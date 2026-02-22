@@ -98,19 +98,19 @@ structure ConnectingMapData (GB GF_prev : Type u) where
 /-! ## Standard Homotopy Group Instances -/
 
 /-- ℤ as a homotopy group (for πₙ(Sⁿ) etc.). -/
-def intHomotopyGroupData : HomotopyGroupData Int where
+noncomputable def intHomotopyGroupData : HomotopyGroupData Int where
   zero := 0
   add := (· + ·)
   neg := (- ·)
 
 /-- ℤ/2ℤ (Bool) as a homotopy group (for stable stems etc.). -/
-def boolHomotopyGroupData : HomotopyGroupData Bool where
+noncomputable def boolHomotopyGroupData : HomotopyGroupData Bool where
   zero := false
   add := xor
   neg := id
 
 /-- Trivial group (PUnit) as a homotopy group. -/
-def punitHomotopyGroupData : HomotopyGroupData PUnit where
+noncomputable def punitHomotopyGroupData : HomotopyGroupData PUnit where
   zero := PUnit.unit
   add := fun _ _ => PUnit.unit
   neg := fun _ => PUnit.unit
@@ -143,15 +143,15 @@ Using the long exact sequence, we can derive homotopy groups. Here's the templat
 -/
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Basic Theorem Stubs -/
 
-def inducedMapId (G : Type u) : InducedMapData G G where
+noncomputable def inducedMapId (G : Type u) : InducedMapData G G where
   induced := id
 
-def inducedMapComp {GA GB GC : Type u}
+noncomputable def inducedMapComp {GA GB GC : Type u}
     (f : InducedMapData GA GB) (g : InducedMapData GB GC) : InducedMapData GA GC where
   induced := fun x => g.induced (f.induced x)
 

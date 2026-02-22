@@ -79,13 +79,13 @@ structure SSetMap (X Y : SSet.{u}) where
     Path (mapLevel (n + 1) (X.degen n i x)) (Y.degen n i (mapLevel n x))
 
 /-- Identity simplicial map. -/
-def SSetMap.id (X : SSet.{u}) : SSetMap X X where
+noncomputable def SSetMap.id (X : SSet.{u}) : SSetMap X X where
   mapLevel := fun _ x => x
   map_face := fun _ _ _ => Path.refl _
   map_degen := fun _ _ _ => Path.refl _
 
 /-- Composition of simplicial maps. -/
-def SSetMap.comp {X Y Z : SSet.{u}} (f : SSetMap X Y) (g : SSetMap Y Z) :
+noncomputable def SSetMap.comp {X Y Z : SSet.{u}} (f : SSetMap X Y) (g : SSetMap Y Z) :
     SSetMap X Z where
   mapLevel := fun n x => g.mapLevel n (f.mapLevel n x)
   map_face := fun n i x =>
@@ -156,7 +156,7 @@ structure KanComplex where
 
 /-- Uniqueness of fillers up to Path: two fillers of the same horn
     give Path-related simplices. -/
-def horn_filler_unique (K : KanComplex.{u}) (n : Nat)
+noncomputable def horn_filler_unique (K : KanComplex.{u}) (n : Nat)
     (k : Fin (n + 2)) (h : Horn K.sset n k)
     (f₁ f₂ : HornFiller K.sset n k h)
     (i : Fin (n + 2)) (hi : i ≠ k) :
@@ -166,7 +166,7 @@ def horn_filler_unique (K : KanComplex.{u}) (n : Nat)
 /-! ## Quasi-Categories -/
 
 /-- An inner horn is a horn Λ^n_k with 0 < k < n+1. -/
-def isInnerHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
+noncomputable def isInnerHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
   0 < k.val ∧ k.val < n + 1
 
 /-- A quasi-category (∞-category): inner horns have fillers. -/
@@ -179,7 +179,7 @@ structure QuasiCategory where
     ∀ (h : Horn sset n k), HornFiller sset n k h
 
 /-- Every Kan complex is a quasi-category. -/
-def KanComplex.toQuasiCategory (K : KanComplex.{u}) : QuasiCategory.{u} where
+noncomputable def KanComplex.toQuasiCategory (K : KanComplex.{u}) : QuasiCategory.{u} where
   sset := K.sset
   innerFill := fun n k _ h => K.fill n k h
 
@@ -223,7 +223,7 @@ structure QCComposition (Q : QuasiCategory.{u})
   comp_target : Path (Q.sset.face 0 0 composite) z
 
 /-- Path.trans gives transitivity of source/target witnesses. -/
-def comp_source_target (Q : QuasiCategory.{u})
+noncomputable def comp_source_target (Q : QuasiCategory.{u})
     {x y z : Q.sset.simp 0} (c : QCComposition Q x y z) :
     Path (Q.sset.face 0 0 c.f) (Q.sset.face 0 1 c.g) :=
   Path.trans c.f_target (Path.symm c.g_source)
@@ -252,7 +252,7 @@ structure InfinityAdj (C D : QuasiCategory.{u}) where
 
 /-- Triangle identity for adjunctions: if counit is an equivalence,
     then L(R(L(x))) ≃ L(x). We witness this via the counit data. -/
-def triangle_identity_left {C D : QuasiCategory.{u}}
+noncomputable def triangle_identity_left {C D : QuasiCategory.{u}}
     (adj : InfinityAdj C D) (x : C.sset.simp 0)
     (h : D.sset.face 0 1 (adj.counit (adj.leftAdj x)) =
          D.sset.face 0 0 (adj.counit (adj.leftAdj x))) :

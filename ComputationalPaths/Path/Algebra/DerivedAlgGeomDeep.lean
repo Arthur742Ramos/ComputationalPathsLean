@@ -51,16 +51,16 @@ structure SCRHom (R S : SCR.{u}) where
   face_compat : (n : Nat) → (i : Fin (n + 2)) → (x : R.ring.carrier (n + 1)) →
     ringHom.map n (R.faces.face n i x) = S.faces.face n i (ringHom.map (n + 1) x)
 
-def pi0 (R : SCR.{u}) : Type u := R.ring.carrier 0
+noncomputable def pi0 (R : SCR.{u}) : Type u := R.ring.carrier 0
 
-def pi0_map {R S : SCR.{u}} (f : SCRHom R S) : pi0 R → pi0 S :=
+noncomputable def pi0_map {R S : SCR.{u}} (f : SCRHom R S) : pi0 R → pi0 S :=
   f.ringHom.map 0
 
-def scrIdHom (R : SCR.{u}) : SCRHom R R where
+noncomputable def scrIdHom (R : SCR.{u}) : SCRHom R R where
   ringHom := { map := fun _ x => x, map_zero := fun _ => rfl, map_add := fun _ _ => rfl }
   face_compat := fun _ _ _ => rfl
 
-def scrComp {R S T : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T) : SCRHom R T where
+noncomputable def scrComp {R S T : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T) : SCRHom R T where
   ringHom := {
     map := fun n x => g.ringHom.map n (f.ringHom.map n x)
     map_zero := fun n => by rw [f.ringHom.map_zero, g.ringHom.map_zero]
@@ -72,29 +72,29 @@ def scrComp {R S T : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T) : SCRHom R T whe
     rw [f.face_compat, g.face_compat]
 
 -- 1. π₀ functoriality — composition
-def pi0_map_comp {R S T : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T)
+noncomputable def pi0_map_comp {R S T : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T)
     (x : pi0 R) : Path (pi0_map g (pi0_map f x)) (pi0_map (scrComp f g) x) :=
   Path.refl _
 
 -- 2. π₀ functoriality — identity
-def pi0_map_id (R : SCR.{u}) (x : pi0 R) :
+noncomputable def pi0_map_id (R : SCR.{u}) (x : pi0 R) :
     Path (pi0_map (scrIdHom R) x) x :=
   Path.refl _
 
 -- 3. Left identity
-def scr_comp_left_id {R S : SCR.{u}} (f : SCRHom R S) (n : Nat)
+noncomputable def scr_comp_left_id {R S : SCR.{u}} (f : SCRHom R S) (n : Nat)
     (x : R.ring.carrier n) :
     Path ((scrComp (scrIdHom R) f).ringHom.map n x) (f.ringHom.map n x) :=
   Path.refl _
 
 -- 4. Right identity
-def scr_comp_right_id {R S : SCR.{u}} (f : SCRHom R S) (n : Nat)
+noncomputable def scr_comp_right_id {R S : SCR.{u}} (f : SCRHom R S) (n : Nat)
     (x : R.ring.carrier n) :
     Path ((scrComp f (scrIdHom S)).ringHom.map n x) (f.ringHom.map n x) :=
   Path.refl _
 
 -- 5. Associativity
-def scr_comp_assoc {R S T U : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T) (h : SCRHom T U)
+noncomputable def scr_comp_assoc {R S T U : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T) (h : SCRHom T U)
     (n : Nat) (x : R.ring.carrier n) :
     Path ((scrComp (scrComp f g) h).ringHom.map n x)
          ((scrComp f (scrComp g h)).ringHom.map n x) :=
@@ -114,13 +114,13 @@ structure CotangentMor {A B A' B' : SCR.{u}}
     mapMod n (L.diff n x) = L'.diff n (mapMod (n + 1) x)
 
 -- 6. Identity cotangent morphism
-def cotangentIdMor {A B : SCR.{u}} (L : CotangentComplex A B) :
+noncomputable def cotangentIdMor {A B : SCR.{u}} (L : CotangentComplex A B) :
     CotangentMor L L where
   mapMod := fun _ x => x
   chain_compat := fun _ _ => rfl
 
 -- 7. Cotangent morphism composition
-def cotangentComp {A B A' B' A'' B'' : SCR.{u}}
+noncomputable def cotangentComp {A B A' B' A'' B'' : SCR.{u}}
     {L : CotangentComplex A B} {L' : CotangentComplex A' B'}
     {L'' : CotangentComplex A'' B''}
     (f : CotangentMor L L') (g : CotangentMor L' L'') :
@@ -129,21 +129,21 @@ def cotangentComp {A B A' B' A'' B'' : SCR.{u}}
   chain_compat := fun n x => by rw [f.chain_compat, g.chain_compat]
 
 -- 8. Left-unit
-def cotangent_id_comp {A B A' B' : SCR.{u}}
+noncomputable def cotangent_id_comp {A B A' B' : SCR.{u}}
     {L : CotangentComplex A B} {L' : CotangentComplex A' B'}
     (f : CotangentMor L L') (n : Nat) (x : L.module n) :
     Path ((cotangentComp (cotangentIdMor L) f).mapMod n x) (f.mapMod n x) :=
   Path.refl _
 
 -- 9. Right-unit
-def cotangent_comp_id {A B A' B' : SCR.{u}}
+noncomputable def cotangent_comp_id {A B A' B' : SCR.{u}}
     {L : CotangentComplex A B} {L' : CotangentComplex A' B'}
     (f : CotangentMor L L') (n : Nat) (x : L.module n) :
     Path ((cotangentComp f (cotangentIdMor L')).mapMod n x) (f.mapMod n x) :=
   Path.refl _
 
 -- 10. Associativity
-def cotangent_comp_assoc {A1 B1 A2 B2 A3 B3 A4 B4 : SCR.{u}}
+noncomputable def cotangent_comp_assoc {A1 B1 A2 B2 A3 B3 A4 B4 : SCR.{u}}
     {L1 : CotangentComplex A1 B1} {L2 : CotangentComplex A2 B2}
     {L3 : CotangentComplex A3 B3} {L4 : CotangentComplex A4 B4}
     (f : CotangentMor L1 L2) (g : CotangentMor L2 L3) (h : CotangentMor L3 L4)
@@ -153,7 +153,7 @@ def cotangent_comp_assoc {A1 B1 A2 B2 A3 B3 A4 B4 : SCR.{u}}
   Path.refl _
 
 -- 11. Chain map via congrArg + trans
-def chain_trans_path {A B A' B' A'' B'' : SCR.{u}}
+noncomputable def chain_trans_path {A B A' B' A'' B'' : SCR.{u}}
     {L1 : CotangentComplex A B} {L2 : CotangentComplex A' B'}
     {L3 : CotangentComplex A'' B''}
     (f : CotangentMor L1 L2) (g : CotangentMor L2 L3)
@@ -165,14 +165,14 @@ def chain_trans_path {A B A' B' A'' B'' : SCR.{u}}
     (Path.mk [] (g.chain_compat n (f.mapMod (n + 1) x)))
 
 -- 12. Symmetry of chain compatibility
-def cotangent_chain_symm {A B A' B' : SCR.{u}}
+noncomputable def cotangent_chain_symm {A B A' B' : SCR.{u}}
     {L1 : CotangentComplex A B} {L2 : CotangentComplex A' B'}
     (f : CotangentMor L1 L2) (n : Nat) (x : L1.module (n + 1)) :
     Path (L2.diff n (f.mapMod (n + 1) x)) (f.mapMod n (L1.diff n x)) :=
   Path.symm (Path.mk [] (f.chain_compat n x))
 
 -- 13. Chain compatibility from composition
-def cotangent_chain_comp {A B A' B' A'' B'' : SCR.{u}}
+noncomputable def cotangent_chain_comp {A B A' B' A'' B'' : SCR.{u}}
     {L1 : CotangentComplex A B} {L2 : CotangentComplex A' B'}
     {L3 : CotangentComplex A'' B''}
     (f : CotangentMor L1 L2) (g : CotangentMor L2 L3)
@@ -192,12 +192,12 @@ structure SqZeroExt (B : SCR.{u}) where
     Path (proj.ringHom.map n (sect n x)) x
 
 -- 14. Retraction path
-def sqzero_retract_path {B : SCR.{u}} (e : SqZeroExt B) (n : Nat) (x : B.ring.carrier n) :
+noncomputable def sqzero_retract_path {B : SCR.{u}} (e : SqZeroExt B) (n : Nat) (x : B.ring.carrier n) :
     Path (e.proj.ringHom.map n (e.sect n x)) x :=
   e.retract n x
 
 -- 15. Double retraction via trans
-def sqzero_double_retract {B : SCR.{u}} (e : SqZeroExt B) (n : Nat) (x : B.ring.carrier n) :
+noncomputable def sqzero_double_retract {B : SCR.{u}} (e : SqZeroExt B) (n : Nat) (x : B.ring.carrier n) :
     Path (e.proj.ringHom.map n (e.sect n (e.proj.ringHom.map n (e.sect n x)))) x :=
   Path.trans
     (Path.congrArg (fun y => e.proj.ringHom.map n (e.sect n y)) (e.retract n x))
@@ -215,7 +215,7 @@ structure PostnikovMap (R : SCR.{u}) (n : Nat)
   connecting : SCRHom Pn.trunc Pn'.trunc
 
 -- 16. Adjacent Postnikov levels
-def postnikov_connected {R : SCR.{u}} {n : Nat}
+noncomputable def postnikov_connected {R : SCR.{u}} {n : Nat}
     (Pn1 : PostnikovTrunc R (n + 1)) (Pn : PostnikovTrunc R n)
     (_conn : PostnikovMap R n Pn1 Pn)
     (k : Nat) (hk : n < k) (x y : Pn.trunc.ring.carrier k) :
@@ -223,7 +223,7 @@ def postnikov_connected {R : SCR.{u}} {n : Nat}
   Pn.truncAbove k hk x y
 
 -- 17. Postnikov truncation trivial one above
-def postnikov_succ_trivial {R : SCR.{u}} {n : Nat}
+noncomputable def postnikov_succ_trivial {R : SCR.{u}} {n : Nat}
     (P : PostnikovTrunc R (n + 1))
     (x y : P.trunc.ring.carrier (n + 2)) :
     Path x y :=
@@ -239,7 +239,7 @@ structure DerivedTensor (A R S : SCR.{u}) where
   overA_right : SCRHom A S
 
 -- 18. Tensor left proj is stable
-def derived_tensor_left_proj {A R S : SCR.{u}} (T : DerivedTensor A R S)
+noncomputable def derived_tensor_left_proj {A R S : SCR.{u}} (T : DerivedTensor A R S)
     (n : Nat) (x : R.ring.carrier n) :
     Path (T.leftMap.ringHom.map n x) (T.leftMap.ringHom.map n x) :=
   Path.refl _
@@ -257,7 +257,7 @@ structure FormallyEtale (A B : SCR.{u}) (_f : SCRHom A B)
   isZero : (n : Nat) → (x : L.module n) → (y : L.module n) → Path x y
 
 -- 19. Étale ⟹ contractible cotangent
-def etale_cotangent_contractible {A B : SCR.{u}} {f : SCRHom A B}
+noncomputable def etale_cotangent_contractible {A B : SCR.{u}} {f : SCRHom A B}
     {L : CotangentComplex A B} (e : FormallyEtale A B f L)
     (n : Nat) (x y : L.module n) : Path x y :=
   e.isZero n x y
@@ -276,12 +276,12 @@ structure DerivedSchemeMor (X Y : DerivedScheme.{u}) where
   ringMap : (i : X.charts) → SCRHom (Y.ring (chartMap i)) (X.ring i)
 
 -- 20. Identity derived scheme morphism
-def dsIdMor (X : DerivedScheme.{u}) : DerivedSchemeMor X X where
+noncomputable def dsIdMor (X : DerivedScheme.{u}) : DerivedSchemeMor X X where
   chartMap := id
   ringMap := fun i => scrIdHom (X.ring i)
 
 -- 21. Composition
-def dsMorComp {X Y Z : DerivedScheme.{u}}
+noncomputable def dsMorComp {X Y Z : DerivedScheme.{u}}
     (f : DerivedSchemeMor X Y) (g : DerivedSchemeMor Y Z) :
     DerivedSchemeMor X Z where
   chartMap := g.chartMap ∘ f.chartMap
@@ -305,7 +305,7 @@ structure AQDerivation (A B : SCR.{u}) (_f : SCRHom A B) (M : Nat → Type u) wh
     Path (deriv n (B.ring.add x y)) (deriv n x)
 
 -- 22. Zero derivation
-def zeroDerivation (A B : SCR.{u}) (f : SCRHom A B)
+noncomputable def zeroDerivation (A B : SCR.{u}) (f : SCRHom A B)
     (M : Nat → Type u) (mzero : (n : Nat) → M n) : AQDerivation A B f M where
   deriv := fun n _ => mzero n
   leibniz := fun n _ _ => Path.refl (mzero n)
@@ -331,21 +331,21 @@ structure CotangentTransitivity (A B C : SCR.{u})
 /-! ## Additional Deep Theorems -/
 
 -- 23. Face compatibility via congrArg
-def scr_hom_face_path {R S : SCR.{u}} (f : SCRHom R S)
+noncomputable def scr_hom_face_path {R S : SCR.{u}} (f : SCRHom R S)
     (n : Nat) (i : Fin (n + 2)) (x : R.ring.carrier (n + 1)) :
     Path (f.ringHom.map n (R.faces.face n i x))
          (S.faces.face n i (f.ringHom.map (n + 1) x)) :=
   Path.mk [] (f.face_compat n i x)
 
 -- 24. Face compatibility symmetry
-def scr_hom_face_symm {R S : SCR.{u}} (f : SCRHom R S)
+noncomputable def scr_hom_face_symm {R S : SCR.{u}} (f : SCRHom R S)
     (n : Nat) (i : Fin (n + 2)) (x : R.ring.carrier (n + 1)) :
     Path (S.faces.face n i (f.ringHom.map (n + 1) x))
          (f.ringHom.map n (R.faces.face n i x)) :=
   Path.symm (scr_hom_face_path f n i x)
 
 -- 25. Composite face compatibility via trans
-def scr_comp_face_path {R S T : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T)
+noncomputable def scr_comp_face_path {R S T : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T)
     (n : Nat) (i : Fin (n + 2)) (x : R.ring.carrier (n + 1)) :
     Path (g.ringHom.map n (f.ringHom.map n (R.faces.face n i x)))
          (T.faces.face n i (g.ringHom.map (n + 1) (f.ringHom.map (n + 1) x))) :=
@@ -354,20 +354,20 @@ def scr_comp_face_path {R S T : SCR.{u}} (f : SCRHom R S) (g : SCRHom S T)
     (Path.mk [] (g.face_compat n i (f.ringHom.map (n + 1) x)))
 
 -- 26. Graded ring identity hom
-def gradedRingIdHom (R : GradedRing.{u}) : GradedRingHom R R where
+noncomputable def gradedRingIdHom (R : GradedRing.{u}) : GradedRingHom R R where
   map := fun _ x => x
   map_zero := fun _ => rfl
   map_add := fun _ _ => rfl
 
 -- 27. Graded ring composition
-def gradedRingCompHom {R S T : GradedRing.{u}}
+noncomputable def gradedRingCompHom {R S T : GradedRing.{u}}
     (f : GradedRingHom R S) (g : GradedRingHom S T) : GradedRingHom R T where
   map := fun n x => g.map n (f.map n x)
   map_zero := fun n => by rw [f.map_zero, g.map_zero]
   map_add := fun a b => by rw [f.map_add, g.map_add]
 
 -- 28. Graded ring composition associativity
-def gradedRing_comp_assoc {R S T U : GradedRing.{u}}
+noncomputable def gradedRing_comp_assoc {R S T U : GradedRing.{u}}
     (f : GradedRingHom R S) (g : GradedRingHom S T) (h : GradedRingHom T U)
     (n : Nat) (x : R.carrier n) :
     Path ((gradedRingCompHom (gradedRingCompHom f g) h).map n x)
@@ -375,7 +375,7 @@ def gradedRing_comp_assoc {R S T U : GradedRing.{u}}
   Path.refl _
 
 -- 29. Graded composition preserves zero via congrArg + trans
-def gradedRing_zero_trans {R S T : GradedRing.{u}}
+noncomputable def gradedRing_zero_trans {R S T : GradedRing.{u}}
     (f : GradedRingHom R S) (g : GradedRingHom S T) (n : Nat) :
     Path (g.map n (f.map n (R.zero n))) (T.zero n) :=
   Path.trans
@@ -383,23 +383,23 @@ def gradedRing_zero_trans {R S T : GradedRing.{u}}
     (Path.mk [] (g.map_zero n))
 
 -- 30. Symmetry of zero-preservation
-def gradedRing_zero_symm {R S : GradedRing.{u}}
+noncomputable def gradedRing_zero_symm {R S : GradedRing.{u}}
     (f : GradedRingHom R S) (n : Nat) :
     Path (S.zero n) (f.map n (R.zero n)) :=
   Path.symm (Path.mk [] (f.map_zero n))
 
 -- 31. π₀ preserves zero via Path.mk
-def pi0_map_zero {R S : SCR.{u}} (f : SCRHom R S) :
+noncomputable def pi0_map_zero {R S : SCR.{u}} (f : SCRHom R S) :
     Path (pi0_map f (R.ring.zero 0)) (S.ring.zero 0) :=
   Path.mk [] (f.ringHom.map_zero 0)
 
 -- 32. π₀ preserves add via Path.mk
-def pi0_map_add {R S : SCR.{u}} (f : SCRHom R S) (a b : pi0 R) :
+noncomputable def pi0_map_add {R S : SCR.{u}} (f : SCRHom R S) (a b : pi0 R) :
     Path (pi0_map f (R.ring.add a b)) (S.ring.add (pi0_map f a) (pi0_map f b)) :=
   Path.mk [] (f.ringHom.map_add a b)
 
 -- 33. Graded composition preserves zero (direct)
-def gradedRing_comp_zero {R S T : GradedRing.{u}}
+noncomputable def gradedRing_comp_zero {R S T : GradedRing.{u}}
     (f : GradedRingHom R S) (g : GradedRingHom S T) (n : Nat) :
     Path ((gradedRingCompHom f g).map n (R.zero n)) (T.zero n) :=
   Path.mk [] ((gradedRingCompHom f g).map_zero n)
@@ -413,7 +413,7 @@ theorem cotangent_symm_symm {A B A' B' : SCR.{u}}
   simp [Path.symm]
 
 -- 35. Triple chain composition
-def triple_chain_comp {A1 B1 A2 B2 A3 B3 A4 B4 : SCR.{u}}
+noncomputable def triple_chain_comp {A1 B1 A2 B2 A3 B3 A4 B4 : SCR.{u}}
     {L1 : CotangentComplex A1 B1} {L2 : CotangentComplex A2 B2}
     {L3 : CotangentComplex A3 B3} {L4 : CotangentComplex A4 B4}
     (f : CotangentMor L1 L2) (g : CotangentMor L2 L3) (h : CotangentMor L3 L4)

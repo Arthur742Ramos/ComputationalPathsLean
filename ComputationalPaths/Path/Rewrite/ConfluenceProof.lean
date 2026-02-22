@@ -87,7 +87,7 @@ variable {A : Type u}
 /-! ## Helper Lemmas -/
 
 /-- Identity context for use with context-based rules. -/
-@[simp] def idContext (A : Type u) : Context A A := ⟨id⟩
+@[simp] noncomputable def idContext (A : Type u) : Context A A := ⟨id⟩
 
 /-- `Context.map idContext p = p` (specialization of congrArg_id). -/
 @[simp] theorem map_idContext {a b : A} (p : Path a b) :
@@ -102,7 +102,7 @@ variable {A : Type u}
 /-- Step that re-associates a cancellation pattern.
     `p · (symm(p) · q) → (p · symm(p)) · q`
     This is `context_tt_cancel_left` specialized to the identity context. -/
-def step_cancel_left_reassoc {a b c : A} (p : Path a b) (q : Path a c) :
+noncomputable def step_cancel_left_reassoc {a b c : A} (p : Path a b) (q : Path a c) :
     Step (Path.trans p (Path.trans (Path.symm p) q))
          (Path.trans (Path.trans p (Path.symm p)) q) := by
   have ctx_step := Step.context_tt_cancel_left (idContext A) p q
@@ -113,7 +113,7 @@ def step_cancel_left_reassoc {a b c : A} (p : Path a b) (q : Path a c) :
 
 /-- Step that re-associates a symmetric cancellation pattern.
     `symm(p) · (p · q) → (symm(p) · p) · q`  -/
-def step_cancel_right_reassoc {a b c : A} (p : Path a b) (q : Path b c) :
+noncomputable def step_cancel_right_reassoc {a b c : A} (p : Path a b) (q : Path b c) :
     Step (Path.trans (Path.symm p) (Path.trans p q))
          (Path.trans (Path.trans (Path.symm p) p) q) := by
   -- Use context_tt_cancel_left with symm(p) in place of p
@@ -133,7 +133,7 @@ We reuse the standard congruence lemmas from `Rw.lean`, except for the
 symmetry congruence which we define there as `rw_symm_congr`. -/
 
 /-- Steps at left and right positions of a trans commute. -/
-def commute_trans_left_right {a b c : A} {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+noncomputable def commute_trans_left_right {a b c : A} {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (hp : Step p₁ p₂) (hq : Step q₁ q₂) :
     Confluence.Join
       (Path.trans p₂ q₁)  -- applied left step
@@ -144,7 +144,7 @@ def commute_trans_left_right {a b c : A} {p₁ p₂ : Path a b} {q₁ q₂ : Pat
   , right := Rw.tail (Rw.refl _) (Step.trans_congr_left q₂ hp) }
 
 /-- Two steps on the left component of trans: lift the join. -/
-def join_lift_trans_left {a b c : A} {p₁ p₂ : Path a b} (r : Path b c)
+noncomputable def join_lift_trans_left {a b c : A} {p₁ p₂ : Path a b} (r : Path b c)
     (hj : Confluence.Join p₁ p₂) :
     Confluence.Join (Path.trans p₁ r) (Path.trans p₂ r) :=
   { meet := Path.trans hj.meet r
@@ -152,7 +152,7 @@ def join_lift_trans_left {a b c : A} {p₁ p₂ : Path a b} (r : Path b c)
   , right := rw_trans_congr_left r hj.right }
 
 /-- Two steps on the right component of trans: lift the join. -/
-def join_lift_trans_right {a b c : A} (p : Path a b) {q₁ q₂ : Path b c}
+noncomputable def join_lift_trans_right {a b c : A} (p : Path a b) {q₁ q₂ : Path b c}
     (hj : Confluence.Join q₁ q₂) :
     Confluence.Join (Path.trans p q₁) (Path.trans p q₂) :=
   { meet := Path.trans p hj.meet
@@ -160,28 +160,28 @@ def join_lift_trans_right {a b c : A} (p : Path a b) {q₁ q₂ : Path b c}
   , right := rw_trans_congr_right p hj.right }
 
 /-- Lift a join through symm_congr. -/
-def join_lift_symm {a b : A} {p q : Path a b} (hj : Confluence.Join p q) :
+noncomputable def join_lift_symm {a b : A} {p q : Path a b} (hj : Confluence.Join p q) :
     Confluence.Join (Path.symm p) (Path.symm q) :=
   { meet := Path.symm hj.meet
   , left := rw_symm_congr hj.left
   , right := rw_symm_congr hj.right }
 
 /-- Direct join construction when both steps result in the same path. -/
-@[simp] def join_eq {a b : A} {p q : Path a b} (h : Path p q) :
+@[simp] noncomputable def join_eq {a b : A} {p q : Path a b} (h : Path p q) :
     Confluence.Join p q :=
   { meet := p
   , left := Rw.refl p
   , right := rw_of_eq h.toEq.symm }
 
 /-- Join from definitional equality. -/
-@[simp] def join_rfl {a b : A} (p : Path a b) :
+@[simp] noncomputable def join_rfl {a b : A} (p : Path a b) :
     Confluence.Join p p :=
   { meet := p
   , left := Rw.refl p
   , right := Rw.refl p }
 
 /-- Extend a join by applying additional steps. -/
-@[simp] def join_extend_left {a b : A} {p q r : Path a b} {_s : Path a b}
+@[simp] noncomputable def join_extend_left {a b : A} {p q r : Path a b} {_s : Path a b}
     (j : Confluence.Join p q) (hs : Rw r j.meet) (hp : Path r p) :
     Confluence.Join p q :=
   { meet := j.meet
@@ -189,7 +189,7 @@ def join_lift_symm {a b : A} {p q : Path a b} (hj : Confluence.Join p q) :
   , right := j.right }
 
 /-- Build a join when one side already reduces to the other's target. -/
-@[simp] def join_of_rw_to_same {a b : A} {p q : Path a b} {_r : Path a b} {s : Path a b}
+@[simp] noncomputable def join_of_rw_to_same {a b : A} {p q : Path a b} {_r : Path a b} {s : Path a b}
     (hq : Rw p s) (hr : Rw q s) :
     Confluence.Join p q :=
   { meet := s
@@ -207,7 +207,7 @@ variable {a b c d : A}
     Via assoc: `p · (q · refl)`
     Via rrr on outer: `p · q`
     Join: Both reach `p · q` (the second via `trans_refl_right` on inner). -/
-def local_confluence_tt_rrr (p : Path a b) (q : Path b c) :
+noncomputable def local_confluence_tt_rrr (p : Path a b) (q : Path b c) :
     Confluence.Join
       (Path.trans p (Path.trans q (Path.refl c)))  -- via trans_assoc
       (Path.trans p q)  -- via trans_refl_right
@@ -222,7 +222,7 @@ def local_confluence_tt_rrr (p : Path a b) (q : Path b c) :
     Via assoc: `refl · (q · r)`
     Via lrr on inner: `q · r`
     Join: Both reach `q · r`. -/
-def local_confluence_tt_lrr (q : Path a b) (r : Path b c) :
+noncomputable def local_confluence_tt_lrr (q : Path a b) (r : Path b c) :
     Confluence.Join
       (Path.trans (Path.refl a) (Path.trans q r))  -- via trans_assoc
       (Path.trans q r)  -- via trans_refl_left
@@ -234,7 +234,7 @@ def local_confluence_tt_lrr (q : Path a b) (r : Path b c) :
 /-- Critical pair: Nested associativity
     Source: `(((p · q) · r) · s)`
     Two ways to apply trans_assoc. -/
-def local_confluence_tt_tt (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def local_confluence_tt_tt (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Confluence.Join
       (Path.trans (Path.trans p (Path.trans q r)) s)  -- inner assoc first: (p · (q · r)) · s
       (Path.trans (Path.trans p q) (Path.trans r s))  -- outer assoc first: (p · q) · (r · s)
@@ -260,7 +260,7 @@ variable {a b c : A}
     Via symm_symm: `refl`
     Via symm applied to symm_refl: `symm(refl)` → need to then apply symm_refl
     Join: Both reach `refl`. -/
-def local_confluence_ss_sr (a : A) :
+noncomputable def local_confluence_ss_sr (a : A) :
     Confluence.Join
       (Path.refl a)  -- via symm_symm
       (Path.symm (Path.refl a))  -- via symm_congr of symm_refl
@@ -277,7 +277,7 @@ def local_confluence_ss_sr (a : A) :
     Via symm_congr of symm_trans_congr: `symm(symm(q) · symm(p))`
     Join: The second needs `symm_trans_congr` then `symm_symm` twice.
 -/
-def local_confluence_ss_stss (p : Path a b) (q : Path b c) :
+noncomputable def local_confluence_ss_stss (p : Path a b) (q : Path b c) :
     Confluence.Join
       (Path.trans p q)  -- via symm_symm
       (Path.symm (Path.trans (Path.symm q) (Path.symm p)))  -- via symm_congr ∘ symm_trans_congr
@@ -306,7 +306,7 @@ variable {a b c : A}
     Via assoc: `p · (symm(p) · q)`
     Via trans_symm on inner: `refl · q`
     Join: Both reach `q`. -/
-def local_confluence_tt_ts (p : Path a b) (q : Path a c) :
+noncomputable def local_confluence_tt_ts (p : Path a b) (q : Path a c) :
     Confluence.Join
       (Path.trans p (Path.trans (Path.symm p) q))  -- via trans_assoc
       (Path.trans (Path.refl a) q)  -- via trans_symm then still have outer trans
@@ -325,7 +325,7 @@ def local_confluence_tt_ts (p : Path a b) (q : Path a c) :
     Via assoc: `symm(p) · (p · q)`
     Via symm_trans on inner: `refl · q`
     Join: Both reach `q`. -/
-def local_confluence_tt_st (p : Path a b) (q : Path b c) :
+noncomputable def local_confluence_tt_st (p : Path a b) (q : Path b c) :
     Confluence.Join
       (Path.trans (Path.symm p) (Path.trans p q))  -- via trans_assoc
       (Path.trans (Path.refl b) q)  -- via symm_trans on inner, keeping outer trans
@@ -359,7 +359,7 @@ the full rewrite system using the global `toEq`-confluence bridge.
 -/
 
 /-- Tier 1: associativity/unit critical-pair families are joinable. -/
-def AssocUnitTierCertificate : Prop :=
+noncomputable def AssocUnitTierCertificate : Prop :=
   (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
       Nonempty (Confluence.Join (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q))) ∧
   (∀ {A : Type u} {a b c : A} (q : Path a b) (r : Path b c),
@@ -370,7 +370,7 @@ def AssocUnitTierCertificate : Prop :=
         (Path.trans (Path.trans p q) (Path.trans r s))))
 
 /-- Tier 2: symmetry critical-pair families are joinable. -/
-def SymmetryTierCertificate : Prop :=
+noncomputable def SymmetryTierCertificate : Prop :=
   (∀ {A : Type u} (a : A),
       Nonempty (Confluence.Join (Path.refl a) (Path.symm (Path.refl a)))) ∧
   (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
@@ -379,7 +379,7 @@ def SymmetryTierCertificate : Prop :=
         (Path.symm (Path.trans (Path.symm q) (Path.symm p)))))
 
 /-- Tier 3: inverse/cancellation critical-pair families are joinable. -/
-def InverseTierCertificate : Prop :=
+noncomputable def InverseTierCertificate : Prop :=
   (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path a c),
       Nonempty (Confluence.Join
         (Path.trans p (Path.trans (Path.symm p) q))
@@ -390,7 +390,7 @@ def InverseTierCertificate : Prop :=
         (Path.trans (Path.refl b) q)))
 
 /-- Tier 4: independent congruence steps commute and therefore close peaks. -/
-def CongruenceTierCertificate : Prop :=
+noncomputable def CongruenceTierCertificate : Prop :=
   ∀ {A : Type u} {a b c : A} {p₁ p₂ : Path a b} {q₁ q₂ : Path b c},
     Step p₁ p₂ → Step q₁ q₂ →
       Nonempty (Confluence.Join (Path.trans p₂ q₁) (Path.trans p₁ q₂))
@@ -431,7 +431,7 @@ theorem congruence_tier_certificate :
   exact ⟨commute_trans_left_right (A := A) hp hq⟩
 
 /-- Layered modular decomposition theorem for the full `Step` system. -/
-def LayeredStepConfluenceCertificate : Prop :=
+noncomputable def LayeredStepConfluenceCertificate : Prop :=
   AssocUnitTierCertificate.{u} ∧
   SymmetryTierCertificate.{u} ∧
   InverseTierCertificate.{u} ∧
@@ -497,7 +497,7 @@ theorem full_step_confluence_toEq_layered
 /-! ## Rw utilities -/
 
 /-- Transitivity for Rw (append two derivations). -/
-def rw_append {a b : A} {p q r : Path a b} (h1 : Rw p q) (h2 : Rw q r) : Rw p r := by
+noncomputable def rw_append {a b : A} {p q r : Path a b} (h1 : Rw p q) (h2 : Rw q r) : Rw p r := by
   induction h2 with
   | refl => exact h1
   | tail _ step ih => exact Rw.tail ih step
@@ -554,7 +554,7 @@ making `RwPlus` reflexive and hence non-well-founded as a relation on
 
 `Terminating` records that the abstract TRS terminates: specifically, that
 `GroupoidTRS.Expr.Step` is well-founded. -/
-def Terminating : Prop :=
+noncomputable def Terminating : Prop :=
   WellFounded (fun q p : GroupoidTRS.Expr => GroupoidTRS.Expr.Step p q)
 
 class HasTerminationProp : Prop where
@@ -567,7 +567,7 @@ This is a genuine termination proof using the polynomial weight function
 combined lexicographically with the left-association weight
 `lw(trans e₁ e₂) = lw(e₁) + lw(e₂) + size(e₁)`. Every rewrite step
 strictly decreases this measure. -/
-instance instHasTerminationProp : HasTerminationProp where
+noncomputable instance instHasTerminationProp : HasTerminationProp where
   termination_prop := GroupoidTRS.Expr.termination
 
 theorem termination_prop_of [HasTerminationProp] :
@@ -616,7 +616,7 @@ abstract `Expr` syntax. The proof constructs an explicit homomorphism
 `CStep`, and derives confluence from the uniqueness of reduced words.
 
 No `Step.canon`, no `step_drop`, no UIP, no proof irrelevance. -/
-instance instHasConfluencePropExpr : HasConfluencePropExpr where
+noncomputable instance instHasConfluencePropExpr : HasConfluencePropExpr where
   confluence := GroupoidConfluence.confluence
 
 /-! ### Path-level `HasConfluenceProp` (backward compatibility)

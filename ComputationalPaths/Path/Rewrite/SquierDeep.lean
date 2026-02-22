@@ -53,7 +53,7 @@ structure SquierFiniteDerivationType where
   critical_resolves : ∀ c, c ∈ criticalGenerators → c.Statement
 
 /-- Canonical FDT witness from the 78-step catalogue and critical-pair resolutions. -/
-def squierFDT : SquierFiniteDerivationType where
+noncomputable def squierFDT : SquierFiniteDerivationType where
   stepGenerators := allStepRules
   criticalGenerators := allCriticalPairs
   step_complete := allStepRules_complete
@@ -71,7 +71,7 @@ theorem squier_generates_all_rweq {A : Type u} {a b : A} {p q : Path a b}
 /-! ## Homotopy basis via critical pairs -/
 
 /-- The homotopy basis consists of all enumerated critical-pair cases. -/
-def homotopyBasis : List CriticalPairCase := allCriticalPairs
+noncomputable def homotopyBasis : List CriticalPairCase := allCriticalPairs
 
 theorem homotopyBasis_resolves :
     ∀ c ∈ homotopyBasis, c.Statement := by
@@ -90,10 +90,10 @@ theorem homotopyBasis_decompose_rweq {A : Type u} {a b : A} {p q : Path a b}
 /-! ## Finiteness bound -/
 
 /-- Bound on overlap positions per critical pair (root vs inner overlap). -/
-def overlapPositionBound : Nat := 2
+noncomputable def overlapPositionBound : Nat := 2
 
 /-- Global bound: `#criticalPairs × #overlapPositions`. -/
-def homotopyBasisUpperBound : Nat := allCriticalPairs.length * overlapPositionBound
+noncomputable def homotopyBasisUpperBound : Nat := allCriticalPairs.length * overlapPositionBound
 
 theorem homotopyBasis_finite_bound :
     homotopyBasis.length ≤ allCriticalPairs.length * overlapPositionBound := by
@@ -111,10 +111,10 @@ theorem homotopyBasis_bound_eval : homotopyBasisUpperBound = 66 := by
 structure PresentedMonoid where
   Carrier : Type u
 
-def HasFDT (_M : PresentedMonoid) : Prop :=
+noncomputable def HasFDT (_M : PresentedMonoid) : Prop :=
   ∃ rules : List StepRule, rules.length = 78
 
-def TypeFP3 (_M : PresentedMonoid) : Prop :=
+noncomputable def TypeFP3 (_M : PresentedMonoid) : Prop :=
   ∃ n : Nat, homotopyBasis.length ≤ n
 
 theorem fdt_implies_typeFP3 (M : PresentedMonoid) :
@@ -123,7 +123,7 @@ theorem fdt_implies_typeFP3 (M : PresentedMonoid) :
   rcases hFDT with ⟨_, _⟩
   exact ⟨allCriticalPairs.length * overlapPositionBound, homotopyBasis_finite_bound⟩
 
-def computationalPathMonoid : PresentedMonoid := ⟨Unit⟩
+noncomputable def computationalPathMonoid : PresentedMonoid := ⟨Unit⟩
 
 theorem computationalPathMonoid_hasFDT : HasFDT computationalPathMonoid :=
   ⟨allStepRules, allStepRules_count⟩

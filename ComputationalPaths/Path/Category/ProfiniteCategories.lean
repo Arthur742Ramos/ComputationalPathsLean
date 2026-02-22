@@ -100,11 +100,11 @@ structure BoolAlg where
   compl_join : ∀ a, join a (compl a) = top
 
 /-- The Stone space of a Boolean algebra. -/
-def StoneSpace (_ : BoolAlg) : ProfiniteSet :=
+noncomputable def StoneSpace (_ : BoolAlg) : ProfiniteSet :=
   ⟨Unit, trivial, trivial⟩
 
 /-- The clopen algebra of a profinite set. -/
-def ClopenAlgebra (_ : ProfiniteSet) : BoolAlg where
+noncomputable def ClopenAlgebra (_ : ProfiniteSet) : BoolAlg where
   carrier := Unit
   top := ()
   bot := ()
@@ -326,10 +326,10 @@ structure ProfiniteHomotopyType where
   underlying : Type u
   completeness : True
 
-def isStoneDualityFormalized : Prop :=
+noncomputable def isStoneDualityFormalized : Prop :=
   True
 
-def hasLightCondensedEnhancement : Prop :=
+noncomputable def hasLightCondensedEnhancement : Prop :=
   True
 
 /-! ## Additional Theorems -/
@@ -414,29 +414,29 @@ theorem light_condensed_enhancement_exists : hasLightCondensedEnhancement := by
 
 /-! ## Computational-path profinite integration -/
 
-def proObjectInversePathSystem (Obj : Type u) (P : ProObject Obj) : Type _ :=
+noncomputable def proObjectInversePathSystem (Obj : Type u) (P : ProObject Obj) : Type _ :=
   (i : P.index) → Path (P.objects i) (P.objects i)
 
-def proObjectInversePathSystem_base (Obj : Type u) (P : ProObject Obj) :
+noncomputable def proObjectInversePathSystem_base (Obj : Type u) (P : ProObject Obj) :
     proObjectInversePathSystem Obj P :=
   fun i => Path.refl (P.objects i)
 
-def profiniteCompletionPathCompletion (G : Type u) (C : ProfiniteCompletion G) :
+noncomputable def profiniteCompletionPathCompletion (G : Type u) (C : ProfiniteCompletion G) :
     Path C C :=
   Path.refl C
 
-def stoneDualityPathSpace (B : BoolAlg) : Type _ :=
+noncomputable def stoneDualityPathSpace (B : BoolAlg) : Type _ :=
   Path (StoneSpace (ClopenAlgebra (StoneSpace B))) (StoneSpace B)
 
-def stoneDualityPathWitness (B : BoolAlg) : stoneDualityPathSpace B :=
+noncomputable def stoneDualityPathWitness (B : BoolAlg) : stoneDualityPathSpace B :=
   Path.refl _
 
-def proObjectPathCompose (Obj : Type u) (P : ProObject Obj) (i : P.index)
+noncomputable def proObjectPathCompose (Obj : Type u) (P : ProObject Obj) (i : P.index)
     (p q : Path (P.objects i) (P.objects i)) :
     Path (P.objects i) (P.objects i) :=
   Path.trans p q
 
-def profinitePathRewrite {Obj : Type u} {x y : Obj}
+noncomputable def profinitePathRewrite {Obj : Type u} {x y : Obj}
     (p q : Path x y) : Prop :=
   Path.toEq p = Path.toEq q
 

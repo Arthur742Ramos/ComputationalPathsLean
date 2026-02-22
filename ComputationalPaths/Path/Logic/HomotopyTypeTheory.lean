@@ -55,21 +55,21 @@ structure PathEquiv (A B : Type u) where
   left_inv : (a : A) → Path (invFun (toFun a)) a
 
 /-- Identity equivalence. -/
-def PathEquiv.idEquiv (A : Type u) : PathEquiv A A where
+noncomputable def PathEquiv.idEquiv (A : Type u) : PathEquiv A A where
   toFun := fun a => a
   invFun := fun a => a
   right_inv := fun b => Path.refl b
   left_inv := fun a => Path.refl a
 
 /-- Inverse equivalence. -/
-def PathEquiv.inv {A B : Type u} (e : PathEquiv A B) : PathEquiv B A where
+noncomputable def PathEquiv.inv {A B : Type u} (e : PathEquiv A B) : PathEquiv B A where
   toFun := e.invFun
   invFun := e.toFun
   right_inv := e.left_inv
   left_inv := e.right_inv
 
 /-- Composition of equivalences. -/
-def PathEquiv.compose {A B C : Type u}
+noncomputable def PathEquiv.compose {A B C : Type u}
     (e₁ : PathEquiv A B) (e₂ : PathEquiv B C) : PathEquiv A C where
   toFun := fun a => e₂.toFun (e₁.toFun a)
   invFun := fun c => e₁.invFun (e₂.invFun c)
@@ -163,14 +163,14 @@ structure HITData where
   pathTgt : pathGens → points
 
 /-- The circle S¹ as a HIT: one point, one loop. -/
-def circleHIT : HITData where
+noncomputable def circleHIT : HITData where
   points := PUnit
   pathGens := PUnit
   pathSrc := fun _ => PUnit.unit
   pathTgt := fun _ => PUnit.unit
 
 /-- The suspension ΣA as a HIT: two points, paths from each a:A. -/
-def suspensionHIT (A : Type u) : HITData where
+noncomputable def suspensionHIT (A : Type u) : HITData where
   points := A ⊕ A
   pathGens := A
   pathSrc := fun a => Sum.inl a

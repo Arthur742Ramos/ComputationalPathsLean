@@ -28,26 +28,26 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a     => .nil a
   | .cons s p  => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
-def Path.congrArg (f : α → β) (lbl : String)
+noncomputable def Path.congrArg (f : α → β) (lbl : String)
     : Path α a b → Path β (f a) (f b)
   | .nil _    => .nil _
   | .cons _ p => .cons (.rule lbl (f _) (f _)) (p.congrArg f lbl)
@@ -105,7 +105,7 @@ inductive Mor where
 deriving DecidableEq, Repr
 
 /-- Functor action on morphisms. -/
-def functorMap (tag : String) : Mor → Mor
+noncomputable def functorMap (tag : String) : Mor → Mor
   | .id x      => .id (tag ++ "(" ++ x ++ ")")
   | .comp f g  => .comp (functorMap tag f) (functorMap tag g)
   | .named n   => .named (tag ++ "(" ++ n ++ ")")
@@ -130,7 +130,7 @@ structure CatEquiv where
   counitIso: Bool      -- G ∘ F ≅ Id
 deriving DecidableEq, Repr
 
-def CatEquiv.isEquiv (e : CatEquiv) : Bool :=
+noncomputable def CatEquiv.isEquiv (e : CatEquiv) : Bool :=
   e.unitIso && e.counitIso
 
 -- 9
@@ -141,7 +141,7 @@ theorem equiv_needs_both (e : CatEquiv) :
 -- 10
 theorem mk_equiv : (CatEquiv.mk "F" "G" true true).isEquiv = true := rfl
 
-def roundTripPath (m : Mor) (fwd bwd : String) :
+noncomputable def roundTripPath (m : Mor) (fwd bwd : String) :
     Path Mor m (functorMap bwd (functorMap fwd m)) :=
   Path.trans
     (.single (.rule ("apply_" ++ fwd) m (functorMap fwd m)))
@@ -153,7 +153,7 @@ theorem roundTripPath_length (m : Mor) (fwd bwd : String) :
     (roundTripPath m fwd bwd).length = 2 := by
   simp [roundTripPath, Path.trans, Path.single, Path.length]
 
-def equivIsoPath (m : Mor) (fwd bwd : String) :
+noncomputable def equivIsoPath (m : Mor) (fwd bwd : String) :
     Path Mor (functorMap bwd (functorMap fwd m)) m :=
   .single (.rule "counit_iso" (functorMap bwd (functorMap fwd m)) m)
 
@@ -175,7 +175,7 @@ structure Adjunction where
   triangle2 : Bool   -- (G ε) ∘ (η G) = id_G
 deriving DecidableEq, Repr
 
-def Adjunction.isValid (adj : Adjunction) : Bool :=
+noncomputable def Adjunction.isValid (adj : Adjunction) : Bool :=
   adj.triangle1 && adj.triangle2
 
 -- 13
@@ -187,7 +187,7 @@ theorem adj_valid_needs_triangles (adj : Adjunction) :
 theorem mk_adjunction_valid :
     (Adjunction.mk "F" "G" (.named "η") (.named "ε") true true).isValid = true := rfl
 
-def adjUnitCounitPath (adj : Adjunction) :
+noncomputable def adjUnitCounitPath (adj : Adjunction) :
     Path Mor adj.unit adj.counit :=
   .single (.rule "adj_transpose" adj.unit adj.counit)
 
@@ -195,7 +195,7 @@ def adjUnitCounitPath (adj : Adjunction) :
 theorem adjUnitCounitPath_len (adj : Adjunction) :
     (adjUnitCounitPath adj).length = 1 := rfl
 
-def trianglePath (adj : Adjunction) :
+noncomputable def trianglePath (adj : Adjunction) :
     Path Mor (Mor.comp adj.counit (functorMap adj.leftAdj adj.unit))
              (Mor.id adj.leftAdj) :=
   let src := Mor.comp adj.counit (functorMap adj.leftAdj adj.unit)
@@ -223,7 +223,7 @@ structure MonadData where
   unitR : Bool       -- μ ∘ ηT = id
 deriving DecidableEq, Repr
 
-def MonadData.isMonad (m : MonadData) : Bool :=
+noncomputable def MonadData.isMonad (m : MonadData) : Bool :=
   m.assoc && m.unitL && m.unitR
 
 -- 17
@@ -236,7 +236,7 @@ theorem mk_monad_valid :
     (MonadData.mk "T" (.named "μ") (.named "η") true true true).isMonad = true := rfl
 
 /-- Beck's theorem sketch: an adjunction yields a monad. -/
-def adjToMonad (adj : Adjunction) : MonadData where
+noncomputable def adjToMonad (adj : Adjunction) : MonadData where
   T     := adj.rightAdj ++ "∘" ++ adj.leftAdj
   mu    := .named ("μ_" ++ adj.leftAdj)
   eta   := adj.unit
@@ -255,10 +255,10 @@ inductive BeckStage where
   | adjunction | monad | algebras | comparison | monadic
 deriving DecidableEq, Repr
 
-def beckStep (a b : BeckStage) : Step BeckStage a b :=
+noncomputable def beckStep (a b : BeckStage) : Step BeckStage a b :=
   .rule "beck" a b
 
-def beckPath : Path BeckStage .adjunction .monadic :=
+noncomputable def beckPath : Path BeckStage .adjunction .monadic :=
   Path.trans
     (Path.trans
       (.single (beckStep .adjunction .monad))
@@ -287,7 +287,7 @@ structure KanExt where
   universal : Bool
 deriving DecidableEq, Repr
 
-def KanExt.isUniversal (k : KanExt) : Bool := k.universal
+noncomputable def KanExt.isUniversal (k : KanExt) : Bool := k.universal
 
 -- 21
 theorem kan_mk_universal :
@@ -297,10 +297,10 @@ theorem kan_mk_universal :
 theorem kan_mk_right_universal :
     (KanExt.mk .right "F" "K" "Ran_K F" true).isUniversal = true := rfl
 
-def kanColimitFormula (k : KanExt) : Mor :=
+noncomputable def kanColimitFormula (k : KanExt) : Mor :=
   Mor.named ("colim_" ++ k.functor ++ "_over_" ++ k.along)
 
-def kanExtPath (k : KanExt) :
+noncomputable def kanExtPath (k : KanExt) :
     Path Mor (Mor.named k.functor) (Mor.named k.result) :=
   Path.trans
     (.single (.rule "kan_setup" (Mor.named k.functor) (kanColimitFormula k)))
@@ -311,7 +311,7 @@ theorem kanExtPath_length (k : KanExt) :
     (kanExtPath k).length = 2 := by
   simp [kanExtPath, kanColimitFormula, Path.trans, Path.single, Path.length]
 
-def kanDualPath (f : String) (along : String) :
+noncomputable def kanDualPath (f : String) (along : String) :
     Path Mor (Mor.named ("Lan_" ++ along ++ " " ++ f))
              (Mor.named ("Ran_" ++ along ++ " " ++ f)) :=
   .single (.rule "kan_duality"
@@ -341,14 +341,14 @@ structure CommaMor where
   commutes : Bool
 deriving DecidableEq, Repr
 
-def CommaMor.isValid (cm : CommaMor) : Bool := cm.commutes
+noncomputable def CommaMor.isValid (cm : CommaMor) : Bool := cm.commutes
 
 -- 25
 theorem comma_mor_valid_iff (cm : CommaMor) :
     cm.isValid = true ↔ cm.commutes = true := by
   simp [CommaMor.isValid]
 
-def commaIdentity (obj : CommaObj) : CommaMor where
+noncomputable def commaIdentity (obj : CommaObj) : CommaMor where
   domObj := obj
   codObj := obj
   srcMor := .id obj.src
@@ -359,7 +359,7 @@ def commaIdentity (obj : CommaObj) : CommaMor where
 theorem commaIdentity_valid (obj : CommaObj) :
     (commaIdentity obj).isValid = true := rfl
 
-def slicePath (obj1 obj2 : CommaObj) :
+noncomputable def slicePath (obj1 obj2 : CommaObj) :
     Path CommaObj obj1 obj2 :=
   .single (.rule "comma_morphism" obj1 obj2)
 
@@ -384,7 +384,7 @@ structure FibMor where
   fiberMor: Mor
 deriving DecidableEq, Repr
 
-def fibIdentity (obj : FibObj) : FibMor where
+noncomputable def fibIdentity (obj : FibObj) : FibMor where
   dom := obj
   cod := obj
   baseMor := .id obj.base
@@ -398,7 +398,7 @@ theorem fibIdentity_base (obj : FibObj) :
 theorem fibIdentity_fiber (obj : FibObj) :
     (fibIdentity obj).fiberMor = .id obj.fiber := rfl
 
-def fibCompose (f g : FibMor) : FibMor where
+noncomputable def fibCompose (f g : FibMor) : FibMor where
   dom := f.dom
   cod := g.cod
   baseMor := .comp f.baseMor g.baseMor
@@ -408,7 +408,7 @@ def fibCompose (f g : FibMor) : FibMor where
 theorem fibCompose_base (f g : FibMor) :
     (fibCompose f g).baseMor = .comp f.baseMor g.baseMor := rfl
 
-def grothendieckPath (f g : FibMor) :
+noncomputable def grothendieckPath (f g : FibMor) :
     Path FibMor f (fibCompose f g) :=
   .single (.rule "grothendieck_compose" f (fibCompose f g))
 
@@ -417,7 +417,7 @@ theorem grothendieckPath_length (f g : FibMor) :
     (grothendieckPath f g).length = 1 := by
   simp [grothendieckPath, Path.single, Path.length]
 
-def grothendieckProjection (fm : FibMor) : Mor := fm.baseMor
+noncomputable def grothendieckProjection (fm : FibMor) : Mor := fm.baseMor
 
 -- 32
 theorem projection_of_identity (obj : FibObj) :
@@ -433,14 +433,14 @@ structure ProfObj where
   value : Nat      -- cardinality of the hom-set
 deriving DecidableEq, Repr
 
-def profIdentity (x : String) : ProfObj where
+noncomputable def profIdentity (x : String) : ProfObj where
   left := x; right := x; value := 1
 
 -- 33
 theorem profIdentity_value (x : String) :
     (profIdentity x).value = 1 := rfl
 
-def profCompose (p q : ProfObj) : ProfObj where
+noncomputable def profCompose (p q : ProfObj) : ProfObj where
   left := p.left; right := q.right; value := p.value * q.value
 
 -- 34
@@ -457,7 +457,7 @@ theorem profCompose_identity_right (x : String) (p : ProfObj) :
     (profCompose p (profIdentity x)).value = p.value := by
   simp [profCompose, profIdentity, Nat.mul_one]
 
-def profPath (p q : ProfObj) :
+noncomputable def profPath (p q : ProfObj) :
     Path ProfObj p (profCompose p q) :=
   .single (.rule "prof_compose" p (profCompose p q))
 
@@ -481,9 +481,9 @@ structure DayObj where
   value : Nat
 deriving DecidableEq, Repr
 
-def dayUnit : DayObj := { name := "I", value := 1 }
+noncomputable def dayUnit : DayObj := { name := "I", value := 1 }
 
-def dayConv (a b : DayObj) : DayObj where
+noncomputable def dayConv (a b : DayObj) : DayObj where
   name := a.name ++ "⊗" ++ b.name
   value := a.value * b.value
 
@@ -506,7 +506,7 @@ theorem dayConv_assoc_value (a b c : DayObj) :
     (dayConv (dayConv a b) c).value = (dayConv a (dayConv b c)).value := by
   simp [dayConv, Nat.mul_assoc]
 
-def dayConvPath (a b : DayObj) :
+noncomputable def dayConvPath (a b : DayObj) :
     Path DayObj a (dayConv a b) :=
   .single (.rule "day_tensor" a (dayConv a b))
 
@@ -515,7 +515,7 @@ theorem dayConvPath_length (a b : DayObj) :
     (dayConvPath a b).length = 1 := by
   simp [dayConvPath, Path.single, Path.length]
 
-def dayAssociatorPath (a b c : DayObj) :
+noncomputable def dayAssociatorPath (a b c : DayObj) :
     Path DayObj (dayConv (dayConv a b) c) (dayConv a (dayConv b c)) :=
   .single (.rule "day_assoc" (dayConv (dayConv a b) c)
                               (dayConv a (dayConv b c)))
@@ -525,7 +525,7 @@ theorem dayAssociatorPath_length (a b c : DayObj) :
     (dayAssociatorPath a b c).length = 1 := by
   simp [dayAssociatorPath, Path.single, Path.length]
 
-def daySymmPath (a b : DayObj) :
+noncomputable def daySymmPath (a b : DayObj) :
     Path DayObj (dayConv a b) (dayConv b a) :=
   .single (.rule "day_symmetry" (dayConv a b) (dayConv b a))
 
@@ -549,10 +549,10 @@ inductive PipeStage where
   | adjunction | monad | beck | kan | profunctor | day | done
 deriving DecidableEq, Repr
 
-def pipeStep (a b : PipeStage) (label : String) : Step PipeStage a b :=
+noncomputable def pipeStep (a b : PipeStage) (label : String) : Step PipeStage a b :=
   .rule label a b
 
-def fullPipeline : Path PipeStage .adjunction .done :=
+noncomputable def fullPipeline : Path PipeStage .adjunction .done :=
   Path.trans
     (Path.trans
       (Path.trans
@@ -569,7 +569,7 @@ def fullPipeline : Path PipeStage .adjunction .done :=
 theorem fullPipeline_length : fullPipeline.length = 6 := by
   simp [fullPipeline, pipeStep, Path.trans, Path.single, Path.length]
 
-def fullPipelineReverse : Path PipeStage .done .adjunction :=
+noncomputable def fullPipelineReverse : Path PipeStage .done .adjunction :=
   fullPipeline.symm
 
 -- 48
@@ -587,7 +587,7 @@ theorem congrArg_pipeline :
 -- §12  Symm / trans composites
 -- ============================================================
 
-def adjEquivPath (m : Mor) :
+noncomputable def adjEquivPath (m : Mor) :
     Path Mor m m :=
   let fwd := roundTripPath m "F" "G"
   let bwd := equivIsoPath m "F" "G"

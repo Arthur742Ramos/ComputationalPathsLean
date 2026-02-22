@@ -107,7 +107,7 @@ noncomputable def periodicity_cancel_right_rweq :
 end MoravaKPathData
 
 /-- Constant chromatic filtration with identity transitions. -/
-def constantFiltration (X : Type u) : ChromaticFiltrationPaths X where
+noncomputable def constantFiltration (X : Type u) : ChromaticFiltrationPaths X where
   stage := fun _ => X
   localization := fun _ x => x
   transition := fun _ x => x
@@ -116,7 +116,7 @@ def constantFiltration (X : Type u) : ChromaticFiltrationPaths X where
   twoStepStep := fun _ x => Path.Step.trans_refl_right (Path.refl x)
 
 /-- Canonical Morava K-path package on `PUnit`. -/
-def trivialMoravaKPathData (p n : Nat) (hp : p > 1) : MoravaKPathData where
+noncomputable def trivialMoravaKPathData (p n : Nat) (hp : p > 1) : MoravaKPathData where
   prime := p
   prime_gt_one := hp
   height := n

@@ -48,33 +48,33 @@ structure MatroidOps (n : Nat) where
 -- ============================================================================
 
 -- 1: Rank of empty set
-def rank_empty_path (n : Nat) (r : RankFn n) :
+noncomputable def rank_empty_path (n : Nat) (r : RankFn n) :
     Path (r.rank (fun _ => false)) 0 :=
   Path.mk [Step.mk _ _ r.rank_empty] r.rank_empty
 
 -- 2: Rank empty composed with successor
-def rank_empty_succ (n : Nat) (r : RankFn n) :
+noncomputable def rank_empty_succ (n : Nat) (r : RankFn n) :
     Path (Nat.succ (r.rank (fun _ => false))) (Nat.succ 0) :=
   Path.congrArg Nat.succ (rank_empty_path n r)
 
 -- 3: Rank empty composed with addition
-def rank_empty_add (n : Nat) (r : RankFn n) (k : Nat) :
+noncomputable def rank_empty_add (n : Nat) (r : RankFn n) (k : Nat) :
     Path (r.rank (fun _ => false) + k) (0 + k) :=
   Path.congrArg (· + k) (rank_empty_path n r)
 
 -- 4: Double successor of rank empty
-def rank_empty_succ_succ (n : Nat) (r : RankFn n) :
+noncomputable def rank_empty_succ_succ (n : Nat) (r : RankFn n) :
     Path (Nat.succ (Nat.succ (r.rank (fun _ => false)))) (Nat.succ (Nat.succ 0)) :=
   Path.congrArg Nat.succ (rank_empty_succ n r)
 
 -- 5: Rank of same set via two rank functions
-def rank_transfer (n : Nat) (r1 r2 : RankFn n) (S : Fin n → Bool)
+noncomputable def rank_transfer (n : Nat) (r1 r2 : RankFn n) (S : Fin n → Bool)
     (h : r1.rank S = r2.rank S) :
     Path (r1.rank S) (r2.rank S) :=
   Path.mk [Step.mk _ _ h] h
 
 -- 6: Rank transfer composed with function
-def rank_transfer_map (n : Nat) (r1 r2 : RankFn n) (S : Fin n → Bool)
+noncomputable def rank_transfer_map (n : Nat) (r1 r2 : RankFn n) (S : Fin n → Bool)
     (h : r1.rank S = r2.rank S) (f : Nat → Nat) :
     Path (f (r1.rank S)) (f (r2.rank S)) :=
   Path.congrArg f (rank_transfer n r1 r2 S h)
@@ -84,43 +84,43 @@ def rank_transfer_map (n : Nat) (r1 r2 : RankFn n) (S : Fin n → Bool)
 -- ============================================================================
 
 -- 7: Closure idempotency
-def closure_idem (n : Nat) (c : ClosureOp n) (S : Fin n → Bool) :
+noncomputable def closure_idem (n : Nat) (c : ClosureOp n) (S : Fin n → Bool) :
     Path (c.cl (c.cl S)) (c.cl S) :=
   Path.mk [Step.mk _ _ (c.idempotent S)] (c.idempotent S)
 
 -- 8: Triple closure
-def closure_triple (n : Nat) (c : ClosureOp n) (S : Fin n → Bool) :
+noncomputable def closure_triple (n : Nat) (c : ClosureOp n) (S : Fin n → Bool) :
     Path (c.cl (c.cl (c.cl S))) (c.cl S) :=
   Path.trans
     (Path.congrArg c.cl (closure_idem n c S))
     (closure_idem n c S)
 
 -- 9: Quadruple closure
-def closure_quad (n : Nat) (c : ClosureOp n) (S : Fin n → Bool) :
+noncomputable def closure_quad (n : Nat) (c : ClosureOp n) (S : Fin n → Bool) :
     Path (c.cl (c.cl (c.cl (c.cl S)))) (c.cl S) :=
   Path.trans
     (Path.congrArg c.cl (closure_triple n c S))
     (closure_idem n c S)
 
 -- 10: Quintuple closure
-def closure_quint (n : Nat) (c : ClosureOp n) (S : Fin n → Bool) :
+noncomputable def closure_quint (n : Nat) (c : ClosureOp n) (S : Fin n → Bool) :
     Path (c.cl (c.cl (c.cl (c.cl (c.cl S))))) (c.cl S) :=
   Path.trans
     (Path.congrArg c.cl (closure_quad n c S))
     (closure_idem n c S)
 
 -- 11: Closure as functor
-def closure_map (n : Nat) (c : ClosureOp n) (S T : Fin n → Bool)
+noncomputable def closure_map (n : Nat) (c : ClosureOp n) (S T : Fin n → Bool)
     (p : Path S T) : Path (c.cl S) (c.cl T) :=
   Path.congrArg c.cl p
 
 -- 12: Double closure map
-def closure_map_double (n : Nat) (c : ClosureOp n) (S T : Fin n → Bool)
+noncomputable def closure_map_double (n : Nat) (c : ClosureOp n) (S T : Fin n → Bool)
     (p : Path S T) : Path (c.cl (c.cl S)) (c.cl (c.cl T)) :=
   Path.congrArg c.cl (closure_map n c S T p)
 
 -- 13: Pointwise closure identity
-def closure_pointwise_idem (n : Nat) (c : ClosureOp n) :
+noncomputable def closure_pointwise_idem (n : Nat) (c : ClosureOp n) :
     Path (fun S => c.cl (c.cl S)) (fun S => c.cl S) :=
   Path.mk [Step.mk _ _ (funext (fun S => c.idempotent S))] (funext (fun S => c.idempotent S))
 
@@ -129,17 +129,17 @@ def closure_pointwise_idem (n : Nat) (c : ClosureOp n) :
 -- ============================================================================
 
 -- 14: Flat closure identity
-def flat_cl_identity (n : Nat) (c : ClosureOp n) (F : Fin n → Bool)
+noncomputable def flat_cl_identity (n : Nat) (c : ClosureOp n) (F : Fin n → Bool)
     (hF : c.cl F = F) : Path (c.cl F) F :=
   Path.mk [Step.mk _ _ hF] hF
 
 -- 15: Flat double application
-def flat_double (n : Nat) (c : ClosureOp n) (F : Fin n → Bool)
+noncomputable def flat_double (n : Nat) (c : ClosureOp n) (F : Fin n → Bool)
     (hF : c.cl F = F) : Path (c.cl (c.cl F)) F :=
   Path.trans (closure_idem n c F) (flat_cl_identity n c F hF)
 
 -- 16: Flat triple application
-def flat_triple (n : Nat) (c : ClosureOp n) (F : Fin n → Bool)
+noncomputable def flat_triple (n : Nat) (c : ClosureOp n) (F : Fin n → Bool)
     (hF : c.cl F = F) : Path (c.cl (c.cl (c.cl F))) F :=
   Path.trans (closure_triple n c F) (flat_cl_identity n c F hF)
 
@@ -155,25 +155,25 @@ structure DualRankData (n : Nat) where
   compl_invol : ∀ S, complement (complement S) = S
 
 -- 17: Complement involution
-def compl_invol_path (n : Nat) (d : DualRankData n) (S : Fin n → Bool) :
+noncomputable def compl_invol_path (n : Nat) (d : DualRankData n) (S : Fin n → Bool) :
     Path (d.complement (d.complement S)) S :=
   Path.mk [Step.mk _ _ (d.compl_invol S)] (d.compl_invol S)
 
 -- 18: Double complement via congrArg
-def compl_double_map (n : Nat) (d : DualRankData n) (S : Fin n → Bool) :
+noncomputable def compl_double_map (n : Nat) (d : DualRankData n) (S : Fin n → Bool) :
     Path (d.complement (d.complement (d.complement (d.complement S)))) S :=
   Path.trans
     (Path.congrArg d.complement (Path.congrArg d.complement (compl_invol_path n d S)))
     (compl_invol_path n d S)
 
 -- 19: Biduality for rank
-def biduality_rank (n : Nat) (d : DualRankData n) (S : Fin n → Bool)
+noncomputable def biduality_rank (n : Nat) (d : DualRankData n) (S : Fin n → Bool)
     (h : d.dual.rank (d.complement S) = d.primal.rank S) :
     Path (d.dual.rank (d.complement S)) (d.primal.rank S) :=
   Path.mk [Step.mk _ _ h] h
 
 -- 20: Biduality composed with successor
-def biduality_rank_succ (n : Nat) (d : DualRankData n) (S : Fin n → Bool)
+noncomputable def biduality_rank_succ (n : Nat) (d : DualRankData n) (S : Fin n → Bool)
     (h : d.dual.rank (d.complement S) = d.primal.rank S) :
     Path (Nat.succ (d.dual.rank (d.complement S))) (Nat.succ (d.primal.rank S)) :=
   Path.congrArg Nat.succ (biduality_rank n d S h)
@@ -190,26 +190,26 @@ structure DirectSumRank (n m : Nat) where
   additivity : ∀ S T, combined_rank S T = r1.rank S + r2.rank T
 
 -- 21: Direct sum additivity
-def direct_sum_add (n m : Nat) (ds : DirectSumRank n m)
+noncomputable def direct_sum_add (n m : Nat) (ds : DirectSumRank n m)
     (S : Fin n → Bool) (T : Fin m → Bool) :
     Path (ds.combined_rank S T) (ds.r1.rank S + ds.r2.rank T) :=
   Path.mk [Step.mk _ _ (ds.additivity S T)] (ds.additivity S T)
 
 -- 22: Direct sum empty sets
-def direct_sum_empty (n m : Nat) (ds : DirectSumRank n m) :
+noncomputable def direct_sum_empty (n m : Nat) (ds : DirectSumRank n m) :
     Path (ds.combined_rank (fun _ => false) (fun _ => false))
          (ds.r1.rank (fun _ => false) + ds.r2.rank (fun _ => false)) :=
   direct_sum_add n m ds (fun _ => false) (fun _ => false)
 
 -- 23: Direct sum empty with rank_empty
-def direct_sum_empty_zero (n m : Nat) (ds : DirectSumRank n m) :
+noncomputable def direct_sum_empty_zero (n m : Nat) (ds : DirectSumRank n m) :
     Path (ds.r1.rank (fun _ => false) + ds.r2.rank (fun _ => false)) (0 + 0) :=
   have h : ds.r1.rank (fun _ => false) + ds.r2.rank (fun _ => false) = 0 + 0 := by
     rw [ds.r1.rank_empty, ds.r2.rank_empty]
   Path.mk [Step.mk _ _ h] h
 
 -- 24: Full direct sum empty chain
-def direct_sum_full_empty (n m : Nat) (ds : DirectSumRank n m) :
+noncomputable def direct_sum_full_empty (n m : Nat) (ds : DirectSumRank n m) :
     Path (ds.combined_rank (fun _ => false) (fun _ => false)) (0 + 0) :=
   Path.trans (direct_sum_empty n m ds) (direct_sum_empty_zero n m ds)
 
@@ -233,23 +233,23 @@ structure ContractionData (n : Nat) where
   rank_shift : ∀ S, contracted.rank S = original.rank S - original.rank contract_set
 
 -- 25: Deletion rank agreement
-def deletion_rank_agree (n : Nat) (d : DeletionData n) (S : Fin n → Bool)
+noncomputable def deletion_rank_agree (n : Nat) (d : DeletionData n) (S : Fin n → Bool)
     (h : ∀ i, S i = true → d.delete_mask i = true) :
     Path (d.restricted.rank S) (d.original.rank S) :=
   Path.mk [Step.mk _ _ (d.rank_agree S h)] (d.rank_agree S h)
 
 -- 26: Contraction rank shift
-def contraction_rank_shift (n : Nat) (c : ContractionData n) (S : Fin n → Bool) :
+noncomputable def contraction_rank_shift (n : Nat) (c : ContractionData n) (S : Fin n → Bool) :
     Path (c.contracted.rank S) (c.original.rank S - c.original.rank c.contract_set) :=
   Path.mk [Step.mk _ _ (c.rank_shift S)] (c.rank_shift S)
 
 -- 27: Deletion of empty preserves zero rank
-def deletion_empty (n : Nat) (d : DeletionData n) :
+noncomputable def deletion_empty (n : Nat) (d : DeletionData n) :
     Path (d.restricted.rank (fun _ => false)) 0 :=
   Path.mk [Step.mk _ _ d.restricted.rank_empty] d.restricted.rank_empty
 
 -- 28: Original empty rank via deletion
-def deletion_original_empty (n : Nat) (d : DeletionData n) :
+noncomputable def deletion_original_empty (n : Nat) (d : DeletionData n) :
     Path (d.original.rank (fun _ => false)) 0 :=
   Path.mk [Step.mk _ _ d.original.rank_empty] d.original.rank_empty
 
@@ -263,18 +263,18 @@ structure TutteEval where
   ty : Nat
 
 -- 29: Tutte evaluation at specific point
-def tutte_at_point (t : TutteEval) (hx : t.tx = 1) :
+noncomputable def tutte_at_point (t : TutteEval) (hx : t.tx = 1) :
     Path t.tx 1 :=
   Path.mk [Step.mk _ _ hx] hx
 
 -- 30: Tutte pair path
-def tutte_pair (t : TutteEval) (hx : t.tx = 1) (hy : t.ty = 2) :
+noncomputable def tutte_pair (t : TutteEval) (hx : t.tx = 1) (hy : t.ty = 2) :
     Path (t.tx, t.ty) (1, 2) :=
   have h : (t.tx, t.ty) = (1, 2) := by rw [hx, hy]
   Path.mk [Step.mk _ _ h] h
 
 -- 31: Tutte x via congrArg
-def tutte_x_map (t : TutteEval) (f : Nat → Nat) (hx : t.tx = 1) :
+noncomputable def tutte_x_map (t : TutteEval) (f : Nat → Nat) (hx : t.tx = 1) :
     Path (f t.tx) (f 1) :=
   Path.congrArg f (tutte_at_point t hx)
 
@@ -290,17 +290,17 @@ structure GreedySolution (n : Nat) where
   optimality : greedy_value = optimal_value
 
 -- 32: Greedy optimality as path
-def greedy_optimal (n : Nat) (g : GreedySolution n) :
+noncomputable def greedy_optimal (n : Nat) (g : GreedySolution n) :
     Path g.greedy_value g.optimal_value :=
   Path.mk [Step.mk _ _ g.optimality] g.optimality
 
 -- 33: Greedy composed with successor
-def greedy_optimal_succ (n : Nat) (g : GreedySolution n) :
+noncomputable def greedy_optimal_succ (n : Nat) (g : GreedySolution n) :
     Path (Nat.succ g.greedy_value) (Nat.succ g.optimal_value) :=
   Path.congrArg Nat.succ (greedy_optimal n g)
 
 -- 34: Greedy value doubled
-def greedy_optimal_double (n : Nat) (g : GreedySolution n) :
+noncomputable def greedy_optimal_double (n : Nat) (g : GreedySolution n) :
     Path (g.greedy_value + g.greedy_value) (g.optimal_value + g.optimal_value) :=
   have h : g.greedy_value + g.greedy_value = g.optimal_value + g.optimal_value := by
     rw [g.optimality]
@@ -318,13 +318,13 @@ structure IntersectionData (n : Nat) where
   bound : ∀ S, common_rank S ≤ min (r1.rank S) (r2.rank S)
 
 -- 35: Intersection rank identity
-def intersection_rank_id (n : Nat) (d : IntersectionData n)
+noncomputable def intersection_rank_id (n : Nat) (d : IntersectionData n)
     (S T : Fin n → Bool) (h : d.common_rank S = d.common_rank T) :
     Path (d.common_rank S) (d.common_rank T) :=
   Path.mk [Step.mk _ _ h] h
 
 -- 36: Intersection rank via congrArg
-def intersection_rank_map (n : Nat) (d : IntersectionData n)
+noncomputable def intersection_rank_map (n : Nat) (d : IntersectionData n)
     (S T : Fin n → Bool) (h : d.common_rank S = d.common_rank T) (f : Nat → Nat) :
     Path (f (d.common_rank S)) (f (d.common_rank T)) :=
   Path.congrArg f (intersection_rank_id n d S T h)
@@ -339,7 +339,7 @@ structure ReprMatroid (n k : Nat) where
   rank_of : (Fin n → Bool) → Nat
 
 -- 37: Representation rank identity
-def repr_rank_id (n k : Nat) (r1 r2 : ReprMatroid n k)
+noncomputable def repr_rank_id (n k : Nat) (r1 r2 : ReprMatroid n k)
     (S : Fin n → Bool) (h : r1.rank_of S = r2.rank_of S) :
     Path (r1.rank_of S) (r2.rank_of S) :=
   Path.mk [Step.mk _ _ h] h
@@ -356,12 +356,12 @@ structure Graph where
   rank_empty : edgeRank (fun _ => false) = 0
 
 -- 38: Graphic matroid empty rank
-def graphic_empty (g : Graph) :
+noncomputable def graphic_empty (g : Graph) :
     Path (g.edgeRank (fun _ => false)) 0 :=
   Path.mk [Step.mk _ _ g.rank_empty] g.rank_empty
 
 -- 39: Graphic composed with succ
-def graphic_empty_succ (g : Graph) :
+noncomputable def graphic_empty_succ (g : Graph) :
     Path (Nat.succ (g.edgeRank (fun _ => false))) (Nat.succ 0) :=
   Path.congrArg Nat.succ (graphic_empty g)
 
@@ -440,13 +440,13 @@ theorem rank_empty_trans_refl (n : Nat) (r : RankFn n) :
 -- ============================================================================
 
 -- 51: Deletion then original empty chain
-def deletion_chain_empty (n : Nat) (d : DeletionData n)
+noncomputable def deletion_chain_empty (n : Nat) (d : DeletionData n)
     (h : ∀ i, (fun _ : Fin n => false) i = true → d.delete_mask i = true) :
     Path (d.restricted.rank (fun _ => false)) (d.original.rank (fun _ => false)) :=
   deletion_rank_agree n d (fun _ => false) h
 
 -- 52: Full deletion empty chain to zero
-def deletion_full_chain (n : Nat) (d : DeletionData n)
+noncomputable def deletion_full_chain (n : Nat) (d : DeletionData n)
     (h : ∀ i, (fun _ : Fin n => false) i = true → d.delete_mask i = true) :
     Path (d.restricted.rank (fun _ => false)) 0 :=
   Path.trans
@@ -454,19 +454,19 @@ def deletion_full_chain (n : Nat) (d : DeletionData n)
     (deletion_original_empty n d)
 
 -- 53: Biduality rank chain
-def biduality_chain (n : Nat) (d : DualRankData n) (S : Fin n → Bool)
+noncomputable def biduality_chain (n : Nat) (d : DualRankData n) (S : Fin n → Bool)
     (h1 : d.dual.rank (d.complement S) = d.primal.rank S)
     (h2 : d.primal.rank S = d.dual.rank (d.complement S)) :
     Path (d.dual.rank (d.complement S)) (d.dual.rank (d.complement S)) :=
   Path.trans (biduality_rank n d S h1) (Path.mk [Step.mk _ _ h2] h2)
 
 -- 54: CongrArg chain: f(g(rank(empty))) = f(g(0))
-def rank_double_map (n : Nat) (r : RankFn n) (f g : Nat → Nat) :
+noncomputable def rank_double_map (n : Nat) (r : RankFn n) (f g : Nat → Nat) :
     Path (f (g (r.rank (fun _ => false)))) (f (g 0)) :=
   Path.congrArg f (Path.congrArg g (rank_empty_path n r))
 
 -- 55: Direct sum full chain with congrArg
-def direct_sum_chain (n m : Nat) (ds : DirectSumRank n m) :
+noncomputable def direct_sum_chain (n m : Nat) (ds : DirectSumRank n m) :
     Path (Nat.succ (ds.combined_rank (fun _ => false) (fun _ => false)))
          (Nat.succ (0 + 0)) :=
   Path.congrArg Nat.succ (direct_sum_full_empty n m ds)

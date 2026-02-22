@@ -26,19 +26,19 @@ inductive IntervalRel : Bool → Bool → Prop where
   | seg : IntervalRel false true
 
 /-- The interval type. -/
-def Interval : Type := Quot IntervalRel
+noncomputable def Interval : Type := Quot IntervalRel
 
-def Interval.zero : Interval := Quot.mk _ false
-def Interval.one  : Interval := Quot.mk _ true
+noncomputable def Interval.zero : Interval := Quot.mk _ false
+noncomputable def Interval.one  : Interval := Quot.mk _ true
 
 theorem Interval.seg_eq : Interval.zero = Interval.one :=
   Quot.sound IntervalRel.seg
 
-def Interval.segPath : Path Interval.zero Interval.one :=
+noncomputable def Interval.segPath : Path Interval.zero Interval.one :=
   Path.mk [Step.mk _ _ Interval.seg_eq] Interval.seg_eq
 
 /-- Interval elimination. -/
-def Interval.lift {D : Type v} (d₀ d₁ : D) (h : d₀ = d₁) : Interval → D :=
+noncomputable def Interval.lift {D : Type v} (d₀ d₁ : D) (h : d₀ = d₁) : Interval → D :=
   Quot.lift (fun b => if b then d₁ else d₀) (fun a b r => by cases r; exact h)
 
 /-- 1. The interval segment composed with its inverse is trivial. -/
@@ -59,11 +59,11 @@ theorem interval_seg_symm_symm :
 /-! ## Deep circle properties -/
 
 /-- 4. Circle loop iterated twice via trans. -/
-def Circle.loop2 : Path Circle.base Circle.base :=
+noncomputable def Circle.loop2 : Path Circle.base Circle.base :=
   Path.trans Circle.loop Circle.loop
 
 /-- 5. Circle loop iterated three times. -/
-def Circle.loop3 : Path Circle.base Circle.base :=
+noncomputable def Circle.loop3 : Path Circle.base Circle.base :=
   Path.trans Circle.loop2 Circle.loop
 
 /-- 6. Triple loop associativity: (loop ∘ loop) ∘ loop = loop ∘ (loop ∘ loop). -/
@@ -95,7 +95,7 @@ theorem circle_loop_symm_steps_length :
 /-! ## Suspension functor -/
 
 /-- Map on suspensions induced by a function. -/
-def Susp.map {A B : Type u} (f : A → B) : Susp A → Susp B :=
+noncomputable def Susp.map {A B : Type u} (f : A → B) : Susp A → Susp B :=
   Pushout.lift (fun _ => @Susp.north B) (fun _ => @Susp.south B)
     (fun a => by
       show @Susp.north B = @Susp.south B
@@ -149,11 +149,11 @@ theorem pushout_map_id_inr {A B C : Type u} {s : Span A B C} (b : B) :
 /-! ## Quotient as HIT -/
 
 /-- A setoid quotient as a HIT via Quot. -/
-def HITQuot {A : Type u} (R : A → A → Prop) : Type u := Quot R
+noncomputable def HITQuot {A : Type u} (R : A → A → Prop) : Type u := Quot R
 
-def HITQuot.cls {A : Type u} {R : A → A → Prop} (a : A) : HITQuot R := Quot.mk R a
+noncomputable def HITQuot.cls {A : Type u} {R : A → A → Prop} (a : A) : HITQuot R := Quot.mk R a
 
-def HITQuot.clsPath {A : Type u} {R : A → A → Prop} {a b : A} (r : R a b) :
+noncomputable def HITQuot.clsPath {A : Type u} {R : A → A → Prop} {a b : A} (r : R a b) :
     Path (HITQuot.cls a : HITQuot R) (HITQuot.cls b) :=
   Path.mk [Step.mk _ _ (Quot.sound r)] (Quot.sound r)
 
@@ -168,7 +168,7 @@ theorem hitquot_cls_steps {A : Type u} {R : A → A → Prop} {a b : A} (r : R a
   simp [HITQuot.clsPath]
 
 /-- Quotient elimination. -/
-def HITQuot.lift {A : Type u} {R : A → A → Prop} {D : Type v}
+noncomputable def HITQuot.lift {A : Type u} {R : A → A → Prop} {D : Type v}
     (f : A → D) (h : ∀ a b, R a b → f a = f b) : HITQuot R → D :=
   Quot.lift f (fun a b r => h a b r)
 
@@ -184,12 +184,12 @@ inductive TruncRel (A : Type u) : A → A → Prop where
   | trunc (a b : A) : TruncRel A a b
 
 /-- Propositional truncation ‖A‖. -/
-def PropTrunc (A : Type u) : Type u := Quot (TruncRel A)
+noncomputable def PropTrunc (A : Type u) : Type u := Quot (TruncRel A)
 
-def PropTrunc.mk {A : Type u} (a : A) : PropTrunc A := Quot.mk _ a
+noncomputable def PropTrunc.mk {A : Type u} (a : A) : PropTrunc A := Quot.mk _ a
 
 /-- The truncation path: all elements are identified. -/
-def PropTrunc.truncPath {A : Type u} (a b : A) :
+noncomputable def PropTrunc.truncPath {A : Type u} (a b : A) :
     Path (PropTrunc.mk a : PropTrunc A) (PropTrunc.mk b) :=
   Path.mk [Step.mk _ _ (Quot.sound (TruncRel.trunc a b))] (Quot.sound (TruncRel.trunc a b))
 
@@ -205,7 +205,7 @@ theorem proptrunc_trans_chain_proof {A : Type u} (a b c : A) :
   Subsingleton.elim _ _
 
 /-- PropTrunc elimination into propositions. -/
-def PropTrunc.lift {A : Type u} {B : Type v}
+noncomputable def PropTrunc.lift {A : Type u} {B : Type v}
     (f : A → B) (hprop : ∀ x y : B, x = y) : PropTrunc A → B :=
   Quot.lift f (fun a b _ => hprop (f a) (f b))
 

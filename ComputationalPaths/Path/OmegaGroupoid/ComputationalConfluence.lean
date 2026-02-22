@@ -45,12 +45,12 @@ each `Step` gives a `Derivation₂.step`, and `Rw` is built from steps
 by reflexivity and transitivity. -/
 
 /-- Embed a single step into a Derivation₂. -/
-def step_to_derivation₂ {p q : Path a b}
+noncomputable def step_to_derivation₂ {p q : Path a b}
     (h : Step p q) : Derivation₂ p q :=
   Derivation₂.step h
 
 /-- Build a Derivation₂ from reflexivity. -/
-def refl_derivation₂ (p : Path a b) : Derivation₂ p p :=
+noncomputable def refl_derivation₂ (p : Path a b) : Derivation₂ p p :=
   Derivation₂.refl p
 
 /-! ## Derivation₂ Properties -/
@@ -105,29 +105,29 @@ paths are connected by a 3-cell. -/
 /-- Any two Derivation₂ values between the same paths are connected by
 a Derivation₃.  This is the contractibility₃ theorem from the ω-groupoid
 module, restated here for clarity. -/
-def confluence_implies_3cell {p q : Path a b}
+noncomputable def confluence_implies_3cell {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
   contractibility₃ d₁ d₂
 
 /-- The connection between any derivation and the identity: every derivation
 from p to p is connected to the identity derivation by a 3-cell. -/
-def derivation₂_connected_to_refl (p : Path a b)
+noncomputable def derivation₂_connected_to_refl (p : Path a b)
     (d : Derivation₂ p p) : Derivation₃ d (Derivation₂.refl p) :=
   contractibility₃ d (Derivation₂.refl p)
 
 /-- Every derivation is connected to its double inverse. -/
-def derivation₂_inv_inv {p q : Path a b}
+noncomputable def derivation₂_inv_inv {p q : Path a b}
     (d : Derivation₂ p q) : Derivation₃ (Derivation₂.inv (Derivation₂.inv d)) d :=
   contractibility₃ _ d
 
 /-- Every derivation composed with its inverse is connected to refl. -/
-def derivation₂_vcomp_inv {p q : Path a b}
+noncomputable def derivation₂_vcomp_inv {p q : Path a b}
     (d : Derivation₂ p q) :
     Derivation₃ (Derivation₂.vcomp d (Derivation₂.inv d)) (Derivation₂.refl p) :=
   contractibility₃ _ _
 
 /-- The inverse composed with the original is connected to refl. -/
-def derivation₂_inv_vcomp {p q : Path a b}
+noncomputable def derivation₂_inv_vcomp {p q : Path a b}
     (d : Derivation₂ p q) :
     Derivation₃ (Derivation₂.vcomp (Derivation₂.inv d) d) (Derivation₂.refl q) :=
   contractibility₃ _ _
@@ -135,19 +135,19 @@ def derivation₂_inv_vcomp {p q : Path a b}
 /-! ## Whiskering and Step Derivations -/
 
 /-- Left whiskering a step derivation. -/
-def step_whisker_left (f : Path a b) {p q : Path b c}
+noncomputable def step_whisker_left (f : Path a b) {p q : Path b c}
     (h : Step p q) :
     Derivation₂ (Path.trans f p) (Path.trans f q) :=
   whiskerLeft f (step_to_derivation₂ h)
 
 /-- Right whiskering a step derivation. -/
-def step_whisker_right {p q : Path a b}
+noncomputable def step_whisker_right {p q : Path a b}
     (h : Step p q) (g : Path b c) :
     Derivation₂ (Path.trans p g) (Path.trans q g) :=
   whiskerRight (step_to_derivation₂ h) g
 
 /-- Horizontal composition from two step derivations. -/
-def step_hcomp {p p' : Path a b} {q q' : Path b c}
+noncomputable def step_hcomp {p p' : Path a b} {q q' : Path b c}
     (hp : Step p p') (hq : Step q q') :
     Derivation₂ (Path.trans p q) (Path.trans p' q') :=
   hcomp (step_to_derivation₂ hp) (step_to_derivation₂ hq)
@@ -155,64 +155,64 @@ def step_hcomp {p p' : Path a b} {q q' : Path b c}
 /-! ## Derived Groupoid Laws via Confluence -/
 
 /-- Left unit law: `refl · p ≈ p` as a derivation. -/
-def unit_left_derivation (p : Path a b) :
+noncomputable def unit_left_derivation (p : Path a b) :
     Derivation₂ (Path.trans (Path.refl a) p) p :=
   Derivation₂.step (Step.trans_refl_left p)
 
 /-- Right unit law: `p · refl ≈ p` as a derivation. -/
-def unit_right_derivation (p : Path a b) :
+noncomputable def unit_right_derivation (p : Path a b) :
     Derivation₂ (Path.trans p (Path.refl b)) p :=
   Derivation₂.step (Step.trans_refl_right p)
 
 /-- Associativity: `(p · q) · r ≈ p · (q · r)` as a derivation. -/
-def assoc_derivation (p : Path a b) (q : Path b c) (r : Path c d) :
+noncomputable def assoc_derivation (p : Path a b) (q : Path b c) (r : Path c d) :
     Derivation₂ (Path.trans (Path.trans p q) r)
                  (Path.trans p (Path.trans q r)) :=
   Derivation₂.step (Step.trans_assoc p q r)
 
 /-- Right inverse: `p · p⁻¹ ≈ refl` as a derivation. -/
-def inv_right_derivation (p : Path a b) :
+noncomputable def inv_right_derivation (p : Path a b) :
     Derivation₂ (Path.trans p (Path.symm p)) (Path.refl a) :=
   Derivation₂.step (Step.trans_symm p)
 
 /-- Left inverse: `p⁻¹ · p ≈ refl` as a derivation. -/
-def inv_left_derivation (p : Path a b) :
+noncomputable def inv_left_derivation (p : Path a b) :
     Derivation₂ (Path.trans (Path.symm p) p) (Path.refl b) :=
   Derivation₂.step (Step.symm_trans p)
 
 /-- Double inverse: `(p⁻¹)⁻¹ ≈ p` as a derivation. -/
-def inv_inv_derivation (p : Path a b) :
+noncomputable def inv_inv_derivation (p : Path a b) :
     Derivation₂ (Path.symm (Path.symm p)) p :=
   Derivation₂.step (Step.symm_symm p)
 
 /-- Anti-homomorphism: `(p · q)⁻¹ ≈ q⁻¹ · p⁻¹` as a derivation. -/
-def anti_hom_derivation (p : Path a b) (q : Path b c) :
+noncomputable def anti_hom_derivation (p : Path a b) (q : Path b c) :
     Derivation₂ (Path.symm (Path.trans p q))
                  (Path.trans (Path.symm q) (Path.symm p)) :=
   Derivation₂.step (Step.symm_trans_congr p q)
 
 /-- Symm of refl: `(refl a)⁻¹ ≈ refl a` as a derivation. -/
-def symm_refl_derivation (x : A) :
+noncomputable def symm_refl_derivation (x : A) :
     Derivation₂ (Path.symm (Path.refl x)) (Path.refl x) :=
   Derivation₂.step (Step.symm_refl x)
 
 /-! ## Coherence: All Groupoid Law Derivations Are Connected -/
 
 /-- Any two derivations witnessing the left unit law are connected. -/
-def unit_left_coherence (p : Path a b)
+noncomputable def unit_left_coherence (p : Path a b)
     (d : Derivation₂ (Path.trans (Path.refl a) p) p) :
     Derivation₃ d (unit_left_derivation p) :=
   contractibility₃ d (unit_left_derivation p)
 
 /-- Any two derivations witnessing associativity are connected. -/
-def assoc_coherence (p : Path a b) (q : Path b c) (r : Path c d)
+noncomputable def assoc_coherence (p : Path a b) (q : Path b c) (r : Path c d)
     (d' : Derivation₂ (Path.trans (Path.trans p q) r)
                        (Path.trans p (Path.trans q r))) :
     Derivation₃ d' (assoc_derivation p q r) :=
   contractibility₃ d' (assoc_derivation p q r)
 
 /-- Any two derivations witnessing the right inverse law are connected. -/
-def inv_right_coherence (p : Path a b)
+noncomputable def inv_right_coherence (p : Path a b)
     (d : Derivation₂ (Path.trans p (Path.symm p)) (Path.refl a)) :
     Derivation₃ d (inv_right_derivation p) :=
   contractibility₃ d (inv_right_derivation p)

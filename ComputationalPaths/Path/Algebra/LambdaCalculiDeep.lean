@@ -26,26 +26,26 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _ => 0
   | .cons _ p => 1 + p.length
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .mk name a b => .mk (name ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a => .nil a
   | .cons s rest => rest.symm.trans (.cons s.symm (.nil _))
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil b)
 
 -- congrArg: lift a path through a function
-def Path.congrArg (f : α → β) (lbl : String)
+noncomputable def Path.congrArg (f : α → β) (lbl : String)
     : Path α a b → Path β (f a) (f b)
   | .nil _ => .nil _
   | .cons _ p => .cons (.mk lbl (f _) (f _)) (p.congrArg f lbl)
@@ -92,12 +92,12 @@ deriving DecidableEq, Repr
 
 namespace UTerm
 
-def shift (d cutoff : Nat) : UTerm → UTerm
+noncomputable def shift (d cutoff : Nat) : UTerm → UTerm
   | var n     => if n ≥ cutoff then var (n + d) else var n
   | lam body  => lam (shift d (cutoff + 1) body)
   | app f a   => app (shift d cutoff f) (shift d cutoff a)
 
-def subst (j : Nat) (s : UTerm) : UTerm → UTerm
+noncomputable def subst (j : Nat) (s : UTerm) : UTerm → UTerm
   | var n     => if n == j then s
                  else if n > j then var (n - 1)
                  else var n
@@ -105,7 +105,7 @@ def subst (j : Nat) (s : UTerm) : UTerm → UTerm
   | app f a   => app (subst j s f) (subst j s a)
 
 /-- Term size for termination arguments. -/
-def size : UTerm → Nat
+noncomputable def size : UTerm → Nat
   | var _   => 1
   | lam t   => 1 + size t
   | app f a => 1 + size f + size a
@@ -225,7 +225,7 @@ theorem UParPath.trans {a b c : UTerm}
   | step s _ ih => exact .step s (ih q)
 
 /-- Confluence (Church-Rosser) statement. -/
-def ChurchRosser : Prop :=
+noncomputable def ChurchRosser : Prop :=
   ∀ a b c : UTerm, UPath a b → UPath a c → ∃ d, UPath b d ∧ UPath c d
 
 /-- Theorem 16: If Church-Rosser, normal form is unique. -/
@@ -579,13 +579,13 @@ theorem TyPath.congrArr {a a' b b' : TyExpr}
 -- ============================================================
 
 /-- Erase types from STLC to get untyped terms. -/
-def eraseS : STerm → UTerm
+noncomputable def eraseS : STerm → UTerm
   | .var n     => .var n
   | .lam _ t   => .lam (eraseS t)
   | .app f a   => .app (eraseS f) (eraseS a)
 
 /-- Erase types from System F to untyped. -/
-def eraseF : FTerm → UTerm
+noncomputable def eraseF : FTerm → UTerm
   | .var n     => .var n
   | .lam _ t   => .lam (eraseF t)
   | .app f a   => .app (eraseF f) (eraseF a)
@@ -593,7 +593,7 @@ def eraseF : FTerm → UTerm
   | .tapp t _  => .app (eraseF t) (.var 0)  -- type app becomes dummy app
 
 /-- Erase types from Fω term to untyped. -/
-def eraseFw : FwTerm → UTerm
+noncomputable def eraseFw : FwTerm → UTerm
   | .var n     => .var n
   | .lam _ t   => .lam (eraseFw t)
   | .app f a   => .app (eraseFw f) (eraseFw a)
@@ -731,24 +731,24 @@ theorem BetaEtaSymPath.symm {a b : UTerm}
 -- ============================================================
 
 /-- Embed STLC type into System F type. -/
-def embedStoF : SType → FType
+noncomputable def embedStoF : SType → FType
   | .base n => .tvar n
   | .arr σ τ => .arr (embedStoF σ) (embedStoF τ)
 
 /-- Embed STLC term into System F term. -/
-def embedTermStoF : STerm → FTerm
+noncomputable def embedTermStoF : STerm → FTerm
   | .var n => .var n
   | .lam σ t => .lam (embedStoF σ) (embedTermStoF t)
   | .app f a => .app (embedTermStoF f) (embedTermStoF a)
 
 /-- Embed System F type into Fω type expression. -/
-def embedFtoFw : FType → TyExpr
+noncomputable def embedFtoFw : FType → TyExpr
   | .tvar n => .tvar n
   | .arr σ τ => .arr (embedFtoFw σ) (embedFtoFw τ)
   | .forall_ τ => .forallTy .star (embedFtoFw τ)
 
 /-- Embed System F term into Fω term. -/
-def embedTermFtoFw : FTerm → FwTerm
+noncomputable def embedTermFtoFw : FTerm → FwTerm
   | .var n => .var n
   | .lam τ t => .lam (embedFtoFw τ) (embedTermFtoFw t)
   | .app f a => .app (embedTermFtoFw f) (embedTermFtoFw a)
@@ -776,7 +776,7 @@ theorem embedStoF_preserves_path {t t' : STerm}
 -- ============================================================
 
 /-- Full embedding STLC → Fω via F. -/
-def embedStoFw (t : STerm) : FwTerm :=
+noncomputable def embedStoFw (t : STerm) : FwTerm :=
   embedTermFtoFw (embedTermStoF t)
 
 /-- Theorem 49: Direct STLC→Fω embedding agrees with composition. -/
@@ -800,7 +800,7 @@ inductive UDPath : UTerm → UTerm → Type where
   | nil  : (a : UTerm) → UDPath a a
   | cons : {a b c : UTerm} → UBeta a b → UDPath b c → UDPath a c
 
-def UDPath.trans : UDPath a b → UDPath b c → UDPath a c
+noncomputable def UDPath.trans : UDPath a b → UDPath b c → UDPath a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
@@ -819,7 +819,7 @@ theorem UDPath.trans_nil_right (p : UDPath a b) :
   | cons s _ ih => simp [UDPath.trans, ih]
 
 /-- congrArg: lift UDPath through lambda. -/
-def UDPath.congrLam : UDPath a b → UDPath (.lam a) (.lam b)
+noncomputable def UDPath.congrLam : UDPath a b → UDPath (.lam a) (.lam b)
   | .nil _ => .nil _
   | .cons s p => .cons (.congLam s) p.congrLam
 
@@ -831,7 +831,7 @@ theorem UDPath.congrLam_trans (p : UDPath a b) (q : UDPath b c) :
   | cons s _ ih => simp [UDPath.trans, UDPath.congrLam, ih]
 
 /-- congrArg: lift UDPath through app left. -/
-def UDPath.congrAppL (x : UTerm) : UDPath a b → UDPath (.app a x) (.app b x)
+noncomputable def UDPath.congrAppL (x : UTerm) : UDPath a b → UDPath (.app a x) (.app b x)
   | .nil _ => .nil _
   | .cons s p => .cons (.congAppL s) (p.congrAppL x)
 
@@ -847,7 +847,7 @@ theorem UDPath.congrAppL_trans (x : UTerm) (p : UDPath a b) (q : UDPath b c) :
 -- ============================================================
 
 /-- Theorem 56: Diamond property for a step relation. -/
-def Diamond (R : UTerm → UTerm → Prop) : Prop :=
+noncomputable def Diamond (R : UTerm → UTerm → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
 
 /-- Theorem 56b: Diamond implies semi-confluence (single step vs path). -/
@@ -904,8 +904,8 @@ theorem UTerm.size_app_right (f a : UTerm) : a.size < (UTerm.app f a).size := by
 -- §19  Identity and constant combinators across calculi
 -- ============================================================
 
-def utermI : UTerm := .lam (.var 0)
-def utermK : UTerm := .lam (.lam (.var 1))
+noncomputable def utermI : UTerm := .lam (.var 0)
+noncomputable def utermK : UTerm := .lam (.lam (.var 1))
 
 /-- Theorem 59: I erased from STLC is the untyped I. -/
 theorem eraseS_I (τ : SType) :

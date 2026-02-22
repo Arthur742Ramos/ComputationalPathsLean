@@ -115,7 +115,7 @@ structure Contactomorphism (M N : ContactStructure.{u}) where
   preserves_contact : True
 
 /-- Identity contactomorphism. -/
-def Contactomorphism.id (M : ContactStructure.{u}) : Contactomorphism M M where
+noncomputable def Contactomorphism.id (M : ContactStructure.{u}) : Contactomorphism M M where
   toFun := _root_.id
   invFun := _root_.id
   left_inv := fun x => Path.refl x
@@ -123,7 +123,7 @@ def Contactomorphism.id (M : ContactStructure.{u}) : Contactomorphism M M where
   preserves_contact := trivial
 
 /-- Composition of contactomorphisms. -/
-def Contactomorphism.comp {M N P : ContactStructure.{u}}
+noncomputable def Contactomorphism.comp {M N P : ContactStructure.{u}}
     (g : Contactomorphism N P) (f : Contactomorphism M N) :
     Contactomorphism M P where
   toFun := g.toFun ∘ f.toFun

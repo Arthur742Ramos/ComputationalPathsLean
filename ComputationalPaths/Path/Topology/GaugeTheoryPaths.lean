@@ -65,11 +65,11 @@ structure InvariantInnerProduct (G : GaugeGroup) where
   ad_invariant  : True
 
 /-- Adjoint representation Ad : G → Aut(g). -/
-def adjointRep (G : GaugeGroup) : G.carrier → G.lieAlg → G.lieAlg :=
+noncomputable def adjointRep (G : GaugeGroup) : G.carrier → G.lieAlg → G.lieAlg :=
   fun _ v => v   -- abstract
 
 /-- Coadjoint representation Ad* : G → Aut(g*). -/
-def coadjointRep (G : GaugeGroup) : G.carrier → G.lieAlg → G.lieAlg :=
+noncomputable def coadjointRep (G : GaugeGroup) : G.carrier → G.lieAlg → G.lieAlg :=
   fun _ v => v   -- abstract
 
 /-! ## 2. Principal Bundles -/
@@ -91,7 +91,7 @@ structure AssociatedBundle (G : GaugeGroup) (P : PrincipalBundle G) where
   assoc      : True
 
 /-- The adjoint bundle Ad P = P ×_Ad g. -/
-def adjointBundle (G : GaugeGroup) (P : PrincipalBundle G) :
+noncomputable def adjointBundle (G : GaugeGroup) (P : PrincipalBundle G) :
     AssociatedBundle G P where
   fiber    := G.lieAlg
   fiberDim := G.dim
@@ -119,7 +119,7 @@ structure Connection (G : GaugeGroup) (P : PrincipalBundle G) where
   normalised  : True   -- A(ξ_X) = X for X ∈ g
 
 /-- The affine space of connections: two connections differ by Ω¹(Ad P). -/
-def connectionDiff {G : GaugeGroup} {P : PrincipalBundle G}
+noncomputable def connectionDiff {G : GaugeGroup} {P : PrincipalBundle G}
     (A B : Connection G P) : P.base → G.lieAlg :=
   fun x => A.form x   -- placeholder for A − B
 
@@ -159,19 +159,19 @@ structure GaugeTransformation (G : GaugeGroup) (P : PrincipalBundle G) where
   smooth    : True
 
 /-- Gauge group multiplication. -/
-def gaugeMul {G : GaugeGroup} {P : PrincipalBundle G}
+noncomputable def gaugeMul {G : GaugeGroup} {P : PrincipalBundle G}
     (g₁ g₂ : GaugeTransformation G P) : GaugeTransformation G P where
   gaugeFn := fun x => G.mul (g₁.gaugeFn x) (g₂.gaugeFn x)
   smooth  := trivial
 
 /-- Gauge inverse. -/
-def gaugeInv {G : GaugeGroup} {P : PrincipalBundle G}
+noncomputable def gaugeInv {G : GaugeGroup} {P : PrincipalBundle G}
     (g : GaugeTransformation G P) : GaugeTransformation G P where
   gaugeFn := fun x => G.inv (g.gaugeFn x)
   smooth  := trivial
 
 /-- Gauge action on connections: g · A = Ad_g A + g* θ. -/
-def gaugeAct {G : GaugeGroup} {P : PrincipalBundle G}
+noncomputable def gaugeAct {G : GaugeGroup} {P : PrincipalBundle G}
     (_g : GaugeTransformation G P) (A : Connection G P) :
     Connection G P where
   form        := A.form   -- abstract
@@ -179,7 +179,7 @@ def gaugeAct {G : GaugeGroup} {P : PrincipalBundle G}
   normalised  := trivial
 
 /-- Gauge orbit: the equivalence class of A under gauge. -/
-def gaugeOrbit {G : GaugeGroup} {P : PrincipalBundle G}
+noncomputable def gaugeOrbit {G : GaugeGroup} {P : PrincipalBundle G}
     (A B : Connection G P) : Prop :=
   ∃ _g : GaugeTransformation G P, True   -- ∃ g, g·A = B
 
@@ -290,7 +290,7 @@ structure FlatModuli (G : GaugeGroup) (P : PrincipalBundle G) where
   equiv_rel : True   -- orbits is an equivalence relation
 
 /-- Dimension of the flat moduli (for surface groups). -/
-def flatModuliDim (G : GaugeGroup) (genus : Nat) : Int :=
+noncomputable def flatModuliDim (G : GaugeGroup) (genus : Nat) : Int :=
   (G.dim : Int) * (2 * (genus : Int) - 2)
 
 /-- Character variety: Hom(π₁, G) / G. -/
@@ -429,18 +429,18 @@ section HolonomyRewrite
 
 variable {G : GaugeGroup} {P : PrincipalBundle G}
 
-def holonomyRewriteStep (x y : Connection G P)
+noncomputable def holonomyRewriteStep (x y : Connection G P)
     (h : x = y) : Step (Connection G P) :=
   Step.mk x y h
 
-def holonomyPathWitness (x y : Connection G P)
+noncomputable def holonomyPathWitness (x y : Connection G P)
     (h : x = y) : Path x y :=
   Path.stepChain h
 
-def holonomyRewrite {x y : Connection G P} (p q : Path x y) : Prop :=
+noncomputable def holonomyRewrite {x y : Connection G P} (p q : Path x y) : Prop :=
   ∃ r : Path y y, q = Path.trans p r
 
-def holonomyRewriteConfluent : Prop :=
+noncomputable def holonomyRewriteConfluent : Prop :=
   ∀ {x y : Connection G P} (p q₁ q₂ : Path x y),
     holonomyRewrite p q₁ →
     holonomyRewrite p q₂ →

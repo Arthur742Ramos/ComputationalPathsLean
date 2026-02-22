@@ -64,7 +64,7 @@ structure HomotopyFunctor (C D : PointedCategory.{u}) where
     mapHom (C.comp f g) = D.comp (mapHom f) (mapHom g)
 
 /-- The identity homotopy functor. -/
-def HomotopyFunctor.identity (C : PointedCategory.{u}) :
+noncomputable def HomotopyFunctor.identity (C : PointedCategory.{u}) :
     HomotopyFunctor C C where
   mapObj := _root_.id
   mapHom := _root_.id
@@ -102,7 +102,7 @@ structure Excisive (C D : PointedCategory.{u}) (n : Nat)
     True
 
 /-- Every functor is trivially ∞-excisive. -/
-def triviallyExcisive (C D : PointedCategory.{u})
+noncomputable def triviallyExcisive (C D : PointedCategory.{u})
     (F : HomotopyFunctor C D) (n : Nat) : Excisive C D n F where
   excisive := fun _ _ => trivial
 
@@ -134,7 +134,7 @@ structure ExcisiveApproximation (C D : PointedCategory.{u})
     (_ : NatTrans F G), True
 
 /-- The trivial 0-excisive approximation. -/
-def zeroApprox (C D : PointedCategory.{u})
+noncomputable def zeroApprox (C D : PointedCategory.{u})
     (F : HomotopyFunctor C D) (pt : D.Obj)
     (toTerminal : ∀ (X : D.Obj), D.Hom X pt)
     (terminal_unique : ∀ (X : D.Obj) (f g : D.Hom X pt), f = g) :

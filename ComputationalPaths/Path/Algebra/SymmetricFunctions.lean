@@ -54,7 +54,7 @@ structure Partition where
   sorted : parts.Pairwise (· ≥ ·)
 
 /-- Size of a partition (sum of parts). -/
-def Partition.size (lam : Partition) : Nat :=
+noncomputable def Partition.size (lam : Partition) : Nat :=
   lam.parts.foldl (· + ·) 0
 
 /-- Conjugate (transpose) partition. -/
@@ -84,7 +84,7 @@ abbrev VariablePermutation (n : Nat) := Fin n → Fin n
 namespace ExponentVector
 
 /-- Permute an exponent vector by a variable permutation. -/
-def permute {n : Nat} (σ : VariablePermutation n) (α : ExponentVector n) : ExponentVector n :=
+noncomputable def permute {n : Nat} (σ : VariablePermutation n) (α : ExponentVector n) : ExponentVector n :=
   fun i => α (σ i)
 
 /-- Permuting by the identity permutation does nothing. -/
@@ -109,16 +109,16 @@ structure FormalPolynomial (R : Type u) (n : Nat) where
 namespace FormalPolynomial
 
 /-- Constant formal polynomial. -/
-def const {R : Type u} {n : Nat} (c : R) : FormalPolynomial R n :=
+noncomputable def const {R : Type u} {n : Nat} (c : R) : FormalPolynomial R n :=
   ⟨fun _ => c⟩
 
 /-- Pointwise sum of formal polynomials. -/
-def add {R : Type u} [Add R] {n : Nat}
+noncomputable def add {R : Type u} [Add R] {n : Nat}
     (f g : FormalPolynomial R n) : FormalPolynomial R n :=
   ⟨fun α => f.coeff α + g.coeff α⟩
 
 /-- Symmetry under permutations of variables. -/
-def IsSymmetric {R : Type u} {n : Nat} (f : FormalPolynomial R n) : Prop :=
+noncomputable def IsSymmetric {R : Type u} {n : Nat} (f : FormalPolynomial R n) : Prop :=
   ∀ (σ : VariablePermutation n) (α : ExponentVector n),
     f.coeff (ExponentVector.permute σ α) = f.coeff α
 
@@ -140,7 +140,7 @@ theorem IsSymmetric.add {R : Type u} [Add R] {n : Nat}
 end FormalPolynomial
 
 /-- Symmetric polynomials as permutation-invariant formal polynomials. -/
-def SymmetricPolynomial (R : Type u) (n : Nat) :=
+noncomputable def SymmetricPolynomial (R : Type u) (n : Nat) :=
   {f : FormalPolynomial R n // FormalPolynomial.IsSymmetric f}
 
 /-! ## Symmetric Function Ring -/
@@ -186,7 +186,7 @@ structure ElementarySymFun (SR : SymRing) where
   e_part_mul : ∀ lam, Path (e_part lam) (e_part lam)
 
 /-- Path: e_0 is the multiplicative identity. -/
-def e_zero_one (SR : SymRing) (ef : ElementarySymFun SR) :
+noncomputable def e_zero_one (SR : SymRing) (ef : ElementarySymFun SR) :
     Path (ef.e 0) SR.one :=
   ef.e_zero
 
@@ -225,7 +225,7 @@ structure PowerSumSymFun (SR : SymRing) where
   p_part_mul : ∀ lam, Path (p_part lam) (p_part lam)
 
 /-- Path.trans: Newton's identity chains. -/
-def newton_chain (SR : SymRing) (pf : PowerSumSymFun SR)
+noncomputable def newton_chain (SR : SymRing) (pf : PowerSumSymFun SR)
     (ef : ElementarySymFun SR) (n : Nat) :
     Path (pf.p (n + 1)) (pf.p (n + 1)) :=
   Path.trans (pf.newton_identity_e ef n) (Path.refl _)
@@ -291,7 +291,7 @@ structure HallLittlewoodSystem (SR : SymRing) (sf : SchurFunction SR) where
     Path (SR.mul (Q lam t) (Q mu t)) (SR.mul (Q lam t) (Q mu t))
 
 /-- Specialization theorem extracted from Hall-Littlewood data. -/
-def hallLittlewood_to_schur (SR : SymRing) (sf : SchurFunction SR)
+noncomputable def hallLittlewood_to_schur (SR : SymRing) (sf : SchurFunction SR)
     (HL : HallLittlewoodSystem SR sf) (lam : Partition) :
     Path (HL.P lam 0) (sf.s lam) :=
   HL.specialize_t_zero lam
@@ -320,14 +320,14 @@ structure MacdonaldSystem (SR : SymRing) (sf : SchurFunction SR)
     Path (SR.mul (P lam q t) (Q mu q t)) (SR.mul (P lam q t) (Q mu q t))
 
 /-- `q = 0` specialization from Macdonald to Hall-Littlewood. -/
-def macdonald_to_hallLittlewood (SR : SymRing) (sf : SchurFunction SR)
+noncomputable def macdonald_to_hallLittlewood (SR : SymRing) (sf : SchurFunction SR)
     (HL : HallLittlewoodSystem SR sf) (M : MacdonaldSystem SR sf HL)
     (lam : Partition) (t : Nat) :
     Path (M.P lam 0 t) (HL.P lam t) :=
   M.specialize_q_zero lam t
 
 /-- Combined specialization `(q,t) = (0,0)` to Schur data. -/
-def macdonald_zero_zero_to_schur (SR : SymRing) (sf : SchurFunction SR)
+noncomputable def macdonald_zero_zero_to_schur (SR : SymRing) (sf : SchurFunction SR)
     (HL : HallLittlewoodSystem SR sf) (M : MacdonaldSystem SR sf HL)
     (lam : Partition) :
     Path (M.P lam 0 0) (sf.s lam) :=
@@ -353,7 +353,7 @@ structure JacobiTrudiPath (SR : SymRing)
     Path (sf.s lam) (sf.s lam)
 
 /-- Path.trans: Jacobi-Trudi composed with dual. -/
-def jt_dual_compose (SR : SymRing) (sf : SchurFunction SR) (hf : HomogeneousSymFun SR)
+noncomputable def jt_dual_compose (SR : SymRing) (sf : SchurFunction SR) (hf : HomogeneousSymFun SR)
     (jt : JacobiTrudiPath SR sf hf) (_ef : ElementarySymFun SR) (lam : Partition) :
     Path (sf.s lam) (sf.s lam) :=
   Path.trans (jt.jacobi_trudi lam) (Path.symm (jt.jacobi_trudi lam))
@@ -389,7 +389,7 @@ structure LRRule (SR : SymRing) (sf : SchurFunction SR) where
   lr_nonneg : ∀ lam mu nu, lr_coeff lam mu nu ≥ 0
 
 /-- Path.trans: LR symmetry is involutive. -/
-def lr_symm_invol (SR : SymRing) (sf : SchurFunction SR) (lr : LRRule SR sf)
+noncomputable def lr_symm_invol (SR : SymRing) (sf : SchurFunction SR) (lr : LRRule SR sf)
     (lam mu nu : Partition) :
     Path (lr.lr_coeff lam mu nu) (lr.lr_coeff lam mu nu) :=
   Path.trans (lr.lr_symmetry lam mu nu) (lr.lr_symmetry mu lam nu)

@@ -23,7 +23,7 @@ inductive Letter : Type
 
 namespace Letter
 
-def inv : Letter → Letter
+noncomputable def inv : Letter → Letter
   | .pos n => .neg n
   | .neg n => .pos n
 
@@ -33,13 +33,13 @@ noncomputable def inv_inv (g : Letter) : inv (inv g) = g := by
 end Letter
 
 /-- Reduced words: no adjacent inverse pair. -/
-def Normal : List Letter → Prop
+noncomputable def Normal : List Letter → Prop
   | [] => True
   | [_] => True
   | g :: h :: t => Letter.inv g ≠ h ∧ Normal (h :: t)
 
 /-- Prepend one letter, canceling when an inverse pair appears at the boundary. -/
-def push (g : Letter) : List Letter → List Letter
+noncomputable def push (g : Letter) : List Letter → List Letter
   | [] => [g]
   | h :: t => if Letter.inv g = h then t else g :: h :: t
 
@@ -70,7 +70,7 @@ noncomputable def push_preserves_normal (g : Letter) :
         simpa [push, hc, Normal] using And.intro hc hnormal
 
 /-- Innermost normalization on words (right-associated recursive reduction). -/
-def reduceWord : List Letter → List Letter
+noncomputable def reduceWord : List Letter → List Letter
   | [] => []
   | g :: w => push g (reduceWord w)
 
@@ -98,21 +98,21 @@ noncomputable def reduceWord_measure_drop (g : Letter) (w : List Letter) :
   exact Nat.lt_succ_of_le (reduceWord_length_le w)
 
 /-- Syntax-level words before cancellation. -/
-def rawWord : Expr → List Letter
+noncomputable def rawWord : Expr → List Letter
   | .atom n => [.pos n]
   | .refl => []
   | .symm p => (rawWord p).reverse.map Letter.inv
   | .trans p q => rawWord p ++ rawWord q
 
 /-- Innermost strategy: normalize subterms before reducing the parent term. -/
-def normalizeInnermost : Expr → List Letter
+noncomputable def normalizeInnermost : Expr → List Letter
   | .atom n => [.pos n]
   | .refl => []
   | .symm p => reduceWord ((normalizeInnermost p).reverse.map Letter.inv)
   | .trans p q => reduceWord (normalizeInnermost p ++ normalizeInnermost q)
 
 /-- Outermost strategy: flatten first, then normalize once. -/
-def normalizeOutermost (p : Expr) : List Letter :=
+noncomputable def normalizeOutermost (p : Expr) : List Letter :=
   reduceWord (rawWord p)
 
 inductive ReductionStrategy
@@ -120,12 +120,12 @@ inductive ReductionStrategy
   | outermost
   deriving DecidableEq, Repr
 
-def normalizeWith : ReductionStrategy → Expr → List Letter
+noncomputable def normalizeWith : ReductionStrategy → Expr → List Letter
   | .innermost => normalizeInnermost
   | .outermost => normalizeOutermost
 
 /-- Canonical normal form used to solve the word problem. -/
-def normalForm (p : Expr) : List Letter :=
+noncomputable def normalForm (p : Expr) : List Letter :=
   normalizeWith .outermost p
 
 noncomputable def normalizeInnermost_normal (p : Expr) : Normal (normalizeInnermost p) := by
@@ -151,14 +151,14 @@ noncomputable def normalizeWith_normal (s : ReductionStrategy) (p : Expr) :
   | outermost => simpa [normalizeWith] using normalizeOutermost_normal p
 
 /-- Decidable rewrite equality for the groupoid fragment via normal forms. -/
-def GroupoidRwEq (p q : Expr) : Prop :=
+noncomputable def GroupoidRwEq (p q : Expr) : Prop :=
   normalForm p = normalForm q
 
-instance groupoidRwEq_decidable (p q : Expr) : Decidable (GroupoidRwEq p q) := by
+noncomputable instance groupoidRwEq_decidable (p q : Expr) : Decidable (GroupoidRwEq p q) := by
   unfold GroupoidRwEq normalForm normalizeWith normalizeOutermost
   infer_instance
 
-def decideGroupoidRwEq (p q : Expr) : Bool :=
+noncomputable def decideGroupoidRwEq (p q : Expr) : Bool :=
   decide (GroupoidRwEq p q)
 
 noncomputable def decideGroupoidRwEq_spec (p q : Expr) :
@@ -166,7 +166,7 @@ noncomputable def decideGroupoidRwEq_spec (p q : Expr) :
   simp [decideGroupoidRwEq]
 
 /-- Complexity measure used for explicit termination arguments on expressions. -/
-def exprComplexity : Expr → Nat
+noncomputable def exprComplexity : Expr → Nat
   | .atom _ => 1
   | .refl => 1
   | .symm p => exprComplexity p + 1
@@ -193,12 +193,12 @@ noncomputable def normalization_expr_wf :
   InvImage.wf exprComplexity Nat.lt_wfRel.wf
 
 /-- Interpret a reduced-word letter as a loop path. -/
-def letterPath {A : Type u} {a : A} (ρ : Nat → Path a a) : Letter → Path a a
+noncomputable def letterPath {A : Type u} {a : A} (ρ : Nat → Path a a) : Letter → Path a a
   | .pos n => ρ n
   | .neg n => Path.symm (ρ n)
 
 /-- Interpret a word as an iterated composition of loop paths. -/
-def evalWord {A : Type u} {a : A} (ρ : Nat → Path a a) : List Letter → Path a a
+noncomputable def evalWord {A : Type u} {a : A} (ρ : Nat → Path a a) : List Letter → Path a a
   | [] => Path.refl a
   | g :: w => Path.trans (letterPath ρ g) (evalWord ρ w)
 

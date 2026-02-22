@@ -63,12 +63,12 @@ structure InverseSystem where
     Path (transition n (mul (n + 1) x y)) (mul n (transition n x) (transition n y))
 
 /-- Path-valued left identity. -/
-def InverseSystem.one_mul_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
+noncomputable def InverseSystem.one_mul_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
     Path (S.mul n (S.one n) x) x :=
   Path.stepChain (S.one_mul n x)
 
 /-- Path-valued associativity. -/
-def InverseSystem.mul_assoc_path (S : InverseSystem) (n : Nat) (x y z : S.obj n) :
+noncomputable def InverseSystem.mul_assoc_path (S : InverseSystem) (n : Nat) (x y z : S.obj n) :
     Path (S.mul n (S.mul n x y) z) (S.mul n x (S.mul n y z)) :=
   Path.stepChain (S.mul_assoc n x y z)
 
@@ -109,7 +109,7 @@ structure ProfiniteGroup extends InverseSystem where
   lim_mul_left_inv : ∀ x, Path (lim_mul (lim_inv x) x) lim_one
 
 /-- Path-valued left identity at the limit level. -/
-def ProfiniteGroup.lim_one_mul_path (G : ProfiniteGroup) (x : G.limit) :
+noncomputable def ProfiniteGroup.lim_one_mul_path (G : ProfiniteGroup) (x : G.limit) :
     Path (G.lim_mul G.lim_one x) x :=
   G.lim_one_mul x
 
@@ -131,7 +131,7 @@ structure ProPGroup extends ProfiniteGroup where
          (toProfiniteGroup.toInverseSystem.one n)
 
 /-- Trivial pro-p group on PUnit. -/
-def ProPGroup.trivial (p : Nat) (hp : p ≥ 2) : ProPGroup where
+noncomputable def ProPGroup.trivial (p : Nat) (hp : p ≥ 2) : ProPGroup where
   obj := fun _ => PUnit
   transition := fun _ x => x
   one := fun _ => PUnit.unit
@@ -179,7 +179,7 @@ structure SylowProfinite (G : ProfiniteGroup) where
   exists_element : ∃ x : G.limit, subgroup x
 
 /-- Sylow existence: every profinite group has a Sylow p-subgroup. -/
-def sylow_exists (G : ProfiniteGroup) (p : Nat) (hp : p ≥ 2) : SylowProfinite G where
+noncomputable def sylow_exists (G : ProfiniteGroup) (p : Nat) (hp : p ≥ 2) : SylowProfinite G where
   p := p
   p_ge_two := hp
   subgroup := fun _ => True
@@ -204,7 +204,7 @@ structure ProfiniteCompletion (G : Type u) where
     Path (canonical one_G) completion.lim_one
 
 /-- Trivial profinite completion (on PUnit). -/
-def ProfiniteCompletion.trivial : ProfiniteCompletion PUnit where
+noncomputable def ProfiniteCompletion.trivial : ProfiniteCompletion PUnit where
   completion := (ProPGroup.trivial 2 (by omega)).toProfiniteGroup
   canonical := fun _ => PUnit.unit
   canonical_mul := fun _ _ _ => Path.refl _
@@ -237,7 +237,7 @@ structure ContinuousCohomology (G : ProfiniteGroup) where
     Path (coboundary (n + 1) (coboundary n c)) (coboundary (n + 1) (coboundary n c))
 
 /-- The zeroth cohomology H^0 as fixed points. -/
-def fixed_points (G : ProfiniteGroup) (M : Type u)
+noncomputable def fixed_points (G : ProfiniteGroup) (M : Type u)
     (action : G.limit → M → M)
     (action_one : ∀ m, Path (action G.lim_one m) m) :
     M → Prop :=
@@ -257,7 +257,7 @@ inductive ProfiniteStep : {A : Type u} → A → A → Prop
                     (G.lim_mul (G.lim_mul x y) z)
 
 /-- ProfiniteStep implies Path. -/
-def profiniteStep_to_path {A : Type u} {a b : A} (h : ProfiniteStep a b) :
+noncomputable def profiniteStep_to_path {A : Type u} {a b : A} (h : ProfiniteStep a b) :
     Path a b := by
   cases h with
   | transition_compose => exact Path.refl _

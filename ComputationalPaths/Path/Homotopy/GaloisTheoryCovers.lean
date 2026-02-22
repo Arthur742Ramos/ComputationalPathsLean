@@ -93,7 +93,7 @@ abbrev fiberFunctor (a : A) (C : CoveringSpace.Covering A) : Type u :=
 /-! ## Grothendieck Galois correspondence -/
 
 /-- Grothendieck-style Galois correspondence: coverings vs. groupoid actions. -/
-def grothendieckGaloisEquiv (A : Type u) :
+noncomputable def grothendieckGaloisEquiv (A : Type u) :
     SimpleEquiv (CoveringSpace.Covering A) (CoveringSpace.GroupoidAction A) :=
   CoveringSpace.coveringGroupoidActionEquiv A
 
@@ -133,11 +133,11 @@ abbrev galoisGroup (C : GaloisCovering A) : Type u :=
   GaloisGroup (A := A) C.covering
 
 /-- Identity element in the Galois group. -/
-def galoisId (C : CoveringSpace.Covering A) : GaloisGroup (A := A) C :=
+noncomputable def galoisId (C : CoveringSpace.Covering A) : GaloisGroup (A := A) C :=
   CoveringSpace.DeckTransformation.id
 
 /-- Composition in the Galois group. -/
-def galoisComp (C : CoveringSpace.Covering A) :
+noncomputable def galoisComp (C : CoveringSpace.Covering A) :
     GaloisGroup (A := A) C → GaloisGroup (A := A) C → GaloisGroup (A := A) C :=
   CoveringSpace.DeckTransformation.comp
 

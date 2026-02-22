@@ -18,7 +18,7 @@ structure PathHomGroupoid (a b : A) where
   vcomp₂ : ∀ {p q r : Path a b}, RwEq p q → RwEq q r → RwEq p r
   inv₂ : ∀ {p q : Path a b}, RwEq p q → RwEq q p
 
-@[simp] def pathHomGroupoid (a b : A) : PathHomGroupoid (A := A) a b where
+@[simp] noncomputable def pathHomGroupoid (a b : A) : PathHomGroupoid (A := A) a b where
   id₂ := fun p => RwEq.refl p
   vcomp₂ := fun α β => RwEq.trans α β
   inv₂ := fun α => RwEq.symm α
@@ -151,7 +151,7 @@ noncomputable def yonedaToNat {a x : A} (p : Path a x) : EnrichedNat (A := A) a 
         (RwEq.step (Step.trans_congr_right p (Step.trans_refl_left g))))
 
 /-- Yoneda evaluation at identity. -/
-@[simp] def yonedaFromNat {a x : A} (η : EnrichedNat (A := A) a x) : Path a x :=
+@[simp] noncomputable def yonedaFromNat {a x : A} (η : EnrichedNat (A := A) a x) : Path a x :=
   η.app (Path.refl x)
 
 /-- Enriched Yoneda left inverse (up to `RwEq`). -/

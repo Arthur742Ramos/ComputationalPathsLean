@@ -73,7 +73,7 @@ noncomputable def commute_cancel_rweq (r p q : Nat) :
   rweq_cmpA_inv_left (D.commutePath r p q)
 
 /-- Composite boundary loop induced by the `d² = 0` witness. -/
-def boundaryLoop (r p q : Nat) :
+noncomputable def boundaryLoop (r p q : Nat) :
     Path (D.d r p q (D.d r p q (E.base p q))) (D.d r p q (D.d r p q (E.base p q))) :=
   Path.trans (D.dSquaredPath r p q) (Path.symm (D.dSquaredPath r p q))
 
@@ -84,7 +84,7 @@ noncomputable def boundaryLoop_contracts (r p q : Nat) :
   exact rweq_cmpA_inv_right (D.dSquaredPath r p q)
 
 /-- Apply page transition to the `d² = 0` witness. -/
-def stabilizedBoundary (r p q : Nat) :
+noncomputable def stabilizedBoundary (r p q : Nat) :
     Path
       (E.shift r p q (D.d r p q (D.d r p q (E.base p q))))
       (E.shift r p q (E.base p q)) :=
@@ -99,7 +99,7 @@ noncomputable def stabilizedBoundary_contracts (r p q : Nat) :
 end Differentials
 
 /-- Trivial differential package over the trivial page package. -/
-def trivialDifferentials : Differentials trivialPages where
+noncomputable def trivialDifferentials : Differentials trivialPages where
   d := fun _ _ _ _ => PUnit.unit
   dSquaredPath := fun _ _ _ => Path.refl PUnit.unit
   dSquaredStep := fun _ _ _ => Path.Step.trans_refl_right (Path.refl PUnit.unit)

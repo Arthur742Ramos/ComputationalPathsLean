@@ -50,7 +50,7 @@ noncomputable def bar_action_rweq
   rweq_of_operadic_step (K.barActionStep c xs)
 
 /-- Round-trip loop from bar/cobar unit on the algebra side. -/
-def dualRoundTrip (x : A) :
+noncomputable def dualRoundTrip (x : A) :
     Path (K.duality.cobar (K.duality.bar x)) (K.duality.cobar (K.duality.bar x)) :=
   Path.trans (K.duality.unitPath x) (Path.symm (K.duality.unitPath x))
 
@@ -60,7 +60,7 @@ noncomputable def dual_roundtrip_rweq (x : A) :
   exact rweq_cmpA_inv_right (K.duality.unitPath x)
 
 /-- Unit action path on a bar-cobar image inside the source `E_n`-algebra. -/
-def enUnitOnDualized (x : A) :
+noncomputable def enUnitOnDualized (x : A) :
     Path
       (K.enAlgebra.base.act (identityCube n)
         (fun _ => K.duality.cobar (K.duality.bar x)))
@@ -70,7 +70,7 @@ def enUnitOnDualized (x : A) :
 end EnKoszulDualityPathData
 
 /-- Build `E_n`-Koszul duality path data from legacy operadic Koszul data. -/
-def EnKoszulDualityPathData.ofLegacy
+noncomputable def EnKoszulDualityPathData.ofLegacy
     (n : Nat)
     (K : KoszulOperadicAlgebraPathData (enOperad n)) :
     EnKoszulDualityPathData n K.carrier K.dualCarrier where
@@ -81,7 +81,7 @@ def EnKoszulDualityPathData.ofLegacy
   barActionStep := fun c xs => OperadicPathStep.ofKoszulStep (K.barActionStep c xs)
 
 /-- Trivial `E_n`-Koszul duality path data on `Unit`. -/
-def EnKoszulDualityPathData.trivial (n : Nat) :
+noncomputable def EnKoszulDualityPathData.trivial (n : Nat) :
     EnKoszulDualityPathData n Unit Unit where
   enAlgebra := EnOperadAlgebraPathData.trivial n
   duality := BarCobarDualityPathData.trivial

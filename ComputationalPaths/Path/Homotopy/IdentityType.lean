@@ -111,7 +111,7 @@ variable {P : A → Type v} {a a' : A}
 
 /-- Dependent application of a function to a path (apd).
     For `f : Π(x:A), P(x)` and `p : a = a'`, we get `apd f p : p*(f(a)) = f(a')`. -/
-@[simp] def apd (f : (x : A) → P x) (p : Path a a') :
+@[simp] noncomputable def apd (f : (x : A) → P x) (p : Path a a') :
     Path (Path.transport (A := A) (D := P) p (f a)) (f a') :=
   match p with
   | ⟨_, proof⟩ => by cases proof; exact Path.refl (f a)

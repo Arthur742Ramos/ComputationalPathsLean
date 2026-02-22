@@ -66,12 +66,12 @@ variable {C : Type u} {D : Type v}
 variable {F : C → D} {G : D → C}
 
 /-- Forward action on paths induced by `F`. -/
-def mapPath (_E : CategoricalEquivalence C D F G) {x y : C} :
+noncomputable def mapPath (_E : CategoricalEquivalence C D F G) {x y : C} :
     Path x y → Path (F x) (F y) :=
   fun p => Path.congrArg F p
 
 /-- Backward action on paths induced by `G`, whiskered by unit witnesses. -/
-def unmapPath (E : CategoricalEquivalence C D F G) {x y : C} :
+noncomputable def unmapPath (E : CategoricalEquivalence C D F G) {x y : C} :
     Path (F x) (F y) → Path x y :=
   fun q =>
     Path.trans (E.unitIso x).hom

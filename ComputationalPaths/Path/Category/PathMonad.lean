@@ -48,10 +48,10 @@ namespace PathMonad
 variable {A : Type u}
 
 /-- Unit of the path monad: the reflexive path. -/
-@[simp] def pure (a : A) : Path a a := Path.refl a
+@[simp] noncomputable def pure (a : A) : Path a a := Path.refl a
 
 /-- Kleisli extension for the path monad: compose two paths. -/
-@[simp] def extend {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
+@[simp] noncomputable def extend {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
 -- ============================================================
@@ -131,11 +131,11 @@ namespace KleisliArrow
 variable {a b c d : A}
 
 /-- Identity Kleisli arrow. -/
-@[simp] def id (a : A) : KleisliArrow A a a :=
+@[simp] noncomputable def id (a : A) : KleisliArrow A a a :=
   ⟨pure a⟩
 
 /-- Composition of Kleisli arrows. -/
-@[simp] def comp (f : KleisliArrow A a b) (g : KleisliArrow A b c) :
+@[simp] noncomputable def comp (f : KleisliArrow A a b) (g : KleisliArrow A b c) :
     KleisliArrow A a c :=
   ⟨extend f.arrow g.arrow⟩
 
@@ -156,7 +156,7 @@ variable {a b c d : A}
   cases f; cases g; cases h; simp
 
 /-- Inverse Kleisli arrow via path symmetry. -/
-@[simp] def inv (f : KleisliArrow A a b) : KleisliArrow A b a :=
+@[simp] noncomputable def inv (f : KleisliArrow A a b) : KleisliArrow A b a :=
   ⟨Path.symm f.arrow⟩
 
 /-- Left inverse for Kleisli arrows (at the toEq level). -/
@@ -210,7 +210,7 @@ namespace TransportAlgebra
 variable {A : Type u} {X : A → Type v}
 
 /-- The canonical transport algebra uses Eq.rec. -/
-def canonical (X : A → Type v) : TransportAlgebra A X where
+noncomputable def canonical (X : A → Type v) : TransportAlgebra A X where
   action := fun h x => h ▸ x
   action_rfl := fun _ _ => rfl
   action_trans_eq := fun p q x => by cases p; cases q; rfl
@@ -238,7 +238,7 @@ theorem action_symm_right (alg : TransportAlgebra A X) {a b : A}
   cases p; simp [alg.action_rfl]
 
 /-- Lift a transport algebra to act on paths (using the proof field). -/
-def liftToPath (alg : TransportAlgebra A X) :
+noncomputable def liftToPath (alg : TransportAlgebra A X) :
     {a b : A} → Path a b → X a → X b :=
   fun p x => alg.action p.proof x
 
@@ -268,12 +268,12 @@ structure AlgHom {X Y : A → Type v}
     map b (alg₁.action p x) = alg₂.action p (map a x)
 
 /-- Identity algebra homomorphism. -/
-def AlgHom.id {X : A → Type v} (alg : TransportAlgebra A X) : AlgHom alg alg where
+noncomputable def AlgHom.id {X : A → Type v} (alg : TransportAlgebra A X) : AlgHom alg alg where
   map := fun _ x => x
   commute := fun _ _ => rfl
 
 /-- Composition of algebra homomorphisms. -/
-def AlgHom.comp {X Y Z : A → Type v}
+noncomputable def AlgHom.comp {X Y Z : A → Type v}
     {alg₁ : TransportAlgebra A X} {alg₂ : TransportAlgebra A Y}
     {alg₃ : TransportAlgebra A Z}
     (f : AlgHom alg₁ alg₂) (g : AlgHom alg₂ alg₃) :
@@ -301,7 +301,7 @@ theorem AlgHom.comp_id' {X Y : A → Type v}
 -- ============================================================
 
 /-- The constant transport algebra: equality acts trivially. -/
-def constAlg (D : Type v) : TransportAlgebra A (fun _ => D) where
+noncomputable def constAlg (D : Type v) : TransportAlgebra A (fun _ => D) where
   action := fun p x => by cases p; exact x
   action_rfl := fun _ _ => rfl
   action_trans_eq := fun p q x => by cases p; cases q; rfl

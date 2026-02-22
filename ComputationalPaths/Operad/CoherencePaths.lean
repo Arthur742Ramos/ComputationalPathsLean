@@ -20,12 +20,12 @@ universe u
 abbrev Operation {A : Type u} (a b : A) := Path a b
 
 /-- Operadic composition is path composition. -/
-@[simp] def opComp {A : Type u} {a b c : A}
+@[simp] noncomputable def opComp {A : Type u} {a b c : A}
     (f : Operation a b) (g : Operation b c) : Operation a c :=
   Path.trans f g
 
 /-- Identity operation. -/
-@[simp] def opId {A : Type u} (a : A) : Operation a a :=
+@[simp] noncomputable def opId {A : Type u} (a : A) : Operation a a :=
   Path.refl a
 
 section Coherence

@@ -45,7 +45,7 @@ inductive LTerm : Type where
 namespace LTerm
 
 /-- Size of a term. -/
-def size : LTerm → Nat
+noncomputable def size : LTerm → Nat
   | .var _ => 1
   | .app t s => t.size + s.size + 1
   | .lam t => t.size + 1
@@ -54,28 +54,28 @@ theorem size_pos (t : LTerm) : 0 < t.size := by
   cases t <;> simp [size] <;> omega
 
 /-- Shift free variables by `d` above cutoff `c`. -/
-def shift (d : Int) (c : Nat) : LTerm → LTerm
+noncomputable def shift (d : Int) (c : Nat) : LTerm → LTerm
   | .var n => if n < c then .var n else .var (Int.toNat (n + d))
   | .app t s => .app (shift d c t) (shift d c s)
   | .lam t => .lam (shift d (c + 1) t)
 
 /-- Substitution: replace var `j` with term `s` (de Bruijn). -/
-def subst (j : Nat) (s : LTerm) : LTerm → LTerm
+noncomputable def subst (j : Nat) (s : LTerm) : LTerm → LTerm
   | .var n => if n == j then s else .var n
   | .app t1 t2 => .app (subst j s t1) (subst j s t2)
   | .lam t => .lam (subst (j + 1) (shift 1 0 s) t)
 
 /-- Beta reduction body: substitute var 0, then shift down. -/
-def betaBody (body arg : LTerm) : LTerm :=
+noncomputable def betaBody (body arg : LTerm) : LTerm :=
   shift (-1) 0 (subst 0 (shift 1 0 arg) body)
 
 /-- Check if a term is a value (lambda abstraction). -/
-def isLam : LTerm → Bool
+noncomputable def isLam : LTerm → Bool
   | .lam _ => true
   | _ => false
 
 /-- A term is in normal form if no beta-redex exists. -/
-def isNF : LTerm → Bool
+noncomputable def isNF : LTerm → Bool
   | .var _ => true
   | .app (.lam _) _ => false
   | .app t s => t.isNF && s.isNF
@@ -200,7 +200,7 @@ end ParBeta
 /-! ## Normal Forms -/
 
 /-- A term is in beta normal form if no beta step is possible. -/
-def BetaNF (t : LTerm) : Prop := ∀ s, ¬BetaStep t s
+noncomputable def BetaNF (t : LTerm) : Prop := ∀ s, ¬BetaStep t s
 
 /-- Variables are in normal form. -/
 theorem var_nf (n : Nat) : BetaNF (.var n) := by
@@ -243,7 +243,7 @@ theorem nf_star_eq {t s : LTerm} (hnf : BetaNF t) (h : BetaStar t s) :
 /-! ## Eta Reduction -/
 
 /-- Check if variable n occurs free in a term. -/
-def freeIn (n : Nat) : LTerm → Bool
+noncomputable def freeIn (n : Nat) : LTerm → Bool
   | .var m => n == m
   | .app t s => freeIn n t || freeIn n s
   | .lam t => freeIn (n + 1) t
@@ -287,7 +287,7 @@ theorem head_star_is_beta_star : HeadStar t s → BetaStar t s := by
   | cons step _ ih => exact .cons (head_is_beta step) ih
 
 /-- Head normal form: no head redex. -/
-def HeadNF (t : LTerm) : Prop := ∀ s, ¬HeadStep t s
+noncomputable def HeadNF (t : LTerm) : Prop := ∀ s, ¬HeadStep t s
 
 /-- Variables are head normal forms. -/
 theorem var_head_nf (n : Nat) : HeadNF (.var n) := by
@@ -309,7 +309,7 @@ theorem beta_nf_head_nf {t : LTerm} (h : BetaNF t) : HeadNF t := by
 
 /-- If `t` converts to `s`, they reduce to a common reduct (Church-Rosser).
     This is the key consequence of confluence. -/
-def CR_statement : Prop :=
+noncomputable def CR_statement : Prop :=
   ∀ t s : LTerm, BetaConv t s → ∃ u, BetaStar t u ∧ BetaStar s u
 
 /-- Normal forms are unique (consequence of CR). -/
@@ -341,7 +341,7 @@ theorem beta_star_lam_congr {t t' : LTerm} (h : BetaStar t t') :
 /-! ## Connection to computational Path -/
 
 /-- Lambda term equality lifted to computational path. -/
-def termPath {t s : LTerm} (h : t = s) : Path t s := Path.mk [Step.mk _ _ h] h
+noncomputable def termPath {t s : LTerm} (h : t = s) : Path t s := Path.mk [Step.mk _ _ h] h
 
 /-- Composition of term paths. -/
 theorem termPath_toEq_trans {t s u : LTerm} (h1 : t = s) (h2 : s = u) :

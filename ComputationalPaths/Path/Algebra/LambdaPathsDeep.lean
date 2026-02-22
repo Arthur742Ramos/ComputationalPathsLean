@@ -31,13 +31,13 @@ open LTerm
 -- ============================================================
 
 /-- Shift free variables ≥ cutoff by `d`. -/
-def shift (d cutoff : Nat) : LTerm → LTerm
+noncomputable def shift (d cutoff : Nat) : LTerm → LTerm
   | var n     => if n ≥ cutoff then var (n + d) else var n
   | lam body  => lam (shift d (cutoff + 1) body)
   | app f a   => app (shift d cutoff f) (shift d cutoff a)
 
 /-- Substitute variable `j` with term `s` in `t`. -/
-def subst (j : Nat) (s : LTerm) : LTerm → LTerm
+noncomputable def subst (j : Nat) (s : LTerm) : LTerm → LTerm
   | var n     => if n == j then s
                  else if n > j then var (n - 1)
                  else var n
@@ -211,7 +211,7 @@ theorem PathBound.trans {a b c : LTerm} {m n : Nat}
 -- ============================================================
 
 /-- A term is a beta normal form when no beta step applies. -/
-def isBetaNF : LTerm → Prop
+noncomputable def isBetaNF : LTerm → Prop
   | var _    => True
   | lam t    => isBetaNF t
   | app (lam _) _ => False
@@ -384,7 +384,7 @@ structure StandardPath (a b : LTerm) where
   intPart  : IntPath mid b
 
 /-- Def 35: Refl gives a trivial standard path. -/
-def StandardPath.refl (t : LTerm) : StandardPath t t :=
+noncomputable def StandardPath.refl (t : LTerm) : StandardPath t t :=
   ⟨t, HeadPath.refl t, IntPath.refl t⟩
 
 /-- Theorem 36: A standard path is a beta path (soundness). -/
@@ -398,12 +398,12 @@ theorem StandardPath.toPath {a b : LTerm} (sp : StandardPath a b) :
   sp.toBetaPath.toPath
 
 /-- Def 38: Head path gives a standard path with trivial internal part. -/
-def HeadPath.toStandard {a b : LTerm} (hp : HeadPath a b) :
+noncomputable def HeadPath.toStandard {a b : LTerm} (hp : HeadPath a b) :
     StandardPath a b :=
   ⟨b, hp, IntPath.refl b⟩
 
 /-- Def 39: Internal path gives a standard path with trivial head part. -/
-def IntPath.toStandard {a b : LTerm} (ip : IntPath a b) :
+noncomputable def IntPath.toStandard {a b : LTerm} (ip : IntPath a b) :
     StandardPath a b :=
   ⟨a, HeadPath.refl a, ip⟩
 
@@ -413,10 +413,10 @@ def IntPath.toStandard {a b : LTerm} (ip : IntPath a b) :
 
 /-- A Böhm approximation truncates at a given depth, replacing
     non‑HNF subterms with ⊥ (bottom, represented as a distinguished var). -/
-def botTerm : LTerm := var 9999
+noncomputable def botTerm : LTerm := var 9999
 
 /-- Approximate to depth n. -/
-def approx : Nat → LTerm → LTerm
+noncomputable def approx : Nat → LTerm → LTerm
   | 0, _          => botTerm
   | _ + 1, var k  => var k
   | n + 1, lam t  => lam (approx n t)
@@ -442,7 +442,7 @@ theorem approx_app (n : Nat) (f a : LTerm) :
 
 /-- The Böhm ordering: t ≤_BT u when every finite approximation of t
     can be matched by u. -/
-def boehmLeq (t u : LTerm) : Prop :=
+noncomputable def boehmLeq (t u : LTerm) : Prop :=
   ∀ n, ∃ m, approx n t = approx m u ∨ approx n t = botTerm
 
 /-- Theorem 44: Böhm ordering is reflexive. -/
@@ -461,7 +461,7 @@ theorem boehmLeq_bot (t : LTerm) : boehmLeq botTerm t := by
 -- ============================================================
 
 /-- Confluence statement: if a →* b and a →* c then ∃ d, b →* d ∧ c →* d. -/
-def Confluent : Prop :=
+noncomputable def Confluent : Prop :=
   ∀ a b c : LTerm, Path a b → Path a c → ∃ d, Path b d ∧ Path c d
 
 /-- Theorem 46: If confluent, then NF is unique up to path equality. -/
@@ -539,7 +539,7 @@ theorem BetaStep.toParStep {a b : LTerm} (s : BetaStep a b) : ParStep a b := by
 -- ============================================================
 
 /-- Leftmost‑outermost strategy: picks the head redex if present. -/
-def leftmostStep : LTerm → Option LTerm
+noncomputable def leftmostStep : LTerm → Option LTerm
   | app (lam body) arg => some (subst 0 arg body)
   | app f a =>
     match leftmostStep f with
@@ -567,13 +567,13 @@ theorem leftmostStep_beta (body arg : LTerm) :
 -- ============================================================
 
 /-- Maximum free variable index in a term. -/
-def maxFV : LTerm → Nat → Nat
+noncomputable def maxFV : LTerm → Nat → Nat
   | var n, bound    => if n ≥ bound then n - bound + 1 else 0
   | lam t, bound    => maxFV t (bound + 1)
   | app f a, bound  => max (maxFV f bound) (maxFV a bound)
 
 /-- A term is closed when maxFV = 0. -/
-def isClosed (t : LTerm) : Prop := maxFV t 0 = 0
+noncomputable def isClosed (t : LTerm) : Prop := maxFV t 0 = 0
 
 /-- Theorem 53: var 0 under one binder is closed from outside. -/
 theorem lam_var0_closed : isClosed (lam (var 0)) := by
@@ -591,7 +591,7 @@ theorem church_zero_closed : isClosed (lam (lam (var 0))) := by
 -- ============================================================
 
 /-- Beta expansion: the reverse of beta reduction. -/
-def BetaExpansion (a b : LTerm) : Prop := BetaStep b a
+noncomputable def BetaExpansion (a b : LTerm) : Prop := BetaStep b a
 
 /-- Theorem 56: A beta expansion composes with reduction into a SymPath via symm+trans. -/
 theorem expansion_then_reduction {a b c : LTerm}
@@ -618,7 +618,7 @@ inductive DPath : LTerm → LTerm → Type where
   | cons : {a b c : LTerm} → Step a b → DPath b c → DPath a c
 
 /-- Theorem 58: trans for DPath. -/
-def DPath.trans : DPath a b → DPath b c → DPath a c
+noncomputable def DPath.trans : DPath a b → DPath b c → DPath a c
   | DPath.nil _, q => q
   | DPath.cons s p, q => DPath.cons s (DPath.trans p q)
 
@@ -657,7 +657,7 @@ theorem dpath_category_laws :
 -- ============================================================
 
 /-- The I combinator: λx.x -/
-def termI : LTerm := lam (var 0)
+noncomputable def termI : LTerm := lam (var 0)
 
 /-- Theorem 63: I x →β x  (single beta step path). -/
 theorem I_reduces (x : LTerm) :
@@ -680,7 +680,7 @@ theorem I_reduces_to (x : LTerm) :
 -- ============================================================
 
 /-- Two paths are co-terminal when they reach the same target. -/
-def CoTerminal (b c : LTerm) (_ : Path a b) (_ : Path a c) : Prop := b = c
+noncomputable def CoTerminal (b c : LTerm) (_ : Path a b) (_ : Path a c) : Prop := b = c
 
 /-- Theorem 66: Reflexive paths are always co-terminal. -/
 theorem coTerminal_refl (t : LTerm) :
@@ -692,7 +692,7 @@ theorem path_refl_trans_eq {a b : LTerm} (p : Path a b) :
   Path.trans (Path.refl a) p
 
 /-- Theorem 68: congrLam on DPath distributes over trans. -/
-def DPath.congrLam : DPath a b → DPath (lam a) (lam b)
+noncomputable def DPath.congrLam : DPath a b → DPath (lam a) (lam b)
   | DPath.nil _ => DPath.nil _
   | DPath.cons s p => DPath.cons (Step.congLam s) (DPath.congrLam p)
 
@@ -704,7 +704,7 @@ theorem dpath_congrLam_trans {a b c : LTerm}
   | cons s _ ih => simp [DPath.trans, DPath.congrLam, ih]
 
 /-- Theorem 69: congrAppL on DPath distributes over trans. -/
-def DPath.congrAppL (x : LTerm) : DPath a b → DPath (app a x) (app b x)
+noncomputable def DPath.congrAppL (x : LTerm) : DPath a b → DPath (app a x) (app b x)
   | DPath.nil _ => DPath.nil _
   | DPath.cons s p => DPath.cons (Step.congAppL s) (DPath.congrAppL x p)
 
@@ -716,7 +716,7 @@ theorem dpath_congrAppL_trans {f f' f'' a : LTerm}
   | cons s _ ih => simp [DPath.trans, DPath.congrAppL, ih]
 
 /-- Theorem 70: congrAppR on DPath distributes over trans. -/
-def DPath.congrAppR (x : LTerm) : DPath a b → DPath (app x a) (app x b)
+noncomputable def DPath.congrAppR (x : LTerm) : DPath a b → DPath (app x a) (app x b)
   | DPath.nil _ => DPath.nil _
   | DPath.cons s p => DPath.cons (Step.congAppR s) (DPath.congrAppR x p)
 

@@ -39,13 +39,13 @@ We define ℤ/2ℤ as Fin 2 locally.
 abbrev Z2 : Type := Fin 2
 
 /-- Zero element of ℤ/2ℤ. -/
-def z2_zero : Z2 := ⟨0, by decide⟩
+noncomputable def z2_zero : Z2 := ⟨0, by decide⟩
 
 /-- One element of ℤ/2ℤ. -/
-def z2_one : Z2 := ⟨1, by decide⟩
+noncomputable def z2_one : Z2 := ⟨1, by decide⟩
 
 /-- Addition in ℤ/2ℤ. -/
-def z2_add (a b : Z2) : Z2 :=
+noncomputable def z2_add (a b : Z2) : Z2 :=
   ⟨(a.val + b.val) % 2, by
     have h : (0 : Nat) < 2 := by decide
     exact Nat.mod_lt _ h⟩
@@ -54,26 +54,26 @@ def z2_add (a b : Z2) : Z2 :=
 abbrev S3FiveLoop : Type := Z2
 
 /-- The trivial 5-loop (constant map). -/
-def s3FiveLoop_refl : S3FiveLoop := z2_zero
+noncomputable def s3FiveLoop_refl : S3FiveLoop := z2_zero
 
 /-- The generator: η² : S⁵ → S³.
 
 This is the Hopf square, the composition of Hopf maps. -/
-def s3FiveLoop_etaSquared : S3FiveLoop := z2_one
+noncomputable def s3FiveLoop_etaSquared : S3FiveLoop := z2_one
 
 /-- Composition of 5-loops. -/
-def s3FiveLoop_comp : S3FiveLoop → S3FiveLoop → S3FiveLoop := z2_add
+noncomputable def s3FiveLoop_comp : S3FiveLoop → S3FiveLoop → S3FiveLoop := z2_add
 
 /-- Inverse of a 5-loop. -/
-def s3FiveLoop_inv : S3FiveLoop → S3FiveLoop := id
+noncomputable def s3FiveLoop_inv : S3FiveLoop → S3FiveLoop := id
 
 /-! ## The ℤ/2ℤ Structure -/
 
 /-- The parity of a 5-loop: which element of ℤ/2ℤ it represents. -/
-def s3FiveLoop_parity : S3FiveLoop → Z2 := id
+noncomputable def s3FiveLoop_parity : S3FiveLoop → Z2 := id
 
 /-- Construct a 5-loop from its parity. -/
-def s3FiveLoop_of_parity : Z2 → S3FiveLoop := id
+noncomputable def s3FiveLoop_of_parity : Z2 → S3FiveLoop := id
 
 /-- The generator η² has parity 1. -/
 theorem s3FiveLoop_etaSquared_parity :
@@ -118,7 +118,7 @@ theorem two_etaSquared_trivial :
 /-! ## The Main Equivalence -/
 
 /-- The fifth homotopy group of S³. -/
-def S3PiFive : Type := S3FiveLoop
+noncomputable def S3PiFive : Type := S3FiveLoop
 
 /-- **Main Theorem**: π₅(S³) ≃ ℤ/2ℤ.
 

@@ -108,7 +108,7 @@ noncomputable def gluing_cancel_right_rweq (F : Obj) :
 end PerverseSheafPathData
 
 /-- Build perverse-sheaf path data from path-level witnesses. -/
-def mkPerverseSheafPathData
+noncomputable def mkPerverseSheafPathData
     {Obj : Type u}
     (shift : Obj → Int → Obj)
     (nearbyCycles : Obj → Obj)

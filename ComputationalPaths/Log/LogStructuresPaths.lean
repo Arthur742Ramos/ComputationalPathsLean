@@ -42,7 +42,7 @@ namespace LogStructurePathData
 variable {Obj Monoid : Type u} (L : LogStructurePathData Obj Monoid)
 
 /-- Step witness: right-unit normalization for chart multiplicativity. -/
-def chartMul_step (x y : Obj) :
+noncomputable def chartMul_step (x y : Obj) :
     Path.Step
       (Path.trans (L.chartMulPath x y)
         (Path.refl (L.monoidMul (L.chart x) (L.chart y))))
@@ -57,7 +57,7 @@ noncomputable def chartMul_rweq (x y : Obj) :
   rweq_of_step (L.chartMul_step x y)
 
 /-- Step witness: right-unit normalization for the chart-unit comparison. -/
-def chartUnit_step :
+noncomputable def chartUnit_step :
     Path.Step
       (Path.trans L.chartUnitPath (Path.refl L.unitMonoid))
       L.chartUnitPath :=
@@ -70,7 +70,7 @@ noncomputable def chartUnit_rweq :
   rweq_of_step (L.chartUnit_step)
 
 /-- Step witness: right-unit normalization for chart transport along paths. -/
-def transportChart_step {x y : Obj} (p : Path x y) :
+noncomputable def transportChart_step {x y : Obj} (p : Path x y) :
     Path.Step
       (Path.trans (L.transportChart p) (Path.refl (L.chart y)))
       (L.transportChart p) :=
@@ -91,7 +91,7 @@ noncomputable def chartUnit_cancel_rweq :
 end LogStructurePathData
 
 /-- Trivial instance instantiating the logarithmic-structure path interface. -/
-def trivialLogStructurePathData : LogStructurePathData PUnit Nat where
+noncomputable def trivialLogStructurePathData : LogStructurePathData PUnit Nat where
   chart := fun _ => 0
   strataMul := fun _ _ => PUnit.unit
   monoidMul := Nat.add

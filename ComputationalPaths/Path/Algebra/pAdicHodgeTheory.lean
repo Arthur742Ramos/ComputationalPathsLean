@@ -59,11 +59,11 @@ namespace PathField
 variable {K : Type u} (F : PathField K)
 
 /-- Right identity for multiplication. -/
-def mul_one (a : K) : Path (F.mul a F.one) a :=
+noncomputable def mul_one (a : K) : Path (F.mul a F.one) a :=
   Path.trans (F.mul_comm a F.one) (F.one_mul a)
 
 /-- Addition with zero on the right. -/
-def add_zero (a : K) : Path (F.add a F.zero) a :=
+noncomputable def add_zero (a : K) : Path (F.add a F.zero) a :=
   Path.trans (F.add_comm a F.zero) (F.zero_add a)
 
 end PathField
@@ -116,7 +116,7 @@ inductive PeriodRingStep (R : Type u) : R → R → Prop where
       PeriodRingStep (F.add a b) (F.add a b)
 
 /-- Every `PeriodRingStep` gives a `Path`. -/
-def PeriodRingStep.toPath {R : Type u} {a b : R}
+noncomputable def PeriodRingStep.toPath {R : Type u} {a b : R}
     (s : PeriodRingStep R a b) : Path a b :=
   match s with
   | .frobenius_phi _ => Path.refl _
@@ -160,13 +160,13 @@ namespace PeriodRingBdR
 variable {K : Type u} {F : PathField K}
 
 /-- Galois action composed twice. -/
-def galois_compose (B : PeriodRingBdR K F) (g h : K) (x : B.carrier) :
+noncomputable def galois_compose (B : PeriodRingBdR K F) (g h : K) (x : B.carrier) :
     Path (B.galoisAction g (B.galoisAction h x))
       (B.galoisAction g (B.galoisAction h x)) :=
   Path.refl _
 
 /-- The filtration is compatible with the ring multiplication. -/
-def fil_mul_compat (B : PeriodRingBdR K F) (i j : Int) (x y : B.carrier)
+noncomputable def fil_mul_compat (B : PeriodRingBdR K F) (i j : Int) (x y : B.carrier)
     (hx : B.filtration.level i x) (hy : B.filtration.level j y) :
     B.filtration.level (i + j) (B.ring.mul x y) → 
     Path (B.ring.mul x y) (B.ring.mul x y) :=
@@ -201,23 +201,23 @@ namespace PeriodRingBcrys
 variable {K : Type u} {F : PathField K}
 
 /-- Frobenius preserves zero. -/
-def phi_zero (B : PeriodRingBcrys K F) :
+noncomputable def phi_zero (B : PeriodRingBcrys K F) :
     Path (B.phi B.ring.zero) B.ring.zero :=
   -- 0 = 0 + 0, so phi(0) = phi(0 + 0) = phi(0) + phi(0), giving phi(0) = 0
   Path.refl _
 
 /-- Double Frobenius application. -/
-def phi_phi (B : PeriodRingBcrys K F) (x : B.carrier) :
+noncomputable def phi_phi (B : PeriodRingBcrys K F) (x : B.carrier) :
     Path (B.phi (B.phi x)) (B.phi (B.phi x)) :=
   Path.refl _
 
 /-- Frobenius of a product, multi-step derivation. -/
-def phi_mul_expanded (B : PeriodRingBcrys K F) (a b : B.carrier) :
+noncomputable def phi_mul_expanded (B : PeriodRingBcrys K F) (a b : B.carrier) :
     Path (B.phi (B.ring.mul a b)) (B.ring.mul (B.phi a) (B.phi b)) :=
   Path.trans (B.phi_mul a b) (Path.refl _)
 
 /-- Galois-Frobenius commutation composed with itself. -/
-def galois_phi_double (B : PeriodRingBcrys K F) (g : K) (x : B.carrier) :
+noncomputable def galois_phi_double (B : PeriodRingBcrys K F) (g : K) (x : B.carrier) :
     Path (B.galoisAction g (B.phi (B.phi x)))
       (B.phi (B.phi (B.galoisAction g x))) :=
   Path.trans
@@ -289,7 +289,7 @@ structure Morphism (M N : FilteredPhiModule K F) where
   map_fil : ∀ i x, M.filLevel i x → N.filLevel i (toFun x)
 
 /-- Identity morphism. -/
-def Morphism.id (M : FilteredPhiModule K F) : Morphism M M where
+noncomputable def Morphism.id (M : FilteredPhiModule K F) : Morphism M M where
   toFun := fun x => x
   map_add := fun _ _ => Path.refl _
   map_zero := Path.refl _
@@ -297,7 +297,7 @@ def Morphism.id (M : FilteredPhiModule K F) : Morphism M M where
   map_fil := fun _ _ h => h
 
 /-- Composition of morphisms. -/
-def Morphism.comp {M N P : FilteredPhiModule K F}
+noncomputable def Morphism.comp {M N P : FilteredPhiModule K F}
     (g : Morphism N P) (f : Morphism M N) : Morphism M P where
   toFun := fun x => g.toFun (f.toFun x)
   map_add := fun a b =>
@@ -394,19 +394,19 @@ namespace ComparisonData
 variable {K : Type u} {F : PathField K}
 
 /-- The inclusion is a ring homomorphism, full witness. -/
-def inclusion_is_hom (C : ComparisonData K F) : Prop :=
+noncomputable def inclusion_is_hom (C : ComparisonData K F) : Prop :=
   (∀ a b, Path (C.inclusion (C.bcrys.ring.add a b))
     (C.bdR.ring.add (C.inclusion a) (C.inclusion b))) ∧
   (∀ a b, Path (C.inclusion (C.bcrys.ring.mul a b))
     (C.bdR.ring.mul (C.inclusion a) (C.inclusion b)))
 
 /-- Multi-step: inclusion of a Frobenius output. -/
-def incl_phi (C : ComparisonData K F) (x : C.bcrys.carrier) :
+noncomputable def incl_phi (C : ComparisonData K F) (x : C.bcrys.carrier) :
     Path (C.inclusion (C.bcrys.phi x)) (C.inclusion (C.bcrys.phi x)) :=
   Path.refl _
 
 /-- Composed inclusion: add then include vs include then add. -/
-def incl_add_expanded (C : ComparisonData K F) (a b : C.bcrys.carrier) :
+noncomputable def incl_add_expanded (C : ComparisonData K F) (a b : C.bcrys.carrier) :
     Path (C.inclusion (C.bcrys.ring.add a b))
       (C.bdR.ring.add (C.inclusion a) (C.inclusion b)) :=
   Path.trans (C.incl_add a b) (Path.refl _)
@@ -460,7 +460,7 @@ namespace HodgeTateData
 variable {K : Type u} {F : PathField K}
 
 /-- The total dimension is well-defined. -/
-def dim_well_defined (H : HodgeTateData K F) :
+noncomputable def dim_well_defined (H : HodgeTateData K F) :
     Path H.totalDim H.totalDim :=
   Path.trans H.mult_sum (Path.refl _)
 
@@ -483,7 +483,7 @@ structure FontaineFunctor (K : Type u) (F : PathField K) where
 /-! ## RwEq constructions -/
 
 /-- Multi-step: Frobenius commutes with Galois through B_crys. -/
-def frobenius_galois_multi {K : Type u} {F : PathField K}
+noncomputable def frobenius_galois_multi {K : Type u} {F : PathField K}
     (B : PeriodRingBcrys K F) (g : K) (a b : B.carrier) :
     Path (B.galoisAction g (B.phi (B.ring.add a b)))
       (B.phi (B.ring.add (B.galoisAction g a) (B.galoisAction g b))) :=
@@ -494,7 +494,7 @@ def frobenius_galois_multi {K : Type u} {F : PathField K}
       (Path.congrArg B.phi (Path.refl _)))
 
 /-- Symmetry of the comparison inclusion. -/
-def comparison_incl_symm {K : Type u} {F : PathField K}
+noncomputable def comparison_incl_symm {K : Type u} {F : PathField K}
     (C : ComparisonData K F) (a b : C.bcrys.carrier) :
     Path (C.bdR.ring.add (C.inclusion a) (C.inclusion b))
       (C.inclusion (C.bcrys.ring.add a b)) :=

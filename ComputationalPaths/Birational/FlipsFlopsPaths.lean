@@ -42,12 +42,12 @@ namespace FlipFlopPathData
 variable {X : Type u} (B : FlipFlopPathData X)
 
 /-- Canonical path for the basic `flip ∘ flop` birational cycle. -/
-def flipThenFlopCanonicalPath (x : X) :
+noncomputable def flipThenFlopCanonicalPath (x : X) :
     Path (B.canonical (B.flip (B.flop x))) (B.canonical x) :=
   Path.trans (B.flipPath (B.flop x)) (B.flopPath x)
 
 /-- Canonical path for the basic `flop ∘ flip` birational cycle. -/
-def flopThenFlipCanonicalPath (x : X) :
+noncomputable def flopThenFlipCanonicalPath (x : X) :
     Path (B.canonical (B.flop (B.flip x))) (B.canonical x) :=
   Path.trans (B.flopPath (B.flip x)) (B.flipPath x)
 

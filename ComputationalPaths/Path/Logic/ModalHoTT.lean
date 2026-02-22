@@ -72,7 +72,7 @@ structure ModalityFull where
     ((a : A) → B (eta A a)) → ((x : op A) → B x)
 
 /-- Predicate for a type being modal (fixed by the modality). -/
-def IsModal (M : ModalityFull) (A : Type u) : Prop :=
+noncomputable def IsModal (M : ModalityFull) (A : Type u) : Prop :=
   ∃ (inv : M.op A → A), ∀ a : A, inv (M.eta A a) = a
 
 /-! ## Lex Modalities -/

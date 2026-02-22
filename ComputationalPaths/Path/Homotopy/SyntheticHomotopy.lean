@@ -23,11 +23,11 @@ structure PType where
   pt      : carrier
 
 /-- The loop space Ω(A, a₀) as the type of paths a₀ = a₀. -/
-def LoopSpace (A : PType) : PType :=
+noncomputable def LoopSpace (A : PType) : PType :=
   ⟨PLift (A.pt = A.pt), ⟨rfl⟩⟩
 
 /-- The n-fold iterated loop space Ωⁿ(A). -/
-def IteratedLoopSpace : Nat → PType → PType
+noncomputable def IteratedLoopSpace : Nat → PType → PType
   | 0,     A => A
   | n + 1, A => IteratedLoopSpace n (LoopSpace A)
 
@@ -46,7 +46,7 @@ inductive Susp (A : Type u) : Type u where
 axiom Susp.merid {A : Type u} : A → @Susp.north A = @Susp.south A
 
 /-- Pointed suspension. -/
-def PSusp (A : PType) : PType :=
+noncomputable def PSusp (A : PType) : PType :=
   ⟨Susp A.carrier, Susp.north⟩
 
 
@@ -90,7 +90,7 @@ axiom HoPushout.glue {A B C : Type u} {f : C → A} {g : C → B}
 /-! ## Theorems -/
 
 /-- The n-th homotopy group πₙ(A) as a type. -/
-def HomotopyGroup (n : Nat) (A : PType) : Type :=
+noncomputable def HomotopyGroup (n : Nat) (A : PType) : Type :=
   (IteratedLoopSpace n A).carrier
 
 

@@ -23,19 +23,19 @@ inductive CPath (α : Type u) : α → α → Type u where
   | nil (a : α) : CPath α a a
   | cons {a b c : α} : CStep α a b → CPath α b c → CPath α a c
 
-def pTrans {α : Type u} {a b c : α} : CPath α a b → CPath α b c → CPath α a c
+noncomputable def pTrans {α : Type u} {a b c : α} : CPath α a b → CPath α b c → CPath α a c
   | CPath.nil _, q => q
   | CPath.cons s p', q => CPath.cons s (pTrans p' q)
 
-def pSymmStep {α : Type u} {a b : α} : CStep α a b → CStep α b a
+noncomputable def pSymmStep {α : Type u} {a b : α} : CStep α a b → CStep α b a
   | CStep.refl a => CStep.refl a
   | CStep.arrow h => CStep.arrow (Ne.symm h)
 
-def pSymm {α : Type u} {a b : α} : CPath α a b → CPath α b a
+noncomputable def pSymm {α : Type u} {a b : α} : CPath α a b → CPath α b a
   | CPath.nil a => CPath.nil a
   | CPath.cons s p => pTrans (pSymm p) (CPath.cons (pSymmStep s) (CPath.nil _))
 
-def pCongrArg {α : Type u} {β : Type v} [DecidableEq β] (f : α → β) {a b : α} :
+noncomputable def pCongrArg {α : Type u} {β : Type v} [DecidableEq β] (f : α → β) {a b : α} :
     CPath α a b → CPath β (f a) (f b)
   | CPath.nil _ => CPath.nil (f _)
   | CPath.cons (CStep.refl _) p => pCongrArg f p
@@ -44,10 +44,10 @@ def pCongrArg {α : Type u} {β : Type v} [DecidableEq β] (f : α → β) {a b 
       cast (by rw [heq]) (pCongrArg f p)
     else CPath.cons (CStep.arrow heq) (pCongrArg f p)
 
-def stepToPath {α : Type u} {a b : α} (s : CStep α a b) : CPath α a b :=
+noncomputable def stepToPath {α : Type u} {a b : α} (s : CStep α a b) : CPath α a b :=
   CPath.cons s (CPath.nil _)
 
-def pathLen {α : Type u} {a b : α} : CPath α a b → Nat
+noncomputable def pathLen {α : Type u} {a b : α} : CPath α a b → Nat
   | CPath.nil _ => 0
   | CPath.cons _ p => 1 + pathLen p
 
@@ -71,7 +71,7 @@ structure SMap (X Y : SSet) where
   comm_degen : {n : Nat} → (k : Fin (n + 1)) → (σ : X.cells n) →
     mapCells (X.degen k σ) = Y.degen k (mapCells σ)
 
-def SMap.id (X : SSet) : SMap X X where
+noncomputable def SMap.id (X : SSet) : SMap X X where
   mapCells := fun σ => σ
   comm_face := fun _ _ => rfl
   comm_degen := fun _ _ => rfl
@@ -83,20 +83,20 @@ def SMap.id (X : SSet) : SMap X X where
 structure Horn (n : Nat) (k : Fin (n + 1)) where
   faces : (j : Fin (n + 1)) → j ≠ k → Simplex (n - 1)
 
-def isInnerHorn (n : Nat) (k : Fin (n + 1)) : Prop :=
+noncomputable def isInnerHorn (n : Nat) (k : Fin (n + 1)) : Prop :=
   0 < k.val ∧ k.val < n
 
-instance isInnerHornDec (n : Nat) (k : Fin (n + 1)) : Decidable (isInnerHorn n k) :=
+noncomputable instance isInnerHornDec (n : Nat) (k : Fin (n + 1)) : Decidable (isInnerHorn n k) :=
   inferInstanceAs (Decidable (_ ∧ _))
 
 structure HornFiller (n : Nat) (k : Fin (n + 1)) where
   horn : Horn n k
   filler : Simplex n
 
-def HasInnerHornFillers (S : SSet) : Prop :=
+noncomputable def HasInnerHornFillers (S : SSet) : Prop :=
   ∀ (n : Nat) (k : Fin (n + 2)), isInnerHorn (n + 1) k → True
 
-def HasAllHornFillers (S : SSet) : Prop :=
+noncomputable def HasAllHornFillers (S : SSet) : Prop :=
   ∀ (n : Nat) (k : Fin (n + 2)), True
 
 -- ============================================================
@@ -107,15 +107,15 @@ structure QCat where
   under : SSet
   innerFill : HasInnerHornFillers under
 
-def QCat.Obj (C : QCat) : Type := C.under.cells 0
-def QCat.Mor (C : QCat) : Type := C.under.cells 1
-def QCat.TwoCell (C : QCat) : Type := C.under.cells 2
-def QCat.ThreeCell (C : QCat) : Type := C.under.cells 3
-def QCat.Cell (C : QCat) (n : Nat) : Type := C.under.cells n
+noncomputable def QCat.Obj (C : QCat) : Type := C.under.cells 0
+noncomputable def QCat.Mor (C : QCat) : Type := C.under.cells 1
+noncomputable def QCat.TwoCell (C : QCat) : Type := C.under.cells 2
+noncomputable def QCat.ThreeCell (C : QCat) : Type := C.under.cells 3
+noncomputable def QCat.Cell (C : QCat) (n : Nat) : Type := C.under.cells n
 
-def QCat.src (C : QCat) (f : C.Mor) : C.Obj := C.under.face ⟨1, by omega⟩ f
-def QCat.tgt (C : QCat) (f : C.Mor) : C.Obj := C.under.face ⟨0, by omega⟩ f
-def QCat.idMor (C : QCat) (x : C.Obj) : C.Mor := C.under.degen ⟨0, by omega⟩ x
+noncomputable def QCat.src (C : QCat) (f : C.Mor) : C.Obj := C.under.face ⟨1, by omega⟩ f
+noncomputable def QCat.tgt (C : QCat) (f : C.Mor) : C.Obj := C.under.face ⟨0, by omega⟩ f
+noncomputable def QCat.idMor (C : QCat) (x : C.Obj) : C.Mor := C.under.degen ⟨0, by omega⟩ x
 
 structure QCat.Equiv (C : QCat) where
   forward : C.Mor
@@ -131,14 +131,14 @@ structure KanCx where
   under : SSet
   kanCond : HasAllHornFillers under
 
-def KanCx.toQCat (K : KanCx) : QCat where
+noncomputable def KanCx.toQCat (K : KanCx) : QCat where
   under := K.under
   innerFill := fun n k _ => K.kanCond n k
 
 structure HomotopyClass (K : KanCx) (n : Nat) (basepoint : K.under.cells 0) where
   representative : K.under.cells n
 
-def isInfGroupoid (K : KanCx) : Prop := ∀ (_ : K.under.cells 1), True
+noncomputable def isInfGroupoid (K : KanCx) : Prop := ∀ (_ : K.under.cells 1), True
 
 -- ============================================================
 -- PART VI: Composition in Quasi-Categories
@@ -158,7 +158,7 @@ structure ComposablePair (C : QCat) where
 structure MapSpace (C : QCat) (x y : C.Obj) where
   morphisms : List C.Mor
 
-def HigherMor (C : QCat) (n : Nat) : Type := C.under.cells n
+noncomputable def HigherMor (C : QCat) (n : Nat) : Type := C.under.cells n
 
 -- ============================================================
 -- PART VII: Simplicial Nerve
@@ -201,7 +201,7 @@ structure InfFunctor (C : QCat) where
   onObj : C.Obj → Type
   onMor : C.Mor → Type
 
-def straighten (C E : QCat) (p : LeftFib E C) : InfFunctor C where
+noncomputable def straighten (C E : QCat) (p : LeftFib E C) : InfFunctor C where
   onObj := fun x => { e : E.Obj // p.proj.mapCells e = x }
   onMor := fun f => { e : E.Mor // p.proj.mapCells e = f }
 
@@ -236,10 +236,10 @@ structure QColimitCocone (J C : QCat) (D : QDiagram J C) where
   cocone : QCocone J C D
   isColimit : True
 
-def HasQLimits (J C : QCat) : Prop :=
+noncomputable def HasQLimits (J C : QCat) : Prop :=
   ∀ (D : QDiagram J C), ∃ (_ : QLimitCone J C D), True
 
-def HasQColimits (J C : QCat) : Prop :=
+noncomputable def HasQColimits (J C : QCat) : Prop :=
   ∀ (D : QDiagram J C), ∃ (_ : QColimitCocone J C D), True
 
 structure QPullback (C : QCat) where

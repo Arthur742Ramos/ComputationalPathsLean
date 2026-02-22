@@ -74,7 +74,7 @@ structure TwoOfThree (A : Type u) where
     isWeq f → isWeq g → isWeq (Path.trans f g)
 
 /-- The trivial two-of-three where every path is a weak equivalence. -/
-def trivialTwoOfThree (A : Type u) : TwoOfThree A where
+noncomputable def trivialTwoOfThree (A : Type u) : TwoOfThree A where
   isWeq := fun _ => True
   left_cancel := fun _ _ _ _ => trivial
   right_cancel := fun _ _ _ _ => trivial
@@ -157,7 +157,7 @@ structure MCat (A : Type u) extends ModelCategory A where
     Retract f g → fib g → fib f
 
 /-- Identity MCat structure on computational paths. -/
-def trivialMCat (A : Type u) : MCat A where
+noncomputable def trivialMCat (A : Type u) : MCat A where
   toModelCategory := pathModelCategory A
   twoOfThree := trivialTwoOfThree A
   weq_agree := fun {_ _} p => ⟨fun _ => path_is_weak_equivalence (A := A) p, fun _ => trivial⟩
@@ -207,14 +207,14 @@ structure TotalRightDerived {A : Type u} {B : Type v}
   obj_path : ∀ b : B, Path (obj b) (Q.rightObj b)
 
 /-- Every Quillen pair yields trivial total derived functors. -/
-def trivialLeftDerived {A : Type u} {B : Type v}
+noncomputable def trivialLeftDerived {A : Type u} {B : Type v}
     (M : MCat A) (N : MCat B) (Q : QuillenPair M N) :
     TotalLeftDerived M N Q where
   obj := Q.leftObj
   obj_path := fun _a => Path.refl _
 
 /-- Every Quillen pair yields trivial total right derived functors. -/
-def trivialRightDerived {A : Type u} {B : Type v}
+noncomputable def trivialRightDerived {A : Type u} {B : Type v}
     (M : MCat A) (N : MCat B) (Q : QuillenPair M N) :
     TotalRightDerived M N Q where
   obj := Q.rightObj
@@ -327,12 +327,12 @@ structure BousfieldLocalization (A : Type u) where
 
 /-- An S-local object: one seeing all S-local equivalences as
     homotopy equivalences. -/
-def isLocalObject {A : Type u} (L : BousfieldLocalization A) (X : A) : Prop :=
+noncomputable def isLocalObject {A : Type u} (L : BousfieldLocalization A) (X : A) : Prop :=
   ∀ {a b : A} (f : Path a b), L.localWeq f → True
 
 /-- An S-local fibration: a map with RLP against S-local trivial
     cofibrations. -/
-def isLocalFibration {A : Type u} (L : BousfieldLocalization A)
+noncomputable def isLocalFibration {A : Type u} (L : BousfieldLocalization A)
     {a b : A} (p : Path a b) : Prop :=
   L.localized.fib p
 
@@ -393,13 +393,13 @@ structure CofibrantlyGenerated (A : Type u) extends MCat A where
 
 /-- A left proper model category: pushouts along cofibrations preserve
     weak equivalences. -/
-def isLeftProper (A : Type u) (M : MCat A) : Prop :=
+noncomputable def isLeftProper (A : Type u) (M : MCat A) : Prop :=
   ∀ {a b c : A} (f : Path a b) (g : Path a c),
     M.twoOfThree.isWeq f → M.cof g → True
 
 /-- A right proper model category: pullbacks along fibrations preserve
     weak equivalences. -/
-def isRightProper (A : Type u) (M : MCat A) : Prop :=
+noncomputable def isRightProper (A : Type u) (M : MCat A) : Prop :=
   ∀ {a b c : A} (f : Path a b) (g : Path c b),
     M.twoOfThree.isWeq f → M.fib g → True
 
@@ -438,13 +438,13 @@ theorem sm7_axiom {A : Type u} (SM : SimplicialModelCategory A)
 /-! ## Path witnesses -/
 
 /-- Path witness: Quillen adjunction unit-counit triangle. -/
-def quillen_triangle {A : Type u} {B : Type v}
+noncomputable def quillen_triangle {A : Type u} {B : Type v}
     {M : MCat A} {N : MCat B} (Q : QuillenPair M N) (a : A) :
     Path (Q.unit a) (Q.unit a) :=
   Path.refl _
 
 /-- Path witness: factorization coherence. -/
-def factorization_coherence {A : Type u} (F : FunctorialFactorization A)
+noncomputable def factorization_coherence {A : Type u} (F : FunctorialFactorization A)
     {a b : A} (p : Path a b) :
     Path (Path.trans (F.leftFactor p).2 (F.rightFactor p)) p :=
   F.factor_path p

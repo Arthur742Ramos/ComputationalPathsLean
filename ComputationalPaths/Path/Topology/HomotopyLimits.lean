@@ -103,7 +103,7 @@ structure Diagram (I : DiagramShape.{u}) (A : Type v) where
 /-! ## Homotopy limit cones -/
 
 /-- The constant diagram at `a`. -/
-def constDiagram {A : Type v} (I : DiagramShape.{u}) (a : A) : Diagram I A where
+noncomputable def constDiagram {A : Type v} (I : DiagramShape.{u}) (a : A) : Diagram I A where
   obj := fun _ => a
   morph := fun {i j} (_ : I.Arrow i j) => Path.refl a
   morph_id := fun _ => Path.refl (Path.refl a)
@@ -120,7 +120,7 @@ structure HoLimCone {I : DiagramShape.{u}} {A : Type v}
     Path (Path.trans (leg i) (D.morph f)) (leg j)
 
 /-- The identity cone for a constant diagram. -/
-def HoLimCone.const {A : Type v} (I : DiagramShape.{u}) (a : A) :
+noncomputable def HoLimCone.const {A : Type v} (I : DiagramShape.{u}) (a : A) :
     HoLimCone (constDiagram I a) a where
   leg := fun _ => Path.refl a
   coherence := fun {i j} (_ : I.Arrow i j) => by
@@ -192,7 +192,7 @@ structure HomotopyPullbackData (X A B C : Type v)
       (∀ y : Y, Path (pr₂ (u y)) (b y))
 
 /-- Trivial homotopy pullback (product with diagonal). -/
-def trivialHoPullback (A B C : Type v)
+noncomputable def trivialHoPullback (A B C : Type v)
     (f : A → C) (g : B → C) :
     HomotopyPullbackData (Σ (a : A) (b : B), Path (f a) (g b)) A B C f g where
   pr₁ := fun ⟨a, _, _⟩ => a
@@ -261,7 +261,7 @@ structure TelData (A : Type v) where
     Path (Path.trans (map n) (incl (n + 1))) (incl n)
 
 /-- Build a telescope from a sequence with explicit inclusions. -/
-def TelData.ofSequence {A : Type v}
+noncomputable def TelData.ofSequence {A : Type v}
     (seq : Nat → A) (colim : A)
     (map : ∀ n, Path (seq n) (seq (n + 1)))
     (incl : ∀ n, Path (seq n) colim)
@@ -295,7 +295,7 @@ structure MayerVietorisData (A : Type v) where
   comm : Path (Path.trans top right) (Path.trans left bot)
 
 /-- A Mayer–Vietoris square from four paths forming a commutative square. -/
-def MayerVietorisData.ofSquare {A : Type v}
+noncomputable def MayerVietorisData.ofSquare {A : Type v}
     {a b c d : A}
     (f : Path a b) (g : Path c d)
     (h : Path a c) (k : Path b d)
@@ -314,7 +314,7 @@ def MayerVietorisData.ofSquare {A : Type v}
 /-! ## Coherence theorems -/
 
 /-- Cone composition: composing a cone with a map yields a cone. -/
-def cone_compose {I : DiagramShape.{u}} {A : Type v}
+noncomputable def cone_compose {I : DiagramShape.{u}} {A : Type v}
     {D : Diagram I A} {X Y : A}
     (c : HoLimCone D X) (f : Path Y X) :
     HoLimCone D Y :=
@@ -353,7 +353,7 @@ noncomputable def holimstep_multi_sound {A : Type u} {a b : A}
   RwEq.trans (holimstep_rweq h1) (holimstep_rweq h2)
 
 /-- Mayer–Vietoris commutativity is symmetric. -/
-def mayerVietoris_symm {A : Type v}
+noncomputable def mayerVietoris_symm {A : Type v}
     (MV : MayerVietorisData A) :
     Path (Path.trans MV.left MV.bot) (Path.trans MV.top MV.right) :=
   Path.symm MV.comm

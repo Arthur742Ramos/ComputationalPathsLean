@@ -127,14 +127,14 @@ structure LieIdeal (LA : PathLieAlg A) {a : A} where
   bracket_mem : ∀ p q, mem q → mem (LA.bracket p q)
 
 /-- The zero ideal. -/
-def zeroIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) where
+noncomputable def zeroIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) where
   mem := fun p => p = LA.zero a
   zero_mem := rfl
   add_mem := fun p q hp hq => by rw [hp, hq, LA.add_zero]
   bracket_mem := fun p q hq => by rw [hq, LA.bracket_zero_right]
 
 /-- The whole algebra as an ideal. -/
-def wholeIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) where
+noncomputable def wholeIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) where
   mem := fun _ => True
   zero_mem := trivial
   add_mem := fun _ _ _ _ => trivial
@@ -143,29 +143,29 @@ def wholeIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) where
 /-! ## Derived series and solvability -/
 
 /-- Derived subalgebra predicate: element is a bracket. -/
-def isDerived (LA : PathLieAlg A) {a : A} (p : Path a a) : Prop :=
+noncomputable def isDerived (LA : PathLieAlg A) {a : A} (p : Path a a) : Prop :=
   ∃ q r : Path a a, p = LA.bracket q r
 
 /-- Iterated derived series predicate. -/
-def inDerivedN (LA : PathLieAlg A) {a : A} : Nat → Path a a → Prop
+noncomputable def inDerivedN (LA : PathLieAlg A) {a : A} : Nat → Path a a → Prop
   | 0 => fun _ => True
   | n + 1 => fun p => ∃ q r : Path a a,
       inDerivedN LA n q ∧ inDerivedN LA n r ∧ p = LA.bracket q r
 
 /-- Solvable: derived series eventually vanishes. -/
-def isSolvable (LA : PathLieAlg A) {a : A} : Prop :=
+noncomputable def isSolvable (LA : PathLieAlg A) {a : A} : Prop :=
   ∃ n : Nat, ∀ p : Path a a, inDerivedN LA n p → p = LA.zero a
 
 /-! ## Lower central series and nilpotency -/
 
 /-- Lower central series predicate. -/
-def inLowerCentralN (LA : PathLieAlg A) {a : A} : Nat → Path a a → Prop
+noncomputable def inLowerCentralN (LA : PathLieAlg A) {a : A} : Nat → Path a a → Prop
   | 0 => fun _ => True
   | n + 1 => fun p => ∃ q r : Path a a,
       inLowerCentralN LA n q ∧ p = LA.bracket q r
 
 /-- Nilpotent: lower central series eventually vanishes. -/
-def isNilpotent (LA : PathLieAlg A) {a : A} : Prop :=
+noncomputable def isNilpotent (LA : PathLieAlg A) {a : A} : Prop :=
   ∃ n : Nat, ∀ p : Path a a, inLowerCentralN LA n p → p = LA.zero a
 
 /-- Zero-step derived series is trivially satisfied. -/
@@ -193,7 +193,7 @@ structure LieRep (LA : PathLieAlg A) {a : A} (M : Type v) where
     act (LA.add p q) m = act p (act q m)
 
 /-- Trivial representation. -/
-def trivialRep (LA : PathLieAlg A) {a : A} (M : Type v) :
+noncomputable def trivialRep (LA : PathLieAlg A) {a : A} (M : Type v) :
     LieRep LA M (a := a) where
   act := fun _ m => m
   act_zero := fun _ => rfl
@@ -211,14 +211,14 @@ structure LieHom (LA₁ LA₂ : PathLieAlg A) {a : A} where
   map_zero : map (LA₁.zero a) = LA₂.zero a
 
 /-- Identity homomorphism. -/
-def idHom (LA : PathLieAlg A) {a : A} : LieHom LA LA (a := a) where
+noncomputable def idHom (LA : PathLieAlg A) {a : A} : LieHom LA LA (a := a) where
   map := id
   map_bracket := fun _ _ => rfl
   map_add := fun _ _ => rfl
   map_zero := rfl
 
 /-- Kernel of a Lie homomorphism is an ideal. -/
-def kernel_ideal (LA₁ LA₂ : PathLieAlg A) {a : A}
+noncomputable def kernel_ideal (LA₁ LA₂ : PathLieAlg A) {a : A}
     (f : LieHom LA₁ LA₂ (a := a)) :
     LieIdeal LA₁ (a := a) where
   mem := fun p => f.map p = LA₂.zero a
@@ -257,7 +257,7 @@ theorem neg_neg (LA : PathLieAlg A) {a : A} (p : Path a a) :
   exact step1
 
 /-- Bracket anticomm as a path. -/
-def bracket_anticomm_path (LA : PathLieAlg A) {a : A}
+noncomputable def bracket_anticomm_path (LA : PathLieAlg A) {a : A}
     (p q : Path a a) :
     Path (LA.bracket p q) (LA.neg (LA.bracket q p)) :=
   ofEq (LA.bracket_anticomm p q)

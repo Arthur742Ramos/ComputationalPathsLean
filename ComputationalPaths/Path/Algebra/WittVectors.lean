@@ -40,7 +40,7 @@ structure BigWittVector (R : Type u) where
   coeff : Nat → R
 
 /-- Equality of big Witt vectors via pointwise path equality. -/
-def bigWitt_ext {R : Type u} (a b : BigWittVector R)
+noncomputable def bigWitt_ext {R : Type u} (a b : BigWittVector R)
     (h : ∀ n, Path (a.coeff n) (b.coeff n)) : Path a b :=
   Path.mk [] (by cases a; cases b; congr; funext n; exact (h n).proof)
 
@@ -62,11 +62,11 @@ structure GhostMap (R : Type u) where
   ghost_zero : ∀ v, Path (ghostComponent 0 v) (v.coeff 0)
 
 /-- The ghost map sends a Witt vector to its sequence of ghost components. -/
-def ghostMapFn {R : Type u} (g : GhostMap R) (v : BigWittVector R) : Nat → R :=
+noncomputable def ghostMapFn {R : Type u} (g : GhostMap R) (v : BigWittVector R) : Nat → R :=
   fun n => g.ghostComponent n v
 
 /-- Ghost map applied at index 0 recovers the first component. -/
-def ghost_at_zero {R : Type u} (g : GhostMap R) (v : BigWittVector R) :
+noncomputable def ghost_at_zero {R : Type u} (g : GhostMap R) (v : BigWittVector R) :
     Path (ghostMapFn g v 0) (v.coeff 0) :=
   g.ghost_zero v
 
@@ -103,12 +103,12 @@ structure PTypicalWittVector (p : Nat) (R : Type u) where
   coeff : Nat → R
 
 /-- Equality of p-typical Witt vectors. -/
-def ptypical_ext {p : Nat} {R : Type u} (a b : PTypicalWittVector p R)
+noncomputable def ptypical_ext {p : Nat} {R : Type u} (a b : PTypicalWittVector p R)
     (h : ∀ n, Path (a.coeff n) (b.coeff n)) : Path a b :=
   Path.mk [] (by cases a; cases b; congr; funext n; exact (h n).proof)
 
 /-- Embedding p-typical Witt vectors into big Witt vectors. -/
-def ptypicalToBig {p : Nat} {R : Type u} (_zero : R)
+noncomputable def ptypicalToBig {p : Nat} {R : Type u} (_zero : R)
     (v : PTypicalWittVector p R) : BigWittVector R :=
   { coeff := fun n => v.coeff n }
 
@@ -122,13 +122,13 @@ structure FrobeniusOp (p : Nat) (R : Type u) where
   frob_coeff_zero : ∀ v, Path ((frob v).coeff 0) ((frob v).coeff 0)
 
 /-- Iterated Frobenius. -/
-def iterFrob {p : Nat} {R : Type u} (F : FrobeniusOp p R) :
+noncomputable def iterFrob {p : Nat} {R : Type u} (F : FrobeniusOp p R) :
     Nat → PTypicalWittVector p R → PTypicalWittVector p R
   | 0 => id
   | n + 1 => F.frob ∘ iterFrob F n
 
 /-- Iterated Frobenius at 0 is identity. -/
-def iterFrob_zero {p : Nat} {R : Type u} (F : FrobeniusOp p R)
+noncomputable def iterFrob_zero {p : Nat} {R : Type u} (F : FrobeniusOp p R)
     (v : PTypicalWittVector p R) : Path (iterFrob F 0 v) v :=
   Path.refl v
 
@@ -167,7 +167,7 @@ structure TeichmuellerLift (p : Nat) (R : Type u) where
     Path ((teichmueller r).coeff (n + 1)) zero
 
 /-- Teichmüller lift recovers the input at degree 0. -/
-def teich_recover {p : Nat} {R : Type u} (T : TeichmuellerLift p R)
+noncomputable def teich_recover {p : Nat} {R : Type u} (T : TeichmuellerLift p R)
     (r : R) : Path ((T.teichmueller r).coeff 0) r :=
   T.teich_coeff_zero r
 
@@ -179,12 +179,12 @@ structure TruncatedWittVector (p : Nat) (n : Nat) (R : Type u) where
   coeff : Fin n → R
 
 /-- Truncation map from full Witt vectors to truncated ones. -/
-def truncate {p : Nat} {n : Nat} {R : Type u}
+noncomputable def truncate {p : Nat} {n : Nat} {R : Type u}
     (v : PTypicalWittVector p R) : TruncatedWittVector p n R :=
   { coeff := fun i => v.coeff i.val }
 
 /-- Truncation respects the first component. -/
-def truncate_coeff_zero {p : Nat} {n : Nat} {R : Type u}
+noncomputable def truncate_coeff_zero {p : Nat} {n : Nat} {R : Type u}
     (v : PTypicalWittVector p R) (hn : 0 < n) :
     Path ((truncate v : TruncatedWittVector p n R).coeff ⟨0, hn⟩) (v.coeff 0) :=
   Path.refl _
@@ -202,13 +202,13 @@ structure WittFunctoriality (p : Nat) (R : Type u) (S : Type v) where
     Path ((wittMap v).coeff n) (ringMap (v.coeff n))
 
 /-- Functoriality preserves components. -/
-def wittMap_preserves {p : Nat} {R : Type u} {S : Type v}
+noncomputable def wittMap_preserves {p : Nat} {R : Type u} {S : Type v}
     (F : WittFunctoriality p R S) (v : PTypicalWittVector p R) (n : Nat) :
     Path ((F.wittMap v).coeff n) (F.ringMap (v.coeff n)) :=
   F.wittMap_coeff v n
 
 /-- Identity functoriality. -/
-def wittFunctorialityId (p : Nat) (R : Type u) : WittFunctoriality p R R :=
+noncomputable def wittFunctorialityId (p : Nat) (R : Type u) : WittFunctoriality p R R :=
   { ringMap := id
     wittMap := id
     wittMap_coeff := fun _ _ => Path.refl _ }

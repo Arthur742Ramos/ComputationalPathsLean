@@ -62,7 +62,7 @@ variable {F G H K : A → B}
 -- ============================================================
 
 /-- The identity natural transformation on `F`, with `refl` components. -/
-def id (F : A → B) : PathNatTrans F F where
+noncomputable def id (F : A → B) : PathNatTrans F F where
   component := fun a => Path.refl (F a)
   naturality := fun p => by simp
 
@@ -76,7 +76,7 @@ def id (F : A → B) : PathNatTrans F F where
 
 /-- Vertical composition of natural transformations: compose componentwise
     via `Path.trans`. -/
-def vcomp (α : PathNatTrans F G) (β : PathNatTrans G H) :
+noncomputable def vcomp (α : PathNatTrans F G) (β : PathNatTrans G H) :
     PathNatTrans F H where
   component := fun a => Path.trans (α.component a) (β.component a)
   naturality := fun {a b} p => by
@@ -114,7 +114,7 @@ theorem vcomp_assoc (α : PathNatTrans F G) (β : PathNatTrans G H)
 
 /-- Left whiskering: given `J : B → C` and `α : F ⟹ G`, produce
     `J ∘ F ⟹ J ∘ G` by applying `congrArg J` to each component. -/
-def whiskerLeft (J : B → C) (α : PathNatTrans F G) :
+noncomputable def whiskerLeft (J : B → C) (α : PathNatTrans F G) :
     PathNatTrans (fun a => J (F a)) (fun a => J (G a)) where
   component := fun a => Path.congrArg J (α.component a)
   naturality := fun {a b} p => by
@@ -141,7 +141,7 @@ def whiskerLeft (J : B → C) (α : PathNatTrans F G) :
 
 /-- Right whiskering: given `K : C → A` and `α : F ⟹ G`, produce
     `F ∘ K ⟹ G ∘ K`. -/
-def whiskerRight (α : PathNatTrans F G) (K : C → A) :
+noncomputable def whiskerRight (α : PathNatTrans F G) (K : C → A) :
     PathNatTrans (fun c => F (K c)) (fun c => G (K c)) where
   component := fun c => α.component (K c)
   naturality := fun {c₁ c₂} p => by
@@ -157,7 +157,7 @@ def whiskerRight (α : PathNatTrans F G) (K : C → A) :
 
 /-- Horizontal composition of 2-cells: given `α : F ⟹ G` and
     `β : J ⟹ K` where `J, K : B → C`, form `J∘F ⟹ K∘G`. -/
-def hcomp {J K : B → C}
+noncomputable def hcomp {J K : B → C}
     (α : PathNatTrans F G) (β : PathNatTrans J K) :
     PathNatTrans (fun a => J (F a)) (fun a => K (G a)) where
   component := fun a =>

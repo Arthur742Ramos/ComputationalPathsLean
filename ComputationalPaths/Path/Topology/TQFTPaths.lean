@@ -76,14 +76,14 @@ inductive TQFTStep (C : CobordismCategory.{u, v}) :
       TQFTStep C (C.comp f (C.id Y)) f
 
 /-- Interpret a cobordism step as a computational path. -/
-def tqftStepPath {C : CobordismCategory.{u, v}} {X Y : C.Obj} {f g : C.Hom X Y} :
+noncomputable def tqftStepPath {C : CobordismCategory.{u, v}} {X Y : C.Obj} {f g : C.Hom X Y} :
     TQFTStep C f g → Path f g
   | TQFTStep.assoc f g h => C.assoc f g h
   | TQFTStep.left_id f => C.left_id f
   | TQFTStep.right_id f => C.right_id f
 
 /-- Compose two cobordism steps into a single path. -/
-def tqft_steps_compose {C : CobordismCategory.{u, v}} {X Y : C.Obj}
+noncomputable def tqft_steps_compose {C : CobordismCategory.{u, v}} {X Y : C.Obj}
     {f g h : C.Hom X Y} (s1 : TQFTStep C f g) (s2 : TQFTStep C g h) :
     Path f h :=
   Path.trans (tqftStepPath s1) (tqftStepPath s2)
@@ -120,7 +120,7 @@ structure AtiyahSegalAxioms (C D : CobordismCategory)
     Path (Z.morMap (C.comp f g)) (D.comp (Z.morMap f) (Z.morMap g))
 
 /-- Gluing formula derived from Atiyah-Segal axioms. -/
-def gluing_formula {C D : CobordismCategory} {Z : TQFTFunctor C D}
+noncomputable def gluing_formula {C D : CobordismCategory} {Z : TQFTFunctor C D}
     (A : AtiyahSegalAxioms C D Z) {X Y Z' : C.Obj}
     (f : C.Hom X Y) (g : C.Hom Y Z') :
     Path (Z.morMap (C.comp f g)) (D.comp (Z.morMap f) (Z.morMap g)) :=
@@ -129,13 +129,13 @@ def gluing_formula {C D : CobordismCategory} {Z : TQFTFunctor C D}
 /-! ## Partition functions -/
 
 /-- The partition function evaluates a closed cobordism at the monoidal unit. -/
-def partitionFunction (C D : CobordismCategory) (Z : TQFTFunctor C D) :
+noncomputable def partitionFunction (C D : CobordismCategory) (Z : TQFTFunctor C D) :
     C.Hom C.tensorUnit C.tensorUnit →
       D.Hom (Z.objMap C.tensorUnit) (Z.objMap C.tensorUnit) :=
   fun W => Z.morMap W
 
 /-- Gluing formula for partition functions. -/
-def partitionFunction_gluing {C D : CobordismCategory} {Z : TQFTFunctor C D}
+noncomputable def partitionFunction_gluing {C D : CobordismCategory} {Z : TQFTFunctor C D}
     (A : AtiyahSegalAxioms C D Z)
     (f g : C.Hom C.tensorUnit C.tensorUnit) :
     Path (partitionFunction C D Z (C.comp f g))
@@ -173,7 +173,7 @@ structure TwoDClassification (C D : CobordismCategory) (Z : TQFTFunctor C D) whe
   classifies : True
 
 /-- 2D classification theorem: a 2D TQFT determines a Frobenius algebra. -/
-def twoD_classification {C D : CobordismCategory} {Z : TQFTFunctor C D}
+noncomputable def twoD_classification {C D : CobordismCategory} {Z : TQFTFunctor C D}
     (H : TwoDClassification C D Z) : FrobeniusAlgebra H.carrier :=
   H.algebra
 

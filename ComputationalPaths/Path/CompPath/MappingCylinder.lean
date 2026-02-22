@@ -44,7 +44,7 @@ abbrev Cylinder (A : Type u) : Type u := A × Interval
 variable {A B : Type u}
 
 /-- The mapping cylinder of `f : A → B`. -/
-def MappingCylinder (f : A → B) : Type u :=
+noncomputable def MappingCylinder (f : A → B) : Type u :=
   Pushout (Cylinder A) B A (fun a => (a, Interval.left)) f
 
 @[simp] theorem mappingCylinder_def (f : A → B) :
@@ -56,25 +56,25 @@ namespace MappingCylinder
 variable {A B : Type u} (f : A → B)
 
 /-- Include the cylinder into the mapping cylinder. -/
-def inCylinder : Cylinder A → MappingCylinder f :=
+noncomputable def inCylinder : Cylinder A → MappingCylinder f :=
   Pushout.inl (A := Cylinder A) (B := B) (C := A)
     (f := fun a => (a, Interval.left)) (g := f)
 
 /-- Include the target `B` into the mapping cylinder. -/
-def inTarget : B → MappingCylinder f :=
+noncomputable def inTarget : B → MappingCylinder f :=
   Pushout.inr (A := Cylinder A) (B := B) (C := A)
     (f := fun a => (a, Interval.left)) (g := f)
 
 /-- The bottom embedding of `A` at the left endpoint. -/
-def bottom (a : A) : MappingCylinder f :=
+noncomputable def bottom (a : A) : MappingCylinder f :=
   inCylinder (f := f) (a, Interval.left)
 
 /-- The top embedding of `A` at the right endpoint. -/
-def top (a : A) : MappingCylinder f :=
+noncomputable def top (a : A) : MappingCylinder f :=
   inCylinder (f := f) (a, Interval.right)
 
 /-- The gluing path identifying `bottom a` with `f a` in the mapping cylinder. -/
-def glue (a : A) :
+noncomputable def glue (a : A) :
     Path (bottom (f := f) a) (inTarget (f := f) (f a)) :=
   Pushout.glue (A := Cylinder A) (B := B) (C := A)
     (f := fun a => (a, Interval.left)) (g := f) a

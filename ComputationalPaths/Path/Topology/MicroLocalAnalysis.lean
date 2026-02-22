@@ -47,58 +47,58 @@ structure KashiwaraSchapiraDatum where
 structure CharacteristicCycle where
   multiplicity : Nat → Nat
 
-def cotangentProjection (ξ : CotangentPoint) : Nat :=
+noncomputable def cotangentProjection (ξ : CotangentPoint) : Nat :=
   ξ.base
 
-def cotangentFiberWeight (ξ : CotangentPoint) : Int :=
+noncomputable def cotangentFiberWeight (ξ : CotangentPoint) : Int :=
   ξ.covector
 
-def wavefrontContains (W : WavefrontSet) (ξ : CotangentPoint) : Prop :=
+noncomputable def wavefrontContains (W : WavefrontSet) (ξ : CotangentPoint) : Prop :=
   W.contains ξ
 
-def wavefrontUnion (W₁ W₂ : WavefrontSet) : WavefrontSet :=
+noncomputable def wavefrontUnion (W₁ W₂ : WavefrontSet) : WavefrontSet :=
   ⟨fun ξ => W₁.contains ξ ∨ W₂.contains ξ⟩
 
-def wavefrontIntersection (W₁ W₂ : WavefrontSet) : WavefrontSet :=
+noncomputable def wavefrontIntersection (W₁ W₂ : WavefrontSet) : WavefrontSet :=
   ⟨fun ξ => W₁.contains ξ ∧ W₂.contains ξ⟩
 
-def microsupportContains (M : Microsupport) (ξ : CotangentPoint) : Prop :=
+noncomputable def microsupportContains (M : Microsupport) (ξ : CotangentPoint) : Prop :=
   M.contains ξ
 
-def microsupportOfSheaf (F : SheafModel) : Microsupport :=
+noncomputable def microsupportOfSheaf (F : SheafModel) : Microsupport :=
   ⟨fun ξ => ξ.base ≤ F.stalk ξ.base⟩
 
-def microsupportEnvelope (W : WavefrontSet) : Microsupport :=
+noncomputable def microsupportEnvelope (W : WavefrontSet) : Microsupport :=
   ⟨W.contains⟩
 
-def characteristicVarietyModel (K : KashiwaraSchapiraDatum) : Nat :=
+noncomputable def characteristicVarietyModel (K : KashiwaraSchapiraDatum) : Nat :=
   K.microsupportBound + 1
 
-def fbiTransformAmplitude (D : FBITransformDatum) (n : Nat) : Int :=
+noncomputable def fbiTransformAmplitude (D : FBITransformDatum) (n : Nat) : Int :=
   D.amplitude n + D.phase (Int.ofNat n)
 
-def satoBoundaryValue (H : HyperfunctionModel) (n : Nat) : Int :=
+noncomputable def satoBoundaryValue (H : HyperfunctionModel) (n : Nat) : Int :=
   H.boundaryValue n
 
-def propagationCone (P : PropagationDatum) (ξ : CotangentPoint) : Nat :=
+noncomputable def propagationCone (P : PropagationDatum) (ξ : CotangentPoint) : Nat :=
   (P.flow ξ).base
 
-def bicharacteristicFlowStep (P : PropagationDatum) (ξ : CotangentPoint) : CotangentPoint :=
+noncomputable def bicharacteristicFlowStep (P : PropagationDatum) (ξ : CotangentPoint) : CotangentPoint :=
   P.flow ξ
 
-def nonCharacteristicPullbackCondition (K : KashiwaraSchapiraDatum) (n : Nat) : Prop :=
+noncomputable def nonCharacteristicPullbackCondition (K : KashiwaraSchapiraDatum) (n : Nat) : Prop :=
   n ≤ characteristicVarietyModel K
 
-def cleanIntersectionIndex (a b : Nat) : Nat :=
+noncomputable def cleanIntersectionIndex (a b : Nat) : Nat :=
   a + b
 
-def microsupportEstimate (K : KashiwaraSchapiraDatum) (n : Nat) : Nat :=
+noncomputable def microsupportEstimate (K : KashiwaraSchapiraDatum) (n : Nat) : Nat :=
   characteristicVarietyModel K + n
 
-def sheafQuantizationWeight (F : SheafModel) (n : Nat) : Nat :=
+noncomputable def sheafQuantizationWeight (F : SheafModel) (n : Nat) : Nat :=
   F.stalk n + n
 
-def microstalkRank (G : MicrolocalSheaf) (n : Nat) : Nat :=
+noncomputable def microstalkRank (G : MicrolocalSheaf) (n : Nat) : Nat :=
   G.sheaf.stalk n
 
 noncomputable def involutiveClosureMeasure (W : WavefrontSet) (n : Nat) : Nat :=
@@ -112,19 +112,19 @@ noncomputable def singularSupportSize (W : WavefrontSet) (N : Nat) : Nat :=
     exact (List.range N).foldl
       (fun acc n => acc + if W.contains ⟨n, 0⟩ then 1 else 0) 0
 
-def microlocalCutoff (N n : Nat) : Nat :=
+noncomputable def microlocalCutoff (N n : Nat) : Nat :=
   n % (N + 1)
 
-def propagationEnergy (P : PropagationDatum) (n : Nat) : Nat :=
+noncomputable def propagationEnergy (P : PropagationDatum) (n : Nat) : Nat :=
   (P.flow ⟨n, 0⟩).base + n
 
-def temperedGrowthIndex (D : FBITransformDatum) (n : Nat) : Nat :=
+noncomputable def temperedGrowthIndex (D : FBITransformDatum) (n : Nat) : Nat :=
   Int.natAbs (fbiTransformAmplitude D n)
 
-def characteristicCycleMass (C : CharacteristicCycle) (N : Nat) : Nat :=
+noncomputable def characteristicCycleMass (C : CharacteristicCycle) (N : Nat) : Nat :=
   (List.range N).foldl (fun acc n => acc + C.multiplicity n) 0
 
-def hyperfunctionOrder (H : HyperfunctionModel) (n : Nat) : Nat :=
+noncomputable def hyperfunctionOrder (H : HyperfunctionModel) (n : Nat) : Nat :=
   Int.natAbs (H.boundaryValue n)
 
 theorem cotangentProjection_def (ξ : CotangentPoint) :
@@ -208,11 +208,11 @@ theorem characteristicCycleMass_nonneg (C : CharacteristicCycle) (N : Nat) :
 theorem hyperfunctionOrder_nonneg (H : HyperfunctionModel) (n : Nat) :
     0 ≤ hyperfunctionOrder H n := Nat.zero_le _
 
-def microlocal_path_refl (K : KashiwaraSchapiraDatum) :
+noncomputable def microlocal_path_refl (K : KashiwaraSchapiraDatum) :
     Path (characteristicVarietyModel K) (characteristicVarietyModel K) :=
   Path.refl _
 
-def microlocal_path_trans (K : KashiwaraSchapiraDatum) :
+noncomputable def microlocal_path_trans (K : KashiwaraSchapiraDatum) :
     Path (characteristicVarietyModel K) (characteristicVarietyModel K) :=
   Path.trans (Path.refl _) (Path.refl _)
 

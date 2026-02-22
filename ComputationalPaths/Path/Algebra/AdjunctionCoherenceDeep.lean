@@ -105,13 +105,13 @@ inductive APath : MorE → MorE → Type where
   | step {a b c : MorE} : AStep a b → APath b c → APath a c
 
 /-- Theorem 1: Transitivity. -/
-def APath.trans {a b c : MorE} (p : APath a b) (q : APath b c) : APath a c :=
+noncomputable def APath.trans {a b c : MorE} (p : APath a b) (q : APath b c) : APath a c :=
   match p with
   | .refl _ => q
   | .step s rest => .step s (rest.trans q)
 
 /-- Step symmetry. -/
-def AStep.symm : AStep a b → AStep b a
+noncomputable def AStep.symm : AStep a b → AStep b a
   | .tri1 n => .tri1_inv n
   | .tri1_inv n => .tri1 n
   | .tri2 n => .tri2_inv n
@@ -136,13 +136,13 @@ def AStep.symm : AStep a b → AStep b a
   | .congCompR l s => .congCompR l s.symm
 
 /-- Theorem 2: Path symmetry. -/
-def APath.symm {a b : MorE} (p : APath a b) : APath b a :=
+noncomputable def APath.symm {a b : MorE} (p : APath a b) : APath b a :=
   match p with
   | .refl _ => .refl _
   | .step s rest => rest.symm.trans (.step s.symm (.refl _))
 
 /-- Single step as path. -/
-def APath.single (s : AStep a b) : APath a b :=
+noncomputable def APath.single (s : AStep a b) : APath a b :=
   .step s (.refl _)
 
 -- ============================================================
@@ -150,7 +150,7 @@ def APath.single (s : AStep a b) : APath a b :=
 -- ============================================================
 
 /-- Path length. -/
-def APath.length : APath a b → Nat
+noncomputable def APath.length : APath a b → Nat
   | .refl _ => 0
   | .step _ rest => 1 + rest.length
 
@@ -172,26 +172,26 @@ theorem APath.length_trans (p : APath a b) (q : APath b c) :
 -- ============================================================
 
 /-- Theorem 6: congrArg — fmapF preserves paths. -/
-def APath.congrFmapF (p : APath a b) : APath (MorE.fmapF a) (MorE.fmapF b) :=
+noncomputable def APath.congrFmapF (p : APath a b) : APath (MorE.fmapF a) (MorE.fmapF b) :=
   match p with
   | .refl _ => .refl _
   | .step s rest => .step (.congFmapF s) rest.congrFmapF
 
 /-- Theorem 7: congrArg — fmapG preserves paths. -/
-def APath.congrFmapG (p : APath a b) : APath (MorE.fmapG a) (MorE.fmapG b) :=
+noncomputable def APath.congrFmapG (p : APath a b) : APath (MorE.fmapG a) (MorE.fmapG b) :=
   match p with
   | .refl _ => .refl _
   | .step s rest => .step (.congFmapG s) rest.congrFmapG
 
 /-- Theorem 8: congrArg — comp left preserves paths. -/
-def APath.congrCompL (r : MorE) (p : APath a b) :
+noncomputable def APath.congrCompL (r : MorE) (p : APath a b) :
     APath (MorE.comp a r) (MorE.comp b r) :=
   match p with
   | .refl _ => .refl _
   | .step s rest => .step (.congCompL r s) (rest.congrCompL r)
 
 /-- Theorem 9: congrArg — comp right preserves paths. -/
-def APath.congrCompR (l : MorE) (p : APath a b) :
+noncomputable def APath.congrCompR (l : MorE) (p : APath a b) :
     APath (MorE.comp l a) (MorE.comp l b) :=
   match p with
   | .refl _ => .refl _
@@ -216,31 +216,31 @@ theorem APath.length_congrFmapG (p : APath a b) :
 -- ============================================================
 
 /-- Theorem 12: Triangle 1 — εF ∘ Fη = id. -/
-def triangle1 (n : Nat) : APath
+noncomputable def triangle1 (n : Nat) : APath
     (MorE.comp (MorE.eps n) (MorE.fmapF (MorE.eta n)))
     (MorE.id n) :=
   APath.single (AStep.tri1 n)
 
 /-- Theorem 13: Triangle 2 — Gε ∘ ηG = id. -/
-def triangle2 (n : Nat) : APath
+noncomputable def triangle2 (n : Nat) : APath
     (MorE.comp (MorE.fmapG (MorE.eps n)) (MorE.eta n))
     (MorE.id n) :=
   APath.single (AStep.tri2 n)
 
 /-- Theorem 14: Triangle 1 inverse. -/
-def triangle1_inv (n : Nat) : APath
+noncomputable def triangle1_inv (n : Nat) : APath
     (MorE.id n)
     (MorE.comp (MorE.eps n) (MorE.fmapF (MorE.eta n))) :=
   APath.single (AStep.tri1_inv n)
 
 /-- Theorem 15: Triangle 2 inverse. -/
-def triangle2_inv (n : Nat) : APath
+noncomputable def triangle2_inv (n : Nat) : APath
     (MorE.id n)
     (MorE.comp (MorE.fmapG (MorE.eps n)) (MorE.eta n)) :=
   APath.single (AStep.tri2_inv n)
 
 /-- Theorem 16: Triangle roundtrip — tri1 ∘ tri1⁻¹ is a loop. -/
-def triangle1_loop (n : Nat) : APath
+noncomputable def triangle1_loop (n : Nat) : APath
     (MorE.comp (MorE.eps n) (MorE.fmapF (MorE.eta n)))
     (MorE.comp (MorE.eps n) (MorE.fmapF (MorE.eta n))) :=
   (triangle1 n).trans (triangle1_inv n)
@@ -256,21 +256,21 @@ theorem triangle1_loop_length (n : Nat) :
 -- ============================================================
 
 /-- Theorem 18: F(id) → id. -/
-def fmapF_id (n : Nat) : APath (MorE.fmapF (MorE.id n)) (MorE.id n) :=
+noncomputable def fmapF_id (n : Nat) : APath (MorE.fmapF (MorE.id n)) (MorE.id n) :=
   APath.single (AStep.fmapFId n)
 
 /-- Theorem 19: G(id) → id. -/
-def fmapG_id (n : Nat) : APath (MorE.fmapG (MorE.id n)) (MorE.id n) :=
+noncomputable def fmapG_id (n : Nat) : APath (MorE.fmapG (MorE.id n)) (MorE.id n) :=
   APath.single (AStep.fmapGId n)
 
 /-- Theorem 20: F(g ∘ f) → F(g) ∘ F(f). -/
-def fmapF_comp (f g : MorE) : APath
+noncomputable def fmapF_comp (f g : MorE) : APath
     (MorE.fmapF (MorE.comp g f))
     (MorE.comp (MorE.fmapF g) (MorE.fmapF f)) :=
   APath.single (AStep.fmapFComp f g)
 
 /-- Theorem 21: G(g ∘ f) → G(g) ∘ G(f). -/
-def fmapG_comp (f g : MorE) : APath
+noncomputable def fmapG_comp (f g : MorE) : APath
     (MorE.fmapG (MorE.comp g f))
     (MorE.comp (MorE.fmapG g) (MorE.fmapG f)) :=
   APath.single (AStep.fmapGComp f g)
@@ -280,31 +280,31 @@ def fmapG_comp (f g : MorE) : APath
 -- ============================================================
 
 /-- Monad multiplication μ_n = G(ε_n). -/
-def monadMu (n : Nat) : MorE := MorE.fmapG (MorE.eps n)
+noncomputable def monadMu (n : Nat) : MorE := MorE.fmapG (MorE.eps n)
 
 /-- Monad unit η_n. -/
-def monadEta (n : Nat) : MorE := MorE.eta n
+noncomputable def monadEta (n : Nat) : MorE := MorE.eta n
 
 /-- Theorem 22: Left unit: μ ∘ η = G(ε) ∘ η → id via triangle2. -/
-def monad_left_unit (n : Nat) : APath
+noncomputable def monad_left_unit (n : Nat) : APath
     (MorE.comp (monadMu n) (monadEta n))
     (MorE.id n) :=
   APath.single (AStep.tri2 n)
 
 /-- Theorem 23: Right unit: G(ε ∘ Fη) → G(id) via congruence + triangle1. -/
-def monad_right_unit_step1 (n : Nat) : APath
+noncomputable def monad_right_unit_step1 (n : Nat) : APath
     (MorE.fmapG (MorE.comp (MorE.eps n) (MorE.fmapF (MorE.eta n))))
     (MorE.fmapG (MorE.id n)) :=
   (triangle1 n).congrFmapG
 
 /-- Theorem 24: Then G(id) → id. -/
-def monad_right_unit_step2 (n : Nat) : APath
+noncomputable def monad_right_unit_step2 (n : Nat) : APath
     (MorE.fmapG (MorE.id n))
     (MorE.id n) :=
   fmapG_id n
 
 /-- Theorem 25: Full right unit: G(ε ∘ Fη) → id, 2-step chain. -/
-def monad_right_unit (n : Nat) : APath
+noncomputable def monad_right_unit (n : Nat) : APath
     (MorE.fmapG (MorE.comp (MorE.eps n) (MorE.fmapF (MorE.eta n))))
     (MorE.id n) :=
   (monad_right_unit_step1 n).trans (monad_right_unit_step2 n)
@@ -321,15 +321,15 @@ theorem monad_right_unit_length (n : Nat) :
 -- ============================================================
 
 /-- The mate of a morphism f under adjunction. -/
-def mateExpr (f : MorE) : MorE :=
+noncomputable def mateExpr (f : MorE) : MorE :=
   MorE.comp (MorE.eps 0) (MorE.fmapF f)
 
 /-- The comate of a morphism g. -/
-def comateExpr (g : MorE) : MorE :=
+noncomputable def comateExpr (g : MorE) : MorE :=
   MorE.comp g (MorE.eta 0)
 
 /-- Theorem 27: mate(η) = ε ∘ F(η) → id by triangle1. -/
-def mate_of_eta_path : APath (mateExpr (MorE.eta 0)) (MorE.id 0) :=
+noncomputable def mate_of_eta_path : APath (mateExpr (MorE.eta 0)) (MorE.id 0) :=
   triangle1 0
 
 /-- Theorem 28: comate(ε) = ε ∘ η, definitionally. -/
@@ -341,27 +341,27 @@ theorem comate_of_eps_def :
 -- ============================================================
 
 /-- Theorem 29: id ∘ f → f. -/
-def idL_path (f : MorE) (n : Nat) : APath (MorE.comp (MorE.id n) f) f :=
+noncomputable def idL_path (f : MorE) (n : Nat) : APath (MorE.comp (MorE.id n) f) f :=
   APath.single (AStep.idL f n)
 
 /-- Theorem 30: f ∘ id → f. -/
-def idR_path (f : MorE) (n : Nat) : APath (MorE.comp f (MorE.id n)) f :=
+noncomputable def idR_path (f : MorE) (n : Nat) : APath (MorE.comp f (MorE.id n)) f :=
   APath.single (AStep.idR f n)
 
 /-- Theorem 31: (h ∘ g) ∘ f → h ∘ (g ∘ f). -/
-def assoc_path (f g h : MorE) : APath
+noncomputable def assoc_path (f g h : MorE) : APath
     (MorE.comp (MorE.comp h g) f)
     (MorE.comp h (MorE.comp g f)) :=
   APath.single (AStep.assoc f g h)
 
 /-- Theorem 32: Double identity absorption: id ∘ (id ∘ f) → f, 2 steps. -/
-def double_idL (f : MorE) (n m : Nat) : APath
+noncomputable def double_idL (f : MorE) (n m : Nat) : APath
     (MorE.comp (MorE.id m) (MorE.comp (MorE.id n) f)) f :=
   (APath.single (AStep.idL (MorE.comp (MorE.id n) f) m)).trans
     (APath.single (AStep.idL f n))
 
 /-- Theorem 33: (f ∘ id) ∘ id → f, 2 steps. -/
-def double_idR (f : MorE) (n m : Nat) : APath
+noncomputable def double_idR (f : MorE) (n m : Nat) : APath
     (MorE.comp (MorE.comp f (MorE.id n)) (MorE.id m)) f :=
   (APath.single (AStep.idR (MorE.comp f (MorE.id n)) m)).trans
     (APath.single (AStep.idR f n))
@@ -379,7 +379,7 @@ def double_idR (f : MorE) (n m : Nat) : APath
 
 /-- Theorem 34: For composed adjunctions, double triangle path.
     (ε' ∘ F'(ε ∘ Fη) ∘ F'η') can be reduced via lifting. -/
-def compose_adj_triangle (n : Nat) : APath
+noncomputable def compose_adj_triangle (n : Nat) : APath
     (MorE.fmapF (MorE.comp (MorE.eps n) (MorE.fmapF (MorE.eta n))))
     (MorE.fmapF (MorE.id n)) :=
   (triangle1 n).congrFmapF
@@ -394,16 +394,16 @@ structure TAlg where
   act : MorE  -- h : T(obj) → obj
 
 /-- Algebra unit law: h ∘ η = id (as path existence). -/
-def TAlg.unitLaw (alg : TAlg) : Prop :=
+noncomputable def TAlg.unitLaw (alg : TAlg) : Prop :=
   Nonempty (APath (MorE.comp alg.act (MorE.eta alg.obj)) (MorE.id alg.obj))
 
 /-- Algebra associativity: h ∘ μ = h ∘ Th (as path existence). -/
-def TAlg.assocLaw (alg : TAlg) : Prop :=
+noncomputable def TAlg.assocLaw (alg : TAlg) : Prop :=
   Nonempty (APath (MorE.comp alg.act (monadMu alg.obj))
                   (MorE.comp alg.act (MorE.fmapG (MorE.fmapF alg.act))))
 
 /-- Theorem 35: Free algebra on n: carrier = n, action = G(ε_n). -/
-def freeAlgebra (n : Nat) : TAlg := ⟨n, monadMu n⟩
+noncomputable def freeAlgebra (n : Nat) : TAlg := ⟨n, monadMu n⟩
 
 /-- Theorem 36: Free algebra satisfies unit law (via triangle2). -/
 theorem freeAlgebra_unitLaw (n : Nat) : (freeAlgebra n).unitLaw :=
@@ -420,7 +420,7 @@ structure Fork where
   coeq  : MorE
 
 /-- Fork commutativity as path existence. -/
-def Fork.commutes (fk : Fork) : Prop :=
+noncomputable def Fork.commutes (fk : Fork) : Prop :=
   Nonempty (APath (MorE.comp fk.coeq fk.left) (MorE.comp fk.coeq fk.right))
 
 /-- Theorem 37: Trivial fork with identical arrows commutes (refl). -/
@@ -467,7 +467,7 @@ theorem AStep.symm_symm_assoc (f g h : MorE) : (AStep.assoc f g h).symm.symm = A
 -- ============================================================
 
 /-- Theorem 44: Double reassociation: ((h∘g)∘f)∘e → h∘(g∘(f∘e)), 2 steps. -/
-def double_assoc (e f g h : MorE) : APath
+noncomputable def double_assoc (e f g h : MorE) : APath
     (MorE.comp (MorE.comp (MorE.comp h g) f) e)
     (MorE.comp h (MorE.comp g (MorE.comp f e))) :=
   (APath.single (AStep.assoc e f (MorE.comp h g))).trans
@@ -480,13 +480,13 @@ theorem double_assoc_length (e f g h : MorE) :
 
 /-- Theorem 46: Pentagon path — two different 3-step reassociation routes
     from ((k∘h)∘g)∘f agree at endpoints. -/
-def pentagon_left (f g h k : MorE) : APath
+noncomputable def pentagon_left (f g h k : MorE) : APath
     (MorE.comp (MorE.comp (MorE.comp k h) g) f)
     (MorE.comp k (MorE.comp h (MorE.comp g f))) :=
   (APath.single (AStep.assoc f g (MorE.comp k h))).trans
     ((APath.single (AStep.assoc (MorE.comp g f) h k)))
 
-def pentagon_right (f g h k : MorE) : APath
+noncomputable def pentagon_right (f g h k : MorE) : APath
     (MorE.comp (MorE.comp (MorE.comp k h) g) f)
     (MorE.comp k (MorE.comp h (MorE.comp g f))) :=
   ((APath.single (AStep.congCompL f (AStep.assoc g h k))).trans
@@ -498,7 +498,7 @@ def pentagon_right (f g h k : MorE) : APath
 -- ============================================================
 
 /-- A property transported along a path. -/
-def transport {P : MorE → Prop} {a b : MorE} (_path : APath a b) (pa : P a)
+noncomputable def transport {P : MorE → Prop} {a b : MorE} (_path : APath a b) (pa : P a)
     (h : ∀ x y, AStep x y → P x → P y) : P b := by
   induction _path with
   | refl _ => exact pa
@@ -510,7 +510,7 @@ theorem transport_refl {P : MorE → Prop} {a : MorE} (pa : P a)
     transport (APath.refl a) pa h = pa := rfl
 
 /-- Theorem 48: A predicate "is identity" is preserved by triangle1. -/
-def isId : MorE → Prop
+noncomputable def isId : MorE → Prop
   | MorE.id _ => True
   | _ => False
 
@@ -522,7 +522,7 @@ theorem triangle1_transports_to_id (n : Nat) :
 -- ============================================================
 
 /-- Two paths converge if there exist paths to a common target. -/
-def converge (p : APath a b) (q : APath a c) : Prop :=
+noncomputable def converge (p : APath a b) (q : APath a c) : Prop :=
   ∃ d : MorE, Nonempty (APath b d) ∧ Nonempty (APath c d)
 
 /-- Theorem 49: Identical paths converge trivially. -/

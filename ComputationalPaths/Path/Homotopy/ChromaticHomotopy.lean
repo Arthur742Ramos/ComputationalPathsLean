@@ -80,7 +80,7 @@ structure ChromaticHeight (p : Prime) where
   vanishing_below : True
 
 /-- Height 0 corresponds to rational spectra. -/
-def heightZero (p : Prime) : ChromaticHeight.{u} p where
+noncomputable def heightZero (p : Prime) : ChromaticHeight.{u} p where
   spectrum := PUnit
   height := 0
   nontrivial := trivial
@@ -107,7 +107,7 @@ structure ChromaticFiltration (p : Prime) where
   intersection_trivial : True
 
 /-- Trivial chromatic filtration. -/
-def trivialFiltration (p : Prime) : ChromaticFiltration.{u} p where
+noncomputable def trivialFiltration (p : Prime) : ChromaticFiltration.{u} p where
   layer := fun _ => PUnit
   layer_zero_all := trivial
   inclusion := fun _ _ => PUnit.unit
@@ -125,7 +125,7 @@ structure ThickSubcategory (p : Prime) where
   extension_closed : True
 
 /-- The thick subcategory C_n of spectra of type ≥ n. -/
-def thickCN (p : Prime) (_n : Nat) : ThickSubcategory.{u} p where
+noncomputable def thickCN (p : Prime) (_n : Nat) : ThickSubcategory.{u} p where
   objects := fun _ => True
   retract_closed := trivial
   extension_closed := trivial
@@ -155,7 +155,7 @@ structure NilpotenceData where
   detected : True
 
 /-- The trivial nilpotence: the zero map is nilpotent. -/
-def trivialNilpotence : NilpotenceData.{u} where
+noncomputable def trivialNilpotence : NilpotenceData.{u} where
   carrier := PUnit
   degree := 0
   selfMap := fun _ => PUnit.unit
@@ -195,7 +195,7 @@ structure ChromaticConvergence (p : Prime) where
   convergence : True
 
 /-- Trivial chromatic convergence. -/
-def trivialConvergence (p : Prime) : ChromaticConvergence.{u} p where
+noncomputable def trivialConvergence (p : Prime) : ChromaticConvergence.{u} p where
   spectrum := PUnit
   chromaticLocalization := fun _ => PUnit
   locMap := fun _ _ => PUnit.unit

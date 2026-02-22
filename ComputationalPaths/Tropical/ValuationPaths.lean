@@ -101,7 +101,7 @@ noncomputable def tropical_length_cancel_rweq (e : Edge) :
 end TropicalizationPathData
 
 /-- Trivial valuation package to instantiate the tropical path interface. -/
-def trivialValuationPathData : ValuationPathData PUnit Nat where
+noncomputable def trivialValuationPathData : ValuationPathData PUnit Nat where
   zeroK := PUnit.unit
   addK := fun _ _ => PUnit.unit
   mulK := fun _ _ => PUnit.unit
@@ -114,7 +114,7 @@ def trivialValuationPathData : ValuationPathData PUnit Nat where
   addValStep := fun _ _ => Path.Step.trans_refl_left (Path.refl 0)
 
 /-- Trivial tropicalization from the trivial curve and valuation packages. -/
-def trivialTropicalizationPathData :
+noncomputable def trivialTropicalizationPathData :
     TropicalizationPathData trivialTropicalCurvePathData trivialValuationPathData where
   edgeLabel := fun _ => PUnit.unit
   tropicalLength := fun _ => 0

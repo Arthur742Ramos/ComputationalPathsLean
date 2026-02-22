@@ -35,7 +35,7 @@ structure CSPSolution (C : CSP A) where
   selfConsistent : C.constraint point point
 
 /-- Any domain element gives a solution via self-consistency -/
-def trivialSolution (C : CSP A) (a : A) (h : C.domain a) :
+noncomputable def trivialSolution (C : CSP A) (a : A) (h : C.domain a) :
     CSPSolution C where
   point := a
   inDomain := h
@@ -44,7 +44,7 @@ def trivialSolution (C : CSP A) (a : A) (h : C.domain a) :
 /-! ## Constraint paths: equal solutions are connected -/
 
 /-- Path between solution points when they are equal -/
-def solutionPath (C : CSP A) (s₁ s₂ : CSPSolution C)
+noncomputable def solutionPath (C : CSP A) (s₁ s₂ : CSPSolution C)
     (h : s₁.point = s₂.point) :
     Path s₁.point s₂.point :=
   Path.mk [Step.mk _ _ h] h
@@ -78,7 +78,7 @@ structure FixedWitness (C : CSP A) (AC : ArcConsistent C) where
   isFixed : AC.witness fixedPt = fixedPt
 
 /-- Path from witness to fixed point -/
-def fixedWitnessPath (C : CSP A) (AC : ArcConsistent C)
+noncomputable def fixedWitnessPath (C : CSP A) (AC : ArcConsistent C)
     (FW : FixedWitness C AC) :
     Path (AC.witness FW.fixedPt) FW.fixedPt :=
   Path.mk [Step.mk _ _ FW.isFixed] FW.isFixed
@@ -99,7 +99,7 @@ structure PropagationStep (C : CSP A) where
   preserves : ∀ a, C.domain a → C.constraint a a → refined a
 
 /-- Two successive propagation steps compose -/
-def composeProps (C : CSP A) (P₁ P₂ : PropagationStep C)
+noncomputable def composeProps (C : CSP A) (P₁ P₂ : PropagationStep C)
     (h : ∀ a, P₂.refined a → P₁.refined a) :
     PropagationStep C where
   refined := P₂.refined
@@ -107,7 +107,7 @@ def composeProps (C : CSP A) (P₁ P₂ : PropagationStep C)
   preserves := fun a hd hc => P₂.preserves a hd hc
 
 /-- Identity propagation step -/
-def idProp (C : CSP A) : PropagationStep C where
+noncomputable def idProp (C : CSP A) : PropagationStep C where
   refined := C.domain
   refines := fun _ h => h
   preserves := fun _ h _ => h
@@ -120,12 +120,12 @@ structure SearchNode (A : Type u) where
   choices : List A
 
 /-- Path from a search node's value to one of its choices -/
-def choicePath (n : SearchNode A) (c : A) (h : c = n.value) :
+noncomputable def choicePath (n : SearchNode A) (c : A) (h : c = n.value) :
     Path c n.value :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Backtracking: reverting a choice via symm -/
-def backtrack (n : SearchNode A) (c : A) (h : c = n.value) :
+noncomputable def backtrack (n : SearchNode A) (c : A) (h : c = n.value) :
     Path n.value c :=
   symm (choicePath n c h)
 
@@ -147,17 +147,17 @@ structure CSPEquiv (C₁ C₂ : CSP A) where
   backward : ∀ a, C₂.domain a → C₁.domain a
 
 /-- CSP equivalence is reflexive -/
-def cspEquiv_refl (C : CSP A) : CSPEquiv C C where
+noncomputable def cspEquiv_refl (C : CSP A) : CSPEquiv C C where
   forward := fun _ h => h
   backward := fun _ h => h
 
 /-- CSP equivalence is symmetric -/
-def cspEquiv_symm (e : CSPEquiv C₁ C₂) : CSPEquiv C₂ C₁ where
+noncomputable def cspEquiv_symm (e : CSPEquiv C₁ C₂) : CSPEquiv C₂ C₁ where
   forward := e.backward
   backward := e.forward
 
 /-- CSP equivalence is transitive -/
-def cspEquiv_trans (e₁ : CSPEquiv C₁ C₂) (e₂ : CSPEquiv C₂ C₃) :
+noncomputable def cspEquiv_trans (e₁ : CSPEquiv C₁ C₂) (e₂ : CSPEquiv C₂ C₃) :
     CSPEquiv C₁ C₃ where
   forward := fun a h => e₂.forward a (e₁.forward a h)
   backward := fun a h => e₁.backward a (e₂.backward a h)

@@ -73,7 +73,7 @@ inductive DiamondStep (X : Type u) : X → X → Prop where
   | quotient (a b : X) (h : a = b) : DiamondStep a b
 
 /-- Every DiamondStep yields a Path. -/
-def DiamondStep.toPath {X : Type u} {a b : X}
+noncomputable def DiamondStep.toPath {X : Type u} {a b : X}
     (s : DiamondStep X a b) : Path a b :=
   match s with
   | .proetale_desc _ => Path.refl _
@@ -116,12 +116,12 @@ namespace ProEtaleCoverData
 variable {X : Type u} {Y : Type v}
 
 /-- Multi-step: surjectivity composed with map_zero. -/
-def surj_zero (PE : ProEtaleCoverData X Y) :
+noncomputable def surj_zero (PE : ProEtaleCoverData X Y) :
     Path (PE.coverMap (PE.surj PE.target.ringData.zero)) PE.target.ringData.zero :=
   Path.trans (PE.surj_spec PE.target.ringData.zero) (Path.refl _)
 
 /-- Symmetry: target zero comes from cover. -/
-def zero_from_cover (PE : ProEtaleCoverData X Y) :
+noncomputable def zero_from_cover (PE : ProEtaleCoverData X Y) :
     Path PE.target.ringData.zero (PE.coverMap PE.source.ringData.zero) :=
   Path.symm PE.map_zero
 
@@ -152,7 +152,7 @@ namespace VTopologyData
 variable {X : Type u}
 
 /-- Multi-step: surjectivity for a specific cover. -/
-def cover_surj_witness (VT : VTopologyData X) (i : VT.CoverIdx) (x : X) :
+noncomputable def cover_surj_witness (VT : VTopologyData X) (i : VT.CoverIdx) (x : X) :
     Path (VT.coverMap i (VT.cover_surj i x)) x :=
   Path.trans (VT.cover_surj_spec i x) (Path.refl _)
 
@@ -198,28 +198,28 @@ namespace DiamondData
 variable {X : Type u} {Y : Type v}
 
 /-- Multi-step: surjectivity of the quotient map. -/
-def surj_witness (D : DiamondData X Y) (x : X) :
+noncomputable def surj_witness (D : DiamondData X Y) (x : X) :
     Path (D.quotientMap (D.quot_surj x)) x :=
   Path.trans (D.quot_surj_spec x) (Path.refl _)
 
 /-- Symmetry: x comes from the quotient. -/
-def x_from_quot (D : DiamondData X Y) (x : X) :
+noncomputable def x_from_quot (D : DiamondData X Y) (x : X) :
     Path x (D.quotientMap (D.quot_surj x)) :=
   Path.symm (D.quot_surj_spec x)
 
 /-- Reflexivity of the relation yields a trivial path. -/
-def quot_refl (D : DiamondData X Y) (y : Y) :
+noncomputable def quot_refl (D : DiamondData X Y) (y : Y) :
     Path (D.quotientMap y) (D.quotientMap y) :=
   D.quot_respects y y (D.equivRel.refl_rel y)
 
 /-- Symmetry of the quotient respect. -/
-def quot_symm (D : DiamondData X Y) (y1 y2 : Y)
+noncomputable def quot_symm (D : DiamondData X Y) (y1 y2 : Y)
     (h : D.equivRel.rel y1 y2) :
     Path (D.quotientMap y2) (D.quotientMap y1) :=
   Path.symm (D.quot_respects y1 y2 h)
 
 /-- Transitivity: if y1 ~ y2 ~ y3, then quotientMap y1 = quotientMap y3. -/
-def quot_trans (D : DiamondData X Y) (y1 y2 y3 : Y)
+noncomputable def quot_trans (D : DiamondData X Y) (y1 y2 y3 : Y)
     (h12 : D.equivRel.rel y1 y2) (h23 : D.equivRel.rel y2 y3) :
     Path (D.quotientMap y1) (D.quotientMap y3) :=
   Path.trans (D.quot_respects y1 y2 h12) (D.quot_respects y2 y3 h23)
@@ -272,17 +272,17 @@ namespace PerfectoidDiamondData
 variable {X : Type u}
 
 /-- Multi-step: quotient map is identity, so surj composed with id is id. -/
-def quot_surj_id (PD : PerfectoidDiamondData X) (x : X) :
+noncomputable def quot_surj_id (PD : PerfectoidDiamondData X) (x : X) :
     Path (PD.diamond.quotientMap (PD.diamond.quot_surj x)) x :=
   Path.trans (PD.diamond.quot_surj_spec x) (Path.refl _)
 
 /-- Composed: identity of quotient map. -/
-def quot_id_trans (PD : PerfectoidDiamondData X) (x : X) :
+noncomputable def quot_id_trans (PD : PerfectoidDiamondData X) (x : X) :
     Path x (PD.diamond.quotientMap x) :=
   Path.symm (PD.quot_is_id x)
 
 /-- Multi-step: any element maps to itself via the diamond. -/
-def roundtrip (PD : PerfectoidDiamondData X) (x : X) :
+noncomputable def roundtrip (PD : PerfectoidDiamondData X) (x : X) :
     Path (PD.diamond.quotientMap x) x :=
   Path.trans (PD.quot_is_id x) (Path.refl _)
 
@@ -317,17 +317,17 @@ namespace DiamondProductData
 variable {X : Type u} {Y : Type v} {S : Type w}
 
 /-- Multi-step: fiber condition for the first projection. -/
-def fiber_fst (DP : DiamondProductData X Y S) (p : DP.ProductType) :
+noncomputable def fiber_fst (DP : DiamondProductData X Y S) (p : DP.ProductType) :
     Path (DP.proj1 (DP.fst p)) (DP.proj2 (DP.snd p)) :=
   Path.trans (DP.fiber_eq p) (Path.refl _)
 
 /-- Symmetry: the fiber condition reversed. -/
-def fiber_snd (DP : DiamondProductData X Y S) (p : DP.ProductType) :
+noncomputable def fiber_snd (DP : DiamondProductData X Y S) (p : DP.ProductType) :
     Path (DP.proj2 (DP.snd p)) (DP.proj1 (DP.fst p)) :=
   Path.symm (DP.fiber_eq p)
 
 /-- Composed: pairing and projection give the original morphism. -/
-def pair_fst_trans (DP : DiamondProductData X Y S)
+noncomputable def pair_fst_trans (DP : DiamondProductData X Y S)
     (Z : Type u) (f : Z → X) (g : Z → Y)
     (h : ∀ z, Path (DP.proj1 (f z)) (DP.proj2 (g z)))
     (z : Z) :
@@ -358,14 +358,14 @@ variable {X : Type u} {Y : Type v} {XP : Type u} {YP : Type v}
 variable {DX : DiamondData X XP} {DY : DiamondData Y YP}
 
 /-- Multi-step: compatibility for a surjection point. -/
-def compat_surj (DM : DiamondMorphismData X Y XP YP DX DY) (x : X) :
+noncomputable def compat_surj (DM : DiamondMorphismData X Y XP YP DX DY) (x : X) :
     Path (DM.morphMap x) (DY.quotientMap (DM.liftMap (DX.quot_surj x))) :=
   Path.trans
     (Path.congrArg DM.morphMap (Path.symm (DX.quot_surj_spec x)))
     (DM.compat (DX.quot_surj x))
 
 /-- Symmetry: quotientMap ∘ lift gives morphMap. -/
-def compat_symm (DM : DiamondMorphismData X Y XP YP DX DY) (xp : XP) :
+noncomputable def compat_symm (DM : DiamondMorphismData X Y XP YP DX DY) (xp : XP) :
     Path (DY.quotientMap (DM.liftMap xp)) (DM.morphMap (DX.quotientMap xp)) :=
   Path.symm (DM.compat xp)
 
@@ -374,20 +374,20 @@ end DiamondMorphismData
 /-! ## RwEq multi-step constructions -/
 
 /-- Multi-step: diamond quotient transitivity chain. -/
-def diamond_trans_chain {X : Type u} {Y : Type v}
+noncomputable def diamond_trans_chain {X : Type u} {Y : Type v}
     (D : DiamondData X Y) (y1 y2 y3 : Y)
     (h12 : D.equivRel.rel y1 y2) (h23 : D.equivRel.rel y2 y3) :
     Path (D.quotientMap y1) (D.quotientMap y3) :=
   D.quot_trans y1 y2 y3 h12 h23
 
 /-- Symmetry chain: surjectivity and quotient. -/
-def diamond_surj_symm {X : Type u} {Y : Type v}
+noncomputable def diamond_surj_symm {X : Type u} {Y : Type v}
     (D : DiamondData X Y) (x : X) :
     Path x (D.quotientMap (D.quot_surj x)) :=
   Path.symm (D.quot_surj_spec x)
 
 /-- Multi-step: perfectoid diamond roundtrip composed with refl. -/
-def perf_diamond_roundtrip {X : Type u}
+noncomputable def perf_diamond_roundtrip {X : Type u}
     (PD : PerfectoidDiamondData X) (x : X) :
     Path (PD.diamond.quotientMap x) x :=
   Path.trans (PD.quot_is_id x) (Path.refl _)

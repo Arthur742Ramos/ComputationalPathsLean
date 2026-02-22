@@ -81,12 +81,12 @@ structure PathOver {D : A → Type v} {a b : A} (p : Path a b) (u : D a) (v : D 
   over_eq : Path.transport (D := D) p u = v
 
 /-- Reflexive dependent path. -/
-def PathOver.reflOver {D : A → Type v} {a : A} (u : D a) :
+noncomputable def PathOver.reflOver {D : A → Type v} {a : A} (u : D a) :
     PathOver (Path.refl a) u u :=
   ⟨by simp [Path.transport]⟩
 
 /-- Dependent path from apd. -/
-def PathOver.fromApd {D : A → Type v} (f : ∀ x, D x)
+noncomputable def PathOver.fromApd {D : A → Type v} (f : ∀ x, D x)
     {a b : A} (p : Path a b) :
     PathOver p (f a) (f b) :=
   ⟨transport_apd_eq f p⟩
@@ -94,7 +94,7 @@ def PathOver.fromApd {D : A → Type v} (f : ∀ x, D x)
 /-! ## 7. PathOver composition along trans -/
 
 /-- Compose dependent paths over a composite base path. -/
-def PathOver.trans' {D : A → Type v} {a b c : A}
+noncomputable def PathOver.trans' {D : A → Type v} {a b c : A}
     {p : Path a b} {q : Path b c}
     {u : D a} {v : D b} {w : D c}
     (po₁ : PathOver p u v) (po₂ : PathOver q v w) :
@@ -109,7 +109,7 @@ def PathOver.trans' {D : A → Type v} {a b c : A}
 /-! ## 8. PathOver symmetry -/
 
 /-- Reverse a dependent path. -/
-def PathOver.symm' {D : A → Type v} {a b : A}
+noncomputable def PathOver.symm' {D : A → Type v} {a b : A}
     {p : Path a b} {u : D a} {v : D b}
     (po : PathOver p u v) :
     PathOver (Path.symm p) v u :=
@@ -353,7 +353,7 @@ theorem apd_nondep {f : A → B} {a b : A} (p : Path a b) :
 /-! ## 27. Transport preserves paths (congruence) -/
 
 /-- If two values are path-equal, their transports are path-equal. -/
-def transport_path_cong {D : A → Type v} {a b : A}
+noncomputable def transport_path_cong {D : A → Type v} {a b : A}
     (p : Path a b) {u w : D a}
     (q : Path u w) :
     Path (Path.transport (D := D) p u) (Path.transport (D := D) p w) := by
@@ -465,7 +465,7 @@ theorem transport_congrArg_id {D : A → Type v} {a b : A}
 /-! ## 36. PathOver constant transport -/
 
 /-- PathOver in constant family from transport_const. -/
-def pathover_of_eq_const {D : Type v} {a b : A}
+noncomputable def pathover_of_eq_const {D : Type v} {a b : A}
     (p : Path a b) {u v : D} (h : u = v) :
     PathOver (D := fun _ => D) p u v :=
   ⟨by rw [Path.transport_const]; exact h⟩

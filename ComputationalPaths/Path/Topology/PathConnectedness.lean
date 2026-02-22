@@ -24,7 +24,7 @@ class PathConnected (A : Type u) : Prop where
   joined : ∀ a b : A, Nonempty (Path a b)
 
 /-- The relation "there exists a path from `a` to `b`". -/
-def PathRelated {A : Type u} (a b : A) : Prop :=
+noncomputable def PathRelated {A : Type u} (a b : A) : Prop :=
   Nonempty (Path a b)
 
 /-! ## PathRelated is an equivalence relation -/
@@ -45,13 +45,13 @@ theorem pathRelated_equivalence (A : Type u) : Equivalence (@PathRelated A) :=
   ⟨pathRelated_refl, fun h => pathRelated_symm h, fun h₁ h₂ => pathRelated_trans h₁ h₂⟩
 
 /-- The setoid on `A` induced by path-relatedness. -/
-def pathSetoid (A : Type u) : Setoid A :=
+noncomputable def pathSetoid (A : Type u) : Setoid A :=
   ⟨@PathRelated A, pathRelated_equivalence A⟩
 
 /-! ## Path components -/
 
 /-- The path component of `a` is the predicate on all points related to `a` by a path. -/
-def pathComponent {A : Type u} (a : A) (b : A) : Prop :=
+noncomputable def pathComponent {A : Type u} (a : A) (b : A) : Prop :=
   PathRelated a b
 
 theorem mem_pathComponent_self {A : Type u} (a : A) : pathComponent a a :=
@@ -73,11 +73,11 @@ theorem pathComponent_trans {A : Type u} {a b c : A}
 /-! ## π₀: set of path components -/
 
 /-- π₀(A): the type of path components (quotient by path-relatedness). -/
-def Pi0 (A : Type u) : Type u :=
+noncomputable def Pi0 (A : Type u) : Type u :=
   Quotient (pathSetoid A)
 
 /-- Canonical map from `A` to its set of path components. -/
-def Pi0.mk {A : Type u} (a : A) : Pi0 A :=
+noncomputable def Pi0.mk {A : Type u} (a : A) : Pi0 A :=
   Quotient.mk (pathSetoid A) a
 
 /-- Two points map to the same component iff they are path-related. -/
@@ -101,7 +101,7 @@ theorem Pi0.surjective {A : Type u} : Function.Surjective (@Pi0.mk A) := by
 
 /-- The universal property: a function from `A` that is constant on path
 components factors uniquely through `Pi0`. -/
-def Pi0.lift {A : Type u} {B : Type v} (f : A → B)
+noncomputable def Pi0.lift {A : Type u} {B : Type v} (f : A → B)
     (hf : ∀ a b : A, PathRelated a b → f a = f b) : Pi0 A → B :=
   Quotient.lift f (fun a b h => hf a b h)
 
@@ -121,7 +121,7 @@ theorem Pi0.lift_unique {A : Type u} {B : Type v} (f : A → B)
 /-! ## Functoriality: maps preserve path structure -/
 
 /-- A function `f : A → B` maps paths in `A` to paths in `B`. -/
-def mapPath {A : Type u} {B : Type v} (f : A → B) {a b : A} (p : Path a b) :
+noncomputable def mapPath {A : Type u} {B : Type v} (f : A → B) {a b : A} (p : Path a b) :
     Path (f a) (f b) :=
   Path.congrArg f p
 
@@ -145,7 +145,7 @@ theorem mapPath_preserves_related {A : Type u} {B : Type v} (f : A → B)
   h.elim fun p => ⟨mapPath f p⟩
 
 /-- Functorial action on π₀. -/
-def Pi0.map {A : Type u} {B : Type v} (f : A → B) : Pi0 A → Pi0 B :=
+noncomputable def Pi0.map {A : Type u} {B : Type v} (f : A → B) : Pi0 A → Pi0 B :=
   Pi0.lift (fun a => Pi0.mk (f a))
     (fun a b h => Pi0.mk_eq_iff.mpr (mapPath_preserves_related f h))
 

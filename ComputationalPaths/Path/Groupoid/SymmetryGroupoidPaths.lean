@@ -23,39 +23,39 @@ structure State where
   charge : Nat
 deriving DecidableEq, Repr
 
-@[simp] def vacuum : State := ⟨0, 0⟩
-@[simp] def excitedA : State := ⟨1, 0⟩
-@[simp] def excitedB : State := ⟨0, 1⟩
-@[simp] def excitedAB : State := ⟨1, 1⟩
+@[simp] noncomputable def vacuum : State := ⟨0, 0⟩
+@[simp] noncomputable def excitedA : State := ⟨1, 0⟩
+@[simp] noncomputable def excitedB : State := ⟨0, 1⟩
+@[simp] noncomputable def excitedAB : State := ⟨1, 1⟩
 
 /-! ## Symmetry transformations -/
 
 /-- Charge conjugation: flips charge. -/
-@[simp] def chargeConj (s : State) : State := ⟨s.config, s.charge⟩
+@[simp] noncomputable def chargeConj (s : State) : State := ⟨s.config, s.charge⟩
 
 /-- Config reflection: maps config → config. -/
-@[simp] def configRefl (s : State) : State := ⟨s.config, s.charge⟩
+@[simp] noncomputable def configRefl (s : State) : State := ⟨s.config, s.charge⟩
 
 /-- Swap symmetry: exchanges config and charge. -/
-@[simp] def swapSym (s : State) : State := ⟨s.charge, s.config⟩
+@[simp] noncomputable def swapSym (s : State) : State := ⟨s.charge, s.config⟩
 
 /-- Identity symmetry. -/
-@[simp] def idSym (s : State) : State := s
+@[simp] noncomputable def idSym (s : State) : State := s
 
 /-- Double swap. -/
-@[simp] def doubleSwap (s : State) : State := swapSym (swapSym s)
+@[simp] noncomputable def doubleSwap (s : State) : State := swapSym (swapSym s)
 
 /-- Shift config by 1. -/
-@[simp] def shiftConfig (s : State) : State := ⟨s.config + 1, s.charge⟩
+@[simp] noncomputable def shiftConfig (s : State) : State := ⟨s.config + 1, s.charge⟩
 
 /-- Shift charge by 1. -/
-@[simp] def shiftCharge (s : State) : State := ⟨s.config, s.charge + 1⟩
+@[simp] noncomputable def shiftCharge (s : State) : State := ⟨s.config, s.charge + 1⟩
 
 /-- Projection to charge-zero sector. -/
-@[simp] def projectCharge (s : State) : State := ⟨s.config, 0⟩
+@[simp] noncomputable def projectCharge (s : State) : State := ⟨s.config, 0⟩
 
 /-- Projection to config-zero sector. -/
-@[simp] def projectConfig (s : State) : State := ⟨0, s.charge⟩
+@[simp] noncomputable def projectConfig (s : State) : State := ⟨0, s.charge⟩
 
 /-! ## Symmetries ARE invertible paths, groupoid structure -/
 
@@ -63,17 +63,17 @@ deriving DecidableEq, Repr
 abbrev Symmetry (a b : State) := Path a b
 
 /-- Symmetry composition IS trans. -/
-def symCompose {a b c : State}
+noncomputable def symCompose {a b c : State}
     (f : Symmetry a b) (g : Symmetry b c) : Symmetry a c :=
   Path.trans f g
 
 /-- Symmetry inverse IS symm. -/
-def symInverse {a b : State}
+noncomputable def symInverse {a b : State}
     (f : Symmetry a b) : Symmetry b a :=
   Path.symm f
 
 /-- Identity symmetry IS refl. -/
-def symId (a : State) : Symmetry a a := Path.refl a
+noncomputable def symId (a : State) : Symmetry a a := Path.refl a
 
 /-! ## Invariants and conservation laws -/
 
@@ -81,16 +81,16 @@ def symId (a : State) : Symmetry a a := Path.refl a
 abbrev Observable := State → Nat
 
 /-- Total quantum number. -/
-@[simp] def totalCharge : Observable := fun s => s.config + s.charge
+@[simp] noncomputable def totalCharge : Observable := fun s => s.config + s.charge
 
 /-- Config observable. -/
-@[simp] def configObs : Observable := fun s => s.config
+@[simp] noncomputable def configObs : Observable := fun s => s.config
 
 /-- Charge observable. -/
-@[simp] def chargeObs : Observable := fun s => s.charge
+@[simp] noncomputable def chargeObs : Observable := fun s => s.charge
 
 /-- An observable is conserved along a symmetry (path) if it's equal at endpoints. -/
-def isConserved (obs : Observable) {a b : State} (_ : Symmetry a b) : Prop :=
+noncomputable def isConserved (obs : Observable) {a b : State} (_ : Symmetry a b) : Prop :=
   obs a = obs b
 
 /-! ## Core theorems -/
@@ -130,21 +130,21 @@ theorem sym_inv_id (a : State) : symInverse (symId a) = symId a :=
 theorem swap_involution (s : State) : swapSym (swapSym s) = s := by
   cases s; simp
 
-def swap_inv_path (s : State) : Path (swapSym (swapSym s)) s :=
+noncomputable def swap_inv_path (s : State) : Path (swapSym (swapSym s)) s :=
   Path.mk [Step.mk _ _ (swap_involution s)] (swap_involution s)
 
 -- 8. Double swap is identity
 theorem doubleSwap_is_id (s : State) : doubleSwap s = s := by
   cases s; simp
 
-def doubleSwap_path (s : State) : Path (doubleSwap s) s :=
+noncomputable def doubleSwap_path (s : State) : Path (doubleSwap s) s :=
   Path.mk [Step.mk _ _ (doubleSwap_is_id s)] (doubleSwap_is_id s)
 
 -- 9. Projection is idempotent
 theorem projectCharge_idem (s : State) :
     projectCharge (projectCharge s) = projectCharge s := by simp
 
-def projectCharge_idem_path (s : State) :
+noncomputable def projectCharge_idem_path (s : State) :
     Path (projectCharge (projectCharge s)) (projectCharge s) :=
   Path.mk [Step.mk _ _ (projectCharge_idem s)] (projectCharge_idem s)
 
@@ -152,7 +152,7 @@ def projectCharge_idem_path (s : State) :
 theorem project_kills_shift (s : State) :
     projectCharge (shiftCharge s) = projectCharge s := by simp
 
-def project_kills_shift_path (s : State) :
+noncomputable def project_kills_shift_path (s : State) :
     Path (projectCharge (shiftCharge s)) (projectCharge s) :=
   Path.mk [Step.mk _ _ (project_kills_shift s)] (project_kills_shift s)
 
@@ -161,12 +161,12 @@ theorem totalCharge_swap_conserved (s : State) :
     totalCharge (swapSym s) = totalCharge s := by
   simp [Nat.add_comm]
 
-def totalCharge_swap_path (s : State) :
+noncomputable def totalCharge_swap_path (s : State) :
     Path (totalCharge (swapSym s)) (totalCharge s) :=
   Path.mk [Step.mk _ _ (totalCharge_swap_conserved s)] (totalCharge_swap_conserved s)
 
 -- 12. Noether-type: symmetry path gives conservation path via congrArg
-def noether_correspondence (obs : Observable) {a b : State}
+noncomputable def noether_correspondence (obs : Observable) {a b : State}
     (sym : Symmetry a b) : Path (obs a) (obs b) :=
   Path.congrArg obs sym
 
@@ -182,7 +182,7 @@ theorem symmetry_breaking_obstruction :
     projectCharge vacuum ≠ excitedB := by simp
 
 -- 15. CongrArg through swap gives new symmetry
-def swap_functorial {a b : State} (p : Symmetry a b) :
+noncomputable def swap_functorial {a b : State} (p : Symmetry a b) :
     Symmetry (swapSym a) (swapSym b) :=
   Path.congrArg swapSym p
 
@@ -200,16 +200,16 @@ theorem swap_func_inverse {a b : State}
   Path.congrArg_symm swapSym f
 
 -- 18. Transport along symmetry
-def sym_transport {D : State → Type} {a b : State}
+noncomputable def sym_transport {D : State → Type} {a b : State}
     (p : Symmetry a b) (x : D a) : D b :=
   Path.transport p x
 
 -- 19. Step construction for swap involution
-def swap_step (s : State) : Step State :=
+noncomputable def swap_step (s : State) : Step State :=
   ⟨swapSym (swapSym s), s, swap_involution s⟩
 
 -- 20. Projection functorial
-def project_functorial {a b : State} (p : Symmetry a b) :
+noncomputable def project_functorial {a b : State} (p : Symmetry a b) :
     Symmetry (projectCharge a) (projectCharge b) :=
   Path.congrArg projectCharge p
 
@@ -230,12 +230,12 @@ theorem vacuum_config_proj : projectConfig vacuum = vacuum := by rfl
 theorem swap_vacuum : swapSym vacuum = vacuum := by rfl
 
 -- 25. Conservation of total charge: swap roundtrip path
-def swap_conservation_roundtrip (s : State) :
+noncomputable def swap_conservation_roundtrip (s : State) :
     Path (totalCharge s) (totalCharge s) :=
   Path.trans (Path.symm (totalCharge_swap_path s)) (totalCharge_swap_path s)
 
 -- 26. Composed symmetry breaks to projected symmetry via congrArg
-def symmetry_to_projected {a b : State}
+noncomputable def symmetry_to_projected {a b : State}
     (sym : Symmetry a b) :
     Path (projectCharge a) (projectCharge b) :=
   Path.congrArg projectCharge sym

@@ -46,7 +46,7 @@ structure Env where
   lookup : Nat → Nat
 
 /-- Update an environment at a given variable. -/
-def Env.update (env : Env) (x : Nat) (v : Nat) : Env :=
+noncomputable def Env.update (env : Env) (x : Nat) (v : Nat) : Env :=
   ⟨fun y => if y == x then v else env.lookup y⟩
 
 /-- 1. Update-same: retrieving updated variable. -/
@@ -76,7 +76,7 @@ theorem env_update_comm (env : Env) (x y : Nat) (vx vy : Nat) (hne : x ≠ y) :
 /-! ## Meaning Functions -/
 
 /-- 5. Expression denotation. -/
-def evalExpr (env : Env) : Expr → Nat
+noncomputable def evalExpr (env : Env) : Expr → Nat
   | Expr.lit n => n
   | Expr.var x => env.lookup x
   | Expr.add e1 e2 => evalExpr env e1 + evalExpr env e2
@@ -84,7 +84,7 @@ def evalExpr (env : Env) : Expr → Nat
   | Expr.letE x e1 e2 => evalExpr (env.update x (evalExpr env e1)) e2
 
 /-- 6. Statement denotation. -/
-def evalStmt (env : Env) : Stmt → Env
+noncomputable def evalStmt (env : Env) : Stmt → Env
   | Stmt.skip => env
   | Stmt.assign x e => env.update x (evalExpr env e)
   | Stmt.seq s1 s2 => evalStmt (evalStmt env s1) s2
@@ -112,32 +112,32 @@ theorem eval_seq_skip (env : Env) (s : Stmt) :
 /-! ## Semantic Paths -/
 
 /-- 11. Path between expression values under equal environments. -/
-def semanticPath (env : Env) (e1 e2 : Expr) (h : ∀ env', evalExpr env' e1 = evalExpr env' e2) :
+noncomputable def semanticPath (env : Env) (e1 e2 : Expr) (h : ∀ env', evalExpr env' e1 = evalExpr env' e2) :
     Path (evalExpr env e1) (evalExpr env e2) :=
   Path.mk [Step.mk (evalExpr env e1) (evalExpr env e2) (h env)] (h env)
 
 /-- 12. Literal semantic path is refl. -/
-def lit_semantic_refl (env : Env) (n : Nat) : Path (evalExpr env (Expr.lit n)) n :=
+noncomputable def lit_semantic_refl (env : Env) (n : Nat) : Path (evalExpr env (Expr.lit n)) n :=
   Path.refl n
 
 /-- 13. Variable semantic path is refl. -/
-def var_semantic_refl (env : Env) (x : Nat) : Path (evalExpr env (Expr.var x)) (env.lookup x) :=
+noncomputable def var_semantic_refl (env : Env) (x : Nat) : Path (evalExpr env (Expr.var x)) (env.lookup x) :=
   Path.refl _
 
 /-- 14. Add distributes over evaluation (refl). -/
-def add_eval_path (env : Env) (e1 e2 : Expr) :
+noncomputable def add_eval_path (env : Env) (e1 e2 : Expr) :
     Path (evalExpr env (Expr.add e1 e2)) (evalExpr env e1 + evalExpr env e2) :=
   Path.refl _
 
 /-- 15. Mul distributes over evaluation (refl). -/
-def mul_eval_path (env : Env) (e1 e2 : Expr) :
+noncomputable def mul_eval_path (env : Env) (e1 e2 : Expr) :
     Path (evalExpr env (Expr.mul e1 e2)) (evalExpr env e1 * evalExpr env e2) :=
   Path.refl _
 
 /-! ## Compositionality as Path Functoriality -/
 
 /-- 16. Statement path for skip is refl. -/
-def stmt_path_skip (env : Env) : Path (evalStmt env Stmt.skip) env :=
+noncomputable def stmt_path_skip (env : Env) : Path (evalStmt env Stmt.skip) env :=
   Path.refl env
 
 /-- 17. Compositionality: seq factors through components. -/
@@ -146,14 +146,14 @@ theorem compositionality_seq (env : Env) (s1 s2 : Stmt) :
     evalStmt (evalStmt env s1) s2 := rfl
 
 /-- 18. Compositionality path. -/
-def compositionality_path (env : Env) (s1 s2 : Stmt) :
+noncomputable def compositionality_path (env : Env) (s1 s2 : Stmt) :
     Path (evalStmt env (Stmt.seq s1 s2)) (evalStmt (evalStmt env s1) s2) :=
   Path.refl _
 
 /-! ## Substitution -/
 
 /-- Simple substitution: replace var x with expression e. -/
-def substExpr (x : Nat) (e : Expr) : Expr → Expr
+noncomputable def substExpr (x : Nat) (e : Expr) : Expr → Expr
   | Expr.lit n => Expr.lit n
   | Expr.var y => if y == x then e else Expr.var y
   | Expr.add e1 e2 => Expr.add (substExpr x e e1) (substExpr x e e2)
@@ -186,14 +186,14 @@ theorem subst_mul (x : Nat) (e e1 e2 : Expr) :
     Expr.mul (substExpr x e e1) (substExpr x e e2) := rfl
 
 /-- 24. Path: substitution on lit is identity. -/
-def subst_lit_path (env : Env) (x : Nat) (e : Expr) (n : Nat) :
+noncomputable def subst_lit_path (env : Env) (x : Nat) (e : Expr) (n : Nat) :
     Path (evalExpr env (substExpr x e (Expr.lit n))) (evalExpr env (Expr.lit n)) :=
   Path.refl _
 
 /-! ## Semantic Equivalence -/
 
 /-- Two expressions are semantically equivalent. -/
-def SemEquiv (e1 e2 : Expr) : Prop :=
+noncomputable def SemEquiv (e1 e2 : Expr) : Prop :=
   ∀ env : Env, evalExpr env e1 = evalExpr env e2
 
 /-- 25. Semantic equivalence is reflexive. -/
@@ -210,7 +210,7 @@ theorem semEquiv_trans {e1 e2 e3 : Expr} (h1 : SemEquiv e1 e2) (h2 : SemEquiv e2
   fun env => (h1 env).trans (h2 env)
 
 /-- 28. Semantic equivalence as a path. -/
-def semEquivPath {e1 e2 : Expr} (h : SemEquiv e1 e2) (env : Env) :
+noncomputable def semEquivPath {e1 e2 : Expr} (h : SemEquiv e1 e2) (env : Env) :
     Path (evalExpr env e1) (evalExpr env e2) :=
   Path.mk [Step.mk _ _ (h env)] (h env)
 
@@ -257,7 +257,7 @@ theorem mul_assoc_sem (e1 e2 e3 : Expr) :
 /-! ## Statement Equivalence -/
 
 /-- Two statements are semantically equivalent. -/
-def StmtEquiv (s1 s2 : Stmt) : Prop :=
+noncomputable def StmtEquiv (s1 s2 : Stmt) : Prop :=
   ∀ env : Env, evalStmt env s1 = evalStmt env s2
 
 /-- 37. Statement equivalence is reflexive. -/
@@ -287,7 +287,7 @@ theorem seq_assoc_equiv (s1 s2 s3 : Stmt) :
   fun _ => rfl
 
 /-- 43. Equivalence as path. -/
-def stmtEquivPath {s1 s2 : Stmt} (h : StmtEquiv s1 s2) (env : Env) :
+noncomputable def stmtEquivPath {s1 s2 : Stmt} (h : StmtEquiv s1 s2) (env : Env) :
     Path (evalStmt env s1) (evalStmt env s2) :=
   Path.mk [Step.mk _ _ (h env)] (h env)
 

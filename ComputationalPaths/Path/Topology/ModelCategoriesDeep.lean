@@ -81,7 +81,7 @@ inductive MorphismClass where
   deriving DecidableEq
 
 /-- Path witness for trivial fibration = fibration ∩ weq. -/
-def trivFibDecomp :
+noncomputable def trivFibDecomp :
     Path MorphismClass.trivialFibration MorphismClass.trivialFibration :=
   Path.stepChain rfl
 
@@ -104,7 +104,7 @@ structure TwoOfThreeData (A : Type u) where
     isWeq g → isWeq (Path.trans f g) → isWeq f
 
 /-- Trivial two-of-three: every path is a weq. -/
-def trivialTwoOfThree (A : Type u) : TwoOfThreeData A where
+noncomputable def trivialTwoOfThree (A : Type u) : TwoOfThreeData A where
   isWeq := fun _ => True
   weq_refl := fun _ => trivial
   comp_closed := fun _ _ _ _ => trivial
@@ -112,12 +112,12 @@ def trivialTwoOfThree (A : Type u) : TwoOfThreeData A where
   right_cancel := fun _ _ _ _ => trivial
 
 /-- Path witness: identity is a weak equivalence. -/
-def TwoOfThreeData.reflWeqPath {A : Type u} (T : TwoOfThreeData A) (a : A) :
+noncomputable def TwoOfThreeData.reflWeqPath {A : Type u} (T : TwoOfThreeData A) (a : A) :
     Path (T.isWeq (Path.refl a)) True :=
   Path.stepChain (propext ⟨fun _ => trivial, fun _ => T.weq_refl a⟩)
 
 /-- Step chain: compose two weqs and get a weq. -/
-def TwoOfThreeData.compWeqChain {A : Type u} (T : TwoOfThreeData A)
+noncomputable def TwoOfThreeData.compWeqChain {A : Type u} (T : TwoOfThreeData A)
     {a b c : A} (f : Path a b) (g : Path b c)
     (hf : T.isWeq f) (hg : T.isWeq g) :
     Path (T.isWeq (Path.trans f g)) True :=
@@ -140,7 +140,7 @@ structure RetractData {A : Type u} {a b c d : A}
   retract_eq : Path.trans section_map retraction = Path.refl a
 
 /-- Path witness for retract condition. -/
-def RetractData.retractPath {A : Type u} {a b c d : A}
+noncomputable def RetractData.retractPath {A : Type u} {a b c d : A}
     {f : Path a b} {g : Path c d}
     (R : RetractData f g) :
     Path (Path.trans R.section_map R.retraction) (Path.refl a) :=
@@ -166,13 +166,13 @@ structure LiftingData {A : Type u} (a b c d : A) where
   lower_triangle : Path.trans lift right_map = bottom
 
 /-- Path witness for upper triangle. -/
-def LiftingData.upperPath {A : Type u} {a b c d : A}
+noncomputable def LiftingData.upperPath {A : Type u} {a b c d : A}
     (L : LiftingData a b c d) :
     Path (Path.trans L.left_map L.lift) L.top :=
   Path.stepChain L.upper_triangle
 
 /-- Path witness for lower triangle. -/
-def LiftingData.lowerPath {A : Type u} {a b c d : A}
+noncomputable def LiftingData.lowerPath {A : Type u} {a b c d : A}
     (L : LiftingData a b c d) :
     Path (Path.trans L.lift L.right_map) L.bottom :=
   Path.stepChain L.lower_triangle
@@ -196,13 +196,13 @@ structure FactorizationData {A : Type u} {a b : A}
   factor2_class : MorphismClass
 
 /-- Path witness for factorization. -/
-def FactorizationData.factorPath {A : Type u} {a b : A}
+noncomputable def FactorizationData.factorPath {A : Type u} {a b : A}
     {f : Path a b} (F : FactorizationData f) :
     Path (Path.trans F.factor1 F.factor2) f :=
   Path.stepChain F.compose_eq
 
 /-- Step chain: two factorizations compose. -/
-def FactorizationData.doubleFactorChain {A : Type u} {a b : A}
+noncomputable def FactorizationData.doubleFactorChain {A : Type u} {a b : A}
     {f : Path a b}
     (F : FactorizationData f)
     (G : FactorizationData F.factor2)
@@ -234,7 +234,7 @@ structure ClosedModelData (A : Type u) where
   factor_triv_cof_fib : ∀ {a b : A} (_f : Path a b), True
 
 /-- Trivial closed model category: everything is everything. -/
-def trivialClosedModel (A : Type u) : ClosedModelData A where
+noncomputable def trivialClosedModel (A : Type u) : ClosedModelData A where
   weq := trivialTwoOfThree A
   isFib := fun _ => True
   isCof := fun _ => True
@@ -266,19 +266,19 @@ structure CylinderObject {A : Type u} (a : A) where
   proj_right : Path.trans incl_right proj = Path.refl a
 
 /-- Path witness for projection-left. -/
-def CylinderObject.projLeftPath {A : Type u} {a : A}
+noncomputable def CylinderObject.projLeftPath {A : Type u} {a : A}
     (C : CylinderObject a) :
     Path (Path.trans C.incl_left C.proj) (Path.refl a) :=
   Path.stepChain C.proj_left
 
 /-- Path witness for projection-right. -/
-def CylinderObject.projRightPath {A : Type u} {a : A}
+noncomputable def CylinderObject.projRightPath {A : Type u} {a : A}
     (C : CylinderObject a) :
     Path (Path.trans C.incl_right C.proj) (Path.refl a) :=
   Path.stepChain C.proj_right
 
 /-- Step chain: both inclusions project to the same point. -/
-def CylinderObject.bothProjectChain {A : Type u} {a : A}
+noncomputable def CylinderObject.bothProjectChain {A : Type u} {a : A}
     (C : CylinderObject a) :
     Path (Path.trans C.incl_left C.proj) (Path.trans C.incl_right C.proj) :=
   Path.trans
@@ -303,12 +303,12 @@ structure PathObject {A : Type u} (a : A) where
   ev_tgt_diag : Path.trans diag ev_tgt = Path.refl a
 
 /-- Path witness for source evaluation. -/
-def PathObject.srcPath {A : Type u} {a : A} (P : PathObject a) :
+noncomputable def PathObject.srcPath {A : Type u} {a : A} (P : PathObject a) :
     Path (Path.trans P.diag P.ev_src) (Path.refl a) :=
   Path.stepChain P.ev_src_diag
 
 /-- Path witness for target evaluation. -/
-def PathObject.tgtPath {A : Type u} {a : A} (P : PathObject a) :
+noncomputable def PathObject.tgtPath {A : Type u} {a : A} (P : PathObject a) :
     Path (Path.trans P.diag P.ev_tgt) (Path.refl a) :=
   Path.stepChain P.ev_tgt_diag
 
@@ -327,13 +327,13 @@ structure LeftHomotopy {A : Type u} {a b : A}
   restrict_right : Path.trans cyl.incl_right homotopy = g
 
 /-- Path witness for left restriction. -/
-def LeftHomotopy.leftPath {A : Type u} {a b : A}
+noncomputable def LeftHomotopy.leftPath {A : Type u} {a b : A}
     {f g : Path a b} (H : LeftHomotopy f g) :
     Path (Path.trans H.cyl.incl_left H.homotopy) f :=
   Path.stepChain H.restrict_left
 
 /-- Path witness for right restriction. -/
-def LeftHomotopy.rightPath {A : Type u} {a b : A}
+noncomputable def LeftHomotopy.rightPath {A : Type u} {a b : A}
     {f g : Path a b} (H : LeftHomotopy f g) :
     Path (Path.trans H.cyl.incl_right H.homotopy) g :=
   Path.stepChain H.restrict_right
@@ -360,7 +360,7 @@ structure QuillenAdjunctionData (A B : Type u) where
   right_preserves_fib : True
 
 /-- Path witness for triangle identity. -/
-def QuillenAdjunctionData.trianglePath {A B : Type u}
+noncomputable def QuillenAdjunctionData.trianglePath {A B : Type u}
     (Q : QuillenAdjunctionData A B) (a : A) :
     Path (Path.trans (Path.congrArg Q.leftAdj (Q.unit a)) (Q.counit (Q.leftAdj a)))
          (Path.refl (Q.leftAdj a)) :=
@@ -430,7 +430,7 @@ structure ReedyCategoryData where
   inverse_lowers : ∀ a b, inverse a b → degree a > degree b
 
 /-- Path witness for degree raising. -/
-def ReedyCategoryData.directPath (R : ReedyCategoryData)
+noncomputable def ReedyCategoryData.directPath (R : ReedyCategoryData)
     (a b : R.obj) (h : R.direct a b) :
     Path (R.degree a < R.degree b) True :=
   Path.stepChain (propext ⟨fun _ => trivial, fun _ => R.direct_raises a b h⟩)
@@ -447,7 +447,7 @@ structure ReedyModelData (A : Type u) where
   latching : reedy.obj → A
 
 /-- Path for matching-latching duality. -/
-def ReedyModelData.matchLatchPath {A : Type u}
+noncomputable def ReedyModelData.matchLatchPath {A : Type u}
     (R : ReedyModelData A) (x : R.reedy.obj) :
     Path (R.matching x) (R.matching x) :=
   Path.stepChain rfl

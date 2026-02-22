@@ -47,7 +47,7 @@ noncomputable def iterated_unit_rweq (x : A) :
   rweq_of_operadic_step (E.iteratedUnitStep x)
 
 /-- Unit action path on an `E_n`-algebra output. -/
-def unitOnAction {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
+noncomputable def unitOnAction {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     Path
       (E.base.act (LittleCubesOperad.identityCube n) (fun _ => E.base.act c xs))
       (E.base.act c xs) :=
@@ -58,7 +58,7 @@ def unitOnAction {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     E.unitOnAction c xs = E.base.unitActionPath (E.base.act c xs) := rfl
 
 /-- Round-trip loop formed from the unit-action witness on an output. -/
-def actionUnitRoundTrip {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
+noncomputable def actionUnitRoundTrip {k : Nat} (c : EnSpace n k) (xs : Fin k → A) :
     Path
       (E.base.act (LittleCubesOperad.identityCube n) (fun _ => E.base.act c xs))
       (E.base.act (LittleCubesOperad.identityCube n) (fun _ => E.base.act c xs)) :=
@@ -137,7 +137,7 @@ noncomputable def iterated_unit_left_refl_rweq (x : A) :
 end EnOperadAlgebraPathData
 
 /-- Build `E_n`-operad algebra path data from an operad-algebra path package. -/
-def EnOperadAlgebraPathData.ofBase
+noncomputable def EnOperadAlgebraPathData.ofBase
     (n : Nat)
     {A : Type u}
     (base : AlgebraOverOperadPathData (LittleCubesOperad.enOperad n) A) :
@@ -154,7 +154,7 @@ def EnOperadAlgebraPathData.ofBase
         (base.unitActionPath x))
 
 /-- Upgrade a plain `E_n`-algebra to path-preserving `E_n`-algebra data. -/
-def EnOperadAlgebraPathData.ofEnAlgebra
+noncomputable def EnOperadAlgebraPathData.ofEnAlgebra
     (n : Nat)
     (A : LittleCubesOperad.EnAlgebra n) :
     EnOperadAlgebraPathData n A.carrier :=
@@ -168,7 +168,7 @@ def EnOperadAlgebraPathData.ofEnAlgebra
         OperadAlgebraStep.left_unit (Path.stepChain (A.equivariant σ θ xs)) }
 
 /-- Trivial `E_n`-operad algebra path data on `Unit`. -/
-def EnOperadAlgebraPathData.trivial (n : Nat) : EnOperadAlgebraPathData n Unit :=
+noncomputable def EnOperadAlgebraPathData.trivial (n : Nat) : EnOperadAlgebraPathData n Unit :=
   EnOperadAlgebraPathData.ofBase n
     (AlgebraOverOperadPathData.trivial (LittleCubesOperad.enOperad n))
 

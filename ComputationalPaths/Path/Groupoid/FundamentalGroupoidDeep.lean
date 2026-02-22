@@ -20,10 +20,10 @@ variable {A : Type u} {B : Type v} {C : Type w}
 @[ext] structure GMor (A : Type u) (x y : A) where
   path : Path x y
 
-@[simp] def GMor.id (x : A) : GMor A x x := ⟨Path.refl x⟩
-@[simp] def GMor.comp {x y z : A} (f : GMor A x y) (g : GMor A y z) : GMor A x z :=
+@[simp] noncomputable def GMor.id (x : A) : GMor A x x := ⟨Path.refl x⟩
+@[simp] noncomputable def GMor.comp {x y z : A} (f : GMor A x y) (g : GMor A y z) : GMor A x z :=
   ⟨Path.trans f.path g.path⟩
-@[simp] def GMor.inv {x y : A} (f : GMor A x y) : GMor A y x :=
+@[simp] noncomputable def GMor.inv {x y : A} (f : GMor A x y) : GMor A y x :=
   ⟨Path.symm f.path⟩
 
 /-! ## Basic groupoid laws -/
@@ -98,7 +98,7 @@ theorem GFunctor.preserves_inv (F : GFunctor A B) {x y : A} (f : GMor A x y) :
   simp
 
 /-- 12. Functor composition. -/
-def GFunctor.compFunctor (F : GFunctor A B) (G : GFunctor B C) : GFunctor A C where
+noncomputable def GFunctor.compFunctor (F : GFunctor A B) (G : GFunctor B C) : GFunctor A C where
   obj := G.obj ∘ F.obj
   mor := fun f => G.mor (F.mor f)
   mor_id := fun x => by
@@ -147,7 +147,7 @@ theorem GNatTrans.vcomp_naturality_toEq {F G H : GFunctor A B}
   simp [GMor.comp]
 
 /-- 16. Identity natural transformation. -/
-def GNatTrans.identity (F : GFunctor A B) : GNatTrans F F where
+noncomputable def GNatTrans.identity (F : GFunctor A B) : GNatTrans F F where
   component := fun x => GMor.id (F.obj x)
   naturality := fun f => by ext; simp
 
@@ -162,11 +162,11 @@ theorem GNatTrans.naturality_toEq {F G : GFunctor A B}
 /-! ## Conjugation and commutator -/
 
 /-- Conjugate: g⁻¹ ∘ f ∘ g for f : x → x, g : x → y. -/
-@[simp] def conjugate {x y : A} (f : GMor A x x) (g : GMor A x y) : GMor A y y :=
+@[simp] noncomputable def conjugate {x y : A} (f : GMor A x x) (g : GMor A x y) : GMor A y y :=
   GMor.comp (GMor.inv g) (GMor.comp f g)
 
 /-- Commutator: f ∘ g ∘ f⁻¹ ∘ g⁻¹ -/
-@[simp] def commutator {x : A} (f g : GMor A x x) : GMor A x x :=
+@[simp] noncomputable def commutator {x : A} (f g : GMor A x x) : GMor A x x :=
   GMor.comp (GMor.comp f g) (GMor.comp (GMor.inv f) (GMor.inv g))
 
 /-- 18. Conjugation by identity is identity (via trans/symm reduction). -/
@@ -241,7 +241,7 @@ structure DeckTransformation (E : Type u) (B : Type u) (C : GFunctor E B) where
   covers : ∀ {x : E}, C.obj (auto.obj x) = C.obj x
 
 /-- 28. Composition of deck transformations. -/
-def DeckTransformation.comp {E B : Type u} {C : GFunctor E B}
+noncomputable def DeckTransformation.comp {E B : Type u} {C : GFunctor E B}
     (d1 d2 : DeckTransformation E B C) : DeckTransformation E B C where
   auto := GFunctor.compFunctor d2.auto d1.auto
   covers := fun {x} => by
@@ -251,7 +251,7 @@ def DeckTransformation.comp {E B : Type u} {C : GFunctor E B}
       _ = C.obj x := d2.covers
 
 /-- 29. Identity deck transformation. -/
-def DeckTransformation.identity {E B : Type u} (C : GFunctor E B) :
+noncomputable def DeckTransformation.identity {E B : Type u} (C : GFunctor E B) :
     DeckTransformation E B C where
   auto := {
     obj := _root_.id

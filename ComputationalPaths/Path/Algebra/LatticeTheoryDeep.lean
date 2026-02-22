@@ -28,32 +28,32 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | Path.nil _, q => q
   | Path.cons s p, q => Path.cons s (Path.trans p q)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | Step.refl a => Step.refl a
   | Step.rule name a b => Step.rule (name ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | Path.nil a => Path.nil a
   | Path.cons s p => Path.trans (Path.symm p) (Path.cons (Step.symm s) (Path.nil _))
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   Path.cons s (Path.nil _)
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | Path.nil _ => 0
   | Path.cons _ p => 1 + Path.length p
 
-def Path.map (f : α → β) : Path α a b → Path β (f a) (f b)
+noncomputable def Path.map (f : α → β) : Path α a b → Path β (f a) (f b)
   | Path.nil a => Path.nil (f a)
   | Path.cons (Step.refl a) p => Path.cons (Step.refl (f a)) (Path.map f p)
   | Path.cons (Step.rule n a b) p =>
     Path.cons (Step.rule n (f a) (f b)) (Path.map f p)
 
-def congrArgPath (f : α → β) : Path α a b → Path β (f a) (f b) :=
+noncomputable def congrArgPath (f : α → β) : Path α a b → Path β (f a) (f b) :=
   Path.map f
 
 -- ============================================================================
@@ -92,12 +92,12 @@ structure Poset (α : Type) where
   le_antisymm : ∀ a b, le a b = true → le b a = true → a = b
 
 -- Theorem 4
-def poset_refl_path (P : Poset α) (a : α) :
+noncomputable def poset_refl_path (P : Poset α) (a : α) :
     Path Bool (P.le a a) true :=
   Path.single (Step.rule "le_refl" (P.le a a) true)
 
 -- Theorem 5
-def poset_trans_path (P : Poset α) (a b c : α) :
+noncomputable def poset_trans_path (P : Poset α) (a b c : α) :
     Path Bool (P.le a c) true :=
   let s1 := Step.rule "le_trans_witness" (P.le a c) true
   Path.single s1
@@ -119,47 +119,47 @@ structure Lattice (α : Type) extends Poset α where
   absorb_jm  : ∀ a b, join a (meet a b) = a
 
 -- Theorem 6
-def meet_comm_path (L : Lattice α) (a b : α) :
+noncomputable def meet_comm_path (L : Lattice α) (a b : α) :
     Path α (L.meet a b) (L.meet b a) :=
   Path.single (Step.rule "meet_comm" (L.meet a b) (L.meet b a))
 
 -- Theorem 7
-def join_comm_path (L : Lattice α) (a b : α) :
+noncomputable def join_comm_path (L : Lattice α) (a b : α) :
     Path α (L.join a b) (L.join b a) :=
   Path.single (Step.rule "join_comm" (L.join a b) (L.join b a))
 
 -- Theorem 8
-def meet_assoc_path (L : Lattice α) (a b c : α) :
+noncomputable def meet_assoc_path (L : Lattice α) (a b c : α) :
     Path α (L.meet (L.meet a b) c) (L.meet a (L.meet b c)) :=
   Path.single (Step.rule "meet_assoc" _ _)
 
 -- Theorem 9
-def join_assoc_path (L : Lattice α) (a b c : α) :
+noncomputable def join_assoc_path (L : Lattice α) (a b c : α) :
     Path α (L.join (L.join a b) c) (L.join a (L.join b c)) :=
   Path.single (Step.rule "join_assoc" _ _)
 
 -- Theorem 10
-def absorb_mj_path (L : Lattice α) (a b : α) :
+noncomputable def absorb_mj_path (L : Lattice α) (a b : α) :
     Path α (L.meet a (L.join a b)) a :=
   Path.single (Step.rule "absorb_mj" _ _)
 
 -- Theorem 11
-def absorb_jm_path (L : Lattice α) (a b : α) :
+noncomputable def absorb_jm_path (L : Lattice α) (a b : α) :
     Path α (L.join a (L.meet a b)) a :=
   Path.single (Step.rule "absorb_jm" _ _)
 
 -- Theorem 12: Idempotence path for meet
-def meet_idem_path (L : Lattice α) (a : α) :
+noncomputable def meet_idem_path (L : Lattice α) (a : α) :
     Path α (L.meet a a) a :=
   Path.single (Step.rule "meet_idem" _ _)
 
 -- Theorem 13: Idempotence path for join
-def join_idem_path (L : Lattice α) (a : α) :
+noncomputable def join_idem_path (L : Lattice α) (a : α) :
     Path α (L.join a a) a :=
   Path.single (Step.rule "join_idem" _ _)
 
 -- Theorem 14: Multi-step: meet(a, join(a, meet(a,b))) →[absorb_jm inside]→ meet(a,a) →[idem]→ a
-def double_absorb_path (L : Lattice α) (a b : α) :
+noncomputable def double_absorb_path (L : Lattice α) (a b : α) :
     Path α (L.meet a (L.join a (L.meet a b))) a :=
   Path.cons (Step.rule "absorb_jm_in_arg" (L.meet a (L.join a (L.meet a b))) (L.meet a a))
     (Path.cons (Step.rule "meet_idem" (L.meet a a) a) (Path.nil a))
@@ -170,7 +170,7 @@ theorem double_absorb_path_length (L : Lattice α) (a b : α) :
   simp [double_absorb_path, Path.length]
 
 -- Theorem 16: 4-element right-association of meet
-def meet_right_assoc4_path (L : Lattice α) (a b c d : α) :
+noncomputable def meet_right_assoc4_path (L : Lattice α) (a b c d : α) :
     Path α (L.meet (L.meet (L.meet a b) c) d)
            (L.meet a (L.meet b (L.meet c d))) :=
   Path.cons (Step.rule "assoc_outer" _ (L.meet (L.meet a b) (L.meet c d)))
@@ -183,7 +183,7 @@ theorem meet_right_assoc4_length (L : Lattice α) (a b c d : α) :
   simp [meet_right_assoc4_path, Path.length]
 
 -- Theorem 18: Symmetry of meet-comm path
-def meet_comm_roundtrip (L : Lattice α) (a b : α) :
+noncomputable def meet_comm_roundtrip (L : Lattice α) (a b : α) :
     Path α (L.meet a b) (L.meet a b) :=
   Path.trans (meet_comm_path L a b) (Path.symm (meet_comm_path L a b))
 
@@ -202,17 +202,17 @@ structure DistribLattice (α : Type) extends Lattice α where
   distrib_jm : ∀ a b c, join a (meet b c) = meet (join a b) (join a c)
 
 -- Theorem 20
-def distrib_mj_path (D : DistribLattice α) (a b c : α) :
+noncomputable def distrib_mj_path (D : DistribLattice α) (a b c : α) :
     Path α (D.meet a (D.join b c)) (D.join (D.meet a b) (D.meet a c)) :=
   Path.single (Step.rule "distrib_∧_∨" _ _)
 
 -- Theorem 21
-def distrib_jm_path (D : DistribLattice α) (a b c : α) :
+noncomputable def distrib_jm_path (D : DistribLattice α) (a b c : α) :
     Path α (D.join a (D.meet b c)) (D.meet (D.join a b) (D.join a c)) :=
   Path.single (Step.rule "distrib_∨_∧" _ _)
 
 -- Theorem 22: Multi-step distributivity + commutativity
-def distrib_comm_path (D : DistribLattice α) (a b c : α) :
+noncomputable def distrib_comm_path (D : DistribLattice α) (a b c : α) :
     Path α (D.meet a (D.join b c)) (D.join (D.meet b a) (D.meet c a)) :=
   Path.cons (Step.rule "distrib" (D.meet a (D.join b c)) (D.join (D.meet a b) (D.meet a c)))
     (Path.cons (Step.rule "meet_comm_both" (D.join (D.meet a b) (D.meet a c))
@@ -231,7 +231,7 @@ structure DownsetRep (α : Type) where
   joinOp     : List α → List α → List α
   meetOp     : List α → List α → List α
 
-def birkhoff_path (α : Type) (R : DownsetRep α) (s t : List α) :
+noncomputable def birkhoff_path (α : Type) (R : DownsetRep α) (s t : List α) :
     Path (List α) (R.meetOp s t) (R.meetOp s t) :=
   Path.cons (Step.rule "birkhoff_meet_is_inter" (R.meetOp s t) (R.meetOp s t))
     (Path.nil _)
@@ -251,17 +251,17 @@ structure BoundedLattice (α : Type) extends Lattice α where
   top_join : ∀ a, join top a = top
 
 -- Theorem 25
-def bot_join_path (B : BoundedLattice α) (a : α) :
+noncomputable def bot_join_path (B : BoundedLattice α) (a : α) :
     Path α (B.join B.bot a) a :=
   Path.single (Step.rule "bot_join" _ _)
 
 -- Theorem 26
-def top_meet_path (B : BoundedLattice α) (a : α) :
+noncomputable def top_meet_path (B : BoundedLattice α) (a : α) :
     Path α (B.meet B.top a) a :=
   Path.single (Step.rule "top_meet" _ _)
 
 -- Theorem 27: Multi-step bot path: meet(bot, join(top, a)) →[top_join]→ meet(bot, top) →[bot_meet_comm]→ bot
-def bot_absorb_path (B : BoundedLattice α) (a : α) :
+noncomputable def bot_absorb_path (B : BoundedLattice α) (a : α) :
     Path α (B.meet B.bot (B.join B.top a)) B.bot :=
   Path.cons (Step.rule "top_join_inner" (B.meet B.bot (B.join B.top a)) (B.meet B.bot B.top))
     (Path.cons (Step.rule "bot_meet_top" (B.meet B.bot B.top) B.bot)
@@ -273,12 +273,12 @@ structure ComplementedLattice (α : Type) extends BoundedLattice α where
   compl_meet : ∀ a, meet a (compl a) = bot
 
 -- Theorem 28
-def compl_join_path (C : ComplementedLattice α) (a : α) :
+noncomputable def compl_join_path (C : ComplementedLattice α) (a : α) :
     Path α (C.join a (C.compl a)) C.top :=
   Path.single (Step.rule "compl_join" _ _)
 
 -- Theorem 29
-def compl_meet_path (C : ComplementedLattice α) (a : α) :
+noncomputable def compl_meet_path (C : ComplementedLattice α) (a : α) :
     Path α (C.meet a (C.compl a)) C.bot :=
   Path.single (Step.rule "compl_meet" _ _)
 
@@ -287,23 +287,23 @@ structure BoolAlg (α : Type) extends ComplementedLattice α where
   double_compl : ∀ a, compl (compl a) = a
 
 -- Theorem 30: De Morgan path: ¬(a ∧ b) → ¬a ∨ ¬b
-def demorgan1_path (B : BoolAlg α) (a b : α) :
+noncomputable def demorgan1_path (B : BoolAlg α) (a b : α) :
     Path α (B.compl (B.meet a b)) (B.join (B.compl a) (B.compl b)) :=
   Path.single (Step.rule "DeMorgan₁" _ _)
 
 -- Theorem 31: De Morgan path: ¬(a ∨ b) → ¬a ∧ ¬b
-def demorgan2_path (B : BoolAlg α) (a b : α) :
+noncomputable def demorgan2_path (B : BoolAlg α) (a b : α) :
     Path α (B.compl (B.join a b)) (B.meet (B.compl a) (B.compl b)) :=
   Path.single (Step.rule "DeMorgan₂" _ _)
 
 -- Theorem 32: Double complement path
-def double_compl_path (B : BoolAlg α) (a : α) :
+noncomputable def double_compl_path (B : BoolAlg α) (a : α) :
     Path α (B.compl (B.compl a)) a :=
   Path.single (Step.rule "double_compl" _ _)
 
 -- Theorem 33: Multi-step Boolean simplification
 -- meet(a, join(b, compl(b))) →[compl_join]→ meet(a, top) →[meet_top]→ a
-def ba_simplify_path (B : BoolAlg α) (a b : α)
+noncomputable def ba_simplify_path (B : BoolAlg α) (a b : α)
     (h_mt : ∀ x, B.meet x B.top = x) :
     Path α (B.meet a (B.join b (B.compl b))) a :=
   Path.cons (Step.rule "compl_join" (B.meet a (B.join b (B.compl b))) (B.meet a B.top))
@@ -323,12 +323,12 @@ structure ModLattice (α : Type) extends Lattice α where
   modular : ∀ a b c, le a c = true → join a (meet b c) = meet (join a b) c
 
 -- Theorem 35
-def modular_law_path (M : ModLattice α) (a b c : α) (h : M.le a c = true) :
+noncomputable def modular_law_path (M : ModLattice α) (a b c : α) (h : M.le a c = true) :
     Path α (M.join a (M.meet b c)) (M.meet (M.join a b) c) :=
   Path.single (Step.rule "modular_law" _ _)
 
 -- Theorem 36: Diamond isomorphism path
-def diamond_path (M : ModLattice α) (a b : α) :
+noncomputable def diamond_path (M : ModLattice α) (a b : α) :
     Path (α × α) (a, M.join a b) (M.meet a b, b) :=
   Path.cons (Step.rule "diamond_lower" (a, M.join a b) (M.meet a b, M.join a b))
     (Path.cons (Step.rule "diamond_upper" (M.meet a b, M.join a b) (M.meet a b, b))
@@ -365,7 +365,7 @@ theorem clat_sup_ge_inf (C : CLat α) (S : α → Bool) (a : α) (ha : S a = tru
   exact C.le_trans _ a _ (C.inf_lower S a ha) (C.sup_upper S a ha)
 
 -- Theorem 39: sup/inf coherence path
-def sup_inf_coherence_path (C : CLat α) (S : α → Bool) (a : α) (ha : S a = true) :
+noncomputable def sup_inf_coherence_path (C : CLat α) (S : α → Bool) (a : α) (ha : S a = true) :
     Path Bool (C.le (C.inf S) (C.sup S)) true :=
   Path.cons (Step.rule "inf_lower_to_a" (C.le (C.inf S) (C.sup S)) (C.le (C.inf S) (C.sup S)))
     (Path.cons (Step.rule "trans_via_a" (C.le (C.inf S) (C.sup S)) true)
@@ -378,10 +378,10 @@ def sup_inf_coherence_path (C : CLat α) (S : α → Bool) (a : α) (ha : S a = 
 structure MonoEndo (C : CLat α) (f : α → α) : Prop where
   mono : ∀ a b, C.le a b = true → C.le (f a) (f b) = true
 
-def preFP (C : CLat α) (f : α → α) : α → Bool :=
+noncomputable def preFP (C : CLat α) (f : α → α) : α → Bool :=
   fun x => C.le (f x) x
 
-def lfp (C : CLat α) (f : α → α) : α := C.inf (preFP C f)
+noncomputable def lfp (C : CLat α) (f : α → α) : α := C.inf (preFP C f)
 
 -- Theorem 40: f(lfp) ≤ lfp
 theorem kt_pre (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
@@ -406,16 +406,16 @@ theorem knaster_tarski (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
   C.le_antisymm _ _ (kt_pre C f hm) (kt_post C f hm)
 
 -- Theorem 43: KT path witness
-def knaster_tarski_path (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
+noncomputable def knaster_tarski_path (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
     Path α (f (lfp C f)) (lfp C f) :=
   Path.cons (Step.rule "KT_pre_fp" (f (lfp C f)) (lfp C f))
     (Path.nil _)
 
 -- Greatest fixed point
-def postFP (C : CLat α) (f : α → α) : α → Bool :=
+noncomputable def postFP (C : CLat α) (f : α → α) : α → Bool :=
   fun x => C.le x (f x)
 
-def gfp (C : CLat α) (f : α → α) : α := C.sup (postFP C f)
+noncomputable def gfp (C : CLat α) (f : α → α) : α := C.sup (postFP C f)
 
 -- Theorem 44: gfp ≤ f(gfp)
 theorem gfp_post (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
@@ -440,7 +440,7 @@ theorem gfp_fixpoint (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
   C.le_antisymm _ _ (gfp_pre C f hm) (gfp_post C f hm)
 
 -- Theorem 47: gfp path witness (multi-step with both directions)
-def gfp_fixpoint_path (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
+noncomputable def gfp_fixpoint_path (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
     Path α (f (gfp C f)) (gfp C f) :=
   Path.cons (Step.rule "gfp_pre" (f (gfp C f)) (gfp C f))
     (Path.nil _)
@@ -449,7 +449,7 @@ def gfp_fixpoint_path (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
 -- §10  Kleene fixed point (iteration from bottom)
 -- ============================================================================
 
-def kleeneIter (C : CLat α) (f : α → α) : Nat → α
+noncomputable def kleeneIter (C : CLat α) (f : α → α) : Nat → α
   | 0 => C.bot
   | n + 1 => f (kleeneIter C f n)
 
@@ -461,12 +461,12 @@ theorem kleene_ascending (C : CLat α) (f : α → α) (hm : MonoEndo C f)
   | succ n ih => simp [kleeneIter]; exact hm.mono _ _ ih
 
 -- Theorem 49: Kleene iterate path
-def kleene_step_path (C : CLat α) (f : α → α) (n : Nat) :
+noncomputable def kleene_step_path (C : CLat α) (f : α → α) (n : Nat) :
     Path α (kleeneIter C f n) (kleeneIter C f (n + 1)) :=
   Path.single (Step.rule s!"kleene_step_{n}" _ _)
 
 -- Theorem 50: Multi-step Kleene chain path (0 to k)
-def kleene_chain_path (C : CLat α) (f : α → α) : (k : Nat) →
+noncomputable def kleene_chain_path (C : CLat α) (f : α → α) : (k : Nat) →
     Path α (kleeneIter C f 0) (kleeneIter C f k)
   | 0 => Path.nil _
   | k + 1 => Path.trans (kleene_chain_path C f k) (kleene_step_path C f k)
@@ -538,7 +538,7 @@ theorem gc_fgf (P : CLat α) (Q : CLat β) (gc : GaloisConn P Q) (a : α) :
   · exact gc_lower_mono P Q gc _ _ (gc_unit P Q gc a)
 
 -- Theorem 59: Multi-step GC coherence path
-def gc_coherence_path (P : CLat α) (Q : CLat β) (gc : GaloisConn P Q) (b : β) :
+noncomputable def gc_coherence_path (P : CLat α) (Q : CLat β) (gc : GaloisConn P Q) (b : β) :
     Path β (gc.lower (gc.upper (gc.lower (gc.upper b))))
            (gc.lower (gc.upper b)) :=
   let p1 : Path β _ (gc.lower (gc.upper (gc.lower (gc.upper b)))) := Path.nil _
@@ -566,7 +566,7 @@ theorem scott_is_mono (C : CLat α) (f : α → α) (hs : ScottCont C f) :
     MonoEndo C f := hs.is_mono
 
 -- Theorem 61: Scott continuity path witness
-def scott_path (C : CLat α) (f : α → α) (prop : Prop) :
+noncomputable def scott_path (C : CLat α) (f : α → α) (prop : Prop) :
     Path Prop (ScottCont C f → MonoEndo C f) (ScottCont C f → MonoEndo C f) :=
   Path.cons (Step.rule "scott_unfold" (ScottCont C f → MonoEndo C f) (ScottCont C f → MonoEndo C f))
     (Path.nil _)
@@ -582,7 +582,7 @@ structure ClosureOp (C : CLat α) where
   idempotent  : ∀ a, cl (cl a) = cl a
 
 -- Theorem 62: GC induces closure operator
-def gc_closure (P : CLat α) (Q : CLat β) (gc : GaloisConn P Q) : ClosureOp P where
+noncomputable def gc_closure (P : CLat α) (Q : CLat β) (gc : GaloisConn P Q) : ClosureOp P where
   cl := fun a => gc.upper (gc.lower a)
   extensive := gc_unit P Q gc
   monotone_cl := by
@@ -593,19 +593,19 @@ def gc_closure (P : CLat α) (Q : CLat β) (gc : GaloisConn P Q) : ClosureOp P w
     exact gc_gfg P Q gc (gc.lower a)
 
 -- Theorem 63: Closure path (multi-step cl∘cl → cl)
-def closure_idem_path (C : CLat α) (cl : ClosureOp C) (a : α) :
+noncomputable def closure_idem_path (C : CLat α) (cl : ClosureOp C) (a : α) :
     Path α (cl.cl (cl.cl a)) (cl.cl a) :=
   Path.single (Step.rule "closure_idempotent" _ _)
 
 -- Theorem 64: Extensive + idempotent coherence 3-step path
 -- a →[extensive] cl(a) →[extensive_applied_to_cl] cl(cl(a)) →[idempotent] cl(a)
-def closure_coherence_path (C : CLat α) (cl : ClosureOp C) (a : α) :
+noncomputable def closure_coherence_path (C : CLat α) (cl : ClosureOp C) (a : α) :
     Path α a (cl.cl a) :=
   Path.cons (Step.rule "extensive" a (cl.cl a))
     (Path.nil _)
 
 -- Theorem 65: Roundtrip path a → cl(a) → cl²(a) → cl(a)
-def closure_roundtrip (C : CLat α) (cl : ClosureOp C) (a : α) :
+noncomputable def closure_roundtrip (C : CLat α) (cl : ClosureOp C) (a : α) :
     Path α a (cl.cl a) :=
   Path.cons (Step.rule "ext" a (cl.cl a)) (Path.nil _)
 
@@ -618,12 +618,12 @@ structure LatHom (L₁ L₂ : Lattice α) (f : α → α) : Prop where
   pres_join : ∀ a b, f (L₁.join a b) = L₂.join (f a) (f b)
 
 -- Theorem 66: Lattice hom preserves meet path
-def hom_meet_path (L₁ L₂ : Lattice α) (f : α → α) (hf : LatHom L₁ L₂ f) (a b : α) :
+noncomputable def hom_meet_path (L₁ L₂ : Lattice α) (f : α → α) (hf : LatHom L₁ L₂ f) (a b : α) :
     Path α (f (L₁.meet a b)) (L₂.meet (f a) (f b)) :=
   Path.single (Step.rule "hom_pres_meet" _ _)
 
 -- Theorem 67: Lattice hom preserves join path
-def hom_join_path (L₁ L₂ : Lattice α) (f : α → α) (hf : LatHom L₁ L₂ f) (a b : α) :
+noncomputable def hom_join_path (L₁ L₂ : Lattice α) (f : α → α) (hf : LatHom L₁ L₂ f) (a b : α) :
     Path α (f (L₁.join a b)) (L₂.join (f a) (f b)) :=
   Path.single (Step.rule "hom_pres_join" _ _)
 
@@ -639,7 +639,7 @@ theorem hom_comp (L₁ L₂ L₃ : Lattice α) (f g : α → α)
     rw [hf.pres_join, hg.pres_join]
 
 -- Theorem 69: Multi-step hom composition path
-def hom_comp_meet_path (L₁ L₂ L₃ : Lattice α) (f g : α → α)
+noncomputable def hom_comp_meet_path (L₁ L₂ L₃ : Lattice α) (f g : α → α)
     (hf : LatHom L₁ L₂ f) (hg : LatHom L₂ L₃ g) (a b : α) :
     Path α (g (f (L₁.meet a b))) (L₃.meet (g (f a)) (g (f b))) :=
   Path.cons (Step.rule "g_pres_f_meet" (g (f (L₁.meet a b))) (g (L₂.meet (f a) (f b))))
@@ -667,7 +667,7 @@ structure LatCong (L : Lattice α) (R : α → α → Bool) : Prop where
     R (L.join a₁ b₁) (L.join a₂ b₂) = true
 
 -- Theorem 71: Congruence path (multi-step)
-def cong_path (L : Lattice α) (R : α → α → Bool) (hR : LatCong L R) (a b c : α)
+noncomputable def cong_path (L : Lattice α) (R : α → α → Bool) (hR : LatCong L R) (a b c : α)
     (h1 : R a b = true) (h2 : R b c = true) :
     Path Bool (R a c) true :=
   Path.cons (Step.rule "cong_trans_1" (R a c) (R a c))
@@ -675,7 +675,7 @@ def cong_path (L : Lattice α) (R : α → α → Bool) (hR : LatCong L R) (a b 
       (Path.nil true))
 
 -- Theorem 72: Congruence preserves meet (path witness)
-def cong_meet_path (L : Lattice α) (R : α → α → Bool) (hR : LatCong L R)
+noncomputable def cong_meet_path (L : Lattice α) (R : α → α → Bool) (hR : LatCong L R)
     (a₁ a₂ b₁ b₂ : α) (ha : R a₁ a₂ = true) (hb : R b₁ b₂ = true) :
     Path Bool (R (L.meet a₁ b₁) (L.meet a₂ b₂)) true :=
   Path.cons (Step.rule "cong_meet_compat" (R (L.meet a₁ b₁) (L.meet a₂ b₂)) true)
@@ -689,7 +689,7 @@ def cong_meet_path (L : Lattice α) (R : α → α → Bool) (hR : LatCong L R)
 -- is itself a complete lattice (Knaster-Tarski corollary)
 -- We witness this structurally
 
-def fixedPointPred (C : CLat α) [DecidableEq α] (f : α → α) : α → Bool :=
+noncomputable def fixedPointPred (C : CLat α) [DecidableEq α] (f : α → α) : α → Bool :=
   fun x => decide (f x = x)
 
 -- Theorem 74: lfp is in the fixed-point set
@@ -716,7 +716,7 @@ theorem lfp_le_gfp (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
   exact h
 
 -- Theorem 77: Multi-step path from lfp to gfp via fixed-point reasoning
-def lfp_to_gfp_path (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
+noncomputable def lfp_to_gfp_path (C : CLat α) (f : α → α) (hm : MonoEndo C f) :
     Path α (lfp C f) (gfp C f) :=
   Path.cons (Step.rule "lfp_is_postfp" (lfp C f) (lfp C f))
     (Path.cons (Step.rule "postfp_le_gfp" (lfp C f) (gfp C f))
@@ -736,7 +736,7 @@ inductive LTerm where
 deriving DecidableEq, Repr
 
 -- Evaluation in a bounded lattice
-def evalLTerm (B : BoundedLattice α) (env : Nat → α) : LTerm → α
+noncomputable def evalLTerm (B : BoundedLattice α) (env : Nat → α) : LTerm → α
   | .var n => env n
   | .meetT s t => B.meet (evalLTerm B env s) (evalLTerm B env t)
   | .joinT s t => B.join (evalLTerm B env s) (evalLTerm B env t)
@@ -763,13 +763,13 @@ theorem eval_top (B : BoundedLattice α) (env : Nat → α) :
 
 -- Theorem 82: Term rewriting path for idempotent simplification
 -- meetT(x, x) rewrites to x
-def idem_rewrite_path (B : BoundedLattice α) (env : Nat → α) (n : Nat) :
+noncomputable def idem_rewrite_path (B : BoundedLattice α) (env : Nat → α) (n : Nat) :
     Path α (evalLTerm B env (.meetT (.var n) (.var n))) (evalLTerm B env (.var n)) :=
   Path.single (Step.rule "meet_idem_rewrite" _ _)
 
 -- Theorem 83: Multi-step term simplification:
 -- meetT(x, joinT(x, y)) →[absorb] x
-def absorb_rewrite_path (B : BoundedLattice α) (env : Nat → α) (n m : Nat) :
+noncomputable def absorb_rewrite_path (B : BoundedLattice α) (env : Nat → α) (n m : Nat) :
     Path α (evalLTerm B env (.meetT (.var n) (.joinT (.var n) (.var m))))
            (evalLTerm B env (.var n)) :=
   Path.cons (Step.rule "unfold_eval" _ (B.meet (env n) (B.join (env n) (env m))))
@@ -784,11 +784,11 @@ def absorb_rewrite_path (B : BoundedLattice α) (env : Nat → α) (n m : Nat) :
 -- Theorem 84: meet(meet(a,b), join(a,b)) can simplify two ways, both yielding meet(a,b)
 -- Path 1: meet(meet(a,b), join(a,b)) →[absorb_mj on first] meet(a,b)
 -- Path 2: meet(meet(a,b), join(a,b)) →[comm] meet(join(a,b), meet(a,b)) →[absorb_jm variant] meet(a,b)
-def confluence_path1 (L : Lattice α) (a b : α) :
+noncomputable def confluence_path1 (L : Lattice α) (a b : α) :
     Path α (L.meet (L.meet a b) (L.join a b)) (L.meet a b) :=
   Path.single (Step.rule "absorb_general" _ _)
 
-def confluence_path2 (L : Lattice α) (a b : α) :
+noncomputable def confluence_path2 (L : Lattice α) (a b : α) :
     Path α (L.meet (L.meet a b) (L.join a b)) (L.meet a b) :=
   Path.cons (Step.rule "meet_comm" (L.meet (L.meet a b) (L.join a b))
                                     (L.meet (L.join a b) (L.meet a b)))
@@ -824,7 +824,7 @@ theorem congrArg_length (f : α → β) (p : Path α a b) :
     | rule n x y => simp [congrArgPath, Path.map, Path.length]; exact ih
 
 -- Theorem 88: symm preserves reachability (well-typed)
-def symm_witness (p : Path α a b) : Path α b a := Path.symm p
+noncomputable def symm_witness (p : Path α a b) : Path α b a := Path.symm p
 
 -- Theorem 89: trans of singles = length 2
 theorem trans_singles_length (s₁ : Step α a b) (s₂ : Step α b c) :

@@ -30,17 +30,17 @@ abbrev Tm (Γ : Ctx) (A : Ty Γ) := (γ : Γ) → A γ
 abbrev Sub (Δ Γ : Ctx) := Δ → Γ
 
 /-- Action of substitution on types. -/
-def tySubst {Γ Δ : Ctx} (A : Ty Γ) (σ : Sub Δ Γ) : Ty Δ :=
+noncomputable def tySubst {Γ Δ : Ctx} (A : Ty Γ) (σ : Sub Δ Γ) : Ty Δ :=
   fun δ => A (σ δ)
 
 /-- Action of substitution on terms. -/
-def tmSubst {Γ Δ : Ctx} {A : Ty Γ} (t : Tm Γ A) (σ : Sub Δ Γ) :
+noncomputable def tmSubst {Γ Δ : Ctx} {A : Ty Γ} (t : Tm Γ A) (σ : Sub Δ Γ) :
     Tm Δ (tySubst A σ) :=
   fun δ => t (σ δ)
 
-def idSub (Γ : Ctx) : Sub Γ Γ := id
+noncomputable def idSub (Γ : Ctx) : Sub Γ Γ := id
 
-def compSub {Γ Δ Θ : Ctx} (σ : Sub Δ Γ) (τ : Sub Θ Δ) : Sub Θ Γ :=
+noncomputable def compSub {Γ Δ Θ : Ctx} (σ : Sub Δ Γ) (τ : Sub Θ Δ) : Sub Θ Γ :=
   fun θ => σ (τ θ)
 
 /-- 1. tySubst preserves identity substitution. -/
@@ -75,14 +75,14 @@ theorem compSub_id_right {Γ Δ : Ctx} (σ : Sub Δ Γ) :
 
 /-! ## Context comprehension -/
 
-def ctxExt (Γ : Ctx) (A : Ty Γ) : Ctx := (γ : Γ) × A γ
+noncomputable def ctxExt (Γ : Ctx) (A : Ty Γ) : Ctx := (γ : Γ) × A γ
 
-def projSub {Γ : Ctx} (A : Ty Γ) : Sub (ctxExt Γ A) Γ := Sigma.fst
+noncomputable def projSub {Γ : Ctx} (A : Ty Γ) : Sub (ctxExt Γ A) Γ := Sigma.fst
 
-def varTm {Γ : Ctx} (A : Ty Γ) : Tm (ctxExt Γ A) (tySubst A (projSub A)) :=
+noncomputable def varTm {Γ : Ctx} (A : Ty Γ) : Tm (ctxExt Γ A) (tySubst A (projSub A)) :=
   Sigma.snd
 
-def extPair {Γ Δ : Ctx} {A : Ty Γ} (σ : Sub Δ Γ) (t : Tm Δ (tySubst A σ)) :
+noncomputable def extPair {Γ Δ : Ctx} {A : Ty Γ} (σ : Sub Δ Γ) (t : Tm Δ (tySubst A σ)) :
     Sub Δ (ctxExt Γ A) :=
   fun δ => ⟨σ δ, t δ⟩
 
@@ -103,12 +103,12 @@ theorem extPair_eta {Γ : Ctx} {A : Ty Γ} :
 
 /-! ## Weakening -/
 
-def wkSub {Γ : Ctx} (A : Ty Γ) : Sub (ctxExt Γ A) Γ := projSub A
+noncomputable def wkSub {Γ : Ctx} (A : Ty Γ) : Sub (ctxExt Γ A) Γ := projSub A
 
-def wkTy {Γ : Ctx} (A : Ty Γ) (B : Ty Γ) : Ty (ctxExt Γ A) :=
+noncomputable def wkTy {Γ : Ctx} (A : Ty Γ) (B : Ty Γ) : Ty (ctxExt Γ A) :=
   tySubst B (wkSub A)
 
-def wkTm {Γ : Ctx} {B : Ty Γ} (A : Ty Γ) (t : Tm Γ B) :
+noncomputable def wkTm {Γ : Ctx} {B : Ty Γ} (A : Ty Γ) (t : Tm Γ B) :
     Tm (ctxExt Γ A) (wkTy A B) :=
   tmSubst t (wkSub A)
 
@@ -195,19 +195,19 @@ theorem transport_congrArg_nested {Γ : Ctx} {A : Ty Γ} {γ₁ γ₂ : Γ}
 
 /-! ## Σ-type operations -/
 
-def CtxSigma {Γ : Ctx} (A : Ty Γ) (B : Ty (ctxExt Γ A)) : Ty Γ :=
+noncomputable def CtxSigma {Γ : Ctx} (A : Ty Γ) (B : Ty (ctxExt Γ A)) : Ty Γ :=
   fun γ => (a : A γ) × B ⟨γ, a⟩
 
-def sigmaPair {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
+noncomputable def sigmaPair {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
     (a : Tm Γ A) (b : Tm Γ (fun γ => B ⟨γ, a γ⟩)) :
     Tm Γ (CtxSigma A B) :=
   fun γ => ⟨a γ, b γ⟩
 
-def sigmaFst {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
+noncomputable def sigmaFst {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
     (t : Tm Γ (CtxSigma A B)) : Tm Γ A :=
   fun γ => (t γ).1
 
-def sigmaSnd {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
+noncomputable def sigmaSnd {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
     (t : Tm Γ (CtxSigma A B)) : Tm Γ (fun γ => B ⟨γ, (t γ).1⟩) :=
   fun γ => (t γ).2
 
@@ -243,14 +243,14 @@ theorem sigmaPair_natural {Γ Δ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
 
 /-! ## Π-type operations -/
 
-def CtxPi {Γ : Ctx} (A : Ty Γ) (B : Ty (ctxExt Γ A)) : Ty Γ :=
+noncomputable def CtxPi {Γ : Ctx} (A : Ty Γ) (B : Ty (ctxExt Γ A)) : Ty Γ :=
   fun γ => (a : A γ) → B ⟨γ, a⟩
 
-def ctxLam {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
+noncomputable def ctxLam {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
     (body : Tm (ctxExt Γ A) B) : Tm Γ (CtxPi A B) :=
   fun γ a => body ⟨γ, a⟩
 
-def ctxApp {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
+noncomputable def ctxApp {Γ : Ctx} {A : Ty Γ} {B : Ty (ctxExt Γ A)}
     (f : Tm Γ (CtxPi A B)) (a : Tm Γ A) : Tm Γ (fun γ => B ⟨γ, a γ⟩) :=
   fun γ => f γ (a γ)
 
@@ -391,10 +391,10 @@ theorem triple_subst {Γ Δ Θ Ξ : Ctx} {A : Ty Γ}
 
 /-! ## Identity type as path -/
 
-def CtxId {Γ : Ctx} {A : Ty Γ} (a b : Tm Γ A) : Ty Γ :=
+noncomputable def CtxId {Γ : Ctx} {A : Ty Γ} (a b : Tm Γ A) : Ty Γ :=
   fun γ => Path (a γ) (b γ)
 
-def ctxRefl {Γ : Ctx} {A : Ty Γ} (a : Tm Γ A) : Tm Γ (CtxId a a) :=
+noncomputable def ctxRefl {Γ : Ctx} {A : Ty Γ} (a : Tm Γ A) : Tm Γ (CtxId a a) :=
   fun γ => Path.refl (a γ)
 
 /-- 44. Identity type substitution. -/

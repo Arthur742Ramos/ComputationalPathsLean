@@ -19,19 +19,19 @@ namespace ContextShape
 variable {A : Type u}
 
 /-- Interpret a context shape as an actual unary context. -/
-def fill : ContextShape A → A → A
+noncomputable def fill : ContextShape A → A → A
   | hole => fun a => a
   | layer f inner => fun a => f (fill inner a)
 
-def toContext (S : ContextShape A) : Context A A := ⟨fill S⟩
+noncomputable def toContext (S : ContextShape A) : Context A A := ⟨fill S⟩
 
 /-- Action of a context shape on paths. -/
-def map : (S : ContextShape A) → {a b : A} → Path a b → Path (fill S a) (fill S b)
+noncomputable def map : (S : ContextShape A) → {a b : A} → Path a b → Path (fill S a) (fill S b)
   | hole, _, _, p => p
   | layer f inner, _, _, p => Path.congrArg f (map inner p)
 
 /-- Structural composition of context shapes. -/
-def comp : ContextShape A → ContextShape A → ContextShape A
+noncomputable def comp : ContextShape A → ContextShape A → ContextShape A
   | S, hole => S
   | S, layer f inner => layer f (comp S inner)
 

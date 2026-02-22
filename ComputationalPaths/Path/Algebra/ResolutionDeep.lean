@@ -34,26 +34,26 @@ inductive Path (α : Type) : α → α → Type where
   | cons : Step α a b → Path α b c → Path α a c
 
 /-- Path composition (transitivity). -/
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | Path.nil _, q => q
   | Path.cons s p, q => Path.cons s (Path.trans p q)
 
 /-- Step reversal. -/
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | Step.refl a => Step.refl a
   | Step.rule name a b => Step.rule (name ++ "⁻¹") b a
 
 /-- Path reversal (symmetry). -/
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | Path.nil a => Path.nil a
   | Path.cons s p => Path.trans (Path.symm p) (Path.cons (Step.symm s) (Path.nil _))
 
 /-- Single-step path. -/
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   Path.cons s (Path.nil _)
 
 /-- Path length. -/
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | Path.nil _ => 0
   | Path.cons _ p => 1 + Path.length p
 
@@ -61,7 +61,7 @@ def Path.length : Path α a b → Nat
 -- Propositional path connectivity
 -- ============================================================================
 
-def PathConnected (α : Type) (a b : α) : Prop := Nonempty (Path α a b)
+noncomputable def PathConnected (α : Type) (a b : α) : Prop := Nonempty (Path α a b)
 
 -- 1
 theorem pathConnected_refl (a : α) : PathConnected α a a :=
@@ -136,7 +136,7 @@ inductive Literal (A : Type) : Type where
   | neg : A → Literal A
 deriving Repr, BEq
 
-def Literal.complement : Literal A → Literal A
+noncomputable def Literal.complement : Literal A → Literal A
   | Literal.pos a => Literal.neg a
   | Literal.neg a => Literal.pos a
 
@@ -173,11 +173,11 @@ inductive ResPath (A : Type) : Clause A → Clause A → Type where
   | refl : (c : Clause A) → ResPath A c c
   | step : ResolutionStep A → ResPath A s₁ s₂ → ResPath A s₀ s₂
 
-def ResPath.trans : ResPath A c₁ c₂ → ResPath A c₂ c₃ → ResPath A c₁ c₃
+noncomputable def ResPath.trans : ResPath A c₁ c₂ → ResPath A c₂ c₃ → ResPath A c₁ c₃
   | ResPath.refl _, q => q
   | ResPath.step s p, q => ResPath.step s (ResPath.trans p q)
 
-def ResPath.length : ResPath A c₁ c₂ → Nat
+noncomputable def ResPath.length : ResPath A c₁ c₂ → Nat
   | ResPath.refl _ => 0
   | ResPath.step _ p => 1 + ResPath.length p
 
@@ -227,7 +227,7 @@ structure Equation (F V : Type) where
   lhs : FOTerm F V
   rhs : FOTerm F V
 
-def Equation.symm (eq : Equation F V) : Equation F V :=
+noncomputable def Equation.symm (eq : Equation F V) : Equation F V :=
   { lhs := eq.rhs, rhs := eq.lhs }
 
 -- 24
@@ -247,7 +247,7 @@ structure RewriteRule (F V : Type) where
   lhs : FOTerm F V
   rhs : FOTerm F V
 
-def RewriteRule.symm (r : RewriteRule F V) : RewriteRule F V :=
+noncomputable def RewriteRule.symm (r : RewriteRule F V) : RewriteRule F V :=
   { lhs := r.rhs, rhs := r.lhs }
 
 -- 27
@@ -268,11 +268,11 @@ inductive ParaPath (F V : Type) : Clause (FOTerm F V) → Clause (FOTerm F V) �
   | refl : (c : Clause (FOTerm F V)) → ParaPath F V c c
   | step : ParaStep F V → ParaPath F V c₁ c₂ → ParaPath F V c₀ c₂
 
-def ParaPath.trans : ParaPath F V c₁ c₂ → ParaPath F V c₂ c₃ → ParaPath F V c₁ c₃
+noncomputable def ParaPath.trans : ParaPath F V c₁ c₂ → ParaPath F V c₂ c₃ → ParaPath F V c₁ c₃
   | ParaPath.refl _, q => q
   | ParaPath.step s p, q => ParaPath.step s (ParaPath.trans p q)
 
-def ParaPath.length : ParaPath F V c₁ c₂ → Nat
+noncomputable def ParaPath.length : ParaPath F V c₁ c₂ → Nat
   | ParaPath.refl _ => 0
   | ParaPath.step _ p => 1 + ParaPath.length p
 
@@ -310,9 +310,9 @@ theorem paraPath_trans_length (p : ParaPath F V c₁ c₂) (q : ParaPath F V c�
 -- Substitution paths for unification
 -- ============================================================================
 
-def Subst (F V : Type) := V → FOTerm F V
+noncomputable def Subst (F V : Type) := V → FOTerm F V
 
-def Subst.id : Subst F V := FOTerm.var
+noncomputable def Subst.id : Subst F V := FOTerm.var
 
 inductive SubstPath (F V : Type) : FOTerm F V → FOTerm F V → Type where
   | varSubst : (v : V) → (t : FOTerm F V) → SubstPath F V (FOTerm.var v) t
@@ -403,17 +403,17 @@ theorem ground_app_nil (f : F) : @IsGround F V (FOTerm.app f []) :=
 -- TRS paths
 -- ============================================================================
 
-def TRS (F V : Type) := List (RewriteRule F V)
+noncomputable def TRS (F V : Type) := List (RewriteRule F V)
 
 inductive TRSPath (F V : Type) : FOTerm F V → FOTerm F V → Type where
   | refl : (t : FOTerm F V) → TRSPath F V t t
   | ruleApp : (r : RewriteRule F V) → TRSPath F V t₁ t₂ → TRSPath F V t₀ t₂
 
-def TRSPath.trans : TRSPath F V t₁ t₂ → TRSPath F V t₂ t₃ → TRSPath F V t₁ t₃
+noncomputable def TRSPath.trans : TRSPath F V t₁ t₂ → TRSPath F V t₂ t₃ → TRSPath F V t₁ t₃
   | TRSPath.refl _, q => q
   | TRSPath.ruleApp r p, q => TRSPath.ruleApp r (TRSPath.trans p q)
 
-def TRSPath.length : TRSPath F V t₁ t₂ → Nat
+noncomputable def TRSPath.length : TRSPath F V t₁ t₂ → Nat
   | TRSPath.refl _ => 0
   | TRSPath.ruleApp _ p => 1 + TRSPath.length p
 
@@ -473,7 +473,7 @@ theorem clause_length_append (c₁ c₂ : Clause A) :
 -- Normal forms
 -- ============================================================================
 
-def IsNormalForm (noRewrite : α → Prop) (t : α) : Prop := noRewrite t
+noncomputable def IsNormalForm (noRewrite : α → Prop) (t : α) : Prop := noRewrite t
 
 -- 51
 theorem normalForm_path_trivial (t : α) :
@@ -484,9 +484,9 @@ theorem normalForm_path_trivial (t : α) :
 -- Herbrand universe
 -- ============================================================================
 
-def HerbrandUniverse (F V : Type) := { t : FOTerm F V // @IsGround F V t }
+noncomputable def HerbrandUniverse (F V : Type) := { t : FOTerm F V // @IsGround F V t }
 
-def HerbrandInterp (F V : Type) := FOTerm F V → Bool
+noncomputable def HerbrandInterp (F V : Type) := FOTerm F V → Bool
 
 structure GroundInstance (F V : Type) where
   originalClause : Clause (FOTerm F V)
@@ -507,7 +507,7 @@ theorem herbrand_compose (w₁ w₂ : HerbrandWitness F V) :
 -- Transport along paths
 -- ============================================================================
 
-def PathInvariant (P : α → Prop) : Prop :=
+noncomputable def PathInvariant (P : α → Prop) : Prop :=
   ∀ (a b : α), Step α a b → P a → P b
 
 -- 53
@@ -521,7 +521,7 @@ theorem transport_along_path {P : α → Prop} (hinv : PathInvariant P)
 -- Congruence paths
 -- ============================================================================
 
-def liftPath (f : F) : Path (FOTerm F V) t₁ t₂ →
+noncomputable def liftPath (f : F) : Path (FOTerm F V) t₁ t₂ →
     Path (FOTerm F V) (FOTerm.app f [t₁]) (FOTerm.app f [t₂])
   | Path.nil _ => Path.nil _
   | Path.cons s rest =>
@@ -578,11 +578,11 @@ theorem clauses_append_length (s₁ s₂ : List (Clause A)) :
 -- Substitution application
 -- ============================================================================
 
-def applySubst (σ : Subst F V) : FOTerm F V → FOTerm F V
+noncomputable def applySubst (σ : Subst F V) : FOTerm F V → FOTerm F V
   | FOTerm.var v => σ v
   | FOTerm.app f args => FOTerm.app f (args.map (applySubst σ))
 
-def Subst.comp (σ₁ σ₂ : Subst F V) : Subst F V :=
+noncomputable def Subst.comp (σ₁ σ₂ : Subst F V) : Subst F V :=
   fun v => applySubst σ₂ (σ₁ v)
 
 -- 62
@@ -616,7 +616,7 @@ theorem path_cons_length (s : Step α a b) (p : Path α b c) :
 -- Confluence property
 -- ============================================================================
 
-def Confluent (R : α → α → Prop) : Prop :=
+noncomputable def Confluent (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
 
 -- 67
@@ -624,7 +624,7 @@ theorem confluent_of_trivial : Confluent (fun (a b : α) => a = b) := by
   intro a b c hab hac
   exact ⟨b, rfl, by rw [← hab, hac]⟩
 
-def LocallyConfluent (R : α → α → Prop) : Prop :=
+noncomputable def LocallyConfluent (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
 
 -- 68
@@ -636,7 +636,7 @@ theorem locally_confluent_eq : LocallyConfluent (fun (a b : α) => a = b) := by
 -- More TRS path lemmas
 -- ============================================================================
 
-def TRSPath.single (r : RewriteRule F V) (t₀ : FOTerm F V) :
+noncomputable def TRSPath.single (r : RewriteRule F V) (t₀ : FOTerm F V) :
     TRSPath F V t₀ r.rhs :=
   TRSPath.ruleApp r (TRSPath.refl r.rhs)
 
@@ -648,7 +648,7 @@ theorem trsPath_single_length (r : RewriteRule F V) (t₀ : FOTerm F V) :
 -- Unsatisfiability
 -- ============================================================================
 
-def Unsatisfiable (interp : HerbrandInterp F V → Clause (FOTerm F V) → Bool)
+noncomputable def Unsatisfiable (interp : HerbrandInterp F V → Clause (FOTerm F V) → Bool)
     (clauses : List (Clause (FOTerm F V))) : Prop :=
   ∀ I, ∃ c ∈ clauses, interp I c = false
 
@@ -666,7 +666,7 @@ inductive MultiStepN (R : α → α → Prop) : Nat → α → α → Prop where
   | zero : MultiStepN R 0 a a
   | succ : R a b → MultiStepN R n b c → MultiStepN R (n + 1) a c
 
-def MultiStep (R : α → α → Prop) : α → α → Prop :=
+noncomputable def MultiStep (R : α → α → Prop) : α → α → Prop :=
   fun a b => ∃ n : Nat, MultiStepN R n a b
 
 -- 71
@@ -703,7 +703,7 @@ theorem herbrand_instances_append (g₁ g₂ : List (GroundInstance F V)) :
 -- Resolution path categorical identities
 -- ============================================================================
 
-def ResPath.id (c : Clause A) : ResPath A c c := ResPath.refl c
+noncomputable def ResPath.id (c : Clause A) : ResPath A c c := ResPath.refl c
 
 -- 77
 theorem resPath_id_left (p : ResPath A c₁ c₂) :

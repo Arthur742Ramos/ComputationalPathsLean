@@ -18,84 +18,84 @@ abbrev Weight := Int
 structure ArithmeticFunction where
   toFun : Nat → Int
 
-def ArithmeticFunction.eval (f : ArithmeticFunction) (n : Nat) : Int :=
+noncomputable def ArithmeticFunction.eval (f : ArithmeticFunction) (n : Nat) : Int :=
   f.toFun n
 
-def ArithmeticFunction.zero : ArithmeticFunction :=
+noncomputable def ArithmeticFunction.zero : ArithmeticFunction :=
   ⟨fun _ => 0⟩
 
-def ArithmeticFunction.one : ArithmeticFunction :=
+noncomputable def ArithmeticFunction.one : ArithmeticFunction :=
   ⟨fun _ => 1⟩
 
-def ArithmeticFunction.add (f g : ArithmeticFunction) : ArithmeticFunction :=
+noncomputable def ArithmeticFunction.add (f g : ArithmeticFunction) : ArithmeticFunction :=
   ⟨fun n => f.toFun n + g.toFun n⟩
 
-def ArithmeticFunction.mul (f g : ArithmeticFunction) : ArithmeticFunction :=
+noncomputable def ArithmeticFunction.mul (f g : ArithmeticFunction) : ArithmeticFunction :=
   ⟨fun n => f.toFun n * g.toFun n⟩
 
-def ArithmeticFunction.scale (c : Int) (f : ArithmeticFunction) : ArithmeticFunction :=
+noncomputable def ArithmeticFunction.scale (c : Int) (f : ArithmeticFunction) : ArithmeticFunction :=
   ⟨fun n => c * f.toFun n⟩
 
-def dirichletConvolution (f g : ArithmeticFunction) : ArithmeticFunction :=
+noncomputable def dirichletConvolution (f g : ArithmeticFunction) : ArithmeticFunction :=
   ⟨fun n => f.toFun n * g.toFun n⟩
 
-def mobiusLike : ArithmeticFunction :=
+noncomputable def mobiusLike : ArithmeticFunction :=
   ⟨fun n => if n = 0 then 0 else if n = 1 then 1 else -1⟩
 
-def vonMangoldtLike : ArithmeticFunction :=
+noncomputable def vonMangoldtLike : ArithmeticFunction :=
   ⟨fun n => if n = 0 then 0 else Int.ofNat n⟩
 
 structure DirichletCharacter where
   modulus : Nat
   value : Nat → Int
 
-def DirichletCharacter.principal (q : Nat) : DirichletCharacter :=
+noncomputable def DirichletCharacter.principal (q : Nat) : DirichletCharacter :=
   ⟨q, fun _ => 1⟩
 
-def riemannZetaTerm (s : Int) (n : Nat) : Int :=
+noncomputable def riemannZetaTerm (s : Int) (n : Nat) : Int :=
   s + Int.ofNat n
 
-def riemannZetaPartial (s : Int) : Nat → Int
+noncomputable def riemannZetaPartial (s : Int) : Nat → Int
   | 0 => 0
   | Nat.succ n => riemannZetaPartial s n + riemannZetaTerm s (n + 1)
 
-def riemannZetaFormal (s : Int) (N : Nat) : Int :=
+noncomputable def riemannZetaFormal (s : Int) (N : Nat) : Int :=
   riemannZetaPartial s N
 
-def dirichletLTerm (χ : DirichletCharacter) (s : Int) (n : Nat) : Int :=
+noncomputable def dirichletLTerm (χ : DirichletCharacter) (s : Int) (n : Nat) : Int :=
   χ.value n * (s + Int.ofNat n)
 
-def dirichletLPartial (χ : DirichletCharacter) (s : Int) : Nat → Int
+noncomputable def dirichletLPartial (χ : DirichletCharacter) (s : Int) : Nat → Int
   | 0 => 0
   | Nat.succ n => dirichletLPartial χ s n + dirichletLTerm χ s (n + 1)
 
-def dirichletLFormal (χ : DirichletCharacter) (s : Int) (N : Nat) : Int :=
+noncomputable def dirichletLFormal (χ : DirichletCharacter) (s : Int) (N : Nat) : Int :=
   dirichletLPartial χ s N
 
 structure PrimeCountingModel where
   x : Nat
   piValue : Nat
 
-def pntMainTerm (M : PrimeCountingModel) : Int :=
+noncomputable def pntMainTerm (M : PrimeCountingModel) : Int :=
   Int.ofNat M.x
 
-def pntErrorTerm (M : PrimeCountingModel) : Int :=
+noncomputable def pntErrorTerm (M : PrimeCountingModel) : Int :=
   Int.ofNat M.piValue - pntMainTerm M
 
-def primeNumberTheoremApprox (M : PrimeCountingModel) : Int :=
+noncomputable def primeNumberTheoremApprox (M : PrimeCountingModel) : Int :=
   pntMainTerm M + pntErrorTerm M
 
-def chebyshevPsi (x : Nat) : Int :=
+noncomputable def chebyshevPsi (x : Nat) : Int :=
   Int.ofNat x
 
-def explicitFormulaSkeleton (M : PrimeCountingModel) : Int :=
+noncomputable def explicitFormulaSkeleton (M : PrimeCountingModel) : Int :=
   primeNumberTheoremApprox M + chebyshevPsi M.x
 
 structure ZeroFreeRegion where
   sigmaBound : Int
   imagHeight : Int
 
-def hasZeroFreeStrip (Z : ZeroFreeRegion) : Prop :=
+noncomputable def hasZeroFreeStrip (Z : ZeroFreeRegion) : Prop :=
   Z.sigmaBound > 0 ∧ Z.imagHeight ≥ 0
 
 structure SiegelWalfiszDatum where
@@ -103,14 +103,14 @@ structure SiegelWalfiszDatum where
   modulus : Nat
   residueClass : Nat
 
-def siegelWalfiszBound (S : SiegelWalfiszDatum) : Int :=
+noncomputable def siegelWalfiszBound (S : SiegelWalfiszDatum) : Int :=
   Int.ofNat (S.x + S.modulus + S.residueClass)
 
 structure BombieriVinogradovDatum where
   x : Nat
   level : Nat
 
-def bombieriVinogradovLevel (B : BombieriVinogradovDatum) : Int :=
+noncomputable def bombieriVinogradovLevel (B : BombieriVinogradovDatum) : Int :=
   Int.ofNat (B.x + B.level)
 
 structure LargeSieveDatum where
@@ -118,16 +118,16 @@ structure LargeSieveDatum where
   N : Nat
   coefficient : Nat → Int
 
-def largeSieveBound (L : LargeSieveDatum) : Int :=
+noncomputable def largeSieveBound (L : LargeSieveDatum) : Int :=
   Int.ofNat (L.Q + L.N)
 
-def arithmeticProgressionCount (x q a : Nat) : Nat :=
+noncomputable def arithmeticProgressionCount (x q a : Nat) : Nat :=
   if q = 0 then 0 else x / q + a % q
 
-def logarithmicIntegralModel (x : Nat) : Int :=
+noncomputable def logarithmicIntegralModel (x : Nat) : Int :=
   Int.ofNat x
 
-def mollifierWeight (k : Nat) : Int :=
+noncomputable def mollifierWeight (k : Nat) : Int :=
   Int.ofNat (k + 1)
 
 theorem arithmeticFunction_eval (f : ArithmeticFunction) (n : Nat) :
@@ -211,13 +211,13 @@ theorem logarithmicIntegralModel_zero :
 theorem mollifierWeight_zero :
     mollifierWeight 0 = 1 := rfl
 
-def pnt_main_term_path (M : PrimeCountingModel) :
+noncomputable def pnt_main_term_path (M : PrimeCountingModel) :
     Path (pntMainTerm M) (pntMainTerm M) :=
   Path.trans
     (Path.symm (Path.refl (pntMainTerm M)))
     (Path.refl (pntMainTerm M))
 
-def pnt_two_step_path (M : PrimeCountingModel) :
+noncomputable def pnt_two_step_path (M : PrimeCountingModel) :
     Path (pntMainTerm M) (pntMainTerm M) :=
   Path.trans
     (Path.congrArg (fun t => t) (Path.refl (pntMainTerm M)))

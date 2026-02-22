@@ -99,7 +99,7 @@ structure IteratedDelooping (X : Pointed) (n : Nat) where
       (loopPointed (level ⟨k.val + 1, Nat.succ_lt_succ k.isLt⟩))
 
 /-- Trivial 0-fold delooping: just the space itself. -/
-def IteratedDelooping.zero (X : Pointed) : IteratedDelooping X 0 where
+noncomputable def IteratedDelooping.zero (X : Pointed) : IteratedDelooping X 0 where
   level := fun _ => X
   level_zero := rfl
   structureMap := fun k => Fin.elim0 k
@@ -125,7 +125,7 @@ structure EnSpaceData (X : Pointed) (n : Nat) where
     (delooping.structureMap k).toFun ((inverse k).toFun l) = l
 
 /-- An E1 space has a 1-fold delooping: it is a loop space. -/
-def E1SpaceData (X : Pointed) := EnSpaceData X 1
+noncomputable def E1SpaceData (X : Pointed) := EnSpaceData X 1
 
 /-! ## Group completion -/
 
@@ -160,13 +160,13 @@ structure GroupCompletion (X : Pointed) where
     completionMul y (inv y) = completion.pt
 
 /-- Path-valued left inverse. -/
-def GroupCompletion.inv_left_path {X : Pointed} (G : GroupCompletion X)
+noncomputable def GroupCompletion.inv_left_path {X : Pointed} (G : GroupCompletion X)
     (y : G.completion.carrier) :
     Path (G.completionMul (G.inv y) y) G.completion.pt :=
   Path.stepChain (G.inv_left y)
 
 /-- The trivial group completion of a single point. -/
-def GroupCompletion.trivial : GroupCompletion { carrier := Unit, pt := () } where
+noncomputable def GroupCompletion.trivial : GroupCompletion { carrier := Unit, pt := () } where
   monoid :=
     { mul := fun _ _ => ()
       mul_pt_left := fun _ => rfl

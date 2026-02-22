@@ -56,7 +56,7 @@ structure SimplicialNerve where
   mor_level : dimBound 1
 
 /-- The simplicial nerve yields a quasi-category. -/
-def SimplicialNerve.toQuasiCategory (N : SimplicialNerve) : QuasiCategory where
+noncomputable def SimplicialNerve.toQuasiCategory (N : SimplicialNerve) : QuasiCategory where
   sset := N.sset
   innerKan := N.innerKan
 
@@ -64,7 +64,7 @@ theorem simplicialNerve_is_quasiCat (N : SimplicialNerve) :
     N.toQuasiCategory.sset = N.sset :=
   rfl
 
-def simplicialNerve_is_quasiCat_path (N : SimplicialNerve) :
+noncomputable def simplicialNerve_is_quasiCat_path (N : SimplicialNerve) :
     Path N.toQuasiCategory.sset N.sset :=
   Path.refl _
 
@@ -100,7 +100,7 @@ theorem joyal_fibrant_is_quasiCat (X : JoyalFibrantObject) :
     ∃ (C : QuasiCategory), C.sset = X.sset :=
   ⟨⟨X.sset, X.fibrant⟩, rfl⟩
 
-def joyal_fibrant_is_quasiCat_path (X : JoyalFibrantObject) :
+noncomputable def joyal_fibrant_is_quasiCat_path (X : JoyalFibrantObject) :
     Path (QuasiCategory.mk X.sset X.fibrant).sset X.sset :=
   Path.refl _
 
@@ -136,7 +136,7 @@ theorem mapping_space_refl_invariance (C : QuasiCategory) (x y : C.obj)
     ∀ n, M.sset.obj n = M.sset.obj n :=
   fun _ => rfl
 
-def mapping_space_refl_invariance_path (C : QuasiCategory) (x y : C.obj)
+noncomputable def mapping_space_refl_invariance_path (C : QuasiCategory) (x y : C.obj)
     (M : InftyCatMappingSpace C x y) (n : Nat) :
     Path (M.sset.obj n) (M.sset.obj n) :=
   Path.refl _
@@ -152,12 +152,12 @@ structure InftyCatFunctor (C D : QuasiCategory) where
     InnerHorn n k → True
 
 /-- The identity ∞-functor. -/
-def InftyCatFunctor.id (C : QuasiCategory) : InftyCatFunctor C C where
+noncomputable def InftyCatFunctor.id (C : QuasiCategory) : InftyCatFunctor C C where
   map := ⟨fun n x => x, fun n i x => rfl⟩
   preserves_inner := fun _ _ _ => trivial
 
 /-- Composition of ∞-functors. -/
-def InftyCatFunctor.comp {C D E : QuasiCategory}
+noncomputable def InftyCatFunctor.comp {C D E : QuasiCategory}
     (F : InftyCatFunctor C D) (G : InftyCatFunctor D E) :
     InftyCatFunctor C E where
   map := ⟨fun n x => G.map.map n (F.map.map n x),
@@ -172,7 +172,7 @@ theorem functor_id_comp {C D : QuasiCategory} (F : InftyCatFunctor C D) :
       (InftyCatFunctor.comp (InftyCatFunctor.id C) F).map.map n x = F.map.map n x :=
   fun _ _ => rfl
 
-def functor_id_comp_path {C D : QuasiCategory} (F : InftyCatFunctor C D)
+noncomputable def functor_id_comp_path {C D : QuasiCategory} (F : InftyCatFunctor C D)
     (n : Nat) (x : C.sset.obj n) :
     Path ((InftyCatFunctor.comp (InftyCatFunctor.id C) F).map.map n x) (F.map.map n x) :=
   Path.refl _
@@ -189,7 +189,7 @@ theorem functor_comp_assoc {C D E F' : QuasiCategory}
       (InftyCatFunctor.comp G (InftyCatFunctor.comp H K)).map.map n x :=
   fun _ _ => rfl
 
-def functor_comp_assoc_path {C D E F' : QuasiCategory}
+noncomputable def functor_comp_assoc_path {C D E F' : QuasiCategory}
     (G : InftyCatFunctor C D) (H : InftyCatFunctor D E) (K : InftyCatFunctor E F')
     (n : Nat) (x : C.sset.obj n) :
     Path ((InftyCatFunctor.comp (InftyCatFunctor.comp G H) K).map.map n x)
@@ -233,7 +233,7 @@ theorem adjunction_hom_natural_refl (A : InftyCatAdjunctionHom C D)
     A.homEquiv x y f = A.homEquiv x y f :=
   rfl
 
-def adjunction_hom_natural_refl_path (A : InftyCatAdjunctionHom C D)
+noncomputable def adjunction_hom_natural_refl_path (A : InftyCatAdjunctionHom C D)
     (x : C.obj) (y : D.obj) (f : D.mor) :
     Path (A.homEquiv x y f) (A.homEquiv x y f) :=
   Path.refl _
@@ -276,7 +276,7 @@ theorem limit_apex_unique (C : QuasiCategory) (D : InftyCatDiagram C)
     ∃ (e : C.mor), True :=
   ⟨C.id L₁.apex, trivial⟩
 
-def limit_apex_unique_path (C : QuasiCategory) (D : InftyCatDiagram C)
+noncomputable def limit_apex_unique_path (C : QuasiCategory) (D : InftyCatDiagram C)
     (L : InftyCatLimit C D) :
     Path L.apex L.apex :=
   Path.refl _
@@ -302,7 +302,7 @@ theorem yoneda_preserves_id (C : QuasiCategory) (Y : InftyCatYoneda C) (x : C.ob
     Y.yoneda.map.map 0 x = Y.yoneda.map.map 0 x :=
   rfl
 
-def yoneda_preserves_id_path (C : QuasiCategory) (Y : InftyCatYoneda C) (x : C.obj) :
+noncomputable def yoneda_preserves_id_path (C : QuasiCategory) (Y : InftyCatYoneda C) (x : C.obj) :
     Path (Y.yoneda.map.map 0 x) (Y.yoneda.map.map 0 x) :=
   Path.refl _
 
@@ -329,7 +329,7 @@ theorem equivalence_refl (C : QuasiCategory) :
       (InftyCatFunctor.id C).map.map n x :=
   fun _ _ => rfl
 
-def equivalence_refl_path (C : QuasiCategory) (n : Nat) (x : C.sset.obj n) :
+noncomputable def equivalence_refl_path (C : QuasiCategory) (n : Nat) (x : C.sset.obj n) :
     Path ((InftyCatFunctor.comp (InftyCatFunctor.id C) (InftyCatFunctor.id C)).map.map n x)
          ((InftyCatFunctor.id C).map.map n x) :=
   Path.refl _
@@ -363,7 +363,7 @@ theorem adjoint_functor_unit_exists (C D : PresentableInftyCat)
       (InftyCatFunctor.comp A.functor A.rightAdjoint).map.map n x :=
   fun _ _ => rfl
 
-def adjoint_functor_unit_path (C D : PresentableInftyCat)
+noncomputable def adjoint_functor_unit_path (C D : PresentableInftyCat)
     (A : AdjointFunctorThm C D) (n : Nat) (x : C.cat.sset.obj n) :
     Path ((InftyCatFunctor.comp A.functor A.rightAdjoint).map.map n x)
          ((InftyCatFunctor.comp A.functor A.rightAdjoint).map.map n x) :=
@@ -387,12 +387,12 @@ theorem localization_functor_exists (C : QuasiCategory)
     L.locFunctor.map.map 0 = L.locFunctor.map.map 0 :=
   rfl
 
-def localization_functor_path (C : QuasiCategory)
+noncomputable def localization_functor_path (C : QuasiCategory)
     (L : InftyCatLocalization C) :
     Path (L.locFunctor.map.map 0) (L.locFunctor.map.map 0) :=
   Path.refl _
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end InfinityCatDeep2

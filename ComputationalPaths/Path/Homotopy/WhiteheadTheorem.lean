@@ -25,7 +25,7 @@ abbrev PiN (_n : Nat) (A : Type u) (a : A) : Type u :=
   PathRwQuot A a a
 
 /-- Induced map on `PiN`: action of `f` on quotient loops. -/
-def piNMap {A B : Type u} (f : A → B) (n : Nat) (a : A) :
+noncomputable def piNMap {A B : Type u} (f : A → B) (n : Nat) (a : A) :
     PiN n A a → PiN n B (f a) :=
   PathRwQuot.congrArg A B f
 
@@ -77,7 +77,7 @@ structure IsOneType (A : Type u) : Type u where
   rweq_trans : ∀ {a b : A} {p q r : Path a b}, RwEq p q → RwEq q r → RwEq p r
 
 /-- Every type is a 1-type in the computational-path setting. -/
-def isOneType_of_any (A : Type u) : IsOneType A where
+noncomputable def isOneType_of_any (A : Type u) : IsOneType A where
   rweq_refl := fun p => rweq_refl p
   rweq_symm := fun h => rweq_symm h
   rweq_trans := fun h₁ h₂ => rweq_trans h₁ h₂
@@ -92,7 +92,7 @@ structure PathLiftingData {A B : Type u} (f : A → B) (a₀ : A) : Type u where
   liftPath  : ∀ b : B, (γ : Path (f a₀) b) → Path (f (liftPoint b γ)) b
 
 /-- Explicit `Step` witness used as a loop-normalization coherence. -/
-def refl_loop_unit_rweq {A : Type u} (a : A) :
+noncomputable def refl_loop_unit_rweq {A : Type u} (a : A) :
     RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
   rweq_of_step (Step.trans_refl_left (Path.refl a))
 
@@ -125,7 +125,7 @@ structure HomotopyEquivalence {A B : Type u} (f : A → B) : Type u where
 /-- Whitehead theorem for 1-types:
 if `f` is a weak homotopy equivalence, path lifting + `π₁` bijection provide
 a homotopy inverse. -/
-def whitehead_one_type {A B : Type u} {f : A → B} {a₀ : A}
+noncomputable def whitehead_one_type {A B : Type u} {f : A → B} {a₀ : A}
     (_hA : IsOneType A) (_hB : IsOneType B)
     (hweak : WeakHomotopyEquivalence f)
     (hconn : PathConnected B (f a₀))
@@ -146,15 +146,15 @@ structure IsContractible (X : Type u) : Type u where
   contraction : ∀ x : X, Path center x
 
 /-- Computational sets (`0`-types): loop spaces are contractible. -/
-def IsSet (A : Type u) : Type u :=
+noncomputable def IsSet (A : Type u) : Type u :=
   ∀ a : A, IsContractible (PiN 1 A a)
 
 /-- `n`-types: all `k`-cells with `k > n` are contractible. -/
-def IsNType (n : Nat) (A : Type u) : Type u :=
+noncomputable def IsNType (n : Nat) (A : Type u) : Type u :=
   ∀ k : Nat, n < k → ∀ a : A, IsContractible (PiN k A a)
 
 /-- `0`-types are sets. -/
-def zero_types_are_sets {A : Type u} (h0 : IsNType 0 A) : IsSet A := by
+noncomputable def zero_types_are_sets {A : Type u} (h0 : IsNType 0 A) : IsSet A := by
   intro a
   exact h0 1 (Nat.zero_lt_succ 0) a
 
@@ -173,7 +173,7 @@ structure PathGroupoid (A : Type u) : Type (u + 1) where
   comp_inv : ∀ {a b : A} (x : Hom a b), comp x (inv x) = id a
 
 /-- Canonical path-groupoid on any type via `PathRwQuot`. -/
-def pathGroupoid (A : Type u) : PathGroupoid A where
+noncomputable def pathGroupoid (A : Type u) : PathGroupoid A where
   Hom := fun a b => PathRwQuot A a b
   id := fun a => PathRwQuot.refl a
   comp := fun x y => PathRwQuot.trans x y
@@ -185,7 +185,7 @@ def pathGroupoid (A : Type u) : PathGroupoid A where
   comp_inv := fun x => PathRwQuot.trans_symm x
 
 /-- `1`-types are groupoids. -/
-def one_types_are_groupoids {A : Type u} (_h1 : IsNType 1 A) :
+noncomputable def one_types_are_groupoids {A : Type u} (_h1 : IsNType 1 A) :
     PathGroupoid A :=
   pathGroupoid A
 

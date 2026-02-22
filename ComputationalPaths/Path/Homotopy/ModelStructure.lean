@@ -29,7 +29,7 @@ universe u
 -- ============================================================================
 
 /-- Functorial action of a map on `PathRwQuot`. -/
-def pathRwMap {A B : Type u} (f : A → B) {a₁ a₂ : A} :
+noncomputable def pathRwMap {A B : Type u} (f : A → B) {a₁ a₂ : A} :
     PathRwQuot A a₁ a₂ → PathRwQuot B (f a₁) (f a₂) :=
   PathRwQuot.congrArg A B f
 
@@ -90,7 +90,7 @@ structure LiftSolution {A B X Y : Type u} {i : A → B} {p : X → Y}
   fac_left : ∀ a, lift (i a) = sq.left a
   fac_right : ∀ b, p (lift b) = sq.right b
 
-def HasLLP {A B X Y : Type u} (i : A → B) (p : X → Y) : Prop :=
+noncomputable def HasLLP {A B X Y : Type u} (i : A → B) (p : X → Y) : Prop :=
   ∀ sq : LiftingProblem i p, Nonempty (LiftSolution sq)
 
 /-- Acyclic fibration data (carried as a structure so non-Prop fields are OK). -/
@@ -101,7 +101,7 @@ structure AcyclicFibrationData {X Y : Type u} (p : X → Y) where
   sec_eq : ∀ y, p (sec y) = y
   ret_eq : ∀ x, sec (p x) = x
 
-def AcyclicFibration {X Y : Type u} (p : X → Y) : Prop :=
+noncomputable def AcyclicFibration {X Y : Type u} (p : X → Y) : Prop :=
   Nonempty (AcyclicFibrationData p)
 
 theorem acyclicFibration_id (A : Type u) : AcyclicFibration (X := A) (Y := A) id :=
@@ -111,7 +111,7 @@ theorem acyclicFibration_id (A : Type u) : AcyclicFibration (X := A) (Y := A) id
      sec_eq := fun _ => rfl
      ret_eq := fun _ => rfl }⟩
 
-def Cofibration {A B : Type u} (i : A → B) : Prop :=
+noncomputable def Cofibration {A B : Type u} (i : A → B) : Prop :=
   ∀ {X Y : Type u} (p : X → Y), AcyclicFibration p → HasLLP i p
 
 /-- Every map is a cofibration.  Lifts use section/retraction data. -/

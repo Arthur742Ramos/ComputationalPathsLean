@@ -135,7 +135,7 @@ structure CircuitAxiomatization (α : Type u) where
 
 namespace Matroid
 
-def toCircuitAxiomatization (M : Matroid α) : CircuitAxiomatization α where
+noncomputable def toCircuitAxiomatization (M : Matroid α) : CircuitAxiomatization α where
   M := M
   IsCircuit := M.IsCircuit
   isCircuit_iff := by intro C; rfl
@@ -230,7 +230,7 @@ section Graphic
 variable {V : Type u}
 
 /-- A basic graphic-matroid example on the edge set of `G` (free on edges). -/
-def graphicMatroid (G : SimpleGraph V) : Matroid (Sym2 V) :=
+noncomputable def graphicMatroid (G : SimpleGraph V) : Matroid (Sym2 V) :=
   Matroid.freeOn G.edgeSet
 
 @[simp] theorem graphicMatroid_indep_iff (G : SimpleGraph V) (I : Set (Sym2 V)) :
@@ -240,7 +240,7 @@ def graphicMatroid (G : SimpleGraph V) : Matroid (Sym2 V) :=
 end Graphic
 
 /-- Matroid duality. -/
-def matroidDual (M : Matroid α) : Matroid α := M✶
+noncomputable def matroidDual (M : Matroid α) : Matroid α := M✶
 
 @[simp] theorem matroidDual_involutive (M : Matroid α) : matroidDual (matroidDual M) = M := by
   simp [matroidDual]

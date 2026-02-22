@@ -57,7 +57,7 @@ theorem cohom_comm_symm_symm (R : MotivicCohomRing) (p q : Int) (x y : R.H p q) 
   Path.symm_symm (R.add_comm p q x y)
 
 /-- Double zero addition is identity. -/
-def cohom_zero_zero (R : MotivicCohomRing) (p q : Int) :
+noncomputable def cohom_zero_zero (R : MotivicCohomRing) (p q : Int) :
     Path (R.add p q (R.zero p q) (R.zero p q)) (R.zero p q) :=
   R.zero_add p q (R.zero p q)
 
@@ -233,7 +233,7 @@ theorem gw_comm_symm_symm (G : GrothendieckWitt) (x y : G.GW) :
   Path.symm_symm (G.add_comm x y)
 
 /-- GW zero is both-sided identity. -/
-def gw_zero_both (G : GrothendieckWitt) :
+noncomputable def gw_zero_both (G : GrothendieckWitt) :
     Path (G.add G.zero G.zero) G.zero :=
   G.zero_add G.zero
 
@@ -529,7 +529,7 @@ theorem fgl_zero_add_refl (F : MotivicFGL) (x : F.R) :
   simp
 
 /-- FGL zero is both-sided identity. -/
-def fgl_zero_both (F : MotivicFGL) :
+noncomputable def fgl_zero_both (F : MotivicFGL) :
     Path (F.add F.zero F.zero) F.zero :=
   F.zero_add F.zero
 

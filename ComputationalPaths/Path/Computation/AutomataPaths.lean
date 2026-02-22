@@ -35,7 +35,7 @@ structure DFAPath (Q : Type u) (Alpha : Type u) where
   total : ∀ q a, Path (δ q a) (δ q a)
 
 /-- Extended transition function for DFA on a word. -/
-def dfaExtend {Q Alpha : Type u} (M : DFAPath Q Alpha) : Q → List Alpha → Q
+noncomputable def dfaExtend {Q Alpha : Type u} (M : DFAPath Q Alpha) : Q → List Alpha → Q
   | q, [] => q
   | q, a :: w => dfaExtend M (M.δ q a) w
 
@@ -45,28 +45,28 @@ structure DFARun {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) (w : List Alph
   reaches : Path (dfaExtend M q w) q'
 
 /-- DFA acceptance: word is accepted iff extended transition from q₀ lands in accept. -/
-def dfaAccepts {Q Alpha : Type u} (M : DFAPath Q Alpha) (w : List Alpha) : Prop :=
+noncomputable def dfaAccepts {Q Alpha : Type u} (M : DFAPath Q Alpha) (w : List Alpha) : Prop :=
   M.accept (dfaExtend M M.q₀ w)
 
 /-! ## Basic DFA Path Theorems -/
 
 /-- Empty word keeps the DFA in its current state. -/
-def dfa_empty_word {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) :
+noncomputable def dfa_empty_word {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) :
     Path (dfaExtend M q []) q :=
   Path.refl q
 
 /-- Single character transition matches δ. -/
-def dfa_single_char {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) (a : Alpha) :
+noncomputable def dfa_single_char {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) (a : Alpha) :
     Path (dfaExtend M q [a]) (M.δ q a) :=
   Path.refl (M.δ q a)
 
 /-- Extending a word by one character. -/
-def dfa_extend_cons {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) (a : Alpha) (w : List Alpha) :
+noncomputable def dfa_extend_cons {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) (a : Alpha) (w : List Alpha) :
     Path (dfaExtend M q (a :: w)) (dfaExtend M (M.δ q a) w) :=
   Path.refl _
 
 /-- DFA run is deterministic: same word from same state yields same result. -/
-def dfa_run_deterministic {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) (w : List Alpha) :
+noncomputable def dfa_run_deterministic {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q) (w : List Alpha) :
     Path (dfaExtend M q w) (dfaExtend M q w) :=
   Path.refl _
 
@@ -101,7 +101,7 @@ inductive nfaReach {Q Alpha : Type u} (M : NFAPath Q Alpha) : Q → List Alpha �
       nfaReach M q (a :: w) q''
 
 /-- NFA acceptance: some initial state reaches some accepting state. -/
-def nfaAccepts {Q Alpha : Type u} (M : NFAPath Q Alpha) (w : List Alpha) : Prop :=
+noncomputable def nfaAccepts {Q Alpha : Type u} (M : NFAPath Q Alpha) (w : List Alpha) : Prop :=
   ∃ q₀ q, M.initial q₀ ∧ nfaReach M q₀ w q ∧ M.accept q
 
 /-- Empty word NFA reach is reflexive. -/
@@ -112,7 +112,7 @@ theorem nfa_empty_reach {Q Alpha : Type u} (M : NFAPath Q Alpha) (q : Q) :
 /-! ## Product Construction -/
 
 /-- Product of two DFAs. -/
-def ProductDFA {Q₁ Q₂ Alpha : Type u} (M₁ : DFAPath Q₁ Alpha) (M₂ : DFAPath Q₂ Alpha) :
+noncomputable def ProductDFA {Q₁ Q₂ Alpha : Type u} (M₁ : DFAPath Q₁ Alpha) (M₂ : DFAPath Q₂ Alpha) :
     DFAPath (Q₁ × Q₂) Alpha where
   δ := fun ⟨q₁, q₂⟩ a => (M₁.δ q₁ a, M₂.δ q₂ a)
   q₀ := (M₁.q₀, M₂.q₀)
@@ -139,7 +139,7 @@ noncomputable def product_accepts_iff {Q₁ Q₂ Alpha : Type u}
 /-! ## Complement Construction -/
 
 /-- Complement DFA: swap accepting and rejecting states. -/
-def ComplementDFA {Q Alpha : Type u} (M : DFAPath Q Alpha) : DFAPath Q Alpha where
+noncomputable def ComplementDFA {Q Alpha : Type u} (M : DFAPath Q Alpha) : DFAPath Q Alpha where
   δ := M.δ
   q₀ := M.q₀
   accept := fun q => ¬ M.accept q
@@ -155,21 +155,21 @@ noncomputable def complement_extend {Q Alpha : Type u} (M : DFAPath Q Alpha) (q 
 /-! ## Subset Construction (NFA → DFA) -/
 
 /-- Subset construction: state is a set of NFA states. -/
-def SubsetDFA {Q Alpha : Type u} (M : NFAPath Q Alpha) : DFAPath (Q → Prop) Alpha where
+noncomputable def SubsetDFA {Q Alpha : Type u} (M : NFAPath Q Alpha) : DFAPath (Q → Prop) Alpha where
   δ := fun S a => fun q' => ∃ q, S q ∧ M.δ q a q'
   q₀ := M.initial
   accept := fun S => ∃ q, S q ∧ M.accept q
   total := fun _ _ => Path.refl _
 
 /-- Subset DFA initial state matches NFA initial states. -/
-def subset_initial {Q Alpha : Type u} (M : NFAPath Q Alpha) :
+noncomputable def subset_initial {Q Alpha : Type u} (M : NFAPath Q Alpha) :
     Path (SubsetDFA M).q₀ M.initial :=
   Path.refl _
 
 /-! ## Union DFA -/
 
 /-- Union DFA via product construction. -/
-def UnionDFA {Q₁ Q₂ Alpha : Type u} (M₁ : DFAPath Q₁ Alpha) (M₂ : DFAPath Q₂ Alpha) :
+noncomputable def UnionDFA {Q₁ Q₂ Alpha : Type u} (M₁ : DFAPath Q₁ Alpha) (M₂ : DFAPath Q₂ Alpha) :
     DFAPath (Q₁ × Q₂) Alpha where
   δ := fun ⟨q₁, q₂⟩ a => (M₁.δ q₁ a, M₂.δ q₂ a)
   q₀ := (M₁.q₀, M₂.q₀)
@@ -189,7 +189,7 @@ noncomputable def union_extend_eq_product {Q₁ Q₂ Alpha : Type u}
 /-! ## Myhill-Nerode Equivalence -/
 
 /-- Myhill-Nerode equivalence: two words are equivalent if they lead to the same state. -/
-def myhillNerodeEquiv {Q Alpha : Type u} (M : DFAPath Q Alpha) (w₁ w₂ : List Alpha) : Prop :=
+noncomputable def myhillNerodeEquiv {Q Alpha : Type u} (M : DFAPath Q Alpha) (w₁ w₂ : List Alpha) : Prop :=
   dfaExtend M M.q₀ w₁ = dfaExtend M M.q₀ w₂
 
 /-- Myhill-Nerode equivalence is reflexive. -/
@@ -225,7 +225,7 @@ theorem mn_acceptance {Q Alpha : Type u} (M : DFAPath Q Alpha) (w₁ w₂ : List
 /-! ## State Reachability as Path Existence -/
 
 /-- DFA state reachability: q' is reachable from q. -/
-def dfaReachable {Q Alpha : Type u} (M : DFAPath Q Alpha) (q q' : Q) : Prop :=
+noncomputable def dfaReachable {Q Alpha : Type u} (M : DFAPath Q Alpha) (q q' : Q) : Prop :=
   ∃ w : List Alpha, dfaExtend M q w = q'
 
 /-- Every state is reachable from itself (empty word). -/
@@ -244,7 +244,7 @@ theorem reachable_trans {Q Alpha : Type u} (M : DFAPath Q Alpha) (q₁ q₂ q₃
 /-! ## Path-based State Equivalence and Minimization -/
 
 /-- Two states are equivalent if they accept the same continuations. -/
-def stateEquiv {Q Alpha : Type u} (M : DFAPath Q Alpha) (q₁ q₂ : Q) : Prop :=
+noncomputable def stateEquiv {Q Alpha : Type u} (M : DFAPath Q Alpha) (q₁ q₂ : Q) : Prop :=
   ∀ w : List Alpha, M.accept (dfaExtend M q₁ w) ↔ M.accept (dfaExtend M q₂ w)
 
 /-- State equivalence is reflexive. -/
@@ -265,7 +265,7 @@ theorem stateEquiv_trans {Q Alpha : Type u} (M : DFAPath Q Alpha) (q₁ q₂ q�
 /-! ## congrArg and transport for automata -/
 
 /-- congrArg for DFA transitions. -/
-def congrArg_dfa_transition {Q Alpha : Type u} (M : DFAPath Q Alpha) (a : Alpha)
+noncomputable def congrArg_dfa_transition {Q Alpha : Type u} (M : DFAPath Q Alpha) (a : Alpha)
     {q₁ q₂ : Q} (h : Path q₁ q₂) : Path (M.δ q₁ a) (M.δ q₂ a) :=
   Path.congrArg (fun q => M.δ q a) h
 

@@ -26,25 +26,25 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _ => 0
   | .cons _ p => 1 + p.length
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .mk name a b => .mk (name ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a => .nil a
   | .cons s rest => rest.symm.trans (.cons s.symm (.nil _))
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Path.congrArg (f : α → β) (lbl : String) : Path α a b → Path β (f a) (f b)
+noncomputable def Path.congrArg (f : α → β) (lbl : String) : Path α a b → Path β (f a) (f b)
   | .nil _ => .nil _
   | .cons _ p => .cons (.mk lbl _ _) (p.congrArg f lbl)
 
@@ -52,7 +52,7 @@ def Path.congrArg (f : α → β) (lbl : String) : Path α a b → Path β (f a)
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   witness : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
 -- ============================================================
 -- §2  Path algebra lemmas
@@ -87,7 +87,7 @@ theorem path_single_length (s : Step α a b) :
 abbrev Sigma := Nat   -- alphabet symbols as Nat
 abbrev Word := List Sigma
 
-def wordConcat (u v : Word) : Word := u ++ v
+noncomputable def wordConcat (u v : Word) : Word := u ++ v
 
 theorem wordConcat_assoc (u v w : Word) :
     wordConcat (wordConcat u v) w = wordConcat u (wordConcat v w) :=
@@ -104,18 +104,18 @@ theorem wordConcat_nil_right (w : Word) : wordConcat w [] = w :=
 
 abbrev Lang := Word → Prop
 
-def emptyLang : Lang := fun _ => False
-def epsilonLang : Lang := fun w => w = []
-def singletonLang (a : Sigma) : Lang := fun w => w = [a]
+noncomputable def emptyLang : Lang := fun _ => False
+noncomputable def epsilonLang : Lang := fun w => w = []
+noncomputable def singletonLang (a : Sigma) : Lang := fun w => w = [a]
 
-def langUnion (L₁ L₂ : Lang) : Lang := fun w => L₁ w ∨ L₂ w
-def langConcat (L₁ L₂ : Lang) : Lang := fun w => ∃ u v, w = wordConcat u v ∧ L₁ u ∧ L₂ v
-def langStar (L : Lang) : Lang := fun w =>
+noncomputable def langUnion (L₁ L₂ : Lang) : Lang := fun w => L₁ w ∨ L₂ w
+noncomputable def langConcat (L₁ L₂ : Lang) : Lang := fun w => ∃ u v, w = wordConcat u v ∧ L₁ u ∧ L₂ v
+noncomputable def langStar (L : Lang) : Lang := fun w =>
   ∃ ws : List Word, w = ws.foldl wordConcat [] ∧ ∀ u, u ∈ ws → L u
 
 -- Language complement and intersection
-def langComplement (L : Lang) : Lang := fun w => ¬ L w
-def langIntersect (L₁ L₂ : Lang) : Lang := fun w => L₁ w ∧ L₂ w
+noncomputable def langComplement (L : Lang) : Lang := fun w => ¬ L w
+noncomputable def langIntersect (L₁ L₂ : Lang) : Lang := fun w => L₁ w ∧ L₂ w
 
 -- ============================================================
 -- §5  Regular Expressions
@@ -130,7 +130,7 @@ inductive RE where
   | star  : RE → RE
 deriving DecidableEq, Repr
 
-def RE.denote : RE → Lang
+noncomputable def RE.denote : RE → Lang
   | .empty => emptyLang
   | .eps   => epsilonLang
   | .sym a => singletonLang a
@@ -146,42 +146,42 @@ abbrev REPath := Path RE
 -- ============================================================
 
 -- Union commutativity path
-def reUnionComm (r s : RE) : REPath (RE.union r s) (RE.union s r) :=
+noncomputable def reUnionComm (r s : RE) : REPath (RE.union r s) (RE.union s r) :=
   Path.single (.mk "union_comm" _ _)
 
 -- Union associativity path
-def reUnionAssoc (r s t : RE) :
+noncomputable def reUnionAssoc (r s t : RE) :
     REPath (RE.union (RE.union r s) t) (RE.union r (RE.union s t)) :=
   Path.single (.mk "union_assoc" _ _)
 
 -- Concat associativity path
-def reCatAssoc (r s t : RE) :
+noncomputable def reCatAssoc (r s t : RE) :
     REPath (RE.cat (RE.cat r s) t) (RE.cat r (RE.cat s t)) :=
   Path.single (.mk "cat_assoc" _ _)
 
 -- Union with empty
-def reUnionEmpty (r : RE) : REPath (RE.union r .empty) r :=
+noncomputable def reUnionEmpty (r : RE) : REPath (RE.union r .empty) r :=
   Path.single (.mk "union_empty_right" _ _)
 
 -- Concat with epsilon
-def reCatEps (r : RE) : REPath (RE.cat r .eps) r :=
+noncomputable def reCatEps (r : RE) : REPath (RE.cat r .eps) r :=
   Path.single (.mk "cat_eps_right" _ _)
 
-def reEpsCat (r : RE) : REPath (RE.cat .eps r) r :=
+noncomputable def reEpsCat (r : RE) : REPath (RE.cat .eps r) r :=
   Path.single (.mk "eps_cat_left" _ _)
 
 -- Star unrolling: r* = ε ∪ r·r*
-def reStarUnroll (r : RE) :
+noncomputable def reStarUnroll (r : RE) :
     REPath (RE.star r) (RE.union .eps (RE.cat r (RE.star r))) :=
   Path.single (.mk "star_unroll" _ _)
 
 -- Concat distributes over union
-def reCatDistL (r s t : RE) :
+noncomputable def reCatDistL (r s t : RE) :
     REPath (RE.cat r (RE.union s t)) (RE.union (RE.cat r s) (RE.cat r t)) :=
   Path.single (.mk "cat_dist_left" _ _)
 
 -- Multi-step: (r ∪ ∅) · ε → (r ∪ ∅) → r via trans chain
-def reSimplify (r : RE) :
+noncomputable def reSimplify (r : RE) :
     REPath (RE.cat (RE.union r .empty) .eps) r :=
   let mid := RE.union r .empty
   (Path.single (.mk "cat_eps_right" _ mid)).trans
@@ -201,17 +201,17 @@ structure DFA where
   isFinal  : Nat → Bool
   delta    : Nat → Sigma → Nat
 
-def DFA.run (m : DFA) (q : Nat) : Word → Nat
+noncomputable def DFA.run (m : DFA) (q : Nat) : Word → Nat
   | []      => q
   | a :: w  => DFA.run m (m.delta q a) w
 
-def DFA.accepts (m : DFA) (w : Word) : Bool :=
+noncomputable def DFA.accepts (m : DFA) (w : Word) : Bool :=
   m.isFinal (m.run m.start w)
 
-def DFA.language (m : DFA) : Lang := fun w => m.accepts w = true
+noncomputable def DFA.language (m : DFA) : Lang := fun w => m.accepts w = true
 
 -- Transition path: each symbol read is a step
-def DFA.transPath (m : DFA) (q : Nat) : (w : Word) → Path Nat q (m.run q w)
+noncomputable def DFA.transPath (m : DFA) (q : Nat) : (w : Word) → Path Nat q (m.run q w)
   | []     => Path.nil q
   | a :: w =>
     let q' := m.delta q a
@@ -231,7 +231,7 @@ theorem dfa_run_concat (m : DFA) (q : Nat) (u v : Word) :
   | cons a u ih => simp [DFA.run, wordConcat]; exact ih _
 
 -- Path for concatenated word = trans of paths
-def DFA.concatPath (m : DFA) (q : Nat) (u v : Word) :
+noncomputable def DFA.concatPath (m : DFA) (q : Nat) (u v : Word) :
     Path Nat q (m.run q (wordConcat u v)) :=
   let p1 := m.transPath q u
   let mid := m.run q u
@@ -248,20 +248,20 @@ structure NFA where
   isFinal : Nat → Bool
   delta   : Nat → Sigma → List Nat
 
-def NFA.stepStates (m : NFA) (qs : List Nat) (a : Sigma) : List Nat :=
+noncomputable def NFA.stepStates (m : NFA) (qs : List Nat) (a : Sigma) : List Nat :=
   (qs.flatMap (fun q => m.delta q a)).eraseDups
 
-def NFA.runStates (m : NFA) (qs : List Nat) : Word → List Nat
+noncomputable def NFA.runStates (m : NFA) (qs : List Nat) : Word → List Nat
   | []     => qs
   | a :: w => NFA.runStates m (m.stepStates qs a) w
 
-def NFA.accepts (m : NFA) (w : Word) : Bool :=
+noncomputable def NFA.accepts (m : NFA) (w : Word) : Bool :=
   (m.runStates m.start w).any m.isFinal
 
-def NFA.language (m : NFA) : Lang := fun w => m.accepts w = true
+noncomputable def NFA.language (m : NFA) : Lang := fun w => m.accepts w = true
 
 -- NFA run path: each symbol transitions a set of states
-def NFA.transPath (m : NFA) (qs : List Nat) : (w : Word) →
+noncomputable def NFA.transPath (m : NFA) (qs : List Nat) : (w : Word) →
     Path (List Nat) qs (m.runStates qs w)
   | []     => Path.nil qs
   | a :: w =>
@@ -278,7 +278,7 @@ theorem nfa_path_length_eq_word (m : NFA) (qs : List Nat) (w : Word) :
 -- §9  Subset construction (NFA → DFA) as path morphism
 -- ============================================================
 
-def subsetDFA (m : NFA) : DFA where
+noncomputable def subsetDFA (m : NFA) : DFA where
   states  := 2 ^ m.states  -- conceptually; encoding as Nat
   start   := 0  -- encode start set
   isFinal := fun _ => false  -- placeholder
@@ -286,7 +286,7 @@ def subsetDFA (m : NFA) : DFA where
 
 -- The important thing: the path structure is preserved
 -- We model this as a path mapping from NFA state-set paths to DFA paths
-def subsetPathMap (m : NFA) (qs : List Nat) (w : Word) :
+noncomputable def subsetPathMap (m : NFA) (qs : List Nat) (w : Word) :
     Path (List Nat) qs (m.runStates qs w) :=
   m.transPath qs w
 
@@ -298,7 +298,7 @@ theorem subset_construction_path_preserved (m : NFA) (w : Word) :
 -- §10  Myhill-Nerode equivalence classes
 -- ============================================================
 
-def myhillNerode (L : Lang) (u v : Word) : Prop :=
+noncomputable def myhillNerode (L : Lang) (u v : Word) : Prop :=
   ∀ w : Word, L (wordConcat u w) ↔ L (wordConcat v w)
 
 -- MN is reflexive
@@ -317,12 +317,12 @@ theorem mn_trans (L : Lang) (u v x : Word)
   fun w => Iff.trans (h1 w) (h2 w)
 
 -- MN path: chain of equivalence steps
-def mnPath (L : Lang) (u v : Word) (h : myhillNerode L u v) :
+noncomputable def mnPath (L : Lang) (u v : Word) (h : myhillNerode L u v) :
     Path Word u v :=
   Path.single (.mk "myhill_nerode_equiv" u v)
 
 -- MN transitivity as path trans
-def mnTransPath (L : Lang) (u v x : Word)
+noncomputable def mnTransPath (L : Lang) (u v x : Word)
     (h1 : myhillNerode L u v) (h2 : myhillNerode L v x) :
     Path Word u x :=
   (mnPath L u v h1).trans (mnPath L v x h2)
@@ -345,16 +345,16 @@ structure PumpDecomp (w : Word) (p : Nat) where
   xy_bound : (wordConcat x y).length ≤ p
   y_nonempty : y.length ≥ 1
 
-def repeatWord (w : Word) : Nat → Word
+noncomputable def repeatWord (w : Word) : Nat → Word
   | 0 => []
   | n + 1 => w ++ repeatWord w n
 
 /-- Pumped word: xyⁱz -/
-def pumpWord (d : PumpDecomp w p) (i : Nat) : Word :=
+noncomputable def pumpWord (d : PumpDecomp w p) (i : Nat) : Word :=
   wordConcat d.x (wordConcat (repeatWord d.y i) d.z)
 
 -- Path from w to pumped version (i steps of unrolling)
-def pumpPath (d : PumpDecomp w p) (i : Nat) : Path Word w (pumpWord d i) :=
+noncomputable def pumpPath (d : PumpDecomp w p) (i : Nat) : Path Word w (pumpWord d i) :=
   Path.single (.mk s!"pump({i})" w (pumpWord d i))
 
 -- Pump 0 removes y
@@ -368,7 +368,7 @@ theorem pump_one_original (d : PumpDecomp w p) :
   simp [pumpWord, repeatWord, wordConcat]
 
 -- Pumping path chain: w → pump(0) → pump(1) → pump(2) via trans
-def pumpChain (d : PumpDecomp w p) :
+noncomputable def pumpChain (d : PumpDecomp w p) :
     Path Word w (pumpWord d 2) :=
   (pumpPath d 0).trans ((pumpPath d 0).symm.trans (pumpPath d 2))
 
@@ -393,7 +393,7 @@ structure StateElimRE (m : DFA) where
 
 -- Kleene roundtrip path: RE → NFA → DFA → RE'
 -- We model the conceptual chain as a 3-step path in RE space
-def kleeneRoundtrip (r : RE) : REPath r r :=
+noncomputable def kleeneRoundtrip (r : RE) : REPath r r :=
   (Path.single (.mk "thompson_construct" r r)).trans
     ((Path.single (.mk "subset_construct" r r)).trans
       (Path.single (.mk "state_eliminate" r r)))
@@ -406,7 +406,7 @@ theorem kleeneRoundtrip_three_steps (r : RE) :
 -- §13  Language equivalence as path bisimulation
 -- ============================================================
 
-def langEquiv (L₁ L₂ : Lang) : Prop := ∀ w, L₁ w ↔ L₂ w
+noncomputable def langEquiv (L₁ L₂ : Lang) : Prop := ∀ w, L₁ w ↔ L₂ w
 
 theorem langEquiv_refl (L : Lang) : langEquiv L L :=
   fun _ => Iff.rfl
@@ -419,11 +419,11 @@ theorem langEquiv_trans (h1 : langEquiv L₁ L₂) (h2 : langEquiv L₂ L₃) :
   fun w => Iff.trans (h1 w) (h2 w)
 
 -- Path witness for language equivalence chain
-def langEquivPath (L₁ L₂ : Lang) (h : langEquiv L₁ L₂) :
+noncomputable def langEquivPath (L₁ L₂ : Lang) (h : langEquiv L₁ L₂) :
     Path Lang L₁ L₂ :=
   Path.single (.mk "lang_equiv" L₁ L₂)
 
-def langEquivChain (L₁ L₂ L₃ : Lang)
+noncomputable def langEquivChain (L₁ L₂ L₃ : Lang)
     (h12 : langEquiv L₁ L₂) (h23 : langEquiv L₂ L₃) :
     Path Lang L₁ L₃ :=
   (langEquivPath L₁ L₂ h12).trans (langEquivPath L₂ L₃ h23)
@@ -459,7 +459,7 @@ theorem langUnion_empty (L : Lang) :
 
 -- Multi-step simplification path:
 -- (L₁ ∪ L₂) ∪ ∅ → L₁ ∪ L₂ → L₂ ∪ L₁
-def langSimplifyPath (L₁ L₂ : Lang) :
+noncomputable def langSimplifyPath (L₁ L₂ : Lang) :
     Path Lang (langUnion (langUnion L₁ L₂) emptyLang) (langUnion L₂ L₁) :=
   (langEquivPath _ _ (langUnion_empty (langUnion L₁ L₂))).trans
     (langEquivPath _ _ (langUnion_comm L₁ L₂))
@@ -472,7 +472,7 @@ theorem langSimplifyPath_length (L₁ L₂ : Lang) :
 -- §15  DFA complementation
 -- ============================================================
 
-def DFA.complement (m : DFA) : DFA where
+noncomputable def DFA.complement (m : DFA) : DFA where
   states  := m.states
   start   := m.start
   isFinal := fun q => !m.isFinal q
@@ -483,7 +483,7 @@ theorem dfa_complement_involution (m : DFA) (q : Nat) :
   simp [DFA.complement, Bool.not_not]
 
 -- Complement path: M → M̄ → M̄̄ = M  (on isFinal)
-def complementPath (m : DFA) :
+noncomputable def complementPath (m : DFA) :
     Path (Nat → Bool) m.isFinal m.isFinal :=
   (Path.single (.mk "complement" m.isFinal m.complement.isFinal)).trans
     ((Path.single (.mk "complement⁻¹" m.complement.isFinal
@@ -498,7 +498,7 @@ theorem complementPath_length (m : DFA) :
 -- §16  DFA product construction (intersection)
 -- ============================================================
 
-def DFA.product (m₁ m₂ : DFA) : DFA where
+noncomputable def DFA.product (m₁ m₂ : DFA) : DFA where
   states  := m₁.states * m₂.states
   start   := m₁.start * m₂.states + m₂.start  -- pair encoding
   isFinal := fun q => m₁.isFinal (q / m₂.states) && m₂.isFinal (q % m₂.states)
@@ -508,7 +508,7 @@ def DFA.product (m₁ m₂ : DFA) : DFA where
     m₁.delta q1 a * m₂.states + m₂.delta q2 a
 
 -- Product path mirrors both DFA paths simultaneously
-def productStepSync (m₁ m₂ : DFA) (q₁ q₂ : Nat) (a : Sigma) :
+noncomputable def productStepSync (m₁ m₂ : DFA) (q₁ q₂ : Nat) (a : Sigma) :
     Path Nat (q₁ * m₂.states + q₂)
              (m₁.delta q₁ a * m₂.states + m₂.delta q₂ a) :=
   Path.single (.mk s!"product_step({a})" _ _)
@@ -554,11 +554,11 @@ inductive DerivPath (g : CFG) : SForm → SForm → Type where
   | nil  : (s : SForm) → DerivPath g s s
   | cons : Derives g a b → DerivPath g b c → DerivPath g a c
 
-def DerivPath.trans : DerivPath g a b → DerivPath g b c → DerivPath g a c
+noncomputable def DerivPath.trans : DerivPath g a b → DerivPath g b c → DerivPath g a c
   | .nil _, q => q
   | .cons d rest, q => .cons d (rest.trans q)
 
-def DerivPath.length : DerivPath g a b → Nat
+noncomputable def DerivPath.length : DerivPath g a b → Nat
   | .nil _ => 0
   | .cons _ rest => 1 + rest.length
 
@@ -573,16 +573,16 @@ theorem derivPath_trans_length (p : DerivPath g a b) (q : DerivPath g b c) :
 -- ============================================================
 
 /-- A production is in CNF: A → BC or A → a -/
-def Production.isCNF (p : Production) : Bool :=
+noncomputable def Production.isCNF (p : Production) : Bool :=
   match p.rhs with
   | [GSymbol.nt _, GSymbol.nt _] => true
   | [GSymbol.term _]             => true
   | _                             => false
 
-def CFG.inCNF (g : CFG) : Prop := ∀ p ∈ g.prods, p.isCNF = true
+noncomputable def CFG.inCNF (g : CFG) : Prop := ∀ p ∈ g.prods, p.isCNF = true
 
 -- CNF conversion as path from original grammar to CNF grammar
-def cnfConversionPath (g₁ g₂ : CFG) : Path CFG g₁ g₂ :=
+noncomputable def cnfConversionPath (g₁ g₂ : CFG) : Path CFG g₁ g₂ :=
   (Path.single (.mk "eliminate_eps" g₁ g₁)).trans
     ((Path.single (.mk "eliminate_unit" g₁ g₁)).trans
       ((Path.single (.mk "break_long_rhs" g₁ g₁)).trans
@@ -601,11 +601,11 @@ structure CYKTable where
   entries : Nat → Nat → List NT   -- entries(i, len)
 
 /-- CYK fill step: filling table entry (i,len) from entries of shorter spans -/
-def cykFillStep (i len : Nat) : Step (Nat × Nat) (i, len - 1) (i, len) :=
+noncomputable def cykFillStep (i len : Nat) : Step (Nat × Nat) (i, len - 1) (i, len) :=
   .mk s!"cyk_fill({i},{len})" (i, len - 1) (i, len)
 
 -- Path through CYK table: filling from len=1 to len=n
-def cykFillPath (i : Nat) : (n : Nat) → Path (Nat × Nat) (i, 0) (i, n)
+noncomputable def cykFillPath (i : Nat) : (n : Nat) → Path (Nat × Nat) (i, 0) (i, n)
   | 0     => Path.nil (i, 0)
   | n + 1 => (cykFillPath i n).trans (Path.single (cykFillStep i (n + 1)))
 
@@ -625,21 +625,21 @@ inductive DTree (g : CFG) where
   | leaf : Sigma → DTree g
   | node : (p : Production) → p ∈ g.prods → List (DTree g) → DTree g
 
-def DTree.depth : DTree g → Nat
+noncomputable def DTree.depth : DTree g → Nat
   | .leaf _ => 0
   | .node _ _ children => 1 + (children.map DTree.depth).foldl max 0
 
-def DTree.yield : DTree g → List Sigma
+noncomputable def DTree.yield : DTree g → List Sigma
   | .leaf a => [a]
   | .node _ _ children => children.flatMap DTree.yield
 
 -- Tree depth as Nat value
-@[simp] def DTree.depthVal : DTree g → Nat
+@[simp] noncomputable def DTree.depthVal : DTree g → Nat
   | .leaf _ => 0
   | .node _ _ children => 1 + (children.map DTree.depthVal).foldl max 0
 
 -- Path witnessing tree exploration
-def DTree.explorePath : (t : DTree g) → Path Nat 0 t.depthVal
+noncomputable def DTree.explorePath : (t : DTree g) → Path Nat 0 t.depthVal
   | .leaf _ => by simp [DTree.depthVal]; exact Path.nil 0
   | .node _ _ children => by
     simp [DTree.depthVal]
@@ -649,10 +649,10 @@ def DTree.explorePath : (t : DTree g) → Path Nat 0 t.depthVal
 -- §21  Ambiguity
 -- ============================================================
 
-def CFG.isAmbiguous (g : CFG) : Prop :=
+noncomputable def CFG.isAmbiguous (g : CFG) : Prop :=
   ∃ (w : Word) (t₁ t₂ : DTree g), t₁.yield = w ∧ t₂.yield = w ∧ t₁ ≠ t₂
 
-def CFG.isUnambiguous (g : CFG) : Prop := ¬ g.isAmbiguous
+noncomputable def CFG.isUnambiguous (g : CFG) : Prop := ¬ g.isAmbiguous
 
 -- Ambiguity witness as branching paths
 -- Two different derivation paths for the same word
@@ -665,7 +665,7 @@ structure AmbiguityWitness (g : CFG) (w : SForm) where
 -- §22  Star height and RE complexity
 -- ============================================================
 
-def RE.starHeight : RE → Nat
+noncomputable def RE.starHeight : RE → Nat
   | .empty => 0
   | .eps   => 0
   | .sym _ => 0
@@ -686,7 +686,7 @@ theorem star_height_star (r : RE) :
   simp [RE.starHeight]
 
 -- Path showing star-height preservation through RE transformations
-def starHeightPreserved (r s : RE) (h : r.starHeight = s.starHeight) :
+noncomputable def starHeightPreserved (r s : RE) (h : r.starHeight = s.starHeight) :
     Path Nat r.starHeight s.starHeight :=
   h ▸ Path.nil r.starHeight
 
@@ -694,7 +694,7 @@ def starHeightPreserved (r s : RE) (h : r.starHeight = s.starHeight) :
 -- §23  RE size and path complexity
 -- ============================================================
 
-def RE.size : RE → Nat
+noncomputable def RE.size : RE → Nat
   | .empty => 1
   | .eps   => 1
   | .sym _ => 1
@@ -713,14 +713,14 @@ theorem re_size_union (r s : RE) :
 -- §24  Language reversal
 -- ============================================================
 
-def langReverse (L : Lang) : Lang := fun w => L w.reverse
+noncomputable def langReverse (L : Lang) : Lang := fun w => L w.reverse
 
 theorem langReverse_involution (L : Lang) :
     langEquiv (langReverse (langReverse L)) L :=
   fun w => by simp [langReverse, List.reverse_reverse]
 
 -- Reversal path: L → L^R → L^RR = L (3-step roundtrip)
-def reversalRoundtrip (L : Lang) : Path Lang L L :=
+noncomputable def reversalRoundtrip (L : Lang) : Path Lang L L :=
   (Path.single (.mk "reverse" L (langReverse L))).trans
     ((Path.single (.mk "reverse" (langReverse L) (langReverse (langReverse L)))).trans
       (Path.single (.mk "involution" (langReverse (langReverse L)) L)))
@@ -733,8 +733,8 @@ theorem reversalRoundtrip_length (L : Lang) :
 -- §25  Word prefix / suffix relations
 -- ============================================================
 
-def isPrefix (u w : Word) : Prop := ∃ v, w = wordConcat u v
-def isSuffix (v w : Word) : Prop := ∃ u, w = wordConcat u v
+noncomputable def isPrefix (u w : Word) : Prop := ∃ v, w = wordConcat u v
+noncomputable def isSuffix (v w : Word) : Prop := ∃ u, w = wordConcat u v
 
 theorem prefix_nil (w : Word) : isPrefix [] w :=
   ⟨w, rfl⟩
@@ -749,7 +749,7 @@ theorem prefix_trans (h1 : isPrefix u v) (h2 : isPrefix v w) :
   exact ⟨wordConcat s1 s2, by simp [wordConcat, List.append_assoc]⟩
 
 -- Prefix chain as path
-def prefixChainPath (u v w : Word)
+noncomputable def prefixChainPath (u v w : Word)
     (h1 : isPrefix u v) (h2 : isPrefix v w) : Path Word u w :=
   (Path.single (.mk "prefix_extend" u v)).trans
     (Path.single (.mk "prefix_extend" v w))
@@ -764,7 +764,7 @@ theorem prefixChainPath_length (u v w : Word)
 -- ============================================================
 
 -- States are equivalent if they accept the same future words
-def stateEquiv (m : DFA) (q₁ q₂ : Nat) : Prop :=
+noncomputable def stateEquiv (m : DFA) (q₁ q₂ : Nat) : Prop :=
   ∀ w : Word, m.isFinal (m.run q₁ w) = m.isFinal (m.run q₂ w)
 
 theorem stateEquiv_refl (m : DFA) (q : Nat) : stateEquiv m q q :=
@@ -780,7 +780,7 @@ theorem stateEquiv_trans (m : DFA) (q₁ q₂ q₃ : Nat)
   fun w => Trans.trans (h1 w) (h2 w)
 
 -- Minimization as collapsing equivalent states: multi-step path
-def minimizePath (m : DFA) (q₁ q₂ q₃ : Nat)
+noncomputable def minimizePath (m : DFA) (q₁ q₂ q₃ : Nat)
     (h1 : stateEquiv m q₁ q₂) (h2 : stateEquiv m q₂ q₃) :
     Path Nat q₁ q₃ :=
   (Path.single (.mk "merge_equiv" q₁ q₂)).trans
@@ -790,7 +790,7 @@ def minimizePath (m : DFA) (q₁ q₂ q₃ : Nat)
 -- §27  Distinguishing suffixes
 -- ============================================================
 
-def distinguishes (m : DFA) (w : Word) (q₁ q₂ : Nat) : Prop :=
+noncomputable def distinguishes (m : DFA) (w : Word) (q₁ q₂ : Nat) : Prop :=
   m.isFinal (m.run q₁ w) ≠ m.isFinal (m.run q₂ w)
 
 theorem distinguish_symm (m : DFA) (w : Word) (q₁ q₂ : Nat)
@@ -803,7 +803,7 @@ theorem distinguish_symm (m : DFA) (w : Word) (q₁ q₂ : Nat)
 
 -- Union closure path: L₁ regular, L₂ regular ⇒ L₁ ∪ L₂ regular
 -- 3-step: build NFA₁, build NFA₂, combine with new start
-def unionClosurePath (r₁ r₂ : RE) :
+noncomputable def unionClosurePath (r₁ r₂ : RE) :
     REPath (RE.union r₁ r₂) (RE.union r₁ r₂) :=
   let e := RE.union r₁ r₂
   (Path.single (.mk "build_nfa1" e e)).trans
@@ -818,7 +818,7 @@ theorem unionClosurePath_length (r₁ r₂ : RE) :
 -- §29  RE derivatives (Brzozowski)
 -- ============================================================
 
-def RE.nullable : RE → Bool
+noncomputable def RE.nullable : RE → Bool
   | .empty => false
   | .eps   => true
   | .sym _ => false
@@ -826,7 +826,7 @@ def RE.nullable : RE → Bool
   | .cat r s   => r.nullable && s.nullable
   | .star _    => true
 
-def RE.derivative (a : Sigma) : RE → RE
+noncomputable def RE.derivative (a : Sigma) : RE → RE
   | .empty => .empty
   | .eps   => .empty
   | .sym b => if a == b then .eps else .empty
@@ -837,7 +837,7 @@ def RE.derivative (a : Sigma) : RE → RE
   | .star r => .cat (r.derivative a) (.star r)
 
 -- Derivative chain: path through successive derivatives
-def derivativeChainPath (r : RE) : (w : Word) → REPath r (w.foldl (fun r a => r.derivative a) r)
+noncomputable def derivativeChainPath (r : RE) : (w : Word) → REPath r (w.foldl (fun r a => r.derivative a) r)
   | []     => Path.nil r
   | a :: w =>
     let r' := r.derivative a
@@ -856,23 +856,23 @@ theorem derivativeChain_length (r : RE) (w : Word) :
 -- ============================================================
 
 -- (r ∪ s)* = (r* · s*)* via path chain
-def starUnionPath (r s : RE) :
+noncomputable def starUnionPath (r s : RE) :
     REPath (RE.star (RE.union r s)) (RE.star (RE.cat (RE.star r) (RE.star s))) :=
   let mid := RE.star (RE.cat r (RE.star s))
   (Path.single (.mk "star_union_expand" _ mid)).trans
     (Path.single (.mk "star_interleave" mid _))
 
 -- r** = r* (star idempotent)
-def starIdempotent (r : RE) :
+noncomputable def starIdempotent (r : RE) :
     REPath (RE.star (RE.star r)) (RE.star r) :=
   Path.single (.mk "star_idempotent" _ _)
 
 -- ∅* = ε
-def emptyStarEps : REPath (RE.star .empty) .eps :=
+noncomputable def emptyStarEps : REPath (RE.star .empty) .eps :=
   Path.single (.mk "empty_star_eps" _ _)
 
 -- 3-step: ∅** → ∅* → ε → ε (ε = ε)
-def emptyStarChain : REPath (RE.star (RE.star .empty)) .eps :=
+noncomputable def emptyStarChain : REPath (RE.star (RE.star .empty)) .eps :=
   (starIdempotent .empty).trans emptyStarEps
 
 theorem emptyStarChain_length : (emptyStarChain).length = 2 := by
@@ -883,12 +883,12 @@ theorem emptyStarChain_length : (emptyStarChain).length = 2 := by
 -- §31  Transport: from DFA acceptance to language membership
 -- ============================================================
 
-def transport_dfa_lang (m : DFA) (w : Word) (h : m.accepts w = true) :
+noncomputable def transport_dfa_lang (m : DFA) (w : Word) (h : m.accepts w = true) :
     m.language w :=
   h
 
 -- Path-based transport: carry acceptance proof along DFA path
-def acceptanceTransport (m : DFA) (w : Word) (h : m.accepts w = true) :
+noncomputable def acceptanceTransport (m : DFA) (w : Word) (h : m.accepts w = true) :
     Path Bool (m.accepts w) true :=
   h ▸ Path.nil true
 
@@ -904,7 +904,7 @@ structure ENFA where
   delta   : Nat → Sigma → List Nat
   epsDelta : Nat → List Nat  -- ε-transitions
 
-def ENFA.epsClosure (m : ENFA) (qs : List Nat) (fuel : Nat) : List Nat :=
+noncomputable def ENFA.epsClosure (m : ENFA) (qs : List Nat) (fuel : Nat) : List Nat :=
   match fuel with
   | 0 => qs
   | fuel + 1 =>
@@ -914,7 +914,7 @@ def ENFA.epsClosure (m : ENFA) (qs : List Nat) (fuel : Nat) : List Nat :=
     else m.epsClosure combined fuel
 
 -- ε-closure path: iteratively expanding reachable states
-def epsClosurePath (m : ENFA) (qs : List Nat) (fuel : Nat) :
+noncomputable def epsClosurePath (m : ENFA) (qs : List Nat) (fuel : Nat) :
     Path (List Nat) qs (m.epsClosure qs fuel) :=
   Path.single (.mk "eps_closure" qs (m.epsClosure qs fuel))
 
@@ -931,12 +931,12 @@ theorem langUnion_congr (h1 : langEquiv L₁ L₁') (h2 : langEquiv L₂ L₂') 
                              (fun a => Or.inr ((h2 w).mpr a))⟩
 
 -- congrArg-style path: lift equivalence through langUnion
-def langUnionCongrPath (L₁ L₁' L₂ : Lang) (h : langEquiv L₁ L₁') :
+noncomputable def langUnionCongrPath (L₁ L₁' L₂ : Lang) (h : langEquiv L₁ L₁') :
     Path Lang (langUnion L₁ L₂) (langUnion L₁' L₂) :=
   Path.single (.mk "union_congrArg_left" _ _)
 
 -- Multi-step: rewrite both sides
-def langUnionCongrBothPath (L₁ L₁' L₂ L₂' : Lang)
+noncomputable def langUnionCongrBothPath (L₁ L₁' L₂ L₂' : Lang)
     (h1 : langEquiv L₁ L₁') (h2 : langEquiv L₂ L₂') :
     Path Lang (langUnion L₁ L₂) (langUnion L₁' L₂') :=
   (langUnionCongrPath L₁ L₁' L₂ h1).trans
@@ -966,11 +966,11 @@ inductive RERewrite : RE → RE → Prop where
   | union_idem     : RERewrite (.union r r) r
 
 -- Rewriting path
-def rewritePath (h : RERewrite r₁ r₂) : REPath r₁ r₂ :=
+noncomputable def rewritePath (h : RERewrite r₁ r₂) : REPath r₁ r₂ :=
   Path.single (.mk "re_rewrite" r₁ r₂)
 
 -- Multi-step rewriting: (∅ ∪ ε)* → ε* → ε
-def multiRewriteExample : REPath (RE.star (RE.union .empty .eps))
+noncomputable def multiRewriteExample : REPath (RE.star (RE.union .empty .eps))
                                   .eps :=
   (Path.single (.mk "union_empty_l_in_star" _ (RE.star .eps))).trans
     (Path.single (.mk "star_eps" (RE.star .eps) .eps))
@@ -984,7 +984,7 @@ theorem multiRewriteExample_length :
 -- ============================================================
 
 -- Symmetric closure of rewriting
-def rewriteSymmPath (h : RERewrite r₁ r₂) : REPath r₂ r₁ :=
+noncomputable def rewriteSymmPath (h : RERewrite r₁ r₂) : REPath r₂ r₁ :=
   (rewritePath h).symm
 
 theorem rewriteSymm_length (h : RERewrite r₁ r₂) :
@@ -1003,7 +1003,7 @@ structure Confluence (r s t : RE) where
   pathT : REPath t u
 
 -- Diamond property witness via paths
-def diamondWitness (r s t u : RE)
+noncomputable def diamondWitness (r s t u : RE)
     (ps : REPath r s) (pt : REPath r t) (qs : REPath s u) (qt : REPath t u) :
     Cell2 (ps.trans qs) (pt.trans qt) → Prop :=
   fun _ => True
@@ -1041,7 +1041,7 @@ theorem nullable_cat (r s : RE) :
 -- ============================================================
 
 -- Derivative of concatenated input = iterated derivative
-def RE.wordDerivative (w : Word) (r : RE) : RE :=
+noncomputable def RE.wordDerivative (w : Word) (r : RE) : RE :=
   w.foldl (fun r a => r.derivative a) r
 
 theorem wordDerivative_nil (r : RE) : RE.wordDerivative [] r = r := rfl
@@ -1051,7 +1051,7 @@ theorem wordDerivative_cons (a : Sigma) (w : Word) (r : RE) :
   simp [RE.wordDerivative]
 
 -- Path through word derivative chain
-def wordDerivativePath (w : Word) (r : RE) :
+noncomputable def wordDerivativePath (w : Word) (r : RE) :
     REPath r (RE.wordDerivative w r) :=
   derivativeChainPath r w
 
@@ -1059,7 +1059,7 @@ def wordDerivativePath (w : Word) (r : RE) :
 -- §40  Language emptiness as path property
 -- ============================================================
 
-def Lang.isEmpty (L : Lang) : Prop := ∀ w, ¬ L w
+noncomputable def Lang.isEmpty (L : Lang) : Prop := ∀ w, ¬ L w
 
 theorem emptyLang_isEmpty : Lang.isEmpty emptyLang :=
   fun _ h => h
@@ -1070,7 +1070,7 @@ theorem langUnion_empty_both (L₁ L₂ : Lang)
   fun w h => h.elim (h1 w) (h2 w)
 
 -- Emptiness check path: reduce then check
-def emptinessCheckPath (L : Lang) : Path Bool true true :=
+noncomputable def emptinessCheckPath (L : Lang) : Path Bool true true :=
   (Path.single (.mk "reduce_to_dfa" true true)).trans
     ((Path.single (.mk "check_reachable_finals" true true)).trans
       (Path.single (.mk "report_result" true true)))
@@ -1085,7 +1085,7 @@ theorem emptinessCheckPath_length (L : Lang) :
 
 -- The RE rewriting system's critical pairs all resolve
 -- Witnessed by path confluence diagrams
-def reCoherence (r : RE) :
+noncomputable def reCoherence (r : RE) :
     Cell2 (Path.nil r) (Path.nil r) :=
   Cell2.id (Path.nil r)
 
@@ -1105,7 +1105,7 @@ theorem coherence_assoc (p : Path α a b) (q : Path α b c) (r : Path α c d) :
 
 -- A 6-step path encoding the main development:
 -- RE → NFA → DFA → minimize → complement → back to RE
-def grandTourPath (r : RE) : REPath r r :=
+noncomputable def grandTourPath (r : RE) : REPath r r :=
   (Path.single (.mk "thompson" r r)).trans
     ((Path.single (.mk "subset_construction" r r)).trans
       ((Path.single (.mk "minimize" r r)).trans

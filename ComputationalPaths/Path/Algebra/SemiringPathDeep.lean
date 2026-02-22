@@ -42,38 +42,38 @@ variable {S : Type u}
 -- ============================================================================
 -- Def 1: Double zero addition
 -- ============================================================================
-def semiring_add_zero_zero (R : PathSemiring S) : Path (R.add R.zero R.zero) R.zero :=
+noncomputable def semiring_add_zero_zero (R : PathSemiring S) : Path (R.add R.zero R.zero) R.zero :=
   R.add_zero_right R.zero
 
 -- ============================================================================
 -- Def 2: Multiply one by one
 -- ============================================================================
-def semiring_mul_one_one (R : PathSemiring S) : Path (R.mul R.one R.one) R.one :=
+noncomputable def semiring_mul_one_one (R : PathSemiring S) : Path (R.mul R.one R.one) R.one :=
   R.mul_one_right R.one
 
 -- ============================================================================
 -- Def 3: Zero times one
 -- ============================================================================
-def semiring_zero_mul_one (R : PathSemiring S) : Path (R.mul R.zero R.one) R.zero :=
+noncomputable def semiring_zero_mul_one (R : PathSemiring S) : Path (R.mul R.zero R.one) R.zero :=
   R.mul_zero_left R.one
 
 -- ============================================================================
 -- Def 4: One times zero
 -- ============================================================================
-def semiring_one_mul_zero (R : PathSemiring S) : Path (R.mul R.one R.zero) R.zero :=
+noncomputable def semiring_one_mul_zero (R : PathSemiring S) : Path (R.mul R.one R.zero) R.zero :=
   R.mul_zero_right R.one
 
 -- ============================================================================
 -- Def 5: Add comm applied twice is identity path (up to proof)
 -- ============================================================================
-def semiring_add_comm_twice (R : PathSemiring S) (a b : S) :
+noncomputable def semiring_add_comm_twice (R : PathSemiring S) (a b : S) :
     Path (R.add a b) (R.add a b) :=
   Path.trans (R.add_comm a b) (R.add_comm b a)
 
 -- ============================================================================
 -- Def 6: Triple addition reassociation
 -- ============================================================================
-def semiring_triple_add_assoc (R : PathSemiring S) (a b c d : S) :
+noncomputable def semiring_triple_add_assoc (R : PathSemiring S) (a b c d : S) :
     Path (R.add (R.add (R.add a b) c) d) (R.add a (R.add b (R.add c d))) :=
   Path.trans (R.add_assoc (R.add a b) c d)
     (R.add_assoc a b (R.add c d))
@@ -81,14 +81,14 @@ def semiring_triple_add_assoc (R : PathSemiring S) (a b c d : S) :
 -- ============================================================================
 -- Def 7: Distributivity with zero sum
 -- ============================================================================
-def semiring_dist_zero_sum (R : PathSemiring S) (a : S) :
+noncomputable def semiring_dist_zero_sum (R : PathSemiring S) (a : S) :
     Path (R.mul a (R.add R.zero R.zero)) (R.add (R.mul a R.zero) (R.mul a R.zero)) :=
   R.mul_dist_left a R.zero R.zero
 
 -- ============================================================================
 -- Def 8: Left distributivity then annihilation
 -- ============================================================================
-def semiring_dist_then_annihilate (R : PathSemiring S) (a : S) :
+noncomputable def semiring_dist_then_annihilate (R : PathSemiring S) (a : S) :
     Path (R.mul a (R.add R.zero R.zero)) R.zero :=
   Path.trans (R.mul_dist_left a R.zero R.zero)
     (Path.trans (Path.congrArg (fun x => R.add x (R.mul a R.zero)) (R.mul_zero_right a))
@@ -98,14 +98,14 @@ def semiring_dist_then_annihilate (R : PathSemiring S) (a : S) :
 -- ============================================================================
 -- Def 9: Mul commutes with add_zero via paths
 -- ============================================================================
-def semiring_mul_add_zero (R : PathSemiring S) (a b : S) :
+noncomputable def semiring_mul_add_zero (R : PathSemiring S) (a b : S) :
     Path (R.mul a (R.add b R.zero)) (R.mul a b) :=
   Path.congrArg (fun x => R.mul a x) (R.add_zero_right b)
 
 -- ============================================================================
 -- Def 10: Mul one on both sides
 -- ============================================================================
-def semiring_one_mul_one_right (R : PathSemiring S) (a : S) :
+noncomputable def semiring_one_mul_one_right (R : PathSemiring S) (a : S) :
     Path (R.mul (R.mul R.one a) R.one) a :=
   Path.trans (R.mul_one_right (R.mul R.one a))
     (R.mul_one_left a)
@@ -125,31 +125,31 @@ variable {T : Type u}
 -- ============================================================================
 -- Def 11: Negation of zero path
 -- ============================================================================
-def ring_neg_zero (Ring : PathRing T) :
+noncomputable def ring_neg_zero (Ring : PathRing T) :
     Path (Ring.add (Ring.neg Ring.zero) Ring.zero) Ring.zero :=
   Ring.add_neg_left Ring.zero
 
 -- ============================================================================
 -- Def 12: Double negation path
 -- ============================================================================
-def ring_double_neg_add (Ring : PathRing T) (a : T) :
+noncomputable def ring_double_neg_add (Ring : PathRing T) (a : T) :
     Path (Ring.add (Ring.neg (Ring.neg a)) (Ring.neg a)) Ring.zero :=
   Ring.add_neg_left (Ring.neg a)
 
 -- ============================================================================
 -- Def 13: Subtraction as addition of negation
 -- ============================================================================
-def ring_sub {T : Type u} (Ring : PathRing T) (a b : T) : T :=
+noncomputable def ring_sub {T : Type u} (Ring : PathRing T) (a b : T) : T :=
   Ring.add a (Ring.neg b)
 
-def ring_sub_self (Ring : PathRing T) (a : T) :
+noncomputable def ring_sub_self (Ring : PathRing T) (a : T) :
     Path (ring_sub Ring a a) Ring.zero :=
   Ring.add_neg_right a
 
 -- ============================================================================
 -- Def 14: a - 0 via path
 -- ============================================================================
-def ring_sub_zero_path (Ring : PathRing T) (a : T) :
+noncomputable def ring_sub_zero_path (Ring : PathRing T) (a : T) :
     Path (ring_sub Ring a Ring.zero) a :=
   Path.trans
     (Path.congrArg (fun x => Ring.add a x)
@@ -160,14 +160,14 @@ def ring_sub_zero_path (Ring : PathRing T) (a : T) :
 -- ============================================================================
 -- Def 15: 0 - a = -a
 -- ============================================================================
-def ring_zero_sub (Ring : PathRing T) (a : T) :
+noncomputable def ring_zero_sub (Ring : PathRing T) (a : T) :
     Path (ring_sub Ring Ring.zero a) (Ring.neg a) :=
   Ring.add_zero_left (Ring.neg a)
 
 -- ============================================================================
 -- Def 16: -a + (a + b) = b via path
 -- ============================================================================
-def ring_neg_add_cancel_left (Ring : PathRing T) (a b : T) :
+noncomputable def ring_neg_add_cancel_left (Ring : PathRing T) (a b : T) :
     Path (Ring.add (Ring.neg a) (Ring.add a b)) b :=
   Path.trans (Path.symm (Ring.add_assoc (Ring.neg a) a b))
     (Path.trans (Path.congrArg (fun x => Ring.add x b) (Ring.add_neg_left a))
@@ -176,7 +176,7 @@ def ring_neg_add_cancel_left (Ring : PathRing T) (a b : T) :
 -- ============================================================================
 -- Def 17: Right cancellation via negation
 -- ============================================================================
-def ring_add_neg_cancel_right (Ring : PathRing T) (a b : T) :
+noncomputable def ring_add_neg_cancel_right (Ring : PathRing T) (a b : T) :
     Path (Ring.add (Ring.add a b) (Ring.neg b)) a :=
   Path.trans (Ring.add_assoc a b (Ring.neg b))
     (Path.trans (Path.congrArg (fun x => Ring.add a x) (Ring.add_neg_right b))
@@ -197,7 +197,7 @@ structure PathRingHom {S T : Type u} (RS : PathRing S) (RT : PathRing T) where
 -- ============================================================================
 -- Def 18: Homomorphism preserves negation
 -- ============================================================================
-def hom_preserve_neg {S T : Type u} (RS : PathRing S) (RT : PathRing T)
+noncomputable def hom_preserve_neg {S T : Type u} (RS : PathRing S) (RT : PathRing T)
     (h : PathRingHom RS RT) (a : S) :
     Path (RT.add (h.f a) (h.f (RS.neg a))) RT.zero :=
   Path.trans (Path.symm (h.preserve_add a (RS.neg a)))
@@ -207,7 +207,7 @@ def hom_preserve_neg {S T : Type u} (RS : PathRing S) (RT : PathRing T)
 -- ============================================================================
 -- Def 19: Composition of homomorphisms preserves zero
 -- ============================================================================
-def hom_comp_preserve_zero {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
+noncomputable def hom_comp_preserve_zero {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
     (h1 : PathRingHom RS RT) (h2 : PathRingHom RT RU) :
     Path (h2.f (h1.f RS.zero)) RU.zero :=
   Path.trans (Path.congrArg h2.f h1.preserve_zero) h2.preserve_zero
@@ -215,7 +215,7 @@ def hom_comp_preserve_zero {S T U : Type u} {RS : PathRing S} {RT : PathRing T} 
 -- ============================================================================
 -- Def 20: Composition preserves one
 -- ============================================================================
-def hom_comp_preserve_one {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
+noncomputable def hom_comp_preserve_one {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
     (h1 : PathRingHom RS RT) (h2 : PathRingHom RT RU) :
     Path (h2.f (h1.f RS.one)) RU.one :=
   Path.trans (Path.congrArg h2.f h1.preserve_one) h2.preserve_one
@@ -223,7 +223,7 @@ def hom_comp_preserve_one {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {
 -- ============================================================================
 -- Def 21: Composition preserves addition
 -- ============================================================================
-def hom_comp_preserve_add {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
+noncomputable def hom_comp_preserve_add {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
     (h1 : PathRingHom RS RT) (h2 : PathRingHom RT RU) (a b : S) :
     Path (h2.f (h1.f (RS.add a b))) (RU.add (h2.f (h1.f a)) (h2.f (h1.f b))) :=
   Path.trans (Path.congrArg h2.f (h1.preserve_add a b))
@@ -232,7 +232,7 @@ def hom_comp_preserve_add {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {
 -- ============================================================================
 -- Def 22: Composition preserves multiplication
 -- ============================================================================
-def hom_comp_preserve_mul {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
+noncomputable def hom_comp_preserve_mul {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
     (h1 : PathRingHom RS RT) (h2 : PathRingHom RT RU) (a b : S) :
     Path (h2.f (h1.f (RS.mul a b))) (RU.mul (h2.f (h1.f a)) (h2.f (h1.f b))) :=
   Path.trans (Path.congrArg h2.f (h1.preserve_mul a b))
@@ -270,7 +270,7 @@ structure PathIdeal {S : Type u} (R : PathRing S) where
 -- ============================================================================
 -- Def 23: Every two-sided ideal is a left ideal
 -- ============================================================================
-def ideal_to_left {S : Type u} {R : PathRing S} (I : PathIdeal R) : PathLeftIdeal R where
+noncomputable def ideal_to_left {S : Type u} {R : PathRing S} (I : PathIdeal R) : PathLeftIdeal R where
   mem := I.mem
   zero_mem := I.zero_mem
   add_mem := I.add_mem
@@ -280,7 +280,7 @@ def ideal_to_left {S : Type u} {R : PathRing S} (I : PathIdeal R) : PathLeftIdea
 -- ============================================================================
 -- Def 24: Every two-sided ideal is a right ideal
 -- ============================================================================
-def ideal_to_right {S : Type u} {R : PathRing S} (I : PathIdeal R) : PathRightIdeal R where
+noncomputable def ideal_to_right {S : Type u} {R : PathRing S} (I : PathIdeal R) : PathRightIdeal R where
   mem := I.mem
   zero_mem := I.zero_mem
   add_mem := I.add_mem
@@ -408,7 +408,7 @@ structure PathCRT {S : Type u} (R : PathRing S) where
 -- ============================================================================
 -- Def 34: CRT witnesses sum to one
 -- ============================================================================
-def crt_sum_one {S : Type u} {R : PathRing S} (crt : PathCRT R) :
+noncomputable def crt_sum_one {S : Type u} {R : PathRing S} (crt : PathCRT R) :
     Path (R.add crt.coprime_witness_r crt.coprime_witness_s) R.one :=
   crt.coprime_sum
 
@@ -448,14 +448,14 @@ structure PathPolySemiring (S : Type u) (R : PathSemiring S) where
 -- ============================================================================
 -- Def 37: Polynomial zero has zero coefficients
 -- ============================================================================
-def poly_zero_coeff {S : Type u} {R : PathSemiring S} (PS : PathPolySemiring S R) (n : Nat) :
+noncomputable def poly_zero_coeff {S : Type u} {R : PathSemiring S} (PS : PathPolySemiring S R) (n : Nat) :
     Path (PS.coeff PS.zero_poly n) R.zero :=
   PS.zero_coeff n
 
 -- ============================================================================
 -- Def 38: Polynomial addition is associative
 -- ============================================================================
-def poly_add_assoc {S : Type u} {R : PathSemiring S} (PS : PathPolySemiring S R)
+noncomputable def poly_add_assoc {S : Type u} {R : PathSemiring S} (PS : PathPolySemiring S R)
     (p q r : PS.Poly) :
     Path (PS.add_poly (PS.add_poly p q) r) (PS.add_poly p (PS.add_poly q r)) :=
   PS.add_assoc_poly p q r
@@ -463,7 +463,7 @@ def poly_add_assoc {S : Type u} {R : PathSemiring S} (PS : PathPolySemiring S R)
 -- ============================================================================
 -- Def 39: Polynomial add zero right
 -- ============================================================================
-def poly_add_zero {S : Type u} {R : PathSemiring S} (PS : PathPolySemiring S R)
+noncomputable def poly_add_zero {S : Type u} {R : PathSemiring S} (PS : PathPolySemiring S R)
     (p : PS.Poly) :
     Path (PS.add_poly p PS.zero_poly) p :=
   PS.add_zero_right_poly p
@@ -482,7 +482,7 @@ structure PathEvalHom {S : Type u} (R : PathSemiring S) (PS : PathPolySemiring S
 -- ============================================================================
 -- Def 40: Evaluation at zero of zero polynomial
 -- ============================================================================
-def eval_zero_at_zero {S : Type u} {R : PathSemiring S} {PS : PathPolySemiring S R}
+noncomputable def eval_zero_at_zero {S : Type u} {R : PathSemiring S} {PS : PathPolySemiring S R}
     (E : PathEvalHom R PS) :
     Path (E.eval PS.zero_poly R.zero) R.zero :=
   E.eval_zero R.zero
@@ -490,7 +490,7 @@ def eval_zero_at_zero {S : Type u} {R : PathSemiring S} {PS : PathPolySemiring S
 -- ============================================================================
 -- Def 41: Evaluation preserves addition
 -- ============================================================================
-def eval_preserves_add {S : Type u} {R : PathSemiring S} {PS : PathPolySemiring S R}
+noncomputable def eval_preserves_add {S : Type u} {R : PathSemiring S} {PS : PathPolySemiring S R}
     (E : PathEvalHom R PS) (p q : PS.Poly) (x : S) :
     Path (E.eval (PS.add_poly p q) x) (R.add (E.eval p x) (E.eval q x)) :=
   E.eval_add p q x
@@ -506,20 +506,20 @@ structure PathMatrix2x2 (S : Type u) (R : PathSemiring S) where
   a21 : S
   a22 : S
 
-def matrix_add {S : Type u} (R : PathSemiring S)
+noncomputable def matrix_add {S : Type u} (R : PathSemiring S)
     (A B : PathMatrix2x2 S R) : PathMatrix2x2 S R where
   a11 := R.add A.a11 B.a11
   a12 := R.add A.a12 B.a12
   a21 := R.add A.a21 B.a21
   a22 := R.add A.a22 B.a22
 
-def matrix_zero {S : Type u} (R : PathSemiring S) : PathMatrix2x2 S R where
+noncomputable def matrix_zero {S : Type u} (R : PathSemiring S) : PathMatrix2x2 S R where
   a11 := R.zero
   a12 := R.zero
   a21 := R.zero
   a22 := R.zero
 
-def matrix_mul {S : Type u} (R : PathSemiring S)
+noncomputable def matrix_mul {S : Type u} (R : PathSemiring S)
     (A B : PathMatrix2x2 S R) : PathMatrix2x2 S R where
   a11 := R.add (R.mul A.a11 B.a11) (R.mul A.a12 B.a21)
   a12 := R.add (R.mul A.a11 B.a12) (R.mul A.a12 B.a22)
@@ -529,35 +529,35 @@ def matrix_mul {S : Type u} (R : PathSemiring S)
 -- ============================================================================
 -- Def 42: Matrix add zero right (component a11)
 -- ============================================================================
-def matrix_add_zero_a11 {S : Type u} (R : PathSemiring S) (A : PathMatrix2x2 S R) :
+noncomputable def matrix_add_zero_a11 {S : Type u} (R : PathSemiring S) (A : PathMatrix2x2 S R) :
     Path (matrix_add R A (matrix_zero R)).a11 A.a11 :=
   R.add_zero_right A.a11
 
 -- ============================================================================
 -- Def 43: Matrix add zero right (component a12)
 -- ============================================================================
-def matrix_add_zero_a12 {S : Type u} (R : PathSemiring S) (A : PathMatrix2x2 S R) :
+noncomputable def matrix_add_zero_a12 {S : Type u} (R : PathSemiring S) (A : PathMatrix2x2 S R) :
     Path (matrix_add R A (matrix_zero R)).a12 A.a12 :=
   R.add_zero_right A.a12
 
 -- ============================================================================
 -- Def 44: Matrix add zero right (component a21)
 -- ============================================================================
-def matrix_add_zero_a21 {S : Type u} (R : PathSemiring S) (A : PathMatrix2x2 S R) :
+noncomputable def matrix_add_zero_a21 {S : Type u} (R : PathSemiring S) (A : PathMatrix2x2 S R) :
     Path (matrix_add R A (matrix_zero R)).a21 A.a21 :=
   R.add_zero_right A.a21
 
 -- ============================================================================
 -- Def 45: Matrix add zero right (component a22)
 -- ============================================================================
-def matrix_add_zero_a22 {S : Type u} (R : PathSemiring S) (A : PathMatrix2x2 S R) :
+noncomputable def matrix_add_zero_a22 {S : Type u} (R : PathSemiring S) (A : PathMatrix2x2 S R) :
     Path (matrix_add R A (matrix_zero R)).a22 A.a22 :=
   R.add_zero_right A.a22
 
 -- ============================================================================
 -- Def 46: Matrix add commutativity (component a11)
 -- ============================================================================
-def matrix_add_comm_a11 {S : Type u} (R : PathSemiring S)
+noncomputable def matrix_add_comm_a11 {S : Type u} (R : PathSemiring S)
     (A B : PathMatrix2x2 S R) :
     Path (matrix_add R A B).a11 (matrix_add R B A).a11 :=
   R.add_comm A.a11 B.a11
@@ -565,7 +565,7 @@ def matrix_add_comm_a11 {S : Type u} (R : PathSemiring S)
 -- ============================================================================
 -- Def 47: Matrix add commutativity (component a22)
 -- ============================================================================
-def matrix_add_comm_a22 {S : Type u} (R : PathSemiring S)
+noncomputable def matrix_add_comm_a22 {S : Type u} (R : PathSemiring S)
     (A B : PathMatrix2x2 S R) :
     Path (matrix_add R A B).a22 (matrix_add R B A).a22 :=
   R.add_comm A.a22 B.a22
@@ -577,7 +577,7 @@ def matrix_add_comm_a22 {S : Type u} (R : PathSemiring S)
 -- ============================================================================
 -- Def 48: Left distributivity applied twice
 -- ============================================================================
-def semiring_dist_left_twice (R : PathSemiring S) (a b c d : S) :
+noncomputable def semiring_dist_left_twice (R : PathSemiring S) (a b c d : S) :
     Path (R.mul a (R.add (R.add b c) d))
       (R.add (R.mul a (R.add b c)) (R.mul a d)) :=
   R.mul_dist_left a (R.add b c) d
@@ -585,28 +585,28 @@ def semiring_dist_left_twice (R : PathSemiring S) (a b c d : S) :
 -- ============================================================================
 -- Def 49: Right distributivity then left zero
 -- ============================================================================
-def semiring_right_dist_zero (R : PathSemiring S) (a : S) :
+noncomputable def semiring_right_dist_zero (R : PathSemiring S) (a : S) :
     Path (R.mul (R.add a R.zero) a) (R.add (R.mul a a) (R.mul R.zero a)) :=
   R.mul_dist_right a R.zero a
 
 -- ============================================================================
 -- Def 50: Simplify right dist with zero via paths
 -- ============================================================================
-def semiring_right_dist_zero_simplify (R : PathSemiring S) (a : S) :
+noncomputable def semiring_right_dist_zero_simplify (R : PathSemiring S) (a : S) :
     Path (R.add (R.mul a a) (R.mul R.zero a)) (R.add (R.mul a a) R.zero) :=
   Path.congrArg (fun x => R.add (R.mul a a) x) (R.mul_zero_left a)
 
 -- ============================================================================
 -- Def 51: Full simplification chain
 -- ============================================================================
-def semiring_full_simplify (R : PathSemiring S) (a : S) :
+noncomputable def semiring_full_simplify (R : PathSemiring S) (a : S) :
     Path (R.add (R.mul a a) R.zero) (R.mul a a) :=
   R.add_zero_right (R.mul a a)
 
 -- ============================================================================
 -- Def 52: Composition of three semiring paths
 -- ============================================================================
-def semiring_triple_path (R : PathSemiring S) (a : S) :
+noncomputable def semiring_triple_path (R : PathSemiring S) (a : S) :
     Path (R.mul (R.add a R.zero) a) (R.mul a a) :=
   Path.trans (semiring_right_dist_zero R a)
     (Path.trans (semiring_right_dist_zero_simplify R a)
@@ -615,28 +615,28 @@ def semiring_triple_path (R : PathSemiring S) (a : S) :
 -- ============================================================================
 -- Def 53: Associativity of multiplication composed with identity
 -- ============================================================================
-def semiring_mul_assoc_one (R : PathSemiring S) (a b : S) :
+noncomputable def semiring_mul_assoc_one (R : PathSemiring S) (a b : S) :
     Path (R.mul (R.mul a b) R.one) (R.mul a (R.mul b R.one)) :=
   R.mul_assoc a b R.one
 
 -- ============================================================================
 -- Def 54: Mul assoc with one simplification
 -- ============================================================================
-def semiring_mul_assoc_one_simp (R : PathSemiring S) (a b : S) :
+noncomputable def semiring_mul_assoc_one_simp (R : PathSemiring S) (a b : S) :
     Path (R.mul (R.mul a b) R.one) (R.mul a b) :=
   R.mul_one_right (R.mul a b)
 
 -- ============================================================================
 -- Def 55: Path symmetry in ring context
 -- ============================================================================
-def ring_path_symm (Ring : PathRing T) (a : T) :
+noncomputable def ring_path_symm (Ring : PathRing T) (a : T) :
     Path Ring.zero (Ring.add a (Ring.neg a)) :=
   Path.symm (Ring.add_neg_right a)
 
 -- ============================================================================
 -- Def 56: Path transitivity chain in ring
 -- ============================================================================
-def ring_trans_chain (Ring : PathRing T) (a b : T) :
+noncomputable def ring_trans_chain (Ring : PathRing T) (a b : T) :
     Path (Ring.add (Ring.add a b) (Ring.neg b)) a :=
   ring_add_neg_cancel_right Ring a b
 
@@ -647,7 +647,7 @@ def ring_trans_chain (Ring : PathRing T) (a b : T) :
 -- ============================================================================
 -- Def 57: Identity homomorphism
 -- ============================================================================
-def id_ring_hom (R : PathRing S) : PathRingHom R R where
+noncomputable def id_ring_hom (R : PathRing S) : PathRingHom R R where
   f := fun x => x
   preserve_add := fun a b => Path.refl (R.add a b)
   preserve_mul := fun a b => Path.refl (R.mul a b)
@@ -657,14 +657,14 @@ def id_ring_hom (R : PathRing S) : PathRingHom R R where
 -- ============================================================================
 -- Def 58: Identity hom preserves structure trivially
 -- ============================================================================
-def id_hom_preserves_add (R : PathRing S) (a b : S) :
+noncomputable def id_hom_preserves_add (R : PathRing S) (a b : S) :
     Path ((id_ring_hom R).f (R.add a b)) (R.add ((id_ring_hom R).f a) ((id_ring_hom R).f b)) :=
   (id_ring_hom R).preserve_add a b
 
 -- ============================================================================
 -- Def 59: Composition of ring homomorphisms
 -- ============================================================================
-def comp_ring_hom {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
+noncomputable def comp_ring_hom {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : PathRing U}
     (g : PathRingHom RT RU) (f : PathRingHom RS RT) : PathRingHom RS RU where
   f := fun x => g.f (f.f x)
   preserve_add := fun a b =>
@@ -681,7 +681,7 @@ def comp_ring_hom {S T U : Type u} {RS : PathRing S} {RT : PathRing T} {RU : Pat
 -- ============================================================================
 -- Def 60: Semiring congrArg with addition
 -- ============================================================================
-def semiring_congrArg_add (R : PathSemiring S) (a b c : S)
+noncomputable def semiring_congrArg_add (R : PathSemiring S) (a b c : S)
     (p : Path a b) :
     Path (R.add a c) (R.add b c) :=
   Path.congrArg (fun x => R.add x c) p
@@ -689,7 +689,7 @@ def semiring_congrArg_add (R : PathSemiring S) (a b c : S)
 -- ============================================================================
 -- Def 61: Semiring congrArg with multiplication
 -- ============================================================================
-def semiring_congrArg_mul (R : PathSemiring S) (a b c : S)
+noncomputable def semiring_congrArg_mul (R : PathSemiring S) (a b c : S)
     (p : Path a b) :
     Path (R.mul a c) (R.mul b c) :=
   Path.congrArg (fun x => R.mul x c) p
@@ -701,7 +701,7 @@ def semiring_congrArg_mul (R : PathSemiring S) (a b c : S)
 -- ============================================================================
 -- Def 62: Four-step path simplification
 -- ============================================================================
-def four_step_simplify (R : PathSemiring S) (a : S) :
+noncomputable def four_step_simplify (R : PathSemiring S) (a : S) :
     Path (R.add (R.add (R.mul a R.one) R.zero) R.zero) a :=
   Path.trans (R.add_zero_right (R.add (R.mul a R.one) R.zero))
     (Path.trans (R.add_zero_right (R.mul a R.one))
@@ -710,21 +710,21 @@ def four_step_simplify (R : PathSemiring S) (a : S) :
 -- ============================================================================
 -- Def 63: Nested distributivity
 -- ============================================================================
-def nested_dist (R : PathSemiring S) (a b c : S) :
+noncomputable def nested_dist (R : PathSemiring S) (a b c : S) :
     Path (R.mul a (R.add b c)) (R.add (R.mul a b) (R.mul a c)) :=
   R.mul_dist_left a b c
 
 -- ============================================================================
 -- Def 64: Square via distributivity
 -- ============================================================================
-def square_dist (R : PathSemiring S) (a : S) :
+noncomputable def square_dist (R : PathSemiring S) (a : S) :
     Path (R.mul a (R.add a a)) (R.add (R.mul a a) (R.mul a a)) :=
   R.mul_dist_left a a a
 
 -- ============================================================================
 -- Def 65: Ring: a + (-a + b) = b
 -- ============================================================================
-def ring_cancel_neg_left (Ring : PathRing T) (a b : T) :
+noncomputable def ring_cancel_neg_left (Ring : PathRing T) (a b : T) :
     Path (Ring.add a (Ring.add (Ring.neg a) b)) b :=
   Path.trans (Path.symm (Ring.add_assoc a (Ring.neg a) b))
     (Path.trans (Path.congrArg (fun x => Ring.add x b) (Ring.add_neg_right a))
@@ -733,7 +733,7 @@ def ring_cancel_neg_left (Ring : PathRing T) (a b : T) :
 -- ============================================================================
 -- Def 66: Path between equal semiring expressions via one and zero
 -- ============================================================================
-def semiring_path_one_zero (R : PathSemiring S) (a : S) :
+noncomputable def semiring_path_one_zero (R : PathSemiring S) (a : S) :
     Path (R.mul R.one (R.add a R.zero)) a :=
   Path.trans (R.mul_one_left (R.add a R.zero))
     (R.add_zero_right a)
@@ -741,28 +741,28 @@ def semiring_path_one_zero (R : PathSemiring S) (a : S) :
 -- ============================================================================
 -- Def 67: Symmetry of distributivity
 -- ============================================================================
-def semiring_dist_symm (R : PathSemiring S) (a b c : S) :
+noncomputable def semiring_dist_symm (R : PathSemiring S) (a b c : S) :
     Path (R.add (R.mul a b) (R.mul a c)) (R.mul a (R.add b c)) :=
   Path.symm (R.mul_dist_left a b c)
 
 -- ============================================================================
 -- Def 68: Symmetry of associativity of add
 -- ============================================================================
-def semiring_add_assoc_symm (R : PathSemiring S) (a b c : S) :
+noncomputable def semiring_add_assoc_symm (R : PathSemiring S) (a b c : S) :
     Path (R.add a (R.add b c)) (R.add (R.add a b) c) :=
   Path.symm (R.add_assoc a b c)
 
 -- ============================================================================
 -- Def 69: Symmetry of associativity of mul
 -- ============================================================================
-def semiring_mul_assoc_symm (R : PathSemiring S) (a b c : S) :
+noncomputable def semiring_mul_assoc_symm (R : PathSemiring S) (a b c : S) :
     Path (R.mul a (R.mul b c)) (R.mul (R.mul a b) c) :=
   Path.symm (R.mul_assoc a b c)
 
 -- ============================================================================
 -- Def 70: congrArg for right argument of add
 -- ============================================================================
-def semiring_congrArg_add_right (R : PathSemiring S) (a : S) {b c : S}
+noncomputable def semiring_congrArg_add_right (R : PathSemiring S) (a : S) {b c : S}
     (p : Path b c) :
     Path (R.add a b) (R.add a c) :=
   Path.congrArg (fun x => R.add a x) p
@@ -770,7 +770,7 @@ def semiring_congrArg_add_right (R : PathSemiring S) (a : S) {b c : S}
 -- ============================================================================
 -- Def 71: congrArg for right argument of mul
 -- ============================================================================
-def semiring_congrArg_mul_right (R : PathSemiring S) (a : S) {b c : S}
+noncomputable def semiring_congrArg_mul_right (R : PathSemiring S) (a : S) {b c : S}
     (p : Path b c) :
     Path (R.mul a b) (R.mul a c) :=
   Path.congrArg (fun x => R.mul a x) p
@@ -778,7 +778,7 @@ def semiring_congrArg_mul_right (R : PathSemiring S) (a : S) {b c : S}
 -- ============================================================================
 -- Def 72: Double distributivity a*(b+c+d) via paths
 -- ============================================================================
-def semiring_double_dist (R : PathSemiring S) (a b c d : S) :
+noncomputable def semiring_double_dist (R : PathSemiring S) (a b c d : S) :
     Path (R.mul a (R.add b (R.add c d)))
       (R.add (R.mul a b) (R.add (R.mul a c) (R.mul a d))) :=
   Path.trans (R.mul_dist_left a b (R.add c d))
@@ -803,7 +803,7 @@ theorem kernel_zero {S T : Type u} {RS : PathRing S} {RT : PathRing T}
 -- ============================================================================
 -- Def 75: Annihilation chain: a*0 + 0 = 0
 -- ============================================================================
-def semiring_annihilate_add_zero (R : PathSemiring S) (a : S) :
+noncomputable def semiring_annihilate_add_zero (R : PathSemiring S) (a : S) :
     Path (R.add (R.mul a R.zero) R.zero) R.zero :=
   Path.trans (R.add_zero_right (R.mul a R.zero))
     (R.mul_zero_right a)
@@ -811,7 +811,7 @@ def semiring_annihilate_add_zero (R : PathSemiring S) (a : S) :
 -- ============================================================================
 -- Def 76: 0*a + 0 = 0
 -- ============================================================================
-def semiring_zero_mul_add_zero (R : PathSemiring S) (a : S) :
+noncomputable def semiring_zero_mul_add_zero (R : PathSemiring S) (a : S) :
     Path (R.add (R.mul R.zero a) R.zero) R.zero :=
   Path.trans (R.add_zero_right (R.mul R.zero a))
     (R.mul_zero_left a)
@@ -819,7 +819,7 @@ def semiring_zero_mul_add_zero (R : PathSemiring S) (a : S) :
 -- ============================================================================
 -- Def 77: (a+0)*(b+0) path to a*b
 -- ============================================================================
-def semiring_add_zero_mul_add_zero (R : PathSemiring S) (a b : S) :
+noncomputable def semiring_add_zero_mul_add_zero (R : PathSemiring S) (a b : S) :
     Path (R.mul (R.add a R.zero) (R.add b R.zero)) (R.mul a b) :=
   Path.trans (Path.congrArg (fun x => R.mul x (R.add b R.zero)) (R.add_zero_right a))
     (Path.congrArg (fun x => R.mul a x) (R.add_zero_right b))
@@ -827,14 +827,14 @@ def semiring_add_zero_mul_add_zero (R : PathSemiring S) (a b : S) :
 -- ============================================================================
 -- Def 78: Ring neg distributes over add: -(a+b) via path chain
 -- ============================================================================
-def ring_neg_add_path (Ring : PathRing T) (a b : T) :
+noncomputable def ring_neg_add_path (Ring : PathRing T) (a b : T) :
     Path (Ring.add (Ring.neg (Ring.add a b)) (Ring.add a b)) Ring.zero :=
   Ring.add_neg_left (Ring.add a b)
 
 -- ============================================================================
 -- Def 79: 1*(1*a) = a via paths
 -- ============================================================================
-def semiring_one_one_mul (R : PathSemiring S) (a : S) :
+noncomputable def semiring_one_one_mul (R : PathSemiring S) (a : S) :
     Path (R.mul R.one (R.mul R.one a)) a :=
   Path.trans (R.mul_one_left (R.mul R.one a))
     (R.mul_one_left a)
@@ -842,7 +842,7 @@ def semiring_one_one_mul (R : PathSemiring S) (a : S) :
 -- ============================================================================
 -- Def 80: Trans path chain: (a+b)+(-b+c) to a+c via ring laws
 -- ============================================================================
-def ring_add_sub_add (Ring : PathRing T) (a b c : T) :
+noncomputable def ring_add_sub_add (Ring : PathRing T) (a b c : T) :
     Path (Ring.add (Ring.add a b) (Ring.add (Ring.neg b) c))
       (Ring.add a c) :=
   Path.trans (Ring.add_assoc a b (Ring.add (Ring.neg b) c))
@@ -854,35 +854,35 @@ def ring_add_sub_add (Ring : PathRing T) (a b c : T) :
 -- ============================================================================
 -- Def 81: Symmetric path composition for add_comm
 -- ============================================================================
-def semiring_add_comm_symm (R : PathSemiring S) (a b : S) :
+noncomputable def semiring_add_comm_symm (R : PathSemiring S) (a b : S) :
     Path (R.add b a) (R.add a b) :=
   Path.symm (R.add_comm a b)
 
 -- ============================================================================
 -- Def 82: mul_one_left symmetric
 -- ============================================================================
-def semiring_mul_one_left_symm (R : PathSemiring S) (a : S) :
+noncomputable def semiring_mul_one_left_symm (R : PathSemiring S) (a : S) :
     Path a (R.mul R.one a) :=
   Path.symm (R.mul_one_left a)
 
 -- ============================================================================
 -- Def 83: mul_one_right symmetric
 -- ============================================================================
-def semiring_mul_one_right_symm (R : PathSemiring S) (a : S) :
+noncomputable def semiring_mul_one_right_symm (R : PathSemiring S) (a : S) :
     Path a (R.mul a R.one) :=
   Path.symm (R.mul_one_right a)
 
 -- ============================================================================
 -- Def 84: Idempotent structure: a + a via distributivity from (1+1)*a
 -- ============================================================================
-def semiring_sum_via_dist (R : PathSemiring S) (a : S) :
+noncomputable def semiring_sum_via_dist (R : PathSemiring S) (a : S) :
     Path (R.mul (R.add R.one R.one) a) (R.add (R.mul R.one a) (R.mul R.one a)) :=
   R.mul_dist_right R.one R.one a
 
 -- ============================================================================
 -- Def 85: Simplify (1+1)*a = a+a
 -- ============================================================================
-def semiring_sum_via_dist_simp (R : PathSemiring S) (a : S) :
+noncomputable def semiring_sum_via_dist_simp (R : PathSemiring S) (a : S) :
     Path (R.mul (R.add R.one R.one) a) (R.add a a) :=
   Path.trans (R.mul_dist_right R.one R.one a)
     (Path.trans (Path.congrArg (fun x => R.add x (R.mul R.one a)) (R.mul_one_left a))

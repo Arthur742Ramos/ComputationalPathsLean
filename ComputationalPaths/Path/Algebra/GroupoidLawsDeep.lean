@@ -36,29 +36,29 @@ inductive Path : Pt → Pt → Type where
   | cons : Step a b → Path b c → Path a c
 
 /-- Theorem 1 – refl path. -/
-def Path.refl (a : Pt) : Path a a := Path.nil a
+noncomputable def Path.refl (a : Pt) : Path a a := Path.nil a
 
 /-- Theorem 2 – single step to path. -/
-def Path.single (s : Step a b) : Path a b :=
+noncomputable def Path.single (s : Step a b) : Path a b :=
   Path.cons s (Path.nil _)
 
 /-- Theorem 3 – trans: path composition. -/
-def Path.trans : Path a b → Path b c → Path a c
+noncomputable def Path.trans : Path a b → Path b c → Path a c
   | Path.nil _, q => q
   | Path.cons s p, q => Path.cons s (Path.trans p q)
 
 /-- Theorem 4 – Step.symm: step inversion. -/
-def Step.symm : Step a b → Step b a
+noncomputable def Step.symm : Step a b → Step b a
   | Step.edge n m => Step.edge m n
   | Step.refl a => Step.refl a
 
 /-- Theorem 5 – Path.symm: path inversion. -/
-def Path.symm : Path a b → Path b a
+noncomputable def Path.symm : Path a b → Path b a
   | Path.nil a => Path.nil a
   | Path.cons s p => Path.trans (Path.symm p) (Path.single (Step.symm s))
 
 /-- Theorem 6 – path length. -/
-def Path.length : Path a b → Nat
+noncomputable def Path.length : Path a b → Nat
   | Path.nil _ => 0
   | Path.cons _ p => 1 + p.length
 
@@ -126,13 +126,13 @@ inductive Path2 : Path a b → Path a b → Type where
   | step2 : (name : String) → (p q : Path a b) → Path2 p q
 
 /-- Theorem 16 – Path2.trans: vertical composition of 2-paths. -/
-def Path2.trans : Path2 p q → Path2 q r → Path2 p r
+noncomputable def Path2.trans : Path2 p q → Path2 q r → Path2 p r
   | Path2.refl2 _, h => h
   | Path2.step2 n p q, Path2.refl2 _ => Path2.step2 n p q
   | Path2.step2 n1 p _, Path2.step2 n2 _ r => Path2.step2 (n1 ++ "·" ++ n2) p r
 
 /-- Theorem 17 – Path2.symm: inversion of 2-paths. -/
-def Path2.symm : Path2 p q → Path2 q p
+noncomputable def Path2.symm : Path2 p q → Path2 q p
   | Path2.refl2 p => Path2.refl2 p
   | Path2.step2 n p q => Path2.step2 (n ++ "⁻¹") q p
 
@@ -150,10 +150,10 @@ inductive HPath2 : Path a b → Path a b → Type where
   | hcomp : (name : String) → (p q : Path a b) → HPath2 p q
 
 /-- Theorem 19 – horizontal identity. -/
-def HPath2.hid (p : Path a b) : HPath2 p p := HPath2.hrefl p
+noncomputable def HPath2.hid (p : Path a b) : HPath2 p p := HPath2.hrefl p
 
 /-- Theorem 20 – horizontal trans. -/
-def HPath2.htrans : HPath2 p q → HPath2 q r → HPath2 p r
+noncomputable def HPath2.htrans : HPath2 p q → HPath2 q r → HPath2 p r
   | HPath2.hrefl _, h => h
   | HPath2.hcomp n p q, HPath2.hrefl _ => HPath2.hcomp n p q
   | HPath2.hcomp n1 p _, HPath2.hcomp n2 _ r => HPath2.hcomp (n1 ++ "⋆" ++ n2) p r
@@ -167,7 +167,7 @@ structure EckmannHilton (a : Pt) where
   horiz : HPath2 (Path.trans loop1 loop2) (Path.trans loop2 loop1)
 
 /-- Theorem 21 – Eckmann-Hilton for refl loops. -/
-def eckmannHilton_refl (a : Pt) : EckmannHilton a :=
+noncomputable def eckmannHilton_refl (a : Pt) : EckmannHilton a :=
   { loop1 := Path.refl a
     loop2 := Path.refl a
     vert  := Path2.refl2 _
@@ -186,7 +186,7 @@ structure FundGroupoid where
   inv  : path x y → path y x
 
 /-- Theorem 22 – our Path forms a fundamental groupoid. -/
-def ptGroupoid : FundGroupoid :=
+noncomputable def ptGroupoid : FundGroupoid :=
   { pts  := Pt
     path := Path
     id   := Path.refl
@@ -198,16 +198,16 @@ def ptGroupoid : FundGroupoid :=
 -- ============================================================
 
 /-- Loop at a base point. -/
-def Loop (a : Pt) := Path a a
+noncomputable def Loop (a : Pt) := Path a a
 
 /-- Theorem 23 – loop composition. -/
-def Loop.comp {a : Pt} (l₁ l₂ : Loop a) : Loop a := Path.trans l₁ l₂
+noncomputable def Loop.comp {a : Pt} (l₁ l₂ : Loop a) : Loop a := Path.trans l₁ l₂
 
 /-- Theorem 24 – loop identity. -/
-def Loop.id (a : Pt) : Loop a := Path.refl a
+noncomputable def Loop.id (a : Pt) : Loop a := Path.refl a
 
 /-- Theorem 25 – loop inverse. -/
-def Loop.inv {a : Pt} (l : Loop a) : Loop a := Path.symm l
+noncomputable def Loop.inv {a : Pt} (l : Loop a) : Loop a := Path.symm l
 
 /-- Theorem 26 – loop composition is associative. -/
 theorem loop_assoc {a : Pt} (l₁ l₂ l₃ : Loop a) :
@@ -227,10 +227,10 @@ theorem loop_id_right {a : Pt} (l : Loop a) :
 -- ============================================================
 
 /-- A map between point spaces. -/
-def PtMap := Pt → Pt
+noncomputable def PtMap := Pt → Pt
 
 /-- Theorem 29 – congrArg for Step: a map lifts steps. -/
-def Step.map (f : PtMap) : Step a b → Step (f a) (f b)
+noncomputable def Step.map (f : PtMap) : Step a b → Step (f a) (f b)
   | Step.edge n m => by
     show Step (f (Pt.mk n)) (f (Pt.mk m))
     exact Step.edge (match f (Pt.mk n) with | Pt.mk k => k)
@@ -238,7 +238,7 @@ def Step.map (f : PtMap) : Step a b → Step (f a) (f b)
   | Step.refl a => Step.refl (f a)
 
 /-- Theorem 30 – congrArg for Path: a map lifts paths functorially. -/
-def Path.map (f : PtMap) : Path a b → Path (f a) (f b)
+noncomputable def Path.map (f : PtMap) : Path a b → Path (f a) (f b)
   | Path.nil a => Path.nil (f a)
   | Path.cons s p => Path.cons (Step.map f s) (Path.map f p)
 
@@ -270,7 +270,7 @@ theorem map_id (p : Path a b) : Path.map id p = p := by
 -- ============================================================
 
 /-- A type family (fibration) over Pt. -/
-def Fibre := Pt → Type
+noncomputable def Fibre := Pt → Type
 
 /-- Transport data: how a step acts on fibres. -/
 structure StepTransport (F : Fibre) where
@@ -278,7 +278,7 @@ structure StepTransport (F : Fibre) where
   bwd : Step a b → F b → F a
 
 /-- Theorem 34 – transport along a path. -/
-def transport (F : Fibre) (tr : StepTransport F) : Path a b → F a → F b
+noncomputable def transport (F : Fibre) (tr : StepTransport F) : Path a b → F a → F b
   | Path.nil _, x => x
   | Path.cons s p, x => transport F tr p (tr.fwd s x)
 
@@ -397,11 +397,11 @@ structure GroupoidMorphism (G₁ G₂ : FundGroupoid) where
   onPath : G₁.path x y → G₂.path (onObj x) (onObj y)
 
 /-- Theorem 47 – identity morphism. -/
-def GroupoidMorphism.id (G : FundGroupoid) : GroupoidMorphism G G :=
+noncomputable def GroupoidMorphism.id (G : FundGroupoid) : GroupoidMorphism G G :=
   { onObj := fun x => x, onPath := fun p => p }
 
 /-- Theorem 48 – composition of morphisms. -/
-def GroupoidMorphism.comp (f : GroupoidMorphism G₁ G₂) (g : GroupoidMorphism G₂ G₃) :
+noncomputable def GroupoidMorphism.comp (f : GroupoidMorphism G₁ G₂) (g : GroupoidMorphism G₂ G₃) :
     GroupoidMorphism G₁ G₃ :=
   { onObj := fun x => g.onObj (f.onObj x)
     onPath := fun p => g.onPath (f.onPath p) }
@@ -411,7 +411,7 @@ def GroupoidMorphism.comp (f : GroupoidMorphism G₁ G₂) (g : GroupoidMorphism
 -- ============================================================
 
 /-- Cyclic group of paths: Z/n on a single point. -/
-def cyclicLoop (n : Nat) (k : Nat) (a : Pt) : Path a a :=
+noncomputable def cyclicLoop (n : Nat) (k : Nat) (a : Pt) : Path a a :=
   match k with
   | 0 => Path.refl a
   | k + 1 => Path.trans (Path.single (Step.edge (match a with | Pt.mk m => m)
@@ -472,7 +472,7 @@ theorem cons_length_pos (s : Step a b) (p : Path b c) :
 -- ============================================================
 
 /-- Conjugation of a loop by a path. -/
-def conjugate (p : Path a b) (l : Loop b) : Loop a :=
+noncomputable def conjugate (p : Path a b) (l : Loop b) : Loop a :=
   Path.trans (Path.trans p l) (Path.symm p)
 
 /-- Theorem 54 – conjugation by refl is identity. -/
@@ -494,7 +494,7 @@ theorem conjugate_comp_refl (l₁ l₂ : Loop a) :
 -- ============================================================
 
 /-- Two loops are equivalent if there is a 2-path between them. -/
-def loopEquiv (l₁ l₂ : Loop a) : Prop := Nonempty (Path2 l₁ l₂)
+noncomputable def loopEquiv (l₁ l₂ : Loop a) : Prop := Nonempty (Path2 l₁ l₂)
 
 /-- Theorem 56 – loopEquiv is reflexive. -/
 theorem loopEquiv_refl (l : Loop a) : loopEquiv l l :=

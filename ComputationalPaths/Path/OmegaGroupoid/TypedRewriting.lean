@@ -55,7 +55,7 @@ inductive TStar {a b : A} (r : Path a b → Path a b → Type v) :
 namespace TStar
 
 /-- Single step implies multi-step -/
-def single {a b : A} {r : Path a b → Path a b → Type v}
+noncomputable def single {a b : A} {r : Path a b → Path a b → Type v}
     {p q : Path a b} (h : r p q) : TStar r p q :=
   TStar.tail (TStar.refl p) h
 
@@ -72,7 +72,7 @@ noncomputable def head {a b : A} {r : Path a b → Path a b → Type v}
   trans (single hpq) hqs
 
 /-- Length of a TStar derivation -/
-def length {a b : A} {r : Path a b → Path a b → Type v}
+noncomputable def length {a b : A} {r : Path a b → Path a b → Type v}
     {p q : Path a b} : TStar r p q → Nat
   | .refl _ => 0
   | .tail h _ => h.length + 1
@@ -98,17 +98,17 @@ structure TJoinable {a b : A} (r : Path a b → Path a b → Type v)
 namespace TJoinable
 
 /-- Joinability is reflexive -/
-def refl {a b : A} {r : Path a b → Path a b → Type v} (p : Path a b) :
+noncomputable def refl {a b : A} {r : Path a b → Path a b → Type v} (p : Path a b) :
     TJoinable r p p :=
   ⟨p, .refl p, .refl p⟩
 
 /-- Joinability is symmetric -/
-def symm {a b : A} {r : Path a b → Path a b → Type v}
+noncomputable def symm {a b : A} {r : Path a b → Path a b → Type v}
     {p q : Path a b} (j : TJoinable r p q) : TJoinable r q p :=
   ⟨j.common, j.right, j.left⟩
 
 /-- From a TStar derivation, paths are joinable -/
-def of_star {a b : A} {r : Path a b → Path a b → Type v}
+noncomputable def of_star {a b : A} {r : Path a b → Path a b → Type v}
     {p q : Path a b} (h : TStar r p q) : TJoinable r p q :=
   ⟨q, h, .refl q⟩
 
@@ -190,7 +190,7 @@ section KeyLemmas
 variable {a b : A} {r : Path a b → Path a b → Type v}
 
 /-- Diamond implies local confluence -/
-def localConfluent_of_diamond (hd : TDiamond (a := a) (b := b) r) :
+noncomputable def localConfluent_of_diamond (hd : TDiamond (a := a) (b := b) r) :
     TLocalConfluent r where
   close := fun h₁ h₂ =>
     let ⟨s, h₃, h₄⟩ := hd.close h₁ h₂
@@ -330,7 +330,7 @@ noncomputable def TPlus.trans_star {a b : A} {r : Path a b → Path a b → Type
 
 /-- Termination: the relation is well-founded on the reverse of TPlus.
     We state this propositionally since `WellFounded` lives in `Prop`. -/
-def Terminating {a b : A} (r : Path a b → Path a b → Type v) : Prop :=
+noncomputable def Terminating {a b : A} (r : Path a b → Path a b → Type v) : Prop :=
   WellFounded (fun (p q : Path a b) => Nonempty (TPlus r q p))
 
 /-- Head-based multi-step: built by prepending steps at the front.

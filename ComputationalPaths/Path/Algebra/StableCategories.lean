@@ -63,7 +63,7 @@ structure StableSuspension (C : PreAdditiveCategory) where
          (C.comp (shift.shiftHom f) (shift.shiftHom g))
 
 /-- Build a StableSuspension from a ShiftFunctor. -/
-def StableSuspension.ofShift (C : PreAdditiveCategory)
+noncomputable def StableSuspension.ofShift (C : PreAdditiveCategory)
     (T : ShiftFunctor C) : StableSuspension C where
   shift := T
   shift_id_path := fun X => Path.stepChain (T.shift_id X)
@@ -96,7 +96,7 @@ structure ExactTrianglePath (C : PreAdditiveCategory)
   hg_zero_path : Path (C.comp tri.g tri.h) (C.zero tri.Y (T.shiftObj tri.X))
 
 /-- Build an ExactTrianglePath from an ExactTriangle. -/
-def ExactTrianglePath.ofExact {C : PreAdditiveCategory}
+noncomputable def ExactTrianglePath.ofExact {C : PreAdditiveCategory}
     {T : ShiftFunctor C} (Tr : Triangle C T)
     (ex : ExactTriangle Tr) : ExactTrianglePath C T where
   tri := Tr
@@ -119,7 +119,7 @@ structure OctahedralPath (TC : TriangulatedCategory) where
       TC.distinguished Tgf ∧ Tgf.X = X ∧ Tgf.Y = Z
 
 /-- The trivial octahedral axiom (using tr2_complete). -/
-def trivialOctahedral (TC : TriangulatedCategory) :
+noncomputable def trivialOctahedral (TC : TriangulatedCategory) :
     OctahedralPath TC where
   octahedral := fun f g _Tf _ _hX _hY _Tg _ _ _ =>
     let ⟨Z', g', h', dist⟩ := TC.tr2_complete (TC.cat.comp f g)
@@ -179,7 +179,7 @@ structure StableInfinityData where
   fiber_seq : Obj → Obj → Obj → Prop
 
 /-- The trivial stable ∞-category data on any type. -/
-def trivialStableInfinity (A : Type u) : StableInfinityData.{u} where
+noncomputable def trivialStableInfinity (A : Type u) : StableInfinityData.{u} where
   Obj := A
   Map := fun _ _ => PUnit
   susp := id

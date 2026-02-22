@@ -75,7 +75,7 @@ section FundamentalGroupoidFunctoriality
 variable {A : Type u} {B : Type u}
 
 /-- A function induces a functor between fundamental groupoids. -/
-def fundamentalGroupoidFunctor (f : A → B) : FundamentalGroupoidFunctor A B where
+noncomputable def fundamentalGroupoidFunctor (f : A → B) : FundamentalGroupoidFunctor A B where
   obj := f
   map := fun p => fundamentalGroupoidMap f p
   map_id := by
@@ -106,11 +106,11 @@ namespace FundamentalGroupoidFunctor
 variable {A : Type u} {B : Type u} {C : Type u}
 
 /-- The identity functor on the fundamental groupoid. -/
-def id (A : Type u) : FundamentalGroupoidFunctor A A :=
+noncomputable def id (A : Type u) : FundamentalGroupoidFunctor A A :=
   fundamentalGroupoidFunctor (A := A) (B := A) _root_.id
 
 /-- Composition of fundamental groupoid functors. -/
-def comp (F : FundamentalGroupoidFunctor A B)
+noncomputable def comp (F : FundamentalGroupoidFunctor A B)
     (G : FundamentalGroupoidFunctor B C) : FundamentalGroupoidFunctor A C where
   obj := fun a => G.obj (F.obj a)
   map := fun p => G.map (F.map p)

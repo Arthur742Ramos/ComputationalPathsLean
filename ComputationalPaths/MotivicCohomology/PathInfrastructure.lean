@@ -52,7 +52,7 @@ noncomputable def zeroDifferential_cancel_left_rweq (n : Int) :
   rweq_cmpA_inv_left (I.zeroDifferentialPath n)
 
 /-- Trivial motivic cohomology infrastructure on `PUnit`. -/
-def trivial (X : Type u) (x0 : X) :
+noncomputable def trivial (X : Type u) (x0 : X) :
     MotivicCohomologyPathInfrastructure X (fun _ => PUnit) where
   complex := MotivicComplexPathData.trivial X x0
   cycleMap := CycleMapPathData.constant (C := MotivicComplexPathData.trivial X x0)

@@ -44,7 +44,7 @@ structure CLSubstFunctor (P Q : CLFiberCat) where
   mapHom : {A B : P.Ob} → P.Hom A B → Q.Hom (mapOb A) (mapOb B)
 
 -- Theorem 1: Substitution preserves identity (Path witness)
-def substPreservesId (P : CLFiberCat) (F : CLSubstFunctor P P) (A : P.Ob) :
+noncomputable def substPreservesId (P : CLFiberCat) (F : CLSubstFunctor P P) (A : P.Ob) :
     Path (F.mapHom (P.idH A)) (F.mapHom (P.idH A)) :=
   Path.refl (F.mapHom (P.idH A))
 
@@ -56,14 +56,14 @@ structure CLHyperdoctrine where
   subst : {A B : base.Ob} → base.Hom A B → CLSubstFunctor (fiber B) (fiber A)
 
 -- Theorem 2: Identity substitution coherence (on objects)
-def identitySubstOb (H : CLHyperdoctrine) (A : H.base.Ob)
+noncomputable def identitySubstOb (H : CLHyperdoctrine) (A : H.base.Ob)
     (phi : (H.fiber A).Ob) :
     Path ((H.subst (H.base.idH A)).mapOb phi)
          ((H.subst (H.base.idH A)).mapOb phi) :=
   Path.refl _
 
 -- Theorem 3: Substitution composition coherence
-def substCompOb (H : CLHyperdoctrine) {A B C : H.base.Ob}
+noncomputable def substCompOb (H : CLHyperdoctrine) {A B C : H.base.Ob}
     (f : H.base.Hom A B) (g : H.base.Hom B C) (phi : (H.fiber C).Ob) :
     Path ((H.subst f).mapOb ((H.subst g).mapOb phi))
          ((H.subst f).mapOb ((H.subst g).mapOb phi)) :=
@@ -83,17 +83,17 @@ structure CLBCSquare (H : CLHyperdoctrine) where
   commutes : H.base.comp f h = H.base.comp g k
 
 -- Theorem 4: Beck-Chevalley path from commutativity
-def beckChevalleyPath (H : CLHyperdoctrine) (sq : CLBCSquare H) :
+noncomputable def beckChevalleyPath (H : CLHyperdoctrine) (sq : CLBCSquare H) :
     Path (H.base.comp sq.f sq.h) (H.base.comp sq.g sq.k) :=
   Path.mk [Step.mk _ _ sq.commutes] sq.commutes
 
 -- Theorem 5: Beck-Chevalley symmetry
-def beckChevalleySymm (H : CLHyperdoctrine) (sq : CLBCSquare H) :
+noncomputable def beckChevalleySymm (H : CLHyperdoctrine) (sq : CLBCSquare H) :
     Path (H.base.comp sq.g sq.k) (H.base.comp sq.f sq.h) :=
   Path.symm (beckChevalleyPath H sq)
 
 -- Theorem 6: Double Beck-Chevalley is reflexive
-def beckChevalleyDouble (H : CLHyperdoctrine) (sq : CLBCSquare H) :
+noncomputable def beckChevalleyDouble (H : CLHyperdoctrine) (sq : CLBCSquare H) :
     Path (H.base.comp sq.f sq.h) (H.base.comp sq.f sq.h) :=
   Path.trans (beckChevalleyPath H sq) (beckChevalleySymm H sq)
 
@@ -108,12 +108,12 @@ structure CLUniversalQuant (P Q : CLFiberCat) where
   counit : (A : P.Ob) → Q.Hom (forall_ A) (forall_ A)
 
 -- Theorem 7: Existential self-coherence
-def existentialCoherence (P Q : CLFiberCat) (E : CLExistentialQuant P Q)
+noncomputable def existentialCoherence (P Q : CLFiberCat) (E : CLExistentialQuant P Q)
     (A : P.Ob) : Path (E.exists_ A) (E.exists_ A) :=
   Path.refl _
 
 -- Theorem 8: Universal self-coherence
-def universalCoherence (P Q : CLFiberCat) (U : CLUniversalQuant P Q)
+noncomputable def universalCoherence (P Q : CLFiberCat) (U : CLUniversalQuant P Q)
     (A : P.Ob) : Path (U.forall_ A) (U.forall_ A) :=
   Path.refl _
 
@@ -125,22 +125,22 @@ structure CLAdjunctionData (F : Type u) (G : Type u) where
   rightTriangle : (y : G) → eta (eps y) = y
 
 -- Theorem 9: Adjunction left triangle as Path
-def adjLeftPath {F G : Type u} (adj : CLAdjunctionData F G) (x : F) :
+noncomputable def adjLeftPath {F G : Type u} (adj : CLAdjunctionData F G) (x : F) :
     Path (adj.eps (adj.eta x)) x :=
   Path.mk [Step.mk _ _ (adj.leftTriangle x)] (adj.leftTriangle x)
 
 -- Theorem 10: Adjunction right triangle as Path
-def adjRightPath {F G : Type u} (adj : CLAdjunctionData F G) (y : G) :
+noncomputable def adjRightPath {F G : Type u} (adj : CLAdjunctionData F G) (y : G) :
     Path (adj.eta (adj.eps y)) y :=
   Path.mk [Step.mk _ _ (adj.rightTriangle y)] (adj.rightTriangle y)
 
 -- Theorem 11: Adjunction round-trip on left
-def adjRoundTripLeft {F G : Type u} (adj : CLAdjunctionData F G) (x : F) :
+noncomputable def adjRoundTripLeft {F G : Type u} (adj : CLAdjunctionData F G) (x : F) :
     Path x x :=
   Path.trans (Path.symm (adjLeftPath adj x)) (adjLeftPath adj x)
 
 -- Theorem 12: Adjunction round-trip on right
-def adjRoundTripRight {F G : Type u} (adj : CLAdjunctionData F G) (y : G) :
+noncomputable def adjRoundTripRight {F G : Type u} (adj : CLAdjunctionData F G) (y : G) :
     Path y y :=
   Path.trans (Path.symm (adjRightPath adj y)) (adjRightPath adj y)
 
@@ -155,25 +155,25 @@ structure CLFrobeniusData where
     existsOp (meetOp phi (substOp psi)) = meetOp (existsOp phi) psi
 
 -- Theorem 13: Frobenius reciprocity as Path
-def frobeniusPath (F : CLFrobeniusData) (phi psi : F.carrier) :
+noncomputable def frobeniusPath (F : CLFrobeniusData) (phi psi : F.carrier) :
     Path (F.existsOp (F.meetOp phi (F.substOp psi)))
          (F.meetOp (F.existsOp phi) psi) :=
   Path.mk [Step.mk _ _ (F.frobenius phi psi)] (F.frobenius phi psi)
 
 -- Theorem 14: Frobenius symmetry
-def frobeniusSymm (F : CLFrobeniusData) (phi psi : F.carrier) :
+noncomputable def frobeniusSymm (F : CLFrobeniusData) (phi psi : F.carrier) :
     Path (F.meetOp (F.existsOp phi) psi)
          (F.existsOp (F.meetOp phi (F.substOp psi))) :=
   Path.symm (frobeniusPath F phi psi)
 
 -- Theorem 15: Frobenius round-trip
-def frobeniusRoundTrip (F : CLFrobeniusData) (phi psi : F.carrier) :
+noncomputable def frobeniusRoundTrip (F : CLFrobeniusData) (phi psi : F.carrier) :
     Path (F.existsOp (F.meetOp phi (F.substOp psi)))
          (F.existsOp (F.meetOp phi (F.substOp psi))) :=
   Path.trans (frobeniusPath F phi psi) (frobeniusSymm F phi psi)
 
 -- Theorem 16: Frobenius with congrArg
-def frobeniusCongrArg (F : CLFrobeniusData) (phi psi : F.carrier)
+noncomputable def frobeniusCongrArg (F : CLFrobeniusData) (phi psi : F.carrier)
     (f : F.carrier → F.carrier) :
     Path (f (F.existsOp (F.meetOp phi (F.substOp psi))))
          (f (F.meetOp (F.existsOp phi) psi)) :=
@@ -189,7 +189,7 @@ structure CLImageFact where
   factorizes : source = target
 
 -- Theorem 17: Image factorization Path
-def imageFactPath (I : CLImageFact) : Path I.source I.target :=
+noncomputable def imageFactPath (I : CLImageFact) : Path I.source I.target :=
   Path.mk [Step.mk _ _ I.factorizes] I.factorizes
 
 structure CLPBStableRegEpi where
@@ -199,15 +199,15 @@ structure CLPBStableRegEpi where
   stable : pulled = original
 
 -- Theorem 18: Pullback stability Path
-def pbStablePath (P : CLPBStableRegEpi) : Path P.pulled P.original :=
+noncomputable def pbStablePath (P : CLPBStableRegEpi) : Path P.pulled P.original :=
   Path.mk [Step.mk _ _ P.stable] P.stable
 
 -- Theorem 19: Pullback stability symmetry
-def pbStableSymm (P : CLPBStableRegEpi) : Path P.original P.pulled :=
+noncomputable def pbStableSymm (P : CLPBStableRegEpi) : Path P.original P.pulled :=
   Path.symm (pbStablePath P)
 
 -- Theorem 20: Pullback stability round-trip
-def pbStableRoundTrip (P : CLPBStableRegEpi) : Path P.pulled P.pulled :=
+noncomputable def pbStableRoundTrip (P : CLPBStableRegEpi) : Path P.pulled P.pulled :=
   Path.trans (pbStablePath P) (pbStableSymm P)
 
 /-! ## Section 8: Exact Categories -/
@@ -226,7 +226,7 @@ structure CLKernelPairExact where
   coeq : carrier
 
 -- Theorem 21: Exact category reflexivity
-def exactRefl (K : CLKernelPairExact) :
+noncomputable def exactRefl (K : CLKernelPairExact) :
     Path K.coeq K.coeq :=
   Path.refl _
 
@@ -238,7 +238,7 @@ structure CLSubobject where
   inclusion : (x : ambient) → sub x → ambient := fun x _ => x
 
 -- Theorem 22: Subobject inclusion coherence
-def subInclusionCoherence (S : CLSubobject) (x : S.ambient) (h : S.sub x) :
+noncomputable def subInclusionCoherence (S : CLSubobject) (x : S.ambient) (h : S.sub x) :
     Path (S.inclusion x h) (S.inclusion x h) :=
   Path.refl _
 
@@ -253,27 +253,27 @@ structure CLSubobjectLattice where
   joinComm : (a b : carrier) → join_ a b = join_ b a
 
 -- Theorem 23: Meet commutativity Path
-def meetCommPath (L : CLSubobjectLattice) (a b : L.carrier) :
+noncomputable def meetCommPath (L : CLSubobjectLattice) (a b : L.carrier) :
     Path (L.meet a b) (L.meet b a) :=
   Path.mk [Step.mk _ _ (L.meetComm a b)] (L.meetComm a b)
 
 -- Theorem 24: Join commutativity Path
-def joinCommPath (L : CLSubobjectLattice) (a b : L.carrier) :
+noncomputable def joinCommPath (L : CLSubobjectLattice) (a b : L.carrier) :
     Path (L.join_ a b) (L.join_ b a) :=
   Path.mk [Step.mk _ _ (L.joinComm a b)] (L.joinComm a b)
 
 -- Theorem 25: Double meet commutativity
-def meetCommDouble (L : CLSubobjectLattice) (a b : L.carrier) :
+noncomputable def meetCommDouble (L : CLSubobjectLattice) (a b : L.carrier) :
     Path (L.meet a b) (L.meet a b) :=
   Path.trans (meetCommPath L a b) (meetCommPath L b a)
 
 -- Theorem 26: Double join commutativity
-def joinCommDouble (L : CLSubobjectLattice) (a b : L.carrier) :
+noncomputable def joinCommDouble (L : CLSubobjectLattice) (a b : L.carrier) :
     Path (L.join_ a b) (L.join_ a b) :=
   Path.trans (joinCommPath L a b) (joinCommPath L b a)
 
 -- Theorem 27: Meet commutativity with congrArg
-def meetCommCongrArg (L : CLSubobjectLattice) (a b : L.carrier)
+noncomputable def meetCommCongrArg (L : CLSubobjectLattice) (a b : L.carrier)
     (f : L.carrier → L.carrier) :
     Path (f (L.meet a b)) (f (L.meet b a)) :=
   Path.congrArg f (meetCommPath L a b)
@@ -288,17 +288,17 @@ structure CLComprehensionScheme where
   projIsA : (A : baseOb) → (p : predicate A) → projection A p = A
 
 -- Theorem 28: Comprehension projection Path
-def comprProjPath (C : CLComprehensionScheme) (A : C.baseOb) (p : C.predicate A) :
+noncomputable def comprProjPath (C : CLComprehensionScheme) (A : C.baseOb) (p : C.predicate A) :
     Path (C.projection A p) A :=
   Path.mk [Step.mk _ _ (C.projIsA A p)] (C.projIsA A p)
 
 -- Theorem 29: Comprehension projection symmetry
-def comprProjSymm (C : CLComprehensionScheme) (A : C.baseOb) (p : C.predicate A) :
+noncomputable def comprProjSymm (C : CLComprehensionScheme) (A : C.baseOb) (p : C.predicate A) :
     Path A (C.projection A p) :=
   Path.symm (comprProjPath C A p)
 
 -- Theorem 30: Comprehension round-trip
-def comprRoundTrip (C : CLComprehensionScheme) (A : C.baseOb) (p : C.predicate A) :
+noncomputable def comprRoundTrip (C : CLComprehensionScheme) (A : C.baseOb) (p : C.predicate A) :
     Path A A :=
   Path.trans (comprProjSymm C A p) (comprProjPath C A p)
 
@@ -313,7 +313,7 @@ inductive CLILTerm where
   | fst : CLILTerm → CLILTerm
   | snd : CLILTerm → CLILTerm
 
-def CLILTerm.substT (t : CLILTerm) (n : Nat) (s : CLILTerm) : CLILTerm :=
+noncomputable def CLILTerm.substT (t : CLILTerm) (n : Nat) (s : CLILTerm) : CLILTerm :=
   match t with
   | .var m => if m == n then s else .var m
   | .app f a => .app (f.substT n s) (a.substT n s)
@@ -324,17 +324,17 @@ def CLILTerm.substT (t : CLILTerm) (n : Nat) (s : CLILTerm) : CLILTerm :=
   | .snd a => .snd (a.substT n s)
 
 -- Theorem 31: Unit is substitution-invariant
-def unitSubstInvariant (n : Nat) (s : CLILTerm) :
+noncomputable def unitSubstInvariant (n : Nat) (s : CLILTerm) :
     Path (CLILTerm.unit_.substT n s) CLILTerm.unit_ :=
   Path.refl _
 
 -- Theorem 32: Double unit substitution
-def unitDoubleSubst (n m : Nat) (s t : CLILTerm) :
+noncomputable def unitDoubleSubst (n m : Nat) (s t : CLILTerm) :
     Path ((CLILTerm.unit_.substT n s).substT m t) CLILTerm.unit_ :=
   Path.refl _
 
 -- Theorem 33: Variable substitution hit
-def varSubstHit (n : Nat) (s : CLILTerm) :
+noncomputable def varSubstHit (n : Nat) (s : CLILTerm) :
     Path ((CLILTerm.var n).substT n s) s := by
   simp [CLILTerm.substT]
   exact Path.refl _
@@ -352,7 +352,7 @@ inductive CLILFormula where
   | forall_ : CLILFormula → CLILFormula
   | exists_ : CLILFormula → CLILFormula
 
-def CLILFormula.complexity : CLILFormula → Nat
+noncomputable def CLILFormula.complexity : CLILFormula → Nat
   | .top_ => 0
   | .bot_ => 0
   | .atom _ => 1
@@ -364,20 +364,20 @@ def CLILFormula.complexity : CLILFormula → Nat
   | .exists_ a => 1 + a.complexity
 
 -- Theorem 34: Top complexity
-def topComplexity : Path (CLILFormula.top_.complexity) 0 :=
+noncomputable def topComplexity : Path (CLILFormula.top_.complexity) 0 :=
   Path.refl _
 
 -- Theorem 35: Bot complexity
-def botComplexity : Path (CLILFormula.bot_.complexity) 0 :=
+noncomputable def botComplexity : Path (CLILFormula.bot_.complexity) 0 :=
   Path.refl _
 
 -- Theorem 36: Conjunction complexity decomposition
-def conjComplexity (a b : CLILFormula) :
+noncomputable def conjComplexity (a b : CLILFormula) :
     Path (CLILFormula.conj a b).complexity (1 + a.complexity + b.complexity) :=
   Path.refl _
 
 -- Theorem 37: Negation complexity
-def negComplexity (a : CLILFormula) :
+noncomputable def negComplexity (a : CLILFormula) :
     Path (CLILFormula.neg a).complexity (1 + a.complexity) :=
   Path.refl _
 
@@ -387,16 +387,16 @@ structure CLSequent where
   context : List CLILFormula
   conclusion : CLILFormula
 
-def CLSequent.depth : CLSequent → Nat :=
+noncomputable def CLSequent.depth : CLSequent → Nat :=
   fun s => s.context.length
 
 -- Theorem 38: Empty context has depth zero
-def emptyContextDepth (phi : CLILFormula) :
+noncomputable def emptyContextDepth (phi : CLILFormula) :
     Path (CLSequent.mk [] phi).depth 0 :=
   Path.refl _
 
 -- Theorem 39: Singleton context depth
-def singletonContextDepth (psi phi : CLILFormula) :
+noncomputable def singletonContextDepth (psi phi : CLILFormula) :
     Path (CLSequent.mk [psi] phi).depth 1 :=
   Path.refl _
 
@@ -416,50 +416,50 @@ structure CLHeytingAlgebra where
   botJoin : (a : carrier) → joinH botH a = a
 
 -- Theorem 40: Heyting top-meet Path
-def heytingTopMeet (H : CLHeytingAlgebra) (a : H.carrier) :
+noncomputable def heytingTopMeet (H : CLHeytingAlgebra) (a : H.carrier) :
     Path (H.meetH H.topH a) a :=
   Path.mk [Step.mk _ _ (H.topMeet a)] (H.topMeet a)
 
 -- Theorem 41: Heyting bot-join Path
-def heytingBotJoin (H : CLHeytingAlgebra) (a : H.carrier) :
+noncomputable def heytingBotJoin (H : CLHeytingAlgebra) (a : H.carrier) :
     Path (H.joinH H.botH a) a :=
   Path.mk [Step.mk _ _ (H.botJoin a)] (H.botJoin a)
 
 -- Theorem 42: Heyting meet commutativity
-def heytingMeetComm (H : CLHeytingAlgebra) (a b : H.carrier) :
+noncomputable def heytingMeetComm (H : CLHeytingAlgebra) (a b : H.carrier) :
     Path (H.meetH a b) (H.meetH b a) :=
   Path.mk [Step.mk _ _ (H.meetComm a b)] (H.meetComm a b)
 
 -- Theorem 43: Heyting join commutativity
-def heytingJoinComm (H : CLHeytingAlgebra) (a b : H.carrier) :
+noncomputable def heytingJoinComm (H : CLHeytingAlgebra) (a b : H.carrier) :
     Path (H.joinH a b) (H.joinH b a) :=
   Path.mk [Step.mk _ _ (H.joinComm a b)] (H.joinComm a b)
 
 -- Theorem 44: Top-meet then meet-comm chain
-def topMeetThenComm (H : CLHeytingAlgebra) (a : H.carrier) :
+noncomputable def topMeetThenComm (H : CLHeytingAlgebra) (a : H.carrier) :
     Path (H.meetH H.topH a) (H.meetH a H.topH) :=
   Path.trans (heytingTopMeet H a)
     (Path.symm (Path.trans (heytingMeetComm H a H.topH) (heytingTopMeet H a)))
 
 -- Theorem 45: Soundness: top interprets to top
-def soundnessTop (H : CLHeytingAlgebra) :
+noncomputable def soundnessTop (H : CLHeytingAlgebra) :
     Path H.topH H.topH :=
   Path.refl _
 
 -- Theorem 46: Soundness congruence for meet
-def soundnessMeetCongr (H : CLHeytingAlgebra) (a b c : H.carrier)
+noncomputable def soundnessMeetCongr (H : CLHeytingAlgebra) (a b c : H.carrier)
     (p : Path a b) :
     Path (H.meetH a c) (H.meetH b c) :=
   Path.congrArg (fun x => H.meetH x c) p
 
 -- Theorem 47: Soundness congruence for join
-def soundnessJoinCongr (H : CLHeytingAlgebra) (a b c : H.carrier)
+noncomputable def soundnessJoinCongr (H : CLHeytingAlgebra) (a b c : H.carrier)
     (p : Path a b) :
     Path (H.joinH a c) (H.joinH b c) :=
   Path.congrArg (fun x => H.joinH x c) p
 
 -- Theorem 48: Soundness congruence for impl
-def soundnessImplCongr (H : CLHeytingAlgebra) (a b c : H.carrier)
+noncomputable def soundnessImplCongr (H : CLHeytingAlgebra) (a b c : H.carrier)
     (p : Path a b) :
     Path (H.implH a c) (H.implH b c) :=
   Path.congrArg (fun x => H.implH x c) p
@@ -476,17 +476,17 @@ structure CLLindenbaumTarski where
   quotientResp : (a b : carrier) → equiv a b → quotient_ a = quotient_ b
 
 -- Theorem 49: Lindenbaum quotient path
-def lindenbaumPath (LT : CLLindenbaumTarski) (a b : LT.carrier) (h : LT.equiv a b) :
+noncomputable def lindenbaumPath (LT : CLLindenbaumTarski) (a b : LT.carrier) (h : LT.equiv a b) :
     Path (LT.quotient_ a) (LT.quotient_ b) :=
   Path.mk [Step.mk _ _ (LT.quotientResp a b h)] (LT.quotientResp a b h)
 
 -- Theorem 50: Lindenbaum quotient symmetry
-def lindenbaumSymm (LT : CLLindenbaumTarski) (a b : LT.carrier) (h : LT.equiv a b) :
+noncomputable def lindenbaumSymm (LT : CLLindenbaumTarski) (a b : LT.carrier) (h : LT.equiv a b) :
     Path (LT.quotient_ b) (LT.quotient_ a) :=
   Path.symm (lindenbaumPath LT a b h)
 
 -- Theorem 51: Lindenbaum transitivity through paths
-def lindenbaumTrans (LT : CLLindenbaumTarski) (a b c : LT.carrier)
+noncomputable def lindenbaumTrans (LT : CLLindenbaumTarski) (a b c : LT.carrier)
     (h1 : LT.equiv a b) (h2 : LT.equiv b c) :
     Path (LT.quotient_ a) (LT.quotient_ c) :=
   Path.trans (lindenbaumPath LT a b h1) (lindenbaumPath LT b c h2)
@@ -502,17 +502,17 @@ structure CLQuantSubstCoherence where
   substForall : (a : carrier) → substQ (forallQ a) = forallQ (substQ a)
 
 -- Theorem 52: Substitution-existential coherence
-def substExistsPath (Q : CLQuantSubstCoherence) (a : Q.carrier) :
+noncomputable def substExistsPath (Q : CLQuantSubstCoherence) (a : Q.carrier) :
     Path (Q.substQ (Q.existsQ a)) (Q.existsQ (Q.substQ a)) :=
   Path.mk [Step.mk _ _ (Q.substExists a)] (Q.substExists a)
 
 -- Theorem 53: Substitution-universal coherence
-def substForallPath (Q : CLQuantSubstCoherence) (a : Q.carrier) :
+noncomputable def substForallPath (Q : CLQuantSubstCoherence) (a : Q.carrier) :
     Path (Q.substQ (Q.forallQ a)) (Q.forallQ (Q.substQ a)) :=
   Path.mk [Step.mk _ _ (Q.substForall a)] (Q.substForall a)
 
 -- Theorem 54: Double substitution-existential
-def doubleSubstExists (Q : CLQuantSubstCoherence) (a : Q.carrier) :
+noncomputable def doubleSubstExists (Q : CLQuantSubstCoherence) (a : Q.carrier) :
     Path (Q.substQ (Q.substQ (Q.existsQ a)))
          (Q.existsQ (Q.substQ (Q.substQ a))) :=
   let p1 := substExistsPath Q a
@@ -521,7 +521,7 @@ def doubleSubstExists (Q : CLQuantSubstCoherence) (a : Q.carrier) :
   Path.trans p2 p3
 
 -- Theorem 55: Double substitution-universal
-def doubleSubstForall (Q : CLQuantSubstCoherence) (a : Q.carrier) :
+noncomputable def doubleSubstForall (Q : CLQuantSubstCoherence) (a : Q.carrier) :
     Path (Q.substQ (Q.substQ (Q.forallQ a)))
          (Q.forallQ (Q.substQ (Q.substQ a))) :=
   let p1 := substForallPath Q a
@@ -530,13 +530,13 @@ def doubleSubstForall (Q : CLQuantSubstCoherence) (a : Q.carrier) :
   Path.trans p2 p3
 
 -- Theorem 56: Exists-forall substitution interchange
-def existsForallSubstInterchange (Q : CLQuantSubstCoherence) (a : Q.carrier) :
+noncomputable def existsForallSubstInterchange (Q : CLQuantSubstCoherence) (a : Q.carrier) :
     Path (Q.substQ (Q.existsQ (Q.forallQ a)))
          (Q.existsQ (Q.substQ (Q.forallQ a))) :=
   substExistsPath Q (Q.forallQ a)
 
 -- Theorem 57: Forall-exists substitution interchange
-def forallExistsSubstInterchange (Q : CLQuantSubstCoherence) (a : Q.carrier) :
+noncomputable def forallExistsSubstInterchange (Q : CLQuantSubstCoherence) (a : Q.carrier) :
     Path (Q.substQ (Q.forallQ (Q.existsQ a)))
          (Q.forallQ (Q.substQ (Q.existsQ a))) :=
   substForallPath Q (Q.existsQ a)
@@ -551,19 +551,19 @@ structure CLFiberedFunctor where
   projCoherent : (x : totalOb) → proj (fiberMap x) = proj x
 
 -- Theorem 58: Fibered functor projection coherence
-def fiberedProjPath (F : CLFiberedFunctor) (x : F.totalOb) :
+noncomputable def fiberedProjPath (F : CLFiberedFunctor) (x : F.totalOb) :
     Path (F.proj (F.fiberMap x)) (F.proj x) :=
   Path.mk [Step.mk _ _ (F.projCoherent x)] (F.projCoherent x)
 
 -- Theorem 59: Fibered functor double map coherence
-def fiberedDoublePath (F : CLFiberedFunctor) (x : F.totalOb) :
+noncomputable def fiberedDoublePath (F : CLFiberedFunctor) (x : F.totalOb) :
     Path (F.proj (F.fiberMap (F.fiberMap x))) (F.proj x) :=
   Path.trans
     (fiberedProjPath F (F.fiberMap x))
     (fiberedProjPath F x)
 
 -- Theorem 60: Fibered projection symmetry
-def fiberedProjSymm (F : CLFiberedFunctor) (x : F.totalOb) :
+noncomputable def fiberedProjSymm (F : CLFiberedFunctor) (x : F.totalOb) :
     Path (F.proj x) (F.proj (F.fiberMap x)) :=
   Path.symm (fiberedProjPath F x)
 
@@ -578,27 +578,27 @@ structure CLIndexedCoherence where
   assocLaw : (a : carrier) → substComp (substComp a) = substComp a
 
 -- Theorem 61: Identity law Path
-def indexedIdPath (I : CLIndexedCoherence) (a : I.carrier) :
+noncomputable def indexedIdPath (I : CLIndexedCoherence) (a : I.carrier) :
     Path (I.substId a) a :=
   Path.mk [Step.mk _ _ (I.idLaw a)] (I.idLaw a)
 
 -- Theorem 62: Composition law Path
-def indexedCompPath (I : CLIndexedCoherence) (a : I.carrier) :
+noncomputable def indexedCompPath (I : CLIndexedCoherence) (a : I.carrier) :
     Path (I.substComp a) a :=
   Path.mk [Step.mk _ _ (I.compLaw a)] (I.compLaw a)
 
 -- Theorem 63: Associativity law Path
-def indexedAssocPath (I : CLIndexedCoherence) (a : I.carrier) :
+noncomputable def indexedAssocPath (I : CLIndexedCoherence) (a : I.carrier) :
     Path (I.substComp (I.substComp a)) (I.substComp a) :=
   Path.mk [Step.mk _ _ (I.assocLaw a)] (I.assocLaw a)
 
 -- Theorem 64: Id then comp coherence chain
-def idThenCompPath (I : CLIndexedCoherence) (a : I.carrier) :
+noncomputable def idThenCompPath (I : CLIndexedCoherence) (a : I.carrier) :
     Path (I.substId (I.substComp a)) (I.substComp a) :=
   indexedIdPath I (I.substComp a)
 
 -- Theorem 65: Comp then id coherence chain
-def compThenIdPath (I : CLIndexedCoherence) (a : I.carrier) :
+noncomputable def compThenIdPath (I : CLIndexedCoherence) (a : I.carrier) :
     Path (I.substComp (I.substId a)) a :=
   Path.trans
     (Path.congrArg I.substComp (indexedIdPath I a))
@@ -614,12 +614,12 @@ structure CLInterpretation where
   interpNat : (x : domainOfDisc) → interp (substInterp x) = interp x
 
 -- Theorem 66: Interpretation naturality Path
-def interpNatPath (I : CLInterpretation) (x : I.domainOfDisc) :
+noncomputable def interpNatPath (I : CLInterpretation) (x : I.domainOfDisc) :
     Path (I.interp (I.substInterp x)) (I.interp x) :=
   Path.mk [Step.mk _ _ (I.interpNat x)] (I.interpNat x)
 
 -- Theorem 67: Double interpretation naturality
-def interpDoubleNat (I : CLInterpretation) (x : I.domainOfDisc) :
+noncomputable def interpDoubleNat (I : CLInterpretation) (x : I.domainOfDisc) :
     Path (I.interp (I.substInterp (I.substInterp x)))
          (I.interp x) :=
   Path.trans
@@ -627,7 +627,7 @@ def interpDoubleNat (I : CLInterpretation) (x : I.domainOfDisc) :
     (interpNatPath I x)
 
 -- Theorem 68: CongrArg through interpretation
-def interpCongrArg (I : CLInterpretation) (f : I.carrier → I.carrier)
+noncomputable def interpCongrArg (I : CLInterpretation) (f : I.carrier → I.carrier)
     (x : I.domainOfDisc) :
     Path (f (I.interp (I.substInterp x))) (f (I.interp x)) :=
   Path.congrArg f (interpNatPath I x)
@@ -643,28 +643,28 @@ structure CLPathAlgebra where
   rightUnit : (a : carrier) → op a e = a
 
 -- Theorem 69: Left unit Path
-def pathAlgLeftUnit (PA : CLPathAlgebra) (a : PA.carrier) :
+noncomputable def pathAlgLeftUnit (PA : CLPathAlgebra) (a : PA.carrier) :
     Path (PA.op PA.e a) a :=
   Path.mk [Step.mk _ _ (PA.leftUnit a)] (PA.leftUnit a)
 
 -- Theorem 70: Right unit Path
-def pathAlgRightUnit (PA : CLPathAlgebra) (a : PA.carrier) :
+noncomputable def pathAlgRightUnit (PA : CLPathAlgebra) (a : PA.carrier) :
     Path (PA.op a PA.e) a :=
   Path.mk [Step.mk _ _ (PA.rightUnit a)] (PA.rightUnit a)
 
 -- Theorem 71: Associativity Path
-def pathAlgAssoc (PA : CLPathAlgebra) (a b c : PA.carrier) :
+noncomputable def pathAlgAssoc (PA : CLPathAlgebra) (a b c : PA.carrier) :
     Path (PA.op (PA.op a b) c) (PA.op a (PA.op b c)) :=
   Path.mk [Step.mk _ _ (PA.opAssoc a b c)] (PA.opAssoc a b c)
 
 -- Theorem 72: Left unit congruence
-def pathAlgLeftUnitCongr (PA : CLPathAlgebra) (a : PA.carrier)
+noncomputable def pathAlgLeftUnitCongr (PA : CLPathAlgebra) (a : PA.carrier)
     (f : PA.carrier → PA.carrier) :
     Path (f (PA.op PA.e a)) (f a) :=
   Path.congrArg f (pathAlgLeftUnit PA a)
 
 -- Theorem 73: Pentagon-like coherence (assoc chain)
-def pathAlgPentagon (PA : CLPathAlgebra) (a b c d : PA.carrier) :
+noncomputable def pathAlgPentagon (PA : CLPathAlgebra) (a b c d : PA.carrier) :
     Path (PA.op (PA.op (PA.op a b) c) d)
          (PA.op a (PA.op b (PA.op c d))) :=
   Path.trans
@@ -672,7 +672,7 @@ def pathAlgPentagon (PA : CLPathAlgebra) (a b c d : PA.carrier) :
     (pathAlgAssoc PA a b (PA.op c d))
 
 -- Theorem 74: Unit coherence triangle
-def pathAlgUnitTriangle (PA : CLPathAlgebra) (a : PA.carrier) :
+noncomputable def pathAlgUnitTriangle (PA : CLPathAlgebra) (a : PA.carrier) :
     Path (PA.op (PA.op PA.e a) PA.e) (PA.op PA.e (PA.op a PA.e)) :=
   pathAlgAssoc PA PA.e a PA.e
 
@@ -686,46 +686,46 @@ structure CLContextExtension where
   weakenEq : (gam : ctx) → (A : ty gam) → weaken gam A = extend gam A
 
 -- Theorem 75: Weakening-extension coherence
-def weakenExtPath (CE : CLContextExtension) (gam : CE.ctx) (A : CE.ty gam) :
+noncomputable def weakenExtPath (CE : CLContextExtension) (gam : CE.ctx) (A : CE.ty gam) :
     Path (CE.weaken gam A) (CE.extend gam A) :=
   Path.mk [Step.mk _ _ (CE.weakenEq gam A)] (CE.weakenEq gam A)
 
 -- Theorem 76: Weakening-extension symmetry
-def weakenExtSymm (CE : CLContextExtension) (gam : CE.ctx) (A : CE.ty gam) :
+noncomputable def weakenExtSymm (CE : CLContextExtension) (gam : CE.ctx) (A : CE.ty gam) :
     Path (CE.extend gam A) (CE.weaken gam A) :=
   Path.symm (weakenExtPath CE gam A)
 
 -- Theorem 77: Weakening round-trip
-def weakenRoundTrip (CE : CLContextExtension) (gam : CE.ctx) (A : CE.ty gam) :
+noncomputable def weakenRoundTrip (CE : CLContextExtension) (gam : CE.ctx) (A : CE.ty gam) :
     Path (CE.weaken gam A) (CE.weaken gam A) :=
   Path.trans (weakenExtPath CE gam A) (weakenExtSymm CE gam A)
 
 /-! ## Section 22: Summary / Verification Theorems -/
 
 -- Theorem 78: trans of symm is well-defined
-def summaryTransSymm {A : Type u} (x y : A) (p : Path x y) :
+noncomputable def summaryTransSymm {A : Type u} (x y : A) (p : Path x y) :
     Path x x :=
   Path.trans p (Path.symm p)
 
 -- Theorem 79: symm of trans is well-defined
-def summarySymmTrans {A : Type u} (x y z : A) (p : Path x y) (q : Path y z) :
+noncomputable def summarySymmTrans {A : Type u} (x y z : A) (p : Path x y) (q : Path y z) :
     Path z x :=
   Path.symm (Path.trans p q)
 
 -- Theorem 80: congrArg preserves trans
-def summaryCongrArgTrans {A B : Type u} (f : A → B) (x y z : A)
+noncomputable def summaryCongrArgTrans {A B : Type u} (f : A → B) (x y z : A)
     (p : Path x y) (q : Path y z) :
     Path (f x) (f z) :=
   Path.congrArg f (Path.trans p q)
 
 -- Theorem 81: congrArg preserves symm
-def summaryCongrArgSymm {A B : Type u} (f : A → B) (x y : A)
+noncomputable def summaryCongrArgSymm {A B : Type u} (f : A → B) (x y : A)
     (p : Path x y) :
     Path (f y) (f x) :=
   Path.congrArg f (Path.symm p)
 
 -- Theorem 82: triple trans
-def tripleTransPath {A : Type u} (a b c d : A)
+noncomputable def tripleTransPath {A : Type u} (a b c d : A)
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Path a d :=
   Path.trans (Path.trans p q) r

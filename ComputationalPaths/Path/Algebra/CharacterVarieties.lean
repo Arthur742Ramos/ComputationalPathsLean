@@ -76,32 +76,32 @@ structure PathGroupData (G : Type u) where
   mul_inv : ∀ a, mul a (inv a) = one
 
 /-- Path witness for associativity. -/
-def PathGroupData.assocPath {G : Type u} (grp : PathGroupData G)
+noncomputable def PathGroupData.assocPath {G : Type u} (grp : PathGroupData G)
     (a b c : G) : Path (grp.mul (grp.mul a b) c) (grp.mul a (grp.mul b c)) :=
   Path.stepChain (grp.mul_assoc a b c)
 
 /-- Path witness for left identity. -/
-def PathGroupData.leftIdPath {G : Type u} (grp : PathGroupData G)
+noncomputable def PathGroupData.leftIdPath {G : Type u} (grp : PathGroupData G)
     (a : G) : Path (grp.mul grp.one a) a :=
   Path.stepChain (grp.one_mul a)
 
 /-- Path witness for right identity. -/
-def PathGroupData.rightIdPath {G : Type u} (grp : PathGroupData G)
+noncomputable def PathGroupData.rightIdPath {G : Type u} (grp : PathGroupData G)
     (a : G) : Path (grp.mul a grp.one) a :=
   Path.stepChain (grp.mul_one a)
 
 /-- Path witness for left inverse. -/
-def PathGroupData.invLeftPath {G : Type u} (grp : PathGroupData G)
+noncomputable def PathGroupData.invLeftPath {G : Type u} (grp : PathGroupData G)
     (a : G) : Path (grp.mul (grp.inv a) a) grp.one :=
   Path.stepChain (grp.inv_mul a)
 
 /-- Path witness for right inverse. -/
-def PathGroupData.invRightPath {G : Type u} (grp : PathGroupData G)
+noncomputable def PathGroupData.invRightPath {G : Type u} (grp : PathGroupData G)
     (a : G) : Path (grp.mul a (grp.inv a)) grp.one :=
   Path.stepChain (grp.mul_inv a)
 
 /-- Step chain for (a*b)*(b⁻¹*a⁻¹) = 1. -/
-def PathGroupData.productInvChain {G : Type u} (grp : PathGroupData G)
+noncomputable def PathGroupData.productInvChain {G : Type u} (grp : PathGroupData G)
     (a b : G) (h : grp.mul (grp.mul a b) (grp.mul (grp.inv b) (grp.inv a)) = grp.one) :
     Path (grp.mul (grp.mul a b) (grp.mul (grp.inv b) (grp.inv a))) grp.one :=
   Path.stepChain h
@@ -116,19 +116,19 @@ structure RepresentationData (G : Type u) (V : Type u) where
   action_mul : ∀ g h v, action (grp.mul g h) v = action g (action h v)
 
 /-- Path witness for action of identity. -/
-def RepresentationData.actionOnePath {G V : Type u}
+noncomputable def RepresentationData.actionOnePath {G V : Type u}
     (ρ : RepresentationData G V) (v : V) :
     Path (ρ.action ρ.grp.one v) v :=
   Path.stepChain (ρ.action_one v)
 
 /-- Path witness for action of product. -/
-def RepresentationData.actionMulPath {G V : Type u}
+noncomputable def RepresentationData.actionMulPath {G V : Type u}
     (ρ : RepresentationData G V) (g h : G) (v : V) :
     Path (ρ.action (ρ.grp.mul g h) v) (ρ.action g (ρ.action h v)) :=
   Path.stepChain (ρ.action_mul g h v)
 
 /-- Triple action associativity chain. -/
-def RepresentationData.tripleActionChain {G V : Type u}
+noncomputable def RepresentationData.tripleActionChain {G V : Type u}
     (ρ : RepresentationData G V) (g h k : G) (v : V) :
     Path (ρ.action (ρ.grp.mul (ρ.grp.mul g h) k) v)
          (ρ.action g (ρ.action h (ρ.action k v))) :=
@@ -140,7 +140,7 @@ def RepresentationData.tripleActionChain {G V : Type u}
       (Path.congrArg (ρ.action g) (Path.stepChain (ρ.action_mul h k v))))
 
 /-- Action composed with inverse returns to start. -/
-def RepresentationData.actionInvChain {G V : Type u}
+noncomputable def RepresentationData.actionInvChain {G V : Type u}
     (ρ : RepresentationData G V) (g : G) (v : V) :
     Path (ρ.action (ρ.grp.mul g (ρ.grp.inv g)) v) v :=
   Path.trans
@@ -161,18 +161,18 @@ structure CharacterData (G : Type u) where
   class_function : ∀ g h, char (grp.mul g (grp.mul h (grp.inv g))) = char h
 
 /-- Path witness for class function property. -/
-def CharacterData.classFunctionPath {G : Type u} (χ : CharacterData G)
+noncomputable def CharacterData.classFunctionPath {G : Type u} (χ : CharacterData G)
     (g h : G) :
     Path (χ.char (χ.grp.mul g (χ.grp.mul h (χ.grp.inv g)))) (χ.char h) :=
   Path.stepChain (χ.class_function g h)
 
 /-- Path witness for character at identity. -/
-def CharacterData.charOnePath {G : Type u} (χ : CharacterData G) :
+noncomputable def CharacterData.charOnePath {G : Type u} (χ : CharacterData G) :
     Path (χ.char χ.grp.one) (χ.char χ.grp.one) :=
   Path.stepChain (χ.char_one)
 
 /-- Step chain: conjugation by g then g⁻¹ preserves character. -/
-def CharacterData.doubleConjChain {G : Type u} (χ : CharacterData G)
+noncomputable def CharacterData.doubleConjChain {G : Type u} (χ : CharacterData G)
     (g h : G)
     (hconj : χ.char (χ.grp.mul (χ.grp.inv g) (χ.grp.mul
       (χ.grp.mul g (χ.grp.mul h (χ.grp.inv g))) g)) = χ.char h) :
@@ -198,7 +198,7 @@ structure CharacterVariety (G : Type u) (V : Type u) where
   equiv_trans : ∀ ρ σ τ, equiv ρ σ → equiv σ τ → equiv ρ τ
 
 /-- Path witness for reflexivity of character variety equivalence. -/
-def CharacterVariety.reflPath {G V : Type u} (CV : CharacterVariety G V) :
+noncomputable def CharacterVariety.reflPath {G V : Type u} (CV : CharacterVariety G V) :
     Path (CV.equiv CV.rep CV.rep) True :=
   Path.stepChain (propext ⟨fun _ => trivial, fun _ => CV.equiv_refl CV.rep⟩)
 
@@ -218,12 +218,12 @@ structure EndAlgebra (V : Type u) where
   comp_assoc : ∀ f g h, comp (comp f g) h = comp f (comp g h)
 
 /-- Path for endomorphism composition identity. -/
-def EndAlgebra.compIdPath {V : Type u} (E : EndAlgebra V)
+noncomputable def EndAlgebra.compIdPath {V : Type u} (E : EndAlgebra V)
     (f : V → V) : Path (E.comp f E.idMap) f :=
   Path.stepChain (E.comp_id f)
 
 /-- Path for endomorphism associativity. -/
-def EndAlgebra.compAssocPath {V : Type u} (E : EndAlgebra V)
+noncomputable def EndAlgebra.compAssocPath {V : Type u} (E : EndAlgebra V)
     (f g h : V → V) :
     Path (E.comp (E.comp f g) h) (E.comp f (E.comp g h)) :=
   Path.stepChain (E.comp_assoc f g h)
@@ -242,7 +242,7 @@ structure SchurWeylData (G : Type u) (V : Type u) where
   double_comm_thm : doubleCommutant.endo = (fun v => rep.action grp.one v)
 
 /-- Path witness for the double commutant theorem. -/
-def SchurWeylData.doubleCommPath {G V : Type u}
+noncomputable def SchurWeylData.doubleCommPath {G V : Type u}
     (SW : SchurWeylData G V) :
     Path SW.doubleCommutant.endo (fun v => SW.rep.action SW.grp.one v) :=
   Path.stepChain SW.double_comm_thm
@@ -261,17 +261,17 @@ structure PermData (n : Nat) where
   left_inv : ∀ i, inv (perm i) = i
 
 /-- Path for right inverse of permutation. -/
-def PermData.rightInvPath {n : Nat} (σ : PermData n) (i : Fin n) :
+noncomputable def PermData.rightInvPath {n : Nat} (σ : PermData n) (i : Fin n) :
     Path (σ.perm (σ.inv i)) i :=
   Path.stepChain (σ.right_inv i)
 
 /-- Path for left inverse of permutation. -/
-def PermData.leftInvPath {n : Nat} (σ : PermData n) (i : Fin n) :
+noncomputable def PermData.leftInvPath {n : Nat} (σ : PermData n) (i : Fin n) :
     Path (σ.inv (σ.perm i)) i :=
   Path.stepChain (σ.left_inv i)
 
 /-- Step chain: perm ∘ inv ∘ perm = perm. -/
-def PermData.permInvPermChain {n : Nat} (σ : PermData n) (i : Fin n) :
+noncomputable def PermData.permInvPermChain {n : Nat} (σ : PermData n) (i : Fin n) :
     Path (σ.perm (σ.inv (σ.perm i))) (σ.perm i) :=
   Path.congrArg σ.perm (Path.stepChain (σ.left_inv i))
 
@@ -285,7 +285,7 @@ structure Partition where
   sorted : parts.Pairwise (· ≥ ·)
 
 /-- Trivial partition [n]. -/
-def trivialPartition (n : Nat) : Partition where
+noncomputable def trivialPartition (n : Nat) : Partition where
   parts := [n]
   sorted := List.pairwise_singleton _ _
 
@@ -305,18 +305,18 @@ structure SchurFunctorData (V : Type u) where
   fmap_comp : ∀ f g, fmap (f ∘ g) = fmap f ∘ fmap g
 
 /-- Path witness for Schur functor identity. -/
-def SchurFunctorData.fmapIdPath {V : Type u} (S : SchurFunctorData V) :
+noncomputable def SchurFunctorData.fmapIdPath {V : Type u} (S : SchurFunctorData V) :
     Path (S.fmap id) id :=
   Path.stepChain S.fmap_id
 
 /-- Path witness for Schur functor composition. -/
-def SchurFunctorData.fmapCompPath {V : Type u} (S : SchurFunctorData V)
+noncomputable def SchurFunctorData.fmapCompPath {V : Type u} (S : SchurFunctorData V)
     (f g : V → V) :
     Path (S.fmap (f ∘ g)) (S.fmap f ∘ S.fmap g) :=
   Path.stepChain (S.fmap_comp f g)
 
 /-- Step chain: fmap id ∘ fmap f = fmap f. -/
-def SchurFunctorData.idCompChain {V : Type u} (S : SchurFunctorData V)
+noncomputable def SchurFunctorData.idCompChain {V : Type u} (S : SchurFunctorData V)
     (f : V → V) :
     Path (S.fmap id ∘ S.fmap f) (S.fmap f) :=
   Path.trans
@@ -340,12 +340,12 @@ structure TensorPowerData (V : Type u) (n : Nat) where
     glAction f (snAction σ t) = snAction σ (glAction f t)
 
 /-- Path witness for GL action identity. -/
-def TensorPowerData.glIdPath {V : Type u} {n : Nat}
+noncomputable def TensorPowerData.glIdPath {V : Type u} {n : Nat}
     (T : TensorPowerData V n) : Path (T.glAction id) id :=
   Path.stepChain T.gl_id
 
 /-- Path witness for commutativity of actions. -/
-def TensorPowerData.commutePath {V : Type u} {n : Nat}
+noncomputable def TensorPowerData.commutePath {V : Type u} {n : Nat}
     (T : TensorPowerData V n)
     (f : V → V) (σ : Fin n → Fin n) (t : T.tensorPower) :
     Path (T.glAction f (T.snAction σ t)) (T.snAction σ (T.glAction f t)) :=
@@ -367,7 +367,7 @@ structure OrthogonalityData (G : Type u) where
   second_orthogonality : True
 
 /-- Path witness for orthogonality. -/
-def OrthogonalityData.orthPath {G : Type u} (O : OrthogonalityData G)
+noncomputable def OrthogonalityData.orthPath {G : Type u} (O : OrthogonalityData G)
     (i j : Fin O.chars.length) :
     Path ((i = j) ∨ True) True :=
   Path.stepChain (propext ⟨fun _ => trivial, fun _ => O.first_orthogonality i j⟩)

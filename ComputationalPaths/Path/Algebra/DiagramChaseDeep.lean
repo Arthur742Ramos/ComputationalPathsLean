@@ -29,41 +29,41 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   witness : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
-def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
+noncomputable def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.witness.trans τ.witness⟩
 
-def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
+noncomputable def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.witness.symm⟩
 
-def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
+noncomputable def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
     Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (Path.trans r) σ.witness⟩
 
-def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
+noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.witness⟩
 
@@ -115,7 +115,7 @@ abbrev refl_path (a : N) : Path N a a := Path.nil a
 --   bl --bot--> br
 
 -- Theorem 1: right-then-down path length
-def sq_pathRD (tl tr br : N) (topL rightL : String) : Path N tl br :=
+noncomputable def sq_pathRD (tl tr br : N) (topL rightL : String) : Path N tl br :=
   (sp topL tl tr).trans (sp rightL tr br)
 
 theorem sq_pathRD_len (tl tr br : N) (t r : String) :
@@ -123,7 +123,7 @@ theorem sq_pathRD_len (tl tr br : N) (t r : String) :
   simp [sq_pathRD, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 2: down-then-right path length
-def sq_pathDR (tl bl br : N) (leftL botL : String) : Path N tl br :=
+noncomputable def sq_pathDR (tl bl br : N) (leftL botL : String) : Path N tl br :=
   (sp leftL tl bl).trans (sp botL bl br)
 
 theorem sq_pathDR_len (tl bl br : N) (l b : String) :
@@ -141,7 +141,7 @@ theorem id_sq_DR_len (a : N) :
   simp [sq_pathDR, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 5: horizontal composition of squares
-def hcomp_sq (tl tm tr bl bm br : N) (t1 t2 r1 r2 : String) : Path N tl br :=
+noncomputable def hcomp_sq (tl tm tr bl bm br : N) (t1 t2 r1 r2 : String) : Path N tl br :=
   (sq_pathRD tl tm bm t1 r1).trans (sq_pathRD bm tr br t2 r2)
 
 theorem hcomp_sq_len (tl tm tr bl bm br : N) (t1 t2 r1 r2 : String) :
@@ -149,7 +149,7 @@ theorem hcomp_sq_len (tl tm tr bl bm br : N) (t1 t2 r1 r2 : String) :
   simp [hcomp_sq, sq_pathRD, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 6: vertical composition of squares
-def vcomp_sq (tl tr ml mr bl br : N) (l1 l2 b1 b2 : String) : Path N tl br :=
+noncomputable def vcomp_sq (tl tr ml mr bl br : N) (l1 l2 b1 b2 : String) : Path N tl br :=
   (sq_pathDR tl ml mr l1 b1).trans (sq_pathDR mr bl br l2 b2)
 
 theorem vcomp_sq_len (tl tr ml mr bl br : N) (l1 l2 b1 b2 : String) :
@@ -180,7 +180,7 @@ theorem chase_three_len (a b c d : N) (n1 n2 n3 : String) :
 -- ============================================================
 
 -- Theorem 10: exactness chase = 2-step
-def exactness_chase (x mid tgt : N) (f_l g_l : String) : Path N x tgt :=
+noncomputable def exactness_chase (x mid tgt : N) (f_l g_l : String) : Path N x tgt :=
   (sp ("apply:" ++ f_l) x mid).trans (sp ("exact→" ++ g_l) mid tgt)
 
 theorem exactness_chase_len (x mid tgt : N) (f_l g_l : String) :
@@ -188,7 +188,7 @@ theorem exactness_chase_len (x mid tgt : N) (f_l g_l : String) :
   simp [exactness_chase, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 11: compose-zero path
-def compose_zero (src mid tgt : N) (f_l g_l : String) : Path N src tgt :=
+noncomputable def compose_zero (src mid tgt : N) (f_l g_l : String) : Path N src tgt :=
   (sp f_l src mid).trans ((sp g_l mid tgt).trans (sp "gf=0" tgt tgt))
 
 theorem compose_zero_len (src mid tgt : N) (f_l g_l : String) :
@@ -196,7 +196,7 @@ theorem compose_zero_len (src mid tgt : N) (f_l g_l : String) :
   simp [compose_zero, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 12: short exact sequence 0 → A → B → C → 0
-def ses_path (z a b c : N) (f_l g_l : String) : Path N z z :=
+noncomputable def ses_path (z a b c : N) (f_l g_l : String) : Path N z z :=
   (sp "0→A" z a).trans ((sp f_l a b).trans ((sp g_l b c).trans (sp "C→0" c z)))
 
 theorem ses_path_len (z a b c : N) (f_l g_l : String) :
@@ -211,7 +211,7 @@ theorem ses_path_len (z a b c : N) (f_l g_l : String) :
 -- We use: a1=1, a2=2, a3=3, a4=4, a5=5, b1=11, b2=12, b3=13, b4=14, b5=15
 
 -- Theorem 13: five lemma mono chase (8 steps)
-def five_mono (a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 : N) : Path N b3 b3 :=
+noncomputable def five_mono (a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 : N) : Path N b3 b3 :=
   (sp "pick-x-in-ker-α₃" b3 a3).trans
   ((sp "apply-f₃" a3 a4).trans
   ((sp "comm-sq34" a4 b4).trans
@@ -227,7 +227,7 @@ theorem five_mono_len (a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 : N) :
   simp [five_mono, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 15: five lemma epi chase (8 steps)
-def five_epi (a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 : N) : Path N b3 b3 :=
+noncomputable def five_epi (a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 : N) : Path N b3 b3 :=
   (sp "pick-y" b3 b3).trans
   ((sp "apply-g₃" b3 b4).trans
   ((sp "α₄-surj" b4 a4).trans
@@ -243,7 +243,7 @@ theorem five_epi_len (a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 : N) :
   simp [five_epi, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 17: full five lemma = mono + epi (16 steps)
-def five_full (a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 : N) : Path N b3 b3 :=
+noncomputable def five_full (a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 : N) : Path N b3 b3 :=
   (five_mono a1 a2 a3 a4 a5 b1 b2 b3 b4 b5).trans
   (five_epi a1 a2 a3 a4 a5 b1 b2 b3 b4 b5)
 
@@ -271,7 +271,7 @@ theorem five_epi_symm_len (a1 a2 a3 a4 a5 b1 b2 b3 b4 b5 : N) :
 -- Plus: kerG, cokerA, kerA, kerB, cokerB, cokerG
 
 -- Theorem 20: connecting morphism δ : kerG → cokerA (5 steps)
-def snake_delta (a2 a3 b1 b2 kerG cokerA : N) : Path N kerG cokerA :=
+noncomputable def snake_delta (a2 a3 b1 b2 kerG cokerA : N) : Path N kerG cokerA :=
   (sp "lift-to-a₃" kerG a3).trans
   ((sp "g-surj-preimg" a3 a2).trans
   ((sp "apply-β" a2 b2).trans
@@ -284,7 +284,7 @@ theorem snake_delta_len (a2 a3 b1 b2 kerG cokerA : N) :
   simp [snake_delta, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 22: snake 6-term exact sequence
-def snake_six (kerA kerB kerG cokerA cokerB cokerG : N) : Path N kerA cokerG :=
+noncomputable def snake_six (kerA kerB kerG cokerA cokerB cokerG : N) : Path N kerA cokerG :=
   (sp "ker(α)→ker(β)" kerA kerB).trans
   ((sp "ker(β)→ker(γ)" kerB kerG).trans
   ((sp "δ" kerG cokerA).trans
@@ -322,7 +322,7 @@ theorem snake_six_trans (kerA kerB kerG cokerA cokerB cokerG : N)
 -- We just use 9 distinct Nat nodes
 
 -- Theorem 27: column 1 exactness chase (4 steps)
-def nine_col1 (a11 a12 a21 a22 a31 : N) : Path N a11 a31 :=
+noncomputable def nine_col1 (a11 a12 a21 a22 a31 : N) : Path N a11 a31 :=
   (sp "row1-exact" a11 a12).trans
   ((sp "col2-exact" a12 a22).trans
   ((sp "row2-inv" a22 a21).trans
@@ -334,7 +334,7 @@ theorem nine_col1_len (a11 a12 a21 a22 a31 : N) :
   simp [nine_col1, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 29: column 3 exactness chase (4 steps)
-def nine_col3 (a13 a12 a23 a22 a33 : N) : Path N a13 a33 :=
+noncomputable def nine_col3 (a13 a12 a23 a22 a33 : N) : Path N a13 a33 :=
   (sp "row1-inv" a13 a12).trans
   ((sp "col2-exact" a12 a22).trans
   ((sp "row2-right" a22 a23).trans
@@ -345,7 +345,7 @@ theorem nine_col3_len (a13 a12 a23 a22 a33 : N) :
   simp [nine_col3, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 30: full traverse top-left to bottom-right (6 steps)
-def nine_full (a11 a12 a21 a22 a31 a32 a33 : N) : Path N a11 a33 :=
+noncomputable def nine_full (a11 a12 a21 a22 a31 a32 a33 : N) : Path N a11 a33 :=
   (nine_col1 a11 a12 a21 a22 a31).trans
   ((sp "row3-r1" a31 a32).trans (sp "row3-r2" a32 a33))
 
@@ -355,7 +355,7 @@ theorem nine_full_len (a11 a12 a21 a22 a31 a32 a33 : N) :
   simp [nine_full, nine_col1, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 32: diagonal (2 steps)
-def nine_diag (a11 a22 a33 : N) : Path N a11 a33 :=
+noncomputable def nine_diag (a11 a22 a33 : N) : Path N a11 a33 :=
   (sp "diag-11-22" a11 a22).trans (sp "diag-22-33" a22 a33)
 
 theorem nine_diag_len (a11 a22 a33 : N) :
@@ -363,7 +363,7 @@ theorem nine_diag_len (a11 a22 a33 : N) :
   simp [nine_diag, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 33: row 2 (2 steps)
-def nine_row2 (a21 a22 a23 : N) : Path N a21 a23 :=
+noncomputable def nine_row2 (a21 a22 a23 : N) : Path N a21 a23 :=
   (sp "r21→22" a21 a22).trans (sp "r22→23" a22 a23)
 
 theorem nine_row2_len (a21 a22 a23 : N) :
@@ -380,7 +380,7 @@ theorem nine_col1_symm_len (a11 a12 a21 a22 a31 : N) :
 -- ============================================================
 
 -- Theorem 35: horseshoe chase (4 steps)
-def horseshoe (pa a b c pc : N) : Path N pa pc :=
+noncomputable def horseshoe (pa a b c pc : N) : Path N pa pc :=
   (sp "lift-resA" pa a).trans
   ((sp "A→B" a b).trans
   ((sp "B→C" b c).trans
@@ -392,7 +392,7 @@ theorem horseshoe_len (pa a b c pc : N) :
   simp [horseshoe, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 37: direct sum path (2 steps)
-def horseshoe_dsum (pa pb pc : N) : Path N pa pc :=
+noncomputable def horseshoe_dsum (pa pb pc : N) : Path N pa pc :=
   (sp "PA↪PA⊕PC" pa pb).trans (sp "PA⊕PC↠PC" pb pc)
 
 theorem horseshoe_dsum_len (pa pb pc : N) :
@@ -415,7 +415,7 @@ theorem congrArg_path_eq (f : N → N)
   subst h; rfl
 
 -- Theorem 40: functor maps square path RD
-def map_sq_RD (F : N → N) (tl tr br : N) (t r : String) : Path N (F tl) (F br) :=
+noncomputable def map_sq_RD (F : N → N) (tl tr br : N) (t r : String) : Path N (F tl) (F br) :=
   (sp ("F(" ++ t ++ ")") (F tl) (F tr)).trans
   (sp ("F(" ++ r ++ ")") (F tr) (F br))
 
@@ -424,7 +424,7 @@ theorem map_sq_RD_len (F : N → N) (tl tr br : N) (t r : String) :
   simp [map_sq_RD, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 41: functor maps square path DR
-def map_sq_DR (F : N → N) (tl bl br : N) (l b : String) : Path N (F tl) (F br) :=
+noncomputable def map_sq_DR (F : N → N) (tl bl br : N) (l b : String) : Path N (F tl) (F br) :=
   (sp ("F(" ++ l ++ ")") (F tl) (F bl)).trans
   (sp ("F(" ++ b ++ ")") (F bl) (F br))
 
@@ -446,7 +446,7 @@ theorem congrArg_cell2_id (p : Path N a b) :
 -- ============================================================
 
 -- Theorem 44: salamander interlock path (right-down)
-def salam_RD (nw ne se : N) : Path N nw se :=
+noncomputable def salam_RD (nw ne se : N) : Path N nw se :=
   (sp "top-exact" nw ne).trans (sp "right-exact" ne se)
 
 theorem salam_RD_len (nw ne se : N) :
@@ -454,7 +454,7 @@ theorem salam_RD_len (nw ne se : N) :
   simp [salam_RD, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 45: salamander alt path (down-right)
-def salam_DR (nw sw se : N) : Path N nw se :=
+noncomputable def salam_DR (nw sw se : N) : Path N nw se :=
   (sp "left-exact" nw sw).trans (sp "bot-exact" sw se)
 
 theorem salam_DR_len (nw sw se : N) :
@@ -462,7 +462,7 @@ theorem salam_DR_len (nw sw se : N) :
   simp [salam_DR, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 46: salamander cycle
-def salam_cycle (nw ne sw se : N) : Path N nw nw :=
+noncomputable def salam_cycle (nw ne sw se : N) : Path N nw nw :=
   (salam_RD nw ne se).trans (salam_DR nw sw se).symm
 
 theorem salam_cycle_len (nw ne sw se : N) :
@@ -471,7 +471,7 @@ theorem salam_cycle_len (nw ne sw se : N) :
         sp, Path.single, Path.trans, Path.length, Path.symm, Step.symm]
 
 -- Theorem 47: salamander extended
-def salam_ext (north nw ne se south : N) : Path N north south :=
+noncomputable def salam_ext (north nw ne se south : N) : Path N north south :=
   (sp "N→NW" north nw).trans ((salam_RD nw ne se).trans (sp "SE→S" se south))
 
 theorem salam_ext_len (north nw ne se south : N) :
@@ -483,7 +483,7 @@ theorem salam_ext_len (north nw ne se south : N) :
 -- ============================================================
 
 -- Theorem 48: zigzag connecting (6 steps)
-def zigzag_delta (a b c hnc hn1a : N) : Path N c a :=
+noncomputable def zigzag_delta (a b c hnc hn1a : N) : Path N c a :=
   (sp "pick-cycle" c hnc).trans
   ((sp "lift-to-B" hnc b).trans
   ((sp "apply-d" b b).trans
@@ -497,7 +497,7 @@ theorem zigzag_delta_len (a b c hnc hn1a : N) :
   simp [zigzag_delta, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 50: LES fragment (3 steps, periodic)
-def zigzag_frag (a b c : N) (n : Nat) : Path N a a :=
+noncomputable def zigzag_frag (a b c : N) (n : Nat) : Path N a a :=
   (sp ("H" ++ toString n ++ "f") a b).trans
   ((sp ("H" ++ toString n ++ "g") b c).trans
    (sp ("δ" ++ toString n) c a))
@@ -508,7 +508,7 @@ theorem zigzag_frag_len (a b c : N) (n : Nat) :
   simp [zigzag_frag, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 52: iterated LES
-def zigzag_iter (a b c : N) (n : Nat) : (k : Nat) → Path N a a
+noncomputable def zigzag_iter (a b c : N) (n : Nat) : (k : Nat) → Path N a a
   | 0     => Path.nil a
   | k + 1 => (zigzag_frag a b c (n + k)).trans (zigzag_iter a b c n k)
 
@@ -531,7 +531,7 @@ theorem zigzag_delta_symm_len (a b c hnc hn1a : N) :
 -- ============================================================
 
 -- Theorem 55: chase through composition
-def chase_comp (a b c : N) (f_l g_l : String) : Path N a c :=
+noncomputable def chase_comp (a b c : N) (f_l g_l : String) : Path N a c :=
   (sp f_l a b).trans (sp g_l b c)
 
 theorem chase_comp_len (a b c : N) (f_l g_l : String) :
@@ -544,7 +544,7 @@ theorem chase_comp_symm_len (a b c : N) (f_l g_l : String) :
   simp [chase_comp, sp, Path.single, Path.trans, Path.length, Path.symm, Step.symm]
 
 -- Theorem 57: pullback chase
-def pullback_chase (pb a t : N) : Path N pb t :=
+noncomputable def pullback_chase (pb a t : N) : Path N pb t :=
   (sp "π₁" pb a).trans (sp "f" a t)
 
 theorem pullback_chase_len (pb a t : N) :
@@ -552,7 +552,7 @@ theorem pullback_chase_len (pb a t : N) :
   simp [pullback_chase, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 58: pushout chase
-def pushout_chase (s a po : N) : Path N s po :=
+noncomputable def pushout_chase (s a po : N) : Path N s po :=
   (sp "f" s a).trans (sp "ι₁" a po)
 
 theorem pushout_chase_len (s a po : N) :
@@ -560,7 +560,7 @@ theorem pushout_chase_len (s a po : N) :
   simp [pushout_chase, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 59: kernel-cokernel sequence
-def ker_coker (k s t ck : N) (f_l : String) : Path N k ck :=
+noncomputable def ker_coker (k s t ck : N) (f_l : String) : Path N k ck :=
   (sp "ker↪src" k s).trans ((sp f_l s t).trans (sp "tgt↠coker" t ck))
 
 theorem ker_coker_len (k s t ck : N) (f_l : String) :
@@ -568,7 +568,7 @@ theorem ker_coker_len (k s t ck : N) (f_l : String) :
   simp [ker_coker, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 60: mono ⟹ trivial kernel
-def mono_ker (z k : N) : Path N z k :=
+noncomputable def mono_ker (z k : N) : Path N z k :=
   (sp "0→ker" z k).trans (sp "ker=0" k k)
 
 theorem mono_ker_len (z k : N) :
@@ -576,7 +576,7 @@ theorem mono_ker_len (z k : N) :
   simp [mono_ker, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 61: epi ⟹ trivial cokernel
-def epi_coker (ck z : N) : Path N ck z :=
+noncomputable def epi_coker (ck z : N) : Path N ck z :=
   (sp "coker=0" ck ck).trans (sp "coker→0" ck z)
 
 theorem epi_coker_len (ck z : N) :
@@ -584,7 +584,7 @@ theorem epi_coker_len (ck z : N) :
   simp [epi_coker, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 62: iso chase
-def iso_chase (s t : N) (f_l : String) : Path N s t :=
+noncomputable def iso_chase (s t : N) (f_l : String) : Path N s t :=
   (sp "check-mono" s s).trans ((sp "check-epi" s s).trans (sp f_l s t))
 
 theorem iso_chase_len (s t : N) (f_l : String) :
@@ -658,7 +658,7 @@ theorem cell2_vinv_vcomp {p q : Path N a b} (σ : Cell2 p q) :
 -- ============================================================
 
 -- Theorem 74: derived functor chase
-def derived_chase (s t : N) (n : Nat) : Path N s t :=
+noncomputable def derived_chase (s t : N) (n : Nat) : Path N s t :=
   (sp "take-res" s s).trans ((sp ("F-deg-" ++ toString n) s t).trans (sp "homology" t t))
 
 theorem derived_chase_len (s t : N) (n : Nat) :
@@ -666,7 +666,7 @@ theorem derived_chase_len (s t : N) (n : Nat) :
   simp [derived_chase, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 75: derived connecting
-def derived_delta (s t : N) (n : Nat) : Path N t s :=
+noncomputable def derived_delta (s t : N) (n : Nat) : Path N t s :=
   (sp "RⁿF" t t).trans ((sp "δ-connect" t s).trans (sp "Rⁿ⁺¹F" s s))
 
 theorem derived_delta_len (s t : N) (n : Nat) :
@@ -678,7 +678,7 @@ theorem derived_delta_len (s t : N) (n : Nat) :
 -- ============================================================
 
 -- Theorem 76: spectral differential
-def spectral_diff (r : Nat) (p q : N) : Path N p q :=
+noncomputable def spectral_diff (r : Nat) (p q : N) : Path N p q :=
   (sp ("d_" ++ toString r) p p).trans (sp ("E_" ++ toString r) p q)
 
 theorem spectral_diff_len (r : Nat) (p q : N) :
@@ -686,7 +686,7 @@ theorem spectral_diff_len (r : Nat) (p q : N) :
   simp [spectral_diff, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 77: page transition
-def spectral_page (r : Nat) (obj : N) : Path N obj obj :=
+noncomputable def spectral_page (r : Nat) (obj : N) : Path N obj obj :=
   (sp ("ker-d" ++ toString r) obj obj).trans
   ((sp ("mod-im-d" ++ toString r) obj obj).trans
    (sp ("E" ++ toString (r+1)) obj obj))
@@ -700,7 +700,7 @@ theorem spectral_page_len (r : Nat) (obj : N) :
 -- ============================================================
 
 -- Theorem 78: mapping cone chase
-def cone_chase (s t cone : N) : Path N s t :=
+noncomputable def cone_chase (s t cone : N) : Path N s t :=
   (sp "incl-shift" s cone).trans (sp "cone-diff" cone t)
 
 theorem cone_chase_len (s t cone : N) :
@@ -708,7 +708,7 @@ theorem cone_chase_len (s t cone : N) :
   simp [cone_chase, sp, Path.single, Path.trans, Path.length]
 
 -- Theorem 79: exact triangle
-def exact_tri (s t cone : N) : Path N s s :=
+noncomputable def exact_tri (s t cone : N) : Path N s s :=
   (sp "f" s t).trans ((sp "incl" t cone).trans (sp "proj" cone s))
 
 theorem exact_tri_len (s t cone : N) :

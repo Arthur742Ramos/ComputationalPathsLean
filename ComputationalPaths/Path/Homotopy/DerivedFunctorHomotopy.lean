@@ -29,7 +29,7 @@ universe u v w
 /-! ## Homotopy relation on maps -/
 
 /-- Two maps are related when there exists a computational homotopy between them. -/
-def HomotopyRel {A : Type u} {B : Type v} (f g : A → B) : Prop :=
+noncomputable def HomotopyRel {A : Type u} {B : Type v} (f g : A → B) : Prop :=
   Nonempty (FunHomotopy f g)
 
 /-- Homotopy relation is reflexive. -/
@@ -64,16 +64,16 @@ theorem homotopyRel_equiv {A : Type u} {B : Type v} :
     exact homotopyRel_trans (A := A) (B := B) (f := f) (g := g) (h := h) hfg hgh
 
 /-- The setoid of maps modulo homotopy. -/
-def homotopySetoid (A : Type u) (B : Type v) : Setoid (A → B) where
+noncomputable def homotopySetoid (A : Type u) (B : Type v) : Setoid (A → B) where
   r := HomotopyRel (A := A) (B := B)
   iseqv := homotopyRel_equiv (A := A) (B := B)
 
 /-- Homotopy classes of maps. -/
-def HomotopyClass (A : Type u) (B : Type v) : Type (max u v) :=
+noncomputable def HomotopyClass (A : Type u) (B : Type v) : Type (max u v) :=
   Quotient (homotopySetoid A B)
 
 /-- The homotopy class of a map. -/
-def homotopyClass {A : Type u} {B : Type v} (f : A → B) :
+noncomputable def homotopyClass {A : Type u} {B : Type v} (f : A → B) :
     HomotopyClass A B :=
   Quotient.mk _ f
 
@@ -98,7 +98,7 @@ namespace HomotopyLocalizationMap
 variable {A : Type u} {B : Type v} {C : Type w}
 
 /-- Lift a homotopy-respecting map to homotopy classes. -/
-def lift (F : HomotopyLocalizationMap A B C) :
+noncomputable def lift (F : HomotopyLocalizationMap A B C) :
     HomotopyClass A B → C :=
   Quotient.lift F.map (fun _ _ h => F.respects h)
 
@@ -109,7 +109,7 @@ def lift (F : HomotopyLocalizationMap A B C) :
 end HomotopyLocalizationMap
 
 /-- The derived map on homotopy classes. -/
-def derivedMap {A : Type u} {B : Type v} {C : Type w}
+noncomputable def derivedMap {A : Type u} {B : Type v} {C : Type w}
     (F : HomotopyLocalizationMap A B C) : HomotopyClass A B → C :=
   HomotopyLocalizationMap.lift F
 
@@ -136,19 +136,19 @@ theorem homotopyLocalization_universal {A : Type u} {B : Type v} {C : Type w}
 /-! ## Derived pre/post composition -/
 
 /-- Precomposition preserves homotopies. -/
-def homotopy_precompose {A : Type u} {B : Type v} {C : Type w} (f : A → B)
+noncomputable def homotopy_precompose {A : Type u} {B : Type v} {C : Type w} (f : A → B)
     {g h : B → C} (H : FunHomotopy g h) :
     FunHomotopy (fun a => g (f a)) (fun a => h (f a)) :=
   fun a => H (f a)
 
 /-- Postcomposition preserves homotopies. -/
-def homotopy_postcompose {A : Type u} {B : Type v} {C : Type w} (g : B → C)
+noncomputable def homotopy_postcompose {A : Type u} {B : Type v} {C : Type w} (g : B → C)
     {f h : A → B} (H : FunHomotopy f h) :
     FunHomotopy (fun a => g (f a)) (fun a => g (h a)) :=
   fun a => ap g (H a)
 
 /-- Derived precomposition on homotopy classes. -/
-def precompose {A : Type u} {B : Type v} {C : Type w} (f : A → B) :
+noncomputable def precompose {A : Type u} {B : Type v} {C : Type w} (f : A → B) :
     HomotopyClass B C → HomotopyClass A C :=
   HomotopyLocalizationMap.lift (A := B) (B := C) (C := HomotopyClass A C)
     { map := fun g => homotopyClass (fun a => g (f a))
@@ -158,7 +158,7 @@ def precompose {A : Type u} {B : Type v} {C : Type w} (f : A → B) :
         exact homotopyClass_eq (homotopy_precompose (f := f) H) }
 
 /-- Derived postcomposition on homotopy classes. -/
-def postcompose {A : Type u} {B : Type v} {C : Type w} (g : B → C) :
+noncomputable def postcompose {A : Type u} {B : Type v} {C : Type w} (g : B → C) :
     HomotopyClass A B → HomotopyClass A C :=
   HomotopyLocalizationMap.lift (A := A) (B := B) (C := HomotopyClass A C)
     { map := fun f => homotopyClass (fun a => g (f a))

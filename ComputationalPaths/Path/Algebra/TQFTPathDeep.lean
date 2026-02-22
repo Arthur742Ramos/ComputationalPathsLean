@@ -42,7 +42,7 @@ inductive Boundary where
   deriving DecidableEq, Repr
 
 /-- Disjoint union of boundaries -/
-def Boundary.disjointUnion : Boundary → Boundary → Boundary
+noncomputable def Boundary.disjointUnion : Boundary → Boundary → Boundary
   | .empty, b => b
   | b, .empty => b
   | a, _ => a
@@ -54,11 +54,11 @@ structure Cobordism where
   label : String := ""
 
 /-- Identity cobordism (cylinder) -/
-def Cobordism.identity (b : Boundary) : Cobordism :=
+noncomputable def Cobordism.identity (b : Boundary) : Cobordism :=
   { source := b, target := b, label := "cylinder" }
 
 /-- Composition of cobordisms (gluing) -/
-def Cobordism.compose (c1 c2 : Cobordism) (_ : c1.target = c2.source) : Cobordism :=
+noncomputable def Cobordism.compose (c1 c2 : Cobordism) (_ : c1.target = c2.source) : Cobordism :=
   { source := c1.source, target := c2.target, label := c1.label ++ "∘" ++ c2.label }
 
 -- ========================================================================
@@ -71,7 +71,7 @@ structure VSpace (k : Type u) where
   dim : Nat := 0
 
 /-- Dual vector space -/
-def VSpace.dual (V : VSpace.{u,v} k) : VSpace.{u,v} k :=
+noncomputable def VSpace.dual (V : VSpace.{u,v} k) : VSpace.{u,v} k :=
   { carrier := V.carrier, dim := V.dim }
 
 -- ========================================================================
@@ -88,10 +88,10 @@ structure TQFTData (k : Type u) where
 -- ========================================================================
 
 /-- Euler characteristic of genus-g closed surface -/
-def eulerChar (g : Nat) : Int := 2 - 2 * g
+noncomputable def eulerChar (g : Nat) : Int := 2 - 2 * g
 
 /-- Genus-g surface dimension formula -/
-def GenusValue (n : Nat) : Nat := 2 * n
+noncomputable def GenusValue (n : Nat) : Nat := 2 * n
 
 /-- Frobenius algebra structure (from 2d TQFT) -/
 structure FrobeniusData (A : Type u) where

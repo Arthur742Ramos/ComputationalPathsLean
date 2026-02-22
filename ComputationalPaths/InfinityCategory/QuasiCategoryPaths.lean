@@ -52,7 +52,7 @@ noncomputable def assoc_rweq {w x y z : Obj}
 end QuasiPathComposition
 
 /-- Canonical quasi-category composition on paths is `Path.trans`. -/
-def canonical (Obj : Type u) : QuasiPathComposition Obj where
+noncomputable def canonical (Obj : Type u) : QuasiPathComposition Obj where
   compose := fun p q => Path.trans p q
   left_id_step := fun p => Path.Step.trans_refl_left p
   right_id_step := fun p => Path.Step.trans_refl_right p

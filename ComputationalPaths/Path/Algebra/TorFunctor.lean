@@ -50,12 +50,12 @@ structure TorFunctor where
 
 namespace TorFunctor
 
-private def torTrivialObj : PointedSet.{w} where
+private noncomputable def torTrivialObj : PointedSet.{w} where
   carrier := PUnit
   zero := PUnit.unit
 
 /-- The trivial Tor functor sending every pair to the one-point set. -/
-def trivial : TorFunctor.{u, v, w} where
+noncomputable def trivial : TorFunctor.{u, v, w} where
   mapObj := fun _ _ => torTrivialObj
   mapMor := by
     intro A A' B B' f g

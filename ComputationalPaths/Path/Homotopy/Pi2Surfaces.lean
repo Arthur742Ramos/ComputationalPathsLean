@@ -24,7 +24,7 @@ namespace Pi2Surfaces
 
 universe u
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Surface type representatives -/
@@ -69,11 +69,11 @@ abbrev Pi2 (A : Type) (a : A) : Type :=
 abbrev pi2Sphere2Model : Type := Int
 
 /-- The degree of a map S² → S², giving the π₂ element. -/
-def pi2Sphere2Degree : Pi2 Sphere2 sphere2Base → Int :=
+noncomputable def pi2Sphere2Degree : Pi2 Sphere2 sphere2Base → Int :=
   fun _ => 0
 
 /-- The generator of π₂(S²): the identity map of degree 1. -/
-def pi2Sphere2Generator : Pi2 Sphere2 sphere2Base :=
+noncomputable def pi2Sphere2Generator : Pi2 Sphere2 sphere2Base :=
   Path.refl (Path.refl sphere2Base)
 
 /-- Path witnessing that the generator equals refl. -/
@@ -81,23 +81,23 @@ theorem pi2Sphere2Generator_eq_refl :
     pi2Sphere2Generator = Path.refl (Path.refl sphere2Base) := rfl
 
 /-- Coherence: double reflexivity is itself reflexive. -/
-def pi2Sphere2ReflCoherence :
+noncomputable def pi2Sphere2ReflCoherence :
     Path pi2Sphere2Generator (Path.refl (Path.refl sphere2Base)) :=
   Path.refl _
 
 /-! ## Group operations on π₂ -/
 
 /-- Composition of π₂ elements (vertical stacking of 2-loops). -/
-def pi2Comp {A : Type} {a : A}
+noncomputable def pi2Comp {A : Type} {a : A}
     (α β : Pi2 A a) : Pi2 A a :=
   Path.trans α β
 
 /-- The identity element of π₂. -/
-def pi2Id {A : Type} {a : A} : Pi2 A a :=
+noncomputable def pi2Id {A : Type} {a : A} : Pi2 A a :=
   Path.refl (Path.refl a)
 
 /-- The inverse of a π₂ element. -/
-def pi2Inv {A : Type} {a : A}
+noncomputable def pi2Inv {A : Type} {a : A}
     (α : Pi2 A a) : Pi2 A a :=
   Path.symm α
 
@@ -120,19 +120,19 @@ theorem pi2Comp_assoc {A : Type} {a : A}
   unfold pi2Comp; exact trans_assoc α β γ
 
 /-- Coherence path for left identity. -/
-def pi2Comp_id_left_path {A : Type} {a : A}
+noncomputable def pi2Comp_id_left_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Comp pi2Id α) α :=
   Path.stepChain (pi2Comp_id_left α)
 
 /-- Coherence path for right identity. -/
-def pi2Comp_id_right_path {A : Type} {a : A}
+noncomputable def pi2Comp_id_right_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Comp α pi2Id) α :=
   Path.stepChain (pi2Comp_id_right α)
 
 /-- Coherence path for associativity. -/
-def pi2Comp_assoc_path {A : Type} {a : A}
+noncomputable def pi2Comp_assoc_path {A : Type} {a : A}
     (α β γ : Pi2 A a) :
     Path (pi2Comp (pi2Comp α β) γ)
          (pi2Comp α (pi2Comp β γ)) :=
@@ -158,7 +158,7 @@ theorem pi2Inv_id {A : Type} {a : A} :
   unfold pi2Inv pi2Id; exact symm_refl (Path.refl a)
 
 /-- Path for inverse of identity. -/
-def pi2Inv_id_path {A : Type} {a : A} :
+noncomputable def pi2Inv_id_path {A : Type} {a : A} :
     Path (pi2Inv (pi2Id (A := A) (a := a))) (pi2Id (A := A) (a := a)) :=
   Path.stepChain pi2Inv_id
 
@@ -169,7 +169,7 @@ theorem pi2Inv_comp {A : Type} {a : A}
   unfold pi2Inv pi2Comp; exact symm_trans α β
 
 /-- Path for inverse distributing over composition. -/
-def pi2Inv_comp_path {A : Type} {a : A}
+noncomputable def pi2Inv_comp_path {A : Type} {a : A}
     (α β : Pi2 A a) :
     Path (pi2Inv (pi2Comp α β)) (pi2Comp (pi2Inv β) (pi2Inv α)) :=
   Path.stepChain (pi2Inv_comp α β)
@@ -181,7 +181,7 @@ theorem pi2Inv_inv {A : Type} {a : A}
   unfold pi2Inv; exact symm_symm α
 
 /-- Path for double inverse. -/
-def pi2Inv_inv_path {A : Type} {a : A}
+noncomputable def pi2Inv_inv_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Inv (pi2Inv α)) α :=
   Path.stepChain (pi2Inv_inv α)
@@ -189,7 +189,7 @@ def pi2Inv_inv_path {A : Type} {a : A}
 /-! ## Functoriality of π₂ -/
 
 /-- A function f : A → B induces a map π₂(A,a) → π₂(B, f a). -/
-def pi2Map {A B : Type} {a : A} (f : A → B) :
+noncomputable def pi2Map {A B : Type} {a : A} (f : A → B) :
     Pi2 A a → Pi2 B (f a) :=
   fun α => Path.congrArg (Path.congrArg f ·) α
 
@@ -199,7 +199,7 @@ theorem pi2Map_refl {A B : Type} {a : A} (f : A → B) :
   unfold pi2Map pi2Id; simp [Path.congrArg]
 
 /-- Coherence for π₂ map on refl. -/
-def pi2Map_refl_path {A B : Type} {a : A} (f : A → B) :
+noncomputable def pi2Map_refl_path {A B : Type} {a : A} (f : A → B) :
     Path (pi2Map f (pi2Id (A := A) (a := a)))
          (pi2Id (A := B) (a := f a)) :=
   Path.stepChain (pi2Map_refl f)
@@ -213,7 +213,7 @@ theorem pi2Map_comp {A B : Type} {a : A} (f : A → B)
   exact congrArg_trans (fun x => Path.congrArg f x) α β
 
 /-- Coherence path for distributivity. -/
-def pi2Map_comp_path {A B : Type} {a : A} (f : A → B)
+noncomputable def pi2Map_comp_path {A B : Type} {a : A} (f : A → B)
     (α β : Pi2 A a) :
     Path (pi2Map f (pi2Comp α β))
          (pi2Comp (pi2Map f α) (pi2Map f β)) :=
@@ -227,7 +227,7 @@ theorem pi2Map_inv {A B : Type} {a : A} (f : A → B)
   exact congrArg_symm (fun x => Path.congrArg f x) α
 
 /-- Coherence for π₂ map commuting with inversion. -/
-def pi2Map_inv_path {A B : Type} {a : A} (f : A → B)
+noncomputable def pi2Map_inv_path {A B : Type} {a : A} (f : A → B)
     (α : Pi2 A a) :
     Path (pi2Map f (pi2Inv α)) (pi2Inv (pi2Map f α)) :=
   Path.stepChain (pi2Map_inv f α)
@@ -240,7 +240,7 @@ theorem pi2Map_comp_fun {A B C : Type} {a : A} (f : A → B) (g : B → C)
   simp [Path.congrArg]
 
 /-- Coherence for composition of π₂ maps. -/
-def pi2Map_comp_fun_path {A B C : Type} {a : A} (f : A → B) (g : B → C)
+noncomputable def pi2Map_comp_fun_path {A B C : Type} {a : A} (f : A → B) (g : B → C)
     (α : Pi2 A a) :
     Path (pi2Map (fun x => g (f x)) α) (pi2Map g (pi2Map f α)) :=
   Path.stepChain (pi2Map_comp_fun f g α)
@@ -256,7 +256,7 @@ theorem pi2Map_id_fun {A : Type} {a : A}
     simp [Path.congrArg]
 
 /-- Coherence for identity π₂ map. -/
-def pi2Map_id_fun_path {A : Type} {a : A}
+noncomputable def pi2Map_id_fun_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Map (fun x : A => x) α) α :=
   Path.stepChain (pi2Map_id_fun α)
@@ -264,12 +264,12 @@ def pi2Map_id_fun_path {A : Type} {a : A}
 /-! ## Product formulas for π₂ -/
 
 /-- π₂(A × B) → π₂(A): projection to the first factor. -/
-def pi2ProdFst {A B : Type} {a : A} {b : B} :
+noncomputable def pi2ProdFst {A B : Type} {a : A} {b : B} :
     Pi2 (A × B) (a, b) → Pi2 A a :=
   fun α => Path.congrArg (Path.congrArg Prod.fst ·) α
 
 /-- π₂(A × B) → π₂(B): projection to the second factor. -/
-def pi2ProdSnd {A B : Type} {a : A} {b : B} :
+noncomputable def pi2ProdSnd {A B : Type} {a : A} {b : B} :
     Pi2 (A × B) (a, b) → Pi2 B b :=
   fun α => Path.congrArg (Path.congrArg Prod.snd ·) α
 
@@ -286,13 +286,13 @@ theorem pi2ProdSnd_refl {A B : Type} {a : A} {b : B} :
   simp [pi2ProdSnd, Path.congrArg]
 
 /-- Coherence: fst projection preserves path structure. -/
-def pi2ProdFst_coherence {A B : Type} {a : A} {b : B} :
+noncomputable def pi2ProdFst_coherence {A B : Type} {a : A} {b : B} :
     Path (pi2ProdFst (Path.refl (Path.refl (a, b))))
          (Path.refl (Path.refl a)) :=
   Path.stepChain pi2ProdFst_refl
 
 /-- Coherence: snd projection preserves path structure. -/
-def pi2ProdSnd_coherence {A B : Type} {a : A} {b : B} :
+noncomputable def pi2ProdSnd_coherence {A B : Type} {a : A} {b : B} :
     Path (pi2ProdSnd (Path.refl (Path.refl (a, b))))
          (Path.refl (Path.refl b)) :=
   Path.stepChain pi2ProdSnd_refl
@@ -312,14 +312,14 @@ theorem pi2ProdSnd_comp {A B : Type} {a : A} {b : B}
   exact congrArg_trans (fun x => Path.congrArg Prod.snd x) α β
 
 /-- Coherence for Fst homomorphism. -/
-def pi2ProdFst_comp_path {A B : Type} {a : A} {b : B}
+noncomputable def pi2ProdFst_comp_path {A B : Type} {a : A} {b : B}
     (α β : Pi2 (A × B) (a, b)) :
     Path (pi2ProdFst (pi2Comp α β))
          (pi2Comp (pi2ProdFst α) (pi2ProdFst β)) :=
   Path.stepChain (pi2ProdFst_comp α β)
 
 /-- Coherence for Snd homomorphism. -/
-def pi2ProdSnd_comp_path {A B : Type} {a : A} {b : B}
+noncomputable def pi2ProdSnd_comp_path {A B : Type} {a : A} {b : B}
     (α β : Pi2 (A × B) (a, b)) :
     Path (pi2ProdSnd (pi2Comp α β))
          (pi2Comp (pi2ProdSnd α) (pi2ProdSnd β)) :=
@@ -350,7 +350,7 @@ theorem pi2_abelian_toEq {A : Type} {a : A}
 /-! ## Hopf action -/
 
 /-- The Hopf action on π₂(S²) is the identity. -/
-def hopfPi2Action : Pi2 Sphere2 sphere2Base → Pi2 Sphere2 sphere2Base :=
+noncomputable def hopfPi2Action : Pi2 Sphere2 sphere2Base → Pi2 Sphere2 sphere2Base :=
   fun α => α
 
 /-- The Hopf action is the identity. -/
@@ -358,7 +358,7 @@ theorem hopfPi2Action_id (α : Pi2 Sphere2 sphere2Base) :
     hopfPi2Action α = α := rfl
 
 /-- Coherence path for Hopf action. -/
-def hopfPi2Action_path (α : Pi2 Sphere2 sphere2Base) :
+noncomputable def hopfPi2Action_path (α : Pi2 Sphere2 sphere2Base) :
     Path (hopfPi2Action α) α :=
   Path.refl α
 
@@ -368,7 +368,7 @@ theorem hopfPi2Action_comp (α β : Pi2 Sphere2 sphere2Base) :
       pi2Comp (hopfPi2Action α) (hopfPi2Action β) := rfl
 
 /-- Coherence for Hopf preserving comp. -/
-def hopfPi2Action_comp_path (α β : Pi2 Sphere2 sphere2Base) :
+noncomputable def hopfPi2Action_comp_path (α β : Pi2 Sphere2 sphere2Base) :
     Path (hopfPi2Action (pi2Comp α β))
          (pi2Comp (hopfPi2Action α) (hopfPi2Action β)) :=
   Path.refl _
@@ -382,7 +382,7 @@ abbrev Susp' (_A : Type) : Type := PUnit
 @[simp] abbrev suspBase' (A : Type) : Susp' A := PUnit.unit
 
 /-- Suspension map on π₂ (trivial in our model). -/
-def suspPi2Map {A : Type} {a : A} :
+noncomputable def suspPi2Map {A : Type} {a : A} :
     Pi2 A a → Pi2 (Susp' A) (suspBase' A) :=
   fun _ => pi2Id
 
@@ -401,7 +401,7 @@ theorem suspPi2Map_comp {A : Type} {a : A}
   exact (trans_refl_left (refl (refl PUnit.unit))).symm
 
 /-- Coherence for suspension composition. -/
-def suspPi2Map_comp_path {A : Type} {a : A}
+noncomputable def suspPi2Map_comp_path {A : Type} {a : A}
     (α β : Pi2 A a) :
     Path (suspPi2Map (pi2Comp α β))
          (pi2Comp (suspPi2Map (A := A) α) (suspPi2Map (A := A) β)) :=
@@ -416,7 +416,7 @@ theorem suspPi2Map_inv {A : Type} {a : A}
   exact (symm_refl (refl PUnit.unit)).symm
 
 /-- Coherence for suspension inversion. -/
-def suspPi2Map_inv_path {A : Type} {a : A}
+noncomputable def suspPi2Map_inv_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (suspPi2Map (pi2Inv α))
          (pi2Inv (suspPi2Map (A := A) α)) :=
@@ -431,12 +431,12 @@ abbrev Wedge' (_A _B : Type) : Type := PUnit
 @[simp] abbrev wedgeBase' (A B : Type) : Wedge' A B := PUnit.unit
 
 /-- Inclusion of π₂(A) into π₂(A ∨ B). -/
-def wedgeInclLeft' {A B : Type} {a : A} :
+noncomputable def wedgeInclLeft' {A B : Type} {a : A} :
     Pi2 A a → Pi2 (Wedge' A B) (wedgeBase' A B) :=
   fun _ => pi2Id
 
 /-- Inclusion of π₂(B) into π₂(A ∨ B). -/
-def wedgeInclRight' {A B : Type} {b : B} :
+noncomputable def wedgeInclRight' {A B : Type} {b : B} :
     Pi2 B b → Pi2 (Wedge' A B) (wedgeBase' A B) :=
   fun _ => pi2Id
 
@@ -515,7 +515,7 @@ theorem pi2_genus4_trivial (α : Pi2 (Surface 4) (surfaceBase 4)) :
 /-! ## Iterated π₂ composition -/
 
 /-- Iterate π₂ composition n times. -/
-def pi2Iterate {A : Type} {a : A}
+noncomputable def pi2Iterate {A : Type} {a : A}
     (α : Pi2 A a) : Nat → Pi2 A a
   | 0 => pi2Id
   | n + 1 => pi2Comp α (pi2Iterate α n)
@@ -533,7 +533,7 @@ theorem pi2Iterate_one {A : Type} {a : A}
   exact pi2Comp_id_right α
 
 /-- Path for iterating once. -/
-def pi2Iterate_one_path {A : Type} {a : A}
+noncomputable def pi2Iterate_one_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Iterate α 1) α :=
   Path.stepChain (pi2Iterate_one α)
@@ -546,7 +546,7 @@ theorem pi2Iterate_two {A : Type} {a : A}
   rw [pi2Iterate_one]
 
 /-- Path for iterating twice. -/
-def pi2Iterate_two_path {A : Type} {a : A}
+noncomputable def pi2Iterate_two_path {A : Type} {a : A}
     (α : Pi2 A a) :
     Path (pi2Iterate α 2) (pi2Comp α α) :=
   Path.stepChain (pi2Iterate_two α)

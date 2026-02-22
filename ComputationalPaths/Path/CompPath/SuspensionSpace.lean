@@ -38,7 +38,7 @@ universe u
 /-! ## Suspension space -/
 
 /-- Suspension as a pushout of two unit points along X. -/
-def SuspensionCompPath (X : Type u) : Type u :=
+noncomputable def SuspensionCompPath (X : Type u) : Type u :=
   Pushout PUnit' PUnit' X (fun _ => PUnit'.unit) (fun _ => PUnit'.unit)
 
 namespace SuspensionCompPath
@@ -46,17 +46,17 @@ namespace SuspensionCompPath
 variable {X : Type u}
 
 /-- North pole of the suspension. -/
-def north : SuspensionCompPath X :=
+noncomputable def north : SuspensionCompPath X :=
   Pushout.inl (A := PUnit') (B := PUnit') (C := X)
     (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) PUnit'.unit
 
 /-- South pole of the suspension. -/
-def south : SuspensionCompPath X :=
+noncomputable def south : SuspensionCompPath X :=
   Pushout.inr (A := PUnit') (B := PUnit') (C := X)
     (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) PUnit'.unit
 
 /-- Meridian from the north pole to the south pole through x. -/
-def merid (x : X) : Path (north (X := X)) (south (X := X)) :=
+noncomputable def merid (x : X) : Path (north (X := X)) (south (X := X)) :=
   Pushout.glue (A := PUnit') (B := PUnit') (C := X)
     (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) x
 
@@ -82,12 +82,12 @@ abbrev suspMerid {X : Type u} (x : X) :
 
 /-- The meridian path from north to south is nontrivial in general,
     but two meridians compose via the south pole to give a loop at north. -/
-def suspMeridLoop {X : Type u} (x y : X) :
+noncomputable def suspMeridLoop {X : Type u} (x y : X) :
     Path (suspNorth X) (suspNorth X) :=
   Path.trans (suspMerid x) (Path.symm (suspMerid y))
 
 /-- The trivial loop at the north pole. -/
-def suspNorthRefl (X : Type u) : Path (suspNorth X) (suspNorth X) :=
+noncomputable def suspNorthRefl (X : Type u) : Path (suspNorth X) (suspNorth X) :=
   Path.refl (suspNorth X)
 
 /-- The loop `merid(x) ⬝ merid(x)⁻¹` has trivial `toEq`. -/
@@ -101,7 +101,7 @@ theorem suspMeridLoop_toEq_eq {X : Type u} (x y x' y' : X) :
   simp [suspMeridLoop]
 
 /-- The meridian from south back to north. -/
-def suspMeridInv {X : Type u} (x : X) :
+noncomputable def suspMeridInv {X : Type u} (x : X) :
     Path (suspSouth X) (suspNorth X) :=
   Path.symm (suspMerid x)
 
@@ -120,7 +120,7 @@ theorem suspMeridInv_cancel {X : Type u} (x : X) :
 /-- Suspension is functorial: a map `f : X → Y` induces `Σf : ΣX → ΣY`.
     On the pushout quotient, poles go to poles and meridians are re-glued
     through `f`. -/
-def suspFunctor {X Y : Type u} (f : X → Y) : Susp X → Susp Y :=
+noncomputable def suspFunctor {X Y : Type u} (f : X → Y) : Susp X → Susp Y :=
   Quot.lift
     (fun s => match s with
       | Sum.inl _ => suspNorth Y
@@ -160,7 +160,7 @@ abbrev DoubleSusp (X : Type u) : Type u := Susp (Susp X)
 abbrev TripleSusp (X : Type u) : Type u := Susp (DoubleSusp X)
 
 /-- Iterated suspension Σⁿ X. -/
-def iterSusp : Nat → Type u → Type u
+noncomputable def iterSusp : Nat → Type u → Type u
   | 0 => id
   | Nat.succ n => fun X => Susp (iterSusp n X)
 
@@ -174,7 +174,7 @@ theorem iterSusp_one (X : Type u) : iterSusp 1 X = Susp X := rfl
 theorem iterSusp_two (X : Type u) : iterSusp 2 X = DoubleSusp X := rfl
 
 /-- Iterated suspension is functorial: `Σⁿ f`. -/
-def iterSuspFunctor {X Y : Type u} : (n : Nat) → (X → Y) → iterSusp n X → iterSusp n Y
+noncomputable def iterSuspFunctor {X Y : Type u} : (n : Nat) → (X → Y) → iterSusp n X → iterSusp n Y
   | 0 => fun f => f
   | Nat.succ n => fun f => suspFunctor (iterSuspFunctor n f)
 
@@ -188,17 +188,17 @@ structure SuspCWData where
   baseDim : Nat
 
 /-- The suspension adds two 0-cells (poles) and shifts all other cells up by 1. -/
-def suspCWCellCount (base : SuspCWData) : Nat → Nat
+noncomputable def suspCWCellCount (base : SuspCWData) : Nat → Nat
   | 0 => 2  -- north and south poles
   | Nat.succ k => base.baseCells k
 
 /-- CW data for Σ(point): 2 vertices, 1 edge → S¹. -/
-def suspPointCW : SuspCWData where
+noncomputable def suspPointCW : SuspCWData where
   baseCells := fun _ => if 0 = 0 then 1 else 0
   baseDim := 0
 
 /-- Euler characteristic of the suspension: χ(ΣX) = 2 - χ(X). -/
-def suspEulerChar (baseEuler : Int) : Int := 2 - baseEuler
+noncomputable def suspEulerChar (baseEuler : Int) : Int := 2 - baseEuler
 
 /-- χ(Σ(point)) = χ(S¹) = 0. -/
 theorem susp_point_euler : suspEulerChar 1 = 1 := rfl
@@ -217,7 +217,7 @@ structure SuspConnectivity (X : Type u) where
   suspConnectivity : Nat := baseConnectivity + 1
 
 /-- The suspension of a 0-connected space is 1-connected. -/
-def susp0Connected (X : Type u) : SuspConnectivity X where
+noncomputable def susp0Connected (X : Type u) : SuspConnectivity X where
   baseConnectivity := 0
 
 /-- The connectivity of the suspension is as expected. -/
@@ -227,17 +227,17 @@ theorem suspConnectivity_value (X : Type u) :
 /-! ## Path Coherence Witnesses -/
 
 /-- Path coherence: north pole is in the suspension. -/
-def suspNorth_ofEq (X : Type u) :
+noncomputable def suspNorth_ofEq (X : Type u) :
     Path (suspNorth X) (suspNorth X) :=
   Path.stepChain rfl
 
 /-- Path coherence: south pole is in the suspension. -/
-def suspSouth_ofEq (X : Type u) :
+noncomputable def suspSouth_ofEq (X : Type u) :
     Path (suspSouth X) (suspSouth X) :=
   Path.stepChain rfl
 
 /-- Path coherence: two meridians through the same point are equal. -/
-def suspMerid_eq (x : X) :
+noncomputable def suspMerid_eq (x : X) :
     Path (suspMerid x) (suspMerid x) :=
   Path.refl (suspMerid x)
 
@@ -251,7 +251,7 @@ theorem suspMerid_symm_trans_proof (x : X) :
 /-- The smash product X ∧ Y relates to suspensions via
     Σ(X × Y) → ΣX ∨ ΣY (cofiber sequence).
     We record the dimension formula for cells. -/
-def smashSuspDimShift (dimX dimY : Nat) : Nat := dimX + dimY
+noncomputable def smashSuspDimShift (dimX dimY : Nat) : Nat := dimX + dimY
 
 /-- Σ(Sⁿ) ≃ Sⁿ⁺¹ dimensionally. -/
 theorem susp_sphere_dim (n : Nat) : n + 1 = Nat.succ n := rfl

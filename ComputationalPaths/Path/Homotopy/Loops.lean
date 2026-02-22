@@ -32,15 +32,15 @@ namespace LoopSpace
 variable {A : Type u} {a : A}
 
 /-- Reflexive loop at the base point. -/
-@[simp] def id : LoopSpace A a :=
+@[simp] noncomputable def id : LoopSpace A a :=
   Path.refl a
 
 /-- Loop inversion inherited from path symmetry. -/
-@[simp] def inv (p : LoopSpace A a) : LoopSpace A a :=
+@[simp] noncomputable def inv (p : LoopSpace A a) : LoopSpace A a :=
   Path.symm p
 
 /-- Loop composition inherited from path concatenation. -/
-@[simp] def comp (p q : LoopSpace A a) : LoopSpace A a :=
+@[simp] noncomputable def comp (p q : LoopSpace A a) : LoopSpace A a :=
   Path.trans p q
 
 @[simp] theorem comp_assoc (p q r : LoopSpace A a) :
@@ -114,19 +114,19 @@ variable {A : Type u} {a : A}
     -Int.negSucc n = Int.ofNat (Nat.succ n) := rfl
 
 /-- Embed a concrete loop in the quotient. -/
-@[simp] def ofLoop (p : LoopSpace A a) : LoopQuot A a :=
+@[simp] noncomputable def ofLoop (p : LoopSpace A a) : LoopQuot A a :=
   Quot.mk _ p
 
 /-- Identity element in the loop quotient. -/
-@[simp] def id : LoopQuot A a :=
+@[simp] noncomputable def id : LoopQuot A a :=
   PathRwQuot.refl (A := A) a
 
 /-- Loop composition in the quotient. -/
-@[simp] def comp (x y : LoopQuot A a) : LoopQuot A a :=
+@[simp] noncomputable def comp (x y : LoopQuot A a) : LoopQuot A a :=
   PathRwQuot.trans (A := A) x y
 
 /-- Loop inversion in the quotient. -/
-@[simp] def inv (x : LoopQuot A a) : LoopQuot A a :=
+@[simp] noncomputable def inv (x : LoopQuot A a) : LoopQuot A a :=
   PathRwQuot.symm (A := A) x
 
 @[simp] theorem ofLoop_trans (p q : LoopSpace A a) :
@@ -266,7 +266,7 @@ the strict group laws on `LoopQuot`.
     (y := comp (inv y) (inv x)) (z := comp x y) (h := hL.trans hR.symm)
 
 /-- Natural-number iteration of a loop-quotient element. -/
-@[simp] def pow (x : LoopQuot A a) : Nat → LoopQuot A a
+@[simp] noncomputable def pow (x : LoopQuot A a) : Nat → LoopQuot A a
   | 0 => id
   | Nat.succ n => comp (pow x n) x
 
@@ -301,7 +301,7 @@ theorem pow_add (x : LoopQuot A a) (m n : Nat) :
         _ = comp (pow x m) (pow x n.succ) := rfl
 
 /-- Iterate a loop an integer number of times. -/
-@[simp] def zpow (x : LoopQuot A a) : Int → LoopQuot A a
+@[simp] noncomputable def zpow (x : LoopQuot A a) : Int → LoopQuot A a
   | Int.ofNat n => pow x n
   | Int.negSucc n => inv (pow x (Nat.succ n))
 
@@ -485,7 +485,7 @@ structure LoopMonoid (A : Type u) (a : A) where
   mul_one : ∀ x, mul x one = x
 
 /-- Canonical loop monoid induced by rewrite-quotiented loops. -/
-@[simp] def loopMonoid (A : Type u) (a : A) : LoopMonoid A a where
+@[simp] noncomputable def loopMonoid (A : Type u) (a : A) : LoopMonoid A a where
   mul := LoopQuot.comp
   one := LoopQuot.id
   mul_assoc := LoopQuot.comp_assoc
@@ -502,7 +502,7 @@ structure LoopGroup (A : Type u) (a : A) extends LoopMonoid A a where
   mul_right_inv : ∀ x, mul x (inv x) = one
 
 /-- Canonical loop group induced by rewrite-quotiented loops. -/
-@[simp] def loopGroup (A : Type u) (a : A) : LoopGroup A a where
+@[simp] noncomputable def loopGroup (A : Type u) (a : A) : LoopGroup A a where
   toLoopMonoid := loopMonoid A a
   inv := LoopQuot.inv
   mul_left_inv := LoopQuot.inv_comp

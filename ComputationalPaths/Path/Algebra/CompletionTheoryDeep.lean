@@ -24,7 +24,7 @@ inductive CTm where
   | app   : CTm → CTm → CTm
 deriving DecidableEq, Repr
 
-def CTm.size : CTm → Nat
+noncomputable def CTm.size : CTm → Nat
   | .var _     => 1
   | .const _   => 1
   | .app l r   => 1 + l.size + r.size
@@ -33,10 +33,10 @@ def CTm.size : CTm → Nat
 -- §2  Substitutions
 -- ============================================================
 
-def CSubst := Nat → CTm
-def CSubst.id : CSubst := CTm.var
+noncomputable def CSubst := Nat → CTm
+noncomputable def CSubst.id : CSubst := CTm.var
 
-def CTm.applyS (σ : CSubst) : CTm → CTm
+noncomputable def CTm.applyS (σ : CSubst) : CTm → CTm
   | .var n   => σ n
   | .const c => .const c
   | .app l r => .app (l.applyS σ) (r.applyS σ)
@@ -68,21 +68,21 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _, q       => q
   | .cons s p, q    => .cons s (p.trans q)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a       => .refl a
   | .rule t a b   => .rule (t ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a     => .nil a
   | .cons s p  => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.single (s : Step α a b) : Path α a b := .cons s (.nil _)
+noncomputable def Path.single (s : Step α a b) : Path α a b := .cons s (.nil _)
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _     => 0
   | .cons _ p  => 1 + p.length
 
@@ -103,8 +103,8 @@ structure Rule where
 deriving DecidableEq, Repr
 
 /-- Orientation: choosing a direction for an equation. -/
-def orient (eq : Equation) : Rule := ⟨eq.lhs, eq.rhs⟩
-def orientRev (eq : Equation) : Rule := ⟨eq.rhs, eq.lhs⟩
+noncomputable def orient (eq : Equation) : Rule := ⟨eq.lhs, eq.rhs⟩
+noncomputable def orientRev (eq : Equation) : Rule := ⟨eq.rhs, eq.lhs⟩
 
 /-- Theorem 4: orient preserves lhs. -/
 theorem orient_lhs (eq : Equation) : (orient eq).lhs = eq.lhs := rfl
@@ -123,10 +123,10 @@ theorem orientRev_rhs (eq : Equation) : (orientRev eq).rhs = eq.lhs := rfl
 -- ============================================================
 
 /-- Weight-based ordering: t > s if t.size > s.size. -/
-def termGt (t s : CTm) : Bool := t.size > s.size
+noncomputable def termGt (t s : CTm) : Bool := t.size > s.size
 
 /-- Orientability predicate. -/
-def orientable (eq : Equation) : Bool :=
+noncomputable def orientable (eq : Equation) : Bool :=
   termGt eq.lhs eq.rhs || termGt eq.rhs eq.lhs
 
 /-- Theorem 8: Size of var is 1. -/
@@ -160,16 +160,16 @@ structure RwState where
 deriving Repr
 
 -- Step types for the completion procedure
-def orientStep (eq : Equation) : Step RwState st1 st2 :=
+noncomputable def orientStep (eq : Equation) : Step RwState st1 st2 :=
   Step.rule ("orient[" ++ reprStr eq.lhs ++ "→" ++ reprStr eq.rhs ++ "]") st1 st2
 
-def deduceStep (tag : String) : Step RwState st1 st2 :=
+noncomputable def deduceStep (tag : String) : Step RwState st1 st2 :=
   Step.rule ("deduce:" ++ tag) st1 st2
 
-def simplifyStep (tag : String) : Step RwState st1 st2 :=
+noncomputable def simplifyStep (tag : String) : Step RwState st1 st2 :=
   Step.rule ("simplify:" ++ tag) st1 st2
 
-def deleteStep : Step RwState st1 st2 :=
+noncomputable def deleteStep : Step RwState st1 st2 :=
   Step.rule "delete-trivial" st1 st2
 
 -- ============================================================
@@ -183,7 +183,7 @@ structure CriticalPair where
 deriving DecidableEq, Repr
 
 /-- Trivial critical pair: both sides identical. -/
-def CriticalPair.isTrivial (cp : CriticalPair) : Bool :=
+noncomputable def CriticalPair.isTrivial (cp : CriticalPair) : Bool :=
   cp.left == cp.right
 
 /-- Theorem 13: Trivial critical pair with equal sides. -/
@@ -192,7 +192,7 @@ theorem CriticalPair.isTrivial_eq (t : CTm) :
   simp [CriticalPair.isTrivial, BEq.beq]
 
 /-- Extract equation from critical pair. -/
-def CriticalPair.toEquation (cp : CriticalPair) : Equation :=
+noncomputable def CriticalPair.toEquation (cp : CriticalPair) : Equation :=
   ⟨cp.left, cp.right⟩
 
 /-- Theorem 14: toEquation preserves left. -/
@@ -227,7 +227,7 @@ structure CompState where
 deriving Repr
 
 /-- Initial state from a set of equations. -/
-def CompState.init (eqs : List Equation) : CompState :=
+noncomputable def CompState.init (eqs : List Equation) : CompState :=
   ⟨[], eqs⟩
 
 /-- Theorem 16: Initial state has no rules. -/
@@ -243,18 +243,18 @@ theorem CompState.init_eqs (eqs : List Equation) :
 -- ============================================================
 
 /-- Delete a trivial equation (lhs = rhs when lhs == rhs). -/
-def applyDelete (st : CompState) (i : Nat) : CompState :=
+noncomputable def applyDelete (st : CompState) (i : Nat) : CompState :=
   { st with equations := st.equations.eraseIdx i }
 
 /-- Orient: move equation to rules. -/
-def applyOrient (st : CompState) (i : Nat) : CompState :=
+noncomputable def applyOrient (st : CompState) (i : Nat) : CompState :=
   match st.equations[i]? with
   | some eq => { rules := st.rules ++ [orient eq],
                  equations := st.equations.eraseIdx i }
   | none => st
 
 /-- Add a critical pair as a new equation. -/
-def applyDeduce (st : CompState) (cp : CriticalPair) : CompState :=
+noncomputable def applyDeduce (st : CompState) (cp : CriticalPair) : CompState :=
   { st with equations := st.equations ++ [cp.toEquation] }
 
 /-- Theorem 18: Delete removes one equation. -/
@@ -286,7 +286,7 @@ theorem applyDelete_rules (st : CompState) (i : Nat) :
 -- §10  Path-theoretic completion traces
 -- ============================================================
 
-def completionStep (name : String) (s1 s2 : CompState) :
+noncomputable def completionStep (name : String) (s1 s2 : CompState) :
     Step CompState s1 s2 :=
   Step.rule name s1 s2
 
@@ -321,17 +321,17 @@ theorem symm_single_length (s1 s2 : CompState) (name : String) :
 -- ============================================================
 
 /-- A ground term has no variables. -/
-def CTm.isGround : CTm → Bool
+noncomputable def CTm.isGround : CTm → Bool
   | .var _   => false
   | .const _ => true
   | .app l r => l.isGround && r.isGround
 
 /-- A ground equation has ground terms on both sides. -/
-def Equation.isGround (eq : Equation) : Bool :=
+noncomputable def Equation.isGround (eq : Equation) : Bool :=
   eq.lhs.isGround && eq.rhs.isGround
 
 /-- A ground rule has ground terms on both sides. -/
-def Rule.isGround (r : Rule) : Bool :=
+noncomputable def Rule.isGround (r : Rule) : Bool :=
   r.lhs.isGround && r.rhs.isGround
 
 /-- Theorem 27: Constants are ground. -/
@@ -367,7 +367,7 @@ structure ReductionOrdering where
   substClosed : ∀ (σ : CSubst) (l r : CTm), gt l r → gt (l.applyS σ) (r.applyS σ)
 
 /-- An LPO-like ordering based on size. -/
-def sizeGt (t s : CTm) : Prop := t.size > s.size
+noncomputable def sizeGt (t s : CTm) : Prop := t.size > s.size
 
 /-- Theorem 32: sizeGt is irreflexive. -/
 theorem sizeGt_irrefl (t : CTm) : ¬ sizeGt t t := by
@@ -397,7 +397,7 @@ inductive MarkedEq where
 deriving Repr
 
 /-- Classify an equation by orientability. -/
-def classifyEq (eq : Equation) : MarkedEq :=
+noncomputable def classifyEq (eq : Equation) : MarkedEq :=
   if termGt eq.lhs eq.rhs then .oriented (orient eq)
   else if termGt eq.rhs eq.lhs then .oriented (orientRev eq)
   else .unoriented eq
@@ -438,7 +438,7 @@ structure Joinable (α : Type) (a b c : α) where
   pathR : Path α b c
 
 /-- Build a joinability witness from a trivial critical pair. -/
-def trivialJoin (t : CTm) : Joinable CTm t t t :=
+noncomputable def trivialJoin (t : CTm) : Joinable CTm t t t :=
   ⟨Path.nil t, Path.nil t⟩
 
 /-- Theorem 39: Trivial join has both paths of length 0. -/
@@ -447,7 +447,7 @@ theorem trivialJoin_lengths (t : CTm) :
   ⟨rfl, rfl⟩
 
 /-- A completion system is locally confluent if all critical pairs are joinable. -/
-def locallyConfluent (cps : List CriticalPair) (join : CriticalPair → Bool) : Bool :=
+noncomputable def locallyConfluent (cps : List CriticalPair) (join : CriticalPair → Bool) : Bool :=
   cps.all join
 
 /-- Theorem 40: Empty critical pair list is trivially locally confluent. -/
@@ -468,7 +468,7 @@ theorem equation_double_reverse (eq : Equation) :
   cases eq; rfl
 
 /-- A completion path showing orient-reverse coherence. -/
-def orientReversePath (_eq : Equation) (s1 s2 s3 : CompState) :
+noncomputable def orientReversePath (_eq : Equation) (s1 s2 s3 : CompState) :
     Path CompState s1 s3 :=
   Path.trans
     (Path.single (completionStep "orient" s1 s2))
@@ -484,7 +484,7 @@ theorem orientReversePath_length (eq : Equation) (s1 s2 s3 : CompState) :
 -- ============================================================
 
 /-- congrArg-style: if l = l' and r = r', then app l r = app l' r'. -/
-def congrAppPath (s1 s2 s3 s4 : CompState)
+noncomputable def congrAppPath (s1 s2 s3 s4 : CompState)
     (pL : Path CompState s1 s2) (_pR : Path CompState s3 s4) :
     Path CompState s1 s2 :=
   pL  -- The left path witnesses the left congruence step

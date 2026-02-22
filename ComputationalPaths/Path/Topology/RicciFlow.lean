@@ -122,7 +122,7 @@ structure RicciStep (g₀ g₁ : RiemannianMetric) where
   energy_decrease : True
 
 /-- Compose two Ricci flow steps. -/
-def RicciStep.comp {g₀ g₁ g₂ : RiemannianMetric}
+noncomputable def RicciStep.comp {g₀ g₁ g₂ : RiemannianMetric}
     (s₁ : RicciStep g₀ g₁) (s₂ : RicciStep g₁ g₂) :
     RicciStep g₀ g₂ where
   curv₀ := s₁.curv₀
@@ -130,7 +130,7 @@ def RicciStep.comp {g₀ g₁ g₂ : RiemannianMetric}
   energy_decrease := trivial
 
 /-- The identity Ricci step. -/
-def RicciStep.identity (g : RiemannianMetric) : RicciStep g g where
+noncomputable def RicciStep.identity (g : RiemannianMetric) : RicciStep g g where
   curv₀ := { scalarCurv := fun _ => 0, ricciTensor := fun _ _ => 0,
              riemannTensor := fun _ _ _ _ => 0, sectionalCurv := fun _ _ => 0,
              ricci_trace := trivial, scalar_trace := trivial }
@@ -377,13 +377,13 @@ theorem positive_scalar_preserved (flow : RicciFlowData) (mp : MaximumPrinciple 
   mp.positive_preserved h t
 
 /-- Identity step is a left unit up to RwEq. -/
-def ricciStep_id_left (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
+noncomputable def ricciStep_id_left (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
     RwEq (RicciStep.comp (RicciStep.identity g₀) s).step_eq s.step_eq := by
   simpa [RicciStep.comp, RicciStep.identity] using
     (RwEq.step (Step.trans_refl_right s.step_eq))
 
 /-- Identity step is a right unit up to RwEq. -/
-def ricciStep_id_right (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
+noncomputable def ricciStep_id_right (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
     RwEq (RicciStep.comp s (RicciStep.identity g₁)).step_eq s.step_eq := by
   simpa [RicciStep.comp, RicciStep.identity] using
     (RwEq.step (Step.trans_refl_left s.step_eq))

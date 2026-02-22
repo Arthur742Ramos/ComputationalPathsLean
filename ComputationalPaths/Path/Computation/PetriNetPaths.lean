@@ -24,7 +24,7 @@ universe u
 /-! ## Petri Net Definition -/
 
 /-- A marking is a function from places to token counts. -/
-def Marking (P : Type u) := P → Nat
+noncomputable def Marking (P : Type u) := P → Nat
 
 /-- A Petri net with n places. -/
 structure PetriNet (P : Type u) (T : Type u) where
@@ -34,21 +34,21 @@ structure PetriNet (P : Type u) (T : Type u) where
   post : T → P → Nat
 
 /-- A transition is enabled at a marking if all places have enough tokens. -/
-def enabled {P T : Type u} (N : PetriNet P T) (m : Marking P) (t : T) : Prop :=
+noncomputable def enabled {P T : Type u} (N : PetriNet P T) (m : Marking P) (t : T) : Prop :=
   ∀ p : P, N.pre t p ≤ m p
 
 /-- Fire a transition, producing a new marking. -/
-def fire {P T : Type u} (N : PetriNet P T) (m : Marking P) (t : T)
+noncomputable def fire {P T : Type u} (N : PetriNet P T) (m : Marking P) (t : T)
     (_h : enabled N m t) : Marking P :=
   fun p => m p - N.pre t p + N.post t p
 
 /-- Firing sequence: list of transitions. -/
-def FiringSeq (T : Type u) := List T
+noncomputable def FiringSeq (T : Type u) := List T
 
 /-! ## Reachability -/
 
 /-- One-step reachability. -/
-def oneStep {P T : Type u} (N : PetriNet P T) (m₁ m₂ : Marking P) : Prop :=
+noncomputable def oneStep {P T : Type u} (N : PetriNet P T) (m₁ m₂ : Marking P) : Prop :=
   ∃ t : T, ∃ h : enabled N m₁ t, fire N m₁ t h = m₂
 
 /-- Multi-step reachability (reflexive-transitive closure). -/
@@ -98,7 +98,7 @@ theorem fire_identity {P T : Type u} (N : PetriNet P T) (m : Marking P) (t : T)
 /-! ## Coverability -/
 
 /-- Marking m₁ covers m₂ if m₁ ≥ m₂ everywhere. -/
-def covers {P : Type u} (m₁ m₂ : Marking P) : Prop :=
+noncomputable def covers {P : Type u} (m₁ m₂ : Marking P) : Prop :=
   ∀ p : P, m₂ p ≤ m₁ p
 
 /-- Covering is reflexive. -/
@@ -111,7 +111,7 @@ theorem covers_trans {P : Type u} {m₁ m₂ m₃ : Marking P}
   fun p => Nat.le_trans (h₂₃ p) (h₁₂ p)
 
 /-- A marking is coverable if some reachable marking covers it. -/
-def coverable {P T : Type u} (N : PetriNet P T) (m₀ m : Marking P) : Prop :=
+noncomputable def coverable {P T : Type u} (N : PetriNet P T) (m₀ m : Marking P) : Prop :=
   ∃ m', reachable N m₀ m' ∧ covers m' m
 
 /-- If m is reachable, it is coverable by itself. -/
@@ -130,11 +130,11 @@ structure PInvariant {P T : Type u} (N : PetriNet P T) where
     weight p * (N.post t p : Int) = weight p * (N.pre t p : Int)
 
 /-- Weighted sum of a marking. -/
-def weightedSum {P : Type u} (w : P → Int) (m : Marking P) (places : List P) : Int :=
+noncomputable def weightedSum {P : Type u} (w : P → Int) (m : Marking P) (places : List P) : Int :=
   places.foldl (fun acc p => acc + w p * (m p : Int)) 0
 
 /-- Zero marking: all places have 0 tokens. -/
-def zeroMarking (P : Type u) : Marking P := fun _ => 0
+noncomputable def zeroMarking (P : Type u) : Marking P := fun _ => 0
 
 /-- Zero marking is covered by all markings. -/
 theorem zero_covered {P : Type u} (m : Marking P) : covers m (zeroMarking P) :=
@@ -159,13 +159,13 @@ theorem enabled_mono {P T : Type u} (N : PetriNet P T) (m m' : Marking P) (t : T
   fun p => Nat.le_trans (hen p) (hge p)
 
 /-- Path witness: enabled monotonicity as a def. -/
-def enabled_mono_path {P T : Type u} (N : PetriNet P T) (m m' : Marking P) (t : T)
+noncomputable def enabled_mono_path {P T : Type u} (N : PetriNet P T) (m m' : Marking P) (t : T)
     (_hen : enabled N m t) (_hge : covers m' m) :
     Path (enabled N m' t) (enabled N m' t) :=
   Path.refl _
 
 /-- congrArg for firing: same transition at equal markings gives equal results. -/
-def congrArg_fire {P T : Type u} (N : PetriNet P T) (t : T)
+noncomputable def congrArg_fire {P T : Type u} (N : PetriNet P T) (t : T)
     {m₁ m₂ : Marking P} (h : Path m₁ m₂) (hen₁ : enabled N m₁ t) :
     Path (fire N m₁ t hen₁)
          (fire N m₂ t (by cases h with | mk _ p => cases p; exact hen₁)) := by
@@ -178,12 +178,12 @@ theorem transport_reachable {P T : Type u} (N : PetriNet P T)
   cases h with | mk steps proof => cases proof; exact hr
 
 /-- symm of a petri net marking path. -/
-def symm_marking {P : Type u} {m₁ m₂ : Marking P}
+noncomputable def symm_marking {P : Type u} {m₁ m₂ : Marking P}
     (p : Path m₁ m₂) : Path m₂ m₁ :=
   Path.symm p
 
 /-- trans of marking paths. -/
-def trans_marking {P : Type u} {m₁ m₂ m₃ : Marking P}
+noncomputable def trans_marking {P : Type u} {m₁ m₂ m₃ : Marking P}
     (p : Path m₁ m₂) (q : Path m₂ m₃) : Path m₁ m₃ :=
   Path.trans p q
 
@@ -235,13 +235,13 @@ theorem trans_refl_marking {P : Type u} (m₁ m₂ : Marking P) (p : Path m₁ m
     Path.trans p (Path.refl m₂) = p := by simp
 
 /-- congrArg for enabled predicate. -/
-def congrArg_enabled {P T : Type u} (N : PetriNet P T) (t : T)
+noncomputable def congrArg_enabled {P T : Type u} (N : PetriNet P T) (t : T)
     {m₁ m₂ : Marking P} (h : Path m₁ m₂) :
     Path (enabled N m₁ t) (enabled N m₂ t) :=
   Path.congrArg (fun m => enabled N m t) h
 
 /-- Path.symm for reachability marking endpoint. -/
-def reachable_symm_endpoint {P T : Type u} (N : PetriNet P T)
+noncomputable def reachable_symm_endpoint {P T : Type u} (N : PetriNet P T)
     {m₁ m₂ m₃ : Marking P} (h : Path m₂ m₃) :
     Path (reachable N m₁ m₃) (reachable N m₁ m₂) :=
   Path.symm (Path.congrArg (reachable N m₁) h)

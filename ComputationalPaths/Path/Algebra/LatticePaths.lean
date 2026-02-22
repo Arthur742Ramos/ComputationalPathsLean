@@ -29,7 +29,7 @@ variable {A : Type u} {B : Type v}
 /-! ## Step-count preorder -/
 
 /-- Step-count ordering. -/
-def stepCountLe {a b : A} (p q : Path a b) : Prop :=
+noncomputable def stepCountLe {a b : A} (p q : Path a b) : Prop :=
   p.steps.length ≤ q.steps.length
 
 theorem stepCountLe_refl {a b : A} (p : Path a b) :
@@ -72,11 +72,11 @@ theorem congrArg_stepCount (f : A → B) {a b : A} (p : Path a b) :
 /-! ## Proof-level meet/join -/
 
 /-- Meet: pick the shorter trace. -/
-def pathMeet {a b : A} (p q : Path a b) : Path a b :=
+noncomputable def pathMeet {a b : A} (p q : Path a b) : Path a b :=
   if p.steps.length ≤ q.steps.length then p else q
 
 /-- Join: pick the longer trace. -/
-def pathJoin {a b : A} (p q : Path a b) : Path a b :=
+noncomputable def pathJoin {a b : A} (p q : Path a b) : Path a b :=
   if p.steps.length ≤ q.steps.length then q else p
 
 theorem pathMeet_idem {a b : A} (p : Path a b) :

@@ -32,7 +32,7 @@ namespace PathPreservingSSetMap
 variable {S T U : SSetData.{u}}
 
 /-- Identity simplicial map with path-preserving structure. -/
-def id (S : SSetData) : PathPreservingSSetMap S S where
+noncomputable def id (S : SSetData) : PathPreservingSSetMap S S where
   map := fun _ x => x
   map_face := by
     intro n i x
@@ -42,7 +42,7 @@ def id (S : SSetData) : PathPreservingSSetMap S S where
     rfl
 
 /-- Composition of path-preserving simplicial maps. -/
-def comp (F : PathPreservingSSetMap S T) (G : PathPreservingSSetMap T U) :
+noncomputable def comp (F : PathPreservingSSetMap S T) (G : PathPreservingSSetMap T U) :
     PathPreservingSSetMap S U where
   map := fun n x => G.map n (F.map n x)
   map_face := by
@@ -63,7 +63,7 @@ def comp (F : PathPreservingSSetMap S T) (G : PathPreservingSSetMap T U) :
             G.map_degen n i (F.map n x)
 
 /-- Action on computational paths with an explicit trailing identity segment. -/
-def mapPath (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj n}
+noncomputable def mapPath (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj n}
     (p : Path x y) : Path (F.map n x) (F.map n y) :=
   Path.trans (Path.congrArg (F.map n) p) (Path.refl (F.map n y))
 
@@ -94,7 +94,7 @@ noncomputable def mapPath_respects_rweq (F : PathPreservingSSetMap S T)
       (rweq_symm (F.mapPath_rweq q)))
 
 /-- Transport horn data along a path-preserving simplicial map. -/
-def mapHorn (F : PathPreservingSSetMap S T) {n : Nat}
+noncomputable def mapHorn (F : PathPreservingSSetMap S T) {n : Nat}
     {k : Fin (n + 2)} (horn : HornData S n k) : HornData T n k where
   faces := fun i hi => F.map n (horn.faces i hi)
   compat := by
@@ -102,7 +102,7 @@ def mapHorn (F : PathPreservingSSetMap S T) {n : Nat}
     trivial
 
 /-- Transport a horn filler along a path-preserving simplicial map. -/
-def mapHornFiller (F : PathPreservingSSetMap S T) {n : Nat}
+noncomputable def mapHornFiller (F : PathPreservingSSetMap S T) {n : Nat}
     {k : Fin (n + 2)} (horn : HornData S n k)
     (filler : HornFiller S n k horn) :
     HornFiller T n k (F.mapHorn horn) where
@@ -118,14 +118,14 @@ def mapHornFiller (F : PathPreservingSSetMap S T) {n : Nat}
       _ = (F.mapHorn horn).faces i hi := rfl
 
 /-- Horn filling on mapped horns induced by a Kan filler on the source. -/
-def fillMappedHorn (F : PathPreservingSSetMap S T)
+noncomputable def fillMappedHorn (F : PathPreservingSSetMap S T)
     (kan : KanFillerProperty S)
     (n : Nat) (k : Fin (n + 2)) (horn : HornData S n k) :
     HornFiller T n k (F.mapHorn horn) :=
   F.mapHornFiller horn (kan.fill n k horn)
 
 /-- Inner-horn filling on mapped horns induced by source inner-Kan fillers. -/
-def fillMappedInnerHorn (F : PathPreservingSSetMap S T)
+noncomputable def fillMappedInnerHorn (F : PathPreservingSSetMap S T)
     (kan : InnerKanProperty S)
     (n : Nat) (k : Fin (n + 2)) (hk : InnerHorn n k)
     (horn : HornData S n k) :
@@ -133,7 +133,7 @@ def fillMappedInnerHorn (F : PathPreservingSSetMap S T)
   F.mapHornFiller horn (kan.fill n k hk horn)
 
 /-- Face equations of transported fillers as computational paths. -/
-def mappedFacePath (F : PathPreservingSSetMap S T)
+noncomputable def mappedFacePath (F : PathPreservingSSetMap S T)
     (kan : KanFillerProperty S)
     {n : Nat} {k : Fin (n + 2)} (horn : HornData S n k)
     (i : Fin (n + 2)) (hi : i ≠ k) :
@@ -186,11 +186,11 @@ namespace ImageKanCondition
 variable {S T : SSetData.{u}} (F : PathPreservingSSetMap S T)
 
 /-- Any source Kan structure induces mapped-horn Kan fillers. -/
-def ofKan (kan : KanFillerProperty S) : ImageKanCondition F where
+noncomputable def ofKan (kan : KanFillerProperty S) : ImageKanCondition F where
   fill := fun n k horn => F.fillMappedHorn kan n k horn
 
 /-- Mapped-horn Kan fillers restrict to mapped inner-horn fillers. -/
-def toInner (K : ImageKanCondition F) : ImageInnerKanCondition F where
+noncomputable def toInner (K : ImageKanCondition F) : ImageInnerKanCondition F where
   fill := by
     intro n k _ horn
     exact K.fill n k horn
@@ -202,11 +202,11 @@ namespace ImageInnerKanCondition
 variable {S T : SSetData.{u}} (F : PathPreservingSSetMap S T)
 
 /-- Any source inner-Kan structure induces mapped inner-horn fillers. -/
-def ofInnerKan (kan : InnerKanProperty S) : ImageInnerKanCondition F where
+noncomputable def ofInnerKan (kan : InnerKanProperty S) : ImageInnerKanCondition F where
   fill := fun n k hk horn => F.fillMappedInnerHorn kan n k hk horn
 
 /-- Full source Kan structure induces mapped inner-Kan fillers. -/
-def ofKan (kan : KanFillerProperty S) : ImageInnerKanCondition F :=
+noncomputable def ofKan (kan : KanFillerProperty S) : ImageInnerKanCondition F :=
   (ImageKanCondition.ofKan F kan).toInner
 
 end ImageInnerKanCondition

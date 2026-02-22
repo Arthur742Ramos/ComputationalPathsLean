@@ -27,7 +27,7 @@ inductive OperadicPathStep {A : Type u} :
       OperadicPathStep (Path.trans p (Path.symm p)) (Path.refl a)
 
 /-- Interpret an operadic infrastructure step as a primitive `Path.Step`. -/
-def OperadicPathStep.toStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def OperadicPathStep.toStep {A : Type u} {a b : A} {p q : Path a b}
     (s : OperadicPathStep p q) : Path.Step p q :=
   match s with
   | .right_unit p => Path.Step.trans_refl_right p
@@ -40,7 +40,7 @@ noncomputable def rweq_of_operadic_step {A : Type u} {a b : A}
   rweq_of_step (OperadicPathStep.toStep s)
 
 /-- Translate legacy operad-algebra steps to shared operadic infrastructure. -/
-def OperadicPathStep.ofOperadAlgebraStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def OperadicPathStep.ofOperadAlgebraStep {A : Type u} {a b : A} {p q : Path a b}
     (s : OperadAlgebraStep p q) : OperadicPathStep p q :=
   match s with
   | .right_unit p => OperadicPathStep.right_unit p
@@ -48,7 +48,7 @@ def OperadicPathStep.ofOperadAlgebraStep {A : Type u} {a b : A} {p q : Path a b}
   | .inverse_cancel p => OperadicPathStep.inverse_cancel p
 
 /-- Translate legacy Koszul steps to shared operadic infrastructure. -/
-def OperadicPathStep.ofKoszulStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def OperadicPathStep.ofKoszulStep {A : Type u} {a b : A} {p q : Path a b}
     (s : KoszulStep p q) : OperadicPathStep p q :=
   match s with
   | .right_unit p => OperadicPathStep.right_unit p

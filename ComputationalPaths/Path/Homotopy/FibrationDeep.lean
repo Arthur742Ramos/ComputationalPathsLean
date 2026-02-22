@@ -27,7 +27,7 @@ structure Fiber (f : E → B) (b : B) where
   over  : f point = b
 
 /-- Construct a fiber element from a point and proof. -/
-def Fiber.mk' (f : E → B) (e : E) : Fiber f (f e) :=
+noncomputable def Fiber.mk' (f : E → B) (e : E) : Fiber f (f e) :=
   ⟨e, rfl⟩
 
 /-- Equality of fiber elements: same point implies equal (proof irrelevance). -/
@@ -38,7 +38,7 @@ theorem Fiber.ext {f : E → B} {b : B} (x y : Fiber f b)
 /-! ## 3–4. Fiber transport (action of paths on fibers) -/
 
 /-- Transport a fiber along a path in the base (via a type family). -/
-def fiberTransport {P : B → Type v} {b₁ b₂ : B}
+noncomputable def fiberTransport {P : B → Type v} {b₁ b₂ : B}
     (p : Path b₁ b₂) (x : P b₁) : P b₂ :=
   transport p x
 
@@ -83,11 +83,11 @@ structure FiberSeq (P : B → Type v) (b : B) where
   basePoint  : B := b
 
 /-- The inclusion of the fiber into the total space. -/
-def fiberInclusion {P : B → Type v} (b : B) (x : P b) : (y : B) × P y :=
+noncomputable def fiberInclusion {P : B → Type v} (b : B) (x : P b) : (y : B) × P y :=
   ⟨b, x⟩
 
 /-- The projection from total space to base. -/
-def totalProjection {P : B → Type v} (s : (y : B) × P y) : B :=
+noncomputable def totalProjection {P : B → Type v} (s : (y : B) × P y) : B :=
   s.1
 
 /-- Projection of inclusion is the base point. -/
@@ -97,7 +97,7 @@ theorem proj_incl {P : B → Type v} (b : B) (x : P b) :
 /-! ## 9–10. Homotopy lifting property -/
 
 /-- A section of a type family is a dependent function. -/
-def Section (P : B → Type v) := (b : B) → P b
+noncomputable def Section (P : B → Type v) := (b : B) → P b
 
 /-- Lifting property: a section s lifts any path in B to fiber transport. -/
 theorem section_lifts {P : B → Type v} (s : Section P)
@@ -105,7 +105,7 @@ theorem section_lifts {P : B → Type v} (s : Section P)
     fiberTransport p (s b₁) = s b₂ → True := fun _ => trivial
 
 /-- The canonical lift of a path: transport the fiber element. -/
-def pathLift {P : B → Type v} {b₁ b₂ : B}
+noncomputable def pathLift {P : B → Type v} {b₁ b₂ : B}
     (p : Path b₁ b₂) (x : P b₁) : P b₂ :=
   fiberTransport p x
 
@@ -122,12 +122,12 @@ theorem pathLift_trans {P : B → Type v} {b₁ b₂ b₃ : B}
 /-! ## 11–12. Connecting map (boundary operator) -/
 
 /-- Total space path type: a path in the base plus fiber alignment. -/
-def TotalPathProp {P : B → Type v} (s t : (b : B) × P b) : Prop :=
+noncomputable def TotalPathProp {P : B → Type v} (s t : (b : B) × P b) : Prop :=
   ∃ h : Path s.1 t.1, fiberTransport h s.2 = t.2
 
 /-- The connecting map ∂: given a loop in B at b, compute the
     self-map of the fiber P b induced by transport around the loop. -/
-def connectingMap {P : B → Type v} {b : B}
+noncomputable def connectingMap {P : B → Type v} {b : B}
     (loop : Path b b) : P b → P b :=
   fiberTransport loop
 
@@ -179,7 +179,7 @@ theorem fiberTransport_natural_comp {P Q R : B → Type v}
 /-! ## 15–16. Pullback fibration -/
 
 /-- Pullback of a type family along a map. -/
-def pullbackFamily (f : A → B) (P : B → Type v) : A → Type v :=
+noncomputable def pullbackFamily (f : A → B) (P : B → Type v) : A → Type v :=
   fun a => P (f a)
 
 /-- Transport in pullback family equals transport along congrArg. -/
@@ -200,7 +200,7 @@ theorem pullback_transport_trans {f : A → B} {P : B → Type v}
 /-! ## 17–18. Long exact sequence (algebraic structure) -/
 
 /-- Exactness condition: the image of one map is the kernel of the next. -/
-def IsExactAt {X Y Z : Type u} (f : X → Y) (g : Y → Z) (z₀ : Z) : Prop :=
+noncomputable def IsExactAt {X Y Z : Type u} (f : X → Y) (g : Y → Z) (z₀ : Z) : Prop :=
   ∀ y : Y, g y = z₀ ↔ ∃ x : X, f x = y
 
 /-- The fiber sequence is exact: fiber inclusion composed with projection
@@ -216,12 +216,12 @@ theorem fiber_total_base_exact {P : B → Type v} (b : B) :
 /-! ## 19–20. Fiber equivalence under path -/
 
 /-- Fiber transport gives an equivalence between fibers. -/
-def fiberEquiv {P : B → Type v} {b₁ b₂ : B} (p : Path b₁ b₂) :
+noncomputable def fiberEquiv {P : B → Type v} {b₁ b₂ : B} (p : Path b₁ b₂) :
     P b₁ → P b₂ :=
   fiberTransport p
 
 /-- The inverse of the fiber equivalence. -/
-def fiberEquivInv {P : B → Type v} {b₁ b₂ : B} (p : Path b₁ b₂) :
+noncomputable def fiberEquivInv {P : B → Type v} {b₁ b₂ : B} (p : Path b₁ b₂) :
     P b₂ → P b₁ :=
   fiberTransport (symm p)
 
@@ -289,7 +289,7 @@ theorem FiberMorphism.commutes {P Q : B → Type v}
   fiberTransport_natural φ.map p x
 
 /-- Composition of fiber morphisms. -/
-def FiberMorphism.comp {P Q R : B → Type v}
+noncomputable def FiberMorphism.comp {P Q R : B → Type v}
     (ψ : FiberMorphism Q R) (φ : FiberMorphism P Q) : FiberMorphism P R :=
   ⟨fun b x => ψ.map b (φ.map b x)⟩
 

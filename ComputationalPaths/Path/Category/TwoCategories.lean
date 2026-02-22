@@ -145,14 +145,14 @@ structure RightUnitor (B : BicategoryData) {a b : B.Obj} (f : B.Hom a b) where
   inverse : B.TwoHom f (B.comp₁ f (B.id₁ b))
 
 /-- Pentagon axiom: the two ways of re-associating (f∘g)∘(h∘k) agree. -/
-def PentagonAxiom (B : BicategoryData)
+noncomputable def PentagonAxiom (B : BicategoryData)
     (assoc : {a b c d : B.Obj} → (f : B.Hom a b) → (g : B.Hom b c) → (h : B.Hom c d) →
              Associator B f g h) : Prop :=
   ∀ {a b c d e : B.Obj} (f : B.Hom a b) (g : B.Hom b c) (h : B.Hom c d) (k : B.Hom d e),
     True -- Full coherence diagram (simplified for brevity)
 
 /-- Triangle axiom: associator and unitors are compatible. -/
-def TriangleAxiom (B : BicategoryData)
+noncomputable def TriangleAxiom (B : BicategoryData)
     (assoc : {a b c : B.Obj} → (f : B.Hom a b) → (g : B.Hom b c) → (h : B.Hom c c) →
              Associator B f g h)
     (runit : {a b : B.Obj} → (f : B.Hom a b) → RightUnitor B f) : Prop :=
@@ -214,7 +214,7 @@ structure Adjunction₂ (C : StrictTwoCategory) {a b : C.Obj}
 
 /-- The mates correspondence: given adjunctions f ⊣ u and f' ⊣ u',
     there is a bijection between 2-cells f'h → kf and hu' → u k. -/
-def MatesCorrespondence (C : StrictTwoCategory)
+noncomputable def MatesCorrespondence (C : StrictTwoCategory)
     {a b a' b' : C.Obj}
     {f : C.Hom a b} {u : C.Hom b a} (adj₁ : Adjunction₂ C f u)
     {f' : C.Hom a' b'} {u' : C.Hom b' a'} (adj₂ : Adjunction₂ C f' u')
@@ -291,7 +291,7 @@ structure LaxAlgebra (C : StrictTwoCategory) (M : TwoMonad C) where
 -- ============================================================
 
 /-- A 2-monad is flexible if every pseudo-algebra can be strictified. -/
-def IsFlexible (C : StrictTwoCategory) (M : TwoMonad C) : Prop :=
+noncomputable def IsFlexible (C : StrictTwoCategory) (M : TwoMonad C) : Prop :=
   ∀ (A : PseudoAlgebra C M), ∃ (B : StrictAlgebra C M),
     True  -- B is pseudo-equivalent to A
 
@@ -378,7 +378,7 @@ theorem whisker_right_functorial (C : StrictTwoCategory)
   trivial
 
 /-- The identity pseudofunctor. -/
-def idPseudoFunctor (B : BicategoryData) : LaxFunctor B B where
+noncomputable def idPseudoFunctor (B : BicategoryData) : LaxFunctor B B where
   mapObj := id
   mapHom := id
   mapTwo := id
@@ -386,7 +386,7 @@ def idPseudoFunctor (B : BicategoryData) : LaxFunctor B B where
   idCell := fun a => B.id₂ (B.id₁ a)
 
 /-- Composition of lax functors. -/
-def compLaxFunctor {B₁ B₂ B₃ : BicategoryData}
+noncomputable def compLaxFunctor {B₁ B₂ B₃ : BicategoryData}
     (F : LaxFunctor B₁ B₂) (G : LaxFunctor B₂ B₃) : LaxFunctor B₁ B₃ where
   mapObj := G.mapObj ∘ F.mapObj
   mapHom := G.mapHom ∘ F.mapHom
@@ -397,7 +397,7 @@ def compLaxFunctor {B₁ B₂ B₃ : BicategoryData}
     B₃.vcomp (G.idCell (F.mapObj a)) (G.mapTwo (F.idCell a))
 
 /-- Every adjunction in a 2-category gives rise to a monad. -/
-def monadFromAdjunction₂ (C : StrictTwoCategory)
+noncomputable def monadFromAdjunction₂ (C : StrictTwoCategory)
     {a b : C.Obj} (l : C.Hom a b) (r : C.Hom b a) (adj : Adjunction₂ C l r) :
     C.Hom a a :=
   C.comp₁ l r
@@ -491,13 +491,13 @@ structure ModificationData (B₁ B₂ : BicategoryData)
   component : (a : B₁.Obj) → B₂.Hom (F.mapObj a) (G.mapObj a)
   coherence : True
 
-def ModificationVerticalComp (B₁ B₂ : BicategoryData)
+noncomputable def ModificationVerticalComp (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ : LaxTransformation₂ B₁ B₂ F G}
     (_ : ModificationData B₁ B₂ α β) (_ : ModificationData B₁ B₂ β γ) : Prop :=
   True
 
-def ModificationHorizontalComp (B₁ B₂ : BicategoryData)
+noncomputable def ModificationHorizontalComp (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ : LaxTransformation₂ B₁ B₂ F G}
     (_ : ModificationData B₁ B₂ α β) (_ : ModificationData B₁ B₂ β γ) : Prop :=
@@ -610,17 +610,17 @@ theorem em_comparison_2functor_exists (C : StrictTwoCategory) (M : TwoMonad C) :
 
 /-! ## Computational-path 2-categorical integration -/
 
-def twoCellAsPath {C : StrictTwoCategory} {a b : C.Obj}
+noncomputable def twoCellAsPath {C : StrictTwoCategory} {a b : C.Obj}
     (f g : C.Hom a b) : Type v :=
   Path f g
 
-def twoCellVerticalPath {C : StrictTwoCategory} {a b : C.Obj}
+noncomputable def twoCellVerticalPath {C : StrictTwoCategory} {a b : C.Obj}
     {f g h : C.Hom a b}
     (α : twoCellAsPath f g) (β : twoCellAsPath g h) :
     twoCellAsPath f h :=
   Path.trans α β
 
-def twoCellMatesTransposition {C : StrictTwoCategory} {a b : C.Obj}
+noncomputable def twoCellMatesTransposition {C : StrictTwoCategory} {a b : C.Obj}
     {f g : C.Hom a b} (α : twoCellAsPath f g) :
     twoCellAsPath g f :=
   Path.symm α
@@ -637,11 +637,11 @@ def twoCellMatesTransposition {C : StrictTwoCategory} {a b : C.Obj}
       twoCellVerticalPath α (twoCellVerticalPath β γ) := by
   simpa [twoCellVerticalPath] using Path.trans_assoc α β γ
 
-def twoCategoryRewrite {C : StrictTwoCategory} {a b : C.Obj}
+noncomputable def twoCategoryRewrite {C : StrictTwoCategory} {a b : C.Obj}
     {f g : C.Hom a b} (α β : twoCellAsPath f g) : Prop :=
   Path.toEq α = Path.toEq β
 
-def twoCategoryRewriteConfluent {C : StrictTwoCategory} {a b : C.Obj}
+noncomputable def twoCategoryRewriteConfluent {C : StrictTwoCategory} {a b : C.Obj}
     {f g : C.Hom a b} : Prop :=
   ∀ α β γ : twoCellAsPath f g,
     twoCategoryRewrite α β → twoCategoryRewrite α γ →

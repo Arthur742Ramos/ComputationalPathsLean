@@ -26,11 +26,11 @@ open ComputationalPaths.Path
 
 abbrev Interval : Type := Bool
 
-def I0 : Interval := false
-def I1 : Interval := true
-def iNeg (i : Interval) : Interval := !i
-def iMeet (i j : Interval) : Interval := i && j
-def iJoin (i j : Interval) : Interval := i || j
+noncomputable def I0 : Interval := false
+noncomputable def I1 : Interval := true
+noncomputable def iNeg (i : Interval) : Interval := !i
+noncomputable def iMeet (i j : Interval) : Interval := i && j
+noncomputable def iJoin (i j : Interval) : Interval := i || j
 
 /-! ## Interval algebra -/
 
@@ -69,14 +69,14 @@ structure CubePath (A : Type u) (a b : A) where
   eq : a = b
 
 /-- Constant cubical path. -/
-def CubePath.refl (A : Type u) (a : A) : CubePath A a a where
+noncomputable def CubePath.refl (A : Type u) (a : A) : CubePath A a a where
   fn := fun _ => a
   at0 := rfl
   at1 := rfl
   eq := rfl
 
 /-- Reverse a cubical path. -/
-def CubePath.symm {A : Type u} {a b : A} (p : CubePath A a b) : CubePath A b a where
+noncomputable def CubePath.symm {A : Type u} {a b : A} (p : CubePath A a b) : CubePath A b a where
   fn := fun i => p.fn (iNeg i)
   at0 := by show p.fn (iNeg I0) = b; rw [iNeg_I0]; exact p.at1
   at1 := by show p.fn (iNeg I1) = a; rw [iNeg_I1]; exact p.at0
@@ -88,7 +88,7 @@ theorem CubePath.symm_symm_fn {A : Type u} {a b : A} (p : CubePath A a b) :
   funext i; simp [CubePath.symm, iNeg_iNeg]
 
 /-- Map a function over a cubical path. -/
-def CubePath.map {A : Type u} {B : Type v} (f : A → B) {a b : A}
+noncomputable def CubePath.map {A : Type u} {B : Type v} (f : A → B) {a b : A}
     (p : CubePath A a b) : CubePath B (f a) (f b) where
   fn := fun i => f (p.fn i)
   at0 := by show f (p.fn I0) = f a; rw [p.at0]
@@ -101,7 +101,7 @@ theorem CubePath.map_refl {A : Type u} {B : Type v} (f : A → B) (a : A) :
   simp [CubePath.map, CubePath.refl]
 
 /-- From a computational path to a cubical path. -/
-def cubPathOfPath {A : Type u} {a b : A} (p : Path a b) : CubePath A a b where
+noncomputable def cubPathOfPath {A : Type u} {a b : A} (p : Path a b) : CubePath A a b where
   fn := fun i => if i = I0 then a else b
   at0 := by simp [I0]
   at1 := by simp [I1, I0]
@@ -124,7 +124,7 @@ structure CubeSquare (A : Type u) (a00 a01 a10 a11 : A) where
   c11 : fn I1 I1 = a11
 
 /-- Constant square. -/
-def CubeSquare.const (A : Type u) (a : A) : CubeSquare A a a a a where
+noncomputable def CubeSquare.const (A : Type u) (a : A) : CubeSquare A a a a a where
   fn := fun _ _ => a
   c00 := rfl
   c01 := rfl
@@ -132,7 +132,7 @@ def CubeSquare.const (A : Type u) (a : A) : CubeSquare A a a a a where
   c11 := rfl
 
 /-- Map over a square. -/
-def CubeSquare.map {A : Type u} {B : Type v} (f : A → B)
+noncomputable def CubeSquare.map {A : Type u} {B : Type v} (f : A → B)
     {a00 a01 a10 a11 : A} (s : CubeSquare A a00 a01 a10 a11) :
     CubeSquare B (f a00) (f a01) (f a10) (f a11) where
   fn := fun i j => f (s.fn i j)
@@ -147,7 +147,7 @@ theorem CubeSquare.map_const {A : Type u} {B : Type v} (f : A → B) (a : A) :
   simp [CubeSquare.map, CubeSquare.const]
 
 /-- Left face of a square (fix first coord to I0). -/
-def squareFaceLeft {A : Type u} {a00 a01 a10 a11 : A}
+noncomputable def squareFaceLeft {A : Type u} {a00 a01 a10 a11 : A}
     (s : CubeSquare A a00 a01 a10 a11) (heq : a00 = a01) : CubePath A a00 a01 where
   fn := s.fn I0
   at0 := s.c00
@@ -155,7 +155,7 @@ def squareFaceLeft {A : Type u} {a00 a01 a10 a11 : A}
   eq := heq
 
 /-- Right face of a square (fix first coord to I1). -/
-def squareFaceRight {A : Type u} {a00 a01 a10 a11 : A}
+noncomputable def squareFaceRight {A : Type u} {a00 a01 a10 a11 : A}
     (s : CubeSquare A a00 a01 a10 a11) (heq : a10 = a11) : CubePath A a10 a11 where
   fn := s.fn I1
   at0 := s.c10
@@ -163,7 +163,7 @@ def squareFaceRight {A : Type u} {a00 a01 a10 a11 : A}
   eq := heq
 
 /-- Bottom face of a square (fix second coord to I0). -/
-def squareFaceBot {A : Type u} {a00 a01 a10 a11 : A}
+noncomputable def squareFaceBot {A : Type u} {a00 a01 a10 a11 : A}
     (s : CubeSquare A a00 a01 a10 a11) (heq : a00 = a10) : CubePath A a00 a10 where
   fn := fun i => s.fn i I0
   at0 := s.c00
@@ -171,7 +171,7 @@ def squareFaceBot {A : Type u} {a00 a01 a10 a11 : A}
   eq := heq
 
 /-- Top face of a square (fix second coord to I1). -/
-def squareFaceTop {A : Type u} {a00 a01 a10 a11 : A}
+noncomputable def squareFaceTop {A : Type u} {a00 a01 a10 a11 : A}
     (s : CubeSquare A a00 a01 a10 a11) (heq : a01 = a11) : CubePath A a01 a11 where
   fn := fun i => s.fn i I1
   at0 := s.c01
@@ -181,7 +181,7 @@ def squareFaceTop {A : Type u} {a00 a01 a10 a11 : A}
 /-! ## Connection maps -/
 
 /-- Connection via meet: produces a square from a path. -/
-def connectionMeet {A : Type u} {a b : A} (p : CubePath A a b) :
+noncomputable def connectionMeet {A : Type u} {a b : A} (p : CubePath A a b) :
     CubeSquare A a a a b where
   fn := fun i j => p.fn (iMeet i j)
   c00 := by show p.fn (iMeet I0 I0) = a; rw [show iMeet I0 I0 = I0 from rfl]; exact p.at0
@@ -190,7 +190,7 @@ def connectionMeet {A : Type u} {a b : A} (p : CubePath A a b) :
   c11 := by show p.fn (iMeet I1 I1) = b; rw [show iMeet I1 I1 = I1 from rfl]; exact p.at1
 
 /-- Connection via join: produces a square from a path. -/
-def connectionJoin {A : Type u} {a b : A} (p : CubePath A a b) :
+noncomputable def connectionJoin {A : Type u} {a b : A} (p : CubePath A a b) :
     CubeSquare A a b b b where
   fn := fun i j => p.fn (iJoin i j)
   c00 := by show p.fn (iJoin I0 I0) = a; rw [show iJoin I0 I0 = I0 from rfl]; exact p.at0
@@ -201,10 +201,10 @@ def connectionJoin {A : Type u} {a b : A} (p : CubePath A a b) :
 /-! ## Transport -/
 
 /-- The path equality from a cubical path. -/
-def CubePath.toEq {A : Type u} {a b : A} (p : CubePath A a b) : a = b := p.eq
+noncomputable def CubePath.toEq {A : Type u} {a b : A} (p : CubePath A a b) : a = b := p.eq
 
 /-- Transport along a cubical path via the underlying equality. -/
-def cubeTransport {A : Type u} {P : A → Type v} {a b : A}
+noncomputable def cubeTransport {A : Type u} {P : A → Type v} {a b : A}
     (p : CubePath A a b) (x : P a) : P b :=
   p.eq ▸ x
 
@@ -237,16 +237,16 @@ theorem CompData.middle_right {A : Type u} {a b c : A} (d : CompData A a b c) :
 /-! ## 2-paths (path of paths) -/
 
 /-- A 2-path between computational paths. -/
-def TwoPath {A : Type u} {a b : A} (p q : Path a b) : Type u := Path p q
+noncomputable def TwoPath {A : Type u} {a b : A} (p q : Path a b) : Type u := Path p q
 
-def TwoPath.refl {A : Type u} {a b : A} (p : Path a b) : TwoPath p p := Path.refl p
-def TwoPath.symm {A : Type u} {a b : A} {p q : Path a b} (α : TwoPath p q) : TwoPath q p :=
+noncomputable def TwoPath.refl {A : Type u} {a b : A} (p : Path a b) : TwoPath p p := Path.refl p
+noncomputable def TwoPath.symm {A : Type u} {a b : A} {p q : Path a b} (α : TwoPath p q) : TwoPath q p :=
   Path.symm α
-def TwoPath.trans {A : Type u} {a b : A} {p q r : Path a b}
+noncomputable def TwoPath.trans {A : Type u} {a b : A} {p q r : Path a b}
     (α : TwoPath p q) (β : TwoPath q r) : TwoPath p r := Path.trans α β
 
 /-- 2-path transport. -/
-def twoPathTransport {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def twoPathTransport {A : Type u} {a b : A} {p q : Path a b}
     (α : TwoPath p q) {B : Path a b → Type v} (x : B p) : B q :=
   Path.transport (D := B) α x
 

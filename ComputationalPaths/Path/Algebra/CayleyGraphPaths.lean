@@ -40,7 +40,7 @@ inductive SignedGen (Gen : Type u) : Type u where
 namespace SignedGen
 
 /-- Invert a signed generator. -/
-def inv {Gen : Type u} : SignedGen Gen -> SignedGen Gen
+noncomputable def inv {Gen : Type u} : SignedGen Gen -> SignedGen Gen
   | pos g => neg g
   | neg g => pos g
 
@@ -52,11 +52,11 @@ abbrev Word (Gen : Type u) : Type u := List (SignedGen Gen)
 namespace Word
 
 /-- Append a generator to the right of a word. -/
-def appendGen {Gen : Type u} (w : Word Gen) (g : SignedGen Gen) : Word Gen :=
+noncomputable def appendGen {Gen : Type u} (w : Word Gen) (g : SignedGen Gen) : Word Gen :=
   w ++ [g]
 
 /-- Invert a word by reversing and flipping signs. -/
-def inv {Gen : Type u} (w : Word Gen) : Word Gen :=
+noncomputable def inv {Gen : Type u} (w : Word Gen) : Word Gen :=
   w.reverse.map SignedGen.inv
 
 @[simp] theorem length_appendGen {Gen : Type u} (w : Word Gen) (g : SignedGen Gen) :
@@ -80,15 +80,15 @@ structure GroupPresentation where
   rel_length : forall {w1 w2}, Rel w1 w2 -> List.length w1 = List.length w2
 
 /-- Cayley graph vertices as a quotient of words by the presentation relation. -/
-def CayleyVertex (P : GroupPresentation) : Type u :=
+noncomputable def CayleyVertex (P : GroupPresentation) : Type u :=
   Quot P.Rel
 
 /-- Project a word to its Cayley vertex. -/
-def wordToVertex (P : GroupPresentation) (w : Word P.Gen) : CayleyVertex P :=
+noncomputable def wordToVertex (P : GroupPresentation) (w : Word P.Gen) : CayleyVertex P :=
   Quot.mk _ w
 
 /-- Right action of a signed generator on a Cayley vertex. -/
-def vertexMul (P : GroupPresentation) (v : CayleyVertex P) (g : SignedGen P.Gen) :
+noncomputable def vertexMul (P : GroupPresentation) (v : CayleyVertex P) (g : SignedGen P.Gen) :
     CayleyVertex P :=
   Quot.lift
     (fun w => wordToVertex P (Word.appendGen w g))
@@ -100,11 +100,11 @@ def vertexMul (P : GroupPresentation) (v : CayleyVertex P) (g : SignedGen P.Gen)
 /-! ## Adjacency and word paths -/
 
 /-- Adjacency in the Cayley graph via a single generator. -/
-def Adjacent (P : GroupPresentation) (v w : CayleyVertex P) : Type u :=
+noncomputable def Adjacent (P : GroupPresentation) (v w : CayleyVertex P) : Type u :=
   Sigma fun g : SignedGen P.Gen => Path (vertexMul P v g) w
 
 /-- Right action of a word on a Cayley vertex. -/
-def wordAction (P : GroupPresentation) (v : CayleyVertex P) :
+noncomputable def wordAction (P : GroupPresentation) (v : CayleyVertex P) :
     Word P.Gen -> CayleyVertex P
   | [] => v
   | g :: rest => wordAction P (vertexMul P v g) rest
@@ -112,7 +112,7 @@ def wordAction (P : GroupPresentation) (v : CayleyVertex P) :
 /-! ## Path composition for word actions -/
 
 /-- Compose two adjacent generator steps into a length-two word path. -/
-def composeAdjacentWord2 (P : GroupPresentation) {v w u : CayleyVertex P}
+noncomputable def composeAdjacentWord2 (P : GroupPresentation) {v w u : CayleyVertex P}
     (p : Adjacent P v w) (q : Adjacent P w u) :
     Path (wordAction P v [p.1, q.1]) u := by
   cases p with
@@ -126,7 +126,7 @@ def composeAdjacentWord2 (P : GroupPresentation) {v w u : CayleyVertex P}
       simpa [wordAction] using composed
 
 /-- Concatenating words corresponds to composing actions by `Path.trans`. -/
-def wordAction_append_path (P : GroupPresentation) (v : CayleyVertex P)
+noncomputable def wordAction_append_path (P : GroupPresentation) (v : CayleyVertex P)
     (w1 w2 : Word P.Gen) :
     Path (wordAction P v (w1 ++ w2)) (wordAction P (wordAction P v w1) w2) :=
   match w1 with
@@ -139,18 +139,18 @@ def wordAction_append_path (P : GroupPresentation) (v : CayleyVertex P)
         simpa [wordAction] using (wordAction_append_path P (vertexMul P v g) rest w2)
 
 /-- Two words are equivalent if they give the same Cayley vertex. -/
-def WordPathEq (P : GroupPresentation) (w1 w2 : Word P.Gen) : Type u :=
+noncomputable def WordPathEq (P : GroupPresentation) (w1 w2 : Word P.Gen) : Type u :=
   Path (wordToVertex P w1) (wordToVertex P w2)
 
 /-- A relation witness induces a computational path between vertices. -/
-def rel_to_WordPathEq (P : GroupPresentation) {w1 w2 : Word P.Gen}
+noncomputable def rel_to_WordPathEq (P : GroupPresentation) {w1 w2 : Word P.Gen}
     (h : P.Rel w1 w2) : WordPathEq P w1 w2 :=
   Path.stepChain (Quot.sound h)
 
 /-! ## Word path composition -/
 
 /-- `Path.trans` composes word paths in the Cayley graph. -/
-def wordPathEq_trans (P : GroupPresentation) {w1 w2 w3 : Word P.Gen}
+noncomputable def wordPathEq_trans (P : GroupPresentation) {w1 w2 w3 : Word P.Gen}
     (p : WordPathEq P w1 w2) (q : WordPathEq P w2 w3) : WordPathEq P w1 w3 :=
   Path.trans p q
 
@@ -166,15 +166,15 @@ noncomputable def wordPath_rweq_refl (P : GroupPresentation) (w : Word P.Gen) :
 /-! ## Word metric and geodesics -/
 
 /-- Word metric on words: the length of the word. -/
-def wordMetric {Gen : Type u} (w : Word Gen) : Nat :=
+noncomputable def wordMetric {Gen : Type u} (w : Word Gen) : Nat :=
   List.length w
 
 /-- Word metric on Cayley vertices, well-defined by `rel_length`. -/
-def vertexMetric (P : GroupPresentation) : CayleyVertex P -> Nat :=
+noncomputable def vertexMetric (P : GroupPresentation) : CayleyVertex P -> Nat :=
   Quot.lift (fun w => List.length w) (fun _ _ h => P.rel_length h)
 
 /-- A word is geodesic if no equivalent word is shorter. -/
-def Geodesic (P : GroupPresentation) (w : Word P.Gen) : Prop :=
+noncomputable def Geodesic (P : GroupPresentation) (w : Word P.Gen) : Prop :=
   forall w', P.Rel w w' -> List.length w <= List.length w'
 
 /-! ## Graph automorphisms -/
@@ -190,7 +190,7 @@ structure CayleyGraphAutomorphism (P : GroupPresentation) where
 namespace CayleyGraphAutomorphism
 
 /-- Identity automorphism of a Cayley graph. -/
-def id (P : GroupPresentation) : CayleyGraphAutomorphism P where
+noncomputable def id (P : GroupPresentation) : CayleyGraphAutomorphism P where
   toFun := fun v => v
   invFun := fun v => v
   left_inv := fun v =>
@@ -245,18 +245,18 @@ theorem wordMetric_nonneg {Gen : Type u} (w : Word Gen) :
   Nat.zero_le _
 
 /-- WordPathEq is reflexive. -/
-def WordPathEq.refl (P : GroupPresentation) (w : Word P.Gen) :
+noncomputable def WordPathEq.refl (P : GroupPresentation) (w : Word P.Gen) :
     WordPathEq P w w := by
   let p : WordPathEq P w w := Path.refl (wordToVertex P w)
   exact Path.trans (Path.symm p) p
 
 /-- WordPathEq is symmetric. -/
-def WordPathEq.symm (P : GroupPresentation) {w₁ w₂ : Word P.Gen}
+noncomputable def WordPathEq.symm (P : GroupPresentation) {w₁ w₂ : Word P.Gen}
     (h : WordPathEq P w₁ w₂) : WordPathEq P w₂ w₁ :=
   Path.symm h
 
 /-- WordPathEq is transitive. -/
-def WordPathEq.trans (P : GroupPresentation) {w₁ w₂ w₃ : Word P.Gen}
+noncomputable def WordPathEq.trans (P : GroupPresentation) {w₁ w₂ w₃ : Word P.Gen}
     (h₁ : WordPathEq P w₁ w₂) (h₂ : WordPathEq P w₂ w₃) :
     WordPathEq P w₁ w₃ :=
   Path.trans h₁ h₂

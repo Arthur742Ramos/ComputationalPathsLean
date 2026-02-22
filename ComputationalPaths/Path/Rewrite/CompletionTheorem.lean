@@ -30,13 +30,13 @@ abbrev RwEqClass {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b) : Type u :=
   S.NF
 
-instance {A : Type u} {a b : A}
+noncomputable instance {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b) :
     DecidableEq (RwEqClass S) :=
   S.nf_decEq
 
 /-- Class map sending each path to its unique normal-form representative. -/
-def CompleteStepSystem.classOf {A : Type u} {a b : A}
+noncomputable def CompleteStepSystem.classOf {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b) (p : Path a b) :
     RwEqClass S :=
   S.nf p
@@ -71,7 +71,7 @@ theorem CompleteStepSystem.unique_normal_form_class {A : Type u} {a b : A}
       _ = S.classOf p := (S.sound hpq).symm
 
 /-- Deciding `RwEq` reduces to comparing normal forms. -/
-def CompleteStepSystem.decideRwEq {A : Type u} {a b : A}
+noncomputable def CompleteStepSystem.decideRwEq {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b)
     (p q : Path a b) : Decidable (RwEq p q) := by
   by_cases hnf : S.classOf p = S.classOf q
@@ -79,7 +79,7 @@ def CompleteStepSystem.decideRwEq {A : Type u} {a b : A}
   · exact isFalse (fun hrweq => hnf (S.sound hrweq))
 
 /-- Boolean word-problem solver from normal-form comparison. -/
-def CompleteStepSystem.decideRwEqBool {A : Type u} {a b : A}
+noncomputable def CompleteStepSystem.decideRwEqBool {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b)
     (p q : Path a b) : Bool :=
   decide (S.classOf p = S.classOf q)
@@ -110,11 +110,11 @@ theorem CompleteStepSystem.fork_commutes {A : Type u} {a b : A}
   exact S.sound hFork
 
 /-- Finite critical-pair condition in the Squier package. -/
-def HasFiniteCriticalPairs : Prop :=
+noncomputable def HasFiniteCriticalPairs : Prop :=
   ∃ criticals : List CriticalPairCase, ∀ c : CriticalPairCase, c ∈ criticals
 
 /-- Finite derivation type condition via `SquierDeep`. -/
-def HasFiniteDerivationType : Prop :=
+noncomputable def HasFiniteDerivationType : Prop :=
   ∃ fdt : SquierFiniteDerivationType, True
 
 theorem hasFiniteCriticalPairs : HasFiniteCriticalPairs :=

@@ -104,7 +104,7 @@ inductive PhaseStep (BZ : BrillouinZone.{u}) :
   | chern_quant (c : Int) : PhaseStep BZ c c
 
 /-- Interpret a phase step as a path. -/
-def phaseStepPath {BZ : BrillouinZone.{u}} {a b : Int} :
+noncomputable def phaseStepPath {BZ : BrillouinZone.{u}} {a b : Int} :
     PhaseStep BZ a b → Path a b
   | PhaseStep.chern_quant _ => Path.refl _
 
@@ -217,7 +217,7 @@ structure KTheoryClassification where
   bott_period : True
 
 /-- The periodic table of topological insulators (Kitaev). -/
-def periodicTable : AZClass → Nat → Nat
+noncomputable def periodicTable : AZClass → Nat → Nat
   | AZClass.A,    d => if d % 2 == 0 then 1 else 0  -- ℤ in even dim
   | AZClass.AIII, d => if d % 2 == 1 then 1 else 0  -- ℤ in odd dim
   | AZClass.AII,  d =>

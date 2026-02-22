@@ -43,10 +43,10 @@ structure OmegaSpectrum extends PreSpectrum where
     Path (adjoint n (structMap n x)) x
 
 /-- Level of a spectrum. -/
-def PreSpectrum.level (E : PreSpectrum) (n : Nat) : Type := E.Space n
+noncomputable def PreSpectrum.level (E : PreSpectrum) (n : Nat) : Type := E.Space n
 
 /-- The basepoint at level n. -/
-def PreSpectrum.base (E : PreSpectrum) (n : Nat) : E.Space n := E.point n
+noncomputable def PreSpectrum.base (E : PreSpectrum) (n : Nat) : E.Space n := E.point n
 
 -- ============================================================================
 -- § 2. MAPS OF SPECTRA
@@ -60,13 +60,13 @@ structure SpectrumMap (E F : PreSpectrum) where
     Path (F.structMap n (mapLevel n x)) (mapLevel (n + 1) (E.structMap n x))
 
 /-- Identity map of spectra. -/
-def SpectrumMap.idMap (E : PreSpectrum) : SpectrumMap E E where
+noncomputable def SpectrumMap.idMap (E : PreSpectrum) : SpectrumMap E E where
   mapLevel := fun _ x => x
   mapPoint := fun n => Path.refl (E.point n)
   mapCommute := fun n x => Path.refl (E.structMap n x)
 
 /-- Composition of spectrum maps. -/
-def SpectrumMap.comp {E F G : PreSpectrum}
+noncomputable def SpectrumMap.comp {E F G : PreSpectrum}
     (g : SpectrumMap F G) (f : SpectrumMap E F) : SpectrumMap E G where
   mapLevel := fun n x => g.mapLevel n (f.mapLevel n x)
   mapPoint := fun n =>
@@ -94,7 +94,7 @@ structure SpectrumHomotopy {E F : PreSpectrum}
     f.mapPoint n
 
 /-- Reflexive homotopy — identity homotopy. -/
-def SpectrumHomotopy.refl {E F : PreSpectrum}
+noncomputable def SpectrumHomotopy.refl {E F : PreSpectrum}
     (f : SpectrumMap E F) : SpectrumHomotopy f f where
   htpyLevel := fun n x => Path.refl (f.mapLevel n x)
   htpyPoint := fun n => trans_refl_left (f.mapPoint n)
@@ -104,20 +104,20 @@ def SpectrumHomotopy.refl {E F : PreSpectrum}
 -- ============================================================================
 
 /-- A loop at level n: path from basepoint to itself. -/
-def LoopAt (E : PreSpectrum) (n : Nat) : Type :=
+noncomputable def LoopAt (E : PreSpectrum) (n : Nat) : Type :=
   Path (E.point n) (E.point n)
 
 /-- The trivial loop. -/
-def LoopAt.trivial (E : PreSpectrum) (n : Nat) : LoopAt E n :=
+noncomputable def LoopAt.trivial (E : PreSpectrum) (n : Nat) : LoopAt E n :=
   Path.refl (E.point n)
 
 /-- Loop composition via trans. -/
-def LoopAt.compose {E : PreSpectrum} {n : Nat}
+noncomputable def LoopAt.compose {E : PreSpectrum} {n : Nat}
     (p q : LoopAt E n) : LoopAt E n :=
   Path.trans p q
 
 /-- Loop inverse via symm. -/
-def LoopAt.inverse {E : PreSpectrum} {n : Nat}
+noncomputable def LoopAt.inverse {E : PreSpectrum} {n : Nat}
     (p : LoopAt E n) : LoopAt E n :=
   Path.symm p
 
@@ -158,7 +158,7 @@ theorem loop_inverse_invol {E : PreSpectrum} {n : Nat}
 -- ============================================================================
 
 /-- Push a loop forward through the structure map. -/
-def suspensionMap {E : PreSpectrum} {n : Nat}
+noncomputable def suspensionMap {E : PreSpectrum} {n : Nat}
     (p : LoopAt E n) : Path (E.structMap n (E.point n)) (E.structMap n (E.point n)) :=
   Path.congrArg (E.structMap n) p
 
@@ -187,7 +187,7 @@ theorem suspensionMap_refl {E : PreSpectrum} {n : Nat} :
 -- ============================================================================
 
 /-- For an omega-spectrum, map loops at n+1 back to level n. -/
-def omegaLoopBack {E : OmegaSpectrum} {n : Nat}
+noncomputable def omegaLoopBack {E : OmegaSpectrum} {n : Nat}
     (p : LoopAt E.toPreSpectrum (n + 1)) :
     Path (E.adjoint n (E.point (n + 1))) (E.adjoint n (E.point (n + 1))) :=
   Path.congrArg (E.adjoint n) p
@@ -216,7 +216,7 @@ structure SpectrumFiber {E F : PreSpectrum} (f : SpectrumMap E F) (n : Nat) wher
   witness : Path (f.mapLevel n pt) (F.point n)
 
 /-- The basepoint fiber element. -/
-def SpectrumFiber.baseFiber {E F : PreSpectrum}
+noncomputable def SpectrumFiber.baseFiber {E F : PreSpectrum}
     (f : SpectrumMap E F) (n : Nat) : SpectrumFiber f n where
   pt := E.point n
   witness := f.mapPoint n
@@ -230,7 +230,7 @@ structure FiberPath {E F : PreSpectrum} {f : SpectrumMap E F} {n : Nat}
     a.witness
 
 /-- Theorem 11: Reflexive fiber path. -/
-def FiberPath.refl {E F : PreSpectrum} {f : SpectrumMap E F} {n : Nat}
+noncomputable def FiberPath.refl {E F : PreSpectrum} {f : SpectrumMap E F} {n : Nat}
     (a : SpectrumFiber f n) : FiberPath a a where
   basePath := Path.refl a.pt
   overPath := trans_refl_left a.witness
@@ -254,7 +254,7 @@ structure CofiberMapData {E F : PreSpectrum}
     Path (C.incl n (f.mapLevel n x)) (C.cofPoint n)
 
 /-- Theorem 12: Cofiber inclusion sends basepoint to cofPoint. -/
-def cofiber_incl_base {E F : PreSpectrum}
+noncomputable def cofiber_incl_base {E F : PreSpectrum}
     (C : SpectrumCofiber E F) (n : Nat) :
     Path (C.incl n (F.point n)) (C.cofPoint n) :=
   C.inclPoint n
@@ -271,25 +271,25 @@ structure SuspensionData where
   suspBase : (n : Nat) → Path (susp n (base n)) (base (n + 1))
 
 /-- Build a prespectrum from suspension data. -/
-def SuspensionData.toPreSpectrum (S : SuspensionData) : PreSpectrum where
+noncomputable def SuspensionData.toPreSpectrum (S : SuspensionData) : PreSpectrum where
   Space := S.carrier
   point := S.base
   structMap := S.susp
   structPoint := S.suspBase
 
 /-- Theorem 13: Suspension spectrum structure map preserves basepoint. -/
-def susp_spectrum_base (S : SuspensionData) (n : Nat) :
+noncomputable def susp_spectrum_base (S : SuspensionData) (n : Nat) :
     Path (S.susp n (S.base n)) (S.base (n + 1)) :=
   S.suspBase n
 
 /-- Iterated suspension. -/
-def iterSusp (S : SuspensionData) (n : Nat) (x : S.carrier 0) : S.carrier n :=
+noncomputable def iterSusp (S : SuspensionData) (n : Nat) (x : S.carrier 0) : S.carrier n :=
   match n with
   | 0 => x
   | k + 1 => S.susp k (iterSusp S k x)
 
 /-- Theorem 14: Iterated suspension of base is base (Path-valued). -/
-def iterSusp_base (S : SuspensionData) :
+noncomputable def iterSusp_base (S : SuspensionData) :
     (n : Nat) → Path (iterSusp S n (S.base 0)) (S.base n)
   | 0 => Path.refl (S.base 0)
   | n + 1 =>
@@ -319,27 +319,27 @@ structure EMSpectrumData where
   kstructBase : (n : Nat) → Path (kstruct n (kpoint n)) (kpoint (n + 1))
 
 /-- Theorem 15: EM group operation is unital (left). -/
-def em_unit_left (D : EMSpectrumData) (n : Nat) (x : D.KSpace n) :
+noncomputable def em_unit_left (D : EMSpectrumData) (n : Nat) (x : D.KSpace n) :
     Path (D.kop n (D.kpoint n) x) x :=
   D.kunit_left n x
 
 /-- Theorem 16: EM group operation is unital (right). -/
-def em_unit_right (D : EMSpectrumData) (n : Nat) (x : D.KSpace n) :
+noncomputable def em_unit_right (D : EMSpectrumData) (n : Nat) (x : D.KSpace n) :
     Path (D.kop n x (D.kpoint n)) x :=
   D.kunit_right n x
 
 /-- Theorem 17: EM group operation is associative. -/
-def em_assoc (D : EMSpectrumData) (n : Nat) (x y z : D.KSpace n) :
+noncomputable def em_assoc (D : EMSpectrumData) (n : Nat) (x y z : D.KSpace n) :
     Path (D.kop n (D.kop n x y) z) (D.kop n x (D.kop n y z)) :=
   D.kassoc n x y z
 
 /-- Theorem 18: EM inverse is left inverse. -/
-def em_inv_left (D : EMSpectrumData) (n : Nat) (x : D.KSpace n) :
+noncomputable def em_inv_left (D : EMSpectrumData) (n : Nat) (x : D.KSpace n) :
     Path (D.kop n (D.kinv n x) x) (D.kpoint n) :=
   D.kinv_left n x
 
 /-- Build EM prespectrum from EM data. -/
-def EMSpectrumData.toPreSpectrum (D : EMSpectrumData) : PreSpectrum where
+noncomputable def EMSpectrumData.toPreSpectrum (D : EMSpectrumData) : PreSpectrum where
   Space := D.KSpace
   point := D.kpoint
   structMap := D.kstruct
@@ -362,19 +362,19 @@ structure SmashSpectrum (E F : PreSpectrum) where
   smStructBase : (n : Nat) → Path (smStruct n (smPoint n)) (smPoint (n + 1))
 
 /-- Theorem 19: Smash of basepoints is basepoint (left). -/
-def smash_base_left {E F : PreSpectrum} (S : SmashSpectrum E F) (n : Nat)
+noncomputable def smash_base_left {E F : PreSpectrum} (S : SmashSpectrum E F) (n : Nat)
     (y : F.Space n) :
     Path (S.smPair n (E.point n) y) (S.smPoint n) :=
   S.smLeft n y
 
 /-- Theorem 20: Smash of basepoints is basepoint (right). -/
-def smash_base_right {E F : PreSpectrum} (S : SmashSpectrum E F) (n : Nat)
+noncomputable def smash_base_right {E F : PreSpectrum} (S : SmashSpectrum E F) (n : Nat)
     (x : E.Space n) :
     Path (S.smPair n x (F.point n)) (S.smPoint n) :=
   S.smRight n x
 
 /-- SmashSpectrum as a PreSpectrum. -/
-def SmashSpectrum.toPreSpectrum {E F : PreSpectrum} (S : SmashSpectrum E F) : PreSpectrum where
+noncomputable def SmashSpectrum.toPreSpectrum {E F : PreSpectrum} (S : SmashSpectrum E F) : PreSpectrum where
   Space := S.SmSpace
   point := S.smPoint
   structMap := S.smStruct
@@ -392,12 +392,12 @@ structure DesuspensionData (E : PreSpectrum) where
     Path (desusp n (E.structMap n x)) x
 
 /-- Theorem 21: Desuspension sends basepoint to basepoint. -/
-def desusp_base {E : PreSpectrum} (D : DesuspensionData E) (n : Nat) :
+noncomputable def desusp_base {E : PreSpectrum} (D : DesuspensionData E) (n : Nat) :
     Path (D.desusp n (E.point (n + 1))) (E.point n) :=
   D.desuspBase n
 
 /-- Theorem 22: Desuspension is left inverse of structure map. -/
-def desusp_struct_inv {E : PreSpectrum} (D : DesuspensionData E) (n : Nat)
+noncomputable def desusp_struct_inv {E : PreSpectrum} (D : DesuspensionData E) (n : Nat)
     (x : E.Space n) :
     Path (D.desusp n (E.structMap n x)) x :=
   D.desuspStruct n x
@@ -417,7 +417,7 @@ structure ExactTriple where
     Path (g.mapLevel n (f.mapLevel n x)) (specG.point n)
 
 /-- Theorem 23: Exactness at basepoint. -/
-def exact_at_base (T : ExactTriple) (n : Nat) :
+noncomputable def exact_at_base (T : ExactTriple) (n : Nat) :
     Path (T.g.mapLevel n (T.f.mapLevel n (T.specE.point n))) (T.specG.point n) :=
   T.exactness n (T.specE.point n)
 
@@ -427,7 +427,7 @@ structure ConnectingMap (T : ExactTriple) where
   deltaBase : (n : Nat) → Path (delta n (T.specG.point (n + 1))) (T.specE.point n)
 
 /-- Theorem 24: Connecting map sends basepoint to basepoint. -/
-def connecting_base (T : ExactTriple) (C : ConnectingMap T) (n : Nat) :
+noncomputable def connecting_base (T : ExactTriple) (C : ConnectingMap T) (n : Nat) :
     Path (C.delta n (T.specG.point (n + 1))) (T.specE.point n) :=
   C.deltaBase n
 
@@ -437,7 +437,7 @@ structure ExtendedExactness (T : ExactTriple) (C : ConnectingMap T) where
     Path (T.f.mapLevel n (C.delta n x)) (T.specF.point n)
 
 /-- Theorem 25: Extended exactness at delta-f composition. -/
-def extended_exact_delta_f
+noncomputable def extended_exact_delta_f
     (T : ExactTriple) (C : ConnectingMap T) (EE : ExtendedExactness T C)
     (n : Nat) (x : T.specG.Space (n + 1)) :
     Path (T.f.mapLevel n (C.delta n x)) (T.specF.point n) :=
@@ -448,7 +448,7 @@ def extended_exact_delta_f
 -- ============================================================================
 
 /-- Applying a function levelwise to paths in a spectrum. -/
-def spectrumCongrArg {E : PreSpectrum} {n : Nat}
+noncomputable def spectrumCongrArg {E : PreSpectrum} {n : Nat}
     (f : E.Space n → E.Space n)
     {x y : E.Space n}
     (p : Path x y) : Path (f x) (f y) :=
@@ -569,26 +569,26 @@ structure StableEquiv (E F : PreSpectrum) where
     Path (backward.mapLevel n (forward.mapLevel n x)) x
 
 /-- Theorem 38: A stable equivalence gives path (right). -/
-def stable_equiv_right {E F : PreSpectrum}
+noncomputable def stable_equiv_right {E F : PreSpectrum}
     (e : StableEquiv E F) (n : Nat) (x : F.Space n) :
     Path (e.forward.mapLevel n (e.backward.mapLevel n x)) x :=
   e.rightInv n x
 
 /-- Theorem 39: A stable equivalence gives path (left). -/
-def stable_equiv_left {E F : PreSpectrum}
+noncomputable def stable_equiv_left {E F : PreSpectrum}
     (e : StableEquiv E F) (n : Nat) (x : E.Space n) :
     Path (e.backward.mapLevel n (e.forward.mapLevel n x)) x :=
   e.leftInv n x
 
 /-- Theorem 40: Identity is a stable equivalence. -/
-def StableEquiv.id (E : PreSpectrum) : StableEquiv E E where
+noncomputable def StableEquiv.id (E : PreSpectrum) : StableEquiv E E where
   forward := SpectrumMap.idMap E
   backward := SpectrumMap.idMap E
   rightInv := fun _ x => Path.refl x
   leftInv := fun _ x => Path.refl x
 
 /-- Theorem 41: Stable equivalence is symmetric. -/
-def StableEquiv.symm {E F : PreSpectrum}
+noncomputable def StableEquiv.symm {E F : PreSpectrum}
     (e : StableEquiv E F) : StableEquiv F E where
   forward := e.backward
   backward := e.forward
@@ -600,26 +600,26 @@ def StableEquiv.symm {E F : PreSpectrum}
 -- ============================================================================
 
 /-- Shift a spectrum by one level. -/
-def shiftSpectrum (E : PreSpectrum) : PreSpectrum where
+noncomputable def shiftSpectrum (E : PreSpectrum) : PreSpectrum where
   Space := fun n => E.Space (n + 1)
   point := fun n => E.point (n + 1)
   structMap := fun n => E.structMap (n + 1)
   structPoint := fun n => E.structPoint (n + 1)
 
 /-- Theorem 42: Shift preserves the structure map path. -/
-def shift_structPoint (E : PreSpectrum) (n : Nat) :
+noncomputable def shift_structPoint (E : PreSpectrum) (n : Nat) :
     Path ((shiftSpectrum E).structMap n ((shiftSpectrum E).point n))
          ((shiftSpectrum E).point (n + 1)) :=
   E.structPoint (n + 1)
 
 /-- The canonical map from E to its shift via structure maps. -/
-def toShift (E : PreSpectrum) : SpectrumMap E (shiftSpectrum E) where
+noncomputable def toShift (E : PreSpectrum) : SpectrumMap E (shiftSpectrum E) where
   mapLevel := fun n => E.structMap n
   mapPoint := fun n => E.structPoint n
   mapCommute := fun n x => Path.refl (E.structMap (n + 1) (E.structMap n x))
 
 /-- Theorem 43: toShift sends basepoint correctly. -/
-def toShift_base (E : PreSpectrum) (n : Nat) :
+noncomputable def toShift_base (E : PreSpectrum) (n : Nat) :
     Path ((toShift E).mapLevel n (E.point n))
          ((shiftSpectrum E).point n) :=
   E.structPoint n
@@ -634,7 +634,7 @@ theorem double_shift_space (E : PreSpectrum) (n : Nat) :
 -- ============================================================================
 
 /-- A 2-path (path between paths) at a spectrum level — equality of paths. -/
-def Path2At (_E : PreSpectrum) (_n : Nat) {A : Type}
+noncomputable def Path2At (_E : PreSpectrum) (_n : Nat) {A : Type}
     (p q : A) : Prop :=
   p = q
 
@@ -715,14 +715,14 @@ theorem omega_adjoint_refl {E : OmegaSpectrum} {n : Nat}
 -- ============================================================================
 
 /-- Theorem 54: EM spectrum operation is functorial (left). -/
-def em_op_congrArg {D : EMSpectrumData} {n : Nat}
+noncomputable def em_op_congrArg {D : EMSpectrumData} {n : Nat}
     {x y : D.KSpace n} (z : D.KSpace n)
     (p : Path x y) :
     Path (D.kop n x z) (D.kop n y z) :=
   Path.congrArg (fun w => D.kop n w z) p
 
 /-- Theorem 55: EM spectrum operation is functorial (right). -/
-def em_op_congrArg_right {D : EMSpectrumData} {n : Nat}
+noncomputable def em_op_congrArg_right {D : EMSpectrumData} {n : Nat}
     (x : D.KSpace n) {y z : D.KSpace n}
     (p : Path y z) :
     Path (D.kop n x y) (D.kop n x z) :=
@@ -795,7 +795,7 @@ theorem spectrum_congrArg_id {E : PreSpectrum} {n : Nat}
 -- ============================================================================
 
 /-- Wedge (coproduct) of two spectra. -/
-def wedgeSpectrum
+noncomputable def wedgeSpectrum
     (wedge : Nat → Type)
     (wpt : (n : Nat) → wedge n)
     (wstruct : (n : Nat) → wedge n → wedge (n + 1))
@@ -812,7 +812,7 @@ structure WedgeInclusion (E : PreSpectrum) (W : PreSpectrum) where
   inclBase : (n : Nat) → Path (incl n (E.point n)) (W.point n)
 
 /-- Theorem 63: Wedge inclusion sends basepoint to basepoint. -/
-def wedge_incl_base {E W : PreSpectrum}
+noncomputable def wedge_incl_base {E W : PreSpectrum}
     (i : WedgeInclusion E W) (n : Nat) :
     Path (i.incl n (E.point n)) (W.point n) :=
   i.inclBase n
@@ -895,7 +895,7 @@ theorem desusp_symm {E : PreSpectrum} (D : DesuspensionData E)
 -- ============================================================================
 
 /-- A spectrum map induces a group homomorphism on loops. -/
-def specMapOnLoops {E F : PreSpectrum} (f : SpectrumMap E F) (n : Nat)
+noncomputable def specMapOnLoops {E F : PreSpectrum} (f : SpectrumMap E F) (n : Nat)
     (p : LoopAt E n) : Path (f.mapLevel n (E.point n)) (f.mapLevel n (E.point n)) :=
   Path.congrArg (f.mapLevel n) p
 
@@ -925,7 +925,7 @@ theorem specMapOnLoops_inverse {E F : PreSpectrum} (f : SpectrumMap E F) (n : Na
 
 /-- Conjugated loop: transport a loop at level n to a loop at level n+1
     using the structure path. -/
-def conjugatedLoop {E : PreSpectrum} {n : Nat}
+noncomputable def conjugatedLoop {E : PreSpectrum} {n : Nat}
     (p : LoopAt E n) :
     Path (E.structMap n (E.point n)) (E.structMap n (E.point n)) :=
   Path.congrArg (E.structMap n) p
@@ -949,7 +949,7 @@ theorem conjugatedLoop_inverse {E : PreSpectrum} {n : Nat}
 -- ============================================================================
 
 /-- Transport along a path in a spectrum level. -/
-def spectrumTransport {E : PreSpectrum} {n : Nat}
+noncomputable def spectrumTransport {E : PreSpectrum} {n : Nat}
     {x y : E.Space n}
     (p : Path x y) : x = y :=
   p.toEq

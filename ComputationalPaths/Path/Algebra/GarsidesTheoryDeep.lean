@@ -91,18 +91,18 @@ inductive Path : E → E → Type where
 -- ============================================================
 
 /-- Theorem 1 – Path reflexivity. -/
-def Path.refl (a : E) : Path a a := Path.nil a
+noncomputable def Path.refl (a : E) : Path a a := Path.nil a
 
 /-- Theorem 2 – Lift single step. -/
-def Path.step (s : Step a b) : Path a b := Path.cons s (Path.nil _)
+noncomputable def Path.step (s : Step a b) : Path a b := Path.cons s (Path.nil _)
 
 /-- Theorem 3 – Path transitivity (composition). -/
-def Path.trans : Path a b → Path b c → Path a c
+noncomputable def Path.trans : Path a b → Path b c → Path a c
   | Path.nil _, q => q
   | Path.cons s p, q => Path.cons s (Path.trans p q)
 
 /-- Theorem 4 – Path length. -/
-def Path.len : Path a b → Nat
+noncomputable def Path.len : Path a b → Nat
   | Path.nil _ => 0
   | Path.cons _ p => 1 + p.len
 
@@ -111,32 +111,32 @@ def Path.len : Path a b → Nat
 -- ============================================================
 
 /-- Theorem 5 – congrArg for mul (left argument fixed). -/
-def Path.congrMulL (c : E) : Path a b → Path (.mul c a) (.mul c b)
+noncomputable def Path.congrMulL (c : E) : Path a b → Path (.mul c a) (.mul c b)
   | Path.nil _ => Path.nil _
   | Path.cons s p => Path.cons (Step.congMulL c s) (Path.congrMulL c p)
 
 /-- Theorem 6 – congrArg for mul (right argument fixed). -/
-def Path.congrMulR (c : E) : Path a b → Path (.mul a c) (.mul b c)
+noncomputable def Path.congrMulR (c : E) : Path a b → Path (.mul a c) (.mul b c)
   | Path.nil _ => Path.nil _
   | Path.cons s p => Path.cons (Step.congMulR c s) (Path.congrMulR c p)
 
 /-- Theorem 7 – congrArg for meet on left. -/
-def Path.congrMeetL (c : E) : Path a b → Path (.meet a c) (.meet b c)
+noncomputable def Path.congrMeetL (c : E) : Path a b → Path (.meet a c) (.meet b c)
   | Path.nil _ => Path.nil _
   | Path.cons s p => Path.cons (Step.congMeetL c s) (Path.congrMeetL c p)
 
 /-- Theorem 8 – congrArg for meet on right. -/
-def Path.congrMeetR (c : E) : Path a b → Path (.meet c a) (.meet c b)
+noncomputable def Path.congrMeetR (c : E) : Path a b → Path (.meet c a) (.meet c b)
   | Path.nil _ => Path.nil _
   | Path.cons s p => Path.cons (Step.congMeetR c s) (Path.congrMeetR c p)
 
 /-- Theorem 9 – congrArg for join on left. -/
-def Path.congrJoinL (c : E) : Path a b → Path (.join a c) (.join b c)
+noncomputable def Path.congrJoinL (c : E) : Path a b → Path (.join a c) (.join b c)
   | Path.nil _ => Path.nil _
   | Path.cons s p => Path.cons (Step.congJoinL c s) (Path.congrJoinL c p)
 
 /-- Theorem 10 – congrArg for join on right. -/
-def Path.congrJoinR (c : E) : Path a b → Path (.join c a) (.join c b)
+noncomputable def Path.congrJoinR (c : E) : Path a b → Path (.join c a) (.join c b)
   | Path.nil _ => Path.nil _
   | Path.cons s p => Path.cons (Step.congJoinR c s) (Path.congrJoinR c p)
 
@@ -206,7 +206,7 @@ theorem len_congrMeetR (c : E) (p : Path a b) :
 -- ============================================================
 
 /-- Left divisibility: a | b iff ∃ c, path from a·c to b. -/
-def LDiv (a b : E) : Prop := ∃ c : E, Nonempty (Path (.mul a c) b)
+noncomputable def LDiv (a b : E) : Prop := ∃ c : E, Nonempty (Path (.mul a c) b)
 
 /-- Theorem 21 – one left-divides everything. -/
 theorem lDiv_one (a : E) : LDiv .one a :=
@@ -224,7 +224,7 @@ theorem lDiv_trans {a b c : E} (h1 : LDiv a b) (h2 : LDiv b c) : LDiv a c := by
     (Path.trans (Path.congrMulR y px) py)⟩⟩
 
 /-- Right divisibility. -/
-def RDiv (a b : E) : Prop := ∃ c : E, Nonempty (Path (.mul c a) b)
+noncomputable def RDiv (a b : E) : Prop := ∃ c : E, Nonempty (Path (.mul c a) b)
 
 /-- Theorem 24 – one right-divides everything. -/
 theorem rDiv_one (a : E) : RDiv .one a :=
@@ -243,16 +243,16 @@ theorem gen_lDiv_delta (i : Nat) : LDiv (.gen i) .delta :=
   ⟨.comp i .delta, ⟨Path.step (Step.compDef i)⟩⟩
 
 /-- Theorem 27 – Δ is balanced: cycling path from Δ·a to a·Δ. -/
-def delta_balanced (a : E) : Path (.mul .delta a) (.mul a .delta) :=
+noncomputable def delta_balanced (a : E) : Path (.mul .delta a) (.mul a .delta) :=
   Path.step (Step.cycle a)
 
 /-- Theorem 28 – Double cycling returns to original form. -/
-def cycle_cycle (a : E) : Path (.mul .delta (.mul .delta a))
+noncomputable def cycle_cycle (a : E) : Path (.mul .delta (.mul .delta a))
                                 (.mul .delta (.mul a .delta)) :=
   Path.congrMulL .delta (delta_balanced a)
 
 /-- Theorem 29 – Cycling composed with decycling. -/
-def cycle_decycle (a : E) : Path (.mul .delta (.mul a .delta))
+noncomputable def cycle_decycle (a : E) : Path (.mul .delta (.mul a .delta))
                                  (.mul .delta (.mul .delta a)) :=
   Path.congrMulL .delta (Path.step (Step.cycleI a))
 
@@ -261,29 +261,29 @@ def cycle_decycle (a : E) : Path (.mul .delta (.mul a .delta))
 -- ============================================================
 
 /-- Theorem 30 – Double meet commutativity round-trip. -/
-def meet_comm_comm (a b : E) : Path (.meet a b) (.meet a b) :=
+noncomputable def meet_comm_comm (a b : E) : Path (.meet a b) (.meet a b) :=
   Path.trans (Path.step (Step.meetComm a b)) (Path.step (Step.meetComm b a))
 
 /-- Theorem 31 – meet associativity round-trip. -/
-def meet_assoc_round (a b c : E) : Path (.meet a (.meet b c)) (.meet a (.meet b c)) :=
+noncomputable def meet_assoc_round (a b c : E) : Path (.meet a (.meet b c)) (.meet a (.meet b c)) :=
   Path.trans (Path.step (Step.meetAssocI a b c)) (Path.step (Step.meetAssoc a b c))
 
 /-- Theorem 32 – Absorption: meet(a, join(a,b)) → a. -/
-def absorption_chain (a b : E) : Path (.meet a (.join a b)) a :=
+noncomputable def absorption_chain (a b : E) : Path (.meet a (.join a b)) a :=
   Path.step (Step.absorbMJ a b)
 
 /-- Theorem 33 – Absorption + idempotency chain.
     join(a, meet(a,b)) → a → meet(a,a). -/
-def absorb_then_idem (a b : E) : Path (.join a (.meet a b)) (.meet a a) :=
+noncomputable def absorb_then_idem (a b : E) : Path (.join a (.meet a b)) (.meet a a) :=
   Path.trans (Path.step (Step.absorbJM a b)) (Path.step (Step.meetIdemI a))
 
 /-- Theorem 34 – Meet chain: meet(a, meet(b,c)) → meet(meet(a,b), c) → meet(c, meet(a,b)). -/
-def meet_chain (a b c : E) : Path (.meet a (.meet b c)) (.meet c (.meet a b)) :=
+noncomputable def meet_chain (a b c : E) : Path (.meet a (.meet b c)) (.meet c (.meet a b)) :=
   Path.trans (Path.step (Step.meetAssocI a b c))
     (Path.step (Step.meetComm (.meet a b) c))
 
 /-- Theorem 35 – Join chain: join(a, join(b,c)) → join(join(a,b), c) → join(c, join(a,b)). -/
-def join_chain (a b c : E) : Path (.join a (.join b c)) (.join c (.join a b)) :=
+noncomputable def join_chain (a b c : E) : Path (.join a (.join b c)) (.join c (.join a b)) :=
   Path.trans (Path.step (Step.joinAssocI a b c))
     (Path.step (Step.joinComm (.join a b) c))
 
@@ -292,7 +292,7 @@ def join_chain (a b c : E) : Path (.join a (.join b c)) (.join c (.join a b)) :=
 -- ============================================================
 
 /-- A property indexed by elements. -/
-def EProp := E → Prop
+noncomputable def EProp := E → Prop
 
 /-- Theorem 36 – Transport along a path: if P respects steps, paths preserve P. -/
 theorem transport_path (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
@@ -328,16 +328,16 @@ structure NF where
   factors : List E
 
 /-- Theorem 40 – Empty normal form. -/
-def NF.empty : NF := ⟨[]⟩
+noncomputable def NF.empty : NF := ⟨[]⟩
 
 /-- Theorem 41 – Singleton normal form. -/
-def NF.single (a : E) : NF := ⟨[a]⟩
+noncomputable def NF.single (a : E) : NF := ⟨[a]⟩
 
 /-- Theorem 42 – NF concatenation. -/
-def NF.append (nf1 nf2 : NF) : NF := ⟨nf1.factors ++ nf2.factors⟩
+noncomputable def NF.append (nf1 nf2 : NF) : NF := ⟨nf1.factors ++ nf2.factors⟩
 
 /-- Theorem 43 – NF length. -/
-def NF.len (nf : NF) : Nat := nf.factors.length
+noncomputable def NF.len (nf : NF) : Nat := nf.factors.length
 
 /-- Theorem 44 – Empty NF has length 0. -/
 theorem NF.empty_len : NF.empty.len = 0 := rfl
@@ -370,23 +370,23 @@ theorem NF.append_empty_right (nf : NF) :
 -- ============================================================
 
 /-- The greedy factor of a is meet(a, Δ). -/
-def greedyFactor (a : E) : E := .meet a .delta
+noncomputable def greedyFactor (a : E) : E := .meet a .delta
 
 /-- Theorem 50 – Greedy factor commutativity path. -/
-def greedyFactor_comm_path (a : E) : Path (greedyFactor a) (.meet .delta a) :=
+noncomputable def greedyFactor_comm_path (a : E) : Path (greedyFactor a) (.meet .delta a) :=
   Path.step (Step.meetComm a .delta)
 
 /-- Theorem 51 – When meet(Δ, a), greedy gives a. -/
-def greedyFactor_simple (a : E) : Path (.meet .delta a) a :=
+noncomputable def greedyFactor_simple (a : E) : Path (.meet .delta a) a :=
   Path.step (Step.meetDelta a)
 
 /-- Theorem 52 – Greedy factor of Δ is Δ. -/
-def greedyFactor_delta : Path (greedyFactor .delta) .delta :=
+noncomputable def greedyFactor_delta : Path (greedyFactor .delta) .delta :=
   Path.trans (Path.step (Step.meetComm .delta .delta))
     (Path.step (Step.meetDelta .delta))
 
 /-- Theorem 53 – Greedy factor of one is one. -/
-def greedyFactor_one : Path (greedyFactor .one) .one :=
+noncomputable def greedyFactor_one : Path (greedyFactor .one) .one :=
   Path.step (Step.meetOne .delta)
 
 -- ============================================================
@@ -394,28 +394,28 @@ def greedyFactor_one : Path (greedyFactor .one) .one :=
 -- ============================================================
 
 /-- Theorem 54 – congrArg mul distributes over meet. -/
-def congrArg_mul_meet (f a b : E) :
+noncomputable def congrArg_mul_meet (f a b : E) :
     Path (.mul f (.meet a b)) (.meet (.mul f a) (.mul f b)) :=
   Path.step (Step.distMeet f a b)
 
 /-- Theorem 55 – congrArg mul distributes over join. -/
-def congrArg_mul_join (f a b : E) :
+noncomputable def congrArg_mul_join (f a b : E) :
     Path (.mul f (.join a b)) (.join (.mul f a) (.mul f b)) :=
   Path.step (Step.distJoin f a b)
 
 /-- Theorem 56 – Distribute then commute chain. -/
-def congrArg_dist_comm (f a b : E) :
+noncomputable def congrArg_dist_comm (f a b : E) :
     Path (.mul f (.meet a b)) (.meet (.mul f b) (.mul f a)) :=
   Path.trans (Path.step (Step.distMeet f a b))
     (Path.step (Step.meetComm (.mul f a) (.mul f b)))
 
 /-- Theorem 57 – congrArg preserves meet idempotency. -/
-def congrArg_meet_idem (f a : E) :
+noncomputable def congrArg_meet_idem (f a : E) :
     Path (.mul f (.meet a a)) (.mul f a) :=
   Path.step (Step.congMulL f (Step.meetIdem a))
 
 /-- Theorem 58 – congrArg + absorption. -/
-def congrArg_absorption (f a b : E) :
+noncomputable def congrArg_absorption (f a b : E) :
     Path (.mul f (.meet a (.join a b))) (.mul f a) :=
   Path.step (Step.congMulL f (Step.absorbMJ a b))
 
@@ -424,28 +424,28 @@ def congrArg_absorption (f a b : E) :
 -- ============================================================
 
 /-- Theorem 59 – Cycling path. -/
-def cycling_path (a : E) : Path (.mul .delta a) (.mul a .delta) :=
+noncomputable def cycling_path (a : E) : Path (.mul .delta a) (.mul a .delta) :=
   Path.step (Step.cycle a)
 
 /-- Theorem 60 – Decycling path. -/
-def decycling_path (a : E) : Path (.mul a .delta) (.mul .delta a) :=
+noncomputable def decycling_path (a : E) : Path (.mul a .delta) (.mul .delta a) :=
   Path.step (Step.cycleI a)
 
 /-- Theorem 61 – Cycling is an involution (round-trip). -/
-def cycling_involution (a : E) : Path (.mul .delta a) (.mul .delta a) :=
+noncomputable def cycling_involution (a : E) : Path (.mul .delta a) (.mul .delta a) :=
   Path.trans (cycling_path a) (decycling_path a)
 
 /-- Theorem 62 – cycling_involution has length 2. -/
 theorem cycling_involution_len (a : E) : (cycling_involution a).len = 2 := rfl
 
 /-- Theorem 63 – Nested cycling: Δ·(Δ·a) → Δ·(a·Δ) → (a·Δ)·Δ. -/
-def nested_cycling (a : E) : Path (.mul .delta (.mul .delta a))
+noncomputable def nested_cycling (a : E) : Path (.mul .delta (.mul .delta a))
                                    (.mul (.mul a .delta) .delta) :=
   Path.trans (Path.congrMulL .delta (cycling_path a))
     (cycling_path (.mul a .delta))
 
 /-- Theorem 64 – Cycling commutes with meet (via distributivity). -/
-def cycling_meet (a b : E) :
+noncomputable def cycling_meet (a b : E) :
     Path (.mul .delta (.meet a b)) (.meet (.mul a .delta) (.mul b .delta)) :=
   Path.trans (Path.step (Step.distMeet .delta a b))
     (Path.trans (Path.congrMeetL (.mul .delta b) (cycling_path a))
@@ -520,18 +520,18 @@ theorem congrJoinR_trans (c : E) (p : Path a b) (q : Path b d) :
 -- ============================================================
 
 /-- The shelf operation: a ▷ b = meet(mul(a,b), Δ). -/
-def shelf (a b : E) : E := .meet (.mul a b) .delta
+noncomputable def shelf (a b : E) : E := .meet (.mul a b) .delta
 
 /-- Theorem 73 – Shelf definition. -/
 theorem shelf_def (a b : E) : shelf a b = .meet (.mul a b) .delta := rfl
 
 /-- Theorem 74 – Shelf with identity: shelf(one, a) → meet(a, Δ). -/
-def shelf_one_path (a : E) :
+noncomputable def shelf_one_path (a : E) :
     Path (shelf .one a) (.meet a .delta) :=
   Path.congrMeetL .delta (Path.step (Step.unitL a))
 
 /-- Theorem 75 – Shelf with delta: shelf(Δ, a) → meet(mul(a,Δ), Δ). -/
-def shelf_delta_path (a : E) :
+noncomputable def shelf_delta_path (a : E) :
     Path (shelf .delta a) (.meet (.mul a .delta) .delta) :=
   Path.congrMeetL .delta (cycling_path a)
 
@@ -540,16 +540,16 @@ def shelf_delta_path (a : E) :
 -- ============================================================
 
 /-- Artin generator. -/
-def sigma (i : Nat) : E := .gen i
+noncomputable def sigma (i : Nat) : E := .gen i
 
 /-- Theorem 76 – Braid associativity path. -/
-def braid_assoc (i j : Nat) :
+noncomputable def braid_assoc (i j : Nat) :
     Path (.mul (sigma i) (.mul (sigma j) (sigma i)))
          (.mul (.mul (sigma i) (sigma j)) (sigma i)) :=
   Path.step (Step.assocInv (sigma i) (sigma j) (sigma i))
 
 /-- Theorem 77 – Double braid associativity. -/
-def double_braid_assoc (i j : Nat) :
+noncomputable def double_braid_assoc (i j : Nat) :
     Path (.mul (sigma i) (.mul (sigma j) (.mul (sigma i) (sigma j))))
          (.mul (.mul (sigma i) (.mul (sigma j) (sigma i))) (sigma j)) :=
   Path.trans
@@ -587,7 +587,7 @@ structure PathMap where
   onStep : Step a b → Step (onElem a) (onElem b)
 
 /-- Theorem 81 – A PathMap lifts to paths. -/
-def PathMap.liftPath (F : PathMap) : Path a b → Path (F.onElem a) (F.onElem b)
+noncomputable def PathMap.liftPath (F : PathMap) : Path a b → Path (F.onElem a) (F.onElem b)
   | Path.nil _ => Path.nil _
   | Path.cons s p => Path.cons (F.onStep s) (F.liftPath p)
 
@@ -619,10 +619,10 @@ inductive Cell2 : Path a b → Path a b → Type where
   | trans : Cell2 p q → Cell2 q r → Cell2 p r
 
 /-- Theorem 85 – 2-cell reflexivity. -/
-def Cell2.id (p : Path a b) : Cell2 p p := Cell2.refl p
+noncomputable def Cell2.id (p : Path a b) : Cell2 p p := Cell2.refl p
 
 /-- Theorem 86 – 2-cell composition. -/
-def Cell2.comp : Cell2 p q → Cell2 q r → Cell2 p r := Cell2.trans
+noncomputable def Cell2.comp : Cell2 p q → Cell2 q r → Cell2 p r := Cell2.trans
 
 /-- Theorem 87 – 2-cell reflexivity (propositional). -/
 theorem cell2_refl_exists (p : Path a b) : Nonempty (Cell2 p p) :=
@@ -640,14 +640,14 @@ theorem cell2_trans_exists {p q r : Path a b}
 -- ============================================================
 
 /-- Theorem 89 – Pentagon left: ((a·b)·c)·d → (a·b)·(c·d) → a·(b·(c·d)). -/
-def pentagon_left (a b c d : E) :
+noncomputable def pentagon_left (a b c d : E) :
     Path (.mul (.mul (.mul a b) c) d) (.mul a (.mul b (.mul c d))) :=
   Path.trans (Path.step (Step.assoc (.mul a b) c d))
     (Path.step (Step.assoc a b (.mul c d)))
 
 /-- Theorem 90 – Pentagon right:
     ((a·b)·c)·d → (a·(b·c))·d → a·((b·c)·d) → a·(b·(c·d)). -/
-def pentagon_right (a b c d : E) :
+noncomputable def pentagon_right (a b c d : E) :
     Path (.mul (.mul (.mul a b) c) d) (.mul a (.mul b (.mul c d))) :=
   Path.trans (Path.congrMulR d (Path.step (Step.assoc a b c)))
     (Path.trans (Path.step (Step.assoc a (.mul b c) d))
@@ -662,24 +662,24 @@ theorem pentagon_right_len (a b c d : E) :
     (pentagon_right a b c d).len = 3 := rfl
 
 /-- Theorem 93 – Meet-join comm path via congruence. -/
-def meet_join_comm_path (a b c : E) :
+noncomputable def meet_join_comm_path (a b c : E) :
     Path (.meet a (.join b c)) (.meet a (.join c b)) :=
   Path.congrMeetR a (Path.step (Step.joinComm b c))
 
 /-- Theorem 94 – Three-step lattice path. -/
-def lattice_three_step (a b c : E) :
+noncomputable def lattice_three_step (a b c : E) :
     Path (.join (.meet a b) c) (.join c (.meet b a)) :=
   Path.trans (Path.congrJoinL c (Path.step (Step.meetComm a b)))
     (Path.step (Step.joinComm (.meet b a) c))
 
 /-- Theorem 95 – Double unit cancellation: one·(one·a) → a. -/
-def double_unit_cancel (a : E) :
+noncomputable def double_unit_cancel (a : E) :
     Path (.mul .one (.mul .one a)) a :=
   Path.trans (Path.step (Step.unitL (.mul .one a)))
     (Path.step (Step.unitL a))
 
 /-- Theorem 96 – Double unit insertion: a → one·(one·a). -/
-def double_unit_insert (a : E) :
+noncomputable def double_unit_insert (a : E) :
     Path a (.mul .one (.mul .one a)) :=
   Path.trans (Path.step (Step.unitLInv a))
     (Path.step (Step.unitLInv (.mul .one a)))
@@ -689,21 +689,21 @@ theorem double_unit_roundtrip_len (a : E) :
     (Path.trans (double_unit_insert a) (double_unit_cancel a)).len = 4 := rfl
 
 /-- Theorem 98 – Distributivity + associativity chain. -/
-def dist_assoc_chain (f a b c : E) :
+noncomputable def dist_assoc_chain (f a b c : E) :
     Path (.mul f (.meet a (.meet b c)))
          (.meet (.mul f (.meet a b)) (.mul f c)) :=
   Path.trans (Path.step (Step.congMulL f (Step.meetAssocI a b c)))
     (Path.step (Step.distMeet f (.meet a b) c))
 
 /-- Theorem 99 – Lift cycling through meet. -/
-def lift_cycling_meet (a b : E) :
+noncomputable def lift_cycling_meet (a b : E) :
     Path (.meet (.mul .delta a) (.mul .delta b))
          (.meet (.mul a .delta) (.mul b .delta)) :=
   Path.trans (Path.congrMeetL (.mul .delta b) (cycling_path a))
     (Path.congrMeetR (.mul a .delta) (cycling_path b))
 
 /-- Theorem 100 – Full Garside pipeline (4-step). -/
-def garside_pipeline (a : E) :
+noncomputable def garside_pipeline (a : E) :
     Path (.mul .one (.meet .delta (.meet a a))) (.meet a a) :=
   Path.trans (Path.step (Step.unitL (.meet .delta (.meet a a))))
     (Path.trans (Path.step (Step.congMeetR .delta (Step.meetIdem a)))

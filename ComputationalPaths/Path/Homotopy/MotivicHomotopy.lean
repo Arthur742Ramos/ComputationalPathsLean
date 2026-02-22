@@ -45,12 +45,12 @@ structure Scheme where
   isAffine : Prop
 
 /-- The affine line A¹. -/
-def affineLine : Scheme.{u} where
+noncomputable def affineLine : Scheme.{u} where
   points := PUnit
   isAffine := True
 
 /-- The point Spec(k). -/
-def specPoint : Scheme.{u} where
+noncomputable def specPoint : Scheme.{u} where
   points := PUnit
   isAffine := True
 
@@ -59,11 +59,11 @@ structure SchemeMorphism (X Y : Scheme.{u}) where
   toFun : X.points → Y.points
 
 /-- Identity morphism. -/
-def SchemeMorphism.id (X : Scheme.{u}) : SchemeMorphism X X where
+noncomputable def SchemeMorphism.id (X : Scheme.{u}) : SchemeMorphism X X where
   toFun := _root_.id
 
 /-- Composition of morphisms. -/
-def SchemeMorphism.comp {X Y Z : Scheme.{u}}
+noncomputable def SchemeMorphism.comp {X Y Z : Scheme.{u}}
     (g : SchemeMorphism Y Z) (f : SchemeMorphism X Y) : SchemeMorphism X Z where
   toFun := g.toFun ∘ f.toFun
 
@@ -79,7 +79,7 @@ structure NisnevichCovering (X : Scheme.{u}) where
   surjective : ∀ (x : X.points), ∃ (y : cover.points), coverMap.toFun y = x
 
 /-- Trivial Nisnevich covering: X covers itself. -/
-def trivialCovering (X : Scheme.{u}) : NisnevichCovering X where
+noncomputable def trivialCovering (X : Scheme.{u}) : NisnevichCovering X where
   cover := X
   coverMap := SchemeMorphism.id X
   surjective := fun x => ⟨x, rfl⟩
@@ -101,7 +101,7 @@ structure MotivicSpace where
   nisnevich_descent : True
 
 /-- The representable motivic space of a scheme. -/
-def representable (X : Scheme.{u}) : MotivicSpace.{u} where
+noncomputable def representable (X : Scheme.{u}) : MotivicSpace.{u} where
   presheaf := {
     sections := fun Y => SchemeMorphism Y X
     restrict := fun f g => SchemeMorphism.comp g f
@@ -120,7 +120,7 @@ structure A1Homotopy (X Y : MotivicSpace.{u}) where
   homotopy : True
 
 /-- Identity A¹-homotopy equivalence. -/
-def A1Homotopy.refl (X : MotivicSpace.{u}) : A1Homotopy X X where
+noncomputable def A1Homotopy.refl (X : MotivicSpace.{u}) : A1Homotopy X X where
   forward := fun _ x => x
   backward := fun _ x => x
   homotopy := trivial
@@ -143,18 +143,18 @@ structure MotivicSphere where
   space : MotivicSpace.{u}
 
 /-- The algebraic circle G_m. -/
-def Gm : Scheme.{u} where
+noncomputable def Gm : Scheme.{u} where
   points := PUnit
   isAffine := True
 
 /-- S^{1,0}: the simplicial circle. -/
-def simplicialCircle : MotivicSphere.{u} where
+noncomputable def simplicialCircle : MotivicSphere.{u} where
   p := 1
   q := 0
   space := representable specPoint
 
 /-- S^{1,1}: the Tate twist G_m. -/
-def tateCircle : MotivicSphere.{u} where
+noncomputable def tateCircle : MotivicSphere.{u} where
   p := 1
   q := 1
   space := representable Gm
@@ -287,7 +287,7 @@ theorem nisnevich_descent_trivial_representable (X Y : Scheme.{u}) (s : SchemeMo
 theorem MGL_represents_cobordism (m : MGL.{u}) : m.represents_cobordism = trivial := by
   rfl
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

@@ -46,14 +46,14 @@ namespace GradedFloerPathData
 variable {Gen : Type u} (G : GradedFloerPathData Gen)
 
 /-- Grading path for shifting continuation images. -/
-def continuationShiftPath (x : Gen) :
+noncomputable def continuationShiftPath (x : Gen) :
     Path
       (G.grading (G.shift (G.complex.continuation x)))
       (G.grading (G.complex.continuation x)) :=
   G.shiftDegreePath (G.complex.continuation x)
 
 /-- Step witness: right-unit normalization for differential degree behavior. -/
-def differentialDegree_step (x : Gen) :
+noncomputable def differentialDegree_step (x : Gen) :
     Path.Step
       (Path.trans (G.differentialDegreePath x) (Path.refl (Nat.pred (G.grading x))))
       (G.differentialDegreePath x) :=
@@ -66,7 +66,7 @@ noncomputable def differentialDegree_rweq (x : Gen) :
   rweq_of_step (G.differentialDegree_step x)
 
 /-- Step witness: right-unit normalization for continuation degree behavior. -/
-def continuationDegree_step (x : Gen) :
+noncomputable def continuationDegree_step (x : Gen) :
     Path.Step
       (Path.trans (G.continuationDegreePath x) (Path.refl (G.grading x)))
       (G.continuationDegreePath x) :=
@@ -79,7 +79,7 @@ noncomputable def continuationDegree_rweq (x : Gen) :
   rweq_of_step (G.continuationDegree_step x)
 
 /-- Step witness: left-unit normalization for shift degree behavior. -/
-def shiftDegree_step (x : Gen) :
+noncomputable def shiftDegree_step (x : Gen) :
     Path.Step
       (Path.trans (Path.refl (G.grading (G.shift x))) (G.shiftDegreePath x))
       (G.shiftDegreePath x) :=
@@ -92,7 +92,7 @@ noncomputable def shiftDegree_rweq (x : Gen) :
   rweq_of_step (G.shiftDegree_step x)
 
 /-- Step witness: right-unit normalization for shift/differential compatibility. -/
-def shiftCommutes_step (x : Gen) :
+noncomputable def shiftCommutes_step (x : Gen) :
     Path.Step
       (Path.trans (G.shiftCommutesPath x) (Path.refl (G.complex.differential (G.shift x))))
       (G.shiftCommutesPath x) :=
@@ -105,7 +105,7 @@ noncomputable def shiftCommutes_rweq (x : Gen) :
   rweq_of_step (G.shiftCommutes_step x)
 
 /-- Step witness: right-unit normalization for shifted continuation grading. -/
-def continuationShift_step (x : Gen) :
+noncomputable def continuationShift_step (x : Gen) :
     Path.Step
       (Path.trans (G.continuationShiftPath x) (Path.refl (G.grading (G.complex.continuation x))))
       (G.continuationShiftPath x) :=
@@ -126,7 +126,7 @@ noncomputable def shiftCommutes_cancel_rweq (x : Gen) :
 end GradedFloerPathData
 
 /-- Trivial model instantiating the graded Floer computational-path interface. -/
-def trivialGradedFloerPathData : GradedFloerPathData PUnit where
+noncomputable def trivialGradedFloerPathData : GradedFloerPathData PUnit where
   complex := FloerComplex.trivialFloerComplexPathData
   grading := fun _ => 0
   shift := fun _ => PUnit.unit

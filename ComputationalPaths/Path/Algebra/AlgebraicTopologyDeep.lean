@@ -41,13 +41,13 @@ structure CWComplex where
   cells3 : Nat    -- 3-cells (volumes)
 deriving DecidableEq, Repr
 
-def cwTotalCells (C : CWComplex) : Nat :=
+noncomputable def cwTotalCells (C : CWComplex) : Nat :=
   C.cells0 + C.cells1 + C.cells2 + C.cells3
 
-def cwEulerChar (C : CWComplex) : Int :=
+noncomputable def cwEulerChar (C : CWComplex) : Int :=
   (C.cells0 : Int) - (C.cells1 : Int) + (C.cells2 : Int) - (C.cells3 : Int)
 
-def cwSkeleton (C : CWComplex) (k : Nat) : Nat :=
+noncomputable def cwSkeleton (C : CWComplex) (k : Nat) : Nat :=
   match k with
   | 0 => C.cells0
   | 1 => C.cells0 + C.cells1
@@ -55,37 +55,37 @@ def cwSkeleton (C : CWComplex) (k : Nat) : Nat :=
   | _ => cwTotalCells C
 
 /-- 1-skeleton of a specific complex. -/
-def cwSkeleton_1_example :
+noncomputable def cwSkeleton_1_example :
     Path (cwSkeleton ⟨3, 4, 2, 1⟩ 1) 7 :=
   Path.refl _
 
 /-- 0-skeleton of a specific complex. -/
-def cwSkeleton_0_example :
+noncomputable def cwSkeleton_0_example :
     Path (cwSkeleton ⟨3, 4, 2, 1⟩ 0) 3 :=
   Path.refl _
 
 -- Theorem 1 – Euler char of a point
-def eulerChar_point : Path (cwEulerChar ⟨1, 0, 0, 0⟩) 1 :=
+noncomputable def eulerChar_point : Path (cwEulerChar ⟨1, 0, 0, 0⟩) 1 :=
   Path.refl _
 
 -- Theorem 2 – Euler char of S¹ (1 vertex, 1 edge)
-def eulerChar_S1 : Path (cwEulerChar ⟨1, 1, 0, 0⟩) 0 :=
+noncomputable def eulerChar_S1 : Path (cwEulerChar ⟨1, 1, 0, 0⟩) 0 :=
   Path.refl _
 
 -- Theorem 3 – Euler char of S² (1 vertex, 0 edges, 1 face)
-def eulerChar_S2 : Path (cwEulerChar ⟨1, 0, 1, 0⟩) 2 :=
+noncomputable def eulerChar_S2 : Path (cwEulerChar ⟨1, 0, 1, 0⟩) 2 :=
   Path.refl _
 
 -- Theorem 4 – Euler char of torus (1v, 2e, 1f)
-def eulerChar_torus : Path (cwEulerChar ⟨1, 2, 1, 0⟩) 0 :=
+noncomputable def eulerChar_torus : Path (cwEulerChar ⟨1, 2, 1, 0⟩) 0 :=
   Path.refl _
 
 -- Theorem 5 – total cells of empty complex
-def totalCells_empty : Path (cwTotalCells ⟨0, 0, 0, 0⟩) 0 :=
+noncomputable def totalCells_empty : Path (cwTotalCells ⟨0, 0, 0, 0⟩) 0 :=
   Path.refl _
 
 -- Theorem 6 – skeleton monotonicity via path trans
-def skeleton_chain (C : CWComplex) :
+noncomputable def skeleton_chain (C : CWComplex) :
     Path (cwSkeleton C 0) (cwSkeleton C 0) :=
   Path.trans (Path.refl _) (Path.refl _)
 
@@ -106,39 +106,39 @@ structure HomotopyClass where
 deriving DecidableEq, Repr
 
 /-- Composition in the fundamental groupoid. -/
-def groupoidComp (p q : HomotopyClass) (h : p.tgt = q.src) : HomotopyClass :=
+noncomputable def groupoidComp (p q : HomotopyClass) (h : p.tgt = q.src) : HomotopyClass :=
   { src := p.src, tgt := q.tgt, classId := p.classId + q.classId }
 
 /-- Inverse in the fundamental groupoid. -/
-def groupoidInv (p : HomotopyClass) : HomotopyClass :=
+noncomputable def groupoidInv (p : HomotopyClass) : HomotopyClass :=
   { src := p.tgt, tgt := p.src, classId := p.classId }
 
 /-- Identity morphism. -/
-def groupoidId (x : SpacePoint) : HomotopyClass :=
+noncomputable def groupoidId (x : SpacePoint) : HomotopyClass :=
   { src := x, tgt := x, classId := 0 }
 
 -- Theorem 7 – left identity for groupoid composition
-def groupoidComp_id_left (p : HomotopyClass) :
+noncomputable def groupoidComp_id_left (p : HomotopyClass) :
     Path (groupoidComp (groupoidId p.src) p rfl).classId p.classId :=
   Path.stepChain (by simp [groupoidComp, groupoidId])
 
 -- Theorem 8 – right identity
-def groupoidComp_id_right (p : HomotopyClass) :
+noncomputable def groupoidComp_id_right (p : HomotopyClass) :
     Path (groupoidComp p (groupoidId p.tgt) rfl).classId p.classId :=
   Path.stepChain (by simp [groupoidComp, groupoidId])
 
 -- Theorem 9 – inverse source/target swap
-def groupoidInv_src (p : HomotopyClass) :
+noncomputable def groupoidInv_src (p : HomotopyClass) :
     Path (groupoidInv p).src p.tgt :=
   Path.refl _
 
 -- Theorem 10 – double inverse is identity on classId
-def groupoidInv_inv (p : HomotopyClass) :
+noncomputable def groupoidInv_inv (p : HomotopyClass) :
     Path (groupoidInv (groupoidInv p)).classId p.classId :=
   Path.refl _
 
 -- Theorem 11 – composition with inverse gives classId = 2 * classId
-def groupoidComp_inv (p : HomotopyClass) :
+noncomputable def groupoidComp_inv (p : HomotopyClass) :
     Path (groupoidComp p (groupoidInv p) rfl).classId (p.classId + p.classId) :=
   Path.refl _
 
@@ -153,24 +153,24 @@ structure CoveringSpace where
   totalCells : Nat      -- cells in the total space
 deriving DecidableEq, Repr
 
-def coveringCellCount (C : CoveringSpace) : Nat :=
+noncomputable def coveringCellCount (C : CoveringSpace) : Nat :=
   C.baseCells * C.degree
 
-def coveringEulerRelation (C : CoveringSpace) : Int :=
+noncomputable def coveringEulerRelation (C : CoveringSpace) : Int :=
   (C.totalCells : Int) - (C.baseCells : Int) * (C.degree : Int)
 
 -- Theorem 12 – trivial covering (degree 1)
-def covering_degree1 :
+noncomputable def covering_degree1 :
     Path (coveringCellCount ⟨5, 1, 5⟩) 5 :=
   Path.refl _
 
 -- Theorem 13 – double covering cell count
-def covering_degree2 :
+noncomputable def covering_degree2 :
     Path (coveringCellCount ⟨3, 2, 6⟩) 6 :=
   Path.refl _
 
 -- Theorem 14 – covering Euler relation for exact covering
-def covering_euler_exact :
+noncomputable def covering_euler_exact :
     Path (coveringEulerRelation ⟨4, 3, 12⟩) 0 :=
   Path.refl _
 
@@ -185,24 +185,24 @@ structure VanKampenData where
   relIntersect : Nat -- relations from U ∩ V
 deriving DecidableEq, Repr
 
-def vkTotalGens (vk : VanKampenData) : Nat :=
+noncomputable def vkTotalGens (vk : VanKampenData) : Nat :=
   vk.genA + vk.genB
 
-def vkNetGens (vk : VanKampenData) : Int :=
+noncomputable def vkNetGens (vk : VanKampenData) : Int :=
   (vk.genA : Int) + (vk.genB : Int) - (vk.relIntersect : Int)
 
 -- Theorem 15 – total generators is sum
-def vk_total_gens_sum (a b r : Nat) :
+noncomputable def vk_total_gens_sum (a b r : Nat) :
     Path (vkTotalGens ⟨a, b, r⟩) (a + b) :=
   Path.refl _
 
 -- Theorem 16 – wedge of circles: S¹ ∨ S¹
-def vk_wedge_circles :
+noncomputable def vk_wedge_circles :
     Path (vkTotalGens ⟨1, 1, 0⟩) 2 :=
   Path.refl _
 
 -- Theorem 17 – symmetric VK data gives same total gens (concrete)
-def vk_symmetric_example :
+noncomputable def vk_symmetric_example :
     Path (vkTotalGens ⟨3, 5, 2⟩) (vkTotalGens ⟨5, 3, 2⟩) :=
   Path.refl _
 
@@ -218,35 +218,35 @@ structure HomologyProfile where
   beta3 : Nat
 deriving DecidableEq, Repr
 
-def homologyEuler (H : HomologyProfile) : Int :=
+noncomputable def homologyEuler (H : HomologyProfile) : Int :=
   (H.beta0 : Int) - (H.beta1 : Int) + (H.beta2 : Int) - (H.beta3 : Int)
 
-def homologyTotalRank (H : HomologyProfile) : Nat :=
+noncomputable def homologyTotalRank (H : HomologyProfile) : Nat :=
   H.beta0 + H.beta1 + H.beta2 + H.beta3
 
 -- Theorem 18 – Euler char from Betti numbers of S²
-def betti_S2_euler : Path (homologyEuler ⟨1, 0, 1, 0⟩) 2 :=
+noncomputable def betti_S2_euler : Path (homologyEuler ⟨1, 0, 1, 0⟩) 2 :=
   Path.refl _
 
 -- Theorem 19 – Betti of point
-def betti_point_euler : Path (homologyEuler ⟨1, 0, 0, 0⟩) 1 :=
+noncomputable def betti_point_euler : Path (homologyEuler ⟨1, 0, 0, 0⟩) 1 :=
   Path.refl _
 
 -- Theorem 20 – Betti of torus
-def betti_torus_euler : Path (homologyEuler ⟨1, 2, 1, 0⟩) 0 :=
+noncomputable def betti_torus_euler : Path (homologyEuler ⟨1, 2, 1, 0⟩) 0 :=
   Path.refl _
 
 -- Theorem 21 – total rank of S²
-def betti_S2_rank : Path (homologyTotalRank ⟨1, 0, 1, 0⟩) 2 :=
+noncomputable def betti_S2_rank : Path (homologyTotalRank ⟨1, 0, 1, 0⟩) 2 :=
   Path.refl _
 
 -- Theorem 22 – Euler char agrees between CW and Betti for S²
-def euler_cw_betti_S2 :
+noncomputable def euler_cw_betti_S2 :
     Path (cwEulerChar ⟨1, 0, 1, 0⟩) (homologyEuler ⟨1, 0, 1, 0⟩) :=
   Path.refl _
 
 -- Theorem 23 – Euler char agrees for torus
-def euler_cw_betti_torus :
+noncomputable def euler_cw_betti_torus :
     Path (cwEulerChar ⟨1, 2, 1, 0⟩) (homologyEuler ⟨1, 2, 1, 0⟩) :=
   Path.refl _
 
@@ -261,24 +261,24 @@ structure ShortExact where
   rankC : Nat
 deriving DecidableEq, Repr
 
-def sesValid (s : ShortExact) : Bool :=
+noncomputable def sesValid (s : ShortExact) : Bool :=
   s.rankB == s.rankA + s.rankC
 
-def sesKernel (s : ShortExact) : Nat := s.rankA
-def sesCokernel (s : ShortExact) : Nat := s.rankC
+noncomputable def sesKernel (s : ShortExact) : Nat := s.rankA
+noncomputable def sesCokernel (s : ShortExact) : Nat := s.rankC
 
 -- Theorem 24 – rank-nullity for SES (concrete)
-def ses_rank_nullity :
+noncomputable def ses_rank_nullity :
     Path (sesValid ⟨3, 8, 5⟩) true :=
   Path.refl _
 
 -- Theorem 25 – kernel of a valid SES
-def ses_kernel_val :
+noncomputable def ses_kernel_val :
     Path (sesKernel ⟨3, 8, 5⟩) 3 :=
   Path.refl _
 
 -- Theorem 26 – cokernel
-def ses_cokernel_val :
+noncomputable def ses_cokernel_val :
     Path (sesCokernel ⟨3, 8, 5⟩) 5 :=
   Path.refl _
 
@@ -295,24 +295,24 @@ structure MayerVietoris where
   connecting : Nat   -- connecting homomorphism rank
 deriving DecidableEq, Repr
 
-def mvAlternatingSum (mv : MayerVietoris) : Int :=
+noncomputable def mvAlternatingSum (mv : MayerVietoris) : Int :=
   (mv.rankU : Int) + (mv.rankV : Int) - (mv.rankUV : Int) - (mv.connecting : Int)
 
-def mvLowerBound (mv : MayerVietoris) : Nat :=
+noncomputable def mvLowerBound (mv : MayerVietoris) : Nat :=
   mv.rankU + mv.rankV
 
 -- Theorem 27 – MV for disjoint union (concrete)
-def mv_disjoint :
+noncomputable def mv_disjoint :
     Path (mvAlternatingSum ⟨3, 4, 0, 7, 0⟩) 7 :=
   Path.refl _
 
 -- Theorem 28 – MV lower bound
-def mv_lower_bound_val :
+noncomputable def mv_lower_bound_val :
     Path (mvLowerBound ⟨3, 4, 2, 5, 1⟩) 7 :=
   Path.refl _
 
 -- Theorem 29 – MV symmetric (concrete example)
-def mv_symmetric_example :
+noncomputable def mv_symmetric_example :
     Path (mvAlternatingSum ⟨3, 5, 2, 6, 0⟩)
          (mvAlternatingSum ⟨5, 3, 2, 6, 0⟩) :=
   Path.refl _
@@ -328,24 +328,24 @@ structure CellularChain where
   cycleRank : Nat   -- rank of kernel of d_n
 deriving DecidableEq, Repr
 
-def cellularHomologyRank (ch : CellularChain) : Int :=
+noncomputable def cellularHomologyRank (ch : CellularChain) : Int :=
   (ch.cycleRank : Int) - (ch.boundaryRank : Int)
 
-def cellularChainValid (ch : CellularChain) : Bool :=
+noncomputable def cellularChainValid (ch : CellularChain) : Bool :=
   ch.cycleRank ≤ ch.rank && ch.boundaryRank ≤ ch.cycleRank
 
 -- Theorem 30 – homology rank when trivial boundary
-def cellular_trivialBdy :
+noncomputable def cellular_trivialBdy :
     Path (cellularHomologyRank ⟨5, 0, 3⟩) 3 :=
   Path.refl _
 
 -- Theorem 31 – homology rank when all cycles are boundaries
-def cellular_exact :
+noncomputable def cellular_exact :
     Path (cellularHomologyRank ⟨5, 3, 3⟩) 0 :=
   Path.refl _
 
 -- Theorem 32 – chain validity for a valid chain
-def cellular_valid_example :
+noncomputable def cellular_valid_example :
     Path (cellularChainValid ⟨5, 2, 3⟩) true :=
   Path.refl _
 
@@ -355,35 +355,35 @@ def cellular_valid_example :
 
 -- Theorem 33 – Euler of wedge sum via trans chain
 -- χ(X ∨ Y) = χ(X) + χ(Y) - 1 for CW complexes sharing a vertex
-def wedgeSumEuler (X Y : CWComplex) : Int :=
+noncomputable def wedgeSumEuler (X Y : CWComplex) : Int :=
   cwEulerChar X + cwEulerChar Y - 1
 
-def eulerWedge_S1_S1 :
+noncomputable def eulerWedge_S1_S1 :
     Path (wedgeSumEuler ⟨1, 1, 0, 0⟩ ⟨1, 1, 0, 0⟩) (-1) :=
   Path.refl _
 
 -- Theorem 34 – congrArg chain: cwEulerChar respects equality
-def euler_congrArg (C D : CWComplex) (h : Path C D) :
+noncomputable def euler_congrArg (C D : CWComplex) (h : Path C D) :
     Path (cwEulerChar C) (cwEulerChar D) :=
   Path.congrArg cwEulerChar h
 
 -- Theorem 35 – trans chain: Euler S² = CW Euler S² = Betti Euler S²
-def euler_chain_S2 :
+noncomputable def euler_chain_S2 :
     Path (cwEulerChar ⟨1, 0, 1, 0⟩) (homologyEuler ⟨1, 0, 1, 0⟩) :=
   Path.trans (Path.refl _) (Path.refl _)
 
 -- Theorem 36 – symm chain: reverse Euler agreement
-def euler_chain_S2_symm :
+noncomputable def euler_chain_S2_symm :
     Path (homologyEuler ⟨1, 0, 1, 0⟩) (cwEulerChar ⟨1, 0, 1, 0⟩) :=
   Path.symm euler_chain_S2
 
 -- Theorem 37 – congrArg on homologyTotalRank
-def totalRank_congrArg (H K : HomologyProfile) (h : Path H K) :
+noncomputable def totalRank_congrArg (H K : HomologyProfile) (h : Path H K) :
     Path (homologyTotalRank H) (homologyTotalRank K) :=
   Path.congrArg homologyTotalRank h
 
 -- Theorem 38 – trans + congrArg composition
-def euler_trans_congr (C D : CWComplex) (h : Path C D) :
+noncomputable def euler_trans_congr (C D : CWComplex) (h : Path C D) :
     Path (cwEulerChar C) (cwEulerChar D) :=
   Path.trans (Path.congrArg cwEulerChar h) (Path.refl _)
 
@@ -392,40 +392,40 @@ def euler_trans_congr (C D : CWComplex) (h : Path C D) :
 -- ════════════════════════════════════════════════════════════════════
 
 /-- Product Euler characteristic. -/
-def productEuler (X Y : CWComplex) : Int :=
+noncomputable def productEuler (X Y : CWComplex) : Int :=
   cwEulerChar X * cwEulerChar Y
 
 /-- Suspension increases cells. -/
-def suspensionCW (C : CWComplex) : CWComplex :=
+noncomputable def suspensionCW (C : CWComplex) : CWComplex :=
   { cells0 := 2, cells1 := C.cells0, cells2 := C.cells1, cells3 := C.cells2 }
 
 -- Theorem 39 – product Euler of two points
-def product_euler_points :
+noncomputable def product_euler_points :
     Path (productEuler ⟨1, 0, 0, 0⟩ ⟨1, 0, 0, 0⟩) 1 :=
   Path.refl _
 
 -- Theorem 40 – product Euler of S¹ × S¹ = torus
-def product_euler_torus :
+noncomputable def product_euler_torus :
     Path (productEuler ⟨1, 1, 0, 0⟩ ⟨1, 1, 0, 0⟩) 0 :=
   Path.refl _
 
 -- Theorem 41 – suspension of a point gives S¹-like structure
-def suspension_point :
+noncomputable def suspension_point :
     Path (suspensionCW ⟨1, 0, 0, 0⟩) ⟨2, 1, 0, 0⟩ :=
   Path.refl _
 
 -- Theorem 42 – Euler char of suspension of S⁰ (2 points)
-def euler_suspension_S0 :
+noncomputable def euler_suspension_S0 :
     Path (cwEulerChar (suspensionCW ⟨2, 0, 0, 0⟩)) 0 :=
   Path.refl _
 
 -- Theorem 43 – congrArg through suspension
-def suspension_congrArg (C D : CWComplex) (h : Path C D) :
+noncomputable def suspension_congrArg (C D : CWComplex) (h : Path C D) :
     Path (suspensionCW C) (suspensionCW D) :=
   Path.congrArg suspensionCW h
 
 -- Theorem 44 – trans chain: suspension then Euler
-def suspension_euler_chain (C D : CWComplex) (h : Path C D) :
+noncomputable def suspension_euler_chain (C D : CWComplex) (h : Path C D) :
     Path (cwEulerChar (suspensionCW C)) (cwEulerChar (suspensionCW D)) :=
   Path.congrArg cwEulerChar (Path.congrArg suspensionCW h)
 
@@ -441,16 +441,16 @@ structure LESPairData where
   connectingRank : Nat
 deriving DecidableEq, Repr
 
-def lesPairAlternating (d : LESPairData) : Int :=
+noncomputable def lesPairAlternating (d : LESPairData) : Int :=
   (d.rankHnX : Int) - (d.rankHnA : Int) - (d.rankHnXA : Int) + (d.connectingRank : Int)
 
 -- Theorem 45 – LES for contractible X, A = point
-def les_contractible :
+noncomputable def les_contractible :
     Path (lesPairAlternating ⟨1, 1, 0, 0⟩) 0 :=
   Path.refl _
 
 -- Theorem 46 – LES alternating sum symmetry chain
-def les_alternating_zero :
+noncomputable def les_alternating_zero :
     Path (lesPairAlternating ⟨3, 5, 2, 0⟩) 0 :=
   Path.refl _
 
@@ -465,19 +465,19 @@ structure UniversalCoeffData where
   cohomRank : Nat     -- H^n
 deriving DecidableEq, Repr
 
-def ucExpectedCohom (u : UniversalCoeffData) : Nat :=
+noncomputable def ucExpectedCohom (u : UniversalCoeffData) : Nat :=
   u.homRank + u.torRank
 
-def ucValid (u : UniversalCoeffData) : Bool :=
+noncomputable def ucValid (u : UniversalCoeffData) : Bool :=
   u.cohomRank == ucExpectedCohom u
 
 -- Theorem 47 – UCT for torsion-free case
-def uct_torsion_free :
+noncomputable def uct_torsion_free :
     Path (ucExpectedCohom ⟨5, 0, 5⟩) 5 :=
   Path.refl _
 
 -- Theorem 48 – UCT validity check
-def uct_valid_example :
+noncomputable def uct_valid_example :
     Path (ucValid ⟨3, 1, 4⟩) true :=
   Path.refl _
 
@@ -491,24 +491,24 @@ structure CupProductData where
   degQ : Nat
 deriving DecidableEq, Repr
 
-def cupProductDeg (c : CupProductData) : Nat :=
+noncomputable def cupProductDeg (c : CupProductData) : Nat :=
   c.degP + c.degQ
 
 -- Theorem 49 – cup product degree
-def cup_deg_example :
+noncomputable def cup_deg_example :
     Path (cupProductDeg ⟨1, 2⟩) 3 :=
   Path.refl _
 
 -- Theorem 50 – cup product commutativity sign (graded comm)
 -- sign = (-1)^(p*q), represented as parity
-def cupSignParity (c : CupProductData) : Nat :=
+noncomputable def cupSignParity (c : CupProductData) : Nat :=
   (c.degP * c.degQ) % 2
 
-def cup_sign_odd_odd :
+noncomputable def cup_sign_odd_odd :
     Path (cupSignParity ⟨1, 1⟩) 1 :=
   Path.refl _
 
-def cup_sign_even_any :
+noncomputable def cup_sign_even_any :
     Path (cupSignParity ⟨0, 7⟩) 0 :=
   Path.refl _
 
@@ -522,21 +522,21 @@ structure EMSpace where
   dimension : Nat
 deriving DecidableEq, Repr
 
-def emBettiAt (E : EMSpace) (k : Nat) : Nat :=
+noncomputable def emBettiAt (E : EMSpace) (k : Nat) : Nat :=
   if k == E.dimension then E.groupRank else 0
 
 -- Theorem 51 – K(Z, 1) has β₁ = 1
-def em_KZ1_betti1 :
+noncomputable def em_KZ1_betti1 :
     Path (emBettiAt ⟨1, 1⟩ 1) 1 :=
   Path.refl _
 
 -- Theorem 52 – K(Z, 1) has β₀ = 0
-def em_KZ1_betti0 :
+noncomputable def em_KZ1_betti0 :
     Path (emBettiAt ⟨1, 1⟩ 0) 0 :=
   Path.refl _
 
 -- Theorem 53 – K(Z², 2) has β₂ = 2
-def em_KZ2_2_betti2 :
+noncomputable def em_KZ2_2_betti2 :
     Path (emBettiAt ⟨2, 2⟩ 2) 2 :=
   Path.refl _
 
@@ -551,16 +551,16 @@ structure ObstructionData where
   isVanishing : Bool
 deriving DecidableEq, Repr
 
-def obstructionExtensible (o : ObstructionData) : Bool :=
+noncomputable def obstructionExtensible (o : ObstructionData) : Bool :=
   o.isVanishing || o.obstructionRank == 0
 
 -- Theorem 54 – vanishing obstruction allows extension
-def obstruction_vanishing :
+noncomputable def obstruction_vanishing :
     Path (obstructionExtensible ⟨3, 5, true⟩) true :=
   Path.refl _
 
 -- Theorem 55 – zero rank obstruction allows extension
-def obstruction_zero_rank :
+noncomputable def obstruction_zero_rank :
     Path (obstructionExtensible ⟨3, 0, false⟩) true :=
   Path.refl _
 
@@ -575,16 +575,16 @@ structure PoincareDualityData where
   bettiNK : Nat      -- β_{n-k}
 deriving DecidableEq, Repr
 
-def pdValid (d : PoincareDualityData) : Bool :=
+noncomputable def pdValid (d : PoincareDualityData) : Bool :=
   d.bettiK == d.bettiNK
 
 -- Theorem 56 – duality for S² (β₀ = β₂ = 1)
-def pd_S2 :
+noncomputable def pd_S2 :
     Path (pdValid ⟨2, 1, 1⟩) true :=
   Path.refl _
 
 -- Theorem 57 – duality for torus (β₁ = β₁ = 2)
-def pd_torus :
+noncomputable def pd_torus :
     Path (pdValid ⟨2, 2, 2⟩) true :=
   Path.refl _
 
@@ -593,24 +593,24 @@ def pd_torus :
 -- ════════════════════════════════════════════════════════════════════
 
 -- Theorem 58 – three-step trans chain for Euler
-def euler_three_step_trans :
+noncomputable def euler_three_step_trans :
     Path (cwEulerChar ⟨1, 0, 1, 0⟩) (homologyEuler ⟨1, 0, 1, 0⟩) :=
   Path.trans
     (Path.trans (Path.refl _) (Path.refl _))
     (Path.refl _)
 
 -- Theorem 59 – symm of trans chain
-def euler_symm_trans :
+noncomputable def euler_symm_trans :
     Path (homologyEuler ⟨1, 0, 1, 0⟩) (cwEulerChar ⟨1, 0, 1, 0⟩) :=
   Path.symm euler_three_step_trans
 
 -- Theorem 60 – congrArg + trans: product Euler respects CW equality
-def productEuler_congrArg_left (X X' Y : CWComplex) (h : Path X X') :
+noncomputable def productEuler_congrArg_left (X X' Y : CWComplex) (h : Path X X') :
     Path (productEuler X Y) (productEuler X' Y) :=
   Path.congrArg (fun c => productEuler c Y) h
 
 -- Theorem 61 – congrArg + trans: product Euler respects both args
-def productEuler_congrArg_both (X X' Y Y' : CWComplex)
+noncomputable def productEuler_congrArg_both (X X' Y Y' : CWComplex)
     (hx : Path X X') (hy : Path Y Y') :
     Path (productEuler X Y) (productEuler X' Y') :=
   Path.trans
@@ -618,7 +618,7 @@ def productEuler_congrArg_both (X X' Y Y' : CWComplex)
     (Path.congrArg (fun c => productEuler X' c) hy)
 
 -- Theorem 62 – transport: Euler char value transports along CW path
-def euler_transport (C D : CWComplex) (h : Path C D) :
+noncomputable def euler_transport (C D : CWComplex) (h : Path C D) :
     cwEulerChar C = cwEulerChar D :=
   (Path.congrArg cwEulerChar h).toEq
 
@@ -629,7 +629,7 @@ theorem euler_coherence (C : CWComplex) :
   simp [Path.trans, Path.refl]
 
 -- Theorem 64 – composition of congrArg chains
-def double_congrArg_chain (C D E : CWComplex) (h1 : Path C D) (h2 : Path D E) :
+noncomputable def double_congrArg_chain (C D E : CWComplex) (h1 : Path C D) (h2 : Path D E) :
     Path (cwEulerChar C) (cwEulerChar E) :=
   Path.trans
     (Path.congrArg cwEulerChar h1)
@@ -651,7 +651,7 @@ theorem congrArg_trans_dist (C D E : CWComplex) (p : Path C D) (q : Path D E) :
 
 universe u v
 
-def atomicPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
+noncomputable def atomicPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 theorem atomicPath_toEq {A : Type u} {a b : A} (h : a = b) :
@@ -688,18 +688,18 @@ theorem atomicPath_trans_refl {A : Type u} {a b : A} (h : a = b) :
 structure FundamentalArrow {X : Type u} (x y : X) where
   path : Path x y
 
-def FundamentalArrow.id {X : Type u} (x : X) : FundamentalArrow x x :=
+noncomputable def FundamentalArrow.id {X : Type u} (x : X) : FundamentalArrow x x :=
   ⟨Path.refl x⟩
 
-def FundamentalArrow.comp {X : Type u} {x y z : X}
+noncomputable def FundamentalArrow.comp {X : Type u} {x y z : X}
     (f : FundamentalArrow x y) (g : FundamentalArrow y z) : FundamentalArrow x z :=
   ⟨Path.trans f.path g.path⟩
 
-def FundamentalArrow.inv {X : Type u} {x y : X}
+noncomputable def FundamentalArrow.inv {X : Type u} {x y : X}
     (f : FundamentalArrow x y) : FundamentalArrow y x :=
   ⟨Path.symm f.path⟩
 
-def FundamentalArrow.map {X : Type u} {Y : Type v} (F : X → Y) {x y : X}
+noncomputable def FundamentalArrow.map {X : Type u} {Y : Type v} (F : X → Y) {x y : X}
     (f : FundamentalArrow x y) : FundamentalArrow (F x) (F y) :=
   ⟨Path.congrArg F f.path⟩
 
@@ -779,18 +779,18 @@ structure CoverLift {E : Type u} {X : Type v}
   liftPath : Path e₀ e₁
   endProj : Path (cov.proj e₁) y
 
-def coveringSectionPath {E : Type u} {X : Type v}
+noncomputable def coveringSectionPath {E : Type u} {X : Type v}
     (cov : CoveringSpaceSketch E X) (x : X) : Path (cov.proj (cov.sec x)) x :=
   atomicPath (cov.proj_sec x)
 
-def coveringLiftRefl {E : Type u} {X : Type v}
+noncomputable def coveringLiftRefl {E : Type u} {X : Type v}
     (cov : CoveringSpaceSketch E X) (x : X) :
     CoverLift cov (Path.refl x) (cov.sec x) (cov.sec x) where
   startProj := coveringSectionPath cov x
   liftPath := Path.refl _
   endProj := Path.trans (coveringSectionPath cov x) (Path.refl _)
 
-def coveringLiftComp {E : Type u} {X : Type v}
+noncomputable def coveringLiftComp {E : Type u} {X : Type v}
     (cov : CoveringSpaceSketch E X)
     {x y z : X} {p : Path x y} {q : Path y z}
     {e₀ e₁ e₂ : E}
@@ -804,7 +804,7 @@ structure DeckTransform {E : Type u} {X : Type v} (cov : CoveringSpaceSketch E X
   map : E → E
   proj_comm : (e : E) → cov.proj (map e) = cov.proj e
 
-def DeckTransform.mapPath {E : Type u} {X : Type v}
+noncomputable def DeckTransform.mapPath {E : Type u} {X : Type v}
     {cov : CoveringSpaceSketch E X} (d : DeckTransform cov) {e₁ e₂ : E}
     (p : Path e₁ e₂) : Path (d.map e₁) (d.map e₂) :=
   Path.congrArg d.map p
@@ -878,19 +878,19 @@ structure VanKampenSketch where
   rankUV : Nat
   rankUnion : Nat
 
-def vkPushoutRank (V : VanKampenSketch) : Nat :=
+noncomputable def vkPushoutRank (V : VanKampenSketch) : Nat :=
   V.rankU + V.rankV - V.rankUV
 
-def vkBoundaryRank (V : VanKampenSketch) : Nat :=
+noncomputable def vkBoundaryRank (V : VanKampenSketch) : Nat :=
   V.rankUV + V.rankUnion
 
-def vkSwap (V : VanKampenSketch) : VanKampenSketch where
+noncomputable def vkSwap (V : VanKampenSketch) : VanKampenSketch where
   rankU := V.rankV
   rankV := V.rankU
   rankUV := V.rankUV
   rankUnion := V.rankUnion
 
-def vkPushoutPath (V : VanKampenSketch) :
+noncomputable def vkPushoutPath (V : VanKampenSketch) :
     Path (vkPushoutRank V) (V.rankU + V.rankV - V.rankUV) :=
   Path.refl _
 
@@ -932,19 +932,19 @@ structure HomologyGroupData where
   reducedShift : Nat
   degree : Nat
 
-def hgRank (H : HomologyGroupData) : Nat :=
+noncomputable def hgRank (H : HomologyGroupData) : Nat :=
   (H.cycles + H.reducedShift) - H.boundaries
 
-def hgReducedRank (H : HomologyGroupData) : Nat :=
+noncomputable def hgReducedRank (H : HomologyGroupData) : Nat :=
   H.cycles - H.boundaries
 
-def hgShift (H : HomologyGroupData) : HomologyGroupData where
+noncomputable def hgShift (H : HomologyGroupData) : HomologyGroupData where
   cycles := H.cycles + H.reducedShift
   boundaries := H.boundaries + 1
   reducedShift := H.reducedShift
   degree := H.degree + 1
 
-def hgRankPath (H : HomologyGroupData) :
+noncomputable def hgRankPath (H : HomologyGroupData) :
     Path (hgRank H) ((H.cycles + H.reducedShift) - H.boundaries) :=
   Path.refl _
 
@@ -981,22 +981,22 @@ structure ExactSeqData where
   imGH : Nat
   kerHI : Nat
 
-def exactDefectLeft (E : ExactSeqData) : Nat :=
+noncomputable def exactDefectLeft (E : ExactSeqData) : Nat :=
   E.kerGH - E.imFG
 
-def exactDefectRight (E : ExactSeqData) : Nat :=
+noncomputable def exactDefectRight (E : ExactSeqData) : Nat :=
   E.kerHI - E.imGH
 
-def exactTotal (E : ExactSeqData) : Nat :=
+noncomputable def exactTotal (E : ExactSeqData) : Nat :=
   E.imFG + E.kerGH + E.imGH + E.kerHI
 
-def exactSwap (E : ExactSeqData) : ExactSeqData where
+noncomputable def exactSwap (E : ExactSeqData) : ExactSeqData where
   imFG := E.imGH
   kerGH := E.kerHI
   imGH := E.imFG
   kerHI := E.kerGH
 
-def exactLeftPath (E : ExactSeqData) :
+noncomputable def exactLeftPath (E : ExactSeqData) :
     Path (exactDefectLeft E) (E.kerGH - E.imFG) :=
   Path.refl _
 
@@ -1038,19 +1038,19 @@ structure MayerVietorisSketch where
   rankInter : Nat
   rankUnion : Nat
 
-def mvAltRank (M : MayerVietorisSketch) : Nat :=
+noncomputable def mvAltRank (M : MayerVietorisSketch) : Nat :=
   M.rankA + M.rankB - M.rankInter
 
-def mvExactRank (M : MayerVietorisSketch) : Nat :=
+noncomputable def mvExactRank (M : MayerVietorisSketch) : Nat :=
   M.rankA + M.rankB + M.rankInter + M.rankUnion
 
-def mvSketchSwap (M : MayerVietorisSketch) : MayerVietorisSketch where
+noncomputable def mvSketchSwap (M : MayerVietorisSketch) : MayerVietorisSketch where
   rankA := M.rankB
   rankB := M.rankA
   rankInter := M.rankInter
   rankUnion := M.rankUnion
 
-def mvAltPath (M : MayerVietorisSketch) :
+noncomputable def mvAltPath (M : MayerVietorisSketch) :
     Path (mvAltRank M) (M.rankA + M.rankB - M.rankInter) :=
   Path.refl _
 
@@ -1091,19 +1091,19 @@ structure CWComplexSketch where
   cells2 : Nat
   cells3 : Nat
 
-def cwEulerDeep (C : CWComplexSketch) : Int :=
+noncomputable def cwEulerDeep (C : CWComplexSketch) : Int :=
   (C.cells0 : Int) - (C.cells1 : Int) + (C.cells2 : Int) - (C.cells3 : Int)
 
-def cwTotalCellsDeep (C : CWComplexSketch) : Nat :=
+noncomputable def cwTotalCellsDeep (C : CWComplexSketch) : Nat :=
   C.cells0 + C.cells1 + C.cells2 + C.cells3
 
-def cwNextSkeleton (C : CWComplexSketch) : CWComplexSketch where
+noncomputable def cwNextSkeleton (C : CWComplexSketch) : CWComplexSketch where
   cells0 := C.cells0
   cells1 := C.cells1
   cells2 := C.cells2
   cells3 := C.cells3 + 1
 
-def cwEulerPath (C : CWComplexSketch) :
+noncomputable def cwEulerPath (C : CWComplexSketch) :
     Path (cwEulerDeep C)
       ((C.cells0 : Int) - (C.cells1 : Int) + (C.cells2 : Int) - (C.cells3 : Int)) :=
   Path.refl _
@@ -1141,19 +1141,19 @@ structure CellularHomologySketch where
   boundariesNext : Nat
   cellsN : Nat
 
-def cellularRank (H : CellularHomologySketch) : Nat :=
+noncomputable def cellularRank (H : CellularHomologySketch) : Nat :=
   H.cyclesN - H.boundariesN
 
-def cellularBoundarySquare (H : CellularHomologySketch) : Nat :=
+noncomputable def cellularBoundarySquare (H : CellularHomologySketch) : Nat :=
   H.boundariesN + H.boundariesNext
 
-def cellularShift (H : CellularHomologySketch) : CellularHomologySketch where
+noncomputable def cellularShift (H : CellularHomologySketch) : CellularHomologySketch where
   cyclesN := H.cyclesN + H.cellsN
   boundariesN := H.boundariesN + 1
   boundariesNext := H.boundariesNext + 1
   cellsN := H.cellsN
 
-def cellularRankPath (H : CellularHomologySketch) :
+noncomputable def cellularRankPath (H : CellularHomologySketch) :
     Path (cellularRank H) (H.cyclesN - H.boundariesN) :=
   Path.refl _
 

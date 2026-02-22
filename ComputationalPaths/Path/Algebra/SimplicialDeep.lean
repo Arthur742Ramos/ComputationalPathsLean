@@ -54,11 +54,11 @@ open ComputationalPaths.Path
 /-! ## Section 1: Face and Degeneracy Maps on Lists -/
 
 /-- Remove the i-th element from a list (0-indexed face map). -/
-def faceMap {A : Type u} (i : Nat) (xs : List A) : List A :=
+noncomputable def faceMap {A : Type u} (i : Nat) (xs : List A) : List A :=
   xs.take i ++ xs.drop (i + 1)
 
 /-- Duplicate the j-th element (0-indexed degeneracy map). -/
-def degeneracyMap {A : Type u} (j : Nat) (xs : List A) : List A :=
+noncomputable def degeneracyMap {A : Type u} (j : Nat) (xs : List A) : List A :=
   match xs[j]? with
   | some v => xs.take (j + 1) ++ [v] ++ xs.drop (j + 1)
   | none   => xs
@@ -81,7 +81,7 @@ theorem faceMap_zero_cons {A : Type u} (x : A) (xs : List A) :
   simp [faceMap, List.take, List.drop]
 
 /-- Path witnessing face map at 0 drops head. -/
-def faceMap_zero_cons_path {A : Type u} (x : A) (xs : List A) :
+noncomputable def faceMap_zero_cons_path {A : Type u} (x : A) (xs : List A) :
     Path (faceMap 0 (x :: xs)) xs :=
   Path.mk [Step.mk (faceMap 0 (x :: xs)) xs (faceMap_zero_cons x xs)] (faceMap_zero_cons x xs)
 
@@ -92,7 +92,7 @@ theorem faceMap_large {A : Type u} (xs : List A) (i : Nat) (h : i ≥ xs.length)
         List.drop_of_length_le (by omega : xs.length ≤ i + 1)]
 
 /-- Path for face map beyond length. -/
-def faceMap_large_path {A : Type u} (xs : List A) (i : Nat) (h : i ≥ xs.length) :
+noncomputable def faceMap_large_path {A : Type u} (xs : List A) (i : Nat) (h : i ≥ xs.length) :
     Path (faceMap i xs) xs :=
   Path.mk [Step.mk _ _ (faceMap_large xs i h)] (faceMap_large xs i h)
 
@@ -108,21 +108,21 @@ structure SimplicialData (A : Nat → Type u) where
 
 /-- The simplicial identity d_i ∘ d_j = d_{j+1} ∘ d_i for i ≤ j,
     expressed as a propositional equality. -/
-def FaceFaceIdentity {A : Nat → Type u} (S : SimplicialData A)
+noncomputable def FaceFaceIdentity {A : Nat → Type u} (S : SimplicialData A)
     (n : Nat) (i j : Nat) (_h : i ≤ j) : Prop :=
   ∀ x : A (n + 2),
     S.face n i (S.face (n + 1) j x) =
     S.face n j (S.face (n + 1) (i) x)
 
 /-- The simplicial identity for degeneracies: s_i ∘ s_j = s_j ∘ s_{i+1} for i ≥ j. -/
-def DegenDegenIdentity {A : Nat → Type u} (S : SimplicialData A)
+noncomputable def DegenDegenIdentity {A : Nat → Type u} (S : SimplicialData A)
     (n : Nat) (i j : Nat) (_h : i ≥ j) : Prop :=
   ∀ x : A n,
     S.degen (n + 1) i (S.degen n j x) =
     S.degen (n + 1) j (S.degen n (i + 1) x)
 
 /-- Mixed identity: d_j ∘ s_j = id. -/
-def FaceDegenIdentity {A : Nat → Type u} (S : SimplicialData A)
+noncomputable def FaceDegenIdentity {A : Nat → Type u} (S : SimplicialData A)
     (n : Nat) (j : Nat) : Prop :=
   ∀ x : A n, S.face n j (S.degen n j x) = x
 
@@ -173,7 +173,7 @@ structure SimplicialMap {A B : Nat → Type u}
     mapLevel (n + 1) (S.degen n j x) = T.degen n j (mapLevel n x)
 
 /-- Path witnessing that a simplicial map commutes with face. -/
-def simplicialMap_face_path {A B : Nat → Type u}
+noncomputable def simplicialMap_face_path {A B : Nat → Type u}
     {S : SimplicialData A} {T : SimplicialData B}
     (f : SimplicialMap S T)
     (n : Nat) (i : Nat) (x : A (n + 1)) :
@@ -182,7 +182,7 @@ def simplicialMap_face_path {A B : Nat → Type u}
   Path.mk [Step.mk _ _ (f.comm_face n i x)] (f.comm_face n i x)
 
 /-- Path witnessing that a simplicial map commutes with degeneracy. -/
-def simplicialMap_degen_path {A B : Nat → Type u}
+noncomputable def simplicialMap_degen_path {A B : Nat → Type u}
     {S : SimplicialData A} {T : SimplicialData B}
     (f : SimplicialMap S T)
     (n : Nat) (j : Nat) (x : A n) :
@@ -191,7 +191,7 @@ def simplicialMap_degen_path {A B : Nat → Type u}
   Path.mk [Step.mk _ _ (f.comm_degen n j x)] (f.comm_degen n j x)
 
 /-- Theorem 3: Composing simplicial maps preserves face commutativity paths. -/
-def simplicialMap_compose_face_path {A B C : Nat → Type u}
+noncomputable def simplicialMap_compose_face_path {A B C : Nat → Type u}
     {SA : SimplicialData A} {SB : SimplicialData B} {SC : SimplicialData C}
     (f : SimplicialMap SA SB) (g : SimplicialMap SB SC)
     (n : Nat) (i : Nat) (x : A (n + 1)) :
@@ -202,7 +202,7 @@ def simplicialMap_compose_face_path {A B C : Nat → Type u}
     (simplicialMap_face_path g n i (f.mapLevel (n + 1) x))
 
 /-- Theorem 4: Composing simplicial maps preserves degeneracy commutativity paths. -/
-def simplicialMap_compose_degen_path {A B C : Nat → Type u}
+noncomputable def simplicialMap_compose_degen_path {A B C : Nat → Type u}
     {SA : SimplicialData A} {SB : SimplicialData B} {SC : SimplicialData C}
     (f : SimplicialMap SA SB) (g : SimplicialMap SB SC)
     (n : Nat) (j : Nat) (x : A n) :
@@ -215,7 +215,7 @@ def simplicialMap_compose_degen_path {A B C : Nat → Type u}
 /-! ## Section 6: Identity and Composition of Simplicial Maps -/
 
 /-- The identity simplicial map. -/
-def simplicialMap_id {A : Nat → Type u} (S : SimplicialData A) :
+noncomputable def simplicialMap_id {A : Nat → Type u} (S : SimplicialData A) :
     SimplicialMap S S where
   mapLevel := fun _ x => x
   comm_face := fun _ _ _ => rfl
@@ -257,14 +257,14 @@ structure KanFillerPath {A : Nat → Type u} (S : SimplicialData A)
     Path (S.face n i filler) (horn.faces i h)
 
 /-- Theorem 7: A Kan filler yields a path from any non-k face to the horn data. -/
-def kanFiller_to_path {A : Nat → Type u} {S : SimplicialData A}
+noncomputable def kanFiller_to_path {A : Nat → Type u} {S : SimplicialData A}
     {n k : Nat} {horn : HornData A S n k}
     (kf : KanFiller S n k horn) (i : Nat) (h : i ≠ k) :
     Path (S.face n i kf.filler) (horn.faces i h) :=
   Path.mk [Step.mk _ _ (kf.face_match i h)] (kf.face_match i h)
 
 /-- Theorem 8: Two Kan fillers yield a path between their face images. -/
-def kanFiller_face_path {A : Nat → Type u} {S : SimplicialData A}
+noncomputable def kanFiller_face_path {A : Nat → Type u} {S : SimplicialData A}
     {n k : Nat} {horn : HornData A S n k}
     (kf1 kf2 : KanFiller S n k horn) (i : Nat) (h : i ≠ k) :
     Path (S.face n i kf1.filler) (S.face n i kf2.filler) :=
@@ -301,7 +301,7 @@ structure ChainComplexData (A : Nat → Type u) where
     differential n (differential (n + 1) x) = (abGrp n).zero
 
 /-- Path witnessing ∂² = 0 in a chain complex. -/
-def boundary_sq_path {A : Nat → Type u} (C : ChainComplexData A)
+noncomputable def boundary_sq_path {A : Nat → Type u} (C : ChainComplexData A)
     (n : Nat) (x : A (n + 2)) :
     Path (C.differential n (C.differential (n + 1) x))
          ((C.abGrp n).zero) :=
@@ -315,7 +315,7 @@ theorem boundary_sq_path_roundtrip {A : Nat → Type u} (C : ChainComplexData A)
   simp
 
 /-- Theorem 11: congrArg through differential preserves boundary square. -/
-def boundary_sq_congrArg {A B : Nat → Type u}
+noncomputable def boundary_sq_congrArg {A B : Nat → Type u}
     (C : ChainComplexData A) (f : (n : Nat) → A n → B n)
     (_comm : (n : Nat) → (x : A (n + 1)) → f n (C.differential n x) = f n (C.differential n x))
     (n : Nat) (x : A (n + 2)) :
@@ -337,7 +337,7 @@ structure MooreComplexData (A : Nat → Type u) where
     boundary n (boundary (n + 1) x) = (abGrp n).zero
 
 /-- Theorem 12: Moore complex boundary² = 0 as Path. -/
-def moore_boundary_sq_path {A : Nat → Type u} (M : MooreComplexData A)
+noncomputable def moore_boundary_sq_path {A : Nat → Type u} (M : MooreComplexData A)
     (n : Nat) (x : A (n + 2)) :
     Path (M.boundary n (M.boundary (n + 1) x))
          ((M.abGrp n).zero) :=
@@ -345,7 +345,7 @@ def moore_boundary_sq_path {A : Nat → Type u} (M : MooreComplexData A)
 
 /-- Theorem 13: Two applications of the Moore boundary give a path to zero,
     and this path is compatible under congrArg with any group homomorphism. -/
-def moore_boundary_functorial {A B : Nat → Type u}
+noncomputable def moore_boundary_functorial {A B : Nat → Type u}
     (M : MooreComplexData A) (f : (n : Nat) → A n → B n)
     (n : Nat) (x : A (n + 2)) :
     Path (f n (M.boundary n (M.boundary (n + 1) x)))
@@ -370,7 +370,7 @@ structure SimplicialHomotopy {A B : Nat → Type u}
     T.face n (n + 1) (homotopy n n x) = g.mapLevel n x
 
 /-- Theorem 14: The bottom condition gives a Path from face to f. -/
-def homotopy_bottom_path {A B : Nat → Type u}
+noncomputable def homotopy_bottom_path {A B : Nat → Type u}
     {S : SimplicialData A} {T : SimplicialData B}
     {f g : SimplicialMap S T}
     (H : SimplicialHomotopy S T f g)
@@ -380,7 +380,7 @@ def homotopy_bottom_path {A B : Nat → Type u}
   Path.mk [Step.mk _ _ (H.bottom n x)] (H.bottom n x)
 
 /-- Theorem 15: The top condition gives a Path from face to g. -/
-def homotopy_top_path {A B : Nat → Type u}
+noncomputable def homotopy_top_path {A B : Nat → Type u}
     {S : SimplicialData A} {T : SimplicialData B}
     {f g : SimplicialMap S T}
     (H : SimplicialHomotopy S T f g)
@@ -390,7 +390,7 @@ def homotopy_top_path {A B : Nat → Type u}
   Path.mk [Step.mk _ _ (H.top n x)] (H.top n x)
 
 /-- Theorem 16: Composing bottom and symm top gives a path from f to g via homotopy. -/
-def homotopy_f_to_g_path {A B : Nat → Type u}
+noncomputable def homotopy_f_to_g_path {A B : Nat → Type u}
     {S : SimplicialData A} {T : SimplicialData B}
     {f g : SimplicialMap S T}
     (H : SimplicialHomotopy S T f g)
@@ -405,7 +405,7 @@ def homotopy_f_to_g_path {A B : Nat → Type u}
       (homotopy_top_path H n x))
 
 /-- Theorem 17: Simplicial homotopy is reflexive (use identity homotopy). -/
-def simplicialHomotopy_refl {A B : Nat → Type u}
+noncomputable def simplicialHomotopy_refl {A B : Nat → Type u}
     (S : SimplicialData A) (T : SimplicialData B)
     (f : SimplicialMap S T)
     (has_degen : ∀ n x, T.face n 0 (T.degen n 0 (f.mapLevel n x)) = f.mapLevel n x)
@@ -432,7 +432,7 @@ structure GeometricRealizationData (A : Nat → Type u) (X : Type v) where
     charMap n (simpl.face n i x) t = charMap (n + 1) x (faceIncl n i t)
 
 /-- Theorem 18: Face compatibility as a Path. -/
-def face_compat_path {A : Nat → Type u} {X : Type v}
+noncomputable def face_compat_path {A : Nat → Type u} {X : Type v}
     (G : GeometricRealizationData A X) (n : Nat) (i : Nat)
     (x : A (n + 1)) (t : G.stdSimplex n) :
     Path (G.charMap n (G.simpl.face n i x) t)
@@ -440,7 +440,7 @@ def face_compat_path {A : Nat → Type u} {X : Type v}
   Path.mk [Step.mk _ _ (G.face_compat n i x t)] (G.face_compat n i x t)
 
 /-- Theorem 19: Composing two face compatibilities yields a coherent path. -/
-def face_compat_compose {A : Nat → Type u} {X : Type v}
+noncomputable def face_compat_compose {A : Nat → Type u} {X : Type v}
     (G : GeometricRealizationData A X)
     (n : Nat) (i j : Nat)
     (x : A (n + 2)) (t : G.stdSimplex n)
@@ -462,7 +462,7 @@ structure CoskeletalData (A : Nat → Type u) (S : SimplicialData A) (n : Nat) w
 
 /-- Theorem 20: In an n-coskeletal simplicial set, higher simplices
     with matching faces are connected by paths. -/
-def coskeletal_path {A : Nat → Type u} {S : SimplicialData A}
+noncomputable def coskeletal_path {A : Nat → Type u} {S : SimplicialData A}
     {n : Nat} (C : CoskeletalData A S n)
     (m : Nat) (h : m + 1 > n) (x y : A (m + 1))
     (faces_eq : ∀ i, S.face m i x = S.face m i y) :
@@ -473,14 +473,14 @@ def coskeletal_path {A : Nat → Type u} {S : SimplicialData A}
 /-! ## Section 13: Simplicial Kernel and Image -/
 
 /-- Kernel of a simplicial map at level n. -/
-def simplicialKernel {A B : Nat → Type u}
+noncomputable def simplicialKernel {A B : Nat → Type u}
     {S : SimplicialData A} {T : SimplicialData B}
     (f : SimplicialMap S T) (n : Nat) (grp : AbGroupStr (B n)) :
     A n → Prop :=
   fun x => f.mapLevel n x = grp.zero
 
 /-- Theorem 21: If x is in the kernel, we get a Path to zero. -/
-def kernel_path {A B : Nat → Type u}
+noncomputable def kernel_path {A B : Nat → Type u}
     {S : SimplicialData A} {T : SimplicialData B}
     (f : SimplicialMap S T) (n : Nat) (grp : AbGroupStr (B n))
     (x : A n) (hx : simplicialKernel f n grp x) :
@@ -501,7 +501,7 @@ theorem kernel_face_compat {A B : Nat → Type u}
   rw [f.comm_face n i x, hx, face_zero]
 
 /-- Theorem 23: Path from kernel element through face to zero. -/
-def kernel_face_path {A B : Nat → Type u}
+noncomputable def kernel_face_path {A B : Nat → Type u}
     {S : SimplicialData A} {T : SimplicialData B}
     (f : SimplicialMap S T)
     (n : Nat) (i : Nat)
@@ -531,7 +531,7 @@ structure DegeneracySplitting (A : Nat → Type u) (S : SimplicialData A) where
     ∃ _ : (decompose n x).1 ≤ n, True
 
 /-- Theorem 24: Non-degenerate simplices have trivial decomposition path. -/
-def nondegenerate_decompose_path {A : Nat → Type u}
+noncomputable def nondegenerate_decompose_path {A : Nat → Type u}
     {S : SimplicialData A}
     (D : DegeneracySplitting A S) (n : Nat) (x : A n)
     (_ : D.isNonDegenerate n x)
@@ -542,7 +542,7 @@ def nondegenerate_decompose_path {A : Nat → Type u}
 /-! ## Section 15: Simplicial Object Functor Laws -/
 
 /-- Composition of simplicial maps. -/
-def simplicialMap_compose {A B C : Nat → Type u}
+noncomputable def simplicialMap_compose {A B C : Nat → Type u}
     {SA : SimplicialData A} {SB : SimplicialData B} {SC : SimplicialData C}
     (f : SimplicialMap SA SB) (g : SimplicialMap SB SC) :
     SimplicialMap SA SC where
@@ -588,22 +588,22 @@ structure SmallCatData (Ob : Type u) where
     comp (comp f g) h = comp f (comp g h)
 
 /-- The nerve: n-simplices are composable chains of n morphisms. -/
-def nerveSimplices (Ob : Type u) (C : SmallCatData Ob) : Nat → Type u
+noncomputable def nerveSimplices (Ob : Type u) (C : SmallCatData Ob) : Nat → Type u
   | 0 => Ob
   | n + 1 => (a : Ob) × (b : Ob) × C.Mor a b × (nerveSimplices Ob C n)
 
 /-- Theorem 28: Identity composition path in nerve. -/
-def nerve_id_comp_path {Ob : Type u} (C : SmallCatData Ob) (a b : Ob) (f : C.Mor a b) :
+noncomputable def nerve_id_comp_path {Ob : Type u} (C : SmallCatData Ob) (a b : Ob) (f : C.Mor a b) :
     Path (C.comp (C.idMor a) f) f :=
   Path.mk [Step.mk _ _ (C.id_comp f)] (C.id_comp f)
 
 /-- Theorem 29: Composition identity path in nerve. -/
-def nerve_comp_id_path {Ob : Type u} (C : SmallCatData Ob) (a b : Ob) (f : C.Mor a b) :
+noncomputable def nerve_comp_id_path {Ob : Type u} (C : SmallCatData Ob) (a b : Ob) (f : C.Mor a b) :
     Path (C.comp f (C.idMor b)) f :=
   Path.mk [Step.mk _ _ (C.comp_id f)] (C.comp_id f)
 
 /-- Theorem 30: Associativity path in nerve. -/
-def nerve_assoc_path {Ob : Type u} (C : SmallCatData Ob)
+noncomputable def nerve_assoc_path {Ob : Type u} (C : SmallCatData Ob)
     {a b c d : Ob} (f : C.Mor a b) (g : C.Mor b c) (h : C.Mor c d) :
     Path (C.comp (C.comp f g) h) (C.comp f (C.comp g h)) :=
   Path.mk [Step.mk _ _ (C.comp_assoc f g h)] (C.comp_assoc f g h)
@@ -619,7 +619,7 @@ theorem nerve_pentagon_coherence {Ob : Type u} (C : SmallCatData Ob)
   rfl
 
 /-- Theorem 32: Left and right unit compose to give associator path. -/
-def nerve_triangle_path {Ob : Type u} (C : SmallCatData Ob)
+noncomputable def nerve_triangle_path {Ob : Type u} (C : SmallCatData Ob)
     {a b c : Ob} (f : C.Mor a b) (g : C.Mor b c) :
     Path (C.comp (C.comp f (C.idMor b)) g)
          (C.comp f g) :=
@@ -644,26 +644,26 @@ structure DoldKanData (A : Nat → Type u) (B : Nat → Type u) where
     inverse n (normalize n x) = x
 
 /-- Theorem 33: N ∘ Gam roundtrip as Path. -/
-def doldkan_NGam_path {A B : Nat → Type u}
+noncomputable def doldkan_NGam_path {A B : Nat → Type u}
     (DK : DoldKanData A B) (n : Nat) (x : B n) :
     Path (DK.normalize n (DK.inverse n x)) x :=
   Path.mk [Step.mk _ _ (DK.roundtrip_NGam n x)] (DK.roundtrip_NGam n x)
 
 /-- Theorem 34: Gam ∘ N roundtrip as Path. -/
-def doldkan_GamN_path {A B : Nat → Type u}
+noncomputable def doldkan_GamN_path {A B : Nat → Type u}
     (DK : DoldKanData A B) (n : Nat) (x : A n) :
     Path (DK.inverse n (DK.normalize n x)) x :=
   Path.mk [Step.mk _ _ (DK.roundtrip_GamN n x)] (DK.roundtrip_GamN n x)
 
 /-- Theorem 35: Full roundtrip N ∘ Gam ∘ N = N via trans of paths. -/
-def doldkan_full_roundtrip {A B : Nat → Type u}
+noncomputable def doldkan_full_roundtrip {A B : Nat → Type u}
     (DK : DoldKanData A B) (n : Nat) (x : A n) :
     Path (DK.normalize n (DK.inverse n (DK.normalize n x)))
          (DK.normalize n x) :=
   doldkan_NGam_path DK n (DK.normalize n x)
 
 /-- Theorem 36: Alternative path via congrArg. -/
-def doldkan_roundtrip_congrArg {A B : Nat → Type u}
+noncomputable def doldkan_roundtrip_congrArg {A B : Nat → Type u}
     (DK : DoldKanData A B) (n : Nat) (x : A n) :
     Path (DK.normalize n (DK.inverse n (DK.normalize n x)))
          (DK.normalize n x) :=
@@ -687,26 +687,26 @@ structure BasedSimplicialData (A : Nat → Type u) extends SimplicialData A wher
   degen_base : (n : Nat) → (j : Nat) → degen n j (basepoint n) = basepoint (n + 1)
 
 /-- Theorem 38: Face of basepoint path. -/
-def face_basepoint_path {A : Nat → Type u} (BS : BasedSimplicialData A)
+noncomputable def face_basepoint_path {A : Nat → Type u} (BS : BasedSimplicialData A)
     (n : Nat) (i : Nat) :
     Path (BS.face n i (BS.basepoint (n + 1))) (BS.basepoint n) :=
   Path.mk [Step.mk _ _ (BS.face_base n i)] (BS.face_base n i)
 
 /-- Theorem 39: Degen of basepoint path. -/
-def degen_basepoint_path {A : Nat → Type u} (BS : BasedSimplicialData A)
+noncomputable def degen_basepoint_path {A : Nat → Type u} (BS : BasedSimplicialData A)
     (n : Nat) (j : Nat) :
     Path (BS.degen n j (BS.basepoint n)) (BS.basepoint (n + 1)) :=
   Path.mk [Step.mk _ _ (BS.degen_base n j)] (BS.degen_base n j)
 
 /-- Theorem 40: Face then degen on basepoint gives basepoint path. -/
-def face_degen_basepoint_path {A : Nat → Type u} (BS : BasedSimplicialData A)
+noncomputable def face_degen_basepoint_path {A : Nat → Type u} (BS : BasedSimplicialData A)
     (n : Nat) (i j : Nat) :
     Path (BS.face (n + 1) i (BS.degen (n + 1) j (BS.basepoint (n + 1))))
          (BS.face (n + 1) i (BS.basepoint (n + 2))) :=
   Path.congrArg (BS.face (n + 1) i) (degen_basepoint_path BS (n + 1) j)
 
 /-- Theorem 41: Composing face-base and degen-base paths. -/
-def basepoint_face_degen_roundtrip {A : Nat → Type u} (BS : BasedSimplicialData A)
+noncomputable def basepoint_face_degen_roundtrip {A : Nat → Type u} (BS : BasedSimplicialData A)
     (n : Nat) (j : Nat) :
     Path (BS.face n j (BS.degen n j (BS.basepoint n)))
          (BS.basepoint n) :=
@@ -726,14 +726,14 @@ structure AugmentedSimplicialData (A : Nat → Type u) (A_neg1 : Type u) where
     augmentation (simpl.face 0 0 x) = augmentation (simpl.face 0 1 x)
 
 /-- Theorem 42: Augmentation compatibility as Path. -/
-def augmentation_compat_path {A : Nat → Type u} {A_neg1 : Type u}
+noncomputable def augmentation_compat_path {A : Nat → Type u} {A_neg1 : Type u}
     (Aug : AugmentedSimplicialData A A_neg1) (x : A 1) :
     Path (Aug.augmentation (Aug.simpl.face 0 0 x))
          (Aug.augmentation (Aug.simpl.face 0 1 x)) :=
   Path.mk [Step.mk _ _ (Aug.aug_compat x)] (Aug.aug_compat x)
 
 /-- Theorem 43: Augmentation compatibility composed with congrArg. -/
-def augmentation_compat_functorial {A : Nat → Type u} {A_neg1 B : Type u}
+noncomputable def augmentation_compat_functorial {A : Nat → Type u} {A_neg1 B : Type u}
     (Aug : AugmentedSimplicialData A A_neg1)
     (f : A_neg1 → B) (x : A 1) :
     Path (f (Aug.augmentation (Aug.simpl.face 0 0 x)))
@@ -754,21 +754,21 @@ structure ExtraDegeneracyData (A : Nat → Type u) (A_neg1 : Type u)
     Aug.simpl.face 0 0 (Aug.simpl.degen 0 0 x) = x
 
 /-- Theorem 44: Extra degeneracy roundtrip as Path. -/
-def extra_degen_roundtrip_path {A : Nat → Type u} {A_neg1 : Type u}
+noncomputable def extra_degen_roundtrip_path {A : Nat → Type u} {A_neg1 : Type u}
     {Aug : AugmentedSimplicialData A A_neg1}
     (ED : ExtraDegeneracyData A A_neg1 Aug) (x : A_neg1) :
     Path (Aug.augmentation (ED.extraDegen x)) x :=
   Path.mk [Step.mk _ _ (ED.aug_extra x)] (ED.aug_extra x)
 
 /-- Theorem 45: Face-extra roundtrip as Path. -/
-def face_extra_roundtrip_path {A : Nat → Type u} {A_neg1 : Type u}
+noncomputable def face_extra_roundtrip_path {A : Nat → Type u} {A_neg1 : Type u}
     {Aug : AugmentedSimplicialData A A_neg1}
     (ED : ExtraDegeneracyData A A_neg1 Aug) (x : A 0) :
     Path (Aug.simpl.face 0 0 (Aug.simpl.degen 0 0 x)) x :=
   Path.mk [Step.mk _ _ (ED.face_extra x)] (ED.face_extra x)
 
 /-- Theorem 46: Augmentation through extra degen via congrArg. -/
-def extra_degen_aug_congrArg {A : Nat → Type u} {A_neg1 : Type u}
+noncomputable def extra_degen_aug_congrArg {A : Nat → Type u} {A_neg1 : Type u}
     {Aug : AugmentedSimplicialData A A_neg1}
     (ED : ExtraDegeneracyData A A_neg1 Aug) (f : A_neg1 → A_neg1) (x : A_neg1) :
     Path (f (Aug.augmentation (ED.extraDegen x))) (f x) :=
@@ -820,14 +820,14 @@ theorem nerve_assoc_symm_symm {Ob : Type u} (C : SmallCatData Ob)
   rw [Path.symm_symm]
 
 /-- Theorem 52: Trans of nerve id paths gives assoc-like path. -/
-def nerve_id_comp_trans {Ob : Type u} (C : SmallCatData Ob)
+noncomputable def nerve_id_comp_trans {Ob : Type u} (C : SmallCatData Ob)
     {a b c : Ob} (f : C.Mor a b) (g : C.Mor b c) :
     Path (C.comp (C.idMor a) (C.comp f g))
          (C.comp f g) :=
   nerve_id_comp_path C a _ (C.comp f g)
 
 /-- Theorem 53: Boundary square path composed via congrArg. -/
-def boundary_sq_double_congrArg {A B : Nat → Type u}
+noncomputable def boundary_sq_double_congrArg {A B : Nat → Type u}
     (C : ChainComplexData A)
     (f : A 0 → B 0)
     (x : A 2) :

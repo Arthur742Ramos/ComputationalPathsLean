@@ -47,7 +47,7 @@ universe u
 /-! ## Cohomology inputs -/
 
 /-- Trivial cohomology data on a space. -/
-def trivialCohomologyOn (X : Type u) : CohomologyOn X where
+noncomputable def trivialCohomologyOn (X : Type u) : CohomologyOn X where
   ring := { carrier := PUnit }
 
 /-! ## Input data from fibrations -/
@@ -68,7 +68,7 @@ namespace EilenbergMooreInput
 variable {F E B : Type u}
 
 /-- Trivial input package for a given fiber sequence. -/
-def trivial (seq : FiberSeq F E B) : EilenbergMooreInput F E B where
+noncomputable def trivial (seq : FiberSeq F E B) : EilenbergMooreInput F E B where
   fiberSeq := seq
   cohomFiber := trivialCohomologyOn F
   cohomTotal := trivialCohomologyOn E
@@ -96,7 +96,7 @@ namespace EilenbergMooreSS
 variable {bound : Nat} {F E B : Type u}
 
 /-- The E2 page of the Eilenberg-Moore spectral sequence. -/
-def e2Page (ss : EilenbergMooreSS bound F E B) : SpectralPage bound :=
+noncomputable def e2Page (ss : EilenbergMooreSS bound F E B) : SpectralPage bound :=
   ss.sequence.page 2
 
 end EilenbergMooreSS
@@ -129,7 +129,7 @@ namespace KoszulResolution
 variable {A : PointedSet.{u}}
 
 /-- The trivial Koszul resolution. -/
-def trivial (A : PointedSet.{u}) : KoszulResolution A :=
+noncomputable def trivial (A : PointedSet.{u}) : KoszulResolution A :=
   { (Algebra.BarResolution.trivial A) with
     koszul := True
     linear := True }
@@ -145,23 +145,23 @@ theorem koszul_tor_statement :
 /-! ## Trivial construction -/
 
 /-- The one-point pointed set as a spectral-sequence term. -/
-def trivialPtSet : PtSet.{u} where
+noncomputable def trivialPtSet : PtSet.{u} where
   carrier := PUnit
   zero := PUnit.unit
 
 /-- The trivial spectral sequence page with zero differential. -/
-def trivialPage (bound : Nat) : SpectralPage.{u} bound where
+noncomputable def trivialPage (bound : Nat) : SpectralPage.{u} bound where
   term := fun _ _ => trivialPtSet
   diff := fun _ _ => zeroMor trivialPtSet trivialPtSet
   dd_zero := fun _ _ _ => Path.refl _
 
 /-- A constant spectral sequence with trivial pages. -/
-def trivialSpectralSeq (bound : Nat) : SpectralSeq.{u} bound where
+noncomputable def trivialSpectralSeq (bound : Nat) : SpectralSeq.{u} bound where
   page := fun _ => trivialPage bound
   nextPage := fun _ _ _ => PtMor.id trivialPtSet
 
 /-- The trivial Eilenberg-Moore spectral sequence attached to any fibration. -/
-def trivialEilenbergMoore {F E B : Type u} (bound : Nat) (seq : FiberSeq F E B) :
+noncomputable def trivialEilenbergMoore {F E B : Type u} (bound : Nat) (seq : FiberSeq F E B) :
     EilenbergMooreSS bound F E B where
   input := EilenbergMooreInput.trivial seq
   sequence := trivialSpectralSeq bound

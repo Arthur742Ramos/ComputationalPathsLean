@@ -42,13 +42,13 @@ theorem append {A : Type u} {step : A → A → Prop} {a b c : A}
 
 end RStar
 
-def IsNF {A : Type u} (step : A → A → Prop) (a : A) : Prop := ∀ b, ¬step a b
+noncomputable def IsNF {A : Type u} (step : A → A → Prop) (a : A) : Prop := ∀ b, ¬step a b
 
-def Confluent {A : Type u} (step : A → A → Prop) : Prop :=
+noncomputable def Confluent {A : Type u} (step : A → A → Prop) : Prop :=
   ∀ {a b c : A}, RStar step a b → RStar step a c →
     ∃ d, RStar step b d ∧ RStar step c d
 
-def SN {A : Type u} (step : A → A → Prop) : Prop :=
+noncomputable def SN {A : Type u} (step : A → A → Prop) : Prop :=
   WellFounded (fun b a => step a b)
 
 theorem sn_has_nf {A : Type u} {step : A → A → Prop} (hT : SN step) (a : A) :
@@ -119,9 +119,9 @@ noncomputable def word_problem_decidable {A : Type u} {step : A → A → Prop}
 /-- A path word over alphabet `Sym`. -/
 abbrev PathWord (Sym : Type u) := List Sym
 
-def PathWord.empty (Sym : Type u) : PathWord Sym := []
+noncomputable def PathWord.empty (Sym : Type u) : PathWord Sym := []
 
-def PathWord.concat {Sym : Type u} (w1 w2 : PathWord Sym) : PathWord Sym :=
+noncomputable def PathWord.concat {Sym : Type u} (w1 w2 : PathWord Sym) : PathWord Sym :=
   w1 ++ w2
 
 theorem pathword_concat_assoc {Sym : Type u} (w1 w2 w3 : PathWord Sym) :
@@ -154,10 +154,10 @@ namespace DFA
 
 variable {Sym : Type u}
 
-def run (M : DFA Sym) (w : PathWord Sym) : M.State :=
+noncomputable def run (M : DFA Sym) (w : PathWord Sym) : M.State :=
   w.foldl M.delta M.start
 
-def accepts (M : DFA Sym) (w : PathWord Sym) : Bool :=
+noncomputable def accepts (M : DFA Sym) (w : PathWord Sym) : Bool :=
   M.accept (M.run w)
 
 /-- A DFA accepts a word iff it ends in an accepting state (decidable). -/
@@ -179,7 +179,7 @@ end DFA
 /-! ## Regular Path Languages via DFA acceptance -/
 
 /-- A language predicate on path words is regular if decided by a DFA. -/
-def IsRegular {Sym : Type u} (L : PathWord Sym → Prop) : Prop :=
+noncomputable def IsRegular {Sym : Type u} (L : PathWord Sym → Prop) : Prop :=
   ∃ M : DFA Sym, ∀ w, M.accepts w = true ↔ L w
 
 /-- The always-false predicate is regular. -/
@@ -218,11 +218,11 @@ structure DehnFunction where
   bound : Nat → Nat
   monotone : ∀ m n, m ≤ n → bound m ≤ bound n
 
-def LinearDehn (C : Nat) : DehnFunction where
+noncomputable def LinearDehn (C : Nat) : DehnFunction where
   bound := fun n => C * n
   monotone := fun _ _ h => Nat.mul_le_mul_left C h
 
-def QuadraticDehn (C : Nat) : DehnFunction where
+noncomputable def QuadraticDehn (C : Nat) : DehnFunction where
   bound := fun n => C * n * n
   monotone := fun _ _ h => Nat.mul_le_mul (Nat.mul_le_mul_left C h) h
 
@@ -232,7 +232,7 @@ theorem linear_dehn_bound (C n : Nat) :
 theorem quadratic_dehn_bound (C n : Nat) :
     (QuadraticDehn C).bound n = C * n * n := rfl
 
-def DehnFunction.comp (f g : DehnFunction) : DehnFunction where
+noncomputable def DehnFunction.comp (f g : DehnFunction) : DehnFunction where
   bound := fun n => f.bound (g.bound n)
   monotone := fun _ _ h => f.monotone _ _ (g.monotone _ _ h)
 
@@ -271,7 +271,7 @@ theorem dec_rws_equiv_trans {A : Type u} [DecidableEq A] (R : DecRWS A)
 
 /-! ## Connection to Computational Paths -/
 
-def eqToPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
+noncomputable def eqToPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk _ _ h] h
 
 /-- All proofs of `a = b` are equal (proof irrelevance). -/
@@ -292,7 +292,7 @@ noncomputable instance path_endpoints_decidable {A : Type u} [DecidableEq A]
 
 /-! ## Path Traces and Automata -/
 
-def pathTrace {A : Type u} {a b : A} (p : Path a b) : List (Step A) := p.steps
+noncomputable def pathTrace {A : Type u} {a b : A} (p : Path a b) : List (Step A) := p.steps
 
 theorem pathTrace_refl {A : Type u} (a : A) :
     pathTrace (Path.refl a) = [] := rfl
@@ -304,7 +304,7 @@ theorem pathTrace_trans {A : Type u} {a b c : A}
 theorem pathTrace_symm {A : Type u} {a b : A} (p : Path a b) :
     pathTrace (Path.symm p) = (pathTrace p).reverse.map Step.symm := rfl
 
-def pathTraceLen {A : Type u} {a b : A} (p : Path a b) : Nat :=
+noncomputable def pathTraceLen {A : Type u} {a b : A} (p : Path a b) : Nat :=
   (pathTrace p).length
 
 theorem pathTraceLen_refl {A : Type u} (a : A) :

@@ -80,7 +80,7 @@ structure LeftKanPathPreserving where
           (leftMap (J := J) (X := X) (q := q) ⟨a, ⟨p, x⟩⟩)).2.1)
         ((leftMap (J := J) (X := X) (q := Path.trans q r) ⟨a, ⟨p, x⟩⟩).2.1)
 
-def leftKanPathPreserving : LeftKanPathPreserving (J := J) (X := X) where
+noncomputable def leftKanPathPreserving : LeftKanPathPreserving (J := J) (X := X) where
   map_id_step := by
     intro b a p x
     exact leftMap_id_step (J := J) (X := X) (b := b) a p x
@@ -148,7 +148,7 @@ structure RightKanPathPreserving where
       {a : A} (p : Path d (J.obj a)),
       RwEq (Path.trans (Path.trans q r) p) (Path.trans q (Path.trans r p))
 
-def rightKanPathPreserving : RightKanPathPreserving (J := J) where
+noncomputable def rightKanPathPreserving : RightKanPathPreserving (J := J) where
   map_id_arg_step := by
     intro b a p
     exact Path.Step.trans_refl_left p

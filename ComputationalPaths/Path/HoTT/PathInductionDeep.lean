@@ -22,7 +22,7 @@ variable {A : Type u}
 /-! ## 1–3. J-eliminators on Eq (the semantic content of Path) -/
 
 /-- Based J-eliminator for propositional equality. -/
-def J {a : A} (C : (b : A) → a = b → Sort v)
+noncomputable def J {a : A} (C : (b : A) → a = b → Sort v)
     (c : C a rfl) {b : A} (h : a = b) : C b h := by
   cases h; exact c
 
@@ -31,7 +31,7 @@ theorem J_comp {a : A} (C : (b : A) → a = b → Sort v)
     (c : C a rfl) : J C c rfl = c := rfl
 
 /-- Paulin-Mohring J: fixed endpoint is the target. -/
-def J_PM {b : A} (C : (a : A) → a = b → Sort v)
+noncomputable def J_PM {b : A} (C : (a : A) → a = b → Sort v)
     (c : C b rfl) {a : A} (h : a = b) : C a h := by
   cases h; exact c
 
@@ -40,7 +40,7 @@ theorem J_PM_comp {b : A} (C : (a : A) → a = b → Sort v)
     (c : C b rfl) : J_PM C c rfl = c := rfl
 
 /-- Free path induction: both endpoints vary. -/
-def J_free (C : (a b : A) → a = b → Sort v)
+noncomputable def J_free (C : (a b : A) → a = b → Sort v)
     (c : ∀ a, C a a rfl) {a b : A} (h : a = b) : C a b h := by
   cases h; exact c a
 
@@ -51,7 +51,7 @@ theorem J_free_comp (C : (a b : A) → a = b → Sort v)
 /-! ## 4–5. Transport as special case of J -/
 
 /-- Transport recovered from J. -/
-def J_transport {B : A → Sort v} {a b : A} (h : a = b) (x : B a) : B b :=
+noncomputable def J_transport {B : A → Sort v} {a b : A} (h : a = b) (x : B a) : B b :=
   J (fun b _ => B b) x h
 
 /-- J_transport computes on rfl. -/
@@ -74,7 +74,7 @@ theorem J_transport_trans_eq {B : A → Sort v} {a b c : A}
 /-! ## 6–7. Path-level induction (using proof field) -/
 
 /-- Induction on a path's proof field for endpoint-dependent families. -/
-def pathInd {a : A} (C : (b : A) → Sort v) (c : C a)
+noncomputable def pathInd {a : A} (C : (b : A) → Sort v) (c : C a)
     {b : A} (p : Path a b) : C b := by
   exact p.proof ▸ c
 
@@ -95,10 +95,10 @@ theorem leibniz_eq_transport {a b : A} (p : Path a b) (P : A → Prop) (h : P a)
 /-! ## 8–9. Based path space -/
 
 /-- The based path space: Σ (b : A), Path a b. -/
-def BasedPathSpace (a : A) := (b : A) × Path a b
+noncomputable def BasedPathSpace (a : A) := (b : A) × Path a b
 
 /-- Canonical center. -/
-def bpsCenter (a : A) : BasedPathSpace a := ⟨a, refl a⟩
+noncomputable def bpsCenter (a : A) : BasedPathSpace a := ⟨a, refl a⟩
 
 /-- First projection equals base, via proof field. -/
 theorem bps_fst_eq {a : A} (bp : BasedPathSpace a) : bp.1 = a :=
@@ -111,7 +111,7 @@ theorem bps_Subsingleton.elim {a : A} (bp : BasedPathSpace a) :
 /-! ## 10–11. Singleton contractibility (Eq level) -/
 
 /-- Singleton type at Eq level: Σ (x : A), PLift (x = a). -/
-def SingletonEq (a : A) := (x : A) × PLift (x = a)
+noncomputable def SingletonEq (a : A) := (x : A) × PLift (x = a)
 
 /-- Singleton is contractible. -/
 theorem singleton_contr (a : A) (s : SingletonEq a) : s = ⟨a, PLift.up rfl⟩ := by
@@ -125,7 +125,7 @@ theorem singleton_subsingleton (a : A) (s1 s2 : SingletonEq a) : s1 = s2 :=
 /-! ## 12–13. Path-over (dependent paths) -/
 
 /-- A dependent path: transport p u = v. -/
-def PathOver {B : A → Sort v} {a b : A} (p : Path a b) (u : B a) (v : B b) : Prop :=
+noncomputable def PathOver {B : A → Sort v} {a b : A} (p : Path a b) (u : B a) (v : B b) : Prop :=
   transport p u = v
 
 /-- Reflexive path-over. -/
@@ -258,13 +258,13 @@ theorem transport_natural_comp {B C D : A → Type v}
 /-! ## 20. Encode-decode setup -/
 
 /-- Code for identity at a. -/
-def Code (a : A) : A → Prop := fun b => a = b
+noncomputable def Code (a : A) : A → Prop := fun b => a = b
 
 /-- Encode a path as a code. -/
-def encode {a b : A} (p : Path a b) : Code a b := p.proof
+noncomputable def encode {a b : A} (p : Path a b) : Code a b := p.proof
 
 /-- Decode a code to a path. -/
-def decode {a b : A} (c : Code a b) : Path a b := ofEq c
+noncomputable def decode {a b : A} (c : Code a b) : Path a b := ofEq c
 
 /-- Encode-decode round trip on codes. -/
 theorem encode_decode {a b : A} (c : Code a b) :
@@ -291,7 +291,7 @@ theorem J_unique {a : A} {C : (b : A) → a = b → Sort v}
 /-! ## 22. Based J derives PM-J -/
 
 /-- Derive PM-J from based J via symmetry. -/
-def J_to_PM {b : A} (C : (a : A) → a = b → Sort v) (c : C b rfl)
+noncomputable def J_to_PM {b : A} (C : (a : A) → a = b → Sort v) (c : C b rfl)
     {a : A} (h : a = b) : C a h :=
   J (fun a (h : b = a) => C a h.symm) (by simp; exact c) h.symm
 

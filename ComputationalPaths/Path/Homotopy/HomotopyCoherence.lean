@@ -53,11 +53,11 @@ namespace AInfinityChain
 variable {Obj : Type u} {Hom : Obj → Obj → Type v}
  
 /-- Source object of a chain. -/
-def source {n : Nat} (chain : AInfinityChain Obj Hom n) : Obj :=
+noncomputable def source {n : Nat} (chain : AInfinityChain Obj Hom n) : Obj :=
   chain.vertices ⟨0, by omega⟩
  
 /-- Target object of a chain. -/
-def target {n : Nat} (chain : AInfinityChain Obj Hom n) : Obj :=
+noncomputable def target {n : Nat} (chain : AInfinityChain Obj Hom n) : Obj :=
   chain.vertices ⟨n, by omega⟩
  
 end AInfinityChain
@@ -83,11 +83,11 @@ structure AInfinityCategory where
 namespace AInfinityCategory
  
 /-- Identity morphism in an A-infinity category. -/
-def id (C : AInfinityCategory) (X : C.Obj) : C.Hom X X :=
+noncomputable def id (C : AInfinityCategory) (X : C.Obj) : C.Hom X X :=
   C.unit X
  
 /-- Evaluate higher composition on a chain. -/
-def compChain (C : AInfinityCategory) {n : Nat}
+noncomputable def compChain (C : AInfinityCategory) {n : Nat}
     (chain : AInfinityChain C.Obj C.Hom n) :
     C.Hom (AInfinityChain.source chain) (AInfinityChain.target chain) :=
   C.comp chain
@@ -108,7 +108,7 @@ structure AInfinityFunctor (C D : AInfinityCategory) where
   map_comp : ∀ {n : Nat} (_chain : AInfinityChain C.Obj C.Hom n), True
  
 /-- Identity A-infinity functor. -/
-def AInfinityFunctor.id (C : AInfinityCategory) : AInfinityFunctor C C where
+noncomputable def AInfinityFunctor.id (C : AInfinityCategory) : AInfinityFunctor C C where
   mapObj := _root_.id
   mapHom := fun f => f
   map_unit := fun _ => trivial
@@ -140,7 +140,7 @@ structure SmallFunctor (C : SmallCatData.{u}) (D : SmallCatData.{v}) where
     mapHom (C.comp f g) = D.comp (mapHom f) (mapHom g)
  
 /-- Identity functor for small categories. -/
-def SmallFunctor.id (C : SmallCatData.{u}) : SmallFunctor C C where
+noncomputable def SmallFunctor.id (C : SmallCatData.{u}) : SmallFunctor C C where
   mapObj := _root_.id
   mapHom := fun f => f
   map_id := fun _ => rfl
@@ -168,7 +168,7 @@ structure CoherentNerveData (C : AInfinityCategory) where
   coherence : True
  
 /-- The simplicial set underlying a coherent nerve. -/
-def CoherentNerveData.sSet {C : AInfinityCategory} (N : CoherentNerveData C) :
+noncomputable def CoherentNerveData.sSet {C : AInfinityCategory} (N : CoherentNerveData C) :
     SSetData :=
   N.sset
  
@@ -239,7 +239,7 @@ theorem unit_right_coherence (C : AInfinityCategory) :
     C.unit_right = trivial := by
   rfl
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

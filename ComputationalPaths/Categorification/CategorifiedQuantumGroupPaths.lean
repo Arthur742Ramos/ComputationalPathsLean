@@ -57,7 +57,7 @@ variable {Obj : Type u}
 variable (Q : CatQuantumGroupPathData Obj)
 
 /-- Step witness: right-unit normalization for crossings. -/
-def crossing_step (X Y : Obj) :
+noncomputable def crossing_step (X Y : Obj) :
     Path.Step
       (Path.trans
         (Q.crossingPath X Y)
@@ -74,7 +74,7 @@ noncomputable def crossing_rweq (X Y : Obj) :
   rweq_of_step (Q.crossing_step X Y)
 
 /-- Step witness: left-unit normalization for nil-Hecke paths. -/
-def nilHecke_step (X : Obj) :
+noncomputable def nilHecke_step (X : Obj) :
     Path.Step
       (Path.trans
         (Path.refl (Q.tensor (Q.e1 (Q.e1 X)) (Q.shift X)))
@@ -91,7 +91,7 @@ noncomputable def nilHecke_rweq (X : Obj) :
   rweq_of_step (Q.nilHecke_step X)
 
 /-- Unit followed by counit, modeling a biadjunction triangle leg. -/
-def unitCounitTrianglePath (X : Obj) :
+noncomputable def unitCounitTrianglePath (X : Obj) :
     Path (Q.tensor (Q.f1 (Q.e1 X)) (Q.shift X))
       (Q.tensor (Q.e1 (Q.f1 X)) (Q.shift X)) :=
   Path.trans (Q.unitPath X) (Q.counitPath X)
@@ -117,7 +117,7 @@ noncomputable def crossing_cancel_right (X Y : Obj) :
   rweq_cmpA_inv_right (Q.crossingPath X Y)
 
 /-- Step witness: right-unit normalization for braid-hexagon coherence. -/
-def braidHexagon_step (X Y Z : Obj) :
+noncomputable def braidHexagon_step (X Y Z : Obj) :
     Path.Step
       (Path.trans
         (Q.braidHexagonPath X Y Z)
@@ -144,7 +144,7 @@ noncomputable def unitCounit_cancel_rweq (X : Obj) :
 end CatQuantumGroupPathData
 
 /-- Trivial model instantiating categorified quantum-group path data. -/
-def trivialCatQuantumGroupPathData : CatQuantumGroupPathData PUnit where
+noncomputable def trivialCatQuantumGroupPathData : CatQuantumGroupPathData PUnit where
   tensor := fun _ _ => PUnit.unit
   shift := fun _ => PUnit.unit
   e1 := fun _ => PUnit.unit

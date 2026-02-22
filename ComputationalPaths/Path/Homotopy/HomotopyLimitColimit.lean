@@ -55,7 +55,7 @@ structure HomotopyCone (X : Type x) (f : A → C) (g : B → C) : Type (max u x)
 namespace HomotopyCone
 
 /-- A strictly commuting cone yields a homotopy cone. -/
-def of_eq {X : Type x} {f : A → C} {g : B → C}
+noncomputable def of_eq {X : Type x} {f : A → C} {g : B → C}
     (left : X → A) (right : X → B)
     (h : (fun x => f (left x)) = (fun x => g (right x))) :
     HomotopyCone (X := X) f g :=
@@ -64,19 +64,19 @@ def of_eq {X : Type x} {f : A → C} {g : B → C}
     comm := fun x => Path.stepChain (_root_.congrArg (fun k => k x) h) }
 
 /-- Convert a homotopy cone into a pullback cone. -/
-def toPullbackCone {X : Type x} {f : A → C} {g : B → C}
+noncomputable def toPullbackCone {X : Type x} {f : A → C} {g : B → C}
     (cone : HomotopyCone (X := X) f g) :
     CompPath.Pullback.Cone (A := A) (B := B) (C := C) (f := f) (g := g) X :=
   ⟨cone.left, ⟨cone.right, cone.comm⟩⟩
 
 /-- Convert a pullback cone into a homotopy cone. -/
-def ofPullbackCone {X : Type x} {f : A → C} {g : B → C}
+noncomputable def ofPullbackCone {X : Type x} {f : A → C} {g : B → C}
     (cone : CompPath.Pullback.Cone (A := A) (B := B) (C := C) (f := f) (g := g) X) :
     HomotopyCone (X := X) f g :=
   ⟨cone.1, cone.2.1, cone.2.2⟩
 
 /-- Homotopy cones are equivalent to pullback cones. -/
-def pullbackConeEquiv {X : Type x} {f : A → C} {g : B → C} :
+noncomputable def pullbackConeEquiv {X : Type x} {f : A → C} {g : B → C} :
     SimpleEquiv
       (CompPath.Pullback.Cone (A := A) (B := B) (C := C) (f := f) (g := g) X)
       (HomotopyCone (X := X) f g) where
@@ -96,7 +96,7 @@ def pullbackConeEquiv {X : Type x} {f : A → C} {g : B → C} :
 end HomotopyCone
 
 /-- Maps into the homotopy limit correspond to homotopy cones. -/
-def homotopyLimitConeEquiv {X : Type x} {f : A → C} {g : B → C} :
+noncomputable def homotopyLimitConeEquiv {X : Type x} {f : A → C} {g : B → C} :
     SimpleEquiv
       (X → HomotopyLimit (A := A) (B := B) (C := C) f g)
       (HomotopyCone (X := X) f g) :=
@@ -128,7 +128,7 @@ structure HomotopyCocone (X : Type x) (f : C → A) (g : C → B) : Type (max u 
 namespace HomotopyCocone
 
 /-- A strictly commuting cocone yields a homotopy cocone. -/
-def of_eq {X : Type x} {f : C → A} {g : C → B}
+noncomputable def of_eq {X : Type x} {f : C → A} {g : C → B}
     (inl : A → X) (inr : B → X)
     (h : (fun c => inl (f c)) = (fun c => inr (g c))) :
     HomotopyCocone (X := X) f g :=
@@ -137,7 +137,7 @@ def of_eq {X : Type x} {f : C → A} {g : C → B}
     comm := fun c => Path.stepChain (_root_.congrArg (fun k => k c) h) }
 
 /-- Convert the homotopy commutativity into propositional equality. -/
-def commEq {X : Type x} {f : C → A} {g : C → B}
+noncomputable def commEq {X : Type x} {f : C → A} {g : C → B}
     (cone : HomotopyCocone (X := X) f g) :
     ∀ c : C, cone.inl (f c) = cone.inr (g c) :=
   fun c => (cone.comm c).toEq
@@ -145,7 +145,7 @@ def commEq {X : Type x} {f : C → A} {g : C → B}
 end HomotopyCocone
 
 /-- The canonical homotopy cocone on the pushout. -/
-def homotopyColimitCocone {A B C : Type u} (f : C → A) (g : C → B) :
+noncomputable def homotopyColimitCocone {A B C : Type u} (f : C → A) (g : C → B) :
     HomotopyCocone
       (X := HomotopyColimit (A := A) (B := B) (C := C) f g) f g :=
   { inl := fun a => PushoutCompPath.inl (A := A) (B := B) (C := C) (f := f) (g := g) a
@@ -153,7 +153,7 @@ def homotopyColimitCocone {A B C : Type u} (f : C → A) (g : C → B) :
     comm := fun c => PushoutCompPath.glue (A := A) (B := B) (C := C) (f := f) (g := g) c }
 
 /-- Map out of the homotopy colimit using a homotopy cocone. -/
-def homotopyColimitDesc {X : Type x} {f : C → A} {g : C → B}
+noncomputable def homotopyColimitDesc {X : Type x} {f : C → A} {g : C → B}
     (cone : HomotopyCocone (X := X) f g) :
     HomotopyColimit (A := A) (B := B) (C := C) f g → X :=
   Quot.lift
@@ -180,7 +180,7 @@ def homotopyColimitDesc {X : Type x} {f : C → A} {g : C → B}
       cone.inr b := rfl
 
 /-- Turn a map out of the homotopy colimit into a homotopy cocone. -/
-def homotopyColimitCoconeMap {X : Type x} {f : C → A} {g : C → B}
+noncomputable def homotopyColimitCoconeMap {X : Type x} {f : C → A} {g : C → B}
     (h : HomotopyColimit (A := A) (B := B) (C := C) f g → X) :
     HomotopyCocone (X := X) f g :=
   { inl := fun a => h (PushoutCompPath.inl (A := A) (B := B) (C := C) (f := f) (g := g) a)

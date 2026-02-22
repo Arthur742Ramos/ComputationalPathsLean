@@ -191,7 +191,7 @@ structure DCMorphism (C D : DeformationContext.{u}) where
     Path (mapHom (C.comp f g)) (D.comp (mapHom f) (mapHom g))
 
 /-- Identity deformation context morphism. -/
-def DCMorphism.idDC (C : DeformationContext.{u}) : DCMorphism C C where
+noncomputable def DCMorphism.idDC (C : DeformationContext.{u}) : DCMorphism C C where
   mapObj := _root_.id
   mapHom := _root_.id
   map_id := fun _ => Path.refl _
@@ -235,13 +235,13 @@ structure DGLieMor (L M : DGLie.{u}) where
     Path (toFun (L.diff x)) (M.diff (toFun x))
 
 /-- Identity DG Lie morphism. -/
-def DGLieMor.id (L : DGLie.{u}) : DGLieMor L L where
+noncomputable def DGLieMor.id (L : DGLie.{u}) : DGLieMor L L where
   toFun := _root_.id
   map_bracket := fun _ _ => Path.refl _
   map_diff := fun _ => Path.refl _
 
 /-- Composition of DG Lie morphisms. -/
-def DGLieMor.comp {L M N : DGLie.{u}} (f : DGLieMor L M) (g : DGLieMor M N) :
+noncomputable def DGLieMor.comp {L M N : DGLie.{u}} (f : DGLieMor L M) (g : DGLieMor M N) :
     DGLieMor L N where
   toFun := g.toFun ∘ f.toFun
   map_bracket := fun x y =>
@@ -312,7 +312,7 @@ structure TangentFunctoriality
     Path (tangentMap (TF.add x y)) (TG.add (tangentMap x) (tangentMap y))
 
 /-- Tangent complex is functorial. -/
-def tangent_functorial
+noncomputable def tangent_functorial
     (F G : FormalModuli.{u})
     (φ : ∀ (R : ArtinRing.{u}), F.obj R → G.obj R)
     (TF : TangentComplex F) (TG : TangentComplex G)

@@ -124,7 +124,7 @@ theorem BraidPathSym.trans {n : Nat} {a b c : BraidWord n}
   | step s _ ih => exact BraidPathSym.step s (ih q)
 
 /-- Flip a single symmetric step. -/
-def BraidStepSym.flip {n : Nat} {a b : BraidWord n}
+noncomputable def BraidStepSym.flip {n : Nat} {a b : BraidWord n}
     (s : BraidStepSym n a b) : BraidStepSym n b a :=
   match s with
   | .fwd h => .bwd h
@@ -143,7 +143,7 @@ theorem BraidPathSym.symm {n : Nat} {a b : BraidWord n}
 -- ============================================================
 
 /-- Left‑divisibility: a ≼_L b  iff  ∃ c, a ++ c  ≡  b  (up to braid equiv). -/
-def LeftDiv (n : Nat) (a b : BraidWord n) : Prop :=
+noncomputable def LeftDiv (n : Nat) (a b : BraidWord n) : Prop :=
   ∃ c : BraidWord n, BraidPathSym n (a ++ c) b
 
 /-- Reflexivity of left‑divisibility. -/
@@ -259,16 +259,16 @@ structure NormalForm (L : SimpleLattice) where
   bounded : ∀ x, x ∈ factors → L.le x L.top
 
 /-- The empty normal form. -/
-def NormalForm.empty (L : SimpleLattice) : NormalForm L :=
+noncomputable def NormalForm.empty (L : SimpleLattice) : NormalForm L :=
   ⟨[], fun _ h => by simp at h⟩
 
 /-- A single‑factor normal form. -/
-def NormalForm.single (L : SimpleLattice) (s : L.carrier)
+noncomputable def NormalForm.single (L : SimpleLattice) (s : L.carrier)
     (hs : L.le s L.top) : NormalForm L :=
   ⟨[s], fun x hx => by simp at hx; subst hx; exact hs⟩
 
 /-- Length of a normal form. -/
-def NormalForm.length (nf : NormalForm L) : Nat := nf.factors.length
+noncomputable def NormalForm.length (nf : NormalForm L) : Nat := nf.factors.length
 
 /-- The empty normal form has length 0. -/
 theorem NormalForm.empty_length (L : SimpleLattice) :
@@ -292,7 +292,7 @@ structure LatticeIso (L₁ L₂ : SimpleLattice) where
   map_top : toFun L₁.top = L₂.top
 
 /-- Transport a normal form along an isomorphism. -/
-def NormalForm.transport {L₁ L₂ : SimpleLattice}
+noncomputable def NormalForm.transport {L₁ L₂ : SimpleLattice}
     (iso : LatticeIso L₁ L₂) (nf : NormalForm L₁) : NormalForm L₂ :=
   ⟨nf.factors.map iso.toFun,
    fun x hx => by
@@ -335,18 +335,18 @@ inductive S2 : Type where
   | s1 : S2
 deriving DecidableEq, Repr
 
-def S2.le : S2 → S2 → Prop
+noncomputable def S2.le : S2 → S2 → Prop
   | .e, _   => True
   | .s1, .s1 => True
   | .s1, .e  => False
 
-instance : DecidableRel S2.le := fun a b =>
+noncomputable instance : DecidableRel S2.le := fun a b =>
   match a, b with
   | .e, _    => isTrue trivial
   | .s1, .s1 => isTrue trivial
   | .s1, .e  => isFalse id
 
-def S2Lattice : SimpleLattice where
+noncomputable def S2Lattice : SimpleLattice where
   carrier := S2
   le := S2.le
   bot := .e
@@ -396,11 +396,11 @@ theorem RTClosure.trans {α : Type} {R : α → α → Prop} {a b c : α}
 
 /-- Local confluence: if a rewrites to both b and c in one step,
     they have a common reduct. -/
-def LocallyConfluent {α : Type} (R : α → α → Prop) : Prop :=
+noncomputable def LocallyConfluent {α : Type} (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, RTClosure R b d ∧ RTClosure R c d
 
 /-- Church–Rosser: any two equivalent terms have a common reduct. -/
-def ChurchRosser {α : Type} (R : α → α → Prop) : Prop :=
+noncomputable def ChurchRosser {α : Type} (R : α → α → Prop) : Prop :=
   ∀ a b, RTClosure R a b → ∃ d, RTClosure R a d ∧ RTClosure R b d
 
 /-- Trivially, a relation with at most one reduct per element is locally confluent. -/

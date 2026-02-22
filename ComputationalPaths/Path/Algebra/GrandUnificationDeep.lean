@@ -32,27 +32,27 @@ inductive Path (α : Type) : α → α → Type where
   | cons : Step α a b → Path α b c → Path α a c
 
 -- Theorem 1: Lift a single step to a path
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
 -- Theorem 2: Path composition (trans)
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
 -- Theorem 3: Step inversion
-def Step.inv : Step α a b → Step α b a
+noncomputable def Step.inv : Step α a b → Step α b a
   | .fwd t a b => .bwd t b a
   | .bwd t a b => .fwd t b a
   | .refl a    => .refl a
 
 -- Theorem 4: Path inversion
-def Path.inv : Path α a b → Path α b a
+noncomputable def Path.inv : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.inv.trans (.single s.inv)
 
 -- Theorem 5: Path length
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -132,14 +132,14 @@ inductive Cell2 (α : Type) : Path α a b → Path α a b → Type where
   | inv   : Cell2 α p q → Cell2 α q p
 
 -- Theorem 17: 2-cell identity
-def Cell2.id (p : Path α a b) : Cell2 α p p := .refl p
+noncomputable def Cell2.id (p : Path α a b) : Cell2 α p p := .refl p
 
 -- Theorem 18: 2-cell composition
-def Cell2.compose (f : Cell2 α p q) (g : Cell2 α q r) : Cell2 α p r :=
+noncomputable def Cell2.compose (f : Cell2 α p q) (g : Cell2 α q r) : Cell2 α p r :=
   .comp f g
 
 -- Theorem 19: 2-cell inverse
-def Cell2.inverse (f : Cell2 α p q) : Cell2 α q p := .inv f
+noncomputable def Cell2.inverse (f : Cell2 α p q) : Cell2 α q p := .inv f
 
 -- ============================================================
 -- §4  3-Cells: Coherence proofs
@@ -153,27 +153,27 @@ inductive Cell3 (α : Type) : Cell2 α p q → Cell2 α p q → Type where
   | inv   : Cell3 α f g → Cell3 α g f
 
 -- Theorem 20: 3-cell identity
-def Cell3.id (f : Cell2 α p q) : Cell3 α f f := .refl f
+noncomputable def Cell3.id (f : Cell2 α p q) : Cell3 α f f := .refl f
 
 -- Theorem 21: 3-cell composition
-def Cell3.compose (u : Cell3 α f g) (v : Cell3 α g h) : Cell3 α f h :=
+noncomputable def Cell3.compose (u : Cell3 α f g) (v : Cell3 α g h) : Cell3 α f h :=
   .comp u v
 
 -- Theorem 22: 3-cell inverse
-def Cell3.inverse (u : Cell3 α f g) : Cell3 α g f := .inv u
+noncomputable def Cell3.inverse (u : Cell3 α f g) : Cell3 α g f := .inv u
 
 -- ============================================================
 -- §5  CongrArg as a Functor
 -- ============================================================
 
 -- Theorem 23: congrArg lifts steps
-def Step.map (f : α → β) : Step α a b → Step β (f a) (f b)
+noncomputable def Step.map (f : α → β) : Step α a b → Step β (f a) (f b)
   | .fwd t a b => .fwd t (f a) (f b)
   | .bwd t a b => .bwd t (f a) (f b)
   | .refl a    => .refl (f a)
 
 -- Theorem 24: congrArg lifts paths (functorial action)
-def Path.map (f : α → β) : Path α a b → Path β (f a) (f b)
+noncomputable def Path.map (f : α → β) : Path α a b → Path β (f a) (f b)
   | .nil a    => .nil (f a)
   | .cons s p => .cons (s.map f) (p.map f)
 
@@ -225,7 +225,7 @@ theorem map_map (f : α → β) (g : β → γ) (p : Path α a b) :
 -- ============================================================
 
 -- Theorem 31: transport definition
-def transportNat : Path Nat a b → (Nat → Nat) → (Nat → Nat)
+noncomputable def transportNat : Path Nat a b → (Nat → Nat) → (Nat → Nat)
   | .nil _,    f => f
   | .cons _ p, f => transportNat p f
 
@@ -248,22 +248,22 @@ theorem transport_nil (f : Nat → Nat) :
 abbrev Loop (α : Type) (a : α) := Path α a a
 
 -- Theorem 34: loop composition
-def Loop.comp (p q : Loop α a) : Loop α a := p.trans q
+noncomputable def Loop.comp (p q : Loop α a) : Loop α a := p.trans q
 
 -- Theorem 35: loop identity
-def Loop.one (a : α) : Loop α a := Path.nil a
+noncomputable def Loop.one (a : α) : Loop α a := Path.nil a
 
 -- Theorem 36: loop inverse
-def Loop.symm (p : Loop α a) : Loop α a := p.inv
+noncomputable def Loop.symm (p : Loop α a) : Loop α a := p.inv
 
 /-- A 2-loop is a 2-cell from refl to refl. -/
 abbrev Loop2 (α : Type) (a : α) := Cell2 α (Path.nil a) (Path.nil a)
 
 -- Theorem 37: horizontal composition of 2-loops
-def Loop2.hcomp (f g : Loop2 α a) : Loop2 α a := .comp f g
+noncomputable def Loop2.hcomp (f g : Loop2 α a) : Loop2 α a := .comp f g
 
 -- Theorem 38: vertical composition of 2-loops
-def Loop2.vcomp (f g : Loop2 α a) : Loop2 α a := .comp f g
+noncomputable def Loop2.vcomp (f g : Loop2 α a) : Loop2 α a := .comp f g
 
 -- Theorem 39: Eckmann-Hilton — h-comp = v-comp for 2-loops
 theorem eckmann_hilton (f g : Loop2 α a) :
@@ -274,10 +274,10 @@ theorem eckmann_hilton (f g : Loop2 α a) :
 -- ============================================================
 
 -- Theorem 40: left whiskering
-def whiskerL (_p : Path α a b) (σ : Cell2 α q r) : Cell2 α q r := σ
+noncomputable def whiskerL (_p : Path α a b) (σ : Cell2 α q r) : Cell2 α q r := σ
 
 -- Theorem 41: right whiskering
-def whiskerR (σ : Cell2 α p q) (_r : Path α b c) : Cell2 α p q := σ
+noncomputable def whiskerR (σ : Cell2 α p q) (_r : Path α b c) : Cell2 α p q := σ
 
 -- Theorem 42: whiskering preserves identity
 theorem whiskerL_id (p : Path α a b) (q : Path α b c) :
@@ -297,7 +297,7 @@ structure AssocWitness (α : Type) where
     (p.trans q).trans r = p.trans (q.trans r)
 
 -- Theorem 44: associativity coherence holds
-def assocWitness : AssocWitness α :=
+noncomputable def assocWitness : AssocWitness α :=
   ⟨fun _ _ _ _ p q r => trans_assoc p q r⟩
 
 /-- Coherence witness for unit laws. -/
@@ -306,7 +306,7 @@ structure UnitWitness (α : Type) where
   right_id : (a b : α) → (p : Path α a b) → p.trans (.nil b) = p
 
 -- Theorem 45: unit coherence holds
-def unitWitness : UnitWitness α :=
+noncomputable def unitWitness : UnitWitness α :=
   ⟨fun _ _ p => trans_nil_left p, fun _ _ p => trans_nil_right p⟩
 
 /-- Coherence witness for inverses. -/
@@ -315,7 +315,7 @@ structure InvWitness (α : Type) where
     (p.trans q).inv = q.inv.trans p.inv
 
 -- Theorem 46: inverse coherence holds
-def invWitness : InvWitness α :=
+noncomputable def invWitness : InvWitness α :=
   ⟨fun _ _ _ p q => inv_trans p q⟩
 
 -- ============================================================
@@ -333,7 +333,7 @@ structure GpdData (α : Type) where
   rightIdLaw: (p : Path α a b) → compose p (idPath b) = p
 
 -- Theorem 47: paths form a groupoid
-def pathsGroupoid : GpdData α where
+noncomputable def pathsGroupoid : GpdData α where
   idPath    := Path.nil
   compose   := Path.trans
   inverse   := Path.inv
@@ -351,7 +351,7 @@ structure Gpd2Data (α : Type) where
   cellInv  : Cell2 α p q → Cell2 α q p
 
 -- Theorem 48: 2-cells form a 2-groupoid
-def cells2Groupoid : Gpd2Data α where
+noncomputable def cells2Groupoid : Gpd2Data α where
   cellId   := Cell2.refl
   cellComp := Cell2.comp
   cellInv  := Cell2.inv
@@ -367,7 +367,7 @@ structure FunctorData (α β : Type) (f : α → β) where
     mapFn (p.trans q) = (mapFn p).trans (mapFn q)
 
 -- Theorem 49: Path.map is a functor
-def mapFunctor (f : α → β) : FunctorData α β f where
+noncomputable def mapFunctor (f : α → β) : FunctorData α β f where
   mapFn    := Path.map f
   presId   := fun _ => rfl
   presComp := map_trans f
@@ -384,7 +384,7 @@ structure LoopMonoidData (α : Type) (a : α) where
   rightId  : (p : Loop α a) → mul p one = p
 
 -- Theorem 50: loops form a monoid
-def loopMonoid (a : α) : LoopMonoidData α a where
+noncomputable def loopMonoid (a : α) : LoopMonoidData α a where
   mul      := Path.trans
   one      := Path.nil a
   assocLaw := trans_assoc
@@ -470,17 +470,17 @@ structure PathIso (α : Type) (a b : α) where
   bwd : Path α b a
 
 -- Theorem 61: every path gives an iso
-def isoOfPath (p : Path α a b) : PathIso α a b := ⟨p, p.inv⟩
+noncomputable def isoOfPath (p : Path α a b) : PathIso α a b := ⟨p, p.inv⟩
 
 -- Theorem 62: iso composition
-def PathIso.compose (i : PathIso α a b) (j : PathIso α b c) : PathIso α a c :=
+noncomputable def PathIso.compose (i : PathIso α a b) (j : PathIso α b c) : PathIso α a c :=
   ⟨i.fwd.trans j.fwd, j.bwd.trans i.bwd⟩
 
 -- Theorem 63: iso identity
-def PathIso.identity (a : α) : PathIso α a a := ⟨.nil a, .nil a⟩
+noncomputable def PathIso.identity (a : α) : PathIso α a a := ⟨.nil a, .nil a⟩
 
 -- Theorem 64: iso inverse
-def PathIso.symm (i : PathIso α a b) : PathIso α b a := ⟨i.bwd, i.fwd⟩
+noncomputable def PathIso.symm (i : PathIso α a b) : PathIso α b a := ⟨i.bwd, i.fwd⟩
 
 -- ============================================================
 -- §19  Map interaction with inv (deep chains)
@@ -513,10 +513,10 @@ structure ConfluenceWit (α : Type) (a : α) where
   right  : Path α a target
 
 -- Theorem 68: trivial confluence
-def trivialConfl (a : α) : ConfluenceWit α a := ⟨a, .nil a, .nil a⟩
+noncomputable def trivialConfl (a : α) : ConfluenceWit α a := ⟨a, .nil a, .nil a⟩
 
 -- Theorem 69: confluence from two steps
-def stepConfl (s₁ : Step α a b) (s₂ : Step α a c)
+noncomputable def stepConfl (s₁ : Step α a b) (s₂ : Step α a c)
     (j₁ : Path α b d) (j₂ : Path α c d) : ConfluenceWit α a :=
   ⟨d, (Path.single s₁).trans j₁, (Path.single s₂).trans j₂⟩
 
@@ -533,7 +533,7 @@ structure CatData (α : Type) where
     compMor (compMor p q) r = compMor p (compMor q r)
 
 -- Theorem 70: paths form a category
-def pathCat : CatData α where
+noncomputable def pathCat : CatData α where
   idMor    := Path.nil
   compMor  := Path.trans
   idLeft   := trans_nil_left
@@ -553,7 +553,7 @@ structure GrandUnif (α : Type) where
   iWit : InvWitness α
 
 -- Theorem 71: the grand unification exists
-def grandUnification : GrandUnif α where
+noncomputable def grandUnification : GrandUnif α where
   gpd  := pathsGroupoid
   gpd2 := cells2Groupoid
   cat  := pathCat

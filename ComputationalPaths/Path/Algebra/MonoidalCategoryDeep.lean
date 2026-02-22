@@ -30,27 +30,27 @@ universe u v w
 -- ============================================================
 
 /-- Tensor product on Nat is addition. -/
-@[simp] def tensor (a b : Nat) : Nat := a + b
+@[simp] noncomputable def tensor (a b : Nat) : Nat := a + b
 
 /-- Unit object for the monoidal structure. -/
-@[simp] def munit : Nat := 0
+@[simp] noncomputable def munit : Nat := 0
 
 /-- 1. Tensor with zero on the right is identity. -/
-def tensor_unit_right (a : Nat) : Path (tensor a munit) a :=
+noncomputable def tensor_unit_right (a : Nat) : Path (tensor a munit) a :=
   Path.mk [Step.mk (a + 0) a (Nat.add_zero a)] (Nat.add_zero a)
 
 /-- 2. Tensor with zero on the left is identity. -/
-def tensor_unit_left (a : Nat) : Path (tensor munit a) a :=
+noncomputable def tensor_unit_left (a : Nat) : Path (tensor munit a) a :=
   Path.mk [Step.mk (0 + a) a (Nat.zero_add a)] (Nat.zero_add a)
 
 /-- 3. Associativity of tensor. -/
-def tensor_assoc (a b c : Nat) :
+noncomputable def tensor_assoc (a b c : Nat) :
     Path (tensor (tensor a b) c) (tensor a (tensor b c)) :=
   Path.mk [Step.mk ((a + b) + c) (a + (b + c)) (Nat.add_assoc a b c)]
     (Nat.add_assoc a b c)
 
 /-- 4. Commutativity of tensor (braiding). -/
-def tensor_comm (a b : Nat) : Path (tensor a b) (tensor b a) :=
+noncomputable def tensor_comm (a b : Nat) : Path (tensor a b) (tensor b a) :=
   Path.mk [Step.mk (a + b) (b + a) (Nat.add_comm a b)]
     (Nat.add_comm a b)
 
@@ -67,7 +67,7 @@ structure MonoidalCat (O : Type u) where
   right_unitor : ∀ a, Path (tensor a unit) a
 
 /-- 5. Concrete Nat monoidal category. -/
-def NatMonoidal : MonoidalCat Nat where
+noncomputable def NatMonoidal : MonoidalCat Nat where
   tensor := tensor
   unit := munit
   assoc := tensor_assoc
@@ -79,17 +79,17 @@ def NatMonoidal : MonoidalCat Nat where
 -- ============================================================
 
 /-- 6. Associator is self-inverse (one direction). -/
-def assoc_inverse_left (a b c : Nat) :
+noncomputable def assoc_inverse_left (a b c : Nat) :
     Path (tensor a (tensor b c)) (tensor (tensor a b) c) :=
   symm (tensor_assoc a b c)
 
 /-- 7. Associator roundtrip left. -/
-def assoc_roundtrip_left (a b c : Nat) :
+noncomputable def assoc_roundtrip_left (a b c : Nat) :
     Path (tensor (tensor a b) c) (tensor (tensor a b) c) :=
   trans (tensor_assoc a b c) (symm (tensor_assoc a b c))
 
 /-- 8. Associator roundtrip right. -/
-def assoc_roundtrip_right (a b c : Nat) :
+noncomputable def assoc_roundtrip_right (a b c : Nat) :
     Path (tensor a (tensor b c)) (tensor a (tensor b c)) :=
   trans (symm (tensor_assoc a b c)) (tensor_assoc a b c)
 
@@ -108,14 +108,14 @@ theorem assoc_roundtrip_right_toEq (a b c : Nat) :
 -- ============================================================
 
 /-- Pentagon path 1:  ((a⊗b)⊗c)⊗d → (a⊗(b⊗c))⊗d → a⊗((b⊗c)⊗d) → a⊗(b⊗(c⊗d)). -/
-def pentagon_path1 (a b c d : Nat) :
+noncomputable def pentagon_path1 (a b c d : Nat) :
     Path (tensor (tensor (tensor a b) c) d) (tensor a (tensor b (tensor c d))) :=
   trans (congrArg (fun x => tensor x d) (tensor_assoc a b c))
     (trans (tensor_assoc a (tensor b c) d)
       (congrArg (tensor a) (tensor_assoc b c d)))
 
 /-- Pentagon path 2: ((a⊗b)⊗c)⊗d → (a⊗b)⊗(c⊗d) → a⊗(b⊗(c⊗d)). -/
-def pentagon_path2 (a b c d : Nat) :
+noncomputable def pentagon_path2 (a b c d : Nat) :
     Path (tensor (tensor (tensor a b) c) d) (tensor a (tensor b (tensor c d))) :=
   trans (tensor_assoc (tensor a b) c d) (tensor_assoc a b (tensor c d))
 
@@ -134,13 +134,13 @@ theorem pentagon_identity (a b c d : Nat) :
 -- ============================================================
 
 /-- Triangle path 1: (a⊗0)⊗b → a⊗(0⊗b) → a⊗b via left unitor on b. -/
-def triangle_path1 (a b : Nat) :
+noncomputable def triangle_path1 (a b : Nat) :
     Path (tensor (tensor a munit) b) (tensor a b) :=
   trans (tensor_assoc a munit b)
     (congrArg (tensor a) (tensor_unit_left b))
 
 /-- Triangle path 2: (a⊗0)⊗b → a⊗b via right unitor on a. -/
-def triangle_path2 (a b : Nat) :
+noncomputable def triangle_path2 (a b : Nat) :
     Path (tensor (tensor a munit) b) (tensor a b) :=
   congrArg (fun x => tensor x b) (tensor_unit_right a)
 
@@ -159,11 +159,11 @@ theorem triangle_identity (a b : Nat) :
 -- ============================================================
 
 /-- 15. Left unitor inverse. -/
-def left_unitor_inv (a : Nat) : Path a (tensor munit a) :=
+noncomputable def left_unitor_inv (a : Nat) : Path a (tensor munit a) :=
   symm (tensor_unit_left a)
 
 /-- 16. Right unitor inverse. -/
-def right_unitor_inv (a : Nat) : Path a (tensor a munit) :=
+noncomputable def right_unitor_inv (a : Nat) : Path a (tensor a munit) :=
   symm (tensor_unit_right a)
 
 /-- 17. Left unitor roundtrip. -/
@@ -177,12 +177,12 @@ theorem right_unitor_roundtrip (a : Nat) :
   simp [right_unitor_inv]
 
 /-- 19. Left unitor naturality: congruence transports left unitor. -/
-def left_unitor_natural (a b : Nat) (p : Path a b) :
+noncomputable def left_unitor_natural (a b : Nat) (p : Path a b) :
     Path (tensor munit a) (tensor munit b) :=
   congrArg (tensor munit) p
 
 /-- 20. Right unitor naturality. -/
-def right_unitor_natural (a b : Nat) (p : Path a b) :
+noncomputable def right_unitor_natural (a b : Nat) (p : Path a b) :
     Path (tensor a munit) (tensor b munit) :=
   congrArg (fun x => tensor x munit) p
 
@@ -199,7 +199,7 @@ theorem right_unitor_nat_square (a b : Nat) (p : Path a b) :
   Subsingleton.elim _ _
 
 /-- 23. Unit tensor with itself. -/
-def unit_tensor_unit : Path (tensor munit munit) munit :=
+noncomputable def unit_tensor_unit : Path (tensor munit munit) munit :=
   tensor_unit_left munit
 
 /-- 24. Both unitors agree on unit. -/
@@ -217,7 +217,7 @@ theorem braiding_involution (a b : Nat) :
   Subsingleton.elim _ _
 
 /-- 26. Braiding inverse. -/
-def braiding_inv (a b : Nat) : Path (tensor b a) (tensor a b) :=
+noncomputable def braiding_inv (a b : Nat) : Path (tensor b a) (tensor a b) :=
   symm (tensor_comm a b)
 
 /-- 27. Braiding symm equals inverse. -/
@@ -226,7 +226,7 @@ theorem braiding_symm_eq_inv (a b : Nat) :
   Subsingleton.elim _ _
 
 /-- 28. Braiding naturality via congrArg. -/
-def braiding_natural_in_first (a₁ a₂ b : Nat) (p : Path a₁ a₂) :
+noncomputable def braiding_natural_in_first (a₁ a₂ b : Nat) (p : Path a₁ a₂) :
     Path (tensor a₁ b) (tensor b a₂) :=
   trans (congrArg (fun x => tensor x b) p) (tensor_comm a₂ b)
 
@@ -236,14 +236,14 @@ def braiding_natural_in_first (a₁ a₂ b : Nat) (p : Path a₁ a₂) :
 
 /-- Hexagon path 1: (a⊗b)⊗c → a⊗(b⊗c) → a⊗(c⊗b) → (a⊗c)⊗b
     via associator then braiding in second slot then de-associator. -/
-def hexagon_path1 (a b c : Nat) :
+noncomputable def hexagon_path1 (a b c : Nat) :
     Path (tensor (tensor a b) c) (tensor (tensor a c) b) :=
   trans (tensor_assoc a b c)
     (trans (congrArg (tensor a) (tensor_comm b c))
       (symm (tensor_assoc a c b)))
 
 /-- Hexagon path 2: (a⊗b)⊗c → (b⊗a)⊗c → b⊗(a⊗c) → (a⊗c)⊗b. -/
-def hexagon_path2 (a b c : Nat) :
+noncomputable def hexagon_path2 (a b c : Nat) :
     Path (tensor (tensor a b) c) (tensor (tensor a c) b) :=
   trans (congrArg (fun x => tensor x c) (tensor_comm a b))
     (trans (tensor_assoc b a c)
@@ -255,13 +255,13 @@ theorem hexagon_identity1 (a b c : Nat) :
   Subsingleton.elim _ _
 
 /-- Second hexagon: dual version. -/
-def hexagon2_path1 (a b c : Nat) :
+noncomputable def hexagon2_path1 (a b c : Nat) :
     Path (tensor a (tensor b c)) (tensor b (tensor a c)) :=
   trans (symm (tensor_assoc a b c))
     (trans (congrArg (fun x => tensor x c) (tensor_comm a b))
       (tensor_assoc b a c))
 
-def hexagon2_path2 (a b c : Nat) :
+noncomputable def hexagon2_path2 (a b c : Nat) :
     Path (tensor a (tensor b c)) (tensor b (tensor a c)) :=
   Path.mk [Step.mk (tensor a (tensor b c)) (tensor b (tensor a c))
     (show a + (b + c) = b + (a + c) by omega)]
@@ -304,7 +304,7 @@ structure StringDiagram where
   path : Path source target
 
 /-- 34. Compose string diagrams. -/
-def StringDiagram.compose (d1 d2 : StringDiagram) (h : d1.target = d2.source) :
+noncomputable def StringDiagram.compose (d1 d2 : StringDiagram) (h : d1.target = d2.source) :
     StringDiagram :=
   { source := d1.source
     target := d2.target
@@ -312,7 +312,7 @@ def StringDiagram.compose (d1 d2 : StringDiagram) (h : d1.target = d2.source) :
               trans p d2.path) }
 
 /-- 35. Identity string diagram. -/
-def StringDiagram.id (n : Nat) : StringDiagram :=
+noncomputable def StringDiagram.id (n : Nat) : StringDiagram :=
   { source := n, target := n, path := refl n }
 
 /-- 36. String diagram equivalence: any two diagrams with same endpoints agree. -/
@@ -326,12 +326,12 @@ theorem string_diagram_equiv (d1 d2 : StringDiagram)
 -- ============================================================
 
 /-- 37. Product associator. -/
-def prod_assoc (A B C : Type) :
+noncomputable def prod_assoc (A B C : Type) :
     (A × B) × C → A × (B × C) :=
   fun ⟨⟨a, b⟩, c⟩ => ⟨a, ⟨b, c⟩⟩
 
 /-- 38. Product associator inverse. -/
-def prod_assoc_inv (A B C : Type) :
+noncomputable def prod_assoc_inv (A B C : Type) :
     A × (B × C) → (A × B) × C :=
   fun ⟨a, ⟨b, c⟩⟩ => ⟨⟨a, b⟩, c⟩
 
@@ -350,19 +350,19 @@ theorem prod_assoc_roundtrip_right {A B C : Type}
   rfl
 
 /-- 41. Left unitor for product: Unit × A → A. -/
-def prod_left_unitor (A : Type) : Unit × A → A :=
+noncomputable def prod_left_unitor (A : Type) : Unit × A → A :=
   fun ⟨(), a⟩ => a
 
 /-- 42. Right unitor for product: A × Unit → A. -/
-def prod_right_unitor (A : Type) : A × Unit → A :=
+noncomputable def prod_right_unitor (A : Type) : A × Unit → A :=
   fun ⟨a, ()⟩ => a
 
 /-- 43. Left unitor inverse. -/
-def prod_left_unitor_inv (A : Type) : A → Unit × A :=
+noncomputable def prod_left_unitor_inv (A : Type) : A → Unit × A :=
   fun a => ⟨(), a⟩
 
 /-- 44. Right unitor inverse. -/
-def prod_right_unitor_inv (A : Type) : A → A × Unit :=
+noncomputable def prod_right_unitor_inv (A : Type) : A → A × Unit :=
   fun a => ⟨a, ()⟩
 
 /-- 45. Left unitor roundtrip. -/
@@ -374,7 +374,7 @@ theorem prod_right_unitor_roundtrip {A : Type} (a : A) :
     prod_right_unitor A (prod_right_unitor_inv A a) = a := rfl
 
 /-- 47. Product braiding. -/
-def prod_braiding (A B : Type) : A × B → B × A :=
+noncomputable def prod_braiding (A B : Type) : A × B → B × A :=
   fun ⟨a, b⟩ => ⟨b, a⟩
 
 /-- 48. Product braiding involution. -/
@@ -388,7 +388,7 @@ theorem prod_braiding_involution {A B : Type} (x : A × B) :
 -- ============================================================
 
 /-- 49. Tensor is a bifunctor: congruence in both arguments. -/
-def tensor_bimap (a₁ a₂ b₁ b₂ : Nat)
+noncomputable def tensor_bimap (a₁ a₂ b₁ b₂ : Nat)
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (tensor a₁ b₁) (tensor a₂ b₂) :=
   trans (congrArg (fun x => tensor x b₁) p)
@@ -434,13 +434,13 @@ structure MonoidalFunctor where
   preserve_unit : Path (map munit) munit
 
 /-- 53. Identity monoidal functor. -/
-def MonoidalFunctor.id : MonoidalFunctor where
+noncomputable def MonoidalFunctor.id : MonoidalFunctor where
   map := fun n => n
   preserve_tensor := fun a b => refl (tensor a b)
   preserve_unit := refl munit
 
 /-- 54. Composition of monoidal functors. -/
-def MonoidalFunctor.comp (F G : MonoidalFunctor) : MonoidalFunctor where
+noncomputable def MonoidalFunctor.comp (F G : MonoidalFunctor) : MonoidalFunctor where
   map := fun n => G.map (F.map n)
   preserve_tensor := fun a b =>
     trans (congrArg G.map (F.preserve_tensor a b))
@@ -464,17 +464,17 @@ theorem monoidal_functor_assoc (F : MonoidalFunctor) (a b c : Nat) :
 -- ============================================================
 
 /-- 56. Transport along associator. -/
-def transport_assoc {D : Nat → Type} (a b c : Nat) (x : D (tensor (tensor a b) c)) :
+noncomputable def transport_assoc {D : Nat → Type} (a b c : Nat) (x : D (tensor (tensor a b) c)) :
     D (tensor a (tensor b c)) :=
   transport (D := D) (tensor_assoc a b c) x
 
 /-- 57. Transport along left unitor. -/
-def transport_left_unitor {D : Nat → Type} (a : Nat) (x : D (tensor munit a)) :
+noncomputable def transport_left_unitor {D : Nat → Type} (a : Nat) (x : D (tensor munit a)) :
     D a :=
   transport (D := D) (tensor_unit_left a) x
 
 /-- 58. Transport along right unitor. -/
-def transport_right_unitor {D : Nat → Type} (a : Nat) (x : D (tensor a munit)) :
+noncomputable def transport_right_unitor {D : Nat → Type} (a : Nat) (x : D (tensor a munit)) :
     D a :=
   transport (D := D) (tensor_unit_right a) x
 
@@ -502,12 +502,12 @@ structure EnrichedHom (a b : Nat) where
   witness : Path (tensor a value) b
 
 /-- 61. Identity enriched hom. -/
-def enriched_id (a : Nat) : EnrichedHom a a :=
+noncomputable def enriched_id (a : Nat) : EnrichedHom a a :=
   { value := munit
     witness := tensor_unit_right a }
 
 /-- 62. Composition of enriched homs. -/
-def enriched_comp (a b c : Nat) (f : EnrichedHom a b) (g : EnrichedHom b c) :
+noncomputable def enriched_comp (a b c : Nat) (f : EnrichedHom a b) (g : EnrichedHom b c) :
     EnrichedHom a c :=
   { value := tensor f.value g.value
     witness := trans
@@ -519,12 +519,12 @@ def enriched_comp (a b c : Nat) (f : EnrichedHom a b) (g : EnrichedHom b c) :
 -- ============================================================
 
 /-- 63. Currying witness: transport between left and right associated tensors. -/
-def curry_path (a b c : Nat) (h : Path (tensor (tensor a b) c) 0) :
+noncomputable def curry_path (a b c : Nat) (h : Path (tensor (tensor a b) c) 0) :
     Path (tensor a (tensor b c)) 0 :=
   trans (symm (tensor_assoc a b c)) h
 
 /-- 64. Uncurrying. -/
-def uncurry_path (a b c : Nat) (h : Path (tensor a (tensor b c)) 0) :
+noncomputable def uncurry_path (a b c : Nat) (h : Path (tensor a (tensor b c)) 0) :
     Path (tensor (tensor a b) c) 0 :=
   trans (tensor_assoc a b c) h
 
@@ -538,7 +538,7 @@ theorem curry_uncurry_roundtrip (a b c : Nat) (h : Path (tensor (tensor a b) c) 
 -- ============================================================
 
 /-- 66. Five-fold associator path 1. -/
-def five_assoc_path1 (a b c d e : Nat) :
+noncomputable def five_assoc_path1 (a b c d e : Nat) :
     Path (tensor (tensor (tensor (tensor a b) c) d) e)
          (tensor a (tensor b (tensor c (tensor d e)))) :=
   Path.mk [Step.mk (tensor (tensor (tensor (tensor a b) c) d) e)
@@ -547,7 +547,7 @@ def five_assoc_path1 (a b c d e : Nat) :
     (show ((a+b)+c)+d+e = a+(b+(c+(d+e))) by omega)
 
 /-- 67. Five-fold reassociation via different route (different step trace). -/
-def five_assoc_path2 (a b c d e : Nat) :
+noncomputable def five_assoc_path2 (a b c d e : Nat) :
     Path (tensor (tensor (tensor (tensor a b) c) d) e)
          (tensor a (tensor b (tensor c (tensor d e)))) :=
   trans (tensor_assoc (tensor (tensor a b) c) d e)
@@ -567,7 +567,7 @@ theorem five_assoc_coherence (a b c d e : Nat) :
 -- ============================================================
 
 /-- 69. Double braiding with associator. -/
-def double_braiding_assoc (a b c : Nat) :
+noncomputable def double_braiding_assoc (a b c : Nat) :
     Path (tensor (tensor a b) c) (tensor (tensor b a) c) :=
   congrArg (fun x => tensor x c) (tensor_comm a b)
 
@@ -594,25 +594,25 @@ theorem braiding_natural_second (a b₁ b₂ : Nat) (q : Path b₁ b₂) :
 -- ============================================================
 
 /-- Bool to Nat encoding. -/
-def bool_to_nat (b : Bool) : Nat := if b then 1 else 0
+noncomputable def bool_to_nat (b : Bool) : Nat := if b then 1 else 0
 
 /-- 73. Path from Bool.not involution via congrArg. -/
-def bool_not_not_path (b : Bool) :
+noncomputable def bool_not_not_path (b : Bool) :
     Path (bool_to_nat b) (bool_to_nat (Bool.not (Bool.not b))) := by
   cases b <;> exact refl _
 
 /-- 74. Step witnessing Bool identity on Nat. -/
-def bool_id_step (b : Bool) : Step Nat :=
+noncomputable def bool_id_step (b : Bool) : Step Nat :=
   Step.mk (bool_to_nat b) (bool_to_nat b) rfl
 
 /-- 75. Bool tensor path. -/
-def bool_tensor_comm (a b : Bool) :
+noncomputable def bool_tensor_comm (a b : Bool) :
     Path (bool_to_nat a + bool_to_nat b)
          (bool_to_nat b + bool_to_nat a) :=
   tensor_comm (bool_to_nat a) (bool_to_nat b)
 
 /-- 76. Bool tensor associativity. -/
-def bool_tensor_assoc (a b c : Bool) :
+noncomputable def bool_tensor_assoc (a b c : Bool) :
     Path ((bool_to_nat a + bool_to_nat b) + bool_to_nat c)
          (bool_to_nat a + (bool_to_nat b + bool_to_nat c)) :=
   tensor_assoc (bool_to_nat a) (bool_to_nat b) (bool_to_nat c)
@@ -637,7 +637,7 @@ structure MonoidalNatTrans (F G : MonoidalFunctor) where
       (G.preserve_tensor a b)).toEq
 
 /-- 78. Identity monoidal natural transformation. -/
-def MonoidalNatTrans.id (F : MonoidalFunctor) : MonoidalNatTrans F F where
+noncomputable def MonoidalNatTrans.id (F : MonoidalFunctor) : MonoidalNatTrans F F where
   component := fun n => refl (F.map n)
   naturality := fun _ _ => Subsingleton.elim _ _
 
@@ -646,7 +646,7 @@ def MonoidalNatTrans.id (F : MonoidalFunctor) : MonoidalNatTrans F F where
 -- ============================================================
 
 /-- 79. Yang-Baxter equation path. -/
-def yang_baxter_path (a b c : Nat) :
+noncomputable def yang_baxter_path (a b c : Nat) :
     Path (tensor a (tensor b c)) (tensor b (tensor c a)) :=
   trans (tensor_comm a (tensor b c))
     (tensor_assoc b c a)

@@ -50,11 +50,11 @@ namespace ModelCategory
 variable {A : Type u}
 
 /-- A trivial cofibration is both a cofibration and a weak equivalence. -/
-def trivialCofibration (M : ModelCategory A) {a b : A} (p : Path a b) : Prop :=
+noncomputable def trivialCofibration (M : ModelCategory A) {a b : A} (p : Path a b) : Prop :=
   M.cof p ∧ M.weq p
 
 /-- A trivial fibration is both a fibration and a weak equivalence. -/
-def trivialFibration (M : ModelCategory A) {a b : A} (p : Path a b) : Prop :=
+noncomputable def trivialFibration (M : ModelCategory A) {a b : A} (p : Path a b) : Prop :=
   M.fib p ∧ M.weq p
 
 end ModelCategory
@@ -66,15 +66,15 @@ section PathModel
 variable (A : Type u)
 
 /-- Weak equivalences in the path model structure: paths with rewrite inverses. -/
-def pathWeakEquivalence {a b : A} (p : Path a b) : Prop :=
+noncomputable def pathWeakEquivalence {a b : A} (p : Path a b) : Prop :=
   Nonempty (WeakCategory.IsIso (A := A) (WeakCategory.identity A) p)
 
 /-- Fibrations in the path model structure (all paths). -/
-def pathFibration {a b : A} (_p : Path a b) : Prop :=
+noncomputable def pathFibration {a b : A} (_p : Path a b) : Prop :=
   True
 
 /-- Cofibrations in the path model structure (all paths). -/
-def pathCofibration {a b : A} (_p : Path a b) : Prop :=
+noncomputable def pathCofibration {a b : A} (_p : Path a b) : Prop :=
   True
 
 /-- Every computational path is a weak equivalence. -/
@@ -83,7 +83,7 @@ theorem path_is_weak_equivalence {a b : A} (p : Path a b) :
   exact ⟨WeakGroupoid.isIso (A := A) (G := WeakGroupoid.identity A) p⟩
 
 /-- The trivial model category structure on computational paths. -/
-def pathModelCategory (A : Type u) : ModelCategory A where
+noncomputable def pathModelCategory (A : Type u) : ModelCategory A where
   toWeakCategory := WeakCategory.identity A
   weq := fun {a b} p => pathWeakEquivalence (A := A) p
   fib := fun {a b} p => pathFibration (A := A) p

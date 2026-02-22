@@ -34,11 +34,11 @@ structure Approx {D : Type u} (a b : DomainElem D) where
   witness : Path a b
 
 /-- Reflexivity of approximation. -/
-def Approx.refl' {D : Type u} (a : DomainElem D) : Approx a a :=
+noncomputable def Approx.refl' {D : Type u} (a : DomainElem D) : Approx a a :=
   ⟨Path.refl a⟩
 
 /-- Transitivity of approximation via path composition. -/
-def Approx.trans' {D : Type u} {a b c : DomainElem D}
+noncomputable def Approx.trans' {D : Type u} {a b c : DomainElem D}
     (h1 : Approx a b) (h2 : Approx b c) : Approx a c :=
   ⟨Path.trans h1.witness h2.witness⟩
 
@@ -59,7 +59,7 @@ structure Chain (D : Type u) where
   links : ∀ n : Nat, Path (elems n) (elems (n + 1))
 
 /-- The length-zero prefix of a chain is reflexive. -/
-def Chain.prefix_path {D : Type u} (c : Chain D) (n : Nat) :
+noncomputable def Chain.prefix_path {D : Type u} (c : Chain D) (n : Nat) :
     Path (c.elems 0) (c.elems n) :=
   match n with
   | 0 => Path.refl (c.elems 0)
@@ -114,24 +114,24 @@ structure ScottCont (D : Type u) (E : Type v) where
   map_path : ∀ {a b : DomainElem D}, Path a b → Path (func a) (func b)
 
 /-- Scott continuous map preserves reflexivity. -/
-def ScottCont.map_refl {D : Type u} {E : Type v} (f : ScottCont D E)
+noncomputable def ScottCont.map_refl {D : Type u} {E : Type v} (f : ScottCont D E)
     (a : DomainElem D) : Path (f.func a) (f.func a) :=
   f.map_path (Path.refl a)
 
 /-- Scott continuous map preserves transitivity. -/
-def ScottCont.map_trans {D : Type u} {E : Type v} (f : ScottCont D E)
+noncomputable def ScottCont.map_trans {D : Type u} {E : Type v} (f : ScottCont D E)
     {a b c : DomainElem D} (p : Path a b) (q : Path b c) :
     Path (f.func a) (f.func c) :=
   f.map_path (Path.trans p q)
 
 /-- Composition of Scott continuous functions. -/
-def ScottCont.comp {D E F : Type u}
+noncomputable def ScottCont.comp {D E F : Type u}
     (g : ScottCont E F) (f : ScottCont D E) : ScottCont D F where
   func := g.func ∘ f.func
   map_path := fun p => g.map_path (f.map_path p)
 
 /-- Identity Scott continuous function. -/
-def ScottCont.id (D : Type u) : ScottCont D D where
+noncomputable def ScottCont.id (D : Type u) : ScottCont D D where
   func := fun x => x
   map_path := fun p => p
 
@@ -144,7 +144,7 @@ theorem scott_comp_id {D E : Type u} (f : ScottCont D E) :
     (ScottCont.comp (ScottCont.id E) f).func = f.func := rfl
 
 /-- Scott continuous map on chains. -/
-def ScottCont.mapChain {D : Type u} {E : Type v}
+noncomputable def ScottCont.mapChain {D : Type u} {E : Type v}
     (f : ScottCont D E) (c : Chain D) : Chain E where
   elems := fun n => f.func (c.elems n)
   links := fun n => f.map_path (c.links n)
@@ -157,7 +157,7 @@ theorem scott_map_chain_elem {D : Type u} {E : Type v}
 /-! ## Kleene Fixed-Point Theorem -/
 
 /-- Kleene chain: iterate a continuous function from bottom. -/
-def kleeneChain {D : Type u} (pd : PointedDomain D) (f : ScottCont D D) :
+noncomputable def kleeneChain {D : Type u} (pd : PointedDomain D) (f : ScottCont D D) :
     Chain D where
   elems := fun n => Nat.rec pd.bot (fun _ x => f.func x) n
   links := fun n => by
@@ -202,7 +202,7 @@ structure FunSpace (D : Type u) (E : Type v) where
   cont : ScottCont D E
 
 /-- Pointwise path between continuous functions. -/
-def FunSpace.pointwisePath {D : Type u} {E : Type v}
+noncomputable def FunSpace.pointwisePath {D : Type u} {E : Type v}
     (f g : FunSpace D E)
     (pw : ∀ x : DomainElem D, Path (f.cont.func x) (g.cont.func x)) :
     ∀ x : DomainElem D, Path (f.cont.func x) (g.cont.func x) :=
@@ -216,7 +216,7 @@ theorem funspace_refl {D : Type u} {E : Type v} (f : FunSpace D E)
 /-! ## Path Algebra for Domains -/
 
 /-- Symmetry of domain approximation paths. -/
-def domainSymm {D : Type u} {a b : DomainElem D}
+noncomputable def domainSymm {D : Type u} {a b : DomainElem D}
     (p : Path a b) : Path b a :=
   Path.symm p
 
@@ -226,12 +226,12 @@ theorem domain_symm_symm {D : Type u} {a b : DomainElem D}
   Path.symm_symm p
 
 /-- CongrArg through DomainElem.val. -/
-def domain_congrArg {D : Type u} {a b : DomainElem D}
+noncomputable def domain_congrArg {D : Type u} {a b : DomainElem D}
     (p : Path a b) : Path (DomainElem.mk a.val) (DomainElem.mk b.val) :=
   Path.congrArg (fun x => DomainElem.mk x.val) p
 
 /-- Transport of domain properties along paths. -/
-def domain_transport {D : Type u} {P : DomainElem D → Type v}
+noncomputable def domain_transport {D : Type u} {P : DomainElem D → Type v}
     {a b : DomainElem D} (p : Path a b) (x : P a) : P b :=
   Path.transport p x
 

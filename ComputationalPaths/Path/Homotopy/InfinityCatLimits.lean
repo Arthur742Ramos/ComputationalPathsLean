@@ -119,7 +119,7 @@ structure TerminalCone {I C : QuasiCategory} (D : InfinityDiagram I C) where
   unique : ∀ x (f g : ConeSliceHom x obj), f = g
 
 /-- Build an infinity-limit from a terminal cone. -/
-def limitOfTerminal {I C : QuasiCategory} {D : InfinityDiagram I C}
+noncomputable def limitOfTerminal {I C : QuasiCategory} {D : InfinityDiagram I C}
     (T : TerminalCone D) : InfinityLimit D where
   cone := T.obj.cone
   universal := fun other =>
@@ -149,7 +149,7 @@ structure TerminalCocone {I C : QuasiCategory} (D : InfinityDiagram I C) where
   unique : ∀ x (f g : CoconeSliceHom x obj), f = g
 
 /-- Build an infinity-colimit from a terminal cocone (coslice convention). -/
-def colimitOfTerminal {I C : QuasiCategory} {D : InfinityDiagram I C}
+noncomputable def colimitOfTerminal {I C : QuasiCategory} {D : InfinityDiagram I C}
     (T : TerminalCocone D) : InfinityColimit D where
   cocone := T.obj.cocone
   universal := fun other =>
@@ -248,7 +248,7 @@ noncomputable abbrev infinitySeifertVanKampen (c0 : C)
 end SeifertVanKampen
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

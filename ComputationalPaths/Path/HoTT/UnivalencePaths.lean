@@ -36,7 +36,7 @@ structure Equiv'' (A : Type u) (B : Type v) where
 notation:25 A " ≃ₚ " B => Equiv'' A B
 
 /-- Identity equivalence. -/
-def Equiv''.idEquiv (A : Type u) : A ≃ₚ A where
+noncomputable def Equiv''.idEquiv (A : Type u) : A ≃ₚ A where
   toFun  := id
   invFun := id
   sect   := fun a => Path.refl a
@@ -44,7 +44,7 @@ def Equiv''.idEquiv (A : Type u) : A ≃ₚ A where
 
 /-! ## 1. Equivalence composition via path trans -/
 
-def Equiv''.comp (e₁ : A ≃ₚ B) (e₂ : B ≃ₚ C) : A ≃ₚ C where
+noncomputable def Equiv''.comp (e₁ : A ≃ₚ B) (e₂ : B ≃ₚ C) : A ≃ₚ C where
   toFun  := e₂.toFun ∘ e₁.toFun
   invFun := e₁.invFun ∘ e₂.invFun
   sect   := fun a =>
@@ -58,7 +58,7 @@ def Equiv''.comp (e₁ : A ≃ₚ B) (e₂ : B ≃ₚ C) : A ≃ₚ C where
 
 /-! ## 2. Equivalence inverse -/
 
-def Equiv''.inv' (e : A ≃ₚ B) : B ≃ₚ A where
+noncomputable def Equiv''.inv' (e : A ≃ₚ B) : B ≃ₚ A where
   toFun  := e.invFun
   invFun := e.toFun
   sect   := e.retr
@@ -140,7 +140,7 @@ structure IsContr (A : Type u) where
 
 /-! ## 14. Contractible types have path between any two points -/
 
-def isContr_path (h : IsContr A) (a b : A) : Path a b :=
+noncomputable def isContr_path (h : IsContr A) (a b : A) : Path a b :=
   Path.trans (Path.symm (h.contr a)) (h.contr b)
 
 /-! ## 15. The connecting path steps are symm ++ contr -/
@@ -170,7 +170,7 @@ theorem isContr_triple_chain_steps (h : IsContr A) (a b c : A) :
 
 /-! ## 19. Unit is contractible -/
 
-def unitIsContr : IsContr Unit where
+noncomputable def unitIsContr : IsContr Unit where
   center := ()
   contr  := fun _ => Path.refl ()
 
@@ -191,7 +191,7 @@ structure IsProp (A : Type u) where
 
 /-! ## 22. Contractible implies proposition -/
 
-def isContr_isProp (h : IsContr A) : IsProp A where
+noncomputable def isContr_isProp (h : IsContr A) : IsProp A where
   propPath := fun a b => isContr_path h a b
 
 /-! ## 23. Proposition path chain agrees at proof level -/
@@ -221,19 +221,19 @@ structure IsSet' (A : Type u) where
 
 /-! ## 26. Propositions are sets -/
 
-def isProp_isSet (h : IsProp A) : IsSet' A where
+noncomputable def isProp_isSet (h : IsProp A) : IsSet' A where
   setPath := fun _ _ => Subsingleton.elim _ _
 
 /-! ## 27. Unit is a set -/
 
-def unitIsSet : IsSet' Unit :=
+noncomputable def unitIsSet : IsSet' Unit :=
   isProp_isSet (isContr_isProp unitIsContr)
 
 /-! ## Path Induction (J-eliminator) via transport -/
 
 /-! ## 28. Based path induction at proof level -/
 
-def pathInd_proof {A : Type u} {a : A}
+noncomputable def pathInd_proof {A : Type u} {a : A}
     (D : (b : A) → a = b → Sort v)
     (d : D a rfl)
     {b : A} (p : Path a b) : D b p.proof := by
@@ -261,22 +261,22 @@ theorem transport_arrow {P Q : A → Type v} {a b : A}
 /-! ## Functional extensionality via paths -/
 
 /-- Pointwise path between functions. -/
-def Homotopy' (f g : A → B) : Type (max u v) :=
+noncomputable def Homotopy' (f g : A → B) : Type (max u v) :=
   (a : A) → Path (f a) (g a)
 
 /-! ## 31. Homotopy is reflexive -/
 
-def Homotopy'.reflH (f : A → B) : Homotopy' f f :=
+noncomputable def Homotopy'.reflH (f : A → B) : Homotopy' f f :=
   fun a => Path.refl (f a)
 
 /-! ## 32. Homotopy is symmetric via symm -/
 
-def Homotopy'.symmH {f g : A → B} (h : Homotopy' f g) : Homotopy' g f :=
+noncomputable def Homotopy'.symmH {f g : A → B} (h : Homotopy' f g) : Homotopy' g f :=
   fun a => Path.symm (h a)
 
 /-! ## 33. Homotopy is transitive via trans -/
 
-def Homotopy'.transH {f g k : A → B} (h₁ : Homotopy' f g) (h₂ : Homotopy' g k) :
+noncomputable def Homotopy'.transH {f g k : A → B} (h₁ : Homotopy' f g) (h₂ : Homotopy' g k) :
     Homotopy' f k :=
   fun a => Path.trans (h₁ a) (h₂ a)
 
@@ -309,7 +309,7 @@ theorem homotopy_trans_steps {f g k : A → B}
 
 /-! ## 38. Funext from homotopy -/
 
-def funextPath {f g : (a : A) → B} (h : ∀ a, f a = g a) : Path f g :=
+noncomputable def funextPath {f g : (a : A) → B} (h : ∀ a, f a = g a) : Path f g :=
   Path.mk [Step.mk f g (funext h)] (funext h)
 
 /-! ## 39. Funext path has one step -/
@@ -402,7 +402,7 @@ theorem ua'_roundtrip_fwd {A B : Type u} (e : A ≃ₚ B) (a : A) :
 
 /-! ## 52. ua roundtrip gives section -/
 
-def ua'_roundtrip_sect {A B : Type u} (e : A ≃ₚ B) (a : A) :
+noncomputable def ua'_roundtrip_sect {A B : Type u} (e : A ≃ₚ B) (a : A) :
     Path
       (Path.transport (D := fun X => X) (Path.symm (ua' e))
         (Path.transport (D := fun X => X) (ua' e) a))
@@ -413,7 +413,7 @@ def ua'_roundtrip_sect {A B : Type u} (e : A ≃ₚ B) (a : A) :
 
 /-! ## 53. Equiv preserves contractibility -/
 
-def isContr_equiv (h : IsContr A) (e : A ≃ₚ B) : IsContr B where
+noncomputable def isContr_equiv (h : IsContr A) (e : A ≃ₚ B) : IsContr B where
   center := e.toFun h.center
   contr  := fun b =>
     Path.trans
@@ -429,7 +429,7 @@ theorem isContr_equiv_contr_steps (h : IsContr A) (e : A ≃ₚ B) (b : B) :
 
 /-! ## 55. Equiv preserves propositions -/
 
-def isProp_equiv (h : IsProp A) (e : A ≃ₚ B) : IsProp B where
+noncomputable def isProp_equiv (h : IsProp A) (e : A ≃ₚ B) : IsProp B where
   propPath := fun b₁ b₂ =>
     Path.trans
       (Path.symm (e.retr b₁))
@@ -479,13 +479,13 @@ theorem congrArg_equiv_comp {A B C : Type u} (e₁ : A ≃ₚ B) (e₂ : B ≃�
 /-! ## Path-over and dependent paths -/
 
 /-- A path-over: a path in a family lying over a base path. -/
-def PathOver' {A : Type u} (P : A → Type v) {a b : A}
+noncomputable def PathOver' {A : Type u} (P : A → Type v) {a b : A}
     (p : Path a b) (u : P a) (v : P b) : Type v :=
   Path (Path.transport (D := P) p u) v
 
 /-! ## 61. PathOver reflexivity -/
 
-def pathOver_refl {P : A → Type v} {a : A} (u : P a) :
+noncomputable def pathOver_refl {P : A → Type v} {a : A} (u : P a) :
     PathOver' P (Path.refl a) u u := by
   show Path (Path.transport (D := P) (Path.refl a) u) u
   simp [Path.transport]
@@ -497,7 +497,7 @@ structure Fiber' (f : A → B) (b : B) where
   point : A
   path  : Path (f point) b
 
-def fiber_center (e : A ≃ₚ B) (b : B) : Fiber' e.toFun b :=
+noncomputable def fiber_center (e : A ≃ₚ B) (b : B) : Fiber' e.toFun b :=
   ⟨e.invFun b, e.retr b⟩
 
 /-! ## 63. Fiber center uses genuine retr path -/

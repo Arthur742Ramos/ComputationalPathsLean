@@ -31,14 +31,14 @@ universe u v
 /-! ## Path-typed representability -/
 
 /-- Path-typed left inverse for a representability equivalence. -/
-def equiv_leftInvPath {A : Type u} {F : PathContraFunctor A}
+noncomputable def equiv_leftInvPath {A : Type u} {F : PathContraFunctor A}
     (R : ContraRepresentable A F) (b : A) (x : F.obj b) :
     ComputationalPaths.Path
       ((R.equiv b).invFun ((R.equiv b).toFun x)) x :=
   ComputationalPaths.Path.stepChain ((R.equiv b).left_inv x)
 
 /-- Path-typed right inverse for a representability equivalence. -/
-def equiv_rightInvPath {A : Type u} {F : PathContraFunctor A}
+noncomputable def equiv_rightInvPath {A : Type u} {F : PathContraFunctor A}
     (R : ContraRepresentable A F) (b : A)
     (y : FundamentalGroupoid.Hom A b R.obj) :
     ComputationalPaths.Path
@@ -46,7 +46,7 @@ def equiv_rightInvPath {A : Type u} {F : PathContraFunctor A}
   ComputationalPaths.Path.stepChain ((R.equiv b).right_inv y)
 
 /-- Path-typed naturality of a representability equivalence. -/
-def equiv_naturalityPath {A : Type u} {F : PathContraFunctor A}
+noncomputable def equiv_naturalityPath {A : Type u} {F : PathContraFunctor A}
     (R : ContraRepresentable A F) {b c : A}
     (p : FundamentalGroupoid.Hom A b c) (x : F.obj c) :
     ComputationalPaths.Path
@@ -55,7 +55,7 @@ def equiv_naturalityPath {A : Type u} {F : PathContraFunctor A}
   ComputationalPaths.Path.stepChain (R.naturality (p := p) (x := x))
 
 /-- Brown representability expressed as a Path-typed inverse law. -/
-def brown_representability_path {A : Type u} {F : PathContraFunctor A}
+noncomputable def brown_representability_path {A : Type u} {F : PathContraFunctor A}
     (W : WedgeAxiom A F) (MV : MayerVietorisAxiom A F W)
     (b : A) (x : F.obj b) :
     ComputationalPaths.Path

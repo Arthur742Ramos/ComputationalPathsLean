@@ -154,7 +154,7 @@ structure HodgeDecomposition (Ω : DifferentialForms) where
   unique : True
 
 /-- Hodge decomposition is orthogonal. -/
-def hodge_orthogonal (Ω : DifferentialForms) (H : HodgeDecomposition Ω) :
+noncomputable def hodge_orthogonal (Ω : DifferentialForms) (H : HodgeDecomposition Ω) :
     True :=
   H.orthogonal
 
@@ -173,7 +173,7 @@ structure HodgeDeRham (Ω : DifferentialForms) where
   iso : ∀ p, Path (harmonic p).harmonicDim (deRham.betti p)
 
 /-- The Hodge–de Rham isomorphism witnesses equality of dimensions. -/
-def hodge_deRham_iso (Ω : DifferentialForms) (H : HodgeDeRham Ω) (p : Nat) :
+noncomputable def hodge_deRham_iso (Ω : DifferentialForms) (H : HodgeDeRham Ω) (p : Nat) :
     Path (H.harmonic p).harmonicDim (H.deRham.betti p) :=
   H.iso p
 

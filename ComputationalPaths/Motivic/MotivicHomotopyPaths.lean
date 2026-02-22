@@ -46,7 +46,7 @@ structure A1Contractible (X : Type u) (A1 : Type v) where
   contract_start : ∀ (x : X), contract x zero = Path.refl (x, zero)
 
 /-- The projection from an A¹-contractible pair is a path equivalence. -/
-def a1_contract_proj_path {X : Type u} {A1 : Type v}
+noncomputable def a1_contract_proj_path {X : Type u} {A1 : Type v}
     (C : A1Contractible X A1) (x : X) (t : A1) :
     Path (x, t).1 x :=
   Path.refl x
@@ -69,7 +69,7 @@ structure A1Homotopy (X Y : Type u) (A1 : Type v) (f g : X → Y) where
   right_end : ∀ x : X, Path (homotopy (x, at_one)) (g x)
 
 /-- A¹-homotopy is reflexive. -/
-def A1Homotopy.refl_hom (X Y : Type u) (A1 : Type v) [Inhabited A1]
+noncomputable def A1Homotopy.refl_hom (X Y : Type u) (A1 : Type v) [Inhabited A1]
     (f : X → Y) : A1Homotopy X Y A1 f f where
   homotopy := fun p => f p.1
   at_zero := default
@@ -78,7 +78,7 @@ def A1Homotopy.refl_hom (X Y : Type u) (A1 : Type v) [Inhabited A1]
   right_end := fun x => Path.refl (f x)
 
 /-- A¹-homotopy is symmetric via path inversion. -/
-def A1Homotopy.symm_hom {X Y : Type u} {A1 : Type v} {f g : X → Y}
+noncomputable def A1Homotopy.symm_hom {X Y : Type u} {A1 : Type v} {f g : X → Y}
     (H : A1Homotopy X Y A1 f g) : A1Homotopy X Y A1 g f where
   homotopy := H.homotopy
   at_zero := H.at_one
@@ -133,7 +133,7 @@ theorem nisnevich_commute_symm {U V X Y : Type u}
   Path.symm_symm (sq.commute u)
 
 /-- Applying a functor to both sides of a Nisnevich square preserves commutativity. -/
-def nisnevich_functorial {U V X Y Z : Type u}
+noncomputable def nisnevich_functorial {U V X Y Z : Type u}
     (sq : NisnevichSquare U V X Y) (h : Y → Z) (u : U) :
     Path (h (sq.j (sq.f u))) (h (sq.i (sq.g u))) :=
   Path.congrArg h (sq.commute u)
@@ -177,30 +177,30 @@ structure MotivicSphere where
   q : Nat  -- algebraic/weight dimension
 
 /-- The bigraded structure of motivic spheres. -/
-def motivic_sphere_add (s1 s2 : MotivicSphere) : MotivicSphere :=
+noncomputable def motivic_sphere_add (s1 s2 : MotivicSphere) : MotivicSphere :=
   ⟨s1.p + s2.p, s1.q + s2.q⟩
 
 /-- Smash product is commutative on sphere dimensions. -/
-def motivic_sphere_add_comm (s1 s2 : MotivicSphere) :
+noncomputable def motivic_sphere_add_comm (s1 s2 : MotivicSphere) :
     Path (motivic_sphere_add s1 s2) (motivic_sphere_add s2 s1) :=
   Path.mk [] (by simp [motivic_sphere_add, Nat.add_comm])
 
 /-- Smash product is associative on sphere dimensions. -/
-def motivic_sphere_add_assoc (s1 s2 s3 : MotivicSphere) :
+noncomputable def motivic_sphere_add_assoc (s1 s2 s3 : MotivicSphere) :
     Path (motivic_sphere_add (motivic_sphere_add s1 s2) s3)
          (motivic_sphere_add s1 (motivic_sphere_add s2 s3)) :=
   Path.mk [] (by simp [motivic_sphere_add, Nat.add_assoc])
 
 /-- Unit sphere S^{0,0}. -/
-def motivic_sphere_zero : MotivicSphere := ⟨0, 0⟩
+noncomputable def motivic_sphere_zero : MotivicSphere := ⟨0, 0⟩
 
 /-- S^{0,0} is left unit for smash. -/
-def motivic_sphere_zero_add (s : MotivicSphere) :
+noncomputable def motivic_sphere_zero_add (s : MotivicSphere) :
     Path (motivic_sphere_add motivic_sphere_zero s) s :=
   Path.mk [] (by simp [motivic_sphere_add, motivic_sphere_zero])
 
 /-- S^{0,0} is right unit for smash. -/
-def motivic_sphere_add_zero (s : MotivicSphere) :
+noncomputable def motivic_sphere_add_zero (s : MotivicSphere) :
     Path (motivic_sphere_add s motivic_sphere_zero) s :=
   Path.mk [] (by simp [motivic_sphere_add, motivic_sphere_zero])
 
@@ -219,21 +219,21 @@ theorem motivic_sphere_pentagon (s1 s2 s3 s4 : MotivicSphere) :
   simp [motivic_sphere_add_assoc, motivic_sphere_add]
 
 /-- S^{1,0} is the simplicial circle. -/
-def S10 : MotivicSphere := ⟨1, 0⟩
+noncomputable def S10 : MotivicSphere := ⟨1, 0⟩
 
 /-- S^{0,1} is Gm (the algebraic circle). -/
-def S01 : MotivicSphere := ⟨0, 1⟩
+noncomputable def S01 : MotivicSphere := ⟨0, 1⟩
 
 /-- S^{1,1} = S^{1,0} ∧ S^{0,1} is the Tate twist sphere. -/
-def S11 : MotivicSphere := ⟨1, 1⟩
+noncomputable def S11 : MotivicSphere := ⟨1, 1⟩
 
 /-- S^{1,1} decomposes as smash of S^{1,0} and S^{0,1}. -/
-def S11_decompose :
+noncomputable def S11_decompose :
     Path S11 (motivic_sphere_add S10 S01) :=
   Path.mk [] (by simp [S11, S10, S01, motivic_sphere_add])
 
 /-- S^{2,1} = S^{1,0} ∧ S^{1,1}. -/
-def S21_decompose :
+noncomputable def S21_decompose :
     Path (motivic_sphere_add S10 S11) ⟨2, 1⟩ :=
   Path.mk [] (by simp [S10, S11, motivic_sphere_add])
 
@@ -344,23 +344,23 @@ theorem ktheory_bond_basepoint (K : KTheorySpectrum) (n : Nat) :
   simp
 
 /-- Iterated bonding maps. -/
-def ktheory_bond_iter (K : KTheorySpectrum) (n : Nat) :
+noncomputable def ktheory_bond_iter (K : KTheorySpectrum) (n : Nat) :
     ∀ k : Nat, K.level n → K.level (n + k)
   | 0 => fun x => by rw [Nat.add_zero]; exact x
   | k + 1 => fun x => by rw [Nat.add_succ]; exact K.bond (n + k) (ktheory_bond_iter K n k x)
 
 /-- K₀ path: the identity on K₀ composes trivially. -/
-def k0_identity (K : KTheorySpectrum) :
+noncomputable def k0_identity (K : KTheorySpectrum) :
     Path (K.basepoint 0) (K.basepoint 0) :=
   Path.refl (K.basepoint 0)
 
 /-- K₁ path: bonding from K₀ reaches K₁ basepoint. -/
-def k1_from_k0 (K : KTheorySpectrum) :
+noncomputable def k1_from_k0 (K : KTheorySpectrum) :
     Path (K.bond 0 (K.basepoint 0)) (K.basepoint 1) :=
   K.bond_path 0
 
 /-- Double bonding path. -/
-def k2_from_k0 (K : KTheorySpectrum) :
+noncomputable def k2_from_k0 (K : KTheorySpectrum) :
     Path (K.bond 1 (K.bond 0 (K.basepoint 0))) (K.basepoint 2) :=
   Path.trans (Path.congrArg (K.bond 1) (K.bond_path 0)) (K.bond_path 1)
 
@@ -391,12 +391,12 @@ theorem adams_psi1_id {K0 : Type u} (A : AdamsOp K0) (x : K0) :
   simp
 
 /-- ψ¹ ∘ ψ^k = ψ^k via composition law. -/
-def adams_psi1_compose {K0 : Type u} (A : AdamsOp K0) (k : Nat) (x : K0) :
+noncomputable def adams_psi1_compose {K0 : Type u} (A : AdamsOp K0) (k : Nat) (x : K0) :
     Path (A.psi 1 (A.psi k x)) (A.psi (1 * k) x) :=
   A.psi_compose 1 k x
 
 /-- ψ^k ∘ ψ¹ = ψ^k via composition law. -/
-def adams_psik_compose1 {K0 : Type u} (A : AdamsOp K0) (k : Nat) (x : K0) :
+noncomputable def adams_psik_compose1 {K0 : Type u} (A : AdamsOp K0) (k : Nat) (x : K0) :
     Path (A.psi k (A.psi 1 x)) (A.psi (k * 1) x) :=
   A.psi_compose k 1 x
 
@@ -436,7 +436,7 @@ theorem bott_inv_self {K : Type u} (B : BottPeriodicity K) (x : K) :
   simp
 
 /-- Double Bott inverse-map has a computational path back. -/
-def bott_double_inv {K : Type u} (B : BottPeriodicity K) (x : K) :
+noncomputable def bott_double_inv {K : Type u} (B : BottPeriodicity K) (x : K) :
     Path (B.beta_inv (B.beta_inv (B.beta (B.beta x)))) x :=
   Path.trans (Path.congrArg B.beta_inv (B.period_path_inv (B.beta x)))
              (B.period_path_inv x)
@@ -608,7 +608,7 @@ theorem slice_bond_refl (T : SliceTower) (n : Int) :
   simp
 
 /-- Double slice bonding. -/
-def slice_double_bond (T : SliceTower) (n : Int) :
+noncomputable def slice_double_bond (T : SliceTower) (n : Int) :
     Path (T.bond (n + 1) (T.bond n (T.slice n))) (T.bond (n + 1) (T.slice (n + 1))) :=
   Path.congrArg (T.bond (n + 1)) (T.bond_path n)
 

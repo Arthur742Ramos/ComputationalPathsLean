@@ -32,7 +32,7 @@ deriving DecidableEq, Repr
 
 abbrev KnotDiagram := List Crossing
 
-def unknot : KnotDiagram := []
+noncomputable def unknot : KnotDiagram := []
 
 -- ============================================================================
 -- §2  Reidemeister Moves as Steps
@@ -62,16 +62,16 @@ inductive KnotPath : KnotDiagram → KnotDiagram → Type where
       (s : ReidemeisterStep d₁ d₂) (p : KnotPath d₂ d₃) : KnotPath d₁ d₃
 
 /-- Theorem 1: Transitivity of knot paths. -/
-def KnotPath.trans : KnotPath a b → KnotPath b c → KnotPath a c
+noncomputable def KnotPath.trans : KnotPath a b → KnotPath b c → KnotPath a c
   | .refl _, q => q
   | .step s p, q => .step s (p.trans q)
 
 /-- Theorem 2: Single step lifts to a path. -/
-def KnotPath.single (s : ReidemeisterStep a b) : KnotPath a b :=
+noncomputable def KnotPath.single (s : ReidemeisterStep a b) : KnotPath a b :=
   KnotPath.step s (KnotPath.refl b)
 
 /-- Theorem 3: Path length. -/
-def KnotPath.length : KnotPath a b → Nat
+noncomputable def KnotPath.length : KnotPath a b → Nat
   | .refl _ => 0
   | .step _ p => 1 + p.length
 
@@ -95,28 +95,28 @@ inductive KnotPathSym : KnotDiagram → KnotDiagram → Type where
   | step  {a b c} : ReidemeisterStepSym a b → KnotPathSym b c → KnotPathSym a c
 
 /-- Theorem 5: Transitivity of symmetric knot paths. -/
-def KnotPathSym.trans : KnotPathSym a b → KnotPathSym b c → KnotPathSym a c
+noncomputable def KnotPathSym.trans : KnotPathSym a b → KnotPathSym b c → KnotPathSym a c
   | .refl _, q => q
   | .step s p, q => .step s (p.trans q)
 
 /-- Theorem 6: Symmetry of symmetric knot paths. -/
-def KnotPathSym.symm : KnotPathSym a b → KnotPathSym b a
+noncomputable def KnotPathSym.symm : KnotPathSym a b → KnotPathSym b a
   | .refl _ => .refl _
   | .step (.fwd h) p => p.symm.trans (.step (.bwd h) (.refl _))
   | .step (.bwd h) p => p.symm.trans (.step (.fwd h) (.refl _))
 
 /-- Theorem 7: Forward path lifts to symmetric. -/
-def KnotPath.toSym : KnotPath a b → KnotPathSym a b
+noncomputable def KnotPath.toSym : KnotPath a b → KnotPathSym a b
   | .refl _ => .refl _
   | .step s p => .step (.fwd s) p.toSym
 
 /-- Theorem 8: R1 add/remove is symmetric. -/
-def r1_sym (pre suf : KnotDiagram) (c : Crossing) :
+noncomputable def r1_sym (pre suf : KnotDiagram) (c : Crossing) :
     KnotPathSym (pre ++ suf) (pre ++ [c] ++ suf) :=
   .step (.fwd (ReidemeisterStep.r1_add pre suf c)) (.refl _)
 
 /-- Theorem 9: R2 round-trip gives reflexive symmetric path. -/
-def r2_roundtrip (pre suf : KnotDiagram) (c₁ c₂ : Crossing)
+noncomputable def r2_roundtrip (pre suf : KnotDiagram) (c₁ c₂ : Crossing)
     (hopp : c₁.sign ≠ c₂.sign) :
     KnotPathSym (pre ++ suf) (pre ++ suf) :=
   let add := KnotPathSym.step
@@ -126,7 +126,7 @@ def r2_roundtrip (pre suf : KnotDiagram) (c₁ c₂ : Crossing)
   add.trans rem
 
 /-- Theorem 10: Symmetric path length. -/
-def KnotPathSym.length : KnotPathSym a b → Nat
+noncomputable def KnotPathSym.length : KnotPathSym a b → Nat
   | .refl _ => 0
   | .step _ p => 1 + p.length
 
@@ -135,7 +135,7 @@ def KnotPathSym.length : KnotPathSym a b → Nat
 -- ============================================================================
 
 /-- Theorem 11: congrArg — prepending preserves Reidemeister steps. -/
-def ReidemeisterStep.congrArg_prepend (pfx : KnotDiagram) :
+noncomputable def ReidemeisterStep.congrArg_prepend (pfx : KnotDiagram) :
     ReidemeisterStep a b → ReidemeisterStep (pfx ++ a) (pfx ++ b)
   | .r1_add pre suf c => by
     rw [show pfx ++ (pre ++ suf) = (pfx ++ pre) ++ suf from by simp [List.append_assoc]]
@@ -159,13 +159,13 @@ def ReidemeisterStep.congrArg_prepend (pfx : KnotDiagram) :
     exact ReidemeisterStep.r3_slide (pfx ++ pre) suf a b c
 
 /-- Theorem 12: congrArg — prepending preserves knot paths. -/
-def KnotPath.congrArg_prepend (pfx : KnotDiagram) :
+noncomputable def KnotPath.congrArg_prepend (pfx : KnotDiagram) :
     KnotPath a b → KnotPath (pfx ++ a) (pfx ++ b)
   | .refl _ => .refl _
   | .step s p => .step (s.congrArg_prepend pfx) (p.congrArg_prepend pfx)
 
 /-- Theorem 13: congrArg — appending suffix preserves Reidemeister steps. -/
-def ReidemeisterStep.congrArg_append (sfx : KnotDiagram) :
+noncomputable def ReidemeisterStep.congrArg_append (sfx : KnotDiagram) :
     ReidemeisterStep a b → ReidemeisterStep (a ++ sfx) (b ++ sfx)
   | .r1_add pre suf c => by
     rw [show (pre ++ suf) ++ sfx = pre ++ (suf ++ sfx) from by simp [List.append_assoc]]
@@ -189,7 +189,7 @@ def ReidemeisterStep.congrArg_append (sfx : KnotDiagram) :
     exact ReidemeisterStep.r3_slide pre (suf ++ sfx) a b c
 
 /-- Theorem 14: congrArg — appending suffix preserves knot paths. -/
-def KnotPath.congrArg_append (sfx : KnotDiagram) :
+noncomputable def KnotPath.congrArg_append (sfx : KnotDiagram) :
     KnotPath a b → KnotPath (a ++ sfx) (b ++ sfx)
   | .refl _ => .refl _
   | .step s p => .step (s.congrArg_append sfx) (p.congrArg_append sfx)
@@ -198,7 +198,7 @@ def KnotPath.congrArg_append (sfx : KnotDiagram) :
 -- §6  Crossing Number
 -- ============================================================================
 
-def crossingNumber (d : KnotDiagram) : Nat := d.length
+noncomputable def crossingNumber (d : KnotDiagram) : Nat := d.length
 
 /-- Theorem 15: Unknot has crossing number 0. -/
 theorem crossingNumber_unknot : crossingNumber unknot = 0 := rfl
@@ -222,12 +222,12 @@ theorem crossingNumber_r3 (pre suf : KnotDiagram) (a b c : Crossing) :
 -- §7  Writhe
 -- ============================================================================
 
-def crossingValue (c : Crossing) : Int :=
+noncomputable def crossingValue (c : Crossing) : Int :=
   match c.sign with
   | .pos => 1
   | .neg => -1
 
-def writhe (d : KnotDiagram) : Int :=
+noncomputable def writhe (d : KnotDiagram) : Int :=
   (d.map crossingValue).foldl (· + ·) 0
 
 /-- Theorem 19: Writhe of the unknot is 0. -/
@@ -247,7 +247,7 @@ theorem writhe_single_neg (id : Nat) :
 -- §8  Knot Invariant Predicate via Paths
 -- ============================================================================
 
-def IsReidemeisterInvariant (f : KnotDiagram → α) : Prop :=
+noncomputable def IsReidemeisterInvariant (f : KnotDiagram → α) : Prop :=
   ∀ d₁ d₂, ReidemeisterStep d₁ d₂ → f d₁ = f d₂
 
 /-- Theorem 22: An R-invariant is constant along paths (transport). -/
@@ -304,12 +304,12 @@ inductive BraidPath : BraidWord → BraidWord → Type where
   | step {a b c} : BraidStep a b → BraidPath b c → BraidPath a c
 
 /-- Theorem 25: Transitivity of braid paths. -/
-def BraidPath.trans : BraidPath a b → BraidPath b c → BraidPath a c
+noncomputable def BraidPath.trans : BraidPath a b → BraidPath b c → BraidPath a c
   | .refl _, q => q
   | .step s p, q => .step s (p.trans q)
 
 /-- Theorem 26: Single braid step lifts to path. -/
-def BraidPath.single (s : BraidStep a b) : BraidPath a b :=
+noncomputable def BraidPath.single (s : BraidStep a b) : BraidPath a b :=
   .step s (.refl b)
 
 /-- Theorem 27: Cancel reduces braid length by 2. -/
@@ -336,13 +336,13 @@ inductive MarkovPath : BraidWord → BraidWord → Type where
   | markov_step {a b c} : MarkovStep a b → MarkovPath b c → MarkovPath a c
 
 /-- Theorem 28: Transitivity of Markov paths. -/
-def MarkovPath.trans : MarkovPath a b → MarkovPath b c → MarkovPath a c
+noncomputable def MarkovPath.trans : MarkovPath a b → MarkovPath b c → MarkovPath a c
   | .refl _, q => q
   | .braid_step s p, q => .braid_step s (p.trans q)
   | .markov_step s p, q => .markov_step s (p.trans q)
 
 /-- Theorem 29: Braid path lifts to Markov path. -/
-def BraidPath.toMarkov : BraidPath a b → MarkovPath a b
+noncomputable def BraidPath.toMarkov : BraidPath a b → MarkovPath a b
   | .refl _ => .refl _
   | .step s p => .braid_step s p.toMarkov
 
@@ -356,7 +356,7 @@ structure BracketVal where
   loops  : Nat
 deriving DecidableEq, Repr
 
-def BracketVal.add (v₁ v₂ : BracketVal) : BracketVal :=
+noncomputable def BracketVal.add (v₁ v₂ : BracketVal) : BracketVal :=
   ⟨v₁.coeffA + v₂.coeffA, v₁.coeffB + v₂.coeffB, v₁.loops + v₂.loops⟩
 
 /-- Theorem 30: Bracket addition is commutative. -/
@@ -370,7 +370,7 @@ theorem BracketVal.add_assoc (v₁ v₂ v₃ : BracketVal) :
   simp [BracketVal.add, Int.add_assoc, Nat.add_assoc]
 
 /-- Zero bracket. -/
-def BracketVal.zero : BracketVal := ⟨0, 0, 0⟩
+noncomputable def BracketVal.zero : BracketVal := ⟨0, 0, 0⟩
 
 /-- Theorem 32: Zero is left identity for bracket addition. -/
 theorem BracketVal.zero_add (v : BracketVal) : BracketVal.zero.add v = v := by
@@ -385,7 +385,7 @@ theorem BracketVal.add_zero (v : BracketVal) : v.add BracketVal.zero = v := by
 -- ============================================================================
 
 /-- Theorem 34: R3 is a cyclic slide — applying it 3 times returns to start. -/
-def r3_cyclic (pre suf : KnotDiagram) (a b c : Crossing) :
+noncomputable def r3_cyclic (pre suf : KnotDiagram) (a b c : Crossing) :
     KnotPath (pre ++ [a, b, c] ++ suf) (pre ++ [a, b, c] ++ suf) :=
   let s1 := KnotPath.single (ReidemeisterStep.r3_slide pre suf a b c)
   let s2 := KnotPath.single (ReidemeisterStep.r3_slide pre suf b c a)
@@ -411,7 +411,7 @@ theorem r3_cyclic_length (pre suf : KnotDiagram) (a b c : Crossing) :
 -- §14  Connected Sum
 -- ============================================================================
 
-def connectedSum (d₁ d₂ : KnotDiagram) : KnotDiagram := d₁ ++ d₂
+noncomputable def connectedSum (d₁ d₂ : KnotDiagram) : KnotDiagram := d₁ ++ d₂
 
 /-- Theorem 38: Connected sum with unknot (left identity). -/
 theorem connectedSum_unknot_left (d : KnotDiagram) :
@@ -427,17 +427,17 @@ theorem connectedSum_assoc (d₁ d₂ d₃ : KnotDiagram) :
   simp [connectedSum, List.append_assoc]
 
 /-- Theorem 41: Paths compose through connected sum (left congrArg). -/
-def connectedSum_congrArg_left (d₂ : KnotDiagram) (p : KnotPath d₁ d₁') :
+noncomputable def connectedSum_congrArg_left (d₂ : KnotDiagram) (p : KnotPath d₁ d₁') :
     KnotPath (connectedSum d₁ d₂) (connectedSum d₁' d₂) :=
   show KnotPath (d₁ ++ d₂) (d₁' ++ d₂) from p.congrArg_append d₂
 
 /-- Theorem 42: Paths compose through connected sum (right congrArg). -/
-def connectedSum_congrArg_right (d₁ : KnotDiagram) (p : KnotPath d₂ d₂') :
+noncomputable def connectedSum_congrArg_right (d₁ : KnotDiagram) (p : KnotPath d₂ d₂') :
     KnotPath (connectedSum d₁ d₂) (connectedSum d₁ d₂') :=
   show KnotPath (d₁ ++ d₂) (d₁ ++ d₂') from p.congrArg_prepend d₁
 
 /-- Theorem 43: Both sides compose via trans. -/
-def connectedSum_congrArg_both (p₁ : KnotPath d₁ d₁') (p₂ : KnotPath d₂ d₂') :
+noncomputable def connectedSum_congrArg_both (p₁ : KnotPath d₁ d₁') (p₂ : KnotPath d₂ d₂') :
     KnotPath (connectedSum d₁ d₂) (connectedSum d₁' d₂') :=
   (connectedSum_congrArg_left d₂ p₁).trans (connectedSum_congrArg_right d₁' p₂)
 
@@ -461,7 +461,7 @@ theorem crossingNumber_connectedSum (d₁ d₂ : KnotDiagram) :
 -- §16  Braid Closure
 -- ============================================================================
 
-def braidClosure : BraidWord → KnotDiagram
+noncomputable def braidClosure : BraidWord → KnotDiagram
   | [] => []
   | (.sigma n) :: rest => ⟨n, .pos⟩ :: braidClosure rest
   | (.sigmaInv n) :: rest => ⟨n, .neg⟩ :: braidClosure rest
@@ -494,12 +494,12 @@ structure LocalConfluence where
   path2 : KnotPath target2 join
 
 /-- Theorem 48: Confluence witness yields a diamond path via trans. -/
-def confluence_diamond (lc : LocalConfluence) :
+noncomputable def confluence_diamond (lc : LocalConfluence) :
     KnotPath lc.source lc.join :=
   (KnotPath.single lc.step1).trans lc.path1
 
 /-- Theorem 49: Alternative diamond side via trans. -/
-def confluence_diamond_alt (lc : LocalConfluence) :
+noncomputable def confluence_diamond_alt (lc : LocalConfluence) :
     KnotPath lc.source lc.join :=
   (KnotPath.single lc.step2).trans lc.path2
 
@@ -509,13 +509,13 @@ def confluence_diamond_alt (lc : LocalConfluence) :
 
 abbrev JonesPoly := List (Int × Int)
 
-def JonesPoly.eval (p : JonesPoly) (t : Int) : Int :=
+noncomputable def JonesPoly.eval (p : JonesPoly) (t : Int) : Int :=
   p.foldl (fun acc (c, e) => acc + c * t ^ e.toNat) 0
 
 /-- Theorem 50: Empty polynomial evaluates to 0. -/
 theorem JonesPoly.eval_empty (t : Int) : JonesPoly.eval [] t = 0 := rfl
 
-def jonesUnknot : JonesPoly := [(1, 0)]
+noncomputable def jonesUnknot : JonesPoly := [(1, 0)]
 
 /-- Theorem 51: Jones polynomial of unknot at any t is 1. -/
 theorem jones_unknot_eval (t : Int) : JonesPoly.eval jonesUnknot t = 1 := by
@@ -526,7 +526,7 @@ theorem jones_unknot_eval (t : Int) : JonesPoly.eval jonesUnknot t = 1 := by
 -- ============================================================================
 
 /-- Theorem 52: R1-remove then R1-add gives a loop path. -/
-def r1_remove_add_loop (pre suf : KnotDiagram) (c : Crossing) :
+noncomputable def r1_remove_add_loop (pre suf : KnotDiagram) (c : Crossing) :
     KnotPath (pre ++ [c] ++ suf) (pre ++ [c] ++ suf) :=
   .step (ReidemeisterStep.r1_remove pre suf c)
     (.step (ReidemeisterStep.r1_add pre suf c) (.refl _))

@@ -78,7 +78,7 @@ structure TriangleMorphism {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
 namespace TriangleMorphism
 
 /-- Identity morphism of a triangle. -/
-def id {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
+noncomputable def id {C : PreAdditiveCategory.{u}} {T : ShiftFunctor C}
     (Tr : Triangle C T) : TriangleMorphism Tr Tr where
   f_map := C.id Tr.X
   g_map := C.id Tr.Y

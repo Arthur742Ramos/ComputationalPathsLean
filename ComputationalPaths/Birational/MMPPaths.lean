@@ -34,14 +34,14 @@ namespace MMPPathData
 variable {X : Type u} (M : MMPPathData X)
 
 /-- Apply one elementary MMP move to a birational model. -/
-def applyMove (m : Move) (x : X) : X :=
+noncomputable def applyMove (m : Move) (x : X) : X :=
   match m with
   | Move.flip => M.birational.flip x
   | Move.flop => M.birational.flop x
   | Move.contract => M.contract x
 
 /-- Canonical path associated to a single MMP move. -/
-def moveCanonicalPath (m : Move) (x : X) :
+noncomputable def moveCanonicalPath (m : Move) (x : X) :
     Path (M.birational.canonical (M.applyMove m x)) (M.birational.canonical x) := by
   cases m with
   | flip =>
@@ -52,7 +52,7 @@ def moveCanonicalPath (m : Move) (x : X) :
       simpa [applyMove] using (M.contractPath x)
 
 /-- Canonical path associated to two consecutive MMP moves. -/
-def twoStepCanonicalPath (m₁ m₂ : Move) (x : X) :
+noncomputable def twoStepCanonicalPath (m₁ m₂ : Move) (x : X) :
     Path
       (M.birational.canonical (M.applyMove m₁ (M.applyMove m₂ x)))
       (M.birational.canonical x) :=
@@ -75,7 +75,7 @@ noncomputable def moveCancelLeft (m : Move) (x : X) :
   rweq_cmpA_inv_left (M.moveCanonicalPath m x)
 
 /-- Path for the standard `flip` then `flop` segment of an MMP run. -/
-def flipThenFlopPath (x : X) :
+noncomputable def flipThenFlopPath (x : X) :
     Path (M.birational.canonical (M.birational.flip (M.birational.flop x)))
       (M.birational.canonical x) :=
   M.twoStepCanonicalPath Move.flip Move.flop x

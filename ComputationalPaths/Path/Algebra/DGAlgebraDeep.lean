@@ -125,19 +125,19 @@ inductive DGAPath : DGAExpr → DGAExpr → Type where
 
 namespace DGAPath
 
-def trans : DGAPath a b → DGAPath b c → DGAPath a c
+noncomputable def trans : DGAPath a b → DGAPath b c → DGAPath a c
   | .nil _, q => q
   | .cons s p, q => .cons s (trans p q)
 
-def symm : DGAPath a b → DGAPath b a
+noncomputable def symm : DGAPath a b → DGAPath b a
   | .nil _ => .nil _
   | .cons s p => (symm p).trans (.cons (.symm s) (.nil _))
 
-def congrArg (f : DGAExpr → DGAExpr) : DGAPath a b → DGAPath (f a) (f b)
+noncomputable def congrArg (f : DGAExpr → DGAExpr) : DGAPath a b → DGAPath (f a) (f b)
   | .nil _ => .nil _
   | .cons s p => .cons (.congrArg f s) (congrArg f p)
 
-def length : DGAPath a b → Nat
+noncomputable def length : DGAPath a b → Nat
   | .nil _ => 0
   | .cons _ p => 1 + p.length
 
@@ -147,25 +147,25 @@ def length : DGAPath a b → Nat
 
 -- === 1. d²=0 and Leibniz ===
 
-def d_squared_zero_path (x : DGAExpr) :
+noncomputable def d_squared_zero_path (x : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.diff x)) DGAExpr.zero :=
   .cons .d_squared_zero (.nil _)
 
-def leibniz_rule_path (x y : DGAExpr) :
+noncomputable def leibniz_rule_path (x y : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.mul x y))
             (DGAExpr.add (DGAExpr.mul (DGAExpr.diff x) y)
                          (DGAExpr.mul x (DGAExpr.diff y))) :=
   .cons .leibniz (.nil _)
 
-def graded_comm_path (x y : DGAExpr) :
+noncomputable def graded_comm_path (x y : DGAExpr) :
     DGAPath (DGAExpr.mul x y) (DGAExpr.mul y x) :=
   .cons .graded_comm (.nil _)
 
-def graded_comm_involutive (x y : DGAExpr) :
+noncomputable def graded_comm_involutive (x y : DGAExpr) :
     DGAPath (DGAExpr.mul x y) (DGAExpr.mul x y) :=
   .cons .graded_comm (.cons .graded_comm (.nil _))
 
-def d_leibniz_chain (x y : DGAExpr) :
+noncomputable def d_leibniz_chain (x y : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.diff (DGAExpr.mul x y)))
             (DGAExpr.diff (DGAExpr.add (DGAExpr.mul (DGAExpr.diff x) y)
                                        (DGAExpr.mul x (DGAExpr.diff y)))) :=
@@ -173,37 +173,37 @@ def d_leibniz_chain (x y : DGAExpr) :
 
 -- === 2. Algebra axioms ===
 
-def mul_assoc_path :
+noncomputable def mul_assoc_path :
     DGAPath (DGAExpr.mul (DGAExpr.mul a b) c)
             (DGAExpr.mul a (DGAExpr.mul b c)) :=
   .cons .mul_assoc (.nil _)
 
-def add_comm_path :
+noncomputable def add_comm_path :
     DGAPath (DGAExpr.add a b) (DGAExpr.add b a) :=
   .cons .add_comm (.nil _)
 
-def left_distrib_path :
+noncomputable def left_distrib_path :
     DGAPath (DGAExpr.mul a (DGAExpr.add b c))
             (DGAExpr.add (DGAExpr.mul a b) (DGAExpr.mul a c)) :=
   .cons .left_distrib (.nil _)
 
-def add_neg_path :
+noncomputable def add_neg_path :
     DGAPath (DGAExpr.add a (DGAExpr.neg a)) DGAExpr.zero :=
   .cons .add_neg (.nil _)
 
 -- === 3. DG-modules ===
 
-def mod_diff_squared_path (m : DGAExpr) :
+noncomputable def mod_diff_squared_path (m : DGAExpr) :
     DGAPath (DGAExpr.modDiff (DGAExpr.modDiff m)) DGAExpr.zero :=
   .cons .mod_diff_squared (.nil _)
 
-def mod_leibniz_path (a m : DGAExpr) :
+noncomputable def mod_leibniz_path (a m : DGAExpr) :
     DGAPath (DGAExpr.modDiff (DGAExpr.modAction a m))
             (DGAExpr.add (DGAExpr.modAction (DGAExpr.diff a) m)
                          (DGAExpr.modAction a (DGAExpr.modDiff m))) :=
   .cons .mod_leibniz (.nil _)
 
-def mod_diff_compat_chain (a m : DGAExpr) :
+noncomputable def mod_diff_compat_chain (a m : DGAExpr) :
     DGAPath (DGAExpr.modDiff (DGAExpr.modDiff (DGAExpr.modAction a m)))
             (DGAExpr.modDiff (DGAExpr.add (DGAExpr.modAction (DGAExpr.diff a) m)
                                           (DGAExpr.modAction a (DGAExpr.modDiff m)))) :=
@@ -211,96 +211,96 @@ def mod_diff_compat_chain (a m : DGAExpr) :
 
 -- === 4. Derived tensor product ===
 
-def derived_tensor_assoc_path :
+noncomputable def derived_tensor_assoc_path :
     DGAPath (DGAExpr.derivedTensor (DGAExpr.derivedTensor a b) c)
             (DGAExpr.derivedTensor a (DGAExpr.derivedTensor b c)) :=
   .cons .derived_tensor_assoc (.nil _)
 
-def derived_tensor_unit_path :
+noncomputable def derived_tensor_unit_path :
     DGAPath (DGAExpr.derivedTensor a DGAExpr.one) a :=
   .cons .derived_tensor_unit (.nil _)
 
 -- === 5. Koszul duality ===
 
-def koszul_self_dual_path (a : DGAExpr) :
+noncomputable def koszul_self_dual_path (a : DGAExpr) :
     DGAPath (DGAExpr.koszulDual (DGAExpr.koszulDual a)) a :=
   .cons .koszul_self_dual (.nil _)
 
-def koszul_bar_path (a : DGAExpr) :
+noncomputable def koszul_bar_path (a : DGAExpr) :
     DGAPath (DGAExpr.koszulDual a) (DGAExpr.bar a) :=
   .cons .koszul_bar_equiv (.nil _)
 
-def koszul_resolution_path (a : DGAExpr) :
+noncomputable def koszul_resolution_path (a : DGAExpr) :
     DGAPath (DGAExpr.koszulComplex a)
             (DGAExpr.quasiIso (DGAExpr.koszulComplex a) a) :=
   .cons .koszul_resolution (.nil _)
 
 -- Koszul dual → bar → cobar → quasi-iso chain
-def koszul_bar_cobar_chain (a : DGAExpr) :
+noncomputable def koszul_bar_cobar_chain (a : DGAExpr) :
     DGAPath (DGAExpr.cobar (DGAExpr.koszulDual a))
             (DGAExpr.cobar (DGAExpr.bar a)) :=
   .cons (.congrArg DGAExpr.cobar .koszul_bar_equiv) (.nil _)
 
 -- === 6. A∞ structure ===
 
-def a_inf_m1_is_diff_path (x : DGAExpr) :
+noncomputable def a_inf_m1_is_diff_path (x : DGAExpr) :
     DGAPath (DGAExpr.aInfM 1 [x]) (DGAExpr.diff x) :=
   .cons .a_inf_m1_is_diff (.nil _)
 
-def a_inf_m2_is_mul_path (x y : DGAExpr) :
+noncomputable def a_inf_m2_is_mul_path (x y : DGAExpr) :
     DGAPath (DGAExpr.aInfM 2 [x, y]) (DGAExpr.mul x y) :=
   .cons .a_inf_m2_is_mul (.nil _)
 
-def a_inf_m1_squared_zero (x : DGAExpr) :
+noncomputable def a_inf_m1_squared_zero (x : DGAExpr) :
     DGAPath (DGAExpr.aInfM 1 [DGAExpr.aInfM 1 [x]]) DGAExpr.zero :=
   .cons (.congrArg (DGAExpr.aInfM 1 [·]) .a_inf_m1_is_diff)
     (.cons .a_inf_m1_is_diff
       (.cons .d_squared_zero (.nil _)))
 
-def a_inf_m2_comm (x y : DGAExpr) :
+noncomputable def a_inf_m2_comm (x y : DGAExpr) :
     DGAPath (DGAExpr.aInfM 2 [x, y]) (DGAExpr.mul y x) :=
   .cons .a_inf_m2_is_mul (.cons .graded_comm (.nil _))
 
 -- === 7. Bar/cobar constructions ===
 
-def bar_cobar_equivalence (a : DGAExpr) :
+noncomputable def bar_cobar_equivalence (a : DGAExpr) :
     DGAPath (DGAExpr.cobar (DGAExpr.bar a))
             (DGAExpr.quasiIso (DGAExpr.cobar (DGAExpr.bar a)) a) :=
   .cons .bar_cobar_equiv (.nil _)
 
-def bar_diff_path (a : DGAExpr) :
+noncomputable def bar_diff_path (a : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.bar a)) (DGAExpr.bar (DGAExpr.diff a)) :=
   .cons .bar_diff (.nil _)
 
-def cobar_diff_path (c : DGAExpr) :
+noncomputable def cobar_diff_path (c : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.cobar c)) (DGAExpr.cobar (DGAExpr.diff c)) :=
   .cons .cobar_diff (.nil _)
 
-def bar_d_squared (a : DGAExpr) :
+noncomputable def bar_d_squared (a : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.diff (DGAExpr.bar a))) DGAExpr.zero :=
   .cons .d_squared_zero (.nil _)
 
 -- === 8. Formality ===
 
-def formality_path (a : DGAExpr) :
+noncomputable def formality_path (a : DGAExpr) :
     DGAPath (DGAExpr.formalSpace a)
             (DGAExpr.quasiIso a (DGAExpr.cohomology a)) :=
   .cons .formality (.nil _)
 
-def formality_congrArg (a : DGAExpr) (f : DGAExpr → DGAExpr) :
+noncomputable def formality_congrArg (a : DGAExpr) (f : DGAExpr → DGAExpr) :
     DGAPath (f (DGAExpr.formalSpace a))
             (f (DGAExpr.quasiIso a (DGAExpr.cohomology a))) :=
   (formality_path a).congrArg f
 
 -- === 9. Massey products ===
 
-def massey_indeterminacy_path (a b c : DGAExpr) :
+noncomputable def massey_indeterminacy_path (a b c : DGAExpr) :
     DGAPath (DGAExpr.massey a b c)
             (DGAExpr.add (DGAExpr.massey a b c)
                          (DGAExpr.indeterminacy (DGAExpr.massey a b c))) :=
   .cons .massey_indeterminacy (.nil _)
 
-def massey_indeterminacy_congrArg (a b c : DGAExpr) (f : DGAExpr → DGAExpr) :
+noncomputable def massey_indeterminacy_congrArg (a b c : DGAExpr) (f : DGAExpr → DGAExpr) :
     DGAPath (f (DGAExpr.massey a b c))
             (f (DGAExpr.add (DGAExpr.massey a b c)
                             (DGAExpr.indeterminacy (DGAExpr.massey a b c)))) :=
@@ -308,37 +308,37 @@ def massey_indeterminacy_congrArg (a b c : DGAExpr) (f : DGAExpr → DGAExpr) :
 
 -- === 10. Minimal models ===
 
-def minimal_model_exists_path (a : DGAExpr) :
+noncomputable def minimal_model_exists_path (a : DGAExpr) :
     DGAPath a (DGAExpr.quasiIso (DGAExpr.minimalModel a) a) :=
   .cons .minimal_exists (.nil _)
 
-def minimal_diff_decomposable_path (a : DGAExpr) :
+noncomputable def minimal_diff_decomposable_path (a : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.minimalModel a))
             (DGAExpr.mul (DGAExpr.minimalModel a) (DGAExpr.minimalModel a)) :=
   .cons .minimal_diff_decomposable (.nil _)
 
-def minimal_model_formal_chain (a : DGAExpr) :
+noncomputable def minimal_model_formal_chain (a : DGAExpr) :
     DGAPath (DGAExpr.formalSpace a)
             (DGAExpr.quasiIso a (DGAExpr.cohomology a)) :=
   .cons .formality (.nil _)
 
 -- === 11. Sullivan models / rational homotopy ===
 
-def sullivan_model_path (x : DGAExpr) :
+noncomputable def sullivan_model_path (x : DGAExpr) :
     DGAPath (DGAExpr.rationalType x)
             (DGAExpr.spatial (DGAExpr.sullivanModel x)) :=
   .cons .sullivan_model_exists (.nil _)
 
-def sullivan_spatial_adjunction_path (a : DGAExpr) :
+noncomputable def sullivan_spatial_adjunction_path (a : DGAExpr) :
     DGAPath (DGAExpr.sullivanModel (DGAExpr.spatial a)) a :=
   .cons .sullivan_spatial_adjunction (.nil _)
 
-def sullivan_rational_equiv_path (x : DGAExpr) :
+noncomputable def sullivan_rational_equiv_path (x : DGAExpr) :
     DGAPath (DGAExpr.spatial (DGAExpr.sullivanModel x))
             (DGAExpr.rationalType x) :=
   .cons .sullivan_rational_equiv (.nil _)
 
-def sullivan_roundtrip (x : DGAExpr) :
+noncomputable def sullivan_roundtrip (x : DGAExpr) :
     DGAPath (DGAExpr.rationalType x) (DGAExpr.rationalType x) :=
   .cons .sullivan_model_exists
     (.cons .sullivan_rational_equiv (.nil _))
@@ -346,7 +346,7 @@ def sullivan_roundtrip (x : DGAExpr) :
 -- === 12. Deep cross-cutting ===
 
 -- Leibniz + graded commutativity chain
-def leibniz_comm_chain (x y : DGAExpr) :
+noncomputable def leibniz_comm_chain (x y : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.mul x y))
             (DGAExpr.add (DGAExpr.mul y (DGAExpr.diff x))
                          (DGAExpr.mul (DGAExpr.diff y) x)) :=
@@ -355,35 +355,35 @@ def leibniz_comm_chain (x y : DGAExpr) :
       (.cons (.congrArg (DGAExpr.add _) .graded_comm) (.nil _)))
 
 -- A∞ m1 → diff → d²=0
-def ainf_d_squared_chain (x : DGAExpr) :
+noncomputable def ainf_d_squared_chain (x : DGAExpr) :
     DGAPath (DGAExpr.aInfM 1 [DGAExpr.aInfM 1 [x]]) DGAExpr.zero :=
   .cons (.congrArg (DGAExpr.aInfM 1 [·]) .a_inf_m1_is_diff)
     (.cons .a_inf_m1_is_diff
       (.cons .d_squared_zero (.nil _)))
 
 -- Cocycle → cohomology chain
-def cocycle_to_cohomology (x : DGAExpr) :
+noncomputable def cocycle_to_cohomology (x : DGAExpr) :
     DGAPath (DGAExpr.cocycle x) (DGAExpr.cohomology x) :=
   .cons .cocycle_represents (.nil _)
 
 -- Cocycle has zero differential
-def cocycle_diff_zero (x : DGAExpr) :
+noncomputable def cocycle_diff_zero (x : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.cocycle x)) DGAExpr.zero :=
   .cons .cohomology_of_cocycle (.nil _)
 
 -- Sullivan + minimal chain
-def sullivan_minimal_chain (x : DGAExpr) :
+noncomputable def sullivan_minimal_chain (x : DGAExpr) :
     DGAPath (DGAExpr.rationalType x)
             (DGAExpr.spatial (DGAExpr.sullivanModel x)) :=
   .cons .sullivan_model_exists (.nil _)
 
 -- Bar preserves d²=0
-def bar_d_squared_chain (a : DGAExpr) :
+noncomputable def bar_d_squared_chain (a : DGAExpr) :
     DGAPath (DGAExpr.diff (DGAExpr.diff (DGAExpr.bar a))) DGAExpr.zero :=
   .cons .d_squared_zero (.nil _)
 
 -- Koszul dual is quasi-iso to bar
-def koszul_is_bar (a : DGAExpr) :
+noncomputable def koszul_is_bar (a : DGAExpr) :
     DGAPath (DGAExpr.koszulDual a) (DGAExpr.bar a) :=
   .cons .koszul_bar_equiv (.nil _)
 

@@ -40,7 +40,7 @@ universe u
 abbrev StableStem (_n : Nat) : Type := Unit
 
 /-- Canonical basepoint element in each stable stem. -/
-def stableStemBase (n : Nat) : StableStem n := ()
+noncomputable def stableStemBase (n : Nat) : StableStem n := ()
 
 /-! ## Image of J -/
 
@@ -48,7 +48,7 @@ def stableStemBase (n : Nat) : StableStem n := ()
 abbrev JSource (_n : Nat) : Type := Unit
 
 /-- The J-homomorphism into stable stems (modeled as a constant map). -/
-def jHomomorphism (n : Nat) : JSource n → StableStem n :=
+noncomputable def jHomomorphism (n : Nat) : JSource n → StableStem n :=
   fun _ => stableStemBase n
 
 /-- The image of J in degree n, tagged as stable stem classes. -/
@@ -57,11 +57,11 @@ structure ImageOfJ (n : Nat) where
   elem : StableStem n
 
 /-- The canonical image-of-J element. -/
-def imageOfJBase (n : Nat) : ImageOfJ n :=
+noncomputable def imageOfJBase (n : Nat) : ImageOfJ n :=
   ⟨stableStemBase n⟩
 
 /-- Map from the J-source into the image of J. -/
-def imageOfJMap (n : Nat) : JSource n → ImageOfJ n :=
+noncomputable def imageOfJMap (n : Nat) : JSource n → ImageOfJ n :=
   fun x => ⟨jHomomorphism n x⟩
 
 /-! ## Adams e-invariant -/
@@ -74,20 +74,20 @@ structure AdamsEInvariant (n : Nat) where
   value : Int
 
 /-- The Adams e-invariant (placeholder returning 0). -/
-def adamsEInvariant (n : Nat) (x : StableStem n) : AdamsEInvariant n :=
+noncomputable def adamsEInvariant (n : Nat) (x : StableStem n) : AdamsEInvariant n :=
   { elem := x, value := 0 }
 
 /-- The e-invariant of the base J-image class. -/
-def adamsEInvariantOfJ (n : Nat) : AdamsEInvariant n :=
+noncomputable def adamsEInvariantOfJ (n : Nat) : AdamsEInvariant n :=
   adamsEInvariant n (jHomomorphism n ())
 
 /-! ## Alpha and beta families -/
 
 /-- The stem of the alpha family at index k (odd stems). -/
-def alphaStem (k : Nat) : Nat := 2 * k + 1
+noncomputable def alphaStem (k : Nat) : Nat := 2 * k + 1
 
 /-- The stem of the beta family at index k (even stems). -/
-def betaStem (k : Nat) : Nat := 2 * k + 2
+noncomputable def betaStem (k : Nat) : Nat := 2 * k + 2
 
 /-- The alpha family class at index k. -/
 structure AlphaFamily (k : Nat) where
@@ -100,11 +100,11 @@ structure BetaFamily (k : Nat) where
   elem : StableStem (betaStem k)
 
 /-- Placeholder alpha family element. -/
-def alphaFamily (k : Nat) : AlphaFamily k :=
+noncomputable def alphaFamily (k : Nat) : AlphaFamily k :=
   ⟨stableStemBase (alphaStem k)⟩
 
 /-- Placeholder beta family element. -/
-def betaFamily (k : Nat) : BetaFamily k :=
+noncomputable def betaFamily (k : Nat) : BetaFamily k :=
   ⟨stableStemBase (betaStem k)⟩
 
 /-! ## Chromatic spectral sequence at height 1 -/
@@ -119,13 +119,13 @@ structure ChromaticHeightOneSS (p : ChromaticHomotopy.Prime) where
   converges_to_stem : Type
 
 /-- The trivial height-1 chromatic spectral sequence at prime p. -/
-def trivialHeightOneSS (p : ChromaticHomotopy.Prime) : ChromaticHeightOneSS p where
+noncomputable def trivialHeightOneSS (p : ChromaticHomotopy.Prime) : ChromaticHeightOneSS p where
   E2 := AdamsSpectralSequence.trivialPage 1
   d_squared := inferInstance
   converges_to_stem := Unit
 
 /-- The prime 2, used for examples. -/
-def primeTwo : ChromaticHomotopy.Prime :=
+noncomputable def primeTwo : ChromaticHomotopy.Prime :=
   { val := 2, gt_one := by decide }
 
 
@@ -145,7 +145,7 @@ theorem adamsEInvariant_value (n : Nat) (x : StableStem n) :
 
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 

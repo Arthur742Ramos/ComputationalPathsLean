@@ -29,22 +29,22 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _ => 0
   | .cons _ p => 1 + p.length
 
@@ -119,9 +119,9 @@ theorem length_symm (p : Path α a b) : p.symm.length = p.length := by
 structure Hom (α : Type) (a b : α) where
   path : Path α a b
 
-def Hom.id (a : α) : Hom α a a := ⟨Path.nil a⟩
+noncomputable def Hom.id (a : α) : Hom α a a := ⟨Path.nil a⟩
 
-def Hom.comp (f : Hom α a b) (g : Hom α b c) : Hom α a c :=
+noncomputable def Hom.comp (f : Hom α a b) (g : Hom α b c) : Hom α a c :=
   ⟨f.path.trans g.path⟩
 
 /-- Theorem 11 -/
@@ -147,7 +147,7 @@ structure PathFunctor (α β : Type) where
   mapObj : α → β
   mapStep : {a b : α} → Step α a b → Step β (mapObj a) (mapObj b)
 
-def PathFunctor.mapPath (F : PathFunctor α β) :
+noncomputable def PathFunctor.mapPath (F : PathFunctor α β) :
     Path α a b → Path β (F.mapObj a) (F.mapObj b)
   | .nil a => .nil (F.mapObj a)
   | .cons s p => .cons (F.mapStep s) (F.mapPath p)
@@ -180,7 +180,7 @@ theorem functor_preserves_single (F : PathFunctor α β) (s : Step α a b) :
 -- §6  Identity and Composition of Functors
 -- ============================================================
 
-def PathFunctor.idFunctor (α : Type) : PathFunctor α α where
+noncomputable def PathFunctor.idFunctor (α : Type) : PathFunctor α α where
   mapObj := id
   mapStep := id
 
@@ -193,7 +193,7 @@ theorem idFunctor_mapPath (p : Path α a b) :
     simp [PathFunctor.mapPath, PathFunctor.idFunctor]
     exact ih
 
-def PathFunctor.comp (F : PathFunctor α β) (G : PathFunctor β γ) :
+noncomputable def PathFunctor.comp (F : PathFunctor α β) (G : PathFunctor β γ) :
     PathFunctor α γ where
   mapObj := G.mapObj ∘ F.mapObj
   mapStep := fun s => G.mapStep (F.mapStep s)
@@ -219,7 +219,7 @@ structure PathNatTrans (F G : PathFunctor α β) where
     Path.trans (component a) (G.mapPath (Path.single s))
 
 /-- Theorem 20 -/
-def PathNatTrans.idNat (F : PathFunctor α β) : PathNatTrans F F where
+noncomputable def PathNatTrans.idNat (F : PathFunctor α β) : PathNatTrans F F where
   component := fun a => Path.nil (F.mapObj a)
   naturality := fun {a b} s => by
     simp [Path.trans, PathFunctor.mapPath, Path.single, trans_nil_right]
@@ -242,13 +242,13 @@ theorem natTrans_vcomp_id_right_component {F G : PathFunctor α β}
 -- §8  Whiskering
 -- ============================================================
 
-def whiskerLeft' {α β : Type} {F G : PathFunctor α β}
+noncomputable def whiskerLeft' {α β : Type} {F G : PathFunctor α β}
     (a : α) {x : β}
     (p : Path β x (F.mapObj a)) (η : PathNatTrans F G) :
     Path β x (G.mapObj a) :=
   Path.trans p (η.component a)
 
-def whiskerRight' {α β : Type} {F G : PathFunctor α β}
+noncomputable def whiskerRight' {α β : Type} {F G : PathFunctor α β}
     (a : α) (η : PathNatTrans F G) {y : β}
     (p : Path β (G.mapObj a) y) :
     Path β (F.mapObj a) y :=
@@ -280,7 +280,7 @@ theorem whiskerLeft_trans' {α β : Type} {F G : PathFunctor α β}
 -- §9  Constant Functor
 -- ============================================================
 
-def PathFunctor.const (α : Type) (b : β) : PathFunctor α β where
+noncomputable def PathFunctor.const (α : Type) (b : β) : PathFunctor α β where
   mapObj := fun _ => b
   mapStep := fun _ => Step.refl b
 
@@ -300,14 +300,14 @@ theorem const_functor_length (b : β) (p : Path α a c) :
 structure PathCat (α : Type) where
   carrier : α
 
-def PathCat.hom (a b : PathCat α) := Path α a.carrier b.carrier
+noncomputable def PathCat.hom (a b : PathCat α) := Path α a.carrier b.carrier
 
 /-- Theorem 27 -/
-def PathCat.idMor (a : PathCat α) : PathCat.hom a a :=
+noncomputable def PathCat.idMor (a : PathCat α) : PathCat.hom a a :=
   Path.nil a.carrier
 
 /-- Theorem 28 -/
-def PathCat.compMor {a b c : PathCat α}
+noncomputable def PathCat.compMor {a b c : PathCat α}
     (f : PathCat.hom a b) (g : PathCat.hom b c) :
     PathCat.hom a c :=
   Path.trans f g
@@ -316,9 +316,9 @@ def PathCat.compMor {a b c : PathCat α}
 -- §11  Yoneda for Paths
 -- ============================================================
 
-def yonedaObj (a : α) (x : α) := Path α a x
+noncomputable def yonedaObj (a : α) (x : α) := Path α a x
 
-def yonedaMap (a : α) {x y : α} (p : Path α x y) :
+noncomputable def yonedaMap (a : α) {x y : α} (p : Path α x y) :
     yonedaObj a x → yonedaObj a y :=
   fun q => Path.trans q p
 
@@ -352,7 +352,7 @@ structure RewriteTranslation (α β : Type) where
   translate : α → β
   ruleMap : {a b : α} → Step α a b → Step β (translate a) (translate b)
 
-def RewriteTranslation.toFunctor (T : RewriteTranslation α β) :
+noncomputable def RewriteTranslation.toFunctor (T : RewriteTranslation α β) :
     PathFunctor α β where
   mapObj := T.translate
   mapStep := T.ruleMap
@@ -376,15 +376,15 @@ structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   eq : p = q
 
 /-- Theorem 35 -/
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
 /-- Theorem 36 -/
-def Cell2.vcomp {p q r : Path α a b}
+noncomputable def Cell2.vcomp {p q r : Path α a b}
     (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.eq.trans τ.eq⟩
 
 /-- Theorem 37 -/
-def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
+noncomputable def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.eq.symm⟩
 
 /-- Theorem 38: Horizontal composition via congrArg on trans. -/

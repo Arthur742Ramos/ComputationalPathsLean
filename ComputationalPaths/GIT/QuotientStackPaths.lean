@@ -74,7 +74,7 @@ noncomputable def atlas_rweq (x : Obj) :
   rweq_of_step (Q.atlasStep x)
 
 /-- Compose two descent moves, corresponding to sequential group actions. -/
-def actionDescentTwoStepPath (g h : Group) (x : Obj) :
+noncomputable def actionDescentTwoStepPath (g h : Group) (x : Obj) :
     Path (Q.quotientMap (Q.action g (Q.action h x))) (Q.quotientMap x) :=
   Path.trans (Q.actionDescentPath g (Q.action h x)) (Q.actionDescentPath h x)
 
@@ -101,7 +101,7 @@ noncomputable def semistable_transport_cancel_rweq (g : Group) (x : Obj) :
 end QuotientStackPathData
 
 /-- Trivial quotient-stack model with canonical Step witnesses. -/
-def trivialQuotientStackPathData : QuotientStackPathData PUnit PUnit where
+noncomputable def trivialQuotientStackPathData : QuotientStackPathData PUnit PUnit where
   action := fun _ _ => PUnit.unit
   quotientMap := fun _ => PUnit.unit
   semistable := fun _ => True

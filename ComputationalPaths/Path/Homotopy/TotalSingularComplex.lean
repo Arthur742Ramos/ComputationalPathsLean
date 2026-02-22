@@ -61,21 +61,21 @@ namespace SingularSimplex
 variable {X : Type u}
 
 /-- The i-th face of a singular (n+1)-simplex: omit vertex i. -/
-def face {n : Nat} (i : Fin (n + 2)) (σ : SingularSimplex X (n + 1)) :
+noncomputable def face {n : Nat} (i : Fin (n + 2)) (σ : SingularSimplex X (n + 1)) :
     SingularSimplex X n where
   toFun := fun j =>
     if j.val < i.val then σ.toFun ⟨j.val, by omega⟩
     else σ.toFun ⟨j.val + 1, by omega⟩
 
 /-- The i-th degeneracy of a singular n-simplex: repeat vertex i. -/
-def degen {n : Nat} (i : Fin (n + 1)) (σ : SingularSimplex X n) :
+noncomputable def degen {n : Nat} (i : Fin (n + 1)) (σ : SingularSimplex X n) :
     SingularSimplex X (n + 1) where
   toFun := fun j =>
     if h : j.val ≤ i.val then σ.toFun ⟨j.val, by omega⟩
     else σ.toFun ⟨j.val - 1, by omega⟩
 
 /-- A constant singular simplex at a point. -/
-def const (x : X) (n : Nat) : SingularSimplex X n where
+noncomputable def const (x : X) (n : Nat) : SingularSimplex X n where
   toFun := fun _ => x
 
 /-- Face of a constant simplex is constant. -/
@@ -85,7 +85,7 @@ theorem face_const (x : X) (n : Nat) (i : Fin (n + 2)) :
   simp [face, const]
 
 /-- `Path`-typed face of constant. -/
-def face_const_path (x : X) (n : Nat) (i : Fin (n + 2)) :
+noncomputable def face_const_path (x : X) (n : Nat) (i : Fin (n + 2)) :
     Path (face i (const x (n + 1))) (const x n) :=
   Path.stepChain (face_const x n i)
 
@@ -96,7 +96,7 @@ theorem degen_const (x : X) (n : Nat) (i : Fin (n + 1)) :
   simp [degen, const]
 
 /-- `Path`-typed degeneracy of constant. -/
-def degen_const_path (x : X) (n : Nat) (i : Fin (n + 1)) :
+noncomputable def degen_const_path (x : X) (n : Nat) (i : Fin (n + 1)) :
     Path (degen i (const x n)) (const x (n + 1)) :=
   Path.stepChain (degen_const x n i)
 
@@ -105,7 +105,7 @@ end SingularSimplex
 /-! ## Singular Complex as a Simplicial Set -/
 
 /-- The singular complex of X as an `SSetData`. -/
-def singularComplex (X : Type u) : SSetData where
+noncomputable def singularComplex (X : Type u) : SSetData where
   obj := fun n => SingularSimplex X n
   face := fun _n i σ => SingularSimplex.face i σ
   degen := fun _n i σ => SingularSimplex.degen i σ
@@ -124,7 +124,7 @@ The key identity for ∂² = 0 is the simplicial identity:
 -/
 
 /-- Signs for the alternating sum boundary: (-1)^i. -/
-def boundarySign (i : Nat) : Int :=
+noncomputable def boundarySign (i : Nat) : Int :=
   if i % 2 = 0 then 1 else -1
 
 /-- The simplicial identity for face maps: d_i ∘ d_j = d_{j+1} ∘ d_i for i ≤ j.
@@ -142,7 +142,7 @@ theorem face_face_identity {X : Type u} {n : Nat}
   split_ifs with h1 h2 h3 h4 <;> congr 1 <;> omega
 
 /-- `Path`-typed face-face identity. -/
-def face_face_path {X : Type u} {n : Nat}
+noncomputable def face_face_path {X : Type u} {n : Nat}
     (σ : SingularSimplex X (n + 2))
     (i j : Nat) (hi : i < n + 2) (hj : j < n + 2) (hij : i ≤ j) :
     Path (SingularSimplex.face ⟨i, by omega⟩
@@ -173,7 +173,7 @@ structure SingularHomologyData (X : Type u) (n : Nat) where
 /-! ## Functoriality of the Singular Complex -/
 
 /-- A map f : X → Y induces a map on singular simplices. -/
-def singularMap {X Y : Type u} (f : X → Y) (n : Nat) :
+noncomputable def singularMap {X Y : Type u} (f : X → Y) (n : Nat) :
     SingularSimplex X n → SingularSimplex Y n :=
   fun σ => { toFun := f ∘ σ.toFun }
 
@@ -187,7 +187,7 @@ theorem singularMap_face {X Y : Type u} (f : X → Y) (n : Nat)
   split_ifs <;> rfl
 
 /-- `Path`-typed functoriality for face maps. -/
-def singularMap_face_path {X Y : Type u} (f : X → Y) (n : Nat)
+noncomputable def singularMap_face_path {X Y : Type u} (f : X → Y) (n : Nat)
     (i : Fin (n + 2)) (σ : SingularSimplex X (n + 1)) :
     Path (singularMap f n (SingularSimplex.face i σ))
          (SingularSimplex.face i (singularMap f (n + 1) σ)) :=
@@ -209,7 +209,7 @@ theorem singularMap_id {X : Type u} (n : Nat) (σ : SingularSimplex X n) :
   simp [singularMap]
 
 /-- `Path`-typed identity. -/
-def singularMap_id_path {X : Type u} (n : Nat) (σ : SingularSimplex X n) :
+noncomputable def singularMap_id_path {X : Type u} (n : Nat) (σ : SingularSimplex X n) :
     Path (singularMap id n σ) σ :=
   Path.stepChain (singularMap_id n σ)
 
@@ -221,7 +221,7 @@ theorem singularMap_comp {X Y Z : Type u} (f : X → Y) (g : Y → Z)
   simp [singularMap, Function.comp]
 
 /-- `Path`-typed composition. -/
-def singularMap_comp_path {X Y Z : Type u} (f : X → Y) (g : Y → Z)
+noncomputable def singularMap_comp_path {X Y Z : Type u} (f : X → Y) (g : Y → Z)
     (n : Nat) (σ : SingularSimplex X n) :
     Path (singularMap g n (singularMap f n σ)) (singularMap (g ∘ f) n σ) :=
   Path.stepChain (singularMap_comp f g n σ)

@@ -34,15 +34,15 @@ structure FGMor (A : Type u) (a b : A) where
   path : Path a b
 
 /-- Identity morphism in the fundamental groupoid -/
-def FGMor.id (A : Type u) (a : A) : FGMor A a a :=
+noncomputable def FGMor.id (A : Type u) (a : A) : FGMor A a a :=
   ⟨Path.refl a⟩
 
 /-- Composition of morphisms (path transitivity) -/
-def FGMor.comp {A : Type u} {a b c : A} (f : FGMor A a b) (g : FGMor A b c) : FGMor A a c :=
+noncomputable def FGMor.comp {A : Type u} {a b c : A} (f : FGMor A a b) (g : FGMor A b c) : FGMor A a c :=
   ⟨Path.trans f.path g.path⟩
 
 /-- Inverse morphism (path symmetry) -/
-def FGMor.inv {A : Type u} {a b : A} (f : FGMor A a b) : FGMor A b a :=
+noncomputable def FGMor.inv {A : Type u} {a b : A} (f : FGMor A a b) : FGMor A b a :=
   ⟨Path.symm f.path⟩
 
 -- Theorem 1: Left identity in fundamental groupoid
@@ -104,7 +104,7 @@ structure UniqueLift {E : Type u} {X : Type v} (cov : CoveringSpace E X) where
     (l1 l2 : LiftedPath cov p e h) → Path l1.endpoint l2.endpoint
 
 -- Theorem 6: Lifting the identity path gives the identity
-def liftRefl {E : Type u} {X : Type v} (cov : CoveringSpace E X)
+noncomputable def liftRefl {E : Type u} {X : Type v} (cov : CoveringSpace E X)
     (e : E) : LiftedPath cov (Path.refl (cov.proj e)) e rfl :=
   ⟨e, Path.refl e, rfl⟩
 
@@ -119,7 +119,7 @@ theorem liftRefl_path {E : Type u} {X : Type v} (cov : CoveringSpace E X)
   rfl
 
 /-- Concatenation of lifted paths -/
-def liftTrans {E : Type u} {X : Type v} (cov : CoveringSpace E X)
+noncomputable def liftTrans {E : Type u} {X : Type v} (cov : CoveringSpace E X)
     {x y z : X} {p : Path x y} {q : Path y z} {e : E} {h : cov.proj e = x}
     (lp : LiftedPath cov p e h) (lq : LiftedPath cov q lp.endpoint lp.projEndpoint) :
     LiftedPath cov (Path.trans p q) e h :=
@@ -184,12 +184,12 @@ structure DeckTransformation (E : Type u) (X : Type v) (cov : CoveringSpace E X)
   coversId : ∀ e : E, cov.proj (map e) = cov.proj e
 
 /-- Identity deck transformation -/
-def DeckTransformation.id {E : Type u} {X : Type v} (cov : CoveringSpace E X) :
+noncomputable def DeckTransformation.id {E : Type u} {X : Type v} (cov : CoveringSpace E X) :
     DeckTransformation E X cov :=
   ⟨fun e => e, fun _ => rfl⟩
 
 /-- Composition of deck transformations -/
-def DeckTransformation.comp {E : Type u} {X : Type v} {cov : CoveringSpace E X}
+noncomputable def DeckTransformation.comp {E : Type u} {X : Type v} {cov : CoveringSpace E X}
     (f g : DeckTransformation E X cov) : DeckTransformation E X cov :=
   ⟨fun e => f.map (g.map e), fun e => by rw [f.coversId, g.coversId]⟩
 
@@ -211,7 +211,7 @@ theorem deck_preserves_fiber {E : Type u} {X : Type v} {cov : CoveringSpace E X}
   d.coversId e
 
 /-- A deck transformation acts on paths via congrArg -/
-def DeckTransformation.mapPath {E : Type u} {X : Type v} {cov : CoveringSpace E X}
+noncomputable def DeckTransformation.mapPath {E : Type u} {X : Type v} {cov : CoveringSpace E X}
     (d : DeckTransformation E X cov) {a b : E} (p : Path a b) : Path (d.map a) (d.map b) :=
   Path.congrArg d.map p
 
@@ -242,15 +242,15 @@ structure LoopSpace (A : Type u) (x : A) where
   loop : Path x x
 
 /-- Composition of loops -/
-def LoopSpace.comp {A : Type u} {x : A} (l1 l2 : LoopSpace A x) : LoopSpace A x :=
+noncomputable def LoopSpace.comp {A : Type u} {x : A} (l1 l2 : LoopSpace A x) : LoopSpace A x :=
   ⟨Path.trans l1.loop l2.loop⟩
 
 /-- Inverse loop -/
-def LoopSpace.inv {A : Type u} {x : A} (l : LoopSpace A x) : LoopSpace A x :=
+noncomputable def LoopSpace.inv {A : Type u} {x : A} (l : LoopSpace A x) : LoopSpace A x :=
   ⟨Path.symm l.loop⟩
 
 /-- Trivial loop -/
-def LoopSpace.trivial {A : Type u} (x : A) : LoopSpace A x :=
+noncomputable def LoopSpace.trivial {A : Type u} (x : A) : LoopSpace A x :=
   ⟨Path.refl x⟩
 
 -- Theorem 19: Left identity for loops
@@ -303,7 +303,7 @@ structure GroupoidFunctor (A : Type u) (B : Type v) where
     morMap (Path.trans p q) = Path.trans (morMap p) (morMap q)
 
 -- Theorem 23: Any function induces a groupoid functor via congrArg
-def inducedFunctor {A : Type u} {B : Type v} (f : A → B) : GroupoidFunctor A B :=
+noncomputable def inducedFunctor {A : Type u} {B : Type v} (f : A → B) : GroupoidFunctor A B :=
   ⟨f, fun p => Path.congrArg f p, fun _ => rfl, fun p q => Path.congrArg_trans f p q⟩
 
 -- Theorem 24: Induced functor preserves identity
@@ -325,7 +325,7 @@ theorem inducedFunctor_symm {A : Type u} {B : Type v} (f : A → B)
   Path.congrArg_symm f p
 
 /-- Identity functor on a groupoid -/
-def idFunctor (A : Type u) : GroupoidFunctor A A :=
+noncomputable def idFunctor (A : Type u) : GroupoidFunctor A A :=
   ⟨_root_.id, fun p => p, fun _ => rfl, fun _ _ => rfl⟩
 
 -- Theorem 27: Identity functor preserves morphisms exactly
@@ -334,7 +334,7 @@ theorem idFunctor_morMap {A : Type u} {a b : A} (p : Path a b) :
   rfl
 
 /-- Composition of groupoid functors -/
-def GroupoidFunctor.comp {A : Type u} {B : Type v} {C : Type w}
+noncomputable def GroupoidFunctor.comp {A : Type u} {B : Type v} {C : Type w}
     (F : GroupoidFunctor A B) (G : GroupoidFunctor B C) : GroupoidFunctor A C :=
   ⟨fun x => G.objMap (F.objMap x),
    fun p => G.morMap (F.morMap p),
@@ -369,11 +369,11 @@ structure LoopSubgroup (A : Type u) (x : A) where
   closedInv : ∀ l, mem l → mem (LoopSpace.inv l)
 
 -- Theorem 30: The full loop group is a subgroup
-def fullLoopSubgroup (A : Type u) (x : A) : LoopSubgroup A x :=
+noncomputable def fullLoopSubgroup (A : Type u) (x : A) : LoopSubgroup A x :=
   ⟨fun _ => True, trivial, fun _ _ _ _ => trivial, fun _ _ => trivial⟩
 
 -- Theorem 31: The trivial subgroup
-def trivialLoopSubgroup (A : Type u) (x : A) : LoopSubgroup A x :=
+noncomputable def trivialLoopSubgroup (A : Type u) (x : A) : LoopSubgroup A x :=
   ⟨fun l => l.loop = Path.refl x,
    rfl,
    fun l1 l2 h1 h2 => by
@@ -391,7 +391,7 @@ structure NormalLoopSubgroup (A : Type u) (x : A) extends LoopSubgroup A x where
     mem h → mem ⟨Path.trans (Path.trans g.loop h.loop) (Path.symm g.loop)⟩
 
 -- Theorem 32: Full subgroup is normal
-def fullLoopSubgroup_normal (A : Type u) (x : A) : NormalLoopSubgroup A x :=
+noncomputable def fullLoopSubgroup_normal (A : Type u) (x : A) : NormalLoopSubgroup A x :=
   ⟨fullLoopSubgroup A x, fun _ _ _ => trivial⟩
 
 -- ============================================================
@@ -422,7 +422,7 @@ structure PathClass (A : Type u) (x0 : A) where
   pathFromBase : Path x0 endpoint
 
 /-- The projection from path classes to the base space -/
-def PathClass.proj {A : Type u} {x0 : A} (pc : PathClass A x0) : A :=
+noncomputable def PathClass.proj {A : Type u} {x0 : A} (pc : PathClass A x0) : A :=
   pc.endpoint
 
 -- Theorem 34: Projection of a path class gives its endpoint
@@ -431,7 +431,7 @@ theorem pathClass_proj_eq {A : Type u} {x0 : A} (pc : PathClass A x0) :
   rfl
 
 /-- The basepoint of the universal cover -/
-def universalBasepoint {A : Type u} (x0 : A) : PathClass A x0 :=
+noncomputable def universalBasepoint {A : Type u} (x0 : A) : PathClass A x0 :=
   ⟨x0, Path.refl x0⟩
 
 -- Theorem 35: The basepoint projects to x0
@@ -440,7 +440,7 @@ theorem universalBasepoint_proj {A : Type u} (x0 : A) :
   rfl
 
 /-- Lifting a path to the universal cover -/
-def universalLift {A : Type u} {x0 : A} (pc : PathClass A x0)
+noncomputable def universalLift {A : Type u} {x0 : A} (pc : PathClass A x0)
     {y : A} (p : Path pc.endpoint y) : PathClass A x0 :=
   ⟨y, Path.trans pc.pathFromBase p⟩
 
@@ -487,7 +487,7 @@ structure GroupoidNatTrans {A : Type u} {B : Type v}
     Path.trans (F.morMap p) (component b) = Path.trans (component a) (G.morMap p)
 
 -- Theorem 41: Identity natural transformation
-def GroupoidNatTrans.id {A : Type u} {B : Type v}
+noncomputable def GroupoidNatTrans.id {A : Type u} {B : Type v}
     (F : GroupoidFunctor A B) : GroupoidNatTrans F F :=
   ⟨fun x => Path.refl (F.objMap x),
    fun p => by simp⟩
@@ -516,12 +516,12 @@ inductive PushoutPath (A B C : Type u) (span : TypeSpan A B C) :
   | crossInv : (c : C) → PushoutPath A B C span (Sum.inr (span.right c)) (Sum.inl (span.left c))
 
 -- Theorem 43: Left inclusion preserves refl
-def pushout_refl_left {A B C : Type u} {span : TypeSpan A B C} (a : A) :
+noncomputable def pushout_refl_left {A B C : Type u} {span : TypeSpan A B C} (a : A) :
     PushoutPath A B C span (Sum.inl a) (Sum.inl a) :=
   PushoutPath.inclLeft (Path.refl a)
 
 -- Theorem 44: Right inclusion preserves refl
-def pushout_refl_right {A B C : Type u} {span : TypeSpan A B C} (b : B) :
+noncomputable def pushout_refl_right {A B C : Type u} {span : TypeSpan A B C} (b : B) :
     PushoutPath A B C span (Sum.inr b) (Sum.inr b) :=
   PushoutPath.inclRight (Path.refl b)
 
@@ -530,7 +530,7 @@ structure PushoutRoundtrip {A B C : Type u} (span : TypeSpan A B C) (c : C) wher
   fwd : PushoutPath A B C span (Sum.inl (span.left c)) (Sum.inr (span.right c))
   bwd : PushoutPath A B C span (Sum.inr (span.right c)) (Sum.inl (span.left c))
 
-def pushout_roundtrip {A B C : Type u} (span : TypeSpan A B C) (c : C) :
+noncomputable def pushout_roundtrip {A B C : Type u} (span : TypeSpan A B C) (c : C) :
     PushoutRoundtrip span c :=
   ⟨PushoutPath.cross c, PushoutPath.crossInv c⟩
 
@@ -581,7 +581,7 @@ theorem path_symm_trans {A : Type u} {a b : A} (p : Path a b) :
 -- ============================================================
 
 /-- Transport along a path in the base space -/
-def fiberTransport {E : Type u} {X : Type v} (cov : CoveringSpace E X)
+noncomputable def fiberTransport {E : Type u} {X : Type v} (cov : CoveringSpace E X)
     {x y : X} (_p : Path x y)
     (lift : (e : E) → cov.proj e = x → E) :
     (e : E) → cov.proj e = x → E :=
@@ -601,7 +601,7 @@ structure MonodromyPath {E : Type u} {X : Type v} (cov : CoveringSpace E X)
   pathInE : Path e image
 
 -- Theorem 54: Trivial monodromy path is refl
-def trivialMonodromyPath {E : Type u} {X : Type v} (cov : CoveringSpace E X)
+noncomputable def trivialMonodromyPath {E : Type u} {X : Type v} (cov : CoveringSpace E X)
     (x : X) (e : E) (h : cov.proj e = x) :
     MonodromyPath cov (LoopSpace.trivial x) e h :=
   ⟨e, h, Path.refl e⟩
@@ -613,7 +613,7 @@ theorem trivialMonodromy_image {E : Type u} {X : Type v} (cov : CoveringSpace E 
   rfl
 
 /-- Composition of monodromy paths -/
-def compMonodromyPath {E : Type u} {X : Type v} (cov : CoveringSpace E X)
+noncomputable def compMonodromyPath {E : Type u} {X : Type v} (cov : CoveringSpace E X)
     {x : X} {l1 l2 : LoopSpace X x} {e : E} {h : cov.proj e = x}
     (m1 : MonodromyPath cov l1 e h)
     (m2 : MonodromyPath cov l2 m1.image m1.imageFib) :
@@ -647,7 +647,7 @@ structure CoveringMorphism {E1 E2 : Type u} {X : Type v}
   commutes : ∀ e : E1, cov2.proj (map e) = cov1.proj e
 
 /-- Identity covering morphism -/
-def CoveringMorphism.id {E : Type u} {X : Type v} (cov : CoveringSpace E X) :
+noncomputable def CoveringMorphism.id {E : Type u} {X : Type v} (cov : CoveringSpace E X) :
     CoveringMorphism cov cov :=
   ⟨fun e => e, fun _ => rfl⟩
 
@@ -657,7 +657,7 @@ theorem covMor_id_map {E : Type u} {X : Type v} (cov : CoveringSpace E X) (e : E
   rfl
 
 /-- Composition of covering morphisms -/
-def CoveringMorphism.comp {E1 E2 E3 : Type u} {X : Type v}
+noncomputable def CoveringMorphism.comp {E1 E2 E3 : Type u} {X : Type v}
     {cov1 : CoveringSpace E1 X} {cov2 : CoveringSpace E2 X} {cov3 : CoveringSpace E3 X}
     (f : CoveringMorphism cov1 cov2) (g : CoveringMorphism cov2 cov3) :
     CoveringMorphism cov1 cov3 :=
@@ -671,7 +671,7 @@ theorem covMor_comp_commutes {E1 E2 E3 : Type u} {X : Type v}
   (CoveringMorphism.comp f g).commutes e
 
 -- Theorem 60: Covering morphism respects paths
-def covMor_mapPath {E1 E2 : Type u} {X : Type v}
+noncomputable def covMor_mapPath {E1 E2 : Type u} {X : Type v}
     {cov1 : CoveringSpace E1 X} {cov2 : CoveringSpace E2 X}
     (f : CoveringMorphism cov1 cov2) {a b : E1} (p : Path a b) :
     Path (f.map a) (f.map b) :=
@@ -702,12 +702,12 @@ structure FiberComponent {E : Type u} {X : Type v} (cov : CoveringSpace E X) (x 
   pathFromE : Path e point
 
 -- Theorem 63: The starting point is in its own component
-def fiberComponent_self {E : Type u} {X : Type v} (cov : CoveringSpace E X)
+noncomputable def fiberComponent_self {E : Type u} {X : Type v} (cov : CoveringSpace E X)
     (x : X) (e : E) (h : cov.proj e = x) : FiberComponent cov x e :=
   ⟨e, h, Path.refl e⟩
 
 -- Theorem 64: Component membership is transitive
-def fiberComponent_trans {E : Type u} {X : Type v} (cov : CoveringSpace E X)
+noncomputable def fiberComponent_trans {E : Type u} {X : Type v} (cov : CoveringSpace E X)
     (x : X) (e : E) (fc1 : FiberComponent cov x e)
     (fc2 : FiberComponent cov x fc1.point) : FiberComponent cov x e :=
   ⟨fc2.point, fc2.inFiber, Path.trans fc1.pathFromE fc2.pathFromE⟩

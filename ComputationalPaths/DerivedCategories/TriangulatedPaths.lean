@@ -38,7 +38,7 @@ inductive TriangulatedStep {Obj : Type u} :
         (Path.trans (Path.symm q) (Path.symm p))
 
 /-- Interpret a triangulated step as a primitive `Path.Step`. -/
-def TriangulatedStep.toStep {Obj : Type u} {a b : Obj} {p q : Path a b}
+noncomputable def TriangulatedStep.toStep {Obj : Type u} {a b : Obj} {p q : Path a b}
     (s : TriangulatedStep p q) : Path.Step p q :=
   match s with
   | .shift_right_unit p => Path.Step.trans_refl_right p
@@ -90,14 +90,14 @@ namespace TriangulatedPaths
 variable {Obj : Type u} (T : TriangulatedPaths Obj)
 
 /-- Primitive step witness for shift coherence. -/
-def shift_step {X Y : Obj} (p : Path X Y) :
+noncomputable def shift_step {X Y : Obj} (p : Path X Y) :
     Path.Step
       (Path.trans (T.shiftPath p) (Path.refl (T.shiftObj Y)))
       (T.shiftPath p) :=
   TriangulatedStep.toStep (T.shiftStep p)
 
 /-- Primitive step witness for connecting morphism coherence. -/
-def connect_step {X Y Z : Obj}
+noncomputable def connect_step {X Y Z : Obj}
     (h : T.distinguished X Y Z) (f : Path X Y) (g : Path Y Z) :
     Path.Step
       (Path.trans (Path.refl Z) (T.connect h f g))
@@ -105,7 +105,7 @@ def connect_step {X Y Z : Obj}
   TriangulatedStep.toStep (T.connectStep h f g)
 
 /-- Primitive step witness for triangle rotation coherence. -/
-def rotation_step {X Y Z : Obj}
+noncomputable def rotation_step {X Y Z : Obj}
     (h : T.distinguished X Y Z) (f : Path X Y) (g : Path Y Z) :
     Path.Step
       (Path.trans (T.rotationPath h f g) (Path.refl (T.shiftObj X)))
@@ -113,21 +113,21 @@ def rotation_step {X Y Z : Obj}
   TriangulatedStep.toStep (T.rotationStep h f g)
 
 /-- Primitive step witness for cone cancellation coherence. -/
-def cone_step {X Y : Obj} (p : Path X Y) :
+noncomputable def cone_step {X Y : Obj} (p : Path X Y) :
     Path.Step
       (Path.trans (Path.symm p) p)
       (Path.refl Y) :=
   TriangulatedStep.toStep (T.coneStep p)
 
 /-- Primitive step witness for right-cancellation in cone-style composites. -/
-def cone_right_step (_T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
+noncomputable def cone_right_step (_T : TriangulatedPaths Obj) {X Y : Obj} (p : Path X Y) :
     Path.Step
       (Path.trans p (Path.symm p))
       (Path.refl X) :=
   TriangulatedStep.toStep (TriangulatedStep.cone_cancel_right p)
 
 /-- Primitive step witness for associativity in triangulated composites. -/
-def assoc_step (_T : TriangulatedPaths Obj) {W X Y Z : Obj}
+noncomputable def assoc_step (_T : TriangulatedPaths Obj) {W X Y Z : Obj}
     (p : Path W X) (q : Path X Y) (r : Path Y Z) :
     Path.Step
       (Path.trans (Path.trans p q) r)
@@ -135,7 +135,7 @@ def assoc_step (_T : TriangulatedPaths Obj) {W X Y Z : Obj}
   TriangulatedStep.toStep (TriangulatedStep.triangle_assoc p q r)
 
 /-- Primitive step witness for symmetry over composition. -/
-def symm_trans_step (_T : TriangulatedPaths Obj) {X Y Z : Obj}
+noncomputable def symm_trans_step (_T : TriangulatedPaths Obj) {X Y Z : Obj}
     (p : Path X Y) (q : Path Y Z) :
     Path.Step
       (Path.symm (Path.trans p q))
@@ -240,7 +240,7 @@ noncomputable def cone_unit_assoc_rweq (T : TriangulatedPaths Obj) {X Y : Obj} (
 end TriangulatedPaths
 
 /-- Trivial triangulated-path package with canonical unit/cancellation steps. -/
-def trivialTriangulatedPaths (Obj : Type u) : TriangulatedPaths Obj where
+noncomputable def trivialTriangulatedPaths (Obj : Type u) : TriangulatedPaths Obj where
   shiftObj := id
   shiftPath := fun {_ _} p => p
   distinguished := fun _ _ _ => True

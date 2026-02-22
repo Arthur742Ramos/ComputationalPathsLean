@@ -17,7 +17,7 @@ open Path
 universe u
 
 /-- Braiding on the first two factors of a triple tensor point. -/
-def braid12 {A : Type u} (R : A × A → A × A) (x : A × A × A) :
+noncomputable def braid12 {A : Type u} (R : A × A → A × A) (x : A × A × A) :
     A × A × A :=
   let (a, bc) := x
   let (b, c) := bc
@@ -25,7 +25,7 @@ def braid12 {A : Type u} (R : A × A → A × A) (x : A × A × A) :
   (a', (b', c))
 
 /-- Braiding on the last two factors of a triple tensor point. -/
-def braid23 {A : Type u} (R : A × A → A × A) (x : A × A × A) :
+noncomputable def braid23 {A : Type u} (R : A × A → A × A) (x : A × A × A) :
     A × A × A :=
   let (a, bc) := x
   let (b, c) := bc
@@ -33,7 +33,7 @@ def braid23 {A : Type u} (R : A × A → A × A) (x : A × A × A) :
   (a, (b', c'))
 
 /-- Yang-Baxter equation as a path family. -/
-def YangBaxter {A : Type u} (R : A × A → A × A) : Type u :=
+noncomputable def YangBaxter {A : Type u} (R : A × A → A × A) : Type u :=
   ∀ x : A × A × A,
     Path (braid12 R (braid23 R (braid12 R x)))
       (braid23 R (braid12 R (braid23 R x)))
@@ -52,7 +52,7 @@ namespace RMatrixPathData
 variable {A : Type u} (R : RMatrixPathData A)
 
 /-- Step witness: right-unit normalization for mapped tensor paths. -/
-def mapPath_step {x y : A × A} (p : Path x y) :
+noncomputable def mapPath_step {x y : A × A} (p : Path x y) :
     Path.Step
       (Path.trans (R.mapPath p) (Path.refl (R.braid y)))
       (R.mapPath p) :=
@@ -65,7 +65,7 @@ noncomputable def mapPath_rweq {x y : A × A} (p : Path x y) :
   rweq_of_step (R.mapPath_step p)
 
 /-- Step witness: right-unit normalization for the left inverse path. -/
-def leftInv_step (x : A × A) :
+noncomputable def leftInv_step (x : A × A) :
     Path.Step
       (Path.trans (R.leftInvPath x) (Path.refl x))
       (R.leftInvPath x) :=
@@ -78,7 +78,7 @@ noncomputable def leftInv_rweq (x : A × A) :
   rweq_of_step (R.leftInv_step x)
 
 /-- Step witness: right-unit normalization for the right inverse path. -/
-def rightInv_step (x : A × A) :
+noncomputable def rightInv_step (x : A × A) :
     Path.Step
       (Path.trans (R.rightInvPath x) (Path.refl x))
       (R.rightInvPath x) :=
@@ -103,7 +103,7 @@ noncomputable def rightInv_cancel_rweq (x : A × A) :
   rweq_cmpA_inv_left (R.rightInvPath x)
 
 /-- Step witness: right-unit normalization for Yang-Baxter coherence. -/
-def yangBaxter_step (x : A × A × A) :
+noncomputable def yangBaxter_step (x : A × A × A) :
     Path.Step
       (Path.trans
         (R.yangBaxterPath x)
@@ -119,7 +119,7 @@ noncomputable def yangBaxter_rweq (x : A × A × A) :
       (R.yangBaxterPath x) :=
   rweq_of_step (R.yangBaxter_step x)
 
-def yangBaxter_symm (x : A × A × A) :
+noncomputable def yangBaxter_symm (x : A × A × A) :
     Path
       (braid23 R.braid (braid12 R.braid (braid23 R.braid x)))
       (braid12 R.braid (braid23 R.braid (braid12 R.braid x))) :=

@@ -28,25 +28,25 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _ => 0
   | .cons _ p => 1 + p.length
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .mk name a b => .mk (name ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a => .nil a
   | .cons s rest => rest.symm.trans (.cons s.symm (.nil _))
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil b)
 
-def Path.congrArg (f : α → β) (lbl : String)
+noncomputable def Path.congrArg (f : α → β) (lbl : String)
     : Path α a b → Path β (f a) (f b)
   | .nil _ => .nil _
   | .cons _ p => .cons (.mk lbl _ _) (p.congrArg f lbl)
@@ -81,17 +81,17 @@ structure Graph where
   edges    : List (Nat × Nat)
 deriving DecidableEq, Repr
 
-def Graph.empty : Graph := ⟨0, []⟩
+noncomputable def Graph.empty : Graph := ⟨0, []⟩
 
-def Graph.addNode (g : Graph) : Graph :=
+noncomputable def Graph.addNode (g : Graph) : Graph :=
   { g with numNodes := g.numNodes + 1 }
 
-def Graph.addEdge (g : Graph) (s t : Nat) : Graph :=
+noncomputable def Graph.addEdge (g : Graph) (s t : Nat) : Graph :=
   { g with edges := (s, t) :: g.edges }
 
-def Graph.numEdges (g : Graph) : Nat := g.edges.length
+noncomputable def Graph.numEdges (g : Graph) : Nat := g.edges.length
 
-def Graph.union (g1 g2 : Graph) : Graph :=
+noncomputable def Graph.union (g1 g2 : Graph) : Graph :=
   { numNodes := g1.numNodes + g2.numNodes,
     edges := g1.edges ++ g2.edges.map (fun (s, t) => (s + g1.numNodes, t + g1.numNodes)) }
 
@@ -103,11 +103,11 @@ structure GraphMorphism (g1 g2 : Graph) where
   nodeMap : Nat → Nat
   edgePreserving : ∀ e ∈ g1.edges, (nodeMap e.1, nodeMap e.2) ∈ g2.edges
 
-def GraphMorphism.id (g : Graph) : GraphMorphism g g where
+noncomputable def GraphMorphism.id (g : Graph) : GraphMorphism g g where
   nodeMap := fun n => n
   edgePreserving := fun e h => h
 
-def GraphMorphism.comp (f : GraphMorphism g1 g2) (h : GraphMorphism g2 g3) :
+noncomputable def GraphMorphism.comp (f : GraphMorphism g1 g2) (h : GraphMorphism g2 g3) :
     GraphMorphism g1 g3 where
   nodeMap := fun n => h.nodeMap (f.nodeMap n)
   edgePreserving := fun e he => h.edgePreserving _ (f.edgePreserving e he)
@@ -141,7 +141,7 @@ structure DPOResult where
   result    : Graph
 deriving Repr
 
-def applyDPO (rule : DPORule) (host : Graph) : DPOResult :=
+noncomputable def applyDPO (rule : DPORule) (host : Graph) : DPOResult :=
   let removedNodes := rule.lhs.numNodes - rule.interface.numNodes
   let addedNodes := rule.rhs.numNodes - rule.interface.numNodes
   let contextNodes := host.numNodes - removedNodes
@@ -149,7 +149,7 @@ def applyDPO (rule : DPORule) (host : Graph) : DPOResult :=
   let result : Graph := ⟨contextNodes + addedNodes, context.edges ++ rule.rhs.edges⟩
   ⟨context, result⟩
 
-def applySPO (rule : SPORule) (host : Graph) : Graph :=
+noncomputable def applySPO (rule : SPORule) (host : Graph) : Graph :=
   let removedNodes := rule.lhs.numNodes
   let contextNodes := host.numNodes - removedNodes
   let addedNodes := rule.rhs.numNodes
@@ -165,14 +165,14 @@ structure GState where
   ruleHist  : List Nat
 deriving DecidableEq, Repr
 
-def gStep (name : String) (s1 s2 : GState) : Step GState s1 s2 :=
+noncomputable def gStep (name : String) (s1 s2 : GState) : Step GState s1 s2 :=
   Step.mk name s1 s2
 
-def dpStep (rule : DPORule) (idx : Nat) (host : GState) : GState :=
+noncomputable def dpStep (rule : DPORule) (idx : Nat) (host : GState) : GState :=
   let res := applyDPO rule host.graph
   ⟨res.result, host.ruleHist ++ [idx]⟩
 
-def spoStep (rule : SPORule) (idx : Nat) (host : GState) : GState :=
+noncomputable def spoStep (rule : SPORule) (idx : Nat) (host : GState) : GState :=
   ⟨applySPO rule host.graph, host.ruleHist ++ [idx]⟩
 
 -- ============================================================
@@ -305,7 +305,7 @@ structure Confluence (α : Type) where
     (d : α) × (Path α b d × Path α c d)
 
 /-- Theorem 20: Trivial confluence — identical endpoints. -/
-def trivial_confluence_same (b : α) :
+noncomputable def trivial_confluence_same (b : α) :
     (d : α) × (Path α b d × Path α b d) :=
   ⟨b, Path.nil b, Path.nil b⟩
 
@@ -389,7 +389,7 @@ theorem typed_rule_interface_coherent
 -- ============================================================
 
 /-- Build a path from a list of DPO applications. -/
-def buildTransformPath : (rules : List (DPORule × Nat)) → (host : GState) →
+noncomputable def buildTransformPath : (rules : List (DPORule × Nat)) → (host : GState) →
     (final : GState) × Path GState host final
   | [], host => ⟨host, Path.nil host⟩
   | (r, i) :: rest, host =>
@@ -459,7 +459,7 @@ theorem union_nodes_assoc (g1 g2 g3 : Graph) :
   simp [Graph.union, Nat.add_assoc]
 
 /-- Theorem 37: Union commutativity path. -/
-def union_comm_path (g1 g2 : Graph) : Path Nat (Graph.union g1 g2).numNodes (Graph.union g2 g1).numNodes :=
+noncomputable def union_comm_path (g1 g2 : Graph) : Path Nat (Graph.union g1 g2).numNodes (Graph.union g2 g1).numNodes :=
   Path.cons (Step.mk "union-comm-fwd" _ _) (Path.nil _)
 
 -- ============================================================
@@ -543,7 +543,7 @@ theorem parallel_diamond_paths
 -- §19  Graph size and termination
 -- ============================================================
 
-def graphSize (g : Graph) : Nat := g.numNodes + g.numEdges
+noncomputable def graphSize (g : Graph) : Nat := g.numNodes + g.numEdges
 
 /-- Theorem 46: Size-decreasing rule terminates. -/
 theorem size_decreasing_terminates (rule : DPORule) (host : Graph)
@@ -564,7 +564,7 @@ theorem empty_graph_size : graphSize Graph.empty = 0 := by
 -- ============================================================
 
 /-- Transport: extract equality from path endpoints (all steps rewrite type index). -/
-def Path.collapse : Path α a b → Path α a b
+noncomputable def Path.collapse : Path α a b → Path α a b
   | .nil a => .nil a
   | .cons s p => .cons s (p.collapse)
 

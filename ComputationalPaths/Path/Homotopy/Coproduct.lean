@@ -34,14 +34,14 @@ private theorem sum_inr_ne_inl (b : B) (a : A) : Sum.inr b ≠ Sum.inl a := fun 
 /-- The code family for characterizing paths in Sum A B from Sum.inl a₀.
     code(inl a) = (a₀ = a)
     code(inr b) = PEmpty (universe-polymorphic empty type) -/
-def sumCode (a₀ : A) : Sum A B → Type u
+noncomputable def sumCode (a₀ : A) : Sum A B → Type u
   | Sum.inl a => Path a₀ a
   | Sum.inr _ => PEmpty.{u+1}
 
 /-- encode: (Sum.inl a₀ = x) → code(x)
     For x = inl a, we extract the underlying path
     For x = inr b, this case is impossible -/
-def sumEncode {a₀ : A} {x : Sum A B} (p : Path (Sum.inl a₀) x) : sumCode a₀ x := by
+noncomputable def sumEncode {a₀ : A} {x : Sum A B} (p : Path (Sum.inl a₀) x) : sumCode a₀ x := by
   cases x with
   | inl a =>
       -- p : Path (Sum.inl a₀) (Sum.inl a)
@@ -56,22 +56,22 @@ def sumEncode {a₀ : A} {x : Sum A B} (p : Path (Sum.inl a₀) x) : sumCode a�
 /-- decode: code(x) → (Sum.inl a₀ = x)
     For x = inl a, we lift the path via congrArg
     For x = inr b, code is PEmpty so this is vacuously true -/
-def sumDecode {a₀ : A} {x : Sum A B} (c : sumCode a₀ x) : Path (Sum.inl a₀ : Sum A B) x := by
+noncomputable def sumDecode {a₀ : A} {x : Sum A B} (c : sumCode a₀ x) : Path (Sum.inl a₀ : Sum A B) x := by
   cases x with
   | inl a => exact inlCongr c
   | inr _ => exact c.elim
 
 /-- Similarly for inr values -/
-def sumCodeR (b₀ : B) : Sum A B → Type u
+noncomputable def sumCodeR (b₀ : B) : Sum A B → Type u
   | Sum.inl _ => PEmpty.{u+1}
   | Sum.inr b => Path b₀ b
 
-def sumEncodeR {b₀ : B} {x : Sum A B} (p : Path (Sum.inr b₀ : Sum A B) x) : sumCodeR b₀ x := by
+noncomputable def sumEncodeR {b₀ : B} {x : Sum A B} (p : Path (Sum.inr b₀ : Sum A B) x) : sumCodeR b₀ x := by
   cases x with
   | inl a => exact absurd p.toEq (sum_inr_ne_inl b₀ a)
   | inr b => exact Path.stepChain (Sum.inr.injEq b₀ b ▸ p.toEq)
 
-def sumDecodeR {b₀ : B} {x : Sum A B} (c : sumCodeR b₀ x) : Path (Sum.inr b₀ : Sum A B) x := by
+noncomputable def sumDecodeR {b₀ : B} {x : Sum A B} (c : sumCodeR b₀ x) : Path (Sum.inr b₀ : Sum A B) x := by
   cases x with
   | inl _ => exact c.elim
   | inr b => exact inrCongr c

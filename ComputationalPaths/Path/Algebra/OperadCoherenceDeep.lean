@@ -27,10 +27,10 @@ structure Operad (C : Type u) where
   arity : C → Nat
 
 /-- Operadic composition γ. -/
-def operadGamma {C : Type u} (O : Operad C) (f g : C) : C := O.compose f g
+noncomputable def operadGamma {C : Type u} (O : Operad C) (f g : C) : C := O.compose f g
 
 /-- Identity element of an operad. -/
-def operadId {C : Type u} (O : Operad C) : C := O.identity
+noncomputable def operadId {C : Type u} (O : Operad C) : C := O.identity
 
 -- ============================================================
 -- Section 2: Operadic Composition — Unitality and Associativity
@@ -49,13 +49,13 @@ structure OperadAssoc {C : Type u} (O : Operad C) where
   witness : (f g h : C) → Path (O.compose (O.compose f g) h) (O.compose f (O.compose g h))
 
 /-- Def 1: Composing left unit then right unit yields a composite path. -/
-def operad_unit_compose {C : Type u} (O : Operad C)
+noncomputable def operad_unit_compose {C : Type u} (O : Operad C)
     (lu : OperadLeftUnit O) (ru : OperadRightUnit O) (f : C) :
     Path (O.compose (O.compose O.identity f) O.identity) f :=
   Path.trans (congrArg (fun x => O.compose x O.identity) (lu.witness f)) (ru.witness f)
 
 /-- Def 2: Associativity path is invertible via symm. -/
-def operad_assoc_invertible {C : Type u} (O : Operad C)
+noncomputable def operad_assoc_invertible {C : Type u} (O : Operad C)
     (oa : OperadAssoc O) (f g h : C) :
     Path (O.compose f (O.compose g h)) (O.compose (O.compose f g) h) :=
   Path.symm (oa.witness f g h)
@@ -79,7 +79,7 @@ theorem operad_lunit_trans_refl {C : Type u} (O : Operad C)
   trans_refl_left (lu.witness f)
 
 /-- Def 6: Associativity is transitive — two assoc witnesses chained. -/
-def operad_assoc_chain {C : Type u} (O : Operad C) (oa : OperadAssoc O)
+noncomputable def operad_assoc_chain {C : Type u} (O : Operad C) (oa : OperadAssoc O)
     (f g h k : C) :
     Path (O.compose (O.compose (O.compose f g) h) k)
          (O.compose f (O.compose g (O.compose h k))) :=
@@ -110,7 +110,7 @@ structure Equivariance {C : Type u} (O : SymOperad C) where
     Path (O.permAction s (O.compose f g)) (O.compose (O.permAction s f) g)
 
 /-- Def 8: Equivariance path is reversible. -/
-def equivariance_symm {C : Type u} (O : SymOperad C) (E : Equivariance O)
+noncomputable def equivariance_symm {C : Type u} (O : SymOperad C) (E : Equivariance O)
     (n : Nat) (s : OperadPerm n) (f g : C) :
     Path (O.compose (O.permAction s f) g) (O.permAction s (O.compose f g)) :=
   Path.symm (E.witness n s f g)
@@ -133,7 +133,7 @@ structure PermIdentity {C : Type u} (O : SymOperad C) where
   witness : (n : Nat) → (f : C) → Path (O.permAction (idPerm (n := n)) f) f
 
 /-- Def 11: Perm identity path inversion. -/
-def perm_id_inv {C : Type u} (O : SymOperad C) (pid : PermIdentity O)
+noncomputable def perm_id_inv {C : Type u} (O : SymOperad C) (pid : PermIdentity O)
     (n : Nat) (f : C) :
     Path f (O.permAction (pid.idPerm (n := n)) f) :=
   Path.symm (pid.witness n f)
@@ -168,7 +168,7 @@ theorem algebra_comp_symm_symm {C : Type u} {O : Operad C} {A : Type v}
   symm_symm (alg.comp_act f g a)
 
 /-- Def 15: Composing unit then comp_act paths. -/
-def algebra_unit_then_comp {C : Type u} {O : Operad C} {A : Type v}
+noncomputable def algebra_unit_then_comp {C : Type u} {O : Operad C} {A : Type v}
     (alg : OperadAlgebra O A) (g : C) (a : A) :
     Path (alg.action (O.compose O.identity g) a) (alg.action g a) :=
   Path.trans (alg.comp_act O.identity g a)
@@ -181,7 +181,7 @@ theorem algebra_unit_trans_refl {C : Type u} {O : Operad C} {A : Type v}
   trans_refl_right (alg.unit_act a)
 
 /-- Def 17: Algebra action inverse. -/
-def algebra_unit_inv {C : Type u} {O : Operad C} {A : Type v}
+noncomputable def algebra_unit_inv {C : Type u} {O : Operad C} {A : Type v}
     (alg : OperadAlgebra O A) (a : A) :
     Path a (alg.action O.identity a) :=
   Path.symm (alg.unit_act a)
@@ -204,19 +204,19 @@ structure OperadMorphism {C : Type u} (src tgt : Operad C) where
   pres_comp : (f g : C) → Path (map (src.compose f g)) (tgt.compose (map f) (map g))
 
 /-- Def 19: Morphism identity preservation reversed. -/
-def morphism_pres_id_symm {C : Type u} {src tgt : Operad C}
+noncomputable def morphism_pres_id_symm {C : Type u} {src tgt : Operad C}
     (m : OperadMorphism src tgt) :
     Path tgt.identity (m.map src.identity) :=
   Path.symm m.pres_id
 
 /-- Def 20: Composition preservation reversed. -/
-def morphism_pres_comp_inv {C : Type u} {src tgt : Operad C}
+noncomputable def morphism_pres_comp_inv {C : Type u} {src tgt : Operad C}
     (m : OperadMorphism src tgt) (f g : C) :
     Path (tgt.compose (m.map f) (m.map g)) (m.map (src.compose f g)) :=
   Path.symm (m.pres_comp f g)
 
 /-- Identity morphism on an operad. -/
-def operadMorphismId {C : Type u} (O : Operad C) : OperadMorphism O O where
+noncomputable def operadMorphismId {C : Type u} (O : Operad C) : OperadMorphism O O where
   map := id
   pres_id := Path.refl O.identity
   pres_comp := fun f g => Path.refl (O.compose f g)
@@ -227,7 +227,7 @@ theorem id_morphism_pres_id {C : Type u} (O : Operad C) :
   rfl
 
 /-- Def 22: congrArg applied to morphism map. -/
-def morphism_congrArg {C : Type u} {src tgt : Operad C}
+noncomputable def morphism_congrArg {C : Type u} {src tgt : Operad C}
     (m : OperadMorphism src tgt)
     {a b : C} (p : Path a b) :
     Path (m.map a) (m.map b) :=
@@ -248,7 +248,7 @@ theorem morphism_congrArg_symm {C : Type u} {src tgt : Operad C}
   congrArg_symm m.map p
 
 /-- Composition of operad morphisms. -/
-def operadMorphismComp {C : Type u} {O1 O2 O3 : Operad C}
+noncomputable def operadMorphismComp {C : Type u} {O1 O2 O3 : Operad C}
     (m1 : OperadMorphism O1 O2) (m2 : OperadMorphism O2 O3) :
     OperadMorphism O1 O3 where
   map := m2.map ∘ m1.map
@@ -296,19 +296,19 @@ inductive FreeOperadTerm (C : Type u) where
   | comp : FreeOperadTerm C → FreeOperadTerm C → FreeOperadTerm C
 
 /-- Def 29: Generator embedding preserves paths. -/
-def freeOperad_gen_path {C : Type u} {a b : C} (p : Path a b) :
+noncomputable def freeOperad_gen_path {C : Type u} {a b : C} (p : Path a b) :
     Path (FreeOperadTerm.gen a) (FreeOperadTerm.gen b) :=
   Path.congrArg FreeOperadTerm.gen p
 
 /-- Def 30: Free operad comp functorial in first arg. -/
-def freeOperad_comp_left {C : Type u}
+noncomputable def freeOperad_comp_left {C : Type u}
     {f1 f2 : FreeOperadTerm C} (g : FreeOperadTerm C)
     (p : Path f1 f2) :
     Path (FreeOperadTerm.comp f1 g) (FreeOperadTerm.comp f2 g) :=
   Path.congrArg (fun x => FreeOperadTerm.comp x g) p
 
 /-- Def 31: Free operad comp functorial in second arg. -/
-def freeOperad_comp_right {C : Type u}
+noncomputable def freeOperad_comp_right {C : Type u}
     (f : FreeOperadTerm C) {g1 g2 : FreeOperadTerm C}
     (p : Path g1 g2) :
     Path (FreeOperadTerm.comp f g1) (FreeOperadTerm.comp f g2) :=
@@ -356,12 +356,12 @@ structure AInfOperad (C : Type u) where
   assocPath : (n m : Nat) → Path (compose (mu n) (mu m)) (mu (n + m - 1))
 
 /-- Def 36: A∞ associativity path. -/
-def aInf_assoc {C : Type u} (O : AInfOperad C) (n m : Nat) :
+noncomputable def aInf_assoc {C : Type u} (O : AInfOperad C) (n m : Nat) :
     Path (O.compose (O.mu n) (O.mu m)) (O.mu (n + m - 1)) :=
   O.assocPath n m
 
 /-- Def 37: A∞ associativity path reversal. -/
-def aInf_assoc_symm {C : Type u} (O : AInfOperad C) (n m : Nat) :
+noncomputable def aInf_assoc_symm {C : Type u} (O : AInfOperad C) (n m : Nat) :
     Path (O.mu (n + m - 1)) (O.compose (O.mu n) (O.mu m)) :=
   Path.symm (O.assocPath n m)
 
@@ -393,27 +393,27 @@ structure EInfOperad (C : Type u) where
   contractible : (n : Nat) → (x y : C) → Path x y
 
 /-- Def 41: E∞ path between any two. -/
-def eInf_path {C : Type u} (O : EInfOperad C) (n : Nat) (x y : C) :
+noncomputable def eInf_path {C : Type u} (O : EInfOperad C) (n : Nat) (x y : C) :
     Path x y :=
   O.contractible n x y
 
 /-- Def 42: E∞ commutativity. -/
-def eInf_commute {C : Type u} (O : EInfOperad C) (n : Nat) (f g : C) :
+noncomputable def eInf_commute {C : Type u} (O : EInfOperad C) (n : Nat) (f g : C) :
     Path (O.compose f g) (O.compose g f) :=
   O.contractible n _ _
 
 /-- Def 43: E∞ perm triviality. -/
-def eInf_perm_trivial {C : Type u} (O : EInfOperad C) (n : Nat) (f : C) :
+noncomputable def eInf_perm_trivial {C : Type u} (O : EInfOperad C) (n : Nat) (f : C) :
     Path (O.permAct f) f :=
   O.contractible n _ _
 
 /-- Def 44: E∞ unit absorption. -/
-def eInf_unit {C : Type u} (O : EInfOperad C) (n : Nat) (f : C) :
+noncomputable def eInf_unit {C : Type u} (O : EInfOperad C) (n : Nat) (f : C) :
     Path (O.compose O.identity f) f :=
   O.contractible n _ _
 
 /-- Def 45: E∞ associativity. -/
-def eInf_assoc {C : Type u} (O : EInfOperad C) (n : Nat) (f g h : C) :
+noncomputable def eInf_assoc {C : Type u} (O : EInfOperad C) (n : Nat) (f g h : C) :
     Path (O.compose (O.compose f g) h) (O.compose f (O.compose g h)) :=
   O.contractible n _ _
 
@@ -430,7 +430,7 @@ structure MayRecognition (C : Type u) (A : Type v) where
   recognition : Path (deloop (action operad.identity space)) space
 
 /-- Def 46: Recognition path reversed. -/
-def may_recognition_inv {C : Type u} {A : Type v} (M : MayRecognition C A) :
+noncomputable def may_recognition_inv {C : Type u} {A : Type v} (M : MayRecognition C A) :
     Path M.space (M.deloop (M.action M.operad.identity M.space)) :=
   Path.symm M.recognition
 
@@ -464,7 +464,7 @@ structure BVTensor (C : Type u) where
          (tensor_compose (tensor_compose f1 g1) (tensor_compose f2 g2))
 
 /-- Def 50: BV interchange reversed. -/
-def bv_interchange_symm {C : Type u} (BV : BVTensor C) (f1 f2 g1 g2 : C) :
+noncomputable def bv_interchange_symm {C : Type u} (BV : BVTensor C) (f1 f2 g1 g2 : C) :
     Path (BV.tensor_compose (BV.tensor_compose f1 g1) (BV.tensor_compose f2 g2))
          (BV.tensor_compose (BV.left.compose f1 f2) (BV.right.compose g1 g2)) :=
   Path.symm (BV.interchange f1 f2 g1 g2)
@@ -475,7 +475,7 @@ theorem bv_interchange_symm_symm {C : Type u} (BV : BVTensor C) (f1 f2 g1 g2 : C
   symm_symm (BV.interchange f1 f2 g1 g2)
 
 /-- Def 52: BV interchange applied via congrArg. -/
-def bv_interchange_congrArg {C : Type u} (BV : BVTensor C) (f1 f2 g1 g2 : C)
+noncomputable def bv_interchange_congrArg {C : Type u} (BV : BVTensor C) (f1 f2 g1 g2 : C)
     (h : C → C) :
     Path (h (BV.tensor_compose (BV.left.compose f1 f2) (BV.right.compose g1 g2)))
          (h (BV.tensor_compose (BV.tensor_compose f1 g1) (BV.tensor_compose f2 g2))) :=
@@ -498,19 +498,19 @@ structure PentagonData (C : Type u) where
   assoc : (a b c : C) → Path (compose (compose a b) c) (compose a (compose b c))
 
 /-- Def 54: Pentagon — one route around the associahedron. -/
-def pentagon_route_one {C : Type u} (P : PentagonData C) (a b c d : C) :
+noncomputable def pentagon_route_one {C : Type u} (P : PentagonData C) (a b c d : C) :
     Path (P.compose (P.compose (P.compose a b) c) d)
          (P.compose (P.compose a b) (P.compose c d)) :=
   P.assoc (P.compose a b) c d
 
 /-- Def 55: Pentagon — second segment via congrArg. -/
-def pentagon_route_two {C : Type u} (P : PentagonData C) (a b c d : C) :
+noncomputable def pentagon_route_two {C : Type u} (P : PentagonData C) (a b c d : C) :
     Path (P.compose (P.compose a b) (P.compose c d))
          (P.compose a (P.compose b (P.compose c d))) :=
   P.assoc a b (P.compose c d)
 
 /-- Def 56: Pentagon composite path. -/
-def pentagon_composite {C : Type u} (P : PentagonData C) (a b c d : C) :
+noncomputable def pentagon_composite {C : Type u} (P : PentagonData C) (a b c d : C) :
     Path (P.compose (P.compose (P.compose a b) c) d)
          (P.compose a (P.compose b (P.compose c d))) :=
   Path.trans (pentagon_route_one P a b c d) (pentagon_route_two P a b c d)
@@ -524,22 +524,22 @@ structure TriangleData (C : Type u) where
   rightUnit : (a : C) → Path (compose a identity) a
 
 /-- Def 57: Triangle — direct route. -/
-def triangle_direct {C : Type u} (T : TriangleData C) (a b : C) :
+noncomputable def triangle_direct {C : Type u} (T : TriangleData C) (a b : C) :
     Path (T.compose (T.compose a T.identity) b) (T.compose a b) :=
   congrArg (fun x => T.compose x b) (T.rightUnit a)
 
 /-- Def 58: Triangle — indirect route. -/
-def triangle_indirect {C : Type u} (T : TriangleData C) (a b : C) :
+noncomputable def triangle_indirect {C : Type u} (T : TriangleData C) (a b : C) :
     Path (T.compose (T.compose a T.identity) b) (T.compose a (T.compose T.identity b)) :=
   T.assoc a T.identity b
 
 /-- Def 59: Triangle — second leg of indirect. -/
-def triangle_indirect_leg2 {C : Type u} (T : TriangleData C) (a b : C) :
+noncomputable def triangle_indirect_leg2 {C : Type u} (T : TriangleData C) (a b : C) :
     Path (T.compose a (T.compose T.identity b)) (T.compose a b) :=
   congrArg (T.compose a) (T.leftUnit b)
 
 /-- Def 60: Triangle — full indirect composite. -/
-def triangle_indirect_full {C : Type u} (T : TriangleData C) (a b : C) :
+noncomputable def triangle_indirect_full {C : Type u} (T : TriangleData C) (a b : C) :
     Path (T.compose (T.compose a T.identity) b) (T.compose a b) :=
   Path.trans (triangle_indirect T a b) (triangle_indirect_leg2 T a b)
 
@@ -616,7 +616,7 @@ structure ColoredUnit {Color : Type u} {C : Type v} (O : ColoredOperad Color C) 
   witness : (c : Color) → Path (O.compose (O.identity c) (O.identity c)) (O.identity c)
 
 /-- Def 70: Colored unit path reversed. -/
-def colored_unit_inv {Color : Type u} {C : Type v}
+noncomputable def colored_unit_inv {Color : Type u} {C : Type v}
     (O : ColoredOperad Color C) (cu : ColoredUnit O) (c : Color) :
     Path (O.identity c) (O.compose (O.identity c) (O.identity c)) :=
   Path.symm (cu.witness c)
@@ -637,7 +637,7 @@ structure OperadTwoCell {C : Type u} {O1 O2 : Operad C}
   component : (c : C) → Path (m1.map c) (m2.map c)
 
 /-- Identity 2-cell. -/
-def operadTwoCellId {C : Type u} {O1 O2 : Operad C}
+noncomputable def operadTwoCellId {C : Type u} {O1 O2 : Operad C}
     (m : OperadMorphism O1 O2) : OperadTwoCell m m where
   component := fun c => Path.refl (m.map c)
 
@@ -648,7 +648,7 @@ theorem two_cell_id_component {C : Type u} {O1 O2 : Operad C}
   rfl
 
 /-- Vertical composition of 2-cells. -/
-def operadTwoCellVComp {C : Type u} {O1 O2 : Operad C}
+noncomputable def operadTwoCellVComp {C : Type u} {O1 O2 : Operad C}
     {m1 m2 m3 : OperadMorphism O1 O2}
     (alpha : OperadTwoCell m1 m2) (beta : OperadTwoCell m2 m3) :
     OperadTwoCell m1 m3 where
@@ -667,7 +667,7 @@ theorem vcomp_id_right {C : Type u} {O1 O2 : Operad C}
   trans_refl_right (alpha.component c)
 
 /-- Inverse 2-cell. -/
-def operadTwoCellInv {C : Type u} {O1 O2 : Operad C}
+noncomputable def operadTwoCellInv {C : Type u} {O1 O2 : Operad C}
     {m1 m2 : OperadMorphism O1 O2}
     (alpha : OperadTwoCell m1 m2) : OperadTwoCell m2 m1 where
   component := fun c => Path.symm (alpha.component c)
@@ -699,13 +699,13 @@ theorem susp_desusp_symm_symm {C : Type u} (S : OperadSuspension C) (c : C) :
   symm_symm (S.susp_desusp c)
 
 /-- Def 77: Suspension functoriality. -/
-def susp_functorial {C : Type u} (S : OperadSuspension C)
+noncomputable def susp_functorial {C : Type u} (S : OperadSuspension C)
     {a b : C} (p : Path a b) :
     Path (S.suspend a) (S.suspend b) :=
   congrArg S.suspend p
 
 /-- Def 78: Desuspension functoriality. -/
-def desusp_functorial {C : Type u} (S : OperadSuspension C)
+noncomputable def desusp_functorial {C : Type u} (S : OperadSuspension C)
     {a b : C} (p : Path a b) :
     Path (S.desuspend a) (S.desuspend b) :=
   congrArg S.desuspend p

@@ -29,7 +29,7 @@ namespace GrayCategory
 variable {Obj : Type u}
 
 /-- Pentagon coherence as a computational-path 3-cell. -/
-def pentagonPath (G : GrayCategory (Obj := Obj))
+noncomputable def pentagonPath (G : GrayCategory (Obj := Obj))
     {a b c d e : Obj}
     (f : G.Hom a b) (g : G.Hom b c) (h : G.Hom c d) (k : G.Hom d e) :
     CellPath
@@ -38,7 +38,7 @@ def pentagonPath (G : GrayCategory (Obj := Obj))
   TwoCategory.pentagonPath G.toTwoCategory f g h k
 
 /-- Triangle coherence as a computational-path 3-cell. -/
-def trianglePath (G : GrayCategory (Obj := Obj))
+noncomputable def trianglePath (G : GrayCategory (Obj := Obj))
     {a b c : Obj} (f : G.Hom a b) (g : G.Hom b c) :
     CellPath
       (TwoCategory.triangleLeftRoute G.toTwoCategory f g)
@@ -46,7 +46,7 @@ def trianglePath (G : GrayCategory (Obj := Obj))
   TwoCategory.trianglePath G.toTwoCategory f g
 
 /-- Interchange coherence as a computational-path 3-cell. -/
-def interchangePath (G : GrayCategory (Obj := Obj))
+noncomputable def interchangePath (G : GrayCategory (Obj := Obj))
     {a b c : Obj} {f₀ f₁ f₂ : G.Hom a b} {g₀ g₁ g₂ : G.Hom b c}
     (η₁ : G.TwoCell f₀ f₁) (η₂ : G.TwoCell f₁ f₂)
     (θ₁ : G.TwoCell g₀ g₁) (θ₂ : G.TwoCell g₁ g₂) :
@@ -66,7 +66,7 @@ theorem gray_interchange_from_path (G : GrayCategory (Obj := Obj))
     (Path.toEq (G.interchangePath η₁ η₂ θ₁ θ₂))
 
 /-- The interchange equation induces a canonical `CellPath` witness. -/
-def gray_interchange_path_from_interchange (G : GrayCategory (Obj := Obj))
+noncomputable def gray_interchange_path_from_interchange (G : GrayCategory (Obj := Obj))
     {a b c : Obj} {f₀ f₁ f₂ : G.Hom a b} {g₀ g₁ g₂ : G.Hom b c}
     (η₁ : G.TwoCell f₀ f₁) (η₂ : G.TwoCell f₁ f₂)
     (θ₁ : G.TwoCell g₀ g₁) (θ₂ : G.TwoCell g₁ g₂) :
@@ -200,7 +200,7 @@ theorem gray_interchange_nonempty (G : GrayCategory (Obj := Obj))
   ⟨G.interchangePath η₁ η₂ θ₁ θ₂⟩
 
 /-- Gray-categories inherit pentagon coherence from their underlying 2-category. -/
-def gray_pentagon_from_interchange (G : GrayCategory (Obj := Obj))
+noncomputable def gray_pentagon_from_interchange (G : GrayCategory (Obj := Obj))
     {a b c d e : Obj}
     (f : G.Hom a b) (g : G.Hom b c) (h : G.Hom c d) (k : G.Hom d e) :
     CellPath
@@ -209,7 +209,7 @@ def gray_pentagon_from_interchange (G : GrayCategory (Obj := Obj))
   G.pentagonPath f g h k
 
 /-- A Gray-category carries pentagon 3-cell data. -/
-def gray_to_tricategory_coherence_pentagon (G : GrayCategory (Obj := Obj))
+noncomputable def gray_to_tricategory_coherence_pentagon (G : GrayCategory (Obj := Obj))
     {a b c d e : Obj}
     (f : G.Hom a b) (g : G.Hom b c) (h : G.Hom c d) (k : G.Hom d e) :
     CellPath
@@ -218,7 +218,7 @@ def gray_to_tricategory_coherence_pentagon (G : GrayCategory (Obj := Obj))
   G.pentagonPath f g h k
 
 /-- A Gray-category carries triangle 3-cell data. -/
-def gray_to_tricategory_coherence_triangle (G : GrayCategory (Obj := Obj))
+noncomputable def gray_to_tricategory_coherence_triangle (G : GrayCategory (Obj := Obj))
     {a b c : Obj} (f : G.Hom a b) (g : G.Hom b c) :
     CellPath
       (TwoCategory.triangleLeftRoute G.toTwoCategory f g)
@@ -365,7 +365,7 @@ theorem gray_to_tricategory_full_coherence_data
 end GrayCategory
 
 /-- Computational paths carry a canonical Gray-category structure. -/
-def pathGrayCategory (A : Type u) : GrayCategory (Obj := A) where
+noncomputable def pathGrayCategory (A : Type u) : GrayCategory (Obj := A) where
   toTwoCategory := pathTwoCategory A
   interchange_path := by
     intro a b c f₀ f₁ f₂ g₀ g₁ g₂ η₁ η₂ θ₁ θ₂
@@ -410,7 +410,7 @@ theorem pathGrayCategory_tensor_assoc (A : Type u)
   rfl
 
 /-- The path Gray-category tensor associativity equality can be lifted to a 3-cell witness. -/
-def pathGrayCategory_tensor_assoc_path (A : Type u)
+noncomputable def pathGrayCategory_tensor_assoc_path (A : Type u)
     {a b c d : A}
     {f₀ f₁ : Path a b} {g₀ g₁ : Path b c} {h₀ h₁ : Path c d}
     (η : (pathGrayCategory A).TwoCell f₀ f₁)

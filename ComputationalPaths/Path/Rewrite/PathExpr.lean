@@ -25,14 +25,14 @@ inductive PathExpr (A : Type u) : A → A → Type (u + 1) where
 namespace PathExpr
 
 /-- Evaluate a `PathExpr` back into a `Path`. -/
-def eval {A : Type u} {a b : A} : PathExpr A a b → Path a b
+noncomputable def eval {A : Type u} {a b : A} : PathExpr A a b → Path a b
   | .atom p => p
   | .refl _ => Path.refl _
   | .symm e => Path.symm (eval e)
   | .trans e₁ e₂ => Path.trans (eval e₁) (eval e₂)
 
 /-- Size of a `PathExpr`. -/
-def size {A : Type u} {a b : A} : PathExpr A a b → Nat
+noncomputable def size {A : Type u} {a b : A} : PathExpr A a b → Nat
   | .atom _ => 1
   | .refl _ => 1
   | .symm e => 1 + size e
@@ -55,7 +55,7 @@ theorem rw_eq_source {A : Type u} {a b : A} {p q : PathExpr A a b}
   | refl _ => rfl
   | step hs _ _ => exact nomatch hs
 
-def rw_of_step {A : Type u} {a b : A} {p q : PathExpr A a b}
+noncomputable def rw_of_step {A : Type u} {a b : A} {p q : PathExpr A a b}
     (h : Step p q) : Rw p q := nomatch h
 
 /-- Join data for `PathExpr`. -/
@@ -71,7 +71,7 @@ theorem join_eq {A : Type u} {a b : A} {p q : PathExpr A a b}
   exact h1.trans h2.symm
 
 /-- Confluence combinator (trivial since Step is empty). -/
-def confluence_of_local {A : Type u} {a b : A}
+noncomputable def confluence_of_local {A : Type u} {a b : A}
     {p q r : PathExpr A a b}
     (hq : Rw p q) (hr : Rw p r) :
     Join q r := by
@@ -81,7 +81,7 @@ def confluence_of_local {A : Type u} {a b : A}
   exact ⟨p, Rw.refl p, Rw.refl p⟩
 
 /-- Normalize an expression (identity in the trivial core). -/
-def normalize {A : Type u} {a b : A} (e : PathExpr A a b) : PathExpr A a b := e
+noncomputable def normalize {A : Type u} {a b : A} (e : PathExpr A a b) : PathExpr A a b := e
 
 /-! ## Transitive closure, complexity, termination -/
 
@@ -104,7 +104,7 @@ theorem rwPlus_complexity_lt {A : Type u} {a b : A}
   | cons hs _ _ => exact nomatch hs
 
 /-- The rewrite system is terminating: no infinite `Step` chains. -/
-def Terminating (A : Type u) (a b : A) : Prop :=
+noncomputable def Terminating (A : Type u) (a b : A) : Prop :=
   ∀ e : PathExpr A a b, Acc (fun q p => Step p q) e
 
 /-- The trivial rewrite system is terminating. -/

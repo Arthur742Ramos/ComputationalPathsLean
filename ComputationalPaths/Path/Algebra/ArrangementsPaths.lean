@@ -94,7 +94,7 @@ structure IntersectionLattice (A : Arrangement.{u}) where
                              (Flat.codim (flat (meet j2 j1)))
 
 /-- The lattice is ranked by codimension (Path). -/
-def lattice_ranked {A : Arrangement.{u}} (L : IntersectionLattice A)
+noncomputable def lattice_ranked {A : Arrangement.{u}} (L : IntersectionLattice A)
     (j : L.J) : Path (Flat.codim (L.flat j)) (Flat.codim (L.flat j)) :=
   L.le_refl j
 
@@ -146,7 +146,7 @@ structure OrlikSolomon (A : Arrangement.{u}) where
   rank_formula : ∀ (p : Nat), Path p p
 
 /-- Poincaré polynomial of OS algebra = characteristic polynomial. -/
-def os_poincare {A : Arrangement.{u}} (os : OrlikSolomon A) :
+noncomputable def os_poincare {A : Arrangement.{u}} (os : OrlikSolomon A) :
     ∀ (p : Nat), Path p p :=
   os.rank_formula
 
@@ -169,7 +169,7 @@ structure ZaslavskyThm (A : Arrangement.{u}) (L : IntersectionLattice A)
     Path n_bounded n_bounded
 
 /-- Corollary: n hyperplanes in general position have 2^n regions. -/
-def general_position_regions (n : Nat) :
+noncomputable def general_position_regions (n : Nat) :
     Path (2 ^ n) (2 ^ n) :=
   Path.trans
     (Path.congrArg (fun x => x) (Path.refl (2 ^ n)))

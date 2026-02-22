@@ -34,7 +34,7 @@ universe u v w
 /-! ## Extension data -/
 
 /-- Restrict a map along a function. -/
-@[simp] def restrict {A : Type u} {B : Type v} (i : A -> B) {X : Type w}
+@[simp] noncomputable def restrict {A : Type u} {B : Type v} (i : A -> B) {X : Type w}
     (h : B -> X) : A -> X :=
   fun a => h (i a)
 
@@ -47,7 +47,7 @@ structure Extension {A : Type u} {B : Type v} {X : Type w}
   comm : forall a, Path (map (i a)) (g a)
 
 /-- The extension problem is obstruction-free if an extension exists. -/
-def obstructionFree {A : Type u} {B : Type v} {X : Type w}
+noncomputable def obstructionFree {A : Type u} {B : Type v} {X : Type w}
     (i : A -> B) (g : A -> X) : Prop :=
   Nonempty (Extension i g)
 
@@ -64,24 +64,24 @@ variable {A : Type u} {B : Type v} {X : Type w}
 variable {i : A -> B} {g : A -> X}
 
 /-- Restriction of an extension to the base. -/
-@[simp] def restrict (e : Extension i g) : A -> X :=
+@[simp] noncomputable def restrict (e : Extension i g) : A -> X :=
   ObstructionTheory.restrict i e.map
 
 /-- The restriction of an extension agrees with the base map. -/
-def restrict_path (e : Extension i g) : Path e.restrict g := by
+noncomputable def restrict_path (e : Extension i g) : Path e.restrict g := by
   simpa [Extension.restrict, ObstructionTheory.restrict] using
     (Path.lamCongr (fun a => e.comm a))
 
 end Extension
 
 /-- Extract the obstruction witness from an extension. -/
-def obstructionOfExtension {A : Type u} {B : Type v} {X : Type w}
+noncomputable def obstructionOfExtension {A : Type u} {B : Type v} {X : Type w}
     {i : A -> B} {g : A -> X} (e : Extension i g) :
     Obstruction i g e.map :=
   Extension.restrict_path (i := i) (g := g) e
 
 /-- Build an extension from a candidate map and an obstruction witness. -/
-def extensionOfObstruction {A : Type u} {B : Type v} {X : Type w}
+noncomputable def extensionOfObstruction {A : Type u} {B : Type v} {X : Type w}
     (i : A -> B) (g : A -> X) (h : B -> X) (p : Obstruction i g h) :
     Extension i g :=
   { map := h
@@ -90,7 +90,7 @@ def extensionOfObstruction {A : Type u} {B : Type v} {X : Type w}
 /-! ## Extensionality -/
 
 /-- Extension maps are path-equal when they agree pointwise. -/
-def extension_unique {A : Type u} {B : Type v} {X : Type w}
+noncomputable def extension_unique {A : Type u} {B : Type v} {X : Type w}
     {i : A -> B} {g : A -> X} (e1 e2 : Extension i g)
     (h : forall b, Path (e1.map b) (e2.map b)) :
     Path e1.map e2.map :=
@@ -113,7 +113,7 @@ extensions are unique up to a function path when they agree pointwise.
   rfl
 
 /-- An extension restricts to the original map via paths. -/
-def extension_restricts {A : Type u} {B : Type v} {X : Type w}
+noncomputable def extension_restricts {A : Type u} {B : Type v} {X : Type w}
     {i : A → B} {g : A → X} (e : Extension i g) (a : A) :
     Path (e.map (i a)) (g a) :=
   e.comm a
@@ -138,7 +138,7 @@ theorem obstruction_roundtrip {A : Type u} {B : Type v} {X : Type w}
   rfl
 
 /-- Extension uniqueness: if two extensions agree pointwise, their maps are path-equal. -/
-def extension_unique_of_pointwise {A : Type u} {B : Type v} {X : Type w}
+noncomputable def extension_unique_of_pointwise {A : Type u} {B : Type v} {X : Type w}
     {i : A → B} {g : A → X} (e1 e2 : Extension i g)
     (h : ∀ b, Path (e1.map b) (e2.map b)) :
     Path e1.map e2.map :=
@@ -151,7 +151,7 @@ theorem extension_gives_obstructionFree {A : Type u} {B : Type v} {X : Type w}
   ⟨e⟩
 
 /-- The identity extension along `id` always exists. -/
-def extensionAlongId {A : Type u} {X : Type w} (g : A → X) : Extension _root_.id g where
+noncomputable def extensionAlongId {A : Type u} {X : Type w} (g : A → X) : Extension _root_.id g where
   map := g
   comm := fun a => Path.refl (g a)
 

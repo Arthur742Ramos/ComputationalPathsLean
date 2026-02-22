@@ -27,13 +27,13 @@ structure AdjPEF (A : Type u) where
 namespace AdjPEF
 variable {A : Type u}
 
-def id : AdjPEF A where
+noncomputable def id : AdjPEF A where
   obj a := a
   mp p := p
   mp_refl _ := rfl
   mp_trans _ _ := rfl
 
-def comp (F G : AdjPEF A) : AdjPEF A where
+noncomputable def comp (F G : AdjPEF A) : AdjPEF A where
   obj a := G.obj (F.obj a)
   mp p := G.mp (F.mp p)
   mp_refl a := by show G.mp (F.mp (Path.refl a)) = _; rw [F.mp_refl, G.mp_refl]
@@ -57,11 +57,11 @@ structure AdjNT {A : Type u} (F G : AdjPEF A) where
 namespace AdjNT
 variable {A : Type u}
 
-def idNT (F : AdjPEF A) : AdjNT F F where
+noncomputable def idNT (F : AdjPEF A) : AdjNT F F where
   cmp a := Path.refl (F.obj a)
   nat p := by simp
 
-def vcomp {F G H : AdjPEF A} (η : AdjNT F G) (θ : AdjNT G H) : AdjNT F H where
+noncomputable def vcomp {F G H : AdjPEF A} (η : AdjNT F G) (θ : AdjNT G H) : AdjNT F H where
   cmp a := Path.trans (η.cmp a) (θ.cmp a)
   nat p := by
     rw [← Path.trans_assoc, η.nat p, Path.trans_assoc, θ.nat p, ← Path.trans_assoc]
@@ -69,7 +69,7 @@ def vcomp {F G H : AdjPEF A} (η : AdjNT F G) (θ : AdjNT G H) : AdjNT F H where
 theorem vcomp_cmp {F G H : AdjPEF A} (η : AdjNT F G) (θ : AdjNT G H) (a : A) :
     (vcomp η θ).cmp a = Path.trans (η.cmp a) (θ.cmp a) := rfl
 
-def whiskerL {F G : AdjPEF A} (H : AdjPEF A) (η : AdjNT F G) :
+noncomputable def whiskerL {F G : AdjPEF A} (H : AdjPEF A) (η : AdjNT F G) :
     AdjNT (AdjPEF.comp F H) (AdjPEF.comp G H) where
   cmp a := H.mp (η.cmp a)
   nat p := by
@@ -77,7 +77,7 @@ def whiskerL {F G : AdjPEF A} (H : AdjPEF A) (η : AdjNT F G) :
          Path.trans (H.mp (η.cmp _)) (H.mp (G.mp p))
     rw [← H.mp_trans, ← H.mp_trans, η.nat p]
 
-def whiskerR {F G : AdjPEF A} (η : AdjNT F G) (H : AdjPEF A) :
+noncomputable def whiskerR {F G : AdjPEF A} (η : AdjNT F G) (H : AdjPEF A) :
     AdjNT (AdjPEF.comp H F) (AdjPEF.comp H G) where
   cmp a := η.cmp (H.obj a)
   nat p := η.nat (H.mp p)
@@ -99,7 +99,7 @@ variable {A : Type u}
 
 /-! ### Identity adjunction -/
 
-def idAdj : PathAdj (AdjPEF.id (A := A)) AdjPEF.id where
+noncomputable def idAdj : PathAdj (AdjPEF.id (A := A)) AdjPEF.id where
   η := AdjNT.idNT AdjPEF.id
   ε := AdjNT.idNT AdjPEF.id
   triL _ := by simp [AdjPEF.id]
@@ -112,7 +112,7 @@ theorem idAdj_triR (a : A) : (idAdj (A := A)).triR a = rfl := Subsingleton.elim 
 
 /-! ### Composition of adjunctions -/
 
-def compAdj {L R L' R' : AdjPEF A} (adj₁ : PathAdj L R) (adj₂ : PathAdj L' R') :
+noncomputable def compAdj {L R L' R' : AdjPEF A} (adj₁ : PathAdj L R) (adj₂ : PathAdj L' R') :
     PathAdj (AdjPEF.comp L L') (AdjPEF.comp R' R) where
   η := {
     cmp := fun a => Path.trans (adj₁.η.cmp a) (R.mp (adj₂.η.cmp (L.obj a)))
@@ -162,11 +162,11 @@ theorem compAdj_ε {L R L' R' : AdjPEF A} (adj₁ : PathAdj L R) (adj₂ : PathA
 
 /-! ### Hom-set equivalence -/
 
-def homFwd {L R : AdjPEF A} (adj : PathAdj L R) {a b : A}
+noncomputable def homFwd {L R : AdjPEF A} (adj : PathAdj L R) {a b : A}
     (f : Path (L.obj a) b) : Path a (R.obj b) :=
   Path.trans (adj.η.cmp a) (R.mp f)
 
-def homBwd {L R : AdjPEF A} (adj : PathAdj L R) {a b : A}
+noncomputable def homBwd {L R : AdjPEF A} (adj : PathAdj L R) {a b : A}
     (g : Path a (R.obj b)) : Path (L.obj a) b :=
   Path.trans (L.mp g) (adj.ε.cmp b)
 
@@ -195,7 +195,7 @@ theorem homBwd_def {L R : AdjPEF A} (adj : PathAdj L R) {a b : A}
 /-! ### Mate correspondence (propositional level) -/
 
 /-- Given L ⊣ R and L' ⊣ R', any σ : L.obj a = L'.obj a induces a mate R'.obj a = R.obj a. -/
-def mateProp {L R L' R' : AdjPEF A} (adj₁ : PathAdj L R) (adj₂ : PathAdj L' R')
+noncomputable def mateProp {L R L' R' : AdjPEF A} (adj₁ : PathAdj L R) (adj₂ : PathAdj L' R')
     (σ : ∀ a, L.obj a = L'.obj a) (a : A) : R'.obj a = R.obj a :=
   ((adj₁.η.cmp (R'.obj a)).toEq).trans
     (_root_.congrArg R.obj (((σ (R'.obj a)).trans (adj₂.ε.cmp a).toEq)))
@@ -213,7 +213,7 @@ structure AdjPEFIso (F G : AdjPEF A) where
   ri  : ∀ a, (bwd a).trans (fwd a) = rfl
 
 /-- Left adjoints are unique up to isomorphism (propositional level). -/
-def leftUnique {L L' R : AdjPEF A} (a1 : PathAdj L R) (a2 : PathAdj L' R) :
+noncomputable def leftUnique {L L' R : AdjPEF A} (a1 : PathAdj L R) (a2 : PathAdj L' R) :
     AdjPEFIso L L' where
   fwd a := (_root_.congrArg L.obj (a2.η.cmp a).toEq).trans (a1.ε.cmp (L'.obj a)).toEq
   bwd a := (_root_.congrArg L'.obj (a1.η.cmp a).toEq).trans (a2.ε.cmp (L.obj a)).toEq
@@ -221,7 +221,7 @@ def leftUnique {L L' R : AdjPEF A} (a1 : PathAdj L R) (a2 : PathAdj L' R) :
   ri _ := Subsingleton.elim _ _
 
 /-- Right adjoints are unique up to propositional isomorphism via the mate. -/
-def rightUnique {L R R' : AdjPEF A} (a1 : PathAdj L R) (a2 : PathAdj L R') :
+noncomputable def rightUnique {L R R' : AdjPEF A} (a1 : PathAdj L R) (a2 : PathAdj L R') :
     AdjPEFIso R R' where
   fwd a := mateProp a2 a1 (fun _ => rfl) a
   bwd a := mateProp a1 a2 (fun _ => rfl) a

@@ -27,10 +27,10 @@ structure LimPEF (A : Type u) where
 namespace LimPEF
 variable {A : Type u}
 
-def id : LimPEF A where
+noncomputable def id : LimPEF A where
   obj a := a; mp p := p; mp_refl _ := rfl; mp_trans _ _ := rfl
 
-def comp (F G : LimPEF A) : LimPEF A where
+noncomputable def comp (F G : LimPEF A) : LimPEF A where
   obj a := G.obj (F.obj a)
   mp p := G.mp (F.mp p)
   mp_refl a := by show G.mp (F.mp (Path.refl a)) = _; rw [F.mp_refl, G.mp_refl]
@@ -74,7 +74,7 @@ theorem pair_unique_toEq {a b prod : A} (P : PathProduct a b prod)
     h.toEq = (P.pair x f g).toEq := Subsingleton.elim _ _
 
 /-- Product of an object with itself has a diagonal. -/
-def diagonal {a prod : A} (P : PathProduct a a prod) : Path a prod :=
+noncomputable def diagonal {a prod : A} (P : PathProduct a a prod) : Path a prod :=
   P.pair a (Path.refl a) (Path.refl a)
 
 theorem diagonal_fst_toEq {a prod : A} (P : PathProduct a a prod) :
@@ -86,7 +86,7 @@ theorem diagonal_snd_toEq {a prod : A} (P : PathProduct a a prod) :
   P.pair_snd_toEq a (Path.refl a) (Path.refl a)
 
 /-- Product is symmetric: a × b ≅ b × a at the toEq level. -/
-def swap {a b prod prod' : A}
+noncomputable def swap {a b prod prod' : A}
     (P : PathProduct a b prod) (Q : PathProduct b a prod') :
     Path prod prod' :=
   Q.pair prod P.snd P.fst
@@ -176,7 +176,7 @@ theorem copair_unique_toEq {a b coprod : A} (C : PathCoproduct a b coprod)
     h.toEq = (C.copair x f g).toEq := Subsingleton.elim _ _
 
 /-- Codiagonal (fold map). -/
-def codiagonal {a coprod : A} (C : PathCoproduct a a coprod) : Path coprod a :=
+noncomputable def codiagonal {a coprod : A} (C : PathCoproduct a a coprod) : Path coprod a :=
   C.copair a (Path.refl a) (Path.refl a)
 
 theorem codiagonal_inl_toEq {a coprod : A} (C : PathCoproduct a a coprod) :
@@ -188,7 +188,7 @@ theorem codiagonal_inr_toEq {a coprod : A} (C : PathCoproduct a a coprod) :
   C.copair_inr_toEq a (Path.refl a) (Path.refl a)
 
 /-- Coproduct is symmetric. -/
-def swap {a b coprod coprod' : A}
+noncomputable def swap {a b coprod coprod' : A}
     (C : PathCoproduct a b coprod) (D : PathCoproduct b a coprod') :
     Path coprod coprod' :=
   C.copair coprod' (D.inr) (D.inl)
@@ -245,12 +245,12 @@ end PathPushout
 
 /-! ## Functor preservation -/
 
-def preservesProducts {A : Type u} (F : LimPEF A)
+noncomputable def preservesProducts {A : Type u} (F : LimPEF A)
     {a b prod : A} (P : PathProduct a b prod) : Prop :=
   ∃ (Q : PathProduct (F.obj a) (F.obj b) (F.obj prod)),
     Q.fst.toEq = (F.mp P.fst).toEq ∧ Q.snd.toEq = (F.mp P.snd).toEq
 
-def preservesEqualizers {A : Type u} (F : LimPEF A)
+noncomputable def preservesEqualizers {A : Type u} (F : LimPEF A)
     (f g : A → A) {a eq_obj : A} (E : PathEqualizer f g a eq_obj) : Prop :=
   ∃ (FE : PathEqualizer (fun x => F.obj (f x)) (fun x => F.obj (g x))
       (F.obj a) (F.obj eq_obj)),
@@ -259,14 +259,14 @@ def preservesEqualizers {A : Type u} (F : LimPEF A)
 /-! ## Trivial cones -/
 
 /-- Constant endofunctor. -/
-def constPEF {A : Type u} (c : A) : LimPEF A where
+noncomputable def constPEF {A : Type u} (c : A) : LimPEF A where
   obj _ := c
   mp _ := Path.refl c
   mp_refl _ := rfl
   mp_trans _ _ := by simp
 
 /-- Every point has a trivial cone over a constant functor. -/
-def constCone {A : Type u} (c : A) : PathCone (constPEF c) c where
+noncomputable def constCone {A : Type u} (c : A) : PathCone (constPEF c) c where
   leg _ := Path.refl c
   comm _ := by simp [constPEF]
 
@@ -274,7 +274,7 @@ theorem constCone_leg {A : Type u} (c x : A) :
     (constCone c).leg x = Path.refl c := rfl
 
 /-- Every point has a trivial cocone over a constant functor. -/
-def constCocone {A : Type u} (c : A) : PathCocone (constPEF c) c where
+noncomputable def constCocone {A : Type u} (c : A) : PathCocone (constPEF c) c where
   leg _ := Path.refl c
   comm _ := by simp [constPEF]
 
@@ -283,7 +283,7 @@ theorem constCocone_leg {A : Type u} (c x : A) :
 
 /-! ## Duality -/
 
-def productToCoproduct {A : Type u} {a b prod : A} (P : PathProduct a b prod) :
+noncomputable def productToCoproduct {A : Type u} {a b prod : A} (P : PathProduct a b prod) :
     PathCoproduct a b prod where
   inl := Path.symm P.fst
   inr := Path.symm P.snd
@@ -301,7 +301,7 @@ theorem productToCoproduct_inr_toEq {A : Type u} {a b prod : A} (P : PathProduct
 /-! ## Cone morphism properties -/
 
 /-- The identity morphism on a cone. -/
-def coneMorphId {A : Type u} {D : LimPEF A} {c : A} (K : PathCone D c) :
+noncomputable def coneMorphId {A : Type u} {D : LimPEF A} {c : A} (K : PathCone D c) :
     PathConeMorphism K K where
   morph := Path.refl c
   compat_toEq a := by simp
@@ -310,7 +310,7 @@ theorem coneMorphId_morph {A : Type u} {D : LimPEF A} {c : A} (K : PathCone D c)
     (coneMorphId K).morph = Path.refl c := rfl
 
 /-- Composition of cone morphisms. -/
-def coneMorphComp {A : Type u} {D : LimPEF A} {c c' c'' : A}
+noncomputable def coneMorphComp {A : Type u} {D : LimPEF A} {c c' c'' : A}
     {K : PathCone D c} {K' : PathCone D c'} {K'' : PathCone D c''}
     (f : PathConeMorphism K K') (g : PathConeMorphism K' K'') :
     PathConeMorphism K K'' where
@@ -323,7 +323,7 @@ theorem coneMorphComp_morph {A : Type u} {D : LimPEF A} {c c' c'' : A}
     (coneMorphComp f g).morph = Path.trans f.morph g.morph := rfl
 
 /-- Composition of cocone morphisms. -/
-def coconeMorphComp {A : Type u} {D : LimPEF A} {c c' c'' : A}
+noncomputable def coconeMorphComp {A : Type u} {D : LimPEF A} {c c' c'' : A}
     {K : PathCocone D c} {K' : PathCocone D c'} {K'' : PathCocone D c''}
     (f : PathCoconeMorphism K K') (g : PathCoconeMorphism K' K'') :
     PathCoconeMorphism K K'' where

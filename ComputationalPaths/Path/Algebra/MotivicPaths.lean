@@ -32,23 +32,23 @@ structure AlgCycle where
   deriving DecidableEq, Repr, BEq
 
 /-- Zero cycle at a given codimension. -/
-def AlgCycle.zero (p : Nat) : AlgCycle :=
+noncomputable def AlgCycle.zero (p : Nat) : AlgCycle :=
   { codim := p, components := [] }
 
 /-- Sum of two cycles (same codimension). -/
-def AlgCycle.add (c₁ c₂ : AlgCycle) : AlgCycle :=
+noncomputable def AlgCycle.add (c₁ c₂ : AlgCycle) : AlgCycle :=
   { codim := c₁.codim, components := c₁.components ++ c₂.components }
 
 /-- Negation of a cycle. -/
-def AlgCycle.neg (c : AlgCycle) : AlgCycle :=
+noncomputable def AlgCycle.neg (c : AlgCycle) : AlgCycle :=
   { codim := c.codim, components := c.components.map (· * (-1)) }
 
 /-- Degree of a zero-cycle: sum of multiplicities. -/
-def AlgCycle.degree (c : AlgCycle) : Int :=
+noncomputable def AlgCycle.degree (c : AlgCycle) : Int :=
   c.components.foldl (· + ·) 0
 
 /-- Number of irreducible components. -/
-def AlgCycle.numComponents (c : AlgCycle) : Nat :=
+noncomputable def AlgCycle.numComponents (c : AlgCycle) : Nat :=
   c.components.length
 
 /-- Zero cycle has degree 0. -/
@@ -73,7 +73,7 @@ theorem add_zero_components (c : AlgCycle) :
   simp [AlgCycle.add, AlgCycle.zero]
 
 /-- Adding zero gives same components (path). -/
-def add_zero_path (c : AlgCycle) :
+noncomputable def add_zero_path (c : AlgCycle) :
     Path (c.add (AlgCycle.zero c.codim)).components (c.components ++ []) :=
   Path.mk [Step.mk _ _ (add_zero_components c)] (add_zero_components c)
 
@@ -89,11 +89,11 @@ structure ChowData where
   torsion : Nat      -- torsion subgroup order
 
 /-- CH^p(X, 0) is the classical Chow group. -/
-def ChowData.classical (p rank : Nat) : ChowData :=
+noncomputable def ChowData.classical (p rank : Nat) : ChowData :=
   { codim := p, degree := 0, rank := rank, torsion := 1 }
 
 /-- Product on Chow groups: CH^p ⊗ CH^q → CH^{p+q}. -/
-def ChowData.product (c₁ c₂ : ChowData) : ChowData :=
+noncomputable def ChowData.product (c₁ c₂ : ChowData) : ChowData :=
   { codim := c₁.codim + c₂.codim,
     degree := c₁.degree + c₂.degree,
     rank := c₁.rank * c₂.rank,
@@ -120,7 +120,7 @@ theorem classical_degree (p rank : Nat) :
   simp [ChowData.classical]
 
 /-- Product codim comm path. -/
-def chow_product_codim_comm_path (c₁ c₂ : ChowData) :
+noncomputable def chow_product_codim_comm_path (c₁ c₂ : ChowData) :
     Path (c₁.product c₂).codim (c₂.product c₁).codim :=
   Path.mk [Step.mk _ _ (chow_product_codim_comm c₁ c₂)] (chow_product_codim_comm c₁ c₂)
 
@@ -141,7 +141,7 @@ theorem cycle_class_degree (ccm : CycleClassMap) :
   ccm.degree_formula
 
 /-- Cycle class degree path. -/
-def cycle_class_degree_path (ccm : CycleClassMap) :
+noncomputable def cycle_class_degree_path (ccm : CycleClassMap) :
     Path ccm.target_degree (2 * ccm.source_codim) :=
   Path.mk [Step.mk _ _ ccm.degree_formula] ccm.degree_formula
 
@@ -161,11 +161,11 @@ structure MotivicWeight where
   twist : Nat
 
 /-- Tate twist: shift weight by 2. -/
-def MotivicWeight.tateTwist (mw : MotivicWeight) : MotivicWeight :=
+noncomputable def MotivicWeight.tateTwist (mw : MotivicWeight) : MotivicWeight :=
   { weight := mw.weight + 2, degree := mw.degree, twist := mw.twist + 1 }
 
 /-- Double Tate twist. -/
-def MotivicWeight.doubleTwist (mw : MotivicWeight) : MotivicWeight :=
+noncomputable def MotivicWeight.doubleTwist (mw : MotivicWeight) : MotivicWeight :=
   mw.tateTwist.tateTwist
 
 /-- Tate twist increases weight by 2. -/
@@ -190,7 +190,7 @@ theorem tate_twist_twist (mw : MotivicWeight) :
   simp [MotivicWeight.tateTwist]
 
 /-- Double twist path. -/
-def double_twist_weight_path (mw : MotivicWeight) :
+noncomputable def double_twist_weight_path (mw : MotivicWeight) :
     Path mw.doubleTwist.weight (mw.weight + 4) :=
   Path.mk [Step.mk _ _ (double_twist_weight mw)] (double_twist_weight mw)
 
@@ -205,11 +205,11 @@ structure MotivicSSPage where
   q : Int        -- complementary degree
 
 /-- Differential on page r goes (r, 1-r). -/
-def MotivicSSPage.diffTarget (ss : MotivicSSPage) : MotivicSSPage :=
+noncomputable def MotivicSSPage.diffTarget (ss : MotivicSSPage) : MotivicSSPage :=
   { page := ss.page, p := ss.p + ss.page, q := ss.q + 1 - ss.page }
 
 /-- Next page. -/
-def MotivicSSPage.nextPage (ss : MotivicSSPage) : MotivicSSPage :=
+noncomputable def MotivicSSPage.nextPage (ss : MotivicSSPage) : MotivicSSPage :=
   { page := ss.page + 1, p := ss.p, q := ss.q }
 
 /-- Differential preserves page number. -/
@@ -246,12 +246,12 @@ theorem bloch_kato_iso (bk : BlochKatoData) :
   bk.iso
 
 /-- Bloch-Kato path. -/
-def bloch_kato_path (bk : BlochKatoData) :
+noncomputable def bloch_kato_path (bk : BlochKatoData) :
     Path bk.milnorK_rank bk.galoisH_rank :=
   Path.mk [Step.mk _ _ bk.iso] bk.iso
 
 /-- Bloch-Kato symmetric path. -/
-def bloch_kato_symm_path (bk : BlochKatoData) :
+noncomputable def bloch_kato_symm_path (bk : BlochKatoData) :
     Path bk.galoisH_rank bk.milnorK_rank :=
   Path.symm (bloch_kato_path bk)
 
@@ -266,17 +266,17 @@ structure VoevodskyMotive where
   isEffective : Bool
 
 /-- Tate motive Z(n). -/
-def VoevodskyMotive.tate (n : Nat) : VoevodskyMotive :=
+noncomputable def VoevodskyMotive.tate (n : Nat) : VoevodskyMotive :=
   { weight := 2 * n, dimension := 1, isEffective := true }
 
 /-- Direct sum of motives. -/
-def VoevodskyMotive.directSum (m₁ m₂ : VoevodskyMotive) : VoevodskyMotive :=
+noncomputable def VoevodskyMotive.directSum (m₁ m₂ : VoevodskyMotive) : VoevodskyMotive :=
   { weight := max m₁.weight m₂.weight,
     dimension := m₁.dimension + m₂.dimension,
     isEffective := m₁.isEffective && m₂.isEffective }
 
 /-- Tensor product of motives. -/
-def VoevodskyMotive.tensor (m₁ m₂ : VoevodskyMotive) : VoevodskyMotive :=
+noncomputable def VoevodskyMotive.tensor (m₁ m₂ : VoevodskyMotive) : VoevodskyMotive :=
   { weight := m₁.weight + m₂.weight,
     dimension := m₁.dimension * m₂.dimension,
     isEffective := m₁.isEffective && m₂.isEffective }
@@ -307,7 +307,7 @@ theorem tensor_dimension (m₁ m₂ : VoevodskyMotive) :
   simp [VoevodskyMotive.tensor]
 
 /-- Direct sum dimension path. -/
-def directSum_dim_comm_path (m₁ m₂ : VoevodskyMotive) :
+noncomputable def directSum_dim_comm_path (m₁ m₂ : VoevodskyMotive) :
     Path (m₁.directSum m₂).dimension (m₂.directSum m₁).dimension :=
   Path.mk [Step.mk _ _ (directSum_dim_comm m₁ m₂)] (directSum_dim_comm m₁ m₂)
 
@@ -317,7 +317,7 @@ theorem tensor_weight_comm (m₁ m₂ : VoevodskyMotive) :
   simp [VoevodskyMotive.tensor, Int.add_comm]
 
 /-- Tensor weight comm path. -/
-def tensor_weight_comm_path (m₁ m₂ : VoevodskyMotive) :
+noncomputable def tensor_weight_comm_path (m₁ m₂ : VoevodskyMotive) :
     Path (m₁.tensor m₂).weight (m₂.tensor m₁).weight :=
   Path.mk [Step.mk _ _ (tensor_weight_comm m₁ m₂)] (tensor_weight_comm m₁ m₂)
 

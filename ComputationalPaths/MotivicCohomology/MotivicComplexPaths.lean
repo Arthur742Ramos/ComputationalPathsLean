@@ -74,7 +74,7 @@ noncomputable def dSquared_cancel_right_rweq (n : Int) (x : C.term n) :
   rweq_cmpA_inv_right (C.dSquaredPath n x)
 
 /-- Canonical trivial motivic complex on `PUnit`. -/
-def trivial (X : Type u) (x0 : X) : MotivicComplexPathData X where
+noncomputable def trivial (X : Type u) (x0 : X) : MotivicComplexPathData X where
   base := x0
   term := fun _ => PUnit
   zero := fun _ => PUnit.unit

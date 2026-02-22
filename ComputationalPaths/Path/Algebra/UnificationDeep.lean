@@ -23,27 +23,27 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans {α : Type} {a b c : α}
+noncomputable def Path.trans {α : Type} {a b c : α}
     (p : Path α a b) (q : Path α b c) : Path α a c :=
   match p with
   | .nil _ => q
   | .cons s rest => .cons s (rest.trans q)
 
-def Path.length {α : Type} {a b : α} : Path α a b → Nat
+noncomputable def Path.length {α : Type} {a b : α} : Path α a b → Nat
   | .nil _       => 0
   | .cons _ rest => 1 + rest.length
 
-def Step.symm {α : Type} {a b : α} : Step α a b → Step α b a
+noncomputable def Step.symm {α : Type} {a b : α} : Step α a b → Step α b a
   | .mk tag a b => .mk (tag ++ "⁻¹") b a
 
-def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a
+noncomputable def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a
   | .nil a => .nil a
   | .cons s rest => rest.symm.trans (.cons s.symm (.nil _))
 
-def Path.single {α : Type} {a b : α} (s : Step α a b) : Path α a b :=
+noncomputable def Path.single {α : Type} {a b : α} (s : Step α a b) : Path α a b :=
   .cons s (.nil b)
 
-def Path.congrArg {α β : Type} (f : α → β) {a b : α}
+noncomputable def Path.congrArg {α β : Type} (f : α → β) {a b : α}
     (p : Path α a b) : Path β (f a) (f b) :=
   match p with
   | .nil a => .nil (f a)
@@ -107,7 +107,7 @@ deriving DecidableEq, Repr
 -- §4  Term metrics
 -- ============================================================
 
-def Tm.size : Tm → Nat
+noncomputable def Tm.size : Tm → Nat
   | .var _    => 1
   | .const _  => 1
   | .app l r  => 1 + l.size + r.size
@@ -124,7 +124,7 @@ theorem Tm.size_app_left (l r : Tm) : l.size < (Tm.app l r).size := by
 theorem Tm.size_app_right (l r : Tm) : r.size < (Tm.app l r).size := by
   simp [Tm.size]; omega
 
-def Tm.depth : Tm → Nat
+noncomputable def Tm.depth : Tm → Nat
   | .var _    => 0
   | .const _  => 0
   | .app l r  => 1 + max l.depth r.depth
@@ -144,7 +144,7 @@ theorem Tm.depth_app_right (l r : Tm) : r.depth < (Tm.app l r).depth := by
 -- §5  Occurs check
 -- ============================================================
 
-def Tm.occurs (x : Nat) : Tm → Bool
+noncomputable def Tm.occurs (x : Nat) : Tm → Bool
   | .var n    => n == x
   | .const _  => false
   | .app l r  => l.occurs x || r.occurs x
@@ -165,7 +165,7 @@ theorem Tm.occurs_app (x : Nat) (l r : Tm) :
 -- §6  Ground terms
 -- ============================================================
 
-def Tm.isGround : Tm → Bool
+noncomputable def Tm.isGround : Tm → Bool
   | .var _    => false
   | .const _  => true
   | .app l r  => l.isGround && r.isGround
@@ -190,7 +190,7 @@ theorem Tm.ground_no_occurs (t : Tm) (x : Nat)
 -- §7  Free variables
 -- ============================================================
 
-def Tm.fvs : Tm → List Nat
+noncomputable def Tm.fvs : Tm → List Nat
   | .var n   => [n]
   | .const _ => []
   | .app l r => l.fvs ++ r.fvs
@@ -205,11 +205,11 @@ theorem Tm.fvs_const (c : String) : Tm.fvs (.const c) = [] := rfl
 -- §8  Substitutions
 -- ============================================================
 
-def Subst := Nat → Tm
+noncomputable def Subst := Nat → Tm
 
-def Subst.id : Subst := Tm.var
+noncomputable def Subst.id : Subst := Tm.var
 
-def applyS (σ : Subst) : Tm → Tm
+noncomputable def applyS (σ : Subst) : Tm → Tm
   | .var n    => σ n
   | .const c  => .const c
   | .app l r  => .app (applyS σ l) (applyS σ r)
@@ -229,10 +229,10 @@ theorem applyS_const (σ : Subst) (c : String) :
 theorem applyS_app (σ : Subst) (l r : Tm) :
     applyS σ (.app l r) = .app (applyS σ l) (applyS σ r) := rfl
 
-def Subst.comp (σ τ : Subst) : Subst :=
+noncomputable def Subst.comp (σ τ : Subst) : Subst :=
   fun n => applyS σ (τ n)
 
-def Subst.single (x : Nat) (t : Tm) : Subst :=
+noncomputable def Subst.single (x : Nat) (t : Tm) : Subst :=
   fun n => if n == x then t else .var n
 
 /-- Theorem 25: single hits target. -/
@@ -248,7 +248,7 @@ theorem Subst.single_miss (x y : Nat) (t : Tm) (h : y ≠ x) :
 -- §9  Idempotent substitutions
 -- ============================================================
 
-def Subst.idempotent (σ : Subst) : Prop :=
+noncomputable def Subst.idempotent (σ : Subst) : Prop :=
   ∀ n, applyS σ (σ n) = σ n
 
 /-- Theorem 27: identity is idempotent. -/
@@ -265,12 +265,12 @@ deriving DecidableEq, Repr
 
 abbrev UProblem := List UEq
 
-def UEq.isSolved (e : UEq) : Bool :=
+noncomputable def UEq.isSolved (e : UEq) : Bool :=
   match e.lhs with
   | .var x => !(e.rhs.occurs x)
   | _      => false
 
-def UProblem.allSolved (P : UProblem) : Bool := P.all UEq.isSolved
+noncomputable def UProblem.allSolved (P : UProblem) : Bool := P.all UEq.isSolved
 
 /-- Theorem 28: empty problem is solved. -/
 theorem UProblem.allSolved_nil : UProblem.allSolved [] = true := rfl
@@ -279,10 +279,10 @@ theorem UProblem.allSolved_nil : UProblem.allSolved [] = true := rfl
 -- §11  Unifiers
 -- ============================================================
 
-def UEq.unifiedBy (e : UEq) (σ : Subst) : Prop :=
+noncomputable def UEq.unifiedBy (e : UEq) (σ : Subst) : Prop :=
   applyS σ e.lhs = applyS σ e.rhs
 
-def UProblem.unifiedBy (P : UProblem) (σ : Subst) : Prop :=
+noncomputable def UProblem.unifiedBy (P : UProblem) (σ : Subst) : Prop :=
   ∀ e, e ∈ P → e.unifiedBy σ
 
 /-- Theorem 29: id unifies empty. -/
@@ -396,7 +396,7 @@ inductive UPath : UProblem → UProblem → Type where
   | done   : (P : UProblem) → UPath P P
   | step   : (tag : String) → MMStep P Q → UPath Q R → UPath P R
 
-def UPath.stepCount : UPath P R → Nat
+noncomputable def UPath.stepCount : UPath P R → Nat
   | .done _        => 0
   | .step _ _ rest => 1 + rest.stepCount
 
@@ -404,7 +404,7 @@ def UPath.stepCount : UPath P R → Nat
 theorem UPath.stepCount_done (P : UProblem) :
     (UPath.done P).stepCount = 0 := rfl
 
-def UPath.concat {P Q R : UProblem}
+noncomputable def UPath.concat {P Q R : UProblem}
     (pq : UPath P Q) (qr : UPath Q R) : UPath P R :=
   match pq with
   | .done _          => qr
@@ -422,7 +422,7 @@ theorem UPath.stepCount_concat {P Q R : UProblem}
 -- §15  Solution equivalence
 -- ============================================================
 
-def solutionEquiv (P Q : UProblem) : Prop :=
+noncomputable def solutionEquiv (P Q : UProblem) : Prop :=
   ∀ σ : Subst, P.unifiedBy σ ↔ Q.unifiedBy σ
 
 /-- Theorem 42: reflexive. -/
@@ -449,7 +449,7 @@ theorem delete_equiv (t : Tm) (rest : UProblem) :
 -- §16  Most-general unifiers
 -- ============================================================
 
-def Subst.moreGeneral (σ τ : Subst) : Prop :=
+noncomputable def Subst.moreGeneral (σ τ : Subst) : Prop :=
   ∃ ρ : Subst, ∀ n, τ n = applyS ρ (σ n)
 
 /-- Theorem 46: reflexivity. -/
@@ -478,12 +478,12 @@ theorem ground_unif_eq (s t : Tm)
 -- §18  Depth sum measure
 -- ============================================================
 
-def depthSum : UProblem → Nat
+noncomputable def depthSum : UProblem → Nat
   | []      => 0
   | e :: es => e.lhs.depth + e.rhs.depth + depthSum es
 
 /-- Size-based problem measure (correct for decompose). -/
-def sizeSum : UProblem → Nat
+noncomputable def sizeSum : UProblem → Nat
   | []      => 0
   | e :: es => e.lhs.size + e.rhs.size + sizeSum es
 
@@ -519,7 +519,7 @@ inductive ACPath : Tm → Tm → Type where
             ACPath (.app (.const "f") (.app a (.app (.const "f") (.app b c_)))) d →
             ACPath (.app (.const "f") (.app (.app (.const "f") (.app a b)) c_)) d
 
-def ACPath.len : ACPath s t → Nat
+noncomputable def ACPath.len : ACPath s t → Nat
   | .nil _            => 0
   | .comm _ _ rest    => 1 + rest.len
   | .assoc _ _ _ rest => 1 + rest.len
@@ -557,7 +557,7 @@ structure CritPair where
   term2 : Tm
 deriving Repr
 
-def CritPair.trivial (cp : CritPair) : Bool := cp.term1 == cp.term2
+noncomputable def CritPair.trivial (cp : CritPair) : Bool := cp.term1 == cp.term2
 
 /-- Theorem 54: trivial for equal terms. -/
 theorem CritPair.trivial_eq (t : Tm) :
@@ -620,7 +620,7 @@ inductive EEquiv (E : ETheory) : Tm → Tm → Prop where
       EEquiv E l₁ l₂ → EEquiv E r₁ r₂ →
       EEquiv E (.app l₁ r₁) (.app l₂ r₂)
 
-def EUnifier (E : ETheory) (s t : Tm) (σ : Subst) : Prop :=
+noncomputable def EUnifier (E : ETheory) (s t : Tm) (σ : Subst) : Prop :=
   EEquiv E (applyS σ s) (applyS σ t)
 
 /-- Theorem 58: id is E-unifier for equal terms. -/
@@ -634,7 +634,7 @@ theorem EEquiv.refl' (E : ETheory) (t : Tm) : EEquiv E t t := EEquiv.refl t
 -- §24  Coherence
 -- ============================================================
 
-def UPath.coherent (p q : UPath P R) : Prop :=
+noncomputable def UPath.coherent (p q : UPath P R) : Prop :=
   p.stepCount ≥ 0 ∧ q.stepCount ≥ 0
 
 /-- Theorem 60: all UPaths coherent. -/
@@ -645,7 +645,7 @@ theorem UPath.coherent_always (p q : UPath P R) :
 -- §25  Substitution domain
 -- ============================================================
 
-def Subst.domainOn (σ : Subst) (vars : List Nat) : List Nat :=
+noncomputable def Subst.domainOn (σ : Subst) (vars : List Nat) : List Nat :=
   vars.filter fun x => σ x != .var x
 
 /-- Theorem 61: identity has empty domain. -/

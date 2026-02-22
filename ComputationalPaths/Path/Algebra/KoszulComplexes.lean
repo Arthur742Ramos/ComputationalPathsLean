@@ -86,38 +86,38 @@ structure CRingData (R : Type u) where
   zero_mul : ∀ a, mul zero a = zero
 
 /-- Path witness for additive associativity. -/
-def CRingData.addAssocPath {R : Type u} (ring : CRingData R)
+noncomputable def CRingData.addAssocPath {R : Type u} (ring : CRingData R)
     (a b c : R) : Path (ring.add (ring.add a b) c) (ring.add a (ring.add b c)) :=
   Path.stepChain (ring.add_assoc a b c)
 
 /-- Path witness for commutativity of addition. -/
-def CRingData.addCommPath {R : Type u} (ring : CRingData R)
+noncomputable def CRingData.addCommPath {R : Type u} (ring : CRingData R)
     (a b : R) : Path (ring.add a b) (ring.add b a) :=
   Path.stepChain (ring.add_comm a b)
 
 /-- Path witness for multiplicative associativity. -/
-def CRingData.mulAssocPath {R : Type u} (ring : CRingData R)
+noncomputable def CRingData.mulAssocPath {R : Type u} (ring : CRingData R)
     (a b c : R) : Path (ring.mul (ring.mul a b) c) (ring.mul a (ring.mul b c)) :=
   Path.stepChain (ring.mul_assoc a b c)
 
 /-- Path witness for commutativity of multiplication. -/
-def CRingData.mulCommPath {R : Type u} (ring : CRingData R)
+noncomputable def CRingData.mulCommPath {R : Type u} (ring : CRingData R)
     (a b : R) : Path (ring.mul a b) (ring.mul b a) :=
   Path.stepChain (ring.mul_comm a b)
 
 /-- Path witness for distributivity. -/
-def CRingData.distribPath {R : Type u} (ring : CRingData R)
+noncomputable def CRingData.distribPath {R : Type u} (ring : CRingData R)
     (a b c : R) :
     Path (ring.mul a (ring.add b c)) (ring.add (ring.mul a b) (ring.mul a c)) :=
   Path.stepChain (ring.distrib_left a b c)
 
 /-- Path witness for mul_zero. -/
-def CRingData.mulZeroPath {R : Type u} (ring : CRingData R) (a : R) :
+noncomputable def CRingData.mulZeroPath {R : Type u} (ring : CRingData R) (a : R) :
     Path (ring.mul a ring.zero) ring.zero :=
   Path.stepChain (ring.mul_zero a)
 
 /-- Step chain: a*(b+c) - a*b = a*c. -/
-def CRingData.distribCancelChain {R : Type u} (ring : CRingData R)
+noncomputable def CRingData.distribCancelChain {R : Type u} (ring : CRingData R)
     (a b c : R)
     (h : ring.add (ring.mul a (ring.add b c)) (ring.neg (ring.mul a b)) =
          ring.mul a c) :
@@ -126,7 +126,7 @@ def CRingData.distribCancelChain {R : Type u} (ring : CRingData R)
   Path.stepChain h
 
 /-- Trivial ring on PUnit. -/
-def trivialRing : CRingData PUnit where
+noncomputable def trivialRing : CRingData PUnit where
   zero := PUnit.unit
   one := PUnit.unit
   add := fun _ _ => PUnit.unit
@@ -164,21 +164,21 @@ structure RModuleData {R : Type u} (ring : CRingData R) (M : Type v) where
   smul_zero : ∀ r, smul r zero = zero
 
 /-- Path witness for smul associativity. -/
-def RModuleData.smulMulPath {R : Type u} {M : Type v}
+noncomputable def RModuleData.smulMulPath {R : Type u} {M : Type v}
     {ring : CRingData R} (mod : RModuleData ring M)
     (r s : R) (x : M) :
     Path (mod.smul (ring.mul r s) x) (mod.smul r (mod.smul s x)) :=
   Path.stepChain (mod.smul_mul r s x)
 
 /-- Path witness for smul distributivity. -/
-def RModuleData.smulAddPath {R : Type u} {M : Type v}
+noncomputable def RModuleData.smulAddPath {R : Type u} {M : Type v}
     {ring : CRingData R} (mod : RModuleData ring M)
     (r : R) (x y : M) :
     Path (mod.smul r (mod.add x y)) (mod.add (mod.smul r x) (mod.smul r y)) :=
   Path.stepChain (mod.smul_add r x y)
 
 /-- Step chain: r*(s*x) = (r*s)*x by commutativity. -/
-def RModuleData.smulCommChain {R : Type u} {M : Type v}
+noncomputable def RModuleData.smulCommChain {R : Type u} {M : Type v}
     {ring : CRingData R} (mod : RModuleData ring M)
     (r s : R) (x : M) :
     Path (mod.smul r (mod.smul s x)) (mod.smul (ring.mul r s) x) :=
@@ -193,7 +193,7 @@ structure RegularElement {R : Type u} {M : Type v}
   regular : ∀ x : M, mod.smul r x = mod.zero → x = mod.zero
 
 /-- Path witness for regularity. -/
-def RegularElement.regularPath {R : Type u} {M : Type v}
+noncomputable def RegularElement.regularPath {R : Type u} {M : Type v}
     {ring : CRingData R} {mod : RModuleData ring M} {r : R}
     (reg : RegularElement ring mod r) (x : M) (h : mod.smul r x = mod.zero) :
     Path x mod.zero :=
@@ -210,7 +210,7 @@ structure RegularSequence {R : Type u} {M : Type v}
   nondegenerate : seq.length > 0 ∨ True
 
 /-- Path witness for non-degeneracy. -/
-def RegularSequence.nondegPath {R : Type u} {M : Type v}
+noncomputable def RegularSequence.nondegPath {R : Type u} {M : Type v}
     {ring : CRingData R} {mod : RModuleData ring M}
     (RS : RegularSequence ring mod) :
     Path (RS.seq.length > 0 ∨ True) True :=
@@ -232,7 +232,7 @@ structure ExteriorAlgebra {R : Type u} (ring : CRingData R) (n : Nat) where
     wedge p p a a = wedge p p a a
 
 /-- Path witness for anticommutativity. -/
-def ExteriorAlgebra.anticommPath {R : Type u} {ring : CRingData R} {n : Nat}
+noncomputable def ExteriorAlgebra.anticommPath {R : Type u} {ring : CRingData R} {n : Nat}
     (E : ExteriorAlgebra ring n) (p q : Nat)
     (a : E.carrier p) (b : E.carrier q) :
     Path (E.wedge p q a b) (E.wedge p q a b) :=
@@ -256,7 +256,7 @@ structure KoszulComplex {R : Type u} {M : Type v}
     diff p (diff (p + 1) x) = chainZero p
 
 /-- Path witness for d² = 0. -/
-def KoszulComplex.diffSquaredPath {R : Type u} {M : Type v}
+noncomputable def KoszulComplex.diffSquaredPath {R : Type u} {M : Type v}
     {ring : CRingData R} {mod : RModuleData ring M}
     (K : KoszulComplex ring mod) (p : Nat) (x : K.chainGroup (p + 2)) :
     Path (K.diff p (K.diff (p + 1) x)) (K.chainZero p) :=
@@ -264,7 +264,7 @@ def KoszulComplex.diffSquaredPath {R : Type u} {M : Type v}
 
 /-- Step chain: d applied three times still yields zero
     via intermediate d²=0 applications. -/
-def KoszulComplex.tripleZeroChain {R : Type u} {M : Type v}
+noncomputable def KoszulComplex.tripleZeroChain {R : Type u} {M : Type v}
     {ring : CRingData R} {mod : RModuleData ring M}
     (K : KoszulComplex ring mod) (p : Nat) (x : K.chainGroup (p + 3))
     (h : K.diff p (K.diff (p + 1) (K.diff (p + 2) x)) = K.chainZero p) :
@@ -351,19 +351,19 @@ structure CohenMacaulay {R : Type u}
   seq_length : max_reg_seq.length = depth
 
 /-- Path witness for CM condition. -/
-def CohenMacaulay.cmPath {R : Type u} {ring : CRingData R}
+noncomputable def CohenMacaulay.cmPath {R : Type u} {ring : CRingData R}
     (CM : CohenMacaulay ring) :
     Path CM.depth CM.dimension :=
   Path.stepChain CM.cm_condition
 
 /-- Path witness for sequence length. -/
-def CohenMacaulay.seqLengthPath {R : Type u} {ring : CRingData R}
+noncomputable def CohenMacaulay.seqLengthPath {R : Type u} {ring : CRingData R}
     (CM : CohenMacaulay ring) :
     Path CM.max_reg_seq.length CM.depth :=
   Path.stepChain CM.seq_length
 
 /-- Step chain: seq_length = dimension through depth. -/
-def CohenMacaulay.lengthDimChain {R : Type u} {ring : CRingData R}
+noncomputable def CohenMacaulay.lengthDimChain {R : Type u} {ring : CRingData R}
     (CM : CohenMacaulay ring) :
     Path CM.max_reg_seq.length CM.dimension :=
   Path.trans
@@ -382,7 +382,7 @@ structure Gorenstein {R : Type u} (ring : CRingData R) where
   canonical_free : True
 
 /-- Path for Gorenstein implies CM. -/
-def Gorenstein.cmImpliesPath {R : Type u} {ring : CRingData R}
+noncomputable def Gorenstein.cmImpliesPath {R : Type u} {ring : CRingData R}
     (G : Gorenstein ring) :
     Path G.cm.depth G.cm.dimension :=
   Path.stepChain G.cm.cm_condition
@@ -402,14 +402,14 @@ structure AuslanderBuchsbaum {R : Type u} {M : Type v}
   ab_formula : proj_dim + depth_M = depth_R
 
 /-- Path witness for AB formula. -/
-def AuslanderBuchsbaum.formulaPath {R : Type u} {M : Type v}
+noncomputable def AuslanderBuchsbaum.formulaPath {R : Type u} {M : Type v}
     {ring : CRingData R} {mod : RModuleData ring M}
     (AB : AuslanderBuchsbaum ring mod) :
     Path (AB.proj_dim + AB.depth_M) AB.depth_R :=
   Path.stepChain AB.ab_formula
 
 /-- Step chain: if pd = 0 then depth_M = depth_R. -/
-def AuslanderBuchsbaum.freeModuleChain {R : Type u} {M : Type v}
+noncomputable def AuslanderBuchsbaum.freeModuleChain {R : Type u} {M : Type v}
     {ring : CRingData R} {mod : RModuleData ring M}
     (AB : AuslanderBuchsbaum ring mod)
     (hpd : AB.proj_dim = 0) :

@@ -41,11 +41,11 @@ structure ConeMor {D : SeqDiag.{u}} (C₁ C₂ : Cone D) where
   comm : ∀ n (x : C₁.apex), C₂.proj n (map x) = C₁.proj n x
 
 -- 1: id
-def ConeMor.id (C : Cone D) : ConeMor C C where
+noncomputable def ConeMor.id (C : Cone D) : ConeMor C C where
   map := _root_.id; comm := fun _ _ => rfl
 
 -- 2: composition
-def ConeMor.comp {C₁ C₂ C₃ : Cone D}
+noncomputable def ConeMor.comp {C₁ C₂ C₃ : Cone D}
     (f : ConeMor C₁ C₂) (g : ConeMor C₂ C₃) : ConeMor C₁ C₃ where
   map := g.map ∘ f.map
   comm := fun n x => by simp [Function.comp]; rw [g.comm, f.comm]
@@ -78,11 +78,11 @@ structure CoconeMor {D : SeqDiag.{u}} (C₁ C₂ : Cocone D) where
   comm : ∀ n (x : D.obj n), map (C₁.inj n x) = C₂.inj n x
 
 -- 6: id
-def CoconeMor.id (C : Cocone D) : CoconeMor C C where
+noncomputable def CoconeMor.id (C : Cocone D) : CoconeMor C C where
   map := _root_.id; comm := fun _ _ => rfl
 
 -- 7: composition
-def CoconeMor.comp {C₁ C₂ C₃ : Cocone D}
+noncomputable def CoconeMor.comp {C₁ C₂ C₃ : Cocone D}
     (f : CoconeMor C₁ C₂) (g : CoconeMor C₂ C₃) : CoconeMor C₁ C₃ where
   map := g.map ∘ f.map
   comm := fun n x => by simp [Function.comp]; rw [f.comm, g.comm]
@@ -99,7 +99,7 @@ theorem CoconeMor.comp_id {C₁ C₂ : Cocone D} (f : CoconeMor C₁ C₂) :
 
 /-! ## §4 Mapping telescope and sequential colimit -/
 
-def MappingTelescope (D : SeqDiag.{u}) : Type u := Σ n, D.obj n
+noncomputable def MappingTelescope (D : SeqDiag.{u}) : Type u := Σ n, D.obj n
 
 inductive TelescopeRel (D : SeqDiag.{u}) :
     MappingTelescope D → MappingTelescope D → Prop where
@@ -111,9 +111,9 @@ theorem TelescopeRel.extract {D : SeqDiag.{u}} {a b : MappingTelescope D}
     ∃ n, ∃ x : D.obj n, a = ⟨n, x⟩ ∧ b = ⟨n + 1, D.map n x⟩ := by
   cases h with | step n x => exact ⟨n, x, rfl, rfl⟩
 
-def SeqColimit (D : SeqDiag.{u}) : Type u := Quot (TelescopeRel D)
+noncomputable def SeqColimit (D : SeqDiag.{u}) : Type u := Quot (TelescopeRel D)
 
-def SeqColimit.ι (D : SeqDiag.{u}) (n : Nat) (x : D.obj n) : SeqColimit D :=
+noncomputable def SeqColimit.ι (D : SeqDiag.{u}) (n : Nat) (x : D.obj n) : SeqColimit D :=
   Quot.mk _ ⟨n, x⟩
 
 -- 11: compatibility of ι with structure maps
@@ -122,13 +122,13 @@ theorem SeqColimit.ι_comm (D : SeqDiag.{u}) (n : Nat) (x : D.obj n) :
   Quot.sound (TelescopeRel.step n x)
 
 -- 12: the colimit forms a cocone
-def SeqColimit.cocone (D : SeqDiag.{u}) : Cocone D where
+noncomputable def SeqColimit.cocone (D : SeqDiag.{u}) : Cocone D where
   nadir := SeqColimit D
   inj := SeqColimit.ι D
   comm := fun n x => (SeqColimit.ι_comm D n x).symm
 
 -- 13: universal property (descent)
-def SeqColimit.desc {D : SeqDiag.{u}} (C : Cocone D) : SeqColimit D → C.nadir :=
+noncomputable def SeqColimit.desc {D : SeqDiag.{u}} (C : Cocone D) : SeqColimit D → C.nadir :=
   Quot.lift (fun p => C.inj p.1 p.2) (by
     intro a b h; cases h with | step n x => exact (C.comm n x).symm)
 
@@ -137,13 +137,13 @@ theorem SeqColimit.desc_ι {D : SeqDiag.{u}} (C : Cocone D) (n : Nat) (x : D.obj
     SeqColimit.desc C (SeqColimit.ι D n x) = C.inj n x := rfl
 
 -- 15: desc gives a cocone morphism
-def SeqColimit.descMor {D : SeqDiag.{u}} (C : Cocone D) :
+noncomputable def SeqColimit.descMor {D : SeqDiag.{u}} (C : Cocone D) :
     CoconeMor (SeqColimit.cocone D) C where
   map := SeqColimit.desc C
   comm := fun _ _ => rfl
 
 -- 16: Path in the colimit from the identification
-def SeqColimit.ιPath (D : SeqDiag.{u}) (n : Nat) (x : D.obj n) :
+noncomputable def SeqColimit.ιPath (D : SeqDiag.{u}) (n : Nat) (x : D.obj n) :
     Path (SeqColimit.ι D n x) (SeqColimit.ι D (n + 1) (D.map n x)) :=
   Path.mk [Step.mk _ _ (SeqColimit.ι_comm D n x)]
     (SeqColimit.ι_comm D n x)
@@ -162,7 +162,7 @@ structure HoLim (D : SeqDiag.{u}) where
   compat : ∀ n, D.map n (point n) = point (n + 1)
 
 -- 18: HoLim forms a cone
-def HoLim.cone (D : SeqDiag.{u}) : Cone D where
+noncomputable def HoLim.cone (D : SeqDiag.{u}) : Cone D where
   apex := HoLim D
   proj := fun n h => h.point n
   comm := fun n h => h.compat n
@@ -172,7 +172,7 @@ theorem HoLim.proj_comm (D : SeqDiag.{u}) (h : HoLim D) (n : Nat) :
     D.map n (h.point n) = h.point (n + 1) := h.compat n
 
 -- 20: lifting into HoLim
-def HoLim.lift (C : Cone D) : C.apex → HoLim D :=
+noncomputable def HoLim.lift (C : Cone D) : C.apex → HoLim D :=
   fun x => ⟨fun n => C.proj n x, fun n => C.comm n x⟩
 
 -- 21: lift commutes with projections
@@ -180,7 +180,7 @@ theorem HoLim.lift_proj (C : Cone D) (x : C.apex) (n : Nat) :
     (HoLim.lift C x).point n = C.proj n x := rfl
 
 -- 22: lift gives a cone morphism
-def HoLim.liftMor (C : Cone D) : ConeMor C (HoLim.cone D) where
+noncomputable def HoLim.liftMor (C : Cone D) : ConeMor C (HoLim.cone D) where
   map := HoLim.lift C
   comm := fun _ _ => rfl
 
@@ -198,7 +198,7 @@ theorem milnor_kernel_is_holim (D : SeqDiag.{u}) (s : ∀ n, D.obj n) :
   · intro ⟨h, hs⟩; subst hs; exact h.compat
 
 -- 25: milnor diff as a path
-def milnorPath (D : SeqDiag.{u}) (h : HoLim D) (n : Nat) :
+noncomputable def milnorPath (D : SeqDiag.{u}) (h : HoLim D) (n : Nat) :
     Path (D.map n (h.point n)) (h.point (n + 1)) :=
   Path.mk [Step.mk _ _ (h.compat n)] (h.compat n)
 
@@ -208,11 +208,11 @@ theorem milnorPath_trans_proof (D : SeqDiag.{u}) (h : HoLim D) (n : Nat) :
 
 /-! ## §7 Telescope filtration -/
 
-def TelescopeFilt (D : SeqDiag.{u}) (n : Nat) : Type u :=
+noncomputable def TelescopeFilt (D : SeqDiag.{u}) (n : Nat) : Type u :=
   Σ k : Fin (n + 1), D.obj k
 
 -- 27: inclusion of filtrations
-def TelescopeFilt.incl (D : SeqDiag.{u}) (n : Nat) :
+noncomputable def TelescopeFilt.incl (D : SeqDiag.{u}) (n : Nat) :
     TelescopeFilt D n → TelescopeFilt D (n + 1) :=
   fun ⟨⟨k, hk⟩, x⟩ => ⟨⟨k, Nat.lt_succ_of_lt hk⟩, x⟩
 
@@ -230,11 +230,11 @@ structure MappingPathSpace (f : A → B) (b : B) where
 abbrev HoFiber (f : A → B) (b : B) := MappingPathSpace f b
 
 -- 29: projection
-def MappingPathSpace.proj {f : A → B} {b : B} :
+noncomputable def MappingPathSpace.proj {f : A → B} {b : B} :
     MappingPathSpace f b → A := fun m => m.point
 
 -- 30: canonical element
-def MappingPathSpace.canonical (f : A → B) (a : A) :
+noncomputable def MappingPathSpace.canonical (f : A → B) (a : A) :
     MappingPathSpace f (f a) := ⟨a, Path.refl (f a)⟩
 
 -- 31: canonical proj
@@ -253,12 +253,12 @@ structure HoPullback (f : A → C) (g : B → C) where
   path : Path (f fst) (g snd)
 
 -- 33: first projection
-def HoPullback.π₁ {f : A → C} {g : B → C} : HoPullback f g → A := fun p => p.fst
+noncomputable def HoPullback.π₁ {f : A → C} {g : B → C} : HoPullback f g → A := fun p => p.fst
 -- 34: second projection
-def HoPullback.π₂ {f : A → C} {g : B → C} : HoPullback f g → B := fun p => p.snd
+noncomputable def HoPullback.π₂ {f : A → C} {g : B → C} : HoPullback f g → B := fun p => p.snd
 
 -- 35: universal property
-def HoPullback.lift {D : Type u} {f : A → C} {g : B → C}
+noncomputable def HoPullback.lift {D : Type u} {f : A → C} {g : B → C}
     (h₁ : D → A) (h₂ : D → B)
     (hc : ∀ d, Path (f (h₁ d)) (g (h₂ d))) : D → HoPullback f g :=
   fun d => ⟨h₁ d, h₂ d, hc d⟩
@@ -274,7 +274,7 @@ theorem HoPullback.lift_π₂ {D : Type u} {f : A → C} {g : B → C}
     HoPullback.π₂ (HoPullback.lift h₁ h₂ hc d) = h₂ d := rfl
 
 -- 38: diagonal as a section of the pullback
-def HoPullback.diagonal (a : A) :
+noncomputable def HoPullback.diagonal (a : A) :
     HoPullback (_root_.id : A → A) (_root_.id : A → A) :=
   ⟨a, a, Path.refl a⟩
 
@@ -283,7 +283,7 @@ theorem HoPullback.diagonal_π₁ (a : A) :
     HoPullback.π₁ (HoPullback.diagonal a) = a := rfl
 
 -- 40: pullback over refl path has canonical injection
-def HoPullback.ofEq {f : A → C} {g : B → C} (a : A) (b : B) (h : f a = g b) :
+noncomputable def HoPullback.ofEq {f : A → C} {g : B → C} (a : A) (b : B) (h : f a = g b) :
     HoPullback f g := ⟨a, b, Path.mk [Step.mk _ _ h] h⟩
 
 /-! ## §10 Natural transformations between diagrams -/
@@ -294,11 +294,11 @@ structure SeqNat (D₁ D₂ : SeqDiag.{u}) where
     D₂.map n (component n x) = component (n + 1) (D₁.map n x)
 
 -- 41: identity
-def SeqNat.id (D : SeqDiag.{u}) : SeqNat D D where
+noncomputable def SeqNat.id (D : SeqDiag.{u}) : SeqNat D D where
   component := fun _ => _root_.id; naturality := fun _ _ => rfl
 
 -- 42: composition
-def SeqNat.comp (α : SeqNat D₁ D₂) (β : SeqNat D₂ D₃) : SeqNat D₁ D₃ where
+noncomputable def SeqNat.comp (α : SeqNat D₁ D₂) (β : SeqNat D₂ D₃) : SeqNat D₁ D₃ where
   component := fun n => β.component n ∘ α.component n
   naturality := fun n x => by
     simp [Function.comp]; rw [β.naturality n]; congr 1; exact α.naturality n x
@@ -314,7 +314,7 @@ theorem SeqNat.comp_id (α : SeqNat D₁ D₂) :
   cases α; simp [SeqNat.comp, SeqNat.id]
 
 -- 45: induced map on homotopy limits
-def SeqNat.hoLimMap (α : SeqNat D₁ D₂) (h : HoLim D₁) : HoLim D₂ where
+noncomputable def SeqNat.hoLimMap (α : SeqNat D₁ D₂) (h : HoLim D₁) : HoLim D₂ where
   point := fun n => α.component n (h.point n)
   compat := fun n => by rw [α.naturality n]; congr 1; exact h.compat n
 
@@ -333,7 +333,7 @@ theorem SeqNat.comp_hoLimMap {D₁ D₂ D₃ : SeqDiag.{u}}
   simp [SeqNat.comp, SeqNat.hoLimMap, Function.comp]
 
 -- 49: induced map on colimits
-def SeqNat.seqColimMap (α : SeqNat D₁ D₂) :
+noncomputable def SeqNat.seqColimMap (α : SeqNat D₁ D₂) :
     SeqColimit D₁ → SeqColimit D₂ :=
   Quot.lift (fun p => SeqColimit.ι D₂ p.1 (α.component p.1 p.2)) (by
     intro a b h; cases h with
@@ -357,7 +357,7 @@ theorem FibTower.section_retract (T : FibTower.{u}) (n : Nat) (x : T.obj n) :
     T.section_ n (T.map n x) = x := T.section_inv n x
 
 -- 52: section gives a path (deep — uses Step/Path)
-def FibTower.sectionPath (T : FibTower.{u}) (n : Nat) (x : T.obj n) :
+noncomputable def FibTower.sectionPath (T : FibTower.{u}) (n : Nat) (x : T.obj n) :
     Path (T.section_ n (T.map n x)) x :=
   Path.mk [Step.mk _ _ (T.section_inv n x)] (T.section_inv n x)
 
@@ -368,16 +368,16 @@ theorem FibTower.hoLim_section_compat (T : FibTower.{u})
 
 /-! ## §12 Totalization -/
 
-def Tot (D : SeqDiag.{u}) : Type u := HoLim D
+noncomputable def Tot (D : SeqDiag.{u}) : Type u := HoLim D
 
 -- 54: Tot = HoLim
 theorem Tot_eq_HoLim (D : SeqDiag.{u}) : Tot D = HoLim D := rfl
 
 -- 55: cone structure
-def Tot.cone (D : SeqDiag.{u}) : Cone D := HoLim.cone D
+noncomputable def Tot.cone (D : SeqDiag.{u}) : Cone D := HoLim.cone D
 
 -- 56: nat trans induces map on Tot
-def Tot.map (α : SeqNat D₁ D₂) : Tot D₁ → Tot D₂ := α.hoLimMap
+noncomputable def Tot.map (α : SeqNat D₁ D₂) : Tot D₁ → Tot D₂ := α.hoLimMap
 
 -- 57: Tot.map preserves identity
 theorem Tot.map_id (D : SeqDiag.{u}) : Tot.map (SeqNat.id D) = _root_.id := by
@@ -392,12 +392,12 @@ theorem Tot.map_comp {D₁ D₂ D₃ : SeqDiag.{u}}
 /-! ## §13 Shift diagram and iterated structure maps -/
 
 /-- Shift the diagram by one level. -/
-def SeqDiag.shift (D : SeqDiag.{u}) : SeqDiag.{u} where
+noncomputable def SeqDiag.shift (D : SeqDiag.{u}) : SeqDiag.{u} where
   obj := fun n => D.obj (n + 1)
   map := fun n => D.map (n + 1)
 
 -- 59: HoLim of shifted diagram is a tail of HoLim
-def HoLim.tail {D : SeqDiag.{u}} (h : HoLim D) : HoLim D.shift where
+noncomputable def HoLim.tail {D : SeqDiag.{u}} (h : HoLim D) : HoLim D.shift where
   point := fun n => h.point (n + 1)
   compat := fun n => h.compat (n + 1)
 
@@ -420,7 +420,7 @@ theorem HoLim.ι_compat {D : SeqDiag.{u}} (h : HoLim D) (n : Nat) :
 /-! ## §14 Iterated structure maps and compatibility -/
 
 /-- Iterated structure map in a sequential diagram. -/
-def SeqDiag.iterMap (D : SeqDiag.{u}) (n : Nat) (x : D.obj 0) : D.obj n :=
+noncomputable def SeqDiag.iterMap (D : SeqDiag.{u}) (n : Nat) (x : D.obj 0) : D.obj n :=
   match n with
   | 0     => x
   | k + 1 => D.map k (D.iterMap k x)
@@ -434,7 +434,7 @@ theorem SeqDiag.iterMap_succ (D : SeqDiag.{u}) (n : Nat) (x : D.obj 0) :
     D.iterMap (n + 1) x = D.map n (D.iterMap n x) := rfl
 
 -- 65: iterMap gives a compatible sequence starting from any x₀
-def HoLim.ofIterMap (D : SeqDiag.{u}) (x : D.obj 0) : HoLim D where
+noncomputable def HoLim.ofIterMap (D : SeqDiag.{u}) (x : D.obj 0) : HoLim D where
   point := fun n => D.iterMap n x
   compat := fun _ => rfl
 

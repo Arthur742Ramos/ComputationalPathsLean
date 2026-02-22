@@ -118,7 +118,7 @@ noncomputable def tilt_compatibility_cancel_rweq (x : X) (g : G) :
 end PerfectoidPDivisibleBridge
 
 /-- Trivial p-divisible-group path data on `PUnit`. -/
-def trivialPDivisibleGroupPathData : PDivisibleGroupPathData PUnit where
+noncomputable def trivialPDivisibleGroupPathData : PDivisibleGroupPathData PUnit where
   zero := PUnit.unit
   add := fun _ _ => PUnit.unit
   pMul := fun _ => PUnit.unit
@@ -129,7 +129,7 @@ def trivialPDivisibleGroupPathData : PDivisibleGroupPathData PUnit where
   compatibilityStep := fun _ _ => Path.Step.trans_refl_left (Path.refl PUnit.unit)
 
 /-- Trivial bridge from the canonical perfectoid and p-divisible data. -/
-def trivialPerfectoidPDivisibleBridge :
+noncomputable def trivialPerfectoidPDivisibleBridge :
     PerfectoidPDivisibleBridge PUnit PUnit PUnit
       trivialPerfectoidSpacePathData trivialPDivisibleGroupPathData where
   hodgeTateWeight := fun _ _ => 0

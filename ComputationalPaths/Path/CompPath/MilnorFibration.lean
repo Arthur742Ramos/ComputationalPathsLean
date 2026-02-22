@@ -66,11 +66,11 @@ namespace MilnorFiber
 variable {E B : Type u} (mf : MilnorFibration E B)
 
 /-- The point in the total space underlying a Milnor fiber element. -/
-def point (x : MilnorFiber mf) : E :=
+noncomputable def point (x : MilnorFiber mf) : E :=
   Fiber.point x
 
 /-- The path witnessing that a Milnor fiber element maps to the regular value. -/
-def basePath (x : MilnorFiber mf) :
+noncomputable def basePath (x : MilnorFiber mf) :
     Path (mf.map (point mf x)) mf.regularValue :=
   Fiber.prop x
 
@@ -146,20 +146,20 @@ namespace MilnorMonodromy
 variable {E B : Type u} {mf : MilnorFibration E B}
 
 /-- Monodromy as a function on the Milnor fiber. -/
-def map (m : MilnorMonodromy mf) : MilnorFiber mf → MilnorFiber mf :=
+noncomputable def map (m : MilnorMonodromy mf) : MilnorFiber mf → MilnorFiber mf :=
   m.action.toFun
 
 /-- Monodromy inverse as a function on the Milnor fiber. -/
-def inv (m : MilnorMonodromy mf) : MilnorFiber mf → MilnorFiber mf :=
+noncomputable def inv (m : MilnorMonodromy mf) : MilnorFiber mf → MilnorFiber mf :=
   m.action.invFun
 
 /-- Path witness for the left inverse law of monodromy. -/
-def leftInvPath (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
+noncomputable def leftInvPath (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
     Path (m.inv (m.map x)) x :=
   Path.stepChain (m.action.left_inv x)
 
 /-- Path witness for the right inverse law of monodromy. -/
-def rightInvPath (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
+noncomputable def rightInvPath (m : MilnorMonodromy mf) (x : MilnorFiber mf) :
     Path (m.map (m.inv x)) x :=
   Path.stepChain (m.action.right_inv x)
 
@@ -215,7 +215,7 @@ namespace PicardLefschetzData
 variable {E B : Type u} {mf : MilnorFibration E B}
 
 /-- The Picard-Lefschetz formula as a Path witness. -/
-def formula (d : PicardLefschetzData mf) (x : MilnorFiber mf) :
+noncomputable def formula (d : PicardLefschetzData mf) (x : MilnorFiber mf) :
     Path (d.monodromy.map x) (d.reflection x) :=
   d.reflection_spec x
 

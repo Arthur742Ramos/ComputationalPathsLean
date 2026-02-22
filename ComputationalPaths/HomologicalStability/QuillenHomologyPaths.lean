@@ -29,7 +29,7 @@ inductive QuillenHomologyStep {A : Type u} :
       QuillenHomologyStep (Path.trans (Path.symm p) p) (Path.refl b)
 
 /-- Interpret Quillen-homology domain steps as primitive path steps. -/
-def QuillenHomologyStep.toStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def QuillenHomologyStep.toStep {A : Type u} {a b : A} {p q : Path a b}
     (s : QuillenHomologyStep p q) : Path.Step p q :=
   match s with
   | .right_unit p => Path.Step.trans_refl_right p
@@ -70,14 +70,14 @@ noncomputable def linearization_rweq (x : A) :
   rweq_of_quillen_step (Q.linearizationStep x)
 
 /-- Transport of Quillen-homology classes along stabilization. -/
-def stabilizationTransport (x : A) :
+noncomputable def stabilizationTransport (x : A) :
     Path
       (Q.indecomposables (Q.derive (Q.stabilize x)))
       (Q.indecomposables (Q.stabilize (Q.derive x))) :=
   Path.congrArg Q.indecomposables (Q.stabilizationPath x)
 
 /-- Left-unit normalization for the stabilization comparison. -/
-def stabilization_left_unit_step (x : A) :
+noncomputable def stabilization_left_unit_step (x : A) :
     QuillenHomologyStep
       (Path.trans (Path.refl (Q.derive (Q.stabilize x))) (Q.stabilizationPath x))
       (Q.stabilizationPath x) :=
@@ -90,7 +90,7 @@ noncomputable def stabilization_left_unit_rweq (x : A) :
   rweq_of_quillen_step (Q.stabilization_left_unit_step x)
 
 /-- Round-trip path for Quillen linearization. -/
-def linearizationRoundTrip (x : A) :
+noncomputable def linearizationRoundTrip (x : A) :
     Path
       (Q.stabilize (Q.indecomposables x))
       (Q.stabilize (Q.indecomposables x)) :=
@@ -116,7 +116,7 @@ variable {X : Type u} {Y : Type v}
 variable (B : ScanningQuillenBridge X Y)
 
 /-- Quillen linearization path evaluated on scanned points. -/
-def scanLinearizationPath (x : X) :
+noncomputable def scanLinearizationPath (x : X) :
     Path
       (B.quillen.indecomposables (B.quillen.derive (B.scanning.scan x)))
       (B.quillen.stabilize (B.quillen.indecomposables (B.scanning.scan x))) :=
@@ -129,7 +129,7 @@ noncomputable def scanLinearization_cancel_rweq (x : X) :
   rweq_cmpA_inv_left (B.scanLinearizationPath x)
 
 /-- Stabilized scanning map comparison in Quillen homology. -/
-def stabilizedScanningPath (x : X) :
+noncomputable def stabilizedScanningPath (x : X) :
     Path
       (B.quillen.stabilize (B.scanning.scan (B.scanning.sourceStabilize x)))
       (B.quillen.stabilize (B.scanning.targetShift (B.scanning.scan x))) :=
@@ -154,7 +154,7 @@ noncomputable def stabilizedScanning_cancel_rweq (x : X) :
 end ScanningQuillenBridge
 
 /-- Trivial model instantiating the Quillen-homology path interface. -/
-def trivialQuillenHomologyPathData : QuillenHomologyPathData PUnit where
+noncomputable def trivialQuillenHomologyPathData : QuillenHomologyPathData PUnit where
   derive := fun _ => PUnit.unit
   indecomposables := fun _ => PUnit.unit
   stabilize := fun _ => PUnit.unit
@@ -163,7 +163,7 @@ def trivialQuillenHomologyPathData : QuillenHomologyPathData PUnit where
   linearizationStep := fun _ => QuillenHomologyStep.right_unit (Path.refl PUnit.unit)
 
 /-- Trivial bridge between scanning maps and Quillen homology. -/
-def trivialScanningQuillenBridge : ScanningQuillenBridge PUnit PUnit where
+noncomputable def trivialScanningQuillenBridge : ScanningQuillenBridge PUnit PUnit where
   scanning := ScanningMapPaths.trivialScanningMapData
   quillen := trivialQuillenHomologyPathData
 

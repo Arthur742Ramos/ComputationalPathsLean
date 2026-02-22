@@ -34,42 +34,42 @@ abbrev SetPath (s₁ s₂ : SetState) := Path s₁ s₂
 /-! ## Basic set operations as path functions -/
 
 /-- Empty set operation: maps any state to 0. -/
-def emptySetOp : SetState → SetState := fun _ => 0
+noncomputable def emptySetOp : SetState → SetState := fun _ => 0
 
 /-- Singleton operation: maps state n to encoding n+1. -/
-def singletonOp : SetState → SetState := fun n => n + 1
+noncomputable def singletonOp : SetState → SetState := fun n => n + 1
 
 /-- Pair set operation. -/
-def pairOp (offset : Nat) : SetState → SetState := fun n => n + offset
+noncomputable def pairOp (offset : Nat) : SetState → SetState := fun n => n + offset
 
 /-- Union operation. -/
-def unionOp : SetState → SetState := fun n => 2 * n
+noncomputable def unionOp : SetState → SetState := fun n => 2 * n
 
 /-- Power set operation. -/
-def powerSetOp : SetState → SetState := fun n => 2 ^ n
+noncomputable def powerSetOp : SetState → SetState := fun n => 2 ^ n
 
 /-- Successor ordinal operation. -/
-def succOrd : SetState → SetState := fun n => n + 1/-! ## Extensionality: paths between sets with same members -/
+noncomputable def succOrd : SetState → SetState := fun n => n + 1/-! ## Extensionality: paths between sets with same members -/
 
 /-- Extensionality as path: if two states encode the same set, there's a path. -/
-def extensionality_path (s₁ s₂ : SetState) (h : s₁ = s₂) :
+noncomputable def extensionality_path (s₁ s₂ : SetState) (h : s₁ = s₂) :
     SetPath s₁ s₂ :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Extensionality is symmetric. -/
-def extensionality_symm (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def extensionality_symm (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     SetPath s₂ s₁ :=
   Path.symm p
 
 /-- Extensionality is transitive. -/
-def extensionality_trans (s₁ s₂ s₃ : SetState)
+noncomputable def extensionality_trans (s₁ s₂ s₃ : SetState)
     (p : SetPath s₁ s₂) (q : SetPath s₂ s₃) : SetPath s₁ s₃ :=
   Path.trans p q
 
 /-! ## Empty set axiom -/
 
 /-- Empty set path: all states map to 0. -/
-def emptyPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def emptyPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (emptySetOp s₁) (emptySetOp s₂) :=
   Path.congrArg emptySetOp p
 
@@ -85,7 +85,7 @@ theorem empty_path_refl (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
 /-! ## Pairing axiom -/
 
 /-- Pairing path: applying pair operation along a path. -/
-def pairingPath (offset : Nat) (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def pairingPath (offset : Nat) (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (pairOp offset s₁) (pairOp offset s₂) :=
   Path.congrArg (pairOp offset) p
 
@@ -106,7 +106,7 @@ theorem pairing_symm (offset : Nat) (s₁ s₂ : SetState)
 /-! ## Union axiom -/
 
 /-- Union path: applying union along a derivation. -/
-def unionPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def unionPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (unionOp s₁) (unionOp s₂) :=
   Path.congrArg unionOp p
 
@@ -127,7 +127,7 @@ theorem union_symm (s₁ s₂ : SetState)
 /-! ## Power set axiom -/
 
 /-- Power set path: applying power set along a derivation. -/
-def powerSetPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def powerSetPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (powerSetOp s₁) (powerSetOp s₂) :=
   Path.congrArg powerSetOp p
 
@@ -148,7 +148,7 @@ theorem powerSet_symm (s₁ s₂ : SetState)
 /-! ## Ordinals as path-indexed natural numbers -/
 
 /-- Successor ordinal path. -/
-def succPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def succPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (succOrd s₁) (succOrd s₂) :=
   Path.congrArg succOrd p
 
@@ -165,12 +165,12 @@ theorem succ_symm (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
   simp [succPath]
 
 /-- Iterated successor. -/
-def iterSucc : Nat → SetState → SetState
+noncomputable def iterSucc : Nat → SetState → SetState
   | 0, n => n
   | k + 1, n => succOrd (iterSucc k n)
 
 /-- Iterated successor path. -/
-def iterSuccPath (k : Nat) (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def iterSuccPath (k : Nat) (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (iterSucc k s₁) (iterSucc k s₂) :=
   Path.congrArg (iterSucc k) p
 
@@ -184,10 +184,10 @@ theorem iterSucc_trans (k : Nat) (s₁ s₂ s₃ : SetState)
 /-! ## Well-ordering -/
 
 /-- Well-ordering comparison: maps to a linear order encoding. -/
-def woCompare : SetState → SetState := fun n => n
+noncomputable def woCompare : SetState → SetState := fun n => n
 
 /-- Well-ordering path: equal states have same ordering position. -/
-def woPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def woPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (woCompare s₁) (woCompare s₂) :=
   Path.congrArg woCompare p
 
@@ -220,10 +220,10 @@ theorem transfinite_inverse (P : SetState → Type u)
 /-! ## Cardinals as equivalence classes -/
 
 /-- Cardinal size function. -/
-def cardSize : SetState → SetState := fun n => n
+noncomputable def cardSize : SetState → SetState := fun n => n
 
 /-- Cardinal path: equinumerous sets have same cardinal. -/
-def cardPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def cardPath (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (cardSize s₁) (cardSize s₂) :=
   Path.congrArg cardSize p
 
@@ -248,11 +248,11 @@ theorem card_id (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
 /-! ## Separation / Comprehension schema -/
 
 /-- Separation: filter a set by a decidable predicate on states. -/
-def separationOp (pred : SetState → Bool) : SetState → SetState :=
+noncomputable def separationOp (pred : SetState → Bool) : SetState → SetState :=
   fun n => if pred n then n else 0
 
 /-- Separation path. -/
-def separationPath (pred : SetState → Bool) (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def separationPath (pred : SetState → Bool) (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (separationOp pred s₁) (separationOp pred s₂) :=
   Path.congrArg (separationOp pred) p
 
@@ -266,7 +266,7 @@ theorem separation_trans (pred : SetState → Bool) (s₁ s₂ s₃ : SetState)
 /-! ## Replacement schema -/
 
 /-- Replacement: apply a function to each element (state-level). -/
-def replacementPath (f : SetState → SetState) (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
+noncomputable def replacementPath (f : SetState → SetState) (s₁ s₂ : SetState) (p : SetPath s₁ s₂) :
     Path (f s₁) (f s₂) :=
   Path.congrArg f p
 
@@ -294,7 +294,7 @@ theorem replacement_comp (f g : SetState → SetState) (s₁ s₂ : SetState)
 /-! ## Foundation / Regularity -/
 
 /-- Depth of a set derivation path (models ∈-rank). -/
-def setDepth {s₁ s₂ : SetState} (p : SetPath s₁ s₂) : Nat :=
+noncomputable def setDepth {s₁ s₂ : SetState} (p : SetPath s₁ s₂) : Nat :=
   p.steps.length
 
 /-- Reflexive path has depth 0 (empty set rank). -/
@@ -322,12 +322,12 @@ theorem congrArg_depth (f : SetState → SetState) (s₁ s₂ : SetState) (p : S
 
 /-- The infinity axiom: there exists a set closed under successor.
     Modeled as: succOrd path from any n is always constructible. -/
-def infinity_succ_path (n : SetState) :
+noncomputable def infinity_succ_path (n : SetState) :
     SetPath (succOrd n) (succOrd n) :=
   Path.refl (succOrd n)
 
 /-- The omega chain: successor maps n to n+1 via congrArg. -/
-def omegaSuccStep (n : SetState) (p : SetPath n n) :
+noncomputable def omegaSuccStep (n : SetState) (p : SetPath n n) :
     Path (succOrd n) (succOrd n) :=
   Path.congrArg succOrd p
 

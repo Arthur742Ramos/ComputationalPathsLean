@@ -26,14 +26,14 @@ structure IndependenceAlphabet (Sym : Type u) where
   indep_symm : ∀ {a b : Sym}, indep a b → indep b a
   indep_irrefl : ∀ a : Sym, ¬ indep a a
 
-def Dependent {Sym : Type u} (A : IndependenceAlphabet Sym) (a b : Sym) : Prop :=
+noncomputable def Dependent {Sym : Type u} (A : IndependenceAlphabet Sym) (a b : Sym) : Prop :=
   ¬ A.indep a b
 
-def pairWord {Sym : Type u} (a b : Sym) : TraceWord Sym := [a, b]
+noncomputable def pairWord {Sym : Type u} (a b : Sym) : TraceWord Sym := [a, b]
 
-def swapPair {Sym : Type u} (a b : Sym) : TraceWord Sym := [b, a]
+noncomputable def swapPair {Sym : Type u} (a b : Sym) : TraceWord Sym := [b, a]
 
-def swapTwicePair {Sym : Type u} (a b : Sym) : TraceWord Sym := swapPair b a
+noncomputable def swapTwicePair {Sym : Type u} (a b : Sym) : TraceWord Sym := swapPair b a
 
 section Independence
 
@@ -80,7 +80,7 @@ section PathCore
 variable {Sym : Type u}
 variable {w x y z : TraceWord Sym}
 
-def mkTraceStepPath {u v : TraceWord Sym} (h : u = v) : Path u v :=
+noncomputable def mkTraceStepPath {u v : TraceWord Sym} (h : u = v) : Path u v :=
   Path.mk [Step.mk u v h] h
 
 theorem mkTraceStepPath_toEq {u v : TraceWord Sym} (h : u = v) :
@@ -157,14 +157,14 @@ section TraceMonoid
 
 variable {Sym : Type u}
 
-def traceMul : TraceWord Sym → TraceWord Sym → TraceWord Sym := List.append
+noncomputable def traceMul : TraceWord Sym → TraceWord Sym → TraceWord Sym := List.append
 
-def traceOne : TraceWord Sym := []
+noncomputable def traceOne : TraceWord Sym := []
 
-def leftMul (u : TraceWord Sym) : TraceWord Sym → TraceWord Sym :=
+noncomputable def leftMul (u : TraceWord Sym) : TraceWord Sym → TraceWord Sym :=
   fun v => traceMul u v
 
-def rightMul (v : TraceWord Sym) : TraceWord Sym → TraceWord Sym :=
+noncomputable def rightMul (v : TraceWord Sym) : TraceWord Sym → TraceWord Sym :=
   fun u => traceMul u v
 
 theorem traceMul_assoc (u v w : TraceWord Sym) :
@@ -191,34 +191,34 @@ theorem traceMul_length (u v : TraceWord Sym) :
     (traceMul u v).length = u.length + v.length := by
   simp [traceMul]
 
-def traceMulAssocPath (u v w : TraceWord Sym) :
+noncomputable def traceMulAssocPath (u v w : TraceWord Sym) :
     Path (traceMul (traceMul u v) w) (traceMul u (traceMul v w)) :=
   mkTraceStepPath (traceMul_assoc u v w)
 
-def traceMulLeftUnitPath (u : TraceWord Sym) :
+noncomputable def traceMulLeftUnitPath (u : TraceWord Sym) :
     Path (traceMul traceOne u) u :=
   Path.refl u
 
-def traceMulRightUnitPath (u : TraceWord Sym) :
+noncomputable def traceMulRightUnitPath (u : TraceWord Sym) :
     Path (traceMul u traceOne) u :=
   mkTraceStepPath (traceOne_right u)
 
-def traceMulLeftCongr (u : TraceWord Sym)
+noncomputable def traceMulLeftCongr (u : TraceWord Sym)
     {v1 v2 : TraceWord Sym} (p : Path v1 v2) :
     Path (traceMul u v1) (traceMul u v2) :=
   Path.congrArg (leftMul u) p
 
-def traceMulRightCongr (v : TraceWord Sym)
+noncomputable def traceMulRightCongr (v : TraceWord Sym)
     {u1 u2 : TraceWord Sym} (p : Path u1 u2) :
     Path (traceMul u1 v) (traceMul u2 v) :=
   Path.congrArg (rightMul v) p
 
-def traceMulBothCongr {u1 u2 v1 v2 : TraceWord Sym}
+noncomputable def traceMulBothCongr {u1 u2 v1 v2 : TraceWord Sym}
     (p : Path u1 u2) (q : Path v1 v2) :
     Path (traceMul u1 v1) (traceMul u2 v2) :=
   Path.trans (traceMulRightCongr v1 p) (traceMulLeftCongr u2 q)
 
-def traceMulFourPath (a b c d : TraceWord Sym) :
+noncomputable def traceMulFourPath (a b c d : TraceWord Sym) :
     Path (traceMul (traceMul (traceMul a b) c) d)
       (traceMul a (traceMul b (traceMul c d))) :=
   Path.trans
@@ -254,21 +254,21 @@ variable {Sym : Type u}
 abbrev Clique (Sym : Type u) := List Sym
 abbrev CFNormalForm (Sym : Type u) := List (Clique Sym)
 
-def cfFlatten : CFNormalForm Sym → TraceWord Sym
+noncomputable def cfFlatten : CFNormalForm Sym → TraceWord Sym
   | [] => []
   | b :: bs => b ++ cfFlatten bs
 
-def cfNormalize (w : TraceWord Sym) : CFNormalForm Sym :=
+noncomputable def cfNormalize (w : TraceWord Sym) : CFNormalForm Sym :=
   [w]
 
-def cfEquivalent (x y : CFNormalForm Sym) : Prop :=
+noncomputable def cfEquivalent (x y : CFNormalForm Sym) : Prop :=
   cfFlatten x = cfFlatten y
 
-def cfFlattenCongrPath {x y : CFNormalForm Sym} (p : Path x y) :
+noncomputable def cfFlattenCongrPath {x y : CFNormalForm Sym} (p : Path x y) :
     Path (cfFlatten x) (cfFlatten y) :=
   Path.congrArg cfFlatten p
 
-def cfNormalizeCongrPath {u v : TraceWord Sym} (p : Path u v) :
+noncomputable def cfNormalizeCongrPath {u v : TraceWord Sym} (p : Path u v) :
     Path (cfNormalize u) (cfNormalize v) :=
   Path.congrArg cfNormalize p
 
@@ -325,13 +325,13 @@ section Levi
 
 variable {Sym : Type u}
 
-def LeviEquation (u1 u2 v1 v2 : TraceWord Sym) : Prop :=
+noncomputable def LeviEquation (u1 u2 v1 v2 : TraceWord Sym) : Prop :=
   u1 ++ u2 = v1 ++ v2
 
-def LeviWitness (u1 u2 v1 v2 : TraceWord Sym) : Prop :=
+noncomputable def LeviWitness (u1 u2 v1 v2 : TraceWord Sym) : Prop :=
   ∃ t : TraceWord Sym, u1 = v1 ++ t ∧ v2 = t ++ u2
 
-def leviEquationPath {u1 u2 v1 v2 : TraceWord Sym}
+noncomputable def leviEquationPath {u1 u2 v1 v2 : TraceWord Sym}
     (h : LeviEquation u1 u2 v1 v2) :
     Path (u1 ++ u2) (v1 ++ v2) :=
   mkTraceStepPath h
@@ -399,23 +399,23 @@ variable {Gam : Type u}
 
 abbrev TraceLanguage (Gam : Type u) := TraceWord Gam → Prop
 
-def langEmpty : TraceLanguage Gam := fun _ => False
+noncomputable def langEmpty : TraceLanguage Gam := fun _ => False
 
-def langFull : TraceLanguage Gam := fun _ => True
+noncomputable def langFull : TraceLanguage Gam := fun _ => True
 
-def langUnion (L1 L2 : TraceLanguage Gam) : TraceLanguage Gam :=
+noncomputable def langUnion (L1 L2 : TraceLanguage Gam) : TraceLanguage Gam :=
   fun w => L1 w ∨ L2 w
 
-def langInter (L1 L2 : TraceLanguage Gam) : TraceLanguage Gam :=
+noncomputable def langInter (L1 L2 : TraceLanguage Gam) : TraceLanguage Gam :=
   fun w => L1 w ∧ L2 w
 
-def langConcat (L1 L2 : TraceLanguage Gam) : TraceLanguage Gam :=
+noncomputable def langConcat (L1 L2 : TraceLanguage Gam) : TraceLanguage Gam :=
   fun w => ∃ u v, w = u ++ v ∧ L1 u ∧ L2 v
 
-def singletonLang (w0 : TraceWord Gam) : TraceLanguage Gam :=
+noncomputable def singletonLang (w0 : TraceWord Gam) : TraceLanguage Gam :=
   fun w => w = w0
 
-def LangSubset (L1 L2 : TraceLanguage Gam) : Prop :=
+noncomputable def LangSubset (L1 L2 : TraceLanguage Gam) : Prop :=
   ∀ w, L1 w → L2 w
 
 theorem langUnion_comm (L1 L2 : TraceLanguage Gam) :
@@ -543,11 +543,11 @@ namespace DFA
 
 variable {State : Type u}
 
-def run (M : DFA Gam State) : State → TraceWord Gam → State
+noncomputable def run (M : DFA Gam State) : State → TraceWord Gam → State
   | s, [] => s
   | s, a :: w => run M (M.step s a) w
 
-def accepts (M : DFA Gam State) (w : TraceWord Gam) : Prop :=
+noncomputable def accepts (M : DFA Gam State) (w : TraceWord Gam) : Prop :=
   M.accept (run M M.start w)
 
 theorem run_nil (M : DFA Gam State) (s : State) :
@@ -570,18 +570,18 @@ theorem accepts_cons (M : DFA Gam State)
 
 end DFA
 
-def Recognizes {State : Type u} (M : DFA Gam State) (L : TraceLanguage Gam) : Prop :=
+noncomputable def Recognizes {State : Type u} (M : DFA Gam State) (L : TraceLanguage Gam) : Prop :=
   ∀ w, DFA.accepts M w ↔ L w
 
-def TraceRecognizable (L : TraceLanguage Gam) : Prop :=
+noncomputable def TraceRecognizable (L : TraceLanguage Gam) : Prop :=
   ∃ (State : Type u), ∃ M : DFA Gam State, Recognizes M L
 
-def fullDFA : DFA Gam (ULift.{u} Unit) where
+noncomputable def fullDFA : DFA Gam (ULift.{u} Unit) where
   start := ⟨()⟩
   step := fun _ _ => ⟨()⟩
   accept := fun _ => True
 
-def emptyDFA : DFA Gam (ULift.{u} Unit) where
+noncomputable def emptyDFA : DFA Gam (ULift.{u} Unit) where
   start := ⟨()⟩
   step := fun _ _ => ⟨()⟩
   accept := fun _ => False
@@ -611,11 +611,11 @@ namespace AsyncAutomaton
 
 variable {State : Type u}
 
-def run (M : AsyncAutomaton Gam State) : State → TraceWord Gam → State
+noncomputable def run (M : AsyncAutomaton Gam State) : State → TraceWord Gam → State
   | s, [] => s
   | s, a :: w => run M (M.localStep s a) w
 
-def accepts (M : AsyncAutomaton Gam State) (w : TraceWord Gam) : Prop :=
+noncomputable def accepts (M : AsyncAutomaton Gam State) (w : TraceWord Gam) : Prop :=
   M.accept (run M M.start w)
 
 theorem run_nil (M : AsyncAutomaton Gam State) (s : State) :
@@ -629,11 +629,11 @@ theorem run_cons (M : AsyncAutomaton Gam State) (s : State)
 
 end AsyncAutomaton
 
-def AsyncRecognizes {State : Type u}
+noncomputable def AsyncRecognizes {State : Type u}
     (M : AsyncAutomaton Gam State) (L : TraceLanguage Gam) : Prop :=
   ∀ w, AsyncAutomaton.accepts M w ↔ L w
 
-def dfaToAsync {State : Type u} (M : DFA Gam State) : AsyncAutomaton Gam State where
+noncomputable def dfaToAsync {State : Type u} (M : DFA Gam State) : AsyncAutomaton Gam State where
   start := M.start
   localStep := M.step
   accept := M.accept
@@ -663,7 +663,7 @@ theorem recognizable_implies_async {L : TraceLanguage Gam}
   intro w
   exact (dfaToAsync_accepts M w).trans (hM w)
 
-def ZielonkaStatement (A : IndependenceAlphabet Gam) (L : TraceLanguage Gam) : Prop :=
+noncomputable def ZielonkaStatement (A : IndependenceAlphabet Gam) (L : TraceLanguage Gam) : Prop :=
   TraceRecognizable (Gam := Gam) L →
     ∃ (State : Type u), ∃ M : AsyncAutomaton Gam State, AsyncRecognizes M L
 
@@ -689,22 +689,22 @@ section DiamondChurchRosser
 
 variable {Gam : Type u}
 
-def TraceRewrite : TraceWord Gam → TraceWord Gam → Prop :=
+noncomputable def TraceRewrite : TraceWord Gam → TraceWord Gam → Prop :=
   fun u v => u = v
 
-def Diamond {α : Type u} (R : α → α → Prop) : Prop :=
+noncomputable def Diamond {α : Type u} (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
 
-def Confluent {α : Type u} (R : α → α → Prop) : Prop :=
+noncomputable def Confluent {α : Type u} (R : α → α → Prop) : Prop :=
   Diamond R
 
-def ChurchRosser {α : Type u} (R : α → α → Prop) : Prop :=
+noncomputable def ChurchRosser {α : Type u} (R : α → α → Prop) : Prop :=
   ∀ a b, R a b → ∃ c, R a c ∧ R b c
 
-def NormalForm {α : Type u} (R : α → α → Prop) (a : α) : Prop :=
+noncomputable def NormalForm {α : Type u} (R : α → α → Prop) (a : α) : Prop :=
   ∀ b, R a b → b = a
 
-def traceRewriteToPath {u v : TraceWord Gam}
+noncomputable def traceRewriteToPath {u v : TraceWord Gam}
     (h : TraceRewrite (Gam := Gam) u v) : Path u v :=
   mkTraceStepPath h
 

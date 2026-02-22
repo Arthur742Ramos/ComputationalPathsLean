@@ -26,14 +26,14 @@ structure NVal where
   val : Nat
   deriving DecidableEq, Repr
 
-instance : Inhabited NVal := ⟨⟨0⟩⟩
+noncomputable instance : Inhabited NVal := ⟨⟨0⟩⟩
 
-def nval (n : Nat) : NVal := ⟨n⟩
+noncomputable def nval (n : Nat) : NVal := ⟨n⟩
 
-def nadd (a b : NVal) : NVal := ⟨a.val + b.val⟩
-def nmul (a b : NVal) : NVal := ⟨a.val * b.val⟩
-def nzero : NVal := ⟨0⟩
-def none_ : NVal := ⟨1⟩
+noncomputable def nadd (a b : NVal) : NVal := ⟨a.val + b.val⟩
+noncomputable def nmul (a b : NVal) : NVal := ⟨a.val * b.val⟩
+noncomputable def nzero : NVal := ⟨0⟩
+noncomputable def none_ : NVal := ⟨1⟩
 
 /-! ## §2 Basic arithmetic equalities -/
 
@@ -75,7 +75,7 @@ inductive NTStep : NVal → NVal → Type where
   | distribute : (a b c : NVal) → NTStep (nmul a (nadd b c)) (nadd (nmul a b) (nmul a c))
 
 /-- Each NTStep yields a propositional equality. -/
-def NTStep.toEq : NTStep a b → a = b
+noncomputable def NTStep.toEq : NTStep a b → a = b
   | .add_comm a b     => nadd_comm a b
   | .add_assoc a b c  => nadd_assoc a b c
   | .mul_comm a b     => nmul_comm a b
@@ -88,14 +88,14 @@ def NTStep.toEq : NTStep a b → a = b
 /-! ## §4 Building paths from steps -/
 
 /-- Build a Path from a single NTStep. -/
-def stepPath {a b : NVal} (s : NTStep a b) : Path a b :=
+noncomputable def stepPath {a b : NVal} (s : NTStep a b) : Path a b :=
   let h := s.toEq
   Path.mk [⟨a, b, h⟩] h
 
 /-! ## §5 Divisibility as computational paths -/
 
 /-- `a` divides `b` iff there exists `k` such that `b = a * k`. -/
-def Divides (a b : NVal) : Prop := ∃ k : Nat, b.val = a.val * k
+noncomputable def Divides (a b : NVal) : Prop := ∃ k : Nat, b.val = a.val * k
 
 /-- Theorem 1: Every number divides itself. -/
 theorem divides_refl (a : NVal) : Divides a a :=
@@ -136,10 +136,10 @@ inductive DivStep : (NVal × NVal) → (NVal × NVal) → Type where
   | factor_out  : (a : NVal) → (k : Nat) → DivStep (a, ⟨a.val * k⟩) (a, ⟨a.val * k⟩)
 
 /-- Divisibility path: rewriting chain for divisibility relation. -/
-def divPath_refl (a : NVal) : Path (a, a) (a, a) := Path.refl (a, a)
+noncomputable def divPath_refl (a : NVal) : Path (a, a) (a, a) := Path.refl (a, a)
 
 /-- Theorem 7: Divisibility path composition via trans. -/
-def div_path_trans (a b c : NVal × NVal) (p : Path a b) (q : Path b c) :
+noncomputable def div_path_trans (a b c : NVal × NVal) (p : Path a b) (q : Path b c) :
     Path a c :=
   Path.trans p q
 
@@ -213,61 +213,61 @@ structure BezoutWitness where
   identity : (gcd_val : Int) = x * (a : Int) + y * (b : Int)
 
 /-- Theorem 15: Bezout witness for gcd(6,4) = 2. -/
-def bezout_6_4 : BezoutWitness where
+noncomputable def bezout_6_4 : BezoutWitness where
   a := 6; b := 4; gcd_val := 2; x := 1; y := -1
   identity := by native_decide
 
 /-- Theorem 16: Bezout witness for gcd(35,15) = 5. -/
-def bezout_35_15 : BezoutWitness where
+noncomputable def bezout_35_15 : BezoutWitness where
   a := 35; b := 15; gcd_val := 5; x := 1; y := -2
   identity := by native_decide
 
 /-- Theorem 17: Bezout witness for gcd(12,8) = 4. -/
-def bezout_12_8 : BezoutWitness where
+noncomputable def bezout_12_8 : BezoutWitness where
   a := 12; b := 8; gcd_val := 4; x := 1; y := -1
   identity := by native_decide
 
 /-! ## §9 Arithmetic rewrite paths (computational) -/
 
 /-- Theorem 18: Distributivity path. -/
-def dist_path (a b c : NVal) :
+noncomputable def dist_path (a b c : NVal) :
     Path (nmul a (nadd b c)) (nadd (nmul a b) (nmul a c)) :=
   stepPath (NTStep.distribute a b c)
 
 /-- Theorem 19: Commutativity + associativity chain for addition. -/
-def add_comm_assoc_path (a b c : NVal) :
+noncomputable def add_comm_assoc_path (a b c : NVal) :
     Path (nadd (nadd a b) c) (nadd (nadd b a) c) :=
   Path.congrArg (fun x => nadd x c) (stepPath (NTStep.add_comm a b))
 
 /-- Theorem 20: Multiplication commutativity path. -/
-def mul_comm_path (a b : NVal) : Path (nmul a b) (nmul b a) :=
+noncomputable def mul_comm_path (a b : NVal) : Path (nmul a b) (nmul b a) :=
   stepPath (NTStep.mul_comm a b)
 
 /-- Theorem 21: Multi-step: a*(b+c) → (a*b)+(a*c) → (b*a)+(a*c). -/
-def dist_then_comm_path (a b c : NVal) :
+noncomputable def dist_then_comm_path (a b c : NVal) :
     Path (nmul a (nadd b c)) (nadd (nmul b a) (nmul a c)) :=
   Path.trans
     (dist_path a b c)
     (Path.congrArg (fun x => nadd x (nmul a c)) (mul_comm_path a b))
 
 /-- Theorem 22: a+0 → a path. -/
-def add_zero_path (a : NVal) : Path (nadd a nzero) a :=
+noncomputable def add_zero_path (a : NVal) : Path (nadd a nzero) a :=
   stepPath (NTStep.add_zero a)
 
 /-- Theorem 23: a*1 → a path. -/
-def mul_one_path (a : NVal) : Path (nmul a none_) a :=
+noncomputable def mul_one_path (a : NVal) : Path (nmul a none_) a :=
   stepPath (NTStep.mul_one a)
 
 /-- Theorem 24: a*0 → 0 path. -/
-def mul_zero_path (a : NVal) : Path (nmul a nzero) nzero :=
+noncomputable def mul_zero_path (a : NVal) : Path (nmul a nzero) nzero :=
   stepPath (NTStep.mul_zero a)
 
 /-- Theorem 25: Symm of add_zero: a → a+0. -/
-def add_zero_symm_path (a : NVal) : Path a (nadd a nzero) :=
+noncomputable def add_zero_symm_path (a : NVal) : Path a (nadd a nzero) :=
   Path.symm (add_zero_path a)
 
 /-- Theorem 26: Round-trip: a → a+0 → a. -/
-def add_zero_roundtrip (a : NVal) : Path a a :=
+noncomputable def add_zero_roundtrip (a : NVal) : Path a a :=
   Path.trans (add_zero_symm_path a) (add_zero_path a)
 
 /-! ## §10 Fundamental Theorem of Arithmetic (unique factorization) -/
@@ -279,12 +279,12 @@ structure Factorization where
   allGt1  : ∀ p ∈ factors, p ≥ 2
 
 /-- Product of a list of naturals. -/
-def listProd : List Nat → Nat
+noncomputable def listProd : List Nat → Nat
   | [] => 1
   | x :: xs => x * listProd xs
 
 /-- A factorization represents a number. -/
-def Factorization.product (f : Factorization) : Nat := listProd f.factors
+noncomputable def Factorization.product (f : Factorization) : Nat := listProd f.factors
 
 /-- Theorem 27: listProd of empty is 1. -/
 theorem listProd_nil : listProd [] = 1 := rfl
@@ -320,7 +320,7 @@ structure CRTSolution where
   valid : ∀ (rm : Nat × Nat), rm ∈ system.residues → solution % rm.2 = rm.1
 
 /-- Theorem 33: CRT for x ≡ 2 (mod 3), x ≡ 3 (mod 5). -/
-def crt_3_5 : CRTSolution where
+noncomputable def crt_3_5 : CRTSolution where
   system := ⟨[(2, 3), (3, 5)], trivial⟩
   solution := 8
   valid := by
@@ -329,7 +329,7 @@ def crt_3_5 : CRTSolution where
     rcases hmem with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> native_decide
 
 /-- Theorem 34: CRT for x ≡ 1 (mod 2), x ≡ 2 (mod 3), x ≡ 3 (mod 5). -/
-def crt_2_3_5 : CRTSolution where
+noncomputable def crt_2_3_5 : CRTSolution where
   system := ⟨[(1, 2), (2, 3), (3, 5)], trivial⟩
   solution := 23
   valid := by
@@ -340,7 +340,7 @@ def crt_2_3_5 : CRTSolution where
 /-! ## §12 Quadratic Reciprocity Sketch -/
 
 /-- Legendre symbol (simplified computation). -/
-def legendreSymbol (a p : Nat) : Int :=
+noncomputable def legendreSymbol (a p : Nat) : Int :=
   if p ≤ 2 then 0
   else
     let r := Nat.mod (Nat.pow a ((p - 1) / 2)) p
@@ -363,7 +363,7 @@ theorem qr_3_5 : legendreSymbol 3 5 * legendreSymbol 5 3 =
 /-! ## §13 p-adic Valuation -/
 
 /-- p-adic valuation: largest power of p dividing n. -/
-def padicVal (p n : Nat) : Nat :=
+noncomputable def padicVal (p n : Nat) : Nat :=
   if p ≤ 1 ∨ n == 0 then 0
   else
     let rec go (n : Nat) (fuel : Nat) : Nat :=
@@ -433,9 +433,9 @@ theorem PadicStep.deterministic {s t₁ t₂ : PadicState}
 /-! ## §15 Congruence and modular arithmetic paths -/
 
 /-- Modular equivalence. -/
-def ModEq (m a b : Nat) : Prop := a % m = b % m
+noncomputable def ModEq (m a b : Nat) : Prop := a % m = b % m
 
-instance modEqDecidable (m a b : Nat) : Decidable (ModEq m a b) := by
+noncomputable instance modEqDecidable (m a b : Nat) : Decidable (ModEq m a b) := by
   unfold ModEq
   infer_instance
 
@@ -460,70 +460,70 @@ theorem modEq_100_1_mod3 : ModEq 3 100 1 := rfl
 /-! ## §16 GCD path composition with congrArg -/
 
 /-- Embed GCDState into NVal pair. -/
-def gcdToNVal (s : GCDState) : NVal × NVal := (⟨s.a⟩, ⟨s.b⟩)
+noncomputable def gcdToNVal (s : GCDState) : NVal × NVal := (⟨s.a⟩, ⟨s.b⟩)
 
 /-- Theorem 51: Path via congrArg on GCD state embedding. -/
-def gcd_congr_path (a b c : NVal) (p : Path a b) :
+noncomputable def gcd_congr_path (a b c : NVal) (p : Path a b) :
     Path (nadd c a) (nadd c b) :=
   Path.congrArg (nadd c) p
 
 /-- Theorem 52: Nested congruence: inside a product. -/
-def nested_mul_congr (a b : NVal) {x y : NVal} (p : Path x y) :
+noncomputable def nested_mul_congr (a b : NVal) {x y : NVal} (p : Path x y) :
     Path (nmul a (nmul b x)) (nmul a (nmul b y)) :=
   Path.congrArg (nmul a) (Path.congrArg (nmul b) p)
 
 /-- Theorem 53: symm of distributivity. -/
-def dist_symm_path (a b c : NVal) :
+noncomputable def dist_symm_path (a b c : NVal) :
     Path (nadd (nmul a b) (nmul a c)) (nmul a (nadd b c)) :=
   Path.symm (dist_path a b c)
 
 /-- Theorem 54: Chain: distribute then collect back. -/
-def dist_roundtrip (a b c : NVal) :
+noncomputable def dist_roundtrip (a b c : NVal) :
     Path (nmul a (nadd b c)) (nmul a (nadd b c)) :=
   Path.trans (dist_path a b c) (dist_symm_path a b c)
 
 /-! ## §17 Multi-step composite rewriting paths -/
 
 /-- Theorem 55: Four-step add reassociation. -/
-def add_assoc4_path (a b c d : NVal) :
+noncomputable def add_assoc4_path (a b c d : NVal) :
     Path (nadd (nadd (nadd a b) c) d) (nadd a (nadd b (nadd c d))) :=
   Path.trans
     (stepPath (NTStep.add_assoc (nadd a b) c d))
     (stepPath (NTStep.add_assoc a b (nadd c d)))
 
 /-- Theorem 56: Mul associativity four-fold. -/
-def mul_assoc4_path (a b c d : NVal) :
+noncomputable def mul_assoc4_path (a b c d : NVal) :
     Path (nmul (nmul (nmul a b) c) d) (nmul a (nmul b (nmul c d))) :=
   Path.trans
     (stepPath (NTStep.mul_assoc (nmul a b) c d))
     (stepPath (NTStep.mul_assoc a b (nmul c d)))
 
 /-- Theorem 57: congrArg left multiplication. -/
-def mul_congr_left (c : NVal) {a b : NVal} (p : Path a b) :
+noncomputable def mul_congr_left (c : NVal) {a b : NVal} (p : Path a b) :
     Path (nmul c a) (nmul c b) :=
   Path.congrArg (nmul c) p
 
 /-- Theorem 58: congrArg right multiplication. -/
-def mul_congr_right (c : NVal) {a b : NVal} (p : Path a b) :
+noncomputable def mul_congr_right (c : NVal) {a b : NVal} (p : Path a b) :
     Path (nmul a c) (nmul b c) :=
   Path.congrArg (fun x => nmul x c) p
 
 /-- Theorem 59: Comm then assoc chain for multiplication. -/
-def mul_comm_assoc_path (a b c : NVal) :
+noncomputable def mul_comm_assoc_path (a b c : NVal) :
     Path (nmul (nmul b a) c) (nmul a (nmul b c)) :=
   Path.trans
     (Path.congrArg (fun x => nmul x c) (mul_comm_path b a))
     (stepPath (NTStep.mul_assoc a b c))
 
 /-- Theorem 60: Full distribution then factor chain. -/
-def full_distribute_path (a b c : NVal) :
+noncomputable def full_distribute_path (a b c : NVal) :
     Path (nmul a (nadd b c)) (nadd (nmul a b) (nmul a c)) :=
   dist_path a b c
 
 /-! ## §18 Prime computation witnesses -/
 
 /-- A number is prime if it's ≥ 2 and has no divisors other than 1 and itself. -/
-def isPrime (n : Nat) : Bool :=
+noncomputable def isPrime (n : Nat) : Bool :=
   decide (n ≥ 2) && ((List.range n).filter (fun d => decide (d ≥ 2) && n % d == 0)).length == 0
 
 /-- Theorem 61: 2 is prime. -/
@@ -541,7 +541,7 @@ theorem seven_prime : isPrime 7 = true := by native_decide
 /-! ## §19 Additional multi-step computational paths -/
 
 /-- Theorem 65: Reassociate-swap-reassociate on addition. -/
-def add_reassoc_swap_path (a b c : NVal) :
+noncomputable def add_reassoc_swap_path (a b c : NVal) :
     Path (nadd (nadd a b) c) (nadd (nadd a c) b) :=
   Path.trans
     (stepPath (NTStep.add_assoc a b c))
@@ -550,7 +550,7 @@ def add_reassoc_swap_path (a b c : NVal) :
       (Path.symm (stepPath (NTStep.add_assoc a c b))))
 
 /-- Theorem 66: Reassociate-swap-reassociate on multiplication. -/
-def mul_reassoc_swap_path (a b c : NVal) :
+noncomputable def mul_reassoc_swap_path (a b c : NVal) :
     Path (nmul (nmul a b) c) (nmul (nmul a c) b) :=
   Path.trans
     (stepPath (NTStep.mul_assoc a b c))
@@ -559,7 +559,7 @@ def mul_reassoc_swap_path (a b c : NVal) :
       (Path.symm (stepPath (NTStep.mul_assoc a c b))))
 
 /-- Theorem 67: Distribution + local commutativity in both summands. -/
-def dist_double_comm_path (a b c : NVal) :
+noncomputable def dist_double_comm_path (a b c : NVal) :
     Path (nmul a (nadd b c)) (nadd (nmul b a) (nmul c a)) :=
   Path.trans
     (dist_path a b c)
@@ -568,11 +568,11 @@ def dist_double_comm_path (a b c : NVal) :
       (Path.congrArg (nadd (nmul b a)) (mul_comm_path a c)))
 
 /-- Theorem 68: Multiply by one roundtrip. -/
-def mul_one_roundtrip_path (a : NVal) : Path a a :=
+noncomputable def mul_one_roundtrip_path (a : NVal) : Path a a :=
   Path.trans (Path.symm (mul_one_path a)) (mul_one_path a)
 
 /-- Theorem 69: Add zero roundtrip nested under multiplication. -/
-def mul_add_zero_roundtrip_path (a b : NVal) :
+noncomputable def mul_add_zero_roundtrip_path (a b : NVal) :
     Path (nmul a b) (nmul a b) :=
   Path.trans
     (Path.congrArg (nmul a) (add_zero_symm_path b))

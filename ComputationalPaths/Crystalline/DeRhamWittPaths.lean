@@ -66,12 +66,12 @@ namespace DeRhamWittPathData
 variable {Ring : Type u} (W : DeRhamWittPathData Ring)
 
 /-- Functorial transport of paths along Frobenius. -/
-def frobeniusTransport {n : Nat} {x y : W.level (n + 1)} (p : Path x y) :
+noncomputable def frobeniusTransport {n : Nat} {x y : W.level (n + 1)} (p : Path x y) :
     Path (W.frobenius n x) (W.frobenius n y) :=
   Path.congrArg (W.frobenius n) p
 
 /-- Functorial transport of paths along Verschiebung. -/
-def verschiebungTransport {n : Nat} {x y : W.level n} (p : Path x y) :
+noncomputable def verschiebungTransport {n : Nat} {x y : W.level n} (p : Path x y) :
     Path (W.verschiebung n x) (W.verschiebung n y) :=
   Path.congrArg (W.verschiebung n) p
 
@@ -107,7 +107,7 @@ noncomputable def projectionFrobenius_rweq (n : Nat) (x : W.level (n + 1)) :
   rweq_of_step (W.projectionFrobeniusStep n x)
 
 /-- Primitive right-unit normalization witness for `frobeniusTransport`. -/
-def frobeniusTransport_step {n : Nat} {x y : W.level (n + 1)} (p : Path x y) :
+noncomputable def frobeniusTransport_step {n : Nat} {x y : W.level (n + 1)} (p : Path x y) :
     Path.Step
       (Path.trans (W.frobeniusTransport p) (Path.refl (W.frobenius n y)))
       (W.frobeniusTransport p) :=
@@ -121,7 +121,7 @@ noncomputable def frobeniusTransport_rweq {n : Nat} {x y : W.level (n + 1)}
   rweq_of_step (W.frobeniusTransport_step p)
 
 /-- Primitive right-unit normalization witness for `verschiebungTransport`. -/
-def verschiebungTransport_step {n : Nat} {x y : W.level n} (p : Path x y) :
+noncomputable def verschiebungTransport_step {n : Nat} {x y : W.level n} (p : Path x y) :
     Path.Step
       (Path.trans (W.verschiebungTransport p) (Path.refl (W.verschiebung n y)))
       (W.verschiebungTransport p) :=
@@ -137,7 +137,7 @@ noncomputable def verschiebungTransport_rweq {n : Nat} {x y : W.level n}
 end DeRhamWittPathData
 
 /-- Trivial de Rham-Witt path package on `PUnit`. -/
-def trivialDeRhamWittPathData (Ring : Type u) : DeRhamWittPathData Ring where
+noncomputable def trivialDeRhamWittPathData (Ring : Type u) : DeRhamWittPathData Ring where
   level := fun _ => PUnit
   zero := fun _ => PUnit.unit
   add := fun _ _ _ => PUnit.unit

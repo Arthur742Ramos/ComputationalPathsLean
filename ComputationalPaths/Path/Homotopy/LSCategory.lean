@@ -50,12 +50,12 @@ namespace ContractibleIn
 variable {X : Type u}
 
 /-- Path witness for the contraction. -/
-def contract_path (U : ContractibleIn X) (x : U.carrier) :
+noncomputable def contract_path (U : ContractibleIn X) (x : U.carrier) :
     Path (U.incl x) U.center :=
   U.contract x
 
 /-- Build a contractible-in-X set from a contractible carrier. -/
-def ofIsContr {U : Type u} (h : Truncation.IsContr U) (incl : U -> X) :
+noncomputable def ofIsContr {U : Type u} (h : Truncation.IsContr U) (incl : U -> X) :
     ContractibleIn X where
   carrier := U
   incl := incl
@@ -81,7 +81,7 @@ namespace LSCover
 variable {X : Type u} {n : Nat}
 
 /-- Path witness for the covering equation. -/
-def cover_path (C : LSCover X n) (x : X) :
+noncomputable def cover_path (C : LSCover X n) (x : X) :
     Path ((C.sets (C.cover x).1).incl (C.cover x).2) x :=
   Path.stepChain (C.cover_eq x)
 
@@ -103,7 +103,7 @@ namespace LSCategoryData
 variable {X : Type u}
 
 /-- The LS-category value. -/
-def catValue (data : LSCategoryData X) : Nat :=
+noncomputable def catValue (data : LSCategoryData X) : Nat :=
   data.cat
 
 /-- Minimality witness for cat(X). -/
@@ -114,7 +114,7 @@ theorem cat_minimal (data : LSCategoryData X) (m : Nat) (h : LSCover X m) :
 end LSCategoryData
 
 /-- cat(X) packaged as a function from LS-category data. -/
-def cat (X : Type u) (data : LSCategoryData X) : Nat :=
+noncomputable def cat (X : Type u) (data : LSCategoryData X) : Nat :=
   data.cat
 
 /-! ## Cup-length lower bound -/
@@ -130,7 +130,7 @@ structure CohomologyOn (X : Type u) where
   ring : CohomologyRingData
 
 /-- Cup-length (placeholder value). -/
-def cupLength {X : Type u} (_H : CohomologyOn X) : Nat :=
+noncomputable def cupLength {X : Type u} (_H : CohomologyOn X) : Nat :=
   0
 
 /-- Cup-length lower bound: cup-length <= cat(X). -/
@@ -177,7 +177,7 @@ namespace GaneaFibration
 variable {X : Type u} {n : Nat}
 
 /-- Path witness for the section equation. -/
-def section_path (g : GaneaFibration X n) (x : X) :
+noncomputable def section_path (g : GaneaFibration X n) (x : X) :
     Path (g.proj (g.sectionMap x)) x :=
   Path.stepChain (g.sectionMap_eq x)
 

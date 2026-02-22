@@ -96,7 +96,7 @@ variable {D : Type u} (R : ReidData D)
   Path.symm_symm _
 
 /-- 9. congrArg r1add on r1AddRemove -/
-def r1AddOfR1AddRemovePath (d : D) :
+noncomputable def r1AddOfR1AddRemovePath (d : D) :
     Path (R.r1add (R.r1remove (R.r1add d))) (R.r1add d) :=
   Path.congrArg R.r1add (R.r1AddRemovePath d)
 
@@ -106,7 +106,7 @@ def r1AddOfR1AddRemovePath (d : D) :
   Path.trans_refl_right _
 
 /-- 11. congrArg r1remove on r1RemoveAdd -/
-def r1RemOfR1RemoveAddPath (d : D) :
+noncomputable def r1RemOfR1RemoveAddPath (d : D) :
     Path (R.r1remove (R.r1add (R.r1remove d))) (R.r1remove d) :=
   Path.congrArg R.r1remove (R.r1RemoveAddPath d)
 
@@ -145,7 +145,7 @@ def r1RemOfR1RemoveAddPath (d : D) :
   Path.symm_symm _
 
 /-- 18. congrArg r2add on r2AddRemove -/
-def r2AddOfR2AddRemovePath (d : D) :
+noncomputable def r2AddOfR2AddRemovePath (d : D) :
     Path (R.r2add (R.r2remove (R.r2add d))) (R.r2add d) :=
   Path.congrArg R.r2add (R.r2AddRemovePath d)
 
@@ -155,7 +155,7 @@ def r2AddOfR2AddRemovePath (d : D) :
   Path.trans_refl_right _
 
 /-- 20. congrArg r2remove on r2RemoveAdd -/
-def r2RemOfR2RemoveAddPath (d : D) :
+noncomputable def r2RemOfR2RemoveAddPath (d : D) :
     Path (R.r2remove (R.r2add (R.r2remove d))) (R.r2remove d) :=
   Path.congrArg R.r2remove (R.r2RemoveAddPath d)
 
@@ -188,7 +188,7 @@ theorem symm_r2AddRemove_eq (d : D) :
   Path.symm_symm _
 
 /-- 26. congrArg r3slide on r3SlideSlide -/
-def r3SlideCubedPath (d : D) :
+noncomputable def r3SlideCubedPath (d : D) :
     Path (R.r3slide (R.r3slide (R.r3slide d))) (R.r3slide d) :=
   Path.congrArg R.r3slide (R.r3SlideSlidePath d)
 
@@ -203,7 +203,7 @@ def r3SlideCubedPath (d : D) :
   Path.symm_symm _
 
 /-- 29. congrArg mirror on r3SlideSlide -/
-def mirrorR3SlideSlidePath (d : D) :
+noncomputable def mirrorR3SlideSlidePath (d : D) :
     Path (R.mirror (R.r3slide (R.r3slide d))) (R.mirror d) :=
   Path.congrArg R.mirror (R.r3SlideSlidePath d)
 
@@ -271,7 +271,7 @@ def mirrorR3SlideSlidePath (d : D) :
 -- ============================================================
 
 /-- 41. R1 then R2: r2add(r1add d) sequence -/
-def r1ThenR2Path (d : D) :
+noncomputable def r1ThenR2Path (d : D) :
     Path (R.r2remove (R.r2add (R.r1remove (R.r1add d)))) d :=
   Path.trans
     (Path.congrArg (fun x => R.r2remove (R.r2add x)) (R.r1AddRemovePath d))
@@ -288,7 +288,7 @@ def r1ThenR2Path (d : D) :
   Path.symm_symm _
 
 /-- 44. R2 then R3: simplify after slide -/
-def r2ThenR3Path (d : D) :
+noncomputable def r2ThenR3Path (d : D) :
     Path (R.r3slide (R.r3slide (R.r2remove (R.r2add d)))) (R.r3slide (R.r3slide d)) :=
   Path.congrArg (fun x => R.r3slide (R.r3slide x)) (R.r2AddRemovePath d)
 
@@ -298,7 +298,7 @@ def r2ThenR3Path (d : D) :
   Path.trans_refl_right _
 
 /-- 46. Full R2-R3 cleanup: r3slide² ∘ r2-cleanup → identity -/
-def r2R3CleanupPath (d : D) :
+noncomputable def r2R3CleanupPath (d : D) :
     Path (R.r3slide (R.r3slide (R.r2remove (R.r2add d)))) d :=
   Path.trans (R.r2ThenR3Path d) (R.r3SlideSlidePath d)
 
@@ -318,7 +318,7 @@ def r2R3CleanupPath (d : D) :
   by simp
 
 /-- 50. congrArg mirror on r1ThenR2 -/
-def mirrorR1ThenR2Path (d : D) :
+noncomputable def mirrorR1ThenR2Path (d : D) :
     Path (R.mirror (R.r2remove (R.r2add (R.r1remove (R.r1add d))))) (R.mirror d) :=
   Path.congrArg R.mirror (R.r1ThenR2Path d)
 
@@ -328,7 +328,7 @@ def mirrorR1ThenR2Path (d : D) :
   Path.trans_refl_right _
 
 /-- 52. congrArg (connect · e) on r1AddRemove -/
-def connectR1Path (d e : D) :
+noncomputable def connectR1Path (d e : D) :
     Path (R.connect (R.r1remove (R.r1add d)) e) (R.connect d e) :=
   Path.congrArg (R.connect · e) (R.r1AddRemovePath d)
 
@@ -343,7 +343,7 @@ def connectR1Path (d e : D) :
   Path.symm_symm _
 
 /-- 55. congrArg (connect d ·) on r2AddRemove -/
-def connectR2RPath (d e : D) :
+noncomputable def connectR2RPath (d e : D) :
     Path (R.connect d (R.r2remove (R.r2add e))) (R.connect d e) :=
   Path.congrArg (R.connect d) (R.r2AddRemovePath e)
 
@@ -368,7 +368,7 @@ def connectR2RPath (d e : D) :
   Path.symm_symm _
 
 /-- 60. congrArg mirror on connectAssoc -/
-def mirrorConnectAssocPath (a b c : D) :
+noncomputable def mirrorConnectAssocPath (a b c : D) :
     Path (R.mirror (R.connect (R.connect a b) c))
          (R.mirror (R.connect a (R.connect b c))) :=
   Path.congrArg R.mirror (R.connectAssocPath a b c)

@@ -42,7 +42,7 @@ namespace HomotopyPullbackSquare
 /-! ## Basic properties -/
 
 /-- A strictly commuting square yields a homotopy pullback square. -/
-def of_eq {X Y Z P : Type u} {f : X → Z} {g : Y → Z}
+noncomputable def of_eq {X Y Z P : Type u} {f : X → Z} {g : Y → Z}
     {p1 : P → X} {p2 : P → Y}
     (h : (fun p => f (p1 p)) = (fun p => g (p2 p))) :
     HomotopyPullbackSquare f g p1 p2 where
@@ -50,7 +50,7 @@ def of_eq {X Y Z P : Type u} {f : X → Z} {g : Y → Z}
     Path.stepChain (_root_.congrArg (fun k => k p) h)
 
 /-- Homotopy pullback squares are symmetric in composition order. -/
-def symm {X Y Z P : Type u} {f : X → Z} {g : Y → Z}
+noncomputable def symm {X Y Z P : Type u} {f : X → Z} {g : Y → Z}
     {p1 : P → X} {p2 : P → Y} (h : HomotopyPullbackSquare f g p1 p2) :
     FunHomotopy (fun p => g (p2 p)) (fun p => f (p1 p)) :=
   fun p => Path.symm (h.comm p)
@@ -60,7 +60,7 @@ end HomotopyPullbackSquare
 /-! ## Pullback square in the path setting -/
 
 /-- The canonical pullback square in the computational pullback type commutes. -/
-def pullback_square_commutes {A B C : Type u} (f : A → C) (g : B → C) :
+noncomputable def pullback_square_commutes {A B C : Type u} (f : A → C) (g : B → C) :
     HomotopyPullbackSquare f g
       (CompPath.Pullback.fst (f := f) (g := g))
       (CompPath.Pullback.snd (f := f) (g := g)) where

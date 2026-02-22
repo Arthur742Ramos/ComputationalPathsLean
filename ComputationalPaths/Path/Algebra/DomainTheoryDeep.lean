@@ -65,7 +65,7 @@ structure MonoFun {A : Type u} {B : Type v} (cA : CPO A) (cB : CPO B) (f : A →
   mono : ∀ a b, cA.ord.le a b → cB.ord.le (f a) (f b)
 
 /-- Image of a directed set under a monotone function -/
-def imageDirected {A : Type u} {B : Type v} (cA : CPO A) (cB : CPO B)
+noncomputable def imageDirected {A : Type u} {B : Type v} (cA : CPO A) (cB : CPO B)
     (f : A → B) (mf : MonoFun cA cB f) (d : Directed A cA.ord) : Directed B cB.ord where
   carrier := fun i => f (d.carrier i)
   nonempty := trivial
@@ -84,31 +84,31 @@ structure ScottCont {A : Type u} {B : Type v} (cA : CPO A) (cB : CPO B) (f : A �
 -- ============================================================
 
 /-- Def 1: Reflexivity of order as path -/
-def order_refl_path {A : Type u} (_cpo : CPO A) (a : A) :
+noncomputable def order_refl_path {A : Type u} (_cpo : CPO A) (a : A) :
     Path a a :=
   Path.refl a
 
 /-- Def 2: Transitivity of order antisymmetry gives path composition -/
-def order_trans_path {A : Type u} (cpo : CPO A) (a b c : A)
+noncomputable def order_trans_path {A : Type u} (cpo : CPO A) (a b c : A)
     (hab : cpo.ord.le a b) (hba : cpo.ord.le b a)
     (hbc : cpo.ord.le b c) (hcb : cpo.ord.le c b) :
     Path a c :=
   Path.trans (cpo.ord.antisym a b hab hba) (cpo.ord.antisym b c hbc hcb)
 
 /-- Def 3: Symmetry of path from antisymmetry -/
-def order_symm_path {A : Type u} (cpo : CPO A) (a b : A)
+noncomputable def order_symm_path {A : Type u} (cpo : CPO A) (a b : A)
     (hab : cpo.ord.le a b) (hba : cpo.ord.le b a) :
     Path b a :=
   Path.symm (cpo.ord.antisym a b hab hba)
 
 /-- Def 4: Bottom is unique up to path -/
-def bot_unique {A : Type u} (cpo : CPO A) (b1 b2 : A)
+noncomputable def bot_unique {A : Type u} (cpo : CPO A) (b1 b2 : A)
     (hb1 : ∀ a, cpo.ord.le b1 a) (hb2 : ∀ a, cpo.ord.le b2 a) :
     Path b1 b2 :=
   cpo.ord.antisym b1 b2 (hb1 b2) (hb2 b1)
 
 /-- Def 5: Supremum is unique up to path -/
-def sup_unique {A : Type u} (cpo : CPO A) (d : Directed A cpo.ord)
+noncomputable def sup_unique {A : Type u} (cpo : CPO A) (d : Directed A cpo.ord)
     (s1 s2 : A)
     (h1_upper : ∀ i, cpo.ord.le (d.carrier i) s1)
     (h1_least : ∀ u, (∀ i, cpo.ord.le (d.carrier i) u) → cpo.ord.le s1 u)
@@ -134,7 +134,7 @@ theorem chain_le_of_le {A : Type u} (cpo : CPO A) (c : Chain A cpo)
   | step h ih => exact cpo.ord.trans_le _ _ _ ih (c.ascending _)
 
 /-- Convert a chain to a directed set -/
-def chainToDirected {A : Type u} (cpo : CPO A) (c : Chain A cpo) : Directed A cpo.ord where
+noncomputable def chainToDirected {A : Type u} (cpo : CPO A) (c : Chain A cpo) : Directed A cpo.ord where
   carrier := c.elem
   nonempty := trivial
   directed := fun i j =>
@@ -142,7 +142,7 @@ def chainToDirected {A : Type u} (cpo : CPO A) (c : Chain A cpo) : Directed A cp
              chain_le_of_le cpo c j (i + j) (Nat.le_add_left j i)⟩⟩
 
 /-- Def 6: Chain supremum witness -/
-def chain_sup {A : Type u} (cpo : CPO A) (c : Chain A cpo) : A :=
+noncomputable def chain_sup {A : Type u} (cpo : CPO A) (c : Chain A cpo) : A :=
   (cpo.dirSup (chainToDirected cpo c)).sup
 
 /-- Theorem 7: Chain elements are below sup -/
@@ -151,7 +151,7 @@ theorem chain_elem_le_sup {A : Type u} (cpo : CPO A) (c : Chain A cpo) (i : Nat)
   (cpo.dirSup (chainToDirected cpo c)).upper i
 
 /-- Kleene iteration: f^n(⊥) -/
-def kleeneIter {A : Type u} (cpo : CPO A) (f : A → A) : Nat → A
+noncomputable def kleeneIter {A : Type u} (cpo : CPO A) (f : A → A) : Nat → A
   | 0 => cpo.bottom.bot
   | n + 1 => f (kleeneIter cpo f n)
 
@@ -164,18 +164,18 @@ theorem kleene_ascending {A : Type u} (cpo : CPO A) (f : A → A)
   | succ n ih => exact mf.mono _ _ ih
 
 /-- The Kleene chain as a Chain structure -/
-def kleeneChain {A : Type u} (cpo : CPO A) (f : A → A)
+noncomputable def kleeneChain {A : Type u} (cpo : CPO A) (f : A → A)
     (mf : MonoFun cpo cpo f) : Chain A cpo where
   elem := kleeneIter cpo f
   ascending := kleene_ascending cpo f mf
 
 /-- Def 9: Kleene chain as directed set -/
-def kleeneDirected {A : Type u} (cpo : CPO A) (f : A → A)
+noncomputable def kleeneDirected {A : Type u} (cpo : CPO A) (f : A → A)
     (mf : MonoFun cpo cpo f) : Directed A cpo.ord :=
   chainToDirected cpo (kleeneChain cpo f mf)
 
 /-- Def 10: Fixed point path - Scott-continuous f has lfp -/
-def fixed_point_path {A : Type u} (cpo : CPO A) (f : A → A)
+noncomputable def fixed_point_path {A : Type u} (cpo : CPO A) (f : A → A)
     (sf : ScottCont cpo cpo f) :
     Path (f (cpo.dirSup (kleeneDirected cpo f sf.mono)).sup)
          (cpo.dirSup (kleeneDirected cpo f sf.mono)).sup := by
@@ -216,12 +216,12 @@ theorem lfp_least {A : Type u} (cpo : CPO A) (f : A → A)
 -- ============================================================
 
 /-- Our own iterate for f -/
-def iterateFun {A : Type u} (f : A → A) : Nat → A → A
+noncomputable def iterateFun {A : Type u} (f : A → A) : Nat → A → A
   | 0 => id
   | n + 1 => f ∘ iterateFun f n
 
 /-- Def 13: Path chain from iteration using antisymmetry witnesses -/
-def iterPathChain {A : Type u} (cpo : CPO A) (f : A → A)
+noncomputable def iterPathChain {A : Type u} (cpo : CPO A) (f : A → A)
     (mf : MonoFun cpo cpo f)
     (hanti : ∀ n, Path (kleeneIter cpo f n) (kleeneIter cpo f (n+1))) :
     ∀ n, Path (kleeneIter cpo f 0) (kleeneIter cpo f n)
@@ -229,7 +229,7 @@ def iterPathChain {A : Type u} (cpo : CPO A) (f : A → A)
   | n + 1 => Path.trans (iterPathChain cpo f mf hanti n) (hanti n)
 
 /-- Def 14: Functoriality of iteration paths -/
-def iter_path_functorial {A : Type u} {B : Type v}
+noncomputable def iter_path_functorial {A : Type u} {B : Type v}
     (g : A → B) (cpoA : CPO A) (f : A → A)
     (mf : MonoFun cpoA cpoA f)
     (hanti : ∀ n, Path (kleeneIter cpoA f n) (kleeneIter cpoA f (n+1)))
@@ -248,7 +248,7 @@ theorem iter_path_assoc {A : Type u} {a b c d : A}
 -- ============================================================
 
 /-- Def 16: Composition of monotone functions is monotone -/
-def mono_comp {A : Type u} {B : Type v} {C : Type w}
+noncomputable def mono_comp {A : Type u} {B : Type v} {C : Type w}
     (cA : CPO A) (cB : CPO B) (cC : CPO C)
     (f : A → B) (g : B → C)
     (mf : MonoFun cA cB f) (mg : MonoFun cB cC g) :
@@ -256,7 +256,7 @@ def mono_comp {A : Type u} {B : Type v} {C : Type w}
   mono := fun _a _b hab => mg.mono _ _ (mf.mono _ _ hab)
 
 /-- Def 17: Identity is monotone -/
-def mono_id {A : Type u} (cA : CPO A) : MonoFun cA cA id where
+noncomputable def mono_id {A : Type u} (cA : CPO A) : MonoFun cA cA id where
   mono := fun _ _ h => h
 
 /-- Theorem 18: Monotone composition with id is identity -/
@@ -290,12 +290,12 @@ structure AlgebraicDomain (A : Type u) extends CPO A where
   basis_sup : ∀ a, Path (dirSup (basis a)).sup a
 
 /-- Def 20: Compact elements below an element form a path to it -/
-def compact_approx_path {A : Type u} (ad : AlgebraicDomain A) (a : A) :
+noncomputable def compact_approx_path {A : Type u} (ad : AlgebraicDomain A) (a : A) :
     Path (ad.dirSup (ad.basis a)).sup a :=
   ad.basis_sup a
 
 /-- Def 21: Path between compact approximations is transitive -/
-def compact_chain_path {A : Type u} {a b c : A}
+noncomputable def compact_chain_path {A : Type u} {a b c : A}
     (pab : Path a b) (pbc : Path b c) : Path a c :=
   Path.trans pab pbc
 
@@ -304,11 +304,11 @@ def compact_chain_path {A : Type u} {a b c : A}
 -- ============================================================
 
 /-- Pointwise order on functions -/
-def funLe {A : Type u} {B : Type v} (cB : CPO B) (f g : A → B) : Prop :=
+noncomputable def funLe {A : Type u} {B : Type v} (cB : CPO B) (f g : A → B) : Prop :=
   ∀ a, cB.ord.le (f a) (g a)
 
 /-- Def 22: Function space bottom -/
-def funBot {A : Type u} {B : Type v} (cB : CPO B) : A → B :=
+noncomputable def funBot {A : Type u} {B : Type v} (cB : CPO B) : A → B :=
   fun _ => cB.bottom.bot
 
 /-- Theorem 23: Function space bottom is least -/
@@ -337,13 +337,13 @@ structure Retract (A : Type u) (B : Type v) where
   retract_section : ∀ a, Path (retract_ (section_ a)) a
 
 /-- Def 26: Retract composition is identity path -/
-def retract_id_path {A : Type u} {B : Type v}
+noncomputable def retract_id_path {A : Type u} {B : Type v}
     (r : Retract A B) (a : A) :
     Path (r.retract_ (r.section_ a)) a :=
   r.retract_section a
 
 /-- Def 27: Retract preserves paths via congrArg -/
-def retract_preserves_path {A : Type u} {B : Type v}
+noncomputable def retract_preserves_path {A : Type u} {B : Type v}
     (r : Retract A B) (a1 a2 : A) (p : Path a1 a2) :
     Path (r.retract_ (r.section_ a1)) (r.retract_ (r.section_ a2)) :=
   Path.congrArg r.retract_ (Path.congrArg r.section_ p)
@@ -363,13 +363,13 @@ structure EmbProj (A : Type u) (B : Type v) where
   ep_deflation : ∀ b, Path (embed (proj (embed (proj b)))) (embed (proj b))
 
 /-- Def 29: EP pair gives a retract -/
-def ep_to_retract {A : Type u} {B : Type v} (ep : EmbProj A B) : Retract A B where
+noncomputable def ep_to_retract {A : Type u} {B : Type v} (ep : EmbProj A B) : Retract A B where
   section_ := ep.embed
   retract_ := ep.proj
   retract_section := ep.ep_retract
 
 /-- Def 30: EP composition p∘e∘p∘e is path-equal to p∘e via congrArg -/
-def ep_idempotent {A : Type u} {B : Type v}
+noncomputable def ep_idempotent {A : Type u} {B : Type v}
     (ep : EmbProj A B) (b : A) :
     Path (ep.proj (ep.embed (ep.proj (ep.embed b)))) (ep.proj (ep.embed b)) :=
   Path.congrArg ep.proj (Path.congrArg ep.embed (ep.ep_retract b))
@@ -384,20 +384,20 @@ structure DomainSeq where
   ep : ∀ n, EmbProj (Dom n) (Dom (n + 1))
 
 /-- Def 31: Composing EP retract paths -/
-def ep_compose_retract {A : Type u} {B : Type v} {C : Type w}
+noncomputable def ep_compose_retract {A : Type u} {B : Type v} {C : Type w}
     (ep1 : EmbProj A B) (ep2 : EmbProj B C) (a : A) :
     Path (ep1.proj (ep2.proj (ep2.embed (ep1.embed a)))) a :=
   Path.trans (Path.congrArg ep1.proj (ep2.ep_retract (ep1.embed a))) (ep1.ep_retract a)
 
 /-- Def 32: Composing EP retract paths is functorial -/
-def ep_compose_functorial {A : Type u} {B : Type v} {C : Type w}
+noncomputable def ep_compose_functorial {A : Type u} {B : Type v} {C : Type w}
     (ep1 : EmbProj A B) (ep2 : EmbProj B C) (a1 a2 : A) (p : Path a1 a2) :
     Path (ep1.proj (ep2.proj (ep2.embed (ep1.embed a1))))
          (ep1.proj (ep2.proj (ep2.embed (ep1.embed a2)))) :=
   Path.congrArg (fun x => ep1.proj (ep2.proj (ep2.embed (ep1.embed x)))) p
 
 /-- Def 33: EP retract path composed with functorial path -/
-def ep_retract_naturality {A : Type u} {B : Type v} {C : Type w}
+noncomputable def ep_retract_naturality {A : Type u} {B : Type v} {C : Type w}
     (ep1 : EmbProj A B) (ep2 : EmbProj B C) (a1 a2 : A) (p : Path a1 a2) :
     Path (ep1.proj (ep2.proj (ep2.embed (ep1.embed a1)))) a2 :=
   Path.trans (ep_compose_functorial ep1 ep2 a1 a2 p) (ep_compose_retract ep1 ep2 a2)
@@ -412,18 +412,18 @@ inductive Lifted (A : Type u) where
   | up : A → Lifted A
 
 /-- Def 34: Lifted path from base path -/
-def lifted_path {A : Type u} (a b : A) (p : Path a b) :
+noncomputable def lifted_path {A : Type u} (a b : A) (p : Path a b) :
     Path (Lifted.up a) (Lifted.up b) :=
   Path.congrArg Lifted.up p
 
 /-- Def 35: Lifted path composition -/
-def lifted_path_trans {A : Type u} (a b c : A)
+noncomputable def lifted_path_trans {A : Type u} (a b c : A)
     (p : Path a b) (q : Path b c) :
     Path (Lifted.up a) (Lifted.up c) :=
   Path.congrArg Lifted.up (Path.trans p q)
 
 /-- Def 36: Lifted path symmetry -/
-def lifted_path_symm {A : Type u} (a b : A) (p : Path a b) :
+noncomputable def lifted_path_symm {A : Type u} (a b : A) (p : Path a b) :
     Path (Lifted.up b) (Lifted.up a) :=
   Path.congrArg Lifted.up (Path.symm p)
 
@@ -446,22 +446,22 @@ theorem lifted_congrArg_symm {A : Type u} {a b : A}
 -- ============================================================
 
 /-- Def 39: Projection preserves paths (fst) -/
-def fst_path {A : Type u} {B : Type v} {p q : A × B} (h : Path p q) :
+noncomputable def fst_path {A : Type u} {B : Type v} {p q : A × B} (h : Path p q) :
     Path p.1 q.1 :=
   Path.congrArg Prod.fst h
 
 /-- Def 40: Second projection preserves paths -/
-def snd_path {A : Type u} {B : Type v} {p q : A × B} (h : Path p q) :
+noncomputable def snd_path {A : Type u} {B : Type v} {p q : A × B} (h : Path p q) :
     Path p.2 q.2 :=
   Path.congrArg Prod.snd h
 
 /-- Def 41: Pairing preserves paths -/
-def pair_path_fst {A : Type u} {B : Type v} (a1 a2 : A) (b : B)
+noncomputable def pair_path_fst {A : Type u} {B : Type v} (a1 a2 : A) (b : B)
     (p : Path a1 a2) : Path (a1, b) (a2, b) :=
   Path.congrArg (fun x => (x, b)) p
 
 /-- Def 42: Pairing preserves paths (second component) -/
-def pair_path_snd {A : Type u} {B : Type v} (a : A) (b1 b2 : B)
+noncomputable def pair_path_snd {A : Type u} {B : Type v} (a : A) (b1 b2 : B)
     (p : Path b1 b2) : Path (a, b1) (a, b2) :=
   Path.congrArg (fun y => (a, y)) p
 
@@ -470,12 +470,12 @@ def pair_path_snd {A : Type u} {B : Type v} (a : A) (b1 b2 : B)
 -- ============================================================
 
 /-- Def 43: Injection preserves paths (left) -/
-def inl_path {A : Type u} {B : Type v} (a1 a2 : A) (p : Path a1 a2) :
+noncomputable def inl_path {A : Type u} {B : Type v} (a1 a2 : A) (p : Path a1 a2) :
     Path (Sum.inl a1 : A ⊕ B) (Sum.inl a2) :=
   Path.congrArg Sum.inl p
 
 /-- Def 44: Injection preserves paths (right) -/
-def inr_path {A : Type u} {B : Type v} (b1 b2 : B) (p : Path b1 b2) :
+noncomputable def inr_path {A : Type u} {B : Type v} (b1 b2 : B) (p : Path b1 b2) :
     Path (Sum.inr b1 : A ⊕ B) (Sum.inr b2) :=
   Path.congrArg Sum.inr p
 
@@ -508,12 +508,12 @@ structure SmythSet (A : Type u) (cpo : CPO A) where
   upward : ∀ a₁ b₁, cpo.ord.le a₁ b₁ → mem a₁ → mem b₁
 
 /-- Def 47: Singleton is in Hoare powerdomain -/
-def hoareSingleton {A : Type u} (cpo : CPO A) (a : A) : HoareSet A cpo where
+noncomputable def hoareSingleton {A : Type u} (cpo : CPO A) (a : A) : HoareSet A cpo where
   mem := fun x => cpo.ord.le x a
   downward := fun _x _y hxy hya => cpo.ord.trans_le _ _ _ hxy hya
 
 /-- Def 48: Singleton is in Smyth powerdomain -/
-def smythSingleton {A : Type u} (cpo : CPO A) (a : A) : SmythSet A cpo where
+noncomputable def smythSingleton {A : Type u} (cpo : CPO A) (a : A) : SmythSet A cpo where
   mem := fun x => cpo.ord.le a x
   upward := fun _x _y hxy hax => cpo.ord.trans_le _ _ _ hax hxy
 
@@ -575,7 +575,7 @@ theorem domain_congrArg_comp {A : Type u} {B : Type v} {C : Type w}
 -- ============================================================
 
 /-- Def 58: Applying a function to path-equal args gives path -/
-def apply_path {A : Type u} {B : Type v}
+noncomputable def apply_path {A : Type u} {B : Type v}
     (f : A → B) {a b : A} (p : Path a b) :
     Path (f a) (f b) :=
   Path.congrArg f p
@@ -589,7 +589,7 @@ theorem apply_path_trans {A : Type u} {B : Type v}
   Path.congrArg_trans f p q
 
 /-- Def 60: Two functions compose to give paths -/
-def compose_path {A : Type u} {B : Type v} {C : Type w}
+noncomputable def compose_path {A : Type u} {B : Type v} {C : Type w}
     (f : A → B) (g : B → C) {a1 a2 : A} (p : Path a1 a2) :
     Path (g (f a1)) (g (f a2)) :=
   Path.congrArg g (Path.congrArg f p)
@@ -605,24 +605,24 @@ theorem compose_functorial {A : Type u} {B : Type v} {C : Type w}
 -- ============================================================
 
 /-- Def 62: Fixed point path is symmetric -/
-def fixed_point_symm {A : Type u} (f : A → A) (x : A) (p : Path (f x) x) :
+noncomputable def fixed_point_symm {A : Type u} (f : A → A) (x : A) (p : Path (f x) x) :
     Path x (f x) :=
   Path.symm p
 
 /-- Def 63: Fixed points are path-related through order -/
-def fixed_points_ordered_path {A : Type u} (cpo : CPO A)
+noncomputable def fixed_points_ordered_path {A : Type u} (cpo : CPO A)
     (x y : A) (hxy : cpo.ord.le x y) (hyx : cpo.ord.le y x) :
     Path x y :=
   cpo.ord.antisym x y hxy hyx
 
 /-- Def 64: Kleene iterates map to paths -/
-def kleene_path_step {A : Type u} (cpo : CPO A) (f : A → A) (n : Nat)
+noncomputable def kleene_path_step {A : Type u} (cpo : CPO A) (f : A → A) (n : Nat)
     (p : Path (kleeneIter cpo f n) (kleeneIter cpo f (n + 1))) :
     Path (f (kleeneIter cpo f n)) (f (kleeneIter cpo f (n + 1))) :=
   Path.congrArg f p
 
 /-- Def 65: Kleene path chain via congrArg -/
-def kleene_apply_path {A : Type u} (cpo : CPO A) (f : A → A) (n : Nat)
+noncomputable def kleene_apply_path {A : Type u} (cpo : CPO A) (f : A → A) (n : Nat)
     (p : Path (kleeneIter cpo f n) (kleeneIter cpo f (n + 1))) :
     Path (kleeneIter cpo f (n + 1)) (kleeneIter cpo f (n + 2)) :=
   Path.congrArg f p
@@ -636,13 +636,13 @@ structure Denotation (Expr : Type u) (D : Type v) where
   denote : Expr → D
 
 /-- Def 66: Denotation preserves expression paths -/
-def denote_preserves_path {Expr : Type u} {D : Type v}
+noncomputable def denote_preserves_path {Expr : Type u} {D : Type v}
     (den : Denotation Expr D) {e1 e2 : Expr} (p : Path e1 e2) :
     Path (den.denote e1) (den.denote e2) :=
   Path.congrArg den.denote p
 
 /-- Def 67: Composing denotations with a function -/
-def denote_compose {Expr : Type u} {D : Type v} {E : Type w}
+noncomputable def denote_compose {Expr : Type u} {D : Type v} {E : Type w}
     (den : Denotation Expr D) (f : D → E)
     {e1 e2 : Expr} (p : Path e1 e2) :
     Path (f (den.denote e1)) (f (den.denote e2)) :=

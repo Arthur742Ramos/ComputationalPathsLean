@@ -48,7 +48,7 @@ inductive StepCategory where
   deriving DecidableEq, Repr
 
 /-- Assign each of the 78 Step rules to its category. -/
-def categoryOf : StepRule → StepCategory
+noncomputable def categoryOf : StepRule → StepCategory
   | .symm_refl => .groupoid
   | .symm_symm => .groupoid
   | .trans_refl_left => .groupoid
@@ -129,7 +129,7 @@ def categoryOf : StepRule → StepCategory
   | .trans_cancel_right => .structural
 
 /-- Numeric priority for each category (lower = simplified first). -/
-def StepCategory.priority : StepCategory → Nat
+noncomputable def StepCategory.priority : StepCategory → Nat
   | .transport => 0
   | .product => 1
   | .sigma => 2
@@ -149,14 +149,14 @@ theorem categoryOf_total : ∀ r : StepRule, ∃ c : StepCategory, categoryOf r 
 /-! ## Multi-component termination measure -/
 
 /-- Four-component lexicographic ordering on Nat⁴. -/
-def NatLex4 (a b : Nat × Nat × Nat × Nat) : Prop :=
+noncomputable def NatLex4 (a b : Nat × Nat × Nat × Nat) : Prop :=
   a.1 < b.1 ∨
   (a.1 = b.1 ∧ a.2.1 < b.2.1) ∨
   (a.1 = b.1 ∧ a.2.1 = b.2.1 ∧ a.2.2.1 < b.2.2.1) ∨
   (a.1 = b.1 ∧ a.2.1 = b.2.1 ∧ a.2.2.1 = b.2.2.1 ∧ a.2.2.2 < b.2.2.2)
 
 /-- Pair lexicographic order. -/
-def NatLex2 (a b : Nat × Nat) : Prop :=
+noncomputable def NatLex2 (a b : Nat × Nat) : Prop :=
   a.1 < b.1 ∨ (a.1 = b.1 ∧ a.2 < b.2)
 
 private theorem natLex2_acc : ∀ w l : Nat, Acc NatLex2 (w, l) := by
@@ -177,10 +177,10 @@ theorem natLex2_wf : WellFounded NatLex2 :=
   ⟨fun ⟨w, l⟩ => natLex2_acc w l⟩
 
 /-- Four-component lex = two nested pair lex orders. -/
-def flattenMeasure (x : Nat × Nat × Nat × Nat) : (Nat × Nat) × (Nat × Nat) :=
+noncomputable def flattenMeasure (x : Nat × Nat × Nat × Nat) : (Nat × Nat) × (Nat × Nat) :=
   ((x.1, x.2.1), (x.2.2.1, x.2.2.2))
 
-def flatLex (a b : (Nat × Nat) × (Nat × Nat)) : Prop :=
+noncomputable def flatLex (a b : (Nat × Nat) × (Nat × Nat)) : Prop :=
   NatLex2 a.1 b.1 ∨ (a.1 = b.1 ∧ NatLex2 a.2 b.2)
 
 private theorem flatLex_acc : ∀ a b : Nat × Nat, Acc flatLex (a, b) := by
@@ -217,7 +217,7 @@ noncomputable def natLex4_wf : WellFounded NatLex4 :=
     (InvImage.wf flattenMeasure flatLex_wf)
 
 /-- Compute the 4-component measure from a GroupoidTRS expression. -/
-def exprMeasure4 (e : Expr) : Nat × Nat × Nat × Nat :=
+noncomputable def exprMeasure4 (e : Expr) : Nat × Nat × Nat × Nat :=
   (0, Expr.weight e, 0, Expr.leftWeight e)
 
 /-- Every Expr.Step strictly decreases the 4-component measure. -/
@@ -248,11 +248,11 @@ structure SizeChangeGraph where
   deriving DecidableEq, Repr
 
 /-- A size-change graph is valid if at least one component decreases. -/
-def SizeChangeGraph.valid (g : SizeChangeGraph) : Prop :=
+noncomputable def SizeChangeGraph.valid (g : SizeChangeGraph) : Prop :=
   g.decreasesWeight ∨ g.decreasesAssoc
 
 /-- Size-change graph for each rule shape. -/
-def ruleShapeSCG : RuleShape → SizeChangeGraph
+noncomputable def ruleShapeSCG : RuleShape → SizeChangeGraph
   | .symmRefl => ⟨true, false⟩
   | .symmSymm => ⟨true, false⟩
   | .transReflLeft => ⟨true, false⟩
@@ -301,7 +301,7 @@ theorem non_assoc_decreases_weight (s : RuleShape) (hs : s ≠ .transAssoc) (hs2
 /-! ## Size-Change Termination Principle -/
 
 /-- Apply a function n times. -/
-def iterateN (f : α → α) : Nat → α → α
+noncomputable def iterateN (f : α → α) : Nat → α → α
   | 0, x => x
   | n + 1, x => iterateN f n (f x)
 

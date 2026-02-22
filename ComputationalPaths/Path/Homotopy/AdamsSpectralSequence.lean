@@ -125,7 +125,7 @@ class HasDifferentialSquaredZero {r : Nat} (E : SpectralSequencePage r) where
       (E.groups.zero (s + r + r) (t + r - 1 + r - 1))
 
 /-- The main theorem: d ∘ d = 0 -/
-def differential_squared_zero {r : Nat} (E : SpectralSequencePage r) 
+noncomputable def differential_squared_zero {r : Nat} (E : SpectralSequencePage r) 
     [h : HasDifferentialSquaredZero E] (s t : Nat) (x : E.groups.carrier s t) :
     Path (E.d (s + r) (t + r - 1) (E.d s t x))
       (E.groups.zero (s + r + r) (t + r - 1 + r - 1)) :=
@@ -159,7 +159,7 @@ where all groups are trivial.
 -/
 
 /-- The trivial bigraded group (all groups are Unit) -/
-def trivialBiGradedGroup : BiGradedGroup where
+noncomputable def trivialBiGradedGroup : BiGradedGroup where
   carrier := fun _ _ => Unit
   zero := fun _ _ => ()
   add := fun _ _ _ _ => ()
@@ -171,18 +171,18 @@ def trivialBiGradedGroup : BiGradedGroup where
   add_right_neg := fun _ _ _ => Path.stepChain rfl
 
 /-- The zero differential on the trivial group -/
-def trivialDifferential (r : Nat) : Differential trivialBiGradedGroup r where
+noncomputable def trivialDifferential (r : Nat) : Differential trivialBiGradedGroup r where
   map := fun _ _ _ => ()
   map_zero := fun _ _ => Path.stepChain rfl
   map_add := fun _ _ _ _ => Path.stepChain rfl
 
 /-- The trivial spectral sequence page -/
-def trivialPage (r : Nat) : SpectralSequencePage r where
+noncomputable def trivialPage (r : Nat) : SpectralSequencePage r where
   groups := trivialBiGradedGroup
   differential := trivialDifferential r
 
 /-- The trivial page satisfies d ∘ d = 0 -/
-instance (r : Nat) : HasDifferentialSquaredZero (trivialPage r) where
+noncomputable instance (r : Nat) : HasDifferentialSquaredZero (trivialPage r) where
   d_squared_zero := fun _ _ _ => Path.stepChain rfl
 
 end AdamsSpectralSequence

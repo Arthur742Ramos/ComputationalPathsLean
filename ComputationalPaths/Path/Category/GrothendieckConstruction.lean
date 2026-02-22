@@ -41,7 +41,7 @@ theorem totalPathLiftEq {P : A → Type u}
   subst h; rfl
 
 /-- Lift a path in the base to the total space. -/
-def totalPathLift {P : A → Type u}
+noncomputable def totalPathLift {P : A → Type u}
     {a b : A} (p : Path a b) (x : P a) :
     Path (Sigma.mk a x : Σ c, P c) (Sigma.mk b (p.proof ▸ x)) :=
   Path.stepChain (totalPathLiftEq p.proof x)
@@ -55,7 +55,7 @@ theorem totalPathLift_refl_toEq {P : A → Type u}
 /-! ## Transport along paths -/
 
 /-- Transport a fiber element along a base path using path proof. -/
-def transportFiber {P : A → Type u} {a b : A}
+noncomputable def transportFiber {P : A → Type u} {a b : A}
     (p : Path a b) (x : P a) : P b :=
   p.proof ▸ x
 
@@ -123,7 +123,7 @@ structure PseudofunctorToType (A : Type u) where
     transport (h₁.trans h₂) x = transport h₂ (transport h₁ x)
 
 /-- Convert a type family to a pseudofunctor using `Eq.rec`. -/
-def pseudofunctorOfFamily (P : A → Type u) :
+noncomputable def pseudofunctorOfFamily (P : A → Type u) :
     PseudofunctorToType A where
   fiber := P
   transport := fun h x => h ▸ x

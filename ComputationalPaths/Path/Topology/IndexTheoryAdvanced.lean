@@ -55,7 +55,7 @@ structure FredholmOperator where
   dimCoker : Int
 
 /-- The Fredholm index. -/
-def fredholmIndex (D : FredholmOperator) : Int :=
+noncomputable def fredholmIndex (D : FredholmOperator) : Int :=
   D.dimKer - D.dimCoker
 
 /-- An elliptic differential operator on a manifold with symbol data. -/
@@ -108,7 +108,7 @@ structure EtaInvariant where
   regular_at_zero : True
 
 /-- The reduced eta invariant ξ = (η + dim ker D) / 2. -/
-def reducedEta (ei : EtaInvariant) : Int :=
+noncomputable def reducedEta (ei : EtaInvariant) : Int :=
   (ei.etaValue + ei.operator.dimKer) / 2
 
 /-! ## Atiyah-Patodi-Singer Theorem -/
@@ -340,7 +340,7 @@ structure CoarseBaumConnes where
 /-! ## Theorems -/
 
 /-- Fredholm index is additive: ind(D₁ ⊕ D₂) = ind(D₁) + ind(D₂). -/
-def index_additive (D₁ D₂ : FredholmOperator) :
+noncomputable def index_additive (D₁ D₂ : FredholmOperator) :
     Path (fredholmIndex D₁ + fredholmIndex D₂)
          ((D₁.dimKer + D₂.dimKer) - (D₁.dimCoker + D₂.dimCoker)) :=
   Path.stepChain (by simp [fredholmIndex]; omega)
@@ -348,19 +348,19 @@ def index_additive (D₁ D₂ : FredholmOperator) :
 -- index_homotopy_invariant: requires genuine homotopy data (deleted)
 
 /-- APS index formula: ind = local - reduced eta. -/
-def aps_formula (aps : APSIndexTheorem) :
+noncomputable def aps_formula (aps : APSIndexTheorem) :
     Path aps.apsIndex (aps.localIndex - reducedEta aps.boundaryEta) :=
   aps.aps_formula
 
 /-- Spectral flow is additive under concatenation. -/
-def spectral_flow_additive (sfa : SpectralFlowAdditivity) :
+noncomputable def spectral_flow_additive (sfa : SpectralFlowAdditivity) :
     Path sfa.sfConcat (sfa.sf₁.sfValue + sfa.sf₂.sfValue) :=
   sfa.additive
 
 -- sf_eq_eta_diff: requires genuine APS data (deleted)
 
 /-- Families index theorem: ch(ind) = pushforward. -/
-def families_index_formula (fam : OperatorFamily) (fit : FamiliesIndexTheorem fam) :
+noncomputable def families_index_formula (fam : OperatorFamily) (fit : FamiliesIndexTheorem fam) :
     Path fit.chernOfIndex fit.pushforward :=
   fit.families_formula
 
@@ -377,7 +377,7 @@ theorem adiabatic_limit_convergence (fam : OperatorFamily)
     (al : AdiabaticLimit fam) : True := al.converges
 
 /-- Connes index formula in noncommutative geometry. -/
-def connes_index_formula (cit : ConnesIndexTheorem) :
+noncomputable def connes_index_formula (cit : ConnesIndexTheorem) :
     Path cit.pairingValue cit.localValue :=
   cit.connes_formula
 
@@ -404,7 +404,7 @@ theorem eta_gauge_integer (ei₁ ei₂ : EtaInvariant) (_gauge : True) :
     True := trivial
 
 /-- The reduced eta invariant is well-defined mod integers. -/
-def reduced_eta_well_defined (ei : EtaInvariant) :
+noncomputable def reduced_eta_well_defined (ei : EtaInvariant) :
     Path (reducedEta ei) ((ei.etaValue + ei.operator.dimKer) / 2) :=
   Path.refl _
 

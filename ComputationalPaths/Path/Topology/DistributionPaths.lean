@@ -42,37 +42,37 @@ structure TestFunctionSpace where
   support_zero : Path (support_size zero) 0
 
 /-- 1. Zero test function has zero support -/
-def support_zero_path (T : TestFunctionSpace) :
+noncomputable def support_zero_path (T : TestFunctionSpace) :
     Path (T.support_size T.zero) 0 :=
   T.support_zero
 
 /-- 2. Addition commutativity -/
-def test_add_comm (T : TestFunctionSpace) (f g : T.carrier) :
+noncomputable def test_add_comm (T : TestFunctionSpace) (f g : T.carrier) :
     Path (T.add f g) (T.add g f) :=
   T.add_comm f g
 
 /-- 3. Zero is right identity -/
-def test_add_zero (T : TestFunctionSpace) (f : T.carrier) :
+noncomputable def test_add_zero (T : TestFunctionSpace) (f : T.carrier) :
     Path (T.add f T.zero) f :=
   T.add_zero f
 
 /-- 4. Zero is left identity -/
-def test_zero_add (T : TestFunctionSpace) (f : T.carrier) :
+noncomputable def test_zero_add (T : TestFunctionSpace) (f : T.carrier) :
     Path (T.add T.zero f) f :=
   trans (T.add_comm T.zero f) (T.add_zero f)
 
 /-- 5. Self-inverse via neg -/
-def test_add_neg (T : TestFunctionSpace) (f : T.carrier) :
+noncomputable def test_add_neg (T : TestFunctionSpace) (f : T.carrier) :
     Path (T.add f (T.neg f)) T.zero :=
   T.add_neg f
 
 /-- 6. Scalar multiplication of zero -/
-def test_smul_zero (T : TestFunctionSpace) (n : Int) :
+noncomputable def test_smul_zero (T : TestFunctionSpace) (n : Int) :
     Path (T.smul n T.zero) T.zero :=
   T.smul_zero n
 
 /-- 7. Support of smul zero -/
-def support_smul_zero (T : TestFunctionSpace) (n : Int) :
+noncomputable def support_smul_zero (T : TestFunctionSpace) (n : Int) :
     Path (T.support_size (T.smul n T.zero)) 0 :=
   trans (congrArg T.support_size (T.smul_zero n)) T.support_zero
 
@@ -85,18 +85,18 @@ structure Distribution (T : TestFunctionSpace) where
   linear_add : ∀ f g, Path (eval (T.add f g)) (eval (T.add f g))
 
 /-- The zero distribution. -/
-def Distribution.zeroDist (T : TestFunctionSpace) : Distribution T where
+noncomputable def Distribution.zeroDist (T : TestFunctionSpace) : Distribution T where
   eval := fun _ => 0
   eval_zero := Path.refl _
   linear_add := fun _ _ => Path.refl _
 
 /-- 8. Zero distribution evaluates to zero -/
-def zero_dist_eval (T : TestFunctionSpace) (f : T.carrier) :
+noncomputable def zero_dist_eval (T : TestFunctionSpace) (f : T.carrier) :
     Path ((Distribution.zeroDist T).eval f) 0 :=
   Path.refl _
 
 /-- 9. Distribution at zero -/
-def dist_eval_zero (T : TestFunctionSpace) (d : Distribution T) :
+noncomputable def dist_eval_zero (T : TestFunctionSpace) (d : Distribution T) :
     Path (d.eval T.zero) 0 :=
   d.eval_zero
 
@@ -146,12 +146,12 @@ noncomputable def dist_deriv_zero_dist (T : TestFunctionSpace) (D : DerivativeOp
               (Path.mk [Step.mk _ _ (Int.neg_zero)] Int.neg_zero)
 
 /-- 14. Derivative operator at zero -/
-def deriv_at_zero (T : TestFunctionSpace) (D : DerivativeOp T) :
+noncomputable def deriv_at_zero (T : TestFunctionSpace) (D : DerivativeOp T) :
     Path (D.deriv T.zero) T.zero :=
   D.deriv_zero
 
 /-- 15. Support of derivative at zero -/
-def support_deriv_zero (T : TestFunctionSpace) (D : DerivativeOp T) :
+noncomputable def support_deriv_zero (T : TestFunctionSpace) (D : DerivativeOp T) :
     Path (T.support_size (D.deriv T.zero)) 0 :=
   trans (congrArg T.support_size D.deriv_zero) T.support_zero
 
@@ -165,27 +165,27 @@ structure Convolution (T : TestFunctionSpace) where
   conv_zero_right : ∀ f, Path (conv f T.zero) T.zero
 
 /-- 16. Convolution commutativity -/
-def conv_comm_path (T : TestFunctionSpace) (C : Convolution T) (f g : T.carrier) :
+noncomputable def conv_comm_path (T : TestFunctionSpace) (C : Convolution T) (f g : T.carrier) :
     Path (C.conv f g) (C.conv g f) :=
   C.conv_comm f g
 
 /-- 17. Convolution with zero on left -/
-def conv_zero_left_path (T : TestFunctionSpace) (C : Convolution T) (f : T.carrier) :
+noncomputable def conv_zero_left_path (T : TestFunctionSpace) (C : Convolution T) (f : T.carrier) :
     Path (C.conv T.zero f) T.zero :=
   C.conv_zero_left f
 
 /-- 18. Convolution with zero on right -/
-def conv_zero_right_path (T : TestFunctionSpace) (C : Convolution T) (f : T.carrier) :
+noncomputable def conv_zero_right_path (T : TestFunctionSpace) (C : Convolution T) (f : T.carrier) :
     Path (C.conv f T.zero) T.zero :=
   C.conv_zero_right f
 
 /-- 19. Double commutativity returns to start -/
-def conv_comm_double (T : TestFunctionSpace) (C : Convolution T) (f g : T.carrier) :
+noncomputable def conv_comm_double (T : TestFunctionSpace) (C : Convolution T) (f g : T.carrier) :
     Path (C.conv f g) (C.conv f g) :=
   trans (C.conv_comm f g) (C.conv_comm g f)
 
 /-- 20. Support of convolution with zero -/
-def support_conv_zero (T : TestFunctionSpace) (C : Convolution T) (f : T.carrier) :
+noncomputable def support_conv_zero (T : TestFunctionSpace) (C : Convolution T) (f : T.carrier) :
     Path (T.support_size (C.conv T.zero f)) 0 :=
   trans (congrArg T.support_size (C.conv_zero_left f)) T.support_zero
 
@@ -201,37 +201,37 @@ structure FourierTransform (T : TestFunctionSpace) where
   inv_roundtrip : ∀ f, Path (fourier (inv_fourier f)) f
 
 /-- 21. Fourier transform of zero -/
-def fourier_zero_path (T : TestFunctionSpace) (F : FourierTransform T) :
+noncomputable def fourier_zero_path (T : TestFunctionSpace) (F : FourierTransform T) :
     Path (F.fourier T.zero) T.zero :=
   F.fourier_zero
 
 /-- 22. Inverse Fourier of zero -/
-def inv_fourier_zero_path (T : TestFunctionSpace) (F : FourierTransform T) :
+noncomputable def inv_fourier_zero_path (T : TestFunctionSpace) (F : FourierTransform T) :
     Path (F.inv_fourier T.zero) T.zero :=
   F.inv_fourier_zero
 
 /-- 23. Fourier roundtrip -/
-def fourier_roundtrip (T : TestFunctionSpace) (F : FourierTransform T) (f : T.carrier) :
+noncomputable def fourier_roundtrip (T : TestFunctionSpace) (F : FourierTransform T) (f : T.carrier) :
     Path (F.inv_fourier (F.fourier f)) f :=
   F.roundtrip f
 
 /-- 24. Inverse Fourier roundtrip -/
-def inv_fourier_roundtrip (T : TestFunctionSpace) (F : FourierTransform T) (f : T.carrier) :
+noncomputable def inv_fourier_roundtrip (T : TestFunctionSpace) (F : FourierTransform T) (f : T.carrier) :
     Path (F.fourier (F.inv_fourier f)) f :=
   F.inv_roundtrip f
 
 /-- 25. Double Fourier at zero -/
-def fourier_double_zero (T : TestFunctionSpace) (F : FourierTransform T) :
+noncomputable def fourier_double_zero (T : TestFunctionSpace) (F : FourierTransform T) :
     Path (F.fourier (F.fourier T.zero)) (F.fourier T.zero) :=
   congrArg F.fourier F.fourier_zero
 
 /-- 26. Fourier roundtrip at zero chains -/
-def fourier_roundtrip_zero (T : TestFunctionSpace) (F : FourierTransform T) :
+noncomputable def fourier_roundtrip_zero (T : TestFunctionSpace) (F : FourierTransform T) :
     Path (F.inv_fourier (F.fourier T.zero)) T.zero :=
   F.roundtrip T.zero
 
 /-- 27. Support of Fourier of zero -/
-def support_fourier_zero (T : TestFunctionSpace) (F : FourierTransform T) :
+noncomputable def support_fourier_zero (T : TestFunctionSpace) (F : FourierTransform T) :
     Path (T.support_size (F.fourier T.zero)) 0 :=
   trans (congrArg T.support_size F.fourier_zero) T.support_zero
 
@@ -242,19 +242,19 @@ structure TemperedDist (T : TestFunctionSpace) extends Distribution T where
   growth_bound : Nat
 
 /-- 28. Tempered distribution at zero -/
-def tempered_at_zero (T : TestFunctionSpace) (td : TemperedDist T) :
+noncomputable def tempered_at_zero (T : TestFunctionSpace) (td : TemperedDist T) :
     Path (td.eval T.zero) 0 :=
   td.eval_zero
 
 /-- Zero tempered distribution. -/
-def TemperedDist.zeroTempered (T : TestFunctionSpace) : TemperedDist T where
+noncomputable def TemperedDist.zeroTempered (T : TestFunctionSpace) : TemperedDist T where
   eval := fun _ => 0
   eval_zero := Path.refl _
   linear_add := fun _ _ => Path.refl _
   growth_bound := 0
 
 /-- 29. Zero tempered distribution evaluates to zero -/
-def zero_tempered_eval (T : TestFunctionSpace) (f : T.carrier) :
+noncomputable def zero_tempered_eval (T : TestFunctionSpace) (f : T.carrier) :
     Path ((TemperedDist.zeroTempered T).eval f) 0 :=
   Path.refl _
 
@@ -267,13 +267,13 @@ structure SobolevElement (T : TestFunctionSpace) where
   sobolev_norm : Nat
 
 /-- 30. Sobolev element at zero -/
-def sobolev_zero (T : TestFunctionSpace) : SobolevElement T where
+noncomputable def sobolev_zero (T : TestFunctionSpace) : SobolevElement T where
   func := T.zero
   order := 0
   sobolev_norm := 0
 
 /-- 31. Sobolev norm of zero element -/
-def sobolev_zero_norm (T : TestFunctionSpace) :
+noncomputable def sobolev_zero_norm (T : TestFunctionSpace) :
     Path (sobolev_zero T).sobolev_norm 0 :=
   Path.refl _
 
@@ -288,12 +288,12 @@ structure FundamentalSolution (T : TestFunctionSpace) where
   is_fundamental : Path (op green) (op green)
 
 /-- 32. Fundamental solution operator at zero -/
-def fund_sol_op_zero (T : TestFunctionSpace) (fs : FundamentalSolution T) :
+noncomputable def fund_sol_op_zero (T : TestFunctionSpace) (fs : FundamentalSolution T) :
     Path (fs.op T.zero) T.zero :=
   fs.op_zero
 
 /-- 33. Support of operator at zero -/
-def fund_sol_support_zero (T : TestFunctionSpace) (fs : FundamentalSolution T) :
+noncomputable def fund_sol_support_zero (T : TestFunctionSpace) (fs : FundamentalSolution T) :
     Path (T.support_size (fs.op T.zero)) 0 :=
   trans (congrArg T.support_size fs.op_zero) T.support_zero
 
@@ -306,22 +306,22 @@ structure Mollifier (T : TestFunctionSpace) where
   approx : ∀ f, Path (mollify (mollify f)) (mollify (mollify f))
 
 /-- 34. Mollifier at zero -/
-def mollify_zero_path (T : TestFunctionSpace) (M : Mollifier T) :
+noncomputable def mollify_zero_path (T : TestFunctionSpace) (M : Mollifier T) :
     Path (M.mollify T.zero) T.zero :=
   M.mollify_zero
 
 /-- 35. Double mollification at zero -/
-def mollify_double_zero (T : TestFunctionSpace) (M : Mollifier T) :
+noncomputable def mollify_double_zero (T : TestFunctionSpace) (M : Mollifier T) :
     Path (M.mollify (M.mollify T.zero)) T.zero :=
   trans (congrArg M.mollify M.mollify_zero) M.mollify_zero
 
 /-- 36. Triple mollification at zero -/
-def mollify_triple_zero (T : TestFunctionSpace) (M : Mollifier T) :
+noncomputable def mollify_triple_zero (T : TestFunctionSpace) (M : Mollifier T) :
     Path (M.mollify (M.mollify (M.mollify T.zero))) T.zero :=
   trans (congrArg M.mollify (mollify_double_zero T M)) M.mollify_zero
 
 /-- 37. Support of mollification at zero -/
-def support_mollify_zero (T : TestFunctionSpace) (M : Mollifier T) :
+noncomputable def support_mollify_zero (T : TestFunctionSpace) (M : Mollifier T) :
     Path (T.support_size (M.mollify T.zero)) 0 :=
   trans (congrArg T.support_size M.mollify_zero) T.support_zero
 
@@ -335,29 +335,29 @@ structure DistPairing (T : TestFunctionSpace) where
   pair_comm : ∀ d₁ d₂, Path (pair d₁ d₂) (pair d₂ d₁)
 
 /-- 38. Pairing with zero on left -/
-def pair_zero_left_path (T : TestFunctionSpace) (P : DistPairing T) (d : Distribution T) :
+noncomputable def pair_zero_left_path (T : TestFunctionSpace) (P : DistPairing T) (d : Distribution T) :
     Path (P.pair (Distribution.zeroDist T) d) 0 :=
   P.pair_zero_left d
 
 /-- 39. Pairing with zero on right -/
-def pair_zero_right_path (T : TestFunctionSpace) (P : DistPairing T) (d : Distribution T) :
+noncomputable def pair_zero_right_path (T : TestFunctionSpace) (P : DistPairing T) (d : Distribution T) :
     Path (P.pair d (Distribution.zeroDist T)) 0 :=
   P.pair_zero_right d
 
 /-- 40. Pairing commutativity -/
-def pair_comm_path (T : TestFunctionSpace) (P : DistPairing T)
+noncomputable def pair_comm_path (T : TestFunctionSpace) (P : DistPairing T)
     (d₁ d₂ : Distribution T) :
     Path (P.pair d₁ d₂) (P.pair d₂ d₁) :=
   P.pair_comm d₁ d₂
 
 /-- 41. Double commutativity of pairing -/
-def pair_comm_double (T : TestFunctionSpace) (P : DistPairing T)
+noncomputable def pair_comm_double (T : TestFunctionSpace) (P : DistPairing T)
     (d₁ d₂ : Distribution T) :
     Path (P.pair d₁ d₂) (P.pair d₁ d₂) :=
   trans (P.pair_comm d₁ d₂) (P.pair_comm d₂ d₁)
 
 /-- 42. Zero-zero pairing -/
-def pair_zero_zero (T : TestFunctionSpace) (P : DistPairing T) :
+noncomputable def pair_zero_zero (T : TestFunctionSpace) (P : DistPairing T) :
     Path (P.pair (Distribution.zeroDist T) (Distribution.zeroDist T)) 0 :=
   P.pair_zero_left (Distribution.zeroDist T)
 

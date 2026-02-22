@@ -95,7 +95,7 @@ theorem mul_inv (a : π.carrier) : π.mul a (π.inv a) = π.e := by
     _ = π.e := π.inv_mul (π.inv a)
 
 -- Theorem 2: mul_inv as Path
-def mul_inv_path (a : π.carrier) : Path (π.mul a (π.inv a)) π.e :=
+noncomputable def mul_inv_path (a : π.carrier) : Path (π.mul a (π.inv a)) π.e :=
   Path.stepChain (π.mul_inv a)
 
 -- Theorem 3: identity is unique (left)
@@ -130,18 +130,18 @@ namespace Extension
 variable {A X Y : Type u} {prob : ExtensionProblem A X Y}
 
 -- Theorem 5: compatibility as Path
-def compat_path (sol : Extension A X Y prob) (a : A) :
+noncomputable def compat_path (sol : Extension A X Y prob) (a : A) :
     Path (sol.ext (prob.inclusion a)) (prob.baseMap a) :=
   Path.stepChain (sol.compat a)
 
 -- Theorem 6: identity extension (when inclusion = id)
-def idExtension (prob : ExtensionProblem X X Y)
+noncomputable def idExtension (prob : ExtensionProblem X X Y)
     (hid : prob.inclusion = id) : Extension X X Y prob where
   ext := prob.baseMap
   compat := fun a => by simp [hid]
 
 -- Theorem 7: composition of extensions along a chain A ↪ B ↪ X
-def compExtension {A B X Y : Type u}
+noncomputable def compExtension {A B X Y : Type u}
     (prob1 : ExtensionProblem A B Y)
     (prob2 : ExtensionProblem B X Y)
     (sol2 : Extension B X Y prob2) :
@@ -179,7 +179,7 @@ theorem vanish_of_ext (obs : ObstructionClass A X Y prob R)
   obs.vanishes_iff.mpr h
 
 -- Theorem 10: vanishing obstruction Path
-def vanish_path (obs : ObstructionClass A X Y prob R)
+noncomputable def vanish_path (obs : ObstructionClass A X Y prob R)
     (h : obs.cocycle = obs.zero) : Path obs.cocycle obs.zero :=
   Path.stepChain h
 
@@ -211,13 +211,13 @@ namespace KSpaceDeep
 variable {G : Type u} {n : Nat}
 
 -- Theorem 11: below-dimension triviality as Path
-def trivial_below_path (ks : KSpaceDeep G n) (k : Nat) (hk : k < n)
+noncomputable def trivial_below_path (ks : KSpaceDeep G n) (k : Nat) (hk : k < n)
     (π : HomotopyGroupData ks.carrier ks.base k) (x : π.carrier) :
     Path x π.e :=
   Path.stepChain (ks.trivialBelow k hk π x)
 
 -- Theorem 12: above-dimension triviality as Path
-def trivial_above_path (ks : KSpaceDeep G n) (k : Nat) (hk : n < k)
+noncomputable def trivial_above_path (ks : KSpaceDeep G n) (k : Nat) (hk : n < k)
     (π : HomotopyGroupData ks.carrier ks.base k) (x : π.carrier) :
     Path x π.e :=
   Path.stepChain (ks.trivialAbove k hk π x)
@@ -235,13 +235,13 @@ structure CohomologyRepresentation (X : Type u) (ks : KSpaceDeep G n)
   inv_roundtrip : ∀ c, classify (deClassify c) = c
 
 -- Theorem 14: roundtrip as Path
-def cohom_roundtrip_path {X : Type u} {ks : KSpaceDeep G n} {C : Type u}
+noncomputable def cohom_roundtrip_path {X : Type u} {ks : KSpaceDeep G n} {C : Type u}
     (rep : CohomologyRepresentation X ks C) (f : X → ks.carrier) :
     Path (rep.deClassify (rep.classify f)) f :=
   Path.stepChain (rep.roundtrip f)
 
 -- Theorem 15: inverse roundtrip as Path
-def cohom_inv_roundtrip_path {X : Type u} {ks : KSpaceDeep G n} {C : Type u}
+noncomputable def cohom_inv_roundtrip_path {X : Type u} {ks : KSpaceDeep G n} {C : Type u}
     (rep : CohomologyRepresentation X ks C) (c : C) :
     Path (rep.classify (rep.deClassify c)) c :=
   Path.stepChain (rep.inv_roundtrip c)
@@ -275,12 +275,12 @@ namespace PostnikovStage
 variable {X : Type u} {base : X} {n : Nat}
 
 -- Theorem 16: truncation of base as Path
-def truncBase_path (ps : PostnikovStage X base n) :
+noncomputable def truncBase_path (ps : PostnikovStage X base n) :
     Path (ps.truncMap base) ps.stageBase :=
   Path.stepChain ps.truncBase
 
 -- Theorem 17: higher homotopy triviality as Path
-def pi_trivial_path (ps : PostnikovStage X base n) (k : Nat) (hk : n < k)
+noncomputable def pi_trivial_path (ps : PostnikovStage X base n) (k : Nat) (hk : n < k)
     (πS : HomotopyGroupData ps.stage ps.stageBase k) (x : πS.carrier) :
     Path x πS.e :=
   Path.stepChain (ps.piTrivial k hk πS x)
@@ -303,17 +303,17 @@ namespace PostnikovMap
 variable {X : Type u} {base : X} {n : Nat}
 
 -- Theorem 18: connecting map base compatibility as Path
-def connectBase_path (pm : PostnikovMap X base n) :
+noncomputable def connectBase_path (pm : PostnikovMap X base n) :
     Path (pm.connect pm.upper.stageBase) pm.lower.stageBase :=
   Path.stepChain pm.connectBase
 
 -- Theorem 19: tower compatibility as Path
-def compat_path (pm : PostnikovMap X base n) (x : X) :
+noncomputable def compat_path (pm : PostnikovMap X base n) (x : X) :
     Path (pm.connect (pm.upper.truncMap x)) (pm.lower.truncMap x) :=
   Path.stepChain (pm.compat x)
 
 -- Theorem 20: tower composition: composing two maps
-def tower_compose {m : Nat} (pm1 : PostnikovMap X base n)
+noncomputable def tower_compose {m : Nat} (pm1 : PostnikovMap X base n)
     (pm2 : PostnikovMap X base m)
     (h : pm2.lower.stage = pm1.upper.stage)
     (hBase : h ▸ pm2.lower.stageBase = pm1.upper.stageBase) :
@@ -341,7 +341,7 @@ namespace KInvariant
 variable {X : Type u} {base : X} {n : Nat} {G : Type u}
 
 -- Theorem 21: k-invariant basepoint compatibility as Path
-def kMapBase_path (ki : KInvariant X base n G) :
+noncomputable def kMapBase_path (ki : KInvariant X base n G) :
     Path (ki.kMap ki.stage.stageBase) ki.emSpace.base :=
   Path.stepChain ki.kMapBase
 
@@ -354,13 +354,13 @@ structure KInvariantFiber (ki : KInvariant X base n G) where
   fiberCond : ∀ x : fiberSpace, ki.kMap (incl x) = ki.emSpace.base
 
 -- Theorem 23: fiber inclusion preserves basepoint as Path
-def fiber_inclBase_path (ki : KInvariant X base n G)
+noncomputable def fiber_inclBase_path (ki : KInvariant X base n G)
     (fib : KInvariantFiber ki) :
     Path (fib.incl fib.fiberBase) ki.stage.stageBase :=
   Path.stepChain fib.inclBase
 
 -- Theorem 24: fiber condition as Path
-def fiber_cond_path (ki : KInvariant X base n G)
+noncomputable def fiber_cond_path (ki : KInvariant X base n G)
     (fib : KInvariantFiber ki) (x : fib.fiberSpace) :
     Path (ki.kMap (fib.incl x)) ki.emSpace.base :=
   Path.stepChain (fib.fiberCond x)
@@ -385,12 +385,12 @@ namespace Lift
 variable {X B E : Type u} {prob : LiftingProblem X B E}
 
 -- Theorem 25: lift compatibility as Path
-def compat_path (l : Lift X B E prob) (x : X) :
+noncomputable def compat_path (l : Lift X B E prob) (x : X) :
     Path (prob.fibration (l.lift x)) (prob.baseMap x) :=
   Path.stepChain (l.compat x)
 
 -- Theorem 26: identity lift (when fibration = id)
-def idLift (f : X → B) (prob : LiftingProblem X B B)
+noncomputable def idLift (f : X → B) (prob : LiftingProblem X B B)
     (hfib : prob.fibration = id) (hf : f = prob.baseMap) :
     Lift X B B prob where
   lift := f
@@ -420,7 +420,7 @@ theorem vanish_of_lift (obs : LiftObstruction X B E prob R)
   obs.vanishes_iff.mpr h
 
 -- Theorem 29: vanishing as Path
-def vanish_path (obs : LiftObstruction X B E prob R)
+noncomputable def vanish_path (obs : LiftObstruction X B E prob R)
     (h : obs.obstruction = obs.zero) : Path obs.obstruction obs.zero :=
   Path.stepChain h
 
@@ -444,7 +444,7 @@ namespace CWSkeleton
 variable {X : Type u}
 
 -- Theorem 30: compatibility as Path
-def compat_path (cw : CWSkeleton X) (n : Nat) (x : cw.skeleton n) :
+noncomputable def compat_path (cw : CWSkeleton X) (n : Nat) (x : cw.skeleton n) :
     Path (cw.toTotal (n + 1) (cw.incl n x)) (cw.toTotal n x) :=
   Path.stepChain (cw.compat n x)
 
@@ -453,12 +453,12 @@ theorem compat_double (cw : CWSkeleton X) (n : Nat) (x : cw.skeleton n) :
     cw.toTotal (n + 2) (cw.incl (n + 1) (cw.incl n x)) = cw.toTotal n x := by
   rw [cw.compat (n + 1), cw.compat n]
 
-def compat_double_path (cw : CWSkeleton X) (n : Nat) (x : cw.skeleton n) :
+noncomputable def compat_double_path (cw : CWSkeleton X) (n : Nat) (x : cw.skeleton n) :
     Path (cw.toTotal (n + 2) (cw.incl (n + 1) (cw.incl n x))) (cw.toTotal n x) :=
   Path.stepChain (cw.compat_double n x)
 
 -- Theorem 32: skeletal extension problem
-def skeletalExtProblem (cw : CWSkeleton X) (n : Nat) (Y : Type u)
+noncomputable def skeletalExtProblem (cw : CWSkeleton X) (n : Nat) (Y : Type u)
     (f : cw.skeleton n → Y) : ExtensionProblem (cw.skeleton n) (cw.skeleton (n + 1)) Y where
   inclusion := cw.incl n
   baseMap := f

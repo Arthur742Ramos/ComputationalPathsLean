@@ -63,21 +63,21 @@ structure SchemeMor (X Y : SmoothScheme.{u}) where
   toFun : X.points → Y.points
 
 /-- Identity morphism. -/
-def SchemeMor.id (X : SmoothScheme.{u}) : SchemeMor X X where
+noncomputable def SchemeMor.id (X : SmoothScheme.{u}) : SchemeMor X X where
   toFun := _root_.id
 
 /-- Composition of scheme morphisms. -/
-def SchemeMor.comp {X Y Z : SmoothScheme.{u}} (f : SchemeMor X Y)
+noncomputable def SchemeMor.comp {X Y Z : SmoothScheme.{u}} (f : SchemeMor X Y)
     (g : SchemeMor Y Z) : SchemeMor X Z where
   toFun := g.toFun ∘ f.toFun
 
 /-- The affine line A¹. -/
-def affineLine : SmoothScheme.{u} where
+noncomputable def affineLine : SmoothScheme.{u} where
   points := PUnit
   dim := 1
 
 /-- Product of schemes (simplified). -/
-def schemeProd (X Y : SmoothScheme.{u}) : SmoothScheme.{u} where
+noncomputable def schemeProd (X Y : SmoothScheme.{u}) : SmoothScheme.{u} where
   points := X.points × Y.points
   dim := X.dim + Y.dim
 
@@ -114,7 +114,7 @@ structure A1Invariance (X : SmoothScheme.{u}) where
     Path (section_.toFun (proj.toFun p)) (section_.toFun (proj.toFun p))
 
 /-- A¹-invariance holds for any scheme (canonical construction). -/
-def a1_invariance (X : SmoothScheme.{u}) : A1Invariance X where
+noncomputable def a1_invariance (X : SmoothScheme.{u}) : A1Invariance X where
   proj := { toFun := fun p => p.1 }
   proj_fun := rfl
   section_ := { toFun := fun x => (x, PUnit.unit) }
@@ -223,7 +223,7 @@ structure KTheorySpectrum where
     Path (spectrum.bond n X s) (spectrum.bond n X s) -- periodicity witness
 
 /-- Bott periodicity as a Path: K_n(X) → K_{n+2}(X) via double bonding. -/
-def bott_periodicity (K : KTheorySpectrum.{u}) (n : Nat)
+noncomputable def bott_periodicity (K : KTheorySpectrum.{u}) (n : Nat)
     (X : SmoothScheme.{u})
     (s : ((K.spectrum.space n).level 0).sections X) :
     Path (K.spectrum.bond (n + 1) X (K.spectrum.bond n X s))

@@ -52,7 +52,7 @@ structure RectEmbed (n : Nat) where
 
 /-- Two rectilinear embeddings have disjoint images if their intervals are
     disjoint in at least one coordinate. -/
-def disjointImages {n : Nat} (e₁ e₂ : RectEmbed n) : Prop :=
+noncomputable def disjointImages {n : Nat} (e₁ e₂ : RectEmbed n) : Prop :=
   ∃ i : Fin n,
     (e₁.intervals i).hi ≤ (e₂.intervals i).lo ∨
     (e₂.intervals i).hi ≤ (e₁.intervals i).lo
@@ -68,7 +68,7 @@ structure LittleCubeConfig (n : Nat) (k : Nat) where
   pairwise_disjoint : ∀ i j : Fin k, i ≠ j → disjointImages (cubes i) (cubes j)
 
 /-- The identity little cube: a single cube filling the whole space. -/
-def identityCube (n : Nat) : LittleCubeConfig n 1 where
+noncomputable def identityCube (n : Nat) : LittleCubeConfig n 1 where
   cubes := fun _ =>
     { intervals := fun _ => { lo := 0, hi := 1, valid := Nat.zero_lt_one } }
   pairwise_disjoint := fun i j h => absurd (Fin.ext (by omega)) h
@@ -76,12 +76,12 @@ def identityCube (n : Nat) : LittleCubeConfig n 1 where
 /-! ## En operad -/
 
 /-- The space of little n-cube configurations of arity k. -/
-def EnSpace (n : Nat) (k : Nat) : Type :=
+noncomputable def EnSpace (n : Nat) (k : Nat) : Type :=
   LittleCubeConfig n k
 
 /-- The symmetric group acts on little cube configurations by
     permuting the labels. -/
-def enAction (n : Nat) {k : Nat} (σ : Perm k) (c : EnSpace n k) :
+noncomputable def enAction (n : Nat) {k : Nat} (σ : Perm k) (c : EnSpace n k) :
     EnSpace n k where
   cubes := c.cubes ∘ σ.invFun
   pairwise_disjoint := fun i j h => by
@@ -93,7 +93,7 @@ def enAction (n : Nat) {k : Nat} (σ : Perm k) (c : EnSpace n k) :
     exact h1
 
 /-- The En operad as a clean operad. -/
-def enOperad (n : Nat) : CleanOperad where
+noncomputable def enOperad (n : Nat) : CleanOperad where
   ops := fun k => EnSpace n k
   unit := identityCube n
   action := fun σ c => enAction n σ c
@@ -103,13 +103,13 @@ def enOperad (n : Nat) : CleanOperad where
 /-! ## Composition of little cubes -/
 
 /-- Rescale a sub-interval: place inner inside outer. -/
-def rescaleInterval (outer inner : SubInterval) : SubInterval where
+noncomputable def rescaleInterval (outer inner : SubInterval) : SubInterval where
   lo := outer.lo + inner.lo
   hi := outer.lo + inner.hi
   valid := Nat.add_lt_add_left inner.valid outer.lo
 
 /-- Compose two rectilinear embeddings: place inner inside outer. -/
-def composeEmbed {n : Nat} (outer inner : RectEmbed n) : RectEmbed n where
+noncomputable def composeEmbed {n : Nat} (outer inner : RectEmbed n) : RectEmbed n where
   intervals := fun i => rescaleInterval (outer.intervals i) (inner.intervals i)
 
 /-! ## En-algebras -/
@@ -129,19 +129,19 @@ structure EnAlgebra (n : Nat) where
     act (identityCube n) (fun _ => x) = x
 
 /-- The trivial En-algebra on Unit. -/
-def EnAlgebra.trivial (n : Nat) : EnAlgebra n where
+noncomputable def EnAlgebra.trivial (n : Nat) : EnAlgebra n where
   carrier := Unit
   act := fun _ _ => ()
   equivariant := fun _ _ _ => rfl
   unit_act := fun _ => rfl
 
 /-- Path-valued unit law. -/
-def EnAlgebra.unit_act_path {n : Nat} (A : EnAlgebra n) (x : A.carrier) :
+noncomputable def EnAlgebra.unit_act_path {n : Nat} (A : EnAlgebra n) (x : A.carrier) :
     Path (A.act (identityCube n) (fun _ => x)) x :=
   Path.stepChain (A.unit_act x)
 
 /-- Path-valued equivariance. -/
-def EnAlgebra.equivariant_path {n : Nat} (A : EnAlgebra n)
+noncomputable def EnAlgebra.equivariant_path {n : Nat} (A : EnAlgebra n)
     {k : Nat} (σ : Perm k) (c : EnSpace n k) (xs : Fin k → A.carrier) :
     Path (A.act (enAction n σ c) xs) (A.act c (xs ∘ σ.invFun)) :=
   Path.stepChain (A.equivariant σ c xs)
@@ -165,7 +165,7 @@ structure EnRecognitionData (n : Nat) where
   right_inv : ∀ y, toTarget (fromTarget y) = y
 
 /-- Path-valued left inverse. -/
-def EnRecognitionData.left_inv_path {n : Nat} (d : EnRecognitionData n) (x : d.algebra.carrier) :
+noncomputable def EnRecognitionData.left_inv_path {n : Nat} (d : EnRecognitionData n) (x : d.algebra.carrier) :
     Path (d.fromTarget (d.toTarget x)) x :=
   Path.stepChain (d.left_inv x)
 
@@ -180,12 +180,12 @@ structure EnAlgebraHom {n : Nat} (A B : EnAlgebra n) where
     toFun (A.act c xs) = B.act c (toFun ∘ xs)
 
 /-- Identity En-algebra morphism. -/
-def EnAlgebraHom.id {n : Nat} (A : EnAlgebra n) : EnAlgebraHom A A where
+noncomputable def EnAlgebraHom.id {n : Nat} (A : EnAlgebra n) : EnAlgebraHom A A where
   toFun := _root_.id
   map_act := fun _ _ => rfl
 
 /-- Composition of En-algebra morphisms. -/
-def EnAlgebraHom.comp {n : Nat} {A B C : EnAlgebra n}
+noncomputable def EnAlgebraHom.comp {n : Nat} {A B C : EnAlgebra n}
     (g : EnAlgebraHom B C) (f : EnAlgebraHom A B) : EnAlgebraHom A C where
   toFun := g.toFun ∘ f.toFun
   map_act := fun c xs => by

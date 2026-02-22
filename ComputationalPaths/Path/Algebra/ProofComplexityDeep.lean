@@ -54,7 +54,7 @@ structure CNF where
 deriving Repr
 
 /-- Formula size: total number of symbols -/
-def CNF.size (f : CNF) : Nat := f.numClauses * f.maxWidth + f.numVars
+noncomputable def CNF.size (f : CNF) : Nat := f.numClauses * f.maxWidth + f.numVars
 
 -- ============================================================
 -- Section 2: Cook-Reckhow Proof Systems
@@ -71,13 +71,13 @@ structure CookReckhowSystem extends ProofSystem where
   polyVerify : Path verificationCost (proofLength + formulaSize)
 
 /-- 2: Composing two proofs in a Cook-Reckhow system -/
-def crSystem_comp (s1 s2 : CookReckhowSystem) : ProofSystem :=
+noncomputable def crSystem_comp (s1 s2 : CookReckhowSystem) : ProofSystem :=
   { proofLength := s1.proofLength + s2.proofLength
     formulaSize := s1.formulaSize + s2.formulaSize
     verificationCost := s1.verificationCost + s2.verificationCost }
 
 /-- 3: Composed verification cost -/
-def crSystem_comp_verify (s1 s2 : CookReckhowSystem) :
+noncomputable def crSystem_comp_verify (s1 s2 : CookReckhowSystem) :
     Path (crSystem_comp s1 s2).verificationCost
          ((crSystem_comp s1 s2).proofLength + (crSystem_comp s1 s2).formulaSize) := by
   unfold crSystem_comp
@@ -87,14 +87,14 @@ def crSystem_comp_verify (s1 s2 : CookReckhowSystem) :
   exact Path.mk [] (by omega)
 
 /-- 4: Trivial proof system (axiom only) -/
-def trivialProofSystem : CookReckhowSystem :=
+noncomputable def trivialProofSystem : CookReckhowSystem :=
   { proofLength := 0
     formulaSize := 0
     verificationCost := 0
     polyVerify := Path.refl 0 }
 
 /-- 5: Proof system with single axiom -/
-def singleAxiomSystem (n : Nat) : CookReckhowSystem :=
+noncomputable def singleAxiomSystem (n : Nat) : CookReckhowSystem :=
   { proofLength := 1
     formulaSize := n
     verificationCost := 1 + n
@@ -115,23 +115,23 @@ structure ResolutionSpace extends ResolutionProof where
   space : Nat
 
 /-- 6: Resolution step -/
-def resolutionStep (rp : ResolutionProof) : ResolutionProof :=
+noncomputable def resolutionStep (rp : ResolutionProof) : ResolutionProof :=
   { numSteps := rp.numSteps + 1
     inputClauses := rp.inputClauses
     maxWidth := rp.maxWidth + 1 }
 
 /-- 7: Resolution step increases step count -/
-def resolutionStep_increases (rp : ResolutionProof) :
+noncomputable def resolutionStep_increases (rp : ResolutionProof) :
     Path (resolutionStep rp).numSteps (rp.numSteps + 1) :=
   Path.refl (rp.numSteps + 1)
 
 /-- 8: Multiple resolution steps -/
-def iterResolution : Nat → ResolutionProof → ResolutionProof
+noncomputable def iterResolution : Nat → ResolutionProof → ResolutionProof
   | 0, rp => rp
   | n + 1, rp => resolutionStep (iterResolution n rp)
 
 /-- 9: Iterated resolution step count -/
-def iterResolution_steps (n : Nat) (rp : ResolutionProof) :
+noncomputable def iterResolution_steps (n : Nat) (rp : ResolutionProof) :
     Path (iterResolution n rp).numSteps (rp.numSteps + n) := by
   induction n with
   | zero => unfold iterResolution; exact Path.mk [] (by omega)
@@ -142,7 +142,7 @@ def iterResolution_steps (n : Nat) (rp : ResolutionProof) :
     exact Path.mk [] (by omega)
 
 /-- 10: Resolution width grows -/
-def resolution_width_grows (rp : ResolutionProof) :
+noncomputable def resolution_width_grows (rp : ResolutionProof) :
     Path (resolutionStep rp).maxWidth (rp.maxWidth + 1) :=
   Path.refl (rp.maxWidth + 1)
 
@@ -152,7 +152,7 @@ structure TreeResolution extends ResolutionProof where
   treeBound : Path numSteps treeSize
 
 /-- 12: Tree resolution reflexivity -/
-def treeRes_refl (n : Nat) (w : Nat) : TreeResolution :=
+noncomputable def treeRes_refl (n : Nat) (w : Nat) : TreeResolution :=
   { numSteps := n
     inputClauses := 0
     maxWidth := w
@@ -167,7 +167,7 @@ structure WidthSpaceTradeoff where
   tradeoff : Path (width + space) (formulaVars + formulaVars)
 
 /-- 13: Width-space tradeoff with swapped arguments -/
-def width_space_swap (wst : WidthSpaceTradeoff) :
+noncomputable def width_space_swap (wst : WidthSpaceTradeoff) :
     Path (wst.space + wst.width) (wst.formulaVars + wst.formulaVars) := by
   have h := wst.tradeoff.proof
   exact Path.mk [] (by omega)
@@ -183,20 +183,20 @@ structure CuttingPlanesProof where
   formulaSize : Nat
 
 /-- 14: Cutting planes proof length -/
-def cpProofLength (cp : CuttingPlanesProof) : Nat :=
+noncomputable def cpProofLength (cp : CuttingPlanesProof) : Nat :=
   cp.numSteps * cp.maxCoeffBits
 
 /-- 15: Cutting planes subsumes resolution (on step count) -/
-def cp_subsumes_resolution (rp : ResolutionProof) :
+noncomputable def cp_subsumes_resolution (rp : ResolutionProof) :
     Path rp.numSteps (rp.numSteps + 0) := by
   exact Path.mk [] (by omega)
 
 /-- 16: Cutting planes with bounded coefficients -/
-def boundedCP (n bits : Nat) : CuttingPlanesProof :=
+noncomputable def boundedCP (n bits : Nat) : CuttingPlanesProof :=
   { numSteps := n, maxCoeffBits := bits, formulaSize := n }
 
 /-- 17: Proof length monotonicity via congrArg -/
-def cpProofLength_mono (n1 n2 bits : Nat) (h : Path n1 n2) :
+noncomputable def cpProofLength_mono (n1 n2 bits : Nat) (h : Path n1 n2) :
     Path (cpProofLength (boundedCP n1 bits)) (cpProofLength (boundedCP n2 bits)) :=
   Path.congrArg (· * bits) h
 
@@ -219,32 +219,32 @@ structure FregeProof where
   depth : Nat
 
 /-- 19: Frege proof size -/
-def fregeSize (fp : FregeProof) : Nat := fp.numLines * fp.formulaSize
+noncomputable def fregeSize (fp : FregeProof) : Nat := fp.numLines * fp.formulaSize
 
 /-- 20: Frege system from resolution -/
-def fregeFromResolution (rp : ResolutionProof) : FregeProof :=
+noncomputable def fregeFromResolution (rp : ResolutionProof) : FregeProof :=
   { numLines := rp.numSteps
     formulaSize := rp.maxWidth
     depth := rp.maxWidth }
 
 /-- 21: Frege-from-resolution preserves step count -/
-def fregeFromResolution_lines (rp : ResolutionProof) :
+noncomputable def fregeFromResolution_lines (rp : ResolutionProof) :
     Path (fregeFromResolution rp).numLines rp.numSteps :=
   Path.refl rp.numSteps
 
 /-- 22: Frege proof composition (cut rule) -/
-def fregeCompose (fp1 fp2 : FregeProof) : FregeProof :=
+noncomputable def fregeCompose (fp1 fp2 : FregeProof) : FregeProof :=
   { numLines := fp1.numLines + fp2.numLines
     formulaSize := max fp1.formulaSize fp2.formulaSize
     depth := max fp1.depth fp2.depth + 1 }
 
 /-- 23: Frege composition: lines sum is commutative -/
-def fregeCompose_lines_comm (fp1 fp2 : FregeProof) :
+noncomputable def fregeCompose_lines_comm (fp1 fp2 : FregeProof) :
     Path (fregeCompose fp1 fp2).numLines (fregeCompose fp2 fp1).numLines := by
   unfold fregeCompose; simp; exact Path.mk [] (by omega)
 
 /-- 24: Frege size is subadditive when formula sizes match -/
-def fregeSize_subadditive (fp1 fp2 : FregeProof)
+noncomputable def fregeSize_subadditive (fp1 fp2 : FregeProof)
     (h : fp1.formulaSize = fp2.formulaSize) :
     Path (fregeSize (fregeCompose fp1 fp2))
          (fregeSize fp1 + fregeSize fp2) := by
@@ -261,36 +261,36 @@ structure ExtFregeProof extends FregeProof where
   numExtensions : Nat
 
 /-- 25: Extension rule: adds a new abbreviation -/
-def extensionRule (efp : ExtFregeProof) : ExtFregeProof :=
+noncomputable def extensionRule (efp : ExtFregeProof) : ExtFregeProof :=
   { numLines := efp.numLines + 1
     formulaSize := efp.formulaSize + 1
     depth := efp.depth
     numExtensions := efp.numExtensions + 1 }
 
 /-- 26: Extended Frege subsumes Frege -/
-def extFregeFromFrege (fp : FregeProof) : ExtFregeProof :=
+noncomputable def extFregeFromFrege (fp : FregeProof) : ExtFregeProof :=
   { numLines := fp.numLines
     formulaSize := fp.formulaSize
     depth := fp.depth
     numExtensions := 0 }
 
 /-- 27: Embedding preserves line count -/
-def extFrege_embedding_lines (fp : FregeProof) :
+noncomputable def extFrege_embedding_lines (fp : FregeProof) :
     Path (extFregeFromFrege fp).numLines fp.numLines :=
   Path.refl fp.numLines
 
 /-- 28: Extension rule increases extension count -/
-def extensionRule_count (efp : ExtFregeProof) :
+noncomputable def extensionRule_count (efp : ExtFregeProof) :
     Path (extensionRule efp).numExtensions (efp.numExtensions + 1) :=
   Path.refl (efp.numExtensions + 1)
 
 /-- 29: Iterated extensions -/
-def iterExtension : Nat → ExtFregeProof → ExtFregeProof
+noncomputable def iterExtension : Nat → ExtFregeProof → ExtFregeProof
   | 0, efp => efp
   | n + 1, efp => extensionRule (iterExtension n efp)
 
 /-- 30: Iterated extension count -/
-def iterExtension_count (n : Nat) (efp : ExtFregeProof) :
+noncomputable def iterExtension_count (n : Nat) (efp : ExtFregeProof) :
     Path (iterExtension n efp).numExtensions (efp.numExtensions + n) := by
   induction n with
   | zero => unfold iterExtension; exact Path.mk [] (by omega)
@@ -312,7 +312,7 @@ structure ComplexityMeasure where
   bound : Path proofLen (formulaLen + overhead)
 
 /-- 31: Complexity measure composition -/
-def complexityMeasure_comp (m1 m2 : ComplexityMeasure)
+noncomputable def complexityMeasure_comp (m1 m2 : ComplexityMeasure)
     (h : Path m1.formulaLen m2.proofLen) : ComplexityMeasure :=
   { proofLen := m1.proofLen
     formulaLen := m2.formulaLen
@@ -324,11 +324,11 @@ def complexityMeasure_comp (m1 m2 : ComplexityMeasure)
       exact Path.mk [] (by omega) }
 
 /-- 32: Identity complexity measure -/
-def complexityMeasure_id (n : Nat) : ComplexityMeasure :=
+noncomputable def complexityMeasure_id (n : Nat) : ComplexityMeasure :=
   { proofLen := n, formulaLen := n, overhead := 0, bound := Path.mk [] (by omega) }
 
 /-- 33: Complexity measure identity has zero overhead -/
-def complexityMeasure_id_overhead (n : Nat) :
+noncomputable def complexityMeasure_id_overhead (n : Nat) :
     Path (complexityMeasure_id n).overhead 0 :=
   Path.refl 0
 
@@ -340,11 +340,11 @@ structure PolyBound where
   bound : Path output (input ^ degree + input)
 
 /-- 34: Linear bound (degree 1) -/
-def linearBound (n : Nat) : PolyBound :=
+noncomputable def linearBound (n : Nat) : PolyBound :=
   { input := n, output := n ^ 1 + n, degree := 1, bound := Path.refl (n ^ 1 + n) }
 
 /-- 35: Polynomial bound degree commutativity -/
-def polyBound_degree_add (b1 b2 : PolyBound) :
+noncomputable def polyBound_degree_add (b1 b2 : PolyBound) :
     Path (b1.degree + b2.degree) (b2.degree + b1.degree) :=
   Path.mk [] (by omega)
 
@@ -355,7 +355,7 @@ structure SuperpolySeparation where
   formulaSize : Nat
 
 /-- 36: Trivial separation -/
-def trivialSeparation (n : Nat) : SuperpolySeparation :=
+noncomputable def trivialSeparation (n : Nat) : SuperpolySeparation :=
   { systemA_length := n, systemB_length := n, formulaSize := n }
 
 -- ============================================================
@@ -374,7 +374,7 @@ structure BoundedInterpolant extends CraigInterpolant where
   sizeBound : Path interpolantSize (sharedVars + sharedVars)
 
 /-- 38: Trivial interpolant -/
-def trivialInterpolant : BoundedInterpolant :=
+noncomputable def trivialInterpolant : BoundedInterpolant :=
   { leftSize := 0
     rightSize := 0
     interpolantSize := 0
@@ -382,7 +382,7 @@ def trivialInterpolant : BoundedInterpolant :=
     sizeBound := Path.refl 0 }
 
 /-- 39: Interpolant composition -/
-def interpolant_comp (i1 i2 : BoundedInterpolant)
+noncomputable def interpolant_comp (i1 i2 : BoundedInterpolant)
     (h : Path i1.sharedVars i2.sharedVars) : BoundedInterpolant :=
   { leftSize := i1.leftSize + i2.leftSize
     rightSize := i1.rightSize + i2.rightSize
@@ -394,7 +394,7 @@ def interpolant_comp (i1 i2 : BoundedInterpolant)
       exact Path.mk [] (by omega) }
 
 /-- 40: Interpolant symmetry -/
-def interpolant_symm (ci : CraigInterpolant) : CraigInterpolant :=
+noncomputable def interpolant_symm (ci : CraigInterpolant) : CraigInterpolant :=
   { leftSize := ci.rightSize
     rightSize := ci.leftSize
     interpolantSize := ci.interpolantSize
@@ -415,17 +415,17 @@ structure FeasibleInterpolation extends BoundedInterpolant where
   feasibility : Path computationCost (interpolantSize + leftSize + rightSize)
 
 /-- 42: Feasible interpolation implies bounded -/
-def feasible_implies_bounded (fi : FeasibleInterpolation) :
+noncomputable def feasible_implies_bounded (fi : FeasibleInterpolation) :
     Path fi.interpolantSize (fi.sharedVars + fi.sharedVars) :=
   fi.sizeBound
 
 /-- 43: Feasible interpolation cost -/
-def feasible_cost_lower (fi : FeasibleInterpolation) :
+noncomputable def feasible_cost_lower (fi : FeasibleInterpolation) :
     Path fi.computationCost (fi.interpolantSize + fi.leftSize + fi.rightSize) :=
   fi.feasibility
 
 /-- 44: Trivial feasible interpolation -/
-def trivialFeasibleInterpolation : FeasibleInterpolation :=
+noncomputable def trivialFeasibleInterpolation : FeasibleInterpolation :=
   { leftSize := 0
     rightSize := 0
     interpolantSize := 0
@@ -445,23 +445,23 @@ structure MonotoneCircuit where
   numInputs : Nat
 
 /-- 45: Circuit composition -/
-def circuitCompose (c1 c2 : MonotoneCircuit) : MonotoneCircuit :=
+noncomputable def circuitCompose (c1 c2 : MonotoneCircuit) : MonotoneCircuit :=
   { numGates := c1.numGates + c2.numGates
     depth := c1.depth + c2.depth
     numInputs := max c1.numInputs c2.numInputs }
 
 /-- 46: Circuit depth is subadditive -/
-def circuit_depth_subadditive (c1 c2 : MonotoneCircuit) :
+noncomputable def circuit_depth_subadditive (c1 c2 : MonotoneCircuit) :
     Path (circuitCompose c1 c2).depth (c1.depth + c2.depth) :=
   Path.refl (c1.depth + c2.depth)
 
 /-- 47: Circuit gate count is additive -/
-def circuit_gates_additive (c1 c2 : MonotoneCircuit) :
+noncomputable def circuit_gates_additive (c1 c2 : MonotoneCircuit) :
     Path (circuitCompose c1 c2).numGates (c1.numGates + c2.numGates) :=
   Path.refl (c1.numGates + c2.numGates)
 
 /-- 48: Gate count commutativity -/
-def circuit_gates_comm (c1 c2 : MonotoneCircuit) :
+noncomputable def circuit_gates_comm (c1 c2 : MonotoneCircuit) :
     Path (circuitCompose c1 c2).numGates (circuitCompose c2 c1).numGates := by
   unfold circuitCompose; simp; exact Path.mk [] (by omega)
 
@@ -471,7 +471,7 @@ structure MonotoneLowerBound where
   circuitLowerBound : Nat
 
 /-- 49: Trivial lower bound -/
-def trivialMonotoneBound (n : Nat) : MonotoneLowerBound :=
+noncomputable def trivialMonotoneBound (n : Nat) : MonotoneLowerBound :=
   { functionComplexity := n, circuitLowerBound := n }
 
 -- ============================================================
@@ -485,7 +485,7 @@ structure CommGame where
   commBits : Nat
 
 /-- 50: Communication game symmetry -/
-def commGame_symm (g : CommGame) : CommGame :=
+noncomputable def commGame_symm (g : CommGame) : CommGame :=
   { inputBitsAlice := g.inputBitsBob
     inputBitsBob := g.inputBitsAlice
     commBits := g.commBits }
@@ -496,11 +496,11 @@ theorem commGame_symm_symm (g : CommGame) :
   unfold commGame_symm; rfl
 
 /-- 52: Communication total input -/
-def commGame_totalInput (g : CommGame) : Nat :=
+noncomputable def commGame_totalInput (g : CommGame) : Nat :=
   g.inputBitsAlice + g.inputBitsBob
 
 /-- 53: Total input is symmetric -/
-def commGame_totalInput_symm (g : CommGame) :
+noncomputable def commGame_totalInput_symm (g : CommGame) :
     Path (commGame_totalInput g) (commGame_totalInput (commGame_symm g)) := by
   simp [commGame_totalInput, commGame_symm]; exact Path.mk [] (by omega)
 
@@ -511,7 +511,7 @@ structure CommCircuitReduction where
   reductionPath : Path game.commBits (circuit.depth + circuit.depth)
 
 /-- 54: Reduction preserves communication -/
-def reduction_preserves_comm (r : CommCircuitReduction) :
+noncomputable def reduction_preserves_comm (r : CommCircuitReduction) :
     Path r.game.commBits (r.circuit.depth + r.circuit.depth) :=
   r.reductionPath
 
@@ -527,12 +527,12 @@ structure Automatizability where
   automBound : Path searchCost (proofLen + formulaSize)
 
 /-- 55: Trivially automatizable -/
-def trivialAutom : Automatizability :=
+noncomputable def trivialAutom : Automatizability :=
   { proofLen := 0, searchCost := 0, formulaSize := 0
     automBound := Path.refl 0 }
 
 /-- 56: Automatizability composition -/
-def autom_comp (a1 a2 : Automatizability)
+noncomputable def autom_comp (a1 a2 : Automatizability)
     (h : Path a1.formulaSize a2.proofLen) : Automatizability :=
   { proofLen := a1.proofLen + a2.proofLen
     searchCost := a1.searchCost + a2.searchCost
@@ -541,7 +541,7 @@ def autom_comp (a1 a2 : Automatizability)
       have h1 := a1.automBound.proof
       have h2 := a2.automBound.proof
       exact Path.mk [] (by omega) }/-- 57: Search cost is additive -/
-def autom_search_additive (a1 a2 : Automatizability)
+noncomputable def autom_search_additive (a1 a2 : Automatizability)
     (h : Path a1.formulaSize a2.proofLen) :
     Path (autom_comp a1 a2 h).searchCost (a1.searchCost + a2.searchCost) :=
   Path.refl (a1.searchCost + a2.searchCost)
@@ -558,12 +558,12 @@ structure ProofSimulation where
   simPath : Path systemB_length (systemA_length + blowup)
 
 /-- 58: Identity simulation -/
-def sim_id (n : Nat) : ProofSimulation :=
+noncomputable def sim_id (n : Nat) : ProofSimulation :=
   { systemA_length := n, systemB_length := n, blowup := 0
     simPath := Path.mk [] (by omega) }
 
 /-- 59: Simulation composition -/
-def sim_comp (s1 s2 : ProofSimulation)
+noncomputable def sim_comp (s1 s2 : ProofSimulation)
     (h : Path s1.systemB_length s2.systemA_length) : ProofSimulation :=
   { systemA_length := s1.systemA_length
     systemB_length := s2.systemB_length
@@ -575,7 +575,7 @@ def sim_comp (s1 s2 : ProofSimulation)
       exact Path.mk [] (by omega) }
 
 /-- 60: P-simulation preserves polynomial bounds -/
-def pSim_preserves_poly (s : ProofSimulation) (deg : Nat)
+noncomputable def pSim_preserves_poly (s : ProofSimulation) (deg : Nat)
     (h : Path s.blowup (s.systemA_length ^ deg)) :
     Path s.systemB_length (s.systemA_length + s.systemA_length ^ deg) := by
   have h1 := s.simPath.proof
@@ -587,7 +587,7 @@ def pSim_preserves_poly (s : ProofSimulation) (deg : Nat)
 -- ============================================================
 
 /-- 61: congrArg on resolution step count -/
-def congrArg_resolution_steps (rp1 rp2 : ResolutionProof)
+noncomputable def congrArg_resolution_steps (rp1 rp2 : ResolutionProof)
     (h : Path rp1.numSteps rp2.numSteps) :
     Path (rp1.numSteps + 1) (rp2.numSteps + 1) :=
   Path.congrArg (· + 1) h
@@ -607,13 +607,13 @@ theorem congrArg_resolution_symm (rp1 rp2 : ResolutionProof)
   simp [Path.congrArg_symm]
 
 /-- 64: congrArg on Frege proof lines -/
-def congrArg_frege_lines (fp1 fp2 : FregeProof)
+noncomputable def congrArg_frege_lines (fp1 fp2 : FregeProof)
     (h : Path fp1.numLines fp2.numLines) :
     Path (fp1.numLines * fp1.formulaSize) (fp2.numLines * fp1.formulaSize) :=
   Path.congrArg (· * fp1.formulaSize) h
 
 /-- 65: congrArg functoriality for circuit gates -/
-def congrArg_circuit_gates (c1 c2 : MonotoneCircuit)
+noncomputable def congrArg_circuit_gates (c1 c2 : MonotoneCircuit)
     (h : Path c1.numGates c2.numGates) :
     Path (c1.numGates + 0) (c2.numGates + 0) :=
   Path.congrArg (· + 0) h
@@ -633,38 +633,38 @@ structure ProofHierarchy where
   name : String
 
 /-- 67: Resolution is at level 1 -/
-def resolutionLevel : ProofHierarchy :=
+noncomputable def resolutionLevel : ProofHierarchy :=
   { level := 1, name := "Resolution" }
 
 /-- 68: Cutting planes is at level 2 -/
-def cuttingPlanesLevel : ProofHierarchy :=
+noncomputable def cuttingPlanesLevel : ProofHierarchy :=
   { level := 2, name := "CuttingPlanes" }
 
 /-- 69: Frege is at level 3 -/
-def fregeLevel : ProofHierarchy :=
+noncomputable def fregeLevel : ProofHierarchy :=
   { level := 3, name := "Frege" }
 
 /-- 70: Extended Frege is at level 4 -/
-def extFregeLevel : ProofHierarchy :=
+noncomputable def extFregeLevel : ProofHierarchy :=
   { level := 4, name := "ExtFrege" }
 
 /-- 71: Hierarchy ordering: resolution + 1 = CP -/
-def hierarchy_resolution_lt_cp :
+noncomputable def hierarchy_resolution_lt_cp :
     Path (resolutionLevel.level + 1) cuttingPlanesLevel.level :=
   Path.refl 2
 
 /-- 72: Hierarchy ordering: CP + 1 = Frege -/
-def hierarchy_cp_lt_frege :
+noncomputable def hierarchy_cp_lt_frege :
     Path (cuttingPlanesLevel.level + 1) fregeLevel.level :=
   Path.refl 3
 
 /-- 73: Hierarchy ordering: Frege + 1 = ExtFrege -/
-def hierarchy_frege_lt_extFrege :
+noncomputable def hierarchy_frege_lt_extFrege :
     Path (fregeLevel.level + 1) extFregeLevel.level :=
   Path.refl 4
 
 /-- 74: Full hierarchy chain via trans -/
-def hierarchy_resolution_to_extFrege :
+noncomputable def hierarchy_resolution_to_extFrege :
     Path (resolutionLevel.level + 3) extFregeLevel.level :=
   Path.mk [] (by rfl)
 
@@ -685,23 +685,23 @@ structure CDCLState where
   conflicts : Nat
 
 /-- 76: CDCL learning step -/
-def cdclLearn (st : CDCLState) : CDCLState :=
+noncomputable def cdclLearn (st : CDCLState) : CDCLState :=
   { learnedClauses := st.learnedClauses + 1
     decisions := st.decisions
     conflicts := st.conflicts + 1 }
 
 /-- 77: CDCL learned clause count -/
-def cdclLearn_count (st : CDCLState) :
+noncomputable def cdclLearn_count (st : CDCLState) :
     Path (cdclLearn st).learnedClauses (st.learnedClauses + 1) :=
   Path.refl (st.learnedClauses + 1)
 
 /-- 78: Iterated CDCL -/
-def iterCDCL : Nat → CDCLState → CDCLState
+noncomputable def iterCDCL : Nat → CDCLState → CDCLState
   | 0, st => st
   | n + 1, st => cdclLearn (iterCDCL n st)
 
 /-- 79: Iterated CDCL clause count -/
-def iterCDCL_count (n : Nat) (st : CDCLState) :
+noncomputable def iterCDCL_count (n : Nat) (st : CDCLState) :
     Path (iterCDCL n st).learnedClauses (st.learnedClauses + n) := by
   induction n with
   | zero => unfold iterCDCL; exact Path.mk [] (by omega)
@@ -712,7 +712,7 @@ def iterCDCL_count (n : Nat) (st : CDCLState) :
     exact Path.mk [] (by omega)
 
 /-- 80: CDCL conflict count matches iterations -/
-def cdcl_conflicts_match (n : Nat) (st : CDCLState) :
+noncomputable def cdcl_conflicts_match (n : Nat) (st : CDCLState) :
     Path (iterCDCL n st).conflicts (st.conflicts + n) := by
   induction n with
   | zero => unfold iterCDCL; exact Path.mk [] (by omega)

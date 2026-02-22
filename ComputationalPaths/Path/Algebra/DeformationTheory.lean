@@ -63,17 +63,17 @@ structure FPSRing (R : Type u) where
   mul_comm : ∀ x y, mul x y = mul y x
 
 /-- The zero formal power series. -/
-def FormalPowerSeries.zeroFPS {R : Type u} (ring : FPSRing R) :
+noncomputable def FormalPowerSeries.zeroFPS {R : Type u} (ring : FPSRing R) :
     FormalPowerSeries R where
   coeff := fun _ => ring.zero
 
 /-- Addition of formal power series. -/
-def FormalPowerSeries.addFPS {R : Type u} (ring : FPSRing R)
+noncomputable def FormalPowerSeries.addFPS {R : Type u} (ring : FPSRing R)
     (f g : FormalPowerSeries R) : FormalPowerSeries R where
   coeff := fun n => ring.add (f.coeff n) (g.coeff n)
 
 /-- Path-valued add_zero law for FPS. -/
-def FormalPowerSeries.add_zero_path {R : Type u} (ring : FPSRing R)
+noncomputable def FormalPowerSeries.add_zero_path {R : Type u} (ring : FPSRing R)
     (f : FormalPowerSeries R) :
     Path (FormalPowerSeries.addFPS ring (FormalPowerSeries.zeroFPS ring) f) f :=
   Path.stepChain (by
@@ -104,7 +104,7 @@ structure DGLA where
   add_zero_left : ∀ n (x : obj n), add n (zero n) x = x
 
 /-- Path-valued d² = 0 for DGLAs. -/
-def DGLA.d_squared_path (L : DGLA) (n : Int) (x : L.obj n) :
+noncomputable def DGLA.d_squared_path (L : DGLA) (n : Int) (x : L.obj n) :
     Path (L.d (n + 1) (L.d n x)) (L.zero (n + 1 + 1)) :=
   Path.stepChain (L.d_squared n x)
 
@@ -119,7 +119,7 @@ structure MaurerCartanElement (L : DGLA) where
   mc_eq : L.add 2 (L.d 1 element) (L.bracket 1 1 element element) = L.zero 2
 
 /-- Path-valued Maurer-Cartan equation. -/
-def MaurerCartanElement.mc_path {L : DGLA} (mc : MaurerCartanElement L) :
+noncomputable def MaurerCartanElement.mc_path {L : DGLA} (mc : MaurerCartanElement L) :
     Path (L.add 2 (L.d 1 mc.element) (L.bracket 1 1 mc.element mc.element))
          (L.zero 2) :=
   Path.stepChain mc.mc_eq
@@ -135,7 +135,7 @@ structure FormalDeformation (R : Type u) (ring : FPSRing R) where
   zeroth_order : corrections.coeff 0 = ring.one
 
 /-- Path-valued zeroth order condition. -/
-def FormalDeformation.zeroth_path {R : Type u} {ring : FPSRing R}
+noncomputable def FormalDeformation.zeroth_path {R : Type u} {ring : FPSRing R}
     (def_ : FormalDeformation R ring) :
     Path (def_.corrections.coeff 0) ring.one :=
   Path.stepChain def_.zeroth_order
@@ -173,7 +173,7 @@ structure TangentCohomology (L : DGLA) where
   coboundary_is_cocycle : ∀ x, coboundary x → cocycle x
 
 /-- Path-valued cocycle condition. -/
-def TangentCohomology.cocycle_path {L : DGLA} (T : TangentCohomology L)
+noncomputable def TangentCohomology.cocycle_path {L : DGLA} (T : TangentCohomology L)
     (x : L.obj 1) (hx : T.cocycle x) :
     Path (L.d 1 x) (L.zero 2) :=
   Path.stepChain (T.cocycle_cond x hx)
@@ -191,7 +191,7 @@ structure ObstructionData (L : DGLA) where
   extends_iff_zero : Prop
 
 /-- Path-valued obstruction cocycle condition. -/
-def ObstructionData.cocycle_path {L : DGLA} (ob : ObstructionData L) :
+noncomputable def ObstructionData.cocycle_path {L : DGLA} (ob : ObstructionData L) :
     Path (L.d 2 ob.obstruction) (L.zero 3) :=
   Path.stepChain ob.is_cocycle
 
@@ -208,7 +208,7 @@ structure KodairaSpencerMap (L : DGLA) where
   image_cocycle : ∀ v, L.d 1 (ks v) = L.zero 2
 
 /-- Path-valued Kodaira-Spencer image is cocycle. -/
-def KodairaSpencerMap.image_cocycle_path {L : DGLA} (ks : KodairaSpencerMap L)
+noncomputable def KodairaSpencerMap.image_cocycle_path {L : DGLA} (ks : KodairaSpencerMap L)
     (v : ks.tangentParam) :
     Path (L.d 1 (ks.ks v)) (L.zero 2) :=
   Path.stepChain (ks.image_cocycle v)
@@ -236,7 +236,7 @@ structure KuranishiSpace (L : DGLA) where
   on_space : ∀ x, ambient x → kuranishi_map x = L.zero 2
 
 /-- Path-valued Kuranishi equation. -/
-def KuranishiSpace.on_space_path {L : DGLA} (K : KuranishiSpace L)
+noncomputable def KuranishiSpace.on_space_path {L : DGLA} (K : KuranishiSpace L)
     (x : L.obj 1) (hx : K.ambient x) :
     Path (K.kuranishi_map x) (L.zero 2) :=
   Path.stepChain (K.on_space x hx)
@@ -252,7 +252,7 @@ structure GaugeEquivalence (L : DGLA) (α β : MaurerCartanElement L) where
   gauge_action : L.add 1 α.element (L.d 0 gauge) = β.element
 
 /-- Path-valued gauge action. -/
-def GaugeEquivalence.gauge_path {L : DGLA} {α β : MaurerCartanElement L}
+noncomputable def GaugeEquivalence.gauge_path {L : DGLA} {α β : MaurerCartanElement L}
     (g : GaugeEquivalence L α β) :
     Path (L.add 1 α.element (L.d 0 g.gauge)) β.element :=
   Path.stepChain g.gauge_action

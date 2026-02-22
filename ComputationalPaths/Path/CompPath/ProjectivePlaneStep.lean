@@ -43,14 +43,14 @@ open Step
 abbrev rp2LoopSpace : Type := Path (A := RealProjective2) rp2Base rp2Base
 
 /-- The fundamental loop. -/
-@[simp] def rp2Loop : rp2LoopSpace := Path.stepChain rfl
+@[simp] noncomputable def rp2Loop : rp2LoopSpace := Path.stepChain rfl
 
 /-- Loop squared: `loop ⬝ loop`. -/
 @[simp] noncomputable def rp2LoopSquared : rp2LoopSpace :=
   Path.trans rp2Loop rp2Loop
 
 /-- Loop power. -/
-@[simp] def rp2LoopPow : Nat → rp2LoopSpace
+@[simp] noncomputable def rp2LoopPow : Nat → rp2LoopSpace
   | 0 => Path.refl rp2Base
   | Nat.succ n => Path.trans (rp2LoopPow n) rp2Loop
 
@@ -194,7 +194,7 @@ theorem rp2SymmRefl :
 /-! ## Trace of the RP² normalization -/
 
 /-- The 2-fold cancellation trace, recording explicit Steps. -/
-def rp2CancellationTrace : List String :=
+noncomputable def rp2CancellationTrace : List String :=
   [ "Step 1: (refl ⬝ loop²) ▷ loop²  [trans_refl_left]"
   , "Step 2: loop² ▷ refl  [RP2Step.relation]"
   ]

@@ -47,82 +47,82 @@ structure BubbleTreeDatum where
   levels : Nat
   energyAt : Nat → Nat
 
-def canonicalPrescription (R : RiemannianDatum) : ScalarCurvaturePrescription :=
+noncomputable def canonicalPrescription (R : RiemannianDatum) : ScalarCurvaturePrescription :=
   ⟨R, R.scalarCurv⟩
 
-def dirichletEnergy (H : HarmonicMapDatum) (n : Nat) : Nat :=
+noncomputable def dirichletEnergy (H : HarmonicMapDatum) (n : Nat) : Nat :=
   H.energyDensity n + H.f.toFun n
 
-def tensionFieldNorm (H : HarmonicMapDatum) (n : Nat) : Nat :=
+noncomputable def tensionFieldNorm (H : HarmonicMapDatum) (n : Nat) : Nat :=
   H.energyDensity n
 
-def harmonicMapEnergy (H : HarmonicMapDatum) (n : Nat) : Nat :=
+noncomputable def harmonicMapEnergy (H : HarmonicMapDatum) (n : Nat) : Nat :=
   dirichletEnergy H n + tensionFieldNorm H n
 
-def minimalSurfaceArea (M : MinimalSurfaceDatum) (n : Nat) : Nat :=
+noncomputable def minimalSurfaceArea (M : MinimalSurfaceDatum) (n : Nat) : Nat :=
   M.areaDensity n
 
-def meanCurvature (F : MeanCurvatureFlowDatum) (n : Nat) : Int :=
+noncomputable def meanCurvature (F : MeanCurvatureFlowDatum) (n : Nat) : Int :=
   F.meanCurvatureVec n
 
-def meanCurvatureStep (F : MeanCurvatureFlowDatum) (n : Nat) : Int :=
+noncomputable def meanCurvatureStep (F : MeanCurvatureFlowDatum) (n : Nat) : Int :=
   meanCurvature F (n + 1) - meanCurvature F n
 
-def willmoreEnergy (W : WillmoreDatum) (n : Nat) : Nat :=
+noncomputable def willmoreEnergy (W : WillmoreDatum) (n : Nat) : Nat :=
   W.curvatureSq n + W.immersion n
 
-def yamabeFunctional (Y : YamabeDatum) (n : Nat) : Nat :=
+noncomputable def yamabeFunctional (Y : YamabeDatum) (n : Nat) : Nat :=
   Y.conformalFactor n + Y.metric.dim
 
-def yamabeEnergyAt (Y : YamabeDatum) (n : Nat) : Nat :=
+noncomputable def yamabeEnergyAt (Y : YamabeDatum) (n : Nat) : Nat :=
   yamabeFunctional Y n + n
 
-def conformalLaplacianModel (Y : YamabeDatum) (n : Nat) : Int :=
+noncomputable def conformalLaplacianModel (Y : YamabeDatum) (n : Nat) : Int :=
   Int.ofNat (Y.conformalFactor n) + Y.metric.scalarCurv n
 
-def scalarCurvatureDefect (S : ScalarCurvaturePrescription) (n : Nat) : Int :=
+noncomputable def scalarCurvatureDefect (S : ScalarCurvaturePrescription) (n : Nat) : Int :=
   S.metric.scalarCurv n - S.target n
 
-def prescribedScalarResidual (S : ScalarCurvaturePrescription) (n : Nat) : Nat :=
+noncomputable def prescribedScalarResidual (S : ScalarCurvaturePrescription) (n : Nat) : Nat :=
   Int.natAbs (scalarCurvatureDefect S n)
 
-def bubbleScale (B : BubbleTreeDatum) (k : Nat) : Nat :=
+noncomputable def bubbleScale (B : BubbleTreeDatum) (k : Nat) : Nat :=
   k + 1
 
-def bubbleEnergyLoss (B : BubbleTreeDatum) : Nat :=
+noncomputable def bubbleEnergyLoss (B : BubbleTreeDatum) : Nat :=
   B.energyAt B.levels
 
-def bubbleLevelEnergy (B : BubbleTreeDatum) (k : Nat) : Nat :=
+noncomputable def bubbleLevelEnergy (B : BubbleTreeDatum) (k : Nat) : Nat :=
   B.energyAt k + bubbleScale B k
 
-def monotonicityQuantity (H : HarmonicMapDatum) (n : Nat) : Nat :=
+noncomputable def monotonicityQuantity (H : HarmonicMapDatum) (n : Nat) : Nat :=
   harmonicMapEnergy H n + n
 
-def epsilonRegularityThreshold (H : HarmonicMapDatum) : Nat :=
+noncomputable def epsilonRegularityThreshold (H : HarmonicMapDatum) : Nat :=
   H.f.toFun 0 + 1
 
-def concentrationMeasure (B : BubbleTreeDatum) (N : Nat) : Nat :=
+noncomputable def concentrationMeasure (B : BubbleTreeDatum) (N : Nat) : Nat :=
   (List.range N).foldl (fun acc k => acc + B.energyAt k) 0
 
-def flowTimeStep (n : Nat) : Nat :=
+noncomputable def flowTimeStep (n : Nat) : Nat :=
   n + 1
 
-def renormalizedArea (M : MinimalSurfaceDatum) (n : Nat) : Nat :=
+noncomputable def renormalizedArea (M : MinimalSurfaceDatum) (n : Nat) : Nat :=
   minimalSurfaceArea M n / (n + 1)
 
-def harmonicRadius (H : HarmonicMapDatum) (n : Nat) : Nat :=
+noncomputable def harmonicRadius (H : HarmonicMapDatum) (n : Nat) : Nat :=
   tensionFieldNorm H n + 1
 
-def geodesicBallVolumeModel (R : RiemannianDatum) (r : Nat) : Nat :=
+noncomputable def geodesicBallVolumeModel (R : RiemannianDatum) (r : Nat) : Nat :=
   R.dim * (r + 1)
 
-def neckEnergy (B : BubbleTreeDatum) : Nat :=
+noncomputable def neckEnergy (B : BubbleTreeDatum) : Nat :=
   B.energyAt 0
 
-def blowupRateModel (B : BubbleTreeDatum) (k : Nat) : Nat :=
+noncomputable def blowupRateModel (B : BubbleTreeDatum) (k : Nat) : Nat :=
   B.energyAt k + k
 
-def curvaturePinchingModel (W : WillmoreDatum) (n : Nat) : Nat :=
+noncomputable def curvaturePinchingModel (W : WillmoreDatum) (n : Nat) : Nat :=
   W.curvatureSq n + n
 
 theorem dirichletEnergy_nonneg (H : HarmonicMapDatum) (n : Nat) :
@@ -194,11 +194,11 @@ theorem curvaturePinchingModel_nonneg (W : WillmoreDatum) (n : Nat) :
 theorem yamabeEnergyAt_nonneg (Y : YamabeDatum) (n : Nat) :
     0 ≤ yamabeEnergyAt Y n := Nat.zero_le _
 
-def geometric_path_refl (Y : YamabeDatum) (n : Nat) :
+noncomputable def geometric_path_refl (Y : YamabeDatum) (n : Nat) :
     Path (yamabeFunctional Y n) (yamabeFunctional Y n) :=
   Path.refl _
 
-def geometric_path_trans (Y : YamabeDatum) (n : Nat) :
+noncomputable def geometric_path_trans (Y : YamabeDatum) (n : Nat) :
     Path (yamabeFunctional Y n) (yamabeFunctional Y n) :=
   Path.trans (Path.refl _) (Path.refl _)
 

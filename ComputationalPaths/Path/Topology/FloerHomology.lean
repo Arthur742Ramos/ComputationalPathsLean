@@ -87,7 +87,7 @@ structure PeriodicOrbit (M : FloerData.{u}) where
   czIndex : Int
 
 /-- Non-degeneracy of a periodic orbit. -/
-def IsNonDegenerate (M : FloerData.{u}) (_ : PeriodicOrbit M) : Prop :=
+noncomputable def IsNonDegenerate (M : FloerData.{u}) (_ : PeriodicOrbit M) : Prop :=
   True  -- 1 is not an eigenvalue of the linearized return map
 
 /-- The set of non-degenerate periodic orbits. -/
@@ -147,7 +147,7 @@ structure FloerStep (M : FloerData.{u})
   index_eq : Path indexDiff (γ₁.czIndex - γ₂.czIndex)
 
 /-- Composition of Floer steps via gluing. -/
-def FloerStep.comp {M : FloerData.{u}}
+noncomputable def FloerStep.comp {M : FloerData.{u}}
     {γ₁ γ₂ γ₃ : PeriodicOrbit M}
     (s₁ : FloerStep M γ₁ γ₂) (_s₂ : FloerStep M γ₂ γ₃) :
     FloerStep M γ₁ γ₃ where

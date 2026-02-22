@@ -37,7 +37,7 @@ inductive OperadStep {A : Type u} :
       OperadStep (Path.symm (Path.trans p q)) (Path.trans (Path.symm q) (Path.symm p))
 
 /-- Interpret an operad step as a primitive `Path.Step`. -/
-def OperadStep.toStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def OperadStep.toStep {A : Type u} {a b : A} {p q : Path a b}
     (s : OperadStep p q) : Path.Step p q :=
   match s with
   | .right_unit p => Path.Step.trans_refl_right p
@@ -47,7 +47,7 @@ def OperadStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .symm_trans p q => Path.Step.symm_trans_congr p q
 
 /-- Lift an operad step to rewrite equivalence. -/
-def rweq_of_operad_step {A : Type u} {a b : A}
+noncomputable def rweq_of_operad_step {A : Type u} {a b : A}
     {p q : Path a b} (s : OperadStep p q) : RwEq p q :=
   rweq_of_step (OperadStep.toStep s)
 
@@ -75,51 +75,51 @@ namespace OperadData
 variable {A : Type u} (O : OperadData A)
 
 /-- Left unit law holds up to rewrite equivalence via trans with refl. -/
-def left_unit_rweq (x : A) :
+noncomputable def left_unit_rweq (x : A) :
     RwEq
       (Path.trans (O.leftUnitPath x) (Path.refl x))
       (O.leftUnitPath x) :=
   rweq_of_operad_step (OperadStep.right_unit (O.leftUnitPath x))
 
 /-- Right unit law holds up to rewrite equivalence via trans with refl. -/
-def right_unit_rweq (x : A) :
+noncomputable def right_unit_rweq (x : A) :
     RwEq
       (Path.trans (O.rightUnitPath x) (Path.refl x))
       (O.rightUnitPath x) :=
   rweq_of_operad_step (OperadStep.right_unit (O.rightUnitPath x))
 
 /-- Associativity law holds up to rewrite equivalence. -/
-def assoc_rweq (x y z : A) :
+noncomputable def assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (O.assocPath x y z) (Path.refl (O.compose x (O.compose y z))))
       (O.assocPath x y z) :=
   rweq_of_operad_step (OperadStep.right_unit (O.assocPath x y z))
 
 /-- Unit-assoc round-trip: compose with inverse of left unit. -/
-def unitAssocRoundTrip (x : A) :
+noncomputable def unitAssocRoundTrip (x : A) :
     Path (O.compose O.ident x) (O.compose O.ident x) :=
   Path.trans (O.leftUnitPath x) (Path.symm (O.leftUnitPath x))
 
 /-- Round-trip composes to refl up to RwEq. -/
-def unitAssocRoundTrip_rweq (x : A) :
+noncomputable def unitAssocRoundTrip_rweq (x : A) :
     RwEq (O.unitAssocRoundTrip x) (Path.refl (O.compose O.ident x)) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (O.leftUnitPath x))
 
 /-- Double composition: compose three elements. -/
-def compose3 (x y z : A) : A := O.compose (O.compose x y) z
+noncomputable def compose3 (x y z : A) : A := O.compose (O.compose x y) z
 
 /-- Rebracketing path for triple composition. -/
-def rebracket (x y z : A) : Path (O.compose3 x y z) (O.compose x (O.compose y z)) :=
+noncomputable def rebracket (x y z : A) : Path (O.compose3 x y z) (O.compose x (O.compose y z)) :=
   O.assocPath x y z
 
 /-- Mac Lane coherence for the assoc paths: any two rebracketings agree. -/
-def rebracket_coherence (x y z : A)
+noncomputable def rebracket_coherence (x y z : A)
     (h₁ h₂ : Path (O.compose3 x y z) (O.compose x (O.compose y z))) :
     h₁.toEq = h₂.toEq := by
   apply Subsingleton.elim
 
 /-- Transport the compose operation along a path. -/
-def compose_transport {x₁ x₂ : A} (p : Path x₁ x₂) (y : A) :
+noncomputable def compose_transport {x₁ x₂ : A} (p : Path x₁ x₂) (y : A) :
     Path.transport (D := fun _ => A) p (O.compose x₁ y) = O.compose x₁ y := by
   simp [Path.transport_const]
 
@@ -141,31 +141,31 @@ namespace SymmetricOperadData
 variable {A : Type u} (S : SymmetricOperadData A)
 
 /-- Swap involution holds up to RwEq (via trans with refl). -/
-def swap_inv_rweq (x : A) :
+noncomputable def swap_inv_rweq (x : A) :
     RwEq
       (Path.trans (S.swapInvPath x) (Path.refl x))
       (S.swapInvPath x) :=
   rweq_of_operad_step (OperadStep.right_unit (S.swapInvPath x))
 
 /-- Swap-compose coherence holds up to RwEq. -/
-def swap_compose_rweq (x y : A) :
+noncomputable def swap_compose_rweq (x y : A) :
     RwEq
       (Path.trans (S.swapComposePath x y) (Path.refl (S.swap (S.compose x y))))
       (S.swapComposePath x y) :=
   rweq_of_operad_step (OperadStep.right_unit (S.swapComposePath x y))
 
 /-- Double swap round-trip path. -/
-def doubleSwapRoundTrip (x : A) :
+noncomputable def doubleSwapRoundTrip (x : A) :
     Path (S.swap (S.swap x)) (S.swap (S.swap x)) :=
   Path.trans (S.swapInvPath x) (Path.symm (S.swapInvPath x))
 
 /-- Double swap round-trip is identity up to RwEq. -/
-def doubleSwapRoundTrip_rweq (x : A) :
+noncomputable def doubleSwapRoundTrip_rweq (x : A) :
     RwEq (S.doubleSwapRoundTrip x) (Path.refl (S.swap (S.swap x))) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (S.swapInvPath x))
 
 /-- Naturality of swap with left unit: two paths between the same endpoints agree. -/
-def swap_leftUnit_naturality (x : A)
+noncomputable def swap_leftUnit_naturality (x : A)
     (p q : Path (S.swap (S.compose S.ident x)) (S.swap x)) :
     p.toEq = q.toEq := by
   apply Subsingleton.elim
@@ -191,36 +191,36 @@ variable {A : Type u} {B : Type v} {O : OperadData A}
 variable (alg : AlgebraData A B O)
 
 /-- Unit action round-trip: act with ident then undo. -/
-def unitRoundTrip (b : B) :
+noncomputable def unitRoundTrip (b : B) :
     Path (alg.act O.ident b) (alg.act O.ident b) :=
   Path.trans (alg.unitPath b) (Path.symm (alg.unitPath b))
 
 /-- Unit round-trip is identity up to RwEq. -/
-def unitRoundTrip_rweq (b : B) :
+noncomputable def unitRoundTrip_rweq (b : B) :
     RwEq (alg.unitRoundTrip b) (Path.refl (alg.act O.ident b)) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (alg.unitPath b))
 
 /-- Composition coherence: two ways of acting agree up to RwEq. -/
-def compose_coherence_rweq (x y : A) (b : B) :
+noncomputable def compose_coherence_rweq (x y : A) (b : B) :
     RwEq
       (Path.trans (alg.composePath x y b) (Path.refl (alg.act x (alg.act y b))))
       (alg.composePath x y b) :=
   rweq_of_operad_step (OperadStep.right_unit (alg.composePath x y b))
 
 /-- Transport algebra element along a path in B. -/
-def act_transport_const (x : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
+noncomputable def act_transport_const (x : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
     Path.transport (D := fun _ => B) p (alg.act x b₁) = alg.act x b₁ := by
   simp [Path.transport_const]
 
 /-- Associativity of iterated action: two-step decomposition. -/
-def iteratedActAssoc (x y z : A) (b : B) :
+noncomputable def iteratedActAssoc (x y z : A) (b : B) :
     Path (alg.act (O.compose (O.compose x y) z) b) (alg.act x (alg.act y (alg.act z b))) :=
   Path.trans
     (alg.composePath (O.compose x y) z b)
     (alg.composePath x y (alg.act z b))
 
 /-- Iterated action associativity followed by refl simplifies. -/
-def iteratedActAssoc_rweq (x y z : A) (b : B) :
+noncomputable def iteratedActAssoc_rweq (x y z : A) (b : B) :
     RwEq
       (Path.trans (alg.iteratedActAssoc x y z b) (Path.refl _))
       (alg.iteratedActAssoc x y z b) :=
@@ -247,7 +247,7 @@ variable {A : Type u} {B : Type v} {C : Type w}
 variable {O₁ : OperadData A} {O₂ : OperadData B} {O₃ : OperadData C}
 
 /-- Compose two operad morphisms. -/
-def comp (f : OperadMorphism O₁ O₂) (g : OperadMorphism O₂ O₃) :
+noncomputable def comp (f : OperadMorphism O₁ O₂) (g : OperadMorphism O₂ O₃) :
     OperadMorphism O₁ O₃ where
   mapOp := g.mapOp ∘ f.mapOp
   identPath :=
@@ -260,17 +260,17 @@ def comp (f : OperadMorphism O₁ O₂) (g : OperadMorphism O₂ O₃) :
       (g.composePath (f.mapOp x) (f.mapOp y))
 
 /-- Identity operad morphism. -/
-def id (O : OperadData A) : OperadMorphism O O where
+noncomputable def id (O : OperadData A) : OperadMorphism O O where
   mapOp := fun x => x
   identPath := Path.refl O.ident
   composePath _ _ := Path.refl _
 
 /-- Left unit for composition of morphisms. -/
-def comp_id_left (f : OperadMorphism O₁ O₂) :
+noncomputable def comp_id_left (f : OperadMorphism O₁ O₂) :
     (comp (id O₁) f).mapOp = f.mapOp := rfl
 
 /-- Ident preservation of composition followed by refl simplifies. -/
-def comp_ident_rweq (f : OperadMorphism O₁ O₂) (g : OperadMorphism O₂ O₃) :
+noncomputable def comp_ident_rweq (f : OperadMorphism O₁ O₂) (g : OperadMorphism O₂ O₃) :
     RwEq
       (Path.trans (comp f g).identPath (Path.refl _))
       (comp f g).identPath :=
@@ -303,7 +303,7 @@ namespace FreeOperadData
 variable {G : Type u} (F : FreeOperadData G)
 
 /-- The free operad underlying this data. -/
-def toOperadData : OperadData G where
+noncomputable def toOperadData : OperadData G where
   ops := fun _ => F.gen
   ident := F.freeIdent
   compose := F.freeCompose
@@ -312,14 +312,14 @@ def toOperadData : OperadData G where
   assocPath := F.freeAssocPath
 
 /-- Free assoc: left-nested trans-with-refl simplifies. -/
-def free_assoc_rweq (x y z : G) :
+noncomputable def free_assoc_rweq (x y z : G) :
     RwEq
       (Path.trans (F.freeAssocPath x y z) (Path.refl _))
       (F.freeAssocPath x y z) :=
   rweq_of_operad_step (OperadStep.right_unit (F.freeAssocPath x y z))
 
 /-- Universal property: congrArg on free paths preserves toEq. -/
-def universal_property_toEq
+noncomputable def universal_property_toEq
     (f : G → G) :
     ∀ x : G, (Path.congrArg f (F.freeLeftUnitPath x)).toEq =
       (Path.congrArg f (F.freeLeftUnitPath x)).toEq := by
@@ -351,38 +351,38 @@ namespace LittleCubesData
 variable {A : Type u} (L : LittleCubesData A)
 
 /-- Cube unit coherence up to RwEq. -/
-def cube_unit_rweq (x : A) :
+noncomputable def cube_unit_rweq (x : A) :
     RwEq
       (Path.trans (L.cubeUnitPath x) (Path.refl x))
       (L.cubeUnitPath x) :=
   rweq_of_operad_step (OperadStep.right_unit (L.cubeUnitPath x))
 
 /-- Cube associativity coherence up to RwEq. -/
-def cube_assoc_rweq (x y z : A) :
+noncomputable def cube_assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (L.cubeAssocPath x y z) (Path.refl _))
       (L.cubeAssocPath x y z) :=
   rweq_of_operad_step (OperadStep.right_unit (L.cubeAssocPath x y z))
 
 /-- Swap composed with itself: round-trip path. -/
-def swapRoundTrip (x y : A) :
+noncomputable def swapRoundTrip (x y : A) :
     Path (L.composeCube x y) (L.composeCube x y) :=
   Path.trans (L.cubeSwapPath x y) (L.cubeSwapPath y x)
 
 /-- Swap involution: two swaps are identity up to toEq. -/
-def swap_involution_toEq (x y : A) :
+noncomputable def swap_involution_toEq (x y : A) :
     (L.swapRoundTrip x y).toEq =
     (Path.refl (L.composeCube x y)).toEq := by
   apply Subsingleton.elim
 
 /-- Cube swap-assoc coherence: two different path constructions agree (toEq). -/
-def swap_assoc_coherence (x y z : A)
+noncomputable def swap_assoc_coherence (x y z : A)
     (p q : Path (L.composeCube (L.composeCube x y) z) (L.composeCube x (L.composeCube z y))) :
     p.toEq = q.toEq := by
   apply Subsingleton.elim
 
 /-- Little cubes form an operad. -/
-def toOperadData : OperadData A where
+noncomputable def toOperadData : OperadData A where
   ops := fun _ => L.cube
   ident := L.identCube
   compose := L.composeCube
@@ -412,21 +412,21 @@ namespace AInfinityData
 variable {A : Type u} (AI : AInfinityData A)
 
 /-- Assoc path followed by refl simplifies. -/
-def assoc_rweq (x y z : A) :
+noncomputable def assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (AI.assocPath x y z) (Path.refl _))
       (AI.assocPath x y z) :=
   rweq_of_operad_step (OperadStep.right_unit (AI.assocPath x y z))
 
 /-- Pentagon coherence followed by refl simplifies. -/
-def pentagon_rweq (x y z w : A) :
+noncomputable def pentagon_rweq (x y z w : A) :
     RwEq
       (Path.trans (AI.pentagonPath x y z w) (Path.refl _))
       (AI.pentagonPath x y z w) :=
   rweq_of_operad_step (OperadStep.right_unit (AI.pentagonPath x y z w))
 
 /-- The two standard paths from ((xy)z)w to x(y(zw)) agree at toEq level. -/
-def pentagon_coherence_toEq (x y z w : A) :
+noncomputable def pentagon_coherence_toEq (x y z w : A) :
     (Path.trans (AI.assocPath (AI.mul x y) z w)
                 (AI.assocPath x y (AI.mul z w))).toEq =
     (Path.trans (Path.congrArg (fun a => AI.mul a w) (AI.assocPath x y z))
@@ -435,16 +435,16 @@ def pentagon_coherence_toEq (x y z w : A) :
   apply Subsingleton.elim
 
 /-- A-infinity assoc is self-inverse round-trip up to RwEq. -/
-def assocInvRoundTrip (x y z : A) :
+noncomputable def assocInvRoundTrip (x y z : A) :
     Path (AI.mul (AI.mul x y) z) (AI.mul (AI.mul x y) z) :=
   Path.trans (AI.assocPath x y z) (Path.symm (AI.assocPath x y z))
 
-def assocInvRoundTrip_rweq (x y z : A) :
+noncomputable def assocInvRoundTrip_rweq (x y z : A) :
     RwEq (AI.assocInvRoundTrip x y z) (Path.refl _) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (AI.assocPath x y z))
 
 /-- CongrArg of mul on assocPath. -/
-def mul_congrArg_assoc (x y z w : A) :
+noncomputable def mul_congrArg_assoc (x y z w : A) :
     Path.congrArg (AI.mul x) (AI.assocPath y z w) =
     Path.congrArg (AI.mul x) (AI.assocPath y z w) := rfl
 
@@ -465,24 +465,24 @@ namespace EInfinityData
 variable {A : Type u} (EI : EInfinityData A)
 
 /-- Comm path followed by refl simplifies. -/
-def comm_rweq (x y : A) :
+noncomputable def comm_rweq (x y : A) :
     RwEq
       (Path.trans (EI.commPath x y) (Path.refl _))
       (EI.commPath x y) :=
   rweq_of_operad_step (OperadStep.right_unit (EI.commPath x y))
 
 /-- Comm round-trip: swap twice returns to start. -/
-def commRoundTrip (x y : A) :
+noncomputable def commRoundTrip (x y : A) :
     Path (EI.mul x y) (EI.mul x y) :=
   Path.trans (EI.commPath x y) (EI.commPath y x)
 
 /-- Comm round-trip and refl agree at toEq level. -/
-def commRoundTrip_toEq (x y : A) :
+noncomputable def commRoundTrip_toEq (x y : A) :
     (EI.commRoundTrip x y).toEq = (Path.refl (EI.mul x y)).toEq := by
   apply Subsingleton.elim
 
 /-- Hexagon identity: two paths from mul(mul x y)z to mul y(mul x z) agree (toEq). -/
-def hexagon_toEq (x y z : A) :
+noncomputable def hexagon_toEq (x y z : A) :
     let p1 := Path.congrArg (fun a => EI.mul a z) (EI.commPath x y)
     let p2 := EI.toAInfinityData.assocPath y x z
     let route1 := Path.trans p1 p2
@@ -491,7 +491,7 @@ def hexagon_toEq (x y z : A) :
   rfl
 
 /-- Symmetry of commPath. -/
-def comm_symm_toEq (x y : A) :
+noncomputable def comm_symm_toEq (x y : A) :
     (Path.symm (EI.commPath x y)).toEq = (EI.commPath y x).toEq := by
   apply Subsingleton.elim
 
@@ -522,25 +522,25 @@ variable {alg : AlgebraData A C O₁}
 variable (K : OperadicKanExtData O₁ O₂ f alg)
 
 /-- Extension unit followed by refl. -/
-def ext_unit_rweq (c : C) :
+noncomputable def ext_unit_rweq (c : C) :
     RwEq
       (Path.trans (K.extUnitPath c) (Path.refl _))
       (K.extUnitPath c) :=
   rweq_of_operad_step (OperadStep.right_unit (K.extUnitPath c))
 
 /-- Extension coherence composed with unit. -/
-def ext_cohere_unit_toEq (c : C) :
+noncomputable def ext_cohere_unit_toEq (c : C) :
     (Path.trans (K.extCoherePath O₁.ident c) (alg.unitPath c)).toEq =
     (K.extUnitPath c).toEq := by
   apply Subsingleton.elim
 
 /-- Extension round-trip: extend then undo. -/
-def extRoundTrip (x : A) (c : C) :
+noncomputable def extRoundTrip (x : A) (c : C) :
     Path (K.extAct (f.mapOp x) c) (K.extAct (f.mapOp x) c) :=
   Path.trans (K.extCoherePath x c) (Path.symm (K.extCoherePath x c))
 
 /-- Extension round-trip is refl up to RwEq. -/
-def extRoundTrip_rweq (x : A) (c : C) :
+noncomputable def extRoundTrip_rweq (x : A) (c : C) :
     RwEq (K.extRoundTrip x c) (Path.refl _) :=
   rweq_of_operad_step (OperadStep.inverse_cancel (K.extCoherePath x c))
 
@@ -549,26 +549,26 @@ end OperadicKanExtData
 /-! ## Path permutation action -/
 
 /-- Path-level permutation: swap in a path sequence via symmetry. -/
-def pathPermute {A : Type u} {a b c : A}
+noncomputable def pathPermute {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Path a c :=
   Path.trans p q
 
 /-- Path permute with symm reversal. -/
-def pathPermuteReverse {A : Type u} {a b c : A}
+noncomputable def pathPermuteReverse {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Path c a :=
   Path.symm (pathPermute p q)
 
 /-- Path permute reverse unfolds correctly. -/
-def pathPermuteReverse_eq {A : Type u} {a b c : A}
+noncomputable def pathPermuteReverse_eq {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     pathPermuteReverse p q = Path.trans (Path.symm q) (Path.symm p) := by
   unfold pathPermuteReverse pathPermute
   simp
 
 /-- Double reversal of path permutation is identity. -/
-def pathPermute_double_reverse_toEq {A : Type u} {a b c : A}
+noncomputable def pathPermute_double_reverse_toEq {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     (Path.trans (pathPermute p q) (pathPermuteReverse p q)).toEq =
     (Path.refl a).toEq := by
@@ -576,7 +576,7 @@ def pathPermute_double_reverse_toEq {A : Type u} {a b c : A}
   simp
 
 /-- Associativity of path permutation. -/
-def pathPermute_assoc {A : Type u} {a b c d : A}
+noncomputable def pathPermute_assoc {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     pathPermute (pathPermute p q) r = pathPermute p (pathPermute q r) := by
   unfold pathPermute
@@ -605,21 +605,21 @@ namespace ColoredOperadData
 variable {Color : Type u} {A : Type v} (CO : ColoredOperadData Color A)
 
 /-- Colored unit up to RwEq. -/
-def color_unit_rweq (c : Color) (x : A) :
+noncomputable def color_unit_rweq (c : Color) (x : A) :
     RwEq
       (Path.trans (CO.colorUnitPath c x) (Path.refl x))
       (CO.colorUnitPath c x) :=
   rweq_of_operad_step (OperadStep.right_unit (CO.colorUnitPath c x))
 
 /-- Colored associativity up to RwEq. -/
-def color_assoc_rweq (x y z : A) :
+noncomputable def color_assoc_rweq (x y z : A) :
     RwEq
       (Path.trans (CO.colorAssocPath x y z) (Path.refl _))
       (CO.colorAssocPath x y z) :=
   rweq_of_operad_step (OperadStep.right_unit (CO.colorAssocPath x y z))
 
 /-- Underlying uncolored operad at a fixed color. -/
-def atColor (c : Color) : OperadData A where
+noncomputable def atColor (c : Color) : OperadData A where
   ops := fun _ => CO.hom c c
   ident := CO.colorIdent c
   compose := CO.colorCompose

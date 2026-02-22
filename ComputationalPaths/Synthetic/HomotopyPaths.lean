@@ -91,7 +91,7 @@ variable {A : Type u} {P : A → Type u}
   Path.apd (A := A) (B := P) f p
 
 /-- Canonical path witnessing that transport along `refl` computes to identity. -/
-def transportReflPath {a : A} (u : P a) :
+noncomputable def transportReflPath {a : A} (u : P a) :
     Path (Path.transport (A := A) (D := P) (Path.refl a) u) u :=
   Path.stepChain (A := P a)
     (a := Path.transport (A := A) (D := P) (Path.refl a) u)
@@ -125,21 +125,21 @@ variable {A : Type u} {B : Type u} {C : Type u}
 abbrev Homotopy {X : Type u} {Y : Type u} (f g : X → Y) : Type u :=
   (x : X) → Path (f x) (g x)
 
-@[simp] def hRefl (f : A → B) : Homotopy f f :=
+@[simp] noncomputable def hRefl (f : A → B) : Homotopy f f :=
   fun x => Path.refl (f x)
 
-@[simp] def hSymm {f g : A → B} (H : Homotopy f g) : Homotopy g f :=
+@[simp] noncomputable def hSymm {f g : A → B} (H : Homotopy f g) : Homotopy g f :=
   fun x => inverse (H x)
 
-@[simp] def hTrans {f g h : A → B}
+@[simp] noncomputable def hTrans {f g h : A → B}
     (H₁ : Homotopy f g) (H₂ : Homotopy g h) : Homotopy f h :=
   fun x => concat (H₁ x) (H₂ x)
 
-@[simp] def whiskerRight (k : B → C) {f g : A → B}
+@[simp] noncomputable def whiskerRight (k : B → C) {f g : A → B}
     (H : Homotopy f g) : Homotopy (fun x => k (f x)) (fun x => k (g x)) :=
   fun x => ap (A := B) k (H x)
 
-@[simp] def whiskerLeft {X : Type u} (h : X → A) {f g : A → B}
+@[simp] noncomputable def whiskerLeft {X : Type u} (h : X → A) {f g : A → B}
     (H : Homotopy f g) : Homotopy (fun x => f (h x)) (fun x => g (h x)) :=
   fun x => H (h x)
 

@@ -27,15 +27,15 @@ namespace GlobularCell
 variable {β : Type u}
 
 /-- Reflexive cell at a given point. -/
-@[simp] def refl (x : β) : GlobularCell β :=
+@[simp] noncomputable def refl (x : β) : GlobularCell β :=
   { src := x, tgt := x, path := Path.refl x }
 
 /-- Symmetry flips the endpoints and applies `Path.symm`. -/
-@[simp] def symm (c : GlobularCell β) : GlobularCell β :=
+@[simp] noncomputable def symm (c : GlobularCell β) : GlobularCell β :=
   { src := c.tgt, tgt := c.src, path := Path.symm c.path }
 
 /-- Composition of cells; the path argument aligns the midpoint. -/
-@[simp] def trans (p : GlobularCell β) (q : GlobularCell β)
+@[simp] noncomputable def trans (p : GlobularCell β) (q : GlobularCell β)
     (h : Path p.tgt q.src) : GlobularCell β :=
   { src := p.src
     tgt := q.tgt
@@ -79,12 +79,12 @@ variable {β : Type u}
   cases h
   rfl
 
-private def trans_assoc_left_eq (p q r : GlobularCell β)
+private noncomputable def trans_assoc_left_eq (p q r : GlobularCell β)
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path (trans p q h₁).tgt r.src := by
   simpa [trans] using h₂
 
-private def trans_assoc_right_eq (p q r : GlobularCell β)
+private noncomputable def trans_assoc_right_eq (p q r : GlobularCell β)
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path p.tgt (trans q r h₂).src := by
   simpa [trans] using h₁
@@ -103,7 +103,7 @@ end GlobularCell
 
 /-- Iterated globular levels over a base type `A`.  Level `0` is `A` itself,
 while `level (n+1)` stores explicit cells between level-`n` elements. -/
-def GlobularLevel (A : Type u) : Nat → Type u
+noncomputable def GlobularLevel (A : Type u) : Nat → Type u
   | 0 => A
   | Nat.succ n => GlobularCell (GlobularLevel A n)
 
@@ -117,17 +117,17 @@ variable {A : Type u}
       GlobularCell (GlobularLevel A n) := rfl
 
 /-- Reflexive cell living one dimension higher. -/
-@[simp] def refl {n : Nat} (x : GlobularLevel A n) :
+@[simp] noncomputable def refl {n : Nat} (x : GlobularLevel A n) :
     GlobularLevel A (n + 1) :=
   GlobularCell.refl x
 
 /-- Symmetry at level `n+1`. -/
-@[simp] def symm {n : Nat} (c : GlobularLevel A (n + 1)) :
+@[simp] noncomputable def symm {n : Nat} (c : GlobularLevel A (n + 1)) :
     GlobularLevel A (n + 1) :=
   GlobularCell.symm c
 
 /-- Composition at level `n+1`.  The middle path aligns the endpoints. -/
-@[simp] def trans {n : Nat}
+@[simp] noncomputable def trans {n : Nat}
     (p : GlobularLevel A (n + 1)) (q : GlobularLevel A (n + 1))
     (h : Path p.tgt q.src) :
     GlobularLevel A (n + 1) :=
@@ -182,14 +182,14 @@ variable {A : Type u}
   cases h
   rfl
 
-private def globular_trans_assoc_left_eq {n : Nat}
+private noncomputable def globular_trans_assoc_left_eq {n : Nat}
     (p q r : GlobularLevel A (n + 1))
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path (trans (A := A) p q h₁).tgt r.src := by
   simpa [trans] using
     (GlobularCell.trans_assoc_left_eq (β := GlobularLevel A n) p q r h₁ h₂)
 
-private def globular_trans_assoc_right_eq {n : Nat}
+private noncomputable def globular_trans_assoc_right_eq {n : Nat}
     (p q r : GlobularLevel A (n + 1))
     (h₁ : Path p.tgt q.src) (h₂ : Path q.tgt r.src) :
     Path p.tgt (trans (A := A) q r h₂).src := by
@@ -214,7 +214,7 @@ variable {B : Type v}
 is just function application, while higher cells are mapped by applying the
 function to the endpoints and functorially transporting the underlying
 computational path. -/
-@[simp] def map : {n : Nat} → (A → B) → GlobularLevel A n → GlobularLevel B n
+@[simp] noncomputable def map : {n : Nat} → (A → B) → GlobularLevel A n → GlobularLevel B n
   | 0, f, a => f a
   | Nat.succ n, f, c =>
       { src := map (n := n) f c.src
@@ -255,7 +255,7 @@ computational path. -/
 end Functoriality
 
 /-- Underlying computational path of a higher cell. -/
-@[simp] def toPath {n : Nat} (c : GlobularLevel A (n + 1)) :
+@[simp] noncomputable def toPath {n : Nat} (c : GlobularLevel A (n + 1)) :
     Path c.src c.tgt :=
   c.path
 

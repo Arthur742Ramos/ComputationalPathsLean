@@ -25,7 +25,7 @@ structure ForcingNotion where
   one : carrier  -- greatest element
 
 /-- Compatibility of conditions. -/
-def Compatible (P : ForcingNotion) (p q : P.carrier) : Prop :=
+noncomputable def Compatible (P : ForcingNotion) (p q : P.carrier) : Prop :=
   ∃ r : P.carrier, P.le r p ∧ P.le r q
 
 /-- Antichain: pairwise incompatible set of conditions. -/
@@ -34,11 +34,11 @@ structure Antichain (P : ForcingNotion) where
   pairwise_incompat : ∀ p q, p ∈ elems → q ∈ elems → p ≠ q → ¬Compatible P p q
 
 /-- CCC (countable chain condition): every antichain is countable. -/
-def CCC (P : ForcingNotion) : Prop :=
+noncomputable def CCC (P : ForcingNotion) : Prop :=
   True  -- every antichain is countable
 
 /-- Dense set in a forcing notion. -/
-def DenseSet (P : ForcingNotion) (D : P.carrier → Prop) : Prop :=
+noncomputable def DenseSet (P : ForcingNotion) (D : P.carrier → Prop) : Prop :=
   ∀ p : P.carrier, ∃ q, P.le q p ∧ D q
 
 /-- Generic filter over a collection of dense sets. -/
@@ -52,15 +52,15 @@ structure Forces (P : ForcingNotion) (p : P.carrier) (φ : Prop) where
   witness : Prop
 
 /-- Cohen forcing (adding reals). -/
-def CohenForcing : ForcingNotion :=
+noncomputable def CohenForcing : ForcingNotion :=
   ⟨List Bool, fun s t => t.isPrefixOf s, []⟩
 
 /-- Random forcing (Solovay forcing). -/
-def RandomForcing : ForcingNotion :=
+noncomputable def RandomForcing : ForcingNotion :=
   ⟨ℕ, fun a b => a ≤ b, 0⟩  -- simplified
 
 /-- Sacks forcing. -/
-def SacksForcing : ForcingNotion :=
+noncomputable def SacksForcing : ForcingNotion :=
   ⟨ℕ, fun a b => a ≤ b, 0⟩
 
 /-- Iterated forcing (two-step). -/
@@ -68,19 +68,19 @@ structure IteratedForcing (P : ForcingNotion) (Q : ForcingNotion) where
   combined : ForcingNotion
 
 /-- Martin's axiom: MA(κ) for a cardinal κ. -/
-def MartinsAxiom (κ : ℕ) : Prop :=
+noncomputable def MartinsAxiom (κ : ℕ) : Prop :=
   True  -- for every CCC poset and < κ dense sets, a generic filter exists
 
 /-- Proper forcing. -/
-def Proper (P : ForcingNotion) : Prop :=
+noncomputable def Proper (P : ForcingNotion) : Prop :=
   True  -- every countable elementary submodel has a condition forcing it is generic
 
 /-- Proper forcing axiom (PFA). -/
-def PFA : Prop :=
+noncomputable def PFA : Prop :=
   True  -- MA for all proper posets with ℵ₁ dense sets
 
 /-- Martin's maximum (MM). -/
-def MartinsMaximum : Prop :=
+noncomputable def MartinsMaximum : Prop :=
   True  -- strongest forcing axiom consistent with ZFC
 
 /-- Souslin line: a dense linear order without endpoints, CCC, not separable. -/
@@ -123,7 +123,7 @@ structure CoreModel where
   level : ℕ → Type u
 
 /-- Determinacy for pointclasses. -/
-def PointclassDeterminacy (Γ : (ℕ → ℕ) → Prop → Prop) : Prop :=
+noncomputable def PointclassDeterminacy (Γ : (ℕ → ℕ) → Prop → Prop) : Prop :=
   True  -- all games in Γ are determined
 
 -- ============================================================

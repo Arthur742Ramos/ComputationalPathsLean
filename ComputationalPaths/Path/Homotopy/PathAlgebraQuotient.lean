@@ -83,7 +83,7 @@ theorem map_inv (f : PiOneHom A a B b) (x : π₁(A, a)) :
     _ = PiOne.inv (f.toFun x) := by simp
 
 /-- The kernel of a homomorphism. -/
-def kernel (f : PiOneHom A a B b) (x : π₁(A, a)) : Prop :=
+noncomputable def kernel (f : PiOneHom A a B b) (x : π₁(A, a)) : Prop :=
   f.toFun x = PiOne.id
 
 theorem kernel_id (f : PiOneHom A a B b) : f.kernel PiOne.id := f.map_id
@@ -102,7 +102,7 @@ theorem kernel_inv (f : PiOneHom A a B b) {x : π₁(A, a)}
   exact LoopQuot.inv_id
 
 /-- The kernel is a normal subgroup. -/
-def kernelNormal (f : PiOneHom A a B b) : NormalSubgroup A a where
+noncomputable def kernelNormal (f : PiOneHom A a B b) : NormalSubgroup A a where
   mem := f.kernel
   mem_id := f.kernel_id
   mem_mul := fun hx hy => f.kernel_mul hx hy
@@ -117,12 +117,12 @@ end PiOneHom
 /-! ## Quotient by kernel -/
 
 /-- Two elements are in the same kernel coset. -/
-def kernelCoset {a : A} {b : B} (f : PiOneHom A a B b)
+noncomputable def kernelCoset {a : A} {b : B} (f : PiOneHom A a B b)
     (x y : π₁(A, a)) : Prop :=
   f.toFun x = f.toFun y
 
 /-- The quotient of π₁ by the kernel. -/
-def KernelQuot {a : A} {b : B} (f : PiOneHom A a B b) : Type u :=
+noncomputable def KernelQuot {a : A} {b : B} (f : PiOneHom A a B b) : Type u :=
   Quot (kernelCoset f)
 
 namespace KernelQuot
@@ -130,13 +130,13 @@ namespace KernelQuot
 variable {a : A} {b : B} (f : PiOneHom A a B b)
 
 /-- Projection. -/
-def proj : π₁(A, a) → KernelQuot f := Quot.mk _
+noncomputable def proj : π₁(A, a) → KernelQuot f := Quot.mk _
 
 /-- The identity element. -/
-def id : KernelQuot f := proj f PiOne.id
+noncomputable def id : KernelQuot f := proj f PiOne.id
 
 /-- The first isomorphism map. -/
-def isoMap : KernelQuot f → π₁(B, b) :=
+noncomputable def isoMap : KernelQuot f → π₁(B, b) :=
   Quot.lift f.toFun (fun _ _ h => h)
 
 /-- The iso map is injective. -/

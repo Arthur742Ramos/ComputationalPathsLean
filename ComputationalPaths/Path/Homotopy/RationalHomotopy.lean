@@ -56,12 +56,12 @@ structure CDGAMorphism (A B : CDGA) where
 
 namespace CDGAMorphism
 
-def id' (A : CDGA) : CDGAMorphism A A where
+noncomputable def id' (A : CDGA) : CDGAMorphism A A where
   map := fun _ x => x
   map_zero := fun _ => rfl
   map_diff := fun _ _ => rfl
 
-def comp {A B C : CDGA} (g : CDGAMorphism B C) (f : CDGAMorphism A B) : CDGAMorphism A C where
+noncomputable def comp {A B C : CDGA} (g : CDGAMorphism B C) (f : CDGAMorphism A B) : CDGAMorphism A C where
   map := fun n x => g.map n (f.map n x)
   map_zero := fun n => by rw [f.map_zero, g.map_zero]
   map_diff := fun n x => by rw [f.map_diff, g.map_diff]
@@ -89,7 +89,7 @@ structure QuasiIsomorphism (A B : CDGA) extends CDGAMorphism A B where
   isQuasiIso : True
 
 /-- Identity quasi-isomorphism. -/
-def QuasiIsomorphism.id' (A : CDGA) : QuasiIsomorphism A A where
+noncomputable def QuasiIsomorphism.id' (A : CDGA) : QuasiIsomorphism A A where
   toCDGAMorphism := CDGAMorphism.id' A
   isQuasiIso := trivial
 
@@ -145,20 +145,20 @@ structure IntrinsicallyFormal (A : CDGA) (M : MinimalModel A) where
   formalModel : FormalCDGA M.model.toCDGA
 
 /-- The trivial CDGA. -/
-def trivialCDGA : CDGA where
+noncomputable def trivialCDGA : CDGA where
   component := fun _ => Unit
   zero := fun _ => ()
   diff := fun _ _ => ()
   diff_sq := fun _ _ => rfl
 
 /-- Trivial formality. -/
-def trivialFormal : FormalCDGA trivialCDGA where
+noncomputable def trivialFormal : FormalCDGA trivialCDGA where
   cohomologyCDGA := trivialCDGA
   cohom_diff_zero := fun _ _ => rfl
   zigzag := CDGAMorphism.id' trivialCDGA
 
 /-- The point is formal. -/
-def pointFormal : FormalSpace where
+noncomputable def pointFormal : FormalSpace where
   cochains := trivialCDGA
   formality := trivialFormal
 
@@ -199,7 +199,7 @@ inductive RationalDichotomy where
   | hyperbolic : HyperbolicSpace → RationalDichotomy
 
 /-- Every trivial space is elliptic. -/
-def trivialElliptic : EllipticSpace where
+noncomputable def trivialElliptic : EllipticSpace where
   cochains := trivialCDGA
   model := {
     model := {
@@ -215,7 +215,7 @@ def trivialElliptic : EllipticSpace where
   poincare := trivial
 
 /-- The point is elliptic. -/
-def pointElliptic : RationalDichotomy :=
+noncomputable def pointElliptic : RationalDichotomy :=
   .elliptic trivialElliptic
 
 /-! ## Rational equivalences -/
@@ -230,13 +230,13 @@ structure RationalEquivalence (A B : CDGA) where
   consistent : numSteps = intermediates.length
 
 /-- Every CDGA is rationally equivalent to itself. -/
-def RationalEquivalence.refl (A : CDGA) : RationalEquivalence A A where
+noncomputable def RationalEquivalence.refl (A : CDGA) : RationalEquivalence A A where
   intermediates := []
   numSteps := 0
   consistent := rfl
 
 /-- Rational equivalence is symmetric. -/
-def RationalEquivalence.symm {A B : CDGA} (e : RationalEquivalence A B) :
+noncomputable def RationalEquivalence.symm {A B : CDGA} (e : RationalEquivalence A B) :
     RationalEquivalence B A where
   intermediates := e.intermediates.reverse
   numSteps := e.numSteps
@@ -246,7 +246,7 @@ def RationalEquivalence.symm {A B : CDGA} (e : RationalEquivalence A B) :
 
 /-- The Sullivan model of an odd sphere S^{2n+1}: a single generator in
     degree 2n+1 with zero differential. -/
-def oddSphereCDGA (_n : Nat) : CDGA where
+noncomputable def oddSphereCDGA (_n : Nat) : CDGA where
   component := fun _ => Unit
   zero := fun _ => ()
   diff := fun _ _ => ()
@@ -254,14 +254,14 @@ def oddSphereCDGA (_n : Nat) : CDGA where
 
 /-- The Sullivan model of an even sphere S^{2n}: generators in degrees 2n
     and 4n-1. -/
-def evenSphereCDGA (_n : Nat) : CDGA where
+noncomputable def evenSphereCDGA (_n : Nat) : CDGA where
   component := fun _ => Unit
   zero := fun _ => ()
   diff := fun _ _ => ()
   diff_sq := fun _ _ => rfl
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

@@ -48,13 +48,13 @@ consists of pairs (a, p) where a : A and p : P(a).
 -/
 
 /-- The total space of a type family. -/
-def TotalSpace (P : A → Type u) : Type u := Σ (a : A), P a
+noncomputable def TotalSpace (P : A → Type u) : Type u := Σ (a : A), P a
 
 /-- The projection from total space to base space. -/
-def proj {P : A → Type u} : TotalSpace P → A := Sigma.fst
+noncomputable def proj {P : A → Type u} : TotalSpace P → A := Sigma.fst
 
 /-- A point in the total space consists of a base point and a fiber element. -/
-def TotalPoint {P : A → Type u} (a : A) (p : P a) : TotalSpace P := ⟨a, p⟩
+noncomputable def TotalPoint {P : A → Type u} (a : A) (p : P a) : TotalSpace P := ⟨a, p⟩
 
 /-! ## Path Lifting
 
@@ -65,11 +65,11 @@ there is a unique lifted path in the total space.
 
 /-- Transport in a type family P along a path in the base.
 This is the computational paths version of path lifting in fibers. -/
-def fiberTransport {P : A → Type u} {a b : A} (p : Path a b) : P a → P b :=
+noncomputable def fiberTransport {P : A → Type u} {a b : A} (p : Path a b) : P a → P b :=
   Path.transport p
 
 /-- Explicit single-step path built directly from a `Step` witness. -/
-@[simp] def singleStepPath {a b : A} (h : a = b) : Path a b :=
+@[simp] noncomputable def singleStepPath {a b : A} (h : a = b) : Path a b :=
   Path.mk [ComputationalPaths.Step.mk a b h] h
 
 @[simp] theorem singleStepPath_toEq {a b : A} (h : a = b) :
@@ -204,7 +204,7 @@ theorem transport_injective (_hP : IsCovering P) {a b : A}
   exact h'
 
 /-- Paths in the total space project to paths in the base. -/
-def projPath {a₁ a₂ : A} {x₁ : P a₁} {x₂ : P a₂}
+noncomputable def projPath {a₁ a₂ : A} {x₁ : P a₁} {x₂ : P a₂}
     (q : Path (TotalPoint a₁ x₁) (TotalPoint a₂ x₂)) : Path a₁ a₂ :=
   Path.congrArg proj q
 
@@ -218,7 +218,7 @@ This action is a key feature of covering space theory.
 
 /-- The action of a loop on a fiber element via transport.
 Given a loop at a and a point in P(a), transport gives another point in P(a). -/
-def loopAction {P : A → Type u} {a : A} (l : LoopSpace A a) (x : P a) : P a :=
+noncomputable def loopAction {P : A → Type u} {a : A} (l : LoopSpace A a) (x : P a) : P a :=
   fiberTransport l x
 
 /-- The loop action respects a single rewrite `Step`. -/
@@ -327,7 +327,7 @@ namespace DeckTransformation
 variable {P : A → Type u}
 
 /-- Identity deck transformation. -/
-def id : DeckTransformation P where
+noncomputable def id : DeckTransformation P where
   toFun := _root_.id
   proj_eq := fun _ => rfl
   inv := _root_.id
@@ -335,7 +335,7 @@ def id : DeckTransformation P where
   right_inv := fun _ => rfl
 
 /-- Composition of deck transformations. -/
-def comp (f g : DeckTransformation P) : DeckTransformation P where
+noncomputable def comp (f g : DeckTransformation P) : DeckTransformation P where
   toFun := f.toFun ∘ g.toFun
   proj_eq := fun x => by simp [f.proj_eq, g.proj_eq]
   inv := g.inv ∘ f.inv

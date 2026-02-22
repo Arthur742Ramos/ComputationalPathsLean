@@ -39,7 +39,7 @@ variable {A B : Type u}
 /-! ## Mapping cone (cofiber) -/
 
 /-- The mapping cone (cofiber) of `f : A -> B` as a pushout of `B` and `1` along `A`. -/
-def MappingCone (f : A -> B) : Type u :=
+noncomputable def MappingCone (f : A -> B) : Type u :=
   Pushout B PUnit' A f (fun _ => PUnit'.unit)
 
 /-- Alias for the mapping cone. -/
@@ -50,25 +50,25 @@ namespace Cofiber
 variable (f : A -> B)
 
 /-- Inclusion of `B` into the cofiber. -/
-def inl (b : B) : Cofiber f :=
+noncomputable def inl (b : B) : Cofiber f :=
   Pushout.inl (A := B) (B := PUnit') (C := A) (f := f) (g := fun _ => PUnit'.unit) b
 
 /-- The basepoint of the cofiber (the cone point). -/
-def basepoint : Cofiber f :=
+noncomputable def basepoint : Cofiber f :=
   Pushout.inr (A := B) (B := PUnit') (C := A) (f := f) (g := fun _ => PUnit'.unit) PUnit'.unit
 
 /-- The gluing path identifying `f a` with the cone point. -/
-def glue (a : A) :
+noncomputable def glue (a : A) :
     Path (inl (f := f) (f a)) (basepoint (f := f)) :=
   Pushout.glue (A := B) (B := PUnit') (C := A) (f := f) (g := fun _ => PUnit'.unit) a
 
 /-- Inverse glue: from basepoint back to inl (f a). -/
-def glueInv (a : A) :
+noncomputable def glueInv (a : A) :
     Path (basepoint (f := f)) (inl (f := f) (f a)) :=
   Path.symm (glue f a)
 
 /-- Loop at basepoint through a glued pair: glueInv(a) ⬝ glue(a). -/
-def loop (a : A) :
+noncomputable def loop (a : A) :
     Path (basepoint (f := f)) (basepoint (f := f)) :=
   Path.trans (glueInv f a) (glue f a)
 
@@ -83,7 +83,7 @@ theorem loop_proof_eq (a a' : A) :
   simp
 
 /-- Linking path: connect two inl points through basepoint. -/
-def link (a a' : A) :
+noncomputable def link (a a' : A) :
     Path (inl (f := f) (f a)) (inl (f := f) (f a')) :=
   Path.trans (glue f a) (glueInv f a')
 
@@ -102,7 +102,7 @@ end Cofiber
 /-! ## Functoriality -/
 
 /-- A commutative square `g ∘ fA = fB ∘ h` induces a map on cofibers. -/
-def cofiberMap {A₁ A₂ B₁ B₂ : Type u}
+noncomputable def cofiberMap {A₁ A₂ B₁ B₂ : Type u}
     {f₁ : A₁ → B₁} {f₂ : A₂ → B₂}
     (h : A₁ → A₂) (g : B₁ → B₂)
     (comm : ∀ a, g (f₁ a) = f₂ (h a)) :
@@ -139,12 +139,12 @@ theorem cofiberMap_inl {A₁ A₂ B₁ B₂ : Type u}
 abbrev CofiberId (A : Type u) : Type u := Cofiber (id : A → A)
 
 /-- In Cf(id), every inl a is connected to the basepoint. -/
-def cofiberId_glue (a : A) :
+noncomputable def cofiberId_glue (a : A) :
     Path (Cofiber.inl (f := (id : A → A)) a) (Cofiber.basepoint (f := (id : A → A))) :=
   Cofiber.glue id a
 
 /-- Cf(id) is a subsingleton: id a = a, so everything collapses. -/
-instance cofiberIdSubsingleton : Subsingleton (CofiberId A) where
+noncomputable instance cofiberIdSubsingleton : Subsingleton (CofiberId A) where
   allEq x y := by
     refine Quot.inductionOn x ?_
     intro x'
@@ -169,22 +169,22 @@ instance cofiberIdSubsingleton : Subsingleton (CofiberId A) where
         cases v; rfl
 
 /-- Path connecting any two points of Cf(id). -/
-def cofiberId_path (x y : CofiberId A) : Path x y :=
+noncomputable def cofiberId_path (x y : CofiberId A) : Path x y :=
   Path.stepChain (Subsingleton.elim x y)
 
 /-! ## Cofiber of a constant map -/
 
 /-- The constant map sending everything to a basepoint. -/
-def constMap {C : Type u} (b₀ : B) : C → B := fun _ => b₀
+noncomputable def constMap {C : Type u} (b₀ : B) : C → B := fun _ => b₀
 
 /-- In the cofiber of the constant map to b₀, all glue paths start at inl b₀. -/
-def cofiberConst_glue {C : Type u} (b₀ : B) (a : C) :
+noncomputable def cofiberConst_glue {C : Type u} (b₀ : B) (a : C) :
     Path (Cofiber.inl (f := constMap (C := C) b₀) b₀)
       (Cofiber.basepoint (f := constMap (C := C) b₀)) :=
   Cofiber.glue (constMap (C := C) b₀) a
 
 /-- The loop at inl b₀ in Cf(const_{b₀}) via a: go to basepoint and back. -/
-def cofiberConst_loop {C : Type u} (b₀ : B) (a : C) :
+noncomputable def cofiberConst_loop {C : Type u} (b₀ : B) (a : C) :
     Path (Cofiber.inl (f := constMap (C := C) b₀) b₀)
       (Cofiber.inl (f := constMap (C := C) b₀) b₀) :=
   Cofiber.link (constMap (C := C) b₀) a a
@@ -212,11 +212,11 @@ theorem cofiber_transport_loop_const
 /-! ## Cofiber inclusion map -/
 
 /-- The inclusion B → Cf(f). -/
-def cofiberInclusion (f : A → B) : B → Cofiber f :=
+noncomputable def cofiberInclusion (f : A → B) : B → Cofiber f :=
   Cofiber.inl (f := f)
 
 /-- The projection from Cf(f) to the basepoint is well-defined. -/
-def cofiberCollapse (f : A → B) : Cofiber f → PUnit' :=
+noncomputable def cofiberCollapse (f : A → B) : Cofiber f → PUnit' :=
   fun _ => PUnit'.unit
 
 /-- The collapse map is constant. -/
@@ -224,7 +224,7 @@ theorem cofiberCollapse_const (f : A → B) (x y : Cofiber f) :
     cofiberCollapse f x = cofiberCollapse f y := rfl
 
 /-- Path witness of the collapse being constant. -/
-def cofiberCollapse_const_path (f : A → B) (x y : Cofiber f) :
+noncomputable def cofiberCollapse_const_path (f : A → B) (x y : Cofiber f) :
     Path (cofiberCollapse f x) (cofiberCollapse f y) :=
   Path.refl _
 

@@ -53,12 +53,12 @@ namespace GSetHom
 variable {G : Type u} {S : StrictGroup G}
 
 /-- Identity equivariant map. -/
-def id (X : GSet.{u, v} G S) : GSetHom X X where
+noncomputable def id (X : GSet.{u, v} G S) : GSetHom X X where
   toFun := fun x => x
   equivariant := fun _ _ => rfl
 
 /-- Composition of equivariant maps. -/
-def comp {X Y Z : GSet.{u, v} G S} (f : GSetHom X Y) (g : GSetHom Y Z) :
+noncomputable def comp {X Y Z : GSet.{u, v} G S} (f : GSetHom X Y) (g : GSetHom Y Z) :
     GSetHom X Z where
   toFun := fun x => g.toFun (f.toFun x)
   equivariant := by
@@ -81,14 +81,14 @@ namespace FiniteGSet
 variable {G : Type u} {S : StrictGroup G}
 
 /-- Forget the finiteness data. -/
-def toGSet (X : FiniteGSet.{u, v} G S) : GSet.{u, v} G S where
+noncomputable def toGSet (X : FiniteGSet.{u, v} G S) : GSet.{u, v} G S where
   carrier := X.carrier
   action := X.action
 
 end FiniteGSet
 
 /-- Equivariant maps between finite G-sets. -/
-def FiniteGSetHom {G : Type u} {S : StrictGroup G}
+noncomputable def FiniteGSetHom {G : Type u} {S : StrictGroup G}
     (X Y : FiniteGSet.{u, v} G S) :=
   GSetHom X.toGSet Y.toGSet
 
@@ -128,12 +128,12 @@ structure SpectrumMap (X Y : Spectrum.{w}) where
 namespace SpectrumMap
 
 /-- Identity spectrum map. -/
-def id (X : Spectrum.{w}) : SpectrumMap X X where
+noncomputable def id (X : Spectrum.{w}) : SpectrumMap X X where
   map := fun _ x => x
   map_pt := fun _ => rfl
 
 /-- Composition of spectrum maps. -/
-def comp {X Y Z : Spectrum.{w}} (f : SpectrumMap X Y) (g : SpectrumMap Y Z) :
+noncomputable def comp {X Y Z : Spectrum.{w}} (f : SpectrumMap X Y) (g : SpectrumMap Y Z) :
     SpectrumMap X Z where
   map := fun n x => g.map n (f.map n x)
   map_pt := by
@@ -243,7 +243,7 @@ structure DressFamily (G : Type u) (S : StrictGroup G) where
 namespace DressFamily
 
 /-- The full Dress family containing all subgroups. -/
-def full (G : Type u) (S : StrictGroup G) : DressFamily G S where
+noncomputable def full (G : Type u) (S : StrictGroup G) : DressFamily G S where
   carrier := fun _ => True
   contains_trivial := trivial
   closed_under_conj := trivial
@@ -263,7 +263,7 @@ structure DressInduction {G : Type u} {S : StrictGroup G}
 /-! ## Burnside Mackey functor -/
 
 /-- The Burnside Mackey functor, modeled as the constant Nat functor. -/
-def burnsideMackeyFunctor (G : Type u) (S : StrictGroup G) :
+noncomputable def burnsideMackeyFunctor (G : Type u) (S : StrictGroup G) :
     MackeyFunctor.{u, v, 0} G S where
   obj := fun _ => Nat
   res := fun _ n => n
@@ -275,12 +275,12 @@ def burnsideMackeyFunctor (G : Type u) (S : StrictGroup G) :
   mackey := fun _ _ => trivial
 
 /-- Dress induction holds for the Burnside Mackey functor with the full family. -/
-def burnsideDressInduction (G : Type u) (S : StrictGroup G) :
+noncomputable def burnsideDressInduction (G : Type u) (S : StrictGroup G) :
     DressInduction (burnsideMackeyFunctor.{u, v} G S) where
   family := DressFamily.full G S
   induction := trivial
 
-private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
 /-! ## Summary
 

@@ -47,7 +47,7 @@ abbrev family (f : A → B) : B → Type u :=
   fun b => HomotopyFiber f b
 
 /-- The homotopy fiber sequence `hofiber f b → A → B` at a chosen basepoint. -/
-def fiberSeq {f : A → B} {b : B} (x0 : HomotopyFiber f b) :
+noncomputable def fiberSeq {f : A → B} {b : B} (x0 : HomotopyFiber f b) :
     FiberSeq (HomotopyFiber f b) A B where
   proj := f
   baseB := b
@@ -59,7 +59,7 @@ def fiberSeq {f : A → B} {b : B} (x0 : HomotopyFiber f b) :
   right_inv := by intro x; rfl
 
 /-- The homotopy fiber sequence is exact at the total space. -/
-def fiberSeq_exact {f : A → B} {b : B} (x0 : HomotopyFiber f b) :
+noncomputable def fiberSeq_exact {f : A → B} {b : B} (x0 : HomotopyFiber f b) :
     IsExactAt (fiberSeq (f := f) (b := b) x0) := by
   refine
     { incl_to_base := ?_, base_from_fiber := ?_ }
@@ -71,7 +71,7 @@ def fiberSeq_exact {f : A → B} {b : B} (x0 : HomotopyFiber f b) :
 /-! ## Total space equivalence -/
 
 /-- The total space of the homotopy fiber family is equivalent to `A`. -/
-def totalEquiv (f : A → B) :
+noncomputable def totalEquiv (f : A → B) :
     SimpleEquiv (Total (P := family f)) A where
   toFun := fun x => x.2.point
   invFun := fun a => ⟨f a, ⟨a, rfl⟩⟩
@@ -117,12 +117,12 @@ theorem exact_at_base {f : A → B} (b : B) (x0 : HomotopyFiber f b) :
 /-! ## Fibration case -/
 
 /-- For a type family fibration, the homotopy fiber agrees with the actual fiber. -/
-def fibrationEquiv {P : B → Type u} (b : B) :
+noncomputable def fibrationEquiv {P : B → Type u} (b : B) :
     SimpleEquiv (HomotopyFiber (@Total.proj B P) b) (P b) :=
   fiberEquivFamily (P := P) b
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary

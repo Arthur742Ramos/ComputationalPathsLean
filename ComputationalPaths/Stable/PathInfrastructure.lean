@@ -41,13 +41,13 @@ namespace SpectrumMap
 variable {E F G : Spectrum}
 
 /-- Identity spectrum map. -/
-def id (E : Spectrum) : SpectrumMap E E where
+noncomputable def id (E : Spectrum) : SpectrumMap E E where
   mapLevel := fun n => PathPointedMap.id (E.level n)
   commBase := fun n =>
     Path.refl ((E.structureMap n).toFun (sigmaPointed (E.level n)).pt)
 
 /-- Composition of spectrum maps. -/
-def comp (g : SpectrumMap F G) (f : SpectrumMap E F) : SpectrumMap E G where
+noncomputable def comp (g : SpectrumMap F G) (f : SpectrumMap E F) : SpectrumMap E G where
   mapLevel := fun n => PathPointedMap.comp (g.mapLevel n) (f.mapLevel n)
   commBase := fun n =>
     Path.trans
@@ -123,7 +123,7 @@ namespace SpectrumMapPathPreserving
 variable {E F : Spectrum} (f : SpectrumMap E F)
 
 /-- Canonical path-preservation witness derived from primitive `Step` rules. -/
-def canonical : SpectrumMapPathPreserving f where
+noncomputable def canonical : SpectrumMapPathPreserving f where
   comm_assoc_step := fun n => SpectrumMap.commBase_assoc_step (f := f) n
   structure_cancel_step := fun n => SpectrumMap.structure_cancel_step (F := F) n
 
@@ -176,7 +176,7 @@ noncomputable def right_cancel_rweq (e : StableEquivalence E F) (n : Nat) :
   rweq_of_step (e.right_cancel_step n)
 
 /-- Identity stable equivalence on a spectrum. -/
-def refl (E : Spectrum) : StableEquivalence E E where
+noncomputable def refl (E : Spectrum) : StableEquivalence E E where
   toMap := SpectrumMap.id E
   invMap := SpectrumMap.id E
   to_path_preserving := SpectrumMapPathPreserving.canonical (f := SpectrumMap.id E)
@@ -187,7 +187,7 @@ def refl (E : Spectrum) : StableEquivalence E E where
   right_cancel_step := fun n => Path.Step.symm_trans (Path.refl (E.level n).pt)
 
 /-- Symmetry of stable equivalences by swapping forward and inverse maps. -/
-def symm (e : StableEquivalence E F) : StableEquivalence F E where
+noncomputable def symm (e : StableEquivalence E F) : StableEquivalence F E where
   toMap := e.invMap
   invMap := e.toMap
   to_path_preserving := e.inv_path_preserving

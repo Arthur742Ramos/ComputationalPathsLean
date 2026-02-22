@@ -46,7 +46,7 @@ structure ChainComplex where
     boundary n (boundary (n + 1) x) = zero n
 
 /-- Path witness for ∂² = 0. -/
-def boundary_squared_zero_path (C : ChainComplex) (n : Nat)
+noncomputable def boundary_squared_zero_path (C : ChainComplex) (n : Nat)
     (x : C.group (n + 2)) :
     Path (C.boundary n (C.boundary (n + 1) x)) (C.zero n) :=
   Path.stepChain (C.boundary_sq n x)
@@ -54,7 +54,7 @@ def boundary_squared_zero_path (C : ChainComplex) (n : Nat)
 /-! ## Trivial chain complex -/
 
 /-- The trivial chain complex with all groups Unit. -/
-def trivialChainComplex : ChainComplex where
+noncomputable def trivialChainComplex : ChainComplex where
   group := fun _ => Unit
   boundary := fun _ _ => ()
   zero := fun _ => ()
@@ -65,7 +65,7 @@ theorem trivialChainComplex_boundary_zero (n : Nat) (x : Unit) :
     trivialChainComplex.boundary n x = () := rfl
 
 /-- Path witness for trivial boundary. -/
-def trivialChainComplex_boundary_path (n : Nat) (x : Unit) :
+noncomputable def trivialChainComplex_boundary_path (n : Nat) (x : Unit) :
     Path (trivialChainComplex.boundary n x) () :=
   Path.stepChain rfl
 
@@ -80,30 +80,30 @@ structure IntChainComplex where
     boundary n (boundary (n + 1) x) = 0
 
 /-- Convert an IntChainComplex to a ChainComplex. -/
-def intToChainComplex (IC : IntChainComplex) : ChainComplex where
+noncomputable def intToChainComplex (IC : IntChainComplex) : ChainComplex where
   group := fun _ => Int
   boundary := IC.boundary
   zero := fun _ => 0
   boundary_sq := IC.boundary_sq
 
 /-- The zero integer chain complex. -/
-def zeroIntChainComplex : IntChainComplex where
+noncomputable def zeroIntChainComplex : IntChainComplex where
   boundary := fun _ _ => 0
   boundary_sq := fun _ _ => rfl
 
 /-- Path witness for the zero boundary. -/
-def zeroIntChainComplex_boundary_path (n : Nat) (x : Int) :
+noncomputable def zeroIntChainComplex_boundary_path (n : Nat) (x : Int) :
     Path (zeroIntChainComplex.boundary n x) 0 :=
   Path.stepChain rfl
 
 /-! ## Homology via kernel/image -/
 
 /-- Cycle predicate: x is in ker(∂ₙ). -/
-def isCycle (C : ChainComplex) (n : Nat) (x : C.group (n + 1)) : Prop :=
+noncomputable def isCycle (C : ChainComplex) (n : Nat) (x : C.group (n + 1)) : Prop :=
   C.boundary n x = C.zero n
 
 /-- Boundary predicate: x is in im(∂ₙ₊₁). -/
-def isBoundary (C : ChainComplex) (n : Nat) (x : C.group (n + 1)) : Prop :=
+noncomputable def isBoundary (C : ChainComplex) (n : Nat) (x : C.group (n + 1)) : Prop :=
   ∃ y : C.group (n + 2), C.boundary (n + 1) y = x
 
 /-- Every boundary is a cycle (∂² = 0). -/
@@ -113,7 +113,7 @@ theorem boundary_is_cycle (C : ChainComplex) (n : Nat)
   exact C.boundary_sq n x
 
 /-- Path witness: every boundary is a cycle. -/
-def boundary_is_cycle_path (C : ChainComplex) (n : Nat)
+noncomputable def boundary_is_cycle_path (C : ChainComplex) (n : Nat)
     (x : C.group (n + 2)) :
     Path (C.boundary n (C.boundary (n + 1) x)) (C.zero n) :=
   boundary_squared_zero_path C n x
@@ -128,27 +128,27 @@ structure FiniteChainData where
   rank : Nat → Nat
 
 /-- Euler characteristic as alternating sum of ranks. -/
-def eulerChar (data : FiniteChainData) : Int :=
+noncomputable def eulerChar (data : FiniteChainData) : Int :=
   (List.range (data.dim + 1)).foldl
     (fun acc n => acc + (-1 : Int) ^ n * Int.ofNat (data.rank n)) 0
 
 /-- Euler characteristic of empty complex is zero. -/
-def eulerChar_empty : Int :=
+noncomputable def eulerChar_empty : Int :=
   eulerChar { dim := 0, rank := fun _ => 0 }
 
 /-- Path witness: Euler characteristic of empty complex is zero. -/
-def eulerChar_empty_path :
+noncomputable def eulerChar_empty_path :
     Path eulerChar_empty 0 :=
   Path.stepChain rfl
 
 /-- A point has Euler characteristic 1. -/
-def eulerChar_point :
+noncomputable def eulerChar_point :
     Path (eulerChar { dim := 0, rank := fun _ => 1 }) 1 :=
   Path.stepChain rfl
 
 /-- Euler characteristic of an interval (1 vertex, 1 edge counted as
     dim 0 with rank 1, dim 1 with rank 0 for a single vertex). -/
-def eulerChar_segment :
+noncomputable def eulerChar_segment :
     Path (eulerChar { dim := 1, rank := fun n => if n = 0 then 2 else if n = 1 then 1 else 0 }) 1 :=
   Path.stepChain (by native_decide)
 
@@ -165,19 +165,19 @@ structure ChainMap (C D : ChainComplex) where
   map_zero : ∀ (n : Nat), map n (C.zero n) = D.zero n
 
 /-- Path witness for commutativity of a chain map with boundary. -/
-def chainMap_comm_path (C D : ChainComplex) (f : ChainMap C D)
+noncomputable def chainMap_comm_path (C D : ChainComplex) (f : ChainMap C D)
     (n : Nat) (x : C.group (n + 1)) :
     Path (D.boundary n (f.map (n + 1) x)) (f.map n (C.boundary n x)) :=
   Path.stepChain (f.comm n x)
 
 /-- Identity chain map. -/
-def chainMap_id (C : ChainComplex) : ChainMap C C where
+noncomputable def chainMap_id (C : ChainComplex) : ChainMap C C where
   map := fun _ x => x
   comm := fun _ _ => rfl
   map_zero := fun _ => rfl
 
 /-- Composition of chain maps. -/
-def chainMap_comp {C D E : ChainComplex} (f : ChainMap C D) (g : ChainMap D E) :
+noncomputable def chainMap_comp {C D E : ChainComplex} (f : ChainMap C D) (g : ChainMap D E) :
     ChainMap C E where
   map := fun n x => g.map n (f.map n x)
   comm := fun n x => by
@@ -189,19 +189,19 @@ def chainMap_comp {C D E : ChainComplex} (f : ChainMap C D) (g : ChainMap D E) :
     rw [f.map_zero, g.map_zero]
 
 /-- Path witness: composition preserves identity. -/
-def chainMap_comp_id_path (C D : ChainComplex) (f : ChainMap C D)
+noncomputable def chainMap_comp_id_path (C D : ChainComplex) (f : ChainMap C D)
     (n : Nat) (x : C.group n) :
     Path ((chainMap_comp f (chainMap_id D)).map n x) (f.map n x) :=
   Path.stepChain rfl
 
 /-- Path witness: identity composed with a map is the map. -/
-def chainMap_id_comp_path (C D : ChainComplex) (f : ChainMap C D)
+noncomputable def chainMap_id_comp_path (C D : ChainComplex) (f : ChainMap C D)
     (n : Nat) (x : C.group n) :
     Path ((chainMap_comp (chainMap_id C) f).map n x) (f.map n x) :=
   Path.stepChain rfl
 
 /-- Associativity of chain map composition. -/
-def chainMap_comp_assoc_path {C D E F : ChainComplex}
+noncomputable def chainMap_comp_assoc_path {C D E F : ChainComplex}
     (f : ChainMap C D) (g : ChainMap D E) (h : ChainMap E F)
     (n : Nat) (x : C.group n) :
     Path ((chainMap_comp (chainMap_comp f g) h).map n x)

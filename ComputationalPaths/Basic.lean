@@ -17,6 +17,6 @@ import ComputationalPaths.Path.Groupoid
 namespace ComputationalPaths
 
 /-- Library version marker.  Bump as the formalisation progresses. -/
-def libraryVersion : String := "0.1.0"
+noncomputable def libraryVersion : String := "0.1.0"
 
 end ComputationalPaths

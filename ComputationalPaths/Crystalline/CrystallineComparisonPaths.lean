@@ -50,26 +50,26 @@ variable {W : DeRhamWittPathData Ring}
 variable (C : CrystallineComparisonPathData W X)
 
 /-- Comparison map transported along a base path. -/
-def comparisonAlong {x y : X} (p : Path x y) (n : Nat) :
+noncomputable def comparisonAlong {x y : X} (p : Path x y) (n : Nat) :
     Path (C.crystallineClass n x) (C.deRhamWittClass n y) :=
   Path.trans (C.comparisonPath n x) (C.deRhamWittMap p n)
 
 /-- Naturality path between transported comparison maps. -/
-def comparisonNaturalityAlong {x y : X} (p : Path x y) (n : Nat) :
+noncomputable def comparisonNaturalityAlong {x y : X} (p : Path x y) (n : Nat) :
     Path
       (C.comparisonAlong p n)
       (Path.trans (C.crystallineMap p n) (C.comparisonPath n y)) :=
   C.comparisonNaturality p n
 
 /-- Frobenius transport of the crystalline comparison path. -/
-def frobeniusComparison (n : Nat) (x : X) :
+noncomputable def frobeniusComparison (n : Nat) (x : X) :
     Path
       (W.frobenius 0 (C.crystallineClass n x))
       (W.frobenius 0 (C.deRhamWittClass n x)) :=
   Path.congrArg (W.frobenius 0) (C.comparisonPath n x)
 
 /-- Step witness: right-unit normalization for comparison paths. -/
-def comparison_step (n : Nat) (x : X) :
+noncomputable def comparison_step (n : Nat) (x : X) :
     Path.Step
       (Path.trans (C.comparisonPath n x) (Path.refl (C.deRhamWittClass n x)))
       (C.comparisonPath n x) :=
@@ -82,7 +82,7 @@ noncomputable def comparison_rweq (n : Nat) (x : X) :
   rweq_of_step (C.comparison_step n x)
 
 /-- Step witness: right-unit normalization for transported comparisons. -/
-def comparisonAlong_step {x y : X} (p : Path x y) (n : Nat) :
+noncomputable def comparisonAlong_step {x y : X} (p : Path x y) (n : Nat) :
     Path.Step
       (Path.trans (C.comparisonAlong p n) (Path.refl (C.deRhamWittClass n y)))
       (C.comparisonAlong p n) :=
@@ -101,7 +101,7 @@ noncomputable def comparisonAlong_cancel_rweq {x y : X} (p : Path x y) (n : Nat)
   rweq_cmpA_inv_left (C.comparisonAlong p n)
 
 /-- Step witness: right-unit normalization for naturality paths. -/
-def comparisonNaturality_step {x y : X} (p : Path x y) (n : Nat) :
+noncomputable def comparisonNaturality_step {x y : X} (p : Path x y) (n : Nat) :
     Path.Step
       (Path.trans (C.comparisonNaturalityAlong p n)
         (Path.refl (Path.trans (C.crystallineMap p n) (C.comparisonPath n y))))
@@ -116,7 +116,7 @@ noncomputable def comparisonNaturality_rweq {x y : X} (p : Path x y) (n : Nat) :
   rweq_of_step (C.comparisonNaturality_step p n)
 
 /-- Step witness: right-unit normalization for Frobenius compatibility transport. -/
-def frobeniusComparison_step (n : Nat) (x : X) :
+noncomputable def frobeniusComparison_step (n : Nat) (x : X) :
     Path.Step
       (Path.trans (C.frobeniusComparison n x)
         (Path.refl (W.frobenius 0 (C.deRhamWittClass n x))))
@@ -133,7 +133,7 @@ noncomputable def frobeniusComparison_rweq (n : Nat) (x : X) :
 end CrystallineComparisonPathData
 
 /-- Trivial crystalline comparison package over the trivial de Rham-Witt model. -/
-def trivialCrystallineComparisonPathData (Ring : Type u) :
+noncomputable def trivialCrystallineComparisonPathData (Ring : Type u) :
     CrystallineComparisonPathData
       (W := DeRhamWittPaths.trivialDeRhamWittPathData Ring) PUnit where
   crystallineClass := fun _ _ => PUnit.unit

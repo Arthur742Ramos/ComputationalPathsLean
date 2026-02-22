@@ -35,42 +35,42 @@ noncomputable section
 /-! ## §1  Loop Space Ω(A, a) -/
 
 /-- The based loop space: paths from `a` to itself. -/
-def LoopSpace (A : Type u) (a : A) : Type u := Path a a
+noncomputable def LoopSpace (A : Type u) (a : A) : Type u := Path a a
 
 /-- Loop multiplication is path composition. -/
-def loopMul {A : Type u} {a : A} (p q : LoopSpace A a) : LoopSpace A a :=
+noncomputable def loopMul {A : Type u} {a : A} (p q : LoopSpace A a) : LoopSpace A a :=
   Path.trans p q
 
 /-- Loop identity is the reflexivity path. -/
-def loopOne {A : Type u} (a : A) : LoopSpace A a :=
+noncomputable def loopOne {A : Type u} (a : A) : LoopSpace A a :=
   Path.refl a
 
 /-- Loop inverse is path symmetry. -/
-def loopInv {A : Type u} {a : A} (p : LoopSpace A a) : LoopSpace A a :=
+noncomputable def loopInv {A : Type u} {a : A} (p : LoopSpace A a) : LoopSpace A a :=
   Path.symm p
 
 /-- **Associativity**: `(p · q) · r ≈ p · (q · r)` via the `trans_assoc` Step. -/
-def loopMul_assoc {A : Type u} {a : A} (p q r : LoopSpace A a) :
+noncomputable def loopMul_assoc {A : Type u} {a : A} (p q r : LoopSpace A a) :
     RwEq (loopMul (loopMul p q) r) (loopMul p (loopMul q r)) :=
   rweq_of_step (Step.trans_assoc p q r)
 
 /-- **Left identity**: `refl · p ≈ p` via the `trans_refl_left` Step. -/
-def loopOne_mul {A : Type u} {a : A} (p : LoopSpace A a) :
+noncomputable def loopOne_mul {A : Type u} {a : A} (p : LoopSpace A a) :
     RwEq (loopMul (loopOne a) p) p :=
   rweq_of_step (Step.trans_refl_left p)
 
 /-- **Right identity**: `p · refl ≈ p` via the `trans_refl_right` Step. -/
-def loopMul_one {A : Type u} {a : A} (p : LoopSpace A a) :
+noncomputable def loopMul_one {A : Type u} {a : A} (p : LoopSpace A a) :
     RwEq (loopMul p (loopOne a)) p :=
   rweq_of_step (Step.trans_refl_right p)
 
 /-- **Left inverse**: `p⁻¹ · p ≈ refl` via the `symm_trans` Step. -/
-def loopInv_mul {A : Type u} {a : A} (p : LoopSpace A a) :
+noncomputable def loopInv_mul {A : Type u} {a : A} (p : LoopSpace A a) :
     RwEq (loopMul (loopInv p) p) (loopOne a) :=
   rweq_of_step (Step.symm_trans p)
 
 /-- **Right inverse**: `p · p⁻¹ ≈ refl` via the `trans_symm` Step. -/
-def loopMul_inv {A : Type u} {a : A} (p : LoopSpace A a) :
+noncomputable def loopMul_inv {A : Type u} {a : A} (p : LoopSpace A a) :
     RwEq (loopMul p (loopInv p)) (loopOne a) :=
   rweq_of_step (Step.trans_symm p)
 
@@ -87,7 +87,7 @@ structure LoopGroupWitness (A : Type u) (a : A) where
   mul_inv   : ∀ p : Path a a, RwEq (mul p (inv p)) one
 
 /-- Canonical loop-group witness for `Ω(A, a)`. -/
-def loopGroup (A : Type u) (a : A) : LoopGroupWitness A a where
+noncomputable def loopGroup (A : Type u) (a : A) : LoopGroupWitness A a where
   mul       := loopMul
   one       := loopOne a
   inv       := loopInv
@@ -101,15 +101,15 @@ def loopGroup (A : Type u) (a : A) : LoopGroupWitness A a where
 
 /-- The double loop space: loops on `Path.refl a` in the loop space.
     Elements are `RwEq` witnesses from `refl` to `refl` in `Ω(A, a)`. -/
-def LoopSpace₂ (A : Type u) (a : A) : Type u :=
+noncomputable def LoopSpace₂ (A : Type u) (a : A) : Type u :=
   RwEq (Path.refl a : Path a a) (Path.refl a)
 
 /-- Vertical composition of 2-loops: plain `RwEq` transitivity. -/
-def vcomp {A : Type u} {a : A} (α β : LoopSpace₂ A a) : LoopSpace₂ A a :=
+noncomputable def vcomp {A : Type u} {a : A} (α β : LoopSpace₂ A a) : LoopSpace₂ A a :=
   rweq_trans α β
 
 /-- Horizontal composition of 2-loops via `rweq_trans_congr`. -/
-def hcomp {A : Type u} {a : A} (α β : LoopSpace₂ A a) : LoopSpace₂ A a :=
+noncomputable def hcomp {A : Type u} {a : A} (α β : LoopSpace₂ A a) : LoopSpace₂ A a :=
   rweq_trans_congr α β
 
 -- Interchange step: `hcomp α β ≈ vcomp α β`.
@@ -135,7 +135,7 @@ def hcomp {A : Type u} {a : A} (α β : LoopSpace₂ A a) : LoopSpace₂ A a :=
     - and the horizontal composition is symmetric since the two
       whiskering factors commute for `refl`-endpoints.
 -/
-def eckmannHilton {A : Type u} {a : A} (α β : LoopSpace₂ A a) :
+noncomputable def eckmannHilton {A : Type u} {a : A} (α β : LoopSpace₂ A a) :
     RwEq (Path.refl a) (Path.refl a) :=
   -- We witness that vcomp α β gives the same result as vcomp β α
   -- by going through hcomp. The key: at refl-endpoints,
@@ -169,12 +169,12 @@ theorem omega2_abelian_prop {A : Type u} {a : A}
 
 /-- We represent Ωⁿ concretely. For n ≥ 1, elements of Ωⁿ(A,a) are
     chains of RwEq at progressively higher levels. -/
-def OmegaN (A : Type u) (a : A) : Nat → Type u
+noncomputable def OmegaN (A : Type u) (a : A) : Nat → Type u
   | 0     => LoopSpace A a
   | _n + 1 => RwEq (loopOne a) (loopOne a)
 
 /-- Identity element of Ωⁿ. -/
-def omegaN_refl {A : Type u} (a : A) : (n : Nat) → OmegaN A a n
+noncomputable def omegaN_refl {A : Type u} (a : A) : (n : Nat) → OmegaN A a n
   | 0     => loopOne a
   | _ + 1 => rweq_refl (loopOne a)
 
@@ -193,13 +193,13 @@ structure Delooping (A : Type u) (a : A) where
 
 /-- Conjugation by `γ : Path a b` sends a loop at `a` to a loop at `b`:
     `ℓ ↦ γ⁻¹ · ℓ · γ`. -/
-def conjugate {A : Type u} {a b : A} (γ : Path a b) (ℓ : LoopSpace A a) :
+noncomputable def conjugate {A : Type u} {a b : A} (γ : Path a b) (ℓ : LoopSpace A a) :
     LoopSpace A b :=
   Path.trans (Path.symm γ) (Path.trans ℓ γ)
 
 /-- Conjugation preserves `RwEq` — naturality witness. If `ℓ₁ ≈ ℓ₂`
     then `conjugate γ ℓ₁ ≈ conjugate γ ℓ₂`. -/
-def conjugate_rweq_natural {A : Type u} {a b : A} (γ : Path a b)
+noncomputable def conjugate_rweq_natural {A : Type u} {a b : A} (γ : Path a b)
     {ℓ₁ ℓ₂ : LoopSpace A a} (h : RwEq ℓ₁ ℓ₂) :
     RwEq (conjugate γ ℓ₁) (conjugate γ ℓ₂) :=
   -- conjugate γ ℓ = trans (symm γ) (trans ℓ γ)
@@ -219,7 +219,7 @@ def conjugate_rweq_natural {A : Type u} {a b : A} (γ : Path a b)
       ≈ γ⁻¹·((ℓ₁·ℓ₂)·γ)            [assoc⁻¹]
       = LHS
     Then take RwEq.symm. -/
-def conjugate_mul {A : Type u} {a b : A} (γ : Path a b)
+noncomputable def conjugate_mul {A : Type u} {a b : A} (γ : Path a b)
     (ℓ₁ ℓ₂ : LoopSpace A a) :
     RwEq (conjugate γ (loopMul ℓ₁ ℓ₂))
          (loopMul (conjugate γ ℓ₁) (conjugate γ ℓ₂)) :=
@@ -242,7 +242,7 @@ def conjugate_mul {A : Type u} {a b : A} (γ : Path a b)
 
 /-- Conjugation sends the identity to the identity:
     `conjugate γ refl ≈ refl`. -/
-def conjugate_one {A : Type u} {a b : A} (γ : Path a b) :
+noncomputable def conjugate_one {A : Type u} {a b : A} (γ : Path a b) :
     RwEq (conjugate γ (loopOne a)) (loopOne b) :=
   -- conjugate γ refl = trans (symm γ) (trans refl γ)
   -- Step 1: trans refl γ ≈ γ  (trans_refl_left)
@@ -253,7 +253,7 @@ def conjugate_one {A : Type u} {a b : A} (γ : Path a b) :
 
 /-- Conjugation sends inverses to inverses:
     `conjugate γ (ℓ⁻¹) ≈ (conjugate γ ℓ)⁻¹`. -/
-def conjugate_inv {A : Type u} {a b : A} (γ : Path a b) (ℓ : LoopSpace A a) :
+noncomputable def conjugate_inv {A : Type u} {a b : A} (γ : Path a b) (ℓ : LoopSpace A a) :
     RwEq (conjugate γ (loopInv ℓ)) (loopInv (conjugate γ ℓ)) :=
   -- LHS = trans (symm γ) (trans (symm ℓ) γ)
   -- mid = trans (trans (symm γ) (symm ℓ)) γ  (by reverse assoc)
@@ -283,7 +283,7 @@ structure LoopIso (A : Type u) (a b : A) where
   fwd_mul : ∀ ℓ₁ ℓ₂, RwEq (fwd (loopMul ℓ₁ ℓ₂)) (loopMul (fwd ℓ₁) (fwd ℓ₂))
 
 /-- A path `γ : a → b` induces a group isomorphism `Ω(A,a) ≅ Ω(A,b)`. -/
-def conjugateIso {A : Type u} {a b : A} (γ : Path a b) : LoopIso A a b where
+noncomputable def conjugateIso {A : Type u} {a b : A} (γ : Path a b) : LoopIso A a b where
   fwd := conjugate γ
   bwd := conjugate (Path.symm γ)
   fwd_bwd := fun ℓ =>
@@ -339,24 +339,24 @@ inductive JamesWord (A : Type u) (a : A) : Type u
   | cons : LoopSpace A a → JamesWord A a → JamesWord A a
 
 /-- Monoid multiplication on James words: list concatenation. -/
-def JamesWord.append {A : Type u} {a : A} :
+noncomputable def JamesWord.append {A : Type u} {a : A} :
     JamesWord A a → JamesWord A a → JamesWord A a
   | .nil, w       => w
   | .cons l w, w' => .cons l (JamesWord.append w w')
 
 /-- The canonical map from James words to loops: concatenate all loops. -/
-def jamesEval {A : Type u} {a : A} : JamesWord A a → LoopSpace A a
+noncomputable def jamesEval {A : Type u} {a : A} : JamesWord A a → LoopSpace A a
   | .nil        => loopOne a
   | .cons l w   => loopMul l (jamesEval w)
 
 /-- James evaluation sends the empty word to `refl`. -/
-def jamesEval_nil {A : Type u} {a : A} :
+noncomputable def jamesEval_nil {A : Type u} {a : A} :
     jamesEval (.nil : JamesWord A a) = loopOne a :=
   rfl
 
 /-- James evaluation is a monoid homomorphism (modulo `RwEq`):
     `eval(w₁ ++ w₂) ≈ eval(w₁) · eval(w₂)`. -/
-def jamesEval_append {A : Type u} {a : A} :
+noncomputable def jamesEval_append {A : Type u} {a : A} :
     (w₁ w₂ : JamesWord A a) →
     RwEq (jamesEval (JamesWord.append w₁ w₂)) (loopMul (jamesEval w₁) (jamesEval w₂))
   | .nil, w₂ =>
@@ -374,7 +374,7 @@ def jamesEval_append {A : Type u} {a : A} :
 
 /-- The James relation: inserting the basepoint `refl` is trivial.
     `cons refl w ≈ w` as witnessed by `RwEq`. -/
-def jamesRelation {A : Type u} {a : A} (w : JamesWord A a) :
+noncomputable def jamesRelation {A : Type u} {a : A} (w : JamesWord A a) :
     RwEq (jamesEval (.cons (loopOne a) w)) (jamesEval w) :=
   -- eval(cons refl w) = loopMul refl (eval w) ≈ eval w
   loopOne_mul (jamesEval w)

@@ -46,19 +46,19 @@ all points in A that map to b.
 -/
 
 /-- The fiber of a map f at a point b. -/
-def Fiber (f : A → B) (b : B) : Type u :=
+noncomputable def Fiber (f : A → B) (b : B) : Type u :=
   { a : A // f a = b }
 
 /-- Project from fiber to total space. -/
-def Fiber.point {f : A → B} {b : B} (x : Fiber f b) : A :=
+noncomputable def Fiber.point {f : A → B} {b : B} (x : Fiber f b) : A :=
   x.val
 
 /-- The proof that a fiber element maps to the base point. -/
-def Fiber.prop {f : A → B} {b : B} (x : Fiber f b) : Path (f x.point) b :=
+noncomputable def Fiber.prop {f : A → B} {b : B} (x : Fiber f b) : Path (f x.point) b :=
   Path.stepChain x.property
 
 /-- Construct a fiber element. -/
-def Fiber.mk {f : A → B} {b : B} (a : A) (h : Path (f a) b) : Fiber f b :=
+noncomputable def Fiber.mk {f : A → B} {b : B} (a : A) (h : Path (f a) b) : Fiber f b :=
   ⟨a, h.toEq⟩
 
 /-! ## Type Families as Fibrations
@@ -71,10 +71,10 @@ The total space is Σ(b:B). P(b), and the projection is fst.
 abbrev Total (P : B → Type u) : Type u := Σ (b : B), P b
 
 /-- The projection from total space to base. -/
-def Total.proj {P : B → Type u} : Total P → B := Sigma.fst
+noncomputable def Total.proj {P : B → Type u} : Total P → B := Sigma.fst
 
 /-- The fiber of Total.proj over b is equivalent to P(b). -/
-def fiberEquivFamily {P : B → Type u} (b : B) :
+noncomputable def fiberEquivFamily {P : B → Type u} (b : B) :
     SimpleEquiv (Fiber (@Total.proj B P) b) (P b) where
   toFun := fun ⟨⟨_, p⟩, h⟩ => Path.transport (Path.stepChain h) p
   invFun := fun p => Fiber.mk (f := @Total.proj B P) (b := b) ⟨b, p⟩ (Path.refl b)
@@ -110,11 +110,11 @@ namespace FiberSeq
 variable {F E B : Type u}
 
 /-- The inclusion of the fiber into the total space. -/
-def incl (seq : FiberSeq F E B) : F → E :=
+noncomputable def incl (seq : FiberSeq F E B) : F → E :=
   fun f => (seq.toFiber f).point
 
 /-- The fiber inclusion composed with projection is constant. -/
-def proj_incl (seq : FiberSeq F E B) (f : F) :
+noncomputable def proj_incl (seq : FiberSeq F E B) (f : F) :
     Path (seq.proj (seq.incl f)) seq.baseB :=
   (seq.toFiber f).prop
 
@@ -191,7 +191,7 @@ structure IsExactAt (seq : FiberSeq F E B) where
   base_from_fiber : ∀ e, Path (seq.proj e) seq.baseB → Σ f, Path (seq.incl f) e
 
 /-- The canonical fiber sequence for a type family. -/
-def canonicalFiberSeq {P : B → Type u} (b : B) (x₀ : P b) :
+noncomputable def canonicalFiberSeq {P : B → Type u} (b : B) (x₀ : P b) :
     FiberSeq (P b) (Total P) B where
   proj := @Total.proj B P
   baseB := b
@@ -207,7 +207,7 @@ def canonicalFiberSeq {P : B → Type u} (b : B) (x₀ : P b) :
     | ⟨⟨_, p⟩, h⟩ => by subst h; rfl
 
 /-- The canonical fiber sequence is exact. -/
-def canonicalFiberSeq_exact {P : B → Type u} (b : B) (x₀ : P b) :
+noncomputable def canonicalFiberSeq_exact {P : B → Type u} (b : B) (x₀ : P b) :
     IsExactAt (canonicalFiberSeq b x₀) where
   incl_to_base := fun f => (canonicalFiberSeq b x₀).proj_incl f
   base_from_fiber := fun ⟨b', p⟩ h => by
@@ -220,7 +220,7 @@ A map f : A → B induces maps f_* : π_n(A, a) → π_n(B, f(a)).
 -/
 
 /-- Induced map on loop spaces. -/
-def inducedLoopMap (f : A → B) (a : A) : LoopSpace A a → LoopSpace B (f a) :=
+noncomputable def inducedLoopMap (f : A → B) (a : A) : LoopSpace A a → LoopSpace B (f a) :=
   Path.congrArg f
 
 /-- Induced map respects RwEq (via context map preservation). -/
@@ -274,11 +274,11 @@ For computational paths, we establish these at the π₁ level.
 -/
 
 /-- Image of a map on π₁ (as a predicate). -/
-def imageOnPi1 (f : A → B) (a : A) : π₁(B, f a) → Prop :=
+noncomputable def imageOnPi1 (f : A → B) (a : A) : π₁(B, f a) → Prop :=
   fun β => ∃ α, inducedPi1Map f a α = β
 
 /-- Kernel of a map on π₁ (elements mapping to identity). -/
-def kernelOnPi1 (f : A → B) (a : A) : π₁(A, a) → Prop :=
+noncomputable def kernelOnPi1 (f : A → B) (a : A) : π₁(A, a) → Prop :=
   fun α => inducedPi1Map f a α = Quot.mk _ (Path.refl (f a))
 
 /-! ## Long Exact Sequence of Homotopy Groups

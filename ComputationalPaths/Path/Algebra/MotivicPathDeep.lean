@@ -39,13 +39,13 @@ structure SmScheme where
   dim : Nat
 
 /-- The affine line A1 as a smooth scheme. -/
-def A1 : SmScheme := ⟨Unit, 1⟩
+noncomputable def A1 : SmScheme := ⟨Unit, 1⟩
 
 /-- The projective line P1 as a smooth scheme. -/
-def P1 : SmScheme := ⟨Bool, 1⟩
+noncomputable def P1 : SmScheme := ⟨Bool, 1⟩
 
 /-- Gm (multiplicative group scheme) as a smooth scheme. -/
-def Gm : SmScheme := ⟨Unit, 1⟩
+noncomputable def Gm : SmScheme := ⟨Unit, 1⟩
 
 /-- A presheaf on smooth schemes: assigns a type to each scheme. -/
 structure Presheaf where
@@ -57,11 +57,11 @@ structure PresheafMor (F G : Presheaf) where
   components : (X : SmScheme) → F.sections X → G.sections X
 
 /-- Identity presheaf morphism. -/
-def PresheafMor.id (F : Presheaf) : PresheafMor F F :=
+noncomputable def PresheafMor.id (F : Presheaf) : PresheafMor F F :=
   ⟨fun _ x => x⟩
 
 /-- Composition of presheaf morphisms. -/
-def PresheafMor.comp {F G H : Presheaf} (g : PresheafMor G H) (f : PresheafMor F G) :
+noncomputable def PresheafMor.comp {F G H : Presheaf} (g : PresheafMor G H) (f : PresheafMor F G) :
     PresheafMor F H :=
   ⟨fun X x => g.components X (f.components X x)⟩
 
@@ -75,17 +75,17 @@ structure A1Homotopy (F : Presheaf) (X : SmScheme) (s t : F.sections X) where
   witness : Path s t
 
 /-- A1-homotopy is reflexive. -/
-def A1Homotopy.refl (F : Presheaf) (X : SmScheme) (s : F.sections X) :
+noncomputable def A1Homotopy.refl (F : Presheaf) (X : SmScheme) (s : F.sections X) :
     A1Homotopy F X s s :=
   ⟨Path.refl s⟩
 
 /-- A1-homotopy is symmetric via Path.symm. -/
-def A1Homotopy.symm {F : Presheaf} {X : SmScheme} {s t : F.sections X}
+noncomputable def A1Homotopy.symm {F : Presheaf} {X : SmScheme} {s t : F.sections X}
     (h : A1Homotopy F X s t) : A1Homotopy F X t s :=
   ⟨Path.symm h.witness⟩
 
 /-- A1-homotopy is transitive via Path.trans. -/
-def A1Homotopy.trans {F : Presheaf} {X : SmScheme} {s t u : F.sections X}
+noncomputable def A1Homotopy.trans {F : Presheaf} {X : SmScheme} {s t u : F.sections X}
     (h1 : A1Homotopy F X s t) (h2 : A1Homotopy F X t u) : A1Homotopy F X s u :=
   ⟨Path.trans h1.witness h2.witness⟩
 
@@ -99,19 +99,19 @@ structure A1LocalEquiv (F G : Presheaf) where
     Path (fwd.components X (bwd.components X t)) t
 
 -- Theorem 1: A1-local equivalence is reflexive
-def a1_local_equiv_refl (F : Presheaf) :
+noncomputable def a1_local_equiv_refl (F : Presheaf) :
     A1LocalEquiv F F :=
   ⟨PresheafMor.id F, PresheafMor.id F,
    fun _ s => Path.refl s,
    fun _ t => Path.refl t⟩
 
 -- Theorem 2: A1-local equivalence is symmetric
-def a1_local_equiv_symm {F G : Presheaf} (e : A1LocalEquiv F G) :
+noncomputable def a1_local_equiv_symm {F G : Presheaf} (e : A1LocalEquiv F G) :
     A1LocalEquiv G F :=
   ⟨e.bwd, e.fwd, e.homotopyBwd, e.homotopyFwd⟩
 
 -- Theorem 3: A1-homotopy transitivity is associative
-def a1_homotopy_trans_assoc {F : Presheaf} {X : SmScheme}
+noncomputable def a1_homotopy_trans_assoc {F : Presheaf} {X : SmScheme}
     {a b c d : F.sections X}
     (h1 : A1Homotopy F X a b) (h2 : A1Homotopy F X b c)
     (h3 : A1Homotopy F X c d) :
@@ -120,7 +120,7 @@ def a1_homotopy_trans_assoc {F : Presheaf} {X : SmScheme}
   trans_assoc h1.witness h2.witness h3.witness
 
 -- Theorem 4: A1-homotopy symm is involutive
-def a1_homotopy_symm_symm {F : Presheaf} {X : SmScheme}
+noncomputable def a1_homotopy_symm_symm {F : Presheaf} {X : SmScheme}
     {s t : F.sections X} (h : A1Homotopy F X s t) :
     (A1Homotopy.symm (A1Homotopy.symm h)).witness = h.witness :=
   symm_symm h.witness
@@ -150,7 +150,7 @@ structure NisnevichSheaf extends Presheaf where
     (s t : toPresheaf.sections sq.base) → Path s t → Path (glue sq d) s
 
 -- Theorem 5: Sheaf gluing respects identity descent
-def sheaf_glue_refl_descent {S : NisnevichSheaf} {sq : NisnevichSquare}
+noncomputable def sheaf_glue_refl_descent {S : NisnevichSheaf} {sq : NisnevichSquare}
     (d : NisnevichDescent S.toPresheaf sq) (s : S.toPresheaf.sections sq.base) :
     Path (S.unique sq d s s (Path.refl s))
          (S.unique sq d s s (Path.refl s)) :=
@@ -162,7 +162,7 @@ structure Sheafification (F : Presheaf) where
   unit : PresheafMor F sheaf.toPresheaf
 
 -- Theorem 6: Sheafification unit is natural (path-level)
-def sheafification_naturality {F : Presheaf}
+noncomputable def sheafification_naturality {F : Presheaf}
     (Sh : Sheafification F) (X : SmScheme) (s : F.sections X) :
     Path (Sh.unit.components X s) (Sh.unit.components X s) :=
   Path.refl _
@@ -188,12 +188,12 @@ structure PointedMotivicMor (E F : PointedMotivicSpace) where
     Path (map.components X (E.basepoint X)) (F.basepoint X)
 
 -- Theorem 7: Identity morphism of pointed motivic spaces
-def pointed_motivic_id (E : PointedMotivicSpace) :
+noncomputable def pointed_motivic_id (E : PointedMotivicSpace) :
     PointedMotivicMor E E :=
   ⟨PresheafMor.id E.sheaf.toPresheaf, fun _X => Path.refl _⟩
 
 -- Theorem 8: Composition of pointed motivic morphisms preserves basepoint
-def pointed_motivic_comp_preserves_pt
+noncomputable def pointed_motivic_comp_preserves_pt
     {E F G : PointedMotivicSpace}
     (g : PointedMotivicMor F G) (f : PointedMotivicMor E F) :
     (X : SmScheme) →
@@ -237,20 +237,20 @@ structure A1Suspension (E : PointedMotivicSpace) where
     Path (north X) (south X)
 
 -- Theorem 9: Suspension basepoint meridian
-def susp_basepoint_merid (E : PointedMotivicSpace)
+noncomputable def susp_basepoint_merid (E : PointedMotivicSpace)
     (sig : A1Suspension E) (X : SmScheme) :
     Path (sig.north X) (sig.south X) :=
   sig.merid X (E.basepoint X)
 
 -- Theorem 10: Double suspension meridian composition
-def double_susp_merid {E : PointedMotivicSpace}
+noncomputable def double_susp_merid {E : PointedMotivicSpace}
     (sig1 _sig2 : A1Suspension E) (X : SmScheme)
     (s : E.sheaf.toPresheaf.sections X) :
     Path (sig1.north X) (sig1.south X) :=
   Path.trans (sig1.merid X s) (Path.refl _)
 
 -- Theorem 11: Meridian is functorial under path composition
-def merid_trans {E : PointedMotivicSpace}
+noncomputable def merid_trans {E : PointedMotivicSpace}
     (sig : A1Suspension E) (X : SmScheme)
     (s : E.sheaf.toPresheaf.sections X) :
     Path (Path.trans (sig.merid X s) (Path.symm (sig.merid X s)))
@@ -276,11 +276,11 @@ structure CohomOp (H K : MotivicCohomology) where
     (x : H.groups F) → Path (op E (H.induced f x)) (K.induced f (op F x))
 
 -- Theorem 12: Identity cohomology operation
-def cohom_op_id (H : MotivicCohomology) : CohomOp H H :=
+noncomputable def cohom_op_id (H : MotivicCohomology) : CohomOp H H :=
   ⟨fun _ x => x, fun _ _ => Path.refl _⟩
 
 -- Theorem 13: Composition of cohomology operations
-def cohom_op_comp {H K L : MotivicCohomology}
+noncomputable def cohom_op_comp {H K L : MotivicCohomology}
     (g : CohomOp K L) (f : CohomOp H K) : CohomOp H L :=
   ⟨fun E x => g.op E (f.op E x),
    fun {E F} phi x =>
@@ -293,7 +293,7 @@ structure SteenrodMotivicOp where
   op : (H : MotivicCohomology) → CohomOp H H
 
 -- Theorem 14: Steenrod operation respects path composition
-def steenrod_path_compat (sq : SteenrodMotivicOp)
+noncomputable def steenrod_path_compat (sq : SteenrodMotivicOp)
     (H : MotivicCohomology) (E : PointedMotivicSpace)
     (x : H.groups E) :
     Path ((sq.op H).op E x) ((sq.op H).op E x) :=
@@ -305,7 +305,7 @@ structure PowerOp (H : MotivicCohomology) where
   op : (E : PointedMotivicSpace) → H.groups E → H.groups E
 
 -- Theorem 15: Power operation applied twice
-def power_op_twice {H : MotivicCohomology} (P : PowerOp H)
+noncomputable def power_op_twice {H : MotivicCohomology} (P : PowerOp H)
     (E : PointedMotivicSpace) (x : H.groups E) :
     Path (P.op E (P.op E x)) (P.op E (P.op E x)) :=
   Path.refl _
@@ -327,12 +327,12 @@ structure SpectrumMor (E F : MotivicSpectrum) where
          ((maps (n + 1)).map.components X ((E.bond n).components X s))
 
 -- Theorem 16: Identity spectrum morphism
-def spectrum_mor_id (E : MotivicSpectrum) : SpectrumMor E E :=
+noncomputable def spectrum_mor_id (E : MotivicSpectrum) : SpectrumMor E E :=
   ⟨fun n => pointed_motivic_id (E.level n),
    fun _ _ _ => Path.refl _⟩
 
 -- Theorem 17: Spectrum morphism composition compatibility
-def spectrum_mor_comp_compat
+noncomputable def spectrum_mor_comp_compat
     {E F G : MotivicSpectrum}
     (g : SpectrumMor F G) (f : SpectrumMor E F)
     (n : Nat) (X : SmScheme) (s : (E.level n).sheaf.toPresheaf.sections X) :
@@ -358,7 +358,7 @@ structure MotivicKTheory extends MotivicSpectrum where
     kpresheaf.kgroups X n → (level n).sheaf.toPresheaf.sections X
 
 -- Theorem 18: K-theory representation is natural
-def ktheory_rep_natural (KT : MotivicKTheory) (n : Nat) (X : SmScheme)
+noncomputable def ktheory_rep_natural (KT : MotivicKTheory) (n : Nat) (X : SmScheme)
     (x : KT.kpresheaf.kgroups X n) :
     Path (KT.represents n X x) (KT.represents n X x) :=
   Path.refl _
@@ -371,13 +371,13 @@ structure BottElement (KT : MotivicKTheory) where
     Path (KT.kpresheaf.induced (Y := X) n x) (KT.kpresheaf.induced (Y := X) n x)
 
 -- Theorem 19: Bott periodicity path is reflexive
-def bott_periodicity_refl (KT : MotivicKTheory) (b : BottElement KT)
+noncomputable def bott_periodicity_refl (KT : MotivicKTheory) (b : BottElement KT)
     (X : SmScheme) (n : Nat) (x : KT.kpresheaf.kgroups X n) :
     Path (b.periodicity X n x) (b.periodicity X n x) :=
   Path.refl _
 
 -- Theorem 20: K-theory spectrum bond compatibility with Bott
-def ktheory_bond_bott (KT : MotivicKTheory) (_b : BottElement KT)
+noncomputable def ktheory_bond_bott (KT : MotivicKTheory) (_b : BottElement KT)
     (n : Nat) (X : SmScheme) (x : KT.kpresheaf.kgroups X n) :
     Path (KT.represents n X x) (KT.represents n X x) :=
   Path.refl _
@@ -406,7 +406,7 @@ structure MotivicThomSpectrum extends MotivicSpectrum where
     (thomSpaces n).space.sheaf.toPresheaf.sections X
 
 -- Theorem 21: Thom isomorphism preserves identity
-def thom_iso_preserves_id (MTS : MotivicThomSpectrum)
+noncomputable def thom_iso_preserves_id (MTS : MotivicThomSpectrum)
     (n : Nat) (X : SmScheme)
     (s : (MTS.level n).sheaf.toPresheaf.sections X) :
     Path (MTS.thomIso n X s) (MTS.thomIso n X s) :=
@@ -418,13 +418,13 @@ structure ThomClass (V : VectorBundle) (H : MotivicCohomology) where
   classElement : H.groups thomSpace.space
 
 -- Theorem 22: Thom class naturality under path
-def thom_class_natural {V : VectorBundle} {H : MotivicCohomology}
+noncomputable def thom_class_natural {V : VectorBundle} {H : MotivicCohomology}
     (tc : ThomClass V H) :
     Path tc.classElement tc.classElement :=
   Path.refl _
 
 -- Theorem 23: Thom spectrum bond respects Thom iso
-def thom_spectrum_bond_iso (MTS : MotivicThomSpectrum)
+noncomputable def thom_spectrum_bond_iso (MTS : MotivicThomSpectrum)
     (n : Nat) (X : SmScheme)
     (s : (MTS.level n).sheaf.toPresheaf.sections X) :
     Path (MTS.thomIso n X s)
@@ -453,7 +453,7 @@ structure SliceOfSpectrum (E : MotivicSpectrum) (q : Int) where
   section_ : SpectrumMor slice E
 
 -- Theorem 24: Slice projection-section gives path
-def slice_proj_section {E : MotivicSpectrum} {q : Int}
+noncomputable def slice_proj_section {E : MotivicSpectrum} {q : Int}
     (sl : SliceOfSpectrum E q) (n : Nat) (X : SmScheme)
     (s : (sl.slice.level n).sheaf.toPresheaf.sections X) :
     Path ((sl.projection.maps n).map.components X
@@ -463,13 +463,13 @@ def slice_proj_section {E : MotivicSpectrum} {q : Int}
   Path.refl _
 
 -- Theorem 25: Slice filtration is functorial
-def slice_filtration_functorial {E : MotivicSpectrum}
+noncomputable def slice_filtration_functorial {E : MotivicSpectrum}
     (SF : SliceFiltration E) (q : Int) :
     SpectrumMor (SF.slices q) (SF.slices q) :=
   SF.sliceMap q
 
 -- Theorem 26: Slice zero of HZ is HZ
-def slice_zero_hz (E : MotivicSpectrum)
+noncomputable def slice_zero_hz (E : MotivicSpectrum)
     (sl : SliceOfSpectrum E 0) (n : Nat) (X : SmScheme)
     (s : (E.level n).sheaf.toPresheaf.sections X) :
     Path ((sl.section_.maps n).map.components X
@@ -479,7 +479,7 @@ def slice_zero_hz (E : MotivicSpectrum)
   Path.refl _
 
 -- Theorem 27: Adjacent slices relation
-def adjacent_slices {E : MotivicSpectrum}
+noncomputable def adjacent_slices {E : MotivicSpectrum}
     (sl1 : SliceOfSpectrum E 0) (_sl2 : SliceOfSpectrum E 1)
     (n : Nat) (X : SmScheme)
     (s : (E.level n).sheaf.toPresheaf.sections X) :
@@ -504,32 +504,32 @@ structure MWSymbol (MW : MilnorWittKTheory) where
   element : MW.groups degree
 
 /-- Path between MW K-theory elements. -/
-def mwPath (MW : MilnorWittKTheory) (n : Int) (a b : MW.groups n) :=
+noncomputable def mwPath (MW : MilnorWittKTheory) (n : Int) (a b : MW.groups n) :=
   Path a b
 
 -- Theorem 28: MW product with unit is identity (path)
-def mw_product_unit {MW : MilnorWittKTheory}
+noncomputable def mw_product_unit {MW : MilnorWittKTheory}
     (x : MW.groups 0)
     (unitLaw : Path (MW.product MW.unit x) x) :
     Path (MW.product MW.unit x) x :=
   unitLaw
 
 -- Theorem 29: MW eta squared path
-def mw_eta_squared (MW : MilnorWittKTheory)
+noncomputable def mw_eta_squared (MW : MilnorWittKTheory)
     (etaSq : MW.groups (-1 + -1))
     (p : Path (MW.product MW.eta MW.eta) etaSq) :
     Path (MW.product MW.eta MW.eta) etaSq :=
   p
 
 -- Theorem 30: MW symbol product commutativity witness
-def mw_symbol_comm {MW : MilnorWittKTheory}
+noncomputable def mw_symbol_comm {MW : MilnorWittKTheory}
     {n : Int} (a b : MW.groups n)
     (commWit : Path (MW.product a b) (MW.product b a)) :
     Path (MW.product a b) (MW.product b a) :=
   commWit
 
 -- Theorem 31: Steinberg relation path in MW K-theory
-def steinberg_relation (MW : MilnorWittKTheory)
+noncomputable def steinberg_relation (MW : MilnorWittKTheory)
     (a : MW.groups 1)
     (steinberg : MW.groups 2)
     (rel : Path (MW.product a a) steinberg) :
@@ -547,7 +547,7 @@ structure StableMotivicHom (E F : MotivicSpectrum) where
   map : (n : Nat) → PointedMotivicMor (E.level n) (F.level n)
 
 -- Theorem 32: Stable motivic hom composition
-def stable_hom_comp {E F G : MotivicSpectrum}
+noncomputable def stable_hom_comp {E F G : MotivicSpectrum}
     (g : StableMotivicHom F G) (f : StableMotivicHom E F) :
     StableMotivicHom E G :=
   ⟨f.degree + g.degree, f.weight + g.weight,
@@ -557,11 +557,11 @@ def stable_hom_comp {E F G : MotivicSpectrum}
                ((g.map n).preservesPt X)⟩⟩
 
 -- Theorem 33: Identity in stable motivic homotopy
-def stable_hom_id (E : MotivicSpectrum) : StableMotivicHom E E :=
+noncomputable def stable_hom_id (E : MotivicSpectrum) : StableMotivicHom E E :=
   ⟨0, 0, fun n => pointed_motivic_id (E.level n)⟩
 
 -- Theorem 34: Stable hom preserves paths at each level
-def stable_hom_preserves_path {E F : MotivicSpectrum}
+noncomputable def stable_hom_preserves_path {E F : MotivicSpectrum}
     (h : StableMotivicHom E F) (n : Nat) (X : SmScheme)
     {s t : (E.level n).sheaf.toPresheaf.sections X}
     (p : Path s t) :
@@ -586,13 +586,13 @@ structure AdamsE2 (H : MotivicCohomology) where
   group : Type
 
 -- Theorem 35: Adams filtration inclusion is spectrum morphism
-def adams_filtration_inclusion {E : MotivicSpectrum}
+noncomputable def adams_filtration_inclusion {E : MotivicSpectrum}
     (AF : AdamsFiltration E) :
     SpectrumMor AF.subSpectrum E :=
   AF.inclusion
 
 -- Theorem 36: Adams d2 differential path witness
-def adams_d2_path (H : MotivicCohomology)
+noncomputable def adams_d2_path (H : MotivicCohomology)
     (e1 e2 : AdamsE2 H)
     (d2elem : e1.group)
     (_target : e2.group)
@@ -618,18 +618,18 @@ structure HZSpectrum extends MotivicSpectrum where
   levelIsEM : (n : Nat) → Path (level n) (emSpaces n).space
 
 -- Theorem 37: HZ spectrum levels are EM spaces
-def hz_level_em (HZ : HZSpectrum) (n : Nat) :
+noncomputable def hz_level_em (HZ : HZSpectrum) (n : Nat) :
     Path (HZ.level n) (HZ.emSpaces n).space :=
   HZ.levelIsEM n
 
 -- Theorem 38: EM space representation is functorial
-def em_rep_functorial (em : MotivicEM) (X : SmScheme)
+noncomputable def em_rep_functorial (em : MotivicEM) (X : SmScheme)
     (s : em.space.sheaf.toPresheaf.sections X) :
     Path (em.represents X s) (em.represents X s) :=
   Path.refl _
 
 -- Theorem 39: HZ bond compatibility with EM
-def hz_bond_em (HZ : HZSpectrum) (n : Nat) (X : SmScheme)
+noncomputable def hz_bond_em (HZ : HZSpectrum) (n : Nat) (X : SmScheme)
     (s : (HZ.level n).sheaf.toPresheaf.sections X) :
     Path ((HZ.bond n).components X s) ((HZ.bond n).components X s) :=
   Path.refl _
@@ -655,7 +655,7 @@ structure CofiberSeq where
   quot : SpectrumMor target cofiber
 
 -- Theorem 40: Fiber sequence composition gives trivial path
-def fiber_seq_comp_trivial (fs : FiberSeq)
+noncomputable def fiber_seq_comp_trivial (fs : FiberSeq)
     (n : Nat) (X : SmScheme)
     (s : (fs.fiber.level n).sheaf.toPresheaf.sections X) :
     Path ((fs.proj.maps n).map.components X
@@ -665,7 +665,7 @@ def fiber_seq_comp_trivial (fs : FiberSeq)
   Path.refl _
 
 -- Theorem 41: Cofiber sequence composition
-def cofiber_seq_comp (cs : CofiberSeq)
+noncomputable def cofiber_seq_comp (cs : CofiberSeq)
     (n : Nat) (X : SmScheme)
     (s : (cs.source.level n).sheaf.toPresheaf.sections X) :
     Path ((cs.quot.maps n).map.components X
@@ -675,7 +675,7 @@ def cofiber_seq_comp (cs : CofiberSeq)
   Path.refl _
 
 -- Theorem 42: Rotating fiber and cofiber
-def fiber_cofiber_rotation
+noncomputable def fiber_cofiber_rotation
     (fs : FiberSeq) (_cs : CofiberSeq) :
     Path fs.fiber.level fs.fiber.level :=
   Path.refl _
@@ -694,21 +694,21 @@ structure MotivicPiGroup (E : PointedMotivicSpace) where
   unit : elements
 
 -- Theorem 43: Motivic pi group unit law
-def motivic_pi_unit_left {E : PointedMotivicSpace}
+noncomputable def motivic_pi_unit_left {E : PointedMotivicSpace}
     (piG : MotivicPiGroup E) (x : piG.elements)
     (law : Path (piG.compose piG.unit x) x) :
     Path (piG.compose piG.unit x) x :=
   law
 
 -- Theorem 44: Motivic pi group inverse law
-def motivic_pi_inv_law {E : PointedMotivicSpace}
+noncomputable def motivic_pi_inv_law {E : PointedMotivicSpace}
     (piG : MotivicPiGroup E) (x : piG.elements)
     (law : Path (piG.compose x (piG.inv x)) piG.unit) :
     Path (piG.compose x (piG.inv x)) piG.unit :=
   law
 
 -- Theorem 45: Induced map on motivic pi groups
-def motivic_pi_induced {E F : PointedMotivicSpace}
+noncomputable def motivic_pi_induced {E F : PointedMotivicSpace}
     (_f : PointedMotivicMor E F)
     (piE : MotivicPiGroup E) (piF : MotivicPiGroup F)
     (induced : piE.elements → piF.elements)
@@ -737,13 +737,13 @@ structure FormalGroupLaw where
   assoc : (a b c : coeffRing) → Path (add (add a b) c) (add a (add b c))
 
 -- Theorem 46: FGL associativity via Path.trans
-def fgl_assoc_trans (F : FormalGroupLaw)
+noncomputable def fgl_assoc_trans (F : FormalGroupLaw)
     (a b c d : F.coeffRing) :
     Path (F.add (F.add (F.add a b) c) d) (F.add (F.add a (F.add b c)) d) :=
   Path.congrArg (fun x => F.add x d) (F.assoc a b c)
 
 -- Theorem 47: FGL unit law
-def fgl_unit (F : FormalGroupLaw)
+noncomputable def fgl_unit (F : FormalGroupLaw)
     (unitLaw : (x : F.coeffRing) → Path (F.add F.zero x) x)
     (x : F.coeffRing) :
     Path (F.add F.zero x) x :=
@@ -768,7 +768,7 @@ structure TransferMap (E : MotivicSpectrum) where
     (E.level n).sheaf.toPresheaf.sections target
 
 -- Theorem 48: Norm-transfer composition path
-def norm_transfer_comp (E : MotivicSpectrum)
+noncomputable def norm_transfer_comp (E : MotivicSpectrum)
     (nm : NormMap E) (tr : TransferMap E)
     (n : Nat) (s : (E.level n).sheaf.toPresheaf.sections nm.source)
     (_compat : nm.source = tr.source)
@@ -777,7 +777,7 @@ def norm_transfer_comp (E : MotivicSpectrum)
   Path.refl _
 
 -- Theorem 49: Transfer is functorial
-def transfer_functorial (E : MotivicSpectrum)
+noncomputable def transfer_functorial (E : MotivicSpectrum)
     (tr : TransferMap E) (n : Nat)
     (s : (E.level n).sheaf.toPresheaf.sections tr.source) :
     Path (tr.transfer n s) (tr.transfer n s) :=
@@ -795,14 +795,14 @@ structure MotivicSpectralSeq where
     Path (differentials r (differentials r x)) (differentials r (differentials r x))
 
 -- Theorem 50: Spectral sequence differential squared is path-trivial
-def ss_diff_squared (SS : MotivicSpectralSeq) (r : Nat)
+noncomputable def ss_diff_squared (SS : MotivicSpectralSeq) (r : Nat)
     (x : SS.pages r) :
     Path (SS.differentials r (SS.differentials r x))
          (SS.differentials r (SS.differentials r x)) :=
   SS.convergent r x
 
 -- Theorem 51: Path coherence for motivic compositions
-def motivic_path_coherence
+noncomputable def motivic_path_coherence
     {A : Type} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     (Path.trans (Path.trans p q) r) =
@@ -810,25 +810,25 @@ def motivic_path_coherence
   trans_assoc p q r
 
 -- Theorem 52: Motivic symm-trans cancellation
-def motivic_symm_trans_cancel
+noncomputable def motivic_symm_trans_cancel
     {A : Type} {a b : A} (p : Path a b) (q : Path b a) :
     (Path.trans p q).symm = (Path.symm q).trans (Path.symm p) :=
   symm_trans p q
 
 -- Theorem 53: Double symmetry in motivic context
-def motivic_double_symm {A : Type} {a b : A} (p : Path a b) :
+noncomputable def motivic_double_symm {A : Type} {a b : A} (p : Path a b) :
     Path.symm (Path.symm p) = p :=
   symm_symm p
 
 -- Theorem 54: CongrArg distributes over trans in motivic maps
-def motivic_congrArg_trans {A B : Type} (f : A → B)
+noncomputable def motivic_congrArg_trans {A B : Type} (f : A → B)
     {a b c : A} (p : Path a b) (q : Path b c) :
     Path.congrArg f (Path.trans p q) =
          Path.trans (Path.congrArg f p) (Path.congrArg f q) :=
   congrArg_trans f p q
 
 -- Theorem 55: CongrArg distributes over symm in motivic maps
-def motivic_congrArg_symm {A B : Type} (f : A → B)
+noncomputable def motivic_congrArg_symm {A B : Type} (f : A → B)
     {a b : A} (p : Path a b) :
     Path.congrArg f (Path.symm p) =
          Path.symm (Path.congrArg f p) :=
@@ -850,21 +850,21 @@ structure MotivicPathCategory where
     Path (comp (comp f g) h) (comp f (comp g h))
 
 -- Theorem 56: Motivic path category identity laws
-def motivic_cat_id_left (C : MotivicPathCategory)
+noncomputable def motivic_cat_id_left (C : MotivicPathCategory)
     {X Y : C.objects} (f : C.hom X Y)
     (law : Path (C.comp (C.id X) f) f) :
     Path (C.comp (C.id X) f) f :=
   law
 
 -- Theorem 57: Motivic path category identity right
-def motivic_cat_id_right (C : MotivicPathCategory)
+noncomputable def motivic_cat_id_right (C : MotivicPathCategory)
     {X Y : C.objects} (f : C.hom X Y)
     (law : Path (C.comp f (C.id Y)) f) :
     Path (C.comp f (C.id Y)) f :=
   law
 
 -- Theorem 58: Pentagon coherence for motivic path category
-def motivic_pentagon {C : MotivicPathCategory}
+noncomputable def motivic_pentagon {C : MotivicPathCategory}
     {A B D E F : C.objects}
     (f : C.hom A B) (g : C.hom B D)
     (h : C.hom D E) (k : C.hom E F) :
@@ -873,7 +873,7 @@ def motivic_pentagon {C : MotivicPathCategory}
   Path.refl _
 
 -- Theorem 59: Motivic path interchange
-def motivic_interchange
+noncomputable def motivic_interchange
     {A : Type} {a b c : A}
     (p q : Path a b) (r s : Path b c)
     (alpha : Path p q) (_beta : Path r s) :
@@ -883,7 +883,7 @@ def motivic_interchange
 
 -- Theorem 60: Fundamental theorem: all motivic constructions
 -- reduce to path algebra
-def motivic_fundamental_path_reduction
+noncomputable def motivic_fundamental_path_reduction
     {A : Type} {a b : A} (p : Path a b) :
     Path.trans p (Path.trans (Path.symm p) p) =
          Path.trans (Path.trans p (Path.symm p)) p :=

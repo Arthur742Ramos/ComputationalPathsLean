@@ -89,7 +89,7 @@ noncomputable def roundtrip_rweq (E : Obj) :
   rweq_of_step (S.roundtripStep E)
 
 /-- Roundtrip through a shift and inverse shift, then return via symmetry. -/
-def phaseRoundtripPath (E : Obj) (n : Int) :
+noncomputable def phaseRoundtripPath (E : Obj) (n : Int) :
     Path (S.phase (S.shift E n)) (S.phase (S.shift E n)) :=
   Path.trans (S.phaseShiftPath E n) (Path.symm (S.phaseShiftPath E n))
 
@@ -108,7 +108,7 @@ noncomputable def roundtrip_cancel_rweq (E : Obj) :
 end StabilityConditionPathData
 
 /-- Trivial stability-condition model with canonical Step witnesses. -/
-def trivialStabilityConditionPathData : StabilityConditionPathData PUnit where
+noncomputable def trivialStabilityConditionPathData : StabilityConditionPathData PUnit where
   shift := fun _ _ => PUnit.unit
   centralCharge := fun _ => (0, 0)
   phase := fun _ => 0

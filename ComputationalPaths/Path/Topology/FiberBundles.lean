@@ -70,7 +70,7 @@ structure BundleSection (E : VectorBundle) where
   is_section : ∀ b, Path (E.proj (section_ b)) b
 
 /-- The zero section is always a valid section. -/
-def zeroSection_isSection (E : VectorBundle) : BundleSection E where
+noncomputable def zeroSection_isSection (E : VectorBundle) : BundleSection E where
   section_ := E.zeroSection
   is_section := E.section_proj
 
@@ -86,7 +86,7 @@ structure VectorBundleMorphism (E₁ E₂ : VectorBundle) where
   fiberwise_linear : True
 
 /-- Identity morphism on a vector bundle. -/
-def vectorBundleMorphism_id (E : VectorBundle) : VectorBundleMorphism E E where
+noncomputable def vectorBundleMorphism_id (E : VectorBundle) : VectorBundleMorphism E E where
   baseMap := id
   totalMap := id
   commutes := fun e => Path.refl (E.proj e)
@@ -247,7 +247,7 @@ structure BundleParallelTransport (E : VectorBundle)
   linear : True
 
 /-- Parallel transport at zero is identity — proof extraction. -/
-def bundleTransport_id (E : VectorBundle) (conn : VBConnection E)
+noncomputable def bundleTransport_id (E : VectorBundle) (conn : VBConnection E)
     (pt : BundleParallelTransport E conn)
     (h : 0 ≤ pt.pathLength) (e : E.total) :
     Path (pt.transport 0 h e) e :=
@@ -313,7 +313,7 @@ structure FirstChern (E : VectorBundle) (cc : ChernClasses E) where
   classifies_lines : E.rank = 1 → True
 
 /-- First Chern class is in degree 2 — proof extraction. -/
-def firstChern_degree (E : VectorBundle) (cc : ChernClasses E)
+noncomputable def firstChern_degree (E : VectorBundle) (cc : ChernClasses E)
     (fc : FirstChern E cc) : Path fc.c1.degree 2 :=
   fc.degree_two
 
@@ -329,7 +329,7 @@ structure ChernCharacter (E : VectorBundle) where
   multiplicative : True
 
 /-- ch_0 = rank — proof extraction. -/
-def chernChar_rank (E : VectorBundle) (ch : ChernCharacter E) :
+noncomputable def chernChar_rank (E : VectorBundle) (ch : ChernCharacter E) :
     Path (ch.components 0) (Int.ofNat E.rank) :=
   ch.ch_zero
 
@@ -347,7 +347,7 @@ structure PontryaginClasses (E : VectorBundle) where
   complexification : True
 
 /-- Pontryagin class degree — proof extraction. -/
-def pontryagin_degree (E : VectorBundle) (pc : PontryaginClasses E) (k : Nat) :
+noncomputable def pontryagin_degree (E : VectorBundle) (pc : PontryaginClasses E) (k : Nat) :
     Path (pc.pontryagin k).degree (4 * k) :=
   pc.degree_eq k
 
@@ -417,7 +417,7 @@ theorem pontryagin_degree_div4 (E : VectorBundle) (pc : PontryaginClasses E)
   exact ⟨k, (pc.degree_eq k).proof⟩
 
 /-- Direct sum rank is additive — proof extraction. -/
-def directSum_rank (E₁ E₂ : VectorBundle) (ds : DirectSumBundle E₁ E₂) :
+noncomputable def directSum_rank (E₁ E₂ : VectorBundle) (ds : DirectSumBundle E₁ E₂) :
     Path ds.bundle.rank (E₁.rank + E₂.rank) :=
   ds.rank_add
 

@@ -30,21 +30,21 @@ structure Event (Ω : Type u) where
   pred : Ω → Prop
 
 /-- The certain event. -/
-def Event.certain (Ω : Type u) : Event Ω := ⟨fun _ => True⟩
+noncomputable def Event.certain (Ω : Type u) : Event Ω := ⟨fun _ => True⟩
 
 /-- The impossible event. -/
-def Event.impossible (Ω : Type u) : Event Ω := ⟨fun _ => False⟩
+noncomputable def Event.impossible (Ω : Type u) : Event Ω := ⟨fun _ => False⟩
 
 /-- Complement of an event. -/
-def Event.compl {Ω : Type u} (A : Event Ω) : Event Ω :=
+noncomputable def Event.compl {Ω : Type u} (A : Event Ω) : Event Ω :=
   ⟨fun ω => ¬A.pred ω⟩
 
 /-- Intersection of events. -/
-def Event.inter {Ω : Type u} (A B : Event Ω) : Event Ω :=
+noncomputable def Event.inter {Ω : Type u} (A B : Event Ω) : Event Ω :=
   ⟨fun ω => A.pred ω ∧ B.pred ω⟩
 
 /-- Union of events. -/
-def Event.union {Ω : Type u} (A B : Event Ω) : Event Ω :=
+noncomputable def Event.union {Ω : Type u} (A B : Event Ω) : Event Ω :=
   ⟨fun ω => A.pred ω ∨ B.pred ω⟩
 
 /-! ## Probability Measure Paths -/
@@ -56,7 +56,7 @@ structure MeasurePath (Ω : Type u) where
   normPath : Path (prob (Event.certain Ω)) totalProb
 
 /-- Two measure paths are equivalent when they agree on all events. -/
-def measurePathEquiv {Ω : Type u} (m1 m2 : MeasurePath Ω) : Prop :=
+noncomputable def measurePathEquiv {Ω : Type u} (m1 m2 : MeasurePath Ω) : Prop :=
   ∀ e : Event Ω, m1.prob e = m2.prob e
 
 /-- Measure path equivalence is reflexive. -/
@@ -83,12 +83,12 @@ theorem prob_congrArg {Ω : Type u} (m : MeasurePath Ω) {e1 e2 : Event Ω}
   _root_.congrArg m.prob h
 
 /-- Path from congrArg on probability. -/
-def prob_congrArg_path {Ω : Type u} (m : MeasurePath Ω) {e1 e2 : Event Ω}
+noncomputable def prob_congrArg_path {Ω : Type u} (m : MeasurePath Ω) {e1 e2 : Event Ω}
     (h : e1 = e2) : Path (m.prob e1) (m.prob e2) :=
   Path.mk [Step.mk _ _ (_root_.congrArg m.prob h)] (_root_.congrArg m.prob h)
 
 /-- Transport of probability data along event equality. -/
-def prob_transport {Ω : Type u} {P : Event Ω → Type v}
+noncomputable def prob_transport {Ω : Type u} {P : Event Ω → Type v}
     {e1 e2 : Event Ω} (h : e1 = e2) (x : P e1) : P e2 :=
   Path.transport (Path.mk [Step.mk _ _ h] h) x
 
@@ -159,7 +159,7 @@ structure BayesData (Ω : Type u) where
   pathBA : Path condValBA probAB
 
 /-- Bayes composition: a path from condValAB to condValBA. -/
-def bayes_compose {Ω : Type u} (bd : BayesData Ω) :
+noncomputable def bayes_compose {Ω : Type u} (bd : BayesData Ω) :
     Path bd.condValAB bd.condValBA :=
   Path.trans bd.pathAB (Path.symm bd.pathBA)
 
@@ -227,7 +227,7 @@ structure IndepData (Ω : Type u) where
   indepPath : Path probAB product
 
 /-- Independence factor: composed path from joint to product of marginals. -/
-def indep_factor_path {Ω : Type u} (d : IndepData Ω) :
+noncomputable def indep_factor_path {Ω : Type u} (d : IndepData Ω) :
     Path d.probAB (d.probA * d.probB) :=
   Path.trans d.indepPath d.prodPath
 
@@ -375,7 +375,7 @@ theorem prob_path_assoc {a b c d : Nat}
   simp
 
 /-- Probability path congrArg through a function. -/
-def prob_map_path {a b : Nat} (f : Nat → Nat) (p : Path a b) :
+noncomputable def prob_map_path {a b : Nat} (f : Nat → Nat) (p : Path a b) :
     Path (f a) (f b) :=
   Path.congrArg f p
 
@@ -387,13 +387,13 @@ theorem prob_map_refl (f : Nat → Nat) (a : Nat) :
 /-! ## Trivial Instances -/
 
 /-- Trivial measure path on Unit. -/
-def trivialMeasurePath : MeasurePath Unit where
+noncomputable def trivialMeasurePath : MeasurePath Unit where
   prob := fun _ => 1
   totalProb := 1
   normPath := Path.refl 1
 
 /-- Trivial Bayes data. -/
-def trivialBayesData : BayesData Unit where
+noncomputable def trivialBayesData : BayesData Unit where
   probAB := 1
   condValAB := 1
   condValBA := 1
@@ -401,7 +401,7 @@ def trivialBayesData : BayesData Unit where
   pathBA := Path.refl 1
 
 /-- Trivial independence data. -/
-def trivialIndepData : IndepData Unit where
+noncomputable def trivialIndepData : IndepData Unit where
   probA := 1
   probB := 1
   probAB := 1
@@ -410,13 +410,13 @@ def trivialIndepData : IndepData Unit where
   indepPath := Path.refl 1
 
 /-- Trivial expectation data. -/
-def trivialExpData : ExpectationData where
+noncomputable def trivialExpData : ExpectationData where
   expectation := 5
   weightedSum := 5
   sumPath := Path.refl 5
 
 /-- Trivial total probability data. -/
-def trivialTotalProb : TotalProbData Unit where
+noncomputable def trivialTotalProb : TotalProbData Unit where
   probA := 3
   weightedSum := 3
   totalProbPath := Path.refl 3

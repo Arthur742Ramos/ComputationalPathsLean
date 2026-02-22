@@ -29,20 +29,20 @@ structure FactorizationAggregate where
   totalWeight : Nat
 
 /-- Disk embeddings as elementary rewrite steps. -/
-def diskEmbeddingRewriteStep (x y : FactorizationCell)
+noncomputable def diskEmbeddingRewriteStep (x y : FactorizationCell)
     (h : x = y) : Step FactorizationCell :=
   Step.mk x y h
 
 /-- Factorization decomposition as computational path composition. -/
-def factorizationDecompositionPath (x y : FactorizationAggregate)
+noncomputable def factorizationDecompositionPath (x y : FactorizationAggregate)
     (h : x = y) : Path x y :=
   Path.stepChain h
 
-def factorizationRewrite {x y : FactorizationCell}
+noncomputable def factorizationRewrite {x y : FactorizationCell}
     (p q : Path x y) : Prop :=
   ∃ r : Path y y, q = Path.trans p r
 
-def factorizationConfluent : Prop :=
+noncomputable def factorizationConfluent : Prop :=
   ∀ {x y : FactorizationCell} (p q₁ q₂ : Path x y),
     factorizationRewrite p q₁ →
     factorizationRewrite p q₂ →

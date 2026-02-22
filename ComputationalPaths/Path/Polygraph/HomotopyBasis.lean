@@ -67,7 +67,7 @@ structure HomotopyBasis where
   termination : WellFounded (fun q p : Expr => CStep p q)
 
 /-- The groupoid TRS homotopy basis: 9 generating 3-cell families. -/
-def groupoidHomotopyBasis : HomotopyBasis where
+noncomputable def groupoidHomotopyBasis : HomotopyBasis where
   generators := []  -- We track them via the theorem below rather than data
   local_resolution := local_confluence
   termination := cstep_termination
@@ -231,7 +231,7 @@ structure CoherentPresentation3D where
   basis : ∀ a b c : Expr, CStep a b → CStep a c → ∃ d, CRTC b d ∧ CRTC c d
 
 /-- The completed groupoid TRS is a 3-dimensional coherent presentation. -/
-def coherentPresentation3d : CoherentPresentation3D where
+noncomputable def coherentPresentation3d : CoherentPresentation3D where
   num2cells := 10  -- 8 base + 2 cancellation
   num3cells := 9   -- 9 critical pair resolution families
   convergent := ⟨confluence, cstep_termination⟩

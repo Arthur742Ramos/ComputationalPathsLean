@@ -41,19 +41,19 @@ variable {L : LogStructurePathData Obj Monoid}
 variable (T : LogTropicalizationPathData L Γ)
 
 /-- Tropicalization preserves the chart-unit comparison path. -/
-def tropicalizeChartUnit :
+noncomputable def tropicalizeChartUnit :
     Path (T.tropicalize (L.chart L.unitObj)) (T.tropicalize L.unitMonoid) :=
   T.tropicalizeMap L.chartUnitPath
 
 /-- Composite path: tropicalizing chart multiplication agrees with tropical sum. -/
-def tropicalizeChartMul (x y : Obj) :
+noncomputable def tropicalizeChartMul (x y : Obj) :
     Path
       (T.tropicalize (L.chart (L.strataMul x y)))
       (T.tropMul (T.tropicalize (L.chart x)) (T.tropicalize (L.chart y))) :=
   Path.trans (T.tropicalizeMap (L.chartMulPath x y)) (T.tropicalizeMulPath x y)
 
 /-- Step witness: right-unit normalization for mapped tropicalization paths. -/
-def tropicalizeMap_step {a b : Monoid} (p : Path a b) :
+noncomputable def tropicalizeMap_step {a b : Monoid} (p : Path a b) :
     Path.Step
       (Path.trans (T.tropicalizeMap p) (Path.refl (T.tropicalize b)))
       (T.tropicalizeMap p) :=
@@ -66,7 +66,7 @@ noncomputable def tropicalizeMap_rweq {a b : Monoid} (p : Path a b) :
   rweq_of_step (T.tropicalizeMap_step p)
 
 /-- Step witness: right-unit normalization for tropicalized multiplication. -/
-def tropicalizeMul_step (x y : Obj) :
+noncomputable def tropicalizeMul_step (x y : Obj) :
     Path.Step
       (Path.trans (T.tropicalizeMulPath x y)
         (Path.refl (T.tropMul (T.tropicalize (L.chart x)) (T.tropicalize (L.chart y)))))
@@ -81,7 +81,7 @@ noncomputable def tropicalizeMul_rweq (x y : Obj) :
   rweq_of_step (T.tropicalizeMul_step x y)
 
 /-- Step witness: right-unit normalization for the tropicalized unit path. -/
-def tropicalizeUnit_step :
+noncomputable def tropicalizeUnit_step :
     Path.Step
       (Path.trans T.tropicalizeUnitPath
         (Path.refl (T.tropMul (T.tropicalize L.unitMonoid) (T.tropicalize L.unitMonoid))))
@@ -96,7 +96,7 @@ noncomputable def tropicalizeUnit_rweq :
   rweq_of_step (T.tropicalizeUnit_step)
 
 /-- Step witness: right-unit normalization for tropicalized chart multiplication. -/
-def tropicalizeChartMul_step (x y : Obj) :
+noncomputable def tropicalizeChartMul_step (x y : Obj) :
     Path.Step
       (Path.trans (T.tropicalizeChartMul x y)
         (Path.refl (T.tropMul (T.tropicalize (L.chart x)) (T.tropicalize (L.chart y)))))
@@ -119,7 +119,7 @@ noncomputable def tropicalizeChartMul_cancel_rweq (x y : Obj) :
 end LogTropicalizationPathData
 
 /-- Trivial instance instantiating logarithmic tropicalization path data. -/
-def trivialLogTropicalizationPathData :
+noncomputable def trivialLogTropicalizationPathData :
     LogTropicalizationPathData LogStructuresPaths.trivialLogStructurePathData Nat where
   tropicalize := fun n => n
   tropMul := Nat.add

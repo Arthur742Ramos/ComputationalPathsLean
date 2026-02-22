@@ -167,7 +167,7 @@ theorem comp_assoc_eq {D : Type x}
 /-! ## Constant functor -/
 
 /-- The constant functor sends every path to `rfl`. -/
-def constFunctor (b : B) : EqFunctor A B where
+noncomputable def constFunctor (b : B) : EqFunctor A B where
   obj := fun _ => b
   map := fun _ => rfl
   map_refl := fun _ => rfl
@@ -228,22 +228,22 @@ theorem pathRwQuot_toEq_refl (a : A) :
   rfl
 
 /-- Path witness: the quotient groupoid respects double inversion. -/
-def pathRwQuot_symm_symm_path {a b : A} (p : PathRwQuot A a b) :
+noncomputable def pathRwQuot_symm_symm_path {a b : A} (p : PathRwQuot A a b) :
     Path (PathRwQuot.symm (PathRwQuot.symm p)) p :=
   Path.stepChain (PathRwQuot.symm_symm p)
 
 /-- Path witness: the quotient groupoid respects left identity. -/
-def pathRwQuot_trans_refl_left_path {a b : A} (p : PathRwQuot A a b) :
+noncomputable def pathRwQuot_trans_refl_left_path {a b : A} (p : PathRwQuot A a b) :
     Path (PathRwQuot.trans (PathRwQuot.refl a) p) p :=
   Path.stepChain (PathRwQuot.trans_refl_left p)
 
 /-- Path witness: the quotient groupoid respects right identity. -/
-def pathRwQuot_trans_refl_right_path {a b : A} (p : PathRwQuot A a b) :
+noncomputable def pathRwQuot_trans_refl_right_path {a b : A} (p : PathRwQuot A a b) :
     Path (PathRwQuot.trans p (PathRwQuot.refl b)) p :=
   Path.stepChain (PathRwQuot.trans_refl_right p)
 
 /-- Path witness: the quotient groupoid is associative. -/
-def pathRwQuot_assoc_path {a b c d : A}
+noncomputable def pathRwQuot_assoc_path {a b c d : A}
     (p : PathRwQuot A a b) (q : PathRwQuot A b c) (r : PathRwQuot A c d) :
     Path (PathRwQuot.trans (PathRwQuot.trans p q) r)
          (PathRwQuot.trans p (PathRwQuot.trans q r)) :=

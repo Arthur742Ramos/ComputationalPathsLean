@@ -60,13 +60,13 @@ variable {M : SteenrodOperations.GradedF2Module.{u}} (S : CartanData M)
 /-! ## Path witness of the Cartan formula -/
 
 /-- Path witness of the Cartan formula. -/
-def cartan_formula_path (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
+noncomputable def cartan_formula_path (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.sq k (p + q) (S.cup p q x y)) (S.cartanSum k p q x y) :=
   Path.stepChain (S.cartan_formula k p q x y)
 
 
 /-- Symmetric path: from Cartan sum back to Sq^k of the cup product. -/
-def cartan_formula_path_symm (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
+noncomputable def cartan_formula_path_symm (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.cartanSum k p q x y) (S.sq k (p + q) (S.cup p q x y)) :=
   Path.symm (cartan_formula_path S k p q x y)
 
@@ -74,19 +74,19 @@ def cartan_formula_path_symm (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
 /-! ## Cartan formula for zero elements -/
 
 /-- Cartan formula when the left factor is zero. -/
-def cartan_zero_left (k p q : Nat) (y : M.carrier q) :
+noncomputable def cartan_zero_left (k p q : Nat) (y : M.carrier q) :
     Path (S.sq k (p + q) (S.cup p q (M.zero p) y))
       (S.cartanSum k p q (M.zero p) y) :=
   cartan_formula_path S k p q (M.zero p) y
 
 /-- Cartan formula when the right factor is zero. -/
-def cartan_zero_right (k p q : Nat) (x : M.carrier p) :
+noncomputable def cartan_zero_right (k p q : Nat) (x : M.carrier p) :
     Path (S.sq k (p + q) (S.cup p q x (M.zero q)))
       (S.cartanSum k p q x (M.zero q)) :=
   cartan_formula_path S k p q x (M.zero q)
 
 /-- Cartan formula when both factors are zero. -/
-def cartan_zero_both (k p q : Nat) :
+noncomputable def cartan_zero_both (k p q : Nat) :
     Path (S.sq k (p + q) (S.cup p q (M.zero p) (M.zero q)))
       (S.cartanSum k p q (M.zero p) (M.zero q)) :=
   cartan_formula_path S k p q (M.zero p) (M.zero q)
@@ -97,14 +97,14 @@ def cartan_zero_both (k p q : Nat) :
 /-! ## Cartan formula and additivity -/
 
 /-- Sq^k distributes over cup product addition in the left factor. -/
-def cartan_add_left (k p q : Nat)
+noncomputable def cartan_add_left (k p q : Nat)
     (x₁ x₂ : M.carrier p) (y : M.carrier q) :
     Path (S.sq k (p + q) (S.cup p q (M.add p x₁ x₂) y))
       (S.cartanSum k p q (M.add p x₁ x₂) y) :=
   cartan_formula_path S k p q (M.add p x₁ x₂) y
 
 /-- Sq^k distributes over cup product addition in the right factor. -/
-def cartan_add_right (k p q : Nat)
+noncomputable def cartan_add_right (k p q : Nat)
     (x : M.carrier p) (y₁ y₂ : M.carrier q) :
     Path (S.sq k (p + q) (S.cup p q x (M.add q y₁ y₂)))
       (S.cartanSum k p q x (M.add q y₁ y₂)) :=
@@ -115,7 +115,7 @@ def cartan_add_right (k p q : Nat)
 /-! ## Cartan formula: Sq^0 case -/
 
 /-- The Cartan sum at k = 0 relates to Sq^0 of the cup product. -/
-def cartan_sq_zero (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
+noncomputable def cartan_sq_zero (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.sq 0 (p + q) (S.cup p q x y))
       (S.cartanSum 0 p q x y) :=
   cartan_formula_path S 0 p q x y
@@ -125,7 +125,7 @@ def cartan_sq_zero (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
 
 /-- When k > p + q, Sq^k of the cup product vanishes by instability.
     This gives a path from the Cartan sum to zero. -/
-def cartan_above_path (k p q : Nat) (hk : k > p + q)
+noncomputable def cartan_above_path (k p q : Nat) (hk : k > p + q)
     (x : M.carrier p) (y : M.carrier q) :
     Path (S.cartanSum k p q x y) (M.zero (p + q + k)) :=
   Path.trans
@@ -135,7 +135,7 @@ def cartan_above_path (k p q : Nat) (hk : k > p + q)
 /-! ## Sq applied to cup of self (char 2) -/
 
 /-- Sq^k applied to cup(x, x) relates to the Cartan sum at x = x. -/
-def cartan_self (k p : Nat) (x : M.carrier p) :
+noncomputable def cartan_self (k p : Nat) (x : M.carrier p) :
     Path (S.sq k (p + p) (S.cup p p x x))
       (S.cartanSum k p p x x) :=
   cartan_formula_path S k p p x x
@@ -143,7 +143,7 @@ def cartan_self (k p : Nat) (x : M.carrier p) :
 /-! ## Round-trip Cartan path -/
 
 /-- Round-trip: Cartan forward then backward yields a loop. -/
-def cartan_roundtrip (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
+noncomputable def cartan_roundtrip (k p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.sq k (p + q) (S.cup p q x y))
       (S.sq k (p + q) (S.cup p q x y)) :=
   Path.trans (cartan_formula_path S k p q x y)
@@ -176,7 +176,7 @@ namespace CartanAssocData
 variable {M : SteenrodOperations.GradedF2Module.{u}} (S : CartanAssocData M)
 
 /-- Path witness of cup product associativity (left form). -/
-def cup_assoc_path (p q r : Nat)
+noncomputable def cup_assoc_path (p q r : Nat)
     (x : M.carrier p) (y : M.carrier q) (z : M.carrier r) :
     Path (S.cup (p + q) r (S.cup p q x y) z)
       (S.cup_assoc_target p q r x y z) :=
@@ -199,7 +199,7 @@ namespace CartanCommData
 variable {M : SteenrodOperations.GradedF2Module.{u}} (S : CartanCommData M)
 
 /-- Path witness of cup product commutativity. -/
-def cup_comm_path (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
+noncomputable def cup_comm_path (p q : Nat) (x : M.carrier p) (y : M.carrier q) :
     Path (S.cup p q x y) (S.cup_comm_target p q x y) :=
   Path.stepChain (S.cup_comm_eq p q x y)
 
@@ -229,25 +229,25 @@ namespace CartanUnitData
 variable {M : SteenrodOperations.GradedF2Module.{u}} (S : CartanUnitData M)
 
 /-- Path witness of the left unit law. -/
-def cup_unit_left_path (n : Nat) (x : M.carrier n) :
+noncomputable def cup_unit_left_path (n : Nat) (x : M.carrier n) :
     Path (S.cup 0 n S.unit x) (S.cup_unit_left_target n x) :=
   Path.stepChain (S.cup_unit_left n x)
 
 /-- Path witness of the right unit law. -/
-def cup_unit_right_path (n : Nat) (x : M.carrier n) :
+noncomputable def cup_unit_right_path (n : Nat) (x : M.carrier n) :
     Path (S.cup n 0 x S.unit) (S.cup_unit_right_target n x) :=
   Path.stepChain (S.cup_unit_right n x)
 
 
 
 /-- Cartan formula for Sq^k applied to unit ∪ x. -/
-def cartan_unit_left_path (k n : Nat) (x : M.carrier n) :
+noncomputable def cartan_unit_left_path (k n : Nat) (x : M.carrier n) :
     Path (S.sq k (0 + n) (S.cup 0 n S.unit x))
       (S.cartanSum k 0 n S.unit x) :=
   S.toCartanData.cartan_formula_path k 0 n S.unit x
 
 /-- Cartan formula for Sq^k applied to x ∪ unit. -/
-def cartan_unit_right_path (k n : Nat) (x : M.carrier n) :
+noncomputable def cartan_unit_right_path (k n : Nat) (x : M.carrier n) :
     Path (S.sq k (n + 0) (S.cup n 0 x S.unit))
       (S.cartanSum k n 0 x S.unit) :=
   S.toCartanData.cartan_formula_path k n 0 x S.unit

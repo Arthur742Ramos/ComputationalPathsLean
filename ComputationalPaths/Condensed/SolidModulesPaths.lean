@@ -80,7 +80,7 @@ noncomputable def idempotent_two_step_rweq (x : M) :
 end SolidModulePathData
 
 /-- Identity solidification package, giving concrete computational witnesses. -/
-def identitySolidModulePathData (M : Type u) : SolidModulePathData M where
+noncomputable def identitySolidModulePathData (M : Type u) : SolidModulePathData M where
   solidify := fun x => x
   unitPath := fun x => Path.refl x
   unitStep := fun x => Path.Step.trans_refl_right (Path.refl x)

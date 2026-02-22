@@ -45,14 +45,14 @@ structure SymGamWitness (X : Type u) where
 
 variable {X : Type u}
 
-def infinitySheaf (Ops : InfinityToposOps X) (x : X) : X := Ops.sheafify x
-def hyperObject (Ops : InfinityToposOps X) (x : X) : X := Ops.hyperComplete x
-def shapeObject (Ops : InfinityToposOps X) (x : X) : X := Ops.shape x
-def postnikovObject (Ops : InfinityToposOps X) (n : Nat) (x : X) : X := Ops.postnikov n x
-def truncatedObject (Ops : InfinityToposOps X) (n : Nat) (x : X) : X := Ops.truncate n x
-def classifyingObject (Ops : InfinityToposOps X) (x : X) : X := Ops.classify x
-def modalityObject (Ops : InfinityToposOps X) (x : X) : X := Ops.modal x
-def lexLocalizationObject (Ops : InfinityToposOps X) (x : X) : X := Ops.lexLocalize x
+noncomputable def infinitySheaf (Ops : InfinityToposOps X) (x : X) : X := Ops.sheafify x
+noncomputable def hyperObject (Ops : InfinityToposOps X) (x : X) : X := Ops.hyperComplete x
+noncomputable def shapeObject (Ops : InfinityToposOps X) (x : X) : X := Ops.shape x
+noncomputable def postnikovObject (Ops : InfinityToposOps X) (n : Nat) (x : X) : X := Ops.postnikov n x
+noncomputable def truncatedObject (Ops : InfinityToposOps X) (n : Nat) (x : X) : X := Ops.truncate n x
+noncomputable def classifyingObject (Ops : InfinityToposOps X) (x : X) : X := Ops.classify x
+noncomputable def modalityObject (Ops : InfinityToposOps X) (x : X) : X := Ops.modal x
+noncomputable def lexLocalizationObject (Ops : InfinityToposOps X) (x : X) : X := Ops.lexLocalize x
 
 theorem infinity_sheaf_def (Ops : InfinityToposOps X) (x : X) :
     infinitySheaf Ops x = Ops.sheafify x := rfl

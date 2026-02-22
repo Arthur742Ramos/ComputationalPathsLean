@@ -49,7 +49,7 @@ abbrev Square {A : Type u} {a b : A} (p q : Path a b) : Prop :=
 variable {A : Type u} {a b c : A}
 
 /-- Vertical composition of squares. -/
-@[simp] def squareVComp {p q r : Path a b}
+@[simp] noncomputable def squareVComp {p q r : Path a b}
     (eta : Square (A := A) (a := a) (b := b) p q)
     (theta : Square (A := A) (a := a) (b := b) q r) :
     Square (A := A) (a := a) (b := b) p r :=
@@ -57,7 +57,7 @@ variable {A : Type u} {a b c : A}
     (p := p) (q := q) (r := r) eta theta
 
 /-- Horizontal composition of squares. -/
-@[simp] def squareHComp {f g : Path a b} {h k : Path b c}
+@[simp] noncomputable def squareHComp {f g : Path a b} {h k : Path b c}
     (eta : Square (A := A) (a := a) (b := b) f g)
     (theta : Square (A := A) (a := b) (b := c) h k) :
     Square (A := A) (a := a) (b := c)
@@ -113,19 +113,19 @@ structure ConnectionPair {A : Type u} {a b : A} (f : Path a b) : Prop where
       (Path.trans f (Path.refl b)) f
 
 /-- Every path has a canonical companion pair. -/
-@[simp] def companionPair {a b : A} (f : Path a b) :
+@[simp] noncomputable def companionPair {a b : A} (f : Path a b) :
     CompanionPair (A := A) (a := a) (b := b) f where
   unit := rweq_cmpA_inv_right f
   counit := rweq_cmpA_inv_left f
 
 /-- Every path has a canonical conjoint pair. -/
-@[simp] def conjointPair {a b : A} (f : Path a b) :
+@[simp] noncomputable def conjointPair {a b : A} (f : Path a b) :
     ConjointPair (A := A) (a := a) (b := b) f where
   unit := rweq_cmpA_inv_left f
   counit := rweq_cmpA_inv_right f
 
 /-- Every path has a canonical connection pair. -/
-@[simp] def connectionPair {a b : A} (f : Path a b) :
+@[simp] noncomputable def connectionPair {a b : A} (f : Path a b) :
     ConnectionPair (A := A) (a := a) (b := b) f where
   left := rweq_cmpA_refl_left f
   right := rweq_cmpA_refl_right f
@@ -133,7 +133,7 @@ structure ConnectionPair {A : Type u} {a b : A} (f : Path a b) : Prop where
 /-! ## Folding to the path 2-category -/
 
 /-- Folding map from squares to 2-cells in the path 2-category. -/
-@[simp] def foldingSquare {A : Type u} {a b : A} {p q : Path a b} :
+@[simp] noncomputable def foldingSquare {A : Type u} {a b : A} {p q : Path a b} :
     Square (A := A) (a := a) (b := b) p q ->
       Path2Cell (A := A) (a := a) (b := b) p q :=
   fun eta => eta

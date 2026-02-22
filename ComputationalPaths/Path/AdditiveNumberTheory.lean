@@ -50,23 +50,23 @@ structure AdditiveStructure where
 namespace AdditiveStructure
 
 /-- Sum of the first `n` terms of a sequence. -/
-def sum (A : AdditiveStructure) (f : Nat -> A.carrier) : Nat -> A.carrier
+noncomputable def sum (A : AdditiveStructure) (f : Nat -> A.carrier) : Nat -> A.carrier
   | 0 => A.zero
   | n + 1 => A.add (sum A f n) (f n)
 
 /-- Congruence on the left input of addition. -/
-def add_path_left (A : AdditiveStructure) {a b : A.carrier} (p : Path a b)
+noncomputable def add_path_left (A : AdditiveStructure) {a b : A.carrier} (p : Path a b)
     (c : A.carrier) : Path (A.add a c) (A.add b c) :=
   Path.congrArg (fun x => A.add x c) p
 
 /-- Two-term sum path used in Goldbach-style decompositions. -/
-def sum_two_path (A : AdditiveStructure) (p q : A.carrier) :
+noncomputable def sum_two_path (A : AdditiveStructure) (p q : A.carrier) :
     Path (sum A (fun i => match i with | 0 => p | _ => q) 2)
       (A.add p q) :=
   add_path_left A (A.zero_add p) q
 
 /-- Three-term sum path used in Vinogradov-style decompositions. -/
-def sum_three_path (A : AdditiveStructure) (p q r : A.carrier) :
+noncomputable def sum_three_path (A : AdditiveStructure) (p q r : A.carrier) :
     Path (sum A (fun i => match i with | 0 => p | 1 => q | _ => r) 3)
       (A.add p (A.add q r)) :=
   Path.trans
@@ -96,7 +96,7 @@ structure AdditiveFunction (S : Type u) (V : Type v) where
 namespace AdditiveFunction
 
 /-- Pointwise Path equality between additive functions. -/
-def PointwisePath {S : Type u} {V : Type v} (F G : AdditiveFunction S V) :
+noncomputable def PointwisePath {S : Type u} {V : Type v} (F G : AdditiveFunction S V) :
     Type (max u v) :=
   forall s : S, Path (F.eval s) (G.eval s)
 
@@ -124,7 +124,7 @@ inductive AdditiveStep {S : Type u} {V : Type v} :
 namespace AdditiveStep
 
 /-- Build a decomposition step from a pointwise Path. -/
-def ofPointwisePath {S : Type u} {V : Type v} {F G : AdditiveFunction S V}
+noncomputable def ofPointwisePath {S : Type u} {V : Type v} {F G : AdditiveFunction S V}
     (h : AdditiveFunction.PointwisePath F G) : AdditiveStep F G :=
   AdditiveStep.byDecomposition F G h
 

@@ -23,7 +23,7 @@ variable {A : Type u}
 /-! ## J-eliminator for propositional equality -/
 
 /-- The J-eliminator for propositional equality. -/
-def J_eq {a : A} (C : (b : A) → a = b → Sort v)
+noncomputable def J_eq {a : A} (C : (b : A) → a = b → Sort v)
     (c : C a rfl) {b : A} (h : a = b) : C b h := by
   cases h; exact c
 
@@ -33,7 +33,7 @@ theorem J_eq_rfl {a : A} (C : (b : A) → a = b → Sort v)
     J_eq C c rfl = c := rfl
 
 /-- Paulin-Mohring J: endpoint on the left varies. -/
-def J'_eq {b : A} (C : (a : A) → a = b → Sort v)
+noncomputable def J'_eq {b : A} (C : (a : A) → a = b → Sort v)
     (c : C b rfl) {a : A} (h : a = b) : C a h := by
   cases h; exact c
 
@@ -43,7 +43,7 @@ theorem J'_eq_rfl {b : A} (C : (a : A) → a = b → Sort v)
     J'_eq C c rfl = c := rfl
 
 /-- J for transport: given a type family, transport along equality. -/
-def J_transport {B : A → Sort v} {a b : A} (h : a = b) (x : B a) : B b := by
+noncomputable def J_transport {B : A → Sort v} {a b : A} (h : a = b) (x : B a) : B b := by
   cases h; exact x
 
 /-- J_transport on rfl is identity. -/
@@ -53,7 +53,7 @@ theorem J_transport_rfl {B : A → Sort v} {a : A} (x : B a) :
 /-! ## Path induction for endpoint-dependent families -/
 
 /-- Path induction for families depending only on the endpoint. -/
-def pathIndEndpoint {a : A} (C : (b : A) → Sort v)
+noncomputable def pathIndEndpoint {a : A} (C : (b : A) → Sort v)
     (c : C a) {b : A} (p : Path a b) : C b := by
   cases p with | mk steps proof => cases proof; exact c
 
@@ -192,7 +192,7 @@ theorem congrArg_comp_path {B : Type v} {C : Type w} (f : B → C) (g : A → B)
 /-! ## Path-over types -/
 
 /-- A path-over: relating `u : B a` to `v : B b` over `p : Path a b`. -/
-def PathOver {B : A → Type v} {a b : A} (p : Path a b)
+noncomputable def PathOver {B : A → Type v} {a b : A} (p : Path a b)
     (u : B a) (v : B b) : Prop :=
   Path.transport p u = v
 
@@ -243,10 +243,10 @@ theorem pathOver_to_eq {B : A → Type v} {a b : A}
 /-! ## Singleton contractibility -/
 
 /-- The based path space. -/
-def BasedPathSpace (a : A) := (b : A) × Path a b
+noncomputable def BasedPathSpace (a : A) := (b : A) × Path a b
 
 /-- The canonical center of the based path space. -/
-def basedPathCenter (a : A) : BasedPathSpace a := ⟨a, refl a⟩
+noncomputable def basedPathCenter (a : A) : BasedPathSpace a := ⟨a, refl a⟩
 
 /-- Every element of the based path space projects to a (propositionally). -/
 theorem basedPath_fst_eq {a : A} (s : BasedPathSpace a) :

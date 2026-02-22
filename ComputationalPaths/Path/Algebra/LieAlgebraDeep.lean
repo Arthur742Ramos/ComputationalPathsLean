@@ -70,14 +70,14 @@ structure LieAlgHom (L : Type u) (M : Type v)
   map_bracket : (x y : L) → Path (toFun (BL.bracket x y)) (BM.bracket (toFun x) (toFun y))
 
 /-- Identity homomorphism. -/
-def LieAlgHom.id (L : Type u) (BL : LieBracketCore L) : LieAlgHom L L BL BL where
+noncomputable def LieAlgHom.id (L : Type u) (BL : LieBracketCore L) : LieAlgHom L L BL BL where
   toFun := fun x => x
   map_add := fun x y => Path.refl (BL.add x y)
   map_zero := Path.refl BL.zero
   map_bracket := fun x y => Path.refl (BL.bracket x y)
 
 /-- Composition of Lie algebra homomorphisms. -/
-def LieAlgHom.comp {L : Type u} {M : Type v} {N : Type w}
+noncomputable def LieAlgHom.comp {L : Type u} {M : Type v} {N : Type w}
     {BL : LieBracketCore L} {BM : LieBracketCore M} {BN : LieBracketCore N}
     (g : LieAlgHom M N BM BN) (f : LieAlgHom L M BL BM) :
     LieAlgHom L N BL BN where
@@ -122,7 +122,7 @@ structure Solvable (L : Type u) (B : LieBracketCore L) where
   terminates : (x : L) → DerivedLevel depth → Path (B.bracket x x) B.zero
 
 /-- Solvable algebras have trivial self-bracket path. -/
-def solvableSelfBracket {L : Type u} (B : LieBracketCore L)
+noncomputable def solvableSelfBracket {L : Type u} (B : LieBracketCore L)
     (x : L) : Path (B.bracket x x) B.zero :=
   B.self_bracket_zero x
 
@@ -140,7 +140,7 @@ structure Nilpotent (L : Type u) (B : LieBracketCore L) where
   terminal_zero : (x : L) → Path (B.bracket x B.zero) B.zero
 
 /-- Nilpotent implies solvable. -/
-def nilpotentIsSolvable {L : Type u} (B : LieBracketCore L)
+noncomputable def nilpotentIsSolvable {L : Type u} (B : LieBracketCore L)
     (N : Nilpotent L B) : Solvable L B where
   depth := N.nilpotency_class
   terminates := fun x _ => B.self_bracket_zero x
@@ -160,12 +160,12 @@ structure KillingForm (L : Type u) (K : Type v) where
     Path (form (bracket x y) z) (form x (bracket y z))
 
 /-- Killing form symmetry composed with itself gives reflexivity. -/
-def killingSymmSymm {L : Type u} {K : Type v} (kf : KillingForm L K)
+noncomputable def killingSymmSymm {L : Type u} {K : Type v} (kf : KillingForm L K)
     (x y : L) : Path (kf.form x y) (kf.form x y) :=
   Path.trans (kf.symmetry x y) (kf.symmetry y x)
 
 /-- Killing form invariance path. -/
-def killingInvariance {L : Type u} {K : Type v} (kf : KillingForm L K)
+noncomputable def killingInvariance {L : Type u} {K : Type v} (kf : KillingForm L K)
     (bracket : L → L → L) (x y z : L) :
     Path (kf.form (bracket x y) z) (kf.form x (bracket y z)) :=
   kf.invariance bracket x y z
@@ -187,7 +187,7 @@ structure CartanSubalgebra (L : Type u) (B : LieBracketCore L) where
   zero_mem : carrier B.zero
 
 /-- The bracket of Cartan elements vanishes by path. -/
-def cartanBracketZero {L : Type u} {B : LieBracketCore L}
+noncomputable def cartanBracketZero {L : Type u} {B : LieBracketCore L}
     (H : CartanSubalgebra L B) (h1 h2 : L)
     (m1 : H.carrier h1) (m2 : H.carrier h2) :
     Path (B.bracket h1 h2) B.zero :=
@@ -206,7 +206,7 @@ structure RootDatum (V : Type u) where
   reflection_closed : (alpha beta : V) → roots alpha → roots beta → roots (add beta (neg alpha))
 
 /-- Negation of a root is a root. -/
-def rootNeg {V : Type u} (R : RootDatum V) (alpha : V) (h : R.roots alpha) :
+noncomputable def rootNeg {V : Type u} (R : RootDatum V) (alpha : V) (h : R.roots alpha) :
     R.roots (R.neg alpha) :=
   R.neg_root alpha h
 
@@ -218,12 +218,12 @@ structure WeylReflection (V : Type u) where
   involutive : (v : V) → Path (reflect (reflect v)) v
 
 /-- Weyl reflection is involutive, witnessed by path. -/
-def weylInvolutive {V : Type u} (w : WeylReflection V) (v : V) :
+noncomputable def weylInvolutive {V : Type u} (w : WeylReflection V) (v : V) :
     Path (w.reflect (w.reflect v)) v :=
   w.involutive v
 
 /-- Composing a reflection with itself yields identity via path composition. -/
-def weylReflectSquareCompose {V : Type u} (w : WeylReflection V) (v : V) :
+noncomputable def weylReflectSquareCompose {V : Type u} (w : WeylReflection V) (v : V) :
     Path (w.reflect (w.reflect (w.reflect (w.reflect v)))) v :=
   Path.trans (Path.congrArg (fun t => w.reflect (w.reflect t)) (w.involutive v))
              (w.involutive v)
@@ -269,11 +269,11 @@ structure PBWRelation (L : Type u) (B : LieBracketCore L) where
                       (UEAElem.gen (B.bracket x y)))
 
 /-- The canonical map from L to UEA(L). -/
-def lieToUEA {L : Type u} (x : L) : UEAElem L :=
+noncomputable def lieToUEA {L : Type u} (x : L) : UEAElem L :=
   UEAElem.gen x
 
 /-- The canonical map preserves structure. -/
-def lieToUEARefl {L : Type u} (x : L) :
+noncomputable def lieToUEARefl {L : Type u} (x : L) :
     Path (lieToUEA x) (UEAElem.gen x) :=
   Path.refl (UEAElem.gen x)
 
@@ -301,7 +301,7 @@ structure LieRepBracketCompat (L : Type u) (M : Type v) (B : LieBracketCore L)
                    (rho.negM (rho.act y (rho.act x m))))
 
 /-- Trivial representation: every element acts as identity. -/
-def LieRep.trivial (L : Type u) (M : Type v) (B : LieBracketCore L)
+noncomputable def LieRep.trivial (L : Type u) (M : Type v) (B : LieBracketCore L)
     (addM : M → M → M) (zeroM : M) (negM : M → M)
     (idem : (m : M) → Path m (addM m m)) : LieRep L M B where
   act := fun _ m => m
@@ -322,7 +322,7 @@ structure LieSubrep (L : Type u) (M : Type v) (B : LieBracketCore L)
 /-! ## 14. Adjoint Representation -/
 
 /-- The adjoint representation ad : L → End(L). -/
-def adjointAction {L : Type u} (B : LieBracketCore L) (x : L) : L → L :=
+noncomputable def adjointAction {L : Type u} (B : LieBracketCore L) (x : L) : L → L :=
   fun y => B.bracket x y
 
 /-- Adjoint action is a derivation (Jacobi identity reformulation). -/
@@ -333,7 +333,7 @@ structure AdjointIsDerivation (L : Type u) (B : LieBracketCore L) where
                 (B.bracket y (adjointAction B x z)))
 
 /-- The adjoint representation as a LieRep. -/
-def adjointRep {L : Type u} (B : LieBracketCore L) : LieRep L L B where
+noncomputable def adjointRep {L : Type u} (B : LieBracketCore L) : LieRep L L B where
   act := adjointAction B
   addM := B.add
   zeroM := B.zero
@@ -342,40 +342,40 @@ def adjointRep {L : Type u} (B : LieBracketCore L) : LieRep L L B where
   act_add_m := fun x m n => B.bilinear_right_add x m n
 
 /-- ad(x) applied to x gives zero by self-bracket. -/
-def adjointSelfZero {L : Type u} (B : LieBracketCore L) (x : L) :
+noncomputable def adjointSelfZero {L : Type u} (B : LieBracketCore L) (x : L) :
     Path (adjointAction B x x) B.zero :=
   B.self_bracket_zero x
 
 /-- Composing adjoint actions via paths. -/
-def adjointCompose {L : Type u} (B : LieBracketCore L) (x y z : L) :
+noncomputable def adjointCompose {L : Type u} (B : LieBracketCore L) (x y z : L) :
     Path (adjointAction B x (adjointAction B y z)) (B.bracket x (B.bracket y z)) :=
   Path.refl (B.bracket x (B.bracket y z))
 
 /-- ad(0) kills everything. -/
-def adjointOfZero {L : Type u} (B : LieBracketCore L) (y : L) :
+noncomputable def adjointOfZero {L : Type u} (B : LieBracketCore L) (y : L) :
     Path (adjointAction B B.zero y) B.zero :=
   B.bracket_zero_left y
 
 /-- ad(x)(0) = 0. -/
-def adjointOnZero {L : Type u} (B : LieBracketCore L) (x : L) :
+noncomputable def adjointOnZero {L : Type u} (B : LieBracketCore L) (x : L) :
     Path (adjointAction B x B.zero) B.zero :=
   B.bracket_zero_right x
 
 /-! ## 15. Lie Algebra Cohomology -/
 
 /-- A 1-cochain is a function L → M. -/
-def Cochain1 (L : Type u) (M : Type v) := L → M
+noncomputable def Cochain1 (L : Type u) (M : Type v) := L → M
 
 /-- A 2-cochain is a bilinear map L → L → M. -/
-def Cochain2 (L : Type u) (M : Type v) := L → L → M
+noncomputable def Cochain2 (L : Type u) (M : Type v) := L → L → M
 
 /-- The coboundary d⁰ : M → (L → M) for a representation. -/
-def coboundary0 {L : Type u} {M : Type v} (B : LieBracketCore L)
+noncomputable def coboundary0 {L : Type u} {M : Type v} (B : LieBracketCore L)
     (rho : LieRep L M B) (m : M) : Cochain1 L M :=
   fun x => rho.act x m
 
 /-- The coboundary d¹ : (L → M) → (L → L → M). -/
-def coboundary1 {L : Type u} {M : Type v} (B : LieBracketCore L)
+noncomputable def coboundary1 {L : Type u} {M : Type v} (B : LieBracketCore L)
     (rho : LieRep L M B) (f : Cochain1 L M) : Cochain2 L M :=
   fun x y => rho.addM (rho.addM (rho.act x (f y))
                                  (rho.negM (rho.act y (f x))))
@@ -390,51 +390,51 @@ structure CoboundarySquareZero (L : Type u) (M : Type v) (B : LieBracketCore L)
 /-! ## 16. Bracket Laws and Coherence -/
 
 /-- Left bilinearity coherence: path composition. -/
-def bilinLeftCoherence {L : Type u} (B : LieBracketCore L)
+noncomputable def bilinLeftCoherence {L : Type u} (B : LieBracketCore L)
     (x y z w : L) :
     Path (B.bracket (B.add (B.add x y) z) w)
          (B.bracket (B.add x (B.add y z)) w) :=
   Path.congrArg (fun t => B.bracket t w) (B.add_assoc x y z)
 
 /-- Antisymmetry coherence: double application returns to start. -/
-def antisymmCoherence {L : Type u} (B : LieBracketCore L) (x y : L) :
+noncomputable def antisymmCoherence {L : Type u} (B : LieBracketCore L) (x y : L) :
     Path (B.bracket x y) (B.neg (B.neg (B.bracket x y))) :=
   Path.trans (B.antisymmetry x y)
     (Path.congrArg B.neg (B.antisymmetry y x))
 
 /-- Symmetry of antisymmetry path. -/
-def antisymmSymm {L : Type u} (B : LieBracketCore L) (x y : L) :
+noncomputable def antisymmSymm {L : Type u} (B : LieBracketCore L) (x y : L) :
     Path (B.neg (B.bracket y x)) (B.bracket x y) :=
   Path.symm (B.antisymmetry x y)
 
 /-! ## 17. Path-Level Bracket Manipulation -/
 
 /-- Transport a path through the bracket (left slot). -/
-def bracketCongrLeft {L : Type u} (B : LieBracketCore L)
+noncomputable def bracketCongrLeft {L : Type u} (B : LieBracketCore L)
     {x x' : L} (p : Path x x') (y : L) :
     Path (B.bracket x y) (B.bracket x' y) :=
   Path.congrArg (fun t => B.bracket t y) p
 
 /-- Transport a path through the bracket (right slot). -/
-def bracketCongrRight {L : Type u} (B : LieBracketCore L)
+noncomputable def bracketCongrRight {L : Type u} (B : LieBracketCore L)
     (x : L) {y y' : L} (p : Path y y') :
     Path (B.bracket x y) (B.bracket x y') :=
   Path.congrArg (fun t => B.bracket x t) p
 
 /-- Transport paths through both slots of the bracket. -/
-def bracketCongr {L : Type u} (B : LieBracketCore L)
+noncomputable def bracketCongr {L : Type u} (B : LieBracketCore L)
     {x x' y y' : L} (p : Path x x') (q : Path y y') :
     Path (B.bracket x y) (B.bracket x' y') :=
   Path.trans (bracketCongrLeft B p y) (bracketCongrRight B x' q)
 
 /-- Transitivity of bracket paths. -/
-def bracketPathTrans {L : Type u} {B : LieBracketCore L}
+noncomputable def bracketPathTrans {L : Type u} {B : LieBracketCore L}
     {x y z : L} (p : Path (B.bracket x y) z) {w : L} (q : Path z w) :
     Path (B.bracket x y) w :=
   Path.trans p q
 
 /-- Symmetry of bracket path. -/
-def bracketPathSymm {L : Type u} {B : LieBracketCore L}
+noncomputable def bracketPathSymm {L : Type u} {B : LieBracketCore L}
     {x y z : L} (p : Path (B.bracket x y) z) :
     Path z (B.bracket x y) :=
   Path.symm p
@@ -449,7 +449,7 @@ structure LieDerivation (L : Type u) (B : LieBracketCore L) where
     (B.add (B.bracket (toFun x) y) (B.bracket x (toFun y)))
 
 /-- Inner derivation ad(x). -/
-def innerDerivation {L : Type u} (B : LieBracketCore L)
+noncomputable def innerDerivation {L : Type u} (B : LieBracketCore L)
     (J : HasJacobiCyclic L B) (x : L) :
     LieDerivation L B where
   toFun := adjointAction B x
@@ -457,7 +457,7 @@ def innerDerivation {L : Type u} (B : LieBracketCore L)
   leibniz := fun y z => J.jacobi_cyclic x y z
 
 /-- Composition of derivation with bracket path. -/
-def derivationBracketPath {L : Type u} {B : LieBracketCore L}
+noncomputable def derivationBracketPath {L : Type u} {B : LieBracketCore L}
     (D : LieDerivation L B) (x y : L) :
     Path (D.toFun (B.bracket x y))
          (B.add (B.bracket (D.toFun x) y) (B.bracket x (D.toFun y))) :=
@@ -473,7 +473,7 @@ structure CentralExtension (L : Type u) (A : Type v) (E : Type w)
   central : (a : A) → (e : E) → Path (BE.bracket (inc a) e) BE.zero
 
 /-- The inclusion maps to center. -/
-def centralExtInCenter {L : Type u} {A : Type v} {E : Type w}
+noncomputable def centralExtInCenter {L : Type u} {A : Type v} {E : Type w}
     {BL : LieBracketCore L} {BE : LieBracketCore E}
     (ext : CentralExtension L A E BL BE) (a : A) (e : E) :
     Path (BE.bracket (ext.inc a) e) BE.zero :=
@@ -507,7 +507,7 @@ structure RootSpaceDecomp (L : Type u) (B : LieBracketCore L)
     root_space (B.add alpha beta) (B.bracket x y)
 
 /-- Cartan elements act diagonally on root spaces (path witness). -/
-def cartanDiagonalAction {L : Type u} (B : LieBracketCore L)
+noncomputable def cartanDiagonalAction {L : Type u} (B : LieBracketCore L)
     (H : CartanSubalgebra L B) (h x : L) (_hH : H.carrier h) :
     Path (B.bracket h x) (B.bracket h x) :=
   Path.refl (B.bracket h x)
@@ -521,7 +521,7 @@ structure CasimirElement (L : Type u) where
                             (UEAElem.mul elem (UEAElem.gen x))
 
 /-- The Casimir element commutes with all generators. -/
-def casimirCentral {L : Type u} (C : CasimirElement L) (x : L) :
+noncomputable def casimirCentral {L : Type u} (C : CasimirElement L) (x : L) :
     Path (UEAElem.mul (UEAElem.gen x) C.elem)
          (UEAElem.mul C.elem (UEAElem.gen x)) :=
   C.central x
@@ -535,7 +535,7 @@ inductive TensorElem (M : Type u) (N : Type v) : Type (max u v) where
   | zero : TensorElem M N
 
 /-- Tensor product representation action. -/
-def tensorRepAct {L : Type u} {M : Type v} {N : Type w}
+noncomputable def tensorRepAct {L : Type u} {M : Type v} {N : Type w}
     (B : LieBracketCore L) (rhoM : LieRep L M B) (rhoN : LieRep L N B) :
     L → TensorElem M N → TensorElem M N :=
   fun x t => match t with
@@ -549,21 +549,21 @@ def tensorRepAct {L : Type u} {M : Type v} {N : Type w}
 /-! ## 24. Homomorphism Path Properties -/
 
 /-- Identity composed with f is f. -/
-def homCompIdLeft {L : Type u} {M : Type v}
+noncomputable def homCompIdLeft {L : Type u} {M : Type v}
     {BL : LieBracketCore L} {BM : LieBracketCore M}
     (f : LieAlgHom L M BL BM) (x : L) :
     Path ((LieAlgHom.comp (LieAlgHom.id M BM) f).toFun x) (f.toFun x) :=
   Path.refl (f.toFun x)
 
 /-- f composed with identity is f. -/
-def homCompIdRight {L : Type u} {M : Type v}
+noncomputable def homCompIdRight {L : Type u} {M : Type v}
     {BL : LieBracketCore L} {BM : LieBracketCore M}
     (f : LieAlgHom L M BL BM) (x : L) :
     Path ((LieAlgHom.comp f (LieAlgHom.id L BL)).toFun x) (f.toFun x) :=
   Path.refl (f.toFun x)
 
 /-- Associativity of composition at the element level. -/
-def homCompAssoc {L : Type u} {M : Type v} {N : Type w} {P : Type u}
+noncomputable def homCompAssoc {L : Type u} {M : Type v} {N : Type w} {P : Type u}
     {BL : LieBracketCore L} {BM : LieBracketCore M}
     {BN : LieBracketCore N} {BP : LieBracketCore P}
     (h : LieAlgHom N P BN BP) (g : LieAlgHom M N BM BN) (f : LieAlgHom L M BL BM)
@@ -588,7 +588,7 @@ structure EngelWitness (L : Type u) (M : Type v) (B : LieBracketCore L) where
   all_annihilate : (x : L) → Path (rep.act x common_eigenvector) rep.zeroM
 
 /-- Engel's theorem gives a fixed point. -/
-def engelFixedPoint {L : Type u} {M : Type v} {B : LieBracketCore L}
+noncomputable def engelFixedPoint {L : Type u} {M : Type v} {B : LieBracketCore L}
     (E : EngelWitness L M B) (x : L) :
     Path (E.rep.act x E.common_eigenvector) E.rep.zeroM :=
   E.all_annihilate x
@@ -606,24 +606,24 @@ structure LieTheoremWitness (L : Type u) (M : Type v) (B : LieBracketCore L) whe
 /-! ## 28. congrArg through operations -/
 
 /-- congrArg through add (left). -/
-def addCongrLeft {L : Type u} (B : LieBracketCore L)
+noncomputable def addCongrLeft {L : Type u} (B : LieBracketCore L)
     {x x' : L} (p : Path x x') (y : L) :
     Path (B.add x y) (B.add x' y) :=
   Path.congrArg (fun t => B.add t y) p
 
 /-- congrArg through add (right). -/
-def addCongrRight {L : Type u} (B : LieBracketCore L)
+noncomputable def addCongrRight {L : Type u} (B : LieBracketCore L)
     (x : L) {y y' : L} (p : Path y y') :
     Path (B.add x y) (B.add x y') :=
   Path.congrArg (fun t => B.add x t) p
 
 /-- Path through neg. -/
-def negCongrPath {L : Type u} (B : LieBracketCore L)
+noncomputable def negCongrPath {L : Type u} (B : LieBracketCore L)
     {x y : L} (p : Path x y) : Path (B.neg x) (B.neg y) :=
   Path.congrArg B.neg p
 
 /-- Add congr on both sides. -/
-def addCongr {L : Type u} (B : LieBracketCore L)
+noncomputable def addCongr {L : Type u} (B : LieBracketCore L)
     {x x' y y' : L} (p : Path x x') (q : Path y y') :
     Path (B.add x y) (B.add x' y') :=
   Path.trans (addCongrLeft B p y) (addCongrRight B x' q)
@@ -631,21 +631,21 @@ def addCongr {L : Type u} (B : LieBracketCore L)
 /-! ## 29. Bracket-Add Interaction Paths -/
 
 /-- Right distribute bracket over add. -/
-def bracketDistributeRight {L : Type u} (B : LieBracketCore L)
+noncomputable def bracketDistributeRight {L : Type u} (B : LieBracketCore L)
     (x y z : L) :
     Path (B.bracket x (B.add y z))
          (B.add (B.bracket x y) (B.bracket x z)) :=
   B.bilinear_right_add x y z
 
 /-- Left distribute bracket over add. -/
-def bracketDistributeLeft {L : Type u} (B : LieBracketCore L)
+noncomputable def bracketDistributeLeft {L : Type u} (B : LieBracketCore L)
     (x y z : L) :
     Path (B.bracket (B.add x y) z)
          (B.add (B.bracket x z) (B.bracket y z)) :=
   B.bilinear_left_add x y z
 
 /-- Self-bracket factors through antisymmetry. -/
-def selfBracketViaAntisymm {L : Type u} (B : LieBracketCore L) (x : L) :
+noncomputable def selfBracketViaAntisymm {L : Type u} (B : LieBracketCore L) (x : L) :
     Path (B.bracket x x) B.zero :=
   B.self_bracket_zero x
 
@@ -660,7 +660,7 @@ structure LieRepMorphism (L : Type u) (M : Type v) (N : Type w)
   map_zero : Path (toFun rhoM.zeroM) rhoN.zeroM
 
 /-- Identity morphism of representations. -/
-def LieRepMorphism.id {L : Type u} {M : Type v}
+noncomputable def LieRepMorphism.id {L : Type u} {M : Type v}
     {B : LieBracketCore L} (rhoM : LieRep L M B) :
     LieRepMorphism L M M B rhoM rhoM where
   toFun := fun m => m
@@ -669,7 +669,7 @@ def LieRepMorphism.id {L : Type u} {M : Type v}
   map_zero := Path.refl rhoM.zeroM
 
 /-- Composition of representation morphisms. -/
-def LieRepMorphism.comp {L : Type u} {M : Type v} {N : Type w} {P : Type u}
+noncomputable def LieRepMorphism.comp {L : Type u} {M : Type v} {N : Type w} {P : Type u}
     {B : LieBracketCore L} {rhoM : LieRep L M B} {rhoN : LieRep L N B} {rhoP : LieRep L P B}
     (g : LieRepMorphism L N P B rhoN rhoP) (f : LieRepMorphism L M N B rhoM rhoN) :
     LieRepMorphism L M P B rhoM rhoP where
@@ -705,7 +705,7 @@ structure InvariantForm (L : Type u) (M : Type v) (K : Type w)
 /-! ## 33. Path Algebra of Bracket Operations -/
 
 /-- Jacobi expressed as a path chain. -/
-def jacobiPathChain {L : Type u} (B : LieBracketCore L) (J : HasJacobi L B)
+noncomputable def jacobiPathChain {L : Type u} (B : LieBracketCore L) (J : HasJacobi L B)
     (x y z : L) :
     Path (B.add (B.add (B.bracket x (B.bracket y z))
                        (B.bracket y (B.bracket z x)))
@@ -714,18 +714,18 @@ def jacobiPathChain {L : Type u} (B : LieBracketCore L) (J : HasJacobi L B)
   J.jacobi x y z
 
 /-- Antisymmetry gives neg-cancel structure for bracket sums. -/
-def antisymmNegCancel {L : Type u} (B : LieBracketCore L) (x y : L) :
+noncomputable def antisymmNegCancel {L : Type u} (B : LieBracketCore L) (x y : L) :
     Path (B.add (B.bracket x y) (B.bracket y x))
          (B.add (B.bracket x y) (B.neg (B.bracket x y))) :=
   addCongrRight B (B.bracket x y) (B.antisymmetry y x)
 
 /-- Combined antisymmetry + neg cancel. -/
-def bracketSumToZero {L : Type u} (B : LieBracketCore L) (x y : L) :
+noncomputable def bracketSumToZero {L : Type u} (B : LieBracketCore L) (x y : L) :
     Path (B.add (B.bracket x y) (B.neg (B.bracket x y))) B.zero :=
   B.neg_cancel (B.bracket x y)
 
 /-- Full chain: [x,y] + [y,x] = 0. -/
-def antisymmSumZero {L : Type u} (B : LieBracketCore L) (x y : L) :
+noncomputable def antisymmSumZero {L : Type u} (B : LieBracketCore L) (x y : L) :
     Path (B.add (B.bracket x y) (B.bracket y x)) B.zero :=
   Path.trans (antisymmNegCancel B x y) (bracketSumToZero B x y)
 
@@ -778,7 +778,7 @@ inductive FreeLieElem (G : Type u) : Type u where
   | zero : FreeLieElem G
 
 /-- The free Lie algebra bracket. -/
-def freeLieBracket {G : Type u} (a b : FreeLieElem G) : FreeLieElem G :=
+noncomputable def freeLieBracket {G : Type u} (a b : FreeLieElem G) : FreeLieElem G :=
   FreeLieElem.bracket a b
 
 /-- Free Lie algebra antisymmetry path structure. -/
@@ -812,20 +812,20 @@ structure BorelSubalgebra (L : Type u) (B : LieBracketCore L) where
 /-! ## 41. Path coherence for nested brackets -/
 
 /-- Nested bracket coherence: [[x,y],z] path to -[[y,x],z]. -/
-def nestedBracketAntisymm {L : Type u} (B : LieBracketCore L) (x y z : L) :
+noncomputable def nestedBracketAntisymm {L : Type u} (B : LieBracketCore L) (x y z : L) :
     Path (B.bracket (B.bracket x y) z)
          (B.bracket (B.neg (B.bracket y x)) z) :=
   bracketCongrLeft B (B.antisymmetry x y) z
 
 /-- Double bracket path composition. -/
-def doubleBracketTrans {L : Type u} (B : LieBracketCore L)
+noncomputable def doubleBracketTrans {L : Type u} (B : LieBracketCore L)
     {x y z w : L} (_p : Path (B.bracket x y) z)
     (q : Path (B.bracket z w) (B.bracket z w)) :
     Path (B.bracket z w) (B.bracket z w) :=
   q
 
 /-- Bracket distributes, then antisymmetry applies (path chain). -/
-def bracketDistThenAntisymm {L : Type u} (B : LieBracketCore L)
+noncomputable def bracketDistThenAntisymm {L : Type u} (B : LieBracketCore L)
     (x y z : L) :
     Path (B.bracket (B.add x y) z)
          (B.add (B.bracket x z) (B.bracket y z)) :=
@@ -843,7 +843,7 @@ structure HomKernel (L : Type u) (M : Type v)
   bracket_mem : (x y : L) → carrier x → carrier (BL.bracket x y)
 
 /-- The kernel contains zero. -/
-def kernelZero {L : Type u} {M : Type v}
+noncomputable def kernelZero {L : Type u} {M : Type v}
     {BL : LieBracketCore L} {BM : LieBracketCore M}
     (f : LieAlgHom L M BL BM) : Path (f.toFun BL.zero) BM.zero :=
   f.map_zero
@@ -861,17 +861,17 @@ structure HomImage (L : Type u) (M : Type v)
 /-! ## 44. Nilpotent action paths -/
 
 /-- Iterated adjoint action. -/
-def iteratedAd {L : Type u} (B : LieBracketCore L) (x : L) : Nat → L → L
+noncomputable def iteratedAd {L : Type u} (B : LieBracketCore L) (x : L) : Nat → L → L
   | 0 => fun y => y
   | n + 1 => fun y => B.bracket x (iteratedAd B x n y)
 
 /-- Iterated ad at 0 is identity. -/
-def iteratedAdZero {L : Type u} (B : LieBracketCore L) (x y : L) :
+noncomputable def iteratedAdZero {L : Type u} (B : LieBracketCore L) (x y : L) :
     Path (iteratedAd B x 0 y) y :=
   Path.refl y
 
 /-- Iterated ad at 1 is just the bracket. -/
-def iteratedAdOne {L : Type u} (B : LieBracketCore L) (x y : L) :
+noncomputable def iteratedAdOne {L : Type u} (B : LieBracketCore L) (x y : L) :
     Path (iteratedAd B x 1 y) (B.bracket x y) :=
   Path.refl (B.bracket x y)
 
@@ -911,7 +911,7 @@ structure AdjointBracketCompat (L : Type u) (B : LieBracketCore L) where
 /-! ## 49. Path chain for bilinearity -/
 
 /-- Full bilinearity chain: bracket(add(x,y), add(z,w)). -/
-def fullBilinearExpansion {L : Type u} (B : LieBracketCore L)
+noncomputable def fullBilinearExpansion {L : Type u} (B : LieBracketCore L)
     (x y z w : L) :
     Path (B.bracket (B.add x y) (B.add z w))
          (B.add (B.add (B.bracket x z) (B.bracket x w))
@@ -923,14 +923,14 @@ def fullBilinearExpansion {L : Type u} (B : LieBracketCore L)
 /-! ## 50. Naturality of antisymmetry -/
 
 /-- Antisymmetry is natural with respect to bracket congruence. -/
-def antisymmNatural {L : Type u} (B : LieBracketCore L)
+noncomputable def antisymmNatural {L : Type u} (B : LieBracketCore L)
     {x x' y y' : L} (p : Path x x') (q : Path y y') :
     Path (B.bracket x y) (B.neg (B.bracket y' x')) :=
   Path.trans (bracketCongr B p q)
     (B.antisymmetry x' y')
 
 /-- Bracket antisymmetry chain through negation path. -/
-def antisymmChain {L : Type u} (B : LieBracketCore L) (x y : L) :
+noncomputable def antisymmChain {L : Type u} (B : LieBracketCore L) (x y : L) :
     Path (B.add (B.bracket x y) (B.bracket y x)) B.zero :=
   antisymmSumZero B x y
 
@@ -952,7 +952,7 @@ structure KillingViaAdjoint (L : Type u) (K : Type v)
          (trace (fun z => adjointAction B x (adjointAction B y z)))
 
 /-- Killing form is symmetric via path. -/
-def killingViaAdjointSymm {L : Type u} {K : Type v} {B : LieBracketCore L}
+noncomputable def killingViaAdjointSymm {L : Type u} {K : Type v} {B : LieBracketCore L}
     (_kva : KillingViaAdjoint L K B) (kf : KillingForm L K)
     (x y : L) : Path (kf.form x y) (kf.form y x) :=
   kf.symmetry x y

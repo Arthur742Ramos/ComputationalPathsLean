@@ -26,7 +26,7 @@ inductive MixedHodgeStep {H : Type u} :
       MixedHodgeStep (Path.trans p (Path.symm p)) (Path.refl a)
 
 /-- Interpret a mixed-Hodge domain step as a primitive `Path.Step`. -/
-def MixedHodgeStep.toStep {H : Type u} {a b : H} {p q : Path a b}
+noncomputable def MixedHodgeStep.toStep {H : Type u} {a b : H} {p q : Path a b}
     (s : MixedHodgeStep p q) : Path.Step p q :=
   match s with
   | .weight_right_unit p => Path.Step.trans_refl_right p
@@ -97,7 +97,7 @@ noncomputable def graded_weight_rweq (n : Int) (x : H) :
   rweq_of_mixed_hodge_step (M.gradedWeightStep n x)
 
 /-- Round-trip path used in polarization-style cancellation checks. -/
-def weightRoundTrip (i j : Int) (x : H) :
+noncomputable def weightRoundTrip (i j : Int) (x : H) :
     Path
       (M.weightFiltration i (M.weightFiltration j x))
       (M.weightFiltration i (M.weightFiltration j x)) :=
@@ -111,7 +111,7 @@ noncomputable def weight_roundtrip_rweq (i j : Int) (x : H) :
     (MixedHodgeStep.polarization_cancel (M.weightComposePath i j x))
 
 /-- Weight filtration transport induced by a path in the base. -/
-def transportWeight
+noncomputable def transportWeight
     {X : Type v} (fiber : X → H) {x y : X} (p : Path x y) (i : Int) :
     Path (M.weightFiltration i (fiber x)) (M.weightFiltration i (fiber y)) :=
   Path.congrArg (M.weightFiltration i) (Path.congrArg fiber p)
@@ -119,7 +119,7 @@ def transportWeight
 end MixedHodgeFiltrationData
 
 /-- Build mixed-Hodge filtration data from path-level coherence witnesses. -/
-def mkMixedHodgeFiltrationData
+noncomputable def mkMixedHodgeFiltrationData
     {H : Type u}
     (weightFiltration : Int → H → H)
     (hodgeFiltration : Nat → H → H)

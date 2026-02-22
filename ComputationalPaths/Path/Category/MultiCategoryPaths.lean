@@ -43,19 +43,19 @@ structure MultiCat where
     (h : Hom [c] d) → comp₁ (comp₁ f g) h = comp₁ f (comp₁ g h)
 
 /-- Path witness for left unit law. -/
-def MultiCat.id_comp₁_path (M : MultiCat) {a b : M.Obj}
+noncomputable def MultiCat.id_comp₁_path (M : MultiCat) {a b : M.Obj}
     (f : M.Hom [a] b) :
     Path (M.comp₁ (M.id a) f) f :=
   Path.stepChain (M.id_comp₁ f)
 
 /-- Path witness for right unit law. -/
-def MultiCat.comp₁_id_path (M : MultiCat) {a b : M.Obj}
+noncomputable def MultiCat.comp₁_id_path (M : MultiCat) {a b : M.Obj}
     (f : M.Hom [a] b) :
     Path (M.comp₁ f (M.id b)) f :=
   Path.stepChain (M.comp₁_id f)
 
 /-- Path witness for associativity. -/
-def MultiCat.assoc₁_path (M : MultiCat) {a b c d : M.Obj}
+noncomputable def MultiCat.assoc₁_path (M : MultiCat) {a b c d : M.Obj}
     (f : M.Hom [a] b) (g : M.Hom [b] c) (h : M.Hom [c] d) :
     Path (M.comp₁ (M.comp₁ f g) h) (M.comp₁ f (M.comp₁ g h)) :=
   Path.stepChain (M.assoc₁ f g h)
@@ -117,12 +117,12 @@ structure MultiFunctor (M N : MultiCat) where
     map₁ (M.comp₁ f g) = N.comp₁ (map₁ f) (map₁ g)
 
 /-- Path witness for identity preservation. -/
-def MultiFunctor.map₁_id_path (F : MultiFunctor M N) (a : M.Obj) :
+noncomputable def MultiFunctor.map₁_id_path (F : MultiFunctor M N) (a : M.Obj) :
     Path (F.map₁ (M.id a)) (N.id (F.obj a)) :=
   Path.stepChain (F.map₁_id a)
 
 /-- Path witness for composition preservation. -/
-def MultiFunctor.map₁_comp_path (F : MultiFunctor M N) {a b c : M.Obj}
+noncomputable def MultiFunctor.map₁_comp_path (F : MultiFunctor M N) {a b c : M.Obj}
     (f : M.Hom [a] b) (g : M.Hom [b] c) :
     Path (F.map₁ (M.comp₁ f g)) (N.comp₁ (F.map₁ f) (F.map₁ g)) :=
   Path.stepChain (F.map₁_comp f g)
@@ -140,7 +140,7 @@ theorem map₁_id_path_cancel (F : MultiFunctor M N) (a : M.Obj) :
   simp [MultiFunctor.map₁_id_path]
 
 /-- Identity multifunctor. -/
-def MultiFunctor.idFunctor (M : MultiCat) : MultiFunctor M M where
+noncomputable def MultiFunctor.idFunctor (M : MultiCat) : MultiFunctor M M where
   obj := _root_.id
   map₁ := fun f => f
   map₁_id := fun _ => rfl
@@ -152,7 +152,7 @@ theorem id_functor_map₁_id (M : MultiCat) (a : M.Obj) :
   rfl
 
 /-- Composition of multifunctors. -/
-def MultiFunctor.compFunctor (F : MultiFunctor M N) (G : MultiFunctor N P) :
+noncomputable def MultiFunctor.compFunctor (F : MultiFunctor M N) (G : MultiFunctor N P) :
     MultiFunctor M P where
   obj := G.obj ∘ F.obj
   map₁ := fun f => G.map₁ (F.map₁ f)
@@ -181,7 +181,7 @@ structure MultiNatTrans (F G : MultiFunctor M N) where
       N.comp₁ (F.map₁ f) (component b)
 
 /-- Path witness for naturality. -/
-def MultiNatTrans.naturality_path {F G : MultiFunctor M N}
+noncomputable def MultiNatTrans.naturality_path {F G : MultiFunctor M N}
     (η : MultiNatTrans F G) {a b : M.Obj} (f : M.Hom [a] b) :
     Path (N.comp₁ (η.component a) (G.map₁ f))
          (N.comp₁ (F.map₁ f) (η.component b)) :=
@@ -203,7 +203,7 @@ theorem naturality_path_cancel {F G : MultiFunctor M N}
   simp [MultiNatTrans.naturality_path]
 
 /-- Identity multinatural transformation. -/
-def MultiNatTrans.idTrans (F : MultiFunctor M N) : MultiNatTrans F F where
+noncomputable def MultiNatTrans.idTrans (F : MultiFunctor M N) : MultiNatTrans F F where
   component := fun a => N.id (F.obj a)
   naturality := fun f => by rw [N.id_comp₁, N.comp₁_id]
 
@@ -240,7 +240,7 @@ theorem congrArg_tensor_right {M : MultiCat} (T : TensorData M)
 /-! ## Transport in multicategories -/
 
 /-- Transport a multi-morphism along a path on the target. -/
-def transport_hom (M : MultiCat) {inputs : List M.Obj} {b₁ b₂ : M.Obj}
+noncomputable def transport_hom (M : MultiCat) {inputs : List M.Obj} {b₁ b₂ : M.Obj}
     (p : Path b₁ b₂) (f : M.Hom inputs b₁) : M.Hom inputs b₂ :=
   Path.transport (D := fun b => M.Hom inputs b) p f
 

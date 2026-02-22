@@ -50,27 +50,27 @@ structure QuasiCategory where
 namespace QuasiCategory
 
 /-- Objects are 0-simplices. -/
-def obj (C : QuasiCategory) : Type u :=
+noncomputable def obj (C : QuasiCategory) : Type u :=
   C.sset.obj 0
 
 /-- Morphisms are 1-simplices. -/
-def mor (C : QuasiCategory) : Type u :=
+noncomputable def mor (C : QuasiCategory) : Type u :=
   C.sset.obj 1
 
 /-- Source of a morphism (face d1). -/
-def source (C : QuasiCategory) (f : C.mor) : C.obj :=
+noncomputable def source (C : QuasiCategory) (f : C.mor) : C.obj :=
   C.sset.face 0 ⟨1, by omega⟩ f
 
 /-- Target of a morphism (face d0). -/
-def target (C : QuasiCategory) (f : C.mor) : C.obj :=
+noncomputable def target (C : QuasiCategory) (f : C.mor) : C.obj :=
   C.sset.face 0 ⟨0, by omega⟩ f
 
 /-- Identity morphism via degeneracy. -/
-def id (C : QuasiCategory) (x : C.obj) : C.mor :=
+noncomputable def id (C : QuasiCategory) (x : C.obj) : C.mor :=
   C.sset.degen 0 ⟨0, by omega⟩ x
 
 /-- 2-simplices of a quasi-category. -/
-def twoSimplex (C : QuasiCategory) : Type u :=
+noncomputable def twoSimplex (C : QuasiCategory) : Type u :=
   C.sset.obj 2
 
 /-- Composability of morphisms in a quasi-category. -/
@@ -79,13 +79,13 @@ structure Composable (C : QuasiCategory) (f g : C.mor) : Prop where
   target_eq : C.target f = C.source g
 
 /-- The inner horn Lambda^2_1 determined by two composable edges. -/
-def compHorn (C : QuasiCategory) (f g : C.mor) :
+noncomputable def compHorn (C : QuasiCategory) (f g : C.mor) :
     HornData C.sset 1 ⟨1, by omega⟩ where
   faces := fun i _ => if i.val = 0 then g else f
   compat := fun _ _ _ _ _ _ _ => trivial
 
 /-- The chosen inner horn filler used for composition. -/
-def compFiller (C : QuasiCategory) (f g : C.mor) :
+noncomputable def compFiller (C : QuasiCategory) (f g : C.mor) :
     HornFiller C.sset 1 ⟨1, by omega⟩ (compHorn C f g) :=
   by
     have hk : InnerHorn 1 ⟨1, by omega⟩ := by
@@ -93,7 +93,7 @@ def compFiller (C : QuasiCategory) (f g : C.mor) :
     exact C.innerKan.fill 1 ⟨1, by omega⟩ hk (compHorn C f g)
 
 /-- Composition via the inner horn filler (face d1 of the filler). -/
-def comp (C : QuasiCategory) (f g : C.mor) : C.mor :=
+noncomputable def comp (C : QuasiCategory) (f g : C.mor) : C.mor :=
   C.sset.face 1 ⟨1, by omega⟩ (compFiller C f g).simplex
 
 end QuasiCategory
@@ -116,7 +116,7 @@ abbrev Map (M : MappingSpaceData C) (x y : C.obj) : SSetData :=
   M.map x y
 
 /-- The mapping space Map(x,y) is Kan. -/
-  def mapIsKan (M : MappingSpaceData C) (x y : C.obj) :
+  noncomputable def mapIsKan (M : MappingSpaceData C) (x y : C.obj) :
       KanFillerProperty (Map M x y) :=
     M.kan x y
 
@@ -142,7 +142,7 @@ structure HomotopyCategoryData (C : QuasiCategory) where
   comp_assoc : ∀ {a b c d} (_ : hom a b) (_ : hom b c) (_ : hom c d), True
 
 /-- The homotopy category induced by a quasi-category. -/
-def homotopyCategory (C : QuasiCategory) : HomotopyCategoryData C where
+noncomputable def homotopyCategory (C : QuasiCategory) : HomotopyCategoryData C where
   obj := C.obj
   hom := fun _ _ => C.mor
   id := C.id
@@ -163,11 +163,11 @@ structure NerveQuasiCategory (C : SmallCatData) where
 /-! ## Left and right fibrations -/
 
 /-- Left horns: inner horns or k = 0. -/
-def LeftHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
+noncomputable def LeftHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
   k.val = 0 ∨ InnerHorn n k
 
 /-- Right horns: inner horns or k = n+1. -/
-def RightHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
+noncomputable def RightHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
   k.val = n + 1 ∨ InnerHorn n k
 
 /-- Left fibration data between simplicial sets. -/
@@ -249,7 +249,7 @@ theorem left_horn_cases (n : Nat) (k : Fin (n + 2)) (h : LeftHorn n k) :
     k.val = 0 ∨ InnerHorn n k :=
   h
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary

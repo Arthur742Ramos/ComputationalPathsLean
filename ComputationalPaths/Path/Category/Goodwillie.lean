@@ -9,69 +9,69 @@ structure GoodwillieFunctor where
   map : Obj → Obj
   base : Obj
 
-def functorObject (F : GoodwillieFunctor) : Type u := F.Obj
+noncomputable def functorObject (F : GoodwillieFunctor) : Type u := F.Obj
 
-def nExcisive (F : GoodwillieFunctor) (n : Nat) : Prop := True
+noncomputable def nExcisive (F : GoodwillieFunctor) (n : Nat) : Prop := True
 
-def reduced (F : GoodwillieFunctor) : Prop := True
+noncomputable def reduced (F : GoodwillieFunctor) : Prop := True
 
-def polynomialApproximation (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := F.map
+noncomputable def polynomialApproximation (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := F.map
 
-def goodwillieTowerStage (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj :=
+noncomputable def goodwillieTowerStage (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj :=
   polynomialApproximation F n
 
-def goodwillieTower (F : GoodwillieFunctor) : Nat → (F.Obj → F.Obj) :=
+noncomputable def goodwillieTower (F : GoodwillieFunctor) : Nat → (F.Obj → F.Obj) :=
   goodwillieTowerStage F
 
-def towerLimit (F : GoodwillieFunctor) : F.Obj → F.Obj := fun x => x
+noncomputable def towerLimit (F : GoodwillieFunctor) : F.Obj → F.Obj := fun x => x
 
-def derivativeSpectrum (F : GoodwillieFunctor) (n : Nat) : Type u := F.Obj
+noncomputable def derivativeSpectrum (F : GoodwillieFunctor) (n : Nat) : Type u := F.Obj
 
-def crossEffect (F : GoodwillieFunctor) (n : Nat) : Type u := F.Obj
+noncomputable def crossEffect (F : GoodwillieFunctor) (n : Nat) : Type u := F.Obj
 
-def homogeneousLayer (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
+noncomputable def homogeneousLayer (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
 
-def classificationData (F : GoodwillieFunctor) (n : Nat) : Prop := True
+noncomputable def classificationData (F : GoodwillieFunctor) (n : Nat) : Prop := True
 
-def taylorCoefficient (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
+noncomputable def taylorCoefficient (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
 
-def linearization (F : GoodwillieFunctor) : F.Obj → F.Obj := fun x => x
+noncomputable def linearization (F : GoodwillieFunctor) : F.Obj → F.Obj := fun x => x
 
-def stabilization (F : GoodwillieFunctor) : F.Obj → F.Obj := fun x => x
+noncomputable def stabilization (F : GoodwillieFunctor) : F.Obj → F.Obj := fun x => x
 
-def delooping (F : GoodwillieFunctor) : F.Obj → F.Obj := fun x => x
+noncomputable def delooping (F : GoodwillieFunctor) : F.Obj → F.Obj := fun x => x
 
-def convergenceCondition (F : GoodwillieFunctor) : Prop := True
+noncomputable def convergenceCondition (F : GoodwillieFunctor) : Prop := True
 
-def analyticRadius (F : GoodwillieFunctor) : Nat := 0
+noncomputable def analyticRadius (F : GoodwillieFunctor) : Nat := 0
 
-def excisiveComparisonMap (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
+noncomputable def excisiveComparisonMap (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
 
-def fiberOfStage (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
+noncomputable def fiberOfStage (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
 
-def multilinearization (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
+noncomputable def multilinearization (F : GoodwillieFunctor) (n : Nat) : F.Obj → F.Obj := fun x => x
 
-def homogeneousClassification (F : GoodwillieFunctor) (n : Nat) : Prop := True
+noncomputable def homogeneousClassification (F : GoodwillieFunctor) (n : Nat) : Prop := True
 
-def stageShift (F : GoodwillieFunctor) (n : Nat) : Nat := n + 1
+noncomputable def stageShift (F : GoodwillieFunctor) (n : Nat) : Nat := n + 1
 
-def derivativeAtBase (F : GoodwillieFunctor) (n : Nat) : derivativeSpectrum F n := F.base
+noncomputable def derivativeAtBase (F : GoodwillieFunctor) (n : Nat) : derivativeSpectrum F n := F.base
 
-def crossEffectAtBase (F : GoodwillieFunctor) (n : Nat) : crossEffect F n := F.base
+noncomputable def crossEffectAtBase (F : GoodwillieFunctor) (n : Nat) : crossEffect F n := F.base
 
-def derivativePath (F : GoodwillieFunctor) (n : Nat) :
+noncomputable def derivativePath (F : GoodwillieFunctor) (n : Nat) :
     Path (derivativeAtBase F n) (derivativeAtBase F n) := Path.refl _
 
-def crossEffectPath (F : GoodwillieFunctor) (n : Nat) :
+noncomputable def crossEffectPath (F : GoodwillieFunctor) (n : Nat) :
     Path (crossEffectAtBase F n) (crossEffectAtBase F n) := Path.refl _
 
-def homogeneousPath (F : GoodwillieFunctor) (x : F.Obj) :
+noncomputable def homogeneousPath (F : GoodwillieFunctor) (x : F.Obj) :
     Path (homogeneousLayer F 0 x) (homogeneousLayer F 0 x) := Path.refl _
 
-def towerPath (F : GoodwillieFunctor) (x : F.Obj) :
+noncomputable def towerPath (F : GoodwillieFunctor) (x : F.Obj) :
     Path (towerLimit F x) (towerLimit F x) := Path.trans (Path.refl _) (Path.refl _)
 
-def classificationPath (F : GoodwillieFunctor) (x : F.Obj) : Path x x := Path.refl x
+noncomputable def classificationPath (F : GoodwillieFunctor) (x : F.Obj) : Path x x := Path.refl x
 
 theorem polynomialApproximation_id (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
     polynomialApproximation F n x = F.map x := by

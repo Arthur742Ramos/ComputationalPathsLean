@@ -72,11 +72,11 @@ noncomputable def higherPiN_refl (A : Type u) (a : A) (n : Nat) : HigherPiN A a 
   | _ + 3 => PUnit.unit
 
 /-- Type representing π_n(A × B, (a, b)). -/
-def ProdHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
+noncomputable def ProdHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
   HigherPiN (A × B) (a, b) n
 
 /-- Type representing π_n(A, a) × π_n(B, b). -/
-def ProdOfHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
+noncomputable def ProdOfHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
   HigherPiN A a n × HigherPiN B b n
 
 /-- Helper: `π₂` is always a subsingleton in the current computational-paths model. -/

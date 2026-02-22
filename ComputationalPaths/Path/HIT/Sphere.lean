@@ -48,7 +48,7 @@ universe u
 
 /-- The 2-sphere S², defined as the suspension of the circle.
     S² = Σ(S¹) = Pushout PUnit' PUnit' Circle -/
-def Sphere2 : Type u := Suspension Circle
+noncomputable def Sphere2 : Type u := Suspension Circle
 
 namespace Sphere2
 
@@ -65,9 +65,9 @@ noncomputable def merid (x : Circle) : Path (north : Sphere2) south :=
 /-- The basepoint of S² (we choose the north pole). -/
 noncomputable def basepoint : Sphere2 := north
 
-instance : Nonempty Sphere2 := ⟨basepoint⟩
+noncomputable instance : Nonempty Sphere2 := ⟨basepoint⟩
 
-instance : Subsingleton Sphere2 := by
+noncomputable instance : Subsingleton Sphere2 := by
   unfold Sphere2 Suspension
   infer_instance
 
@@ -154,10 +154,10 @@ By SVK:
 -/
 
 /-- The constant map from Circle to PUnit'. -/
-def circleToNorth : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
+noncomputable def circleToNorth : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
 
 /-- The constant map from Circle to PUnit'. -/
-def circleToSouth : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
+noncomputable def circleToSouth : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
 
 /-! ## Key Lemmas for Trivial Decode
 

@@ -152,7 +152,7 @@ structure ReebFoliation where
   codim_one : Path foliationData.codim 1
 
 /-- Standard Reeb foliation construction. -/
-def standardReeb : ReebFoliation.{0} :=
+noncomputable def standardReeb : ReebFoliation.{0} :=
   { component1 := ⟨Unit, Unit, trivial, trivial⟩,
     component2 := ⟨Unit, Unit, trivial, trivial⟩,
     gluing := Path.refl _,

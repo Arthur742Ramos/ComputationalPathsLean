@@ -47,7 +47,7 @@ structure HasVComp (P : BiGraded.{u}) where
     vcomp (vcomp f g) h = vcomp f (vcomp g h)
 
 -- 1. Path-valued vertical associativity
-def HasVComp.vcomp_assoc_path {P : BiGraded.{u}} (vc : HasVComp P)
+noncomputable def HasVComp.vcomp_assoc_path {P : BiGraded.{u}} (vc : HasVComp P)
     {m n k l : Nat}
     (f : P.ops m n) (g : P.ops n k) (h : P.ops k l) :
     Path (vc.vcomp (vc.vcomp f g) h) (vc.vcomp f (vc.vcomp g h)) :=
@@ -80,23 +80,23 @@ structure PROP extends BiGraded.{u} where
     vcomp (hcomp f g) (hcomp f' g') = hcomp (vcomp f f') (vcomp g g')
 
 -- 2. Path-valued left identity
-def PROP.vcomp_id_left_path (P : PROP.{u}) {m n : Nat} (f : P.ops m n) :
+noncomputable def PROP.vcomp_id_left_path (P : PROP.{u}) {m n : Nat} (f : P.ops m n) :
     Path (P.vcomp (P.identity m) f) f :=
   Path.stepChain (P.vcomp_id_left f)
 
 -- 3. Path-valued right identity
-def PROP.vcomp_id_right_path (P : PROP.{u}) {m n : Nat} (f : P.ops m n) :
+noncomputable def PROP.vcomp_id_right_path (P : PROP.{u}) {m n : Nat} (f : P.ops m n) :
     Path (P.vcomp f (P.identity n)) f :=
   Path.stepChain (P.vcomp_id_right f)
 
 -- 4. Path-valued vertical associativity
-def PROP.vcomp_assoc_path (P : PROP.{u}) {m n k l : Nat}
+noncomputable def PROP.vcomp_assoc_path (P : PROP.{u}) {m n k l : Nat}
     (f : P.ops m n) (g : P.ops n k) (h : P.ops k l) :
     Path (P.vcomp (P.vcomp f g) h) (P.vcomp f (P.vcomp g h)) :=
   Path.stepChain (P.vcomp_assoc f g h)
 
 -- 5. Path-valued interchange law
-def PROP.interchange_path (P : PROP.{u}) {a b c d e fd : Nat}
+noncomputable def PROP.interchange_path (P : PROP.{u}) {a b c d e fd : Nat}
     (f : P.ops a b) (g : P.ops c d) (f' : P.ops b e) (g' : P.ops d fd) :
     Path (P.vcomp (P.hcomp f g) (P.hcomp f' g'))
          (P.hcomp (P.vcomp f f') (P.vcomp g g')) :=
@@ -107,7 +107,7 @@ theorem PROP.id_vcomp_id (P : PROP.{u}) (n : Nat) :
     P.vcomp (P.identity n) (P.identity n) = P.identity n :=
   P.vcomp_id_left (P.identity n)
 
-def PROP.id_vcomp_id_path (P : PROP.{u}) (n : Nat) :
+noncomputable def PROP.id_vcomp_id_path (P : PROP.{u}) (n : Nat) :
     Path (P.vcomp (P.identity n) (P.identity n)) (P.identity n) :=
   Path.stepChain (P.id_vcomp_id n)
 
@@ -121,13 +121,13 @@ structure PROPMorphism (P Q : PROP.{u}) where
     map (P.vcomp f g) = Q.vcomp (map f) (map g)
 
 -- 7. Identity PROP morphism
-def PROPMorphism.id (P : PROP.{u}) : PROPMorphism P P where
+noncomputable def PROPMorphism.id (P : PROP.{u}) : PROPMorphism P P where
   map := fun f => f
   map_id := fun _ => rfl
   map_vcomp := fun _ _ => rfl
 
 -- 8. Composition of PROP morphisms
-def PROPMorphism.comp {P Q R : PROP.{u}}
+noncomputable def PROPMorphism.comp {P Q R : PROP.{u}}
     (g : PROPMorphism Q R) (f : PROPMorphism P Q) : PROPMorphism P R where
   map := fun x => g.map (f.map x)
   map_id := fun n => by rw [f.map_id, g.map_id]
@@ -162,18 +162,18 @@ structure Properad extends BiGraded.{u} where
     vcomp_conn (vcomp_conn f g) h = vcomp_conn f (vcomp_conn g h)
 
 -- 11. Path-valued properad associativity
-def Properad.vcomp_conn_assoc_path (P : Properad.{u}) {m n k l : Nat}
+noncomputable def Properad.vcomp_conn_assoc_path (P : Properad.{u}) {m n k l : Nat}
     (f : P.ops m n) (g : P.ops n k) (h : P.ops k l) :
     Path (P.vcomp_conn (P.vcomp_conn f g) h) (P.vcomp_conn f (P.vcomp_conn g h)) :=
   Path.stepChain (P.vcomp_conn_assoc f g h)
 
 -- 12. Path-valued properad unit
-def Properad.unit_left_path (P : Properad.{u}) {m : Nat} (f : P.ops 1 m) :
+noncomputable def Properad.unit_left_path (P : Properad.{u}) {m : Nat} (f : P.ops 1 m) :
     Path (P.vcomp_conn P.identity f) f :=
   Path.stepChain (P.vcomp_unit_left f)
 
 -- 13. Path-valued properad right unit
-def Properad.unit_right_path (P : Properad.{u}) {m : Nat} (f : P.ops m 1) :
+noncomputable def Properad.unit_right_path (P : Properad.{u}) {m : Nat} (f : P.ops m 1) :
     Path (P.vcomp_conn f P.identity) f :=
   Path.stepChain (P.vcomp_unit_right f)
 
@@ -188,7 +188,7 @@ structure Dioperad extends BiGraded.{u} where
     ops (m₁ + 1) n₁ → ops m₂ (n₂ + 1) → ops (m₁ + m₂) (n₁ + n₂)
 
 -- 14. Dioperad has an underlying bigraded collection
-def Dioperad.underlying (D : Dioperad.{u}) : BiGraded.{u} := D.toBiGraded
+noncomputable def Dioperad.underlying (D : Dioperad.{u}) : BiGraded.{u} := D.toBiGraded
 
 -- 15. Dioperad identity composition produces correct arity
 theorem Dioperad.dcomp_arity {D : Dioperad.{u}} {m₁ n₁ m₂ n₂ : Nat}
@@ -208,14 +208,14 @@ structure WheeledPROP extends PROP.{u} where
     vcomp (contract f) g
 
 -- 16. Path-valued contraction naturality
-def WheeledPROP.contract_natural_path (W : WheeledPROP.{u}) {m n k : Nat}
+noncomputable def WheeledPROP.contract_natural_path (W : WheeledPROP.{u}) {m n k : Nat}
     (f : W.ops (m + 1) (n + 1)) (g : W.ops n k) :
     Path (W.contract (W.vcomp f (W.hcomp g (W.identity 1))))
          (W.vcomp (W.contract f) g) :=
   Path.stepChain (W.contract_natural f g)
 
 /-- Double contraction: contracting twice. -/
-def WheeledPROP.double_contract (W : WheeledPROP.{u}) {m n : Nat}
+noncomputable def WheeledPROP.double_contract (W : WheeledPROP.{u}) {m n : Nat}
     (f : W.ops (m + 2) (n + 2)) : W.ops m n :=
   W.contract (W.contract f)
 
@@ -241,17 +241,17 @@ structure FrobeniusObj (P : PROP.{u}) where
   frobenius : P.vcomp mul comul = P.vcomp mul comul
 
 -- 17. Path-valued unit law
-def FrobeniusObj.unit_law_path {P : PROP.{u}} (F : FrobeniusObj P) :
+noncomputable def FrobeniusObj.unit_law_path {P : PROP.{u}} (F : FrobeniusObj P) :
     Path (P.vcomp (P.hcomp F.unit (P.identity 1)) F.mul) (P.identity 1) :=
   Path.stepChain F.unit_law
 
 -- 18. Path-valued counit law
-def FrobeniusObj.counit_law_path {P : PROP.{u}} (F : FrobeniusObj P) :
+noncomputable def FrobeniusObj.counit_law_path {P : PROP.{u}} (F : FrobeniusObj P) :
     Path (P.vcomp F.comul (P.hcomp F.counit (P.identity 1))) (P.identity 1) :=
   Path.stepChain F.counit_law
 
 -- 19. Path-valued Frobenius relation
-def FrobeniusObj.frobenius_path {P : PROP.{u}} (F : FrobeniusObj P) :
+noncomputable def FrobeniusObj.frobenius_path {P : PROP.{u}} (F : FrobeniusObj P) :
     Path (P.vcomp F.mul F.comul) (P.vcomp F.mul F.comul) :=
   Path.refl _
 
@@ -265,7 +265,7 @@ structure CommFrobeniusObj (P : PROP.{u}) extends FrobeniusObj P where
   cocomm_comul : P.vcomp comul swap = comul
 
 -- 20. Path-valued commutativity
-def CommFrobeniusObj.comm_path {P : PROP.{u}} (F : CommFrobeniusObj P) :
+noncomputable def CommFrobeniusObj.comm_path {P : PROP.{u}} (F : CommFrobeniusObj P) :
     Path (P.vcomp F.swap F.mul) F.mul :=
   Path.stepChain F.comm_mul
 
@@ -284,13 +284,13 @@ structure PROPRep (P : PROP.{u}) (X : Type u) where
     interp (P.vcomp f g) args = interp g (interp f args)
 
 -- 21. Path-valued representation identity
-def PROPRep.interp_id_path {P : PROP.{u}} {X : Type u} (R : PROPRep P X)
+noncomputable def PROPRep.interp_id_path {P : PROP.{u}} {X : Type u} (R : PROPRep P X)
     (n : Nat) (args : Fin n → X) :
     Path (R.interp (P.identity n) args) args :=
   Path.stepChain (R.interp_id n args)
 
 -- 22. Path-valued representation vcomp
-def PROPRep.interp_vcomp_path {P : PROP.{u}} {X : Type u} (R : PROPRep P X)
+noncomputable def PROPRep.interp_vcomp_path {P : PROP.{u}} {X : Type u} (R : PROPRep P X)
     {m n k : Nat} (f : P.ops m n) (g : P.ops n k) (args : Fin m → X) :
     Path (R.interp (P.vcomp f g) args) (R.interp g (R.interp f args)) :=
   Path.stepChain (R.interp_vcomp f g args)
@@ -307,14 +307,14 @@ structure BialgebraObj (P : PROP.{u}) where
   compat : P.vcomp mul comul = P.vcomp mul comul
 
 -- 23. Path-valued bialgebra compatibility
-def BialgebraObj.compat_path {P : PROP.{u}} (B : BialgebraObj P) :
+noncomputable def BialgebraObj.compat_path {P : PROP.{u}} (B : BialgebraObj P) :
     Path (P.vcomp B.mul B.comul) (P.vcomp B.mul B.comul) :=
   Path.refl _
 
 /-! ## PROP from operad -/
 
 /-- Simplified PROP from operad: operations (m,1) come from operad arity m. -/
-def operadToPROP_simple (arity : Nat → Type u) : BiGraded.{u} where
+noncomputable def operadToPROP_simple (arity : Nat → Type u) : BiGraded.{u} where
   ops := fun m n => match n with
     | 1 => arity m
     | _ => PEmpty
@@ -336,7 +336,7 @@ theorem PROP.identity_idempotent (P : PROP.{u}) (n : Nat) :
   P.vcomp_id_left _
 
 -- 26. Three-fold vcomp associativity path composition
-def PROP.triple_assoc_path (P : PROP.{u}) {m n k l r : Nat}
+noncomputable def PROP.triple_assoc_path (P : PROP.{u}) {m n k l r : Nat}
     (f : P.ops m n) (g : P.ops n k) (h : P.ops k l) (j : P.ops l r) :
     Path (P.vcomp (P.vcomp (P.vcomp f g) h) j)
          (P.vcomp f (P.vcomp g (P.vcomp h j))) :=
@@ -345,7 +345,7 @@ def PROP.triple_assoc_path (P : PROP.{u}) {m n k l r : Nat}
     (Path.stepChain (P.vcomp_assoc f g (P.vcomp h j)))
 
 -- 27. Frobenius implies μΔ is an endomorphism path
-def FrobeniusObj.mulcomul_endo_path {P : PROP.{u}} (F : FrobeniusObj P) :
+noncomputable def FrobeniusObj.mulcomul_endo_path {P : PROP.{u}} (F : FrobeniusObj P) :
     Path (P.vcomp F.mul F.comul) (P.vcomp F.mul F.comul) :=
   Path.refl _
 
@@ -355,7 +355,7 @@ theorem Properad.id_double_comp (P : Properad.{u}) :
     P.identity := by
   rw [P.vcomp_unit_left, P.vcomp_unit_left]
 
-def Properad.id_double_comp_path (P : Properad.{u}) :
+noncomputable def Properad.id_double_comp_path (P : Properad.{u}) :
     Path (P.vcomp_conn (P.vcomp_conn P.identity P.identity) P.identity)
          P.identity :=
   Path.stepChain (P.id_double_comp)
@@ -366,7 +366,7 @@ theorem Properad.triple_comp (P : Properad.{u}) {m n k l : Nat}
     P.vcomp_conn (P.vcomp_conn f g) h = P.vcomp_conn f (P.vcomp_conn g h) :=
   P.vcomp_conn_assoc f g h
 
-def Properad.triple_comp_path (P : Properad.{u}) {m n k l : Nat}
+noncomputable def Properad.triple_comp_path (P : Properad.{u}) {m n k l : Nat}
     (f : P.ops m n) (g : P.ops n k) (h : P.ops k l) :
     Path (P.vcomp_conn (P.vcomp_conn f g) h)
          (P.vcomp_conn f (P.vcomp_conn g h)) :=
@@ -385,7 +385,7 @@ theorem PROPRep.interp_double_vcomp {P : PROP.{u}} {X : Type u} (R : PROPRep P X
     R.interp h (R.interp g (R.interp f args)) := by
   rw [R.interp_vcomp, R.interp_vcomp]
 
-def PROPRep.interp_double_vcomp_path {P : PROP.{u}} {X : Type u} (R : PROPRep P X)
+noncomputable def PROPRep.interp_double_vcomp_path {P : PROP.{u}} {X : Type u} (R : PROPRep P X)
     {m n k l : Nat} (f : P.ops m n) (g : P.ops n k) (h : P.ops k l)
     (args : Fin m → X) :
     Path (R.interp (P.vcomp (P.vcomp f g) h) args)

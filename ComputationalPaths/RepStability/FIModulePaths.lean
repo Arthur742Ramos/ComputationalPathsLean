@@ -30,11 +30,11 @@ structure FIHom (n m : Nat) where
 namespace FIHom
 
 /-- Identity FI morphism. -/
-def id (n : Nat) : FIHom n n where
+noncomputable def id (n : Nat) : FIHom n n where
   map := fun i => i
 
 /-- Composition of FI morphisms. -/
-def comp {n m k : Nat} (f : FIHom n m) (g : FIHom m k) : FIHom n k where
+noncomputable def comp {n m k : Nat} (f : FIHom n m) (g : FIHom m k) : FIHom n k where
   map := fun i => g.map (f.map i)
 
 @[simp] theorem comp_id_left {n m : Nat} (f : FIHom n m) :
@@ -56,17 +56,17 @@ def comp {n m k : Nat} (f : FIHom n m) (g : FIHom m k) : FIHom n k where
   rfl
 
 /-- Path witness for left identity in FI composition. -/
-def comp_id_left_path {n m : Nat} (f : FIHom n m) :
+noncomputable def comp_id_left_path {n m : Nat} (f : FIHom n m) :
     Path (comp (id n) f) f :=
   Path.stepChain (comp_id_left f)
 
 /-- Path witness for right identity in FI composition. -/
-def comp_id_right_path {n m : Nat} (f : FIHom n m) :
+noncomputable def comp_id_right_path {n m : Nat} (f : FIHom n m) :
     Path (comp f (id m)) f :=
   Path.stepChain (comp_id_right f)
 
 /-- Path witness for associativity in FI composition. -/
-def comp_assoc_path {n m k l : Nat}
+noncomputable def comp_assoc_path {n m k l : Nat}
     (f : FIHom n m) (g : FIHom m k) (h : FIHom k l) :
     Path (comp (comp f g) h) (comp f (comp g h)) :=
   Path.stepChain (comp_assoc f g h)
@@ -102,12 +102,12 @@ variable {Carrier : Type u}
 variable (F : FIModulePathData Carrier)
 
 /-- Composite FI-action comparison path. -/
-def actionCompositePath {n m k : Nat} (f : FIHom n m) (g : FIHom m k) (x : Carrier) :
+noncomputable def actionCompositePath {n m k : Nat} (f : FIHom n m) (g : FIHom m k) (x : Carrier) :
     Path (F.action (FIHom.comp f g) x) (F.action g (F.action f x)) :=
   F.actionCompPath f g x
 
 /-- Step witness: right-unit normalization for identity action coherence. -/
-def actionId_step (n : Nat) (x : Carrier) :
+noncomputable def actionId_step (n : Nat) (x : Carrier) :
     Path.Step
       (Path.trans (F.actionIdPath n x) (Path.refl x))
       (F.actionIdPath n x) :=
@@ -120,7 +120,7 @@ noncomputable def actionId_rweq (n : Nat) (x : Carrier) :
   rweq_of_step (F.actionId_step n x)
 
 /-- Step witness: left-unit normalization for stabilization naturality. -/
-def stabilizationNaturality_step {n m : Nat} (f : FIHom n m) (x : Carrier) :
+noncomputable def stabilizationNaturality_step {n m : Nat} (f : FIHom n m) (x : Carrier) :
     Path.Step
       (Path.trans (Path.refl (F.stabilize m (F.action f x))) (F.stabilizationNaturalityPath f x))
       (F.stabilizationNaturalityPath f x) :=
@@ -133,7 +133,7 @@ noncomputable def stabilizationNaturality_rweq {n m : Nat} (f : FIHom n m) (x : 
   rweq_of_step (F.stabilizationNaturality_step f x)
 
 /-- Step witness: right-unit normalization for eventual stability paths. -/
-def eventualStability_step (n : Nat) (hn : F.stableRange ≤ n) (x : Carrier) :
+noncomputable def eventualStability_step (n : Nat) (hn : F.stableRange ≤ n) (x : Carrier) :
     Path.Step
       (Path.trans
         (F.eventualStabilityPath n hn x)
@@ -150,7 +150,7 @@ noncomputable def eventualStability_rweq (n : Nat) (hn : F.stableRange ≤ n) (x
   rweq_of_step (F.eventualStability_step n hn x)
 
 /-- Two-step eventual stability path obtained by composing adjacent stages. -/
-def eventualStability_twoStepPath (n : Nat) (hn : F.stableRange ≤ n) (x : Carrier) :
+noncomputable def eventualStability_twoStepPath (n : Nat) (hn : F.stableRange ≤ n) (x : Carrier) :
     Path (F.stabilize n x) (F.stabilize ((n + 1) + 1) x) :=
   Path.trans
     (F.eventualStabilityPath n hn x)
@@ -176,7 +176,7 @@ noncomputable def eventualStability_twoStep_cancel_rweq (n : Nat)
   rweq_cmpA_inv_left (F.eventualStability_twoStepPath n hn x)
 
 /-- Bridge comparing stabilization naturality at identity with action-id laws. -/
-def stabilizationIdBridgePath (n : Nat) (x : Carrier) :
+noncomputable def stabilizationIdBridgePath (n : Nat) (x : Carrier) :
     Path (F.stabilize n (F.action (FIHom.id n) x))
       (F.action (FIHom.id n) (F.stabilize n x)) :=
   Path.trans
@@ -201,7 +201,7 @@ noncomputable def actionComposite_cancel_rweq {n m k : Nat}
 end FIModulePathData
 
 /-- Trivial model instantiating the FI-module computational-path interface. -/
-def trivialFIModulePathData : FIModulePathData PUnit where
+noncomputable def trivialFIModulePathData : FIModulePathData PUnit where
   action := fun {_ _} _ _ => PUnit.unit
   stabilize := fun _ _ => PUnit.unit
   stableRange := 0

@@ -37,9 +37,9 @@ deriving Repr, BEq, DecidableEq
 
 abbrev Ctx := List Ty
 
-@[simp] def Ctx.empty : Ctx := []
-@[simp] def Ctx.extend (Γ : Ctx) (τ : Ty) : Ctx := τ :: Γ
-@[reducible] def Ctx.lookup (Γ : Ctx) (n : Nat) : Option Ty := List.get? Γ n
+@[simp] noncomputable def Ctx.empty : Ctx := []
+@[simp] noncomputable def Ctx.extend (Γ : Ctx) (τ : Ty) : Ctx := τ :: Γ
+@[reducible] noncomputable def Ctx.lookup (Γ : Ctx) (n : Nat) : Option Ty := List.get? Γ n
 
 -- 1
 theorem empty_lookup (n : Nat) : Ctx.lookup Ctx.empty n = none := rfl
@@ -72,7 +72,7 @@ theorem hastype_irrel {Γ : Ctx} {t : Term} {τ : Ty}
 
 /-! ## Type inference -/
 
-@[simp] def typeInfer (Γ : Ctx) : Term → Option Ty
+@[simp] noncomputable def typeInfer (Γ : Ctx) : Term → Option Ty
   | .var n => Γ.lookup n
   | .lam τ t =>
     match typeInfer (Γ.extend τ) t with
@@ -115,7 +115,7 @@ theorem isvalue_irrel {t : Term} (h1 h2 : IsValue t) : h1 = h2 :=
   Subsingleton.elim h1 h2
 
 /-- Substitution (simplified, no shifting). -/
-@[simp] def subst (s : Term) : Term → Term
+@[simp] noncomputable def subst (s : Term) : Term → Term
   | .var 0 => s
   | .var (n + 1) => .var n
   | .lam τ t => .lam τ (subst s t)
@@ -166,61 +166,61 @@ theorem var_type_unique {Γ : Ctx} {n : Nat} {τ₁ τ₂ : Ty}
   rw [h1] at h2; exact Option.some.inj h2
 
 -- 12. Type uniqueness path
-def var_type_path {Γ : Ctx} {n : Nat} {τ₁ τ₂ : Ty}
+noncomputable def var_type_path {Γ : Ctx} {n : Nat} {τ₁ τ₂ : Ty}
     (h1 : Γ.lookup n = some τ₁) (h2 : Γ.lookup n = some τ₂) : Path τ₁ τ₂ :=
   ⟨[⟨τ₁, τ₂, var_type_unique h1 h2⟩], var_type_unique h1 h2⟩
 
 /-! ## CongrArg paths through type constructors -/
 
 -- 13. Arr left congruence
-def arr_left_path {τ₁ τ₂ : Ty} (σ : Ty) (p : Path τ₁ τ₂) :
+noncomputable def arr_left_path {τ₁ τ₂ : Ty} (σ : Ty) (p : Path τ₁ τ₂) :
     Path (Ty.arr τ₁ σ) (Ty.arr τ₂ σ) :=
   Path.congrArg (fun τ => Ty.arr τ σ) p
 
 -- 14. Arr right congruence
-def arr_right_path (τ : Ty) {σ₁ σ₂ : Ty} (p : Path σ₁ σ₂) :
+noncomputable def arr_right_path (τ : Ty) {σ₁ σ₂ : Ty} (p : Path σ₁ σ₂) :
     Path (Ty.arr τ σ₁) (Ty.arr τ σ₂) :=
   Path.congrArg (Ty.arr τ) p
 
 -- 15. Prod left congruence
-def prod_left_path {τ₁ τ₂ : Ty} (σ : Ty) (p : Path τ₁ τ₂) :
+noncomputable def prod_left_path {τ₁ τ₂ : Ty} (σ : Ty) (p : Path τ₁ τ₂) :
     Path (Ty.prod τ₁ σ) (Ty.prod τ₂ σ) :=
   Path.congrArg (fun τ => Ty.prod τ σ) p
 
 -- 16. Prod right congruence
-def prod_right_path (τ : Ty) {σ₁ σ₂ : Ty} (p : Path σ₁ σ₂) :
+noncomputable def prod_right_path (τ : Ty) {σ₁ σ₂ : Ty} (p : Path σ₁ σ₂) :
     Path (Ty.prod τ σ₁) (Ty.prod τ σ₂) :=
   Path.congrArg (Ty.prod τ) p
 
 -- 17. CongrArg through typeInfer
-def typeInfer_congrArg (Γ : Ctx) {t1 t2 : Term} (p : Path t1 t2) :
+noncomputable def typeInfer_congrArg (Γ : Ctx) {t1 t2 : Term} (p : Path t1 t2) :
     Path (typeInfer Γ t1) (typeInfer Γ t2) :=
   Path.congrArg (typeInfer Γ) p
 
 -- 18. CongrArg through Ctx.extend
-def extend_congrArg {Γ₁ Γ₂ : Ctx} (τ : Ty) (p : Path Γ₁ Γ₂) :
+noncomputable def extend_congrArg {Γ₁ Γ₂ : Ctx} (τ : Ty) (p : Path Γ₁ Γ₂) :
     Path (Ctx.extend Γ₁ τ) (Ctx.extend Γ₂ τ) :=
   Path.congrArg (fun Γ => Ctx.extend Γ τ) p
 
 -- 19. CongrArg through Ctx.lookup
-def lookup_congrArg {Γ₁ Γ₂ : Ctx} (n : Nat) (p : Path Γ₁ Γ₂) :
+noncomputable def lookup_congrArg {Γ₁ Γ₂ : Ctx} (n : Nat) (p : Path Γ₁ Γ₂) :
     Path (Γ₁.lookup n) (Γ₂.lookup n) :=
   Path.congrArg (fun Γ => Ctx.lookup Γ n) p
 
 /-! ## Transport along type and context paths -/
 
 -- 20. Transport typing along context path
-def typing_transport {Γ1 Γ2 : Ctx} {t : Term} {τ : Ty}
+noncomputable def typing_transport {Γ1 Γ2 : Ctx} {t : Term} {τ : Ty}
     (p : Path Γ1 Γ2) (h : HasType Γ1 t τ) : HasType Γ2 t τ :=
   Path.transport (D := fun Γ => HasType Γ t τ) p h
 
 -- 21. Transport typing along type path
-def typing_type_transport {Γ : Ctx} {t : Term} {τ1 τ2 : Ty}
+noncomputable def typing_type_transport {Γ : Ctx} {t : Term} {τ1 τ2 : Ty}
     (p : Path τ1 τ2) (h : HasType Γ t τ1) : HasType Γ t τ2 :=
   Path.transport (D := fun τ => HasType Γ t τ) p h
 
 -- 22. Transport a predicate along a type path
-def pred_transport {τ1 τ2 : Ty} (P : Ty → Prop) (p : Path τ1 τ2)
+noncomputable def pred_transport {τ1 τ2 : Ty} (P : Ty → Prop) (p : Path τ1 τ2)
     (h : P τ1) : P τ2 :=
   Path.transport (D := P) p h
 
@@ -240,7 +240,7 @@ theorem extend_inj {Γ1 Γ2 : Ctx} {τ : Ty}
   unfold Ctx.extend at h; exact List.tail_eq_of_cons_eq h
 
 -- 26. Injectivity path
-def extend_inj_path {Γ1 Γ2 : Ctx} {τ : Ty}
+noncomputable def extend_inj_path {Γ1 Γ2 : Ctx} {τ : Ty}
     (h : Ctx.extend Γ1 τ = Ctx.extend Γ2 τ) : Path Γ1 Γ2 :=
   ⟨[⟨Γ1, Γ2, extend_inj h⟩], extend_inj h⟩
 
@@ -292,22 +292,22 @@ theorem ty_path_coherence {τ₁ τ₂ : Ty} (p q : Path τ₁ τ₂) :
 /-! ## Type inference paths -/
 
 -- 36. Type inference on var via refl
-def typeInfer_var_path (Γ : Ctx) (n : Nat) :
+noncomputable def typeInfer_var_path (Γ : Ctx) (n : Nat) :
     Path (typeInfer Γ (.var n)) (Γ.lookup n) :=
   Path.refl _
 
 -- 37. Type inference on unit via refl
-def typeInfer_unit_path (Γ : Ctx) :
+noncomputable def typeInfer_unit_path (Γ : Ctx) :
     Path (typeInfer Γ .unit) (some Ty.base) :=
   Path.refl _
 
 -- 38. Equal terms infer equal types (congrArg)
-def typeInfer_term_path (Γ : Ctx) {t1 t2 : Term} (p : Path t1 t2) :
+noncomputable def typeInfer_term_path (Γ : Ctx) {t1 t2 : Term} (p : Path t1 t2) :
     Path (typeInfer Γ t1) (typeInfer Γ t2) :=
   Path.congrArg (typeInfer Γ) p
 
 -- 39. Equal contexts yield equal inferences
-def typeInfer_ctx_path {Γ1 Γ2 : Ctx} (t : Term) (p : Path Γ1 Γ2) :
+noncomputable def typeInfer_ctx_path {Γ1 Γ2 : Ctx} (t : Term) (p : Path Γ1 Γ2) :
     Path (typeInfer Γ1 t) (typeInfer Γ2 t) :=
   Path.congrArg (fun Γ => typeInfer Γ t) p
 

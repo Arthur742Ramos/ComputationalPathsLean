@@ -80,7 +80,7 @@ structure LocallyPresentableCategory (κ : RegularCardinal)
   hasCoproducts : True
   hasCoequalizers : True
 
-def LocallyFinitelyPresentable := LocallyPresentableCategory 0
+noncomputable def LocallyFinitelyPresentable := LocallyPresentableCategory 0
 
 -- ============================================================
 -- §5  Accessible Functors
@@ -121,7 +121,7 @@ theorem ind_left_adjoint (_ : RegularCardinal) : True := by trivial
 -- §7  Orthogonality and Small Object Argument
 -- ============================================================
 
-def Orthogonal (Obj : Type u) (Hom : Obj → Obj → Type v)
+noncomputable def Orthogonal (Obj : Type u) (Hom : Obj → Obj → Type v)
     {a b c d : Obj} (_ : Hom a b) (_ : Hom c d) : Prop :=
   True
 
@@ -164,7 +164,7 @@ structure Sketch where
 structure SketchModels (_ : Sketch) where
   models : Type u
 
-def IsSketchable (_ : Type u) : Prop := True
+noncomputable def IsSketchable (_ : Type u) : Prop := True
 
 -- ============================================================
 -- §10  Major Theorems
@@ -271,10 +271,10 @@ structure DoctrineMorphism (D₁ D₂ : SoundDoctrine) where
   mapSyntax : D₁.syntaxType → D₂.syntaxType
   preservesTruth : True
 
-def isAccessibleSketchable (κ : RegularCardinal) (C : AccessibleCategory κ) : Prop :=
+noncomputable def isAccessibleSketchable (κ : RegularCardinal) (C : AccessibleCategory κ) : Prop :=
   True
 
-def hasReflectiveAccessibleSubcategory (κ : RegularCardinal)
+noncomputable def hasReflectiveAccessibleSubcategory (κ : RegularCardinal)
     (C : AccessibleCategory κ) : Prop :=
   True
 
@@ -371,18 +371,18 @@ theorem sketchability_iff_makkai_pare (κ : RegularCardinal)
 
 /-! ## Computational-path accessibility integration -/
 
-def filteredColimitPathLimit {κ : RegularCardinal}
+noncomputable def filteredColimitPathLimit {κ : RegularCardinal}
     (C : AccessibleCategory κ) (X Y : C.Obj) : Type _ :=
   Path X Y
 
-def filteredColimitPathCompose {κ : RegularCardinal}
+noncomputable def filteredColimitPathCompose {κ : RegularCardinal}
     {C : AccessibleCategory κ} {X Y Z : C.Obj}
     (p : filteredColimitPathLimit C X Y)
     (q : filteredColimitPathLimit C Y Z) :
     filteredColimitPathLimit C X Z :=
   Path.trans p q
 
-def filteredColimitPathId {κ : RegularCardinal}
+noncomputable def filteredColimitPathId {κ : RegularCardinal}
     {C : AccessibleCategory κ} (X : C.Obj) :
     filteredColimitPathLimit C X X :=
   Path.refl X
@@ -396,19 +396,19 @@ def filteredColimitPathId {κ : RegularCardinal}
       filteredColimitPathCompose p (filteredColimitPathCompose q r) := by
   simpa [filteredColimitPathCompose] using Path.trans_assoc p q r
 
-def indObjectPathCompletion (Obj : Type u) (I : IndCategory Obj) : Type _ :=
+noncomputable def indObjectPathCompletion (Obj : Type u) (I : IndCategory Obj) : Type _ :=
   (x : I.indObj) → Path x x
 
-def indObjectPathCompletion_base (Obj : Type u) (I : IndCategory Obj) :
+noncomputable def indObjectPathCompletion_base (Obj : Type u) (I : IndCategory Obj) :
     indObjectPathCompletion Obj I :=
   fun x => Path.refl x
 
-def accessiblePathRewrite {κ : RegularCardinal} {C : AccessibleCategory κ}
+noncomputable def accessiblePathRewrite {κ : RegularCardinal} {C : AccessibleCategory κ}
     {X Y : C.Obj}
     (p q : filteredColimitPathLimit C X Y) : Prop :=
   Path.toEq p = Path.toEq q
 
-def accessiblePathRewriteConfluent {κ : RegularCardinal} {C : AccessibleCategory κ}
+noncomputable def accessiblePathRewriteConfluent {κ : RegularCardinal} {C : AccessibleCategory κ}
     {X Y : C.Obj} : Prop :=
   ∀ p q r : filteredColimitPathLimit C X Y,
     accessiblePathRewrite p q → accessiblePathRewrite p r →

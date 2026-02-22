@@ -32,7 +32,7 @@ structure ControlledTransition (S : Type u) where
   controlPath : Path src tgt
 
 /-- Compose two controlled transitions sequentially. -/
-def controlCompose {S : Type u} {a b c : S}
+noncomputable def controlCompose {S : Type u} {a b c : S}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -61,7 +61,7 @@ structure ReachabilityWitness (S : Type u) where
   reachPath : Path from_ to_
 
 /-- Reachability is transitive via path composition. -/
-def reachTransitive {S : Type u} (r1 : ReachabilityWitness S) (r2 : ReachabilityWitness S)
+noncomputable def reachTransitive {S : Type u} (r1 : ReachabilityWitness S) (r2 : ReachabilityWitness S)
     (h : r1.to_ = r2.from_) : Path r1.from_ r2.to_ :=
   Path.trans r1.reachPath (Path.trans (Path.mk [Step.mk _ _ h] h) r2.reachPath)
 
@@ -144,7 +144,7 @@ structure FeedbackData (S : Type u) where
   feedbackPath : Path preState postState
 
 /-- Feedback loop: composing feedback paths. -/
-def feedbackLoop {S : Type u} {a : S} (p : Path a a) : Nat → Path a a
+noncomputable def feedbackLoop {S : Type u} {a : S} (p : Path a a) : Nat → Path a a
   | 0 => Path.refl a
   | n + 1 => Path.trans (feedbackLoop p n) p
 

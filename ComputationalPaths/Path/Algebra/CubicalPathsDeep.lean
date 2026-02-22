@@ -39,28 +39,28 @@ inductive Path : CPoint → CPoint → Type where
   | nil  : (a : CPoint) → Path a a
   | cons : Step a b → Path b c → Path a c
 
-def Path.refl (a : CPoint) : Path a a := .nil a
-def Path.single (s : Step a b) : Path a b := .cons s (.nil _)
+noncomputable def Path.refl (a : CPoint) : Path a a := .nil a
+noncomputable def Path.single (s : Step a b) : Path a b := .cons s (.nil _)
 
 /-- Theorem 1 – trans (path composition). -/
-def Path.trans : Path a b → Path b c → Path a c
+noncomputable def Path.trans : Path a b → Path b c → Path a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
 /-- Step inversion. -/
-def Step.symm : Step a b → Step b a
+noncomputable def Step.symm : Step a b → Step b a
   | .edge n m  => .edge m n
   | .refl a    => .refl a
   | .coe n m   => .coe m n
   | .fill n m  => .fill m n
 
 /-- Theorem 2 – path inversion. -/
-def Path.symm : Path a b → Path b a
+noncomputable def Path.symm : Path a b → Path b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.single s.symm)
 
 /-- Theorem 3 – path length. -/
-def Path.length : Path a b → Nat
+noncomputable def Path.length : Path a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -108,7 +108,7 @@ theorem step_symm_symm : (s : Step a b) → s.symm.symm = s
 -- ============================================================
 
 /-- Interval meet (∧). -/
-def Iv.meet : Iv → Iv → Iv
+noncomputable def Iv.meet : Iv → Iv → Iv
   | .i0, _   => .i0
   | _, .i0   => .i0
   | .i1, j   => j
@@ -116,7 +116,7 @@ def Iv.meet : Iv → Iv → Iv
   | .imid, .imid => .imid
 
 /-- Interval join (∨). -/
-def Iv.join : Iv → Iv → Iv
+noncomputable def Iv.join : Iv → Iv → Iv
   | .i1, _   => .i1
   | _, .i1   => .i1
   | .i0, j   => j
@@ -124,7 +124,7 @@ def Iv.join : Iv → Iv → Iv
   | .imid, .imid => .imid
 
 /-- Interval negation. -/
-def Iv.neg : Iv → Iv
+noncomputable def Iv.neg : Iv → Iv
   | .i0   => .i1
   | .i1   => .i0
   | .imid => .imid
@@ -206,7 +206,7 @@ structure CLine (α : Type u) where
   atMid : α
 
 /-- Evaluate a line at an interval point. -/
-def CLine.eval (l : CLine α) : Iv → α
+noncomputable def CLine.eval (l : CLine α) : Iv → α
   | .i0   => l.atI0
   | .i1   => l.atI1
   | .imid => l.atMid
@@ -222,11 +222,11 @@ structure CPathType (α : Type u) (a b : α) where
   bdry1 : line.atI1 = b
 
 /-- Theorem 26 – reflexivity path type. -/
-def CPathType.refl (x : α) : CPathType α x x :=
+noncomputable def CPathType.refl (x : α) : CPathType α x x :=
   ⟨⟨x, x, x⟩, rfl, rfl⟩
 
 /-- Theorem 27 – symmetry of path type. -/
-def CPathType.symm (p : CPathType α a b) : CPathType α b a :=
+noncomputable def CPathType.symm (p : CPathType α a b) : CPathType α b a :=
   ⟨⟨p.line.atI1, p.line.atI0, p.line.atMid⟩, p.bdry1, p.bdry0⟩
 
 -- ============================================================
@@ -234,14 +234,14 @@ def CPathType.symm (p : CPathType α a b) : CPathType α b a :=
 -- ============================================================
 
 /-- Coercion along a line of types (modeled for a single type). -/
-def coe_line (l : CLine α) (i j : Iv) : α :=
+noncomputable def coe_line (l : CLine α) (i j : Iv) : α :=
   l.eval j
 
 /-- Theorem 28 – coe at same endpoint is identity. -/
 theorem coe_refl (l : CLine α) (i : Iv) : coe_line l i i = l.eval i := rfl
 
 /-- Homogeneous composition: compose two lines sharing a midpoint. -/
-def hcomp (l₁ : CLine α) (l₂ : CLine α) (h : l₁.atI1 = l₂.atI0) : CLine α :=
+noncomputable def hcomp (l₁ : CLine α) (l₂ : CLine α) (h : l₁.atI1 = l₂.atI0) : CLine α :=
   ⟨l₁.atI0, l₂.atI1, l₁.atI1⟩
 
 /-- Theorem 29 – hcomp preserves left endpoint. -/
@@ -265,7 +265,7 @@ structure CSquare (α : Type) where
   edgeMid  : α
 
 /-- Kan filler: given three sides of a square, produce the fourth. -/
-def kanFill (top : CLine α) (left : CLine α) (right : CLine α)
+noncomputable def kanFill (top : CLine α) (left : CLine α) (right : CLine α)
     (htl : top.atI0 = left.atI1)
     (htr : top.atI1 = right.atI1) : CSquare α :=
   ⟨left.atI0, left.atI1, right.atI0, right.atI1, top.atMid⟩
@@ -284,11 +284,11 @@ theorem kanFill_topleft (top left right : CLine α) htl htr :
 -- ============================================================
 
 /-- Connection ∧ on lines: squeeze towards i0. -/
-def connection_meet (l : CLine α) : Iv → Iv → α :=
+noncomputable def connection_meet (l : CLine α) : Iv → Iv → α :=
   fun i j => l.eval (Iv.meet i j)
 
 /-- Connection ∨ on lines: squeeze towards i1. -/
-def connection_join (l : CLine α) : Iv → Iv → α :=
+noncomputable def connection_join (l : CLine α) : Iv → Iv → α :=
   fun i j => l.eval (Iv.join i j)
 
 /-- Theorem 33 – connection_meet at (i0, j) gives l(i0). -/
@@ -323,11 +323,11 @@ structure GlueData (A B : Type) where
   rightInv: ∀ b, toFun (invFun b) = b
 
 /-- Theorem 37 – identity GlueData. -/
-def GlueData.id (A : Type) : GlueData A A :=
+noncomputable def GlueData.id (A : Type) : GlueData A A :=
   ⟨fun a => a, fun a => a, fun _ => rfl, fun _ => rfl⟩
 
 /-- Glue type at a given interval point. -/
-def GlueType (g : GlueData A B) : Iv → Type :=
+noncomputable def GlueType (g : GlueData A B) : Iv → Type :=
   fun i => match i with
   | .i0   => A
   | .i1   => B
@@ -340,7 +340,7 @@ theorem glueType_i0 (g : GlueData A B) : GlueType g .i0 = A := rfl
 theorem glueType_i1 (g : GlueData A B) : GlueType g .i1 = B := rfl
 
 /-- Theorem 40 – GlueData composition. -/
-def GlueData.comp (g₁ : GlueData A B) (g₂ : GlueData B C) : GlueData A C :=
+noncomputable def GlueData.comp (g₁ : GlueData A B) (g₂ : GlueData B C) : GlueData A C :=
   ⟨g₂.toFun ∘ g₁.toFun,
    g₁.invFun ∘ g₂.invFun,
    fun a => by simp [Function.comp]; rw [g₂.leftInv, g₁.leftInv],
@@ -355,14 +355,14 @@ structure CEquiv (A B : Type) where
   glue : GlueData A B
 
 /-- Theorem 41 – reflexivity of CEquiv. -/
-def CEquiv.refl (A : Type) : CEquiv A A := ⟨GlueData.id A⟩
+noncomputable def CEquiv.refl (A : Type) : CEquiv A A := ⟨GlueData.id A⟩
 
 /-- Theorem 42 – symmetry of CEquiv. -/
-def CEquiv.symm (e : CEquiv A B) : CEquiv B A :=
+noncomputable def CEquiv.symm (e : CEquiv A B) : CEquiv B A :=
   ⟨⟨e.glue.invFun, e.glue.toFun, e.glue.rightInv, e.glue.leftInv⟩⟩
 
 /-- Theorem 43 – transitivity of CEquiv. -/
-def CEquiv.trans (e₁ : CEquiv A B) (e₂ : CEquiv B C) : CEquiv A C :=
+noncomputable def CEquiv.trans (e₁ : CEquiv A B) (e₂ : CEquiv B C) : CEquiv A C :=
   ⟨GlueData.comp e₁.glue e₂.glue⟩
 
 /-- Theorem 44 – CEquiv round-trip left. -/
@@ -378,14 +378,14 @@ theorem cequiv_right_inv (e : CEquiv A B) (b : B) :
 -- ============================================================
 
 /-- The "ua" map: an equivalence gives a cubical path type. -/
-def ua (e : CEquiv A B) : CPathType (Type _) A B :=
+noncomputable def ua (e : CEquiv A B) : CPathType (Type _) A B :=
   ⟨⟨A, B, A⟩, rfl, rfl⟩
 
 /-- Theorem 46 – ua of identity is refl. -/
 theorem ua_refl (A : Type) : (ua (CEquiv.refl A)).line.atI0 = A := rfl
 
 /-- Transport along ua is the equivalence function. -/
-def transport_ua (e : CEquiv A B) (a : A) : B :=
+noncomputable def transport_ua (e : CEquiv A B) (a : A) : B :=
   e.glue.toFun a
 
 /-- Theorem 47 – transport along ua computes as the glue function. -/
@@ -397,7 +397,7 @@ theorem transport_ua_eq (e : CEquiv A B) (a : A) :
 -- ============================================================
 
 /-- Map a function over a line. -/
-def CLine.map (f : α → β) (l : CLine α) : CLine β :=
+noncomputable def CLine.map (f : α → β) (l : CLine α) : CLine β :=
   ⟨f l.atI0, f l.atI1, f l.atMid⟩
 
 /-- Theorem 48 – map preserves eval. -/
@@ -419,18 +419,18 @@ theorem map_comp (f : α → β) (g : β → γ) (l : CLine α) :
 -- ============================================================
 
 /-- Lift a CLine equality to a computational path between its endpoints. -/
-def pathOfLine (l : CLine CPoint) : Path l.atI0 l.atI1 :=
+noncomputable def pathOfLine (l : CLine CPoint) : Path l.atI0 l.atI1 :=
   .cons (.edge (match l.atI0 with | .mk n => n) (match l.atI1 with | .mk m => m)) (.nil _)
 
 /-- Theorem 51 – coe step creates a single-step path. -/
-def coePath (n m : Nat) : Path (.mk n) (.mk m) :=
+noncomputable def coePath (n m : Nat) : Path (.mk n) (.mk m) :=
   .single (.coe n m)
 
 /-- Theorem 52 – coe path has length 1. -/
 theorem coePath_length (n m : Nat) : (coePath n m).length = 1 := rfl
 
 /-- Theorem 53 – fill step creates a single-step path. -/
-def fillPath (n m : Nat) : Path (.mk n) (.mk m) :=
+noncomputable def fillPath (n m : Nat) : Path (.mk n) (.mk m) :=
   .single (.fill n m)
 
 /-- Theorem 54 – trans of coe paths composes. -/
@@ -448,10 +448,10 @@ inductive Path2 : Path a b → Path a b → Type where
   | symm2  : Path2 p q → Path2 q p
 
 /-- Theorem 55 – refl2 is reflexive. -/
-def Path2.rfl2 (p : Path a b) : Path2 p p := .refl2 p
+noncomputable def Path2.rfl2 (p : Path a b) : Path2 p p := .refl2 p
 
 /-- Theorem 56 – 2-path has vertical composition. -/
-def Path2.vcomp (α : Path2 p q) (β : Path2 q r) : Path2 p r :=
+noncomputable def Path2.vcomp (α : Path2 p q) (β : Path2 q r) : Path2 p r :=
   .trans2 α β
 
 /-- A 3-cell: path between 2-paths. -/
@@ -460,14 +460,14 @@ inductive Path3 : Path2 p q → Path2 p q → Type where
   | trans3 : Path3 α β → Path3 β γ → Path3 α γ
 
 /-- Theorem 57 – refl3 exists. -/
-def Path3.rfl3 (α : Path2 p q) : Path3 α α := .refl3 α
+noncomputable def Path3.rfl3 (α : Path2 p q) : Path3 α α := .refl3 α
 
 -- ============================================================
 -- §14  Coherence: interchange law
 -- ============================================================
 
 /-- Horizontal composition of 2-paths (assuming same shape). -/
-def Path2.hcomp (α : Path2 p q) (β : Path2 p q) : Path2 p q :=
+noncomputable def Path2.hcomp (α : Path2 p q) (β : Path2 p q) : Path2 p q :=
   .trans2 α (.symm2 (.trans2 (.symm2 α) β))
 
 /-- Theorem 58 – hcomp with refl2 returns same. -/
@@ -480,14 +480,14 @@ theorem hcomp_refl2_eq (p : Path a b) :
 -- ============================================================
 
 /-- Build a 3-step path n→m→k→j. -/
-def threeCoe (n m k j : Nat) : Path (.mk n) (.mk j) :=
+noncomputable def threeCoe (n m k j : Nat) : Path (.mk n) (.mk j) :=
   (coePath n m).trans ((coePath m k).trans (coePath k j))
 
 /-- Theorem 59 – three-step path length. -/
 theorem threeCoe_length (n m k j : Nat) : (threeCoe n m k j).length = 3 := rfl
 
 /-- Build a path and its reverse, then compose. -/
-def roundTrip (n m : Nat) : Path (.mk n) (.mk n) :=
+noncomputable def roundTrip (n m : Nat) : Path (.mk n) (.mk n) :=
   (coePath n m).trans (.single (.coe m n))
 
 /-- Theorem 60 – round trip length. -/
@@ -526,7 +526,7 @@ theorem join_distrib_meet (i j k : Iv) :
 -- ============================================================
 
 /-- Transport a property along a computational path. -/
-def transportPath {P : CPoint → Prop} {a b : CPoint}
+noncomputable def transportPath {P : CPoint → Prop} {a b : CPoint}
     (_p : Path a b) (pa : P a) (h : ∀ x y, Step x y → P x → P y) : P b := by
   induction _p with
   | nil => exact pa
@@ -538,7 +538,7 @@ theorem transport_nil {P : CPoint → Prop} (a : CPoint) (pa : P a)
     transportPath (.nil a) pa h = pa := rfl
 
 /-- Theorem 68 – constant transport. -/
-def transport_const {a b : CPoint} (p : Path a b) (x : α) : α := x
+noncomputable def transport_const {a b : CPoint} (p : Path a b) (x : α) : α := x
 
 theorem transport_const_eq {a b : CPoint} (p : Path a b) (x : α) :
     transport_const p x = x := rfl

@@ -106,7 +106,7 @@ inductive StepRule where
   | trans_cancel_right
 deriving DecidableEq, Repr
 
-def allStepRules : List StepRule := [
+noncomputable def allStepRules : List StepRule := [
   .symm_refl, .symm_symm, .trans_refl_left, .trans_refl_right, .trans_symm, .symm_trans,
   .symm_trans_congr, .trans_assoc, .map2_subst, .prod_fst_beta, .prod_snd_beta,
   .prod_rec_beta, .prod_eta, .prod_mk_symm, .prod_map_congrArg, .sigma_fst_beta,
@@ -173,7 +173,7 @@ inductive CriticalPairCase where
   | symm_congr_symm_trans
 deriving DecidableEq, Repr
 
-def allCriticalPairs : List CriticalPairCase := [
+noncomputable def allCriticalPairs : List CriticalPairCase := [
   .trans_assoc_trans_refl_left,
   .trans_assoc_trans_refl_right,
   .trans_assoc_trans_symm,
@@ -217,7 +217,7 @@ theorem allCriticalPairs_complete : ∀ c : CriticalPairCase, c ∈ allCriticalP
   cases c <;> simp [allCriticalPairs]
 
 /-- The pair of rewrite rules producing the given overlap schema. -/
-def CriticalPairCase.rules : CriticalPairCase → StepRule × StepRule
+noncomputable def CriticalPairCase.rules : CriticalPairCase → StepRule × StepRule
   | .trans_assoc_trans_refl_left => (.trans_assoc, .trans_refl_left)
   | .trans_assoc_trans_refl_right => (.trans_assoc, .trans_refl_left)
   | .trans_assoc_trans_symm => (.trans_assoc, .trans_symm)
@@ -256,7 +256,7 @@ theorem CriticalPairCase.rules_in_catalogue (c : CriticalPairCase) :
     c.rules.1 ∈ allStepRules ∧ c.rules.2 ∈ allStepRules := by
   exact ⟨allStepRules_complete c.rules.1, allStepRules_complete c.rules.2⟩
 
-def JoinableRw {A : Type u} {a b : A} (p q : Path a b) : Prop :=
+noncomputable def JoinableRw {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   ∃ r, Rw p r ∧ Rw q r
 
 local notation "Step.Joinable" => JoinableRw
@@ -282,7 +282,7 @@ theorem joinable_symm {A : Type u} {a b : A} {p q : Path a b} :
   Rw.tail (rw_two h₁ h₂) h₃
 
 /-- Target joinability statement for each critical-pair schema. -/
-def CriticalPairCase.Statement : CriticalPairCase → Prop
+noncomputable def CriticalPairCase.Statement : CriticalPairCase → Prop
   | .trans_assoc_trans_refl_left =>
       ∀ {A : Type u} {a b c : A} (p : Path a b) (r : Path b c),
         Step.Joinable (Path.trans (Path.refl a) (Path.trans p r)) (Path.trans p r)
@@ -781,7 +781,7 @@ theorem critical_pair_symm_congr_symm_trans_joinable
   · exact rw_single (Step.trans_symm (Path.symm p))
 
 /-- Case analysis assigning each critical pair its explicit resolution proof. -/
-def CriticalPairCase.proof : (c : CriticalPairCase) → c.Statement
+noncomputable def CriticalPairCase.proof : (c : CriticalPairCase) → c.Statement
   | .trans_assoc_trans_refl_left => critical_pair_trans_assoc_trans_refl_left_joinable
   | .trans_assoc_trans_refl_right => critical_pair_trans_assoc_trans_refl_right_joinable
   | .trans_assoc_trans_symm => critical_pair_trans_assoc_trans_symm_joinable

@@ -60,9 +60,9 @@ end RTC
 section Defs
 variable {α : Type u} (R : α → α → Prop)
 
-def Confluent : Prop := ∀ a b c, RTC R a b → RTC R a c → ∃ d, RTC R b d ∧ RTC R c d
-def LocallyConfluent : Prop := ∀ a b c, R a b → R a c → ∃ d, RTC R b d ∧ RTC R c d
-def IsNF (a : α) : Prop := ∀ b, ¬ R a b
+noncomputable def Confluent : Prop := ∀ a b c, RTC R a b → RTC R a c → ∃ d, RTC R b d ∧ RTC R c d
+noncomputable def LocallyConfluent : Prop := ∀ a b c, R a b → R a c → ∃ d, RTC R b d ∧ RTC R c d
+noncomputable def IsNF (a : α) : Prop := ∀ b, ¬ R a b
 
 end Defs
 
@@ -73,7 +73,7 @@ section GroundConfluence
 variable {α : Type u} {R : α → α → Prop}
 
 /-- Ground confluence: confluence restricted to a subset. -/
-def GroundConfluent (P : α → Prop) : Prop :=
+noncomputable def GroundConfluent (P : α → Prop) : Prop :=
   ∀ a b c, P a → RTC R a b → RTC R a c → ∃ d, RTC R b d ∧ RTC R c d
 
 /-- Full confluence implies ground confluence for any predicate. -/
@@ -146,7 +146,7 @@ end EquivClosure
 variable (R E : α → α → Prop)
 
 /-- Confluence modulo E: peaks can be closed up to E-equivalence. -/
-def ConfluentModulo : Prop :=
+noncomputable def ConfluentModulo : Prop :=
   ∀ a b c, RTC R a b → RTC R a c →
     ∃ b' c', RTC R b b' ∧ RTC R c c' ∧ EquivClosure E b' c'
 
@@ -229,7 +229,7 @@ section Deterministic
 variable {α : Type u}
 
 /-- A deterministic step function. -/
-def DetStep (step : α → Option α) (a b : α) : Prop := step a = some b
+noncomputable def DetStep (step : α → Option α) (a b : α) : Prop := step a = some b
 
 /-- Deterministic steps are functional. -/
 theorem det_functional {step : α → Option α} {a b c : α}
@@ -267,11 +267,11 @@ section Commutation
 variable {α : Type u} {R S : α → α → Prop}
 
 /-- Single-step commutation. -/
-def Commute1 : Prop :=
+noncomputable def Commute1 : Prop :=
   ∀ a b c, R a b → S a c → ∃ d, S b d ∧ R c d
 
 /-- Multi-step commutation. -/
-def StrongCommute : Prop :=
+noncomputable def StrongCommute : Prop :=
   ∀ a b c, RTC R a b → RTC S a c → ∃ d, RTC S b d ∧ RTC R c d
 
 /-- Strip lemma for commutation: single R-step vs multi S-step. -/
@@ -321,7 +321,7 @@ section ReflClosure
 variable {α : Type u} {R : α → α → Prop}
 
 /-- Reflexive closure of R. -/
-def ReflClosure (a b : α) : Prop := R a b ∨ a = b
+noncomputable def ReflClosure (a b : α) : Prop := R a b ∨ a = b
 
 theorem rtc_refl_embed {a b : α} (h : RTC R a b) :
     RTC (ReflClosure (R := R)) a b := by

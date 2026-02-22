@@ -51,7 +51,7 @@ structure PointedCovering (P : A → Type u) (a : A) extends IsCovering P where
 
 /-- The image of a loop under the fiber action: starting from the basepoint,
     transport the loop and check if we return to the basepoint. -/
-def coveringLoopLifts {P : A → Type u} {a : A}
+noncomputable def coveringLoopLifts {P : A → Type u} {a : A}
     (pc : PointedCovering P a) (l : LoopSpace A a) : Prop :=
   loopAction l pc.basepoint = pc.basepoint
 
@@ -94,20 +94,20 @@ theorem coveringLoopLifts_trans {P : A → Type u} {a : A}
 /-! ## Path witnesses for lifting properties -/
 
 /-- Path witness: identity loop lifts to basepoint. -/
-def coveringLoopLifts_refl_path {P : A → Type u} {a : A}
+noncomputable def coveringLoopLifts_refl_path {P : A → Type u} {a : A}
     (pc : PointedCovering P a) :
     Path (loopAction (Path.refl a) pc.basepoint) pc.basepoint :=
   Path.stepChain (coveringLoopLifts_refl pc)
 
 /-- Path witness: transport along a loop and its reverse is identity. -/
-def coveringLoopAction_symm_trans_path {P : A → Type u} {a : A}
+noncomputable def coveringLoopAction_symm_trans_path {P : A → Type u} {a : A}
     (l : LoopSpace A a) (x : P a) :
     Path (loopAction (Path.symm l) (loopAction l x)) x := by
   unfold loopAction fiberTransport
   exact Path.stepChain (Path.transport_symm_left l x)
 
 /-- Path witness: transport along a loop reverse then forward is identity. -/
-def coveringLoopAction_trans_symm_path {P : A → Type u} {a : A}
+noncomputable def coveringLoopAction_trans_symm_path {P : A → Type u} {a : A}
     (l : LoopSpace A a) (x : P a) :
     Path (loopAction l (loopAction (Path.symm l) x)) x := by
   unfold loopAction fiberTransport
@@ -153,26 +153,26 @@ theorem normalCovering_deck_id_action {P : A → Type u}
 /-! ## Transport coherence for covering maps -/
 
 /-- Transport in the fiber is compatible with path composition. -/
-def fiberTransport_trans_path {P : A → Type u} {a b c : A}
+noncomputable def fiberTransport_trans_path {P : A → Type u} {a b c : A}
     (p : Path a b) (q : Path b c) (x : P a) :
     Path (fiberTransport (Path.trans p q) x)
       (fiberTransport q (fiberTransport p x)) :=
   Path.stepChain (fiberTransport_trans p q x)
 
 /-- Path witness: transport along reflexivity is identity. -/
-def fiberTransport_refl_path {P : A → Type u} {a : A} (x : P a) :
+noncomputable def fiberTransport_refl_path {P : A → Type u} {a : A} (x : P a) :
     Path (fiberTransport (Path.refl a) x) x :=
   Path.stepChain rfl
 
 /-- Path witness: transport along symm then forward is identity. -/
-def fiberTransport_symm_cancel_path {P : A → Type u} {a b : A}
+noncomputable def fiberTransport_symm_cancel_path {P : A → Type u} {a b : A}
     (p : Path a b) (x : P a) :
     Path (fiberTransport (Path.symm p) (fiberTransport p x)) x := by
   unfold fiberTransport
   exact Path.stepChain (Path.transport_symm_left p x)
 
 /-- Path witness: transport forward then symm is identity. -/
-def fiberTransport_cancel_symm_path {P : A → Type u} {a b : A}
+noncomputable def fiberTransport_cancel_symm_path {P : A → Type u} {a b : A}
     (p : Path a b) (y : P b) :
     Path (fiberTransport p (fiberTransport (Path.symm p) y)) y := by
   unfold fiberTransport

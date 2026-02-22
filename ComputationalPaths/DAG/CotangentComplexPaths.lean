@@ -66,7 +66,7 @@ noncomputable def base_change_cancel_rweq (n : Nat) (x : L.degree n) :
 end CotangentComplexPaths
 
 /-- Trivial cotangent-complex package with identity differential and base change. -/
-def trivialCotangentComplexPaths (R : Type u) : CotangentComplexPaths R where
+noncomputable def trivialCotangentComplexPaths (R : Type u) : CotangentComplexPaths R where
   degree := fun _ => PUnit
   differential := fun _ _ => PUnit.unit
   dSquaredPath := fun _ _ => Path.refl PUnit.unit

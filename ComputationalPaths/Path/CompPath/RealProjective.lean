@@ -38,13 +38,13 @@ universe u
 abbrev Z2 : Type := Bool
 
 /-- Addition in Z/2 is XOR. -/
-@[simp] def z2_add (a b : Z2) : Z2 := xor a b
+@[simp] noncomputable def z2_add (a b : Z2) : Z2 := xor a b
 
 /-- The zero element of Z/2. -/
-@[simp] def z2_zero : Z2 := false
+@[simp] noncomputable def z2_zero : Z2 := false
 
 /-- The nonzero element of Z/2. -/
-@[simp] def z2_one : Z2 := true
+@[simp] noncomputable def z2_one : Z2 := true
 
 /-! ## Z/2 Group Laws -/
 
@@ -70,7 +70,7 @@ abbrev Z2 : Type := Bool
   cases a <;> rfl
 
 /-- Negation in Z/2 is the identity. -/
-@[simp] def z2_neg (a : Z2) : Z2 := a
+@[simp] noncomputable def z2_neg (a : Z2) : Z2 := a
 
 /-- Left inverse law: a + a = 0. -/
 @[simp] theorem z2_neg_add (a : Z2) : z2_add (z2_neg a) a = z2_zero := by
@@ -109,39 +109,39 @@ noncomputable def rp2PiOneEquivZ2 : SimpleEquiv rp2PiOne Z2 where
 /-! ## Coherence Witnesses -/
 
 /-- Path coherence: the generator of π₁(RP²) has order 2. -/
-def rp2GeneratorOrder2 :
+noncomputable def rp2GeneratorOrder2 :
     Path (z2_add z2_one z2_one) z2_zero :=
   Path.stepChain rfl
 
 /-- Path coherence: addition in Z/2 is involutive. -/
-def z2_add_involutive (a : Z2) :
+noncomputable def z2_add_involutive (a : Z2) :
     Path (z2_add a a) z2_zero :=
   Path.stepChain (z2_add_self a)
 
 /-- Path coherence: commutativity of Z/2 addition. -/
-def z2_comm_path (a b : Z2) :
+noncomputable def z2_comm_path (a b : Z2) :
     Path (z2_add a b) (z2_add b a) :=
   Path.stepChain (z2_add_comm a b)
 
 /-- Path coherence: associativity of Z/2 addition. -/
-def z2_assoc_path (a b c : Z2) :
+noncomputable def z2_assoc_path (a b c : Z2) :
     Path (z2_add (z2_add a b) c) (z2_add a (z2_add b c)) :=
   Path.stepChain (z2_add_assoc a b c)
 
 /-- Path coherence: left identity. -/
-def z2_zero_add_path (a : Z2) :
+noncomputable def z2_zero_add_path (a : Z2) :
     Path (z2_add z2_zero a) a :=
   Path.stepChain (z2_zero_add a)
 
 /-- Path coherence: right identity. -/
-def z2_add_zero_path (a : Z2) :
+noncomputable def z2_add_zero_path (a : Z2) :
     Path (z2_add a z2_zero) a :=
   Path.stepChain (z2_add_zero a)
 
 /-! ## Z/2 Multiplication -/
 
 /-- Multiplication in Z/2 is AND. -/
-@[simp] def z2_mul (a b : Z2) : Z2 := a && b
+@[simp] noncomputable def z2_mul (a b : Z2) : Z2 := a && b
 
 /-- Multiplication is commutative. -/
 @[simp] theorem z2_mul_comm (a b : Z2) : z2_mul a b = z2_mul b a := by
@@ -190,7 +190,7 @@ structure RPnCWData where
   cellCount : Nat → Nat := fun k => if k ≤ dim then 1 else 0
 
 /-- Standard CW structure for RP^n. -/
-def rpnStdCW (n : Nat) : RPnCWData where
+noncomputable def rpnStdCW (n : Nat) : RPnCWData where
   dim := n
   cellCount := fun k => if k ≤ n then 1 else 0
 
@@ -207,7 +207,7 @@ theorem rpn_cell_count_gt (n k : Nat) (h : ¬(k ≤ n)) :
 /-! ## Euler Characteristics of Projective Spaces -/
 
 /-- Euler characteristic of RP^n. -/
-def rpnEulerChar : Nat → Int
+noncomputable def rpnEulerChar : Nat → Int
   | 0 => 1
   | 1 => 0
   | Nat.succ (Nat.succ n) =>
@@ -236,7 +236,7 @@ noncomputable def rpnPiOneEquivZ2 (n : Nat) (_ : n ≥ 2) :
 /-! ## Double Cover -/
 
 /-- The degree of the standard covering S^n → RP^n is 2. -/
-def rpnCoveringDegree : Nat := 2
+noncomputable def rpnCoveringDegree : Nat := 2
 
 /-- The universal cover of RP^n is S^n (recorded as a fact). -/
 theorem rpn_universal_cover_is_sphere :
@@ -249,13 +249,13 @@ structure RPnH0Data where
   rank : Nat := 1
 
 /-- H_k(RP²; Z) for k = 0, 1, 2. -/
-def rp2HomologyRank : Nat → Nat
+noncomputable def rp2HomologyRank : Nat → Nat
   | 0 => 1  -- H₀ ≅ Z
   | 1 => 0  -- H₁ ≅ Z/2 (torsion, rank 0)
   | _ => 0  -- H₂ = 0
 
 /-- The first homology of RP² has torsion Z/2. -/
-def rp2H1Torsion : Nat := 2
+noncomputable def rp2H1Torsion : Nat := 2
 
 /-- The total rank of H_*(RP²) is 1. -/
 theorem rp2_total_rank :
@@ -270,7 +270,7 @@ theorem rp2_transport_const (D : Type) (x : D) :
   simp [Path.transport]
 
 /-- Double application of the generator returns to identity, witnessed by a path. -/
-def rp2_double_loop_refl :
+noncomputable def rp2_double_loop_refl :
     Path (z2_add (z2_add z2_one z2_one) (z2_add z2_one z2_one)) z2_zero :=
   Path.stepChain rfl
 

@@ -144,7 +144,7 @@ theorem mvExactAtPieces
   simp [mvFold, mvConnecting, h]
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary

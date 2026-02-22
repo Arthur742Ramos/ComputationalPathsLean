@@ -66,7 +66,7 @@ inductive SpectrumStep (α : Type u) : α → α → Type u where
   | stable_eq : ∀ (a b c : α), SpectrumStep α a b → SpectrumStep α b c → SpectrumStep α a c
 
 /-- A spectrum path is a Path built from SpectrumStep. -/
-def SpectrumPath (α : Type u) (a b : α) : Type u :=
+noncomputable def SpectrumPath (α : Type u) (a b : α) : Type u :=
   Path (SpectrumStep α) a b
 
 /-! ## Symmetric Sequences -/
@@ -263,12 +263,12 @@ theorem smash_assoc_coherence (S : Type u)
 /-! ## Spectrum Morphism Composition -/
 
 /-- Identity spectrum map. -/
-def SpectrumMap.id (S : Type u) (ld : LevelData S) : SpectrumMap S ld ld :=
+noncomputable def SpectrumMap.id (S : Type u) (ld : LevelData S) : SpectrumMap S ld ld :=
   { level_map := fun _ x => x
     structure_compat := fun _ _ => Path.refl _ _ }
 
 /-- Composition of spectrum maps. -/
-def SpectrumMap.comp (S : Type u) {a b c : LevelData S}
+noncomputable def SpectrumMap.comp (S : Type u) {a b c : LevelData S}
     (f : SpectrumMap S a b) (g : SpectrumMap S b c) :
     SpectrumMap S a c :=
   { level_map := fun n x => g.level_map n (f.level_map n x)

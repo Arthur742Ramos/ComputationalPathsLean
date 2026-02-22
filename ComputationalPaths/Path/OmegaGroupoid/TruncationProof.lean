@@ -62,19 +62,19 @@ variable {A : Type u} {a b : A}
 abbrev RwEqT (p q : Path a b) : Type u := Derivation₂ p q
 
 /-- The identity trace. -/
-@[inline] def RwEqT.rfl (p : Path a b) : RwEqT p p := Derivation₂.refl p
+@[inline] noncomputable def RwEqT.rfl (p : Path a b) : RwEqT p p := Derivation₂.refl p
 
 /-- Composition of traces. -/
-@[inline] def RwEqT.comp {p q r : Path a b}
+@[inline] noncomputable def RwEqT.comp {p q r : Path a b}
     (t₁ : RwEqT p q) (t₂ : RwEqT q r) : RwEqT p r :=
   Derivation₂.vcomp t₁ t₂
 
 /-- Inversion of a trace. -/
-@[inline] def RwEqT.inv {p q : Path a b} (t : RwEqT p q) : RwEqT q p :=
+@[inline] noncomputable def RwEqT.inv {p q : Path a b} (t : RwEqT p q) : RwEqT q p :=
   Derivation₂.inv t
 
 /-- A single-step trace. -/
-@[inline] def RwEqT.ofStep {p q : Path a b} (s : Step p q) : RwEqT p q :=
+@[inline] noncomputable def RwEqT.ofStep {p q : Path a b} (s : Step p q) : RwEqT p q :=
   Derivation₂.step s
 
 end TypeValuedTrace
@@ -275,10 +275,10 @@ variable {A : Type u}
   Path.trans p q
 
 /-- Identity 1-cell. -/
-@[inline] def id₁ (a : A) : Path a a := Path.refl a
+@[inline] noncomputable def id₁ (a : A) : Path a a := Path.refl a
 
 /-- Inverse of a 1-cell. -/
-@[inline] def inv₁ {a b : A} (p : Path a b) : Path b a := Path.symm p
+@[inline] noncomputable def inv₁ {a b : A} (p : Path a b) : Path b a := Path.symm p
 
 /-! ### Level 2: Derivation₂ composition, identity, inverse
 

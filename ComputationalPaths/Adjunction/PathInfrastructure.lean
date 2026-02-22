@@ -27,19 +27,19 @@ variable {C : Type u} {D : Type v}
 variable {F : C → D} {G : D → C}
 
 /-- Left triangle `ε_{F x} ∘ Fηₓ`. -/
-def leftTriangle (adj : AdjunctionData C D F G) (x : C) : Path (F x) (F x) :=
+noncomputable def leftTriangle (adj : AdjunctionData C D F G) (x : C) : Path (F x) (F x) :=
   Path.trans (Path.congrArg F (adj.unit x)) (adj.counit (F x))
 
 /-- Right triangle `Gεᵧ ∘ η_{G y}`. -/
-def rightTriangle (adj : AdjunctionData C D F G) (y : D) : Path (G y) (G y) :=
+noncomputable def rightTriangle (adj : AdjunctionData C D F G) (y : D) : Path (G y) (G y) :=
   Path.trans (adj.unit (G y)) (Path.congrArg G (adj.counit y))
 
 /-- Counit components rewrite to inverses of `F`-mapped unit components. -/
-def LeftCounitInverse (adj : AdjunctionData C D F G) : Type _ :=
+noncomputable def LeftCounitInverse (adj : AdjunctionData C D F G) : Type _ :=
   ∀ x : C, RwEq (adj.counit (F x)) (Path.symm (Path.congrArg F (adj.unit x)))
 
 /-- Unit components rewrite to inverses of `G`-mapped counit components. -/
-def RightUnitInverse (adj : AdjunctionData C D F G) : Type _ :=
+noncomputable def RightUnitInverse (adj : AdjunctionData C D F G) : Type _ :=
   ∀ y : D, RwEq (adj.unit (G y)) (Path.symm (Path.congrArg G (adj.counit y)))
 
 /-- Triangle (zigzag) identities packaged together. -/

@@ -39,21 +39,21 @@ abbrev PiOneFreeProduct : Type u :=
   Quot (FreeProductWord.FreeGroupEq (G₁ := π₁(A, a₀)) (G₂ := π₁(B, b₀)))
 
 /-- Embed a word into the free product quotient. -/
-def piOneFreeProductOfWord
+noncomputable def piOneFreeProductOfWord
     (w : FreeProductWord (π₁(A, a₀)) (π₁(B, b₀))) :
     PiOneFreeProduct a₀ b₀ :=
   Quot.mk _ w
 
 /-- Identity element (empty word). -/
-def piOneFreeProductOne : PiOneFreeProduct a₀ b₀ :=
+noncomputable def piOneFreeProductOne : PiOneFreeProduct a₀ b₀ :=
   piOneFreeProductOfWord a₀ b₀ .nil
 
 /-- Left injection of π₁(A, a₀) into the free product. -/
-def piOneFreeProductInl (x : π₁(A, a₀)) : PiOneFreeProduct a₀ b₀ :=
+noncomputable def piOneFreeProductInl (x : π₁(A, a₀)) : PiOneFreeProduct a₀ b₀ :=
   piOneFreeProductOfWord a₀ b₀ (FreeProductWord.singleLeft x)
 
 /-- Right injection of π₁(B, b₀) into the free product. -/
-def piOneFreeProductInr (y : π₁(B, b₀)) : PiOneFreeProduct a₀ b₀ :=
+noncomputable def piOneFreeProductInr (y : π₁(B, b₀)) : PiOneFreeProduct a₀ b₀ :=
   piOneFreeProductOfWord a₀ b₀ (FreeProductWord.singleRight y)
 
 /-- Multiply by a fixed word on the right. -/

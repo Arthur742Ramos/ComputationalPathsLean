@@ -42,17 +42,17 @@ namespace Cover
 variable {A : Type u}
 
 /-- The chosen index for a point. -/
-def index (C : Cover A) (a : A) : C.I :=
+noncomputable def index (C : Cover A) (a : A) : C.I :=
   (C.cover a).1
 
 /-- The chosen membership witness for a point. -/
-def member (C : Cover A) (a : A) : C.U (C.index a) a :=
+noncomputable def member (C : Cover A) (a : A) : C.U (C.index a) a :=
   (C.cover a).2
 
 end Cover
 
 /-- Pull back a cover along a map `f : B -> A`. -/
-def pullbackCover {A B : Type u} (f : B -> A) (C : Cover A) : Cover B :=
+noncomputable def pullbackCover {A B : Type u} (f : B -> A) (C : Cover A) : Cover B :=
   { I := C.I
     U := fun i b => C.U i (f b)
     cover := fun b =>
@@ -85,11 +85,11 @@ structure Simplex {A : Type u} (C : Cover A) where
           rfl
 
 /-- The nerve of a cover. -/
-def Nerve {A : Type u} (C : Cover A) : Type _ :=
+noncomputable def Nerve {A : Type u} (C : Cover A) : Type _ :=
   Simplex C
 
 /-- The canonical 0-simplex chosen by the cover. -/
-def nerveVertex {A : Type u} (C : Cover A) (a : A) : Nerve C := by
+noncomputable def nerveVertex {A : Type u} (C : Cover A) (a : A) : Nerve C := by
   let c := C.cover a
   refine { indices := [c.1], point := a, witness := ?_ }
   intro i hi
@@ -98,15 +98,15 @@ def nerveVertex {A : Type u} (C : Cover A) (a : A) : Nerve C := by
   | tail _ hi' => cases hi'
 
 /-- The Mapper construction: nerve of the pullback cover. -/
-def Mapper {A B : Type u} (f : B -> A) (C : Cover A) : Type _ :=
+noncomputable def Mapper {A B : Type u} (f : B -> A) (C : Cover A) : Type _ :=
   Nerve (pullbackCover f C)
 
 /-- The 1-d Mapper: simplices with at most two indices. -/
-def Mapper1 {A B : Type u} (f : B -> A) (C : Cover A) : Type _ :=
+noncomputable def Mapper1 {A B : Type u} (f : B -> A) (C : Cover A) : Type _ :=
   { s : Mapper f C // s.indices.length <= 2 }
 
 /-- The Reeb graph as the 1-d Mapper skeleton. -/
-def ReebGraph {A B : Type u} (f : B -> A) (C : Cover A) : Type _ :=
+noncomputable def ReebGraph {A B : Type u} (f : B -> A) (C : Cover A) : Type _ :=
   Mapper1 f C
 
 /-- Reeb graphs are definitionally the 1-d Mapper. -/
@@ -127,18 +127,18 @@ namespace CoverRefinement
 variable {A : Type u} {C D E : Cover A}
 
 /-- Identity refinement. -/
-def refl (C : Cover A) : CoverRefinement C C :=
+noncomputable def refl (C : Cover A) : CoverRefinement C C :=
   { refine := id
     mapU := fun _ _ h => h }
 
 /-- Composition of refinements. -/
-def comp (r : CoverRefinement C D) (s : CoverRefinement D E) : CoverRefinement C E :=
+noncomputable def comp (r : CoverRefinement C D) (s : CoverRefinement D E) : CoverRefinement C E :=
   { refine := fun i => s.refine (r.refine i)
     mapU := fun i a h => s.mapU (r.refine i) a (r.mapU i a h) }
 
 end CoverRefinement
 
-private def refineWitness {A : Type u} {C D : Cover A} (r : CoverRefinement C D)
+private noncomputable def refineWitness {A : Type u} {C D : Cover A} (r : CoverRefinement C D)
     (indices : List C.I) (point : A)
     (w : forall i, List.Mem i indices -> C.U i point) :
     forall j, List.Mem j (indices.map r.refine) -> D.U j point := by
@@ -159,24 +159,24 @@ private def refineWitness {A : Type u} {C D : Cover A} (r : CoverRefinement C D)
           exact ih hk' j hj'
 
 /-- Map a simplex along a refinement. -/
-def simplexMap {A : Type u} {C D : Cover A} (r : CoverRefinement C D) (s : Simplex C) :
+noncomputable def simplexMap {A : Type u} {C D : Cover A} (r : CoverRefinement C D) (s : Simplex C) :
     Simplex D := by
   refine { indices := s.indices.map r.refine, point := s.point, witness := ?_ }
   exact refineWitness r s.indices s.point s.witness
 
 /-- Map the nerve along a refinement. -/
-def nerveMap {A : Type u} {C D : Cover A} (r : CoverRefinement C D) :
+noncomputable def nerveMap {A : Type u} {C D : Cover A} (r : CoverRefinement C D) :
     Nerve C -> Nerve D :=
   simplexMap r
 
 /-- Pull back a refinement along a map. -/
-def pullbackRefinement {A B : Type u} (f : B -> A) {C D : Cover A}
+noncomputable def pullbackRefinement {A B : Type u} (f : B -> A) {C D : Cover A}
     (r : CoverRefinement C D) : CoverRefinement (pullbackCover f C) (pullbackCover f D) :=
   { refine := r.refine
     mapU := fun i b h => r.mapU i (f b) h }
 
 /-- Map a Mapper along a refinement. -/
-def mapperMap {A B : Type u} (f : B -> A) {C D : Cover A} (r : CoverRefinement C D) :
+noncomputable def mapperMap {A B : Type u} (f : B -> A) {C D : Cover A} (r : CoverRefinement C D) :
     Mapper f C -> Mapper f D :=
   nerveMap (pullbackRefinement f r)
 
@@ -213,7 +213,7 @@ theorem mapper_map_comp {A B : Type u} {C D E : Cover A} (f : B -> A)
     (nerve_map_comp (r := pullbackRefinement f r) (s := pullbackRefinement f s) (x := x))
 
 /-- Refinement maps respect computational paths. -/
-def mapper_stable_under_refinement {A B : Type u} {C D : Cover A}
+noncomputable def mapper_stable_under_refinement {A B : Type u} {C D : Cover A}
     (f : B -> A) (r : CoverRefinement C D) {x y : Mapper f C} (p : Path x y) :
     Path (mapperMap f r x) (mapperMap f r y) :=
   Path.congrArg (mapperMap f r) p
@@ -226,12 +226,12 @@ structure GoodCover {A : Type u} (C : Cover A) where
   nerveEquiv : SimpleEquiv A (Nerve C)
 
 /-- The nerve lemma packaged as a SimpleEquiv. -/
-def nerve_lemma {A : Type u} {C : Cover A} (h : GoodCover C) :
+noncomputable def nerve_lemma {A : Type u} {C : Cover A} (h : GoodCover C) :
     SimpleEquiv A (Nerve C) :=
   h.nerveEquiv
 
 /-- The left inverse of the nerve lemma as a computational path. -/
-def nerve_lemma_path {A : Type u} {C : Cover A} (h : GoodCover C) (a : A) :
+noncomputable def nerve_lemma_path {A : Type u} {C : Cover A} (h : GoodCover C) (a : A) :
     Path (h.nerveEquiv.invFun (h.nerveEquiv.toFun a)) a :=
   Path.stepChain (h.nerveEquiv.left_inv a)
 

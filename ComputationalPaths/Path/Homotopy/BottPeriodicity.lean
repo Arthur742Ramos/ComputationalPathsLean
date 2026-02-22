@@ -56,12 +56,12 @@ structure PointedEquiv (X Y : Pointed) where
 namespace PointedEquiv
 
 /-- Convert a pointed equivalence to a pointed map. -/
-def toPointedMap {X Y : Pointed} (e : PointedEquiv X Y) : PointedMap X Y where
+noncomputable def toPointedMap {X Y : Pointed} (e : PointedEquiv X Y) : PointedMap X Y where
   toFun := e.toEquiv.toFun
   map_pt := e.map_pt.toEq
 
 /-- Identity pointed equivalence. -/
-def refl (X : Pointed) : PointedEquiv X X where
+noncomputable def refl (X : Pointed) : PointedEquiv X X where
   toEquiv := SimpleEquiv.refl X.carrier
   map_pt := Path.refl X.pt
 
@@ -87,12 +87,12 @@ structure BottPeriodicityData (BU : Pointed) where
 namespace BottPeriodicityData
 
 /-- The pi2 equivalence from Bott periodicity data. -/
-def pi2EquivInt {BU : Pointed} (B : BottPeriodicityData BU) :
+noncomputable def pi2EquivInt {BU : Pointed} (B : BottPeriodicityData BU) :
     SimpleEquiv (pi2 BU) Int :=
   B.pi2_equiv_int
 
 /-- The Bott equivalence as a pointed map. -/
-def bottMap {BU : Pointed} (B : BottPeriodicityData BU) :
+noncomputable def bottMap {BU : Pointed} (B : BottPeriodicityData BU) :
     PointedMap BU (omega2 BU) :=
   B.bott_equiv.toPointedMap
 
@@ -112,7 +112,7 @@ structure RealBottPeriodicityData (BO : Pointed) where
 namespace RealBottPeriodicityData
 
 /-- The real Bott equivalence as a pointed map. -/
-def bottMap {BO : Pointed} (B : RealBottPeriodicityData BO) :
+noncomputable def bottMap {BO : Pointed} (B : RealBottPeriodicityData BO) :
     PointedMap BO (omega8 BO) :=
   B.bott_equiv.toPointedMap
 
@@ -130,13 +130,13 @@ structure SphereData where
 namespace SphereData
 
 /-- View a sphere-like type as a pointed type. -/
-def toPointed (S : SphereData) : Pointed :=
+noncomputable def toPointed (S : SphereData) : Pointed :=
   { carrier := S.carrier, pt := S.base }
 
 end SphereData
 
 /-- The suspension base used for clutching constructions. -/
-def clutchingBase (S : SphereData) : Pointed :=
+noncomputable def clutchingBase (S : SphereData) : Pointed :=
   { carrier := CompPath.SuspensionCompPath S.carrier
     pt := CompPath.SuspensionCompPath.north (X := S.carrier) }
 
@@ -156,7 +156,7 @@ structure ClutchingConstruction (S : SphereData) (BU : Pointed) where
 namespace ClutchingConstruction
 
 /-- The clutching map as a pointed map. -/
-def clutchingPointedMap {S : SphereData} {BU : Pointed}
+noncomputable def clutchingPointedMap {S : SphereData} {BU : Pointed}
     (C : ClutchingConstruction S BU) :
     PointedMap (S.toPointed) BU :=
   { toFun := C.clutchingMap
@@ -178,19 +178,19 @@ structure AdamsOperation {M : Type u} (S : StrictMonoid M) where
 namespace AdamsOperation
 
 /-- Path-typed psi^1 identity. -/
-def psi_one_path {M : Type u} {S : StrictMonoid M}
+noncomputable def psi_one_path {M : Type u} {S : StrictMonoid M}
     (A : AdamsOperation S) (x : KTheory.K0 S) :
     Path (A.psi 1 x) x :=
   Path.stepChain (A.psi_one x)
 
 /-- Path-typed psi^0 on zero. -/
-def psi_zero_path {M : Type u} {S : StrictMonoid M}
+noncomputable def psi_zero_path {M : Type u} {S : StrictMonoid M}
     (A : AdamsOperation S) :
     Path (A.psi 0 (KTheory.zero S)) (KTheory.zero S) :=
   Path.stepChain A.psi_zero
 
 /-- The trivial Adams operation: all psi^k are the identity. -/
-def trivial {M : Type u} (S : StrictMonoid M) : AdamsOperation S where
+noncomputable def trivial {M : Type u} (S : StrictMonoid M) : AdamsOperation S where
   psi := fun _ x => x
   psi_one := by intro _; rfl
   psi_zero := rfl
@@ -217,13 +217,13 @@ structure CannibalisticClass {K B E V M : Type u} (S : StrictMonoid M) where
 namespace CannibalisticClass
 
 /-- Path-typed psi^k Thom identity. -/
-def psi_thom_path {K B E V M : Type u} {S : StrictMonoid M}
+noncomputable def psi_thom_path {K B E V M : Type u} {S : StrictMonoid M}
     (C : CannibalisticClass (K := K) (B := B) (E := E) (V := V) (S := S)) :
     Path (C.adams.psi C.k C.thomClass) C.cannibalistic :=
   Path.stepChain C.psi_thom
 
 /-- Trivial cannibalistic class built from the zero Thom class. -/
-def trivial {K B E V M : Type u} (S : StrictMonoid M)
+noncomputable def trivial {K B E V M : Type u} (S : StrictMonoid M)
     (bundle : VectorBundle.VectorBundleData K B E V) :
     CannibalisticClass (K := K) (B := B) (E := E) (V := V) (S := S) :=
   { bundle := bundle

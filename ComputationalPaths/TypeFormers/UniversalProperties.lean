@@ -13,17 +13,17 @@ section Products
 variable {X A B : Type u}
 variable {x y : X}
 
-@[simp] def pairPath (f : X → A) (g : X → B) (p : Path x y) :
+@[simp] noncomputable def pairPath (f : X → A) (g : X → B) (p : Path x y) :
     Path (f x, g x) (f y, g y) :=
   Path.prodMk (Path.congrArg f p) (Path.congrArg g p)
 
-@[simp] def fstPairStep (f : X → A) (g : X → B) (p : Path x y) :
+@[simp] noncomputable def fstPairStep (f : X → A) (g : X → B) (p : Path x y) :
     Step (Path.fst (pairPath f g p)) (Path.congrArg f p) := by
   simpa [pairPath, Path.fst, Path.prodMk] using
     (Step.prod_fst_beta (A := A) (B := B)
       (p := Path.congrArg f p) (q := Path.congrArg g p))
 
-@[simp] def sndPairStep (f : X → A) (g : X → B) (p : Path x y) :
+@[simp] noncomputable def sndPairStep (f : X → A) (g : X → B) (p : Path x y) :
     Step (Path.snd (pairPath f g p)) (Path.congrArg g p) := by
   simpa [pairPath, Path.snd, Path.prodMk] using
     (Step.prod_snd_beta (A := B) (B := A)
@@ -64,23 +64,23 @@ section Coproducts
 variable {A B C : Type u}
 variable {a₁ a₂ : A} {b₁ b₂ : B}
 
-@[simp] def inlPath (p : Path a₁ a₂) :
+@[simp] noncomputable def inlPath (p : Path a₁ a₂) :
     Path (Sum.inl a₁ : Sum A B) (Sum.inl a₂) :=
   Path.inlCongr p
 
-@[simp] def inrPath (p : Path b₁ b₂) :
+@[simp] noncomputable def inrPath (p : Path b₁ b₂) :
     Path (Sum.inr b₁ : Sum A B) (Sum.inr b₂) :=
   Path.inrCongr p
 
 -- copair is imported from BetaEtaDeep
 
-@[simp] def caseInlStep (f : A → C) (g : B → C) (p : Path a₁ a₂) :
+@[simp] noncomputable def caseInlStep (f : A → C) (g : B → C) (p : Path a₁ a₂) :
     Step (Path.congrArg (copair f g) (inlPath p)) (Path.congrArg f p) := by
   simpa [copair, inlPath] using
     (Step.sum_rec_inl_beta (A := C) (α := A) (β := B)
       (f := f) (g := g) (p := p))
 
-@[simp] def caseInrStep (f : A → C) (g : B → C) (p : Path b₁ b₂) :
+@[simp] noncomputable def caseInrStep (f : A → C) (g : B → C) (p : Path b₁ b₂) :
     Step (Path.congrArg (copair f g) (inrPath p)) (Path.congrArg g p) := by
   simpa [copair, inrPath] using
     (Step.sum_rec_inr_beta (A := C) (α := A) (β := B)
@@ -133,13 +133,13 @@ section Functions
 variable {A B C : Type u}
 variable {f g : A → B}
 
-@[simp] def lamAppStep
+@[simp] noncomputable def lamAppStep
     (p : ∀ x : A, Path (f x) (g x)) (a : A) :
     Step (Path.app (Path.lamCongr p) a) (p a) := by
   simpa [Path.app] using
     (Step.fun_app_beta (A := B) (α := A) (p := p) (a := a))
 
-@[simp] def lamEtaStep (p : Path f g) :
+@[simp] noncomputable def lamEtaStep (p : Path f g) :
     Step (Path.lamCongr (fun x => Path.app p x)) p :=
   Step.fun_eta p
 
@@ -152,9 +152,9 @@ variable {f g : A → B}
     RwEq (Path.lamCongr (fun x => Path.app p x)) p :=
   rweq_of_step (lamEtaStep p)
 
-@[simp] def curryFn (h : A × B → C) : A → B → C := fun a b => h (a, b)
+@[simp] noncomputable def curryFn (h : A × B → C) : A → B → C := fun a b => h (a, b)
 
-@[simp] def uncurryFn (k : A → B → C) : A × B → C := fun ab => k ab.1 ab.2
+@[simp] noncomputable def uncurryFn (k : A → B → C) : A × B → C := fun ab => k ab.1 ab.2
 
 noncomputable def curryAdjunctionRwEq
     {h₁ h₂ : A × B → C}

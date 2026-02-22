@@ -104,7 +104,7 @@ variable {n : Nat}
           simp [inverse, inverse_wordConcat, ih, wordConcat]
 
 /-- Word exponentiation by natural numbers. -/
-@[simp] def wordPow (w : BouquetWord n) : Nat → BouquetWord n
+@[simp] noncomputable def wordPow (w : BouquetWord n) : Nat → BouquetWord n
   | 0 => .nil
   | Nat.succ k => wordConcat (wordPow w k) w
 

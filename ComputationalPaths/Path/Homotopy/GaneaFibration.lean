@@ -42,7 +42,7 @@ abbrev Omega (X : PtdType.{u}) : Type u :=
   LoopSpaceEq X.carrier X.pt
 
 /-- The n-th Ganea space. Stage 1 is the based path space. -/
-def GaneaSpace : Nat → PtdType.{u} → Type u
+noncomputable def GaneaSpace : Nat → PtdType.{u} → Type u
   | 0, X => Total (P := fun _ : X.carrier => PUnit)
   | 1, X => PathSpace X.carrier X.pt
   | n + 2, X =>
@@ -50,25 +50,25 @@ def GaneaSpace : Nat → PtdType.{u} → Type u
         CompPath.Join (GaneaSpace (n + 1) X) (Omega X))
 
 /-- The fiber type of the n-th Ganea fibration. -/
-def GaneaFiber : Nat → PtdType.{u} → Type u
+noncomputable def GaneaFiber : Nat → PtdType.{u} → Type u
   | 0, _ => PUnit
   | 1, X => Omega X
   | n + 2, X => CompPath.Join (GaneaSpace (n + 1) X) (Omega X)
 
 /-- Basepoint in the Ganea space. -/
-def ganeaBase : (n : Nat) → (X : PtdType.{u}) → GaneaSpace n X
+noncomputable def ganeaBase : (n : Nat) → (X : PtdType.{u}) → GaneaSpace n X
   | 0, X => ⟨X.pt, PUnit.unit⟩
   | 1, X => pathSpaceBase X.carrier X.pt
   | n + 2, X => ⟨X.pt, CompPath.JoinSpace.inl (ganeaBase (n + 1) X)⟩
 
 /-- Basepoint in the Ganea fiber. -/
-def ganeaFiberBase : (n : Nat) → (X : PtdType.{u}) → GaneaFiber n X
+noncomputable def ganeaFiberBase : (n : Nat) → (X : PtdType.{u}) → GaneaFiber n X
   | 0, _ => PUnit.unit
   | 1, X => liftEqRefl X.pt
   | n + 2, X => CompPath.JoinSpace.inl (ganeaBase (n + 1) X)
 
 /-- Projection map of the Ganea space to the base. -/
-def ganeaProj : (n : Nat) → (X : PtdType.{u}) → GaneaSpace n X → X.carrier
+noncomputable def ganeaProj : (n : Nat) → (X : PtdType.{u}) → GaneaSpace n X → X.carrier
   | 0, X => Total.proj (P := fun _ : X.carrier => PUnit)
   | 1, X => pathSpaceProj (A := X.carrier) (a := X.pt)
   | n + 2, X =>
@@ -76,7 +76,7 @@ def ganeaProj : (n : Nat) → (X : PtdType.{u}) → GaneaSpace n X → X.carrier
         CompPath.Join (GaneaSpace (n + 1) X) (Omega X))
 
 /-- The n-th Ganea fibration G_n(X) -> X packaged as a fiber sequence. -/
-def ganeaFibration : (n : Nat) → (X : PtdType.{u}) →
+noncomputable def ganeaFibration : (n : Nat) → (X : PtdType.{u}) →
     FiberSeq (GaneaFiber n X) (GaneaSpace n X) X.carrier
   | 0, X =>
       canonicalFiberSeq (P := fun _ : X.carrier => PUnit) (b := X.pt)
@@ -110,16 +110,16 @@ structure GaneaSection (n : Nat) (X : PtdType.{u}) where
   section_proj : True
 
 /-- A trivial section picking the basepoint in every fiber. -/
-def ganeaTrivialSection (n : Nat) (X : PtdType.{u}) : GaneaSection n X where
+noncomputable def ganeaTrivialSection (n : Nat) (X : PtdType.{u}) : GaneaSection n X where
   toFun := fun _ => ganeaBase n X
   section_proj := trivial
 
 /-- The n-th Ganea fibration admits a section (scaffold). -/
-def ganeaHasSection (n : Nat) (X : PtdType.{u}) : Prop :=
+noncomputable def ganeaHasSection (n : Nat) (X : PtdType.{u}) : Prop :=
   Nonempty (GaneaSection n X)
 
 /-- LS-category (scaffold value). -/
-def cat (_ : PtdType.{u}) : Nat :=
+noncomputable def cat (_ : PtdType.{u}) : Nat :=
   0
 
 /-- cat(X) <= n iff the n-th Ganea fibration admits a section (scaffold). -/

@@ -76,7 +76,7 @@ noncomputable def untilt_cancel_rweq (x : X) :
 end PerfectoidSpacePathData
 
 /-- Trivial perfectoid-space path data on `PUnit`. -/
-def trivialPerfectoidSpacePathData : PerfectoidSpacePathData PUnit PUnit where
+noncomputable def trivialPerfectoidSpacePathData : PerfectoidSpacePathData PUnit PUnit where
   tilt := fun _ => PUnit.unit
   untilt := fun _ => PUnit.unit
   sectionVal := fun _ => PUnit.unit

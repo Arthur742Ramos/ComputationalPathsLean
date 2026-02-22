@@ -51,7 +51,7 @@ structure WhitmanAxioms (L : LatticeSignature) where
       Path (L.meet (L.join a b) (L.join c d))
         (L.join (L.meet (L.join a b) c) (L.meet (L.join a b) d))
 
-private def pathOfEq {A : Type u} {a b : A} (h : a = b) : Path a b :=
+private noncomputable def pathOfEq {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 section LatticeDerived
@@ -60,67 +60,67 @@ variable {L : LatticeSignature}
 variable (Lat : LatticeAxioms L)
 variable {a b c d : L.Carrier}
 
-def meet_comm_path (a b : L.Carrier) :
+noncomputable def meet_comm_path (a b : L.Carrier) :
     Nonempty (Path (L.meet a b) (L.meet b a)) :=
   ⟨Lat.meet_comm a b⟩
 
-def join_comm_path (a b : L.Carrier) :
+noncomputable def join_comm_path (a b : L.Carrier) :
     Nonempty (Path (L.join a b) (L.join b a)) :=
   ⟨Lat.join_comm a b⟩
 
-def meet_assoc_path (a b c : L.Carrier) :
+noncomputable def meet_assoc_path (a b c : L.Carrier) :
     Nonempty (Path (L.meet (L.meet a b) c) (L.meet a (L.meet b c))) :=
   ⟨Lat.meet_assoc a b c⟩
 
-def join_assoc_path (a b c : L.Carrier) :
+noncomputable def join_assoc_path (a b c : L.Carrier) :
     Nonempty (Path (L.join (L.join a b) c) (L.join a (L.join b c))) :=
   ⟨Lat.join_assoc a b c⟩
 
-def meet_idem_path (a : L.Carrier) :
+noncomputable def meet_idem_path (a : L.Carrier) :
     Nonempty (Path (L.meet a a) a) :=
   ⟨Lat.meet_idem a⟩
 
-def join_idem_path (a : L.Carrier) :
+noncomputable def join_idem_path (a : L.Carrier) :
     Nonempty (Path (L.join a a) a) :=
   ⟨Lat.join_idem a⟩
 
-def absorb_meet_join_path (a b : L.Carrier) :
+noncomputable def absorb_meet_join_path (a b : L.Carrier) :
     Nonempty (Path (L.meet a (L.join a b)) a) :=
   ⟨Lat.absorb_meet_join a b⟩
 
-def absorb_join_meet_path (a b : L.Carrier) :
+noncomputable def absorb_join_meet_path (a b : L.Carrier) :
     Nonempty (Path (L.join a (L.meet a b)) a) :=
   ⟨Lat.absorb_join_meet a b⟩
 
-def meet_comm_symm (a b : L.Carrier) :
+noncomputable def meet_comm_symm (a b : L.Carrier) :
     Nonempty (Path (L.meet b a) (L.meet a b)) :=
   ⟨Path.symm (Lat.meet_comm a b)⟩
 
-def join_comm_symm (a b : L.Carrier) :
+noncomputable def join_comm_symm (a b : L.Carrier) :
     Nonempty (Path (L.join b a) (L.join a b)) :=
   ⟨Path.symm (Lat.join_comm a b)⟩
 
-def meet_assoc_symm (a b c : L.Carrier) :
+noncomputable def meet_assoc_symm (a b c : L.Carrier) :
     Nonempty (Path (L.meet a (L.meet b c)) (L.meet (L.meet a b) c)) :=
   ⟨Path.symm (Lat.meet_assoc a b c)⟩
 
-def join_assoc_symm (a b c : L.Carrier) :
+noncomputable def join_assoc_symm (a b c : L.Carrier) :
     Nonempty (Path (L.join a (L.join b c)) (L.join (L.join a b) c)) :=
   ⟨Path.symm (Lat.join_assoc a b c)⟩
 
-def meet_idem_symm (a : L.Carrier) :
+noncomputable def meet_idem_symm (a : L.Carrier) :
     Nonempty (Path a (L.meet a a)) :=
   ⟨Path.symm (Lat.meet_idem a)⟩
 
-def join_idem_symm (a : L.Carrier) :
+noncomputable def join_idem_symm (a : L.Carrier) :
     Nonempty (Path a (L.join a a)) :=
   ⟨Path.symm (Lat.join_idem a)⟩
 
-def absorb_meet_join_symm (a b : L.Carrier) :
+noncomputable def absorb_meet_join_symm (a b : L.Carrier) :
     Nonempty (Path a (L.meet a (L.join a b))) :=
   ⟨Path.symm (Lat.absorb_meet_join a b)⟩
 
-def absorb_join_meet_symm (a b : L.Carrier) :
+noncomputable def absorb_join_meet_symm (a b : L.Carrier) :
     Nonempty (Path a (L.join a (L.meet a b))) :=
   ⟨Path.symm (Lat.absorb_join_meet a b)⟩
 
@@ -132,75 +132,75 @@ theorem join_comm_roundtrip_toEq (a b : L.Carrier) :
     (Path.trans (Lat.join_comm a b) (Path.symm (Lat.join_comm a b))).toEq = rfl := by
   simp
 
-def meet_left_congr (p : Path a b) :
+noncomputable def meet_left_congr (p : Path a b) :
     Nonempty (Path (L.meet a c) (L.meet b c)) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.meet x c) p⟩
 
-def meet_right_congr (p : Path c d) :
+noncomputable def meet_right_congr (p : Path c d) :
     Nonempty (Path (L.meet a c) (L.meet a d)) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.meet a x) p⟩
 
-def join_left_congr (p : Path a b) :
+noncomputable def join_left_congr (p : Path a b) :
     Nonempty (Path (L.join a c) (L.join b c)) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.join x c) p⟩
 
-def join_right_congr (p : Path c d) :
+noncomputable def join_right_congr (p : Path c d) :
     Nonempty (Path (L.join a c) (L.join a d)) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.join a x) p⟩
 
-def meet_bimap_congr (p : Path a b) (q : Path c d) :
+noncomputable def meet_bimap_congr (p : Path a b) (q : Path c d) :
     Nonempty (Path (L.meet a c) (L.meet b d)) := by
   have hp : a = b := p.toEq
   have hq : c = d := q.toEq
   refine ⟨pathOfEq ?_⟩
   simpa [hp, hq]
 
-def join_bimap_congr (p : Path a b) (q : Path c d) :
+noncomputable def join_bimap_congr (p : Path a b) (q : Path c d) :
     Nonempty (Path (L.join a c) (L.join b d)) := by
   have hp : a = b := p.toEq
   have hq : c = d := q.toEq
   refine ⟨pathOfEq ?_⟩
   simpa [hp, hq]
 
-def absorb_meet_join_swapped (a b : L.Carrier) :
+noncomputable def absorb_meet_join_swapped (a b : L.Carrier) :
     Nonempty (Path (L.meet (L.join a b) a) a) := by
   exact ⟨Path.trans (Lat.meet_comm (L.join a b) a) (Lat.absorb_meet_join a b)⟩
 
-def absorb_join_meet_swapped (a b : L.Carrier) :
+noncomputable def absorb_join_meet_swapped (a b : L.Carrier) :
     Nonempty (Path (L.join (L.meet a b) a) a) := by
   exact ⟨Path.trans (Lat.join_comm (L.meet a b) a) (Lat.absorb_join_meet a b)⟩
 
-def meet_idem_from_absorb (a : L.Carrier) :
+noncomputable def meet_idem_from_absorb (a : L.Carrier) :
     Nonempty (Path (L.meet a a) a) := by
   refine ⟨Path.trans ?_ (Lat.absorb_meet_join a a)⟩
   simpa using Path.congrArg (fun x => L.meet a x) (Path.symm (Lat.join_idem a))
 
-def join_idem_from_absorb (a : L.Carrier) :
+noncomputable def join_idem_from_absorb (a : L.Carrier) :
     Nonempty (Path (L.join a a) a) := by
   refine ⟨Path.trans ?_ (Lat.absorb_join_meet a a)⟩
   simpa using Path.congrArg (fun x => L.join a x) (Path.symm (Lat.meet_idem a))
 
-def meet_assoc_congr_left (p : Path a b) :
+noncomputable def meet_assoc_congr_left (p : Path a b) :
     Nonempty (Path (L.meet (L.meet a c) d) (L.meet (L.meet b c) d)) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.meet (L.meet x c) d) p⟩
 
-def meet_assoc_congr_right (p : Path c d) :
+noncomputable def meet_assoc_congr_right (p : Path c d) :
     Nonempty (Path (L.meet a (L.meet b c)) (L.meet a (L.meet b d))) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.meet a (L.meet b x)) p⟩
 
-def join_assoc_congr_left (p : Path a b) :
+noncomputable def join_assoc_congr_left (p : Path a b) :
     Nonempty (Path (L.join (L.join a c) d) (L.join (L.join b c) d)) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.join (L.join x c) d) p⟩
 
-def join_assoc_congr_right (p : Path c d) :
+noncomputable def join_assoc_congr_right (p : Path c d) :
     Nonempty (Path (L.join a (L.join b c)) (L.join a (L.join b d))) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.join a (L.join b x)) p⟩
 
-def absorb_meet_join_right_congr (p : Path b c) :
+noncomputable def absorb_meet_join_right_congr (p : Path b c) :
     Nonempty (Path (L.meet a (L.join a b)) (L.meet a (L.join a c))) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.meet a (L.join a x)) p⟩
 
-def absorb_join_meet_right_congr (p : Path b c) :
+noncomputable def absorb_join_meet_right_congr (p : Path b c) :
     Nonempty (Path (L.join a (L.meet a b)) (L.join a (L.meet a c))) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.join a (L.meet a x)) p⟩
 
@@ -212,19 +212,19 @@ variable {L : LatticeSignature}
 variable (Dist : DistributiveAxioms L) (Lat : LatticeAxioms L)
 variable {a b c d : L.Carrier}
 
-def meet_over_join_path (a b c : L.Carrier) :
+noncomputable def meet_over_join_path (a b c : L.Carrier) :
     Nonempty (Path (L.meet a (L.join b c)) (L.join (L.meet a b) (L.meet a c))) :=
   ⟨Dist.meet_over_join a b c⟩
 
-def join_over_meet_path (a b c : L.Carrier) :
+noncomputable def join_over_meet_path (a b c : L.Carrier) :
     Nonempty (Path (L.join a (L.meet b c)) (L.meet (L.join a b) (L.join a c))) :=
   ⟨Dist.join_over_meet a b c⟩
 
-def meet_over_join_symm (a b c : L.Carrier) :
+noncomputable def meet_over_join_symm (a b c : L.Carrier) :
     Nonempty (Path (L.join (L.meet a b) (L.meet a c)) (L.meet a (L.join b c))) :=
   ⟨Path.symm (Dist.meet_over_join a b c)⟩
 
-def join_over_meet_symm (a b c : L.Carrier) :
+noncomputable def join_over_meet_symm (a b c : L.Carrier) :
     Nonempty (Path (L.meet (L.join a b) (L.join a c)) (L.join a (L.meet b c))) :=
   ⟨Path.symm (Dist.join_over_meet a b c)⟩
 
@@ -236,27 +236,27 @@ theorem join_over_meet_roundtrip_toEq (a b c : L.Carrier) :
     (Path.trans (Dist.join_over_meet a b c) (Path.symm (Dist.join_over_meet a b c))).toEq = rfl := by
   simp
 
-def meet_over_join_congr_left (p : Path a b) :
+noncomputable def meet_over_join_congr_left (p : Path a b) :
     Nonempty (Path (L.meet a (L.join c d)) (L.meet b (L.join c d))) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.meet x (L.join c d)) p⟩
 
-def join_over_meet_congr_left (p : Path a b) :
+noncomputable def join_over_meet_congr_left (p : Path a b) :
     Nonempty (Path (L.join a (L.meet c d)) (L.join b (L.meet c d))) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.join x (L.meet c d)) p⟩
 
-def meet_over_join_with_comm (a b c : L.Carrier) :
+noncomputable def meet_over_join_with_comm (a b c : L.Carrier) :
     Nonempty (Path (L.meet a (L.join b c)) (L.join (L.meet a c) (L.meet a b))) := by
   exact ⟨Path.trans (Dist.meet_over_join a b c) (Lat.join_comm (L.meet a b) (L.meet a c))⟩
 
-def join_over_meet_with_comm (a b c : L.Carrier) :
+noncomputable def join_over_meet_with_comm (a b c : L.Carrier) :
     Nonempty (Path (L.join a (L.meet b c)) (L.meet (L.join a c) (L.join a b))) := by
   exact ⟨Path.trans (Dist.join_over_meet a b c) (Lat.meet_comm (L.join a b) (L.join a c))⟩
 
-def meet_over_join_right_congr (p : Path c d) :
+noncomputable def meet_over_join_right_congr (p : Path c d) :
     Nonempty (Path (L.join (L.meet a b) (L.meet a c)) (L.join (L.meet a b) (L.meet a d))) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.join (L.meet a b) (L.meet a x)) p⟩
 
-def join_over_meet_right_congr (p : Path c d) :
+noncomputable def join_over_meet_right_congr (p : Path c d) :
     Nonempty (Path (L.meet (L.join a b) (L.join a c)) (L.meet (L.join a b) (L.join a d))) := by
   exact ⟨by simpa using Path.congrArg (fun x => L.meet (L.join a b) (L.join a x)) p⟩
 
@@ -269,11 +269,11 @@ variable (ModAx : ModularAxioms L) (Lat : LatticeAxioms L)
 variable (Cmp : ComplementedAxioms L)
 variable {a b c : L.Carrier}
 
-def modular_identity_path (a b c : L.Carrier) :
+noncomputable def modular_identity_path (a b c : L.Carrier) :
     Nonempty (Path (L.join a (L.meet b c)) (L.meet (L.join a b) c)) :=
   ⟨ModAx.modular_identity a b c⟩
 
-def modular_identity_symm (a b c : L.Carrier) :
+noncomputable def modular_identity_symm (a b c : L.Carrier) :
     Nonempty (Path (L.meet (L.join a b) c) (L.join a (L.meet b c))) :=
   ⟨Path.symm (ModAx.modular_identity a b c)⟩
 
@@ -305,11 +305,11 @@ theorem join_compl_symm (a : L.Carrier) :
     Nonempty (Path L.top (L.join a (Cmp.comp a))) :=
   ⟨Path.symm (Cmp.join_compl a)⟩
 
-def meet_compl_commuted (a : L.Carrier) :
+noncomputable def meet_compl_commuted (a : L.Carrier) :
     Nonempty (Path (L.meet (Cmp.comp a) a) L.bot) := by
   exact ⟨Path.trans (Lat.meet_comm (Cmp.comp a) a) (Cmp.meet_compl a)⟩
 
-def join_compl_commuted (a : L.Carrier) :
+noncomputable def join_compl_commuted (a : L.Carrier) :
     Nonempty (Path (L.join (Cmp.comp a) a) L.top) := by
   exact ⟨Path.trans (Lat.join_comm (Cmp.comp a) a) (Cmp.join_compl a)⟩
 
@@ -340,7 +340,7 @@ variable {L : LatticeSignature.{u}}
 variable {M : LatticeSignature.{v}}
 variable {N : LatticeSignature.{w}}
 
-def idHom (L : LatticeSignature.{u}) : LatticeHom L L where
+noncomputable def idHom (L : LatticeSignature.{u}) : LatticeHom L L where
   toFun := fun x => x
   map_meet := by
     intro a b
@@ -351,7 +351,7 @@ def idHom (L : LatticeSignature.{u}) : LatticeHom L L where
   map_bot := Path.refl L.bot
   map_top := Path.refl L.top
 
-def comp (g : LatticeHom M N) (f : LatticeHom L M) : LatticeHom L N where
+noncomputable def comp (g : LatticeHom M N) (f : LatticeHom L M) : LatticeHom L N where
   toFun := fun x => g.toFun (f.toFun x)
   map_meet := by
     intro a b
@@ -481,7 +481,7 @@ variable {L : LatticeSignature.{u}}
 variable {Gam : Type v}
 variable {Del : Type w}
 
-def eval (Sym : Gam → L.Carrier) : LatticePolynomial L Gam → L.Carrier
+noncomputable def eval (Sym : Gam → L.Carrier) : LatticePolynomial L Gam → L.Carrier
   | .var g => Sym g
   | .bot => L.bot
   | .top => L.top
@@ -510,7 +510,7 @@ def eval (Sym : Gam → L.Carrier) : LatticePolynomial L Gam → L.Carrier
     eval Sym (.join p q) = L.join (eval Sym p) (eval Sym q) :=
   rfl
 
-def map (Sym : Gam → Del) : LatticePolynomial L Gam → LatticePolynomial L Del
+noncomputable def map (Sym : Gam → Del) : LatticePolynomial L Gam → LatticePolynomial L Del
   | .var g => .var (Sym g)
   | .bot => .bot
   | .top => .top
@@ -563,7 +563,7 @@ def map (Sym : Gam → Del) : LatticePolynomial L Gam → LatticePolynomial L De
     eval Tau (map Sym p) = eval (fun g => Tau (Sym g)) p := by
   simpa using eval_map (L := L) Tau Sym p
 
-def subst (Sym : Gam → LatticePolynomial L Del) :
+noncomputable def subst (Sym : Gam → LatticePolynomial L Del) :
     LatticePolynomial L Gam → LatticePolynomial L Del
   | .var g => Sym g
   | .bot => .bot
@@ -627,7 +627,7 @@ def subst (Sym : Gam → LatticePolynomial L Del) :
 
 end LatticePolynomial
 
-def PolyRel {L : LatticeSignature.{u}} {Gam : Type v}
+noncomputable def PolyRel {L : LatticeSignature.{u}} {Gam : Type v}
     (p q : LatticePolynomial L Gam) : Prop :=
   ∀ Sym : Gam → L.Carrier,
     Nonempty (Path (LatticePolynomial.eval Sym p) (LatticePolynomial.eval Sym q))
@@ -691,16 +691,16 @@ structure LatticeIdentity (L : LatticeSignature.{u}) (Gam : Type v) where
   lhs : LatticePolynomial L Gam
   rhs : LatticePolynomial L Gam
 
-def SatisfiesIdentity {L : LatticeSignature.{u}} {Gam : Type v}
+noncomputable def SatisfiesIdentity {L : LatticeSignature.{u}} {Gam : Type v}
     (Id : LatticeIdentity L Gam) : Prop :=
   PolyRel (L := L) Id.lhs Id.rhs
 
-def symmIdentity {L : LatticeSignature.{u}} {Gam : Type v}
+noncomputable def symmIdentity {L : LatticeSignature.{u}} {Gam : Type v}
     (Id : LatticeIdentity L Gam) : LatticeIdentity L Gam where
   lhs := Id.rhs
   rhs := Id.lhs
 
-def substIdentity {L : LatticeSignature.{u}} {Gam : Type v} {Del : Type w}
+noncomputable def substIdentity {L : LatticeSignature.{u}} {Gam : Type v} {Del : Type w}
     (Sym : Gam → LatticePolynomial L Del)
     (Id : LatticeIdentity L Gam) : LatticeIdentity L Del where
   lhs := LatticePolynomial.subst Sym Id.lhs
@@ -750,7 +750,7 @@ end IdentityTheorems
 abbrev EquationalTheory (L : LatticeSignature.{u}) (Gam : Type v) :=
   List (LatticeIdentity L Gam)
 
-def ModelsTheory {L : LatticeSignature.{u}} {Gam : Type v}
+noncomputable def ModelsTheory {L : LatticeSignature.{u}} {Gam : Type v}
     (Theory : EquationalTheory L Gam) : Prop :=
   ∀ Id : LatticeIdentity L Gam, Id ∈ Theory → SatisfiesIdentity (L := L) Id
 
@@ -786,7 +786,7 @@ end BirkhoffTheorems
 abbrev FreeLattice (L : LatticeSignature.{u}) (Gam : Type v) :=
   LatticePolynomial L Gam
 
-def freeVar {L : LatticeSignature.{u}} {Gam : Type v} (g : Gam) : FreeLattice L Gam :=
+noncomputable def freeVar {L : LatticeSignature.{u}} {Gam : Type v} (g : Gam) : FreeLattice L Gam :=
   .var g
 
 section FreeLatticeTheorems
@@ -818,7 +818,7 @@ theorem freeTop_eval (Sym : Gam → L.Carrier) :
 
 end FreeLatticeTheorems
 
-def WhitmanCondition (L : LatticeSignature.{u}) : Prop :=
+noncomputable def WhitmanCondition (L : LatticeSignature.{u}) : Prop :=
   ∀ a b c d : L.Carrier,
     Nonempty (Path (L.meet (L.join a b) (L.join c d))
       (L.join (L.meet (L.join a b) c) (L.meet (L.join a b) d)))
@@ -828,16 +828,16 @@ section WhitmanTheorems
 variable {L : LatticeSignature.{u}}
 variable (W : WhitmanAxioms L)
 
-def whitman_path (a b c d : L.Carrier) :
+noncomputable def whitman_path (a b c d : L.Carrier) :
     Nonempty (Path (L.meet (L.join a b) (L.join c d))
       (L.join (L.meet (L.join a b) c) (L.meet (L.join a b) d))) :=
   ⟨W.whitman a b c d⟩
 
-def whitman_condition_holds : WhitmanCondition L := by
+noncomputable def whitman_condition_holds : WhitmanCondition L := by
   intro a b c d
   exact ⟨W.whitman a b c d⟩
 
-def whitman_symm (a b c d : L.Carrier) :
+noncomputable def whitman_symm (a b c d : L.Carrier) :
     Nonempty (Path (L.join (L.meet (L.join a b) c) (L.meet (L.join a b) d))
       (L.meet (L.join a b) (L.join c d))) :=
   ⟨Path.symm (W.whitman a b c d)⟩

@@ -58,7 +58,7 @@ variable {A B C : Type u}
       rfl
 
 /-- Identity natural transformation. -/
-def id (F : FundamentalGroupoidFunctor A B) :
+noncomputable def id (F : FundamentalGroupoidFunctor A B) :
     FundamentalGroupoidNatTrans F F where
   app := fun a => FundamentalGroupoid.id' B (F.obj a)
   naturality := by
@@ -72,7 +72,7 @@ def id (F : FundamentalGroupoidFunctor A B) :
             exact FundamentalGroupoid.comp_id' (A := B) (p := F.map p)
 
 /-- Vertical composition of natural transformations. -/
-def vcomp {F G H : FundamentalGroupoidFunctor A B}
+noncomputable def vcomp {F G H : FundamentalGroupoidFunctor A B}
     (η : FundamentalGroupoidNatTrans F G)
     (θ : FundamentalGroupoidNatTrans G H) :
     FundamentalGroupoidNatTrans F H where
@@ -128,7 +128,7 @@ def vcomp {F G H : FundamentalGroupoidFunctor A B}
   exact FundamentalGroupoid.id_comp' (A := B) (p := η.app a)
 
 /-- Horizontal composition of natural transformations. -/
-def hcomp {F G : FundamentalGroupoidFunctor A B}
+noncomputable def hcomp {F G : FundamentalGroupoidFunctor A B}
     {H K : FundamentalGroupoidFunctor B C}
     (η : FundamentalGroupoidNatTrans F G)
     (θ : FundamentalGroupoidNatTrans H K) :
@@ -209,7 +209,7 @@ structure FundamentalGroupoidFunctorCategory (A : Type u) (B : Type u) where
       comp η (id G) = η
 
 /-- The functor category of fundamental groupoid functors. -/
-def fundamentalGroupoidFunctorCategory (A : Type u) (B : Type u) :
+noncomputable def fundamentalGroupoidFunctorCategory (A : Type u) (B : Type u) :
     FundamentalGroupoidFunctorCategory A B where
   id := FundamentalGroupoidNatTrans.id
   comp := fun η θ => FundamentalGroupoidNatTrans.vcomp η θ
@@ -223,7 +223,7 @@ def fundamentalGroupoidFunctorCategory (A : Type u) (B : Type u) :
     intro F G η
     exact FundamentalGroupoidNatTrans.vcomp_id (η := η)
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

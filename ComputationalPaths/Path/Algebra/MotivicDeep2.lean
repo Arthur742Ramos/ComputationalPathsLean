@@ -52,13 +52,13 @@ structure A1HomotopyData (α : Type u) where
   isA1Equiv : Bool
 
 /-- A¹-contractible scheme (e.g., affine space Aⁿ). -/
-def a1Contractible (k : α) (n : Nat) : SmoothSchemeData α where
+noncomputable def a1Contractible (k : α) (n : Nat) : SmoothSchemeData α where
   baseField := k
   dimension := n
   label := s!"A^{n}"
 
 /-- Path witnessing A¹-contractibility of affine space. -/
-def affineContractiblePath (k : α) (n : Nat) :
+noncomputable def affineContractiblePath (k : α) (n : Nat) :
     Path (a1Contractible k n) (a1Contractible k n) := Path.refl _
 
 theorem a1Contractible_dim (k : α) (n : Nat) :
@@ -86,7 +86,7 @@ structure NisnevichCover (α : Type u) where
   isEtale : Bool
 
 /-- Empty Nisnevich cover (identity cover). -/
-def trivialNisnevichCover (X : SmoothSchemeData α) : NisnevichCover α where
+noncomputable def trivialNisnevichCover (X : SmoothSchemeData α) : NisnevichCover α where
   base := X
   coveringSchemes := [X]
   isEtale := true
@@ -113,7 +113,7 @@ structure MotivicSpectrumData (α : Type u) where
   weight : Int
 
 /-- The motivic sphere spectrum S^{p,q}. -/
-def motivicSphere (base : α) (p q : Int) : MotivicSpaceData α where
+noncomputable def motivicSphere (base : α) (p q : Int) : MotivicSpaceData α where
   underlying := base
   weight := q
   connectivity := p - q
@@ -137,7 +137,7 @@ structure MotivicCohomologyData (α : Type u) where
   rank : Nat
 
 /-- Cup product on motivic cohomology. -/
-def motivicCupProduct (a b : MotivicCohomologyData α) : MotivicCohomologyData α where
+noncomputable def motivicCupProduct (a b : MotivicCohomologyData α) : MotivicCohomologyData α where
   scheme := a.scheme
   degree := a.degree + b.degree
   weight := a.weight + b.weight
@@ -151,7 +151,7 @@ theorem motivicCup_weight (a b : MotivicCohomologyData α) :
     (motivicCupProduct a b).weight = a.weight + b.weight := rfl
 
 /-- H^{n,n}(Spec k; Z) ≅ K^M_n(k) (Nesterenko–Suslin–Totaro). -/
-def motivicDiagonalPath {α : Type u} (h : MotivicCohomologyData α) :
+noncomputable def motivicDiagonalPath {α : Type u} (h : MotivicCohomologyData α) :
     Path h h := Path.refl h
 
 -- ============================================================================
@@ -165,19 +165,19 @@ structure MilnorKData (α : Type u) where
   generators : List α     -- symbols {a₁, ..., aₙ}
 
 /-- K^M_0(F) = ℤ. -/
-def milnorK0 (k : α) : MilnorKData α where
+noncomputable def milnorK0 (k : α) : MilnorKData α where
   field := k
   degree := 0
   generators := []
 
 /-- K^M_1(F) = F×. -/
-def milnorK1 (k : α) (units : List α) : MilnorKData α where
+noncomputable def milnorK1 (k : α) (units : List α) : MilnorKData α where
   field := k
   degree := 1
   generators := units
 
 /-- Product in Milnor K-theory: K^M_m ⊗ K^M_n → K^M_{m+n}. -/
-def milnorProduct (a b : MilnorKData α) : MilnorKData α where
+noncomputable def milnorProduct (a b : MilnorKData α) : MilnorKData α where
   field := a.field
   degree := a.degree + b.degree
   generators := a.generators ++ b.generators
@@ -189,7 +189,7 @@ theorem milnorProduct_degree (a b : MilnorKData α) :
     (milnorProduct a b).degree = a.degree + b.degree := rfl
 
 /-- Steinberg relation: {a, 1-a} = 0 in K^M_2(F). -/
-def steinbergRelationPath (k : α) :
+noncomputable def steinbergRelationPath (k : α) :
     Path (milnorK0 k) (milnorK0 k) := Path.refl _
 
 -- ============================================================================
@@ -205,7 +205,7 @@ structure BlochKatoData (α : Type u) where
   isIsomorphism : Bool
 
 /-- Bloch-Kato at degree 1 is Kummer theory. -/
-def blochKatoDeg1 (k : α) (p : Nat) : BlochKatoData α where
+noncomputable def blochKatoDeg1 (k : α) (p : Nat) : BlochKatoData α where
   field := k
   degree := 1
   prime := p
@@ -240,7 +240,7 @@ structure SliceTower (α : Type u) where
   filtrationAt : Int → MotivicSpectrumData α
 
 /-- The zeroth slice of HZ is HZ. -/
-def sliceHZPath {α : Type u} (s : VoevodskySlice α) :
+noncomputable def sliceHZPath {α : Type u} (s : VoevodskySlice α) :
     Path s s := Path.refl s
 
 -- ============================================================================
@@ -256,7 +256,7 @@ structure MotivicSteenrodOp where
   outputWeight : Int     -- q + i
 
 /-- Sq^{2i}: H^{p,q} → H^{p+2i, q+i}. -/
-def motivicSq (i : Nat) (p q : Int) : MotivicSteenrodOp where
+noncomputable def motivicSq (i : Nat) (p q : Int) : MotivicSteenrodOp where
   degree := 2 * i
   inputDegree := p
   inputWeight := q
@@ -275,7 +275,7 @@ structure MotivicAdemRelation where
   b : Nat
   isValid : Bool   -- a < 2b
 
-def motivicAdem (a b : Nat) : MotivicAdemRelation where
+noncomputable def motivicAdem (a b : Nat) : MotivicAdemRelation where
   a := a
   b := b
   isValid := a < 2 * b
@@ -301,7 +301,7 @@ structure MotivicAdamsData where
   convergesTo : String   -- description of abutment
 
 /-- Motivic Adams at p=2 for the sphere. -/
-def motivicAdamsSphere : MotivicAdamsData where
+noncomputable def motivicAdamsSphere : MotivicAdamsData where
   prime := 2
   entries := []
   convergesTo := "π_{*,*}(S^{0,0})_2^∧"
@@ -320,7 +320,7 @@ structure NormFunctor (α : Type u) where
   outputSpectrum : α
 
 /-- Norm is multiplicative: N(E ∧ F) ≃ N(E) ∧ N(F). -/
-def normMultiplicativePath {α : Type u} (n : NormFunctor α) :
+noncomputable def normMultiplicativePath {α : Type u} (n : NormFunctor α) :
     Path n n := Path.refl n
 
 -- ============================================================================
@@ -334,11 +334,11 @@ structure MotivicFiberSeq (α : Type u) where
   base : MotivicSpaceData α
 
 /-- Connectivity of fiber sequence. -/
-def motivicFiberConnectivity (seq : MotivicFiberSeq α) : Int :=
+noncomputable def motivicFiberConnectivity (seq : MotivicFiberSeq α) : Int :=
   seq.fiber.connectivity
 
 /-- Path: motivic fiber sequence is exact. -/
-def motivicFiberExactPath {α : Type u} (seq : MotivicFiberSeq α) :
+noncomputable def motivicFiberExactPath {α : Type u} (seq : MotivicFiberSeq α) :
     Path seq seq := Path.refl seq
 
 theorem motivicFiberConn_eq (seq : MotivicFiberSeq α) :
@@ -354,7 +354,7 @@ structure MotivicHopfEta (α : Type u) where
   stem : Int      -- 1
   weight : Int    -- 1
 
-def motivicEta (k : α) : MotivicHopfEta α where
+noncomputable def motivicEta (k : α) : MotivicHopfEta α where
   baseField := k
   stem := 1
   weight := 1
@@ -364,7 +364,7 @@ structure RhoTorsion (α : Type u) where
   baseField : α
   order : Nat   -- 2 for char ≠ 2
 
-def rhoElement (k : α) : RhoTorsion α where
+noncomputable def rhoElement (k : α) : RhoTorsion α where
   baseField := k
   order := 2
 
@@ -373,7 +373,7 @@ theorem motivicEta_weight (k : α) : (motivicEta k).weight = 1 := rfl
 theorem rhoElement_order (k : α) : (rhoElement k).order = 2 := rfl
 
 /-- Path: η-periodic motivic stems stabilize. -/
-def etaPeriodicPath {α : Type u} (e : MotivicHopfEta α) :
+noncomputable def etaPeriodicPath {α : Type u} (e : MotivicHopfEta α) :
     Path e e := Path.refl e
 
 -- ============================================================================
@@ -387,7 +387,7 @@ structure AlgebraicCobordismData (α : Type u) where
   coeffRing : String   -- MGL_{2*,*} ≅ L (Lazard ring)
 
 /-- MGL represents algebraic cobordism: MGL^{2n,n}(X) = Ω^n(X). -/
-def mglCobordismPath {α : Type u} (mgl : AlgebraicCobordismData α) :
+noncomputable def mglCobordismPath {α : Type u} (mgl : AlgebraicCobordismData α) :
     Path mgl mgl := Path.refl mgl
 
 /-- Comparison: MGL → MU under realization. -/
@@ -395,7 +395,7 @@ structure RealizationData (α : Type u) where
   motivicSpectrum : AlgebraicCobordismData α
   topologicalName : String
 
-def mglRealization (mgl : AlgebraicCobordismData α) : RealizationData α where
+noncomputable def mglRealization (mgl : AlgebraicCobordismData α) : RealizationData α where
   motivicSpectrum := mgl
   topologicalName := "MU"
 

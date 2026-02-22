@@ -29,41 +29,41 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a     => .nil a
   | .cons s p  => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   eq : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
-def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
+noncomputable def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.eq.trans τ.eq⟩
 
-def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
+noncomputable def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.eq.symm⟩
 
-def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
+noncomputable def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
     Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (Path.trans r) σ.eq⟩
 
-def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
+noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.eq⟩
 
@@ -78,22 +78,22 @@ inductive Omega where
   deriving DecidableEq, Repr
 
 /-- Internal conjunction on Ω. -/
-def Omega.and : Omega → Omega → Omega
+noncomputable def Omega.and : Omega → Omega → Omega
   | .tt, .tt => .tt
   | _,   _   => .ff
 
 /-- Internal disjunction on Ω. -/
-def Omega.or : Omega → Omega → Omega
+noncomputable def Omega.or : Omega → Omega → Omega
   | .ff, .ff => .ff
   | _,   _   => .tt
 
 /-- Internal implication on Ω. -/
-def Omega.imp : Omega → Omega → Omega
+noncomputable def Omega.imp : Omega → Omega → Omega
   | .tt, .ff => .ff
   | _,   _   => .tt
 
 /-- Internal negation on Ω. -/
-def Omega.neg : Omega → Omega
+noncomputable def Omega.neg : Omega → Omega
   | .tt => .ff
   | .ff => .tt
 
@@ -116,7 +116,7 @@ inductive CharPath : CharPhase × Omega → CharPhase × Omega → Prop where
   | refl (s : CharPhase × Omega) : CharPath s s
   | step : CharStep s₁ s₂ → CharPath s₂ s₃ → CharPath s₁ s₃
 
-def CharPath.trans' : CharPath s₁ s₂ → CharPath s₂ s₃ → CharPath s₁ s₃
+noncomputable def CharPath.trans' : CharPath s₁ s₂ → CharPath s₂ s₃ → CharPath s₁ s₃
   | .refl _, q => q
   | .step h p, q => .step h (p.trans' q)
 
@@ -208,7 +208,7 @@ theorem omega_absorption_or (a b : Omega) :
 -- ============================================================
 
 /-- Build a full classify→verify path for any truth value. -/
-def charFullPath (v : Omega) : CharPath (.input, v) (.verified, v) :=
+noncomputable def charFullPath (v : Omega) : CharPath (.input, v) (.verified, v) :=
   .step (CharStep.classify v) (.step (CharStep.verify v) (.refl _))
 
 /-- Theorem 19: Full characteristic path has length 2 steps. -/
@@ -256,10 +256,10 @@ inductive PBPath : List PBStep → List PBStep → Prop where
   | extend (h : PBStep) : PBPath xs ys → PBPath (h :: xs) (h :: ys)
 
 /-- The standard verification path for a pullback. -/
-def pbVerifyPath : List PBStep := [.checkLeft, .checkRight, .unify]
+noncomputable def pbVerifyPath : List PBStep := [.checkLeft, .checkRight, .unify]
 
 /-- Theorem 22: Pullback cone from equal functions yields identity apex. -/
-def pb_cone_identity (f : PBObj → Nat) (p : PBObj) :
+noncomputable def pb_cone_identity (f : PBObj → Nat) (p : PBObj) :
     PullbackCone f f :=
   ⟨p, p, p, rfl⟩
 
@@ -276,29 +276,29 @@ structure PowerElem (α : Type) where
   char : α → Omega
 
 /-- Membership test via characteristic map. -/
-def PowerElem.mem (pe : PowerElem α) (x : α) : Bool :=
+noncomputable def PowerElem.mem (pe : PowerElem α) (x : α) : Bool :=
   pe.char x == .tt
 
 /-- Singleton subset. -/
-def PowerElem.singleton [DecidableEq α] (a : α) : PowerElem α :=
+noncomputable def PowerElem.singleton [DecidableEq α] (a : α) : PowerElem α :=
   ⟨fun x => if x == a then .tt else .ff⟩
 
 /-- Empty subset. -/
-def PowerElem.empty : PowerElem α := ⟨fun _ => .ff⟩
+noncomputable def PowerElem.empty : PowerElem α := ⟨fun _ => .ff⟩
 
 /-- Full subset. -/
-def PowerElem.full : PowerElem α := ⟨fun _ => .tt⟩
+noncomputable def PowerElem.full : PowerElem α := ⟨fun _ => .tt⟩
 
 /-- Intersection of power elements. -/
-def PowerElem.inter (p q : PowerElem α) : PowerElem α :=
+noncomputable def PowerElem.inter (p q : PowerElem α) : PowerElem α :=
   ⟨fun x => Omega.and (p.char x) (q.char x)⟩
 
 /-- Union of power elements. -/
-def PowerElem.union (p q : PowerElem α) : PowerElem α :=
+noncomputable def PowerElem.union (p q : PowerElem α) : PowerElem α :=
   ⟨fun x => Omega.or (p.char x) (q.char x)⟩
 
 /-- Complement of a power element. -/
-def PowerElem.compl (p : PowerElem α) : PowerElem α :=
+noncomputable def PowerElem.compl (p : PowerElem α) : PowerElem α :=
   ⟨fun x => Omega.neg (p.char x)⟩
 
 /-- Theorem 24: Intersection is commutative (via congrArg chain). -/
@@ -373,14 +373,14 @@ structure LTTopology where
   pres_and : ∀ x y, j (Omega.and x y) = Omega.and (j x) (j y)
 
 /-- The identity topology: j = id. -/
-def LTTopology.identity : LTTopology where
+noncomputable def LTTopology.identity : LTTopology where
   j := id
   pres_tt := rfl
   idempotent := fun _ => rfl
   pres_and := fun _ _ => rfl
 
 /-- The double-negation topology: j = ¬¬. -/
-def LTTopology.doubleNeg : LTTopology where
+noncomputable def LTTopology.doubleNeg : LTTopology where
   j := fun x => Omega.neg (Omega.neg x)
   pres_tt := by rfl
   idempotent := fun x => by cases x <;> rfl
@@ -410,7 +410,7 @@ theorem lt_j_ff_decidable (t : LTTopology) :
 -- ============================================================
 
 /-- Sheafification applies the topology to each truth value in a power element. -/
-def sheafify (t : LTTopology) (p : PowerElem α) : PowerElem α :=
+noncomputable def sheafify (t : LTTopology) (p : PowerElem α) : PowerElem α :=
   ⟨fun x => t.j (p.char x)⟩
 
 /-- Theorem 37: Sheafification is idempotent. -/

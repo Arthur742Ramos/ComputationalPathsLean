@@ -45,7 +45,7 @@ namespace LeftModule
 variable {A : Type u}
 
 /-- The canonical left module coming from a type family via transport. -/
-def ofFamily (B : A → Type v) : LeftModule A where
+noncomputable def ofFamily (B : A → Type v) : LeftModule A where
   carrier := B
   act := fun {a b} p x => transport (D := B) p x
   act_refl := by
@@ -75,14 +75,14 @@ variable {M : LeftModule A}
   S.stable p hx
 
 /-- The full submodule. -/
-def full (M : LeftModule A) : Submodule M where
+noncomputable def full (M : LeftModule A) : Submodule M where
   carrier := fun _ _ => True
   stable := by
     intro a b p x hx
     trivial
 
 /-- The empty submodule. -/
-def empty (M : LeftModule A) : Submodule M where
+noncomputable def empty (M : LeftModule A) : Submodule M where
   carrier := fun _ _ => False
   stable := by
     intro a b p x hx
@@ -107,7 +107,7 @@ theorem empty_not_mem (a : A) (x : M.carrier a) :
   False.elim
 
 /-- Restrict a left module to a submodule. -/
-def subtype (S : Submodule M) : LeftModule A where
+noncomputable def subtype (S : Submodule M) : LeftModule A where
   carrier := fun a => {x : M.carrier a // S.carrier a x}
   act := fun {a b} p x => ⟨M.act p x.1, S.stable p x.2⟩
   act_refl := by
@@ -133,7 +133,7 @@ structure QuotientRel (M : LeftModule A) where
       rel x y → rel (M.act p x) (M.act p y)
 
 /-- Quotient a left module by a compatible relation. -/
-def quotient {M : LeftModule A} (R : QuotientRel M) : LeftModule A where
+noncomputable def quotient {M : LeftModule A} (R : QuotientRel M) : LeftModule A where
   carrier := fun a => Quot (R.rel (a := a))
   act := by
     intro a b p
@@ -198,7 +198,7 @@ namespace RightModule
 variable {A : Type u}
 
 /-- The canonical right module coming from a type family via transport. -/
-def ofFamily (B : A → Type v) : RightModule A where
+noncomputable def ofFamily (B : A → Type v) : RightModule A where
   carrier := B
   act := fun {a b} p x => transport (D := B) (Path.symm p) x
   act_refl := by
@@ -229,14 +229,14 @@ variable {M : RightModule A}
   S.stable p hx
 
 /-- The full submodule. -/
-def full (M : RightModule A) : Submodule M where
+noncomputable def full (M : RightModule A) : Submodule M where
   carrier := fun _ _ => True
   stable := by
     intro a b p x hx
     trivial
 
 /-- The empty submodule. -/
-def empty (M : RightModule A) : Submodule M where
+noncomputable def empty (M : RightModule A) : Submodule M where
   carrier := fun _ _ => False
   stable := by
     intro a b p x hx
@@ -261,7 +261,7 @@ theorem empty_not_mem (a : A) (x : M.carrier a) :
   False.elim
 
 /-- Restrict a right module to a submodule. -/
-def subtype (S : Submodule M) : RightModule A where
+noncomputable def subtype (S : Submodule M) : RightModule A where
   carrier := fun a => {x : M.carrier a // S.carrier a x}
   act := fun {a b} p x => ⟨M.act p x.1, S.stable p x.2⟩
   act_refl := by
@@ -287,7 +287,7 @@ structure QuotientRel (M : RightModule A) where
       rel x y → rel (M.act p x) (M.act p y)
 
 /-- Quotient a right module by a compatible relation. -/
-def quotient {M : RightModule A} (R : QuotientRel M) : RightModule A where
+noncomputable def quotient {M : RightModule A} (R : QuotientRel M) : RightModule A where
   carrier := fun a => Quot (R.rel (a := a))
   act := by
     intro a b p
@@ -344,17 +344,17 @@ inductive TensorRel {A : Type u} (R : RightModule.{u, v} A) (L : LeftModule.{u, 
         (Sigma.mk b (Prod.mk r (L.act p l)))
 
 /-- Tensor product of a right and left module over a path algebra. -/
-def TensorProduct {A : Type u} (R : RightModule.{u, v} A) (L : LeftModule.{u, w} A) :
+noncomputable def TensorProduct {A : Type u} (R : RightModule.{u, v} A) (L : LeftModule.{u, w} A) :
     Type (max u v w) :=
   Quot (TensorRel R L)
 
 /-- Introduce a pure tensor. -/
-def tensorMk {A : Type u} {R : RightModule.{u, v} A} {L : LeftModule.{u, w} A} {a : A}
+noncomputable def tensorMk {A : Type u} {R : RightModule.{u, v} A} {L : LeftModule.{u, w} A} {a : A}
     (r : R.carrier a) (l : L.carrier a) : TensorProduct R L :=
   Quot.mk (TensorRel R L) (Sigma.mk a (Prod.mk r l))
 
 /-- The tensor relation identifying left and right actions. -/
-def tensor_rel {A : Type u} {R : RightModule.{u, v} A} {L : LeftModule.{u, w} A}
+noncomputable def tensor_rel {A : Type u} {R : RightModule.{u, v} A} {L : LeftModule.{u, w} A}
     {a b : A} (p : Path a b) (r : R.carrier b) (l : L.carrier a) :
     Path (tensorMk (r := R.act p r) (l := l))
       (tensorMk (r := r) (l := L.act p l)) :=

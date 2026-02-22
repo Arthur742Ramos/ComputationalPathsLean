@@ -157,17 +157,17 @@ namespace MonoidHom
 variable {M : Type u} {N : Type v} {P : Type w}
 variable {S : StrictMonoid M} {T : StrictMonoid N} {U : StrictMonoid P}
 
-instance : CoeFun (MonoidHom M N S T) (fun _ => M → N) :=
+noncomputable instance : CoeFun (MonoidHom M N S T) (fun _ => M → N) :=
   ⟨MonoidHom.toFun⟩
 
 /-- Identity homomorphism. -/
-@[simp] def id (S : StrictMonoid M) : MonoidHom M M S S where
+@[simp] noncomputable def id (S : StrictMonoid M) : MonoidHom M M S S where
   toFun := _root_.id
   map_mul := by intro x y; rfl
   map_one := rfl
 
 /-- Composition of homomorphisms. -/
-@[simp] def comp (f : MonoidHom M N S T) (g : MonoidHom N P T U) :
+@[simp] noncomputable def comp (f : MonoidHom M N S T) (g : MonoidHom N P T U) :
     MonoidHom M P S U where
   toFun := fun x => g (f x)
   map_mul := by intro x y; simp [f.map_mul, g.map_mul]
@@ -189,16 +189,16 @@ namespace GroupHom
 variable {G : Type u} {H : Type v} {K : Type w}
 variable {S : StrictGroup G} {T : StrictGroup H} {U : StrictGroup K}
 
-instance : CoeFun (GroupHom G H S T) (fun _ => G → H) :=
+noncomputable instance : CoeFun (GroupHom G H S T) (fun _ => G → H) :=
   ⟨fun f => f.toMonoidHom.toFun⟩
 
 /-- Identity group homomorphism. -/
-@[simp] def id (S : StrictGroup G) : GroupHom G G S S where
+@[simp] noncomputable def id (S : StrictGroup G) : GroupHom G G S S where
   toMonoidHom := MonoidHom.id S.toStrictMonoid
   map_inv := by intro x; rfl
 
 /-- Composition of group homomorphisms. -/
-@[simp] def comp (f : GroupHom G H S T) (g : GroupHom H K T U) :
+@[simp] noncomputable def comp (f : GroupHom G H S T) (g : GroupHom H K T U) :
     GroupHom G K S U where
   toMonoidHom := MonoidHom.comp f.toMonoidHom g.toMonoidHom
   map_inv := by intro x; simp [f.map_inv, g.map_inv]
@@ -230,7 +230,7 @@ namespace Subgroup
 variable {G : Type u} {S : StrictGroup G}
 
 /-- Trivial subgroup. -/
-@[simp] def trivial (S : StrictGroup G) : Subgroup G S where
+@[simp] noncomputable def trivial (S : StrictGroup G) : Subgroup G S where
   carrier := fun x => x = S.one
   one_mem := rfl
   mul_mem := by
@@ -241,7 +241,7 @@ variable {G : Type u} {S : StrictGroup G}
     simpa [hx] using (StrictGroup.inv_one S)
 
 /-- Intersection of subgroups. -/
-@[simp] def inter (H K : Subgroup G S) : Subgroup G S where
+@[simp] noncomputable def inter (H K : Subgroup G S) : Subgroup G S where
   carrier := fun x => H.carrier x ∧ K.carrier x
   one_mem := ⟨H.one_mem, K.one_mem⟩
   mul_mem := by
@@ -291,7 +291,7 @@ namespace StrictMonoid
 variable {M : Type u}
 
 /-- Natural power of an element in a strict monoid. -/
-@[simp] def pow (S : StrictMonoid M) (x : M) : Nat → M
+@[simp] noncomputable def pow (S : StrictMonoid M) (x : M) : Nat → M
   | 0 => S.one
   | Nat.succ n => S.mul (pow S x n) x
 
@@ -354,7 +354,7 @@ namespace StrictGroup
 variable {G : Type u}
 
 /-- Natural power in a strict group (alias of monoid power). -/
-@[simp] def pow (S : StrictGroup G) (x : G) : Nat → G :=
+@[simp] noncomputable def pow (S : StrictGroup G) (x : G) : Nat → G :=
   StrictMonoid.pow (S := S.toStrictMonoid) x
 
 /-- Zero power in a strict group. -/
@@ -394,7 +394,7 @@ theorem pow_mul (S : StrictGroup G) (x : G) (m n : Nat) :
     -Int.negSucc n = Int.ofNat (Nat.succ n) := rfl
 
 /-- Integer power in a strict group. -/
-@[simp] def zpow (S : StrictGroup G) (x : G) : Int → G
+@[simp] noncomputable def zpow (S : StrictGroup G) (x : G) : Int → G
   | Int.ofNat n => pow S x n
   | Int.negSucc n => S.inv (pow S x (Nat.succ n))
 
@@ -632,7 +632,7 @@ theorem zpow_neg (S : StrictGroup G) (x : G) (z : Int) :
       exact h₁.trans h₂.symm
 
 /-- Conjugation by an element. -/
-@[simp] def conj (S : StrictGroup G) (g x : G) : G :=
+@[simp] noncomputable def conj (S : StrictGroup G) (g x : G) : G :=
   S.mul (S.mul g x) (S.inv g)
 
 /-- Conjugation by identity is identity. -/
@@ -736,7 +736,7 @@ theorem conj_conj (S : StrictGroup G) (g h x : G) :
     _ = conj S (S.mul g h) x := rfl
 
 /-- Commutator of two elements. -/
-@[simp] def commutator (S : StrictGroup G) (x y : G) : G :=
+@[simp] noncomputable def commutator (S : StrictGroup G) (x y : G) : G :=
   S.mul (S.mul x y) (S.mul (S.inv x) (S.inv y))
 
 /-- Commutator with identity on the left. -/
@@ -801,7 +801,7 @@ end StrictGroup
 /-! ## Equivalences from Homomorphisms -/
 
 /-- A group isomorphism packaged as a SimpleEquiv. -/
-@[simp] def groupIso_toSimpleEquiv {G : Type u} {H : Type v}
+@[simp] noncomputable def groupIso_toSimpleEquiv {G : Type u} {H : Type v}
     {S : StrictGroup G} {T : StrictGroup H}
     (f : GroupHom G H S T)
     (g : GroupHom H G T S)

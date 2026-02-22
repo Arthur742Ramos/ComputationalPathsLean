@@ -42,20 +42,20 @@ structure DiffRing (R : Type u) where
 /-! ## Path-valued Leibniz rule -/
 
 /-- Path witnessing the Leibniz rule. -/
-def leibnizPath (DR : DiffRing R) (x y : R) :
+noncomputable def leibnizPath (DR : DiffRing R) (x y : R) :
     Path (DR.deriv (DR.mul x y))
          (DR.add (DR.mul (DR.deriv x) y) (DR.mul x (DR.deriv y))) :=
   Path.mk [Step.mk _ _ (DR.leibniz x y)] (DR.leibniz x y)
 
 /-- Path witnessing additivity of derivation. -/
-def derivAddPath (DR : DiffRing R) (x y : R) :
+noncomputable def derivAddPath (DR : DiffRing R) (x y : R) :
     Path (DR.deriv (DR.add x y)) (DR.add (DR.deriv x) (DR.deriv y)) :=
   Path.mk [Step.mk _ _ (DR.deriv_add x y)] (DR.deriv_add x y)
 
 /-! ## Higher derivations -/
 
 /-- The n-th iterated derivation. -/
-def iterDeriv (DR : DiffRing R) : Nat → R → R
+noncomputable def iterDeriv (DR : DiffRing R) : Nat → R → R
   | 0, x => x
   | n + 1, x => DR.deriv (iterDeriv DR n x)
 
@@ -66,7 +66,7 @@ theorem iterDeriv_succ (DR : DiffRing R) (n : Nat) (x : R) :
     iterDeriv DR (n + 1) x = DR.deriv (iterDeriv DR n x) := rfl
 
 /-- Path for iterated derivation unfolding. -/
-def iterDerivSuccPath (DR : DiffRing R) (n : Nat) (x : R) :
+noncomputable def iterDerivSuccPath (DR : DiffRing R) (n : Nat) (x : R) :
     Path (iterDeriv DR (n + 1) x) (DR.deriv (iterDeriv DR n x)) :=
   Path.refl _
 
@@ -82,7 +82,7 @@ structure DiffIdeal (DR : DiffRing R) where
   deriv_mem : ∀ x, mem x → mem (DR.deriv x)
 
 /-- The full ring is a differential ideal. -/
-def fullDiffIdeal (DR : DiffRing R) : DiffIdeal DR where
+noncomputable def fullDiffIdeal (DR : DiffRing R) : DiffIdeal DR where
   mem := fun _ => True
   zero_mem := trivial
   add_mem := fun _ _ _ _ => trivial
@@ -91,7 +91,7 @@ def fullDiffIdeal (DR : DiffRing R) : DiffIdeal DR where
   deriv_mem := fun _ _ => trivial
 
 /-- Intersection of two differential ideals. -/
-def interDiffIdeal (DR : DiffRing R) (I J : DiffIdeal DR) : DiffIdeal DR where
+noncomputable def interDiffIdeal (DR : DiffRing R) (I J : DiffIdeal DR) : DiffIdeal DR where
   mem := fun x => I.mem x ∧ J.mem x
   zero_mem := ⟨I.zero_mem, J.zero_mem⟩
   add_mem := fun x y ⟨hxi, hxj⟩ ⟨hyi, hyj⟩ =>
@@ -101,7 +101,7 @@ def interDiffIdeal (DR : DiffRing R) (I J : DiffIdeal DR) : DiffIdeal DR where
   deriv_mem := fun x ⟨hi, hj⟩ => ⟨I.deriv_mem x hi, J.deriv_mem x hj⟩
 
 /-- Containment of differential ideals. -/
-def diffIdealContained (DR : DiffRing R) (I J : DiffIdeal DR) : Prop :=
+noncomputable def diffIdealContained (DR : DiffRing R) (I J : DiffIdeal DR) : Prop :=
   ∀ x, I.mem x → J.mem x
 
 theorem interDiffIdeal_left (DR : DiffRing R) (I J : DiffIdeal DR) :
@@ -124,13 +124,13 @@ structure DiffRingHom {R S : Type u} (DR₁ : DiffRing R) (DR₂ : DiffRing S) w
   f_deriv : ∀ x, f (DR₁.deriv x) = DR₂.deriv (f x)
 
 /-- Path witnessing commutativity of f with D. -/
-def diffHomCommPath {R S : Type u} {DR₁ : DiffRing R} {DR₂ : DiffRing S}
+noncomputable def diffHomCommPath {R S : Type u} {DR₁ : DiffRing R} {DR₂ : DiffRing S}
     (φ : DiffRingHom DR₁ DR₂) (x : R) :
     Path (φ.f (DR₁.deriv x)) (DR₂.deriv (φ.f x)) :=
   Path.mk [Step.mk _ _ (φ.f_deriv x)] (φ.f_deriv x)
 
 /-- Composition of differential ring homomorphisms. -/
-def compDiffRingHom {R S T : Type u} {DR₁ : DiffRing R} {DR₂ : DiffRing S} {DR₃ : DiffRing T}
+noncomputable def compDiffRingHom {R S T : Type u} {DR₁ : DiffRing R} {DR₂ : DiffRing S} {DR₃ : DiffRing T}
     (φ : DiffRingHom DR₁ DR₂) (ψ : DiffRingHom DR₂ DR₃) :
     DiffRingHom DR₁ DR₃ where
   f := ψ.f ∘ φ.f
@@ -143,7 +143,7 @@ def compDiffRingHom {R S T : Type u} {DR₁ : DiffRing R} {DR₂ : DiffRing S} {
 /-! ## Wronskian -/
 
 /-- Wronskian of two elements in a differential ring. -/
-def wronskian (DR : DiffRing R) (x y : R) : R :=
+noncomputable def wronskian (DR : DiffRing R) (x y : R) : R :=
   DR.add (DR.mul x (DR.deriv y)) (DR.neg (DR.mul (DR.deriv x) y))
 
 /-- Wronskian unfolding. -/
@@ -152,7 +152,7 @@ theorem wronskian_unfold (DR : DiffRing R) (x y : R) :
     DR.add (DR.mul x (DR.deriv y)) (DR.neg (DR.mul (DR.deriv x) y)) := rfl
 
 /-- Path for Wronskian definition. -/
-def wronskianPath (DR : DiffRing R) (x y : R) :
+noncomputable def wronskianPath (DR : DiffRing R) (x y : R) :
     Path (wronskian DR x y)
          (DR.add (DR.mul x (DR.deriv y)) (DR.neg (DR.mul (DR.deriv x) y))) :=
   Path.refl _
@@ -160,7 +160,7 @@ def wronskianPath (DR : DiffRing R) (x y : R) :
 /-! ## Constants of a Differential Ring -/
 
 /-- The ring of constants: elements with D(x) = 0. -/
-def constants (DR : DiffRing R) : R → Prop :=
+noncomputable def constants (DR : DiffRing R) : R → Prop :=
   fun x => DR.deriv x = DR.zero
 
 /-- Sum of constants is a constant. -/
@@ -171,12 +171,12 @@ theorem constants_add (DR : DiffRing R) (x y : R)
   rw [DR.deriv_add, hx, hy, DR.zero_add]
 
 /-- Path from D(x+y) to D(x)+D(y). -/
-def constantsAddPath (DR : DiffRing R) (x y : R) :
+noncomputable def constantsAddPath (DR : DiffRing R) (x y : R) :
     Path (DR.deriv (DR.add x y)) (DR.add (DR.deriv x) (DR.deriv y)) :=
   Path.mk [Step.mk _ _ (DR.deriv_add x y)] (DR.deriv_add x y)
 
 /-- Path witnessing constants are closed under addition. -/
-def constantsClosedPath (DR : DiffRing R) (x y : R)
+noncomputable def constantsClosedPath (DR : DiffRing R) (x y : R)
     (hx : constants DR x) (hy : constants DR y) :
     Path (DR.deriv (DR.add x y)) DR.zero :=
   Path.mk [Step.mk _ _ (constants_add DR x y hx hy)]
@@ -192,7 +192,7 @@ structure DiffFieldExt (K : Type u) (L : Type u) where
   embed_deriv : ∀ x, extRing.deriv (embed x) = embed (baseRing.deriv x)
 
 /-- Path for embed commuting with derivation. -/
-def embedDerivPath {K L : Type u} (ext : DiffFieldExt K L) (x : K) :
+noncomputable def embedDerivPath {K L : Type u} (ext : DiffFieldExt K L) (x : K) :
     Path (ext.extRing.deriv (ext.embed x)) (ext.embed (ext.baseRing.deriv x)) :=
   Path.mk [Step.mk _ _ (ext.embed_deriv x)] (ext.embed_deriv x)
 
@@ -217,38 +217,38 @@ structure DiffAutomorphism {K L : Type u} (pv : PicardVessiot K L) where
   f_fix_base : ∀ k, f (pv.ext.embed k) = pv.ext.embed k
 
 /-- Identity differential automorphism. -/
-def idDiffAuto {K L : Type u} (pv : PicardVessiot K L) : DiffAutomorphism pv where
+noncomputable def idDiffAuto {K L : Type u} (pv : PicardVessiot K L) : DiffAutomorphism pv where
   f := id
   f_deriv := fun _ => rfl
   f_fix_base := fun _ => rfl
 
 /-- Composition of differential automorphisms. -/
-def compDiffAuto {K L : Type u} (pv : PicardVessiot K L)
+noncomputable def compDiffAuto {K L : Type u} (pv : PicardVessiot K L)
     (σ τ : DiffAutomorphism pv) : DiffAutomorphism pv where
   f := σ.f ∘ τ.f
   f_deriv := fun x => by simp [Function.comp, τ.f_deriv, σ.f_deriv]
   f_fix_base := fun k => by simp [Function.comp, τ.f_fix_base, σ.f_fix_base]
 
 /-- Path: identity fixes all elements. -/
-def idAutoFixPath {K L : Type u} (pv : PicardVessiot K L) (x : L) :
+noncomputable def idAutoFixPath {K L : Type u} (pv : PicardVessiot K L) (x : L) :
     Path ((idDiffAuto pv).f x) x :=
   Path.refl x
 
 /-- Path: composition is associative. -/
-def compAutoAssocPath {K L : Type u} (pv : PicardVessiot K L)
+noncomputable def compAutoAssocPath {K L : Type u} (pv : PicardVessiot K L)
     (σ τ μ : DiffAutomorphism pv) (x : L) :
     Path ((compDiffAuto pv (compDiffAuto pv σ τ) μ).f x)
          ((compDiffAuto pv σ (compDiffAuto pv τ μ)).f x) :=
   Path.refl _
 
 /-- Path: identity is left unit for composition. -/
-def compIdLeftPath {K L : Type u} (pv : PicardVessiot K L)
+noncomputable def compIdLeftPath {K L : Type u} (pv : PicardVessiot K L)
     (σ : DiffAutomorphism pv) (x : L) :
     Path ((compDiffAuto pv (idDiffAuto pv) σ).f x) (σ.f x) :=
   Path.refl _
 
 /-- Path: identity is right unit for composition. -/
-def compIdRightPath {K L : Type u} (pv : PicardVessiot K L)
+noncomputable def compIdRightPath {K L : Type u} (pv : PicardVessiot K L)
     (σ : DiffAutomorphism pv) (x : L) :
     Path ((compDiffAuto pv σ (idDiffAuto pv)).f x) (σ.f x) :=
   Path.refl _
@@ -261,12 +261,12 @@ structure Derivation (DR : DiffRing R) where
   d_add : ∀ x y, d (DR.add x y) = DR.add (d x) (d y)
 
 /-- The standard derivation of a differential ring. -/
-def standardDerivation (DR : DiffRing R) : Derivation DR where
+noncomputable def standardDerivation (DR : DiffRing R) : Derivation DR where
   d := DR.deriv
   d_add := DR.deriv_add
 
 /-- Path: standard derivation agrees with ring derivation. -/
-def standardDerivPath (DR : DiffRing R) (x : R) :
+noncomputable def standardDerivPath (DR : DiffRing R) (x : R) :
     Path ((standardDerivation DR).d x) (DR.deriv x) :=
   Path.refl _
 
@@ -277,16 +277,16 @@ structure DiffPoly (R : Type u) where
   coeffs : List R
 
 /-- Order of a differential polynomial. -/
-def diffPolyOrder (p : DiffPoly R) : Nat := p.coeffs.length
+noncomputable def diffPolyOrder (p : DiffPoly R) : Nat := p.coeffs.length
 
 /-- The zero differential polynomial. -/
-def zeroDiffPoly (R : Type u) : DiffPoly R where
+noncomputable def zeroDiffPoly (R : Type u) : DiffPoly R where
   coeffs := []
 
 theorem zeroDiffPoly_order (R : Type u) : diffPolyOrder (zeroDiffPoly R) = 0 := rfl
 
 /-- Path for zero polynomial order. -/
-def zeroDiffPolyOrderPath (R : Type u) :
+noncomputable def zeroDiffPolyOrderPath (R : Type u) :
     Path (diffPolyOrder (zeroDiffPoly R)) 0 :=
   Path.refl _
 
@@ -304,26 +304,26 @@ structure LiouvilleTower where
   steps : List LiouvilleStep
 
 /-- Height of a Liouville tower. -/
-def liouvilleHeight (t : LiouvilleTower) : Nat := t.steps.length
+noncomputable def liouvilleHeight (t : LiouvilleTower) : Nat := t.steps.length
 
 /-- An extension is Liouvillian if tower is nonempty. -/
-def isLiouvillian (t : LiouvilleTower) : Prop :=
+noncomputable def isLiouvillian (t : LiouvilleTower) : Prop :=
   t.steps.length > 0
 
 /-- Empty tower (trivial extension). -/
-def trivialTower : LiouvilleTower := ⟨[]⟩
+noncomputable def trivialTower : LiouvilleTower := ⟨[]⟩
 
 theorem trivialTower_height : liouvilleHeight trivialTower = 0 := rfl
 
 /-- Path: trivial tower has zero height. -/
-def trivialTowerHeightPath :
+noncomputable def trivialTowerHeightPath :
     Path (liouvilleHeight trivialTower) 0 :=
   Path.refl _
 
 /-! ## Product rule and iterated Leibniz -/
 
 /-- Product rule path (synonym for Leibniz). -/
-def productRulePath (DR : DiffRing R) (x y : R) :=
+noncomputable def productRulePath (DR : DiffRing R) (x y : R) :=
   leibnizPath DR x y
 
 /-- Iterated Leibniz rule for D²(xy). -/
@@ -333,13 +333,13 @@ theorem iter_leibniz_2 (DR : DiffRing R) (x y : R) :
   simp [iterDeriv, DR.leibniz]
 
 /-- Path for second-order Leibniz. -/
-def iterLeibniz2Path (DR : DiffRing R) (x y : R) :
+noncomputable def iterLeibniz2Path (DR : DiffRing R) (x y : R) :
     Path (iterDeriv DR 2 (DR.mul x y))
          (DR.deriv (DR.add (DR.mul (DR.deriv x) y) (DR.mul x (DR.deriv y)))) :=
   Path.mk [Step.mk _ _ (iter_leibniz_2 DR x y)] (iter_leibniz_2 DR x y)
 
 /-- Leibniz path via trans: compose rewrite with Leibniz. -/
-def leibnizTransPath (DR : DiffRing R) (x y z : R)
+noncomputable def leibnizTransPath (DR : DiffRing R) (x y z : R)
     (hxy : DR.mul x y = z) :
     Path (DR.deriv z) (DR.add (DR.mul (DR.deriv x) y) (DR.mul x (DR.deriv y))) :=
   Path.trans
@@ -350,7 +350,7 @@ def leibnizTransPath (DR : DiffRing R) (x y z : R)
 /-! ## Differential ideal generated by an element -/
 
 /-- The radical differential ideal predicate: closed under D and multiplication. -/
-def inDiffIdealGen (DR : DiffRing R) (a : R) : R → Prop :=
+noncomputable def inDiffIdealGen (DR : DiffRing R) (a : R) : R → Prop :=
   fun x => ∃ n : Nat, ∃ r : R, x = DR.mul r (iterDeriv DR n a)
 
 /-! ## Summary counts -/

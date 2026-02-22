@@ -80,7 +80,7 @@ noncomputable def circlePiOneMul (x y : circlePiOne) : circlePiOne :=
       Quot.mk _ (CircleCompPathExpr.trans p q) := rfl
 
 /-- Identity element of `circlePiOne` (constant loop). -/
-def circlePiOneOne : circlePiOne :=
+noncomputable def circlePiOneOne : circlePiOne :=
   circleDecode 0
 
 /-- The winding-number map on `circlePiOne`. -/

@@ -31,7 +31,7 @@ modules can import the model category axioms from the `Homotopy` namespace.
 
 end Path
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end ComputationalPaths

@@ -108,19 +108,19 @@ theorem word_append_nil {α : Type u} (w : Word α) :
     w ++ [] = w := List.append_nil w
 
 /-- Path witnessing associativity of word concatenation. -/
-def wordAssocPath {α : Type u} (u v w : Word α) :
+noncomputable def wordAssocPath {α : Type u} (u v w : Word α) :
     ComputationalPaths.Path (u ++ v ++ w) (u ++ (v ++ w)) :=
   ComputationalPaths.Path.mk [Step.mk _ _ (word_append_assoc u v w)]
     (word_append_assoc u v w)
 
 /-- Path witnessing left identity of word concatenation. -/
-def wordNilLeftPath {α : Type u} (w : Word α) :
+noncomputable def wordNilLeftPath {α : Type u} (w : Word α) :
     ComputationalPaths.Path ([] ++ w) w :=
   ComputationalPaths.Path.mk [Step.mk _ _ (word_nil_append w)]
     (word_nil_append w)
 
 /-- Path witnessing right identity of word concatenation. -/
-def wordNilRightPath {α : Type u} (w : Word α) :
+noncomputable def wordNilRightPath {α : Type u} (w : Word α) :
     ComputationalPaths.Path (w ++ []) w :=
   ComputationalPaths.Path.mk [Step.mk _ _ (word_append_nil w)]
     (word_append_nil w)
@@ -153,12 +153,12 @@ theorem ThueEq.equiv {α : Type u} {rules : List (SRule α)}
 
 /-- A string rewriting system has the Church-Rosser property if
 ThueEq implies joinability via SRtc. -/
-def ChurchRosser {α : Type u} (rules : List (SRule α)) : Prop :=
+noncomputable def ChurchRosser {α : Type u} (rules : List (SRule α)) : Prop :=
   ∀ a b : Word α, ThueEq rules a b →
     ∃ c, SRtc rules a c ∧ SRtc rules b c
 
 /-- A string rewriting system is confluent if all forks join. -/
-def Confluent {α : Type u} (rules : List (SRule α)) : Prop :=
+noncomputable def Confluent {α : Type u} (rules : List (SRule α)) : Prop :=
   ∀ a b c : Word α, SRtc rules a b → SRtc rules a c →
     ∃ d, SRtc rules b d ∧ SRtc rules c d
 
@@ -191,11 +191,11 @@ theorem confluent_implies_churchRosser {α : Type u} {rules : List (SRule α)}
 /-! ## Length-Based Termination -/
 
 /-- A rule is length-reducing if its RHS is strictly shorter. -/
-def SRule.isLengthReducing {α : Type u} (r : SRule α) : Prop :=
+noncomputable def SRule.isLengthReducing {α : Type u} (r : SRule α) : Prop :=
   r.rhs.length < r.lhs.length
 
 /-- A system is length-reducing if all rules are. -/
-def isLengthReducing {α : Type u} (rules : List (SRule α)) : Prop :=
+noncomputable def isLengthReducing {α : Type u} (rules : List (SRule α)) : Prop :=
   ∀ r ∈ rules, SRule.isLengthReducing r
 
 /-- Length-reducing steps decrease word length. -/
@@ -231,7 +231,7 @@ theorem length_reducing_wf {α : Type u} {rules : List (SRule α)}
 /-! ## Normal Forms -/
 
 /-- A word is in normal form if no rule applies to it. -/
-def IsNF {α : Type u} (rules : List (SRule α)) (w : Word α) : Prop :=
+noncomputable def IsNF {α : Type u} (rules : List (SRule α)) (w : Word α) : Prop :=
   ∀ w', ¬ SStep rules w w'
 
 /-- In a confluent system, two NFs reachable from the same source are equal. -/

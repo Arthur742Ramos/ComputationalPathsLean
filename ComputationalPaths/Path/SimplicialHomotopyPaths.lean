@@ -75,13 +75,13 @@ structure SimpMap (S T : SimpSet) where
     map (n + 1) (S.degen n i x) = T.degen n i (map n x)
 
 /-- Identity simplicial map. -/
-def SimpMap.id (S : SimpSet) : SimpMap S S where
+noncomputable def SimpMap.id (S : SimpSet) : SimpMap S S where
   map := fun _ x => x
   face_comm := fun _ _ _ => rfl
   degen_comm := fun _ _ _ => rfl
 
 /-- Composition of simplicial maps via path transitivity. -/
-def SimpMap.comp {S T U : SimpSet} (F : SimpMap S T) (G : SimpMap T U) :
+noncomputable def SimpMap.comp {S T U : SimpSet} (F : SimpMap S T) (G : SimpMap T U) :
     SimpMap S U where
   map := fun n x => G.map n (F.map n x)
   face_comm := by
@@ -100,7 +100,7 @@ def SimpMap.comp {S T U : SimpSet} (F : SimpMap S T) (G : SimpMap T U) :
     exact h1.trans h2
 
 /-- Path-lifted action of a simplicial map on a computational path. -/
-def SimpMap.mapPath {S T : SimpSet} (F : SimpMap S T) {n : Nat}
+noncomputable def SimpMap.mapPath {S T : SimpSet} (F : SimpMap S T) {n : Nat}
     {x y : S.obj n} (p : Path x y) : Path (F.map n x) (F.map n y) :=
   Path.congrArg (F.map n) p
 
@@ -148,18 +148,18 @@ structure SimpHomotopy (S T : SimpSet) (F G : SimpMap S T) where
   hom : ∀ (n : Nat) (x : S.obj n), Path (F.map n x) (G.map n x)
 
 /-- Theorem 6: Reflexive homotopy (F ~ F). -/
-def SimpHomotopy.refl_hom {S T : SimpSet} (F : SimpMap S T) :
+noncomputable def SimpHomotopy.refl_hom {S T : SimpSet} (F : SimpMap S T) :
     SimpHomotopy S T F F where
   hom := fun n x => Path.refl (F.map n x)
 
 /-- Theorem 7: Inverse homotopy via path symmetry. -/
-def SimpHomotopy.symm_hom {S T : SimpSet} {F G : SimpMap S T}
+noncomputable def SimpHomotopy.symm_hom {S T : SimpSet} {F G : SimpMap S T}
     (H : SimpHomotopy S T F G) :
     SimpHomotopy S T G F where
   hom := fun n x => Path.symm (H.hom n x)
 
 /-- Theorem 8: Vertical composition of homotopies via trans. -/
-def SimpHomotopy.trans_hom {S T : SimpSet} {F G K : SimpMap S T}
+noncomputable def SimpHomotopy.trans_hom {S T : SimpSet} {F G K : SimpMap S T}
     (H1 : SimpHomotopy S T F G) (H2 : SimpHomotopy S T G K) :
     SimpHomotopy S T F K where
   hom := fun n x => Path.trans (H1.hom n x) (H2.hom n x)
@@ -197,7 +197,7 @@ structure KanComplexPath (S : SimpSet) where
     HornFill S n k h
 
 /-- Inner Kan property (quasi-category): only inner horns fill. -/
-def InnerHornProp (n : Nat) (k : Fin (n + 2)) : Prop :=
+noncomputable def InnerHornProp (n : Nat) (k : Fin (n + 2)) : Prop :=
   0 < k.val ∧ k.val < n + 1
 
 structure QuasiCategory (S : SimpSet) where
@@ -206,7 +206,7 @@ structure QuasiCategory (S : SimpSet) where
     ∀ (h : HornDatum S n k), HornFill S n k h
 
 /-- Theorem 11: Every Kan complex is a quasi-category. -/
-def kanIsQuasiCat {S : SimpSet} (kan : KanComplexPath S) : QuasiCategory S where
+noncomputable def kanIsQuasiCat {S : SimpSet} (kan : KanComplexPath S) : QuasiCategory S where
   fill := fun n k _ h => kan.fill n k h
 
 /-- Minimal Kan: fillers are unique when missing face agrees. -/
@@ -217,7 +217,7 @@ structure MinimalKan (S : SimpSet) extends KanComplexPath S where
     f1.filler = f2.filler
 
 /-- Theorem 12: Filler uniqueness as a Path. -/
-def minimalFillerPath {S : SimpSet} (mk : MinimalKan S)
+noncomputable def minimalFillerPath {S : SimpSet} (mk : MinimalKan S)
     {n : Nat} {k : Fin (n + 2)} {h : HornDatum S n k}
     (f1 f2 : HornFill S n k h)
     (hk : S.face n k f1.filler = S.face n k f2.filler) :
@@ -256,7 +256,7 @@ structure SmallCat where
     comp (comp f g) h = comp f (comp g h)
 
 /-- Path-witness of the category associativity law. -/
-def SmallCat.assocPath (C : SmallCat) {a b c d : C.Ob}
+noncomputable def SmallCat.assocPath (C : SmallCat) {a b c d : C.Ob}
     (f : C.Mor a b) (g : C.Mor b c) (h : C.Mor c d) :
     Path (C.comp (C.comp f g) h) (C.comp f (C.comp g h)) :=
   Path.stepChain (C.assoc_law f g h)
@@ -272,12 +272,12 @@ theorem SmallCat.assocPath_trans {C : SmallCat} {a b c d e : C.Ob}
   rfl
 
 /-- Theorem 16: Category left identity via path. -/
-def SmallCat.idCompPath (C : SmallCat) {a b : C.Ob}
+noncomputable def SmallCat.idCompPath (C : SmallCat) {a b : C.Ob}
     (f : C.Mor a b) : Path (C.comp (C.idMor a) f) f :=
   Path.stepChain (C.id_comp f)
 
 /-- Theorem 17: Category right identity via path. -/
-def SmallCat.compIdPath (C : SmallCat) {a b : C.Ob}
+noncomputable def SmallCat.compIdPath (C : SmallCat) {a b : C.Ob}
     (f : C.Mor a b) : Path (C.comp f (C.idMor b)) f :=
   Path.stepChain (C.comp_id f)
 
@@ -300,7 +300,7 @@ structure ColimitCocone (S : SimpSet) where
     Path (incl (n + 1) (S.degen n i x)) (incl n x)
 
 /-- Theorem 19: Colimit face-degen roundtrip via trans. -/
-def cocone_roundtrip {S : SimpSet} (C : ColimitCocone S)
+noncomputable def cocone_roundtrip {S : SimpSet} (C : ColimitCocone S)
     (n : Nat) (i : Fin (n + 1)) (x : S.obj n) (j : Fin (n + 2)) :
     Path (C.incl n (S.face n j (S.degen n i x))) (C.incl n x) :=
   Path.trans (C.face_path n j (S.degen n i x)) (C.degen_path n i x)
@@ -332,7 +332,7 @@ structure DoldKanData (S : SimpSet) where
     Path (denormalize n (normalize n x)) x
 
 /-- Theorem 22: Dold-Kan roundtrip path is invertible via symm. -/
-def doldkan_inverse {S : SimpSet} (dk : DoldKanData S)
+noncomputable def doldkan_inverse {S : SimpSet} (dk : DoldKanData S)
     (n : Nat) (x : S.obj n) :
     Path x (dk.denormalize n (dk.normalize n x)) :=
   Path.symm (dk.roundtrip n x)
@@ -361,17 +361,17 @@ structure SimpLoop (S : PointedSimpSet) (n : Nat) where
   loop : Path (S.base n) (S.base n)
 
 /-- Composition of simplicial loops via trans. -/
-def SimpLoop.comp {S : PointedSimpSet} {n : Nat}
+noncomputable def SimpLoop.comp {S : PointedSimpSet} {n : Nat}
     (α β : SimpLoop S n) : SimpLoop S n :=
   ⟨Path.trans α.loop β.loop⟩
 
 /-- Inverse of a simplicial loop via symm. -/
-def SimpLoop.inv {S : PointedSimpSet} {n : Nat}
+noncomputable def SimpLoop.inv {S : PointedSimpSet} {n : Nat}
     (α : SimpLoop S n) : SimpLoop S n :=
   ⟨Path.symm α.loop⟩
 
 /-- Trivial loop via refl. -/
-def SimpLoop.trivial (S : PointedSimpSet) (n : Nat) : SimpLoop S n :=
+noncomputable def SimpLoop.trivial (S : PointedSimpSet) (n : Nat) : SimpLoop S n :=
   ⟨Path.refl (S.base n)⟩
 
 /-- Theorem 25: Loop composition is associative. -/
@@ -423,7 +423,7 @@ theorem SimpLoop.inv_inv {S : PointedSimpSet} {n : Nat}
 /-! ## Section 9: Functoriality on Homotopy Groups -/
 
 /-- A simplicial map sends loops to loops via congrArg. -/
-def SimpLoop.mapLoop {S T : PointedSimpSet} (F : SimpMap S.toSimpSet T.toSimpSet)
+noncomputable def SimpLoop.mapLoop {S T : PointedSimpSet} (F : SimpMap S.toSimpSet T.toSimpSet)
     {n : Nat} (hbase : F.map n (S.base n) = T.base n)
     (α : SimpLoop S n) : SimpLoop T n :=
   ⟨Path.trans (Path.symm (Path.stepChain hbase))
@@ -453,7 +453,7 @@ theorem SimpLoop.map_comp_eq {S T : PointedSimpSet}
 /-! ## Section 10: Transport along Simplicial Paths -/
 
 /-- Transport a simplex along a path in the base via congrArg. -/
-def transportSimplex {S : SimpSet} {B : Type u}
+noncomputable def transportSimplex {S : SimpSet} {B : Type u}
     (D : B → S.obj 0) {b1 b2 : B} (p : Path b1 b2) :
     Path (D b1) (D b2) :=
   Path.congrArg D p
@@ -489,13 +489,13 @@ structure SimpGroupoidMor (S : SimpSet) (n : Nat) (x y : S.obj n) where
   pathMor : Path x y
 
 /-- Composition in the simplicial groupoid via trans. -/
-def SimpGroupoidMor.comp {S : SimpSet} {n : Nat} {x y z : S.obj n}
+noncomputable def SimpGroupoidMor.comp {S : SimpSet} {n : Nat} {x y z : S.obj n}
     (f : SimpGroupoidMor S n x y) (g : SimpGroupoidMor S n y z) :
     SimpGroupoidMor S n x z :=
   ⟨Path.trans f.pathMor g.pathMor⟩
 
 /-- Inverse in the simplicial groupoid via symm. -/
-def SimpGroupoidMor.inv {S : SimpSet} {n : Nat} {x y : S.obj n}
+noncomputable def SimpGroupoidMor.inv {S : SimpSet} {n : Nat} {x y : S.obj n}
     (f : SimpGroupoidMor S n x y) : SimpGroupoidMor S n y x :=
   ⟨Path.symm f.pathMor⟩
 
@@ -523,7 +523,7 @@ theorem SimpGroupoidMor.assoc {S : SimpSet} {n : Nat}
   simp [SimpGroupoidMor.comp]
 
 /-- Theorem 39: Face map acts functorially on the groupoid via congrArg. -/
-def SimpGroupoidMor.faceMap {S : SimpSet} {n : Nat}
+noncomputable def SimpGroupoidMor.faceMap {S : SimpSet} {n : Nat}
     {x y : S.obj (n + 1)} (i : Fin (n + 2))
     (f : SimpGroupoidMor S (n + 1) x y) :
     SimpGroupoidMor S n (S.face n i x) (S.face n i y) :=
@@ -541,7 +541,7 @@ theorem SimpGroupoidMor.faceMap_comp {S : SimpSet} {n : Nat}
   simp [SimpGroupoidMor.faceMap, SimpGroupoidMor.comp]
 
 /-- Theorem 41: Degeneracy map acts functorially on the groupoid. -/
-def SimpGroupoidMor.degenMap {S : SimpSet} {n : Nat}
+noncomputable def SimpGroupoidMor.degenMap {S : SimpSet} {n : Nat}
     {x y : S.obj n} (i : Fin (n + 1))
     (f : SimpGroupoidMor S n x y) :
     SimpGroupoidMor S (n + 1) (S.degen n i x) (S.degen n i y) :=

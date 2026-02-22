@@ -60,7 +60,7 @@ structure FormalGroupLaw (R : Type u) where
   unit_coeff : ∀ i, i ≥ 2 → coeff i 0 = ringZero
 
 /-- The additive formal group law: F(x,y) = x + y. -/
-def additiveFGL (R : Type u) (zero one : R) (add mul : R → R → R) :
+noncomputable def additiveFGL (R : Type u) (zero one : R) (add mul : R → R → R) :
     FormalGroupLaw R where
   ringMul := mul
   ringAdd := add
@@ -143,7 +143,7 @@ structure QuillenTheorem where
   right_inv : ∀ y, Path (forward (backward y)) y
 
 /-- Quillen's theorem gives an isomorphism. -/
-def quillen_iso (Q : QuillenTheorem) :
+noncomputable def quillen_iso (Q : QuillenTheorem) :
     ∀ x : Q.mu.coeffRing, Path (Q.backward (Q.forward x)) x :=
   Q.left_inv
 

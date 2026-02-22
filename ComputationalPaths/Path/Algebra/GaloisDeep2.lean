@@ -30,17 +30,17 @@ inductive ExtPath : FieldElem → FieldElem → Type where
   | cons : {a b c : FieldElem} → ExtStep a b → ExtPath b c → ExtPath a c
 
 /-- Concatenation of extension paths -/
-def ExtPath.trans : {a b c : FieldElem} → ExtPath a b → ExtPath b c → ExtPath a c
+noncomputable def ExtPath.trans : {a b c : FieldElem} → ExtPath a b → ExtPath b c → ExtPath a c
   | _, _, _, ExtPath.nil _, q => q
   | _, _, _, ExtPath.cons s p, q => ExtPath.cons s (ExtPath.trans p q)
 
 /-- Symmetry of extension paths -/
-def ExtPath.symm : {a b : FieldElem} → ExtPath a b → ExtPath b a
+noncomputable def ExtPath.symm : {a b : FieldElem} → ExtPath a b → ExtPath b a
   | _, _, ExtPath.nil a => ExtPath.nil a
   | _, _, ExtPath.cons s p => ExtPath.trans (ExtPath.symm p) (ExtPath.cons (ExtStep.symm s) (ExtPath.nil _))
 
 /-- CongrArg lifting for extension paths -/
-def ExtPath.congrArg (f : FieldElem → FieldElem) : {a b : FieldElem} → ExtPath a b → ExtPath (f a) (f b)
+noncomputable def ExtPath.congrArg (f : FieldElem → FieldElem) : {a b : FieldElem} → ExtPath a b → ExtPath (f a) (f b)
   | _, _, ExtPath.nil a => ExtPath.nil (f a)
   | _, _, ExtPath.cons s p => ExtPath.cons (ExtStep.congrArg f s) (ExtPath.congrArg f p)
 
@@ -67,17 +67,17 @@ inductive GalPath : FieldAut → FieldAut → Type where
   | cons : {σ τ ρ : FieldAut} → GalStep σ τ → GalPath τ ρ → GalPath σ ρ
 
 /-- Concatenation of Galois paths -/
-def GalPath.trans : {σ τ ρ : FieldAut} → GalPath σ τ → GalPath τ ρ → GalPath σ ρ
+noncomputable def GalPath.trans : {σ τ ρ : FieldAut} → GalPath σ τ → GalPath τ ρ → GalPath σ ρ
   | _, _, _, GalPath.nil _, q => q
   | _, _, _, GalPath.cons s p, q => GalPath.cons s (GalPath.trans p q)
 
 /-- Symmetry of Galois paths -/
-def GalPath.symm : {σ τ : FieldAut} → GalPath σ τ → GalPath τ σ
+noncomputable def GalPath.symm : {σ τ : FieldAut} → GalPath σ τ → GalPath τ σ
   | _, _, GalPath.nil σ => GalPath.nil σ
   | _, _, GalPath.cons s p => GalPath.trans (GalPath.symm p) (GalPath.cons (GalStep.symm s) (GalPath.nil _))
 
 /-- CongrArg for Galois paths -/
-def GalPath.congrArg (f : FieldAut → FieldAut) : {σ τ : FieldAut} → GalPath σ τ → GalPath (f σ) (f τ)
+noncomputable def GalPath.congrArg (f : FieldAut → FieldAut) : {σ τ : FieldAut} → GalPath σ τ → GalPath (f σ) (f τ)
   | _, _, GalPath.nil σ => GalPath.nil (f σ)
   | _, _, GalPath.cons s p => GalPath.cons (GalStep.congrArg f s) (GalPath.congrArg f p)
 
@@ -86,7 +86,7 @@ def GalPath.congrArg (f : FieldAut → FieldAut) : {σ τ : FieldAut} → GalPat
 -- ============================================================
 
 /-- Fixed field: elements fixed by all automorphisms in a group -/
-def isFixed (G : List FieldAut) (a : FieldElem) : Prop :=
+noncomputable def isFixed (G : List FieldAut) (a : FieldElem) : Prop :=
   ∀ σ, σ ∈ G → σ.apply a = a
 
 /-- Fixed by identity is trivially true -/
@@ -111,7 +111,7 @@ theorem subgroup_larger_fixed (G H : List FieldAut) (a : FieldElem)
   fun σ hMem => hFixed σ (hSub σ hMem)
 
 /-- Path witness for fixed field correspondence -/
-def fixedFieldPath (G : List FieldAut) (a : FieldElem) (σ : FieldAut)
+noncomputable def fixedFieldPath (G : List FieldAut) (a : FieldElem) (σ : FieldAut)
     (hMem : σ ∈ G) (hFixed : isFixed G a) : ExtPath (σ.apply a) a :=
   let _h := hFixed σ hMem
   ExtPath.cons (ExtStep.adjoin (σ.apply a) a) (ExtPath.nil a)
@@ -121,7 +121,7 @@ def fixedFieldPath (G : List FieldAut) (a : FieldElem) (σ : FieldAut)
 -- ============================================================
 
 /-- A field extension is normal if it's closed under all embeddings -/
-def IsNormal (base ext : List FieldElem) (auts : List FieldAut) : Prop :=
+noncomputable def IsNormal (base ext : List FieldElem) (auts : List FieldAut) : Prop :=
   ∀ a, a ∈ ext → ∀ σ, σ ∈ auts → σ.apply a ∈ ext
 
 /-- Normal extensions are preserved under restriction -/
@@ -131,7 +131,7 @@ theorem normal_restrict (base ext : List FieldElem) (auts sub_auts : List FieldA
   fun a hA σ hσ => hNorm a hA σ (hSub σ hσ)
 
 /-- Path witnessing normality -/
-def normalPath (ext : List FieldElem) (auts : List FieldAut)
+noncomputable def normalPath (ext : List FieldElem) (auts : List FieldAut)
     (a : FieldElem) (hA : a ∈ ext) (σ : FieldAut) (hσ : σ ∈ auts)
     (hNorm : IsNormal [] ext auts) : ExtPath a (σ.apply a) :=
   ExtPath.cons (ExtStep.adjoin a (σ.apply a)) (ExtPath.nil _)
@@ -141,15 +141,15 @@ def normalPath (ext : List FieldElem) (auts : List FieldAut)
 -- ============================================================
 
 /-- A polynomial is separable if it has distinct roots -/
-def IsSeparable (roots : List FieldElem) : Prop :=
+noncomputable def IsSeparable (roots : List FieldElem) : Prop :=
   roots.Nodup
 
 /-- Separable extension: every element has separable minimal polynomial -/
-def SeparableExt (ext : List FieldElem) (minPolys : FieldElem → List FieldElem) : Prop :=
+noncomputable def SeparableExt (ext : List FieldElem) (minPolys : FieldElem → List FieldElem) : Prop :=
   ∀ a, a ∈ ext → IsSeparable (minPolys a)
 
 /-- Separable + Normal = Galois -/
-def IsGalois (base ext : List FieldElem) (auts : List FieldAut)
+noncomputable def IsGalois (base ext : List FieldElem) (auts : List FieldAut)
     (minPolys : FieldElem → List FieldElem) : Prop :=
   IsNormal base ext auts ∧ SeparableExt ext minPolys
 
@@ -196,12 +196,12 @@ structure CyclotomicExt where
   rootCount : roots.length = n
 
 /-- Cyclotomic extensions are abelian (Galois group is abelian) -/
-def CyclotomicAbelian (cyc : CyclotomicExt) (auts : List FieldAut) : Prop :=
+noncomputable def CyclotomicAbelian (cyc : CyclotomicExt) (auts : List FieldAut) : Prop :=
   ∀ σ τ, σ ∈ auts → τ ∈ auts → ∀ a, a ∈ cyc.roots →
     σ.apply (τ.apply a) = τ.apply (σ.apply a)
 
 /-- Path witnessing commutativity in cyclotomic extension -/
-def cyclotomicCommPath (cyc : CyclotomicExt) (auts : List FieldAut)
+noncomputable def cyclotomicCommPath (cyc : CyclotomicExt) (auts : List FieldAut)
     (hAb : CyclotomicAbelian cyc auts)
     (σ τ : FieldAut) (hσ : σ ∈ auts) (hτ : τ ∈ auts)
     (a : FieldElem) (ha : a ∈ cyc.roots)
@@ -225,7 +225,7 @@ structure RadicalTower where
   levelsNonempty : levels.length > 0
 
 /-- Path through a radical tower -/
-def radicalTowerPath (rt : RadicalTower) (h : rt.levels.length ≥ 2) :
+noncomputable def radicalTowerPath (rt : RadicalTower) (h : rt.levels.length ≥ 2) :
     ExtPath (FieldElem.mk 0) (FieldElem.mk 1) :=
   ExtPath.cons (ExtStep.adjoin (FieldElem.mk 0) (FieldElem.mk 1)) (ExtPath.nil _)
 
@@ -253,7 +253,7 @@ theorem artin_inequality (ad : ArtinData) : ad.ext.length ≤ ad.group.length :=
   rw [ad.degreeMatch, ad.groupOrder]; exact Nat.le_refl _
 
 /-- Path witness for Artin's theorem -/
-def artinPath (ad : ArtinData) : ExtPath (FieldElem.mk 0) (FieldElem.mk ad.degree) :=
+noncomputable def artinPath (ad : ArtinData) : ExtPath (FieldElem.mk 0) (FieldElem.mk ad.degree) :=
   ExtPath.cons (ExtStep.adjoin (FieldElem.mk 0) (FieldElem.mk ad.degree)) (ExtPath.nil _)
 
 -- ============================================================
@@ -261,7 +261,7 @@ def artinPath (ad : ArtinData) : ExtPath (FieldElem.mk 0) (FieldElem.mk ad.degre
 -- ============================================================
 
 /-- Characters are distinct: no nontrivial linear relation -/
-def DedekindIndependent (chars : List FieldAut) : Prop :=
+noncomputable def DedekindIndependent (chars : List FieldAut) : Prop :=
   ∀ coeffs : List Nat,
     coeffs.length = chars.length →
     (∀ c, c ∈ coeffs → c = 0) ∨ chars.length = 0
@@ -273,7 +273,7 @@ theorem dedekind_single (σ : FieldAut) (coeffs : List Nat)
   hAll
 
 /-- Path witness for Dedekind independence -/
-def dedekindPath (σ : FieldAut) :
+noncomputable def dedekindPath (σ : FieldAut) :
     GalPath σ σ :=
   GalPath.nil _
 
@@ -306,11 +306,11 @@ theorem finite_ext_degree (ext : List FieldElem) : ext.length ≥ 0 :=
 -- ============================================================
 
 /-- Compositum of two extensions -/
-def compositum (E₁ E₂ : List FieldElem) : List FieldElem :=
+noncomputable def compositum (E₁ E₂ : List FieldElem) : List FieldElem :=
   E₁ ++ E₂
 
 /-- Intersection of two extensions -/
-def intersection (E₁ E₂ : List FieldElem) : List FieldElem :=
+noncomputable def intersection (E₁ E₂ : List FieldElem) : List FieldElem :=
   E₁.filter (· ∈ E₂)
 
 /-- Compositum contains both extensions -/
@@ -328,7 +328,7 @@ theorem intersection_sub_left (E₁ E₂ : List FieldElem) (a : FieldElem)
   (List.mem_filter.mp h).1
 
 /-- Path through compositum -/
-def compositumPath (E₁ E₂ : List FieldElem) (a b : FieldElem)
+noncomputable def compositumPath (E₁ E₂ : List FieldElem) (a b : FieldElem)
     (ha : a ∈ E₁) (_hb : b ∈ E₂) : ExtPath a b :=
   ExtPath.cons (ExtStep.adjoin a b) (ExtPath.nil b)
 
@@ -356,16 +356,16 @@ theorem galois_closed_compose (G : List FieldAut) (σ τ result : FieldAut)
   hResult
 
 /-- Multi-step Galois path: σ ∘ τ ∘ ρ -/
-def galois_triple_compose (σ τ ρ : FieldAut) : GalPath σ ρ :=
+noncomputable def galois_triple_compose (σ τ ρ : FieldAut) : GalPath σ ρ :=
   GalPath.cons (GalStep.compose σ τ) (GalPath.cons (GalStep.compose τ ρ) (GalPath.nil ρ))
 
 /-- Galois path with symmetry: σ → τ → σ -/
-def galois_round_trip (σ τ : FieldAut) : GalPath σ σ :=
+noncomputable def galois_round_trip (σ τ : FieldAut) : GalPath σ σ :=
   GalPath.cons (GalStep.compose σ τ)
     (GalPath.cons (GalStep.symm (GalStep.compose σ τ)) (GalPath.nil σ))
 
 /-- CongrArg in Galois path -/
-def galois_congrArg_path (f : FieldAut → FieldAut) (σ τ : FieldAut) : GalPath (f σ) (f τ) :=
+noncomputable def galois_congrArg_path (f : FieldAut → FieldAut) (σ τ : FieldAut) : GalPath (f σ) (f τ) :=
   GalPath.cons (GalStep.congrArg f (GalStep.compose σ τ)) (GalPath.nil (f τ))
 
 -- ============================================================
@@ -373,7 +373,7 @@ def galois_congrArg_path (f : FieldAut → FieldAut) (σ τ : FieldAut) : GalPat
 -- ============================================================
 
 /-- Simple extension: generated by a single element -/
-def IsSimple (ext : List FieldElem) (gen : FieldElem) : Prop :=
+noncomputable def IsSimple (ext : List FieldElem) (gen : FieldElem) : Prop :=
   gen ∈ ext ∧ ∀ a, a ∈ ext → True  -- simplified: every element depends on generator
 
 /-- Primitive element theorem: finite separable extension is simple -/
@@ -383,7 +383,7 @@ theorem primitive_element (ext : List FieldElem) (hFin : ext ≠ [])
   | a :: _ => exact ⟨a, List.mem_cons_self⟩
 
 /-- Path from generator to any element in simple extension -/
-def simpleExtPath (gen a : FieldElem) : ExtPath gen a :=
+noncomputable def simpleExtPath (gen a : FieldElem) : ExtPath gen a :=
   ExtPath.cons (ExtStep.adjoin gen a) (ExtPath.nil a)
 
 -- ============================================================
@@ -391,7 +391,7 @@ def simpleExtPath (gen a : FieldElem) : ExtPath gen a :=
 -- ============================================================
 
 /-- Five-step extension path -/
-def fiveStepExtPath (a b c d e f : FieldElem) : ExtPath a f :=
+noncomputable def fiveStepExtPath (a b c d e f : FieldElem) : ExtPath a f :=
   ExtPath.cons (ExtStep.adjoin a b)
     (ExtPath.cons (ExtStep.adjoin b c)
       (ExtPath.cons (ExtStep.adjoin c d)
@@ -399,41 +399,41 @@ def fiveStepExtPath (a b c d e f : FieldElem) : ExtPath a f :=
           (ExtPath.cons (ExtStep.adjoin e f) (ExtPath.nil f)))))
 
 /-- Path associativity: (p ++ q) ++ r = p ++ (q ++ r) -/
-def extPath_trans_assoc {a b c d : FieldElem}
+noncomputable def extPath_trans_assoc {a b c d : FieldElem}
     (p : ExtPath a b) (q : ExtPath b c) (r : ExtPath c d)
     : ExtPath a d :=
   ExtPath.trans (ExtPath.trans p q) r
 
 /-- Round-trip path: a → b → a -/
-def roundTripPath (a b : FieldElem) : ExtPath a a :=
+noncomputable def roundTripPath (a b : FieldElem) : ExtPath a a :=
   ExtPath.cons (ExtStep.adjoin a b)
     (ExtPath.cons (ExtStep.symm (ExtStep.adjoin a b)) (ExtPath.nil a))
 
 /-- Diamond path: a → b → d and a → c → d -/
-def diamondPathLeft (a b d : FieldElem) : ExtPath a d :=
+noncomputable def diamondPathLeft (a b d : FieldElem) : ExtPath a d :=
   ExtPath.cons (ExtStep.adjoin a b) (ExtPath.cons (ExtStep.adjoin b d) (ExtPath.nil d))
 
-def diamondPathRight (a c d : FieldElem) : ExtPath a d :=
+noncomputable def diamondPathRight (a c d : FieldElem) : ExtPath a d :=
   ExtPath.cons (ExtStep.adjoin a c) (ExtPath.cons (ExtStep.adjoin c d) (ExtPath.nil d))
 
 /-- CongrArg chain: applying f to a multi-step path -/
-def congrArgChain (f : FieldElem → FieldElem) (a b c : FieldElem) : ExtPath (f a) (f c) :=
+noncomputable def congrArgChain (f : FieldElem → FieldElem) (a b c : FieldElem) : ExtPath (f a) (f c) :=
   ExtPath.congrArg f (ExtPath.cons (ExtStep.adjoin a b)
     (ExtPath.cons (ExtStep.adjoin b c) (ExtPath.nil c)))
 
 /-- Symm of trans -/
-def symm_trans_path (a b c : FieldElem) : ExtPath c a :=
+noncomputable def symm_trans_path (a b c : FieldElem) : ExtPath c a :=
   ExtPath.symm (ExtPath.cons (ExtStep.adjoin a b)
     (ExtPath.cons (ExtStep.adjoin b c) (ExtPath.nil c)))
 
 /-- Trans of symm paths -/
-def trans_symm_path (a b c : FieldElem) : ExtPath c a :=
+noncomputable def trans_symm_path (a b c : FieldElem) : ExtPath c a :=
   ExtPath.trans
     (ExtPath.symm (ExtPath.cons (ExtStep.adjoin b c) (ExtPath.nil c)))
     (ExtPath.symm (ExtPath.cons (ExtStep.adjoin a b) (ExtPath.nil b)))
 
 /-- Complex Galois path with trans, symm, congrArg -/
-def complexGaloisPath (σ τ ρ : FieldAut) (f : FieldAut → FieldAut) : GalPath (f σ) ρ :=
+noncomputable def complexGaloisPath (σ τ ρ : FieldAut) (f : FieldAut → FieldAut) : GalPath (f σ) ρ :=
   GalPath.trans
     (GalPath.congrArg f (GalPath.cons (GalStep.compose σ τ) (GalPath.nil τ)))
     (GalPath.trans

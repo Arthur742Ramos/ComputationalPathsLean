@@ -138,9 +138,9 @@ structure LeraySS {X Y : Type u} {τX : Topology X} {τY : Topology Y}
     §8  PUnit model
     ================================================================ -/
 
-private def pp : @Path PUnit a b := by cases a; cases b; exact Path.refl _
+private noncomputable def pp : @Path PUnit a b := by cases a; cases b; exact Path.refl _
 
-private def puTop : Topology PUnit where
+private noncomputable def puTop : Topology PUnit where
   Open := PUnit
   incl := fun _ _ => True
   inter := fun _ _ => .unit
@@ -148,18 +148,18 @@ private def puTop : Topology PUnit where
   incl_refl := fun _ => True.intro
   incl_trans := fun _ _ => True.intro
 
-private def puCov : Covering puTop PUnit.unit where
+private noncomputable def puCov : Covering puTop PUnit.unit where
   index := PUnit
   opens := fun _ => .unit
   covers := fun _ => True.intro
 
-private def puPsh : Presheaf (X := PUnit) puTop where
+private noncomputable def puPsh : Presheaf (X := PUnit) puTop where
   sections := fun _ => PUnit
   restrict := fun _ _ => .unit
   restrict_id := fun _ _ => pp
   restrict_comp := fun _ _ _ => pp
 
-private def puSheaf : Sheaf (X := PUnit) puTop where
+private noncomputable def puSheaf : Sheaf (X := PUnit) puTop where
   sections := fun _ => PUnit
   restrict := fun _ _ => .unit
   restrict_id := fun _ _ => pp
@@ -167,10 +167,10 @@ private def puSheaf : Sheaf (X := PUnit) puTop where
   separation := fun _ => { sep := fun _ _ _ => pp }
   gluing := fun _ => { glue := fun _ => .unit }
 
-private def puSM : SheafMorphism puSheaf puSheaf :=
+private noncomputable def puSM : SheafMorphism puSheaf puSheaf :=
   { morph := { map := fun _ _ => .unit, natural := fun _ _ => pp } }
 
-private def puPM : PresheafMorphism puPsh puPsh :=
+private noncomputable def puPM : PresheafMorphism puPsh puPsh :=
   { map := fun _ _ => .unit, natural := fun _ _ => pp }
 
 /-! ## §9  Non-trivial Path proofs -/
@@ -223,7 +223,7 @@ theorem restrict_id_cancel
   simp
 
 -- 7: congrArg through restriction
-def restrict_congrArg
+noncomputable def restrict_congrArg
     {X : Type u} {τ : Topology X} (F : Presheaf (X := X) τ)
     {U V : τ.Open} (i : τ.incl V U) {s t : F.sections U}
     (p : Path s t) :
@@ -260,7 +260,7 @@ theorem gluing_punit_val :
     (puSheaf.gluing puCov).glue gd = PUnit.unit := by intro gd; rfl
 
 -- 12: morphism composition
-def PresheafMorphism.comp {X : Type u} {τ : Topology X}
+noncomputable def PresheafMorphism.comp {X : Type u} {τ : Topology X}
     {F G H : Presheaf (X := X) τ}
     (φ : PresheafMorphism F G) (ψ : PresheafMorphism G H) :
     PresheafMorphism F H where
@@ -270,7 +270,7 @@ def PresheafMorphism.comp {X : Type u} {τ : Topology X}
                (Path.congrArg (ψ.map V) (φ.natural i s))
 
 -- 13: identity morphism
-def PresheafMorphism.id_ {X : Type u} {τ : Topology X}
+noncomputable def PresheafMorphism.id_ {X : Type u} {τ : Topology X}
     (F : Presheaf (X := X) τ) : PresheafMorphism F F where
   map := fun _ s => s
   natural := fun _ _ => Path.refl _
@@ -303,7 +303,7 @@ theorem PresheafMorphism.comp_assoc_map {X : Type u} {τ : Topology X}
     (PresheafMorphism.comp φ (PresheafMorphism.comp ψ χ)).map U s := rfl
 
 -- 18: sheaf morphism composition
-def SheafMorphism.comp {X : Type u} {τ : Topology X}
+noncomputable def SheafMorphism.comp {X : Type u} {τ : Topology X}
     {F G H : Sheaf (X := X) τ}
     (φ : SheafMorphism F G) (ψ : SheafMorphism G H) :
     SheafMorphism F H :=
@@ -318,7 +318,7 @@ theorem SheafMorphism.comp_assoc_map {X : Type u} {τ : Topology X}
     (SheafMorphism.comp φ (SheafMorphism.comp ψ χ)).morph.map U s := rfl
 
 -- 20: Čech 0-cocycle restricts consistently
-def cech0_restrict_consistent
+noncomputable def cech0_restrict_consistent
     {X : Type u} {τ : Topology X}
     (F : Presheaf (X := X) τ)
     {U : τ.Open} (cov : Covering τ U)
@@ -335,7 +335,7 @@ theorem transport_sections
   cases h; rfl
 
 -- 22: kernel presheaf inclusion gives zero
-def kernel_inclusion_zero
+noncomputable def kernel_inclusion_zero
     {X : Type u} {τ : Topology X}
     {F G : Presheaf (X := X) τ}
     (φ : PresheafMorphism F G)
@@ -377,7 +377,7 @@ theorem comp_naturality_def
                (Path.congrArg (ψ.map V) (φ.natural i s)) := rfl
 
 -- 26: sheafification eta is functorial on paths
-def sheafification_eta_path
+noncomputable def sheafification_eta_path
     {X : Type u} {τ : Topology X}
     (F : Presheaf (X := X) τ)
     (SF : Sheafification τ F)
@@ -405,7 +405,7 @@ theorem sheafification_eta_symm
     Path.symm (Path.congrArg (SF.eta_sections U) p) := by simp
 
 -- 29: stalk map is well-defined on paths through germs
-def stalk_map_germ_path
+noncomputable def stalk_map_germ_path
     {X : Type u} {τ : Topology X}
     (F : Presheaf (X := X) τ) (U : τ.Open)
     (S : Stalk F U) (g₁ g₂ : Germ F U) (p : Path g₁ g₂) :
@@ -422,7 +422,7 @@ theorem godement_differential_composable
     (G.maps (n + 1)).morph.map U ((G.maps n).morph.map U s) := rfl
 
 -- 31: separation gives path whose toEq is well-defined
-def gluing_unique_path
+noncomputable def gluing_unique_path
     {X : Type u} {τ : Topology X}
     (F : Sheaf (X := X) τ)
     {U : τ.Open} (cov : Covering τ U)
@@ -433,7 +433,7 @@ def gluing_unique_path
   (F.separation cov).sep s t h
 
 -- 32: gluing unique path + symm gives inverse direction
-def gluing_unique_path_symm
+noncomputable def gluing_unique_path_symm
     {X : Type u} {τ : Topology X}
     (F : Sheaf (X := X) τ)
     {U : τ.Open} (cov : Covering τ U)

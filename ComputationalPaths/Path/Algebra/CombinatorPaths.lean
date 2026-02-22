@@ -38,7 +38,7 @@ infixl:90 " ⬝ " => CL.app
 /-! ## One-step reduction -/
 
 /-- One-step weak head reduction for combinators. -/
-def reduce : CL → CL
+noncomputable def reduce : CL → CL
   | CL.app CL.I x => x
   | CL.app (CL.app CL.K x) _ => x
   | CL.app (CL.app (CL.app CL.S f) g) x =>
@@ -48,27 +48,27 @@ def reduce : CL → CL
 /-! ## Basic combinator reduction paths -/
 
 /-- I x reduces to x. -/
-def I_path (x : CL) : Path (reduce (CL.I ⬝ x)) x := Path.refl x
+noncomputable def I_path (x : CL) : Path (reduce (CL.I ⬝ x)) x := Path.refl x
 
 /-- K x y reduces to x. -/
-def K_path (x y : CL) : Path (reduce ((CL.K ⬝ x) ⬝ y)) x := Path.refl x
+noncomputable def K_path (x y : CL) : Path (reduce ((CL.K ⬝ x) ⬝ y)) x := Path.refl x
 
 /-- S f g x reduces to (f x)(g x). -/
-def S_path (f g x : CL) :
+noncomputable def S_path (f g x : CL) :
     Path (reduce (((CL.S ⬝ f) ⬝ g) ⬝ x)) ((f ⬝ x) ⬝ (g ⬝ x)) := Path.refl _
 
 /-- S K K x first step: reduces to (K x)(K x). -/
-def SKK_step1 (x : CL) :
+noncomputable def SKK_step1 (x : CL) :
     Path (reduce (((CL.S ⬝ CL.K) ⬝ CL.K) ⬝ x)) ((CL.K ⬝ x) ⬝ (CL.K ⬝ x)) :=
   Path.refl _
 
 /-- S K K x second step: K x (K x) reduces to x. -/
-def SKK_step2 (x : CL) :
+noncomputable def SKK_step2 (x : CL) :
     Path (reduce ((CL.K ⬝ x) ⬝ (CL.K ⬝ x))) x :=
   Path.refl _
 
 /-- Multi-step reduction. -/
-def reduceN : Nat → CL → CL
+noncomputable def reduceN : Nat → CL → CL
   | 0, t => t
   | n + 1, t => reduceN n (reduce t)
 
@@ -78,49 +78,49 @@ theorem SKK_reduces (x : CL) :
   simp [reduceN, reduce]
 
 /-- SKK two-step as a path. -/
-def SKK_path (x : CL) :
+noncomputable def SKK_path (x : CL) :
     Path (reduceN 2 (((CL.S ⬝ CL.K) ⬝ CL.K) ⬝ x)) x :=
   Path.mk [Step.mk _ _ (SKK_reduces x)] (SKK_reduces x)
 
 /-! ## Church booleans -/
 
-def churchTrue : CL := CL.K
-def churchFalse : CL := CL.K ⬝ CL.I
+noncomputable def churchTrue : CL := CL.K
+noncomputable def churchFalse : CL := CL.K ⬝ CL.I
 
 /-- True x y → x. -/
-def churchTrue_path (x y : CL) : Path (reduce ((churchTrue ⬝ x) ⬝ y)) x := Path.refl x
+noncomputable def churchTrue_path (x y : CL) : Path (reduce ((churchTrue ⬝ x) ⬝ y)) x := Path.refl x
 
 /-- False step 1: K I x → I. -/
-def churchFalse_step1 (x : CL) : Path (reduce (churchFalse ⬝ x)) CL.I := Path.refl _
+noncomputable def churchFalse_step1 (x : CL) : Path (reduce (churchFalse ⬝ x)) CL.I := Path.refl _
 
 /-- False step 2: I y → y. -/
-def churchFalse_step2 (y : CL) : Path (reduce (CL.I ⬝ y)) y := Path.refl y
+noncomputable def churchFalse_step2 (y : CL) : Path (reduce (CL.I ⬝ y)) y := Path.refl y
 
 /-- False two-step: after reducing churchFalse x to I, then I y to y. -/
-def churchFalse_path (_x y : CL) :
+noncomputable def churchFalse_path (_x y : CL) :
     Path (reduce (CL.I ⬝ y)) y :=
   churchFalse_step2 y
 
 /-! ## Church numerals -/
 
-def churchNum : Nat → CL
+noncomputable def churchNum : Nat → CL
   | 0 => CL.K ⬝ CL.I
   | n + 1 => CL.S ⬝ (churchNum n)
 
-def church_zero_path : Path (churchNum 0) (CL.K ⬝ CL.I) := Path.refl _
-def church_one_path : Path (churchNum 1) (CL.S ⬝ (CL.K ⬝ CL.I)) := Path.refl _
+noncomputable def church_zero_path : Path (churchNum 0) (CL.K ⬝ CL.I) := Path.refl _
+noncomputable def church_one_path : Path (churchNum 1) (CL.S ⬝ (CL.K ⬝ CL.I)) := Path.refl _
 
 theorem church_zero_neq_one : churchNum 0 ≠ churchNum 1 := by simp [churchNum]
 
-def church_succ_path (n : Nat) :
+noncomputable def church_succ_path (n : Nat) :
     Path (churchNum (n + 1)) (CL.S ⬝ churchNum n) := Path.refl _
 
 /-! ## Fixed-point combinators -/
 
-def omega : CL := (CL.S ⬝ CL.I) ⬝ CL.I
+noncomputable def omega : CL := (CL.S ⬝ CL.I) ⬝ CL.I
 
 /-- ω x reduces to (I x)(I x). -/
-def omega_path (x : CL) :
+noncomputable def omega_path (x : CL) :
     Path (reduce (omega ⬝ x)) ((CL.I ⬝ x) ⬝ (CL.I ⬝ x)) := Path.refl _
 
 theorem I_compute (x : CL) : reduce (CL.I ⬝ x) = x := rfl

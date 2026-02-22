@@ -57,7 +57,7 @@ structure Functor (C D : Category.{u}) where
     mapHom (C.comp f g) = D.comp (mapHom f) (mapHom g)
 
 /-- The identity functor. -/
-def Functor.identity (C : Category.{u}) : Functor C C where
+noncomputable def Functor.identity (C : Category.{u}) : Functor C C where
   mapObj := _root_.id
   mapHom := _root_.id
   map_id := fun _ => rfl
@@ -86,7 +86,7 @@ structure LocalObject (C : Category.{u}) (S : MorphismClass C) (W : C.Obj) where
     precomp f hf g = C.comp f g
 
 /-- Every object is local with respect to the empty class. -/
-def localEmpty (C : Category.{u}) (W : C.Obj) :
+noncomputable def localEmpty (C : Category.{u}) (W : C.Obj) :
     LocalObject C ⟨fun _ => False⟩ W where
   precomp := fun _ hf => absurd hf id
   precomp_eq := fun _ hf => absurd hf id
@@ -103,7 +103,7 @@ structure LocalEquivalence (C : Category.{u}) (S : MorphismClass C) where
     True
 
 /-- Every isomorphism is a local equivalence. -/
-def isoLocalEquiv (C : Category.{u}) (S : MorphismClass C)
+noncomputable def isoLocalEquiv (C : Category.{u}) (S : MorphismClass C)
     {X Y : C.Obj} (f : C.Hom X Y) (g : C.Hom Y X)
     (_hfg : C.comp f g = C.id X) (_hgf : C.comp g f = C.id Y) :
     LocalEquivalence C S where
@@ -128,7 +128,7 @@ structure LocalizationFunctor (C : Category.{u}) (S : MorphismClass C) where
       C.comp (L.mapHom f) g = C.id (L.mapObj X)
 
 /-- The identity localization with respect to the empty class. -/
-def trivialLocalization (C : Category.{u}) :
+noncomputable def trivialLocalization (C : Category.{u}) :
     LocalizationFunctor C ⟨fun _ => False⟩ where
   L := Functor.identity C
   unit := {
@@ -177,7 +177,7 @@ structure Nullification (C : Category.{u}) (A : C.Obj) where
 
 /-- Trivial nullification: if A is already the terminal object, nullification
     does nothing. -/
-def trivialNullification (C : Category.{u}) (pt : C.Obj) :
+noncomputable def trivialNullification (C : Category.{u}) (pt : C.Obj) :
     Nullification C pt where
   aEquiv := ⟨fun _ => True⟩
   pA := Functor.identity C
@@ -199,7 +199,7 @@ structure Cellularization (C : Category.{u}) (A : C.Obj) where
   idempotent : ∀ (X : C.Obj), cwA.mapObj (cwA.mapObj X) = cwA.mapObj X
 
 /-- Trivial cellularization. -/
-def trivialCellularization (C : Category.{u}) (A : C.Obj) :
+noncomputable def trivialCellularization (C : Category.{u}) (A : C.Obj) :
     Cellularization C A where
   cwA := Functor.identity C
   counit := fun X => C.id X
@@ -220,7 +220,7 @@ structure LocalizationTriangle (C : Category.{u}) (A X : C.Obj)
     C.comp (CW.counit X) (N.unit X)
 
 /-- Construct the localization triangle from the given data. -/
-def mkLocalizationTriangle (C : Category.{u}) (A X : C.Obj)
+noncomputable def mkLocalizationTriangle (C : Category.{u}) (A X : C.Obj)
     (N : Nullification C A) (CW : Cellularization C A) :
     LocalizationTriangle C A X N CW where
   cellMap := CW.counit X
@@ -276,7 +276,7 @@ theorem every_object_local_empty (C : Category.{u}) (W : C.Obj) :
     ∀ {X Y : C.Obj} (f : C.Hom X Y) (hf : False), False := by
   intro _ _ _ hf; exact hf
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

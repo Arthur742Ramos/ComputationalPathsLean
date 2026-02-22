@@ -116,11 +116,11 @@ theorem smul_zero_vec (a : K) : vs.add (vs.smul a vs.zero) vs.zero = vs.smul a v
   vs.add_zero (vs.smul a vs.zero)
 
 /-- `Path`-typed zero_add. -/
-def zero_add_path (v : V) : Path (vs.add vs.zero v) v :=
+noncomputable def zero_add_path (v : V) : Path (vs.add vs.zero v) v :=
   Path.stepChain (vs.zero_add v)
 
 /-- `Path`-typed one_smul. -/
-def one_smul_path (v : V) : Path (vs.smul vs.scalars.one v) v :=
+noncomputable def one_smul_path (v : V) : Path (vs.smul vs.scalars.one v) v :=
   Path.stepChain (vs.one_smul v)
 
 end VectorSpace
@@ -157,19 +157,19 @@ namespace LinearIso
 variable {K V W : Type u} {vs : VectorSpace K V} {ws : VectorSpace K W}
 
 /-- Identity linear isomorphism. -/
-def id (vs : VectorSpace K V) : LinearIso vs vs where
+noncomputable def id (vs : VectorSpace K V) : LinearIso vs vs where
   fwd := { toFun := _root_.id, map_add := fun _ _ => rfl, map_smul := fun _ _ => rfl }
   bwd := { toFun := _root_.id, map_add := fun _ _ => rfl, map_smul := fun _ _ => rfl }
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
 /-- `Path`-typed left inverse. -/
-def left_inv_path (iso : LinearIso vs ws) (v : V) :
+noncomputable def left_inv_path (iso : LinearIso vs ws) (v : V) :
     Path (iso.bwd.toFun (iso.fwd.toFun v)) v :=
   Path.stepChain (iso.left_inv v)
 
 /-- `Path`-typed right inverse. -/
-def right_inv_path (iso : LinearIso vs ws) (w : W) :
+noncomputable def right_inv_path (iso : LinearIso vs ws) (w : W) :
     Path (iso.fwd.toFun (iso.bwd.toFun w)) w :=
   Path.stepChain (iso.right_inv w)
 
@@ -195,19 +195,19 @@ namespace VectorBundleData
 variable {K B E V : Type u}
 
 /-- The projection of the underlying bundle. -/
-def proj (vb : VectorBundleData K B E V) : E → B := vb.bundle.proj
+noncomputable def proj (vb : VectorBundleData K B E V) : E → B := vb.bundle.proj
 
 /-- The fiber over a point. -/
-def fiberAt (vb : VectorBundleData K B E V) (b : B) : Type u :=
+noncomputable def fiberAt (vb : VectorBundleData K B E V) (b : B) : Type u :=
   vb.bundle.fiberAt b
 
 /-- Map from fiber to model. -/
-def fiberToModel (vb : VectorBundleData K B E V) (b : B) :
+noncomputable def fiberToModel (vb : VectorBundleData K B E V) (b : B) :
     Fiber vb.bundle.proj b → V :=
   vb.bundle.fiberToModel b
 
 /-- Map from model to fiber. -/
-def modelToFiber (vb : VectorBundleData K B E V) (b : B) :
+noncomputable def modelToFiber (vb : VectorBundleData K B E V) (b : B) :
     V → Fiber vb.bundle.proj b :=
   vb.bundle.modelToFiber b
 
@@ -230,14 +230,14 @@ namespace BundleSection
 variable {B E : Type u} {proj : E → B}
 
 /-- `Path`-typed section property. -/
-def section_proj_path (s : BundleSection proj) (b : B) :
+noncomputable def section_proj_path (s : BundleSection proj) (b : B) :
     Path (proj (s.toFun b)) b :=
   Path.stepChain (s.section_proj b)
 
 end BundleSection
 
 /-- The zero section of a vector bundle. -/
-def zeroSection {K B E V : Type u}
+noncomputable def zeroSection {K B E V : Type u}
     (vb : VectorBundleData K B E V) : BundleSection vb.bundle.proj where
   toFun := fun b => (vb.bundle.modelToFiber b vb.vectorSpace.zero).val
   section_proj := fun b => by
@@ -245,7 +245,7 @@ def zeroSection {K B E V : Type u}
     exact this
 
 /-- `Path`-typed zero section property. -/
-def zeroSection_proj_path {K B E V : Type u}
+noncomputable def zeroSection_proj_path {K B E V : Type u}
     (vb : VectorBundleData K B E V) (b : B) :
     Path (vb.bundle.proj ((zeroSection vb).toFun b)) b :=
   Path.stepChain ((zeroSection vb).section_proj b)
@@ -256,7 +256,7 @@ The direct sum (Whitney sum) of two vector bundles over the same base.
 -/
 
 /-- Direct sum of two vector spaces over the same scalar ring. -/
-def directSumVS {K V W : Type u}
+noncomputable def directSumVS {K V W : Type u}
     (R : ScalarRing K) (vs : VectorSpace K V) (ws : VectorSpace K W)
     (hvs : vs.scalars = R) (hws : ws.scalars = R) :
     VectorSpace K (V × W) where
@@ -301,11 +301,11 @@ namespace DirectSumBundle
 variable {K B V W : Type u}
 
 /-- The rank of the direct sum is the sum of ranks. -/
-def directSum_rank (ds : DirectSumBundle K B V W) : Nat :=
+noncomputable def directSum_rank (ds : DirectSumBundle K B V W) : Nat :=
   ds.rankV + ds.rankW
 
 /-- `Path`-typed rank additivity. -/
-def rank_add_path (ds : DirectSumBundle K B V W) :
+noncomputable def rank_add_path (ds : DirectSumBundle K B V W) :
     Path ds.directSum_rank (ds.rankV + ds.rankW) :=
   Path.refl ds.directSum_rank
 
@@ -315,14 +315,14 @@ theorem proj_fst (ds : DirectSumBundle K B V W) (b : B) (v : V) (w : W) :
   ds.proj_eq b v w
 
 /-- `Path`-typed projection. -/
-def proj_fst_path (ds : DirectSumBundle K B V W) (b : B) (v : V) (w : W) :
+noncomputable def proj_fst_path (ds : DirectSumBundle K B V W) (b : B) (v : V) (w : W) :
     Path (ds.proj (b, v, w)) b :=
   Path.stepChain (ds.proj_fst b v w)
 
 end DirectSumBundle
 
 /-- Canonical direct sum bundle from product projection. -/
-def canonicalDirectSum (K : Type u) (B : Type u) (V W : Type u)
+noncomputable def canonicalDirectSum (K : Type u) (B : Type u) (V W : Type u)
     (vsV : VectorSpace K V) (vsW : VectorSpace K W)
     (rV rW : Nat) : DirectSumBundle K B V W where
   vsV := vsV
@@ -345,7 +345,7 @@ structure TensorProd (V : Type u) (W : Type u) where
   snd : W
 
 /-- Tensor product of two vector spaces (simplified: only simple tensors). -/
-def tensorProductVS {K V W : Type u}
+noncomputable def tensorProductVS {K V W : Type u}
     (R : ScalarRing K) (vs : VectorSpace K V) (ws : VectorSpace K W)
     (hvs : vs.scalars = R) (hws : ws.scalars = R) :
     VectorSpace K (TensorProd V W) where
@@ -391,12 +391,12 @@ The dual bundle has fibers that are dual to the original fibers.
 -/
 
 /-- Abstract dual space (as functions to scalars). -/
-def DualSpace (K : Type u) (V : Type u) : Type u := V → K
+noncomputable def DualSpace (K : Type u) (V : Type u) : Type u := V → K
 
 /-- Dual vector space with trivial scalar action.
     This avoids requiring ring distributivity while still capturing the
     additive group structure of the dual space faithfully. -/
-def dualVS {K V : Type u} (vs : VectorSpace K V) :
+noncomputable def dualVS {K V : Type u} (vs : VectorSpace K V) :
     VectorSpace K (DualSpace K V) where
   scalars := vs.scalars
   zero := fun _ => vs.scalars.zero
@@ -425,7 +425,7 @@ variable {K B V : Type u}
 theorem dual_rank (db : DualBundle K B V) : db.rank = db.rank := rfl
 
 /-- `Path`-typed rank equality. -/
-def dual_rank_path (db : DualBundle K B V) :
+noncomputable def dual_rank_path (db : DualBundle K B V) :
     Path db.rank db.rank :=
   Path.refl db.rank
 

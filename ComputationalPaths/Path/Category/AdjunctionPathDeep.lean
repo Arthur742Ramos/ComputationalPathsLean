@@ -70,13 +70,13 @@ structure PathAdjunction (A : Type u) (B : Type v) where
     (eta (G.obj y)).trans (G.map (eps y)) = Path.refl (G.obj y)
 
 -- Theorem 1: Unit component is a path from x to GF(x)
-def unit_path {A : Type u} {B : Type v}
+noncomputable def unit_path {A : Type u} {B : Type v}
     (adj : PathAdjunction A B) (x : A) :
     Path x (adj.G.obj (adj.F.obj x)) :=
   adj.eta x
 
 -- Theorem 2: Counit component is a path from FG(y) to y
-def counit_path {A : Type u} {B : Type v}
+noncomputable def counit_path {A : Type u} {B : Type v}
     (adj : PathAdjunction A B) (y : B) :
     Path (adj.F.obj (adj.G.obj y)) y :=
   adj.eps y
@@ -107,7 +107,7 @@ theorem triangle_F_symm {A : Type u} {B : Type v}
 -- ============================================================
 
 /-- The monad T = GF arising from an adjunction -/
-def monadFromAdj {A : Type u} {B : Type v}
+noncomputable def monadFromAdj {A : Type u} {B : Type v}
     (adj : PathAdjunction A B) : PathFunctor A where
   obj := fun x => adj.G.obj (adj.F.obj x)
   map := fun p => adj.G.map (adj.F.map p)
@@ -117,13 +117,13 @@ def monadFromAdj {A : Type u} {B : Type v}
     rw [adj.F.map_comp p q, adj.G.map_comp]
 
 -- Theorem 6: Monad unit η : x → T(x) from adjunction unit
-def monad_unit_from_adj {A : Type u} {B : Type v}
+noncomputable def monad_unit_from_adj {A : Type u} {B : Type v}
     (adj : PathAdjunction A B) (x : A) :
     Path x ((monadFromAdj adj).obj x) :=
   adj.eta x
 
 -- Theorem 7: Monad multiplication μ = GεF : T²(x) → T(x)
-def monad_mult_from_adj {A : Type u} {B : Type v}
+noncomputable def monad_mult_from_adj {A : Type u} {B : Type v}
     (adj : PathAdjunction A B) (x : A) :
     Path ((monadFromAdj adj).obj ((monadFromAdj adj).obj x))
          ((monadFromAdj adj).obj x) :=
@@ -187,16 +187,16 @@ theorem monad_assoc_coherence {A : Type u}
 -- ============================================================
 
 /-- Kleisli arrow: a → T(b) as a Path -/
-def KleisliArr {A : Type u} (M : PathMonad A) (x y : A) :=
+noncomputable def KleisliArr {A : Type u} (M : PathMonad A) (x y : A) :=
   Path x (M.T.obj y)
 
 -- Theorem 13: Kleisli identity arrow
-def kleisli_id {A : Type u} (M : PathMonad A) (x : A) :
+noncomputable def kleisli_id {A : Type u} (M : PathMonad A) (x : A) :
     KleisliArr M x x :=
   M.eta x
 
 -- Theorem 14: Kleisli composition via trans and mu
-def kleisli_comp {A : Type u} (M : PathMonad A) {x y z : A}
+noncomputable def kleisli_comp {A : Type u} (M : PathMonad A) {x y z : A}
     (f : KleisliArr M x y) (g : KleisliArr M y z) :
     KleisliArr M x z :=
   f.trans ((M.T.map g).trans (M.mu z))
@@ -213,7 +213,7 @@ theorem kleisli_comp_uses_trans {A : Type u} (M : PathMonad A)
   rfl
 
 -- Theorem 17: Kleisli composition yields a path
-def kleisli_comp_path {A : Type u} (M : PathMonad A)
+noncomputable def kleisli_comp_path {A : Type u} (M : PathMonad A)
     {x y z : A} (f : KleisliArr M x y) (g : KleisliArr M y z) :
     Path x (M.T.obj z) :=
   kleisli_comp M f g
@@ -238,7 +238,7 @@ structure PathAlgebra {A : Type u} (M : PathMonad A) where
               (M.T.map structure_map).trans structure_map
 
 -- Theorem 19: Free algebra for a monad
-def freeAlgebra {A : Type u} (M : PathMonad A) (x : A) :
+noncomputable def freeAlgebra {A : Type u} (M : PathMonad A) (x : A) :
     PathAlgebra M where
   carrier := M.T.obj x
   structure_map := M.mu x
@@ -280,7 +280,7 @@ structure AlgebraMorphism {A : Type u} {M : PathMonad A}
              alg1.structure_map.trans morph
 
 -- Theorem 24: Identity algebra morphism
-def algebra_id_morph {A : Type u} {M : PathMonad A}
+noncomputable def algebra_id_morph {A : Type u} {M : PathMonad A}
     (alg : PathAlgebra M) :
     AlgebraMorphism alg alg where
   morph := Path.refl alg.carrier
@@ -289,7 +289,7 @@ def algebra_id_morph {A : Type u} {M : PathMonad A}
     simp
 
 -- Theorem 25: Composition of algebra morphisms
-def algebra_comp_morph {A : Type u} {M : PathMonad A}
+noncomputable def algebra_comp_morph {A : Type u} {M : PathMonad A}
     {alg1 alg2 alg3 : PathAlgebra M}
     (f : AlgebraMorphism alg1 alg2)
     (g : AlgebraMorphism alg2 alg3) :
@@ -308,7 +308,7 @@ def algebra_comp_morph {A : Type u} {M : PathMonad A}
 -- ============================================================
 
 /-- Vertical composition of natural transformations -/
-def pathNatTransComp {A : Type u} {B : Type v}
+noncomputable def pathNatTransComp {A : Type u} {B : Type v}
     {F G H : PathFunctorAB A B}
     (alpha : PathNatTrans F G) (beta : PathNatTrans G H) :
     PathNatTrans F H where
@@ -329,7 +329,7 @@ theorem natTransComp_component {A : Type u} {B : Type v}
   rfl
 
 /-- Identity natural transformation -/
-def pathNatTransId {A : Type u} {B : Type v}
+noncomputable def pathNatTransId {A : Type u} {B : Type v}
     (F : PathFunctorAB A B) : PathNatTrans F F where
   component := fun x => Path.refl (F.obj x)
   naturality := fun p => by
@@ -484,7 +484,7 @@ theorem kleisli_comp_expand {A : Type u} (M : PathMonad A)
 -- ============================================================
 
 /-- Free functor sends morphisms via T.map -/
-def freeFunctorMap {A : Type u} (M : PathMonad A) {x y : A}
+noncomputable def freeFunctorMap {A : Type u} (M : PathMonad A) {x y : A}
     (p : Path x y) : Path (M.T.obj x) (M.T.obj y) :=
   M.T.map p
 
@@ -557,12 +557,12 @@ structure PathComonad (A : Type u) where
     (delta x).trans (D.map (delta x))
 
 -- Theorem 49: Comonad counit
-def comonad_counit {A : Type u} (W : PathComonad A) (x : A) :
+noncomputable def comonad_counit {A : Type u} (W : PathComonad A) (x : A) :
     Path (W.D.obj x) x :=
   W.epsilon x
 
 -- Theorem 50: Comonad comultiplication
-def comonad_comult {A : Type u} (W : PathComonad A) (x : A) :
+noncomputable def comonad_comult {A : Type u} (W : PathComonad A) (x : A) :
     Path (W.D.obj x) (W.D.obj (W.D.obj x)) :=
   W.delta x
 
@@ -587,7 +587,7 @@ theorem comonad_coassoc_law {A : Type u} (W : PathComonad A) (x : A) :
 -- ============================================================
 
 /-- Comonad D = FG from adjunction -/
-def comonadFunctorFromAdj {A : Type u} {B : Type v}
+noncomputable def comonadFunctorFromAdj {A : Type u} {B : Type v}
     (adj : PathAdjunction A B) : PathFunctor B where
   obj := fun y => adj.F.obj (adj.G.obj y)
   map := fun q => adj.F.map (adj.G.map q)
@@ -597,13 +597,13 @@ def comonadFunctorFromAdj {A : Type u} {B : Type v}
     rw [adj.G.map_comp p q, adj.F.map_comp]
 
 -- Theorem 54: Comonad counit from adjunction
-def comonad_counit_from_adj {A : Type u} {B : Type v}
+noncomputable def comonad_counit_from_adj {A : Type u} {B : Type v}
     (adj : PathAdjunction A B) (y : B) :
     Path (adj.F.obj (adj.G.obj y)) y :=
   adj.eps y
 
 -- Theorem 55: Comonad comultiplication from adjunction: FηG
-def comonad_comult_from_adj {A : Type u} {B : Type v}
+noncomputable def comonad_comult_from_adj {A : Type u} {B : Type v}
     (adj : PathAdjunction A B) (y : B) :
     Path (adj.F.obj (adj.G.obj y))
          (adj.F.obj (adj.G.obj (adj.F.obj (adj.G.obj y)))) :=
@@ -614,7 +614,7 @@ def comonad_comult_from_adj {A : Type u} {B : Type v}
 -- ============================================================
 
 -- Theorem 56: Left whiskering component: F maps α components
-def leftWhisker_comp {A : Type u} {B : Type v} {C : Type w}
+noncomputable def leftWhisker_comp {A : Type u} {B : Type v} {C : Type w}
     (F : PathFunctorAB B C) {G H : PathFunctorAB A B}
     (alpha : PathNatTrans G H) (x : A) :
     Path (F.obj (G.obj x)) (F.obj (H.obj x)) :=
@@ -629,7 +629,7 @@ theorem leftWhisker_naturality {A : Type u} {B : Type v} {C : Type w}
   rw [← F.map_comp, alpha.naturality, F.map_comp]
 
 -- Theorem 58: Right whiskering component: α at F(x)
-def rightWhisker_comp {A : Type u} {B : Type v} {C : Type w}
+noncomputable def rightWhisker_comp {A : Type u} {B : Type v} {C : Type w}
     {G H : PathFunctorAB B C}
     (alpha : PathNatTrans G H) (F : PathFunctorAB A B) (x : A) :
     Path (G.obj (F.obj x)) (H.obj (F.obj x)) :=
@@ -659,7 +659,7 @@ structure DistributiveLaw {A : Type u} (S T : PathMonad A) where
     S.eta (T.T.obj x)
 
 -- Theorem 58: Distributive law swaps functor applications
-def dist_law_swap {A : Type u} {S T : PathMonad A}
+noncomputable def dist_law_swap {A : Type u} {S T : PathMonad A}
     (dl : DistributiveLaw S T) (x : A) :
     Path (S.T.obj (T.T.obj x)) (T.T.obj (S.T.obj x)) :=
   dl.law x

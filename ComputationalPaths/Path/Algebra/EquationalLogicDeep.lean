@@ -35,21 +35,21 @@ inductive Term (Sig : Signature) (Var : Type) where
   | app  : (op : Sig.OpSym) → (Fin (Sig.arity op) → Term Sig Var) → Term Sig Var
 
 /-- A substitution is just a map from variables to terms. -/
-def Subst (Sig : Signature) (Var : Type) :=
+noncomputable def Subst (Sig : Signature) (Var : Type) :=
   Var → Term Sig Var
 
 /-- Apply a substitution to a term. -/
-def applySubst {Sig : Signature} {Var : Type}
+noncomputable def applySubst {Sig : Signature} {Var : Type}
     (sigma : Subst Sig Var) : Term Sig Var → Term Sig Var
   | Term.var x     => sigma x
   | Term.app op ts => Term.app op (fun i => applySubst sigma (ts i))
 
 /-- The identity substitution. -/
-def idSubst {Sig : Signature} {Var : Type} : Subst Sig Var :=
+noncomputable def idSubst {Sig : Signature} {Var : Type} : Subst Sig Var :=
   fun x => Term.var x
 
 /-- Composition of substitutions. -/
-def compSubst {Sig : Signature} {Var : Type}
+noncomputable def compSubst {Sig : Signature} {Var : Type}
     (sigma tau : Subst Sig Var) : Subst Sig Var :=
   fun x => applySubst sigma (tau x)
 
@@ -68,7 +68,7 @@ theorem applySubst_id {Sig : Signature} {Var : Type}
 
 /-- Path witnessing that id-substitution is neutral. -/
 -- Theorem 2
-def applySubst_id_path {Sig : Signature} {Var : Type}
+noncomputable def applySubst_id_path {Sig : Signature} {Var : Type}
     (t : Term Sig Var) : Path (applySubst idSubst t) t :=
   Path.mk [Step.mk _ _ (applySubst_id t)] (applySubst_id t)
 
@@ -80,7 +80,7 @@ structure Equation (Sig : Signature) (Var : Type) where
   rhs : Term Sig Var
 
 /-- An equational theory is a predicate on equations. -/
-def EqTheory (Sig : Signature) (Var : Type) :=
+noncomputable def EqTheory (Sig : Signature) (Var : Type) :=
   Equation Sig Var → Prop
 
 /-! ## §4  Algebras for a Signature -/
@@ -91,11 +91,11 @@ structure SigAlgebra (Sig : Signature) where
   interp  : (op : Sig.OpSym) → (Fin (Sig.arity op) → Car) → Car
 
 /-- An environment / variable assignment maps variables to carrier elements. -/
-def Env (Sig : Signature) (Alg : SigAlgebra Sig) (Var : Type) :=
+noncomputable def Env (Sig : Signature) (Alg : SigAlgebra Sig) (Var : Type) :=
   Var → Alg.Car
 
 /-- Evaluate a term in an algebra under an environment. -/
-def eval {Sig : Signature} {Var : Type}
+noncomputable def eval {Sig : Signature} {Var : Type}
     (Alg : SigAlgebra Sig) (env : Env Sig Alg Var)
     : Term Sig Var → Alg.Car
   | Term.var x     => env x
@@ -103,12 +103,12 @@ def eval {Sig : Signature} {Var : Type}
 
 /-- An algebra satisfies an equation when both sides evaluate equally
     under every variable assignment. -/
-def satisfies {Sig : Signature} {Var : Type}
+noncomputable def satisfies {Sig : Signature} {Var : Type}
     (Alg : SigAlgebra Sig) (eq : Equation Sig Var) : Prop :=
   ∀ env : Env Sig Alg Var, eval Alg env eq.lhs = eval Alg env eq.rhs
 
 /-- An algebra is a model of an equational theory. -/
-def isModel {Sig : Signature} {Var : Type}
+noncomputable def isModel {Sig : Signature} {Var : Type}
     (Alg : SigAlgebra Sig) (Thy : EqTheory Sig Var) : Prop :=
   ∀ eq : Equation Sig Var, Thy eq → satisfies Alg eq
 
@@ -117,7 +117,7 @@ def isModel {Sig : Signature} {Var : Type}
 /-- A derivation step: given an equation in the theory, and
     an environment that witnesses it, we get a `Path` between the evaluations. -/
 -- Theorem 3
-def axiomPath {Sig : Signature} {Var : Type}
+noncomputable def axiomPath {Sig : Signature} {Var : Type}
     (Alg : SigAlgebra Sig) (eq : Equation Sig Var)
     (hsat : satisfies Alg eq) (env : Env Sig Alg Var)
     : Path (eval Alg env eq.lhs) (eval Alg env eq.rhs) :=
@@ -202,7 +202,7 @@ theorem congruence_refl (f : A → B) (a : A) :
 
 /-- Semantic consequence: an equation follows from a theory when every
     model of the theory satisfies the equation. -/
-def eqConsequence {Sig : Signature} {Var : Type}
+noncomputable def eqConsequence {Sig : Signature} {Var : Type}
     (Thy : EqTheory Sig Var) (eq : Equation Sig Var) : Prop :=
   ∀ (Alg : SigAlgebra Sig), isModel Alg Thy → satisfies Alg eq
 
@@ -258,7 +258,7 @@ theorem hom_eval {Sig : Signature} {Var : Type}
 
 /-- Path witnessing homomorphism-evaluation compatibility. -/
 -- Theorem 17
-def hom_eval_path {Sig : Signature} {Var : Type}
+noncomputable def hom_eval_path {Sig : Signature} {Var : Type}
     {A1 A2 : SigAlgebra Sig} (h : SigHom A1 A2)
     (env : Env Sig A1 Var) (t : Term Sig Var) :
     Path (h.func (eval A1 env t)) (eval A2 (fun x => h.func (env x)) t) :=
@@ -289,7 +289,7 @@ theorem hom_preserves_satisfaction {Sig : Signature} {Var : Type}
 
 /-- Path version: homomorphic image maps paths via congrArg. -/
 -- Theorem 19
-def hom_map_path {Sig : Signature}
+noncomputable def hom_map_path {Sig : Signature}
     {A1 A2 : SigAlgebra Sig} (h : SigHom A1 A2)
     {a b : A1.Car} (p : Path a b) :
     Path (h.func a) (h.func b) :=
@@ -332,7 +332,7 @@ theorem subalgebra_preserves_satisfaction {Sig : Signature} {Var : Type}
 /-! ## §12  Direct Products -/
 
 /-- Direct product of a family of algebras. -/
-def productAlgebra {Sig : Signature} {I : Type}
+noncomputable def productAlgebra {Sig : Signature} {I : Type}
     (Algs : I → SigAlgebra Sig) : SigAlgebra Sig where
   Car := ∀ i : I, (Algs i).Car
   interp := fun op args => fun i => (Algs i).interp op (fun j => args j i)
@@ -364,7 +364,7 @@ theorem product_preserves_satisfaction {Sig : Signature} {Var : Type}
 
 /-- Path witnessing product satisfaction. -/
 -- Theorem 25
-def product_satisfaction_path {Sig : Signature} {Var : Type}
+noncomputable def product_satisfaction_path {Sig : Signature} {Var : Type}
     {I : Type} (Algs : I → SigAlgebra Sig)
     (eq : Equation Sig Var)
     (hsat : ∀ i, satisfies (Algs i) eq)
@@ -389,7 +389,7 @@ structure Variety (Sig : Signature) where
 
 /-- The variety of all models of an equational theory. -/
 -- Theorem 26
-def theory_variety {Sig : Signature} {Var : Type}
+noncomputable def theory_variety {Sig : Signature} {Var : Type}
     (Thy : EqTheory Sig Var) : Variety Sig where
   member := fun Alg => isModel Alg Thy
   closed_hom := by
@@ -407,7 +407,7 @@ def theory_variety {Sig : Signature} {Var : Type}
 /-! ## §14  Equational Theory of a Class -/
 
 /-- The equational theory of a class of algebras. -/
-def theoryOf {Sig : Signature} {Var : Type}
+noncomputable def theoryOf {Sig : Signature} {Var : Type}
     (K : SigAlgebra Sig → Prop) : EqTheory Sig Var :=
   fun eq => ∀ Alg, K Alg → satisfies Alg eq
 
@@ -440,7 +440,7 @@ structure Congruence {Sig : Signature} (Alg : SigAlgebra Sig) where
 
 /-- Path from a propositional equality witnessed by a congruence. -/
 -- Theorem 29
-def congruence_path {Sig : Signature}
+noncomputable def congruence_path {Sig : Signature}
     {Alg : SigAlgebra Sig} (_cong : Congruence Alg)
     {a b : Alg.Car} (heq : a = b) :
     Path a b :=
@@ -457,7 +457,7 @@ theorem congruence_path_trans {C : Type}
 /-! ## §16  Term Algebra -/
 
 /-- The term algebra: carrier is terms, operations are term constructors. -/
-def termAlgebra (Sig : Signature) (Var : Type) :
+noncomputable def termAlgebra (Sig : Signature) (Var : Type) :
     SigAlgebra Sig where
   Car := Term Sig Var
   interp := fun op args => Term.app op args
@@ -476,7 +476,7 @@ theorem eval_termAlgebra_var {Sig : Signature} {Var : Type}
 
 /-- Path from eval-in-term-algebra to identity. -/
 -- Theorem 32
-def eval_termAlgebra_var_path {Sig : Signature} {Var : Type}
+noncomputable def eval_termAlgebra_var_path {Sig : Signature} {Var : Type}
     (t : Term Sig Var) :
     Path (eval (termAlgebra Sig Var) Term.var t) t :=
   Path.mk [Step.mk _ _ (eval_termAlgebra_var t)] (eval_termAlgebra_var t)
@@ -496,7 +496,7 @@ theorem eval_termAlgebra_eq_applySubst {Sig : Signature} {Var : Type}
 
 /-- Path witnessing the eval/applySubst correspondence. -/
 -- Theorem 34
-def eval_subst_path {Sig : Signature} {Var : Type}
+noncomputable def eval_subst_path {Sig : Signature} {Var : Type}
     (sigma : Subst Sig Var) (t : Term Sig Var) :
     Path (eval (termAlgebra Sig Var) sigma t) (applySubst sigma t) :=
   let h := eval_termAlgebra_eq_applySubst sigma t
@@ -518,7 +518,7 @@ theorem applySubst_comp {Sig : Signature} {Var : Type}
 
 /-- Path for substitution compositionality. -/
 -- Theorem 36
-def subst_comp_path {Sig : Signature} {Var : Type}
+noncomputable def subst_comp_path {Sig : Signature} {Var : Type}
     (sigma tau : Subst Sig Var) (t : Term Sig Var) :
     Path (applySubst sigma (applySubst tau t))
          (applySubst (compSubst sigma tau) t) :=
@@ -528,21 +528,21 @@ def subst_comp_path {Sig : Signature} {Var : Type}
 /-! ## §18  Unification as Path Finding -/
 
 /-- A unifier for two terms is a substitution making them equal. -/
-def IsUnifier {Sig : Signature} {Var : Type}
+noncomputable def IsUnifier {Sig : Signature} {Var : Type}
     (sigma : Subst Sig Var) (s t : Term Sig Var) : Prop :=
   applySubst sigma s = applySubst sigma t
 
 /-- A unification path: given a unifier, we get a path between the
     substituted terms. -/
 -- Theorem 37
-def unificationPath {Sig : Signature} {Var : Type}
+noncomputable def unificationPath {Sig : Signature} {Var : Type}
     (sigma : Subst Sig Var) (s t : Term Sig Var)
     (hunif : IsUnifier sigma s t) :
     Path (applySubst sigma s) (applySubst sigma t) :=
   Path.mk [Step.mk _ _ hunif] hunif
 
 /-- Most general unifiers: sigma is more general than tau. -/
-def IsMoreGeneral {Sig : Signature} {Var : Type}
+noncomputable def IsMoreGeneral {Sig : Signature} {Var : Type}
     (sigma tau : Subst Sig Var) : Prop :=
   ∃ rho : Subst Sig Var, ∀ x, applySubst rho (sigma x) = tau x
 
@@ -586,14 +586,14 @@ structure CriticalPair (Car : Type) where
   pathR  : Path source right
 
 /-- A critical pair is joinable if there exists a common reduct. -/
-def CriticalPair.joinable {Car : Type} (cp : CriticalPair Car) : Prop :=
+noncomputable def CriticalPair.joinable {Car : Type} (cp : CriticalPair Car) : Prop :=
   ∃ target : Car,
     (∃ _p : Path cp.left target, True) ∧
     (∃ _q : Path cp.right target, True)
 
 /-- If a critical pair is trivial (left = right), we get a direct path. -/
 -- Theorem 41
-def trivial_critical_pair {Car : Type}
+noncomputable def trivial_critical_pair {Car : Type}
     (cp : CriticalPair Car) (h : cp.left = cp.right) :
     Path cp.left cp.right :=
   Path.mk [Step.mk _ _ h] h
@@ -601,7 +601,7 @@ def trivial_critical_pair {Car : Type}
 /-- The critical pair lemma: from a critical pair we derive a path
     between the two reducts via the source. -/
 -- Theorem 42
-def critical_pair_path {Car : Type}
+noncomputable def critical_pair_path {Car : Type}
     (cp : CriticalPair Car) :
     Path cp.left cp.right :=
   Path.trans (Path.symm cp.pathL) cp.pathR
@@ -629,7 +629,7 @@ theorem critical_pair_symm {Car : Type}
 /-! ## §20  Equational Closure Properties -/
 
 /-- An equational theory is closed under substitution instances. -/
-def substClosed {Sig : Signature} {Var : Type}
+noncomputable def substClosed {Sig : Signature} {Var : Type}
     (Thy : EqTheory Sig Var) : Prop :=
   ∀ eq : Equation Sig Var, Thy eq → ∀ sigma : Subst Sig Var,
     Thy ⟨applySubst sigma eq.lhs, applySubst sigma eq.rhs⟩
@@ -719,7 +719,7 @@ theorem deduction_symm_trans {C : Type} {a b c : C}
 /-- If an equation is a semantic consequence of a theory, then in every
     model we get a derivation path. -/
 -- Theorem 55
-def birkhoff_completeness_path {Sig : Signature} {Var : Type}
+noncomputable def birkhoff_completeness_path {Sig : Signature} {Var : Type}
     (Thy : EqTheory Sig Var) (eq : Equation Sig Var)
     (hcons : eqConsequence Thy eq)
     (Alg : SigAlgebra Sig) (hmodel : isModel Alg Thy)
@@ -730,7 +730,7 @@ def birkhoff_completeness_path {Sig : Signature} {Var : Type}
 
 /-- Chaining two Birkhoff completeness paths via trans. -/
 -- Theorem 56
-def birkhoff_chain {Sig : Signature} {Var : Type}
+noncomputable def birkhoff_chain {Sig : Signature} {Var : Type}
     (Thy : EqTheory Sig Var)
     (eq1 eq2 : Equation Sig Var)
     (hcons1 : eqConsequence Thy eq1)
@@ -751,25 +751,25 @@ def birkhoff_chain {Sig : Signature} {Var : Type}
 
 /-- Rule 1: Reflexivity. -/
 -- Theorem 57
-def rule_refl (a : A) : Path a a := Path.refl a
+noncomputable def rule_refl (a : A) : Path a a := Path.refl a
 
 /-- Rule 2: Symmetry. -/
 -- Theorem 58
-def rule_symm {a b : A} (p : Path a b) : Path b a := Path.symm p
+noncomputable def rule_symm {a b : A} (p : Path a b) : Path b a := Path.symm p
 
 /-- Rule 3: Transitivity. -/
 -- Theorem 59
-def rule_trans {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
+noncomputable def rule_trans {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
 /-- Rule 4: Congruence. -/
 -- Theorem 60
-def rule_cong (f : A → B) {a b : A} (p : Path a b) :
+noncomputable def rule_cong (f : A → B) {a b : A} (p : Path a b) :
     Path (f a) (f b) := Path.congrArg f p
 
 /-- Rule 5: Substitution — instantiate variables. -/
 -- Theorem 61
-def rule_subst_inst {Sig : Signature} {Var : Type}
+noncomputable def rule_subst_inst {Sig : Signature} {Var : Type}
     (Alg : SigAlgebra Sig)
     (env : Env Sig Alg Var)
     (s t : Term Sig Var)
@@ -780,7 +780,7 @@ def rule_subst_inst {Sig : Signature} {Var : Type}
 
 /-- Demonstrate composition of deduction rules into a single derivation chain. -/
 -- Theorem 62
-def five_rules_compose {C : Type} {a b c d : C}
+noncomputable def five_rules_compose {C : Type} {a b c d : C}
     (f : C → C) (p : Path a b) (q : Path b c) (r : Path c d) :
     Path (f a) (f d) :=
   let step1 := Path.trans p q
@@ -834,7 +834,7 @@ theorem eval_is_hom {Sig : Signature} {Var : Type}
 
 /-- Path witnessing the homomorphism property. -/
 -- Theorem 68
-def eval_hom_path {Sig : Signature} {Var : Type}
+noncomputable def eval_hom_path {Sig : Signature} {Var : Type}
     (Alg : SigAlgebra Sig) (env : Env Sig Alg Var)
     (op : Sig.OpSym) (args : Fin (Sig.arity op) → Term Sig Var) :
     Path (eval Alg env (Term.app op args))
@@ -845,7 +845,7 @@ def eval_hom_path {Sig : Signature} {Var : Type}
 
 /-- Intersection of equational theories. -/
 -- Theorem 69
-def theoryInter {Sig : Signature} {Var : Type}
+noncomputable def theoryInter {Sig : Signature} {Var : Type}
     (T1 T2 : EqTheory Sig Var) : EqTheory Sig Var :=
   fun eq => T1 eq ∧ T2 eq
 
@@ -869,7 +869,7 @@ theorem model_inter_left {Sig : Signature} {Var : Type}
 /-! ## §28  Derivation Length and Path Steps -/
 
 /-- The number of steps in a derivation path. -/
-def derivLength {C : Type} {a b : C} (p : Path a b) : Nat :=
+noncomputable def derivLength {C : Type} {a b : C} (p : Path a b) : Nat :=
   p.steps.length
 
 /-- Reflexivity has zero derivation length. -/

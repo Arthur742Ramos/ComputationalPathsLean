@@ -45,18 +45,18 @@ structure ArtinBraidGroup (n : Nat) where
   braid_rel : Homotopy.ConfigurationSpace.BraidGroupData.BraidRelation data
 
 /-- Generator notation: sigma_i. -/
-def sigma {n : Nat} (B : ArtinBraidGroup n) : Fin (n - 1) → B.data.Braid :=
+noncomputable def sigma {n : Nat} (B : ArtinBraidGroup n) : Fin (n - 1) → B.data.Braid :=
   B.data.gen
 
 /-- Path-typed far commutativity. -/
-def far_comm_path {n : Nat} (B : ArtinBraidGroup n) (i j : Fin (n - 1))
+noncomputable def far_comm_path {n : Nat} (B : ArtinBraidGroup n) (i j : Fin (n - 1))
     (h : i.val + 2 ≤ j.val ∨ j.val + 2 ≤ i.val) :
     Path (B.data.mul (B.data.gen i) (B.data.gen j))
          (B.data.mul (B.data.gen j) (B.data.gen i)) :=
   Homotopy.ConfigurationSpace.BraidGroupData.far_comm_path B.data B.far_comm i j h
 
 /-- Path-typed braid relation. -/
-def braid_rel_path {n : Nat} (B : ArtinBraidGroup n) (i j : Fin (n - 1))
+noncomputable def braid_rel_path {n : Nat} (B : ArtinBraidGroup n) (i j : Fin (n - 1))
     (h : j.val = i.val + 1) :
     Path (B.data.mul (B.data.mul (B.data.gen i) (B.data.gen j)) (B.data.gen i))
          (B.data.mul (B.data.mul (B.data.gen j) (B.data.gen i)) (B.data.gen j)) :=
@@ -120,7 +120,7 @@ structure BraidRepresentation (n : Nat) (B : ArtinBraidGroup n) where
   map_inv : ∀ x, toFun (B.data.inv x) = targetGroup.inv (toFun x)
 
 /-- Path witness for multiplicativity. -/
-def map_mul_path {n : Nat} {B : ArtinBraidGroup n}
+noncomputable def map_mul_path {n : Nat} {B : ArtinBraidGroup n}
     (R : BraidRepresentation n B) (x y : B.data.Braid) :
     Path (R.toFun (B.data.mul x y)) (R.targetGroup.mul (R.toFun x) (R.toFun y)) :=
   Path.stepChain (R.map_mul x y)

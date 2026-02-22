@@ -53,21 +53,21 @@ abbrev Circle : Type u := S1Point.{u}
 abbrev point : Circle.{u} := S1Point.base
 
 /-- The fundamental loop generator. -/
-def loopPath : Path (point : Circle.{u}) point :=
+noncomputable def loopPath : Path (point : Circle.{u}) point :=
   Path.stepChain (by rfl : (point : Circle.{u}) = point)
 
 /-- Iterated loop power. -/
-def loopPow : Nat → Path (point : Circle.{u}) point
+noncomputable def loopPow : Nat → Path (point : Circle.{u}) point
   | 0     => Path.refl point
   | n + 1 => Path.trans loopPath (loopPow n)
 
 /-- Integer loop power. -/
-def loopZPow : Int → Path (point : Circle.{u}) point
+noncomputable def loopZPow : Int → Path (point : Circle.{u}) point
   | .ofNat n    => loopPow n
   | .negSucc n  => Path.symm (loopPow (n + 1))
 
 /-- Winding number of a formal loop expression. -/
-def windingNumber : S1Expr S1Point.base S1Point.base → Int
+noncomputable def windingNumber : S1Expr S1Point.base S1Point.base → Int
   | .refl     => 0
   | .loop     => 1
   | .symm e   => -windingNumber e
@@ -85,7 +85,7 @@ structure CircleRecData (B : Type v) where
   recBase : recFn point = b
 
 /-- The recursion principle for the circle. -/
-def circleRec (B : Type v) (b : B) (l : Path b b) : CircleRecData B where
+noncomputable def circleRec (B : Type v) (b : B) (l : Path b b) : CircleRecData B where
   b := b
   l := l
   recFn := fun _ => b
@@ -98,7 +98,7 @@ theorem circleRec_point (B : Type v) (b : B) (l : Path b b) :
 /-- The image of the loop under a constant map is `RwEq` to `refl`.
     Since `congrArg (fun _ => b) (stepChain rfl)` = `stepChain rfl` (for b),
     we use `rweq_ofEq_rfl_refl` to relate `stepChain rfl` to `refl`. -/
-def circleRec_loop (B : Type v) (b : B) :
+noncomputable def circleRec_loop (B : Type v) (b : B) :
     RwEq (Path.congrArg (fun (_ : Circle) => b) loopPath)
          (Path.refl b) := by
   simp [Path.congrArg, loopPath, Path.stepChain]
@@ -116,7 +116,7 @@ structure CircleIndData (D : Circle.{u} → Type v) where
   indBase : indFn point = d
 
 /-- Construct induction data. -/
-def circleInd (D : Circle.{u} → Type v) (d : D point)
+noncomputable def circleInd (D : Circle.{u} → Type v) (d : D point)
     (dl : Path (Path.cast (D := D) loopPath d) d) : CircleIndData D where
   d := d
   dloop := dl
@@ -138,30 +138,30 @@ inductive SuspRel (A : Type u) : Sum Bool A → Sum Bool A → Prop where
   | south_merid (a : A) : SuspRel A (Sum.inl false) (Sum.inr a)
 
 /-- The suspension of `A`. -/
-def Susp (A : Type u) : Type u := Quot (SuspRel A)
+noncomputable def Susp (A : Type u) : Type u := Quot (SuspRel A)
 
 /-- North pole. -/
-def Susp.north (A : Type u) : Susp A := Quot.mk _ (Sum.inl true)
+noncomputable def Susp.north (A : Type u) : Susp A := Quot.mk _ (Sum.inl true)
 /-- South pole. -/
-def Susp.south (A : Type u) : Susp A := Quot.mk _ (Sum.inl false)
+noncomputable def Susp.south (A : Type u) : Susp A := Quot.mk _ (Sum.inl false)
 
 /-- Meridian from north to south via `a`. -/
-def Susp.merid {A : Type u} (a : A) : Path (Susp.north A) (Susp.south A) :=
+noncomputable def Susp.merid {A : Type u} (a : A) : Path (Susp.north A) (Susp.south A) :=
   Path.trans
     (Path.ofEq (Quot.sound (SuspRel.north_merid a)))
     (Path.symm (Path.ofEq (Quot.sound (SuspRel.south_merid a))))
 
 /-- Meridian loop. -/
-def Susp.meridLoop {A : Type u} (a b : A) : Path (Susp.north A) (Susp.north A) :=
+noncomputable def Susp.meridLoop {A : Type u} (a b : A) : Path (Susp.north A) (Susp.north A) :=
   Path.trans (Susp.merid a) (Path.symm (Susp.merid b))
 
 /-- Meridian loop cancels. -/
-def Susp.meridLoop_cancel {A : Type u} (a : A) :
+noncomputable def Susp.meridLoop_cancel {A : Type u} (a : A) :
     RwEq (Susp.meridLoop a a) (Path.refl (Susp.north A)) :=
   rweq_of_step (Step.trans_symm (Susp.merid a))
 
 /-- Right identity for meridian loops. -/
-def Susp.meridLoop_trans_refl {A : Type u} (a b : A) :
+noncomputable def Susp.meridLoop_trans_refl {A : Type u} (a b : A) :
     RwEq (Path.trans (Susp.meridLoop a b) (Path.refl (Susp.north A)))
          (Susp.meridLoop a b) :=
   rweq_of_step (Step.trans_refl_right (Susp.meridLoop a b))
@@ -204,19 +204,19 @@ private theorem s2_all_eq (x y : Sum Bool Circle) :
   | Sum.inr S1Point.base => rfl
 
 /-- S² is a subsingleton. -/
-instance : Subsingleton S2 := by
+noncomputable instance : Subsingleton S2 := by
   constructor
   intro a b
   exact Quot.inductionOn a (fun sa => Quot.inductionOn b (fun sb => s2_all_eq sa sb))
 
 /-- All meridian loops on S² are trivial. -/
-def s2_all_meridLoops_trivial (x y : Circle) :
+noncomputable def s2_all_meridLoops_trivial (x y : Circle) :
     RwEq (Susp.meridLoop x y) (Path.refl s2North) := by
   cases x; cases y; exact Susp.meridLoop_cancel S1Point.base
 
 /-- Axiom K for subsingleton types: every loop is RwEq-related to refl.
     This is a local version avoiding the broken Sets.lean. -/
-private def axiomK_subsingleton {A : Type u} [Subsingleton A] (a : A)
+private noncomputable def axiomK_subsingleton {A : Type u} [Subsingleton A] (a : A)
     (p : Path a a) : RwEq p (Path.refl a) := by
   have step_eq : ∀ (s : ComputationalPaths.Step A),
       s = ComputationalPaths.Step.mk a a rfl := by
@@ -253,7 +253,7 @@ theorem s2_pi1_trivial :
     exact ⟨axiomK_subsingleton s2North p⟩)
 
 /-- π₁(S²) ≃ Unit. -/
-def s2_pi1_equiv_unit :
+noncomputable def s2_pi1_equiv_unit :
     SimpleEquiv (Quot (fun (p q : Path s2North s2North) => RwEqProp p q)) Unit where
   toFun := fun _ => ()
   invFun := fun _ => Quot.mk _ (Path.refl s2North)
@@ -270,30 +270,30 @@ inductive PushoutRel (A B C : Type u) (f : C → A) (g : C → B) :
   | glue (c : C) : PushoutRel A B C f g (Sum.inl (f c)) (Sum.inr (g c))
 
 /-- The pushout of a span `A ←f— C —g→ B`. -/
-def PushoutHIT (A B C : Type u) (f : C → A) (g : C → B) : Type u :=
+noncomputable def PushoutHIT (A B C : Type u) (f : C → A) (g : C → B) : Type u :=
   Quot (PushoutRel A B C f g)
 
 /-- Left injection. -/
-def PushoutHIT.inl {A B C : Type u} {f : C → A} {g : C → B} (a : A) :
+noncomputable def PushoutHIT.inl {A B C : Type u} {f : C → A} {g : C → B} (a : A) :
     PushoutHIT A B C f g := Quot.mk _ (Sum.inl a)
 
 /-- Right injection. -/
-def PushoutHIT.inr {A B C : Type u} {f : C → A} {g : C → B} (b : B) :
+noncomputable def PushoutHIT.inr {A B C : Type u} {f : C → A} {g : C → B} (b : B) :
     PushoutHIT A B C f g := Quot.mk _ (Sum.inr b)
 
 /-- Gluing path. -/
-def PushoutHIT.glue {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
+noncomputable def PushoutHIT.glue {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
     Path (PushoutHIT.inl (f c) : PushoutHIT A B C f g) (PushoutHIT.inr (g c)) :=
   Path.ofEq (Quot.sound (PushoutRel.glue c))
 
 /-- Lift a path in `A` to the pushout via `inl`. -/
-def PushoutHIT.inlPath {A B C : Type u} {f : C → A} {g : C → B}
+noncomputable def PushoutHIT.inlPath {A B C : Type u} {f : C → A} {g : C → B}
     {a₁ a₂ : A} (p : Path a₁ a₂) :
     Path (PushoutHIT.inl a₁ : PushoutHIT A B C f g) (PushoutHIT.inl a₂) :=
   Path.congrArg PushoutHIT.inl p
 
 /-- Lift a path in `B` to the pushout via `inr`. -/
-def PushoutHIT.inrPath {A B C : Type u} {f : C → A} {g : C → B}
+noncomputable def PushoutHIT.inrPath {A B C : Type u} {f : C → A} {g : C → B}
     {b₁ b₂ : B} (p : Path b₁ b₂) :
     Path (PushoutHIT.inr b₁ : PushoutHIT A B C f g) (PushoutHIT.inr b₂) :=
   Path.congrArg PushoutHIT.inr p
@@ -322,14 +322,14 @@ inductive VKWord {A B C : Type u} (f : C → A) (g : C → B) (c₀ : C) :
   | consRight (q : Path (g c₀) (g c₀)) (rest : VKWord f g c₀) : VKWord f g c₀
 
 /-- Right-side segment: `glue · inr-loop · glue⁻¹`. -/
-def vkRightSegment {A B C : Type u} {f : C → A} {g : C → B} (c₀ : C)
+noncomputable def vkRightSegment {A B C : Type u} {f : C → A} {g : C → B} (c₀ : C)
     (q : Path (g c₀) (g c₀)) :
     Path (PushoutHIT.inl (f c₀) : PushoutHIT A B C f g) (PushoutHIT.inl (f c₀)) :=
   Path.trans (PushoutHIT.glue c₀)
     (Path.trans (PushoutHIT.inrPath q) (Path.symm (PushoutHIT.glue c₀)))
 
 /-- Decode a VK word to a loop in the pushout. -/
-def vkDecode {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C} :
+noncomputable def vkDecode {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C} :
     VKWord f g c₀ → Path (PushoutHIT.inl (f c₀) : PushoutHIT A B C f g) (PushoutHIT.inl (f c₀))
   | .nil           => Path.refl _
   | .consLeft p w  => Path.trans (PushoutHIT.inlPath p) (vkDecode w)
@@ -341,7 +341,7 @@ theorem vkDecode_nil {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C} :
     Path.refl (PushoutHIT.inl (f c₀) : PushoutHIT A B C f g) := rfl
 
 /-- Concatenation of VK words. -/
-def vkAppend {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C} :
+noncomputable def vkAppend {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C} :
     VKWord f g c₀ → VKWord f g c₀ → VKWord f g c₀
   | .nil, w           => w
   | .consLeft p r, w  => .consLeft p (vkAppend r w)
@@ -356,7 +356,7 @@ theorem vkAppend_nil {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
   | consRight q rest ih => simp [vkAppend, ih]
 
 /-- Decode of appended words ≈ trans of individual decodes. -/
-def vkDecode_append {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
+noncomputable def vkDecode_append {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
     (w₁ w₂ : VKWord f g c₀) :
     RwEq (vkDecode (vkAppend w₁ w₂))
          (Path.trans (vkDecode w₁) (vkDecode w₂)) := by
@@ -380,30 +380,30 @@ def vkDecode_append {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
         (vkRightSegment c₀ q) (vkDecode rest) (vkDecode w₂))))
 
 /-- The empty word is the identity. -/
-def vkWord_identity {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C} :
+noncomputable def vkWord_identity {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C} :
     RwEq (vkDecode (.nil : VKWord f g c₀)) (Path.refl _) := RwEq.refl _
 
 /-- Left identity. -/
-def vkWord_left_identity {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
+noncomputable def vkWord_left_identity {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
     (w : VKWord f g c₀) :
     RwEq (Path.trans (vkDecode .nil) (vkDecode w)) (vkDecode w) :=
   rweq_of_step (Step.trans_refl_left (vkDecode w))
 
 /-- Right identity. -/
-def vkWord_right_identity {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
+noncomputable def vkWord_right_identity {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
     (w : VKWord f g c₀) :
     RwEq (Path.trans (vkDecode w) (vkDecode .nil)) (vkDecode w) :=
   rweq_of_step (Step.trans_refl_right (vkDecode w))
 
 /-- Associativity. -/
-def vkWord_assoc {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
+noncomputable def vkWord_assoc {A B C : Type u} {f : C → A} {g : C → B} {c₀ : C}
     (w₁ w₂ w₃ : VKWord f g c₀) :
     RwEq (Path.trans (Path.trans (vkDecode w₁) (vkDecode w₂)) (vkDecode w₃))
          (Path.trans (vkDecode w₁) (Path.trans (vkDecode w₂) (vkDecode w₃))) :=
   rweq_of_step (Step.trans_assoc (vkDecode w₁) (vkDecode w₂) (vkDecode w₃))
 
 /-- Inverse law: right-segment cancels. -/
-def vkRightSegment_inv {A B C : Type u} {f : C → A} {g : C → B} (c₀ : C)
+noncomputable def vkRightSegment_inv {A B C : Type u} {f : C → A} {g : C → B} (c₀ : C)
     (q : Path (g c₀) (g c₀)) :
     RwEq (Path.trans (vkRightSegment c₀ q)
                      (Path.symm (vkRightSegment c₀ q)))

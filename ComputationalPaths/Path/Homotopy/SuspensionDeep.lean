@@ -30,11 +30,11 @@ inductive Susp (A : Type u) where
   | north : Susp A
   | south : Susp A
 
-def suspMap (_ : A → B) : Susp A → Susp B
+noncomputable def suspMap (_ : A → B) : Susp A → Susp B
   | .north => .north
   | .south => .south
 
-def suspMapPath (f : A → B) {x y : Susp A} (p : Path x y) :
+noncomputable def suspMapPath (f : A → B) {x y : Susp A} (p : Path x y) :
     Path (suspMap f x) (suspMap f y) :=
   congrArg (suspMap f) p
 
@@ -42,8 +42,8 @@ def suspMapPath (f : A → B) {x y : Susp A} (p : Path x y) :
 
 abbrev NorthLoop (A : Type u) := Path (Susp.north : Susp A) Susp.north
 
-def loopComp (p q : NorthLoop A) : NorthLoop A := Path.trans p q
-def loopInv (p : NorthLoop A) : NorthLoop A := Path.symm p
+noncomputable def loopComp (p q : NorthLoop A) : NorthLoop A := Path.trans p q
+noncomputable def loopInv (p : NorthLoop A) : NorthLoop A := Path.symm p
 
 /-! ## 1. Loop composition is associative -/
 
@@ -112,7 +112,7 @@ theorem suspMapPath_symm_trans (f : A → B) {x y z : Susp A}
 
 abbrev DoubleSusp (A : Type u) := Susp (Susp A)
 
-def doubleSuspMap (f : A → B) : DoubleSusp A → DoubleSusp B :=
+noncomputable def doubleSuspMap (f : A → B) : DoubleSusp A → DoubleSusp B :=
   suspMap (suspMap f)
 
 /-! ## 9. Double suspension functoriality -/
@@ -179,10 +179,10 @@ inductive Cofiber (f : A → B) where
   | inl : B → Cofiber f
   | vertex : Cofiber f
 
-def cofiberInl (f : A → B) : B → Cofiber f := Cofiber.inl
-def cofiberVertex (f : A → B) : Cofiber f := Cofiber.vertex
+noncomputable def cofiberInl (f : A → B) : B → Cofiber f := Cofiber.inl
+noncomputable def cofiberVertex (f : A → B) : Cofiber f := Cofiber.vertex
 
-def cofiberPath {f : A → B} {b₁ b₂ : B} (p : Path b₁ b₂) :
+noncomputable def cofiberPath {f : A → B} {b₁ b₂ : B} (p : Path b₁ b₂) :
     Path (cofiberInl f b₁) (cofiberInl f b₂) :=
   congrArg (cofiberInl f) p
 
@@ -202,9 +202,9 @@ theorem cofiberPath_symm {f : A → B} {b₁ b₂ : B} (p : Path b₁ b₂) :
 
 /-! ## 18. Puppe sequence stages -/
 
-def puppeStage1 (f : A → B) : B → Cofiber f := cofiberInl f
+noncomputable def puppeStage1 (f : A → B) : B → Cofiber f := cofiberInl f
 
-def puppeStage3 (f : A → B) : Susp A → Susp B := suspMap f
+noncomputable def puppeStage3 (f : A → B) : Susp A → Susp B := suspMap f
 
 theorem puppe_stage3_path (f : A → B) {x y : Susp A} (p : Path x y) :
     congrArg (puppeStage3 f) p = suspMapPath f p := rfl
@@ -222,7 +222,7 @@ theorem puppe_stage3_symm (f : A → B) {x y : Susp A} (p : Path x y) :
 
 /-! ## 19. Connectivity -/
 
-def PathConnected (X : Type u) : Prop := ∀ x y : X, Nonempty (Path x y)
+noncomputable def PathConnected (X : Type u) : Prop := ∀ x y : X, Nonempty (Path x y)
 
 /-- North-north and south-south are trivially path-connected. -/
 theorem susp_self_connected (x : Susp A) : Nonempty (Path x x) :=
@@ -260,7 +260,7 @@ theorem susp_path_reassoc (f : A → B) {v w x y z : Susp A}
 
 /-! ## 24. Cofiber map on codomain -/
 
-def cofiberMapCodomain {f : A → B} (h : B → C) :
+noncomputable def cofiberMapCodomain {f : A → B} (h : B → C) :
     Cofiber f → Cofiber (fun a => h (f a))
   | .inl b => .inl (h b)
   | .vertex => .vertex
@@ -288,7 +288,7 @@ theorem cofiberPath_symm_symm {f : A → B} {b₁ b₂ : B} (p : Path b₁ b₂)
 
 /-! ## 27. Freudenthal map (trivial model: loop at a ↦ loop at north) -/
 
-def freudenthalMap (a : A) : Path a a → NorthLoop A :=
+noncomputable def freudenthalMap (a : A) : Path a a → NorthLoop A :=
   fun _ => Path.refl Susp.north
 
 theorem freudenthalMap_trans (a : A) (p q : Path a a) :
@@ -373,7 +373,7 @@ structure LoopGroupData (A : Type u) where
   right_id : ∀ p, mul p one = p
   inv_inv : ∀ p, inv (inv p) = p
 
-def canonicalLoopGroup (A : Type u) : LoopGroupData A where
+noncomputable def canonicalLoopGroup (A : Type u) : LoopGroupData A where
   mul := loopComp
   one := Path.refl _
   inv := loopInv
@@ -384,7 +384,7 @@ def canonicalLoopGroup (A : Type u) : LoopGroupData A where
 
 /-! ## 34. Σ-Ω adjunction data: map from loops to suspension paths -/
 
-def sigmaOmega_unit (a : A) (p : Path a a) : NorthLoop A :=
+noncomputable def sigmaOmega_unit (a : A) (p : Path a a) : NorthLoop A :=
   freudenthalMap a p
 
 theorem sigmaOmega_unit_trans (a : A) (p q : Path a a) :

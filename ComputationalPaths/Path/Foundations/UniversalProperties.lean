@@ -21,18 +21,18 @@ namespace ProdPath
 variable {A : Type u} {B : Type v}
 
 /-- Split a product equality into component equalities. -/
-def projEqs {p₁ p₂ : A × B} (h : p₁ = p₂) :
+noncomputable def projEqs {p₁ p₂ : A × B} (h : p₁ = p₂) :
     p₁.1 = p₂.1 ∧ p₁.2 = p₂.2 := by
   cases h; exact ⟨rfl, rfl⟩
 
 /-- Build a product equality from component equalities. -/
-def mkEq {a₁ a₂ : A} {b₁ b₂ : B}
+noncomputable def mkEq {a₁ a₂ : A} {b₁ b₂ : B}
     (ha : a₁ = a₂) (hb : b₁ = b₂) :
     ((a₁, b₁) : A × B) = (a₂, b₂) := by
   cases ha; cases hb; rfl
 
 /-- Build a product equality from component paths. -/
-def mkPath {a₁ a₂ : A} {b₁ b₂ : B}
+noncomputable def mkPath {a₁ a₂ : A} {b₁ b₂ : B}
     (pa : Path a₁ a₂) (pb : Path b₁ b₂) :
     ((a₁, b₁) : A × B) = (a₂, b₂) :=
   mkEq pa.toEq pb.toEq
@@ -104,12 +104,12 @@ namespace SumPath
 variable {A : Type u} {B : Type v}
 
 /-- Paths in `Sum.inl` reduce to paths in `A`. -/
-def inl_path {a₁ a₂ : A} (h : (Sum.inl a₁ : A ⊕ B) = Sum.inl a₂) :
+noncomputable def inl_path {a₁ a₂ : A} (h : (Sum.inl a₁ : A ⊕ B) = Sum.inl a₂) :
     a₁ = a₂ :=
   Sum.inl.inj h
 
 /-- Paths in `Sum.inr` reduce to paths in `B`. -/
-def inr_path {b₁ b₂ : B} (h : (Sum.inr b₁ : A ⊕ B) = Sum.inr b₂) :
+noncomputable def inr_path {b₁ b₂ : B} (h : (Sum.inr b₁ : A ⊕ B) = Sum.inr b₂) :
     b₁ = b₂ :=
   Sum.inr.inj h
 
@@ -168,13 +168,13 @@ namespace FunExtPath
 variable {A : Type u} {B : Type v}
 
 /-- Function extensionality: pointwise paths give a path between functions. -/
-def funext {f g : A → B} (h : ∀ x, Path (f x) (g x)) :
+noncomputable def funext {f g : A → B} (h : ∀ x, Path (f x) (g x)) :
     Path f g :=
   Path.mk [Step.mk _ _ (_root_.funext (fun x => (h x).toEq))]
     (_root_.funext (fun x => (h x).toEq))
 
 /-- Pointwise extraction from a function path. -/
-def happly {f g : A → B} (p : Path f g) (x : A) :
+noncomputable def happly {f g : A → B} (p : Path f g) (x : A) :
     Path (f x) (g x) :=
   Path.congrArg (fun h => h x) p
 
@@ -207,13 +207,13 @@ theorem funext_trans {f g k : A → B}
   simp [funext]
 
 /-- Dependent function extensionality. -/
-def dfunext {C : A → Type v} {f g : ∀ x, C x}
+noncomputable def dfunext {C : A → Type v} {f g : ∀ x, C x}
     (h : ∀ x, Path (f x) (g x)) : Path f g :=
   Path.mk [Step.mk _ _ (_root_.funext (fun x => (h x).toEq))]
     (_root_.funext (fun x => (h x).toEq))
 
 /-- Pointwise extraction from dependent function path. -/
-def dhapply {C : A → Type v} {f g : ∀ x, C x}
+noncomputable def dhapply {C : A → Type v} {f g : ∀ x, C x}
     (p : Path f g) (x : A) : f x = g x :=
   congrFun p.toEq x
 
@@ -230,10 +230,10 @@ namespace PathUniversal
 variable {A : Type u} {a b : A}
 
 /-- The path space maps to Eq via toEq. -/
-def pathToEq : Path a b → (a = b) := Path.toEq
+noncomputable def pathToEq : Path a b → (a = b) := Path.toEq
 
 /-- Eq maps to path space via ofEq. -/
-def eqToPath : (a = b) → Path a b := fun h => Path.mk [Step.mk _ _ h] h
+noncomputable def eqToPath : (a = b) → Path a b := fun h => Path.mk [Step.mk _ _ h] h
 
 @[simp] theorem pathToEq_eqToPath (h : a = b) :
     pathToEq (eqToPath h) = h := rfl
@@ -295,17 +295,17 @@ theorem ext {p q : Pullback f g}
   cases p; cases q; simp at h₁ h₂; cases h₁; cases h₂; rfl
 
 /-- Projection to the first component. -/
-def pr₁ (p : Pullback f g) : A := p.fst
+noncomputable def pr₁ (p : Pullback f g) : A := p.fst
 
 /-- Projection to the second component. -/
-def pr₂ (p : Pullback f g) : B := p.snd
+noncomputable def pr₂ (p : Pullback f g) : B := p.snd
 
 /-- The pullback square commutes. -/
 theorem commutes (p : Pullback f g) : f (pr₁ p) = g (pr₂ p) :=
   p.comm
 
 /-- Universal property: any cone factors through the pullback. -/
-def universal {D : Type u}
+noncomputable def universal {D : Type u}
     (d₁ : D → A) (d₂ : D → B) (comm : ∀ x, f (d₁ x) = g (d₂ x))
     (x : D) : Pullback f g :=
   ⟨d₁ x, d₂ x, comm x⟩

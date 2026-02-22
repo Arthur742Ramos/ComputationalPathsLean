@@ -32,9 +32,9 @@ deriving DecidableEq, Repr
 
 namespace Iv
 
-def neg : Iv → Iv | .i0 => .i1 | .i1 => .i0
-def min : Iv → Iv → Iv | .i0, _ => .i0 | _, .i0 => .i0 | .i1, .i1 => .i1
-def max : Iv → Iv → Iv | .i1, _ => .i1 | _, .i1 => .i1 | .i0, .i0 => .i0
+noncomputable def neg : Iv → Iv | .i0 => .i1 | .i1 => .i0
+noncomputable def min : Iv → Iv → Iv | .i0, _ => .i0 | _, .i0 => .i0 | .i1, .i1 => .i1
+noncomputable def max : Iv → Iv → Iv | .i1, _ => .i1 | _, .i1 => .i1 | .i0, .i0 => .i0
 
 -- 1: involution
 theorem neg_neg (i : Iv) : i.neg.neg = i := by cases i <;> rfl
@@ -83,9 +83,9 @@ structure Line (A : Type u) where
   atI1 : A
   path  : Path atI0 atI1
 
-def Line.const (a : A) : Line A := ⟨a, a, Path.refl a⟩
-def Line.rev (l : Line A) : Line A := ⟨l.atI1, l.atI0, Path.symm l.path⟩
-def Line.eval (l : Line A) : Iv → A | .i0 => l.atI0 | .i1 => l.atI1
+noncomputable def Line.const (a : A) : Line A := ⟨a, a, Path.refl a⟩
+noncomputable def Line.rev (l : Line A) : Line A := ⟨l.atI1, l.atI0, Path.symm l.path⟩
+noncomputable def Line.eval (l : Line A) : Iv → A | .i0 => l.atI0 | .i1 => l.atI1
 
 -- 17: eval const
 theorem Line.eval_const (a : A) (i : Iv) : (Line.const a).eval i = a := by
@@ -104,16 +104,16 @@ structure Square {A : Type u} (a₀₀ a₀₁ a₁₀ a₁₁ : A) where
   right  : Path a₀₁ a₁₁
   coh    : Path.trans top right = Path.trans left bottom
 
-def Square.const (a : A) : Square a a a a :=
+noncomputable def Square.const (a : A) : Square a a a a :=
   ⟨Path.refl a, Path.refl a, Path.refl a, Path.refl a, rfl⟩
 
 /-! ## §4 Connections -/
 
-def connectionMin {a b : A} (p : Path a b) : Square a a a b where
+noncomputable def connectionMin {a b : A} (p : Path a b) : Square a a a b where
   top := Path.refl a; bottom := p; left := Path.refl a; right := p
   coh := by simp
 
-def connectionMax {a b : A} (p : Path a b) : Square a b b b where
+noncomputable def connectionMax {a b : A} (p : Path a b) : Square a b b b where
   top := p; bottom := Path.refl b; left := p; right := Path.refl b
   coh := by simp
 
@@ -137,7 +137,7 @@ theorem connectionMax_refl (a : A) :
 
 /-! ## §5 Square transpose -/
 
-def Square.transpose {a₀₀ a₀₁ a₁₀ a₁₁ : A}
+noncomputable def Square.transpose {a₀₀ a₀₁ a₁₀ a₁₁ : A}
     (s : Square a₀₀ a₀₁ a₁₀ a₁₁) : Square a₀₀ a₁₀ a₀₁ a₁₁ where
   top := s.left; bottom := s.right; left := s.top; right := s.bottom
   coh := s.coh.symm
@@ -154,11 +154,11 @@ theorem Square.transpose_const (a : A) :
 
 /-! ## §6 Degeneracy squares -/
 
-def horizDegen {a b : A} (p : Path a b) : Square a b a b where
+noncomputable def horizDegen {a b : A} (p : Path a b) : Square a b a b where
   top := p; bottom := p; left := Path.refl a; right := Path.refl b
   coh := by simp
 
-def vertDegen {a b : A} (p : Path a b) : Square a a b b where
+noncomputable def vertDegen {a b : A} (p : Path a b) : Square a a b b where
   top := Path.refl a; bottom := Path.refl b; left := p; right := p
   coh := by simp
 
@@ -177,7 +177,7 @@ theorem horizDegen_refl (a : A) : horizDegen (Path.refl a) = Square.const a := b
 
 /-! ## §7 Kan composition -/
 
-def kanComp {a b c : A} (p : Path a b) (q : Path a c) : Path b c :=
+noncomputable def kanComp {a b c : A} (p : Path a b) (q : Path a c) : Path b c :=
   Path.trans (Path.symm p) q
 
 -- 28: kanComp refl left
@@ -196,7 +196,7 @@ theorem kanComp_assoc {a b c d : A}
 
 /-! ## §8 Coercion / transport -/
 
-def coe' {a b : A} (P : A → Type v) (p : Path a b) (x : P a) : P b :=
+noncomputable def coe' {a b : A} (P : A → Type v) (p : Path a b) (x : P a) : P b :=
   Path.cast (D := P) p x
 
 -- 31: refl transport
@@ -286,17 +286,17 @@ structure GlueData (A : Type u) (B : Type v) where
   sec : ∀ b, fwd (bwd b) = b
   ret : ∀ a, bwd (fwd a) = a
 
-def GlueData.identity (A : Type u) : GlueData A A :=
+noncomputable def GlueData.identity (A : Type u) : GlueData A A :=
   ⟨_root_.id, _root_.id, fun _ => rfl, fun _ => rfl⟩
 
-def GlueData.inv (g : GlueData A B) : GlueData B A :=
+noncomputable def GlueData.inv (g : GlueData A B) : GlueData B A :=
   ⟨g.bwd, g.fwd, g.ret, g.sec⟩
 
 -- 44: inv involution
 theorem GlueData.inv_inv (g : GlueData A B) : g.inv.inv = g := by cases g; rfl
 
 -- 45: transport gives glue data
-def GlueData.ofPath {a b : A} (P : A → Type v) (p : Path a b) :
+noncomputable def GlueData.ofPath {a b : A} (P : A → Type v) (p : Path a b) :
     GlueData (P a) (P b) where
   fwd := coe' P p
   bwd := coe' P (Path.symm p)
@@ -309,7 +309,7 @@ theorem GlueData.ofPath_refl (P : A → Type v) (a : A) :
   simp [GlueData.ofPath, GlueData.identity]; constructor <;> rfl
 
 -- 47: GlueData composition
-def GlueData.comp (g₁ : GlueData A B) (g₂ : GlueData B C) : GlueData A C where
+noncomputable def GlueData.comp (g₁ : GlueData A B) (g₂ : GlueData B C) : GlueData A C where
   fwd := g₂.fwd ∘ g₁.fwd
   bwd := g₁.bwd ∘ g₂.bwd
   sec := fun c => by simp [Function.comp]; rw [g₁.sec]; exact g₂.sec c
@@ -332,7 +332,7 @@ structure IsContr (A : Type u) where
   contract : ∀ x, Path center x
 
 -- 50: Unit is contractible
-def unitContr : IsContr Unit := ⟨(), fun _ => Path.refl ()⟩
+noncomputable def unitContr : IsContr Unit := ⟨(), fun _ => Path.refl ()⟩
 
 -- 51: contractible implies path proofs equal
 theorem isContr_paths_eq (_hc : IsContr A) {a b : A} (p q : Path a b) :
@@ -344,10 +344,10 @@ theorem isContr_paths_eq (_hc : IsContr A) {a b : A} (p q : Path a b) :
 structure Htpy (f g : A → B) where
   at_ : ∀ x : A, Path (f x) (g x)
 
-def Htpy.rfl' (f : A → B) : Htpy f f := ⟨fun x => Path.refl (f x)⟩
-def Htpy.inv' {f g : A → B} (H : Htpy f g) : Htpy g f :=
+noncomputable def Htpy.rfl' (f : A → B) : Htpy f f := ⟨fun x => Path.refl (f x)⟩
+noncomputable def Htpy.inv' {f g : A → B} (H : Htpy f g) : Htpy g f :=
   ⟨fun x => Path.symm (H.at_ x)⟩
-def Htpy.comp' {f g h : A → B} (H₁ : Htpy f g) (H₂ : Htpy g h) : Htpy f h :=
+noncomputable def Htpy.comp' {f g h : A → B} (H₁ : Htpy f g) (H₂ : Htpy g h) : Htpy f h :=
   ⟨fun x => Path.trans (H₁.at_ x) (H₂.at_ x)⟩
 
 -- 52: left unit
@@ -369,7 +369,7 @@ theorem Htpy.comp_assoc {f g h k : A → B}
 
 /-! ## §13 happly -/
 
-def happly {f g : A → B} (p : Path f g) : Htpy f g :=
+noncomputable def happly {f g : A → B} (p : Path f g) : Htpy f g :=
   ⟨fun x => Path.mk (p.steps.map (Step.map (· x))) (congrFun p.proof x)⟩
 
 -- 55: happly refl
@@ -379,7 +379,7 @@ theorem happly_refl (f : A → B) :
 
 /-! ## §14 Dependent Kan filling -/
 
-def depKanFill {a b : A} (P : A → Type v) (p : Path a b) (u : P a) : P b :=
+noncomputable def depKanFill {a b : A} (P : A → Type v) (p : Path a b) (u : P a) : P b :=
   coe' P p u
 
 -- 56: refl filling
@@ -408,7 +408,7 @@ structure CompStr (A : Type u) where
     comp (comp p q) r = comp p (comp q r)
 
 -- 59: standard composition structure
-def stdCompStr : CompStr A :=
+noncomputable def stdCompStr : CompStr A :=
   ⟨Path.trans, Path.trans_refl_left, Path.trans_refl_right, Path.trans_assoc⟩
 
 -- 60: std comp is trans
@@ -423,7 +423,7 @@ structure Cube2 (A : Type u) where
   side0 : Path line0.atI0 line1.atI0
   side1 : Path line0.atI1 line1.atI1
 
-def Cube2.degen (l : Line A) : Cube2 A :=
+noncomputable def Cube2.degen (l : Line A) : Cube2 A :=
   ⟨l, l, Path.refl l.atI0, Path.refl l.atI1⟩
 
 -- 61: degen side0
@@ -436,7 +436,7 @@ theorem Cube2.degen_side1 (l : Line A) :
 
 /-! ## §17 Dependent action on paths (apd) -/
 
-def apd {P : A → Type v} (f : ∀ x : A, P x) {a b : A} (p : Path a b) :
+noncomputable def apd {P : A → Type v} (f : ∀ x : A, P x) {a b : A} (p : Path a b) :
     PathOver P p (f a) (f b) := by
   constructor
   cases p with | mk s pr => cases pr; rfl
@@ -447,7 +447,7 @@ theorem apd_refl {P : A → Type v} (f : ∀ x : A, P x) (a : A) :
 
 /-! ## §18 Line functoriality -/
 
-def Line.map (f : A → B) (l : Line A) : Line B where
+noncomputable def Line.map (f : A → B) (l : Line A) : Line B where
   atI0 := f l.atI0
   atI1 := f l.atI1
   path := Path.mk (l.path.steps.map (Step.map f)) (_root_.congrArg f l.path.proof)
@@ -478,7 +478,7 @@ theorem Square.const_coh (a : A) : (Square.const a).coh = rfl := by
 
 /-! ## §20 Kan transport = trans -/
 
-def kanTransp {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
+noncomputable def kanTransp {a b c : A} (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
 -- 69: kanTransp is trans

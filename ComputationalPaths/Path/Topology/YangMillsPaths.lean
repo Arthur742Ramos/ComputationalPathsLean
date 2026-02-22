@@ -57,7 +57,7 @@ structure LieGroup where
   rank          : Nat
 
 /-- Adjoint representation: G → Aut(g). -/
-def LieGroup.adjoint (G : LieGroup) : G.carrier → G.lieAlgebra → G.lieAlgebra :=
+noncomputable def LieGroup.adjoint (G : LieGroup) : G.carrier → G.lieAlgebra → G.lieAlgebra :=
   fun _ v => v   -- abstract placeholder
 
 /-- Lie bracket on the Lie algebra. -/
@@ -92,7 +92,7 @@ structure AssociatedBundle (G : LieGroup) (P : PrincipalBundle G) where
   assoc      : True
 
 /-- Adjoint bundle: P ×_Ad g. -/
-def adjointBundle (G : LieGroup) (P : PrincipalBundle G) :
+noncomputable def adjointBundle (G : LieGroup) (P : PrincipalBundle G) :
     AssociatedBundle G P where
   fiber    := G.lieAlgebra
   fiberDim := G.dim
@@ -108,7 +108,7 @@ structure Connection (G : LieGroup) (P : PrincipalBundle G) where
   normalised   : True
 
 /-- The affine space of connections: any two differ by a g-valued 1-form. -/
-def connectionDifference {G : LieGroup} {P : PrincipalBundle G}
+noncomputable def connectionDifference {G : LieGroup} {P : PrincipalBundle G}
     (_A _B : Connection G P) : P.base → G.lieAlgebra :=
   fun x => _A.form x  -- placeholder
 
@@ -138,13 +138,13 @@ structure GaugeTransformation (G : LieGroup) (P : PrincipalBundle G) where
   smooth    : True
 
 /-- Gauge group structure. -/
-def gaugeGroupMul {G : LieGroup} {P : PrincipalBundle G}
+noncomputable def gaugeGroupMul {G : LieGroup} {P : PrincipalBundle G}
     (g₁ g₂ : GaugeTransformation G P) : GaugeTransformation G P where
   gaugeFn := fun x => G.mul (g₁.gaugeFn x) (g₂.gaugeFn x)
   smooth  := trivial
 
 /-- Gauge action on connections: g · A = gAg⁻¹ + g dg⁻¹. -/
-def gaugeAct {G : LieGroup} {P : PrincipalBundle G}
+noncomputable def gaugeAct {G : LieGroup} {P : PrincipalBundle G}
     (_g : GaugeTransformation G P) (A : Connection G P) :
     Connection G P where
   form        := A.form   -- abstract
@@ -165,13 +165,13 @@ structure HodgeStar (G : LieGroup) (P : PrincipalBundle G) where
   baseDim_four : P.baseDim = 4
 
 /-- Self-dual component F⁺ = ½(F + *F). -/
-def selfDualPart {G : LieGroup} {P : PrincipalBundle G}
+noncomputable def selfDualPart {G : LieGroup} {P : PrincipalBundle G}
     (hs : HodgeStar G P) (F : P.base → G.lieAlgebra) :
     P.base → G.lieAlgebra :=
   fun x => F x   -- placeholder
 
 /-- Anti-self-dual component F⁻ = ½(F − *F). -/
-def antiSelfDualPart {G : LieGroup} {P : PrincipalBundle G}
+noncomputable def antiSelfDualPart {G : LieGroup} {P : PrincipalBundle G}
     (hs : HodgeStar G P) (F : P.base → G.lieAlgebra) :
     P.base → G.lieAlgebra :=
   fun x => F x   -- placeholder
@@ -261,7 +261,7 @@ structure DeformationComplex (G : LieGroup) (P : PrincipalBundle G)
   h2   : Nat    -- cokernel (obstruction)
 
 /-- Atiyah-Singer index of the deformation complex. -/
-def deformationIndex {G : LieGroup} {P : PrincipalBundle G}
+noncomputable def deformationIndex {G : LieGroup} {P : PrincipalBundle G}
     {A : Connection G P} (D : DeformationComplex G P A) : Int :=
   (D.h1 : Int) - (D.h0 : Int) - (D.h2 : Int)
 
@@ -448,18 +448,18 @@ section GaugeRewrite
 
 variable {G : LieGroup} {P : PrincipalBundle G}
 
-def gaugeRewriteStep (x y : Connection G P)
+noncomputable def gaugeRewriteStep (x y : Connection G P)
     (h : x = y) : Step (Connection G P) :=
   Step.mk x y h
 
-def gaugePathWitness (x y : Connection G P)
+noncomputable def gaugePathWitness (x y : Connection G P)
     (h : x = y) : Path x y :=
   Path.stepChain h
 
-def gaugeRewrite {x y : Connection G P} (p q : Path x y) : Prop :=
+noncomputable def gaugeRewrite {x y : Connection G P} (p q : Path x y) : Prop :=
   ∃ r : Path y y, q = Path.trans p r
 
-def gaugeRewriteConfluent : Prop :=
+noncomputable def gaugeRewriteConfluent : Prop :=
   ∀ {x y : Connection G P} (p q₁ q₂ : Path x y),
     gaugeRewrite p q₁ →
     gaugeRewrite p q₂ →

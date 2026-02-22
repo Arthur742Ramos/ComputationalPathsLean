@@ -119,19 +119,19 @@ inductive DTTPath : DTTExpr → DTTExpr → Type where
 
 namespace DTTPath
 
-def trans : DTTPath a b → DTTPath b c → DTTPath a c
+noncomputable def trans : DTTPath a b → DTTPath b c → DTTPath a c
   | .nil, q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def symm : DTTPath a b → DTTPath b a
+noncomputable def symm : DTTPath a b → DTTPath b a
   | .nil => .nil
   | .cons s p => p.symm.trans (.cons (.symm s) .nil)
 
-def congrArg (f : DTTExpr → DTTExpr) : DTTPath a b → DTTPath (f a) (f b)
+noncomputable def congrArg (f : DTTExpr → DTTExpr) : DTTPath a b → DTTPath (f a) (f b)
   | .nil => .nil
   | .cons s p => .cons (.congrArg f s) (congrArg f p)
 
-def length : DTTPath a b → Nat
+noncomputable def length : DTTPath a b → Nat
   | .nil => 0
   | .cons _ p => 1 + p.length
 
@@ -140,55 +140,55 @@ def length : DTTPath a b → Nat
 -- ============================================================================
 
 -- 1. Projection of pair extracts first component
-def sigma_fst_beta (a b : DTTExpr) :
+noncomputable def sigma_fst_beta (a b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair a b)) a :=
   .cons .sigmaFstBeta .nil
 
 -- 2. Projection of pair extracts second component
-def sigma_snd_beta (a b : DTTExpr) :
+noncomputable def sigma_snd_beta (a b : DTTExpr) :
     DTTPath (DTTExpr.snd (DTTExpr.pair a b)) b :=
   .cons .sigmaSndBeta .nil
 
 -- 3. Eta rule for sigma types
-def sigma_eta (p : DTTExpr) :
+noncomputable def sigma_eta (p : DTTExpr) :
     DTTPath (DTTExpr.pair (DTTExpr.fst p) (DTTExpr.snd p)) p :=
   .cons .sigmaEta .nil
 
 -- 4. Fst of pair then re-pair with snd
-def sigma_fst_snd_roundtrip (a b : DTTExpr) :
+noncomputable def sigma_fst_snd_roundtrip (a b : DTTExpr) :
     DTTPath (DTTExpr.pair (DTTExpr.fst (DTTExpr.pair a b)) (DTTExpr.snd (DTTExpr.pair a b)))
             (DTTExpr.pair a b) :=
   .cons (.sigmaPairCong .sigmaFstBeta .sigmaSndBeta) .nil
 
 -- 5. Fst-snd roundtrip then eta
-def sigma_fst_snd_eta (a b : DTTExpr) :
+noncomputable def sigma_fst_snd_eta (a b : DTTExpr) :
     DTTPath (DTTExpr.pair (DTTExpr.fst (DTTExpr.pair a b)) (DTTExpr.snd (DTTExpr.pair a b)))
             (DTTExpr.pair a b) :=
   (sigma_fst_snd_roundtrip a b)
 
 -- 6. Congruence of fst
-def sigma_fst_cong (p q : DTTExpr) (s : DTTStep p q) :
+noncomputable def sigma_fst_cong (p q : DTTExpr) (s : DTTStep p q) :
     DTTPath (DTTExpr.fst p) (DTTExpr.fst q) :=
   .cons (.sigmaFstCong s) .nil
 
 -- 7. Congruence of snd
-def sigma_snd_cong (p q : DTTExpr) (s : DTTStep p q) :
+noncomputable def sigma_snd_cong (p q : DTTExpr) (s : DTTStep p q) :
     DTTPath (DTTExpr.snd p) (DTTExpr.snd q) :=
   .cons (.sigmaSndCong s) .nil
 
 -- 8. Double pair projection chain
-def sigma_double_fst (a b c _d : DTTExpr) :
+noncomputable def sigma_double_fst (a b c _d : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.fst (DTTExpr.pair a b)) c)) (DTTExpr.fst (DTTExpr.pair a c)) :=
   .cons (.sigmaFstCong (.sigmaPairCong .sigmaFstBeta (.refl c))) .nil
 
 -- 9. Nested pair fst-fst extraction
-def sigma_nested_fst (a b c : DTTExpr) :
+noncomputable def sigma_nested_fst (a b c : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.fst (DTTExpr.pair (DTTExpr.pair a b) c)))
             (DTTExpr.fst (DTTExpr.pair a b)) :=
   .cons (.sigmaFstCong .sigmaFstBeta) .nil
 
 -- 10. Nested pair full extraction
-def sigma_nested_extract (a b c : DTTExpr) :
+noncomputable def sigma_nested_extract (a b c : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.fst (DTTExpr.pair (DTTExpr.pair a b) c))) a :=
   (sigma_nested_fst a b c).trans (sigma_fst_beta a b)
 
@@ -197,30 +197,30 @@ def sigma_nested_extract (a b c : DTTExpr) :
 -- ============================================================================
 
 -- 11. Eta for functions
-def pi_eta (f : DTTExpr) :
+noncomputable def pi_eta (f : DTTExpr) :
     DTTPath (DTTExpr.lam (DTTExpr.app f (DTTExpr.var 0))) f :=
   .cons .piEta .nil
 
 -- 12. Function extensionality
-def pi_funext (f g : DTTExpr) (a : DTTExpr) (x : DTTExpr)
+noncomputable def pi_funext (f g : DTTExpr) (a : DTTExpr) (x : DTTExpr)
     (h : DTTStep (DTTExpr.app f x) (DTTExpr.app g x)) :
     DTTPath (DTTExpr.pi a (DTTExpr.app f (DTTExpr.var 0)))
             (DTTExpr.pi a (DTTExpr.app g (DTTExpr.var 0))) :=
   .cons (.funext h) .nil
 
 -- 13. Application congruence
-def pi_app_cong (f g a b : DTTExpr) (sf : DTTStep f g) (sa : DTTStep a b) :
+noncomputable def pi_app_cong (f g a b : DTTExpr) (sf : DTTStep f g) (sa : DTTStep a b) :
     DTTPath (DTTExpr.app f a) (DTTExpr.app g b) :=
   .cons (.appCong sf sa) .nil
 
 -- 14. Eta then apply
-def pi_eta_app (f : DTTExpr) (x : DTTExpr) :
+noncomputable def pi_eta_app (f : DTTExpr) (x : DTTExpr) :
     DTTPath (DTTExpr.app (DTTExpr.lam (DTTExpr.app f (DTTExpr.var 0))) x)
             (DTTExpr.app f x) :=
   .cons (.appCong .piEta (.refl x)) .nil
 
 -- 15. Double eta
-def pi_double_eta (f : DTTExpr) :
+noncomputable def pi_double_eta (f : DTTExpr) :
     DTTPath (DTTExpr.lam (DTTExpr.app (DTTExpr.lam (DTTExpr.app f (DTTExpr.var 0))) (DTTExpr.var 0))) f :=
   .cons (.congrArg DTTExpr.lam (.appCong .piEta (.refl (DTTExpr.var 0))))
   (.cons .piEta .nil)
@@ -230,24 +230,24 @@ def pi_double_eta (f : DTTExpr) :
 -- ============================================================================
 
 -- 16. W-type beta reduction
-def w_beta (a f g : DTTExpr) :
+noncomputable def w_beta (a f g : DTTExpr) :
     DTTPath (DTTExpr.wrec (DTTExpr.wsup a f) g)
             (DTTExpr.app (DTTExpr.app g a)
               (DTTExpr.lam (DTTExpr.wrec (DTTExpr.app f (DTTExpr.var 0)) g))) :=
   .cons .wBeta .nil
 
 -- 17. W-sup congruence
-def w_sup_cong (a a' f f' : DTTExpr) (sa : DTTStep a a') (sf : DTTStep f f') :
+noncomputable def w_sup_cong (a a' f f' : DTTExpr) (sa : DTTStep a a') (sf : DTTStep f f') :
     DTTPath (DTTExpr.wsup a f) (DTTExpr.wsup a' f') :=
   .cons (.wsupCong sa sf) .nil
 
 -- 18. W-rec congruence
-def w_rec_cong (w w' g g' : DTTExpr) (sw : DTTStep w w') (sg : DTTStep g g') :
+noncomputable def w_rec_cong (w w' g g' : DTTExpr) (sw : DTTStep w w') (sg : DTTStep g g') :
     DTTPath (DTTExpr.wrec w g) (DTTExpr.wrec w' g') :=
   .cons (.wrecCong sw sg) .nil
 
 -- 19. W-rec with congruent sup
-def w_rec_sup_cong (a a' f f' g : DTTExpr) (sa : DTTStep a a') (sf : DTTStep f f') :
+noncomputable def w_rec_sup_cong (a a' f f' g : DTTExpr) (sa : DTTStep a a') (sf : DTTStep f f') :
     DTTPath (DTTExpr.wrec (DTTExpr.wsup a f) g)
             (DTTExpr.wrec (DTTExpr.wsup a' f') g) :=
   .cons (.wrecCong (.wsupCong sa sf) (.refl g)) .nil
@@ -257,48 +257,48 @@ def w_rec_sup_cong (a a' f f' g : DTTExpr) (sa : DTTStep a a') (sf : DTTStep f f
 -- ============================================================================
 
 -- 20. Universe cumulativity
-def univ_cumul (n : Nat) :
+noncomputable def univ_cumul (n : Nat) :
     DTTPath (DTTExpr.univ n) (DTTExpr.univ (n + 1)) :=
   .cons .univCumul .nil
 
 -- 21. Two-level cumulativity
-def univ_cumul_two (n : Nat) :
+noncomputable def univ_cumul_two (n : Nat) :
     DTTPath (DTTExpr.univ n) (DTTExpr.univ (n + 2)) :=
   (univ_cumul n).trans (univ_cumul (n + 1))
 
 -- 22. Three-level cumulativity
-def univ_cumul_three (n : Nat) :
+noncomputable def univ_cumul_three (n : Nat) :
     DTTPath (DTTExpr.univ n) (DTTExpr.univ (n + 3)) :=
   (univ_cumul_two n).trans (univ_cumul (n + 2))
 
 -- 23. Lift-lower roundtrip
-def univ_lift_lower (a : DTTExpr) :
+noncomputable def univ_lift_lower (a : DTTExpr) :
     DTTPath (DTTExpr.lower (DTTExpr.lift a)) a :=
   .cons .liftLower .nil
 
 -- 24. Lower-lift embedding
-def univ_lower_lift (a : DTTExpr) :
+noncomputable def univ_lower_lift (a : DTTExpr) :
     DTTPath a (DTTExpr.lower (DTTExpr.lift a)) :=
   .cons .lowerLift .nil
 
 -- 25. Lift-lower-lift cycle
-def univ_lift_lower_lift (a : DTTExpr) :
+noncomputable def univ_lift_lower_lift (a : DTTExpr) :
     DTTPath (DTTExpr.lift (DTTExpr.lower (DTTExpr.lift a))) (DTTExpr.lift a) :=
   .cons (.liftCong .liftLower) .nil
 
 -- 26. Double lift-lower
-def univ_double_lift_lower (a : DTTExpr) :
+noncomputable def univ_double_lift_lower (a : DTTExpr) :
     DTTPath (DTTExpr.lower (DTTExpr.lift (DTTExpr.lower (DTTExpr.lift a)))) a :=
   .cons (.lowerCong (.liftCong .liftLower))
   (.cons .liftLower .nil)
 
 -- 27. Large elimination of nat
-def large_elim_nat :
+noncomputable def large_elim_nat :
     DTTPath (DTTExpr.largeElim DTTExpr.nat) (DTTExpr.univ 0) :=
   .cons .largeElimNat .nil
 
 -- 28. Large elimination then cumulativity
-def large_elim_nat_cumul :
+noncomputable def large_elim_nat_cumul :
     DTTPath (DTTExpr.largeElim DTTExpr.nat) (DTTExpr.univ 1) :=
   large_elim_nat.trans (univ_cumul 0)
 
@@ -307,72 +307,72 @@ def large_elim_nat_cumul :
 -- ============================================================================
 
 -- 29. Church zero representation
-def church_zero_repr :
+noncomputable def church_zero_repr :
     DTTPath (DTTExpr.churchNat 0) (DTTExpr.lam (DTTExpr.lam (DTTExpr.var 0))) :=
   .cons .churchZeroEq .nil
 
 -- 30. Church successor
-def church_succ_zero :
+noncomputable def church_succ_zero :
     DTTPath (DTTExpr.app DTTExpr.churchSucc (DTTExpr.churchNat 0))
             (DTTExpr.churchNat 1) :=
   .cons .churchSuccStep .nil
 
 -- 31. Church successor of successor
-def church_succ_one :
+noncomputable def church_succ_one :
     DTTPath (DTTExpr.app DTTExpr.churchSucc (DTTExpr.churchNat 1))
             (DTTExpr.churchNat 2) :=
   .cons .churchSuccStep .nil
 
 -- 32. Double successor
-def church_double_succ :
+noncomputable def church_double_succ :
     DTTPath (DTTExpr.app DTTExpr.churchSucc (DTTExpr.app DTTExpr.churchSucc (DTTExpr.churchNat 0)))
             (DTTExpr.churchNat 2) :=
   .cons (.congrArg (DTTExpr.app DTTExpr.churchSucc) .churchSuccStep)
   (.cons .churchSuccStep .nil)
 
 -- 33. Church plus zero left identity
-def church_plus_zero_left (m : DTTExpr) :
+noncomputable def church_plus_zero_left (m : DTTExpr) :
     DTTPath (DTTExpr.churchPlus (DTTExpr.churchNat 0) m) m :=
   .cons .churchPlusZero .nil
 
 -- 34. Church plus one
-def church_plus_one (m : DTTExpr) :
+noncomputable def church_plus_one (m : DTTExpr) :
     DTTPath (DTTExpr.churchPlus (DTTExpr.churchNat 1) m)
             (DTTExpr.app DTTExpr.churchSucc (DTTExpr.churchPlus (DTTExpr.churchNat 0) m)) :=
   .cons .churchPlusSucc .nil
 
 -- 35. Church plus one simplifies
-def church_plus_one_simp (m : DTTExpr) :
+noncomputable def church_plus_one_simp (m : DTTExpr) :
     DTTPath (DTTExpr.churchPlus (DTTExpr.churchNat 1) m)
             (DTTExpr.app DTTExpr.churchSucc m) :=
   (church_plus_one m).trans
     (.cons (.congrArg (DTTExpr.app DTTExpr.churchSucc) .churchPlusZero) .nil)
 
 -- 36. Church mult zero left
-def church_mult_zero_left (m : DTTExpr) :
+noncomputable def church_mult_zero_left (m : DTTExpr) :
     DTTPath (DTTExpr.churchMult (DTTExpr.churchNat 0) m) (DTTExpr.churchNat 0) :=
   .cons .churchMultZero .nil
 
 -- 37. Church mult one
-def church_mult_one_step (m : DTTExpr) :
+noncomputable def church_mult_one_step (m : DTTExpr) :
     DTTPath (DTTExpr.churchMult (DTTExpr.churchNat 1) m)
             (DTTExpr.churchPlus m (DTTExpr.churchMult (DTTExpr.churchNat 0) m)) :=
   .cons .churchMultSucc .nil
 
 -- 38. Church mult one simplifies
-def church_mult_one_simp (m : DTTExpr) :
+noncomputable def church_mult_one_simp (m : DTTExpr) :
     DTTPath (DTTExpr.churchMult (DTTExpr.churchNat 1) m)
             (DTTExpr.churchPlus m (DTTExpr.churchNat 0)) :=
   (church_mult_one_step m).trans
     (.cons (.churchPlusCong (.refl m) .churchMultZero) .nil)
 
 -- 39. Church plus congruence
-def church_plus_cong_path (a a' b b' : DTTExpr) (sa : DTTStep a a') (sb : DTTStep b b') :
+noncomputable def church_plus_cong_path (a a' b b' : DTTExpr) (sa : DTTStep a a') (sb : DTTStep b b') :
     DTTPath (DTTExpr.churchPlus a b) (DTTExpr.churchPlus a' b') :=
   .cons (.churchPlusCong sa sb) .nil
 
 -- 40. Church mult two
-def church_mult_two_step (m : DTTExpr) :
+noncomputable def church_mult_two_step (m : DTTExpr) :
     DTTPath (DTTExpr.churchMult (DTTExpr.churchNat 2) m)
             (DTTExpr.churchPlus m (DTTExpr.churchMult (DTTExpr.churchNat 1) m)) :=
   .cons .churchMultSucc .nil
@@ -382,55 +382,55 @@ def church_mult_two_step (m : DTTExpr) :
 -- ============================================================================
 
 -- 41. Polymorphic identity applied to type
-def poly_id_app (ty : DTTExpr) :
+noncomputable def poly_id_app (ty : DTTExpr) :
     DTTPath (DTTExpr.tyApp DTTExpr.polyId ty) (DTTExpr.lam (DTTExpr.var 0)) :=
   .cons .polyIdApp .nil
 
 -- 42. Polymorphic composition is associative
-def poly_comp_assoc (f g h : DTTExpr) :
+noncomputable def poly_comp_assoc (f g h : DTTExpr) :
     DTTPath (DTTExpr.polyComp (DTTExpr.polyComp f g) h)
             (DTTExpr.polyComp f (DTTExpr.polyComp g h)) :=
   .cons .polyCompAssoc .nil
 
 -- 43. Left identity of composition
-def poly_comp_id_left (f : DTTExpr) :
+noncomputable def poly_comp_id_left (f : DTTExpr) :
     DTTPath (DTTExpr.polyComp DTTExpr.polyId f) f :=
   .cons .polyCompId .nil
 
 -- 44. Right identity of composition
-def poly_id_comp_right (f : DTTExpr) :
+noncomputable def poly_id_comp_right (f : DTTExpr) :
     DTTPath (DTTExpr.polyComp f DTTExpr.polyId) f :=
   .cons .polyIdComp .nil
 
 -- 45. Double identity composition
-def poly_double_id :
+noncomputable def poly_double_id :
     DTTPath (DTTExpr.polyComp DTTExpr.polyId DTTExpr.polyId) DTTExpr.polyId :=
   .cons .polyCompId .nil
 
 -- 46. Composition with identity on both sides
-def poly_id_sandwich (f : DTTExpr) :
+noncomputable def poly_id_sandwich (f : DTTExpr) :
     DTTPath (DTTExpr.polyComp DTTExpr.polyId (DTTExpr.polyComp f DTTExpr.polyId)) f :=
   .cons .polyCompId
   (.cons .polyIdComp .nil)
 
 -- 47. Triple composition rebracketing
-def poly_comp_rebracket (f g h : DTTExpr) :
+noncomputable def poly_comp_rebracket (f g h : DTTExpr) :
     DTTPath (DTTExpr.polyComp (DTTExpr.polyComp f g) h)
             (DTTExpr.polyComp f (DTTExpr.polyComp g h)) :=
   .cons .polyCompAssoc .nil
 
 -- 48. Composition congruence
-def poly_comp_cong_path (f f' g g' : DTTExpr) (sf : DTTStep f f') (sg : DTTStep g g') :
+noncomputable def poly_comp_cong_path (f f' g g' : DTTExpr) (sf : DTTStep f f') (sg : DTTStep g g') :
     DTTPath (DTTExpr.polyComp f g) (DTTExpr.polyComp f' g') :=
   .cons (.polyCompCong sf sg) .nil
 
 -- 49. Type application congruence
-def ty_app_cong_path (f g a b : DTTExpr) (sf : DTTStep f g) (sa : DTTStep a b) :
+noncomputable def ty_app_cong_path (f g a b : DTTExpr) (sf : DTTStep f g) (sa : DTTStep a b) :
     DTTPath (DTTExpr.tyApp f a) (DTTExpr.tyApp g b) :=
   .cons (.tyAppCong sf sa) .nil
 
 -- 50. Forall congruence
-def forall_cong_path (a b : DTTExpr) (s : DTTStep a b) :
+noncomputable def forall_cong_path (a b : DTTExpr) (s : DTTStep a b) :
     DTTPath (DTTExpr.forallTy a) (DTTExpr.forallTy b) :=
   .cons (.forallCong s) .nil
 
@@ -439,18 +439,18 @@ def forall_cong_path (a b : DTTExpr) (s : DTTStep a b) :
 -- ============================================================================
 
 -- 51. IndRec beta
-def ind_rec_beta (a b c : DTTExpr) :
+noncomputable def ind_rec_beta (a b c : DTTExpr) :
     DTTPath (DTTExpr.indRec a b c) (DTTExpr.app (DTTExpr.app a b) c) :=
   .cons .indRecBeta .nil
 
 -- 52. IndRec congruence
-def ind_rec_cong_path (a a' b b' c c' : DTTExpr)
+noncomputable def ind_rec_cong_path (a a' b b' c c' : DTTExpr)
     (sa : DTTStep a a') (sb : DTTStep b b') (sc : DTTStep c c') :
     DTTPath (DTTExpr.indRec a b c) (DTTExpr.indRec a' b' c') :=
   .cons (.indRecCong sa sb sc) .nil
 
 -- 53. IndRec with identity function
-def ind_rec_id (b c : DTTExpr) :
+noncomputable def ind_rec_id (b c : DTTExpr) :
     DTTPath (DTTExpr.indRec (DTTExpr.lam (DTTExpr.var 0)) b c)
             (DTTExpr.app (DTTExpr.app (DTTExpr.lam (DTTExpr.var 0)) b) c) :=
   .cons .indRecBeta .nil
@@ -460,71 +460,71 @@ def ind_rec_id (b c : DTTExpr) :
 -- ============================================================================
 
 -- 54. Sigma projection in universe context
-def sigma_fst_universe (n : Nat) (b : DTTExpr) :
+noncomputable def sigma_fst_universe (n : Nat) (b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.univ n) b)) (DTTExpr.univ n) :=
   sigma_fst_beta (DTTExpr.univ n) b
 
 -- 55. Sigma projection then cumulativity
-def sigma_fst_univ_cumul (n : Nat) (b : DTTExpr) :
+noncomputable def sigma_fst_univ_cumul (n : Nat) (b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.univ n) b)) (DTTExpr.univ (n+1)) :=
   (sigma_fst_universe n b).trans (univ_cumul n)
 
 -- 56. Church numeral in sigma pair
-def sigma_church_fst (n : Nat) (b : DTTExpr) :
+noncomputable def sigma_church_fst (n : Nat) (b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.churchNat n) b)) (DTTExpr.churchNat n) :=
   sigma_fst_beta (DTTExpr.churchNat n) b
 
 -- 57. Poly id applied in sigma context
-def sigma_poly_id (ty b : DTTExpr) :
+noncomputable def sigma_poly_id (ty b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.tyApp DTTExpr.polyId ty) b))
             (DTTExpr.lam (DTTExpr.var 0)) :=
   (sigma_fst_beta _ b).trans (poly_id_app ty)
 
 -- 58. Function applied to fst of pair
-def app_fst_pair (f a b : DTTExpr) :
+noncomputable def app_fst_pair (f a b : DTTExpr) :
     DTTPath (DTTExpr.app f (DTTExpr.fst (DTTExpr.pair a b)))
             (DTTExpr.app f a) :=
   .cons (.appCong (.refl f) .sigmaFstBeta) .nil
 
 -- 59. Lift of church numeral roundtrip
-def lift_church_roundtrip (n : Nat) :
+noncomputable def lift_church_roundtrip (n : Nat) :
     DTTPath (DTTExpr.lower (DTTExpr.lift (DTTExpr.churchNat n))) (DTTExpr.churchNat n) :=
   univ_lift_lower (DTTExpr.churchNat n)
 
 -- 60. Sigma pair of lifted values
-def sigma_lift_pair (a b : DTTExpr) :
+noncomputable def sigma_lift_pair (a b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.lower (DTTExpr.lift a)) b)) a :=
   (sigma_fst_beta _ b).trans (univ_lift_lower a)
 
 -- 61. Composition in sigma fst
-def sigma_fst_comp (f _g b : DTTExpr) :
+noncomputable def sigma_fst_comp (f _g b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.polyComp DTTExpr.polyId f) b)) f :=
   (sigma_fst_beta _ b).trans (poly_comp_id_left f)
 
 -- 62. W-type in sigma context
-def sigma_wrec_fst (w g b : DTTExpr) :
+noncomputable def sigma_wrec_fst (w g b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.wrec w g) b)) (DTTExpr.wrec w g) :=
   sigma_fst_beta _ b
 
 -- 63. Large elimination in sigma
-def sigma_large_elim_fst (b : DTTExpr) :
+noncomputable def sigma_large_elim_fst (b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.largeElim DTTExpr.nat) b)) (DTTExpr.univ 0) :=
   (sigma_fst_beta _ b).trans large_elim_nat
 
 -- 64. Church plus in poly comp context
-def church_plus_zero_in_comp (m : DTTExpr) :
+noncomputable def church_plus_zero_in_comp (m : DTTExpr) :
     DTTPath (DTTExpr.polyComp (DTTExpr.churchPlus (DTTExpr.churchNat 0) m) DTTExpr.polyId)
             m :=
   .cons (.polyCompCong .churchPlusZero (.refl DTTExpr.polyId))
   (.cons .polyIdComp .nil)
 
 -- 65. Triple universe lift-lower-lift
-def triple_univ_round (a : DTTExpr) :
+noncomputable def triple_univ_round (a : DTTExpr) :
     DTTPath (DTTExpr.lower (DTTExpr.lift (DTTExpr.lower (DTTExpr.lift a)))) a :=
   univ_double_lift_lower a
 
 -- 66. Church succ then plus zero
-def church_succ_then_plus_zero :
+noncomputable def church_succ_then_plus_zero :
     DTTPath (DTTExpr.churchPlus (DTTExpr.churchNat 0)
               (DTTExpr.app DTTExpr.churchSucc (DTTExpr.churchNat 0)))
             (DTTExpr.churchNat 1) :=
@@ -532,31 +532,31 @@ def church_succ_then_plus_zero :
   (.cons .churchSuccStep .nil)
 
 -- 67. Nested sigma projections
-def sigma_nested_snd_fst (a b c : DTTExpr) :
+noncomputable def sigma_nested_snd_fst (a b c : DTTExpr) :
     DTTPath (DTTExpr.snd (DTTExpr.pair a (DTTExpr.fst (DTTExpr.pair b c)))) b :=
   .cons .sigmaSndBeta
   (.cons .sigmaFstBeta .nil)
 
 -- 68. Eta then fst
-def eta_fst_combine (f a b : DTTExpr) :
+noncomputable def eta_fst_combine (f a b : DTTExpr) :
     DTTPath (DTTExpr.app (DTTExpr.lam (DTTExpr.app f (DTTExpr.var 0)))
               (DTTExpr.fst (DTTExpr.pair a b)))
             (DTTExpr.app f a) :=
   .cons (.appCong .piEta .sigmaFstBeta) .nil
 
 -- 69. Multi-level universe with large elimination
-def large_elim_three_cumul :
+noncomputable def large_elim_three_cumul :
     DTTPath (DTTExpr.largeElim DTTExpr.nat) (DTTExpr.univ 3) :=
   large_elim_nat.trans (univ_cumul_three 0)
 
 -- 70. Church mult then sigma projection
-def church_mult_sigma (m b : DTTExpr) :
+noncomputable def church_mult_sigma (m b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair (DTTExpr.churchMult (DTTExpr.churchNat 0) m) b))
             (DTTExpr.churchNat 0) :=
   (sigma_fst_beta _ b).trans (church_mult_zero_left m)
 
 -- 71. Five-step combined path
-def five_step_combined (m b : DTTExpr) :
+noncomputable def five_step_combined (m b : DTTExpr) :
     DTTPath (DTTExpr.fst (DTTExpr.pair
               (DTTExpr.polyComp DTTExpr.polyId
                 (DTTExpr.polyComp (DTTExpr.churchPlus (DTTExpr.churchNat 0) m) DTTExpr.polyId))
@@ -568,18 +568,18 @@ def five_step_combined (m b : DTTExpr) :
     (.cons .churchPlusZero .nil)))
 
 -- 72. Symmetry of sigma eta
-def sigma_eta_symm (p : DTTExpr) :
+noncomputable def sigma_eta_symm (p : DTTExpr) :
     DTTPath p (DTTExpr.pair (DTTExpr.fst p) (DTTExpr.snd p)) :=
   (sigma_eta p).symm
 
 -- 73. Church plus two
-def church_plus_two (m : DTTExpr) :
+noncomputable def church_plus_two (m : DTTExpr) :
     DTTPath (DTTExpr.churchPlus (DTTExpr.churchNat 2) m)
             (DTTExpr.app DTTExpr.churchSucc (DTTExpr.churchPlus (DTTExpr.churchNat 1) m)) :=
   .cons .churchPlusSucc .nil
 
 -- 74. Church plus two simplification chain
-def church_plus_two_simp (m : DTTExpr) :
+noncomputable def church_plus_two_simp (m : DTTExpr) :
     DTTPath (DTTExpr.churchPlus (DTTExpr.churchNat 2) m)
             (DTTExpr.app DTTExpr.churchSucc (DTTExpr.app DTTExpr.churchSucc m)) :=
   (church_plus_two m).trans

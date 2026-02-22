@@ -22,11 +22,11 @@ abbrev TropicalWeight : Type := WithTop ℤ
 abbrev Valuation (ι : Type u) : Type u := Finset ι → TropicalWeight
 
 /-- Basis exchange on finite sets: remove `e` and insert `f`. -/
-def exchange {ι : Type u} [DecidableEq ι] (B : Finset ι) (e f : ι) : Finset ι :=
+noncomputable def exchange {ι : Type u} [DecidableEq ι] (B : Finset ι) (e f : ι) : Finset ι :=
   insert f (B.erase e)
 
 /-- Tropical Plucker exchange relation for rank `r` valuations. -/
-def TropicalPluckerRelation {ι : Type u} [DecidableEq ι] (r : ℕ) (v : Valuation ι) : Prop :=
+noncomputable def TropicalPluckerRelation {ι : Type u} [DecidableEq ι] (r : ℕ) (v : Valuation ι) : Prop :=
   ∀ ⦃B₁ B₂ : Finset ι⦄,
     B₁.card = r →
     B₂.card = r →
@@ -63,7 +63,7 @@ theorem ValuatedMatroid.exchange_inequality
   M.tropicalPlucker hB₁ hB₂ he
 
 /-- The Dressian: all valuations satisfying tropical Plucker relations. -/
-def Dressian (ι : Type u) [DecidableEq ι] (r : ℕ) : Set (Valuation ι) :=
+noncomputable def Dressian (ι : Type u) [DecidableEq ι] (r : ℕ) : Set (Valuation ι) :=
   { v | TropicalPluckerRelation r v }
 
 /-- A representable tropical valuation (abstract representation witness). -/
@@ -72,7 +72,7 @@ structure TropicalRepresentation (ι : Type u) [DecidableEq ι] (r : ℕ) where
   plucker : TropicalPluckerRelation r valuation
 
 /-- The tropical Grassmannian: representable tropical valuations. -/
-def TropicalGrassmannian (ι : Type u) [DecidableEq ι] (r : ℕ) : Set (Valuation ι) :=
+noncomputable def TropicalGrassmannian (ι : Type u) [DecidableEq ι] (r : ℕ) : Set (Valuation ι) :=
   { v | ∃ R : TropicalRepresentation ι r, R.valuation = v }
 
 /-- Every tropical Grassmannian point lies in the Dressian. -/
@@ -96,15 +96,15 @@ structure RegularSubdivision (ι : Type u) where
   nonempty : ∃ B : Finset ι, cells B
 
 /-- The cells induced by a valuation are exactly those with finite weight. -/
-def inducedCells {ι : Type u} (v : Valuation ι) : Set (Finset ι) :=
+noncomputable def inducedCells {ι : Type u} (v : Valuation ι) : Set (Finset ι) :=
   { B | v B ≠ ⊤ }
 
 /-- A subdivision is regular for `v` when its cells match the induced support. -/
-def IsRegularFor {ι : Type u} (S : RegularSubdivision ι) (v : Valuation ι) : Prop :=
+noncomputable def IsRegularFor {ι : Type u} (S : RegularSubdivision ι) (v : Valuation ι) : Prop :=
   ∀ B : Finset ι, S.cells B ↔ inducedCells v B
 
 /-- Canonical regular subdivision attached to a valuation with nonempty support. -/
-def regularSubdivisionOfValuation
+noncomputable def regularSubdivisionOfValuation
     {ι : Type u}
     (v : Valuation ι)
     (h : ∃ B : Finset ι, v B ≠ ⊤) :

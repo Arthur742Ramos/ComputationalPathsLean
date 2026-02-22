@@ -60,19 +60,19 @@ namespace LeraySerreSequence
 variable (L : LeraySerreSequence.{u})
 
 /-- Distinguished `E₂` representative at bidegree `(0,0)`. -/
-def e2Base : L.pages.term 0 0 :=
+noncomputable def e2Base : L.pages.term 0 0 :=
   L.pages.base 0 0
 
 /-- Base filtration class extracted from the distinguished representative. -/
-def baseClass (s r : Nat) : L.pages.term 0 0 :=
+noncomputable def baseClass (s r : Nat) : L.pages.term 0 0 :=
   L.baseFiltration s r L.e2Base
 
 /-- Fiber filtration class extracted from the distinguished representative. -/
-def fiberClass (s r : Nat) : L.pages.term 0 0 :=
+noncomputable def fiberClass (s r : Nat) : L.pages.term 0 0 :=
   L.fiberFiltration s r L.e2Base
 
 /-- Leray-Serre transgression path at filtration level `s` and page `r`. -/
-def transgression (s r : Nat) :
+noncomputable def transgression (s r : Nat) :
     Path (L.baseClass (s + 1) r) (L.fiberClass s r) :=
   L.transgressionPath s r
 
@@ -83,7 +83,7 @@ noncomputable def transgression_rweq (s r : Nat) :
   rweq_of_step (L.transgressionStep s r)
 
 /-- Loop induced by transgression and its inverse. -/
-def transgressionLoop (s r : Nat) :
+noncomputable def transgressionLoop (s r : Nat) :
     Path (L.baseClass (s + 1) r) (L.baseClass (s + 1) r) :=
   Path.trans (L.transgression s r) (Path.symm (L.transgression s r))
 
@@ -95,7 +95,7 @@ noncomputable def transgressionLoop_contracts (s r : Nat) :
   exact rweq_cmpA_inv_right (L.transgression s r)
 
 /-- Shifted transgression witness mapped into the limiting term. -/
-def shiftedTransgression (s r : Nat) :
+noncomputable def shiftedTransgression (s r : Nat) :
     Path
       (L.convergence.embed 0 0 (L.pages.shift r 0 0 (L.baseClass (s + 1) r)))
       (L.convergence.embed 0 0 (L.pages.shift r 0 0 (L.fiberClass s r))) :=
@@ -104,7 +104,7 @@ def shiftedTransgression (s r : Nat) :
     (L.transgression s r)
 
 /-- Transgression witness after stabilization in the fiber filtration. -/
-def transgressionToFiberLimit (s r : Nat) :
+noncomputable def transgressionToFiberLimit (s r : Nat) :
     Path
       (L.convergence.embed 0 0 (L.pages.shift r 0 0 (L.baseClass (s + 1) r)))
       (L.convergence.embed 0 0 (L.fiberClass s r)) :=
@@ -119,7 +119,7 @@ noncomputable def transgressionToFiberLimit_rweq (s r : Nat) :
   rweq_cmpA_refl_right (L.transgressionToFiberLimit s r)
 
 /-- `d² = 0` transported through the fiber filtration at `(0,0)`. -/
-def fiberBoundaryCompression (s r : Nat) :
+noncomputable def fiberBoundaryCompression (s r : Nat) :
     Path
       (L.fiberFiltration s r
         (L.differentials.d r 0 0 (L.differentials.d r 0 0 L.e2Base)))
@@ -127,7 +127,7 @@ def fiberBoundaryCompression (s r : Nat) :
   Path.congrArg (L.fiberFiltration s r) (L.differentials.dSquaredPath r 0 0)
 
 /-- Shifted boundary compression mapped into the limiting term. -/
-def shiftedFiberBoundaryCompression (s r : Nat) :
+noncomputable def shiftedFiberBoundaryCompression (s r : Nat) :
     Path
       (L.convergence.embed 0 0
         (L.pages.shift r 0 0
@@ -139,7 +139,7 @@ def shiftedFiberBoundaryCompression (s r : Nat) :
     (L.fiberBoundaryCompression s r)
 
 /-- Shifted fiber boundaries converge to the stabilized fiber class. -/
-def fiberBoundaryToLimit (s r : Nat) :
+noncomputable def fiberBoundaryToLimit (s r : Nat) :
     Path
       (L.convergence.embed 0 0
         (L.pages.shift r 0 0
@@ -159,7 +159,7 @@ noncomputable def fiberBoundaryToLimit_rweq (s r : Nat) :
 end LeraySerreSequence
 
 /-- Canonical trivial Leray-Serre package. -/
-def trivialLeraySerreSequence : LeraySerreSequence where
+noncomputable def trivialLeraySerreSequence : LeraySerreSequence where
   pages := trivialPages
   differentials := trivialDifferentials
   convergence := trivialConvergence

@@ -24,7 +24,7 @@ structure LTS (S : Type u) (L : Type u) where
   trans : S → L → S → Prop
 
 /-- A trace is a sequence of labels. -/
-def Trace (L : Type u) := List L
+noncomputable def Trace (L : Type u) := List L
 
 /-- Multi-step reachability: s can reach s' via a trace. -/
 inductive Reaches {S L : Type u} (lts : LTS S L) : S → List L → S → Prop
@@ -33,7 +33,7 @@ inductive Reaches {S L : Type u} (lts : LTS S L) : S → List L → S → Prop
            Reaches lts s (l :: w) s''
 
 /-- A state s' is reachable from s. -/
-def Reachable {S L : Type u} (lts : LTS S L) (s s' : S) : Prop :=
+noncomputable def Reachable {S L : Type u} (lts : LTS S L) (s s' : S) : Prop :=
   ∃ w, Reaches lts s w s'
 
 /-- A simulation relation. -/
@@ -53,7 +53,7 @@ structure Bisimulation {S L : Type u}
 /-! ## Product LTS -/
 
 /-- Product of two LTSs: synchronous product on shared labels. -/
-def productLTS {S₁ S₂ L : Type u} (lts₁ : LTS S₁ L) (lts₂ : LTS S₂ L) :
+noncomputable def productLTS {S₁ S₂ L : Type u} (lts₁ : LTS S₁ L) (lts₂ : LTS S₂ L) :
     LTS (S₁ × S₂) L where
   trans := fun ⟨s₁, s₂⟩ l ⟨s₁', s₂'⟩ =>
     lts₁.trans s₁ l s₁' ∧ lts₂.trans s₂ l s₂'
@@ -64,7 +64,7 @@ structure LTSPair (S₁ S₂ : Type u) where
   snd : S₂
 
 /-- Path between LTS pairs from component paths. -/
-def pairPath {S₁ S₂ : Type u} {a₁ a₂ : S₁} {b₁ b₂ : S₂}
+noncomputable def pairPath {S₁ S₂ : Type u} {a₁ a₂ : S₁} {b₁ b₂ : S₂}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (LTSPair.mk a₁ b₁) (LTSPair.mk a₂ b₂) :=
   (Path.congrArg (fun a => LTSPair.mk a b₁) p).trans
@@ -134,13 +134,13 @@ theorem pairPath_trans {S₁ S₂ : Type u}
   cases e1; cases e2; cases e3; cases e4; rfl
 
 /-- 9. First projection of pair path. -/
-def pairPath_fst {S₁ S₂ : Type u} {a₁ a₂ : S₁} {b₁ b₂ : S₂}
+noncomputable def pairPath_fst {S₁ S₂ : Type u} {a₁ a₂ : S₁} {b₁ b₂ : S₂}
     (p : Path (LTSPair.mk a₁ b₁) (LTSPair.mk a₂ b₂)) :
     Path a₁ a₂ :=
   Path.congrArg LTSPair.fst p
 
 /-- 10. Second projection of pair path. -/
-def pairPath_snd {S₁ S₂ : Type u} {a₁ a₂ : S₁} {b₁ b₂ : S₂}
+noncomputable def pairPath_snd {S₁ S₂ : Type u} {a₁ a₂ : S₁} {b₁ b₂ : S₂}
     (p : Path (LTSPair.mk a₁ b₁) (LTSPair.mk a₂ b₂)) :
     Path b₁ b₂ :=
   Path.congrArg LTSPair.snd p
@@ -162,28 +162,28 @@ theorem pairPath_snd_proj {S₁ S₂ : Type u} {a₁ a₂ : S₁} {b₁ b₂ : S
 /-! ## Trace Operations -/
 
 /-- 13. Trace concatenation path: empty left. -/
-def trace_nil_left {L : Type u} (t : List L) :
+noncomputable def trace_nil_left {L : Type u} (t : List L) :
     Path (([] : List L) ++ t) t :=
   Path.refl t
 
 /-- 14. Trace concatenation path: empty right. -/
-def trace_nil_right {L : Type u} (t : List L) :
+noncomputable def trace_nil_right {L : Type u} (t : List L) :
     Path (t ++ ([] : List L)) t :=
   Path.mk [Step.mk _ _ (List.append_nil t)] (List.append_nil t)
 
 /-- 15. Trace associativity. -/
-def trace_assoc {L : Type u} (t₁ t₂ t₃ : List L) :
+noncomputable def trace_assoc {L : Type u} (t₁ t₂ t₃ : List L) :
     Path (t₁ ++ t₂ ++ t₃) (t₁ ++ (t₂ ++ t₃)) :=
   Path.mk [Step.mk _ _ (List.append_assoc t₁ t₂ t₃)] (List.append_assoc t₁ t₂ t₃)
 
 /-- 16. Trace congruence on left. -/
-def trace_congr_left {L : Type u} {t₁ t₁' : List L}
+noncomputable def trace_congr_left {L : Type u} {t₁ t₁' : List L}
     (p : Path t₁ t₁') (t₂ : List L) :
     Path (t₁ ++ t₂) (t₁' ++ t₂) :=
   Path.congrArg (· ++ t₂) p
 
 /-- 17. Trace congruence on right. -/
-def trace_congr_right {L : Type u} (t₁ : List L)
+noncomputable def trace_congr_right {L : Type u} (t₁ : List L)
     {t₂ t₂' : List L} (p : Path t₂ t₂') :
     Path (t₁ ++ t₂) (t₁ ++ t₂') :=
   Path.congrArg (t₁ ++ ·) p
@@ -195,7 +195,7 @@ structure QuotState (S : Type u) (R : S → S → Prop) where
   rep : S
 
 /-- 18. QuotState path from underlying path. -/
-def quotState_path {S : Type u} (R : S → S → Prop)
+noncomputable def quotState_path {S : Type u} (R : S → S → Prop)
     {s₁ s₂ : S} (p : Path s₁ s₂) :
     Path (QuotState.mk (R := R) s₁) (QuotState.mk (R := R) s₂) :=
   Path.congrArg (QuotState.mk (R := R)) p
@@ -216,11 +216,11 @@ theorem quotState_path_trans {S : Type u} (R : S → S → Prop)
 /-! ## LTS Map -/
 
 /-- Map an LTS through a state function. -/
-def mapLTS {S₁ S₂ L : Type u} (f : S₁ → S₂) (lts : LTS S₁ L) : LTS S₂ L where
+noncomputable def mapLTS {S₁ S₂ L : Type u} (f : S₁ → S₂) (lts : LTS S₁ L) : LTS S₂ L where
   trans := fun s₂ l s₂' => ∃ s₁ s₁', f s₁ = s₂ ∧ f s₁' = s₂' ∧ lts.trans s₁ l s₁'
 
 /-- 21. LTS map preserves paths between states. -/
-def mapLTS_path {S₁ S₂ _L : Type u} (f : S₁ → S₂)
+noncomputable def mapLTS_path {S₁ S₂ _L : Type u} (f : S₁ → S₂)
     {s₁ s₂ : S₁} (p : Path s₁ s₂) :
     Path (f s₁) (f s₂) :=
   Path.congrArg f p

@@ -52,12 +52,12 @@ namespace FukayaCategoryPathData
 variable {Obj Mor : Type u} (F : FukayaCategoryPathData Obj Mor)
 
 /-- Compare left and right unit forms by an explicit composite path. -/
-def leftToRightUnitPath (f : Mor) :
+noncomputable def leftToRightUnitPath (f : Mor) :
     Path (F.mu2 (F.idMor (F.source f)) f) (F.mu2 f (F.idMor (F.target f))) :=
   Path.trans (F.unitLeftPath f) (Path.symm (F.unitRightPath f))
 
 /-- Step witness: right-unit normalization for associativity coherence. -/
-def assoc_step (f g h : Mor) :
+noncomputable def assoc_step (f g h : Mor) :
     Path.Step
       (Path.trans (F.assocPath f g h) (Path.refl (F.mu2 f (F.mu2 g h))))
       (F.assocPath f g h) :=
@@ -70,7 +70,7 @@ noncomputable def assoc_rweq (f g h : Mor) :
   rweq_of_step (F.assoc_step f g h)
 
 /-- Step witness: right-unit normalization for left-unit coherence. -/
-def unitLeft_step (f : Mor) :
+noncomputable def unitLeft_step (f : Mor) :
     Path.Step
       (Path.trans (F.unitLeftPath f) (Path.refl f))
       (F.unitLeftPath f) :=
@@ -83,7 +83,7 @@ noncomputable def unitLeft_rweq (f : Mor) :
   rweq_of_step (F.unitLeft_step f)
 
 /-- Step witness: right-unit normalization for right-unit coherence. -/
-def unitRight_step (f : Mor) :
+noncomputable def unitRight_step (f : Mor) :
     Path.Step
       (Path.trans (F.unitRightPath f) (Path.refl f))
       (F.unitRightPath f) :=
@@ -96,7 +96,7 @@ noncomputable def unitRight_rweq (f : Mor) :
   rweq_of_step (F.unitRight_step f)
 
 /-- Step witness: right-unit normalization for differential-square coherence. -/
-def differentialSquare_step (f : Mor) :
+noncomputable def differentialSquare_step (f : Mor) :
     Path.Step
       (Path.trans (F.differentialSquarePath f) (Path.refl F.zeroMor))
       (F.differentialSquarePath f) :=
@@ -109,7 +109,7 @@ noncomputable def differentialSquare_rweq (f : Mor) :
   rweq_of_step (F.differentialSquare_step f)
 
 /-- Step witness: right-unit normalization for Leibniz coherence. -/
-def leibniz_step (f g : Mor) :
+noncomputable def leibniz_step (f g : Mor) :
     Path.Step
       (Path.trans (F.leibnizPath f g) (Path.refl (F.mu2 (F.mu1 f) g)))
       (F.leibnizPath f g) :=
@@ -122,7 +122,7 @@ noncomputable def leibniz_rweq (f g : Mor) :
   rweq_of_step (F.leibniz_step f g)
 
 /-- Step witness: right-unit normalization for unit-comparison path. -/
-def leftToRightUnit_step (f : Mor) :
+noncomputable def leftToRightUnit_step (f : Mor) :
     Path.Step
       (Path.trans (F.leftToRightUnitPath f) (Path.refl (F.mu2 f (F.idMor (F.target f)))))
       (F.leftToRightUnitPath f) :=
@@ -171,7 +171,7 @@ variable {H : FloerHomologyPathData Gen}
 variable (B : FukayaToFloerBridge F H)
 
 /-- Step witness: right-unit normalization for μ₁/differential compatibility. -/
-def mu1ToDifferential_step (f : Mor) :
+noncomputable def mu1ToDifferential_step (f : Mor) :
     Path.Step
       (Path.trans
         (B.mu1ToDifferentialPath f)
@@ -188,7 +188,7 @@ noncomputable def mu1ToDifferential_rweq (f : Mor) :
   rweq_of_step (B.mu1ToDifferential_step f)
 
 /-- Step witness: right-unit normalization for identity-to-cycle transport. -/
-def idToCycle_step (X : Obj) :
+noncomputable def idToCycle_step (X : Obj) :
     Path.Step
       (Path.trans (B.idToCyclePath X) (Path.refl H.zero))
       (B.idToCyclePath X) :=
@@ -209,7 +209,7 @@ noncomputable def idToCycle_cancel_rweq (X : Obj) :
 end FukayaToFloerBridge
 
 /-- Trivial model instantiating the Fukaya-category computational-path interface. -/
-def trivialFukayaCategoryPathData : FukayaCategoryPathData PUnit PUnit where
+noncomputable def trivialFukayaCategoryPathData : FukayaCategoryPathData PUnit PUnit where
   source := fun _ => PUnit.unit
   target := fun _ => PUnit.unit
   idMor := fun _ => PUnit.unit
@@ -223,7 +223,7 @@ def trivialFukayaCategoryPathData : FukayaCategoryPathData PUnit PUnit where
   leibnizPath := fun _ _ => Path.refl PUnit.unit
 
 /-- Trivial bridge instance between Fukaya and Floer path packages. -/
-def trivialFukayaToFloerBridge :
+noncomputable def trivialFukayaToFloerBridge :
     FukayaToFloerBridge trivialFukayaCategoryPathData
       FloerHomologyPaths.trivialFloerHomologyPathData where
   morphismToGenerator := fun _ => PUnit.unit

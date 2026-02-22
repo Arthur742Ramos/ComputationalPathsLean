@@ -89,7 +89,7 @@ structure RankMatroid (n : Nat) where
     (∀ i, A i = true → B i = true) → rank A ≤ rank B
 
 /-- The rank of the ground set is the matroid rank. -/
-def matroidFullRank (n : Nat) (M : RankMatroid n) : Nat :=
+noncomputable def matroidFullRank (n : Nat) (M : RankMatroid n) : Nat :=
   M.rank (fun _ => true)
 
 /-- Rank is bounded by n. -/
@@ -128,7 +128,7 @@ structure MatroidDual (n : Nat) (M : RankMatroid n) where
   dual_rank_empty : Path (dualRank (fun _ => false)) 0
 
 /-- Double duality: (M*)* = M at the rank level. -/
-def doubleDualRank (n : Nat) (_M : RankMatroid n)
+noncomputable def doubleDualRank (n : Nat) (_M : RankMatroid n)
     (D : MatroidDual n _M) :
     Path (D.dualRank (fun _ => false)) 0 :=
   D.dual_rank_empty
@@ -238,7 +238,7 @@ structure ValuatedMatroid (n r : Nat) where
     Path (valuation i + valuation j) (valuation i + valuation j)
 
 /-- A uniform valuated matroid U_{r,n}. -/
-def uniformValuatedMatroid (n r : Nat) (_hr : r ≤ n)
+noncomputable def uniformValuatedMatroid (n r : Nat) (_hr : r ≤ n)
     (nb : Nat) (bases : Fin nb → (Fin r → Fin n)) :
     ValuatedMatroid n r where
   numBases := nb
@@ -262,7 +262,7 @@ structure TropicalLinearSpace (n r : Nat) where
   codim_formula : Path (dim + codim) n
 
 /-- Tropical hyperplane: codimension 1 tropical linear space. -/
-def tropicalHyperplane (n : Nat) (_hn : n > 0)
+noncomputable def tropicalHyperplane (n : Nat) (_hn : n > 0)
     (vm : ValuatedMatroid n (n - 1)) :
     TropicalLinearSpace n (n - 1) where
   valuatedMatroid := vm
@@ -281,7 +281,7 @@ structure TropicalGrassmannian (n r : Nat) where
   numPlucker : Nat
 
 /-- Gr(2,n) has a nice fan structure. -/
-def tropGr2n (n : Nat) (_hn : n ≥ 2) : TropicalGrassmannian n 2 where
+noncomputable def tropGr2n (n : Nat) (_hn : n ≥ 2) : TropicalGrassmannian n 2 where
   dim := 2 * (n - 2)
   dim_formula := Path.stepChain (by omega)
   numPlucker := n * (n - 1) / 2
@@ -310,7 +310,7 @@ structure BasePolytope (n : Nat) (M : RankMatroid n) extends MatroidPolytope n M
 
 /-- Multi-step: rank submodularity chain.
     r(A ∪ B) + r(A ∩ B) ≤ r(A) + r(B) via explicit bound steps. -/
-def submodularChain (n : Nat) (M : RankMatroid n)
+noncomputable def submodularChain (n : Nat) (M : RankMatroid n)
     (A B : Fin n → Bool) :
     Path (M.rank (fun i => A i || B i) + M.rank (fun i => A i && B i))
          (M.rank (fun i => A i || B i) + M.rank (fun i => A i && B i)) :=
@@ -318,27 +318,27 @@ def submodularChain (n : Nat) (M : RankMatroid n)
 
 /-- Multi-step: tropical linear space dimension chain.
     dim(L) = r, codim(L) = n - r, dim + codim = n. -/
-def tropLinSpaceDimChain (n r : Nat) (_hr : r ≤ n)
+noncomputable def tropLinSpaceDimChain (n r : Nat) (_hr : r ≤ n)
     (tls : TropicalLinearSpace n r) :
     Path tls.dim r :=
   Path.trans tls.dim_eq_rank (Path.refl r)
 
 /-- Multi-step: matroid duality rank chain.
     r*(E) = |E| + r(∅) - r(E) = n + 0 - r(E) = n - r(E). -/
-def dualRankChain (n : Nat) (M : RankMatroid n)
+noncomputable def dualRankChain (n : Nat) (M : RankMatroid n)
     (D : MatroidDual n M) :
     Path (D.dualRank (fun _ => false)) 0 :=
   D.dual_rank_empty
 
 /-- Multi-step: intersection + union.
     max|I₁ ∩ I₂| = min(r₁(A) + r₂(E\A)), chained with union rank. -/
-def intersectionUnionChain (n : Nat) (mi : MatroidIntersection n) :
+noncomputable def intersectionUnionChain (n : Nat) (mi : MatroidIntersection n) :
     Path mi.maxCommonIndep mi.minMaxValue :=
   Path.trans mi.minmax_path (Path.refl mi.minMaxValue)
 
 /-- Three-step chain: Grassmannian dimension.
     dim Gr(r,n) = r(n-r), via explicit computation. -/
-def grassmannianDimChain (n r : Nat) (_hn : n ≥ r)
+noncomputable def grassmannianDimChain (n r : Nat) (_hn : n ≥ r)
     (tg : TropicalGrassmannian n r) :
     Path tg.dim (r * (n - r)) :=
   Path.trans tg.dim_formula (Path.refl (r * (n - r)))
@@ -346,51 +346,51 @@ def grassmannianDimChain (n r : Nat) (_hn : n ≥ r)
 /-! ## Representability, Tutte Data, and Oriented/Tropical Bridges -/
 
 /-- Cardinality proxy for the ground set. -/
-def matroidGroundCard (n : Nat) : Nat := n
+noncomputable def matroidGroundCard (n : Nat) : Nat := n
 
 /-- Dual rank evaluated at the full ground set. -/
-def matroidDualRankAtGround (n : Nat) (M : RankMatroid n)
+noncomputable def matroidDualRankAtGround (n : Nat) (M : RankMatroid n)
     (D : MatroidDual n M) : Nat :=
   D.dualRank (fun _ => true)
 
 /-- Pair of ranks from deletion/contraction minors at the empty subset. -/
-def matroidMinorRankPair (n : Nat) (M : RankMatroid n) (e : Fin n)
+noncomputable def matroidMinorRankPair (n : Nat) (M : RankMatroid n) (e : Fin n)
     (del : MatroidDeletion n M e) (con : MatroidContraction n M e) : Nat × Nat :=
   (del.delRank (fun _ => false), con.contrRank (fun _ => false))
 
 /-- Representability over a coefficient type (simplified predicate). -/
-def isRepresentableOver (n : Nat) (_M : RankMatroid n) (_F : Type u) : Prop := True
+noncomputable def isRepresentableOver (n : Nat) (_M : RankMatroid n) (_F : Type u) : Prop := True
 
 /-- Ambient representation dimension (simplified). -/
-def representationDimension (n : Nat) (_M : RankMatroid n) : Nat := n
+noncomputable def representationDimension (n : Nat) (_M : RankMatroid n) : Nat := n
 
 /-- Coefficient of the Tutte polynomial at (i,j) (simplified). -/
-def tutteCoefficient (n : Nat) (_M : RankMatroid n) (i j : Nat) : Nat :=
+noncomputable def tutteCoefficient (n : Nat) (_M : RankMatroid n) (i j : Nat) : Nat :=
   i + j
 
 /-- Evaluation T_M(1,1) in the simplified model. -/
-def tutteAtOneOne (n : Nat) (M : RankMatroid n) : Nat :=
+noncomputable def tutteAtOneOne (n : Nat) (M : RankMatroid n) : Nat :=
   tutteCoefficient n M 1 1
 
 /-- Matroid-intersection upper bound proxy. -/
-def matroidIntersectionUpperBound (n : Nat) (mi : MatroidIntersection n) : Nat :=
+noncomputable def matroidIntersectionUpperBound (n : Nat) (mi : MatroidIntersection n) : Nat :=
   mi.minMaxValue
 
 /-- Chirotope sign placeholder for oriented matroids. -/
-def orientedMatroidSign (n : Nat) (i : Fin n) : Int :=
+noncomputable def orientedMatroidSign (n : Nat) (i : Fin n) : Int :=
   i.1
 
 /-- Complexity proxy for the oriented circuit system. -/
-def orientedCircuitComplexity (n : Nat) (_M : RankMatroid n) : Nat :=
+noncomputable def orientedCircuitComplexity (n : Nat) (_M : RankMatroid n) : Nat :=
   n
 
 /-- Tropical weight extracted from a valuated matroid basis. -/
-def tropicalWeightFromValuation (n r : Nat) (vm : ValuatedMatroid n r)
+noncomputable def tropicalWeightFromValuation (n r : Nat) (vm : ValuatedMatroid n r)
     (i : Fin vm.numBases) : Int :=
   vm.valuation i
 
 /-- Dimension bridge between matroid and tropical models. -/
-def tropicalBridgeDimension (n r : Nat) (tls : TropicalLinearSpace n r) : Nat :=
+noncomputable def tropicalBridgeDimension (n r : Nat) (tls : TropicalLinearSpace n r) : Nat :=
   tls.dim
 
 theorem matroidGroundCard_refl (n : Nat) :

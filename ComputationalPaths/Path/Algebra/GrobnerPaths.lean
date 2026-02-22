@@ -81,17 +81,17 @@ structure PolyRewriteSystem (A : Type u) where
   rules : List (A × A)
 
 /-- Local confluence: all critical pairs are resolvable. -/
-def PolyRewriteSystem.isLocallyConfluent (rs : PolyRewriteSystem A) : Prop :=
+noncomputable def PolyRewriteSystem.isLocallyConfluent (rs : PolyRewriteSystem A) : Prop :=
   ∀ (cp : CriticalPair A),
     ∃ (t : A) (pl : Path cp.left t) (pr : Path cp.right t), True
 
 /-- Global confluence: all divergent paths can be joined. -/
-def PolyRewriteSystem.isGloballyConfluent (rs : PolyRewriteSystem A) : Prop :=
+noncomputable def PolyRewriteSystem.isGloballyConfluent (rs : PolyRewriteSystem A) : Prop :=
   ∀ (a b c : A), Path a b → Path a c →
     ∃ (d : A) (p : Path b d) (q : Path c d), True
 
 /-- Termination via a well-founded measure. -/
-def PolyRewriteSystem.isTerminating (rs : PolyRewriteSystem A) : Prop :=
+noncomputable def PolyRewriteSystem.isTerminating (rs : PolyRewriteSystem A) : Prop :=
   ∃ (measure : A → Nat), ∀ r ∈ rs.rules, measure r.2 < measure r.1
 
 /-- Newman's lemma: local confluence + termination → global confluence. -/
@@ -102,13 +102,13 @@ theorem newman_lemma_statement (A : Type u) (rs : PolyRewriteSystem A)
   exact ⟨c, Path.trans (Path.symm pab) pac, Path.refl c, trivial⟩
 
 /-- Resolved critical pair gives a path from ancestor to target (left). -/
-def resolved_critical_pair_diamond {A : Type u}
+noncomputable def resolved_critical_pair_diamond {A : Type u}
     (rcp : ResolvedCriticalPair A) :
     Path rcp.ancestor rcp.target :=
   Path.trans rcp.pathLeft rcp.resolveLeft
 
 /-- Alternative path through the right branch of a resolved pair. -/
-def resolved_critical_pair_diamond_right {A : Type u}
+noncomputable def resolved_critical_pair_diamond_right {A : Type u}
     (rcp : ResolvedCriticalPair A) :
     Path rcp.ancestor rcp.target :=
   Path.trans rcp.pathRight rcp.resolveRight
@@ -153,19 +153,19 @@ theorem equiv_same_nf {A : Type u} (N : PolyNormalForm A)
   (N.sound a b p).toEq
 
 /-- Normal form of element reached via path. -/
-def nf_of_path {A : Type u} (N : PolyNormalForm A)
+noncomputable def nf_of_path {A : Type u} (N : PolyNormalForm A)
     {a b : A} (p : Path a b) :
     Path (N.nf a) (N.nf b) :=
   N.sound a b p
 
 /-- Composing reduction paths. -/
-def reduction_compose {A : Type u} (N : PolyNormalForm A)
+noncomputable def reduction_compose {A : Type u} (N : PolyNormalForm A)
     {a b : A} (p : Path a b) :
     Path a (N.nf b) :=
   Path.trans p (N.reduce b)
 
 /-- Reduction path is compatible with symmetry. -/
-def reduction_symm {A : Type u} (N : PolyNormalForm A)
+noncomputable def reduction_symm {A : Type u} (N : PolyNormalForm A)
     {a b : A} (p : Path a b) :
     Path (N.nf b) (N.nf a) :=
   Path.symm (N.sound a b p)

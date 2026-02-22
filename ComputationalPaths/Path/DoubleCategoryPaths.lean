@@ -70,14 +70,14 @@ variable {a b c : A}
 /-! ## Double category operations on paths -/
 
 /-- Vertical composition of squares in the path double category. -/
-@[simp] def squareVComp {p q r : Path a b}
+@[simp] noncomputable def squareVComp {p q r : Path a b}
     (η : PathSquare (A := A) (a := a) (b := b) p q)
     (θ : PathSquare (A := A) (a := a) (b := b) q r) :
     PathSquare (A := A) (a := a) (b := b) p r :=
   TwoCell.comp (A := A) (a := a) (b := b) (p := p) (q := q) (r := r) η θ
 
 /-- Horizontal composition of squares in the path double category. -/
-@[simp] def squareHComp {f g : Path a b} {h k : Path b c}
+@[simp] noncomputable def squareHComp {f g : Path a b} {h k : Path b c}
     (η : PathSquare (A := A) (a := a) (b := b) f g)
     (θ : PathSquare (A := A) (a := b) (b := c) h k) :
     PathSquare (A := A) (a := a) (b := c)
@@ -99,7 +99,7 @@ compositions. -/
     (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)
 
 /-- The computational-path double category. -/
-def pathDoubleCategory (A : Type u') : DoubleCategory A where
+noncomputable def pathDoubleCategory (A : Type u') : DoubleCategory A where
   interchange := by
     intro a b c f₀ f₁ f₂ g₀ g₁ g₂ η₁ η₂ θ₁ θ₂
     exact TwoCell.comp_hcomp_hcomp (A := A) (a := a) (b := b) (c := c)

@@ -181,7 +181,7 @@ theorem torusLoop2_snd_toEq :
 /-- Euler characteristic of the torus.
     χ(T²) = V - E + F = 1 - 2 + 1 = 0
     (CW structure: 1 vertex, 2 edges, 1 face). -/
-def torusEulerChar : Int := 0
+noncomputable def torusEulerChar : Int := 0
 
 /-- The CW cell count data for the torus. -/
 structure TorusCWData where
@@ -190,7 +190,7 @@ structure TorusCWData where
   faces : Nat := 1
 
 /-- The standard CW structure on the torus. -/
-def torusStdCW : TorusCWData := { vertices := 1, edges := 2, faces := 1 }
+noncomputable def torusStdCW : TorusCWData := { vertices := 1, edges := 2, faces := 1 }
 
 /-- The Euler characteristic computes from the CW data. -/
 theorem torusEuler_from_CW :
@@ -218,7 +218,7 @@ theorem nTorus_zero : nTorus.{u} 0 = PUnit := rfl
 theorem nTorus_one : nTorus.{u} 1 = Circle.{u} := rfl
 
 /-- Betti numbers of the 2-torus. β_0 = β_2 = 1, β_1 = 2. -/
-def torus2BettiNumber : Nat → Nat
+noncomputable def torus2BettiNumber : Nat → Nat
   | 0 => 1
   | 1 => 2
   | 2 => 1
@@ -311,10 +311,10 @@ theorem torusDiagonal_base :
     torusDiagonal circleBase.{u} = torusBase := rfl
 
 /-- The covering degree of the standard double cover of T² is 2. -/
-def torusStdCoveringDegree : Nat := 2
+noncomputable def torusStdCoveringDegree : Nat := 2
 
 /-- The genus of the torus is 1. -/
-def torusGenus : Nat := 1
+noncomputable def torusGenus : Nat := 1
 
 /-- The genus–Euler characteristic relation: χ = 2 - 2g. -/
 theorem torusGenus_euler : (2 : Int) - 2 * torusGenus = torusEulerChar := rfl

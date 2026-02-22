@@ -25,7 +25,7 @@ structure SegalPathSpace where
 namespace SegalPathSpace
 
 /-- Canonical Segal path space with `Path` as 1-simplices. -/
-def pathSpace (Obj : Type u) : SegalPathSpace where
+noncomputable def pathSpace (Obj : Type u) : SegalPathSpace where
   Obj := Obj
   OneSimplex := Path
   toPath := fun e => e
@@ -69,7 +69,7 @@ noncomputable def assoc_rweq {w x y z : S.Obj}
 end SegalComposition
 
 /-- Segal composition induced from canonical quasi-category path composition. -/
-def fromQuasi (Obj : Type u) :
+noncomputable def fromQuasi (Obj : Type u) :
     SegalComposition (SegalPathSpace.pathSpace Obj) where
   compose := (QuasiCategoryPaths.canonical Obj).compose
   binary_step := by

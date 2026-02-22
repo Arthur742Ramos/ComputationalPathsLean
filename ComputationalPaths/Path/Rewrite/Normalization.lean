@@ -29,7 +29,7 @@ variable {A : Type u} {a b c : A}
 
 /-! ## Normal forms and normalization -/
 
-def IsNormal {A : Type u} {a b : A} (p : Path a b) : Prop :=
+noncomputable def IsNormal {A : Type u} {a b : A} (p : Path a b) : Prop :=
   p = Path.stepChain p.toEq
 
 @[simp] theorem isNormal_iff {A : Type u} {a b : A} (p : Path a b) :
@@ -41,7 +41,7 @@ def IsNormal {A : Type u} {a b : A} (p : Path a b) : Prop :=
   unfold IsNormal
   simp
 
-@[simp] def normalize {A : Type u} {a b : A} (p : Path a b) : Path a b :=
+@[simp] noncomputable def normalize {A : Type u} {a b : A} (p : Path a b) : Path a b :=
   Path.stepChain (A := A) (a := a) (b := b) p.toEq
 
 @[simp] theorem normalize_isNormal {A : Type u} {a b : A}
@@ -54,7 +54,7 @@ structure NormalForm (A : Type u) (a b : A) where
   path : Path a b
   isNormal : IsNormal (A := A) (a := a) (b := b) path
 
-@[simp] def normalizeForm {A : Type u} {a b : A}
+@[simp] noncomputable def normalizeForm {A : Type u} {a b : A}
     (p : Path a b) : NormalForm A a b :=
   { path := normalize p
     isNormal := normalize_isNormal (A := A) (a := a) (b := b) p }
@@ -159,7 +159,7 @@ theorem normalForm_unique {A : Type u} {a b : A}
   rw [h1, h2]
 
 /-- The type of normal forms between two points is a subsingleton. -/
-instance normalForm_subsingleton {A : Type u} {a b : A} :
+noncomputable instance normalForm_subsingleton {A : Type u} {a b : A} :
     Subsingleton (NormalForm A a b) :=
   ⟨fun nf₁ nf₂ => by
     cases nf₁ with
@@ -244,17 +244,17 @@ theorem normalize_loop_unique {A : Type u} {a : A}
 /-! ## NormalForm constructors -/
 
 /-- Build a normal form from a propositional equality. -/
-def NormalForm.ofEqForm {A : Type u} {a b : A} (h : a = b) :
+noncomputable def NormalForm.ofEqForm {A : Type u} {a b : A} (h : a = b) :
     NormalForm A a b :=
   ⟨Path.stepChain h, isNormal_ofEq h⟩
 
 /-- Build a normal form by normalizing any path. -/
-def NormalForm.ofPath {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def NormalForm.ofPath {A : Type u} {a b : A} (p : Path a b) :
     NormalForm A a b :=
   normalizeForm p
 
 /-- Extract the underlying equality from a normal form. -/
-def NormalForm.toEq {A : Type u} {a b : A} (nf : NormalForm A a b) :
+noncomputable def NormalForm.toEq {A : Type u} {a b : A} (nf : NormalForm A a b) :
     a = b :=
   nf.path.toEq
 

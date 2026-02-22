@@ -46,7 +46,7 @@ noncomputable def section_rweq (p : X × A1) :
 end A1PathInfrastructure
 
 /-- Build A¹-invariance infrastructure from path-level witnesses. -/
-def mkA1PathInfrastructure
+noncomputable def mkA1PathInfrastructure
     {X : Type u} {A1 : Type v}
     (proj : X × A1 → X)
     (sec : X → X × A1)
@@ -61,7 +61,7 @@ def mkA1PathInfrastructure
   sectionStep := fun p => Path.Step.trans_refl_left (sectionPath p)
 
 /-- Canonical A¹-invariance infrastructure for the identity projection/section. -/
-def idA1PathInfrastructure (X : Type u) :
+noncomputable def idA1PathInfrastructure (X : Type u) :
     A1PathInfrastructure X PUnit.{1} :=
   mkA1PathInfrastructure
     (proj := fun p => p.1)

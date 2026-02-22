@@ -46,7 +46,7 @@ structure BrownGerstenSpectralSequence where
 namespace BrownGerstenSpectralSequence
 
 /-- The trivial Brown-Gersten spectral sequence. -/
-def trivial : BrownGerstenSpectralSequence where
+noncomputable def trivial : BrownGerstenSpectralSequence where
   seq := trivialSpectralPage
   next := fun _ _ _ _ => PUnit.unit
   target := fun _ _ => PUnit

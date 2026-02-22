@@ -106,12 +106,12 @@ theorem neg_neg (a : A) : G.neg (G.neg a) = a := by
   exact h2
 
 /-- `Path`-typed associativity. -/
-def add_assoc_path (a b c : A) :
+noncomputable def add_assoc_path (a b c : A) :
     Path (G.add (G.add a b) c) (G.add a (G.add b c)) :=
   Path.stepChain (G.add_assoc a b c)
 
 /-- `Path`-typed commutativity. -/
-def add_comm_path (a b : A) :
+noncomputable def add_comm_path (a b : A) :
     Path (G.add a b) (G.add b a) :=
   Path.stepChain (G.add_comm a b)
 
@@ -132,23 +132,23 @@ namespace GroupHom
 variable {A B : Type u} {GA : AbelianGroupData A} {GB : AbelianGroupData B}
 
 /-- `Path`-typed map_add. -/
-def map_add_path (φ : GroupHom GA GB) (a b : A) :
+noncomputable def map_add_path (φ : GroupHom GA GB) (a b : A) :
     Path (φ.toFun (GA.add a b)) (GB.add (φ.toFun a) (φ.toFun b)) :=
   Path.stepChain (φ.map_add a b)
 
 /-- `Path`-typed map_zero. -/
-def map_zero_path (φ : GroupHom GA GB) :
+noncomputable def map_zero_path (φ : GroupHom GA GB) :
     Path (φ.toFun GA.zero) GB.zero :=
   Path.stepChain φ.map_zero
 
 /-- Identity homomorphism. -/
-def id (GA : AbelianGroupData A) : GroupHom GA GA where
+noncomputable def id (GA : AbelianGroupData A) : GroupHom GA GA where
   toFun := _root_.id
   map_add := fun _ _ => rfl
   map_zero := rfl
 
 /-- Composition of homomorphisms. -/
-def comp {C : Type u} {GC : AbelianGroupData C}
+noncomputable def comp {C : Type u} {GC : AbelianGroupData C}
     (ψ : GroupHom GB GC) (φ : GroupHom GA GB) : GroupHom GA GC where
   toFun := ψ.toFun ∘ φ.toFun
   map_add := fun a b => by
@@ -186,13 +186,13 @@ namespace SimplicialAbelianGroup
 variable (S : SimplicialAbelianGroup)
 
 /-- `Path`-typed face homomorphism property. -/
-def face_add_path (n : Nat) (i : Fin (n + 2)) (a b : S.carrier (n + 1)) :
+noncomputable def face_add_path (n : Nat) (i : Fin (n + 2)) (a b : S.carrier (n + 1)) :
     Path (S.face n i ((S.grp (n + 1)).add a b))
          ((S.grp n).add (S.face n i a) (S.face n i b)) :=
   Path.stepChain (S.face_add n i a b)
 
 /-- `Path`-typed face preserves zero. -/
-def face_zero_path (n : Nat) (i : Fin (n + 2)) :
+noncomputable def face_zero_path (n : Nat) (i : Fin (n + 2)) :
     Path (S.face n i (S.grp (n + 1)).zero) (S.grp n).zero :=
   Path.stepChain (S.face_zero n i)
 
@@ -229,12 +229,12 @@ namespace NormalizedChainComplex
 variable {S : SimplicialAbelianGroup} (N : NormalizedChainComplex S)
 
 /-- `Path`-typed boundary squared is zero. -/
-def boundary_sq_zero_path (n : Nat) (a : N.elem (n + 2)) :
+noncomputable def boundary_sq_zero_path (n : Nat) (a : N.elem (n + 2)) :
     Path (N.boundary n (N.boundary (n + 1) a)) (N.grp n).zero :=
   Path.stepChain (N.boundary_sq_zero n a)
 
 /-- `Path`-typed boundary homomorphism. -/
-def boundary_add_path (n : Nat) (a b : N.elem (n + 1)) :
+noncomputable def boundary_add_path (n : Nat) (a b : N.elem (n + 1)) :
     Path (N.boundary n ((N.grp (n + 1)).add a b))
          ((N.grp n).add (N.boundary n a) (N.boundary n b)) :=
   Path.stepChain (N.boundary_add n a b)
@@ -261,7 +261,7 @@ structure MooreComplex where
 
 /-- Build the Moore complex from a simplicial abelian group,
     given an explicit ∂² = 0 hypothesis. -/
-def mooreComplexData (S : SimplicialAbelianGroup)
+noncomputable def mooreComplexData (S : SimplicialAbelianGroup)
     (sq_zero : ∀ n (a : S.carrier (n + 2)),
       S.face n ⟨0, by omega⟩ (S.face (n + 1) ⟨0, by omega⟩ a) =
       (S.grp n).zero) : MooreComplex where
@@ -272,7 +272,7 @@ def mooreComplexData (S : SimplicialAbelianGroup)
   boundary_sq_zero := sq_zero
 
 /-- `Path`-typed ∂² = 0 in the Moore complex. -/
-def moore_boundary_sq_zero_path (M : MooreComplex) (n : Nat)
+noncomputable def moore_boundary_sq_zero_path (M : MooreComplex) (n : Nat)
     (a : M.carrier (n + 2)) :
     Path (M.boundary n (M.boundary (n + 1) a)) (M.grp n).zero :=
   Path.stepChain (M.boundary_sq_zero n a)
@@ -298,7 +298,7 @@ namespace NormalizedInclusion
 variable {S : SimplicialAbelianGroup}
 
 /-- `Path`-typed boundary compatibility. -/
-def incl_boundary_path (ni : NormalizedInclusion S) (n : Nat)
+noncomputable def incl_boundary_path (ni : NormalizedInclusion S) (n : Nat)
     (a : ni.normalized.elem (n + 1)) :
     Path (ni.incl n (ni.normalized.boundary n a))
          (ni.moore.boundary n (ni.incl (n + 1) a)) :=
@@ -326,19 +326,19 @@ namespace DoldKanEquivalenceData
 variable (dk : DoldKanEquivalenceData)
 
 /-- `Path`-typed N ∘ Γ round-trip. -/
-def dk_roundtrip_NΓ_path (C : MooreComplex) (n : Nat) :
+noncomputable def dk_roundtrip_NΓ_path (C : MooreComplex) (n : Nat) :
     Path ((dk.N (dk.Γ C)).carrier n) (C.carrier n) :=
   Path.stepChain (dk.NΓ_carrier C n)
 
 /-- `Path`-typed Γ ∘ N round-trip. -/
-def dk_roundtrip_ΓN_path (S : SimplicialAbelianGroup) (n : Nat) :
+noncomputable def dk_roundtrip_ΓN_path (S : SimplicialAbelianGroup) (n : Nat) :
     Path ((dk.Γ (dk.N S)).carrier n) (S.carrier n) :=
   Path.stepChain (dk.ΓN_carrier S n)
 
 end DoldKanEquivalenceData
 
 /-- A trivial Dold-Kan equivalence using zero boundaries. -/
-def trivialDoldKan : DoldKanEquivalenceData where
+noncomputable def trivialDoldKan : DoldKanEquivalenceData where
   N := fun S => {
     carrier := S.carrier,
     grp := S.grp,

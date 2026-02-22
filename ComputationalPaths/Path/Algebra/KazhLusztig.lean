@@ -77,22 +77,22 @@ structure CoxeterGroup where
   coxeterDiag : ∀ (s : S), coxeterMatrix s s = 1
 
 /-- Path witness for left identity. -/
-def CoxeterGroup.one_mul_path (G : CoxeterGroup) (w : G.W) :
+noncomputable def CoxeterGroup.one_mul_path (G : CoxeterGroup) (w : G.W) :
     Path (G.mul G.one w) w :=
   Path.stepChain (G.one_mul w)
 
 /-- Path witness for associativity. -/
-def CoxeterGroup.mul_assoc_path (G : CoxeterGroup) (a b c : G.W) :
+noncomputable def CoxeterGroup.mul_assoc_path (G : CoxeterGroup) (a b c : G.W) :
     Path (G.mul (G.mul a b) c) (G.mul a (G.mul b c)) :=
   Path.stepChain (G.mul_assoc a b c)
 
 /-- Path witness for involution. -/
-def CoxeterGroup.involution_path (G : CoxeterGroup) (s : G.S) :
+noncomputable def CoxeterGroup.involution_path (G : CoxeterGroup) (s : G.S) :
     Path (G.mul (G.gen s) (G.gen s)) G.one :=
   Path.stepChain (G.involution s)
 
 /-- Path witness for diagonal of Coxeter matrix. -/
-def CoxeterGroup.coxeterDiag_path (G : CoxeterGroup) (s : G.S) :
+noncomputable def CoxeterGroup.coxeterDiag_path (G : CoxeterGroup) (s : G.S) :
     Path (G.coxeterMatrix s s) 1 :=
   Path.stepChain (G.coxeterDiag s)
 
@@ -109,19 +109,19 @@ structure LengthFunction (G : CoxeterGroup) where
     length (G.mul w v) ≤ length w + length v
 
 /-- Path witness for length of identity. -/
-def LengthFunction.length_one_path {G : CoxeterGroup}
+noncomputable def LengthFunction.length_one_path {G : CoxeterGroup}
     (L : LengthFunction G) :
     Path (L.length G.one) 0 :=
   Path.stepChain L.length_one
 
 /-- Path witness for length of generator. -/
-def LengthFunction.length_gen_path {G : CoxeterGroup}
+noncomputable def LengthFunction.length_gen_path {G : CoxeterGroup}
     (L : LengthFunction G) (s : G.S) :
     Path (L.length (G.gen s)) 1 :=
   Path.stepChain (L.length_gen s)
 
 /-- Chain: length of s*s = length of e = 0. -/
-def LengthFunction.involution_chain {G : CoxeterGroup}
+noncomputable def LengthFunction.involution_chain {G : CoxeterGroup}
     (L : LengthFunction G) (s : G.S) :
     Path (L.length (G.mul (G.gen s) (G.gen s)))
          0 :=
@@ -146,7 +146,7 @@ structure BruhatOrder (G : CoxeterGroup) where
     le w (G.mul (G.gen s) w) ∨ le (G.mul (G.gen s) w) w
 
 /-- Path witness for Bruhat reflexivity as a self-path. -/
-def BruhatOrder.le_refl_witness {G : CoxeterGroup}
+noncomputable def BruhatOrder.le_refl_witness {G : CoxeterGroup}
     (_B : BruhatOrder G) (w : G.W) :
     Path w w :=
   Path.refl w
@@ -162,12 +162,12 @@ structure LaurentPoly where
     n > N ∨ n < -N → coeffs n = 0
 
 /-- Zero Laurent polynomial. -/
-def LaurentPoly.zero : LaurentPoly where
+noncomputable def LaurentPoly.zero : LaurentPoly where
   coeffs := fun _ => 0
   finite_supp := ⟨0, fun _ _ => rfl⟩
 
 /-- The monomial qⁿ. -/
-def LaurentPoly.qpow (n : Int) : LaurentPoly where
+noncomputable def LaurentPoly.qpow (n : Int) : LaurentPoly where
   coeffs := fun m => if m = n then 1 else 0
   finite_supp := by
     refine ⟨n.natAbs + 1, fun m hm => ?_⟩
@@ -180,7 +180,7 @@ def LaurentPoly.qpow (n : Int) : LaurentPoly where
     · rfl
 
 /-- Addition of Laurent polynomials. -/
-def LaurentPoly.add (p q : LaurentPoly) : LaurentPoly where
+noncomputable def LaurentPoly.add (p q : LaurentPoly) : LaurentPoly where
   coeffs := fun n => p.coeffs n + q.coeffs n
   finite_supp := by
     obtain ⟨N₁, h₁⟩ := p.finite_supp
@@ -197,7 +197,7 @@ theorem LaurentPoly.add_zero_coeffs (p : LaurentPoly) :
   simp [add, zero]
 
 /-- Path witness for add_zero. -/
-def LaurentPoly.add_zero_path (p : LaurentPoly) :
+noncomputable def LaurentPoly.add_zero_path (p : LaurentPoly) :
     Path (LaurentPoly.add p LaurentPoly.zero).coeffs p.coeffs :=
   Path.stepChain (LaurentPoly.add_zero_coeffs p)
 
@@ -207,11 +207,11 @@ structure HeckeElement (G : CoxeterGroup) where
   coeff : G.W → LaurentPoly
 
 /-- Zero element of the Hecke algebra. -/
-def HeckeElement.zero (G : CoxeterGroup) : HeckeElement G where
+noncomputable def HeckeElement.zero (G : CoxeterGroup) : HeckeElement G where
   coeff := fun _ => LaurentPoly.zero
 
 /-- Addition in the Hecke algebra. -/
-def HeckeElement.add {G : CoxeterGroup}
+noncomputable def HeckeElement.add {G : CoxeterGroup}
     (h₁ h₂ : HeckeElement G) : HeckeElement G where
   coeff := fun w => LaurentPoly.add (h₁.coeff w) (h₂.coeff w)
 
@@ -223,7 +223,7 @@ theorem HeckeElement.add_zero_coeff {G : CoxeterGroup}
   simp [add, zero, LaurentPoly.add, LaurentPoly.zero]
 
 /-- Path witness for Hecke add zero. -/
-def HeckeElement.add_zero_path {G : CoxeterGroup}
+noncomputable def HeckeElement.add_zero_path {G : CoxeterGroup}
     (h : HeckeElement G) (w : G.W) :
     Path ((HeckeElement.add h (HeckeElement.zero G)).coeff w).coeffs
          (h.coeff w).coeffs :=
@@ -255,7 +255,7 @@ structure KLPolynomial (G : CoxeterGroup) where
   diagonal : y = w → poly.coeffs = (LaurentPoly.qpow 0).coeffs
 
 /-- Path witness for KL polynomial on diagonal. -/
-def KLPolynomial.diagonal_path {G : CoxeterGroup}
+noncomputable def KLPolynomial.diagonal_path {G : CoxeterGroup}
     (P : KLPolynomial G) (h : P.y = P.w) :
     Path P.poly.coeffs (LaurentPoly.qpow 0).coeffs :=
   Path.stepChain (P.diagonal h)
@@ -273,7 +273,7 @@ structure KLPolynomialVanishing (G : CoxeterGroup)
   poly_zero : ∀ (n : Int), (LaurentPoly.zero).coeffs n = 0
 
 /-- Path witness for vanishing. -/
-def KLPolynomialVanishing.zero_path {G : CoxeterGroup}
+noncomputable def KLPolynomialVanishing.zero_path {G : CoxeterGroup}
     {B : BruhatOrder G}
     (V : KLPolynomialVanishing G B) (n : Int) :
     Path ((LaurentPoly.zero).coeffs n) 0 :=
@@ -282,7 +282,7 @@ def KLPolynomialVanishing.zero_path {G : CoxeterGroup}
 /-! ## KL Basis and Bar Involution -/
 
 /-- Bar involution on Laurent polynomials: q ↦ q⁻¹. -/
-def LaurentPoly.bar (p : LaurentPoly) : LaurentPoly where
+noncomputable def LaurentPoly.bar (p : LaurentPoly) : LaurentPoly where
   coeffs := fun n => p.coeffs (-n)
   finite_supp := by
     obtain ⟨N, hN⟩ := p.finite_supp
@@ -297,12 +297,12 @@ theorem LaurentPoly.bar_bar (p : LaurentPoly) :
   simp [bar]
 
 /-- Path witness for bar involution. -/
-def LaurentPoly.bar_bar_path (p : LaurentPoly) :
+noncomputable def LaurentPoly.bar_bar_path (p : LaurentPoly) :
     Path (LaurentPoly.bar (LaurentPoly.bar p)).coeffs p.coeffs :=
   Path.stepChain (LaurentPoly.bar_bar p)
 
 /-- Bar involution on Hecke algebra elements. -/
-def HeckeElement.bar {G : CoxeterGroup}
+noncomputable def HeckeElement.bar {G : CoxeterGroup}
     (h : HeckeElement G) : HeckeElement G where
   coeff := fun w => LaurentPoly.bar (h.coeff w)
 
@@ -314,7 +314,7 @@ theorem HeckeElement.bar_bar {G : CoxeterGroup}
   simp [bar, LaurentPoly.bar]
 
 /-- Path witness for Hecke bar involution. -/
-def HeckeElement.bar_bar_path {G : CoxeterGroup}
+noncomputable def HeckeElement.bar_bar_path {G : CoxeterGroup}
     (h : HeckeElement G) (w : G.W) :
     Path ((HeckeElement.bar (HeckeElement.bar h)).coeff w).coeffs
          (h.coeff w).coeffs :=
@@ -332,7 +332,7 @@ structure KLBasis (G : CoxeterGroup) where
       (element.coeff v).coeffs
 
 /-- Path witness for KL bar-invariance. -/
-def KLBasis.bar_invariant_path {G : CoxeterGroup}
+noncomputable def KLBasis.bar_invariant_path {G : CoxeterGroup}
     (C : KLBasis G) (v : G.W) :
     Path ((HeckeElement.bar C.element).coeff v).coeffs
          (C.element.coeff v).coeffs :=
@@ -416,13 +416,13 @@ structure KLConjecture (G : CoxeterGroup) (g : LieAlgData) where
     (klPoly y w).poly.coeffs 0 = (klPoly y w).poly.coeffs 0
 
 /-- Path witness for KL conjecture. -/
-def KLConjecture.conjecture_path {G : CoxeterGroup} {g : LieAlgData}
+noncomputable def KLConjecture.conjecture_path {G : CoxeterGroup} {g : LieAlgData}
     (K : KLConjecture G g) (y w : G.W) :
     Path (K.compMult y w).mult (K.compMult y w).mult :=
   Path.refl _
 
 /-- Path witness for evaluation at q = 1. -/
-def KLConjecture.eval_path {G : CoxeterGroup} {g : LieAlgData}
+noncomputable def KLConjecture.eval_path {G : CoxeterGroup} {g : LieAlgData}
     (K : KLConjecture G g) (y w : G.W) :
     Path ((K.klPoly y w).poly.coeffs 0)
          ((K.klPoly y w).poly.coeffs 0) :=
@@ -442,7 +442,7 @@ structure RPolynomial (G : CoxeterGroup) where
   diagonal : y = w → poly.coeffs = (LaurentPoly.qpow 0).coeffs
 
 /-- Path witness for R-polynomial diagonal. -/
-def RPolynomial.diagonal_path {G : CoxeterGroup}
+noncomputable def RPolynomial.diagonal_path {G : CoxeterGroup}
     (R : RPolynomial G) (h : R.y = R.w) :
     Path R.poly.coeffs (LaurentPoly.qpow 0).coeffs :=
   Path.stepChain (R.diagonal h)
@@ -459,7 +459,7 @@ structure RPolyRecursion (G : CoxeterGroup) where
     (rPoly y (G.mul (G.gen s) w)).poly.coeffs
 
 /-- Path witness for R-polynomial recursion. -/
-def RPolyRecursion.recursion_path {G : CoxeterGroup}
+noncomputable def RPolyRecursion.recursion_path {G : CoxeterGroup}
     (R : RPolyRecursion G) (s : G.S) (y w : G.W) :
     Path ((R.rPoly y (G.mul (G.gen s) w)).poly.coeffs)
          ((R.rPoly y (G.mul (G.gen s) w)).poly.coeffs) :=
@@ -487,23 +487,23 @@ structure KLStep (A : Type u) where
   proof : src = tgt
 
 /-- Convert to a Path. -/
-def KLStep.toPath {A : Type u}
+noncomputable def KLStep.toPath {A : Type u}
     (s : KLStep A) : Path s.src s.tgt :=
   Path.stepChain s.proof
 
 /-- Compose two KL step paths. -/
-def klChain {A : Type u} {a b c : A}
+noncomputable def klChain {A : Type u} {a b c : A}
     (h1 : a = b) (h2 : b = c) : Path a c :=
   Path.trans (Path.stepChain h1) (Path.stepChain h2)
 
 /-- Triple chain for KL steps. -/
-def klChain3 {A : Type u} {a b c d : A}
+noncomputable def klChain3 {A : Type u} {a b c d : A}
     (h1 : a = b) (h2 : b = c) (h3 : c = d) : Path a d :=
   Path.trans (Path.trans (Path.stepChain h1) (Path.stepChain h2))
              (Path.stepChain h3)
 
 /-- Symmetry for KL paths. -/
-def klSym {A : Type u} {a b : A} (h : a = b) : Path b a :=
+noncomputable def klSym {A : Type u} {a b : A} (h : a = b) : Path b a :=
   Path.symm (Path.stepChain h)
 
 /-! ## Summary -/

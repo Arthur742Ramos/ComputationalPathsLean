@@ -245,7 +245,7 @@ inductive TDAStep : Prop
   | wasserstein_opt : TDAStep
 
 /-- TDAStep validity. -/
-def tdaStep_valid : TDAStep → True
+noncomputable def tdaStep_valid : TDAStep → True
   | TDAStep.mapper_refine => trivial
   | TDAStep.reeb_quotient => trivial
   | TDAStep.merge_event => trivial
@@ -253,12 +253,12 @@ def tdaStep_valid : TDAStep → True
   | TDAStep.wasserstein_opt => trivial
 
 /-- Merge tree root is a fixed point (Path witness). -/
-def mergeTree_root_fixed (t : MergeTree) :
+noncomputable def mergeTree_root_fixed (t : MergeTree) :
     Path (t.parent t.root) t.root :=
   t.root_fixed
 
 /-- Mapper node count consistency. -/
-def mapper_node_count (m : MapperGraph) :
+noncomputable def mapper_node_count (m : MapperGraph) :
     Path m.numNodes m.nodes.length :=
   m.node_count
 

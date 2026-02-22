@@ -30,13 +30,13 @@ structure SymPerm (n : Nat) where
   left_inv : ∀ i, invFun (toFun i) = i
   right_inv : ∀ i, toFun (invFun i) = i
 
-def SymPerm.id (n : Nat) : SymPerm n where
+noncomputable def SymPerm.id (n : Nat) : SymPerm n where
   toFun := fun i => i
   invFun := fun i => i
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
-def SymPerm.comp {n : Nat} (s t : SymPerm n) : SymPerm n where
+noncomputable def SymPerm.comp {n : Nat} (s t : SymPerm n) : SymPerm n where
   toFun := s.toFun ∘ t.toFun
   invFun := t.invFun ∘ s.invFun
   left_inv := fun i => by
@@ -44,7 +44,7 @@ def SymPerm.comp {n : Nat} (s t : SymPerm n) : SymPerm n where
   right_inv := fun i => by
     simp [Function.comp, s.right_inv, t.right_inv]
 
-def SymPerm.inv {n : Nat} (s : SymPerm n) : SymPerm n where
+noncomputable def SymPerm.inv {n : Nat} (s : SymPerm n) : SymPerm n where
   toFun := s.invFun
   invFun := s.toFun
   left_inv := s.right_inv
@@ -89,11 +89,11 @@ theorem symPerm_inv_comp_toFun_apply {n : Nat} (s : SymPerm n) (i : Fin n) :
     (SymPerm.comp (SymPerm.inv s) s).toFun i = i := by
   simpa [SymPerm.comp, SymPerm.inv, Function.comp] using s.left_inv i
 
-def symPerm_comp_inv_path {n : Nat} (s : SymPerm n) (i : Fin n) :
+noncomputable def symPerm_comp_inv_path {n : Nat} (s : SymPerm n) (i : Fin n) :
     Path ((SymPerm.comp s (SymPerm.inv s)).toFun i) i :=
   Path.stepChain (symPerm_comp_inv_toFun_apply s i)
 
-def symPerm_inv_comp_path {n : Nat} (s : SymPerm n) (i : Fin n) :
+noncomputable def symPerm_inv_comp_path {n : Nat} (s : SymPerm n) (i : Fin n) :
     Path ((SymPerm.comp (SymPerm.inv s) s).toFun i) i :=
   Path.stepChain (symPerm_inv_comp_toFun_apply s i)
 
@@ -117,20 +117,20 @@ structure Operad where
   Gam : {n : Nat} → Op n → (Fin n → Op 1) → Op 1
   Gam_unit : Gam unit (fun _ => unit) = unit
 
-def Operad.SymAction_id_path (O : Operad) {n : Nat} (x : O.Op n) :
+noncomputable def Operad.SymAction_id_path (O : Operad) {n : Nat} (x : O.Op n) :
     Path (O.SymAction (SymPerm.id n) x) x :=
   Path.stepChain (O.SymAction_id x)
 
-def Operad.SymAction_comp_path (O : Operad) {n : Nat}
+noncomputable def Operad.SymAction_comp_path (O : Operad) {n : Nat}
     (s t : SymPerm n) (x : O.Op n) :
     Path (O.SymAction (SymPerm.comp s t) x) (O.SymAction s (O.SymAction t x)) :=
   Path.stepChain (O.SymAction_comp s t x)
 
-def Operad.Gam_unit_path (O : Operad) :
+noncomputable def Operad.Gam_unit_path (O : Operad) :
     Path (O.Gam O.unit (fun _ => O.unit)) O.unit :=
   Path.stepChain O.Gam_unit
 
-def Operad.trivial : Operad where
+noncomputable def Operad.trivial : Operad where
   Op := fun _ => Unit
   unit := ()
   SymAction := fun _ _ => ()
@@ -185,16 +185,16 @@ structure OperadAlgebra (O : Operad) where
   equivariant : {n : Nat} → ∀ (s : SymPerm n) (theta : O.Op n) (xs : Fin n → carrier),
     act (O.SymAction s theta) xs = act theta (xs ∘ s.invFun)
 
-def OperadAlgebra.unit_act_path {O : Operad} (A : OperadAlgebra O) (x : A.carrier) :
+noncomputable def OperadAlgebra.unit_act_path {O : Operad} (A : OperadAlgebra O) (x : A.carrier) :
     Path (A.act O.unit (fun _ => x)) x :=
   Path.stepChain (A.unit_act x)
 
-def OperadAlgebra.equivariant_path {O : Operad} (A : OperadAlgebra O) {n : Nat}
+noncomputable def OperadAlgebra.equivariant_path {O : Operad} (A : OperadAlgebra O) {n : Nat}
     (s : SymPerm n) (theta : O.Op n) (xs : Fin n → A.carrier) :
     Path (A.act (O.SymAction s theta) xs) (A.act theta (xs ∘ s.invFun)) :=
   Path.stepChain (A.equivariant s theta xs)
 
-def OperadAlgebra.trivial (O : Operad) : OperadAlgebra O where
+noncomputable def OperadAlgebra.trivial (O : Operad) : OperadAlgebra O where
   carrier := Unit
   act := fun _ _ => ()
   unit_act := fun _ => rfl
@@ -230,18 +230,18 @@ structure OperadAlgHom {O : Operad} (A B : OperadAlgebra O) where
   map_act : {n : Nat} → ∀ (theta : O.Op n) (xs : Fin n → A.carrier),
     toFun (A.act theta xs) = B.act theta (toFun ∘ xs)
 
-def OperadAlgHom.id {O : Operad} (A : OperadAlgebra O) : OperadAlgHom A A where
+noncomputable def OperadAlgHom.id {O : Operad} (A : OperadAlgebra O) : OperadAlgHom A A where
   toFun := fun x => x
   map_act := fun _ _ => rfl
 
-def OperadAlgHom.comp {O : Operad} {A B C : OperadAlgebra O}
+noncomputable def OperadAlgHom.comp {O : Operad} {A B C : OperadAlgebra O}
     (g : OperadAlgHom B C) (f : OperadAlgHom A B) : OperadAlgHom A C where
   toFun := g.toFun ∘ f.toFun
   map_act := fun theta xs => by
     show g.toFun (f.toFun (A.act theta xs)) = C.act theta (fun i => g.toFun (f.toFun (xs i)))
     rw [f.map_act theta xs, g.map_act theta (f.toFun ∘ xs)]
 
-def OperadAlgHom.map_act_path {O : Operad} {A B : OperadAlgebra O}
+noncomputable def OperadAlgHom.map_act_path {O : Operad} {A B : OperadAlgebra O}
     (f : OperadAlgHom A B) {n : Nat} (theta : O.Op n) (xs : Fin n → A.carrier) :
     Path (f.toFun (A.act theta xs)) (B.act theta (f.toFun ∘ xs)) :=
   Path.stepChain (f.map_act theta xs)
@@ -285,15 +285,15 @@ inductive AssociaTree : Nat → Type
   | leaf : AssociaTree 1
   | node : {m n : Nat} → AssociaTree m → AssociaTree n → AssociaTree (m + n)
 
-def AssociaTree.internalNodes : AssociaTree n → Nat
+noncomputable def AssociaTree.internalNodes : AssociaTree n → Nat
   | AssociaTree.leaf => 0
   | AssociaTree.node t1 t2 => 1 + AssociaTree.internalNodes t1 + AssociaTree.internalNodes t2
 
-def AssociaTree.height : AssociaTree n → Nat
+noncomputable def AssociaTree.height : AssociaTree n → Nat
   | AssociaTree.leaf => 0
   | AssociaTree.node t1 t2 => Nat.succ (Nat.max (AssociaTree.height t1) (AssociaTree.height t2))
 
-def AssociaTree.isLeaf : AssociaTree n → Bool
+noncomputable def AssociaTree.isLeaf : AssociaTree n → Bool
   | AssociaTree.leaf => true
   | AssociaTree.node _ _ => false
 
@@ -329,14 +329,14 @@ structure Associahedron (n : Nat) where
   vertices : List (AssociaTree n)
   edges : List (AssociaTree n × AssociaTree n)
 
-def associahedronOne : Associahedron 1 where
+noncomputable def associahedronOne : Associahedron 1 where
   vertices := [AssociaTree.leaf]
   edges := []
 
-def Associahedron.vertexCount (A : Associahedron n) : Nat :=
+noncomputable def Associahedron.vertexCount (A : Associahedron n) : Nat :=
   A.vertices.length
 
-def Associahedron.edgeCount (A : Associahedron n) : Nat :=
+noncomputable def Associahedron.edgeCount (A : Associahedron n) : Nat :=
   A.edges.length
 
 theorem associahedronOne_vertexCount :
@@ -361,21 +361,21 @@ structure AInfinityAlgebra (A : Type u) where
   m1_square : ∀ x : A, m 0 (fun _ => m 0 (fun _ => x)) = eta
   m1_eta : m 0 (fun _ => eta) = eta
 
-def AInfinityAlgebra.m1 {A : Type u} (X : AInfinityAlgebra A) (x : A) : A :=
+noncomputable def AInfinityAlgebra.m1 {A : Type u} (X : AInfinityAlgebra A) (x : A) : A :=
   X.m 0 (fun _ => x)
 
-def AInfinityAlgebra.m2 {A : Type u} (X : AInfinityAlgebra A) (x y : A) : A :=
+noncomputable def AInfinityAlgebra.m2 {A : Type u} (X : AInfinityAlgebra A) (x y : A) : A :=
   X.m 1 (fun i => if i.val = 0 then x else y)
 
-def AInfinityAlgebra.m1_square_path {A : Type u} (X : AInfinityAlgebra A) (x : A) :
+noncomputable def AInfinityAlgebra.m1_square_path {A : Type u} (X : AInfinityAlgebra A) (x : A) :
     Path (X.m1 (X.m1 x)) X.eta :=
   Path.stepChain (X.m1_square x)
 
-def AInfinityAlgebra.m1_eta_path {A : Type u} (X : AInfinityAlgebra A) :
+noncomputable def AInfinityAlgebra.m1_eta_path {A : Type u} (X : AInfinityAlgebra A) :
     Path (X.m1 X.eta) X.eta :=
   Path.stepChain X.m1_eta
 
-def AInfinityAlgebra.trivial : AInfinityAlgebra Unit where
+noncomputable def AInfinityAlgebra.trivial : AInfinityAlgebra Unit where
   m := fun _ _ => ()
   eta := ()
   m1_square := fun _ => rfl
@@ -420,25 +420,25 @@ structure LInfinityAlgebra (A : Type u) where
     l 1 (fun i => if i.val = 0 then x else y) =
       l 1 (fun i => if i.val = 0 then x else y)
 
-def LInfinityAlgebra.l1 {A : Type u} (X : LInfinityAlgebra A) (x : A) : A :=
+noncomputable def LInfinityAlgebra.l1 {A : Type u} (X : LInfinityAlgebra A) (x : A) : A :=
   X.l 0 (fun _ => x)
 
-def LInfinityAlgebra.l2 {A : Type u} (X : LInfinityAlgebra A) (x y : A) : A :=
+noncomputable def LInfinityAlgebra.l2 {A : Type u} (X : LInfinityAlgebra A) (x y : A) : A :=
   X.l 1 (fun i => if i.val = 0 then x else y)
 
-def LInfinityAlgebra.l1_square_path {A : Type u} (X : LInfinityAlgebra A) (x : A) :
+noncomputable def LInfinityAlgebra.l1_square_path {A : Type u} (X : LInfinityAlgebra A) (x : A) :
     Path (X.l1 (X.l1 x)) X.zero :=
   Path.stepChain (X.l1_square x)
 
-def LInfinityAlgebra.l1_zero_path {A : Type u} (X : LInfinityAlgebra A) :
+noncomputable def LInfinityAlgebra.l1_zero_path {A : Type u} (X : LInfinityAlgebra A) :
     Path (X.l1 X.zero) X.zero :=
   Path.stepChain X.l1_zero
 
-def LInfinityAlgebra.jacobi2_path {A : Type u} (X : LInfinityAlgebra A) (x y : A) :
+noncomputable def LInfinityAlgebra.jacobi2_path {A : Type u} (X : LInfinityAlgebra A) (x y : A) :
     Path (X.l2 x y) (X.l2 x y) :=
   Path.stepChain (X.jacobi2 x y)
 
-def LInfinityAlgebra.trivial : LInfinityAlgebra Unit where
+noncomputable def LInfinityAlgebra.trivial : LInfinityAlgebra Unit where
   l := fun _ _ => ()
   zero := ()
   l1_square := fun _ => rfl
@@ -480,11 +480,11 @@ theorem lInfinity_jacobi2_path_eq_stepChain {A : Type u}
 structure EInfinityOperad extends Operad where
   contractible : {n : Nat} → ∀ x y : Op n, x = y
 
-def EInfinityOperad.contractible_path (E : EInfinityOperad) {n : Nat}
+noncomputable def EInfinityOperad.contractible_path (E : EInfinityOperad) {n : Nat}
     (x y : E.Op n) : Path x y :=
   Path.stepChain (E.contractible x y)
 
-def EInfinityOperad.trivial : EInfinityOperad where
+noncomputable def EInfinityOperad.trivial : EInfinityOperad where
   Op := fun _ => Unit
   unit := ()
   SymAction := fun _ _ => ()
@@ -522,11 +522,11 @@ structure LittleDisk (n : Nat) where
   center : Fin n → Nat
   radius : Fin n → Nat
 
-def LittleDisk.unit : LittleDisk 1 where
+noncomputable def LittleDisk.unit : LittleDisk 1 where
   center := fun _ => 0
   radius := fun _ => 1
 
-def LittleDisk.permute {n : Nat} (s : SymPerm n) (d : LittleDisk n) : LittleDisk n where
+noncomputable def LittleDisk.permute {n : Nat} (s : SymPerm n) (d : LittleDisk n) : LittleDisk n where
   center := d.center ∘ s.invFun
   radius := d.radius ∘ s.invFun
 
@@ -543,7 +543,7 @@ theorem littleDisk_permute_comp {n : Nat} (s t : SymPerm n) (d : LittleDisk n) :
   cases d
   rfl
 
-def littleDisksOperad : Operad where
+noncomputable def littleDisksOperad : Operad where
   Op := LittleDisk
   unit := LittleDisk.unit
   SymAction := fun s d => LittleDisk.permute s d
@@ -570,11 +570,11 @@ structure QuadraticDatum where
   Gen : Type u
   Rel : Gen → Gen → Prop
 
-def QuadraticDatum.koszulDual (Q : QuadraticDatum) : QuadraticDatum where
+noncomputable def QuadraticDatum.koszulDual (Q : QuadraticDatum) : QuadraticDatum where
   Gen := Q.Gen
   Rel := Q.Rel
 
-def QuadraticDatum.koszulDualPath (Q : QuadraticDatum) :
+noncomputable def QuadraticDatum.koszulDualPath (Q : QuadraticDatum) :
     Path Q.koszulDual.koszulDual Q :=
   Path.refl _
 
@@ -594,7 +594,7 @@ structure KoszulPair where
   left : QuadraticDatum
   right : QuadraticDatum
 
-def KoszulPair.swap (K : KoszulPair) : KoszulPair where
+noncomputable def KoszulPair.swap (K : KoszulPair) : KoszulPair where
   left := K.right
   right := K.left
 
@@ -617,7 +617,7 @@ structure ChainData where
   d : ∀ n, obj (n + 1) → obj n
   d_squared : ∀ n (x : obj (n + 2)), d n (d (n + 1) x) = zero n
 
-def ChainData.d_squared_path (C : ChainData) (n : Nat) (x : C.obj (n + 2)) :
+noncomputable def ChainData.d_squared_path (C : ChainData) (n : Nat) (x : C.obj (n + 2)) :
     Path (C.d n (C.d (n + 1) x)) (C.zero n) :=
   Path.stepChain (C.d_squared n x)
 
@@ -637,12 +637,12 @@ structure BarCobarAdjunction (C : ChainData) where
   triangle_left : ∀ n (x : C.obj n), counitMap n (unitMap n x) = x
   triangle_right : ∀ n (x : C.obj n), unitMap n (counitMap n x) = x
 
-def BarCobarAdjunction.triangle_left_path (A : BarCobarAdjunction C)
+noncomputable def BarCobarAdjunction.triangle_left_path (A : BarCobarAdjunction C)
     (n : Nat) (x : C.obj n) :
     Path (A.counitMap n (A.unitMap n x)) x :=
   Path.stepChain (A.triangle_left n x)
 
-def BarCobarAdjunction.triangle_right_path (A : BarCobarAdjunction C)
+noncomputable def BarCobarAdjunction.triangle_right_path (A : BarCobarAdjunction C)
     (n : Nat) (x : C.obj n) :
     Path (A.unitMap n (A.counitMap n x)) x :=
   Path.stepChain (A.triangle_right n x)
@@ -679,7 +679,7 @@ structure OperadicHomology (O : Operad) where
   boundary_squared : ∀ n (x : group (n + 2)),
     boundary n (boundary (n + 1) x) = zero n
 
-def OperadicHomology.boundary_squared_path {O : Operad}
+noncomputable def OperadicHomology.boundary_squared_path {O : Operad}
     (H : OperadicHomology O) (n : Nat) (x : H.group (n + 2)) :
     Path (H.boundary n (H.boundary (n + 1) x)) (H.zero n) :=
   Path.stepChain (H.boundary_squared n x)
@@ -704,12 +704,12 @@ inductive DTree where
   | corolla : Nat → DTree
   | graft : DTree → DTree → DTree
 
-def DTree.size : DTree → Nat
+noncomputable def DTree.size : DTree → Nat
   | DTree.eta => 1
   | DTree.corolla n => n + 1
   | DTree.graft t1 t2 => DTree.size t1 + DTree.size t2 + 1
 
-def DTree.leafCount : DTree → Nat
+noncomputable def DTree.leafCount : DTree → Nat
   | DTree.eta => 1
   | DTree.corolla n => n
   | DTree.graft t1 t2 => DTree.leafCount t1 + DTree.leafCount t2
@@ -744,15 +744,15 @@ structure DendroidalSet where
   face_idem : ∀ t (x : cell t), face t (face t x) = face t x
   degeneracy_idem : ∀ t (x : cell t), degeneracy t (degeneracy t x) = degeneracy t x
 
-def DendroidalSet.face_path (X : DendroidalSet) (t : DTree) (x : X.cell t) :
+noncomputable def DendroidalSet.face_path (X : DendroidalSet) (t : DTree) (x : X.cell t) :
     Path (X.face t (X.face t x)) (X.face t x) :=
   Path.stepChain (X.face_idem t x)
 
-def DendroidalSet.degeneracy_path (X : DendroidalSet) (t : DTree) (x : X.cell t) :
+noncomputable def DendroidalSet.degeneracy_path (X : DendroidalSet) (t : DTree) (x : X.cell t) :
     Path (X.degeneracy t (X.degeneracy t x)) (X.degeneracy t x) :=
   Path.stepChain (X.degeneracy_idem t x)
 
-def DendroidalSet.constant : DendroidalSet where
+noncomputable def DendroidalSet.constant : DendroidalSet where
   cell := fun _ => Unit
   face := fun _ _ => ()
   degeneracy := fun _ _ => ()

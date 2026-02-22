@@ -125,7 +125,7 @@ structure EtaleMap where
   finitelyPresented : True
 
 /-- Identity map is étale. -/
-def etaleId (R : Type u) (RR : CRingData R) : EtaleMap where
+noncomputable def etaleId (R : Type u) (RR : CRingData R) : EtaleMap where
   sourceRing := R
   targetRing := R
   sourceStr := RR
@@ -221,7 +221,7 @@ structure EtaleSheaf (X : SchemeData) where
   gluing : True
 
 /-- The constant sheaf with value A. -/
-def constantSheaf (X : SchemeData) (A : Type u) (AG : AbelianGroupData A) :
+noncomputable def constantSheaf (X : SchemeData) (A : Type u) (AG : AbelianGroupData A) :
     EtaleSheaf X where
   sections := fun _ => A
   groupStr := fun _ => AG

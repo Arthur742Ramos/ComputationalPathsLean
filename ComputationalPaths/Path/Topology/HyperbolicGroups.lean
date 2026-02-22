@@ -53,7 +53,7 @@ namespace MetricData
 variable {X : Type u} (M : MetricData X)
 
 /-- The Gromov product of x and y with basepoint e. -/
-def gromovProduct (e x y : X) : Nat :=
+noncomputable def gromovProduct (e x y : X) : Nat :=
   (M.dist e x + M.dist e y - M.dist x y) / 2
 
 /-- Coerce the reflexive path of distances to an equality. -/
@@ -65,14 +65,14 @@ theorem dist_comm_eq (x y : X) : M.dist x y = M.dist y x :=
   Path.toEq (M.dist_comm x y)
 
 /-- The Gromov product is symmetric. -/
-def gromovProduct_comm (e x y : X) :
+noncomputable def gromovProduct_comm (e x y : X) :
     Path (M.gromovProduct e x y) (M.gromovProduct e y x) := by
   apply Path.stepChain
   simp [gromovProduct, dist_comm_eq (M:=M) x y,
     Nat.add_comm (M.dist e x) (M.dist e y)]
 
 /-- Symmetry of the Gromov product yields a loop by path composition. -/
-def gromovProduct_comm_loop (e x y : X) :
+noncomputable def gromovProduct_comm_loop (e x y : X) :
     Path (M.gromovProduct e x y) (M.gromovProduct e x y) :=
   Path.trans (gromovProduct_comm (M:=M) e x y)
     (Path.symm (gromovProduct_comm (M:=M) e x y))
@@ -189,7 +189,7 @@ structure QuasiGeodesic {X : Type u} (M : MetricData X) (lam eps : Nat) where
 /-- The Morse Lemma: in a δ-hyperbolic space, every quasi-geodesic stays
     within a bounded distance of any geodesic with the same endpoints.
     This is stated as a proposition (existence of the bound). -/
-def MorseLemma {X : Type u} (H : DeltaHyperbolic X) (lam eps : Nat) : Prop :=
+noncomputable def MorseLemma {X : Type u} (H : DeltaHyperbolic X) (lam eps : Nat) : Prop :=
   ∃ R : Nat,
     ∀ (qg : QuasiGeodesic H.toMetricData lam eps)
       (seg : GeodesicSegment H.toMetricData (qg.point ⟨0, Nat.zero_lt_succ _⟩)
@@ -209,16 +209,16 @@ structure SeqAtInfinity {X : Type u} (M : MetricData X) (basepoint : X) where
 
 /-- Equivalence relation on sequences at infinity: two sequences are equivalent
     if their Gromov product diverges. -/
-def seqEquiv {X : Type u} (M : MetricData X) (basepoint : X)
+noncomputable def seqEquiv {X : Type u} (M : MetricData X) (basepoint : X)
     (s₁ s₂ : SeqAtInfinity M basepoint) : Prop :=
   ∀ N : Nat, ∃ n₀ : Nat, ∀ n, n ≥ n₀ → M.gromovProduct basepoint (s₁.seq n) (s₂.seq n) ≥ N
 
 /-- The boundary at infinity as a quotient of sequences going to infinity. -/
-def BoundaryAtInfinity {X : Type u} (M : MetricData X) (basepoint : X) : Type u :=
+noncomputable def BoundaryAtInfinity {X : Type u} (M : MetricData X) (basepoint : X) : Type u :=
   Quot (seqEquiv M basepoint)
 
 /-- Project a sequence at infinity to its boundary class. -/
-def toBoundary {X : Type u} {M : MetricData X} {basepoint : X}
+noncomputable def toBoundary {X : Type u} {M : MetricData X} {basepoint : X}
     (s : SeqAtInfinity M basepoint) : BoundaryAtInfinity M basepoint :=
   Quot.mk _ s
 

@@ -39,24 +39,24 @@ theorem suspRel_equivalence (A : Type u) : Equivalence (SuspRel A) :=
   ⟨SuspRel.refl, fun h => SuspRel.symm h, fun h₁ h₂ => SuspRel.trans h₁ h₂⟩
 
 /-- Setoid for the suspension quotient. -/
-def suspSetoid (A : Type u) : Setoid (SuspRaw A) :=
+noncomputable def suspSetoid (A : Type u) : Setoid (SuspRaw A) :=
   ⟨SuspRel A, suspRel_equivalence A⟩
 
 /-- The suspension of `A` as a quotient type. -/
-def Susp (A : Type u) : Type u := Quotient (suspSetoid A)
+noncomputable def Susp (A : Type u) : Type u := Quotient (suspSetoid A)
 
 namespace Susp
 
 variable {A : Type u} {B : Type v}
 
 /-- The north pole in the suspension. -/
-def north : Susp A := Quotient.mk (suspSetoid A) SuspRaw.north
+noncomputable def north : Susp A := Quotient.mk (suspSetoid A) SuspRaw.north
 
 /-- The south pole in the suspension. -/
-def south : Susp A := Quotient.mk (suspSetoid A) SuspRaw.south
+noncomputable def south : Susp A := Quotient.mk (suspSetoid A) SuspRaw.south
 
 /-- The meridian point corresponding to `a`. -/
-def merid (a : A) : Susp A := Quotient.mk (suspSetoid A) (SuspRaw.merid a)
+noncomputable def merid (a : A) : Susp A := Quotient.mk (suspSetoid A) (SuspRaw.merid a)
 
 /-- In the suspension, `merid a = north`. -/
 theorem merid_eq_north (a : A) : merid a = @north A :=
@@ -73,11 +73,11 @@ theorem north_eq_south (a : A) : @north A = @south A :=
 /-! ## Path constructions in the suspension -/
 
 /-- Full meridian path from north to south through `a`. -/
-def fullMeridian (a : A) : Path (@north A) (@south A) :=
+noncomputable def fullMeridian (a : A) : Path (@north A) (@south A) :=
   Path.mk [Step.mk _ _ (north_eq_south a)] (north_eq_south a)
 
 /-- Reverse meridian path. -/
-def fullMeridianRev (a : A) : Path (@south A) (@north A) :=
+noncomputable def fullMeridianRev (a : A) : Path (@south A) (@north A) :=
   Path.symm (fullMeridian a)
 
 /-- The meridian path has the expected proof component. -/
@@ -92,7 +92,7 @@ theorem fullMeridian_eq (a b : A) : fullMeridian a = fullMeridian b := by
 /-! ## Loop structure -/
 
 /-- A loop at north built from two meridians. -/
-def meridianLoop (a b : A) : Path (@north A) (@north A) :=
+noncomputable def meridianLoop (a b : A) : Path (@north A) (@north A) :=
   Path.trans (fullMeridian a) (fullMeridianRev b)
 
 theorem meridianLoop_toEq (a b : A) :
@@ -100,7 +100,7 @@ theorem meridianLoop_toEq (a b : A) :
   simp [meridianLoop, fullMeridian, fullMeridianRev]
 
 /-- A loop at south. -/
-def southLoop (a b : A) : Path (@south A) (@south A) :=
+noncomputable def southLoop (a b : A) : Path (@south A) (@south A) :=
   Path.trans (fullMeridianRev a) (fullMeridian b)
 
 theorem southLoop_toEq (a b : A) :
@@ -120,7 +120,7 @@ theorem loop_south_eq (p q : Path (@south A) (@south A)) :
 /-! ## Suspension functoriality -/
 
 /-- Raw map on suspension data. -/
-def mapRaw (f : A → B) : SuspRaw A → SuspRaw B
+noncomputable def mapRaw (f : A → B) : SuspRaw A → SuspRaw B
   | SuspRaw.north => SuspRaw.north
   | SuspRaw.south => SuspRaw.south
   | SuspRaw.merid a => SuspRaw.merid (f a)
@@ -136,7 +136,7 @@ theorem mapRaw_respects (f : A → B) {x y : SuspRaw A} (h : SuspRel A x y) :
   | trans _ _ ih₁ ih₂ => exact SuspRel.trans ih₁ ih₂
 
 /-- Functorial map on suspensions. -/
-def map (f : A → B) : Susp A → Susp B :=
+noncomputable def map (f : A → B) : Susp A → Susp B :=
   Quotient.lift (fun x => Quotient.mk (suspSetoid B) (mapRaw f x))
     (fun _ _ h => Quotient.sound (mapRaw_respects f h))
 
@@ -166,7 +166,7 @@ theorem eq_north (x : Susp A) [Nonempty A] : x = north := by
     | merid a => exact merid_eq_north a)
 
 /-- The suspension of a nonempty type is path-connected. -/
-def pathConnectedPath [Nonempty A] (x y : Susp A) : Path x y :=
+noncomputable def pathConnectedPath [Nonempty A] (x y : Susp A) : Path x y :=
   Path.mk [Step.mk _ _ ((eq_north x).trans (eq_north y).symm)]
     ((eq_north x).trans (eq_north y).symm)
 
@@ -192,7 +192,7 @@ theorem transport_meridianLoop {D : Susp A → Sort v} (a b : A)
 abbrev Susp2 (A : Type u) := Susp (Susp A)
 
 /-- North pole of double suspension. -/
-def north2 : Susp2 A := north
+noncomputable def north2 : Susp2 A := north
 
 /-- Double suspension of nonempty type: all elements equal. -/
 theorem susp2_eq [Nonempty A] (x y : Susp2 A) : x = y := by
@@ -202,7 +202,7 @@ theorem susp2_eq [Nonempty A] (x y : Susp2 A) : x = y := by
 /-! ## Reduced structure: folding -/
 
 /-- Folding map on raw data. -/
-def foldRaw : SuspRaw A → SuspRaw A
+noncomputable def foldRaw : SuspRaw A → SuspRaw A
   | SuspRaw.north => SuspRaw.north
   | SuspRaw.south => SuspRaw.south
   | SuspRaw.merid _ => SuspRaw.south

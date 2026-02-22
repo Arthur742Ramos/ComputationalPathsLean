@@ -87,7 +87,7 @@ namespace TwoCategory
 variable {Obj : Type u}
 
 /-- Left route of Mac Lane's pentagon in a `TwoCategory`. -/
-def pentagonLeftRoute (C : TwoCategory (Obj := Obj))
+noncomputable def pentagonLeftRoute (C : TwoCategory (Obj := Obj))
     {a b c d e : Obj}
     (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) (k : C.Hom d e) :
     C.TwoCell (C.comp (C.comp (C.comp f g) h) k)
@@ -98,7 +98,7 @@ def pentagonLeftRoute (C : TwoCategory (Obj := Obj))
     (C.whiskerLeft f (C.assoc g h k))
 
 /-- Right route of Mac Lane's pentagon in a `TwoCategory`. -/
-def pentagonRightRoute (C : TwoCategory (Obj := Obj))
+noncomputable def pentagonRightRoute (C : TwoCategory (Obj := Obj))
     {a b c d e : Obj}
     (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) (k : C.Hom d e) :
     C.TwoCell (C.comp (C.comp (C.comp f g) h) k)
@@ -106,7 +106,7 @@ def pentagonRightRoute (C : TwoCategory (Obj := Obj))
   C.vcomp (C.assoc (C.comp f g) h k) (C.assoc f g (C.comp h k))
 
 /-- Left route of Mac Lane's triangle in a `TwoCategory`. -/
-def triangleLeftRoute (C : TwoCategory (Obj := Obj))
+noncomputable def triangleLeftRoute (C : TwoCategory (Obj := Obj))
     {a b c : Obj} (f : C.Hom a b) (g : C.Hom b c) :
     C.TwoCell (C.comp (C.comp f (C.id₁ b)) g) (C.comp f g) :=
   C.vcomp
@@ -114,20 +114,20 @@ def triangleLeftRoute (C : TwoCategory (Obj := Obj))
     (C.whiskerLeft f (C.leftUnitor g))
 
 /-- Right route of Mac Lane's triangle in a `TwoCategory`. -/
-def triangleRightRoute (C : TwoCategory (Obj := Obj))
+noncomputable def triangleRightRoute (C : TwoCategory (Obj := Obj))
     {a b c : Obj} (f : C.Hom a b) (g : C.Hom b c) :
     C.TwoCell (C.comp (C.comp f (C.id₁ b)) g) (C.comp f g) :=
   C.whiskerRight g (C.rightUnitor f)
 
 /-- Explicit computational-path witness for the pentagon identity. -/
-def pentagonPath (C : TwoCategory (Obj := Obj))
+noncomputable def pentagonPath (C : TwoCategory (Obj := Obj))
     {a b c d e : Obj}
     (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) (k : C.Hom d e) :
     CellPath (pentagonLeftRoute C f g h k) (pentagonRightRoute C f g h k) :=
   C.pentagon_path f g h k
 
 /-- Explicit computational-path witness for the triangle identity. -/
-def trianglePath (C : TwoCategory (Obj := Obj))
+noncomputable def trianglePath (C : TwoCategory (Obj := Obj))
     {a b c : Obj} (f : C.Hom a b) (g : C.Hom b c) :
     CellPath (triangleLeftRoute C f g) (triangleRightRoute C f g) :=
   C.triangle_path f g
@@ -238,7 +238,7 @@ abbrev Path2Cell {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   Nonempty (RwEq (A := A) (a := a) (b := b) p q)
 
 /-- The 2-category carried by computational paths. -/
-def pathTwoCategory (A : Type u) : TwoCategory (Obj := A) where
+noncomputable def pathTwoCategory (A : Type u) : TwoCategory (Obj := A) where
   toWeakBicategory := weakBicategory A
   vcomp_assoc := by
     intro a b f g h i η θ ι

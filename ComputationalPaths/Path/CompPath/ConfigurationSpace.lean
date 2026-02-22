@@ -40,7 +40,7 @@ universe u
 /-- Path-based collision predicate for a family of points.
     Two distinct indices must not be connected by a path.
     Since `Path` lives in `Type u`, we use function to `False`. -/
-def NoCollision {A : Type u} {n : Nat} (f : Fin n → A) : Prop :=
+noncomputable def NoCollision {A : Type u} {n : Nat} (f : Fin n → A) : Prop :=
   ∀ {i j : Fin n}, i ≠ j → Path (f i) (f j) → False
 
 /-- NoCollision is preserved under composition with injective-on-paths functions. -/
@@ -60,7 +60,7 @@ theorem noCollision_restrict {A : Type u} {n m : Nat}
 /-! ## Configuration spaces -/
 
 /-- Ordered configuration space of `n` points in `A`. -/
-def ConfigurationSpace (A : Type u) (n : Nat) : Type u :=
+noncomputable def ConfigurationSpace (A : Type u) (n : Nat) : Type u :=
   {f : Fin n → A // NoCollision f}
 
 namespace ConfigurationSpace
@@ -68,7 +68,7 @@ namespace ConfigurationSpace
 variable {A : Type u} {n : Nat}
 
 /-- Underlying family of points. -/
-@[simp] def points (c : ConfigurationSpace A n) : Fin n → A := c.1
+@[simp] noncomputable def points (c : ConfigurationSpace A n) : Fin n → A := c.1
 
 /-- Collision-free property for configurations. -/
 theorem noCollision (c : ConfigurationSpace A n) {i j : Fin n} (h : i ≠ j)
@@ -76,7 +76,7 @@ theorem noCollision (c : ConfigurationSpace A n) {i j : Fin n} (h : i ≠ j)
   c.2 h p
 
 /-- The i-th particle of a configuration. -/
-def particle (c : ConfigurationSpace A n) (i : Fin n) : A := c.1 i
+noncomputable def particle (c : ConfigurationSpace A n) (i : Fin n) : A := c.1 i
 
 /-- Two distinct particles are not path-connected. -/
 theorem particle_distinct (c : ConfigurationSpace A n)
@@ -88,7 +88,7 @@ end ConfigurationSpace
 /-! ## Empty configuration -/
 
 /-- The unique empty configuration. -/
-def configurationSpaceEmpty (A : Type u) : ConfigurationSpace A 0 :=
+noncomputable def configurationSpaceEmpty (A : Type u) : ConfigurationSpace A 0 :=
   ⟨(fun i => nomatch i), fun {i} => nomatch i⟩
 
 /-- The empty configuration is the only configuration of 0 points. -/
@@ -101,14 +101,14 @@ theorem configurationSpace_zero_unique (A : Type u) (c : ConfigurationSpace A 0)
     exact nomatch i
 
 /-- Path witness of uniqueness of the empty configuration. -/
-def configurationSpace_zero_unique_path (A : Type u) (c : ConfigurationSpace A 0) :
+noncomputable def configurationSpace_zero_unique_path (A : Type u) (c : ConfigurationSpace A 0) :
     Path c (configurationSpaceEmpty A) :=
   Path.stepChain (configurationSpace_zero_unique A c)
 
 /-! ## Singleton configuration -/
 
 /-- A single-point configuration is trivially collision-free. -/
-def configurationSpaceSingleton {A : Type u} (a : A) : ConfigurationSpace A 1 :=
+noncomputable def configurationSpaceSingleton {A : Type u} (a : A) : ConfigurationSpace A 1 :=
   ⟨fun _ => a, fun {i j} h _ => by
     have : i = j := by
       have hi := i.isLt
@@ -127,7 +127,7 @@ private theorem fin2_cases (i : Fin 2) : i.val = 0 ∨ i.val = 1 := by
   omega
 
 /-- Two-point configuration from a pair of path-distinct points. -/
-def configurationSpacePair {A : Type u} (a b : A)
+noncomputable def configurationSpacePair {A : Type u} (a b : A)
     (hdist : Path a b → False) : ConfigurationSpace A 2 :=
   ⟨fun i => if i.val = 0 then a else b,
    fun {i j} h p => by
@@ -150,7 +150,7 @@ theorem configurationSpacePair_second {A : Type u} (a b : A)
 /-! ## Forgetful map -/
 
 /-- Forget the last particle: Conf_{n+1}(A) → Conf_n(A). -/
-def ConfigurationSpace.forget {A : Type u} {n : Nat}
+noncomputable def ConfigurationSpace.forget {A : Type u} {n : Nat}
     (c : ConfigurationSpace A (n + 1)) : ConfigurationSpace A n :=
   ⟨fun i => c.1 ⟨i.val, by omega⟩,
    fun {i j} h p => c.2
@@ -165,7 +165,7 @@ theorem ConfigurationSpace.forget_particle {A : Type u} {n : Nat}
 /-! ## Restriction to a subset of indices -/
 
 /-- Restrict a configuration to a subset of indices given by an injection. -/
-def ConfigurationSpace.restrict {A : Type u} {n m : Nat}
+noncomputable def ConfigurationSpace.restrict {A : Type u} {n m : Nat}
     (c : ConfigurationSpace A n) (r : Fin m → Fin n)
     (hr : ∀ {i j : Fin m}, i ≠ j → r i ≠ r j) :
     ConfigurationSpace A m :=
@@ -180,7 +180,7 @@ theorem ConfigurationSpace.restrict_particle {A : Type u} {n m : Nat}
 /-! ## Transport of configurations along maps -/
 
 /-- Transport a configuration along a function g : A → B that reflects paths. -/
-def ConfigurationSpace.mapConfig {A B : Type u} {n : Nat}
+noncomputable def ConfigurationSpace.mapConfig {A B : Type u} {n : Nat}
     (g : A → B)
     (hg : ∀ {a₁ a₂ : A}, Path (g a₁) (g a₂) → Path a₁ a₂)
     (c : ConfigurationSpace A n) : ConfigurationSpace B n :=
@@ -196,17 +196,17 @@ theorem ConfigurationSpace.mapConfig_particle {A B : Type u} {n : Nat}
 /-! ## Unordered configuration space -/
 
 /-- The relation identifying configurations that differ by a permutation of indices. -/
-def ConfigurationSpace.PermRelated {A : Type u} {n : Nat}
+noncomputable def ConfigurationSpace.PermRelated {A : Type u} {n : Nat}
     (c₁ c₂ : ConfigurationSpace A n) : Prop :=
   ∃ σ : Fin n → Fin n,
     (∀ {i j}, σ i = σ j → i = j) ∧ (∀ i, c₂.1 i = c₁.1 (σ i))
 
 /-- Unordered configuration space: quotient by the symmetric group. -/
-def UConfigurationSpace (A : Type u) (n : Nat) : Type u :=
+noncomputable def UConfigurationSpace (A : Type u) (n : Nat) : Type u :=
   Quot (@ConfigurationSpace.PermRelated A n)
 
 /-- Projection from ordered to unordered configuration space. -/
-def UConfigurationSpace.mk {A : Type u} {n : Nat}
+noncomputable def UConfigurationSpace.mk {A : Type u} {n : Nat}
     (c : ConfigurationSpace A n) : UConfigurationSpace A n :=
   Quot.mk _ c
 
@@ -222,7 +222,7 @@ theorem uConfigurationSpace_zero_unique (A : Type u)
   rw [hcx, hcy]
 
 /-- Path witness that the unordered 0-configuration space has a unique element. -/
-def uConfigurationSpace_zero_unique_path (A : Type u)
+noncomputable def uConfigurationSpace_zero_unique_path (A : Type u)
     (x y : UConfigurationSpace A 0) :
     Path x y :=
   Path.stepChain (uConfigurationSpace_zero_unique A x y)

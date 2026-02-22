@@ -40,36 +40,36 @@ inductive PosExpr where
 namespace PosExpr
 
 /-- Embed a positive expression into `Expr`. -/
-@[simp] def toExpr : PosExpr → Expr
+@[simp] noncomputable def toExpr : PosExpr → Expr
   | .atom n => .atom n
   | .refl => .refl
   | .trans e₁ e₂ => .trans e₁.toExpr e₂.toExpr
 
 /-- Number of atoms. -/
-@[simp] def atomCount : PosExpr → Nat
+@[simp] noncomputable def atomCount : PosExpr → Nat
   | .atom _ => 1
   | .refl => 0
   | .trans e₁ e₂ => e₁.atomCount + e₂.atomCount
 
 /-- Collect atom indices left to right. -/
-def toWord : PosExpr → List Nat
+noncomputable def toWord : PosExpr → List Nat
   | .atom n => [n]
   | .refl => []
   | .trans e₁ e₂ => e₁.toWord ++ e₂.toWord
 
 /-- Maximum atom index + 1. -/
-def maxAtomSucc : PosExpr → Nat
+noncomputable def maxAtomSucc : PosExpr → Nat
   | .atom n => n + 1
   | .refl => 0
   | .trans e₁ e₂ => max e₁.maxAtomSucc e₂.maxAtomSucc
 
 /-! ## Monoid Structure -/
 
-@[simp] def comp (e₁ e₂ : PosExpr) : PosExpr := .trans e₁ e₂
-@[simp] def one : PosExpr := .refl
+@[simp] noncomputable def comp (e₁ e₂ : PosExpr) : PosExpr := .trans e₁ e₂
+@[simp] noncomputable def one : PosExpr := .refl
 
 /-- Rewrite equivalence inherited from Expr. -/
-def PosRwEq (e₁ e₂ : PosExpr) : Prop :=
+noncomputable def PosRwEq (e₁ e₂ : PosExpr) : Prop :=
   ExprRwEq e₁.toExpr e₂.toExpr
 
 theorem posRwEq_refl (e : PosExpr) : PosRwEq e e := ExprRwEq.refl _
@@ -120,7 +120,7 @@ theorem toWord_length (e : PosExpr) : e.toWord.length = e.atomCount := by
 /-! ## Partial Garside Structure for Bounded Fragments -/
 
 /-- Concatenation of atoms 0..n-1. -/
-def partialGarside : Nat → PosExpr
+noncomputable def partialGarside : Nat → PosExpr
   | 0 => .refl
   | 1 => .atom 0
   | n + 2 => .trans (partialGarside (n + 1)) (.atom (n + 1))
@@ -165,7 +165,7 @@ theorem posRwEq_iff_toRW (e₁ e₂ : PosExpr) :
 /-! ## Left Divisibility -/
 
 /-- `e₁` left-divides `e₂` if `e₂ ≡ trans e₁ r` for some `r`. -/
-def LeftDiv (e₁ e₂ : PosExpr) : Prop :=
+noncomputable def LeftDiv (e₁ e₂ : PosExpr) : Prop :=
   ∃ r : PosExpr, PosRwEq (comp e₁ r) e₂
 
 /-- Left divisibility is reflexive. -/

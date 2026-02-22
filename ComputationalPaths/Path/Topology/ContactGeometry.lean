@@ -59,12 +59,12 @@ structure ContactStructure where
   distribution_eq : ∀ p v, distribution p v ↔ alpha v = 0
 
 /-- Any vector in ξ has α(v) = 0. -/
-def distribution_vanishes (cs : ContactStructure) (p : cs.carrier)
+noncomputable def distribution_vanishes (cs : ContactStructure) (p : cs.carrier)
     (v : cs.tangent) (hv : cs.distribution p v) : cs.alpha v = 0 :=
   (cs.distribution_eq p v).mp hv
 
 /-- If α(v) = 0 then v ∈ ξ. -/
-def zero_implies_distribution (cs : ContactStructure) (p : cs.carrier)
+noncomputable def zero_implies_distribution (cs : ContactStructure) (p : cs.carrier)
     (v : cs.tangent) (h : cs.alpha v = 0) : cs.distribution p v :=
   (cs.distribution_eq p v).mpr h
 
@@ -119,7 +119,7 @@ structure Contactomorphism (cs₁ cs₂ : ContactStructure) where
   preserves : True   -- φ_* ξ₁ = ξ₂
 
 /-- Identity contactomorphism. -/
-def contacto_id (cs : ContactStructure) : Contactomorphism cs cs where
+noncomputable def contacto_id (cs : ContactStructure) : Contactomorphism cs cs where
   toFun     := id
   invFun    := id
   left_inv  := fun _ => rfl
@@ -127,7 +127,7 @@ def contacto_id (cs : ContactStructure) : Contactomorphism cs cs where
   preserves := trivial
 
 /-- Composition of contactomorphisms. -/
-def contacto_comp {cs₁ cs₂ cs₃ : ContactStructure}
+noncomputable def contacto_comp {cs₁ cs₂ cs₃ : ContactStructure}
     (f : Contactomorphism cs₁ cs₂) (g : Contactomorphism cs₂ cs₃) :
     Contactomorphism cs₁ cs₃ where
   toFun     := g.toFun ∘ f.toFun
@@ -137,7 +137,7 @@ def contacto_comp {cs₁ cs₂ cs₃ : ContactStructure}
   preserves := trivial
 
 /-- Inverse contactomorphism. -/
-def contacto_inv {cs₁ cs₂ : ContactStructure}
+noncomputable def contacto_inv {cs₁ cs₂ : ContactStructure}
     (f : Contactomorphism cs₁ cs₂) : Contactomorphism cs₂ cs₁ where
   toFun     := f.invFun
   invFun    := f.toFun
@@ -246,7 +246,7 @@ structure OvertwistedStructure (cs : ContactStructure.{u}) where
   disk : OvertwistedDisk.{u} cs
 
 /-- Tight and overtwisted are mutually exclusive. -/
-def tight_ot_exclusive (cs : ContactStructure.{u})
+noncomputable def tight_ot_exclusive (cs : ContactStructure.{u})
     (tight : TightStructure.{u} cs) (ot : OvertwistedStructure.{u} cs) : False :=
   tight.no_overtwisted ot.disk
 
@@ -426,18 +426,18 @@ section LegendrianRewrite
 
 variable {cs : ContactStructure}
 
-def legendrianRewriteStep (x y : LegendrianKnot cs)
+noncomputable def legendrianRewriteStep (x y : LegendrianKnot cs)
     (h : x = y) : Step (LegendrianKnot cs) :=
   Step.mk x y h
 
-def legendrianIsotopyPath (x y : LegendrianKnot cs)
+noncomputable def legendrianIsotopyPath (x y : LegendrianKnot cs)
     (h : x = y) : Path x y :=
   Path.stepChain h
 
-def legendrianRewrite {x y : LegendrianKnot cs} (p q : Path x y) : Prop :=
+noncomputable def legendrianRewrite {x y : LegendrianKnot cs} (p q : Path x y) : Prop :=
   ∃ r : Path y y, q = Path.trans p r
 
-def legendrianRewriteConfluent {cs : ContactStructure.{u}}
+noncomputable def legendrianRewriteConfluent {cs : ContactStructure.{u}}
     {x y : LegendrianKnot.{u} cs} : Prop :=
   ∀ (p q₁ q₂ : Path x y),
     legendrianRewrite p q₁ →

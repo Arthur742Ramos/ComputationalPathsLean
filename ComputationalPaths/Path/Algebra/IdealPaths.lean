@@ -29,171 +29,171 @@ structure Ideal where
 deriving DecidableEq, Repr
 
 /-- The zero ideal. -/
-@[simp] def zeroIdeal : Ideal := ⟨0⟩
+@[simp] noncomputable def zeroIdeal : Ideal := ⟨0⟩
 
 /-- The unit ideal (all of ℤ). -/
-@[simp] def unitIdeal : Ideal := ⟨1⟩
+@[simp] noncomputable def unitIdeal : Ideal := ⟨1⟩
 
 /-- Sum of ideals: (a) + (b) = (gcd a b). -/
-@[simp] def Ideal.sum (I J : Ideal) : Ideal := ⟨Nat.gcd I.gen J.gen⟩
+@[simp] noncomputable def Ideal.sum (I J : Ideal) : Ideal := ⟨Nat.gcd I.gen J.gen⟩
 
 /-- Product of ideals: (a) · (b) = (a * b). -/
-@[simp] def Ideal.prod (I J : Ideal) : Ideal := ⟨I.gen * J.gen⟩
+@[simp] noncomputable def Ideal.prod (I J : Ideal) : Ideal := ⟨I.gen * J.gen⟩
 
 /-- Intersection of ideals: (a) ∩ (b) = (lcm a b). -/
-@[simp] def Ideal.inter (I J : Ideal) : Ideal := ⟨Nat.lcm I.gen J.gen⟩
+@[simp] noncomputable def Ideal.inter (I J : Ideal) : Ideal := ⟨Nat.lcm I.gen J.gen⟩
 
 /-- Canonical projection to quotient. -/
-@[simp] def quotProj (I : Ideal) (a : R) : Nat :=
+@[simp] noncomputable def quotProj (I : Ideal) (a : R) : Nat :=
   if I.gen = 0 then a.natAbs else a.natAbs % I.gen
 
 /-! ## 1-6: Sum properties via stepChain -/
 
 /-- 1. Sum is commutative. -/
-def ideal_sum_comm_path (I J : Ideal) :
+noncomputable def ideal_sum_comm_path (I J : Ideal) :
     Path (Ideal.sum I J) (Ideal.sum J I) :=
   Path.stepChain (by simp [Ideal.sum, Nat.gcd_comm])
 
 /-- 2. Sum is associative. -/
-def ideal_sum_assoc_path (I J K : Ideal) :
+noncomputable def ideal_sum_assoc_path (I J K : Ideal) :
     Path (Ideal.sum (Ideal.sum I J) K) (Ideal.sum I (Ideal.sum J K)) :=
   Path.stepChain (by simp [Ideal.sum, Nat.gcd_assoc])
 
 /-- 3. Sum with zero ideal (right identity). -/
-def ideal_sum_zero_path (I : Ideal) :
+noncomputable def ideal_sum_zero_path (I : Ideal) :
     Path (Ideal.sum I zeroIdeal) I :=
   Path.stepChain (by simp [Ideal.sum, Nat.gcd_zero_right])
 
 /-- 4. Sum with zero ideal (left identity). -/
-def ideal_sum_zero_left_path (I : Ideal) :
+noncomputable def ideal_sum_zero_left_path (I : Ideal) :
     Path (Ideal.sum zeroIdeal I) I :=
   Path.stepChain (by simp [Ideal.sum, Nat.gcd_zero_left])
 
 /-- 5. Sum is idempotent. -/
-def ideal_sum_self_path (I : Ideal) :
+noncomputable def ideal_sum_self_path (I : Ideal) :
     Path (Ideal.sum I I) I :=
   Path.stepChain (by simp [Ideal.sum, Nat.gcd_self])
 
 /-- 6. Symmetry of sum commutativity: inverse path. -/
-def ideal_sum_comm_inv (I J : Ideal) :
+noncomputable def ideal_sum_comm_inv (I J : Ideal) :
     Path (Ideal.sum J I) (Ideal.sum I J) :=
   Path.symm (ideal_sum_comm_path I J)
 
 /-! ## 7-12: Product properties via stepChain -/
 
 /-- 7. Product is commutative. -/
-def ideal_prod_comm_path (I J : Ideal) :
+noncomputable def ideal_prod_comm_path (I J : Ideal) :
     Path (Ideal.prod I J) (Ideal.prod J I) :=
   Path.stepChain (by simp [Ideal.prod, Nat.mul_comm])
 
 /-- 8. Product is associative. -/
-def ideal_prod_assoc_path (I J K : Ideal) :
+noncomputable def ideal_prod_assoc_path (I J K : Ideal) :
     Path (Ideal.prod (Ideal.prod I J) K) (Ideal.prod I (Ideal.prod J K)) :=
   Path.stepChain (by simp [Ideal.prod, Nat.mul_assoc])
 
 /-- 9. Product with unit ideal (right identity). -/
-def ideal_prod_unit_path (I : Ideal) :
+noncomputable def ideal_prod_unit_path (I : Ideal) :
     Path (Ideal.prod I unitIdeal) I :=
   Path.stepChain (by simp [Ideal.prod, Nat.mul_one])
 
 /-- 10. Product with unit ideal (left identity). -/
-def ideal_prod_unit_left_path (I : Ideal) :
+noncomputable def ideal_prod_unit_left_path (I : Ideal) :
     Path (Ideal.prod unitIdeal I) I :=
   Path.stepChain (by simp [Ideal.prod, Nat.one_mul])
 
 /-- 11. Product with zero ideal (right absorber). -/
-def ideal_prod_zero_path (I : Ideal) :
+noncomputable def ideal_prod_zero_path (I : Ideal) :
     Path (Ideal.prod I zeroIdeal) zeroIdeal :=
   Path.stepChain (by simp [Ideal.prod, Nat.mul_zero])
 
 /-- 12. Product with zero ideal (left absorber). -/
-def ideal_prod_zero_left_path (I : Ideal) :
+noncomputable def ideal_prod_zero_left_path (I : Ideal) :
     Path (Ideal.prod zeroIdeal I) zeroIdeal :=
   Path.stepChain (by simp [Ideal.prod, Nat.zero_mul])
 
 /-! ## 13-16: Intersection properties -/
 
 /-- 13. Intersection is commutative. -/
-def ideal_inter_comm_path (I J : Ideal) :
+noncomputable def ideal_inter_comm_path (I J : Ideal) :
     Path (Ideal.inter I J) (Ideal.inter J I) :=
   Path.stepChain (by simp [Ideal.inter, Nat.lcm_comm])
 
 /-- 14. Intersection with unit ideal. -/
-def ideal_inter_unit_path (I : Ideal) :
+noncomputable def ideal_inter_unit_path (I : Ideal) :
     Path (Ideal.inter I unitIdeal) I :=
   Path.stepChain (by simp [Ideal.inter, Nat.lcm, Nat.gcd_one_right, Nat.div_one])
 
 /-- 15. Symmetry of intersection commutativity. -/
-def ideal_inter_comm_inv (I J : Ideal) :
+noncomputable def ideal_inter_comm_inv (I J : Ideal) :
     Path (Ideal.inter J I) (Ideal.inter I J) :=
   Path.symm (ideal_inter_comm_path I J)
 
 /-- 16. Intersection with zero ideal. -/
-def ideal_inter_zero_path (I : Ideal) :
+noncomputable def ideal_inter_zero_path (I : Ideal) :
     Path (Ideal.inter I zeroIdeal) zeroIdeal :=
   Path.stepChain (by simp [Ideal.inter, Nat.lcm, Nat.gcd_zero_right])
 
 /-! ## 17-22: Congruence / functorial paths via congrArg -/
 
 /-- 17. Congruence: equal ideals give equal sums (left). -/
-def ideal_sum_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
+noncomputable def ideal_sum_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
     Path (Ideal.sum I₁ J) (Ideal.sum I₂ J) :=
   Path.congrArg (fun I => Ideal.sum I J) h
 
 /-- 18. Congruence: equal ideals give equal sums (right). -/
-def ideal_sum_congrArg_right (I : Ideal) {J₁ J₂ : Ideal} (h : Path J₁ J₂) :
+noncomputable def ideal_sum_congrArg_right (I : Ideal) {J₁ J₂ : Ideal} (h : Path J₁ J₂) :
     Path (Ideal.sum I J₁) (Ideal.sum I J₂) :=
   Path.congrArg (Ideal.sum I) h
 
 /-- 19. Congruence: equal ideals give equal products (left). -/
-def ideal_prod_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
+noncomputable def ideal_prod_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
     Path (Ideal.prod I₁ J) (Ideal.prod I₂ J) :=
   Path.congrArg (fun I => Ideal.prod I J) h
 
 /-- 20. Congruence: equal ideals give equal products (right). -/
-def ideal_prod_congrArg_right (I : Ideal) {J₁ J₂ : Ideal} (h : Path J₁ J₂) :
+noncomputable def ideal_prod_congrArg_right (I : Ideal) {J₁ J₂ : Ideal} (h : Path J₁ J₂) :
     Path (Ideal.prod I J₁) (Ideal.prod I J₂) :=
   Path.congrArg (Ideal.prod I) h
 
 /-- 21. Congruence for intersection (left). -/
-def ideal_inter_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
+noncomputable def ideal_inter_congrArg_left {I₁ I₂ : Ideal} (h : Path I₁ I₂) (J : Ideal) :
     Path (Ideal.inter I₁ J) (Ideal.inter I₂ J) :=
   Path.congrArg (fun I => Ideal.inter I J) h
 
 /-- 22. Congruence for quotient projection. -/
-def quotProj_congrArg {I₁ I₂ : Ideal} (h : Path I₁ I₂) (a : R) :
+noncomputable def quotProj_congrArg {I₁ I₂ : Ideal} (h : Path I₁ I₂) (a : R) :
     Path (quotProj I₁ a) (quotProj I₂ a) :=
   Path.congrArg (fun I => quotProj I a) h
 
 /-! ## 23-28: Composite paths via trans -/
 
 /-- 23. Sum rotation: (I+J)+K → I+(J+K) → (J+K)+I. -/
-def ideal_sum_rotate (I J K : Ideal) :
+noncomputable def ideal_sum_rotate (I J K : Ideal) :
     Path (Ideal.sum (Ideal.sum I J) K) (Ideal.sum (Ideal.sum J K) I) :=
   Path.trans (ideal_sum_assoc_path I J K) (ideal_sum_comm_path I (Ideal.sum J K))
 
 /-- 24. Product rotation: (I·J)·K → I·(J·K) → (J·K)·I. -/
-def ideal_prod_rotate (I J K : Ideal) :
+noncomputable def ideal_prod_rotate (I J K : Ideal) :
     Path (Ideal.prod (Ideal.prod I J) K) (Ideal.prod (Ideal.prod J K) I) :=
   Path.trans (ideal_prod_assoc_path I J K) (ideal_prod_comm_path I (Ideal.prod J K))
 
 /-- 25. Sum-product coherence: I·(J+K) is commuted to (J+K)·I. -/
-def sum_prod_coherence (I J K : Ideal) :
+noncomputable def sum_prod_coherence (I J K : Ideal) :
     Path (Ideal.prod I (Ideal.sum J K)) (Ideal.prod (Ideal.sum J K) I) :=
   ideal_prod_comm_path I (Ideal.sum J K)
 
 /-- 26. CRT coprime sum: when gcd = 1, sum is unit ideal. -/
-def crt_coprime_sum_path (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
+noncomputable def crt_coprime_sum_path (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
     Path (Ideal.sum I J) unitIdeal :=
   Path.stepChain (by simp [Ideal.sum, h])
 
 /-- 27. CRT followed by product comm: composing two paths. -/
-def crt_prod_chain (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
+noncomputable def crt_prod_chain (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
     Path (Ideal.prod I J) (Ideal.prod J I) :=
   ideal_prod_comm_path I J
 
 /-- 28. Zero ideal absorbed from left then right: zeroIdeal + I → I → I + zeroIdeal reversed. -/
-def sum_zero_roundtrip (I : Ideal) :
+noncomputable def sum_zero_roundtrip (I : Ideal) :
     Path (Ideal.sum zeroIdeal I) (Ideal.sum I zeroIdeal) :=
   Path.trans (ideal_sum_zero_left_path I) (Path.symm (ideal_sum_zero_path I))
 
@@ -216,12 +216,12 @@ theorem sum_comm_symm_symm_toEq (I J : Ideal) :
   simp
 
 /-- 32. Symm of sum_zero is a path from I back to sum. -/
-def sum_zero_inv (I : Ideal) :
+noncomputable def sum_zero_inv (I : Ideal) :
     Path I (Ideal.sum I zeroIdeal) :=
   Path.symm (ideal_sum_zero_path I)
 
 /-- 33. Symm of prod_unit is a path from I back to prod. -/
-def prod_unit_inv (I : Ideal) :
+noncomputable def prod_unit_inv (I : Ideal) :
     Path I (Ideal.prod I unitIdeal) :=
   Path.symm (ideal_prod_unit_path I)
 

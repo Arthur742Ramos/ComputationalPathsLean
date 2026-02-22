@@ -43,7 +43,7 @@ structure IndependentSet {V : Type u} (G : SimpleGraph V) where
   independent : ∀ {u v : V}, vertices u → vertices v → ¬ G.adj u v
 
 /-- A color class: set of vertices with the same color. -/
-def colorClass {V : Type u} {C : Type v} {G : SimpleGraph V}
+noncomputable def colorClass {V : Type u} {C : Type v} {G : SimpleGraph V}
     (col : Coloring G C) (c : C) [DecidableEq C] : V → Prop :=
   fun v => col.color v = c
 
@@ -78,11 +78,11 @@ structure KColoring {V : Type u} (G : SimpleGraph V) (k : Nat) where
   col : ProperColoring G (Fin k)
 
 /-- Chromatic number bound: the graph admits a k-coloring. -/
-def chromaticBound {V : Type u} (G : SimpleGraph V) (k : Nat) : Prop :=
+noncomputable def chromaticBound {V : Type u} (G : SimpleGraph V) (k : Nat) : Prop :=
   Nonempty (KColoring G k)
 
 /-- A k-colorable graph is (k+1)-colorable. -/
-def chromatic_monotone {V : Type u} {G : SimpleGraph V} {k : Nat}
+noncomputable def chromatic_monotone {V : Type u} {G : SimpleGraph V} {k : Nat}
     (h : KColoring G k) : KColoring G (k + 1) :=
   { col :=
     { color := fun v => (h.col.color v).castSucc
@@ -93,7 +93,7 @@ def chromatic_monotone {V : Type u} {G : SimpleGraph V} {k : Nat}
 /-! ## Independent sets and coloring -/
 
 /-- Empty set is independent. -/
-def emptyIndependent {V : Type u} (G : SimpleGraph V) : IndependentSet G :=
+noncomputable def emptyIndependent {V : Type u} (G : SimpleGraph V) : IndependentSet G :=
   { vertices := fun _ => False
     independent := fun h _ _ => h.elim }
 
@@ -104,7 +104,7 @@ theorem independent_path_witness {V : Type u} {G : SimpleGraph V}
   S.independent hu hv
 
 /-- Union of disjoint independent sets from different colors. -/
-def colorClassIndependent {V : Type u} {C : Type v} [DecidableEq C]
+noncomputable def colorClassIndependent {V : Type u} {C : Type v} [DecidableEq C]
     {G : SimpleGraph V} (col : ProperColoring G C) (c : C) :
     IndependentSet G :=
   { vertices := colorClass col.toColoring c
@@ -118,7 +118,7 @@ structure GreedyColoring {V : Type u} (G : SimpleGraph V) where
   stepCount : Nat
 
 /-- Greedy coloring step count path witness. -/
-def greedy_step_count_path {V : Type u} {G : SimpleGraph V}
+noncomputable def greedy_step_count_path {V : Type u} {G : SimpleGraph V}
     (gc : GreedyColoring G) :
     Path gc.stepCount gc.stepCount :=
   Path.refl gc.stepCount
@@ -126,14 +126,14 @@ def greedy_step_count_path {V : Type u} {G : SimpleGraph V}
 /-! ## Path algebra for colorings -/
 
 /-- Coloring equality via Path when underlying functions agree. -/
-def coloring_path_of_eq {V : Type u} {C : Type v}
+noncomputable def coloring_path_of_eq {V : Type u} {C : Type v}
     {G : SimpleGraph V} (c1 c2 : Coloring G C)
     (h : c1.color = c2.color) :
     Path c1.color c2.color :=
   Path.mk [Step.mk _ _ h] h
 
 /-- congrArg on coloring function. -/
-def congrArg_color {V : Type u} {C : Type v}
+noncomputable def congrArg_color {V : Type u} {C : Type v}
     {G : SimpleGraph V} (col : Coloring G C)
     {a b : V} (p : Path a b) :
     Path (col.color a) (col.color b) :=

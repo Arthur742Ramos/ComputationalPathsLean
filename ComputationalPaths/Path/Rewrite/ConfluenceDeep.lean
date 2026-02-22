@@ -47,13 +47,13 @@ noncomputable def cases_head {a b : α} (h : RTC R a b) :
 
 end RTC
 
-def LocallyConfluent {α : Type u} (R : α → α → Prop) : Prop :=
+noncomputable def LocallyConfluent {α : Type u} (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, RTC R b d ∧ RTC R c d
 
-def Confluent {α : Type u} (R : α → α → Prop) : Prop :=
+noncomputable def Confluent {α : Type u} (R : α → α → Prop) : Prop :=
   ∀ a b c, RTC R a b → RTC R a c → ∃ d, RTC R b d ∧ RTC R c d
 
-def Diamond {α : Type u} (R : α → α → Prop) : Prop :=
+noncomputable def Diamond {α : Type u} (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
 
 noncomputable def newman_lemma {α : Type u} {R : α → α → Prop}
@@ -108,13 +108,13 @@ noncomputable def rw_of_rtc {p q : Path a b}
   | step hpq hqr ih =>
       exact rw_trans (rw_of_step hpq) ih
 
-def StepLocallyConfluent : Prop :=
+noncomputable def StepLocallyConfluent : Prop :=
   ∀ p q r : Path a b, Step p q → Step p r → ∃ m, Rw q m ∧ Rw r m
 
-def StepConfluent : Prop :=
+noncomputable def StepConfluent : Prop :=
   ∀ p q r : Path a b, Rw p q → Rw p r → ∃ m, Rw q m ∧ Rw r m
 
-def StepDiamond : Prop :=
+noncomputable def StepDiamond : Prop :=
   ∀ p q r : Path a b, Step p q → Step p r → ∃ m, Step q m ∧ Step r m
 
 theorem step_newman_lemma
@@ -178,7 +178,7 @@ inductive CoreCriticalPair : Type (u + 1)
   | symm_congr_trans_assoc {a b c d : A}
       (p : Path a b) (q : Path b c) (r : Path c d)
 
-def CoreCriticalPair.Joinable : CoreCriticalPair (A := A) → Prop
+noncomputable def CoreCriticalPair.Joinable : CoreCriticalPair (A := A) → Prop
   | .trans_assoc_trans_refl_left p r =>
       Step.Joinable (Path.trans (Path.refl _) (Path.trans p r)) (Path.trans p r)
   | .trans_assoc_trans_refl_right p r =>

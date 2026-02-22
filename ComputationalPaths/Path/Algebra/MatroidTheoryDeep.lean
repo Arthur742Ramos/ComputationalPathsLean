@@ -110,7 +110,7 @@ structure RepresentableData (E : Type u) (Gam : Type v) (M : Matroid E) where
 
 /-! ## Generic path constructors and naming conventions -/
 
-def singleStepPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
+noncomputable def singleStepPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 theorem singleStepPath_toEq {A : Type u} {a b : A} (h : a = b) :

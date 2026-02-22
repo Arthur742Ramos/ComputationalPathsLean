@@ -46,7 +46,7 @@ structure PathContraFunctor (A : Type u) where
 /-! ## Representable contravariant functors -/
 
 /-- Representable contravariant functor Hom(-, a) on the path homotopy category. -/
-def contraRepresentable (A : Type u) (a : A) : PathContraFunctor A where
+noncomputable def contraRepresentable (A : Type u) (a : A) : PathContraFunctor A where
   obj := fun b => FundamentalGroupoid.Hom A b a
   map := fun {b c} p q => FundamentalGroupoid.comp' A p q
   map_id := by
@@ -98,7 +98,7 @@ structure ContraRepresentable (A : Type u) (F : PathContraFunctor A) where
 /-! ## Brown representability -/
 
 /-- The wedge and Mayer-Vietoris axioms determine a representability equivalence. -/
-def wedge_equiv {A : Type u} {F : PathContraFunctor A}
+noncomputable def wedge_equiv {A : Type u} {F : PathContraFunctor A}
     (W : WedgeAxiom A F) (MV : MayerVietorisAxiom A F W) (b : A) :
     SimpleEquiv (F.obj b) (FundamentalGroupoid.Hom A b W.obj) where
   toFun := fun x => W.lift x
@@ -112,7 +112,7 @@ def wedge_equiv {A : Type u} {F : PathContraFunctor A}
     exact W.lift_spec (x := F.map p W.elem)
 
 /-- Brown representability: wedge + Mayer-Vietoris implies representability. -/
-def brown_representability {A : Type u} {F : PathContraFunctor A}
+noncomputable def brown_representability {A : Type u} {F : PathContraFunctor A}
     (W : WedgeAxiom A F) (MV : MayerVietorisAxiom A F W) :
     ContraRepresentable A F := by
   refine

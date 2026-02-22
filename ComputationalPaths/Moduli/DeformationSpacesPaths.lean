@@ -32,12 +32,12 @@ namespace DeformationSpacePathData
 variable {X : Type u} (D : DeformationSpacePathData X)
 
 /-- Iterated specialization from the `n`-th fiber to the special fiber. -/
-def specializeFrom : (n : Nat) → Path (D.fiber n) D.specialFiber
+noncomputable def specializeFrom : (n : Nat) → Path (D.fiber n) D.specialFiber
   | 0 => D.specialize
   | n + 1 => Path.trans (D.transition n) (specializeFrom n)
 
 /-- Closed loop induced by specializing and returning along the inverse path. -/
-def specializeLoop (n : Nat) : Path (D.fiber (n + 1)) (D.fiber (n + 1)) :=
+noncomputable def specializeLoop (n : Nat) : Path (D.fiber (n + 1)) (D.fiber (n + 1)) :=
   Path.trans (D.specializeFrom (n + 1)) (Path.symm (D.specializeFrom (n + 1)))
 
 /-- Primitive normalization steps for deformation-space path expressions. -/
@@ -78,7 +78,7 @@ structure Section where
 namespace Section
 
 /-- Specialization of a section at parameter `0`. -/
-def specializeAtZero (s : D.Section) : Path (s.value 0) D.specialFiber :=
+noncomputable def specializeAtZero (s : D.Section) : Path (s.value 0) D.specialFiber :=
   Path.trans (s.lift 0) D.specialize
 
 noncomputable def specializeAtZero_refl_right_rweq (s : D.Section) :
@@ -98,7 +98,7 @@ end Section
 end DeformationSpacePathData
 
 /-- Constant deformation-space model on `Nat`. -/
-def constantNatDeformation : DeformationSpacePathData Nat where
+noncomputable def constantNatDeformation : DeformationSpacePathData Nat where
   fiber := fun _ => 0
   specialFiber := 0
   specialize := Path.refl 0

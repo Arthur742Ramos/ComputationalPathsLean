@@ -49,7 +49,7 @@ structure PolyhedralFan (E : Type u) [DecidableEq E] where
       ∃ ρ : WeightedCone E, ρ ∈ cones ∧ ρ.support = σ.support ∩ τ.support
 
 /-- Balancing condition for weighted fans. -/
-def IsBalanced {E : Type u} [DecidableEq E] (F : PolyhedralFan E) : Prop :=
+noncomputable def IsBalanced {E : Type u} [DecidableEq E] (F : PolyhedralFan E) : Prop :=
   ∀ ⦃σ : WeightedCone E⦄, σ ∈ F.cones → 0 < σ.weight
 
 variable {E : Type u} [DecidableEq E]
@@ -73,7 +73,7 @@ structure BergmanWitness (M : FiniteMatroid E) where
   balancing_axiom : IsBalanced fan
 
 /-- The Bergman fan of a matroid, viewed as a tropical variety. -/
-def bergmanFan (M : FiniteMatroid E) (W : BergmanWitness M) : TropicalVariety E where
+noncomputable def bergmanFan (M : FiniteMatroid E) (W : BergmanWitness M) : TropicalVariety E where
   fan := W.fan
   balanced := W.balancing_axiom
 
@@ -100,7 +100,7 @@ structure TropicalLinearSpace (E : Type u) [DecidableEq E] where
   from_matroid : ∃ (M : FiniteMatroid E) (W : BergmanWitness M), variety = bergmanFan M W
 
 /-- Build a tropical linear space from a matroid and a Bergman witness. -/
-def tropicalLinearSpaceOfMatroid (M : FiniteMatroid E) (W : BergmanWitness M) (r : Nat) :
+noncomputable def tropicalLinearSpaceOfMatroid (M : FiniteMatroid E) (W : BergmanWitness M) (r : Nat) :
     TropicalLinearSpace E where
   variety := bergmanFan M W
   rank := r
@@ -125,7 +125,7 @@ theorem tropicalLinearSpace_matroidCorrespondence
     exact C.right_inverse L
 
 /-- The correspondence packaged as an equivalence. -/
-def matroidTropicalEquiv (C : MatroidLinearCorrespondence E) :
+noncomputable def matroidTropicalEquiv (C : MatroidLinearCorrespondence E) :
     FiniteMatroid E ≃ TropicalLinearSpace E where
   toFun := C.toLinearSpace
   invFun := C.toMatroid
@@ -174,7 +174,7 @@ theorem fineStructure_theorem
   · exact W.balancing_axiom
 
 /-- A two-step computational-path witness for balancing invariance. -/
-def balancingChain {M : FiniteMatroid E} (W : BergmanWitness M) :
+noncomputable def balancingChain {M : FiniteMatroid E} (W : BergmanWitness M) :
     Path (IsBalanced W.fan) (IsBalanced W.fan) :=
   Path.trans (Path.refl (IsBalanced W.fan)) (Path.refl (IsBalanced W.fan))
 

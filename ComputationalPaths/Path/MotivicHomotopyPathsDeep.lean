@@ -49,7 +49,7 @@ structure MotivicFiber (F E B : Type u) where
   trivial  : ∀ f : F, Path (proj (incl f)) basepoint
 
 /-- Trivial motivic fiber: constant map to basepoint. -/
-def MotivicFiber.identity (A : Type u) (a : A) : MotivicFiber A A A where
+noncomputable def MotivicFiber.identity (A : Type u) (a : A) : MotivicFiber A A A where
   incl      := fun _ => a
   proj      := fun _ => a
   basepoint := a
@@ -86,14 +86,14 @@ structure A1LocalEquiv (X Y : Type u) where
   section_  : ∀ x : X, Path (backward (forward x)) x
 
 /-- Identity A¹-local equivalence. -/
-def A1LocalEquiv.idEquiv (X : Type u) : A1LocalEquiv X X where
+noncomputable def A1LocalEquiv.idEquiv (X : Type u) : A1LocalEquiv X X where
   forward  := id
   backward := id
   retract  := fun x => Path.refl x
   section_  := fun x => Path.refl x
 
 /-- Composition of A¹-local equivalences. -/
-def A1LocalEquiv.comp {X Y Z : Type u}
+noncomputable def A1LocalEquiv.comp {X Y Z : Type u}
     (e₁ : A1LocalEquiv X Y) (e₂ : A1LocalEquiv Y Z) : A1LocalEquiv X Z where
   forward  := e₂.forward ∘ e₁.forward
   backward := e₁.backward ∘ e₂.backward
@@ -141,12 +141,12 @@ structure WeightPath (A : Type u) where
   edge  : ∀ n : Nat, Path (obj n) (obj (n + 1))
 
 /-- Composing two consecutive weight edges. -/
-def WeightPath.composeTwoEdges {A : Type u} (w : WeightPath A) (n : Nat) :
+noncomputable def WeightPath.composeTwoEdges {A : Type u} (w : WeightPath A) (n : Nat) :
     Path (w.obj n) (w.obj (n + 2)) :=
   Path.trans (w.edge n) (w.edge (n + 1))
 
 /-- Composing three consecutive weight edges. -/
-def WeightPath.composeThreeEdges {A : Type u} (w : WeightPath A) (n : Nat) :
+noncomputable def WeightPath.composeThreeEdges {A : Type u} (w : WeightPath A) (n : Nat) :
     Path (w.obj n) (w.obj (n + 3)) :=
   Path.trans (w.composeTwoEdges n) (w.edge (n + 2))
 
@@ -185,12 +185,12 @@ structure MotivicAdams (A : Type u) (basepoint : A) where
   psi_base : Path (psi basepoint) basepoint
 
 /-- Identity Adams operation. -/
-def MotivicAdams.identity {A : Type u} (a : A) : MotivicAdams A a where
+noncomputable def MotivicAdams.identity {A : Type u} (a : A) : MotivicAdams A a where
   psi      := id
   psi_base := Path.refl a
 
 /-- Composition of Adams operations. -/
-def MotivicAdams.comp {A : Type u} {a : A}
+noncomputable def MotivicAdams.comp {A : Type u} {a : A}
     (ψ₁ ψ₂ : MotivicAdams A a) : MotivicAdams A a where
   psi      := ψ₁.psi ∘ ψ₂.psi
   psi_base := Path.trans (Path.congrArg ψ₁.psi ψ₂.psi_base) ψ₁.psi_base
@@ -229,7 +229,7 @@ structure SliceTower (A : Type u) where
   conn  : ∀ n : Nat, Path (slice (n + 1)) (slice n)
 
 /-- Composing the slice tower down k levels from level n. -/
-def SliceTower.descend {A : Type u} (t : SliceTower A) : (n k : Nat) → Path (t.slice (n + k)) (t.slice n)
+noncomputable def SliceTower.descend {A : Type u} (t : SliceTower A) : (n k : Nat) → Path (t.slice (n + k)) (t.slice n)
   | _, 0     => Path.refl _
   | n, k + 1 => Path.trans (t.conn (n + k)) (t.descend n k)
 
@@ -268,7 +268,7 @@ structure MotivicHopf (E B F : Type u) where
   collapse : ∀ f : F, Path (eta (fiber f)) base_pt
 
 /-- Trivial Hopf map (identity). -/
-def MotivicHopf.trivial (A : Type u) (a : A) : MotivicHopf A A A where
+noncomputable def MotivicHopf.trivial (A : Type u) (a : A) : MotivicHopf A A A where
   eta      := id
   fiber    := fun _ => a
   base_pt  := a
@@ -306,7 +306,7 @@ structure MotivicPurity (Th Susp : Type u) where
   section_ : ∀ t : Th, Path (backward (forward t)) t
 
 /-- Trivial purity (identity). -/
-def MotivicPurity.identity (A : Type u) : MotivicPurity A A where
+noncomputable def MotivicPurity.identity (A : Type u) : MotivicPurity A A where
   forward  := id
   backward := id
   retract  := fun a => Path.refl a

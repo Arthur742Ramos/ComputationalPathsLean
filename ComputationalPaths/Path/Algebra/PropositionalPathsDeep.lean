@@ -23,24 +23,24 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans {α : Type} {a b c : α}
+noncomputable def Path.trans {α : Type} {a b c : α}
     (p : Path α a b) (q : Path α b c) : Path α a c :=
   match p with
   | .nil _ => q
   | .cons s rest => .cons s (rest.trans q)
 
-def Path.length {α : Type} {a b : α} : Path α a b → Nat
+noncomputable def Path.length {α : Type} {a b : α} : Path α a b → Nat
   | .nil _ => 0
   | .cons _ rest => 1 + rest.length
 
-def Step.symm {α : Type} {a b : α} : Step α a b → Step α b a
+noncomputable def Step.symm {α : Type} {a b : α} : Step α a b → Step α b a
   | .mk name a b => .mk (name ++ "⁻¹") b a
 
-def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a
+noncomputable def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a
   | .nil a => .nil a
   | .cons s rest => rest.symm.trans (.cons s.symm (.nil _))
 
-def Path.single {α : Type} {a b : α} (s : Step α a b) : Path α a b :=
+noncomputable def Path.single {α : Type} {a b : α} (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
 -- ============================================================
@@ -93,7 +93,7 @@ deriving DecidableEq, Repr
 
 open Formula
 
-def Formula.size : Formula → Nat
+noncomputable def Formula.size : Formula → Nat
   | atom _   => 1
   | neg A    => 1 + A.size
   | conj A B => 1 + A.size + B.size
@@ -107,7 +107,7 @@ theorem formula_size_pos (A : Formula) : A.size ≥ 1 := by
   cases A <;> simp [Formula.size] <;> omega
 
 /-- Atom set (variables occurring in a formula). -/
-def Formula.atoms : Formula → List Nat
+noncomputable def Formula.atoms : Formula → List Nat
   | atom n   => [n]
   | neg A    => A.atoms
   | conj A B => A.atoms ++ B.atoms
@@ -123,7 +123,7 @@ theorem top_atoms : Formula.top.atoms = [] := rfl
 theorem bot_atoms : Formula.bot.atoms = [] := rfl
 
 /-- Formula depth. -/
-def Formula.depth : Formula → Nat
+noncomputable def Formula.depth : Formula → Nat
   | atom _   => 0
   | neg A    => 1 + A.depth
   | conj A B => 1 + max A.depth B.depth
@@ -150,7 +150,7 @@ inductive RuleName where
   | conjAssoc | disjAssoc | conjIdemp | disjIdemp
 deriving DecidableEq, Repr
 
-def applyRule (r : RuleName) (f : Formula) : Option Formula :=
+noncomputable def applyRule (r : RuleName) (f : Formula) : Option Formula :=
   match r, f with
   | .dne, neg (neg A) => some A
   | .deMorganConj, neg (conj A B) => some (disj (neg A) (neg B))
@@ -222,26 +222,26 @@ abbrev Clause := List Literal
 abbrev CNF := List Clause
 abbrev DNF := List Clause
 
-def Literal.toFormula : Literal → Formula
+noncomputable def Literal.toFormula : Literal → Formula
   | .pos n => atom n
   | .neg_ n => neg (atom n)
 
-def clauseToDisj : Clause → Formula
+noncomputable def clauseToDisj : Clause → Formula
   | []      => bot
   | [l]     => l.toFormula
   | l :: ls => disj l.toFormula (clauseToDisj ls)
 
-def clauseToConj : Clause → Formula
+noncomputable def clauseToConj : Clause → Formula
   | []      => top
   | [l]     => l.toFormula
   | l :: ls => conj l.toFormula (clauseToConj ls)
 
-def cnfToFormula : CNF → Formula
+noncomputable def cnfToFormula : CNF → Formula
   | []      => top
   | [c]     => clauseToDisj c
   | c :: cs => conj (clauseToDisj c) (cnfToFormula cs)
 
-def dnfToFormula : DNF → Formula
+noncomputable def dnfToFormula : DNF → Formula
   | []      => bot
   | [c]     => clauseToConj c
   | c :: cs => disj (clauseToConj c) (dnfToFormula cs)
@@ -268,7 +268,7 @@ theorem dnf_empty_clause : clauseToConj [] = top := rfl
 -- §6  NNF (Negation Normal Form)
 -- ============================================================
 
-def Formula.isNNF : Formula → Bool
+noncomputable def Formula.isNNF : Formula → Bool
   | atom _       => true
   | neg (atom _) => true
   | neg _        => false
@@ -299,7 +299,7 @@ inductive NormPhase where
 deriving DecidableEq, Repr
 
 /-- Theorem 29: CNF pipeline as a 4-step path. -/
-def cnfPipeline : Path NormPhase NormPhase.original NormPhase.cnf :=
+noncomputable def cnfPipeline : Path NormPhase NormPhase.original NormPhase.cnf :=
   .cons (.mk "eliminate_implications" NormPhase.original NormPhase.impFree)
     (.cons (.mk "push_negations_nnf" NormPhase.impFree NormPhase.nnf)
       (.cons (.mk "distribute_disj_over_conj" NormPhase.nnf NormPhase.distributed)
@@ -309,7 +309,7 @@ def cnfPipeline : Path NormPhase NormPhase.original NormPhase.cnf :=
 theorem cnf_pipeline_length : cnfPipeline.length = 4 := rfl
 
 /-- Theorem 30: DNF pipeline as a 4-step path. -/
-def dnfPipeline : Path NormPhase NormPhase.original NormPhase.dnf :=
+noncomputable def dnfPipeline : Path NormPhase NormPhase.original NormPhase.dnf :=
   .cons (.mk "eliminate_implications" NormPhase.original NormPhase.impFree)
     (.cons (.mk "push_negations_nnf" NormPhase.impFree NormPhase.nnf)
       (.cons (.mk "distribute_conj_over_disj" NormPhase.nnf NormPhase.distributed)
@@ -319,7 +319,7 @@ def dnfPipeline : Path NormPhase NormPhase.original NormPhase.dnf :=
 theorem dnf_pipeline_length : dnfPipeline.length = 4 := rfl
 
 /-- Theorem 31: CNF and DNF share first two steps. -/
-def shared_prefix : Path NormPhase NormPhase.original NormPhase.nnf :=
+noncomputable def shared_prefix : Path NormPhase NormPhase.original NormPhase.nnf :=
   .cons (.mk "eliminate_implications" NormPhase.original NormPhase.impFree)
     (.cons (.mk "push_negations_nnf" NormPhase.impFree NormPhase.nnf)
       (.nil NormPhase.nnf))
@@ -331,14 +331,14 @@ theorem shared_prefix_length : shared_prefix.length = 2 := rfl
 -- ============================================================
 
 /-- DNE normalization path: ¬¬A → A. -/
-def dnePath (A : Formula) : Path Formula (neg (neg A)) A :=
+noncomputable def dnePath (A : Formula) : Path Formula (neg (neg A)) A :=
   .cons (.mk "dne" (neg (neg A)) A) (.nil A)
 
 /-- Theorem 32: DNE path has length 1. -/
 theorem dne_path_length (A : Formula) : (dnePath A).length = 1 := rfl
 
 /-- De Morgan conj path: ¬(A ∧ B) → ¬A ∨ ¬B. -/
-def deMorganConjPath (A B : Formula) :
+noncomputable def deMorganConjPath (A B : Formula) :
     Path Formula (neg (conj A B)) (disj (neg A) (neg B)) :=
   .cons (.mk "deMorgan_conj" (neg (conj A B)) (disj (neg A) (neg B)))
     (.nil _)
@@ -348,7 +348,7 @@ theorem deMorgan_conj_path_length (A B : Formula) :
     (deMorganConjPath A B).length = 1 := rfl
 
 /-- De Morgan disj path: ¬(A ∨ B) → ¬A ∧ ¬B. -/
-def deMorganDisjPath (A B : Formula) :
+noncomputable def deMorganDisjPath (A B : Formula) :
     Path Formula (neg (disj A B)) (conj (neg A) (neg B)) :=
   .cons (.mk "deMorgan_disj" (neg (disj A B)) (conj (neg A) (neg B)))
     (.nil _)
@@ -358,7 +358,7 @@ theorem deMorgan_disj_path_length (A B : Formula) :
     (deMorganDisjPath A B).length = 1 := rfl
 
 /-- Imp elimination path: (A → B) → (¬A ∨ B). -/
-def impElimPath (A B : Formula) :
+noncomputable def impElimPath (A B : Formula) :
     Path Formula (imp A B) (disj (neg A) B) :=
   .cons (.mk "imp_elim" (imp A B) (disj (neg A) B)) (.nil _)
 
@@ -368,7 +368,7 @@ theorem imp_elim_path_length (A B : Formula) :
 
 /-- Multi-step: imp then DNE on left disjunct.
     (¬¬A → B) →step→ (¬¬¬A ∨ B) →step→ (¬A ∨ B). -/
-def impDnePath (A B : Formula) :
+noncomputable def impDnePath (A B : Formula) :
     Path Formula (imp (neg (neg A)) B) (disj (neg A) B) :=
   .cons (.mk "imp_elim" (imp (neg (neg A)) B) (disj (neg (neg (neg A))) B))
     (.cons (.mk "dne_in_disj" (disj (neg (neg (neg A))) B) (disj (neg A) B))
@@ -388,7 +388,7 @@ structure InterpolationWitness where
   interpolant : Formula
   sharedAtoms : List Nat
 
-def interpolation_path (w : InterpolationWitness) :
+noncomputable def interpolation_path (w : InterpolationWitness) :
     Path Formula w.formulaA w.formulaB :=
   .cons (.mk "project_to_interpolant" w.formulaA w.interpolant)
     (.cons (.mk "expand_from_interpolant" w.interpolant w.formulaB)
@@ -399,7 +399,7 @@ theorem interpolation_path_length (w : InterpolationWitness) :
     (interpolation_path w).length = 2 := rfl
 
 /-- Theorem 38: Trivial interpolation — interpolant is A itself. -/
-def trivial_interpolant (A : Formula) : InterpolationWitness :=
+noncomputable def trivial_interpolant (A : Formula) : InterpolationWitness :=
   { formulaA := A, formulaB := A, interpolant := A, sharedAtoms := A.atoms }
 
 theorem trivial_interpolation_self (A : Formula) :
@@ -415,7 +415,7 @@ inductive ProofStep where
   | cut     : Formula → ProofStep
 deriving DecidableEq, Repr
 
-def isCutFree : List ProofStep → Bool
+noncomputable def isCutFree : List ProofStep → Bool
   | [] => true
   | (ProofStep.cut _) :: _ => false
   | _ :: rest => isCutFree rest
@@ -432,7 +432,7 @@ theorem cut_not_cut_free (A : Formula) (rest : List ProofStep) :
     isCutFree (.cut A :: rest) = false := rfl
 
 /-- Cut elimination path: removes cuts one by one. -/
-def cutElim_path : (n : Nat) → Path Nat n 0
+noncomputable def cutElim_path : (n : Nat) → Path Nat n 0
   | 0 => .nil 0
   | n + 1 => .cons (.mk s!"eliminate_cut_{n+1}" (n + 1) n) (cutElim_path n)
 
@@ -447,7 +447,7 @@ theorem cutElim_path_length : ∀ n, (cutElim_path n).length = n := by
 -- ============================================================
 
 /-- Theorem 43: conjComm is involutory (2-step roundtrip). -/
-def conjComm_roundtrip (A B : Formula) :
+noncomputable def conjComm_roundtrip (A B : Formula) :
     Path Formula (conj A B) (conj A B) :=
   .cons (.mk "conjComm" (conj A B) (conj B A))
     (.cons (.mk "conjComm" (conj B A) (conj A B))
@@ -457,7 +457,7 @@ theorem conjComm_roundtrip_length (A B : Formula) :
     (conjComm_roundtrip A B).length = 2 := rfl
 
 /-- Theorem 44: disjComm is involutory. -/
-def disjComm_roundtrip (A B : Formula) :
+noncomputable def disjComm_roundtrip (A B : Formula) :
     Path Formula (disj A B) (disj A B) :=
   .cons (.mk "disjComm" (disj A B) (disj B A))
     (.cons (.mk "disjComm" (disj B A) (disj A B))
@@ -477,7 +477,7 @@ structure Diamond (α : Type) (a : α) where
   joinL : Path α left target
   joinR : Path α right target
 
-def commAssocDiamond (A B C : Formula) : Diamond Formula (conj (conj A B) C) :=
+noncomputable def commAssocDiamond (A B C : Formula) : Diamond Formula (conj (conj A B) C) :=
   { left   := conj (conj B A) C
     right  := conj A (conj B C)
     target := conj A (conj B C)
@@ -500,12 +500,12 @@ theorem diamond_left_len (A B C : Formula) :
 
 /-- Theorem 47: Two strategies (innermost/outermost) both reach NNF.
     Modeled as two paths with same endpoints but different lengths. -/
-def innermost_to_nnf : Path NormPhase NormPhase.original NormPhase.nnf :=
+noncomputable def innermost_to_nnf : Path NormPhase NormPhase.original NormPhase.nnf :=
   .cons (.mk "innermost_step1" NormPhase.original NormPhase.impFree)
     (.cons (.mk "innermost_step2" NormPhase.impFree NormPhase.nnf)
       (.nil _))
 
-def outermost_to_nnf : Path NormPhase NormPhase.original NormPhase.nnf :=
+noncomputable def outermost_to_nnf : Path NormPhase NormPhase.original NormPhase.nnf :=
   .cons (.mk "outermost_single" NormPhase.original NormPhase.nnf)
     (.nil _)
 
@@ -525,7 +525,7 @@ theorem strategy_coherence_target :
 
 abbrev Valuation := Nat → Bool
 
-def Formula.eval (v : Valuation) : Formula → Bool
+noncomputable def Formula.eval (v : Valuation) : Formula → Bool
   | atom n   => v n
   | neg A    => !A.eval v
   | conj A B => A.eval v && B.eval v
@@ -580,7 +580,7 @@ theorem eval_disjComm (v : Valuation) (A B : Formula) :
 -- §14  Complementary Literals and Resolution
 -- ============================================================
 
-def Literal.complement : Literal → Literal
+noncomputable def Literal.complement : Literal → Literal
   | .pos n => .neg_ n
   | .neg_ n => .pos n
 
@@ -593,7 +593,7 @@ theorem complement_neq (l : Literal) : l.complement ≠ l := by
   cases l <;> simp [Literal.complement]
 
 /-- Resolution derivation path. -/
-def resolution_path : (steps : Nat) → Path Nat steps 0
+noncomputable def resolution_path : (steps : Nat) → Path Nat steps 0
   | 0 => .nil 0
   | n + 1 => .cons (.mk s!"resolve_{n+1}" (n + 1) n) (resolution_path n)
 
@@ -612,7 +612,7 @@ structure TseitinState where
   clauses : CNF
 deriving Repr
 
-def tseitin_path : Path NormPhase NormPhase.original NormPhase.cnf :=
+noncomputable def tseitin_path : Path NormPhase NormPhase.original NormPhase.cnf :=
   .cons (.mk "introduce_fresh_vars" NormPhase.original NormPhase.impFree)
     (.cons (.mk "generate_clauses" NormPhase.impFree NormPhase.nnf)
       (.cons (.mk "collect_cnf" NormPhase.nnf NormPhase.cnf)
@@ -626,7 +626,7 @@ theorem tseitin_path_length : tseitin_path.length = 3 := rfl
 -- ============================================================
 
 /-- Theorem 62: congrArg-style path lifting — map endpoints. -/
-def Path.map {α : Type} (f : α → α) (fname : String) {a b : α}
+noncomputable def Path.map {α : Type} (f : α → α) (fname : String) {a b : α}
     (p : Path α a b) : Path α (f a) (f b) :=
   match p with
   | .nil x => .nil (f x)
@@ -648,7 +648,7 @@ theorem map_nil {α : Type} (f : α → α) (fname : String) (a : α) :
     (Path.nil a).map f fname = .nil (f a) := rfl
 
 /-- Theorem 65: congrArg on formula negation — lift path under neg. -/
-def liftNeg {A B : Formula} (p : Path Formula A B) :
+noncomputable def liftNeg {A B : Formula} (p : Path Formula A B) :
     Path Formula (neg A) (neg B) :=
   p.map neg "neg"
 
@@ -656,7 +656,7 @@ theorem liftNeg_length {A B : Formula} (p : Path Formula A B) :
     (liftNeg p).length = p.length := map_preserves_length neg "neg" p
 
 /-- Theorem 66: congrArg on conjunction — lift path into left conjunct. -/
-def liftConjL {A B : Formula} (C : Formula) (p : Path Formula A B) :
+noncomputable def liftConjL {A B : Formula} (C : Formula) (p : Path Formula A B) :
     Path Formula (conj A C) (conj B C) :=
   p.map (fun x => conj x C) "conjL"
 
@@ -667,7 +667,7 @@ theorem liftConjL_length {A B : Formula} (C : Formula) (p : Path Formula A B) :
 -- §17  Transport Along Paths
 -- ============================================================
 
-def Path.transport {α : Type} (P : α → Prop) {a b : α}
+noncomputable def Path.transport {α : Type} (P : α → Prop) {a b : α}
     (prf : P a) (path : Path α a b)
     (step_pres : ∀ {x y : α}, Step α x y → P x → P y) : P b :=
   match path with
@@ -688,7 +688,7 @@ structure SemanticPath where
   target : Formula
   path   : Path Formula source target
 
-def dne_semantic_path (A : Formula) : SemanticPath :=
+noncomputable def dne_semantic_path (A : Formula) : SemanticPath :=
   { source := neg (neg A), target := A, path := dnePath A }
 
 /-- Theorem 68: DNE semantic path preserves evaluation. -/
@@ -696,7 +696,7 @@ theorem dne_semantic_preserves (v : Valuation) (A : Formula) :
     (dne_semantic_path A).source.eval v = (dne_semantic_path A).target.eval v := by
   simp [dne_semantic_path, Formula.eval, Bool.not_not]
 
-def deMorgan_conj_semantic (A B : Formula) : SemanticPath :=
+noncomputable def deMorgan_conj_semantic (A B : Formula) : SemanticPath :=
   { source := neg (conj A B)
     target := disj (neg A) (neg B)
     path := deMorganConjPath A B }
@@ -711,7 +711,7 @@ theorem deMorgan_conj_preserves (v : Valuation) (A B : Formula) :
 -- §19  Reverse Paths and Roundtrips
 -- ============================================================
 
-def tseitin_reverse : Path NormPhase NormPhase.cnf NormPhase.original :=
+noncomputable def tseitin_reverse : Path NormPhase NormPhase.cnf NormPhase.original :=
   tseitin_path.symm
 
 /-- Theorem 70: Tseitin reverse has length 3. -/
@@ -720,7 +720,7 @@ theorem tseitin_reverse_length : tseitin_reverse.length = 3 := by
   simp only [Path.symm, Path.trans, Path.length, Step.symm]
 
 /-- Full roundtrip original → CNF → original. -/
-def roundtrip : Path NormPhase NormPhase.original NormPhase.original :=
+noncomputable def roundtrip : Path NormPhase NormPhase.original NormPhase.original :=
   tseitin_path.trans tseitin_reverse
 
 /-- Theorem 71: Roundtrip has length 6. -/
@@ -736,7 +736,7 @@ theorem roundtrip_length : roundtrip.length = 6 := by
 -- ============================================================
 
 /-- Theorem 72: Absorption law A ∧ (A ∨ B) → A as a path. -/
-def absorption_conj_path (A B : Formula) :
+noncomputable def absorption_conj_path (A B : Formula) :
     Path Formula (conj A (disj A B)) A :=
   .cons (.mk "absorption_conj" (conj A (disj A B)) A) (.nil A)
 
@@ -750,7 +750,7 @@ theorem eval_absorption_conj (v : Valuation) (A B : Formula) :
   cases A.eval v <;> simp
 
 /-- Theorem 74: Multi-step normalization: ¬(A → B) → A ∧ ¬B. -/
-def neg_imp_path (A B : Formula) :
+noncomputable def neg_imp_path (A B : Formula) :
     Path Formula (neg (imp A B)) (conj A (neg B)) :=
   .cons (.mk "imp_to_disj" (neg (imp A B)) (neg (disj (neg A) B)))
     (.cons (.mk "deMorgan_disj" (neg (disj (neg A) B)) (conj (neg (neg A)) (neg B)))

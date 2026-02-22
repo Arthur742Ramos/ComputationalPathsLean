@@ -38,7 +38,7 @@ abbrev merid {A : Type u} (a : A) : Path (north A) (south A) :=
   SuspensionCompPath.merid (X := A) a
 
 /-- A suspension loop written as an explicit `Path.trans` chain. -/
-def meridLoop {A : Type u} (a b : A) : Path (north A) (north A) :=
+noncomputable def meridLoop {A : Type u} (a b : A) : Path (north A) (north A) :=
   Path.trans (merid (A := A) a) (Path.symm (merid (A := A) b))
 
 noncomputable def meridLoop_rightUnit_rwEq {A : Type u} (a b : A) :
@@ -75,12 +75,12 @@ noncomputable def susp_leftAdjoint_loop
       (PointedMap X (omegaEqPointed Y)) :=
   loopSpaceSuspensionAdjunction X Y
 
-def susp_leftAdjoint_loop_leftInv (X Y : Pointed)
+noncomputable def susp_leftAdjoint_loop_leftInv (X Y : Pointed)
     (f : PointedMap (sigmaPointed X) Y) :
     Path ((susp_leftAdjoint_loop X Y).invFun ((susp_leftAdjoint_loop X Y).toFun f)) f :=
   (susp_leftAdjoint_loop X Y).left_inv f
 
-def susp_leftAdjoint_loop_rightInv (X Y : Pointed)
+noncomputable def susp_leftAdjoint_loop_rightInv (X Y : Pointed)
     (g : PointedMap X (omegaEqPointed Y)) :
     Path ((susp_leftAdjoint_loop X Y).toFun ((susp_leftAdjoint_loop X Y).invFun g)) g :=
   (susp_leftAdjoint_loop X Y).right_inv g
@@ -92,7 +92,7 @@ inductive Sphere0 : Type
   | right
 deriving DecidableEq, Repr
 
-def SphereN : Nat → Type
+noncomputable def SphereN : Nat → Type
   | 0 => Sphere0
   | Nat.succ n => Susp (SphereN n)
 
@@ -113,7 +113,7 @@ abbrev sphereMerid (n : Nat) (x : SphereN n) :
   merid (A := SphereN n) x
 
 /-- The standard suspension loop on `Sⁿ` as a trans/symm chain in `Sⁿ⁺¹`. -/
-def sphereMeridChain (n : Nat) (x y : SphereN n) :
+noncomputable def sphereMeridChain (n : Nat) (x y : SphereN n) :
     Path (sphereNorth n) (sphereNorth n) :=
   Path.trans (sphereMerid n x) (Path.symm (sphereMerid n y))
 

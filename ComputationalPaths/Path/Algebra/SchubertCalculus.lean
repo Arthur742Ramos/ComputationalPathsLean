@@ -61,70 +61,70 @@ structure PetersonLamShimozonoData (n : Nat) where
   translationLength : Nat
   positivityWeight : Nat
 
-def bruhatLength (n : Nat) (v : SchubertVariety n) : Nat :=
+noncomputable def bruhatLength (n : Nat) (v : SchubertVariety n) : Nat :=
   v.codim
 
-def schubertCellDimension (n : Nat) (v : SchubertVariety n) : Nat :=
+noncomputable def schubertCellDimension (n : Nat) (v : SchubertVariety n) : Nat :=
   n - v.codim
 
-def oppositeSchubertDimension (n : Nat) (v : SchubertVariety n) : Nat :=
+noncomputable def oppositeSchubertDimension (n : Nat) (v : SchubertVariety n) : Nat :=
   v.codim
 
-def schubertClassDegree (n : Nat) (c : SchubertClass n) : Nat :=
+noncomputable def schubertClassDegree (n : Nat) (c : SchubertClass n) : Nat :=
   c.degree
 
-def cupProductDegree (n : Nat) (c₁ c₂ : SchubertClass n) : Nat :=
+noncomputable def cupProductDegree (n : Nat) (c₁ c₂ : SchubertClass n) : Nat :=
   c₁.degree + c₂.degree
 
-def lrCoefficient (n : Nat) (lr : LittlewoodRichardsonData n) : Nat :=
+noncomputable def lrCoefficient (n : Nat) (lr : LittlewoodRichardsonData n) : Nat :=
   lr.coeff
 
-def lrTableauCount (n : Nat) (lr : LittlewoodRichardsonData n) : Nat :=
+noncomputable def lrTableauCount (n : Nat) (lr : LittlewoodRichardsonData n) : Nat :=
   lr.coeff
 
-def pieriCoefficient (n : Nat) (p : PieriData n) : Nat :=
+noncomputable def pieriCoefficient (n : Nat) (p : PieriData n) : Nat :=
   p.coefficient
 
-def pieriExpansionSize (n : Nat) (p : PieriData n) : Nat :=
+noncomputable def pieriExpansionSize (n : Nat) (p : PieriData n) : Nat :=
   p.specialIndex + 1
 
-def doubleSchubertDegree (n : Nat) (d : DoubleSchubertPolynomial n) : Nat :=
+noncomputable def doubleSchubertDegree (n : Nat) (d : DoubleSchubertPolynomial n) : Nat :=
   d.degree
 
-def doubleSchubertSpecialization (n : Nat) (d : DoubleSchubertPolynomial n) : Nat :=
+noncomputable def doubleSchubertSpecialization (n : Nat) (d : DoubleSchubertPolynomial n) : Nat :=
   d.numMonomials
 
-def kTheoryEulerCharacteristic (n : Nat) (k : FlagKTheory n) : Int :=
+noncomputable def kTheoryEulerCharacteristic (n : Nat) (k : FlagKTheory n) : Int :=
   k.eulerChar
 
-def kTheoryProductClass (n : Nat) (k₁ k₂ : FlagKTheory n) : Nat :=
+noncomputable def kTheoryProductClass (n : Nat) (k₁ k₂ : FlagKTheory n) : Nat :=
   k₁.rank + k₂.rank
 
-def petersonTranslation (n : Nat) (pls : PetersonLamShimozonoData n) : Nat :=
+noncomputable def petersonTranslation (n : Nat) (pls : PetersonLamShimozonoData n) : Nat :=
   pls.translationLength
 
-def affineSchubertDegree (n : Nat) (pls : PetersonLamShimozonoData n) : Nat :=
+noncomputable def affineSchubertDegree (n : Nat) (pls : PetersonLamShimozonoData n) : Nat :=
   pls.affineIndex
 
-def quantumSchubertIndex (n : Nat) (c : SchubertClass n) : Nat :=
+noncomputable def quantumSchubertIndex (n : Nat) (c : SchubertClass n) : Nat :=
   c.variety.index.1
 
-def schubertPolynomialSupport (n : Nat) (d : DoubleSchubertPolynomial n) : Nat :=
+noncomputable def schubertPolynomialSupport (n : Nat) (d : DoubleSchubertPolynomial n) : Nat :=
   d.numMonomials
 
-def schubertDivisorClass (n : Nat) (c : SchubertClass n) : Nat :=
+noncomputable def schubertDivisorClass (n : Nat) (c : SchubertClass n) : Nat :=
   c.degree
 
-def richardsonDimension (n : Nat) (v₁ v₂ : SchubertVariety n) : Nat :=
+noncomputable def richardsonDimension (n : Nat) (v₁ v₂ : SchubertVariety n) : Nat :=
   n - (v₁.codim + v₂.codim)
 
-def degeneracyLocusCodim (n : Nat) (v : SchubertVariety n) : Nat :=
+noncomputable def degeneracyLocusCodim (n : Nat) (v : SchubertVariety n) : Nat :=
   v.codim
 
-def flagVarietyDimension (n : Nat) : Nat :=
+noncomputable def flagVarietyDimension (n : Nat) : Nat :=
   n * (n - 1) / 2
 
-def plsPositivityWitness (n : Nat) (pls : PetersonLamShimozonoData n) : Nat :=
+noncomputable def plsPositivityWitness (n : Nat) (pls : PetersonLamShimozonoData n) : Nat :=
   pls.positivityWeight
 
 theorem bruhatLength_refl (n : Nat) (v : SchubertVariety n) :

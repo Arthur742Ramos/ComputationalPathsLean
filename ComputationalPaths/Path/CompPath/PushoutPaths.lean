@@ -56,7 +56,7 @@ deriving DecidableEq, Repr
 
 namespace Side
 
-def flip : Side → Side
+noncomputable def flip : Side → Side
   | left => right
   | right => left
 
@@ -89,31 +89,31 @@ namespace FreeProductWord
 variable {G₁ : Type u} {G₂ : Type u}
 
 /-- Concatenate two words. -/
-def concat : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
+noncomputable def concat : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
   | nil, w₂ => w₂
   | consLeft x rest, w₂ => consLeft x (concat rest w₂)
   | consRight y rest, w₂ => consRight y (concat rest w₂)
 
 /-- Length of a word. -/
-def length : FreeProductWord G₁ G₂ → Nat
+noncomputable def length : FreeProductWord G₁ G₂ → Nat
   | nil => 0
   | consLeft _ rest => 1 + length rest
   | consRight _ rest => 1 + length rest
 
 /-- Singleton word from G₁. -/
-def singleLeft (x : G₁) : FreeProductWord G₁ G₂ := consLeft x nil
+noncomputable def singleLeft (x : G₁) : FreeProductWord G₁ G₂ := consLeft x nil
 
 /-- Singleton word from G₂. -/
-def singleRight (y : G₂) : FreeProductWord G₁ G₂ := consRight y nil
+noncomputable def singleRight (y : G₂) : FreeProductWord G₁ G₂ := consRight y nil
 
 /-- Reverse a word. -/
-def reverse : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
+noncomputable def reverse : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
   | nil => nil
   | consLeft x rest => concat (reverse rest) (singleLeft x)
   | consRight y rest => concat (reverse rest) (singleRight y)
 
 /-- Map a word by mapping each letter on its side. -/
-def map {H₁ H₂ : Type u}
+noncomputable def map {H₁ H₂ : Type u}
     (f : G₁ → H₁) (g : G₂ → H₂) :
     FreeProductWord G₁ G₂ → FreeProductWord H₁ H₂
   | nil => nil
@@ -133,7 +133,7 @@ def map {H₁ H₂ : Type u}
     map f g (consRight y rest) = consRight (g y) (map f g rest) := rfl
 
 /-- Equivalence on free-product words induced by equivalences on each side. -/
-def equiv {H₁ H₂ : Type u}
+noncomputable def equiv {H₁ H₂ : Type u}
     (e₁ : SimpleEquiv G₁ H₁) (e₂ : SimpleEquiv G₂ H₂) :
     SimpleEquiv (FreeProductWord G₁ G₂) (FreeProductWord H₁ H₂) where
   toFun := map e₁.toFun e₂.toFun
@@ -157,7 +157,7 @@ def equiv {H₁ H₂ : Type u}
 
 /-- Inverse of a word in a free product: reverse and negate each element.
 This requires `Neg` instances on the component types (e.g., for ℤ). -/
-def inverse [Neg G₁] [Neg G₂] : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
+noncomputable def inverse [Neg G₁] [Neg G₂] : FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂
   | nil => nil
   | consLeft x rest => concat (inverse rest) (singleLeft (-x))
   | consRight y rest => concat (inverse rest) (singleRight (-y))
@@ -233,7 +233,7 @@ A reduced word has no adjacent elements from the same side. This is important
 for normal forms in free products. -/
 
 /-- A word is reduced if no two adjacent elements are from the same side. -/
-def isReduced : FreeProductWord G₁ G₂ → Bool
+noncomputable def isReduced : FreeProductWord G₁ G₂ → Bool
   | nil => true
   | consLeft _ nil => true
   | consLeft _ (consLeft _ _) => false
@@ -692,7 +692,7 @@ inductive AmalgEquiv {G₁ G₂ H : Type u} (i₁ : H → G₁) (i₂ : H → G�
       AmalgEquiv i₁ i₂ w₁ w₂ → AmalgEquiv i₁ i₂ w₂ w₃ → AmalgEquiv i₁ i₂ w₁ w₃
 
 /-- The amalgamated free product G₁ *_H G₂ as a quotient. -/
-def AmalgamatedFreeProduct (G₁ G₂ H : Type u) (i₁ : H → G₁) (i₂ : H → G₂) : Type u :=
+noncomputable def AmalgamatedFreeProduct (G₁ G₂ H : Type u) (i₁ : H → G₁) (i₂ : H → G₂) : Type u :=
   Quot (AmalgEquiv i₁ i₂)
 
 namespace AmalgamatedFreeProduct
@@ -700,18 +700,18 @@ namespace AmalgamatedFreeProduct
 variable {G₁ G₂ H : Type u} {i₁ : H → G₁} {i₂ : H → G₂}
 
 /-- Embed a word into the amalgamated free product. -/
-def ofWord (w : FreeProductWord G₁ G₂) : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
+noncomputable def ofWord (w : FreeProductWord G₁ G₂) : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
   Quot.mk _ w
 
 /-- Identity element (empty word). -/
-def one : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ := ofWord .nil
+noncomputable def one : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ := ofWord .nil
 
 /-- Embed an element of G₁. -/
-def inl (x : G₁) : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
+noncomputable def inl (x : G₁) : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
   ofWord (FreeProductWord.singleLeft x)
 
 /-- Embed an element of G₂. -/
-def inr (y : G₂) : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
+noncomputable def inr (y : G₂) : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
   ofWord (FreeProductWord.singleRight y)
 
 /-- The amalgamation: i₁(h) = i₂(h) in the product. -/
@@ -736,7 +736,7 @@ theorem amalgamate (h : H) :
     (FreeProductWord.nil (G₁ := G₁) (G₂ := G₂))
 
 /-- Multiplication helper on words. -/
-def mulWord (w₁ w₂ : FreeProductWord G₁ G₂) : FreeProductWord G₁ G₂ :=
+noncomputable def mulWord (w₁ w₂ : FreeProductWord G₁ G₂) : FreeProductWord G₁ G₂ :=
   FreeProductWord.concat w₁ w₂
 
 /-- Concatenation respects the equivalence relation on the left. -/
@@ -798,14 +798,14 @@ theorem concat_respects_right (w₁ : FreeProductWord G₁ G₂) {w₂ w₂' : F
   | trans _ _ ih1 ih2 => exact AmalgEquiv.trans ih1 ih2
 
 /-- Multiplication helper: multiply a word on the right. -/
-def mulWordRight (w₂ : FreeProductWord G₁ G₂) :
+noncomputable def mulWordRight (w₂ : FreeProductWord G₁ G₂) :
     AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ → AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
   Quot.lift
     (fun w₁ => ofWord (FreeProductWord.concat w₁ w₂))
     (fun _ _ h => Quot.sound (concat_respects_left w₂ h))
 
 /-- Multiplication in the amalgamated free product. -/
-def mul (x y : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
+noncomputable def mul (x y : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
     AmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
   Quot.lift
     (fun w₂ => mulWordRight w₂ x)
@@ -817,8 +817,8 @@ def mul (x y : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
         exact concat_respects_right w₁ h)
     y
 
-instance : Mul (AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨mul⟩
-instance : One (AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨one⟩
+noncomputable instance : Mul (AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨mul⟩
+noncomputable instance : One (AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨one⟩
 
 @[simp] theorem one_mul' (x : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) : mul one x = x := by
   induction x using Quot.ind with
@@ -947,7 +947,7 @@ theorem inverse_respects_amalg [Neg G₁] [Neg G₂] [Neg H]
 
 /-- Inverse operation on the amalgamated free product.
 Requires that the amalgamation maps commute with negation. -/
-def inv [Neg G₁] [Neg G₂] [Neg H]
+noncomputable def inv [Neg G₁] [Neg G₂] [Neg H]
     (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
     (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))
     (x : AmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
@@ -1027,7 +1027,7 @@ end FullAmalgEquiv
 
 /-- The full amalgamated free product with group structure.
 Quotiented by both amalgamation and free group reduction. -/
-def FullAmalgamatedFreeProduct (G₁ G₂ H : Type u) [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
+noncomputable def FullAmalgamatedFreeProduct (G₁ G₂ H : Type u) [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
     (i₁ : H → G₁) (i₂ : H → G₂) : Type u :=
   Quot (FullAmalgEquiv i₁ i₂)
 
@@ -1037,11 +1037,11 @@ variable {G₁ G₂ H : Type u} [Add G₁] [Add G₂] [Zero G₁] [Zero G₂]
 variable {i₁ : H → G₁} {i₂ : H → G₂}
 
 /-- Embed a word into the full amalgamated free product. -/
-def ofWord (w : FreeProductWord G₁ G₂) : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
+noncomputable def ofWord (w : FreeProductWord G₁ G₂) : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
   Quot.mk _ w
 
 /-- Identity element (empty word). -/
-def one : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ := ofWord .nil
+noncomputable def one : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ := ofWord .nil
 
 /-- Concatenation respects the full equivalence relation on the left. -/
 theorem concat_respects_left (w₂ : FreeProductWord G₁ G₂) {w₁ w₁' : FreeProductWord G₁ G₂}
@@ -1090,14 +1090,14 @@ theorem concat_respects_right (w₁ : FreeProductWord G₁ G₂) {w₂ w₂' : F
   | trans _ _ ih1 ih2 => exact FullAmalgEquiv.trans ih1 ih2
 
 /-- Multiplication helper: multiply a word on the right. -/
-def mulWordRight (w₂ : FreeProductWord G₁ G₂) :
+noncomputable def mulWordRight (w₂ : FreeProductWord G₁ G₂) :
     FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ → FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
   Quot.lift
     (fun w₁ => ofWord (FreeProductWord.concat w₁ w₂))
     (fun _ _ h => Quot.sound (concat_respects_left w₂ h))
 
 /-- Multiplication in the full amalgamated free product. -/
-def mul (x y : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
+noncomputable def mul (x y : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
     FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂ :=
   Quot.lift
     (fun w₂ => mulWordRight w₂ x)
@@ -1109,8 +1109,8 @@ def mul (x y : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) :
         exact concat_respects_right w₁ h)
     y
 
-instance : Mul (FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨mul⟩
-instance : One (FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨one⟩
+noncomputable instance : Mul (FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨mul⟩
+noncomputable instance : One (FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) := ⟨one⟩
 
 @[simp] theorem one_mul' (x : FullAmalgamatedFreeProduct G₁ G₂ H i₁ i₂) : mul one x = x := by
   induction x using Quot.ind with
@@ -1136,7 +1136,7 @@ Requires group laws for negation:
 - Negation commutes with i₁, i₂
 - Negation anti-distributes over addition: -(x + y) = (-y) + (-x)
 - Negation of zero is zero -/
-def inv [Neg G₁] [Neg G₂] [Neg H]
+noncomputable def inv [Neg G₁] [Neg G₂] [Neg H]
     (hi₁ : ∀ h : H, -(i₁ h) = i₁ (-h))
     (hi₂ : ∀ h : H, -(i₂ h) = i₂ (-h))
     (hnegG₁ : ∀ x y : G₁, -(x + y) = (-y) + (-x))
@@ -1217,7 +1217,7 @@ variable {G₁ G₂ H : Type u}
 /-- Lift a pair of functions to a function on free product words.
 This is the "word extension" that applies φ₁ to left letters and φ₂ to right letters,
 then combines the results using the group operation in H. -/
-def wordLift [One H] [Mul H] (φ₁ : G₁ → H) (φ₂ : G₂ → H) :
+noncomputable def wordLift [One H] [Mul H] (φ₁ : G₁ → H) (φ₂ : G₂ → H) :
     FreeProductWord G₁ G₂ → H
   | .nil => 1
   | .consLeft x rest => φ₁ x * wordLift φ₁ φ₂ rest
@@ -1340,38 +1340,38 @@ surface-specific free-group encodings used in older developments.
 /-- The free group on a type of generators α, as a free product.
 Elements are represented as words with positive (Left) and inverse (Right) generators.
 This is an alias for FreeProductWord α α. -/
-def GeneratorWord (α : Type u) : Type u := FreeProductWord α α
+noncomputable def GeneratorWord (α : Type u) : Type u := FreeProductWord α α
 
 namespace GeneratorWord
 
 variable {α : Type u}
 
 /-- Empty word (identity element). -/
-def nil : GeneratorWord α := FreeProductWord.nil
+noncomputable def nil : GeneratorWord α := FreeProductWord.nil
 
 /-- A positive generator (g⁺). -/
-def gen (a : α) : GeneratorWord α := FreeProductWord.singleLeft a
+noncomputable def gen (a : α) : GeneratorWord α := FreeProductWord.singleLeft a
 
 /-- An inverse generator (g⁻¹). -/
-def genInv (a : α) : GeneratorWord α := FreeProductWord.singleRight a
+noncomputable def genInv (a : α) : GeneratorWord α := FreeProductWord.singleRight a
 
 /-- Concatenation of free group words. -/
-def mul (w₁ w₂ : GeneratorWord α) : GeneratorWord α :=
+noncomputable def mul (w₁ w₂ : GeneratorWord α) : GeneratorWord α :=
   FreeProductWord.concat w₁ w₂
 
 /-- Length of a word. -/
-def length : GeneratorWord α → Nat := FreeProductWord.length
+noncomputable def length : GeneratorWord α → Nat := FreeProductWord.length
 
 /-- The word for a⁺ ⋅ a⁻¹. -/
-def genTimesGenInv (a : α) : GeneratorWord α :=
+noncomputable def genTimesGenInv (a : α) : GeneratorWord α :=
   mul (gen a) (genInv a)
 
 /-- The word for a⁻¹ ⋅ a⁺. -/
-def genInvTimesGen (a : α) : GeneratorWord α :=
+noncomputable def genInvTimesGen (a : α) : GeneratorWord α :=
   mul (genInv a) (gen a)
 
-instance : One (GeneratorWord α) := ⟨nil⟩
-instance : Mul (GeneratorWord α) := ⟨mul⟩
+noncomputable instance : One (GeneratorWord α) := ⟨nil⟩
+noncomputable instance : Mul (GeneratorWord α) := ⟨mul⟩
 
 @[simp] theorem one_def : (1 : GeneratorWord α) = nil := rfl
 @[simp] theorem mul_def (w₁ w₂ : GeneratorWord α) : w₁ * w₂ = mul w₁ w₂ := rfl
@@ -1393,19 +1393,19 @@ We represent this via GeneratorWord Bool. -/
 abbrev FreeGroupTwo := GeneratorWord Bool
 
 /-- Generator a in F₂. -/
-def genA : FreeGroupTwo := gen false
+noncomputable def genA : FreeGroupTwo := gen false
 
 /-- Generator b in F₂. -/
-def genB : FreeGroupTwo := gen true
+noncomputable def genB : FreeGroupTwo := gen true
 
 /-- Inverse of generator a in F₂. -/
-def genAInv : FreeGroupTwo := genInv false
+noncomputable def genAInv : FreeGroupTwo := genInv false
 
 /-- Inverse of generator b in F₂. -/
-def genBInv : FreeGroupTwo := genInv true
+noncomputable def genBInv : FreeGroupTwo := genInv true
 
 /-- The word aba⁻¹b⁻¹ (commutator) in F₂. -/
-def commutator : FreeGroupTwo :=
+noncomputable def commutator : FreeGroupTwo :=
   genA * genB * genAInv * genBInv
 
 /-- The commutator has length 4. -/
@@ -1424,18 +1424,18 @@ A word in F₁ can be "evaluated" to an integer by summing:
 namespace FreeGroupOne
 
 /-- Evaluate a word in F₁ to an integer (winding number). -/
-def toInt : GeneratorWord.FreeGroupOne → Int
+noncomputable def toInt : GeneratorWord.FreeGroupOne → Int
   | .nil => 0
   | .consLeft () rest => 1 + toInt rest
   | .consRight () rest => -1 + toInt rest
 
 /-- Convert a natural number to a word in F₁ (positive powers of the generator). -/
-def ofNat : Nat → GeneratorWord.FreeGroupOne
+noncomputable def ofNat : Nat → GeneratorWord.FreeGroupOne
   | 0 => .nil
   | n + 1 => .consLeft () (ofNat n)
 
 /-- ofInt for negative integers. -/
-def ofNegNat : Nat → GeneratorWord.FreeGroupOne
+noncomputable def ofNegNat : Nat → GeneratorWord.FreeGroupOne
   | 0 => .nil
   | n + 1 => .consRight () (ofNegNat n)
 
@@ -1727,7 +1727,7 @@ variable {a₀ : A} {b₀ : B}
 
 /-- Encode a provenance-aware pushout path by mapping `inl`/`inr` steps to letters.
 Glue steps are ignored, serving only to switch sides in a path representation. -/
-def encodeWith
+noncomputable def encodeWith
     (encodeInl : ∀ {a a' : A}, Path a a' → π₁(A, a₀))
     (encodeInr : ∀ {b b' : B}, Path b b' → π₁(B, b₀))
     {x y : PushoutCompPath A B C f g} :
@@ -1837,7 +1837,7 @@ class HasWedgeProvenanceEncode (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) :
   encodeInr_loop : ∀ p : LoopSpace B b₀, encodeInr p = Quot.mk _ p
 
 /-- Encode a provenance loop as a word in the free product of `π₁(A)` and `π₁(B)`. -/
-def wedgeProvenanceEncode
+noncomputable def wedgeProvenanceEncode
     [HasWedgeProvenanceEncode A B a₀ b₀] :
     WedgeProvenanceLoop (A := A) (B := B) a₀ b₀ →
       FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
@@ -1850,14 +1850,14 @@ def wedgeProvenanceEncode
       HasWedgeProvenanceEncode.encodeInr (A := A) (B := B) (a₀ := a₀) (b₀ := b₀))
 
 /-- Two provenance loops are equivalent if their encoded words coincide. -/
-def wedgeProvenanceRel
+noncomputable def wedgeProvenanceRel
     [HasWedgeProvenanceEncode A B a₀ b₀]
     (p q : WedgeProvenanceLoop (A := A) (B := B) a₀ b₀) : Prop :=
   wedgeProvenanceEncode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) p =
     wedgeProvenanceEncode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) q
 
 /-- Setoid on provenance loops by encoded-word equality. -/
-def wedgeProvenanceSetoid
+noncomputable def wedgeProvenanceSetoid
     [HasWedgeProvenanceEncode A B a₀ b₀] :
     Setoid (WedgeProvenanceLoop (A := A) (B := B) a₀ b₀) where
   r := wedgeProvenanceRel (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
@@ -1876,7 +1876,7 @@ abbrev WedgeProvenanceQuot
   Quot (wedgeProvenanceSetoid (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)).r
 
 /-- Encode at the quotient level. -/
-def wedgeProvenanceEncodeQuot
+noncomputable def wedgeProvenanceEncodeQuot
     [HasWedgeProvenanceEncode A B a₀ b₀] :
     WedgeProvenanceQuot (A := A) (B := B) a₀ b₀ →
       FreeProductWord (π₁(A, a₀)) (π₁(B, b₀)) :=
@@ -2224,13 +2224,13 @@ class HasPushoutSVKEncodeData (A : Type u) (B : Type u) (C : Type u)
       AmalgEquiv (piOneFmap c₀) (piOneGmap c₀)
         (encodeQuot (pushoutDecode c₀ w)) w
 
-instance (priority := 100) hasPushoutSVKDecodeEncode_of_encodeData (A : Type u) (B : Type u)
+noncomputable instance (priority := 100) hasPushoutSVKDecodeEncode_of_encodeData (A : Type u) (B : Type u)
     (C : Type u) (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeData A B C f g c₀] :
     HasPushoutSVKDecodeEncode A B C f g c₀ where
   decode_encode := HasPushoutSVKEncodeData.decode_encode (A := A) (B := B) (C := C) (f := f)
     (g := g) (c₀ := c₀)
 
-instance (priority := 100) hasPushoutSVKEncodeDecode_of_encodeData (A : Type u) (B : Type u)
+noncomputable instance (priority := 100) hasPushoutSVKEncodeDecode_of_encodeData (A : Type u) (B : Type u)
     (C : Type u) (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeData A B C f g c₀] :
     HasPushoutSVKEncodeDecode A B C f g c₀ where
   encode_decode := HasPushoutSVKEncodeData.encode_decode (A := A) (B := B) (C := C) (f := f)
@@ -2781,7 +2781,7 @@ class HasPushoutSVKEncodeDecodeFull (A : Type u) (B : Type u) (C : Type u)
       FullAmalgEquiv (piOneFmap c₀) (piOneGmap c₀)
         (pushoutEncodeQuotAxiom A B C f g c₀ (pushoutDecode c₀ w)) w
 
-instance (priority := 100) hasPushoutSVKEncodeDecodeFull_of_encodeDecode
+noncomputable instance (priority := 100) hasPushoutSVKEncodeDecodeFull_of_encodeDecode
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
     [HasPushoutSVKEncodeQuot A B C f g c₀] [HasPushoutSVKEncodeDecode A B C f g c₀] :
     HasPushoutSVKEncodeDecodeFull A B C f g c₀ where
@@ -2832,7 +2832,7 @@ class HasPushoutSVKDecodeFullAmalgBijective (A : Type u) (B : Type u) (C : Type 
       Function.Surjective
       (pushoutDecodeFullAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀)
 
-instance (priority := 200) hasPushoutSVKDecodeFullAmalgBijective_of_encode
+noncomputable instance (priority := 200) hasPushoutSVKDecodeFullAmalgBijective_of_encode
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
     [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀]
@@ -3001,7 +3001,7 @@ class HasPushoutSVKDecodeAmalgBijective (A : Type u) (B : Type u) (C : Type u)
       Function.Surjective
       (pushoutDecodeAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀)
 
-instance (priority := 200) hasPushoutSVKDecodeAmalgBijective_of_encode
+noncomputable instance (priority := 200) hasPushoutSVKDecodeAmalgBijective_of_encode
     (A : Type u) (B : Type u) (C : Type u) (f : C → A) (g : C → B) (c₀ : C)
     [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
     [HasPushoutSVKEncodeQuot A B C f g c₀]
@@ -3057,7 +3057,7 @@ noncomputable def seifertVanKampenEquiv_of_decodeAmalg_bijective
               (g := g) (c₀ := c₀)).2
           (pushoutDecodeAmalg (A := A) (B := B) (C := C) (f := f) (g := g) c₀ x))
 
-private def quotRel {α : Sort u} (r : α → α → Prop) (hr : Equivalence r) : Quot r → Quot r → Prop :=
+private noncomputable def quotRel {α : Sort u} (r : α → α → Prop) (hr : Equivalence r) : Quot r → Quot r → Prop :=
   fun q₁ q₂ =>
     Quot.liftOn q₁
       (fun a₁ =>
@@ -3577,13 +3577,13 @@ class HasWedgeSVKEncodeData (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) : Ty
           (pushoutDecode (A := A) (B := B) (C := PUnit')
             (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit w) = w
 
-instance (priority := 100) hasWedgeSVKDecodeEncode_of_encodeData
+noncomputable instance (priority := 100) hasWedgeSVKDecodeEncode_of_encodeData
     (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) [HasWedgeSVKEncodeData A B a₀ b₀] :
     HasWedgeSVKDecodeEncode A B a₀ b₀ where
   decode_encode :=
     HasWedgeSVKEncodeData.decode_encode (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
 
-instance (priority := 100) hasWedgeSVKEncodeDecode_of_encodeData
+noncomputable instance (priority := 100) hasWedgeSVKEncodeDecode_of_encodeData
     (A : Type u) (B : Type u) (a₀ : A) (b₀ : B) [HasWedgeSVKEncodeData A B a₀ b₀] :
     HasWedgeSVKEncodeDecode A B a₀ b₀ where
   encode_decode :=

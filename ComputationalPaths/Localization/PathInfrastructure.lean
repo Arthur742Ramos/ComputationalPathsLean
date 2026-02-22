@@ -34,7 +34,7 @@ namespace LocalizationFunctor
 variable {A : Type u} (L : LocalizationFunctor A)
 
 /-- Localization action on paths with an explicit trailing identity segment. -/
-def mapPath {a b : A} (p : Path a b) : Path (L.obj a) (L.obj b) :=
+noncomputable def mapPath {a b : A} (p : Path a b) : Path (L.obj a) (L.obj b) :=
   Path.trans (Path.congrArg L.obj p) (Path.refl (L.obj b))
 
 /-- Localization preserves paths with a direct `Step` witness. -/

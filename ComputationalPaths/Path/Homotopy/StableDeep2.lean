@@ -55,13 +55,13 @@ structure SpectrumMorphism (α : Type u) where
 
 
 /-- Identity morphism of spectra. -/
-def SpectrumMorphism.id (E : SpectrumData α) : SpectrumMorphism α where
+noncomputable def SpectrumMorphism.id (E : SpectrumData α) : SpectrumMorphism α where
   source := E
   target := E
   levelMap := E.level
 
 /-- Composition of spectrum morphisms. -/
-def SpectrumMorphism.comp (f g : SpectrumMorphism α) : SpectrumMorphism α where
+noncomputable def SpectrumMorphism.comp (f g : SpectrumMorphism α) : SpectrumMorphism α where
   source := f.source
   target := g.target
   levelMap := fun n => g.levelMap n
@@ -94,7 +94,7 @@ structure StableSmash (α : Type u) where
 
 
 /-- Unit spectrum for smash product. -/
-def sphereSpectrum (base : α) : SpectrumData α where
+noncomputable def sphereSpectrum (base : α) : SpectrumData α where
   level := fun _ => base
   bondingMap := fun _ => base
 
@@ -116,7 +116,7 @@ structure StableStemData where
 
 
 /-- Known stable stems. -/
-def stableStem : Int → StableStemData
+noncomputable def stableStem : Int → StableStemData
   | 0 => { degree := 0, order := 0, generators := 1 }    -- ℤ
   | 1 => { degree := 1, order := 2, generators := 1 }    -- ℤ/2
   | 2 => { degree := 2, order := 2, generators := 1 }    -- ℤ/2
@@ -130,7 +130,7 @@ theorem stableStem_three_order : (stableStem 3).order = 24 := rfl
 theorem stableStem_seven_order : (stableStem 7).order = 240 := rfl
 
 /-- Path witnessing η² relation in stem 2. -/
-def etaSquaredPath : Path (stableStem 2) (stableStem 2) := Path.refl _
+noncomputable def etaSquaredPath : Path (stableStem 2) (stableStem 2) := Path.refl _
 
 -- ============================================================================
 -- Section 4: Adams Spectral Sequence E₂ Page
@@ -157,8 +157,8 @@ structure AdamsDifferential where
   isNonzero : Bool
 
 
-def adamsDiffTargetS (d : AdamsDifferential) : Nat := d.sourceS + d.page
-def adamsDiffTargetT (d : AdamsDifferential) : Nat := d.sourceT + d.page - 1
+noncomputable def adamsDiffTargetS (d : AdamsDifferential) : Nat := d.sourceS + d.page
+noncomputable def adamsDiffTargetT (d : AdamsDifferential) : Nat := d.sourceT + d.page - 1
 
 theorem adamsDiffTargetS_def (d : AdamsDifferential) :
     adamsDiffTargetS d = d.sourceS + d.page := rfl
@@ -171,7 +171,7 @@ structure AdamsConvergence where
 
 
 /-- Path: d² = 0 for Adams differentials (trivially modeled). -/
-def adamsD2Zero (d : AdamsDifferential) :
+noncomputable def adamsD2Zero (d : AdamsDifferential) :
     Path d d := Path.refl d
 
 -- ============================================================================
@@ -192,12 +192,12 @@ structure FGLHeight where
 
 
 /-- The additive formal group law F(x,y) = x + y. -/
-def additiveFGL (zero : α) : FormalGroupLawData α where
+noncomputable def additiveFGL (zero : α) : FormalGroupLawData α where
   ring := zero
   coeffs := fun _ _ => zero
 
 /-- The multiplicative formal group law F(x,y) = x + y + xy. -/
-def multiplicativeFGL (zero one : α) : FormalGroupLawData α where
+noncomputable def multiplicativeFGL (zero one : α) : FormalGroupLawData α where
   ring := zero
   coeffs := fun i j => if i == 1 && j == 1 then one else zero
 
@@ -222,12 +222,12 @@ structure MoravaStabilizer where
   order : String   -- description of automorphism group
 
 
-def moravaK (p n : Nat) : MoravaKData where
+noncomputable def moravaK (p n : Nat) : MoravaKData where
   prime := p
   height := n
   coeffRing := s!"F_{p}[v_{n}, v_{n}⁻¹]"
 
-def moravaStabilizer (p n : Nat) : MoravaStabilizer where
+noncomputable def moravaStabilizer (p n : Nat) : MoravaStabilizer where
   prime := p
   height := n
   order := s!"Aut(Γ_{n})"
@@ -260,7 +260,7 @@ structure MonochromaticLayer (α : Type u) where
 
 
 /-- Chromatic convergence: X ≃ lim_n L_n X for finite spectra. -/
-def chromaticConvergencePath {α : Type u} (tower : ChromaticTower α) :
+noncomputable def chromaticConvergencePath {α : Type u} (tower : ChromaticTower α) :
     Path tower tower := Path.refl tower
 
 theorem chromaticTower_locHeight {α : Type u} (tower : ChromaticTower α) (n : Nat) :
@@ -280,7 +280,7 @@ structure GreekLetterElement where
 
 
 /-- α-family: αₜ ∈ πₛ_{2t(p-1)-1} at odd prime p. -/
-def alphaElement (p t : Nat) : GreekLetterElement where
+noncomputable def alphaElement (p t : Nat) : GreekLetterElement where
   family := "alpha"
   index := t
   prime := p
@@ -288,7 +288,7 @@ def alphaElement (p t : Nat) : GreekLetterElement where
   order := p
 
 /-- β-family: βₜ ∈ πₛ_{2t(p²-1)-2} at odd prime p. -/
-def betaElement (p t : Nat) : GreekLetterElement where
+noncomputable def betaElement (p t : Nat) : GreekLetterElement where
   family := "beta"
   index := t
   prime := p
@@ -318,13 +318,13 @@ structure TodaBracket where
 
 
 /-- Toda bracket stem formula: |⟨f,g,h⟩| = |f| + |g| + |h| + 1. -/
-def todaBracketStem (f g h : Int) : Int := f + g + h + 1
+noncomputable def todaBracketStem (f g h : Int) : Int := f + g + h + 1
 
 theorem todaBracketStem_def (f g h : Int) :
     todaBracketStem f g h = f + g + h + 1 := rfl
 
 /-- The relation η³ = 12ν via Toda bracket ⟨η, 2, η⟩ = ν. -/
-def todaEtaCubeRelation : TodaBracket where
+noncomputable def todaEtaCubeRelation : TodaBracket where
   f_stem := 1    -- η
   g_stem := 0    -- 2 (degree 0 map)
   h_stem := 1    -- η
@@ -345,7 +345,7 @@ structure ThickSubcategoryData where
 
 
 /-- Hopkins-Smith thick subcategory theorem: C_0 ⊂ C_1 ⊂ ... -/
-def thickSubcategory (p n : Nat) : ThickSubcategoryData where
+noncomputable def thickSubcategory (p n : Nat) : ThickSubcategoryData where
   height := n
   prime := p
   description := s!"C_{n} at p={p}"
@@ -363,7 +363,7 @@ theorem thickSubcategory_prime (p n : Nat) :
     (thickSubcategory p n).prime = p := rfl
 
 /-- Path: thick subcategory filtration is totally ordered. -/
-def thickFiltrationPath (p n : Nat) :
+noncomputable def thickFiltrationPath (p n : Nat) :
     Path (thickSubcategory p n) (thickSubcategory p n) := Path.refl _
 
 -- ============================================================================
@@ -377,16 +377,16 @@ structure BousfieldClass where
 
 
 /-- Bousfield lattice partial order: ⟨E⟩ ≤ ⟨F⟩. -/
-def bousfieldLeq (a b : BousfieldClass) : Prop :=
+noncomputable def bousfieldLeq (a b : BousfieldClass) : Prop :=
   a.height = a.height  -- simplified model
 
 /-- HZ Bousfield class (rational localization). -/
-def bousfieldHZ : BousfieldClass where
+noncomputable def bousfieldHZ : BousfieldClass where
   name := "HZ"
   height := some 0
 
 /-- K(n) Bousfield class. -/
-def bousfieldKn (n : Nat) : BousfieldClass where
+noncomputable def bousfieldKn (n : Nat) : BousfieldClass where
   name := s!"K({n})"
   height := some n
 
@@ -407,7 +407,7 @@ structure VnSelfMap (α : Type u) where
 
 
 /-- Periodicity theorem: every type-n spectrum admits a v_n self-map. -/
-def periodicityTheorem {α : Type u} (E : SpectrumData α) (n period : Nat) :
+noncomputable def periodicityTheorem {α : Type u} (E : SpectrumData α) (n period : Nat) :
     VnSelfMap α where
   spectrum := E
   height := n
@@ -417,7 +417,7 @@ theorem periodicityTheorem_height {α : Type u} (E : SpectrumData α) (n p : Nat
     (periodicityTheorem E n p).height = n := rfl
 
 /-- Path witnessing periodicity: Σ^{|v_n|} M_n ≃ M_n. -/
-def vnPeriodicityPath {α : Type u} (v : VnSelfMap α) :
+noncomputable def vnPeriodicityPath {α : Type u} (v : VnSelfMap α) :
     Path v v := Path.refl v
 
 -- ============================================================================
@@ -432,7 +432,7 @@ structure StableCofiberSeq (α : Type u) where
 
 
 /-- Stable cofiber sequences rotate: X → Y → Z → ΣX → ... -/
-def cofiberRotation {α : Type u} (seq : StableCofiberSeq α) :
+noncomputable def cofiberRotation {α : Type u} (seq : StableCofiberSeq α) :
     StableCofiberSeq α where
   fiber := seq.total
   total := seq.cofiber
@@ -445,7 +445,7 @@ theorem cofiberRotation_total {α : Type u} (seq : StableCofiberSeq α) :
     (cofiberRotation seq).total = seq.cofiber := rfl
 
 /-- Path: double rotation returns to (shifted) original. -/
-def doubleRotationPath {α : Type u} (seq : StableCofiberSeq α) :
+noncomputable def doubleRotationPath {α : Type u} (seq : StableCofiberSeq α) :
     Path (cofiberRotation (cofiberRotation seq)).fiber seq.cofiber := by
   simp [cofiberRotation]
   exact Path.refl _

@@ -44,83 +44,83 @@ structure NormedSpace where
   smul_one : ∀ v, Path (smul 1 v) v
   neg_neg : ∀ v, Path (neg (neg v)) v
 
-def NormedSpace.sub (V : NormedSpace) (v w : V.carrier) : V.carrier :=
+noncomputable def NormedSpace.sub (V : NormedSpace) (v w : V.carrier) : V.carrier :=
   V.add v (V.neg w)
 
-def NormedSpace.dist (V : NormedSpace) (v w : V.carrier) : Nat :=
+noncomputable def NormedSpace.dist (V : NormedSpace) (v w : V.carrier) : Nat :=
   V.norm (V.sub v w)
 
 /-- 1. Norm of zero -/
-def norm_zero_path (V : NormedSpace) : Path (V.norm V.zero) 0 :=
+noncomputable def norm_zero_path (V : NormedSpace) : Path (V.norm V.zero) 0 :=
   V.norm_zero
 
 /-- 2. Norm of neg -/
-def norm_neg_path (V : NormedSpace) (v : V.carrier) :
+noncomputable def norm_neg_path (V : NormedSpace) (v : V.carrier) :
     Path (V.norm (V.neg v)) (V.norm v) :=
   V.norm_neg v
 
 /-- 3. Self-distance relates to norm of zero -/
-def dist_self (V : NormedSpace) (v : V.carrier) :
+noncomputable def dist_self (V : NormedSpace) (v : V.carrier) :
     Path (V.dist v v) (V.norm V.zero) :=
   congrArg V.norm (V.add_neg v)
 
 /-- 4. Self-distance is zero -/
-def dist_self_zero (V : NormedSpace) (v : V.carrier) :
+noncomputable def dist_self_zero (V : NormedSpace) (v : V.carrier) :
     Path (V.dist v v) 0 :=
   trans (dist_self V v) V.norm_zero
 
 /-- 5. Commutativity of addition -/
-def add_comm_path (V : NormedSpace) (v w : V.carrier) :
+noncomputable def add_comm_path (V : NormedSpace) (v w : V.carrier) :
     Path (V.add v w) (V.add w v) :=
   V.add_comm v w
 
 /-- 6. Right identity -/
-def add_zero_path (V : NormedSpace) (v : V.carrier) :
+noncomputable def add_zero_path (V : NormedSpace) (v : V.carrier) :
     Path (V.add v V.zero) v :=
   V.add_zero v
 
 /-- 7. Left identity via commutativity -/
-def zero_add_path (V : NormedSpace) (v : V.carrier) :
+noncomputable def zero_add_path (V : NormedSpace) (v : V.carrier) :
     Path (V.add V.zero v) v :=
   trans (V.add_comm V.zero v) (V.add_zero v)
 
 /-- 8. Left inverse via commutativity -/
-def neg_add_path (V : NormedSpace) (v : V.carrier) :
+noncomputable def neg_add_path (V : NormedSpace) (v : V.carrier) :
     Path (V.add (V.neg v) v) V.zero :=
   trans (V.add_comm (V.neg v) v) (V.add_neg v)
 
 /-- 9. Associativity -/
-def add_assoc_path (V : NormedSpace) (u v w : V.carrier) :
+noncomputable def add_assoc_path (V : NormedSpace) (u v w : V.carrier) :
     Path (V.add (V.add u v) w) (V.add u (V.add v w)) :=
   V.add_assoc u v w
 
 /-- 10. Scalar mult preserves zero -/
-def smul_zero_path (V : NormedSpace) (n : Int) :
+noncomputable def smul_zero_path (V : NormedSpace) (n : Int) :
     Path (V.smul n V.zero) V.zero :=
   V.smul_zero n
 
 /-- 11. Norm of smul zero -/
-def norm_smul_zero (V : NormedSpace) (n : Int) :
+noncomputable def norm_smul_zero (V : NormedSpace) (n : Int) :
     Path (V.norm (V.smul n V.zero)) 0 :=
   trans (congrArg V.norm (V.smul_zero n)) V.norm_zero
 
 /-- 12. Sub self is zero -/
-def sub_self_zero (V : NormedSpace) (v : V.carrier) :
+noncomputable def sub_self_zero (V : NormedSpace) (v : V.carrier) :
     Path (V.sub v v) V.zero :=
   V.add_neg v
 
 /-- 13. Double negation -/
-def neg_neg_path (V : NormedSpace) (v : V.carrier) :
+noncomputable def neg_neg_path (V : NormedSpace) (v : V.carrier) :
     Path (V.neg (V.neg v)) v :=
   V.neg_neg v
 
 /-- 14. Norm of double negation -/
-def norm_neg_neg (V : NormedSpace) (v : V.carrier) :
+noncomputable def norm_neg_neg (V : NormedSpace) (v : V.carrier) :
     Path (V.norm (V.neg (V.neg v))) (V.norm v) :=
   congrArg V.norm (V.neg_neg v)
 
 /-- 15. Norm of neg via double path -/
-def norm_neg_neg_chain (V : NormedSpace) (v : V.carrier) :
+noncomputable def norm_neg_neg_chain (V : NormedSpace) (v : V.carrier) :
     Path (V.norm (V.neg (V.neg v))) (V.norm v) :=
   trans (V.norm_neg (V.neg v)) (V.norm_neg v)
 
@@ -133,14 +133,14 @@ structure BoundedLinearMap (V W : NormedSpace) where
   map_neg : ∀ v, Path (map (V.neg v)) (W.neg (map v))
   bound : Nat
 
-def BoundedLinearMap.id (V : NormedSpace) : BoundedLinearMap V V where
+noncomputable def BoundedLinearMap.id (V : NormedSpace) : BoundedLinearMap V V where
   map := fun v => v
   map_zero := Path.refl _
   map_add := fun _ _ => Path.refl _
   map_neg := fun _ => Path.refl _
   bound := 1
 
-def BoundedLinearMap.comp {V W X : NormedSpace}
+noncomputable def BoundedLinearMap.comp {V W X : NormedSpace}
     (g : BoundedLinearMap W X) (f : BoundedLinearMap V W) :
     BoundedLinearMap V X where
   map := fun v => g.map (f.map v)
@@ -151,7 +151,7 @@ def BoundedLinearMap.comp {V W X : NormedSpace}
     trans (congrArg g.map (f.map_neg v)) (g.map_neg (f.map v))
   bound := g.bound * f.bound
 
-def BoundedLinearMap.zeroMap (V W : NormedSpace) : BoundedLinearMap V W where
+noncomputable def BoundedLinearMap.zeroMap (V W : NormedSpace) : BoundedLinearMap V W where
   map := fun _ => W.zero
   map_zero := Path.refl _
   map_add := fun _ _ => symm (W.add_zero W.zero)
@@ -163,19 +163,19 @@ def BoundedLinearMap.zeroMap (V W : NormedSpace) : BoundedLinearMap V W where
   bound := 0
 
 /-- 16. Composition with identity on left -/
-def comp_id_left {V W : NormedSpace} (f : BoundedLinearMap V W)
+noncomputable def comp_id_left {V W : NormedSpace} (f : BoundedLinearMap V W)
     (v : V.carrier) :
     Path ((BoundedLinearMap.comp (BoundedLinearMap.id W) f).map v) (f.map v) :=
   Path.refl _
 
 /-- 17. Composition with identity on right -/
-def comp_id_right {V W : NormedSpace} (f : BoundedLinearMap V W)
+noncomputable def comp_id_right {V W : NormedSpace} (f : BoundedLinearMap V W)
     (v : V.carrier) :
     Path ((BoundedLinearMap.comp f (BoundedLinearMap.id V)).map v) (f.map v) :=
   Path.refl _
 
 /-- 18. Composition is associative (pointwise) -/
-def comp_assoc {V W X Y : NormedSpace}
+noncomputable def comp_assoc {V W X Y : NormedSpace}
     (h : BoundedLinearMap X Y) (g : BoundedLinearMap W X)
     (f : BoundedLinearMap V W) (v : V.carrier) :
     Path ((BoundedLinearMap.comp (BoundedLinearMap.comp h g) f).map v)
@@ -183,20 +183,20 @@ def comp_assoc {V W X Y : NormedSpace}
   Path.refl _
 
 /-- 19. BLM preserves subtraction -/
-def blm_preserves_sub {V W : NormedSpace} (f : BoundedLinearMap V W)
+noncomputable def blm_preserves_sub {V W : NormedSpace} (f : BoundedLinearMap V W)
     (v w : V.carrier) :
     Path (f.map (V.sub v w)) (W.sub (f.map v) (f.map w)) :=
   trans (f.map_add v (V.neg w))
     (congrArg (W.add (f.map v)) (f.map_neg w))
 
 /-- 20. BLM maps neg neg to original -/
-def blm_neg_neg {V W : NormedSpace} (f : BoundedLinearMap V W)
+noncomputable def blm_neg_neg {V W : NormedSpace} (f : BoundedLinearMap V W)
     (v : V.carrier) :
     Path (f.map (V.neg (V.neg v))) (f.map v) :=
   congrArg f.map (V.neg_neg v)
 
 /-- 21. BLM maps neg neg through W.neg -/
-def blm_neg_neg_chain {V W : NormedSpace} (f : BoundedLinearMap V W)
+noncomputable def blm_neg_neg_chain {V W : NormedSpace} (f : BoundedLinearMap V W)
     (v : V.carrier) :
     Path (W.neg (W.neg (f.map v))) (f.map v) :=
   W.neg_neg (f.map v)
@@ -208,7 +208,7 @@ structure OperatorNorm (V W : NormedSpace) where
   value : Nat
 
 /-- 22. Operator norm of composition -/
-def opNorm_comp_submult {V W X : NormedSpace}
+noncomputable def opNorm_comp_submult {V W X : NormedSpace}
     (nf : OperatorNorm V W) (ng : OperatorNorm W X) :
     OperatorNorm V X :=
   ⟨BoundedLinearMap.comp ng.op nf.op, ng.value * nf.value⟩
@@ -222,19 +222,19 @@ structure BanachSpace extends NormedSpace where
   limit : CauchySeq toNormedSpace → carrier
   limit_unique : ∀ (s : CauchySeq toNormedSpace), Path (limit s) (limit s)
 
-def zero_cauchy (V : NormedSpace) : CauchySeq V where
+noncomputable def zero_cauchy (V : NormedSpace) : CauchySeq V where
   seq := fun _ => V.zero
 
-def const_cauchy (V : NormedSpace) (v : V.carrier) : CauchySeq V where
+noncomputable def const_cauchy (V : NormedSpace) (v : V.carrier) : CauchySeq V where
   seq := fun _ => v
 
 /-- 23. Constant sequence entry -/
-def const_cauchy_at (V : NormedSpace) (v : V.carrier) (n : Nat) :
+noncomputable def const_cauchy_at (V : NormedSpace) (v : V.carrier) (n : Nat) :
     Path ((const_cauchy V v).seq n) v :=
   Path.refl _
 
 /-- 24. Zero cauchy at any index -/
-def zero_cauchy_at (V : NormedSpace) (n : Nat) :
+noncomputable def zero_cauchy_at (V : NormedSpace) (n : Nat) :
     Path ((zero_cauchy V).seq n) V.zero :=
   Path.refl _
 
@@ -246,22 +246,22 @@ structure Contraction (B : BanachSpace) where
   is_fixed : Path (map fixedPoint) fixedPoint
 
 /-- 25. Double iteration at fixed point -/
-def contraction_iterate (B : BanachSpace) (c : Contraction B) :
+noncomputable def contraction_iterate (B : BanachSpace) (c : Contraction B) :
     Path (c.map (c.map c.fixedPoint)) c.fixedPoint :=
   trans (congrArg c.map c.is_fixed) c.is_fixed
 
 /-- 26. Triple iteration -/
-def contraction_triple (B : BanachSpace) (c : Contraction B) :
+noncomputable def contraction_triple (B : BanachSpace) (c : Contraction B) :
     Path (c.map (c.map (c.map c.fixedPoint))) c.fixedPoint :=
   trans (congrArg c.map (contraction_iterate B c)) c.is_fixed
 
 /-- 27. Quad iteration -/
-def contraction_quad (B : BanachSpace) (c : Contraction B) :
+noncomputable def contraction_quad (B : BanachSpace) (c : Contraction B) :
     Path (c.map (c.map (c.map (c.map c.fixedPoint)))) c.fixedPoint :=
   trans (congrArg c.map (contraction_triple B c)) c.is_fixed
 
 /-- 28. General fixed-point propagation -/
-def contraction_propagate (B : BanachSpace) (c : Contraction B)
+noncomputable def contraction_propagate (B : BanachSpace) (c : Contraction B)
     (x : B.carrier) (hx : Path (c.map x) x) :
     Path (c.map (c.map x)) x :=
   trans (congrArg c.map hx) hx
@@ -273,13 +273,13 @@ structure SurjectiveBLM (V W : NormedSpace) extends BoundedLinearMap V W where
   right_inv_spec : ∀ w, Path (map (rightInv w)) w
 
 /-- 29. Open mapping right inverse -/
-def open_mapping_right_inv {V W : NormedSpace}
+noncomputable def open_mapping_right_inv {V W : NormedSpace}
     (f : SurjectiveBLM V W) (w : W.carrier) :
     Path (f.map (f.rightInv w)) w :=
   f.right_inv_spec w
 
 /-- 30. Composing right inverse with path -/
-def surjective_comp_path {V W : NormedSpace}
+noncomputable def surjective_comp_path {V W : NormedSpace}
     (f : SurjectiveBLM V W) (w₁ w₂ : W.carrier)
     (h : Path w₁ w₂) :
     Path (f.map (f.rightInv w₁)) w₂ :=
@@ -292,16 +292,16 @@ structure DualFunctional (V : NormedSpace) where
   eval_zero : Path (eval V.zero) 0
 
 /-- 31. Dual evaluation at zero -/
-def dual_eval_zero (V : NormedSpace) (φ : DualFunctional V) :
+noncomputable def dual_eval_zero (V : NormedSpace) (φ : DualFunctional V) :
     Path (φ.eval V.zero) 0 :=
   φ.eval_zero
 
-def canonical_embedding (V : NormedSpace) (v : V.carrier) :
+noncomputable def canonical_embedding (V : NormedSpace) (v : V.carrier) :
     DualFunctional V → Nat :=
   fun φ => φ.eval v
 
 /-- 32. Canonical embedding at zero -/
-def canonical_embedding_zero (V : NormedSpace) (φ : DualFunctional V) :
+noncomputable def canonical_embedding_zero (V : NormedSpace) (φ : DualFunctional V) :
     Path (canonical_embedding V V.zero φ) 0 :=
   φ.eval_zero
 
@@ -314,14 +314,14 @@ structure IsometricIso (V W : NormedSpace) where
   right_inv : ∀ w, Path (forward.map (backward.map w)) w
   preserves_norm : ∀ v, Path (W.norm (forward.map v)) (V.norm v)
 
-def isometricIso_refl (V : NormedSpace) : IsometricIso V V where
+noncomputable def isometricIso_refl (V : NormedSpace) : IsometricIso V V where
   forward := BoundedLinearMap.id V
   backward := BoundedLinearMap.id V
   left_inv := fun _ => Path.refl _
   right_inv := fun _ => Path.refl _
   preserves_norm := fun _ => Path.refl _
 
-def isometricIso_symm {V W : NormedSpace} (i : IsometricIso V W) :
+noncomputable def isometricIso_symm {V W : NormedSpace} (i : IsometricIso V W) :
     IsometricIso W V where
   forward := i.backward
   backward := i.forward
@@ -331,7 +331,7 @@ def isometricIso_symm {V W : NormedSpace} (i : IsometricIso V W) :
     trans (symm (i.preserves_norm (i.backward.map w)))
           (congrArg W.norm (i.right_inv w))
 
-def isometricIso_trans {V W X : NormedSpace}
+noncomputable def isometricIso_trans {V W X : NormedSpace}
     (i : IsometricIso V W) (j : IsometricIso W X) :
     IsometricIso V X where
   forward := BoundedLinearMap.comp j.forward i.forward
@@ -346,36 +346,36 @@ def isometricIso_trans {V W X : NormedSpace}
     trans (j.preserves_norm (i.forward.map v)) (i.preserves_norm v)
 
 /-- 33. Iso preserves norm -/
-def iso_preserves_norm {V W : NormedSpace} (i : IsometricIso V W)
+noncomputable def iso_preserves_norm {V W : NormedSpace} (i : IsometricIso V W)
     (v : V.carrier) :
     Path (W.norm (i.forward.map v)) (V.norm v) :=
   i.preserves_norm v
 
 /-- 34. Roundtrip norm preservation -/
-def iso_roundtrip_norm {V W : NormedSpace} (i : IsometricIso V W)
+noncomputable def iso_roundtrip_norm {V W : NormedSpace} (i : IsometricIso V W)
     (v : V.carrier) :
     Path (V.norm (i.backward.map (i.forward.map v))) (V.norm v) :=
   congrArg V.norm (i.left_inv v)
 
 /-- 35. Forward roundtrip -/
-def iso_roundtrip_forward {V W : NormedSpace} (i : IsometricIso V W)
+noncomputable def iso_roundtrip_forward {V W : NormedSpace} (i : IsometricIso V W)
     (v : V.carrier) :
     Path (i.backward.map (i.forward.map v)) v :=
   i.left_inv v
 
 /-- 36. Backward roundtrip -/
-def iso_roundtrip_backward {V W : NormedSpace} (i : IsometricIso V W)
+noncomputable def iso_roundtrip_backward {V W : NormedSpace} (i : IsometricIso V W)
     (w : W.carrier) :
     Path (i.forward.map (i.backward.map w)) w :=
   i.right_inv w
 
 /-- 37. Iso sends zero to zero -/
-def iso_forward_zero {V W : NormedSpace} (i : IsometricIso V W) :
+noncomputable def iso_forward_zero {V W : NormedSpace} (i : IsometricIso V W) :
     Path (i.forward.map V.zero) W.zero :=
   i.forward.map_zero
 
 /-- 38. Iso backward sends zero to zero -/
-def iso_backward_zero {V W : NormedSpace} (i : IsometricIso V W) :
+noncomputable def iso_backward_zero {V W : NormedSpace} (i : IsometricIso V W) :
     Path (i.backward.map W.zero) V.zero :=
   i.backward.map_zero
 
@@ -389,18 +389,18 @@ structure NeumannData (V : NormedSpace) where
   iter_succ : ∀ n v, Path (iter (n + 1) v) (op (iter n v))
 
 /-- 39. Neumann iteration 0 at zero -/
-def neumann_iter_zero_at_zero (V : NormedSpace) (nd : NeumannData V) :
+noncomputable def neumann_iter_zero_at_zero (V : NormedSpace) (nd : NeumannData V) :
     Path (nd.iter 0 V.zero) V.zero :=
   nd.iter_zero V.zero
 
 /-- 40. Neumann iteration 1 at zero -/
-def neumann_iter_one_at_zero (V : NormedSpace) (nd : NeumannData V) :
+noncomputable def neumann_iter_one_at_zero (V : NormedSpace) (nd : NeumannData V) :
     Path (nd.iter 1 V.zero) V.zero :=
   trans (nd.iter_succ 0 V.zero)
     (trans (congrArg nd.op (nd.iter_zero V.zero)) nd.op_zero)
 
 /-- 41. Neumann iteration 2 at zero -/
-def neumann_iter_two_at_zero (V : NormedSpace) (nd : NeumannData V) :
+noncomputable def neumann_iter_two_at_zero (V : NormedSpace) (nd : NeumannData V) :
     Path (nd.iter 2 V.zero) V.zero :=
   trans (nd.iter_succ 1 V.zero)
     (trans (congrArg nd.op (neumann_iter_one_at_zero V nd)) nd.op_zero)

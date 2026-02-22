@@ -62,7 +62,7 @@ noncomputable def twoStep_cancel_right_rweq (r p q : Nat) (x : E.term p q) :
 end SpectralPagePaths
 
 /-- Trivial spectral-page path package. -/
-def trivialSpectralPagePaths : SpectralPagePaths where
+noncomputable def trivialSpectralPagePaths : SpectralPagePaths where
   term := fun _ _ => PUnit
   base := fun _ _ => PUnit.unit
   next := fun _ _ _ _ => PUnit.unit

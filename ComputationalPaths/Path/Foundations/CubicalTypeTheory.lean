@@ -7,40 +7,40 @@ namespace CubicalTypeTheory
 
 universe u v
 
-def CubicalInterval : Type := Bool
-def i0 : CubicalInterval := false
-def i1 : CubicalInterval := true
+noncomputable def CubicalInterval : Type := Bool
+noncomputable def i0 : CubicalInterval := false
+noncomputable def i1 : CubicalInterval := true
 
-def connAnd (i j : CubicalInterval) : CubicalInterval := i && j
-def connOr (i j : CubicalInterval) : CubicalInterval := i || j
-def connNeg (i : CubicalInterval) : CubicalInterval := !i
-def connDiagLeft (i j : CubicalInterval) : CubicalInterval := connAnd i (connOr i j)
-def connDiagRight (i j : CubicalInterval) : CubicalInterval := connOr i (connAnd i j)
+noncomputable def connAnd (i j : CubicalInterval) : CubicalInterval := i && j
+noncomputable def connOr (i j : CubicalInterval) : CubicalInterval := i || j
+noncomputable def connNeg (i : CubicalInterval) : CubicalInterval := !i
+noncomputable def connDiagLeft (i j : CubicalInterval) : CubicalInterval := connAnd i (connOr i j)
+noncomputable def connDiagRight (i j : CubicalInterval) : CubicalInterval := connOr i (connAnd i j)
 
 structure Cube (A : Type u) where
   point : CubicalInterval → A
 
-def cubeEndpoint0 {A : Type u} (c : Cube A) : A := c.point i0
-def cubeEndpoint1 {A : Type u} (c : Cube A) : A := c.point i1
-def constCube {A : Type u} (a : A) : Cube A := ⟨fun _ => a⟩
-def cubeMap {A : Type u} {B : Type v} (f : A → B) (c : Cube A) : Cube B :=
+noncomputable def cubeEndpoint0 {A : Type u} (c : Cube A) : A := c.point i0
+noncomputable def cubeEndpoint1 {A : Type u} (c : Cube A) : A := c.point i1
+noncomputable def constCube {A : Type u} (a : A) : Cube A := ⟨fun _ => a⟩
+noncomputable def cubeMap {A : Type u} {B : Type v} (f : A → B) (c : Cube A) : Cube B :=
   ⟨fun i => f (c.point i)⟩
 
 structure OpenBox (A : Type u) where
   left : A
   right : A
 
-def boxLeftToRight {A : Type u} (b : OpenBox A) : A := b.right
-def boxRightToLeft {A : Type u} (b : OpenBox A) : A := b.left
-def flipOpenBox {A : Type u} (b : OpenBox A) : OpenBox A := ⟨b.right, b.left⟩
+noncomputable def boxLeftToRight {A : Type u} (b : OpenBox A) : A := b.right
+noncomputable def boxRightToLeft {A : Type u} (b : OpenBox A) : A := b.left
+noncomputable def flipOpenBox {A : Type u} (b : OpenBox A) : OpenBox A := ⟨b.right, b.left⟩
 
 structure KanOperation (A : Type u) where
   fill : OpenBox A → A
 
-def trivialKan {A : Type u} (a : A) : KanOperation A := ⟨fun _ => a⟩
-def composeKan {A : Type u} (K : KanOperation A) (b : OpenBox A) : A := K.fill b
+noncomputable def trivialKan {A : Type u} (a : A) : KanOperation A := ⟨fun _ => a⟩
+noncomputable def composeKan {A : Type u} (K : KanOperation A) (b : OpenBox A) : A := K.fill b
 
-def transportConst {A : Type u} {a b : A} (p : Path a b) : Unit :=
+noncomputable def transportConst {A : Type u} {a b : A} (p : Path a b) : Unit :=
   Path.transport (D := fun _ : A => Unit) p ()
 
 structure GlueType (A : Type u) (B : Type u) where
@@ -49,18 +49,18 @@ structure GlueType (A : Type u) (B : Type u) where
   sec : (b : B) → Path (toFun (invFun b)) b
   ret : (a : A) → Path (invFun (toFun a)) a
 
-def glueForward {A : Type u} {B : Type u} (G : GlueType A B) : A → B := G.toFun
-def glueBackward {A : Type u} {B : Type u} (G : GlueType A B) : B → A := G.invFun
-def glueRoundTripForward {A : Type u} {B : Type u} (G : GlueType A B) : Prop :=
+noncomputable def glueForward {A : Type u} {B : Type u} (G : GlueType A B) : A → B := G.toFun
+noncomputable def glueBackward {A : Type u} {B : Type u} (G : GlueType A B) : B → A := G.invFun
+noncomputable def glueRoundTripForward {A : Type u} {B : Type u} (G : GlueType A B) : Prop :=
   ∀ b : B, G.toFun (G.invFun b) = b
-def glueRoundTripBackward {A : Type u} {B : Type u} (G : GlueType A B) : Prop :=
+noncomputable def glueRoundTripBackward {A : Type u} {B : Type u} (G : GlueType A B) : Prop :=
   ∀ a : A, G.invFun (G.toFun a) = a
 
 structure CubicalUnivalence (A : Type u) (B : Type u) where
   glue : GlueType A B
   ua : A = B
 
-def uaRefl (A : Type u) : CubicalUnivalence A A where
+noncomputable def uaRefl (A : Type u) : CubicalUnivalence A A where
   glue := {
     toFun := fun a => a
     invFun := fun a => a
@@ -69,10 +69,10 @@ def uaRefl (A : Type u) : CubicalUnivalence A A where
   }
   ua := rfl
 
-def connectionSquare (i j : CubicalInterval) : CubicalInterval :=
+noncomputable def connectionSquare (i j : CubicalInterval) : CubicalInterval :=
   connOr (connAnd i j) (connAnd (connNeg i) j)
 
-def compositionBoundary {A : Type u} (c : Cube A) : OpenBox A :=
+noncomputable def compositionBoundary {A : Type u} (c : Cube A) : OpenBox A :=
   ⟨cubeEndpoint0 c, cubeEndpoint1 c⟩
 
 theorem connAnd_comm (i j : CubicalInterval) : connAnd i j = connAnd j i := by

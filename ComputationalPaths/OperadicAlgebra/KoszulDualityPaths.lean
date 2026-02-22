@@ -26,7 +26,7 @@ inductive KoszulStep {A : Type u} :
       KoszulStep (Path.trans p (Path.symm p)) (Path.refl a)
 
 /-- Interpret a Koszul-domain step as a primitive `Path.Step`. -/
-def KoszulStep.toStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def KoszulStep.toStep {A : Type u} {a b : A} {p q : Path a b}
     (s : KoszulStep p q) : Path.Step p q :=
   match s with
   | .right_unit p => Path.Step.trans_refl_right p
@@ -75,7 +75,7 @@ noncomputable def counit_rweq (c : C) :
   rweq_of_koszul_step (D.counitStep c)
 
 /-- Round-trip path at the algebra side. -/
-def algebraRoundTrip (a : A) : Path (D.cobar (D.bar a)) (D.cobar (D.bar a)) :=
+noncomputable def algebraRoundTrip (a : A) : Path (D.cobar (D.bar a)) (D.cobar (D.bar a)) :=
   Path.trans (D.unitPath a) (Path.symm (D.unitPath a))
 
 noncomputable def algebra_roundtrip_rweq (a : A) :
@@ -84,7 +84,7 @@ noncomputable def algebra_roundtrip_rweq (a : A) :
   exact rweq_cmpA_inv_right (D.unitPath a)
 
 /-- Transport a path through the bar map. -/
-def mapBar {x y : A} (p : Path x y) : Path (D.bar x) (D.bar y) :=
+noncomputable def mapBar {x y : A} (p : Path x y) : Path (D.bar x) (D.bar y) :=
   Path.congrArg D.bar p
 
 end BarCobarDualityPathData
@@ -129,7 +129,7 @@ noncomputable def bar_action_rweq
   rweq_of_koszul_step (K.barActionStep θ xs)
 
 /-- Unit action on a bar-cobar image in the underlying operadic algebra. -/
-def unitOnDualized (x : K.carrier) :
+noncomputable def unitOnDualized (x : K.carrier) :
     Path
       (K.algebra.act O.unit (fun _ => K.duality.cobar (K.duality.bar x)))
       (K.duality.cobar (K.duality.bar x)) :=
@@ -138,7 +138,7 @@ def unitOnDualized (x : K.carrier) :
 end KoszulOperadicAlgebraPathData
 
 /-- Trivial bar/cobar duality package on `Unit`. -/
-def BarCobarDualityPathData.trivial : BarCobarDualityPathData Unit Unit where
+noncomputable def BarCobarDualityPathData.trivial : BarCobarDualityPathData Unit Unit where
   bar := _root_.id
   cobar := _root_.id
   unitPath := fun _ => Path.refl ()
@@ -147,7 +147,7 @@ def BarCobarDualityPathData.trivial : BarCobarDualityPathData Unit Unit where
   counitStep := fun _ => KoszulStep.left_unit (Path.refl ())
 
 /-- Trivial Koszul-operadic algebra path data over any operad. -/
-def KoszulOperadicAlgebraPathData.trivial
+noncomputable def KoszulOperadicAlgebraPathData.trivial
     (O : Path.Algebra.OperadTheory.CleanOperad) :
     KoszulOperadicAlgebraPathData O where
   carrier := Unit

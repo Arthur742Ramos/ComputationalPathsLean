@@ -49,7 +49,7 @@ structure AWDecomp (n : Nat) where
   total : ∀ (p q : Nat) (h : p + q = n), decomp p q h
 
 /-- The AW decomposition exists for every degree. -/
-def awDecomp (n : Nat) : AWDecomp n where
+noncomputable def awDecomp (n : Nat) : AWDecomp n where
   decomp := fun _ _ _ => True
   total := fun _ _ _ => trivial
 
@@ -67,7 +67,7 @@ The EZ map uses signed sums over shuffles.
 
 /-- The sign associated to a permutation, computed from the parity
 of the number of inversions. -/
-def shuffleSign (inversions : Nat) : Int :=
+noncomputable def shuffleSign (inversions : Nat) : Int :=
   if inversions % 2 = 0 then 1 else -1
 
 /-- The sign of 0 inversions is +1. -/
@@ -75,7 +75,7 @@ theorem shuffleSign_zero : shuffleSign 0 = 1 := by
   simp [shuffleSign]
 
 /-- `Path`-typed sign of zero inversions. -/
-def shuffleSign_zeroPath : Path (shuffleSign 0) (1 : Int) :=
+noncomputable def shuffleSign_zeroPath : Path (shuffleSign 0) (1 : Int) :=
   Path.stepChain shuffleSign_zero
 
 /-- The sign is always ±1. -/
@@ -85,7 +85,7 @@ theorem shuffleSign_sq (k : Nat) :
   split <;> simp
 
 /-- `Path`-typed sign squaring. -/
-def shuffleSign_sqPath (k : Nat) :
+noncomputable def shuffleSign_sqPath (k : Nat) :
     Path (shuffleSign k * shuffleSign k) (1 : Int) :=
   Path.stepChain (shuffleSign_sq k)
 
@@ -116,7 +116,7 @@ structure ChainHtpyEquiv (C D : ChainComplex3.{u}) where
   backward : ChainMap3 D C
 
 /-- Reflexive chain homotopy equivalence. -/
-def chainHtpyRefl (C : ChainComplex3.{u}) : ChainHtpyEquiv C C where
+noncomputable def chainHtpyRefl (C : ChainComplex3.{u}) : ChainHtpyEquiv C C where
   forward := ChainMap3.id C
   backward := ChainMap3.id C
 
@@ -163,12 +163,12 @@ structure CrossProductData where
   degY : Nat
 
 /-- The cross product data for degrees (p, q). -/
-def crossProduct (p q : Nat) : CrossProductData where
+noncomputable def crossProduct (p q : Nat) : CrossProductData where
   degX := p
   degY := q
 
 /-- The target degree of the cross product. -/
-def CrossProductData.targetDeg (cp : CrossProductData) : Nat :=
+noncomputable def CrossProductData.targetDeg (cp : CrossProductData) : Nat :=
   cp.degX + cp.degY
 
 /-- The cross product target degree is p + q. -/

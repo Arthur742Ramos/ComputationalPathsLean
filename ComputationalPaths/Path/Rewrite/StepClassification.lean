@@ -280,7 +280,7 @@ structure RuleInfo where
   deriving Repr
 
 /-- The complete catalog of all 77 Step constructors. -/
-def allRules : List RuleInfo := [
+noncomputable def allRules : List RuleInfo := [
   -- ═══════════════════════════════════════════════════════════════
   -- GROUP A: GROUPOID (Basic Path Algebra) — Rules 1–8
   -- ═══════════════════════════════════════════════════════════════
@@ -822,19 +822,19 @@ def allRules : List RuleInfo := [
 -/
 
 /-- Total number of constructors: 77 (including canon). -/
-def totalRules : Nat := allRules.length
+noncomputable def totalRules : Nat := allRules.length
 
 /-- Rules by category. -/
-def simplificationRules : List RuleInfo :=
+noncomputable def simplificationRules : List RuleInfo :=
   allRules.filter (·.category == .simplification)
 
-def reorientationRules : List RuleInfo :=
+noncomputable def reorientationRules : List RuleInfo :=
   allRules.filter (·.category == .reorientation)
 
-def congruenceRules : List RuleInfo :=
+noncomputable def congruenceRules : List RuleInfo :=
   allRules.filter (·.category == .congruence)
 
-def distributionRules : List RuleInfo :=
+noncomputable def distributionRules : List RuleInfo :=
   allRules.filter (·.category == .distribution)
 
 /-!
@@ -853,7 +853,7 @@ inductive RewriteTier where
   deriving DecidableEq, Repr
 
 /-- Rule groups attached to each modular layer. -/
-def tierGroups : RewriteTier → List RuleGroup
+noncomputable def tierGroups : RewriteTier → List RuleGroup
   | .groupoidCore => [.groupoid, .structural]
   | .typeSpecific => [.product, .sigma, .sum, .function, .depApp]
   | .transport => [.transport]
@@ -861,7 +861,7 @@ def tierGroups : RewriteTier → List RuleGroup
   | .congruencePropagation => [.biContext, .mapLR]
 
 /-- Layer orthogonality means the group assignments have no overlap. -/
-def TierOrthogonal (t₁ t₂ : RewriteTier) : Prop :=
+noncomputable def TierOrthogonal (t₁ t₂ : RewriteTier) : Prop :=
   ∀ g : RuleGroup, g ∈ tierGroups t₁ → g ∉ tierGroups t₂
 
 theorem tier_groupoid_typespecific_orthogonal :
@@ -905,7 +905,7 @@ theorem tier_transport_congruence_orthogonal :
   intro g hg; simp [tierGroups] at hg ⊢; rcases hg with rfl <;> decide
 
 /-- Consolidated orthogonality certificate for the modular layering. -/
-def tierOrthogonalityCertificate : Prop :=
+noncomputable def tierOrthogonalityCertificate : Prop :=
   TierOrthogonal .groupoidCore .typeSpecific ∧
   TierOrthogonal .groupoidCore .transport ∧
   TierOrthogonal .groupoidCore .contextual ∧
@@ -1033,53 +1033,53 @@ theorem tier_distinct_layers_disjoint :
   intro t₁ t₂ g hne hg₁ hg₂
   exact tier_pairwise_disjoint t₁ t₂ hne g hg₁ hg₂
 
-def critical_pair_tt_rrr_joinable {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_rrr_joinable {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Confluence.Join
       (Path.trans p (Path.trans q (Path.refl c)))
       (Path.trans p q) :=
   ConfluenceProof.local_confluence_tt_rrr (A := A) p q
 
-def critical_pair_tt_lrr_joinable {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_lrr_joinable {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
     Confluence.Join
       (Path.trans (Path.refl a) (Path.trans q r))
       (Path.trans q r) :=
   ConfluenceProof.local_confluence_tt_lrr (A := A) q r
 
-def critical_pair_tt_tt_joinable {A : Type u} {a b c d e : A}
+noncomputable def critical_pair_tt_tt_joinable {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Confluence.Join
       (Path.trans (Path.trans p (Path.trans q r)) s)
       (Path.trans (Path.trans p q) (Path.trans r s)) :=
   ConfluenceProof.local_confluence_tt_tt (A := A) p q r s
 
-def critical_pair_ss_sr_joinable {A : Type u} (a : A) :
+noncomputable def critical_pair_ss_sr_joinable {A : Type u} (a : A) :
     Confluence.Join (Path.refl a) (Path.symm (Path.refl a)) :=
   ConfluenceProof.local_confluence_ss_sr (A := A) a
 
-def critical_pair_ss_stss_joinable {A : Type u} {a b c : A}
+noncomputable def critical_pair_ss_stss_joinable {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Confluence.Join
       (Path.trans p q)
       (Path.symm (Path.trans (Path.symm q) (Path.symm p))) :=
   ConfluenceProof.local_confluence_ss_stss (A := A) p q
 
-def critical_pair_tt_ts_joinable {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_ts_joinable {A : Type u} {a b c : A}
     (p : Path a b) (q : Path a c) :
     Confluence.Join
       (Path.trans p (Path.trans (Path.symm p) q))
       (Path.trans (Path.refl a) q) :=
   ConfluenceProof.local_confluence_tt_ts (A := A) p q
 
-def critical_pair_tt_st_joinable {A : Type u} {a b c : A}
+noncomputable def critical_pair_tt_st_joinable {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Confluence.Join
       (Path.trans (Path.symm p) (Path.trans p q))
       (Path.trans (Path.refl b) q) :=
   ConfluenceProof.local_confluence_tt_st (A := A) p q
 
-def critical_pair_trans_congr_commute_joinable {A : Type u} {a b c : A}
+noncomputable def critical_pair_trans_congr_commute_joinable {A : Type u} {a b c : A}
     {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (hp : Step p₁ p₂) (hq : Step q₁ q₂) :
     Confluence.Join
@@ -1142,7 +1142,7 @@ theorem critical_pair_trans_congr_commute_is_joinable {A : Type u} {a b c : A}
   exact ⟨critical_pair_trans_congr_commute_joinable (A := A) hp hq⟩
 
 /-- Joinability certificate for all core critical-pair families. -/
-def criticalPairJoinabilityCertificate : Prop :=
+noncomputable def criticalPairJoinabilityCertificate : Prop :=
   (∀ {A : Type u} {a b c : A} (p : Path a b) (q : Path b c),
       Nonempty (Confluence.Join (Path.trans p (Path.trans q (Path.refl c))) (Path.trans p q))) ∧
   (∀ {A : Type u} {a b c : A} (q : Path a b) (r : Path b c),

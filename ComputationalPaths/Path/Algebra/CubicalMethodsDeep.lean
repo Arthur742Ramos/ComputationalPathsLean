@@ -36,18 +36,18 @@ inductive I : Type where
   deriving DecidableEq, Repr
 
 /-- Left endpoint of the interval. -/
-def i0 : I := I.pt
+noncomputable def i0 : I := I.pt
 /-- Right endpoint of the interval. -/
-def i1 : I := I.pt
+noncomputable def i1 : I := I.pt
 
 /-- The interval is contractible. -/
 theorem I_eq (x y : I) : x = y := by cases x; cases y; rfl
 
 /-- Canonical step on the interval. -/
-def iStep : Step I := Step.mk i0 i1 (I_eq i0 i1)
+noncomputable def iStep : Step I := Step.mk i0 i1 (I_eq i0 i1)
 
 /-- Canonical path on the interval. -/
-def iPath : Path i0 i1 := Path.mk [iStep] (I_eq i0 i1)
+noncomputable def iPath : Path i0 i1 := Path.mk [iStep] (I_eq i0 i1)
 
 /-- Interval path proof composes to rfl. -/
 theorem iPath_proof_eq : iPath.proof = I_eq i0 i1 := rfl
@@ -59,23 +59,23 @@ structure Line (A : Type u) (a b : A) where
   path : Path a b
 
 /-- Reflexive line. -/
-def Line.refl {A : Type u} (a : A) : Line A a a :=
+noncomputable def Line.refl {A : Type u} (a : A) : Line A a a :=
   ⟨Path.refl a⟩
 
 /-- Compose two lines. -/
-def Line.trans {A : Type u} {a b c : A} (l₁ : Line A a b) (l₂ : Line A b c) :
+noncomputable def Line.trans {A : Type u} {a b c : A} (l₁ : Line A a b) (l₂ : Line A b c) :
     Line A a c :=
   ⟨Path.trans l₁.path l₂.path⟩
 
 /-- Reverse a line. -/
-def Line.symm {A : Type u} {a b : A} (l : Line A a b) : Line A b a :=
+noncomputable def Line.symm {A : Type u} {a b : A} (l : Line A a b) : Line A b a :=
   ⟨Path.symm l.path⟩
 
 /-- Bool line from true to true. -/
-def boolLineRefl : Line Bool true true := Line.refl true
+noncomputable def boolLineRefl : Line Bool true true := Line.refl true
 
 /-- Nat line from 0 to 0. -/
-def natLineRefl : Line Nat 0 0 := Line.refl 0
+noncomputable def natLineRefl : Line Nat 0 0 := Line.refl 0
 
 /-- Line trans refl left. -/
 theorem line_trans_refl_left {A : Type u} {a b : A} (l : Line A a b) :
@@ -127,23 +127,23 @@ structure Square {A : Type u} {a b : A} (p q : Path a b) where
   eq : p.proof = q.proof
 
 /-- Identity square. -/
-def Square.refl {A : Type u} {a b : A} (p : Path a b) : Square p p :=
+noncomputable def Square.refl {A : Type u} {a b : A} (p : Path a b) : Square p p :=
   ⟨rfl⟩
 
 /-- Vertical composition of squares. -/
-def Square.vcomp {A : Type u} {a b : A} {p q r : Path a b}
+noncomputable def Square.vcomp {A : Type u} {a b : A} {p q r : Path a b}
     (s₁ : Square p q) (s₂ : Square q r) : Square p r :=
   ⟨s₁.eq.trans s₂.eq⟩
 
 /-- Horizontal composition of squares. -/
-def Square.hcomp {A : Type u} {a b c : A}
+noncomputable def Square.hcomp {A : Type u} {a b c : A}
     {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (s₁ : Square p₁ p₂) (s₂ : Square q₁ q₂) :
     Square (Path.trans p₁ q₁) (Path.trans p₂ q₂) :=
   ⟨by apply Subsingleton.elim⟩
 
 /-- Inverse square. -/
-def Square.inv {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def Square.inv {A : Type u} {a b : A} {p q : Path a b}
     (s : Square p q) : Square q p :=
   ⟨s.eq.symm⟩
 
@@ -186,7 +186,7 @@ theorem square_vcomp_inv_right {A : Type u} {a b : A} {p q : Path a b}
 /-! ## Section 4 — Kan filling -/
 
 /-- Kan filling: given three sides, produce a filler square. -/
-def kanFill {A : Type u} {a b c : A}
+noncomputable def kanFill {A : Type u} {a b c : A}
     (top : Path a b) (left : Path a c) (right : Path b c) :
     Square (Path.trans top right) left :=
   ⟨by apply Subsingleton.elim⟩
@@ -199,13 +199,13 @@ theorem kanFill_unique {A : Type u} {a b c : A}
   square_unique f₁ f₂
 
 /-- Concrete Kan filling for Bool. -/
-def kanFillBool : Square
+noncomputable def kanFillBool : Square
     (Path.trans (Path.refl true) (Path.refl true))
     (Path.refl true) :=
   kanFill (Path.refl true) (Path.refl true) (Path.refl true)
 
 /-- Concrete Kan filling for Nat. -/
-def kanFillNat : Square
+noncomputable def kanFillNat : Square
     (Path.trans (Path.refl (0:Nat)) (Path.refl 0))
     (Path.refl 0) :=
   kanFill (Path.refl 0) (Path.refl 0) (Path.refl 0)
@@ -225,12 +225,12 @@ theorem kanFill_unique_nat
 /-! ## Section 5 — Connection operations -/
 
 /-- Connection ∧: square from trans p refl to p. -/
-def connection_and {A : Type u} {a b : A}
+noncomputable def connection_and {A : Type u} {a b : A}
     (p : Path a b) : Square (Path.trans p (Path.refl b)) p :=
   ⟨by apply Subsingleton.elim⟩
 
 /-- Connection ∨: square from trans refl p to p. -/
-def connection_or {A : Type u} {a b : A}
+noncomputable def connection_or {A : Type u} {a b : A}
     (p : Path a b) : Square (Path.trans (Path.refl a) p) p :=
   ⟨by apply Subsingleton.elim⟩
 
@@ -255,13 +255,13 @@ theorem connection_or_idem {A : Type u} {a b : A} (p : Path a b) :
     (connection_or p).eq.symm.symm = (connection_or p).eq := rfl
 
 /-- Concrete connection on Bool. -/
-def connectionBool : Square
+noncomputable def connectionBool : Square
     (Path.trans (Path.refl true) (Path.refl true))
     (Path.refl true) :=
   connection_or (Path.refl true)
 
 /-- Concrete connection on Nat. -/
-def connectionNat : Square
+noncomputable def connectionNat : Square
     (Path.trans (Path.refl (0 : Nat)) (Path.refl 0))
     (Path.refl 0) :=
   connection_or (Path.refl 0)
@@ -269,7 +269,7 @@ def connectionNat : Square
 /-! ## Section 6 — Degeneracies -/
 
 /-- Degeneracy: refl path induces a trivial square. -/
-def degeneracy {A : Type u} {a : A} : Square (Path.refl a) (Path.refl a) :=
+noncomputable def degeneracy {A : Type u} {a : A} : Square (Path.refl a) (Path.refl a) :=
   Square.refl (Path.refl a)
 
 /-- Degeneracy coherence: vcomp with itself is itself. -/
@@ -294,7 +294,7 @@ theorem degeneracy_inv {A : Type u} {a : A} :
 /-! ## Section 7 — congrArg interaction with cubical structure -/
 
 /-- congrArg maps lines to lines. -/
-def congrArg_line {A : Type u} {B : Type u} (f : A → B) {a b : A}
+noncomputable def congrArg_line {A : Type u} {B : Type u} (f : A → B) {a b : A}
     (l : Line A a b) : Line B (f a) (f b) :=
   ⟨Path.congrArg f l.path⟩
 
@@ -313,7 +313,7 @@ theorem congrArg_line_symm {A B : Type u} (f : A → B) {a b : A}
   simp [congrArg_line, Line.symm]
 
 /-- congrArg maps squares to squares. -/
-def congrArg_square {A B : Type u} (f : A → B) {a b : A} {p q : Path a b}
+noncomputable def congrArg_square {A B : Type u} (f : A → B) {a b : A} {p q : Path a b}
     (s : Square p q) :
     Square (Path.congrArg f p) (Path.congrArg f q) :=
   ⟨by apply Subsingleton.elim⟩
@@ -327,7 +327,7 @@ theorem congrArg_square_refl {A B : Type u} (f : A → B) {a b : A}
 /-! ## Section 8 — Transport and cubical structure -/
 
 /-- Transport along a line. -/
-def transport_line {A : Type u} {D : A → Sort u} {a b : A}
+noncomputable def transport_line {A : Type u} {D : A → Sort u} {a b : A}
     (l : Line A a b) (x : D a) : D b :=
   Path.transport l.path x
 
@@ -347,16 +347,16 @@ theorem transport_line_trans {A : Type u} {D : A → Sort u} {a b c : A}
 /-! ## Section 9 — Concrete Bool paths with Step.mk -/
 
 /-- Step from true to true. -/
-def stepBoolTT : Step Bool := Step.mk true true rfl
+noncomputable def stepBoolTT : Step Bool := Step.mk true true rfl
 
 /-- Step from false to false. -/
-def stepBoolFF : Step Bool := Step.mk false false rfl
+noncomputable def stepBoolFF : Step Bool := Step.mk false false rfl
 
 /-- Path from true to true via a step. -/
-def pathBoolTT : Path true true := Path.mk [stepBoolTT] rfl
+noncomputable def pathBoolTT : Path true true := Path.mk [stepBoolTT] rfl
 
 /-- Path from false to false via a step. -/
-def pathBoolFF : Path false false := Path.mk [stepBoolFF] rfl
+noncomputable def pathBoolFF : Path false false := Path.mk [stepBoolFF] rfl
 
 /-- Composing Bool paths. -/
 theorem pathBoolTT_trans :
@@ -378,16 +378,16 @@ theorem pathBoolFF_proof : pathBoolFF.proof = rfl := rfl
 /-! ## Section 10 — Concrete Nat paths with Step.mk -/
 
 /-- Step from 0 to 0. -/
-def stepNat00 : Step Nat := Step.mk 0 0 rfl
+noncomputable def stepNat00 : Step Nat := Step.mk 0 0 rfl
 
 /-- Step from 42 to 42. -/
-def stepNat42 : Step Nat := Step.mk 42 42 rfl
+noncomputable def stepNat42 : Step Nat := Step.mk 42 42 rfl
 
 /-- Path from 0 to 0 via a step. -/
-def pathNat00 : Path (0 : Nat) 0 := Path.mk [stepNat00] rfl
+noncomputable def pathNat00 : Path (0 : Nat) 0 := Path.mk [stepNat00] rfl
 
 /-- Path from 42 to 42 via a step. -/
-def pathNat42 : Path (42 : Nat) 42 := Path.mk [stepNat42] rfl
+noncomputable def pathNat42 : Path (42 : Nat) 42 := Path.mk [stepNat42] rfl
 
 /-- Composing Nat paths. -/
 theorem pathNat00_trans :
@@ -409,13 +409,13 @@ theorem pathNat42_proof : pathNat42.proof = rfl := rfl
 /-! ## Section 11 — Pentagon coherence for fourfold composition -/
 
 /-- Fourfold composition, left-nested. -/
-def comp4L {A : Type u} {a b c d e : A}
+noncomputable def comp4L {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Path a e :=
   Path.trans (Path.trans (Path.trans p q) r) s
 
 /-- Fourfold composition, right-nested. -/
-def comp4R {A : Type u} {a b c d e : A}
+noncomputable def comp4R {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Path a e :=
   Path.trans p (Path.trans q (Path.trans r s))
@@ -452,7 +452,7 @@ theorem pentagon_nat :
 /-! ## Section 12 — Higher cubes -/
 
 /-- Square between trans and trans after reassociation. -/
-def assocSquare {A : Type u} {a b c d : A}
+noncomputable def assocSquare {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Square (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   ⟨by apply Subsingleton.elim⟩
@@ -465,13 +465,13 @@ theorem assocSquare_cancel {A : Type u} {a b c d : A}
   square_unique _ _
 
 /-- Associator square on Bool. -/
-def assocSquareBool :
+noncomputable def assocSquareBool :
     Square (Path.trans (Path.trans (Path.refl true) (Path.refl true)) (Path.refl true))
            (Path.trans (Path.refl true) (Path.trans (Path.refl true) (Path.refl true))) :=
   assocSquare (Path.refl true) (Path.refl true) (Path.refl true)
 
 /-- Associator square on Nat. -/
-def assocSquareNat :
+noncomputable def assocSquareNat :
     Square (Path.trans (Path.trans (Path.refl (0:Nat)) (Path.refl 0)) (Path.refl 0))
            (Path.trans (Path.refl 0) (Path.trans (Path.refl 0) (Path.refl 0))) :=
   assocSquare (Path.refl 0) (Path.refl 0) (Path.refl 0)
@@ -499,7 +499,7 @@ theorem transport_kan_filler_proof {A : Type u} {a b c : A}
 /-! ## Section 14 — Path operations on products -/
 
 /-- Path in a product from component paths. -/
-def prodPath {A B : Type u} {a₁ a₂ : A} {b₁ b₂ : B}
+noncomputable def prodPath {A B : Type u} {a₁ a₂ : A} {b₁ b₂ : B}
     (pa : Path a₁ a₂) (pb : Path b₁ b₂) :
     Path (a₁, b₁) (a₂, b₂) :=
   Path.trans
@@ -562,18 +562,18 @@ structure PathOver {A : Type u} (D : A → Type u) {a b : A}
   eq : Path.transport p da = db
 
 /-- Reflexive PathOver. -/
-def PathOver.refl {A : Type u} {D : A → Type u} {a : A} (da : D a) :
+noncomputable def PathOver.refl {A : Type u} {D : A → Type u} {a : A} (da : D a) :
     PathOver D (Path.refl a) da da :=
   ⟨rfl⟩
 
 /-- Transport gives a PathOver. -/
-def PathOver.ofTransport {A : Type u} {D : A → Type u} {a b : A}
+noncomputable def PathOver.ofTransport {A : Type u} {D : A → Type u} {a b : A}
     (p : Path a b) (da : D a) :
     PathOver D p da (Path.transport p da) :=
   ⟨rfl⟩
 
 /-- PathOver composition. -/
-def PathOver.comp {A : Type u} {D : A → Type u} {a b c : A}
+noncomputable def PathOver.comp {A : Type u} {D : A → Type u} {a b c : A}
     {p : Path a b} {q : Path b c}
     {da : D a} {db : D b} {dc : D c}
     (po₁ : PathOver D p da db) (po₂ : PathOver D q db dc) :
@@ -597,7 +597,7 @@ theorem pathOver_unique {A : Type u} {D : A → Type u} {a b : A}
 /-! ## Section 18 — Additional Bool/Nat concrete results -/
 
 /-- congrArg not on Bool path. -/
-def congrArgNotBool : Path (not true) (not true) :=
+noncomputable def congrArgNotBool : Path (not true) (not true) :=
   Path.congrArg not (Path.refl true)
 
 /-- congrArg not = refl false. -/
@@ -606,7 +606,7 @@ theorem congrArgNotBool_eq_refl :
   simp [congrArgNotBool, Path.congrArg, Path.refl]
 
 /-- congrArg Nat.succ on Nat path. -/
-def congrArgSuccNat : Path (Nat.succ 0) (Nat.succ 0) :=
+noncomputable def congrArgSuccNat : Path (Nat.succ 0) (Nat.succ 0) :=
   Path.congrArg Nat.succ (Path.refl 0)
 
 /-- congrArg succ = refl 1. -/

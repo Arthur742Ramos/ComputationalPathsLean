@@ -118,12 +118,12 @@ structure RightHomotopy {A : Type u} (a b : A) where
   lift : Path a pathObj
 
 /-- Left homotopy composed path. -/
-def left_htpy_path₀ {A : Type u} {a b : A}
+noncomputable def left_htpy_path₀ {A : Type u} {a b : A}
     (h : LeftHomotopy a b) : Path a b :=
   Path.trans h.incl₀ h.proj
 
 /-- Alternate left homotopy composed path. -/
-def left_htpy_path₁ {A : Type u} {a b : A}
+noncomputable def left_htpy_path₁ {A : Type u} {a b : A}
     (h : LeftHomotopy a b) : Path a b :=
   Path.trans h.incl₁ h.proj
 
@@ -134,11 +134,11 @@ theorem left_htpy_toEq {A : Type u} {a b : A}
   rfl
 
 /-- Right homotopy composed paths. -/
-def right_htpy_path₀ {A : Type u} {a b : A}
+noncomputable def right_htpy_path₀ {A : Type u} {a b : A}
     (h : RightHomotopy a b) : Path a b :=
   Path.trans h.lift h.ev₀
 
-def right_htpy_path₁ {A : Type u} {a b : A}
+noncomputable def right_htpy_path₁ {A : Type u} {a b : A}
     (h : RightHomotopy a b) : Path a b :=
   Path.trans h.lift h.ev₁
 
@@ -152,7 +152,7 @@ structure HomotopyCategory (A : Type u) where
   comp_hom : ∀ {x y z : A}, hom x y → hom y z → hom x z
 
 /-- Identity path in homotopy category. -/
-def ho_cat_refl {A : Type u} (hc : HomotopyCategory A) :
+noncomputable def ho_cat_refl {A : Type u} (hc : HomotopyCategory A) :
     Path hc.obj hc.obj :=
   Path.refl hc.obj
 
@@ -171,11 +171,11 @@ structure QuillenPair (A : Type u) where
   counit : ∀ a, Path (L.obj (R.obj a)) a
 
 /-- Left derived functor: L composed with cofibrant replacement. -/
-def left_derived {A : Type u} (qp : QuillenPair A) : PEF A :=
+noncomputable def left_derived {A : Type u} (qp : QuillenPair A) : PEF A :=
   qp.L
 
 /-- Right derived functor: R composed with fibrant replacement. -/
-def right_derived {A : Type u} (qp : QuillenPair A) : PEF A :=
+noncomputable def right_derived {A : Type u} (qp : QuillenPair A) : PEF A :=
   qp.R
 
 /-- Derived functor preserves refl. -/

@@ -94,27 +94,27 @@ structure HopfOps (A : Type u) where
   antipode : A → A
 
 /-- Build a primitive step directly from an equality witness. -/
-def mkStepFromEq {A : Type u} {a b : A} (h : a = b) : Step A :=
+noncomputable def mkStepFromEq {A : Type u} {a b : A} (h : a = b) : Step A :=
   Step.mk a b h
 
 /-- Build a one-step path directly from an equality witness. -/
-def mkPathFromEq {A : Type u} {a b : A} (h : a = b) : Path a b :=
+noncomputable def mkPathFromEq {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [mkStepFromEq h] h
 
 /-- Reflexive path that stores a concrete singleton `Step.mk` trace. -/
-def mkReflPath {A : Type u} (a : A) : Path a a :=
+noncomputable def mkReflPath {A : Type u} (a : A) : Path a a :=
   Path.mk [Step.mk a a rfl] rfl
 
-def kAction (x : UqExpr) : UqExpr :=
+noncomputable def kAction (x : UqExpr) : UqExpr :=
   UqExpr.mul (UqExpr.gen (QGen.K 0)) x
 
-def ybLeft (r : RMatExpr) : RMatExpr :=
+noncomputable def ybLeft (r : RMatExpr) : RMatExpr :=
   RMatExpr.comp (RMatExpr.comp (RMatExpr.braid12 r) (RMatExpr.braid23 r)) (RMatExpr.braid12 r)
 
-def ybRight (r : RMatExpr) : RMatExpr :=
+noncomputable def ybRight (r : RMatExpr) : RMatExpr :=
   RMatExpr.comp (RMatExpr.braid23 r) (RMatExpr.comp (RMatExpr.braid12 r) (RMatExpr.braid23 r))
 
-def qDoubleSwap (d : QuantumDouble) : QuantumDouble :=
+noncomputable def qDoubleSwap (d : QuantumDouble) : QuantumDouble :=
   { left := d.right, right := d.left }
 
 /-! ## Core path API and rewrite lemmas -/
@@ -175,38 +175,38 @@ theorem thm12_mkPath_irrel {A : Type u} {a b : A}
 
 /-! ## Hopf algebra coherence wrappers -/
 
-def thm13_hopf_mul_refl {A : Type u} (H : HopfOps A) (a b : A) :
+noncomputable def thm13_hopf_mul_refl {A : Type u} (H : HopfOps A) (a b : A) :
     Path (H.mul a b) (H.mul a b) :=
   Path.refl (H.mul a b)
 
-def thm14_hopf_unit_refl {A : Type u} (H : HopfOps A) :
+noncomputable def thm14_hopf_unit_refl {A : Type u} (H : HopfOps A) :
     Path H.one H.one :=
   mkReflPath H.one
 
-def thm15_hopf_comul1_refl {A : Type u} (H : HopfOps A) (a : A) :
+noncomputable def thm15_hopf_comul1_refl {A : Type u} (H : HopfOps A) (a : A) :
     Path (H.comul1 a) (H.comul1 a) :=
   Path.refl (H.comul1 a)
 
-def thm16_hopf_comul2_refl {A : Type u} (H : HopfOps A) (a : A) :
+noncomputable def thm16_hopf_comul2_refl {A : Type u} (H : HopfOps A) (a : A) :
     Path (H.comul2 a) (H.comul2 a) :=
   Path.refl (H.comul2 a)
 
-def thm17_hopf_antipode_congr {A : Type u} (H : HopfOps A)
+noncomputable def thm17_hopf_antipode_congr {A : Type u} (H : HopfOps A)
     {a b : A} (p : Path a b) :
     Path (H.antipode a) (H.antipode b) :=
   Path.congrArg H.antipode p
 
-def thm18_hopf_counit_congr {A : Type u} (H : HopfOps A)
+noncomputable def thm18_hopf_counit_congr {A : Type u} (H : HopfOps A)
     {a b : A} (p : Path a b) :
     Path (H.counit a) (H.counit b) :=
   Path.congrArg H.counit p
 
-def thm19_hopf_mul_congr_left {A : Type u} (H : HopfOps A)
+noncomputable def thm19_hopf_mul_congr_left {A : Type u} (H : HopfOps A)
     (a : A) {b c : A} (p : Path b c) :
     Path (H.mul a b) (H.mul a c) :=
   Path.congrArg (fun x => H.mul a x) p
 
-def thm20_hopf_mul_congr_right {A : Type u} (H : HopfOps A)
+noncomputable def thm20_hopf_mul_congr_right {A : Type u} (H : HopfOps A)
     (a : A) {b c : A} (p : Path b c) :
     Path (H.mul b a) (H.mul c a) :=
   Path.congrArg (fun x => H.mul x a) p
@@ -223,11 +223,11 @@ theorem thm22_hopf_symm_trans {A : Type u} {a b c : A}
 
 /-! ## `Uq(g)` path calculations -/
 
-def thm23_uq_gen_refl (g : QGen) :
+noncomputable def thm23_uq_gen_refl (g : QGen) :
     Path (UqExpr.gen g) (UqExpr.gen g) :=
   mkReflPath (UqExpr.gen g)
 
-def thm24_uq_kAction_congr {a b : UqExpr}
+noncomputable def thm24_uq_kAction_congr {a b : UqExpr}
     (p : Path a b) :
     Path (kAction a) (kAction b) :=
   Path.congrArg kAction p
@@ -244,17 +244,17 @@ theorem thm26_uq_kAction_symm {a b : UqExpr}
       Path.symm (Path.congrArg kAction p) := by
   simpa using Path.congrArg_symm kAction p
 
-def thm27_uq_tensor_congr_left (x : UqExpr) {a b : UqExpr}
+noncomputable def thm27_uq_tensor_congr_left (x : UqExpr) {a b : UqExpr}
     (p : Path a b) :
     Path (UqExpr.tensor x a) (UqExpr.tensor x b) :=
   Path.congrArg (fun t => UqExpr.tensor x t) p
 
-def thm28_uq_comm_chain {a b : UqExpr}
+noncomputable def thm28_uq_comm_chain {a b : UqExpr}
     (p : Path a b) :
     Path a a :=
   Path.trans p (Path.symm p)
 
-def thm29_uq_comm_chain_symm {a b : UqExpr}
+noncomputable def thm29_uq_comm_chain_symm {a b : UqExpr}
     (p : Path a b) :
     Path b b :=
   Path.trans (Path.symm p) p
@@ -276,20 +276,20 @@ theorem thm32_uq_trans_refl_right {a b : UqExpr}
 
 /-! ## R-matrices and Yang-Baxter equation interface -/
 
-def thm33_yb_left_refl (r : RMatExpr) :
+noncomputable def thm33_yb_left_refl (r : RMatExpr) :
     Path (ybLeft r) (ybLeft r) :=
   Path.refl (ybLeft r)
 
-def thm34_yb_right_refl (r : RMatExpr) :
+noncomputable def thm34_yb_right_refl (r : RMatExpr) :
     Path (ybRight r) (ybRight r) :=
   Path.refl (ybRight r)
 
-def thm35_yb_bridge_symm {r1 r2 : RMatExpr}
+noncomputable def thm35_yb_bridge_symm {r1 r2 : RMatExpr}
     (p : Path (ybLeft r1) (ybRight r2)) :
     Path (ybRight r2) (ybLeft r1) :=
   Path.symm p
 
-def thm36_yb_bridge_trans {r1 r2 r3 : RMatExpr}
+noncomputable def thm36_yb_bridge_trans {r1 r2 r3 : RMatExpr}
     (p : Path (ybLeft r1) (ybRight r2))
     (q : Path (ybRight r2) (ybLeft r3)) :
     Path (ybLeft r1) (ybLeft r3) :=
@@ -302,7 +302,7 @@ theorem thm37_yb_bridge_assoc {r1 r2 r3 r4 : RMatExpr}
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
   simpa using Path.trans_assoc p q r
 
-def thm38_rInverse_congr {r s : RMatExpr}
+noncomputable def thm38_rInverse_congr {r s : RMatExpr}
     (p : Path r s) :
     Path (RMatExpr.inverse r) (RMatExpr.inverse s) :=
   Path.congrArg RMatExpr.inverse p
@@ -332,16 +332,16 @@ theorem thm42_yb_toEq_bridge {r1 r2 : RMatExpr}
 
 /-! ## Quantum double and ribbon category coherence -/
 
-def thm43_qdouble_refl (d : QuantumDouble) :
+noncomputable def thm43_qdouble_refl (d : QuantumDouble) :
     Path d d :=
   Path.refl d
 
-def thm44_qdouble_swap_congr {d1 d2 : QuantumDouble}
+noncomputable def thm44_qdouble_swap_congr {d1 d2 : QuantumDouble}
     (p : Path d1 d2) :
     Path (qDoubleSwap d1) (qDoubleSwap d2) :=
   Path.congrArg qDoubleSwap p
 
-def thm45_qdouble_swap_symm {d1 d2 : QuantumDouble}
+noncomputable def thm45_qdouble_swap_symm {d1 d2 : QuantumDouble}
     (p : Path d1 d2) :
     Path (qDoubleSwap d2) (qDoubleSwap d1) :=
   Path.symm (Path.congrArg qDoubleSwap p)
@@ -352,16 +352,16 @@ theorem thm46_qdouble_swap_roundtrip {d1 d2 : QuantumDouble}
       Path.congrArg qDoubleSwap p := by
   simpa using Path.symm_symm (Path.congrArg qDoubleSwap p)
 
-def thm47_ribbon_obj_refl (n : Nat) :
+noncomputable def thm47_ribbon_obj_refl (n : Nat) :
     Path (RibbonExpr.obj n) (RibbonExpr.obj n) :=
   mkReflPath (RibbonExpr.obj n)
 
-def thm48_ribbon_tensor_congr_left (x : RibbonExpr)
+noncomputable def thm48_ribbon_tensor_congr_left (x : RibbonExpr)
     {a b : RibbonExpr} (p : Path a b) :
     Path (RibbonExpr.tensor x a) (RibbonExpr.tensor x b) :=
   Path.congrArg (fun t => RibbonExpr.tensor x t) p
 
-def thm49_ribbon_tensor_congr_right (x : RibbonExpr)
+noncomputable def thm49_ribbon_tensor_congr_right (x : RibbonExpr)
     {a b : RibbonExpr} (p : Path a b) :
     Path (RibbonExpr.tensor a x) (RibbonExpr.tensor b x) :=
   Path.congrArg (fun t => RibbonExpr.tensor t x) p
@@ -374,17 +374,17 @@ theorem thm50_ribbon_tensor_congr_trans (x : RibbonExpr)
         (Path.congrArg (fun t => RibbonExpr.tensor x t) q) := by
   simpa using Path.congrArg_trans (fun t => RibbonExpr.tensor x t) p q
 
-def thm51_ribbon_braiding_congr_left (x : RibbonExpr)
+noncomputable def thm51_ribbon_braiding_congr_left (x : RibbonExpr)
     {a b : RibbonExpr} (p : Path a b) :
     Path (RibbonExpr.braiding x a) (RibbonExpr.braiding x b) :=
   Path.congrArg (fun t => RibbonExpr.braiding x t) p
 
-def thm52_ribbon_braiding_congr_right (x : RibbonExpr)
+noncomputable def thm52_ribbon_braiding_congr_right (x : RibbonExpr)
     {a b : RibbonExpr} (p : Path a b) :
     Path (RibbonExpr.braiding a x) (RibbonExpr.braiding b x) :=
   Path.congrArg (fun t => RibbonExpr.braiding t x) p
 
-def thm53_ribbon_twist_congr {a b : RibbonExpr}
+noncomputable def thm53_ribbon_twist_congr {a b : RibbonExpr}
     (p : Path a b) :
     Path (RibbonExpr.twist a) (RibbonExpr.twist b) :=
   Path.congrArg RibbonExpr.twist p
@@ -397,20 +397,20 @@ theorem thm54_ribbon_dual_symm_symm {a b : RibbonExpr}
 
 /-! ## Drinfeld center and Kazhdan-Lusztig wrappers -/
 
-def thm55_center_carrier_refl (c : CenterObj) :
+noncomputable def thm55_center_carrier_refl (c : CenterObj) :
     Path c.carrier c.carrier :=
   Path.refl c.carrier
 
-def thm56_center_half_refl (c : CenterObj) :
+noncomputable def thm56_center_half_refl (c : CenterObj) :
     Path c.halfBraiding c.halfBraiding :=
   Path.refl c.halfBraiding
 
-def thm57_center_congr_carrier {c1 c2 : CenterObj}
+noncomputable def thm57_center_congr_carrier {c1 c2 : CenterObj}
     (p : Path c1 c2) :
     Path c1.carrier c2.carrier :=
   Path.congrArg CenterObj.carrier p
 
-def thm58_center_congr_half {c1 c2 : CenterObj}
+noncomputable def thm58_center_congr_half {c1 c2 : CenterObj}
     (p : Path c1 c2) :
     Path c1.halfBraiding c2.halfBraiding :=
   Path.congrArg CenterObj.halfBraiding p
@@ -420,11 +420,11 @@ theorem thm59_center_trans_assoc {c1 c2 c3 c4 : CenterObj}
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
   simpa using Path.trans_assoc p q r
 
-def thm60_kl_bar_refl (k : KLExpr) :
+noncomputable def thm60_kl_bar_refl (k : KLExpr) :
     Path (KLExpr.bar k) (KLExpr.bar k) :=
   Path.refl (KLExpr.bar k)
 
-def thm61_kl_bar_congr {a b : KLExpr}
+noncomputable def thm61_kl_bar_congr {a b : KLExpr}
     (p : Path a b) :
     Path (KLExpr.bar a) (KLExpr.bar b) :=
   Path.congrArg KLExpr.bar p
@@ -443,26 +443,26 @@ theorem thm63_kl_bar_congr_trans {a b c : KLExpr}
 
 /-! ## Crystal and canonical bases -/
 
-def thm64_crystal_highest_refl (n : Nat) :
+noncomputable def thm64_crystal_highest_refl (n : Nat) :
     Path (CrystalExpr.highest n) (CrystalExpr.highest n) :=
   Path.refl (CrystalExpr.highest n)
 
-def thm65_crystal_raise_congr (i : Nat) {a b : CrystalExpr}
+noncomputable def thm65_crystal_raise_congr (i : Nat) {a b : CrystalExpr}
     (p : Path a b) :
     Path (CrystalExpr.raise i a) (CrystalExpr.raise i b) :=
   Path.congrArg (CrystalExpr.raise i) p
 
-def thm66_crystal_lower_congr (i : Nat) {a b : CrystalExpr}
+noncomputable def thm66_crystal_lower_congr (i : Nat) {a b : CrystalExpr}
     (p : Path a b) :
     Path (CrystalExpr.lower i a) (CrystalExpr.lower i b) :=
   Path.congrArg (CrystalExpr.lower i) p
 
-def thm67_crystal_tensor_congr_left (x : CrystalExpr)
+noncomputable def thm67_crystal_tensor_congr_left (x : CrystalExpr)
     {a b : CrystalExpr} (p : Path a b) :
     Path (CrystalExpr.tensor x a) (CrystalExpr.tensor x b) :=
   Path.congrArg (fun t => CrystalExpr.tensor x t) p
 
-def thm68_crystal_tensor_congr_right (x : CrystalExpr)
+noncomputable def thm68_crystal_tensor_congr_right (x : CrystalExpr)
     {a b : CrystalExpr} (p : Path a b) :
     Path (CrystalExpr.tensor a x) (CrystalExpr.tensor b x) :=
   Path.congrArg (fun t => CrystalExpr.tensor t x) p
@@ -475,26 +475,26 @@ theorem thm69_crystal_tensor_congr_trans (x : CrystalExpr)
         (Path.congrArg (fun t => CrystalExpr.tensor x t) q) := by
   simpa using Path.congrArg_trans (fun t => CrystalExpr.tensor x t) p q
 
-def thm70_canonical_basis_refl (n : Nat) :
+noncomputable def thm70_canonical_basis_refl (n : Nat) :
     Path (CanonicalExpr.basis n) (CanonicalExpr.basis n) :=
   mkReflPath (CanonicalExpr.basis n)
 
-def thm71_canonical_bar_congr {a b : CanonicalExpr}
+noncomputable def thm71_canonical_bar_congr {a b : CanonicalExpr}
     (p : Path a b) :
     Path (CanonicalExpr.bar a) (CanonicalExpr.bar b) :=
   Path.congrArg CanonicalExpr.bar p
 
-def thm72_canonical_dual_congr {a b : CanonicalExpr}
+noncomputable def thm72_canonical_dual_congr {a b : CanonicalExpr}
     (p : Path a b) :
     Path (CanonicalExpr.dual a) (CanonicalExpr.dual b) :=
   Path.congrArg CanonicalExpr.dual p
 
-def thm73_canonical_prod_congr_left (x : CanonicalExpr)
+noncomputable def thm73_canonical_prod_congr_left (x : CanonicalExpr)
     {a b : CanonicalExpr} (p : Path a b) :
     Path (CanonicalExpr.prod x a) (CanonicalExpr.prod x b) :=
   Path.congrArg (fun t => CanonicalExpr.prod x t) p
 
-def thm74_canonical_prod_congr_right (x : CanonicalExpr)
+noncomputable def thm74_canonical_prod_congr_right (x : CanonicalExpr)
     {a b : CanonicalExpr} (p : Path a b) :
     Path (CanonicalExpr.prod a x) (CanonicalExpr.prod b x) :=
   Path.congrArg (fun t => CanonicalExpr.prod t x) p

@@ -69,21 +69,21 @@ structure QuasiCategory where
         sset.face n i filler = h.faces i hi
 
 /-- Objects of a quasi-category are 0-simplices. -/
-def QuasiCategory.obj (C : QuasiCategory) : Type u := C.sset.obj 0
+noncomputable def QuasiCategory.obj (C : QuasiCategory) : Type u := C.sset.obj 0
 
 /-- Morphisms are 1-simplices. -/
-def QuasiCategory.mor (C : QuasiCategory) : Type u := C.sset.obj 1
+noncomputable def QuasiCategory.mor (C : QuasiCategory) : Type u := C.sset.obj 1
 
 /-- Source of a morphism (face d₁). -/
-def QuasiCategory.source (C : QuasiCategory) (f : C.mor) : C.obj :=
+noncomputable def QuasiCategory.source (C : QuasiCategory) (f : C.mor) : C.obj :=
   C.sset.face 0 ⟨1, by omega⟩ f
 
 /-- Target of a morphism (face d₀). -/
-def QuasiCategory.target (C : QuasiCategory) (f : C.mor) : C.obj :=
+noncomputable def QuasiCategory.target (C : QuasiCategory) (f : C.mor) : C.obj :=
   C.sset.face 0 ⟨0, by omega⟩ f
 
 /-- 2-simplices witness composition. -/
-def QuasiCategory.twoSimplex (C : QuasiCategory) : Type u := C.sset.obj 2
+noncomputable def QuasiCategory.twoSimplex (C : QuasiCategory) : Type u := C.sset.obj 2
 
 /-- A Kan-complex-enriched category. -/
 structure KanEnrichment where
@@ -127,13 +127,13 @@ structure InfinityFunctor (C D : QuasiCategory) where
     mapLevel (n + 1) (C.sset.degen n i x) = D.sset.degen n i (mapLevel n x)
 
 /-- Identity functor. -/
-def idFunctor (C : QuasiCategory) : InfinityFunctor C C where
+noncomputable def idFunctor (C : QuasiCategory) : InfinityFunctor C C where
   mapLevel := fun _ x => x
   comm_face := fun _ _ _ => rfl
   comm_degen := fun _ _ _ => rfl
 
 /-- Composition of functors. -/
-def compFunctor {C D E : QuasiCategory}
+noncomputable def compFunctor {C D E : QuasiCategory}
     (G : InfinityFunctor D E) (F : InfinityFunctor C D) :
     InfinityFunctor C E where
   mapLevel := fun n x => G.mapLevel n (F.mapLevel n x)
@@ -333,7 +333,7 @@ end HigherTopos
 end Homotopy
 end Path
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end ComputationalPaths

@@ -46,7 +46,7 @@ namespace EtaleSitePathData
 variable {Obj Cover : Type u} (S : EtaleSitePathData Obj Cover)
 
 /-- Step witness: right-unit normalization for pullback associativity. -/
-def pullbackAssoc_step (U V W : Obj) :
+noncomputable def pullbackAssoc_step (U V W : Obj) :
     Path.Step
       (Path.trans (S.pullbackAssocPath U V W)
         (Path.refl (S.pullbackObj U (S.pullbackObj V W))))
@@ -61,7 +61,7 @@ noncomputable def pullbackAssoc_rweq (U V W : Obj) :
   rweq_of_step (S.pullbackAssoc_step U V W)
 
 /-- Step witness: left-unit normalization for cover composition. -/
-def coverCompose_step (f g : Cover) :
+noncomputable def coverCompose_step (f g : Cover) :
     Path.Step
       (Path.trans (Path.refl (S.source (S.composeCover f g))) (S.coverComposePath f g))
       (S.coverComposePath f g) :=
@@ -74,7 +74,7 @@ noncomputable def coverCompose_rweq (f g : Cover) :
   rweq_of_step (S.coverCompose_step f g)
 
 /-- Step witness: right-unit normalization for restriction transport. -/
-def restrictionMap_step {U V : Obj} (p : Path U V) :
+noncomputable def restrictionMap_step {U V : Obj} (p : Path U V) :
     Path.Step
       (Path.trans (S.restrictionMap p)
         (Path.refl (S.pullbackObj V S.baseObj)))
@@ -97,7 +97,7 @@ noncomputable def restriction_cancel_rweq (U : Obj) :
 end EtaleSitePathData
 
 /-- Trivial etale-site path package on `PUnit`. -/
-def trivialEtaleSitePathData : EtaleSitePathData PUnit PUnit where
+noncomputable def trivialEtaleSitePathData : EtaleSitePathData PUnit PUnit where
   source := fun _ => PUnit.unit
   target := fun _ => PUnit.unit
   pullbackObj := fun _ _ => PUnit.unit

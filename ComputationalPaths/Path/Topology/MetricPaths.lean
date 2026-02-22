@@ -82,29 +82,29 @@ theorem dist_symm_symm {A : Type u} (M : PathMetric A) (a b : A) :
 /-! ## Path witnesses — zero Path.mk [Step.mk _ _ _] _ -/
 
 -- 8
-def dist_self_path {A : Type u} (M : PathMetric A) (a : A) :
+noncomputable def dist_self_path {A : Type u} (M : PathMetric A) (a : A) :
     Path (M.dist a a) 0 :=
   ⟨[], M.dist_self a⟩
 
 -- 9
-def dist_symm_path {A : Type u} (M : PathMetric A) (a b : A) :
+noncomputable def dist_symm_path {A : Type u} (M : PathMetric A) (a b : A) :
     Path (M.dist a b) (M.dist b a) :=
   ⟨[], M.dist_symm a b⟩
 
 -- 10
-def dist_self_add_path {A : Type u} (M : PathMetric A) (a : A) :
+noncomputable def dist_self_add_path {A : Type u} (M : PathMetric A) (a : A) :
     Path (M.dist a a + M.dist a a) 0 :=
   ⟨[], dist_eq_zero_self M a⟩
 
 -- 11
-def dist_symm_loop {A : Type u} (M : PathMetric A) (a b : A) :
+noncomputable def dist_symm_loop {A : Type u} (M : PathMetric A) (a b : A) :
     Path (M.dist a b) (M.dist a b) :=
   Path.trans (dist_symm_path M a b) (dist_symm_path M b a)
 
 /-! ## Discrete metric -/
 
 -- 12
-def discreteMetric (A : Type u) [DecidableEq A] : PathMetric A where
+noncomputable def discreteMetric (A : Type u) [DecidableEq A] : PathMetric A where
   dist := fun a b => if a = b then 0 else 1
   dist_self := by intro a; simp
   dist_symm := by
@@ -123,14 +123,14 @@ theorem discrete_neq {A : Type u} [DecidableEq A] (a b : A) (h : a ≠ b) :
     (discreteMetric A).dist a b = 1 := by simp [discreteMetric, h]
 
 -- 15
-def discrete_self_path {A : Type u} [DecidableEq A] (a : A) :
+noncomputable def discrete_self_path {A : Type u} [DecidableEq A] (a : A) :
     Path ((discreteMetric A).dist a a) 0 :=
   dist_self_path (discreteMetric A) a
 
 /-! ## Metric Balls -/
 
 /-- Open ball. -/
-def MetricBall {A : Type u} (M : PathMetric A) (center : A) (r : Nat) : A → Prop :=
+noncomputable def MetricBall {A : Type u} (M : PathMetric A) (center : A) (r : Nat) : A → Prop :=
   fun x => M.dist center x < r
 
 -- 16
@@ -163,7 +163,7 @@ structure MetricCauchy {A : Type u} (M : PathMetric A) where
   cauchy : ∀ eps : Nat, 0 < eps → ∃ N, ∀ n m, N ≤ n → N ≤ m → M.dist (seq n) (seq m) < eps
 
 -- 21
-def constCauchy {A : Type u} (M : PathMetric A) (a : A) : MetricCauchy M where
+noncomputable def constCauchy {A : Type u} (M : PathMetric A) (a : A) : MetricCauchy M where
   seq := fun _ => a
   cauchy := by intro eps heps; exact ⟨0, fun _ _ _ _ => by simp [M.dist_self]; exact heps⟩
 
@@ -172,7 +172,7 @@ theorem constCauchy_dist_zero {A : Type u} (M : PathMetric A) (a : A) (n m : Nat
     M.dist ((constCauchy M a).seq n) ((constCauchy M a).seq m) = 0 := M.dist_self a
 
 -- 23
-def constCauchy_dist_path {A : Type u} (M : PathMetric A) (a : A) (n m : Nat) :
+noncomputable def constCauchy_dist_path {A : Type u} (M : PathMetric A) (a : A) (n m : Nat) :
     Path (M.dist ((constCauchy M a).seq n) ((constCauchy M a).seq m)) 0 :=
   ⟨[], constCauchy_dist_zero M a n m⟩
 
@@ -222,14 +222,14 @@ theorem isometry_comp {A : Type u} {B : Type v} {C : Type u}
   ⟨fun a₁ a₂ => by simp [Function.comp, hg.iso, hf.iso]⟩
 
 -- 28
-def isometry_dist_path {A : Type u} {B : Type v}
+noncomputable def isometry_dist_path {A : Type u} {B : Type v}
     {MA : PathMetric A} {MB : PathMetric B} {f : A → B}
     (h : PathIsometry MA MB f) (a₁ a₂ : A) :
     Path (MB.dist (f a₁) (f a₂)) (MA.dist a₁ a₂) :=
   ⟨[], h.iso a₁ a₂⟩
 
 -- 29
-def isometry_comp_path {A : Type u} {B : Type v} {C : Type u}
+noncomputable def isometry_comp_path {A : Type u} {B : Type v} {C : Type u}
     {MA : PathMetric A} {MB : PathMetric B} {MC : PathMetric C}
     {f : A → B} {g : B → C}
     (hf : PathIsometry MA MB f) (hg : PathIsometry MB MC g) (a₁ a₂ : A) :
@@ -243,7 +243,7 @@ theorem isometry_preserves_self {A : Type u} {B : Type v}
     MB.dist (f a) (f a) = 0 := by rw [h.iso]; exact MA.dist_self a
 
 -- 31
-def isometry_self_path {A : Type u} {B : Type v}
+noncomputable def isometry_self_path {A : Type u} {B : Type v}
     {MA : PathMetric A} {MB : PathMetric B} {f : A → B}
     (h : PathIsometry MA MB f) (a : A) :
     Path (MB.dist (f a) (f a)) 0 :=
@@ -262,7 +262,7 @@ theorem contraction_self_zero {A : Type u} {M : PathMetric A} {f : A → A}
     (_c : ContractionMap M f) (a : A) : M.dist (f a) (f a) = 0 := M.dist_self (f a)
 
 -- 33
-def contraction_self_path {A : Type u} {M : PathMetric A} {f : A → A}
+noncomputable def contraction_self_path {A : Type u} {M : PathMetric A} {f : A → A}
     (c : ContractionMap M f) (a : A) :
     Path (M.dist (f a) (f a)) 0 :=
   ⟨[], contraction_self_zero c a⟩
@@ -288,7 +288,7 @@ theorem bounded_triangle {A : Type u} {M : PathMetric A} {B : Nat}
 /-! ## Path Length as Distance -/
 
 /-- The length of a path's rewrite steps. -/
-def pathLength {A : Type u} {a b : A} (p : Path a b) : Nat := p.steps.length
+noncomputable def pathLength {A : Type u} {a b : A} (p : Path a b) : Nat := p.steps.length
 
 -- 36
 @[simp] theorem pathLength_refl {A : Type u} (a : A) :
@@ -305,12 +305,12 @@ theorem pathLength_symm {A : Type u} {a b : A} (p : Path a b) :
   simp [pathLength, List.length_map, List.length_reverse]
 
 -- 39
-def pathLength_trans_path {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
+noncomputable def pathLength_trans_path {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
     Path (pathLength (Path.trans p q)) (pathLength p + pathLength q) :=
   ⟨[], pathLength_trans p q⟩
 
 -- 40
-def pathLength_symm_path {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def pathLength_symm_path {A : Type u} {a b : A} (p : Path a b) :
     Path (pathLength (Path.symm p)) (pathLength p) :=
   ⟨[], pathLength_symm p⟩
 
@@ -320,18 +320,18 @@ structure MetricCompletion {A : Type u} (M : PathMetric A) where
   rep : MetricCauchy M
 
 -- 41
-def embedCompletion {A : Type u} (M : PathMetric A) (a : A) : MetricCompletion M :=
+noncomputable def embedCompletion {A : Type u} (M : PathMetric A) (a : A) : MetricCompletion M :=
   ⟨constCauchy M a⟩
 
 -- 42
-def embed_path {A : Type u} (M : PathMetric A) (a : A) :
+noncomputable def embed_path {A : Type u} (M : PathMetric A) (a : A) :
     Path (embedCompletion M a) (embedCompletion M a) :=
   Path.refl _
 
 /-! ## CongrArg composed paths -/
 
 -- 43
-def congrArg_dist {A B : Type u} (M : PathMetric A) (f : B → A) {b1 b2 : B}
+noncomputable def congrArg_dist {A B : Type u} (M : PathMetric A) (f : B → A) {b1 b2 : B}
     (p : Path b1 b2) : Path (M.dist (f b1) (f b1)) (M.dist (f b2) (f b2)) :=
   Path.congrArg (fun b => M.dist (f b) (f b)) p
 
@@ -340,12 +340,12 @@ theorem congrArg_dist_zero {A B : Type u} (M : PathMetric A) (f : B → A) (b : 
     M.dist (f b) (f b) = 0 := M.dist_self (f b)
 
 -- 45
-def congrArg_dist_self_path {A B : Type u} (M : PathMetric A) (f : B → A) (b : B) :
+noncomputable def congrArg_dist_self_path {A B : Type u} (M : PathMetric A) (f : B → A) (b : B) :
     Path (M.dist (f b) (f b)) 0 :=
   ⟨[], M.dist_self (f b)⟩
 
 -- 46
-def congrArg_dist_trans {A B : Type u} (M : PathMetric A) (f : B → A) {b1 b2 b3 : B}
+noncomputable def congrArg_dist_trans {A B : Type u} (M : PathMetric A) (f : B → A) {b1 b2 b3 : B}
     (p : Path b1 b2) (q : Path b2 b3) :
     Path (M.dist (f b1) (f b1)) (M.dist (f b3) (f b3)) :=
   Path.congrArg (fun b => M.dist (f b) (f b)) (Path.trans p q)

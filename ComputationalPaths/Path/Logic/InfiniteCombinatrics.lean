@@ -52,7 +52,7 @@ structure Monochromatic {X : Type u} {k : Nat}
   mono_witness : (x y : X) → S x → S y → x ≠ y →
     Path (c.color x y) col
 
-def Monochromatic.restrict {X : Type u} {k : Nat}
+noncomputable def Monochromatic.restrict {X : Type u} {k : Nat}
     {c : Coloring X k} {S : X → Prop} {col : Fin k}
     (m : Monochromatic c S col)
     (T : X → Prop) (hTS : ∀ x, T x → S x) :
@@ -63,7 +63,7 @@ def Monochromatic.restrict {X : Type u} {k : Nat}
 /-! ## Pigeonhole -/
 
 /-- Pigeonhole principle (Path from statement to True). -/
-def pigeonhole_path (n : Nat) (f : Fin (n + 1) → Fin n) (_ : 0 < n) :
+noncomputable def pigeonhole_path (n : Nat) (f : Fin (n + 1) → Fin n) (_ : 0 < n) :
     Path (∃ i j : Fin (n + 1), i ≠ j ∧ f i = f j : Prop) True :=
   Path.stepChain (by
     simp only [eq_iff_iff]
@@ -87,7 +87,7 @@ structure InfiniteRamsey (k : Nat) where
       ∀ i j : Nat, i < j → Path (c.color (S.enum i) (S.enum j)) col
 
 /-- Monochromatic color uniqueness via Path composition. -/
-def mono_color_unique {k : Nat} (c : Coloring Nat k)
+noncomputable def mono_color_unique {k : Nat} (c : Coloring Nat k)
     (S : InfiniteSubset) (col₁ col₂ : Fin k)
     (h₁ : Path (c.color (S.enum 0) (S.enum 1)) col₁)
     (h₂ : Path (c.color (S.enum 0) (S.enum 1)) col₂) :
@@ -115,16 +115,16 @@ inductive FiniteTree (L : Type u) : Type u
   | leaf : L → FiniteTree L
   | node : L → List (FiniteTree L) → FiniteTree L
 
-def FiniteTree.label {L : Type u} : FiniteTree L → L
+noncomputable def FiniteTree.label {L : Type u} : FiniteTree L → L
   | FiniteTree.leaf l => l
   | FiniteTree.node l _ => l
 
-def FiniteTree.size {L : Type u} : FiniteTree L → Nat
+noncomputable def FiniteTree.size {L : Type u} : FiniteTree L → Nat
   | FiniteTree.leaf _ => 1
   | FiniteTree.node _ cs => 1 + cs.foldl (fun acc t => acc + t.size) 0
 
 /-- Tree embedding (Prop: s can be embedded into t). -/
-def TreeEmbed (L : Type u) (le : L → L → Prop)
+noncomputable def TreeEmbed (L : Type u) (le : L → L → Prop)
     (s t : FiniteTree L) : Prop :=
   match s, t with
   | FiniteTree.leaf a, FiniteTree.leaf b => le a b
@@ -132,7 +132,7 @@ def TreeEmbed (L : Type u) (le : L → L → Prop)
   | FiniteTree.node _ _, FiniteTree.leaf _ => False
   | FiniteTree.node a _, FiniteTree.node b _ => le a b  -- simplified
 
-def tree_leaf_refl (L : Type u) (le : L → L → Prop)
+noncomputable def tree_leaf_refl (L : Type u) (le : L → L → Prop)
     (a : L) (hle : le a a) :
     TreeEmbed L le (FiniteTree.leaf a) (FiniteTree.leaf a) := by
   simp [TreeEmbed]; exact hle
@@ -146,12 +146,12 @@ structure WellQuasiOrder (X : Type u) where
   wqo : (f : Nat → X) → ∃ i j : Nat, i < j ∧ le (f i) (f j)
 
 /-- WQO property as Path to True. -/
-def wqo_path {X : Type u} (W : WellQuasiOrder X) (f : Nat → X) :
+noncomputable def wqo_path {X : Type u} (W : WellQuasiOrder X) (f : Nat → X) :
     Path (∃ i j : Nat, i < j ∧ W.le (f i) (f j) : Prop) True :=
   Path.stepChain (by simp only [eq_iff_iff]; exact ⟨fun _ => trivial, fun _ => W.wqo f⟩)
 
 /-- WQO reflexive path. -/
-def wqo_refl_path {X : Type u} (W : WellQuasiOrder X) (f : Nat → X) :
+noncomputable def wqo_refl_path {X : Type u} (W : WellQuasiOrder X) (f : Nat → X) :
     Path (∃ i j : Nat, i < j ∧ W.le (f i) (f j) : Prop)
          (∃ i j : Nat, i < j ∧ W.le (f i) (f j) : Prop) :=
   Path.refl _
@@ -164,7 +164,7 @@ structure KruskalData (L : Type u) where
     ∃ i j : Nat, i < j ∧ TreeEmbed L label_le (f i) (f j)
 
 /-- Kruskal as Path to True. -/
-def kruskal_path {L : Type u} (K : KruskalData L)
+noncomputable def kruskal_path {L : Type u} (K : KruskalData L)
     (f : Nat → FiniteTree L) :
     Path (∃ i j, i < j ∧ TreeEmbed L K.label_le (f i) (f j) : Prop) True :=
   Path.stepChain (by simp only [eq_iff_iff]; exact ⟨fun _ => trivial, fun _ => K.tree_wqo f⟩)

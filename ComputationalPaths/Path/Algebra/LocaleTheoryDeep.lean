@@ -51,66 +51,66 @@ variable {F : Type u} (fr : Frame F)
 -- ============================================================
 
 /-- Theorem 1: meet is commutative (symmetric witness) -/
-def frame_meet_comm_symm (a b : F) : Path (fr.meet b a) (fr.meet a b) :=
+noncomputable def frame_meet_comm_symm (a b : F) : Path (fr.meet b a) (fr.meet a b) :=
   Path.symm (fr.meet_comm a b)
 
 /-- Theorem 2: join is commutative (symmetric witness) -/
-def frame_join_comm_symm (a b : F) : Path (fr.join b a) (fr.join a b) :=
+noncomputable def frame_join_comm_symm (a b : F) : Path (fr.join b a) (fr.join a b) :=
   Path.symm (fr.join_comm a b)
 
 /-- Theorem 3: top is left identity for meet -/
-def frame_top_meet_left (a : F) : Path (fr.meet fr.top a) a :=
+noncomputable def frame_top_meet_left (a : F) : Path (fr.meet fr.top a) a :=
   Path.trans (fr.meet_comm fr.top a) (fr.meet_top a)
 
 /-- Theorem 4: bot is left identity for join -/
-def frame_bot_join_left (a : F) : Path (fr.join fr.bot a) a :=
+noncomputable def frame_bot_join_left (a : F) : Path (fr.join fr.bot a) a :=
   Path.trans (fr.join_comm fr.bot a) (fr.join_bot a)
 
 /-- Theorem 5: meet_assoc reversed -/
-def frame_meet_assoc_rev (a b c : F) :
+noncomputable def frame_meet_assoc_rev (a b c : F) :
     Path (fr.meet a (fr.meet b c)) (fr.meet (fr.meet a b) c) :=
   Path.symm (fr.meet_assoc a b c)
 
 /-- Theorem 6: join_assoc reversed -/
-def frame_join_assoc_rev (a b c : F) :
+noncomputable def frame_join_assoc_rev (a b c : F) :
     Path (fr.join a (fr.join b c)) (fr.join (fr.join a b) c) :=
   Path.symm (fr.join_assoc a b c)
 
 /-- Theorem 7: bot is left annihilator for meet -/
-def frame_bot_meet_left (a : F) : Path (fr.meet fr.bot a) fr.bot :=
+noncomputable def frame_bot_meet_left (a : F) : Path (fr.meet fr.bot a) fr.bot :=
   Path.trans (fr.meet_comm fr.bot a) (fr.meet_bot a)
 
 /-- Theorem 8: top is left annihilator for join -/
-def frame_top_join_left (a : F) : Path (fr.join fr.top a) fr.top :=
+noncomputable def frame_top_join_left (a : F) : Path (fr.join fr.top a) fr.top :=
   Path.trans (fr.join_comm fr.top a) (fr.join_top a)
 
 /-- Theorem 9: Double meet idempotence -/
-def frame_meet_idem_double (a : F) :
+noncomputable def frame_meet_idem_double (a : F) :
     Path (fr.meet (fr.meet a a) (fr.meet a a)) (fr.meet a a) :=
   fr.meet_idem (fr.meet a a)
 
 /-- Theorem 10: Congruence of meet in left argument -/
-def frame_meet_congrL (a b c : F) (p : Path a b) :
+noncomputable def frame_meet_congrL (a b c : F) (p : Path a b) :
     Path (fr.meet a c) (fr.meet b c) :=
   Path.congrArg (fun x => fr.meet x c) p
 
 /-- Theorem 11: Congruence of meet in right argument -/
-def frame_meet_congrR (a b c : F) (p : Path b c) :
+noncomputable def frame_meet_congrR (a b c : F) (p : Path b c) :
     Path (fr.meet a b) (fr.meet a c) :=
   Path.congrArg (fun x => fr.meet a x) p
 
 /-- Theorem 12: Congruence of join in left argument -/
-def frame_join_congrL (a b c : F) (p : Path a b) :
+noncomputable def frame_join_congrL (a b c : F) (p : Path a b) :
     Path (fr.join a c) (fr.join b c) :=
   Path.congrArg (fun x => fr.join x c) p
 
 /-- Theorem 13: Congruence of join in right argument -/
-def frame_join_congrR (a b c : F) (p : Path b c) :
+noncomputable def frame_join_congrR (a b c : F) (p : Path b c) :
     Path (fr.join a b) (fr.join a c) :=
   Path.congrArg (fun x => fr.join a x) p
 
 /-- Theorem 14: Congruence of sup through a function path -/
-def frame_sup_congr {I : Type u} (s t : I → F)
+noncomputable def frame_sup_congr {I : Type u} (s t : I → F)
     (p : Path s t) :
     Path (fr.sup s) (fr.sup t) :=
   Path.congrArg fr.sup p
@@ -130,12 +130,12 @@ structure FrameHom (F G : Type u) (frF : Frame F) (frG : Frame G) where
 variable {G : Type u} {frG : Frame G}
 
 /-- Theorem 15: Frame hom applied to meet_top -/
-def frameHom_meet_top (h : FrameHom F G fr frG) (a : F) :
+noncomputable def frameHom_meet_top (h : FrameHom F G fr frG) (a : F) :
     Path (h.fn (fr.meet a fr.top)) (h.fn a) :=
   Path.congrArg h.fn (fr.meet_top a)
 
 /-- Theorem 16: Composition of frame homs -/
-def frameHom_comp {H : Type u} {frH : Frame H}
+noncomputable def frameHom_comp {H : Type u} {frH : Frame H}
     (g : FrameHom G H frG frH) (f : FrameHom F G fr frG) :
     FrameHom F H fr frH where
   fn := fun x => g.fn (f.fn x)
@@ -147,14 +147,14 @@ def frameHom_comp {H : Type u} {frH : Frame H}
     Path.trans (Path.congrArg g.fn (f.pres_sup s)) (g.pres_sup (fun i => f.fn (s i)))
 
 /-- Theorem 17: Identity frame homomorphism -/
-def frameHom_id : FrameHom F F fr fr where
+noncomputable def frameHom_id : FrameHom F F fr fr where
   fn := id
   pres_top := Path.refl _
   pres_meet := fun _ _ => Path.refl _
   pres_sup := fun _ => Path.refl _
 
 /-- Theorem 18: Frame hom composition is associative pointwise -/
-def frameHom_comp_assoc {H K : Type u} {frH : Frame H} {frK : Frame K}
+noncomputable def frameHom_comp_assoc {H K : Type u} {frH : Frame H} {frK : Frame K}
     (h : FrameHom H K frH frK) (g : FrameHom G H frG frH) (f : FrameHom F G fr frG) :
     (a : F) → Path ((frameHom_comp fr (frameHom_comp frG h g) f).fn a)
                     ((frameHom_comp fr h (frameHom_comp fr g f)).fn a) :=
@@ -175,7 +175,7 @@ variable {fr}
 variable (nu : Nucleus F fr)
 
 /-- Theorem 19: Nucleus preserves top via inflate + meet_top -/
-def nucleus_pres_top : Path (nu.j fr.top) fr.top :=
+noncomputable def nucleus_pres_top : Path (nu.j fr.top) fr.top :=
   -- inflate: meet(top, j(top)) = top
   -- meet_idem(j(top)): meet(j(top), j(top)) = j(top)  [symm]
   -- pres_meet(top,top): j(meet(top,top)) = meet(j(top),j(top))
@@ -210,31 +210,31 @@ def nucleus_pres_top : Path (nu.j fr.top) fr.top :=
   Path.trans (Path.symm p3) (Path.trans (Path.symm p2) p1)
 
 /-- Theorem 20: Nucleus is monotone (path witness) -/
-def nucleus_monotone_witness (a b : F) (p : Path (fr.meet a b) a) :
+noncomputable def nucleus_monotone_witness (a b : F) (p : Path (fr.meet a b) a) :
     Path (fr.meet (nu.j a) (nu.j b)) (nu.j a) :=
   let step1 : Path (nu.j (fr.meet a b)) (nu.j a) := Path.congrArg nu.j p
   Path.trans (Path.symm (nu.pres_meet a b)) step1
 
 /-- Theorem 21: j(j(j(a))) = j(a) via transitivity -/
-def nucleus_triple_idem (a : F) : Path (nu.j (nu.j (nu.j a))) (nu.j a) :=
+noncomputable def nucleus_triple_idem (a : F) : Path (nu.j (nu.j (nu.j a))) (nu.j a) :=
   Path.trans (nu.idempotent (nu.j a)) (nu.idempotent a)
 
 /-- Theorem 22: Nucleus applied to meet then idem -/
-def nucleus_meet_idem (a b : F) :
+noncomputable def nucleus_meet_idem (a b : F) :
     Path (nu.j (nu.j (fr.meet a b))) (fr.meet (nu.j a) (nu.j b)) :=
   Path.trans (nu.idempotent (fr.meet a b)) (nu.pres_meet a b)
 
 /-- Theorem 23: Congruence through nucleus -/
-def nucleus_congr (a b : F) (p : Path a b) : Path (nu.j a) (nu.j b) :=
+noncomputable def nucleus_congr (a b : F) (p : Path a b) : Path (nu.j a) (nu.j b) :=
   Path.congrArg nu.j p
 
 /-- Theorem 24: Nucleus on meet commutes with meet commutativity -/
-def nucleus_meet_comm (a b : F) :
+noncomputable def nucleus_meet_comm (a b : F) :
     Path (nu.j (fr.meet a b)) (nu.j (fr.meet b a)) :=
   Path.congrArg nu.j (fr.meet_comm a b)
 
 /-- Theorem 25: Nucleus on join bot -/
-def nucleus_join_bot (a : F) :
+noncomputable def nucleus_join_bot (a : F) :
     Path (nu.j (fr.join a fr.bot)) (nu.j a) :=
   Path.congrArg nu.j (fr.join_bot a)
 
@@ -247,12 +247,12 @@ structure Sublocale (F : Type u) (fr : Frame F) where
   nu : Nucleus F fr
 
 /-- Theorem 26: j(a) is always a fixed point -/
-def sublocale_image_fixed (sl : Sublocale F fr) (a : F) :
+noncomputable def sublocale_image_fixed (sl : Sublocale F fr) (a : F) :
     Path (sl.nu.j (sl.nu.j a)) (sl.nu.j a) :=
   sl.nu.idempotent a
 
 /-- Theorem 27: Meet of fixed points is fixed -/
-def sublocale_meet_closed (sl : Sublocale F fr) (a b : F)
+noncomputable def sublocale_meet_closed (sl : Sublocale F fr) (a b : F)
     (pa : Path (sl.nu.j a) a) (pb : Path (sl.nu.j b) b) :
     Path (sl.nu.j (fr.meet a b)) (fr.meet a b) :=
   let step1 := sl.nu.pres_meet a b
@@ -261,7 +261,7 @@ def sublocale_meet_closed (sl : Sublocale F fr) (a b : F)
   Path.trans step1 (Path.trans step2 step3)
 
 /-- Theorem 28: Top is a fixed point under any nucleus -/
-def sublocale_top_fixed (sl : Sublocale F fr) :
+noncomputable def sublocale_top_fixed (sl : Sublocale F fr) :
     Path (sl.nu.j fr.top) fr.top :=
   nucleus_pres_top sl.nu
 
@@ -279,11 +279,11 @@ structure LocaleMorphism (L1 L2 : Type u) (loc1 : Locale L1) (loc2 : Locale L2) 
   star : FrameHom loc2.frameOf loc1.frameOf loc2.fr loc1.fr
 
 /-- Theorem 30: Identity locale morphism -/
-def localeMorphism_id (L : Type u) (loc : Locale L) : LocaleMorphism L L loc loc where
+noncomputable def localeMorphism_id (L : Type u) (loc : Locale L) : LocaleMorphism L L loc loc where
   star := frameHom_id loc.fr
 
 /-- Theorem 31: Composition of locale morphisms (note reversal) -/
-def localeMorphism_comp {L1 L2 L3 : Type u}
+noncomputable def localeMorphism_comp {L1 L2 L3 : Type u}
     {loc1 : Locale L1} {loc2 : Locale L2} {loc3 : Locale L3}
     (g : LocaleMorphism L2 L3 loc2 loc3) (f : LocaleMorphism L1 L2 loc1 loc2) :
     LocaleMorphism L1 L3 loc1 loc3 where
@@ -312,12 +312,12 @@ structure LocalePoint (F : Type u) (fr : Frame F) where
   pres_meet : (a b : F) → Path (pt (fr.meet a b)) (pt a && pt b)
 
 /-- Theorem 32: A point preserves idempotence of meet -/
-def localePoint_idem (lp : LocalePoint F fr) (a : F) :
+noncomputable def localePoint_idem (lp : LocalePoint F fr) (a : F) :
     Path (lp.pt (fr.meet a a)) (lp.pt a) :=
   Path.congrArg lp.pt (fr.meet_idem a)
 
 /-- Theorem 33: A point preserves meet commutativity -/
-def localePoint_meet_comm (lp : LocalePoint F fr) (a b : F) :
+noncomputable def localePoint_meet_comm (lp : LocalePoint F fr) (a b : F) :
     Path (lp.pt (fr.meet a b)) (lp.pt (fr.meet b a)) :=
   Path.congrArg lp.pt (fr.meet_comm a b)
 
@@ -330,12 +330,12 @@ structure SpatialLocale (F : Type u) (fr : Frame F) where
            Path a b
 
 /-- Theorem 34: In a spatial locale, top is detected by all points -/
-def spatial_top_detected (sp : SpatialLocale F fr) (p : sp.points) :
+noncomputable def spatial_top_detected (sp : SpatialLocale F fr) (p : sp.points) :
     Path ((sp.eval p).pt fr.top) true :=
   (sp.eval p).pres_top
 
 /-- Theorem 35: Spatial locale meet preservation through points -/
-def spatial_meet_point (sp : SpatialLocale F fr)
+noncomputable def spatial_meet_point (sp : SpatialLocale F fr)
     (p : sp.points) (a b : F) :
     Path ((sp.eval p).pt (fr.meet a b)) ((sp.eval p).pt a && (sp.eval p).pt b) :=
   (sp.eval p).pres_meet a b
@@ -355,13 +355,13 @@ structure CompactLocale (F : Type u) (fr : Frame F) where
   top_compact : CompactElement F fr fr.top
 
 /-- Theorem 36: In a compact locale, top is covered by finite subfamily -/
-def compact_top_witness {I : Type u} (cl : CompactLocale F fr) (s : I → F)
+noncomputable def compact_top_witness {I : Type u} (cl : CompactLocale F fr) (s : I → F)
     (cov : Path (fr.meet fr.top (fr.sup s)) fr.top) :
     PSigma (fun (i : I) => Path (fr.meet fr.top (s i)) fr.top) :=
   cl.top_compact.compact_cond s cov
 
 /-- Theorem 37: Compact element meets with itself -/
-def compact_self_meet (k : F) (_ : CompactElement F fr k) :
+noncomputable def compact_self_meet (k : F) (_ : CompactElement F fr k) :
     Path (fr.meet k k) k :=
   fr.meet_idem k
 
@@ -383,17 +383,17 @@ structure RegularLocale (F : Type u) (fr : Frame F) where
   reg_join   : (a : F) → Path (fr.sup (reg_elems a)) a
 
 /-- Theorem 38: Well-inside complement disj is symmetric -/
-def wellInside_complement_symm {a b : F} (w : WellInside F fr a b) :
+noncomputable def wellInside_complement_symm {a b : F} (w : WellInside F fr a b) :
     Path (fr.meet w.complement a) fr.bot :=
   Path.trans (fr.meet_comm w.complement a) w.disj
 
 /-- Theorem 39: Well-inside cover is symmetric in join -/
-def wellInside_cover_symm {a b : F} (w : WellInside F fr a b) :
+noncomputable def wellInside_cover_symm {a b : F} (w : WellInside F fr a b) :
     Path (fr.join w.complement b) fr.top :=
   Path.trans (fr.join_comm w.complement b) w.cover
 
 /-- Theorem 40: Well-inside implies double disj -/
-def wellInside_both_disj {a b : F} (w : WellInside F fr a b) :
+noncomputable def wellInside_both_disj {a b : F} (w : WellInside F fr a b) :
     Path (fr.meet (fr.meet a w.complement) (fr.meet w.complement a))
          (fr.meet fr.bot fr.bot) :=
   let p1 := frame_meet_congrL fr (fr.meet a w.complement) fr.bot
@@ -414,25 +414,25 @@ structure ProductFrame (F1 F2 : Type u) (fr1 : Frame F1) (fr2 : Frame F2) where
   proj2   : FrameHom carrier F2 pfr fr2
 
 /-- Theorem 41: Product projection 1 preserves top -/
-def product_proj1_top {fr1 : Frame F} {fr2 : Frame G}
+noncomputable def product_proj1_top {fr1 : Frame F} {fr2 : Frame G}
     (pf : ProductFrame F G fr1 fr2) :
     Path (pf.proj1.fn pf.pfr.top) fr1.top :=
   pf.proj1.pres_top
 
 /-- Theorem 42: Product projection 1 preserves meet -/
-def product_proj_meet {fr1 : Frame F} {fr2 : Frame G}
+noncomputable def product_proj_meet {fr1 : Frame F} {fr2 : Frame G}
     (pf : ProductFrame F G fr1 fr2) (a b : pf.carrier) :
     Path (pf.proj1.fn (pf.pfr.meet a b)) (fr1.meet (pf.proj1.fn a) (pf.proj1.fn b)) :=
   pf.proj1.pres_meet a b
 
 /-- Theorem 43: Product projection 2 preserves top -/
-def product_proj2_top {fr1 : Frame F} {fr2 : Frame G}
+noncomputable def product_proj2_top {fr1 : Frame F} {fr2 : Frame G}
     (pf : ProductFrame F G fr1 fr2) :
     Path (pf.proj2.fn pf.pfr.top) fr2.top :=
   pf.proj2.pres_top
 
 /-- Theorem 44: Product projection 2 preserves meet -/
-def product_proj2_meet {fr1 : Frame F} {fr2 : Frame G}
+noncomputable def product_proj2_meet {fr1 : Frame F} {fr2 : Frame G}
     (pf : ProductFrame F G fr1 fr2) (a b : pf.carrier) :
     Path (pf.proj2.fn (pf.pfr.meet a b)) (fr2.meet (pf.proj2.fn a) (pf.proj2.fn b)) :=
   pf.proj2.pres_meet a b
@@ -455,7 +455,7 @@ structure CoherentFrame (F : Type u) (fr : Frame F) where
   basis_sup   : (x : F) → Path (fr.sup (fun i => embed (basis_elems x i))) x
 
 /-- Theorem 45: Coherent frame compact meet is associative via frame meet -/
-def coherent_meet_assoc (cf : CoherentFrame F fr) (a b c : cf.compacts) :
+noncomputable def coherent_meet_assoc (cf : CoherentFrame F fr) (a b c : cf.compacts) :
     Path (cf.embed (cf.comp_meet (cf.comp_meet a b) c))
          (fr.meet (fr.meet (cf.embed a) (cf.embed b)) (cf.embed c)) :=
   let p1 := cf.meet_compat (cf.comp_meet a b) c
@@ -465,7 +465,7 @@ def coherent_meet_assoc (cf : CoherentFrame F fr) (a b c : cf.compacts) :
   Path.trans p1 p2
 
 /-- Theorem 46: Coherent frame compact top is idempotent -/
-def coherent_top_idem (cf : CoherentFrame F fr) :
+noncomputable def coherent_top_idem (cf : CoherentFrame F fr) :
     Path (cf.embed (cf.comp_meet cf.comp_top cf.comp_top)) (cf.embed cf.comp_top) :=
   let p1 := cf.meet_compat cf.comp_top cf.comp_top
   let p2 := frame_meet_congrL fr (cf.embed cf.comp_top) fr.top (cf.embed cf.comp_top) cf.top_compat
@@ -481,19 +481,19 @@ structure BooleanFrame (F : Type u) (fr : Frame F) where
   compl_join  : (a : F) → Path (fr.join a (compl a)) fr.top
 
 /-- Theorem 47: Complement gives well-inside -/
-def boolean_wellInside (bf : BooleanFrame F fr) (a : F) :
+noncomputable def boolean_wellInside (bf : BooleanFrame F fr) (a : F) :
     WellInside F fr a a where
   complement := bf.compl a
   disj := bf.compl_meet a
   cover := bf.compl_join a
 
 /-- Theorem 48: In a Boolean frame, compl(a) ∧ a = ⊥ -/
-def boolean_compl_meet_symm (bf : BooleanFrame F fr) (a : F) :
+noncomputable def boolean_compl_meet_symm (bf : BooleanFrame F fr) (a : F) :
     Path (fr.meet (bf.compl a) a) fr.bot :=
   Path.trans (fr.meet_comm (bf.compl a) a) (bf.compl_meet a)
 
 /-- Theorem 49: Boolean frame partition simplifies to a -/
-def boolean_partition_simp (bf : BooleanFrame F fr) (a : F) :
+noncomputable def boolean_partition_simp (bf : BooleanFrame F fr) (a : F) :
     Path (fr.meet a (fr.join a (bf.compl a))) a :=
   let step1 := frame_meet_congrR fr a (fr.join a (bf.compl a)) fr.top (bf.compl_join a)
   Path.trans step1 (fr.meet_top a)
@@ -513,28 +513,28 @@ structure LocalicGroup (F : Type u) (fr : Frame F) where
   inv_hom    : FrameHom F F fr fr
 
 /-- Theorem 50: Inverse preserves top -/
-def localicGroup_inv_top (lg : LocalicGroup F fr) :
+noncomputable def localicGroup_inv_top (lg : LocalicGroup F fr) :
     Path (lg.inv_hom.fn fr.top) fr.top :=
   lg.inv_hom.pres_top
 
 /-- Theorem 51: Inverse preserves meet -/
-def localicGroup_inv_meet (lg : LocalicGroup F fr) (a b : F) :
+noncomputable def localicGroup_inv_meet (lg : LocalicGroup F fr) (a b : F) :
     Path (lg.inv_hom.fn (fr.meet a b))
          (fr.meet (lg.inv_hom.fn a) (lg.inv_hom.fn b)) :=
   lg.inv_hom.pres_meet a b
 
 /-- Theorem 52: Multiplication hom preserves top -/
-def localicGroup_mul_top (lg : LocalicGroup F fr) :
+noncomputable def localicGroup_mul_top (lg : LocalicGroup F fr) :
     Path (lg.mul_hom.fn fr.top) lg.mulFr.top :=
   lg.mul_hom.pres_top
 
 /-- Theorem 53: Unit meet idempotence -/
-def localicGroup_unit_idem (lg : LocalicGroup F fr) :
+noncomputable def localicGroup_unit_idem (lg : LocalicGroup F fr) :
     Path (fr.meet lg.unit lg.unit) lg.unit :=
   fr.meet_idem lg.unit
 
 /-- Theorem 54: Inverse composed with meet preserves commutativity -/
-def localicGroup_inv_meet_comm (lg : LocalicGroup F fr) (a b : F) :
+noncomputable def localicGroup_inv_meet_comm (lg : LocalicGroup F fr) (a b : F) :
     Path (lg.inv_hom.fn (fr.meet a b)) (lg.inv_hom.fn (fr.meet b a)) :=
   Path.congrArg lg.inv_hom.fn (fr.meet_comm a b)
 
@@ -543,7 +543,7 @@ def localicGroup_inv_meet_comm (lg : LocalicGroup F fr) (a b : F) :
 -- ============================================================
 
 /-- Theorem 55: Mac Lane pentagon for meet associativity -/
-def frame_pentagon (a b c d : F) :
+noncomputable def frame_pentagon (a b c d : F) :
     Path (fr.meet (fr.meet (fr.meet a b) c) d)
          (fr.meet a (fr.meet b (fr.meet c d))) :=
   let step1 := fr.meet_assoc (fr.meet a b) c d
@@ -551,7 +551,7 @@ def frame_pentagon (a b c d : F) :
   Path.trans step1 step2
 
 /-- Theorem 56: Three-fold commutativity path -/
-def frame_meet_comm3 (a b c : F) :
+noncomputable def frame_meet_comm3 (a b c : F) :
     Path (fr.meet a (fr.meet b c))
          (fr.meet b (fr.meet a c)) :=
   let step1 := Path.symm (fr.meet_assoc a b c)
@@ -560,7 +560,7 @@ def frame_meet_comm3 (a b c : F) :
   Path.trans step1 (Path.trans step2 step3)
 
 /-- Theorem 57: Join pentagon -/
-def frame_join_pentagon (a b c d : F) :
+noncomputable def frame_join_pentagon (a b c d : F) :
     Path (fr.join (fr.join (fr.join a b) c) d)
          (fr.join a (fr.join b (fr.join c d))) :=
   let step1 := fr.join_assoc (fr.join a b) c d
@@ -568,20 +568,20 @@ def frame_join_pentagon (a b c d : F) :
   Path.trans step1 step2
 
 /-- Theorem 58: Absorption chain -/
-def frame_absorption_chain (a b : F) :
+noncomputable def frame_absorption_chain (a b : F) :
     Path (fr.meet a (fr.join a (fr.meet a b))) a :=
   let inner := fr.absorb_jm a b
   let step1 := frame_meet_congrR fr a (fr.join a (fr.meet a b)) a inner
   Path.trans step1 (fr.meet_idem a)
 
 /-- Theorem 59: Nucleus preserves frame meet associativity -/
-def nucleus_meet_assoc (a b c : F) :
+noncomputable def nucleus_meet_assoc (a b c : F) :
     Path (nu.j (fr.meet (fr.meet a b) c))
          (nu.j (fr.meet a (fr.meet b c))) :=
   Path.congrArg nu.j (fr.meet_assoc a b c)
 
 /-- Theorem 60: Nucleus distributes over frame meet twice -/
-def nucleus_meet_expand (a b c : F) :
+noncomputable def nucleus_meet_expand (a b c : F) :
     Path (nu.j (fr.meet a (fr.meet b c)))
          (fr.meet (nu.j a) (fr.meet (nu.j b) (nu.j c))) :=
   let step1 := nu.pres_meet a (fr.meet b c)
@@ -589,7 +589,7 @@ def nucleus_meet_expand (a b c : F) :
   Path.trans step1 step2
 
 /-- Theorem 61: Frame hom composition preserves meet -/
-def frameHom_comp_meet {H : Type u} {frH : Frame H}
+noncomputable def frameHom_comp_meet {H : Type u} {frH : Frame H}
     (g : FrameHom G H frG frH) (f : FrameHom F G fr frG) (a b : F) :
     Path (g.fn (f.fn (fr.meet a b)))
          (frH.meet (g.fn (f.fn a)) (g.fn (f.fn b))) :=
@@ -598,12 +598,12 @@ def frameHom_comp_meet {H : Type u} {frH : Frame H}
   Path.trans step1 step2
 
 /-- Theorem 62: Nucleus on sup idempotent -/
-def nucleus_sup_idem {I : Type u} (s : I → F) :
+noncomputable def nucleus_sup_idem {I : Type u} (s : I → F) :
     Path (nu.j (nu.j (fr.sup s))) (nu.j (fr.sup s)) :=
   nu.idempotent (fr.sup s)
 
 /-- Theorem 63: Four-fold meet associativity for joins -/
-def frame_join_comm3 (a b c : F) :
+noncomputable def frame_join_comm3 (a b c : F) :
     Path (fr.join a (fr.join b c))
          (fr.join b (fr.join a c)) :=
   let step1 := Path.symm (fr.join_assoc a b c)
@@ -612,13 +612,13 @@ def frame_join_comm3 (a b c : F) :
   Path.trans step1 (Path.trans step2 step3)
 
 /-- Theorem 64: Infinite distributivity then nucleus -/
-def nucleus_inf_dist (a : F) {I : Type u} (b : I → F) :
+noncomputable def nucleus_inf_dist (a : F) {I : Type u} (b : I → F) :
     Path (nu.j (fr.meet a (fr.sup b)))
          (nu.j (fr.sup (fun i => fr.meet a (b i)))) :=
   Path.congrArg nu.j (fr.inf_dist a b)
 
 /-- Theorem 65: Nucleus applied to congruent meet arguments -/
-def nucleus_congr_meet (a b c d : F) (p : Path a c) (q : Path b d) :
+noncomputable def nucleus_congr_meet (a b c d : F) (p : Path a c) (q : Path b d) :
     Path (nu.j (fr.meet a b)) (nu.j (fr.meet c d)) :=
   Path.congrArg nu.j
     (Path.trans (frame_meet_congrL fr a c b p) (frame_meet_congrR fr c b d q))

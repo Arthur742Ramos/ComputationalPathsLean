@@ -98,7 +98,7 @@ structure DerivedDifferential (C : ExactCouple) where
   compatible_q : C.j_dq + C.k_dq = ddq
 
 /-- Construct the derived differential from an exact couple. -/
-def mkDerivedDifferential (C : ExactCouple) : DerivedDifferential C where
+noncomputable def mkDerivedDifferential (C : ExactCouple) : DerivedDifferential C where
   ddp := C.j_dp + C.k_dp
   ddq := C.j_dq + C.k_dq
   compatible_p := rfl
@@ -136,12 +136,12 @@ structure SpectralMor (S T : SpectralSeq) where
     (S.page r).module.component p q → (T.page r).module.component p q
 
 /-- Morphism composition. -/
-def SpectralMor.comp {S T U : SpectralSeq}
+noncomputable def SpectralMor.comp {S T U : SpectralSeq}
     (g : SpectralMor T U) (f : SpectralMor S T) : SpectralMor S U where
   pageMap := fun r p q x => g.pageMap r p q (f.pageMap r p q x)
 
 /-- Identity morphism. -/
-def SpectralMor.id (S : SpectralSeq) : SpectralMor S S where
+noncomputable def SpectralMor.id (S : SpectralSeq) : SpectralMor S S where
   pageMap := fun _ _ _ x => x
 
 /-- Identity morphism is neutral on the left. -/
@@ -171,7 +171,7 @@ structure Filtration (X : Type u) where
   nested : ∀ p : Int, ∀ x : X, level p x → level (p + 1) x
 
 /-- The associated graded of a filtration. -/
-def assocGraded (X : Type u) (F : Filtration X) (p : Int) : Type u :=
+noncomputable def assocGraded (X : Type u) (F : Filtration X) (p : Int) : Type u :=
   { x : X // F.level p x ∧ ¬F.level (p - 1) x }
 
 /-- Filtration bounded below: F_p = ∅ for p < N. -/
@@ -192,7 +192,7 @@ structure EdgeMap (S : SpectralSeq) (r : Nat) (p : Int) (T : Type u) where
   toFun : (S.page r).module.component p 0 → T
 
 /-- Composition of edge maps with page inclusion. -/
-def EdgeMap.compose {S : SpectralSeq} {r : Nat} {p : Int} {T U : Type u}
+noncomputable def EdgeMap.compose {S : SpectralSeq} {r : Nat} {p : Int} {T U : Type u}
     (g : T → U) (f : EdgeMap S r p T) : EdgeMap S r p U where
   toFun := g ∘ f.toFun
 

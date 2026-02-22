@@ -49,12 +49,12 @@ inductive SmashRel (X Y : PtdType.{u}) :
       SmashRel X Y p p
 
 /-- The smash product X ∧ Y as a pointed type. -/
-def Smash (X Y : PtdType.{u}) : PtdType.{u} where
+noncomputable def Smash (X Y : PtdType.{u}) : PtdType.{u} where
   carrier := Quot (SmashRel X Y)
   pt := Quot.mk _ (X.pt, Y.pt)
 
 /-- Canonical inclusion X × Y → X ∧ Y. -/
-def smashMk (X Y : PtdType.{u}) (x : X.carrier) (y : Y.carrier) :
+noncomputable def smashMk (X Y : PtdType.{u}) (x : X.carrier) (y : Y.carrier) :
     (Smash X Y).carrier :=
   Quot.mk _ (x, y)
 
@@ -89,7 +89,7 @@ structure BiPtdMap (X Y Z : PtdType.{u}) where
   map_baseR : ∀ y, toFun X.pt y = Z.pt
 
 /-- The universal property: a bipointed map induces a pointed map on the smash product. -/
-def smash_universal {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z) :
+noncomputable def smash_universal {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z) :
     PtdMap (Smash X Y) Z where
   toFun := Quot.lift (fun p => f.toFun p.1 p.2) (by
     intro a b r
@@ -122,7 +122,7 @@ theorem smash_universal_unique {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z)
 /-! ## Commutativity: X ∧ Y ≃ Y ∧ X -/
 
 /-- The swap map X ∧ Y → Y ∧ X. -/
-def smashSwap (X Y : PtdType.{u}) : PtdMap (Smash X Y) (Smash Y X) where
+noncomputable def smashSwap (X Y : PtdType.{u}) : PtdMap (Smash X Y) (Smash Y X) where
   toFun := Quot.lift (fun p => smashMk Y X p.2 p.1) (by
     intro a b r
     cases r with
@@ -141,7 +141,7 @@ theorem smashSwap_smashSwap (X Y : PtdType.{u})
   | _ p => rfl
 
 /-- Commutativity equivalence: X ∧ Y ≃ Y ∧ X. -/
-def smash_comm_equiv (X Y : PtdType.{u}) :
+noncomputable def smash_comm_equiv (X Y : PtdType.{u}) :
     SimpleEquiv (Smash X Y).carrier (Smash Y X).carrier where
   toFun := (smashSwap X Y).toFun
   invFun := (smashSwap Y X).toFun
@@ -151,7 +151,7 @@ def smash_comm_equiv (X Y : PtdType.{u}) :
 /-! ## Associativity: (X ∧ Y) ∧ Z ≃ X ∧ (Y ∧ Z) -/
 
 /-- Helper map (X ∧ Y) → X ∧ (Y ∧ Z) for fixed z. -/
-def smashAssocFun (X Y Z : PtdType.{u}) (z : Z.carrier) :
+noncomputable def smashAssocFun (X Y Z : PtdType.{u}) (z : Z.carrier) :
     (Smash X Y).carrier → (Smash X (Smash Y Z)).carrier :=
   Quot.lift
     (fun p : X.carrier × Y.carrier =>
@@ -198,19 +198,19 @@ theorem smashAssocFun_baseR (X Y Z : PtdType.{u}) (z : Z.carrier) :
     (smash_baseR X (Smash Y Z) (smashMk Y Z Y.pt z))
 
 /-- Bipointed map for associativity. -/
-def smashAssocBi (X Y Z : PtdType.{u}) :
+noncomputable def smashAssocBi (X Y Z : PtdType.{u}) :
     BiPtdMap (Smash X Y) Z (Smash X (Smash Y Z)) where
   toFun := fun a z => smashAssocFun X Y Z z a
   map_baseL := fun a => smashAssocFun_baseL X Y Z a
   map_baseR := fun z => smashAssocFun_baseR X Y Z z
 
 /-- The associativity map (X ∧ Y) ∧ Z → X ∧ (Y ∧ Z). -/
-def smashAssoc (X Y Z : PtdType.{u}) :
+noncomputable def smashAssoc (X Y Z : PtdType.{u}) :
     PtdMap (Smash (Smash X Y) Z) (Smash X (Smash Y Z)) :=
   smash_universal (smashAssocBi X Y Z)
 
 /-- Helper map X ∧ (Y ∧ Z) → (X ∧ Y) ∧ Z for fixed x. -/
-def smashAssocInvFun (X Y Z : PtdType.{u}) (x : X.carrier) :
+noncomputable def smashAssocInvFun (X Y Z : PtdType.{u}) (x : X.carrier) :
     (Smash Y Z).carrier → (Smash (Smash X Y) Z).carrier :=
   Quot.lift
     (fun p : Y.carrier × Z.carrier =>
@@ -256,14 +256,14 @@ theorem smashAssocInvFun_baseR (X Y Z : PtdType.{u}) (yz : (Smash Y Z).carrier) 
         _ = (Smash (Smash X Y) Z).pt := smash_baseR (Smash X Y) Z p.2
 
 /-- Bipointed map for the inverse associativity. -/
-def smashAssocInvBi (X Y Z : PtdType.{u}) :
+noncomputable def smashAssocInvBi (X Y Z : PtdType.{u}) :
     BiPtdMap X (Smash Y Z) (Smash (Smash X Y) Z) where
   toFun := fun x yz => smashAssocInvFun X Y Z x yz
   map_baseL := fun x => smashAssocInvFun_baseL X Y Z x
   map_baseR := fun yz => smashAssocInvFun_baseR X Y Z yz
 
 /-- The inverse associativity map X ∧ (Y ∧ Z) → (X ∧ Y) ∧ Z. -/
-def smashAssocInv (X Y Z : PtdType.{u}) :
+noncomputable def smashAssocInv (X Y Z : PtdType.{u}) :
     PtdMap (Smash X (Smash Y Z)) (Smash (Smash X Y) Z) :=
   smash_universal (smashAssocInvBi X Y Z)
 
@@ -290,7 +290,7 @@ theorem smashAssoc_smashAssocInv (X Y Z : PtdType.{u})
           | _ q => rfl
 
 /-- Associativity equivalence: (X ∧ Y) ∧ Z ≃ X ∧ (Y ∧ Z). -/
-def smash_assoc_equiv (X Y Z : PtdType.{u}) :
+noncomputable def smash_assoc_equiv (X Y Z : PtdType.{u}) :
     SimpleEquiv (Smash (Smash X Y) Z).carrier (Smash X (Smash Y Z)).carrier where
   toFun := (smashAssoc X Y Z).toFun
   invFun := (smashAssocInv X Y Z).toFun
@@ -324,7 +324,7 @@ theorem smash_universal_prop {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z) :
   ⟨smash_universal f, fun x y => smash_universal_mk f x y⟩
 
 /-- The bipointed map that swaps arguments. -/
-def BiPtdMap.swap {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z) :
+noncomputable def BiPtdMap.swap {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z) :
     BiPtdMap Y X Z where
   toFun := fun y x => f.toFun x y
   map_baseL := fun y => f.map_baseR y

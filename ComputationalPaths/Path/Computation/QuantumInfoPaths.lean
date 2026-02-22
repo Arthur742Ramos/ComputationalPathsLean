@@ -23,18 +23,18 @@ structure DensityMatrix where
   coh : Nat
 deriving DecidableEq, Repr
 
-@[simp] def DensityMatrix.trace (ρ : DensityMatrix) : Nat := ρ.p00 + ρ.p11
-@[simp] def DensityMatrix.entropy (ρ : DensityMatrix) : Nat := ρ.p00 * ρ.p11 - ρ.coh * ρ.coh
+@[simp] noncomputable def DensityMatrix.trace (ρ : DensityMatrix) : Nat := ρ.p00 + ρ.p11
+@[simp] noncomputable def DensityMatrix.entropy (ρ : DensityMatrix) : Nat := ρ.p00 * ρ.p11 - ρ.coh * ρ.coh
 
-def isPure (ρ : DensityMatrix) : Prop := ρ.coh * ρ.coh = ρ.p00 * ρ.p11
-def isMixed (ρ : DensityMatrix) : Prop := ρ.coh * ρ.coh < ρ.p00 * ρ.p11
+noncomputable def isPure (ρ : DensityMatrix) : Prop := ρ.coh * ρ.coh = ρ.p00 * ρ.p11
+noncomputable def isMixed (ρ : DensityMatrix) : Prop := ρ.coh * ρ.coh < ρ.p00 * ρ.p11
 
 /-! ## Named states -/
 
-@[simp] def pureZero : DensityMatrix := ⟨1, 0, 0⟩
-@[simp] def pureOne : DensityMatrix := ⟨0, 1, 0⟩
-@[simp] def maxMixed : DensityMatrix := ⟨1, 1, 0⟩
-@[simp] def purePlus : DensityMatrix := ⟨1, 1, 1⟩
+@[simp] noncomputable def pureZero : DensityMatrix := ⟨1, 0, 0⟩
+@[simp] noncomputable def pureOne : DensityMatrix := ⟨0, 1, 0⟩
+@[simp] noncomputable def maxMixed : DensityMatrix := ⟨1, 1, 0⟩
+@[simp] noncomputable def purePlus : DensityMatrix := ⟨1, 1, 1⟩
 
 /-! ## Quantum operations -/
 
@@ -47,7 +47,7 @@ inductive QOp : Type where
   | ampDamp    : QOp
 deriving DecidableEq, Repr
 
-@[simp] def QOp.apply : QOp → DensityMatrix → DensityMatrix
+@[simp] noncomputable def QOp.apply : QOp → DensityMatrix → DensityMatrix
   | .identity,   ρ => ρ
   | .dephase,    ρ => ⟨ρ.p00, ρ.p11, 0⟩
   | .bitFlip,    ρ => ⟨ρ.p11, ρ.p00, ρ.coh⟩
@@ -57,11 +57,11 @@ deriving DecidableEq, Repr
 /-- A quantum channel is a list of operations applied sequentially. -/
 abbrev QChannel := List QOp
 
-@[simp] def QChannel.apply : QChannel → DensityMatrix → DensityMatrix
+@[simp] noncomputable def QChannel.apply : QChannel → DensityMatrix → DensityMatrix
   | [],        ρ => ρ
   | op :: ops, ρ => QChannel.apply ops (op.apply ρ)
 
-@[simp] def QChannel.compose (c1 c2 : QChannel) : QChannel :=
+@[simp] noncomputable def QChannel.compose (c1 c2 : QChannel) : QChannel :=
   (c1 : List QOp) ++ (c2 : List QOp)
 
 /-! ## Basic property theorems -/
@@ -123,10 +123,10 @@ theorem depolarize_trace (ρ : DensityMatrix) :
 
 /-! ## Fidelity and distance -/
 
-@[simp] def fidelity (ρ σ : DensityMatrix) : Nat :=
+@[simp] noncomputable def fidelity (ρ σ : DensityMatrix) : Nat :=
   ρ.p00 * σ.p00 + ρ.p11 * σ.p11 + ρ.coh * σ.coh
 
-@[simp] def traceDistance (ρ σ : DensityMatrix) : Nat :=
+@[simp] noncomputable def traceDistance (ρ σ : DensityMatrix) : Nat :=
   (if ρ.p00 ≥ σ.p00 then ρ.p00 - σ.p00 else σ.p00 - ρ.p00) +
   (if ρ.p11 ≥ σ.p11 then ρ.p11 - σ.p11 else σ.p11 - ρ.p11)
 
@@ -188,40 +188,40 @@ theorem bitFlip_twice_channel (ρ : DensityMatrix) :
 /-! ## Genuine Path constructions via refl / trans / symm / congrArg -/
 
 -- 35. Identity channel gives refl path
-def identity_path (ρ : DensityMatrix) : Path (QOp.identity.apply ρ) ρ :=
+noncomputable def identity_path (ρ : DensityMatrix) : Path (QOp.identity.apply ρ) ρ :=
   Path.refl ρ
 
 -- 36. CongrArg through trace
-def trace_congrArg {ρ σ : DensityMatrix} (p : Path ρ σ) :
+noncomputable def trace_congrArg {ρ σ : DensityMatrix} (p : Path ρ σ) :
     Path ρ.trace σ.trace :=
   Path.congrArg DensityMatrix.trace p
 
 -- 37. CongrArg through entropy
-def entropy_congrArg {ρ σ : DensityMatrix} (p : Path ρ σ) :
+noncomputable def entropy_congrArg {ρ σ : DensityMatrix} (p : Path ρ σ) :
     Path ρ.entropy σ.entropy :=
   Path.congrArg DensityMatrix.entropy p
 
 -- 38. CongrArg through QOp.apply
-def qop_congrArg (op : QOp) {ρ σ : DensityMatrix} (p : Path ρ σ) :
+noncomputable def qop_congrArg (op : QOp) {ρ σ : DensityMatrix} (p : Path ρ σ) :
     Path (op.apply ρ) (op.apply σ) :=
   Path.congrArg op.apply p
 
 -- 39. CongrArg through fidelity (left)
-def fidelity_congrArg_left {ρ₁ ρ₂ : DensityMatrix} (σ : DensityMatrix)
+noncomputable def fidelity_congrArg_left {ρ₁ ρ₂ : DensityMatrix} (σ : DensityMatrix)
     (p : Path ρ₁ ρ₂) : Path (fidelity ρ₁ σ) (fidelity ρ₂ σ) :=
   Path.congrArg (fun ρ => fidelity ρ σ) p
 
 -- 40. CongrArg through fidelity (right)
-def fidelity_congrArg_right (ρ : DensityMatrix) {σ₁ σ₂ : DensityMatrix}
+noncomputable def fidelity_congrArg_right (ρ : DensityMatrix) {σ₁ σ₂ : DensityMatrix}
     (p : Path σ₁ σ₂) : Path (fidelity ρ σ₁) (fidelity ρ σ₂) :=
   Path.congrArg (fidelity ρ) p
 
 -- 41. Symm of a density matrix path
-def dm_symm {ρ σ : DensityMatrix} (p : Path ρ σ) : Path σ ρ :=
+noncomputable def dm_symm {ρ σ : DensityMatrix} (p : Path ρ σ) : Path σ ρ :=
   Path.symm p
 
 -- 42. Trans of density matrix paths
-def dm_trans {ρ σ τ : DensityMatrix} (p : Path ρ σ) (q : Path σ τ) : Path ρ τ :=
+noncomputable def dm_trans {ρ σ τ : DensityMatrix} (p : Path ρ σ) (q : Path σ τ) : Path ρ τ :=
   Path.trans p q
 
 -- 43. Refl is left identity for trans
@@ -256,7 +256,7 @@ theorem congrArg_trace_symm {ρ σ : DensityMatrix} (p : Path ρ σ) :
 /-! ## Transport -/
 
 -- 49. Transport a predicate along a density matrix path
-def transport_isPure {ρ σ : DensityMatrix} (p : Path ρ σ) (h : isPure ρ) :
+noncomputable def transport_isPure {ρ σ : DensityMatrix} (p : Path ρ σ) (h : isPure ρ) :
     isPure σ :=
   Path.transport (D := isPure) p h
 

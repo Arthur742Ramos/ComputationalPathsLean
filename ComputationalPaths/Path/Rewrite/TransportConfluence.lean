@@ -128,7 +128,7 @@ structure TransportCriticalPair where
 
   **Verdict**: Sequential, no true critical pair. The reduction
   `symm (stepChain ...) →* symm refl → refl` is confluent. -/
-def cp_symm_transport_refl : TransportCriticalPair where
+noncomputable def cp_symm_transport_refl : TransportCriticalPair where
   description := "symm applied to transport_refl result — sequential, no overlap"
   joinable := true
   completion_rule := none
@@ -142,7 +142,7 @@ def cp_symm_transport_refl : TransportCriticalPair where
   - No genuine overlap since they don't share a redex.
 
   **Verdict**: Orthogonal — different positions, joinable by commutation. -/
-def cp_assoc_transport_trans : TransportCriticalPair where
+noncomputable def cp_assoc_transport_trans : TransportCriticalPair where
   description := "trans_assoc and transport_trans at different positions — orthogonal"
   joinable := true
   completion_rule := none
@@ -156,7 +156,7 @@ def cp_assoc_transport_trans : TransportCriticalPair where
   - Both paths yield `q`
 
   **Verdict**: Joinable — both paths reach `q`. -/
-def cp_trans_refl_left_transport : TransportCriticalPair where
+noncomputable def cp_trans_refl_left_transport : TransportCriticalPair where
   description := "trans_refl_left after transport_refl_beta — joinable at q"
   joinable := true
   completion_rule := none
@@ -172,7 +172,7 @@ def cp_trans_refl_left_transport : TransportCriticalPair where
 
   **Verdict**: Different sorts — no critical pair. Path normalization
   and transport reduction are orthogonal. -/
-def cp_nested_transport : TransportCriticalPair where
+noncomputable def cp_nested_transport : TransportCriticalPair where
   description := "nested transport with reducible path argument — different sorts"
   joinable := true
   completion_rule := none
@@ -191,7 +191,7 @@ def cp_nested_transport : TransportCriticalPair where
   **Verdict**: Requires proof that both paths yield the same value.
   In our system this is handled by `step_toEq` — both reduce to the
   same propositional equality. -/
-def cp_transport_inverse : TransportCriticalPair where
+noncomputable def cp_transport_inverse : TransportCriticalPair where
   description := "transport along p∘symm(p) vs transport along refl"
   joinable := true
   completion_rule := none
@@ -199,7 +199,7 @@ def cp_transport_inverse : TransportCriticalPair where
 /-! ## Summary of Critical Pair Analysis -/
 
 /-- All identified transport-vs-groupoid critical pairs. -/
-def allTransportCriticalPairs : List TransportCriticalPair :=
+noncomputable def allTransportCriticalPairs : List TransportCriticalPair :=
   [cp_symm_transport_refl,
    cp_assoc_transport_trans,
    cp_trans_refl_left_transport,

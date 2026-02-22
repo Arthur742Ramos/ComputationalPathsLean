@@ -35,7 +35,7 @@ inductive S0 where
   | top  : S0
 
 /-- S⁰ as a pointed type (SuspensionLoop.Pointed). -/
-def S0Pointed : SuspensionLoop.Pointed where
+noncomputable def S0Pointed : SuspensionLoop.Pointed where
   carrier := S0
   pt := S0.base
 
@@ -46,14 +46,14 @@ structure SmashPentagon where
   pentagon_comm : True
 
 /-- A trivial pentagon witness. -/
-def trivialPentagon : SmashPentagon where
+noncomputable def trivialPentagon : SmashPentagon where
   pentagon_comm := trivial
 
 /-- The triangle data for smash unitality. -/
 structure SmashTriangleCoherence where
   triangle_comm : True
 
-def trivialTriangleCoherence : SmashTriangleCoherence where
+noncomputable def trivialTriangleCoherence : SmashTriangleCoherence where
   triangle_comm := trivial
 
 /-! ## Ring spectra -/
@@ -112,7 +112,7 @@ structure ModuleSpectrum (R : RingSpectrum) where
       p = act 0 m R.unit x
 
 /-- The ring spectrum viewed as a module over itself. -/
-def RingSpectrum.selfModule (R : RingSpectrum) : ModuleSpectrum R where
+noncomputable def RingSpectrum.selfModule (R : RingSpectrum) : ModuleSpectrum R where
   spectrum := R.spectrum
   act := R.mul
   act_unit := R.mul_unit_left
@@ -138,7 +138,7 @@ structure SpectrumSmash (E F : SpectrumTheory.Spectrum) where
     (E.level n).carrier → (F.level m).carrier →
     (result.level (n + m)).carrier
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

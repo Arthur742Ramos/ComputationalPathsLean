@@ -96,21 +96,21 @@ variable {a b : A}
 
 /-- Any two derivations with the same source and target are connected.
     This is the foundation for deriving all level-3 coherences. -/
-def connect {p q : Path a b} (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
+noncomputable def connect {p q : Path a b} (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
   contractibility₃ d₁ d₂
 
 /-- The groupoid law `vcomp_refl_left` is a special case of contractibility. -/
-def derive_vcomp_refl_left {p q : Path a b} (d : Derivation₂ p q) :
+noncomputable def derive_vcomp_refl_left {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ (.vcomp (.refl p) d) d :=
   connect (.vcomp (.refl p) d) d
 
 /-- The groupoid law `vcomp_refl_right` is a special case of contractibility. -/
-def derive_vcomp_refl_right {p q : Path a b} (d : Derivation₂ p q) :
+noncomputable def derive_vcomp_refl_right {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ (.vcomp d (.refl q)) d :=
   connect (.vcomp d (.refl q)) d
 
 /-- Associativity `vcomp_assoc` is a special case of contractibility. -/
-def derive_vcomp_assoc {p q r s : Path a b}
+noncomputable def derive_vcomp_assoc {p q r s : Path a b}
     (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) (d₃ : Derivation₂ r s) :
     Derivation₃ (.vcomp (.vcomp d₁ d₂) d₃) (.vcomp d₁ (.vcomp d₂ d₃)) :=
   connect (.vcomp (.vcomp d₁ d₂) d₃) (.vcomp d₁ (.vcomp d₂ d₃))

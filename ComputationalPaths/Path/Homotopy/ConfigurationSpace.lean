@@ -68,7 +68,7 @@ abbrev OrderedConfig (A : Type u) (n : Nat) : Type u :=
   CompPath.ConfigurationSpace A n
 
 /-- The forgetful map: drop the last point from an (n+1)-configuration. -/
-def forgetLast {A : Type u} {n : Nat}
+noncomputable def forgetLast {A : Type u} {n : Nat}
     (c : OrderedConfig A (n + 1)) : OrderedConfig A n :=
   ⟨fun i => c.val ⟨i.val, by omega⟩,
    fun {i j} hij hpath => by
@@ -88,7 +88,7 @@ theorem forgetLast_val {A : Type u} {n : Nat}
   rfl
 
 /-- `Path`-typed forgetLast. -/
-def forgetLast_val_path {A : Type u} {n : Nat}
+noncomputable def forgetLast_val_path {A : Type u} {n : Nat}
     (c : OrderedConfig A (n + 1)) (i : Fin n) :
     Path ((forgetLast c).val i) (c.val ⟨i.val, by omega⟩) :=
   Path.refl _
@@ -109,14 +109,14 @@ structure Perm (n : Nat) where
 namespace Perm
 
 /-- Identity permutation. -/
-def id (n : Nat) : Perm n where
+noncomputable def id (n : Nat) : Perm n where
   toFun := _root_.id
   invFun := _root_.id
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
 /-- Composition of permutations. -/
-def comp {n : Nat} (σ τ : Perm n) : Perm n where
+noncomputable def comp {n : Nat} (σ τ : Perm n) : Perm n where
   toFun := σ.toFun ∘ τ.toFun
   invFun := τ.invFun ∘ σ.invFun
   left_inv := fun i => by
@@ -127,7 +127,7 @@ def comp {n : Nat} (σ τ : Perm n) : Perm n where
     rw [τ.right_inv, σ.right_inv]
 
 /-- Inverse permutation. -/
-def inv {n : Nat} (σ : Perm n) : Perm n where
+noncomputable def inv {n : Nat} (σ : Perm n) : Perm n where
   toFun := σ.invFun
   invFun := σ.toFun
   left_inv := σ.right_inv
@@ -145,7 +145,7 @@ theorem injective {n : Nat} (σ : Perm n) : Function.Injective σ.toFun := by
 end Perm
 
 /-- Act on a configuration by a permutation. -/
-def config_permutation_action {A : Type u} {n : Nat}
+noncomputable def config_permutation_action {A : Type u} {n : Nat}
     (σ : Perm n) (c : OrderedConfig A n) : OrderedConfig A n :=
   ⟨fun i => c.val (σ.toFun i),
    fun {i j} hij hpath => by
@@ -162,7 +162,7 @@ theorem config_action_id {A : Type u} {n : Nat}
   simp [config_permutation_action, Perm.id]
 
 /-- `Path`-typed action by identity. -/
-def config_action_id_path {A : Type u} {n : Nat}
+noncomputable def config_action_id_path {A : Type u} {n : Nat}
     (c : OrderedConfig A n) :
     Path (config_permutation_action (Perm.id n) c) c :=
   Path.stepChain (config_action_id c)
@@ -171,7 +171,7 @@ def config_action_id_path {A : Type u} {n : Nat}
 
 /-- The equivalence relation for unordered configurations:
     two ordered configurations are equivalent if one is a permutation of the other. -/
-def configEquivRel {A : Type u} {n : Nat} :
+noncomputable def configEquivRel {A : Type u} {n : Nat} :
     OrderedConfig A n → OrderedConfig A n → Prop :=
   fun c1 c2 => ∃ σ : Perm n, config_permutation_action σ c1 = c2
 
@@ -181,11 +181,11 @@ theorem configEquivRel_refl {A : Type u} {n : Nat}
   ⟨Perm.id n, config_action_id c⟩
 
 /-- The unordered configuration space as a quotient. -/
-def UnorderedConfig (A : Type u) (n : Nat) : Type u :=
+noncomputable def UnorderedConfig (A : Type u) (n : Nat) : Type u :=
   Quot (@configEquivRel A n)
 
 /-- Project an ordered configuration to an unordered one. -/
-def toUnordered {A : Type u} {n : Nat}
+noncomputable def toUnordered {A : Type u} {n : Nat}
     (c : OrderedConfig A n) : UnorderedConfig A n :=
   Quot.mk configEquivRel c
 
@@ -199,7 +199,7 @@ theorem toUnordered_perm {A : Type u} {n : Nat}
     simp [config_permutation_action, Perm.inv, σ.right_inv]⟩
 
 /-- `Path`-typed permutation invariance. -/
-def toUnordered_perm_path {A : Type u} {n : Nat}
+noncomputable def toUnordered_perm_path {A : Type u} {n : Nat}
     (σ : Perm n) (c : OrderedConfig A n) :
     Path (toUnordered (config_permutation_action σ c)) (toUnordered c) :=
   Path.stepChain (toUnordered_perm σ c)
@@ -219,7 +219,7 @@ variable {A : Type u} {n : Nat}
 
 /-- The fiber of the FN projection over a configuration c is the set of
     points in A that are distinct from all points in c. -/
-def fiberDescription (_fn : FadellNeuwirthData A n)
+noncomputable def fiberDescription (_fn : FadellNeuwirthData A n)
     (c : OrderedConfig A n) : Type u :=
   { a : A // ∀ (i : Fin n), Path (c.val i) a → False }
 
@@ -230,7 +230,7 @@ theorem fn_proj_extends (fn : FadellNeuwirthData A n)
   rw [fn.proj_eq]
 
 /-- `Path`-typed FN projection. -/
-def fn_proj_path (fn : FadellNeuwirthData A n)
+noncomputable def fn_proj_path (fn : FadellNeuwirthData A n)
     (c : OrderedConfig A (n + 1)) :
     Path (fn.proj c) (forgetLast c) :=
   Path.stepChain (fn.fn_proj_extends c)
@@ -238,7 +238,7 @@ def fn_proj_path (fn : FadellNeuwirthData A n)
 end FadellNeuwirthData
 
 /-- Canonical Fadell-Neuwirth data. -/
-def canonicalFN (A : Type u) (n : Nat) : FadellNeuwirthData A n where
+noncomputable def canonicalFN (A : Type u) (n : Nat) : FadellNeuwirthData A n where
   proj := forgetLast
   proj_eq := rfl
 
@@ -287,21 +287,21 @@ structure BraidRelation (bg : BraidGroupData n) where
     bg.mul (bg.mul (bg.gen j) (bg.gen i)) (bg.gen j)
 
 /-- `Path`-typed far commutativity. -/
-def far_comm_path (bg : BraidGroupData n) (fc : FarCommutativity bg)
+noncomputable def far_comm_path (bg : BraidGroupData n) (fc : FarCommutativity bg)
     (i j : Fin (n - 1))
     (h : i.val + 2 ≤ j.val ∨ j.val + 2 ≤ i.val) :
     Path (bg.mul (bg.gen i) (bg.gen j)) (bg.mul (bg.gen j) (bg.gen i)) :=
   Path.stepChain (fc.far_comm i j h)
 
 /-- `Path`-typed braid relation. -/
-def braid_rel_path (bg : BraidGroupData n) (br : BraidRelation bg)
+noncomputable def braid_rel_path (bg : BraidGroupData n) (br : BraidRelation bg)
     (i j : Fin (n - 1)) (h : j.val = i.val + 1) :
     Path (bg.mul (bg.mul (bg.gen i) (bg.gen j)) (bg.gen i))
          (bg.mul (bg.mul (bg.gen j) (bg.gen i)) (bg.gen j)) :=
   Path.stepChain (br.braid_rel i j h)
 
 /-- `Path`-typed associativity. -/
-def mul_assoc_path (bg : BraidGroupData n) (a b c : bg.Braid) :
+noncomputable def mul_assoc_path (bg : BraidGroupData n) (a b c : bg.Braid) :
     Path (bg.mul (bg.mul a b) c) (bg.mul a (bg.mul b c)) :=
   Path.stepChain (bg.mul_assoc a b c)
 
@@ -329,7 +329,7 @@ namespace PureBraidGroupData
 variable {n : Nat}
 
 /-- `Path`-typed inclusion of identity. -/
-def incl_e_path (pb : PureBraidGroupData n) :
+noncomputable def incl_e_path (pb : PureBraidGroupData n) :
     Path (pb.incl pb.e) pb.braid.e :=
   Path.stepChain pb.incl_e
 
@@ -353,7 +353,7 @@ namespace PlaneConfigData
 variable {n : Nat}
 
 /-- `Path`-typed configuration identification. -/
-def config_path (pc : PlaneConfigData n) :
+noncomputable def config_path (pc : PlaneConfigData n) :
     Path pc.config (OrderedConfig pc.Plane n) :=
   Path.stepChain pc.config_eq
 

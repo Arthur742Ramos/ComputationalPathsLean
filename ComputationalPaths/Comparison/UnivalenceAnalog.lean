@@ -34,21 +34,21 @@ structure PathEquiv (α β : Type u) : Type (u + 1) where
 namespace PathEquiv
 
 /-- The identity path-equivalence. -/
-@[simp] def refl (α : Type u) : PathEquiv α α where
+@[simp] noncomputable def refl (α : Type u) : PathEquiv α α where
   toFun    := id
   invFun   := id
   left_inv  := fun x => Path.refl x
   right_inv := fun x => Path.refl x
 
 /-- Symmetry of path-equivalences. -/
-@[simp] def symm {α β : Type u} (e : PathEquiv α β) : PathEquiv β α where
+@[simp] noncomputable def symm {α β : Type u} (e : PathEquiv α β) : PathEquiv β α where
   toFun    := e.invFun
   invFun   := e.toFun
   left_inv  := e.right_inv
   right_inv := e.left_inv
 
 /-- Composition of path-equivalences. -/
-@[simp] def comp {α β γ : Type u} (e : PathEquiv α β) (f : PathEquiv β γ) :
+@[simp] noncomputable def comp {α β γ : Type u} (e : PathEquiv α β) (f : PathEquiv β γ) :
     PathEquiv α γ where
   toFun  := fun x => f.toFun (e.toFun x)
   invFun := fun z => e.invFun (f.invFun z)
@@ -69,7 +69,7 @@ end PathEquiv
 
 /-- Convert a type-level computational path into a path-equivalence via
     transport. -/
-def idToEquiv {α β : Type u} (p : @Path (Type u) α β) : PathEquiv α β where
+noncomputable def idToEquiv {α β : Type u} (p : @Path (Type u) α β) : PathEquiv α β where
   toFun  := fun x => Path.transport (D := fun X : Type u => X) p x
   invFun := fun y => Path.transport (D := fun X : Type u => X) (Path.symm p) y
   left_inv := fun x => by
@@ -131,7 +131,7 @@ theorem transport_self_type {α : Type} (p : @Path (Type) α α) (x : α) :
       subst this; rfl
 
 /-- A `Bool`-negation path-equivalence. -/
-def boolNegEquiv : PathEquiv Bool Bool where
+noncomputable def boolNegEquiv : PathEquiv Bool Bool where
   toFun    := Bool.not
   invFun   := Bool.not
   left_inv := fun b => by cases b <;> exact Path.stepChain rfl
@@ -169,9 +169,9 @@ whose `toEq` coincide (both are `rfl`) but whose step-traces differ,
 hence they are `RwEq`-inequivalent in the sense that one is obtained
 by an identity rewrite the other is not.  This demonstrates that
 computational paths carry *strictly finer* information than HoTT paths. -/
-def path_bool_refl_1 : @Path (Type) Bool Bool := Path.refl Bool
+noncomputable def path_bool_refl_1 : @Path (Type) Bool Bool := Path.refl Bool
 
-def path_bool_refl_2 : @Path (Type) Bool Bool :=
+noncomputable def path_bool_refl_2 : @Path (Type) Bool Bool :=
   Path.trans (Path.refl Bool) (Path.refl Bool)
 
 /-- The two paths have the same `toEq` but different step traces. -/

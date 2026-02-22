@@ -30,7 +30,7 @@ structure PathFilter (A : Type u) {a b : A} where
   superset : ∀ p q : Path a b, mem p → (mem p → mem q) → mem q
 
 /-- The universal filter containing all paths -/
-def universalFilter {a b : A} : PathFilter A (a := a) (b := b) where
+noncomputable def universalFilter {a b : A} : PathFilter A (a := a) (b := b) where
   mem := fun _ => True
   univ_mem := fun _ _ => trivial
   inter_mem := fun p _ _ _ => ⟨p, trivial⟩
@@ -42,7 +42,7 @@ theorem universalFilter_mem {a b : A} (p : Path a b) :
 
 /-! ## Principal filters -/
 
-def principalFilter {a b : A} (p₀ : Path a b) : PathFilter A (a := a) (b := b) where
+noncomputable def principalFilter {a b : A} (p₀ : Path a b) : PathFilter A (a := a) (b := b) where
   mem := fun p => p = p₀
   univ_mem := fun _ _ => trivial
   inter_mem := fun p q hp hq => ⟨p₀, rfl⟩
@@ -59,7 +59,7 @@ theorem principal_refl_mem (a : A) :
 /-! ## Filter maps -/
 
 /-- Map a filter through a function on paths -/
-def filterMap {a b : A} {c d : B}
+noncomputable def filterMap {a b : A} {c d : B}
     (f : Path a b → Path c d) (F : PathFilter A (a := a) (b := b)) :
     PathFilter B (a := c) (b := d) where
   mem := fun q => ∃ p, F.mem p ∧ f p = q
@@ -70,7 +70,7 @@ def filterMap {a b : A} {c d : B}
   superset := fun q1 q2 h1 h12 => h12 h1
 
 /-- congrArg induces a filter map -/
-def congrArgFilterMap {a b : A} (f : A → B)
+noncomputable def congrArgFilterMap {a b : A} (f : A → B)
     (F : PathFilter A (a := a) (b := b)) :
     PathFilter B (a := f a) (b := f b) :=
   filterMap (congrArg f) F
@@ -103,7 +103,7 @@ structure Convergence (A : Type u) {a b : A} where
   converges : filter.mem limit
 
 /-- Convergence to refl via the principal filter -/
-def convergesToRefl (a : A) : Convergence A (a := a) (b := a) where
+noncomputable def convergesToRefl (a : A) : Convergence A (a := a) (b := a) where
   filter := principalFilter (Path.refl a)
   limit := Path.refl a
   converges := rfl
@@ -121,7 +121,7 @@ theorem transport_convergence_limit {P : A → Type v} {a b : A}
 /-! ## Filter products -/
 
 /-- Product of two filters: both conditions hold -/
-def filterProd {a b : A} (F G : PathFilter A (a := a) (b := b)) :
+noncomputable def filterProd {a b : A} (F G : PathFilter A (a := a) (b := b)) :
     PathFilter A (a := a) (b := b) where
   mem := fun p => F.mem p ∧ G.mem p
   univ_mem := fun _ _ => trivial
@@ -163,7 +163,7 @@ structure FilterBase (A : Type u) {a b : A} where
   directed : ∀ p q, base p → base q → ∃ r, base r
 
 /-- Generate a filter from a base -/
-def filterOfBase {a b : A} (B : FilterBase A (a := a) (b := b)) :
+noncomputable def filterOfBase {a b : A} (B : FilterBase A (a := a) (b := b)) :
     PathFilter A (a := a) (b := b) where
   mem := fun p => ∃ q, B.base q ∧ (B.base q → p = q)
   univ_mem := fun _ _ => trivial
@@ -173,7 +173,7 @@ def filterOfBase {a b : A} (B : FilterBase A (a := a) (b := b)) :
   superset := fun p q hp hpq => hpq hp
 
 /-- The singleton base generates a principal filter -/
-def singletonBase {a b : A} (p : Path a b) :
+noncomputable def singletonBase {a b : A} (p : Path a b) :
     FilterBase A (a := a) (b := b) where
   base := fun q => q = p
   nonempty := ⟨p, rfl⟩

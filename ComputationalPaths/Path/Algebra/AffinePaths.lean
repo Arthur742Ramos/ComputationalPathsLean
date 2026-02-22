@@ -22,31 +22,31 @@ universe u
 abbrev Poly := List Int
 
 /-- Evaluate a polynomial at a point. -/
-@[simp] def evalPoly (p : Poly) (x : Int) : Int :=
+@[simp] noncomputable def evalPoly (p : Poly) (x : Int) : Int :=
   p.foldr (fun coeff acc => coeff + x * acc) 0
 
 /-- The zero polynomial. -/
-@[simp] def zeroPoly : Poly := []
+@[simp] noncomputable def zeroPoly : Poly := []
 
 /-- A constant polynomial. -/
-@[simp] def constPoly (c : Int) : Poly := [c]
+@[simp] noncomputable def constPoly (c : Int) : Poly := [c]
 
 /-- The identity polynomial x. -/
-@[simp] def varPoly : Poly := [0, 1]
+@[simp] noncomputable def varPoly : Poly := [0, 1]
 
 /-- Addition of polynomials (pointwise). -/
-@[simp] def addPoly : Poly → Poly → Poly
+@[simp] noncomputable def addPoly : Poly → Poly → Poly
   | [], q => q
   | p, [] => p
   | a :: p', b :: q' => (a + b) :: addPoly p' q'
 
 /-- Negation of a polynomial. -/
-@[simp] def negPoly : Poly → Poly
+@[simp] noncomputable def negPoly : Poly → Poly
   | [] => []
   | a :: p' => (-a) :: negPoly p'
 
 /-- Scalar multiplication. -/
-@[simp] def scalePoly (c : Int) : Poly → Poly
+@[simp] noncomputable def scalePoly (c : Int) : Poly → Poly
   | [] => []
   | a :: p' => (c * a) :: scalePoly c p'
 
@@ -56,10 +56,10 @@ abbrev Poly := List Int
 abbrev AffPoint := Int
 
 /-- Test if a point is a zero of a polynomial. -/
-@[simp] def isZero (p : Poly) (x : AffPoint) : Prop := evalPoly p x = 0
+@[simp] noncomputable def isZero (p : Poly) (x : AffPoint) : Prop := evalPoly p x = 0
 
 /-- The variety (zero set) predicate for a polynomial. -/
-@[simp] def variety (p : Poly) : AffPoint → Prop := fun x => isZero p x
+@[simp] noncomputable def variety (p : Poly) : AffPoint → Prop := fun x => isZero p x
 
 /-! ## Core properties -/
 
@@ -67,7 +67,7 @@ abbrev AffPoint := Int
 theorem eval_zero (x : AffPoint) : evalPoly zeroPoly x = 0 := by
   simp
 
-def eval_zero_path (x : AffPoint) : Path (evalPoly zeroPoly x) 0 :=
+noncomputable def eval_zero_path (x : AffPoint) : Path (evalPoly zeroPoly x) 0 :=
   by
     simpa [eval_zero x] using
       (Path.trans (Path.refl (0 : Int)) (Path.refl (0 : Int)))
@@ -76,7 +76,7 @@ def eval_zero_path (x : AffPoint) : Path (evalPoly zeroPoly x) 0 :=
 theorem eval_const (c : Int) (x : AffPoint) : evalPoly (constPoly c) x = c := by
   simp
 
-def eval_const_path (c : Int) (x : AffPoint) : Path (evalPoly (constPoly c) x) c :=
+noncomputable def eval_const_path (c : Int) (x : AffPoint) : Path (evalPoly (constPoly c) x) c :=
   by
     simpa [eval_const c x] using
       (Path.trans (Path.refl c) (Path.refl c))
@@ -85,7 +85,7 @@ def eval_const_path (c : Int) (x : AffPoint) : Path (evalPoly (constPoly c) x) c
 theorem eval_var (x : AffPoint) : evalPoly varPoly x = x := by
   simp [Int.mul_one, Int.mul_zero, Int.add_zero, Int.zero_add]
 
-def eval_var_path (x : AffPoint) : Path (evalPoly varPoly x) x :=
+noncomputable def eval_var_path (x : AffPoint) : Path (evalPoly varPoly x) x :=
   by
     simpa [eval_var x] using
       (Path.trans (Path.refl x) (Path.refl x))
@@ -100,7 +100,7 @@ theorem eval_scale_const (c a : Int) (x : AffPoint) :
     evalPoly (scalePoly c (constPoly a)) x = c * a := by
   simp [Int.mul_zero, Int.add_zero]
 
-def eval_scale_const_path (c a : Int) (x : AffPoint) :
+noncomputable def eval_scale_const_path (c a : Int) (x : AffPoint) :
     Path (evalPoly (scalePoly c (constPoly a)) x) (c * a) :=
   by
     simpa [eval_scale_const c a x] using
@@ -111,7 +111,7 @@ theorem eval_add_const (a b : Int) (x : AffPoint) :
     evalPoly (addPoly (constPoly a) (constPoly b)) x = a + b := by
   simp
 
-def eval_add_const_path (a b : Int) (x : AffPoint) :
+noncomputable def eval_add_const_path (a b : Int) (x : AffPoint) :
     Path (evalPoly (addPoly (constPoly a) (constPoly b)) x) (a + b) :=
   by
     simpa [eval_add_const a b x] using
@@ -137,7 +137,7 @@ theorem scalePoly_one (p : Poly) : scalePoly 1 p = p := by
   | nil => simp
   | cons a p' ih => simp [ih]
 
-def scalePoly_one_path (p : Poly) : Path (scalePoly 1 p) p :=
+noncomputable def scalePoly_one_path (p : Poly) : Path (scalePoly 1 p) p :=
   by
     simpa [scalePoly_one p] using
       (Path.trans (Path.refl p) (Path.refl p))
@@ -148,23 +148,23 @@ theorem negPoly_negPoly (p : Poly) : negPoly (negPoly p) = p := by
   | nil => simp
   | cons a p' ih => simp [ih]
 
-def negPoly_negPoly_path (p : Poly) : Path (negPoly (negPoly p)) p :=
+noncomputable def negPoly_negPoly_path (p : Poly) : Path (negPoly (negPoly p)) p :=
   by
     simpa [negPoly_negPoly p] using
       (Path.trans (Path.refl p) (Path.refl p))
 
 -- 13. Congruence: equal polynomials give equal evaluations
-def eval_congrArg {p q : Poly} (h : Path p q) (x : AffPoint) :
+noncomputable def eval_congrArg {p q : Poly} (h : Path p q) (x : AffPoint) :
     Path (evalPoly p x) (evalPoly q x) :=
   Path.congrArg (fun p => evalPoly p x) h
 
 -- 14. Congruence: equal points give equal evaluations
-def eval_congrArg_point (p : Poly) {x y : AffPoint} (h : Path x y) :
+noncomputable def eval_congrArg_point (p : Poly) {x y : AffPoint} (h : Path x y) :
     Path (evalPoly p x) (evalPoly p y) :=
   Path.congrArg (evalPoly p) h
 
 -- 15. Variety membership is preserved by polynomial equality
-def variety_transport {p q : Poly} (h : Path p q) (x : AffPoint) :
+noncomputable def variety_transport {p q : Poly} (h : Path p q) (x : AffPoint) :
     Path (variety p x) (variety q x) :=
   Path.congrArg (fun p => variety p x) h
 
@@ -174,7 +174,7 @@ theorem negPoly_negPoly_symm (p : Poly) :
   simp [negPoly_negPoly_path]
 
 -- 17. Transitivity chain: scale 1 then negate twice
-def scale_neg_chain (p : Poly) :
+noncomputable def scale_neg_chain (p : Poly) :
     Path (scalePoly 1 p) (negPoly (negPoly p)) :=
   Path.trans
     (scalePoly_one_path p)
@@ -185,7 +185,7 @@ theorem eval_neg_const (a : Int) (x : AffPoint) :
     evalPoly (negPoly (constPoly a)) x = -(evalPoly (constPoly a) x) := by
   simp
 
-def eval_neg_const_path (a : Int) (x : AffPoint) :
+noncomputable def eval_neg_const_path (a : Int) (x : AffPoint) :
     Path (evalPoly (negPoly (constPoly a)) x) (-(evalPoly (constPoly a) x)) :=
   by
     simpa [eval_neg_const a x] using
@@ -203,7 +203,7 @@ theorem const_nonzero_empty_variety (c : Int) (hc : c ≠ 0) (x : AffPoint) :
   simp [hc]
 
 -- 21. Morphism composition: evaluate at composition of maps
-def eval_compose_path (p : Poly) (f : AffPoint → AffPoint) (x : AffPoint) :
+noncomputable def eval_compose_path (p : Poly) (f : AffPoint → AffPoint) (x : AffPoint) :
     Path (evalPoly p (f x)) (evalPoly p (f x)) :=
   Path.trans
     (Path.refl (evalPoly p (f x)))
@@ -218,22 +218,22 @@ theorem zariski_const_inter (a b : Int) (x : AffPoint)
   omega
 
 -- 23. Transport evaluation along point path
-def transport_eval (p : Poly) {x y : AffPoint} (h : Path x y) :
+noncomputable def transport_eval (p : Poly) {x y : AffPoint} (h : Path x y) :
     Path (evalPoly p x) (evalPoly p y) :=
   Path.congrArg (evalPoly p) h
 
 -- 24. CongrArg for addPoly
-def addPoly_congrArg_left {p q : Poly} (h : Path p q) (r : Poly) :
+noncomputable def addPoly_congrArg_left {p q : Poly} (h : Path p q) (r : Poly) :
     Path (addPoly p r) (addPoly q r) :=
   Path.congrArg (fun p => addPoly p r) h
 
 -- 25. CongrArg for scalePoly
-def scalePoly_congrArg {p q : Poly} (c : Int) (h : Path p q) :
+noncomputable def scalePoly_congrArg {p q : Poly} (c : Int) (h : Path p q) :
     Path (scalePoly c p) (scalePoly c q) :=
   Path.congrArg (scalePoly c) h
 
 -- 26. Chain: add constants then evaluate vs evaluate then add
-def add_eval_chain (a b : Int) (x : AffPoint) :
+noncomputable def add_eval_chain (a b : Int) (x : AffPoint) :
     Path (evalPoly (addPoly (constPoly a) (constPoly b)) x)
          (evalPoly (constPoly a) x + evalPoly (constPoly b) x) :=
   Path.trans

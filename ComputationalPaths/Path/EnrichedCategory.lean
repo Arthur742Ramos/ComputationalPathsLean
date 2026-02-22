@@ -59,7 +59,7 @@ section PathEnriched
 variable (A : Type u)
 
 /-- The groupoid-enriched category of computational paths on a type `A`. -/
-def pathGroupoidEnriched (A : Type u) : GroupoidEnrichedCategory (Obj := A) where
+noncomputable def pathGroupoidEnriched (A : Type u) : GroupoidEnrichedCategory (Obj := A) where
   toWeakBicategory := weakBicategory A
   inv₂ := fun {_a _b} {_f _g} ⟨η⟩ => ⟨η.symm⟩
   vcomp_assoc := by
@@ -86,7 +86,7 @@ def pathGroupoidEnriched (A : Type u) : GroupoidEnrichedCategory (Obj := A) wher
 /-! ## Composition coherence -/
 
 /-- Composition in the enriched path groupoid is associative as a path equality. -/
-def pathGroupoidEnriched_assoc (A : Type u) {a b c d : A}
+noncomputable def pathGroupoidEnriched_assoc (A : Type u) {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Path
       ((pathGroupoidEnriched A).comp ((pathGroupoidEnriched A).comp p q) r)
@@ -95,7 +95,7 @@ def pathGroupoidEnriched_assoc (A : Type u) {a b c d : A}
   simp [pathGroupoidEnriched, weakBicategory]
 
 /-- Pentagon coherence for path composition in the enriched path category. -/
-def pathGroupoidEnriched_pentagon (A : Type u) {a b c d e : A}
+noncomputable def pathGroupoidEnriched_pentagon (A : Type u) {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Path
       ((pathGroupoidEnriched A).comp ((pathGroupoidEnriched A).comp

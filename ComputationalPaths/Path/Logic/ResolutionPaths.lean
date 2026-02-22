@@ -42,7 +42,7 @@ inductive Literal : Type where
   deriving DecidableEq, Repr
 
 /-- Negate a literal. -/
-def Literal.negate : Literal → Literal
+noncomputable def Literal.negate : Literal → Literal
   | pos n => neg n
   | neg n => pos n
 
@@ -51,7 +51,7 @@ def Literal.negate : Literal → Literal
   cases l <;> simp [Literal.negate]
 
 /-- A literal and its negation are complementary. -/
-def Literal.isComplementary (l₁ l₂ : Literal) : Prop :=
+noncomputable def Literal.isComplementary (l₁ l₂ : Literal) : Prop :=
   l₁.negate = l₂
 
 theorem Literal.complementary_symm (l : Literal) :
@@ -68,18 +68,18 @@ theorem Literal.complementary_comm (l₁ l₂ : Literal) :
 abbrev Clause := List Literal
 
 /-- The empty clause (⊥). -/
-def emptyClause : Clause := []
+noncomputable def emptyClause : Clause := []
 
 /-- A unit clause contains exactly one literal. -/
-def isUnitClause (c : Clause) : Prop := c.length = 1
+noncomputable def isUnitClause (c : Clause) : Prop := c.length = 1
 
 /-- Clause size. -/
-def clauseSize (c : Clause) : Nat := c.length
+noncomputable def clauseSize (c : Clause) : Nat := c.length
 
 /-! ## Resolution Operation -/
 
 /-- Resolution: combine two clauses by removing complementary literals. -/
-def resolve (c₁ c₂ : Clause) (l : Literal) : Clause :=
+noncomputable def resolve (c₁ c₂ : Clause) (l : Literal) : Clause :=
   (c₁.filter (· != l)) ++ (c₂.filter (· != l.negate))
 
 /-- Resolving with the empty clause yields a subset of the first clause. -/
@@ -109,7 +109,7 @@ abbrev DerivStep := Nat
 abbrev ResPath (s₁ s₂ : DerivStep) := Path s₁ s₂
 
 /-- Resolution as path composition: each resolution step advances the count. -/
-def resolution_as_trans (s₁ s₂ s₃ : DerivStep)
+noncomputable def resolution_as_trans (s₁ s₂ s₃ : DerivStep)
     (p : ResPath s₁ s₂) (q : ResPath s₂ s₃) : ResPath s₁ s₃ :=
   Path.trans p q
 
@@ -147,7 +147,7 @@ theorem resolution_symm_trans (s₁ s₂ s₃ : DerivStep)
 /-! ## Unit Propagation as Path Shortening -/
 
 /-- Unit propagation: filtering removes literals from clauses. -/
-def unitPropagate (c : Clause) (l : Literal) : Clause :=
+noncomputable def unitPropagate (c : Clause) (l : Literal) : Clause :=
   c.filter (· != l.negate)
 
 /-- Unit propagation does not increase clause size. -/
@@ -187,11 +187,11 @@ structure Refutation where
   derives_empty : Prop  -- the derivation produces the empty clause
 
 /-- Trivial refutation when empty clause is given. -/
-def trivialRefutation : Refutation :=
+noncomputable def trivialRefutation : Refutation :=
   ⟨0, True⟩
 
 /-- Subsumption: one clause is a subset of another. -/
-def subsumes (c₁ c₂ : Clause) : Prop :=
+noncomputable def subsumes (c₁ c₂ : Clause) : Prop :=
   ∀ l : Literal, l ∈ c₁ → l ∈ c₂
 
 /-- Subsumption is reflexive. -/
@@ -248,7 +248,7 @@ theorem transport_clause_trans (P : Clause → Type u)
 /-! ## Derivation Length -/
 
 /-- Length of a derivation as the number of steps. -/
-def derivationLength {s₁ s₂ : DerivStep} (p : ResPath s₁ s₂) : Nat :=
+noncomputable def derivationLength {s₁ s₂ : DerivStep} (p : ResPath s₁ s₂) : Nat :=
   p.steps.length
 
 /-- Identity derivation has length 0. -/

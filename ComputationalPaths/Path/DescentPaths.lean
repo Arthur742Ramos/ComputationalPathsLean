@@ -64,7 +64,7 @@ structure DescentDatum (A : Type u) (B : Type v) (f : A → B) where
     base
 
 /-- Identity descent datum at a point. -/
-def DescentDatum.id {A : Type u} {B : Type v} (f : A → B) (a : A) :
+noncomputable def DescentDatum.id {A : Type u} {B : Type v} (f : A → B) (a : A) :
     DescentDatum A B f where
   fiber := a
   base := f a
@@ -91,13 +91,13 @@ structure StepDescentDatum (A : Type u) where
   stepProof : witness.src = src ∧ witness.tgt = tgt
 
 /-- Cocycle symmetry: if we have a cocycle path, its inverse is also valid. -/
-def cocycle_symm {A : Type u} {B : Type v} (f : A → B)
+noncomputable def cocycle_symm {A : Type u} {B : Type v} (f : A → B)
     (dd : DescentDatum A B f) :
     Path (f dd.pull2) (f dd.pull1) :=
   Path.symm dd.cocycle
 
 /-- Cocycle transitivity via path composition. -/
-def cocycle_trans {A : Type u} {B : Type v} (f : A → B)
+noncomputable def cocycle_trans {A : Type u} {B : Type v} (f : A → B)
     (dd1 dd2 : DescentDatum A B f)
     (h : Path (f dd1.pull2) (f dd2.pull1)) :
     Path (f dd1.pull1) (f dd2.pull2) :=
@@ -131,34 +131,34 @@ structure EffectiveDescentMorphism (A : Type u) (B : Type v)
   unique : ∀ (a1 a2 : A), Path (f a1) (f a2) → Path a1 a2
 
 /-- The section of an effective descent is a path-retraction. -/
-def descent_section_retraction {A : Type u} {B : Type v}
+noncomputable def descent_section_retraction {A : Type u} {B : Type v}
     {f : A → B} (edm : EffectiveDescentMorphism A B f) (b : B) :
     Path (f (edm.descend b)) b :=
   edm.section_ b
 
 /-- Composition of descent sections. -/
-def descent_section_trans {A : Type u} {B : Type v}
+noncomputable def descent_section_trans {A : Type u} {B : Type v}
     {f : A → B} (edm : EffectiveDescentMorphism A B f)
     (b1 b2 : B) (p : Path b1 b2) :
     Path (f (edm.descend b1)) b2 :=
   Path.trans (edm.section_ b1) p
 
 /-- Descent preserves path symmetry. -/
-def descent_unique_symm {A : Type u} {B : Type v}
+noncomputable def descent_unique_symm {A : Type u} {B : Type v}
     {f : A → B} (edm : EffectiveDescentMorphism A B f)
     (a1 a2 : A) (p : Path (f a1) (f a2)) :
     Path a2 a1 :=
   Path.symm (edm.unique a1 a2 p)
 
 /-- Descent uniqueness is transitive. -/
-def descent_unique_trans {A : Type u} {B : Type v}
+noncomputable def descent_unique_trans {A : Type u} {B : Type v}
     {f : A → B} (edm : EffectiveDescentMorphism A B f)
     (a1 a2 a3 : A) (p : Path (f a1) (f a2)) (q : Path (f a2) (f a3)) :
     Path a1 a3 :=
   Path.trans (edm.unique a1 a2 p) (edm.unique a2 a3 q)
 
 /-- Descent along identity paths yields reflexive paths. -/
-def descent_unique_refl {A : Type u} {B : Type v}
+noncomputable def descent_unique_refl {A : Type u} {B : Type v}
     {f : A → B} (edm : EffectiveDescentMorphism A B f) (a : A) :
     Path (f a) (f a) :=
   Path.refl (f a)
@@ -188,32 +188,32 @@ structure GaloisDescentDatum (G : Type u) (A : Type v) where
 
 /-- The fixed-point condition is symmetric: acting and then unacting
 yields a reflexive path. -/
-def galois_fixed_symm {G : Type u} {A : Type v}
+noncomputable def galois_fixed_symm {G : Type u} {A : Type v}
     (gd : GaloisDescentDatum G A) (g : G) :
     Path gd.fixedPt (gd.act g gd.fixedPt) :=
   Path.symm (gd.isFixed g)
 
 /-- Two group elements both fix the fixed point, connected by a path. -/
-def galois_fixed_trans {G : Type u} {A : Type v}
+noncomputable def galois_fixed_trans {G : Type u} {A : Type v}
     (gd : GaloisDescentDatum G A) (g h : G) :
     Path (gd.act g gd.fixedPt) (gd.act h gd.fixedPt) :=
   Path.trans (gd.isFixed g) (Path.symm (gd.isFixed h))
 
 /-- Action by identity on the fixed point factors through act_id. -/
-def galois_act_id_fixed {G : Type u} {A : Type v}
+noncomputable def galois_act_id_fixed {G : Type u} {A : Type v}
     (gd : GaloisDescentDatum G A) :
     Path (gd.act gd.e gd.fixedPt) gd.fixedPt :=
   gd.act_id gd.fixedPt
 
 /-- The act_mul cocycle at the fixed point yields a path back to fixedPt. -/
-def galois_cocycle_at_fixed {G : Type u} {A : Type v}
+noncomputable def galois_cocycle_at_fixed {G : Type u} {A : Type v}
     (gd : GaloisDescentDatum G A) (g h : G) :
     Path (gd.act (gd.mul g h) gd.fixedPt) gd.fixedPt :=
   gd.isFixed (gd.mul g h)
 
 /-- Galois cocycle coherence: the two ways to compute g(h·x) agree
 at the fixed point. -/
-def galois_cocycle_coherence {G : Type u} {A : Type v}
+noncomputable def galois_cocycle_coherence {G : Type u} {A : Type v}
     (gd : GaloisDescentDatum G A) (g h : G) :
     Path (gd.act (gd.mul g h) gd.fixedPt) gd.fixedPt :=
   Path.trans (gd.act_mul g h gd.fixedPt)
@@ -221,7 +221,7 @@ def galois_cocycle_coherence {G : Type u} {A : Type v}
       (gd.isFixed g))
 
 /-- Applying a function to the Galois fixed path. -/
-def galois_congrArg_fixed {G : Type u} {A : Type v} {B : Type w}
+noncomputable def galois_congrArg_fixed {G : Type u} {A : Type v} {B : Type w}
     (gd : GaloisDescentDatum G A) (φ : A → B) (g : G) :
     Path (φ (gd.act g gd.fixedPt)) (φ gd.fixedPt) :=
   Path.congrArg φ (gd.isFixed g)
@@ -253,7 +253,7 @@ theorem faithful_unique_eq {A : Type u} {B : Type v}
   rfl
 
 /-- The descent section composes faithfully. -/
-def faithful_section_compose {A : Type u} {B : Type v}
+noncomputable def faithful_section_compose {A : Type u} {B : Type v}
     {f : A → B} (ffd : FaithfullyFlatDescent A B f)
     (b1 b2 : B) (p : Path b1 b2) :
     Path (f (ffd.descend b1)) b2 :=
@@ -299,7 +299,7 @@ structure MonadicDescentAlgebra (A : Type u) (M : PathMonad A) where
     Path.trans (M.mu carrier) structMap
 
 /-- Identity algebra: carrier is T a, structure map is μ. -/
-def MonadicDescentAlgebra.free {A : Type u} (M : PathMonad A) (a : A) :
+noncomputable def MonadicDescentAlgebra.free {A : Type u} (M : PathMonad A) (a : A) :
     MonadicDescentAlgebra A M where
   carrier := M.T a
   structMap := M.mu a
@@ -316,14 +316,14 @@ structure PathAlgebraMorphism {A : Type u} {M : PathMonad A}
            Path.trans alg1.structMap morph
 
 /-- Identity morphism of path algebras. -/
-def PathAlgebraMorphism.id {A : Type u} {M : PathMonad A}
+noncomputable def PathAlgebraMorphism.id {A : Type u} {M : PathMonad A}
     (alg : MonadicDescentAlgebra A M) :
     PathAlgebraMorphism alg alg where
   morph := Path.refl alg.carrier
   compat := by simp
 
 /-- Composition of path algebra morphisms. -/
-def PathAlgebraMorphism.comp {A : Type u} {M : PathMonad A}
+noncomputable def PathAlgebraMorphism.comp {A : Type u} {M : PathMonad A}
     {alg1 alg2 alg3 : MonadicDescentAlgebra A M}
     (g : PathAlgebraMorphism alg2 alg3)
     (f : PathAlgebraMorphism alg1 alg2) :
@@ -363,7 +363,7 @@ structure PathSquare (A : Type u) where
   comm : Path.trans top right = Path.trans left bot
 
 /-- Identity square at a point. -/
-def PathSquare.id (a : A) : PathSquare A where
+noncomputable def PathSquare.id (a : A) : PathSquare A where
   tl := a
   tr := a
   bl := a
@@ -375,7 +375,7 @@ def PathSquare.id (a : A) : PathSquare A where
   comm := by simp
 
 /-- Horizontal composition of path squares with shared vertex. -/
-def PathSquare.hcomp {A : Type u}
+noncomputable def PathSquare.hcomp {A : Type u}
     {a b c d e f_ : A}
     (top1 : Path a b) (top2 : Path b c)
     (bot1 : Path d e) (bot2 : Path e f_)
@@ -406,7 +406,7 @@ structure BeckChevalleySquare (A : Type u) (B : Type v) where
       (Path.congrArg fBase sq.right)
 
 /-- Vertical composition of path squares with shared edge. -/
-def PathSquare.vcomp {A : Type u}
+noncomputable def PathSquare.vcomp {A : Type u}
     {a b c d e f_ : A}
     (top : Path a b) (mid : Path c d) (bot : Path e f_)
     (left1 : Path a c) (left2 : Path c e)
@@ -454,13 +454,13 @@ structure GrothendieckFibration (E : Type u) (B : Type v)
     Path (lift (Path.refl (p e)) e rfl) e
 
 /-- Lifting identity paths is trivial. -/
-def fibration_lift_refl {E : Type u} {B : Type v}
+noncomputable def fibration_lift_refl {E : Type u} {B : Type v}
     {p : E → B} (fib : GrothendieckFibration E B p) (e : E) :
     Path (fib.lift (Path.refl (p e)) e rfl) e :=
   fib.liftRefl e
 
 /-- The projection of a lift yields the expected base path. -/
-def fibration_proj_lift {E : Type u} {B : Type v}
+noncomputable def fibration_proj_lift {E : Type u} {B : Type v}
     {p : E → B} (fib : GrothendieckFibration E B p)
     {b1 b2 : B} (γ : Path b1 b2) (e : E) (h : p e = b1) :
     Path (p (fib.lift γ e h)) b2 :=
@@ -468,20 +468,20 @@ def fibration_proj_lift {E : Type u} {B : Type v}
 
 /-- Fiber transport: given a path in the base and a point in the fiber,
 transport it along the fibration. -/
-def fiberTransport {E : Type u} {B : Type v}
+noncomputable def fiberTransport {E : Type u} {B : Type v}
     {p : E → B} (fib : GrothendieckFibration E B p)
     {b1 b2 : B} (γ : Path b1 b2) (e : E) (h : p e = b1) : E :=
   fib.lift γ e h
 
 /-- Fiber transport preserves the projection. -/
-def fiberTransport_proj {E : Type u} {B : Type v}
+noncomputable def fiberTransport_proj {E : Type u} {B : Type v}
     {p : E → B} (fib : GrothendieckFibration E B p)
     {b1 b2 : B} (γ : Path b1 b2) (e : E) (h : p e = b1) :
     Path (p (fiberTransport fib γ e h)) b2 :=
   fib.liftProj γ e h
 
 /-- Applying a function to the fiber transport path. -/
-def fiberTransport_congrArg {E : Type u} {B : Type v} {C : Type w}
+noncomputable def fiberTransport_congrArg {E : Type u} {B : Type v} {C : Type w}
     {p : E → B} (fib : GrothendieckFibration E B p)
     (φ : E → C) (e : E) :
     Path (φ (fiberTransport fib (Path.refl (p e)) e rfl)) (φ e) :=
@@ -516,7 +516,7 @@ theorem descent_morph_symm_path {A : Type u} {B : Type v}
 -- ============================================================================
 
 /-- Transport in a family indexed by descent data. -/
-def descentTransport {A : Type u} {D : A → Type v}
+noncomputable def descentTransport {A : Type u} {D : A → Type v}
     {a b : A} (p : Path a b) (x : D a) : D b :=
   Path.transport p x
 
@@ -559,7 +559,7 @@ theorem descentTransport_congrArg {A : Type u} {B : Type v}
 -- ============================================================================
 
 /-- Composing two effective descent morphisms. -/
-def EffectiveDescentMorphism.comp {A : Type u} {B : Type v} {C : Type w}
+noncomputable def EffectiveDescentMorphism.comp {A : Type u} {B : Type v} {C : Type w}
     {f : A → B} {g : B → C}
     (edmF : EffectiveDescentMorphism A B f)
     (edmG : EffectiveDescentMorphism B C g) :
@@ -618,7 +618,7 @@ structure CartesianMorphism (E : Type u) (B : Type v)
     Path e src
 
 /-- Identity cartesian morphism. -/
-def CartesianMorphism.id {E : Type u} {B : Type v}
+noncomputable def CartesianMorphism.id {E : Type u} {B : Type v}
     (p : E → B) (e : E) : CartesianMorphism E B p where
   src := e
   tgt := e
@@ -644,7 +644,7 @@ theorem cartesian_comp_proj {E : Type u} {B : Type v}
 -- ============================================================================
 
 /-- Applying congrArg to all edges of a path square. -/
-def PathSquare.map {A : Type u} {B : Type v}
+noncomputable def PathSquare.map {A : Type u} {B : Type v}
     (f : A → B) (sq : PathSquare A) : PathSquare B where
   tl := f sq.tl
   tr := f sq.tr
@@ -664,7 +664,7 @@ theorem pathSquare_map_id {A : Type u} (a : A) :
   simp [PathSquare.map, PathSquare.id]
 
 /-- Symmetry of a path square: transpose it. -/
-def PathSquare.transpose {A : Type u} (sq : PathSquare A) : PathSquare A where
+noncomputable def PathSquare.transpose {A : Type u} (sq : PathSquare A) : PathSquare A where
   tl := sq.tl
   tr := sq.bl
   bl := sq.tr
@@ -708,7 +708,7 @@ structure DescentEquiv (A : Type u) (B : Type v) (f : A → B) (b : B)
     hb1 ▸ dd1.proj
 
 /-- Identity descent equivalence. -/
-def DescentEquiv.id' {A : Type u} {B : Type v} {f : A → B}
+noncomputable def DescentEquiv.id' {A : Type u} {B : Type v} {f : A → B}
     (dd : DescentDatum A B f) : DescentEquiv A B f dd.base dd dd rfl rfl where
   fiberPath := Path.refl dd.fiber
   projCompat := by simp
@@ -727,7 +727,7 @@ structure SimpleDescentEquiv (A : Type u) (B : Type v) (f : A → B) where
   compat : projPath = Path.congrArg f fiberPath
 
 /-- Identity simple descent equivalence. -/
-def SimpleDescentEquiv.id {A : Type u} {B : Type v} (f : A → B) (a : A) :
+noncomputable def SimpleDescentEquiv.id {A : Type u} {B : Type v} (f : A → B) (a : A) :
     SimpleDescentEquiv A B f where
   src := a
   tgt := a
@@ -736,7 +736,7 @@ def SimpleDescentEquiv.id {A : Type u} {B : Type v} (f : A → B) (a : A) :
   compat := by simp
 
 /-- Symmetry of simple descent equivalences. -/
-def SimpleDescentEquiv.symm {A : Type u} {B : Type v} {f : A → B}
+noncomputable def SimpleDescentEquiv.symm {A : Type u} {B : Type v} {f : A → B}
     (de : SimpleDescentEquiv A B f) :
     SimpleDescentEquiv A B f where
   src := de.tgt
@@ -748,7 +748,7 @@ def SimpleDescentEquiv.symm {A : Type u} {B : Type v} {f : A → B}
     simp
 
 /-- Transitivity of simple descent equivalences (with explicit endpoints). -/
-def SimpleDescentEquiv.comp {A : Type u} {B : Type v} (f : A → B)
+noncomputable def SimpleDescentEquiv.comp {A : Type u} {B : Type v} (f : A → B)
     {a b c : A}
     (p1 : Path a b) (p2 : Path b c)
     (hp1 : Path (f a) (f b)) (hp2 : Path (f b) (f c))

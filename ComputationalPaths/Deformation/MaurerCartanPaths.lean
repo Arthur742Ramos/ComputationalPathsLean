@@ -32,7 +32,7 @@ structure DGLiePathData (A : Type u) where
         Path (bracket x₁ y₁) (bracket x₂ y₂)
 
 /-- Truncated Maurer-Cartan curvature term `d α + [α, α]`. -/
-def curvature {A : Type u} (L : DGLiePathData A) (x : A) : A :=
+noncomputable def curvature {A : Type u} (L : DGLiePathData A) (x : A) : A :=
   L.add (L.diff x) (L.bracket x x)
 
 /-- Maurer-Cartan element represented by a path-valued equation. -/
@@ -56,7 +56,7 @@ namespace MaurerCartanElement
 variable {A : Type u} {L : DGLiePathData A}
 
 /-- Primitive normalization step for an MC equation. -/
-def equationStep (mc : MaurerCartanElement L) :
+noncomputable def equationStep (mc : MaurerCartanElement L) :
     Path.Step (Path.trans mc.equation (Path.refl L.zero)) mc.equation :=
   Path.Step.trans_refl_right mc.equation
 
@@ -75,7 +75,7 @@ noncomputable def equationCancelRight (mc : MaurerCartanElement L) :
   rweq_cmpA_inv_right mc.equation
 
 /-- Transport an MC solution along a path in the underlying carrier. -/
-def transport {β : A} (mc : MaurerCartanElement L) (p : Path mc.element β) :
+noncomputable def transport {β : A} (mc : MaurerCartanElement L) (p : Path mc.element β) :
     MaurerCartanElement L where
   element := β
   equation :=
@@ -84,7 +84,7 @@ def transport {β : A} (mc : MaurerCartanElement L) (p : Path mc.element β) :
       mc.equation
 
 /-- Primitive normalization step for transported MC equations. -/
-def transportStep {β : A} (mc : MaurerCartanElement L) (p : Path mc.element β) :
+noncomputable def transportStep {β : A} (mc : MaurerCartanElement L) (p : Path mc.element β) :
     Path.Step
       (Path.trans (transport mc p).equation (Path.refl L.zero))
       (transport mc p).equation :=
@@ -109,7 +109,7 @@ namespace GaugeAction
 variable {A : Type u} {L : DGLiePathData A}
 
 /-- Gauge actions send Maurer-Cartan elements to Maurer-Cartan elements. -/
-def onMaurerCartan (G : GaugeAction L) (mc : MaurerCartanElement L) :
+noncomputable def onMaurerCartan (G : GaugeAction L) (mc : MaurerCartanElement L) :
     MaurerCartanElement L where
   element := G.act mc.element
   equation := Path.trans (G.preserveCurvature mc.element) mc.equation

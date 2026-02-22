@@ -103,10 +103,10 @@ structure CremonaElement where
   inverseDegree : Nat
 deriving DecidableEq, Repr
 
-@[simp] def twoStep {A : Type u} (a : A) : Path a a :=
+@[simp] noncomputable def twoStep {A : Type u} (a : A) : Path a a :=
   Path.trans (Path.refl a) (Path.refl a)
 
-@[simp] def threeStep {A : Type u} (a : A) : Path a a :=
+@[simp] noncomputable def threeStep {A : Type u} (a : A) : Path a a :=
   Path.trans (twoStep a) (Path.refl a)
 
 /-! ## Divisors -/
@@ -115,46 +115,46 @@ section Divisors
 
 variable {X : BirationalSpace}
 
-@[simp] def principalPart (Gam1 : Gam X) : Gam X := Gam1
-@[simp] def nefShadow (Gam1 : Gam X) : Gam X := Gam1
-@[simp] def ampleShadow (Gam1 : Gam X) : Gam X := Gam1
-@[simp] def canonicalShadow (Gam1 : Gam X) : Gam X := Gam1
-@[simp] def terminalShadow (Gam1 : Gam X) : Gam X := Gam1
+@[simp] noncomputable def principalPart (Gam1 : Gam X) : Gam X := Gam1
+@[simp] noncomputable def nefShadow (Gam1 : Gam X) : Gam X := Gam1
+@[simp] noncomputable def ampleShadow (Gam1 : Gam X) : Gam X := Gam1
+@[simp] noncomputable def canonicalShadow (Gam1 : Gam X) : Gam X := Gam1
+@[simp] noncomputable def terminalShadow (Gam1 : Gam X) : Gam X := Gam1
 
-def divisor_refl (Gam1 : Gam X) : Path Gam1 Gam1 :=
+noncomputable def divisor_refl (Gam1 : Gam X) : Path Gam1 Gam1 :=
   Path.refl Gam1
 
-def divisor_two_step (Gam1 : Gam X) : Path Gam1 Gam1 :=
+noncomputable def divisor_two_step (Gam1 : Gam X) : Path Gam1 Gam1 :=
   twoStep Gam1
 
-def divisor_three_step (Gam1 : Gam X) : Path Gam1 Gam1 :=
+noncomputable def divisor_three_step (Gam1 : Gam X) : Path Gam1 Gam1 :=
   threeStep Gam1
 
-def divisor_symm_refl (Gam1 : Gam X) :
+noncomputable def divisor_symm_refl (Gam1 : Gam X) :
     Path (Path.symm (Path.refl Gam1)) (Path.refl Gam1) := by
   simpa using (Path.refl (Path.refl Gam1))
 
-def divisor_coeff_congr {Gam1 Gam2 : Gam X} (p : Path Gam1 Gam2) :
+noncomputable def divisor_coeff_congr {Gam1 Gam2 : Gam X} (p : Path Gam1 Gam2) :
     Path Gam1.coeff Gam2.coeff :=
   Path.congrArg (fun G : Gam X => G.coeff) p
 
-def divisor_principal_stable (Gam1 : Gam X) :
+noncomputable def divisor_principal_stable (Gam1 : Gam X) :
     Path (principalPart Gam1) Gam1 := by
   simpa [principalPart] using (Path.refl Gam1)
 
-def divisor_nef_shadow_stable (Gam1 : Gam X) :
+noncomputable def divisor_nef_shadow_stable (Gam1 : Gam X) :
     Path (nefShadow Gam1) Gam1 := by
   simpa [nefShadow] using (Path.refl Gam1)
 
-def divisor_ample_shadow_stable (Gam1 : Gam X) :
+noncomputable def divisor_ample_shadow_stable (Gam1 : Gam X) :
     Path (ampleShadow Gam1) Gam1 := by
   simpa [ampleShadow] using (Path.refl Gam1)
 
-def divisor_canonical_shadow_stable (Gam1 : Gam X) :
+noncomputable def divisor_canonical_shadow_stable (Gam1 : Gam X) :
     Path (canonicalShadow Gam1) Gam1 := by
   simpa [canonicalShadow] using (Path.refl Gam1)
 
-def divisor_terminal_shadow_stable (Gam1 : Gam X) :
+noncomputable def divisor_terminal_shadow_stable (Gam1 : Gam X) :
     Path (terminalShadow Gam1) Gam1 := by
   simpa [terminalShadow] using (Path.refl Gam1)
 
@@ -166,37 +166,37 @@ section LinearSystems
 
 variable {X : BirationalSpace}
 
-@[simp] def symClosure (Sym1 : Sym X) : Sym X := Sym1
-@[simp] def symResolution (Sym1 : Sym X) : Sym X := Sym1
-@[simp] def symSwap (Sym1 : Sym X) : Sym X :=
+@[simp] noncomputable def symClosure (Sym1 : Sym X) : Sym X := Sym1
+@[simp] noncomputable def symResolution (Sym1 : Sym X) : Sym X := Sym1
+@[simp] noncomputable def symSwap (Sym1 : Sym X) : Sym X :=
   { fixedPart := Sym1.mobilePart, mobilePart := Sym1.fixedPart }
 
-def linear_refl (Sym1 : Sym X) : Path Sym1 Sym1 :=
+noncomputable def linear_refl (Sym1 : Sym X) : Path Sym1 Sym1 :=
   Path.refl Sym1
 
-def linear_two_step (Sym1 : Sym X) : Path Sym1 Sym1 :=
+noncomputable def linear_two_step (Sym1 : Sym X) : Path Sym1 Sym1 :=
   twoStep Sym1
 
-def linear_three_step (Sym1 : Sym X) : Path Sym1 Sym1 :=
+noncomputable def linear_three_step (Sym1 : Sym X) : Path Sym1 Sym1 :=
   threeStep Sym1
 
-def linear_swap_involution (Sym1 : Sym X) :
+noncomputable def linear_swap_involution (Sym1 : Sym X) :
     Path (symSwap (symSwap Sym1)) Sym1 := by
   simpa [symSwap] using (Path.refl Sym1)
 
-def linear_fixed_congr {Sym1 Sym2 : Sym X} (p : Path Sym1 Sym2) :
+noncomputable def linear_fixed_congr {Sym1 Sym2 : Sym X} (p : Path Sym1 Sym2) :
     Path Sym1.fixedPart Sym2.fixedPart :=
   Path.congrArg (fun S : Sym X => S.fixedPart) p
 
-def linear_mobile_congr {Sym1 Sym2 : Sym X} (p : Path Sym1 Sym2) :
+noncomputable def linear_mobile_congr {Sym1 Sym2 : Sym X} (p : Path Sym1 Sym2) :
     Path Sym1.mobilePart Sym2.mobilePart :=
   Path.congrArg (fun S : Sym X => S.mobilePart) p
 
-def linear_closure_stable (Sym1 : Sym X) :
+noncomputable def linear_closure_stable (Sym1 : Sym X) :
     Path (symClosure Sym1) Sym1 := by
   simpa [symClosure] using (Path.refl Sym1)
 
-def linear_resolution_stable (Sym1 : Sym X) :
+noncomputable def linear_resolution_stable (Sym1 : Sym X) :
     Path (symResolution Sym1) Sym1 := by
   simpa [symResolution] using (Path.refl Sym1)
 
@@ -208,36 +208,36 @@ section BlowUps
 
 variable {X : BirationalSpace}
 
-@[simp] def blowUpTransform (_B : BlowUp X) (Gam1 : Gam X) : Gam X := Gam1
-@[simp] def blowUpInverseTransform (_B : BlowUp X) (Gam1 : Gam X) : Gam X := Gam1
-@[simp] def blowUpFactorization (B : BlowUp X) : BlowUp X := B
+@[simp] noncomputable def blowUpTransform (_B : BlowUp X) (Gam1 : Gam X) : Gam X := Gam1
+@[simp] noncomputable def blowUpInverseTransform (_B : BlowUp X) (Gam1 : Gam X) : Gam X := Gam1
+@[simp] noncomputable def blowUpFactorization (B : BlowUp X) : BlowUp X := B
 
-def blowup_refl (B : BlowUp X) : Path B B :=
+noncomputable def blowup_refl (B : BlowUp X) : Path B B :=
   Path.refl B
 
-def blowup_two_step (B : BlowUp X) : Path B B :=
+noncomputable def blowup_two_step (B : BlowUp X) : Path B B :=
   twoStep B
 
-def blowup_three_step (B : BlowUp X) : Path B B :=
+noncomputable def blowup_three_step (B : BlowUp X) : Path B B :=
   threeStep B
 
-def blowup_exceptional_congr {B1 B2 : BlowUp X} (p : Path B1 B2) :
+noncomputable def blowup_exceptional_congr {B1 B2 : BlowUp X} (p : Path B1 B2) :
     Path B1.exceptional B2.exceptional :=
   Path.congrArg (fun B : BlowUp X => B.exceptional) p
 
-def blowup_center_congr {B1 B2 : BlowUp X} (p : Path B1 B2) :
+noncomputable def blowup_center_congr {B1 B2 : BlowUp X} (p : Path B1 B2) :
     Path B1.centerCode B2.centerCode :=
   Path.congrArg (fun B : BlowUp X => B.centerCode) p
 
-def blowup_transform_stable (B : BlowUp X) (Gam1 : Gam X) :
+noncomputable def blowup_transform_stable (B : BlowUp X) (Gam1 : Gam X) :
     Path (blowUpTransform B Gam1) Gam1 := by
   simpa [blowUpTransform] using (Path.refl Gam1)
 
-def blowup_inverse_transform_stable (B : BlowUp X) (Gam1 : Gam X) :
+noncomputable def blowup_inverse_transform_stable (B : BlowUp X) (Gam1 : Gam X) :
     Path (blowUpInverseTransform B Gam1) Gam1 := by
   simpa [blowUpInverseTransform] using (Path.refl Gam1)
 
-def blowup_factorization_stable (B : BlowUp X) :
+noncomputable def blowup_factorization_stable (B : BlowUp X) :
     Path (blowUpFactorization B) B := by
   simpa [blowUpFactorization] using (Path.refl B)
 
@@ -249,44 +249,44 @@ section Cones
 
 variable {X : BirationalSpace}
 
-@[simp] def moriClosure (C : MoriCone X) : MoriCone X := C
-@[simp] def nefClosure (N : NefCone X) : NefCone X := N
-@[simp] def ampleClosure (A : AmpleCone X) : AmpleCone X := A
-@[simp] def nefToMori (N : NefCone X) : MoriCone X := { rays := N.generators }
-@[simp] def ampleToNef (A : AmpleCone X) : NefCone X := { generators := A.generators }
+@[simp] noncomputable def moriClosure (C : MoriCone X) : MoriCone X := C
+@[simp] noncomputable def nefClosure (N : NefCone X) : NefCone X := N
+@[simp] noncomputable def ampleClosure (A : AmpleCone X) : AmpleCone X := A
+@[simp] noncomputable def nefToMori (N : NefCone X) : MoriCone X := { rays := N.generators }
+@[simp] noncomputable def ampleToNef (A : AmpleCone X) : NefCone X := { generators := A.generators }
 
-def mori_refl (C : MoriCone X) : Path C C :=
+noncomputable def mori_refl (C : MoriCone X) : Path C C :=
   Path.refl C
 
-def mori_two_step (C : MoriCone X) : Path C C :=
+noncomputable def mori_two_step (C : MoriCone X) : Path C C :=
   twoStep C
 
-def mori_three_step (C : MoriCone X) : Path C C :=
+noncomputable def mori_three_step (C : MoriCone X) : Path C C :=
   threeStep C
 
-def mori_rays_congr {C1 C2 : MoriCone X} (p : Path C1 C2) :
+noncomputable def mori_rays_congr {C1 C2 : MoriCone X} (p : Path C1 C2) :
     Path C1.rays C2.rays :=
   Path.congrArg (fun C : MoriCone X => C.rays) p
 
-def nef_refl (N : NefCone X) : Path N N :=
+noncomputable def nef_refl (N : NefCone X) : Path N N :=
   Path.refl N
 
-def nef_generators_congr {N1 N2 : NefCone X} (p : Path N1 N2) :
+noncomputable def nef_generators_congr {N1 N2 : NefCone X} (p : Path N1 N2) :
     Path N1.generators N2.generators :=
   Path.congrArg (fun N : NefCone X => N.generators) p
 
-def ample_refl (A : AmpleCone X) : Path A A :=
+noncomputable def ample_refl (A : AmpleCone X) : Path A A :=
   Path.refl A
 
-def ample_generators_congr {A1 A2 : AmpleCone X} (p : Path A1 A2) :
+noncomputable def ample_generators_congr {A1 A2 : AmpleCone X} (p : Path A1 A2) :
     Path A1.generators A2.generators :=
   Path.congrArg (fun A : AmpleCone X => A.generators) p
 
-def nef_to_mori_stable (N : NefCone X) :
+noncomputable def nef_to_mori_stable (N : NefCone X) :
     Path (nefToMori (nefClosure N)) (nefToMori N) := by
   simpa [nefClosure, nefToMori] using (Path.refl (nefToMori N))
 
-def ample_to_nef_stable (A : AmpleCone X) :
+noncomputable def ample_to_nef_stable (A : AmpleCone X) :
     Path (ampleToNef (ampleClosure A)) (ampleToNef A) := by
   simpa [ampleClosure, ampleToNef] using (Path.refl (ampleToNef A))
 
@@ -298,34 +298,34 @@ section MinimalModelProgram
 
 variable {X : BirationalSpace}
 
-@[simp] def mmpNormalize (S : MmpState X) : MmpState X := S
-@[simp] def mmpAdvance (S : MmpState X) : MmpState X := S
-@[simp] def flipNormalize (F : FlipDatum X) : FlipDatum X := F
+@[simp] noncomputable def mmpNormalize (S : MmpState X) : MmpState X := S
+@[simp] noncomputable def mmpAdvance (S : MmpState X) : MmpState X := S
+@[simp] noncomputable def flipNormalize (F : FlipDatum X) : FlipDatum X := F
 
-def mmp_state_refl (S : MmpState X) : Path S S :=
+noncomputable def mmp_state_refl (S : MmpState X) : Path S S :=
   Path.refl S
 
-def mmp_state_two_step (S : MmpState X) : Path S S :=
+noncomputable def mmp_state_two_step (S : MmpState X) : Path S S :=
   twoStep S
 
-def mmp_state_three_step (S : MmpState X) : Path S S :=
+noncomputable def mmp_state_three_step (S : MmpState X) : Path S S :=
   threeStep S
 
-def mmp_current_divisor_congr {S1 S2 : MmpState X} (p : Path S1 S2) :
+noncomputable def mmp_current_divisor_congr {S1 S2 : MmpState X} (p : Path S1 S2) :
     Path S1.currentDivisor S2.currentDivisor :=
   Path.congrArg (fun S : MmpState X => S.currentDivisor) p
 
-def flip_refl (F : FlipDatum X) : Path F F :=
+noncomputable def flip_refl (F : FlipDatum X) : Path F F :=
   Path.refl F
 
-def flip_two_step (F : FlipDatum X) : Path F F :=
+noncomputable def flip_two_step (F : FlipDatum X) : Path F F :=
   twoStep F
 
-def flip_source_congr {F1 F2 : FlipDatum X} (p : Path F1 F2) :
+noncomputable def flip_source_congr {F1 F2 : FlipDatum X} (p : Path F1 F2) :
     Path F1.source F2.source :=
   Path.congrArg (fun F : FlipDatum X => F.source) p
 
-def flip_target_congr {F1 F2 : FlipDatum X} (p : Path F1 F2) :
+noncomputable def flip_target_congr {F1 F2 : FlipDatum X} (p : Path F1 F2) :
     Path F1.target F2.target :=
   Path.congrArg (fun F : FlipDatum X => F.target) p
 
@@ -337,28 +337,28 @@ section Vanishing
 
 variable {X : BirationalSpace}
 
-@[simp] def applyKawamataViehweg (V : VanishingPackage X) : VanishingPackage X := V
-@[simp] def pushforwardVanishing (V : VanishingPackage X) : VanishingPackage X := V
+@[simp] noncomputable def applyKawamataViehweg (V : VanishingPackage X) : VanishingPackage X := V
+@[simp] noncomputable def pushforwardVanishing (V : VanishingPackage X) : VanishingPackage X := V
 
-def kv_package_refl (V : VanishingPackage X) : Path V V :=
+noncomputable def kv_package_refl (V : VanishingPackage X) : Path V V :=
   Path.refl V
 
-def kv_package_two_step (V : VanishingPackage X) : Path V V :=
+noncomputable def kv_package_two_step (V : VanishingPackage X) : Path V V :=
   twoStep V
 
-def kv_k_divisor_congr {V1 V2 : VanishingPackage X} (p : Path V1 V2) :
+noncomputable def kv_k_divisor_congr {V1 V2 : VanishingPackage X} (p : Path V1 V2) :
     Path V1.kDivisor V2.kDivisor :=
   Path.congrArg (fun V : VanishingPackage X => V.kDivisor) p
 
-def kv_nef_big_divisor_congr {V1 V2 : VanishingPackage X} (p : Path V1 V2) :
+noncomputable def kv_nef_big_divisor_congr {V1 V2 : VanishingPackage X} (p : Path V1 V2) :
     Path V1.nefBigDivisor V2.nefBigDivisor :=
   Path.congrArg (fun V : VanishingPackage X => V.nefBigDivisor) p
 
-def kv_apply_stable (V : VanishingPackage X) :
+noncomputable def kv_apply_stable (V : VanishingPackage X) :
     Path (applyKawamataViehweg V) V := by
   simpa [applyKawamataViehweg] using (Path.refl V)
 
-def kv_pushforward_stable (V : VanishingPackage X) :
+noncomputable def kv_pushforward_stable (V : VanishingPackage X) :
     Path (pushforwardVanishing V) V := by
   simpa [pushforwardVanishing] using (Path.refl V)
 
@@ -370,28 +370,28 @@ section Singularities
 
 variable {X : BirationalSpace}
 
-@[simp] def canonicalToTerminal (S : SingularModel X) : SingularModel X := S
-@[simp] def terminalClosure (S : SingularModel X) : SingularModel X := S
+@[simp] noncomputable def canonicalToTerminal (S : SingularModel X) : SingularModel X := S
+@[simp] noncomputable def terminalClosure (S : SingularModel X) : SingularModel X := S
 
-def singular_refl (S : SingularModel X) : Path S S :=
+noncomputable def singular_refl (S : SingularModel X) : Path S S :=
   Path.refl S
 
-def singular_two_step (S : SingularModel X) : Path S S :=
+noncomputable def singular_two_step (S : SingularModel X) : Path S S :=
   twoStep S
 
-def singular_kind_congr {S1 S2 : SingularModel X} (p : Path S1 S2) :
+noncomputable def singular_kind_congr {S1 S2 : SingularModel X} (p : Path S1 S2) :
     Path S1.kind S2.kind :=
   Path.congrArg (fun S : SingularModel X => S.kind) p
 
-def singular_discrepancy_congr {S1 S2 : SingularModel X} (p : Path S1 S2) :
+noncomputable def singular_discrepancy_congr {S1 S2 : SingularModel X} (p : Path S1 S2) :
     Path S1.discrepancy S2.discrepancy :=
   Path.congrArg (fun S : SingularModel X => S.discrepancy) p
 
-def canonical_to_terminal_stable (S : SingularModel X) :
+noncomputable def canonical_to_terminal_stable (S : SingularModel X) :
     Path (canonicalToTerminal S) S := by
   simpa [canonicalToTerminal] using (Path.refl S)
 
-def terminal_closure_stable (S : SingularModel X) :
+noncomputable def terminal_closure_stable (S : SingularModel X) :
     Path (terminalClosure S) S := by
   simpa [terminalClosure] using (Path.refl S)
 
@@ -403,28 +403,28 @@ section Sarkisov
 
 variable {X : BirationalSpace}
 
-@[simp] def sarkisovNormalize (L : SarkisovLink X) : SarkisovLink X := L
-@[simp] def sarkisovRoundtrip (L : SarkisovLink X) : SarkisovLink X := L
+@[simp] noncomputable def sarkisovNormalize (L : SarkisovLink X) : SarkisovLink X := L
+@[simp] noncomputable def sarkisovRoundtrip (L : SarkisovLink X) : SarkisovLink X := L
 
-def sarkisov_refl (L : SarkisovLink X) : Path L L :=
+noncomputable def sarkisov_refl (L : SarkisovLink X) : Path L L :=
   Path.refl L
 
-def sarkisov_two_step (L : SarkisovLink X) : Path L L :=
+noncomputable def sarkisov_two_step (L : SarkisovLink X) : Path L L :=
   twoStep L
 
-def sarkisov_start_congr {L1 L2 : SarkisovLink X} (p : Path L1 L2) :
+noncomputable def sarkisov_start_congr {L1 L2 : SarkisovLink X} (p : Path L1 L2) :
     Path L1.startState L2.startState :=
   Path.congrArg (fun L : SarkisovLink X => L.startState) p
 
-def sarkisov_end_congr {L1 L2 : SarkisovLink X} (p : Path L1 L2) :
+noncomputable def sarkisov_end_congr {L1 L2 : SarkisovLink X} (p : Path L1 L2) :
     Path L1.endState L2.endState :=
   Path.congrArg (fun L : SarkisovLink X => L.endState) p
 
-def sarkisov_kind_congr {L1 L2 : SarkisovLink X} (p : Path L1 L2) :
+noncomputable def sarkisov_kind_congr {L1 L2 : SarkisovLink X} (p : Path L1 L2) :
     Path L1.linkKind L2.linkKind :=
   Path.congrArg (fun L : SarkisovLink X => L.linkKind) p
 
-def sarkisov_roundtrip_stable (L : SarkisovLink X) :
+noncomputable def sarkisov_roundtrip_stable (L : SarkisovLink X) :
     Path (sarkisovRoundtrip (sarkisovNormalize L)) L := by
   simpa [sarkisovNormalize, sarkisovRoundtrip] using (Path.refl L)
 
@@ -434,42 +434,42 @@ end Sarkisov
 
 section Cremona
 
-@[simp] def cremonaCompose (f g : CremonaElement) : CremonaElement :=
+@[simp] noncomputable def cremonaCompose (f g : CremonaElement) : CremonaElement :=
   { degree := f.degree + g.degree
     inverseDegree := f.inverseDegree + g.inverseDegree }
 
-@[simp] def cremonaInverse (f : CremonaElement) : CremonaElement :=
+@[simp] noncomputable def cremonaInverse (f : CremonaElement) : CremonaElement :=
   { degree := f.inverseDegree, inverseDegree := f.degree }
 
-@[simp] def cremonaNormalize (f : CremonaElement) : CremonaElement := f
-@[simp] def cremonaSarkisovBridge (f : CremonaElement) : CremonaElement := f
+@[simp] noncomputable def cremonaNormalize (f : CremonaElement) : CremonaElement := f
+@[simp] noncomputable def cremonaSarkisovBridge (f : CremonaElement) : CremonaElement := f
 
-def cremona_refl (f : CremonaElement) : Path f f :=
+noncomputable def cremona_refl (f : CremonaElement) : Path f f :=
   Path.refl f
 
-def cremona_two_step (f : CremonaElement) : Path f f :=
+noncomputable def cremona_two_step (f : CremonaElement) : Path f f :=
   twoStep f
 
-def cremona_three_step (f : CremonaElement) : Path f f :=
+noncomputable def cremona_three_step (f : CremonaElement) : Path f f :=
   threeStep f
 
-def cremona_degree_congr {f g : CremonaElement} (p : Path f g) :
+noncomputable def cremona_degree_congr {f g : CremonaElement} (p : Path f g) :
     Path f.degree g.degree :=
   Path.congrArg (fun h : CremonaElement => h.degree) p
 
-def cremona_inverse_degree_congr {f g : CremonaElement} (p : Path f g) :
+noncomputable def cremona_inverse_degree_congr {f g : CremonaElement} (p : Path f g) :
     Path f.inverseDegree g.inverseDegree :=
   Path.congrArg (fun h : CremonaElement => h.inverseDegree) p
 
-def cremona_compose_refl (f g : CremonaElement) :
+noncomputable def cremona_compose_refl (f g : CremonaElement) :
     Path (cremonaCompose f g) (cremonaCompose f g) :=
   Path.refl (cremonaCompose f g)
 
-def cremona_inverse_refl (f : CremonaElement) :
+noncomputable def cremona_inverse_refl (f : CremonaElement) :
     Path (cremonaInverse (cremonaInverse f)) (cremonaNormalize f) := by
   simpa [cremonaInverse, cremonaNormalize] using (Path.refl f)
 
-def cremona_sarkisov_bridge_stable (f : CremonaElement) :
+noncomputable def cremona_sarkisov_bridge_stable (f : CremonaElement) :
     Path (cremonaSarkisovBridge (cremonaNormalize f)) f := by
   simpa [cremonaNormalize, cremonaSarkisovBridge] using (Path.refl f)
 

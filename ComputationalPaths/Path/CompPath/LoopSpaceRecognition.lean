@@ -41,14 +41,14 @@ structure PathSimpleEquiv (α : Type u) (β : Type v) where
   right_inv : ∀ y : β, Path (toFun (invFun y)) y
 
 /-- Identity `PathSimpleEquiv`. -/
-def pathSimpleEquivRefl (α : Type u) : PathSimpleEquiv α α :=
+noncomputable def pathSimpleEquivRefl (α : Type u) : PathSimpleEquiv α α :=
   { toFun := _root_.id
     invFun := _root_.id
     left_inv := fun x => Path.refl x
     right_inv := fun x => Path.refl x }
 
 /-- Convert a `SimpleEquiv` into a `PathSimpleEquiv`. -/
-def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
+noncomputable def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
     PathSimpleEquiv α β :=
   { toFun := e.toFun
     invFun := e.invFun
@@ -67,14 +67,14 @@ structure LoopSpaceRecognition (L : Type u) : Type (u + 1) where
   equiv : PathSimpleEquiv L (LoopSpace space base)
 
 /-- Any loop space recognizes itself. -/
-def recognizeLoopSpace (A : Type u) (a : A) :
+noncomputable def recognizeLoopSpace (A : Type u) (a : A) :
     LoopSpaceRecognition (LoopSpace A a) :=
   { space := A
     base := a
     equiv := pathSimpleEquivRefl (LoopSpace A a) }
 
 /-- Recognition obtained from a `SimpleEquiv` to a loop space. -/
-def recognizeLoopSpaceOfSimpleEquiv {L : Type u} {A : Type u} (a : A)
+noncomputable def recognizeLoopSpaceOfSimpleEquiv {L : Type u} {A : Type u} (a : A)
     (e : SimpleEquiv L (LoopSpace A a)) : LoopSpaceRecognition L :=
   { space := A
     base := a

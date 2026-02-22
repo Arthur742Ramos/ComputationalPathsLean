@@ -42,12 +42,12 @@ structure BundleSection (E : FiberBundle) where
   is_section : ∀ b, Path (E.proj (sec b)) b
 
 /-- The canonical section from fiberAt. -/
-def canonicalSection (E : FiberBundle) : BundleSection E where
+noncomputable def canonicalSection (E : FiberBundle) : BundleSection E where
   sec := fun b => E.inject b (E.fiberAt b)
   is_section := fun b => E.inject_fiber b
 
 /-- Projection of canonical section recovers base point. -/
-def canonicalSection_proj (E : FiberBundle) (b : E.base) :
+noncomputable def canonicalSection_proj (E : FiberBundle) (b : E.base) :
     Path (E.proj ((canonicalSection E).sec b)) b :=
   E.inject_fiber b
 
@@ -64,13 +64,13 @@ structure BundleMorphism (E₁ E₂ : FiberBundle) where
   commutes : ∀ e, Path (E₂.proj (totalMap e)) (baseMap (E₁.proj e))
 
 /-- Identity bundle morphism. -/
-def bundleMorphId (E : FiberBundle) : BundleMorphism E E where
+noncomputable def bundleMorphId (E : FiberBundle) : BundleMorphism E E where
   totalMap := fun e => e
   baseMap := fun b => b
   commutes := fun _ => Path.refl _
 
 /-- Composition of bundle morphisms. -/
-def bundleMorphComp {E₁ E₂ E₃ : FiberBundle}
+noncomputable def bundleMorphComp {E₁ E₂ E₃ : FiberBundle}
     (g : BundleMorphism E₂ E₃) (f : BundleMorphism E₁ E₂) : BundleMorphism E₁ E₃ where
   totalMap := fun e => g.totalMap (f.totalMap e)
   baseMap := fun b => g.baseMap (f.baseMap b)
@@ -109,12 +109,12 @@ theorem bundleMorphComp_assoc_base {E₁ E₂ E₃ E₄ : FiberBundle}
 /-! ## Pullback of Sections -/
 
 /-- Push a section forward along a morphism. -/
-def pushSection {E₁ E₂ : FiberBundle} (f : BundleMorphism E₁ E₂) (s : BundleSection E₁) :
+noncomputable def pushSection {E₁ E₂ : FiberBundle} (f : BundleMorphism E₁ E₂) (s : BundleSection E₁) :
     E₁.base → E₂.total :=
   fun b => f.totalMap (s.sec b)
 
 /-- Push section commutes with projection (path version). -/
-def pushSection_proj {E₁ E₂ : FiberBundle} (f : BundleMorphism E₁ E₂) (s : BundleSection E₁)
+noncomputable def pushSection_proj {E₁ E₂ : FiberBundle} (f : BundleMorphism E₁ E₂) (s : BundleSection E₁)
     (b : E₁.base) :
     Path (E₂.proj (pushSection f s b)) (f.baseMap b) := by
   unfold pushSection
@@ -142,22 +142,22 @@ structure LocalTriv (E : FiberBundle) where
   proj_compat : ∀ e, Path (toProduct e).1 (E.proj e)
 
 /-- Local trivialization preserves projection on round-trip. -/
-def localTriv_proj_roundtrip {E : FiberBundle} (t : LocalTriv E) (e : E.total) :
+noncomputable def localTriv_proj_roundtrip {E : FiberBundle} (t : LocalTriv E) (e : E.total) :
     Path (E.proj (t.fromProduct (t.toProduct e))) (E.proj e) :=
   Path.congrArg E.proj (t.left_inv e)
 
 /-- Local trivialization round-trip on the product side. -/
-def localTriv_product_roundtrip {E : FiberBundle} (t : LocalTriv E) (p : E.base × E.fiber) :
+noncomputable def localTriv_product_roundtrip {E : FiberBundle} (t : LocalTriv E) (p : E.base × E.fiber) :
     Path (t.toProduct (t.fromProduct p)) p :=
   t.right_inv p
 
 /-- Local trivialization: double round-trip from total is identity path. -/
-def localTriv_double_roundtrip {E : FiberBundle} (t : LocalTriv E) (e : E.total) :
+noncomputable def localTriv_double_roundtrip {E : FiberBundle} (t : LocalTriv E) (e : E.total) :
     Path (t.fromProduct (t.toProduct (t.fromProduct (t.toProduct e)))) e :=
   Path.trans (t.left_inv (t.fromProduct (t.toProduct e))) (t.left_inv e)
 
 /-- The first component of the trivialization agrees with projection via path symmetry. -/
-def localTriv_fst_symm {E : FiberBundle} (t : LocalTriv E) (e : E.total) :
+noncomputable def localTriv_fst_symm {E : FiberBundle} (t : LocalTriv E) (e : E.total) :
     Path (E.proj e) (t.toProduct e).1 :=
   Path.symm (t.proj_compat e)
 
@@ -172,25 +172,25 @@ structure Connection (E : FiberBundle) where
     Path (E.proj e) b → Path (lift (Path.refl b) e) e
 
 /-- Parallel transport along a path in the base. -/
-def parallelTransport {E : FiberBundle} (conn : Connection E)
+noncomputable def parallelTransport {E : FiberBundle} (conn : Connection E)
     {b₁ b₂ : E.base} (γ : Path b₁ b₂) (e : E.total) : E.total :=
   conn.lift γ e
 
 /-- Parallel transport along refl is identity. -/
-def parallelTransport_refl {E : FiberBundle} (conn : Connection E)
+noncomputable def parallelTransport_refl {E : FiberBundle} (conn : Connection E)
     (b : E.base) (e : E.total) (h : Path (E.proj e) b) :
     Path (parallelTransport conn (Path.refl b) e) e :=
   conn.lift_refl b e h
 
 /-- Parallel transport projects correctly. -/
-def parallelTransport_proj {E : FiberBundle} (conn : Connection E)
+noncomputable def parallelTransport_proj {E : FiberBundle} (conn : Connection E)
     {b₁ b₂ : E.base} (γ : Path b₁ b₂) (e : E.total)
     (h : Path (E.proj e) b₁) :
     Path (E.proj (parallelTransport conn γ e)) b₂ :=
   conn.lift_proj γ e h
 
 /-- Applying congrArg proj to a parallel transport path gives base endpoint. -/
-def parallelTransport_proj_congrArg {E : FiberBundle} (conn : Connection E)
+noncomputable def parallelTransport_proj_congrArg {E : FiberBundle} (conn : Connection E)
     (b : E.base) (e : E.total) (h : Path (E.proj e) b) :
     Path (E.proj (parallelTransport conn (Path.refl b) e)) (E.proj e) :=
   Path.congrArg E.proj (parallelTransport_refl conn b e h)
@@ -204,13 +204,13 @@ structure FlatConnection (E : FiberBundle) extends Connection E where
     Path (lift (Path.symm γ) (lift γ e)) e
 
 /-- Flat connection: reverse transport recovers original element. -/
-def flat_curvature_zero {E : FiberBundle} (conn : FlatConnection E)
+noncomputable def flat_curvature_zero {E : FiberBundle} (conn : FlatConnection E)
     {b₁ b₂ : E.base} (γ : Path b₁ b₂) (e : E.total) (h : Path (E.proj e) b₁) :
     Path (conn.lift (Path.symm γ) (conn.lift γ e)) e :=
   conn.flat γ e h
 
 /-- Flat connection: projection after round-trip returns to start. -/
-def flat_proj_roundtrip {E : FiberBundle} (conn : FlatConnection E)
+noncomputable def flat_proj_roundtrip {E : FiberBundle} (conn : FlatConnection E)
     {b₁ b₂ : E.base} (γ : Path b₁ b₂) (e : E.total) (h : Path (E.proj e) b₁) :
     Path (E.proj (conn.lift (Path.symm γ) (conn.lift γ e))) (E.proj e) :=
   Path.congrArg E.proj (conn.flat γ e h)
@@ -218,7 +218,7 @@ def flat_proj_roundtrip {E : FiberBundle} (conn : FlatConnection E)
 /-! ## Product Bundle -/
 
 /-- Product bundle: E = B × F. -/
-def productBundle (B F : Type u) (f₀ : F) : FiberBundle where
+noncomputable def productBundle (B F : Type u) (f₀ : F) : FiberBundle where
   base := B
   total := B × F
   fiber := F
@@ -233,7 +233,7 @@ theorem productBundle_proj (B F : Type u) (f₀ : F) (e : B × F) :
     (productBundle B F f₀).proj e = e.1 := rfl
 
 /-- Product bundle section from a function. -/
-def productBundleSection (B F : Type u) (f₀ : F) (s : B → F) :
+noncomputable def productBundleSection (B F : Type u) (f₀ : F) (s : B → F) :
     BundleSection (productBundle B F f₀) where
   sec := fun b => (b, s b)
   is_section := fun _ => Path.refl _
@@ -243,7 +243,7 @@ theorem productBundleSection_proj_refl (B F : Type u) (f₀ : F) (s : B → F) (
     (productBundleSection B F f₀ s).is_section b = Path.refl b := rfl
 
 /-- Product bundle is trivial. -/
-def productBundle_triv (B F : Type u) (f₀ : F) :
+noncomputable def productBundle_triv (B F : Type u) (f₀ : F) :
     LocalTriv (productBundle B F f₀) where
   toProduct := fun e => e
   fromProduct := fun p => p
@@ -252,7 +252,7 @@ def productBundle_triv (B F : Type u) (f₀ : F) :
   proj_compat := fun _ => Path.refl _
 
 /-- The trivial connection on a product bundle: doesn't move the fiber. -/
-def productBundle_conn (B F : Type u) (f₀ : F) :
+noncomputable def productBundle_conn (B F : Type u) (f₀ : F) :
     Connection (productBundle B F f₀) where
   lift := fun {_ _} _ e => e
   lift_proj := fun {b₁ b₂} γ e h =>
@@ -260,7 +260,7 @@ def productBundle_conn (B F : Type u) (f₀ : F) :
   lift_refl := fun _ _ _ => Path.refl _
 
 /-- Product bundle connection is flat. -/
-def productBundle_flatConn (B F : Type u) (f₀ : F) :
+noncomputable def productBundle_flatConn (B F : Type u) (f₀ : F) :
     FlatConnection (productBundle B F f₀) where
   toConnection := productBundle_conn B F f₀
   flat := fun _ _ _ => Path.refl _
@@ -268,7 +268,7 @@ def productBundle_flatConn (B F : Type u) (f₀ : F) :
 /-! ## Pullback Bundle -/
 
 /-- Pullback bundle: given f : A → B and E over B, form f*E over A. -/
-def pullbackBundle (E : FiberBundle) (A : Type u) (f : A → E.base) : FiberBundle where
+noncomputable def pullbackBundle (E : FiberBundle) (A : Type u) (f : A → E.base) : FiberBundle where
   base := A
   total := A × E.fiber
   fiber := E.fiber
@@ -287,7 +287,7 @@ theorem pullbackBundle_fiber (E : FiberBundle) (A : Type u) (f : A → E.base) :
     (pullbackBundle E A f).fiber = E.fiber := rfl
 
 /-- Pullback of a section along a base map. -/
-def pullbackSection {E : FiberBundle} (A : Type u) (f : A → E.base)
+noncomputable def pullbackSection {E : FiberBundle} (A : Type u) (f : A → E.base)
     : BundleSection (pullbackBundle E A f) where
   sec := fun a => (a, E.fiberAt (f a))
   is_section := fun _ => Path.refl _
@@ -296,7 +296,7 @@ def pullbackSection {E : FiberBundle} (A : Type u) (f : A → E.base)
 
 /-- Transport in a dependent type family models the associated bundle construction.
     Transport along p then symm p recovers the original. -/
-def associated_bundle_transport {B : Type u} {D : B → Type u}
+noncomputable def associated_bundle_transport {B : Type u} {D : B → Type u}
     {b₁ b₂ : B} (p : Path b₁ b₂) (x : D b₁) :
     Path.transport (D := D) (Path.trans p (Path.symm p)) x = x := by
   cases p with
@@ -305,7 +305,7 @@ def associated_bundle_transport {B : Type u} {D : B → Type u}
     simp [Path.transport]
 
 /-- Transport composition: transporting along p then q equals transport along (trans p q). -/
-def associated_bundle_trans {B : Type u} {D : B → Type u}
+noncomputable def associated_bundle_trans {B : Type u} {D : B → Type u}
     {b₁ b₂ b₃ : B} (p : Path b₁ b₂) (q : Path b₂ b₃) (x : D b₁) :
     Path.transport (D := D) q (Path.transport (D := D) p x) =
     Path.transport (D := D) (Path.trans p q) x := by
@@ -331,7 +331,7 @@ structure BundleAuto (E : FiberBundle) extends BundleMorphism E E where
   right_inv : ∀ e, Path (totalMap (inv e)) e
 
 /-- Identity automorphism. -/
-def bundleAutoId (E : FiberBundle) : BundleAuto E where
+noncomputable def bundleAutoId (E : FiberBundle) : BundleAuto E where
   totalMap := fun e => e
   baseMap := fun b => b
   commutes := fun _ => Path.refl _
@@ -340,37 +340,37 @@ def bundleAutoId (E : FiberBundle) : BundleAuto E where
   right_inv := fun _ => Path.refl _
 
 /-- Auto inverse composed with auto is identity path. -/
-def bundleAuto_inv_left (E : FiberBundle) (φ : BundleAuto E) (e : E.total) :
+noncomputable def bundleAuto_inv_left (E : FiberBundle) (φ : BundleAuto E) (e : E.total) :
     Path (φ.inv (φ.totalMap e)) e := φ.left_inv e
 
 /-- Auto composed with inverse is identity path. -/
-def bundleAuto_inv_right (E : FiberBundle) (φ : BundleAuto E) (e : E.total) :
+noncomputable def bundleAuto_inv_right (E : FiberBundle) (φ : BundleAuto E) (e : E.total) :
     Path (φ.totalMap (φ.inv e)) e := φ.right_inv e
 
 /-- Projection coherence: proj ∘ auto ∘ inv agrees with proj via path. -/
-def bundleAuto_proj_inv {E : FiberBundle} (φ : BundleAuto E) (e : E.total) :
+noncomputable def bundleAuto_proj_inv {E : FiberBundle} (φ : BundleAuto E) (e : E.total) :
     Path (E.proj (φ.totalMap (φ.inv e))) (E.proj e) :=
   Path.congrArg E.proj (φ.right_inv e)
 
 /-- Composition of autos preserves the commutation square. -/
-def bundleAuto_comp_commutes {E : FiberBundle} (φ ψ : BundleAuto E) (e : E.total) :
+noncomputable def bundleAuto_comp_commutes {E : FiberBundle} (φ ψ : BundleAuto E) (e : E.total) :
     Path (E.proj (φ.totalMap (ψ.totalMap e))) (φ.baseMap (ψ.baseMap (E.proj e))) :=
   Path.trans (φ.commutes (ψ.totalMap e)) (Path.congrArg φ.baseMap (ψ.commutes e))
 
 /-! ## Transition Functions -/
 
 /-- Transition function between two trivializations: compose one with inverse of other. -/
-def transitionFunction {E : FiberBundle} (t₁ t₂ : LocalTriv E)
+noncomputable def transitionFunction {E : FiberBundle} (t₁ t₂ : LocalTriv E)
     (p : E.base × E.fiber) : E.base × E.fiber :=
   t₂.toProduct (t₁.fromProduct p)
 
 /-- Transition function with itself is identity (up to path). -/
-def transition_self {E : FiberBundle} (t : LocalTriv E) (p : E.base × E.fiber) :
+noncomputable def transition_self {E : FiberBundle} (t : LocalTriv E) (p : E.base × E.fiber) :
     Path (transitionFunction t t p) p :=
   Path.trans (Path.congrArg t.toProduct (Path.refl (t.fromProduct p))) (t.right_inv p)
 
 /-- Transition function composition: g₁₃ = g₂₃ ∘ g₁₂. -/
-def transition_compose {E : FiberBundle} (t₁ t₂ t₃ : LocalTriv E)
+noncomputable def transition_compose {E : FiberBundle} (t₁ t₂ t₃ : LocalTriv E)
     (p : E.base × E.fiber) :
     Path (transitionFunction t₁ t₃ p)
          (transitionFunction t₂ t₃ (transitionFunction t₁ t₂ p)) := by
@@ -378,7 +378,7 @@ def transition_compose {E : FiberBundle} (t₁ t₂ t₃ : LocalTriv E)
   exact Path.congrArg t₃.toProduct (Path.symm (t₂.left_inv (t₁.fromProduct p)))
 
 /-- Transition function of t₁ to t₂ then t₂ to t₁ recovers original. -/
-def transition_inv {E : FiberBundle} (t₁ t₂ : LocalTriv E) (p : E.base × E.fiber) :
+noncomputable def transition_inv {E : FiberBundle} (t₁ t₂ : LocalTriv E) (p : E.base × E.fiber) :
     Path (transitionFunction t₂ t₁ (transitionFunction t₁ t₂ p)) p := by
   unfold transitionFunction
   exact Path.trans
@@ -389,13 +389,13 @@ def transition_inv {E : FiberBundle} (t₁ t₂ : LocalTriv E) (p : E.base × E.
 
 /-- A morphism maps a section's values coherently: the projected image
     equals the base map applied to the base point. -/
-def morphism_section_coherence {E₁ E₂ : FiberBundle}
+noncomputable def morphism_section_coherence {E₁ E₂ : FiberBundle}
     (f : BundleMorphism E₁ E₂) (s : BundleSection E₁) (b : E₁.base) :
     Path (E₂.proj (f.totalMap (s.sec b))) (f.baseMap b) :=
   Path.trans (f.commutes (s.sec b)) (Path.congrArg f.baseMap (s.is_section b))
 
 /-- Composing morphisms preserves section coherence. -/
-def morphism_section_coherence_comp {E₁ E₂ E₃ : FiberBundle}
+noncomputable def morphism_section_coherence_comp {E₁ E₂ E₃ : FiberBundle}
     (g : BundleMorphism E₂ E₃) (f : BundleMorphism E₁ E₂)
     (s : BundleSection E₁) (b : E₁.base) :
     Path (E₃.proj (g.totalMap (f.totalMap (s.sec b)))) (g.baseMap (f.baseMap b)) :=

@@ -131,12 +131,12 @@ structure Bundle where
   rank : Nat
 
 /-- Direct sum of bundles. -/
-def Bundle.directSum (E F : Bundle) : Bundle where
+noncomputable def Bundle.directSum (E F : Bundle) : Bundle where
   label := E.label + F.label  -- arbitrary labeling
   rank := E.rank + F.rank
 
 /-- The trivial bundle of rank n. -/
-def Bundle.trivial (n : Nat) : Bundle where
+noncomputable def Bundle.trivial (n : Nat) : Bundle where
   label := 0
   rank := n
 
@@ -173,7 +173,7 @@ theorem chern_zero_is_one (E : Bundle) : C.chern 0 E = R.one :=
   C.chern_zero E
 
 /-- `Path`-typed witness of `c_0(E) = 1`. -/
-def chern_zero_is_onePath (E : Bundle) : Path (C.chern 0 E) R.one :=
+noncomputable def chern_zero_is_onePath (E : Bundle) : Path (C.chern 0 E) R.one :=
   Path.stepChain (C.chern_zero E)
 
 /-- c_k vanishes above the rank. -/
@@ -182,7 +182,7 @@ theorem chern_vanishing_above (k : Nat) (E : Bundle) (hk : k > E.rank) :
   C.chern_vanishing k E hk
 
 /-- `Path`-typed vanishing above the rank. -/
-def chern_vanishing_abovePath (k : Nat) (E : Bundle) (hk : k > E.rank) :
+noncomputable def chern_vanishing_abovePath (k : Nat) (E : Bundle) (hk : k > E.rank) :
     Path (C.chern k E) (R.zero (2 * k)) :=
   Path.stepChain (C.chern_vanishing k E hk)
 
@@ -205,7 +205,7 @@ We represent it as a finite tuple.
 -/
 
 /-- Components of the total Chern class for a rank-n bundle. -/
-def totalChernComponents {R : GradedRing} (C : ChernClassData R) (E : Bundle) :
+noncomputable def totalChernComponents {R : GradedRing} (C : ChernClassData R) (E : Bundle) :
     (k : Fin (E.rank + 1)) → R.carrier (2 * k.val) :=
   fun k => C.chern k.val E
 
@@ -268,7 +268,7 @@ theorem sw_zero_is_one (E : Bundle) : W.sw 0 E = M.one :=
   W.sw_zero E
 
 /-- `Path`-typed witness of `w_0(E) = 1`. -/
-def sw_zero_is_onePath (E : Bundle) : Path (W.sw 0 E) M.one :=
+noncomputable def sw_zero_is_onePath (E : Bundle) : Path (W.sw 0 E) M.one :=
   Path.stepChain (W.sw_zero E)
 
 /-- w_k vanishes above the rank. -/
@@ -277,7 +277,7 @@ theorem sw_vanishing_above (k : Nat) (E : Bundle) (hk : k > E.rank) :
   W.sw_vanishing k E hk
 
 /-- `Path`-typed vanishing above the rank. -/
-def sw_vanishing_abovePath (k : Nat) (E : Bundle) (hk : k > E.rank) :
+noncomputable def sw_vanishing_abovePath (k : Nat) (E : Bundle) (hk : k > E.rank) :
     Path (W.sw k E) (M.zero k) :=
   Path.stepChain (W.sw_vanishing k E hk)
 
@@ -296,7 +296,7 @@ end StiefelWhitneyData
 /-! ## Total Stiefel-Whitney Class -/
 
 /-- Components of the total Stiefel-Whitney class. -/
-def totalSWComponents {M : GradedMod2} (W : StiefelWhitneyData M) (E : Bundle) :
+noncomputable def totalSWComponents {M : GradedMod2} (W : StiefelWhitneyData M) (E : Bundle) :
     (k : Fin (E.rank + 1)) → M.carrier k.val :=
   fun k => W.sw k.val E
 
@@ -350,7 +350,7 @@ theorem euler_rank_zero :
   E_data.euler_trivial_zero
 
 /-- `Path`-typed Euler class for the rank-0 trivial bundle. -/
-def euler_rank_zeroPath :
+noncomputable def euler_rank_zeroPath :
     Path (E_data.euler (Bundle.trivial 0)) (cast (by simp [Bundle.rank_trivial]) R.one) :=
   Path.stepChain E_data.euler_trivial_zero
 
@@ -363,7 +363,7 @@ theorem euler_rank_one :
   exact h
 
 /-- `Path`-typed Euler class for the rank-1 trivial bundle. -/
-def euler_rank_onePath : Path (E_data.euler (Bundle.trivial 1)) (R.zero 1) :=
+noncomputable def euler_rank_onePath : Path (E_data.euler (Bundle.trivial 1)) (R.zero 1) :=
   Path.stepChain (euler_rank_one (E_data := E_data))
 
 end EulerClassData
@@ -391,7 +391,7 @@ theorem pont_zero_is_one (E : Bundle) : P.pont 0 E = R.one :=
   P.pont_zero E
 
 /-- `Path`-typed witness of `p_0(E) = 1`. -/
-def pont_zero_is_onePath (E : Bundle) : Path (P.pont 0 E) R.one :=
+noncomputable def pont_zero_is_onePath (E : Bundle) : Path (P.pont 0 E) R.one :=
   Path.stepChain (P.pont_zero E)
 
 /-- Pontryagin classes vanish above half the rank. -/
@@ -400,7 +400,7 @@ theorem pont_vanishing_above (k : Nat) (E : Bundle) (hk : 2 * k > E.rank) :
   P.pont_vanishing k E hk
 
 /-- `Path`-typed vanishing above half the rank. -/
-def pont_vanishing_abovePath (k : Nat) (E : Bundle) (hk : 2 * k > E.rank) :
+noncomputable def pont_vanishing_abovePath (k : Nat) (E : Bundle) (hk : 2 * k > E.rank) :
     Path (P.pont k E) (R.zero (4 * k)) :=
   Path.stepChain (P.pont_vanishing k E hk)
 
@@ -415,7 +415,7 @@ For trivial bundles it maps to rank.
 /-- The Chern character of the trivial rank-n bundle. The ch(trivial_n) = n
     in degree 0 and 0 in all higher degrees.
     We record just the degree-0 value. -/
-def chernCharacterTrivialDegreeZero (n : Nat) : Nat := n
+noncomputable def chernCharacterTrivialDegreeZero (n : Nat) : Nat := n
 
 /-- ch(trivial_0) = 0 in degree 0. -/
 theorem chernCharacterTrivial_zero :

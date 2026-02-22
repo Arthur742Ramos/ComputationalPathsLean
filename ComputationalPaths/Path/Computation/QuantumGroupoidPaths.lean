@@ -22,29 +22,29 @@ structure QState where
   phase : Nat
 deriving DecidableEq, Repr
 
-@[simp] def groundState : QState := ⟨0, 0⟩
-@[simp] def excited1 : QState := ⟨1, 0⟩
-@[simp] def excited2 : QState := ⟨2, 0⟩
+@[simp] noncomputable def groundState : QState := ⟨0, 0⟩
+@[simp] noncomputable def excited1 : QState := ⟨1, 0⟩
+@[simp] noncomputable def excited2 : QState := ⟨2, 0⟩
 
 /-! ## Quantum gates -/
 
 /-- Pauli-X analogue: swap level bits. -/
-@[simp] def pauliX (q : QState) : QState := ⟨q.phase, q.level⟩
+@[simp] noncomputable def pauliX (q : QState) : QState := ⟨q.phase, q.level⟩
 
 /-- Phase shift. -/
-@[simp] def phaseShift (q : QState) : QState := ⟨q.level, q.phase + 1⟩
+@[simp] noncomputable def phaseShift (q : QState) : QState := ⟨q.level, q.phase + 1⟩
 
 /-- Identity gate. -/
-@[simp] def gateId (q : QState) : QState := q
+@[simp] noncomputable def gateId (q : QState) : QState := q
 
 /-- Level doubling gate. -/
-@[simp] def levelDouble (q : QState) : QState := ⟨q.level + q.level, q.phase⟩
+@[simp] noncomputable def levelDouble (q : QState) : QState := ⟨q.level + q.level, q.phase⟩
 
 /-- Phase reset (measurement projection). -/
-@[simp] def measureProject (q : QState) : QState := ⟨q.level, 0⟩
+@[simp] noncomputable def measureProject (q : QState) : QState := ⟨q.level, 0⟩
 
 /-- Level-phase swap. -/
-@[simp] def lpSwap (q : QState) : QState := ⟨q.phase, q.level⟩
+@[simp] noncomputable def lpSwap (q : QState) : QState := ⟨q.phase, q.level⟩
 
 /-! ## Groupoid structure: morphisms ARE paths, composition IS trans, inverse IS symm -/
 
@@ -52,15 +52,15 @@ deriving DecidableEq, Repr
 abbrev UnitaryMorphism (a b : QState) := Path a b
 
 /-- Identity morphism IS refl. -/
-def idMorphism (a : QState) : UnitaryMorphism a a := Path.refl a
+noncomputable def idMorphism (a : QState) : UnitaryMorphism a a := Path.refl a
 
 /-- Composition of morphisms IS trans. -/
-def composeMorphism {a b c : QState}
+noncomputable def composeMorphism {a b c : QState}
     (f : UnitaryMorphism a b) (g : UnitaryMorphism b c) : UnitaryMorphism a c :=
   Path.trans f g
 
 /-- Inverse of a morphism IS symm. -/
-def inverseMorphism {a b : QState}
+noncomputable def inverseMorphism {a b : QState}
     (f : UnitaryMorphism a b) : UnitaryMorphism b a :=
   Path.symm f
 
@@ -113,7 +113,7 @@ theorem morphism_inv_right_eq {a b : QState} (f : UnitaryMorphism a b) :
 /-! ## Functorial gate action IS congrArg -/
 
 -- 9. Gate action IS congrArg
-def gateAction (gate : QState → QState) {a b : QState}
+noncomputable def gateAction (gate : QState → QState) {a b : QState}
     (p : UnitaryMorphism a b) : UnitaryMorphism (gate a) (gate b) :=
   Path.congrArg gate p
 
@@ -135,21 +135,21 @@ theorem gateAction_inverse (gate : QState → QState) {a b : QState}
 theorem pauliX_involution (q : QState) : pauliX (pauliX q) = q := by
   cases q; simp
 
-def pauliX_inv_path (q : QState) : Path (pauliX (pauliX q)) q :=
+noncomputable def pauliX_inv_path (q : QState) : Path (pauliX (pauliX q)) q :=
   Path.mk [Step.mk _ _ (pauliX_involution q)] (pauliX_involution q)
 
 -- 13. lpSwap = pauliX (definitional)
 theorem lpSwap_eq_pauliX (q : QState) : lpSwap q = pauliX q := by rfl
 
 -- 14. PauliX roundtrip path (trans of path and its symm-shift)
-def pauliX_roundtrip (q : QState) : Path q q :=
+noncomputable def pauliX_roundtrip (q : QState) : Path q q :=
   Path.trans (Path.symm (pauliX_inv_path q)) (pauliX_inv_path q)
 
 -- 15. Measurement is idempotent
 theorem measure_idempotent (q : QState) :
     measureProject (measureProject q) = measureProject q := by simp
 
-def measure_idempotent_path (q : QState) :
+noncomputable def measure_idempotent_path (q : QState) :
     Path (measureProject (measureProject q)) (measureProject q) :=
   Path.mk [Step.mk _ _ (measure_idempotent q)] (measure_idempotent q)
 
@@ -157,26 +157,26 @@ def measure_idempotent_path (q : QState) :
 theorem measure_kills_phase (q : QState) :
     measureProject (phaseShift q) = measureProject q := by simp
 
-def measure_kills_phase_path (q : QState) :
+noncomputable def measure_kills_phase_path (q : QState) :
     Path (measureProject (phaseShift q)) (measureProject q) :=
   Path.mk [Step.mk _ _ (measure_kills_phase q)] (measure_kills_phase q)
 
 -- 17. Transport along gate path
-def quantum_transport {D : QState → Type} {a b : QState}
+noncomputable def quantum_transport {D : QState → Type} {a b : QState}
     (p : UnitaryMorphism a b) (x : D a) : D b :=
   Path.transport p x
 
 -- 18. Step construction for pauliX involution
-def pauliX_inv_step (q : QState) : Step QState :=
+noncomputable def pauliX_inv_step (q : QState) : Step QState :=
   ⟨pauliX (pauliX q), q, pauliX_involution q⟩
 
 -- 19. CongrArg through pauliX
-def pauliX_functorial {a b : QState} (p : Path a b) :
+noncomputable def pauliX_functorial {a b : QState} (p : Path a b) :
     Path (pauliX a) (pauliX b) :=
   Path.congrArg pauliX p
 
 -- 20. CongrArg through measureProject
-def measure_functorial {a b : QState} (p : Path a b) :
+noncomputable def measure_functorial {a b : QState} (p : Path a b) :
     Path (measureProject a) (measureProject b) :=
   Path.congrArg measureProject p
 
@@ -193,7 +193,7 @@ theorem gateAction_comp (f g : QState → QState) {a b : QState}
 theorem pauliX_comp_id : pauliX ∘ pauliX = gateId := by
   funext q; cases q; simp
 
-def pauliX_comp_path : Path (pauliX ∘ pauliX) gateId :=
+noncomputable def pauliX_comp_path : Path (pauliX ∘ pauliX) gateId :=
   Path.mk [Step.mk _ _ pauliX_comp_id] pauliX_comp_id
 
 -- 24. Level doubling preserves phase
@@ -206,7 +206,7 @@ theorem pauliX_ground : pauliX groundState = groundState := by rfl
 theorem measure_ground : measureProject groundState = groundState := by rfl
 
 -- 27. Three-morphism composition
-def triple_compose {a b c d : QState}
+noncomputable def triple_compose {a b c d : QState}
     (f : UnitaryMorphism a b) (g : UnitaryMorphism b c) (h : UnitaryMorphism c d) :
     UnitaryMorphism a d :=
   Path.trans f (Path.trans g h)
@@ -223,7 +223,7 @@ theorem whisker_refl (gate : QState → QState) (a : QState) :
   simp [Path.congrArg]
 
 -- 30. Morphism between measured states via measure_functorial
-def measured_morphism {a b : QState} (p : UnitaryMorphism a b) :
+noncomputable def measured_morphism {a b : QState} (p : UnitaryMorphism a b) :
     UnitaryMorphism (measureProject a) (measureProject b) :=
   measure_functorial p
 

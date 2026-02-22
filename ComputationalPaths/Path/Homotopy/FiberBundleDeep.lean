@@ -80,23 +80,23 @@ namespace GrpData
 variable {G : Type u} (grp : GrpData G)
 
 /-- Path witness: left identity. -/
-def e_mul_path (a : G) : Path (grp.mul grp.e a) a :=
+noncomputable def e_mul_path (a : G) : Path (grp.mul grp.e a) a :=
   Path.stepChain (grp.e_mul a)
 
 /-- Path witness: right identity. -/
-def mul_e_path (a : G) : Path (grp.mul a grp.e) a :=
+noncomputable def mul_e_path (a : G) : Path (grp.mul a grp.e) a :=
   Path.stepChain (grp.mul_e a)
 
 /-- Path witness: left inverse. -/
-def inv_mul_path (a : G) : Path (grp.mul (grp.inv a) a) grp.e :=
+noncomputable def inv_mul_path (a : G) : Path (grp.mul (grp.inv a) a) grp.e :=
   Path.stepChain (grp.inv_mul a)
 
 /-- Path witness: right inverse. -/
-def mul_inv_path (a : G) : Path (grp.mul a (grp.inv a)) grp.e :=
+noncomputable def mul_inv_path (a : G) : Path (grp.mul a (grp.inv a)) grp.e :=
   Path.stepChain (grp.mul_inv a)
 
 /-- Path witness: associativity. -/
-def assoc_path (a b c : G) :
+noncomputable def assoc_path (a b c : G) :
     Path (grp.mul (grp.mul a b) c) (grp.mul a (grp.mul b c)) :=
   Path.stepChain (grp.mul_assoc a b c)
 
@@ -114,7 +114,7 @@ theorem inv_inv (a : G) : grp.inv (grp.inv a) = a := by
     _ = a := grp.e_mul a
 
 -- Theorem 2: inv_inv as Path
-def inv_inv_path (a : G) : Path (grp.inv (grp.inv a)) a :=
+noncomputable def inv_inv_path (a : G) : Path (grp.inv (grp.inv a)) a :=
   Path.stepChain (grp.inv_inv a)
 
 end GrpData
@@ -132,11 +132,11 @@ namespace RightAction
 variable {G X : Type u} {grp : GrpData G} (ra : RightAction G X grp)
 
 -- Theorem 3: action by identity is identity (Path)
-def act_e_path (x : X) : Path (ra.act x grp.e) x :=
+noncomputable def act_e_path (x : X) : Path (ra.act x grp.e) x :=
   Path.stepChain (ra.act_e x)
 
 -- Theorem 4: action associativity (Path)
-def act_mul_path (x : X) (g h : G) :
+noncomputable def act_mul_path (x : X) (g h : G) :
     Path (ra.act (ra.act x g) h) (ra.act x (grp.mul g h)) :=
   Path.stepChain (ra.act_mul x g h)
 
@@ -144,7 +144,7 @@ def act_mul_path (x : X) (g h : G) :
 theorem act_inv_cancel (x : X) (g : G) : ra.act (ra.act x g) (grp.inv g) = x := by
   rw [ra.act_mul, grp.mul_inv, ra.act_e]
 
-def act_inv_cancel_path (x : X) (g : G) :
+noncomputable def act_inv_cancel_path (x : X) (g : G) :
     Path (ra.act (ra.act x g) (grp.inv g)) x :=
   Path.stepChain (ra.act_inv_cancel x g)
 
@@ -152,7 +152,7 @@ def act_inv_cancel_path (x : X) (g : G) :
 theorem inv_act_cancel (x : X) (g : G) : ra.act (ra.act x (grp.inv g)) g = x := by
   rw [ra.act_mul, grp.inv_mul, ra.act_e]
 
-def inv_act_cancel_path (x : X) (g : G) :
+noncomputable def inv_act_cancel_path (x : X) (g : G) :
     Path (ra.act (ra.act x (grp.inv g)) g) x :=
   Path.stepChain (ra.inv_act_cancel x g)
 
@@ -175,12 +175,12 @@ namespace PrincipalBundleData
 variable {B P G : Type u} (pb : PrincipalBundleData B P G)
 
 -- Theorem 7: equivariance as Path
-def equivariant_path (p : P) (g : G) :
+noncomputable def equivariant_path (p : P) (g : G) :
     Path (pb.proj (pb.action.act p g)) (pb.proj p) :=
   Path.stepChain (pb.equivariant p g)
 
 -- Theorem 8: action by e preserves projection
-def proj_act_e (p : P) : Path (pb.proj (pb.action.act p pb.grp.e)) (pb.proj p) :=
+noncomputable def proj_act_e (p : P) : Path (pb.proj (pb.action.act p pb.grp.e)) (pb.proj p) :=
   Path.stepChain (by rw [pb.action.act_e])
 
 -- Theorem 9: free action implies unique transition element
@@ -216,12 +216,12 @@ namespace AssociatedBundleData
 variable {B P G F : Type u} (ab : AssociatedBundleData B P G F)
 
 -- Theorem 10: associated bundle projection is well-defined up to G-action
-def pair_proj_path (p : P) (f : F) :
+noncomputable def pair_proj_path (p : P) (f : F) :
     Path (ab.assocProj (ab.pair p f)) (ab.principal.proj p) :=
   Path.stepChain (ab.pair_proj p f)
 
 -- Theorem 11: equivariance as Path
-def pair_equiv_path (p : P) (f : F) (g : G) :
+noncomputable def pair_equiv_path (p : P) (f : F) (g : G) :
     Path (ab.pair (ab.principal.action.act p g)
               (ab.fiberAction.act f (ab.principal.grp.inv g)))
          (ab.pair p f) :=
@@ -256,7 +256,7 @@ namespace ClutchingData
 variable {F : Type u}
 
 -- Theorem 13: identity clutching function
-def identity : ClutchingData F where
+noncomputable def identity : ClutchingData F where
   Overlap := PUnit
   clutch := fun _ f => f
   clutchInv := fun _ f => f
@@ -264,12 +264,12 @@ def identity : ClutchingData F where
   inv_clutch := fun _ _ => rfl
 
 -- Theorem 14: identity clutching gives trivial bundle (witnessed by Path)
-def identity_clutch_path (f : F) :
+noncomputable def identity_clutch_path (f : F) :
     Path (identity.clutch PUnit.unit f) f :=
   Path.refl f
 
 -- Theorem 15: composition of clutching data
-def compose (c₁ c₂ : ClutchingData F)
+noncomputable def compose (c₁ c₂ : ClutchingData F)
     (hOverlap : c₁.Overlap = c₂.Overlap) : ClutchingData F where
   Overlap := c₁.Overlap
   clutch := fun a f => c₁.clutch a (c₂.clutch (hOverlap ▸ a) f)
@@ -280,12 +280,12 @@ def compose (c₁ c₂ : ClutchingData F)
     simp [c₁.inv_clutch, c₂.inv_clutch]
 
 -- Theorem 16: round-trip as Path
-def clutch_roundtrip_path (cd : ClutchingData F) (a : cd.Overlap) (f : F) :
+noncomputable def clutch_roundtrip_path (cd : ClutchingData F) (a : cd.Overlap) (f : F) :
     Path (cd.clutch a (cd.clutchInv a f)) f :=
   Path.stepChain (cd.clutch_inv a f)
 
 -- Theorem 17: inverse round-trip as Path
-def inv_roundtrip_path (cd : ClutchingData F) (a : cd.Overlap) (f : F) :
+noncomputable def inv_roundtrip_path (cd : ClutchingData F) (a : cd.Overlap) (f : F) :
     Path (cd.clutchInv a (cd.clutch a f)) f :=
   Path.stepChain (cd.inv_clutch a f)
 
@@ -318,17 +318,17 @@ namespace ClassifyingSpace
 variable {G : Type u} (cs : ClassifyingSpace G)
 
 -- Theorem 19: EG is contractible (any two points connected)
-def eg_connected (x y : EG cs) : Path x y :=
+noncomputable def eg_connected (x y : EG cs) : Path x y :=
   Path.trans (cs.contractible.contract x) (Path.symm (cs.contractible.contract y))
 
 -- Theorem 20: any two points project to connected base points
-def proj_center_connected (x : EG cs) :
+noncomputable def proj_center_connected (x : EG cs) :
     Path (cs.proj x) (cs.proj cs.contractible.center) := by
   have h := (cs.contractible.contract x).proof
   exact Path.stepChain (_root_.congrArg cs.proj h)
 
 -- Theorem 21: G-orbits in EG map to single base point
-def orbit_proj (x : EG cs) (g : G) :
+noncomputable def orbit_proj (x : EG cs) (g : G) :
     Path (cs.proj (cs.action.act x g)) (cs.proj x) :=
   Path.stepChain (cs.equivariant x g)
 
@@ -363,7 +363,7 @@ structure BundleEquiv (P₁ P₂ : Type u) (pb₁ : PrincipalBundleData B P₁ G
   roundtrip_bwd : ∀ p, fwd (bwd p) = p
 
 -- Theorem 23: identity bundle equivalence
-def bundleEquiv_refl (P : Type u) (pb : PrincipalBundleData B P G) :
+noncomputable def bundleEquiv_refl (P : Type u) (pb : PrincipalBundleData B P G) :
     BundleEquiv P P pb pb where
   fwd := id
   bwd := id
@@ -373,7 +373,7 @@ def bundleEquiv_refl (P : Type u) (pb : PrincipalBundleData B P G) :
   roundtrip_bwd := fun _ => rfl
 
 -- Theorem 24: bundle equivalence roundtrip paths
-def bundleEquiv_roundtrip_path (P₁ P₂ : Type u)
+noncomputable def bundleEquiv_roundtrip_path (P₁ P₂ : Type u)
     (pb₁ : PrincipalBundleData B P₁ G) (pb₂ : PrincipalBundleData B P₂ G)
     (be : BundleEquiv P₁ P₂ pb₁ pb₂) (p : P₁) :
     Path (be.bwd (be.fwd p)) p :=
@@ -404,7 +404,7 @@ namespace CharClassData
 variable {G R : Type u} (cc : CharClassData G R)
 
 -- Theorem 25: naturality of characteristic class is reflexive (base case)
-def naturality_refl (B P : Type u) (pb : PrincipalBundleData B P G) (b : B) :
+noncomputable def naturality_refl (B P : Type u) (pb : PrincipalBundleData B P G) (b : B) :
     Path ((cc.assign B P pb).val b) ((cc.assign B P pb).val b) :=
   Path.refl _
 
@@ -422,18 +422,18 @@ namespace WhitneySumFormula
 variable {R : Type u} (wsf : WhitneySumFormula R)
 
 -- Theorem 26: commutativity path
-def mul_comm_path (a b : R) : Path (wsf.mul a b) (wsf.mul b a) :=
+noncomputable def mul_comm_path (a b : R) : Path (wsf.mul a b) (wsf.mul b a) :=
   Path.stepChain (wsf.mul_comm a b)
 
 -- Theorem 27: unit path
-def mul_one_path (a : R) : Path (wsf.mul a wsf.one) a :=
+noncomputable def mul_one_path (a : R) : Path (wsf.mul a wsf.one) a :=
   Path.stepChain (wsf.mul_one a)
 
 -- Theorem 28: left unit
 theorem one_mul (a : R) : wsf.mul wsf.one a = a := by
   rw [wsf.mul_comm]; exact wsf.mul_one a
 
-def one_mul_path (a : R) : Path (wsf.mul wsf.one a) a :=
+noncomputable def one_mul_path (a : R) : Path (wsf.mul wsf.one a) a :=
   Path.stepChain (wsf.one_mul a)
 
 end WhitneySumFormula
@@ -454,7 +454,7 @@ namespace GaugeTransformation
 variable {B P G : Type u} {pb : PrincipalBundleData B P G}
 
 -- Theorem 29: identity gauge transformation
-def idGauge : GaugeTransformation pb where
+noncomputable def idGauge : GaugeTransformation pb where
   map := id
   proj_compat := fun _ => rfl
   equivariant := fun _ _ => rfl
@@ -463,7 +463,7 @@ def idGauge : GaugeTransformation pb where
   inv_roundtrip := fun _ => rfl
 
 -- Theorem 30: composition of gauge transformations
-def compGauge (g₁ g₂ : GaugeTransformation pb) : GaugeTransformation pb where
+noncomputable def compGauge (g₁ g₂ : GaugeTransformation pb) : GaugeTransformation pb where
   map := g₁.map ∘ g₂.map
   proj_compat := fun p => by
     simp [Function.comp]
@@ -480,7 +480,7 @@ def compGauge (g₁ g₂ : GaugeTransformation pb) : GaugeTransformation pb wher
     rw [g₂.inv_roundtrip, g₁.inv_roundtrip]
 
 -- Theorem 31: gauge roundtrip Path
-def gauge_roundtrip_path (gt : GaugeTransformation pb) (p : P) :
+noncomputable def gauge_roundtrip_path (gt : GaugeTransformation pb) (p : P) :
     Path (gt.inv (gt.map p)) p :=
   Path.stepChain (gt.roundtrip p)
 
@@ -506,7 +506,7 @@ namespace FiberTransport
 variable {B E F : Type u} {bd : FiberBundleData B E F} (ft : FiberTransport bd)
 
 -- Theorem 34: transport along refl is identity (Path)
-def transport_refl_path (b : B) (f : F) :
+noncomputable def transport_refl_path (b : B) (f : F) :
     Path (ft.transport b b (Path.refl b) f) f :=
   Path.stepChain (ft.transport_refl b f)
 

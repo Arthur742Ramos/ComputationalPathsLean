@@ -42,16 +42,16 @@ variable {p : Path a b} {q : Path b c} {r : Path c d}
 variable {x : B a} {y : B b} {z : B c} {w : B d}
 
 /-- Reflexive PathOver: identity path, same fiber element. -/
-def refl (x : B a) : PathOver B (Path.refl a) x x :=
+noncomputable def refl (x : B a) : PathOver B (Path.refl a) x x :=
   ⟨rfl⟩
 
 /-- Extract the underlying path in the fiber from a PathOver. -/
-def toPath (po : PathOver B p x y) :
+noncomputable def toPath (po : PathOver B p x y) :
     Path (Path.transport (D := B) p x) y :=
   Path.stepChain po.witness
 
 /-- Construct a PathOver from a transport equation. -/
-def ofTransportEq (h : Path.transport (D := B) p x = y) :
+noncomputable def ofTransportEq (h : Path.transport (D := B) p x = y) :
     PathOver B p x y :=
   ⟨h⟩
 
@@ -211,7 +211,7 @@ noncomputable def sigmaStepOfPathOver (po : PathOver B p x y) :
     (sigmaPathOfPathOver (B := B) (p := p) (x := x) (y := y) po).toEq
 
 /-- Project a total-space path back to the base. -/
-def sigmaFst {B : A → Type u} {s t : Sigma B}
+noncomputable def sigmaFst {B : A → Type u} {s t : Sigma B}
     (p : Path s t) : Path s.1 t.1 :=
   Path.congrArg Sigma.fst p
 

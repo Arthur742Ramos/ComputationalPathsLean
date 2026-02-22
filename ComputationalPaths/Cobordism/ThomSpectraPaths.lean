@@ -36,12 +36,12 @@ namespace ThomSpectrumMap
 variable {E F G H : ThomSpectrumMO}
 
 /-- Identity Thom spectrum map. -/
-def id (E : ThomSpectrumMO) : ThomSpectrumMap E E where
+noncomputable def id (E : ThomSpectrumMO) : ThomSpectrumMap E E where
   mapLevel := fun _ x => x
   map_base := fun n => Path.refl (thomBase E n)
 
 /-- Composition of Thom spectrum maps. -/
-def comp (g : ThomSpectrumMap F G) (f : ThomSpectrumMap E F) : ThomSpectrumMap E G where
+noncomputable def comp (g : ThomSpectrumMap F G) (f : ThomSpectrumMap E F) : ThomSpectrumMap E G where
   mapLevel := fun n x => g.mapLevel n (f.mapLevel n x)
   map_base := fun n =>
     Path.trans (Path.congrArg (g.mapLevel n) (f.map_base n)) (g.map_base n)
@@ -61,7 +61,7 @@ theorem map_base_refl_right_step (f : ThomSpectrumMap E F) (n : Nat) :
   Path.Step.trans_refl_right (f.map_base n)
 
 /-- Left-associated threefold basepoint coherence composite. -/
-def compBaseLeft (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
+noncomputable def compBaseLeft (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
     (f : ThomSpectrumMap E F) (n : Nat) :
     Path (h.mapLevel n (g.mapLevel n (f.mapLevel n (thomBase E n)))) (thomBase H n) :=
   Path.trans
@@ -71,7 +71,7 @@ def compBaseLeft (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
     (h.map_base n)
 
 /-- Right-associated threefold basepoint coherence composite. -/
-def compBaseRight (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
+noncomputable def compBaseRight (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
     (f : ThomSpectrumMap E F) (n : Nat) :
     Path (h.mapLevel n (g.mapLevel n (f.mapLevel n (thomBase E n)))) (thomBase H n) :=
   Path.trans
@@ -134,7 +134,7 @@ noncomputable def right_cancel_rweq (e : ThomSpectrumEquivalence E F) (n : Nat) 
   rweq_of_step (e.right_cancel_step n)
 
 /-- Reflexive Thom spectrum equivalence. -/
-def refl (E : ThomSpectrumMO) : ThomSpectrumEquivalence E E where
+noncomputable def refl (E : ThomSpectrumMO) : ThomSpectrumEquivalence E E where
   toMap := ThomSpectrumMap.id E
   invMap := ThomSpectrumMap.id E
   leftBase := fun n => Path.refl (thomBase E n)

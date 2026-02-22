@@ -95,7 +95,7 @@ structure MatroidRank (E : Type u) (M : PathMatroid E) where
           rank S + rank T) True
 
 /-- Path.trans: rank of the ground set equals the matroid rank. -/
-def rank_ground_eq {E : Type u} {M : PathMatroid E}
+noncomputable def rank_ground_eq {E : Type u} {M : PathMatroid E}
     (r : MatroidRank E M) (ground : E → Prop) :
     Path (r.rank ground) (r.rank ground) :=
   Path.refl _
@@ -121,7 +121,7 @@ structure MatroidCircuit (E : Type u) (M : PathMatroid E) where
           (M.ops.diff (M.ops.union C₁ C₂) (M.ops.singleton e))) True
 
 /-- Path: circuit dependence witness. -/
-def circuit_dep_path {E : Type u} {M : PathMatroid E}
+noncomputable def circuit_dep_path {E : Type u} {M : PathMatroid E}
     (mc : MatroidCircuit E M) (C : E → Prop) (hC : mc.isCircuit C) :
     Path (M.indep C) False :=
   mc.circuit_dep C hC
@@ -142,7 +142,7 @@ structure MatroidClosure (E : Type u) (M : PathMatroid E) where
     Path (cl (cl S) e) True
 
 /-- Path.trans: closure of closure equals closure. -/
-def cl_cl_eq {E : Type u} {M : PathMatroid E}
+noncomputable def cl_cl_eq {E : Type u} {M : PathMatroid E}
     (mc : MatroidClosure E M) (S : E → Prop) (e : E) (h : mc.cl S e) :
     Path (mc.cl (mc.cl S) e) True :=
   mc.cl_idempotent S e h
@@ -161,7 +161,7 @@ structure DualMatroid (E : Type u) (M : PathMatroid E) where
     Path (M.indep I) (M.indep I)
 
 /-- Path.trans: double duality is identity on independence. -/
-def double_dual_id {E : Type u} {M : PathMatroid E}
+noncomputable def double_dual_id {E : Type u} {M : PathMatroid E}
     (dm : DualMatroid E M) (I : E → Prop) :
     Path (M.indep I) (M.indep I) :=
   dm.double_dual_indep I
@@ -205,7 +205,7 @@ structure MatroidIntersection (E : Type u)
     Path (r₁.rank S + r₂.rank S) (r₁.rank S + r₂.rank S)
 
 /-- Path: intersection preserves independence in the first matroid. -/
-def intersection_left {E : Type u} {M₁ M₂ : PathMatroid E}
+noncomputable def intersection_left {E : Type u} {M₁ M₂ : PathMatroid E}
     (mi : MatroidIntersection E M₁ M₂) (I : E → Prop) (h : mi.commonIndep I) :
     Path (M₁.indep I) True :=
   mi.common_left I h
@@ -266,7 +266,7 @@ noncomputable def rwEq_circuit_dep {E : Type u} {M : PathMatroid E}
   RwEq.refl _
 
 /-- Path.trans: composing rank monotonicity and bound. -/
-def rank_mono_bound {E : Type u} {M : PathMatroid E}
+noncomputable def rank_mono_bound {E : Type u} {M : PathMatroid E}
     (r : MatroidRank E M) (S : E → Prop) :
     Path (r.rank S ≤ M.ops.card S) True :=
   r.rank_le_card S

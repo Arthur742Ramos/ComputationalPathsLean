@@ -171,11 +171,11 @@ structure TCData (A : RingSpectrum) where
          (tr.frobenius n (project (n + 1) x))
 
 /-- TC is a sub-structure of TR^1. -/
-def tc_to_tr1 {A : RingSpectrum} (T : TCData A) : T.carrier → T.tr.level 1 :=
+noncomputable def tc_to_tr1 {A : RingSpectrum} (T : TCData A) : T.carrier → T.tr.level 1 :=
   T.project 1
 
 /-- The equalizer condition at level 0. -/
-def tc_equalizer_zero {A : RingSpectrum} (T : TCData A) :
+noncomputable def tc_equalizer_zero {A : RingSpectrum} (T : TCData A) :
     ∀ x : T.carrier,
       Path (T.tr.restriction 0 (T.project 1 x))
            (T.tr.frobenius 0 (T.project 1 x)) :=

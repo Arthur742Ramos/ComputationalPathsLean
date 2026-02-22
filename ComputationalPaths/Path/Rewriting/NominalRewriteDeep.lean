@@ -34,19 +34,19 @@ deriving DecidableEq, Repr
 
 abbrev Perm := List Swap
 
-def applySwap (s : Swap) (x : Atom) : Atom :=
+noncomputable def applySwap (s : Swap) (x : Atom) : Atom :=
   if x = s.a then s.b
   else if x = s.b then s.a
   else x
 
-def applyPerm (pi : Perm) (x : Atom) : Atom :=
+noncomputable def applyPerm (pi : Perm) (x : Atom) : Atom :=
   pi.foldl (fun acc s => applySwap s acc) x
 
-def idPerm : Perm := []
+noncomputable def idPerm : Perm := []
 
-def composePerm (pi1 pi2 : Perm) : Perm := pi1 ++ pi2
+noncomputable def composePerm (pi1 pi2 : Perm) : Perm := pi1 ++ pi2
 
-def inversePerm (pi : Perm) : Perm := pi.reverse
+noncomputable def inversePerm (pi : Perm) : Perm := pi.reverse
 
 -- ==========================================
 -- Section 2: Nominal Terms
@@ -60,24 +60,24 @@ inductive NomTerm where
   | unit : NomTerm
 deriving DecidableEq, Repr
 
-def permTerm (pi : Perm) : NomTerm → NomTerm
+noncomputable def permTerm (pi : Perm) : NomTerm → NomTerm
   | NomTerm.atom a   => NomTerm.atom (applyPerm pi a)
   | NomTerm.var n    => NomTerm.var n
   | NomTerm.app t u  => NomTerm.app (permTerm pi t) (permTerm pi u)
   | NomTerm.abs a t  => NomTerm.abs (applyPerm pi a) (permTerm pi t)
   | NomTerm.unit     => NomTerm.unit
 
-def freeAtoms : NomTerm → List Atom
+noncomputable def freeAtoms : NomTerm → List Atom
   | NomTerm.atom a   => [a]
   | NomTerm.var _    => []
   | NomTerm.app t u  => freeAtoms t ++ freeAtoms u
   | NomTerm.abs a t  => (freeAtoms t).filter (· != a)
   | NomTerm.unit     => []
 
-def isFresh (a : Atom) (t : NomTerm) : Prop :=
+noncomputable def isFresh (a : Atom) (t : NomTerm) : Prop :=
   a ∉ freeAtoms t
 
-instance {a : Atom} {t : NomTerm} : Decidable (isFresh a t) :=
+noncomputable instance {a : Atom} {t : NomTerm} : Decidable (isFresh a t) :=
   inferInstanceAs (Decidable (a ∉ freeAtoms t))
 
 -- ==========================================
@@ -91,7 +91,7 @@ theorem applySwap_invol (s : Swap) (x : Atom) :
   split <;> split <;> simp_all <;> omega
 
 -- Theorem 2: Path witness for swap involution
-def swapInvolPath (s : Swap) (x : Atom) :
+noncomputable def swapInvolPath (s : Swap) (x : Atom) :
     Path (applySwap s (applySwap s x)) x :=
   Path.mk [] (applySwap_invol s x)
 
@@ -112,7 +112,7 @@ theorem permTerm_id (t : NomTerm) : permTerm idPerm t = t := by
   | unit => rfl
 
 -- Theorem 5: Path for identity permutation
-def permTermIdPath (t : NomTerm) : Path (permTerm idPerm t) t :=
+noncomputable def permTermIdPath (t : NomTerm) : Path (permTerm idPerm t) t :=
   Path.mk [] (permTerm_id t)
 
 -- ==========================================
@@ -125,7 +125,7 @@ theorem applyPerm_compose (pi1 pi2 : Perm) (x : Atom) :
   simp [composePerm, applyPerm, List.foldl_append]
 
 -- Theorem 7: Path for perm composition on atoms
-def permComposeAtomPath (pi1 pi2 : Perm) (x : Atom) :
+noncomputable def permComposeAtomPath (pi1 pi2 : Perm) (x : Atom) :
     Path (applyPerm (composePerm pi1 pi2) x) (applyPerm pi2 (applyPerm pi1 x)) :=
   Path.mk [] (applyPerm_compose pi1 pi2 x)
 
@@ -140,7 +140,7 @@ theorem permTerm_compose (pi1 pi2 : Perm) (t : NomTerm) :
   | unit => rfl
 
 -- Theorem 9: Path for composition on terms
-def permTermComposePath (pi1 pi2 : Perm) (t : NomTerm) :
+noncomputable def permTermComposePath (pi1 pi2 : Perm) (t : NomTerm) :
     Path (permTerm (composePerm pi1 pi2) t) (permTerm pi2 (permTerm pi1 t)) :=
   Path.mk [] (permTerm_compose pi1 pi2 t)
 
@@ -167,7 +167,7 @@ theorem permTerm_var (pi : Perm) (n : Nat) : permTerm pi (NomTerm.var n) = NomTe
 -- ==========================================
 
 -- Def 14: Equivariant path
-def equivariantPath (pi : Perm) {t u : NomTerm} (p : Path t u) :
+noncomputable def equivariantPath (pi : Perm) {t u : NomTerm} (p : Path t u) :
     Path (permTerm pi t) (permTerm pi u) :=
   Path.congrArg (permTerm pi) p
 
@@ -189,13 +189,13 @@ theorem equivariantSymm (pi : Perm) {t u : NomTerm} (p : Path t u) :
 -- ==========================================
 
 -- Def 17
-def alphaRefl (t : NomTerm) : Path t t := Path.refl t
+noncomputable def alphaRefl (t : NomTerm) : Path t t := Path.refl t
 
 -- Def 18
-def alphaSymm {t u : NomTerm} (p : Path t u) : Path u t := Path.symm p
+noncomputable def alphaSymm {t u : NomTerm} (p : Path t u) : Path u t := Path.symm p
 
 -- Def 19
-def alphaTrans {t u v : NomTerm} (p : Path t u) (q : Path u v) : Path t v :=
+noncomputable def alphaTrans {t u v : NomTerm} (p : Path t u) (q : Path u v) : Path t v :=
   Path.trans p q
 
 -- Theorem 20: Associativity
@@ -261,7 +261,7 @@ theorem fresh_abs_diff (a b : Atom) (t : NomTerm)
 -- Section 10: Nominal Substitution
 -- ==========================================
 
-def substAtom (t : NomTerm) (a b : Atom) : NomTerm :=
+noncomputable def substAtom (t : NomTerm) (a b : Atom) : NomTerm :=
   match t with
   | NomTerm.atom c   => if c = a then NomTerm.atom b else NomTerm.atom c
   | NomTerm.var n    => NomTerm.var n
@@ -285,7 +285,7 @@ theorem substAtom_self (t : NomTerm) (a : Atom) :
   | unit => rfl
 
 -- Def 31: Path for self-substitution
-def substSelfPath (t : NomTerm) (a : Atom) :
+noncomputable def substSelfPath (t : NomTerm) (a : Atom) :
     Path (substAtom t a a) t :=
   Path.mk [] (substAtom_self t a)
 
@@ -301,22 +301,22 @@ theorem substAtom_var (n : Nat) (a b : Atom) :
 -- ==========================================
 
 -- Def 34
-def appCongrLeft (u : NomTerm) {t t' : NomTerm} (p : Path t t') :
+noncomputable def appCongrLeft (u : NomTerm) {t t' : NomTerm} (p : Path t t') :
     Path (NomTerm.app t u) (NomTerm.app t' u) :=
   Path.congrArg (fun x => NomTerm.app x u) p
 
 -- Def 35
-def appCongrRight (t : NomTerm) {u u' : NomTerm} (p : Path u u') :
+noncomputable def appCongrRight (t : NomTerm) {u u' : NomTerm} (p : Path u u') :
     Path (NomTerm.app t u) (NomTerm.app t u') :=
   Path.congrArg (fun x => NomTerm.app t x) p
 
 -- Def 36
-def absCongrBody (a : Atom) {t t' : NomTerm} (p : Path t t') :
+noncomputable def absCongrBody (a : Atom) {t t' : NomTerm} (p : Path t t') :
     Path (NomTerm.abs a t) (NomTerm.abs a t') :=
   Path.congrArg (fun x => NomTerm.abs a x) p
 
 -- Def 37: Combined congruence
-def appCongr {t t' u u' : NomTerm} (pt : Path t t') (pu : Path u u') :
+noncomputable def appCongr {t t' u u' : NomTerm} (pt : Path t t') (pu : Path u u') :
     Path (NomTerm.app t u) (NomTerm.app t' u') :=
   Path.trans (appCongrLeft u pt) (appCongrRight t' pu)
 
@@ -360,14 +360,14 @@ theorem absCongrBody_symm (a : Atom) {t t' : NomTerm} (p : Path t t') :
 -- Section 12: Depth and Size
 -- ==========================================
 
-def depth : NomTerm → Nat
+noncomputable def depth : NomTerm → Nat
   | NomTerm.atom _   => 0
   | NomTerm.var _    => 0
   | NomTerm.app t u  => 1 + max (depth t) (depth u)
   | NomTerm.abs _ t  => 1 + depth t
   | NomTerm.unit     => 0
 
-def termSize : NomTerm → Nat
+noncomputable def termSize : NomTerm → Nat
   | NomTerm.atom _   => 1
   | NomTerm.var _    => 1
   | NomTerm.app t u  => 1 + termSize t + termSize u
@@ -385,7 +385,7 @@ theorem depth_perm (pi : Perm) (t : NomTerm) :
   | unit => rfl
 
 -- Def 45: Path for depth preservation
-def depthPermPath (pi : Perm) (t : NomTerm) :
+noncomputable def depthPermPath (pi : Perm) (t : NomTerm) :
     Path (depth (permTerm pi t)) (depth t) :=
   Path.mk [] (depth_perm pi t)
 
@@ -400,7 +400,7 @@ theorem size_perm (pi : Perm) (t : NomTerm) :
   | unit => rfl
 
 -- Def 47: Path for size preservation
-def sizePermPath (pi : Perm) (t : NomTerm) :
+noncomputable def sizePermPath (pi : Perm) (t : NomTerm) :
     Path (termSize (permTerm pi t)) (termSize t) :=
   Path.mk [] (size_perm pi t)
 
@@ -415,7 +415,7 @@ inductive NomCtx where
   | absC  : Atom → NomCtx → NomCtx
 deriving DecidableEq
 
-def plug : NomCtx → NomTerm → NomTerm
+noncomputable def plug : NomCtx → NomTerm → NomTerm
   | NomCtx.hole,      t => t
   | NomCtx.appL c u,  t => NomTerm.app (plug c t) u
   | NomCtx.appR u c,  t => NomTerm.app u (plug c t)
@@ -425,7 +425,7 @@ def plug : NomCtx → NomTerm → NomTerm
 theorem plug_hole (t : NomTerm) : plug NomCtx.hole t = t := rfl
 
 -- Def 49: Context congruence
-def ctxCongr (c : NomCtx) {t u : NomTerm} (p : Path t u) :
+noncomputable def ctxCongr (c : NomCtx) {t u : NomTerm} (p : Path t u) :
     Path (plug c t) (plug c u) :=
   Path.congrArg (plug c) p
 
@@ -441,7 +441,7 @@ theorem ctxCongr_symm (c : NomCtx) {t u : NomTerm} (p : Path t u) :
     ctxCongr c (Path.symm p) = Path.symm (ctxCongr c p) :=
   Path.congrArg_symm _ p
 
-def composeCtx : NomCtx → NomCtx → NomCtx
+noncomputable def composeCtx : NomCtx → NomCtx → NomCtx
   | NomCtx.hole,     c2 => c2
   | NomCtx.appL c u, c2 => NomCtx.appL (composeCtx c c2) u
   | NomCtx.appR u c, c2 => NomCtx.appR u (composeCtx c c2)
@@ -457,7 +457,7 @@ theorem plug_compose (c1 c2 : NomCtx) (t : NomTerm) :
   | absC a c ih => simp [composeCtx, plug, ih]
 
 -- Def 53: Path for context composition
-def plugComposePath (c1 c2 : NomCtx) (t : NomTerm) :
+noncomputable def plugComposePath (c1 c2 : NomCtx) (t : NomTerm) :
     Path (plug (composeCtx c1 c2) t) (plug c1 (plug c2 t)) :=
   Path.mk [] (plug_compose c1 c2 t)
 
@@ -465,7 +465,7 @@ def plugComposePath (c1 c2 : NomCtx) (t : NomTerm) :
 -- Section 14: Permutation on Contexts
 -- ==========================================
 
-def permCtx (pi : Perm) : NomCtx → NomCtx
+noncomputable def permCtx (pi : Perm) : NomCtx → NomCtx
   | NomCtx.hole     => NomCtx.hole
   | NomCtx.appL c u => NomCtx.appL (permCtx pi c) (permTerm pi u)
   | NomCtx.appR u c => NomCtx.appR (permTerm pi u) (permCtx pi c)
@@ -481,7 +481,7 @@ theorem perm_plug (pi : Perm) (c : NomCtx) (t : NomTerm) :
   | absC a c ih => simp [permCtx, plug, permTerm, ih]
 
 -- Def 55: Path for perm-plug interaction
-def permPlugPath (pi : Perm) (c : NomCtx) (t : NomTerm) :
+noncomputable def permPlugPath (pi : Perm) (c : NomCtx) (t : NomTerm) :
     Path (plug (permCtx pi c) (permTerm pi t)) (permTerm pi (plug c t)) :=
   Path.mk [] (perm_plug pi c t)
 
@@ -495,7 +495,7 @@ structure NomRule where
   rhs : NomTerm
 deriving DecidableEq
 
-def ruleCtxSatisfied (rule : NomRule) (sigma : Nat → NomTerm) : Prop :=
+noncomputable def ruleCtxSatisfied (rule : NomRule) (sigma : Nat → NomTerm) : Prop :=
   ∀ p ∈ rule.freshCtx, isFresh p.1 (sigma p.2)
 
 -- ==========================================
@@ -513,10 +513,10 @@ inductive UnifResult where
 deriving DecidableEq
 
 -- Def 56
-def unifRefl : UnifResult := UnifResult.success idPerm
+noncomputable def unifRefl : UnifResult := UnifResult.success idPerm
 
 -- Def 57: Path witness for unifying a term with itself
-def unifReflPath (t : NomTerm) :
+noncomputable def unifReflPath (t : NomTerm) :
     Path (permTerm idPerm t) t :=
   permTermIdPath t
 
@@ -540,17 +540,17 @@ theorem app_injective_right (t u u' : NomTerm)
   cases h; rfl
 
 -- Def 61
-def absInjectivePath (a : Atom) (t u : NomTerm)
+noncomputable def absInjectivePath (a : Atom) (t u : NomTerm)
     (p : Path (NomTerm.abs a t) (NomTerm.abs a u)) : Path t u :=
   Path.mk [] (abs_injective a t u (Path.toEq p))
 
 -- Def 62
-def appInjectLeftPath (t t' u : NomTerm)
+noncomputable def appInjectLeftPath (t t' u : NomTerm)
     (p : Path (NomTerm.app t u) (NomTerm.app t' u)) : Path t t' :=
   Path.mk [] (app_injective_left t t' u (Path.toEq p))
 
 -- Def 63
-def appInjectRightPath (t u u' : NomTerm)
+noncomputable def appInjectRightPath (t u u' : NomTerm)
     (p : Path (NomTerm.app t u) (NomTerm.app t u')) : Path u u' :=
   Path.mk [] (app_injective_right t u u' (Path.toEq p))
 
@@ -558,7 +558,7 @@ def appInjectRightPath (t u u' : NomTerm)
 -- Section 18: Support
 -- ==========================================
 
-def support (t : NomTerm) : List Atom := freeAtoms t
+noncomputable def support (t : NomTerm) : List Atom := freeAtoms t
 
 -- Theorem 64
 theorem support_unit : support NomTerm.unit = [] := rfl
@@ -567,10 +567,10 @@ theorem support_unit : support NomTerm.unit = [] := rfl
 theorem support_var (n : Nat) : support (NomTerm.var n) = [] := rfl
 
 -- Def 66
-def supportUnitPath : Path (support NomTerm.unit) ([] : List Atom) := Path.refl []
+noncomputable def supportUnitPath : Path (support NomTerm.unit) ([] : List Atom) := Path.refl []
 
 -- Def 67
-def supportVarPath (n : Nat) : Path (support (NomTerm.var n)) ([] : List Atom) := Path.refl []
+noncomputable def supportVarPath (n : Nat) : Path (support (NomTerm.var n)) ([] : List Atom) := Path.refl []
 
 -- ==========================================
 -- Section 19: Inverse Permutation
@@ -584,7 +584,7 @@ theorem inversePerm_singleton (s : Swap) :
 theorem inversePerm_id : inversePerm idPerm = idPerm := rfl
 
 -- Def 70
-def inversePermIdPath : Path (inversePerm idPerm) idPerm := Path.refl idPerm
+noncomputable def inversePermIdPath : Path (inversePerm idPerm) idPerm := Path.refl idPerm
 
 -- ==========================================
 -- Section 20: Equivariant freshness
@@ -662,7 +662,7 @@ structure MatchResult where
   perm  : Perm
 deriving DecidableEq
 
-def trivialMatch : MatchResult :=
+noncomputable def trivialMatch : MatchResult :=
   { subst := [], perm := idPerm }
 
 -- Theorem 80
@@ -676,13 +676,13 @@ theorem trivialMatch_perm : trivialMatch.perm = idPerm := rfl
 -- ==========================================
 
 -- Def 82
-def equivariantCtxRewrite (pi : Perm) (c : NomCtx)
+noncomputable def equivariantCtxRewrite (pi : Perm) (c : NomCtx)
     {lhs rhs : NomTerm} (p : Path lhs rhs) :
     Path (permTerm pi (plug c lhs)) (permTerm pi (plug c rhs)) :=
   Path.congrArg (permTerm pi) (ctxCongr c p)
 
 -- Def 83
-def equivariantCtxRewriteFactored (pi : Perm) (c : NomCtx)
+noncomputable def equivariantCtxRewriteFactored (pi : Perm) (c : NomCtx)
     {lhs rhs : NomTerm} (p : Path lhs rhs) :
     Path (plug (permCtx pi c) (permTerm pi lhs))
          (plug (permCtx pi c) (permTerm pi rhs)) :=
@@ -693,13 +693,13 @@ def equivariantCtxRewriteFactored (pi : Perm) (c : NomCtx)
 -- ==========================================
 
 -- Def 84: Horizontal composition for app
-def hcompApp {t1 t2 u1 u2 : NomTerm}
+noncomputable def hcompApp {t1 t2 u1 u2 : NomTerm}
     (p : Path t1 t2) (q : Path u1 u2) :
     Path (NomTerm.app t1 u1) (NomTerm.app t2 u2) :=
   Path.trans (appCongrLeft u1 p) (appCongrRight t2 q)
 
 -- Def 85: Horizontal composition for abs
-def hcompAbs (a : Atom) {t1 t2 : NomTerm}
+noncomputable def hcompAbs (a : Atom) {t1 t2 : NomTerm}
     (p : Path t1 t2) :
     Path (NomTerm.abs a t1) (NomTerm.abs a t2) :=
   absCongrBody a p
@@ -724,12 +724,12 @@ theorem symm_absCongrBody (a : Atom) {t t' : NomTerm} (p : Path t t') :
 -- ==========================================
 
 -- Def 89
-def composeEquivariant (pi1 pi2 : Perm) {t u : NomTerm} (p : Path t u) :
+noncomputable def composeEquivariant (pi1 pi2 : Perm) {t u : NomTerm} (p : Path t u) :
     Path (permTerm pi2 (permTerm pi1 t)) (permTerm pi2 (permTerm pi1 u)) :=
   equivariantPath pi2 (equivariantPath pi1 p)
 
 -- Def 90
-def composeEquivariantViaCompose (pi1 pi2 : Perm) {t u : NomTerm} (p : Path t u) :
+noncomputable def composeEquivariantViaCompose (pi1 pi2 : Perm) {t u : NomTerm} (p : Path t u) :
     Path (permTerm (composePerm pi1 pi2) t) (permTerm (composePerm pi1 pi2) u) :=
   equivariantPath (composePerm pi1 pi2) p
 
@@ -743,7 +743,7 @@ theorem composePerm_assoc (pi1 pi2 pi3 : Perm) :
   simp [composePerm, List.append_assoc]
 
 -- Def 92
-def composePermAssocPath (pi1 pi2 pi3 : Perm) :
+noncomputable def composePermAssocPath (pi1 pi2 pi3 : Perm) :
     Path (composePerm (composePerm pi1 pi2) pi3)
          (composePerm pi1 (composePerm pi2 pi3)) :=
   Path.mk [] (composePerm_assoc pi1 pi2 pi3)
@@ -758,7 +758,7 @@ theorem composePerm_id_right (pi : Perm) :
   simp [composePerm, idPerm]
 
 -- Def 95
-def composePermIdRightPath (pi : Perm) :
+noncomputable def composePermIdRightPath (pi : Perm) :
     Path (composePerm pi idPerm) pi :=
   Path.mk [] (composePerm_id_right pi)
 
@@ -780,12 +780,12 @@ theorem freeAtoms_unit : freeAtoms NomTerm.unit = [] := rfl
 -- ==========================================
 
 -- Def 99: depth respects paths
-def depthCongrArg {t u : NomTerm} (p : Path t u) :
+noncomputable def depthCongrArg {t u : NomTerm} (p : Path t u) :
     Path (depth t) (depth u) :=
   Path.congrArg depth p
 
 -- Def 100: size respects paths
-def sizeCongrArg {t u : NomTerm} (p : Path t u) :
+noncomputable def sizeCongrArg {t u : NomTerm} (p : Path t u) :
     Path (termSize t) (termSize u) :=
   Path.congrArg termSize p
 
@@ -814,7 +814,7 @@ theorem sizeCongrArg_symm {t u : NomTerm} (p : Path t u) :
   Path.congrArg_symm termSize p
 
 -- Def 105: unit refl path
-def unitReflPath : Path NomTerm.unit NomTerm.unit := Path.refl NomTerm.unit
+noncomputable def unitReflPath : Path NomTerm.unit NomTerm.unit := Path.refl NomTerm.unit
 
 -- ==========================================
 -- Section 31: congrArg composition

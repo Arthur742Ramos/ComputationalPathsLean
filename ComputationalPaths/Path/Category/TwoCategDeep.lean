@@ -38,7 +38,7 @@ structure TwoCell {Obj : Type} (Hom : Obj → Obj → Type)
   cell : Path f g
 
 /-- Identity 2-cell -/
-def TwoCell.id {Obj : Type} {Hom : Obj → Obj → Type}
+noncomputable def TwoCell.id {Obj : Type} {Hom : Obj → Obj → Type}
     {a b : Obj} (f : Hom a b) : TwoCell Hom a b f f :=
   ⟨Path.refl f⟩
 
@@ -49,7 +49,7 @@ theorem twoCell_id_refl {Obj : Type} {Hom : Obj → Obj → Type}
   rfl
 
 /-- Vertical composition of 2-cells -/
-def vcomp {Obj : Type} {Hom : Obj → Obj → Type}
+noncomputable def vcomp {Obj : Type} {Hom : Obj → Obj → Type}
     {a b : Obj} {f g h : Hom a b}
     (alpha : TwoCell Hom a b f g) (beta : TwoCell Hom a b g h) :
     TwoCell Hom a b f h :=
@@ -80,7 +80,7 @@ theorem vcomp_id_right {Obj : Type} {Hom : Obj → Obj → Type}
   Path.trans_refl_right alpha.cell
 
 /-- Inverse of a 2-cell -/
-def TwoCell.inv {Obj : Type} {Hom : Obj → Obj → Type}
+noncomputable def TwoCell.inv {Obj : Type} {Hom : Obj → Obj → Type}
     {a b : Obj} {f g : Hom a b}
     (alpha : TwoCell Hom a b f g) : TwoCell Hom a b g f :=
   ⟨Path.symm alpha.cell⟩
@@ -104,7 +104,7 @@ theorem symm_vcomp {Obj : Type} {Hom : Obj → Obj → Type}
 -- ============================================================================
 
 /-- Horizontal whiskering: apply a function to a path -/
-def hwhisker {A B : Type} (f : A → B) {x y : A}
+noncomputable def hwhisker {A B : Type} (f : A → B) {x y : A}
     (p : Path x y) : Path (f x) (f y) :=
   Path.congrArg f p
 
@@ -127,7 +127,7 @@ theorem hwhisker_symm {A B : Type} (f : A → B) {x y : A}
   Path.congrArg_symm f p
 
 /-- Left whiskering: compose a 2-cell with a 1-cell on the left -/
-def whiskerLeft {A : Type} (F : A → A)
+noncomputable def whiskerLeft {A : Type} (F : A → A)
     {b c : A} (p : Path b c) : Path (F b) (F c) :=
   Path.congrArg F p
 
@@ -150,7 +150,7 @@ theorem whiskerLeft_symm {A : Type} (F : A → A)
   Path.congrArg_symm F p
 
 /-- Right whiskering: apply a fixed function to a path -/
-def whiskerRight {A B : Type} (f : A → B) {a a' : A}
+noncomputable def whiskerRight {A B : Type} (f : A → B) {a a' : A}
     (p : Path a a') : Path (f a) (f a') :=
   Path.congrArg f p
 
@@ -214,20 +214,20 @@ structure Strict2Cat where
     comp1 f (id1 b) = f
 
 -- Theorem 19: In a strict 2-cat, associator Path is derivable
-def strict2cat_assoc_path (C : Strict2Cat)
+noncomputable def strict2cat_assoc_path (C : Strict2Cat)
     {a b c d : C.Obj}
     (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) :
     Path (C.comp1 (C.comp1 f g) h) (C.comp1 f (C.comp1 g h)) :=
   Path.mk [Step.mk _ _ (C.assoc_strict f g h)] (C.assoc_strict f g h)
 
 -- Theorem 20: Strict left unitor as Path
-def strict2cat_lunitor (C : Strict2Cat)
+noncomputable def strict2cat_lunitor (C : Strict2Cat)
     {a b : C.Obj} (f : C.Hom a b) :
     Path (C.comp1 (C.id1 a) f) f :=
   Path.mk [Step.mk _ _ (C.id_left_strict f)] (C.id_left_strict f)
 
 -- Theorem 21: Strict right unitor as Path
-def strict2cat_runitor (C : Strict2Cat)
+noncomputable def strict2cat_runitor (C : Strict2Cat)
     {a b : C.Obj} (f : C.Hom a b) :
     Path (C.comp1 f (C.id1 b)) f :=
   Path.mk [Step.mk _ _ (C.id_right_strict f)] (C.id_right_strict f)
@@ -256,7 +256,7 @@ structure TwoCellIso {A : Type} (f g : A) where
   right_inv_eq : (Path.trans forward backward).toEq = (Path.refl f).toEq
 
 /-- Construct a TwoCellIso from a Path using symm -/
-def twoCellIsoOfPath {A : Type} {f g : A} (p : Path f g) : TwoCellIso f g :=
+noncomputable def twoCellIsoOfPath {A : Type} {f g : A} (p : Path f g) : TwoCellIso f g :=
   { forward := p
     backward := Path.symm p
     left_inv_eq := by simp
@@ -273,7 +273,7 @@ theorem twoCellIso_backward {A : Type} {f g : A} (p : Path f g) :
   rfl
 
 -- Theorem 25: TwoCellIso is symmetric
-def twoCellIsoSymm {A : Type} {f g : A}
+noncomputable def twoCellIsoSymm {A : Type} {f g : A}
     (iso : TwoCellIso f g) : TwoCellIso g f :=
   { forward := iso.backward
     backward := iso.forward
@@ -287,14 +287,14 @@ theorem twoCellIso_symm_symm {A : Type} {f g : A}
   rfl
 
 -- Theorem 27: Identity TwoCellIso
-def twoCellIsoRefl {A : Type} (f : A) : TwoCellIso f f :=
+noncomputable def twoCellIsoRefl {A : Type} (f : A) : TwoCellIso f f :=
   { forward := Path.refl f
     backward := Path.refl f
     left_inv_eq := by simp
     right_inv_eq := by simp }
 
 -- Theorem 28: Composition of TwoCellIsos
-def twoCellIsoTrans {A : Type} {f g h : A}
+noncomputable def twoCellIsoTrans {A : Type} {f g h : A}
     (iso1 : TwoCellIso f g) (iso2 : TwoCellIso g h) : TwoCellIso f h :=
   twoCellIsoOfPath (Path.trans iso1.forward iso2.forward)
 
@@ -406,7 +406,7 @@ theorem strict2functor_symm_derived {A B : Type} (F : Strict2Functor A B)
   rfl
 
 -- Theorem 36: congrArg gives a canonical strict 2-functor
-def congrArg2Functor {A B : Type} (f : A → B) : Strict2Functor A B :=
+noncomputable def congrArg2Functor {A B : Type} (f : A → B) : Strict2Functor A B :=
   { mapObj := f
     map2cell := fun p => Path.congrArg f p
     map_refl := fun _ => rfl
@@ -433,7 +433,7 @@ theorem pseudo2functor_iso_inv {A B : Type}
   (F.compIso x y).left_inv_eq
 
 -- Theorem 39: Identity 2-functor
-def id2Functor (A : Type) : Strict2Functor A A :=
+noncomputable def id2Functor (A : Type) : Strict2Functor A A :=
   { mapObj := id
     map2cell := fun p => p
     map_refl := fun _ => rfl
@@ -456,7 +456,7 @@ structure TwoNatTrans {A B : Type} (F G : Strict2Functor A B) where
     Path.trans (component x) (G.map2cell p)
 
 -- Theorem 41: Identity 2-natural transformation
-def idTwoNatTrans {A B : Type} (F : Strict2Functor A B) :
+noncomputable def idTwoNatTrans {A B : Type} (F : Strict2Functor A B) :
     TwoNatTrans F F :=
   { component := fun x => Path.refl (F.mapObj x)
     naturality := fun p => by simp }
@@ -468,7 +468,7 @@ theorem idTwoNatTrans_component {A B : Type} (F : Strict2Functor A B)
   rfl
 
 /-- Vertical composition of 2-natural transformations -/
-def vcompTwoNatTrans {A B : Type} {F G H : Strict2Functor A B}
+noncomputable def vcompTwoNatTrans {A B : Type} {F G H : Strict2Functor A B}
     (alpha : TwoNatTrans F G) (beta : TwoNatTrans G H) :
     TwoNatTrans F H :=
   { component := fun x => Path.trans (alpha.component x) (beta.component x)
@@ -494,7 +494,7 @@ structure Modification {A B : Type} {F G : Strict2Functor A B}
   modComponent : (x : A) → Path (alpha.component x) (beta.component x)
 
 -- Theorem 44: Identity modification
-def idModification {A B : Type} {F G : Strict2Functor A B}
+noncomputable def idModification {A B : Type} {F G : Strict2Functor A B}
     (alpha : TwoNatTrans F G) : Modification alpha alpha :=
   ⟨fun x => Path.refl (alpha.component x)⟩
 
@@ -506,7 +506,7 @@ theorem idModification_component {A B : Type}
   rfl
 
 /-- Vertical composition of modifications -/
-def vcompModification {A B : Type} {F G : Strict2Functor A B}
+noncomputable def vcompModification {A B : Type} {F G : Strict2Functor A B}
     {alpha beta gam : TwoNatTrans F G}
     (m1 : Modification alpha beta) (m2 : Modification beta gam) :
     Modification alpha gam :=
@@ -522,7 +522,7 @@ theorem vcompModification_component {A B : Type}
   rfl
 
 -- Theorem 47: Inverse modification
-def invModification {A B : Type} {F G : Strict2Functor A B}
+noncomputable def invModification {A B : Type} {F G : Strict2Functor A B}
     {alpha beta : TwoNatTrans F G}
     (m : Modification alpha beta) : Modification beta alpha :=
   ⟨fun x => Path.symm (m.modComponent x)⟩
@@ -580,7 +580,7 @@ theorem adj_triangle_R {A : Type} {L R : A → A}
 
 /-- The mates correspondence: given a 2-cell α : h → k,
     we can produce a mate via whiskering -/
-def mateConstruction {A : Type} {h k : A}
+noncomputable def mateConstruction {A : Type} {h k : A}
     (eta : Path h k) (f : A → A) : Path (f h) (f k) :=
   Path.congrArg f eta
 
@@ -603,7 +603,7 @@ theorem mate_symm {A : Type} {h k : A}
   Path.congrArg_symm f p
 
 /-- Double mate: applying mate twice -/
-def doubleMate {A : Type} {h k : A}
+noncomputable def doubleMate {A : Type} {h k : A}
     (p : Path h k) (f g : A → A) : Path (g (f h)) (g (f k)) :=
   Path.congrArg g (Path.congrArg f p)
 
@@ -657,18 +657,18 @@ structure PathGroupoid (A : Type) (x y : A) where
   carrier : Path x y
 
 -- Theorem 62: PathGroupoid composition
-def pgComp {A : Type} {x y z : A}
+noncomputable def pgComp {A : Type} {x y z : A}
     (p : PathGroupoid A x y) (q : PathGroupoid A y z) :
     PathGroupoid A x z :=
   ⟨Path.trans p.carrier q.carrier⟩
 
 -- Theorem 63: PathGroupoid inverse
-def pgInv {A : Type} {x y : A}
+noncomputable def pgInv {A : Type} {x y : A}
     (p : PathGroupoid A x y) : PathGroupoid A y x :=
   ⟨Path.symm p.carrier⟩
 
 -- Theorem 64: PathGroupoid identity
-def pgId {A : Type} (x : A) : PathGroupoid A x x :=
+noncomputable def pgId {A : Type} (x : A) : PathGroupoid A x x :=
   ⟨Path.refl x⟩
 
 -- Theorem 65: PathGroupoid left identity
@@ -708,7 +708,7 @@ theorem pgInv_inv {A : Type} {x y : A}
 -- ============================================================================
 
 /-- Functorial action of a function on PathGroupoid -/
-def pgMap {A B : Type} (f : A → B) {x y : A}
+noncomputable def pgMap {A B : Type} (f : A → B) {x y : A}
     (p : PathGroupoid A x y) : PathGroupoid B (f x) (f y) :=
   ⟨Path.congrArg f p.carrier⟩
 
@@ -750,7 +750,7 @@ structure NatSquare {A B : Type} (F G : A → B) where
     Path.trans (transform x) (Path.congrArg G p)
 
 -- Theorem 74: Identity naturality square
-def idNatSquare {A B : Type} (F : A → B) : NatSquare F F :=
+noncomputable def idNatSquare {A B : Type} (F : A → B) : NatSquare F F :=
   { transform := fun x => Path.refl (F x)
     natural := fun p => by simp }
 
@@ -764,28 +764,28 @@ theorem idNatSquare_component {A B : Type} (F : A → B) (x : A) :
 -- ============================================================================
 
 -- Theorem 76: Coherence witness for associativity (path of paths)
-def coherence_assoc_witness {A : Type} {a b c d : A}
+noncomputable def coherence_assoc_witness {A : Type} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Path (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   Path.mk [Step.mk _ _ (Path.trans_assoc p q r)] (Path.trans_assoc p q r)
 
 -- Theorem 77: Coherence witness for left unitor
-def coherence_lunitor {A : Type} {a b : A} (p : Path a b) :
+noncomputable def coherence_lunitor {A : Type} {a b : A} (p : Path a b) :
     Path (Path.trans (Path.refl a) p) p :=
   Path.mk [Step.mk _ _ (Path.trans_refl_left p)] (Path.trans_refl_left p)
 
 -- Theorem 78: Coherence witness for right unitor
-def coherence_runitor {A : Type} {a b : A} (p : Path a b) :
+noncomputable def coherence_runitor {A : Type} {a b : A} (p : Path a b) :
     Path (Path.trans p (Path.refl b)) p :=
   Path.mk [Step.mk _ _ (Path.trans_refl_right p)] (Path.trans_refl_right p)
 
 -- Theorem 79: Coherence witness for double inverse
-def coherence_double_inv {A : Type} {a b : A} (p : Path a b) :
+noncomputable def coherence_double_inv {A : Type} {a b : A} (p : Path a b) :
     Path (Path.symm (Path.symm p)) p :=
   Path.mk [Step.mk _ _ (Path.symm_symm p)] (Path.symm_symm p)
 
 -- Theorem 80: Higher coherence - pentagon at Path level
-def higher_pentagon {A : Type} {a b c d e : A}
+noncomputable def higher_pentagon {A : Type} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Path
       (Path.trans (Path.trans (Path.trans p q) r) s)

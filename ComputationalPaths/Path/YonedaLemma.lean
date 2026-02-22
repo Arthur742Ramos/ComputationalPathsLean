@@ -72,7 +72,7 @@ end PathNatTrans
 /-! ## Representable functors -/
 
 /-- Representable functor Hom(a, -) on the path category. -/
-def representable (A : Type u) (a : A) : PathFunctor (A := A) where
+noncomputable def representable (A : Type u) (a : A) : PathFunctor (A := A) where
   obj := fun b => Path a b
   map := fun {b c} p q => Path.trans q p
   map_id := by
@@ -85,7 +85,7 @@ def representable (A : Type u) (a : A) : PathFunctor (A := A) where
 /-! ## Yoneda lemma -/
 
 /-- Yoneda lemma for the path category. -/
-def yoneda {A : Type u} (F : PathFunctor (A := A)) (a : A) :
+noncomputable def yoneda {A : Type u} (F : PathFunctor (A := A)) (a : A) :
     SimpleEquiv (PathNatTrans (representable A a) F) (F.obj a) where
   toFun := fun η => η.app a (Path.refl a)
   invFun := fun x =>
@@ -105,7 +105,7 @@ def yoneda {A : Type u} (F : PathFunctor (A := A)) (a : A) :
     exact (F.map_id a x).toEq
 
 /-- Naturality of a representable natural transformation at the identity witness. -/
-def yonedaNaturalityPath {A : Type u} {F : PathFunctor (A := A)} {a b : A}
+noncomputable def yonedaNaturalityPath {A : Type u} {F : PathFunctor (A := A)} {a b : A}
     (η : PathNatTrans (representable A a) F) (p : Path a b) :
     Path (F.map p (η.app a (Path.refl a))) (η.app b p) := by
   refine Path.stepChain ?_
@@ -113,7 +113,7 @@ def yonedaNaturalityPath {A : Type u} {F : PathFunctor (A := A)} {a b : A}
   simpa [representable, Path.trans_refl_left] using h
 
 /-- Compose two representable legs and evaluate via Yoneda naturality. -/
-def yonedaNaturalityComposePath {A : Type u} {F : PathFunctor (A := A)}
+noncomputable def yonedaNaturalityComposePath {A : Type u} {F : PathFunctor (A := A)}
     {a b c : A} (η : PathNatTrans (representable A a) F)
     (p : Path a b) (q : Path b c) :
     Path (F.map q (F.map p (η.app a (Path.refl a))))
@@ -125,17 +125,17 @@ def yonedaNaturalityComposePath {A : Type u} {F : PathFunctor (A := A)}
 /-! ## Yoneda embedding -/
 
 /-- Yoneda embedding on objects. -/
-def yonedaEmbedding (A : Type u) : A → PathFunctor (A := A) :=
+noncomputable def yonedaEmbedding (A : Type u) : A → PathFunctor (A := A) :=
   fun a => representable A a
 
 /-- Yoneda embedding on morphisms (precomposition). -/
-def yonedaEmbeddingMap {A : Type u} {a b : A}
+noncomputable def yonedaEmbeddingMap {A : Type u} {a b : A}
     (p : Path b a) :
     PathNatTrans (yonedaEmbedding A a) (yonedaEmbedding A b) :=
   (yoneda (A := A) (F := representable A b) a).invFun p
 
 /-- Yoneda hom-set equivalence (full faithfulness). -/
-def yonedaEmbeddingFullyFaithful (A : Type u) :
+noncomputable def yonedaEmbeddingFullyFaithful (A : Type u) :
     ∀ a b,
       SimpleEquiv
         (PathNatTrans (yonedaEmbedding A a) (yonedaEmbedding A b))
@@ -152,7 +152,7 @@ theorem yonedaEmbeddingMap_refl (A : Type u) (a : A) :
   simp [yonedaEmbeddingMap, yoneda, representable]
 
 /-- PathFunctor identity law: map of refl acts as the identity up to a path. -/
-def pathFunctor_map_id_path {A : Type u} (F : PathFunctor (A := A)) (a : A) (x : F.obj a) :
+noncomputable def pathFunctor_map_id_path {A : Type u} (F : PathFunctor (A := A)) (a : A) (x : F.obj a) :
     Path (F.map (Path.refl a) x) x :=
   F.map_id a x
 
@@ -166,7 +166,7 @@ theorem yoneda_natural_functor {A : Type u} {F G : PathFunctor (A := A)}
 
 
 /-- Composition of natural transformations between path functors. -/
-def PathNatTrans.comp {A : Type u} {F G H : PathFunctor (A := A)}
+noncomputable def PathNatTrans.comp {A : Type u} {F G H : PathFunctor (A := A)}
     (η : PathNatTrans G H) (θ : PathNatTrans F G) : PathNatTrans F H where
   app := fun a x => η.app a (θ.app a x)
   naturality := by
@@ -175,7 +175,7 @@ def PathNatTrans.comp {A : Type u} {F G H : PathFunctor (A := A)}
 
 
 /-- Identity natural transformation. -/
-def PathNatTrans.id {A : Type u} (F : PathFunctor (A := A)) : PathNatTrans F F where
+noncomputable def PathNatTrans.id {A : Type u} (F : PathFunctor (A := A)) : PathNatTrans F F where
   app := fun _ x => x
   naturality := by intros; rfl
 
@@ -183,7 +183,7 @@ def PathNatTrans.id {A : Type u} (F : PathFunctor (A := A)) : PathNatTrans F F w
 
 
 /-- Representable functors preserve path composition up to a path. -/
-def representable_map_comp {A : Type u} (a : A) {b c d : A}
+noncomputable def representable_map_comp {A : Type u} (a : A) {b c d : A}
     (p : Path b c) (q : Path c d) (r : Path a b) :
     Path ((representable A a).map q ((representable A a).map p r))
          ((representable A a).map (Path.trans p q) r) :=

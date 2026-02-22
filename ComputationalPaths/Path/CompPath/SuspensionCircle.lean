@@ -33,23 +33,23 @@ universe u
 /-! ## Suspension of the computational circle -/
 
 /-- The suspension of the computational circle. -/
-def SuspensionCircleCompPath : Type u :=
+noncomputable def SuspensionCircleCompPath : Type u :=
   SuspensionCompPath CircleCompPath
 
 /-- Basepoint of the suspension of the computational circle (north pole). -/
-def suspensionCircleBasepoint : SuspensionCircleCompPath :=
+noncomputable def suspensionCircleBasepoint : SuspensionCircleCompPath :=
   Sphere2CompPath.basepoint
 
 /-- North pole of Σ(S¹). -/
-def suspensionCircleNorth : SuspensionCircleCompPath :=
+noncomputable def suspensionCircleNorth : SuspensionCircleCompPath :=
   SuspensionCompPath.north (X := CircleCompPath)
 
 /-- South pole of Σ(S¹). -/
-def suspensionCircleSouth : SuspensionCircleCompPath :=
+noncomputable def suspensionCircleSouth : SuspensionCircleCompPath :=
   SuspensionCompPath.south (X := CircleCompPath)
 
 /-- Meridian of Σ(S¹) for a point on S¹. -/
-def suspensionCircleMerid (x : CircleCompPath) :
+noncomputable def suspensionCircleMerid (x : CircleCompPath) :
     Path (suspensionCircleNorth : SuspensionCircleCompPath) suspensionCircleSouth :=
   SuspensionCompPath.merid (X := CircleCompPath) x
 
@@ -58,14 +58,14 @@ theorem suspensionCircleBasepoint_eq_north :
     (suspensionCircleBasepoint : SuspensionCircleCompPath) = suspensionCircleNorth := rfl
 
 /-- Path witness of the basepoint-north coincidence. -/
-def suspensionCircleBasepoint_eq_north_path :
+noncomputable def suspensionCircleBasepoint_eq_north_path :
     Path (suspensionCircleBasepoint : SuspensionCircleCompPath) suspensionCircleNorth :=
   Path.refl _
 
 /-! ## Subsingleton and π₁ triviality -/
 
 /-- Σ(S¹) is a subsingleton (all points are equal). -/
-instance : Subsingleton SuspensionCircleCompPath where
+noncomputable instance : Subsingleton SuspensionCircleCompPath where
   allEq x y := by
     show @Eq (SuspensionCompPath CircleCompPath) x y
     refine Quot.inductionOn x ?_
@@ -89,7 +89,7 @@ instance : Subsingleton SuspensionCircleCompPath where
                 circleCompPathBase)).symm
 
 /-- Any two points of Σ(S¹) are connected by a path. -/
-def suspensionCircle_path (x y : SuspensionCircleCompPath) : Path x y :=
+noncomputable def suspensionCircle_path (x y : SuspensionCircleCompPath) : Path x y :=
   Path.stepChain (Subsingleton.elim x y)
 
 /-- The fundamental group of Σ(S¹) is trivial. -/
@@ -113,17 +113,17 @@ noncomputable def suspensionCircleCompPath_pi1_equiv_unit :
 /-! ## Meridian path algebra -/
 
 /-- Meridian loop at north: merid(x) ⬝ merid(y)⁻¹. -/
-def suspensionCircleMeridLoop (x y : CircleCompPath) :
+noncomputable def suspensionCircleMeridLoop (x y : CircleCompPath) :
     Path (suspensionCircleNorth : SuspensionCircleCompPath) suspensionCircleNorth :=
   Path.trans (suspensionCircleMerid x) (Path.symm (suspensionCircleMerid y))
 
 /-- The base meridian from the circle's basepoint. -/
-def suspensionCircleMeridBase :
+noncomputable def suspensionCircleMeridBase :
     Path (suspensionCircleNorth : SuspensionCircleCompPath) suspensionCircleSouth :=
   suspensionCircleMerid circleCompPathBase
 
 /-- Inverse meridian: south to north. -/
-def suspensionCircleMeridInv (x : CircleCompPath) :
+noncomputable def suspensionCircleMeridInv (x : CircleCompPath) :
     Path (suspensionCircleSouth : SuspensionCircleCompPath) suspensionCircleNorth :=
   Path.symm (suspensionCircleMerid x)
 
@@ -146,7 +146,7 @@ theorem suspensionCircleMeridLoop_self_proof (x : CircleCompPath) :
   simp
 
 /-- Composition of two meridian paths through south. -/
-def suspensionCircleMeridCompose (x y z : CircleCompPath) :
+noncomputable def suspensionCircleMeridCompose (x y z : CircleCompPath) :
     Path (suspensionCircleNorth : SuspensionCircleCompPath) suspensionCircleNorth :=
   Path.trans (suspensionCircleMeridLoop x y) (suspensionCircleMeridLoop y z)
 
@@ -173,25 +173,25 @@ theorem suspensionCircle_transport_refl
 /-! ## Double suspension of the circle -/
 
 /-- Double suspension of S¹: ΣΣ(S¹). -/
-def DoubleSuspensionCircle : Type u :=
+noncomputable def DoubleSuspensionCircle : Type u :=
   SuspensionCompPath SuspensionCircleCompPath
 
 /-- Basepoint of ΣΣ(S¹). -/
-def doubleSuspensionCircleBasepoint : DoubleSuspensionCircle :=
+noncomputable def doubleSuspensionCircleBasepoint : DoubleSuspensionCircle :=
   SuspensionCompPath.north (X := SuspensionCircleCompPath)
 
 /-- South pole of ΣΣ(S¹). -/
-def doubleSuspensionCircleSouth : DoubleSuspensionCircle :=
+noncomputable def doubleSuspensionCircleSouth : DoubleSuspensionCircle :=
   SuspensionCompPath.south (X := SuspensionCircleCompPath)
 
 /-- Meridian of ΣΣ(S¹) for a point in Σ(S¹). -/
-def doubleSuspensionCircleMerid (x : SuspensionCircleCompPath) :
+noncomputable def doubleSuspensionCircleMerid (x : SuspensionCircleCompPath) :
     Path (doubleSuspensionCircleBasepoint : DoubleSuspensionCircle)
       doubleSuspensionCircleSouth :=
   SuspensionCompPath.merid (X := SuspensionCircleCompPath) x
 
 /-- ΣΣ(S¹) is a subsingleton. -/
-instance : Subsingleton DoubleSuspensionCircle where
+noncomputable instance : Subsingleton DoubleSuspensionCircle where
   allEq x y := by
     refine Quot.inductionOn x ?_
     intro x'
@@ -214,7 +214,7 @@ instance : Subsingleton DoubleSuspensionCircle where
                 suspensionCircleBasepoint)).symm
 
 /-- Any two points of ΣΣ(S¹) are connected by a path. -/
-def doubleSuspensionCircle_path (x y : DoubleSuspensionCircle) : Path x y :=
+noncomputable def doubleSuspensionCircle_path (x y : DoubleSuspensionCircle) : Path x y :=
   Path.stepChain (Subsingleton.elim x y)
 
 /-- π₁(ΣΣ(S¹)) is trivial. -/
@@ -241,7 +241,7 @@ noncomputable def doubleSuspensionCircle_pi1_equiv_unit :
 /-! ## Iterated suspension of the circle -/
 
 /-- Iterated suspension of S¹: Σⁿ(S¹). -/
-def iterSuspCircle : Nat → Type u
+noncomputable def iterSuspCircle : Nat → Type u
   | 0 => CircleCompPath
   | Nat.succ n => SuspensionCompPath (iterSuspCircle n)
 
@@ -259,26 +259,26 @@ theorem iterSuspCircle_two :
 /-! ## Connectivity -/
 
 /-- The suspension circle is path-connected. -/
-instance : IsPathConnected SuspensionCircleCompPath where
+noncomputable instance : IsPathConnected SuspensionCircleCompPath where
   base := suspensionCircleBasepoint
   connected := fun x => suspensionCircle_path suspensionCircleBasepoint x
 
 /-- The double suspension circle is path-connected. -/
-instance : IsPathConnected DoubleSuspensionCircle where
+noncomputable instance : IsPathConnected DoubleSuspensionCircle where
   base := doubleSuspensionCircleBasepoint
   connected := fun x => doubleSuspensionCircle_path doubleSuspensionCircleBasepoint x
 
 /-- Nonempty instance for Σ(S¹). -/
-instance : Nonempty SuspensionCircleCompPath := ⟨suspensionCircleBasepoint⟩
+noncomputable instance : Nonempty SuspensionCircleCompPath := ⟨suspensionCircleBasepoint⟩
 
 /-- Nonempty instance for ΣΣ(S¹). -/
-instance : Nonempty DoubleSuspensionCircle := ⟨doubleSuspensionCircleBasepoint⟩
+noncomputable instance : Nonempty DoubleSuspensionCircle := ⟨doubleSuspensionCircleBasepoint⟩
 
 /-- Inhabited instance for Σ(S¹). -/
-instance : Inhabited SuspensionCircleCompPath := ⟨suspensionCircleBasepoint⟩
+noncomputable instance : Inhabited SuspensionCircleCompPath := ⟨suspensionCircleBasepoint⟩
 
 /-- Inhabited instance for ΣΣ(S¹). -/
-instance : Inhabited DoubleSuspensionCircle := ⟨doubleSuspensionCircleBasepoint⟩
+noncomputable instance : Inhabited DoubleSuspensionCircle := ⟨doubleSuspensionCircleBasepoint⟩
 
 /-! ## Summary -/
 

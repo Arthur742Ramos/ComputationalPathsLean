@@ -90,7 +90,7 @@ inductive Orientability where
   deriving DecidableEq
 
 /-- The Möbius band is non-orientable. -/
-def mobiusBandOrientability : Orientability := Orientability.nonorientable
+noncomputable def mobiusBandOrientability : Orientability := Orientability.nonorientable
 
 /-- Witness that the Möbius band is non-orientable. -/
 theorem mobiusBandNonorientable :
@@ -116,7 +116,7 @@ noncomputable def mobiusBandOrientationReversal :
 abbrev MobiusBandBoundary : Type u := CircleCompPath.{u}
 
 /-- The boundary maps to the core by a degree-2 covering. -/
-def mobiusBandBoundaryCoveringDegree : Nat := 2
+noncomputable def mobiusBandBoundaryCoveringDegree : Nat := 2
 
 /-- The boundary inclusion sends the boundary base to the Möbius band base. -/
 noncomputable def mobiusBandBoundaryInclusion :
@@ -129,7 +129,7 @@ theorem mobiusBandBoundaryInclusion_base :
 
 /-- Euler characteristic of the Möbius band.
     χ(M) = 0 (it deformation retracts to S¹). -/
-def mobiusBandEulerChar : Int := 0
+noncomputable def mobiusBandEulerChar : Int := 0
 
 /-- CW data for the Möbius band:
     1 vertex, 2 edges, 1 face → χ = 1 - 2 + 1 = 0. -/
@@ -138,7 +138,7 @@ structure MobiusBandCWData where
   edges : Nat := 2
   faces : Nat := 1
 
-def mobiusBandStdCW : MobiusBandCWData := {}
+noncomputable def mobiusBandStdCW : MobiusBandCWData := {}
 
 theorem mobiusBandEuler_from_CW :
     (mobiusBandStdCW.vertices : Int) - mobiusBandStdCW.edges + mobiusBandStdCW.faces
@@ -187,13 +187,13 @@ structure NonorientableSurfaceData where
   euler : Int
 
 /-- Data record for the Möbius band. -/
-def mobiusBandSurfaceData : NonorientableSurfaceData where
+noncomputable def mobiusBandSurfaceData : NonorientableSurfaceData where
   name := "Möbius band"
   orientability := Orientability.nonorientable
   euler := 0
 
 /-- Data record for the Klein bottle. -/
-def kleinBottleSurfaceData : NonorientableSurfaceData where
+noncomputable def kleinBottleSurfaceData : NonorientableSurfaceData where
   name := "Klein bottle"
   orientability := Orientability.nonorientable
   euler := 0

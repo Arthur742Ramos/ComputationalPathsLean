@@ -94,10 +94,10 @@ inductive MWGenerator (k : Type u) where
   | eta : MWGenerator k
 
 /-- A monomial in the generators: a list of generators. -/
-def MWMonomial (k : Type u) := List (MWGenerator k)
+noncomputable def MWMonomial (k : Type u) := List (MWGenerator k)
 
 /-- The degree of a monomial: symbols contribute +1, η contributes -1. -/
-def monomialDegree {k : Type u} : MWMonomial k → Int
+noncomputable def monomialDegree {k : Type u} : MWMonomial k → Int
   | [] => 0
   | MWGenerator.symbol _ :: rest => 1 + monomialDegree rest
   | MWGenerator.eta :: rest => (-1) + monomialDegree rest
@@ -116,12 +116,12 @@ theorem monomialDegree_eta {k : Type u} :
   simp [monomialDegree]
 
 /-- Path witnessing that a symbol has degree 1. -/
-def symbol_degree_path {k : Type u} (u : k) :
+noncomputable def symbol_degree_path {k : Type u} (u : k) :
     Path (monomialDegree [MWGenerator.symbol u]) 1 :=
   Path.stepChain (monomialDegree_symbol u)
 
 /-- Path witnessing that η has degree -1. -/
-def eta_degree_path (k : Type u) :
+noncomputable def eta_degree_path (k : Type u) :
     Path (monomialDegree [MWGenerator.eta (k := k)]) (-1) :=
   Path.stepChain monomialDegree_eta
 
@@ -182,7 +182,7 @@ structure HyperbolicElement (k : Type u) (F : MWField k) where
   eta_hyp_zero : Path (kmw_neg1.zero) (kmw_neg1.zero)
 
 /-- The hyperbolic relation as a Path: h = η·[-1] + 2 → η·h = 0. -/
-def hyperbolic_relation (k : Type u) (F : MWField k)
+noncomputable def hyperbolic_relation (k : Type u) (F : MWField k)
     (H : HyperbolicElement k F) :
     Path H.hyp (H.kmw_0.add H.eta_neg1 H.two) :=
   H.hyp_def
@@ -204,7 +204,7 @@ structure FundamentalIdeal (k : Type u) (F : MWField k) (n : Nat) where
   next_incl : (n_succ_carrier : Type u) → (n_succ_carrier → carrier)
 
 /-- Path witnessing I^{n+1} ⊂ I^n inclusion coherence. -/
-def fundamental_ideal_chain (k : Type u) (F : MWField k)
+noncomputable def fundamental_ideal_chain (k : Type u) (F : MWField k)
     (I_n : FundamentalIdeal k F n)
     (I_n1 : FundamentalIdeal k F (n + 1))
     (incl_map : I_n1.carrier → I_n.carrier)
@@ -247,7 +247,7 @@ structure ScharlauTransfer (k L : Type u) (Fk : MWField k)
     Path (transfer b) (transfer b)
 
 /-- Transfer composed with embed multiplies by degree (Path witness). -/
-def transfer_embed_degree (k L : Type u) (Fk : MWField k)
+noncomputable def transfer_embed_degree (k L : Type u) (Fk : MWField k)
     (FL : MWField L) (ext : FieldExtension k L Fk FL) (n : Int)
     (S : ScharlauTransfer k L Fk FL ext n) :
     ∀ x : S.target.carrier,
@@ -318,7 +318,7 @@ structure GerstenComplex (k : Type u) (F : MWField k) (n : Int) where
     Path (diff (p + 1) y (diff p x a y) z) (localKMW (p + 2) z).zero
 
 /-- Path witnessing the Gersten exactness condition. -/
-def gersten_exact (k : Type u) (F : MWField k) (n : Int)
+noncomputable def gersten_exact (k : Type u) (F : MWField k) (n : Int)
     (G : GerstenComplex k F n) (p : Nat)
     (x : G.points p) (a : (G.localKMW p x).carrier)
     (y : G.points (p + 1)) (z : G.points (p + 2)) :
@@ -361,14 +361,14 @@ noncomputable def rwEq_steinberg (k : Type u) (F : MWField k) (n : Int)
 
 /-- Multi-step Path: Steinberg + neg_diag compose to give
     [u, 1-u] = 0 and [u, -u] = 0 are both zero. -/
-def steinberg_neg_diag_composite (k : Type u) (F : MWField k) (n : Int)
+noncomputable def steinberg_neg_diag_composite (k : Type u) (F : MWField k) (n : Int)
     (K : KMWGroup k F n) (u : k)
     (h : F.oneMinus u = F.negUnit u) :
     Path (K.symbolMap [u, F.oneMinus u]) (K.symbolMap [u, F.negUnit u]) :=
   Path.stepChain (by rw [h])
 
 /-- Composite Path: [u, 1-u] = 0 = [u, -u] via trans when 1-u = -u. -/
-def steinberg_via_neg (k : Type u) (F : MWField k) (n : Int)
+noncomputable def steinberg_via_neg (k : Type u) (F : MWField k) (n : Int)
     (K : KMWGroup k F n) (u : k)
     (h : F.oneMinus u = F.negUnit u) :
     Path (K.symbolMap [u, F.oneMinus u]) K.zero :=

@@ -48,12 +48,12 @@ noncomputable abbrev sigmaPointed (X : Pointed) : Pointed :=
   suspPointed X.carrier
  
 /-- Propositional loop space as a pointed type. -/
-def omegaEqPointed (Y : Pointed) : Pointed where
+noncomputable def omegaEqPointed (Y : Pointed) : Pointed where
   carrier := LoopSpaceEq Y.carrier Y.pt
   pt := liftEqRefl Y.pt
  
 /-- Lifted equalities are subsingletons. -/
-instance instSubsingleton_LiftEq {A : Type u} (a b : A) : Subsingleton (LiftEq a b) where
+noncomputable instance instSubsingleton_LiftEq {A : Type u} (a b : A) : Subsingleton (LiftEq a b) where
   allEq := by
     intro p q
     cases p with
@@ -64,11 +64,11 @@ instance instSubsingleton_LiftEq {A : Type u} (a b : A) : Subsingleton (LiftEq a
         cases hq
         rfl
  
-instance instSubsingleton_loopSpaceEq {A : Type u} (a : A) : Subsingleton (LoopSpaceEq A a) := by
+noncomputable instance instSubsingleton_loopSpaceEq {A : Type u} (a : A) : Subsingleton (LoopSpaceEq A a) := by
   dsimp [LoopSpaceEq]
   infer_instance
  
-instance instSubsingleton_omegaEqPointed (Y : Pointed) :
+noncomputable instance instSubsingleton_omegaEqPointed (Y : Pointed) :
     Subsingleton (omegaEqPointed Y).carrier := by
   dsimp [omegaEqPointed]
   infer_instance
@@ -105,7 +105,7 @@ theorem suspension_subsingleton (X : Pointed) : Subsingleton (Suspension X.carri
       cases b'
       rfl
  
-instance instSubsingleton_sigmaPointed (X : Pointed) :
+noncomputable instance instSubsingleton_sigmaPointed (X : Pointed) :
     Subsingleton (sigmaPointed X).carrier :=
   suspension_subsingleton X
  
@@ -132,11 +132,11 @@ theorem pointedMap_subsingleton_of_subsingleton {X Y : Pointed}
     _ = g.toFun X.pt := g.map_pt.symm
     _ = g.toFun x := by simp [hx]
  
-instance instSubsingleton_pointedMap_sigma (X Y : Pointed) :
+noncomputable instance instSubsingleton_pointedMap_sigma (X Y : Pointed) :
     Subsingleton (PointedMap (sigmaPointed X) Y) :=
   pointedMap_subsingleton_of_subsingleton (X := sigmaPointed X) (Y := Y)
  
-instance instSubsingleton_pointedMap_omegaEq (X Y : Pointed) :
+noncomputable instance instSubsingleton_pointedMap_omegaEq (X Y : Pointed) :
     Subsingleton (PointedMap X (omegaEqPointed Y)) := by
   refine ⟨?_⟩
   intro f g
@@ -148,7 +148,7 @@ instance instSubsingleton_pointedMap_omegaEq (X Y : Pointed) :
 /-! ## Functorial maps -/
  
 /-- Map on suspensions induced by a pointed map. -/
-def sigmaMap {X Y : Pointed} (_ : PointedMap X Y) :
+noncomputable def sigmaMap {X Y : Pointed} (_ : PointedMap X Y) :
     PointedMap (sigmaPointed X) (sigmaPointed Y) where
   toFun :=
     Quot.lift
@@ -160,7 +160,7 @@ def sigmaMap {X Y : Pointed} (_ : PointedMap X Y) :
   map_pt := rfl
  
 /-- Map on propositional loop spaces induced by a pointed map. -/
-def omegaEqMap {X Y : Pointed} (f : PointedMap X Y) :
+noncomputable def omegaEqMap {X Y : Pointed} (f : PointedMap X Y) :
     PointedMap (omegaEqPointed X) (omegaEqPointed Y) where
   toFun := fun p =>
     LiftEq.mk (by
@@ -193,7 +193,7 @@ noncomputable def sigmaFunctor : PointedFunctor where
     apply Subsingleton.elim
  
 /-- OmegaEq as a pointed functor. -/
-def omegaEqFunctor : PointedFunctor where
+noncomputable def omegaEqFunctor : PointedFunctor where
   obj := omegaEqPointed
   map := fun {X Y} f => omegaEqMap f
   map_id := by
@@ -203,12 +203,12 @@ def omegaEqFunctor : PointedFunctor where
     intro X Y Z g f
     apply Subsingleton.elim
  
-instance instSubsingleton_pointedMap_omegaEq_sigma (X Y : Pointed) :
+noncomputable instance instSubsingleton_pointedMap_omegaEq_sigma (X Y : Pointed) :
     Subsingleton (PointedMap X (omegaEqFunctor.obj (sigmaFunctor.obj Y))) := by
   dsimp [omegaEqFunctor, sigmaFunctor]
   infer_instance
  
-instance instSubsingleton_pointedMap_sigma_omegaEq (X Y : Pointed) :
+noncomputable instance instSubsingleton_pointedMap_sigma_omegaEq (X Y : Pointed) :
     Subsingleton (PointedMap (sigmaFunctor.obj (omegaEqFunctor.obj X)) Y) := by
   dsimp [omegaEqFunctor, sigmaFunctor]
   infer_instance
@@ -218,12 +218,12 @@ instance instSubsingleton_pointedMap_sigma_omegaEq (X Y : Pointed) :
 noncomputable section
 
 /-- Suspension-to-loop map returning a computational path witness. -/
-def suspToLoopPath {X Y : Pointed} (f : PointedMap (sigmaPointed X) Y) :
+noncomputable def suspToLoopPath {X Y : Pointed} (f : PointedMap (sigmaPointed X) Y) :
     X.carrier → LoopSpace Y.carrier Y.pt :=
   adjMap (X := X.carrier) X.pt f.toFun f.map_pt
 
 /-- Suspension-to-loop map (propositional loops). -/
-def suspToLoopEq {X Y : Pointed} (f : PointedMap (sigmaPointed X) Y) :
+noncomputable def suspToLoopEq {X Y : Pointed} (f : PointedMap (sigmaPointed X) Y) :
     PointedMap X (omegaEqPointed Y) where
   toFun := fun x =>
     LiftEq.mk (suspToLoopPath f x).toEq
@@ -231,7 +231,7 @@ def suspToLoopEq {X Y : Pointed} (f : PointedMap (sigmaPointed X) Y) :
     apply Subsingleton.elim
  
 /-- Loop-to-suspension map (propositional loops). -/
-def loopEqToSusp {X Y : Pointed} (g : PointedMap X (omegaEqPointed Y)) :
+noncomputable def loopEqToSusp {X Y : Pointed} (g : PointedMap X (omegaEqPointed Y)) :
     PointedMap (sigmaPointed X) Y where
   toFun :=
     Quot.lift
@@ -244,7 +244,7 @@ def loopEqToSusp {X Y : Pointed} (g : PointedMap X (omegaEqPointed Y)) :
   map_pt := rfl
 
 /-- `Path` witness of the loop-to-suspension glue. -/
-def loopEqToSusp_glue_path {X Y : Pointed} (g : PointedMap X (omegaEqPointed Y))
+noncomputable def loopEqToSusp_glue_path {X Y : Pointed} (g : PointedMap X (omegaEqPointed Y))
     (x : X.carrier) :
     Path ((loopEqToSusp g).toFun (Suspension.north (X := X.carrier)))
       ((loopEqToSusp g).toFun (Suspension.south (X := X.carrier))) :=
@@ -253,7 +253,7 @@ def loopEqToSusp_glue_path {X Y : Pointed} (g : PointedMap X (omegaEqPointed Y))
 /-! ## Adjunction equivalence -/
  
 /-- Suspension-loop adjunction for propositional loops. -/
-def suspLoopAdjunction (X Y : Pointed) :
+noncomputable def suspLoopAdjunction (X Y : Pointed) :
     SimpleEquiv (PointedMap (sigmaPointed X) Y) (PointedMap X (omegaEqPointed Y)) where
   toFun := suspToLoopEq
   invFun := loopEqToSusp
@@ -265,12 +265,12 @@ def suspLoopAdjunction (X Y : Pointed) :
     apply Subsingleton.elim
  
 /-- Unit of the suspension-loop adjunction. -/
-def unit (X : Pointed) :
+noncomputable def unit (X : Pointed) :
     PointedMap X (omegaEqPointed (sigmaPointed X)) :=
   (suspLoopAdjunction (X := X) (Y := sigmaPointed X)).toFun (PointedMap.id (sigmaPointed X))
  
 /-- Counit of the suspension-loop adjunction. -/
-def counit (Y : Pointed) :
+noncomputable def counit (Y : Pointed) :
     PointedMap (sigmaPointed (omegaEqPointed Y)) Y :=
   (suspLoopAdjunction (X := omegaEqPointed Y) (Y := Y)).invFun (PointedMap.id (omegaEqPointed Y))
  
@@ -344,12 +344,12 @@ noncomputable def sigmaOmegaAdjunction : PointedAdjunction sigmaFunctor omegaEqF
 /-! ## Connections -/
  
 /-- Comparison from propositional loops to computational loops. -/
-def omegaEqToOmega (Y : Pointed) :
+noncomputable def omegaEqToOmega (Y : Pointed) :
     (omegaEqPointed Y).carrier → LoopSpaceAlgebra.Omega Y.carrier Y.pt :=
   loopSpaceEqToPath
  
 /-- Pointed computational circle. -/
-def circlePointed : Pointed where
+noncomputable def circlePointed : Pointed where
   carrier := CompPath.CircleCompPath
   pt := CompPath.circleCompPathBase
  

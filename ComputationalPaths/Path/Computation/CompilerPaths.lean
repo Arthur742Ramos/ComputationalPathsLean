@@ -34,7 +34,7 @@ inductive SrcExpr where
   deriving Repr, BEq, DecidableEq
 
 /-- Source language evaluation. -/
-def srcEval : SrcExpr → Int
+noncomputable def srcEval : SrcExpr → Int
   | .lit n => n
   | .add e1 e2 => srcEval e1 + srcEval e2
   | .mul e1 e2 => srcEval e1 * srcEval e2
@@ -56,7 +56,7 @@ theorem srcEval_neg (e : SrcExpr) :
     srcEval (.neg e) = -(srcEval e) := rfl
 
 /-- Congruence: equal expressions yield path-connected evaluations. -/
-def srcEvalCongr {e1 e2 : SrcExpr} (p : Path e1 e2) :
+noncomputable def srcEvalCongr {e1 e2 : SrcExpr} (p : Path e1 e2) :
     Path (srcEval e1) (srcEval e2) :=
   Path.congrArg srcEval p
 
@@ -74,7 +74,7 @@ inductive Instr where
 abbrev Stack := List Int
 
 /-- Execute a single instruction on a stack. -/
-def execInstr (i : Instr) (s : Stack) : Stack :=
+noncomputable def execInstr (i : Instr) (s : Stack) : Stack :=
   match i, s with
   | .push n, s => n :: s
   | .iadd, a :: b :: rest => (b + a) :: rest
@@ -83,7 +83,7 @@ def execInstr (i : Instr) (s : Stack) : Stack :=
   | _, s => s
 
 /-- Execute a program (list of instructions) on a stack. -/
-def execProg : List Instr → Stack → Stack
+noncomputable def execProg : List Instr → Stack → Stack
   | [], s => s
   | i :: rest, s => execProg rest (execInstr i s)
 
@@ -106,19 +106,19 @@ theorem execProg_append (p1 p2 : List Instr) (s : Stack) :
   | cons i rest ih => exact ih (execInstr i s)
 
 /-- Congruence: path between stacks lifts to execution. -/
-def execProgCongr (prog : List Instr) {s1 s2 : Stack} (p : Path s1 s2) :
+noncomputable def execProgCongr (prog : List Instr) {s1 s2 : Stack} (p : Path s1 s2) :
     Path (execProg prog s1) (execProg prog s2) :=
   Path.congrArg (execProg prog) p
 
 /-- Congruence: path between programs lifts to execution. -/
-def execProgCongrProg {p1 p2 : List Instr} (hp : Path p1 p2) (s : Stack) :
+noncomputable def execProgCongrProg {p1 p2 : List Instr} (hp : Path p1 p2) (s : Stack) :
     Path (execProg p1 s) (execProg p2 s) :=
   Path.congrArg (execProg · s) hp
 
 /-! ## Compilation -/
 
 /-- Compile a source expression to stack machine code. -/
-def compile : SrcExpr → List Instr
+noncomputable def compile : SrcExpr → List Instr
   | .lit n => [Instr.push n]
   | .add e1 e2 => compile e1 ++ compile e2 ++ [Instr.iadd]
   | .mul e1 e2 => compile e1 ++ compile e2 ++ [Instr.imul]
@@ -140,7 +140,7 @@ theorem compile_mul (e1 e2 : SrcExpr) :
     compile (.mul e1 e2) = compile e1 ++ compile e2 ++ [Instr.imul] := rfl
 
 /-- Congruence: equal source yields path-connected compiled code. -/
-def compileCongr {e1 e2 : SrcExpr} (p : Path e1 e2) :
+noncomputable def compileCongr {e1 e2 : SrcExpr} (p : Path e1 e2) :
     Path (compile e1) (compile e2) :=
   Path.congrArg compile p
 
@@ -162,7 +162,7 @@ theorem compile_correct (e : SrcExpr) (s : Stack) :
     rw [ih]; rfl
 
 /-- Path from compiler correctness, via `refl` after rewrite. -/
-def compile_correct_path (e : SrcExpr) (s : Stack) :
+noncomputable def compile_correct_path (e : SrcExpr) (s : Stack) :
     Path (execProg (compile e) s) (srcEval e :: s) :=
   { steps := [], proof := compile_correct e s }
 
@@ -172,19 +172,19 @@ theorem compile_correct_empty (e : SrcExpr) :
   compile_correct e []
 
 /-- Path from empty stack correctness. -/
-def compile_correct_empty_path (e : SrcExpr) :
+noncomputable def compile_correct_empty_path (e : SrcExpr) :
     Path (execProg (compile e) []) [srcEval e] :=
   { steps := [], proof := compile_correct_empty e }
 
 /-- Symmetry: target→source direction of correctness. -/
-def compile_correct_symm (e : SrcExpr) (s : Stack) :
+noncomputable def compile_correct_symm (e : SrcExpr) (s : Stack) :
     Path (srcEval e :: s) (execProg (compile e) s) :=
   Path.symm (compile_correct_path e s)
 
 /-! ## Optimization Passes -/
 
 /-- Constant folding optimization on source expressions. -/
-def constFold : SrcExpr → SrcExpr
+noncomputable def constFold : SrcExpr → SrcExpr
   | .add (.lit a) (.lit b) => .lit (a + b)
   | .mul (.lit a) (.lit b) => .lit (a * b)
   | .neg (.lit a) => .lit (-a)
@@ -197,7 +197,7 @@ def constFold : SrcExpr → SrcExpr
 theorem constFold_lit (n : Int) : srcEval (constFold (.lit n)) = srcEval (.lit n) := rfl
 
 /-- Literal identity optimization. -/
-def litIdOpt : SrcExpr → SrcExpr
+noncomputable def litIdOpt : SrcExpr → SrcExpr
   | .lit n => .lit n
   | .add e1 e2 => .add (litIdOpt e1) (litIdOpt e2)
   | .mul e1 e2 => .mul (litIdOpt e1) (litIdOpt e2)
@@ -213,23 +213,23 @@ theorem litIdOpt_correct (e : SrcExpr) :
   | neg _ ih => simp [litIdOpt, srcEval, ih]
 
 /-- Path from litIdOpt correctness (built as zero-step path). -/
-def litIdOpt_path (e : SrcExpr) :
+noncomputable def litIdOpt_path (e : SrcExpr) :
     Path (srcEval (litIdOpt e)) (srcEval e) :=
   { steps := [], proof := litIdOpt_correct e }
 
 /-- Identity optimization. -/
-def idOpt : SrcExpr → SrcExpr := id
+noncomputable def idOpt : SrcExpr → SrcExpr := id
 
 /-- Identity optimization is correct. -/
 theorem idOpt_correct (e : SrcExpr) : srcEval (idOpt e) = srcEval e := rfl
 
 /-- Identity optimization correctness path (refl). -/
-def idOpt_path (e : SrcExpr) : Path (srcEval (idOpt e)) (srcEval e) := Path.refl _
+noncomputable def idOpt_path (e : SrcExpr) : Path (srcEval (idOpt e)) (srcEval e) := Path.refl _
 
 /-! ## Optimization Composition -/
 
 /-- Compose two optimizations. -/
-def composeOpt (f g : SrcExpr → SrcExpr) : SrcExpr → SrcExpr := f ∘ g
+noncomputable def composeOpt (f g : SrcExpr → SrcExpr) : SrcExpr → SrcExpr := f ∘ g
 
 /-- Composition preserves semantics if both passes do. -/
 theorem composeOpt_correct
@@ -241,7 +241,7 @@ theorem composeOpt_correct
   simp [composeOpt, Function.comp, hf, hg]
 
 /-- Path from composed optimization: chain the two preservation paths. -/
-def composeOpt_path
+noncomputable def composeOpt_path
     (f g : SrcExpr → SrcExpr)
     (hf : ∀ e, srcEval (f e) = srcEval e)
     (hg : ∀ e, srcEval (g e) = srcEval e)
@@ -274,7 +274,7 @@ theorem optimize_compile_correct
   rw [compile_correct, hopt]
 
 /-- Path from end-to-end correctness. -/
-def optimize_compile_path
+noncomputable def optimize_compile_path
     (opt : SrcExpr → SrcExpr)
     (hopt : ∀ e, srcEval (opt e) = srcEval e)
     (e : SrcExpr) (s : Stack) :
@@ -282,7 +282,7 @@ def optimize_compile_path
   { steps := [], proof := optimize_compile_correct opt hopt e s }
 
 /-- Chain: correctness of compile after optimization via trans. -/
-def compile_chain (e : SrcExpr)
+noncomputable def compile_chain (e : SrcExpr)
     (opt : SrcExpr → SrcExpr)
     (hopt : ∀ e, srcEval (opt e) = srcEval e)
     (s : Stack) :
@@ -292,13 +292,13 @@ def compile_chain (e : SrcExpr)
     (Path.congrArg (· :: s) { steps := [], proof := hopt e })
 
 /-- Transport: carry a stack proof along the correctness path. -/
-def correctness_transport (e : SrcExpr) (s : Stack)
+noncomputable def correctness_transport (e : SrcExpr) (s : Stack)
     (P : Stack → Prop) (hp : P (srcEval e :: s)) :
     P (execProg (compile e) s) :=
   Path.transport (D := P) (compile_correct_symm e s) hp
 
 /-- Two optimizations yield path-connected compiled code. -/
-def opt_compile_path_trans
+noncomputable def opt_compile_path_trans
     (opt₁ opt₂ : SrcExpr → SrcExpr)
     (h₁ : ∀ e, srcEval (opt₁ e) = srcEval e)
     (h₂ : ∀ e, srcEval (opt₂ e) = srcEval e)
@@ -310,7 +310,7 @@ def opt_compile_path_trans
     (Path.symm (optimize_compile_path opt₂ h₂ e s))
 
 /-- Correctness is natural: congruence of compile along expression paths. -/
-def compile_natural {e1 e2 : SrcExpr} (p : Path e1 e2) (s : Stack) :
+noncomputable def compile_natural {e1 e2 : SrcExpr} (p : Path e1 e2) (s : Stack) :
     Path (execProg (compile e1) s) (execProg (compile e2) s) :=
   Path.congrArg (fun e => execProg (compile e) s) p
 

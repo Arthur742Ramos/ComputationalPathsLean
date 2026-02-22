@@ -27,19 +27,19 @@ abbrev ZeroCell (A : Type u) := A
 abbrev OneCell (a b : A) := Path a b
 
 /-- A 2-cell (2-morphism) between two 1-cells is an equality of paths. -/
-def TwoCell (p q : OneCell a b) : Prop := p = q
+noncomputable def TwoCell (p q : OneCell a b) : Prop := p = q
 
 /-! ## 1-cell operations -/
 
 /-- Identity 1-cell. -/
-def oneId (a : A) : OneCell a a := Path.refl a
+noncomputable def oneId (a : A) : OneCell a a := Path.refl a
 
 /-- Composition of 1-cells. -/
-def oneComp (f : OneCell a b) (g : OneCell b c) : OneCell a c :=
+noncomputable def oneComp (f : OneCell a b) (g : OneCell b c) : OneCell a c :=
   Path.trans f g
 
 /-- Inverse of a 1-cell. -/
-def oneInv (f : OneCell a b) : OneCell b a :=
+noncomputable def oneInv (f : OneCell a b) : OneCell b a :=
   Path.symm f
 
 /-- Left identity for 1-cell composition. -/
@@ -75,15 +75,15 @@ theorem oneInv_oneId (a : A) :
 /-! ## 2-cell operations -/
 
 /-- Identity 2-cell. -/
-def twoId (f : OneCell a b) : TwoCell f f := rfl
+noncomputable def twoId (f : OneCell a b) : TwoCell f f := rfl
 
 /-- Vertical composition of 2-cells. -/
-def twoVComp {f g h : OneCell a b}
+noncomputable def twoVComp {f g h : OneCell a b}
     (α : TwoCell f g) (β : TwoCell g h) : TwoCell f h :=
   Eq.trans α β
 
 /-- Inverse of a 2-cell. -/
-def twoInv {f g : OneCell a b} (α : TwoCell f g) : TwoCell g f :=
+noncomputable def twoInv {f g : OneCell a b} (α : TwoCell f g) : TwoCell g f :=
   Eq.symm α
 
 /-- All 2-cells between the same 1-cells are equal (proof irrelevance). -/
@@ -127,7 +127,7 @@ theorem twoInv_twoInv {f g : OneCell a b} (α : TwoCell f g) :
 /-! ## Horizontal composition -/
 
 /-- Horizontal composition of 2-cells. -/
-def twoHComp {f₁ f₂ : OneCell a b} {g₁ g₂ : OneCell b c}
+noncomputable def twoHComp {f₁ f₂ : OneCell a b} {g₁ g₂ : OneCell b c}
     (α : TwoCell f₁ f₂) (β : TwoCell g₁ g₂) :
     TwoCell (oneComp f₁ g₁) (oneComp f₂ g₂) := by
   unfold TwoCell oneComp; subst α; subst β; rfl
@@ -138,12 +138,12 @@ theorem twoHComp_id_id (f : OneCell a b) (g : OneCell b c) :
   Subsingleton.elim _ _
 
 /-- Left whiskering: 2-cell postcomposed with a 1-cell. -/
-def whiskerL (f : OneCell a b) {g₁ g₂ : OneCell b c}
+noncomputable def whiskerL (f : OneCell a b) {g₁ g₂ : OneCell b c}
     (β : TwoCell g₁ g₂) : TwoCell (oneComp f g₁) (oneComp f g₂) :=
   twoHComp (twoId f) β
 
 /-- Right whiskering: 2-cell precomposed with a 1-cell. -/
-def whiskerR {f₁ f₂ : OneCell a b} (α : TwoCell f₁ f₂)
+noncomputable def whiskerR {f₁ f₂ : OneCell a b} (α : TwoCell f₁ f₂)
     (g : OneCell b c) : TwoCell (oneComp f₁ g) (oneComp f₂ g) :=
   twoHComp α (twoId g)
 
@@ -176,17 +176,17 @@ theorem eckmann_hilton {f : OneCell a a}
 /-! ## Coherence -/
 
 /-- Associator 2-cell: witnessing associativity of 1-cell composition. -/
-def associator (f : OneCell a b) (g : OneCell b c) (h : OneCell c d) :
+noncomputable def associator (f : OneCell a b) (g : OneCell b c) (h : OneCell c d) :
     TwoCell (oneComp (oneComp f g) h) (oneComp f (oneComp g h)) :=
   oneComp_assoc f g h
 
 /-- Left unitor 2-cell. -/
-def leftUnitor (f : OneCell a b) :
+noncomputable def leftUnitor (f : OneCell a b) :
     TwoCell (oneComp (oneId a) f) f :=
   oneComp_id_left f
 
 /-- Right unitor 2-cell. -/
-def rightUnitor (f : OneCell a b) :
+noncomputable def rightUnitor (f : OneCell a b) :
     TwoCell (oneComp f (oneId b)) f :=
   oneComp_id_right f
 
@@ -209,7 +209,7 @@ theorem triangle (f : OneCell a b) (g : OneCell b c) :
 /-! ## Functoriality (1-cell maps via congrArg) -/
 
 /-- A function induces a 2-functor on the 2-groupoid. -/
-def functorOneCell (f : A → B) (p : OneCell a b) : OneCell (f a) (f b) :=
+noncomputable def functorOneCell (f : A → B) (p : OneCell a b) : OneCell (f a) (f b) :=
   Path.congrArg f p
 
 /-- The functor preserves identity 1-cells. -/
@@ -229,7 +229,7 @@ theorem functor_oneInv (f : A → B) (p : OneCell a b) :
   exact Path.congrArg_symm f p
 
 /-- The functor sends 2-cells to 2-cells. -/
-def functorTwoCell (f : A → B) {p q : OneCell a b}
+noncomputable def functorTwoCell (f : A → B) {p q : OneCell a b}
     (α : TwoCell p q) : TwoCell (functorOneCell f p) (functorOneCell f q) := by
   unfold TwoCell at *
   unfold functorOneCell

@@ -47,7 +47,7 @@ structure HeytingAlg (α : Type u) where
   impl_adj : ∀ a b c, le (meet c a) b ↔ le c (impl a b)
 
 /-- Negation: ¬a = a → ⊥. -/
-def HeytingAlg.neg {α : Type u} (H : HeytingAlg α) (a : α) : α :=
+noncomputable def HeytingAlg.neg {α : Type u} (H : HeytingAlg α) (a : α) : α :=
   H.impl a H.bot
 
 /-! ## HeytingStep: domain-specific rewrites -/
@@ -117,66 +117,66 @@ theorem heyting_join_top {α : Type u} (H : HeytingAlg α) (a : α) :
   H.le_antisymm _ _ (H.join_le _ _ _ (H.le_top a) (H.le_refl H.top)) (H.le_join_right a H.top)
 
 /-- Lift an equality to genuine Path. -/
-def eqToPath {α : Type u} {a b : α} (h : a = b) : Path a b :=
+noncomputable def eqToPath {α : Type u} {a b : α} (h : a = b) : Path a b :=
   ⟨[], h⟩
 
 -- 9
-def heyting_meet_comm_path {α : Type u} (H : HeytingAlg α) (a b : α) :
+noncomputable def heyting_meet_comm_path {α : Type u} (H : HeytingAlg α) (a b : α) :
     Path (H.meet a b) (H.meet b a) :=
   ⟨[], heyting_meet_comm H a b⟩
 
 -- 10
-def heyting_join_comm_path {α : Type u} (H : HeytingAlg α) (a b : α) :
+noncomputable def heyting_join_comm_path {α : Type u} (H : HeytingAlg α) (a b : α) :
     Path (H.join a b) (H.join b a) :=
   ⟨[], heyting_join_comm H a b⟩
 
 -- 11
-def heyting_meet_idem_path {α : Type u} (H : HeytingAlg α) (a : α) :
+noncomputable def heyting_meet_idem_path {α : Type u} (H : HeytingAlg α) (a : α) :
     Path (H.meet a a) a :=
   ⟨[], heyting_meet_idem H a⟩
 
 -- 12
-def heyting_join_idem_path {α : Type u} (H : HeytingAlg α) (a : α) :
+noncomputable def heyting_join_idem_path {α : Type u} (H : HeytingAlg α) (a : α) :
     Path (H.join a a) a :=
   ⟨[], heyting_join_idem H a⟩
 
 -- 13
-def heyting_meet_top_path {α : Type u} (H : HeytingAlg α) (a : α) :
+noncomputable def heyting_meet_top_path {α : Type u} (H : HeytingAlg α) (a : α) :
     Path (H.meet a H.top) a :=
   ⟨[], heyting_meet_top H a⟩
 
 -- 14
-def heyting_join_bot_path {α : Type u} (H : HeytingAlg α) (a : α) :
+noncomputable def heyting_join_bot_path {α : Type u} (H : HeytingAlg α) (a : α) :
     Path (H.join a H.bot) a :=
   ⟨[], heyting_join_bot H a⟩
 
 -- 15
-def heyting_meet_bot_path {α : Type u} (H : HeytingAlg α) (a : α) :
+noncomputable def heyting_meet_bot_path {α : Type u} (H : HeytingAlg α) (a : α) :
     Path (H.meet a H.bot) H.bot :=
   ⟨[], heyting_meet_bot H a⟩
 
 -- 16
-def heyting_join_top_path {α : Type u} (H : HeytingAlg α) (a : α) :
+noncomputable def heyting_join_top_path {α : Type u} (H : HeytingAlg α) (a : α) :
     Path (H.join a H.top) H.top :=
   ⟨[], heyting_join_top H a⟩
 
 /-! ## Composed Heyting paths -/
 
 -- 17
-def meet_comm_loop {α : Type u} (H : HeytingAlg α) (a b : α) :
+noncomputable def meet_comm_loop {α : Type u} (H : HeytingAlg α) (a b : α) :
     HeytingPath H (H.meet a b) (H.meet a b) :=
   HeytingPath.trans (HeytingPath.step (HeytingStep.meetComm a b))
                     (HeytingPath.step (HeytingStep.meetComm b a))
 
 -- 18
-def meet_top_then_idem {α : Type u} (H : HeytingAlg α) (a : α) :
+noncomputable def meet_top_then_idem {α : Type u} (H : HeytingAlg α) (a : α) :
     Path (H.meet (H.meet a H.top) (H.meet a H.top)) a :=
   Path.trans
     (heyting_meet_idem_path H (H.meet a H.top))
     (heyting_meet_top_path H a)
 
 -- 19
-def join_bot_then_idem {α : Type u} (H : HeytingAlg α) (a : α) :
+noncomputable def join_bot_then_idem {α : Type u} (H : HeytingAlg α) (a : α) :
     Path (H.join (H.join a H.bot) (H.join a H.bot)) a :=
   Path.trans
     (heyting_join_idem_path H (H.join a H.bot))
@@ -194,12 +194,12 @@ theorem heyting_dn_intro {α : Type u} (H : HeytingAlg α) (a : α) :
   exact H.le_trans _ _ _ h2 h1
 
 -- 21
-def heyting_congrArg_meet {α : Type u} (H : HeytingAlg α) (a : α) {b₁ b₂ : α}
+noncomputable def heyting_congrArg_meet {α : Type u} (H : HeytingAlg α) (a : α) {b₁ b₂ : α}
     (p : Path b₁ b₂) : Path (H.meet a b₁) (H.meet a b₂) :=
   Path.congrArg (H.meet a) p
 
 -- 22
-def heyting_congrArg_join {α : Type u} (H : HeytingAlg α) (a : α) {b₁ b₂ : α}
+noncomputable def heyting_congrArg_join {α : Type u} (H : HeytingAlg α) (a : α) {b₁ b₂ : α}
     (p : Path b₁ b₂) : Path (H.join a b₁) (H.join a b₂) :=
   Path.congrArg (H.join a) p
 
@@ -225,7 +225,7 @@ inductive IFormula (n : Nat) where
   | impl : IFormula n → IFormula n → IFormula n
 
 /-- Kripke forcing. -/
-def iForces {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F) :
+noncomputable def iForces {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F) :
     W → IFormula n → Prop
   | _, IFormula.bot => False
   | w, IFormula.var i => (V i).val w
@@ -338,19 +338,19 @@ theorem iForces_mp {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W
 /-! ## Path witnesses for Kripke -/
 
 -- 36
-def iForces_congrArg {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+noncomputable def iForces_congrArg {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ : IFormula n) {w₁ w₂ : W} (p : Path w₁ w₂) :
     Path (iForces F V w₁ φ) (iForces F V w₂ φ) :=
   Path.congrArg (fun w => iForces F V w φ) p
 
 -- 37
-def formula_congrArg {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+noncomputable def formula_congrArg {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (w : W) {φ₁ φ₂ : IFormula n} (p : Path φ₁ φ₂) :
     Path (iForces F V w φ₁) (iForces F V w φ₂) :=
   Path.congrArg (iForces F V w) p
 
 -- 38
-def conj_comm_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+noncomputable def conj_comm_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ : IFormula n) (w : W) :
     Path (iForces F V w (IFormula.conj φ ψ))
          (iForces F V w (IFormula.conj ψ φ)) := by
@@ -359,7 +359,7 @@ def conj_comm_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W
   exact ⟨[], h⟩
 
 -- 39
-def disj_comm_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
+noncomputable def disj_comm_path {W : Type u} (F : IKripkeFrame W) (V : Fin n → IValuation W F)
     (φ ψ : IFormula n) (w : W) :
     Path (iForces F V w (IFormula.disj φ ψ))
          (iForces F V w (IFormula.disj ψ φ)) := by
@@ -376,7 +376,7 @@ theorem existence_property_conj {W : Type u} (F : IKripkeFrame W)
 /-! ## Two-world frame -/
 
 -- 41
-def twoWorldIKF : IKripkeFrame Bool where
+noncomputable def twoWorldIKF : IKripkeFrame Bool where
   le := fun a b => a = false ∨ a = b
   le_refl := fun _ => Or.inr rfl
   le_trans := by
@@ -414,12 +414,12 @@ theorem heyting_join_absorb {α : Type u} (H : HeytingAlg α) (a b : α) :
   · exact H.le_join_left a (H.meet a b)
 
 -- 47
-def heyting_meet_absorb_path {α : Type u} (H : HeytingAlg α) (a b : α) :
+noncomputable def heyting_meet_absorb_path {α : Type u} (H : HeytingAlg α) (a b : α) :
     Path (H.meet a (H.join a b)) a :=
   ⟨[], heyting_meet_absorb H a b⟩
 
 -- 48
-def heyting_join_absorb_path {α : Type u} (H : HeytingAlg α) (a b : α) :
+noncomputable def heyting_join_absorb_path {α : Type u} (H : HeytingAlg α) (a b : α) :
     Path (H.join a (H.meet a b)) a :=
   ⟨[], heyting_join_absorb H a b⟩
 

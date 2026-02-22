@@ -191,7 +191,7 @@ namespace StringBracket
 variable {X : Type u}
 
 /-- The string bracket operation. -/
-def bracket (S : StringBracket X) :
+noncomputable def bracket (S : StringBracket X) :
     S.equivariantHomology → S.equivariantHomology → S.equivariantHomology :=
   S.lie.bracket
 
@@ -230,7 +230,7 @@ namespace GoldmanBracket
 variable {Surface : Type u}
 
 /-- The Goldman bracket operation. -/
-def bracket (G : GoldmanBracket Surface) : G.loopClass → G.loopClass → G.loopClass :=
+noncomputable def bracket (G : GoldmanBracket Surface) : G.loopClass → G.loopClass → G.loopClass :=
   G.lie.bracket
 
 /-- The Goldman bracket is exactly the Lie bracket from the packaged structure. -/
@@ -244,7 +244,7 @@ theorem bracket_skew (G : GoldmanBracket Surface) (x y : G.loopClass) :
 
 end GoldmanBracket
 
-private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
 /-! ## Summary -/
 

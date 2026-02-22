@@ -40,16 +40,16 @@ structure FGMor (X : Type u) (a b : X) where
   pathMor : Path a b
 
 /-- Identity morphism in the fundamental groupoid. -/
-def FGMor.id (X : Type u) (a : X) : FGMor X a a :=
+noncomputable def FGMor.id (X : Type u) (a : X) : FGMor X a a :=
   ⟨Path.refl a⟩
 
 /-- Composition of morphisms in the fundamental groupoid. -/
-def FGMor.comp {X : Type u} {a b c : X}
+noncomputable def FGMor.comp {X : Type u} {a b c : X}
     (f : FGMor X a b) (g : FGMor X b c) : FGMor X a c :=
   ⟨Path.trans f.pathMor g.pathMor⟩
 
 /-- Inverse morphism in the fundamental groupoid. -/
-def FGMor.inv {X : Type u} {a b : X}
+noncomputable def FGMor.inv {X : Type u} {a b : X}
     (f : FGMor X a b) : FGMor X b a :=
   ⟨Path.symm f.pathMor⟩
 
@@ -92,7 +92,7 @@ theorem FGMor.inv_inv {X : Type u} {a b : X}
     exact _root_.congrArg FGMor.mk (Path.symm_symm p)
 
 /-- Functor action on the fundamental groupoid via congrArg. -/
-def FGMor.map {X : Type u} {Y : Type v} (φ : X → Y)
+noncomputable def FGMor.map {X : Type u} {Y : Type v} (φ : X → Y)
     {a b : X} (f : FGMor X a b) :
     FGMor Y (φ a) (φ b) :=
   ⟨Path.congrArg φ f.pathMor⟩
@@ -123,16 +123,16 @@ structure LoopAt (X : Type u) (x : X) where
   loop : Path x x
 
 /-- Constant loop. -/
-def LoopAt.const (X : Type u) (x : X) : LoopAt X x :=
+noncomputable def LoopAt.const (X : Type u) (x : X) : LoopAt X x :=
   ⟨Path.refl x⟩
 
 /-- Compose two loops. -/
-def LoopAt.comp {X : Type u} {x : X}
+noncomputable def LoopAt.comp {X : Type u} {x : X}
     (α β : LoopAt X x) : LoopAt X x :=
   ⟨Path.trans α.loop β.loop⟩
 
 /-- Invert a loop. -/
-def LoopAt.inv {X : Type u} {x : X}
+noncomputable def LoopAt.inv {X : Type u} {x : X}
     (α : LoopAt X x) : LoopAt X x :=
   ⟨Path.symm α.loop⟩
 
@@ -220,12 +220,12 @@ structure AmalgamatedPath {A B C : Type u} (vk : VKInclusion A B C)
   pathB : Path (vk.inclB c₁) (vk.inclB c₂)
 
 /-- Reflexive amalgamated path. -/
-def AmalgamatedPath.refl_amalg {A B C : Type u} (vk : VKInclusion A B C)
+noncomputable def AmalgamatedPath.refl_amalg {A B C : Type u} (vk : VKInclusion A B C)
     (c : C) : AmalgamatedPath vk (c₁ := c) (c₂ := c) :=
   ⟨Path.refl (vk.inclA c), Path.refl (vk.inclB c)⟩
 
 /-- Transitivity of amalgamated paths via trans in each component. -/
-def AmalgamatedPath.trans_amalg {A B C : Type u} {vk : VKInclusion A B C}
+noncomputable def AmalgamatedPath.trans_amalg {A B C : Type u} {vk : VKInclusion A B C}
     {c₁ c₂ c₃ : C}
     (p : AmalgamatedPath vk (c₁ := c₁) (c₂ := c₂))
     (q : AmalgamatedPath vk (c₁ := c₂) (c₂ := c₃)) :
@@ -233,7 +233,7 @@ def AmalgamatedPath.trans_amalg {A B C : Type u} {vk : VKInclusion A B C}
   ⟨Path.trans p.pathA q.pathA, Path.trans p.pathB q.pathB⟩
 
 /-- Symmetry of amalgamated paths via symm in each component. -/
-def AmalgamatedPath.symm_amalg {A B C : Type u} {vk : VKInclusion A B C}
+noncomputable def AmalgamatedPath.symm_amalg {A B C : Type u} {vk : VKInclusion A B C}
     {c₁ c₂ : C}
     (p : AmalgamatedPath vk (c₁ := c₁) (c₂ := c₂)) :
     AmalgamatedPath vk (c₁ := c₂) (c₂ := c₁) :=
@@ -275,7 +275,7 @@ theorem AmalgamatedPath.symm_symm {A B C : Type u} {vk : VKInclusion A B C}
     rw [Path.symm_symm, Path.symm_symm]
 
 /-- Constructing amalgamated paths via congrArg through inclusions. -/
-def AmalgamatedPath.ofPath {A B C : Type u} (vk : VKInclusion A B C)
+noncomputable def AmalgamatedPath.ofPath {A B C : Type u} (vk : VKInclusion A B C)
     {c₁ c₂ : C} (p : Path c₁ c₂) :
     AmalgamatedPath vk (c₁ := c₁) (c₂ := c₂) :=
   ⟨Path.congrArg vk.inclA p, Path.congrArg vk.inclB p⟩
@@ -325,13 +325,13 @@ theorem CWStructure.lift_trans {X : Type u} (cw : CWStructure X)
   cw.inclPathTrans n p q
 
 /-- Iterated cell inclusion across multiple skeleta. -/
-def CWStructure.iterIncl {X : Type u} (cw : CWStructure X)
+noncomputable def CWStructure.iterIncl {X : Type u} (cw : CWStructure X)
     (n : Nat) : (k : Nat) → cw.Skeleton n → cw.Skeleton (n + k)
   | 0 => fun x => x
   | k + 1 => fun x => cw.incl (n + k) (cw.iterIncl n k x)
 
 /-- Iterated inclusion lifts paths across multiple skeleta. -/
-def CWStructure.iterLiftPath {X : Type u} (cw : CWStructure X)
+noncomputable def CWStructure.iterLiftPath {X : Type u} (cw : CWStructure X)
     (n : Nat) : (k : Nat) → {a b : cw.Skeleton n} → Path a b →
     Path (cw.iterIncl n k a) (cw.iterIncl n k b)
   | 0 => fun p => p
@@ -365,7 +365,7 @@ structure MVBoundaryElem {X A B C : Type u} (mv : MVData X A B C)
   pathFromB : Path (mv.inclBX preB) x
 
 /-- The connecting map: construct a path through trans and symm. -/
-def MVBoundaryElem.connectingPath {X A B C : Type u}
+noncomputable def MVBoundaryElem.connectingPath {X A B C : Type u}
     {mv : MVData X A B C} {x : X}
     (bd : MVBoundaryElem mv x) :
     Path (mv.inclAX bd.preA) (mv.inclBX bd.preB) :=
@@ -403,7 +403,7 @@ structure FiberSeq (F E B : Type u) where
   fiberMap : ∀ (x : F), Path (proj (incl x)) fiberPt
 
 /-- The connecting map of a fiber sequence. -/
-def FiberSeq.connecting {F E B : Type u} (fs : FiberSeq F E B)
+noncomputable def FiberSeq.connecting {F E B : Type u} (fs : FiberSeq F E B)
     {b₁ b₂ : B} (p : Path b₁ b₂) (e : E) (he : Path (fs.proj e) b₁) :
     Path (fs.proj e) b₂ :=
   Path.trans he p
@@ -440,7 +440,7 @@ theorem FiberSeq.proj_incl_eq {F E B : Type u}
 
 /-- The Hurewicz map: sends a loop to its path data. In the abelianization,
     all loops commute by proof irrelevance. -/
-def hurewiczLoop {X : Type u} {x : X} (α : LoopAt X x) :
+noncomputable def hurewiczLoop {X : Type u} {x : X} (α : LoopAt X x) :
     Path x x :=
   α.loop
 
@@ -481,7 +481,7 @@ structure SuspensionData (X : Type u) where
   merid : X → Path north south
 
 /-- The suspension of a path: merid(a) · merid(b)⁻¹. -/
-def SuspensionData.suspPath {X : Type u} (S : SuspensionData X)
+noncomputable def SuspensionData.suspPath {X : Type u} (S : SuspensionData X)
     (a b : X) :
     Path S.north S.north :=
   Path.trans (S.merid a) (Path.symm (S.merid b))
@@ -493,7 +493,7 @@ theorem SuspensionData.suspPath_self {X : Type u} (S : SuspensionData X)
   rfl
 
 /-- The suspension map on loops (via a basepoint). -/
-def SuspensionData.suspMapLoop {X : Type u} (S : SuspensionData X)
+noncomputable def SuspensionData.suspMapLoop {X : Type u} (S : SuspensionData X)
     (x : X) (_α : LoopAt X x) :
     LoopAt S.Susp S.north :=
   ⟨Path.trans (S.merid x) (Path.symm (S.merid x))⟩
@@ -508,14 +508,14 @@ structure WeakEquiv {X : Type u} {Y : Type v} (f : X → Y) where
     (Path.congrArg f (injPi0 x₁ x₂ p)).toEq = p.toEq
 
 /-- Identity is a weak equivalence. -/
-def WeakEquiv.idEquiv (X : Type u) : WeakEquiv (fun x : X => x) where
+noncomputable def WeakEquiv.idEquiv (X : Type u) : WeakEquiv (fun x : X => x) where
   surjPi0 := fun y => ⟨y, Path.refl y⟩
   injPi0 := fun _ _ p => p
   section_eq := fun _ _ p => by
     simp
 
 /-- Weak equivalence induces bijection on loop spaces. -/
-def WeakEquiv.loopPreimage {X : Type u} {Y : Type v}
+noncomputable def WeakEquiv.loopPreimage {X : Type u} {Y : Type v}
     {f : X → Y} (we : WeakEquiv f) (x : X)
     (α : LoopAt Y (f x)) : LoopAt X x :=
   ⟨we.injPi0 x x α.loop⟩
@@ -535,28 +535,28 @@ structure PathHomotopy {X : Type u} {a b : X}
   homotopyEq : p = q
 
 /-- Reflexive path homotopy. -/
-def PathHomotopy.rfl' {X : Type u} {a b : X} (p : Path a b) :
+noncomputable def PathHomotopy.rfl' {X : Type u} {a b : X} (p : Path a b) :
     PathHomotopy p p :=
   ⟨rfl⟩
 
 /-- Symmetric path homotopy. -/
-def PathHomotopy.symm' {X : Type u} {a b : X} {p q : Path a b}
+noncomputable def PathHomotopy.symm' {X : Type u} {a b : X} {p q : Path a b}
     (h : PathHomotopy p q) : PathHomotopy q p :=
   ⟨h.homotopyEq.symm⟩
 
 /-- Transitive path homotopy. -/
-def PathHomotopy.trans' {X : Type u} {a b : X} {p q r : Path a b}
+noncomputable def PathHomotopy.trans' {X : Type u} {a b : X} {p q r : Path a b}
     (h₁ : PathHomotopy p q) (h₂ : PathHomotopy q r) : PathHomotopy p r :=
   ⟨h₁.homotopyEq.trans h₂.homotopyEq⟩
 
 /-- Concatenation respects path homotopy on the left. -/
-def PathHomotopy.whiskerRight {X : Type u} {a b c : X}
+noncomputable def PathHomotopy.whiskerRight {X : Type u} {a b c : X}
     {p p' : Path a b} (h : PathHomotopy p p') (q : Path b c) :
     PathHomotopy (Path.trans p q) (Path.trans p' q) :=
   ⟨_root_.congrArg (fun t => Path.trans t q) h.homotopyEq⟩
 
 /-- Concatenation respects path homotopy on the right. -/
-def PathHomotopy.whiskerLeft {X : Type u} {a b c : X}
+noncomputable def PathHomotopy.whiskerLeft {X : Type u} {a b c : X}
     (p : Path a b) {q q' : Path b c} (h : PathHomotopy q q') :
     PathHomotopy (Path.trans p q) (Path.trans p q') :=
   ⟨_root_.congrArg (fun t => Path.trans p t) h.homotopyEq⟩
@@ -564,7 +564,7 @@ def PathHomotopy.whiskerLeft {X : Type u} {a b c : X}
 /-! ## Transport in Algebraic Topology Structures -/
 
 /-- Transport a loop along a path of basepoints (conjugation). -/
-def transportLoop {X : Type u} {x y : X} (p : Path x y)
+noncomputable def transportLoop {X : Type u} {x y : X} (p : Path x y)
     (α : LoopAt X x) : LoopAt X y :=
   ⟨Path.trans (Path.symm p) (Path.trans α.loop p)⟩
 

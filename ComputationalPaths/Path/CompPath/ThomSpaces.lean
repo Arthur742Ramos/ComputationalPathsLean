@@ -72,7 +72,7 @@ variable {H : ReducedCohomologyTheory}
 variable {K B Total V : Type u} {bundle : VectorBundleData K B Total V}
 
 /-- `Path`-typed witness that the Thom degree equals the rank. -/
-def degreePath (O : BundleOrientation H bundle) :
+noncomputable def degreePath (O : BundleOrientation H bundle) :
     Path O.thomClass.degree bundle.rank :=
   Path.stepChain O.degree_eq_rank
 
@@ -104,12 +104,12 @@ variable {H : ReducedCohomologyTheory}
 variable {K B Total V : Type u} {bundle : VectorBundleData K B Total V} {b0 : B}
 
 /-- `Path`-typed witness of degree alignment for the Thom isomorphism. -/
-def degreePath (T : OrientedThomIsomorphism H bundle b0) :
+noncomputable def degreePath (T : OrientedThomIsomorphism H bundle b0) :
     Path T.isomorphism.degree bundle.rank :=
   Path.stepChain T.degree_eq_rank
 
 /-- Heterogeneous witness that the Thom class matches the orientation class. -/
-def classPath (T : OrientedThomIsomorphism H bundle b0) :
+noncomputable def classPath (T : OrientedThomIsomorphism H bundle b0) :
     HEq T.isomorphism.thomClass T.orientation.thomClass.thom :=
   T.class_eq
 

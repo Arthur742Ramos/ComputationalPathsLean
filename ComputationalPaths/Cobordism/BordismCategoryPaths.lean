@@ -33,11 +33,11 @@ structure BordismPathCategory where
 abbrev BordismObj (n : Nat) : Type (u + 1) := BordismClass.{u} n
 
 /-- Identity bordism path. -/
-def bordismId {n : Nat} (X : BordismObj n) : Path X X :=
+noncomputable def bordismId {n : Nat} (X : BordismObj n) : Path X X :=
   Path.refl X
 
 /-- Composition of bordism paths. -/
-def bordismComp {n : Nat} {X Y Z : BordismObj n}
+noncomputable def bordismComp {n : Nat} {X Y Z : BordismObj n}
     (p : Path X Y) (q : Path Y Z) : Path X Z :=
   Path.trans p q
 
@@ -92,7 +92,7 @@ noncomputable def bordism_cancel_rweq {n : Nat} {X Y : BordismObj n}
   rweq_of_step (bordism_cancel_step (p := p))
 
 /-- Canonical bordism category with morphisms as computational paths. -/
-def bordismPathCategory (n : Nat) : BordismPathCategory where
+noncomputable def bordismPathCategory (n : Nat) : BordismPathCategory where
   Obj := BordismObj n
   id := bordismId
   comp := fun f g => bordismComp f g

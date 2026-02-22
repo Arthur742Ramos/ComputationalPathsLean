@@ -41,7 +41,7 @@ structure GradedFamily where
   component : Int → Type u
 
 /-- Shift a graded family by n. -/
-def GradedFamily.shift (G : GradedFamily.{u}) (n : Int) : GradedFamily.{u} where
+noncomputable def GradedFamily.shift (G : GradedFamily.{u}) (n : Int) : GradedFamily.{u} where
   component := fun k => G.component (k + n)
 
 /-! ## A-infinity category -/
@@ -66,15 +66,15 @@ structure AInfinityCategory where
     True  -- The full stasheff identity; propositionally witnessed
 
 /-- m₁ is a differential (m₁² = 0). -/
-def AInfinityCategory.m1_sq_zero (C : AInfinityCategory.{u}) : Prop :=
+noncomputable def AInfinityCategory.m1_sq_zero (C : AInfinityCategory.{u}) : Prop :=
   ∀ (X Y : C.Obj), True  -- m₁ ∘ m₁ = 0
 
 /-- m₂ is a chain map with respect to m₁. -/
-def AInfinityCategory.m2_chain_map (C : AInfinityCategory.{u}) : Prop :=
+noncomputable def AInfinityCategory.m2_chain_map (C : AInfinityCategory.{u}) : Prop :=
   ∀ (X Y Z : C.Obj), True  -- m₁ ∘ m₂ = m₂ ∘ (m₁ ⊗ 1 + 1 ⊗ m₁)
 
 /-- Strict A-infinity category: mₙ = 0 for n ≥ 3 (i.e., a DG category). -/
-def AInfinityCategory.isStrict (C : AInfinityCategory.{u}) : Prop :=
+noncomputable def AInfinityCategory.isStrict (C : AInfinityCategory.{u}) : Prop :=
   ∀ (n : Nat) (hn : n ≥ 3)
     (objs : Fin (n + 1) → C.Obj)
     (inputs : ∀ i : Fin n, (C.Hom (objs i.castSucc) (objs i.succ)).component 0),
@@ -99,7 +99,7 @@ structure AInfinityFunctor (C D : AInfinityCategory.{u}) where
     True
 
 /-- Strict A-infinity functor: fₙ = 0 for n ≥ 2. -/
-def AInfinityFunctor.isStrict {C D : AInfinityCategory.{u}}
+noncomputable def AInfinityFunctor.isStrict {C D : AInfinityCategory.{u}}
     (F : AInfinityFunctor C D) : Prop :=
   ∀ (n : Nat) (hn : n ≥ 2), True
 
@@ -180,7 +180,7 @@ structure Perturbation (SDR : StrongDeformationRetract.{u}) where
 
 /-- The homological perturbation lemma: given an SDR and a perturbation,
     produce a new SDR. -/
-def homologicalPerturbationLemma
+noncomputable def homologicalPerturbationLemma
     (SDR : StrongDeformationRetract.{u}) (δ : Perturbation SDR) :
     StrongDeformationRetract.{u} where
   big := SDR.big
@@ -195,7 +195,7 @@ def homologicalPerturbationLemma
   hh_zero := trivial
 
 /-- The transferred A-infinity structure from HPT. -/
-def transferredAInfinity (SDR : StrongDeformationRetract.{u})
+noncomputable def transferredAInfinity (SDR : StrongDeformationRetract.{u})
     (δ : Perturbation SDR) :
     GradedFamily.{u} :=
   (homologicalPerturbationLemma SDR δ).small
@@ -237,7 +237,7 @@ structure AInfinityAlgebra where
 
 /-- Formality: an A-infinity algebra is formal if it is quasi-isomorphic
     to its cohomology with trivial higher products. -/
-def AInfinityAlgebra.isFormal (A : AInfinityAlgebra.{u}) : Prop :=
+noncomputable def AInfinityAlgebra.isFormal (A : AInfinityAlgebra.{u}) : Prop :=
   True  -- H*(A) with m₂ only is quasi-isomorphic to A
 
 /-- An augmented A-infinity algebra. -/
@@ -297,14 +297,14 @@ structure FukayaCategory (M : SymplecticManifoldData.{u}) where
   mn_count : ∀ (n : Nat), n ≥ 3 → True
 
 /-- The Fukaya category is unobstructed if the mₙ satisfy convergence. -/
-def FukayaCategory.isUnobstructed {M : SymplecticManifoldData.{u}}
+noncomputable def FukayaCategory.isUnobstructed {M : SymplecticManifoldData.{u}}
     (F : FukayaCategory M) : Prop :=
   True  -- Maurer-Cartan solutions exist
 
 /-! ## Hochschild cohomology of A-infinity categories -/
 
 /-- Hochschild cochain complex of an A-infinity category. -/
-def ainftyHochschild (C : AInfinityCategory.{u}) : GradedFamily.{u} where
+noncomputable def ainftyHochschild (C : AInfinityCategory.{u}) : GradedFamily.{u} where
   component := fun n =>
     ∀ (k : Nat) (objs : Fin (k + 1) → C.Obj),
     (∀ i : Fin k, (C.Hom (objs i.castSucc) (objs i.succ)).component 0) →
@@ -354,7 +354,7 @@ theorem massey_vanishing_implies_formal (A : AInfinityAlgebra.{u})
 
 /-- Homological smoothness: an A-infinity category C is homologically
     smooth if the diagonal bimodule has a finite resolution. -/
-def isHomologicallySmooth (C : AInfinityCategory.{u}) : Prop :=
+noncomputable def isHomologicallySmooth (C : AInfinityCategory.{u}) : Prop :=
   True
 
 /-- Calabi-Yau structure on an A-infinity category. -/

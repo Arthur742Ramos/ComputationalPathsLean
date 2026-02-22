@@ -72,24 +72,24 @@ namespace GroupData
 variable {G : Type u} (grp : GroupData G)
 
 /-- `Path`-typed associativity. -/
-def mul_assoc_path (a b c : G) :
+noncomputable def mul_assoc_path (a b c : G) :
     Path (grp.mul (grp.mul a b) c) (grp.mul a (grp.mul b c)) :=
   Path.stepChain (grp.mul_assoc a b c)
 
 /-- `Path`-typed left identity. -/
-def e_mul_path (a : G) : Path (grp.mul grp.e a) a :=
+noncomputable def e_mul_path (a : G) : Path (grp.mul grp.e a) a :=
   Path.stepChain (grp.e_mul a)
 
 /-- `Path`-typed right identity. -/
-def mul_e_path (a : G) : Path (grp.mul a grp.e) a :=
+noncomputable def mul_e_path (a : G) : Path (grp.mul a grp.e) a :=
   Path.stepChain (grp.mul_e a)
 
 /-- `Path`-typed left inverse. -/
-def inv_mul_path (a : G) : Path (grp.mul (grp.inv a) a) grp.e :=
+noncomputable def inv_mul_path (a : G) : Path (grp.mul (grp.inv a) a) grp.e :=
   Path.stepChain (grp.inv_mul a)
 
 /-- `Path`-typed right inverse. -/
-def mul_inv_path (a : G) : Path (grp.mul a (grp.inv a)) grp.e :=
+noncomputable def mul_inv_path (a : G) : Path (grp.mul a (grp.inv a)) grp.e :=
   Path.stepChain (grp.mul_inv a)
 
 /-- Inverse of identity is identity. -/
@@ -129,12 +129,12 @@ namespace GAction
 variable {G P : Type u}
 
 /-- `Path`-typed action by identity. -/
-def act_e_path (ga : GAction G P) (p : P) :
+noncomputable def act_e_path (ga : GAction G P) (p : P) :
     Path (ga.act p ga.grp.e) p :=
   Path.stepChain (ga.act_e p)
 
 /-- `Path`-typed action associativity. -/
-def act_mul_path (ga : GAction G P) (p : P) (g h : G) :
+noncomputable def act_mul_path (ga : GAction G P) (p : P) (g h : G) :
     Path (ga.act (ga.act p g) h) (ga.act p (ga.grp.mul g h)) :=
   Path.stepChain (ga.act_mul p g h)
 
@@ -169,7 +169,7 @@ namespace PrincipalBundleData
 variable {G P B : Type u}
 
 /-- `Path`-typed fiber preservation. -/
-def proj_act_path (pb : PrincipalBundleData G P B) (p : P) (g : G) :
+noncomputable def proj_act_path (pb : PrincipalBundleData G P B) (p : P) (g : G) :
     Path (pb.proj (pb.action.act p g)) (pb.proj p) :=
   Path.stepChain (pb.proj_act p g)
 
@@ -179,7 +179,7 @@ theorem act_id (pb : PrincipalBundleData G P B) (p : P) :
   pb.action.act_e p
 
 /-- `Path`-typed act_id. -/
-def act_id_path (pb : PrincipalBundleData G P B) (p : P) :
+noncomputable def act_id_path (pb : PrincipalBundleData G P B) (p : P) :
     Path (pb.action.act p pb.action.grp.e) p :=
   Path.stepChain (pb.act_id p)
 
@@ -203,11 +203,11 @@ structure LeftGAction (G : Type u) (F : Type u) where
   act_mul : ∀ g h f, act (grp.mul g h) f = act g (act h f)
 
 /-- The total space of the associated bundle (before quotienting). -/
-def AssociatedTotal (P : Type u) (F : Type u) : Type u := P × F
+noncomputable def AssociatedTotal (P : Type u) (F : Type u) : Type u := P × F
 
 /-- The associated bundle equivalence relation:
     (p · g, f) ~ (p, g · f). -/
-def associatedRel {G P F : Type u}
+noncomputable def associatedRel {G P F : Type u}
     (rightAct : GAction G P) (leftAct : LeftGAction G F) :
     AssociatedTotal P F → AssociatedTotal P F → Prop :=
   fun ⟨p1, f1⟩ ⟨p2, f2⟩ =>
@@ -238,7 +238,7 @@ namespace AssociatedBundleData
 variable {G P B F : Type u}
 
 /-- The projection of the associated bundle maps to B. -/
-def assocProj (ab : AssociatedBundleData G P B F) :
+noncomputable def assocProj (ab : AssociatedBundleData G P B F) :
     AssociatedTotal P F → B :=
   fun ⟨p, _⟩ => ab.principal.proj p
 
@@ -255,7 +255,7 @@ theorem assocProj_wd (ab : AssociatedBundleData G P B F)
   rw [← hact, ab.principal.proj_act]
 
 /-- `Path`-typed well-definedness. -/
-def assocProj_wd_path (ab : AssociatedBundleData G P B F)
+noncomputable def assocProj_wd_path (ab : AssociatedBundleData G P B F)
     (x y : AssociatedTotal P F)
     (h : associatedRel ab.principal.action ab.fiberAction x y) :
     Path (ab.assocProj x) (ab.assocProj y) :=
@@ -285,14 +285,14 @@ namespace GaugeTransformation
 variable {G P B : Type u}
 
 /-- The identity gauge transformation. -/
-def id (pb : PrincipalBundleData G P B) : GaugeTransformation G P B where
+noncomputable def id (pb : PrincipalBundleData G P B) : GaugeTransformation G P B where
   bundle := pb
   toFun := _root_.id
   preserves_fiber := fun _ => rfl
   equivariant := fun _ _ => rfl
 
 /-- Composition of gauge transformations over the same bundle. -/
-def comp (pb : PrincipalBundleData G P B)
+noncomputable def comp (pb : PrincipalBundleData G P B)
     (φ ψ : GaugeTransformation G P B)
     (hφ : φ.bundle = pb) (hψ : ψ.bundle = pb) :
     GaugeTransformation G P B where
@@ -314,12 +314,12 @@ def comp (pb : PrincipalBundleData G P B)
     exact h2
 
 /-- `Path`-typed fiber preservation. -/
-def preserves_fiber_path (φ : GaugeTransformation G P B) (p : P) :
+noncomputable def preserves_fiber_path (φ : GaugeTransformation G P B) (p : P) :
     Path (φ.bundle.proj (φ.toFun p)) (φ.bundle.proj p) :=
   Path.stepChain (φ.preserves_fiber p)
 
 /-- `Path`-typed equivariance. -/
-def equivariant_path (φ : GaugeTransformation G P B) (p : P) (g : G) :
+noncomputable def equivariant_path (φ : GaugeTransformation G P B) (p : P) (g : G) :
     Path (φ.toFun (φ.bundle.action.act p g))
       (φ.bundle.action.act (φ.toFun p) g) :=
   Path.stepChain (φ.equivariant p g)
@@ -360,13 +360,13 @@ namespace ConnectionData
 variable {G P B : Type u}
 
 /-- `Path`-typed lift projection. -/
-def lift_proj_path (conn : ConnectionData G P B) (p : P) (b : B)
+noncomputable def lift_proj_path (conn : ConnectionData G P B) (p : P) (b : B)
     (γ : Path (conn.bundle.proj p) b) :
     Path (conn.bundle.proj (conn.horizLift p b γ)) b :=
   Path.stepChain (conn.lift_proj p b γ)
 
 /-- `Path`-typed lift of reflexivity. -/
-def lift_refl_path (conn : ConnectionData G P B) (p : P) :
+noncomputable def lift_refl_path (conn : ConnectionData G P B) (p : P) :
     Path (conn.horizLift p (conn.bundle.proj p) (Path.refl (conn.bundle.proj p))) p :=
   Path.stepChain (conn.lift_refl p)
 

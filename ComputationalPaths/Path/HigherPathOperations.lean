@@ -28,7 +28,7 @@ variable {a b c d e : A}
 /-! ## Godement Interchange -/
 
 /-- Godement interchange for derivation-level 2-cells. -/
-def godementInterchange {f f' : Path a b} {g g' : Path b c}
+noncomputable def godementInterchange {f f' : Path a b} {g g' : Path b c}
     (alpha : Derivation₂ f f') (beta : Derivation₂ g g') :
     Derivation₃
       (Derivation₂.vcomp (OmegaGroupoid.whiskerRight alpha g) (OmegaGroupoid.whiskerLeft f' beta))
@@ -38,7 +38,7 @@ def godementInterchange {f f' : Path a b} {g g' : Path b c}
 /-! ## Naturality Squares -/
 
 /-- Naturality of the associator at the 3-cell level. -/
-def associatorNatural {f f' : Path a b} {g g' : Path b c} {h h' : Path c d}
+noncomputable def associatorNatural {f f' : Path a b} {g g' : Path b c} {h h' : Path c d}
     (alpha : Derivation₂ f f') (beta : Derivation₂ g g') (gamma : Derivation₂ h h') :
     Derivation₃
       (Derivation₂.vcomp (OmegaGroupoid.hcomp (OmegaGroupoid.hcomp alpha beta) gamma) (associator f' g' h'))
@@ -46,7 +46,7 @@ def associatorNatural {f f' : Path a b} {g g' : Path b c} {h h' : Path c d}
   contractibility₃ _ _
 
 /-- Naturality of the left unitor at the 3-cell level. -/
-def leftUnitorNatural {f g : Path a b} (alpha : Derivation₂ f g) :
+noncomputable def leftUnitorNatural {f g : Path a b} (alpha : Derivation₂ f g) :
     Derivation₃
       (Derivation₂.vcomp
         (OmegaGroupoid.hcomp (Derivation₂.refl (Path.refl a)) alpha) (leftUnitor g))
@@ -54,7 +54,7 @@ def leftUnitorNatural {f g : Path a b} (alpha : Derivation₂ f g) :
   contractibility₃ _ _
 
 /-- Naturality of the right unitor at the 3-cell level. -/
-def rightUnitorNatural {f g : Path a b} (alpha : Derivation₂ f g) :
+noncomputable def rightUnitorNatural {f g : Path a b} (alpha : Derivation₂ f g) :
     Derivation₃
       (Derivation₂.vcomp
         (OmegaGroupoid.hcomp alpha (Derivation₂.refl (Path.refl b))) (rightUnitor g))
@@ -64,12 +64,12 @@ def rightUnitorNatural {f g : Path a b} (alpha : Derivation₂ f g) :
 /-! ## Pentagon and Triangle Coherence -/
 
 /-- Pentagon identity for associators as a 3-cell. -/
-def pentagonIdentity (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
+noncomputable def pentagonIdentity (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
     Derivation₃ (pentagonLeft f g h k) (pentagonRight f g h k) :=
   pentagonCoherence f g h k
 
 /-- Triangle identity for unitors as a 3-cell. -/
-def triangleIdentity (f : Path a b) (g : Path b c) :
+noncomputable def triangleIdentity (f : Path a b) (g : Path b c) :
     Derivation₃ (triangleLeft f g) (triangleRight f g) :=
   triangleCoherence f g
 

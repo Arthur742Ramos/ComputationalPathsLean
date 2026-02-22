@@ -60,15 +60,15 @@ structure PathCliffordAlg (A : Type u) where
 /-! ## Grade structure -/
 
 /-- Predicate for membership in the even subalgebra. -/
-def isEven (CA : PathCliffordAlg A) {a : A} (p : Path a a) : Prop :=
+noncomputable def isEven (CA : PathCliffordAlg A) {a : A} (p : Path a a) : Prop :=
   CA.gradeInv p = p
 
 /-- Predicate for membership in the odd part. -/
-def isOdd (CA : PathCliffordAlg A) {a : A} (p : Path a a) : Prop :=
+noncomputable def isOdd (CA : PathCliffordAlg A) {a : A} (p : Path a a) : Prop :=
   CA.gradeInv p = symm p
 
 /-- The conjugation involution: grade involution composed with reversion. -/
-def conjugation (CA : PathCliffordAlg A) {a : A} (p : Path a a) : Path a a :=
+noncomputable def conjugation (CA : PathCliffordAlg A) {a : A} (p : Path a a) : Path a a :=
   CA.gradeInv (CA.reversion p)
 
 /-- Conjugation is an involution. -/
@@ -79,7 +79,7 @@ theorem conjugation_invol (CA : PathCliffordAlg A) {a : A} (p : Path a a) :
   rw [CA.gradeInv_invol, CA.rev_invol]
 
 /-- The Clifford norm: p * conjugation(p). -/
-def cliffordNorm (CA : PathCliffordAlg A) {a : A} (p : Path a a) : Path a a :=
+noncomputable def cliffordNorm (CA : PathCliffordAlg A) {a : A} (p : Path a a) : Path a a :=
   CA.clProd p (conjugation CA p)
 
 /-! ## Symmetry and path interactions -/

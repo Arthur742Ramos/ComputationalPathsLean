@@ -54,7 +54,7 @@ structure SubobjClassifier (A : Type u) where
   classify : A → A     -- characteristic morphism for a subobject
 
 /-- Path witnessing that the classifier is well-defined. -/
-def classifier_path {A : Type u} (sc : SubobjClassifier A)
+noncomputable def classifier_path {A : Type u} (sc : SubobjClassifier A)
     (a : A) : Path (sc.classify a) (sc.classify a) :=
   Path.refl (sc.classify a)
 
@@ -73,7 +73,7 @@ structure PowerObj (A : Type u) where
   transpose : A → A → A -- exponential transpose
 
 /-- Path for power object adjunction. -/
-def power_adj_path {A : Type u} (po : PowerObj A) (a : A) :
+noncomputable def power_adj_path {A : Type u} (po : PowerObj A) (a : A) :
     Path (po.transpose a (po.eval a)) (po.transpose a (po.eval a)) :=
   Path.refl _
 
@@ -100,7 +100,7 @@ structure InternalLogic (A : Type u) where
   impl : A → A
 
 /-- Top and bottom satisfy exclusion via paths. -/
-def top_bot_exclusion {A : Type u} (il : InternalLogic A) (a : A) :
+noncomputable def top_bot_exclusion {A : Type u} (il : InternalLogic A) (a : A) :
     Path (il.top (il.bot a)) (il.top (il.bot a)) :=
   Path.refl _
 
@@ -150,7 +150,7 @@ theorem geom_morph_dir_refl {A : Type u} (gm : GeomMorph A) (a : A) :
   gm.dirImage.map_refl a
 
 /-- Composition of geometric morphisms (same base type). -/
-def geom_morph_comp {A : Type u} (f g : GeomMorph A) : GeomMorph A where
+noncomputable def geom_morph_comp {A : Type u} (f g : GeomMorph A) : GeomMorph A where
   invImage := {
     obj := fun a => f.invImage.obj (g.invImage.obj a)
     map := fun p => f.invImage.map (g.invImage.map p)
@@ -184,7 +184,7 @@ structure LTTopology (A : Type u) where
   preserves_conj : ∀ (_ _ : A), True  -- simplified
 
 /-- j being idempotent as a path. -/
-def lt_idempotent_path {A : Type u} (lt : LTTopology A) (a : A) :
+noncomputable def lt_idempotent_path {A : Type u} (lt : LTTopology A) (a : A) :
     Path (lt.j (lt.j a)) (lt.j a) :=
   Path.mk [Step.mk _ _ (lt.idempotent a)] (lt.idempotent a)
 
@@ -221,7 +221,7 @@ theorem lt_preserves_trans {A : Type u} (lt : LTTopology A)
 /-! ## Sheafification via Lawvere-Tierney -/
 
 /-- Sheafification as double application of j. -/
-def sheafify {A : Type u} (lt : LTTopology A) (a : A) : A :=
+noncomputable def sheafify {A : Type u} (lt : LTTopology A) (a : A) : A :=
   lt.j (lt.j a)
 
 /-- Sheafification equals single application via idempotence. -/
@@ -264,7 +264,7 @@ structure PullbackSquare (A : Type u) where
   py : A → A  -- p → y
 
 /-- Pullback is symmetric via path. -/
-def pullback_symm_path {A : Type u} (sq : PullbackSquare A) :
+noncomputable def pullback_symm_path {A : Type u} (sq : PullbackSquare A) :
     Path sq.p sq.p :=
   Path.refl sq.p
 

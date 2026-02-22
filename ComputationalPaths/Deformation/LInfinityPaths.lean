@@ -33,7 +33,7 @@ structure LInfinityPathData (A : Type u) where
   l1Squared : ∀ x : A, Path (l1 (l1 x)) zero
 
 /-- Truncated L-infinity Maurer-Cartan curvature `l₁ α + l₂(α, α)`. -/
-def curvature {A : Type u} (L : LInfinityPathData A) (x : A) : A :=
+noncomputable def curvature {A : Type u} (L : LInfinityPathData A) (x : A) : A :=
   L.add (L.l1 x) (L.l2 x x)
 
 /-- Maurer-Cartan element in a truncated L-infinity algebra. -/
@@ -57,7 +57,7 @@ namespace MaurerCartanElement
 variable {A : Type u} {L : LInfinityPathData A}
 
 /-- Primitive normalization step for an L-infinity MC equation. -/
-def equationStep (mc : MaurerCartanElement L) :
+noncomputable def equationStep (mc : MaurerCartanElement L) :
     Path.Step (Path.trans mc.equation (Path.refl L.zero)) mc.equation :=
   Path.Step.trans_refl_right mc.equation
 
@@ -88,7 +88,7 @@ structure LInfinityMorphismPathData {A : Type u} {B : Type v}
   preservesZero : Path (f1 L.zero) M.zero
 
 /-- Morphisms map MC elements to MC elements through path-preserving transport. -/
-def mapMaurerCartan {A : Type u} {B : Type v}
+noncomputable def mapMaurerCartan {A : Type u} {B : Type v}
     {L : LInfinityPathData A} {M : LInfinityPathData B}
     (φ : LInfinityMorphismPathData L M)
     (α : MaurerCartanElement L) :
@@ -106,7 +106,7 @@ def mapMaurerCartan {A : Type u} {B : Type v}
           φ.preservesZero))
 
 /-- Primitive normalization step for mapped MC equations. -/
-def mapMaurerCartanStep {A : Type u} {B : Type v}
+noncomputable def mapMaurerCartanStep {A : Type u} {B : Type v}
     {L : LInfinityPathData A} {M : LInfinityPathData B}
     (φ : LInfinityMorphismPathData L M)
     (α : MaurerCartanElement L) :
@@ -138,7 +138,7 @@ namespace LInfinityMorphismPathData
 variable {A : Type u} (L : LInfinityPathData A)
 
 /-- Identity path-preserving L-infinity morphism. -/
-def id : LInfinityMorphismPathData L L where
+noncomputable def id : LInfinityMorphismPathData L L where
   f1 := _root_.id
   mapPath := fun p => p
   preservesAdd := fun _ _ => Path.refl _

@@ -46,15 +46,15 @@ abbrev SymmetricProductInfinity (X : Type u) : Type u :=
   Σ n : ℕ, SymmetricProduct X n
 
 /-- Basepoint of the infinite symmetric product (the empty multiset). -/
-def symmProdInfBase (X : Type u) : SymmetricProductInfinity X :=
+noncomputable def symmProdInfBase (X : Type u) : SymmetricProductInfinity X :=
   ⟨0, Sym.nil⟩
 
 /-- Inclusion of a point as a singleton in the infinite symmetric product. -/
-def symmProdInfSingleton {X : Type u} (x : X) : SymmetricProductInfinity X :=
+noncomputable def symmProdInfSingleton {X : Type u} (x : X) : SymmetricProductInfinity X :=
   ⟨1, Sym.cons x Sym.nil⟩
 
 /-- Addition on the infinite symmetric product by multiset sum. -/
-def symmProdInfAdd {X : Type u} :
+noncomputable def symmProdInfAdd {X : Type u} :
     SymmetricProductInfinity X → SymmetricProductInfinity X → SymmetricProductInfinity X
   | ⟨n, s⟩, ⟨m, t⟩ =>
       ⟨n + m,
@@ -72,7 +72,7 @@ theorem symmProdInfAdd_fst {X : Type u}
   cases a; cases b; rfl
 
 /-- `Path` witnessing that the degree component of `symmProdInfAdd` is additive. -/
-def symmProdInfAdd_fst_path {X : Type u}
+noncomputable def symmProdInfAdd_fst_path {X : Type u}
     (a b : SymmetricProductInfinity X) :
     ComputationalPaths.Path (symmProdInfAdd a b).1 (a.1 + b.1) :=
   ComputationalPaths.Path.stepChain (symmProdInfAdd_fst a b)
@@ -85,7 +85,7 @@ theorem symmProdInfAdd_fst_assoc {X : Type u}
   simp [symmProdInfAdd_fst, Nat.add_assoc]
 
 /-- `Path` witnessing associativity of the degree component. -/
-def symmProdInfAdd_fst_assoc_path {X : Type u}
+noncomputable def symmProdInfAdd_fst_assoc_path {X : Type u}
     (a b c : SymmetricProductInfinity X) :
     ComputationalPaths.Path
       (symmProdInfAdd (symmProdInfAdd a b) c).1
@@ -111,20 +111,20 @@ structure DoldThomSpace (X : Type u) where
   equivalence : ∀ n : ℕ, SimpleEquiv (symmProdInfPi n X) (homology n)
 
 /-- Any two Dold-Thom structures on `X` yield equivalent homology theories. -/
-def doldThomHomologyEquiv {X : Type u}
+noncomputable def doldThomHomologyEquiv {X : Type u}
     (A B : DoldThomSpace X) (n : ℕ) :
     SimpleEquiv (A.homology n) (B.homology n) :=
   SimpleEquiv.comp (SimpleEquiv.symm (A.equivalence n)) (B.equivalence n)
 
 /-- `Path` witnessing the Dold-Thom equivalence round-trip. -/
-def doldThomRoundtrip_path {X : Type u}
+noncomputable def doldThomRoundtrip_path {X : Type u}
     (D : DoldThomSpace X) (n : ℕ) (x : symmProdInfPi n X) :
     ComputationalPaths.Path
       ((D.equivalence n).invFun ((D.equivalence n).toFun x)) x :=
   ComputationalPaths.Path.stepChain ((D.equivalence n).left_inv x)
 
 /-- `Path` witnessing the forward round-trip. -/
-def doldThomFwdRoundtrip_path {X : Type u}
+noncomputable def doldThomFwdRoundtrip_path {X : Type u}
     (D : DoldThomSpace X) (n : ℕ) (y : D.homology n) :
     ComputationalPaths.Path
       ((D.equivalence n).toFun ((D.equivalence n).invFun y)) y :=

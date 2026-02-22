@@ -29,7 +29,7 @@ structure GrMor (A B : GrGroup.{u}) (d : Int) where
   map_zero : ∀ n, Path (apply n (A.zero n)) (B.zero (n + d))
 
 /-- The zero morphism. -/
-def GrMor.zeroMor (A B : GrGroup.{u}) (d : Int) : GrMor A B d where
+noncomputable def GrMor.zeroMor (A B : GrGroup.{u}) (d : Int) : GrMor A B d where
   apply _ _ := B.zero _
   map_zero _ := Path.refl _
 
@@ -45,19 +45,19 @@ structure CochainDD (C : CochainComplex.{u}) : Prop where
   dd : ∀ n (x : C.obj n), C.d (n + 1) (C.d n x) = C.zero (n + 1 + 1)
 
 /-- d on zero: direct. -/
-def CochainComplex.d_of_zero (C : CochainComplex.{u}) (n : Int) :
+noncomputable def CochainComplex.d_of_zero (C : CochainComplex.{u}) (n : Int) :
     Path (C.d n (C.zero n)) (C.zero (n + 1)) :=
   C.d_zero n
 
 /-- d² on zero: 3-step chain. -/
-def CochainComplex.dd_zero (C : CochainComplex.{u}) (n : Int) :
+noncomputable def CochainComplex.dd_zero (C : CochainComplex.{u}) (n : Int) :
     Path (C.d (n + 1) (C.d n (C.zero n))) (C.zero (n + 1 + 1)) :=
   Path.trans
     (Path.congrArg (C.d (n + 1)) (C.d_zero n))
     (C.d_zero (n + 1))
 
 /-- d³ on zero: 5-step chain. -/
-def CochainComplex.ddd_zero (C : CochainComplex.{u}) (n : Int) :
+noncomputable def CochainComplex.ddd_zero (C : CochainComplex.{u}) (n : Int) :
     Path (C.d (n + 1 + 1) (C.d (n + 1) (C.d n (C.zero n))))
          (C.zero (n + 1 + 1 + 1)) :=
   Path.trans
@@ -65,7 +65,7 @@ def CochainComplex.ddd_zero (C : CochainComplex.{u}) (n : Int) :
     (C.d_zero (n + 1 + 1))
 
 /-- d⁴ on zero: 7-step chain. -/
-def CochainComplex.dddd_zero (C : CochainComplex.{u}) (n : Int) :
+noncomputable def CochainComplex.dddd_zero (C : CochainComplex.{u}) (n : Int) :
     Path (C.d (n + 1 + 1 + 1) (C.d (n + 1 + 1) (C.d (n + 1) (C.d n (C.zero n)))))
          (C.zero (n + 1 + 1 + 1 + 1)) :=
   Path.trans
@@ -81,13 +81,13 @@ structure CochainMap (A B : CochainComplex.{u}) where
   comm : ∀ n (x : A.obj n), Path (f (n + 1) (A.d n x)) (B.d n (f n x))
 
 /-- Identity cochain map. -/
-def CochainMap.idMap (A : CochainComplex.{u}) : CochainMap A A where
+noncomputable def CochainMap.idMap (A : CochainComplex.{u}) : CochainMap A A where
   f _ x := x
   f_zero _ := Path.refl _
   comm _ _ := Path.refl _
 
 /-- Composition of cochain maps (3-step for zero, 4-step for comm). -/
-def CochainMap.comp {A B C : CochainComplex.{u}}
+noncomputable def CochainMap.comp {A B C : CochainComplex.{u}}
     (g : CochainMap B C) (f : CochainMap A B) : CochainMap A C where
   f n x := g.f n (f.f n x)
   f_zero n := Path.trans (Path.congrArg (g.f n) (f.f_zero n)) (g.f_zero n)
@@ -97,13 +97,13 @@ def CochainMap.comp {A B C : CochainComplex.{u}}
       (g.comm n (f.f n x))
 
 /-- Cochain maps agree on zero (3-step via trans/symm). -/
-def CochainMap.agree_zero {A B : CochainComplex.{u}}
+noncomputable def CochainMap.agree_zero {A B : CochainComplex.{u}}
     (f g : CochainMap A B) (n : Int) :
     Path (f.f n (A.zero n)) (g.f n (A.zero n)) :=
   Path.trans (f.f_zero n) (Path.symm (g.f_zero n))
 
 /-- f commutes with d² on zero (5-step). -/
-def CochainMap.comm_dd_zero {A B : CochainComplex.{u}}
+noncomputable def CochainMap.comm_dd_zero {A B : CochainComplex.{u}}
     (f : CochainMap A B) (n : Int) :
     Path (f.f (n + 1 + 1) (A.d (n + 1) (A.d n (A.zero n))))
          (B.d (n + 1) (B.d n (f.f n (A.zero n)))) :=
@@ -114,7 +114,7 @@ def CochainMap.comm_dd_zero {A B : CochainComplex.{u}}
       (Path.congrArg (B.d (n + 1)) (f.comm n (A.zero n))))
 
 /-- f on d(0) factors through B.zero (4-step). -/
-def CochainMap.f_d_zero {A B : CochainComplex.{u}}
+noncomputable def CochainMap.f_d_zero {A B : CochainComplex.{u}}
     (f : CochainMap A B) (n : Int) :
     Path (f.f (n + 1) (A.d n (A.zero n))) (B.zero (n + 1)) :=
   Path.trans
@@ -134,7 +134,7 @@ structure CupProduct (C : CochainComplex.{u}) where
     Path (cup p q x (C.zero q)) (C.zero (p + q))
 
 /-- d(0 ∪ y) = d(0) = 0: 5-step. -/
-def CupProduct.d_cup_zero_l (C : CochainComplex.{u}) (μ : CupProduct C)
+noncomputable def CupProduct.d_cup_zero_l (C : CochainComplex.{u}) (μ : CupProduct C)
     (p q : Int) (y : C.obj q) :
     Path (C.d (p + q) (μ.cup p q (C.zero p) y)) (C.zero (p + q + 1)) :=
   Path.trans
@@ -142,7 +142,7 @@ def CupProduct.d_cup_zero_l (C : CochainComplex.{u}) (μ : CupProduct C)
     (C.d_zero (p + q))
 
 /-- d(x ∪ 0) = d(0) = 0: 5-step. -/
-def CupProduct.d_cup_zero_r (C : CochainComplex.{u}) (μ : CupProduct C)
+noncomputable def CupProduct.d_cup_zero_r (C : CochainComplex.{u}) (μ : CupProduct C)
     (p q : Int) (x : C.obj p) :
     Path (C.d (p + q) (μ.cup p q x (C.zero q))) (C.zero (p + q + 1)) :=
   Path.trans
@@ -150,19 +150,19 @@ def CupProduct.d_cup_zero_r (C : CochainComplex.{u}) (μ : CupProduct C)
     (C.d_zero (p + q))
 
 /-- 0 ∪ 0 = 0: direct. -/
-def CupProduct.cup_zero_zero (C : CochainComplex.{u}) (μ : CupProduct C)
+noncomputable def CupProduct.cup_zero_zero (C : CochainComplex.{u}) (μ : CupProduct C)
     (p q : Int) :
     Path (μ.cup p q (C.zero p) (C.zero q)) (C.zero (p + q)) :=
   μ.cup_zero_l p q (C.zero q)
 
 /-- d(0 ∪ 0) = 0: 5-step. -/
-def CupProduct.d_cup_zero_zero (C : CochainComplex.{u}) (μ : CupProduct C)
+noncomputable def CupProduct.d_cup_zero_zero (C : CochainComplex.{u}) (μ : CupProduct C)
     (p q : Int) :
     Path (C.d (p + q) (μ.cup p q (C.zero p) (C.zero q))) (C.zero (p + q + 1)) :=
   CupProduct.d_cup_zero_l C μ p q (C.zero q)
 
 /-- Cup is associative on zero: (0 ∪ 0) ∪ 0 = 0 (3-step). -/
-def CupProduct.assoc_zero (C : CochainComplex.{u}) (μ : CupProduct C)
+noncomputable def CupProduct.assoc_zero (C : CochainComplex.{u}) (μ : CupProduct C)
     (p q r : Int) :
     Path (μ.cup (p + q) r (μ.cup p q (C.zero p) (C.zero q)) (C.zero r))
          (C.zero (p + q + r)) :=
@@ -180,13 +180,13 @@ structure CochainHomotopy {A B : CochainComplex.{u}}
   h_zero : ∀ n, Path (h n (A.zero (n + 1))) (B.zero n)
 
 /-- Homotopy on zero: h(0) = 0 (direct). -/
-def CochainHomotopy.h_of_zero {A B : CochainComplex.{u}}
+noncomputable def CochainHomotopy.h_of_zero {A B : CochainComplex.{u}}
     {f g : CochainMap A B} (H : CochainHomotopy f g) (n : Int) :
     Path (H.h n (A.zero (n + 1))) (B.zero n) :=
   H.h_zero n
 
 /-- h(d(0)) = h(0) = 0 via d_zero then h_zero (3-step). -/
-def CochainHomotopy.h_d_zero {A B : CochainComplex.{u}}
+noncomputable def CochainHomotopy.h_d_zero {A B : CochainComplex.{u}}
     {f g : CochainMap A B} (H : CochainHomotopy f g) (n : Int) :
     Path (H.h n (A.d n (A.zero n))) (B.zero n) :=
   Path.trans
@@ -194,7 +194,7 @@ def CochainHomotopy.h_d_zero {A B : CochainComplex.{u}}
     (H.h_zero n)
 
 /-- d(h(0)) = d(0) = 0: 3-step. -/
-def CochainHomotopy.d_h_zero {A B : CochainComplex.{u}}
+noncomputable def CochainHomotopy.d_h_zero {A B : CochainComplex.{u}}
     {f g : CochainMap A B} (H : CochainHomotopy f g) (n : Int) :
     Path (B.d n (H.h n (A.zero (n + 1)))) (B.zero (n + 1)) :=
   Path.trans
@@ -202,7 +202,7 @@ def CochainHomotopy.d_h_zero {A B : CochainComplex.{u}}
     (B.d_zero n)
 
 /-- d(h(d(0))) = 0: 5-step chain through h_d_zero then d_zero. -/
-def CochainHomotopy.d_h_d_zero {A B : CochainComplex.{u}}
+noncomputable def CochainHomotopy.d_h_d_zero {A B : CochainComplex.{u}}
     {f g : CochainMap A B} (H : CochainHomotopy f g) (n : Int) :
     Path (B.d n (H.h n (A.d n (A.zero n)))) (B.zero (n + 1)) :=
   Path.trans
@@ -223,7 +223,7 @@ structure MayerVietoris where
   iB  : CochainMap cB cI     -- inclusion from B
 
 /-- MV: iA ∘ rA on zero = iB ∘ rB on zero (6-step via two 3-step chains and symm). -/
-def MayerVietoris.compatibility_zero (mv : MayerVietoris.{u}) (n : Int) :
+noncomputable def MayerVietoris.compatibility_zero (mv : MayerVietoris.{u}) (n : Int) :
     Path (mv.iA.f n (mv.rA.f n (mv.cAB.zero n)))
          (mv.iB.f n (mv.rB.f n (mv.cAB.zero n))) := by
   have h1 : Path (mv.rA.f n (mv.cAB.zero n)) (mv.cA.zero n) := mv.rA.f_zero n
@@ -237,7 +237,7 @@ def MayerVietoris.compatibility_zero (mv : MayerVietoris.{u}) (n : Int) :
   exact Path.trans h2 (Path.trans h3 (Path.trans (Path.symm h6) (Path.symm h5)))
 
 /-- MV: d ∘ iA ∘ rA on zero = 0 (5-step). -/
-def MayerVietoris.d_iA_rA_zero (mv : MayerVietoris.{u}) (n : Int) :
+noncomputable def MayerVietoris.d_iA_rA_zero (mv : MayerVietoris.{u}) (n : Int) :
     Path (mv.cI.d n (mv.iA.f n (mv.rA.f n (mv.cAB.zero n))))
          (mv.cI.zero (n + 1)) :=
   Path.trans
@@ -265,26 +265,26 @@ structure ConnectingMap (ses : ShortExact.{u}) where
   δ_zero : ∀ n, Path (δ n (ses.C.zero n)) (ses.A.zero (n + 1))
 
 /-- δ(0) = 0: direct. -/
-def ConnectingMap.delta_zero {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
+noncomputable def ConnectingMap.delta_zero {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
     Path (cm.δ n (ses.C.zero n)) (ses.A.zero (n + 1)) :=
   cm.δ_zero n
 
 /-- d ∘ δ on zero: 3-step. -/
-def ConnectingMap.d_delta_zero {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
+noncomputable def ConnectingMap.d_delta_zero {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
     Path (ses.A.d (n + 1) (cm.δ n (ses.C.zero n))) (ses.A.zero (n + 1 + 1)) :=
   Path.trans
     (Path.congrArg (ses.A.d (n + 1)) (cm.δ_zero n))
     (ses.A.d_zero (n + 1))
 
 /-- i ∘ δ on zero: 3-step. -/
-def ConnectingMap.i_delta_zero {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
+noncomputable def ConnectingMap.i_delta_zero {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
     Path (ses.i.f (n + 1) (cm.δ n (ses.C.zero n))) (ses.B.zero (n + 1)) :=
   Path.trans
     (Path.congrArg (ses.i.f (n + 1)) (cm.δ_zero n))
     (ses.i.f_zero (n + 1))
 
 /-- p ∘ i ∘ δ on zero: 5-step chain. -/
-def ConnectingMap.pi_delta_zero {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
+noncomputable def ConnectingMap.pi_delta_zero {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
     Path (ses.p.f (n + 1) (ses.i.f (n + 1) (cm.δ n (ses.C.zero n))))
          (ses.C.zero (n + 1)) :=
   Path.trans
@@ -292,7 +292,7 @@ def ConnectingMap.pi_delta_zero {ses : ShortExact.{u}} (cm : ConnectingMap ses) 
     (ses.p.f_zero (n + 1))
 
 /-- Alternate path for p ∘ i ∘ δ(0) using pi_zero (4-step). -/
-def ConnectingMap.pi_delta_zero_alt {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
+noncomputable def ConnectingMap.pi_delta_zero_alt {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
     Path (ses.p.f (n + 1) (ses.i.f (n + 1) (cm.δ n (ses.C.zero n))))
          (ses.C.zero (n + 1)) :=
   Path.trans
@@ -300,7 +300,7 @@ def ConnectingMap.pi_delta_zero_alt {ses : ShortExact.{u}} (cm : ConnectingMap s
     (ses.pi_zero (n + 1) (ses.A.zero (n + 1)))
 
 /-- The two paths to C.zero agree (via symm/trans). -/
-def ConnectingMap.two_paths_agree {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
+noncomputable def ConnectingMap.two_paths_agree {ses : ShortExact.{u}} (cm : ConnectingMap ses) (n : Int) :
     Path (ses.p.f (n + 1) (ses.i.f (n + 1) (cm.δ n (ses.C.zero n))))
          (ses.p.f (n + 1) (ses.i.f (n + 1) (cm.δ n (ses.C.zero n)))) :=
   Path.trans (cm.pi_delta_zero n) (Path.symm (cm.pi_delta_zero_alt n))
@@ -316,26 +316,26 @@ structure CohomOp (d : Int) where
     Path (f.f (n + d) (op A n x)) (op B n (f.f n x))
 
 /-- Op on zero gives zero: direct. -/
-def CohomOp.op_of_zero (θ : CohomOp.{u} d) (C : CochainComplex.{u}) (n : Int) :
+noncomputable def CohomOp.op_of_zero (θ : CohomOp.{u} d) (C : CochainComplex.{u}) (n : Int) :
     Path (θ.op C n (C.zero n)) (C.zero (n + d)) :=
   θ.op_zero C n
 
 /-- d ∘ op on zero: 3-step. -/
-def CohomOp.d_op_zero (θ : CohomOp.{u} d) (C : CochainComplex.{u}) (n : Int) :
+noncomputable def CohomOp.d_op_zero (θ : CohomOp.{u} d) (C : CochainComplex.{u}) (n : Int) :
     Path (C.d (n + d) (θ.op C n (C.zero n))) (C.zero (n + d + 1)) :=
   Path.trans
     (Path.congrArg (C.d (n + d)) (θ.op_zero C n))
     (C.d_zero (n + d))
 
 /-- op ∘ d on zero: 3-step. -/
-def CohomOp.op_d_zero (θ : CohomOp.{u} d) (C : CochainComplex.{u}) (n : Int) :
+noncomputable def CohomOp.op_d_zero (θ : CohomOp.{u} d) (C : CochainComplex.{u}) (n : Int) :
     Path (θ.op C (n + 1) (C.d n (C.zero n))) (C.zero (n + 1 + d)) :=
   Path.trans
     (Path.congrArg (θ.op C (n + 1)) (C.d_zero n))
     (θ.op_zero C (n + 1))
 
 /-- Composition of two operations applied to zero (5-step). -/
-def CohomOp.comp_zero {d₁ d₂ : Int} (θ₂ : CohomOp.{u} d₂) (θ₁ : CohomOp.{u} d₁)
+noncomputable def CohomOp.comp_zero {d₁ d₂ : Int} (θ₂ : CohomOp.{u} d₂) (θ₁ : CohomOp.{u} d₁)
     (C : CochainComplex.{u}) (n : Int) :
     Path (θ₂.op C (n + d₁) (θ₁.op C n (C.zero n)))
          (C.zero (n + d₁ + d₂)) :=
@@ -344,7 +344,7 @@ def CohomOp.comp_zero {d₁ d₂ : Int} (θ₂ : CohomOp.{u} d₂) (θ₁ : Coho
     (θ₂.op_zero C (n + d₁))
 
 /-- Composition of op₂ ∘ op₁ is natural on zero: 7-step. -/
-def CohomOp.comp_natural_zero {d₁ d₂ : Int} (θ₂ : CohomOp.{u} d₂) (θ₁ : CohomOp.{u} d₁)
+noncomputable def CohomOp.comp_natural_zero {d₁ d₂ : Int} (θ₂ : CohomOp.{u} d₂) (θ₁ : CohomOp.{u} d₁)
     {A B : CochainComplex.{u}} (f : CochainMap A B) (n : Int) :
     Path (f.f (n + d₁ + d₂) (θ₂.op A (n + d₁) (θ₁.op A n (A.zero n))))
          (θ₂.op B (n + d₁) (θ₁.op B n (f.f n (A.zero n)))) :=
@@ -353,14 +353,14 @@ def CohomOp.comp_natural_zero {d₁ d₂ : Int} (θ₂ : CohomOp.{u} d₂) (θ�
     (Path.congrArg (θ₂.op B (n + d₁)) (θ₁.natural f n (A.zero n)))
 
 /-- Naturality of op applied to d(0): 5-step. -/
-def CohomOp.natural_d_zero (θ : CohomOp.{u} d) {A B : CochainComplex.{u}}
+noncomputable def CohomOp.natural_d_zero (θ : CohomOp.{u} d) {A B : CochainComplex.{u}}
     (f : CochainMap A B) (n : Int) :
     Path (f.f (n + 1 + d) (θ.op A (n + 1) (A.d n (A.zero n))))
          (θ.op B (n + 1) (f.f (n + 1) (A.d n (A.zero n)))) :=
   θ.natural f (n + 1) (A.d n (A.zero n))
 
 /-- Full chain: f(op(d(0))) = op(f(d(0))) = op(d(f(0))) = op(d(0)) = 0 (7-step). -/
-def CohomOp.natural_chain_zero (θ : CohomOp.{u} d) {A B : CochainComplex.{u}}
+noncomputable def CohomOp.natural_chain_zero (θ : CohomOp.{u} d) {A B : CochainComplex.{u}}
     (f : CochainMap A B) (n : Int) :
     Path (f.f (n + 1 + d) (θ.op A (n + 1) (A.d n (A.zero n))))
          (B.zero (n + 1 + d)) :=
@@ -386,7 +386,7 @@ structure CrossProduct (A B : CochainComplex.{u}) where
     Path (cross p q x (B.zero q)).2 (B.zero q)
 
 /-- Cross product on (0, y) has first component 0: direct. -/
-def CrossProduct.fst_zero {A B : CochainComplex.{u}} (κ : CrossProduct A B)
+noncomputable def CrossProduct.fst_zero {A B : CochainComplex.{u}} (κ : CrossProduct A B)
     (p q : Int) (y : B.obj q) :
     Path (κ.cross p q (A.zero p) y).1 (A.zero p) :=
   κ.cross_zero_l p q y
@@ -394,12 +394,12 @@ def CrossProduct.fst_zero {A B : CochainComplex.{u}} (κ : CrossProduct A B)
 /-! ## Exact Sequence Lemmas -/
 
 /-- In a SES, the composition p ∘ i sends everything to zero. -/
-def ShortExact.pi_all_zero (ses : ShortExact.{u}) (n : Int) (x : ses.A.obj n) :
+noncomputable def ShortExact.pi_all_zero (ses : ShortExact.{u}) (n : Int) (x : ses.A.obj n) :
     Path (ses.p.f n (ses.i.f n x)) (ses.C.zero n) :=
   ses.pi_zero n x
 
 /-- p ∘ i ∘ d on zero: 7-step chain. -/
-def ShortExact.pi_d_zero (ses : ShortExact.{u}) (n : Int) :
+noncomputable def ShortExact.pi_d_zero (ses : ShortExact.{u}) (n : Int) :
     Path (ses.p.f (n + 1) (ses.i.f (n + 1) (ses.A.d n (ses.A.zero n))))
          (ses.C.zero (n + 1)) :=
   Path.trans
@@ -407,14 +407,14 @@ def ShortExact.pi_d_zero (ses : ShortExact.{u}) (n : Int) :
     (ses.pi_zero (n + 1) (ses.A.zero (n + 1)))
 
 /-- d ∘ p ∘ i on zero via commutativity: 5-step. -/
-def ShortExact.d_pi_zero (ses : ShortExact.{u}) (n : Int) (x : ses.A.obj n) :
+noncomputable def ShortExact.d_pi_zero (ses : ShortExact.{u}) (n : Int) (x : ses.A.obj n) :
     Path (ses.C.d n (ses.p.f n (ses.i.f n x))) (ses.C.zero (n + 1)) :=
   Path.trans
     (Path.congrArg (ses.C.d n) (ses.pi_zero n x))
     (ses.C.d_zero n)
 
 /-- d² ∘ p ∘ i on zero: 7-step. -/
-def ShortExact.dd_pi_zero (ses : ShortExact.{u}) (n : Int) (x : ses.A.obj n) :
+noncomputable def ShortExact.dd_pi_zero (ses : ShortExact.{u}) (n : Int) (x : ses.A.obj n) :
     Path (ses.C.d (n + 1) (ses.C.d n (ses.p.f n (ses.i.f n x))))
          (ses.C.zero (n + 1 + 1)) :=
   Path.trans

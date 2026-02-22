@@ -38,11 +38,11 @@ universe u
 /-! ## Path sizes -/
 
 /-- Length of a path expression, measured by the recorded rewrite trace. -/
-@[simp] def pathLength {A : Type u} {a b : A} (p : Path a b) : Nat :=
+@[simp] noncomputable def pathLength {A : Type u} {a b : A} (p : Path a b) : Nat :=
   p.steps.length
 
 /-- Combined size of two paths, used for symmetric bounds. -/
-@[simp] def pairLength {A : Type u} {a b : A} (p q : Path a b) : Nat :=
+@[simp] noncomputable def pairLength {A : Type u} {a b : A} (p q : Path a b) : Nat :=
   pathLength p + pathLength q
 
 /-- The reflexive path has zero length. -/
@@ -64,7 +64,7 @@ universe u
 /-! ## Derivation lengths -/
 
 /-- Proof-irrelevant length of a reflexive-transitive reduction certificate. -/
-def rwLength {A : Type u} {a b : A} {p q : Path a b} (_ : Rw p q) : Nat :=
+noncomputable def rwLength {A : Type u} {a b : A} {p q : Path a b} (_ : Rw p q) : Nat :=
   0
 
 /-- Reflexive reductions have length zero. -/
@@ -77,7 +77,7 @@ def rwLength {A : Type u} {a b : A} {p q : Path a b} (_ : Rw p q) : Nat :=
     rwLength (Rw.tail h step) = rwLength h := rfl
 
 /-- Proof-irrelevant length of a symmetric rewrite certificate. -/
-def rweqLength {A : Type u} {a b : A} {p q : Path a b} (_ : RwEq p q) : Nat :=
+noncomputable def rweqLength {A : Type u} {a b : A} {p q : Path a b} (_ : RwEq p q) : Nat :=
   0
 
 /-- Reflexive rewrite equality certificates have length zero. -/
@@ -102,7 +102,7 @@ noncomputable def rweqLength_trans {A : Type u} {a b : A} {p q r : Path a b}
 /-! ## Complexity bounds -/
 
 /-- A complexity bound for LND_EQ-TRS reductions. -/
-def reductionBound (f : Nat → Nat) : Prop :=
+noncomputable def reductionBound (f : Nat → Nat) : Prop :=
   ∀ {A : Type u} {a b : A} (p q : Path a b) (h : Rw p q),
     rwLength h ≤ f (pairLength p q)
 
@@ -113,7 +113,7 @@ theorem reductionBound_of_le {f g : Nat → Nat} (hfg : ∀ n, f n ≤ g n) :
   exact Nat.le_trans (hf p q h) (hfg (pairLength p q))
 
 /-- Word problem complexity bound for rewrite equality. -/
-def wordProblemBound (f : Nat → Nat) : Prop :=
+noncomputable def wordProblemBound (f : Nat → Nat) : Prop :=
   ∀ {A : Type u} {a b : A} (p q : Path a b),
     RwEq p q → ∃ h : RwEq p q, rweqLength h ≤ f (pairLength p q)
 
@@ -125,7 +125,7 @@ theorem wordProblemBound_of_le {f g : Nat → Nat} (hfg : ∀ n, f n ≤ g n) :
   exact ⟨h', Nat.le_trans bound (hfg (pairLength p q))⟩
 
 /-- Dehn bounds for null-homotopic loops. -/
-def dehnBound (f : Nat → Nat) : Prop :=
+noncomputable def dehnBound (f : Nat → Nat) : Prop :=
   ∀ {A : Type u} {a : A} (p : Path a a),
     RwEq p (Path.refl a) →
       ∃ h : RwEq p (Path.refl a), rweqLength h ≤ f (pathLength p)
@@ -147,7 +147,7 @@ theorem dehnBound_of_wordProblem {f : Nat → Nat} :
 
 /-- Isoperimetric inequality for the rewrite system:
     just an alias for `dehnBound`. -/
-def isoperimetricBound (f : Nat → Nat) : Prop :=
+noncomputable def isoperimetricBound (f : Nat → Nat) : Prop :=
   ∀ {A : Type u} {a : A} (p : Path a a),
     RwEq p (Path.refl a) →
       ∃ h : RwEq p (Path.refl a), rweqLength h ≤ f (pathLength p)

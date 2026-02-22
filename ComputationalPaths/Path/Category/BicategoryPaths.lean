@@ -35,14 +35,14 @@ abbrev Path2Cell {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   TwoCell (A := A) (a := a) (b := b) p q
 
 /-- Vertical composition of 2-cells. -/
-@[simp] def vcomp {p q r : Path a b}
+@[simp] noncomputable def vcomp {p q r : Path a b}
     (η : Path2Cell (A := A) p q)
     (θ : Path2Cell (A := A) q r) :
     Path2Cell (A := A) p r :=
   TwoCell.comp (A := A) (a := a) (b := b) (p := p) (q := q) (r := r) η θ
 
 /-- Horizontal composition of 2-cells. -/
-@[simp] def hcomp {f g : Path a b} {h k : Path b c}
+@[simp] noncomputable def hcomp {f g : Path a b} {h k : Path b c}
     (η : Path2Cell (A := A) f g)
     (θ : Path2Cell (A := A) h k) :
     Path2Cell (A := A) (Path.trans f h) (Path.trans g k) :=
@@ -142,13 +142,13 @@ explicit 2-cell operations, interchange, and basic coherence/naturality laws.
 /-! ## RwEq whiskering -/
 
 /-- Left whiskering for Path2Cell: precomposing a 2-cell with a 1-cell. -/
-@[simp] def whiskerLeft' (f : Path a b) {g h : Path b c}
+@[simp] noncomputable def whiskerLeft' (f : Path a b) {g h : Path b c}
     (η : Path2Cell (A := A) g h) :
     Path2Cell (A := A) (Path.trans f g) (Path.trans f h) :=
   TwoCell.whiskerLeft (A := A) (a := a) (b := b) (c := c) f η
 
 /-- Right whiskering for Path2Cell: postcomposing a 2-cell with a 1-cell. -/
-@[simp] def whiskerRight' {f g : Path a b} (h : Path b c)
+@[simp] noncomputable def whiskerRight' {f g : Path a b} (h : Path b c)
     (η : Path2Cell (A := A) f g) :
     Path2Cell (A := A) (Path.trans f h) (Path.trans g h) :=
   TwoCell.whiskerRight (A := A) (a := a) (b := b) (c := c) h η

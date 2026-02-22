@@ -90,16 +90,16 @@ inductive BSRel {G : BSGraph.{u}} (H : BSGraphOfGroups G) :
   | trans {w₁ w₂ w₃} : BSRel H w₁ w₂ → BSRel H w₂ w₃ → BSRel H w₁ w₃
 
 /-- The Bass-Serre fundamental group as a quotient of words. -/
-def BSFundamentalGroup {G : BSGraph.{u}} (H : BSGraphOfGroups G) : Type u :=
+noncomputable def BSFundamentalGroup {G : BSGraph.{u}} (H : BSGraphOfGroups G) : Type u :=
   Quot (BSRel H)
 
 /-- Include a vertex-group element. -/
-def bsVertexInclusion {G : BSGraph.{u}} {H : BSGraphOfGroups G}
+noncomputable def bsVertexInclusion {G : BSGraph.{u}} {H : BSGraphOfGroups G}
     (v : G.Vertex) (g : H.vertexGroup v) : BSFundamentalGroup H :=
   Quot.mk _ [BSLetter.ofVertex v g]
 
 /-- Include an edge symbol. -/
-def bsEdgeInclusion {G : BSGraph.{u}} {H : BSGraphOfGroups G}
+noncomputable def bsEdgeInclusion {G : BSGraph.{u}} {H : BSGraphOfGroups G}
     (e : G.Edge) : BSFundamentalGroup H :=
   Quot.mk _ [BSLetter.ofEdge e]
 
@@ -146,7 +146,7 @@ inductive HNNRel {G : Type u} (D : HNNData G) : HNNWord G → HNNWord G → Prop
   | trans {w₁ w₂ w₃} : HNNRel D w₁ w₂ → HNNRel D w₂ w₃ → HNNRel D w₁ w₃
 
 /-- The HNN extension as a quotient. -/
-def HNNExtension {G : Type u} (D : HNNData G) : Type u :=
+noncomputable def HNNExtension {G : Type u} (D : HNNData G) : Type u :=
   Quot (HNNRel D)
 
 /-! ## Trees and Tree Actions -/
@@ -178,7 +178,7 @@ structure BSTreeAction (G : Type u) (S : StrictGroup G) (T : BSTree) where
     ∀ g e, Path (actVertex.act g (T.graph.tgt e)) (T.graph.tgt (actEdge.act g e))
 
 /-- Edge identifications yield computational paths in the fundamental group. -/
-def bsEdgeIdentPath {G : BSGraph.{u}} (H : BSGraphOfGroups G)
+noncomputable def bsEdgeIdentPath {G : BSGraph.{u}} (H : BSGraphOfGroups G)
     (e : G.Edge) (h : H.edgeGroup e) (pre suf : BSWord G H.vertexGroup) :
     Path
       (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.src e) (H.srcInclusion e h)] ++ suf))
@@ -186,7 +186,7 @@ def bsEdgeIdentPath {G : BSGraph.{u}} (H : BSGraphOfGroups G)
   Path.stepChain (Quot.sound (BSRel.edge_ident (H:=H) e h pre suf))
 
 /-- Composing the edge-identification path with its inverse yields a loop. -/
-def bsEdgeIdentLoop {G : BSGraph.{u}} (H : BSGraphOfGroups G)
+noncomputable def bsEdgeIdentLoop {G : BSGraph.{u}} (H : BSGraphOfGroups G)
     (e : G.Edge) (h : H.edgeGroup e) (pre suf : BSWord G H.vertexGroup) :
     Path
       (Quot.mk (BSRel H) (pre ++ [BSLetter.ofVertex (G.src e) (H.srcInclusion e h)] ++ suf))
@@ -195,7 +195,7 @@ def bsEdgeIdentLoop {G : BSGraph.{u}} (H : BSGraphOfGroups G)
     (Path.symm (bsEdgeIdentPath H e h pre suf))
 
 /-- Edge identifications are preserved by the `Option.some` constructor. -/
-def bsEdgeIdentPathSome {G : BSGraph.{u}} (H : BSGraphOfGroups G)
+noncomputable def bsEdgeIdentPathSome {G : BSGraph.{u}} (H : BSGraphOfGroups G)
     (e : G.Edge) (h : H.edgeGroup e) (pre suf : BSWord G H.vertexGroup) :
     Path
       (Option.some

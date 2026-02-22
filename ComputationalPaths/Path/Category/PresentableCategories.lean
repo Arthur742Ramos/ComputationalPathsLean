@@ -8,66 +8,66 @@ structure PresentableInfinityCategory where
   Obj : Type u
   colimitSeed : Obj
 
-def isAccessible (C : PresentableInfinityCategory) : Prop := True
+noncomputable def isAccessible (C : PresentableInfinityCategory) : Prop := True
 
-def isCocomplete (C : PresentableInfinityCategory) : Prop := True
+noncomputable def isCocomplete (C : PresentableInfinityCategory) : Prop := True
 
-def isPresentable (C : PresentableInfinityCategory) : Prop :=
+noncomputable def isPresentable (C : PresentableInfinityCategory) : Prop :=
   isAccessible C ∧ isCocomplete C
 
-def adjointFunctorTheoremHypothesis
+noncomputable def adjointFunctorTheoremHypothesis
     (C D : PresentableInfinityCategory) : Prop := True
 
-def leftAdjointType (C D : PresentableInfinityCategory) : Type _ := C.Obj → D.Obj
+noncomputable def leftAdjointType (C D : PresentableInfinityCategory) : Type _ := C.Obj → D.Obj
 
-def rightAdjointType (C D : PresentableInfinityCategory) : Type _ := D.Obj → C.Obj
+noncomputable def rightAdjointType (C D : PresentableInfinityCategory) : Type _ := D.Obj → C.Obj
 
-def indCompletion (C : PresentableInfinityCategory) : Type u := List C.Obj
+noncomputable def indCompletion (C : PresentableInfinityCategory) : Type u := List C.Obj
 
-def compactObject (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
+noncomputable def compactObject (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
 
-def compactlyGenerated (C : PresentableInfinityCategory) : Prop := True
+noncomputable def compactlyGenerated (C : PresentableInfinityCategory) : Prop := True
 
-def brownRepresentable (C : PresentableInfinityCategory) : Prop := True
+noncomputable def brownRepresentable (C : PresentableInfinityCategory) : Prop := True
 
-def localizationData (C : PresentableInfinityCategory) : Type u := C.Obj → Prop
+noncomputable def localizationData (C : PresentableInfinityCategory) : Type u := C.Obj → Prop
 
-def localizationFunctor (C : PresentableInfinityCategory) : C.Obj → C.Obj := fun x => x
+noncomputable def localizationFunctor (C : PresentableInfinityCategory) : C.Obj → C.Obj := fun x => x
 
-def smashingLocalization (C : PresentableInfinityCategory) : Prop := True
+noncomputable def smashingLocalization (C : PresentableInfinityCategory) : Prop := True
 
-def reflectiveSubcategory (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
+noncomputable def reflectiveSubcategory (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
 
-def coreflectiveSubcategory (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
+noncomputable def coreflectiveSubcategory (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
 
-def generatedUnderColimits (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
+noncomputable def generatedUnderColimits (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
 
-def accessibleLocalization (C : PresentableInfinityCategory) : Prop := True
+noncomputable def accessibleLocalization (C : PresentableInfinityCategory) : Prop := True
 
-def presentableTensorProduct
+noncomputable def presentableTensorProduct
     (C D : PresentableInfinityCategory) : Type _ := C.Obj × D.Obj
 
-def compactGenerationRank (C : PresentableInfinityCategory) : Nat := 0
+noncomputable def compactGenerationRank (C : PresentableInfinityCategory) : Nat := 0
 
-def brownRepresentableFunctor (C : PresentableInfinityCategory) : C.Obj → Type _ :=
+noncomputable def brownRepresentableFunctor (C : PresentableInfinityCategory) : C.Obj → Type _ :=
   fun _ => C.Obj
 
-def localizationSequence (C : PresentableInfinityCategory) : Type _ := C.Obj × C.Obj
+noncomputable def localizationSequence (C : PresentableInfinityCategory) : Type _ := C.Obj × C.Obj
 
-def indCompletionYoneda (C : PresentableInfinityCategory) : C.Obj → indCompletion C :=
+noncomputable def indCompletionYoneda (C : PresentableInfinityCategory) : C.Obj → indCompletion C :=
   fun x => [x]
 
-def compactApproximation (C : PresentableInfinityCategory) : C.Obj → C.Obj := fun x => x
+noncomputable def compactApproximation (C : PresentableInfinityCategory) : C.Obj → C.Obj := fun x => x
 
-def brownWitness (C : PresentableInfinityCategory) : C.Obj → C.Obj := fun x => x
+noncomputable def brownWitness (C : PresentableInfinityCategory) : C.Obj → C.Obj := fun x => x
 
-def adjunctionUnitPath (C : PresentableInfinityCategory) (x : C.Obj) : Path x x :=
+noncomputable def adjunctionUnitPath (C : PresentableInfinityCategory) (x : C.Obj) : Path x x :=
   Path.refl x
 
-def adjunctionCounitPath (C : PresentableInfinityCategory) (x : C.Obj) : Path x x :=
+noncomputable def adjunctionCounitPath (C : PresentableInfinityCategory) (x : C.Obj) : Path x x :=
   Path.refl x
 
-def localizationPath (C : PresentableInfinityCategory) (x : C.Obj) :
+noncomputable def localizationPath (C : PresentableInfinityCategory) (x : C.Obj) :
     Path (localizationFunctor C x) (localizationFunctor C x) := Path.refl _
 
 theorem isPresentable_intro (C : PresentableInfinityCategory) :

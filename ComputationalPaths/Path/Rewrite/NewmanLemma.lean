@@ -119,7 +119,7 @@ We exhibit the critical pair that prevents local confluence of the
 8 base rules (without `Step.canon`). -/
 
 /-- The term witnessing the critical pair between trans_symm and trans_assoc. -/
-def critical_pair_witness : Expr :=
+noncomputable def critical_pair_witness : Expr :=
   .trans (.trans (.atom 0) (.atom 1)) (.symm (.trans (.atom 0) (.atom 1)))
 
 /-- Via trans_symm, the witness reduces to refl. -/

@@ -150,7 +150,7 @@ structure FloerChainComplex (M : SymplecticManifold) where
   zero_add : (k : Nat) → ∀ a, Path (add k (zero k) a) a
 
 /-- d squared = 0 for the Floer differential. -/
-def floer_diff_squared_zero (M : SymplecticManifold)
+noncomputable def floer_diff_squared_zero (M : SymplecticManifold)
     (CF : FloerChainComplex M) :
     ∀ k : Nat, ∀ x : CF.chainGroup (k + 2),
       Path (CF.differential k (CF.differential (k + 1) x)) (CF.zero k) :=
@@ -200,14 +200,14 @@ structure ContinuationMap (M : SymplecticManifold)
          (chainMap k (CF1.differential k x))
 
 /-- The identity continuation map (from constant homotopy). -/
-def identityContinuation (M : SymplecticManifold)
+noncomputable def identityContinuation (M : SymplecticManifold)
     (CF : FloerChainComplex M) : ContinuationMap M CF CF where
   homotopy := ⟨CF.hamiltonian, CF.hamiltonian, trivial⟩
   chainMap := fun _ x => x
   comm_diff := fun _ _ => Path.refl _
 
 /-- Continuation maps compose. -/
-def continuation_composition
+noncomputable def continuation_composition
     (M : SymplecticManifold)
     (CF1 CF2 CF3 : FloerChainComplex M)
     (f12 : ContinuationMap M CF1 CF2)
@@ -253,7 +253,7 @@ structure PSSIsomorphism (M : SymplecticManifold) where
   respects_product : True
 
 /-- The PSS isomorphism implies HF = QH as groups. -/
-def pss_is_iso (M : SymplecticManifold) (P : PSSIsomorphism M) :
+noncomputable def pss_is_iso (M : SymplecticManifold) (P : PSSIsomorphism M) :
     ∀ k : Nat, ∀ x : P.quantum.group k,
       Path (P.pssBackward k (P.pssForward k x)) x :=
   P.left_inv
@@ -305,7 +305,7 @@ structure ArnoldConjecture (M : SymplecticManifold) where
 /-! ## Theorems -/
 
 /-- The Floer differential squares to zero. -/
-def floer_dd_zero' (M : SymplecticManifold) (CF : FloerChainComplex M)
+noncomputable def floer_dd_zero' (M : SymplecticManifold) (CF : FloerChainComplex M)
     (k : Nat) (x : CF.chainGroup (k + 2)) :
     Path (CF.differential k (CF.differential (k + 1) x)) (CF.zero k) :=
   CF.dd_zero k x
@@ -330,13 +330,13 @@ theorem continuation_comp_assoc (M : SymplecticManifold)
   rfl
 
 /-- The PSS isomorphism is an isomorphism (left inverse). -/
-def pss_left_inverse (M : SymplecticManifold) (P : PSSIsomorphism M)
+noncomputable def pss_left_inverse (M : SymplecticManifold) (P : PSSIsomorphism M)
     (k : Nat) (x : P.quantum.group k) :
     Path (P.pssBackward k (P.pssForward k x)) x :=
   P.left_inv k x
 
 /-- The PSS isomorphism is an isomorphism (right inverse). -/
-def pss_right_inverse (M : SymplecticManifold) (P : PSSIsomorphism M)
+noncomputable def pss_right_inverse (M : SymplecticManifold) (P : PSSIsomorphism M)
     (k : Nat) (y : P.floer.group k) :
     Path (P.pssForward k (P.pssBackward k y)) y :=
   P.right_inv k y
@@ -361,14 +361,14 @@ theorem arnold_bound (M : SymplecticManifold) (A : ArnoldConjecture M) :
   A.arnold_bound
 
 /-- Boundaries map to zero in Floer homology. -/
-def floer_boundary_zero (M : SymplecticManifold)
+noncomputable def floer_boundary_zero (M : SymplecticManifold)
     (HF : FloerHomology M) (k : Nat)
     (x : HF.complex.chainGroup (k + 1)) :
     Path (HF.fromCycle k (HF.complex.differential k x)) (HF.zero k) :=
   HF.boundary_to_zero k x
 
 /-- The Floer chain complex has associative addition. -/
-def floer_add_assoc (M : SymplecticManifold)
+noncomputable def floer_add_assoc (M : SymplecticManifold)
     (CF : FloerChainComplex M) (k : Nat) (a b c : CF.chainGroup k) :
     Path (CF.add k (CF.add k a b) c) (CF.add k a (CF.add k b c)) :=
   CF.add_assoc k a b c

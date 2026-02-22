@@ -30,7 +30,7 @@ namespace Cell
 variable {X : Type u} {Y : Type v}
 
 /-- Attachment path from a boundary point to the interior. -/
-def attach (c : Cell X) (b : X) (hb : b ∈ c.boundary) : Path b c.interior :=
+noncomputable def attach (c : Cell X) (b : X) (hb : b ∈ c.boundary) : Path b c.interior :=
   Path.mk [Step.mk _ _ (c.bdry_eq b hb)] (c.bdry_eq b hb)
 
 /-- The attachment proof component. -/
@@ -50,7 +50,7 @@ theorem attach_unique (c : Cell X) (b : X) (hb : b ∈ c.boundary)
   Subsingleton.elim _ _
 
 /-- Symmetry of attachment: path from interior back to boundary. -/
-def detach (c : Cell X) (b : X) (hb : b ∈ c.boundary) : Path c.interior b :=
+noncomputable def detach (c : Cell X) (b : X) (hb : b ∈ c.boundary) : Path c.interior b :=
   Path.symm (c.attach b hb)
 
 theorem detach_attach_toEq (c : Cell X) (b : X) (hb : b ∈ c.boundary) :
@@ -95,7 +95,7 @@ theorem preserves_attach (φ : CellularMap X Y)
   rfl
 
 /-- Composition of cellular maps. -/
-def comp (ψ : CellularMap Y Z) (φ : CellularMap X Y) : CellularMap X Z where
+noncomputable def comp (ψ : CellularMap Y Z) (φ : CellularMap X Y) : CellularMap X Z where
   toFun := ψ.toFun ∘ φ.toFun
   mapCell := ψ.mapCell ∘ φ.mapCell
   interior_compat := fun c => by
@@ -109,7 +109,7 @@ theorem comp_toFun (ψ : CellularMap Y Z) (φ : CellularMap X Y) :
   rfl
 
 /-- Identity cellular map. -/
-def idMap (skel : CWSkeleton X) : CellularMap X X where
+noncomputable def idMap (skel : CWSkeleton X) : CellularMap X X where
   toFun := id
   mapCell := id
   interior_compat := fun _ => rfl
@@ -129,11 +129,11 @@ end CellularMap
 /-! ## Path-based chain complex (counting) -/
 
 /-- The "chain rank" at a given dimension is the number of cells. -/
-def chainRank (skel : CWSkeleton X) : Nat :=
+noncomputable def chainRank (skel : CWSkeleton X) : Nat :=
   skel.cells.length
 
 /-- Simple alternating sum for Euler characteristic. -/
-def altSum : List Nat → Int
+noncomputable def altSum : List Nat → Int
   | [] => 0
   | [n] => (n : Int)
   | n₁ :: n₂ :: rest => (n₁ : Int) - (n₂ : Int) + altSum rest
@@ -151,7 +151,7 @@ theorem altSum_pair (n₁ n₂ : Nat) :
 
 /-- Given a path `p : Path a b` in `X` and a cell containing both `a` and `b`
 in its boundary, the path factors through the cell interior. -/
-def factorThroughCell (c : Cell X) (a b : X) (ha : a ∈ c.boundary) (hb : b ∈ c.boundary)
+noncomputable def factorThroughCell (c : Cell X) (a b : X) (ha : a ∈ c.boundary) (hb : b ∈ c.boundary)
     (_p : Path a b) : Path a b :=
   Path.trans (c.attach a ha) (Cell.detach c b hb)
 
@@ -170,7 +170,7 @@ theorem factorThroughCell_proof (c : Cell X) (a b : X)
 
 /-- Given two boundary points of the same cell, there is a canonical
 two-step path between them (through the interior). -/
-def cellBridge (c : Cell X) (b₁ b₂ : X) (h₁ : b₁ ∈ c.boundary) (h₂ : b₂ ∈ c.boundary) :
+noncomputable def cellBridge (c : Cell X) (b₁ b₂ : X) (h₁ : b₁ ∈ c.boundary) (h₂ : b₂ ∈ c.boundary) :
     Path b₁ b₂ :=
   Path.trans (c.attach b₁ h₁) (Cell.detach c b₂ h₂)
 

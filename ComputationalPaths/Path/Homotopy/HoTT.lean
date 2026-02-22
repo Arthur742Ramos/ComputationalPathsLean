@@ -18,11 +18,11 @@ variable {A : Type u}
 
 /-- Witness for `Π a, Id a a`.  Matches the proof that the reflexive
 path inhabits the first groupoid law. -/
-def inhabIdRefl (A : Type u) : (a : A) → a = a :=
+noncomputable def inhabIdRefl (A : Type u) : (a : A) → a = a :=
   fun _ => rfl
 
 /-- Witness for `Π a b, Id(a,b) → Id(b,a)` using computational-path symmetry. -/
-@[simp] def inhabIdSymm {a b : A} : Path a b → Path b a :=
+@[simp] noncomputable def inhabIdSymm {a b : A} : Path a b → Path b a :=
   fun p => Path.symm p
 
 /-- Translate the symmetry witness back to propositional equality. -/
@@ -31,7 +31,7 @@ theorem inhabIdSymm_toEq {a b : A} (p : Path a b) :
   rfl
 
 /-- Witness for `Π a b c, Id(a,b) → Id(b,c) → Id(a,c)` using transitivity. -/
-@[simp] def inhabIdTrans {a b c : A} :
+@[simp] noncomputable def inhabIdTrans {a b c : A} :
     Path a b → Path b c → Path a c :=
   fun p q => Path.trans p q
 
@@ -43,12 +43,12 @@ theorem inhabIdTrans_toEq
   rfl
 
 /-- Recover the symmetry law for `Id` directly from computational paths. -/
-def inhabIdSymmEq {a b : A} :
+noncomputable def inhabIdSymmEq {a b : A} :
     a = b → b = a :=
   fun h => h.symm
 
 /-- Recover the transitivity law for `Id` from computational paths. -/
-def inhabIdTransEq {a b c : A} :
+noncomputable def inhabIdTransEq {a b c : A} :
     a = b → b = c → a = c :=
   fun h₁ h₂ => h₁.trans h₂
 
@@ -59,7 +59,7 @@ section Functoriality
 variable {B : Type v} {C : Type w}
 
 /-- Action of a function on computational paths (`ap`). -/
-@[simp] def ap (f : A → B) {x y : A} :
+@[simp] noncomputable def ap (f : A → B) {x y : A} :
     Path x y → Path (f x) (f y) :=
   fun p => Path.congrArg f p
 
@@ -94,7 +94,7 @@ variable {B : Type v} {C : Type w}
   exact Path.congrArg_id (p := p)
 
 /-- The familiar `ap` for propositional equality. -/
-def apEq (f : A → B) {x y : A} :
+noncomputable def apEq (f : A → B) {x y : A} :
     x = y → f x = f y :=
   fun h => _root_.congrArg f h
 
@@ -107,7 +107,7 @@ section Transport
 variable {P : A → Type v} {x y : A}
 
 /-- Transport a dependent value along a computational path. -/
-def transport (p : Path x y) (u : P x) : P y :=
+noncomputable def transport (p : Path x y) (u : P x) : P y :=
   Path.transport (A := A) (D := P) p u
 
 @[simp] theorem transport_refl (u : P x) :
@@ -121,7 +121,7 @@ variable {B : Type v}
   Path.transport_const (p := p) (x := b)
 
 /-- Leibniz substitution: transport witnesses `Id`-based substitution. -/
-def leibniz {x y : A} (p : Path x y) : (P x → P y) :=
+noncomputable def leibniz {x y : A} (p : Path x y) : (P x → P y) :=
   fun hx => transport (A := A) (P := P) (p := p) (u := hx)
 
 end Transport
@@ -133,7 +133,7 @@ section TransportEq
 variable {P : A → Type v} {x y : A}
 
 /-- Transport phrased with propositional equality, implemented via path transport. -/
-def transportEq (p : x = y) (u : P x) : P y :=
+noncomputable def transportEq (p : x = y) (u : P x) : P y :=
   transport (A := A) (P := P) (Path.stepChain p) u
 
 @[simp] theorem transportEq_refl (u : P x) :
@@ -158,7 +158,7 @@ def transportEq (p : x = y) (u : P x) : P y :=
       (h := rfl) (x := u)
   simpa [transportEq] using this
 
-def leibnizEq {x y : A} (p : x = y) : P x → P y :=
+noncomputable def leibnizEq {x y : A} (p : x = y) : P x → P y :=
   fun hx => transportEq (P := P) (p := p) (u := hx)
 
 end TransportEq
@@ -170,23 +170,23 @@ section Homotopy
 variable {P : A → Type v}
 
 /-- A homotopy between dependent functions assigns a path for every point. -/
-def Homotopy (f g : (x : A) → P x) : Type (max u v) :=
+noncomputable def Homotopy (f g : (x : A) → P x) : Type (max u v) :=
   (x : A) → Path (f x) (g x)
 
 notation f " ~ᵖ " g => Homotopy f g
 
 /-- Reflexivity of homotopies. -/
-@[simp] def homotopy_refl (f : (x : A) → P x) :
+@[simp] noncomputable def homotopy_refl (f : (x : A) → P x) :
     f ~ᵖ f :=
   fun _ => Path.refl _
 
 /-- Symmetry of homotopies. -/
-@[simp] def homotopy_symm {f g : (x : A) → P x}
+@[simp] noncomputable def homotopy_symm {f g : (x : A) → P x}
     (H : f ~ᵖ g) : g ~ᵖ f :=
   fun x => Path.symm (H x)
 
 /-- Transitivity of homotopies. -/
-@[simp] def homotopy_trans {f g h : (x : A) → P x}
+@[simp] noncomputable def homotopy_trans {f g h : (x : A) → P x}
     (H₁ : f ~ᵖ g) (H₂ : g ~ᵖ h) : f ~ᵖ h :=
   fun x => Path.trans (H₁ x) (H₂ x)
 
@@ -230,12 +230,12 @@ namespace IsEquiv
 variable {f : A → B}
 
 /-- Extract the chosen inverse from an equivalence. -/
-@[simp] def inv (hf : IsEquiv f) : B → A :=
+@[simp] noncomputable def inv (hf : IsEquiv f) : B → A :=
   hf.toQuasiInverse.inv
 
 end IsEquiv
 
-@[simp] def IsEquiv.refl (A : Type u) :
+@[simp] noncomputable def IsEquiv.refl (A : Type u) :
     IsEquiv (fun x : A => x) where
   toQuasiInverse :=
   { inv := fun x => x
@@ -280,7 +280,7 @@ end Prod
 section Unit
 
 /-- The unit type is contractible: every pair of points is connected by a reflexive path. -/
-@[simp] def unitPath (x y : Unit) : Path x y := by
+@[simp] noncomputable def unitPath (x y : Unit) : Path x y := by
   cases x
   cases y
   simpa using Path.refl ()
@@ -305,18 +305,18 @@ section Funext
 variable {A : Type u} {B : Type v}
 
 /-- A pointwise family of computational paths assembles into a path between functions. -/
-@[simp] def funextPath {f g : A → B}
+@[simp] noncomputable def funextPath {f g : A → B}
     (H : (x : A) → Path (f x) (g x)) : Path f g :=
   Path.lamCongr H
 
 /-- A path between functions restricts to pointwise paths. -/
-@[simp] def funextPointwise {f g : A → B}
+@[simp] noncomputable def funextPointwise {f g : A → B}
     (p : Path f g) : (x : A) → Path (f x) (g x) :=
   fun x => Path.app p x
 
 /-- Weak function extensionality: given an inhabitant of `A`,
     pointwise paths between functions extend to a global path. -/
-def weakFunext (a₀ : A) :
+noncomputable def weakFunext (a₀ : A) :
     (f g : A → B) →
       ((x : A) → Path (f x) (g x)) → Path f g :=
   fun f g H =>

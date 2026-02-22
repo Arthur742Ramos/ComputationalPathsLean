@@ -3,7 +3,7 @@
 
 This module introduces a minimal Ext bifunctor interface where all
 functoriality laws are witnessed by computational paths. A trivial
-instance is provided to demonstrate the interface without axioms.
+noncomputable instance is provided to demonstrate the interface without axioms.
 
 ## Key Results
 
@@ -59,7 +59,7 @@ structure ExtFunctor (A : Type u) (B : Type v) where
 namespace ExtFunctor
 
 /-- The trivial Ext functor (constant on `PUnit`). -/
-def trivial (A : Type u) (B : Type v) : ExtFunctor A B where
+noncomputable def trivial (A : Type u) (B : Type v) : ExtFunctor A B where
   obj := fun _ _ => PUnit
   map_left := by
     intro _ _ _ _ _
@@ -94,7 +94,7 @@ end ExtFunctor
 
 /-!
 We introduced a Path-valued Ext bifunctor interface and a trivial
-instance that satisfies the functoriality laws by reflexivity.
+noncomputable instance that satisfies the functoriality laws by reflexivity.
 -/
 
 end Algebra

@@ -65,16 +65,16 @@ abbrev Loop1Space (A : Type u) (a : A) : Type u :=
 
 /-- The 2-loop space: 2-cells from refl to refl.
     An element of Loop2Space is a derivation between the reflexivity path. -/
-def Loop2Space (A : Type u) (a : A) : Type u :=
+noncomputable def Loop2Space (A : Type u) (a : A) : Type u :=
   Derivation₂ (Path.refl a) (Path.refl a)
 
 /-- The 3-loop space: 3-cells from refl₂ to refl₂.
     An element of Loop3Space is a meta-derivation between reflexivity derivations. -/
-def Loop3Space (A : Type u) (a : A) : Type u :=
+noncomputable def Loop3Space (A : Type u) (a : A) : Type u :=
   Derivation₃ (Derivation₂.refl (Path.refl a)) (Derivation₂.refl (Path.refl a))
 
 /-- The 4-loop space: 4-cells from refl₃ to refl₃. -/
-def Loop4Space (A : Type u) (a : A) : Type u :=
+noncomputable def Loop4Space (A : Type u) (a : A) : Type u :=
   Derivation₄ (Derivation₃.refl (Derivation₂.refl (Path.refl a)))
               (Derivation₃.refl (Derivation₂.refl (Path.refl a)))
 
@@ -83,17 +83,17 @@ namespace Loop2Space
 variable {a : A}
 
 /-- Identity 2-loop. -/
-def refl : Loop2Space A a := Derivation₂.refl (Path.refl a)
+noncomputable def refl : Loop2Space A a := Derivation₂.refl (Path.refl a)
 
 /-- Inverse of a 2-loop. -/
-def inv (α : Loop2Space A a) : Loop2Space A a := Derivation₂.inv α
+noncomputable def inv (α : Loop2Space A a) : Loop2Space A a := Derivation₂.inv α
 
 /-- Vertical composition of 2-loops. -/
-def vcomp (α β : Loop2Space A a) : Loop2Space A a := Derivation₂.vcomp α β
+noncomputable def vcomp (α β : Loop2Space A a) : Loop2Space A a := Derivation₂.vcomp α β
 
 /-- Horizontal composition of 2-loops.
     Since both source and target are refl, we can compose horizontally. -/
-def hcomp (α β : Loop2Space A a) : Loop2Space A a := by
+noncomputable def hcomp (α β : Loop2Space A a) : Loop2Space A a := by
   -- hcomp α β : Derivation₂ (trans refl refl) (trans refl refl)
   -- We need to adjust types via the unit laws
   have hα : Derivation₂ (Path.refl a) (Path.refl a) := α
@@ -117,10 +117,10 @@ end Loop2Space
 -/
 
 /-- Two 2-loops are equivalent if connected by a 3-cell. -/
-def Loop2Eq (α β : Loop2Space A a) : Prop := Nonempty (Derivation₃ α β)
+noncomputable def Loop2Eq (α β : Loop2Space A a) : Prop := Nonempty (Derivation₃ α β)
 
 /-- Two 3-loops are equivalent if connected by a 4-cell. -/
-def Loop3Eq {a : A} (m₁ m₂ : Loop3Space A a) : Prop := Nonempty (Derivation₄ m₁ m₂)
+noncomputable def Loop3Eq {a : A} (m₁ m₂ : Loop3Space A a) : Prop := Nonempty (Derivation₄ m₁ m₂)
 
 /-- Loop2Eq is reflexive. -/
 theorem Loop2Eq.refl (α : Loop2Space A a) : Loop2Eq α α :=
@@ -136,7 +136,7 @@ theorem Loop2Eq.trans {α β γ : Loop2Space A a} (h₁ : Loop2Eq α β) (h₂ :
   ⟨Derivation₃.vcomp (Classical.choice h₁) (Classical.choice h₂)⟩
 
 /-- Loop2Eq is an equivalence relation, hence a Setoid. -/
-instance Loop2Setoid (A : Type u) (a : A) : Setoid (Loop2Space A a) where
+noncomputable instance Loop2Setoid (A : Type u) (a : A) : Setoid (Loop2Space A a) where
   r := Loop2Eq
   iseqv := {
     refl := Loop2Eq.refl
@@ -145,7 +145,7 @@ instance Loop2Setoid (A : Type u) (a : A) : Setoid (Loop2Space A a) where
   }
 
 /-- The second homotopy group π₂(A, a). -/
-def PiTwo (A : Type u) (a : A) : Type u :=
+noncomputable def PiTwo (A : Type u) (a : A) : Type u :=
   Quotient (Loop2Setoid A a)
 
 notation "π₂(" A ", " a ")" => PiTwo A a
@@ -155,10 +155,10 @@ namespace PiTwo
 variable {a : A}
 
 /-- The identity element of π₂. -/
-def id : π₂(A, a) := Quotient.mk _ Loop2Space.refl
+noncomputable def id : π₂(A, a) := Quotient.mk _ Loop2Space.refl
 
 /-- Vertical composition induces group multiplication on π₂. -/
-def mul (x y : π₂(A, a)) : π₂(A, a) :=
+noncomputable def mul (x y : π₂(A, a)) : π₂(A, a) :=
   Quotient.lift₂
     (fun α β => Quotient.mk _ (Loop2Space.vcomp α β))
     (fun _ _ _ _ _ _ => Quotient.sound ⟨by
@@ -169,7 +169,7 @@ def mul (x y : π₂(A, a)) : π₂(A, a) :=
     x y
 
 /-- Inversion on π₂. -/
-def inv (x : π₂(A, a)) : π₂(A, a) :=
+noncomputable def inv (x : π₂(A, a)) : π₂(A, a) :=
   Quotient.lift
     (fun α => Quotient.mk _ (Loop2Space.inv α))
     (fun _ _ _ => Quotient.sound ⟨by
@@ -180,7 +180,7 @@ def inv (x : π₂(A, a)) : π₂(A, a) :=
     x
 
 /-- Embed a 2-loop into π₂. -/
-def ofLoop2 (α : Loop2Space A a) : π₂(A, a) := Quotient.mk _ α
+noncomputable def ofLoop2 (α : Loop2Space A a) : π₂(A, a) := Quotient.mk _ α
 
 theorem mul_assoc (x y z : π₂(A, a)) :
     mul (mul x y) z = mul x (mul y z) := by

@@ -51,7 +51,7 @@ structure SchemeData where
     (∀ p, V p → U p) → section_ U hU → section_ V hV
 
 /-- Trivial scheme on a single point. -/
-def SchemeData.point : SchemeData.{u} where
+noncomputable def SchemeData.point : SchemeData.{u} where
   Point := PUnit
   isOpen := fun _ => True
   open_univ := trivial
@@ -73,20 +73,20 @@ structure SchemeMorphism (X Y : SchemeData.{u}) where
     Y.section_ U hU → X.section_ (fun p => U (onPoints p)) (preimage_open U hU)
 
 /-- Identity morphism. -/
-def SchemeMorphism.id (X : SchemeData.{u}) : SchemeMorphism X X where
+noncomputable def SchemeMorphism.id (X : SchemeData.{u}) : SchemeMorphism X X where
   onPoints := _root_.id
   preimage_open := fun _U hU => hU
   pullback := fun _hU s => s
 
 /-- Composition of scheme morphisms. -/
-def SchemeMorphism.comp {X Y Z : SchemeData.{u}}
+noncomputable def SchemeMorphism.comp {X Y Z : SchemeData.{u}}
     (g : SchemeMorphism Y Z) (f : SchemeMorphism X Y) : SchemeMorphism X Z where
   onPoints := g.onPoints ∘ f.onPoints
   preimage_open := fun U hU => f.preimage_open _ (g.preimage_open U hU)
   pullback := fun hU s => f.pullback (g.preimage_open _ hU) (g.pullback hU s)
 
 /-- Path witness that identity composed with f is f. -/
-def SchemeMorphism.id_comp_points {X Y : SchemeData.{u}}
+noncomputable def SchemeMorphism.id_comp_points {X Y : SchemeData.{u}}
     (f : SchemeMorphism X Y) :
     Path (SchemeMorphism.comp (SchemeMorphism.id Y) f).onPoints f.onPoints :=
   Path.refl _
@@ -232,7 +232,7 @@ theorem schemeStep_sound {A : Type u} {a b : A} {p q : Path a b}
   | comp_assoc _ => rfl
   | valuative _ _ h => exact h
 
-private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
 /-! ## Summary -/
 

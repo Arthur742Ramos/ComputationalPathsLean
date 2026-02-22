@@ -37,15 +37,15 @@ variable {A : Type u} {B : Type u}
 /-! ## Loop Space Algebra -/
 
 /-- Loop composition in the loop space. -/
-def loopComp {a : A} (l₁ l₂ : LoopSpace A a) : LoopSpace A a :=
+noncomputable def loopComp {a : A} (l₁ l₂ : LoopSpace A a) : LoopSpace A a :=
   Path.trans l₁ l₂
 
 /-- Loop inverse in the loop space. -/
-def loopInv {a : A} (l : LoopSpace A a) : LoopSpace A a :=
+noncomputable def loopInv {a : A} (l : LoopSpace A a) : LoopSpace A a :=
   Path.symm l
 
 /-- Loop identity is refl. -/
-def loopId (a : A) : LoopSpace A a :=
+noncomputable def loopId (a : A) : LoopSpace A a :=
   Path.refl a
 
 /-- Loop composition is associative. -/
@@ -86,11 +86,11 @@ noncomputable def loopComp_inv_left_rweq {a : A} (l : LoopSpace A a) :
 /-! ## π_1 Group Structure -/
 
 /-- The quotient map from loops to π_1. -/
-def toπ₁ {a : A} (l : LoopSpace A a) : π₁(A, a) :=
+noncomputable def toπ₁ {a : A} (l : LoopSpace A a) : π₁(A, a) :=
   Quot.mk RwEq l
 
 /-- π_1 multiplication via Quot.lift. -/
-def π₁mul {a : A} (x y : π₁(A, a)) : π₁(A, a) :=
+noncomputable def π₁mul {a : A} (x y : π₁(A, a)) : π₁(A, a) :=
   Quot.lift
     (fun l₁ => Quot.lift
       (fun l₂ => Quot.mk RwEq (Path.trans l₁ l₂))
@@ -102,7 +102,7 @@ def π₁mul {a : A} (x y : π₁(A, a)) : π₁(A, a) :=
     x
 
 /-- π_1 inverse via Quot.lift. -/
-def π₁inv {a : A} (x : π₁(A, a)) : π₁(A, a) :=
+noncomputable def π₁inv {a : A} (x : π₁(A, a)) : π₁(A, a) :=
   Quot.lift
     (fun l => Quot.mk RwEq (Path.symm l))
     (fun _ _ h => by
@@ -115,7 +115,7 @@ def π₁inv {a : A} (x : π₁(A, a)) : π₁(A, a) :=
     x
 
 /-- The identity element of π_1. -/
-def π₁id (a : A) : π₁(A, a) :=
+noncomputable def π₁id (a : A) : π₁(A, a) :=
   Quot.mk RwEq (Path.refl a)
 
 /-- Left identity for π_1 multiplication. -/
@@ -153,7 +153,7 @@ theorem π₁mul_assoc {a : A} (x y z : π₁(A, a)) :
 /-! ## Induced Homomorphisms -/
 
 /-- A map f : A → B induces a map on loop spaces. -/
-def loopMap (f : A → B) {a : A} (l : LoopSpace A a) : LoopSpace B (f a) :=
+noncomputable def loopMap (f : A → B) {a : A} (l : LoopSpace A a) : LoopSpace B (f a) :=
   Path.congrArg f l
 
 /-- Loop map preserves refl. -/
@@ -188,13 +188,13 @@ structure PathLift {E B : Type u} (p : E → B) (e : E) {b₁ b₂ : B}
   proj_eq : p endpoint = b₂
 
 /-- Trivial path lift along refl. -/
-def trivialPathLift {E B : Type u} (p : E → B) (e : E) :
+noncomputable def trivialPathLift {E B : Type u} (p : E → B) (e : E) :
     PathLift p e (Path.refl (p e)) rfl where
   endpoint := e
   proj_eq := rfl
 
 /-- Path lift preserves fiber membership. -/
-def pathLift_fiber {E B : Type u} (p : E → B) (e : E) {b : B}
+noncomputable def pathLift_fiber {E B : Type u} (p : E → B) (e : E) {b : B}
     (γ : Path b b) (h : p e = b)
     (lift : PathLift p e γ h) :
     Path (p lift.endpoint) b :=
@@ -203,11 +203,11 @@ def pathLift_fiber {E B : Type u} (p : E → B) (e : E) {b : B}
 /-! ## Hurewicz Map -/
 
 /-- The first homology group H_1 as abelianization of π_1 (quotient structure). -/
-def H₁ (A : Type u) (a : A) : Type u :=
+noncomputable def H₁ (A : Type u) (a : A) : Type u :=
   Quot (fun (x y : π₁(A, a)) => ∃ c : π₁(A, a), π₁mul x c = π₁mul c y)
 
 /-- The Hurewicz map π_1 → H_1. -/
-def hurewiczMap {a : A} : π₁(A, a) → H₁ A a :=
+noncomputable def hurewiczMap {a : A} : π₁(A, a) → H₁ A a :=
   fun x => Quot.mk _ x
 
 /-- Hurewicz map preserves identity. -/
@@ -223,7 +223,7 @@ theorem hurewicz_natural {a : A} (x : π₁(A, a)) :
 /-! ## Transport of Loops -/
 
 /-- Transport of loops along a path (conjugation). -/
-def transportLoop {a b : A} (p : Path a b) (l : LoopSpace A a) : LoopSpace A b :=
+noncomputable def transportLoop {a b : A} (p : Path a b) (l : LoopSpace A a) : LoopSpace A b :=
   Path.trans (Path.symm p) (Path.trans l p)
 
 /-- Transport along refl preserves the loop. -/
@@ -279,7 +279,7 @@ theorem suspensionLoopMap_refl {a : A} :
 /-! ## Path Space Fibration -/
 
 /-- Path space fibration: projects to the endpoint. -/
-def pathSpaceProj (a : A) : (Σ b : A, Path a b) → A :=
+noncomputable def pathSpaceProj (a : A) : (Σ b : A, Path a b) → A :=
   fun ⟨b, _⟩ => b
 
 /-- The fiber of the path space projection over a is the loop space. -/
@@ -315,7 +315,7 @@ theorem loopMap_transportLoop_comp {C : Type u}
   simp [loopMap]
 
 /-- Induced map on π₁ from a function. -/
-def inducedπ₁ (f : A → B) {a : A} : π₁(A, a) → π₁(B, f a) :=
+noncomputable def inducedπ₁ (f : A → B) {a : A} : π₁(A, a) → π₁(B, f a) :=
   Quot.lift
     (fun l => Quot.mk RwEq (loopMap f l))
     (fun _ _ h => Quot.sound (rweq_context_map_of_rweq ⟨f⟩ h))

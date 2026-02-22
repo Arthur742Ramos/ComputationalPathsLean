@@ -32,7 +32,7 @@ variable {A : Type u}
 
 /-- **J for Path**: The motive depends on `y` and `a = y` (the proof field).
 J operates at the proof level; it cannot see the step structure. -/
-def J {a : A} (C : (y : A) → a = y → Sort v)
+noncomputable def J {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) {y : A} (p : Path a y) : C y p.proof := by
   cases p with | mk steps proof => cases proof; exact c
 
@@ -41,7 +41,7 @@ theorem J_comp {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) : J C c (refl a) = c := rfl
 
 /-- **J for endpoint-only motive**: depends only on `y`. -/
-def J_endpoint {a : A} (C : (y : A) → Sort v) (c : C a)
+noncomputable def J_endpoint {a : A} (C : (y : A) → Sort v) (c : C a)
     {y : A} (p : Path a y) : C y := p.proof ▸ c
 
 /-- J_endpoint computation rule. -/
@@ -76,7 +76,7 @@ theorem J_step_irrel {a : A} (C : (y : A) → a = y → Sort v) (c : C a rfl)
     ======================================================================== -/
 
 /-- **Transport derived from J**. -/
-def J_transport {B : A → Sort v} {a y : A} (p : Path a y) (x : B a) : B y :=
+noncomputable def J_transport {B : A → Sort v} {a y : A} (p : Path a y) (x : B a) : B y :=
   J (fun y _ => B y) x p
 
 /-- J_transport on refl is the identity. -/
@@ -89,7 +89,7 @@ theorem J_transport_eq {B : A → Sort v} {a b : A}
   cases p with | mk steps proof => cases proof; rfl
 
 /-- **ap (congrArg) derived from J**: HoTT's `ap f p`. -/
-def J_ap {B : Type v} (f : A → B) {a y : A} (p : Path a y) : f a = f y :=
+noncomputable def J_ap {B : Type v} (f : A → B) {a y : A} (p : Path a y) : f a = f y :=
   J (fun y _ => f a = f y) rfl p
 
 /-- J_ap on refl is rfl. -/
@@ -102,7 +102,7 @@ theorem J_ap_eq {B : Type v} (f : A → B) {a b : A} (p : Path a b) :
   cases p with | mk steps proof => cases proof; rfl
 
 /-- **Symmetry derived from J**. -/
-def J_symm {a y : A} (p : Path a y) : y = a :=
+noncomputable def J_symm {a y : A} (p : Path a y) : y = a :=
   J (fun y _ => y = a) rfl p
 
 theorem J_symm_refl (a : A) : J_symm (refl a) = rfl := rfl
@@ -111,7 +111,7 @@ theorem J_symm_eq {a b : A} (p : Path a b) : J_symm p = p.proof.symm := by
   cases p with | mk s h => cases h; rfl
 
 /-- **Transitivity derived from J**. -/
-def J_trans {a b c : A} (p : Path a b) (q : Path b c) : a = c :=
+noncomputable def J_trans {a b c : A} (p : Path a b) (q : Path b c) : a = c :=
   J (fun c _ => a = c) p.proof q
 
 theorem J_trans_refl (a : A) : J_trans (refl a) (refl a) = rfl := rfl
@@ -126,10 +126,10 @@ theorem J_trans_eq {a b c : A} (p : Path a b) (q : Path b c) :
     ======================================================================== -/
 
 /-- The reflexive path (empty step list). -/
-def witness_refl (a : A) : Path a a := refl a
+noncomputable def witness_refl (a : A) : Path a a := refl a
 
 /-- A path with one step (non-empty step list). -/
-def witness_step (a : A) : Path a a := Path.mk [Step.mk a a rfl] rfl
+noncomputable def witness_step (a : A) : Path a a := Path.mk [Step.mk a a rfl] rfl
 
 /-- **Non-UIP**: The two witnesses are structurally different. -/
 theorem non_uip_witness (a : A) : witness_refl a ≠ witness_step a := by
@@ -225,7 +225,7 @@ theorem path_refines_eq {a b : A} (p q : Path a b) :
     ======================================================================== -/
 
 /-- **ap = congrArg**. -/
-def ap {B : Type v} (f : A → B) {a b : A} (p : Path a b) : Path (f a) (f b) :=
+noncomputable def ap {B : Type v} (f : A → B) {a b : A} (p : Path a b) : Path (f a) (f b) :=
   congrArg f p
 
 theorem ap_eq_congrArg {B : Type v} (f : A → B) {a b : A} (p : Path a b) :
@@ -249,18 +249,18 @@ theorem ap_id {a b : A} (p : Path a b) :
     ap (fun x => x) p = p := congrArg_id p
 
 /-- **HoTT transport = Path.transport**. -/
-def hott_transport {B : A → Sort v} {a b : A} (p : Path a b) (x : B a) : B b :=
+noncomputable def hott_transport {B : A → Sort v} {a b : A} (p : Path a b) (x : B a) : B b :=
   transport p x
 
 theorem hott_transport_eq {B : A → Sort v} {a b : A}
     (p : Path a b) (x : B a) : hott_transport p x = transport p x := rfl
 
 /-- **HoTT inverse = Path.symm**. -/
-def hott_inv {a b : A} (p : Path a b) : Path b a := symm p
+noncomputable def hott_inv {a b : A} (p : Path a b) : Path b a := symm p
 theorem hott_inv_eq {a b : A} (p : Path a b) : hott_inv p = symm p := rfl
 
 /-- **HoTT concat = Path.trans**. -/
-def hott_concat {a b c : A} (p : Path a b) (q : Path b c) : Path a c := trans p q
+noncomputable def hott_concat {a b c : A} (p : Path a b) (q : Path b c) : Path a c := trans p q
 theorem hott_concat_eq {a b c : A} (p : Path a b) (q : Path b c) :
     hott_concat p q = trans p q := rfl
 
@@ -297,10 +297,10 @@ theorem J_apd_refl {B : A → Sort v} (f : ∀ x, B x) (a : A) :
     ======================================================================== -/
 
 /-- Based path space using Path. -/
-def BasedPathSpace (a : A) := (y : A) × Path a y
+noncomputable def BasedPathSpace (a : A) := (y : A) × Path a y
 
 /-- Center of the based path space. -/
-def bps_center (a : A) : BasedPathSpace a := ⟨a, refl a⟩
+noncomputable def bps_center (a : A) : BasedPathSpace a := ⟨a, refl a⟩
 
 /-- The Eq-level contraction. -/
 theorem bps_eq_contr (a : A) (y : A) (h : a = y) :
@@ -323,7 +323,7 @@ theorem bps_not_contractible (a : A) :
     ======================================================================== -/
 
 /-- Path with exactly n steps. -/
-def path_n_steps (a : A) : Nat → Path a a
+noncomputable def path_n_steps (a : A) : Nat → Path a a
   | 0     => refl a
   | n + 1 => Path.mk (Step.mk a a rfl :: (path_n_steps a n).steps) rfl
 
@@ -401,9 +401,9 @@ theorem transport_respects_step_equiv {B : A → Sort v} {a b : A}
     § 15. ENCODE-DECODE
     ======================================================================== -/
 
-def PathCode (a : A) (y : A) : Prop := a = y
-def path_encode {a y : A} (p : Path a y) : PathCode a y := p.proof
-def path_decode {a y : A} (c : PathCode a y) : Path a y := ofEq c
+noncomputable def PathCode (a : A) (y : A) : Prop := a = y
+noncomputable def path_encode {a y : A} (p : Path a y) : PathCode a y := p.proof
+noncomputable def path_decode {a y : A} (c : PathCode a y) : Path a y := ofEq c
 
 theorem path_encode_decode {a y : A} (c : PathCode a y) :
     path_encode (path_decode c) = c := Subsingleton.elim _ _
@@ -415,7 +415,7 @@ theorem path_decode_encode {a y : A} (p : Path a y) :
     § 16. FIBRATION STRUCTURE
     ======================================================================== -/
 
-def fiber_map {B : A → Type v} {a b : A} (p : Path a b) : B a → B b :=
+noncomputable def fiber_map {B : A → Type v} {a b : A} (p : Path a b) : B a → B b :=
   transport p
 
 theorem fiber_map_left_inv {B : A → Type v} {a b : A}
@@ -458,7 +458,7 @@ theorem transport_const_family {B : Type v} {a b : A}
     § 19. PATH OVER (DEPENDENT PATHS)
     ======================================================================== -/
 
-def PathOver {B : A → Sort v} {a b : A} (p : Path a b) (u : B a) (v : B b) : Prop :=
+noncomputable def PathOver {B : A → Sort v} {a b : A} (p : Path a b) (u : B a) (v : B b) : Prop :=
   transport p u = v
 
 theorem pathOver_refl_iff {B : A → Sort v} {a : A} (u v : B a) :
@@ -526,7 +526,7 @@ theorem transport_triangle' {B : A → Sort v} {a b : A}
     ======================================================================== -/
 
 /-- K works for Lean's Eq (because Eq is proof-irrelevant). -/
-def K_for_Eq (a : A) (C : a = a → Prop) (c : C rfl) (h : a = a) : C h := by
+noncomputable def K_for_Eq (a : A) (C : a = a → Prop) (c : C rfl) (h : a = a) : C h := by
   have : h = rfl := Subsingleton.elim h rfl; rw [this]; exact c
 
 /-- K works at Eq level but NOT at Path level. -/
@@ -560,7 +560,7 @@ theorem proof_factoring_motive {a b : A}
     ======================================================================== -/
 
 /-- Paulin-Mohring J: fix target, vary source. -/
-def J_PM {b : A} (C : (a : A) → a = b → Sort v)
+noncomputable def J_PM {b : A} (C : (a : A) → a = b → Sort v)
     (c : C b rfl) {a : A} (p : Path a b) : C a p.proof := by
   cases p with | mk steps proof => cases proof; exact c
 
@@ -627,7 +627,7 @@ structure TwoLevelSummary (A : Type u) where
     transport p x = transport q x
 
 /-- Witness the two-level summary for any type. -/
-def twoLevelWitness (_a : A) : TwoLevelSummary A where
+noncomputable def twoLevelWitness (_a : A) : TwoLevelSummary A where
   nonUIP := fun x => ⟨witness_refl x, witness_step x, non_uip_witness x⟩
   J_valid := fun x _C c y p => by cases p with | mk steps proof => cases proof; exact c
   K_fails := fun x => no_streicher_K x

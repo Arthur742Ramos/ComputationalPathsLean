@@ -27,7 +27,7 @@ inductive BreuilKisinStep {M : Type v} :
       BreuilKisinStep (Path.trans p (Path.symm p)) (Path.refl x)
 
 /-- Interpret a Breuil-Kisin step as a primitive `Path.Step`. -/
-def BreuilKisinStep.toStep {M : Type v} {x y : M} {p q : Path x y}
+noncomputable def BreuilKisinStep.toStep {M : Type v} {x y : M} {p q : Path x y}
     (s : BreuilKisinStep p q) : Path.Step p q :=
   match s with
   | .linearity_right_unit p => Path.Step.trans_refl_right p
@@ -96,28 +96,28 @@ noncomputable def generator_action_rweq (m : M) :
   rweq_of_breuil_kisin_step (B.generatorActionStep m)
 
 /-- Base-change of the prism generator along Frobenius in module action. -/
-def generatorBaseChange (m : M) :
+noncomputable def generatorBaseChange (m : M) :
     Path
       (B.scalar (P.frobenius P.idealGenerator) (B.phiModule m))
       (B.scalar P.idealGenerator (B.phiModule m)) :=
   Path.congrArg (fun a => B.scalar a (B.phiModule m)) P.prismConditionPath
 
 /-- Generator action after Frobenius base-change. -/
-def frobeniusGeneratorAction (m : M) :
+noncomputable def frobeniusGeneratorAction (m : M) :
     Path
       (B.scalar (P.frobenius P.idealGenerator) (B.phiModule m))
       (B.twist (B.phiModule m)) :=
   Path.trans (B.generatorBaseChange m) (B.generatorActionPath (B.phiModule m))
 
 /-- Prismatic/Breuil-Kisin compatibility path through Frobenius and twist. -/
-def breuilKisinPrismaticPath (m : M) :
+noncomputable def breuilKisinPrismaticPath (m : M) :
     Path
       (B.scalar (P.frobenius P.idealGenerator) (B.phiModule m))
       (B.phiModule (B.twist m)) :=
   Path.trans (B.frobeniusGeneratorAction m) (B.twistPath m)
 
 /-- Round-trip path on the twisted Frobenius side. -/
-def twistRoundTrip (m : M) :
+noncomputable def twistRoundTrip (m : M) :
     Path (B.twist (B.phiModule m)) (B.twist (B.phiModule m)) :=
   Path.trans (B.twistPath m) (Path.symm (B.twistPath m))
 
@@ -128,7 +128,7 @@ noncomputable def twist_roundtrip_rweq (m : M) :
 end BreuilKisinModulePathData
 
 /-- Trivial Breuil-Kisin module package over the trivial prism. -/
-def trivialBreuilKisinModulePathData :
+noncomputable def trivialBreuilKisinModulePathData :
     BreuilKisinModulePathData PUnit PUnit trivialPrismPathData where
   scalar := fun _ _ => PUnit.unit
   phiModule := fun _ => PUnit.unit

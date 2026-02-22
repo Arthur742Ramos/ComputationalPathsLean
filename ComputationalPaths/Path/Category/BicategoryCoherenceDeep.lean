@@ -66,7 +66,7 @@ variable {γ : Type u}
 /-- Count of atomic 2-cells. This is the correct semantic invariant:
 preserved by ALL structural rewrites including interchange (since
 `Nat` addition is commutative, unlike `List` concatenation). -/
-def atomCount : Cell2Expr γ → Nat
+noncomputable def atomCount : Cell2Expr γ → Nat
   | id2 => 0
   | atom2 _ => 1
   | comp2_vert f g => f.atomCount + g.atomCount
@@ -79,7 +79,7 @@ def atomCount : Cell2Expr γ → Nat
       f.atomCount + g.atomCount + h.atomCount + k.atomCount
 
 /-- Size of the expression tree (always ≥ 1). -/
-def size : Cell2Expr γ → Nat
+noncomputable def size : Cell2Expr γ → Nat
   | id2 => 1
   | atom2 _ => 1
   | comp2_vert f g => 1 + f.size + g.size
@@ -91,7 +91,7 @@ def size : Cell2Expr γ → Nat
   | interchange_cell f g h k => 1 + f.size + g.size + h.size + k.size
 
 /-- Depth of nesting. -/
-def depth : Cell2Expr γ → Nat
+noncomputable def depth : Cell2Expr γ → Nat
   | id2 => 0
   | atom2 _ => 0
   | comp2_vert f g => 1 + max f.depth g.depth
@@ -274,49 +274,49 @@ theorem atomCount_preserved {e₁ e₂ : Cell2Expr γ} (p : Cell2Path γ e₁ e�
 
 /-! ### Shorthand constructors for common steps -/
 
-def vertAssocFwd (f g h : Cell2Expr γ) :
+noncomputable def vertAssocFwd (f g h : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g h))
                (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert f g) h) :=
   step (Cell2Step.vert_assoc_fwd f g h)
 
-def vertAssocBwd (f g h : Cell2Expr γ) :
+noncomputable def vertAssocBwd (f g h : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert f g) h)
                (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g h)) :=
   step (Cell2Step.vert_assoc_bwd f g h)
 
-def horizAssocFwd (f g h : Cell2Expr γ) :
+noncomputable def horizAssocFwd (f g h : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_horiz f (Cell2Expr.comp2_horiz g h))
                (Cell2Expr.comp2_horiz (Cell2Expr.comp2_horiz f g) h) :=
   step (Cell2Step.horiz_assoc_fwd f g h)
 
-def horizAssocBwd (f g h : Cell2Expr γ) :
+noncomputable def horizAssocBwd (f g h : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_horiz (Cell2Expr.comp2_horiz f g) h)
                (Cell2Expr.comp2_horiz f (Cell2Expr.comp2_horiz g h)) :=
   step (Cell2Step.horiz_assoc_bwd f g h)
 
-def vertLeftUnit (f : Cell2Expr γ) :
+noncomputable def vertLeftUnit (f : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_vert Cell2Expr.id2 f) f :=
   step (Cell2Step.vert_left_unit f)
 
-def vertRightUnit (f : Cell2Expr γ) :
+noncomputable def vertRightUnit (f : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_vert f Cell2Expr.id2) f :=
   step (Cell2Step.vert_right_unit f)
 
-def horizLeftUnit (f : Cell2Expr γ) :
+noncomputable def horizLeftUnit (f : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_horiz Cell2Expr.id2 f) f :=
   step (Cell2Step.horiz_left_unit f)
 
-def horizRightUnit (f : Cell2Expr γ) :
+noncomputable def horizRightUnit (f : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_horiz f Cell2Expr.id2) f :=
   step (Cell2Step.horiz_right_unit f)
 
-def interchangeFwd (f g h k : Cell2Expr γ) :
+noncomputable def interchangeFwd (f g h k : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert h k))
       (Cell2Expr.comp2_vert (Cell2Expr.comp2_horiz f h) (Cell2Expr.comp2_horiz g k)) :=
   step (Cell2Step.interchange_fwd f g h k)
 
-def interchangeBwd (f g h k : Cell2Expr γ) :
+noncomputable def interchangeBwd (f g h k : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert (Cell2Expr.comp2_horiz f h) (Cell2Expr.comp2_horiz g k))
       (Cell2Expr.comp2_horiz (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert h k)) :=
@@ -324,7 +324,7 @@ def interchangeBwd (f g h k : Cell2Expr γ) :
 
 /-! ### Congruence operations (functorial lifting of paths) -/
 
-def congVertLeft {f f' : Cell2Expr γ} (g : Cell2Expr γ) (p : Cell2Path γ f f') :
+noncomputable def congVertLeft {f f' : Cell2Expr γ} (g : Cell2Expr γ) (p : Cell2Path γ f f') :
     Cell2Path γ (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert f' g) :=
   match p with
   | refl _ => refl _
@@ -332,7 +332,7 @@ def congVertLeft {f f' : Cell2Expr γ} (g : Cell2Expr γ) (p : Cell2Path γ f f'
   | Cell2Path.trans p q => Cell2Path.trans (congVertLeft g p) (congVertLeft g q)
   | Cell2Path.symm p => Cell2Path.symm (congVertLeft g p)
 
-def congVertRight (f : Cell2Expr γ) {g g' : Cell2Expr γ} (p : Cell2Path γ g g') :
+noncomputable def congVertRight (f : Cell2Expr γ) {g g' : Cell2Expr γ} (p : Cell2Path γ g g') :
     Cell2Path γ (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert f g') :=
   match p with
   | refl _ => refl _
@@ -340,7 +340,7 @@ def congVertRight (f : Cell2Expr γ) {g g' : Cell2Expr γ} (p : Cell2Path γ g g
   | Cell2Path.trans p q => Cell2Path.trans (congVertRight f p) (congVertRight f q)
   | Cell2Path.symm p => Cell2Path.symm (congVertRight f p)
 
-def congHorizLeft {f f' : Cell2Expr γ} (g : Cell2Expr γ) (p : Cell2Path γ f f') :
+noncomputable def congHorizLeft {f f' : Cell2Expr γ} (g : Cell2Expr γ) (p : Cell2Path γ f f') :
     Cell2Path γ (Cell2Expr.comp2_horiz f g) (Cell2Expr.comp2_horiz f' g) :=
   match p with
   | refl _ => refl _
@@ -348,7 +348,7 @@ def congHorizLeft {f f' : Cell2Expr γ} (g : Cell2Expr γ) (p : Cell2Path γ f f
   | Cell2Path.trans p q => Cell2Path.trans (congHorizLeft g p) (congHorizLeft g q)
   | Cell2Path.symm p => Cell2Path.symm (congHorizLeft g p)
 
-def congHorizRight (f : Cell2Expr γ) {g g' : Cell2Expr γ} (p : Cell2Path γ g g') :
+noncomputable def congHorizRight (f : Cell2Expr γ) {g g' : Cell2Expr γ} (p : Cell2Path γ g g') :
     Cell2Path γ (Cell2Expr.comp2_horiz f g) (Cell2Expr.comp2_horiz f g') :=
   match p with
   | refl _ => refl _
@@ -357,13 +357,13 @@ def congHorizRight (f : Cell2Expr γ) {g g' : Cell2Expr γ} (p : Cell2Path γ g 
   | Cell2Path.symm p => Cell2Path.symm (congHorizRight f p)
 
 /-- Simultaneous congruence on both factors of vertical composition. -/
-def congVertBoth {f f' g g' : Cell2Expr γ}
+noncomputable def congVertBoth {f f' g g' : Cell2Expr γ}
     (p : Cell2Path γ f f') (q : Cell2Path γ g g') :
     Cell2Path γ (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert f' g') :=
   Cell2Path.trans (congVertLeft g p) (congVertRight f' q)
 
 /-- Simultaneous congruence on both factors of horizontal composition. -/
-def congHorizBoth {f f' g g' : Cell2Expr γ}
+noncomputable def congHorizBoth {f f' g g' : Cell2Expr γ}
     (p : Cell2Path γ f f') (q : Cell2Path γ g g') :
     Cell2Path γ (Cell2Expr.comp2_horiz f g) (Cell2Expr.comp2_horiz f' g') :=
   Cell2Path.trans (congHorizLeft g p) (congHorizRight f' q)
@@ -374,7 +374,7 @@ end Cell2Path
 
 /-- Two 2-cell expressions are semantically equivalent when they have
 the same atom count. -/
-def SemEq2 {γ : Type u} (e₁ e₂ : Cell2Expr γ) : Prop :=
+noncomputable def SemEq2 {γ : Type u} (e₁ e₂ : Cell2Expr γ) : Prop :=
   e₁.atomCount = e₂.atomCount
 
 theorem SemEq2.rfl {γ : Type u} {e : Cell2Expr γ} : SemEq2 e e := Eq.refl _
@@ -419,14 +419,14 @@ variable {γ : Type u}
 
 /-- The interchange law as a path:
 `(f∘g) * (h∘k)` ⟶ `(f*h) ∘ (g*k)` -/
-def interchangePath (f g h k : Cell2Expr γ) :
+noncomputable def interchangePath (f g h k : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert h k))
       (Cell2Expr.comp2_vert (Cell2Expr.comp2_horiz f h) (Cell2Expr.comp2_horiz g k)) :=
   Cell2Path.interchangeFwd f g h k
 
 /-- Interchange roundtrip: forward then backward = identity (semantically). -/
-def interchange_roundtrip (f g h k : Cell2Expr γ) :
+noncomputable def interchange_roundtrip (f g h k : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert h k))
       (Cell2Expr.comp2_horiz (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert h k)) :=
@@ -439,7 +439,7 @@ theorem interchange_roundtrip_semantic (f g h k : Cell2Expr γ) :
     (Cell2Path.refl _).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Middle-four interchange: apply interchange in a larger context. -/
-def middle_four_interchange (f g h k p q : Cell2Expr γ) :
+noncomputable def middle_four_interchange (f g h k p q : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert
         (Cell2Expr.comp2_horiz (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert h k))
@@ -451,7 +451,7 @@ def middle_four_interchange (f g h k p q : Cell2Expr γ) :
     (Cell2Expr.comp2_horiz p q) (Cell2Path.interchangeFwd f g h k)
 
 /-- Double interchange: apply interchange to both halves of a vertical composition. -/
-def double_interchange (f g h k p q r s : Cell2Expr γ) :
+noncomputable def double_interchange (f g h k p q r s : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert
         (Cell2Expr.comp2_horiz (Cell2Expr.comp2_vert f g) (Cell2Expr.comp2_vert h k))
@@ -478,7 +478,7 @@ section EckmannHilton
 variable {γ : Type u}
 
 /-- Step 1: introduce horizontal units. `f∘g → (id*f) ∘ (g*id)`. -/
-def eckmann_hilton_step1 (f g : Cell2Expr γ) :
+noncomputable def eckmann_hilton_step1 (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert f g)
       (Cell2Expr.comp2_vert
@@ -490,7 +490,7 @@ def eckmann_hilton_step1 (f g : Cell2Expr γ) :
 
 /-- Step 2: apply interchange backward.
 `(id*f) ∘ (g*id) → (id∘g) * (f∘id)`. -/
-def eckmann_hilton_step2 (f g : Cell2Expr γ) :
+noncomputable def eckmann_hilton_step2 (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert
         (Cell2Expr.comp2_horiz Cell2Expr.id2 f)
@@ -501,7 +501,7 @@ def eckmann_hilton_step2 (f g : Cell2Expr γ) :
   Cell2Path.interchangeBwd Cell2Expr.id2 g f Cell2Expr.id2
 
 /-- Step 3: eliminate units. `(id∘g) * (f∘id) → g * f`. -/
-def eckmann_hilton_step3 (f g : Cell2Expr γ) :
+noncomputable def eckmann_hilton_step3 (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz
         (Cell2Expr.comp2_vert Cell2Expr.id2 g)
@@ -512,7 +512,7 @@ def eckmann_hilton_step3 (f g : Cell2Expr γ) :
     (Cell2Path.vertRightUnit f)
 
 /-- **Eckmann–Hilton path**: `f∘g ⟶ g*f` (multi-step via interchange). -/
-def eckmann_hilton_path (f g : Cell2Expr γ) :
+noncomputable def eckmann_hilton_path (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert f g)
       (Cell2Expr.comp2_horiz g f) :=
@@ -520,7 +520,7 @@ def eckmann_hilton_path (f g : Cell2Expr γ) :
     (Cell2Path.trans (eckmann_hilton_step2 f g) (eckmann_hilton_step3 f g))
 
 /-- Alternative Eckmann–Hilton: `f∘g ⟶ f*g` via the other route. -/
-def eckmann_hilton_path' (f g : Cell2Expr γ) :
+noncomputable def eckmann_hilton_path' (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert f g)
       (Cell2Expr.comp2_horiz f g) :=
@@ -535,7 +535,7 @@ def eckmann_hilton_path' (f g : Cell2Expr γ) :
         (Cell2Path.vertLeftUnit g)))
 
 /-- **Commutativity**: `f*g ⟶ g*f` from combining both EH routes. -/
-def eckmann_hilton_comm (f g : Cell2Expr γ) :
+noncomputable def eckmann_hilton_comm (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz f g)
       (Cell2Expr.comp2_horiz g f) :=
@@ -551,7 +551,7 @@ theorem eckmann_hilton_coherent (f g : Cell2Expr γ) :
   simp [Cell2Expr.atomCount, Nat.add_comm]
 
 /-- Double commutativity is semantically the identity. -/
-def eckmann_hilton_double_comm (f g : Cell2Expr γ) :
+noncomputable def eckmann_hilton_double_comm (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz f g)
       (Cell2Expr.comp2_horiz f g) :=
@@ -569,13 +569,13 @@ section Whiskering
 variable {γ : Type u}
 
 /-- Left whiskering: `g * α` for `α : f ⟶ f'`. -/
-def whiskerLeft (g : Cell2Expr γ) {f f' : Cell2Expr γ}
+noncomputable def whiskerLeft (g : Cell2Expr γ) {f f' : Cell2Expr γ}
     (p : Cell2Path γ f f') :
     Cell2Path γ (Cell2Expr.comp2_horiz g f) (Cell2Expr.comp2_horiz g f') :=
   Cell2Path.congHorizRight g p
 
 /-- Right whiskering: `α * g` for `α : f ⟶ f'`. -/
-def whiskerRight {f f' : Cell2Expr γ} (p : Cell2Path γ f f')
+noncomputable def whiskerRight {f f' : Cell2Expr γ} (p : Cell2Path γ f f')
     (g : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_horiz f g) (Cell2Expr.comp2_horiz f' g) :=
   Cell2Path.congHorizLeft g p
@@ -594,7 +594,7 @@ theorem whiskerRight_count {f f' : Cell2Expr γ} (p : Cell2Path γ f f')
   Subsingleton.elim _ _
 
 /-- Double whiskering: whisker on both sides. -/
-def whiskerBoth (g : Cell2Expr γ) {f f' : Cell2Expr γ}
+noncomputable def whiskerBoth (g : Cell2Expr γ) {f f' : Cell2Expr γ}
     (p : Cell2Path γ f f') (h : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz g (Cell2Expr.comp2_horiz f h))
@@ -602,7 +602,7 @@ def whiskerBoth (g : Cell2Expr γ) {f f' : Cell2Expr γ}
   whiskerLeft g (whiskerRight p h)
 
 /-- Whiskering interacts with interchange. -/
-def whisker_interchange (g : Cell2Expr γ) (f₁ f₂ h₁ h₂ : Cell2Expr γ) :
+noncomputable def whisker_interchange (g : Cell2Expr γ) (f₁ f₂ h₁ h₂ : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz g
         (Cell2Expr.comp2_horiz (Cell2Expr.comp2_vert f₁ f₂) (Cell2Expr.comp2_vert h₁ h₂)))
@@ -611,17 +611,17 @@ def whisker_interchange (g : Cell2Expr γ) (f₁ f₂ h₁ h₂ : Cell2Expr γ) 
   whiskerLeft g (Cell2Path.interchangeFwd f₁ f₂ h₁ h₂)
 
 /-- Left whiskering with `id2` is essentially identity. -/
-def whiskerLeft_id (f : Cell2Expr γ) :
+noncomputable def whiskerLeft_id (f : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_horiz Cell2Expr.id2 f) f :=
   Cell2Path.horizLeftUnit f
 
 /-- Right whiskering with `id2` is essentially identity. -/
-def whiskerRight_id (f : Cell2Expr γ) :
+noncomputable def whiskerRight_id (f : Cell2Expr γ) :
     Cell2Path γ (Cell2Expr.comp2_horiz f Cell2Expr.id2) f :=
   Cell2Path.horizRightUnit f
 
 /-- Whiskering respects vertical composition of paths. -/
-def whiskerLeft_vert (g : Cell2Expr γ) {f₁ f₂ f₃ : Cell2Expr γ}
+noncomputable def whiskerLeft_vert (g : Cell2Expr γ) {f₁ f₂ f₃ : Cell2Expr γ}
     (p : Cell2Path γ f₁ f₂) (q : Cell2Path γ f₂ f₃) :
     Cell2Path γ (Cell2Expr.comp2_horiz g f₁) (Cell2Expr.comp2_horiz g f₃) :=
   whiskerLeft g (Cell2Path.trans p q)
@@ -641,7 +641,7 @@ variable {γ : Type u}
 
 /-- Vertical pentagon path 1 (top-right route):
 `f∘(g∘(h∘k))` → `f∘((g∘h)∘k)` → `(f∘(g∘h))∘k` → `((f∘g)∘h)∘k` -/
-def vertPentagon1 (f g h k : Cell2Expr γ) :
+noncomputable def vertPentagon1 (f g h k : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g (Cell2Expr.comp2_vert h k)))
       (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert f g) h) k) :=
@@ -653,7 +653,7 @@ def vertPentagon1 (f g h k : Cell2Expr γ) :
 
 /-- Vertical pentagon path 2 (bottom-left route):
 `f∘(g∘(h∘k))` → `(f∘g)∘(h∘k)` → `((f∘g)∘h)∘k` -/
-def vertPentagon2 (f g h k : Cell2Expr γ) :
+noncomputable def vertPentagon2 (f g h k : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g (Cell2Expr.comp2_vert h k)))
       (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert f g) h) k) :=
@@ -667,7 +667,7 @@ theorem vert_pentagon_commutes (f g h k : Cell2Expr γ) :
     (vertPentagon2 f g h k).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Horizontal pentagon path 1. -/
-def horizPentagon1 (f g h k : Cell2Expr γ) :
+noncomputable def horizPentagon1 (f g h k : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz f (Cell2Expr.comp2_horiz g (Cell2Expr.comp2_horiz h k)))
       (Cell2Expr.comp2_horiz (Cell2Expr.comp2_horiz (Cell2Expr.comp2_horiz f g) h) k) :=
@@ -678,7 +678,7 @@ def horizPentagon1 (f g h k : Cell2Expr γ) :
       (Cell2Path.congHorizLeft k (Cell2Path.horizAssocFwd f g h)))
 
 /-- Horizontal pentagon path 2. -/
-def horizPentagon2 (f g h k : Cell2Expr γ) :
+noncomputable def horizPentagon2 (f g h k : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz f (Cell2Expr.comp2_horiz g (Cell2Expr.comp2_horiz h k)))
       (Cell2Expr.comp2_horiz (Cell2Expr.comp2_horiz (Cell2Expr.comp2_horiz f g) h) k) :=
@@ -699,7 +699,7 @@ section Triangle
 variable {γ : Type u}
 
 /-- Vertical triangle path 1: `(f∘id)∘g → f∘(id∘g) → f∘g`. -/
-def vertTriangle1 (f g : Cell2Expr γ) :
+noncomputable def vertTriangle1 (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert f Cell2Expr.id2) g)
       (Cell2Expr.comp2_vert f g) :=
@@ -708,7 +708,7 @@ def vertTriangle1 (f g : Cell2Expr γ) :
     (Cell2Path.congVertRight f (Cell2Path.vertLeftUnit g))
 
 /-- Vertical triangle path 2: `(f∘id)∘g → f∘g` via right unit on left. -/
-def vertTriangle2 (f g : Cell2Expr γ) :
+noncomputable def vertTriangle2 (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert f Cell2Expr.id2) g)
       (Cell2Expr.comp2_vert f g) :=
@@ -720,7 +720,7 @@ theorem vert_triangle_commutes (f g : Cell2Expr γ) :
     (vertTriangle2 f g).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Horizontal triangle path 1. -/
-def horizTriangle1 (f g : Cell2Expr γ) :
+noncomputable def horizTriangle1 (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz (Cell2Expr.comp2_horiz f Cell2Expr.id2) g)
       (Cell2Expr.comp2_horiz f g) :=
@@ -729,7 +729,7 @@ def horizTriangle1 (f g : Cell2Expr γ) :
     (Cell2Path.congHorizRight f (Cell2Path.horizLeftUnit g))
 
 /-- Horizontal triangle path 2. -/
-def horizTriangle2 (f g : Cell2Expr γ) :
+noncomputable def horizTriangle2 (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz (Cell2Expr.comp2_horiz f Cell2Expr.id2) g)
       (Cell2Expr.comp2_horiz f g) :=
@@ -748,13 +748,13 @@ section UnitCoherence
 variable {γ : Type u}
 
 /-- Double left-unit absorption: `id∘(id∘f) → f`. Route 1. -/
-def unitAbsorbLeft1 (f : Cell2Expr γ) :
+noncomputable def unitAbsorbLeft1 (f : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert Cell2Expr.id2 (Cell2Expr.comp2_vert Cell2Expr.id2 f)) f :=
   Cell2Path.trans (Cell2Path.vertLeftUnit _) (Cell2Path.vertLeftUnit f)
 
 /-- Route 2. -/
-def unitAbsorbLeft2 (f : Cell2Expr γ) :
+noncomputable def unitAbsorbLeft2 (f : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert Cell2Expr.id2 (Cell2Expr.comp2_vert Cell2Expr.id2 f)) f :=
   Cell2Path.trans
@@ -766,19 +766,19 @@ theorem unit_absorb_coherent (f : Cell2Expr γ) :
     (unitAbsorbLeft2 f).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Double right-unit absorption. -/
-def unitAbsorbRight (f : Cell2Expr γ) :
+noncomputable def unitAbsorbRight (f : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert f Cell2Expr.id2) Cell2Expr.id2) f :=
   Cell2Path.trans (Cell2Path.vertRightUnit _) (Cell2Path.vertRightUnit f)
 
 /-- Mixed unit (left then right). -/
-def unitMixed (f : Cell2Expr γ) :
+noncomputable def unitMixed (f : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert Cell2Expr.id2 (Cell2Expr.comp2_vert f Cell2Expr.id2)) f :=
   Cell2Path.trans (Cell2Path.vertLeftUnit _) (Cell2Path.vertRightUnit f)
 
 /-- Mixed unit (alternative route). -/
-def unitMixed' (f : Cell2Expr γ) :
+noncomputable def unitMixed' (f : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert Cell2Expr.id2 (Cell2Expr.comp2_vert f Cell2Expr.id2)) f :=
   Cell2Path.trans
@@ -797,7 +797,7 @@ section AssocCoherence
 variable {γ : Type u}
 
 /-- Five-fold vertical reassociation (fully left → fully right). -/
-def vertAssoc5 (a b c d e : Cell2Expr γ) :
+noncomputable def vertAssoc5 (a b c d e : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert
         (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert a b) c) d) e)
@@ -811,7 +811,7 @@ def vertAssoc5 (a b c d e : Cell2Expr γ) :
         (Cell2Expr.comp2_vert c (Cell2Expr.comp2_vert d e))))
 
 /-- Alternative five-fold reassociation (through inner steps). -/
-def vertAssoc5' (a b c d e : Cell2Expr γ) :
+noncomputable def vertAssoc5' (a b c d e : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert
         (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert (Cell2Expr.comp2_vert a b) c) d) e)
@@ -834,7 +834,7 @@ theorem vert_assoc5_coherent (a b c d e : Cell2Expr γ) :
     (vertAssoc5' a b c d e).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Associator roundtrip is semantically trivial. -/
-def assoc_roundtrip (f g h : Cell2Expr γ) :
+noncomputable def assoc_roundtrip (f g h : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g h))
       (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g h)) :=
@@ -868,12 +868,12 @@ namespace Modification
 variable {γ : Type u}
 
 /-- Construct a modification from parallel natural transformations. -/
-def ofParallel (n1 n2 : NatTrans2 γ)
+noncomputable def ofParallel (n1 n2 : NatTrans2 γ)
     (hs : n1.source = n2.source) (ht : n1.target = n2.target) :
     Modification γ := ⟨n1, n2, hs, ht⟩
 
 /-- Reflexive modification. -/
-def refl (n : NatTrans2 γ) : Modification γ := ⟨n, n, rfl, rfl⟩
+noncomputable def refl (n : NatTrans2 γ) : Modification γ := ⟨n, n, rfl, rfl⟩
 
 /-- Modifications are coherent: parallel paths give the same atom count proof. -/
 theorem modification_coherence (m : Modification γ) :
@@ -890,7 +890,7 @@ variable {γ : Type u}
 
 /-- Interchange with `id2` on the left:
 `(id∘f) * (id∘g) → (id*id) ∘ (f*g)`. -/
-def interchange_left_units (f g : Cell2Expr γ) :
+noncomputable def interchange_left_units (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz
         (Cell2Expr.comp2_vert Cell2Expr.id2 f)
@@ -901,7 +901,7 @@ def interchange_left_units (f g : Cell2Expr γ) :
   Cell2Path.interchangeFwd Cell2Expr.id2 f Cell2Expr.id2 g
 
 /-- Further simplification: `(id*id)∘(f*g) → id∘(f*g) → f*g`. -/
-def interchange_left_units_simplified (f g : Cell2Expr γ) :
+noncomputable def interchange_left_units_simplified (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz
         (Cell2Expr.comp2_vert Cell2Expr.id2 f)
@@ -915,7 +915,7 @@ def interchange_left_units_simplified (f g : Cell2Expr γ) :
       (Cell2Path.vertLeftUnit (Cell2Expr.comp2_horiz f g)))
 
 /-- Interchange with `id2` on the right. -/
-def interchange_right_units (f g : Cell2Expr γ) :
+noncomputable def interchange_right_units (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz
         (Cell2Expr.comp2_vert f Cell2Expr.id2)
@@ -926,7 +926,7 @@ def interchange_right_units (f g : Cell2Expr γ) :
   Cell2Path.interchangeFwd f Cell2Expr.id2 g Cell2Expr.id2
 
 /-- Further simplification of right-unit interchange. -/
-def interchange_right_units_simplified (f g : Cell2Expr γ) :
+noncomputable def interchange_right_units_simplified (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz
         (Cell2Expr.comp2_vert f Cell2Expr.id2)
@@ -953,7 +953,7 @@ section Pasting
 variable {γ : Type u}
 
 /-- Vertical pasting of three 2-cell paths. -/
-def vertPaste {f₁ f₂ g₁ g₂ h₁ h₂ : Cell2Expr γ}
+noncomputable def vertPaste {f₁ f₂ g₁ g₂ h₁ h₂ : Cell2Expr γ}
     (top : Cell2Path γ f₁ f₂)
     (mid : Cell2Path γ g₁ g₂)
     (bot : Cell2Path γ h₁ h₂) :
@@ -963,7 +963,7 @@ def vertPaste {f₁ f₂ g₁ g₂ h₁ h₂ : Cell2Expr γ}
   Cell2Path.congVertBoth top (Cell2Path.congVertBoth mid bot)
 
 /-- Horizontal pasting of three 2-cell paths. -/
-def horizPaste {f₁ f₂ g₁ g₂ h₁ h₂ : Cell2Expr γ}
+noncomputable def horizPaste {f₁ f₂ g₁ g₂ h₁ h₂ : Cell2Expr γ}
     (left : Cell2Path γ f₁ f₂)
     (mid : Cell2Path γ g₁ g₂)
     (right : Cell2Path γ h₁ h₂) :
@@ -973,7 +973,7 @@ def horizPaste {f₁ f₂ g₁ g₂ h₁ h₂ : Cell2Expr γ}
   Cell2Path.congHorizBoth left (Cell2Path.congHorizBoth mid right)
 
 /-- Pasting square: apply 2-cell paths on top and bottom. -/
-def pastingSquare {f g h k : Cell2Expr γ}
+noncomputable def pastingSquare {f g h k : Cell2Expr γ}
     (top : Cell2Path γ f g) (bot : Cell2Path γ h k) :
     Cell2Path γ
       (Cell2Expr.comp2_vert f h)
@@ -995,14 +995,14 @@ section NaturalitySquares
 variable {γ : Type u}
 
 /-- Associator naturality: assoc commutes with congruence. -/
-def assoc_naturality {f f' g h : Cell2Expr γ} (p : Cell2Path γ f f') :
+noncomputable def assoc_naturality {f f' g h : Cell2Expr γ} (p : Cell2Path γ f f') :
     Cell2Path γ
       (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g h))
       (Cell2Expr.comp2_vert f' (Cell2Expr.comp2_vert g h)) :=
   Cell2Path.congVertLeft (Cell2Expr.comp2_vert g h) p
 
 /-- Left-unitor naturality. -/
-def left_unit_naturality {f f' : Cell2Expr γ} (p : Cell2Path γ f f') :
+noncomputable def left_unit_naturality {f f' : Cell2Expr γ} (p : Cell2Path γ f f') :
     Cell2Path γ
       (Cell2Expr.comp2_vert Cell2Expr.id2 f)
       (Cell2Expr.comp2_vert Cell2Expr.id2 f') :=
@@ -1029,7 +1029,7 @@ section MixedCoherence
 variable {γ : Type u}
 
 /-- Interchange after vertical reassociation. -/
-def interchange_after_assoc (f g h k l m : Cell2Expr γ) :
+noncomputable def interchange_after_assoc (f g h k l m : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz
         (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g h))
@@ -1055,7 +1055,7 @@ section Strictification
 variable {γ : Type u}
 
 /-- In a strict 2-category, the associator roundtrip is the identity. -/
-def strictify_assoc (f g h : Cell2Expr γ) :
+noncomputable def strictify_assoc (f g h : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g h))
       (Cell2Expr.comp2_vert f (Cell2Expr.comp2_vert g h)) :=
@@ -1068,7 +1068,7 @@ theorem strictify_assoc_identity (f g h : Cell2Expr γ) :
     (Cell2Path.refl _).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Left-unit roundtrip. -/
-def strictify_left_unit (f : Cell2Expr γ) :
+noncomputable def strictify_left_unit (f : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert Cell2Expr.id2 f)
       (Cell2Expr.comp2_vert Cell2Expr.id2 f) :=
@@ -1081,7 +1081,7 @@ theorem strictify_left_unit_identity (f : Cell2Expr γ) :
     (Cell2Path.refl _).atomCount_preserved := Subsingleton.elim _ _
 
 /-- Right-unit roundtrip. -/
-def strictify_right_unit (f : Cell2Expr γ) :
+noncomputable def strictify_right_unit (f : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert f Cell2Expr.id2)
       (Cell2Expr.comp2_vert f Cell2Expr.id2) :=
@@ -1187,7 +1187,7 @@ section HVInteraction
 variable {γ : Type u}
 
 /-- Horizontal unit composed vertically. -/
-def horiz_unit_vert (f g : Cell2Expr γ) :
+noncomputable def horiz_unit_vert (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert
         (Cell2Expr.comp2_horiz f g)
@@ -1199,7 +1199,7 @@ def horiz_unit_vert (f g : Cell2Expr γ) :
     (Cell2Path.vertRightUnit (Cell2Expr.comp2_horiz f g))
 
 /-- Vertical unit composed horizontally. -/
-def vert_unit_horiz (f g : Cell2Expr γ) :
+noncomputable def vert_unit_horiz (f g : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_horiz
         (Cell2Expr.comp2_vert f Cell2Expr.id2)
@@ -1230,7 +1230,7 @@ theorem hv_sources_agree (f g : Cell2Expr γ) :
   simp [Cell2Expr.atomCount]
 
 /-- Assoc + interchange commute: triple composition coherence. -/
-def assoc_interchange_commute (f g h k l m : Cell2Expr γ) :
+noncomputable def assoc_interchange_commute (f g h k l m : Cell2Expr γ) :
     Cell2Path γ
       (Cell2Expr.comp2_vert
         (Cell2Expr.comp2_horiz f k)

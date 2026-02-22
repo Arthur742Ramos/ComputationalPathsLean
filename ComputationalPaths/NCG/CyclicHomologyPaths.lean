@@ -123,7 +123,7 @@ noncomputable def SBI_two_refl_rweq (n : Nat) :
       (H.SBI_rweq n))
 
 /-- Roundtrip along SBI and its inverse. -/
-def SBI_roundtrip (n : Nat) :
+noncomputable def SBI_roundtrip (n : Nat) :
     Path
       (H.S (n + 1) (H.I (n + 3) (H.B (n + 2) (H.zero (n + 2)))))
       (H.S (n + 1) (H.I (n + 3) (H.B (n + 2) (H.zero (n + 2))))) :=
@@ -138,7 +138,7 @@ noncomputable def SBI_roundtrip_rweq (n : Nat) :
 end CyclicHomologyPathData
 
 /-- Canonical identity-like cyclic package with explicit Step witnesses. -/
-def identityCyclicHomologyPathData
+noncomputable def identityCyclicHomologyPathData
     (C : Nat → Type u) [∀ n, Inhabited (C n)] :
     CyclicHomologyPathData C where
   zero := fun _ => default

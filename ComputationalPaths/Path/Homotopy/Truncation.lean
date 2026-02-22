@@ -55,11 +55,11 @@ structure IsContr (A : Type u) where
 namespace IsContr
 
 /-- All elements of a contractible type are path-connected. -/
-def allPathsConnected (h : IsContr A) (a b : A) : Path a b :=
+noncomputable def allPathsConnected (h : IsContr A) (a b : A) : Path a b :=
   Path.trans (h.contr a) (Path.symm (h.contr b))
 
 /-- Unit (PUnit') is contractible. -/
-def punitContr : IsContr CompPath.PUnit' where
+noncomputable def punitContr : IsContr CompPath.PUnit' where
   center := CompPath.PUnit'.unit
   contr := fun _ => Path.refl CompPath.PUnit'.unit
 
@@ -78,15 +78,15 @@ structure IsProp (A : Type u) where
 namespace IsProp
 
 /-- Empty type is a proposition (vacuously). -/
-def emptyProp : IsProp Empty where
+noncomputable def emptyProp : IsProp Empty where
   eq := fun a _ => nomatch a
 
 /-- Unit type is a proposition. -/
-def punitProp : IsProp CompPath.PUnit' where
+noncomputable def punitProp : IsProp CompPath.PUnit' where
   eq := fun _ _ => Path.refl CompPath.PUnit'.unit
 
 /-- Contractible types are propositions. -/
-def ofContr (h : IsContr A) : IsProp A where
+noncomputable def ofContr (h : IsContr A) : IsProp A where
   eq := fun a b => h.allPathsConnected a b
 
 end IsProp
@@ -127,11 +127,11 @@ structure IsGroupoid (A : Type u) where
 namespace IsGroupoid
 
 /-- Sets are 1-groupoids. -/
-def ofSet (_h : IsSet A) : IsGroupoid A where
+noncomputable def ofSet (_h : IsSet A) : IsGroupoid A where
   derivEq := fun d₁ d₂ => ⟨contractibility₃ d₁ d₂⟩
 
 /-- All types are 1-groupoids in our framework (by contractibility₃, when assumed). -/
-def allTypes : IsGroupoid A where
+noncomputable def allTypes : IsGroupoid A where
   derivEq := fun d₁ d₂ => ⟨contractibility₃ d₁ d₂⟩
 
 /-- A type is a 1-groupoid iff π₂(A, a) is trivial for all a. -/
@@ -173,15 +173,15 @@ Higher truncation levels include lower ones.
 -/
 
 /-- Contractible types are propositions. -/
-def contr_implies_prop : IsContr A → IsProp A :=
+noncomputable def contr_implies_prop : IsContr A → IsProp A :=
   IsProp.ofContr
 
 /-- Sets are 1-groupoids. -/
-def set_implies_groupoid : IsSet A → IsGroupoid A :=
+noncomputable def set_implies_groupoid : IsSet A → IsGroupoid A :=
   IsGroupoid.ofSet
 
 /-- All types are 1-groupoids (the top of the hierarchy in our framework). -/
-def all_types_groupoid : IsGroupoid A :=
+noncomputable def all_types_groupoid : IsGroupoid A :=
   IsGroupoid.allTypes
 
 /-! ## Summary

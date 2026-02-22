@@ -73,7 +73,7 @@ variable {Branch : Type u}
 variable (C : CoulombBranchPathData Branch)
 
 /-- Composite path from wall-crossed monopoles to a vacuum-extended product. -/
-def wallToVacuumPath (x : Branch) :
+noncomputable def wallToVacuumPath (x : Branch) :
     Path (C.wallCrossing (C.monopole x))
       (C.quantumProduct (C.monopole (C.wallCrossing x)) C.vacuum) :=
   Path.trans
@@ -81,7 +81,7 @@ def wallToVacuumPath (x : Branch) :
     (Path.symm (C.unitRightPath (C.monopole (C.wallCrossing x))))
 
 /-- Step witness: right-unit normalization for monopole involution. -/
-def monopoleInvolution_step (x : Branch) :
+noncomputable def monopoleInvolution_step (x : Branch) :
     Path.Step
       (Path.trans (C.monopoleInvolutionPath x) (Path.refl x))
       (C.monopoleInvolutionPath x) :=
@@ -94,7 +94,7 @@ noncomputable def monopoleInvolution_rweq (x : Branch) :
   rweq_of_step (C.monopoleInvolution_step x)
 
 /-- Step witness: right-unit normalization for left-unit comparison. -/
-def unitLeft_step (x : Branch) :
+noncomputable def unitLeft_step (x : Branch) :
     Path.Step
       (Path.trans (C.unitLeftPath x) (Path.refl x))
       (C.unitLeftPath x) :=
@@ -107,7 +107,7 @@ noncomputable def unitLeft_rweq (x : Branch) :
   rweq_of_step (C.unitLeft_step x)
 
 /-- Step witness: right-unit normalization for right-unit comparison. -/
-def unitRight_step (x : Branch) :
+noncomputable def unitRight_step (x : Branch) :
     Path.Step
       (Path.trans (C.unitRightPath x) (Path.refl x))
       (C.unitRightPath x) :=
@@ -120,7 +120,7 @@ noncomputable def unitRight_rweq (x : Branch) :
   rweq_of_step (C.unitRight_step x)
 
 /-- Step witness: right-unit normalization for wall-monopole compatibility. -/
-def wallMonopole_step (x : Branch) :
+noncomputable def wallMonopole_step (x : Branch) :
     Path.Step
       (Path.trans (C.wallMonopolePath x) (Path.refl (C.monopole (C.wallCrossing x))))
       (C.wallMonopolePath x) :=
@@ -133,7 +133,7 @@ noncomputable def wallMonopole_rweq (x : Branch) :
   rweq_of_step (C.wallMonopole_step x)
 
 /-- Step witness: right-unit normalization for mapped Coulomb paths. -/
-def monopoleMap_step {a b : Branch} (p : Path a b) :
+noncomputable def monopoleMap_step {a b : Branch} (p : Path a b) :
     Path.Step
       (Path.trans (C.monopoleMap p) (Path.refl (C.monopole b)))
       (C.monopoleMap p) :=
@@ -146,7 +146,7 @@ noncomputable def monopoleMap_rweq {a b : Branch} (p : Path a b) :
   rweq_of_step (C.monopoleMap_step p)
 
 /-- Step witness: right-unit normalization for the wall-to-vacuum composite. -/
-def wallToVacuum_step (x : Branch) :
+noncomputable def wallToVacuum_step (x : Branch) :
     Path.Step
       (Path.trans
         (C.wallToVacuumPath x)
@@ -189,13 +189,13 @@ variable {C : CoulombBranchPathData Coulomb}
 variable (B : MirrorCoulombBridge M C)
 
 /-- Monopole transport of mirror mass/FI compatibility. -/
-def mirrorMonopoleComparison (h : Higgs) :
+noncomputable def mirrorMonopoleComparison (h : Higgs) :
     Path (C.monopole (M.mirrorToCoulomb (M.massShift h)))
       (M.fiShift (M.mirrorToCoulomb h)) :=
   Path.trans (C.monopoleMap (M.massFIPath h)) (B.fiMonopolePath h)
 
 /-- Step witness: right-unit normalization for mirror-monopole comparison. -/
-def mirrorMonopole_step (h : Higgs) :
+noncomputable def mirrorMonopole_step (h : Higgs) :
     Path.Step
       (Path.trans
         (B.mirrorMonopoleComparison h)
@@ -220,7 +220,7 @@ noncomputable def mirrorMonopole_cancel_rweq (h : Higgs) :
 end MirrorCoulombBridge
 
 /-- Trivial model instantiating Coulomb-branch computational-path data. -/
-def trivialCoulombBranchPathData : CoulombBranchPathData PUnit where
+noncomputable def trivialCoulombBranchPathData : CoulombBranchPathData PUnit where
   monopole := fun _ => PUnit.unit
   wallCrossing := fun _ => PUnit.unit
   quantumProduct := fun _ _ => PUnit.unit
@@ -237,7 +237,7 @@ def trivialCoulombBranchPathData : CoulombBranchPathData PUnit where
   monopoleMapStep := fun p => Path.Step.trans_refl_right p
 
 /-- Trivial bridge instance between mirror and Coulomb path packages. -/
-def trivialMirrorCoulombBridge :
+noncomputable def trivialMirrorCoulombBridge :
     MirrorCoulombBridge Mirror3DPaths.trivialMirror3DPathData
       trivialCoulombBranchPathData where
   fiMonopolePath := fun _ => Path.refl PUnit.unit

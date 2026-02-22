@@ -71,24 +71,24 @@ end Conv
 
 /-! ## Properties -/
 
-def Diamond (step : A → A → Prop) :=
+noncomputable def Diamond (step : A → A → Prop) :=
   ∀ {a b c : A}, step a b → step a c → ∃ d, step b d ∧ step c d
 
-def WCR (step : A → A → Prop) :=
+noncomputable def WCR (step : A → A → Prop) :=
   ∀ {a b c : A}, step a b → step a c → ∃ d, Star step b d ∧ Star step c d
 
-def CR (step : A → A → Prop) :=
+noncomputable def CR (step : A → A → Prop) :=
   ∀ {a b c : A}, Star step a b → Star step a c → ∃ d, Star step b d ∧ Star step c d
 
-def ChurchRosser (step : A → A → Prop) :=
+noncomputable def ChurchRosser (step : A → A → Prop) :=
   ∀ {a b : A}, Conv step a b → ∃ c, Star step a c ∧ Star step b c
 
-def SemiCR (step : A → A → Prop) :=
+noncomputable def SemiCR (step : A → A → Prop) :=
   ∀ {a b c : A}, step a b → Star step a c → ∃ d, Star step b d ∧ Star step c d
 
-def NF (step : A → A → Prop) (a : A) := ∀ b, ¬step a b
+noncomputable def NF (step : A → A → Prop) (a : A) := ∀ b, ¬step a b
 
-def SN (step : A → A → Prop) := WellFounded (fun b a => step a b)
+noncomputable def SN (step : A → A → Prop) := WellFounded (fun b a => step a b)
 
 /-! ## Strip Lemma -/
 
@@ -266,7 +266,7 @@ end ParStep
 
 /-! ## Subcommutative Diamond -/
 
-def SubDiamond (step : A → A → Prop) :=
+noncomputable def SubDiamond (step : A → A → Prop) :=
   ∀ {a b c : A}, step a b → step a c →
     ∃ d, (b = d ∨ step b d) ∧ (c = d ∨ step c d)
 
@@ -309,13 +309,13 @@ theorem nfOf_fixed {step : A → A → Prop} (hT : SN step) {a : A}
 
 /-! ## Commutation -/
 
-def Commute (s1 s2 : A → A → Prop) :=
+noncomputable def Commute (s1 s2 : A → A → Prop) :=
   ∀ {a b c : A}, Star s1 a b → Star s2 a c → ∃ d, Star s2 b d ∧ Star s1 c d
 
 /-! ## Connection to computational Path -/
 
 /-- Lift an equality to a single-step computational path. -/
-def toPath {a b : A} (h : a = b) : Path a b := Path.mk [Step.mk _ _ h] h
+noncomputable def toPath {a b : A} (h : a = b) : Path a b := Path.mk [Step.mk _ _ h] h
 
 /-- The underlying equality of composed paths is the composition of equalities. -/
 theorem toPath_toEq_trans {a b c : A} (h1 : a = b) (h2 : b = c) :
@@ -368,12 +368,12 @@ structure MarkedRedex (step : A → A → Prop) where
 structure Dev (step : A → A → Prop) where
   redexes : List (MarkedRedex step)
 
-def Dev.len {step : A → A → Prop} (d : Dev step) : Nat := d.redexes.length
+noncomputable def Dev.len {step : A → A → Prop} (d : Dev step) : Nat := d.redexes.length
 
 theorem dev_empty_len {step : A → A → Prop} :
     (Dev.mk (step := step) []).len = 0 := rfl
 
-def Dev.cat {step : A → A → Prop} (d1 d2 : Dev step) : Dev step :=
+noncomputable def Dev.cat {step : A → A → Prop} (d1 d2 : Dev step) : Dev step :=
   ⟨d1.redexes ++ d2.redexes⟩
 
 theorem dev_cat_len {step : A → A → Prop} (d1 d2 : Dev step) :
@@ -382,7 +382,7 @@ theorem dev_cat_len {step : A → A → Prop} (d1 d2 : Dev step) :
 
 /-! ## Cofinal -/
 
-def Cofinal (step : A → A → Prop) (f : Nat → A) :=
+noncomputable def Cofinal (step : A → A → Prop) (f : Nat → A) :=
   (∀ n, step (f n) (f (n + 1))) ∧
   ∀ b, Star step (f 0) b → ∃ m, Star step b (f m)
 

@@ -61,7 +61,7 @@ abbrev zero : TruncLevel := succ minus1
 abbrev one : TruncLevel := succ zero
 
 /-- Natural number to truncation level embedding. -/
-def ofNat : Nat → TruncLevel
+noncomputable def ofNat : Nat → TruncLevel
   | 0 => zero
   | n + 1 => succ (ofNat n)
 

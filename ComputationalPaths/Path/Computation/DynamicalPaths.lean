@@ -36,7 +36,7 @@ structure OrbitSegment (S : Type u) where
   step : Path state nextState
 
 /-- Compose orbit paths via trans. -/
-def orbitCompose {S : Type u} {a b c : S}
+noncomputable def orbitCompose {S : Type u} {a b c : S}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -236,7 +236,7 @@ structure RepellerData (S : Type u) where
   divergePath : Path repellerVal orbitVal
 
 /-- The reverse path from orbit back to repeller. -/
-def repellerReturn {S : Type u} (d : RepellerData S) : Path d.orbitVal d.repellerVal :=
+noncomputable def repellerReturn {S : Type u} (d : RepellerData S) : Path d.orbitVal d.repellerVal :=
   Path.symm d.divergePath
 
 /-- Repeller diverge-return cancels. -/
@@ -282,7 +282,7 @@ structure BifurcationData where
   bifurcPath : Path preVal postVal
 
 /-- Composing two bifurcation transitions. -/
-def bifurcationCascade (d1 : BifurcationData) (d2 : BifurcationData)
+noncomputable def bifurcationCascade (d1 : BifurcationData) (d2 : BifurcationData)
     (h : d1.postVal = d2.preVal) : Path d1.preVal d2.postVal :=
   Path.trans d1.bifurcPath (Path.trans (Path.mk [Step.mk _ _ h] h) d2.bifurcPath)
 
@@ -383,7 +383,7 @@ noncomputable def orbit_rweq_trans_symm {S : Type u} {a b : S} (p : Path a b) :
 /-! ## Iterated Maps and Orbit Chains -/
 
 /-- Iterated orbit: chain of n orbit segments. -/
-def iteratedOrbit {S : Type u} {a : S} (p : Path a a) : Nat → Path a a
+noncomputable def iteratedOrbit {S : Type u} {a : S} (p : Path a a) : Nat → Path a a
   | 0 => Path.refl a
   | n + 1 => Path.trans (iteratedOrbit p n) p
 

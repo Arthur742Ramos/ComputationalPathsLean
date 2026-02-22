@@ -27,11 +27,11 @@ universe u v
 
 /-- `UIP A` asserts that any two computational paths with the same endpoints
 are judgmentally equal, echoing the uniqueness of identity proofs principle. -/
-def UIP (A : Type u) : Prop :=
+noncomputable def UIP (A : Type u) : Prop :=
   ∀ {a b : A}, ∀ (p q : Path a b), p = q
 
 /-- A one-step reflexive loop built explicitly from a singleton `Step` list. -/
-@[simp] def stepLoop {A : Type u} (a : A) : Path a a :=
+@[simp] noncomputable def stepLoop {A : Type u} (a : A) : Path a a :=
   Path.mk (A := A) (a := a) (b := a) [Step.mk a a rfl] rfl
 
 /-- `refl` and the one-step loop are distinct because their step lists differ. -/
@@ -58,7 +58,7 @@ theorem not_uip_of_nonempty {A : Type u} (hA : Nonempty A) : ¬ UIP A := by
 /-! ## Streicher's K principle -/
 
 /-- Streicher's K principle for computational paths: every self-loop is `refl`. -/
-def PathK (A : Type u) : Prop :=
+noncomputable def PathK (A : Type u) : Prop :=
   ∀ {a : A}, ∀ (p : Path a a), p = Path.refl a
 
 /-- K fails for all nonempty types with computational paths. -/
@@ -236,7 +236,7 @@ theorem not_uip_image {A : Type u} {B : Type u} (f : A → B)
 /-! ## Step counting -/
 
 /-- The number of steps in a path is a natural invariant. -/
-@[simp] def stepCount {A : Type u} {a b : A} (p : Path a b) : Nat :=
+@[simp] noncomputable def stepCount {A : Type u} {a b : A} (p : Path a b) : Nat :=
   p.steps.length
 
 /-- `refl` has zero steps. -/
@@ -288,7 +288,7 @@ theorem path_ne_trans_ofEq_rfl {A : Type u} {a : A}
   simp [stepCount, Path.congrArg, List.length_map]
 
 /-- Helper: n-fold concatenation of `ofEq rfl` loops. -/
-def nfoldLoop {A : Type u} (a : A) : Nat → Path a a
+noncomputable def nfoldLoop {A : Type u} (a : A) : Nat → Path a a
   | 0 => Path.refl a
   | n + 1 => Path.trans (nfoldLoop a n) (stepLoop a)
 

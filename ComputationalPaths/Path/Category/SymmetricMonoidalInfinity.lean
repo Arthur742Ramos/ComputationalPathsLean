@@ -65,7 +65,7 @@ structure LaxMonoidalFunctor (C D : SymMonInfCat.{u,v}) where
   unitMap : D.Hom D.monoidal.unit (obj C.monoidal.unit)
 
 /-- Strong (symmetric) monoidal functor: the monoidal maps are equivalences. -/
-def IsStrongMonoidal (C D : SymMonInfCat.{u,v}) (F : LaxMonoidalFunctor C D) : Prop :=
+noncomputable def IsStrongMonoidal (C D : SymMonInfCat.{u,v}) (F : LaxMonoidalFunctor C D) : Prop :=
   True -- placeholder for monoidalMap being an equivalence
 
 /-! ## Day Convolution -/
@@ -78,12 +78,12 @@ noncomputable def Presheaf (C : InfCat.{u,v}) : InfCat.{max u (v+1), max u v} wh
   comp := fun f g x a => g x (f x a)
 
 /-- Day convolution product on presheaves. -/
-def dayConvolution (C : SymMonInfCat.{u,v})
+noncomputable def dayConvolution (C : SymMonInfCat.{u,v})
     (F G : C.Obj → Type v) : C.Obj → Type (max u v) :=
   fun z => Σ (x y : C.Obj), C.Hom (C.monoidal.tensor x y) z × F x × G y
 
 /-- The Day convolution unit: the representable presheaf of the monoidal unit. -/
-def dayUnit (C : SymMonInfCat.{u,v}) : C.Obj → Type v :=
+noncomputable def dayUnit (C : SymMonInfCat.{u,v}) : C.Obj → Type v :=
   fun x => C.Hom C.monoidal.unit x
 
 /-- Day convolution gives a monoidal structure on presheaves. -/
@@ -106,21 +106,21 @@ structure InfinityOperad where
     {c : Color} → MultiHom cs c → True -- placeholder for full composition
 
 /-- The commutative operad Comm. -/
-def commOperad : InfinityOperad.{u,v} where
+noncomputable def commOperad : InfinityOperad.{u,v} where
   Color := PUnit.{u+1}
   MultiHom := fun _ _ => PUnit
   identity := fun _ => PUnit.unit
   composition := fun _ => trivial
 
 /-- The E_n operad (little n-cubes). -/
-def enOperad (n : Nat) : InfinityOperad.{u,v} where
+noncomputable def enOperad (n : Nat) : InfinityOperad.{u,v} where
   Color := PUnit.{u+1}
   MultiHom := fun _ _ => PUnit -- placeholder
   identity := fun _ => PUnit.unit
   composition := fun _ => trivial
 
 /-- The associative operad E_1. -/
-def assocOperad : InfinityOperad.{u,v} := enOperad 1
+noncomputable def assocOperad : InfinityOperad.{u,v} := enOperad 1
 
 /-! ## Algebra Objects -/
 
@@ -131,13 +131,13 @@ structure AlgebraObject (O : InfinityOperad.{u,v}) (C : SymMonInfCat.{u,v}) wher
     O.MultiHom colors c → True -- placeholder for structure maps
 
 /-- A commutative algebra object (E_∞-algebra). -/
-def CommAlgebra (C : SymMonInfCat.{u,v}) := AlgebraObject commOperad C
+noncomputable def CommAlgebra (C : SymMonInfCat.{u,v}) := AlgebraObject commOperad C
 
 /-- An E_n-algebra object. -/
-def EnAlgebra (n : Nat) (C : SymMonInfCat.{u,v}) := AlgebraObject (enOperad n) C
+noncomputable def EnAlgebra (n : Nat) (C : SymMonInfCat.{u,v}) := AlgebraObject (enOperad n) C
 
 /-- An associative algebra object (E_1-algebra). -/
-def AssocAlgebra (C : SymMonInfCat.{u,v}) := EnAlgebra 1 C
+noncomputable def AssocAlgebra (C : SymMonInfCat.{u,v}) := EnAlgebra 1 C
 
 /-- Module over an algebra object. -/
 structure ModuleObject (C : SymMonInfCat.{u,v})
@@ -146,7 +146,7 @@ structure ModuleObject (C : SymMonInfCat.{u,v})
   action : C.Hom (C.monoidal.tensor A.carrier carrier) carrier
 
 /-- Free algebra functor. -/
-def freeAlgebra (O : InfinityOperad.{u,v}) (C : SymMonInfCat.{u,v})
+noncomputable def freeAlgebra (O : InfinityOperad.{u,v}) (C : SymMonInfCat.{u,v})
     (X : C.Obj) : AlgebraObject O C where
   carrier := X
   action := fun _ _ _ => trivial

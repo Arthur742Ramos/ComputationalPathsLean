@@ -61,16 +61,16 @@ inductive WPath : Wire → Wire → Type where
   | cons : WStep a b → WPath b c → WPath a c
 
 /-- Theorem 1 — single step as path. -/
-def WPath.single (s : WStep a b) : WPath a b :=
+noncomputable def WPath.single (s : WStep a b) : WPath a b :=
   .cons s (.nil _)
 
 /-- Theorem 2 — path composition (trans). -/
-def WPath.trans : WPath a b → WPath b c → WPath a c
+noncomputable def WPath.trans : WPath a b → WPath b c → WPath a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
 /-- Step inversion. -/
-def WStep.symm : WStep a b → WStep b a
+noncomputable def WStep.symm : WStep a b → WStep b a
   | .tensorAssoc     => .tensorAssocInv
   | .tensorAssocInv  => .tensorAssoc
   | .unitLeft        => .unitLeftInv
@@ -87,12 +87,12 @@ def WStep.symm : WStep a b → WStep b a
   | .named n a b     => .named (n ++ "⁻¹") b a
 
 /-- Theorem 3 — path inversion (symm). -/
-def WPath.symm : WPath a b → WPath b a
+noncomputable def WPath.symm : WPath a b → WPath b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.single s.symm)
 
 /-- Path length. -/
-def WPath.length : WPath a b → Nat
+noncomputable def WPath.length : WPath a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -104,23 +104,23 @@ def WPath.length : WPath a b → Nat
 structure Cell2 {a b : Wire} (p q : WPath a b) where
   witness : p = q
 
-def Cell2.id (p : WPath a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : WPath a b) : Cell2 p p := ⟨rfl⟩
 
 /-- Theorem 4 — vertical composition of 2-cells. -/
-def Cell2.vcomp {p q r : WPath a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
+noncomputable def Cell2.vcomp {p q r : WPath a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.witness.trans τ.witness⟩
 
 /-- Theorem 5 — vertical inverse of 2-cell. -/
-def Cell2.vinv {p q : WPath a b} (σ : Cell2 p q) : Cell2 q p :=
+noncomputable def Cell2.vinv {p q : WPath a b} (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.witness.symm⟩
 
 /-- Theorem 6 — left whiskering via congrArg. -/
-def whiskerL (r : WPath a b) {p q : WPath b c} (σ : Cell2 p q) :
+noncomputable def whiskerL (r : WPath a b) {p q : WPath b c} (σ : Cell2 p q) :
     Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (WPath.trans r) σ.witness⟩
 
 /-- Theorem 7 — right whiskering via congrArg. -/
-def whiskerR {p q : WPath a b} (σ : Cell2 p q) (r : WPath b c) :
+noncomputable def whiskerR {p q : WPath a b} (σ : Cell2 p q) (r : WPath b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.witness⟩
 
@@ -159,17 +159,17 @@ theorem wpath_single_length (s : WStep a b) :
 -- ============================================================
 
 /-- Lift a step to act on the left factor of a tensor. -/
-def WStep.tensorLeft (s : WStep a b) (c : Wire) :
+noncomputable def WStep.tensorLeft (s : WStep a b) (c : Wire) :
     WStep (Wire.tensor a c) (Wire.tensor b c) :=
   .tensorMap s (.identity c)
 
 /-- Lift a step to act on the right factor of a tensor. -/
-def WStep.tensorRight (c : Wire) (s : WStep a b) :
+noncomputable def WStep.tensorRight (c : Wire) (s : WStep a b) :
     WStep (Wire.tensor c a) (Wire.tensor c b) :=
   .tensorMap (.identity c) s
 
 /-- Theorem 12 — horizontal composition of paths (tensor). -/
-def WPath.hcomp : WPath a b → WPath c d →
+noncomputable def WPath.hcomp : WPath a b → WPath c d →
     WPath (Wire.tensor a c) (Wire.tensor b d)
   | .nil a, .nil c => .nil (Wire.tensor a c)
   | .nil a, .cons s q =>
@@ -213,15 +213,15 @@ theorem interchange_length
 -- ============================================================
 
 /-- Braiding step σ_{a,b} : a ⊗ b → b ⊗ a. -/
-def braidStep (a b : Wire) : WStep (Wire.tensor a b) (Wire.tensor b a) :=
+noncomputable def braidStep (a b : Wire) : WStep (Wire.tensor a b) (Wire.tensor b a) :=
   .braidSwap
 
 /-- Braiding path. -/
-def braidPath (a b : Wire) : WPath (Wire.tensor a b) (Wire.tensor b a) :=
+noncomputable def braidPath (a b : Wire) : WPath (Wire.tensor a b) (Wire.tensor b a) :=
   .single (braidStep a b)
 
 /-- Theorem 16 — double braiding is a 2-step path. -/
-def doubleBraid (a b : Wire) : WPath (Wire.tensor a b) (Wire.tensor a b) :=
+noncomputable def doubleBraid (a b : Wire) : WPath (Wire.tensor a b) (Wire.tensor a b) :=
   (braidPath a b).trans (braidPath b a)
 
 /-- Theorem 17 — double braiding has length 2. -/
@@ -245,13 +245,13 @@ theorem braid_naturality_length (a b c d : Wire)
 -- ============================================================
 
 /-- Left hexagon path (direct braid). -/
-def hexagonLeft (a b c : Wire) :
+noncomputable def hexagonLeft (a b c : Wire) :
     WPath (Wire.tensor a (Wire.tensor b c))
           (Wire.tensor (Wire.tensor b c) a) :=
   .single (.braidSwap (a := a) (b := Wire.tensor b c))
 
 /-- Right hexagon path (five steps). -/
-def hexagonRight (a b c : Wire) :
+noncomputable def hexagonRight (a b c : Wire) :
     WPath (Wire.tensor a (Wire.tensor b c))
           (Wire.tensor (Wire.tensor b c) a) :=
   .cons (.tensorAssocInv (a := a) (b := b) (c := c))
@@ -271,7 +271,7 @@ theorem hexagonLeft_length (a b c : Wire) :
   simp [hexagonLeft, WPath.single, WPath.length, WPath.nil]
 
 /-- Yang-Baxter LHS: 6 steps of braiding. -/
-def yangBaxterLHS (a b c : Wire) :
+noncomputable def yangBaxterLHS (a b c : Wire) :
     WPath (Wire.tensor a (Wire.tensor b c))
           (Wire.tensor c (Wire.tensor b a)) :=
   .cons (.tensorMap (.identity a) (.braidSwap (a := b) (b := c)))
@@ -287,7 +287,7 @@ theorem yangBaxter_lhs_length (a b c : Wire) :
   simp [yangBaxterLHS, WPath.length, WPath.nil]
 
 /-- Yang-Baxter RHS: different route, same length. -/
-def yangBaxterRHS (a b c : Wire) :
+noncomputable def yangBaxterRHS (a b c : Wire) :
     WPath (Wire.tensor a (Wire.tensor b c))
           (Wire.tensor c (Wire.tensor b a)) :=
   .cons (.named "σ₂₃_rhs"
@@ -309,16 +309,16 @@ theorem yangBaxter_length_eq (a b c : Wire) :
 -- ============================================================
 
 /-- Unit η_a : I → A ⊗ A*. -/
-def etaPath (a : Wire) : WPath Wire.unit (Wire.tensor a (Wire.dual a)) :=
+noncomputable def etaPath (a : Wire) : WPath Wire.unit (Wire.tensor a (Wire.dual a)) :=
   .single (.snakeEta a)
 
 /-- Counit ε_a : A* ⊗ A → I. -/
-def epsPath (a : Wire) : WPath (Wire.tensor (Wire.dual a) a) Wire.unit :=
+noncomputable def epsPath (a : Wire) : WPath (Wire.tensor (Wire.dual a) a) Wire.unit :=
   .single (.snakeEps a)
 
 /-- Theorem 23 — right snake identity path (zigzag), 5 steps.
     A →[unitR⁻¹] A⊗I →[id⊗η] A⊗(A⊗A*) →[assoc] (A⊗A)⊗A* →[ε'⊗id] I⊗A* →[unitL] A* -/
-def snakeRight (a : Wire) : WPath a a :=
+noncomputable def snakeRight (a : Wire) : WPath a a :=
   let w1 := Wire.tensor a Wire.unit
   let w2 := Wire.tensor a (Wire.tensor a (Wire.dual a))
   let w3 := Wire.tensor (Wire.tensor a a) (Wire.dual a)
@@ -335,7 +335,7 @@ theorem snakeRight_length (a : Wire) :
   simp [snakeRight, WPath.length, WPath.nil]
 
 /-- Theorem 25 — left snake identity path (zigzag), 5 steps. -/
-def snakeLeft (a : Wire) : WPath (Wire.dual a) (Wire.dual a) :=
+noncomputable def snakeLeft (a : Wire) : WPath (Wire.dual a) (Wire.dual a) :=
   let da := Wire.dual a
   let w1 := Wire.tensor Wire.unit da
   let w2 := Wire.tensor (Wire.tensor a da) da
@@ -370,7 +370,7 @@ theorem snakeLeft_symm_length (a : Wire) :
 -- ============================================================
 
 /-- Left trace: close off with η and ε (using named steps for type flexibility). -/
-def leftTrace (a : Wire) (f : WPath a a) : WPath Wire.unit Wire.unit :=
+noncomputable def leftTrace (a : Wire) (f : WPath a a) : WPath Wire.unit Wire.unit :=
   let w1 := Wire.tensor a (Wire.dual a)
   let w2 := Wire.tensor (Wire.dual a) a
   WPath.cons (WStep.snakeEta a)
@@ -378,7 +378,7 @@ def leftTrace (a : Wire) (f : WPath a a) : WPath Wire.unit Wire.unit :=
       (WPath.cons (WStep.snakeEps a) (WPath.nil _)))
 
 /-- Theorem 29 — left trace of identity. -/
-def leftTraceId (a : Wire) : WPath Wire.unit Wire.unit :=
+noncomputable def leftTraceId (a : Wire) : WPath Wire.unit Wire.unit :=
   leftTrace a (WPath.nil a)
 
 /-- Theorem 30 — trace of identity has length 3. -/
@@ -387,7 +387,7 @@ theorem leftTraceId_length (a : Wire) :
   simp [leftTraceId, leftTrace, WPath.length, WPath.nil]
 
 /-- Right trace (close opposite corners). -/
-def rightTrace (a : Wire) (f : WPath a a) : WPath Wire.unit Wire.unit :=
+noncomputable def rightTrace (a : Wire) (f : WPath a a) : WPath Wire.unit Wire.unit :=
   let w1 := Wire.tensor (Wire.dual a) a
   let w2 := Wire.tensor a (Wire.dual a)
   WPath.cons (WStep.named "η_dual" Wire.unit w1)
@@ -404,7 +404,7 @@ theorem spherical_length (a : Wire) (f : WPath a a) :
 -- ============================================================
 
 /-- Pentagon path: two-step associator. -/
-def pentagonPath (a b c d : Wire) :
+noncomputable def pentagonPath (a b c d : Wire) :
     WPath (Wire.tensor (Wire.tensor (Wire.tensor a b) c) d)
           (Wire.tensor a (Wire.tensor b (Wire.tensor c d))) :=
   .cons (.tensorAssoc (a := Wire.tensor a b) (b := c) (c := d))
@@ -417,7 +417,7 @@ theorem pentagonPath_length (a b c d : Wire) :
   simp [pentagonPath, WPath.length, WPath.nil]
 
 /-- Alternate pentagon route: 3-step. -/
-def pentagonAlt (a b c d : Wire) :
+noncomputable def pentagonAlt (a b c d : Wire) :
     WPath (Wire.tensor (Wire.tensor (Wire.tensor a b) c) d)
           (Wire.tensor a (Wire.tensor b (Wire.tensor c d))) :=
   .cons (.tensorMap (.tensorAssoc (a := a) (b := b) (c := c)) (.identity d))
@@ -436,13 +436,13 @@ theorem coherence_pentagon_lengths (a b c d : Wire) :
   simp [pentagonPath_length, pentagonAlt_length]
 
 /-- Triangle path: single-step. -/
-def trianglePath (a b : Wire) :
+noncomputable def trianglePath (a b : Wire) :
     WPath (Wire.tensor (Wire.tensor a Wire.unit) b)
           (Wire.tensor a b) :=
   .cons (.tensorMap (.unitRight (a := a)) (.identity b)) (.nil _)
 
 /-- Theorem 35 — triangle alt route (2-step). -/
-def triangleAlt (a b : Wire) :
+noncomputable def triangleAlt (a b : Wire) :
     WPath (Wire.tensor (Wire.tensor a Wire.unit) b)
           (Wire.tensor a b) :=
   .cons (.tensorAssoc (a := a) (b := Wire.unit) (c := b))
@@ -462,23 +462,23 @@ structure FrobObj where
   carrier : Wire
 
 /-- Frobenius multiplication μ : A ⊗ A → A. -/
-def frobMul (F : FrobObj) : WPath (Wire.tensor F.carrier F.carrier) F.carrier :=
+noncomputable def frobMul (F : FrobObj) : WPath (Wire.tensor F.carrier F.carrier) F.carrier :=
   .single (.named "μ" _ _)
 
 /-- Frobenius comultiplication δ : A → A ⊗ A. -/
-def frobComul (F : FrobObj) : WPath F.carrier (Wire.tensor F.carrier F.carrier) :=
+noncomputable def frobComul (F : FrobObj) : WPath F.carrier (Wire.tensor F.carrier F.carrier) :=
   .single (.named "δ" _ _)
 
 /-- Frobenius unit η : I → A. -/
-def frobUnit (F : FrobObj) : WPath Wire.unit F.carrier :=
+noncomputable def frobUnit (F : FrobObj) : WPath Wire.unit F.carrier :=
   .single (.named "η_frob" _ _)
 
 /-- Frobenius counit ε : A → I. -/
-def frobCounit (F : FrobObj) : WPath F.carrier Wire.unit :=
+noncomputable def frobCounit (F : FrobObj) : WPath F.carrier Wire.unit :=
   .single (.named "ε_frob" _ _)
 
 /-- Theorem 37 — Frobenius condition LHS: (μ ⊗ id) ∘ (id ⊗ δ), 3 steps. -/
-def frobCondLHS (F : FrobObj) :
+noncomputable def frobCondLHS (F : FrobObj) :
     WPath (Wire.tensor F.carrier F.carrier)
           (Wire.tensor F.carrier F.carrier) :=
   let a := F.carrier
@@ -490,7 +490,7 @@ def frobCondLHS (F : FrobObj) :
       (WPath.cons (WStep.named "μ⊗id" w_aa_a w_aa) (WPath.nil _)))
 
 /-- Theorem 38 — Frobenius condition RHS: (id ⊗ μ) ∘ (δ ⊗ id), 3 steps. -/
-def frobCondRHS (F : FrobObj) :
+noncomputable def frobCondRHS (F : FrobObj) :
     WPath (Wire.tensor F.carrier F.carrier)
           (Wire.tensor F.carrier F.carrier) :=
   let a := F.carrier
@@ -508,7 +508,7 @@ theorem frob_cond_lengths (F : FrobObj) :
         WPath.length, WPath.nil]
 
 /-- Theorem 40 — associativity of μ as 2-step path. -/
-def frobAssoc (F : FrobObj) :
+noncomputable def frobAssoc (F : FrobObj) :
     WPath (Wire.tensor (Wire.tensor F.carrier F.carrier) F.carrier)
           F.carrier :=
   let a := F.carrier
@@ -516,7 +516,7 @@ def frobAssoc (F : FrobObj) :
     (WPath.cons (WStep.named "μ" (Wire.tensor a a) a) (WPath.nil _))
 
 /-- Theorem 41 — coassociativity of δ as 2-step. -/
-def frobCoassoc (F : FrobObj) :
+noncomputable def frobCoassoc (F : FrobObj) :
     WPath F.carrier
           (Wire.tensor F.carrier (Wire.tensor F.carrier F.carrier)) :=
   let a := F.carrier
@@ -559,7 +559,7 @@ theorem double_whisker {p q : WPath b c} (l : WPath a b) (r : WPath c d) (σ : C
 -- ============================================================
 
 /-- Reidemeister II: braid ∘ braid = roundtrip. -/
-def reidemeisterII (a b : Wire) :
+noncomputable def reidemeisterII (a b : Wire) :
     WPath (Wire.tensor a b) (Wire.tensor a b) :=
   .cons (.braidSwap (a := a) (b := b))
     (.cons (.braidSwap (a := b) (b := a)) (.nil _))
@@ -570,7 +570,7 @@ theorem reidemeisterII_length (a b : Wire) :
   simp [reidemeisterII, WPath.length, WPath.nil]
 
 /-- Reidemeister III via Yang-Baxter. -/
-def reidemeisterIII (a b c : Wire) :
+noncomputable def reidemeisterIII (a b c : Wire) :
     WPath (Wire.tensor a (Wire.tensor b c))
           (Wire.tensor c (Wire.tensor b a)) :=
   yangBaxterLHS a b c
@@ -598,7 +598,7 @@ structure Adjunction where
   eps : WPath (Wire.tensor R L) Wire.unit
 
 /-- Theorem 50 — left triangle identity path, 5 steps. -/
-def adjTriangleL (adj : Adjunction) : WPath adj.L adj.L :=
+noncomputable def adjTriangleL (adj : Adjunction) : WPath adj.L adj.L :=
   let l := adj.L; let r := adj.R
   let w1 := Wire.tensor l Wire.unit
   let w2 := Wire.tensor l (Wire.tensor l r)
@@ -611,7 +611,7 @@ def adjTriangleL (adj : Adjunction) : WPath adj.L adj.L :=
           (.cons (WStep.unitLeft (a := l)) (.nil _)))))
 
 /-- Theorem 51 — right triangle identity path, 5 steps. -/
-def adjTriangleR (adj : Adjunction) : WPath adj.R adj.R :=
+noncomputable def adjTriangleR (adj : Adjunction) : WPath adj.R adj.R :=
   let l := adj.L; let r := adj.R
   let w1 := Wire.tensor Wire.unit r
   let w2 := Wire.tensor (Wire.tensor l r) r
@@ -629,7 +629,7 @@ theorem adj_triangles_length (adj : Adjunction) :
   constructor <;> simp [adjTriangleL, adjTriangleR, WPath.length, WPath.nil]
 
 /-- Theorem 53 — mate correspondence, 5 steps. -/
-def mate (adjL adjR : Adjunction) (f : WPath adjL.L adjR.L) :
+noncomputable def mate (adjL adjR : Adjunction) (f : WPath adjL.L adjR.L) :
     WPath adjR.R adjL.R :=
   .cons (.named "η_R" adjR.R (Wire.tensor adjR.R adjR.L))
     (.cons (.named "id_R⊗f" (Wire.tensor adjR.R adjR.L)
@@ -651,7 +651,7 @@ theorem mate_length (adjL adjR : Adjunction) (f : WPath adjL.L adjR.L) :
 -- ============================================================
 
 /-- Theorem 55 — interchange as 2-cell via congrArg. -/
-def interchange2Cell
+noncomputable def interchange2Cell
     {p₁ q₁ : WPath a b} {p₂ q₂ : WPath c d}
     (σ : Cell2 p₁ q₁) (τ : Cell2 p₂ q₂) :
     Cell2 (p₁.hcomp p₂) (q₁.hcomp q₂) :=

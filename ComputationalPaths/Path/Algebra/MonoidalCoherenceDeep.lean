@@ -26,7 +26,7 @@ deriving DecidableEq, Repr
 infixl:70 " ⊗ₘ " => MObj.tensor
 
 /-- Flatten an object to a list of generators (invariant of coherence). -/
-def MObj.flatten : MObj → List Nat
+noncomputable def MObj.flatten : MObj → List Nat
   | .gen n => [n]
   | .unit => []
   | .tensor a b => a.flatten ++ b.flatten
@@ -69,7 +69,7 @@ theorem MonPath.trans {a b c : MObj}
   | step s _ ih => exact MonPath.step s (ih q)
 
 /-- One-step symmetry. -/
-def MonStep.symm : MonStep a b → MonStep b a
+noncomputable def MonStep.symm : MonStep a b → MonStep b a
   | .assocR a b c => .assocL a b c
   | .assocL a b c => .assocR a b c
   | .unitL a => .unitL' a
@@ -123,19 +123,19 @@ theorem MonPath.append_step {a b c : MObj}
 -- ============================================================
 
 /-- Theorem 8: Associator path (A⊗B)⊗C → A⊗(B⊗C). -/
-def assocPath (a b c : MObj) : MonPath ((a ⊗ₘ b) ⊗ₘ c) (a ⊗ₘ (b ⊗ₘ c)) :=
+noncomputable def assocPath (a b c : MObj) : MonPath ((a ⊗ₘ b) ⊗ₘ c) (a ⊗ₘ (b ⊗ₘ c)) :=
   MonPath.single (MonStep.assocR a b c)
 
 /-- Theorem 9: Inverse associator. -/
-def assocPathInv (a b c : MObj) : MonPath (a ⊗ₘ (b ⊗ₘ c)) ((a ⊗ₘ b) ⊗ₘ c) :=
+noncomputable def assocPathInv (a b c : MObj) : MonPath (a ⊗ₘ (b ⊗ₘ c)) ((a ⊗ₘ b) ⊗ₘ c) :=
   MonPath.single (MonStep.assocL a b c)
 
 /-- Theorem 10: Left unitor path. -/
-def unitLPath (a : MObj) : MonPath (.unit ⊗ₘ a) a :=
+noncomputable def unitLPath (a : MObj) : MonPath (.unit ⊗ₘ a) a :=
   MonPath.single (MonStep.unitL a)
 
 /-- Theorem 11: Right unitor path. -/
-def unitRPath (a : MObj) : MonPath (a ⊗ₘ .unit) a :=
+noncomputable def unitRPath (a : MObj) : MonPath (a ⊗ₘ .unit) a :=
   MonPath.single (MonStep.unitR a)
 
 /-- Theorem 12: Associator round-trip. -/
@@ -148,14 +148,14 @@ theorem assoc_roundtrip (a b c : MObj) :
 -- ============================================================
 
 /-- Theorem 13: Pentagon path 1: ((A⊗B)⊗C)⊗D → (A⊗B)⊗(C⊗D) → A⊗(B⊗(C⊗D)). -/
-def pentagonPath1 (a b c d : MObj) :
+noncomputable def pentagonPath1 (a b c d : MObj) :
     MonPath (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d) (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d))) :=
   MonPath.trans
     (MonPath.single (MonStep.assocR (a ⊗ₘ b) c d))
     (MonPath.single (MonStep.assocR a b (c ⊗ₘ d)))
 
 /-- Theorem 14: Pentagon path 2: through α_{A,B,C}⊗D then α_{A,B⊗C,D} then A⊗α_{B,C,D}. -/
-def pentagonPath2 (a b c d : MObj) :
+noncomputable def pentagonPath2 (a b c d : MObj) :
     MonPath (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d) (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d))) :=
   MonPath.trans
     (MonPath.single (MonStep.tensorL d (MonStep.assocR a b c)))
@@ -174,12 +174,12 @@ theorem pentagon_endpoints (a b c d : MObj) :
 -- ============================================================
 
 /-- Theorem 16: Triangle path 1: (A⊗I)⊗B → A⊗B via ρ_A ⊗ id_B. -/
-def trianglePath1 (a b : MObj) :
+noncomputable def trianglePath1 (a b : MObj) :
     MonPath ((a ⊗ₘ .unit) ⊗ₘ b) (a ⊗ₘ b) :=
   MonPath.single (MonStep.tensorL b (MonStep.unitR a))
 
 /-- Theorem 17: Triangle path 2: (A⊗I)⊗B → A⊗(I⊗B) → A⊗B. -/
-def trianglePath2 (a b : MObj) :
+noncomputable def trianglePath2 (a b : MObj) :
     MonPath ((a ⊗ₘ .unit) ⊗ₘ b) (a ⊗ₘ b) :=
   MonPath.trans
     (MonPath.single (MonStep.assocR a .unit b))
@@ -287,7 +287,7 @@ theorem BrMonPath.trans {a b c : MObj}
   | step s _ ih => exact BrMonPath.step s (ih q)
 
 /-- Theorem 30: Braided step symmetry. -/
-def BraidMonStep.symm : BraidMonStep a b → BraidMonStep b a
+noncomputable def BraidMonStep.symm : BraidMonStep a b → BraidMonStep b a
   | .mon s => .mon s.symm
   | .braid a b => .braidInv a b
   | .braidInv a b => .braid a b
@@ -302,7 +302,7 @@ theorem BrMonPath.symm {a b : MObj} (p : BrMonPath a b) : BrMonPath b a := by
     exact BrMonPath.trans ih (BrMonPath.step s.symm (BrMonPath.refl _))
 
 /-- Theorem 32: Braiding path σ_{A,B}. -/
-def braidPath (a b : MObj) : BrMonPath (a ⊗ₘ b) (b ⊗ₘ a) :=
+noncomputable def braidPath (a b : MObj) : BrMonPath (a ⊗ₘ b) (b ⊗ₘ a) :=
   BrMonPath.step (BraidMonStep.braid a b) (BrMonPath.refl _)
 
 /-- Theorem 33: congrArg for braided paths on the left. -/
@@ -325,7 +325,7 @@ theorem BrMonPath.congrArg_tensorR (a : MObj) {b b' : MObj}
 
 /-- Theorem 35: Hexagon path 1:
     (A⊗B)⊗C →α A⊗(B⊗C) →σ (B⊗C)⊗A →α B⊗(C⊗A). -/
-def hexagonPath1 (a b c : MObj) :
+noncomputable def hexagonPath1 (a b c : MObj) :
     BrMonPath ((a ⊗ₘ b) ⊗ₘ c) (b ⊗ₘ (c ⊗ₘ a)) :=
   BrMonPath.trans
     (BrMonPath.step (BraidMonStep.mon (MonStep.assocR a b c)) (BrMonPath.refl _))
@@ -335,7 +335,7 @@ def hexagonPath1 (a b c : MObj) :
 
 /-- Theorem 36: Hexagon path 2:
     (A⊗B)⊗C → (σ⊗C)(B⊗A)⊗C →α B⊗(A⊗C) → B⊗σ B⊗(C⊗A). -/
-def hexagonPath2 (a b c : MObj) :
+noncomputable def hexagonPath2 (a b c : MObj) :
     BrMonPath ((a ⊗ₘ b) ⊗ₘ c) (b ⊗ₘ (c ⊗ₘ a)) :=
   BrMonPath.trans
     (BrMonPath.congrArg_tensorL c
@@ -364,7 +364,7 @@ theorem braid_involution (a b : MObj) :
 -- ============================================================
 
 /-- A monoidal functor on generators. -/
-def MObj.mapGen (f : Nat → Nat) : MObj → MObj
+noncomputable def MObj.mapGen (f : Nat → Nat) : MObj → MObj
   | .gen n => .gen (f n)
   | .unit => .unit
   | .tensor a b => .tensor (a.mapGen f) (b.mapGen f)
@@ -401,12 +401,12 @@ theorem mapGen_tensor (f : Nat → Nat) (a b : MObj) :
 -- ============================================================
 
 /-- Theorem 43: Four-fold reassociation. -/
-def assoc4Path (a b c d : MObj) :
+noncomputable def assoc4Path (a b c d : MObj) :
     MonPath (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d) (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d))) :=
   pentagonPath1 a b c d
 
 /-- Theorem 44: Five-fold reassociation. -/
-def assoc5Path (a b c d e : MObj) :
+noncomputable def assoc5Path (a b c d e : MObj) :
     MonPath ((((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d) ⊗ₘ e) (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ (d ⊗ₘ e)))) :=
   MonPath.trans
     (MonPath.single (MonStep.assocR ((a ⊗ₘ b) ⊗ₘ c) d e))

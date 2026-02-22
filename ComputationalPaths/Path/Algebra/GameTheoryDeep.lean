@@ -58,18 +58,18 @@ inductive Path : GameState n → GameState n → Type where
 -- ============================================================
 
 /-- Theorem 1 — refl. -/
-def Path.refl (gs : GameState n) : Path gs gs := Path.nil gs
+noncomputable def Path.refl (gs : GameState n) : Path gs gs := Path.nil gs
 
 /-- Theorem 2 — single. -/
-def Path.single (s : Step a b) : Path a b :=
+noncomputable def Path.single (s : Step a b) : Path a b :=
   Path.cons s (Path.nil _)
 
 /-- Theorem 3 — trans. -/
-def Path.trans : Path a b → Path b c → Path a c
+noncomputable def Path.trans : Path a b → Path b c → Path a c
   | Path.nil _, q => q
   | Path.cons s p, q => Path.cons s (Path.trans p q)
 
-def Step.inv : Step a b → Step b a
+noncomputable def Step.inv : Step a b → Step b a
   | Step.deviate i s' gs => Step.rewrite _ _
   | Step.scoreStep gs f  => Step.rewrite _ _
   | Step.advance gs      => Step.rewrite _ _
@@ -77,11 +77,11 @@ def Step.inv : Step a b → Step b a
   | Step.equiv a b       => Step.equiv b a
 
 /-- Theorem 4 — symm. -/
-def Path.symm : Path a b → Path b a
+noncomputable def Path.symm : Path a b → Path b a
   | Path.nil gs   => Path.nil gs
   | Path.cons s p => Path.trans (Path.symm p) (Path.single (Step.inv s))
 
-def Path.length : Path a b → Nat
+noncomputable def Path.length : Path a b → Nat
   | Path.nil _    => 0
   | Path.cons _ p => 1 + Path.length p
 
@@ -122,13 +122,13 @@ theorem length_refl (gs : GameState n) : (Path.refl gs).length = 0 := rfl
 -- §4  Best Response and Nash Equilibrium
 -- ============================================================
 
-def IsBestResponse (g : NormalFormGame n) (p : Profile n) (i : Fin n) : Prop :=
+noncomputable def IsBestResponse (g : NormalFormGame n) (p : Profile n) (i : Fin n) : Prop :=
   ∀ s' : Strategy, g.payoff p i ≥ g.payoff ⟨fun j => if j == i then s' else p.choices j⟩ i
 
-def IsNashEquilibrium (g : NormalFormGame n) (p : Profile n) : Prop :=
+noncomputable def IsNashEquilibrium (g : NormalFormGame n) (p : Profile n) : Prop :=
   ∀ i : Fin n, IsBestResponse g p i
 
-def trivialGame : NormalFormGame 1 where
+noncomputable def trivialGame : NormalFormGame 1 where
   strategies := fun _ => [0]
   payoff     := fun _ _ => 0
 
@@ -147,12 +147,12 @@ theorem nash_eq_profile_eq (g : NormalFormGame n) (p q : Profile n)
 -- §5  Dominance
 -- ============================================================
 
-def StrictlyDominates (g : NormalFormGame n) (i : Fin n) (s s' : Strategy) : Prop :=
+noncomputable def StrictlyDominates (g : NormalFormGame n) (i : Fin n) (s s' : Strategy) : Prop :=
   ∀ p : Profile n, p.choices i = s' →
     g.payoff ⟨fun j => if j == i then s else p.choices j⟩ i >
     g.payoff p i
 
-def WeaklyDominates (g : NormalFormGame n) (i : Fin n) (s s' : Strategy) : Prop :=
+noncomputable def WeaklyDominates (g : NormalFormGame n) (i : Fin n) (s s' : Strategy) : Prop :=
   (∀ p : Profile n, p.choices i = s' →
     g.payoff ⟨fun j => if j == i then s else p.choices j⟩ i ≥
     g.payoff p i) ∧
@@ -184,12 +184,12 @@ theorem strict_implies_weak_ge (g : NormalFormGame n) (i : Fin n) (s s' : Strate
 -- ============================================================
 
 /-- Theorem 15 — single deviation path. -/
-def deviationPath (gs : GameState n) (i : Fin n) (s' : Strategy) :
+noncomputable def deviationPath (gs : GameState n) (i : Fin n) (s' : Strategy) :
     Path gs ⟨fun j => if j == i then s' else gs.choices j, gs.scores, gs.round⟩ :=
   Path.single (Step.deviate i s' gs)
 
 /-- Theorem 16 — double deviation via trans. -/
-def doubleDeviation (gs : GameState n) (i j : Fin n) (si sj : Strategy) :
+noncomputable def doubleDeviation (gs : GameState n) (i j : Fin n) (si sj : Strategy) :
     Path gs ⟨fun k => if k == j then sj
                        else if k == i then si
                        else gs.choices k, gs.scores, gs.round⟩ :=
@@ -199,7 +199,7 @@ def doubleDeviation (gs : GameState n) (i j : Fin n) (si sj : Strategy) :
     (Path.single (Step.rewrite mid _))
 
 /-- Theorem 17 — advance path. -/
-def advancePath (gs : GameState n) :
+noncomputable def advancePath (gs : GameState n) :
     Path gs ⟨gs.choices, gs.scores, gs.round + 1⟩ :=
   Path.single (Step.advance gs)
 
@@ -220,7 +220,7 @@ inductive GameTree where
   | decision : (player : Player) → (branches : List GameTree) → GameTree
   | chance   : (probs : List Nat) → (branches : List GameTree) → GameTree
 
-def GameTree.isLeaf : GameTree → Bool
+noncomputable def GameTree.isLeaf : GameTree → Bool
   | .leaf _ => true
   | _ => false
 
@@ -244,18 +244,18 @@ inductive TreePath : GameTree → GameTree → Type where
   | cons : TreeStep a b → TreePath b c → TreePath a c
 
 /-- Theorem 22 — tree path trans. -/
-def TreePath.trans : TreePath a b → TreePath b c → TreePath a c
+noncomputable def TreePath.trans : TreePath a b → TreePath b c → TreePath a c
   | TreePath.nil _, q => q
   | TreePath.cons s p, q => TreePath.cons s (TreePath.trans p q)
 
-def TreeStep.inv : TreeStep a b → TreeStep b a
+noncomputable def TreeStep.inv : TreeStep a b → TreeStep b a
   | TreeStep.chooseBranch _ _ _ _   => TreeStep.rewrite _ _
   | TreeStep.chanceResolve _ _ _ _  => TreeStep.rewrite _ _
   | TreeStep.prune a b   => TreeStep.prune b a
   | TreeStep.rewrite a b => TreeStep.rewrite b a
 
 /-- Theorem 23 — tree path symm. -/
-def TreePath.symm : TreePath a b → TreePath b a
+noncomputable def TreePath.symm : TreePath a b → TreePath b a
   | TreePath.nil t    => TreePath.nil t
   | TreePath.cons s p => TreePath.trans (TreePath.symm p)
       (TreePath.cons (TreeStep.inv s) (TreePath.nil _))
@@ -267,7 +267,7 @@ theorem tree_trans_assoc (p : TreePath a b) (q : TreePath b c) (r : TreePath c d
   | nil _ => rfl
   | cons s p ih => simp [TreePath.trans, ih]
 
-def TreePath.length : TreePath a b → Nat
+noncomputable def TreePath.length : TreePath a b → Nat
   | TreePath.nil _    => 0
   | TreePath.cons _ p => 1 + TreePath.length p
 
@@ -282,7 +282,7 @@ theorem tree_length_trans (p : TreePath a b) (q : TreePath b c) :
 -- §8  Backward Induction
 -- ============================================================
 
-def GameTree.leafPayoffs : GameTree → List Payoff
+noncomputable def GameTree.leafPayoffs : GameTree → List Payoff
   | .leaf ps => ps
   | _ => []
 
@@ -295,7 +295,7 @@ theorem leafPayoffs_decision (p : Player) (bs : List GameTree) :
     (GameTree.decision p bs).leafPayoffs = [] := rfl
 
 /-- Number of branches at a node. -/
-def GameTree.branchCount : GameTree → Nat
+noncomputable def GameTree.branchCount : GameTree → Nat
   | .leaf _ => 0
   | .decision _ bs => bs.length
   | .chance _ bs   => bs.length
@@ -343,7 +343,7 @@ structure ZeroSumGame where
   matrix : Fin size → Fin size → Int
 
 /-- Row minimum. -/
-def ZeroSumGame.rowMinAt (g : ZeroSumGame) (i j : Fin g.size) : Int :=
+noncomputable def ZeroSumGame.rowMinAt (g : ZeroSumGame) (i j : Fin g.size) : Int :=
   min (g.matrix i j) (g.matrix i j)
 
 /-- Theorem 32 — rowMinAt is the entry itself. -/
@@ -352,7 +352,7 @@ theorem rowMinAt_self (g : ZeroSumGame) (i j : Fin g.size) :
   simp [ZeroSumGame.rowMinAt]
 
 /-- A 1×1 zero-sum game. -/
-def singletonZS (v : Int) : ZeroSumGame where
+noncomputable def singletonZS (v : Int) : ZeroSumGame where
   size := 1
   matrix := fun _ _ => v
 
@@ -367,7 +367,7 @@ theorem singleton_value (v : Int) :
 inductive PDChoice where | C | D
   deriving DecidableEq, Repr
 
-def pdPayoff : PDChoice → PDChoice → Payoff
+noncomputable def pdPayoff : PDChoice → PDChoice → Payoff
   | .C, .C => -1
   | .C, .D => -3
   | .D, .C =>  0
@@ -400,13 +400,13 @@ structure Mechanism where
   outcomeSpace : Type
   rule : (Fin nAgents → Nat) → outcomeSpace
 
-def IncentiveCompatible (m : Mechanism) (val : m.outcomeSpace → Fin m.nAgents → Payoff)
+noncomputable def IncentiveCompatible (m : Mechanism) (val : m.outcomeSpace → Fin m.nAgents → Payoff)
     (trueReports : Fin m.nAgents → Nat) : Prop :=
   ∀ i : Fin m.nAgents, ∀ lie : Nat,
     val (m.rule trueReports) i ≥
     val (m.rule (fun j => if j == i then lie else trueReports j)) i
 
-def trivialMech (o : Type) (v : o) : Mechanism where
+noncomputable def trivialMech (o : Type) (v : o) : Mechanism where
   nAgents := 1
   outcomeSpace := o
   rule := fun _ => v
@@ -423,7 +423,7 @@ theorem trivial_ic (o : Type) (v : o) (val : o → Fin 1 → Payoff)
 -- ============================================================
 
 /-- Theorem 41 — transport via choice equality. -/
-def transportChoices (gs : GameState n) (f g : Fin n → Strategy) (heq : f = g) :
+noncomputable def transportChoices (gs : GameState n) (f g : Fin n → Strategy) (heq : f = g) :
     Path ⟨f, gs.scores, gs.round⟩ ⟨g, gs.scores, gs.round⟩ :=
   heq ▸ Path.nil _
 
@@ -432,12 +432,12 @@ theorem coherence_nil (gs : GameState n) :
     ((Path.nil gs).trans (Path.nil gs)).length = 0 := rfl
 
 /-- Theorem 43 — transport via score equality. -/
-def transportScores (gs : GameState n) (f g : Fin n → Payoff) (heq : f = g) :
+noncomputable def transportScores (gs : GameState n) (f g : Fin n → Payoff) (heq : f = g) :
     Path ⟨gs.choices, f, gs.round⟩ ⟨gs.choices, g, gs.round⟩ :=
   heq ▸ Path.nil _
 
 /-- Theorem 44 — transport via round equality. -/
-def transportRound (gs : GameState n) (r s : Nat) (heq : r = s) :
+noncomputable def transportRound (gs : GameState n) (r s : Nat) (heq : r = s) :
     Path ⟨gs.choices, gs.scores, r⟩ ⟨gs.choices, gs.scores, s⟩ :=
   heq ▸ Path.nil _
 
@@ -461,12 +461,12 @@ inductive RepPath : RepeatedState n → RepeatedState n → Type where
   | cons : RepStep a b → RepPath b c → RepPath a c
 
 /-- Theorem 45 — rep path trans. -/
-def RepPath.trans : RepPath a b → RepPath b c → RepPath a c
+noncomputable def RepPath.trans : RepPath a b → RepPath b c → RepPath a c
   | RepPath.nil _, q => q
   | RepPath.cons s p, q => RepPath.cons s (RepPath.trans p q)
 
 /-- Theorem 46 — single round path. -/
-def singleRoundPath (rs : RepeatedState n) (pay : Fin n → Payoff) (h : rs.remaining > 0) :
+noncomputable def singleRoundPath (rs : RepeatedState n) (pay : Fin n → Payoff) (h : rs.remaining > 0) :
     RepPath rs ⟨rs.historyLen + 1, fun i => rs.totalPayoffs i + pay i, rs.remaining - 1⟩ :=
   RepPath.cons (RepStep.playRound rs pay h) (RepPath.nil _)
 
@@ -479,7 +479,7 @@ structure MixedStrategy where
   weights : List Nat
   hlen    : support.length = weights.length
 
-def MixedStrategy.totalWeight (ms : MixedStrategy) : Nat :=
+noncomputable def MixedStrategy.totalWeight (ms : MixedStrategy) : Nat :=
   ms.weights.foldl (· + ·) 0
 
 /-- Theorem 47 — empty support zero weight. -/
@@ -500,7 +500,7 @@ structure CoalGame where
   nPlayers : Nat
   value : Coalition → Int
 
-def IsSuperadditive (g : CoalGame) : Prop :=
+noncomputable def IsSuperadditive (g : CoalGame) : Prop :=
   ∀ s t : Coalition, (∀ x, x ∈ s → x ∉ t) →
     g.value (s ++ t) ≥ g.value s + g.value t
 

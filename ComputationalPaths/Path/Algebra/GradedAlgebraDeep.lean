@@ -49,18 +49,18 @@ structure GradedRing extends GradedModule.{u} where
   gmul : GradedMul toGradedModule
 
 -- Theorem 1: Grading preservation under multiplication as Path
-def gradingPreservation (R : GradedRing.{u}) (p q : Nat)
+noncomputable def gradingPreservation (R : GradedRing.{u}) (p q : Nat)
     (_x : R.component p) (_y : R.component q)
     : Path (p + q) (p + q) :=
   Path.refl (p + q)
 
 -- Theorem 2: Grading sum commutativity as Path via Step
-def gradingSumComm (p q : Nat) (h : p + q = q + p)
+noncomputable def gradingSumComm (p q : Nat) (h : p + q = q + p)
     : Path (p + q) (q + p) :=
   Path.mk [Step.mk (p + q) (q + p) h] h
 
 -- Theorem 3: Grading sum associativity as Path
-def gradingSumAssoc (p q r : Nat) (h : (p + q) + r = p + (q + r))
+noncomputable def gradingSumAssoc (p q r : Nat) (h : (p + q) + r = p + (q + r))
     : Path ((p + q) + r) (p + (q + r)) :=
   Path.mk [Step.mk _ _ h] h
 
@@ -82,14 +82,14 @@ structure DiffSquareZero (M : GradedModule.{u}) (gz : GradedZero M) (diff : Diff
     Path (diff.d n (diff.d (n + 1) x)) (gz.zero n)
 
 -- Theorem 4: d∘d = 0 is witnessed by Path
-def diffSquareZeroPath (M : GradedModule.{u}) (gz : GradedZero M)
+noncomputable def diffSquareZeroPath (M : GradedModule.{u}) (gz : GradedZero M)
     (diff : Differential M) (pf : DiffSquareZero M gz diff)
     (n : Nat) (x : M.component (n + 2))
     : Path (diff.d n (diff.d (n + 1) x)) (gz.zero n) :=
   pf.sq_zero n x
 
 -- Theorem 5: Symmetry of d∘d = 0
-def diffSquareZeroSymm (M : GradedModule.{u}) (gz : GradedZero M)
+noncomputable def diffSquareZeroSymm (M : GradedModule.{u}) (gz : GradedZero M)
     (diff : Differential M) (pf : DiffSquareZero M gz diff)
     (n : Nat) (x : M.component (n + 2))
     : Path (gz.zero n) (diff.d n (diff.d (n + 1) x)) :=
@@ -113,12 +113,12 @@ structure ChainMap (C D : ChainComplex.{u}) where
     Path (D.diff.d n (f (n + 1) x)) (f n (C.diff.d n x))
 
 -- Theorem 7: Identity chain map
-def chainMapId (C : ChainComplex.{u}) : ChainMap C C where
+noncomputable def chainMapId (C : ChainComplex.{u}) : ChainMap C C where
   f := fun _ x => x
   commutes := fun _ _ => Path.refl _
 
 -- Theorem 8: Composition of chain maps
-def chainMapComp {A B C : ChainComplex.{u}}
+noncomputable def chainMapComp {A B C : ChainComplex.{u}}
     (g : ChainMap B C) (f : ChainMap A B) : ChainMap A C where
   f := fun n x => g.f n (f.f n x)
   commutes := fun n x =>
@@ -144,7 +144,7 @@ structure Boundary (C : ChainComplex.{u}) (n : Nat) where
   isBoundary : Path (C.diff.d n preimage) elem
 
 -- Theorem 9: Every boundary is a cycle (d∘d = 0)
-def boundaryIsCycle (C : ChainComplex.{u}) (n : Nat) (b : Boundary C (n + 1))
+noncomputable def boundaryIsCycle (C : ChainComplex.{u}) (n : Nat) (b : Boundary C (n + 1))
     : Path (C.diff.d n b.elem) (C.gz.zero n) :=
   let ddZero : Path (C.diff.d n (C.diff.d (n + 1) b.preimage)) (C.gz.zero n) :=
     C.exact.sq_zero n b.preimage
@@ -154,21 +154,21 @@ def boundaryIsCycle (C : ChainComplex.{u}) (n : Nat) (b : Boundary C (n + 1))
   Path.trans (Path.symm substitute) ddZero
 
 -- Theorem 10: Homology equivalence as Path
-def homologyEquiv (C : ChainComplex.{u}) (n : Nat)
+noncomputable def homologyEquiv (C : ChainComplex.{u}) (n : Nat)
     {z1 z2 : C.mod.component n}
     (rel : Path z1 z2)
     : Path z2 z1 :=
   Path.symm rel
 
 -- Theorem 11: Homology equivalence transitivity
-def homologyEquivTrans (C : ChainComplex.{u}) (n : Nat)
+noncomputable def homologyEquivTrans (C : ChainComplex.{u}) (n : Nat)
     {z1 z2 z3 : C.mod.component n}
     (p : Path z1 z2) (q : Path z2 z3)
     : Path z1 z3 :=
   Path.trans p q
 
 -- Theorem 12: Homology equivalence associativity
-def homologyEquivAssoc (C : ChainComplex.{u}) (n : Nat)
+noncomputable def homologyEquivAssoc (C : ChainComplex.{u}) (n : Nat)
     {a b c d : C.mod.component n}
     (p : Path a b) (q : Path b c) (r : Path c d)
     : Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) :=
@@ -248,12 +248,12 @@ structure DGFunctorComp (C D : DGCategory.{u}) (F : DGFunctor C D) where
            (F.homMap X Y n f) (F.homMap Y Z 0 g))
 
 -- Theorem 19: Identity DG-functor
-def dgFunctorId (C : DGCategory.{u}) : DGFunctor C C where
+noncomputable def dgFunctorId (C : DGCategory.{u}) : DGFunctor C C where
   objMap := fun X => X
   homMap := fun _ _ _ f => f
 
 -- Theorem 20: DG-functor composition
-def dgFunctorComp {A B C : DGCategory.{u}}
+noncomputable def dgFunctorComp {A B C : DGCategory.{u}}
     (G : DGFunctor B C) (F : DGFunctor A B) : DGFunctor A C where
   objMap := fun X => G.objMap (F.objMap X)
   homMap := fun X Y n f => G.homMap (F.objMap X) (F.objMap Y) n (F.homMap X Y n f)
@@ -277,13 +277,13 @@ structure DGNaturality {C D : DGCategory.{u}} {F G : DGFunctor C D}
            (eta.component X) (G.homMap X Y 0 f))
 
 -- Theorem 22: DG-natural transformation closedness
-def dgNatTransClosed {C D : DGCategory.{u}} {F G : DGFunctor C D}
+noncomputable def dgNatTransClosed {C D : DGCategory.{u}} {F G : DGFunctor C D}
     (eta : DGNatTrans F G) (X : C.Obj)
     : Path (eta.component X) (eta.component X) :=
   Path.refl (eta.component X)
 
 -- Theorem 23: Identity DG-natural transformation
-def dgNatTransId {C D : DGCategory.{u}} (F : DGFunctor C D)
+noncomputable def dgNatTransId {C D : DGCategory.{u}} (F : DGFunctor C D)
     (idD : DGIdentity D)
     : DGNatTrans F F where
   component := fun X => idD.id_elem (F.objMap X)
@@ -313,20 +313,20 @@ structure AInfRelation2 (A : AInfAlgebra.{u}) where
          (A.m2 p q x (A.m1 q y))
 
 -- Theorem 26: Symmetry of A-infinity relation 1
-def ainfRelation1Symm (A : AInfAlgebra.{u}) (rel : AInfRelation1 A)
+noncomputable def ainfRelation1Symm (A : AInfAlgebra.{u}) (rel : AInfRelation1 A)
     (n : Nat) (x : A.mod.component (n + 2))
     : Path (A.gz.zero n) (A.m1 n (A.m1 (n + 1) x)) :=
   Path.symm (rel.m1m1_zero n x)
 
 -- Theorem 27: Transitivity chain for A-infinity
-def ainfTransChain (A : AInfAlgebra.{u}) {n : Nat}
+noncomputable def ainfTransChain (A : AInfAlgebra.{u}) {n : Nat}
     {a b c : A.mod.component n}
     (p : Path a b) (q : Path b c)
     : Path a c :=
   Path.trans p q
 
 -- Theorem 28: Higher associativity as Path chain
-def higherAssocPath {T : Type u}
+noncomputable def higherAssocPath {T : Type u}
     {a b c d : T}
     (p : Path a b) (q : Path b c) (r : Path c d)
     : Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) :=
@@ -349,19 +349,19 @@ structure KoszulComplex (K : KoszulPair.{u}) where
   acyclic : DiffSquareZero K.kA gz diff
 
 -- Theorem 29: Koszul differential squares to zero
-def koszulDiffSqZero (K : KoszulPair.{u}) (kc : KoszulComplex K)
+noncomputable def koszulDiffSqZero (K : KoszulPair.{u}) (kc : KoszulComplex K)
     (n : Nat) (x : K.kA.component (n + 2))
     : Path (kc.diff.d n (kc.diff.d (n + 1) x)) (kc.gz.zero n) :=
   kc.acyclic.sq_zero n x
 
 -- Theorem 30: Koszul symmetry
-def koszulDiffSqZeroSymm (K : KoszulPair.{u}) (kc : KoszulComplex K)
+noncomputable def koszulDiffSqZeroSymm (K : KoszulPair.{u}) (kc : KoszulComplex K)
     (n : Nat) (x : K.kA.component (n + 2))
     : Path (kc.gz.zero n) (kc.diff.d n (kc.diff.d (n + 1) x)) :=
   Path.symm (kc.acyclic.sq_zero n x)
 
 -- Theorem 31: Koszul pairing reflexivity
-def koszulPairingRefl (K : KoszulPair.{u}) (p : Nat)
+noncomputable def koszulPairingRefl (K : KoszulPair.{u}) (p : Nat)
     (x : K.kA.component p) (y : K.kDual.component 0)
     : Path (K.pairing p 0 x y) (K.pairing p 0 x y) :=
   Path.refl _
@@ -382,27 +382,27 @@ structure SpectralSequence where
     (page (r + 1)).entry p q → (page r).entry p q
 
 -- Theorem 32: Spectral page reflexivity
-def spectralPageRefl (ss : SpectralSequence.{u}) (r p q : Nat)
+noncomputable def spectralPageRefl (ss : SpectralSequence.{u}) (r p q : Nat)
     (x : (ss.page r).entry p q)
     : Path x x :=
   Path.refl x
 
 -- Theorem 33: Connection preserves Path via congrArg
-def spectralConnection (ss : SpectralSequence.{u}) (r p q : Nat)
+noncomputable def spectralConnection (ss : SpectralSequence.{u}) (r p q : Nat)
     {x y : (ss.page (r + 1)).entry p q}
     (pathR1 : Path x y)
     : Path (ss.connection r p q x) (ss.connection r p q y) :=
   Path.congrArg (ss.connection r p q) pathR1
 
 -- Theorem 34: Connection preserves Path.trans
-def spectralConnectionTrans (ss : SpectralSequence.{u}) (r p q : Nat)
+noncomputable def spectralConnectionTrans (ss : SpectralSequence.{u}) (r p q : Nat)
     {x y z : (ss.page (r + 1)).entry p q}
     (pxy : Path x y) (pyz : Path y z)
     : Path (ss.connection r p q x) (ss.connection r p q z) :=
   Path.congrArg (ss.connection r p q) (Path.trans pxy pyz)
 
 -- Theorem 35: congrArg distributes over trans for spectral maps
-def spectralCongrArgTrans (ss : SpectralSequence.{u}) (r p q : Nat)
+noncomputable def spectralCongrArgTrans (ss : SpectralSequence.{u}) (r p q : Nat)
     {x y z : (ss.page (r + 1)).entry p q}
     (pxy : Path x y) (pyz : Path y z)
     : Path.congrArg (ss.connection r p q) (Path.trans pxy pyz) =
@@ -415,35 +415,35 @@ def spectralCongrArgTrans (ss : SpectralSequence.{u}) (r p q : Nat)
 -- ===================================================================
 
 -- Theorem 36: Path.trans left identity in graded context
-def gradedTransReflLeft {M : GradedModule.{u}} {n : Nat}
+noncomputable def gradedTransReflLeft {M : GradedModule.{u}} {n : Nat}
     {a b : M.component n}
     (p : Path a b)
     : Path.trans (Path.refl a) p = p :=
   trans_refl_left p
 
 -- Theorem 37: Path.trans right identity in graded context
-def gradedTransReflRight {M : GradedModule.{u}} {n : Nat}
+noncomputable def gradedTransReflRight {M : GradedModule.{u}} {n : Nat}
     {a b : M.component n}
     (p : Path a b)
     : Path.trans p (Path.refl b) = p :=
   trans_refl_right p
 
 -- Theorem 38: Path.symm involution in graded context
-def gradedSymmSymm {M : GradedModule.{u}} {n : Nat}
+noncomputable def gradedSymmSymm {M : GradedModule.{u}} {n : Nat}
     {a b : M.component n}
     (p : Path a b)
     : Path.symm (Path.symm p) = p :=
   symm_symm p
 
 -- Theorem 39: symm distributes over trans
-def gradedSymmTrans {M : GradedModule.{u}} {n : Nat}
+noncomputable def gradedSymmTrans {M : GradedModule.{u}} {n : Nat}
     {a b c : M.component n}
     (p : Path a b) (q : Path b c)
     : Path.symm (Path.trans p q) = Path.trans (Path.symm q) (Path.symm p) :=
   symm_trans p q
 
 -- Theorem 40: congrArg preserves symm
-def gradedCongrArgSymm {M N : GradedModule.{u}} {n : Nat}
+noncomputable def gradedCongrArgSymm {M N : GradedModule.{u}} {n : Nat}
     (f : M.component n → N.component n)
     {a b : M.component n}
     (p : Path a b)
@@ -464,7 +464,7 @@ structure DGModule (C : DGCategory.{u}) where
     sections.component n
 
 -- Theorem 41: DG-module action respects Path on morphisms
-def dgModuleActionPath {C : DGCategory.{u}} (M : DGModule C)
+noncomputable def dgModuleActionPath {C : DGCategory.{u}} (M : DGModule C)
     (X : C.Obj) (n : Nat)
     {f g : (C.Hom X M.target).mod.component n}
     (p : Path f g) (s : M.sections.component 0)
@@ -472,7 +472,7 @@ def dgModuleActionPath {C : DGCategory.{u}} (M : DGModule C)
   Path.congrArg (fun h => M.action X n h s) p
 
 -- Theorem 42: DG-module action respects Path on sections
-def dgModuleSectionPath {C : DGCategory.{u}} (M : DGModule C)
+noncomputable def dgModuleSectionPath {C : DGCategory.{u}} (M : DGModule C)
     (X : C.Obj) (n : Nat)
     (f : (C.Hom X M.target).mod.component n)
     {s t : M.sections.component 0}
@@ -491,13 +491,13 @@ structure ChainHomotopy {C D : ChainComplex.{u}} (f g : ChainMap C D) where
     Path (D.diff.d n (h n x)) (f.f n x)
 
 -- Theorem 43: Chain homotopy path extraction
-def homotopicMapsPath {C D : ChainComplex.{u}} {f g : ChainMap C D}
+noncomputable def homotopicMapsPath {C D : ChainComplex.{u}} {f g : ChainMap C D}
     (H : ChainHomotopy f g) (n : Nat) (x : C.mod.component n)
     : Path (D.diff.d n (H.h n x)) (f.f n x) :=
   H.witness n x
 
 -- Theorem 44: Chain homotopy path symmetry
-def homotopicMapsPathSymm {C D : ChainComplex.{u}} {f g : ChainMap C D}
+noncomputable def homotopicMapsPathSymm {C D : ChainComplex.{u}} {f g : ChainMap C D}
     (H : ChainHomotopy f g) (n : Nat) (x : C.mod.component n)
     : Path (f.f n x) (D.diff.d n (H.h n x)) :=
   Path.symm (H.witness n x)
@@ -525,7 +525,7 @@ structure EnrichedComp (H1 H2 H3 : EnrichedHom.{u}) where
          (comp n (H1.homComplex.diff.d n f) g)
 
 -- Theorem 46: Enriched coherence symmetry
-def enrichedCoherenceSymm (H1 H2 H3 : EnrichedHom.{u})
+noncomputable def enrichedCoherenceSymm (H1 H2 H3 : EnrichedHom.{u})
     (ec : EnrichedComp H1 H2 H3)
     (n : Nat)
     (f : H1.homComplex.mod.component (n + 1))
@@ -544,7 +544,7 @@ structure QuasiIso {C D : ChainComplex.{u}} (f : ChainMap C D) where
     Sigma (fun x : C.mod.component n => Path (f.f n x) y)
 
 -- Theorem 47: Quasi-isomorphism composition
-def quasiIsoComp {A B C : ChainComplex.{u}}
+noncomputable def quasiIsoComp {A B C : ChainComplex.{u}}
     {f : ChainMap A B} {g : ChainMap B C}
     (qf : QuasiIso f) (qg : QuasiIso g)
     : (n : Nat) → (z : C.mod.component n) →
@@ -565,7 +565,7 @@ structure AInfMorphism (A B : AInfAlgebra.{u}) where
     Path (B.m1 n (f1 (n + 1) x)) (f1 n (A.m1 n x))
 
 -- Theorem 48: A-infinity morphism composition
-def ainfMorphismComp {A B C : AInfAlgebra.{u}}
+noncomputable def ainfMorphismComp {A B C : AInfAlgebra.{u}}
     (g : AInfMorphism B C) (f : AInfMorphism A B)
     : AInfMorphism A C where
   f1 := fun n x => g.f1 n (f.f1 n x)
@@ -576,7 +576,7 @@ def ainfMorphismComp {A B C : AInfAlgebra.{u}}
     Path.trans step1 step3
 
 -- Theorem 49: Identity A-infinity morphism
-def ainfMorphismId (A : AInfAlgebra.{u}) : AInfMorphism A A where
+noncomputable def ainfMorphismId (A : AInfAlgebra.{u}) : AInfMorphism A A where
   f1 := fun _ x => x
   f1_commutes := fun _ _ => Path.refl _
 
@@ -585,7 +585,7 @@ def ainfMorphismId (A : AInfAlgebra.{u}) : AInfMorphism A A where
 -- ===================================================================
 
 -- Theorem 50: Pentagon coherence for 4-fold Path composition
-def pentagonCoherence {T : Type u}
+noncomputable def pentagonCoherence {T : Type u}
     {a b c d e : T}
     (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e)
@@ -596,45 +596,45 @@ def pentagonCoherence {T : Type u}
   step1.trans step2
 
 -- Theorem 51: Triangle coherence for unit paths
-def triangleCoherence {T : Type u} {a b : T}
+noncomputable def triangleCoherence {T : Type u} {a b : T}
     (p : Path a b)
     : Path.trans (Path.refl a) (Path.trans p (Path.refl b)) = p :=
   let step1 := _root_.congrArg (Path.trans (Path.refl a)) (trans_refl_right p)
   step1.trans (trans_refl_left p)
 
 -- Theorem 52: Inverse path cancellation (left) at toEq level
-def inverseCancel {T : Type u} {a b : T} (p : Path a b)
+noncomputable def inverseCancel {T : Type u} {a b : T} (p : Path a b)
     : Path.toEq (Path.trans (Path.symm p) p) = rfl :=
   toEq_symm_trans p
 
 -- Theorem 53: Inverse path cancellation (right) at toEq level
-def inverseCancelRight {T : Type u} {a b : T} (p : Path a b)
+noncomputable def inverseCancelRight {T : Type u} {a b : T} (p : Path a b)
     : Path.toEq (Path.trans p (Path.symm p)) = rfl :=
   toEq_trans_symm p
 
 -- Theorem 54: Whiskering left with 2-paths
-def whiskerLeftPath {T : Type u} {a b c : T}
+noncomputable def whiskerLeftPath {T : Type u} {a b c : T}
     (p : Path a b) {q r : Path b c}
     (alpha : q = r)
     : Path.trans p q = Path.trans p r :=
   _root_.congrArg (Path.trans p) alpha
 
 -- Theorem 55: Whiskering right with 2-paths
-def whiskerRightPath {T : Type u} {a b c : T}
+noncomputable def whiskerRightPath {T : Type u} {a b c : T}
     {p q : Path a b} (alpha : p = q)
     (r : Path b c)
     : Path.trans p r = Path.trans q r :=
   _root_.congrArg (fun x => Path.trans x r) alpha
 
 -- Theorem 56: Differential functoriality via congrArg
-def gradedDiffFunctorial (C : ChainComplex.{u}) (n : Nat)
+noncomputable def gradedDiffFunctorial (C : ChainComplex.{u}) (n : Nat)
     {x y : C.mod.component (n + 1)}
     (p : Path x y)
     : Path (C.diff.d n x) (C.diff.d n y) :=
   Path.congrArg (C.diff.d n) p
 
 -- Theorem 57: Differential preserves trans
-def gradedDiffPreservesTrans (C : ChainComplex.{u}) (n : Nat)
+noncomputable def gradedDiffPreservesTrans (C : ChainComplex.{u}) (n : Nat)
     {x y z : C.mod.component (n + 1)}
     (p : Path x y) (q : Path y z)
     : Path.congrArg (C.diff.d n) (Path.trans p q) =
@@ -642,7 +642,7 @@ def gradedDiffPreservesTrans (C : ChainComplex.{u}) (n : Nat)
   congrArg_trans (C.diff.d n) p q
 
 -- Theorem 58: Differential preserves symm
-def gradedDiffPreservesSymm (C : ChainComplex.{u}) (n : Nat)
+noncomputable def gradedDiffPreservesSymm (C : ChainComplex.{u}) (n : Nat)
     {x y : C.mod.component (n + 1)}
     (p : Path x y)
     : Path.congrArg (C.diff.d n) (Path.symm p) =
@@ -650,14 +650,14 @@ def gradedDiffPreservesSymm (C : ChainComplex.{u}) (n : Nat)
   congrArg_symm (C.diff.d n) p
 
 -- Theorem 59: Chain map functoriality via congrArg
-def chainMapFunctorial {C D : ChainComplex.{u}} (f : ChainMap C D) (n : Nat)
+noncomputable def chainMapFunctorial {C D : ChainComplex.{u}} (f : ChainMap C D) (n : Nat)
     {x y : C.mod.component n}
     (p : Path x y)
     : Path (f.f n x) (f.f n y) :=
   Path.congrArg (f.f n) p
 
 -- Theorem 60: Full coherence combining trans, symm, congrArg
-def fullGradedCoherence {M : GradedModule.{u}} {n : Nat}
+noncomputable def fullGradedCoherence {M : GradedModule.{u}} {n : Nat}
     {a b c : M.component n}
     (p : Path a b) (q : Path b c)
     : Path.toEq (Path.trans (Path.trans p q) (Path.symm (Path.trans p q))) = rfl :=

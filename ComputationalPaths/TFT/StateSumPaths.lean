@@ -36,7 +36,7 @@ variable {C : CobordismCategory.{u, v}}
 variable (S : StateSumModel C)
 
 /-- Step witness: right-unit normalization for identity amplitudes. -/
-def assignId_step (X : C.Obj) :
+noncomputable def assignId_step (X : C.Obj) :
     Path.Step
       (Path.trans (S.assign_id X) (Path.refl S.zero))
       (S.assign_id X) :=
@@ -49,7 +49,7 @@ noncomputable def assignId_rweq (X : C.Obj) :
   rweq_of_step (S.assignId_step X)
 
 /-- First leg of the gluing chain on amplitudes. -/
-def gluingFirst {W X Y Z : C.Obj}
+noncomputable def gluingFirst {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path
       (S.assign (C.comp (C.comp f g) h))
@@ -57,7 +57,7 @@ def gluingFirst {W X Y Z : C.Obj}
   S.assign_comp (C.comp f g) h
 
 /-- Middle leg of the gluing chain on amplitudes. -/
-def gluingMiddle {W X Y Z : C.Obj}
+noncomputable def gluingMiddle {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path
       (S.add (S.assign (C.comp f g)) (S.assign h))
@@ -65,7 +65,7 @@ def gluingMiddle {W X Y Z : C.Obj}
   Path.congrArg (fun t => S.add t (S.assign h)) (S.assign_comp f g)
 
 /-- Final leg of the gluing chain on amplitudes. -/
-def gluingLast {W X Y Z : C.Obj}
+noncomputable def gluingLast {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path
       (S.add (S.add (S.assign f) (S.assign g)) (S.assign h))
@@ -73,7 +73,7 @@ def gluingLast {W X Y Z : C.Obj}
   S.add_assoc (S.assign f) (S.assign g) (S.assign h)
 
 /-- Left-associated gluing coherence chain. -/
-def gluingChainLeft {W X Y Z : C.Obj}
+noncomputable def gluingChainLeft {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path
       (S.assign (C.comp (C.comp f g) h))
@@ -83,7 +83,7 @@ def gluingChainLeft {W X Y Z : C.Obj}
     (S.gluingLast f g h)
 
 /-- Right-associated gluing coherence chain. -/
-def gluingChainRight {W X Y Z : C.Obj}
+noncomputable def gluingChainRight {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path
       (S.assign (C.comp (C.comp f g) h))
@@ -109,14 +109,14 @@ noncomputable def gluing_assoc_rweq {W X Y Z : C.Obj}
   rweq_of_step (S.gluing_assoc_step f g h)
 
 /-- Step witness: right-unit normalization for left unit amplitudes. -/
-def addLeftUnit_step (a : S.amplitude) :
+noncomputable def addLeftUnit_step (a : S.amplitude) :
     Path.Step
       (Path.trans (S.add_zero_left a) (Path.refl a))
       (S.add_zero_left a) :=
   Path.Step.trans_refl_right (S.add_zero_left a)
 
 /-- Step witness: right-unit normalization for right unit amplitudes. -/
-def addRightUnit_step (a : S.amplitude) :
+noncomputable def addRightUnit_step (a : S.amplitude) :
     Path.Step
       (Path.trans (S.add_zero_right a) (Path.refl a))
       (S.add_zero_right a) :=

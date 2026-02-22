@@ -24,11 +24,11 @@ structure Fibration (B : Type v) where
   proj : total → B
 
 /-- The fiber over a point b. -/
-def Fiber (fib : Fibration B) (b : B) : Type v :=
+noncomputable def Fiber (fib : Fibration B) (b : B) : Type v :=
   { e : fib.total // fib.proj e = b }
 
 /-- Inclusion of a fiber element into the total space. -/
-def Fiber.incl {fib : Fibration B} {b : B} (x : Fiber fib b) : fib.total :=
+noncomputable def Fiber.incl {fib : Fibration B} {b : B} (x : Fiber fib b) : fib.total :=
   x.val
 
 /-- The projection of a fiber element equals the base point. -/
@@ -39,7 +39,7 @@ theorem Fiber.proj_eq {fib : Fibration B} {b : B} (x : Fiber fib b) :
 /-! ## Fiber transport along paths -/
 
 /-- Transport in the fiber along a path in the base. -/
-def fiberTransport {fib : Fibration B} {b₁ b₂ : B}
+noncomputable def fiberTransport {fib : Fibration B} {b₁ b₂ : B}
     (p : Path b₁ b₂) (x : Fiber fib b₁) : Fiber fib b₂ :=
   ⟨x.val, x.property.trans p.toEq⟩
 
@@ -69,17 +69,17 @@ theorem fiberTransport_symm {fib : Fibration B} {b₁ b₂ : B}
 /-! ## Dependent fibration from a type family -/
 
 /-- Every type family gives a fibration via Sigma. -/
-def familyFibration (F : B → Type v) : Fibration B where
+noncomputable def familyFibration (F : B → Type v) : Fibration B where
   total := Σ b, F b
   proj := Sigma.fst
 
 /-- Construct a fiber element from a family element. -/
-def familyFiber_mk (F : B → Type v) {b : B} (x : F b) :
+noncomputable def familyFiber_mk (F : B → Type v) {b : B} (x : F b) :
     Fiber (familyFibration F) b :=
   ⟨⟨b, x⟩, rfl⟩
 
 /-- The fiber of a family fibration over b is F b. -/
-def familyFiber_proj (F : B → Type v) {b : B}
+noncomputable def familyFiber_proj (F : B → Type v) {b : B}
     (x : Fiber (familyFibration F) b) : F b := by
   have h : x.val.fst = b := x.property
   exact h ▸ x.val.snd
@@ -99,7 +99,7 @@ theorem fiberSeq_incl_proj {B E F : Type v} (fs : FiberSeq B E F) (x : F) :
   fs.fiberOver x
 
 /-- Path from proj ∘ incl to the basepoint. -/
-def fiberSeq_proj_incl_path {B E F : Type v} (fs : FiberSeq B E F) (x : F) :
+noncomputable def fiberSeq_proj_incl_path {B E F : Type v} (fs : FiberSeq B E F) (x : F) :
     Path (fs.proj (fs.incl x)) fs.basepoint :=
   Path.mk [Step.mk _ _ (fs.fiberOver x)] (fs.fiberOver x)
 
@@ -112,13 +112,13 @@ structure PathLifting (fib : Fibration B) where
     fib.proj (lift p x) = b₂
 
 /-- The lifted endpoint lies in the target fiber. -/
-def liftedFiber {fib : Fibration B} (pl : PathLifting fib)
+noncomputable def liftedFiber {fib : Fibration B} (pl : PathLifting fib)
     {b₁ b₂ : B} (p : Path b₁ b₂) (x : Fiber fib b₁) :
     Fiber fib b₂ :=
   ⟨pl.lift p x, pl.covers p x⟩
 
 /-- Trivial lifting: using fiber transport. -/
-def trivialLifting (fib : Fibration B) : PathLifting fib where
+noncomputable def trivialLifting (fib : Fibration B) : PathLifting fib where
   lift := fun p x => (fiberTransport p x).val
   covers := fun p x => (fiberTransport p x).property
 
@@ -131,7 +131,7 @@ theorem trivialLifting_eq (fib : Fibration B) {b₁ b₂ : B}
 /-! ## Long exact sequence components -/
 
 /-- The connecting map δ : Ω(B, b) → Fiber sends a loop to transport around it. -/
-def connectingMap {fib : Fibration B} {b : B}
+noncomputable def connectingMap {fib : Fibration B} {b : B}
     (x₀ : Fiber fib b) (l : Path b b) : Fiber fib b :=
   fiberTransport l x₀
 
@@ -157,19 +157,19 @@ theorem connectingMap_symm {fib : Fibration B} {b : B}
 /-! ## Pullback fibration -/
 
 /-- Pullback of a fibration along a map. -/
-def pullbackFib (fib : Fibration B) (f : B → B) : Fibration B where
+noncomputable def pullbackFib (fib : Fibration B) (f : B → B) : Fibration B where
   total := { p : B × fib.total // fib.proj p.2 = f p.1 }
   proj := fun p => p.val.1
 
 /-! ## Path-space fibration -/
 
 /-- The path-space fibration: total space is paths from a fixed basepoint. -/
-def pathSpaceFib (b₀ : B) : Fibration B where
+noncomputable def pathSpaceFib (b₀ : B) : Fibration B where
   total := Σ b, Path b₀ b
   proj := Sigma.fst
 
 /-- The path-space fibration base point. -/
-def pathSpaceFib_basepoint (b₀ : B) :
+noncomputable def pathSpaceFib_basepoint (b₀ : B) :
     Fiber (pathSpaceFib b₀) b₀ :=
   ⟨⟨b₀, Path.refl b₀⟩, rfl⟩
 
@@ -187,12 +187,12 @@ structure FibMap (fib₁ fib₂ : Fibration B) where
   commutes : ∀ e, fib₂.proj (totalMap e) = fib₁.proj e
 
 /-- A fibration map sends fibers to fibers. -/
-def FibMap.fiberMap {fib₁ fib₂ : Fibration B} (fm : FibMap fib₁ fib₂)
+noncomputable def FibMap.fiberMap {fib₁ fib₂ : Fibration B} (fm : FibMap fib₁ fib₂)
     {b : B} (x : Fiber fib₁ b) : Fiber fib₂ b :=
   ⟨fm.totalMap x.val, (fm.commutes x.val).trans x.property⟩
 
 /-- The identity fibration map. -/
-def FibMap.ident (fib : Fibration B) : FibMap fib fib where
+noncomputable def FibMap.ident (fib : Fibration B) : FibMap fib fib where
   totalMap := fun x => x
   commutes := fun _ => rfl
 
@@ -203,7 +203,7 @@ theorem FibMap.ident_fiberMap {fib : Fibration B} {b : B}
   exact Subtype.ext rfl
 
 /-- Composition of fibration maps. -/
-def FibMap.comp {fib₁ fib₂ fib₃ : Fibration B}
+noncomputable def FibMap.comp {fib₁ fib₂ fib₃ : Fibration B}
     (g : FibMap fib₂ fib₃) (f : FibMap fib₁ fib₂) : FibMap fib₁ fib₃ where
   totalMap := g.totalMap ∘ f.totalMap
   commutes := fun e => (g.commutes (f.totalMap e)).trans (f.commutes e)

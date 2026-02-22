@@ -31,7 +31,7 @@ variable {a b c d : A}
 /-! ## Path length -/
 
 /-- The length of a path is the number of rewrite steps it records. -/
-@[simp] def length (p : Path a b) : Nat :=
+@[simp] noncomputable def length (p : Path a b) : Nat :=
   p.steps.length
 
 /-- The reflexive path has length zero. -/
@@ -68,11 +68,11 @@ theorem length_eq_zero_iff (p : Path a b) :
 /-! ## Step extraction -/
 
 /-- The list of source elements from the steps of a path. -/
-def sources (p : Path a b) : List A :=
+noncomputable def sources (p : Path a b) : List A :=
   p.steps.map Step.src
 
 /-- The list of target elements from the steps of a path. -/
-def targets (p : Path a b) : List A :=
+noncomputable def targets (p : Path a b) : List A :=
   p.steps.map Step.tgt
 
 @[simp] theorem sources_refl : sources (refl a) = [] := rfl
@@ -134,11 +134,11 @@ theorem symm_injective (p q : Path a b) (h : symm p = symm q) : p = q := by
 /-! ## Subpath / prefix / suffix -/
 
 /-- `p` is a prefix of `q` when `p.steps` is a prefix of `q.steps`. -/
-def IsPrefix (p : Path a b) (q : Path a c) : Prop :=
+noncomputable def IsPrefix (p : Path a b) (q : Path a c) : Prop :=
   ∃ tail, q.steps = p.steps ++ tail
 
 /-- `p` is a suffix of `q` when `p.steps` is a suffix of `q.steps`. -/
-def IsSuffix (p : Path b c) (q : Path a c) : Prop :=
+noncomputable def IsSuffix (p : Path b c) (q : Path a c) : Prop :=
   ∃ front, q.steps = front ++ p.steps
 
 /-- `refl` is a prefix of every path. -/

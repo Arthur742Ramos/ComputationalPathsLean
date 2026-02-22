@@ -54,7 +54,7 @@ variable {M : MonoidalData A}
 notation:70 a " ⊗ₘ " b => MonoidalData.tensor _ a b
 
 /-- Lift a binary function on types to paths using congrArg twice. -/
-def tensorPath (M : MonoidalData A) {a b c d : A}
+noncomputable def tensorPath (M : MonoidalData A) {a b c d : A}
     (p : Path a b) (q : Path c d) :
     Path (M.tensor a c) (M.tensor b d) :=
   Path.trans (Path.congrArg (M.tensor · c) p) (Path.congrArg (M.tensor b ·) q)
@@ -81,14 +81,14 @@ theorem tensorPath_refl_left (M : MonoidalData A) (a : A) {c d : A}
 -- ============================================================================
 
 /-- Left path around the pentagon: two associators. -/
-def pentagonLeft (M : MonoidalData A) (a b c d : A) :
+noncomputable def pentagonLeft (M : MonoidalData A) (a b c d : A) :
     Path (M.tensor (M.tensor (M.tensor a b) c) d)
          (M.tensor a (M.tensor b (M.tensor c d))) :=
   Path.trans (M.assoc (M.tensor a b) c d) (M.assoc a b (M.tensor c d))
 
 /-- Right path around the pentagon: associator on first factor, then
     associator in context, then associator on second factor. -/
-def pentagonRight (M : MonoidalData A) (a b c d : A) :
+noncomputable def pentagonRight (M : MonoidalData A) (a b c d : A) :
     Path (M.tensor (M.tensor (M.tensor a b) c) d)
          (M.tensor a (M.tensor b (M.tensor c d))) :=
   Path.trans
@@ -116,12 +116,12 @@ theorem pentagon_symm (M : MonoidalData A) (P : PentagonAxiom M) (a b c d : A) :
 -- ============================================================================
 
 /-- Left side of the triangle: right unitor tensored with identity. -/
-def triangleLeft (M : MonoidalData A) (a b : A) :
+noncomputable def triangleLeft (M : MonoidalData A) (a b : A) :
     Path (M.tensor (M.tensor a M.unit) b) (M.tensor a b) :=
   Path.congrArg (M.tensor · b) (M.rightUnitor a)
 
 /-- Right side: associator then left unitor. -/
-def triangleRight (M : MonoidalData A) (a b : A) :
+noncomputable def triangleRight (M : MonoidalData A) (a b : A) :
     Path (M.tensor (M.tensor a M.unit) b) (M.tensor a b) :=
   Path.trans (M.assoc a M.unit b) (Path.congrArg (M.tensor a ·) (M.leftUnitor b))
 
@@ -206,7 +206,7 @@ theorem braid_congrArg (M : MonoidalData A) (B : BraidingData M)
 
 /-- Left path of first hexagon:
     (a⊗b)⊗c →[α] a⊗(b⊗c) →[σ] (b⊗c)⊗a →[α] b⊗(c⊗a) -/
-def hexLeftI (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
+noncomputable def hexLeftI (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
     Path (M.tensor (M.tensor a b) c) (M.tensor b (M.tensor c a)) :=
   Path.trans (M.assoc a b c)
     (Path.trans (B.braid a (M.tensor b c))
@@ -214,7 +214,7 @@ def hexLeftI (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
 
 /-- Right path of first hexagon:
     (a⊗b)⊗c →[σ⊗id] (b⊗a)⊗c →[α] b⊗(a⊗c) →[id⊗σ] b⊗(c⊗a) -/
-def hexRightI (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
+noncomputable def hexRightI (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
     Path (M.tensor (M.tensor a b) c) (M.tensor b (M.tensor c a)) :=
   Path.trans (Path.congrArg (M.tensor · c) (B.braid a b))
     (Path.trans (M.assoc b a c)
@@ -222,7 +222,7 @@ def hexRightI (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
 
 /-- Left path of second hexagon:
     a⊗(b⊗c) →[α⁻¹] (a⊗b)⊗c →[σ] c⊗(a⊗b) →[α⁻¹] (c⊗a)⊗b -/
-def hexLeftII (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
+noncomputable def hexLeftII (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
     Path (M.tensor a (M.tensor b c)) (M.tensor (M.tensor c a) b) :=
   Path.trans (Path.symm (M.assoc a b c))
     (Path.trans (B.braid (M.tensor a b) c)
@@ -230,7 +230,7 @@ def hexLeftII (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
 
 /-- Right path of second hexagon:
     a⊗(b⊗c) →[id⊗σ] a⊗(c⊗b) →[α⁻¹] (a⊗c)⊗b →[σ⊗id] (c⊗a)⊗b -/
-def hexRightII (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
+noncomputable def hexRightII (M : MonoidalData A) (B : BraidingData M) (a b c : A) :
     Path (M.tensor a (M.tensor b c)) (M.tensor (M.tensor c a) b) :=
   Path.trans (Path.congrArg (M.tensor a ·) (B.braid b c))
     (Path.trans (Path.symm (M.assoc a c b))

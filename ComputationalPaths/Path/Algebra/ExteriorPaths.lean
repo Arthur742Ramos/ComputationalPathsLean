@@ -103,7 +103,7 @@ theorem grade_add (EA : PathExteriorAlg A) {a : A}
 /-! ## Determinant via exterior algebra -/
 
 /-- Determinant-like object: wedge of n loops. -/
-def wedgeN (EA : PathExteriorAlg A) {a : A} : List (Path a a) → Path a a
+noncomputable def wedgeN (EA : PathExteriorAlg A) {a : A} : List (Path a a) → Path a a
   | [] => EA.unit a
   | p :: ps => EA.wedge p (wedgeN EA ps)
 
@@ -181,7 +181,7 @@ theorem wedge_self_path_cancel (EA : PathExteriorAlg A) {a : A}
   simp
 
 /-- Wedge anticommutativity as a path. -/
-def wedge_anticomm_path (EA : PathExteriorAlg A) {a : A}
+noncomputable def wedge_anticomm_path (EA : PathExteriorAlg A) {a : A}
     (p q : Path a a) :
     Path (EA.wedge p q) (symm (EA.wedge q p)) :=
   ofEq (EA.wedge_anticomm p q)

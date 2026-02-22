@@ -35,7 +35,7 @@ structure PathMonad (A : Type u) where
     Path.trans (mu x) (Path.congrArg obj p)
 
 /-- Theorem 1: The identity monad -/
-def idMonad (A : Type u) : PathMonad A where
+noncomputable def idMonad (A : Type u) : PathMonad A where
   obj := id
   eta := fun x => Path.refl x
   mu := fun x => Path.refl x
@@ -47,7 +47,7 @@ def idMonad (A : Type u) : PathMonad A where
     exact (Path.steps_map_id p.steps).symm
 
 /-- Theorem 2: Monad functor action via congrArg -/
-def monadMap {A : Type u} (M : PathMonad A) {x y : A} (p : Path x y) :
+noncomputable def monadMap {A : Type u} (M : PathMonad A) {x y : A} (p : Path x y) :
     Path (M.obj x) (M.obj y) :=
   Path.congrArg M.obj p
 
@@ -82,11 +82,11 @@ structure KleisliArrow (A : Type u) (M : PathMonad A) (x y : A) where
   run : Path x (M.obj y)
 
 /-- Theorem 7: Kleisli identity (return / eta) -/
-def kleisliId {A : Type u} (M : PathMonad A) (x : A) : KleisliArrow A M x x where
+noncomputable def kleisliId {A : Type u} (M : PathMonad A) (x : A) : KleisliArrow A M x x where
   run := M.eta x
 
 /-- Theorem 8: Kleisli composition via bind -/
-def kleisliComp {A : Type u} {M : PathMonad A} {x y z : A}
+noncomputable def kleisliComp {A : Type u} {M : PathMonad A} {x y z : A}
     (f : KleisliArrow A M x y) (g : KleisliArrow A M y z) : KleisliArrow A M x z where
   run := Path.trans f.run (Path.trans (monadMap M g.run) (M.mu z))
 
@@ -124,14 +124,14 @@ structure EMAlgebra (A : Type u) (M : PathMonad A) where
              Path.trans (M.mu carrier) struct_map
 
 /-- Theorem 13: Free algebra on a carrier -/
-def freeAlgebra {A : Type u} (M : PathMonad A) (x : A) : EMAlgebra A M where
+noncomputable def freeAlgebra {A : Type u} (M : PathMonad A) (x : A) : EMAlgebra A M where
   carrier := M.obj x
   struct_map := M.mu x
   unit_law := M.mu_eta_right x
   mult_law := M.mu_assoc x
 
 /-- Theorem 14: The identity monad's trivial algebra -/
-def trivialAlgebra {A : Type u} (x : A) : EMAlgebra A (idMonad A) where
+noncomputable def trivialAlgebra {A : Type u} (x : A) : EMAlgebra A (idMonad A) where
   carrier := x
   struct_map := Path.refl x
   unit_law := by simp [idMonad]
@@ -168,13 +168,13 @@ structure AlgMorphism (A : Type u) (M : PathMonad A)
            Path.trans alg1.struct_map morph
 
 /-- Theorem 19: Identity algebra morphism -/
-def algMorphId {A : Type u} {M : PathMonad A} (alg : EMAlgebra A M) :
+noncomputable def algMorphId {A : Type u} {M : PathMonad A} (alg : EMAlgebra A M) :
     AlgMorphism A M alg alg where
   morph := Path.refl alg.carrier
   compat := by simp
 
 /-- Theorem 20: Composition of algebra morphisms -/
-def algMorphComp {A : Type u} {M : PathMonad A}
+noncomputable def algMorphComp {A : Type u} {M : PathMonad A}
     {a1 a2 a3 : EMAlgebra A M}
     (f : AlgMorphism A M a1 a2) (g : AlgMorphism A M a2 a3) :
     AlgMorphism A M a1 a3 where
@@ -217,26 +217,26 @@ theorem algMorphComp_assoc {A : Type u} {M : PathMonad A}
 /-! ## Section 5: Forgetful / Free Adjunction -/
 
 /-- The forgetful functor from algebras to carriers. -/
-def forgetful {A : Type u} {M : PathMonad A} (alg : EMAlgebra A M) : A :=
+noncomputable def forgetful {A : Type u} {M : PathMonad A} (alg : EMAlgebra A M) : A :=
   alg.carrier
 
 /-- Theorem 26: Forgetful on morphisms -/
-def forgetfulMap {A : Type u} {M : PathMonad A}
+noncomputable def forgetfulMap {A : Type u} {M : PathMonad A}
     {a1 a2 : EMAlgebra A M} (f : AlgMorphism A M a1 a2) :
     Path (forgetful a1) (forgetful a2) :=
   f.morph
 
 /-- Theorem 27: Free functor -/
-def freeFunctor {A : Type u} (M : PathMonad A) (x : A) : EMAlgebra A M :=
+noncomputable def freeFunctor {A : Type u} (M : PathMonad A) (x : A) : EMAlgebra A M :=
   freeAlgebra M x
 
 /-- Theorem 28: Unit of adjunction -/
-def adjUnit {A : Type u} (M : PathMonad A) (x : A) :
+noncomputable def adjUnit {A : Type u} (M : PathMonad A) (x : A) :
     Path x (forgetful (freeFunctor M x)) :=
   M.eta x
 
 /-- Theorem 29: Counit of adjunction -/
-def adjCounit {A : Type u} {M : PathMonad A} (alg : EMAlgebra A M) :
+noncomputable def adjCounit {A : Type u} {M : PathMonad A} (alg : EMAlgebra A M) :
     Path (M.obj alg.carrier) alg.carrier :=
   alg.struct_map
 
@@ -257,7 +257,7 @@ theorem forgetful_preserves_comp {A : Type u} {M : PathMonad A}
     Path.trans (forgetfulMap f) (forgetfulMap g) := rfl
 
 /-- Theorem 33: Free algebra morphism from path -/
-def freeAlgMorph {A : Type u} (M : PathMonad A) {x y : A}
+noncomputable def freeAlgMorph {A : Type u} (M : PathMonad A) {x y : A}
     (p : Path x y) : AlgMorphism A M (freeAlgebra M x) (freeAlgebra M y) where
   morph := Path.congrArg M.obj p
   compat := by
@@ -298,7 +298,7 @@ structure ReflexivePair (A : Type u) where
   section_right : Path.trans section_ right_arr = Path.refl target
 
 /-- Theorem 37: Trivial reflexive pair -/
-def trivialReflexivePair {A : Type u} (x : A) : ReflexivePair A where
+noncomputable def trivialReflexivePair {A : Type u} (x : A) : ReflexivePair A where
   source := x
   target := x
   left_arr := Path.refl x
@@ -314,7 +314,7 @@ structure PathCoequalizer (A : Type u) (rp : ReflexivePair A) where
   coeq : Path.trans rp.left_arr proj = Path.trans rp.right_arr proj
 
 /-- Theorem 38: Trivial coequalizer -/
-def trivialCoequalizer {A : Type u} (x : A) :
+noncomputable def trivialCoequalizer {A : Type u} (x : A) :
     PathCoequalizer A (trivialReflexivePair x) where
   apex := x
   proj := Path.refl x
@@ -335,7 +335,7 @@ structure BeckCondition (A : Type u) (M : PathMonad A) where
     CoequalizerWitness A a2.carrier
 
 /-- Theorem 39: Identity monad satisfies Beck -/
-def idBeck (A : Type u) : BeckCondition A (idMonad A) where
+noncomputable def idBeck (A : Type u) : BeckCondition A (idMonad A) where
   creates_coeq := fun _ a2 _ _ _ _ _ =>
     ⟨a2.carrier, Path.refl a2.carrier⟩
 
@@ -355,21 +355,21 @@ structure DistributiveLaw (A : Type u) (S T : PathMonad A) where
   dist : (x : A) → Path (S.obj (T.obj x)) (T.obj (S.obj x))
 
 /-- Theorem 41: Trivial distributive law (left identity) -/
-def trivialDistLawLeft {A : Type u} (M : PathMonad A) :
+noncomputable def trivialDistLawLeft {A : Type u} (M : PathMonad A) :
     DistributiveLaw A (idMonad A) M where
   dist := fun _ => Path.refl _
 
 /-- Theorem 42: Trivial distributive law (right identity) -/
-def trivialDistLawRight {A : Type u} (M : PathMonad A) :
+noncomputable def trivialDistLawRight {A : Type u} (M : PathMonad A) :
     DistributiveLaw A M (idMonad A) where
   dist := fun _ => Path.refl _
 
 /-- Theorem 43: Self-distributive law -/
-def selfDistLaw {A : Type u} : DistributiveLaw A (idMonad A) (idMonad A) where
+noncomputable def selfDistLaw {A : Type u} : DistributiveLaw A (idMonad A) (idMonad A) where
   dist := fun _ => Path.refl _
 
 /-- Theorem 44: Distributive law extraction -/
-def distAt {A : Type u} {S T : PathMonad A}
+noncomputable def distAt {A : Type u} {S T : PathMonad A}
     (dl : DistributiveLaw A S T) (x : A) :
     Path (S.obj (T.obj x)) (T.obj (S.obj x)) :=
   dl.dist x
@@ -385,7 +385,7 @@ structure MonadTransformer (A B : Type u) where
     Path.trans (lift_eta (lift_obj x)) (lift_mu x) = Path.refl (lift_obj x)
 
 /-- Theorem 45: Identity transformer -/
-def idTransformer (A B : Type u) : MonadTransformer A B where
+noncomputable def idTransformer (A B : Type u) : MonadTransformer A B where
   lift_obj := id
   lift_eta := fun x => Path.refl x
   lift_mu := fun x => Path.refl x
@@ -467,14 +467,14 @@ structure AlgPair (A : Type u) (M : PathMonad A) where
   bridge : Path alg1.carrier alg2.carrier
 
 /-- Theorem 58: Reflexive algebra pair -/
-def reflexiveAlgPair {A : Type u} {M : PathMonad A} (alg : EMAlgebra A M) :
+noncomputable def reflexiveAlgPair {A : Type u} {M : PathMonad A} (alg : EMAlgebra A M) :
     AlgPair A M where
   alg1 := alg
   alg2 := alg
   bridge := Path.refl alg.carrier
 
 /-- Theorem 59: Symmetric algebra pair -/
-def symmetricAlgPair {A : Type u} {M : PathMonad A} (ap : AlgPair A M) :
+noncomputable def symmetricAlgPair {A : Type u} {M : PathMonad A} (ap : AlgPair A M) :
     AlgPair A M where
   alg1 := ap.alg2
   alg2 := ap.alg1
@@ -498,12 +498,12 @@ structure MonadMorphism (A : Type u) (M N : PathMonad A) where
     Path.trans (M.eta x) (transform x) = N.eta x
 
 /-- Theorem 62: Identity monad morphism -/
-def idMonadMorphism {A : Type u} (M : PathMonad A) : MonadMorphism A M M where
+noncomputable def idMonadMorphism {A : Type u} (M : PathMonad A) : MonadMorphism A M M where
   transform := fun x => Path.refl (M.obj x)
   unit_compat := fun _ => by simp
 
 /-- Theorem 63: Composition of monad morphisms -/
-def monadMorphComp {A : Type u} {M N P : PathMonad A}
+noncomputable def monadMorphComp {A : Type u} {M N P : PathMonad A}
     (phi : MonadMorphism A M N) (psi : MonadMorphism A N P) :
     MonadMorphism A M P where
   transform := fun x => Path.trans (phi.transform x) (psi.transform x)
@@ -533,7 +533,7 @@ theorem monadMorphComp_assoc {A : Type u} {M N P Q : PathMonad A}
   simp [monadMorphComp]
 
 /-- Theorem 67: Monad morphism from identity monad -/
-def fromIdMorph {A : Type u} (M : PathMonad A) : MonadMorphism A (idMonad A) M where
+noncomputable def fromIdMorph {A : Type u} (M : PathMonad A) : MonadMorphism A (idMonad A) M where
   transform := fun x => M.eta x
   unit_compat := fun _ => by simp [idMonad]
 

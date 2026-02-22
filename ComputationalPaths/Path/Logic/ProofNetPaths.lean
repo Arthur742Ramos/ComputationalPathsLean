@@ -36,7 +36,7 @@ inductive MFormula (n : Nat) where
   deriving DecidableEq, Repr
 
 /-- Linear negation for MLL formulas (De Morgan dual). -/
-def MFormula.neg {n : Nat} : MFormula n → MFormula n
+noncomputable def MFormula.neg {n : Nat} : MFormula n → MFormula n
   | atom i => negAtom i
   | negAtom i => atom i
   | tensor A B => par (neg A) (neg B)
@@ -55,7 +55,7 @@ theorem MFormula.neg_neg {n : Nat} (A : MFormula n) : A.neg.neg = A := by
   | bot => rfl
 
 /-- Formula size (number of connectives + atoms). -/
-def MFormula.size {n : Nat} : MFormula n → Nat
+noncomputable def MFormula.size {n : Nat} : MFormula n → Nat
   | atom _ => 1
   | negAtom _ => 1
   | tensor A B => 1 + size A + size B
@@ -93,15 +93,15 @@ structure ProofStructure (n : Nat) where
   conclusions : List (MFormula n)
 
 /-- Empty proof structure. -/
-def ProofStructure.empty (n : Nat) : ProofStructure n :=
+noncomputable def ProofStructure.empty (n : Nat) : ProofStructure n :=
   { links := [], conclusions := [] }
 
 /-- Add a link to a proof structure. -/
-def ProofStructure.addLink {n : Nat} (ps : ProofStructure n) (l : Link n) : ProofStructure n :=
+noncomputable def ProofStructure.addLink {n : Nat} (ps : ProofStructure n) (l : Link n) : ProofStructure n :=
   { ps with links := l :: ps.links }
 
 /-- Number of links in a proof structure. -/
-def ProofStructure.numLinks {n : Nat} (ps : ProofStructure n) : Nat :=
+noncomputable def ProofStructure.numLinks {n : Nat} (ps : ProofStructure n) : Nat :=
   ps.links.length
 
 /-- Theorem 4: Adding a link increments count. -/
@@ -117,7 +117,7 @@ structure CorrectNet (n : Nat) extends ProofStructure n where
   correct : Prop
 
 /-- Path witnessing correctness: from any formula to any other. -/
-def correctnessPath {A : Type u} (a b : A) (h : a = b) : Path a b :=
+noncomputable def correctnessPath {A : Type u} (a b : A) (h : a = b) : Path a b :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Theorem 5: Correctness path is reflexive at identity. -/
@@ -134,13 +134,13 @@ inductive CutReduction (n : Nat) where
   | unitCut : CutReduction n
 
 /-- Reduction depth of a cut step. -/
-def CutReduction.depth {n : Nat} : CutReduction n → Nat
+noncomputable def CutReduction.depth {n : Nat} : CutReduction n → Nat
   | axiomCut _ => 0
   | tensorParCut A B => 1 + A.size + B.size
   | unitCut => 0
 
 /-- Path witnessing cut reduction: before ↝ after. -/
-def cutReductionPath (before after : Nat) (h : before = after) : Path before after :=
+noncomputable def cutReductionPath (before after : Nat) (h : before = after) : Path before after :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Theorem 6: Cut reduction path composes via trans. -/
@@ -164,7 +164,7 @@ inductive SequentProof (n : Nat) where
   | cut_ : SequentProof n → SequentProof n → SequentProof n
 
 /-- Proof size (number of inference rules). -/
-def SequentProof.size {n : Nat} : SequentProof n → Nat
+noncomputable def SequentProof.size {n : Nat} : SequentProof n → Nat
   | axiom_ _ => 1
   | tensor_ l r => 1 + size l + size r
   | par_ l r => 1 + size l + size r
@@ -175,7 +175,7 @@ theorem SequentProof.size_pos {n : Nat} (p : SequentProof n) : 0 < p.size := by
   cases p <;> simp [SequentProof.size]
 
 /-- Number of cuts in a proof. -/
-def SequentProof.numCuts {n : Nat} : SequentProof n → Nat
+noncomputable def SequentProof.numCuts {n : Nat} : SequentProof n → Nat
   | axiom_ _ => 0
   | tensor_ l r => numCuts l + numCuts r
   | par_ l r => numCuts l + numCuts r
@@ -200,7 +200,7 @@ theorem SequentProof.numCuts_cut {n : Nat} (l r : SequentProof n) :
 /-! ## Path-Based Proof Net Operations -/
 
 /-- Identity proof net: axiom linking each atom to its dual. -/
-def identityNet (n : Nat) : ProofStructure n :=
+noncomputable def identityNet (n : Nat) : ProofStructure n :=
   { links := List.ofFn (fun i : Fin n => Link.axiomLink i),
     conclusions := [] }
 
@@ -210,7 +210,7 @@ theorem identityNet_numLinks (n : Nat) :
   simp [identityNet, ProofStructure.numLinks, List.length_ofFn]
 
 /-- Compose two proof structures (tensor product). -/
-def ProofStructure.compose {n : Nat} (ps1 ps2 : ProofStructure n) : ProofStructure n :=
+noncomputable def ProofStructure.compose {n : Nat} (ps1 ps2 : ProofStructure n) : ProofStructure n :=
   { links := ps1.links ++ ps2.links,
     conclusions := ps1.conclusions ++ ps2.conclusions }
 
@@ -232,7 +232,7 @@ theorem ProofStructure.compose_empty_left {n : Nat} (ps : ProofStructure n) :
 /-! ## MFormula Subformula Count -/
 
 /-- Subformula count. -/
-def MFormula.subformulaCount {n : Nat} : MFormula n → Nat
+noncomputable def MFormula.subformulaCount {n : Nat} : MFormula n → Nat
   | atom _ => 1
   | negAtom _ => 1
   | tensor A B => 1 + subformulaCount A + subformulaCount B
@@ -260,7 +260,7 @@ theorem MFormula.subformulaCount_neg {n : Nat} (A : MFormula n) :
 /-! ## Tensor-Par Duality Paths -/
 
 /-- Path witnessing De Morgan duality between tensor and par. -/
-def deMorganPath {n : Nat} (A B : MFormula n) :
+noncomputable def deMorganPath {n : Nat} (A B : MFormula n) :
     Path (MFormula.tensor A B).neg ((MFormula.par A.neg B.neg) : MFormula n) :=
   Path.refl _
 
@@ -269,7 +269,7 @@ theorem deMorganPath_refl {n : Nat} (A B : MFormula n) :
     (deMorganPath A B).steps = [] := rfl
 
 /-- Path for unit duality: 1⊥ = ⊥. -/
-def unitDualityPath {n : Nat} :
+noncomputable def unitDualityPath {n : Nat} :
     Path (MFormula.one : MFormula n).neg (MFormula.bot : MFormula n) :=
   Path.refl _
 
@@ -280,7 +280,7 @@ theorem unitDualityPath_refl {n : Nat} :
 /-! ## Proof Composition Paths -/
 
 /-- Compose two proofs via cut. -/
-def compositionPath {A : Type u} {a b c : A}
+noncomputable def compositionPath {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -309,14 +309,14 @@ theorem compositionPath_symm_trans {A : Type u} {a b c : A}
 /-! ## Proof Net Weight -/
 
 /-- Weight of a link. -/
-def Link.weight {n : Nat} : Link n → Nat
+noncomputable def Link.weight {n : Nat} : Link n → Nat
   | axiomLink _ => 1
   | cutLink A _ => A.size
   | tensorLink A B => A.size + B.size
   | parLink A B => A.size + B.size
 
 /-- Total weight of a proof structure. -/
-def ProofStructure.weight {n : Nat} (ps : ProofStructure n) : Nat :=
+noncomputable def ProofStructure.weight {n : Nat} (ps : ProofStructure n) : Nat :=
   ps.links.foldl (fun acc l => acc + l.weight) 0
 
 /-- Theorem 25: Empty proof structure has zero weight. -/

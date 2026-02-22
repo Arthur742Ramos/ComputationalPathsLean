@@ -53,12 +53,12 @@ namespace PointedHom
 variable {A B C : PointedSet.{u}}
 
 /-- The identity pointed homomorphism. -/
-def id (A : PointedSet.{u}) : PointedHom A A where
+noncomputable def id (A : PointedSet.{u}) : PointedHom A A where
   toFun := _root_.id
   map_zero := rfl
 
 /-- Composition of pointed homomorphisms. -/
-def comp (g : PointedHom B C) (f : PointedHom A B) : PointedHom A C where
+noncomputable def comp (g : PointedHom B C) (f : PointedHom A B) : PointedHom A C where
   toFun := g.toFun ∘ f.toFun
   map_zero := by
     simp only [Function.comp]
@@ -86,7 +86,7 @@ theorem comp_id (f : PointedHom A B) :
 end PointedHom
 
 /-- The zero (constant) map. -/
-def zeroHom (A B : PointedSet.{u}) : PointedHom A B where
+noncomputable def zeroHom (A B : PointedSet.{u}) : PointedHom A B where
   toFun := fun _ => B.zero
   map_zero := rfl
 
@@ -110,20 +110,20 @@ structure ChainComplex3 where
 /-! ## Kernel, Image, and Exactness -/
 
 /-- The kernel of a pointed hom. -/
-def Kernel {A B : PointedSet.{u}} (f : PointedHom A B) : Type u :=
+noncomputable def Kernel {A B : PointedSet.{u}} (f : PointedHom A B) : Type u :=
   { x : A.carrier // f.toFun x = B.zero }
 
 /-- Zero is in the kernel. -/
-def kernel_zero {A B : PointedSet.{u}} (f : PointedHom A B) :
+noncomputable def kernel_zero {A B : PointedSet.{u}} (f : PointedHom A B) :
     Kernel f :=
   ⟨A.zero, f.map_zero⟩
 
 /-- The image of a pointed hom. -/
-def Image {A B : PointedSet.{u}} (f : PointedHom A B) : Type u :=
+noncomputable def Image {A B : PointedSet.{u}} (f : PointedHom A B) : Type u :=
   { y : B.carrier // ∃ x : A.carrier, f.toFun x = y }
 
 /-- Zero is in the image. -/
-def image_zero {A B : PointedSet.{u}} (f : PointedHom A B) :
+noncomputable def image_zero {A B : PointedSet.{u}} (f : PointedHom A B) :
     Image f :=
   ⟨B.zero, A.zero, f.map_zero⟩
 
@@ -156,7 +156,7 @@ structure ChainMap3 (C D : ChainComplex3.{u}) where
   comm₁₀ : ∀ x, f₀.toFun (C.d₁.toFun x) = D.d₁.toFun (f₁.toFun x)
 
 /-- The identity chain map. -/
-def ChainMap3.id (C : ChainComplex3.{u}) : ChainMap3 C C where
+noncomputable def ChainMap3.id (C : ChainComplex3.{u}) : ChainMap3 C C where
   f₂ := PointedHom.id C.C₂
   f₁ := PointedHom.id C.C₁
   f₀ := PointedHom.id C.C₀
@@ -227,7 +227,7 @@ theorem exactness_transfer {A B C A' B' C' : PointedSet.{u}}
 /-! ## Loop Space as a Pointed Set -/
 
 /-- The loop quotient as a pointed set. -/
-def loopPointedSet (A : Type u) (a : A) : PointedSet.{u} where
+noncomputable def loopPointedSet (A : Type u) (a : A) : PointedSet.{u} where
   carrier := π₁(A, a)
   zero := LoopQuot.id
 

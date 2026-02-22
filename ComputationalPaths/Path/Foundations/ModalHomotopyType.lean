@@ -11,24 +11,24 @@ structure Modality (α : Type u) where
   op : α → α
   modalProp : Prop
 
-def modalApply {α : Type u} (M : Modality α) (x : α) : α := M.op x
-def modalWitness {α : Type u} (M : Modality α) (x : α) : Path (modalApply M x) (modalApply M x) :=
+noncomputable def modalApply {α : Type u} (M : Modality α) (x : α) : α := M.op x
+noncomputable def modalWitness {α : Type u} (M : Modality α) (x : α) : Path (modalApply M x) (modalApply M x) :=
   Path.refl (modalApply M x)
-def modalFixedPoint {α : Type u} (M : Modality α) (x : α) : Prop := modalApply M x = x
-def modalId (α : Type u) : Modality α := ⟨fun x => x, True⟩
-def modalCompose {α : Type u} (M N : Modality α) : Modality α :=
+noncomputable def modalFixedPoint {α : Type u} (M : Modality α) (x : α) : Prop := modalApply M x = x
+noncomputable def modalId (α : Type u) : Modality α := ⟨fun x => x, True⟩
+noncomputable def modalCompose {α : Type u} (M N : Modality α) : Modality α :=
   ⟨fun x => modalApply N (modalApply M x), M.modalProp ∧ N.modalProp⟩
-def modalIterate {α : Type u} (M : Modality α) : Nat → α → α
+noncomputable def modalIterate {α : Type u} (M : Modality α) : Nat → α → α
   | 0, x => x
   | n + 1, x => modalApply M (modalIterate M n x)
-def modalCore {α : Type u} (M : Modality α) (x : α) : α := modalApply M x
+noncomputable def modalCore {α : Type u} (M : Modality α) (x : α) : α := modalApply M x
 
 structure LexModality (α : Type u) extends Modality α where
   preservesPullback : Prop
   preservesTerminal : Prop
 
-def lexAct {α : Type u} (L : LexModality α) (x : α) : α := modalApply L.toModality x
-def lexPredicate {α : Type u} (L : LexModality α) : Prop :=
+noncomputable def lexAct {α : Type u} (L : LexModality α) (x : α) : α := modalApply L.toModality x
+noncomputable def lexPredicate {α : Type u} (L : LexModality α) : Prop :=
   L.preservesPullback ∧ L.preservesTerminal
 
 structure OpenModality (α : Type u) extends Modality α where
@@ -37,19 +37,19 @@ structure OpenModality (α : Type u) extends Modality α where
 structure ClosedModality (α : Type u) extends Modality α where
   closes : α → Prop
 
-def openCore {α : Type u} (O : OpenModality α) (x : α) : α := modalApply O.toModality x
-def closedCore {α : Type u} (C : ClosedModality α) (x : α) : α := modalApply C.toModality x
+noncomputable def openCore {α : Type u} (O : OpenModality α) (x : α) : α := modalApply O.toModality x
+noncomputable def closedCore {α : Type u} (C : ClosedModality α) (x : α) : α := modalApply C.toModality x
 
 structure FractureDatum (α : Type u) where
   left : α → α
   right : α → α
   compatibility : Prop
 
-def fractureLeft {α : Type u} (F : FractureDatum α) (x : α) : α := F.left x
-def fractureRight {α : Type u} (F : FractureDatum α) (x : α) : α := F.right x
-def fractureGlue {α : Type u} (F : FractureDatum α) (x : α) : α × α :=
+noncomputable def fractureLeft {α : Type u} (F : FractureDatum α) (x : α) : α := F.left x
+noncomputable def fractureRight {α : Type u} (F : FractureDatum α) (x : α) : α := F.right x
+noncomputable def fractureGlue {α : Type u} (F : FractureDatum α) (x : α) : α × α :=
   (fractureLeft F x, fractureRight F x)
-def fractureConsistent {α : Type u} (F : FractureDatum α) : Prop := F.compatibility
+noncomputable def fractureConsistent {α : Type u} (F : FractureDatum α) : Prop := F.compatibility
 
 structure RealCohesive (α : Type u) where
   shape : Modality α
@@ -57,10 +57,10 @@ structure RealCohesive (α : Type u) where
   sharp : Modality α
   cohesiveProp : Prop
 
-def shapeOp {α : Type u} (R : RealCohesive α) (x : α) : α := modalApply R.shape x
-def flatOp {α : Type u} (R : RealCohesive α) (x : α) : α := modalApply R.flat x
-def sharpOp {α : Type u} (R : RealCohesive α) (x : α) : α := modalApply R.sharp x
-def cohesiveTriple {α : Type u} (R : RealCohesive α) (x : α) : α × (α × α) :=
+noncomputable def shapeOp {α : Type u} (R : RealCohesive α) (x : α) : α := modalApply R.shape x
+noncomputable def flatOp {α : Type u} (R : RealCohesive α) (x : α) : α := modalApply R.flat x
+noncomputable def sharpOp {α : Type u} (R : RealCohesive α) (x : α) : α := modalApply R.sharp x
+noncomputable def cohesiveTriple {α : Type u} (R : RealCohesive α) (x : α) : α × (α × α) :=
   (shapeOp R x, (flatOp R x, sharpOp R x))
 
 structure DifferentialClass (α : Type u) where
@@ -69,14 +69,14 @@ structure DifferentialClass (α : Type u) where
   flatPart : α
   sharpPart : α
 
-def differentialUnderlying {α : Type u} (D : DifferentialClass α) : α := D.underlying
-def differentialCurvature {α : Type u} (D : DifferentialClass α) : α := D.curvature
-def differentialFlatPart {α : Type u} (D : DifferentialClass α) : α := D.flatPart
-def differentialSharpPart {α : Type u} (D : DifferentialClass α) : α := D.sharpPart
-def differentialTuple {α : Type u} (D : DifferentialClass α) : α × (α × (α × α)) :=
+noncomputable def differentialUnderlying {α : Type u} (D : DifferentialClass α) : α := D.underlying
+noncomputable def differentialCurvature {α : Type u} (D : DifferentialClass α) : α := D.curvature
+noncomputable def differentialFlatPart {α : Type u} (D : DifferentialClass α) : α := D.flatPart
+noncomputable def differentialSharpPart {α : Type u} (D : DifferentialClass α) : α := D.sharpPart
+noncomputable def differentialTuple {α : Type u} (D : DifferentialClass α) : α × (α × (α × α)) :=
   (differentialUnderlying D, (differentialCurvature D, (differentialFlatPart D, differentialSharpPart D)))
 
-def modalPathChain {α : Type u} (x : α) : Path x x :=
+noncomputable def modalPathChain {α : Type u} (x : α) : Path x x :=
   Path.trans (Path.refl x) (Path.refl x)
 
 theorem modalApply_id {α : Type u} (x : α) : modalApply (modalId α) x = x := rfl

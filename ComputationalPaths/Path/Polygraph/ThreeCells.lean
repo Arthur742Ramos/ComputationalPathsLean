@@ -80,7 +80,7 @@ theorem derivEquiv_trans {e₁ e₂ : Expr} {d₁ d₂ d₃ : RwEqDeriv e₁ e�
     (h₁ : DerivEquiv d₁ d₂) (h₂ : DerivEquiv d₂ d₃) : DerivEquiv d₁ d₃ :=
   .dtrans h₁ h₂
 
-instance derivEquivSetoid (e₁ e₂ : Expr) : Setoid (RwEqDeriv e₁ e₂) where
+noncomputable instance derivEquivSetoid (e₁ e₂ : Expr) : Setoid (RwEqDeriv e₁ e₂) where
   r := DerivEquiv
   iseqv := ⟨derivEquiv_refl, fun h => derivEquiv_symm h, fun h₁ h₂ => derivEquiv_trans h₁ h₂⟩
 
@@ -108,20 +108,20 @@ We show there exist two genuinely different derivation equivalences
 between the same pair of 2-cells — a non-trivial 3-cell. -/
 
 /-- Two distinct derivations from `trans refl refl` to `refl`. -/
-def d_left : RwEqDeriv (.trans .refl .refl) .refl :=
+noncomputable def d_left : RwEqDeriv (.trans .refl .refl) .refl :=
   .trans_refl_left .refl
 
-def d_right : RwEqDeriv (.trans .refl .refl) .refl :=
+noncomputable def d_right : RwEqDeriv (.trans .refl .refl) .refl :=
   .trans_refl_right .refl
 
 /-- A 3-cell from d_left to d_right via symmetry of the intermediate form. -/
-def threeCell_via_symm : DerivEquiv
+noncomputable def threeCell_via_symm : DerivEquiv
     (RwEqDeriv.trans d_left (.symm d_right))
     (RwEqDeriv.trans d_left (.symm d_right)) :=
   .refl _
 
 /-- The identity 3-cell on d_left. -/
-def threeCell_id_left : DerivEquiv d_left d_left := .refl _
+noncomputable def threeCell_id_left : DerivEquiv d_left d_left := .refl _
 
 /-- A non-trivial 3-cell: the interchange applied to identity derivations
     produces a different witness than the plain identity. -/

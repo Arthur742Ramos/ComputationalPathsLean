@@ -69,13 +69,13 @@ structure HTPShMor {C : HTCat.{u, v}} (F G : HTPSh C) where
 
 /-! ## Theorem 1: Presheaf identity morphism -/
 
-def presheaf_id_mor (F : HTPSh C) : HTPShMor F F where
+noncomputable def presheaf_id_mor (F : HTPSh C) : HTPShMor F F where
   comp_at := fun _ s => s
   nat := fun _ _ => Path.refl _
 
 /-! ## Theorem 2: Presheaf morphism composition -/
 
-def presheaf_comp_mor {F G H : HTPSh C}
+noncomputable def presheaf_comp_mor {F G H : HTPSh C}
     (α : HTPShMor F G) (β : HTPShMor G H) : HTPShMor F H where
   comp_at := fun A s => β.comp_at A (α.comp_at A s)
   nat := fun {A B} f s =>
@@ -108,7 +108,7 @@ structure HTSieve (C : HTCat.{u, v}) (c : C.Obj) where
   closed : {d e : C.Obj} → (f : C.Hom d c) → (g : C.Hom e d) →
     mem f → mem (C.comp g f)
 
-def maxSieve (C : HTCat.{u, v}) (c : C.Obj) : HTSieve C c where
+noncomputable def maxSieve (C : HTCat.{u, v}) (c : C.Obj) : HTSieve C c where
   mem := fun _ => True
   closed := fun _ _ _ => True.intro
 
@@ -152,7 +152,7 @@ structure HTSheaf (C : HTCat.{u, v}) (J : HTGTop C) where
 
 /-! ## Theorem 8: Amalgamation restricts correctly -/
 
-def amalg_restricts {J : HTGTop C} {F : HTPSh C}
+noncomputable def amalg_restricts {J : HTGTop C} {F : HTPSh C}
     {c : C.Obj} {S : HTSieve C c}
     (sc : HTSheafCond J F) (hS : J.cov c S) (m : HTMatch F S)
     {d : C.Obj} (f : C.Hom d c) (hf : S.mem f) :
@@ -169,7 +169,7 @@ theorem sheaf_unique {J : HTGTop C} {F : HTPSh C}
 
 /-! ## Theorem 10: Amalgamation restriction via congrArg -/
 
-def amalg_restrict_congr {J : HTGTop C} {F : HTPSh C}
+noncomputable def amalg_restrict_congr {J : HTGTop C} {F : HTPSh C}
     {c : C.Obj} {S : HTSieve C c}
     (sc : HTSheafCond J F) (hS : J.cov c S) (m : HTMatch F S)
     {d e : C.Obj} (f : C.Hom d c) (g : C.Hom e d) (hf : S.mem f) :
@@ -192,12 +192,12 @@ structure HTGrpd (C : HTCat.{u, v}) extends HTSimp C where
 
 /-! ## Theorem 11: Groupoid inverse is involutive -/
 
-def grpd_inv_involutive (G : HTGrpd C) :
+noncomputable def grpd_inv_involutive (G : HTGrpd C) :
     Path (C.comp G.inv G.inv) (C.id (G.lev 1)) := G.inv_inv
 
 /-! ## Theorem 12: Groupoid face-degeneracy cancellation -/
 
-def grpd_face_degen (G : HTGrpd C) (i : Fin 1) :
+noncomputable def grpd_face_degen (G : HTGrpd C) (i : Fin 1) :
     Path (C.comp (G.degen 0 i) (G.face 0 i.castSucc)) (C.id (G.lev 0)) :=
   G.face_degen_id 0 i
 
@@ -218,28 +218,28 @@ structure HTGeom (E F : HTCat.{u, v}) where
 
 /-! ## Theorem 13: Geometric morphism left triangle -/
 
-def geom_tri_L {E F : HTCat.{u, v}} (gm : HTGeom E F) (A : F.Obj) :
+noncomputable def geom_tri_L {E F : HTCat.{u, v}} (gm : HTGeom E F) (A : F.Obj) :
     Path (E.comp (gm.inverse.map (gm.adj.unit A)) (gm.adj.counit (gm.inverse.obj A)))
          (E.id (gm.inverse.obj A)) :=
   gm.adj.tri_L A
 
 /-! ## Theorem 14: Geometric morphism right triangle -/
 
-def geom_tri_R {E F : HTCat.{u, v}} (gm : HTGeom E F) (B : E.Obj) :
+noncomputable def geom_tri_R {E F : HTCat.{u, v}} (gm : HTGeom E F) (B : E.Obj) :
     Path (F.comp (gm.adj.unit (gm.direct.obj B)) (gm.direct.map (gm.adj.counit B)))
          (F.id (gm.direct.obj B)) :=
   gm.adj.tri_R B
 
 /-! ## Theorem 15: Functor composition preserves identity via trans -/
 
-def fun_comp_id {C D E : HTCat.{u, v}}
+noncomputable def fun_comp_id {C D E : HTCat.{u, v}}
     (F : HTFun C D) (G : HTFun D E) (A : C.Obj) :
     Path (G.map (F.map (C.id A))) (E.id (G.obj (F.obj A))) :=
   Path.trans (congrArg G.map (F.map_id A)) (G.map_id (F.obj A))
 
 /-! ## Theorem 16: Functor composition preserves composition via trans -/
 
-def fun_comp_comp {C D E : HTCat.{u, v}}
+noncomputable def fun_comp_comp {C D E : HTCat.{u, v}}
     (F : HTFun C D) (G : HTFun D E)
     {A B K : C.Obj} (f : C.Hom A B) (g : C.Hom B K) :
     Path (G.map (F.map (C.comp f g)))
@@ -261,14 +261,14 @@ structure HTClassTopos (site : HTSite.{u, v}) where
 
 /-! ## Theorem 17: Embedding preserves identity -/
 
-def classify_embed_id {site : HTSite.{u, v}} (ct : HTClassTopos site)
+noncomputable def classify_embed_id {site : HTSite.{u, v}} (ct : HTClassTopos site)
     (A : site.cat.Obj) :
     Path (ct.embed.map (site.cat.id A)) (ct.topos.id (ct.embed.obj A)) :=
   ct.embed.map_id A
 
 /-! ## Theorem 18: Embedding preserves composition -/
 
-def classify_embed_comp {site : HTSite.{u, v}} (ct : HTClassTopos site)
+noncomputable def classify_embed_comp {site : HTSite.{u, v}} (ct : HTClassTopos site)
     {A B E : site.cat.Obj} (f : site.cat.Hom A B) (g : site.cat.Hom B E) :=
   ct.embed.map_comp f g
 
@@ -307,30 +307,30 @@ structure HTGiraud (C : HTCat.{u, v}) where
 
 /-! ## Theorem 19: Coproduct inl cancellation -/
 
-def coprod_inl_cancel {A B : C.Obj}
+noncomputable def coprod_inl_cancel {A B : C.Obj}
     (cp : HTCoprod C A B) {X : C.Obj} (f : C.Hom A X) (g : C.Hom B X) :
     Path (C.comp cp.inl (cp.elim f g)) f := cp.inl_elim f g
 
 /-! ## Theorem 20: Coproduct inr cancellation -/
 
-def coprod_inr_cancel {A B : C.Obj}
+noncomputable def coprod_inr_cancel {A B : C.Obj}
     (cp : HTCoprod C A B) {X : C.Obj} (f : C.Hom A X) (g : C.Hom B X) :
     Path (C.comp cp.inr (cp.elim f g)) g := cp.inr_elim f g
 
 /-! ## Theorem 21: Coequalizer absorbs relation -/
 
-def coeq_absorbs {A B : C.Obj} {f g : C.Hom A B} (cq : HTCoeq C f g) :
+noncomputable def coeq_absorbs {A B : C.Obj} {f g : C.Hom A B} (cq : HTCoeq C f g) :
     Path (C.comp f cq.proj) (C.comp g cq.proj) := cq.cond
 
 /-! ## Theorem 22: Coequalizer universal property -/
 
-def coeq_univ {A B : C.Obj} {f g : C.Hom A B} (cq : HTCoeq C f g)
+noncomputable def coeq_univ {A B : C.Obj} {f g : C.Hom A B} (cq : HTCoeq C f g)
     {X : C.Obj} (h : C.Hom B X) (p : Path (C.comp f h) (C.comp g h)) :
     Path (C.comp cq.proj (cq.elim h p)) h := cq.proj_elim h p
 
 /-! ## Theorem 23: Effective epi kernel relation -/
 
-def eff_epi_rel {A B : C.Obj} {e : C.Hom A B} (eff : HTEffEpi C e) :
+noncomputable def eff_epi_rel {A B : C.Obj} {e : C.Hom A B} (eff : HTEffEpi C e) :
     Path (C.comp eff.pr1 e) (C.comp eff.pr2 e) := eff.rel
 
 /-! ## Path descent -/
@@ -344,7 +344,7 @@ structure HTDescent {C : HTCat.{u, v}} {J : HTGTop C}
 
 /-! ## Theorem 24: Descent datum to matching family -/
 
-def descent_to_match {J : HTGTop C} {c : C.Obj}
+noncomputable def descent_to_match {J : HTGTop C} {c : C.Obj}
     {S : HTSieve C c} {F : HTPSh C}
     (dd : HTDescent (C := C) (J := J) (S := S) F) : HTMatch F S where
   fam := dd.loc
@@ -352,7 +352,7 @@ def descent_to_match {J : HTGTop C} {c : C.Obj}
 
 /-! ## Theorem 25: Sheaf descent yields global section -/
 
-def sheaf_descent {J : HTGTop C} {c : C.Obj}
+noncomputable def sheaf_descent {J : HTGTop C} {c : C.Obj}
     {S : HTSieve C c} {F : HTPSh C}
     (sc : HTSheafCond J F) (hS : J.cov c S)
     (dd : HTDescent (C := C) (J := J) (S := S) F) : F.sec c :=
@@ -360,7 +360,7 @@ def sheaf_descent {J : HTGTop C} {c : C.Obj}
 
 /-! ## Theorem 26: Descended section restricts to local data -/
 
-def descended_restricts {J : HTGTop C} {c : C.Obj}
+noncomputable def descended_restricts {J : HTGTop C} {c : C.Obj}
     {S : HTSieve C c} {F : HTPSh C}
     (sc : HTSheafCond J F) (hS : J.cov c S)
     (dd : HTDescent (C := C) (J := J) (S := S) F)
@@ -370,7 +370,7 @@ def descended_restricts {J : HTGTop C} {c : C.Obj}
 
 /-! ## Representable presheaf and Yoneda -/
 
-def yoneda (C : HTCat.{u, v}) (c : C.Obj) : HTPSh C where
+noncomputable def yoneda (C : HTCat.{u, v}) (c : C.Obj) : HTPSh C where
   sec := fun d => C.Hom d c
   res := fun f g => C.comp f g
   res_id := fun A s => C.id_left s
@@ -378,26 +378,26 @@ def yoneda (C : HTCat.{u, v}) (c : C.Obj) : HTPSh C where
 
 /-! ## Theorem 27: Yoneda forward map -/
 
-def yoneda_fwd {c : C.Obj} {F : HTPSh C}
+noncomputable def yoneda_fwd {c : C.Obj} {F : HTPSh C}
     (α : HTPShMor (yoneda C c) F) : F.sec c :=
   α.comp_at c (C.id c)
 
 /-! ## Theorem 28: Yoneda backward map -/
 
-def yoneda_bwd {c : C.Obj} {F : HTPSh C}
+noncomputable def yoneda_bwd {c : C.Obj} {F : HTPSh C}
     (s : F.sec c) : HTPShMor (yoneda C c) F where
   comp_at := fun d f => F.res f s
   nat := fun {A B} f g => F.res_comp f g s
 
 /-! ## Theorem 29: Yoneda roundtrip -/
 
-def yoneda_roundtrip {c : C.Obj} {F : HTPSh C} (s : F.sec c) :
+noncomputable def yoneda_roundtrip {c : C.Obj} {F : HTPSh C} (s : F.sec c) :
     Path (yoneda_fwd (yoneda_bwd s)) s :=
   F.res_id c s
 
 /-! ## Theorem 30: Natural transformation vertical composition -/
 
-def nat_vcomp {C D : HTCat.{u, v}} {F G H : HTFun C D}
+noncomputable def nat_vcomp {C D : HTCat.{u, v}} {F G H : HTFun C D}
     (α : HTNat F G) (β : HTNat G H) : HTNat F H where
   app := fun A => D.comp (α.app A) (β.app A)
   natural := fun {A B} f =>
@@ -413,7 +413,7 @@ def nat_vcomp {C D : HTCat.{u, v}} {F G H : HTFun C D}
 
 /-! ## Theorem 31: Identity natural transformation -/
 
-def nat_id {C D : HTCat.{u, v}} (F : HTFun C D) : HTNat F F where
+noncomputable def nat_id {C D : HTCat.{u, v}} (F : HTFun C D) : HTNat F F where
   app := fun A => D.id (F.obj A)
   natural := fun {A B} f =>
     Path.trans (D.id_right (F.map f)) (Path.symm (D.id_left (F.map f)))
@@ -428,13 +428,13 @@ structure HTPlusConstr {C : HTCat.{u, v}} (J : HTGTop C) (F : HTPSh C) where
     (s : sec' E) → Path (res' (C.comp f g) s) (res' f (res' g s))
   eta : (A : C.Obj) → F.sec A → sec' A
 
-def plus_id {J : HTGTop C} {F : HTPSh C}
+noncomputable def plus_id {J : HTGTop C} {F : HTPSh C}
     (pc : HTPlusConstr J F) (A : C.Obj) (s : pc.sec' A) :
     Path (pc.res' (C.id A) s) s := pc.res'_id A s
 
 /-! ## Theorem 33: Plus composition -/
 
-def plus_comp {J : HTGTop C} {F : HTPSh C}
+noncomputable def plus_comp {J : HTGTop C} {F : HTPSh C}
     (pc : HTPlusConstr J F) {A B E : C.Obj}
     (f : C.Hom A B) (g : C.Hom B E) (s : pc.sec' E) :
     Path (pc.res' (C.comp f g) s) (pc.res' f (pc.res' g s)) :=
@@ -442,21 +442,21 @@ def plus_comp {J : HTGTop C} {F : HTPSh C}
 
 /-! ## Theorem 34: Presheaf restriction coherence -/
 
-def psh_res_coh (F : HTPSh C) {A B E : C.Obj}
+noncomputable def psh_res_coh (F : HTPSh C) {A B E : C.Obj}
     (f : C.Hom A B) (g : C.Hom B E) (s : F.sec E) :
     Path (F.res (C.comp f g) s) (F.res f (F.res g s)) :=
   F.res_comp f g s
 
 /-! ## Theorem 35: Symmetry of presheaf restriction -/
 
-def psh_res_symm (F : HTPSh C) {A B E : C.Obj}
+noncomputable def psh_res_symm (F : HTPSh C) {A B E : C.Obj}
     (f : C.Hom A B) (g : C.Hom B E) (s : F.sec E) :
     Path (F.res f (F.res g s)) (F.res (C.comp f g) s) :=
   Path.symm (F.res_comp f g s)
 
 /-! ## Theorem 36: Functor map respects path -/
 
-def fun_map_path {C D : HTCat.{u, v}} (F : HTFun C D)
+noncomputable def fun_map_path {C D : HTCat.{u, v}} (F : HTFun C D)
     {A B : C.Obj} {f g : C.Hom A B} (p : Path f g) :
     Path (F.map f) (F.map g) :=
   congrArg F.map p
@@ -468,14 +468,14 @@ theorem nat_id_comp {C D : HTCat.{u, v}} (F : HTFun C D) (A : C.Obj) :
 
 /-! ## Theorem 38: Giraud coproduct elimination -/
 
-def giraud_coprod {G : HTGiraud C} (A B : C.Obj)
+noncomputable def giraud_coprod {G : HTGiraud C} (A B : C.Obj)
     {X : C.Obj} (f : C.Hom A X) (g : C.Hom B X) :
     Path (C.comp (G.has_coprod A B).inl ((G.has_coprod A B).elim f g)) f :=
   (G.has_coprod A B).inl_elim f g
 
 /-! ## Theorem 39: Giraud coequalizer -/
 
-def giraud_coeq {G : HTGiraud C} {A B : C.Obj}
+noncomputable def giraud_coeq {G : HTGiraud C} {A B : C.Obj}
     (f g : C.Hom A B) {X : C.Obj} (h : C.Hom B X)
     (p : Path (C.comp f h) (C.comp g h)) :
     Path (C.comp (G.has_coeq f g).proj ((G.has_coeq f g).elim h p)) h :=
@@ -483,7 +483,7 @@ def giraud_coeq {G : HTGiraud C} {A B : C.Obj}
 
 /-! ## Theorem 40: Descent restriction coherence via congrArg -/
 
-def descent_restrict_coh {J : HTGTop C}
+noncomputable def descent_restrict_coh {J : HTGTop C}
     {c : C.Obj} {S : HTSieve C c} {F : HTPSh C}
     (sc : HTSheafCond J F) (hS : J.cov c S)
     (dd : HTDescent (C := C) (J := J) (S := S) F)
@@ -494,26 +494,26 @@ def descent_restrict_coh {J : HTGTop C}
 
 /-! ## Theorem 41: Presheaf restriction identity -/
 
-def psh_res_id (F : HTPSh C) (A : C.Obj) (s : F.sec A) :
+noncomputable def psh_res_id (F : HTPSh C) (A : C.Obj) (s : F.sec A) :
     Path (F.res (C.id A) s) s := F.res_id A s
 
 /-! ## Theorem 42: Adjunction left triangle -/
 
-def adj_tri_L {C D : HTCat.{u, v}} {L : HTFun C D} {R : HTFun D C}
+noncomputable def adj_tri_L {C D : HTCat.{u, v}} {L : HTFun C D} {R : HTFun D C}
     (adj : HTAdj L R) (A : C.Obj) :
     Path (D.comp (L.map (adj.unit A)) (adj.counit (L.obj A)))
          (D.id (L.obj A)) := adj.tri_L A
 
 /-! ## Theorem 43: Adjunction right triangle -/
 
-def adj_tri_R {C D : HTCat.{u, v}} {L : HTFun C D} {R : HTFun D C}
+noncomputable def adj_tri_R {C D : HTCat.{u, v}} {L : HTFun C D} {R : HTFun D C}
     (adj : HTAdj L R) (B : D.Obj) :
     Path (C.comp (adj.unit (R.obj B)) (R.map (adj.counit B)))
          (C.id (R.obj B)) := adj.tri_R B
 
 /-! ## Theorem 44: Functor identity via map_id and congrArg -/
 
-def fun_id_congr {C D : HTCat.{u, v}} (F : HTFun C D)
+noncomputable def fun_id_congr {C D : HTCat.{u, v}} (F : HTFun C D)
     {A B : C.Obj} (f : C.Hom A B) :
     Path (D.comp (F.map f) (D.id (F.obj B)))
          (F.map f) :=

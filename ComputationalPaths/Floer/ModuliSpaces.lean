@@ -61,14 +61,14 @@ namespace ModuliSpacePathData
 variable {Obj Mor Gen : Type u} (M : ModuliSpacePathData Obj Mor Gen)
 
 /-- Boundary transport induced by gluing, under differential application. -/
-def boundaryAfterGluingPath (f g : Mor) :
+noncomputable def boundaryAfterGluingPath (f g : Mor) :
     Path
       (M.graded.complex.differential (M.chordOf (M.fukaya.mu2 f g)))
       (M.graded.complex.differential (M.graded.complex.continuation (M.chordOf g))) :=
   Path.congrArg M.graded.complex.differential (M.gluingPath f g)
 
 /-- Pseudo-holomorphic strip transport into the strip-boundary equation. -/
-def stripToBoundaryPath (f : Mor) :
+noncomputable def stripToBoundaryPath (f : Mor) :
     Path
       (M.pseudo.strip (M.chordOf (M.fukaya.mu1 f)))
       (M.graded.complex.differential (M.chordOf f)) :=
@@ -77,7 +77,7 @@ def stripToBoundaryPath (f : Mor) :
     (M.stripBoundaryPath f)
 
 /-- Step witness: right-unit normalization for strip-boundary paths. -/
-def stripBoundary_step (f : Mor) :
+noncomputable def stripBoundary_step (f : Mor) :
     Path.Step
       (Path.trans
         (M.stripBoundaryPath f)
@@ -94,7 +94,7 @@ noncomputable def stripBoundary_rweq (f : Mor) :
   rweq_of_step (M.stripBoundary_step f)
 
 /-- Step witness: right-unit normalization for pseudo strip-boundary transport. -/
-def stripToBoundary_step (f : Mor) :
+noncomputable def stripToBoundary_step (f : Mor) :
     Path.Step
       (Path.trans
         (M.stripToBoundaryPath f)
@@ -111,7 +111,7 @@ noncomputable def stripToBoundary_rweq (f : Mor) :
   rweq_of_step (M.stripToBoundary_step f)
 
 /-- Step witness: right-unit normalization for gluing paths. -/
-def gluing_step (f g : Mor) :
+noncomputable def gluing_step (f g : Mor) :
     Path.Step
       (Path.trans
         (M.gluingPath f g)
@@ -128,7 +128,7 @@ noncomputable def gluing_rweq (f g : Mor) :
   rweq_of_step (M.gluing_step f g)
 
 /-- Step witness: right-unit normalization for identity-degeneracy paths. -/
-def identityDegeneracy_step (X : Obj) :
+noncomputable def identityDegeneracy_step (X : Obj) :
     Path.Step
       (Path.trans (M.identityDegeneracyPath X) (Path.refl M.graded.complex.zero))
       (M.identityDegeneracyPath X) :=
@@ -141,7 +141,7 @@ noncomputable def identityDegeneracy_rweq (X : Obj) :
   rweq_of_step (M.identityDegeneracy_step X)
 
 /-- Step witness: left-unit normalization for expected dimension drop. -/
-def dimensionDrop_step (f : Mor) :
+noncomputable def dimensionDrop_step (f : Mor) :
     Path.Step
       (Path.trans
         (Path.refl (M.graded.grading (M.chordOf (M.fukaya.mu1 f))))
@@ -158,7 +158,7 @@ noncomputable def dimensionDrop_rweq (f : Mor) :
   rweq_of_step (M.dimensionDrop_step f)
 
 /-- Step witness: right-unit normalization for boundary-after-gluing paths. -/
-def boundaryAfterGluing_step (f g : Mor) :
+noncomputable def boundaryAfterGluing_step (f g : Mor) :
     Path.Step
       (Path.trans
         (M.boundaryAfterGluingPath f g)
@@ -191,7 +191,7 @@ noncomputable def pseudoCurve_cancel_rweq (f : Mor) :
 end ModuliSpacePathData
 
 /-- Trivial model instantiating the moduli-space computational-path interface. -/
-def trivialModuliSpacePathData : ModuliSpacePathData PUnit PUnit PUnit where
+noncomputable def trivialModuliSpacePathData : ModuliSpacePathData PUnit PUnit PUnit where
   fukaya := FukayaCategoryPaths.trivialFukayaCategoryPathData
   graded := GradedPaths.trivialGradedFloerPathData
   pseudo := PseudoHolomorphicCurves.trivialPseudoHolomorphicPathData

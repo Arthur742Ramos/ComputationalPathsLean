@@ -81,7 +81,7 @@ noncomputable def sectionConjecture_in_program_rweq (X : Obj) :
 end GrothendieckProgramPaths
 
 /-- Build Grothendieck-program data from path-level witnesses. -/
-def mkGrothendieckProgramPaths
+noncomputable def mkGrothendieckProgramPaths
     {Obj : Type u}
     (conjectures : AnabelianConjecturePaths Obj)
     (reconstruction : Obj → Obj)
@@ -99,7 +99,7 @@ def mkGrothendieckProgramPaths
   functorialityStep := fun X => Path.Step.trans_refl_left (functorialityPath X)
 
 /-- Canonical identity-model instance of Grothendieck's program paths. -/
-def trivialGrothendieckProgramPaths (Obj : Type u) : GrothendieckProgramPaths Obj where
+noncomputable def trivialGrothendieckProgramPaths (Obj : Type u) : GrothendieckProgramPaths Obj where
   conjectures := trivialAnabelianConjecturePaths Obj
   reconstruction := fun X => X
   reconstructionPath := fun X => Path.refl X

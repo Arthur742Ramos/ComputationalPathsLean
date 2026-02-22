@@ -59,7 +59,7 @@ namespace PseudoHolomorphicPathData
 variable {Gen : Type u} (P : PseudoHolomorphicPathData Gen)
 
 /-- Boundary transport induced by compactifying a Cauchy-Riemann strip. -/
-def boundaryAfterCompactificationPath (x : Gen) :
+noncomputable def boundaryAfterCompactificationPath (x : Gen) :
     Path
       (P.compactify (P.strip (P.complex.differential x)))
       (P.complex.continuation (P.complex.differential x)) :=
@@ -68,7 +68,7 @@ def boundaryAfterCompactificationPath (x : Gen) :
     (P.compactificationPath x)
 
 /-- Step witness: right-unit normalization for Cauchy-Riemann compatibility. -/
-def cauchyRiemann_step (x : Gen) :
+noncomputable def cauchyRiemann_step (x : Gen) :
     Path.Step
       (Path.trans
         (P.cauchyRiemannPath x)
@@ -85,7 +85,7 @@ noncomputable def cauchyRiemann_rweq (x : Gen) :
   rweq_of_step (P.cauchyRiemann_step x)
 
 /-- Step witness: right-unit normalization for asymptotic boundary behavior. -/
-def asymptoticBoundary_step (x : Gen) :
+noncomputable def asymptoticBoundary_step (x : Gen) :
     Path.Step
       (Path.trans
         (P.asymptoticBoundaryPath x)
@@ -102,7 +102,7 @@ noncomputable def asymptoticBoundary_rweq (x : Gen) :
   rweq_of_step (P.asymptoticBoundary_step x)
 
 /-- Step witness: left-unit normalization for energy/action transport. -/
-def energyAction_step (x : Gen) :
+noncomputable def energyAction_step (x : Gen) :
     Path.Step
       (Path.trans
         (Path.refl (P.energy (P.strip x)))
@@ -119,7 +119,7 @@ noncomputable def energyAction_rweq (x : Gen) :
   rweq_of_step (P.energyAction_step x)
 
 /-- Step witness: right-unit normalization for compactification transport. -/
-def compactification_step (x : Gen) :
+noncomputable def compactification_step (x : Gen) :
     Path.Step
       (Path.trans
         (P.compactificationPath x)
@@ -136,7 +136,7 @@ noncomputable def compactification_rweq (x : Gen) :
   rweq_of_step (P.compactification_step x)
 
 /-- Step witness: right-unit normalization for compactified strip boundary paths. -/
-def boundaryAfterCompactification_step (x : Gen) :
+noncomputable def boundaryAfterCompactification_step (x : Gen) :
     Path.Step
       (Path.trans
         (P.boundaryAfterCompactificationPath x)
@@ -161,7 +161,7 @@ noncomputable def asymptoticBoundary_cancel_rweq (x : Gen) :
 end PseudoHolomorphicPathData
 
 /-- Trivial model instantiating pseudo-holomorphic computational-path data. -/
-def trivialPseudoHolomorphicPathData : PseudoHolomorphicPathData PUnit where
+noncomputable def trivialPseudoHolomorphicPathData : PseudoHolomorphicPathData PUnit where
   complex := FloerComplex.trivialFloerComplexPathData
   strip := fun _ => PUnit.unit
   compactify := fun _ => PUnit.unit

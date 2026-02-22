@@ -52,7 +52,7 @@ structure CP where
   step_right : CStep source right
 
 /-- A critical pair is joinable if both reducts reduce to a common expression. -/
-def Joinable (cp : CP) : Prop :=
+noncomputable def Joinable (cp : CP) : Prop :=
   ∃ d, CRTC cp.left d ∧ CRTC cp.right d
 
 /-! ## Type 1: Base Rule vs trans_assoc
@@ -62,7 +62,7 @@ These arise from `trans (trans X Y) Z` where:
 - A base rule applies to the inner `trans X Y` (via `trans_congr_left Z`) -/
 
 /-- CP1a: trans_refl_left vs trans_assoc on `trans (trans refl p) q` -/
-def cp1a (p q : Expr) : CP where
+noncomputable def cp1a (p q : Expr) : CP where
   source := .trans (.trans .refl p) q
   left := .trans p q
   right := .trans .refl (.trans p q)
@@ -73,7 +73,7 @@ theorem cp1a_joinable (p q : Expr) : Joinable (cp1a p q) :=
   ⟨.trans p q, .refl _, CRTC.single (.trans_refl_left _)⟩
 
 /-- CP1b: trans_refl_right vs trans_assoc on `trans (trans p refl) q` -/
-def cp1b (p q : Expr) : CP where
+noncomputable def cp1b (p q : Expr) : CP where
   source := .trans (.trans p .refl) q
   left := .trans p q
   right := .trans p (.trans .refl q)
@@ -84,7 +84,7 @@ theorem cp1b_joinable (p q : Expr) : Joinable (cp1b p q) :=
   ⟨.trans p q, .refl _, CRTC.trans_congr_right p (CRTC.single (.trans_refl_left q))⟩
 
 /-- CP1c: trans_symm vs trans_assoc on `trans (trans p (symm p)) q` -/
-def cp1c (p q : Expr) : CP where
+noncomputable def cp1c (p q : Expr) : CP where
   source := .trans (.trans p (.symm p)) q
   left := .trans .refl q
   right := .trans p (.trans (.symm p) q)
@@ -95,7 +95,7 @@ theorem cp1c_joinable (p q : Expr) : Joinable (cp1c p q) :=
   ⟨q, CRTC.single (.trans_refl_left q), CRTC.single (.trans_cancel_left p q)⟩
 
 /-- CP1d: symm_trans vs trans_assoc on `trans (trans (symm p) p) q` -/
-def cp1d (p q : Expr) : CP where
+noncomputable def cp1d (p q : Expr) : CP where
   source := .trans (.trans (.symm p) p) q
   left := .trans .refl q
   right := .trans (.symm p) (.trans p q)
@@ -107,7 +107,7 @@ theorem cp1d_joinable (p q : Expr) : Joinable (cp1d p q) :=
 
 /-- CP1e: trans_assoc on nested trans: `trans (trans (trans p q) r) s`
     Two applications of trans_assoc overlap (Mac Lane pentagon). -/
-def cp1e (p q r s : Expr) : CP where
+noncomputable def cp1e (p q r s : Expr) : CP where
   source := .trans (.trans (.trans p q) r) s
   left := .trans (.trans p q) (.trans r s)
   right := .trans (.trans p (.trans q r)) s
@@ -126,7 +126,7 @@ These arise from `symm (trans X Y)` where both `symm_trans_congr`
 and a congruence under `symm` might apply. -/
 
 /-- CP2a: symm_trans_congr on `symm (trans refl p)` -/
-def cp2a (p : Expr) : CP where
+noncomputable def cp2a (p : Expr) : CP where
   source := .symm (.trans .refl p)
   left := .trans (.symm p) (.symm .refl)
   right := .symm p
@@ -140,7 +140,7 @@ theorem cp2a_joinable (p : Expr) : Joinable (cp2a p) :=
    .refl _⟩
 
 /-- CP2b: symm_trans_congr on `symm (trans p refl)` -/
-def cp2b (p : Expr) : CP where
+noncomputable def cp2b (p : Expr) : CP where
   source := .symm (.trans p .refl)
   left := .trans (.symm .refl) (.symm p)
   right := .symm p
@@ -159,7 +159,7 @@ These arise from the interaction of `trans_cancel_left`/`trans_cancel_right`
 with `trans_assoc`. -/
 
 /-- CP3a: trans_cancel_left vs trans_assoc on `trans (trans p (trans (symm p) q)) r` -/
-def cp3a (p q r : Expr) : CP where
+noncomputable def cp3a (p q r : Expr) : CP where
   source := .trans (.trans p (.trans (.symm p) q)) r
   left := .trans q r
   right := .trans p (.trans (.trans (.symm p) q) r)
@@ -173,7 +173,7 @@ theorem cp3a_joinable (p q r : Expr) : Joinable (cp3a p q r) :=
      (CRTC.single (.trans_cancel_left p (.trans q r)))⟩
 
 /-- CP3b: trans_cancel_right vs trans_assoc on `trans (trans (symm p) (trans p q)) r` -/
-def cp3b (p q r : Expr) : CP where
+noncomputable def cp3b (p q r : Expr) : CP where
   source := .trans (.trans (.symm p) (.trans p q)) r
   left := .trans q r
   right := .trans (.symm p) (.trans (.trans p q) r)

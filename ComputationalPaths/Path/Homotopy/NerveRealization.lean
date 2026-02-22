@@ -78,17 +78,17 @@ namespace SmallCatData
 variable (C : SmallCatData)
 
 /-- `Path`-typed left identity. -/
-def id_comp_path {a b : C.Obj} (f : C.Hom a b) :
+noncomputable def id_comp_path {a b : C.Obj} (f : C.Hom a b) :
     Path (C.comp (C.id a) f) f :=
   Path.stepChain (C.id_comp f)
 
 /-- `Path`-typed right identity. -/
-def comp_id_path {a b : C.Obj} (f : C.Hom a b) :
+noncomputable def comp_id_path {a b : C.Obj} (f : C.Hom a b) :
     Path (C.comp f (C.id b)) f :=
   Path.stepChain (C.comp_id f)
 
 /-- `Path`-typed associativity. -/
-def comp_assoc_path {a b c d : C.Obj}
+noncomputable def comp_assoc_path {a b c d : C.Obj}
     (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) :
     Path (C.comp (C.comp f g) h) (C.comp f (C.comp g h)) :=
   Path.stepChain (C.comp_assoc f g h)
@@ -110,20 +110,20 @@ namespace Chain'
 variable {C : SmallCatData}
 
 /-- The source of a chain (first vertex). -/
-def source {n : Nat} (ch : Chain' C n) : C.Obj :=
+noncomputable def source {n : Nat} (ch : Chain' C n) : C.Obj :=
   ch.vertices ⟨0, by omega⟩
 
 /-- The target of a chain (last vertex). -/
-def target {n : Nat} (ch : Chain' C n) : C.Obj :=
+noncomputable def target {n : Nat} (ch : Chain' C n) : C.Obj :=
   ch.vertices ⟨n, by omega⟩
 
 /-- A 0-chain from a single object. -/
-def ofObj (a : C.Obj) : Chain' C 0 where
+noncomputable def ofObj (a : C.Obj) : Chain' C 0 where
   vertices := fun _ => a
   edges := fun i => Fin.elim0 i
 
 /-- A 1-chain from a morphism. -/
-def ofMor {a b : C.Obj} (f : C.Hom a b) : Chain' C 1 where
+noncomputable def ofMor {a b : C.Obj} (f : C.Hom a b) : Chain' C 1 where
   vertices := fun i => if i.val = 0 then a else b
   edges := fun ⟨i, hi⟩ => by
     have : i = 0 := by omega
@@ -180,7 +180,7 @@ namespace NerveAdjunctionData
 variable (adj : NerveAdjunctionData)
 
 /-- `Path`-typed unit naturality. -/
-def unit_natural_path (S : SSetData) (n : Nat) (x : S.obj n) :
+noncomputable def unit_natural_path (S : SSetData) (n : Nat) (x : S.obj n) :
     Path (adj.unitMap S n x) x :=
   Path.stepChain (adj.unit_natural S n x)
 
@@ -189,7 +189,7 @@ end NerveAdjunctionData
 /-- A trivial nerve-realization adjunction using the discrete simplicial set.
     The nerve of C at level 0 consists of objects; all higher levels
     also consist of objects (truncated). -/
-def trivialAdjunction : NerveAdjunctionData where
+noncomputable def trivialAdjunction : NerveAdjunctionData where
   nerve := fun C => {
     obj := fun _ => C.Obj,
     face := fun _ _ x => x,
@@ -218,12 +218,12 @@ namespace GroupoidData
 variable (G : GroupoidData)
 
 /-- `Path`-typed left inverse. -/
-def inv_comp_path {a b : G.Obj} (f : G.Hom a b) :
+noncomputable def inv_comp_path {a b : G.Obj} (f : G.Hom a b) :
     Path (G.comp (G.inv f) f) (G.id b) :=
   Path.stepChain (G.inv_comp f)
 
 /-- `Path`-typed right inverse. -/
-def comp_inv_path {a b : G.Obj} (f : G.Hom a b) :
+noncomputable def comp_inv_path {a b : G.Obj} (f : G.Hom a b) :
     Path (G.comp f (G.inv f)) (G.id a) :=
   Path.stepChain (G.comp_inv f)
 
@@ -243,7 +243,7 @@ theorem inv_id (a : G.Obj) : G.inv (G.id a) = G.id a := by
   exact h
 
 /-- `Path`-typed inverse of identity. -/
-def inv_id_path (a : G.Obj) : Path (G.inv (G.id a)) (G.id a) :=
+noncomputable def inv_id_path (a : G.Obj) : Path (G.inv (G.id a)) (G.id a) :=
   Path.stepChain (G.inv_id a)
 
 /-- Inverse of inverse is the original. -/

@@ -34,18 +34,18 @@ structure LatElem where
   deriving DecidableEq
 
 /-- Meet (greatest lower bound). -/
-def meet (a b : LatElem) : LatElem :=
+noncomputable def meet (a b : LatElem) : LatElem :=
   ⟨min a.val b.val⟩
 
 /-- Join (least upper bound). -/
-def join (a b : LatElem) : LatElem :=
+noncomputable def join (a b : LatElem) : LatElem :=
   ⟨max a.val b.val⟩
 
 /-- Bottom element. -/
-def latBot : LatElem := ⟨0⟩
+noncomputable def latBot : LatElem := ⟨0⟩
 
 /-- Top element (parametric). -/
-def latTop (n : Nat) : LatElem := ⟨n⟩
+noncomputable def latTop (n : Nat) : LatElem := ⟨n⟩
 
 /-! ## Equality-level lattice laws (used only to justify primitive steps) -/
 
@@ -120,7 +120,7 @@ deriving DecidableEq
 namespace YourObj
 
 /-- Evaluate a lattice expression into the concrete carrier. -/
-def eval : YourObj → LatElem
+noncomputable def eval : YourObj → LatElem
   | atom a => a
   | .meet x y => _root_.ComputationalPaths.Path.Algebra.LatticeDeepPaths.meet (eval x) (eval y)
   | .join x y => _root_.ComputationalPaths.Path.Algebra.LatticeDeepPaths.join (eval x) (eval y)
@@ -175,11 +175,11 @@ inductive YourPath : YourObj → YourObj → Type
 namespace YourPath
 
 /-- Notation-friendly composition. -/
-@[simp] def comp {x y z : YourObj} (p : YourPath x y) (q : YourPath y z) : YourPath x z :=
+@[simp] noncomputable def comp {x y z : YourObj} (p : YourPath x y) (q : YourPath y z) : YourPath x z :=
   trans p q
 
 /-- A helper: make a one-step path. -/
-@[simp] def ofStep {x y : YourObj} (s : YourStep x y) : YourPath x y :=
+@[simp] noncomputable def ofStep {x y : YourObj} (s : YourStep x y) : YourPath x y :=
   step s
 
 end YourPath
@@ -189,11 +189,11 @@ end YourPath
 namespace Interpret
 
 /-- Atomic computational path from an equality proof (without using the `ofEq` helper). -/
-private def atom {A : Type u} {a b : A} (h : a = b) : Path a b :=
+private noncomputable def atom {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 /-- Interpret a single primitive rewrite step as a computational path. -/
-private def step_sound {x y : YourObj} (s : YourStep x y) :
+private noncomputable def step_sound {x y : YourObj} (s : YourStep x y) :
     Path (eval x) (eval y) :=
   match s with
   | YourStep.meet_comm x y => atom (by simpa using meet_comm (eval x) (eval y))
@@ -215,7 +215,7 @@ private def step_sound {x y : YourObj} (s : YourStep x y) :
   | YourStep.modular x y z h => atom (by simpa using modular_law (eval x) (eval y) (eval z) h)
 
 /-- Interpret a generated `YourPath` as a computational `Path`. -/
-def toPath : ∀ {x y : YourObj}, YourPath x y → Path (eval x) (eval y)
+noncomputable def toPath : ∀ {x y : YourObj}, YourPath x y → Path (eval x) (eval y)
   | _, _, YourPath.refl x => Path.refl (eval x)
   | _, _, @YourPath.step _ _ s => step_sound s
   | _, _, @YourPath.symm _ _ p => Path.symm (toPath p)
@@ -236,100 +236,100 @@ open Interpret
 /-! ## 35+ theorems: building real paths by composition and congruence -/
 
 /-- `meet` commutativity as a `YourPath`. -/
-def meet_comm_Y (x y : YourObj) : YourPath (.meet x y) (.meet y x) :=
+noncomputable def meet_comm_Y (x y : YourObj) : YourPath (.meet x y) (.meet y x) :=
   .step (.meet_comm x y)
 
 /-- `join` commutativity as a `YourPath`. -/
-def join_comm_Y (x y : YourObj) : YourPath (.join x y) (.join y x) :=
+noncomputable def join_comm_Y (x y : YourObj) : YourPath (.join x y) (.join y x) :=
   .step (.join_comm x y)
 
 /-- `meet` associativity as a `YourPath`. -/
-def meet_assoc_Y (x y z : YourObj) :
+noncomputable def meet_assoc_Y (x y z : YourObj) :
     YourPath (.meet (.meet x y) z) (.meet x (.meet y z)) :=
   .step (.meet_assoc x y z)
 
 /-- `join` associativity as a `YourPath`. -/
-def join_assoc_Y (x y z : YourObj) :
+noncomputable def join_assoc_Y (x y z : YourObj) :
     YourPath (.join (.join x y) z) (.join x (.join y z)) :=
   .step (.join_assoc x y z)
 
 /-- A derived commutativity-in-context: `x ∧ (y ∧ z)  ~  x ∧ (z ∧ y)`. -/
-def meet_comm_in_right (x y z : YourObj) :
+noncomputable def meet_comm_in_right (x y z : YourObj) :
     YourPath (.meet x (.meet y z)) (.meet x (.meet z y)) :=
   YourPath.congMeetR x (meet_comm_Y y z)
 
 /-- Computational-path version of meet commutativity (LatElem-level). -/
-def meet_comm_path (a b : LatElem) : Path (meet a b) (meet b a) := by
+noncomputable def meet_comm_path (a b : LatElem) : Path (meet a b) (meet b a) := by
   simpa [YourObj.eval] using (toPath (meet_comm_Y (.atom a) (.atom b)))
 
 /-- Computational-path version of join commutativity (LatElem-level). -/
-def join_comm_path (a b : LatElem) : Path (join a b) (join b a) := by
+noncomputable def join_comm_path (a b : LatElem) : Path (join a b) (join b a) := by
   simpa [YourObj.eval] using (toPath (join_comm_Y (.atom a) (.atom b)))
 
 /-- Computational-path version of meet associativity. -/
-def meet_assoc_path (a b c : LatElem) :
+noncomputable def meet_assoc_path (a b c : LatElem) :
     Path (meet (meet a b) c) (meet a (meet b c)) := by
   simpa [YourObj.eval] using (toPath (meet_assoc_Y (.atom a) (.atom b) (.atom c)))
 
 /-- Computational-path version of join associativity. -/
-def join_assoc_path (a b c : LatElem) :
+noncomputable def join_assoc_path (a b c : LatElem) :
     Path (join (join a b) c) (join a (join b c)) := by
   simpa [YourObj.eval] using (toPath (join_assoc_Y (.atom a) (.atom b) (.atom c)))
 
 /-- Idempotence of meet as a computational path. -/
-def meet_idem_path (a : LatElem) : Path (meet a a) a := by
+noncomputable def meet_idem_path (a : LatElem) : Path (meet a a) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.meet_idem (.atom a))))
 
 /-- Idempotence of join as a computational path. -/
-def join_idem_path (a : LatElem) : Path (join a a) a := by
+noncomputable def join_idem_path (a : LatElem) : Path (join a a) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.join_idem (.atom a))))
 
 /-- Absorption `a ∧ (a ∨ b) ~ a` as a computational path. -/
-def absorption_meet_join_path (a b : LatElem) :
+noncomputable def absorption_meet_join_path (a b : LatElem) :
     Path (meet a (join a b)) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.absorption_meet_join (.atom a) (.atom b))))
 
 /-- Absorption `a ∨ (a ∧ b) ~ a` as a computational path. -/
-def absorption_join_meet_path (a b : LatElem) :
+noncomputable def absorption_join_meet_path (a b : LatElem) :
     Path (join a (meet a b)) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.absorption_join_meet (.atom a) (.atom b))))
 
 /-- Distributivity as a computational path. -/
-def distributive_meet_join_path (a b c : LatElem) :
+noncomputable def distributive_meet_join_path (a b c : LatElem) :
     Path (meet a (join b c)) (join (meet a b) (meet a c)) := by
   simpa [YourObj.eval] using
     (toPath (YourPath.step (YourStep.distributive_meet_join (.atom a) (.atom b) (.atom c))))
 
 /-- Dual distributivity as a computational path. -/
-def distributive_join_meet_path (a b c : LatElem) :
+noncomputable def distributive_join_meet_path (a b c : LatElem) :
     Path (join a (meet b c)) (meet (join a b) (join a c)) := by
   simpa [YourObj.eval] using
     (toPath (YourPath.step (YourStep.distributive_join_meet (.atom a) (.atom b) (.atom c))))
 
 /-- Modular law as a computational path. -/
-def modular_law_path (a b c : LatElem) (h : a.val ≤ c.val) :
+noncomputable def modular_law_path (a b c : LatElem) (h : a.val ≤ c.val) :
     Path (join a (meet b c)) (meet (join a b) c) := by
   simpa [YourObj.eval] using
     (toPath (YourPath.step (YourStep.modular (.atom a) (.atom b) (.atom c) h)))
 
 /-- Join with bottom (left) as a computational path. -/
-def join_bot_path (a : LatElem) : Path (join latBot a) a := by
+noncomputable def join_bot_path (a : LatElem) : Path (join latBot a) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.join_bot (.atom a))))
 
 /-- Join with bottom (right) as a computational path. -/
-def join_bot_right_path (a : LatElem) : Path (join a latBot) a := by
+noncomputable def join_bot_right_path (a : LatElem) : Path (join a latBot) a := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.join_bot_right (.atom a))))
 
 /-- Meet with bottom (left) as a computational path. -/
-def meet_bot_left_path (a : LatElem) : Path (meet latBot a) latBot := by
+noncomputable def meet_bot_left_path (a : LatElem) : Path (meet latBot a) latBot := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.meet_bot_left (.atom a))))
 
 /-- Meet with bottom (right) as a computational path. -/
-def meet_bot_right_path (a : LatElem) : Path (meet a latBot) latBot := by
+noncomputable def meet_bot_right_path (a : LatElem) : Path (meet a latBot) latBot := by
   simpa [YourObj.eval] using (toPath (YourPath.step (YourStep.meet_bot_right (.atom a))))
 
 /-- Example of *genuine* composition: reassociate and commute inside a 3-fold meet. -/
-def meet_reassoc_comm_path (a b c : LatElem) :
+noncomputable def meet_reassoc_comm_path (a b c : LatElem) :
     Path (meet (meet a b) c) (meet (meet a c) b) := by
   -- build in `YourPath` using assoc + congruence + comm, then interpret.
   let x : YourObj := .atom a
@@ -343,7 +343,7 @@ def meet_reassoc_comm_path (a b c : LatElem) :
   simpa [YourObj.eval] using toPath (.trans p1 (.trans p2 p3))
 
 /-- Dual example: reassociate and commute inside a 3-fold join. -/
-def join_reassoc_comm_path (a b c : LatElem) :
+noncomputable def join_reassoc_comm_path (a b c : LatElem) :
     Path (join (join a b) c) (join (join a c) b) := by
   let x : YourObj := .atom a
   let y : YourObj := .atom b
@@ -356,24 +356,24 @@ def join_reassoc_comm_path (a b c : LatElem) :
   simpa [YourObj.eval] using toPath (.trans p1 (.trans p2 p3))
 
 /-- Absorption + symmetry yields: `a = a ∧ (a ∨ b)` as a path. -/
-def absorption_meet_join_symm_path (a b : LatElem) :
+noncomputable def absorption_meet_join_symm_path (a b : LatElem) :
     Path a (meet a (join a b)) := by
   exact Path.symm (absorption_meet_join_path a b)
 
 /-- Absorption + symmetry yields: `a = a ∨ (a ∧ b)` as a path. -/
-def absorption_join_meet_symm_path (a b : LatElem) :
+noncomputable def absorption_join_meet_symm_path (a b : LatElem) :
     Path a (join a (meet a b)) := by
   exact Path.symm (absorption_join_meet_path a b)
 
 /-- A small congruence example: map a commutativity path through `join`. -/
-def join_congr_meet_comm (a b c : LatElem) :
+noncomputable def join_congr_meet_comm (a b c : LatElem) :
     Path (join (meet a b) c) (join (meet b a) c) := by
   -- interpret congruence on the *left* argument of `join`.
   have p : Path (meet a b) (meet b a) := meet_comm_path a b
   exact Path.congrArg (fun t => join t c) p
 
 /-- Another congruence example: map commutativity through `meet`. -/
-def meet_congr_join_comm (a b c : LatElem) :
+noncomputable def meet_congr_join_comm (a b c : LatElem) :
     Path (meet (join a b) c) (meet (join b a) c) := by
   have p : Path (join a b) (join b a) := join_comm_path a b
   exact Path.congrArg (fun t => meet t c) p
@@ -388,23 +388,23 @@ structure Complement (a : LatElem) (n : Nat) where
 
 namespace Complement
 
-private def atom {A : Type u} {x y : A} (h : x = y) : Path x y :=
+private noncomputable def atom {A : Type u} {x y : A} (h : x = y) : Path x y :=
   Path.mk [Step.mk x y h] h
 
 /-- Complement path: `a ∧ c  ~  ⊥`. -/
-def meet_path {a : LatElem} {n : Nat} (c : Complement a n) :
+noncomputable def meet_path {a : LatElem} {n : Nat} (c : Complement a n) :
     Path (meet a c.comp) latBot :=
   atom c.meet_bot
 
 /-- Complement path: `a ∨ c  ~  ⊤`. -/
-def join_path {a : LatElem} {n : Nat} (c : Complement a n) :
+noncomputable def join_path {a : LatElem} {n : Nat} (c : Complement a n) :
     Path (join a c.comp) (latTop n) :=
   atom c.join_top
 
 end Complement
 
 /-- Bottom is self-complementary w.r.t. top `n`. -/
-def botComplement (n : Nat) : Complement latBot n where
+noncomputable def botComplement (n : Nat) : Complement latBot n where
   comp := latTop n
   meet_bot := by simp [meet, latBot, latTop]
   join_top := by simp [join, latBot, latTop]
@@ -422,7 +422,7 @@ structure LatCongruence where
   join_compat : ∀ a₁ a₂ b₁ b₂, rel a₁ a₂ → rel b₁ b₂ → rel (join a₁ b₁) (join a₂ b₂)
 
 /-- Trivial congruence: everything is related. -/
-def trivialCongruence : LatCongruence where
+noncomputable def trivialCongruence : LatCongruence where
   rel := fun _ _ => True
   refl := fun _ => trivial
   symm := fun _ _ _ => trivial
@@ -431,7 +431,7 @@ def trivialCongruence : LatCongruence where
   join_compat := fun _ _ _ _ _ _ => trivial
 
 /-- Discrete congruence: only equal elements are related. -/
-def discreteCongruence : LatCongruence where
+noncomputable def discreteCongruence : LatCongruence where
   rel := fun a b => a = b
   refl := fun a => rfl
   symm := fun _ _ h => h.symm
@@ -440,7 +440,7 @@ def discreteCongruence : LatCongruence where
   join_compat := fun _ _ _ _ h1 h2 => by rw [h1, h2]
 
 /-- Congruence class path: related-by-equality gives a computational path. -/
-def congruence_class_path (_cong : LatCongruence) (a b : LatElem) (h : a = b) : Path a b :=
+noncomputable def congruence_class_path (_cong : LatCongruence) (a b : LatElem) (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 end ComputationalPaths.Path.Algebra.LatticeDeepPaths

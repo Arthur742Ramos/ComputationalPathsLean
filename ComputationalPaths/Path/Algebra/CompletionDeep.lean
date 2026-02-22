@@ -56,10 +56,10 @@ end DiscreteDist
 /-! ## Cauchy sequences as path systems -/
 
 /-- A sequence in A. -/
-def Seq (A : Type u) := Nat → A
+noncomputable def Seq (A : Type u) := Nat → A
 
 /-- A sequence is Cauchy w.r.t. a discrete distance. -/
-def IsCauchy {A : Type u} (d : DiscreteDist A) (s : Seq A) : Prop :=
+noncomputable def IsCauchy {A : Type u} (d : DiscreteDist A) (s : Seq A) : Prop :=
   ∀ ε : Nat, 0 < ε → ∃ N : Nat, ∀ m n : Nat, N ≤ m → N ≤ n → d.dist (s m) (s n) < ε
 
 -- Theorem 4: Constant sequence is Cauchy
@@ -85,14 +85,14 @@ structure CauchyPathSystem {A : Type u} (d : DiscreteDist A) where
   cauchy : IsCauchy d seq
 
 -- Theorem 6: Constant Cauchy path system
-def CauchyPathSystem.const {A : Type u} (d : DiscreteDist A) (a : A) :
+noncomputable def CauchyPathSystem.const {A : Type u} (d : DiscreteDist A) (a : A) :
     CauchyPathSystem d where
   seq := fun _ => a
   links := fun _ => Path.refl a
   cauchy := isCauchy_const d a
 
 -- Theorem 7: Telescoping path from a Cauchy path system
-def telescopePath {A : Type u} {d : DiscreteDist A}
+noncomputable def telescopePath {A : Type u} {d : DiscreteDist A}
     (cps : CauchyPathSystem d) : (m n : Nat) → m ≤ n →
     Path (cps.seq m) (cps.seq n)
   | m, 0, h => by simp at h; subst h; exact Path.refl (cps.seq 0)
@@ -104,7 +104,7 @@ def telescopePath {A : Type u} {d : DiscreteDist A}
       this ▸ Path.refl (cps.seq m)
 
 -- Theorem 8: Telescoping path for 0 to n
-def telescopeFromZero {A : Type u} {d : DiscreteDist A}
+noncomputable def telescopeFromZero {A : Type u} {d : DiscreteDist A}
     (cps : CauchyPathSystem d) (n : Nat) :
     Path (cps.seq 0) (cps.seq n) :=
   telescopePath cps 0 n (Nat.zero_le n)
@@ -117,7 +117,7 @@ theorem telescopePath_toEq {A : Type u} {d : DiscreteDist A}
 /-! ## Equivalence of Cauchy sequences -/
 
 /-- Two Cauchy sequences are equivalent if their distance goes to 0. -/
-def CauchyEquiv {A : Type u} (d : DiscreteDist A)
+noncomputable def CauchyEquiv {A : Type u} (d : DiscreteDist A)
     (s t : CauchyPathSystem d) : Prop :=
   ∀ ε : Nat, 0 < ε → ∃ N : Nat, ∀ n : Nat, N ≤ n →
     d.dist (s.seq n) (t.seq n) < ε
@@ -170,11 +170,11 @@ theorem cauchyEquiv_trans {A : Type u} (d : DiscreteDist A)
 /-! ## Metric completion -/
 
 /-- The metric completion: quotient of Cauchy path systems by equivalence. -/
-def Completion {A : Type u} (d : DiscreteDist A) :=
+noncomputable def Completion {A : Type u} (d : DiscreteDist A) :=
   Quot (CauchyEquiv d)
 
 -- Theorem 13: Embedding of A into its completion
-def Completion.embed {A : Type u} (d : DiscreteDist A) (a : A) :
+noncomputable def Completion.embed {A : Type u} (d : DiscreteDist A) (a : A) :
     Completion d :=
   Quot.mk _ (CauchyPathSystem.const d a)
 
@@ -204,7 +204,7 @@ structure InvLimitElem (S : ProjSystem) where
   compat : ∀ n : Nat, S.map n (components (n + 1)) = components n
 
 -- Theorem 16: Constant family is in the inverse limit if maps fix witness
-def InvLimitElem.ofConstant (S : ProjSystem)
+noncomputable def InvLimitElem.ofConstant (S : ProjSystem)
     (h : ∀ n, S.map n (S.witness (n + 1)) = S.witness n) :
     InvLimitElem S where
   components := S.witness
@@ -219,7 +219,7 @@ theorem InvLimitElem.ext (S : ProjSystem)
 /-! ## Paths in inverse limits -/
 
 -- Theorem 18: Path in each component yields path in inverse limit
-def InvLimitElem.pathFromComponents (S : ProjSystem)
+noncomputable def InvLimitElem.pathFromComponents (S : ProjSystem)
     (x y : InvLimitElem S)
     (h : ∀ n, x.components n = y.components n) :
     Path x y :=
@@ -249,10 +249,10 @@ theorem projection_congrArg_symm (S : ProjSystem) (n : Nat)
 /-! ## Profinite completion -/
 
 /-- The profinite completion: the inverse limit of a projective system. -/
-def ProfiniteCompletion (S : ProjSystem) := InvLimitElem S
+noncomputable def ProfiniteCompletion (S : ProjSystem) := InvLimitElem S
 
 -- Theorem 22: Profinite completion carries path structure from components
-def ProfiniteCompletion.pathLift (S : ProjSystem)
+noncomputable def ProfiniteCompletion.pathLift (S : ProjSystem)
     (x y : ProfiniteCompletion S)
     (h : ∀ n, x.components n = y.components n) :
     Path x y :=
@@ -277,7 +277,7 @@ theorem completion_connected {A : Type u} (d : DiscreteDist A)
 /-! ## Cauchy completeness -/
 
 /-- A discrete distance is complete if every Cauchy sequence converges. -/
-def IsComplete {A : Type u} (d : DiscreteDist A) : Prop :=
+noncomputable def IsComplete {A : Type u} (d : DiscreteDist A) : Prop :=
   ∀ s : CauchyPathSystem d, ∃ a : A, ∀ ε : Nat, 0 < ε →
     ∃ N : Nat, ∀ n : Nat, N ≤ n → d.dist (s.seq n) a < ε
 
@@ -298,12 +298,12 @@ structure UniformMap {A : Type u} {B : Type v}
     ∀ x y : A, dA.dist x y < δ → dB.dist (fn x) (fn y) < ε
 
 -- Theorem 26: Identity is uniformly continuous
-def UniformMap.id {A : Type u} (d : DiscreteDist A) : UniformMap d d where
+noncomputable def UniformMap.id {A : Type u} (d : DiscreteDist A) : UniformMap d d where
   fn := fun x => x
   uniform := fun ε hε => ⟨ε, hε, fun _ _ h => h⟩
 
 -- Theorem 27: Composition of uniform maps
-def UniformMap.comp {A : Type u} {B : Type v} {C : Type w}
+noncomputable def UniformMap.comp {A : Type u} {B : Type v} {C : Type w}
     {dA : DiscreteDist A} {dB : DiscreteDist B} {dC : DiscreteDist C}
     (g : UniformMap dB dC) (f : UniformMap dA dB) : UniformMap dA dC where
   fn := fun x => g.fn (f.fn x)

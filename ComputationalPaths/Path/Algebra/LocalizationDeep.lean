@@ -28,17 +28,17 @@ structure Arrow (A : Type u) where
   mor : Path src tgt
 
 -- 1. Identity arrow
-def Arrow.id (a : A) : Arrow A :=
+noncomputable def Arrow.id (a : A) : Arrow A :=
   Arrow.mk a a (Path.refl a)
 
 -- 2. Composition of arrows
-def Arrow.comp {A : Type u} (f : Arrow A) (g : Arrow A)
+noncomputable def Arrow.comp {A : Type u} (f : Arrow A) (g : Arrow A)
     (h : f.tgt = g.src) : Arrow A :=
   Arrow.mk f.src g.tgt
     (Path.trans f.mor (Path.trans (Path.mk [Step.mk _ _ h] h) g.mor))
 
 -- 3. Inverse arrow
-def Arrow.inv {A : Type u} (f : Arrow A) : Arrow A :=
+noncomputable def Arrow.inv {A : Type u} (f : Arrow A) : Arrow A :=
   Arrow.mk f.tgt f.src (Path.symm f.mor)
 
 -- 4. Inverse of inverse
@@ -53,7 +53,7 @@ structure InvSet (A : Type u) where
   contains : Arrow A → Prop
 
 /-- An arrow is in the inverse set. -/
-def InvSet.mem {A : Type u} (S : InvSet A) (f : Arrow A) : Prop :=
+noncomputable def InvSet.mem {A : Type u} (S : InvSet A) (f : Arrow A) : Prop :=
   S.contains f
 
 -- 5. Localized morphism: a zig-zag of forward arrows and backward (inverted) arrows
@@ -65,7 +65,7 @@ inductive ZigZag (A : Type u) (S : InvSet A) : A → A → Type u where
       ZigZag A S b c → ZigZag A S a c
 
 -- 6. Zig-zag composition
-def ZigZag.comp {A : Type u} {S : InvSet A} {a b c : A}
+noncomputable def ZigZag.comp {A : Type u} {S : InvSet A} {a b c : A}
     (p : ZigZag A S a b) (q : ZigZag A S b c) : ZigZag A S a c :=
   match p with
   | ZigZag.id _ => q
@@ -96,7 +96,7 @@ structure LeftRoof (A : Type u) (S : InvSet A) (a b : A) where
   left_in_S : S.contains (Arrow.mk apex a left_leg)
 
 -- 9. Identity roof
-def LeftRoof.idRoof {A : Type u} {S : InvSet A} {a : A}
+noncomputable def LeftRoof.idRoof {A : Type u} {S : InvSet A} {a : A}
     (hid : S.contains (Arrow.mk a a (Path.refl a))) :
     LeftRoof A S a a :=
   LeftRoof.mk a (Path.refl a) (Path.refl a) hid
@@ -109,7 +109,7 @@ structure RightRoof (A : Type u) (S : InvSet A) (a b : A) where
   right_in_S : S.contains (Arrow.mk b apex right_leg)
 
 -- 11. Right roof from left roof (by inverting)
-def LeftRoof.toRight {A : Type u} {S : InvSet A} {a b : A}
+noncomputable def LeftRoof.toRight {A : Type u} {S : InvSet A} {a b : A}
     (r : LeftRoof A S a b)
     (hS : S.contains (Arrow.mk b r.apex (Path.symm r.right_leg))) :
     RightRoof A S a b :=
@@ -129,7 +129,7 @@ structure LocalizationFunctor (A : Type u) (B : Type v) (S : InvSet A) where
       (Path.trans (map_path f.mor) g).proof = rfl
 
 -- 12. Identity localization functor (inverts nothing)
-def LocalizationFunctor.identity (A : Type u) :
+noncomputable def LocalizationFunctor.identity (A : Type u) :
     LocalizationFunctor A A (InvSet.mk (fun _ => False)) where
   map_obj := id
   map_path := fun p => p
@@ -200,7 +200,7 @@ structure RightOre (A : Type u) (S : InvSet A) : Prop where
 /-! ## Zig-zag length -/
 
 -- 20. Length of a zig-zag
-def ZigZag.length {A : Type u} {S : InvSet A} {a b : A} :
+noncomputable def ZigZag.length {A : Type u} {S : InvSet A} {a b : A} :
     ZigZag A S a b → Nat
   | ZigZag.id _ => 0
   | ZigZag.forward _ _ _ rest => rest.length + 1
@@ -223,13 +223,13 @@ theorem zigzag_backward_length {A : Type u} {S : InvSet A} {a b c : A}
 /-! ## Single-step zig-zags -/
 
 -- 24. Forward single step
-def ZigZag.single_forward {A : Type u} {S : InvSet A} {a b : A}
+noncomputable def ZigZag.single_forward {A : Type u} {S : InvSet A} {a b : A}
     (f : Arrow A) (h1 : f.src = a) (h2 : f.tgt = b) :
     ZigZag A S a b :=
   ZigZag.forward f h1 h2 (ZigZag.id b)
 
 -- 25. Backward single step
-def ZigZag.single_backward {A : Type u} {S : InvSet A} {a b : A}
+noncomputable def ZigZag.single_backward {A : Type u} {S : InvSet A} {a b : A}
     (f : Arrow A) (hm : S.mem f) (h1 : f.src = b) (h2 : f.tgt = a) :
     ZigZag A S a b :=
   ZigZag.backward f hm h1 h2 (ZigZag.id b)
@@ -247,7 +247,7 @@ theorem single_backward_length {A : Type u} {S : InvSet A} {a b : A}
 /-! ## Path lifting to zig-zags -/
 
 -- 28. Lift a path to a single-step forward zig-zag
-def ZigZag.ofPath {A : Type u} {S : InvSet A} {a b : A}
+noncomputable def ZigZag.ofPath {A : Type u} {S : InvSet A} {a b : A}
     (p : Path a b) : ZigZag A S a b :=
   ZigZag.forward (Arrow.mk a b p) rfl rfl (ZigZag.id b)
 
@@ -324,7 +324,7 @@ theorem loc_maps_id_arrow {A : Type u} {B : Type v} {S : InvSet A}
 /-! ## Zig-zag equivalence -/
 
 -- 39. Two zig-zags are equivalent if they have the same proof
-def ZigZag.proofEq {A : Type u} {S : InvSet A} {a b : A}
+noncomputable def ZigZag.proofEq {A : Type u} {S : InvSet A} {a b : A}
     (p q : ZigZag A S a b) : Prop :=
   True  -- In the presence of UIP, all paths are proof-equal
 
@@ -353,7 +353,7 @@ structure LeftFraction (A : Type u) (S : InvSet A) (a b : A) where
   s_in_S : S.contains (Arrow.mk mid a s)
 
 -- 44. Two left fractions are equivalent if they can be completed
-def LeftFraction.equiv {A : Type u} {S : InvSet A} {a b : A}
+noncomputable def LeftFraction.equiv {A : Type u} {S : InvSet A} {a b : A}
     (r₁ r₂ : LeftFraction A S a b) : Prop :=
   ∃ (d : A) (u : Path d r₁.mid) (v : Path d r₂.mid),
     (Path.trans u r₁.s).proof = (Path.trans v r₂.s).proof ∧

@@ -32,30 +32,30 @@ inductive APath (α : Type) : α → α → Type where
   | nil  : (a : α) → APath α a a
   | cons : AStep α a b → APath α b c → APath α a c
 
-def APath.trans {α : Type} {a b c : α}
+noncomputable def APath.trans {α : Type} {a b c : α}
     (p : APath α a b) (q : APath α b c) : APath α a c :=
   match p with
   | .nil _ => q
   | .cons s rest => .cons s (rest.trans q)
 
-def AStep.symm {α : Type} {a b : α} : AStep α a b → AStep α b a
+noncomputable def AStep.symm {α : Type} {a b : α} : AStep α a b → AStep α b a
   | .mk name a b => .mk (name ++ "⁻¹") b a
 
-def APath.symm {α : Type} {a b : α} : APath α a b → APath α b a
+noncomputable def APath.symm {α : Type} {a b : α} : APath α a b → APath α b a
   | .nil a => .nil a
   | .cons s rest => rest.symm.trans (.cons s.symm (.nil _))
 
-def APath.length {α : Type} {a b : α} : APath α a b → Nat
+noncomputable def APath.length {α : Type} {a b : α} : APath α a b → Nat
   | .nil _ => 0
   | .cons _ rest => 1 + rest.length
 
-def APath.single {α : Type} {a b : α} (s : AStep α a b) : APath α a b :=
+noncomputable def APath.single {α : Type} {a b : α} (s : AStep α a b) : APath α a b :=
   .cons s (.nil _)
 
-def AStep.map {α β : Type} (f : α → β) {a b : α} : AStep α a b → AStep β (f a) (f b)
+noncomputable def AStep.map {α β : Type} (f : α → β) {a b : α} : AStep α a b → AStep β (f a) (f b)
   | .mk name a b => .mk name (f a) (f b)
 
-def APath.map {α β : Type} (f : α → β) {a b : α} : APath α a b → APath β (f a) (f b)
+noncomputable def APath.map {α β : Type} (f : α → β) {a b : α} : APath α a b → APath β (f a) (f b)
   | .nil a => .nil (f a)
   | .cons s rest => .cons (s.map f) (rest.map f)
 
@@ -73,14 +73,14 @@ structure DFA where
 -- §3  Extended delta and acceptance
 -- ============================================================
 
-def DFA.deltaStar (M : DFA) (q : AState) : List ASym → AState
+noncomputable def DFA.deltaStar (M : DFA) (q : AState) : List ASym → AState
   | [] => q
   | a :: rest => M.deltaStar (M.delta q a) rest
 
-def DFA.accepts (M : DFA) (w : List ASym) : Prop :=
+noncomputable def DFA.accepts (M : DFA) (w : List ASym) : Prop :=
   M.deltaStar M.start w ∈ M.finals
 
-def DFA.language (M : DFA) : List ASym → Prop := M.accepts
+noncomputable def DFA.language (M : DFA) : List ASym → Prop := M.accepts
 
 /-- Theorem 1: Empty word accepted iff start is final. -/
 theorem DFA.accepts_nil (M : DFA) :
@@ -162,14 +162,14 @@ structure NFA where
   finals  : List AState
   delta   : AState → ASym → List AState
 
-def NFA.deltaSetStep (N : NFA) (qs : List AState) (a : ASym) : List AState :=
+noncomputable def NFA.deltaSetStep (N : NFA) (qs : List AState) (a : ASym) : List AState :=
   (qs.flatMap (fun q => N.delta q a)).eraseDups
 
-def NFA.deltaSetStar (N : NFA) (qs : List AState) : List ASym → List AState
+noncomputable def NFA.deltaSetStar (N : NFA) (qs : List AState) : List ASym → List AState
   | [] => qs
   | a :: rest => N.deltaSetStar (N.deltaSetStep qs a) rest
 
-def NFA.acceptsNFA (N : NFA) (w : List ASym) : Prop :=
+noncomputable def NFA.acceptsNFA (N : NFA) (w : List ASym) : Prop :=
   ∃ q ∈ N.deltaSetStar N.start w, q ∈ N.finals
 
 /-- Theorem 10: NFA deltaSetStar on nil. -/
@@ -191,7 +191,7 @@ theorem NFA.deltaSetStar_append (N : NFA) (qs : List AState) (u v : List ASym) :
 -- §6  Language equivalence and bisimulation paths
 -- ============================================================
 
-def langEquiv (M₁ M₂ : DFA) : Prop :=
+noncomputable def langEquiv (M₁ M₂ : DFA) : Prop :=
   ∀ w : List ASym, M₁.accepts w ↔ M₂.accepts w
 
 /-- Theorem 13: Language equivalence is reflexive. -/
@@ -233,7 +233,7 @@ theorem Bisimulation.toLangEquiv {M₁ M₂ : DFA} (B : Bisimulation M₁ M₂) 
 -- §7  Myhill-Nerode equivalence
 -- ============================================================
 
-def nerodeEquiv (M : DFA) (q₁ q₂ : AState) : Prop :=
+noncomputable def nerodeEquiv (M : DFA) (q₁ q₂ : AState) : Prop :=
   ∀ w : List ASym, M.deltaStar q₁ w ∈ M.finals ↔ M.deltaStar q₂ w ∈ M.finals
 
 /-- Theorem 18: Nerode equivalence is reflexive. -/
@@ -305,7 +305,7 @@ theorem minimize_bisim_self (M : DFA) :
 -- §9  Visits and pumping
 -- ============================================================
 
-def DFA.visits (M : DFA) (q : AState) : List ASym → List AState
+noncomputable def DFA.visits (M : DFA) (q : AState) : List ASym → List AState
   | [] => [q]
   | a :: rest => q :: M.visits (M.delta q a) rest
 
@@ -336,7 +336,7 @@ theorem pumping_decompose (w : List ASym) (n : Nat) (hlen : n ≤ w.length) (hn 
 -- §10  Reachability
 -- ============================================================
 
-def DFA.reachable (M : DFA) (q : AState) : Prop :=
+noncomputable def DFA.reachable (M : DFA) (q : AState) : Prop :=
   ∃ w : List ASym, M.deltaStar M.start w = q
 
 /-- Theorem 28: Start state is always reachable. -/
@@ -373,14 +373,14 @@ inductive ATPath : DFA → DFA → Type where
   | nil  : (M : DFA) → ATPath M M
   | cons : ATStep M₁ M₂ → ATPath M₂ M₃ → ATPath M₁ M₃
 
-def ATPath.trans : ATPath M₁ M₂ → ATPath M₂ M₃ → ATPath M₁ M₃
+noncomputable def ATPath.trans : ATPath M₁ M₂ → ATPath M₂ M₃ → ATPath M₁ M₃
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def ATPath.single (s : ATStep M₁ M₂) : ATPath M₁ M₂ :=
+noncomputable def ATPath.single (s : ATStep M₁ M₂) : ATPath M₁ M₂ :=
   .cons s (.nil _)
 
-def ATPath.length : ATPath M₁ M₂ → Nat
+noncomputable def ATPath.length : ATPath M₁ M₂ → Nat
   | .nil _ => 0
   | .cons _ rest => 1 + rest.length
 
@@ -403,7 +403,7 @@ theorem ATPath.trans_length (p : ATPath M₁ M₂) (q : ATPath M₂ M₃) :
 -- ============================================================
 
 /-- Build an APath tracking state transitions on a word. -/
-def DFA.transPath (M : DFA) (q : AState) : (w : List ASym) → APath AState q (M.deltaStar q w)
+noncomputable def DFA.transPath (M : DFA) (q : AState) : (w : List ASym) → APath AState q (M.deltaStar q w)
   | [] => APath.nil q
   | a :: rest =>
     APath.cons (AStep.mk s!"δ({q.id},{a.id})" q (M.delta q a))
@@ -436,7 +436,7 @@ theorem APath.trans_length {α : Type} {a b c : α} (p : APath α a b) (q : APat
 -- §13  Word equivalence (Myhill-Nerode on words)
 -- ============================================================
 
-def wordEquiv (M : DFA) (u v : List ASym) : Prop :=
+noncomputable def wordEquiv (M : DFA) (u v : List ASym) : Prop :=
   nerodeEquiv M (M.deltaStar M.start u) (M.deltaStar M.start v)
 
 /-- Theorem 37: wordEquiv is reflexive. -/
@@ -496,7 +496,7 @@ theorem RunRewrite.preserves_accept {M : DFA} {w₁ w₂ : List ASym}
 -- §15  Complement DFA
 -- ============================================================
 
-def DFA.complementDFA (M : DFA) (nonFinals : List AState) : DFA where
+noncomputable def DFA.complementDFA (M : DFA) (nonFinals : List AState) : DFA where
   states := M.states
   start := M.start
   finals := nonFinals
@@ -520,7 +520,7 @@ structure ProdState where
   snd : AState
 deriving DecidableEq, Repr
 
-def DFA.productDelta (M₁ M₂ : DFA)
+noncomputable def DFA.productDelta (M₁ M₂ : DFA)
     (encode : ProdState → AState) (decode : AState → ProdState) (q : AState) (a : ASym) : AState :=
   let p := decode q
   encode ⟨M₁.delta p.fst a, M₂.delta p.snd a⟩

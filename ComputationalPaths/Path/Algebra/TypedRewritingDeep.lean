@@ -47,10 +47,10 @@ inductive Tm where
 deriving DecidableEq, Repr
 
 /-- A sort environment assigns sorts to variable indices. -/
-def SortEnv := Nat → Sort'
+noncomputable def SortEnv := Nat → Sort'
 
 /-- Look up the OpSym by name. -/
-def Signature.lookupOp (sig : Signature) (name : String) : Option OpSym :=
+noncomputable def Signature.lookupOp (sig : Signature) (name : String) : Option OpSym :=
   sig.ops.find? (fun op => op.name == name)
 
 /-- Typing judgement for terms: a term has a given sort under a
@@ -83,11 +83,11 @@ structure TRS where
 deriving Repr
 
 /-- A rule is sort‑preserving: both sides have the declared sort. -/
-def TypedRule.sortPreserving (r : TypedRule) (sig : Signature) (env : SortEnv) : Prop :=
+noncomputable def TypedRule.sortPreserving (r : TypedRule) (sig : Signature) (env : SortEnv) : Prop :=
   HasSort sig env r.lhs r.sort ∧ HasSort sig env r.rhs r.sort
 
 /-- All rules in a TRS are sort‑preserving. -/
-def TRS.wellSorted (trs : TRS) (env : SortEnv) : Prop :=
+noncomputable def TRS.wellSorted (trs : TRS) (env : SortEnv) : Prop :=
   ∀ r ∈ trs.rules, r.sortPreserving trs.sig env
 
 -- ============================================================
@@ -105,27 +105,27 @@ inductive Path (α : Type) : α → α → Type where
   | cons : Step α a b → Path α b c → Path α a c
 
 /-- Theorem 1 – trans : path composition. -/
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
 /-- Theorem 2 – length of a path. -/
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _ => 0
   | .cons _ p => 1 + p.length
 
 /-- Step inversion. -/
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a => .refl a
   | .rule name a b => .rule (name ++ "⁻¹") b a
 
 /-- Theorem 3 – symm : path inversion. -/
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
 /-- Theorem 4 – single step lifts to path. -/
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
 -- ============================================================
@@ -198,14 +198,14 @@ theorem TypedPath.tgt_typed {sig : Signature} {env : SortEnv}
   | .cons _ rest _ => rest.tgt_typed
 
 /-- Theorem 13 – Typed path trans. -/
-def TypedPath.trans {sig : Signature} {env : SortEnv}
+noncomputable def TypedPath.trans {sig : Signature} {env : SortEnv}
     {a b c : Tm} {s : Sort'} :
     TypedPath sig env a b s → TypedPath sig env b c s → TypedPath sig env a c s
   | .nil _ _ _, q => q
   | .cons ts rest hEq, q => .cons ts (rest.trans q) hEq
 
 /-- Theorem 14 – Typed path length. -/
-def TypedPath.length {sig : Signature} {env : SortEnv}
+noncomputable def TypedPath.length {sig : Signature} {env : SortEnv}
     {a b : Tm} {s : Sort'} : TypedPath sig env a b s → Nat
   | .nil _ _ _ => 0
   | .cons _ rest _ => 1 + rest.length
@@ -228,7 +228,7 @@ theorem TypedPath.length_trans {sig : Signature} {env : SortEnv}
 
 /-- Theorem 16 – congrArg for app left: if f ~> f' at sort s,
     then  app f t ~> app f' t  at sort s (sort preserving). -/
-def TypedStep.congrArgLeft {sig : Signature} {env : SortEnv}
+noncomputable def TypedStep.congrArgLeft {sig : Signature} {env : SortEnv}
     (ts : TypedStep sig env) (arg : Tm) (sIn : Sort')
     (hArg : HasSort sig env arg sIn) :
     TypedStep sig env :=
@@ -240,7 +240,7 @@ def TypedStep.congrArgLeft {sig : Signature} {env : SortEnv}
     tgt_typed := .appTy ts.tgt arg sIn ts.sort ts.tgt_typed hArg }
 
 /-- Theorem 17 – congrArg for app right. -/
-def TypedStep.congrArgRight {sig : Signature} {env : SortEnv}
+noncomputable def TypedStep.congrArgRight {sig : Signature} {env : SortEnv}
     (f : Tm) (ts : TypedStep sig env) (sOut : Sort')
     (hF : HasSort sig env f sOut) :
     TypedStep sig env :=
@@ -252,7 +252,7 @@ def TypedStep.congrArgRight {sig : Signature} {env : SortEnv}
     tgt_typed := .appTy f ts.tgt ts.sort sOut hF ts.tgt_typed }
 
 /-- Theorem 18 – Lift a typed path through congrArg left. -/
-def TypedPath.congrArgLeft {sig : Signature} {env : SortEnv}
+noncomputable def TypedPath.congrArgLeft {sig : Signature} {env : SortEnv}
     {a b : Tm} {s : Sort'} :
     TypedPath sig env a b s →
     (arg : Tm) → (sIn : Sort') → HasSort sig env arg sIn →
@@ -270,7 +270,7 @@ def TypedPath.congrArgLeft {sig : Signature} {env : SortEnv}
     .cons ts' (rest.congrArgLeft arg sIn hArg) rfl
 
 /-- Theorem 19 – Lift a typed path through congrArg right. -/
-def TypedPath.congrArgRight {sig : Signature} {env : SortEnv}
+noncomputable def TypedPath.congrArgRight {sig : Signature} {env : SortEnv}
     {a b : Tm} {s : Sort'} :
     TypedPath sig env a b s →
     (f : Tm) → (sOut : Sort') → HasSort sig env f sOut →
@@ -293,13 +293,13 @@ def TypedPath.congrArgRight {sig : Signature} {env : SortEnv}
 
 /-- Two terms are typed‑joinable if there exist typed paths to a
     common term, all at the same sort. -/
-def TypedJoinable (sig : Signature) (env : SortEnv)
+noncomputable def TypedJoinable (sig : Signature) (env : SortEnv)
     (a b : Tm) (s : Sort') : Prop :=
   ∃ (common : Tm), Nonempty (TypedPath sig env a common s) ∧
                     Nonempty (TypedPath sig env b common s)
 
 /-- A TRS has the typed confluence (Church–Rosser) property. -/
-def TRS.typedConfluent (trs : TRS) (env : SortEnv) : Prop :=
+noncomputable def TRS.typedConfluent (trs : TRS) (env : SortEnv) : Prop :=
   ∀ (a b c : Tm) (s : Sort'),
     TypedPath trs.sig env a b s →
     TypedPath trs.sig env a c s →
@@ -322,7 +322,7 @@ theorem TypedJoinable.symm {sig : Signature} {env : SortEnv}
 -- ============================================================
 
 /-- A term is a typed normal form w.r.t. a list of rules. -/
-def TypedNormalForm (rules : List TypedRule) (t : Tm) : Prop :=
+noncomputable def TypedNormalForm (rules : List TypedRule) (t : Tm) : Prop :=
   ∀ r ∈ rules, t ≠ r.lhs
 
 /-- A typed normalization result bundles a normal form with its
@@ -336,7 +336,7 @@ structure TypedNormResult (sig : Signature) (env : SortEnv)
 
 /-- Theorem 22 – If t is already a normal form, the trivial
     normalization result exists. -/
-def TypedNormResult.trivial {sig : Signature} {env : SortEnv}
+noncomputable def TypedNormResult.trivial {sig : Signature} {env : SortEnv}
     {rules : List TypedRule} {t : Tm} {s : Sort'}
     (ht : HasSort sig env t s) (hnf : TypedNormalForm rules t) :
     TypedNormResult sig env rules t s :=
@@ -348,7 +348,7 @@ def TypedNormResult.trivial {sig : Signature} {env : SortEnv}
 
 /-- Typed rewrite relation: there exists a non‑empty typed path
     from a to b. -/
-def TypedRewrites (sig : Signature) (env : SortEnv)
+noncomputable def TypedRewrites (sig : Signature) (env : SortEnv)
     (a b : Tm) (s : Sort') : Prop :=
   ∃ p : TypedPath sig env a b s, p.length > 0
 
@@ -380,14 +380,14 @@ deriving DecidableEq, Repr
 abbrev Pos := List Dir
 
 /-- Sub‑term at a position. -/
-def Tm.atPos : Tm → Pos → Option Tm
+noncomputable def Tm.atPos : Tm → Pos → Option Tm
   | t, [] => some t
   | .app l _, Dir.left :: rest => l.atPos rest
   | .app _ r, Dir.right :: rest => r.atPos rest
   | _, _ :: _ => none
 
 /-- Replace sub‑term at a position. -/
-def Tm.replaceAt : Tm → Pos → Tm → Tm
+noncomputable def Tm.replaceAt : Tm → Pos → Tm → Tm
   | _, [], s => s
   | .app l r, Dir.left :: rest, s => .app (l.replaceAt rest s) r
   | .app l r, Dir.right :: rest, s => .app l (r.replaceAt rest s)
@@ -416,16 +416,16 @@ theorem Tm.atPos_app_right (l r : Tm) (p : Pos) :
 -- ============================================================
 
 /-- A substitution maps variable indices to terms. -/
-def Subst := Nat → Tm
+noncomputable def Subst := Nat → Tm
 
 /-- Apply substitution to a term. -/
-def Tm.applySubst (σ : Subst) : Tm → Tm
+noncomputable def Tm.applySubst (σ : Subst) : Tm → Tm
   | .var n _ => σ n
   | .const c => .const c
   | .app l r => .app (l.applySubst σ) (r.applySubst σ)
 
 /-- Identity substitution. -/
-def Subst.id : Subst := fun n => .var n ⟨0⟩
+noncomputable def Subst.id : Subst := fun n => .var n ⟨0⟩
 
 /-- Theorem 29 – Identity substitution on const. -/
 theorem Tm.applySubst_const (σ : Subst) (c : String) :
@@ -448,7 +448,7 @@ structure TypedCriticalPair where
 deriving DecidableEq, Repr
 
 /-- A typed critical pair is trivial when both sides are equal. -/
-def TypedCriticalPair.trivial (cp : TypedCriticalPair) : Prop :=
+noncomputable def TypedCriticalPair.trivial (cp : TypedCriticalPair) : Prop :=
   cp.left = cp.right
 
 /-- Theorem 31 – A trivial critical pair is joinable at its sort. -/
@@ -473,7 +473,7 @@ theorem HasSort.transport {sig : Signature} {env : SortEnv}
   h ▸ ht
 
 /-- Theorem 33 – Transport for TypedPath. -/
-def TypedPath.transport {sig : Signature} {env : SortEnv}
+noncomputable def TypedPath.transport {sig : Signature} {env : SortEnv}
     {a b : Tm} {s1 s2 : Sort'} (h : s1 = s2)
     (p : TypedPath sig env a b s1) : TypedPath sig env a b s2 :=
   h ▸ p
@@ -504,7 +504,7 @@ theorem TypedMeasure.reductions_terminate (m : TypedMeasure)
 -- ============================================================
 
 /-- Typed diamond property. -/
-def TRS.typedDiamond (trs : TRS) (env : SortEnv) : Prop :=
+noncomputable def TRS.typedDiamond (trs : TRS) (env : SortEnv) : Prop :=
   ∀ (a b c : Tm) (s : Sort'),
     (∃ ts : TypedStep trs.sig env, ts.src = a ∧ ts.tgt = b ∧ ts.sort = s) →
     (∃ ts : TypedStep trs.sig env, ts.src = a ∧ ts.tgt = c ∧ ts.sort = s) →
@@ -524,7 +524,7 @@ theorem TRS.diamond_refl {trs : TRS} {env : SortEnv}
 -- ============================================================
 
 /-- Two typed terms are path‑connected at a sort. -/
-def TypedConnected (sig : Signature) (env : SortEnv) (a b : Tm) (s : Sort') : Prop :=
+noncomputable def TypedConnected (sig : Signature) (env : SortEnv) (a b : Tm) (s : Sort') : Prop :=
   Nonempty (TypedPath sig env a b s)
 
 /-- Theorem 37 – TypedConnected is reflexive. -/
@@ -547,7 +547,7 @@ theorem TypedConnected.trans' {sig : Signature} {env : SortEnv}
 -- ============================================================
 
 /-- Erase types from a typed path to get an untyped path. -/
-def TypedPath.erase {sig : Signature} {env : SortEnv}
+noncomputable def TypedPath.erase {sig : Signature} {env : SortEnv}
     {a b : Tm} {s : Sort'} : TypedPath sig env a b s → Path Tm a b
   | .nil t _ _ => .nil t
   | .cons ts rest _ => .cons ts.step (rest.erase)
@@ -579,11 +579,11 @@ theorem TypedPath.erase_trans {sig : Signature} {env : SortEnv}
 -- ============================================================
 
 /-- Theorem 42 – Sort equality is decidable (inherited). -/
-def Sort'.eq_dec (a b : Sort') : Decidable (a = b) :=
+noncomputable def Sort'.eq_dec (a b : Sort') : Decidable (a = b) :=
   inferInstance
 
 /-- Theorem 43 – Two paths at provably equal sorts can be composed. -/
-def TypedPath.transEq {sig : Signature} {env : SortEnv}
+noncomputable def TypedPath.transEq {sig : Signature} {env : SortEnv}
     {a b c : Tm} {s1 s2 : Sort'}
     (h : s1 = s2)
     (p : TypedPath sig env a b s1) (q : TypedPath sig env b c s2) :
@@ -601,15 +601,15 @@ theorem TypedPath.transEq_rfl {sig : Signature} {env : SortEnv}
 -- ============================================================
 
 /-- Two sorts: Nat and Bool. -/
-def sNat : Sort' := ⟨0⟩
-def sBool : Sort' := ⟨1⟩
+noncomputable def sNat : Sort' := ⟨0⟩
+noncomputable def sBool : Sort' := ⟨1⟩
 
 /-- Theorem 45 – sNat ≠ sBool. -/
 theorem sNat_ne_sBool : sNat ≠ sBool := by
   intro h; injection h with h'; exact absurd h' (by decide)
 
 /-- A concrete signature with plus, zero, true, false. -/
-def exSig : Signature :=
+noncomputable def exSig : Signature :=
   { sorts := [sNat, sBool]
     ops := [ ⟨"zero", [], sNat⟩,
              ⟨"succ", [sNat], sNat⟩,
@@ -626,7 +626,7 @@ theorem true_in_sig : (⟨"true", [], sBool⟩ : OpSym) ∈ exSig.ops := by
   simp [exSig]
 
 /-- A sort env for demonstration. -/
-def exEnv : SortEnv := fun _ => sNat
+noncomputable def exEnv : SortEnv := fun _ => sNat
 
 /-- Theorem 48 – The const "zero" has sort sNat. -/
 theorem zero_has_sort_nat : HasSort exSig exEnv (.const "zero") sNat :=
@@ -637,6 +637,6 @@ theorem true_has_sort_bool : HasSort exSig exEnv (.const "true") sBool :=
   .constTy ⟨"true", [], sBool⟩ true_in_sig rfl
 
 /-- Theorem 50 – A concrete typed path: zero ~> zero (refl). -/
-def zero_typed_path :
+noncomputable def zero_typed_path :
     TypedPath exSig exEnv (.const "zero") (.const "zero") sNat :=
   .nil _ sNat zero_has_sort_nat

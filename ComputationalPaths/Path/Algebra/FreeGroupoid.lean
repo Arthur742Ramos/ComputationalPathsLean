@@ -93,7 +93,7 @@ end FreeGroupoidLaws
 
 /-- Free groupoid on the computational-path graph of `A`:
 objects are vertices, morphisms are paths modulo `RwEq`. -/
-def FreeGroupoid (A : Type u) : CPGroupoid where
+noncomputable def FreeGroupoid (A : Type u) : CPGroupoid where
   Obj := A
   Hom := fun a b => PathRwQuot A a b
   id := fun a => PathRwQuot.refl a
@@ -106,7 +106,7 @@ def FreeGroupoid (A : Type u) : CPGroupoid where
   comp_inv := fun x => free_comp_inv x
 
 /-- Raw paths embed as morphisms in the free groupoid. -/
-def ofPath {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def ofPath {A : Type u} {a b : A} (p : Path a b) :
     (FreeGroupoid A).Hom a b :=
   Quot.mk _ p
 
@@ -151,7 +151,7 @@ theorem onRwEq (F : StepGraphMorphism A G)
   | trans _ _ ih₁ ih₂ => exact ih₁.trans ih₂
 
 /-- Canonical factorization through the quotient. -/
-def factorHom (F : StepGraphMorphism A G) {a b : A} :
+noncomputable def factorHom (F : StepGraphMorphism A G) {a b : A} :
     PathRwQuot A a b → G.Hom (F.obj a) (F.obj b) :=
   Quot.lift F.onPath (fun p q h => F.onRwEq (rweq_of_rweqProp h))
 
@@ -160,7 +160,7 @@ def factorHom (F : StepGraphMorphism A G) {a b : A} :
     F.factorHom (Quot.mk _ p) = F.onPath p := rfl
 
 /-- The factorization as a groupoid functor from `FreeGroupoid A`. -/
-def factorFunctor (F : StepGraphMorphism A G) :
+noncomputable def factorFunctor (F : StepGraphMorphism A G) :
     CPFunctor (FreeGroupoid A) G where
   obj := F.obj
   map := fun x => F.factorHom x
@@ -205,7 +205,7 @@ end StepGraphMorphism
 
 /-- A function `f : A → B` induces a groupoid functor `FreeGroupoid A → FreeGroupoid B`
     via `Path.congrArg`. -/
-def FreeGroupoid.map {A B : Type u} (f : A → B) :
+noncomputable def FreeGroupoid.map {A B : Type u} (f : A → B) :
     CPFunctor (FreeGroupoid A) (FreeGroupoid B) where
   obj := f
   map := fun {a b} x =>

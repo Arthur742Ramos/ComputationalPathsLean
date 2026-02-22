@@ -33,12 +33,12 @@ namespace Tricategory
 variable {Obj : Type u}
 
 /-- Build a single explicit rewrite `Step` in the lifted 4-cell universe. -/
-@[simp] def coherenceStep {α : Sort u} {x y : α} (h : x = y) :
+@[simp] noncomputable def coherenceStep {α : Sort u} {x y : α} (h : x = y) :
     ComputationalPaths.Step (PLift α) :=
   ComputationalPaths.Step.mk (PLift.up x) (PLift.up y) (_root_.congrArg PLift.up h)
 
 /-- Build a 4-cell as a one-step computational path. -/
-@[simp] def coherencePath {α : Sort u} {x y : α} (h : x = y) :
+@[simp] noncomputable def coherencePath {α : Sort u} {x y : α} (h : x = y) :
     CellPath x y :=
   Path.mk [coherenceStep h] (_root_.congrArg PLift.up h)
 
@@ -62,7 +62,7 @@ variable {Obj : Type u}
       GrayCategory.trianglePath G f g := rfl
 
 /-- Canonical pentagonator 4-cell built from one explicit step. -/
-@[simp] def pentagonatorStepData
+@[simp] noncomputable def pentagonatorStepData
     (G : GrayCategory (Obj := Obj))
     {a b c d e : Obj}
     (f : G.Hom a b) (g : G.Hom b c) (h : G.Hom c d) (k : G.Hom d e) :
@@ -72,7 +72,7 @@ variable {Obj : Type u}
   coherencePath (pentagonator_eq G f g h k)
 
 /-- Canonical triangulator 4-cell built from one explicit step. -/
-@[simp] def triangulatorStepData
+@[simp] noncomputable def triangulatorStepData
     (G : GrayCategory (Obj := Obj))
     {a b c : Obj} (f : G.Hom a b) (g : G.Hom b c) :
     CellPath
@@ -98,7 +98,7 @@ variable {Obj : Type u}
   coherencePath_steps (triangulator_eq G f g)
 
 /-- Pentagon coherence 4-cell in a tricategory. -/
-def pentagonatorPath (T : Tricategory (Obj := Obj))
+noncomputable def pentagonatorPath (T : Tricategory (Obj := Obj))
     {a b c d e : Obj}
     (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e) :
      CellPath
@@ -107,7 +107,7 @@ def pentagonatorPath (T : Tricategory (Obj := Obj))
    T.pentagonator f g h k
  
  /-- Triangle coherence 4-cell in a tricategory. -/
- def triangulatorPath (T : Tricategory (Obj := Obj))
+ noncomputable def triangulatorPath (T : Tricategory (Obj := Obj))
      {a b c : Obj} (f : T.Hom a b) (g : T.Hom b c) :
      CellPath
        (TwoCategory.trianglePath T.toGrayCategory.toTwoCategory f g)
@@ -117,7 +117,7 @@ def pentagonatorPath (T : Tricategory (Obj := Obj))
  end Tricategory
  
 /-- Computational paths carry a canonical tricategory structure. -/
-def pathTricategory (A : Type u) : Tricategory (Obj := A) where
+noncomputable def pathTricategory (A : Type u) : Tricategory (Obj := A) where
   toGrayCategory := pathGrayCategory A
   pentagonator := by
     intro a b c d e f g h k
@@ -239,7 +239,7 @@ def pathTricategory (A : Type u) : Tricategory (Obj := A) where
   GrayCategory.gray_tensor_naturality' T.toGrayCategory η θ
 
 /-- Explicit one-step coherence cell witnessing Gray interchange. -/
-@[simp] def tricategory_gray_interchange_path
+@[simp] noncomputable def tricategory_gray_interchange_path
     (T : Tricategory (Obj := Obj))
     {a b c : Obj} {f₀ f₁ f₂ : T.Hom a b} {g₀ g₁ g₂ : T.Hom b c}
     (η₁ : T.TwoCell f₀ f₁) (η₂ : T.TwoCell f₁ f₂)
@@ -260,7 +260,7 @@ def pathTricategory (A : Type u) : Tricategory (Obj := A) where
   Tricategory.coherencePath_steps (tricategory_gray_interchange_eq T η₁ η₂ θ₁ θ₂)
 
 /-- Global tricategorical coherence: pentagonator, triangulator, and interchange. -/
-def tricategory_coherence_theorem
+noncomputable def tricategory_coherence_theorem
     (T : Tricategory (Obj := Obj))
     {a b c d e : Obj}
     (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e)
@@ -306,7 +306,7 @@ def tricategory_coherence_theorem
     (Path.trans_refl_right (Tricategory.pentagonatorPath T f g h k))
 
  /-- Pentagonator naturality with respect to right unit composition. -/
-@[simp] def tricategory_pentagon_naturality
+@[simp] noncomputable def tricategory_pentagon_naturality
     (T : Tricategory (Obj := Obj))
     {a b c d e : Obj}
     (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e) :
@@ -338,7 +338,7 @@ def tricategory_coherence_theorem
     (Path.trans_refl_right (Tricategory.triangulatorPath T f g))
 
  /-- Triangulator naturality with respect to right unit composition. -/
-@[simp] def tricategory_triangle_naturality
+@[simp] noncomputable def tricategory_triangle_naturality
     (T : Tricategory (Obj := Obj))
     {a b c : Obj} (f : T.Hom a b) (g : T.Hom b c) :
     CellPath
@@ -390,7 +390,7 @@ def tricategory_coherence_theorem
   simp [CellPath.comp]
 
  /-- Pentagonator and triangulator compositions are coherent under reassociation. -/
-@[simp] def tricategory_coherence
+@[simp] noncomputable def tricategory_coherence
     (T : Tricategory (Obj := Obj))
     {a b c d e : Obj}
     (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e)
@@ -515,7 +515,7 @@ def tricategory_coherence_theorem
       (Tricategory.pentagonatorPath T (T.id₁ a) (T.id₁ a) (T.id₁ a) (T.id₁ a)))
 
 /-- Pentagonator with identity 1-cells has trivial right-unit composition. -/
-@[simp] def tricategory_unit_coherence
+@[simp] noncomputable def tricategory_unit_coherence
     (T : Tricategory (Obj := Obj)) (a : Obj) :
     CellPath
       (CellPath.comp
@@ -553,7 +553,7 @@ def tricategory_coherence_theorem
   simp [CellPath.comp]
 
 /-- Associativity coherence for composing the pentagonator with unit 4-cells. -/
-@[simp] def tricategory_associator_coherence
+@[simp] noncomputable def tricategory_associator_coherence
     (T : Tricategory (Obj := Obj))
     {a b c d e : Obj}
     (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e) :

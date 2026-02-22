@@ -9,78 +9,78 @@ structure HigherMonoidalCategory where
   tensor : Obj → Obj → Obj
   unit : Obj
 
-def infinityOperadShape (n : Nat) : Type := Fin (n + 1)
+noncomputable def infinityOperadShape (n : Nat) : Type := Fin (n + 1)
 
-def infinityOperadAxiom (C : HigherMonoidalCategory) : Prop := True
+noncomputable def infinityOperadAxiom (C : HigherMonoidalCategory) : Prop := True
 
-def algebraObject (C : HigherMonoidalCategory) : Type _ := C.Obj
+noncomputable def algebraObject (C : HigherMonoidalCategory) : Type _ := C.Obj
 
-def commutativeAlgebraObject (C : HigherMonoidalCategory) : Type _ := C.Obj
+noncomputable def commutativeAlgebraObject (C : HigherMonoidalCategory) : Type _ := C.Obj
 
-def dayConvolutionObj (C D : HigherMonoidalCategory) : Type _ := C.Obj × D.Obj
+noncomputable def dayConvolutionObj (C D : HigherMonoidalCategory) : Type _ := C.Obj × D.Obj
 
-def dayConvolutionTensor (C D : HigherMonoidalCategory) :
+noncomputable def dayConvolutionTensor (C D : HigherMonoidalCategory) :
     dayConvolutionObj C D → dayConvolutionObj C D → dayConvolutionObj C D :=
   fun x y => (C.tensor x.1 y.1, D.tensor x.2 y.2)
 
-def dayConvolutionUnit (C D : HigherMonoidalCategory) : dayConvolutionObj C D :=
+noncomputable def dayConvolutionUnit (C D : HigherMonoidalCategory) : dayConvolutionObj C D :=
   (C.unit, D.unit)
 
-def dayConvolutionMonoidal (C D : HigherMonoidalCategory) : Prop := True
+noncomputable def dayConvolutionMonoidal (C D : HigherMonoidalCategory) : Prop := True
 
-def operadicLeftKanExtension (C : HigherMonoidalCategory) : C.Obj → C.Obj := fun x => x
+noncomputable def operadicLeftKanExtension (C : HigherMonoidalCategory) : C.Obj → C.Obj := fun x => x
 
-def operadicRightKanExtension (C : HigherMonoidalCategory) : C.Obj → C.Obj := fun x => x
+noncomputable def operadicRightKanExtension (C : HigherMonoidalCategory) : C.Obj → C.Obj := fun x => x
 
-def monoidalYoneda (C : HigherMonoidalCategory) : C.Obj → Type _ := fun _ => C.Obj
+noncomputable def monoidalYoneda (C : HigherMonoidalCategory) : C.Obj → Type _ := fun _ => C.Obj
 
-def cotangentComplex (C : HigherMonoidalCategory) : algebraObject C → Type _ :=
+noncomputable def cotangentComplex (C : HigherMonoidalCategory) : algebraObject C → Type _ :=
   fun _ => C.Obj
 
-def quillenCohomology (C : HigherMonoidalCategory) : algebraObject C → Type _ :=
+noncomputable def quillenCohomology (C : HigherMonoidalCategory) : algebraObject C → Type _ :=
   fun _ => C.Obj
 
-def derivationSpace (C : HigherMonoidalCategory) : algebraObject C → Type _ :=
+noncomputable def derivationSpace (C : HigherMonoidalCategory) : algebraObject C → Type _ :=
   fun _ => C.Obj
 
-def squareZeroExtension (C : HigherMonoidalCategory) :
+noncomputable def squareZeroExtension (C : HigherMonoidalCategory) :
     algebraObject C → algebraObject C := fun a => a
 
-def indecomposables (C : HigherMonoidalCategory) :
+noncomputable def indecomposables (C : HigherMonoidalCategory) :
     algebraObject C → Type _ := fun _ => C.Obj
 
-def stabilizationFunctor (C : HigherMonoidalCategory) : C.Obj → C.Obj := fun x => x
+noncomputable def stabilizationFunctor (C : HigherMonoidalCategory) : C.Obj → C.Obj := fun x => x
 
-def spectralCotangentComplex (C : HigherMonoidalCategory) :
+noncomputable def spectralCotangentComplex (C : HigherMonoidalCategory) :
     algebraObject C → Type _ := fun _ => C.Obj
 
-def operadicBarConstruction (C : HigherMonoidalCategory) :
+noncomputable def operadicBarConstruction (C : HigherMonoidalCategory) :
     algebraObject C → Type _ := fun _ => List C.Obj
 
-def operadicCobarConstruction (C : HigherMonoidalCategory) :
+noncomputable def operadicCobarConstruction (C : HigherMonoidalCategory) :
     algebraObject C → Type _ := fun _ => List C.Obj
 
-def quillenCohomologyClass (C : HigherMonoidalCategory) :
+noncomputable def quillenCohomologyClass (C : HigherMonoidalCategory) :
     algebraObject C → algebraObject C := fun a => a
 
-def infinityOperadAlgebraMap (C : HigherMonoidalCategory) :
+noncomputable def infinityOperadAlgebraMap (C : HigherMonoidalCategory) :
     algebraObject C → algebraObject C := fun a => a
 
-def dayConvolutionComparison (C D : HigherMonoidalCategory) :
+noncomputable def dayConvolutionComparison (C D : HigherMonoidalCategory) :
     dayConvolutionObj C D → dayConvolutionObj C D := fun x => x
 
-def algebraPath (C : HigherMonoidalCategory) (a : algebraObject C) : Path a a := Path.refl a
+noncomputable def algebraPath (C : HigherMonoidalCategory) (a : algebraObject C) : Path a a := Path.refl a
 
-def commutativePath (C : HigherMonoidalCategory) (a : commutativeAlgebraObject C) :
+noncomputable def commutativePath (C : HigherMonoidalCategory) (a : commutativeAlgebraObject C) :
     Path a a := Path.refl a
 
-def dayConvolutionPath (C D : HigherMonoidalCategory) (x : dayConvolutionObj C D) :
+noncomputable def dayConvolutionPath (C D : HigherMonoidalCategory) (x : dayConvolutionObj C D) :
     Path x x := Path.trans (Path.refl x) (Path.refl x)
 
-def cotangentPath (C : HigherMonoidalCategory) (a : algebraObject C) : Path a a :=
+noncomputable def cotangentPath (C : HigherMonoidalCategory) (a : algebraObject C) : Path a a :=
   Path.refl a
 
-def quillenPath (C : HigherMonoidalCategory) (a : algebraObject C) : Path a a :=
+noncomputable def quillenPath (C : HigherMonoidalCategory) (a : algebraObject C) : Path a a :=
   Path.refl a
 
 theorem infinityOperadShape_nonempty (n : Nat) : Nat.succ n > 0 := by

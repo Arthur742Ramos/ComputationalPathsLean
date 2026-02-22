@@ -37,7 +37,7 @@ inductive Key where
   | sym : Nat → Key
   deriving DecidableEq, Repr
 
-def invKey : Key → Key
+noncomputable def invKey : Key → Key
   | .pub a => .priv a
   | .priv a => .pub a
   | .sym n => .sym n
@@ -51,7 +51,7 @@ theorem invKey_involutive (k : Key) : invKey (invKey k) = k := by
 
 theorem invKey_not_change_sym (n : Nat) : invKey (Key.sym n) = Key.sym n := rfl
 
-def invKey_path (k : Key) : Path (invKey (invKey k)) k :=
+noncomputable def invKey_path (k : Key) : Path (invKey (invKey k)) k :=
   Path.stepChain (invKey_involutive k)
 
 inductive Message where
@@ -65,9 +65,9 @@ inductive Message where
 
 abbrev Sym := Message
 
-def msgId (m : Message) : Message := m
+noncomputable def msgId (m : Message) : Message := m
 
-def msgSize : Message → Nat
+noncomputable def msgSize : Message → Nat
   | .atom _ => 1
   | .nonce _ _ => 1
   | .pair m n => msgSize m + msgSize n + 1
@@ -75,7 +75,7 @@ def msgSize : Message → Nat
   | .hash m => msgSize m + 1
   | .tag _ => 1
 
-def msgDepth : Message → Nat
+noncomputable def msgDepth : Message → Nat
   | .atom _ => 0
   | .nonce _ _ => 0
   | .pair m n => Nat.succ (Nat.max (msgDepth m) (msgDepth n))
@@ -118,27 +118,27 @@ theorem msgSize_enc_invKey (k : Key) (m : Message) :
     msgSize (Message.enc (invKey k) m) = msgSize (Message.enc k m) := by
   simp [msgSize]
 
-def hashWrap (m : Message) : Message := Message.hash m
+noncomputable def hashWrap (m : Message) : Message := Message.hash m
 
-def hashUnwrap : Message → Message
+noncomputable def hashUnwrap : Message → Message
   | Message.hash m => m
   | m => m
 
-def encWrap (k : Key) (m : Message) : Message := Message.enc k m
+noncomputable def encWrap (k : Key) (m : Message) : Message := Message.enc k m
 
-def encUnwrap : Message → Message
+noncomputable def encUnwrap : Message → Message
   | Message.enc _ m => m
   | m => m
 
-def pairLeft : Message → Message
+noncomputable def pairLeft : Message → Message
   | Message.pair m _ => m
   | m => m
 
-def pairRight : Message → Message
+noncomputable def pairRight : Message → Message
   | Message.pair _ n => n
   | m => m
 
-def pairSwap : Message → Message
+noncomputable def pairSwap : Message → Message
   | Message.pair m n => Message.pair n m
   | m => m
 
@@ -169,22 +169,22 @@ theorem msgDepth_hashWrap (m : Message) :
 theorem msgSize_hashWrap (m : Message) :
     msgSize (hashWrap m) = msgSize m + 1 := rfl
 
-def msgId_path (m : Message) : Path (msgId m) m :=
+noncomputable def msgId_path (m : Message) : Path (msgId m) m :=
   Path.refl m
 
-def msgId_size_path (m : Message) : Path (msgSize (msgId m)) (msgSize m) :=
+noncomputable def msgId_size_path (m : Message) : Path (msgSize (msgId m)) (msgSize m) :=
   Path.congrArg msgSize (msgId_path m)
 
-def pairSwap_roundtrip_path (m : Message) : Path (pairSwap (pairSwap m)) m :=
+noncomputable def pairSwap_roundtrip_path (m : Message) : Path (pairSwap (pairSwap m)) m :=
   Path.stepChain (pairSwap_twice m)
 
 /-! ## Dolev-Yao symbolic operations -/
 
-def dyPair (m n : Message) : Message := Message.pair m n
+noncomputable def dyPair (m n : Message) : Message := Message.pair m n
 
-def dyEncrypt (k : Key) (m : Message) : Message := Message.enc k m
+noncomputable def dyEncrypt (k : Key) (m : Message) : Message := Message.enc k m
 
-def dyDecrypt (k : Key) : Message → Message
+noncomputable def dyDecrypt (k : Key) : Message → Message
   | Message.enc k' payload =>
       if invKey k = k' then payload else Message.enc k' payload
   | m => m
@@ -210,11 +210,11 @@ theorem dyDecrypt_sym_key (n : Nat) (m : Message) :
     dyDecrypt (Key.sym n) (Message.enc (Key.sym n) m) = m := by
   simp [dyDecrypt, invKey]
 
-def intruderKnowledge (Gam : List Message) : List Message := Gam
+noncomputable def intruderKnowledge (Gam : List Message) : List Message := Gam
 
-def combineKnowledge (Gam1 Gam2 : List Message) : List Message := Gam1 ++ Gam2
+noncomputable def combineKnowledge (Gam1 Gam2 : List Message) : List Message := Gam1 ++ Gam2
 
-def intruderSynth (Gam : List Message) : List Message := combineKnowledge Gam Gam
+noncomputable def intruderSynth (Gam : List Message) : List Message := combineKnowledge Gam Gam
 
 theorem intruderKnowledge_empty : intruderKnowledge [] = [] := rfl
 
@@ -244,7 +244,7 @@ theorem intruderSynth_length (Gam : List Message) :
     (intruderSynth Gam).length = Gam.length + Gam.length := by
   simp [intruderSynth, combineKnowledge]
 
-def intruderSynth_path_assoc (Gam1 Gam2 Gam3 : List Message) :
+noncomputable def intruderSynth_path_assoc (Gam1 Gam2 Gam3 : List Message) :
     Path (combineKnowledge (combineKnowledge Gam1 Gam2) Gam3)
          (combineKnowledge Gam1 (combineKnowledge Gam2 Gam3)) :=
   Path.stepChain (combineKnowledge_assoc Gam1 Gam2 Gam3)
@@ -260,15 +260,15 @@ inductive Event where
 
 abbrev Trace := List Event
 
-def appendTrace (tr1 tr2 : Trace) : Trace := tr1 ++ tr2
+noncomputable def appendTrace (tr1 tr2 : Trace) : Trace := tr1 ++ tr2
 
-def traceLen (tr : Trace) : Nat := tr.length
+noncomputable def traceLen (tr : Trace) : Nat := tr.length
 
-def appendEvent (tr : Trace) (ev : Event) : Trace := tr ++ [ev]
+noncomputable def appendEvent (tr : Trace) (ev : Event) : Trace := tr ++ [ev]
 
-def reverseTrace (tr : Trace) : Trace := tr.reverse
+noncomputable def reverseTrace (tr : Trace) : Trace := tr.reverse
 
-def hasEvent (ev : Event) (tr : Trace) : Prop := ev ∈ tr
+noncomputable def hasEvent (ev : Event) (tr : Trace) : Prop := ev ∈ tr
 
 theorem appendTrace_assoc (tr1 tr2 tr3 : Trace) :
     appendTrace (appendTrace tr1 tr2) tr3 = appendTrace tr1 (appendTrace tr2 tr3) := by
@@ -297,17 +297,17 @@ theorem reverseTrace_append (tr1 tr2 : Trace) :
     reverseTrace (appendTrace tr1 tr2) = appendTrace (reverseTrace tr2) (reverseTrace tr1) := by
   simp [reverseTrace, appendTrace, List.reverse_append]
 
-def traceAssoc_path (tr1 tr2 tr3 : Trace) :
+noncomputable def traceAssoc_path (tr1 tr2 tr3 : Trace) :
     Path (appendTrace (appendTrace tr1 tr2) tr3) (appendTrace tr1 (appendTrace tr2 tr3)) :=
   Path.stepChain (appendTrace_assoc tr1 tr2 tr3)
 
-def traceLeftUnit_path (tr : Trace) : Path (appendTrace [] tr) tr :=
+noncomputable def traceLeftUnit_path (tr : Trace) : Path (appendTrace [] tr) tr :=
   Path.refl tr
 
-def traceRightUnit_path (tr : Trace) : Path (appendTrace tr []) tr :=
+noncomputable def traceRightUnit_path (tr : Trace) : Path (appendTrace tr []) tr :=
   Path.stepChain (appendTrace_nil_right tr)
 
-def traceRoundtrip_path (tr : Trace) : Path tr tr :=
+noncomputable def traceRoundtrip_path (tr : Trace) : Path tr tr :=
   Path.trans (Path.refl tr) (Path.refl tr)
 
 theorem hasEvent_append_left (ev : Event) (tr1 tr2 : Trace) :
@@ -337,10 +337,10 @@ theorem traceLen_reverse (tr : Trace) : traceLen (reverseTrace tr) = traceLen tr
 
 /-! ## Authentication and secrecy predicates -/
 
-def authentication (tr : Trace) : Prop :=
+noncomputable def authentication (tr : Trace) : Prop :=
   ∀ a b m, Event.recv a b m ∈ tr → Event.send b a m ∈ tr
 
-def secrecy (secret : Message) (tr : Trace) : Prop :=
+noncomputable def secrecy (secret : Message) (tr : Trace) : Prop :=
   Event.claimSecret Agent.server secret ∈ tr →
     Event.send Agent.intruder Agent.intruder secret ∉ tr
 
@@ -374,19 +374,19 @@ theorem secrecy_of_no_server_claim (secret : Message) (tr : Trace)
 
 /-! ## Needham-Schroeder symbolic traces -/
 
-def nsNonceA : Message := Message.nonce 0 Agent.alice
-def nsNonceB : Message := Message.nonce 1 Agent.bob
+noncomputable def nsNonceA : Message := Message.nonce 0 Agent.alice
+noncomputable def nsNonceB : Message := Message.nonce 1 Agent.bob
 
-def nsMsg1 : Message :=
+noncomputable def nsMsg1 : Message :=
   Message.enc (Key.pub Agent.bob) (Message.pair (Message.tag Agent.alice) nsNonceA)
 
-def nsMsg2 : Message :=
+noncomputable def nsMsg2 : Message :=
   Message.enc (Key.pub Agent.alice) (Message.pair nsNonceA nsNonceB)
 
-def nsMsg3 : Message :=
+noncomputable def nsMsg3 : Message :=
   Message.enc (Key.pub Agent.bob) nsNonceB
 
-def nsHonestTrace : Trace :=
+noncomputable def nsHonestTrace : Trace :=
   [ Event.send Agent.alice Agent.bob nsMsg1
   , Event.recv Agent.bob Agent.alice nsMsg1
   , Event.send Agent.bob Agent.alice nsMsg2
@@ -394,7 +394,7 @@ def nsHonestTrace : Trace :=
   , Event.send Agent.alice Agent.bob nsMsg3
   ]
 
-def nsAttackTrace : Trace :=
+noncomputable def nsAttackTrace : Trace :=
   [ Event.send Agent.alice Agent.intruder nsMsg1
   , Event.send Agent.intruder Agent.bob nsMsg1
   , Event.send Agent.bob Agent.intruder nsMsg2
@@ -440,7 +440,7 @@ theorem nsAttack_contains_final_relay :
     Event.send Agent.intruder Agent.bob nsMsg3 ∈ nsAttackTrace := by
   simp [nsAttackTrace]
 
-def nsAttack_as_path : Path nsAttackTrace nsAttackTrace :=
+noncomputable def nsAttack_as_path : Path nsAttackTrace nsAttackTrace :=
   Path.trans (Path.refl nsAttackTrace) (Path.refl nsAttackTrace)
 
 theorem nsAttack_refl_symm :
@@ -455,7 +455,7 @@ theorem nsAttack_assoc_path :
 
 /-! ## Protocol equivalence and symbolic models -/
 
-def protocolEquivalent (tr1 tr2 : Trace) : Prop := traceLen tr1 = traceLen tr2
+noncomputable def protocolEquivalent (tr1 tr2 : Trace) : Prop := traceLen tr1 = traceLen tr2
 
 theorem protocolEquivalent_refl (tr : Trace) : protocolEquivalent tr tr := rfl
 
@@ -477,7 +477,7 @@ theorem ns_protocol_not_equiv : ¬ protocolEquivalent nsHonestTrace nsAttackTrac
   intro h
   simp [protocolEquivalent, nsHonest_length, nsAttack_length] at h
 
-def protocolEquivalent_path_of_equiv {tr1 tr2 : Trace}
+noncomputable def protocolEquivalent_path_of_equiv {tr1 tr2 : Trace}
     (h : protocolEquivalent tr1 tr2) :
     Path (traceLen tr1) (traceLen tr2) :=
   Path.stepChain h
@@ -486,15 +486,15 @@ structure SymbolicModel where
   Sym : Type u
   Gam : List Sym
 
-def modelCard (M : SymbolicModel) : Nat := M.Gam.length
+noncomputable def modelCard (M : SymbolicModel) : Nat := M.Gam.length
 
-def modelEmpty (Sym : Type u) : SymbolicModel :=
+noncomputable def modelEmpty (Sym : Type u) : SymbolicModel :=
   { Sym := Sym, Gam := [] }
 
-def modelInsert (M : SymbolicModel) (x : M.Sym) : SymbolicModel :=
+noncomputable def modelInsert (M : SymbolicModel) (x : M.Sym) : SymbolicModel :=
   { Sym := M.Sym, Gam := x :: M.Gam }
 
-def messageModel (Gam : List Message) : SymbolicModel :=
+noncomputable def messageModel (Gam : List Message) : SymbolicModel :=
   { Sym := Message, Gam := Gam }
 
 theorem modelCard_empty (Sym : Type u) : modelCard (modelEmpty Sym) = 0 := rfl
@@ -522,16 +522,16 @@ structure StrandSpace where
   strands : List Strand
   deriving Repr
 
-def emptyStrandSpace : StrandSpace := { strands := [] }
+noncomputable def emptyStrandSpace : StrandSpace := { strands := [] }
 
-def addStrand (S : StrandSpace) (s : Strand) : StrandSpace :=
+noncomputable def addStrand (S : StrandSpace) (s : Strand) : StrandSpace :=
   { strands := s :: S.strands }
 
-def strandCount (S : StrandSpace) : Nat := S.strands.length
+noncomputable def strandCount (S : StrandSpace) : Nat := S.strands.length
 
-def strandSpaceMessages (S : StrandSpace) : List Event := S.strands.foldr List.append []
+noncomputable def strandSpaceMessages (S : StrandSpace) : List Event := S.strands.foldr List.append []
 
-def strandEquivalent (S1 S2 : StrandSpace) : Prop := strandCount S1 = strandCount S2
+noncomputable def strandEquivalent (S1 S2 : StrandSpace) : Prop := strandCount S1 = strandCount S2
 
 theorem strandCount_empty : strandCount emptyStrandSpace = 0 := rfl
 
@@ -562,7 +562,7 @@ theorem strandEquivalent_trans {S1 S2 S3 : StrandSpace} :
   intro h1 h2
   exact Eq.trans h1 h2
 
-def nsStrandSpace : StrandSpace :=
+noncomputable def nsStrandSpace : StrandSpace :=
   { strands := [nsHonestTrace, nsAttackTrace] }
 
 theorem nsStrand_count : strandCount nsStrandSpace = 2 := rfl
@@ -573,10 +573,10 @@ theorem nsStrand_has_attack : nsAttackTrace ∈ nsStrandSpace.strands := by
 theorem nsStrand_has_honest : nsHonestTrace ∈ nsStrandSpace.strands := by
   simp [nsStrandSpace]
 
-def strandCount_path (S : StrandSpace) : Path (strandCount S) (strandCount S) :=
+noncomputable def strandCount_path (S : StrandSpace) : Path (strandCount S) (strandCount S) :=
   Path.refl (strandCount S)
 
-def strandCount_roundtrip_path (S : StrandSpace) :
+noncomputable def strandCount_roundtrip_path (S : StrandSpace) :
     Path (strandCount S) (strandCount S) :=
   Path.trans (Path.refl (strandCount S)) (Path.refl (strandCount S))
 

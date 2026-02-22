@@ -92,26 +92,26 @@ inductive CStep : Expr → Expr → Prop where
 abbrev CRTC := GroupoidTRS.RTC CStep
 
 namespace CRTC
-def single {a b : Expr} (h : CStep a b) : CRTC a b := RTC.single h
+noncomputable def single {a b : Expr} (h : CStep a b) : CRTC a b := RTC.single h
 
-def symm_congr {p q : Expr} (h : CRTC p q) : CRTC (.symm p) (.symm q) := by
+noncomputable def symm_congr {p q : Expr} (h : CRTC p q) : CRTC (.symm p) (.symm q) := by
   induction h with
   | refl => exact .refl _
   | head s _ ih => exact .head (.symm_congr s) ih
 
-def trans_congr_left (r : Expr) {p q : Expr} (h : CRTC p q) :
+noncomputable def trans_congr_left (r : Expr) {p q : Expr} (h : CRTC p q) :
     CRTC (.trans p r) (.trans q r) := by
   induction h with
   | refl => exact .refl _
   | head s _ ih => exact .head (.trans_congr_left r s) ih
 
-def trans_congr_right (p : Expr) {q r : Expr} (h : CRTC q r) :
+noncomputable def trans_congr_right (p : Expr) {q r : Expr} (h : CRTC q r) :
     CRTC (.trans p q) (.trans p r) := by
   induction h with
   | refl => exact .refl _
   | head s _ ih => exact .head (.trans_congr_right p s) ih
 
-def trans_congr {p p' q q' : Expr} (h₁ : CRTC p p') (h₂ : CRTC q q') :
+noncomputable def trans_congr {p p' q q' : Expr} (h₁ : CRTC p p') (h₂ : CRTC q q') :
     CRTC (.trans p q) (.trans p' q') :=
   (trans_congr_left q h₁).trans (trans_congr_right p' h₂)
 end CRTC
@@ -234,14 +234,14 @@ inductive Gen where
   deriving DecidableEq
 
 namespace Gen
-def inv : Gen → Gen | .pos n => .neg n | .neg n => .pos n
+noncomputable def inv : Gen → Gen | .pos n => .neg n | .neg n => .pos n
 @[simp] theorem inv_inv (g : Gen) : g.inv.inv = g := by cases g <;> rfl
 theorem inv_ne (g : Gen) : g.inv ≠ g := by cases g <;> simp [inv]
-def toExpr : Gen → Expr | .pos n => .atom n | .neg n => .symm (.atom n)
+noncomputable def toExpr : Gen → Expr | .pos n => .atom n | .neg n => .symm (.atom n)
 end Gen
 
 /-- No adjacent inverse pair. -/
-def Reduced : List Gen → Prop
+noncomputable def Reduced : List Gen → Prop
   | [] | [_] => True
   | g :: h :: rest => g.inv ≠ h ∧ Reduced (h :: rest)
 
@@ -249,7 +249,7 @@ theorem reduced_tail {g : Gen} {w : List Gen} (h : Reduced (g :: w)) :
     Reduced w := by cases w with | nil => trivial | cons _ _ => exact h.2
 
 /-- Prepend with cancellation. -/
-def prepend (g : Gen) : List Gen → List Gen
+noncomputable def prepend (g : Gen) : List Gen → List Gen
   | [] => [g]
   | h :: rest => if g.inv = h then rest else g :: h :: rest
 
@@ -297,7 +297,7 @@ theorem prepend_inv_cancel (g : Gen) (w : List Gen) (hw : Reduced w) :
       rw [h1', prepend_cancel g (k :: rest)]
 
 /-- Concatenation with cancellation at junction. -/
-def rwAppend : List Gen → List Gen → List Gen
+noncomputable def rwAppend : List Gen → List Gen → List Gen
   | [], w₂ => w₂
   | g :: rest, w₂ => prepend g (rwAppend rest w₂)
 
@@ -350,7 +350,7 @@ theorem rwAppend_single (g : Gen) (w : List Gen) :
     rwAppend [g] w = prepend g w := rfl
 
 /-- Inversion. -/
-def rwInv : List Gen → List Gen
+noncomputable def rwInv : List Gen → List Gen
   | [] => []
   | g :: rest => rwAppend (rwInv rest) [g.inv]
 
@@ -456,18 +456,18 @@ group. This is the homomorphism from the term algebra to the free group
 that makes the groupoid TRS sound. -/
 
 /-- Semantic interpretation of an expression as a reduced word. -/
-def toRW : Expr → List Gen
+noncomputable def toRW : Expr → List Gen
   | .atom n => [.pos n]
   | .refl => []
   | .symm e => rwInv (toRW e)
   | .trans e₁ e₂ => rwAppend (toRW e₁) (toRW e₂)
 
 /-- Equality on expressions is decidable (inherited from `GroupoidTRS.Expr`). -/
-def expr_eq_decidable (e₁ e₂ : Expr) : Decidable (e₁ = e₂) :=
+noncomputable def expr_eq_decidable (e₁ e₂ : Expr) : Decidable (e₁ = e₂) :=
   inferInstance
 
 /-- Equality of interpreted free-group words is decidable. -/
-def toRW_eq_decidable (e₁ e₂ : Expr) : Decidable (toRW e₁ = toRW e₂) :=
+noncomputable def toRW_eq_decidable (e₁ e₂ : Expr) : Decidable (toRW e₁ = toRW e₂) :=
   inferInstance
 
 theorem toRW_reduced : ∀ (e : Expr), Reduced (toRW e)
@@ -525,13 +525,13 @@ and `reach_symm` as building blocks. -/
 
 /-- Convert a reduced word back to an Expr.
     `[] ↦ refl`, `[g] ↦ g.toExpr`, `g :: rest ↦ trans g.toExpr (rwToExpr rest)` -/
-def rwToExpr : List Gen → Expr
+noncomputable def rwToExpr : List Gen → Expr
   | [] => .refl
   | [g] => g.toExpr
   | g :: h :: rest => .trans g.toExpr (rwToExpr (h :: rest))
 
 /-- The canonical form. -/
-def canon (e : Expr) : Expr := rwToExpr (toRW e)
+noncomputable def canon (e : Expr) : Expr := rwToExpr (toRW e)
 
 @[simp] theorem toRW_gen_toExpr (g : Gen) : toRW g.toExpr = [g] := by
   cases g <;> rfl
@@ -872,7 +872,7 @@ theorem exprRwEq_iff_canon_eq (e₁ e₂ : Expr) :
   · intro h
     exact (toRW_eq_iff_exprRwEq e₁ e₂).1 ((canon_eq_iff_toRW_eq e₁ e₂).1 h)
 
-instance exprRwEqDecidable (e₁ e₂ : Expr) : Decidable (ExprRwEq e₁ e₂) := by
+noncomputable instance exprRwEqDecidable (e₁ e₂ : Expr) : Decidable (ExprRwEq e₁ e₂) := by
   refine
     match (inferInstance : Decidable (canon e₁ = canon e₂)) with
     | isTrue h => isTrue ((exprRwEq_iff_canon_eq e₁ e₂).2 h)
@@ -884,12 +884,12 @@ abbrev ExprRwQuot := Quot ExprRwEq
 /-- Reduced free-group words. -/
 abbrev ReducedWord := {w : List Gen // Reduced w}
 
-def exprRwQuotToReduced : ExprRwQuot → ReducedWord :=
+noncomputable def exprRwQuotToReduced : ExprRwQuot → ReducedWord :=
   Quot.lift
     (fun e => ⟨toRW e, toRW_reduced e⟩)
     (fun _ _ h => Subtype.ext (toRW_eq_of_exprRwEq h))
 
-def reducedToExprRwQuot : ReducedWord → ExprRwQuot :=
+noncomputable def reducedToExprRwQuot : ReducedWord → ExprRwQuot :=
   fun w => Quot.mk _ (rwToExpr w.1)
 
 @[simp] theorem exprRwQuotToReduced_mk (e : Expr) :
@@ -909,7 +909,7 @@ def reducedToExprRwQuot : ReducedWord → ExprRwQuot :=
   exact Quot.sound (ExprRwEq.symm (exprRwEq_of_crtc (reach_canon e)))
 
 /-- `Expr/ExprRwEq` is isomorphic to reduced free-group words. -/
-def exprRwQuotEquivReducedWord : SimpleEquiv ExprRwQuot ReducedWord where
+noncomputable def exprRwQuotEquivReducedWord : SimpleEquiv ExprRwQuot ReducedWord where
   toFun := exprRwQuotToReduced
   invFun := reducedToExprRwQuot
   left_inv := reducedToExprRwQuot_exprRwQuotToReduced
@@ -922,7 +922,7 @@ theorem separation_of_toRW_ne {e₁ e₂ : Expr} (h : toRW e₁ ≠ toRW e₂) :
 
 /-! ## Diamond Property and Confluence -/
 
-def Diamond {α : Type _} (R : α → α → Prop) : Prop :=
+noncomputable def Diamond {α : Type _} (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, RTC R b d ∧ RTC R c d
 
 theorem diamond_implies_local_confluence {α : Type _} {R : α → α → Prop}
@@ -973,7 +973,7 @@ and abstract levels. -/
 /-- Erase type information from a `PathExpr`, producing an abstract `Expr`.
     Atoms are mapped to `Expr.atom 0` (sufficient for the groupoid fragment
     where atom identity doesn't matter for the algebraic structure). -/
-def eraseTypes {A : Type _} {a b : A} :
+noncomputable def eraseTypes {A : Type _} {a b : A} :
     Rewrite.PathExpr A a b → Expr
   | .atom _ => .atom 0
   | .refl _ => .refl

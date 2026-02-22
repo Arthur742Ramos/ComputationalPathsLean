@@ -33,7 +33,7 @@ structure CochainComplex (Obj : Nat → Type u)
     Path (delta (n + 1) (delta n x)) (delta (n + 1) (delta n x))
 
 -- Def 1: boundary applied twice yields zero via Path
-def boundary_square_zero
+noncomputable def boundary_square_zero
     {Obj : Nat → Type u} {zero : (n : Nat) → Obj n}
     {d : (n : Nat) → Obj (n + 1) → Obj n}
     (C : ChainComplex Obj zero d) (n : Nat) (x : Obj (n + 1 + 1)) :
@@ -41,7 +41,7 @@ def boundary_square_zero
   C.boundary n x
 
 -- Def 2: symmetry of boundary condition
-def boundary_square_zero_symm
+noncomputable def boundary_square_zero_symm
     {Obj : Nat → Type u} {zero : (n : Nat) → Obj n}
     {d : (n : Nat) → Obj (n + 1) → Obj n}
     (C : ChainComplex Obj zero d) (n : Nat) (x : Obj (n + 1 + 1)) :
@@ -49,7 +49,7 @@ def boundary_square_zero_symm
   Path.symm (C.boundary n x)
 
 -- Def 3: cochain complex self-consistency
-def cochain_boundary_refl
+noncomputable def cochain_boundary_refl
     {Obj : Nat → Type u} {zero : (n : Nat) → Obj n}
     {delta : (n : Nat) → Obj n → Obj (n + 1)}
     (C : CochainComplex Obj zero delta) (n : Nat) (x : Obj n) :
@@ -73,7 +73,7 @@ structure ChainMap
     Path (f n (dA n x)) (dB n (f (n + 1) x))
 
 -- Def 4: identity chain map commutes
-def chainMap_id_commutes
+noncomputable def chainMap_id_commutes
     {Obj : Nat → Type u} {zero : (n : Nat) → Obj n}
     {d : (n : Nat) → Obj (n + 1) → Obj n}
     (_C : ChainComplex Obj zero d) (n : Nat) (x : Obj (n + 1)) :
@@ -81,7 +81,7 @@ def chainMap_id_commutes
   Path.refl (d n x)
 
 -- Def 5: composition of chain maps commutes
-def chainMap_comp_commutes
+noncomputable def chainMap_comp_commutes
     {ObjA ObjB ObjC : Nat → Type u}
     {_zA : (n : Nat) → ObjA n} {_zB : (n : Nat) → ObjB n} {_zC : (n : Nat) → ObjC n}
     {dA : (n : Nat) → ObjA (n + 1) → ObjA n}
@@ -95,7 +95,7 @@ def chainMap_comp_commutes
   Path.trans (congrArg (g n) (fComm n x)) (gComm n (f (n + 1) x))
 
 -- Def 6: chain map symmetry
-def chainMap_commutes_symm
+noncomputable def chainMap_commutes_symm
     {ObjA ObjB : Nat → Type u}
     {zA : (n : Nat) → ObjA n} {zB : (n : Nat) → ObjB n}
     {dA : (n : Nat) → ObjA (n + 1) → ObjA n}
@@ -125,7 +125,7 @@ structure ChainHomotopy
     Path (f (n + 1) x) (add (n + 1) (g (n + 1) x) (add (n + 1) (dB (n + 1) (h (n + 1) x)) (h n (dA n x))))
 
 -- Def 7: reflexive homotopy
-def homotopy_refl_path
+noncomputable def homotopy_refl_path
     {ObjB : Nat → Type u}
     (f : (n : Nat) → ObjB n)
     (n : Nat) :
@@ -133,12 +133,12 @@ def homotopy_refl_path
   Path.refl (f n)
 
 -- Def 8: symmetric path for homotopy
-def homotopy_symm_witness
+noncomputable def homotopy_symm_witness
     {X : Type u} (a b : X) (p : Path a b) : Path b a :=
   Path.symm p
 
 -- Def 9: transitive path for homotopy
-def homotopy_trans_witness
+noncomputable def homotopy_trans_witness
     {X : Type u} (a b c : X) (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -162,7 +162,7 @@ structure HomotopyEquivalence
   g_chain : (n : Nat) → (y : ObjB (n + 1)) → Path (g n (dB n y)) (dA n (g (n + 1) y))
 
 -- Def 10: forward-backward roundtrip
-def homotopy_equiv_roundtrip_A
+noncomputable def homotopy_equiv_roundtrip_A
     {ObjA ObjB : Nat → Type u}
     {zA : (n : Nat) → ObjA n} {zB : (n : Nat) → ObjB n}
     {dA : (n : Nat) → ObjA (n + 1) → ObjA n}
@@ -173,7 +173,7 @@ def homotopy_equiv_roundtrip_A
   e.gf_id n x
 
 -- Def 11: backward-forward roundtrip
-def homotopy_equiv_roundtrip_B
+noncomputable def homotopy_equiv_roundtrip_B
     {ObjA ObjB : Nat → Type u}
     {zA : (n : Nat) → ObjA n} {zB : (n : Nat) → ObjB n}
     {dA : (n : Nat) → ObjA (n + 1) → ObjA n}
@@ -184,7 +184,7 @@ def homotopy_equiv_roundtrip_B
   e.fg_id n y
 
 -- Def 12: composition of chain equivalence with chain map condition
-def homotopy_equiv_chain_comp
+noncomputable def homotopy_equiv_chain_comp
     {ObjA ObjB : Nat → Type u}
     {zA : (n : Nat) → ObjA n} {zB : (n : Nat) → ObjB n}
     {dA : (n : Nat) → ObjA (n + 1) → ObjA n}
@@ -216,7 +216,7 @@ structure Boundary {Obj : Nat → Type u}
   isBoundary : Path val (d (n + 1) preimage)
 
 -- Def 13: every boundary is a cycle
-def boundary_is_cycle
+noncomputable def boundary_is_cycle
     {Obj : Nat → Type u} {zero : (n : Nat) → Obj n}
     {d : (n : Nat) → Obj (n + 1) → Obj n}
     (C : ChainComplex Obj zero d) (n : Nat)
@@ -225,7 +225,7 @@ def boundary_is_cycle
   C.boundary n b.preimage
 
 -- Def 14: boundary condition via congrArg
-def boundary_via_congrArg
+noncomputable def boundary_via_congrArg
     {Obj : Nat → Type u} {zero : (n : Nat) → Obj n}
     {d : (n : Nat) → Obj (n + 1) → Obj n}
     (C : ChainComplex Obj zero d) (n : Nat) (b : Boundary C n) :
@@ -233,7 +233,7 @@ def boundary_via_congrArg
   congrArg (d n) b.isBoundary
 
 -- Def 15: boundary mapped to zero via trans
-def boundary_maps_to_zero
+noncomputable def boundary_maps_to_zero
     {Obj : Nat → Type u} {zero : (n : Nat) → Obj n}
     {d : (n : Nat) → Obj (n + 1) → Obj n}
     (C : ChainComplex Obj zero d) (n : Nat) (b : Boundary C n) :
@@ -241,7 +241,7 @@ def boundary_maps_to_zero
   Path.trans (congrArg (d n) b.isBoundary) (C.boundary n b.preimage)
 
 -- Def 16: cycle from boundary
-def cycle_from_boundary
+noncomputable def cycle_from_boundary
     {Obj : Nat → Type u} {zero : (n : Nat) → Obj n}
     {d : (n : Nat) → Obj (n + 1) → Obj n}
     (C : ChainComplex Obj zero d) (n : Nat) (b : Boundary C n) :
@@ -264,21 +264,21 @@ structure ShortExactSeq (A B C : Type u)
   exact_ker_im : (b : B) → Path (g b) zeroC → (a : A) × Path (f a) b
 
 -- Def 17: composition in SES is zero
-def ses_composition_zero
+noncomputable def ses_composition_zero
     {A B C : Type u} {zA : A} {zB : B} {zC : C}
     (S : ShortExactSeq A B C zA zB zC) (a : A) :
     Path (S.g (S.f a)) zC :=
   S.exact_gf a
 
 -- Def 18: image subset kernel
-def ses_im_subset_ker
+noncomputable def ses_im_subset_ker
     {A B C : Type u} {zA : A} {zB : B} {zC : C}
     (S : ShortExactSeq A B C zA zB zC) (a : A) :
     Path (S.g (S.f a)) zC :=
   S.exact_gf a
 
 -- Def 19: injectivity witness
-def ses_injectivity
+noncomputable def ses_injectivity
     {A B C : Type u} {zA : A} {zB : B} {zC : C}
     (S : ShortExactSeq A B C zA zB zC) (a : A) (h : Path (S.f a) zB) :
     Path a zA :=
@@ -305,7 +305,7 @@ structure SnakeDiagram (A B C A' B' C' : Type u)
   right_sq : (b : B) → Path (gamma (g b)) (g' (beta b))
 
 -- Def 20: snake left square
-def snake_left_square
+noncomputable def snake_left_square
     {A B C A' B' C' : Type u}
     {zA : A} {zB : B} {zC : C} {zA' : A'} {zB' : B'} {zC' : C'}
     (S : SnakeDiagram A B C A' B' C' zA zB zC zA' zB' zC')
@@ -313,7 +313,7 @@ def snake_left_square
   S.left_sq a
 
 -- Def 21: snake right square
-def snake_right_square
+noncomputable def snake_right_square
     {A B C A' B' C' : Type u}
     {zA : A} {zB : B} {zC : C} {zA' : A'} {zB' : B'} {zC' : C'}
     (S : SnakeDiagram A B C A' B' C' zA zB zC zA' zB' zC')
@@ -321,7 +321,7 @@ def snake_right_square
   S.right_sq b
 
 -- Def 22: outer rectangle via trans
-def snake_outer_rectangle
+noncomputable def snake_outer_rectangle
     {A B C A' B' C' : Type u}
     {zA : A} {zB : B} {zC : C} {zA' : A'} {zB' : B'} {zC' : C'}
     (S : SnakeDiagram A B C A' B' C' zA zB zC zA' zB' zC')
@@ -329,7 +329,7 @@ def snake_outer_rectangle
   Path.trans (S.right_sq (S.f a)) (congrArg S.g' (S.left_sq a))
 
 -- Def 23: top row maps to zero via gamma
-def snake_top_to_zero
+noncomputable def snake_top_to_zero
     {A B C A' B' C' : Type u}
     {zA : A} {zB : B} {zC : C} {zA' : A'} {zB' : B'} {zC' : C'}
     (S : SnakeDiagram A B C A' B' C' zA zB zC zA' zB' zC')
@@ -337,7 +337,7 @@ def snake_top_to_zero
   congrArg S.gamma (S.top_exact a)
 
 -- Def 24: connecting kernel witness
-def snake_connecting_kernel
+noncomputable def snake_connecting_kernel
     {A B C A' B' C' : Type u}
     {zA : A} {zB : B} {zC : C} {zA' : A'} {zB' : B'} {zC' : C'}
     (S : SnakeDiagram A B C A' B' C' zA zB zC zA' zB' zC')
@@ -345,7 +345,7 @@ def snake_connecting_kernel
   congrArg S.g' (S.left_sq a)
 
 -- Def 25: snake outer rectangle symmetry
-def snake_outer_rectangle_symm
+noncomputable def snake_outer_rectangle_symm
     {A B C A' B' C' : Type u}
     {zA : A} {zB : B} {zC : C} {zA' : A'} {zB' : B'} {zC' : C'}
     (S : SnakeDiagram A B C A' B' C' zA zB zC zA' zB' zC')
@@ -353,7 +353,7 @@ def snake_outer_rectangle_symm
   Path.symm (snake_outer_rectangle S a)
 
 -- Def 26: snake bottom exact via congrArg
-def snake_bot_exact_applied
+noncomputable def snake_bot_exact_applied
     {A B C A' B' C' : Type u}
     {zA : A} {zB : B} {zC : C} {zA' : A'} {zB' : B'} {zC' : C'}
     (S : SnakeDiagram A B C A' B' C' zA zB zC zA' zB' zC')
@@ -385,35 +385,35 @@ structure FiveDiagram (A1 A2 A3 A4 A5 B1 B2 B3 B4 B5 : Type u) where
   sq4 : (x : A4) → Path (alpha5 (f4 x)) (g4 (alpha4 x))
 
 -- Def 27: five lemma first square
-def five_lemma_sq1
+noncomputable def five_lemma_sq1
     {A1 A2 A3 A4 A5 B1 B2 B3 B4 B5 : Type u}
     (D : FiveDiagram A1 A2 A3 A4 A5 B1 B2 B3 B4 B5)
     (x : A1) : Path (D.alpha2 (D.f1 x)) (D.g1 (D.alpha1 x)) :=
   D.sq1 x
 
 -- Def 28: composite of squares 1 and 2
-def five_lemma_composite_sq12
+noncomputable def five_lemma_composite_sq12
     {A1 A2 A3 A4 A5 B1 B2 B3 B4 B5 : Type u}
     (D : FiveDiagram A1 A2 A3 A4 A5 B1 B2 B3 B4 B5)
     (x : A1) : Path (D.alpha3 (D.f2 (D.f1 x))) (D.g2 (D.g1 (D.alpha1 x))) :=
   Path.trans (D.sq2 (D.f1 x)) (congrArg D.g2 (D.sq1 x))
 
 -- Def 29: composite of squares 1, 2, 3
-def five_lemma_composite_sq123
+noncomputable def five_lemma_composite_sq123
     {A1 A2 A3 A4 A5 B1 B2 B3 B4 B5 : Type u}
     (D : FiveDiagram A1 A2 A3 A4 A5 B1 B2 B3 B4 B5)
     (x : A1) : Path (D.alpha4 (D.f3 (D.f2 (D.f1 x)))) (D.g3 (D.g2 (D.g1 (D.alpha1 x)))) :=
   Path.trans (D.sq3 (D.f2 (D.f1 x))) (congrArg D.g3 (five_lemma_composite_sq12 D x))
 
 -- Def 30: full composite all four squares
-def five_lemma_composite_sq1234
+noncomputable def five_lemma_composite_sq1234
     {A1 A2 A3 A4 A5 B1 B2 B3 B4 B5 : Type u}
     (D : FiveDiagram A1 A2 A3 A4 A5 B1 B2 B3 B4 B5)
     (x : A1) : Path (D.alpha5 (D.f4 (D.f3 (D.f2 (D.f1 x))))) (D.g4 (D.g3 (D.g2 (D.g1 (D.alpha1 x))))) :=
   Path.trans (D.sq4 (D.f3 (D.f2 (D.f1 x)))) (congrArg D.g4 (five_lemma_composite_sq123 D x))
 
 -- Def 31: five lemma square symmetry
-def five_lemma_sq2_symm
+noncomputable def five_lemma_sq2_symm
     {A1 A2 A3 A4 A5 B1 B2 B3 B4 B5 : Type u}
     (D : FiveDiagram A1 A2 A3 A4 A5 B1 B2 B3 B4 B5)
     (x : A2) : Path (D.g2 (D.alpha2 x)) (D.alpha3 (D.f2 x)) :=
@@ -439,14 +439,14 @@ structure FourDiagram (A1 A2 A3 A4 B1 B2 B3 B4 : Type u) where
   sq3 : (x : A3) → Path (alpha4 (f3 x)) (g3 (alpha3 x))
 
 -- Def 32: four lemma composite
-def four_lemma_composite
+noncomputable def four_lemma_composite
     {A1 A2 A3 A4 B1 B2 B3 B4 : Type u}
     (D : FourDiagram A1 A2 A3 A4 B1 B2 B3 B4)
     (x : A1) : Path (D.alpha3 (D.f2 (D.f1 x))) (D.g2 (D.g1 (D.alpha1 x))) :=
   Path.trans (D.sq2 (D.f1 x)) (congrArg D.g2 (D.sq1 x))
 
 -- Def 33: four lemma triple composite
-def four_lemma_triple_composite
+noncomputable def four_lemma_triple_composite
     {A1 A2 A3 A4 B1 B2 B3 B4 : Type u}
     (D : FourDiagram A1 A2 A3 A4 B1 B2 B3 B4)
     (x : A1) : Path (D.alpha4 (D.f3 (D.f2 (D.f1 x)))) (D.g3 (D.g2 (D.g1 (D.alpha1 x)))) :=
@@ -465,21 +465,21 @@ structure LongExactSeq (H : Nat → Type u) (zero : (n : Nat) → H n) where
     Path (d n x) (zero n) → (y : H (n + 1 + 1)) × Path (d (n + 1) y) x
 
 -- Def 34: LES composition is zero
-def les_comp_zero
+noncomputable def les_comp_zero
     {H : Nat → Type u} {zero : (n : Nat) → H n}
     (L : LongExactSeq H zero) (n : Nat) (x : H (n + 1 + 1)) :
     Path (L.d n (L.d (n + 1) x)) (zero n) :=
   L.exact_comp n x
 
 -- Def 35: LES composition zero symm
-def les_comp_zero_symm
+noncomputable def les_comp_zero_symm
     {H : Nat → Type u} {zero : (n : Nat) → H n}
     (L : LongExactSeq H zero) (n : Nat) (x : H (n + 1 + 1)) :
     Path (zero n) (L.d n (L.d (n + 1) x)) :=
   Path.symm (L.exact_comp n x)
 
 -- Def 36: LES is a chain complex
-def les_as_chain_complex
+noncomputable def les_as_chain_complex
     {H : Nat → Type u} {zero : (n : Nat) → H n}
     (L : LongExactSeq H zero) :
     ChainComplex H zero L.d :=
@@ -497,7 +497,7 @@ structure ConnectingHom (HnC HnA1 : Type u) where
     Path (g (delta x)) (delta (f x))
 
 -- Def 37: connecting homomorphism respects identity
-def connecting_hom_id
+noncomputable def connecting_hom_id
     {HnC HnA1 : Type u}
     (delta : HnC → HnA1)
     (x : HnC) :
@@ -505,7 +505,7 @@ def connecting_hom_id
   Path.refl (delta x)
 
 -- Def 38: connecting homomorphism via naturality
-def connecting_hom_nat
+noncomputable def connecting_hom_nat
     {HnC HnA1 : Type u}
     (ch : ConnectingHom HnC HnA1)
     (f : HnC → HnC) (g : HnA1 → HnA1)
@@ -530,14 +530,14 @@ structure RightDerivedFunctor (F : Type u → Type v) where
   universal : (X : Type u) → (x : F X) → Path (R_zero_map X x) (R_zero_map X x)
 
 -- Def 39: left derived functor reflexivity
-def left_derived_refl
+noncomputable def left_derived_refl
     {F : Type u → Type v}
     (D : LeftDerivedFunctor F) (X : Type u) (x : F X) :
     Path (D.L_zero_map X x) (D.L_zero_map X x) :=
   D.universal X x
 
 -- Def 40: right derived functor reflexivity
-def right_derived_refl
+noncomputable def right_derived_refl
     {F : Type u → Type v}
     (D : RightDerivedFunctor F) (X : Type u) (x : F X) :
     Path (D.R_zero_map X x) (D.R_zero_map X x) :=
@@ -560,14 +560,14 @@ structure TorFunctor (Mod : Type u) where
   tor_functorial : (A B : Mod) → (x : Tor 0 A B) → Path x x
 
 -- Def 41: Ext identity Path
-def ext_id_path
+noncomputable def ext_id_path
     {Mod : Type u}
     (E : ExtFunctor Mod) (A B : Mod) (x : E.Ext 0 A B) :
     Path x x :=
   E.ext_functorial A B x
 
 -- Def 42: Tor identity Path
-def tor_id_path
+noncomputable def tor_id_path
     {Mod : Type u}
     (T : TorFunctor Mod) (A B : Mod) (x : T.Tor 0 A B) :
     Path x x :=
@@ -578,7 +578,7 @@ def tor_id_path
 -- ============================================================
 
 -- Def 43: functoriality under composition
-def chain_map_functorial
+noncomputable def chain_map_functorial
     {A B C : Type u}
     (f : A → B) (g : B → C)
     (x y : A) (p : Path x y) :
@@ -586,7 +586,7 @@ def chain_map_functorial
   congrArg (fun a => g (f a)) p
 
 -- Def 44: chain map preserves trans
-def chain_map_preserves_trans
+noncomputable def chain_map_preserves_trans
     {A B : Type u}
     (f : A → B)
     (x y z : A) (p : Path x y) (q : Path y z) :
@@ -594,14 +594,14 @@ def chain_map_preserves_trans
   congrArg f (Path.trans p q)
 
 -- Def 45: chain map preserves symm
-def chain_map_preserves_symm
+noncomputable def chain_map_preserves_symm
     {A B : Type u}
     (f : A → B) (x y : A) (p : Path x y) :
     Path (f y) (f x) :=
   congrArg f (Path.symm p)
 
 -- Def 46: double functoriality via nested congrArg
-def chain_map_double_func
+noncomputable def chain_map_double_func
     {A B C : Type u}
     (f : A → B) (g : B → C)
     (x y : A) (p : Path x y) :
@@ -613,7 +613,7 @@ def chain_map_double_func
 -- ============================================================
 
 -- Def 47: one square chase
-def diagram_chase_one_square
+noncomputable def diagram_chase_one_square
     {A B C D : Type u}
     (f : A → B) (g : A → C) (h : B → D) (k : C → D)
     (comm : (a : A) → Path (h (f a)) (k (g a)))
@@ -621,7 +621,7 @@ def diagram_chase_one_square
   comm a
 
 -- Def 48: two squares horizontal chase
-def diagram_chase_two_squares
+noncomputable def diagram_chase_two_squares
     {A B C D E F : Type u}
     (f1 : A → B) (f2 : B → C)
     (g1 : D → E) (g2 : E → F)
@@ -632,7 +632,7 @@ def diagram_chase_two_squares
   Path.trans (sq2 (f1 a)) (congrArg g2 (sq1 a))
 
 -- Def 49: commutative triangle
-def diagram_chase_triangle
+noncomputable def diagram_chase_triangle
     {A B C : Type u}
     (f : A → B) (g : B → C) (h : A → C)
     (comm : (a : A) → Path (g (f a)) (h a))
@@ -640,7 +640,7 @@ def diagram_chase_triangle
   comm a
 
 -- Def 50: reverse triangle
-def diagram_chase_triangle_rev
+noncomputable def diagram_chase_triangle_rev
     {A B C : Type u}
     (f : A → B) (g : B → C) (h : A → C)
     (comm : (a : A) → Path (g (f a)) (h a))
@@ -648,7 +648,7 @@ def diagram_chase_triangle_rev
   Path.symm (comm a)
 
 -- Def 51: two-step chase with functoriality
-def diagram_chase_functorial
+noncomputable def diagram_chase_functorial
     {A B C : Type u}
     (f : A → B) (g : B → C)
     (x y : A) (p : Path x y)
@@ -668,14 +668,14 @@ structure ExactCouple (D E : Type u) where
   exact_ij : (d : D) → Path (j (i d)) (j (i d))
 
 -- Def 52: exact couple self-consistency
-def exact_couple_consistent
+noncomputable def exact_couple_consistent
     {D E : Type u}
     (C : ExactCouple D E) (d : D) :
     Path (C.j (C.i d)) (C.j (C.i d)) :=
   C.exact_ij d
 
 -- Def 53: exact couple iteration via refl
-def exact_couple_iterate
+noncomputable def exact_couple_iterate
     {D E : Type u}
     (C : ExactCouple D E) (d : D) :
     Path (C.i (C.i d)) (C.i (C.i d)) :=
@@ -699,7 +699,7 @@ structure MappingCone
     Path (cone_d n (cone_d (n + 1) x)) (cone_zero n)
 
 -- Def 54: mapping cone is a chain complex
-def mapping_cone_as_complex
+noncomputable def mapping_cone_as_complex
     {ObjA ObjB : Nat → Type u}
     {zA : (n : Nat) → ObjA n} {zB : (n : Nat) → ObjB n}
     {dA : (n : Nat) → ObjA (n + 1) → ObjA n}
@@ -715,7 +715,7 @@ def mapping_cone_as_complex
 -- ============================================================
 
 -- Def 55: naturality square
-def naturality_square
+noncomputable def naturality_square
     {A B C D : Type u}
     (f : A → B) (g : C → D)
     (eta_A : A → C) (eta_B : B → D)
@@ -724,7 +724,7 @@ def naturality_square
   nat a
 
 -- Def 56: naturality composition
-def naturality_composition
+noncomputable def naturality_composition
     {A B C D E F : Type u}
     (f : A → B) (g : B → C)
     (h : D → E) (k : E → F)
@@ -735,7 +735,7 @@ def naturality_composition
   Path.trans (nat2 (f a)) (congrArg k (nat1 a))
 
 -- Def 57: interchange law
-def naturality_interchange
+noncomputable def naturality_interchange
     {A B C : Type u}
     (f g : A → B) (h k : B → C)
     (alpha : (a : A) → Path (f a) (g a))
@@ -744,7 +744,7 @@ def naturality_interchange
   Path.trans (beta (f a)) (congrArg k (alpha a))
 
 -- Def 58: vertical composition
-def naturality_vertical
+noncomputable def naturality_vertical
     {A B : Type u}
     (f g h : A → B)
     (p : (a : A) → Path (f a) (g a))
@@ -753,7 +753,7 @@ def naturality_vertical
   Path.trans (p a) (q a)
 
 -- Def 59: whiskering left
-def whisker_left
+noncomputable def whisker_left
     {A B C : Type u}
     (h : B → C)
     (f g : A → B)
@@ -762,7 +762,7 @@ def whisker_left
   congrArg h (p a)
 
 -- Def 60: whiskering right
-def whisker_right
+noncomputable def whisker_right
     {A B C : Type u}
     (f : A → B)
     (g h : B → C)
@@ -784,21 +784,21 @@ structure ZigZagData (A B C : Type u) (zA : A) (zB : B) (zC : C) where
   connecting : (c : C) → Path (f (delta c)) (f (delta c))
 
 -- Def 61: zig-zag section property
-def zigzag_section
+noncomputable def zigzag_section
     {A B C : Type u} {zA : A} {zB : B} {zC : C}
     (Z : ZigZagData A B C zA zB zC) (c : C) :
     Path (Z.g (Z.s c)) c :=
   Z.section_prop c
 
 -- Def 62: zig-zag composition zero
-def zigzag_comp_zero
+noncomputable def zigzag_comp_zero
     {A B C : Type u} {zA : A} {zB : B} {zC : C}
     (Z : ZigZagData A B C zA zB zC) (a : A) :
     Path (Z.g (Z.f a)) zC :=
   Z.comp_zero a
 
 -- Def 63: zig-zag section followed by g is identity on C
-def zigzag_section_inverse
+noncomputable def zigzag_section_inverse
     {A B C : Type u} {zA : A} {zB : B} {zC : C}
     (Z : ZigZagData A B C zA zB zC) (c1 c2 : C) (p : Path c1 c2) :
     Path (Z.g (Z.s c1)) (Z.g (Z.s c2)) :=

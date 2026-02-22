@@ -37,7 +37,7 @@ universe u
 abbrev B (G : Type u) : Type u := BG G
 
 /-- The classifying space map induced by a group homomorphism. -/
-def BMap {G H : Type u} {S : StrictGroup G} {T : StrictGroup H} (_ : GroupHom G H S T) :
+noncomputable def BMap {G H : Type u} {S : StrictGroup G} {T : StrictGroup H} (_ : GroupHom G H S T) :
     B G → B H
   | Delooping.base => Delooping.base
 

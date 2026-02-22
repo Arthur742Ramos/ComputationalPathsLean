@@ -86,7 +86,7 @@ structure LieAlgHom (𝔤 𝔥 : Type u) (L1 : LieAlgebra 𝔤) (L2 : LieAlgebra
   map_zero : Path (map L1.zero) L2.zero
 
 /-- Path.trans: composing bracket preservation with Jacobi identity. -/
-def bracket_jacobi_compose {𝔤 V : Type u} (ρ : LieAlgebraRep 𝔤 V) (x y z : 𝔤) :
+noncomputable def bracket_jacobi_compose {𝔤 V : Type u} (ρ : LieAlgebraRep 𝔤 V) (x y z : 𝔤) :
     Path (ρ.lie.add (ρ.lie.bracket x (ρ.lie.bracket y z))
                      (ρ.lie.add (ρ.lie.bracket y (ρ.lie.bracket z x))
                                 (ρ.lie.bracket z (ρ.lie.bracket x y))))
@@ -174,13 +174,13 @@ structure WeylGroup (𝔥 : Type u) (rs : RootSystem 𝔥) where
   length : WeylWord SimpleRoot → Nat
 
 /-- Extend reflection to Weyl words. -/
-def WeylGroup.wordAction {𝔥 : Type u} {rs : RootSystem 𝔥}
+noncomputable def WeylGroup.wordAction {𝔥 : Type u} {rs : RootSystem 𝔥}
     (W : WeylGroup 𝔥 rs) : WeylWord W.SimpleRoot → rs.wl.Weight → rs.wl.Weight
   | WeylWord.id, wt_ => wt_
   | WeylWord.refl s w, wt_ => W.reflect s (W.wordAction w wt_)
 
 /-- Path.trans: double reflection is identity. -/
-def double_reflection_id {𝔥 : Type u} {rs : RootSystem 𝔥}
+noncomputable def double_reflection_id {𝔥 : Type u} {rs : RootSystem 𝔥}
     (W : WeylGroup 𝔥 rs) (s : W.SimpleRoot) (wt_ : rs.wl.Weight) :
     Path (W.wordAction (WeylWord.refl s (WeylWord.refl s WeylWord.id)) wt_)
          wt_ :=
@@ -213,7 +213,7 @@ structure VermaModule (𝔤 V : Type u) extends HighestWeightModule 𝔤 V where
     Path (universalMap W M hwv) M.hwv
 
 /-- Path.trans: universal map preserves the highest weight vector. -/
-def verma_universal_compose {𝔤 V X : Type u}
+noncomputable def verma_universal_compose {𝔤 V X : Type u}
     (vm : VermaModule 𝔤 V)
     (P : HighestWeightModule 𝔤 X) :
     Path (vm.universalMap X P vm.hwv) P.hwv :=
@@ -235,7 +235,7 @@ structure BGGResolution (𝔤 : Type u) where
   is_verma_sum : ∀ (_n : Nat), True
 
 /-- Path.trans for differential composition in BGG. -/
-def bgg_diff_compose {𝔤 : Type u} (bgg : BGGResolution 𝔤) (n : Nat)
+noncomputable def bgg_diff_compose {𝔤 : Type u} (bgg : BGGResolution 𝔤) (n : Nat)
     (x : bgg.ModuleAt (n + 2)) :
     Path (bgg.diff n (bgg.diff (n + 1) x)) (bgg.diff n (bgg.diff (n + 1) x)) :=
   bgg.diff_sq n x

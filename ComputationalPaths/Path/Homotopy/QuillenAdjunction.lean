@@ -43,7 +43,7 @@ structure PathSimpleEquiv (α : Type u) (β : Type v) where
   right_inv : ∀ y : β, Path (toFun (invFun y)) y
 
 /-- Identity path equivalence. -/
-def pathSimpleEquivRefl (α : Type u) : PathSimpleEquiv α α :=
+noncomputable def pathSimpleEquivRefl (α : Type u) : PathSimpleEquiv α α :=
   { toFun := _root_.id
     invFun := _root_.id
     left_inv := fun x => Path.refl x
@@ -70,7 +70,7 @@ structure ModelFunctor (M : ModelCategory A) (N : ModelCategory B) where
 namespace ModelFunctor
 
 /-- Identity model functor. -/
-def id (M : ModelCategory A) : ModelFunctor M M :=
+noncomputable def id (M : ModelCategory A) : ModelFunctor M M :=
   { obj := _root_.id
     map := fun p => p
     map_refl := fun a => Path.refl (Path.refl a)
@@ -98,12 +98,12 @@ structure ModelAdjunction (M : ModelCategory A) (N : ModelCategory B)
 namespace ModelAdjunction
 
 /-- Unit of a model adjunction. -/
-def unit (adj : ModelAdjunction M N F G) (a : A) :
+noncomputable def unit (adj : ModelAdjunction M N F G) (a : A) :
     Path a (G.obj (F.obj a)) :=
   (adj.homEquiv a (F.obj a)).toFun (Path.refl (F.obj a))
 
 /-- Counit of a model adjunction. -/
-def counit (adj : ModelAdjunction M N F G) (b : B) :
+noncomputable def counit (adj : ModelAdjunction M N F G) (b : B) :
     Path (F.obj (G.obj b)) b :=
   (adj.homEquiv (G.obj b) b).invFun (Path.refl (G.obj b))
 
@@ -118,7 +118,7 @@ section QuillenConditions
 variable {A : Type u} {B : Type v}
 
 /-- Left Quillen condition: preserves cofibrations and trivial cofibrations. -/
-def LeftQuillen (M : ModelCategory A) (N : ModelCategory B)
+noncomputable def LeftQuillen (M : ModelCategory A) (N : ModelCategory B)
     (F : ModelFunctor M N) : Prop :=
   (∀ {a b : A} (p : Path a b), M.cof p → N.cof (F.map p)) ∧
   (∀ {a b : A} (p : Path a b),
@@ -126,7 +126,7 @@ def LeftQuillen (M : ModelCategory A) (N : ModelCategory B)
       ModelCategory.trivialCofibration N (F.map p))
 
 /-- Right Quillen condition: preserves fibrations and trivial fibrations. -/
-def RightQuillen (M : ModelCategory A) (N : ModelCategory B)
+noncomputable def RightQuillen (M : ModelCategory A) (N : ModelCategory B)
     (F : ModelFunctor M N) : Prop :=
   (∀ {a b : A} (p : Path a b), M.fib p → N.fib (F.map p)) ∧
   (∀ {a b : A} (p : Path a b),
@@ -155,12 +155,12 @@ structure QuillenAdjunction (M : ModelCategory A) (N : ModelCategory B) where
   right_quillen : RightQuillen N M right
 
 /-- Identity adjunction for a model category. -/
-def identityAdjunction (M : ModelCategory A) :
+noncomputable def identityAdjunction (M : ModelCategory A) :
     ModelAdjunction M M (ModelFunctor.id M) (ModelFunctor.id M) :=
   { homEquiv := fun a b => pathSimpleEquivRefl (Path a b) }
 
 /-- Identity Quillen adjunction on a model category. -/
-def identityQuillenAdjunction (M : ModelCategory A) : QuillenAdjunction M M :=
+noncomputable def identityQuillenAdjunction (M : ModelCategory A) : QuillenAdjunction M M :=
   { left := ModelFunctor.id M
     right := ModelFunctor.id M
     adj := identityAdjunction (M := M)
@@ -178,7 +178,7 @@ def identityQuillenAdjunction (M : ModelCategory A) : QuillenAdjunction M M :=
         simpa using h }
 
 /-- Identity Quillen adjunction for the path model structure. -/
-def pathModelQuillenAdjunction (A : Type u) :
+noncomputable def pathModelQuillenAdjunction (A : Type u) :
     QuillenAdjunction (pathModelCategory A) (pathModelCategory A) :=
   identityQuillenAdjunction (M := pathModelCategory A)
 

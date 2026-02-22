@@ -38,11 +38,11 @@ noncomputable section
 
 universe u
 
-private def pathOfEqStepChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
+private noncomputable def pathOfEqStepChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
   let core : Path a b := Path.stepChain h
   Path.trans (Path.trans (Path.refl a) core) (Path.refl b)
 
-private def pathOfEqStepChain_rweq {A : Type u} {a b : A} (h : a = b) :
+private noncomputable def pathOfEqStepChain_rweq {A : Type u} {a b : A} (h : a = b) :
     RwEq (pathOfEqStepChain h) (Path.stepChain h) := by
   let core : Path a b := Path.stepChain h
   change RwEq (Path.trans (Path.trans (Path.refl a) core) (Path.refl b)) core
@@ -124,11 +124,11 @@ namespace K0Data
 variable {A : KAlgData.{u}} (K : K0Data A)
 
 /-- Path witness: [0] = 0 in K₀. -/
-def classOf_zero_path : Path (K.classOf A.zero) K.zero :=
+noncomputable def classOf_zero_path : Path (K.classOf A.zero) K.zero :=
   pathOfEqStepChain K.classOf_zero
 
 /-- Path: add is commutative. -/
-def add_comm_path (x y : K.carrier) : Path (K.add x y) (K.add y x) :=
+noncomputable def add_comm_path (x y : K.carrier) : Path (K.add x y) (K.add y x) :=
   pathOfEqStepChain (K.add_comm x y)
 
 end K0Data
@@ -155,7 +155,7 @@ namespace K1Data
 variable {A : KAlgData.{u}} (K : K1Data A)
 
 /-- Path witness: [1] = 0 in K₁. -/
-def classOf_one_path : Path (K.classOf A.one) K.zero :=
+noncomputable def classOf_one_path : Path (K.classOf A.one) K.zero :=
   pathOfEqStepChain K.classOf_one
 
 end K1Data
@@ -190,26 +190,26 @@ namespace FredholmModule
 variable {A : KAlgData.{u}} (FM : FredholmModule A)
 
 /-- Path witness: F(0) = 0. -/
-def fredholm_zero_path : Path (FM.fredholm FM.hZero) FM.hZero :=
+noncomputable def fredholm_zero_path : Path (FM.fredholm FM.hZero) FM.hZero :=
   pathOfEqStepChain FM.fredholm_zero
 
 /-- Path witness: γ² = id. -/
-def grading_sq_path (v : FM.hilbert) : Path (FM.grading (FM.grading v)) v :=
+noncomputable def grading_sq_path (v : FM.hilbert) : Path (FM.grading (FM.grading v)) v :=
   pathOfEqStepChain (FM.grading_sq v)
 
 /-- Path witness: F²(0) = 0. -/
-def fredholm_sq_zero_path : Path (FM.fredholm (FM.fredholm FM.hZero)) FM.hZero :=
+noncomputable def fredholm_sq_zero_path : Path (FM.fredholm (FM.fredholm FM.hZero)) FM.hZero :=
   pathOfEqStepChain FM.fredholm_sq_zero
 
 /-- Multi-step: F(F(F(0))) = F(F(0)) = F(0) = 0, three steps via fredholm_zero. -/
-def fredholm_cube_zero_path :
+noncomputable def fredholm_cube_zero_path :
     Path (FM.fredholm (FM.fredholm (FM.fredholm FM.hZero))) FM.hZero :=
   Path.trans
     (pathOfEqStepChain (_root_.congrArg FM.fredholm FM.fredholm_sq_zero))
     FM.fredholm_zero_path
 
 /-- Path for [F, π(a)](0) = 0. -/
-def comm_compact_path (a : A.carrier) :
+noncomputable def comm_compact_path (a : A.carrier) :
     Path (FM.fredholm (FM.repr a FM.hZero)) (FM.repr a (FM.fredholm FM.hZero)) :=
   pathOfEqStepChain (FM.comm_compact a)
 
@@ -235,23 +235,23 @@ namespace IndexPairing
 variable {A : KAlgData.{u}} (IP : IndexPairing A)
 
 /-- Path witness: index(0) = 0. -/
-def index_zero_path : Path (IP.index IP.k0.zero) 0 :=
+noncomputable def index_zero_path : Path (IP.index IP.k0.zero) 0 :=
   pathOfEqStepChain IP.index_zero
 
 /-- Path witness: index is additive. -/
-def index_add_path (x y : IP.k0.carrier) :
+noncomputable def index_add_path (x y : IP.k0.carrier) :
     Path (IP.index (IP.k0.add x y)) (IP.index x + IP.index y) :=
   pathOfEqStepChain (IP.index_add x y)
 
 /-- Multi-step: index(x + 0) = index(x) + index(0) = index(x) + 0 = index(x).
     Uses Path.trans three times. -/
-def index_add_zero_path (x : IP.k0.carrier)
+noncomputable def index_add_zero_path (x : IP.k0.carrier)
     (h : IP.k0.add x IP.k0.zero = x) :
     Path (IP.index (IP.k0.add x IP.k0.zero)) (IP.index x) :=
   pathOfEqStepChain (_root_.congrArg IP.index h)
 
 /-- RwEq: the direct index(x+0)=index(x) vs the multi-step are path-equivalent. -/
-def index_add_zero_rweq (x : IP.k0.carrier)
+noncomputable def index_add_zero_rweq (x : IP.k0.carrier)
     (h : IP.k0.add x IP.k0.zero = x) :
     RwEq
       (pathOfEqStepChain (_root_.congrArg IP.index h))
@@ -284,11 +284,11 @@ namespace KasparovPair
 variable {A B : KAlgData.{u}} (K : KasparovPair A B)
 
 /-- Path witness: F(0) = 0. -/
-def operatorF_zero_path : Path (K.operatorF K.modZero) K.modZero :=
+noncomputable def operatorF_zero_path : Path (K.operatorF K.modZero) K.modZero :=
   pathOfEqStepChain K.operatorF_zero
 
 /-- Path witness for bimodule associativity. -/
-def act_assoc_path (a : A.carrier) (m : K.modCarrier) (b : B.carrier) :
+noncomputable def act_assoc_path (a : A.carrier) (m : K.modCarrier) (b : B.carrier) :
     Path (K.rightAct (K.leftAct a m) b) (K.leftAct a (K.rightAct m b)) :=
   pathOfEqStepChain (K.act_assoc a m b)
 
@@ -310,7 +310,7 @@ namespace KasparovProduct
 variable {A B C : KAlgData.{u}} (KP : KasparovProduct A B C)
 
 /-- Path witness for product preserving zero. -/
-def product_zero_path : Path (KP.product.operatorF KP.product.modZero) KP.product.modZero :=
+noncomputable def product_zero_path : Path (KP.product.operatorF KP.product.modZero) KP.product.modZero :=
   pathOfEqStepChain KP.product_zero
 
 end KasparovProduct
@@ -341,17 +341,17 @@ namespace BottPeriodicity
 variable {A : KAlgData.{u}} (BP : BottPeriodicity A)
 
 /-- Path witness: β⁻¹(β(x)) = x. -/
-def bott_left_inv_path (n : Nat) (x : BP.kGroup n) :
+noncomputable def bott_left_inv_path (n : Nat) (x : BP.kGroup n) :
     Path (BP.bottInv n (BP.bottFwd n x)) x :=
   pathOfEqStepChain (BP.bott_left_inv n x)
 
 /-- Path witness: β(β⁻¹(y)) = y. -/
-def bott_right_inv_path (n : Nat) (y : BP.kGroup (n + 2)) :
+noncomputable def bott_right_inv_path (n : Nat) (y : BP.kGroup (n + 2)) :
     Path (BP.bottFwd n (BP.bottInv n y)) y :=
   pathOfEqStepChain (BP.bott_right_inv n y)
 
 /-- Multi-step: β⁻¹(β(β⁻¹(β(x)))) = β⁻¹(β(x)) = x. Double Bott periodicity. -/
-def double_bott_path (n : Nat) (x : BP.kGroup n) :
+noncomputable def double_bott_path (n : Nat) (x : BP.kGroup n) :
     Path (BP.bottInv n (BP.bottFwd n (BP.bottInv n (BP.bottFwd n x)))) x :=
   Path.trans
     (pathOfEqStepChain (_root_.congrArg (fun z => BP.bottInv n (BP.bottFwd n z))
@@ -359,12 +359,12 @@ def double_bott_path (n : Nat) (x : BP.kGroup n) :
     (BP.bott_left_inv_path n x)
 
 /-- Multi-step: β(0) → 0_{n+2} and β⁻¹(0_{n+2}) → 0_n compose. -/
-def bott_zero_roundtrip (n : Nat) :
+noncomputable def bott_zero_roundtrip (n : Nat) :
     Path (BP.bottInv n (BP.bottFwd n (BP.kZero n))) (BP.kZero n) :=
   BP.bott_left_inv_path n (BP.kZero n)
 
 /-- RwEq: the roundtrip path and the direct left_inv path are equivalent. -/
-def bott_zero_rweq (n : Nat) :
+noncomputable def bott_zero_rweq (n : Nat) :
     RwEq
       (BP.bott_left_inv_path n (BP.kZero n))
       (BP.bott_zero_roundtrip n) :=
@@ -417,21 +417,21 @@ namespace SixTermExact
 variable {A : KAlgData.{u}} (S : SixTermExact A)
 
 /-- Path witness: i₀(0) = 0. -/
-def i0_zero_path : Path (S.i0 S.z0I) S.z0A :=
+noncomputable def i0_zero_path : Path (S.i0 S.z0I) S.z0A :=
   pathOfEqStepChain S.i0_zero
 
 /-- Path witness: idx(0) = 0. -/
-def idx_zero_path : Path (S.idx S.z1Q) S.z0I :=
+noncomputable def idx_zero_path : Path (S.idx S.z1Q) S.z0I :=
   pathOfEqStepChain S.idx_zero
 
 /-- Multi-step: going around half the sequence on zeros.
     j₀(i₀(0)) = j₀(0) = 0, two steps. -/
-def half_sequence_zero :
+noncomputable def half_sequence_zero :
     Path (S.j0 (S.i0 S.z0I)) S.z0Q :=
   pathOfEqStepChain S.exact_ji_zero
 
 /-- Multi-step: exp(j₀(i₀(0))) = exp(j₀(0)) = exp(0) = 0, three steps. -/
-def third_sequence_zero :
+noncomputable def third_sequence_zero :
     Path (S.exp (S.j0 (S.i0 S.z0I))) S.z1I :=
   Path.trans
     (pathOfEqStepChain (_root_.congrArg S.exp (_root_.congrArg S.j0 S.i0_zero)))
@@ -441,7 +441,7 @@ def third_sequence_zero :
 
 /-- Full six-step path: going around the entire sequence on zeros.
     i₁(exp(j₀(i₀(idx(j₁(0)))))) = 0 (all maps preserve zero). -/
-def full_sequence_zero
+noncomputable def full_sequence_zero
     (h1 : S.j1 S.z1A = S.z1Q)
     (h2 : S.idx S.z1Q = S.z0I)
     (h3 : S.i0 S.z0I = S.z0A)
@@ -457,7 +457,7 @@ def full_sequence_zero
             (pathOfEqStepChain h6)))))
 
 /-- RwEq: direct exactness path vs two-step composition. -/
-def exact_rweq :
+noncomputable def exact_rweq :
     RwEq
       (pathOfEqStepChain S.exact_ji_zero)
       (S.half_sequence_zero) :=
@@ -468,7 +468,7 @@ end SixTermExact
 /-! ## Trivial instances -/
 
 /-- Trivial KAlgData. -/
-def trivialKAlg : KAlgData.{0} where
+noncomputable def trivialKAlg : KAlgData.{0} where
   carrier := PUnit; zero := ⟨⟩; one := ⟨⟩
   add := fun _ _ => ⟨⟩; mul := fun _ _ => ⟨⟩; neg := fun _ => ⟨⟩
   star := fun _ => ⟨⟩; one_mul := fun _ => rfl; mul_one := fun _ => rfl
@@ -477,7 +477,7 @@ def trivialKAlg : KAlgData.{0} where
   star_star := fun _ => rfl
 
 /-- Trivial Bott periodicity. -/
-def trivialBott : BottPeriodicity trivialKAlg where
+noncomputable def trivialBott : BottPeriodicity trivialKAlg where
   kGroup := fun _ => PUnit; kZero := fun _ => ⟨⟩
   bottFwd := fun _ _ => ⟨⟩; bottInv := fun _ _ => ⟨⟩
   bott_left_inv := fun _ _ => rfl; bott_right_inv := fun _ _ => rfl

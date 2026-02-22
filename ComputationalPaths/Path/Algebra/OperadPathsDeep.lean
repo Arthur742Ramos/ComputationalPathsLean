@@ -51,19 +51,19 @@ inductive Path : ArityProfile → ArityProfile → Type where
   | cons : Step a b → Path b c → Path a c
 
 /-- Theorem 1 — refl path (identity computation). -/
-def Path.refl (a : ArityProfile) : Path a a := Path.nil a
+noncomputable def Path.refl (a : ArityProfile) : Path a a := Path.nil a
 
 /-- Theorem 2 — single step lifted to a path. -/
-def Path.single (s : Step a b) : Path a b :=
+noncomputable def Path.single (s : Step a b) : Path a b :=
   Path.cons s (Path.nil _)
 
 /-- Theorem 3 — trans: sequential composition of paths. -/
-def Path.trans : Path a b → Path b c → Path a c
+noncomputable def Path.trans : Path a b → Path b c → Path a c
   | Path.nil _, q => q
   | Path.cons s p, q => Path.cons s (Path.trans p q)
 
 /-- Step inversion. -/
-def Step.symm : Step a b → Step b a
+noncomputable def Step.symm : Step a b → Step b a
   | Step.compose a b  => Step.compose b a
   | Step.identity a   => Step.identity a
   | Step.permute a b  => Step.permute b a
@@ -73,12 +73,12 @@ def Step.symm : Step a b → Step b a
   | Step.fiber a b    => Step.fiber b a
 
 /-- Theorem 4 — symm: path inversion (groupoid inverse). -/
-def Path.symm : Path a b → Path b a
+noncomputable def Path.symm : Path a b → Path b a
   | Path.nil a   => Path.nil a
   | Path.cons s p => Path.trans (Path.symm p) (Path.single (Step.symm s))
 
 /-- Path length. -/
-def Path.length : Path a b → Nat
+noncomputable def Path.length : Path a b → Nat
   | Path.nil _    => 0
   | Path.cons _ p => 1 + p.length
 
@@ -143,14 +143,14 @@ inductive Path2 : Path a b → Path a b → Type where
   | symm2 : Path2 p q → Path2 q p
 
 /-- Theorem 14 — 2-cell identity. -/
-def Path2.id (p : Path a b) : Path2 p p := Path2.refl2 p
+noncomputable def Path2.id (p : Path a b) : Path2 p p := Path2.refl2 p
 
 /-- Theorem 15 — 2-cell composition. -/
-def Path2.comp (α : Path2 p q) (β : Path2 q r) : Path2 p r :=
+noncomputable def Path2.comp (α : Path2 p q) (β : Path2 q r) : Path2 p r :=
   Path2.trans2 α β
 
 /-- Theorem 16 — 2-cell inversion. -/
-def Path2.inv (α : Path2 p q) : Path2 q p := Path2.symm2 α
+noncomputable def Path2.inv (α : Path2 p q) : Path2 q p := Path2.symm2 α
 
 -- ============================================================
 -- §4  Operadic Composition as Paths
@@ -163,27 +163,27 @@ structure OpNode where
 deriving DecidableEq, Repr
 
 /-- Operadic composition: plug operation into slot. -/
-def opCompose (f : OpNode) (g : OpNode) : OpNode :=
+noncomputable def opCompose (f : OpNode) (g : OpNode) : OpNode :=
   { arity := f.arity + g.arity - 1, label := f.label * 1000 + g.label }
 
 /-- Composition profile for arity profiles. -/
-def composeProfile (p : ArityProfile) (q : ArityProfile) : ArityProfile :=
+noncomputable def composeProfile (p : ArityProfile) (q : ArityProfile) : ArityProfile :=
   { inputs := p.inputs ++ q.inputs, output := p.output }
 
 /-- Theorem 17 — composition step as a path. -/
-def composeStep (p q : ArityProfile) : Path (composeProfile p q) (composeProfile p q) :=
+noncomputable def composeStep (p q : ArityProfile) : Path (composeProfile p q) (composeProfile p q) :=
   Path.single (Step.compose (composeProfile p q) (composeProfile p q))
 
 /-- Theorem 18 — identity operation. -/
-def identityOp (c : Colour) : ArityProfile :=
+noncomputable def identityOp (c : Colour) : ArityProfile :=
   { inputs := [c], output := c }
 
 /-- Theorem 19 — identity step is reflexive. -/
-def identityStep (c : Colour) : Path (identityOp c) (identityOp c) :=
+noncomputable def identityStep (c : Colour) : Path (identityOp c) (identityOp c) :=
   Path.single (Step.identity (identityOp c))
 
 /-- Theorem 20 — sequential composition of operadic steps. -/
-def opSeqCompose (p q r : ArityProfile)
+noncomputable def opSeqCompose (p q r : ArityProfile)
     (s1 : Step p q) (s2 : Step q r) : Path p r :=
   Path.trans (Path.single s1) (Path.single s2)
 
@@ -198,15 +198,15 @@ theorem opSeqCompose_length (p q r : ArityProfile)
 -- ============================================================
 
 /-- Left-associated triple composition. -/
-def tripleLeft (p q r : ArityProfile) : ArityProfile :=
+noncomputable def tripleLeft (p q r : ArityProfile) : ArityProfile :=
   composeProfile (composeProfile p q) r
 
 /-- Right-associated triple composition. -/
-def tripleRight (p q r : ArityProfile) : ArityProfile :=
+noncomputable def tripleRight (p q r : ArityProfile) : ArityProfile :=
   composeProfile p (composeProfile q r)
 
 /-- Theorem 22 — associativity coherence path. -/
-def assocPath (p q r : ArityProfile) :
+noncomputable def assocPath (p q r : ArityProfile) :
     Path (tripleLeft p q r) (tripleRight p q r) :=
   Path.single (Step.compose (tripleLeft p q r) (tripleRight p q r))
 
@@ -215,7 +215,7 @@ theorem assocPath_length (p q r : ArityProfile) :
     (assocPath p q r).length = 1 := rfl
 
 /-- Theorem 24 — pentagon coherence: left path for quadruple. -/
-def pentagonLeft (a b c d : ArityProfile) :
+noncomputable def pentagonLeft (a b c d : ArityProfile) :
     Path (tripleLeft (composeProfile a b) c d) (tripleRight a b (composeProfile c d)) :=
   Path.trans
     (assocPath (composeProfile a b) c d)
@@ -224,7 +224,7 @@ def pentagonLeft (a b c d : ArityProfile) :
       (tripleRight a b (composeProfile c d))))
 
 /-- Theorem 25 — pentagon right path. -/
-def pentagonRight (a b c d : ArityProfile) :
+noncomputable def pentagonRight (a b c d : ArityProfile) :
     Path (tripleLeft (composeProfile a b) c d) (tripleRight a b (composeProfile c d)) :=
   Path.trans
     (Path.single (Step.compose
@@ -233,7 +233,7 @@ def pentagonRight (a b c d : ArityProfile) :
     (assocPath a b (composeProfile c d))
 
 /-- Theorem 26 — pentagon coherence 2-cell. -/
-def pentagonCoherence (a b c d : ArityProfile) :
+noncomputable def pentagonCoherence (a b c d : ArityProfile) :
     Path2 (pentagonLeft a b c d) (pentagonRight a b c d) :=
   Path2.step2 _ _
 
@@ -247,16 +247,16 @@ theorem pentagonLeft_length (a b c d : ArityProfile) :
 -- ============================================================
 
 /-- Permutation of inputs. -/
-def permuteInputs (p : ArityProfile) : ArityProfile :=
+noncomputable def permuteInputs (p : ArityProfile) : ArityProfile :=
   { inputs := p.inputs.reverse, output := p.output }
 
 /-- Theorem 28 — permutation step. -/
-def permuteStep (p : ArityProfile) :
+noncomputable def permuteStep (p : ArityProfile) :
     Path p (permuteInputs p) :=
   Path.single (Step.permute p (permuteInputs p))
 
 /-- Theorem 29 — double permutation path (swap twice). -/
-def permuteDouble (p : ArityProfile) :
+noncomputable def permuteDouble (p : ArityProfile) :
     Path p p :=
   Path.trans (permuteStep p) (Path.single (Step.permute (permuteInputs p) p))
 
@@ -266,7 +266,7 @@ theorem permuteDouble_length (p : ArityProfile) :
   simp [permuteDouble]; rw [length_trans]; rfl
 
 /-- Theorem 31 — equivariance: compose then permute vs permute then compose. -/
-def equivariancePath (p q : ArityProfile) :
+noncomputable def equivariancePath (p q : ArityProfile) :
     Path (permuteInputs (composeProfile p q)) (composeProfile (permuteInputs p) q) :=
   Path.trans
     (Path.single (Step.permute (permuteInputs (composeProfile p q))
@@ -280,7 +280,7 @@ theorem equivariancePath_length (p q : ArityProfile) :
   simp [equivariancePath]; rw [length_trans]; rfl
 
 /-- Theorem 33 — equivariance coherence 2-cell. -/
-def equivarianceCoherence (p q : ArityProfile) :
+noncomputable def equivarianceCoherence (p q : ArityProfile) :
     Path2 (equivariancePath p q)
       (Path.trans
         (Path.single (Step.compose (permuteInputs (composeProfile p q))
@@ -319,12 +319,12 @@ inductive FreePath : OpTree → OpTree → Type where
   | cons : FreeStep t u → FreePath u v → FreePath t v
 
 /-- Theorem 35 — free path composition. -/
-def FreePath.trans : FreePath t u → FreePath u v → FreePath t v
+noncomputable def FreePath.trans : FreePath t u → FreePath u v → FreePath t v
   | FreePath.nil _, q => q
   | FreePath.cons s p, q => FreePath.cons s (FreePath.trans p q)
 
 /-- Theorem 36 — free path length. -/
-def FreePath.length : FreePath t u → Nat
+noncomputable def FreePath.length : FreePath t u → Nat
   | FreePath.nil _    => 0
   | FreePath.cons _ p => 1 + p.length
 
@@ -352,11 +352,11 @@ theorem freePath_trans_nil (p : FreePath t u) :
   | cons s p ih => simp [FreePath.trans]; exact ih
 
 /-- Theorem 40 — universal property: map generators to paths. -/
-def freeMap (f : Generator → Path a a) (g : Generator) : Path a a :=
+noncomputable def freeMap (f : Generator → Path a a) (g : Generator) : Path a a :=
   f g
 
 /-- Theorem 41 — universal property preserves composition. -/
-def freeMapTrans (f : Generator → Path a a) (g1 g2 : Generator) : Path a a :=
+noncomputable def freeMapTrans (f : Generator → Path a a) (g1 g2 : Generator) : Path a a :=
   Path.trans (freeMap f g1) (freeMap f g2)
 
 -- ============================================================
@@ -364,14 +364,14 @@ def freeMapTrans (f : Generator → Path a a) (g1 g2 : Generator) : Path a a :=
 -- ============================================================
 
 /-- Function between arity profiles (operadic functor on profiles). -/
-def ArityMap := ArityProfile → ArityProfile
+noncomputable def ArityMap := ArityProfile → ArityProfile
 
 /-- Theorem 42 — congrArg: lift a step through a map. -/
-def congrArgStep (f : ArityMap) (s : Step a b) : Path (f a) (f b) :=
+noncomputable def congrArgStep (f : ArityMap) (s : Step a b) : Path (f a) (f b) :=
   Path.single (Step.compose (f a) (f b))
 
 /-- Theorem 43 — congrArg for full paths. -/
-def congrArgPath (f : ArityMap) : Path a b → Path (f a) (f b)
+noncomputable def congrArgPath (f : ArityMap) : Path a b → Path (f a) (f b)
   | Path.nil a   => Path.nil (f a)
   | Path.cons s p => Path.trans (congrArgStep f s) (congrArgPath f p)
 
@@ -410,7 +410,7 @@ structure AlgCarrier where
 deriving DecidableEq, Repr
 
 /-- Structure map of an algebra: arity profile → carrier action. -/
-def StructMap := ArityProfile → AlgCarrier
+noncomputable def StructMap := ArityProfile → AlgCarrier
 
 /-- Algebra step: compatible with operadic step. -/
 inductive AlgStep : AlgCarrier → AlgCarrier → Type where
@@ -423,12 +423,12 @@ inductive AlgPath : AlgCarrier → AlgCarrier → Type where
   | cons : AlgStep a b → AlgPath b c → AlgPath a c
 
 /-- Theorem 47 — algebra path trans. -/
-def AlgPath.trans : AlgPath a b → AlgPath b c → AlgPath a c
+noncomputable def AlgPath.trans : AlgPath a b → AlgPath b c → AlgPath a c
   | AlgPath.nil _, q => q
   | AlgPath.cons s p, q => AlgPath.cons s (AlgPath.trans p q)
 
 /-- Theorem 48 — algebra path length. -/
-def AlgPath.length : AlgPath a b → Nat
+noncomputable def AlgPath.length : AlgPath a b → Nat
   | AlgPath.nil _    => 0
   | AlgPath.cons _ p => 1 + p.length
 
@@ -448,11 +448,11 @@ theorem algPath_trans_nil (p : AlgPath a b) :
   | cons s p ih => simp [AlgPath.trans]; exact ih
 
 /-- Structure-preserving map from operadic paths to algebra paths. -/
-def structureMap (sm : StructMap) (s : Step a b) : AlgPath (sm a) (sm b) :=
+noncomputable def structureMap (sm : StructMap) (s : Step a b) : AlgPath (sm a) (sm b) :=
   AlgPath.cons (AlgStep.action (sm a) (sm b)) (AlgPath.nil _)
 
 /-- Theorem 51 — structure map on full paths. -/
-def structureMapPath (sm : StructMap) : Path a b → AlgPath (sm a) (sm b)
+noncomputable def structureMapPath (sm : StructMap) : Path a b → AlgPath (sm a) (sm b)
   | Path.nil a    => AlgPath.nil (sm a)
   | Path.cons s p => AlgPath.trans (structureMap sm s) (structureMapPath sm p)
 
@@ -490,12 +490,12 @@ inductive AInfPath : AInfLevel → AInfLevel → Type where
   | cons : AInfStep n m → AInfPath m k → AInfPath n k
 
 /-- Theorem 54 — A∞ path composition. -/
-def AInfPath.trans : AInfPath n m → AInfPath m k → AInfPath n k
+noncomputable def AInfPath.trans : AInfPath n m → AInfPath m k → AInfPath n k
   | AInfPath.nil _, q => q
   | AInfPath.cons s p, q => AInfPath.cons s (AInfPath.trans p q)
 
 /-- A∞ path length. -/
-def AInfPath.length : AInfPath n m → Nat
+noncomputable def AInfPath.length : AInfPath n m → Nat
   | AInfPath.nil _    => 0
   | AInfPath.cons _ p => 1 + p.length
 
@@ -515,15 +515,15 @@ theorem ainfPath_trans_nil (p : AInfPath n m) :
   | cons s p ih => simp [AInfPath.trans]; exact ih
 
 /-- Theorem 57 — higher coherence tower: level n to level n+1. -/
-def coherenceTower (n : Nat) : AInfPath ⟨n⟩ ⟨n + 1⟩ :=
+noncomputable def coherenceTower (n : Nat) : AInfPath ⟨n⟩ ⟨n + 1⟩ :=
   AInfPath.cons (AInfStep.assocHtpy ⟨n⟩ ⟨n + 1⟩) (AInfPath.nil _)
 
 /-- Theorem 58 — composing coherence towers (2-step example). -/
-def coherenceTowerPair (n : Nat) : AInfPath ⟨n⟩ ⟨n + 2⟩ :=
+noncomputable def coherenceTowerPair (n : Nat) : AInfPath ⟨n⟩ ⟨n + 2⟩ :=
   AInfPath.trans (coherenceTower n) (coherenceTower (n + 1))
 
 /-- Theorem 58b — coherence tower triple. -/
-def coherenceTowerTriple (n : Nat) : AInfPath ⟨n⟩ ⟨n + 3⟩ :=
+noncomputable def coherenceTowerTriple (n : Nat) : AInfPath ⟨n⟩ ⟨n + 3⟩ :=
   AInfPath.trans (coherenceTower n) (coherenceTowerPair (n + 1))
 
 /-- E∞ commutativity step. -/
@@ -537,12 +537,12 @@ inductive EInfPath : AInfLevel → AInfLevel → Type where
   | cons : EInfStep n m → EInfPath m k → EInfPath n k
 
 /-- Theorem 59 — E∞ path composition. -/
-def EInfPath.trans : EInfPath n m → EInfPath m k → EInfPath n k
+noncomputable def EInfPath.trans : EInfPath n m → EInfPath m k → EInfPath n k
   | EInfPath.nil _, q => q
   | EInfPath.cons s p, q => EInfPath.cons s (EInfPath.trans p q)
 
 /-- E∞ path length. -/
-def EInfPath.length : EInfPath n m → Nat
+noncomputable def EInfPath.length : EInfPath n m → Nat
   | EInfPath.nil _    => 0
   | EInfPath.cons _ p => 1 + p.length
 
@@ -566,11 +566,11 @@ theorem einfPath_trans_nil (p : EInfPath n m) :
 -- ============================================================
 
 /-- Koszul step: connecting an operation to its dual. -/
-def koszulStep (p : ArityProfile) (q : ArityProfile) : Path p q :=
+noncomputable def koszulStep (p : ArityProfile) (q : ArityProfile) : Path p q :=
   Path.single (Step.koszul p q)
 
 /-- Theorem 62 — bar construction as path reversal. -/
-def barConstruction (p : Path a b) : Path b a :=
+noncomputable def barConstruction (p : Path a b) : Path b a :=
   Path.symm p
 
 /-- Theorem 63 — double bar is double symm. -/
@@ -578,7 +578,7 @@ theorem doubleBar (p : Path a b) :
     barConstruction (barConstruction p) = Path.symm (Path.symm p) := rfl
 
 /-- Theorem 64 — Koszul duality path (quadratic duality). -/
-def koszulDualityPath (p q : ArityProfile) :
+noncomputable def koszulDualityPath (p q : ArityProfile) :
     Path p q :=
   Path.trans (koszulStep p q) (Path.single (Step.identity q))
 
@@ -588,7 +588,7 @@ theorem koszulDualityPath_length (p q : ArityProfile) :
   simp [koszulDualityPath]; rw [length_trans]; rfl
 
 /-- Theorem 66 — Koszul complex: duality then inverse. -/
-def koszulComplex (p q : ArityProfile) : Path p p :=
+noncomputable def koszulComplex (p q : ArityProfile) : Path p p :=
   Path.trans (koszulDualityPath p q) (barConstruction (koszulDualityPath p q))
 
 -- ============================================================
@@ -614,12 +614,12 @@ inductive DendPath : DendCell → DendCell → Type where
   | cons : DendStep d e → DendPath e f → DendPath d f
 
 /-- Theorem 67 — dendroidal path composition. -/
-def DendPath.trans : DendPath d e → DendPath e f → DendPath d f
+noncomputable def DendPath.trans : DendPath d e → DendPath e f → DendPath d f
   | DendPath.nil _, q => q
   | DendPath.cons s p, q => DendPath.cons s (DendPath.trans p q)
 
 /-- Theorem 68 — dendroidal path length. -/
-def DendPath.length : DendPath d e → Nat
+noncomputable def DendPath.length : DendPath d e → Nat
   | DendPath.nil _    => 0
   | DendPath.cons _ p => 1 + p.length
 
@@ -639,7 +639,7 @@ theorem dendPath_trans_nil (p : DendPath d e) :
   | cons s p ih => simp [DendPath.trans]; exact ih
 
 /-- Theorem 71 — inner face then outer face path. -/
-def innerOuterPath (d e f : DendCell) : DendPath d f :=
+noncomputable def innerOuterPath (d e f : DendCell) : DendPath d f :=
   DendPath.cons (DendStep.innerFace d e) (DendPath.cons (DendStep.outerFace e f) (DendPath.nil _))
 
 /-- Theorem 72 — inner-outer path has length 2. -/
@@ -647,7 +647,7 @@ theorem innerOuterPath_length (d e f : DendCell) :
     (innerOuterPath d e f).length = 2 := rfl
 
 /-- Theorem 73 — Segal condition: composition is determined by faces. -/
-def segalPath (d e f : DendCell) :
+noncomputable def segalPath (d e f : DendCell) :
     DendPath d f :=
   DendPath.trans (innerOuterPath d e f)
     (DendPath.cons (DendStep.dendId f) (DendPath.nil _))
@@ -666,7 +666,7 @@ theorem dendPath_length_trans (p : DendPath d e) (q : DendPath e f) :
     simp [DendPath.trans, DendPath.length]; rw [ih]; omega
 
 /-- Theorem 76 — degeneracy then inner face. -/
-def degenInnerPath (d e f : DendCell) : DendPath d f :=
+noncomputable def degenInnerPath (d e f : DendCell) : DendPath d f :=
   DendPath.cons (DendStep.degeneracy d e) (DendPath.cons (DendStep.innerFace e f) (DendPath.nil _))
 
 /-- Theorem 77 — degeneracy-inner path length. -/
@@ -700,13 +700,13 @@ inductive FibPath : FiberOp → FiberOp → Type where
   | horiz : HStep f g → FibPath g h → FibPath f h
 
 /-- Theorem 78 — fibered path composition. -/
-def FibPath.trans : FibPath f g → FibPath g h → FibPath f h
+noncomputable def FibPath.trans : FibPath f g → FibPath g h → FibPath f h
   | FibPath.nil _, q  => q
   | FibPath.vert s p, q  => FibPath.vert s (FibPath.trans p q)
   | FibPath.horiz s p, q => FibPath.horiz s (FibPath.trans p q)
 
 /-- Theorem 79 — fibered path length. -/
-def FibPath.length : FibPath f g → Nat
+noncomputable def FibPath.length : FibPath f g → Nat
   | FibPath.nil _       => 0
   | FibPath.vert _ p    => 1 + p.length
   | FibPath.horiz _ p   => 1 + p.length
@@ -731,15 +731,15 @@ theorem fibPath_trans_nil (p : FibPath f g) :
   | horiz s p ih => simp [FibPath.trans]; exact ih
 
 /-- Theorem 82 — transport path: horizontal step as fibered path. -/
-def transportPath (f g : FiberOp) : FibPath f g :=
+noncomputable def transportPath (f g : FiberOp) : FibPath f g :=
   FibPath.horiz (HStep.transport f g) (FibPath.nil _)
 
 /-- Theorem 83 — vertical path. -/
-def verticalPath (f g : FiberOp) : FibPath f g :=
+noncomputable def verticalPath (f g : FiberOp) : FibPath f g :=
   FibPath.vert (VStep.fiberMove f g) (FibPath.nil _)
 
 /-- Theorem 84 — mixed vertical-horizontal path. -/
-def mixedPath (f g h : FiberOp) : FibPath f h :=
+noncomputable def mixedPath (f g h : FiberOp) : FibPath f h :=
   FibPath.trans (verticalPath f g) (transportPath g h)
 
 /-- Theorem 85 — mixed path has length 2. -/
@@ -748,7 +748,7 @@ theorem mixedPath_length (f g h : FiberOp) :
   simp [mixedPath, verticalPath, transportPath, FibPath.trans, FibPath.length]
 
 /-- Theorem 86 — horizontal then vertical path. -/
-def horizVertPath (f g h : FiberOp) : FibPath f h :=
+noncomputable def horizVertPath (f g h : FiberOp) : FibPath f h :=
   FibPath.trans (transportPath f g) (verticalPath g h)
 
 /-- Theorem 87 — horiz-vert has length 2. -/
@@ -757,7 +757,7 @@ theorem horizVertPath_length (f g h : FiberOp) :
   simp [horizVertPath, transportPath, verticalPath, FibPath.trans, FibPath.length]
 
 /-- Theorem 88 — horiz-vert vs vert-horiz coherence 2-cell. -/
-def fibCoherence2Cell (f g h : FiberOp) :
+noncomputable def fibCoherence2Cell (f g h : FiberOp) :
     Path2 (Path.single (Step.fiber (FiberOp.base f) (FiberOp.base h)))
           (Path.trans (Path.single (Step.fiber (FiberOp.base f) (FiberOp.base g)))
                       (Path.single (Step.fiber (FiberOp.base g) (FiberOp.base h)))) :=
@@ -786,12 +786,12 @@ theorem verticalPath_length (f g : FiberOp) :
     (verticalPath f g).length = 1 := rfl
 
 /-- Theorem 92 — congrArg on compose step. -/
-def congrArgCompose (f : ArityMap) (a b : ArityProfile) :
+noncomputable def congrArgCompose (f : ArityMap) (a b : ArityProfile) :
     Path (f a) (f b) :=
   congrArgStep f (Step.compose a b)
 
 /-- Theorem 93 — congrArg chain: three steps. -/
-def congrArgChain3 (f : ArityMap) (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) :
+noncomputable def congrArgChain3 (f : ArityMap) (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) :
     Path (f a) (f d) :=
   Path.trans (congrArgStep f s1)
     (Path.trans (congrArgStep f s2) (congrArgStep f s3))
@@ -841,7 +841,7 @@ theorem identity_unit_left (c : Colour) (p : ArityProfile) :
     composeProfile (identityOp c) p = { inputs := [c] ++ p.inputs, output := c } := rfl
 
 /-- Theorem 101 — symmetric coherence path. -/
-def symmetricCoherencePath (p : ArityProfile) :
+noncomputable def symmetricCoherencePath (p : ArityProfile) :
     Path p p :=
   Path.trans (permuteDouble p) (permuteDouble p)
 
@@ -852,11 +852,11 @@ theorem symmetricCoherencePath_length (p : ArityProfile) :
         Path.trans, Path.length, Path.single, length_trans]
 
 /-- Theorem 103 — two-level operadic composition path. -/
-def twoLevelCompose (s1 : Step a b) (s2 : Step b c) : Path a c :=
+noncomputable def twoLevelCompose (s1 : Step a b) (s2 : Step b c) : Path a c :=
   Path.trans (Path.single s1) (Path.single s2)
 
 /-- Theorem 104 — three-level operadic composition path. -/
-def threeLevelCompose (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) :
+noncomputable def threeLevelCompose (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) :
     Path a d :=
   Path.trans (Path.single s1) (Path.trans (Path.single s2) (Path.single s3))
 
@@ -867,7 +867,7 @@ theorem threeLevelCompose_length (s1 : Step a b) (s2 : Step b c) (s3 : Step c d)
   rw [length_trans]; rfl
 
 /-- Theorem 106 — four-level composition. -/
-def fourLevelCompose (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) (s4 : Step d e) :
+noncomputable def fourLevelCompose (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) (s4 : Step d e) :
     Path a e :=
   Path.trans (Path.single s1) (threeLevelCompose s2 s3 s4)
 
@@ -879,18 +879,18 @@ theorem fourLevelCompose_length (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) 
   rfl
 
 /-- Theorem 108 — operadic path is a groupoid: symm then trans gives a 2-cell. -/
-def groupoidInverse2Cell (p : Path a b) :
+noncomputable def groupoidInverse2Cell (p : Path a b) :
     Path2 (Path.trans (Path.symm p) p) (Path.trans (Path.symm p) p) :=
   Path2.refl2 _
 
 /-- Theorem 109 — symm distributes over trans as 2-cell. -/
-def symmTrans2Cell (p : Path a b) (q : Path b c) :
+noncomputable def symmTrans2Cell (p : Path a b) (q : Path b c) :
     Path2 (Path.symm (Path.trans p q))
           (Path.trans (Path.symm q) (Path.symm p)) :=
   Path2.step2 _ _
 
 /-- Theorem 110 — congrArg chain: two steps. -/
-def congrArgChain2 (f : ArityMap) (s1 : Step a b) (s2 : Step b c) :
+noncomputable def congrArgChain2 (f : ArityMap) (s1 : Step a b) (s2 : Step b c) :
     Path (f a) (f c) :=
   Path.trans (congrArgStep f s1) (congrArgStep f s2)
 

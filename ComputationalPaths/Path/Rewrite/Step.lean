@@ -848,35 +848,35 @@ inductive Step :
       (p : Path a b) (q : Path b c) :
       Step (A := A) (Path.trans (Path.symm p) (Path.trans p q)) q
 /-- Step-oriented path constructor for reflexivity. -/
-@[simp] def Step.refl {A : Type u} (a : A) : Path a a :=
+@[simp] noncomputable def Step.refl {A : Type u} (a : A) : Path a a :=
   Path.refl a
 
 /-- Step-oriented path constructor for symmetry. -/
-@[simp] def Step.symm {A : Type u} {a b : A} (p : Path a b) : Path b a :=
+@[simp] noncomputable def Step.symm {A : Type u} {a b : A} (p : Path a b) : Path b a :=
   Path.symm p
 
 /-- Step-oriented path constructor for composition. -/
-@[simp] def Step.trans {A : Type u} {a b c : A}
+@[simp] noncomputable def Step.trans {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
 /-- Step-oriented congruence for composition of functions. -/
-@[simp] def Step.congr_comp {A : Type u} {B : Type v} {C : Type w}
+@[simp] noncomputable def Step.congr_comp {A : Type u} {B : Type v} {C : Type w}
     (f : A → B) (g : B → C) {a b : A} (p : Path a b) :
     Path (g (f a)) (g (f b)) :=
   Path.congrArg g (Path.congrArg f p)
 
 /-- Step-oriented right-associated composition. -/
-@[simp] def Step.assoc {A : Type u} {a b c d : A}
+@[simp] noncomputable def Step.assoc {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) : Path a d :=
   Step.trans p (Step.trans q r)
 
 /-- Step-oriented left unit insertion. -/
-@[simp] def Step.unit_left {A : Type u} {a b : A} (p : Path a b) : Path a b :=
+@[simp] noncomputable def Step.unit_left {A : Type u} {a b : A} (p : Path a b) : Path a b :=
   Step.trans (Step.refl a) p
 
 /-- Step-oriented right unit insertion. -/
-@[simp] def Step.unit_right {A : Type u} {a b : A} (p : Path a b) : Path a b :=
+@[simp] noncomputable def Step.unit_right {A : Type u} {a b : A} (p : Path a b) : Path a b :=
   Step.trans p (Step.refl b)
 
 attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
@@ -1070,19 +1070,19 @@ inductive StepStar :
 namespace StepStar
 
 /-- Embed a single rewrite step in `StepStar`. -/
-def single {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def single {A : Type u} {a b : A} {p q : Path a b}
     (h : Step p q) : StepStar p q :=
   StepStar.tail (StepStar.refl p) h
 
 /-- Compose two single steps in `StepStar`. -/
-def two {A : Type u} {a b : A} {p q r : Path a b}
+noncomputable def two {A : Type u} {a b : A} {p q r : Path a b}
     (h₁ : Step p q) (h₂ : Step q r) : StepStar p r :=
   StepStar.tail (single h₁) h₂
 
 end StepStar
 
 /-- Two reducts are joinable when they have a common `StepStar` descendant. -/
-def Step.Joinable {A : Type u} {a b : A} (p q : Path a b) : Prop :=
+noncomputable def Step.Joinable {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   ∃ r, StepStar p r ∧ StepStar q r
 
 /-- Joinability is symmetric. -/
@@ -1597,7 +1597,7 @@ theorem critical_pair_symm_congr_symm_trans_joinable
 /-! ## Lightweight complexity measure -/
 
 /-- Complexity of a path expression, measured by trace length. -/
-@[simp] def Step.complexity {A : Type u} {a b : A} (p : Path a b) : Nat :=
+@[simp] noncomputable def Step.complexity {A : Type u} {a b : A} (p : Path a b) : Nat :=
   p.steps.length
 
 @[simp] theorem Step.complexity_symm {A : Type u} {a b : A} (p : Path a b) :

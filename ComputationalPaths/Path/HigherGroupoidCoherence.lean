@@ -44,14 +44,14 @@ variable {A : Type u}
 variable {a b c d e f' : A}
 
 /-- Left route in the pentagon: two associators. -/
-def pentagon_left (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def pentagon_left (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     TwoCell (A := A) (a := a) (b := e)
       (Path.trans (Path.trans (Path.trans p q) r) s)
       (Path.trans p (Path.trans q (Path.trans r s))) :=
   comp (assoc (Path.trans p q) r s) (assoc p q (Path.trans r s))
 
 /-- Right route in the pentagon: three associators with whiskering. -/
-def pentagon_right (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+noncomputable def pentagon_right (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     TwoCell (A := A) (a := a) (b := e)
       (Path.trans (Path.trans (Path.trans p q) r) s)
       (Path.trans p (Path.trans q (Path.trans r s))) :=
@@ -69,7 +69,7 @@ def pentagon_right (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
 /-! ## Triangle identity -/
 
 /-- Left route of the triangle: associator then right-whisker the left unitor. -/
-def triangle_left (p : Path a b) (q : Path b c) :
+noncomputable def triangle_left (p : Path a b) (q : Path b c) :
     TwoCell (A := A) (a := a) (b := c)
       (Path.trans (Path.trans p (Path.refl b)) q)
       (Path.trans p q) :=
@@ -78,7 +78,7 @@ def triangle_left (p : Path a b) (q : Path b c) :
     (TwoCell.whiskerLeft (f := p) (leftUnitor q))
 
 /-- Right route of the triangle: right-whisker the right unitor. -/
-def triangle_right (p : Path a b) (q : Path b c) :
+noncomputable def triangle_right (p : Path a b) (q : Path b c) :
     TwoCell (A := A) (a := a) (b := c)
       (Path.trans (Path.trans p (Path.refl b)) q)
       (Path.trans p q) :=
@@ -138,7 +138,7 @@ between the same parenthesized compositions are equal. -/
 /-! ## Hexagon identity -/
 
 /-- Left route in the hexagon: relates associators with inversion (braiding). -/
-def hexagon_left (p : Path a b) (q : Path b c) (r : Path c d) :
+noncomputable def hexagon_left (p : Path a b) (q : Path b c) (r : Path c d) :
     TwoCell (A := A) (a := a) (b := d)
       (Path.trans (Path.trans p q) r)
       (Path.trans p (Path.trans q r)) :=
@@ -152,13 +152,13 @@ def hexagon_left (p : Path a b) (q : Path b c) (r : Path c d) :
 /-! ## Inverse coherence -/
 
 /-- The right inverse 2-cell. -/
-def inv_right (p : Path a b) :
+noncomputable def inv_right (p : Path a b) :
     TwoCell (A := A) (a := a) (b := a)
       (Path.trans p (Path.symm p)) (Path.refl a) :=
   rweq_cmpA_inv_right p
 
 /-- The left inverse 2-cell. -/
-def inv_left (p : Path a b) :
+noncomputable def inv_left (p : Path a b) :
     TwoCell (A := A) (a := b) (b := b)
       (Path.trans (Path.symm p) p) (Path.refl b) :=
   rweq_cmpA_inv_left p

@@ -144,7 +144,7 @@ structure SteinbergMap (R : Type u) (ring : RingData R) where
   phi_one : phi st.grp.one = elem.grp.one
 
 /-- K₂(R) = ker(φ : St(R) → E(R)). -/
-def K2Kernel (R : Type u) (ring : RingData R) (sm : SteinbergMap R ring) : Type u :=
+noncomputable def K2Kernel (R : Type u) (ring : RingData R) (sm : SteinbergMap R ring) : Type u :=
   { x : sm.st.carrier // sm.phi x = sm.elem.grp.one }
 
 /-- K₂(R) is a subgroup of St(R). -/

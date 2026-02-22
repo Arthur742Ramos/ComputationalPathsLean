@@ -52,7 +52,7 @@ structure DialecticaFormula where
   kernel : witnessType → challengeType → Prop
 
 /-- Dialectica for conjunction. -/
-def dialectica_conj (A B : DialecticaFormula) : DialecticaFormula where
+noncomputable def dialectica_conj (A B : DialecticaFormula) : DialecticaFormula where
   witnessType := A.witnessType × B.witnessType
   challengeType := A.challengeType ⊕ B.challengeType
   kernel := fun ⟨wa, wb⟩ c =>
@@ -61,7 +61,7 @@ def dialectica_conj (A B : DialecticaFormula) : DialecticaFormula where
     | Sum.inr cb => B.kernel wb cb
 
 /-- Dialectica for implication. -/
-def dialectica_impl (A B : DialecticaFormula) : DialecticaFormula where
+noncomputable def dialectica_impl (A B : DialecticaFormula) : DialecticaFormula where
   witnessType := (A.witnessType → B.witnessType) ×
                  (A.witnessType → B.challengeType → A.challengeType)
   challengeType := A.witnessType × B.challengeType
@@ -74,7 +74,7 @@ structure DialecticaWitness (D : DialecticaFormula) where
   correct : (c : D.challengeType) → Path (D.kernel witness c : Prop) True
 
 /-- Soundness: conjunction witness from component witnesses. -/
-def dialectica_conj_sound (A B : DialecticaFormula)
+noncomputable def dialectica_conj_sound (A B : DialecticaFormula)
     (wA : DialecticaWitness A) (wB : DialecticaWitness B) :
     DialecticaWitness (dialectica_conj A B) where
   witness := (wA.witness, wB.witness)
@@ -84,7 +84,7 @@ def dialectica_conj_sound (A B : DialecticaFormula)
     | Sum.inr cb => wB.correct cb
 
 /-- Path: soundness proof relates component and conjunction witnesses. -/
-def dialectica_soundness_path {A B : DialecticaFormula}
+noncomputable def dialectica_soundness_path {A B : DialecticaFormula}
     (wA : DialecticaWitness A) (wB : DialecticaWitness B)
     (c : (dialectica_conj A B).challengeType) :
     Path ((dialectica_conj_sound A B wA wB).correct c)
@@ -103,19 +103,19 @@ structure MonotoneFunctional where
   mono : (m n : Nat) → m ≤ n → func m ≤ func n
 
 /-- Composition of monotone functionals. -/
-def MonotoneFunctional.compose (f g : MonotoneFunctional) :
+noncomputable def MonotoneFunctional.compose (f g : MonotoneFunctional) :
     MonotoneFunctional where
   func := fun n => f.func (g.func n)
   mono := fun m n hmn =>
     f.mono (g.func m) (g.func n) (g.mono m n hmn)
 
 /-- Identity monotone functional. -/
-def MonotoneFunctional.idMF : MonotoneFunctional where
+noncomputable def MonotoneFunctional.idMF : MonotoneFunctional where
   func := fun n => n
   mono := fun _ _ h => h
 
 /-- Path: composition is associative. -/
-def compose_assoc_path (f g h : MonotoneFunctional) :
+noncomputable def compose_assoc_path (f g h : MonotoneFunctional) :
     Path (MonotoneFunctional.compose (MonotoneFunctional.compose f g) h).func
          (MonotoneFunctional.compose f (MonotoneFunctional.compose g h)).func :=
   Path.refl _
@@ -125,13 +125,13 @@ structure Majorizes (f g : MonotoneFunctional) where
   bound : (n : Nat) → f.func n ≤ g.func n
 
 /-- Majorization is transitive. -/
-def Majorizes.trans_maj {f g h : MonotoneFunctional}
+noncomputable def Majorizes.trans_maj {f g h : MonotoneFunctional}
     (m₁ : Majorizes f g) (m₂ : Majorizes g h) :
     Majorizes f h where
   bound := fun n => Nat.le_trans (m₁.bound n) (m₂.bound n)
 
 /-- Majorization is reflexive. -/
-def Majorizes.refl_maj (f : MonotoneFunctional) :
+noncomputable def Majorizes.refl_maj (f : MonotoneFunctional) :
     Majorizes f f where
   bound := fun _ => Nat.le_refl _
 
@@ -144,14 +144,14 @@ structure ProofTheoreticBound where
   valid : (k n : Nat) → n ≥ bound k → property k n
 
 /-- Path from bound validity to True. -/
-def bound_path (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
+noncomputable def bound_path (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
     Path (b.property k n : Prop) True :=
   Path.stepChain (by
     simp only [eq_iff_iff]
     exact ⟨fun _ => trivial, fun _ => b.valid k n hn⟩)
 
 /-- Composition of bounds. -/
-def ProofTheoreticBound.compose
+noncomputable def ProofTheoreticBound.compose
     (b₁ b₂ : ProofTheoreticBound)
     (connection : ∀ k n, b₁.property k n → b₂.property k n) :
     ProofTheoreticBound where
@@ -179,7 +179,7 @@ structure MetastabilityWitness where
     Path (Int.natAbs (↑(seq m) - ↑(seq n)) ≤ epsilon : Prop) True
 
 /-- Metastability Path. -/
-def metastability_path (w : MetastabilityWitness) :
+noncomputable def metastability_path (w : MetastabilityWitness) :
     Path (w.interval_start = w.interval_start : Prop) True :=
   Path.stepChain (by simp)
 
@@ -193,14 +193,14 @@ structure HerbrandWitness where
   valid : ∃ w, w ∈ witnesses ∧ property challenge w
 
 /-- Herbrand as Path to True. -/
-def herbrand_path (h : HerbrandWitness) :
+noncomputable def herbrand_path (h : HerbrandWitness) :
     Path (∃ w, w ∈ h.witnesses ∧ h.property h.challenge w : Prop) True :=
   Path.stepChain (by
     simp only [eq_iff_iff]
     exact ⟨fun _ => trivial, fun _ => h.valid⟩)
 
 /-- Herbrand combination: merge witness lists. -/
-def HerbrandWitness.combine (h₁ h₂ : HerbrandWitness)
+noncomputable def HerbrandWitness.combine (h₁ h₂ : HerbrandWitness)
     (_ : h₁.property = h₂.property)
     (_ : h₁.challenge = h₂.challenge) :
     HerbrandWitness where

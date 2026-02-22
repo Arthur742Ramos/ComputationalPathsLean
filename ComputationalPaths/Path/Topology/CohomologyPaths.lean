@@ -38,11 +38,11 @@ structure AbGroup where
 /-! ### Derived group laws -/
 
 /-- 1. Negation of zero is zero. -/
-def neg_zero (G : AbGroup) : Path (G.neg G.zero) G.zero :=
+noncomputable def neg_zero (G : AbGroup) : Path (G.neg G.zero) G.zero :=
   Path.trans (Path.symm (G.zero_add (G.neg G.zero))) (G.add_neg G.zero)
 
 /-- 2. Double negation is identity. -/
-def neg_neg (G : AbGroup) (a : G.carrier) : Path (G.neg (G.neg a)) a :=
+noncomputable def neg_neg (G : AbGroup) (a : G.carrier) : Path (G.neg (G.neg a)) a :=
   Path.trans
     (Path.symm (G.add_zero (G.neg (G.neg a))))
     (Path.trans
@@ -54,7 +54,7 @@ def neg_neg (G : AbGroup) (a : G.carrier) : Path (G.neg (G.neg a)) a :=
           (G.zero_add a))))
 
 /-- 3. Left cancellation: a + (neg a + b) = b. -/
-def add_cancel_left (G : AbGroup) (a b : G.carrier) :
+noncomputable def add_cancel_left (G : AbGroup) (a b : G.carrier) :
     Path (G.add a (G.add (G.neg a) b)) b :=
   Path.trans
     (Path.symm (G.add_assoc a (G.neg a) b))
@@ -63,7 +63,7 @@ def add_cancel_left (G : AbGroup) (a b : G.carrier) :
       (G.zero_add b))
 
 /-- 4. Right cancellation: (a + neg b) + b = a. -/
-def add_cancel_right (G : AbGroup) (a b : G.carrier) :
+noncomputable def add_cancel_right (G : AbGroup) (a b : G.carrier) :
     Path (G.add (G.add a (G.neg b)) b) a :=
   Path.trans
     (G.add_assoc a (G.neg b) b)
@@ -72,7 +72,7 @@ def add_cancel_right (G : AbGroup) (a b : G.carrier) :
       (G.add_zero a))
 
 /-- 5. neg distributes over add: neg(a + b) path to neg b + neg a. -/
-def neg_add_rev (G : AbGroup) (a b : G.carrier) :
+noncomputable def neg_add_rev (G : AbGroup) (a b : G.carrier) :
     Path (G.add (G.neg b) (G.neg a)) (G.neg (G.add a b)) := by
   -- Show (neg b + neg a) + (a + b) = 0, so neg b + neg a = neg(a+b)
   -- We use the unique inverse property
@@ -109,7 +109,7 @@ def neg_add_rev (G : AbGroup) (a b : G.carrier) :
           (G.zero_add (G.neg rhs)))))
 
 /-- 6. add is associative (4-fold, left). -/
-def add_assoc4_left (G : AbGroup) (a b c d : G.carrier) :
+noncomputable def add_assoc4_left (G : AbGroup) (a b c d : G.carrier) :
     Path (G.add (G.add (G.add a b) c) d) (G.add a (G.add b (G.add c d))) :=
   Path.trans (G.add_assoc (G.add a b) c d)
     (Path.trans (G.add_assoc a b (G.add c d)) (Path.refl _))
@@ -127,7 +127,7 @@ structure CochainComplex where
     Path (delta (n + 1) (delta n x)) (group (n + 2)).zero
 
 /-- 7. Delta preserves negation. -/
-def delta_neg (C : CochainComplex) (n : Nat) (x : (C.group n).carrier) :
+noncomputable def delta_neg (C : CochainComplex) (n : Nat) (x : (C.group n).carrier) :
     Path (C.delta n ((C.group n).neg x))
          ((C.group (n + 1)).neg (C.delta n x)) := by
   let G := C.group (n + 1)
@@ -151,7 +151,7 @@ def delta_neg (C : CochainComplex) (n : Nat) (x : (C.group n).carrier) :
           (G.zero_add (G.neg δx)))))
 
 /-- 8. Delta applied to (a + neg a) is zero. -/
-def delta_add_neg (C : CochainComplex) (n : Nat) (a : (C.group n).carrier) :
+noncomputable def delta_add_neg (C : CochainComplex) (n : Nat) (a : (C.group n).carrier) :
     Path (C.delta n ((C.group n).add a ((C.group n).neg a))) (C.group (n + 1)).zero :=
   Path.trans (Path.congrArg (C.delta n) ((C.group n).add_neg a)) (C.delta_zero n)
 
@@ -169,29 +169,29 @@ structure Coboundary (C : CochainComplex) (n : Nat) where
   is_coboundary : Path val (C.delta n preimage)
 
 /-- 9. The zero cocycle. -/
-def zeroCocycle (C : CochainComplex) (n : Nat) : Cocycle C n where
+noncomputable def zeroCocycle (C : CochainComplex) (n : Nat) : Cocycle C n where
   val := (C.group n).zero
   is_cocycle := C.delta_zero n
 
 /-- 10. A coboundary is a cocycle (δ² = 0). -/
-def coboundary_is_cocycle (C : CochainComplex) (n : Nat) (x : (C.group n).carrier) :
+noncomputable def coboundary_is_cocycle (C : CochainComplex) (n : Nat) (x : (C.group n).carrier) :
     Cocycle C (n + 1) where
   val := C.delta n x
   is_cocycle := C.delta_squared n x
 
 /-- 11. The zero coboundary. -/
-def zeroCoboundary (C : CochainComplex) (n : Nat) : Coboundary C n where
+noncomputable def zeroCoboundary (C : CochainComplex) (n : Nat) : Coboundary C n where
   val := (C.group (n + 1)).zero
   preimage := (C.group n).zero
   is_coboundary := Path.symm (C.delta_zero n)
 
 /-- 12. δ of a cocycle is zero. -/
-def delta_cocycle_zero (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
+noncomputable def delta_cocycle_zero (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
     Path (C.delta n z.val) (C.group (n + 1)).zero :=
   z.is_cocycle
 
 /-- 13. Sum of cocycles is a cocycle. -/
-def cocycle_add (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C n) :
+noncomputable def cocycle_add (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C n) :
     Cocycle C n where
   val := (C.group n).add z₁.val z₂.val
   is_cocycle :=
@@ -203,7 +203,7 @@ def cocycle_add (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C n) :
           ((C.group (n + 1)).zero_add (C.group (n + 1)).zero)))
 
 /-- 14. Negation of a cocycle is a cocycle. -/
-def cocycle_neg (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
+noncomputable def cocycle_neg (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
     Cocycle C n where
   val := (C.group n).neg z.val
   is_cocycle := by
@@ -217,7 +217,7 @@ def cocycle_neg (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
       (Path.trans (Path.congrArg G.neg h_delta_zero) h_neg_zero)
 
 /-- 15. Sum of coboundaries is a coboundary. -/
-def coboundary_add (C : CochainComplex) (n : Nat) (b₁ b₂ : Coboundary C n) :
+noncomputable def coboundary_add (C : CochainComplex) (n : Nat) (b₁ b₂ : Coboundary C n) :
     Coboundary C n where
   val := (C.group (n + 1)).add b₁.val b₂.val
   preimage := (C.group n).add b₁.preimage b₂.preimage
@@ -229,7 +229,7 @@ def coboundary_add (C : CochainComplex) (n : Nat) (b₁ b₂ : Coboundary C n) :
         (Path.symm (C.delta_add n b₁.preimage b₂.preimage)))
 
 /-- 16. Negation of a coboundary is a coboundary. -/
-def coboundary_neg (C : CochainComplex) (n : Nat) (b : Coboundary C n) :
+noncomputable def coboundary_neg (C : CochainComplex) (n : Nat) (b : Coboundary C n) :
     Coboundary C n where
   val := (C.group (n + 1)).neg b.val
   preimage := (C.group n).neg b.preimage
@@ -239,28 +239,28 @@ def coboundary_neg (C : CochainComplex) (n : Nat) (b : Coboundary C n) :
       (Path.symm (delta_neg C n b.preimage))
 
 /-- 17. Cocycle addition is commutative (at value level). -/
-def cocycle_add_comm (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C n) :
+noncomputable def cocycle_add_comm (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C n) :
     Path (cocycle_add C n z₁ z₂).val (cocycle_add C n z₂ z₁).val :=
   (C.group n).add_comm z₁.val z₂.val
 
 /-- 18. Cocycle addition is associative (at value level). -/
-def cocycle_add_assoc (C : CochainComplex) (n : Nat) (z₁ z₂ z₃ : Cocycle C n) :
+noncomputable def cocycle_add_assoc (C : CochainComplex) (n : Nat) (z₁ z₂ z₃ : Cocycle C n) :
     Path (cocycle_add C n (cocycle_add C n z₁ z₂) z₃).val
          (cocycle_add C n z₁ (cocycle_add C n z₂ z₃)).val :=
   (C.group n).add_assoc z₁.val z₂.val z₃.val
 
 /-- 19. Adding zero cocycle on right. -/
-def cocycle_add_zero (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
+noncomputable def cocycle_add_zero (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
     Path (cocycle_add C n z (zeroCocycle C n)).val z.val :=
   (C.group n).add_zero z.val
 
 /-- 20. Adding zero cocycle on left. -/
-def cocycle_zero_add (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
+noncomputable def cocycle_zero_add (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
     Path (cocycle_add C n (zeroCocycle C n) z).val z.val :=
   (C.group n).zero_add z.val
 
 /-- 21. Cocycle + neg cocycle = zero cocycle (value level). -/
-def cocycle_add_neg_zero (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
+noncomputable def cocycle_add_neg_zero (C : CochainComplex) (n : Nat) (z : Cocycle C n) :
     Path (cocycle_add C n z (cocycle_neg C n z)).val (zeroCocycle C n).val :=
   (C.group n).add_neg z.val
 
@@ -273,13 +273,13 @@ structure Cohomologous (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C (n 
              (C.delta n witness)
 
 /-- 22. Any cocycle is cohomologous to itself (witness = 0). -/
-def cohomologous_refl (C : CochainComplex) (n : Nat) (z : Cocycle C (n + 1)) :
+noncomputable def cohomologous_refl (C : CochainComplex) (n : Nat) (z : Cocycle C (n + 1)) :
     Cohomologous C n z z where
   witness := (C.group n).zero
   rel := Path.trans ((C.group (n + 1)).add_neg z.val) (Path.symm (C.delta_zero n))
 
 /-- 23. Cohomologous is symmetric. -/
-def cohomologous_symm (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C (n + 1))
+noncomputable def cohomologous_symm (C : CochainComplex) (n : Nat) (z₁ z₂ : Cocycle C (n + 1))
     (h : Cohomologous C n z₁ z₂) :
     Cohomologous C n z₂ z₁ where
   witness := (C.group n).neg h.witness
@@ -337,36 +337,36 @@ structure CohomologyClass (C : CochainComplex) (n : Nat) where
   rep : Cocycle C n
 
 /-- 24. Zero cohomology class. -/
-def zeroCohomologyClass (C : CochainComplex) (n : Nat) : CohomologyClass C n where
+noncomputable def zeroCohomologyClass (C : CochainComplex) (n : Nat) : CohomologyClass C n where
   rep := zeroCocycle C n
 
 /-- 25. Addition of cohomology classes. -/
-def cohomologyClassAdd (C : CochainComplex) (n : Nat)
+noncomputable def cohomologyClassAdd (C : CochainComplex) (n : Nat)
     (a b : CohomologyClass C n) : CohomologyClass C n where
   rep := cocycle_add C n a.rep b.rep
 
 /-- 26. Negation of cohomology classes. -/
-def cohomologyClassNeg (C : CochainComplex) (n : Nat)
+noncomputable def cohomologyClassNeg (C : CochainComplex) (n : Nat)
     (a : CohomologyClass C n) : CohomologyClass C n where
   rep := cocycle_neg C n a.rep
 
 /-- 27. Addition is commutative at value level. -/
-def cohomologyClassAdd_comm_val (C : CochainComplex) (n : Nat) (a b : CohomologyClass C n) :
+noncomputable def cohomologyClassAdd_comm_val (C : CochainComplex) (n : Nat) (a b : CohomologyClass C n) :
     Path (cohomologyClassAdd C n a b).rep.val (cohomologyClassAdd C n b a).rep.val :=
   (C.group n).add_comm a.rep.val b.rep.val
 
 /-- 28. Right identity at value level. -/
-def cohomologyClassAdd_zero_right (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
+noncomputable def cohomologyClassAdd_zero_right (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
     Path (cohomologyClassAdd C n a (zeroCohomologyClass C n)).rep.val a.rep.val :=
   (C.group n).add_zero a.rep.val
 
 /-- 29. Left identity at value level. -/
-def cohomologyClassAdd_zero_left (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
+noncomputable def cohomologyClassAdd_zero_left (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
     Path (cohomologyClassAdd C n (zeroCohomologyClass C n) a).rep.val a.rep.val :=
   (C.group n).zero_add a.rep.val
 
 /-- 30. Inverse property at value level. -/
-def cohomologyClassNeg_add (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
+noncomputable def cohomologyClassNeg_add (C : CochainComplex) (n : Nat) (a : CohomologyClass C n) :
     Path (cohomologyClassAdd C n (cohomologyClassNeg C n a) a).rep.val
          (zeroCohomologyClass C n).rep.val :=
   (C.group n).neg_add a.rep.val
@@ -385,12 +385,12 @@ structure ShortExactSeq where
   exact_at_B : ∀ n x, Path (project n (inject n x)) (C'.group n).zero
 
 /-- 31. Exactness restated. -/
-def ses_exact {ses : ShortExactSeq} (n : Nat) (x : (ses.A.group n).carrier) :
+noncomputable def ses_exact {ses : ShortExactSeq} (n : Nat) (x : (ses.A.group n).carrier) :
     Path (ses.project n (ses.inject n x)) (ses.C'.group n).zero :=
   ses.exact_at_B n x
 
 /-- 32. Composing inject then project on zero yields zero via two routes. -/
-def ses_compose_zero (ses : ShortExactSeq) (n : Nat) :
+noncomputable def ses_compose_zero (ses : ShortExactSeq) (n : Nat) :
     Path (ses.project n (ses.inject n (ses.A.group n).zero)) (ses.C'.group n).zero :=
   Path.trans
     (Path.congrArg (ses.project n) (ses.inject_zero n))
@@ -410,19 +410,19 @@ structure CupProduct (C : CochainComplex) where
   cup_zero_right : ∀ p q x, Path (cup p q x (C.group q).zero) (C.group (p + q)).zero
 
 /-- 34. Cup with zero left. -/
-def cup_zero_left_val {C : CochainComplex} (cp : CupProduct C) (p q : Nat)
+noncomputable def cup_zero_left_val {C : CochainComplex} (cp : CupProduct C) (p q : Nat)
     (y : (C.group q).carrier) :
     Path (cp.cup p q (C.group p).zero y) (C.group (p + q)).zero :=
   cp.cup_zero_left p q y
 
 /-- 35. Cup with zero right. -/
-def cup_zero_right_val {C : CochainComplex} (cp : CupProduct C) (p q : Nat)
+noncomputable def cup_zero_right_val {C : CochainComplex} (cp : CupProduct C) (p q : Nat)
     (x : (C.group p).carrier) :
     Path (cp.cup p q x (C.group q).zero) (C.group (p + q)).zero :=
   cp.cup_zero_right p q x
 
 /-- 36. Cup of zero with zero. -/
-def cup_zero_cocycles {C : CochainComplex} (cp : CupProduct C) (p q : Nat) :
+noncomputable def cup_zero_cocycles {C : CochainComplex} (cp : CupProduct C) (p q : Nat) :
     Path (cp.cup p q (C.group p).zero (C.group q).zero) (C.group (p + q)).zero :=
   cp.cup_zero_left p q (C.group q).zero
 
@@ -440,25 +440,25 @@ structure ConnectingHom (ses : ShortExactSeq) where
   connecting_zero : ∀ n, Path (connecting n (ses.C'.group n).zero) (ses.A.group (n + 1)).zero
 
 /-- 38. Connecting hom preserves zero. -/
-def connecting_preserves_zero {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
+noncomputable def connecting_preserves_zero {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
     Path (ch.connecting n (ses.C'.group n).zero) (ses.A.group (n + 1)).zero :=
   ch.connecting_zero n
 
 /-- 39. Composing inject with connecting on zero. -/
-def connecting_inject_zero {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
+noncomputable def connecting_inject_zero {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
     Path (ses.inject (n + 1) (ch.connecting n (ses.C'.group n).zero)) (ses.B.group (n + 1)).zero :=
   Path.trans
     (Path.congrArg (ses.inject (n + 1)) (ch.connecting_zero n))
     (ses.inject_zero (n + 1))
 
 /-- 40. Exactness at A: project ∘ connecting = 0 at zero. -/
-def connecting_exact_at_zero {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
+noncomputable def connecting_exact_at_zero {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
     Path (ses.project (n + 1) (ses.inject (n + 1) (ch.connecting n (ses.C'.group n).zero)))
          (ses.C'.group (n + 1)).zero :=
   ses.exact_at_B (n + 1) (ch.connecting n (ses.C'.group n).zero)
 
 /-- 41. Two routes to zero at connecting: via inject-zero vs via exactness. -/
-def connecting_zero_two_routes {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
+noncomputable def connecting_zero_two_routes {ses : ShortExactSeq} (ch : ConnectingHom ses) (n : Nat) :
     Path (ses.project (n + 1) (ses.inject (n + 1) (ch.connecting n (ses.C'.group n).zero)))
          (ses.C'.group (n + 1)).zero :=
   Path.trans

@@ -24,7 +24,7 @@ namespace Context
 variable {A : Type u} {B : Type v}
 
 /-- Map a path through a unary context (paper's `sub L`). -/
-@[simp] def map (C : Context A B) {a b : A} (p : Path a b) :
+@[simp] noncomputable def map (C : Context A B) {a b : A} (p : Path a b) :
     Path (C.fill a) (C.fill b) :=
   congrArg C.fill p
 
@@ -54,7 +54,7 @@ variable {A : Type u} {B : Type v}
   simp [map]
 
 /-- Compose two unary contexts. -/
-@[simp] def comp {C' : Type w}
+@[simp] noncomputable def comp {C' : Type w}
     (g : Context B C') (f : Context A B) : Context A C' :=
   ⟨fun a => g.fill (f.fill a)⟩
 
@@ -67,7 +67,7 @@ variable {A : Type u} {B : Type v}
 
 /-- Substitution through a unary context on the "left" rewrite.
 This packages the composition described in Definition 3.5 of the paper. -/
-@[simp] def substLeft (C : Context A B)
+@[simp] noncomputable def substLeft (C : Context A B)
     {x : B} {a₁ a₂ : A}
     (h : Path x (C.fill a₁)) (p : Path a₁ a₂) :
     Path x (C.fill a₂) :=
@@ -75,7 +75,7 @@ This packages the composition described in Definition 3.5 of the paper. -/
 
 /-- Substitution through a unary context on the "right" rewrite.
 This captures the second rule in Definition 3.5 of the paper. -/
-@[simp] def substRight (C : Context A B)
+@[simp] noncomputable def substRight (C : Context A B)
     {a₁ a₂ : A} {y : B}
     (p : Path a₁ a₂) (h : Path (C.fill a₂) y) :
     Path (C.fill a₁) y :=
@@ -92,13 +92,13 @@ namespace BiContext
 variable {A : Type u} {B : Type v} {C : Type w}
 
 /-- Substitute along the left hole of a binary context (paper's `sub L`). -/
-@[simp] def mapLeft (K : BiContext A B C)
+@[simp] noncomputable def mapLeft (K : BiContext A B C)
     {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
     Path (K.fill a₁ b) (K.fill a₂ b) :=
   Path.mapLeft (f := K.fill) p b
 
 /-- Substitute along the right hole of a binary context (paper's `sub R`). -/
-@[simp] def mapRight (K : BiContext A B C)
+@[simp] noncomputable def mapRight (K : BiContext A B C)
     (a : A) {b₁ b₂ : B} (p : Path b₁ b₂) :
     Path (K.fill a b₁) (K.fill a b₂) :=
   Path.mapRight (f := K.fill) a p
@@ -120,11 +120,11 @@ variable {A : Type u} {B : Type v} {C : Type w}
   simp [mapLeft]
 
 /-- Freeze the right hole of a binary context to obtain a unary context. -/
-@[simp] def fixRight (K : BiContext A B C) (b : B) : Context A C :=
+@[simp] noncomputable def fixRight (K : BiContext A B C) (b : B) : Context A C :=
   ⟨fun a => K.fill a b⟩
 
 /-- Freeze the left hole of a binary context to obtain a unary context. -/
-@[simp] def fixLeft (K : BiContext A B C) (a : A) : Context B C :=
+@[simp] noncomputable def fixLeft (K : BiContext A B C) (a : A) : Context B C :=
   ⟨fun b => K.fill a b⟩
 
 @[simp] theorem map_fixRight (K : BiContext A B C) (b : B)
@@ -154,7 +154,7 @@ variable {A : Type u} {B : Type v} {C : Type w}
   simp [mapRight]
 
 /-- Substitute through both holes of a binary context simultaneously. -/
-@[simp] def map2 (K : BiContext A B C)
+@[simp] noncomputable def map2 (K : BiContext A B C)
     {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (K.fill a₁ b₁) (K.fill a₂ b₂) :=
@@ -215,13 +215,13 @@ namespace DepContext
 variable {A : Type u} {B : A → Type v}
 
 /-- View transport along a base path as a unary context between fibres. -/
-@[simp] def transportContext {a₁ a₂ : A} (p : Path a₁ a₂) :
+@[simp] noncomputable def transportContext {a₁ a₂ : A} (p : Path a₁ a₂) :
     Context (B a₁) (B a₂) :=
   ⟨fun y =>
     Path.transport (A := A) (D := fun a => B a) p y⟩
 
 /-- Map a base path through a dependent context, transporting the source witness. -/
-@[simp] def map (C : DepContext A B)
+@[simp] noncomputable def map (C : DepContext A B)
     {a₁ a₂ : A} (p : Path a₁ a₂) :
     Path (A := B a₂)
       (Path.transport (A := A) (D := fun a => B a) p (C.fill a₁))
@@ -234,7 +234,7 @@ variable {A : Type u} {B : A → Type v}
 
 /-- Dependent substitution on the left: transport the proof across the base path
 before reapplying the context. -/
-@[simp] def substLeft (C : DepContext A B)
+@[simp] noncomputable def substLeft (C : DepContext A B)
     {a₁ a₂ : A} {x : B a₁}
     (r : Path (A := B a₁) x (C.fill a₁))
     (p : Path a₁ a₂) :
@@ -248,7 +248,7 @@ before reapplying the context. -/
 
 /-- Dependent substitution on the right: apply the context and continue with a
 path in the target fibre. -/
-@[simp] def substRight (C : DepContext A B)
+@[simp] noncomputable def substRight (C : DepContext A B)
     {a₁ a₂ : A} {y : B a₂}
     (p : Path a₁ a₂) (t : Path (A := B a₂) (C.fill a₂) y) :
     Path (A := B a₂)
@@ -258,7 +258,7 @@ path in the target fibre. -/
 
 /-- Symmetry through a dependent context: applying `symm` to the mapped path
 is equivalent to mapping the symmetric witness and transporting the result. -/
-@[simp] def symmMap (C : DepContext A B)
+@[simp] noncomputable def symmMap (C : DepContext A B)
     {a₁ a₂ : A} (p : Path a₁ a₂) :
     Path (A := B a₂)
       (C.fill a₂)
@@ -281,7 +281,7 @@ is equivalent to mapping the symmetric witness and transporting the result. -/
 end DepContext
 
 /-- Dependent congruence for binary functions: left hole. -/
-@[simp] def mapLeftDep
+@[simp] noncomputable def mapLeftDep
     {A : Type u} {B : Type v} {C : A → B → Type w}
     (f : (a : A) → (b : B) → C a b)
     {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
@@ -297,7 +297,7 @@ end DepContext
   simp [mapLeftDep]
 
 /-- Dependent congruence for binary functions: right hole. -/
-@[simp] def mapRightDep
+@[simp] noncomputable def mapRightDep
     {A : Type u} {B : Type v} {C : A → B → Type w}
     (f : (a : A) → (b : B) → C a b)
     (a : A) {b₁ b₂ : B} (q : Path b₁ b₂) :
@@ -313,7 +313,7 @@ end DepContext
   simp [mapRightDep]
 
 /-- Dependent congruence for binary functions on both holes. -/
-@[simp] def map2Dep
+@[simp] noncomputable def map2Dep
     {A : Type u} {B : Type v} {C : A → B → Type w}
     (f : (a : A) → (b : B) → C a b)
     {a₁ a₂ : A} {b₁ b₂ : B}
@@ -344,17 +344,17 @@ namespace DepBiContext
 variable {A : Type u} {B : Type v} {C : A → B → Type w}
 
 /-- Freeze the right hole to obtain a dependent unary context. -/
-@[simp] def fixRight (K : DepBiContext A B C) (b : B) :
+@[simp] noncomputable def fixRight (K : DepBiContext A B C) (b : B) :
     DepContext A (fun a => C a b) :=
   ⟨fun a => K.fill a b⟩
 
 /-- Freeze the left hole to obtain a dependent unary context on `B`. -/
-@[simp] def fixLeft (K : DepBiContext A B C) (a : A) :
+@[simp] noncomputable def fixLeft (K : DepBiContext A B C) (a : A) :
     DepContext B (fun b => C a b) :=
   ⟨fun b => K.fill a b⟩
 
 /-- Map a path through the left hole of a dependent binary context. -/
-@[simp] def mapLeft (K : DepBiContext A B C)
+@[simp] noncomputable def mapLeft (K : DepBiContext A B C)
     {a₁ a₂ : A} (p : Path a₁ a₂) (b : B) :
     Path (A := C a₂ b)
       (Path.transport (A := A) (D := fun a => C a b) p (K.fill a₁ b))
@@ -362,7 +362,7 @@ variable {A : Type u} {B : Type v} {C : A → B → Type w}
   mapLeftDep (f := K.fill) p b
 
 /-- Map a path through the right hole of a dependent binary context. -/
-@[simp] def mapRight (K : DepBiContext A B C)
+@[simp] noncomputable def mapRight (K : DepBiContext A B C)
     (a : A) {b₁ b₂ : B} (q : Path b₁ b₂) :
     Path (A := C a b₂)
       (Path.transport (A := B) (D := fun b => C a b) q (K.fill a b₁))
@@ -370,7 +370,7 @@ variable {A : Type u} {B : Type v} {C : A → B → Type w}
   mapRightDep (f := K.fill) a q
 
 /-- Simultaneously substitute through both holes of a dependent binary context. -/
-@[simp] def map2 (K : DepBiContext A B C)
+@[simp] noncomputable def map2 (K : DepBiContext A B C)
     {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (A := C a₂ b₂)

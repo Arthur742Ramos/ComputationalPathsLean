@@ -47,13 +47,13 @@ namespace Diagram
 variable {A B : Type u}
 
 /-- Precompose a diagram with a path algebra homomorphism. -/
-def precompose (F : Diagram) (f : PathAlgebraHom A F.source) : Diagram where
+noncomputable def precompose (F : Diagram) (f : PathAlgebraHom A F.source) : Diagram where
   source := A
   target := F.target
   map := PathAlgebraHom.comp f F.map
 
 /-- Postcompose a diagram with a path algebra homomorphism. -/
-def postcompose (F : Diagram) (g : PathAlgebraHom F.target B) : Diagram where
+noncomputable def postcompose (F : Diagram) (g : PathAlgebraHom F.target B) : Diagram where
   source := F.source
   target := B
   map := PathAlgebraHom.comp F.map g
@@ -76,13 +76,13 @@ structure HomotopyCommSquare (F G : Diagram.{u}) : Type (u + 1) where
 /-! ## Homotopy lifting operations -/
 
 /-- Precomposition lifts homotopies in the path category. -/
-def homotopy_precompose {A B C : Type u} (f : PathAlgebraHom A B)
+noncomputable def homotopy_precompose {A B C : Type u} (f : PathAlgebraHom A B)
     {g h : PathAlgebraHom B C} (H : FunHomotopy g h) :
     FunHomotopy (PathAlgebraHom.comp f g) (PathAlgebraHom.comp f h) :=
   fun x => H (f x)
 
 /-- Postcomposition lifts homotopies in the path category. -/
-def homotopy_postcompose {A B C : Type u} (f : PathAlgebraHom B C)
+noncomputable def homotopy_postcompose {A B C : Type u} (f : PathAlgebraHom B C)
     {g h : PathAlgebraHom A B} (H : FunHomotopy g h) :
     FunHomotopy (PathAlgebraHom.comp g f) (PathAlgebraHom.comp h f) :=
   fun x => PathAlgebraHom.map f (H x)
@@ -111,13 +111,13 @@ theorem heq_of_eq {α : Sort u} {a b : α} (h : a = b) : HEq a b := by
       rfl
 
 /-- Identity homotopy commutative square on a diagram. -/
-def id (F : Diagram.{u}) : HomotopyCommSquare F F where
+noncomputable def id (F : Diagram.{u}) : HomotopyCommSquare F F where
   left := PathAlgebraHom.id F.source
   right := PathAlgebraHom.id F.target
   comm := fun x => Path.refl (F.map x)
 
 /-- Vertical composition of homotopy commutative squares. -/
-def comp (eta : HomotopyCommSquare F G) (theta : HomotopyCommSquare G H) :
+noncomputable def comp (eta : HomotopyCommSquare F G) (theta : HomotopyCommSquare G H) :
     HomotopyCommSquare F H where
   left := PathAlgebraHom.comp eta.left theta.left
   right := PathAlgebraHom.comp eta.right theta.right
@@ -154,7 +154,7 @@ def comp (eta : HomotopyCommSquare F G) (theta : HomotopyCommSquare G H) :
   rfl
 
 /-- Lift a square by precomposing its top edge. -/
-def precompose (square : HomotopyCommSquare F G) {A : Type u}
+noncomputable def precompose (square : HomotopyCommSquare F G) {A : Type u}
     (f : PathAlgebraHom A F.source) :
     HomotopyCommSquare (Diagram.precompose F f)
       (Diagram.precompose G (PathAlgebraHom.comp f square.left)) where
@@ -163,7 +163,7 @@ def precompose (square : HomotopyCommSquare F G) {A : Type u}
   comm := homotopy_precompose f square.comm
 
 /-- Lift a square by postcomposing its bottom edge. -/
-def postcompose (square : HomotopyCommSquare F G) {B : Type u}
+noncomputable def postcompose (square : HomotopyCommSquare F G) {B : Type u}
     (g : PathAlgebraHom G.target B) :
     HomotopyCommSquare (Diagram.postcompose F (PathAlgebraHom.comp square.right g))
       (Diagram.postcompose G g) where
@@ -198,7 +198,7 @@ structure HomotopyCommDiagramCategory : Type (u + 2) where
       comp eta (id G) = eta
 
 /-- The canonical category of homotopy commutative diagrams. -/
-def homotopyCommDiagramCategory : HomotopyCommDiagramCategory where
+noncomputable def homotopyCommDiagramCategory : HomotopyCommDiagramCategory where
   id := HomotopyCommSquare.id
   comp := HomotopyCommSquare.comp
   comp_assoc := by

@@ -42,7 +42,7 @@ variable {C : CobordismCategory.{u₁, v₁}} {D : CobordismCategory.{u₂, v₂
 variable (F : CobordismFunctor C D)
 
 /-- Step witness: right-unit normalization for mapped identities. -/
-def mapId_step (X : C.Obj) :
+noncomputable def mapId_step (X : C.Obj) :
     Path.Step
       (Path.trans (F.map_id X) (Path.refl (D.id (F.objMap X))))
       (F.map_id X) :=
@@ -55,7 +55,7 @@ noncomputable def mapId_rweq (X : C.Obj) :
   rweq_of_step (F.mapId_step X)
 
 /-- Middle leg in the functorial gluing coherence chain. -/
-def mapCompMiddle {W X Y Z : C.Obj}
+noncomputable def mapCompMiddle {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path
       (D.comp (F.morMap (C.comp f g)) (F.morMap h))
@@ -63,7 +63,7 @@ def mapCompMiddle {W X Y Z : C.Obj}
   Path.congrArg (fun t => D.comp t (F.morMap h)) (F.map_comp f g)
 
 /-- Final leg in the functorial gluing coherence chain. -/
-def mapCompLast {W X Y Z : C.Obj}
+noncomputable def mapCompLast {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path
       (D.comp (D.comp (F.morMap f) (F.morMap g)) (F.morMap h))
@@ -71,7 +71,7 @@ def mapCompLast {W X Y Z : C.Obj}
   D.assoc (F.morMap f) (F.morMap g) (F.morMap h)
 
 /-- Left-associated threefold coherence chain for mapped composition. -/
-def mapCompChainLeft {W X Y Z : C.Obj}
+noncomputable def mapCompChainLeft {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path
       (F.morMap (C.comp (C.comp f g) h))
@@ -81,7 +81,7 @@ def mapCompChainLeft {W X Y Z : C.Obj}
     (F.mapCompLast f g h)
 
 /-- Right-associated threefold coherence chain for mapped composition. -/
-def mapCompChainRight {W X Y Z : C.Obj}
+noncomputable def mapCompChainRight {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path
       (F.morMap (C.comp (C.comp f g) h))

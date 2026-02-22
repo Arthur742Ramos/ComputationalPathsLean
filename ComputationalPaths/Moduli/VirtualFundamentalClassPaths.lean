@@ -50,19 +50,19 @@ namespace VirtualFundamentalClassPathData
 variable {X : Type u} {V : Type v} (C : VirtualFundamentalClassPathData X V)
 
 /-- Deformation invariance of virtual classes along specialization paths. -/
-def deformationInvariantClass
+noncomputable def deformationInvariantClass
     (D : DeformationSpacePathData X) (n : Nat) :
     Path (C.classOf (D.fiber n)) (C.classOf D.specialFiber) :=
   C.mapClass (D.specializeFrom n)
 
 /-- Deformation invariance of expected dimensions along specialization paths. -/
-def deformationInvariantDim
+noncomputable def deformationInvariantDim
     (D : DeformationSpacePathData X) (n : Nat) :
     Path (C.expectedDim (D.fiber n)) (C.expectedDim D.specialFiber) :=
   C.mapDim (D.specializeFrom n)
 
 /-- Deformation invariance of obstruction ranks along specialization paths. -/
-def deformationInvariantRank
+noncomputable def deformationInvariantRank
     (D : DeformationSpacePathData X) (n : Nat) :
     Path (C.obstructionRank (D.fiber n)) (C.obstructionRank D.specialFiber) :=
   C.mapRank (D.specializeFrom n)
@@ -106,7 +106,7 @@ noncomputable def deformationInvariantRank_refl_left_rweq
 end VirtualFundamentalClassPathData
 
 /-- Trivial virtual class package on natural numbers. -/
-def trivialNatVirtualClass : VirtualFundamentalClassPathData Nat Nat where
+noncomputable def trivialNatVirtualClass : VirtualFundamentalClassPathData Nat Nat where
   classOf := fun x => x
   expectedDim := fun _ => 0
   obstructionRank := fun x => x

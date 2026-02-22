@@ -200,14 +200,14 @@ structure Gerbe2Morphism {G₁ G₂ : BundleGerbe}
   compatible : True
 
 /-- Composition of gerbe morphisms. -/
-def GerbeMorphism.comp {G₁ G₂ G₃ : BundleGerbe}
+noncomputable def GerbeMorphism.comp {G₁ G₂ G₃ : BundleGerbe}
     (φ : GerbeMorphism G₁ G₂) (ψ : GerbeMorphism G₂ G₃) :
     GerbeMorphism G₁ G₃ where
   intertwiner := φ.intertwiner × ψ.intertwiner
   compatible := trivial
 
 /-- Identity gerbe morphism. -/
-def GerbeMorphism.id (G : BundleGerbe) : GerbeMorphism G G where
+noncomputable def GerbeMorphism.id (G : BundleGerbe) : GerbeMorphism G G where
   intertwiner := Unit
   compatible := trivial
 
@@ -272,7 +272,7 @@ structure GerbeTrivialization (G : BundleGerbe) where
   compatible : True
 
 /-- A trivial gerbe has zero DD class. -/
-def trivial_gerbe_dd_zero (dd : DixmierDouadyClass) (c : dd.classRep) :
+noncomputable def trivial_gerbe_dd_zero (dd : DixmierDouadyClass) (c : dd.classRep) :
     Path (dd.add c (dd.neg c)) dd.zero :=
   dd.add_neg c
 
@@ -305,7 +305,7 @@ structure GerbeClassification where
 /-! ## Theorems -/
 
 /-- DD class of the tensor product is the sum of DD classes. -/
-def dd_tensor_add (dd : DixmierDouadyClass) (a b c : dd.classRep)
+noncomputable def dd_tensor_add (dd : DixmierDouadyClass) (a b c : dd.classRep)
     (h : Path c (dd.add a b)) :
     Path (dd.add c (dd.neg (dd.add a b)))
          dd.zero :=
@@ -315,28 +315,28 @@ def dd_tensor_add (dd : DixmierDouadyClass) (a b c : dd.classRep)
   Path.trans step1 (dd.add_neg (dd.add a b))
 
 /-- Negation composed with itself: neg(c) + neg(neg(c)) = 0. -/
-def dd_neg_neg (dd : DixmierDouadyClass) (c : dd.classRep) :
+noncomputable def dd_neg_neg (dd : DixmierDouadyClass) (c : dd.classRep) :
     Path (dd.add (dd.neg c) (dd.neg (dd.neg c)))
          dd.zero :=
   dd.add_neg (dd.neg c)
 
 /-- Adding zero on the right is identity. -/
-def dd_add_zero_right (dd : DixmierDouadyClass) (c : dd.classRep) :
+noncomputable def dd_add_zero_right (dd : DixmierDouadyClass) (c : dd.classRep) :
     Path (dd.add c dd.zero) c :=
   dd.add_zero c
 
 /-- Associativity of DD class addition composed with zero. -/
-def dd_assoc_zero (dd : DixmierDouadyClass) (a b : dd.classRep) :
+noncomputable def dd_assoc_zero (dd : DixmierDouadyClass) (a b : dd.classRep) :
     Path (dd.add (dd.add a b) dd.zero) (dd.add a b) :=
   dd.add_zero (dd.add a b)
 
 /-- Composing addition with its inverse yields zero. -/
-def dd_add_inv_zero (dd : DixmierDouadyClass) (a b : dd.classRep) :
+noncomputable def dd_add_inv_zero (dd : DixmierDouadyClass) (a b : dd.classRep) :
     Path (dd.add (dd.add a b) (dd.neg (dd.add a b))) dd.zero :=
   dd.add_neg (dd.add a b)
 
 /-- The inverse of a sum: -(a+b) acts as right inverse of (a+b). -/
-def dd_sum_inverse (dd : DixmierDouadyClass) (a b : dd.classRep) :
+noncomputable def dd_sum_inverse (dd : DixmierDouadyClass) (a b : dd.classRep) :
     Path (dd.add (dd.neg (dd.add a b)) (dd.add a b)) dd.zero :=
   dd.neg_add (dd.add a b)
 

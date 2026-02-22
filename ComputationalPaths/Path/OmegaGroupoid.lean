@@ -117,7 +117,7 @@ inductive Derivation₂ {a b : A} : Path a b → Path a b → Type u where
 
 namespace Derivation₂
 
-def depth {p q : Path a b} : Derivation₂ p q → Nat
+noncomputable def depth {p q : Path a b} : Derivation₂ p q → Nat
   | .refl _ => 0
   | .step _ => 1
   | .inv d => d.depth + 1
@@ -132,7 +132,7 @@ The converse `ofRwEq` shows the other direction. Together they establish:
 
 This bridges the gap between the Type-valued derivations used for the ω-groupoid
 structure and the Prop-valued equivalence relation used in the rewriting theory. -/
-def toRwEq {p q : Path a b} : Derivation₂ p q → RwEq p q
+noncomputable def toRwEq {p q : Path a b} : Derivation₂ p q → RwEq p q
   | .refl _ => RwEq.refl _
   | .step s => RwEq.step s
   | .inv d => RwEq.symm (toRwEq d)
@@ -153,7 +153,7 @@ noncomputable def derivation₂_to_rweq {p q : Path a b} : Derivation₂ p q →
 
 /-! ## Horizontal Composition (Whiskering) -/
 
-def whiskerLeft {a b c : A} (f : Path a b) {p q : Path b c}
+noncomputable def whiskerLeft {a b c : A} (f : Path a b) {p q : Path b c}
     (α : Derivation₂ p q) : Derivation₂ (Path.trans f p) (Path.trans f q) :=
   match α with
   | .refl _ => .refl _
@@ -161,7 +161,7 @@ def whiskerLeft {a b c : A} (f : Path a b) {p q : Path b c}
   | .inv d => .inv (whiskerLeft f d)
   | .vcomp d₁ d₂ => .vcomp (whiskerLeft f d₁) (whiskerLeft f d₂)
 
-def whiskerRight {a b c : A} {p q : Path a b}
+noncomputable def whiskerRight {a b c : A} {p q : Path a b}
     (α : Derivation₂ p q) (g : Path b c) : Derivation₂ (Path.trans p g) (Path.trans q g) :=
   match α with
   | .refl _ => .refl _
@@ -169,7 +169,7 @@ def whiskerRight {a b c : A} {p q : Path a b}
   | .inv d => .inv (whiskerRight d g)
   | .vcomp d₁ d₂ => .vcomp (whiskerRight d₁ g) (whiskerRight d₂ g)
 
-def hcomp {a b c : A} {p p' : Path a b} {q q' : Path b c}
+noncomputable def hcomp {a b c : A} {p p' : Path a b} {q q' : Path b c}
     (α : Derivation₂ p p') (β : Derivation₂ q q') :
     Derivation₂ (Path.trans p q) (Path.trans p' q') :=
   .vcomp (whiskerRight α q) (whiskerLeft p' β)
@@ -253,7 +253,7 @@ inductive Derivation₃ {a b : A} {p q : Path a b} :
 
 namespace Derivation₃
 
-def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ d₂ → Nat
+noncomputable def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ d₂ → Nat
   | .refl _ => 0
   | .step _ => 1
   | .inv m => m.depth + 1
@@ -261,12 +261,12 @@ def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ 
 
 /-- Prop-level projection: any 3-cell yields the same equality proof between
     the induced `RwEq` witnesses of the endpoints. -/
-def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q} (_ : Derivation₃ d₁ d₂) :
+noncomputable def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q} (_ : Derivation₃ d₁ d₂) :
     rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq :=
   rfl
 
 /-- Left whiskering for 3-cells: c · _ applied to both sides -/
-def whiskerLeft₃ {a b : A} {p q r : Path a b} (c : Derivation₂ r p)
+noncomputable def whiskerLeft₃ {a b : A} {p q r : Path a b} (c : Derivation₂ r p)
     {d₁ d₂ : Derivation₂ p q} (α : Derivation₃ d₁ d₂) :
     Derivation₃ (Derivation₂.vcomp c d₁) (Derivation₂.vcomp c d₂) :=
   match α with
@@ -276,7 +276,7 @@ def whiskerLeft₃ {a b : A} {p q r : Path a b} (c : Derivation₂ r p)
   | .vcomp α β => .vcomp (whiskerLeft₃ c α) (whiskerLeft₃ c β)
 
 /-- Right whiskering for 3-cells: _ · c applied to both sides -/
-def whiskerRight₃ {a b : A} {p q r : Path a b}
+noncomputable def whiskerRight₃ {a b : A} {p q r : Path a b}
     {d₁ d₂ : Derivation₂ p q} (α : Derivation₃ d₁ d₂) (c : Derivation₂ q r) :
     Derivation₃ (Derivation₂.vcomp d₁ c) (Derivation₂.vcomp d₂ c) :=
   match α with
@@ -299,7 +299,7 @@ section Contractibility
 variable {a b : A}
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell. -/
-def contractibility₃ {p q : Path a b}
+noncomputable def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
   .step .rweq_eq
 
@@ -310,7 +310,7 @@ so they are connected by a 3-cell.
 
 Loop contraction is the key property that makes the fundamental group well-defined:
 it ensures that different derivations representing the "same" loop are identified. -/
-def loop_contract {p : Path a b} (d : Derivation₂ p p) :
+noncomputable def loop_contract {p : Path a b} (d : Derivation₂ p p) :
     Derivation₃ d (.refl p) :=
   contractibility₃ d (.refl p)
 
@@ -386,7 +386,7 @@ inductive Derivation₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Deriva
 namespace Derivation₄
 
 /-- Left whiskering for 4-cells: c · _ applied to both sides -/
-def whiskerLeft₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
+noncomputable def whiskerLeft₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
     (c : Derivation₃ d₃ d₁) {m₁ m₂ : Derivation₃ d₁ d₂} (α : Derivation₄ m₁ m₂) :
     Derivation₄ (Derivation₃.vcomp c m₁) (Derivation₃.vcomp c m₂) :=
   match α with
@@ -396,7 +396,7 @@ def whiskerLeft₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p 
   | .vcomp α β => .vcomp (whiskerLeft₄ c α) (whiskerLeft₄ c β)
 
 /-- Right whiskering for 4-cells: _ · c applied to both sides -/
-def whiskerRight₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
+noncomputable def whiskerRight₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (α : Derivation₄ m₁ m₂) (c : Derivation₃ d₂ d₃) :
     Derivation₄ (Derivation₃.vcomp m₁ c) (Derivation₃.vcomp m₂ c) :=
   match α with
@@ -405,7 +405,7 @@ def whiskerRight₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p
   | .inv α => .inv (whiskerRight₄ α c)
   | .vcomp α β => .vcomp (whiskerRight₄ α c) (whiskerRight₄ β c)
 
-def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+noncomputable def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} : Derivation₄ m₁ m₂ → Nat
   | .refl _ => 0
   | .step _ => 1
@@ -414,7 +414,7 @@ def depth {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
 
 /-- Prop-level projection: any 4-cell yields the same equality proof between
     the induced `RwEq` witnesses of the endpoints. -/
-def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+noncomputable def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (_ : Derivation₄ m₁ m₂) :
     Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
       Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂ :=
@@ -423,12 +423,12 @@ def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
 end Derivation₄
 
 /-- Contractibility at Level 4: any two parallel 3-cells are connected by a 4-cell. -/
-def contractibility₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+noncomputable def contractibility₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m₁ m₂ : Derivation₃ d₁ d₂) : Derivation₄ m₁ m₂ :=
   .step .rweq_eq
 
 /-- Loop contraction at level 4: Any loop m : Derivation₃ d d contracts to .refl d. -/
-def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂ p q}
+noncomputable def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂ p q}
     (m : Derivation₃ d d) : Derivation₄ m (.refl d) :=
   contractibility₄ m (.refl d)
 
@@ -507,7 +507,7 @@ inductive DerivationHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
 namespace DerivationHigh
 
 /-- Left whiskering for n-cells: c · _ applied to both sides -/
-def whiskerLeft {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+noncomputable def whiskerLeft {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ m₃ : Derivation₃ d₁ d₂} (c : Derivation₄ m₃ m₁)
     {c₁ c₂ : Derivation₄ m₁ m₂} (α : DerivationHigh n c₁ c₂) :
     DerivationHigh n (Derivation₄.vcomp c c₁) (Derivation₄.vcomp c c₂) :=
@@ -518,7 +518,7 @@ def whiskerLeft {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ 
   | .vcomp α β => .vcomp (whiskerLeft c α) (whiskerLeft c β)
 
 /-- Right whiskering for n-cells: _ · c applied to both sides -/
-def whiskerRight {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+noncomputable def whiskerRight {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ m₃ : Derivation₃ d₁ d₂} {c₁ c₂ : Derivation₄ m₁ m₂}
     (α : DerivationHigh n c₁ c₂) (c : Derivation₄ m₂ m₃) :
     DerivationHigh n (Derivation₄.vcomp c₁ c) (Derivation₄.vcomp c₂ c) :=
@@ -531,7 +531,7 @@ def whiskerRight {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂
 end DerivationHigh
 
 /-- Contractibility at Level 5+: any two parallel cells are connected. -/
-def contractibilityHigh {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+noncomputable def contractibilityHigh {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (n : Nat)
     (c₁ c₂ : Derivation₄ m₁ m₂) : DerivationHigh n c₁ c₂ :=
   .step (.rweq_eq (Subsingleton.elim
@@ -539,7 +539,7 @@ def contractibilityHigh {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p 
     (Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₂)))
 
 /-- Loop contraction at level 5+: Any loop c : Derivation₄ m m contracts to .refl m. -/
-def loop_contract_high {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+noncomputable def loop_contract_high {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m : Derivation₃ d₁ d₂} (n : Nat) (c : Derivation₄ m m) :
     DerivationHigh n c (.refl m) :=
   contractibilityHigh n c (.refl m)
@@ -556,28 +556,28 @@ variable {a b c d e : A}
 
 /-- The associator 2-cell: witnesses that path composition is associative up to a 2-cell.
     `associator f g h : (f · g) · h ⟹ f · (g · h)` -/
-def associator (f : Path a b) (g : Path b c) (h : Path c d) :
+noncomputable def associator (f : Path a b) (g : Path b c) (h : Path c d) :
     Derivation₂ (Path.trans (Path.trans f g) h) (Path.trans f (Path.trans g h)) :=
   .step (Step.trans_assoc f g h)
 
 /-- The left unitor 2-cell: witnesses that `refl` is a left identity up to a 2-cell.
     `leftUnitor f : refl · f ⟹ f` -/
-def leftUnitor (f : Path a b) : Derivation₂ (Path.trans (Path.refl a) f) f :=
+noncomputable def leftUnitor (f : Path a b) : Derivation₂ (Path.trans (Path.refl a) f) f :=
   .step (Step.trans_refl_left f)
 
 /-- The right unitor 2-cell: witnesses that `refl` is a right identity up to a 2-cell.
     `rightUnitor f : f · refl ⟹ f` -/
-def rightUnitor (f : Path a b) : Derivation₂ (Path.trans f (Path.refl b)) f :=
+noncomputable def rightUnitor (f : Path a b) : Derivation₂ (Path.trans f (Path.refl b)) f :=
   .step (Step.trans_refl_right f)
 
 /-- Left side of the pentagon: `((f·g)·h)·k ⟹ f·(g·(h·k))` via two associators. -/
-def pentagonLeft (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
+noncomputable def pentagonLeft (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
     Derivation₂ (Path.trans (Path.trans (Path.trans f g) h) k)
                 (Path.trans f (Path.trans g (Path.trans h k))) :=
   .vcomp (associator (Path.trans f g) h k) (associator f g (Path.trans h k))
 
 /-- Right side of the pentagon: `((f·g)·h)·k ⟹ f·(g·(h·k))` via three associators. -/
-def pentagonRight (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
+noncomputable def pentagonRight (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
     Derivation₂ (Path.trans (Path.trans (Path.trans f g) h) k)
                 (Path.trans f (Path.trans g (Path.trans h k))) :=
   .vcomp (.vcomp (whiskerRight (associator f g h) k)
@@ -586,23 +586,23 @@ def pentagonRight (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
 
 /-- **Pentagon coherence** (Mac Lane): The two ways of re-associating four paths
     `((f·g)·h)·k ⟹ f·(g·(h·k))` are equal as 2-cells, witnessed by a 3-cell. -/
-def pentagonCoherence (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
+noncomputable def pentagonCoherence (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
     Derivation₃ (pentagonLeft f g h k) (pentagonRight f g h k) :=
   .step (.pentagon f g h k)
 
 /-- Left side of the triangle: `(f·refl)·g ⟹ f·g` via associator then left unitor. -/
-def triangleLeft (f : Path a b) (g : Path b c) :
+noncomputable def triangleLeft (f : Path a b) (g : Path b c) :
     Derivation₂ (Path.trans (Path.trans f (Path.refl b)) g) (Path.trans f g) :=
   .vcomp (associator f (Path.refl b) g) (whiskerLeft f (leftUnitor g))
 
 /-- Right side of the triangle: `(f·refl)·g ⟹ f·g` via right unitor on f. -/
-def triangleRight (f : Path a b) (g : Path b c) :
+noncomputable def triangleRight (f : Path a b) (g : Path b c) :
     Derivation₂ (Path.trans (Path.trans f (Path.refl b)) g) (Path.trans f g) :=
   whiskerRight (rightUnitor f) g
 
 /-- **Triangle coherence**: The two ways of simplifying `(f·refl)·g ⟹ f·g`
     (via associator+left-unitor vs. via right-unitor) are equal, witnessed by a 3-cell. -/
-def triangleCoherence (f : Path a b) (g : Path b c) :
+noncomputable def triangleCoherence (f : Path a b) (g : Path b c) :
     Derivation₃ (triangleLeft f g) (triangleRight f g) :=
   .step (.triangle f g)
 
@@ -611,7 +611,7 @@ end Coherences
 /-! ## The Full ω-Groupoid Structure -/
 
 /-- Cell type at each dimension -/
-def CellType (A : Type u) : Nat → Type u
+noncomputable def CellType (A : Type u) : Nat → Type u
   | 0 => A
   | 1 => Σ (a b : A), Path a b
   | 2 => Σ (a b : A) (p q : Path a b), Derivation₂ p q
@@ -635,7 +635,7 @@ structure WeakOmegaGroupoid (A : Type u) where
     Derivation₃ (triangleLeft f g) (triangleRight f g)
 
 /-- Computational paths form a weak ω-groupoid -/
-def compPathOmegaGroupoid (A : Type u) : WeakOmegaGroupoid A where
+noncomputable def compPathOmegaGroupoid (A : Type u) : WeakOmegaGroupoid A where
   cells := CellType A
   contract₃ := contractibility₃
   contract₄ := contractibility₄
@@ -696,11 +696,11 @@ noncomputable def cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
 
 /-! ### Truncation Preserves Coherence -/
 
-def trunc₃ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+noncomputable def trunc₃ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m : Derivation₃ d₁ d₂) : rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq :=
   Derivation₃.toRwEqEq m
 
-def trunc₄ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+noncomputable def trunc₄ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂}
     (c : Derivation₄ m₁ m₂) :
     Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =

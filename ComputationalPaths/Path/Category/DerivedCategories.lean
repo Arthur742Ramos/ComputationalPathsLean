@@ -43,10 +43,10 @@ structure ChainHomotopy (C D : ChainComplex.{u}) (f g : ChainMap C D) where
   homotopy : ∀ n : Int, C.obj n → D.obj (n + 1)
 
 /-- Cohomology of a chain complex at degree n. -/
-def cohomologyAt (C : ChainComplex.{u}) (n : Int) : Type u := C.obj n
+noncomputable def cohomologyAt (C : ChainComplex.{u}) (n : Int) : Type u := C.obj n
 
 /-- A quasi-isomorphism: a chain map inducing isomorphisms on all cohomology. -/
-def IsQuasiIsomorphism (C D : ChainComplex.{u}) (f : ChainMap C D) : Prop :=
+noncomputable def IsQuasiIsomorphism (C D : ChainComplex.{u}) (f : ChainMap C D) : Prop :=
   ∀ n : Int, True -- placeholder: H^n(f) is an isomorphism
 
 /-! ## Derived Category -/
@@ -76,13 +76,13 @@ structure BoundedDerivedCategory extends DerivedCategory.{u,v} where
   isBounded : ∀ x : Obj, ∃ (a b : Int), True -- H^n = 0 outside [a,b]
 
 /-- The localization functor Q : K(A) → D(A). -/
-def localizationFunctor (D : DerivedCategory.{u,v}) :
+noncomputable def localizationFunctor (D : DerivedCategory.{u,v}) :
     D.Obj → D.Obj := id
 
 /-! ## Triangulated Structure -/
 
 /-- The shift functor [1] on a derived category. -/
-def shift (D : DerivedCategory.{u,v}) (n : Int) (X : D.Obj) : D.Obj := X
+noncomputable def shift (D : DerivedCategory.{u,v}) (n : Int) (X : D.Obj) : D.Obj := X
 
 /-- An exact (distinguished) triangle in D(A). -/
 structure ExactTriangle (D : DerivedCategory.{u,v}) where
@@ -94,18 +94,18 @@ structure ExactTriangle (D : DerivedCategory.{u,v}) where
   h : D.Hom Z (shift D 1 X)
 
 /-- Mapping cone of a morphism f : X → Y. -/
-def mappingCone (D : DerivedCategory.{u,v}) {X Y : D.Obj}
+noncomputable def mappingCone (D : DerivedCategory.{u,v}) {X Y : D.Obj}
     (f : D.Hom X Y) : D.Obj := Y
 
 /-- Derived Hom (RHom). -/
-def derivedHom (D : DerivedCategory.{u,v}) (X Y : D.Obj) : Type v :=
+noncomputable def derivedHom (D : DerivedCategory.{u,v}) (X Y : D.Obj) : Type v :=
   D.Hom X Y
 
 /-- Derived tensor product. -/
-def derivedTensor (D : DerivedCategory.{u,v}) (X Y : D.Obj) : D.Obj := X
+noncomputable def derivedTensor (D : DerivedCategory.{u,v}) (X Y : D.Obj) : D.Obj := X
 
 /-- Ext groups: Ext^n(X, Y) = Hom_D(X, Y[n]). -/
-def ext (D : DerivedCategory.{u,v}) (X Y : D.Obj) (n : Int) : Type v :=
+noncomputable def ext (D : DerivedCategory.{u,v}) (X Y : D.Obj) (n : Int) : Type v :=
   D.Hom X (shift D n Y)
 
 /-! ## Serre Duality -/
@@ -117,11 +117,11 @@ structure SerreFunctor (D : BoundedDerivedCategory.{u,v}) where
   duality : ∀ (x y : D.Obj), True -- Hom(X,Y) ≅ Hom(Y,SX)^∨
 
 /-- The dualizing sheaf ω_X (canonical bundle shifted). -/
-def dualizingSheaf (D : BoundedDerivedCategory.{u,v})
+noncomputable def dualizingSheaf (D : BoundedDerivedCategory.{u,v})
     (S : SerreFunctor D) (X : D.Obj) : D.Obj := S.obj X
 
 /-- Serre duality pairing. -/
-def serrePairing (D : BoundedDerivedCategory.{u,v})
+noncomputable def serrePairing (D : BoundedDerivedCategory.{u,v})
     (S : SerreFunctor D) (X Y : D.Obj) : Type v :=
   D.Hom X Y
 
@@ -144,7 +144,7 @@ noncomputable def kernelConvolution (D₁ D₂ D₃ : BoundedDerivedCategory.{u,
 /-! ## Exceptional Collections -/
 
 /-- An object E is exceptional if Hom(E, E) = k and Ext^i(E, E) = 0 for i ≠ 0. -/
-def IsExceptional (D : BoundedDerivedCategory.{u,v}) (E : D.Obj) : Prop :=
+noncomputable def IsExceptional (D : BoundedDerivedCategory.{u,v}) (E : D.Obj) : Prop :=
   (∀ n : Int, n ≠ 0 → True) -- Ext^n(E,E) = 0 for n ≠ 0
 
 /-- An exceptional collection: a sequence E₁, ..., E_n with
@@ -156,11 +156,11 @@ structure ExceptionalCollection (D : BoundedDerivedCategory.{u,v}) where
   semiorthogonal : ∀ i j : Fin length, i > j → True -- Ext^*(E_i, E_j) = 0
 
 /-- A full exceptional collection: generates D^b. -/
-def IsFullExceptional (D : BoundedDerivedCategory.{u,v})
+noncomputable def IsFullExceptional (D : BoundedDerivedCategory.{u,v})
     (E : ExceptionalCollection D) : Prop := True
 
 /-- A strong exceptional collection: additionally Ext^i(E_j, E_k) = 0 for all i ≠ 0, j < k. -/
-def IsStrong (D : BoundedDerivedCategory.{u,v})
+noncomputable def IsStrong (D : BoundedDerivedCategory.{u,v})
     (E : ExceptionalCollection D) : Prop := True
 
 /-- Semi-orthogonal decomposition: D = ⟨A₁, ..., A_n⟩. -/
@@ -170,11 +170,11 @@ structure SemiOrthogonalDecomposition (D : BoundedDerivedCategory.{u,v}) where
   orthogonality : ∀ i j : Fin pieces, i > j → True
 
 /-- Left mutation of an exceptional pair. -/
-def leftMutation (D : BoundedDerivedCategory.{u,v})
+noncomputable def leftMutation (D : BoundedDerivedCategory.{u,v})
     (E F : D.Obj) : D.Obj := E
 
 /-- Right mutation of an exceptional pair. -/
-def rightMutation (D : BoundedDerivedCategory.{u,v})
+noncomputable def rightMutation (D : BoundedDerivedCategory.{u,v})
     (E F : D.Obj) : D.Obj := F
 
 /-! ## Theorems -/

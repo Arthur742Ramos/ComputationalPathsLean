@@ -128,15 +128,15 @@ structure FiveLemmaData {Obj : Type u} {Hom : Obj → Obj → Type v}
 
 /-! ## Trivial PUnit Instances -/
 
-private def pp : Path (a : PUnit) (b : PUnit) := by
+private noncomputable def pp : Path (a : PUnit) (b : PUnit) := by
   cases a; cases b; exact Path.refl _
 
-private def pOps : CategoryOps PUnit (fun _ _ => PUnit) where
+private noncomputable def pOps : CategoryOps PUnit (fun _ _ => PUnit) where
   id := fun _ => .unit
   comp := fun _ _ => .unit
   zero := fun _ _ => .unit
 
-def punitKernelData :
+noncomputable def punitKernelData :
     KernelData (ops := pOps) (X := PUnit.unit) (Y := PUnit.unit) PUnit.unit where
   obj := .unit
   kernelIn := .unit
@@ -144,7 +144,7 @@ def punitKernelData :
   lift := fun _ _ => .unit
   lift_comp := fun _ _ => pp
 
-def punitCokernelData :
+noncomputable def punitCokernelData :
     CokernelData (ops := pOps) (X := PUnit.unit) (Y := PUnit.unit) PUnit.unit where
   obj := .unit
   cokernelOut := .unit
@@ -152,14 +152,14 @@ def punitCokernelData :
   desc := fun _ _ => .unit
   desc_comp := fun _ _ => pp
 
-def punitImageData :
+noncomputable def punitImageData :
     ImageData (ops := pOps) (X := PUnit.unit) (Y := PUnit.unit) PUnit.unit where
   obj := .unit
   factor := .unit
   imageIn := .unit
   factor_comp := pp
 
-def punitExactData :
+noncomputable def punitExactData :
     ExactSequenceData (ops := pOps)
       (X := PUnit.unit) (Y := PUnit.unit) (Z := PUnit.unit) .unit .unit where
   comp_zero := pp

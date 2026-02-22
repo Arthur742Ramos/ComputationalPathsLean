@@ -46,7 +46,7 @@ We show that reducing any coefficient causes failure.
 -/
 
 /-- A candidate weight function parameterized by coefficients. -/
-@[simp] def candWeight (symmMul symmAdd transMul transAdd atomW reflW : Nat)
+@[simp] noncomputable def candWeight (symmMul symmAdd transMul transAdd atomW reflW : Nat)
     : Expr → Nat
   | .atom _ => atomW
   | .refl => reflW
@@ -121,12 +121,12 @@ Applying `trans_assoc` repeatedly to right-associate costs `n choose 2` steps.
 -/
 
 /-- Left-associated chain of n atoms. -/
-def leftChain : Nat → Expr
+noncomputable def leftChain : Nat → Expr
   | 0 => .atom 0
   | n + 1 => .trans (leftChain n) (.atom (n + 1))
 
 /-- Right-associated chain of n atoms. -/
-def rightChain : Nat → Expr
+noncomputable def rightChain : Nat → Expr
   | 0 => .atom 0
   | n + 1 => .trans (.atom 0) (rightChainAux 1 n)
 where
@@ -167,7 +167,7 @@ theorem leftChain_leftWeight_ge (n : Nat) : n * n ≤ (leftChain n).leftWeight :
 
 /-- The number of `trans_assoc` steps needed to right-associate a left chain
     is exactly `n*(n-1)/2` (the (n-1)-th triangular number). -/
-def assocSteps : Nat → Nat
+noncomputable def assocSteps : Nat → Nat
   | 0 => 0
   | 1 => 0
   | n + 2 => n + 1 + assocSteps (n + 1)

@@ -25,7 +25,7 @@ structure ChainComplex where
   diff_zero : ∀ n, diff n (zero (n + 1)) = zero n
 
 /-- The trivial chain complex. -/
-def ChainComplex.trivial : ChainComplex.{u} where
+noncomputable def ChainComplex.trivial : ChainComplex.{u} where
   obj := fun _ => PUnit
   diff := fun _ _ => PUnit.unit
   zero := fun _ => PUnit.unit
@@ -44,13 +44,13 @@ structure ChainMap (C D : ChainComplex.{u}) where
   comm : ∀ n (x : C.obj (n + 1)), map n (C.diff n x) = D.diff n (map (n + 1) x)
 
 /-- Identity chain map. -/
-def ChainMap.id (C : ChainComplex.{u}) : ChainMap C C where
+noncomputable def ChainMap.id (C : ChainComplex.{u}) : ChainMap C C where
   map := fun _ x => x
   map_zero := fun _ => rfl
   comm := fun _ _ => rfl
 
 /-- Composition of chain maps. -/
-def ChainMap.comp {C D E : ChainComplex.{u}} (g : ChainMap D E) (f : ChainMap C D) :
+noncomputable def ChainMap.comp {C D E : ChainComplex.{u}} (g : ChainMap D E) (f : ChainMap C D) :
     ChainMap C E where
   map := fun n x => g.map n (f.map n x)
   map_zero := fun n => by simp [f.map_zero, g.map_zero]
@@ -65,7 +65,7 @@ theorem ChainMap.comp_id {C D : ChainComplex.{u}} (f : ChainMap C D) :
     ChainMap.comp f (ChainMap.id C) = f := by cases f; rfl
 
 /-- The zero chain map. -/
-def ChainMap.zero (A C : ChainComplex.{u}) : ChainMap A C where
+noncomputable def ChainMap.zero (A C : ChainComplex.{u}) : ChainMap A C where
   map := fun n _ => C.zero n
   map_zero := fun _ => rfl
   comm := fun n _ => (C.diff_zero n).symm
@@ -80,7 +80,7 @@ structure ChainHomotopy {C D : ChainComplex.{u}} (_ _ : ChainMap C D) where
   homotopy_zero : ∀ n, homotopy n (C.zero n) = D.zero (n + 1)
 
 /-- Reflexive chain homotopy. -/
-def ChainHomotopy.refl {C D : ChainComplex.{u}} (f : ChainMap C D) : ChainHomotopy f f where
+noncomputable def ChainHomotopy.refl {C D : ChainComplex.{u}} (f : ChainMap C D) : ChainHomotopy f f where
   homotopy := fun n _ => D.zero (n + 1)
   homotopy_zero := fun _ => rfl
 
@@ -96,7 +96,7 @@ structure RDerivedFunctorData where
   map_id : ∀ C, mapMor (ChainMap.id C) = ChainMap.id (mapObj C)
 
 /-- The identity derived functor. -/
-def RDerivedFunctorData.id : RDerivedFunctorData.{u} where
+noncomputable def RDerivedFunctorData.id : RDerivedFunctorData.{u} where
   mapObj := _root_.id
   mapMor := _root_.id
   map_id := fun _ => rfl
@@ -117,7 +117,7 @@ structure GrothendieckDualityData where
   counit : ∀ D : ChainComplex.{u}, ChainMap (pushForward.mapObj (exceptionalPullback.mapObj D)) D
 
 /-- The trivial duality data. -/
-def GrothendieckDualityData.trivial : GrothendieckDualityData.{u} where
+noncomputable def GrothendieckDualityData.trivial : GrothendieckDualityData.{u} where
   pushForward := RDerivedFunctorData.id
   exceptionalPullback := RDerivedFunctorData.id
   dualizingComplex := ChainComplex.trivial
@@ -140,7 +140,7 @@ structure SerreDualityData where
   duality : GrothendieckDualityData.{u}
 
 /-- Serre duality for a point. -/
-def SerreDualityData.point : SerreDualityData.{u} where
+noncomputable def SerreDualityData.point : SerreDualityData.{u} where
   dim := 0
   duality := GrothendieckDualityData.trivial
 
@@ -162,7 +162,7 @@ structure ExactTriangle where
   exact : ChainHomotopy (ChainMap.comp g f) (ChainMap.zero A C)
 
 /-- The trivial exact triangle. -/
-def ExactTriangle.trivial : ExactTriangle.{u} where
+noncomputable def ExactTriangle.trivial : ExactTriangle.{u} where
   A := ChainComplex.trivial
   B := ChainComplex.trivial
   C := ChainComplex.trivial

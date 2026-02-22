@@ -141,13 +141,13 @@ inductive CFTStep (V : VertexAlgebra.{u}) :
       CFTStep V (O.coeff a (O.coeff b c n) m) (O.coeff (O.coeff a b m) c n)
 
 /-- Interpret a CFT step as a computational path. -/
-def cftStepPath {V : VertexAlgebra.{u}} {a b : V.states} :
+noncomputable def cftStepPath {V : VertexAlgebra.{u}} {a b : V.states} :
     CFTStep V a b → Path a b
   | CFTStep.vacuum_left a => V.vacuum_axiom a
   | CFTStep.ope_assoc a b c m n O => O.ope_assoc a b c m n
 
 /-- Compose two CFT steps. -/
-def cft_steps_compose {V : VertexAlgebra.{u}}
+noncomputable def cft_steps_compose {V : VertexAlgebra.{u}}
     {a b c : V.states} (s1 : CFTStep V a b) (s2 : CFTStep V b c) :
     Path a c :=
   Path.trans (cftStepPath s1) (cftStepPath s2)

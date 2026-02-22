@@ -33,19 +33,19 @@ variable {a b c d : A}
 /-! ## Whiskering Laws -/
 
 /-- Left whiskering preserves identity 2-cells. -/
-def whiskerLeft_id' (f : Path a b) (g : Path b c) :
+noncomputable def whiskerLeft_id' (f : Path a b) (g : Path b c) :
     TwoCell.whiskerLeft f (TwoCell.id (A := A) g) =
       TwoCell.id (Path.trans f g) := by
   apply Subsingleton.elim
 
 /-- Right whiskering preserves identity 2-cells. -/
-def whiskerRight_id' (f : Path a b) (g : Path b c) :
+noncomputable def whiskerRight_id' (f : Path a b) (g : Path b c) :
     TwoCell.whiskerRight g (TwoCell.id (A := A) f) =
       TwoCell.id (Path.trans f g) := by
   apply Subsingleton.elim
 
 /-- Left whiskering distributes over vertical composition. -/
-def whiskerLeft_comp' {f : Path a b} {g h i : Path b c}
+noncomputable def whiskerLeft_comp' {f : Path a b} {g h i : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h)
     (θ : TwoCell (A := A) (a := b) (b := c) h i) :
     TwoCell.whiskerLeft f (TwoCell.comp η θ) =
@@ -54,7 +54,7 @@ def whiskerLeft_comp' {f : Path a b} {g h i : Path b c}
   apply Subsingleton.elim
 
 /-- Right whiskering distributes over vertical composition. -/
-def whiskerRight_comp' {f g h : Path a b} {k : Path b c}
+noncomputable def whiskerRight_comp' {f g h : Path a b} {k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
     (θ : TwoCell (A := A) (a := a) (b := b) g h) :
     TwoCell.whiskerRight k (TwoCell.comp η θ) =
@@ -65,21 +65,21 @@ def whiskerRight_comp' {f g h : Path a b} {k : Path b c}
 /-! ## Horizontal Composition Laws -/
 
 /-- Horizontal composition with identity 2-cells on the left. -/
-def hcomp_id_left' {f g : Path a b} {h : Path b c}
+noncomputable def hcomp_id_left' {f g : Path a b} {h : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g) :
     TwoCell.hcomp η (TwoCell.id h) =
       TwoCell.whiskerRight h η := by
   apply Subsingleton.elim
 
 /-- Horizontal composition with identity 2-cells on the right. -/
-def hcomp_id_right' {f : Path a b} {g h : Path b c}
+noncomputable def hcomp_id_right' {f : Path a b} {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
     TwoCell.hcomp (TwoCell.id f) η =
       TwoCell.whiskerLeft f η := by
   apply Subsingleton.elim
 
 /-- Interchange with identities collapses to whiskering. -/
-def interchange_id_left' {f g : Path a b} {h k : Path b c}
+noncomputable def interchange_id_left' {f g : Path a b} {h k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
     (θ : TwoCell (A := A) (a := b) (b := c) h k) :
     TwoCell.comp (TwoCell.hcomp η θ)
@@ -88,7 +88,7 @@ def interchange_id_left' {f g : Path a b} {h k : Path b c}
   apply Subsingleton.elim
 
 /-- Interchange with identities collapses to whiskering (right). -/
-def interchange_id_right' {f g : Path a b} {h k : Path b c}
+noncomputable def interchange_id_right' {f g : Path a b} {h k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
     (θ : TwoCell (A := A) (a := b) (b := c) h k) :
     TwoCell.comp (TwoCell.id (Path.trans f h))

@@ -67,17 +67,17 @@ variable {a : A}
 namespace OmegaTwo
 
 /-- The Eckmann-Hilton braiding on OmegaTwo. -/
-def braiding (α β : OmegaTwo A a) :
+noncomputable def braiding (α β : OmegaTwo A a) :
     Derivation₃ (OmegaTwo.hcomp α β) (OmegaTwo.hcomp β α) :=
   hcomp_comm α β
 
 /-- Syllepsis: the braiding is its own inverse (up to a 4-cell). -/
-def syllepsis (α β : OmegaTwo A a) :
+noncomputable def syllepsis (α β : OmegaTwo A a) :
     Derivation₄ (braiding β α) (Derivation₃.inv (braiding α β)) :=
   contractibility₄ (braiding β α) (Derivation₃.inv (braiding α β))
 
 /-- Double braiding contracts to the identity 3-cell. -/
-def braiding_squared (α β : OmegaTwo A a) :
+noncomputable def braiding_squared (α β : OmegaTwo A a) :
     Derivation₄
       (Derivation₃.vcomp (braiding α β) (braiding β α))
       (Derivation₃.refl (OmegaTwo.hcomp α β)) :=

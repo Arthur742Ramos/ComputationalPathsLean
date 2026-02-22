@@ -145,14 +145,14 @@ theorem triple_roundtrip {A : Type u} {D : A → Type v} {a b c d : A}
 /-! ## Encode-decode method -/
 
 /-- Code family for paths (propositional). -/
-def Code {A : Type u} [DecidableEq A] (a b : A) : Prop := a = b
+noncomputable def Code {A : Type u} [DecidableEq A] (a b : A) : Prop := a = b
 
 /-- 18. Encode: from path to code. -/
-def encode {A : Type u} [DecidableEq A] {a b : A}
+noncomputable def encode {A : Type u} [DecidableEq A] {a b : A}
     (p : Path a b) : Code a b := p.proof
 
 /-- 19. Decode: from code to path. -/
-def decode {A : Type u} [DecidableEq A] {a b : A}
+noncomputable def decode {A : Type u} [DecidableEq A] {a b : A}
     (c : Code a b) : Path a b := Path.mk [Step.mk _ _ c] c
 
 /-- 20. Encode-decode roundtrip. -/
@@ -170,13 +170,13 @@ theorem encode_refl {A : Type u} [DecidableEq A] (a : A) :
 /-! ## Function extensionality via paths -/
 
 /-- 23. Function extensionality: pointwise paths give a path between functions. -/
-def funext_path {A : Type u} {B : A → Type v} {f g : (a : A) → B a}
+noncomputable def funext_path {A : Type u} {B : A → Type v} {f g : (a : A) → B a}
     (h : ∀ a, Path (f a) (g a)) : Path f g :=
   Path.mk [Step.mk _ _ (funext (fun a => (h a).proof))]
     (funext (fun a => (h a).proof))
 
 /-- 24. Happly: a path between functions gives pointwise paths. -/
-def happly {A : Type u} {B : A → Type v} {f g : (a : A) → B a}
+noncomputable def happly {A : Type u} {B : A → Type v} {f g : (a : A) → B a}
     (p : Path f g) (a : A) : Path (f a) (g a) :=
   congrArg (fun h => h a) p
 
@@ -206,13 +206,13 @@ structure QInv {A B : Type u} (f : A → B) where
   leftInv : ∀ a, Path (inv (f a)) a
 
 /-- 28. Identity is an equivalence. -/
-def idQInv (A : Type u) : QInv (id : A → A) where
+noncomputable def idQInv (A : Type u) : QInv (id : A → A) where
   inv := id
   rightInv := fun _ => Path.refl _
   leftInv := fun _ => Path.refl _
 
 /-- 29. Equivalences compose (deep multi-step proof). -/
-def compQInv {A B C : Type u} {f : A → B} {g : B → C}
+noncomputable def compQInv {A B C : Type u} {f : A → B} {g : B → C}
     (ef : QInv f) (eg : QInv g) : QInv (g ∘ f) where
   inv := ef.inv ∘ eg.inv
   rightInv := fun c =>
@@ -221,13 +221,13 @@ def compQInv {A B C : Type u} {f : A → B} {g : B → C}
     trans (ap ef.inv (eg.leftInv (f a))) (ef.leftInv a)
 
 /-- 30. Equivalences invert. -/
-def invQInv {A B : Type u} {f : A → B} (ef : QInv f) : QInv ef.inv where
+noncomputable def invQInv {A B : Type u} {f : A → B} (ef : QInv f) : QInv ef.inv where
   inv := f
   rightInv := ef.leftInv
   leftInv := ef.rightInv
 
 /-- 31. Transport is an equivalence (deep proof). -/
-def transportQInv {A : Type u} {D : A → Type u} {a b : A}
+noncomputable def transportQInv {A : Type u} {D : A → Type u} {a b : A}
     (p : Path a b) : QInv (transport (D := D) p) where
   inv := transport (D := D) (symm p)
   rightInv := fun y => Path.mk [Step.mk _ _ (transport_symm_right p y)]

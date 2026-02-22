@@ -50,12 +50,12 @@ inductive LoopExpr where
 
 namespace LoopExpr
 
-instance : Mul LoopExpr := ⟨LoopExpr.concat⟩
-instance : One LoopExpr := ⟨LoopExpr.id_loop⟩
-instance : Inv LoopExpr := ⟨LoopExpr.inv⟩
+noncomputable instance : Mul LoopExpr := ⟨LoopExpr.concat⟩
+noncomputable instance : One LoopExpr := ⟨LoopExpr.id_loop⟩
+noncomputable instance : Inv LoopExpr := ⟨LoopExpr.inv⟩
 
 /-- Size of a loop expression (for termination proofs). -/
-def size : LoopExpr → Nat
+noncomputable def size : LoopExpr → Nat
   | id_loop => 1
   | loop _ => 1
   | concat a b => 1 + a.size + b.size
@@ -74,7 +74,7 @@ theorem size_pos : ∀ e : LoopExpr, 0 < e.size
   | horiz_comp a b => by simp [size]; omega
 
 /-- Depth of nesting. -/
-def depth : LoopExpr → Nat
+noncomputable def depth : LoopExpr → Nat
   | id_loop => 0
   | loop _ => 0
   | concat a b => 1 + max a.depth b.depth
@@ -84,7 +84,7 @@ def depth : LoopExpr → Nat
   | horiz_comp a b => 1 + max a.depth b.depth
 
 /-- Count the number of generators in an expression. -/
-def genCount : LoopExpr → Nat
+noncomputable def genCount : LoopExpr → Nat
   | id_loop => 0
   | loop _ => 1
   | concat a b => a.genCount + b.genCount
@@ -519,11 +519,11 @@ structure ThreeCell (α β : LoopExpr) where
   path2 : LoopPath α β
 
 /-- Route 1 of commutativity: direct EH. -/
-def eh_route1 (α β : LoopExpr) : LoopPath (LoopExpr.concat α β) (LoopExpr.concat β α) :=
+noncomputable def eh_route1 (α β : LoopExpr) : LoopPath (LoopExpr.concat α β) (LoopExpr.concat β α) :=
   EckmannHilton.vert_comm α β
 
 /-- Route 2: go through horiz_comp. α·β ← α⋆β ↝ β⋆α ↝ β·α -/
-def eh_route2 (α β : LoopExpr) : LoopPath (LoopExpr.concat α β) (LoopExpr.concat β α) :=
+noncomputable def eh_route2 (α β : LoopExpr) : LoopPath (LoopExpr.concat α β) (LoopExpr.concat β α) :=
   LoopPath.trans
     (LoopPath.symm (EckmannHilton.horiz_eq_vert α β))
     (LoopPath.trans
@@ -531,12 +531,12 @@ def eh_route2 (α β : LoopExpr) : LoopPath (LoopExpr.concat α β) (LoopExpr.co
       (EckmannHilton.horiz_eq_vert β α))
 
 /-- The syllepsis: both routes yield a valid 3-cell. -/
-def syllepsis (α β : LoopExpr) : ThreeCell (LoopExpr.concat α β) (LoopExpr.concat β α) :=
+noncomputable def syllepsis (α β : LoopExpr) : ThreeCell (LoopExpr.concat α β) (LoopExpr.concat β α) :=
   { path1 := eh_route1 α β
     path2 := eh_route2 α β }
 
 /-- The inverse syllepsis. -/
-def syllepsis_inv (α β : LoopExpr) : ThreeCell (LoopExpr.concat β α) (LoopExpr.concat α β) :=
+noncomputable def syllepsis_inv (α β : LoopExpr) : ThreeCell (LoopExpr.concat β α) (LoopExpr.concat α β) :=
   { path1 := LoopPath.symm (eh_route1 α β)
     path2 := LoopPath.symm (eh_route2 α β) }
 
@@ -546,7 +546,7 @@ theorem syllepsis_roundtrip (α β : LoopExpr) :
   LoopPath.trans (eh_route1 α β) (LoopPath.symm (eh_route1 α β))
 
 /-- The double syllepsis (in Ω⁴X). -/
-def double_syllepsis (α β : LoopExpr) :
+noncomputable def double_syllepsis (α β : LoopExpr) :
     ThreeCell (LoopExpr.concat α β) (LoopExpr.concat β α) :=
   { path1 := LoopPath.trans (EckmannHilton.vert_comm α β) (LoopPath.refl _)
     path2 := LoopPath.trans (LoopPath.refl _) (EckmannHilton.vert_comm α β) }
@@ -565,7 +565,7 @@ inductive JamesWord where
   deriving DecidableEq, Repr
 
 /-- The James map: embed a word into loop expressions. -/
-def jamesMap : JamesWord → LoopExpr
+noncomputable def jamesMap : JamesWord → LoopExpr
   | JamesWord.empty => LoopExpr.id_loop
   | JamesWord.point n => LoopExpr.loop (LoopName.mk n)
   | JamesWord.append w1 w2 => LoopExpr.concat (jamesMap w1) (jamesMap w2)
@@ -577,7 +577,7 @@ theorem jamesMap_append (w1 w2 : JamesWord) :
       LoopExpr.concat (jamesMap w1) (jamesMap w2) := rfl
 
 /-- Word length. -/
-def wordLength : JamesWord → Nat
+noncomputable def wordLength : JamesWord → Nat
   | JamesWord.empty => 0
   | JamesWord.point _ => 1
   | JamesWord.append w1 w2 => wordLength w1 + wordLength w2
@@ -635,18 +635,18 @@ inductive SignedGen where
   deriving DecidableEq, Repr
 
 /-- Convert a signed generator to a loop expression. -/
-def signedGenToExpr : SignedGen → LoopExpr
+noncomputable def signedGenToExpr : SignedGen → LoopExpr
   | SignedGen.pos n => LoopExpr.loop n
   | SignedGen.neg n => LoopExpr.inv (LoopExpr.loop n)
 
 /-- A normal form is a list of signed generators. -/
-def normalFormToExpr : List SignedGen → LoopExpr
+noncomputable def normalFormToExpr : List SignedGen → LoopExpr
   | [] => LoopExpr.id_loop
   | [g] => signedGenToExpr g
   | g :: gs => LoopExpr.concat (signedGenToExpr g) (normalFormToExpr gs)
 
 /-- Flatten a loop expression to a list of signed generators. -/
-def flatten : LoopExpr → List SignedGen
+noncomputable def flatten : LoopExpr → List SignedGen
   | LoopExpr.id_loop => []
   | LoopExpr.loop n => [SignedGen.pos n]
   | LoopExpr.concat a b => flatten a ++ flatten b
@@ -664,10 +664,10 @@ def flatten : LoopExpr → List SignedGen
   | LoopExpr.horiz_comp a b => flatten a ++ flatten b
 
 /-- The normalization function. -/
-def normalize (e : LoopExpr) : List SignedGen := flatten e
+noncomputable def normalize (e : LoopExpr) : List SignedGen := flatten e
 
 /-- Cancel adjacent inverse pairs. -/
-def cancelStep : List SignedGen → List SignedGen
+noncomputable def cancelStep : List SignedGen → List SignedGen
   | [] => []
   | [g] => [g]
   | SignedGen.pos n :: SignedGen.neg m :: rest =>
@@ -679,7 +679,7 @@ def cancelStep : List SignedGen → List SignedGen
   | g :: rest => g :: cancelStep rest
 
 /-- Full cancellation. -/
-def cancelFull (fuel : Nat) (gs : List SignedGen) : List SignedGen :=
+noncomputable def cancelFull (fuel : Nat) (gs : List SignedGen) : List SignedGen :=
   match fuel with
   | 0 => gs
   | n + 1 =>
@@ -687,7 +687,7 @@ def cancelFull (fuel : Nat) (gs : List SignedGen) : List SignedGen :=
       if gs' == gs then gs else cancelFull n gs'
 
 /-- Full normalize with cancellation. -/
-def normalizeFull (e : LoopExpr) : List SignedGen :=
+noncomputable def normalizeFull (e : LoopExpr) : List SignedGen :=
   cancelFull (e.size * 2) (normalize e)
 
 /-- Normalizing id_loop gives empty. -/
@@ -767,13 +767,13 @@ end WhiskerCalculus
 
 namespace DerivedIdentities
 
-private def e := LoopExpr.id_loop
-private def g (n : Nat) := LoopExpr.loop (LoopName.mk n)
-private def α := g 0
-private def β := g 1
-private def γ := g 2
-private def δ := g 3
-private def ε := g 4
+private noncomputable def e := LoopExpr.id_loop
+private noncomputable def g (n : Nat) := LoopExpr.loop (LoopName.mk n)
+private noncomputable def α := g 0
+private noncomputable def β := g 1
+private noncomputable def γ := g 2
+private noncomputable def δ := g 3
+private noncomputable def ε := g 4
 
 /-- 1. Left unit. -/
 theorem t01 : LoopPath (LoopExpr.concat e α) α :=
@@ -1164,7 +1164,7 @@ namespace PathBridge
 open ComputationalPaths.Path
 
 /-- Interpret LoopExpr as a natural number for embedding into Path. -/
-def loopExprHash : LoopExpr → Nat
+noncomputable def loopExprHash : LoopExpr → Nat
   | LoopExpr.id_loop => 0
   | LoopExpr.loop (LoopName.mk n) => n + 1
   | LoopExpr.concat a b => loopExprHash a * 31 + loopExprHash b + 1000
@@ -1174,7 +1174,7 @@ def loopExprHash : LoopExpr → Nat
   | LoopExpr.horiz_comp a b => loopExprHash a * 23 + loopExprHash b + 4000
 
 /-- Reflexive path at a loop hash. -/
-def path_refl_loop (e : LoopExpr) : Path (loopExprHash e) (loopExprHash e) :=
+noncomputable def path_refl_loop (e : LoopExpr) : Path (loopExprHash e) (loopExprHash e) :=
   Path.refl (loopExprHash e)
 
 /-- Two reflexive paths compose at the Path level. -/
@@ -1274,14 +1274,14 @@ structure Omega3 (α β : LoopExpr) where
   path2 : LoopPath α β
 
 /-- Composition in Ω¹. -/
-def omega1_comp (a b : Omega1) : Omega1 :=
+noncomputable def omega1_comp (a b : Omega1) : Omega1 :=
   ⟨LoopExpr.concat a.expr b.expr⟩
 
 /-- Identity in Ω¹. -/
-def omega1_id : Omega1 := ⟨LoopExpr.id_loop⟩
+noncomputable def omega1_id : Omega1 := ⟨LoopExpr.id_loop⟩
 
 /-- Inverse in Ω¹. -/
-def omega1_inv (a : Omega1) : Omega1 := ⟨LoopExpr.inv a.expr⟩
+noncomputable def omega1_inv (a : Omega1) : Omega1 := ⟨LoopExpr.inv a.expr⟩
 
 theorem omega1_left_unit (a : Omega1) :
     LoopPath (omega1_comp omega1_id a).expr a.expr :=

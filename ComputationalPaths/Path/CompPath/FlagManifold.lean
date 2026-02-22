@@ -31,17 +31,17 @@ namespace Flag
 variable {A : Type u}
 
 /-- Length of a flag (number of path segments). -/
-@[simp] def length {a b : A} : Flag A a b → Nat
+@[simp] noncomputable def length {a b : A} : Flag A a b → Nat
   | refl _ => 0
   | step _ q => Nat.succ (length q)
 
 /-- Compose the segments of a flag into a single `Path`. -/
-@[simp] def toPath {a b : A} : Flag A a b → Path a b
+@[simp] noncomputable def toPath {a b : A} : Flag A a b → Path a b
   | refl a => Path.refl a
   | step p q => Path.trans p (toPath q)
 
 /-- View a single `Path` as a one-step flag. -/
-@[simp] def ofPath {a b : A} (p : Path a b) : Flag A a b :=
+@[simp] noncomputable def ofPath {a b : A} (p : Path a b) : Flag A a b :=
   step p (refl b)
 
 /-- The composite of `ofPath` is the original path. -/
@@ -50,7 +50,7 @@ variable {A : Type u}
   simp [ofPath, toPath]
 
 /-- Concatenate two flags by chaining their segments. -/
-@[simp] def append {a b c : A} : Flag A a b → Flag A b c → Flag A a c
+@[simp] noncomputable def append {a b c : A} : Flag A a b → Flag A b c → Flag A a c
   | refl _, q => q
   | step p q, r => step p (append q r)
 
@@ -67,15 +67,15 @@ end Flag
 /-! ## The flag manifold -/
 
 /-- The flag manifold of `A` is the type of endpoints equipped with a flag. -/
-def FlagManifold (A : Type u) : Type u :=
+noncomputable def FlagManifold (A : Type u) : Type u :=
   Σ a b : A, Flag A a b
 
 /-- The trivial flag based at `a`. -/
-@[simp] def flagRefl {A : Type u} (a : A) : Flag A a a :=
+@[simp] noncomputable def flagRefl {A : Type u} (a : A) : Flag A a a :=
   Flag.refl a
 
 /-- Basepoint of the flag manifold at `a`. -/
-@[simp] def flagManifoldBase {A : Type u} (a : A) : FlagManifold A :=
+@[simp] noncomputable def flagManifoldBase {A : Type u} (a : A) : FlagManifold A :=
   ⟨a, a, flagRefl a⟩
 
 /-! ## Deeper properties of flags and the flag manifold -/
@@ -136,7 +136,7 @@ theorem Flag.length_append {A : Type u} {a b c : A}
   Flag.toPath_append f g
 
 /-- A flag can be reversed into a flag from b to a. -/
-def Flag.reverse {A : Type u} {a b : A} : Flag A a b → Flag A b a
+noncomputable def Flag.reverse {A : Type u} {a b : A} : Flag A a b → Flag A b a
   | Flag.refl a => Flag.refl a
   | Flag.step p q => Flag.append (Flag.reverse q) (Flag.ofPath (Path.symm p))
 

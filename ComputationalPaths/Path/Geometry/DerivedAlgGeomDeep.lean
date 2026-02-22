@@ -105,9 +105,9 @@ inductive DPath : DExpr → DExpr → Type where
 
 /-! ## 4. Basic Combinators -/
 
-def DPath.concat (p : DPath a b) (q : DPath b c) : DPath a c := .trans p q
+noncomputable def DPath.concat (p : DPath a b) (q : DPath b c) : DPath a c := .trans p q
 
-def DPath.length : DPath a b → Nat
+noncomputable def DPath.length : DPath a b → Nat
   | .refl _    => 0
   | .step _    => 1
   | .trans p q => p.length + q.length
@@ -130,7 +130,7 @@ theorem dpath_trans_length (p : DPath a b) (q : DPath b c) :
 /-! ## 5. Congruence Lifts -/
 
 -- 5. Lift path through add-left
-def DPath.congr_add_left (p : DPath a b) (c : DExpr) : DPath (.add a c) (.add b c) :=
+noncomputable def DPath.congr_add_left (p : DPath a b) (c : DExpr) : DPath (.add a c) (.add b c) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_add_l s c)
@@ -138,7 +138,7 @@ def DPath.congr_add_left (p : DPath a b) (c : DExpr) : DPath (.add a c) (.add b 
   | .symm p    => .symm (p.congr_add_left c)
 
 -- 6. Lift path through add-right
-def DPath.congr_add_right (c : DExpr) (p : DPath a b) : DPath (.add c a) (.add c b) :=
+noncomputable def DPath.congr_add_right (c : DExpr) (p : DPath a b) : DPath (.add c a) (.add c b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_add_r c s)
@@ -146,7 +146,7 @@ def DPath.congr_add_right (c : DExpr) (p : DPath a b) : DPath (.add c a) (.add c
   | .symm p    => .symm (p.congr_add_right c)
 
 -- 7. Lift path through mul-left
-def DPath.congr_mul_left (p : DPath a b) (c : DExpr) : DPath (.mul a c) (.mul b c) :=
+noncomputable def DPath.congr_mul_left (p : DPath a b) (c : DExpr) : DPath (.mul a c) (.mul b c) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_mul_l s c)
@@ -154,7 +154,7 @@ def DPath.congr_mul_left (p : DPath a b) (c : DExpr) : DPath (.mul a c) (.mul b 
   | .symm p    => .symm (p.congr_mul_left c)
 
 -- 8. Lift path through mul-right
-def DPath.congr_mul_right (c : DExpr) (p : DPath a b) : DPath (.mul c a) (.mul c b) :=
+noncomputable def DPath.congr_mul_right (c : DExpr) (p : DPath a b) : DPath (.mul c a) (.mul c b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_mul_r c s)
@@ -162,7 +162,7 @@ def DPath.congr_mul_right (c : DExpr) (p : DPath a b) : DPath (.mul c a) (.mul c
   | .symm p    => .symm (p.congr_mul_right c)
 
 -- 9. Lift path through negation
-def DPath.congr_neg (p : DPath a b) : DPath (.neg a) (.neg b) :=
+noncomputable def DPath.congr_neg (p : DPath a b) : DPath (.neg a) (.neg b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_neg s)
@@ -170,7 +170,7 @@ def DPath.congr_neg (p : DPath a b) : DPath (.neg a) (.neg b) :=
   | .symm p    => .symm p.congr_neg
 
 -- 10. Lift path through a morphism
-def DPath.congr_hom (k : Nat) (p : DPath a b) : DPath (.hom k a) (.hom k b) :=
+noncomputable def DPath.congr_hom (k : Nat) (p : DPath a b) : DPath (.hom k a) (.hom k b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_hom k s)
@@ -178,7 +178,7 @@ def DPath.congr_hom (k : Nat) (p : DPath a b) : DPath (.hom k a) (.hom k b) :=
   | .symm p    => .symm (p.congr_hom k)
 
 -- 11. Lift path through differential
-def DPath.congr_diff (p : DPath a b) : DPath (.diff a) (.diff b) :=
+noncomputable def DPath.congr_diff (p : DPath a b) : DPath (.diff a) (.diff b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_diff s)
@@ -186,7 +186,7 @@ def DPath.congr_diff (p : DPath a b) : DPath (.diff a) (.diff b) :=
   | .symm p    => .symm p.congr_diff
 
 -- 12. Lift path through face map
-def DPath.congr_face (n i : Nat) (p : DPath a b) : DPath (.face n i a) (.face n i b) :=
+noncomputable def DPath.congr_face (n i : Nat) (p : DPath a b) : DPath (.face n i a) (.face n i b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_face n i s)
@@ -196,55 +196,55 @@ def DPath.congr_face (n i : Nat) (p : DPath a b) : DPath (.face n i a) (.face n 
 /-! ## 6. Morphism Paths -/
 
 -- 13. Identity morphism
-def hom_id_path (a : DExpr) : DPath (.hom 0 a) a :=
+noncomputable def hom_id_path (a : DExpr) : DPath (.hom 0 a) a :=
   .step (.hom_id a)
 
 -- 14. Morphism preserves zero
-def hom_zero_path (k n : Nat) : DPath (.hom k (.zero n)) (.zero n) :=
+noncomputable def hom_zero_path (k n : Nat) : DPath (.hom k (.zero n)) (.zero n) :=
   .step (.hom_zero k n)
 
 -- 15. Morphism distributes over addition
-def hom_add_path (k : Nat) (a b : DExpr) :
+noncomputable def hom_add_path (k : Nat) (a b : DExpr) :
     DPath (.hom k (.add a b)) (.add (.hom k a) (.hom k b)) :=
   .step (.hom_add k a b)
 
 -- 16. Morphism composition
-def hom_comp_path (j k : Nat) (a : DExpr) :
+noncomputable def hom_comp_path (j k : Nat) (a : DExpr) :
     DPath (.hom j (.hom k a)) (.hom (j + k) a) :=
   .step (.hom_comp j k a)
 
 -- 17. Left identity for morphism composition
-def hom_comp_id_left (k : Nat) (a : DExpr) :
+noncomputable def hom_comp_id_left (k : Nat) (a : DExpr) :
     DPath (.hom 0 (.hom k a)) (.hom k a) :=
   .step (.hom_id (.hom k a))
 
 -- 18. Functoriality: hom k preserves zero in two steps
-def hom_zero_two_step (j k n : Nat) :
+noncomputable def hom_zero_two_step (j k n : Nat) :
     DPath (.hom j (.hom k (.zero n))) (.zero n) :=
   .trans (.congr_hom j (hom_zero_path k n)) (hom_zero_path j n)
 
 /-! ## 7. Chain Complex Paths (d² = 0) -/
 
 -- 19. d(0) = 0
-def diff_zero_path (n : Nat) : DPath (.diff (.zero n)) (.zero 0) :=
+noncomputable def diff_zero_path (n : Nat) : DPath (.diff (.zero n)) (.zero 0) :=
   .step (.diff_zero n)
 
 -- 20. d² = 0
-def diff_sq_path (a : DExpr) : DPath (.diff (.diff a)) (.zero 0) :=
+noncomputable def diff_sq_path (a : DExpr) : DPath (.diff (.diff a)) (.zero 0) :=
   .step (.diff_diff a)
 
 -- 21. d distributes over addition
-def diff_add_path (a b : DExpr) :
+noncomputable def diff_add_path (a b : DExpr) :
     DPath (.diff (.add a b)) (.add (.diff a) (.diff b)) :=
   .step (.diff_add a b)
 
 -- 22. Chain map compatibility: d ∘ f = f ∘ d
-def chain_map_path (k : Nat) (a : DExpr) :
+noncomputable def chain_map_path (k : Nat) (a : DExpr) :
     DPath (.diff (.hom k a)) (.hom k (.diff a)) :=
   .step (.diff_hom k a)
 
 -- 23. Chain map on sum, then differential
-def chain_map_add (k : Nat) (a b : DExpr) :
+noncomputable def chain_map_add (k : Nat) (a b : DExpr) :
     DPath (.diff (.hom k (.add a b)))
           (.add (.hom k (.diff a)) (.hom k (.diff b))) :=
   .trans (.step (.diff_hom k (.add a b)))
@@ -252,12 +252,12 @@ def chain_map_add (k : Nat) (a b : DExpr) :
             (.step (.hom_add k (.diff a) (.diff b))))
 
 -- 24. d² on a sum is zero
-def diff_sq_add (a b : DExpr) :
+noncomputable def diff_sq_add (a b : DExpr) :
     DPath (.diff (.diff (.add a b))) (.zero 0) :=
   .step (.diff_diff (.add a b))
 
 -- 25. Composite chain maps commute with d
-def chain_comp_diff (j k : Nat) (a : DExpr) :
+noncomputable def chain_comp_diff (j k : Nat) (a : DExpr) :
     DPath (.diff (.hom j (.hom k a))) (.hom j (.hom k (.diff a))) :=
   .trans (.step (.diff_hom j (.hom k a)))
          (.congr_hom j (.step (.diff_hom k a)))
@@ -265,17 +265,17 @@ def chain_comp_diff (j k : Nat) (a : DExpr) :
 /-! ## 8. Section / Retraction Paths -/
 
 -- 26. Section retraction
-def sect_retract_path (a : DExpr) : DPath (.hom 0 (.sect a)) a :=
+noncomputable def sect_retract_path (a : DExpr) : DPath (.hom 0 (.sect a)) a :=
   .step (.sect_retract a)
 
 -- 27. Double section retraction via trans
-def double_retract (a : DExpr) :
+noncomputable def double_retract (a : DExpr) :
     DPath (.hom 0 (.sect (.hom 0 (.sect a)))) a :=
   .trans (.step (.sect_retract (.hom 0 (.sect a))))
          (.step (.sect_retract a))
 
 -- 28. Section commutes with addition (composite path)
-def sect_add_retract (a b : DExpr) :
+noncomputable def sect_add_retract (a b : DExpr) :
     DPath (.hom 0 (.add (.sect a) (.sect b)))
           (.add a b) :=
   .trans (.step (.hom_add 0 (.sect a) (.sect b)))
@@ -285,17 +285,17 @@ def sect_add_retract (a b : DExpr) :
 /-! ## 9. Face / Degeneracy Paths -/
 
 -- 29. Face commutes with morphism
-def face_hom_path (n i k : Nat) (a : DExpr) :
+noncomputable def face_hom_path (n i k : Nat) (a : DExpr) :
     DPath (.hom k (.face n i a)) (.face n i (.hom k a)) :=
   .step (.face_hom n i k a)
 
 -- 30. Degeneracy commutes with morphism
-def degen_hom_path (n i k : Nat) (a : DExpr) :
+noncomputable def degen_hom_path (n i k : Nat) (a : DExpr) :
     DPath (.hom k (.degen n i a)) (.degen n i (.hom k a)) :=
   .step (.degen_hom n i k a)
 
 -- 31. Face then hom then back (round trip)
-def face_hom_roundtrip (n i : Nat) (a : DExpr) :
+noncomputable def face_hom_roundtrip (n i : Nat) (a : DExpr) :
     DPath (.hom 0 (.face n i a)) (.face n i a) :=
   .trans (.step (.face_hom n i 0 a))
          (.congr_face n i (hom_id_path a))
@@ -303,12 +303,12 @@ def face_hom_roundtrip (n i : Nat) (a : DExpr) :
 /-! ## 10. Distributivity and Algebra -/
 
 -- 32. Full distributivity path
-def distrib_path (a b c : DExpr) :
+noncomputable def distrib_path (a b c : DExpr) :
     DPath (.mul a (.add b c)) (.add (.mul a b) (.mul a c)) :=
   .step (.distrib a b c)
 
 -- 33. Morphism commutes with distributivity
-def hom_distrib (k : Nat) (a b c : DExpr) :
+noncomputable def hom_distrib (k : Nat) (a b c : DExpr) :
     DPath (.hom k (.mul a (.add b c)))
           (.add (.mul (.hom k a) (.hom k b)) (.mul (.hom k a) (.hom k c))) :=
   .trans (.step (.hom_mul k a (.add b c)))
@@ -316,7 +316,7 @@ def hom_distrib (k : Nat) (a b c : DExpr) :
             (.step (.distrib (.hom k a) (.hom k b) (.hom k c))))
 
 -- 34. Morphism preserves neg-cancel: hom k (a + (-a)) ~~> 0
-def hom_neg_chain (k : Nat) (a : DExpr) :
+noncomputable def hom_neg_chain (k : Nat) (a : DExpr) :
     DPath (.hom k (.add a (.neg a))) (.zero 0) :=
   .trans (.congr_hom k (.step (.add_neg a)))
          (.step (.hom_zero k 0))
@@ -329,7 +329,7 @@ structure PostnikovData (n : Nat) where
   truncate : ∀ (k : Nat), n < k → (a b : DExpr) → DPath a b
 
 -- 35. Adjacent Postnikov levels
-def postnikov_coarsen (P : PostnikovData n) :
+noncomputable def postnikov_coarsen (P : PostnikovData n) :
     PostnikovData (n + 1) where
   truncate k hk a b := P.truncate k (by omega) a b
 
@@ -364,7 +364,7 @@ structure SqZeroData where
   proj_sect : DPath (.hom 0 (.sect base)) base  -- proj ∘ sect = id
 
 -- 40. Construct a standard square-zero datum
-def stdSqZero (a : DExpr) : SqZeroData where
+noncomputable def stdSqZero (a : DExpr) : SqZeroData where
   base := a
   total := .sect a
   proj_sect := sect_retract_path a
@@ -378,7 +378,7 @@ structure ObsData where
   vanish : DPath obs (.zero 0) → DPath target target
 
 -- 41. Trivial obstruction
-def trivialObs (a : DExpr) : ObsData where
+noncomputable def trivialObs (a : DExpr) : ObsData where
   obs := .zero 0
   target := a
   vanish := fun _ => .refl a
@@ -386,35 +386,35 @@ def trivialObs (a : DExpr) : ObsData where
 /-! ## 15. Extended Composite Paths -/
 
 -- 42. Chain map composition: f;g commutes with d, two-step
-def chain_comp_two (j k : Nat) (a : DExpr) :
+noncomputable def chain_comp_two (j k : Nat) (a : DExpr) :
     DPath (.diff (.hom j (.hom k a)))
           (.hom (j + k) (.diff a)) :=
   .trans (chain_comp_diff j k a) (.step (.hom_comp j k (.diff a)))
 
 -- 43. Morphism on differential of sum
-def hom_diff_add (k : Nat) (a b : DExpr) :
+noncomputable def hom_diff_add (k : Nat) (a b : DExpr) :
     DPath (.hom k (.diff (.add a b)))
           (.add (.hom k (.diff a)) (.hom k (.diff b))) :=
   .trans (.congr_hom k (diff_add_path a b))
          (.step (.hom_add k (.diff a) (.diff b)))
 
 -- 44. d(f(0)) = 0 chain
-def diff_hom_zero (k n : Nat) :
+noncomputable def diff_hom_zero (k n : Nat) :
     DPath (.diff (.hom k (.zero n))) (.zero 0) :=
   .trans (.congr_diff (hom_zero_path k n)) (.step (.diff_zero n))
 
 -- 45. Neg-neg through hom
-def hom_neg_neg (k : Nat) (a : DExpr) :
+noncomputable def hom_neg_neg (k : Nat) (a : DExpr) :
     DPath (.hom k (.neg (.neg a))) (.hom k a) :=
   .congr_hom k (.step (.neg_neg a))
 
 -- 46. Face map on zero (composite)
-def face_zero (n i k : Nat) :
+noncomputable def face_zero (n i k : Nat) :
     DPath (.face n i (.hom k (.zero n))) (.face n i (.zero n)) :=
   .congr_face n i (hom_zero_path k n)
 
 -- 47. Morphism composition on sum
-def hom_comp_add (j k : Nat) (a b : DExpr) :
+noncomputable def hom_comp_add (j k : Nat) (a b : DExpr) :
     DPath (.hom j (.hom k (.add a b)))
           (.add (.hom (j + k) a) (.hom (j + k) b)) :=
   let p1 : DPath (.hom j (.hom k (.add a b))) (.hom j (.add (.hom k a) (.hom k b))) :=
@@ -428,17 +428,17 @@ def hom_comp_add (j k : Nat) (a b : DExpr) :
   .trans p1 (.trans p2 (.trans p3 p4))
 
 -- 48. d² on hom
-def diff_sq_hom (k : Nat) (a : DExpr) :
+noncomputable def diff_sq_hom (k : Nat) (a : DExpr) :
     DPath (.diff (.diff (.hom k a))) (.zero 0) :=
   .step (.diff_diff (.hom k a))
 
 -- 49. Zero add zero is zero
-def zero_add_zero (n : Nat) :
+noncomputable def zero_add_zero (n : Nat) :
     DPath (.add (.zero n) (.zero n)) (.zero n) :=
   .step (.zero_add n (.zero n))
 
 -- 50. Section retract on sum
-def sect_retract_add (a b : DExpr) :
+noncomputable def sect_retract_add (a b : DExpr) :
     DPath (.add (.hom 0 (.sect a)) (.hom 0 (.sect b))) (.add a b) :=
   .trans ((sect_retract_path a).congr_add_left _)
          ((sect_retract_path b).congr_add_right a)

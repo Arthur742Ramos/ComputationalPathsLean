@@ -35,11 +35,11 @@ structure Variety (k : Type u) where
   dim : Nat
 
 /-- The affine line A1 over a field k -/
-def affineLine (k : Type u) : Variety.{u,0} k :=
+noncomputable def affineLine (k : Type u) : Variety.{u,0} k :=
   { points := PUnit, dim := 1 }
 
 /-- The affine space An over a field k -/
-def affineSpace (k : Type u) (n : Nat) : Variety.{u,0} k :=
+noncomputable def affineSpace (k : Type u) (n : Nat) : Variety.{u,0} k :=
   { points := PUnit, dim := n }
 
 /-- A1-homotopy between two morphisms (abstract representation) -/
@@ -49,17 +49,17 @@ structure A1Homotopy {k : Type u} (X Y : Variety.{u,0} k) where
   dimPath : Path (srcDim + 1) (tgtDim + 1)
 
 /-- 1: A1-homotopy is reflexive -/
-def a1Homotopy_refl {k : Type u} (X Y : Variety.{u,0} k) (d : Nat) :
+noncomputable def a1Homotopy_refl {k : Type u} (X Y : Variety.{u,0} k) (d : Nat) :
     A1Homotopy X Y :=
   { srcDim := d, tgtDim := d, dimPath := Path.refl (d + 1) }
 
 /-- 2: A1-homotopy is symmetric -/
-def a1Homotopy_symm {k : Type u} {X Y : Variety.{u,0} k}
+noncomputable def a1Homotopy_symm {k : Type u} {X Y : Variety.{u,0} k}
     (h : A1Homotopy X Y) : A1Homotopy X Y :=
   { srcDim := h.tgtDim, tgtDim := h.srcDim, dimPath := Path.symm h.dimPath }
 
 /-- 3: A1-homotopy is transitive -/
-def a1Homotopy_trans {k : Type u} {X Y : Variety.{u,0} k}
+noncomputable def a1Homotopy_trans {k : Type u} {X Y : Variety.{u,0} k}
     (h1 h2 : A1Homotopy X Y) (eq : h1.tgtDim = h2.srcDim) : A1Homotopy X Y :=
   { srcDim := h1.srcDim
     tgtDim := h2.tgtDim
@@ -73,7 +73,7 @@ structure A1Contractible {k : Type u} (X : Variety.{u,0} k) where
   contractPath : Path X.dim 0
 
 /-- 4: Affine space A0 is A1-contractible -/
-def affineSpace_contractible (k : Type u) : A1Contractible (affineSpace k 0) :=
+noncomputable def affineSpace_contractible (k : Type u) : A1Contractible (affineSpace k 0) :=
   { contractPath := Path.refl 0 }
 
 /-- A1-equivalence between varieties -/
@@ -81,16 +81,16 @@ structure A1Equiv {k : Type u} (X Y : Variety.{u,0} k) where
   fwdDim : Path X.dim Y.dim
 
 /-- 5: A1-equivalence is reflexive -/
-def a1Equiv_refl {k : Type u} (X : Variety.{u,0} k) : A1Equiv X X :=
+noncomputable def a1Equiv_refl {k : Type u} (X : Variety.{u,0} k) : A1Equiv X X :=
   { fwdDim := Path.refl X.dim }
 
 /-- 6: A1-equivalence is symmetric -/
-def a1Equiv_symm {k : Type u} {X Y : Variety.{u,0} k}
+noncomputable def a1Equiv_symm {k : Type u} {X Y : Variety.{u,0} k}
     (e : A1Equiv X Y) : A1Equiv Y X :=
   { fwdDim := Path.symm e.fwdDim }
 
 /-- 7: A1-equivalence is transitive -/
-def a1Equiv_trans {k : Type u} {X Y Z : Variety.{u,0} k}
+noncomputable def a1Equiv_trans {k : Type u} {X Y Z : Variety.{u,0} k}
     (e1 : A1Equiv X Y) (e2 : A1Equiv Y Z) : A1Equiv X Z :=
   { fwdDim := Path.trans e1.fwdDim e2.fwdDim }
 
@@ -115,12 +115,12 @@ structure NisnevichSquare (k : Type u) where
   dimRelation : Path (totalDim + fiberDim) (openDim + closedDim)
 
 /-- 9: Nisnevich descent: gluing along a Nisnevich square preserves dimension -/
-def nisnevich_descent_dim {k : Type u} (sq : NisnevichSquare k) :
+noncomputable def nisnevich_descent_dim {k : Type u} (sq : NisnevichSquare k) :
     Path (sq.totalDim + sq.fiberDim) (sq.openDim + sq.closedDim) :=
   sq.dimRelation
 
 /-- 10: Symmetric Nisnevich square -/
-def nisnevichSquare_symm {k : Type u} (sq : NisnevichSquare k) :
+noncomputable def nisnevichSquare_symm {k : Type u} (sq : NisnevichSquare k) :
     NisnevichSquare k :=
   { totalDim := sq.totalDim
     openDim := sq.closedDim
@@ -135,7 +135,7 @@ structure NisnevichLocal (n : Nat) where
   localPath : Path localDim n
 
 /-- 11: Nisnevich locality is stable under composition -/
-def nisnevichLocal_comp {n m : Nat} (l1 : NisnevichLocal n) (eq : Path n m) :
+noncomputable def nisnevichLocal_comp {n m : Nat} (l1 : NisnevichLocal n) (eq : Path n m) :
     NisnevichLocal m :=
   { localDim := l1.localDim, localPath := Path.trans l1.localPath eq }
 
@@ -154,25 +154,25 @@ structure MotivicSphere where
   weight : Nat    -- q: weight (algebraic degree)
 
 /-- 12: Smash product of motivic spheres -/
-def motivicSmash (s1 s2 : MotivicSphere) : MotivicSphere :=
+noncomputable def motivicSmash (s1 s2 : MotivicSphere) : MotivicSphere :=
   { topDeg := s1.topDeg + s2.topDeg, weight := s1.weight + s2.weight }
 
 /-- 13: Smash product is commutative in degree -/
-def motivicSmash_comm_top (s1 s2 : MotivicSphere) :
+noncomputable def motivicSmash_comm_top (s1 s2 : MotivicSphere) :
     Path (motivicSmash s1 s2).topDeg (motivicSmash s2 s1).topDeg := by
   unfold motivicSmash
   simp only
   exact Path.mk [] (by omega)
 
 /-- 14: Smash product is commutative in weight -/
-def motivicSmash_comm_weight (s1 s2 : MotivicSphere) :
+noncomputable def motivicSmash_comm_weight (s1 s2 : MotivicSphere) :
     Path (motivicSmash s1 s2).weight (motivicSmash s2 s1).weight := by
   unfold motivicSmash
   simp only
   exact Path.mk [] (by omega)
 
 /-- 15: Smash product is associative in degree -/
-def motivicSmash_assoc_top (s1 s2 s3 : MotivicSphere) :
+noncomputable def motivicSmash_assoc_top (s1 s2 s3 : MotivicSphere) :
     Path (motivicSmash (motivicSmash s1 s2) s3).topDeg
          (motivicSmash s1 (motivicSmash s2 s3)).topDeg := by
   unfold motivicSmash
@@ -180,7 +180,7 @@ def motivicSmash_assoc_top (s1 s2 s3 : MotivicSphere) :
   exact Path.mk [] (by omega)
 
 /-- 16: Smash product is associative in weight -/
-def motivicSmash_assoc_weight (s1 s2 s3 : MotivicSphere) :
+noncomputable def motivicSmash_assoc_weight (s1 s2 s3 : MotivicSphere) :
     Path (motivicSmash (motivicSmash s1 s2) s3).weight
          (motivicSmash s1 (motivicSmash s2 s3)).weight := by
   unfold motivicSmash
@@ -188,25 +188,25 @@ def motivicSmash_assoc_weight (s1 s2 s3 : MotivicSphere) :
   exact Path.mk [] (by omega)
 
 /-- The simplicial sphere S^1_s -/
-def simplicialCircle : MotivicSphere :=
+noncomputable def simplicialCircle : MotivicSphere :=
   { topDeg := 1, weight := 0 }
 
 /-- The algebraic sphere S^1_t = Gm -/
-def algebraicCircle : MotivicSphere :=
+noncomputable def algebraicCircle : MotivicSphere :=
   { topDeg := 1, weight := 1 }
 
 /-- 17: S^{p,q} = S^{p-q}_s smash Gm^{smash q} — degree check -/
-def sphere_decomp_topDeg (p q : Nat) (hpq : q ≤ p) :
+noncomputable def sphere_decomp_topDeg (p q : Nat) (hpq : q ≤ p) :
     Path p ((p - q) + q) :=
   Path.mk [] (by omega)
 
 /-- 18: Trivial motivic sphere is unit for smash -/
-def motivicSmash_unit_left (s : MotivicSphere) :
+noncomputable def motivicSmash_unit_left (s : MotivicSphere) :
     Path (motivicSmash { topDeg := 0, weight := 0 } s).topDeg s.topDeg := by
   unfold motivicSmash; exact Path.mk [] (by simp)
 
 /-- 19: Trivial motivic sphere is unit for smash (weight) -/
-def motivicSmash_unit_left_weight (s : MotivicSphere) :
+noncomputable def motivicSmash_unit_left_weight (s : MotivicSphere) :
     Path (motivicSmash { topDeg := 0, weight := 0 } s).weight s.weight := by
   unfold motivicSmash; exact Path.mk [] (by simp)
 
@@ -220,16 +220,16 @@ structure VectorBundle (k : Type u) where
   rank : Nat
 
 /-- Thom space of a vector bundle: adds rank to dimension -/
-def thomSpace {k : Type u} (E : VectorBundle k) : Nat :=
+noncomputable def thomSpace {k : Type u} (E : VectorBundle k) : Nat :=
   E.basesDim + E.rank
 
 /-- 20: Thom space of trivial bundle -/
-def thom_trivial {k : Type u} (n : Nat) :
+noncomputable def thom_trivial {k : Type u} (n : Nat) :
     Path (thomSpace ({ basesDim := n, rank := 0 } : VectorBundle k)) n := by
   unfold thomSpace; exact Path.mk [] (by simp)
 
 /-- 21: Thom space is additive in rank -/
-def thom_additive_rank {k : Type u} (b r1 r2 : Nat) :
+noncomputable def thom_additive_rank {k : Type u} (b r1 r2 : Nat) :
     Path (thomSpace ({ basesDim := b, rank := r1 + r2 } : VectorBundle k))
          (thomSpace ({ basesDim := b, rank := r1 } : VectorBundle k) + r2) := by
   simp [thomSpace]; exact Path.mk [] (by omega)
@@ -240,14 +240,14 @@ structure ThomIso {k : Type u} (E : VectorBundle k) where
   shiftPath : Path cohomDegree (cohomDegree + E.rank)
 
 /-- 22: Thom isomorphism rank functoriality -/
-def thomIso_rank_functorial {k : Type u} {E1 E2 : VectorBundle k}
+noncomputable def thomIso_rank_functorial {k : Type u} {E1 E2 : VectorBundle k}
     (t1 : ThomIso E1)
     (rankEq : Path E1.rank E2.rank) :
     Path (t1.cohomDegree + E1.rank) (t1.cohomDegree + E2.rank) :=
   Path.congrArg (t1.cohomDegree + ·) rankEq
 
 /-- 23: Thom class is natural: functoriality under pullback -/
-def thom_class_natural {k : Type u} (b1 b2 r : Nat) (dimPath : Path b1 b2) :
+noncomputable def thom_class_natural {k : Type u} (b1 b2 r : Nat) (dimPath : Path b1 b2) :
     Path (thomSpace ({ basesDim := b1, rank := r } : VectorBundle k))
          (thomSpace ({ basesDim := b2, rank := r } : VectorBundle k)) := by
   unfold thomSpace; exact Path.congrArg (· + r) dimPath
@@ -261,18 +261,18 @@ structure FormalGroupLaw where
   coeffDim : Nat
 
 /-- The additive formal group law Ga -/
-def additiveGroupLaw : FormalGroupLaw :=
+noncomputable def additiveGroupLaw : FormalGroupLaw :=
   { coeffDim := 0 }
 
 /-- The multiplicative formal group law Gm -/
-def multiplicativeGroupLaw : FormalGroupLaw :=
+noncomputable def multiplicativeGroupLaw : FormalGroupLaw :=
   { coeffDim := 1 }
 
 /-- Lazard ring dimension: universal ring for formal group laws -/
-def lazardDim (n : Nat) : Nat := n * (n + 1) / 2
+noncomputable def lazardDim (n : Nat) : Nat := n * (n + 1) / 2
 
 /-- 24: Lazard ring base case -/
-def lazard_dim_zero : Path (lazardDim 0) 0 := by
+noncomputable def lazard_dim_zero : Path (lazardDim 0) 0 := by
   unfold lazardDim; exact Path.refl 0
 
 /-- Algebraic cobordism element: degree and codimension -/
@@ -281,22 +281,22 @@ structure CobordismElem where
   codim : Nat
 
 /-- 25: Cobordism ring multiplication on degrees -/
-def cobordism_mul_deg (a b : CobordismElem) : Nat :=
+noncomputable def cobordism_mul_deg (a b : CobordismElem) : Nat :=
   a.degree + b.degree
 
 /-- 26: Cobordism multiplication is commutative on degrees -/
-def cobordism_mul_comm (a b : CobordismElem) :
+noncomputable def cobordism_mul_comm (a b : CobordismElem) :
     Path (cobordism_mul_deg a b) (cobordism_mul_deg b a) := by
   unfold cobordism_mul_deg; exact Path.mk [] (by omega)
 
 /-- 27: Cobordism multiplication is associative on degrees -/
-def cobordism_mul_assoc (a b c : CobordismElem) :
+noncomputable def cobordism_mul_assoc (a b c : CobordismElem) :
     Path (cobordism_mul_deg (⟨cobordism_mul_deg a b, 0⟩) c)
          (cobordism_mul_deg a ⟨cobordism_mul_deg b c, 0⟩) := by
   unfold cobordism_mul_deg; simp; exact Path.mk [] (by omega)
 
 /-- 28: Cobordism unit element -/
-def cobordism_unit (a : CobordismElem) :
+noncomputable def cobordism_unit (a : CobordismElem) :
     Path (cobordism_mul_deg ⟨0, 0⟩ a) a.degree := by
   unfold cobordism_mul_deg; exact Path.mk [] (by simp)
 
@@ -310,11 +310,11 @@ structure SteenrodOp where
   biDegree : Nat    -- bidegree shift
 
 /-- 29: Steenrod square degree formula: Sq^i raises degree by i -/
-def steenrodDegreeShift (sq : SteenrodOp) (n : Nat) : Nat :=
+noncomputable def steenrodDegreeShift (sq : SteenrodOp) (n : Nat) : Nat :=
   n + sq.index
 
 /-- 30: Composition of Steenrod operations -/
-def steenrodComp (sq1 sq2 : SteenrodOp) : SteenrodOp :=
+noncomputable def steenrodComp (sq1 sq2 : SteenrodOp) : SteenrodOp :=
   { index := sq1.index + sq2.index, biDegree := sq1.biDegree + sq2.biDegree }
 
 /-- 31: Steenrod composition is associative -/
@@ -323,7 +323,7 @@ theorem steenrodComp_assoc (a b c : SteenrodOp) :
   unfold steenrodComp; simp [Nat.add_assoc]
 
 /-- 32: Steenrod degree shift is additive under composition -/
-def steenrod_shift_comp (sq1 sq2 : SteenrodOp) (n : Nat) :
+noncomputable def steenrod_shift_comp (sq1 sq2 : SteenrodOp) (n : Nat) :
     Path (steenrodDegreeShift (steenrodComp sq1 sq2) n)
          (steenrodDegreeShift sq1 (steenrodDegreeShift sq2 n)) := by
   unfold steenrodDegreeShift steenrodComp; simp; exact Path.mk [] (by omega)
@@ -335,17 +335,17 @@ structure AdemRelation where
   constraint : a < 2 * b  -- Adem condition
 
 /-- 33: Adem relation: a < 2b implies b > 0 -/
-def adem_bound (rel : AdemRelation) :
+noncomputable def adem_bound (rel : AdemRelation) :
     Path (rel.a + rel.b) (rel.b + rel.a) := by
   exact Path.mk [] (by omega)
 
 /-- 34: Sq^0 is the identity on degree -/
-def sq0_identity (n : Nat) :
+noncomputable def sq0_identity (n : Nat) :
     Path (steenrodDegreeShift { index := 0, biDegree := 0 } n) n := by
   unfold steenrodDegreeShift; exact Path.mk [] (by simp)
 
 /-- 35: Cartan formula structure: Sq^n(xy) = sum Sq^i(x) Sq^j(y) -/
-def cartan_degree (i j n : Nat) (h : i + j = n) :
+noncomputable def cartan_degree (i j n : Nat) (h : i + j = n) :
     Path (steenrodDegreeShift { index := n, biDegree := 0 } 0)
          (steenrodDegreeShift { index := i, biDegree := 0 } 0 +
           steenrodDegreeShift { index := j, biDegree := 0 } 0) := by
@@ -370,12 +370,12 @@ structure NormResidue where
   degreeMatch : Path source.degree target.degree
 
 /-- 36: Norm residue preserves degree -/
-def norm_residue_degree (nr : NormResidue) :
+noncomputable def norm_residue_degree (nr : NormResidue) :
     Path nr.source.degree nr.target.degree :=
   nr.degreeMatch
 
 /-- 37: Composition of norm residue maps -/
-def norm_residue_comp (nr1 nr2 : NormResidue)
+noncomputable def norm_residue_comp (nr1 nr2 : NormResidue)
     (h : Path nr1.target.degree nr2.source.degree) : NormResidue :=
   { source := nr1.source
     target := nr2.target
@@ -392,18 +392,18 @@ theorem norm_residue_comp_assoc (nr1 nr2 nr3 : NormResidue)
   simp [Path.trans_assoc]
 
 /-- 39: Bloch-Kato conjecture: norm residue at degree 0 -/
-def bloch_kato_deg0 :
+noncomputable def bloch_kato_deg0 :
     Path ({ degree := 0 } : MilnorKMod2).degree ({ degree := 0 } : GaloisCohom).degree :=
   Path.refl 0
 
 /-- 40: Milnor conjecture: norm residue at degree n is the identity on degrees -/
-def milnor_conjecture (n : Nat) : NormResidue :=
+noncomputable def milnor_conjecture (n : Nat) : NormResidue :=
   { source := { degree := n }
     target := { degree := n }
     degreeMatch := Path.refl n }
 
 /-- 41: Norm residue inverse -/
-def norm_residue_inv (nr : NormResidue) : NormResidue :=
+noncomputable def norm_residue_inv (nr : NormResidue) : NormResidue :=
   { source := { degree := nr.target.degree }
     target := { degree := nr.source.degree }
     degreeMatch := Path.symm nr.degreeMatch }
@@ -425,45 +425,45 @@ structure MotivicSpectrum where
   weight : Nat
 
 /-- Suspension in the stable motivic category -/
-def suspend (sp : MotivicSpectrum) : MotivicSpectrum :=
+noncomputable def suspend (sp : MotivicSpectrum) : MotivicSpectrum :=
   { level := sp.level + 1, topDeg := sp.topDeg + 1, weight := sp.weight }
 
 /-- 43: Suspension increases level by 1 -/
-def suspend_level (sp : MotivicSpectrum) :
+noncomputable def suspend_level (sp : MotivicSpectrum) :
     Path (suspend sp).level (sp.level + 1) :=
   Path.refl (sp.level + 1)
 
 /-- 44: Double suspension -/
-def double_suspend_level (sp : MotivicSpectrum) :
+noncomputable def double_suspend_level (sp : MotivicSpectrum) :
     Path (suspend (suspend sp)).level (sp.level + 2) := by
   unfold suspend; simp; exact Path.mk [] (by omega)
 
 /-- 45: Suspension preserves weight -/
-def suspend_weight (sp : MotivicSpectrum) :
+noncomputable def suspend_weight (sp : MotivicSpectrum) :
     Path (suspend sp).weight sp.weight :=
   Path.refl sp.weight
 
 /-- Twist suspension: shifts weight -/
-def twistSuspend (sp : MotivicSpectrum) : MotivicSpectrum :=
+noncomputable def twistSuspend (sp : MotivicSpectrum) : MotivicSpectrum :=
   { level := sp.level + 1, topDeg := sp.topDeg + 1, weight := sp.weight + 1 }
 
 /-- 46: Twist suspension shifts both degree and weight -/
-def twistSuspend_deg (sp : MotivicSpectrum) :
+noncomputable def twistSuspend_deg (sp : MotivicSpectrum) :
     Path (twistSuspend sp).topDeg (sp.topDeg + 1) :=
   Path.refl (sp.topDeg + 1)
 
 /-- 47: Twist suspension shifts weight by 1 -/
-def twistSuspend_weight (sp : MotivicSpectrum) :
+noncomputable def twistSuspend_weight (sp : MotivicSpectrum) :
     Path (twistSuspend sp).weight (sp.weight + 1) :=
   Path.refl (sp.weight + 1)
 
 /-- 48: Iterated suspension -/
-def iterSuspend : Nat → MotivicSpectrum → MotivicSpectrum
+noncomputable def iterSuspend : Nat → MotivicSpectrum → MotivicSpectrum
   | 0, sp => sp
   | n + 1, sp => suspend (iterSuspend n sp)
 
 /-- 49: Iterated suspension level -/
-def iterSuspend_level (n : Nat) (sp : MotivicSpectrum) :
+noncomputable def iterSuspend_level (n : Nat) (sp : MotivicSpectrum) :
     Path (iterSuspend n sp).level (sp.level + n) := by
   induction n with
   | zero => unfold iterSuspend; exact Path.mk [] (by omega)
@@ -474,7 +474,7 @@ def iterSuspend_level (n : Nat) (sp : MotivicSpectrum) :
     exact Path.mk [] (by omega)
 
 /-- 50: Iterated suspension preserves weight -/
-def iterSuspend_weight (n : Nat) (sp : MotivicSpectrum) :
+noncomputable def iterSuspend_weight (n : Nat) (sp : MotivicSpectrum) :
     Path (iterSuspend n sp).weight sp.weight := by
   induction n with
   | zero => unfold iterSuspend; exact Path.mk [] (by omega)
@@ -490,20 +490,20 @@ structure StableMotivicEquiv (sp1 sp2 : MotivicSpectrum) where
   weightPath : Path sp1.weight sp2.weight
 
 /-- 51: Stable equivalence is reflexive -/
-def stableEquiv_refl (sp : MotivicSpectrum) : StableMotivicEquiv sp sp :=
+noncomputable def stableEquiv_refl (sp : MotivicSpectrum) : StableMotivicEquiv sp sp :=
   { levelPath := Path.refl sp.level
     topPath := Path.refl sp.topDeg
     weightPath := Path.refl sp.weight }
 
 /-- 52: Stable equivalence is symmetric -/
-def stableEquiv_symm {sp1 sp2 : MotivicSpectrum}
+noncomputable def stableEquiv_symm {sp1 sp2 : MotivicSpectrum}
     (e : StableMotivicEquiv sp1 sp2) : StableMotivicEquiv sp2 sp1 :=
   { levelPath := Path.symm e.levelPath
     topPath := Path.symm e.topPath
     weightPath := Path.symm e.weightPath }
 
 /-- 53: Stable equivalence is transitive -/
-def stableEquiv_trans {sp1 sp2 sp3 : MotivicSpectrum}
+noncomputable def stableEquiv_trans {sp1 sp2 sp3 : MotivicSpectrum}
     (e1 : StableMotivicEquiv sp1 sp2) (e2 : StableMotivicEquiv sp2 sp3) :
     StableMotivicEquiv sp1 sp3 :=
   { levelPath := Path.trans e1.levelPath e2.levelPath
@@ -536,21 +536,21 @@ structure AdamsDegree where
   weight : Nat
 
 /-- 56: Adams differential shifts filtration by 1 -/
-def adamsDiff (d : AdamsDegree) : AdamsDegree :=
+noncomputable def adamsDiff (d : AdamsDegree) : AdamsDegree :=
   { stem := d.stem, filtration := d.filtration + 1, weight := d.weight }
 
 /-- 57: Adams differential preserves stem -/
-def adamsDiff_stem (d : AdamsDegree) :
+noncomputable def adamsDiff_stem (d : AdamsDegree) :
     Path (adamsDiff d).stem d.stem :=
   Path.refl d.stem
 
 /-- 58: Double differential filtration -/
-def adamsDiff_double_filt (d : AdamsDegree) :
+noncomputable def adamsDiff_double_filt (d : AdamsDegree) :
     Path (adamsDiff (adamsDiff d)).filtration (d.filtration + 2) := by
   unfold adamsDiff; simp; exact Path.mk [] (by omega)
 
 /-- 59: Adams edge: filtration 0 elements -/
-def adams_edge (s : Nat) (w : Nat) :
+noncomputable def adams_edge (s : Nat) (w : Nat) :
     Path ({ stem := s, filtration := 0, weight := w } : AdamsDegree).filtration 0 :=
   Path.refl 0
 
@@ -563,11 +563,11 @@ structure EilenbergMacLane where
   level : Nat
 
 /-- 60: EM spectrum inclusion -/
-def emInclusion (n : Nat) : EilenbergMacLane :=
+noncomputable def emInclusion (n : Nat) : EilenbergMacLane :=
   { level := n }
 
 /-- 61: EM spectrum level is functorial -/
-def em_level_congrArg (n m : Nat) (p : Path n m) :
+noncomputable def em_level_congrArg (n m : Nat) (p : Path n m) :
     Path (emInclusion n).level (emInclusion m).level :=
   Path.congrArg (fun k => (emInclusion k).level) p
 
@@ -596,20 +596,20 @@ structure WeightElem where
   purity : Path degree weight  -- pure of weight w means degree = weight
 
 /-- 64: Pure elements are closed under trans composition -/
-def weightElem_trans (w1 w2 : WeightElem)
+noncomputable def weightElem_trans (w1 w2 : WeightElem)
     (h : Path w1.weight w2.degree) : WeightElem :=
   { degree := w1.degree
     weight := w2.weight
     purity := Path.trans w1.purity (Path.trans h w2.purity) }
 
 /-- 65: Pure element symmetry -/
-def weightElem_symm (w : WeightElem) : WeightElem :=
+noncomputable def weightElem_symm (w : WeightElem) : WeightElem :=
   { degree := w.weight
     weight := w.degree
     purity := Path.symm w.purity }
 
 /-- 66: Weight zero is pure -/
-def weight_zero_pure : WeightElem :=
+noncomputable def weight_zero_pure : WeightElem :=
   { degree := 0, weight := 0, purity := Path.refl 0 }
 
 /-- 67: Weight element double symmetry -/
@@ -630,7 +630,7 @@ structure MotivicFiber where
   exactness : Path totalDim (fiberDim + baseDim)
 
 /-- 68: Long exact sequence shifts -/
-def motivicFiber_shift (mf : MotivicFiber) : MotivicFiber :=
+noncomputable def motivicFiber_shift (mf : MotivicFiber) : MotivicFiber :=
   { fiberDim := mf.fiberDim
     totalDim := mf.totalDim + 1
     baseDim := mf.baseDim + 1
@@ -639,16 +639,16 @@ def motivicFiber_shift (mf : MotivicFiber) : MotivicFiber :=
       exact Path.mk [] (by omega) }
 
 /-- 69: Fiber sequence dimension is consistent -/
-def motivicFiber_consistent (mf : MotivicFiber) :
+noncomputable def motivicFiber_consistent (mf : MotivicFiber) :
     Path mf.totalDim (mf.fiberDim + mf.baseDim) :=
   mf.exactness
 
 /-- 70: Trivial fiber sequence -/
-def trivialFiber (n : Nat) : MotivicFiber :=
+noncomputable def trivialFiber (n : Nat) : MotivicFiber :=
   { fiberDim := 0, totalDim := n, baseDim := n, exactness := Path.mk [] (by omega) }
 
 /-- 71: Trivial fiber has zero fiber dimension -/
-def trivialFiber_zero (n : Nat) :
+noncomputable def trivialFiber_zero (n : Nat) :
     Path (trivialFiber n).fiberDim 0 :=
   Path.refl 0
 
@@ -657,7 +657,7 @@ def trivialFiber_zero (n : Nat) :
 -- ============================================================
 
 /-- 72: congrArg applied to motivic sphere topDeg -/
-def congrArg_motivicSmash_topDeg (s1 s2 t : MotivicSphere)
+noncomputable def congrArg_motivicSmash_topDeg (s1 s2 t : MotivicSphere)
     (h : Path s1.topDeg s2.topDeg) :
     Path (s1.topDeg + t.topDeg) (s2.topDeg + t.topDeg) :=
   Path.congrArg (· + t.topDeg) h
@@ -677,7 +677,7 @@ theorem congrArg_trans_motivicSmash (s1 s2 s3 t : MotivicSphere)
   simp [Path.congrArg_trans]
 
 /-- 75: Suspension is functorial via congrArg on level -/
-def suspend_congrArg (sp1 sp2 : MotivicSpectrum) (h : Path sp1.level sp2.level) :
+noncomputable def suspend_congrArg (sp1 sp2 : MotivicSpectrum) (h : Path sp1.level sp2.level) :
     Path (suspend sp1).level (suspend sp2).level :=
   Path.congrArg (· + 1) h
 
@@ -707,7 +707,7 @@ structure MotivicTransfer where
   transferPath : Path targetDeg (sourceDeg + shift)
 
 /-- 78: Transfer composition -/
-def motivicTransfer_comp (t1 t2 : MotivicTransfer)
+noncomputable def motivicTransfer_comp (t1 t2 : MotivicTransfer)
     (h : Path t1.targetDeg t2.sourceDeg) : MotivicTransfer :=
   { sourceDeg := t1.sourceDeg
     targetDeg := t2.targetDeg
@@ -719,11 +719,11 @@ def motivicTransfer_comp (t1 t2 : MotivicTransfer)
       exact Path.mk [] (by omega) }
 
 /-- 79: Identity transfer -/
-def motivicTransfer_id (n : Nat) : MotivicTransfer :=
+noncomputable def motivicTransfer_id (n : Nat) : MotivicTransfer :=
   { sourceDeg := n, targetDeg := n, shift := 0, transferPath := Path.mk [] (by omega) }
 
 /-- 80: Transfer composition respects source degree -/
-def motivicTransfer_comp_degree (t1 t2 : MotivicTransfer)
+noncomputable def motivicTransfer_comp_degree (t1 t2 : MotivicTransfer)
     (h : Path t1.targetDeg t2.sourceDeg) :
     Path (motivicTransfer_comp t1 t2 h).sourceDeg t1.sourceDeg :=
   Path.refl t1.sourceDeg

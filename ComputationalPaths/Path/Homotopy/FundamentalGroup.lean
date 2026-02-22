@@ -20,26 +20,26 @@ abbrev PiOne (A : Type u) (a : A) : Type u :=
   LoopQuot A a
 
 /-- Strict monoid structure carried by `π₁(A, a)`. -/
-abbrev PiOneMonoid (A : Type u) (a : A) : LoopMonoid A a :=
+noncomputable abbrev PiOneMonoid (A : Type u) (a : A) : LoopMonoid A a :=
   loopMonoid A a
 
 /-- Strict group structure carried by `π₁(A, a)`. -/
-abbrev PiOneGroup (A : Type u) (a : A) : LoopGroup A a :=
+noncomputable abbrev PiOneGroup (A : Type u) (a : A) : LoopGroup A a :=
   loopGroup A a
 
 notation "π₁(" A ", " a ")" => PiOne A a
 
 /-- Identity element of `π₁(A, a)`. -/
-@[simp] def PiOne.id {A : Type u} {a : A} : π₁(A, a) :=
+@[simp] noncomputable def PiOne.id {A : Type u} {a : A} : π₁(A, a) :=
   LoopQuot.id (A := A) (a := a)
 
 /-- Group multiplication in `π₁(A, a)` is induced by loop concatenation. -/
-@[simp] def PiOne.mul {A : Type u} {a : A} :
+@[simp] noncomputable def PiOne.mul {A : Type u} {a : A} :
     π₁(A, a) → π₁(A, a) → π₁(A, a) :=
   LoopQuot.comp (A := A) (a := a)
 
 /-- Loop inversion in `π₁(A, a)` comes from reversing paths. -/
-@[simp] def PiOne.inv {A : Type u} {a : A} :
+@[simp] noncomputable def PiOne.inv {A : Type u} {a : A} :
     π₁(A, a) → π₁(A, a) :=
   LoopQuot.inv (A := A) (a := a)
 
@@ -67,17 +67,17 @@ notation "π₁(" A ", " a ")" => PiOne A a
   LoopQuot.comp_inv (A := A) (a := a) x
 
 /-- View a concrete loop as an element of `π₁(A, a)`. -/
-@[simp] def PiOne.ofLoop {A : Type u} {a : A} :
+@[simp] noncomputable def PiOne.ofLoop {A : Type u} {a : A} :
     LoopSpace A a → π₁(A, a) :=
   LoopQuot.ofLoop (A := A) (a := a)
 
 /-- Iterate a fundamental-group element `n` times (natural powers). -/
-@[simp] def PiOne.pow {A : Type u} {a : A} :
+@[simp] noncomputable def PiOne.pow {A : Type u} {a : A} :
     π₁(A, a) → Nat → π₁(A, a) :=
   LoopQuot.pow (A := A) (a := a)
 
 /-- Iterate a fundamental-group element an integer number of times. -/
-@[simp] def PiOne.zpow {A : Type u} {a : A} :
+@[simp] noncomputable def PiOne.zpow {A : Type u} {a : A} :
     π₁(A, a) → Int → π₁(A, a) :=
   LoopQuot.zpow (A := A) (a := a)
 

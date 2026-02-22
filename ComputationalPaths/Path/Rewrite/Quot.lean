@@ -48,7 +48,7 @@ noncomputable def rwEqSetoid (A : Type u) (a b : A) : Setoid (Path a b) where
     (rwEqSetoid A a b).r = rwEqRel A a b :=
   rfl
 
-instance pathRwEqSetoid (A : Type u) (a b : A) :
+noncomputable instance pathRwEqSetoid (A : Type u) (a b : A) :
     Setoid (Path a b) :=
   rwEqSetoid A a b
 
@@ -65,7 +65,7 @@ variable {A : Type u} {a b : A}
 open Quot
 
 /-- Reflexive element in the quotient. -/
-def refl (a : A) : PathRwQuot A a a :=
+noncomputable def refl (a : A) : PathRwQuot A a a :=
   Quot.mk _ (Path.refl a)
 
 /-- Symmetry descends to the quotient. -/
@@ -93,7 +93,7 @@ noncomputable def trans {a b c : A} :
             (rweqProp_of_rweq (rweq_trans_congr_left q (rweq_of_rweqProp hp)))))
 
 /-- Coerce a propositional equality to the path quotient. -/
-@[simp] def ofEq {a b : A} (h : a = b) : PathRwQuot A a b :=
+@[simp] noncomputable def ofEq {a b : A} (h : a = b) : PathRwQuot A a b :=
   Quot.mk _ (Path.stepChain h)
 
 /-- Forget the rewrite trace and recover the underlying equality. -/
@@ -180,12 +180,12 @@ noncomputable def toEq {a b : A} : PathRwQuot A a b → a = b :=
           (Step.trans_assoc (A := A) (p := p) (q := q) (r := r)))))
 
 /-- Paper-style notation `cmpA` for quotient composition. -/
-@[simp] def cmpA {a b c : A} :
+@[simp] noncomputable def cmpA {a b c : A} :
     PathRwQuot A a b → PathRwQuot A b c → PathRwQuot A a c :=
   trans (A := A)
 
 /-- Paper-style notation `invA` for quotient inversion. -/
-@[simp] def invA {a b : A} :
+@[simp] noncomputable def invA {a b : A} :
     PathRwQuot A a b → PathRwQuot A b a :=
   symm (A := A)
 
@@ -229,7 +229,7 @@ noncomputable def toEq {a b : A} : PathRwQuot A a b → a = b :=
     toEq (A := A) (cmpA (A := A) (invA x) x) = rfl := by
   simp
 
-@[simp] def normalPath {a b : A} (x : PathRwQuot A a b) : Path a b :=
+@[simp] noncomputable def normalPath {a b : A} (x : PathRwQuot A a b) : Path a b :=
   Path.stepChain (A := A) (a := a) (b := b) (toEq x)
 
 @[simp] theorem normalPath_isNormal {a b : A}
@@ -242,7 +242,7 @@ noncomputable def toEq {a b : A} : PathRwQuot A a b → a = b :=
     normalPath (A := A) (x := Quot.mk _ p) =
       normalize (A := A) (a := a) (b := b) p := rfl
 
-@[simp] def normalForm {a b : A}
+@[simp] noncomputable def normalForm {a b : A}
     (x : PathRwQuot A a b) : NormalForm A a b :=
   { path := normalPath (A := A) (x := x)
     isNormal := normalPath_isNormal (A := A) (x := x) }
@@ -421,7 +421,7 @@ variable {A : Type u} {B : Type u}
 variable (C : Context A B)
 
 /-- Lift a unary context action to the quotient level. -/
-@[simp] def mapQuot {a b : A} :
+@[simp] noncomputable def mapQuot {a b : A} :
     PathRwQuot A a b → PathRwQuot B (C.fill a) (C.fill b) :=
   Quot.lift
     (fun p => Quot.mk _ (Context.map (A := A) (B := B) C p))
@@ -517,7 +517,7 @@ variable {A : Type u} {B : A → Type u}
 variable (C : DepContext A B)
 
 /-- Lift a dependent context to rewrite-quotiented paths. -/
-@[simp] def mapQuot {a₁ a₂ : A} (x : PathRwQuot A a₁ a₂) :
+@[simp] noncomputable def mapQuot {a₁ a₂ : A} (x : PathRwQuot A a₁ a₂) :
     PathRwQuot (B a₂)
       (Path.transport (A := A) (D := fun a => B a)
         (PathRwQuot.normalPath (A := A) (x := x)) (C.fill a₁))
@@ -556,7 +556,7 @@ variable {A : Type u} {B : Type u} {C : Type u}
 variable (K : BiContext A B C)
 
 /-- Lift substitution along the left hole of a binary context to the quotient level. -/
-@[simp] def mapLeftQuot {a₁ a₂ : A} (b : B) :
+@[simp] noncomputable def mapLeftQuot {a₁ a₂ : A} (b : B) :
     PathRwQuot A a₁ a₂ →
       PathRwQuot C (K.fill a₁ b) (K.fill a₂ b) :=
   Quot.lift
@@ -571,7 +571,7 @@ variable (K : BiContext A B C)
           (p := p) (q := q) (rweq_of_rweqProp h))))
 
 /-- Lift substitution along the right hole of a binary context to the quotient level. -/
-@[simp] def mapRightQuot {b₁ b₂ : B} (a : A) :
+@[simp] noncomputable def mapRightQuot {b₁ b₂ : B} (a : A) :
     PathRwQuot B b₁ b₂ →
       PathRwQuot C (K.fill a b₁) (K.fill a b₂) :=
   Quot.lift
@@ -586,7 +586,7 @@ variable (K : BiContext A B C)
           (p := p) (q := q) (rweq_of_rweqProp h))))
 
 /-- Simultaneously substitute along both holes of a binary context in the quotient. -/
-@[simp] def map2Quot {a₁ a₂ : A} {b₁ b₂ : B}
+@[simp] noncomputable def map2Quot {a₁ a₂ : A} {b₁ b₂ : B}
     (x : PathRwQuot A a₁ a₂) (y : PathRwQuot B b₁ b₂) :
     PathRwQuot C (K.fill a₁ b₁) (K.fill a₂ b₂) :=
   PathRwQuot.cmpA
@@ -760,7 +760,7 @@ variable {A : Type u} {B : Type u} {C : A → B → Type u}
 variable (K : DepBiContext A B C)
 
 /-- Lift left-hole substitution of a dependent bi-context to the rewrite quotient. -/
-@[simp] def mapLeftQuot {a₁ a₂ : A} (b : B)
+@[simp] noncomputable def mapLeftQuot {a₁ a₂ : A} (b : B)
     (x : PathRwQuot A a₁ a₂) :
     PathRwQuot (C a₂ b)
       (Path.transport (A := A) (D := fun a => C a b)
@@ -771,7 +771,7 @@ variable (K : DepBiContext A B C)
       (PathRwQuot.normalPath (A := A) (x := x)) b)
 
 /-- Lift right-hole substitution of a dependent bi-context to the rewrite quotient. -/
-@[simp] def mapRightQuot {b₁ b₂ : B} (a : A)
+@[simp] noncomputable def mapRightQuot {b₁ b₂ : B} (a : A)
     (y : PathRwQuot B b₁ b₂) :
     PathRwQuot (C a b₂)
       (Path.transport (A := B) (D := fun b => C a b)
@@ -782,7 +782,7 @@ variable (K : DepBiContext A B C)
       (PathRwQuot.normalPath (A := B) (x := y)))
 
 /-- Simultaneous substitution for a dependent bi-context in the rewrite quotient. -/
-@[simp] def map2Quot {a₁ a₂ : A} {b₁ b₂ : B}
+@[simp] noncomputable def map2Quot {a₁ a₂ : A} {b₁ b₂ : B}
     (x : PathRwQuot A a₁ a₂) (y : PathRwQuot B b₁ b₂) :
     PathRwQuot (C a₂ b₂)
       (Path.transport (A := B) (D := fun b => C a₂ b)

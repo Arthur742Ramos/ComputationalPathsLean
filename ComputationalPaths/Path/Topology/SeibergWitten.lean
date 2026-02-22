@@ -62,7 +62,7 @@ structure SpinCStructure (X : FourManifold) where
   characteristic : True
 
 /-- The set of Spinᶜ structures is a torsor for H²(X;ℤ). -/
-def spinc_torsor_action {X : FourManifold}
+noncomputable def spinc_torsor_action {X : FourManifold}
     (𝔰 : SpinCStructure X) (h : Int) : SpinCStructure X where
   c1           := 𝔰.c1 + 2 * h
   spinorPlus   := 𝔰.spinorPlus
@@ -87,7 +87,7 @@ structure SpinCCurvature (X : FourManifold) (𝔰 : SpinCStructure X)
   bianchi     : True
 
 /-- Self-dual part F_A⁺ of the curvature. -/
-def selfDualCurvature {X : FourManifold} {𝔰 : SpinCStructure X}
+noncomputable def selfDualCurvature {X : FourManifold} {𝔰 : SpinCStructure X}
     {A : SpinCConnection X 𝔰} (F : SpinCCurvature X 𝔰 A) :
     X.carrier → Int :=
   F.curvForm   -- placeholder (projection to Ω²₊)
@@ -148,7 +148,7 @@ structure SWGaugeTransformation (X : FourManifold) where
   smooth  : True
 
 /-- Gauge action on SW configuration. -/
-def swGaugeAct {X : FourManifold} {𝔰 : SpinCStructure X}
+noncomputable def swGaugeAct {X : FourManifold} {𝔰 : SpinCStructure X}
     (_g : SWGaugeTransformation X)
     (c : SWConfiguration X 𝔰) : SWConfiguration X 𝔰 where
   connection := c.connection   -- abstract g·A
@@ -179,7 +179,7 @@ structure SWModuli (X : FourManifold) (𝔰 : SpinCStructure X) where
   compact     : True
 
 /-- Expected dimension of the SW moduli space. -/
-def swExpectedDim (X : FourManifold) (𝔰 : SpinCStructure X) : Int :=
+noncomputable def swExpectedDim (X : FourManifold) (𝔰 : SpinCStructure X) : Int :=
   (𝔰.c1 * 𝔰.c1 - 2 * X.euler - 3 * X.signature)   -- simplified (missing /4)
 
 /-- Reducible solutions: those with φ = 0 (pure abelian instantons). -/
@@ -279,7 +279,7 @@ structure AdjunctionInequality (X : FourManifold) (SW : SWInvariant X) where
                      selfIntersection + Int.natAbs pairing
 
 /-- The genus bound from the adjunction inequality. -/
-def genusBound (A : AdjunctionInequality X SW) : Int :=
+noncomputable def genusBound (A : AdjunctionInequality X SW) : Int :=
   (A.selfIntersection + Int.natAbs A.pairing + 2) / 2
 
 /-- Adjunction inequality implies the Thom conjecture for CP². -/
@@ -339,18 +339,18 @@ section SWRewrite
 
 variable {X : FourManifold} {𝔰 : SpinCStructure X}
 
-def swRewriteStep (x y : SWConfiguration X 𝔰)
+noncomputable def swRewriteStep (x y : SWConfiguration X 𝔰)
     (h : x = y) : Step (SWConfiguration X 𝔰) :=
   Step.mk x y h
 
-def swDeformationPath (x y : SWConfiguration X 𝔰)
+noncomputable def swDeformationPath (x y : SWConfiguration X 𝔰)
     (h : x = y) : Path x y :=
   Path.stepChain h
 
-def swRewrite {x y : SWConfiguration X 𝔰} (p q : Path x y) : Prop :=
+noncomputable def swRewrite {x y : SWConfiguration X 𝔰} (p q : Path x y) : Prop :=
   ∃ r : Path y y, q = Path.trans p r
 
-def swRewriteConfluent : Prop :=
+noncomputable def swRewriteConfluent : Prop :=
   ∀ {x y : SWConfiguration X 𝔰} (p q₁ q₂ : Path x y),
     swRewrite p q₁ →
     swRewrite p q₂ →

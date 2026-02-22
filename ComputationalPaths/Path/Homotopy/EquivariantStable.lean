@@ -93,7 +93,7 @@ structure BurnsideRing (G : Type u) (S : StrictGroup G) where
   distrib : ∀ _x _y _z : carrier, True
 
 /-- The Burnside ring modeled as the constant Nat ring. -/
-def burnsideRing (G : Type u) (S : StrictGroup G) : BurnsideRing G S where
+noncomputable def burnsideRing (G : Type u) (S : StrictGroup G) : BurnsideRing G S where
   carrier := Nat
   zero := 0
   one := 1
@@ -117,15 +117,15 @@ structure RO (G : Type u) where
 namespace RO
 
 /-- The trivial RO(G) element. -/
-def zero (G : Type u) : RO G :=
+noncomputable def zero (G : Type u) : RO G :=
   { degree := 0 }
 
 /-- Shift the RO(G) degree by one. -/
-def shift {G : Type u} (α : RO G) : RO G :=
+noncomputable def shift {G : Type u} (α : RO G) : RO G :=
   { degree := α.degree + 1 }
 
 /-- Add RO(G) degrees. -/
-def add {G : Type u} (α β : RO G) : RO G :=
+noncomputable def add {G : Type u} (α β : RO G) : RO G :=
   { degree := α.degree + β.degree }
 
 end RO
@@ -155,7 +155,7 @@ structure ROCohomologyTheory (G : Type u) (S : StrictGroup G) where
 namespace ROCohomologyTheory
 
 /-- The trivial RO(G)-graded cohomology theory. -/
-def trivial (G : Type u) (S : StrictGroup G) : ROCohomologyTheory G S :=
+noncomputable def trivial (G : Type u) (S : StrictGroup G) : ROCohomologyTheory G S :=
   { cohomology := fun _ _ => PUnit
     zero := fun _ _ => PUnit.unit
     map := by intro _ _ _ _ _; exact PUnit.unit
@@ -180,7 +180,7 @@ structure TomDieckSplitting {G : Type u} {S : StrictGroup G}
   splitting : ∀ _H : Subgroup G S, True
 
 /-- Trivial tom Dieck splitting witness. -/
-def TomDieckSplitting.trivial {G : Type u} {S : StrictGroup G}
+noncomputable def TomDieckSplitting.trivial {G : Type u} {S : StrictGroup G}
     (E : GenuineGSpectrum G S) : TomDieckSplitting E :=
   { splitting := fun _ => True.intro }
 

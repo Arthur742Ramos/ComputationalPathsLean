@@ -58,17 +58,17 @@ structure DblCat where
 /-! ## Path witnesses for horizontal laws -/
 
 /-- Path witness for horizontal left unit. -/
-def DblCat.hId_comp_path (D : DblCat) {a b : D.Obj} (f : D.HMor a b) :
+noncomputable def DblCat.hId_comp_path (D : DblCat) {a b : D.Obj} (f : D.HMor a b) :
     Path (D.hComp (D.hId a) f) f :=
   Path.stepChain (D.hId_comp f)
 
 /-- Path witness for horizontal right unit. -/
-def DblCat.hComp_id_path (D : DblCat) {a b : D.Obj} (f : D.HMor a b) :
+noncomputable def DblCat.hComp_id_path (D : DblCat) {a b : D.Obj} (f : D.HMor a b) :
     Path (D.hComp f (D.hId b)) f :=
   Path.stepChain (D.hComp_id f)
 
 /-- Path witness for horizontal associativity. -/
-def DblCat.hAssoc_path (D : DblCat) {a b c d : D.Obj}
+noncomputable def DblCat.hAssoc_path (D : DblCat) {a b c d : D.Obj}
     (f : D.HMor a b) (g : D.HMor b c) (h : D.HMor c d) :
     Path (D.hComp (D.hComp f g) h) (D.hComp f (D.hComp g h)) :=
   Path.stepChain (D.hAssoc f g h)
@@ -76,17 +76,17 @@ def DblCat.hAssoc_path (D : DblCat) {a b c d : D.Obj}
 /-! ## Path witnesses for vertical laws -/
 
 /-- Path witness for vertical left unit. -/
-def DblCat.vId_comp_path (D : DblCat) {a b : D.Obj} (f : D.VMor a b) :
+noncomputable def DblCat.vId_comp_path (D : DblCat) {a b : D.Obj} (f : D.VMor a b) :
     Path (D.vComp (D.vId a) f) f :=
   Path.stepChain (D.vId_comp f)
 
 /-- Path witness for vertical right unit. -/
-def DblCat.vComp_id_path (D : DblCat) {a b : D.Obj} (f : D.VMor a b) :
+noncomputable def DblCat.vComp_id_path (D : DblCat) {a b : D.Obj} (f : D.VMor a b) :
     Path (D.vComp f (D.vId b)) f :=
   Path.stepChain (D.vComp_id f)
 
 /-- Path witness for vertical associativity. -/
-def DblCat.vAssoc_path (D : DblCat) {a b c d : D.Obj}
+noncomputable def DblCat.vAssoc_path (D : DblCat) {a b c d : D.Obj}
     (f : D.VMor a b) (g : D.VMor b c) (h : D.VMor c d) :
     Path (D.vComp (D.vComp f g) h) (D.vComp f (D.vComp g h)) :=
   Path.stepChain (D.vAssoc f g h)
@@ -175,17 +175,17 @@ structure DblFunctor (D E : DblCat) where
     vMap (D.vComp f g) = E.vComp (vMap f) (vMap g)
 
 /-- Path witness for horizontal identity preservation. -/
-def DblFunctor.hMap_id_path (F : DblFunctor D E) (a : D.Obj) :
+noncomputable def DblFunctor.hMap_id_path (F : DblFunctor D E) (a : D.Obj) :
     Path (F.hMap (D.hId a)) (E.hId (F.obj a)) :=
   Path.stepChain (F.hMap_id a)
 
 /-- Path witness for vertical identity preservation. -/
-def DblFunctor.vMap_id_path (F : DblFunctor D E) (a : D.Obj) :
+noncomputable def DblFunctor.vMap_id_path (F : DblFunctor D E) (a : D.Obj) :
     Path (F.vMap (D.vId a)) (E.vId (F.obj a)) :=
   Path.stepChain (F.vMap_id a)
 
 /-- Identity double functor. -/
-def DblFunctor.idFunctor (D : DblCat) : DblFunctor D D where
+noncomputable def DblFunctor.idFunctor (D : DblCat) : DblFunctor D D where
   obj := _root_.id
   hMap := fun f => f
   vMap := fun f => f
@@ -226,7 +226,7 @@ structure CompanionData (D : DblCat) {a b : D.Obj}
   isCompanion : D.hComp f (D.hId b) = D.hComp (D.hId a) f
 
 /-- Path witness for the companion relation. -/
-def CompanionData.companion_path {D : DblCat} {a b : D.Obj}
+noncomputable def CompanionData.companion_path {D : DblCat} {a b : D.Obj}
     {f : D.HMor a b} {g : D.VMor a b}
     (C : CompanionData D f g) :
     Path (D.hComp f (D.hId b)) (D.hComp (D.hId a) f) :=
@@ -254,7 +254,7 @@ theorem id_companion (D : DblCat) (a : D.Obj) :
 /-! ## Transport -/
 
 /-- Transport a horizontal morphism along a path on the source. -/
-def transport_hMor_src (D : DblCat) {a₁ a₂ b : D.Obj}
+noncomputable def transport_hMor_src (D : DblCat) {a₁ a₂ b : D.Obj}
     (p : Path a₁ a₂) (f : D.HMor a₁ b) : D.HMor a₂ b :=
   Path.transport (D := fun a => D.HMor a b) p f
 

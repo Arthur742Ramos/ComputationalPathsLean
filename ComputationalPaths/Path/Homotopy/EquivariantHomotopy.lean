@@ -33,14 +33,14 @@ structure GMap {G : Type u} {S : StrictGroup G} (X Y : GSpace G S) where
   equivariant : ∀ g x, toFun (X.action.act g x) = Y.action.act g (toFun x)
 
 /-- Fixed points X^G. -/
-def FixedPoints {G : Type u} {S : StrictGroup G} (X : GSpace G S) : Type u :=
+noncomputable def FixedPoints {G : Type u} {S : StrictGroup G} (X : GSpace G S) : Type u :=
   { x : X.carrier // ∀ g : G, X.action.act g x = x }
 
 
 
 
 /-- Restriction of an equivariant map to fixed points. -/
-def GMap.onFixedPoints {G : Type u} {S : StrictGroup G} {X Y : GSpace G S}
+noncomputable def GMap.onFixedPoints {G : Type u} {S : StrictGroup G} {X Y : GSpace G S}
     (f : GMap X Y) : FixedPoints X → FixedPoints Y
   | ⟨x, hx⟩ => ⟨f.toFun x, fun g => by rw [← f.equivariant, hx g]⟩
 
@@ -54,13 +54,13 @@ structure BorelData (G : Type u) (S : StrictGroup G) where
   contractible : ∀ x y : eg.carrier, x = y
 
 /-- The Borel construction EG ×_G X as a quotient by the diagonal action relation. -/
-def BorelSpace {G : Type u} {S : StrictGroup G}
+noncomputable def BorelSpace {G : Type u} {S : StrictGroup G}
     (bd : BorelData G S) (X : GSpace G S) : Type u :=
   Quot (fun (p q : bd.eg.carrier × X.carrier) =>
     ∃ g : G, bd.eg.action.act g p.1 = q.1 ∧ X.action.act g p.2 = q.2)
 
 /-- Map into the Borel quotient. -/
-def BorelSpace.mk {G : Type u} {S : StrictGroup G}
+noncomputable def BorelSpace.mk {G : Type u} {S : StrictGroup G}
     (bd : BorelData G S) (X : GSpace G S) :
     bd.eg.carrier × X.carrier → BorelSpace bd X :=
   fun p => Quot.mk _ p

@@ -29,28 +29,28 @@ noncomputable section
 abbrev Loop (A : Type u) (a : A) : Type u := Path a a
 
 /-- `Fₙ`: loops with at most `n` recorded rewrite steps. -/
-def Filtration (A : Type u) (a : A) (n : Nat) : Type u :=
+noncomputable def Filtration (A : Type u) (a : A) (n : Nat) : Type u :=
   { p : Loop A a // Path.length p ≤ n }
 
 /-- Canonical inclusion `Fₙ ↪ Fₙ₊₁`. -/
-def filtrationIncl {A : Type u} {a : A} (n : Nat) :
+noncomputable def filtrationIncl {A : Type u} {a : A} (n : Nat) :
     Filtration A a n → Filtration A a (n + 1)
   | ⟨p, hp⟩ => ⟨p, Nat.le_trans hp (Nat.le_succ n)⟩
 
 /-- Reflexive loop always belongs to every filtration stage. -/
-def reflInFiltration (A : Type u) (a : A) (n : Nat) : Filtration A a n :=
+noncomputable def reflInFiltration (A : Type u) (a : A) (n : Nat) : Filtration A a n :=
   ⟨Path.refl a, by simp⟩
 
 /-- Exact-length loops used for the associated graded piece. -/
-def ExactLengthLoop (A : Type u) (a : A) (n : Nat) : Type u :=
+noncomputable def ExactLengthLoop (A : Type u) (a : A) (n : Nat) : Type u :=
   { p : Loop A a // Path.length p = n }
 
 /-- `Grₙ` relation: exact-length loops modulo `RwEq`. -/
-def gradedRel {A : Type u} {a : A} {n : Nat}
+noncomputable def gradedRel {A : Type u} {a : A} {n : Nat}
     (x y : ExactLengthLoop A a n) : Prop :=
   Nonempty (RwEq x.1 y.1)
 
-def gradedSetoid (A : Type u) (a : A) (n : Nat) : Setoid (ExactLengthLoop A a n) where
+noncomputable def gradedSetoid (A : Type u) (a : A) (n : Nat) : Setoid (ExactLengthLoop A a n) where
   r := gradedRel (A := A) (a := a) (n := n)
   iseqv :=
     { refl := by
@@ -71,7 +71,7 @@ abbrev Gr (A : Type u) (a : A) (n : Nat) : Type u :=
   Quot (gradedSetoid A a n).r
 
 /-- A representative for `Grₙ` defines a degree-1 chain in `HomologicalAlgebra`. -/
-def toOneCell {A : Type u} {a : A} {n : Nat}
+noncomputable def toOneCell {A : Type u} {a : A} {n : Nat}
     (x : ExactLengthLoop A a n) : C1 A :=
   ⟨a, a, x.1⟩
 
@@ -89,7 +89,7 @@ abbrev E1Entry (A : Type u) (a : A) (p q : Nat) : Type u :=
   simp [E1Entry]
 
 /-- `E₁` maps to `H₁` via the chain complex quotient from `HomologicalAlgebra`. -/
-def e1ToH1 {A : Type u} {a : A} (n : Nat) :
+noncomputable def e1ToH1 {A : Type u} {a : A} (n : Nat) :
     Gr A a n → H1 A a :=
   Quot.lift
     (fun x : ExactLengthLoop A a n => Quot.mk _ x.1)
@@ -103,7 +103,7 @@ def e1ToH1 {A : Type u} {a : A} (n : Nat) :
   rfl
 
 /-- Representative-level `d₁`: compose with unit path on the left. -/
-def d1Rep {A : Type u} {a : A} {n : Nat}
+noncomputable def d1Rep {A : Type u} {a : A} {n : Nat}
     (x : ExactLengthLoop A a n) : ExactLengthLoop A a n :=
   ⟨Path.trans (Path.refl a) x.1, by
       simpa using x.2⟩
@@ -115,14 +115,14 @@ theorem d1Rep_step {A : Type u} {a : A} {n : Nat}
   simpa [d1Rep] using (Step.trans_refl_left x.1)
 
 /-- Hence `d₁` preserves classes modulo `RwEq`. -/
-def d1Rep_respects_rweq {A : Type u} {a : A} {n : Nat}
+noncomputable def d1Rep_respects_rweq {A : Type u} {a : A} {n : Nat}
     {x y : ExactLengthLoop A a n} (h : RwEq x.1 y.1) :
     RwEq (d1Rep x).1 (d1Rep y).1 := by
   change RwEq (Path.trans (Path.refl a) x.1) (Path.trans (Path.refl a) y.1)
   exact rweq_trans_congr_right (Path.refl a) h
 
 /-- Differential `d₁ : E₁^{n,0} → E₁^{n,0}`. -/
-def d1 {A : Type u} {a : A} (n : Nat) :
+noncomputable def d1 {A : Type u} {a : A} (n : Nat) :
     Gr A a n → Gr A a n :=
   Quot.lift
     (fun x : ExactLengthLoop A a n => Quot.mk _ (d1Rep x))
@@ -135,12 +135,12 @@ def d1 {A : Type u} {a : A} (n : Nat) :
 abbrev E2 (A : Type u) (a : A) : Type u := H1 A a
 
 /-- Convergence statement `E₂ ≃ π₁` via the existing `H₁ ≃ π₁` theorem. -/
-def e2ConvergesToPi1 (A : Type u) (a : A) :
+noncomputable def e2ConvergesToPi1 (A : Type u) (a : A) :
     SimpleEquiv (E2 A a) (π₁(A, a)) :=
   h1EquivPi1 A a
 
 /-- Collapse criterion at `E₂`: every `RwEq` pair has a common `Rw` reduct. -/
-def CollapsesAtE2 (A : Type u) (a : A) : Prop :=
+noncomputable def CollapsesAtE2 (A : Type u) (a : A) : Prop :=
   ∀ p q : Loop A a, RwEq p q → ∃ m, Rw p m ∧ Rw q m
 
 /-- Confluence gives collapse at `E₂` (Church-Rosser on loops). -/

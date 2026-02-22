@@ -37,7 +37,7 @@ universe u
 /-! ## Whitehead Product -/
 
 /-- Whitehead product on computational-path homotopy groups. -/
-def whiteheadProduct {m n : Nat} {A : Type u} {a : A} :
+noncomputable def whiteheadProduct {m n : Nat} {A : Type u} {a : A} :
     PiN m A a → PiN n A a → PiN (m + n - 1) A a :=
   match m, n with
   | 1, 1 => fun x y => LoopGroupAlgebra.commutator (A := A) (a := a) x y
@@ -93,7 +93,7 @@ theorem whitehead_self_pi1 {A : Type u} {a : A}
 
 /-- Graded sign for the antisymmetry of the Whitehead product.
     In the (1,1) case, the sign is -1 (mn = 1). -/
-def gradedSign (m n : Nat) : Int :=
+noncomputable def gradedSign (m n : Nat) : Int :=
   if (m * n) % 2 = 0 then 1 else -1
 
 /-- The graded sign for (1,1) is -1. -/
@@ -143,7 +143,7 @@ theorem whitehead_conj_invariant {A : Type u} {a : A}
 /-! ## Iterated Whitehead Products -/
 
 /-- Iterated Whitehead product (left-associated) on π₁. -/
-def iteratedWhitehead {A : Type u} {a : A} :
+noncomputable def iteratedWhitehead {A : Type u} {a : A} :
     (n : Nat) → PiN 1 A a → PiN 1 A a → PiN 1 A a
   | 0 => fun _ _ => piN_one 1 a
   | 1 => fun x y => whiteheadProduct (m := 1) (n := 1) x y
@@ -190,7 +190,7 @@ structure WhiteheadAlgebra (A : Type u) (a : A) where
   self_trivial : ∀ x, product x x = piN_one 1 a
 
 /-- The canonical Whitehead algebra structure on any type. -/
-def canonicalWhiteheadAlgebra (A : Type u) (a : A) : WhiteheadAlgebra A a where
+noncomputable def canonicalWhiteheadAlgebra (A : Type u) (a : A) : WhiteheadAlgebra A a where
   product := whiteheadProduct (m := 1) (n := 1)
   product_eq := fun _ _ => rfl
   id_left := fun y => whitehead_identity_left_pi1 y
@@ -200,14 +200,14 @@ def canonicalWhiteheadAlgebra (A : Type u) (a : A) : WhiteheadAlgebra A a where
 /-! ## Path Coherence -/
 
 /-- Path witness that the Whitehead product of identities is the identity. -/
-def whitehead_id_id_path {A : Type u} {a : A} :
+noncomputable def whitehead_id_id_path {A : Type u} {a : A} :
     Path
       (whiteheadProduct (m := 1) (n := 1) (A := A) (a := a) (piN_one 1 a) (piN_one 1 a))
       (piN_one 1 a) :=
   Path.stepChain (whitehead_self_pi1 (piN_one 1 a))
 
 /-- Path witness that the Whitehead product equals the commutator. -/
-def whitehead_commutator_path {A : Type u} {a : A}
+noncomputable def whitehead_commutator_path {A : Type u} {a : A}
     (x y : PiN 1 A a) :
     Path
       (whiteheadProduct (m := 1) (n := 1) x y)
@@ -215,7 +215,7 @@ def whitehead_commutator_path {A : Type u} {a : A}
   Path.refl _
 
 /-- Path witness that conjugation is compatible with the Whitehead product. -/
-def whitehead_conj_path {A : Type u} {a : A}
+noncomputable def whitehead_conj_path {A : Type u} {a : A}
     (g x y : PiN 1 A a) :
     Path
       (LoopGroupAlgebra.conj (A := A) (a := a) g
@@ -276,7 +276,7 @@ structure WhiteheadNatural {A : Type u} {B : Type u} {a : A} {b : B}
 
 /-- The n-th term of the lower central series of π₁, defined via iterated
     Whitehead products. -/
-def lowerCentralTerm {A : Type u} {a : A}
+noncomputable def lowerCentralTerm {A : Type u} {a : A}
     (n : Nat) (S : List (PiN 1 A a)) : List (PiN 1 A a) :=
   match n with
   | 0 => S

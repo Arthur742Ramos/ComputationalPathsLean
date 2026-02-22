@@ -81,15 +81,15 @@ inductive PTPath : SeqFormula → SeqFormula → Type where
 
 namespace PTPath
 
-def trans : PTPath A B → PTPath B C → PTPath A C
+noncomputable def trans : PTPath A B → PTPath B C → PTPath A C
   | .nil, q => q
   | .cons s p, q => .cons s (trans p q)
 
-def symm : PTPath A B → PTPath B A
+noncomputable def symm : PTPath A B → PTPath B A
   | .nil => .nil
   | .cons s p => trans (symm p) (.cons (.symm s) .nil)
 
-def congrArg (f : SeqFormula → SeqFormula) : PTPath A B → PTPath (f A) (f B)
+noncomputable def congrArg (f : SeqFormula → SeqFormula) : PTPath A B → PTPath (f A) (f B)
   | .nil => .nil
   | .cons s p => .cons (.congrArg f s) (congrArg f p)
 
@@ -100,193 +100,193 @@ end PTPath
 -- ============================================================================
 
 -- 1. Cut elimination: atomic cut reduces to unit
-def cut_atom_elimination (n : Nat) :
+noncomputable def cut_atom_elimination (n : Nat) :
     PTPath (SeqFormula.conj (SeqFormula.atom n) (SeqFormula.neg (SeqFormula.atom n))) SeqFormula.unit :=
   .cons .cutAtom .nil
 
 -- 2. Cut on conjunction decomposes
-def cut_conj_decompose (A B : SeqFormula) :
+noncomputable def cut_conj_decompose (A B : SeqFormula) :
     PTPath (SeqFormula.conj (SeqFormula.conj A B) (SeqFormula.neg (SeqFormula.conj A B)))
            (SeqFormula.conj (SeqFormula.conj A (SeqFormula.neg A)) (SeqFormula.conj B (SeqFormula.neg B))) :=
   .cons .cutConj .nil
 
 -- 3. Hauptsatz weakening
-def hauptsatz_weakening (A : SeqFormula) :
+noncomputable def hauptsatz_weakening (A : SeqFormula) :
     PTPath (SeqFormula.conj A SeqFormula.unit) A :=
   .cons .hauptsatzWeaken .nil
 
 -- 4. Hauptsatz contraction
-def hauptsatz_contraction (A : SeqFormula) :
+noncomputable def hauptsatz_contraction (A : SeqFormula) :
     PTPath (SeqFormula.conj A A) A :=
   .cons .hauptsatzContract .nil
 
 -- 5. Hauptsatz exchange (commutativity of conjunction)
-def hauptsatz_exchange (A B : SeqFormula) :
+noncomputable def hauptsatz_exchange (A B : SeqFormula) :
     PTPath (SeqFormula.conj A B) (SeqFormula.conj B A) :=
   .cons .hauptsatzExchange .nil
 
 -- 6. Double exchange is identity path
-def exchange_involution (A B : SeqFormula) :
+noncomputable def exchange_involution (A B : SeqFormula) :
     PTPath (SeqFormula.conj A B) (SeqFormula.conj A B) :=
   .cons .hauptsatzExchange (.cons .hauptsatzExchange .nil)
 
 -- 7. Weakening after contraction
-def contract_then_weaken (A : SeqFormula) :
+noncomputable def contract_then_weaken (A : SeqFormula) :
     PTPath (SeqFormula.conj (SeqFormula.conj A A) SeqFormula.unit) A :=
   .cons .hauptsatzWeaken (.cons .hauptsatzContract .nil)
 
 -- 8. Tensor-par duality in linear logic
-def tensor_par_duality (A B : SeqFormula) :
+noncomputable def tensor_par_duality (A B : SeqFormula) :
     PTPath (SeqFormula.tensor A B) (SeqFormula.neg (SeqFormula.par (SeqFormula.neg A) (SeqFormula.neg B))) :=
   .cons .tensorPar .nil
 
 -- 9. Bang dereliction
-def bang_dereliction (A : SeqFormula) :
+noncomputable def bang_dereliction (A : SeqFormula) :
     PTPath (SeqFormula.bang A) A :=
   .cons .bangDereliction .nil
 
 -- 10. Bang contraction
-def bang_contraction (A : SeqFormula) :
+noncomputable def bang_contraction (A : SeqFormula) :
     PTPath (SeqFormula.bang A) (SeqFormula.tensor (SeqFormula.bang A) (SeqFormula.bang A)) :=
   .cons .bangContraction .nil
 
 -- 11. Bang weakening
-def bang_weakening (A : SeqFormula) :
+noncomputable def bang_weakening (A : SeqFormula) :
     PTPath (SeqFormula.bang A) SeqFormula.unit :=
   .cons .bangWeakening .nil
 
 -- 12. Quest-bang duality
-def quest_bang_duality (A : SeqFormula) :
+noncomputable def quest_bang_duality (A : SeqFormula) :
     PTPath (SeqFormula.quest A) (SeqFormula.neg (SeqFormula.bang (SeqFormula.neg A))) :=
   .cons .questDual .nil
 
 -- 13. Double negation elimination
-def double_negation_elim (A : SeqFormula) :
+noncomputable def double_negation_elim (A : SeqFormula) :
     PTPath (SeqFormula.neg (SeqFormula.neg A)) A :=
   .cons .dneg .nil
 
 -- 14. De Morgan's law as path
-def de_morgan_conj (A B : SeqFormula) :
+noncomputable def de_morgan_conj (A B : SeqFormula) :
     PTPath (SeqFormula.neg (SeqFormula.conj A B))
            (SeqFormula.disj (SeqFormula.neg A) (SeqFormula.neg B)) :=
   .cons .deMorgan .nil
 
 -- 15. GoI composition (trace)
-def goi_composition (A B C : SeqFormula) :
+noncomputable def goi_composition (A B C : SeqFormula) :
     PTPath (SeqFormula.tensor (SeqFormula.impl A B) (SeqFormula.impl B C))
            (SeqFormula.impl A C) :=
   .cons .goiTrace .nil
 
 -- 16. GoI execution
-def goi_execution (A B : SeqFormula) :
+noncomputable def goi_execution (A B : SeqFormula) :
     PTPath (SeqFormula.tensor A (SeqFormula.impl A B)) B :=
   .cons .goiExec .nil
 
 -- 17. Deep inference switch rule
-def deep_switch (A B C : SeqFormula) :
+noncomputable def deep_switch (A B C : SeqFormula) :
     PTPath (SeqFormula.conj A (SeqFormula.disj B C))
            (SeqFormula.disj (SeqFormula.conj A B) C) :=
   .cons .deepSwitch .nil
 
 -- 18. Deep inference medial rule
-def deep_medial (A B C D : SeqFormula) :
+noncomputable def deep_medial (A B C D : SeqFormula) :
     PTPath (SeqFormula.conj (SeqFormula.disj A B) (SeqFormula.disj C D))
            (SeqFormula.disj (SeqFormula.conj A C) (SeqFormula.conj B D)) :=
   .cons .deepMedial .nil
 
 -- 19. Focus then blur for disjunction
-def focus_blur_positive (A : SeqFormula) :
+noncomputable def focus_blur_positive (A : SeqFormula) :
     PTPath (SeqFormula.disj A SeqFormula.unit) A :=
   .cons .blurPositive .nil
 
 -- 20. Bang dereliction then contraction chain
-def bang_derelict_via_contraction (A : SeqFormula) :
+noncomputable def bang_derelict_via_contraction (A : SeqFormula) :
     PTPath (SeqFormula.bang A) (SeqFormula.tensor (SeqFormula.bang A) (SeqFormula.bang A)) :=
   .cons .bangContraction .nil
 
 -- 21. Congruence: negation distributes through path
-def neg_congruence (A B : SeqFormula) (p : PTPath A B) :
+noncomputable def neg_congruence (A B : SeqFormula) (p : PTPath A B) :
     PTPath (SeqFormula.neg A) (SeqFormula.neg B) :=
   PTPath.congrArg SeqFormula.neg p
 
 -- 22. Congruence: conjunction left
-def conj_left_congruence (A B C : SeqFormula) (p : PTPath A B) :
+noncomputable def conj_left_congruence (A B C : SeqFormula) (p : PTPath A B) :
     PTPath (SeqFormula.conj A C) (SeqFormula.conj B C) :=
   PTPath.congrArg (fun x => SeqFormula.conj x C) p
 
 -- 23. Congruence: conjunction right
-def conj_right_congruence (A B C : SeqFormula) (p : PTPath B C) :
+noncomputable def conj_right_congruence (A B C : SeqFormula) (p : PTPath B C) :
     PTPath (SeqFormula.conj A B) (SeqFormula.conj A C) :=
   PTPath.congrArg (fun x => SeqFormula.conj A x) p
 
 -- 24. Congruence: disjunction left
-def disj_left_congruence (A B C : SeqFormula) (p : PTPath A B) :
+noncomputable def disj_left_congruence (A B C : SeqFormula) (p : PTPath A B) :
     PTPath (SeqFormula.disj A C) (SeqFormula.disj B C) :=
   PTPath.congrArg (fun x => SeqFormula.disj x C) p
 
 -- 25. Congruence: bang
-def bang_congruence (A B : SeqFormula) (p : PTPath A B) :
+noncomputable def bang_congruence (A B : SeqFormula) (p : PTPath A B) :
     PTPath (SeqFormula.bang A) (SeqFormula.bang B) :=
   PTPath.congrArg SeqFormula.bang p
 
 -- 26. Symmetry of exchange path
-def exchange_symm (A B : SeqFormula) :
+noncomputable def exchange_symm (A B : SeqFormula) :
     PTPath (SeqFormula.conj B A) (SeqFormula.conj A B) :=
   PTPath.symm (hauptsatz_exchange A B)
 
 -- 27. Cut elimination + weakening chain
-def cut_atom_then_weaken (n : Nat) (_X : SeqFormula) :
+noncomputable def cut_atom_then_weaken (n : Nat) (_X : SeqFormula) :
     PTPath (SeqFormula.conj (SeqFormula.conj (SeqFormula.atom n) (SeqFormula.neg (SeqFormula.atom n))) SeqFormula.unit)
            (SeqFormula.conj (SeqFormula.atom n) (SeqFormula.neg (SeqFormula.atom n))) :=
   .cons .hauptsatzWeaken .nil
 
 -- 28. Triple negation reduces to single negation
-def triple_neg_reduce (A : SeqFormula) :
+noncomputable def triple_neg_reduce (A : SeqFormula) :
     PTPath (SeqFormula.neg (SeqFormula.neg (SeqFormula.neg A))) (SeqFormula.neg A) :=
   PTPath.congrArg SeqFormula.neg (.cons .dneg .nil)
 
 -- 29. De Morgan + double negation chain
-def de_morgan_dneg (A B : SeqFormula) :
+noncomputable def de_morgan_dneg (A B : SeqFormula) :
     PTPath (SeqFormula.neg (SeqFormula.conj (SeqFormula.neg (SeqFormula.neg A)) B))
            (SeqFormula.disj (SeqFormula.neg (SeqFormula.neg (SeqFormula.neg A))) (SeqFormula.neg B)) :=
   .cons .deMorgan .nil
 
 -- 30. GoI: compose then execute
-def goi_compose_execute (A B C : SeqFormula) :
+noncomputable def goi_compose_execute (A B C : SeqFormula) :
     PTPath (SeqFormula.tensor A (SeqFormula.tensor (SeqFormula.impl A B) (SeqFormula.impl B C)))
            (SeqFormula.tensor A (SeqFormula.impl A C)) :=
   PTPath.congrArg (fun x => SeqFormula.tensor A x) (.cons .goiTrace .nil)
 
 -- 31. Deep switch under negation
-def deep_switch_neg (A B C : SeqFormula) :
+noncomputable def deep_switch_neg (A B C : SeqFormula) :
     PTPath (SeqFormula.neg (SeqFormula.conj A (SeqFormula.disj B C)))
            (SeqFormula.neg (SeqFormula.disj (SeqFormula.conj A B) C)) :=
   PTPath.congrArg SeqFormula.neg (.cons .deepSwitch .nil)
 
 -- 32. Linear composition: tensor associativity simulation
-def linear_compose_chain (A B C : SeqFormula) :
+noncomputable def linear_compose_chain (A B C : SeqFormula) :
     PTPath (SeqFormula.tensor (SeqFormula.impl A B) (SeqFormula.impl B C))
            (SeqFormula.impl A C) :=
   .cons .goiTrace .nil
 
 -- 33. Focalization: positive formula chain
-def focalization_positive_chain (A B : SeqFormula) :
+noncomputable def focalization_positive_chain (A B : SeqFormula) :
     PTPath (SeqFormula.disj (SeqFormula.disj A B) SeqFormula.unit)
            (SeqFormula.disj A B) :=
   .cons .blurPositive .nil
 
 -- 34. NbE reify-reflect roundtrip
-def nbe_roundtrip (A : SeqFormula) :
+noncomputable def nbe_roundtrip (A : SeqFormula) :
     PTPath A A :=
   .cons .nbeReify (.cons .nbeReflect .nil)
 
 -- 35. NbE under congruence
-def nbe_congruence (A B : SeqFormula) :
+noncomputable def nbe_congruence (A B : SeqFormula) :
     PTPath (SeqFormula.conj A B) (SeqFormula.conj A B) :=
   PTPath.congrArg (fun x => SeqFormula.conj x B) (.cons .nbeReify (.cons .nbeReflect .nil))
 
 -- 36. Bang weakening then dereliction (on different parts)
-def bang_structural_chain (A B : SeqFormula) :
+noncomputable def bang_structural_chain (A B : SeqFormula) :
     PTPath (SeqFormula.tensor (SeqFormula.bang A) (SeqFormula.bang B))
            (SeqFormula.tensor SeqFormula.unit B) :=
   PTPath.trans
@@ -294,53 +294,53 @@ def bang_structural_chain (A B : SeqFormula) :
     (PTPath.congrArg (fun x => SeqFormula.tensor SeqFormula.unit x) (.cons .bangDereliction .nil))
 
 -- 37. Deep medial under negation
-def deep_medial_neg (A B C D : SeqFormula) :
+noncomputable def deep_medial_neg (A B C D : SeqFormula) :
     PTPath (SeqFormula.neg (SeqFormula.conj (SeqFormula.disj A B) (SeqFormula.disj C D)))
            (SeqFormula.neg (SeqFormula.disj (SeqFormula.conj A C) (SeqFormula.conj B D))) :=
   PTPath.congrArg SeqFormula.neg (.cons .deepMedial .nil)
 
 -- 38. Sequent structural: exchange + contraction
-def exchange_contract (A : SeqFormula) :
+noncomputable def exchange_contract (A : SeqFormula) :
     PTPath (SeqFormula.conj A A) A :=
   .cons .hauptsatzContract .nil
 
 -- 39. Quest duality chain: quest then double negation
-def quest_chain (A : SeqFormula) :
+noncomputable def quest_chain (A : SeqFormula) :
     PTPath (SeqFormula.quest (SeqFormula.neg (SeqFormula.neg A)))
            (SeqFormula.neg (SeqFormula.bang (SeqFormula.neg (SeqFormula.neg (SeqFormula.neg A))))) :=
   .cons .questDual .nil
 
 -- 40. Tensor-par + de Morgan combined
-def tensor_par_de_morgan (A B : SeqFormula) :
+noncomputable def tensor_par_de_morgan (A B : SeqFormula) :
     PTPath (SeqFormula.neg (SeqFormula.tensor A B))
            (SeqFormula.neg (SeqFormula.neg (SeqFormula.par (SeqFormula.neg A) (SeqFormula.neg B)))) :=
   PTPath.congrArg SeqFormula.neg (.cons .tensorPar .nil)
 
 -- 41. Deep switch + exchange chain
-def deep_switch_exchange (A B C : SeqFormula) :
+noncomputable def deep_switch_exchange (A B C : SeqFormula) :
     PTPath (SeqFormula.conj A (SeqFormula.disj B C))
            (SeqFormula.disj (SeqFormula.conj A B) C) :=
   .cons .deepSwitch .nil
 
 -- 42. Proof net correctness: tensor-par switching
-def proof_net_switching (A B : SeqFormula) :
+noncomputable def proof_net_switching (A B : SeqFormula) :
     PTPath (SeqFormula.tensor A B)
            (SeqFormula.neg (SeqFormula.par (SeqFormula.neg A) (SeqFormula.neg B))) :=
   .cons .tensorPar .nil
 
 -- 43. Ludics: interaction as GoI execution
-def ludics_interaction (A B : SeqFormula) :
+noncomputable def ludics_interaction (A B : SeqFormula) :
     PTPath (SeqFormula.tensor A (SeqFormula.impl A B)) B :=
   .cons .goiExec .nil
 
 -- 44. Transcendental syntax: type as behavior
-def transcendental_type_behavior (A : SeqFormula) :
+noncomputable def transcendental_type_behavior (A : SeqFormula) :
     PTPath (SeqFormula.bang (SeqFormula.impl A A))
            (SeqFormula.impl A A) :=
   .cons .bangDereliction .nil
 
 -- 45. Contraction under congruence
-def contraction_congruence (A B : SeqFormula) :
+noncomputable def contraction_congruence (A B : SeqFormula) :
     PTPath (SeqFormula.conj (SeqFormula.conj A A) B)
            (SeqFormula.conj A B) :=
   PTPath.congrArg (fun x => SeqFormula.conj x B) (.cons .hauptsatzContract .nil)

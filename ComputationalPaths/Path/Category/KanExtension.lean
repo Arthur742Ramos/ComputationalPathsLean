@@ -20,14 +20,14 @@ namespace PathCategoryFunctor
 variable {A B C : Type u}
 
 /-- Identity path-category functor. -/
-def id (A : Type u) : PathCategoryFunctor A A where
+noncomputable def id (A : Type u) : PathCategoryFunctor A A where
   obj := fun a => a
   map := fun {a b} p => p
   map_id := by intro a; rfl
   map_comp := by intro a b c p q; rfl
 
 /-- Composition of path-category functors. -/
-def comp (F : PathCategoryFunctor A B) (G : PathCategoryFunctor B C) :
+noncomputable def comp (F : PathCategoryFunctor A B) (G : PathCategoryFunctor B C) :
     PathCategoryFunctor A C where
   obj := fun a => G.obj (F.obj a)
   map := fun {a b} p => G.map (F.map p)
@@ -49,7 +49,7 @@ namespace PathNatTrans
 variable {A : Type u}
 
 /-- Vertical composition of natural transformations. -/
-def vcomp {F G H : PathFunctor.{u, v} (A := A)}
+noncomputable def vcomp {F G H : PathFunctor.{u, v} (A := A)}
     (η : PathNatTrans F G) (θ : PathNatTrans G H) :
     PathNatTrans F H where
   app := fun a x => θ.app a (η.app a x)
@@ -63,7 +63,7 @@ def vcomp {F G H : PathFunctor.{u, v} (A := A)}
         rw [η.naturality (p := p) (x := x)]
 
 /-- Whisker a natural transformation by precomposition. -/
-def precompose {A B : Type u} (F : PathCategoryFunctor A B)
+noncomputable def precompose {A B : Type u} (F : PathCategoryFunctor A B)
     {G H : PathFunctor.{u, v} (A := B)} (η : PathNatTrans G H) :
     PathNatTrans (PathFunctor.precompose F G) (PathFunctor.precompose F H) where
   app := fun a x => η.app (F.obj a) x
@@ -78,7 +78,7 @@ end PathNatTrans
 variable {A B C : Type u}
 
 /-- Repackage natural transformations against precomposition by the identity functor. -/
-def precomposeIdEquiv (G M : PathFunctor.{u, v} (A := A)) :
+noncomputable def precomposeIdEquiv (G M : PathFunctor.{u, v} (A := A)) :
     SimpleEquiv (PathNatTrans G M)
       (PathNatTrans G (PathFunctor.precompose (PathCategoryFunctor.id A) M)) where
   toFun := fun η =>
@@ -91,7 +91,7 @@ def precomposeIdEquiv (G M : PathFunctor.{u, v} (A := A)) :
   right_inv := by intro η; apply PathNatTrans.ext; intro a; rfl
 
 /-- Repackage natural transformations with domain precomposed by the identity functor. -/
-def precomposeIdEquivDom (G M : PathFunctor.{u, v} (A := A)) :
+noncomputable def precomposeIdEquivDom (G M : PathFunctor.{u, v} (A := A)) :
     SimpleEquiv (PathNatTrans M G)
       (PathNatTrans (PathFunctor.precompose (PathCategoryFunctor.id A) M) G) where
   toFun := fun η =>
@@ -139,7 +139,7 @@ abbrev pointwiseRightKanExtension (F : PathCategoryFunctor A B)
   pointwiseRightKan F G
 
 /-- The identity functor admits a left Kan extension given by itself. -/
-def leftKanExtension_id (G : PathFunctor.{u, v} (A := A)) :
+noncomputable def leftKanExtension_id (G : PathFunctor.{u, v} (A := A)) :
     LeftKanExtension (PathCategoryFunctor.id A) G where
   lan := G
   unit :=
@@ -148,7 +148,7 @@ def leftKanExtension_id (G : PathFunctor.{u, v} (A := A)) :
   universal := fun M => precomposeIdEquiv (G := G) (M := M)
 
 /-- The identity functor admits a right Kan extension given by itself. -/
-def rightKanExtension_id (G : PathFunctor.{u, v} (A := A)) :
+noncomputable def rightKanExtension_id (G : PathFunctor.{u, v} (A := A)) :
     RightKanExtension (PathCategoryFunctor.id A) G where
   ran := G
   counit :=

@@ -46,13 +46,13 @@ structure Signature where
 -- ============================================================================
 
 /-- Binary operation on a carrier -/
-def BinOp (A : Type u) := A -> A -> A
+noncomputable def BinOp (A : Type u) := A -> A -> A
 
 /-- Unary operation on a carrier -/
-def UnOp (A : Type u) := A -> A
+noncomputable def UnOp (A : Type u) := A -> A
 
 /-- Nullary operation (constant) -/
-def NullOp (A : Type u) := A
+noncomputable def NullOp (A : Type u) := A
 
 -- ============================================================================
 -- Section 3: Homomorphisms
@@ -69,24 +69,24 @@ structure UnHom (A B : Type u) (opA : UnOp A) (opB : UnOp B) where
   preserves : (x : A) -> Path (fn (opA x)) (opB (fn x))
 
 /-- Theorem 1: Identity is a binary homomorphism -/
-def idBinHom (A : Type u) (op : BinOp A) : BinHom A A op op :=
+noncomputable def idBinHom (A : Type u) (op : BinOp A) : BinHom A A op op :=
   { fn := id
     preserves := fun _ _ => refl _ }
 
 /-- Theorem 2: Identity is a unary homomorphism -/
-def idUnHom (A : Type u) (op : UnOp A) : UnHom A A op op :=
+noncomputable def idUnHom (A : Type u) (op : UnOp A) : UnHom A A op op :=
   { fn := id
     preserves := fun _ => refl _ }
 
 /-- Theorem 3: Composition of binary homomorphisms -/
-def compBinHom {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
+noncomputable def compBinHom {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
     (g : BinHom B C opB opC) (f : BinHom A B opA opB) : BinHom A C opA opC :=
   { fn := g.fn ∘ f.fn
     preserves := fun x y =>
       Path.trans (congrArg g.fn (f.preserves x y)) (g.preserves (f.fn x) (f.fn y)) }
 
 /-- Theorem 4: Composition of unary homomorphisms -/
-def compUnHom {A B C : Type u} {opA : UnOp A} {opB : UnOp B} {opC : UnOp C}
+noncomputable def compUnHom {A B C : Type u} {opA : UnOp A} {opB : UnOp B} {opC : UnOp C}
     (g : UnHom B C opB opC) (f : UnHom A B opA opB) : UnHom A C opA opC :=
   { fn := g.fn ∘ f.fn
     preserves := fun x =>
@@ -105,17 +105,17 @@ structure MonoidAlg (A : Type u) where
   right_unit : (x : A) -> Path (op x e) x
 
 /-- Theorem 5: Path coherence for double left unit -/
-def doubleLeftUnit {A : Type u} (M : MonoidAlg A) (x : A) :
+noncomputable def doubleLeftUnit {A : Type u} (M : MonoidAlg A) (x : A) :
     Path (M.op M.e (M.op M.e x)) x :=
   Path.trans (M.left_unit (M.op M.e x)) (M.left_unit x)
 
 /-- Theorem 6: Path coherence for double right unit -/
-def doubleRightUnit {A : Type u} (M : MonoidAlg A) (x : A) :
+noncomputable def doubleRightUnit {A : Type u} (M : MonoidAlg A) (x : A) :
     Path (M.op (M.op x M.e) M.e) x :=
   Path.trans (M.right_unit (M.op x M.e)) (M.right_unit x)
 
 /-- Theorem 7: Unit element is idempotent -/
-def unitIdempotent {A : Type u} (M : MonoidAlg A) :
+noncomputable def unitIdempotent {A : Type u} (M : MonoidAlg A) :
     Path (M.op M.e M.e) M.e :=
   M.left_unit M.e
 
@@ -130,13 +130,13 @@ structure MonoidHom {A B : Type u} (M : MonoidAlg A) (N : MonoidAlg B) where
   pres_unit : Path (fn M.e) N.e
 
 /-- Theorem 8: Identity monoid homomorphism -/
-def idMonoidHom {A : Type u} (M : MonoidAlg A) : MonoidHom M M :=
+noncomputable def idMonoidHom {A : Type u} (M : MonoidAlg A) : MonoidHom M M :=
   { fn := id
     pres_op := fun _ _ => refl _
     pres_unit := refl _ }
 
 /-- Theorem 9: Composition of monoid homomorphisms -/
-def compMonoidHom {A B C : Type u} {M : MonoidAlg A} {N : MonoidAlg B} {P : MonoidAlg C}
+noncomputable def compMonoidHom {A B C : Type u} {M : MonoidAlg A} {N : MonoidAlg B} {P : MonoidAlg C}
     (g : MonoidHom N P) (f : MonoidHom M N) : MonoidHom M P :=
   { fn := g.fn ∘ f.fn
     pres_op := fun x y =>
@@ -144,7 +144,7 @@ def compMonoidHom {A B C : Type u} {M : MonoidAlg A} {N : MonoidAlg B} {P : Mono
     pres_unit := Path.trans (congrArg g.fn f.pres_unit) g.pres_unit }
 
 /-- Theorem 10: Monoid homomorphism preserves double application -/
-def monoidHomDouble {A B : Type u} {M : MonoidAlg A} {N : MonoidAlg B}
+noncomputable def monoidHomDouble {A B : Type u} {M : MonoidAlg A} {N : MonoidAlg B}
     (h : MonoidHom M N) (x y z : A) :
     Path (h.fn (M.op (M.op x y) z)) (N.op (N.op (h.fn x) (h.fn y)) (h.fn z)) :=
   Path.trans
@@ -162,12 +162,12 @@ structure GroupAlg (A : Type u) extends MonoidAlg A where
   right_inv : (x : A) -> Path (op x (inv x)) e
 
 /-- Theorem 11: Inverse of identity is identity -/
-def invOfUnit {A : Type u} (G : GroupAlg A) :
+noncomputable def invOfUnit {A : Type u} (G : GroupAlg A) :
     Path (G.inv G.e) G.e :=
   Path.trans (Path.symm (G.right_unit (G.inv G.e))) (G.left_inv G.e)
 
 /-- Theorem 12: Double inverse via Path -/
-def doubleInv {A : Type u} (G : GroupAlg A) (x : A) :
+noncomputable def doubleInv {A : Type u} (G : GroupAlg A) (x : A) :
     Path (G.inv (G.inv x)) x :=
   let p1 := Path.symm (G.right_unit (G.inv (G.inv x)))
   let p2 := congrArg (G.op (G.inv (G.inv x))) (Path.symm (G.left_inv x))
@@ -189,7 +189,7 @@ structure Congruence (A : Type u) (op : BinOp A) where
   cong : {x₁ x₂ y₁ y₂ : A} -> rel x₁ x₂ -> rel y₁ y₂ -> rel (op x₁ y₁) (op x₂ y₂)
 
 /-- Theorem 13: Trivial congruence (equality via Path) -/
-def trivialCong (A : Type u) (op : BinOp A) : Congruence A op :=
+noncomputable def trivialCong (A : Type u) (op : BinOp A) : Congruence A op :=
   { rel := fun x y => x = y
     isRefl := fun _ => rfl
     isSym := fun p => p.symm
@@ -197,7 +197,7 @@ def trivialCong (A : Type u) (op : BinOp A) : Congruence A op :=
     cong := fun p q => by rw [p, q] }
 
 /-- Theorem 14: Total congruence -/
-def totalCong (A : Type u) (op : BinOp A) : Congruence A op :=
+noncomputable def totalCong (A : Type u) (op : BinOp A) : Congruence A op :=
   { rel := fun _ _ => True
     isRefl := fun _ => True.intro
     isSym := fun _ => True.intro
@@ -213,7 +213,7 @@ structure PathCongruence (A : Type u) (op : BinOp A) where
   pcCong : {x₁ x₂ y₁ y₂ : A} -> rel x₁ x₂ -> rel y₁ y₂ -> rel (op x₁ y₁) (op x₂ y₂)
 
 /-- Theorem 15: Path itself forms a PathCongruence for any operation -/
-def pathCong (A : Type u) (op : BinOp A) : PathCongruence A op :=
+noncomputable def pathCong (A : Type u) (op : BinOp A) : PathCongruence A op :=
   { rel := fun x y => Path x y
     pcRefl := fun x => refl x
     pcSym := fun p => Path.symm p
@@ -231,12 +231,12 @@ structure SubAlgebra (A : Type u) (op : BinOp A) where
   closed : (x y : A) -> mem x -> mem y -> mem (op x y)
 
 /-- Theorem 16: The full carrier is a subalgebra -/
-def fullSubAlg (A : Type u) (op : BinOp A) : SubAlgebra A op :=
+noncomputable def fullSubAlg (A : Type u) (op : BinOp A) : SubAlgebra A op :=
   { mem := fun _ => True
     closed := fun _ _ _ _ => True.intro }
 
 /-- Theorem 17: Intersection of subalgebras is a subalgebra -/
-def interSubAlg {A : Type u} {op : BinOp A}
+noncomputable def interSubAlg {A : Type u} {op : BinOp A}
     (S T : SubAlgebra A op) : SubAlgebra A op :=
   { mem := fun x => S.mem x ∧ T.mem x
     closed := fun x y ⟨sx, tx⟩ ⟨sy, ty⟩ => ⟨S.closed x y sx sy, T.closed x y tx ty⟩ }
@@ -246,23 +246,23 @@ def interSubAlg {A : Type u} {op : BinOp A}
 -- ============================================================================
 
 /-- Product of two algebras with binary operations -/
-def prodOp {A B : Type u} (opA : BinOp A) (opB : BinOp B) : BinOp (A × B) :=
+noncomputable def prodOp {A B : Type u} (opA : BinOp A) (opB : BinOp B) : BinOp (A × B) :=
   fun ⟨a₁, b₁⟩ ⟨a₂, b₂⟩ => (opA a₁ a₂, opB b₁ b₂)
 
 /-- Theorem 18: First projection is a homomorphism -/
-def fstHom {A B : Type u} (opA : BinOp A) (opB : BinOp B) :
+noncomputable def fstHom {A B : Type u} (opA : BinOp A) (opB : BinOp B) :
     BinHom (A × B) A (prodOp opA opB) opA :=
   { fn := Prod.fst
     preserves := fun _ _ => refl _ }
 
 /-- Theorem 19: Second projection is a homomorphism -/
-def sndHom {A B : Type u} (opA : BinOp A) (opB : BinOp B) :
+noncomputable def sndHom {A B : Type u} (opA : BinOp A) (opB : BinOp B) :
     BinHom (A × B) B (prodOp opA opB) opB :=
   { fn := Prod.snd
     preserves := fun _ _ => refl _ }
 
 /-- Theorem 20: Product of monoid algebras is a monoid algebra -/
-def prodMonoidAlg {A B : Type u} (M : MonoidAlg A) (N : MonoidAlg B) :
+noncomputable def prodMonoidAlg {A B : Type u} (M : MonoidAlg A) (N : MonoidAlg B) :
     MonoidAlg (A × B) :=
   { op := prodOp M.op N.op
     e := (M.e, N.e)
@@ -280,7 +280,7 @@ def prodMonoidAlg {A B : Type u} (M : MonoidAlg A) (N : MonoidAlg B) :
         (congrArg (fun y => (a, y)) (N.right_unit b)) }
 
 /-- Theorem 21: Diagonal map into product is a homomorphism -/
-def diagHom {A : Type u} (op : BinOp A) : BinHom A (A × A) op (prodOp op op) :=
+noncomputable def diagHom {A : Type u} (op : BinOp A) : BinHom A (A × A) op (prodOp op op) :=
   { fn := fun a => (a, a)
     preserves := fun _ _ => refl _ }
 
@@ -289,7 +289,7 @@ def diagHom {A : Type u} (op : BinOp A) : BinHom A (A × A) op (prodOp op op) :=
 -- ============================================================================
 
 /-- Kernel of a homomorphism as a congruence -/
-def kernelCong {A B : Type u} {opA : BinOp A} {opB : BinOp B}
+noncomputable def kernelCong {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     (h : BinHom A B opA opB) : PathCongruence A opA :=
   { rel := fun x y => Path (h.fn x) (h.fn y)
     pcRefl := fun _ => refl _
@@ -304,7 +304,7 @@ def kernelCong {A B : Type u} {opA : BinOp A} {opB : BinOp B}
           (Path.symm (h.preserves x₂ y₂))) }
 
 /-- Theorem 22: Kernel congruence is reflexive (explicit) -/
-def kernelRefl {A B : Type u} {opA : BinOp A} {opB : BinOp B}
+noncomputable def kernelRefl {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     (h : BinHom A B opA opB) (x : A) :
     (kernelCong h).rel x x :=
   refl _
@@ -321,18 +321,18 @@ inductive Term (V : Type u) where
   | binary : Nat -> Term V -> Term V -> Term V
 
 /-- Theorem 23: Variable embedding produces distinct terms from distinct variables -/
-def varPath {V : Type u} (v : V) : Path (Term.var v) (Term.var v) :=
+noncomputable def varPath {V : Type u} (v : V) : Path (Term.var v) (Term.var v) :=
   refl _
 
 /-- Substitution as a map on terms -/
-def substTerm {V W : Type u} (s : V -> Term W) : Term V -> Term W
+noncomputable def substTerm {V W : Type u} (s : V -> Term W) : Term V -> Term W
   | Term.var v => s v
   | Term.const n => Term.const n
   | Term.unary n t => Term.unary n (substTerm s t)
   | Term.binary n t1 t2 => Term.binary n (substTerm s t1) (substTerm s t2)
 
 /-- Theorem 24: Identity substitution is identity -/
-def substId {V : Type u} : (t : Term V) -> Path (substTerm Term.var t) t
+noncomputable def substId {V : Type u} : (t : Term V) -> Path (substTerm Term.var t) t
   | Term.var _ => refl _
   | Term.const _ => refl _
   | Term.unary n t => congrArg (Term.unary n) (substId t)
@@ -342,7 +342,7 @@ def substId {V : Type u} : (t : Term V) -> Path (substTerm Term.var t) t
       (congrArg (Term.binary n t1) (substId t2))
 
 /-- Theorem 25: Substitution is functorial (compositionality) -/
-def substComp {V W X : Type u} (s : V -> Term W) (r : W -> Term X) :
+noncomputable def substComp {V W X : Type u} (s : V -> Term W) (r : W -> Term X) :
     (t : Term V) -> Path (substTerm r (substTerm s t)) (substTerm (fun v => substTerm r (s v)) t)
   | Term.var _ => refl _
   | Term.const _ => refl _
@@ -362,10 +362,10 @@ structure Equation (V : Type u) where
   rhs : Term V
 
 /-- An interpretation assigns carrier values to variables -/
-def Interp (V : Type u) (A : Type v) := V -> A
+noncomputable def Interp (V : Type u) (A : Type v) := V -> A
 
 /-- Evaluate a term in a given interpretation -/
-def evalTerm {V : Type u} {A : Type v}
+noncomputable def evalTerm {V : Type u} {A : Type v}
     (constants : Nat -> A) (unOps : Nat -> A -> A) (binOps : Nat -> A -> A -> A)
     (interp : Interp V A) : Term V -> A
   | Term.var v => interp v
@@ -375,7 +375,7 @@ def evalTerm {V : Type u} {A : Type v}
                                       (evalTerm constants unOps binOps interp t2)
 
 /-- Theorem 26: Evaluation respects Path in interpretations -/
-def evalRespPath {V : Type u} {A : Type v}
+noncomputable def evalRespPath {V : Type u} {A : Type v}
     (c : Nat -> A) (u : Nat -> A -> A) (b : Nat -> A -> A -> A)
     (i₁ i₂ : Interp V A) (agree : (v : V) -> Path (i₁ v) (i₂ v)) :
     (t : Term V) -> Path (evalTerm c u b i₁ t) (evalTerm c u b i₂ t)
@@ -394,23 +394,23 @@ def evalRespPath {V : Type u} {A : Type v}
 -- ============================================================================
 
 /-- An algebra satisfies an equation -/
-def Satisfies {V : Type u} {A : Type v}
+noncomputable def Satisfies {V : Type u} {A : Type v}
     (c : Nat -> A) (u : Nat -> A -> A) (b : Nat -> A -> A -> A)
     (eq : Equation V) : Prop :=
   ∀ (i : Interp V A), evalTerm c u b i eq.lhs = evalTerm c u b i eq.rhs
 
 /-- Theorem 27: Satisfaction is witnessed by Path -/
-def satisfiesViaPath {V : Type u} {A : Type v}
+noncomputable def satisfiesViaPath {V : Type u} {A : Type v}
     (c : Nat -> A) (u : Nat -> A -> A) (b : Nat -> A -> A -> A)
     (eq : Equation V) (h : ∀ (i : Interp V A), Path (evalTerm c u b i eq.lhs) (evalTerm c u b i eq.rhs)) :
     Satisfies c u b eq :=
   fun i => (h i).toEq
 
 /-- A theory is a list of equations -/
-def Theory (V : Type u) := List (Equation V)
+noncomputable def Theory (V : Type u) := List (Equation V)
 
 /-- An algebra is a model of a theory -/
-def IsModel {V : Type u} {A : Type v}
+noncomputable def IsModel {V : Type u} {A : Type v}
     (c : Nat -> A) (u : Nat -> A -> A) (b : Nat -> A -> A -> A)
     (thy : Theory V) : Prop :=
   ∀ eq, List.Mem eq thy -> Satisfies c u b eq
@@ -427,14 +427,14 @@ structure BinIso (A B : Type u) (opA : BinOp A) (opB : BinOp B) where
   right_inv : (y : B) -> Path (toHom.fn (invHom.fn y)) y
 
 /-- Theorem 28: Identity isomorphism -/
-def idBinIso (A : Type u) (op : BinOp A) : BinIso A A op op :=
+noncomputable def idBinIso (A : Type u) (op : BinOp A) : BinIso A A op op :=
   { toHom := idBinHom A op
     invHom := idBinHom A op
     left_inv := fun _ => refl _
     right_inv := fun _ => refl _ }
 
 /-- Theorem 29: Inverse of an isomorphism is an isomorphism -/
-def invBinIso {A B : Type u} {opA : BinOp A} {opB : BinOp B}
+noncomputable def invBinIso {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     (iso : BinIso A B opA opB) : BinIso B A opB opA :=
   { toHom := iso.invHom
     invHom := iso.toHom
@@ -442,7 +442,7 @@ def invBinIso {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     right_inv := iso.left_inv }
 
 /-- Theorem 30: Composition of isomorphisms -/
-def compBinIso {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
+noncomputable def compBinIso {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
     (g : BinIso B C opB opC) (f : BinIso A B opA opB) : BinIso A C opA opC :=
   { toHom := compBinHom g.toHom f.toHom
     invHom := compBinHom f.invHom g.invHom
@@ -465,7 +465,7 @@ structure FirstIsoThm (A B : Type u) (opA : BinOp A) (opB : BinOp B)
   iso : BinIso QuotType ImType quotOp imOp
 
 /-- Theorem 31: Injective homomorphism gives trivial kernel -/
-def injectiveKernelTrivial {A B : Type u} {opA : BinOp A} {opB : BinOp B}
+noncomputable def injectiveKernelTrivial {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     (f : BinHom A B opA opB) (inj : (x y : A) -> Path (f.fn x) (f.fn y) -> Path x y)
     (x y : A) (h : (kernelCong f).rel x y) : Path x y :=
   inj x y h
@@ -475,20 +475,20 @@ def injectiveKernelTrivial {A B : Type u} {opA : BinOp A} {opB : BinOp B}
 -- ============================================================================
 
 /-- A class of algebras (predicate on carrier + operation) -/
-def AlgClass := (A : Type u) -> BinOp A -> Prop
+noncomputable def AlgClass := (A : Type u) -> BinOp A -> Prop
 
 /-- Closed under homomorphic images -/
-def ClosedH (C : AlgClass.{u}) : Prop :=
+noncomputable def ClosedH (C : AlgClass.{u}) : Prop :=
   ∀ (A B : Type u) (opA : BinOp A) (opB : BinOp B),
     C A opA -> (∃ f : BinHom A B opA opB, Function.Surjective f.fn) -> C B opB
 
 /-- Closed under subalgebras -/
-def ClosedS (C : AlgClass.{u}) : Prop :=
+noncomputable def ClosedS (C : AlgClass.{u}) : Prop :=
   ∀ (A : Type u) (opA : BinOp A),
     C A opA -> ∀ (_S : SubAlgebra A opA), C A opA
 
 /-- Closed under products -/
-def ClosedP (C : AlgClass.{u}) : Prop :=
+noncomputable def ClosedP (C : AlgClass.{u}) : Prop :=
   ∀ (A B : Type u) (opA : BinOp A) (opB : BinOp B),
     C A opA -> C B opB -> C (A × B) (prodOp opA opB)
 
@@ -504,7 +504,7 @@ structure Variety where
 -- ============================================================================
 
 /-- Theorem 32: Associativity pentagon coherence -/
-def assocPentagon {A : Type u} (op : BinOp A)
+noncomputable def assocPentagon {A : Type u} (op : BinOp A)
     (assocP : (x y z : A) -> Path (op (op x y) z) (op x (op y z)))
     (w x y z : A) :
     Path (op (op (op w x) y) z) (op w (op x (op y z))) :=
@@ -512,21 +512,21 @@ def assocPentagon {A : Type u} (op : BinOp A)
     (Path.trans (assocP w x (op y z)) (congrArg (op w) (refl _)))
 
 /-- Theorem 33: Reassociation from left to right -/
-def reassocLeft {A : Type u} (op : BinOp A)
+noncomputable def reassocLeft {A : Type u} (op : BinOp A)
     (assocP : (x y z : A) -> Path (op (op x y) z) (op x (op y z)))
     (x y z : A) :
     Path (op x (op y z)) (op (op x y) z) :=
   Path.symm (assocP x y z)
 
 /-- Theorem 34: Commutativity self-inverse -/
-def commSelfInverse {A : Type u} (op : BinOp A)
+noncomputable def commSelfInverse {A : Type u} (op : BinOp A)
     (comm : (x y : A) -> Path (op x y) (op y x))
     (x y : A) :
     Path (op x y) (op x y) :=
   Path.trans (comm x y) (comm y x)
 
 /-- Theorem 35: Comm + Assoc gives rearrangement -/
-def commAssocSwap {A : Type u} (op : BinOp A)
+noncomputable def commAssocSwap {A : Type u} (op : BinOp A)
     (assocP : (x y z : A) -> Path (op (op x y) z) (op x (op y z)))
     (comm : (x y : A) -> Path (op x y) (op y x))
     (x y z : A) :
@@ -540,20 +540,20 @@ def commAssocSwap {A : Type u} (op : BinOp A)
 -- ============================================================================
 
 /-- Left multiplication map -/
-def leftMul {A : Type u} (op : BinOp A) (a : A) : A -> A :=
+noncomputable def leftMul {A : Type u} (op : BinOp A) (a : A) : A -> A :=
   fun x => op a x
 
 /-- Right multiplication map -/
-def rightMul {A : Type u} (op : BinOp A) (a : A) : A -> A :=
+noncomputable def rightMul {A : Type u} (op : BinOp A) (a : A) : A -> A :=
   fun x => op x a
 
 /-- Theorem 36: Left multiplication by unit is identity on elements -/
-def leftMulUnitElem {A : Type u} (M : MonoidAlg A) (x : A) :
+noncomputable def leftMulUnitElem {A : Type u} (M : MonoidAlg A) (x : A) :
     Path (leftMul M.op M.e x) x :=
   M.left_unit x
 
 /-- Theorem 37: Right multiplication by unit is identity on elements -/
-def rightMulUnitElem {A : Type u} (M : MonoidAlg A) (x : A) :
+noncomputable def rightMulUnitElem {A : Type u} (M : MonoidAlg A) (x : A) :
     Path (rightMul M.op M.e x) x :=
   M.right_unit x
 
@@ -562,7 +562,7 @@ def rightMulUnitElem {A : Type u} (M : MonoidAlg A) (x : A) :
 -- ============================================================================
 
 /-- Endomorphism monoid on a type -/
-def endoMonoid (A : Type u) : MonoidAlg (A -> A) :=
+noncomputable def endoMonoid (A : Type u) : MonoidAlg (A -> A) :=
   { op := fun f g => f ∘ g
     e := id
     assoc := fun _ _ _ => refl _
@@ -570,12 +570,12 @@ def endoMonoid (A : Type u) : MonoidAlg (A -> A) :=
     right_unit := fun _ => refl _ }
 
 /-- Theorem 38: Endomorphism monoid associativity is trivial -/
-def endoAssocTrivial (A : Type u) (f g h : A -> A) :
+noncomputable def endoAssocTrivial (A : Type u) (f g h : A -> A) :
     Path ((f ∘ g) ∘ h) (f ∘ (g ∘ h)) :=
   refl _
 
 /-- Theorem 39: Endomorphism composition preserves identity -/
-def endoCompId (A : Type u) (f : A -> A) :
+noncomputable def endoCompId (A : Type u) (f : A -> A) :
     Path (f ∘ id) f :=
   refl _
 
@@ -584,24 +584,24 @@ def endoCompId (A : Type u) (f : A -> A) :
 -- ============================================================================
 
 /-- Theorem 40: congrArg preserves refl -/
-def congrArgRefl {A B : Type u} (f : A -> B) (x : A) :
+noncomputable def congrArgRefl {A B : Type u} (f : A -> B) (x : A) :
     Path.congrArg f (refl x) = refl (f x) := by
   simp
 
 /-- Theorem 41: congrArg distributes over trans -/
-def congrArgTransDist {A B : Type u} (f : A -> B) {x y z : A}
+noncomputable def congrArgTransDist {A B : Type u} (f : A -> B) {x y z : A}
     (p : Path x y) (q : Path y z) :
     Path.congrArg f (Path.trans p q) = Path.trans (Path.congrArg f p) (Path.congrArg f q) := by
   simp
 
 /-- Theorem 42: congrArg distributes over symm -/
-def congrArgSymmDist {A B : Type u} (f : A -> B) {x y : A}
+noncomputable def congrArgSymmDist {A B : Type u} (f : A -> B) {x y : A}
     (p : Path x y) :
     Path.congrArg f (Path.symm p) = Path.symm (Path.congrArg f p) := by
   simp
 
 /-- Theorem 43: Composition of congrArg -/
-def congrArgCompPath {A B C : Type u} (f : A -> B) (g : B -> C) {x y : A}
+noncomputable def congrArgCompPath {A B C : Type u} (f : A -> B) (g : B -> C) {x y : A}
     (p : Path x y) :
     Path.congrArg g (Path.congrArg f p) = Path.congrArg (g ∘ f) p := by
   simp
@@ -618,14 +618,14 @@ structure SemilatticeAlg (A : Type u) where
   idem : (x : A) -> Path (op x x) x
 
 /-- Theorem 44: In a semilattice, op x (op x y) = op x y -/
-def semilatAbsorb {A : Type u} (S : SemilatticeAlg A) (x y : A) :
+noncomputable def semilatAbsorb {A : Type u} (S : SemilatticeAlg A) (x y : A) :
     Path (S.op x (S.op x y)) (S.op x y) :=
   Path.trans
     (Path.symm (S.assocP x x y))
     (congrArg (fun w => S.op w y) (S.idem x))
 
 /-- Theorem 45: In a semilattice, op (op x y) y = op x y -/
-def semilatAbsorbR {A : Type u} (S : SemilatticeAlg A) (x y : A) :
+noncomputable def semilatAbsorbR {A : Type u} (S : SemilatticeAlg A) (x y : A) :
     Path (S.op (S.op x y) y) (S.op x y) :=
   Path.trans
     (S.assocP x y y)
@@ -648,12 +648,12 @@ structure RingLikeAlg (A : Type u) where
   distribRight : (x y z : A) -> Path (mul (add x y) z) (add (mul x z) (mul y z))
 
 /-- Theorem 46: Zero right identity from comm -/
-def addZeroRight {A : Type u} (R : RingLikeAlg A) (x : A) :
+noncomputable def addZeroRight {A : Type u} (R : RingLikeAlg A) (x : A) :
     Path (R.add x R.zero) x :=
   Path.trans (R.addComm x R.zero) (R.addZeroLeft x)
 
 /-- Theorem 47: Distribution coherence: (a+b)(c+d) = ac+ad+bc+bd -/
-def distribCoherence {A : Type u} (R : RingLikeAlg A) (a b c d : A) :
+noncomputable def distribCoherence {A : Type u} (R : RingLikeAlg A) (a b c d : A) :
     Path (R.mul (R.add a b) (R.add c d))
          (R.add (R.add (R.mul a c) (R.mul a d)) (R.add (R.mul b c) (R.mul b d))) :=
   Path.trans
@@ -667,10 +667,10 @@ def distribCoherence {A : Type u} (R : RingLikeAlg A) (a b c d : A) :
 -- ============================================================================
 
 /-- Scalar action on a carrier -/
-def ScalarAction (S A : Type u) := S -> A -> A
+noncomputable def ScalarAction (S A : Type u) := S -> A -> A
 
 /-- Theorem 48: Scalar action compatibility with Path -/
-def scalarActionPath {S A : Type u} (act : ScalarAction S A)
+noncomputable def scalarActionPath {S A : Type u} (act : ScalarAction S A)
     {s₁ s₂ : S} {a₁ a₂ : A} (ps : Path s₁ s₂) (pa : Path a₁ a₂) :
     Path (act s₁ a₁) (act s₂ a₂) :=
   Path.trans (congrArg (fun s => act s a₁) ps) (congrArg (act s₂) pa)
@@ -693,7 +693,7 @@ structure LatticeAlg (A : Type u) where
   absorb2 : (x y : A) -> Path (join x (meet x y)) x
 
 /-- Theorem 49: Lattice double absorption -/
-def latticeDoubleAbsorb {A : Type u} (L : LatticeAlg A) (x y : A) :
+noncomputable def latticeDoubleAbsorb {A : Type u} (L : LatticeAlg A) (x y : A) :
     Path (L.meet x (L.join x (L.meet x y))) x :=
   Path.trans
     (congrArg (L.meet x) (L.absorb2 x y))
@@ -704,7 +704,7 @@ def latticeDoubleAbsorb {A : Type u} (L : LatticeAlg A) (x y : A) :
 -- ============================================================================
 
 /-- Theorem 50: Homomorphism preserves iterated binary operation -/
-def homPresIter3 {A B : Type u} {opA : BinOp A} {opB : BinOp B}
+noncomputable def homPresIter3 {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     (h : BinHom A B opA opB) (x y z : A) :
     Path (h.fn (opA x (opA y z))) (opB (h.fn x) (opB (h.fn y) (h.fn z))) :=
   Path.trans
@@ -712,7 +712,7 @@ def homPresIter3 {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     (congrArg (opB (h.fn x)) (h.preserves y z))
 
 /-- Theorem 51: Isomorphism preserves congruence classes -/
-def isoPresCong {A B : Type u} {opA : BinOp A} {opB : BinOp B}
+noncomputable def isoPresCong {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     (iso : BinIso A B opA opB) (x y : A)
     (h : Path (iso.toHom.fn x) (iso.toHom.fn y)) : Path x y :=
   Path.trans
@@ -720,7 +720,7 @@ def isoPresCong {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     (Path.trans (congrArg iso.invHom.fn h) (iso.left_inv y))
 
 /-- Theorem 52: Homomorphism composition associativity -/
-def homCompAssoc {A B C D : Type u}
+noncomputable def homCompAssoc {A B C D : Type u}
     {opA : BinOp A} {opB : BinOp B} {opC : BinOp C} {opD : BinOp D}
     (h : BinHom C D opC opD) (g : BinHom B C opB opC) (f : BinHom A B opA opB)
     (x : A) :
@@ -728,13 +728,13 @@ def homCompAssoc {A B C D : Type u}
   refl _
 
 /-- Theorem 53: Isomorphism inverse is involution -/
-def isoInvInvolution {A B : Type u} {opA : BinOp A} {opB : BinOp B}
+noncomputable def isoInvInvolution {A B : Type u} {opA : BinOp A} {opB : BinOp B}
     (iso : BinIso A B opA opB) (x : A) :
     Path ((invBinIso (invBinIso iso)).toHom.fn x) (iso.toHom.fn x) :=
   refl _
 
 /-- Theorem 54: Product of isomorphisms -/
-def prodBinIso {A₁ A₂ B₁ B₂ : Type u}
+noncomputable def prodBinIso {A₁ A₂ B₁ B₂ : Type u}
     {opA₁ : BinOp A₁} {opA₂ : BinOp A₂} {opB₁ : BinOp B₁} {opB₂ : BinOp B₂}
     (f : BinIso A₁ B₁ opA₁ opB₁) (g : BinIso A₂ B₂ opA₂ opB₂) :
     BinIso (A₁ × A₂) (B₁ × B₂) (prodOp opA₁ opA₂) (prodOp opB₁ opB₂) :=
@@ -760,12 +760,12 @@ def prodBinIso {A₁ A₂ B₁ B₂ : Type u}
         (congrArg (fun y => (a, y)) (g.right_inv b)) }
 
 /-- Iterated application of a function -/
-def iterApp {A : Type u} (f : A -> A) : Nat -> A -> A
+noncomputable def iterApp {A : Type u} (f : A -> A) : Nat -> A -> A
   | 0, x => x
   | n + 1, x => f (iterApp f n x)
 
 /-- Theorem 55: Monoid homomorphism preserves power (iterated product) -/
-def monoidHomPow {A B : Type u} {M : MonoidAlg A} {N : MonoidAlg B}
+noncomputable def monoidHomPow {A B : Type u} {M : MonoidAlg A} {N : MonoidAlg B}
     (h : MonoidHom M N) : (n : Nat) -> (x : A) ->
     Path (h.fn (iterApp (M.op x) n M.e)) (iterApp (N.op (h.fn x)) n N.e)
   | 0, _ => h.pres_unit
@@ -775,7 +775,7 @@ def monoidHomPow {A B : Type u} {M : MonoidAlg A} {N : MonoidAlg B}
       (congrArg (N.op (h.fn x)) (monoidHomPow h n x))
 
 /-- Theorem 56: Universal property of products -/
-def prodUnivProp {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
+noncomputable def prodUnivProp {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
     (f : BinHom C A opC opA) (g : BinHom C B opC opB) :
     BinHom C (A × B) opC (prodOp opA opB) :=
   { fn := fun c => (f.fn c, g.fn c)
@@ -785,19 +785,19 @@ def prodUnivProp {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C
         (congrArg (fun b => (opA (f.fn x) (f.fn y), b)) (g.preserves x y)) }
 
 /-- Theorem 57: Product universal property commutes with fst -/
-def prodUnivFst {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
+noncomputable def prodUnivFst {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
     (f : BinHom C A opC opA) (g : BinHom C B opC opB) (c : C) :
     Path ((fstHom opA opB).fn ((prodUnivProp f g).fn c)) (f.fn c) :=
   refl _
 
 /-- Theorem 58: Product universal property commutes with snd -/
-def prodUnivSnd {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
+noncomputable def prodUnivSnd {A B C : Type u} {opA : BinOp A} {opB : BinOp B} {opC : BinOp C}
     (f : BinHom C A opC opA) (g : BinHom C B opC opB) (c : C) :
     Path ((sndHom opA opB).fn ((prodUnivProp f g).fn c)) (g.fn c) :=
   refl _
 
 /-- Theorem 59: Group algebra: uniqueness of inverse via Path -/
-def invUnique {A : Type u} (G : GroupAlg A) (x y : A)
+noncomputable def invUnique {A : Type u} (G : GroupAlg A) (x y : A)
     (hl : Path (G.op y x) G.e) : Path y (G.inv x) :=
   let p1 : Path y (G.op y (G.op x (G.inv x))) :=
     Path.symm (Path.trans (congrArg (G.op y) (G.right_inv x)) (G.right_unit y))
@@ -810,7 +810,7 @@ def invUnique {A : Type u} (G : GroupAlg A) (x y : A)
   Path.trans p1 (Path.trans p2 (Path.trans p3 p4))
 
 /-- Theorem 60: Lattice: meet is idempotent -/
-def meetSelfDistrib {A : Type u} (L : LatticeAlg A) (x : A) :
+noncomputable def meetSelfDistrib {A : Type u} (L : LatticeAlg A) (x : A) :
     Path (L.meet x x) x :=
   L.meetIdem x
 

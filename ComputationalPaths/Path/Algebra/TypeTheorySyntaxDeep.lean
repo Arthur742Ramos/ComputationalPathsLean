@@ -48,10 +48,10 @@ inductive Tm : Nat → Type where
 
 /-! ## Renaming and Substitution -/
 
-def liftRen (f : Fin n → Fin m) : Fin (n + 1) → Fin (m + 1) :=
+noncomputable def liftRen (f : Fin n → Fin m) : Fin (n + 1) → Fin (m + 1) :=
   Fin.cases ⟨0, Nat.zero_lt_succ m⟩ (fun i => (f i).succ)
 
-def rename (f : Fin n → Fin m) : Tm n → Tm m
+noncomputable def rename (f : Fin n → Fin m) : Tm n → Tm m
   | .var i     => .var (f i)
   | .app s t   => .app (rename f s) (rename f t)
   | .lam ty b  => .lam ty (rename (liftRen f) b)
@@ -60,12 +60,12 @@ def rename (f : Fin n → Fin m) : Tm n → Tm m
   | .snd t     => .snd (rename f t)
   | .unit      => .unit
 
-def shift : Tm n → Tm (n + 1) := rename Fin.castSucc
+noncomputable def shift : Tm n → Tm (n + 1) := rename Fin.castSucc
 
-def exts (sigma : Fin n → Tm m) : Fin (n + 1) → Tm (m + 1) :=
+noncomputable def exts (sigma : Fin n → Tm m) : Fin (n + 1) → Tm (m + 1) :=
   Fin.cases (.var ⟨0, Nat.zero_lt_succ m⟩) (fun i => shift (sigma i))
 
-def substTm (sigma : Fin n → Tm m) : Tm n → Tm m
+noncomputable def substTm (sigma : Fin n → Tm m) : Tm n → Tm m
   | .var i     => sigma i
   | .app s t   => .app (substTm sigma s) (substTm sigma t)
   | .lam ty b  => .lam ty (substTm (exts sigma) b)
@@ -74,7 +74,7 @@ def substTm (sigma : Fin n → Tm m) : Tm n → Tm m
   | .snd t     => .snd (substTm sigma t)
   | .unit      => .unit
 
-def subst1 (s : Tm n) : Tm (n + 1) → Tm n :=
+noncomputable def subst1 (s : Tm n) : Tm (n + 1) → Tm n :=
   substTm (Fin.cases s .var)
 
 /-! ## Typing -/
@@ -119,18 +119,18 @@ inductive ParRed : Tm n → Tm n → Prop where
   | unit   : ParRed .unit .unit
 
 /-- Normal form predicate. -/
-def IsNormal (t : Tm n) : Prop := ∀ t', ¬ Red1 t t'
+noncomputable def IsNormal (t : Tm n) : Prop := ∀ t', ¬ Red1 t t'
 
 /-! ## Semantic valuation -/
 
-def semTy : Ty → Type
+noncomputable def semTy : Ty → Type
   | .base      => Nat
   | .arrow A B => semTy A → semTy B
   | .prod A B  => semTy A × semTy B
   | .unit      => Unit
 
 /-- Size of a term. -/
-def tmSize : Tm n → Nat
+noncomputable def tmSize : Tm n → Nat
   | .var _     => 1
   | .app s t   => 1 + tmSize s + tmSize t
   | .lam _ b   => 1 + tmSize b
@@ -140,7 +140,7 @@ def tmSize : Tm n → Nat
   | .unit      => 1
 
 /-- Constructor tag. -/
-def tmTag : Tm n → Nat
+noncomputable def tmTag : Tm n → Nat
   | .var _     => 0
   | .app _ _   => 1
   | .lam _ _   => 2
@@ -150,7 +150,7 @@ def tmTag : Tm n → Nat
   | .unit      => 6
 
 /-- Simple base-type interpretation. -/
-def interpBase : Tm n → (Fin n → Nat) → Nat
+noncomputable def interpBase : Tm n → (Fin n → Nat) → Nat
   | .var i,     env => env i
   | .app s _,   env => interpBase s env
   | .lam _ _,   _   => 0
@@ -160,7 +160,7 @@ def interpBase : Tm n → (Fin n → Nat) → Nat
   | .unit,      _   => 0
 
 /-- subst1 as a function on the substituted term. -/
-def subst1_fun (b : Tm (n + 1)) : Tm n → Tm n :=
+noncomputable def subst1_fun (b : Tm (n + 1)) : Tm n → Tm n :=
   fun s => subst1 s b
 
 /-!
@@ -178,31 +178,31 @@ through these functions to establish coherence of the metatheory.
 -- ═══════════════════════════════════════════════════════════
 
 -- Theorem 1: Reflexivity for types
-def ty_refl (A : Ty) : Path A A := Path.refl A
+noncomputable def ty_refl (A : Ty) : Path A A := Path.refl A
 
 -- Theorem 2: Arrow type congruence in domain
-def arrow_congL (B : Ty) (p : Path A A') : Path (Ty.arrow A B) (Ty.arrow A' B) :=
+noncomputable def arrow_congL (B : Ty) (p : Path A A') : Path (Ty.arrow A B) (Ty.arrow A' B) :=
   Path.congrArg (fun x => Ty.arrow x B) p
 
 -- Theorem 3: Arrow type congruence in codomain
-def arrow_congR (A : Ty) (p : Path B B') : Path (Ty.arrow A B) (Ty.arrow A B') :=
+noncomputable def arrow_congR (A : Ty) (p : Path B B') : Path (Ty.arrow A B) (Ty.arrow A B') :=
   Path.congrArg (Ty.arrow A) p
 
 -- Theorem 4: Full arrow congruence
-def arrow_cong (pA : Path A A') (pB : Path B B') :
+noncomputable def arrow_cong (pA : Path A A') (pB : Path B B') :
     Path (Ty.arrow A B) (Ty.arrow A' B') :=
   Path.trans (arrow_congL B pA) (arrow_congR A' pB)
 
 -- Theorem 5: Product type congruence in left
-def prod_congL (B : Ty) (p : Path A A') : Path (Ty.prod A B) (Ty.prod A' B) :=
+noncomputable def prod_congL (B : Ty) (p : Path A A') : Path (Ty.prod A B) (Ty.prod A' B) :=
   Path.congrArg (fun x => Ty.prod x B) p
 
 -- Theorem 6: Product type congruence in right
-def prod_congR (A : Ty) (p : Path B B') : Path (Ty.prod A B) (Ty.prod A B') :=
+noncomputable def prod_congR (A : Ty) (p : Path B B') : Path (Ty.prod A B) (Ty.prod A B') :=
   Path.congrArg (Ty.prod A) p
 
 -- Theorem 7: Full product congruence
-def prod_cong (pA : Path A A') (pB : Path B B') :
+noncomputable def prod_cong (pA : Path A A') (pB : Path B B') :
     Path (Ty.prod A B) (Ty.prod A' B') :=
   Path.trans (prod_congL B pA) (prod_congR A' pB)
 
@@ -228,7 +228,7 @@ theorem prod_congL_trans (B : Ty) (p : Path A A') (q : Path A' A'') :
 -- ═══════════════════════════════════════════════════════════
 
 -- Theorem 11: semTy lifts type paths to type-universe paths
-def semTy_path (p : Path A B) : Path (semTy A) (semTy B) :=
+noncomputable def semTy_path (p : Path A B) : Path (semTy A) (semTy B) :=
   Path.congrArg semTy p
 
 -- Theorem 12: semTy distributes over trans
@@ -244,14 +244,14 @@ theorem semTy_symm (p : Path A B) :
   Path.congrArg_symm semTy p
 
 -- Theorem 14: Arrow space path from type paths
-def arrow_sem_path (pA : Path A A') (pB : Path B B') :
+noncomputable def arrow_sem_path (pA : Path A A') (pB : Path B B') :
     Path (semTy A → semTy B) (semTy A' → semTy B') :=
   Path.trans
     (Path.congrArg (fun X => X → semTy B) (Path.congrArg semTy pA))
     (Path.congrArg (fun Y => semTy A' → Y) (Path.congrArg semTy pB))
 
 -- Theorem 15: Product space path from type paths
-def prod_sem_path (pA : Path A A') (pB : Path B B') :
+noncomputable def prod_sem_path (pA : Path A A') (pB : Path B B') :
     Path (semTy A × semTy B) (semTy A' × semTy B') :=
   Path.trans
     (Path.congrArg (fun X => X × semTy B) (Path.congrArg semTy pA))
@@ -285,49 +285,49 @@ theorem semTy_comp (f : Type → Type) (p : Path A B) :
 -- ═══════════════════════════════════════════════════════════
 
 -- Theorem 21: App congruence left via congrArg
-def app_congL (t : Tm n) (p : Path s s') :
+noncomputable def app_congL (t : Tm n) (p : Path s s') :
     Path (Tm.app s t) (Tm.app s' t) :=
   Path.congrArg (fun f => Tm.app f t) p
 
 -- Theorem 22: App congruence right
-def app_congR (s : Tm n) (p : Path t t') :
+noncomputable def app_congR (s : Tm n) (p : Path t t') :
     Path (Tm.app s t) (Tm.app s t') :=
   Path.congrArg (Tm.app s) p
 
 -- Theorem 23: Lambda body congruence
-def lam_cong (ty : Ty) (p : Path b b') :
+noncomputable def lam_cong (ty : Ty) (p : Path b b') :
     Path (Tm.lam ty b) (Tm.lam ty b') :=
   Path.congrArg (Tm.lam ty) p
 
 -- Theorem 24: Pair left congruence
-def pair_congL (t : Tm n) (p : Path s s') :
+noncomputable def pair_congL (t : Tm n) (p : Path s s') :
     Path (Tm.pair s t) (Tm.pair s' t) :=
   Path.congrArg (fun x => Tm.pair x t) p
 
 -- Theorem 25: Pair right congruence
-def pair_congR (s : Tm n) (p : Path t t') :
+noncomputable def pair_congR (s : Tm n) (p : Path t t') :
     Path (Tm.pair s t) (Tm.pair s t') :=
   Path.congrArg (Tm.pair s) p
 
 -- Theorem 26: Full pair congruence
-def pair_cong (ps : Path s s') (pt : Path t t') :
+noncomputable def pair_cong (ps : Path s s') (pt : Path t t') :
     Path (Tm.pair s t) (Tm.pair s' t') :=
   Path.trans (pair_congL t ps) (pair_congR s' pt)
 
 -- Theorem 27: Fst congruence
-def fst_cong (p : Path t t') : Path (Tm.fst t) (Tm.fst t') :=
+noncomputable def fst_cong (p : Path t t') : Path (Tm.fst t) (Tm.fst t') :=
   Path.congrArg Tm.fst p
 
 -- Theorem 28: Snd congruence
-def snd_cong (p : Path t t') : Path (Tm.snd t) (Tm.snd t') :=
+noncomputable def snd_cong (p : Path t t') : Path (Tm.snd t) (Tm.snd t') :=
   Path.congrArg Tm.snd p
 
 -- Theorem 29: Shift (weakening) congruence
-def shift_cong (p : Path s t) : Path (shift s) (shift t) :=
+noncomputable def shift_cong (p : Path s t) : Path (shift s) (shift t) :=
   Path.congrArg shift p
 
 -- Theorem 30: Substitution congruence
-def subst1_cong (b : Tm (n + 1)) (p : Path s s') :
+noncomputable def subst1_cong (b : Tm (n + 1)) (p : Path s s') :
     Path (subst1 s b) (subst1 s' b) :=
   Path.congrArg (subst1_fun b) p
 
@@ -421,7 +421,7 @@ theorem shift_trans (p : Path s t) (q : Path t u) :
 -- ═══════════════════════════════════════════════════════════
 
 -- Theorem 46: Interpretation congruence
-def interp_cong (env : Fin n → Nat) (p : Path s t) :
+noncomputable def interp_cong (env : Fin n → Nat) (p : Path s t) :
     Path (interpBase s env) (interpBase t env) :=
   Path.congrArg (fun tm => interpBase tm env) p
 
@@ -554,17 +554,17 @@ theorem var_normal (i : Fin n) : IsNormal (Tm.var i) := by
 -- ═══════════════════════════════════════════════════════════
 
 -- Theorem 66: Context lookup congruence
-def ctx_lookup_cong (Gam : Ctx) {i j : Fin Gam.length} (p : Path i j) :
+noncomputable def ctx_lookup_cong (Gam : Ctx) {i j : Fin Gam.length} (p : Path i j) :
     Path (Gam.get i) (Gam.get j) :=
   Path.congrArg Gam.get p
 
 -- Theorem 67: Context extension congruence
-def ctx_cons_cong (Gam : Ctx) (p : Path A B) :
+noncomputable def ctx_cons_cong (Gam : Ctx) (p : Path A B) :
     Path (A :: Gam) (B :: Gam) :=
   Path.congrArg (· :: Gam) p
 
 -- Theorem 68: Context length is preserved by path
-def ctx_length_cong {Gam1 Gam2 : Ctx} (p : Path Gam1 Gam2) :
+noncomputable def ctx_length_cong {Gam1 Gam2 : Ctx} (p : Path Gam1 Gam2) :
     Path (List.length Gam1) (List.length Gam2) :=
   Path.congrArg (fun (g : Ctx) => g.length) p
 

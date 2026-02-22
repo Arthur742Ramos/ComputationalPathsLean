@@ -22,13 +22,13 @@ variable {A : Type u}
 /-! ## Enriched Hom-Object: Path types as the enrichment -/
 
 /-- The hom-object in our enriched category: the type of paths from a to b. -/
-def Hom (a b : A) := Path a b
+noncomputable def Hom (a b : A) := Path a b
 
 /-- Identity morphism in the enriched sense: refl as the unit. -/
-def homId (a : A) : Hom a a := Path.refl a
+noncomputable def homId (a : A) : Hom a a := Path.refl a
 
 /-- Composition in the enriched category: trans IS composition. -/
-def homComp {a b c : A} (f : Hom a b) (g : Hom b c) : Hom a c :=
+noncomputable def homComp {a b c : A} (f : Hom a b) (g : Hom b c) : Hom a c :=
   Path.trans f g
 
 /-! ## Enriched Category Laws via multi-step trans chains -/
@@ -55,7 +55,7 @@ theorem homComp_assoc {a b c d : A} (f : Hom a b) (g : Hom b c) (h : Hom c d) :
 /-! ## Enriched symmetry structure (dagger/involutive enrichment) -/
 
 /-- The enriched dagger: symm gives each hom an involution. -/
-def homDagger {a b : A} (f : Hom a b) : Hom b a :=
+noncomputable def homDagger {a b : A} (f : Hom a b) : Hom b a :=
   Path.symm f
 
 /-- Dagger is involutive: applying it twice recovers the original.
@@ -113,7 +113,7 @@ theorem map_dagger (F : EnrichedFunctor A B) {a b : A}
   exact Path.congrArg_symm F.obj f
 
 /-- Composition of enriched functors. -/
-def comp (F : EnrichedFunctor A B) (G : EnrichedFunctor B C) : EnrichedFunctor A C where
+noncomputable def comp (F : EnrichedFunctor A B) (G : EnrichedFunctor B C) : EnrichedFunctor A C where
   obj := G.obj ∘ F.obj
   map := fun f => G.map (F.map f)
   map_def := fun f => by
@@ -147,7 +147,7 @@ variable {B : Type v}
 
 /-- Identity natural transformation. Multi-step: verify naturality via
     trans_refl_right and trans_refl_left. -/
-def id (F : EnrichedFunctor A B) : EnrichedNatTrans F F where
+noncomputable def id (F : EnrichedFunctor A B) : EnrichedNatTrans F F where
   component := fun a => homId (F.obj a)
   naturality := fun f => by
     show homComp (F.map f) (homId _) = homComp (homId _) (F.map f)
@@ -155,7 +155,7 @@ def id (F : EnrichedFunctor A B) : EnrichedNatTrans F F where
 
 /-- Vertical composition of natural transformations.
     Components composed via trans, naturality by multi-step chain. -/
-def vcomp {F G H : EnrichedFunctor A B}
+noncomputable def vcomp {F G H : EnrichedFunctor A B}
     (α : EnrichedNatTrans F G) (β : EnrichedNatTrans G H) :
     EnrichedNatTrans F H where
   component := fun a => homComp (α.component a) (β.component a)
@@ -318,7 +318,7 @@ structure PathCoend (T : A → A → Type v) (X : Type v) where
 
 /-- The enriched Yoneda map: from a natural family to an element.
     Given a family of maps Hom(a, x) → F(x) natural in x, evaluate at id_a. -/
-def yonedaMap {F : A → Type v}
+noncomputable def yonedaMap {F : A → Type v}
     (η : (x : A) → Hom a x → F x) : F a :=
   η a (homId a)
 
@@ -391,7 +391,7 @@ theorem enriched_interchange {a b c : A}
 /-! ## Composing natural transformations with functors (horizontal composition) -/
 
 /-- Horizontal composition (whiskering a nat trans by a functor on the right). -/
-def whiskerRight_natTrans {B : Type v} {C : Type w}
+noncomputable def whiskerRight_natTrans {B : Type v} {C : Type w}
     {F G : EnrichedFunctor A B} (α : EnrichedNatTrans F G)
     (H : EnrichedFunctor B C) : EnrichedNatTrans (EnrichedFunctor.comp F H) (EnrichedFunctor.comp G H) where
   component := fun a => H.map (α.component a)

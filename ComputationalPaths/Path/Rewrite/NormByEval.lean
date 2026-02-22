@@ -63,7 +63,7 @@ NbE = evaluate then quote. In our setting:
 
 /-- Normalization by Evaluation: interpret into the free group, then
     reify the reduced word back to an expression. -/
-@[simp] def nbe (e : Expr) : Expr := canon e
+@[simp] noncomputable def nbe (e : Expr) : Expr := canon e
 
 /-! ## Correctness: NbE Agrees with Rewriting -/
 
@@ -88,7 +88,7 @@ theorem nbe_complete (e₁ e₂ : Expr) :
   · intro h; exact (GroupoidConfluence.exprRwEq_iff_canon_eq e₁ e₂).2 h
 
 /-- NbE decides the word problem. -/
-instance nbe_decidable (e₁ e₂ : Expr) : Decidable (nbe e₁ = nbe e₂) :=
+noncomputable instance nbe_decidable (e₁ e₂ : Expr) : Decidable (nbe e₁ = nbe e₂) :=
   inferInstance
 
 /-! ## Comparison: NbE vs Rewriting
@@ -101,13 +101,13 @@ We formalize the comparison by showing that NbE's `toRW` interpretation
 naturally decomposes into the recursive structure of `Expr`. -/
 
 /-- The semantic domain: reduced words in the free group. -/
-def Sem := { w : List Gen // Reduced w }
+noncomputable def Sem := { w : List Gen // Reduced w }
 
 /-- Evaluate into the semantic domain. -/
-def eval (e : Expr) : Sem := ⟨toRW e, toRW_reduced e⟩
+noncomputable def eval (e : Expr) : Sem := ⟨toRW e, toRW_reduced e⟩
 
 /-- Quote back from the semantic domain. -/
-def quote (s : Sem) : Expr := rwToExpr s.1
+noncomputable def quote (s : Sem) : Expr := rwToExpr s.1
 
 /-- NbE is quote ∘ eval. -/
 theorem nbe_is_quote_eval (e : Expr) : nbe e = quote (eval e) := rfl
@@ -136,7 +136,7 @@ We can use NbE as a more efficient decision procedure than
 the `decideExprRwEq` function in `WordProblem.lean`. -/
 
 /-- NbE-based word problem decision. -/
-def decideNbE (e₁ e₂ : Expr) : Bool :=
+noncomputable def decideNbE (e₁ e₂ : Expr) : Bool :=
   nbe e₁ == nbe e₂
 
 /-- Soundness and completeness of the NbE decision procedure. -/

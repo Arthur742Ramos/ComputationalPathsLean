@@ -32,7 +32,7 @@ universe u v
 /-- The J eliminator: given a family D over pairs (b, proof a = b),
     a base case for refl, and a path p, produce D b p.proof.
     We implement via Eq.recOn on the proof field. -/
-def J {A : Type u} (a : A)
+noncomputable def J {A : Type u} (a : A)
     (D : (b : A) → a = b → Sort v)
     (d : D a rfl)
     {b : A} (p : Path a b) : D b p.proof :=
@@ -61,7 +61,7 @@ theorem J_from_transport {A : Type u} {a b : A}
 /-! ## Section 2 — Based path induction -/
 
 /-- Based path induction via J. -/
-def basedPathInd {A : Type u} (a : A)
+noncomputable def basedPathInd {A : Type u} (a : A)
     (C : (b : A) → a = b → Sort v)
     (c : C a rfl)
     (b : A) (p : Path a b) : C b p.proof :=
@@ -74,7 +74,7 @@ theorem basedPathInd_refl {A : Type u} (a : A)
     basedPathInd a C c a (Path.refl a) = c := rfl
 
 /-- Unbased path induction. -/
-def unbasedPathInd {A : Type u}
+noncomputable def unbasedPathInd {A : Type u}
     (C : (a b : A) → a = b → Sort v)
     (c : ∀ a, C a a rfl)
     (a b : A) (p : Path a b) : C a b p.proof :=
@@ -97,7 +97,7 @@ theorem based_eq_unbased {A : Type u} (a : A)
 /-! ## Section 3 — ap (action on paths) -/
 
 /-- ap: the action of a function on paths, defined via congrArg. -/
-def ap {A : Type u} {B : Type v} (f : A → B) {a b : A}
+noncomputable def ap {A : Type u} {B : Type v} (f : A → B) {a b : A}
     (p : Path a b) : Path (f a) (f b) :=
   Path.congrArg f p
 
@@ -192,11 +192,11 @@ structure QEquiv (A : Type u) (B : Type v) where
   qinv : QuasiInverse toFun
 
 /-- Identity is a quasi-equivalence. -/
-def QEquiv.refl (A : Type u) : QEquiv A A :=
+noncomputable def QEquiv.refl (A : Type u) : QEquiv A A :=
   QEquiv.mk id (QuasiInverse.mk id (fun _ => Path.refl _) (fun _ => Path.refl _))
 
 /-- Inverse quasi-equivalence. -/
-def QEquiv.symm {A B : Type u} (e : QEquiv A B) : QEquiv B A where
+noncomputable def QEquiv.symm {A B : Type u} (e : QEquiv A B) : QEquiv B A where
   toFun := e.qinv.inv
   qinv := {
     inv := e.toFun
@@ -205,7 +205,7 @@ def QEquiv.symm {A B : Type u} (e : QEquiv A B) : QEquiv B A where
   }
 
 /-- Composition of quasi-equivalences. -/
-def QEquiv.trans {A B C : Type u} (e₁ : QEquiv A B) (e₂ : QEquiv B C) :
+noncomputable def QEquiv.trans {A B C : Type u} (e₁ : QEquiv A B) (e₂ : QEquiv B C) :
     QEquiv A C where
   toFun := e₂.toFun ∘ e₁.toFun
   qinv := {
@@ -229,7 +229,7 @@ def QEquiv.trans {A B C : Type u} (e₁ : QEquiv A B) (e₂ : QEquiv B C) :
   }
 
 /-- Bool ≃ Bool via not. -/
-def qequivBoolNot : QEquiv Bool Bool where
+noncomputable def qequivBoolNot : QEquiv Bool Bool where
   toFun := not
   qinv := {
     inv := not
@@ -269,10 +269,10 @@ theorem qequiv_symm_symm {A B : Type u} (e : QEquiv A B) :
 /-! ## Section 6 — Eckmann–Hilton argument -/
 
 /-- 2-paths: equalities between paths (Prop level). -/
-def TwoPath {A : Type u} {a b : A} (p q : Path a b) := p = q
+noncomputable def TwoPath {A : Type u} {a b : A} (p q : Path a b) := p = q
 
 /-- Vertical composition of 2-paths. -/
-def vcomp {A : Type u} {a b : A} {p q r : Path a b}
+noncomputable def vcomp {A : Type u} {a b : A} {p q r : Path a b}
     (α : TwoPath p q) (β : TwoPath q r) : TwoPath p r :=
   α.trans β
 
@@ -377,19 +377,19 @@ structure Fiber {A : Type u} {B : Type v} (f : A → B) (b : B) where
   path : Path (f point) b
 
 /-- Fiber of id over any point. -/
-def Fiber.idFiber {A : Type u} (a : A) : Fiber id a :=
+noncomputable def Fiber.idFiber {A : Type u} (a : A) : Fiber id a :=
   Fiber.mk a (Path.refl a)
 
 /-- Fiber of not over false. -/
-def Fiber.notFalse : Fiber not false :=
+noncomputable def Fiber.notFalse : Fiber not false :=
   Fiber.mk true (Path.mk [Step.mk false false rfl] rfl)
 
 /-- Fiber of not over true. -/
-def Fiber.notTrue : Fiber not true :=
+noncomputable def Fiber.notTrue : Fiber not true :=
   Fiber.mk false (Path.mk [Step.mk true true rfl] rfl)
 
 /-- Fiber of Nat.succ over 1. -/
-def Fiber.succ1 : Fiber Nat.succ 1 :=
+noncomputable def Fiber.succ1 : Fiber Nat.succ 1 :=
   Fiber.mk 0 (Path.mk [Step.mk 1 1 rfl] rfl)
 
 /-! ## Section 11 — Path algebra via ap -/
@@ -470,11 +470,11 @@ theorem ap2_refl {A B : Type u} (f : A → B) {a b : A} (p : Path a b) :
 /-! ## Section 16 — Concrete step constructions -/
 
 /-- Construct a Bool path via explicit step. -/
-def boolPath (b : Bool) : Path b b :=
+noncomputable def boolPath (b : Bool) : Path b b :=
   Path.mk [Step.mk b b rfl] rfl
 
 /-- Construct a Nat path via explicit step. -/
-def natPath (n : Nat) : Path n n :=
+noncomputable def natPath (n : Nat) : Path n n :=
   Path.mk [Step.mk n n rfl] rfl
 
 /-- trans of Bool paths. -/
@@ -527,7 +527,7 @@ structure HalfAdjEquiv (A : Type u) (B : Type v) where
   adj : ∀ a, (ap toFun (sect a)).proof = (retr (toFun a)).proof
 
 /-- Identity as half-adjoint equivalence. -/
-def HalfAdjEquiv.refl (A : Type u) : HalfAdjEquiv A A where
+noncomputable def HalfAdjEquiv.refl (A : Type u) : HalfAdjEquiv A A where
   toFun := id
   invFun := id
   sect := fun a => Path.refl a
@@ -535,7 +535,7 @@ def HalfAdjEquiv.refl (A : Type u) : HalfAdjEquiv A A where
   adj := fun _ => rfl
 
 /-- Half-adjoint equiv gives quasi-equivalence. -/
-def HalfAdjEquiv.toQEquiv {A B : Type u} (e : HalfAdjEquiv A B) : QEquiv A B where
+noncomputable def HalfAdjEquiv.toQEquiv {A B : Type u} (e : HalfAdjEquiv A B) : QEquiv A B where
   toFun := e.toFun
   qinv := {
     inv := e.invFun
@@ -564,13 +564,13 @@ theorem two_path_unique {A : Type u} {a b : A} {p q : Path a b}
 /-! ## Section 20 — Whiskering operations -/
 
 /-- Left whiskering a 2-path. -/
-def whiskerL {A : Type u} {a b c : A} (r : Path a b)
+noncomputable def whiskerL {A : Type u} {a b c : A} (r : Path a b)
     {p q : Path b c} (α : p = q) :
     Path.trans r p = Path.trans r q :=
   _root_.congrArg (Path.trans r) α
 
 /-- Right whiskering a 2-path. -/
-def whiskerR {A : Type u} {a b c : A}
+noncomputable def whiskerR {A : Type u} {a b c : A}
     {p q : Path a b} (α : p = q) (r : Path b c) :
     Path.trans p r = Path.trans q r :=
   _root_.congrArg (fun t => Path.trans t r) α

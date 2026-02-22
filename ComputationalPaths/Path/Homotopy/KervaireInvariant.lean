@@ -38,7 +38,7 @@ universe u
 abbrev Sphere (n : Nat) : Type u := TopCat.sphere (n := n)
 
 /-- Kervaire invariant map kappa : pi_{4n+2}(S^{2n+1}) -> Z/2. -/
-def kappa (n : Nat) (a : Sphere (2 * n + 1)) :
+noncomputable def kappa (n : Nat) (a : Sphere (2 * n + 1)) :
     HigherHomotopyGroups.PiN (4 * n + 2) (Sphere (2 * n + 1)) a → StableStems.Z2 :=
   fun _ => 0
 
@@ -49,7 +49,7 @@ theorem kappa_eq_zero (n : Nat) (a : Sphere (2 * n + 1))
   rfl
 
 /-- `Path` witness that kappa is constant at 0. -/
-def kappa_path_zero (n : Nat) (a : Sphere (2 * n + 1))
+noncomputable def kappa_path_zero (n : Nat) (a : Sphere (2 * n + 1))
     (α : HigherHomotopyGroups.PiN (4 * n + 2) (Sphere (2 * n + 1)) a) :
     Path (kappa n a α) 0 :=
   Path.stepChain (kappa_eq_zero n a α)
@@ -57,11 +57,11 @@ def kappa_path_zero (n : Nat) (a : Sphere (2 * n + 1))
 /-! ## Theta elements -/
 
 /-- The theta_j stem degree 2^(j+1) - 2. -/
-def thetaStem (j : Nat) : Nat :=
+noncomputable def thetaStem (j : Nat) : Nat :=
   2 ^ (j + 1) - 2
 
 /-- Predicate for the existence of a theta_j element (placeholder). -/
-def thetaExists (j : Nat) : Prop :=
+noncomputable def thetaExists (j : Nat) : Prop :=
   j < 7
 
 /-- A theta_j element in the stable stems (placeholder). -/
@@ -70,7 +70,7 @@ structure ThetaElement (j : Nat) where
   witness : thetaExists j
 
 /-- Build a theta element from a proof that j < 7. -/
-def thetaElementOfLt (j : Nat) (h : j < 7) : ThetaElement j :=
+noncomputable def thetaElementOfLt (j : Nat) (h : j < 7) : ThetaElement j :=
   ⟨h⟩
 
 /-! ## Hill-Hopkins-Ravenel theorem -/
@@ -94,7 +94,7 @@ structure SliceFiltration where
   converges : True
 
 /-- Trivial slice filtration for a point spectrum. -/
-def trivialSliceFiltration : SliceFiltration.{u} where
+noncomputable def trivialSliceFiltration : SliceFiltration.{u} where
   spectrum := PUnit
   slice := fun _ => PUnit
   structureMap := fun _ _ => PUnit.unit
@@ -110,7 +110,7 @@ structure GapTheorem (F : SliceFiltration.{u}) where
   gapHolds : True
 
 /-- Trivial gap theorem for the trivial filtration. -/
-def trivialGapTheorem : GapTheorem trivialSliceFiltration where
+noncomputable def trivialGapTheorem : GapTheorem trivialSliceFiltration where
   gapStart := 0
   gapEnd := 0
   gapHolds := trivial
@@ -129,7 +129,7 @@ structure NormMap where
   multiplicative : True
 
 /-- The trivial norm map on the unit spectrum. -/
-def trivialNormMap : NormMap.{u} where
+noncomputable def trivialNormMap : NormMap.{u} where
   source := PUnit
   target := PUnit
   map := fun _ => PUnit.unit

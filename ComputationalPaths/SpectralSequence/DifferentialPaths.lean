@@ -74,7 +74,7 @@ noncomputable def commute_cancel_rweq (r p q : Nat) :
   rweq_cmpA_inv_left (D.commutePath r p q)
 
 /-- Composite boundary loop induced by the `d² = 0` witness. -/
-def boundaryLoop (r p q : Nat) :
+noncomputable def boundaryLoop (r p q : Nat) :
     Path (D.d r p q (D.d r p q (E.base p q))) (D.d r p q (D.d r p q (E.base p q))) :=
   Path.trans (D.dSquaredZeroPath r p q) (Path.symm (D.dSquaredZeroPath r p q))
 
@@ -87,7 +87,7 @@ noncomputable def boundaryLoop_contracts (r p q : Nat) :
 end DifferentialPaths
 
 /-- Trivial differential package over the trivial page package. -/
-def trivialDifferentialPaths : DifferentialPaths trivialSpectralPagePaths where
+noncomputable def trivialDifferentialPaths : DifferentialPaths trivialSpectralPagePaths where
   d := fun _ _ _ _ => PUnit.unit
   dSquaredZeroPath := fun _ _ _ => Path.refl PUnit.unit
   dSquaredZeroStep := fun _ _ _ => Path.Step.trans_refl_right (Path.refl PUnit.unit)
@@ -100,7 +100,7 @@ structure SpectralSequencePaths where
   differentials : DifferentialPaths pages
 
 /-- Canonical trivial spectral-sequence path package. -/
-def trivialSpectralSequencePaths : SpectralSequencePaths where
+noncomputable def trivialSpectralSequencePaths : SpectralSequencePaths where
   pages := trivialSpectralPagePaths
   differentials := trivialDifferentialPaths
 

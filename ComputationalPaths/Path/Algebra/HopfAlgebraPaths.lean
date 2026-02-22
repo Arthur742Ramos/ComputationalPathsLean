@@ -153,7 +153,7 @@ structure PathComodule (HA : PathHopfAlg A) {a : A} (M : Type v) where
   coact_id : ∀ (m : M), (coact m).1 = m ∨ True
 
 /-- Trivial comodule: coaction maps to (m, unit). -/
-def trivialComodule (HA : PathHopfAlg A) {a : A} :
+noncomputable def trivialComodule (HA : PathHopfAlg A) {a : A} :
     PathComodule HA (Path a a) (a := a) where
   coact := fun p => (p, HA.unit a)
   coact_id := fun _ => Or.inl rfl
@@ -161,11 +161,11 @@ def trivialComodule (HA : PathHopfAlg A) {a : A} :
 /-! ## Group algebra aspects -/
 
 /-- Group-like element: Δ(g) = g ⊗ g. -/
-def isGroupLike (HA : PathHopfAlg A) {a : A} (p : Path a a) : Prop :=
+noncomputable def isGroupLike (HA : PathHopfAlg A) {a : A} (p : Path a a) : Prop :=
   HA.comul p = (p, p)
 
 /-- Primitive element: Δ(x) = x ⊗ 1 + 1 ⊗ x. -/
-def isPrimitive (HA : PathHopfAlg A) {a : A} (p : Path a a) : Prop :=
+noncomputable def isPrimitive (HA : PathHopfAlg A) {a : A} (p : Path a a) : Prop :=
   HA.comul p = (HA.mul p (HA.unit a), HA.mul (HA.unit a) p)
 
 /-- Group-like elements are invertible with inverse = antipode. -/
@@ -231,12 +231,12 @@ theorem transport_mul_const (HA : PathHopfAlg A) {a : A}
   transport_const (ofEq (HA.mul_unit_left p)) x
 
 /-- Path from unit laws. -/
-def unit_left_path (HA : PathHopfAlg A) {a : A} (p : Path a a) :
+noncomputable def unit_left_path (HA : PathHopfAlg A) {a : A} (p : Path a a) :
     Path (HA.mul (HA.unit a) p) p :=
   ofEq (HA.mul_unit_left p)
 
 /-- Path from unit right law. -/
-def unit_right_path (HA : PathHopfAlg A) {a : A} (p : Path a a) :
+noncomputable def unit_right_path (HA : PathHopfAlg A) {a : A} (p : Path a a) :
     Path (HA.mul p (HA.unit a)) p :=
   ofEq (HA.mul_unit_right p)
 

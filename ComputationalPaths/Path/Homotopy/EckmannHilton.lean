@@ -183,7 +183,7 @@ noncomputable def interchangeRw
     four 2-cells in a grid are connected by a 3-cell.
 
     `(α ⊲ g) ∘ (f' ⊳ β) ≡₃ (f ⊳ β) ∘ (α ⊲ g')` -/
-def interchangeDeriv {f f' : Path a b} {g g' : Path b c}
+noncomputable def interchangeDeriv {f f' : Path a b} {g g' : Path b c}
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Derivation₃
       (.vcomp (OmegaGroupoid.whiskerRight α g) (OmegaGroupoid.whiskerLeft f' β))
@@ -219,44 +219,44 @@ variable {a : A}
 namespace OmegaTwo
 
 /-- Identity element of Ω². -/
-@[reducible] def id : OmegaTwo A a := Derivation₂.refl (Path.refl a)
+@[reducible] noncomputable def id : OmegaTwo A a := Derivation₂.refl (Path.refl a)
 
 /-- Vertical composition of 2-loops. -/
-@[reducible] def vcomp (α β : OmegaTwo A a) : OmegaTwo A a := Derivation₂.vcomp α β
+@[reducible] noncomputable def vcomp (α β : OmegaTwo A a) : OmegaTwo A a := Derivation₂.vcomp α β
 
 /-- Inverse of a 2-loop. -/
-@[reducible] def inv (α : OmegaTwo A a) : OmegaTwo A a := Derivation₂.inv α
+@[reducible] noncomputable def inv (α : OmegaTwo A a) : OmegaTwo A a := Derivation₂.inv α
 
 /-- Horizontal composition of 2-loops via whiskering.
     Equals `OmegaGroupoid.hcomp α β` definitionally.
     Since `trans (refl a) (refl a) ≡ refl a`, no transport is needed. -/
-@[reducible] def hcomp (α β : OmegaTwo A a) : OmegaTwo A a :=
+@[reducible] noncomputable def hcomp (α β : OmegaTwo A a) : OmegaTwo A a :=
   Derivation₂.vcomp (OmegaGroupoid.whiskerRight α (Path.refl a)) (OmegaGroupoid.whiskerLeft (Path.refl a) β)
 
 /-! ### Group Laws for Vertical Composition (witnessed by Derivation₃) -/
 
 /-- Left identity: `id ∘ α ≡₃ α`. -/
-def vcomp_id_left (α : OmegaTwo A a) :
+noncomputable def vcomp_id_left (α : OmegaTwo A a) :
     Derivation₃ (vcomp id α) α :=
   .step (.vcomp_refl_left α)
 
 /-- Right identity: `α ∘ id ≡₃ α`. -/
-def vcomp_id_right (α : OmegaTwo A a) :
+noncomputable def vcomp_id_right (α : OmegaTwo A a) :
     Derivation₃ (vcomp α id) α :=
   .step (.vcomp_refl_right α)
 
 /-- Associativity: `(α ∘ β) ∘ γ ≡₃ α ∘ (β ∘ γ)`. -/
-def vcomp_assoc (α β γ : OmegaTwo A a) :
+noncomputable def vcomp_assoc (α β γ : OmegaTwo A a) :
     Derivation₃ (vcomp (vcomp α β) γ) (vcomp α (vcomp β γ)) :=
   .step (.vcomp_assoc α β γ)
 
 /-- Left inverse: `α⁻¹ ∘ α ≡₃ id`. -/
-def inv_vcomp (α : OmegaTwo A a) :
+noncomputable def inv_vcomp (α : OmegaTwo A a) :
     Derivation₃ (vcomp (inv α) α) id :=
   .step (.vcomp_inv_left α)
 
 /-- Right inverse: `α ∘ α⁻¹ ≡₃ id`. -/
-def vcomp_inv (α : OmegaTwo A a) :
+noncomputable def vcomp_inv (α : OmegaTwo A a) :
     Derivation₃ (vcomp α (inv α)) id :=
   .step (.vcomp_inv_right α)
 
@@ -288,12 +288,12 @@ variable {a : A}
 
     Both `OmegaGroupoid.whiskerRight α (refl a)` and `α` are derivations between the
     reflexivity path and itself, producing identical `RwEq` proofs. -/
-def whiskerRight_refl_id (α : OmegaTwo A a) :
+noncomputable def whiskerRight_refl_id (α : OmegaTwo A a) :
     Derivation₃ (OmegaGroupoid.whiskerRight α (Path.refl a)) α :=
   .step (.rweq_eq rfl)
 
 /-- Left whiskering by `refl` is connected to the identity by a 3-cell. -/
-def whiskerLeft_refl_id (β : OmegaTwo A a) :
+noncomputable def whiskerLeft_refl_id (β : OmegaTwo A a) :
     Derivation₃ (OmegaGroupoid.whiskerLeft (Path.refl a) β) β :=
   .step (.rweq_eq rfl)
 
@@ -304,7 +304,7 @@ def whiskerLeft_refl_id (β : OmegaTwo A a) :
     Since `hcomp α β` unfolds to `vcomp (OmegaGroupoid.whiskerRight α refl) (OmegaGroupoid.whiskerLeft refl β)`,
     and whiskering by `refl` is the identity up to 3-cells, we conclude by
     congruence of `vcomp` at level 3. -/
-def hcomp_eq_vcomp (α β : OmegaTwo A a) :
+noncomputable def hcomp_eq_vcomp (α β : OmegaTwo A a) :
     Derivation₃ (OmegaTwo.hcomp α β) (OmegaTwo.vcomp α β) :=
   .vcomp
     (Derivation₃.whiskerRight₃ (whiskerRight_refl_id α) (OmegaGroupoid.whiskerLeft (Path.refl a) β))
@@ -312,12 +312,12 @@ def hcomp_eq_vcomp (α β : OmegaTwo A a) :
 
 /-- Alternative horizontal composition: left-whisker first, then right-whisker.
     This is the other diagonal of the interchange square. -/
-@[reducible] def hcomp' (α β : OmegaTwo A a) : OmegaTwo A a :=
+@[reducible] noncomputable def hcomp' (α β : OmegaTwo A a) : OmegaTwo A a :=
   Derivation₂.vcomp (OmegaGroupoid.whiskerLeft (Path.refl a) β) (OmegaGroupoid.whiskerRight α (Path.refl a))
 
 /-- Alternative horizontal composition reduces to reversed vertical composition:
     `hcomp' α β ≡₃ vcomp β α`. -/
-def hcomp'_eq_vcomp (α β : OmegaTwo A a) :
+noncomputable def hcomp'_eq_vcomp (α β : OmegaTwo A a) :
     Derivation₃ (hcomp' α β) (OmegaTwo.vcomp β α) :=
   .vcomp
     (Derivation₃.whiskerRight₃ (whiskerLeft_refl_id β) (OmegaGroupoid.whiskerRight α (Path.refl a)))
@@ -325,7 +325,7 @@ def hcomp'_eq_vcomp (α β : OmegaTwo A a) :
 
 /-- Interchange law specialized to Ω²: the two horizontal compositions
     are connected by a 3-cell. `hcomp α β ≡₃ hcomp' α β`. -/
-def interchange_omegaTwo (α β : OmegaTwo A a) :
+noncomputable def interchange_omegaTwo (α β : OmegaTwo A a) :
     Derivation₃ (OmegaTwo.hcomp α β) (hcomp' α β) :=
   .step (.interchange α β)
 
@@ -340,7 +340,7 @@ def interchange_omegaTwo (α β : OmegaTwo A a) :
       ≡₃ hcomp' α β      (interchange law swaps the order)
       ≡₃ vcomp β α       (hcomp' reduces to reversed vcomp)
     ``` -/
-def eckmann_hilton (α β : OmegaTwo A a) :
+noncomputable def eckmann_hilton (α β : OmegaTwo A a) :
     Derivation₃ (OmegaTwo.vcomp α β) (OmegaTwo.vcomp β α) :=
   .vcomp
     (.vcomp
@@ -349,7 +349,7 @@ def eckmann_hilton (α β : OmegaTwo A a) :
     (hcomp'_eq_vcomp α β)
 
 /-- Horizontal composition on Ω² is commutative. -/
-def hcomp_comm (α β : OmegaTwo A a) :
+noncomputable def hcomp_comm (α β : OmegaTwo A a) :
     Derivation₃ (OmegaTwo.hcomp α β) (OmegaTwo.hcomp β α) :=
   .vcomp
     (hcomp_eq_vcomp α β)

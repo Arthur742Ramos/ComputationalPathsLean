@@ -21,7 +21,7 @@ variable {α : Type u}
 
 /-! ## 1-3. Transport foundations -/
 
-def transport {P : α → Type u} {a b : α} (p : Path a b) (x : P a) : P b :=
+noncomputable def transport {P : α → Type u} {a b : α} (p : Path a b) (x : P a) : P b :=
   p.toEq ▸ x
 
 theorem transport_refl {P : α → Type u} {a : α} (x : P a) :
@@ -49,7 +49,7 @@ theorem transport_const {B : Type u} {a b : α} (p : Path a b) (x : B) :
 
 /-! ## 7-9. ap (non-dependent map) -/
 
-def ap {β : Type u} (f : α → β) {a b : α} (p : Path a b) : Path (f a) (f b) :=
+noncomputable def ap {β : Type u} (f : α → β) {a b : α} (p : Path a b) : Path (f a) (f b) :=
   Path.congrArg f p
 
 theorem ap_trans {β : Type u} (f : α → β) {a b c : α}
@@ -81,7 +81,7 @@ theorem ap_id_toEq {a b : α} (p : Path a b) :
 
 /-! ## 13-15. Dependent map -/
 
-def apd {P : α → Type u} (f : ∀ x, P x) {a b : α} (p : Path a b) :
+noncomputable def apd {P : α → Type u} (f : ∀ x, P x) {a b : α} (p : Path a b) :
     transport p (f a) = f b := by
   cases p with | mk _ proof => cases proof; rfl
 
@@ -94,10 +94,10 @@ theorem apd_irrel {P : α → Type u} (f : ∀ x, P x) {a b : α}
 
 /-! ## 16-18. Fiber transport -/
 
-def fiberFwd {P : α → Type u} {a b : α} (p : Path a b) : P a → P b :=
+noncomputable def fiberFwd {P : α → Type u} {a b : α} (p : Path a b) : P a → P b :=
   transport p
 
-def fiberBwd {P : α → Type u} {a b : α} (p : Path a b) : P b → P a :=
+noncomputable def fiberBwd {P : α → Type u} {a b : α} (p : Path a b) : P b → P a :=
   transport (Path.symm p)
 
 theorem fiber_roundtrip {P : α → Type u} {a b : α} (p : Path a b) (x : P a) :
@@ -110,7 +110,7 @@ theorem fiber_roundtrip' {P : α → Type u} {a b : α} (p : Path a b) (y : P b)
 
 /-! ## 19-21. PathOver -/
 
-def PathOver {P : α → Type u} {a b : α} (p : Path a b) (u : P a) (v : P b) :
+noncomputable def PathOver {P : α → Type u} {a b : α} (p : Path a b) (u : P a) (v : P b) :
     Prop := transport p u = v
 
 theorem pathOver_refl {P : α → Type u} {a : α} (u : P a) :
@@ -140,7 +140,7 @@ theorem transport_ap_eq {β : Type u} {P : β → Type u} (f : α → β) {a b :
 
 /-! ## 25-27. Horizontal composition -/
 
-def hcomp {a b c : α} (p : Path a b) (q : Path b c) : Path a c :=
+noncomputable def hcomp {a b c : α} (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
 theorem hcomp_assoc {a b c d : α} (p : Path a b) (q : Path b c)
@@ -184,10 +184,10 @@ theorem ap_hcomp_symm {β : Type u} (f : α → β) {a b : α} (p : Path a b) :
 
 /-! ## 34-36. Whiskering -/
 
-def whiskerLeft {a b c : α} (p : Path a b) {q r : Path b c}
+noncomputable def whiskerLeft {a b c : α} (p : Path a b) {q r : Path b c}
     (_ : q = r) : Path a c := Path.trans p r
 
-def whiskerRight {a b c : α} {p q : Path a b}
+noncomputable def whiskerRight {a b c : α} {p q : Path a b}
     (_ : p = q) (r : Path b c) : Path a c := Path.trans q r
 
 theorem whiskerLeft_id {a b c : α} (p : Path a b) (q : Path b c) :
@@ -201,11 +201,11 @@ theorem whiskerRight_id {a b c : α} (p : Path a b) (r : Path b c) :
 structure NatTransPath {β : Type u} (f g : α → β) where
   component : ∀ a, Path (f a) (g a)
 
-def natTransComp {β : Type u} {f g h : α → β}
+noncomputable def natTransComp {β : Type u} {f g h : α → β}
     (η : NatTransPath f g) (ε : NatTransPath g h) : NatTransPath f h :=
   { component := fun a => Path.trans (η.component a) (ε.component a) }
 
-def natTransInv {β : Type u} {f g : α → β}
+noncomputable def natTransInv {β : Type u} {f g : α → β}
     (η : NatTransPath f g) : NatTransPath g f :=
   { component := fun a => Path.symm (η.component a) }
 
@@ -257,20 +257,20 @@ theorem naturality_square {β : Type u} (f g : α → β)
     (Path.trans (η.component a) (ap g p)).toEq :=
   Subsingleton.elim _ _
 
-def natTransWhisker {β γ : Type u} {f g : α → β} (h : β → γ)
+noncomputable def natTransWhisker {β γ : Type u} {f g : α → β} (h : β → γ)
     (η : NatTransPath f g) : NatTransPath (h ∘ f) (h ∘ g) :=
   { component := fun a => Path.congrArg h (η.component a) }
 
-def natTransPrecomp {β γ : Type u} {f g : β → γ} (h : α → β)
+noncomputable def natTransPrecomp {β γ : Type u} {f g : β → γ} (h : α → β)
     (η : NatTransPath f g) : NatTransPath (f ∘ h) (g ∘ h) :=
   { component := fun a => η.component (h a) }
 
 /-! ## 49-51. Three/four step -/
 
-def threeStep (p : Path a b) (q : Path b c) (r : Path c d) : Path a d :=
+noncomputable def threeStep (p : Path a b) (q : Path b c) (r : Path c d) : Path a d :=
   Path.trans p (Path.trans q r)
 
-def fourStep {e : α} (p : Path a b) (q : Path b c) (r : Path c d)
+noncomputable def fourStep {e : α} (p : Path a b) (q : Path b c) (r : Path c d)
     (s : Path d e) : Path a e :=
   Path.trans p (Path.trans q (Path.trans r s))
 
@@ -324,13 +324,13 @@ theorem threeStep_toEq (p : Path a b) (q : Path b c) (r : Path c d) :
 
 /-! ## 61-63. CongrArg NatTrans -/
 
-def congrArgNT {β : Type u} (f : α → β) : NatTransPath f f :=
+noncomputable def congrArgNT {β : Type u} (f : α → β) : NatTransPath f f :=
   { component := fun a => Path.refl (f a) }
 
 theorem congrArgNT_is_id {β : Type u} (f : α → β) (a : α) :
     (congrArgNT f).component a = Path.refl (f a) := rfl
 
-def constNT {β : Type u} (x y : β) (p : Path x y) :
+noncomputable def constNT {β : Type u} (x y : β) (p : Path x y) :
     NatTransPath (fun _ : α => x) (fun _ => y) :=
   { component := fun _ => p }
 
@@ -364,7 +364,7 @@ theorem fiber_path_irrel {β : Type u} {f : α → β} {b : β}
     p.toEq = q.toEq :=
   Subsingleton.elim _ _
 
-def fiberPathBase {β : Type u} {f : α → β} {b : β}
+noncomputable def fiberPathBase {β : Type u} {f : α → β} {b : β}
     (x y : Fiber f b) (p : Path x.point y.point) :
     Path (f x.point) (f y.point) :=
   ap f p
@@ -376,10 +376,10 @@ theorem fiberPathBase_toEq {β : Type u} {f : α → β} {b : β}
 
 /-! ## 70-72. Transport equiv witnesses -/
 
-def transportFwd {P : α → Type u} {a b : α} (p : Path a b) : P a → P b :=
+noncomputable def transportFwd {P : α → Type u} {a b : α} (p : Path a b) : P a → P b :=
   transport p
 
-def transportBwd {P : α → Type u} {a b : α} (p : Path a b) : P b → P a :=
+noncomputable def transportBwd {P : α → Type u} {a b : α} (p : Path a b) : P b → P a :=
   transport (Path.symm p)
 
 theorem transport_fwd_bwd {P : α → Type u} {a b : α} (p : Path a b)
@@ -441,7 +441,7 @@ theorem trans_symm_right_toEq {a b : α} (p : Path a b) :
 
 /-! ## 82-84. NatTrans congrArg -/
 
-def natTransCongrArg {β γ : Type u} {f g : α → β} (h : β → γ)
+noncomputable def natTransCongrArg {β γ : Type u} {f g : α → β} (h : β → γ)
     (η : NatTransPath f g) : NatTransPath (h ∘ f) (h ∘ g) :=
   { component := fun a => Path.congrArg h (η.component a) }
 
@@ -463,11 +463,11 @@ structure SigmaPath {P : α → Type u} {x y : (a : α) × P a} where
   basePath : Path x.1 y.1
   fiberEq : transport basePath x.2 = y.2
 
-def sigmaPathRefl {P : α → Type u} {a : α} {x : P a} :
+noncomputable def sigmaPathRefl {P : α → Type u} {a : α} {x : P a} :
     SigmaPath (P := P) (x := ⟨a, x⟩) (y := ⟨a, x⟩) :=
   { basePath := Path.refl a, fiberEq := transport_refl x }
 
-def liftPath {P : α → Type u} {a b : α} (p : Path a b) (u : P a) :
+noncomputable def liftPath {P : α → Type u} {a b : α} (p : Path a b) (u : P a) :
     SigmaPath (P := P) (x := ⟨a, u⟩) (y := ⟨b, transport p u⟩) :=
   { basePath := p, fiberEq := rfl }
 

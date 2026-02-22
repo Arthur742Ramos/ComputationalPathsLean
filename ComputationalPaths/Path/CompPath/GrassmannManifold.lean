@@ -35,14 +35,14 @@ universe u
 /-! ## Grassmannian models -/
 
 /-- Real Grassmannian Gr(k, n) in the computational-path model. -/
-def RealGrassmann : Nat → Nat → Type u
+noncomputable def RealGrassmann : Nat → Nat → Type u
   | 0, _ => PUnit'
   | 1, 0 => PUnit'
   | 1, Nat.succ n => RealProjectiveSpace n
   | Nat.succ (Nat.succ _), _ => PUnit'
 
 /-- Complex Grassmannian Gr(k, n) in the computational-path model. -/
-def ComplexGrassmann : Nat → Nat → Type u
+noncomputable def ComplexGrassmann : Nat → Nat → Type u
   | 0, _ => PUnit'
   | 1, 0 => PUnit'
   | 1, Nat.succ n => ComplexProjectiveSpace n
@@ -51,14 +51,14 @@ def ComplexGrassmann : Nat → Nat → Type u
 /-! ## Basepoints -/
 
 /-- Basepoint of the real Grassmannian model. -/
-@[simp] def realGrassmannBase : (k n : Nat) → RealGrassmann k n
+@[simp] noncomputable def realGrassmannBase : (k n : Nat) → RealGrassmann k n
   | 0, _ => PUnit'.unit
   | 1, 0 => PUnit'.unit
   | 1, Nat.succ n => realProjectiveSpaceBase n
   | Nat.succ (Nat.succ _), _ => PUnit'.unit
 
 /-- Basepoint of the complex Grassmannian model. -/
-@[simp] def complexGrassmannBase : (k n : Nat) → ComplexGrassmann k n
+@[simp] noncomputable def complexGrassmannBase : (k n : Nat) → ComplexGrassmann k n
   | 0, _ => PUnit'.unit
   | 1, 0 => PUnit'.unit
   | 1, Nat.succ n => complexProjectiveBase n
@@ -67,17 +67,17 @@ def ComplexGrassmann : Nat → Nat → Type u
 /-! ## pi_1 models for real Grassmannians -/
 
 /-- Model for pi_1 of the real Grassmannian. -/
-def realGrassmannPiOne : Nat → Nat → Type u
+noncomputable def realGrassmannPiOne : Nat → Nat → Type u
   | 1, Nat.succ n => realProjectivePiOne n
   | _, _ => PUnit'
 
 /-- Group model for pi_1 of the real Grassmannian. -/
-def realGrassmannPiOneModel : Nat → Nat → Type
+noncomputable def realGrassmannPiOneModel : Nat → Nat → Type
   | 1, Nat.succ n => realProjectivePiOneModel n
   | _, _ => Unit
 
 /-- Equivalence between the unit types used in the Grassmannian models. -/
-private def punitEquivUnit : SimpleEquiv PUnit' Unit where
+private noncomputable def punitEquivUnit : SimpleEquiv PUnit' Unit where
   toFun := fun _ => ()
   invFun := fun _ => PUnit'.unit
   left_inv := by

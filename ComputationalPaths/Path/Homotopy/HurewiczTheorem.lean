@@ -36,7 +36,7 @@ abbrev Loop (A : Type u) (a : A) : Type u := Path (A := A) a a
 /-! ## §1  The Abelianization Relation via Computational Paths -/
 
 /-- The commutator `[p,q] = p · q · p⁻¹ · q⁻¹` of two loops. -/
-def loopCommutator {A : Type u} {a : A}
+noncomputable def loopCommutator {A : Type u} {a : A}
     (p q : Loop A a) : Loop A a :=
   Path.trans (Path.trans p q) (Path.trans (Path.symm p) (Path.symm q))
 
@@ -64,18 +64,18 @@ theorem abelRel_equiv {A : Type u} {a : A} :
   symm := AbelRel.symm
   trans := AbelRel.trans
 
-def abelSetoid (A : Type u) (a : A) : Setoid (Loop A a) where
+noncomputable def abelSetoid (A : Type u) (a : A) : Setoid (Loop A a) where
   r := AbelRel
   iseqv := abelRel_equiv
 
 /-- First homology group: loops modulo abelianization relation. -/
-def H₁ (A : Type u) (a : A) : Type u :=
+noncomputable def H₁ (A : Type u) (a : A) : Type u :=
   Quotient (abelSetoid A a)
 
 /-! ## §2  The Hurewicz Map -/
 
 /-- The Hurewicz map on `π₁(A,a)`, well-defined because RwEq ⊆ AbelRel. -/
-def hurewiczMap (A : Type u) (a : A) : π₁(A, a) → H₁ A a :=
+noncomputable def hurewiczMap (A : Type u) (a : A) : π₁(A, a) → H₁ A a :=
   Quot.lift (fun p => Quotient.mk (abelSetoid A a) p)
     (by
       intro p q h
@@ -85,7 +85,7 @@ def hurewiczMap (A : Type u) (a : A) : π₁(A, a) → H₁ A a :=
 /-! ## §3  h is a Group Homomorphism -/
 
 /-- Multiplication on H₁ induced by Path.trans. -/
-def h1Mul {A : Type u} {a : A} :
+noncomputable def h1Mul {A : Type u} {a : A} :
     H₁ A a → H₁ A a → H₁ A a :=
   Quotient.lift₂
     (fun p q => Quotient.mk (abelSetoid A a) (Path.trans p q))
@@ -97,7 +97,7 @@ def h1Mul {A : Type u} {a : A} :
         (AbelRel.congr_left p₂ hq))
 
 /-- Identity element in H₁. -/
-def h1One {A : Type u} (a : A) : H₁ A a :=
+noncomputable def h1One {A : Type u} (a : A) : H₁ A a :=
   Quotient.mk (abelSetoid A a) (Path.refl a)
 
 /-- AbelRel is congruent under Path.symm. -/
@@ -135,7 +135,7 @@ theorem abelRel_symm_congr {A : Type u} {a : A}
   | trans _ _ ih1 ih2 => exact AbelRel.trans ih1 ih2
 
 /-- Inverse in H₁, descending Path.symm. -/
-def h1Inv {A : Type u} {a : A} :
+noncomputable def h1Inv {A : Type u} {a : A} :
     H₁ A a → H₁ A a :=
   Quotient.lift
     (fun p => Quotient.mk (abelSetoid A a) (Path.symm p))
@@ -230,7 +230,7 @@ structure H1GroupWitness (A : Type u) (a : A) where
   mul_inv   : ∀ x : H₁ A a, h1Mul x (h1Inv x) = h1One a
   mul_comm  : ∀ x y : H₁ A a, h1Mul x y = h1Mul y x
 
-def h1GroupWitness (A : Type u) (a : A) : H1GroupWitness A a where
+noncomputable def h1GroupWitness (A : Type u) (a : A) : H1GroupWitness A a where
   mul_assoc := h1Mul_assoc
   one_mul   := h1One_mul
   mul_one   := h1Mul_one
@@ -249,7 +249,7 @@ theorem hurewiczMap_surjective {A : Type u} {a : A} :
   exact ⟨Quot.mk _ p, rfl⟩
 
 /-- The commutator of two elements of π₁. -/
-def pi1Commutator {A : Type u} {a : A}
+noncomputable def pi1Commutator {A : Type u} {a : A}
     (α β : π₁(A, a)) : π₁(A, a) :=
   LoopQuot.comp (LoopQuot.comp α β) (LoopQuot.comp (LoopQuot.inv α) (LoopQuot.inv β))
 
@@ -354,7 +354,7 @@ structure HurewiczTheoremWitness (A : Type u) (a : A) where
   comm_trivial : ∀ α β, map (pi1Commutator α β) = h1One a
   target_abelian : ∀ x y : H₁ A a, h1Mul x y = h1Mul y x
 
-def hurewiczTheorem (A : Type u) (a : A) : HurewiczTheoremWitness A a where
+noncomputable def hurewiczTheorem (A : Type u) (a : A) : HurewiczTheoremWitness A a where
   map := hurewiczMap A a
   map_mul := hurewiczMap_mul
   surjective := hurewiczMap_surjective
@@ -364,18 +364,18 @@ def hurewiczTheorem (A : Type u) (a : A) : HurewiczTheoremWitness A a where
 /-! ## §5  Simply Connected Case: h₂ : π₂ → H₂ -/
 
 /-- Simply connected: every loop is RwEq-equivalent to refl. -/
-def IsSimplyConnected (A : Type u) (a : A) : Prop :=
+noncomputable def IsSimplyConnected (A : Type u) (a : A) : Prop :=
   ∀ (p : Path a a), Nonempty (RwEq p (Path.refl a))
 
 /-- The second homotopy group π₂(A,a): 2-cells from refl to refl. -/
-def Pi2 (A : Type u) (a : A) : Type u :=
+noncomputable def Pi2 (A : Type u) (a : A) : Type u :=
   RwEq (Path.refl (A := A) a) (Path.refl a)
 
 /-- The second homology group H₂(A). -/
-def H₂ (A : Type u) : Type u := Algebra.H2 A
+noncomputable def H₂ (A : Type u) : Type u := Algebra.H2 A
 
 /-- The second Hurewicz map h₂: sends a 2-cell to its H₂ representative. -/
-def hurewiczMap2 {A : Type u} {a : A} :
+noncomputable def hurewiczMap2 {A : Type u} {a : A} :
     Pi2 A a → H₂ A :=
   fun w => Quot.mk _ (Algebra.TwoCell.mk a a (Path.refl a) (Path.refl a) w)
 
@@ -393,7 +393,7 @@ structure HigherHurewiczWitness (A : Type u) (a : A) where
   simply_connected : IsSimplyConnected A a
   map : Pi2 A a → H₂ A
 
-def higherHurewicz {A : Type u} {a : A}
+noncomputable def higherHurewicz {A : Type u} {a : A}
     (hsc : IsSimplyConnected A a) : HigherHurewiczWitness A a where
   simply_connected := hsc
   map := hurewiczMap2
@@ -401,7 +401,7 @@ def higherHurewicz {A : Type u} {a : A}
 /-! ## §6  Comparison with HomologicalAlgebra.H1 -/
 
 /-- Canonical map Algebra.H1 → our H₁ (RwEq ⊆ AbelRel). -/
-def algebraH1ToH1 {A : Type u} {a : A} :
+noncomputable def algebraH1ToH1 {A : Type u} {a : A} :
     Algebra.H1 A a → H₁ A a :=
   Quot.lift
     (fun p => Quotient.mk (abelSetoid A a) p)
@@ -423,7 +423,7 @@ structure HurewiczPackage (A : Type u) (a : A) where
   dim1 : HurewiczTheoremWitness A a
   h1Group : H1GroupWitness A a
 
-def hurewiczPackage (A : Type u) (a : A) : HurewiczPackage A a where
+noncomputable def hurewiczPackage (A : Type u) (a : A) : HurewiczPackage A a where
   dim1 := hurewiczTheorem A a
   h1Group := h1GroupWitness A a
 

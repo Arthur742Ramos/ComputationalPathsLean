@@ -30,15 +30,15 @@ namespace CellPath
 variable {α : Sort u} {x y z : α}
 
 /-- Identity higher cell. -/
-@[simp] def refl (x : α) : CellPath x x :=
+@[simp] noncomputable def refl (x : α) : CellPath x x :=
   Path.refl (PLift.up x)
 
 /-- Turn an equality into a computational-path witness. -/
-@[simp] def ofEq (h : x = y) : CellPath x y :=
+@[simp] noncomputable def ofEq (h : x = y) : CellPath x y :=
   Path.stepChain (_root_.congrArg PLift.up h)
 
 /-- Vertical composition of higher cells. -/
-@[simp] def comp (η : CellPath x y) (θ : CellPath y z) : CellPath x z :=
+@[simp] noncomputable def comp (η : CellPath x y) (θ : CellPath y z) : CellPath x z :=
   Path.trans η θ
 
 end CellPath
@@ -63,12 +63,12 @@ abbrev ThreeCell {p q : Path a b}
 
 namespace ThreeCell
 
-@[simp] def refl {p q : Path a b}
+@[simp] noncomputable def refl {p q : Path a b}
     (η : TwoCell (A := A) (a := a) (b := b) p q) :
     ThreeCell (A := A) (a := a) (b := b) η η :=
   CellPath.refl η
 
-@[simp] def ofEq {p q : Path a b}
+@[simp] noncomputable def ofEq {p q : Path a b}
     {η θ : TwoCell (A := A) (a := a) (b := b) p q}
     (h : η = θ) :
     ThreeCell (A := A) (a := a) (b := b) η θ :=
@@ -77,12 +77,12 @@ namespace ThreeCell
 end ThreeCell
 
 /-- Identity 2-cell on a computational path. -/
-@[simp] def id (p : Path a b) : TwoCell (A := A) (a := a) (b := b) p p :=
+@[simp] noncomputable def id (p : Path a b) : TwoCell (A := A) (a := a) (b := b) p p :=
   ⟨RwEq.refl _⟩
 
 /-- Vertical composition of 2-cells (categorical composition inside each
 `Hom(a,b)` category). -/
-@[simp] def comp {p q r : Path a b}
+@[simp] noncomputable def comp {p q r : Path a b}
     (η : TwoCell (A := A) (a := a) (b := b) p q)
     (θ : TwoCell (A := A) (a := a) (b := b) q r) :
     TwoCell (A := A) (a := a) (b := b) p r := by
@@ -170,7 +170,7 @@ end ThreeCell
   rfl
 
 /-- Left whiskering: precompose a 2-cell with a fixed 1-cell. -/
-@[simp] def whiskerLeft (f : Path a b) {g h : Path b c}
+@[simp] noncomputable def whiskerLeft (f : Path a b) {g h : Path b c}
     (η : TwoCell (A := A) (a := b) (b := c) g h) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f h) := by
   rcases η with ⟨η'⟩
@@ -186,7 +186,7 @@ end ThreeCell
   exact ⟨rweq_trans (rweq_trans_congr_right f η₁') (rweq_trans_congr_right f η₂')⟩
 
 /-- Right whiskering: postcompose a 2-cell with a fixed 1-cell. -/
-@[simp] def whiskerRight {f g : Path a b} (h : Path b c)
+@[simp] noncomputable def whiskerRight {f g : Path a b} (h : Path b c)
     (η : TwoCell (A := A) (a := a) (b := b) f g) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f h) (Path.trans g h) := by
   rcases η with ⟨η'⟩
@@ -214,7 +214,7 @@ end ThreeCell
 /-- Horizontal composition of 2-cells.  This is the operation denoted
 `∘ₕ` (or `circ_h`) in many texts and is defined by first whiskering on the
 right, then whiskering on the left. -/
-@[simp] def hcomp {f g : Path a b} {h k : Path b c}
+@[simp] noncomputable def hcomp {f g : Path a b} {h k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
     (θ : TwoCell (A := A) (a := b) (b := c) h k) :
     TwoCell (A := A) (a := a) (b := c)
@@ -335,7 +335,7 @@ composition on both sides. -/
   rfl
 
 /-- Associator 2-cell witnessing `((hg)f) ⇒ (h(gf))`. -/
-@[simp] def assoc (p : Path a b) (q : Path b c) (r : Path c d) :
+@[simp] noncomputable def assoc (p : Path a b) (q : Path b c) (r : Path c d) :
     TwoCell (A := A) (a := a) (b := d)
       (Path.trans (Path.trans p q) r)
       (Path.trans p (Path.trans q r)) :=
@@ -362,13 +362,13 @@ composition on both sides. -/
         (a := a) (b := b) (c := c) (d := d) p' q' r')))⟩
 
 /-- Left unitor 2-cell witnessing `(1 ∘ f) ⇒ f`. -/
-@[simp] def leftUnitor (p : Path a b) :
+@[simp] noncomputable def leftUnitor (p : Path a b) :
     TwoCell (A := A) (a := a) (b := b)
       (Path.trans (Path.refl a) p) p :=
   ⟨rweq_of_step (Step.trans_refl_left (A := A) (a := a) (b := b) p)⟩
 
 /-- Right unitor 2-cell witnessing `(f ∘ 1) ⇒ f`. -/
-@[simp] def rightUnitor (p : Path a b) :
+@[simp] noncomputable def rightUnitor (p : Path a b) :
     TwoCell (A := A) (a := a) (b := b)
       (Path.trans p (Path.refl b)) p :=
   ⟨rweq_of_step (Step.trans_refl_right (A := A) (a := a) (b := b) p)⟩
@@ -389,7 +389,7 @@ composition on both sides. -/
 /-- Horizontal composition exchanges with vertical composition (the
 interchange law).  The statement produces the canonical 2-cell that
 corresponds to the standard diagrammatic equality from bicategory theory. -/
-@[simp] def interchange
+@[simp] noncomputable def interchange
     {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
     (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
     (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
@@ -403,7 +403,7 @@ corresponds to the standard diagrammatic equality from bicategory theory. -/
 
 /-- The alternative way of composing the same four 2-cells horizontally
 then vertically, useful for establishing the interchange equality. -/
-@[simp] def interchange'
+@[simp] noncomputable def interchange'
     {f₀ f₁ f₂ : Path a b} {g₀ g₁ g₂ : Path b c}
     (η₁ : TwoCell (A := A) (a := a) (b := b) f₀ f₁)
     (η₂ : TwoCell (A := A) (a := a) (b := b) f₁ f₂)
@@ -473,7 +473,7 @@ up to a rewrite-equality 2-cell. -/
 
 /-- Left route of Mac Lane's pentagon, built by vertical composition of
 associator 2-cells and whiskering. -/
-@[simp] def pentagonLeftRoute
+@[simp] noncomputable def pentagonLeftRoute
     {a b c d e : A}
     (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) :
@@ -490,7 +490,7 @@ associator 2-cells and whiskering. -/
       (f := p) (assoc (A := A) (a := b) (b := c) (c := d) (d := e) q r s))
 
 /-- Right route of Mac Lane's pentagon. -/
-@[simp] def pentagonRightRoute
+@[simp] noncomputable def pentagonRightRoute
     {a b c d e : A}
     (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) :
@@ -513,7 +513,7 @@ associator 2-cells and whiskering. -/
   apply Subsingleton.elim
 
 /-- Left route of Mac Lane's triangle. -/
-@[simp] def triangleLeftRoute
+@[simp] noncomputable def triangleLeftRoute
     {a b c : A} (p : Path a b) (q : Path b c) :
     TwoCell (A := A) (a := a) (b := c)
       (Path.trans (Path.trans p (Path.refl b)) q)
@@ -525,7 +525,7 @@ associator 2-cells and whiskering. -/
       (f := p) (leftUnitor (A := A) (a := b) (b := c) q))
 
 /-- Right route of Mac Lane's triangle. -/
-@[simp] def triangleRightRoute
+@[simp] noncomputable def triangleRightRoute
     {a b c : A} (p : Path a b) (q : Path b c) :
     TwoCell (A := A) (a := a) (b := c)
       (Path.trans (Path.trans p (Path.refl b)) q)
@@ -614,7 +614,7 @@ horizontal composites. -/
   interchange_law (A := A) (a := a) (b := b) (c := c) η₁ η₂ θ₁ θ₂
 
 /-- Pentagon coherence promoted to a computational-path 3-cell. -/
-@[simp] def pentagonCoherence
+@[simp] noncomputable def pentagonCoherence
     {a b c d e : A}
     (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) :
@@ -627,7 +627,7 @@ horizontal composites. -/
         (a := a) (b := b) (c := c) (d := d) (e := e) p q r s))
 
 /-- Triangle coherence promoted to a computational-path 3-cell. -/
-@[simp] def triangleCoherence
+@[simp] noncomputable def triangleCoherence
     {a b c : A} (p : Path a b) (q : Path b c) :
     ThreeCell (A := A) (a := a) (b := c)
       (triangleLeftRoute (A := A) (a := a) (b := b) (c := c) p q)
@@ -682,7 +682,7 @@ horizontal composites. -/
   simp [CellPath.comp, CellPath.refl]
 
 /-- Every 2-cell is invertible (since TwoCell lives in Prop). -/
-@[simp] def inv {p q : Path a b}
+@[simp] noncomputable def inv {p q : Path a b}
     (η : TwoCell (A := A) (a := a) (b := b) p q) :
     TwoCell (A := A) (a := a) (b := b) q p := by
   rcases η with ⟨η'⟩
@@ -741,20 +741,20 @@ theorem comp_inv_cancel {p q : Path a b}
   apply Subsingleton.elim
 
 /-- The associator is invertible with explicit inverse. -/
-@[simp] def assoc_inv (p : Path a b) (q : Path b c) (r : Path c d) :
+@[simp] noncomputable def assoc_inv (p : Path a b) (q : Path b c) (r : Path c d) :
     TwoCell (A := A) (a := a) (b := d)
       (Path.trans p (Path.trans q r))
       (Path.trans (Path.trans p q) r) :=
   inv (assoc (A := A) (a := a) (b := b) (c := c) (d := d) p q r)
 
 /-- The left unitor is invertible with explicit inverse. -/
-@[simp] def leftUnitor_inv (p : Path a b) :
+@[simp] noncomputable def leftUnitor_inv (p : Path a b) :
     TwoCell (A := A) (a := a) (b := b)
       p (Path.trans (Path.refl a) p) :=
   inv (leftUnitor (A := A) (a := a) (b := b) p)
 
 /-- The right unitor is invertible with explicit inverse. -/
-@[simp] def rightUnitor_inv (p : Path a b) :
+@[simp] noncomputable def rightUnitor_inv (p : Path a b) :
     TwoCell (A := A) (a := a) (b := b)
       p (Path.trans p (Path.refl b)) :=
   inv (rightUnitor (A := A) (a := a) (b := b) p)
@@ -910,7 +910,7 @@ structure WeakTwoGroupoid (Obj : Type u')
 end WeakTwoGroupoidStructure
 
 /-- Computational paths and rewrite-equality 2-cells form a weak bicategory. -/
-def weakBicategory (A : Type u) :
+noncomputable def weakBicategory (A : Type u) :
     WeakBicategory (Obj := A) where
   Hom := fun a b => Path a b
   TwoCell := fun {a b} p q =>
@@ -946,7 +946,7 @@ def weakBicategory (A : Type u) :
 
 /-- Computational paths organise into a weak 2-groupoid: every path has an
 inverse up to rewrite equality. -/
-def weakTwoGroupoid (A : Type u) :
+noncomputable def weakTwoGroupoid (A : Type u) :
     WeakTwoGroupoid (Obj := A) where
   toWeakBicategory := weakBicategory A
   inv₁ := fun {_ _} f => Path.symm f

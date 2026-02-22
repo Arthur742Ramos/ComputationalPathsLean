@@ -61,14 +61,14 @@ theorem meridian_whisker_contracts_two_cell {X : Type u} (x y : X) :
 /-! ## Suspension as a path pushout -/
 
 /-- A pushout loop in `ΣX` built from two meridians. -/
-def pushoutLoop {X : Type u} (x y : X) :
+noncomputable def pushoutLoop {X : Type u} (x y : X) :
     Path (SuspensionLoop.Suspension.north (X := X)) (SuspensionLoop.Suspension.north (X := X)) :=
   Path.trans
     (SuspensionLoop.Suspension.merid (X := X) x)
     (Path.symm (SuspensionLoop.Suspension.merid (X := X) y))
 
 /-- Degenerate pushout loop using the same meridian in opposite directions. -/
-def pushoutLoopDegenerate {X : Type u} (x : X) :
+noncomputable def pushoutLoopDegenerate {X : Type u} (x : X) :
     Path (SuspensionLoop.Suspension.north (X := X)) (SuspensionLoop.Suspension.north (X := X)) :=
   pushoutLoop x x
 
@@ -109,7 +109,7 @@ theorem pushout_assoc_two_cell {X : Type u} (x y z : X) :
     (SuspensionLoop.Suspension.merid (X := X) z)
 
 /-- Pushout loops carry reflexive computational paths. -/
-def pushoutLoop_path {X : Type u} (x y : X) :
+noncomputable def pushoutLoop_path {X : Type u} (x y : X) :
     Path (pushoutLoop x y) (pushoutLoop x y) :=
   Path.refl _
 

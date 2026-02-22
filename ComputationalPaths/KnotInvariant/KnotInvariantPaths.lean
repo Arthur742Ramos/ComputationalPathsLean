@@ -115,7 +115,7 @@ variable {K Inv : Type u} (I : KnotInvData K Inv)
   Path.symm_symm _
 
 /-- 11. Jones of double mirror: jones(mirror(mirror k)) path -/
-def jonesDoubleMirrorPath (k : K) :
+noncomputable def jonesDoubleMirrorPath (k : K) :
     Path (I.jones (I.mirror (I.mirror k))) (I.jones k) :=
   Path.congrArg I.jones (I.mirrorMirrorPath k)
 
@@ -223,7 +223,7 @@ def jonesDoubleMirrorPath (k : K) :
   Path.symm_symm _
 
 /-- 31. congrArg mirror on connectAssoc -/
-def mirrorConnectAssocPath (k₁ k₂ k₃ : K) :
+noncomputable def mirrorConnectAssocPath (k₁ k₂ k₃ : K) :
     Path (I.mirror (I.connect (I.connect k₁ k₂) k₃))
          (I.mirror (I.connect k₁ (I.connect k₂ k₃))) :=
   Path.congrArg I.mirror (I.connectAssocPath k₁ k₂ k₃)
@@ -234,7 +234,7 @@ def mirrorConnectAssocPath (k₁ k₂ k₃ : K) :
   Path.trans_refl_right _
 
 /-- 33. congrArg jones on connectAssoc -/
-def jonesConnectAssocPath (k₁ k₂ k₃ : K) :
+noncomputable def jonesConnectAssocPath (k₁ k₂ k₃ : K) :
     Path (I.jones (I.connect (I.connect k₁ k₂) k₃))
          (I.jones (I.connect k₁ (I.connect k₂ k₃))) :=
   Path.congrArg I.jones (I.connectAssocPath k₁ k₂ k₃)
@@ -245,7 +245,7 @@ def jonesConnectAssocPath (k₁ k₂ k₃ : K) :
   Path.trans_refl_right _
 
 /-- 35. congrArg mirror on mirrorMirror -/
-def mirrorCubedPath (k : K) :
+noncomputable def mirrorCubedPath (k : K) :
     Path (I.mirror (I.mirror (I.mirror k))) (I.mirror k) :=
   Path.congrArg I.mirror (I.mirrorMirrorPath k)
 
@@ -299,7 +299,7 @@ def mirrorCubedPath (k : K) :
   Path.symm_symm _
 
 /-- 45. congrArg invNeg on invMulAssoc -/
-def negMulAssocPath (a b c : Inv) :
+noncomputable def negMulAssocPath (a b c : Inv) :
     Path (I.invNeg (I.invMul (I.invMul a b) c))
          (I.invNeg (I.invMul a (I.invMul b c))) :=
   Path.congrArg I.invNeg (I.invMulAssocPath a b c)
@@ -314,7 +314,7 @@ def negMulAssocPath (a b c : Inv) :
 -- ============================================================
 
 /-- 47. Jones of connected-sum of mirror: j(mirror k₁ # k₂) -/
-def jonesMirrorConnectPath (k₁ k₂ : K) :
+noncomputable def jonesMirrorConnectPath (k₁ k₂ : K) :
     Path (I.jones (I.connect (I.mirror k₁) k₂))
          (I.invMul (I.invNeg (I.jones k₁)) (I.jones k₂)) :=
   Path.trans
@@ -332,7 +332,7 @@ def jonesMirrorConnectPath (k₁ k₂ : K) :
   Path.symm_symm _
 
 /-- 50. Jones of trivial connect: jones(unknot # k) = jones k -/
-def jonesTrivialConnectPath (k : K) :
+noncomputable def jonesTrivialConnectPath (k : K) :
     Path (I.jones (I.connect I.trivial k)) (I.jones k) :=
   Path.congrArg I.jones (I.connectTrivialLPath k)
 
@@ -342,7 +342,7 @@ def jonesTrivialConnectPath (k : K) :
   Path.trans_refl_right _
 
 /-- 52. congrArg writhe on connectAssoc -/
-def writheConnectAssocPath (k₁ k₂ k₃ : K) :
+noncomputable def writheConnectAssocPath (k₁ k₂ k₃ : K) :
     Path (I.writhe (I.connect (I.connect k₁ k₂) k₃))
          (I.writhe (I.connect k₁ (I.connect k₂ k₃))) :=
   Path.congrArg I.writhe (I.connectAssocPath k₁ k₂ k₃)
@@ -353,7 +353,7 @@ def writheConnectAssocPath (k₁ k₂ k₃ : K) :
   Path.trans_refl_right _
 
 /-- 54. congrArg bracket on connectAssoc -/
-def bracketConnectAssocPath (k₁ k₂ k₃ : K) :
+noncomputable def bracketConnectAssocPath (k₁ k₂ k₃ : K) :
     Path (I.bracket (I.connect (I.connect k₁ k₂) k₃))
          (I.bracket (I.connect k₁ (I.connect k₂ k₃))) :=
   Path.congrArg I.bracket (I.connectAssocPath k₁ k₂ k₃)
@@ -364,7 +364,7 @@ def bracketConnectAssocPath (k₁ k₂ k₃ : K) :
   Path.trans_refl_right _
 
 /-- 56. congrArg crossNum on mirrorMirror -/
-def crossMirrorMirrorPath (k : K) :
+noncomputable def crossMirrorMirrorPath (k : K) :
     Path (I.crossNum (I.mirror (I.mirror k))) (I.crossNum k) :=
   Path.congrArg I.crossNum (I.mirrorMirrorPath k)
 
@@ -382,7 +382,7 @@ theorem symm_jonesMirrorConnect (k₁ k₂ : K) :
   Path.symm_trans _ _
 
 /-- 59. congrArg jones on connectTrivialR -/
-def jonesConnectTrivialRPath (k : K) :
+noncomputable def jonesConnectTrivialRPath (k : K) :
     Path (I.jones (I.connect k I.trivial)) (I.jones k) :=
   Path.congrArg I.jones (I.connectTrivialRPath k)
 

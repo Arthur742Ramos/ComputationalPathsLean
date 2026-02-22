@@ -25,7 +25,7 @@ universe u
 -- Utility: single-step path from a theorem
 -- ═══════════════════════════════════════════════
 
-private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
+private noncomputable def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
   Path.mk [⟨x, y, h⟩] h
 
 /-! ## Vector Bundle Representations -/
@@ -35,10 +35,10 @@ private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
   rank : Nat
   deriving DecidableEq, Repr
 
-@[simp] def trivialBundle (n : Nat) : VBundle := ⟨n⟩
-@[simp] def zeroBundle : VBundle := ⟨0⟩
-@[simp] def directSum (E F : VBundle) : VBundle := ⟨E.rank + F.rank⟩
-@[simp] def tensorProd (E F : VBundle) : VBundle := ⟨E.rank * F.rank⟩
+@[simp] noncomputable def trivialBundle (n : Nat) : VBundle := ⟨n⟩
+@[simp] noncomputable def zeroBundle : VBundle := ⟨0⟩
+@[simp] noncomputable def directSum (E F : VBundle) : VBundle := ⟨E.rank + F.rank⟩
+@[simp] noncomputable def tensorProd (E F : VBundle) : VBundle := ⟨E.rank * F.rank⟩
 
 /-! ## Grothendieck Group (K₀) -/
 
@@ -48,12 +48,12 @@ private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
   neg : Nat
   deriving DecidableEq, Repr
 
-@[simp] def VirtualBundle.ofBundle (E : VBundle) : VirtualBundle := ⟨E.rank, 0⟩
-@[simp] def VirtualBundle.zero : VirtualBundle := ⟨0, 0⟩
-@[simp] def VirtualBundle.add (v w : VirtualBundle) : VirtualBundle :=
+@[simp] noncomputable def VirtualBundle.ofBundle (E : VBundle) : VirtualBundle := ⟨E.rank, 0⟩
+@[simp] noncomputable def VirtualBundle.zero : VirtualBundle := ⟨0, 0⟩
+@[simp] noncomputable def VirtualBundle.add (v w : VirtualBundle) : VirtualBundle :=
   ⟨v.pos + w.pos, v.neg + w.neg⟩
-@[simp] def VirtualBundle.negation (v : VirtualBundle) : VirtualBundle := ⟨v.neg, v.pos⟩
-@[simp] def VirtualBundle.virtualRank (v : VirtualBundle) : Int :=
+@[simp] noncomputable def VirtualBundle.negation (v : VirtualBundle) : VirtualBundle := ⟨v.neg, v.pos⟩
+@[simp] noncomputable def VirtualBundle.virtualRank (v : VirtualBundle) : Int :=
   (v.pos : Int) - (v.neg : Int)
 
 /-! ## Bott periodicity pair -/
@@ -63,15 +63,15 @@ private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
   snd : VirtualBundle
   deriving DecidableEq, Repr
 
-@[simp] def KPair.add (p q : KPair) : KPair :=
+@[simp] noncomputable def KPair.add (p q : KPair) : KPair :=
   ⟨VirtualBundle.add p.fst q.fst, VirtualBundle.add p.snd q.snd⟩
-@[simp] def KPair.zero : KPair := ⟨VirtualBundle.zero, VirtualBundle.zero⟩
-@[simp] def bottMap (v : VirtualBundle) : KPair := ⟨v, VirtualBundle.zero⟩
+@[simp] noncomputable def KPair.zero : KPair := ⟨VirtualBundle.zero, VirtualBundle.zero⟩
+@[simp] noncomputable def bottMap (v : VirtualBundle) : KPair := ⟨v, VirtualBundle.zero⟩
 
 /-! ## Derived operations -/
 
-@[simp] def rankMap (v : VirtualBundle) : Int := v.virtualRank
-@[simp] def chernCharacter (v : VirtualBundle) : Int := v.virtualRank
+@[simp] noncomputable def rankMap (v : VirtualBundle) : Int := v.virtualRank
+@[simp] noncomputable def chernCharacter (v : VirtualBundle) : Int := v.virtualRank
 
 -- ═══════════════════════════════════════════════════════
 -- THEOREMS AND PATH CONSTRUCTIONS — zero Path.mk
@@ -83,7 +83,7 @@ private def stepPath {A : Type _} {x y : A} (h : x = y) : Path x y :=
 theorem directSum_comm_thm (E F : VBundle) : directSum E F = directSum F E := by
   ext; simp [Nat.add_comm]
 
-def directSum_comm (E F : VBundle) :
+noncomputable def directSum_comm (E F : VBundle) :
     Path (directSum E F) (directSum F E) :=
   stepPath (directSum_comm_thm E F)
 
@@ -92,7 +92,7 @@ theorem directSum_assoc_thm (E F G : VBundle) :
     directSum (directSum E F) G = directSum E (directSum F G) := by
   ext; simp [Nat.add_assoc]
 
-def directSum_assoc (E F G : VBundle) :
+noncomputable def directSum_assoc (E F G : VBundle) :
     Path (directSum (directSum E F) G) (directSum E (directSum F G)) :=
   stepPath (directSum_assoc_thm E F G)
 
@@ -100,18 +100,18 @@ def directSum_assoc (E F G : VBundle) :
 theorem directSum_zero_right_thm (E : VBundle) : directSum E zeroBundle = E := by
   ext; simp
 
-def directSum_zero_right (E : VBundle) : Path (directSum E zeroBundle) E :=
+noncomputable def directSum_zero_right (E : VBundle) : Path (directSum E zeroBundle) E :=
   stepPath (directSum_zero_right_thm E)
 
 -- 4. zero left
 theorem directSum_zero_left_thm (E : VBundle) : directSum zeroBundle E = E := by
   ext; simp
 
-def directSum_zero_left (E : VBundle) : Path (directSum zeroBundle E) E :=
+noncomputable def directSum_zero_left (E : VBundle) : Path (directSum zeroBundle E) E :=
   stepPath (directSum_zero_left_thm E)
 
 -- 5. **Multi-step** pentagon: ((E⊕F)⊕G)⊕H = E⊕(F⊕(G⊕H))
-def directSum_pentagon (E F G H : VBundle) :
+noncomputable def directSum_pentagon (E F G H : VBundle) :
     Path (directSum (directSum (directSum E F) G) H)
          (directSum E (directSum F (directSum G H))) :=
   Path.trans (directSum_assoc (directSum E F) G H)
@@ -123,7 +123,7 @@ def directSum_pentagon (E F G H : VBundle) :
 theorem tensor_comm_thm (E F : VBundle) : tensorProd E F = tensorProd F E := by
   ext; simp [Nat.mul_comm]
 
-def tensor_comm (E F : VBundle) :
+noncomputable def tensor_comm (E F : VBundle) :
     Path (tensorProd E F) (tensorProd F E) :=
   stepPath (tensor_comm_thm E F)
 
@@ -132,7 +132,7 @@ theorem tensor_assoc_thm (E F G : VBundle) :
     tensorProd (tensorProd E F) G = tensorProd E (tensorProd F G) := by
   ext; simp [Nat.mul_assoc]
 
-def tensor_assoc (E F G : VBundle) :
+noncomputable def tensor_assoc (E F G : VBundle) :
     Path (tensorProd (tensorProd E F) G) (tensorProd E (tensorProd F G)) :=
   stepPath (tensor_assoc_thm E F G)
 
@@ -140,7 +140,7 @@ def tensor_assoc (E F G : VBundle) :
 theorem tensor_unit_right_thm (E : VBundle) : tensorProd E (trivialBundle 1) = E := by
   ext; simp
 
-def tensor_unit_right (E : VBundle) :
+noncomputable def tensor_unit_right (E : VBundle) :
     Path (tensorProd E (trivialBundle 1)) E :=
   stepPath (tensor_unit_right_thm E)
 
@@ -148,7 +148,7 @@ def tensor_unit_right (E : VBundle) :
 theorem tensor_unit_left_thm (E : VBundle) : tensorProd (trivialBundle 1) E = E := by
   ext; simp
 
-def tensor_unit_left (E : VBundle) :
+noncomputable def tensor_unit_left (E : VBundle) :
     Path (tensorProd (trivialBundle 1) E) E :=
   stepPath (tensor_unit_left_thm E)
 
@@ -156,7 +156,7 @@ def tensor_unit_left (E : VBundle) :
 theorem tensor_zero_thm (E : VBundle) : tensorProd E zeroBundle = zeroBundle := by
   ext; simp
 
-def tensor_zero (E : VBundle) :
+noncomputable def tensor_zero (E : VBundle) :
     Path (tensorProd E zeroBundle) zeroBundle :=
   stepPath (tensor_zero_thm E)
 
@@ -167,7 +167,7 @@ theorem tensor_distrib_left_thm (E F G : VBundle) :
     tensorProd E (directSum F G) = directSum (tensorProd E F) (tensorProd E G) := by
   ext; simp [Nat.left_distrib]
 
-def tensor_distrib_left (E F G : VBundle) :
+noncomputable def tensor_distrib_left (E F G : VBundle) :
     Path (tensorProd E (directSum F G))
          (directSum (tensorProd E F) (tensorProd E G)) :=
   stepPath (tensor_distrib_left_thm E F G)
@@ -177,25 +177,25 @@ theorem tensor_distrib_right_thm (E F G : VBundle) :
     tensorProd (directSum E F) G = directSum (tensorProd E G) (tensorProd F G) := by
   ext; simp [Nat.right_distrib]
 
-def tensor_distrib_right (E F G : VBundle) :
+noncomputable def tensor_distrib_right (E F G : VBundle) :
     Path (tensorProd (directSum E F) G)
          (directSum (tensorProd E G) (tensorProd F G)) :=
   stepPath (tensor_distrib_right_thm E F G)
 
 -- 13. **Multi-step** E⊗(F⊕G) = (E⊗F)⊕(E⊗G) = (F⊗E)⊕(G⊗E)
-def tensor_distrib_comm_right (E F G : VBundle) :
+noncomputable def tensor_distrib_comm_right (E F G : VBundle) :
     Path (tensorProd E (directSum F G))
          (directSum (tensorProd F E) (tensorProd G E)) :=
   Path.trans (tensor_distrib_left E F G)
              (stepPath (by ext; simp [Nat.mul_comm]))
 
 -- 14. **Multi-step** E⊗0 = 0 = 0⊗E → E⊗0 = 0⊗E
-def tensor_zero_comm (E : VBundle) :
+noncomputable def tensor_zero_comm (E : VBundle) :
     Path (tensorProd E zeroBundle) (tensorProd zeroBundle E) :=
   Path.trans (tensor_zero E) (Path.symm (stepPath (by ext; simp)))
 
 -- 15. **Multi-step** (E⊗1)⊕(F⊗1) = E⊕F
-def tensor_unit_sum (E F : VBundle) :
+noncomputable def tensor_unit_sum (E F : VBundle) :
     Path (directSum (tensorProd E (trivialBundle 1)) (tensorProd F (trivialBundle 1)))
          (directSum E F) :=
   let step1 := Path.congrArg (fun x => directSum x (tensorProd F (trivialBundle 1)))
@@ -210,7 +210,7 @@ theorem vb_add_comm (v w : VirtualBundle) :
     VirtualBundle.add v w = VirtualBundle.add w v := by
   ext <;> simp [Nat.add_comm]
 
-def vb_add_comm_path (v w : VirtualBundle) :
+noncomputable def vb_add_comm_path (v w : VirtualBundle) :
     Path (VirtualBundle.add v w) (VirtualBundle.add w v) :=
   stepPath (vb_add_comm v w)
 
@@ -220,7 +220,7 @@ theorem vb_add_assoc (u v w : VirtualBundle) :
     VirtualBundle.add u (VirtualBundle.add v w) := by
   ext <;> simp [Nat.add_assoc]
 
-def vb_add_assoc_path (u v w : VirtualBundle) :
+noncomputable def vb_add_assoc_path (u v w : VirtualBundle) :
     Path (VirtualBundle.add (VirtualBundle.add u v) w)
          (VirtualBundle.add u (VirtualBundle.add v w)) :=
   stepPath (vb_add_assoc u v w)
@@ -229,7 +229,7 @@ def vb_add_assoc_path (u v w : VirtualBundle) :
 theorem vb_add_zero (v : VirtualBundle) :
     VirtualBundle.add v VirtualBundle.zero = v := by ext <;> simp
 
-def vb_add_zero_path (v : VirtualBundle) :
+noncomputable def vb_add_zero_path (v : VirtualBundle) :
     Path (VirtualBundle.add v VirtualBundle.zero) v :=
   stepPath (vb_add_zero v)
 
@@ -237,7 +237,7 @@ def vb_add_zero_path (v : VirtualBundle) :
 theorem vb_zero_add (v : VirtualBundle) :
     VirtualBundle.add VirtualBundle.zero v = v := by ext <;> simp
 
-def vb_zero_add_path (v : VirtualBundle) :
+noncomputable def vb_zero_add_path (v : VirtualBundle) :
     Path (VirtualBundle.add VirtualBundle.zero v) v :=
   stepPath (vb_zero_add v)
 
@@ -246,19 +246,19 @@ theorem vb_neg_neg (v : VirtualBundle) :
     VirtualBundle.negation (VirtualBundle.negation v) = v := by
   ext <;> simp [VirtualBundle.negation]
 
-def vb_neg_neg_path (v : VirtualBundle) :
+noncomputable def vb_neg_neg_path (v : VirtualBundle) :
     Path (VirtualBundle.negation (VirtualBundle.negation v)) v :=
   stepPath (vb_neg_neg v)
 
 /-! ### 21-25 : Virtual rank paths -/
 
 -- 21. virtual rank of zero
-def virtualRank_zero_path :
+noncomputable def virtualRank_zero_path :
     Path VirtualBundle.zero.virtualRank 0 :=
   Path.refl 0
 
 -- 22. virtual rank of bundle
-def virtualRank_ofBundle (E : VBundle) :
+noncomputable def virtualRank_ofBundle (E : VBundle) :
     Path (VirtualBundle.ofBundle E).virtualRank (E.rank : Int) :=
   stepPath (by simp [VirtualBundle.ofBundle, VirtualBundle.virtualRank])
 
@@ -267,7 +267,7 @@ theorem virtualRank_neg_thm (v : VirtualBundle) :
     (VirtualBundle.negation v).virtualRank = -v.virtualRank := by
   simp [VirtualBundle.negation, VirtualBundle.virtualRank]; omega
 
-def virtualRank_neg (v : VirtualBundle) :
+noncomputable def virtualRank_neg (v : VirtualBundle) :
     Path (VirtualBundle.negation v).virtualRank (-v.virtualRank) :=
   stepPath (virtualRank_neg_thm v)
 
@@ -276,7 +276,7 @@ theorem virtualRank_add_thm (v w : VirtualBundle) :
     (VirtualBundle.add v w).virtualRank = v.virtualRank + w.virtualRank := by
   simp [VirtualBundle.add, VirtualBundle.virtualRank]; omega
 
-def virtualRank_add (v w : VirtualBundle) :
+noncomputable def virtualRank_add (v w : VirtualBundle) :
     Path (VirtualBundle.add v w).virtualRank (v.virtualRank + w.virtualRank) :=
   stepPath (virtualRank_add_thm v w)
 
@@ -286,35 +286,35 @@ theorem vb_add_neg_rank_thm (v : VirtualBundle) :
     (VirtualBundle.add v (VirtualBundle.negation v)).virtualRank = 0 := by
   simp [VirtualBundle.add, VirtualBundle.negation, VirtualBundle.virtualRank]; omega
 
-def vb_add_neg_rank_path (v : VirtualBundle) :
+noncomputable def vb_add_neg_rank_path (v : VirtualBundle) :
     Path (VirtualBundle.add v (VirtualBundle.negation v)).virtualRank 0 :=
   stepPath (vb_add_neg_rank_thm v)
 
 /-! ### 26-30 : Chern character and rank map -/
 
 -- 26. rank is additive
-def rankMap_add (v w : VirtualBundle) :
+noncomputable def rankMap_add (v w : VirtualBundle) :
     Path (rankMap (VirtualBundle.add v w)) (rankMap v + rankMap w) :=
   virtualRank_add v w
 
 -- 27. chern character is additive
-def chernCharacter_add (v w : VirtualBundle) :
+noncomputable def chernCharacter_add (v w : VirtualBundle) :
     Path (chernCharacter (VirtualBundle.add v w))
          (chernCharacter v + chernCharacter w) :=
   virtualRank_add v w
 
 -- 28. chern character of zero
-def chernCharacter_zero : Path (chernCharacter VirtualBundle.zero) 0 :=
+noncomputable def chernCharacter_zero : Path (chernCharacter VirtualBundle.zero) 0 :=
   virtualRank_zero_path
 
 -- 29. **Multi-step** chern of negation = neg of chern:
 --     ch(neg v) = rank(neg v) →[neg] -rank(v) = -ch(v)
-def chernCharacter_neg (v : VirtualBundle) :
+noncomputable def chernCharacter_neg (v : VirtualBundle) :
     Path (chernCharacter (VirtualBundle.negation v)) (-chernCharacter v) :=
   virtualRank_neg v
 
 -- 30. **Multi-step** ch(v + neg v) = 0  via  ch is additive then cancellation
-def chernCharacter_cancel (v : VirtualBundle) :
+noncomputable def chernCharacter_cancel (v : VirtualBundle) :
     Path (chernCharacter (VirtualBundle.add v (VirtualBundle.negation v))) 0 :=
   vb_add_neg_rank_path v
 
@@ -324,7 +324,7 @@ def chernCharacter_cancel (v : VirtualBundle) :
 theorem kpair_add_comm_thm (p q : KPair) : KPair.add p q = KPair.add q p := by
   ext <;> simp [Nat.add_comm]
 
-def kpair_add_comm (p q : KPair) :
+noncomputable def kpair_add_comm (p q : KPair) :
     Path (KPair.add p q) (KPair.add q p) :=
   stepPath (kpair_add_comm_thm p q)
 
@@ -332,7 +332,7 @@ def kpair_add_comm (p q : KPair) :
 theorem kpair_add_zero_thm (p : KPair) : KPair.add p KPair.zero = p := by
   ext <;> simp
 
-def kpair_add_zero (p : KPair) :
+noncomputable def kpair_add_zero (p : KPair) :
     Path (KPair.add p KPair.zero) p :=
   stepPath (kpair_add_zero_thm p)
 
@@ -341,7 +341,7 @@ theorem kpair_add_assoc_thm (p q r : KPair) :
     KPair.add (KPair.add p q) r = KPair.add p (KPair.add q r) := by
   ext <;> simp [Nat.add_assoc]
 
-def kpair_add_assoc (p q r : KPair) :
+noncomputable def kpair_add_assoc (p q r : KPair) :
     Path (KPair.add (KPair.add p q) r) (KPair.add p (KPair.add q r)) :=
   stepPath (kpair_add_assoc_thm p q r)
 
@@ -350,7 +350,7 @@ theorem bottMap_add_thm (v w : VirtualBundle) :
     bottMap (VirtualBundle.add v w) = KPair.add (bottMap v) (bottMap w) := by
   ext <;> simp [bottMap, KPair.add, VirtualBundle.add, VirtualBundle.zero]
 
-def bottMap_add (v w : VirtualBundle) :
+noncomputable def bottMap_add (v w : VirtualBundle) :
     Path (bottMap (VirtualBundle.add v w))
          (KPair.add (bottMap v) (bottMap w)) :=
   stepPath (bottMap_add_thm v w)
@@ -359,7 +359,7 @@ def bottMap_add (v w : VirtualBundle) :
 theorem bottMap_zero_thm : bottMap VirtualBundle.zero = KPair.zero := by
   ext <;> simp [bottMap, KPair.zero]
 
-def bottMap_zero : Path (bottMap VirtualBundle.zero) KPair.zero :=
+noncomputable def bottMap_zero : Path (bottMap VirtualBundle.zero) KPair.zero :=
   stepPath bottMap_zero_thm
 
 /-! ### 36-40 : Deep multi-step compositions -/
@@ -370,18 +370,18 @@ theorem directSum_comm_roundtrip (E F : VBundle) :
     (Path.refl (directSum E F)).proof := by rfl
 
 -- 37. **Multi-step** congrArg rank through directSum comm
-def congrArg_rank_comm (E F : VBundle) :
+noncomputable def congrArg_rank_comm (E F : VBundle) :
     Path (directSum E F).rank (directSum F E).rank :=
   Path.congrArg VBundle.rank (directSum_comm E F)
 
 -- 38. **Multi-step** (E⊕0)⊕F = E⊕F  via  zero_right then congrArg
-def directSum_zero_elim (E F : VBundle) :
+noncomputable def directSum_zero_elim (E F : VBundle) :
     Path (directSum (directSum E zeroBundle) F)
          (directSum E F) :=
   Path.congrArg (fun x => directSum x F) (directSum_zero_right E)
 
 -- 39. **Three-step** (0⊕E)⊕(F⊕0) = E⊕F
-def directSum_zero_both (E F : VBundle) :
+noncomputable def directSum_zero_both (E F : VBundle) :
     Path (directSum (directSum zeroBundle E) (directSum F zeroBundle))
          (directSum E F) :=
   let step1 := Path.congrArg (fun x => directSum x (directSum F zeroBundle))
@@ -390,7 +390,7 @@ def directSum_zero_both (E F : VBundle) :
   Path.trans step1 step2
 
 -- 40. **Multi-step** tensor pentagon: ((E⊗F)⊗G)⊗H = E⊗(F⊗(G⊗H))
-def tensor_pentagon (E F G H : VBundle) :
+noncomputable def tensor_pentagon (E F G H : VBundle) :
     Path (tensorProd (tensorProd (tensorProd E F) G) H)
          (tensorProd E (tensorProd F (tensorProd G H))) :=
   Path.trans (tensor_assoc (tensorProd E F) G H)

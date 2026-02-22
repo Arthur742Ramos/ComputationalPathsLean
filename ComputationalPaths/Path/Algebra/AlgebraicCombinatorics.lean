@@ -16,58 +16,58 @@ namespace AlgebraicCombinatorics
 structure Partition where
   parts : List Nat
 
-def Partition.size (P : Partition) : Nat :=
+noncomputable def Partition.size (P : Partition) : Nat :=
   P.parts.foldl (· + ·) 0
 
-def Partition.length (P : Partition) : Nat :=
+noncomputable def Partition.length (P : Partition) : Nat :=
   P.parts.length
 
-def partitionConjugateSizeModel (P : Partition) : Nat :=
+noncomputable def partitionConjugateSizeModel (P : Partition) : Nat :=
   P.size
 
 structure Tableau where
   shape : Partition
   entries : List Nat
 
-def tableauWeight (T : Tableau) : Nat :=
+noncomputable def tableauWeight (T : Tableau) : Nat :=
   T.entries.foldl (· + ·) 0
 
-def tableauShapeSize (T : Tableau) : Nat :=
+noncomputable def tableauShapeSize (T : Tableau) : Nat :=
   T.shape.size
 
 structure SymmetricMonomial where
   coeff : Int
   exponents : List Nat
 
-def monomialDegree (m : SymmetricMonomial) : Nat :=
+noncomputable def monomialDegree (m : SymmetricMonomial) : Nat :=
   m.exponents.foldl (· + ·) 0
 
-def monomialScale (c : Int) (m : SymmetricMonomial) : SymmetricMonomial :=
+noncomputable def monomialScale (c : Int) (m : SymmetricMonomial) : SymmetricMonomial :=
   ⟨c * m.coeff, m.exponents⟩
 
-def monomialMultiply (m n : SymmetricMonomial) : SymmetricMonomial :=
+noncomputable def monomialMultiply (m n : SymmetricMonomial) : SymmetricMonomial :=
   ⟨m.coeff * n.coeff, m.exponents ++ n.exponents⟩
 
 structure SchurPolynomial where
   coeff : Partition → Int
 
-def schurAt (S : SchurPolynomial) (P : Partition) : Int :=
+noncomputable def schurAt (S : SchurPolynomial) (P : Partition) : Int :=
   S.coeff P
 
-def schurNormalize (S : SchurPolynomial) : SchurPolynomial :=
+noncomputable def schurNormalize (S : SchurPolynomial) : SchurPolynomial :=
   S
 
 structure RobinsonSchenstedPair where
   insertionShape : Partition
   recordingShape : Partition
 
-def rsInsertionLength (R : RobinsonSchenstedPair) : Nat :=
+noncomputable def rsInsertionLength (R : RobinsonSchenstedPair) : Nat :=
   R.insertionShape.length
 
-def rsRecordingLength (R : RobinsonSchenstedPair) : Nat :=
+noncomputable def rsRecordingLength (R : RobinsonSchenstedPair) : Nat :=
   R.recordingShape.length
 
-def rsShapeAgreement (R : RobinsonSchenstedPair) : Nat :=
+noncomputable def rsShapeAgreement (R : RobinsonSchenstedPair) : Nat :=
   if R.insertionShape.length = R.recordingShape.length then
     R.insertionShape.length
   else
@@ -77,20 +77,20 @@ structure JeuDeTaquinSlide where
   before : Tableau
   after : Tableau
 
-def jeuDeTaquinLength (J : JeuDeTaquinSlide) : Nat :=
+noncomputable def jeuDeTaquinLength (J : JeuDeTaquinSlide) : Nat :=
   J.after.entries.length
 
 structure CrystalNode where
   weight : Nat
   label : Nat
 
-def crystalWeight (C : CrystalNode) : Nat :=
+noncomputable def crystalWeight (C : CrystalNode) : Nat :=
   C.weight
 
-def crystalRaise (C : CrystalNode) : CrystalNode :=
+noncomputable def crystalRaise (C : CrystalNode) : CrystalNode :=
   { C with weight := C.weight + 1 }
 
-def crystalLower (C : CrystalNode) : CrystalNode :=
+noncomputable def crystalLower (C : CrystalNode) : CrystalNode :=
   { C with weight := C.weight }
 
 structure LRTableauData where
@@ -98,10 +98,10 @@ structure LRTableauData where
   mu : Partition
   nu : Partition
 
-def littlewoodRichardsonCoeff (L : LRTableauData) : Nat :=
+noncomputable def littlewoodRichardsonCoeff (L : LRTableauData) : Nat :=
   L.lam.size + L.mu.size + L.nu.size
 
-def plethysmCoeff (L : LRTableauData) : Nat :=
+noncomputable def plethysmCoeff (L : LRTableauData) : Nat :=
   littlewoodRichardsonCoeff L + L.nu.length
 
 structure MacdonaldDatum where
@@ -109,16 +109,16 @@ structure MacdonaldDatum where
   q : Nat
   t : Nat
 
-def macdonaldSpecialization (M : MacdonaldDatum) : Nat :=
+noncomputable def macdonaldSpecialization (M : MacdonaldDatum) : Nat :=
   M.lam.size + M.q + M.t
 
-def kostkaFoulkesModel (M : MacdonaldDatum) : Nat :=
+noncomputable def kostkaFoulkesModel (M : MacdonaldDatum) : Nat :=
   M.lam.length + M.q
 
-def hallInnerProductModel (P Q : Partition) : Nat :=
+noncomputable def hallInnerProductModel (P Q : Partition) : Nat :=
   P.size + Q.size
 
-def schurExpansionTerm (c : Nat) (P : Partition) : Nat :=
+noncomputable def schurExpansionTerm (c : Nat) (P : Partition) : Nat :=
   c * P.size
 
 theorem partition_size_nil :
@@ -192,13 +192,13 @@ theorem schurExpansionTerm_zero (P : Partition) :
     schurExpansionTerm 0 P = 0 := by
   simp [schurExpansionTerm]
 
-def rs_shape_path (R : RobinsonSchenstedPair) :
+noncomputable def rs_shape_path (R : RobinsonSchenstedPair) :
     Path (rsShapeAgreement R) (rsShapeAgreement R) :=
   Path.trans
     (Path.congrArg (fun n => n) (Path.refl (rsShapeAgreement R)))
     (Path.symm (Path.congrArg (fun n => n) (Path.refl (rsShapeAgreement R))))
 
-def rs_shape_path_trans (R : RobinsonSchenstedPair) :
+noncomputable def rs_shape_path_trans (R : RobinsonSchenstedPair) :
     Path (rsShapeAgreement R) (rsShapeAgreement R) :=
   Path.trans (rs_shape_path R) (Path.symm (rs_shape_path R))
 

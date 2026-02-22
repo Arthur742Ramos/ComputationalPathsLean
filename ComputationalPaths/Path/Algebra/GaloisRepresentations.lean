@@ -51,7 +51,7 @@ namespace ContinuousRepresentation
 variable {G : Type u} {V : Type v}
 
 /-- The action of a continuous representation is stable under paths. -/
-def action_stable (rep : ContinuousRepresentation G V) (g : G) (v : V) :
+noncomputable def action_stable (rep : ContinuousRepresentation G V) (g : G) (v : V) :
     Path (rep.action g v) (rep.action g v) :=
   rep.continuous g v
 
@@ -68,7 +68,7 @@ structure FrobeniusElement {G : Type u} {V : Type v}
   witness : ∀ v, Path (rep.action element v) (rep.action element v)
 
 /-- Compose Frobenius actions using `Path.trans`. -/
-def frobenius_compose {G : Type u} {V : Type v}
+noncomputable def frobenius_compose {G : Type u} {V : Type v}
     (rep : ContinuousRepresentation G V) (F1 F2 : FrobeniusElement rep) (v : V) :
     Path (rep.action (rep.group.mul F1.element F2.element) v)
       (rep.action F1.element (rep.action F2.element v)) := by
@@ -124,7 +124,7 @@ namespace LAdicRepresentation
 variable {G : Type u} {A : Type v}
 
 /-- Levelwise continuity for an l-adic action. -/
-def action_stable (rep : LAdicRepresentation G A) (n : Nat) (g : G)
+noncomputable def action_stable (rep : LAdicRepresentation G A) (n : Nat) (g : G)
     (x : rep.tate.level n) : Path (rep.action n g x) (rep.action n g x) :=
   rep.continuous n g x
 

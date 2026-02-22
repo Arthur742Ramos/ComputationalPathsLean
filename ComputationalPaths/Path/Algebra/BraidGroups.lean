@@ -84,7 +84,7 @@ structure ArtinPresentation (n : Nat) extends BraidGroupAlg n where
   round_trip : ∀ b, Path (word_eval (word_rep b)) b
 
 /-- Trivial braid group B_1 on PUnit. -/
-def BraidGroupAlg.trivial : BraidGroupAlg 1 where
+noncomputable def BraidGroupAlg.trivial : BraidGroupAlg 1 where
   Braid := PUnit
   sigma := fun i => Fin.elim0 i
   sigma_inv := fun i => Fin.elim0 i
@@ -133,7 +133,7 @@ structure PureBraidGroup (n : Nat) extends BraidGroupAlg n where
   gen_pure_is_pure : ∀ i j, isPure (gen_pure i j)
 
 /-- Path-valued perm_one. -/
-def PureBraidGroup.perm_one_path {n : Nat} (P : PureBraidGroup n) (k : Fin n) :
+noncomputable def PureBraidGroup.perm_one_path {n : Nat} (P : PureBraidGroup n) (k : Fin n) :
     Path (P.perm P.one k) k :=
   P.perm_one k
 
@@ -205,7 +205,7 @@ structure JonesData (n : Nat) (B : BraidGroupAlg n) where
   jones_unknot : Path (jones (closure.close B.one)) oneP
 
 /-- Path-valued Jones unknot theorem. -/
-def jones_unknot_path {n : Nat} {B : BraidGroupAlg n} (J : JonesData n B) :
+noncomputable def jones_unknot_path {n : Nat} {B : BraidGroupAlg n} (J : JonesData n B) :
     Path (J.jones (J.closure.close B.one)) J.oneP :=
   J.jones_unknot
 
@@ -227,7 +227,7 @@ inductive BraidStep : {A : Type u} → A → A → Type (u + 2)
       BraidStep (cl.close (B.mul (B.mul a b) (B.inv a))) (cl.close b)
 
 /-- BraidStep implies Path. -/
-def braidStep_to_path {A : Type u} {a b : A} (h : BraidStep a b) :
+noncomputable def braidStep_to_path {A : Type u} {a b : A} (h : BraidStep a b) :
     Path a b := by
   cases h with
   | far_comm h => exact BraidGroupAlg.far_comm _ _ _ h

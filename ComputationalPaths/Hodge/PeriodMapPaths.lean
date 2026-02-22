@@ -27,7 +27,7 @@ inductive PeriodMapStep {D : Type u} :
       PeriodMapStep (Path.trans (Path.symm p) p) (Path.refl b)
 
 /-- Interpret a period-map step as a primitive `Path.Step`. -/
-def PeriodMapStep.toStep {D : Type u} {a b : D} {p q : Path a b}
+noncomputable def PeriodMapStep.toStep {D : Type u} {a b : D} {p q : Path a b}
     (s : PeriodMapStep p q) : Path.Step p q :=
   match s with
   | .horizontality_right_unit p => Path.Step.trans_refl_right p
@@ -110,7 +110,7 @@ noncomputable def local_monodromy_cancel_rweq (x : X) :
   rweq_of_period_step (P.localMonodromyStep x)
 
 /-- Round-trip period path around local monodromy. -/
-def periodRoundTrip (x : X) : Path (P.periodMap x) (P.periodMap x) :=
+noncomputable def periodRoundTrip (x : X) : Path (P.periodMap x) (P.periodMap x) :=
   Path.trans (P.localMonodromy x) (Path.symm (P.localMonodromy x))
 
 noncomputable def period_roundtrip_rweq (x : X) :
@@ -118,7 +118,7 @@ noncomputable def period_roundtrip_rweq (x : X) :
   rweq_of_step (Path.Step.trans_symm (P.localMonodromy x))
 
 /-- Period-map action on weight-filtration transport. -/
-def weightPeriodTransport (i : Int) {x y : X} (p : Path x y) :
+noncomputable def weightPeriodTransport (i : Int) {x y : X} (p : Path x y) :
     Path
       (P.variation.filtration.weightFiltration i (P.variation.fiber x))
       (P.variation.filtration.weightFiltration i (P.variation.fiber y)) :=
@@ -127,7 +127,7 @@ def weightPeriodTransport (i : Int) {x y : X} (p : Path x y) :
 end PeriodMapPathData
 
 /-- Build variation data from a filtration and path transport witness. -/
-def mkVariationMixedHodgeData
+noncomputable def mkVariationMixedHodgeData
     {X : Type u} {H : Type v}
     (filtration : MixedHodgeFiltrationData H)
     (fiber : X → H)

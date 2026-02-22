@@ -42,7 +42,7 @@ structure PostnikovSystem (A : Type u) where
     Path (bond n (proj (n + 1) a)) (proj n a)
 
 /-- The canonical Postnikov system with every stage equal to `A`. -/
-def postnikovSystem (A : Type u) : PostnikovSystem A where
+noncomputable def postnikovSystem (A : Type u) : PostnikovSystem A where
   stage := fun _ => A
   proj := fun _ => _root_.id
   bond := fun _ => _root_.id
@@ -57,11 +57,11 @@ def postnikovSystem (A : Type u) : PostnikovSystem A where
 /-! ## Fibers of bonding maps -/
 
 /-- The fiber of a bonding map at a stage element. -/
-def bondFiber {A : Type u} (P : PostnikovSystem A) (n : Nat) (x : P.stage n) : Type u :=
+noncomputable def bondFiber {A : Type u} (P : PostnikovSystem A) (n : Nat) (x : P.stage n) : Type u :=
   Sigma fun y : P.stage (n + 1) => Path (P.bond n y) x
 
 /-- The fiber at the image of a basepoint. -/
-def bondFiberAt {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) : Type u :=
+noncomputable def bondFiberAt {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) : Type u :=
   bondFiber P n (P.proj n a)
 
 /-! ## Postnikov decompositions -/
@@ -75,7 +75,7 @@ structure PostnikovDecomposition (A : Type u) extends PostnikovSystem A where
     Path (bond n (sectionMap n x)) x
 
 /-- The canonical decomposition with identity sections. -/
-def postnikovDecomposition (A : Type u) : PostnikovDecomposition A :=
+noncomputable def postnikovDecomposition (A : Type u) : PostnikovDecomposition A :=
   { stage := fun _ => A
     proj := fun _ => _root_.id
     bond := fun _ => _root_.id
@@ -87,7 +87,7 @@ def postnikovDecomposition (A : Type u) : PostnikovDecomposition A :=
     (postnikovDecomposition A).sectionMap n a = a := rfl
 
 /-- The section yields a canonical point in each fiber. -/
-def bondFiberSection {A : Type u} (P : PostnikovDecomposition A) (n : Nat) (x : P.stage n) :
+noncomputable def bondFiberSection {A : Type u} (P : PostnikovDecomposition A) (n : Nat) (x : P.stage n) :
     bondFiber (P := P.toPostnikovSystem) n x :=
   ⟨P.sectionMap n x, P.section_left n x⟩
 

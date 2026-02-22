@@ -52,7 +52,7 @@ structure Retract (X Y : Type u) where
   sectionPath : (x : X) → Path (r (i x)) x
 
 /-- `IsZero` is stable under retracts. -/
-def isZero_of_retract {X Y : Type u} (hY : IsZero Y) (h : Retract X Y) :
+noncomputable def isZero_of_retract {X Y : Type u} (hY : IsZero Y) (h : Retract X Y) :
     IsZero X := by
   refine ⟨h.r hY.zero, ?_⟩
   intro x
@@ -78,7 +78,7 @@ structure AcyclicModelsData (F : C → ChainComplex3.{v}) where
 /-! ## Acyclic models theorem -/
 
 /-- Acyclic models theorem: retracts of acyclic models have zero homology. -/
-def acyclic_models_homology_isZero {F : C → ChainComplex3.{v}}
+noncomputable def acyclic_models_homology_isZero {F : C → ChainComplex3.{v}}
     (data : AcyclicModelsData (F := F)) (X : C) :
     IsZero (Homology (F X)) := by
   rcases data.retract X with ⟨m, h⟩
@@ -87,7 +87,7 @@ def acyclic_models_homology_isZero {F : C → ChainComplex3.{v}}
 /-! ## Applications to homology -/
 
 /-- The homology family of an acyclic-models functor is zero objectwise. -/
-def homology_functor_isZero {F : C → ChainComplex3.{v}}
+noncomputable def homology_functor_isZero {F : C → ChainComplex3.{v}}
     (data : AcyclicModelsData (F := F)) :
     ∀ X : C, IsZero (Homology (F X)) := by
   intro X

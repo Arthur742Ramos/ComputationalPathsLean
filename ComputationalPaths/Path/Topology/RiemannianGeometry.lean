@@ -150,7 +150,7 @@ structure LeviCivitaUniqueness (M : RiemannianManifold) where
          (lc₂.connection.covariantDeriv p v Y)
 
 /-- The Levi-Civita connection is unique: existence + uniqueness. -/
-def leviCivita_unique (M : RiemannianManifold) (u : LeviCivitaUniqueness M)
+noncomputable def leviCivita_unique (M : RiemannianManifold) (u : LeviCivitaUniqueness M)
     (p : M.bundle.manifold) (v : M.bundle.tangentAt p) (Y : VectorField M.bundle) :
     Path (u.lc₁.connection.covariantDeriv p v Y)
          (u.lc₂.connection.covariantDeriv p v Y) :=
@@ -225,7 +225,7 @@ structure RicciTensor (M : RiemannianManifold)
   is_trace : True
 
 /-- Ricci symmetry follows directly from the pair symmetry of Riemann. -/
-def ricci_symmetric (M : RiemannianManifold) (lc : LeviCivitaConnection M)
+noncomputable def ricci_symmetric (M : RiemannianManifold) (lc : LeviCivitaConnection M)
     (R : RiemannCurvature M lc) (Ric : RicciTensor M lc R)
     (p : M.bundle.manifold) (v w : M.bundle.tangentAt p) :
     Path (Ric.ricci p v w) (Ric.ricci p w v) :=
@@ -324,7 +324,7 @@ structure ExponentialMap (M : RiemannianManifold)
   local_diffeo : True
 
 /-- The exponential map sends zero to the base point. -/
-def exp_at_zero (M : RiemannianManifold) (lc : LeviCivitaConnection M)
+noncomputable def exp_at_zero (M : RiemannianManifold) (lc : LeviCivitaConnection M)
     (e : ExponentialMap M lc) :
     Path (e.expMap (M.bundle.zeroVec e.basePoint)) e.basePoint :=
   e.exp_zero
@@ -347,13 +347,13 @@ structure ParallelTransport (M : RiemannianManifold)
          (M.metric.inner (curve.point 0) v w)
 
 /-- Parallel transport at time zero is identity. -/
-def parallelTransport_id (M : RiemannianManifold) (lc : LeviCivitaConnection M)
+noncomputable def parallelTransport_id (M : RiemannianManifold) (lc : LeviCivitaConnection M)
     (pt : ParallelTransport M lc) (v : M.bundle.tangentAt (pt.curve.point 0)) :
     Path (pt.transport 0 v) v :=
   pt.transport_zero v
 
 /-- Parallel transport preserves inner products (isometry). -/
-def parallelTransport_isometry (M : RiemannianManifold)
+noncomputable def parallelTransport_isometry (M : RiemannianManifold)
     (lc : LeviCivitaConnection M) (pt : ParallelTransport M lc)
     (s : Nat) (v w : M.bundle.tangentAt (pt.curve.point 0)) :
     Path (M.metric.inner (pt.curve.point s) (pt.transport s v) (pt.transport s w))
@@ -401,7 +401,7 @@ structure GaussBonnet (M : RiemannianManifold)
   gauss_bonnet : Path totalCurvature (2 * euler)
 
 /-- For a surface with constant curvature, Gauss-Bonnet simplifies. -/
-def gaussBonnet_constant (M : RiemannianManifold)
+noncomputable def gaussBonnet_constant (M : RiemannianManifold)
     (lc : LeviCivitaConnection M) (R : RiemannCurvature M lc)
     (gb : GaussBonnet M lc R) :
     Path gb.totalCurvature (2 * gb.euler) :=

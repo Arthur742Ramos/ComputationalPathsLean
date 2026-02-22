@@ -32,7 +32,7 @@ theorem sym_refl_toEq (s : Sym) : Path.toEq (Path.refl s) = rfl := rfl
 
 theorem gam_refl_toEq (g : Gam) : Path.toEq (Path.refl g) = rfl := rfl
 
-@[simp] def mkStepPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
+@[simp] noncomputable def mkStepPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 @[simp] theorem mkStepPath_toEq {A : Type u} {a b : A} (h : a = b) :
@@ -69,16 +69,16 @@ structure CommIdeal where
 
 namespace CommIdeal
 
-@[simp] def zero : CommIdeal := ⟨0⟩
-@[simp] def one : CommIdeal := ⟨1⟩
-@[simp] def add (I J : CommIdeal) : CommIdeal := ⟨Nat.gcd I.gen J.gen⟩
-@[simp] def mul (I J : CommIdeal) : CommIdeal := ⟨I.gen * J.gen⟩
-@[simp] def inter (I J : CommIdeal) : CommIdeal := ⟨Nat.lcm I.gen J.gen⟩
-@[simp] def rad (I : CommIdeal) : CommIdeal := ⟨I.gen⟩
+@[simp] noncomputable def zero : CommIdeal := ⟨0⟩
+@[simp] noncomputable def one : CommIdeal := ⟨1⟩
+@[simp] noncomputable def add (I J : CommIdeal) : CommIdeal := ⟨Nat.gcd I.gen J.gen⟩
+@[simp] noncomputable def mul (I J : CommIdeal) : CommIdeal := ⟨I.gen * J.gen⟩
+@[simp] noncomputable def inter (I J : CommIdeal) : CommIdeal := ⟨Nat.lcm I.gen J.gen⟩
+@[simp] noncomputable def rad (I : CommIdeal) : CommIdeal := ⟨I.gen⟩
 
-@[simp] def isPrime (I : CommIdeal) : Prop := I.gen ≤ 1
-@[simp] def isMaximal (I : CommIdeal) : Prop := I.gen = 1
-@[simp] def isPrimary (_I : CommIdeal) : Prop := True
+@[simp] noncomputable def isPrime (I : CommIdeal) : Prop := I.gen ≤ 1
+@[simp] noncomputable def isMaximal (I : CommIdeal) : Prop := I.gen = 1
+@[simp] noncomputable def isPrimary (_I : CommIdeal) : Prop := True
 
 end CommIdeal
 
@@ -218,7 +218,7 @@ inductive CommIdealStep : CommIdeal → CommIdeal → Type where
   | interComm (I J : CommIdeal) :
       CommIdealStep (CommIdeal.inter I J) (CommIdeal.inter J I)
 
-def CommIdealStep.sound : CommIdealStep I J → I = J
+noncomputable def CommIdealStep.sound : CommIdealStep I J → I = J
   | .addComm I J => commIdeal_add_comm_eq I J
   | .addAssoc I J K => commIdeal_add_assoc_eq I J K
   | .addZeroRight I => commIdeal_add_zero_right_eq I
@@ -227,35 +227,35 @@ def CommIdealStep.sound : CommIdealStep I J → I = J
   | .mulOneRight I => commIdeal_mul_one_right_eq I
   | .interComm I J => commIdeal_inter_comm_eq I J
 
-def CommIdealStep.toPath (s : CommIdealStep I J) : Path I J :=
+noncomputable def CommIdealStep.toPath (s : CommIdealStep I J) : Path I J :=
   Path.mk [Step.mk I J s.sound] s.sound
 
 theorem commIdealStep_toEq {I J : CommIdeal} (s : CommIdealStep I J) :
     Path.toEq (s.toPath) = s.sound := rfl
 
-def add_comm_path (I J : CommIdeal) : Path (CommIdeal.add I J) (CommIdeal.add J I) :=
+noncomputable def add_comm_path (I J : CommIdeal) : Path (CommIdeal.add I J) (CommIdeal.add J I) :=
   (CommIdealStep.addComm I J).toPath
 
-def add_assoc_path (I J K : CommIdeal) :
+noncomputable def add_assoc_path (I J K : CommIdeal) :
     Path (CommIdeal.add (CommIdeal.add I J) K) (CommIdeal.add I (CommIdeal.add J K)) :=
   (CommIdealStep.addAssoc I J K).toPath
 
-def add_zero_right_path (I : CommIdeal) :
+noncomputable def add_zero_right_path (I : CommIdeal) :
     Path (CommIdeal.add I CommIdeal.zero) I :=
   (CommIdealStep.addZeroRight I).toPath
 
-def mul_comm_path (I J : CommIdeal) : Path (CommIdeal.mul I J) (CommIdeal.mul J I) :=
+noncomputable def mul_comm_path (I J : CommIdeal) : Path (CommIdeal.mul I J) (CommIdeal.mul J I) :=
   (CommIdealStep.mulComm I J).toPath
 
-def mul_assoc_path (I J K : CommIdeal) :
+noncomputable def mul_assoc_path (I J K : CommIdeal) :
     Path (CommIdeal.mul (CommIdeal.mul I J) K) (CommIdeal.mul I (CommIdeal.mul J K)) :=
   (CommIdealStep.mulAssoc I J K).toPath
 
-def mul_one_right_path (I : CommIdeal) :
+noncomputable def mul_one_right_path (I : CommIdeal) :
     Path (CommIdeal.mul I CommIdeal.one) I :=
   (CommIdealStep.mulOneRight I).toPath
 
-def inter_comm_path (I J : CommIdeal) :
+noncomputable def inter_comm_path (I J : CommIdeal) :
     Path (CommIdeal.inter I J) (CommIdeal.inter J I) :=
   (CommIdealStep.interComm I J).toPath
 
@@ -292,19 +292,19 @@ theorem inter_comm_roundtrip_toEq (I J : CommIdeal) :
     Path.toEq (Path.trans (inter_comm_path I J) (Path.symm (inter_comm_path I J))) = rfl := by
   simpa using (Path.toEq_trans_symm (p := inter_comm_path I J))
 
-def add_comm_congr_mul_left (I J K : CommIdeal) :
+noncomputable def add_comm_congr_mul_left (I J K : CommIdeal) :
     Path (CommIdeal.mul (CommIdeal.add I J) K) (CommIdeal.mul (CommIdeal.add J I) K) :=
   Path.congrArg (fun X => CommIdeal.mul X K) (add_comm_path I J)
 
-def add_comm_congr_mul_right (I J K : CommIdeal) :
+noncomputable def add_comm_congr_mul_right (I J K : CommIdeal) :
     Path (CommIdeal.mul K (CommIdeal.add I J)) (CommIdeal.mul K (CommIdeal.add J I)) :=
   Path.congrArg (fun X => CommIdeal.mul K X) (add_comm_path I J)
 
-def mul_comm_congr_add_left (I J K : CommIdeal) :
+noncomputable def mul_comm_congr_add_left (I J K : CommIdeal) :
     Path (CommIdeal.add (CommIdeal.mul I J) K) (CommIdeal.add (CommIdeal.mul J I) K) :=
   Path.congrArg (fun X => CommIdeal.add X K) (mul_comm_path I J)
 
-def mul_comm_congr_add_right (I J K : CommIdeal) :
+noncomputable def mul_comm_congr_add_right (I J K : CommIdeal) :
     Path (CommIdeal.add K (CommIdeal.mul I J)) (CommIdeal.add K (CommIdeal.mul J I)) :=
   Path.congrArg (fun X => CommIdeal.add K X) (mul_comm_path I J)
 
@@ -326,23 +326,23 @@ theorem mul_comm_congr_add_right_toEq (I J K : CommIdeal) :
 
 namespace CommRing
 
-@[simp] def localize (R : CommRing) (s : Nat) : CommRing :=
+@[simp] noncomputable def localize (R : CommRing) (s : Nat) : CommRing :=
   ⟨R.ident + s, R.dim, R.depth⟩
 
-@[simp] def completion (R : CommRing) : CommRing :=
+@[simp] noncomputable def completion (R : CommRing) : CommRing :=
   ⟨R.ident, R.dim, R.depth + 1⟩
 
-@[simp] def krullDim (R : CommRing) : Nat := R.dim
+@[simp] noncomputable def krullDim (R : CommRing) : Nat := R.dim
 
-@[simp] def noetherian (_R : CommRing) : Prop := True
+@[simp] noncomputable def noetherian (_R : CommRing) : Prop := True
 
-@[simp] def integralExt (R S : CommRing) : Prop := R.ident ≤ S.ident
+@[simp] noncomputable def integralExt (R S : CommRing) : Prop := R.ident ≤ S.ident
 
-@[simp] def goingUp (R S : CommRing) : Prop := integralExt R S
+@[simp] noncomputable def goingUp (R S : CommRing) : Prop := integralExt R S
 
-@[simp] def goingDown (R S : CommRing) : Prop := R.dim = S.dim
+@[simp] noncomputable def goingDown (R S : CommRing) : Prop := R.dim = S.dim
 
-@[simp] def flat (_R : CommRing) : Prop := True
+@[simp] noncomputable def flat (_R : CommRing) : Prop := True
 
 end CommRing
 
@@ -419,9 +419,9 @@ theorem completion_ident_path_toEq (R : CommRing) :
 theorem completion_dim_path_toEq (R : CommRing) :
     Path.toEq (Path.refl (CommRing.completion R).dim) = rfl := rfl
 
-@[simp] def primaryDecomposition (I : CommIdeal) : List CommIdeal := [I]
+@[simp] noncomputable def primaryDecomposition (I : CommIdeal) : List CommIdeal := [I]
 
-@[simp] def recombinePrimary : List CommIdeal → CommIdeal
+@[simp] noncomputable def recombinePrimary : List CommIdeal → CommIdeal
   | [] => CommIdeal.zero
   | I :: _ => I
 
@@ -459,13 +459,13 @@ structure Fraction where
 
 namespace Fraction
 
-@[simp] def mul (x y : Fraction) : Fraction :=
+@[simp] noncomputable def mul (x y : Fraction) : Fraction :=
   ⟨x.num * y.num, x.den * y.den⟩
 
-@[simp] def add (x y : Fraction) : Fraction :=
+@[simp] noncomputable def add (x y : Fraction) : Fraction :=
   ⟨x.num * y.den + y.num * x.den, x.den * y.den⟩
 
-@[simp] def normalize (x : Fraction) : Fraction :=
+@[simp] noncomputable def normalize (x : Fraction) : Fraction :=
   ⟨x.num, x.den + 1⟩
 
 end Fraction
@@ -514,15 +514,15 @@ structure ModObj where
 
 namespace ModObj
 
-@[simp] def directSum (M N : ModObj) : ModObj := ⟨M.rank + N.rank⟩
-@[simp] def tensor (M N : ModObj) : ModObj := ⟨M.rank * N.rank⟩
+@[simp] noncomputable def directSum (M N : ModObj) : ModObj := ⟨M.rank + N.rank⟩
+@[simp] noncomputable def tensor (M N : ModObj) : ModObj := ⟨M.rank * N.rank⟩
 
 end ModObj
 
-@[simp] def Tor (i : Nat) (M N : ModObj) : Nat :=
+@[simp] noncomputable def Tor (i : Nat) (M N : ModObj) : Nat :=
   if i = 0 then (ModObj.tensor M N).rank else 0
 
-@[simp] def Ext (i : Nat) (M N : ModObj) : Nat :=
+@[simp] noncomputable def Ext (i : Nat) (M N : ModObj) : Nat :=
   if i = 0 then (ModObj.directSum M N).rank else 0
 
 theorem tensor_comm_eq (M N : ModObj) :

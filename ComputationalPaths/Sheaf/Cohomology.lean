@@ -24,7 +24,7 @@ structure CechComplex (A : Type u) where
          (coboundary (n + 1) (coboundary n x))
 
 /-- Boundary path of a cohomology representative. -/
-def boundary {A : Type u} {a b : A} (p : Path a b) : Path a a :=
+noncomputable def boundary {A : Type u} {a b : A} (p : Path a b) : Path a a :=
   Path.trans p (Path.symm p)
 
 /-- Boundary contracts to reflexivity by a single rewrite step. -/

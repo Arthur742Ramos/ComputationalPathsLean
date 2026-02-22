@@ -32,7 +32,7 @@ variable {a b c : A}
 /-- The J-eliminator for the equality component of paths. Given a motive
 `C : ∀ (b : A), a = b → Sort v` and a proof that `C a rfl` holds,
 we derive `C b h` for any `h : a = b`. -/
-def pathInd {C : ∀ (b : A), a = b → Sort v}
+noncomputable def pathInd {C : ∀ (b : A), a = b → Sort v}
     (base : C a rfl)
     {b : A} (h : a = b) : C b h :=
   h ▸ base
@@ -46,7 +46,7 @@ def pathInd {C : ∀ (b : A), a = b → Sort v}
 
 /-- Based path induction: fix a basepoint `a` and a motive over all targets.
 Given the motive holds at `a` with `rfl`, it holds for all `b` with `h : a = b`. -/
-def basedPathInd {C : ∀ (b : A), a = b → Sort v}
+noncomputable def basedPathInd {C : ∀ (b : A), a = b → Sort v}
     (base : C a rfl)
     {b : A} (h : a = b) : C b h :=
   pathInd base h
@@ -60,7 +60,7 @@ def basedPathInd {C : ∀ (b : A), a = b → Sort v}
 
 /-- Eliminate on a `Path` by eliminating on its `proof` field.
 The motive sees only the endpoint and the equality proof, not the steps. -/
-def elimOnProof {C : ∀ (b : A), a = b → Sort v}
+noncomputable def elimOnProof {C : ∀ (b : A), a = b → Sort v}
     (base : C a rfl)
     (p : Path a b) : C b p.proof :=
   p.proof ▸ base
@@ -74,7 +74,7 @@ def elimOnProof {C : ∀ (b : A), a = b → Sort v}
 
 /-- Recursion out of paths: produce a value in `B` from any path, given
 only a recipe for the source endpoint. -/
-def pathRec {B : Sort v}
+noncomputable def pathRec {B : Sort v}
     (base : A → B)
     (_p : Path a b) : B :=
   base a
@@ -187,7 +187,7 @@ theorem symm_symm_trace_companion (p : Path a b) :
 
 /-- Dependent elimination: given a path `p : Path a b` and a family
 `D : A → Sort v`, transform elements of `D a` to `D b`. -/
-def depElim {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
+noncomputable def depElim {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
   transport p x
 
 /-- `depElim` on `refl` is the identity. -/
@@ -248,7 +248,7 @@ theorem eq_ind {a b : A} {P : a = b → Prop} (h : a = b)
   exact base
 
 /-- Applying `pathInd` twice (nested induction). -/
-def pathInd_nested {C : ∀ (b c : A), a = b → a = c → Sort v}
+noncomputable def pathInd_nested {C : ∀ (b c : A), a = b → a = c → Sort v}
     (base : C a a rfl rfl)
     {b c : A} (h₁ : a = b) (h₂ : a = c) : C b c h₁ h₂ := by
   cases h₁; cases h₂; exact base

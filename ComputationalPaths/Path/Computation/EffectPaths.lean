@@ -35,16 +35,16 @@ structure EffectOp where
 abbrev EffectSig := List EffectOp
 
 /-- Number of operations in a signature. -/
-def EffectSig.numOps (sig : EffectSig) : Nat := sig.length
+noncomputable def EffectSig.numOps (sig : EffectSig) : Nat := sig.length
 
 /-- Empty signature. -/
-def EffectSig.empty : EffectSig := []
+noncomputable def EffectSig.empty : EffectSig := []
 
 /-- Theorem 1: Empty signature has zero operations. -/
 theorem EffectSig.numOps_empty : EffectSig.empty.numOps = 0 := rfl
 
 /-- Combine two signatures. -/
-def EffectSig.combine (s1 s2 : EffectSig) : EffectSig := s1 ++ s2
+noncomputable def EffectSig.combine (s1 s2 : EffectSig) : EffectSig := s1 ++ s2
 
 /-- Theorem 2: Combined signature size is additive. -/
 theorem EffectSig.numOps_combine (s1 s2 : EffectSig) :
@@ -74,7 +74,7 @@ inductive FreeEff (α : Type u) where
   | op : Nat → Nat → (Nat → FreeEff α) → FreeEff α
 
 /-- Map a function over a free effect computation. -/
-def FreeEff.map {α β : Type u} (f : α → β) : FreeEff α → FreeEff β
+noncomputable def FreeEff.map {α β : Type u} (f : α → β) : FreeEff α → FreeEff β
   | pure a => pure (f a)
   | op id_ param k => op id_ param (fun r => map f (k r))
 
@@ -83,7 +83,7 @@ theorem FreeEff.map_pure {α β : Type u} (f : α → β) (a : α) :
     FreeEff.map f (FreeEff.pure a) = FreeEff.pure (f a) := rfl
 
 /-- Bind for the free monad. -/
-def FreeEff.bind {α β : Type u} (m : FreeEff α) (f : α → FreeEff β) : FreeEff β :=
+noncomputable def FreeEff.bind {α β : Type u} (m : FreeEff α) (f : α → FreeEff β) : FreeEff β :=
   match m with
   | pure a => f a
   | op id_ param k => op id_ param (fun r => bind (k r) f)
@@ -108,11 +108,11 @@ structure Handler (α β : Type) where
   opClause : Nat → Nat → (Nat → β) → β
 
 /-- Apply a handler to a pure value. -/
-def Handler.handlePure {α β : Type} (h : Handler α β) (a : α) : β :=
+noncomputable def Handler.handlePure {α β : Type} (h : Handler α β) (a : α) : β :=
   h.retClause a
 
 /-- Identity handler. -/
-def Handler.id (α : Type) : Handler α α :=
+noncomputable def Handler.id (α : Type) : Handler α α :=
   { retClause := fun a => a,
     opClause := fun _ _ k => k 0 }
 
@@ -121,7 +121,7 @@ theorem Handler.handlePure_id {α : Type} (a : α) :
     (Handler.id α).handlePure a = a := rfl
 
 /-- Compose two handlers. -/
-def Handler.compose {α β γ : Type} (h1 : Handler β γ) (h2 : Handler α β) : Handler α γ :=
+noncomputable def Handler.compose {α β γ : Type} (h1 : Handler β γ) (h2 : Handler α β) : Handler α γ :=
   { retClause := fun a => h1.retClause (h2.retClause a),
     opClause := fun id_ param k => h1.opClause id_ param k }
 
@@ -142,7 +142,7 @@ theorem Handler.compose_assoc_ret {α β γ δ : Type}
 /-! ## Effect Paths -/
 
 /-- Path witnessing an effect transformation. -/
-def effectPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
+noncomputable def effectPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Theorem 14: Effect path at refl is ofEq rfl. -/
@@ -150,7 +150,7 @@ theorem effectPath_rfl {A : Type u} {a : A} :
     effectPath (rfl : a = a) = Path.mk [Step.mk _ _ rfl] rfl := rfl
 
 /-- Path for handler application on values. -/
-def handlerPath (h : Handler Nat Nat) (a b : Nat) (heq : h.handlePure a = b) :
+noncomputable def handlerPath (h : Handler Nat Nat) (a b : Nat) (heq : h.handlePure a = b) :
     Path (h.handlePure a) b :=
   Path.mk [Step.mk _ _ heq] heq
 
@@ -161,7 +161,7 @@ theorem handlerPath_id (a : Nat) :
 /-! ## Effect State Transformer -/
 
 /-- State handler: interprets state using a given value. -/
-def stateHandler (s : Nat) : Handler Nat (Nat × Nat) :=
+noncomputable def stateHandler (s : Nat) : Handler Nat (Nat × Nat) :=
   { retClause := fun a => (a, s),
     opClause := fun _ param k => k param }
 
@@ -176,7 +176,7 @@ theorem stateHandler_pure_snd (s a : Nat) :
 /-! ## Exception Effect -/
 
 /-- Exception handler: catches exceptions with a default. -/
-def exceptionHandler (default : Nat) : Handler Nat Nat :=
+noncomputable def exceptionHandler (default : Nat) : Handler Nat Nat :=
   { retClause := fun a => a,
     opClause := fun _ _ _ => default }
 
@@ -191,7 +191,7 @@ theorem exceptionHandler_compose (d1 d2 : Nat) (a : Nat) :
 /-! ## Computation Depth -/
 
 /-- Depth of a free effect computation. -/
-def FreeEff.depth {α : Type u} : FreeEff α → Nat
+noncomputable def FreeEff.depth {α : Type u} : FreeEff α → Nat
   | pure _ => 0
   | op _ _ _ => 1
 
@@ -206,7 +206,7 @@ theorem FreeEff.depth_op {α : Type u} (id_ param : Nat) (k : Nat → FreeEff α
 /-! ## Handler Laws as Paths -/
 
 /-- Path witnessing that id handler is neutral. -/
-def idHandlerPath (a : Nat) :
+noncomputable def idHandlerPath (a : Nat) :
     Path ((Handler.id Nat).handlePure a) a :=
   Path.refl a
 
@@ -215,7 +215,7 @@ theorem idHandlerPath_steps (a : Nat) :
     (idHandlerPath a).steps = [] := rfl
 
 /-- Path witnessing handler composition coherence. -/
-def composeCoherencePath {α β γ : Type}
+noncomputable def composeCoherencePath {α β γ : Type}
     (h1 : Handler β γ) (h2 : Handler α β) (a : α) :
     Path ((h1.compose h2).handlePure a) (h1.handlePure (h2.handlePure a)) :=
   Path.refl _
@@ -228,7 +228,7 @@ theorem composeCoherencePath_steps {α β γ : Type}
 /-! ## Effect Subsignature -/
 
 /-- A signature is a subsignature if it's a prefix. -/
-def EffectSig.isSubSig (sub full : EffectSig) : Prop :=
+noncomputable def EffectSig.isSubSig (sub full : EffectSig) : Prop :=
   ∃ rest, full = sub ++ rest
 
 /-- Theorem 24: Empty is always a subsignature. -/

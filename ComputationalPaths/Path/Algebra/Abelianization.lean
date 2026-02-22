@@ -73,14 +73,14 @@ We work with the abelianization relation from Hurewicz.lean.
 -/
 
 /-- The abelianization of BouquetFreeGroup n as a quotient. -/
-def FreeGroupAb (n : Nat) : Type :=
+noncomputable def FreeGroupAb (n : Nat) : Type :=
   Quot (AbelianizationRel (BouquetFreeGroup n)
     BouquetFreeGroup.mul
     BouquetFreeGroup.inv
     (BouquetFreeGroup.one (n := n)))
 
 /-- Projection to abelianization. -/
-def toAb {n : Nat} : BouquetFreeGroup n → FreeGroupAb n :=
+noncomputable def toAb {n : Nat} : BouquetFreeGroup n → FreeGroupAb n :=
   Quot.mk _
 
 /-! ## F_n^ab ≃ ℤⁿ
@@ -90,23 +90,23 @@ Each generator maps to a copy of ℤ, and commutativity is imposed.
 -/
 
 /-- ℤⁿ represented as functions Fin n → Int. -/
-def IntPow (n : Nat) : Type := Fin n → Int
+noncomputable def IntPow (n : Nat) : Type := Fin n → Int
 
 namespace IntPow
 
 variable {n : Nat}
 
 /-- Zero vector. -/
-def zero : IntPow n := fun _ => 0
+noncomputable def zero : IntPow n := fun _ => 0
 
 /-- Addition. -/
-def add (x y : IntPow n) : IntPow n := fun i => x i + y i
+noncomputable def add (x y : IntPow n) : IntPow n := fun i => x i + y i
 
 /-- Negation. -/
-def neg (x y : IntPow n) : IntPow n := fun i => x i - y i
+noncomputable def neg (x y : IntPow n) : IntPow n := fun i => x i - y i
 
 /-- Unit vector at position i. -/
-def unit (i : Fin n) : IntPow n := fun j => if i = j then 1 else 0
+noncomputable def unit (i : Fin n) : IntPow n := fun j => if i = j then 1 else 0
 
 /-- IntPow n is an abelian group. -/
 theorem add_comm (x y : IntPow n) : add x y = add y x := by
@@ -116,7 +116,7 @@ theorem add_comm (x y : IntPow n) : add x y = add y x := by
 end IntPow
 
 /-- Map from BouquetWord to ℤⁿ: sum exponents for each generator. -/
-def wordToIntPow {n : Nat} : BouquetWord n → IntPow n
+noncomputable def wordToIntPow {n : Nat} : BouquetWord n → IntPow n
   | .nil => IntPow.zero
   | .cons l rest =>
       let base := wordToIntPow rest
@@ -182,7 +182,7 @@ theorem wordToIntPow_respects_rel {n : Nat} {w₁ w₂ : BouquetWord n}
       simp only [wordToIntPow, ih]
 
 /-- Map from BouquetFreeGroup to ℤⁿ. -/
-def freeGroupToIntPow {n : Nat} : BouquetFreeGroup n → IntPow n :=
+noncomputable def freeGroupToIntPow {n : Nat} : BouquetFreeGroup n → IntPow n :=
   Quot.lift wordToIntPow (fun _ _ h => wordToIntPow_respects_rel h)
 
 /-- wordToIntPow is additive over concatenation. -/
@@ -288,7 +288,7 @@ theorem wordToIntPow_inverse {n : Nat} (w : BouquetWord n) :
         omega
 
 /-- IntPow negation. -/
-def IntPow.negation {n : Nat} (x : IntPow n) : IntPow n := fun i => -(x i)
+noncomputable def IntPow.negation {n : Nat} (x : IntPow n) : IntPow n := fun i => -(x i)
 
 /-- x + (-x) = 0 for IntPow. -/
 theorem IntPow.add_neg_self {n : Nat} (x : IntPow n) :
@@ -314,7 +314,7 @@ theorem freeGroupToIntPow_inv {n : Nat} (x : BouquetFreeGroup n) :
     exact wordToIntPow_inverse w
 
 /-- Convert a Fin n to a Fin'B n. -/
-def finToFin'B : {n : Nat} → Fin n → Fin'B n
+noncomputable def finToFin'B : {n : Nat} → Fin n → Fin'B n
   | _ + 1, ⟨0, _⟩ => Fin'B.fzero
   | _ + 1, ⟨k + 1, h⟩ => Fin'B.fsucc (finToFin'B ⟨k, Nat.lt_of_succ_lt_succ h⟩)
 
@@ -371,7 +371,7 @@ theorem freeGroupToIntPow_respects_abelianization {n : Nat} {x y : BouquetFreeGr
       exact IntPow.add_neg_self _
 
 /-- The quotient lift of freeGroupToIntPow to FreeGroupAb. -/
-def freeGroupAbToIntPow {n : Nat} : FreeGroupAb n → IntPow n :=
+noncomputable def freeGroupAbToIntPow {n : Nat} : FreeGroupAb n → IntPow n :=
   Quot.lift freeGroupToIntPow (fun _ _ h => freeGroupToIntPow_respects_abelianization h)
 
 /-! ## Constructive Inverse Map: ℤⁿ → F_n^ab
@@ -388,14 +388,14 @@ Strategy:
 
 /-- Create a word for a single generator gᵢ^k.
     Returns nil if k = 0 (since BouquetLetter requires non-zero power). -/
-def singleGenWord {n : Nat} (i : Fin n) (k : Int) : BouquetWord n :=
+noncomputable def singleGenWord {n : Nat} (i : Fin n) (k : Int) : BouquetWord n :=
   if hk : k = 0 then
     BouquetWord.nil
   else
     BouquetWord.cons ⟨finToFin'B i, k, hk⟩ BouquetWord.nil
 
 /-- The generator gᵢ^k in FreeGroupAb. -/
-def genPowAb {n : Nat} (i : Fin n) (k : Int) : FreeGroupAb n :=
+noncomputable def genPowAb {n : Nat} (i : Fin n) (k : Int) : FreeGroupAb n :=
   toAb (Quot.mk _ (singleGenWord i k))
 
 /-- Multiplication in FreeGroupAb (lifted from BouquetFreeGroup.mul). -/
@@ -421,7 +421,7 @@ noncomputable def FreeGroupAb.mul {n : Nat} (x y : FreeGroupAb n) : FreeGroupAb 
     x
 
 /-- Identity in FreeGroupAb. -/
-def FreeGroupAb.one {n : Nat} : FreeGroupAb n :=
+noncomputable def FreeGroupAb.one {n : Nat} : FreeGroupAb n :=
   toAb (BouquetFreeGroup.one (n := n))
 
 /-- Commutativity in FreeGroupAb: multiplication is commutative. -/
@@ -448,7 +448,7 @@ can be reordered to canonical form using the commutativity relation in FreeGroup
 -/
 
 /-- Lift a word from BouquetWord n to BouquetWord (n+1) by incrementing all generator indices. -/
-def liftWord : {n : Nat} → BouquetWord n → BouquetWord (n + 1)
+noncomputable def liftWord : {n : Nat} → BouquetWord n → BouquetWord (n + 1)
   | _, .nil => BouquetWord.nil
   | _, .cons l rest => BouquetWord.cons ⟨Fin'B.fsucc l.gen, l.power, l.power_ne_zero⟩ (liftWord rest)
 
@@ -538,7 +538,7 @@ theorem liftWord_wordToIntPow {n : Nat} (w : BouquetWord n) (j : Fin (n + 1)) :
 
 /-- Build word by recursion: g₀^{v(0)} · g₁^{v(1)} · ... · gₙ₋₁^{v(n-1)}.
     The result represents the product of all generators with their respective powers. -/
-def buildWordRec : (n : Nat) → (v : Fin n → Int) → BouquetWord n
+noncomputable def buildWordRec : (n : Nat) → (v : Fin n → Int) → BouquetWord n
   | 0, _ => BouquetWord.nil
   | m + 1, v =>
       -- gen_0 is the term for generator 0 with power v(0)
@@ -550,7 +550,7 @@ def buildWordRec : (n : Nat) → (v : Fin n → Int) → BouquetWord n
 
 /-- Constructive inverse map candidate: IntPow n → FreeGroupAb n.
     Builds the canonical word gₙ₋₁^{v(n-1)} · ... · g₀^{v(0)} and projects to FreeGroupAb. -/
-def intPowToFreeGroupAbAux (n : Nat) (v : Fin n → Int) : FreeGroupAb n :=
+noncomputable def intPowToFreeGroupAbAux (n : Nat) (v : Fin n → Int) : FreeGroupAb n :=
   toAb (Quot.mk _ (buildWordRec n v))
 
 /-- toAb respects wordConcat as multiplication. -/
@@ -600,7 +600,7 @@ theorem liftWord_respects_BouquetRel {n : Nat} {w₁ w₂ : BouquetWord n}
     exact BouquetRel.congr ⟨Fin'B.fsucc l.gen, l.power, l.power_ne_zero⟩ ih
 
 /-- Lift a BouquetFreeGroup element from n to n+1 generators. -/
-def liftBouquetFreeGroup {n : Nat} : BouquetFreeGroup n → BouquetFreeGroup (n + 1) :=
+noncomputable def liftBouquetFreeGroup {n : Nat} : BouquetFreeGroup n → BouquetFreeGroup (n + 1) :=
   Quot.lift (fun w => Quot.mk (BouquetRel (n + 1)) (liftWord w))
     (fun _ _ h => Quot.sound (liftWord_respects_BouquetRel h))
 
@@ -680,7 +680,7 @@ theorem liftBouquetFreeGroup_respects_AbelianizationRel {n : Nat}
 /-- Lift a FreeGroupAb element from n to n+1 generators.
 
 This is the quotient lift of liftBouquetFreeGroup to FreeGroupAb. -/
-def liftFreeGroupAb {n : Nat} : FreeGroupAb n → FreeGroupAb (n + 1) :=
+noncomputable def liftFreeGroupAb {n : Nat} : FreeGroupAb n → FreeGroupAb (n + 1) :=
   Quot.lift (fun x : BouquetFreeGroup n => toAb (liftBouquetFreeGroup x))
     (fun _ _ h => Quot.sound (liftBouquetFreeGroup_respects_AbelianizationRel h))
 
@@ -712,7 +712,7 @@ theorem toAb_liftWord_congr {n : Nat} {w₁ w₂ : BouquetWord n}
   exact h'
 
 /-- Helper: A single generator word in FreeGroupAb. -/
-def genWordAb {n : Nat} (i : Fin n) (k : Int) : FreeGroupAb n :=
+noncomputable def genWordAb {n : Nat} (i : Fin n) (k : Int) : FreeGroupAb n :=
   toAb (Quot.mk _ (singleGenWord i k))
 
 /-- finToFin'B at a successor index equals fsucc of finToFin'B at the predecessor. -/
@@ -1105,7 +1105,7 @@ theorem decode_encode_word (n : Nat) (w : BouquetWord n) :
     -- The update function matches the if-then-else from mul_genWordAb_buildWordRec
 
 /-- Path version of `decode_encode_word`. -/
-def decode_encode_word_path (n : Nat) (w : BouquetWord n) :
+noncomputable def decode_encode_word_path (n : Nat) (w : BouquetWord n) :
     Path (toAb (Quot.mk _ w))
       (toAb (Quot.mk _ (buildWordRec n (wordToIntPow w)))) :=
   Path.stepChain (decode_encode_word n w)
@@ -1151,11 +1151,11 @@ theorem encode_decode_word (n : Nat) (v : Fin n → Int) :
       exact ihVal
 
 /-- The inverse map ℤⁿ → F_n^ab. -/
-def intPowToFreeGroupAb {n : Nat} : IntPow n → FreeGroupAb n :=
+noncomputable def intPowToFreeGroupAb {n : Nat} : IntPow n → FreeGroupAb n :=
   intPowToFreeGroupAbAux n
 
 /-- Path version of `encode_decode_word`. -/
-def encode_decode_word_path (n : Nat) (v : Fin n → Int) :
+noncomputable def encode_decode_word_path (n : Nat) (v : Fin n → Int) :
     Path (wordToIntPow (buildWordRec n v)) v :=
   Path.stepChain (encode_decode_word n v)
 
@@ -1166,7 +1166,7 @@ theorem freeGroup_ab_left_inv {n : Nat} (v : IntPow n) :
   simp only [intPowToFreeGroupAb, intPowToFreeGroupAbAux, freeGroupAbToIntPow, freeGroupToIntPow]
   exact encode_decode_word n v
 
-def freeGroup_ab_left_inv_path {n : Nat} (v : IntPow n) :
+noncomputable def freeGroup_ab_left_inv_path {n : Nat} (v : IntPow n) :
     Path (freeGroupAbToIntPow (intPowToFreeGroupAb v)) v :=
   Path.stepChain (freeGroup_ab_left_inv v)
 
@@ -1185,7 +1185,7 @@ theorem freeGroup_ab_right_inv {n : Nat} (x : FreeGroupAb n) :
       simp only [freeGroupAbToIntPow, freeGroupToIntPow, intPowToFreeGroupAb, intPowToFreeGroupAbAux]
       exact (decode_encode_word n w).symm
 
-def freeGroup_ab_right_inv_path {n : Nat} (x : FreeGroupAb n) :
+noncomputable def freeGroup_ab_right_inv_path {n : Nat} (x : FreeGroupAb n) :
     Path (intPowToFreeGroupAb (freeGroupAbToIntPow x)) x :=
   Path.stepChain (freeGroup_ab_right_inv x)
 
@@ -1200,7 +1200,7 @@ Commutativity in the abelianization corresponds to commutativity of addition in 
 - Inverse map (`intPowToFreeGroupAb`): Build canonical word g₀^{v₀}·g₁^{v₁}·...·gₙ₋₁^{vₙ₋₁}
 - Left inverse (`freeGroup_ab_left_inv`): Constructively proved via `encode_decode_word`
 - Right inverse (`freeGroup_ab_right_inv`): Constructively proved via `decode_encode_word` -/
-def freeGroup_ab_equiv (n : Nat) : PathSimpleEquiv (FreeGroupAb n) (IntPow n) where
+noncomputable def freeGroup_ab_equiv (n : Nat) : PathSimpleEquiv (FreeGroupAb n) (IntPow n) where
   toFun := freeGroupAbToIntPow
   invFun := intPowToFreeGroupAb
   left_inv := freeGroup_ab_right_inv_path
@@ -1241,7 +1241,7 @@ theorem freeGroupAbToIntPow_genWordAb {n : Nat} (i : Fin n) (k : Int) :
   simpa using wordToIntPow_singleGenWord i k
 
 /-- Descend a hom-like map out of ℤⁿ to `FreeGroupAb`. -/
-def freeGroupAb_desc {n : Nat} {H : Type}
+noncomputable def freeGroupAb_desc {n : Nat} {H : Type}
     (mulH : H → H → H) (invH : H → H) (eH : H)
     (f : IntPow n → H)
     (_hhom : IsMulHom (G := IntPow n) (H := H)
@@ -1319,7 +1319,7 @@ The abelianization of a free product is the direct product of abelianizations.
 -/
 
 /-- Abelianization of free product distributes over product. -/
-def freeProduct_ab_prod {_G _H : Type u} :
+noncomputable def freeProduct_ab_prod {_G _H : Type u} :
     -- (G * H)^ab ≃ G^ab × H^ab
     Path True True := by
   exact Path.stepChain (rfl : True = True)
@@ -1331,13 +1331,13 @@ For the orientable surface of genus g:
 -/
 
 /-- The abelianization of the surface group is ℤ^{2g}. -/
-def surfaceGroup_ab (_g : Nat) :
+noncomputable def surfaceGroup_ab (_g : Nat) :
     -- π₁(Σ_g)^ab ≃ ℤ^{2g}
     Path True True := by
   exact Path.stepChain (rfl : True = True)
 
 /-- For g ≥ 2, the surface group is non-abelian. -/
-def surfaceGroup_nonAbelian (_g : Nat) (_hg : _g ≥ 2) :
+noncomputable def surfaceGroup_nonAbelian (_g : Nat) (_hg : _g ≥ 2) :
     -- π₁(Σ_g) is not abelian
     Path True True := by
   exact Path.stepChain (rfl : True = True)
@@ -1348,17 +1348,17 @@ The Klein bottle group ℤ ⋊ ℤ has abelianization ℤ × ℤ/2ℤ.
 -/
 
 /-- ℤ × ℤ/2ℤ as a type. -/
-def IntTimesZ2 : Type := Int × Fin 2
+noncomputable def IntTimesZ2 : Type := Int × Fin 2
 
 /-- The Klein bottle group presentation: ⟨a, b | aba⁻¹ = b⁻¹⟩
     Abelianization: setting ab = ba gives b² = 1 in addition. -/
-def kleinBottle_ab :
+noncomputable def kleinBottle_ab :
     -- π₁(K)^ab ≃ ℤ × ℤ/2ℤ
     Path True True := by
   exact Path.stepChain (rfl : True = True)
 
 /-- The Klein bottle group is non-abelian. -/
-def kleinBottle_nonAbelian :
+noncomputable def kleinBottle_nonAbelian :
     -- ℤ ⋊ ℤ is not abelian
     Path True True := by
   exact Path.stepChain (rfl : True = True)
@@ -1369,31 +1369,31 @@ By Hurewicz, H₁(X) ≃ π₁(X)^ab for path-connected X.
 -/
 
 /-- H₁(circle) ≃ ℤ -/
-def circle_H1 :
+noncomputable def circle_H1 :
     -- H₁(S¹) ≃ π₁(S¹)^ab ≃ ℤ^ab ≃ ℤ
     Path True True := by
   exact Path.stepChain (rfl : True = True)
 
 /-- H₁(torus) ≃ ℤ² -/
-def torus_H1 :
+noncomputable def torus_H1 :
     -- H₁(T²) ≃ π₁(T²)^ab ≃ (ℤ × ℤ)^ab ≃ ℤ × ℤ
     Path True True := by
   exact Path.stepChain (rfl : True = True)
 
 /-- H₁(figure-eight) ≃ ℤ² -/
-def figureEight_H1 :
+noncomputable def figureEight_H1 :
     -- H₁(S¹ ∨ S¹) ≃ π₁(S¹ ∨ S¹)^ab ≃ (ℤ * ℤ)^ab ≃ ℤ × ℤ
     Path True True := by
   exact Path.stepChain (rfl : True = True)
 
 /-- H₁(orientable surface) ≃ ℤ^{2g} -/
-def orientableSurface_H1 (_g : Nat) :
+noncomputable def orientableSurface_H1 (_g : Nat) :
     -- H₁(Σ_g) ≃ π₁(Σ_g)^ab ≃ ℤ^{2g}
     Path True True := by
   exact Path.stepChain (rfl : True = True)
 
 /-- H₁(Klein bottle) ≃ ℤ × ℤ/2ℤ -/
-def kleinBottle_H1 :
+noncomputable def kleinBottle_H1 :
     -- H₁(K) ≃ π₁(K)^ab ≃ ℤ × ℤ/2ℤ
     Path True True := by
   exact Path.stepChain (rfl : True = True)

@@ -133,7 +133,7 @@ structure OddForm (Q : SymBilinearForm) where
 /-! ## Standard Forms -/
 
 /-- The standard diagonal form ⟨+1⟩^m ⊕ ⟨-1⟩^n. -/
-def diagonalForm (m n : Nat) : SymBilinearForm where
+noncomputable def diagonalForm (m n : Nat) : SymBilinearForm where
   rank := m + n
   coeff := fun i j =>
     if i = j then
@@ -146,7 +146,7 @@ def diagonalForm (m n : Nat) : SymBilinearForm where
     · simp [h, Ne.symm h]
 
 /-- The diagonal form has the expected signature. -/
-def diagonalSignature (m n : Nat) : Signature (diagonalForm m n) where
+noncomputable def diagonalSignature (m n : Nat) : Signature (diagonalForm m n) where
   bPlus := m
   bMinus := n
   sum_eq := Path.mk [] rfl
@@ -210,7 +210,7 @@ structure FreedmanClassification where
   homeomorphic : Path m₁.manifold m₂.manifold
 
 /-- Freedman's theorem gives a homeomorphism. -/
-def freedman_homeo (F : FreedmanClassification) :
+noncomputable def freedman_homeo (F : FreedmanClassification) :
     Path F.m₁.manifold F.m₂.manifold :=
   F.homeomorphic
 

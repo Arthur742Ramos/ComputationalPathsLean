@@ -58,7 +58,7 @@ structure SteenrodSquare where
   operation : {M : GradedF2Module} → (n : Nat) → M.carrier n → M.carrier (n + degree)
 
 /-- Sq⁰ is the identity operation. -/
-def sq0 : SteenrodSquare where
+noncomputable def sq0 : SteenrodSquare where
   degree := 0
   operation := fun n x => by rw [Nat.add_zero]; exact x
 
@@ -73,7 +73,7 @@ structure Sq1Data (M : GradedF2Module) where
 /-! ## Adem Relations -/
 
 /-- Binomial coefficient mod 2. -/
-def binomMod2 : Nat → Nat → F2
+noncomputable def binomMod2 : Nat → Nat → F2
   | _, 0 => F2.one
   | 0, _ + 1 => F2.zero
   | n + 1, k + 1 => F2.add (binomMod2 n k) (binomMod2 n (k + 1))
@@ -91,22 +91,22 @@ structure AdemRelation where
   cond_bound : a < 2 * b
 
 /-- Adem coefficients: C(b-1-j, a-2j) mod 2. -/
-def ademCoeff (rel : AdemRelation) (j : Nat) : F2 :=
+noncomputable def ademCoeff (rel : AdemRelation) (j : Nat) : F2 :=
   if _h : rel.a ≥ 2 * j ∧ rel.b ≥ j + 1 then
     binomMod2 (rel.b - 1 - j) (rel.a - 2 * j)
   else
     F2.zero
 
 /-- A word in the Steenrod algebra: a sequence of Sq^{i_1} Sq^{i_2} ... Sq^{i_k}. -/
-def SteenrodWord := List Nat
+noncomputable def SteenrodWord := List Nat
 
 /-- Total degree of a Steenrod word. -/
-def SteenrodWord.totalDegree : SteenrodWord → Nat
+noncomputable def SteenrodWord.totalDegree : SteenrodWord → Nat
   | [] => 0
   | i :: rest => i + SteenrodWord.totalDegree rest
 
 /-- An admissible sequence: i₁ ≥ 2i₂, i₂ ≥ 2i₃, etc. -/
-def AdmissibleSequence : SteenrodWord → Prop
+noncomputable def AdmissibleSequence : SteenrodWord → Prop
   | [] => True
   | [_] => True
   | i₁ :: i₂ :: rest => i₁ ≥ 2 * i₂ ∧ AdmissibleSequence (i₂ :: rest)
@@ -120,7 +120,7 @@ theorem admissible_nil : AdmissibleSequence [] := by
   simp [AdmissibleSequence]
 
 /-- Excess of an admissible sequence. -/
-def excess : SteenrodWord → Nat
+noncomputable def excess : SteenrodWord → Nat
   | [] => 0
   | [i] => i
   | i₁ :: i₂ :: rest => i₁ - 2 * i₂ + excess (i₂ :: rest)
@@ -188,7 +188,7 @@ structure DualSteenrodAlgebra where
   mul_assoc : ∀ a b c, Path (mul (mul a b) c) (mul a (mul b c))
 
 /-- Path witness for ξ_k degree. -/
-def xi_degree_path (D : DualSteenrodAlgebra) (k : Nat) :
+noncomputable def xi_degree_path (D : DualSteenrodAlgebra) (k : Nat) :
     Path (D.xi_degree k) (2^k - 1) :=
   Path.stepChain (D.xi_degree_eq k)
 
@@ -196,10 +196,10 @@ def xi_degree_path (D : DualSteenrodAlgebra) (k : Nat) :
 
 /-- A Milnor basis element is a sequence r = (r₁, r₂, ..., r_k) of non-negative
     integers, corresponding to ξ₁^{r₁} ξ₂^{r₂} ... ξ_k^{r_k}. -/
-def MilnorSequence := List Nat
+noncomputable def MilnorSequence := List Nat
 
 /-- The degree of a Milnor basis element Sq(r₁, r₂, ...) = Σ r_k (2^k - 1). -/
-def milnorDegree : MilnorSequence → Nat
+noncomputable def milnorDegree : MilnorSequence → Nat
   | [] => 0
   | r :: rest => r * (2^(rest.length + 1) - 1) + milnorDegree rest
 

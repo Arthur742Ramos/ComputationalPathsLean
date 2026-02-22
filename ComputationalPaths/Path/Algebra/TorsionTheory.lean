@@ -74,7 +74,7 @@ structure TorsionPair (C : PreAdditiveCategory.{u}) where
   torsFree_sub : ∀ (F : C.Obj), torsFree F → torsFree F
 
 /-- Path witness for orthogonality. -/
-def TorsionPair.orthogonal_path {C : PreAdditiveCategory.{u}}
+noncomputable def TorsionPair.orthogonal_path {C : PreAdditiveCategory.{u}}
     (tp : TorsionPair C) (T F : C.Obj)
     (_hT : tp.torsion T) (_hF : tp.torsFree F) :
     Path (C.Hom T F) (C.Hom T F) :=
@@ -132,7 +132,7 @@ structure TiltingEquivalence
   derived_equiv : True
 
 /-- Path witness for the Brenner-Butler theorem. -/
-def brennerButler_path {C D : PreAdditiveCategory.{u}}
+noncomputable def brennerButler_path {C D : PreAdditiveCategory.{u}}
     (te : TiltingEquivalence C D) :
     Path te.tiltObj.T te.tiltObj.T :=
   Path.refl _
@@ -151,7 +151,7 @@ structure MutationData (C : PreAdditiveCategory.{u}) where
   involution : ∀ X, Path (mutObj (mutObj X)) X
 
 /-- Left mutation at a torsion pair. -/
-def leftMutation {C : PreAdditiveCategory.{u}}
+noncomputable def leftMutation {C : PreAdditiveCategory.{u}}
     (tp : TorsionPair C) : MutationData C where
   original := tp
   mutated := tp
@@ -159,7 +159,7 @@ def leftMutation {C : PreAdditiveCategory.{u}}
   involution := fun X => Path.refl X
 
 /-- Right mutation at a torsion pair. -/
-def rightMutation {C : PreAdditiveCategory.{u}}
+noncomputable def rightMutation {C : PreAdditiveCategory.{u}}
     (tp : TorsionPair C) : MutationData C where
   original := tp
   mutated := tp
@@ -201,7 +201,7 @@ structure ARTriangle (CC : ClusterCategory.{u}) where
     CC.triCat.distinguished Tr ∧ Tr.X = src
 
 /-- The trivial cluster category using a given triangulated category. -/
-def trivialCluster (TC : TriangulatedCategory.{u})
+noncomputable def trivialCluster (TC : TriangulatedCategory.{u})
     (obj : TC.cat.Obj) : ClusterCategory.{u} where
   triCat := TC
   clusterTilting := obj

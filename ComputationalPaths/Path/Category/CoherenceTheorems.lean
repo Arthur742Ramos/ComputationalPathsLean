@@ -54,7 +54,7 @@ namespace FormalTensor
 variable {α : Type u}
 
 /-- Flatten a formal tensor to a right-nested normal form. -/
-def normalize : FormalTensor α → FormalTensor α
+noncomputable def normalize : FormalTensor α → FormalTensor α
   | unit => unit
   | atom a => atom a
   | tensor l r =>
@@ -63,7 +63,7 @@ def normalize : FormalTensor α → FormalTensor α
     | other => tensor other (normalize r)
 
 /-- Size of a formal tensor expression. -/
-def size : FormalTensor α → Nat
+noncomputable def size : FormalTensor α → Nat
   | unit => 1
   | atom _ => 1
   | tensor l r => 1 + l.size + r.size

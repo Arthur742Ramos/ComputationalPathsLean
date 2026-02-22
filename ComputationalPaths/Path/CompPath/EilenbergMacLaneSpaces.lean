@@ -48,7 +48,7 @@ abbrev KOneSpace (G : Type u) : Type (u + 1) :=
   EilenbergMacLane.KOneSpace G
 
 /-- View a K(G,n) space as a pointed type. -/
-def kSpacePointed {G : Type u} {n : Nat} (X : KSpace G n) : Pointed where
+noncomputable def kSpacePointed {G : Type u} {n : Nat} (X : KSpace G n) : Pointed where
   carrier := X.carrier
   pt := X.base
 
@@ -64,7 +64,7 @@ structure LoopSpaceProperty (G : Type u) (n : Nat) (X : KSpace G (n + 1)) where
   loopBase : loopEquiv.toFun (Path.refl X.base) = loopSpace.base
 
 /-- A loop space recognition derived from the loop space property. -/
-def loopSpaceRecognition {G : Type u} {n : Nat} {X : KSpace G (n + 1)}
+noncomputable def loopSpaceRecognition {G : Type u} {n : Nat} {X : KSpace G (n + 1)}
     (P : LoopSpaceProperty G n X) :
     LoopSpaceRecognition.LoopSpaceRecognition P.loopSpace.carrier :=
   LoopSpaceRecognition.recognizeLoopSpaceOfSimpleEquiv X.base (SimpleEquiv.symm P.loopEquiv)
@@ -72,7 +72,7 @@ def loopSpaceRecognition {G : Type u} {n : Nat} {X : KSpace G (n + 1)}
 /-! ## Cohomology representability -/
 
 /-- Constant pointed map to the basepoint. -/
-def basepointMap (X Y : Pointed) : PointedMap X Y where
+noncomputable def basepointMap (X Y : Pointed) : PointedMap X Y where
   toFun := fun _ => Y.pt
   map_pt := rfl
 
@@ -92,7 +92,7 @@ structure CohomologyRepresentability (H : ReducedCohomologyTheory) where
 namespace CohomologyRepresentability
 
 /-- Evaluate a representing map as a cohomology class. -/
-def eval {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
+noncomputable def eval {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
     (n : Nat) {X : Pointed} (f : PointedMap X (R.space n)) : H.cohomology n X :=
   (R.represent n X).toFun f
 
@@ -122,13 +122,13 @@ structure PostnikovKInvariant (A : Type u) (G : Type u) (n : Nat) where
 namespace PostnikovKInvariant
 
 /-- Pointed view of the n-th Postnikov stage. -/
-def stagePointed {A : Type u} {G : Type u} {n : Nat}
+noncomputable def stagePointed {A : Type u} {G : Type u} {n : Nat}
     (K : PostnikovKInvariant A G n) : Pointed :=
   { carrier := K.system.stage n
     pt := K.system.proj n K.base }
 
 /-- The k-invariant as a pointed map. -/
-def kInvariantMap {A : Type u} {G : Type u} {n : Nat}
+noncomputable def kInvariantMap {A : Type u} {G : Type u} {n : Nat}
     (K : PostnikovKInvariant A G n) :
     PointedMap (stagePointed K) (kSpacePointed K.kSpace) :=
   { toFun := K.kMap
@@ -137,7 +137,7 @@ def kInvariantMap {A : Type u} {G : Type u} {n : Nat}
 end PostnikovKInvariant
 
 /-- The trivial k-invariant with constant map to the basepoint. -/
-def trivialKInvariant {A : Type u} {G : Type u} (n : Nat)
+noncomputable def trivialKInvariant {A : Type u} {G : Type u} (n : Nat)
     (P : PostnikovSystem.PostnikovSystem A) (a : A) (X : KSpace G (n + 2)) :
     PostnikovKInvariant A G n :=
   { system := P
@@ -154,7 +154,7 @@ theorem kSpacePointed_pt {G : Type u} {n : Nat} (X : KSpace G n) :
   rfl
 
 /-- Loop space property implies the loop equivalence is an involution up to Path. -/
-def LoopSpaceProperty.loopEquiv_roundtrip {G : Type u} {n : Nat}
+noncomputable def LoopSpaceProperty.loopEquiv_roundtrip {G : Type u} {n : Nat}
     {X : KSpace G (n + 1)} (P : LoopSpaceProperty G n X) (l : LoopSpace X.carrier X.base) :
     Path (P.loopEquiv.invFun (P.loopEquiv.toFun l)) l :=
   Path.stepChain (P.loopEquiv.left_inv l)
@@ -218,39 +218,39 @@ theorem trivialKInvariant_is_pointed {A G : Type u} (n : Nat)
 /-! ## Computational-path Eilenberg-MacLane addenda -/
 
 /-- Basepoint preservation in loop-space recognition as a computational path. -/
-def LoopSpaceProperty.loopBase_path {G : Type u} {n : Nat}
+noncomputable def LoopSpaceProperty.loopBase_path {G : Type u} {n : Nat}
     {X : KSpace G (n + 1)} (P : LoopSpaceProperty G n X) :
     Path (P.loopEquiv.toFun (Path.refl X.base)) P.loopSpace.base :=
   Path.stepChain P.loopBase
 
 /-- Left inverse of the loop-space equivalence as a computational path. -/
-def LoopSpaceProperty.loopEquiv_left_inv_path {G : Type u} {n : Nat}
+noncomputable def LoopSpaceProperty.loopEquiv_left_inv_path {G : Type u} {n : Nat}
     {X : KSpace G (n + 1)} (P : LoopSpaceProperty G n X)
     (l : LoopSpace X.carrier X.base) :
     Path (P.loopEquiv.invFun (P.loopEquiv.toFun l)) l :=
   Path.stepChain (P.loopEquiv.left_inv l)
 
 /-- Representability sends basepoint maps to zero via computational paths. -/
-def CohomologyRepresentability.eval_base_path
+noncomputable def CohomologyRepresentability.eval_base_path
     {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
     (n : Nat) (X : Pointed) :
     Path (R.eval n (basepointMap X (R.space n))) (H.zero n X) :=
   Path.stepChain (R.eval_base n X)
 
 /-- k-invariant basepoint condition as a computational path. -/
-def PostnikovKInvariant.kMap_base_path {A : Type u} {G : Type u} {n : Nat}
+noncomputable def PostnikovKInvariant.kMap_base_path {A : Type u} {G : Type u} {n : Nat}
     (K : PostnikovKInvariant A G n) :
     Path (K.kMap (K.system.proj n K.base)) K.kSpace.base :=
   Path.stepChain K.kMap_base
 
 /-- Pointed k-invariant map preserves basepoints as a computational path. -/
-def PostnikovKInvariant.kInvariantMap_base_path {A : Type u} {G : Type u} {n : Nat}
+noncomputable def PostnikovKInvariant.kInvariantMap_base_path {A : Type u} {G : Type u} {n : Nat}
     (K : PostnikovKInvariant A G n) :
     Path ((K.kInvariantMap).toFun (K.system.proj n K.base)) K.kSpace.base :=
   Path.stepChain K.kMap_base
 
 /-- The trivial k-invariant sends stage basepoints to the Eilenberg-MacLane basepoint. -/
-def trivialKInvariant_kMap_base_path {A : Type u} {G : Type u} (n : Nat)
+noncomputable def trivialKInvariant_kMap_base_path {A : Type u} {G : Type u} (n : Nat)
     (P : PostnikovSystem.PostnikovSystem A) (a : A) (X : KSpace G (n + 2)) :
     Path ((trivialKInvariant n P a X).kMap (P.proj n a)) X.base :=
   Path.stepChain rfl

@@ -29,41 +29,41 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   witness : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
-def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
+noncomputable def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.witness.trans τ.witness⟩
 
-def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
+noncomputable def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.witness.symm⟩
 
-def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
+noncomputable def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
     Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (Path.trans r) σ.witness⟩
 
-def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
+noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.witness⟩
 
@@ -107,7 +107,7 @@ structure GradedComp where
   deg  : Int
 deriving DecidableEq, Repr
 
-def GradedComp.name (c : GradedComp) : String :=
+noncomputable def GradedComp.name (c : GradedComp) : String :=
   c.obj.name ++ "^{" ++ toString c.deg ++ "}"
 
 /-- A graded morphism between graded components. -/
@@ -118,13 +118,13 @@ structure GradedMor where
   isZero : Bool := false
 deriving Repr
 
-def GradedMor.comp (f g : GradedMor) : GradedMor :=
+noncomputable def GradedMor.comp (f g : GradedMor) : GradedMor :=
   ⟨f.src, g.tgt, g.label ++ " ∘ " ++ f.label, f.isZero || g.isZero⟩
 
-def GradedMor.zeroMor (a b : GradedComp) : GradedMor :=
+noncomputable def GradedMor.zeroMor (a b : GradedComp) : GradedMor :=
   ⟨a, b, "0", true⟩
 
-def GradedMor.idMor (a : GradedComp) : GradedMor :=
+noncomputable def GradedMor.idMor (a : GradedComp) : GradedMor :=
   ⟨a, a, "id", false⟩
 
 -- ============================================================
@@ -146,11 +146,11 @@ structure DGAlgebra where
 
 
 /-- d composed with d. -/
-def DGAlgebra.dSquared (A : DGAlgebra) (n : Int) : GradedMor :=
+noncomputable def DGAlgebra.dSquared (A : DGAlgebra) (n : Int) : GradedMor :=
   (A.diff n).comp (A.diff (n + 1))
 
 /-- Mark d² as the zero map — the DGA constraint. -/
-def DGAlgebra.dSquaredZero (A : DGAlgebra) (n : Int) : GradedMor :=
+noncomputable def DGAlgebra.dSquaredZero (A : DGAlgebra) (n : Int) : GradedMor :=
   GradedMor.zeroMor (A.component n) (A.component (n + 2))
 
 /-- Theorem 1: d² = 0 witnessed as a 2-step path. -/
@@ -166,7 +166,7 @@ structure LeibnizWitness (A : DGAlgebra) (p q : Int) where
   leibnizSum  : GradedMor  -- (da)·b + (-1)^p · a·(db)
   path : Path GradedMor dOfProduct leibnizSum
 
-def mkLeibnizWitness (A : DGAlgebra) (p q : Int) : LeibnizWitness A p q :=
+noncomputable def mkLeibnizWitness (A : DGAlgebra) (p q : Int) : LeibnizWitness A p q :=
   let dab := GradedMor.comp (A.mult p q) (A.diff (p + q))
   let leibSum : GradedMor := ⟨dab.src, dab.tgt, "Leibniz(" ++ toString p ++ "," ++ toString q ++ ")", false⟩
   let s1 := Step.rule "expand_d_product" dab leibSum
@@ -187,11 +187,11 @@ structure CohomologyGroup where
   degree : Int
 deriving DecidableEq, Repr
 
-def DGAlgebra.cohomology (A : DGAlgebra) (n : Int) : CohomologyGroup :=
+noncomputable def DGAlgebra.cohomology (A : DGAlgebra) (n : Int) : CohomologyGroup :=
   ⟨"H^" ++ toString n ++ "(" ++ A.name ++ ")", n⟩
 
 /-- The induced product on cohomology. -/
-def cohomologyProduct (A : DGAlgebra) (p q : Int) : CohomologyGroup :=
+noncomputable def cohomologyProduct (A : DGAlgebra) (p q : Int) : CohomologyGroup :=
   A.cohomology (p + q)
 
 /-- Theorem 3: Cohomology product landing degree is p+q via 2-step path. -/
@@ -228,10 +228,10 @@ structure DGModule where
   action    : Int → Int → GradedMor   -- A^p ⊗ M^q → M^{p+q}
 
 
-def DGModule.dSquared (M : DGModule) (n : Int) : GradedMor :=
+noncomputable def DGModule.dSquared (M : DGModule) (n : Int) : GradedMor :=
   (M.diff n).comp (M.diff (n + 1))
 
-def DGModule.dSquaredZero (M : DGModule) (n : Int) : GradedMor :=
+noncomputable def DGModule.dSquaredZero (M : DGModule) (n : Int) : GradedMor :=
   GradedMor.zeroMor (M.component n) (M.component (n + 2))
 
 /-- Theorem 5: DG-module differential squares to zero — 3-step path. -/
@@ -280,7 +280,7 @@ structure DGCategory where
 
 
 /-- Composition in a DG-category is a chain map. -/
-def DGCategory.compIsChainMap (C : DGCategory) (x y z : DGCatObj) :
+noncomputable def DGCategory.compIsChainMap (C : DGCategory) (x y z : DGCatObj) :
     String := "comp: Hom(" ++ x.name ++ "," ++ y.name ++ ") ⊗ Hom(" ++
       y.name ++ "," ++ z.name ++ ") → Hom(" ++ x.name ++ "," ++ z.name ++ ")"
 
@@ -323,11 +323,11 @@ structure AInfAlgebra where
   multArity : Nat → String
 
 
-def AInfAlgebra.m (A : AInfAlgebra) (n : Nat) : String :=
+noncomputable def AInfAlgebra.m (A : AInfAlgebra) (n : Nat) : String :=
   "m_" ++ toString n ++ "[" ++ A.name ++ "]"
 
 /-- Stasheff identity for arity n: Σ_{i+j=n+1} Σ_k (-1)^ε m_i(... m_j(...) ...) = 0 -/
-def stasheffIdentity (A : AInfAlgebra) (n : Nat) : String :=
+noncomputable def stasheffIdentity (A : AInfAlgebra) (n : Nat) : String :=
   "Stasheff_" ++ toString n ++ "(" ++ A.name ++ ")"
 
 /-- Theorem 11: Stasheff identity for n=1 gives m₁² = 0 (differential). -/

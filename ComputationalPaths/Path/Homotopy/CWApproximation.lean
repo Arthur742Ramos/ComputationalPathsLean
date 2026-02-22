@@ -48,18 +48,18 @@ abbrev CWApproximationData (f : ContinuousMap X Y) : Type (max u v) :=
   CellularApproximation (C := C) (D := D) f
 
 /-- A cellular map admits a CW approximation. -/
-def cwApproximation_of_cellular {f : ContinuousMap X Y}
+noncomputable def cwApproximation_of_cellular {f : ContinuousMap X Y}
     (hf : IsCellularMap C D f) :
     CWApproximationData (C := C) (D := D) f :=
   cellularApproximation_of_cellular (C := C) (D := D) hf
 
 /-- The identity map on a CW complex admits a CW approximation. -/
-def cwApproximation_id :
+noncomputable def cwApproximation_id :
     CWApproximationData (C := C) (D := C) (ContinuousMap.id X) :=
   cwApproximation_of_cellular (C := C) (D := C) (cellular_id (C := C))
 
 /-- Extract the Path-valued homotopy from a CW approximation. -/
-def cwApproximation_path {f : ContinuousMap X Y}
+noncomputable def cwApproximation_path {f : ContinuousMap X Y}
     (approx : CWApproximationData (C := C) (D := D) f) (x : X) :
     Path (approx.map x) (f x) :=
   approx.homotopic x
@@ -77,7 +77,7 @@ theorem cellular_comp_export {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
 
 /-- Compose CW approximations: given approximations for f and g,
     produce an approximation for g ∘ f. -/
-def cwApproximation_comp {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
+noncomputable def cwApproximation_comp {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
     (af : CWApproximationData (C := C) (D := D) f)
     (ag : CWApproximationData (C := D) (D := E) g) :
     CellularApproximation (C := C) (D := E) (g.comp f) where
@@ -89,7 +89,7 @@ def cwApproximation_comp {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
       (ag.homotopic (f x))
 
 /-- Path witness: the composed approximation map equals ag.map ∘ af.map. -/
-def cwApproximation_comp_map_path
+noncomputable def cwApproximation_comp_map_path
     {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
     (af : CWApproximationData (C := C) (D := D) f)
     (ag : CWApproximationData (C := D) (D := E) g) (x : X) :
@@ -108,13 +108,13 @@ theorem cellular_const (y₀ : Y) (hy₀ : ∀ n : ENat, y₀ ∈ CWComplex.skel
   exact hy₀ n
 
 /-- A constant map admits a trivial CW approximation. -/
-def cwApproximation_const (y₀ : Y)
+noncomputable def cwApproximation_const (y₀ : Y)
     (hy₀ : ∀ n : ENat, y₀ ∈ CWComplex.skeleton (C := D) n) :
     CWApproximationData (C := C) (D := D) (ContinuousMap.const X y₀) :=
   cwApproximation_of_cellular (C := C) (D := D) (cellular_const (C := C) (D := D) y₀ hy₀)
 
 /-- Path witness: the constant-map approximation maps everything to y₀. -/
-def cwApproximation_const_path (y₀ : Y)
+noncomputable def cwApproximation_const_path (y₀ : Y)
     (hy₀ : ∀ n : ENat, y₀ ∈ CWComplex.skeleton (C := D) n) (x : X) :
     Path
       ((cwApproximation_const (C := C) (D := D) y₀ hy₀).map x)
@@ -130,13 +130,13 @@ structure SkeletalRestriction {f : ContinuousMap X Y}
   mapsTo : Set.MapsTo f (CWComplex.skeleton (C := C) n) (CWComplex.skeleton (C := D) n)
 
 /-- Every cellular map gives a skeletal restriction at each level. -/
-def skeletalRestriction_of_cellular {f : ContinuousMap X Y}
+noncomputable def skeletalRestriction_of_cellular {f : ContinuousMap X Y}
     (hf : IsCellularMap C D f) (n : ENat) :
     SkeletalRestriction (C := C) (D := D) hf n where
   mapsTo := hf n
 
 /-- The identity is a skeletal restriction at every level. -/
-def skeletalRestriction_id (n : ENat) :
+noncomputable def skeletalRestriction_id (n : ENat) :
     SkeletalRestriction (C := C) (D := C) (cellular_id (C := C)) n where
   mapsTo := cellular_id (C := C) n
 
@@ -152,7 +152,7 @@ structure HomotopyExtensionData where
   obstructionVanishes : Prop
 
 /-- When the obstruction vanishes, we have extension data. -/
-def homotopyExtension_trivial (n : Nat) : HomotopyExtensionData where
+noncomputable def homotopyExtension_trivial (n : Nat) : HomotopyExtensionData where
   level := n
   obstructionVanishes := True
 
@@ -165,14 +165,14 @@ theorem homotopyExtension_trivial_vanishes (n : Nat) :
 
 /-- Two CW approximations of the same map are homotopic via the underlying
     homotopies. -/
-def cwApproximation_homotopy
+noncomputable def cwApproximation_homotopy
     {f : ContinuousMap X Y}
     (a₁ a₂ : CWApproximationData (C := C) (D := D) f) (x : X) :
     Path (a₁.map x) (a₂.map x) :=
   Path.trans (a₁.homotopic x) (Path.symm (a₂.homotopic x))
 
 /-- The homotopy between two approximations is reflexive when they agree. -/
-def cwApproximation_homotopy_refl
+noncomputable def cwApproximation_homotopy_refl
     {f : ContinuousMap X Y}
     (a : CWApproximationData (C := C) (D := D) f) (x : X) :
     Path (a.map x) (a.map x) :=
@@ -189,7 +189,7 @@ theorem cwApproximation_homotopy_refl_toEq
 
 /-- When C ⊆ D via an inclusion that is cellular, the inclusion
     admits a trivial CW approximation. -/
-def cwApproximation_inclusion
+noncomputable def cwApproximation_inclusion
     {ι : ContinuousMap X Y}
     (hι : IsCellularMap C D ι) :
     CWApproximationData (C := C) (D := D) ι :=
@@ -220,7 +220,7 @@ structure RelativeCWApproximation {f : ContinuousMap X Y}
   agreement : ∀ x : X, x ∈ C → Path (approx.map x) (f x)
 
 /-- A cellular map has a trivial relative CW approximation. -/
-def relativeCWApproximation_of_cellular {f : ContinuousMap X Y}
+noncomputable def relativeCWApproximation_of_cellular {f : ContinuousMap X Y}
     (hf : IsCellularMap C D f) :
     RelativeCWApproximation (C := C) (D := D) hf where
   approx := cwApproximation_of_cellular (C := C) (D := D) hf
@@ -245,7 +245,7 @@ theorem cellular_comp_coherence
 
 /-- Path witness: applying two CW approximation homotopies in sequence
     gives a path from a₁.map to f. -/
-def cwApproximation_two_step_path
+noncomputable def cwApproximation_two_step_path
     {f : ContinuousMap X Y}
     (a : CWApproximationData (C := C) (D := D) f) (x : X) :
     Path (a.map x) (f x) :=

@@ -59,13 +59,13 @@ structure ColoredOperad (C : Type u) where
     comp (context := []) f (idOp c) = f
 
 /-- Path-valued left unit law for colored operads. -/
-def ColoredOperad.comp_id_left_path {C : Type u} (O : ColoredOperad C)
+noncomputable def ColoredOperad.comp_id_left_path {C : Type u} (O : ColoredOperad C)
     {inputs : List C} {output : C} (f : O.ops inputs output) :
     Path (O.comp (context := []) (O.idOp output) f) f :=
   Path.stepChain (O.comp_id_left f)
 
 /-- Path-valued right unit law. -/
-def ColoredOperad.comp_id_right_path {C : Type u} (O : ColoredOperad C)
+noncomputable def ColoredOperad.comp_id_right_path {C : Type u} (O : ColoredOperad C)
     {c : C} {output : C} (f : O.ops [c] output) :
     Path (O.comp (context := []) f (O.idOp c)) f :=
   Path.stepChain (O.comp_id_right f)
@@ -88,11 +88,11 @@ structure NSOperad where
     gamma f (fun _ => ⟨1, unit⟩) = ⟨n, f⟩
 
 /-- Path-valued unit laws for non-symmetric operads. -/
-def NSOperad.gamma_unit_left_path (O : NSOperad) {k : Nat} (f : O.ops k) :
+noncomputable def NSOperad.gamma_unit_left_path (O : NSOperad) {k : Nat} (f : O.ops k) :
     Path (O.gamma O.unit (fun _ => ⟨k, f⟩)) ⟨k, f⟩ :=
   Path.stepChain (O.gamma_unit_left f)
 
-def NSOperad.gamma_unit_right_path (O : NSOperad) {n : Nat} (f : O.ops n) :
+noncomputable def NSOperad.gamma_unit_right_path (O : NSOperad) {n : Nat} (f : O.ops n) :
     Path (O.gamma f (fun _ => ⟨1, O.unit⟩)) ⟨n, f⟩ :=
   Path.stepChain (O.gamma_unit_right f)
 
@@ -105,7 +105,7 @@ inductive StasheffTree : Nat → Type
   | graft : StasheffTree m → StasheffTree n → StasheffTree (m + n)
 
 /-- The number of internal edges in a Stasheff tree. -/
-def StasheffTree.internalEdges : StasheffTree n → Nat
+noncomputable def StasheffTree.internalEdges : StasheffTree n → Nat
   | StasheffTree.single => 0
   | StasheffTree.graft t₁ t₂ => 1 + t₁.internalEdges + t₂.internalEdges
 
@@ -127,7 +127,7 @@ structure Associahedron (n : Nat) where
   edges : List (StasheffTree n × StasheffTree n)
 
 /-- K_3 is a point (unique parenthesization of 3 factors). -/
-def K3 : Associahedron 3 where
+noncomputable def K3 : Associahedron 3 where
   vertices := [StasheffTree.graft StasheffTree.single
     (StasheffTree.graft StasheffTree.single StasheffTree.single)]
   edges := []
@@ -136,7 +136,7 @@ def K3 : Associahedron 3 where
 
 /-- The endomorphism operad End(X): operations of arity n are functions
     X^n → X. -/
-def EndomorphismOperad (X : Type u) : CleanOperad where
+noncomputable def EndomorphismOperad (X : Type u) : CleanOperad where
   ops := fun n => (Fin n → X) → X
   unit := fun v => v ⟨0, Nat.lt_of_lt_of_le Nat.zero_lt_one (Nat.le_refl 1)⟩
   action := fun σ f v => f (v ∘ σ.toFun)
@@ -151,7 +151,7 @@ theorem endomorphism_unit_spec (X : Type u) (v : Fin 1 → X) :
   rfl
 
 /-- Path witnessing that the endomorphism operad unit is projection. -/
-def endomorphism_unit_path (X : Type u) (v : Fin 1 → X) :
+noncomputable def endomorphism_unit_path (X : Type u) (v : Fin 1 → X) :
     Path ((EndomorphismOperad X).unit v) (v ⟨0, Nat.zero_lt_one⟩) :=
   Path.refl _
 
@@ -167,12 +167,12 @@ structure OperadIdeal (O : CleanOperad) where
     mem θ → mem (O.action σ θ)
 
 /-- The zero ideal: nothing is in the ideal. -/
-def OperadIdeal.zero (O : CleanOperad) : OperadIdeal O where
+noncomputable def OperadIdeal.zero (O : CleanOperad) : OperadIdeal O where
   mem := fun _ => False
   action_closed := fun _ _ h => h
 
 /-- The whole ideal: everything is in the ideal. -/
-def OperadIdeal.whole (O : CleanOperad) : OperadIdeal O where
+noncomputable def OperadIdeal.whole (O : CleanOperad) : OperadIdeal O where
   mem := fun _ => True
   action_closed := fun _ _ _ => trivial
 
@@ -185,26 +185,26 @@ theorem OperadMorphism.comp_assoc {O P Q R : CleanOperad}
     OperadMorphism.comp (OperadMorphism.comp h g) f := rfl
 
 /-- Path-valued associativity of operad morphism composition. -/
-def OperadMorphism.comp_assoc_path {O P Q R : CleanOperad}
+noncomputable def OperadMorphism.comp_assoc_path {O P Q R : CleanOperad}
     (h : OperadMorphism Q R) (g : OperadMorphism P Q) (f : OperadMorphism O P) :
     Path (OperadMorphism.comp h (OperadMorphism.comp g f))
          (OperadMorphism.comp (OperadMorphism.comp h g) f) :=
   Path.refl _
 
 /-- Path-valued left identity for operad morphism composition. -/
-def OperadMorphism.comp_id_left_path {O P : CleanOperad}
+noncomputable def OperadMorphism.comp_id_left_path {O P : CleanOperad}
     (f : OperadMorphism O P) :
     Path (OperadMorphism.comp (OperadMorphism.id P) f) f :=
   Path.stepChain (OperadMorphism.id_comp_law f)
 
 /-- Path-valued right identity for operad morphism composition. -/
-def OperadMorphism.comp_id_right_path {O P : CleanOperad}
+noncomputable def OperadMorphism.comp_id_right_path {O P : CleanOperad}
     (f : OperadMorphism O P) :
     Path (OperadMorphism.comp f (OperadMorphism.id O)) f :=
   Path.stepChain (OperadMorphism.comp_id_law f)
 
 /-- Coherence from associativity and unit laws. -/
-def OperadMorphism.comp_assoc_unit_path {O Q R : CleanOperad}
+noncomputable def OperadMorphism.comp_assoc_unit_path {O Q R : CleanOperad}
     (h : OperadMorphism Q R) (f : OperadMorphism O Q) :
     Path (OperadMorphism.comp h (OperadMorphism.comp (OperadMorphism.id Q) f))
          (OperadMorphism.comp h f) :=
@@ -235,11 +235,11 @@ structure OperadModule (O : CleanOperad) where
     act (O.action σ θ) xs = act θ (xs ∘ σ.invFun)
 
 /-- Path-valued addition-zero laws. -/
-def OperadModule.add_zero_left_path {O : CleanOperad} (M : OperadModule O) (x : M.carrier) :
+noncomputable def OperadModule.add_zero_left_path {O : CleanOperad} (M : OperadModule O) (x : M.carrier) :
     Path (M.add M.zero x) x :=
   Path.stepChain (M.add_zero_left x)
 
-def OperadModule.add_zero_right_path {O : CleanOperad} (M : OperadModule O) (x : M.carrier) :
+noncomputable def OperadModule.add_zero_right_path {O : CleanOperad} (M : OperadModule O) (x : M.carrier) :
     Path (M.add x M.zero) x :=
   Path.stepChain (M.add_zero_right x)
 

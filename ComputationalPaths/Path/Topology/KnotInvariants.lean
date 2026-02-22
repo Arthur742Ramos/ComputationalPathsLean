@@ -77,7 +77,7 @@ structure ReidemeisterEquiv (d1 d2 : KnotDiagram) where
   path : Path d1 d2
 
 /-- Reflexivity of Reidemeister equivalence. -/
-def reidemeister_equiv_refl (d : KnotDiagram) : ReidemeisterEquiv d d :=
+noncomputable def reidemeister_equiv_refl (d : KnotDiagram) : ReidemeisterEquiv d d :=
   ⟨Path.refl d⟩
 
 /-! ## Reidemeister steps -/
@@ -87,15 +87,15 @@ inductive KnotStep : KnotDiagram → KnotDiagram → Type
   | move (m : ReidemeisterMove) : KnotStep m.source m.target
 
 /-- Extract the computational path carried by a Reidemeister step. -/
-def knotStepPath {d1 d2 : KnotDiagram} : KnotStep d1 d2 → Path d1 d2
+noncomputable def knotStepPath {d1 d2 : KnotDiagram} : KnotStep d1 d2 → Path d1 d2
   | KnotStep.move m => m.path
 
 /-- Convert a Reidemeister step into a Reidemeister equivalence. -/
-def knotStepEquiv {d1 d2 : KnotDiagram} (s : KnotStep d1 d2) : ReidemeisterEquiv d1 d2 :=
+noncomputable def knotStepEquiv {d1 d2 : KnotDiagram} (s : KnotStep d1 d2) : ReidemeisterEquiv d1 d2 :=
   ⟨knotStepPath s⟩
 
 /-- Compose two Reidemeister steps into a single path. -/
-def knot_steps_compose {d1 d2 d3 : KnotDiagram}
+noncomputable def knot_steps_compose {d1 d2 d3 : KnotDiagram}
     (s1 : KnotStep d1 d2) (s2 : KnotStep d2 d3) :
     Path d1 d3 :=
   Path.trans (knotStepPath s1) (knotStepPath s2)
@@ -130,17 +130,17 @@ structure KnotInvariant (α : Type u) where
     Path (value d1) (value d2)
 
 /-- Invariance of a knot invariant under a single Reidemeister step. -/
-def knot_invariant_step {α : Type u} (I : KnotInvariant α) {d1 d2 : KnotDiagram}
+noncomputable def knot_invariant_step {α : Type u} (I : KnotInvariant α) {d1 d2 : KnotDiagram}
     (s : KnotStep d1 d2) : Path (I.value d1) (I.value d2) :=
   I.reidemeister (knotStepEquiv s)
 
 /-- Invariance under a reversed Reidemeister step. -/
-def knot_invariant_step_symm {α : Type u} (I : KnotInvariant α) {d1 d2 : KnotDiagram}
+noncomputable def knot_invariant_step_symm {α : Type u} (I : KnotInvariant α) {d1 d2 : KnotDiagram}
     (s : KnotStep d1 d2) : Path (I.value d2) (I.value d1) :=
   Path.symm (knot_invariant_step I s)
 
 /-- Invariance under two consecutive Reidemeister steps. -/
-def knot_invariant_two_steps {α : Type u} (I : KnotInvariant α)
+noncomputable def knot_invariant_two_steps {α : Type u} (I : KnotInvariant α)
     {d1 d2 d3 : KnotDiagram} (s1 : KnotStep d1 d2) (s2 : KnotStep d2 d3) :
     Path (I.value d1) (I.value d3) :=
   Path.trans (knot_invariant_step I s1) (knot_invariant_step I s2)

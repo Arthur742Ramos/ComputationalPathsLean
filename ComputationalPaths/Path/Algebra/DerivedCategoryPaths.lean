@@ -30,30 +30,30 @@ structure ChainMap (C D : ChainComplex) where
   commutes  : ∀ n x, component (n - 1) (C.diff n x) = D.diff n (component n x)
 
 /-- The zero complex. -/
-@[simp] def zeroComplex : ChainComplex :=
+@[simp] noncomputable def zeroComplex : ChainComplex :=
   { obj := fun _ => 0
     diff := fun _ _ => 0
     diff_sq := fun _ _ => rfl
     diff_zero := fun _ => rfl }
 
 /-- The identity chain map. -/
-@[simp] def idMap (C : ChainComplex) : ChainMap C C :=
+@[simp] noncomputable def idMap (C : ChainComplex) : ChainMap C C :=
   { component := fun _ x => x
     commutes := fun _ _ => rfl }
 
 /-- The zero chain map. -/
-@[simp] def zeroMap (C D : ChainComplex) : ChainMap C D :=
+@[simp] noncomputable def zeroMap (C D : ChainComplex) : ChainMap C D :=
   { component := fun _ _ => 0
     commutes := fun n _ => by simp [D.diff_zero] }
 
 /-- Composition of chain maps. -/
-@[simp] def compMap {A B C : ChainComplex} (f : ChainMap A B) (g : ChainMap B C) :
+@[simp] noncomputable def compMap {A B C : ChainComplex} (f : ChainMap A B) (g : ChainMap B C) :
     ChainMap A C :=
   { component := fun n x => g.component n (f.component n x)
     commutes := fun n x => by rw [f.commutes, g.commutes] }
 
 /-- Shift functor [1]: reindexes objects. -/
-@[simp] def shiftObj (C : ChainComplex) (n : Int) : Int :=
+@[simp] noncomputable def shiftObj (C : ChainComplex) (n : Int) : Int :=
   C.obj (n + 1)
 
 /-! ## Rewrite Steps for Chain Complex Algebra -/
@@ -104,7 +104,7 @@ theorem eval_eq {a b : Int} (s : DStep a b) : a = b := by
   | neg_zero              => exact Int.neg_zero
 
 /-- Lift a step to a core `Path`. -/
-def toCorePath {a b : Int} (s : DStep a b) : Path a b :=
+noncomputable def toCorePath {a b : Int} (s : DStep a b) : Path a b :=
   ⟨[⟨a, b, s.eval_eq⟩], s.eval_eq⟩
 
 end DStep
@@ -131,7 +131,7 @@ theorem eval_eq {a b : Int} (p : DPath a b) : a = b := by
 
 -- 2
 /-- Path depth. -/
-@[simp] def depth {a b : Int} : DPath a b → Nat
+@[simp] noncomputable def depth {a b : Int} : DPath a b → Nat
   | .refl _      => 0
   | .step _      => 1
   | .trans p q   => p.depth + q.depth
@@ -146,7 +146,7 @@ theorem depth_symm {a b : Int} (p : DPath a b) :
 
 -- 5
 /-- Lift to a core `Path`. -/
-def toCorePath {a b : Int} (p : DPath a b) : Path a b :=
+noncomputable def toCorePath {a b : Int} (p : DPath a b) : Path a b :=
   ⟨[⟨a, b, p.eval_eq⟩], p.eval_eq⟩
 
 end DPath
@@ -183,7 +183,7 @@ theorem compMap_zero_left (C D _E : ChainComplex) (n : Int) (x : Int) :
 
 -- 12
 /-- Differential of zero complex squared is zero (trivially). -/
-def diff_sq_zero_path (n : Int) (x : Int) :
+noncomputable def diff_sq_zero_path (n : Int) (x : Int) :
     DPath (zeroComplex.diff (n - 1) (zeroComplex.diff n x)) 0 :=
   .step (.diff_sq zeroComplex n x)
 
@@ -191,47 +191,47 @@ def diff_sq_zero_path (n : Int) (x : Int) :
 
 -- 13
 /-- `x + 0 ⟶ x` -/
-def add_zero_path (x : Int) : DPath (x + 0) x :=
+noncomputable def add_zero_path (x : Int) : DPath (x + 0) x :=
   .step (.add_zero x)
 
 -- 14
 /-- `0 + x ⟶ x` -/
-def zero_add_path (x : Int) : DPath (0 + x) x :=
+noncomputable def zero_add_path (x : Int) : DPath (0 + x) x :=
   .step (.zero_add x)
 
 -- 15
 /-- `x + (-x) ⟶ 0` -/
-def neg_cancel_path (x : Int) : DPath (x + (-x)) 0 :=
+noncomputable def neg_cancel_path (x : Int) : DPath (x + (-x)) 0 :=
   .step (.neg_add x)
 
 -- 16
 /-- `-(-(x)) ⟶ x` -/
-def double_neg_path (x : Int) : DPath (- (-x)) x :=
+noncomputable def double_neg_path (x : Int) : DPath (- (-x)) x :=
   .step (.neg_neg x)
 
 -- 17
 /-- `x + y ⟶ y + x` -/
-def add_comm_path (x y : Int) : DPath (x + y) (y + x) :=
+noncomputable def add_comm_path (x y : Int) : DPath (x + y) (y + x) :=
   .step (.add_comm x y)
 
 -- 18
 /-- `(x + y) + z ⟶ x + (y + z)` -/
-def add_assoc_path (x y z : Int) : DPath (x + y + z) (x + (y + z)) :=
+noncomputable def add_assoc_path (x y z : Int) : DPath (x + y + z) (x + (y + z)) :=
   .step (.add_assoc x y z)
 
 -- 19
 /-- `x * 1 ⟶ x` -/
-def mul_one_path (x : Int) : DPath (x * 1) x :=
+noncomputable def mul_one_path (x : Int) : DPath (x * 1) x :=
   .step (.mul_one x)
 
 -- 20
 /-- `x * 0 ⟶ 0` -/
-def mul_zero_path (x : Int) : DPath (x * 0) 0 :=
+noncomputable def mul_zero_path (x : Int) : DPath (x * 0) 0 :=
   .step (.mul_zero x)
 
 -- 21
 /-- `-0 ⟶ 0` -/
-def neg_zero_path : DPath (-(0 : Int)) 0 :=
+noncomputable def neg_zero_path : DPath (-(0 : Int)) 0 :=
   .step .neg_zero
 
 /-! ## Composed Paths -/
@@ -240,7 +240,7 @@ def neg_zero_path : DPath (-(0 : Int)) 0 :=
 /-- `(x + 0) + (-x) ⟶ x + (0 + (-x))` via assoc, then
     note: x + (0 + (-x)) doesn't simplify further in one step.
     Instead: a simpler two-step composition. -/
-def add_zero_then_comm (x y : Int) : DPath (x + y + 0) (y + x) :=
+noncomputable def add_zero_then_comm (x y : Int) : DPath (x + y + 0) (y + x) :=
   .trans (add_zero_path (x + y)) (add_comm_path x y)
 
 /-! ## Coherence Theorems -/
@@ -275,7 +275,7 @@ structure ChainHomotopy {C D : ChainComplex} (f g : ChainMap C D) where
 
 -- 27
 /-- The zero homotopy (between a map and itself). -/
-def zeroHomotopy (C D : ChainComplex) (f : ChainMap C D) :
+noncomputable def zeroHomotopy (C D : ChainComplex) (f : ChainMap C D) :
     ChainHomotopy f f :=
   { hom := fun _ _ => 0
     htpy := fun n _ => by
@@ -290,7 +290,7 @@ theorem homotopy_refl (C D : ChainComplex) (f : ChainMap C D) :
 /-! ## Mapping Cone -/
 
 /-- Mapping cone value at degree n: C(n-1) + D(n). -/
-@[simp] def coneVal (C D : ChainComplex) (_f : ChainMap C D) (n : Int) : Int :=
+@[simp] noncomputable def coneVal (C D : ChainComplex) (_f : ChainMap C D) (n : Int) : Int :=
   C.obj (n - 1) + D.obj n
 
 -- 29
@@ -301,7 +301,7 @@ theorem cone_zero_zero (n : Int) :
 
 -- 30
 /-- Cone value is commutative in summands. -/
-def cone_comm (C D : ChainComplex) (f : ChainMap C D) (n : Int) :
+noncomputable def cone_comm (C D : ChainComplex) (f : ChainMap C D) (n : Int) :
     DPath (coneVal C D f n) (D.obj n + C.obj (n - 1)) :=
   .step (.add_comm (C.obj (n - 1)) (D.obj n))
 
@@ -316,7 +316,7 @@ structure DistTriangle where
   g : ChainMap Y Z
 
 /-- The zero triangle. -/
-@[simp] def zeroTriangle : DistTriangle :=
+@[simp] noncomputable def zeroTriangle : DistTriangle :=
   { X := zeroComplex
     Y := zeroComplex
     Z := zeroComplex
@@ -335,7 +335,7 @@ theorem zeroTriangle_g_act (n : Int) (x : Int) :
 /-! ## Rotation -/
 
 /-- Rotate a triangle: X → Y → Z becomes Y → Z → X[1]. -/
-def rotateTriangle (t : DistTriangle) : DistTriangle :=
+noncomputable def rotateTriangle (t : DistTriangle) : DistTriangle :=
   { X := t.Y
     Y := t.Z
     Z := t.X  -- simplified: should be shift(X)

@@ -84,7 +84,7 @@ noncomputable def intersection_class_cancel_rweq (z w : Cycle) :
 end CycleClassPathData
 
 /-- Trivial cycle-class package into the trivial Chow ring on `Nat`. -/
-def trivialCycleClassPathData :
+noncomputable def trivialCycleClassPathData :
     CycleClassPathData Nat Nat trivialChowRingPathData where
   cycleClass := fun z => z
   rationalEq := fun z z' => z = z'

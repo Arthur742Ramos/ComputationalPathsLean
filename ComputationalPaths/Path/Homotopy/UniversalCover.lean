@@ -38,20 +38,20 @@ variable {A : Type u}
 
 /-- The fiber of the universal cover at `a₀` over `b` is the set of
 path-equivalence classes from `a₀` to `b` in the fundamental groupoid. -/
-def UnivCoverFiber (a₀ : A) (b : A) : Type u :=
+noncomputable def UnivCoverFiber (a₀ : A) (b : A) : Type u :=
   FundamentalGroupoid.Hom A a₀ b
 
 /-! ## Total space -/
 
 /-- The total space of the universal cover. -/
-def UnivTotal (a₀ : A) : Type u :=
+noncomputable def UnivTotal (a₀ : A) : Type u :=
   (b : A) × UnivCoverFiber a₀ b
 
 /-- The projection from universal cover total space to base. -/
-def univProj (a₀ : A) : UnivTotal a₀ → A := Sigma.fst
+noncomputable def univProj (a₀ : A) : UnivTotal a₀ → A := Sigma.fst
 
 /-- The canonical basepoint in the total space: `(a₀, refl)`. -/
-def univBase (a₀ : A) : UnivTotal a₀ :=
+noncomputable def univBase (a₀ : A) : UnivTotal a₀ :=
   ⟨a₀, FundamentalGroupoid.id' A a₀⟩
 
 /-! ## Projection properties -/
@@ -81,7 +81,7 @@ theorem univBaseLoop_refl (a₀ : A) :
 /-! ## Deck transformations -/
 
 /-- The identity deck transformation on the universal cover. -/
-def deckId (a₀ : A) :
+noncomputable def deckId (a₀ : A) :
     CoveringSpace.DeckTransformation (UnivCoverFiber a₀) :=
   CoveringSpace.DeckTransformation.id
 
@@ -125,7 +125,7 @@ structure of π₁(A, a₀): identity maps to identity. -/
 theorem deck_pi1_identity (a₀ : A) :
     (deckId a₀).toFun (univBase a₀) = univBase a₀ := rfl
 
-private def pathAnchor {B : Type} (b : B) : Path b b :=
+private noncomputable def pathAnchor {B : Type} (b : B) : Path b b :=
   Path.refl b
 
 end UniversalCover

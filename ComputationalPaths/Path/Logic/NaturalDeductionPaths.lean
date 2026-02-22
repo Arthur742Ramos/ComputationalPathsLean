@@ -48,10 +48,10 @@ inductive NDFormula : Type where
 namespace NDFormula
 
 /-- Negation as syntactic sugar. -/
-def neg (A : NDFormula) : NDFormula := impl A bot
+noncomputable def neg (A : NDFormula) : NDFormula := impl A bot
 
 /-- Formula complexity. -/
-def complexity : NDFormula → Nat
+noncomputable def complexity : NDFormula → Nat
   | atom _ => 0
   | top => 0
   | bot => 0
@@ -79,25 +79,25 @@ structure Judgment where
 abbrev NDPath (j : Judgment) := Path (Judgment.mk [] NDFormula.top) j
 
 /-- Assumption rule: A ∈ Γ gives a derivation of Γ ⊢ A. -/
-def assumption (Γ : NDContext) (A : NDFormula) :
+noncomputable def assumption (Γ : NDContext) (A : NDFormula) :
     Path (Judgment.mk Γ A) (Judgment.mk Γ A) :=
   Path.refl _
 
 /-! ## Introduction Rules as Path Steps -/
 
 /-- Top introduction: Γ ⊢ ⊤ is always derivable. -/
-def topIntro (Γ : NDContext) :
+noncomputable def topIntro (Γ : NDContext) :
     Path (Judgment.mk Γ NDFormula.top) (Judgment.mk Γ NDFormula.top) :=
   Path.refl _
 
 /-- Conjunction introduction as path composition. -/
-def conjIntro (Γ : NDContext) (A B : NDFormula) :
+noncomputable def conjIntro (Γ : NDContext) (A B : NDFormula) :
     Path (Judgment.mk Γ (NDFormula.conj A B))
          (Judgment.mk Γ (NDFormula.conj A B)) :=
   Path.refl _
 
 /-- Implication introduction: discharge an assumption. -/
-def implIntro (Γ : NDContext) (A B : NDFormula) :
+noncomputable def implIntro (Γ : NDContext) (A B : NDFormula) :
     Path (Judgment.mk (A :: Γ) B)
          (Judgment.mk (A :: Γ) B) →
     Path (Judgment.mk Γ (NDFormula.impl A B))
@@ -107,21 +107,21 @@ def implIntro (Γ : NDContext) (A B : NDFormula) :
 /-! ## Elimination Rules as Path Steps -/
 
 /-- Conjunction elimination left. -/
-def conjElimLeft (Γ : NDContext) (A B : NDFormula) :
+noncomputable def conjElimLeft (Γ : NDContext) (A B : NDFormula) :
     Path (Judgment.mk Γ (NDFormula.conj A B))
          (Judgment.mk Γ (NDFormula.conj A B)) →
     Path (Judgment.mk Γ A) (Judgment.mk Γ A) :=
   fun _ => Path.refl _
 
 /-- Conjunction elimination right. -/
-def conjElimRight (Γ : NDContext) (A B : NDFormula) :
+noncomputable def conjElimRight (Γ : NDContext) (A B : NDFormula) :
     Path (Judgment.mk Γ (NDFormula.conj A B))
          (Judgment.mk Γ (NDFormula.conj A B)) →
     Path (Judgment.mk Γ B) (Judgment.mk Γ B) :=
   fun _ => Path.refl _
 
 /-- Implication elimination (modus ponens) as path composition. -/
-def implElim (Γ : NDContext) (A B : NDFormula) :
+noncomputable def implElim (Γ : NDContext) (A B : NDFormula) :
     Path (Judgment.mk Γ (NDFormula.impl A B))
          (Judgment.mk Γ (NDFormula.impl A B)) →
     Path (Judgment.mk Γ A) (Judgment.mk Γ A) →
@@ -129,7 +129,7 @@ def implElim (Γ : NDContext) (A B : NDFormula) :
   fun _ _ => Path.refl _
 
 /-- Bottom elimination (ex falso). -/
-def botElim (Γ : NDContext) (A : NDFormula) :
+noncomputable def botElim (Γ : NDContext) (A : NDFormula) :
     Path (Judgment.mk Γ NDFormula.bot)
          (Judgment.mk Γ NDFormula.bot) →
     Path (Judgment.mk Γ A) (Judgment.mk Γ A) :=
@@ -172,7 +172,7 @@ inductive ProofTerm : Type where
   deriving DecidableEq, Repr
 
 /-- Size of a proof term. -/
-def ProofTerm.size : ProofTerm → Nat
+noncomputable def ProofTerm.size : ProofTerm → Nat
   | var _ => 1
   | app f a => 1 + size f + size a
   | lam _ body => 1 + size body
@@ -202,21 +202,21 @@ structure CurryHoward where
   ctx : NDContext
 
 /-- Identity proof corresponds to the identity path. -/
-def curryHowardId (A : NDFormula) : CurryHoward :=
+noncomputable def curryHowardId (A : NDFormula) : CurryHoward :=
   ⟨A, ProofTerm.var 0, [A]⟩
 
 /-- Composition in Curry-Howard corresponds to path trans. -/
-def curryHowardCompose (ch₁ ch₂ : CurryHoward) : CurryHoward :=
+noncomputable def curryHowardCompose (ch₁ ch₂ : CurryHoward) : CurryHoward :=
   ⟨ch₂.formula, ProofTerm.app (ProofTerm.lam 0 ch₂.term) ch₁.term, ch₁.ctx ++ ch₂.ctx⟩
 
 /-- Path correspondence: equal Curry-Howard witnesses have equal formulas. -/
-def curryHoward_path_formula (ch₁ ch₂ : CurryHoward)
+noncomputable def curryHoward_path_formula (ch₁ ch₂ : CurryHoward)
     (p : Path ch₁ ch₂) :
     Path (ch₁.formula) (ch₂.formula) :=
   Path.congrArg CurryHoward.formula p
 
 /-- Path correspondence preserves context. -/
-def curryHoward_path_ctx (ch₁ ch₂ : CurryHoward)
+noncomputable def curryHoward_path_ctx (ch₁ ch₂ : CurryHoward)
     (p : Path ch₁ ch₂) :
     Path (ch₁.ctx) (ch₂.ctx) :=
   Path.congrArg CurryHoward.ctx p
@@ -275,7 +275,7 @@ structure ReductionStrategy where
   isReducing : ∀ t : ProofTerm, reduce t = reduce t  -- consistency
 
 /-- The identity reduction strategy. -/
-def idReduction : ReductionStrategy :=
+noncomputable def idReduction : ReductionStrategy :=
   ⟨fun t => t, fun _ => rfl⟩
 
 /-- Applying the identity reduction yields a reflexive path. -/
@@ -284,7 +284,7 @@ theorem id_reduction_refl (t : ProofTerm) :
   simp [idReduction]
 
 /-- Sequential composition of reductions. -/
-def composeReduction (r₁ r₂ : ReductionStrategy) : ReductionStrategy :=
+noncomputable def composeReduction (r₁ r₂ : ReductionStrategy) : ReductionStrategy :=
   ⟨fun t => r₂.reduce (r₁.reduce t), fun _ => rfl⟩
 
 /-- Reduction composition is reflected in path trans. -/

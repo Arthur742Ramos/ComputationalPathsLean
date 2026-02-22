@@ -48,7 +48,7 @@ structure Triad (A B C : Type u) (f : C → A) (g : C → B) : Type (u + 1) wher
   square : BlakersMassey.PushoutSquare A B C P f g inl inr
 
 /-- Canonical triad built from the computational pushout. -/
-def canonicalTriad (A B C : Type u) (f : C → A) (g : C → B) :
+noncomputable def canonicalTriad (A B C : Type u) (f : C → A) (g : C → B) :
     Triad A B C f g :=
   { P := CompPath.PushoutCompPath A B C f g
     inl := CompPath.PushoutCompPath.inl (A := A) (B := B) (C := C) (f := f) (g := g)
@@ -58,11 +58,11 @@ def canonicalTriad (A B C : Type u) (f : C → A) (g : C → B) :
 /-! ## Sharp Blakers-Massey connectivity -/
 
 /-- Sharp connectivity bound for a triad with (k,l)-connected legs. -/
-def sharpTriadConnectivityBound (k l : Nat) : Nat :=
+noncomputable def sharpTriadConnectivityBound (k l : Nat) : Nat :=
   k + l
 
 /-- Statement asserting the sharp Blakers-Massey triad connectivity bound. -/
-def triadConnectivityStatement {A B C : Type u} {f : C → A} {g : C → B}
+noncomputable def triadConnectivityStatement {A B C : Type u} {f : C → A} {g : C → B}
     (T : Triad A B C f g) (k l : Nat) : Prop :=
   ∃ bound : Nat, bound = sharpTriadConnectivityBound k l ∧ T.P = T.P
 
@@ -75,7 +75,7 @@ theorem sharp_blakers_massey_triad_connectivity {A B C : Type u} {f : C → A} {
 /-! ## Corollaries -/
 
 /-- Freudenthal suspension preview as a corollary of sharp Blakers-Massey. -/
-def freudenthalCorollary {A B C : Type u} {f : C → A} {g : C → B}
+noncomputable def freudenthalCorollary {A B C : Type u} {f : C → A} {g : C → B}
     (T : Triad A B C f g) (k l : Nat)
     (h : triadConnectivityStatement T k l)
     (X : SuspensionLoop.Pointed) :
@@ -86,7 +86,7 @@ def freudenthalCorollary {A B C : Type u} {f : C → A} {g : C → B}
   exact FreudenthalSuspension.freudenthalPreview X
 
 /-- Relative Hurewicz iso packaged as a corollary of sharp Blakers-Massey. -/
-def relativeHurewiczCorollary {A B C : Type u} {f : C → A} {g : C → B}
+noncomputable def relativeHurewiczCorollary {A B C : Type u} {f : C → A} {g : C → B}
     (T : Triad A B C f g) (k l : Nat)
     (h : triadConnectivityStatement T k l)
     (G : Type u) (mul : G → G → G) (one : G) :
@@ -97,11 +97,11 @@ def relativeHurewiczCorollary {A B C : Type u} {f : C → A} {g : C → B}
   exact HurewiczTheorem.hurewiczIdIso G mul one
 
 /-- Metastable range predicate for excision statements. -/
-def metastableRange (n m : Nat) : Prop :=
+noncomputable def metastableRange (n m : Nat) : Prop :=
   n ≤ m
 
 /-- Excision isomorphism in the metastable range. -/
-def excisionIsoMetastable (H : Type u) (n m : Nat) (h : metastableRange n m) :
+noncomputable def excisionIsoMetastable (H : Type u) (n m : Nat) (h : metastableRange n m) :
     SimpleEquiv H H := by
   have _ := n + m
   have _ := h
@@ -144,11 +144,11 @@ theorem freudenthalCorollary_natural {A B C : Type u} {f : C → A} {g : C → B
 /-! ## Computational-path connectivity routes -/
 
 /-- Left-associated route for connectivity composites. -/
-def connectivityRouteLeft {A : Type u} {a : A} (p q r : Path a a) : Path a a :=
+noncomputable def connectivityRouteLeft {A : Type u} {a : A} (p q r : Path a a) : Path a a :=
   Path.trans (Path.trans p q) r
 
 /-- Right-associated route for connectivity composites. -/
-def connectivityRouteRight {A : Type u} {a : A} (p q r : Path a a) : Path a a :=
+noncomputable def connectivityRouteRight {A : Type u} {a : A} (p q r : Path a a) : Path a a :=
   Path.trans p (Path.trans q r)
 
 /-- Reassociation of connectivity routes is witnessed by rewrite equivalence. -/
@@ -157,18 +157,18 @@ noncomputable def connectivity_route_two_cell {A : Type u} {a : A} (p q r : Path
   rweq_tt p q r
 
 /-- The sharp connectivity bound is itself represented by a computational path. -/
-def sharp_bound_path (k l : Nat) :
+noncomputable def sharp_bound_path (k l : Nat) :
     Path (sharpTriadConnectivityBound k l) (k + l) :=
   Path.stepChain rfl
 
 /-- Any triad connectivity statement carries a reflexive computational-path witness. -/
-def triad_connectivity_refl_path {A B C : Type u} {f : C → A} {g : C → B}
+noncomputable def triad_connectivity_refl_path {A B C : Type u} {f : C → A} {g : C → B}
     (T : Triad A B C f g) (k l : Nat) :
     Path (triadConnectivityStatement T k l) (triadConnectivityStatement T k l) :=
   Path.refl _
 
 /-- Barratt-Whitehead products have reflexive computational-path witnesses. -/
-def barratt_whitehead_refl_path {m n : Nat} {A : Type u} {a : A}
+noncomputable def barratt_whitehead_refl_path {m n : Nat} {A : Type u} {a : A}
     (x : HigherHomotopyGroups.PiN m A a) (y : HigherHomotopyGroups.PiN n A a) :
     Path (WhiteheadProduct.whiteheadProduct x y)
       (WhiteheadProduct.whiteheadProduct x y) :=

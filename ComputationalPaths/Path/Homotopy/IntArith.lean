@@ -108,7 +108,7 @@ inductive NatTrichotomy (m n : Nat) where
   | gt : m > n → NatTrichotomy m n
 
 /-- Decide the trichotomy of two natural numbers -/
-def natTrichotomyDec (m n : Nat) : NatTrichotomy m n :=
+noncomputable def natTrichotomyDec (m n : Nat) : NatTrichotomy m n :=
   if h : m < n then NatTrichotomy.lt h
   else if h : m = n then NatTrichotomy.eq h
   else NatTrichotomy.gt (by omega)

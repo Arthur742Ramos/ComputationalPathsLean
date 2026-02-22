@@ -85,13 +85,13 @@ structure SimpSetData where
   degen : ∀ {n : Nat}, Fin (n + 1) → simplices n → simplices (n + 1)
 
 /-- Empty simplicial set. -/
-def SimpSetData.empty : SimpSetData.{u} where
+noncomputable def SimpSetData.empty : SimpSetData.{u} where
   simplices := fun _ => PEmpty
   face := fun _ x => x.elim
   degen := fun _ x => x.elim
 
 /-- Constant simplicial set at a type. -/
-def SimpSetData.const (X : Type u) : SimpSetData.{u} where
+noncomputable def SimpSetData.const (X : Type u) : SimpSetData.{u} where
   simplices := fun _ => X
   face := fun _ x => x
   degen := fun _ x => x
@@ -124,7 +124,7 @@ structure SimpMappingSpace (A : Type u) where
          (comp_simplex f (comp_simplex g h))
 
 /-- Trivial mapping space (uses Path directly). -/
-def trivialSimpMappingSpace (A : Type u) : SimpMappingSpace A where
+noncomputable def trivialSimpMappingSpace (A : Type u) : SimpMappingSpace A where
   mapSpace := fun a b => SimpSetData.const (Path a b)
   id_simplex := fun a => Path.refl a
   comp_simplex := fun f g => Path.trans f g
@@ -173,7 +173,7 @@ structure SimpModelCatData (A : Type u) extends ModelCategory A where
     cof i → weq i → True  -- abstract SM7 + acyclicity
 
 /-- The trivial simplicial model category on computational paths. -/
-def trivialSimpModelCat (A : Type u) : SimpModelCatData A where
+noncomputable def trivialSimpModelCat (A : Type u) : SimpModelCatData A where
   toModelCategory := pathModelCategory A
   mapping := trivialSimpMappingSpace A
   tensoring :=
@@ -239,7 +239,7 @@ structure DerivedMapSpace (A : Type u) (M : SimpModelCatData A) where
          (M.mapping.mapSpace (cofRepl a) (fibRepl b) |>.simplices 0 → Prop)
 
 /-- Trivial derived mapping space (identity replacements). -/
-def trivialDerivedMapSpace (A : Type u) (M : SimpModelCatData A)
+noncomputable def trivialDerivedMapSpace (A : Type u) (M : SimpModelCatData A)
     (hweq_refl : ∀ a : A, M.weq (Path.refl a)) :
     DerivedMapSpace A M where
   cofRepl := id
@@ -355,7 +355,7 @@ noncomputable def simp_framing_id {A : Type u} {M : SimpModelCatData A}
   exact rweq_of_eq (SF.face_degen X j).toEq
 
 /-- Trivial simplicial model category has reflexive mapping spaces. -/
-def trivial_simp_mc_mapping_refl (A : Type u) (a : A) :
+noncomputable def trivial_simp_mc_mapping_refl (A : Type u) (a : A) :
     Path ((trivialSimpMappingSpace A).comp_simplex
             (Path.refl a) (Path.refl a))
          (Path.refl a) :=

@@ -13,9 +13,9 @@ structure Category where
   id : (A : Obj) → Hom A A
   comp : {A B C : Obj} → Hom A B → Hom B C → Hom A C
 
-def homSet (C : Category) (A B : C.Obj) : Type v := C.Hom A B
-def idHom (C : Category) (A : C.Obj) : C.Hom A A := C.id A
-def composeHom (C : Category) {A B D : C.Obj} (f : C.Hom A B) (g : C.Hom B D) : C.Hom A D :=
+noncomputable def homSet (C : Category) (A B : C.Obj) : Type v := C.Hom A B
+noncomputable def idHom (C : Category) (A : C.Obj) : C.Hom A A := C.id A
+noncomputable def composeHom (C : Category) {A B D : C.Obj} (f : C.Hom A B) (g : C.Hom B D) : C.Hom A D :=
   C.comp f g
 
 structure Topos where
@@ -28,13 +28,13 @@ structure Topos where
   orOp : cat.Hom omega omega
   impOp : cat.Hom omega omega
 
-def omegaObj (T : Topos) : T.cat.Obj := T.omega
-def terminalObj (T : Topos) : T.cat.Obj := T.terminal
-def truthArrow (T : Topos) : T.cat.Hom (terminalObj T) (omegaObj T) := T.truth
-def falsityArrow (T : Topos) : T.cat.Hom (terminalObj T) (omegaObj T) := T.falsity
-def andArrow (T : Topos) : T.cat.Hom (omegaObj T) (omegaObj T) := T.andOp
-def orArrow (T : Topos) : T.cat.Hom (omegaObj T) (omegaObj T) := T.orOp
-def impArrow (T : Topos) : T.cat.Hom (omegaObj T) (omegaObj T) := T.impOp
+noncomputable def omegaObj (T : Topos) : T.cat.Obj := T.omega
+noncomputable def terminalObj (T : Topos) : T.cat.Obj := T.terminal
+noncomputable def truthArrow (T : Topos) : T.cat.Hom (terminalObj T) (omegaObj T) := T.truth
+noncomputable def falsityArrow (T : Topos) : T.cat.Hom (terminalObj T) (omegaObj T) := T.falsity
+noncomputable def andArrow (T : Topos) : T.cat.Hom (omegaObj T) (omegaObj T) := T.andOp
+noncomputable def orArrow (T : Topos) : T.cat.Hom (omegaObj T) (omegaObj T) := T.orOp
+noncomputable def impArrow (T : Topos) : T.cat.Hom (omegaObj T) (omegaObj T) := T.impOp
 
 structure MitchellBenabou (T : Topos) where
   Term : Type u
@@ -42,8 +42,8 @@ structure MitchellBenabou (T : Topos) where
   interpTerm : Term → T.cat.Obj
   interpFormula : Formula → T.cat.Hom T.terminal T.omega
 
-def mbInterpretTerm {T : Topos} (L : MitchellBenabou T) (t : L.Term) : T.cat.Obj := L.interpTerm t
-def mbInterpretFormula {T : Topos} (L : MitchellBenabou T)
+noncomputable def mbInterpretTerm {T : Topos} (L : MitchellBenabou T) (t : L.Term) : T.cat.Obj := L.interpTerm t
+noncomputable def mbInterpretFormula {T : Topos} (L : MitchellBenabou T)
     (φ : L.Formula) : T.cat.Hom T.terminal T.omega := L.interpFormula φ
 
 structure KripkeJoyalModel (T : Topos) where
@@ -51,33 +51,33 @@ structure KripkeJoyalModel (T : Topos) where
   le : World → World → Prop
   forces : World → Prop → Prop
 
-def kripkeForces {T : Topos} (K : KripkeJoyalModel T) (w : K.World) (P : Prop) : Prop :=
+noncomputable def kripkeForces {T : Topos} (K : KripkeJoyalModel T) (w : K.World) (P : Prop) : Prop :=
   K.forces w P
-def kripkeOrder {T : Topos} (K : KripkeJoyalModel T) (w₁ w₂ : K.World) : Prop := K.le w₁ w₂
+noncomputable def kripkeOrder {T : Topos} (K : KripkeJoyalModel T) (w₁ w₂ : K.World) : Prop := K.le w₁ w₂
 
 structure GeometricTheory where
   sort : Type u
   axiomSet : Type u
 
-def geometricSorts (G : GeometricTheory) : Type u := G.sort
-def geometricAxiomSet (G : GeometricTheory) : Type u := G.axiomSet
+noncomputable def geometricSorts (G : GeometricTheory) : Type u := G.sort
+noncomputable def geometricAxiomSet (G : GeometricTheory) : Type u := G.axiomSet
 
 structure ClassifyingTopos where
   base : Topos
   theory : GeometricTheory
 
-def classifyingObject (C : ClassifyingTopos) : Topos := C.base
-def classifyingTheory (C : ClassifyingTopos) : GeometricTheory := C.theory
+noncomputable def classifyingObject (C : ClassifyingTopos) : Topos := C.base
+noncomputable def classifyingTheory (C : ClassifyingTopos) : GeometricTheory := C.theory
 
 structure BarrWitness (C : ClassifyingTopos) where
   hasCover : Prop
   barrTheorem : Prop
 
-def barrCovering {C : ClassifyingTopos} (B : BarrWitness C) : Prop := B.hasCover
-def barrRefinement {C : ClassifyingTopos} (B : BarrWitness C) : Prop := B.barrTheorem
+noncomputable def barrCovering {C : ClassifyingTopos} (B : BarrWitness C) : Prop := B.hasCover
+noncomputable def barrRefinement {C : ClassifyingTopos} (B : BarrWitness C) : Prop := B.barrTheorem
 
-def logicPathChain (P : Prop) : Path P P := Path.trans (Path.refl P) (Path.refl P)
-def internalTruthPath (T : Topos) : Path (truthArrow T) (truthArrow T) := Path.refl (truthArrow T)
+noncomputable def logicPathChain (P : Prop) : Path P P := Path.trans (Path.refl P) (Path.refl P)
+noncomputable def internalTruthPath (T : Topos) : Path (truthArrow T) (truthArrow T) := Path.refl (truthArrow T)
 
 theorem homSet_id {C : Category} (A : C.Obj) : homSet C A A = C.Hom A A := rfl
 

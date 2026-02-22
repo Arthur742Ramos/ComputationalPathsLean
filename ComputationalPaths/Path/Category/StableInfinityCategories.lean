@@ -54,10 +54,10 @@ structure CofiberSequence (C : PointedInfinityCategory.{u,v}) where
   g : C.Hom Y Z
 
 /-- The suspension functor Σ : C → C. -/
-def suspension (C : PointedInfinityCategory.{u,v}) (X : C.Obj) : C.Obj := X
+noncomputable def suspension (C : PointedInfinityCategory.{u,v}) (X : C.Obj) : C.Obj := X
 
 /-- The loop functor Ω : C → C. -/
-def loopFunctor (C : PointedInfinityCategory.{u,v}) (X : C.Obj) : C.Obj := X
+noncomputable def loopFunctor (C : PointedInfinityCategory.{u,v}) (X : C.Obj) : C.Obj := X
 
 /-- A stable ∞-category: pointed, with finite limits/colimits, where
     a square is a pullback iff it is a pushout. -/
@@ -78,7 +78,7 @@ structure ExactTriangle (C : StableInfinityCategory.{u,v}) where
   h : C.Hom Z (suspension C.toPointedInfinityCategory X)
 
 /-- Rotation of an exact triangle: (X→Y→Z→ΣX) ↦ (Y→Z→ΣX→ΣY). -/
-def rotateTriangle (C : StableInfinityCategory.{u,v})
+noncomputable def rotateTriangle (C : StableInfinityCategory.{u,v})
     (T : ExactTriangle C) : ExactTriangle C where
   X := T.Y
   Y := T.Z
@@ -88,11 +88,11 @@ def rotateTriangle (C : StableInfinityCategory.{u,v})
   h := C.comp (C.toZero _) (C.fromZero _) -- placeholder
 
 /-- The shift functor [1] on a stable ∞-category (= Σ). -/
-def shiftFunctor (C : StableInfinityCategory.{u,v}) (n : Int) (X : C.Obj) :
+noncomputable def shiftFunctor (C : StableInfinityCategory.{u,v}) (n : Int) (X : C.Obj) :
     C.Obj := X
 
 /-- Distinguished triangles form the class of exact triangles. -/
-def IsDistinguished (C : StableInfinityCategory.{u,v})
+noncomputable def IsDistinguished (C : StableInfinityCategory.{u,v})
     (T : ExactTriangle C) : Prop := True
 
 /-! ## t-Structures -/
@@ -107,26 +107,26 @@ structure TStructure (C : StableInfinityCategory.{u,v}) where
   truncationAbove : C.Obj → Int → C.Obj
 
 /-- The heart of a t-structure: C^♡ = C^≤0 ∩ C^≥0. -/
-def heart (C : StableInfinityCategory.{u,v}) (t : TStructure C) :
+noncomputable def heart (C : StableInfinityCategory.{u,v}) (t : TStructure C) :
     C.Obj → Prop :=
   fun x => t.isInCLeqN x 0 ∧ t.isInCGeqN x 0
 
 /-- The truncation functor τ≤n. -/
-def truncBelow (C : StableInfinityCategory.{u,v}) (t : TStructure C)
+noncomputable def truncBelow (C : StableInfinityCategory.{u,v}) (t : TStructure C)
     (n : Int) (x : C.Obj) : C.Obj :=
   t.truncationBelow x n
 
 /-- The truncation functor τ≥n. -/
-def truncAbove (C : StableInfinityCategory.{u,v}) (t : TStructure C)
+noncomputable def truncAbove (C : StableInfinityCategory.{u,v}) (t : TStructure C)
     (n : Int) (x : C.Obj) : C.Obj :=
   t.truncationAbove x n
 
 /-- Bounded t-structure: every object has finite amplitude. -/
-def IsBounded (C : StableInfinityCategory.{u,v}) (t : TStructure C) : Prop :=
+noncomputable def IsBounded (C : StableInfinityCategory.{u,v}) (t : TStructure C) : Prop :=
   ∀ (x : C.Obj), ∃ (a b : Int), t.isInCLeqN x b ∧ t.isInCGeqN x a
 
 /-- Non-degenerate t-structure: ∩_n C^≤n = 0 and ∩_n C^≥n = 0. -/
-def IsNonDegenerate (C : StableInfinityCategory.{u,v}) (t : TStructure C) : Prop :=
+noncomputable def IsNonDegenerate (C : StableInfinityCategory.{u,v}) (t : TStructure C) : Prop :=
   True -- placeholder
 
 /-! ## Verdier Quotients -/
@@ -144,7 +144,7 @@ structure VerdierQuotient (C : StableInfinityCategory.{u,v})
   quotientFunctor : C.Obj → carrier.Obj
 
 /-- The kernel of a functor between stable ∞-categories. -/
-def functorKernel (C D : StableInfinityCategory.{u,v})
+noncomputable def functorKernel (C D : StableInfinityCategory.{u,v})
     (F : C.Obj → D.Obj) : ThickSubcategory C where
   mem := fun x => F x = D.zero
   closedUnderShift := by intro x hx; simp [shiftFunctor]; exact hx
@@ -163,21 +163,21 @@ structure StabilityCondition (C : StableInfinityCategory.{u,v}) where
   hn_property : ∀ (x : C.Obj), True
 
 /-- Semistable object of phase φ. -/
-def IsSemistable (C : StableInfinityCategory.{u,v})
+noncomputable def IsSemistable (C : StableInfinityCategory.{u,v})
     (σ : StabilityCondition C) (φ : Float) (x : C.Obj) : Prop :=
   σ.slicing φ x
 
 /-- Stable object: semistable with no proper semistable subobjects. -/
-def IsStable (C : StableInfinityCategory.{u,v})
+noncomputable def IsStable (C : StableInfinityCategory.{u,v})
     (σ : StabilityCondition C) (φ : Float) (x : C.Obj) : Prop :=
   IsSemistable C σ φ x ∧ True -- no proper subobjects condition
 
 /-- The space of stability conditions Stab(C). -/
-def StabSpace (C : StableInfinityCategory.{u,v}) :=
+noncomputable def StabSpace (C : StableInfinityCategory.{u,v}) :=
   StabilityCondition C
 
 /-- The phase of a semistable object. -/
-def phase (C : StableInfinityCategory.{u,v})
+noncomputable def phase (C : StableInfinityCategory.{u,v})
     (σ : StabilityCondition C) (x : C.Obj) : Float :=
   Float.atan2 (σ.centralChargeIm x) (σ.centralChargeRe x)
 

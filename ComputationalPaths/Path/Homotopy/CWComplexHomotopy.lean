@@ -40,7 +40,7 @@ variable {E : Set Z} [CWComplex E]
 /-! ## Cellular maps -/
 
 /-- A continuous map is cellular if it preserves every skeleton. -/
-def IsCellularMap (C : Set X) (D : Set Y) [CWComplex C] [CWComplex D]
+noncomputable def IsCellularMap (C : Set X) (D : Set Y) [CWComplex C] [CWComplex D]
     (f : ContinuousMap X Y) : Prop :=
   ∀ n : ENat, Set.MapsTo f (CWComplex.skeleton (C := C) n) (CWComplex.skeleton (C := D) n)
 
@@ -74,7 +74,7 @@ structure CellularApproximation (f : ContinuousMap X Y) : Type (max u v) where
   homotopic : map ~ᵖ f
 
 /-- A cellular map gives a tautological cellular approximation. -/
-def cellularApproximation_of_cellular {f : ContinuousMap X Y}
+noncomputable def cellularApproximation_of_cellular {f : ContinuousMap X Y}
     (hf : IsCellularMap C D f) :
     CellularApproximation (C := C) (D := D) f :=
   { map := f, cellular := hf, homotopic := homotopy_refl (f := f) }

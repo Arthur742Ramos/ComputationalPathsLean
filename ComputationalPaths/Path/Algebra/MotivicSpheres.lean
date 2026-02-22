@@ -66,25 +66,25 @@ structure SmMor (X Y : SmScheme.{u}) where
   toFun : X.carrier → Y.carrier
 
 /-- Identity morphism. -/
-def SmMor.id (X : SmScheme.{u}) : SmMor X X where
+noncomputable def SmMor.id (X : SmScheme.{u}) : SmMor X X where
   toFun := _root_.id
 
 /-- Composition of scheme morphisms. -/
-def SmMor.comp {X Y Z : SmScheme.{u}} (f : SmMor X Y) (g : SmMor Y Z) : SmMor X Z where
+noncomputable def SmMor.comp {X Y Z : SmScheme.{u}} (f : SmMor X Y) (g : SmMor Y Z) : SmMor X Z where
   toFun := g.toFun ∘ f.toFun
 
 /-- The affine line A¹. -/
-def affine1 : SmScheme.{u} where
+noncomputable def affine1 : SmScheme.{u} where
   carrier := PUnit
   dim := 1
 
 /-- The multiplicative group scheme 𝔾_m. -/
-def Gm : SmScheme.{u} where
+noncomputable def Gm : SmScheme.{u} where
   carrier := PUnit
   dim := 1
 
 /-- Product of schemes. -/
-def smProd (X Y : SmScheme.{u}) : SmScheme.{u} where
+noncomputable def smProd (X Y : SmScheme.{u}) : SmScheme.{u} where
   carrier := X.carrier × Y.carrier
   dim := X.dim + Y.dim
 
@@ -93,7 +93,7 @@ structure PtScheme extends SmScheme.{u} where
   basepoint : carrier
 
 /-- The basepoint of 𝔾_m is the multiplicative identity 1. -/
-def Gm_pointed : PtScheme.{u} where
+noncomputable def Gm_pointed : PtScheme.{u} where
   carrier := PUnit
   dim := 1
   basepoint := PUnit.unit
@@ -108,13 +108,13 @@ structure Bidegree where
 deriving DecidableEq
 
 /-- The bidegree of the simplicial circle S¹_s = S^{1,0}. -/
-def simplicialCircleDeg : Bidegree := ⟨1, 0⟩
+noncomputable def simplicialCircleDeg : Bidegree := ⟨1, 0⟩
 
 /-- The bidegree of 𝔾_m = S^{1,1}. -/
-def algebraicCircleDeg : Bidegree := ⟨1, 1⟩
+noncomputable def algebraicCircleDeg : Bidegree := ⟨1, 1⟩
 
 /-- Addition of bidegrees (for smash products). -/
-def Bidegree.add (d₁ d₂ : Bidegree) : Bidegree :=
+noncomputable def Bidegree.add (d₁ d₂ : Bidegree) : Bidegree :=
   ⟨d₁.p + d₂.p, d₁.q + d₂.q⟩
 
 /-- Bidegree addition is commutative. -/
@@ -127,12 +127,12 @@ theorem Bidegree.add_assoc (d₁ d₂ d₃ : Bidegree) :
   simp [Bidegree.add]; constructor <;> omega
 
 /-- Path witnessing commutativity of bidegree addition. -/
-def bidegree_add_comm_path (d₁ d₂ : Bidegree) :
+noncomputable def bidegree_add_comm_path (d₁ d₂ : Bidegree) :
     Path (d₁.add d₂) (d₂.add d₁) :=
   Path.stepChain (Bidegree.add_comm d₁ d₂)
 
 /-- Path witnessing associativity of bidegree addition. -/
-def bidegree_add_assoc_path (d₁ d₂ d₃ : Bidegree) :
+noncomputable def bidegree_add_assoc_path (d₁ d₂ d₃ : Bidegree) :
     Path ((d₁.add d₂).add d₃) (d₁.add (d₂.add d₃)) :=
   Path.stepChain (Bidegree.add_assoc d₁ d₂ d₃)
 
@@ -146,25 +146,25 @@ structure MotivicSphere where
   connectivity : Int
 
 /-- The simplicial circle S¹_s = S^{1,0}. -/
-def simplicialCircle : MotivicSphere.{u} where
+noncomputable def simplicialCircle : MotivicSphere.{u} where
   degree := simplicialCircleDeg
   space := { carrier := PUnit, dim := 0, basepoint := PUnit.unit }
   connectivity := 0
 
 /-- The algebraic circle 𝔾_m = S^{1,1}. -/
-def algebraicCircle : MotivicSphere.{u} where
+noncomputable def algebraicCircle : MotivicSphere.{u} where
   degree := algebraicCircleDeg
   space := Gm_pointed
   connectivity := 0
 
 /-- The motivic sphere S^{p,q} = S^{p-q}_s ∧ 𝔾_m^{∧q}. -/
-def motivicSphere (p q : Int) : MotivicSphere.{u} where
+noncomputable def motivicSphere (p q : Int) : MotivicSphere.{u} where
   degree := ⟨p, q⟩
   space := { carrier := PUnit, dim := 0, basepoint := PUnit.unit }
   connectivity := p - q - 1
 
 /-- Smash product of motivic spheres. -/
-def smashSphere (S₁ S₂ : MotivicSphere.{u}) : MotivicSphere.{u} where
+noncomputable def smashSphere (S₁ S₂ : MotivicSphere.{u}) : MotivicSphere.{u} where
   degree := S₁.degree.add S₂.degree
   space := {
     carrier := S₁.space.carrier × S₂.space.carrier
@@ -179,7 +179,7 @@ theorem smash_bidegree_add (S₁ S₂ : MotivicSphere.{u}) :
   rfl
 
 /-- Path witnessing the smash product bidegree formula. -/
-def smash_bidegree_path (S₁ S₂ : MotivicSphere.{u}) :
+noncomputable def smash_bidegree_path (S₁ S₂ : MotivicSphere.{u}) :
     Path (smashSphere S₁ S₂).degree (S₁.degree.add S₂.degree) :=
   Path.refl _
 
@@ -217,7 +217,7 @@ structure GmLoopSpace extends GmLoop.{u} where
   shift_is_neg1 : Path weight_shift (-1)
 
 /-- Construction of the trivial 𝔾_m-loop space. -/
-def trivialGmLoop (X : PtScheme.{u}) : GmLoopSpace.{u} where
+noncomputable def trivialGmLoop (X : PtScheme.{u}) : GmLoopSpace.{u} where
   target := X
   loops := PUnit
   const := PUnit.unit
@@ -248,7 +248,7 @@ structure A1Contractibility (X : SmScheme.{u}) where
   contraction_path : ∀ x y : X.carrier, Path (contract x) (contract y)
 
 /-- A¹ is contractible (canonical witness). -/
-def a1_is_contractible : A1Contractibility affine1.{u} where
+noncomputable def a1_is_contractible : A1Contractibility affine1.{u} where
   contract := fun _ => PUnit.unit
   contract_const := fun _ => Path.refl _
   section_ := fun _ => PUnit.unit
@@ -256,7 +256,7 @@ def a1_is_contractible : A1Contractibility affine1.{u} where
   contraction_path := fun _ _ => Path.refl _
 
 /-- Product of A¹ with itself is contractible. -/
-def a1_prod_contractible : A1Contractibility (smProd affine1 affine1 : SmScheme.{u}) where
+noncomputable def a1_prod_contractible : A1Contractibility (smProd affine1 affine1 : SmScheme.{u}) where
   contract := fun _ => PUnit.unit
   contract_const := fun _ => Path.refl _
   section_ := fun _ => (PUnit.unit, PUnit.unit)
@@ -289,7 +289,7 @@ theorem suspension_shift (p q : Int) :
   simp [motivicSphere, Bidegree.add, simplicialCircleDeg]
 
 /-- Path witnessing the suspension degree shift. -/
-def suspension_shift_path (p q : Int) :
+noncomputable def suspension_shift_path (p q : Int) :
     Path (motivicSphere (p + 1) q).degree
          ((motivicSphere p q).degree.add simplicialCircleDeg) :=
   Path.stepChain (suspension_shift p q)
@@ -301,7 +301,7 @@ theorem tate_twist_shift (p q : Int) :
   simp [motivicSphere, Bidegree.add, algebraicCircleDeg]
 
 /-- Path witnessing the Tate twist degree shift. -/
-def tate_twist_path (p q : Int) :
+noncomputable def tate_twist_path (p q : Int) :
     Path (motivicSphere (p + 1) (q + 1)).degree
          ((motivicSphere p q).degree.add algebraicCircleDeg) :=
   Path.stepChain (tate_twist_shift p q)
@@ -400,7 +400,7 @@ structure MotivicHopfMap where
   fiber_seq : Path (target.degree.add fiber_deg) source.degree
 
 /-- Construction of the motivic Hopf map. -/
-def motivicHopf : MotivicHopfMap.{u} where
+noncomputable def motivicHopf : MotivicHopfMap.{u} where
   source := motivicSphere 3 2
   target := motivicSphere 2 1
   source_deg := Path.refl _
@@ -421,13 +421,13 @@ noncomputable def rwEq_bidegree_comm (d₁ d₂ : Bidegree) :
   RwEq.refl _
 
 /-- Multi-step Path: suspension ∘ Tate twist computes correctly. -/
-def suspension_tate_composite_path (p q : Int) :
+noncomputable def suspension_tate_composite_path (p q : Int) :
     Path (motivicSphere (p + 2) (q + 1)).degree
          ((motivicSphere p q).degree.add (simplicialCircleDeg.add algebraicCircleDeg)) :=
   Path.stepChain (by simp [motivicSphere, Bidegree.add, simplicialCircleDeg, algebraicCircleDeg])
 
 /-- Composite Path: double suspension adds (2, 0) to bidegree. -/
-def double_suspension_path (p q : Int) :
+noncomputable def double_suspension_path (p q : Int) :
     Path (motivicSphere (p + 2) q).degree
          ((motivicSphere p q).degree.add ⟨2, 0⟩) :=
   Path.stepChain (by show Bidegree.mk (p + 2) q = Bidegree.mk (p + 2) (q + 0); congr 1; omega)
@@ -442,13 +442,13 @@ noncomputable def rwEq_smash_comm (S₁ S₂ : MotivicSphere.{u}) :
   RwEq.refl _
 
 /-- Multi-step Path: smash associativity via trans composition. -/
-def smash_assoc_trans_path (S₁ S₂ S₃ : MotivicSphere.{u}) :
+noncomputable def smash_assoc_trans_path (S₁ S₂ S₃ : MotivicSphere.{u}) :
     Path ((smashSphere (smashSphere S₁ S₂) S₃).degree)
          ((smashSphere S₁ (smashSphere S₂ S₃)).degree) :=
   Path.stepChain (by simp [smashSphere, Bidegree.add]; constructor <;> omega)
 
 /-- The smash associativity coherence as a composed Path. -/
-def smash_assoc_coherence (S₁ S₂ S₃ : MotivicSphere.{u}) :
+noncomputable def smash_assoc_coherence (S₁ S₂ S₃ : MotivicSphere.{u}) :
     Path (smashSphere (smashSphere S₁ S₂) S₃).degree
          (S₁.degree.add (S₂.degree.add S₃.degree)) :=
   Path.trans

@@ -88,7 +88,7 @@ noncomputable def filtDiff_rweq (s n : Nat) :
 /-! ### Cancellation loops -/
 
 /-- d² = 0 loop. -/
-def dSquaredLoop (n : Nat) :
+noncomputable def dSquaredLoop (n : Nat) :
     Path (F.chainDiff n (F.chainDiff n (F.chainBase n)))
       (F.chainDiff n (F.chainDiff n (F.chainBase n))) :=
   Path.trans (F.dSquaredPath n) (Path.symm (F.dSquaredPath n))
@@ -100,7 +100,7 @@ noncomputable def dSquaredLoop_contracts (n : Nat) :
   exact rweq_cmpA_inv_right (F.dSquaredPath n)
 
 /-- Filtration-differential compatibility loop. -/
-def filtDiffLoop (s n : Nat) :
+noncomputable def filtDiffLoop (s n : Nat) :
     Path (F.chainDiff n (F.filt s n (F.chainBase n)))
       (F.chainDiff n (F.filt s n (F.chainBase n))) :=
   Path.trans (F.filtDiffPath s n) (Path.symm (F.filtDiffPath s n))
@@ -128,7 +128,7 @@ noncomputable def filtDiff_inv_left (s n : Nat) :
 /-! ### Congruence through filtration -/
 
 /-- d² = 0 transported through filtration. -/
-def filtDSquaredPath (s n : Nat) :
+noncomputable def filtDSquaredPath (s n : Nat) :
     Path (F.filt s n (F.chainDiff n (F.chainDiff n (F.chainBase n))))
       (F.filt s n (F.chainBase n)) :=
   Path.congrArg (F.filt s n) (F.dSquaredPath n)
@@ -149,20 +149,20 @@ noncomputable def filtDSquared_loop_contracts (s n : Nat) :
 /-! ### Associated graded paths -/
 
 /-- Associated graded: quotient F_s/F_{s-1} (represented structurally). -/
-def gradedPiece (s n : Nat) : F.chain n :=
+noncomputable def gradedPiece (s n : Nat) : F.chain n :=
   F.filt s n (F.chainBase n)
 
 /-- Inclusion of graded piece into next filtration level. -/
-def gradedInclusionPath (s n : Nat) :
+noncomputable def gradedInclusionPath (s n : Nat) :
     Path (F.gradedPiece s n) (F.gradedPiece (s + 1) n) :=
   F.filtInclusionPath s n
 
 /-- Differential on graded pieces. -/
-def gradedDiff (s n : Nat) : F.chain n :=
+noncomputable def gradedDiff (s n : Nat) : F.chain n :=
   F.chainDiff n (F.gradedPiece s n)
 
 /-- Path: graded diff lands in filtered piece. -/
-def gradedDiffFilteredPath (s n : Nat) :
+noncomputable def gradedDiffFilteredPath (s n : Nat) :
     Path (F.gradedDiff s n) (F.filt s n (F.chainDiff n (F.chainBase n))) :=
   F.filtDiffPath s n
 
@@ -176,7 +176,7 @@ noncomputable def gradedDiffFiltered_normalizes (s n : Nat) :
 /-! ### Double filtration composites -/
 
 /-- Composite filtration path: F_s → F_{s+1} → F_{s+2}. -/
-def doubleFiltInclusionPath (s n : Nat) :
+noncomputable def doubleFiltInclusionPath (s n : Nat) :
     Path (F.gradedPiece s n) (F.gradedPiece (s + 2) n) :=
   Path.trans (F.gradedInclusionPath s n) (F.gradedInclusionPath (s + 1) n)
 
@@ -190,7 +190,7 @@ noncomputable def doubleFiltInclusion_normalizes (s n : Nat) :
 end FilteredComplexPaths
 
 /-- Trivial filtered complex. -/
-def trivialFilteredComplexPaths : FilteredComplexPaths where
+noncomputable def trivialFilteredComplexPaths : FilteredComplexPaths where
   chain := fun _ => PUnit
   chainBase := fun _ => PUnit.unit
   chainDiff := fun _ _ => PUnit.unit
@@ -246,7 +246,7 @@ noncomputable def prodLeftUnit_rweq (p q : Nat) (x : M.toPages.term p q) :
   rweq_of_step (M.prodLeftUnitStep p q x)
 
 /-- Product left-unit loop contracts. -/
-def prodLeftUnitLoop (p q : Nat) (x : M.toPages.term p q) :
+noncomputable def prodLeftUnitLoop (p q : Nat) (x : M.toPages.term p q) :
     Path (M.prod p q p q (M.toPages.base p q) x)
       (M.prod p q p q (M.toPages.base p q) x) :=
   Path.trans (M.prodLeftUnitPath p q x) (Path.symm (M.prodLeftUnitPath p q x))
@@ -258,7 +258,7 @@ noncomputable def prodLeftUnitLoop_contracts (p q : Nat) (x : M.toPages.term p q
   exact rweq_cmpA_inv_right (M.prodLeftUnitPath p q x)
 
 /-- Product right-unit loop contracts. -/
-def prodRightUnitLoop (p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def prodRightUnitLoop (p₁ q₁ p₂ q₂ : Nat) :
     Path (M.prod p₁ q₁ p₂ q₂ (M.toPages.base p₁ q₁) (M.toPages.base p₂ q₂))
       (M.prod p₁ q₁ p₂ q₂ (M.toPages.base p₁ q₁) (M.toPages.base p₂ q₂)) :=
   Path.trans (M.prodRightUnitPath p₁ q₁ p₂ q₂)
@@ -281,7 +281,7 @@ noncomputable def prodRightUnit_inv_left (p₁ q₁ p₂ q₂ : Nat) :
 /-! ### Product-shift compatibility -/
 
 /-- Product-shift compatibility loop. -/
-def prodShiftLoop (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def prodShiftLoop (r p₁ q₁ p₂ q₂ : Nat) :
     Path
       (M.toPages.shift r p₁ q₁
         (M.prod p₁ q₁ p₂ q₂ (M.toPages.base p₁ q₁) (M.toPages.base p₂ q₂)))
@@ -308,7 +308,7 @@ noncomputable def prodShift_normalizes (r p₁ q₁ p₂ q₂ : Nat) :
 /-! ### Shift through product on right unit -/
 
 /-- Path: shift applied to the product right-unit. -/
-def shiftProdRightUnitPath (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def shiftProdRightUnitPath (r p₁ q₁ p₂ q₂ : Nat) :
     Path
       (M.toPages.shift r p₁ q₁
         (M.prod p₁ q₁ p₂ q₂ (M.toPages.base p₁ q₁) (M.toPages.base p₂ q₂)))
@@ -332,7 +332,7 @@ noncomputable def shiftProdRightUnit_loop_contracts (r p₁ q₁ p₂ q₂ : Nat
 end MultiplicativePagePaths
 
 /-- Trivial multiplicative page. -/
-def trivialMultiplicativePagePaths : MultiplicativePagePaths where
+noncomputable def trivialMultiplicativePagePaths : MultiplicativePagePaths where
   toPages := trivialPages
   prod := fun _ _ _ _ _ _ => PUnit.unit
   prodLeftUnitPath := fun _ _ _ => Path.refl PUnit.unit
@@ -373,7 +373,7 @@ noncomputable def leibniz_rweq (r p₁ q₁ p₂ q₂ : Nat) :
   rweq_of_step (MD.leibnizStep r p₁ q₁ p₂ q₂)
 
 /-- Leibniz loop contracts. -/
-def leibnizLoop (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def leibnizLoop (r p₁ q₁ p₂ q₂ : Nat) :
     Path
       (MD.toDifferentials.d r p₁ q₁
         (M.prod p₁ q₁ p₂ q₂ (M.toPages.base p₁ q₁) (M.toPages.base p₂ q₂)))
@@ -397,7 +397,7 @@ noncomputable def leibniz_inv_left (r p₁ q₁ p₂ q₂ : Nat) :
 /-! ### Leibniz through shift -/
 
 /-- Shifted Leibniz: apply page shift to the Leibniz path. -/
-def shiftedLeibnizPath (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def shiftedLeibnizPath (r p₁ q₁ p₂ q₂ : Nat) :
     Path
       (M.toPages.shift r p₁ q₁
         (MD.toDifferentials.d r p₁ q₁
@@ -425,7 +425,7 @@ noncomputable def shiftedLeibniz_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
 end MultiplicativeDiffPaths
 
 /-- Trivial multiplicative differential package. -/
-def trivialMultiplicativeDiffPaths :
+noncomputable def trivialMultiplicativeDiffPaths :
     MultiplicativeDiffPaths trivialMultiplicativePagePaths where
   toDifferentials := trivialDifferentials
   leibnizPath := fun _ _ _ _ _ => Path.refl PUnit.unit
@@ -515,7 +515,7 @@ noncomputable def rightEdgeBase_inv_left (n : Nat) :
   rweq_cmpA_inv_left (H.rightEdgeBasePath n)
 
 /-- Shifted left edge to stabilized path. -/
-def leftEdgeShiftToBasePath (r n : Nat) :
+noncomputable def leftEdgeShiftToBasePath (r n : Nat) :
     Path
       (E.shift r n 0 (H.leftEdge n (H.sourceBase n)))
       (E.base n 0) :=
@@ -550,7 +550,7 @@ noncomputable def rightEdgeShift_loop_contracts (r n : Nat) :
 end EdgeHomPaths
 
 /-- Trivial edge homomorphism package. -/
-def trivialEdgeHomPaths :
+noncomputable def trivialEdgeHomPaths :
     EdgeHomPaths trivialPages trivialDifferentials trivialConvergence where
   source := fun _ => PUnit
   target := fun _ => PUnit
@@ -624,7 +624,7 @@ noncomputable def crossShift_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) :
   rweq_cmpA_inv_right (X.crossShiftPath r p₁ q₁ p₂ q₂)
 
 /-- Shifted cross-product base path. -/
-def shiftedCrossBasePath (r p₁ q₁ p₂ q₂ : Nat) :
+noncomputable def shiftedCrossBasePath (r p₁ q₁ p₂ q₂ : Nat) :
     Path
       (E.shift r p₁ q₁
         (X.cross p₁ q₁ p₂ q₂ (E.base p₁ q₁) (E.base p₂ q₂)))
@@ -648,7 +648,7 @@ noncomputable def shiftedCrossBase_loop_contracts (r p₁ q₁ p₂ q₂ : Nat) 
 end CrossProductPaths
 
 /-- Trivial cross-product structure. -/
-def trivialCrossProductPaths : CrossProductPaths trivialPages where
+noncomputable def trivialCrossProductPaths : CrossProductPaths trivialPages where
   cross := fun _ _ _ _ _ _ => PUnit.unit
   crossBasePath := fun _ _ _ _ => Path.refl PUnit.unit
   crossShiftPath := fun _ _ _ _ _ => Path.refl PUnit.unit
@@ -673,15 +673,15 @@ namespace MultiplicativeSpectralSequencePaths
 variable (MS : MultiplicativeSpectralSequencePaths.{u})
 
 /-- Base element at bidegree (0,0). -/
-def baseElement : MS.mulPages.toPages.term 0 0 :=
+noncomputable def baseElement : MS.mulPages.toPages.term 0 0 :=
   MS.mulPages.toPages.base 0 0
 
 /-- Product of base with itself. -/
-def selfProduct : MS.mulPages.toPages.term 0 0 :=
+noncomputable def selfProduct : MS.mulPages.toPages.term 0 0 :=
   MS.mulPages.prod 0 0 0 0 MS.baseElement MS.baseElement
 
 /-- Self-product equals base path. -/
-def selfProductPath :
+noncomputable def selfProductPath :
     Path MS.selfProduct MS.baseElement :=
   MS.mulPages.prodRightUnitPath 0 0 0 0
 
@@ -700,7 +700,7 @@ noncomputable def selfProduct_loop_contracts :
 end MultiplicativeSpectralSequencePaths
 
 /-- Trivial multiplicative spectral sequence. -/
-def trivialMultiplicativeSpectralSequencePaths :
+noncomputable def trivialMultiplicativeSpectralSequencePaths :
     MultiplicativeSpectralSequencePaths where
   mulPages := trivialMultiplicativePagePaths
   mulDiff := trivialMultiplicativeDiffPaths

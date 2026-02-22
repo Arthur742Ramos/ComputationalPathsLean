@@ -43,24 +43,24 @@ structure PathEntourage (A : Type u) where
   symm_mem : ∀ a b, rel a b → rel b a
 
 /-- The diagonal entourage: relates only equal elements. -/
-def diagonalEntourage (A : Type u) : PathEntourage A where
+noncomputable def diagonalEntourage (A : Type u) : PathEntourage A where
   rel := fun a b => a = b
   refl_mem := fun _ => rfl
   symm_mem := fun _ _ h => h.symm
 
 /-- The universal entourage: relates all elements. -/
-def universalEntourage (A : Type u) : PathEntourage A where
+noncomputable def universalEntourage (A : Type u) : PathEntourage A where
   rel := fun _ _ => True
   refl_mem := fun _ => trivial
   symm_mem := fun _ _ _ => trivial
 
 /-- Path witnessing entourage reflexivity. -/
-def entourage_refl_path {A : Type u} (E : PathEntourage A) (a : A) :
+noncomputable def entourage_refl_path {A : Type u} (E : PathEntourage A) (a : A) :
     Path a a :=
   Path.refl a
 
 /-- Intersection of two entourages. -/
-def entourageInter {A : Type u} (E₁ E₂ : PathEntourage A) :
+noncomputable def entourageInter {A : Type u} (E₁ E₂ : PathEntourage A) :
     PathEntourage A where
   rel := fun a b => E₁.rel a b ∧ E₂.rel a b
   refl_mem := fun a => ⟨E₁.refl_mem a, E₂.refl_mem a⟩
@@ -81,17 +81,17 @@ structure UniformPathSpace (A : Type u) where
   mono : ∀ n m, n ≤ m → ∀ a b, (entourage m).rel a b → (entourage n).rel a b
 
 /-- The discrete uniform structure. -/
-def discreteUniform (A : Type u) : UniformPathSpace A where
+noncomputable def discreteUniform (A : Type u) : UniformPathSpace A where
   entourage := fun _ => diagonalEntourage A
   mono := fun _ _ _ _ _ h => h
 
 /-- The trivial (indiscrete) uniform structure. -/
-def indiscreteUniform (A : Type u) : UniformPathSpace A where
+noncomputable def indiscreteUniform (A : Type u) : UniformPathSpace A where
   entourage := fun _ => universalEntourage A
   mono := fun _ _ _ _ _ _ => trivial
 
 /-- Path between discrete entourage relations. -/
-def discrete_entourage_path (A : Type u) (n : Nat) (a : A) :
+noncomputable def discrete_entourage_path (A : Type u) (n : Nat) (a : A) :
     Path ((discreteUniform A).entourage n).rel
          ((discreteUniform A).entourage n).rel :=
   Path.refl _
@@ -118,7 +118,7 @@ theorem const_uniform_continuous {A : Type u} {B : Type v}
   ⟨fun n => ⟨0, fun _ _ _ => (UB.entourage n).refl_mem b⟩⟩
 
 /-- Path witnessing identity uniform continuity at level n. -/
-def id_ucont_path {A : Type u} (U : UniformPathSpace A) (n : Nat) (a : A) :
+noncomputable def id_ucont_path {A : Type u} (U : UniformPathSpace A) (n : Nat) (a : A) :
     Path ((U.entourage n).rel a a) ((U.entourage n).rel a a) :=
   Path.refl _
 
@@ -168,13 +168,13 @@ structure CauchyFilter {A : Type u} (U : UniformPathSpace A) where
   cauchy : ∀ n, ∃ N, ∀ i j, N ≤ i → N ≤ j → (U.entourage n).rel (seq i) (seq j)
 
 /-- A constant sequence is a Cauchy filter. -/
-def constCauchyFilter {A : Type u} (U : UniformPathSpace A) (a : A) :
+noncomputable def constCauchyFilter {A : Type u} (U : UniformPathSpace A) (a : A) :
     CauchyFilter U where
   seq := fun _ => a
   cauchy := fun n => ⟨0, fun _ _ _ _ => (U.entourage n).refl_mem a⟩
 
 /-- Path witnessing constant Cauchy filter relation. -/
-def const_cauchy_path {A : Type u} (U : UniformPathSpace A) (a : A) (n : Nat) :
+noncomputable def const_cauchy_path {A : Type u} (U : UniformPathSpace A) (a : A) (n : Nat) :
     Path ((U.entourage n).rel a a) ((U.entourage n).rel a a) :=
   Path.refl _
 
@@ -192,17 +192,17 @@ structure UniformCompletion {A : Type u} (U : UniformPathSpace A) where
   rep : CauchyFilter U
 
 /-- Embedding of the original space into its completion. -/
-def embedUniform {A : Type u} (U : UniformPathSpace A) (a : A) :
+noncomputable def embedUniform {A : Type u} (U : UniformPathSpace A) (a : A) :
     UniformCompletion U :=
   ⟨constCauchyFilter U a⟩
 
 /-- Path between completions from the same element. -/
-def embed_uniform_path {A : Type u} (U : UniformPathSpace A) (a : A) :
+noncomputable def embed_uniform_path {A : Type u} (U : UniformPathSpace A) (a : A) :
     Path (embedUniform U a) (embedUniform U a) :=
   Path.refl _
 
 /-- CongrArg on embedding. -/
-def embed_congrArg {A : Type u} (U : UniformPathSpace A) {a b : A}
+noncomputable def embed_congrArg {A : Type u} (U : UniformPathSpace A) {a b : A}
     (p : Path a b) :
     Path (embedUniform U a) (embedUniform U b) :=
   Path.congrArg (embedUniform U) p
@@ -225,7 +225,7 @@ theorem embed_symm {A : Type u} (U : UniformPathSpace A) {a b : A}
 
 /-- Self-composition of an entourage: relates a to c if there exists b
     with the entourage relating a to b and b to c. -/
-def entourageSelfComp {A : Type u} (E : PathEntourage A) :
+noncomputable def entourageSelfComp {A : Type u} (E : PathEntourage A) :
     PathEntourage A where
   rel := fun a c => ∃ b, E.rel a b ∧ E.rel b c
   refl_mem := fun a => ⟨a, E.refl_mem a, E.refl_mem a⟩
@@ -258,7 +258,7 @@ structure UniformEquiv {A : Type u} {B : Type v}
   right_inv : ∀ b, toFun (invFun b) = b
 
 /-- The identity is a uniform equivalence. -/
-def idUniformEquiv {A : Type u} (U : UniformPathSpace A) :
+noncomputable def idUniformEquiv {A : Type u} (U : UniformPathSpace A) :
     UniformEquiv U U where
   toFun := id
   invFun := id
@@ -268,7 +268,7 @@ def idUniformEquiv {A : Type u} (U : UniformPathSpace A) :
   right_inv := fun _ => rfl
 
 /-- Path from a uniform equivalence round-trip. -/
-def uniform_equiv_loop {A : Type u} {B : Type v}
+noncomputable def uniform_equiv_loop {A : Type u} {B : Type v}
     {UA : UniformPathSpace A} {UB : UniformPathSpace B}
     (e : UniformEquiv UA UB) (a : A) :
     Path (e.invFun (e.toFun a)) a :=
@@ -286,7 +286,7 @@ theorem uniform_equiv_transport {A : Type u} {B : Type v}
 
 /-- The entourage index of a pair: the smallest n such that
     (a,b) ∈ entourage(n). We use a decision procedure. -/
-def entourageIndex {A : Type u} (U : UniformPathSpace A) [DecidableEq A]
+noncomputable def entourageIndex {A : Type u} (U : UniformPathSpace A) [DecidableEq A]
     (a b : A) : Nat :=
   if a = b then 0 else 1
 
@@ -297,7 +297,7 @@ def entourageIndex {A : Type u} (U : UniformPathSpace A) [DecidableEq A]
   simp [entourageIndex]
 
 /-- Path from entourage index reflexivity. -/
-def entourageIndex_self_path {A : Type u} (U : UniformPathSpace A)
+noncomputable def entourageIndex_self_path {A : Type u} (U : UniformPathSpace A)
     [DecidableEq A] (a : A) :
     Path (entourageIndex U a a) 0 :=
   Path.mk [Step.mk _ _ (entourageIndex_self U a)] (entourageIndex_self U a)

@@ -12,19 +12,19 @@ noncomputable section
 abbrev TropicalSemiring : Type := Tropical (WithTop ℝ)
 
 /-- Tropical addition (`⊕`) is minimum on the underlying values. -/
-def tAdd : TropicalSemiring → TropicalSemiring → TropicalSemiring := (· + ·)
+noncomputable def tAdd : TropicalSemiring → TropicalSemiring → TropicalSemiring := (· + ·)
 
 /-- Tropical multiplication (`⊗`) is ordinary addition on the underlying values. -/
-def tMul : TropicalSemiring → TropicalSemiring → TropicalSemiring := (· * ·)
+noncomputable def tMul : TropicalSemiring → TropicalSemiring → TropicalSemiring := (· * ·)
 
 /-- Tropical additive identity (`∞`). -/
-def tZero : TropicalSemiring := 0
+noncomputable def tZero : TropicalSemiring := 0
 
 /-- Tropical multiplicative identity (`0`). -/
-def tOne : TropicalSemiring := 1
+noncomputable def tOne : TropicalSemiring := 1
 
 /-- `TropicalSemiring` is a commutative semiring. -/
-def tropicalCommSemiring : CommSemiring TropicalSemiring := inferInstance
+noncomputable def tropicalCommSemiring : CommSemiring TropicalSemiring := inferInstance
 
 @[simp] theorem untrop_tAdd (a b : TropicalSemiring) :
     Tropical.untrop (tAdd a b) = min (Tropical.untrop a) (Tropical.untrop b) := rfl

@@ -29,15 +29,15 @@ structure RootedTree (V : Type u) where
   parent_root : parent root = none
 
 /-- Depth of a vertex given a depth function. -/
-def depthOf {V : Type u} (_T : RootedTree V) (depthFn : V → Nat) (v : V) : Nat :=
+noncomputable def depthOf {V : Type u} (_T : RootedTree V) (depthFn : V → Nat) (v : V) : Nat :=
   depthFn v
 
 /-- A vertex is a leaf if it has no children (given a child check). -/
-def isLeaf {V : Type u} (_T : RootedTree V) (hasChild : V → Bool) (v : V) : Prop :=
+noncomputable def isLeaf {V : Type u} (_T : RootedTree V) (hasChild : V → Bool) (v : V) : Prop :=
   hasChild v = false
 
 /-- Height of a tree given a height value. -/
-def treeHeight {V : Type u} (_T : RootedTree V) (heightVal : Nat) : Nat :=
+noncomputable def treeHeight {V : Type u} (_T : RootedTree V) (heightVal : Nat) : Nat :=
   heightVal
 
 /-! ## Path-based tree structure -/
@@ -50,14 +50,14 @@ structure TreePath {V : Type u} (T : RootedTree V) (s t : V) where
   end_eq : Path (vertices.getLast?) (some t)
 
 /-- Trivial path at a vertex. -/
-def TreePath.trivial {V : Type u} (T : RootedTree V) (v : V) : TreePath T v v :=
+noncomputable def TreePath.trivial {V : Type u} (T : RootedTree V) (v : V) : TreePath T v v :=
   { vertices := [v]
     nonempty := List.cons_ne_nil _ _
     start_eq := Path.refl (some v)
     end_eq := Path.refl (some v) }
 
 /-- Length of a tree path. -/
-def TreePath.length {V : Type u} {T : RootedTree V} {s t : V} (p : TreePath T s t) : Nat :=
+noncomputable def TreePath.length {V : Type u} {T : RootedTree V} {s t : V} (p : TreePath T s t) : Nat :=
   p.vertices.length - 1
 
 /-! ## Unique path property -/
@@ -69,7 +69,7 @@ structure UniquePathProperty {V : Type u} (T : RootedTree V) where
     Path p.vertices.length q.vertices.length
 
 /-- Path from root is the computational path witness of rootedness. -/
-def rootPath {V : Type u} (T : RootedTree V) : Path T.root T.root :=
+noncomputable def rootPath {V : Type u} (T : RootedTree V) : Path T.root T.root :=
   Path.refl T.root
 
 /-- Root path has zero steps. -/
@@ -86,12 +86,12 @@ structure TreeMorphism {V : Type u} {W : Type v}
   maps_root : Path (mapV S.root) T.root
 
 /-- Identity tree morphism. -/
-def TreeMorphism.id {V : Type u} (T : RootedTree V) : TreeMorphism T T :=
+noncomputable def TreeMorphism.id {V : Type u} (T : RootedTree V) : TreeMorphism T T :=
   { mapV := fun v => v
     maps_root := Path.refl T.root }
 
 /-- Composition of tree morphisms. -/
-def TreeMorphism.comp {V : Type u} {W : Type v} {X : Type u}
+noncomputable def TreeMorphism.comp {V : Type u} {W : Type v} {X : Type u}
     {S : RootedTree V} {T : RootedTree W} {U : RootedTree X}
     (f : TreeMorphism S T) (g : TreeMorphism T U) : TreeMorphism S U :=
   { mapV := fun v => g.mapV (f.mapV v)
@@ -105,12 +105,12 @@ structure Subtree {V : Type u} (T : RootedTree V) where
   contains_root : pred T.root
 
 /-- Full subtree contains all vertices. -/
-def fullSubtree {V : Type u} (T : RootedTree V) : Subtree T :=
+noncomputable def fullSubtree {V : Type u} (T : RootedTree V) : Subtree T :=
   { pred := fun _ => True
     contains_root := trivial }
 
 /-- Singleton subtree at root. -/
-def rootSubtree {V : Type u} (T : RootedTree V) :
+noncomputable def rootSubtree {V : Type u} (T : RootedTree V) :
     Subtree T :=
   { pred := fun v => v = T.root
     contains_root := rfl }

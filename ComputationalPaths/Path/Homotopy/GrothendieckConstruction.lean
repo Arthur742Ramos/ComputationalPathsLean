@@ -39,7 +39,7 @@ abbrev FibrationFamily (A : Type u) : Type (u + 1) :=
 /-! ## Fiber transport -/
 
 /-- Transport along base paths in a fibration family. -/
-def transportFiber {A : Type u} (P : FibrationFamily A) {a b : A}
+noncomputable def transportFiber {A : Type u} (P : FibrationFamily A) {a b : A}
     (p : Path a b) (x : P a) : P b :=
   Path.transport p x
 
@@ -69,7 +69,7 @@ abbrev GrothendieckConstruction {A : Type u} (F : FundamentalGroupoidTypeFunctor
   FundamentalGroupoid (GrothendieckTotal F)
 
 /-- Projection functor from the Grothendieck construction to the base groupoid. -/
-def grothendieckProjection {A : Type u} (F : FundamentalGroupoidTypeFunctor A) :
+noncomputable def grothendieckProjection {A : Type u} (F : FundamentalGroupoidTypeFunctor A) :
     FundamentalGroupoidFunctor (GrothendieckTotal F) A :=
   fundamentalGroupoidFunctor (A := GrothendieckTotal F) (B := A)
     (Fibration.Total.proj (P := F.obj))
@@ -113,12 +113,12 @@ namespace EqFunctor
 end EqFunctor
 
 /-- Forgetful map from type-valued functors to fibrations. -/
-def functorToFibration {A : Type u} (F : FundamentalGroupoidTypeFunctor A) :
+noncomputable def functorToFibration {A : Type u} (F : FundamentalGroupoidTypeFunctor A) :
     FibrationFamily A :=
   F.obj
 
 /-- The canonical functor associated to a fibration. -/
-def fibrationToFunctor {A : Type u} (P : FibrationFamily A) :
+noncomputable def fibrationToFunctor {A : Type u} (P : FibrationFamily A) :
     FundamentalGroupoidTypeFunctor A :=
   EqFunctor.ofFunction (A := A) (B := Type u) P
 
@@ -134,7 +134,7 @@ theorem functorToFibration_right_inv {A : Type u} (P : FibrationFamily A) :
     functorToFibration (fibrationToFunctor P) = P := rfl
 
 /-- Type-valued functors on Π₁(A) are equivalent to fibrations over A. -/
-def functorFibrationEquiv (A : Type u) :
+noncomputable def functorFibrationEquiv (A : Type u) :
     SimpleEquiv (FundamentalGroupoidTypeFunctor A) (FibrationFamily A) where
   toFun := functorToFibration
   invFun := fibrationToFunctor

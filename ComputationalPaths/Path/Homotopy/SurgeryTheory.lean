@@ -134,7 +134,7 @@ structure NormalBordism {n : Nat} (f g : NormalMap.{u} n) where
   bundle_compat : True
 
 /-- The set of normal invariants [X, G/O]. -/
-def NormalInvariantSet (n : Nat) (_ : PoincareDualitySpace.{u} n) : Type (u + 1) :=
+noncomputable def NormalInvariantSet (n : Nat) (_ : PoincareDualitySpace.{u} n) : Type (u + 1) :=
   Quot (fun (f g : NormalMap.{u} n) => Nonempty (NormalBordism.{u} f g))
 
 /-- The identity normal map (identity is always a normal map). -/
@@ -267,7 +267,7 @@ structure LGroupPeriodicity (n : Nat) where
 /-! ## Surgery Exact Sequence -/
 
 /-- The structure set S(X): manifold structures on X up to h-cobordism. -/
-def StructureSet (n : Nat) (_ : PoincareDualitySpace.{u} n) : Type (u + 1) :=
+noncomputable def StructureSet (n : Nat) (_ : PoincareDualitySpace.{u} n) : Type (u + 1) :=
   Quot (fun (f g : NormalMap.{u} n) => Nonempty (NormalBordism.{u} f g))
 
 /-- The surgery exact sequence:

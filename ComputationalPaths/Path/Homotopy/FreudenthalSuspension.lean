@@ -33,19 +33,19 @@ universe u
 /-! ## Suspension loops -/
 
 /-- Canonical loop at the north pole of the suspension, built from a basepoint. -/
-def suspBaseLoop {X : Type u} (x0 : X) :
+noncomputable def suspBaseLoop {X : Type u} (x0 : X) :
     LoopSpace (Suspension X) (Suspension.north (X := X)) :=
   Path.trans
     (Suspension.merid (X := X) x0)
     (Path.symm (Suspension.merid (X := X) x0))
 
 /-- Suspension map on loops (placeholder): sends any loop to the base loop. -/
-def suspensionMap {X : Type u} (x0 : X) :
+noncomputable def suspensionMap {X : Type u} (x0 : X) :
     LoopSpace X x0 → LoopSpace (Suspension X) (Suspension.north (X := X)) :=
   fun _ => suspBaseLoop (X := X) x0
 
 /-- The suspension map sends the reflexive loop to the base suspension loop. -/
-def suspensionMap_basepoint {X : Type u} (x0 : X) :
+noncomputable def suspensionMap_basepoint {X : Type u} (x0 : X) :
     Path
       (suspensionMap (X := X) x0 (Path.refl x0))
       (suspBaseLoop (X := X) x0) :=
@@ -64,7 +64,7 @@ structure FreudenthalPreview (X : SuspensionLoop.Pointed) where
     Path (toFun (Path.refl X.pt)) (suspBaseLoop (X := X.carrier) X.pt)
 
 /-- Canonical Path-based Freudenthal preview data. -/
-def freudenthalPreview (X : SuspensionLoop.Pointed) : FreudenthalPreview X :=
+noncomputable def freudenthalPreview (X : SuspensionLoop.Pointed) : FreudenthalPreview X :=
   { toFun := suspensionMap (X := X.carrier) X.pt
     basepoint := suspensionMap_basepoint (X := X.carrier) X.pt }
 

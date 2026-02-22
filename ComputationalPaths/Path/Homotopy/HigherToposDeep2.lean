@@ -44,11 +44,11 @@ structure InftyFunctor (C D : QuasiCategory) where
   map : SSetMap C.sset D.sset
 
 /-- Identity ∞-functor. -/
-def InftyFunctor.id (C : QuasiCategory) : InftyFunctor C C where
+noncomputable def InftyFunctor.id (C : QuasiCategory) : InftyFunctor C C where
   map := ⟨fun n x => x, fun n i x => rfl⟩
 
 /-- Composition of ∞-functors. -/
-def InftyFunctor.comp {C D E : QuasiCategory}
+noncomputable def InftyFunctor.comp {C D E : QuasiCategory}
     (F : InftyFunctor C D) (G : InftyFunctor D E) :
     InftyFunctor C E where
   map := ⟨fun n x => G.map.map n (F.map.map n x),
@@ -80,7 +80,7 @@ theorem giraud_all_axioms (G : GiraudAxioms)
     G.isPresentable ∧ G.universalColimits ∧ G.disjointCoproducts ∧ G.effectiveGroupoids :=
   ⟨h1, h2, h3, h4⟩
 
-def giraud_all_axioms_path (G : GiraudAxioms)
+noncomputable def giraud_all_axioms_path (G : GiraudAxioms)
     (h1 : G.isPresentable) (h2 : G.universalColimits)
     (h3 : G.disjointCoproducts) (h4 : G.effectiveGroupoids) :
     Path (G.isPresentable ∧ G.universalColimits ∧ G.disjointCoproducts ∧ G.effectiveGroupoids)
@@ -117,7 +117,7 @@ theorem effective_epi_local_section (T : GiraudAxioms) (e : EffectiveEpi T)
     (h : e.cechNerveIsColimit) : e.cechNerveIsColimit :=
   h
 
-def effective_epi_local_section_path (T : GiraudAxioms) (e : EffectiveEpi T)
+noncomputable def effective_epi_local_section_path (T : GiraudAxioms) (e : EffectiveEpi T)
     (h : e.cechNerveIsColimit) :
     Path e.cechNerveIsColimit e.cechNerveIsColimit :=
   Path.refl _
@@ -148,7 +148,7 @@ theorem bounded_classifier_exists (T : GiraudAxioms)
     B.classifier.universeObj = B.classifier.universeObj :=
   rfl
 
-def bounded_classifier_path (T : GiraudAxioms)
+noncomputable def bounded_classifier_path (T : GiraudAxioms)
     (B : BoundedObjectClassifier T) :
     Path B.classifier.universeObj B.classifier.universeObj :=
   Path.refl _
@@ -173,7 +173,7 @@ theorem neg1_truncated_subterminal (T : GiraudAxioms) (X : NTruncated T (-1)) :
     X.isTruncated → X.isTruncated :=
   id
 
-def neg1_truncated_path (T : GiraudAxioms) (X : NTruncated T (-1)) :
+noncomputable def neg1_truncated_path (T : GiraudAxioms) (X : NTruncated T (-1)) :
     Path X.obj X.obj :=
   Path.refl _
 
@@ -188,11 +188,11 @@ theorem neg2_truncated_contractible (T : GiraudAxioms) (X : NTruncated T (-2)) :
   id
 
 /-- If X is n-truncated, it is also (n+1)-truncated. -/
-def truncated_monotone (T : GiraudAxioms) (n : Int) (X : NTruncated T n) :
+noncomputable def truncated_monotone (T : GiraudAxioms) (n : Int) (X : NTruncated T n) :
     NTruncated T (n + 1) :=
   ⟨X.obj, X.isTruncated⟩
 
-def truncated_monotone_path (T : GiraudAxioms) (n : Int) (X : NTruncated T n) :
+noncomputable def truncated_monotone_path (T : GiraudAxioms) (n : Int) (X : NTruncated T n) :
     Path (truncated_monotone T n X).obj X.obj :=
   Path.refl _
 
@@ -217,7 +217,7 @@ theorem postnikov_stage_zero (T : GiraudAxioms) (P : PostnikovTower T) :
     (P.stageIsTruncated 0).isTruncated → (P.stageIsTruncated 0).isTruncated :=
   id
 
-def postnikov_stage_zero_path (T : GiraudAxioms) (P : PostnikovTower T) :
+noncomputable def postnikov_stage_zero_path (T : GiraudAxioms) (P : PostnikovTower T) :
     Path (P.stage 0) (P.stage 0) :=
   Path.refl _
 
@@ -226,7 +226,7 @@ theorem postnikov_bonding_is_truncation (T : GiraudAxioms) (P : PostnikovTower T
     P.bondingMap n = P.bondingMap n :=
   rfl
 
-def postnikov_bonding_path (T : GiraudAxioms) (P : PostnikovTower T) (n : Nat) :
+noncomputable def postnikov_bonding_path (T : GiraudAxioms) (P : PostnikovTower T) (n : Nat) :
     Path (P.bondingMap n) (P.bondingMap n) :=
   Path.refl _
 
@@ -249,7 +249,7 @@ theorem truncation_idempotent (T : GiraudAxioms) (n : Int)
     τ.truncFunctor.map.map k x :=
   τ.idempotent k x
 
-def truncation_idempotent_path (T : GiraudAxioms) (n : Int)
+noncomputable def truncation_idempotent_path (T : GiraudAxioms) (n : Int)
     (τ : TruncationModality T n) (k : Nat) (x : T.cat.sset.obj k) :
     Path ((InftyFunctor.comp τ.truncFunctor τ.truncFunctor).map.map k x)
          (τ.truncFunctor.map.map k x) :=
@@ -270,7 +270,7 @@ theorem slice_topos_base_obj (T : GiraudAxioms) (S : SliceTopos T) :
     S.base = S.base :=
   rfl
 
-def slice_topos_base_path (T : GiraudAxioms) (S : SliceTopos T) :
+noncomputable def slice_topos_base_path (T : GiraudAxioms) (S : SliceTopos T) :
     Path S.base S.base :=
   Path.refl _
 
@@ -286,7 +286,7 @@ theorem hypercomplete_is_topos (H : HypercompleteTopos) :
     H.cat = H.cat :=
   rfl
 
-def hypercomplete_is_topos_path (H : HypercompleteTopos) :
+noncomputable def hypercomplete_is_topos_path (H : HypercompleteTopos) :
     Path H.cat H.cat :=
   Path.refl _
 
@@ -312,14 +312,14 @@ theorem geometric_morphism_adjunction_refl (S T : GiraudAxioms)
     f.directStar.map.map k (f.inverseStar.map.map k x) :=
   f.adjunction k x
 
-def geometric_morphism_path (S T : GiraudAxioms)
+noncomputable def geometric_morphism_path (S T : GiraudAxioms)
     (f : GeometricMorphism S T) (k : Nat) (x : T.cat.sset.obj k) :
     Path (f.directStar.map.map k (f.inverseStar.map.map k x))
          (f.directStar.map.map k (f.inverseStar.map.map k x)) :=
   Path.mk [Step.mk _ _ (f.adjunction k x)] (f.adjunction k x)
 
 /-- Composition of geometric morphisms. -/
-def GeometricMorphism.comp {R S T : GiraudAxioms}
+noncomputable def GeometricMorphism.comp {R S T : GiraudAxioms}
     (f : GeometricMorphism R S) (g : GeometricMorphism S T) :
     GeometricMorphism R T where
   inverseStar := InftyFunctor.comp g.inverseStar f.inverseStar
@@ -335,7 +335,7 @@ theorem geometric_morphism_comp_assoc {Q R S T : GiraudAxioms}
       (GeometricMorphism.comp f (GeometricMorphism.comp g h)).inverseStar.map.map k x :=
   fun _ _ => rfl
 
-def geometric_morphism_comp_assoc_path {Q R S T : GiraudAxioms}
+noncomputable def geometric_morphism_comp_assoc_path {Q R S T : GiraudAxioms}
     (f : GeometricMorphism Q R) (g : GeometricMorphism R S)
     (h : GeometricMorphism S T) (k : Nat) (x : T.cat.sset.obj k) :
     Path ((GeometricMorphism.comp (GeometricMorphism.comp f g) h).inverseStar.map.map k x)
@@ -360,7 +360,7 @@ theorem whitehead_in_topos_holds (H : HypercompleteTopos)
     (heq : W.isEquivalence) : W.isEquivalence :=
   heq
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end HigherToposDeep2

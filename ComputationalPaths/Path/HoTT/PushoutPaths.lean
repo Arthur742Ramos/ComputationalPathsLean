@@ -35,15 +35,15 @@ inductive PushoutRel {A B C : Type u} (s : Span A B C) :
   | glue (c : C) : PushoutRel s (Sum.inl (s.left c)) (Sum.inr (s.right c))
 
 /-- The pushout type, quotienting A ⊕ B by the glue relation. -/
-def Pushout {A B C : Type u} (s : Span A B C) : Type u :=
+noncomputable def Pushout {A B C : Type u} (s : Span A B C) : Type u :=
   Quot (PushoutRel s)
 
 /-- Left inclusion into the pushout. -/
-def Pushout.inl {A B C : Type u} {s : Span A B C} (a : A) : Pushout s :=
+noncomputable def Pushout.inl {A B C : Type u} {s : Span A B C} (a : A) : Pushout s :=
   Quot.mk _ (Sum.inl a)
 
 /-- Right inclusion into the pushout. -/
-def Pushout.inr {A B C : Type u} {s : Span A B C} (b : B) : Pushout s :=
+noncomputable def Pushout.inr {A B C : Type u} {s : Span A B C} (b : B) : Pushout s :=
   Quot.mk _ (Sum.inr b)
 
 /-- The glue identification: inl(f c) = inr(g c) in the pushout. -/
@@ -52,12 +52,12 @@ theorem Pushout.glue {A B C : Type u} {s : Span A B C} (c : C) :
   Quot.sound (PushoutRel.glue c)
 
 /-- The glue identification as a computational path. -/
-def Pushout.gluePath {A B C : Type u} {s : Span A B C} (c : C) :
+noncomputable def Pushout.gluePath {A B C : Type u} {s : Span A B C} (c : C) :
     Path (@Pushout.inl A B C s (s.left c)) (@Pushout.inr A B C s (s.right c)) :=
   Path.mk [Step.mk _ _ (Pushout.glue c)] (Pushout.glue c)
 
 /-- Elimination from the pushout into a type family (non-dependent). -/
-def Pushout.lift {A B C : Type u} {s : Span A B C} {D : Type v}
+noncomputable def Pushout.lift {A B C : Type u} {s : Span A B C} {D : Type v}
     (fA : A → D) (fB : B → D)
     (hglue : ∀ c, fA (s.left c) = fB (s.right c)) :
     Pushout s → D :=
@@ -83,11 +83,11 @@ inductive CoequalizerRel {X Y : Type u} (f g : X → Y) : Y → Y → Prop where
   | coeq (x : X) : CoequalizerRel f g (f x) (g x)
 
 /-- The coequalizer type. -/
-def Coequalizer {X Y : Type u} (f g : X → Y) : Type u :=
+noncomputable def Coequalizer {X Y : Type u} (f g : X → Y) : Type u :=
   Quot (CoequalizerRel f g)
 
 /-- Inclusion into the coequalizer. -/
-def Coequalizer.inc {X Y : Type u} {f g : X → Y} (y : Y) : Coequalizer f g :=
+noncomputable def Coequalizer.inc {X Y : Type u} {f g : X → Y} (y : Y) : Coequalizer f g :=
   Quot.mk _ y
 
 /-- The coequalizer identification: inc(f x) = inc(g x). -/
@@ -96,12 +96,12 @@ theorem Coequalizer.coeq {X Y : Type u} {f g : X → Y} (x : X) :
   Quot.sound (CoequalizerRel.coeq x)
 
 /-- The coequalizer identification as a computational path. -/
-def Coequalizer.coeqPath {X Y : Type u} {f g : X → Y} (x : X) :
+noncomputable def Coequalizer.coeqPath {X Y : Type u} {f g : X → Y} (x : X) :
     Path (@Coequalizer.inc X Y f g (f x)) (@Coequalizer.inc X Y f g (g x)) :=
   Path.mk [Step.mk _ _ (Coequalizer.coeq x)] (Coequalizer.coeq x)
 
 /-- Elimination from the coequalizer. -/
-def Coequalizer.lift {X Y : Type u} {f g : X → Y} {D : Type v}
+noncomputable def Coequalizer.lift {X Y : Type u} {f g : X → Y} {D : Type v}
     (h : Y → D) (hcoeq : ∀ x, h (f x) = h (g x)) :
     Coequalizer f g → D :=
   Quot.lift h (fun a b r => by cases r with | coeq x => exact hcoeq x)
@@ -114,26 +114,26 @@ theorem Coequalizer.lift_inc {X Y : Type u} {f g : X → Y} {D : Type v}
 /-! ## Suspension -/
 
 /-- The suspension span: PUnit ← A → PUnit. -/
-def suspSpan (A : Type u) : Span PUnit PUnit A where
+noncomputable def suspSpan (A : Type u) : Span PUnit PUnit A where
   left  := fun _ => PUnit.unit
   right := fun _ => PUnit.unit
 
 /-- The suspension type Σ(A). -/
-def Susp (A : Type u) : Type u := Pushout (suspSpan A)
+noncomputable def Susp (A : Type u) : Type u := Pushout (suspSpan A)
 
 /-- North pole. -/
-def Susp.north {A : Type u} : Susp A := Pushout.inl PUnit.unit
+noncomputable def Susp.north {A : Type u} : Susp A := Pushout.inl PUnit.unit
 
 /-- South pole. -/
-def Susp.south {A : Type u} : Susp A := Pushout.inr PUnit.unit
+noncomputable def Susp.south {A : Type u} : Susp A := Pushout.inr PUnit.unit
 
 /-- Meridian: a path from north to south for each a : A. -/
-def Susp.merid {A : Type u} (a : A) :
+noncomputable def Susp.merid {A : Type u} (a : A) :
     Path (@Susp.north A) (@Susp.south A) :=
   Pushout.gluePath a
 
 /-- A loop at the north pole, formed from two meridians. -/
-def Susp.loop {A : Type u} (a₁ a₂ : A) :
+noncomputable def Susp.loop {A : Type u} (a₁ a₂ : A) :
     Path (@Susp.north A) (@Susp.north A) :=
   Path.trans (Susp.merid a₁) (Path.symm (Susp.merid a₂))
 
@@ -150,13 +150,13 @@ theorem Susp.merid_steps {A : Type u} (a : A) :
 /-! ## Circle as suspension of Bool -/
 
 /-- The circle S¹, defined as the suspension of Bool. -/
-def Circle : Type := Susp Bool
+noncomputable def Circle : Type := Susp Bool
 
 /-- Base point of the circle. -/
-def Circle.base : Circle := Susp.north
+noncomputable def Circle.base : Circle := Susp.north
 
 /-- The loop on the circle from the two Bool-meridians. -/
-def Circle.loop : Path Circle.base Circle.base :=
+noncomputable def Circle.loop : Path Circle.base Circle.base :=
   Susp.loop true false
 
 /-- Circle loop has the right step structure (via trans). -/
@@ -173,15 +173,15 @@ inductive WedgeRel {A B : Type u} (a₀ : A) (b₀ : B) :
   | wedge : WedgeRel a₀ b₀ (Sum.inl a₀) (Sum.inr b₀)
 
 /-- The wedge sum A ∨ B (with chosen basepoints). -/
-def Wedge {A B : Type u} (a₀ : A) (b₀ : B) : Type u :=
+noncomputable def Wedge {A B : Type u} (a₀ : A) (b₀ : B) : Type u :=
   Quot (WedgeRel a₀ b₀)
 
 /-- Left inclusion into the wedge. -/
-def Wedge.inl {A B : Type u} {a₀ : A} {b₀ : B} (a : A) : Wedge a₀ b₀ :=
+noncomputable def Wedge.inl {A B : Type u} {a₀ : A} {b₀ : B} (a : A) : Wedge a₀ b₀ :=
   Quot.mk _ (Sum.inl a)
 
 /-- Right inclusion into the wedge. -/
-def Wedge.inr {A B : Type u} {a₀ : A} {b₀ : B} (b : B) : Wedge a₀ b₀ :=
+noncomputable def Wedge.inr {A B : Type u} {a₀ : A} {b₀ : B} (b : B) : Wedge a₀ b₀ :=
   Quot.mk _ (Sum.inr b)
 
 /-- The wedge identification as propositional equality. -/
@@ -190,7 +190,7 @@ theorem Wedge.glue {A B : Type u} {a₀ : A} {b₀ : B} :
   Quot.sound WedgeRel.wedge
 
 /-- The wedge identification as a computational path. -/
-def Wedge.gluePath {A B : Type u} {a₀ : A} {b₀ : B} :
+noncomputable def Wedge.gluePath {A B : Type u} {a₀ : A} {b₀ : B} :
     Path (@Wedge.inl A B a₀ b₀ a₀) (@Wedge.inr A B a₀ b₀ b₀) :=
   Path.mk [Step.mk _ _ Wedge.glue] Wedge.glue
 
@@ -268,7 +268,7 @@ theorem pushout_empty_span (A B : Type u) :
     | Sum.inr b => exact Or.inr ⟨b, rfl⟩
 
 /-- Functoriality: a map of spans induces a map of pushouts. -/
-def Pushout.map {A₁ B₁ C₁ A₂ B₂ C₂ : Type u}
+noncomputable def Pushout.map {A₁ B₁ C₁ A₂ B₂ C₂ : Type u}
     {s₁ : Span A₁ B₁ C₁} {s₂ : Span A₂ B₂ C₂}
     (fA : A₁ → A₂) (fB : B₁ → B₂) (fC : C₁ → C₂)
     (hleft : ∀ c, fA (s₁.left c) = s₂.left (fC c))

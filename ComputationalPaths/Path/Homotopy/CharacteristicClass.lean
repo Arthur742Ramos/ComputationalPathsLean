@@ -87,12 +87,12 @@ namespace ClassifyingSpaceData
 variable {G : Type u}
 
 /-- The universal bundle is contractible. -/
-def universal_contractible (cs : ClassifyingSpaceData G) :
+noncomputable def universal_contractible (cs : ClassifyingSpaceData G) :
     ∀ x : cs.EG, Path x cs.contractible.center :=
   cs.contractible.contract
 
 /-- `Path`-typed contractibility witness. -/
-def contractible_path (cs : ClassifyingSpaceData G) (x : cs.EG) :
+noncomputable def contractible_path (cs : ClassifyingSpaceData G) (x : cs.EG) :
     Path x cs.contractible.center :=
   cs.contractible.contract x
 
@@ -112,7 +112,7 @@ namespace UniversalBundleData
 variable {G : Type u}
 
 /-- The universal bundle gives a FiberBundleData. -/
-def toFiberBundleData (ub : UniversalBundleData G) :
+noncomputable def toFiberBundleData (ub : UniversalBundleData G) :
     FiberBundleData ub.BG ub.EG ub.Fiber where
   proj := ub.proj
   fiberEquiv := ub.fiberEquiv
@@ -124,7 +124,7 @@ theorem universal_roundtrip (ub : UniversalBundleData G) (b : ub.BG)
   (ub.fiberEquiv b).left_inv x
 
 /-- `Path`-typed universal round-trip. -/
-def universal_roundtrip_path (ub : UniversalBundleData G) (b : ub.BG)
+noncomputable def universal_roundtrip_path (ub : UniversalBundleData G) (b : ub.BG)
     (x : Fibration.Fiber ub.proj b) :
     Path ((ub.fiberEquiv b).invFun ((ub.fiberEquiv b).toFun x)) x :=
   Path.stepChain (universal_roundtrip ub b x)
@@ -152,7 +152,7 @@ structure ClassifyingHomotopy (X : Type u) (BG : Type u) where
   homotopy : ∀ x, Path (f.toFun x) (g.toFun x)
 
 /-- Homotopy is reflexive. -/
-def classifyingHomotopyRefl {X BG : Type u} (f : ClassifyingMap X BG) :
+noncomputable def classifyingHomotopyRefl {X BG : Type u} (f : ClassifyingMap X BG) :
     ClassifyingHomotopy X BG where
   f := f
   g := f
@@ -202,13 +202,13 @@ namespace InvariantPolynomial
 variable {𝔤 R : Type u}
 
 /-- The trivial invariant polynomial (constant). -/
-def const (r : R) : InvariantPolynomial 𝔤 R where
+noncomputable def const (r : R) : InvariantPolynomial 𝔤 R where
   eval := fun _ => r
   degree := 0
   eval_zero := fun _ => rfl
 
 /-- `Path`-typed evaluation at constant. -/
-def const_eval_path (r : R) (x : 𝔤) :
+noncomputable def const_eval_path (r : R) (x : 𝔤) :
     Path ((const r : InvariantPolynomial 𝔤 R).eval x) r :=
   Path.refl r
 
@@ -230,7 +230,7 @@ namespace ChernWeilData
 variable {𝔤 R : Type u}
 
 /-- `Path`-typed cwMap_const. -/
-def cwMap_const_path (cw : ChernWeilData 𝔤 R) (r : R) :
+noncomputable def cwMap_const_path (cw : ChernWeilData 𝔤 R) (r : R) :
     Path (cw.cwMap (InvariantPolynomial.const r)) r :=
   Path.stepChain (cw.cwMap_const r)
 
@@ -257,7 +257,7 @@ namespace GrassmannianClassification
 variable {n : Nat}
 
 /-- The Grassmannian classifies via pullback. -/
-def classifyingMap (gc : GrassmannianClassification n) {X : Type u}
+noncomputable def classifyingMap (gc : GrassmannianClassification n) {X : Type u}
     (_bundle : X → Type u) : X → gc.Gr :=
   fun _ => gc.base  -- trivially, all bundles map to the basepoint in this abstract setting
 
@@ -268,7 +268,7 @@ theorem pullback_fiber (gc : GrassmannianClassification n) {X : Type u}
   rfl
 
 /-- `Path`-typed pullback. -/
-def pullback_fiber_path (gc : GrassmannianClassification n) {X : Type u}
+noncomputable def pullback_fiber_path (gc : GrassmannianClassification n) {X : Type u}
     (bundle : X → Type u) (x : X) :
     Path (gc.universalFiber (gc.classifyingMap bundle x)) (gc.universalFiber gc.base) :=
   Path.refl _

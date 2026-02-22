@@ -73,7 +73,7 @@ structure ShortExact {A B C : Obj} (f : Hom A B) (g : Hom B C) where
 
 /-! ## 1: Kernel lift uniqueness -/
 
-def kernel_lift_unique {X Y : Obj} {f : Hom X Y} (K : KernelData ops f)
+noncomputable def kernel_lift_unique {X Y : Obj} {f : Hom X Y} (K : KernelData ops f)
     {W : Obj} (g : Hom W X) (hg : Path (ops.comp g f) (ops.zero W Y))
     (l : Hom W K.obj) (hl : Path (ops.comp l K.ι) g) :
     Path (ops.comp l K.ι) (ops.comp (K.lift g hg) K.ι) :=
@@ -81,7 +81,7 @@ def kernel_lift_unique {X Y : Obj} {f : Hom X Y} (K : KernelData ops f)
 
 /-! ## 2: Cokernel desc uniqueness -/
 
-def cokernel_desc_unique {X Y : Obj} {f : Hom X Y} (C : CokernelData ops f)
+noncomputable def cokernel_desc_unique {X Y : Obj} {f : Hom X Y} (C : CokernelData ops f)
     {W : Obj} (g : Hom Y W) (hg : Path (ops.comp f g) (ops.zero X W))
     (d : Hom C.obj W) (hd : Path (ops.comp C.π d) g) :
     Path (ops.comp C.π d) (ops.comp C.π (C.desc g hg)) :=
@@ -89,38 +89,38 @@ def cokernel_desc_unique {X Y : Obj} {f : Hom X Y} (C : CokernelData ops f)
 
 /-! ## 3: Exact implies composition is zero -/
 
-def exact_comp_zero {X Y Z : Obj} {f : Hom X Y} {g : Hom Y Z}
+noncomputable def exact_comp_zero {X Y Z : Obj} {f : Hom X Y} {g : Hom Y Z}
     (e : ExactAt ops f g) : Path (ops.comp f g) (ops.zero X Z) :=
   e.comp_zero
 
 /-! ## 4: Short exact → exact -/
 
-def short_exact_is_exact {A B C : Obj} {f : Hom A B} {g : Hom B C}
+noncomputable def short_exact_is_exact {A B C : Obj} {f : Hom A B} {g : Hom B C}
     (se : ShortExact ops f g) : ExactAt ops f g :=
   se.exact
 
 /-! ## 5: Exact zero symmetry -/
 
-def exact_zero_symm {X Y Z : Obj} {f : Hom X Y} {g : Hom Y Z}
+noncomputable def exact_zero_symm {X Y Z : Obj} {f : Hom X Y} {g : Hom Y Z}
     (e : ExactAt ops f g) : Path (ops.zero X Z) (ops.comp f g) :=
   Path.symm e.comp_zero
 
 /-! ## 6: Image-coimage factor -/
 
-def image_coimage_factor {X Y : Obj} {f : Hom X Y}
+noncomputable def image_coimage_factor {X Y : Obj} {f : Hom X Y}
     (im : ImageData ops f) (coim : CoimageData ops f) :
     Path (ops.comp im.factorThru im.ι) (ops.comp coim.π coim.factorThru) :=
   Path.trans im.factor_eq (Path.symm coim.factor_eq)
 
 /-! ## 7: Exact reflexivity -/
 
-def exact_path_refl {X Y Z : Obj} {f : Hom X Y} {g : Hom Y Z}
+noncomputable def exact_path_refl {X Y Z : Obj} {f : Hom X Y} {g : Hom Y Z}
     (_e : ExactAt ops f g) : Path (ops.comp f g) (ops.comp f g) :=
   Path.refl _
 
 /-! ## 8: Mono from short exact -/
 
-def mono_from_short_exact {A B C : Obj} {f : Hom A B} {g : Hom B C}
+noncomputable def mono_from_short_exact {A B C : Obj} {f : Hom A B} {g : Hom B C}
     (se : ShortExact ops f g)
     {W : Obj} (h₁ h₂ : Hom W A)
     (eq : Path (ops.comp h₁ f) (ops.comp h₂ f)) : Path h₁ h₂ :=
@@ -128,7 +128,7 @@ def mono_from_short_exact {A B C : Obj} {f : Hom A B} {g : Hom B C}
 
 /-! ## 9: Epi from short exact -/
 
-def epi_from_short_exact {A B C : Obj} {f : Hom A B} {g : Hom B C}
+noncomputable def epi_from_short_exact {A B C : Obj} {f : Hom A B} {g : Hom B C}
     (se : ShortExact ops f g)
     {W : Obj} (h₁ h₂ : Hom C W)
     (eq : Path (ops.comp g h₁) (ops.comp g h₂)) : Path h₁ h₂ :=
@@ -136,14 +136,14 @@ def epi_from_short_exact {A B C : Obj} {f : Hom A B} {g : Hom B C}
 
 /-! ## 10: Diagram chase – congruence left -/
 
-def diagram_chase_left {A B C : Obj} (f₁ f₂ : Hom A B) (g : Hom B C)
+noncomputable def diagram_chase_left {A B C : Obj} (f₁ f₂ : Hom A B) (g : Hom B C)
     (h : Path f₁ f₂) :
     Path (ops.comp f₁ g) (ops.comp f₂ g) :=
   Path.congrArg (fun x => ops.comp x g) h
 
 /-! ## 11: Diagram chase – congruence right -/
 
-def diagram_chase_right {A B C : Obj} (f : Hom A B) (g₁ g₂ : Hom B C)
+noncomputable def diagram_chase_right {A B C : Obj} (f : Hom A B) (g₁ g₂ : Hom B C)
     (h : Path g₁ g₂) :
     Path (ops.comp f g₁) (ops.comp f g₂) :=
   Path.congrArg (fun x => ops.comp f x) h
@@ -171,23 +171,23 @@ structure SnakeLemmaData where
 
 /-! ## 12: Snake square 1 -/
 
-def snake_sq1 (d : SnakeLemmaData ops) :
+noncomputable def snake_sq1 (d : SnakeLemmaData ops) :
     Path (ops.comp d.f d.β) (ops.comp d.α d.f') := d.sq1
 
 /-! ## 13: Snake square 2 -/
 
-def snake_sq2 (d : SnakeLemmaData ops) :
+noncomputable def snake_sq2 (d : SnakeLemmaData ops) :
     Path (ops.comp d.g d.γ) (ops.comp d.β d.g') := d.sq2
 
 /-! ## 14: Snake top exact -/
 
-def snake_top_exact (d : SnakeLemmaData ops) :
+noncomputable def snake_top_exact (d : SnakeLemmaData ops) :
     Path (ops.comp d.f d.g) (ops.zero d.A d.C) :=
   d.exact_top.comp_zero
 
 /-! ## 15: Snake bot exact -/
 
-def snake_bot_exact (d : SnakeLemmaData ops) :
+noncomputable def snake_bot_exact (d : SnakeLemmaData ops) :
     Path (ops.comp d.f' d.g') (ops.zero d.A' d.C') :=
   d.exact_bot.comp_zero
 
@@ -224,22 +224,22 @@ structure FiveLemmaData where
 
 /-! ## 16: Five lemma square 1 -/
 
-def five_lemma_sq1 (d : FiveLemmaData ops) :
+noncomputable def five_lemma_sq1 (d : FiveLemmaData ops) :
     Path (ops.comp d.f₁ d.α₂) (ops.comp d.α₁ d.g₁) := d.sq1
 
 /-! ## 17: Five lemma square 2 -/
 
-def five_lemma_sq2 (d : FiveLemmaData ops) :
+noncomputable def five_lemma_sq2 (d : FiveLemmaData ops) :
     Path (ops.comp d.f₂ d.α₃) (ops.comp d.α₂ d.g₂) := d.sq2
 
 /-! ## 18: Five lemma square 3 -/
 
-def five_lemma_sq3 (d : FiveLemmaData ops) :
+noncomputable def five_lemma_sq3 (d : FiveLemmaData ops) :
     Path (ops.comp d.f₃ d.α₄) (ops.comp d.α₃ d.g₃) := d.sq3
 
 /-! ## 19: Five lemma square 4 -/
 
-def five_lemma_sq4 (d : FiveLemmaData ops) :
+noncomputable def five_lemma_sq4 (d : FiveLemmaData ops) :
     Path (ops.comp d.f₄ d.α₅) (ops.comp d.α₄ d.g₄) := d.sq4
 
 /-! ## Nine lemma data -/
@@ -275,13 +275,13 @@ structure NineLemmaData where
 
 /-! ## 20: Nine lemma row exact -/
 
-def nine_lemma_row1 (d : NineLemmaData ops) :
+noncomputable def nine_lemma_row1 (d : NineLemmaData ops) :
     Path (ops.comp d.f₁ d.f₂) (ops.zero d.A₁ d.A₃) :=
   d.exact_row1.comp_zero
 
 /-! ## 21: Nine lemma col exact -/
 
-def nine_lemma_col1 (d : NineLemmaData ops) :
+noncomputable def nine_lemma_col1 (d : NineLemmaData ops) :
     Path (ops.comp d.α₁ d.β₁) (ops.zero d.A₁ d.C₁) :=
   d.exact_col1.comp_zero
 
@@ -302,7 +302,7 @@ structure HorseshoeLemmaData where
 
 /-! ## 22: Horseshoe exact -/
 
-def horseshoe_exact (d : HorseshoeLemmaData ops) :
+noncomputable def horseshoe_exact (d : HorseshoeLemmaData ops) :
     Path (ops.comp d.f d.g) (ops.zero d.A d.C) :=
   d.exact.exact.comp_zero
 
@@ -316,7 +316,7 @@ structure LongExactSeqData (n : Nat) where
 
 /-! ## 23: Long exact consecutive zero -/
 
-def long_exact_consec_zero {n : Nat} (d : LongExactSeqData ops n)
+noncomputable def long_exact_consec_zero {n : Nat} (d : LongExactSeqData ops n)
     (i : Fin (n - 1)) :
     Path (ops.comp (d.mor ⟨i.val, by omega⟩) (d.mor ⟨i.val + 1, by omega⟩))
          (ops.zero (d.obj ⟨i.val, by omega⟩) (d.obj ⟨i.val + 2, by omega⟩)) :=
@@ -324,13 +324,13 @@ def long_exact_consec_zero {n : Nat} (d : LongExactSeqData ops n)
 
 /-! ## 24: Kernel comp eq -/
 
-def kernel_comp_eq {X Y : Obj} {f : Hom X Y} (K : KernelData ops f) :
+noncomputable def kernel_comp_eq {X Y : Obj} {f : Hom X Y} (K : KernelData ops f) :
     Path (ops.comp K.ι f) (ops.zero K.obj Y) :=
   K.comp_eq
 
 /-! ## 25: Cokernel comp eq -/
 
-def cokernel_comp_eq {X Y : Obj} {f : Hom X Y} (C : CokernelData ops f) :
+noncomputable def cokernel_comp_eq {X Y : Obj} {f : Hom X Y} (C : CokernelData ops f) :
     Path (ops.comp f C.π) (ops.zero X C.obj) :=
   C.comp_eq
 
@@ -342,14 +342,14 @@ structure KerCokerPair {X Y : Obj} (f : Hom X Y) where
 
 /-! ## 26: Kernel-cokernel composition -/
 
-def ker_coker_factor {X Y : Obj} {f : Hom X Y}
+noncomputable def ker_coker_factor {X Y : Obj} {f : Hom X Y}
     (kc : KerCokerPair ops f) :
     Path (ops.comp kc.ker.ι f) (ops.zero kc.ker.obj Y) :=
   kc.ker.comp_eq
 
 /-! ## 27: Kernel lift then compose -/
 
-def kernel_lift_compose {X Y : Obj} {f : Hom X Y}
+noncomputable def kernel_lift_compose {X Y : Obj} {f : Hom X Y}
     (K : KernelData ops f) {W : Obj}
     (g : Hom W X) (hg : Path (ops.comp g f) (ops.zero W Y)) :
     Path (ops.comp (K.lift g hg) K.ι) g :=
@@ -357,7 +357,7 @@ def kernel_lift_compose {X Y : Obj} {f : Hom X Y}
 
 /-! ## 28: Cokernel desc then compose -/
 
-def cokernel_desc_compose {X Y : Obj} {f : Hom X Y}
+noncomputable def cokernel_desc_compose {X Y : Obj} {f : Hom X Y}
     (C : CokernelData ops f) {W : Obj}
     (g : Hom Y W) (hg : Path (ops.comp f g) (ops.zero X W)) :
     Path (ops.comp C.π (C.desc g hg)) g :=
@@ -365,7 +365,7 @@ def cokernel_desc_compose {X Y : Obj} {f : Hom X Y}
 
 /-! ## 29: Short exact zero trans -/
 
-def short_exact_zero_path {A B C : Obj}
+noncomputable def short_exact_zero_path {A B C : Obj}
     {f : Hom A B} {g : Hom B C} (se : ShortExact ops f g) :
     Path (ops.zero A C) (ops.comp f g) :=
   Path.symm se.exact.comp_zero

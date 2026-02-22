@@ -32,7 +32,7 @@ structure InverseSystem where
   transition_mul : ∀ n (x y : obj (n + 1)),
     Path (transition n (mul (n + 1) x y)) (mul n (transition n x) (transition n y))
 
-def InverseSystem.trivial : InverseSystem where
+noncomputable def InverseSystem.trivial : InverseSystem where
   obj := fun _ => PUnit
   transition := fun _ x => x
   one := fun _ => PUnit.unit
@@ -45,61 +45,61 @@ def InverseSystem.trivial : InverseSystem where
   transition_one := fun _ => Path.refl _
   transition_mul := fun _ _ _ => Path.refl _
 
-def InverseSystem.one_mul_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
+noncomputable def InverseSystem.one_mul_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
     Path (S.mul n (S.one n) x) x :=
   Path.stepChain (S.one_mul n x)
 
-def InverseSystem.mul_one_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
+noncomputable def InverseSystem.mul_one_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
     Path (S.mul n x (S.one n)) x :=
   Path.stepChain (S.mul_one n x)
 
-def InverseSystem.mul_assoc_path
+noncomputable def InverseSystem.mul_assoc_path
     (S : InverseSystem) (n : Nat) (x y z : S.obj n) :
     Path (S.mul n (S.mul n x y) z) (S.mul n x (S.mul n y z)) :=
   Path.stepChain (S.mul_assoc n x y z)
 
-def InverseSystem.mul_left_inv_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
+noncomputable def InverseSystem.mul_left_inv_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
     Path (S.mul n (S.inv n x) x) (S.one n) :=
   Path.stepChain (S.mul_left_inv n x)
 
-def inverse_one_mul_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
+noncomputable def inverse_one_mul_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
     Path (S.mul n (S.one n) x) x :=
   S.one_mul_path n x
 
-def inverse_mul_one_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
+noncomputable def inverse_mul_one_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
     Path (S.mul n x (S.one n)) x :=
   S.mul_one_path n x
 
-def inverse_mul_assoc_path (S : InverseSystem) (n : Nat) (x y z : S.obj n) :
+noncomputable def inverse_mul_assoc_path (S : InverseSystem) (n : Nat) (x y z : S.obj n) :
     Path (S.mul n (S.mul n x y) z) (S.mul n x (S.mul n y z)) :=
   S.mul_assoc_path n x y z
 
-def inverse_left_inv_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
+noncomputable def inverse_left_inv_path (S : InverseSystem) (n : Nat) (x : S.obj n) :
     Path (S.mul n (S.inv n x) x) (S.one n) :=
   S.mul_left_inv_path n x
 
-def inverse_transition_one_self (S : InverseSystem) (n : Nat) :
+noncomputable def inverse_transition_one_self (S : InverseSystem) (n : Nat) :
     Path (S.transition n (S.one (n + 1))) (S.one n) :=
   S.transition_one n
 
-def inverse_transition_mul_self (S : InverseSystem) (n : Nat) (x y : S.obj (n + 1)) :
+noncomputable def inverse_transition_mul_self (S : InverseSystem) (n : Nat) (x y : S.obj (n + 1)) :
     Path (S.transition n (S.mul (n + 1) x y)) (S.mul n (S.transition n x) (S.transition n y)) :=
   S.transition_mul n x y
 
-def inverse_transition_one_sym (S : InverseSystem) (n : Nat) :
+noncomputable def inverse_transition_one_sym (S : InverseSystem) (n : Nat) :
     Path (S.one n) (S.transition n (S.one (n + 1))) :=
   Path.symm (S.transition_one n)
 
-def inverse_transition_one_trans (S : InverseSystem) (n : Nat) :
+noncomputable def inverse_transition_one_trans (S : InverseSystem) (n : Nat) :
     Path (S.transition n (S.one (n + 1))) (S.one n) :=
   Path.trans (S.transition_one n) (Path.refl _)
 
-def trivial_inverse_transition_one (n : Nat) :
+noncomputable def trivial_inverse_transition_one (n : Nat) :
     Path ((InverseSystem.trivial).transition n ((InverseSystem.trivial).one (n + 1)))
       ((InverseSystem.trivial).one n) :=
   (InverseSystem.trivial).transition_one n
 
-def trivial_inverse_transition_mul (n : Nat)
+noncomputable def trivial_inverse_transition_mul (n : Nat)
     (x y : (InverseSystem.trivial).obj (n + 1)) :
     Path
       ((InverseSystem.trivial).transition n ((InverseSystem.trivial).mul (n + 1) x y))
@@ -123,7 +123,7 @@ structure ProfiniteGroup extends InverseSystem where
     Path (proj n (lim_mul x y)) (toInverseSystem.mul n (proj n x) (proj n y))
   proj_one : ∀ n, Path (proj n lim_one) (toInverseSystem.one n)
 
-def ProfiniteGroup.trivial : ProfiniteGroup where
+noncomputable def ProfiniteGroup.trivial : ProfiniteGroup where
   obj := fun _ => PUnit
   transition := fun _ x => x
   one := fun _ => PUnit.unit
@@ -147,27 +147,27 @@ def ProfiniteGroup.trivial : ProfiniteGroup where
   proj_mul := fun _ _ _ => Path.refl _
   proj_one := fun _ => Path.refl _
 
-def profinite_proj_compat_refl (G : ProfiniteGroup) (n : Nat) (x : G.limit) :
+noncomputable def profinite_proj_compat_refl (G : ProfiniteGroup) (n : Nat) (x : G.limit) :
     Path (G.proj n x) (G.proj n x) :=
   Path.refl _
 
-def profinite_lim_one_mul_sym (G : ProfiniteGroup) (x : G.limit) :
+noncomputable def profinite_lim_one_mul_sym (G : ProfiniteGroup) (x : G.limit) :
     Path x (G.lim_mul G.lim_one x) :=
   Path.symm (G.lim_one_mul x)
 
-def profinite_lim_mul_one_sym (G : ProfiniteGroup) (x : G.limit) :
+noncomputable def profinite_lim_mul_one_sym (G : ProfiniteGroup) (x : G.limit) :
     Path x (G.lim_mul x G.lim_one) :=
   Path.symm (G.lim_mul_one x)
 
-def profinite_lim_left_inv_sym (G : ProfiniteGroup) (x : G.limit) :
+noncomputable def profinite_lim_left_inv_sym (G : ProfiniteGroup) (x : G.limit) :
     Path G.lim_one (G.lim_mul (G.lim_inv x) x) :=
   Path.symm (G.lim_mul_left_inv x)
 
-def profinite_proj_one_self (G : ProfiniteGroup) (n : Nat) :
+noncomputable def profinite_proj_one_self (G : ProfiniteGroup) (n : Nat) :
     Path (G.proj n G.lim_one) (G.one n) :=
   G.proj_one n
 
-def profinite_proj_mul_self (G : ProfiniteGroup) (n : Nat) (x y : G.limit) :
+noncomputable def profinite_proj_mul_self (G : ProfiniteGroup) (n : Nat) (x y : G.limit) :
     Path (G.proj n (G.lim_mul x y)) (G.mul n (G.proj n x) (G.proj n y)) :=
   G.proj_mul n x y
 
@@ -179,13 +179,13 @@ structure KrullTopology (G : ProfiniteGroup) where
   top_open : isOpenCode 0 = true
   basic_open : ∀ n x, basicCode n x = true → isOpenCode n = true
 
-def KrullTopology.trivial (G : ProfiniteGroup) : KrullTopology G where
+noncomputable def KrullTopology.trivial (G : ProfiniteGroup) : KrullTopology G where
   isOpenCode := fun _ => true
   basicCode := fun _ _ => true
   top_open := rfl
   basic_open := fun _ _ _ => rfl
 
-def krull_top_open_zero (T : KrullTopology G) :
+noncomputable def krull_top_open_zero (T : KrullTopology G) :
     Path (T.isOpenCode 0) true :=
   Path.stepChain T.top_open
   where
@@ -193,20 +193,20 @@ def krull_top_open_zero (T : KrullTopology G) :
       cases T
       exact ProfiniteGroup.trivial
 
-def krull_basic_is_open (G : ProfiniteGroup) (T : KrullTopology G)
+noncomputable def krull_basic_is_open (G : ProfiniteGroup) (T : KrullTopology G)
     (n : Nat) (x : G.limit) (h : T.basicCode n x = true) :
     Path (T.isOpenCode n) true :=
   Path.stepChain (T.basic_open n x h)
 
-def krull_open_transport (G : ProfiniteGroup) (T : KrullTopology G) (n : Nat) :
+noncomputable def krull_open_transport (G : ProfiniteGroup) (T : KrullTopology G) (n : Nat) :
     Path (T.isOpenCode n) (T.isOpenCode n) :=
   Path.refl _
 
-def krull_open_sym (G : ProfiniteGroup) (T : KrullTopology G) (n : Nat) :
+noncomputable def krull_open_sym (G : ProfiniteGroup) (T : KrullTopology G) (n : Nat) :
     Path (T.isOpenCode n) (T.isOpenCode n) :=
   Path.symm (Path.refl _)
 
-def krull_open_trans (G : ProfiniteGroup) (T : KrullTopology G) (n : Nat) :
+noncomputable def krull_open_trans (G : ProfiniteGroup) (T : KrullTopology G) (n : Nat) :
     Path (T.isOpenCode n) (T.isOpenCode n) :=
   Path.trans (Path.refl _) (Path.refl _)
 
@@ -217,30 +217,30 @@ structure ClosedSubgroup (G : ProfiniteGroup) where
   inv_mem : ∀ x, carrier x → carrier (G.lim_inv x)
   closedCode : Bool
 
-def ClosedSubgroup.full (G : ProfiniteGroup) : ClosedSubgroup G where
+noncomputable def ClosedSubgroup.full (G : ProfiniteGroup) : ClosedSubgroup G where
   carrier := fun _ => True
   one_mem := trivial
   mul_mem := fun _ _ _ _ => trivial
   inv_mem := fun _ _ => trivial
   closedCode := true
 
-def closed_subgroup_one_fixed (G : ProfiniteGroup) (H : ClosedSubgroup G) :
+noncomputable def closed_subgroup_one_fixed (G : ProfiniteGroup) (H : ClosedSubgroup G) :
     H.carrier G.lim_one :=
   H.one_mem
 
-def closed_subgroup_mul_closed
+noncomputable def closed_subgroup_mul_closed
     (G : ProfiniteGroup) (H : ClosedSubgroup G)
     (x y : G.limit) (hx : H.carrier x) (hy : H.carrier y) :
     H.carrier (G.lim_mul x y) :=
   H.mul_mem x y hx hy
 
-def closed_subgroup_inv_closed
+noncomputable def closed_subgroup_inv_closed
     (G : ProfiniteGroup) (H : ClosedSubgroup G)
     (x : G.limit) (hx : H.carrier x) :
     H.carrier (G.lim_inv x) :=
   H.inv_mem x hx
 
-def closed_subgroup_is_closed_true
+noncomputable def closed_subgroup_is_closed_true
     (G : ProfiniteGroup) (H : ClosedSubgroup G) (h : H.closedCode = true) :
     Path H.closedCode true :=
   Path.stepChain h
@@ -253,21 +253,21 @@ structure IntermediateField (F : Type u) where
   closedAdd : Bool
   closedMul : Bool
 
-def IntermediateField.full (F : Type u) : IntermediateField F where
+noncomputable def IntermediateField.full (F : Type u) : IntermediateField F where
   carrier := fun _ => True
   containsBase := true
   closedAdd := true
   closedMul := true
 
-def intermediate_contains_base_true (F : Type u) (K : IntermediateField F)
+noncomputable def intermediate_contains_base_true (F : Type u) (K : IntermediateField F)
     (h : K.containsBase = true) : Path K.containsBase true :=
   Path.stepChain h
 
-def intermediate_closed_add_true (F : Type u) (K : IntermediateField F)
+noncomputable def intermediate_closed_add_true (F : Type u) (K : IntermediateField F)
     (h : K.closedAdd = true) : Path K.closedAdd true :=
   Path.stepChain h
 
-def intermediate_closed_mul_true (F : Type u) (K : IntermediateField F)
+noncomputable def intermediate_closed_mul_true (F : Type u) (K : IntermediateField F)
     (h : K.closedMul = true) : Path K.closedMul true :=
   Path.stepChain h
 
@@ -279,7 +279,7 @@ structure InfiniteGaloisCorrespondence (G : ProfiniteGroup) (F : Type u) where
   SymRoundTripCode : ClosedSubgroup G → Bool
   GamRoundTripCode : IntermediateField F → Bool
 
-def InfiniteGaloisCorrespondence.trivial
+noncomputable def InfiniteGaloisCorrespondence.trivial
     (G : ProfiniteGroup) (F : Type u) :
     InfiniteGaloisCorrespondence G F where
   fixedField := fun _ => IntermediateField.full F
@@ -289,43 +289,43 @@ def InfiniteGaloisCorrespondence.trivial
   SymRoundTripCode := fun _ => true
   GamRoundTripCode := fun _ => true
 
-def correspondence_fixed_contains_base
+noncomputable def correspondence_fixed_contains_base
     (G : ProfiniteGroup) (F : Type u)
     (C : InfiniteGaloisCorrespondence G F) (H : ClosedSubgroup G) :
     Path (C.fixedField H).containsBase true :=
   C.fixed_contains_base H
 
-def correspondence_sym_closed
+noncomputable def correspondence_sym_closed
     (G : ProfiniteGroup) (F : Type u)
     (C : InfiniteGaloisCorrespondence G F) (K : IntermediateField F) :
     Path (C.gamSubgroup K).closedCode true :=
   C.subgroup_closed K
 
-def correspondence_roundtrip_subgroup_code
+noncomputable def correspondence_roundtrip_subgroup_code
     (G : ProfiniteGroup) (F : Type u)
     (C : InfiniteGaloisCorrespondence G F) (H : ClosedSubgroup G) :
     Path (C.SymRoundTripCode H) (C.SymRoundTripCode H) :=
   Path.refl _
 
-def correspondence_roundtrip_field_code
+noncomputable def correspondence_roundtrip_field_code
     (G : ProfiniteGroup) (F : Type u)
     (C : InfiniteGaloisCorrespondence G F) (K : IntermediateField F) :
     Path (C.GamRoundTripCode K) (C.GamRoundTripCode K) :=
   Path.refl _
 
-def correspondence_sym_trans
+noncomputable def correspondence_sym_trans
     (G : ProfiniteGroup) (F : Type u)
     (C : InfiniteGaloisCorrespondence G F) (H : ClosedSubgroup G) :
     Path (C.SymRoundTripCode H) (C.SymRoundTripCode H) :=
   Path.trans (Path.refl _) (Path.refl _)
 
-def correspondence_gam_trans
+noncomputable def correspondence_gam_trans
     (G : ProfiniteGroup) (F : Type u)
     (C : InfiniteGaloisCorrespondence G F) (K : IntermediateField F) :
     Path (C.GamRoundTripCode K) (C.GamRoundTripCode K) :=
   Path.trans (Path.refl _) (Path.refl _)
 
-def correspondence_galois_path
+noncomputable def correspondence_galois_path
     (G : ProfiniteGroup) (F : Type u)
     (C : InfiniteGaloisCorrespondence G F) (H : ClosedSubgroup G) :
     Path (C.fixedField H).containsBase (C.fixedField H).containsBase :=
@@ -339,33 +339,33 @@ structure ProfiniteCompletion (A : Type u) where
   denseCode : Nat → A → Bool
   embed_compat : ∀ n a, Path (completion.proj n (embed a)) (completion.proj n (embed a))
 
-def ProfiniteCompletion.trivial (A : Type u) : ProfiniteCompletion A where
+noncomputable def ProfiniteCompletion.trivial (A : Type u) : ProfiniteCompletion A where
   completion := ProfiniteGroup.trivial
   embed := fun _ => PUnit.unit
   denseCode := fun _ _ => true
   embed_compat := fun _ _ => Path.refl _
 
-def completion_embed_proj_refl
+noncomputable def completion_embed_proj_refl
     (A : Type u) (C : ProfiniteCompletion A) (n : Nat) (a : A) :
     Path (C.completion.proj n (C.embed a)) (C.completion.proj n (C.embed a)) :=
   C.embed_compat n a
 
-def completion_dense_code_refl
+noncomputable def completion_dense_code_refl
     (A : Type u) (C : ProfiniteCompletion A) (n : Nat) (a : A) :
     Path (C.denseCode n a) (C.denseCode n a) :=
   Path.refl _
 
-def completion_compatible_path
+noncomputable def completion_compatible_path
     (A : Type u) (C : ProfiniteCompletion A) (n : Nat) (a : A) :
     Path (C.completion.proj n (C.embed a)) (C.completion.proj n (C.embed a)) :=
   Path.trans (C.embed_compat n a) (Path.refl _)
 
-def completion_sym_path
+noncomputable def completion_sym_path
     (A : Type u) (C : ProfiniteCompletion A) (n : Nat) (a : A) :
     Path (C.completion.proj n (C.embed a)) (C.completion.proj n (C.embed a)) :=
   Path.symm (C.embed_compat n a)
 
-def completion_trans_path
+noncomputable def completion_trans_path
     (A : Type u) (C : ProfiniteCompletion A) (n : Nat) (a : A) :
     Path (C.completion.proj n (C.embed a)) (C.completion.proj n (C.embed a)) :=
   Path.trans (Path.refl _) (C.embed_compat n a)
@@ -375,69 +375,69 @@ structure Supernatural where
 
 namespace Supernatural
 
-def one : Supernatural where
+noncomputable def one : Supernatural where
   exp := fun _ => 0
 
-def mul (a b : Supernatural) : Supernatural where
+noncomputable def mul (a b : Supernatural) : Supernatural where
   exp := fun p => a.exp p + b.exp p
 
-def pow (a : Supernatural) : Nat → Supernatural
+noncomputable def pow (a : Supernatural) : Nat → Supernatural
   | 0 => one
   | Nat.succ n => mul a (pow a n)
 
-def le (a b : Supernatural) : Prop :=
+noncomputable def le (a b : Supernatural) : Prop :=
   ∀ p, a.exp p ≤ b.exp p
 
 end Supernatural
 
-def supernatural_one_exp_zero (p : Nat) :
+noncomputable def supernatural_one_exp_zero (p : Nat) :
     (Supernatural.one).exp p = 0 :=
   rfl
 
-def supernatural_mul_exp (a b : Supernatural) (p : Nat) :
+noncomputable def supernatural_mul_exp (a b : Supernatural) (p : Nat) :
     (Supernatural.mul a b).exp p = a.exp p + b.exp p :=
   rfl
 
-def supernatural_mul_one_exp (a : Supernatural) (p : Nat) :
+noncomputable def supernatural_mul_one_exp (a : Supernatural) (p : Nat) :
     (Supernatural.mul a Supernatural.one).exp p = a.exp p + 0 :=
   rfl
 
-def supernatural_one_mul_exp (a : Supernatural) (p : Nat) :
+noncomputable def supernatural_one_mul_exp (a : Supernatural) (p : Nat) :
     (Supernatural.mul Supernatural.one a).exp p = 0 + a.exp p :=
   rfl
 
-def supernatural_mul_assoc_exp (a b c : Supernatural) (p : Nat) :
+noncomputable def supernatural_mul_assoc_exp (a b c : Supernatural) (p : Nat) :
     (Supernatural.mul (Supernatural.mul a b) c).exp p = (a.exp p + b.exp p) + c.exp p :=
   rfl
 
-def supernatural_pow_zero_exp (a : Supernatural) (p : Nat) :
+noncomputable def supernatural_pow_zero_exp (a : Supernatural) (p : Nat) :
     (Supernatural.pow a 0).exp p = 0 :=
   rfl
 
-def supernatural_pow_succ_exp (a : Supernatural) (n p : Nat) :
+noncomputable def supernatural_pow_succ_exp (a : Supernatural) (n p : Nat) :
     (Supernatural.pow a (Nat.succ n)).exp p = a.exp p + (Supernatural.pow a n).exp p :=
   rfl
 
-def supernatural_le_refl (a : Supernatural) :
+noncomputable def supernatural_le_refl (a : Supernatural) :
     Supernatural.le a a := by
   intro p
   exact Nat.le_refl (a.exp p)
 
-def supernatural_le_trans (a b c : Supernatural)
+noncomputable def supernatural_le_trans (a b c : Supernatural)
     (hab : Supernatural.le a b) (hbc : Supernatural.le b c) :
     Supernatural.le a c := by
   intro p
   exact Nat.le_trans (hab p) (hbc p)
 
-def supernatural_path_refl (a : Supernatural) (p : Nat) :
+noncomputable def supernatural_path_refl (a : Supernatural) (p : Nat) :
     Path (a.exp p) (a.exp p) :=
   Path.refl _
 
-def supernatural_sym_path (a : Supernatural) (p : Nat) :
+noncomputable def supernatural_sym_path (a : Supernatural) (p : Nat) :
     Path (a.exp p) (a.exp p) :=
   Path.symm (Path.refl _)
 
-def supernatural_trans_path (a : Supernatural) (p : Nat) :
+noncomputable def supernatural_trans_path (a : Supernatural) (p : Nat) :
     Path (a.exp p) (a.exp p) :=
   Path.trans (Path.refl _) (Path.refl _)
 
@@ -450,34 +450,34 @@ structure SylowProfinite (G : ProfiniteGroup) where
   maximalCode : Bool
   conjugacyCode : Bool
 
-def SylowProfinite.trivial (G : ProfiniteGroup) : SylowProfinite G where
+noncomputable def SylowProfinite.trivial (G : ProfiniteGroup) : SylowProfinite G where
   prime := 2
   prime_ge_two := by decide
   subgroup := ClosedSubgroup.full G
   maximalCode := true
   conjugacyCode := true
 
-def sylow_prime_ge_two (G : ProfiniteGroup) (S : SylowProfinite G) :
+noncomputable def sylow_prime_ge_two (G : ProfiniteGroup) (S : SylowProfinite G) :
     S.prime ≥ 2 :=
   S.prime_ge_two
 
-def sylow_closed_subgroup_closed (G : ProfiniteGroup) (S : SylowProfinite G) :
+noncomputable def sylow_closed_subgroup_closed (G : ProfiniteGroup) (S : SylowProfinite G) :
     Path S.subgroup.closedCode S.subgroup.closedCode :=
   Path.refl _
 
-def sylow_maximal_code_self (G : ProfiniteGroup) (S : SylowProfinite G) :
+noncomputable def sylow_maximal_code_self (G : ProfiniteGroup) (S : SylowProfinite G) :
     Path S.maximalCode S.maximalCode :=
   Path.refl _
 
-def sylow_conjugacy_code_self (G : ProfiniteGroup) (S : SylowProfinite G) :
+noncomputable def sylow_conjugacy_code_self (G : ProfiniteGroup) (S : SylowProfinite G) :
     Path S.conjugacyCode S.conjugacyCode :=
   Path.refl _
 
-def sylow_existence_path (G : ProfiniteGroup) :
+noncomputable def sylow_existence_path (G : ProfiniteGroup) :
     Path (SylowProfinite.trivial G).maximalCode true :=
   Path.refl _
 
-def sylow_uniqueness_code_path (G : ProfiniteGroup) :
+noncomputable def sylow_uniqueness_code_path (G : ProfiniteGroup) :
     Path (SylowProfinite.trivial G).conjugacyCode true :=
   Path.trans (Path.refl _) (Path.refl _)
 
@@ -491,7 +491,7 @@ structure AbsoluteGaloisGroup where
   faithfulCode : Bool
   fixesBaseCode : Bool
 
-def AbsoluteGaloisGroup.trivial (F : Type u) : AbsoluteGaloisGroup where
+noncomputable def AbsoluteGaloisGroup.trivial (F : Type u) : AbsoluteGaloisGroup where
   baseField := F
   gamGroup := ProfiniteGroup.trivial
   separableClosure := F
@@ -499,24 +499,24 @@ def AbsoluteGaloisGroup.trivial (F : Type u) : AbsoluteGaloisGroup where
   faithfulCode := true
   fixesBaseCode := true
 
-def absolute_faithful_code_refl (A : AbsoluteGaloisGroup) :
+noncomputable def absolute_faithful_code_refl (A : AbsoluteGaloisGroup) :
     Path A.faithfulCode A.faithfulCode :=
   Path.refl _
 
-def absolute_action_refl
+noncomputable def absolute_action_refl
     (A : AbsoluteGaloisGroup) (g : A.gamGroup.limit) (x : A.separableClosure) :
     Path (A.action g x) (A.action g x) :=
   Path.refl _
 
-def absolute_fix_base_refl (A : AbsoluteGaloisGroup) :
+noncomputable def absolute_fix_base_refl (A : AbsoluteGaloisGroup) :
     Path A.fixesBaseCode A.fixesBaseCode :=
   Path.refl _
 
-def absolute_sym_path (A : AbsoluteGaloisGroup) :
+noncomputable def absolute_sym_path (A : AbsoluteGaloisGroup) :
     Path A.faithfulCode A.faithfulCode :=
   Path.symm (Path.refl _)
 
-def absolute_trans_path (A : AbsoluteGaloisGroup) :
+noncomputable def absolute_trans_path (A : AbsoluteGaloisGroup) :
     Path A.faithfulCode A.faithfulCode :=
   Path.trans (Path.refl _) (Path.refl _)
 
@@ -534,7 +534,7 @@ structure GaloisCohomology (G : ProfiniteGroup) where
   cupUnit : module
   exactCode : Nat → Bool
 
-def GaloisCohomology.trivial (G : ProfiniteGroup) : GaloisCohomology G where
+noncomputable def GaloisCohomology.trivial (G : ProfiniteGroup) : GaloisCohomology G where
   module := PUnit
   zero := PUnit.unit
   add := fun _ _ => PUnit.unit
@@ -546,67 +546,67 @@ def GaloisCohomology.trivial (G : ProfiniteGroup) : GaloisCohomology G where
   cupUnit := PUnit.unit
   exactCode := fun _ => true
 
-def H0 (G : ProfiniteGroup) (C : GaloisCohomology G) : Type u :=
+noncomputable def H0 (G : ProfiniteGroup) (C : GaloisCohomology G) : Type u :=
   C.module
 
-def H1 (G : ProfiniteGroup) (C : GaloisCohomology G) : Type u :=
+noncomputable def H1 (G : ProfiniteGroup) (C : GaloisCohomology G) : Type u :=
   C.module
 
-def H2 (G : ProfiniteGroup) (C : GaloisCohomology G) : Type u :=
+noncomputable def H2 (G : ProfiniteGroup) (C : GaloisCohomology G) : Type u :=
   C.module
 
-def cohomology_d_square_refl
+noncomputable def cohomology_d_square_refl
     (G : ProfiniteGroup) (C : GaloisCohomology G) (n : Nat) (c : C.cochain n) :
     Path (C.d (n + 1) (C.d n c)) (C.d (n + 1) (C.d n c)) :=
   C.d_square n c
 
-def cohomology_zero_cocycle
+noncomputable def cohomology_zero_cocycle
     (G : ProfiniteGroup) (C : GaloisCohomology G) :
     Path (C.add C.zero C.zero) (C.add C.zero C.zero) :=
   Path.refl _
 
-def cohomology_boundary_boundary
+noncomputable def cohomology_boundary_boundary
     (G : ProfiniteGroup) (C : GaloisCohomology G)
     (n : Nat) (c : C.cochain n) :
     Path (C.d (n + 1) (C.d n c)) (C.d (n + 1) (C.d n c)) :=
   C.d_square n c
 
-def cohomology_h0_fixed_refl
+noncomputable def cohomology_h0_fixed_refl
     (G : ProfiniteGroup) (C : GaloisCohomology G) (x : H0 G C) :
     Path x x :=
   Path.refl _
 
-def cohomology_h1_refl
+noncomputable def cohomology_h1_refl
     (G : ProfiniteGroup) (C : GaloisCohomology G) (x : H1 G C) :
     Path x x :=
   Path.refl _
 
-def cohomology_h2_refl
+noncomputable def cohomology_h2_refl
     (G : ProfiniteGroup) (C : GaloisCohomology G) (x : H2 G C) :
     Path x x :=
   Path.refl _
 
-def cohomology_cup_unit_left
+noncomputable def cohomology_cup_unit_left
     (G : ProfiniteGroup) (C : GaloisCohomology G) (p q : Nat) (x : C.module) :
     Path (C.cup p q C.cupUnit x) (C.cup p q C.cupUnit x) :=
   Path.refl _
 
-def cohomology_cup_unit_right
+noncomputable def cohomology_cup_unit_right
     (G : ProfiniteGroup) (C : GaloisCohomology G) (p q : Nat) (x : C.module) :
     Path (C.cup p q x C.cupUnit) (C.cup p q x C.cupUnit) :=
   Path.refl _
 
-def cohomology_long_exact_stub
+noncomputable def cohomology_long_exact_stub
     (G : ProfiniteGroup) (C : GaloisCohomology G) (n : Nat) :
     Path (C.exactCode n) (C.exactCode n) :=
   Path.refl _
 
-def galois_cohomology_path_sym
+noncomputable def galois_cohomology_path_sym
     (G : ProfiniteGroup) (C : GaloisCohomology G) (n : Nat) :
     Path (C.exactCode n) (C.exactCode n) :=
   Path.symm (Path.refl _)
 
-def galois_cohomology_path_trans
+noncomputable def galois_cohomology_path_trans
     (G : ProfiniteGroup) (C : GaloisCohomology G) (n : Nat) :
     Path (C.exactCode n) (C.exactCode n) :=
   Path.trans (Path.refl _) (Path.refl _)

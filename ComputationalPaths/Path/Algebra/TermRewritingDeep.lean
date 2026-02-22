@@ -40,22 +40,22 @@ deriving DecidableEq, Repr
 
 abbrev TRPos := List TRDir
 
-def TRTm.atPos : TRTm → TRPos → Option TRTm
+noncomputable def TRTm.atPos : TRTm → TRPos → Option TRTm
   | t, []              => some t
   | .app l _, TRDir.L :: p => l.atPos p
   | .app _ r, TRDir.R :: p => r.atPos p
   | _, _ :: _           => none
 
-def TRTm.replaceAt : TRTm → TRPos → TRTm → TRTm
+noncomputable def TRTm.replaceAt : TRTm → TRPos → TRTm → TRTm
   | _, [], s                      => s
   | .app l r, TRDir.L :: p, s => .app (l.replaceAt p s) r
   | .app l r, TRDir.R :: p, s => .app l (r.replaceAt p s)
   | t, _ :: _, _                  => t
 
-def trHoleIdx : Nat := 99999
-def trHole : TRTm := .var trHoleIdx
+noncomputable def trHoleIdx : Nat := 99999
+noncomputable def trHole : TRTm := .var trHoleIdx
 
-def trPlug (ctx t : TRTm) : TRTm :=
+noncomputable def trPlug (ctx t : TRTm) : TRTm :=
   match ctx with
   | .var n   => if n == trHoleIdx then t else .var n
   | .const c => .const c
@@ -65,41 +65,41 @@ def trPlug (ctx t : TRTm) : TRTm :=
 -- §3  Substitutions
 -- ============================================================
 
-def TRSubst := Nat → TRTm
+noncomputable def TRSubst := Nat → TRTm
 
-def TRSubst.id : TRSubst := TRTm.var
+noncomputable def TRSubst.id : TRSubst := TRTm.var
 
-def TRTm.applyS (σ : TRSubst) : TRTm → TRTm
+noncomputable def TRTm.applyS (σ : TRSubst) : TRTm → TRTm
   | .var n   => σ n
   | .const c => .const c
   | .app l r => .app (l.applyS σ) (r.applyS σ)
 
-def TRSubst.comp (σ τ : TRSubst) : TRSubst :=
+noncomputable def TRSubst.comp (σ τ : TRSubst) : TRSubst :=
   fun n => (τ n).applyS σ
 
-def TRSubst.single (x : Nat) (t : TRTm) : TRSubst :=
+noncomputable def TRSubst.single (x : Nat) (t : TRTm) : TRSubst :=
   fun n => if n == x then t else .var n
 
 -- ============================================================
 -- §4  Size, Depth, Variables, Occurs
 -- ============================================================
 
-def TRTm.size : TRTm → Nat
+noncomputable def TRTm.size : TRTm → Nat
   | .var _   => 1
   | .const _ => 1
   | .app l r => 1 + l.size + r.size
 
-def TRTm.depth : TRTm → Nat
+noncomputable def TRTm.depth : TRTm → Nat
   | .var _   => 0
   | .const _ => 0
   | .app l r => 1 + max l.depth r.depth
 
-def TRTm.vars : TRTm → List Nat
+noncomputable def TRTm.vars : TRTm → List Nat
   | .var n   => [n]
   | .const _ => []
   | .app l r => l.vars ++ r.vars
 
-def TRTm.occurs (x : Nat) : TRTm → Bool
+noncomputable def TRTm.occurs (x : Nat) : TRTm → Bool
   | .var n   => n == x
   | .const _ => false
   | .app l r => l.occurs x || r.occurs x
@@ -413,13 +413,13 @@ theorem TRMStep.liftCongrR {R : TRTRS} (l : TRTm)
 -- §14  Joinability & Confluence
 -- ============================================================
 
-def TRJoinable (R : TRTRS) (a b : TRTm) : Prop :=
+noncomputable def TRJoinable (R : TRTRS) (a b : TRTm) : Prop :=
   ∃ c, TRMStep R a c ∧ TRMStep R b c
 
-def TRConfluent (R : TRTRS) : Prop :=
+noncomputable def TRConfluent (R : TRTRS) : Prop :=
   ∀ a b c, TRMStep R a b → TRMStep R a c → TRJoinable R b c
 
-def TRLocallyConfluent (R : TRTRS) : Prop :=
+noncomputable def TRLocallyConfluent (R : TRTRS) : Prop :=
   ∀ a b c, TRStep R a b → TRStep R a c → TRJoinable R b c
 
 /-- Theorem 48: Joinability is reflexive. -/
@@ -441,7 +441,7 @@ theorem TRJoinable.toPath {R : TRTRS} (h : TRJoinable R a b) :
 -- §15  Normal Forms
 -- ============================================================
 
-def TRNF (R : TRTRS) (t : TRTm) : Prop := ∀ t', ¬ TRStep R t t'
+noncomputable def TRNF (R : TRTRS) (t : TRTm) : Prop := ∀ t', ¬ TRStep R t t'
 
 /-- Theorem 51: NF has only trivial self-path. -/
 theorem TRNF.self_path {R : TRTRS} (hnf : TRNF R t) :
@@ -452,7 +452,7 @@ theorem TRNF.self_path {R : TRTRS} (hnf : TRNF R t) :
 -- §16  Termination & Newman's Lemma
 -- ============================================================
 
-def TRTerminating (R : TRTRS) : Prop :=
+noncomputable def TRTerminating (R : TRTRS) : Prop :=
   WellFounded (fun b a => TRStep R a b)
 
 /-- Theorem 52: Newman's lemma. -/
@@ -500,7 +500,7 @@ theorem tr_cp_joinable_path {R : TRTRS} {cp : TRCriticalPair}
   h.toPath
 
 /-- All critical pairs joinable. -/
-def TRAllCPJoinable (R : TRTRS) (cps : List TRCriticalPair) : Prop :=
+noncomputable def TRAllCPJoinable (R : TRTRS) (cps : List TRCriticalPair) : Prop :=
   ∀ cp, cp ∈ cps → TRJoinable R cp.left cp.right
 
 /-- Theorem 55: Empty CP list trivially joinable. -/
@@ -511,9 +511,9 @@ theorem tr_all_cp_joinable_empty (R : TRTRS) : TRAllCPJoinable R [] :=
 -- §18  Reduction Orderings
 -- ============================================================
 
-def TRPrec := String → Nat
+noncomputable def TRPrec := String → Nat
 
-def trSizeLt (s t : TRTm) : Prop := s.size < t.size
+noncomputable def trSizeLt (s t : TRTm) : Prop := s.size < t.size
 
 /-- Theorem 56: sizeLt is well-founded. -/
 theorem tr_sizeLt_wf : WellFounded trSizeLt :=
@@ -533,12 +533,12 @@ structure TRCompState where
   eqs   : List TREquation
 deriving Repr
 
-def trOrient (eq : TREquation) : Option TRRule :=
+noncomputable def trOrient (eq : TREquation) : Option TRRule :=
   if eq.lhs.size > eq.rhs.size then some ⟨eq.lhs, eq.rhs⟩
   else if eq.rhs.size > eq.lhs.size then some ⟨eq.rhs, eq.lhs⟩
   else none
 
-def trCompletionStep (st : TRCompState) : TRCompState :=
+noncomputable def trCompletionStep (st : TRCompState) : TRCompState :=
   match st.eqs with
   | []       => st
   | eq :: rest =>
@@ -591,15 +591,15 @@ theorem tr_narrow_refl {R : TRTRS} (t : TRTm) : TRPath R t t :=
 -- §22  Concrete Example: {f(x) → x}
 -- ============================================================
 
-private def v0 : TRTm := .var 0
-private def cA : TRTm := .const "a"
-private def cB : TRTm := .const "b"
-private def cF : TRTm := .const "f"
+private noncomputable def v0 : TRTm := .var 0
+private noncomputable def cA : TRTm := .const "a"
+private noncomputable def cB : TRTm := .const "b"
+private noncomputable def cF : TRTm := .const "f"
 
-private def ruleF : TRRule := ⟨.app cF v0, v0⟩
-private def exTRS : TRTRS := [ruleF]
+private noncomputable def ruleF : TRRule := ⟨.app cF v0, v0⟩
+private noncomputable def exTRS : TRTRS := [ruleF]
 
-private def σA : TRSubst := fun n => if n == 0 then cA else .var n
+private noncomputable def σA : TRSubst := fun n => if n == 0 then cA else .var n
 
 /-- Theorem 61: f(a) rewrites to a. -/
 theorem tr_ex_fA_to_a : TRStep exTRS (.app cF cA) cA :=
@@ -698,7 +698,7 @@ theorem tr_nf_unique {R : TRTRS} (hConf : TRConfluent R)
 -- §25  Church-Rosser
 -- ============================================================
 
-def TRChurchRosser (R : TRTRS) : Prop :=
+noncomputable def TRChurchRosser (R : TRTRS) : Prop :=
   ∀ a b, TRPath R a b → TRJoinable R a b
 
 /-- Theorem 74: Confluence implies CR for steps. -/
@@ -715,7 +715,7 @@ theorem tr_confluent_join {R : TRTRS} (hConf : TRConfluent R)
 -- §26  Convergent TRS
 -- ============================================================
 
-def TRConvergent (R : TRTRS) : Prop :=
+noncomputable def TRConvergent (R : TRTRS) : Prop :=
   TRTerminating R ∧ TRConfluent R
 
 /-- Theorem 76: Convergent ⟹ unique NFs. -/
@@ -755,7 +755,7 @@ theorem tr_occurs_app (x : Nat) (l r : TRTm) :
 -- §28  Idempotent Substitutions
 -- ============================================================
 
-def TRSubst.idempotent (σ : TRSubst) : Prop :=
+noncomputable def TRSubst.idempotent (σ : TRSubst) : Prop :=
   ∀ t : TRTm, (t.applyS σ).applyS σ = t.applyS σ
 
 /-- Theorem 82: Identity substitution is idempotent. -/
@@ -766,7 +766,7 @@ theorem TRSubst.id_idempotent : TRSubst.idempotent TRSubst.id := by
 -- §29  Completion Invariant
 -- ============================================================
 
-def TRCompInvariant (R : TRTRS) (eqs : List TREquation) : Prop :=
+noncomputable def TRCompInvariant (R : TRTRS) (eqs : List TREquation) : Prop :=
   ∀ eq, eq ∈ eqs → TRJoinable R eq.lhs eq.rhs
 
 /-- Theorem 83: Adding joinable equation preserves invariant. -/
@@ -870,7 +870,7 @@ structure TRRedex (R : TRTRS) where
   σ    : TRSubst
   hmem : rule ∈ R
 
-def TRRedex.disjoint (r₁ r₂ : TRRedex R) : Prop :=
+noncomputable def TRRedex.disjoint (r₁ r₂ : TRRedex R) : Prop :=
   ¬ r₁.pos.isPrefixOf r₂.pos ∧ ¬ r₂.pos.isPrefixOf r₁.pos
 
 /-- Theorem 93: Disjoint redex diamond — two independent steps close. -/

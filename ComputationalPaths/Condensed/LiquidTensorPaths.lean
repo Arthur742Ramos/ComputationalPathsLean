@@ -94,7 +94,7 @@ end LiquidTensorPathData
 
 /-- Canonical liquid tensor package: left projection tensor with identity
 liquidization, carrying explicit step witnesses. -/
-def leftProjectionLiquidTensorPathData (X : Type u) : LiquidTensorPathData X where
+noncomputable def leftProjectionLiquidTensorPathData (X : Type u) : LiquidTensorPathData X where
   tensor := fun x _ => x
   liquidize := fun x => x
   liquidizePath := fun x => Path.refl x

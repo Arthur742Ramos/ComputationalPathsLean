@@ -20,7 +20,7 @@ variable {A : Type u} {B : Type v} {C : Type w}
 variable {a1 a2 a3 : A} {b1 b2 b3 : B}
 
 /-- Congruence in the first argument of a binary function. -/
-@[simp] def mapLeft (f : A → B → C) {a1 a2 : A}
+@[simp] noncomputable def mapLeft (f : A → B → C) {a1 a2 : A}
     (p : Path a1 a2) (b : B) :
     Path (f a1 b) (f a2 b) :=
   congrArg (fun x => f x b) p
@@ -53,7 +53,7 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
     _ = symm (mapLeft f p b) := by rfl
 
 /-- Congruence in the second argument of a binary function. -/
-@[simp] def mapRight (f : A → B → C) (a : A)
+@[simp] noncomputable def mapRight (f : A → B → C) (a : A)
     {b1 b2 : B} (p : Path b1 b2) :
     Path (f a b1) (f a b2) :=
   congrArg (f a) p
@@ -84,7 +84,7 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
     _ = symm (mapRight f a p) := by rfl
 
 /-- Congruence in both arguments of a binary function. -/
-@[simp] def map2 (f : A → B → C)
+@[simp] noncomputable def map2 (f : A → B → C)
     {a1 a2 : A} {b1 b2 : B}
     (p : Path a1 a2) (q : Path b1 b2) :
     Path (f a1 b1) (f a2 b2) :=
@@ -162,16 +162,16 @@ variable {A : Type u} {B : Type v}
 variable {a1 a2 : A} {b1 b2 : B}
 
 /-- Path on product values built componentwise. -/
-@[simp] def prodMk (p : Path a1 a2) (q : Path b1 b2) :
+@[simp] noncomputable def prodMk (p : Path a1 a2) (q : Path b1 b2) :
     Path (Prod.mk a1 b1) (Prod.mk a2 b2) :=
   map2 Prod.mk p q
 
 /-- Project a path on pairs to a path on the first component. -/
-@[simp] def fst (p : Path (a1, b1) (a2, b2)) : Path a1 a2 :=
+@[simp] noncomputable def fst (p : Path (a1, b1) (a2, b2)) : Path a1 a2 :=
   congrArg Prod.fst p
 
 /-- Project a path on pairs to a path on the second component. -/
-@[simp] def snd (p : Path (a1, b1) (a2, b2)) : Path b1 b2 :=
+@[simp] noncomputable def snd (p : Path (a1, b1) (a2, b2)) : Path b1 b2 :=
   congrArg Prod.snd p
 
 @[simp] theorem prodMk_refl_refl (a : A) (b : B) :
@@ -298,12 +298,12 @@ variable {A : Type u} {B : Type v}
 variable {a1 a2 : A} {b1 b2 : B}
 
 /-- Lift a path on the left summand to a path on the coproduct. -/
-@[simp] def inlCongr (p : Path a1 a2) :
+@[simp] noncomputable def inlCongr (p : Path a1 a2) :
     Path (Sum.inl a1 : Sum A B) (Sum.inl a2) :=
   congrArg Sum.inl p
 
 /-- Lift a path on the right summand to a path on the coproduct. -/
-@[simp] def inrCongr (p : Path b1 b2) :
+@[simp] noncomputable def inrCongr (p : Path b1 b2) :
     Path (Sum.inr b1 : Sum A B) (Sum.inr b2) :=
   congrArg Sum.inr p
 
@@ -368,7 +368,7 @@ variable {a1 a2 : A}
 variable {b1 : B a1} {b2 : B a2}
 
 /-- Build a path between dependent pairs from a base path and a fibre path. -/
-@[simp] def sigmaMk (p : Path a1 a2)
+@[simp] noncomputable def sigmaMk (p : Path a1 a2)
     (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
     Path (Sigma.mk a1 b1) (Sigma.mk a2 b2) :=
   Path.stepChain <| by
@@ -382,12 +382,12 @@ variable {b1 : B a1} {b2 : B a2}
             simp [transport]
 
 /-- Project a path on dependent pairs to the path on the first component. -/
-@[simp] def sigmaFst (p : Path (Sigma.mk a1 b1) (Sigma.mk a2 b2)) :
+@[simp] noncomputable def sigmaFst (p : Path (Sigma.mk a1 b1) (Sigma.mk a2 b2)) :
     Path a1 a2 :=
   congrArg Sigma.fst p
 
 /-- Project a path on dependent pairs to a path in the fibre of the second component. -/
-@[simp] def sigmaSnd (p : Path (Sigma.mk a1 b1) (Sigma.mk a2 b2)) :
+@[simp] noncomputable def sigmaSnd (p : Path (Sigma.mk a1 b1) (Sigma.mk a2 b2)) :
     Path
       (transport (A := A) (D := fun a => B a) (sigmaFst (B := B) p) b1)
       b2 :=
@@ -400,7 +400,7 @@ variable {b1 : B a1} {b2 : B a2}
 
 /-- Helper producing the fibre witness that appears when symmetrising
 `sigmaMk` paths. -/
-@[simp] def sigmaSymmSnd
+@[simp] noncomputable def sigmaSymmSnd
     (p : Path a1 a2)
     (q : Path (transport (A := A) (D := fun a => B a) p b1) b2) :
     Path (A := B a1)
@@ -468,7 +468,7 @@ variable {b1 : B a1} {b2 : B a2}
       (p := p) (q := q) (x := x)
 
 /-- Transport for dependent types (Sigma types). -/
-def transportSigma {A : Type u} {B : A → Type v}
+noncomputable def transportSigma {A : Type u} {B : A → Type v}
     {D : ∀ a, B a → Sort w}
     {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
     (p : Path a₁ a₂)
@@ -483,7 +483,7 @@ def transportSigma {A : Type u} {B : A → Type v}
     exact x
 
 /-- Substitution for dependent types. -/
-def substSigma {A : Type u} {B : A → Type v}
+noncomputable def substSigma {A : Type u} {B : A → Type v}
     {D : ∀ a, B a → Sort w}
     {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
     (x : D a₁ b₁)
@@ -530,10 +530,10 @@ variable {A : Type u} {B : Type v}
 variable {f g h : A → B}
 
 /-- Package pointwise paths into a path between functions. -/
-@[simp] def lamCongr (p : ∀ x : A, Path (f x) (g x)) : Path f g :=
+@[simp] noncomputable def lamCongr (p : ∀ x : A, Path (f x) (g x)) : Path f g :=
   Path.mk [] (funext fun x => (p x).proof)
 
-@[simp] def app (p : Path f g) (a : A) : Path (f a) (g a) :=
+@[simp] noncomputable def app (p : Path f g) (a : A) : Path (f a) (g a) :=
   congrArg (fun h => h a) p
 
 @[simp] theorem lamCongr_refl (f : A → B) :

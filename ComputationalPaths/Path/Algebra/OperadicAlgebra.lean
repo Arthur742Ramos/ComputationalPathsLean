@@ -48,7 +48,7 @@ structure AlgOverOperad (O : CleanOperad) where
     Path (act (O.action σ θ) xs) (act θ (xs ∘ σ.invFun))
 
 /-- The trivial Path-valued algebra over any operad. -/
-def AlgOverOperad.trivial (O : CleanOperad) : AlgOverOperad O where
+noncomputable def AlgOverOperad.trivial (O : CleanOperad) : AlgOverOperad O where
   carrier := Unit
   act := fun _ _ => ()
   unit_act := fun _ => Path.refl ()
@@ -59,7 +59,7 @@ def AlgOverOperad.trivial (O : CleanOperad) : AlgOverOperad O where
 /-- The associahedra operad: a non-symmetric operad whose operations are
     indexed by planar trees (parenthesizations). This is the operad governing
     A-infinity algebras. -/
-def associahedraOperad : CleanOperad where
+noncomputable def associahedraOperad : CleanOperad where
   ops := fun _ => AssocTree
   unit := AssocTree.leaf
   action := fun _ t => t  -- Non-symmetric: action is trivial
@@ -103,7 +103,7 @@ structure EInfinityAlgebra where
   algebra : AlgOverOperad operad.toCleanOperad
 
 /-- The trivial E-infinity operad (one operation per arity). -/
-def trivialEInfOperad : EInfinityOperad where
+noncomputable def trivialEInfOperad : EInfinityOperad where
   ops := fun _ => Unit
   unit := ()
   action := fun _ x => x
@@ -112,14 +112,14 @@ def trivialEInfOperad : EInfinityOperad where
   contractible := { connected := fun _ _ => Path.refl () }
 
 /-- The trivial E-infinity algebra. -/
-def trivialEInfAlgebra : EInfinityAlgebra where
+noncomputable def trivialEInfAlgebra : EInfinityAlgebra where
   operad := trivialEInfOperad
   algebra := AlgOverOperad.trivial trivialEInfOperad.toCleanOperad
 
 /-- An E-infinity algebra is commutative up to coherent homotopy.
     The contractibility of the operad ensures that any two ways of
     multiplying elements are connected by a path. -/
-def einfinity_commutative (E : EInfinityAlgebra) {n : Nat}
+noncomputable def einfinity_commutative (E : EInfinityAlgebra) {n : Nat}
     (θ₁ θ₂ : E.operad.ops n) (xs : Fin n → E.algebra.carrier) :
     Path (E.algebra.act θ₁ xs) (E.algebra.act θ₂ xs) :=
   Path.congrArg (fun θ => E.algebra.act θ xs) (E.operad.contractible.connected θ₁ θ₂)
@@ -177,13 +177,13 @@ structure OperadAlgMorphism {O : CleanOperad} (A B : AlgOverOperad O) where
     Path (toFun (A.act θ xs)) (B.act θ (toFun ∘ xs))
 
 /-- Identity morphism. -/
-def OperadAlgMorphism.id {O : CleanOperad} (A : AlgOverOperad O) :
+noncomputable def OperadAlgMorphism.id {O : CleanOperad} (A : AlgOverOperad O) :
     OperadAlgMorphism A A where
   toFun := _root_.id
   map_act := fun _ _ => Path.refl _
 
 /-- Composition of operadic algebra morphisms. -/
-def OperadAlgMorphism.comp {O : CleanOperad} {A B C : AlgOverOperad O}
+noncomputable def OperadAlgMorphism.comp {O : CleanOperad} {A B C : AlgOverOperad O}
     (g : OperadAlgMorphism B C) (f : OperadAlgMorphism A B) :
     OperadAlgMorphism A C where
   toFun := g.toFun ∘ f.toFun

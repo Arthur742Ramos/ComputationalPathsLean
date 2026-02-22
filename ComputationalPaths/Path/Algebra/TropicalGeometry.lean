@@ -49,23 +49,23 @@ inductive TropVal where
 namespace TropVal
 
 /-- Tropical addition: minimum. -/
-def tadd : TropVal → TropVal → TropVal
+noncomputable def tadd : TropVal → TropVal → TropVal
   | fin a, fin b => fin (min a b)
   | fin a, infty => fin a
   | infty, fin b => fin b
   | infty, infty => infty
 
 /-- Tropical multiplication: addition of values. -/
-def tmul : TropVal → TropVal → TropVal
+noncomputable def tmul : TropVal → TropVal → TropVal
   | fin a, fin b => fin (a + b)
   | _, infty => infty
   | infty, _ => infty
 
 /-- Tropical zero (additive identity): ∞. -/
-def tzero : TropVal := infty
+noncomputable def tzero : TropVal := infty
 
 /-- Tropical one (multiplicative identity): 0. -/
-def tone : TropVal := fin 0
+noncomputable def tone : TropVal := fin 0
 
 theorem tadd_comm (a b : TropVal) : tadd a b = tadd b a := by
   cases a with
@@ -176,7 +176,7 @@ structure TropicalSemiring where
   add_idem : ∀ a, Path (add a a) a
 
 /-- Concrete tropical semiring on TropVal. -/
-def tropicalSemiringTropVal : TropicalSemiring where
+noncomputable def tropicalSemiringTropVal : TropicalSemiring where
   carrier := TropVal
   add := TropVal.tadd
   mul := TropVal.tmul
@@ -217,7 +217,7 @@ structure TropicalPolynomial (n : Nat) where
   monomials : List (TropicalMonomial n)
 
 /-- Evaluate a monomial at a point (using tropical arithmetic). -/
-def evalMonomial (m : TropicalMonomial n) (pt : Fin n → TropVal) : TropVal :=
+noncomputable def evalMonomial (m : TropicalMonomial n) (pt : Fin n → TropVal) : TropVal :=
   let dotProduct := (List.finRange n).foldl
     (fun acc i => TropVal.tmul acc (match pt i with
       | TropVal.fin v => TropVal.fin (v * m.exponents i)
@@ -226,7 +226,7 @@ def evalMonomial (m : TropicalMonomial n) (pt : Fin n → TropVal) : TropVal :=
   TropVal.tmul m.coeff dotProduct
 
 /-- Evaluate a tropical polynomial at a point. -/
-def evalTropPoly (p : TropicalPolynomial n) (pt : Fin n → TropVal) : TropVal :=
+noncomputable def evalTropPoly (p : TropicalPolynomial n) (pt : Fin n → TropVal) : TropVal :=
   p.monomials.foldl (fun acc m => TropVal.tadd acc (evalMonomial m pt)) TropVal.tzero
 
 /-- Tropical evaluation respects the semiring structure. -/
@@ -289,7 +289,7 @@ structure TropicalCurve where
   genus_path : Path (genus + numVertices) (numEdges + 1)
 
 /-- Genus 0 tropical curve (tree with legs). -/
-def tropicalTree (v e : Nat) (lengths : Fin e → Int) (hpos : ∀ i, lengths i > 0)
+noncomputable def tropicalTree (v e : Nat) (lengths : Fin e → Int) (hpos : ∀ i, lengths i > 0)
     (heuler : v = e + 1) : TropicalCurve where
   numVertices := v
   numEdges := e
@@ -362,7 +362,7 @@ structure StableIntersection (n : Nat) where
   comm_path : Path result.dim result.dim
 
 /-- Stable intersection is commutative at the dimensional level. -/
-def stableIntersection_comm (n : Nat)
+noncomputable def stableIntersection_comm (n : Nat)
     (si : StableIntersection n) :
     Path (si.variety1.dim + si.variety2.dim)
          (si.variety2.dim + si.variety1.dim) :=
@@ -381,7 +381,7 @@ structure TropicalBezout (n : Nat) where
     ((List.finRange n).foldl (fun acc i => acc * degrees i) 1)
 
 /-- For two curves in the tropical plane: |V₁ ∩ V₂| = deg(V₁) · deg(V₂). -/
-def tropicalBezout_plane (d1 d2 : Nat) :
+noncomputable def tropicalBezout_plane (d1 d2 : Nat) :
     Path (d1 * d2) (d1 * d2) :=
   Path.refl (d1 * d2)
 
@@ -399,14 +399,14 @@ structure TropicalModuli (n : Nat) where
   numMaxCones : Nat
 
 /-- M_{0,4} is a tropical line. -/
-def tropModuli04 : TropicalModuli 4 where
+noncomputable def tropModuli04 : TropicalModuli 4 where
   n_ge_three := by omega
   dim := 1
   dim_formula := Path.stepChain (by omega)
   numMaxCones := 3
 
 /-- M_{0,5} has dimension 2. -/
-def tropModuli05 : TropicalModuli 5 where
+noncomputable def tropModuli05 : TropicalModuli 5 where
   n_ge_three := by omega
   dim := 2
   dim_formula := Path.stepChain (by omega)
@@ -429,13 +429,13 @@ structure FundamentalThmData (n : Nat) where
 
 /-- Tropical semiring law verification: a chain of rewrites showing
     (a ⊕ b) ⊕ c = a ⊕ (b ⊕ c) via explicit steps. -/
-def tropAssocChain (a b c : TropVal) :
+noncomputable def tropAssocChain (a b c : TropVal) :
     Path (TropVal.tadd (TropVal.tadd a b) c) (TropVal.tadd a (TropVal.tadd b c)) :=
   Path.stepChain (TropVal.tadd_assoc a b c)
 
 /-- Multi-step: distributivity + idempotency.
     a ⊙ (b ⊕ b) = (a ⊙ b) ⊕ (a ⊙ b) = a ⊙ b. -/
-def tropDistribIdem (a b : TropVal) :
+noncomputable def tropDistribIdem (a b : TropVal) :
     Path (TropVal.tmul a (TropVal.tadd b b)) (TropVal.tmul a b) :=
   Path.trans
     (Path.stepChain (TropVal.tmul_tadd_distrib a b b))
@@ -443,7 +443,7 @@ def tropDistribIdem (a b : TropVal) :
 
 /-- Multi-step chain: zero absorption + identity.
     0 ⊙ a ⊕ 1 ⊙ a = 0 ⊕ a = a. -/
-def tropZeroIdentChain (a : TropVal) :
+noncomputable def tropZeroIdentChain (a : TropVal) :
     Path (TropVal.tadd (TropVal.tmul TropVal.tzero a) (TropVal.tmul TropVal.tone a))
          a :=
   Path.trans
@@ -455,7 +455,7 @@ def tropZeroIdentChain (a : TropVal) :
       (Path.stepChain (TropVal.tzero_tadd a)))
 
 /-- Associativity + commutativity chain: (a ⊕ b) ⊕ c = (b ⊕ a) ⊕ c = b ⊕ (a ⊕ c). -/
-def tropCommAssocChain (a b c : TropVal) :
+noncomputable def tropCommAssocChain (a b c : TropVal) :
     Path (TropVal.tadd (TropVal.tadd a b) c) (TropVal.tadd b (TropVal.tadd a c)) :=
   Path.trans
     (Path.congrArg (fun x => TropVal.tadd x c) (Path.stepChain (TropVal.tadd_comm a b)))
@@ -491,27 +491,27 @@ structure DualSubdivision (n : Nat) where
 /-! ## Newton Data and Correspondence Counters -/
 
 /-- Number of vertices in the Newton polygon proxy (via monomial count). -/
-def newtonPolygonVertexCount (n : Nat) (p : TropicalPolynomial n) : Nat :=
+noncomputable def newtonPolygonVertexCount (n : Nat) (p : TropicalPolynomial n) : Nat :=
   p.monomials.length
 
 /-- Perimeter weight proxy for the Newton polygon. -/
-def newtonPolygonPerimeterWeight (n : Nat) (p : TropicalPolynomial n) : Nat :=
+noncomputable def newtonPolygonPerimeterWeight (n : Nat) (p : TropicalPolynomial n) : Nat :=
   p.monomials.length
 
 /-- Dimension witness extracted from Kapranov data. -/
-def kapranovWitnessDimension (n : Nat) (_kd : KapranovData n) : Nat :=
+noncomputable def kapranovWitnessDimension (n : Nat) (_kd : KapranovData n) : Nat :=
   n
 
 /-- Mikhalkin multiplicity proxy at a tropical intersection point. -/
-def mikhalkinMultiplicity (n : Nat) (ti : TropicalIntersectionMult n) : Nat :=
+noncomputable def mikhalkinMultiplicity (n : Nat) (ti : TropicalIntersectionMult n) : Nat :=
   ti.multiplicity
 
 /-- Tropical Grassmannian Plücker count proxy. -/
-def tropicalGrassmannianPluckerCount (_n _r : Nat) (numPlucker : Nat) : Nat :=
+noncomputable def tropicalGrassmannianPluckerCount (_n _r : Nat) (numPlucker : Nat) : Nat :=
   numPlucker
 
 /-- Tropical intersection weight from Bézout data. -/
-def tropicalIntersectionWeight (n : Nat) (tb : TropicalBezout n) : Nat :=
+noncomputable def tropicalIntersectionWeight (n : Nat) (tb : TropicalBezout n) : Nat :=
   tb.intersectionCount
 
 theorem newtonPolygonVertexCount_refl (n : Nat) (p : TropicalPolynomial n) :

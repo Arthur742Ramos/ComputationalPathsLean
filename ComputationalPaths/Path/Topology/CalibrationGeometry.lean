@@ -327,7 +327,7 @@ theorem calibrated_volume_minimizing (M : RiemannianData)
   hl.minimizing
 
 /-- Dimension of calibrated submanifold equals degree of calibration. -/
-def calibrated_dim_eq_degree (M : RiemannianData) (cs : CalibratedSubmanifold M) :
+noncomputable def calibrated_dim_eq_degree (M : RiemannianData) (cs : CalibratedSubmanifold M) :
     Path cs.subDim cs.calibration.degree := cs.dim_match
 
 /-- Special Lagrangians are minimal submanifolds. -/
@@ -335,25 +335,25 @@ theorem sLag_minimal (cy : CalabiYauManifold) (sl : SpecialLagrangian cy) :
     True := sl.minimal
 
 /-- Special Lagrangian dimension equals complex dimension. -/
-def sLag_dim (cy : CalabiYauManifold) (sl : SpecialLagrangian cy) :
+noncomputable def sLag_dim (cy : CalabiYauManifold) (sl : SpecialLagrangian cy) :
     Path sl.lagDim cy.complexDim := sl.dim_eq
 
 /-- Associative submanifolds are 3-dimensional. -/
-def associative_dim (g : G2Manifold) (a : AssociativeSubmanifold g) :
+noncomputable def associative_dim (g : G2Manifold) (a : AssociativeSubmanifold g) :
     Path a.assocDim 3 := a.dim_eq_3
 
 /-- Coassociative submanifolds are 4-dimensional. -/
-def coassociative_dim (g : G2Manifold) (c : CoassociativeSubmanifold g) :
+noncomputable def coassociative_dim (g : G2Manifold) (c : CoassociativeSubmanifold g) :
     Path c.coassocDim 4 := c.dim_eq_4
 
 /-- G₂ manifolds are 7-dimensional. -/
-def g2_dim (g : G2Manifold) : Path g.dim 7 := g.dim_eq_7
+noncomputable def g2_dim (g : G2Manifold) : Path g.dim 7 := g.dim_eq_7
 
 /-- Spin(7) manifolds are 8-dimensional. -/
-def spin7_dim (s : Spin7Manifold) : Path s.dim 8 := s.dim_eq_8
+noncomputable def spin7_dim (s : Spin7Manifold) : Path s.dim 8 := s.dim_eq_8
 
 /-- Cayley submanifolds are 4-dimensional. -/
-def cayley_dim (s : Spin7Manifold) (c : CayleySubmanifold s) :
+noncomputable def cayley_dim (s : Spin7Manifold) (c : CayleySubmanifold s) :
     Path c.cayleyDim 4 := c.dim_eq_4
 
 /-- G₂ manifolds are Ricci-flat. -/
@@ -363,7 +363,7 @@ theorem g2_ricci_flat (g : G2Manifold) : True := g.ricci_flat
 theorem spin7_ricci_flat (s : Spin7Manifold) : True := s.ricci_flat
 
 /-- Calabi-Yau real dimension = 2 × complex dimension. -/
-def cy_real_dim (cy : CalabiYauManifold) : Path cy.dim (2 * cy.complexDim) :=
+noncomputable def cy_real_dim (cy : CalabiYauManifold) : Path cy.dim (2 * cy.complexDim) :=
   cy.real_dim_eq
 
 /-- McLean: coassociative deformations are unobstructed. -/

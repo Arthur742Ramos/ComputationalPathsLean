@@ -43,7 +43,7 @@ namespace WeakCategory
 variable {A : Type u}
 
 /-- The canonical weak category carried by any type via computational paths. -/
-def identity (A : Type u) : WeakCategory A where
+noncomputable def identity (A : Type u) : WeakCategory A where
   comp := fun p q => Path.trans p q
   id := fun {a} => Path.refl a
   assoc := by
@@ -67,7 +67,7 @@ structure IsIso (C : WeakCategory A) {a b : A} (f : Path a b) where
     Rw (C.comp f inv) (C.id)
 
 /-- A weak category is a weak groupoid when every morphism has a rewrite inverse. -/
-def IsGroupoid (C : WeakCategory A) : Prop :=
+noncomputable def IsGroupoid (C : WeakCategory A) : Prop :=
   ∀ {a b : A} (f : Path a b), Nonempty (IsIso (A := A) C f)
 
 end WeakCategory
@@ -89,7 +89,7 @@ namespace WeakGroupoid
 variable {A : Type u}
 
 /-- The canonical weak groupoid carried by any type via computational paths. -/
-def identity (A : Type u) : WeakGroupoid A where
+noncomputable def identity (A : Type u) : WeakGroupoid A where
   toWeakCategory := WeakCategory.identity A
   inv := fun p => Path.symm p
   left_inv := by
@@ -100,7 +100,7 @@ def identity (A : Type u) : WeakGroupoid A where
     exact rw_of_step (Step.trans_symm p)
 
 /-- Every morphism in a weak groupoid has a rewrite inverse. -/
-def isIso (G : WeakGroupoid A) {a b : A} (p : Path a b) :
+noncomputable def isIso (G : WeakGroupoid A) {a b : A} (p : Path a b) :
     WeakCategory.IsIso (A := A) (G.toWeakCategory) p where
   inv := G.inv p
   left_inv := G.left_inv (A := A) (a := a) (b := b) (p := p)
@@ -147,7 +147,7 @@ namespace StrictCategory
 variable {A : Type u}
 
 /-- The quotient of computational paths by rewrite equality forms a strict category. -/
-def quotient (A : Type u) : StrictCategory A where
+noncomputable def quotient (A : Type u) : StrictCategory A where
   comp := fun p q => PathRwQuot.trans (A := A) p q
   id := fun {a} => PathRwQuot.refl (A := A) a
   assoc := by
@@ -174,7 +174,7 @@ structure IsIso (C : StrictCategory A) {a b : A}
     Path (C.comp f inv) (C.id (a := a))
 
 /-- A strict category is a groupoid when every morphism admits an inverse. -/
-def IsGroupoid (C : StrictCategory A) : Prop :=
+noncomputable def IsGroupoid (C : StrictCategory A) : Prop :=
   ∀ {a b : A} (f : PathRwQuot A a b),
     Nonempty (IsIso (A := A) C f)
 
@@ -197,7 +197,7 @@ namespace StrictGroupoid
 variable {A : Type u}
 
 /-- Every morphism in a strict groupoid admits a strict inverse. -/
-def isIso (G : StrictGroupoid A) {a b : A} (p : PathRwQuot A a b) :
+noncomputable def isIso (G : StrictGroupoid A) {a b : A} (p : PathRwQuot A a b) :
     StrictCategory.IsIso (A := A) (G.toStrictCategory) p where
   inv := G.inv p
   left_inv := G.left_inv (A := A) (a := a) (b := b) (p := p)
@@ -210,7 +210,7 @@ theorem toStrictCategory_isGroupoid (G : StrictGroupoid A) :
   exact ⟨isIso (A := A) (G := G) (a := a) (b := b) p⟩
 
 /-- The quotient of computational paths by rewrite equality forms a strict groupoid. -/
-def quotient (A : Type u) : StrictGroupoid A where
+noncomputable def quotient (A : Type u) : StrictGroupoid A where
   toStrictCategory := StrictCategory.quotient A
   inv := fun p => PathRwQuot.symm (A := A) p
   left_inv := by
@@ -249,7 +249,7 @@ namespace EqFunctor
 variable {A : Type u} {B : Type v} {C : Type w} {D : Type x}
 
 /-- Identity functor landing in equality. -/
-def id (A : Type u) : EqFunctor A A where
+noncomputable def id (A : Type u) : EqFunctor A A where
   obj := fun a => a
   map := fun p => PathRwQuot.toEq (A := A) p
   map_refl := by intro a; rfl
@@ -261,7 +261,7 @@ def id (A : Type u) : EqFunctor A A where
     exact PathRwQuot.toEq_symm (A := A) (x := p)
 
 /-- Functor induced by a function between base types. -/
-def ofFunction (f : A → B) : EqFunctor A B where
+noncomputable def ofFunction (f : A → B) : EqFunctor A B where
   obj := f
   map := fun p => _root_.congrArg f (PathRwQuot.toEq (A := A) p)
   map_refl := by
@@ -279,7 +279,7 @@ def ofFunction (f : A → B) : EqFunctor A B where
 
 /-- Compose equality-valued functors. The resulting functor first applies `F`
 to a path and then feeds the induced equality into `G`. -/
-def comp (F : EqFunctor A B) (G : EqFunctor B C) : EqFunctor A C where
+noncomputable def comp (F : EqFunctor A B) (G : EqFunctor B C) : EqFunctor A C where
   obj := fun a => G.obj (F.obj a)
   map := fun p =>
     G.map (PathRwQuot.ofEq (A := B) (F.map p))

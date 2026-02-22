@@ -20,7 +20,7 @@ open ComputationalPaths.Path
 -- Section 1: Concrete Order on Bool  (false ≤ true)
 -- ============================================================================
 
-def Bool.le (a b : Bool) : Prop := a = false ∨ b = true
+noncomputable def Bool.le (a b : Bool) : Prop := a = false ∨ b = true
 
 theorem Bool.le_refl (a : Bool) : Bool.le a a := by
   cases a <;> simp [Bool.le]
@@ -37,7 +37,7 @@ theorem Bool.le_antisymm {a b : Bool} (h1 : Bool.le a b) (h2 : Bool.le b a) :
 -- Section 2: Concrete Order on Nat  (standard ≤)
 -- ============================================================================
 
-def Nat.le' (a b : Nat) : Prop := a ≤ b
+noncomputable def Nat.le' (a b : Nat) : Prop := a ≤ b
 
 theorem Nat.le'_refl (a : Nat) : Nat.le' a a := Nat.le_refl a
 
@@ -56,10 +56,10 @@ structure PreOrd (A : Type) where
   le_refl : ∀ a, le a a
   le_trans : ∀ {a b c}, le a b → le b c → le a c
 
-def boolPreOrd : PreOrd Bool :=
+noncomputable def boolPreOrd : PreOrd Bool :=
   ⟨Bool.le, Bool.le_refl, fun h1 h2 => Bool.le_trans h1 h2⟩
 
-def natPreOrd : PreOrd Nat :=
+noncomputable def natPreOrd : PreOrd Nat :=
   ⟨Nat.le', Nat.le'_refl, fun h1 h2 => Nat.le'_trans h1 h2⟩
 
 -- ============================================================================
@@ -75,11 +75,11 @@ structure GC (A B : Type) (pA : PreOrd A) (pB : PreOrd B) where
 -- Section 5: Concrete GC: Bool → Nat
 -- ============================================================================
 
-def boolToNat : Bool → Nat
+noncomputable def boolToNat : Bool → Nat
   | false => 0
   | true  => 1
 
-def natToBool : Nat → Bool
+noncomputable def natToBool : Nat → Bool
   | 0 => false
   | _ + 1 => true
 
@@ -120,16 +120,16 @@ theorem boolNat_gc_adj (a : Bool) (b : Nat) :
       | succ k => simp [boolToNat, Nat.le']
 
 -- Theorem 4: The GC
-def boolNatGC : GC Bool Nat boolPreOrd natPreOrd where
+noncomputable def boolNatGC : GC Bool Nat boolPreOrd natPreOrd where
   lower := boolToNat
   upper := natToBool
   gc_adj := boolNat_gc_adj
 
 -- Theorem 5: Path for lower(false) = 0
-def boolNatGC_lower_false_path : Path (boolNatGC.lower false) 0 := Path.refl _
+noncomputable def boolNatGC_lower_false_path : Path (boolNatGC.lower false) 0 := Path.refl _
 
 -- Theorem 6: Path for lower(true) = 1
-def boolNatGC_lower_true_path : Path (boolNatGC.lower true) 1 := Path.refl _
+noncomputable def boolNatGC_lower_true_path : Path (boolNatGC.lower true) 1 := Path.refl _
 
 -- ============================================================================
 -- Section 6: General GC Properties
@@ -165,10 +165,10 @@ theorem gc_counit (gc : GC A B pA pB) (b : B) :
 -- Section 7: Closure Operator
 -- ============================================================================
 
-def cl (gc : GC A B pA pB) (a : A) : A := gc.upper (gc.lower a)
+noncomputable def cl (gc : GC A B pA pB) (a : A) : A := gc.upper (gc.lower a)
 
 -- Theorem 11: Closure path
-def cl_def_path (gc : GC A B pA pB) (a : A) :
+noncomputable def cl_def_path (gc : GC A B pA pB) (a : A) :
     Path (cl gc a) (gc.upper (gc.lower a)) := Path.refl _
 
 -- Theorem 12: Closure extensive
@@ -189,7 +189,7 @@ theorem cl_idempotent (gc : GC A B pA pB)
   · exact cl_extensive gc (cl gc a)
 
 -- Theorem 15: Idempotence path
-def cl_idempotent_path (gc : GC A B pA pB)
+noncomputable def cl_idempotent_path (gc : GC A B pA pB)
     (antisymm : ∀ {x y : A}, pA.le x y → pA.le y x → x = y) (a : A) :
     Path (cl gc (cl gc a)) (cl gc a) :=
   Path.mk [⟨_, _, cl_idempotent gc antisymm a⟩] (cl_idempotent gc antisymm a)
@@ -207,15 +207,15 @@ theorem boolNat_cl_true : cl boolNatGC true = true := by
   simp [cl, boolNatGC, boolToNat, natToBool]
 
 -- Theorem 18: Path cl(false) = false
-def boolNat_cl_false_path : Path (cl boolNatGC false) false :=
+noncomputable def boolNat_cl_false_path : Path (cl boolNatGC false) false :=
   Path.mk [⟨_, _, boolNat_cl_false⟩] boolNat_cl_false
 
 -- Theorem 19: Path cl(true) = true
-def boolNat_cl_true_path : Path (cl boolNatGC true) true :=
+noncomputable def boolNat_cl_true_path : Path (cl boolNatGC true) true :=
   Path.mk [⟨_, _, boolNat_cl_true⟩] boolNat_cl_true
 
 -- Theorem 20: Trans: cl(cl(false)) → cl(false) → false
-def boolNat_cl_chain : Path (cl boolNatGC (cl boolNatGC false)) false :=
+noncomputable def boolNat_cl_chain : Path (cl boolNatGC (cl boolNatGC false)) false :=
   Path.trans
     (Path.congrArg (cl boolNatGC) boolNat_cl_false_path)
     boolNat_cl_false_path
@@ -224,7 +224,7 @@ def boolNat_cl_chain : Path (cl boolNatGC (cl boolNatGC false)) false :=
 -- Section 9: Kernel Operator
 -- ============================================================================
 
-def ker (gc : GC A B pA pB) (b : B) : B := gc.lower (gc.upper b)
+noncomputable def ker (gc : GC A B pA pB) (b : B) : B := gc.lower (gc.upper b)
 
 -- Theorem 21: Kernel contractive
 theorem ker_contractive (gc : GC A B pA pB) (b : B) :
@@ -244,7 +244,7 @@ theorem ker_idempotent (gc : GC A B pA pB)
   · exact gc_lower_mono gc (gc_unit gc (gc.upper b))
 
 -- Theorem 24: Kernel idempotent path
-def ker_idempotent_path (gc : GC A B pA pB)
+noncomputable def ker_idempotent_path (gc : GC A B pA pB)
     (antisymm : ∀ {x y : B}, pB.le x y → pB.le y x → x = y) (b : B) :
     Path (ker gc (ker gc b)) (ker gc b) :=
   Path.mk [⟨_, _, ker_idempotent gc antisymm b⟩] (ker_idempotent gc antisymm b)
@@ -266,15 +266,15 @@ theorem boolNat_ker_succ (n : Nat) : ker boolNatGC (n + 1) = 1 := by
   simp [ker, boolNatGC, natToBool, boolToNat]
 
 -- Theorem 28: ker(0) path
-def boolNat_ker_zero_path : Path (ker boolNatGC 0) 0 :=
+noncomputable def boolNat_ker_zero_path : Path (ker boolNatGC 0) 0 :=
   Path.mk [⟨_, _, boolNat_ker_zero⟩] boolNat_ker_zero
 
 -- Theorem 29: ker(1) path
-def boolNat_ker_one_path : Path (ker boolNatGC 1) 1 :=
+noncomputable def boolNat_ker_one_path : Path (ker boolNatGC 1) 1 :=
   Path.mk [⟨_, _, boolNat_ker_one⟩] boolNat_ker_one
 
 -- Theorem 30: ker(2) = 1 path
-def boolNat_ker_two_path : Path (ker boolNatGC 2) 1 :=
+noncomputable def boolNat_ker_two_path : Path (ker boolNatGC 2) 1 :=
   Path.mk [⟨_, _, boolNat_ker_succ 1⟩] (boolNat_ker_succ 1)
 
 -- ============================================================================
@@ -282,7 +282,7 @@ def boolNat_ker_two_path : Path (ker boolNatGC 2) 1 :=
 -- ============================================================================
 
 -- Theorem 31: GC compose
-def gc_compose (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) : GC A C pA pC where
+noncomputable def gc_compose (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) : GC A C pA pC where
   lower := gc₂.lower ∘ gc₁.lower
   upper := gc₁.upper ∘ gc₂.upper
   gc_adj := fun a c => by
@@ -293,11 +293,11 @@ def gc_compose (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) : GC A C pA pC wher
       exact (gc₂.gc_adj _ c).mpr ((gc₁.gc_adj a _).mpr h)
 
 -- Theorem 32: Composed lower path
-def gc_compose_lower_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (a : A) :
+noncomputable def gc_compose_lower_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (a : A) :
     Path ((gc_compose gc₁ gc₂).lower a) (gc₂.lower (gc₁.lower a)) := Path.refl _
 
 -- Theorem 33: Composed upper path
-def gc_compose_upper_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (c : C) :
+noncomputable def gc_compose_upper_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (c : C) :
     Path ((gc_compose gc₁ gc₂).upper c) (gc₁.upper (gc₂.upper c)) := Path.refl _
 
 -- ============================================================================
@@ -305,35 +305,35 @@ def gc_compose_upper_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (c : C) 
 -- ============================================================================
 
 -- Theorem 34: Identity GC
-def gc_id (p : PreOrd A) : GC A A p p where
+noncomputable def gc_id (p : PreOrd A) : GC A A p p where
   lower := id
   upper := id
   gc_adj := fun _ _ => Iff.rfl
 
 -- Theorem 35: Identity closure path
-def gc_id_cl_path (p : PreOrd A) (a : A) : Path (cl (gc_id p) a) a := Path.refl _
+noncomputable def gc_id_cl_path (p : PreOrd A) (a : A) : Path (cl (gc_id p) a) a := Path.refl _
 
 -- ============================================================================
 -- Section 13: CongrArg Paths
 -- ============================================================================
 
 -- Theorem 36: congrArg lower
-def congrArg_lower (gc : GC A B pA pB) {a₁ a₂ : A}
+noncomputable def congrArg_lower (gc : GC A B pA pB) {a₁ a₂ : A}
     (p : Path a₁ a₂) : Path (gc.lower a₁) (gc.lower a₂) :=
   Path.congrArg gc.lower p
 
 -- Theorem 37: congrArg upper
-def congrArg_upper (gc : GC A B pA pB) {b₁ b₂ : B}
+noncomputable def congrArg_upper (gc : GC A B pA pB) {b₁ b₂ : B}
     (p : Path b₁ b₂) : Path (gc.upper b₁) (gc.upper b₂) :=
   Path.congrArg gc.upper p
 
 -- Theorem 38: congrArg closure
-def congrArg_cl (gc : GC A B pA pB) {a₁ a₂ : A}
+noncomputable def congrArg_cl (gc : GC A B pA pB) {a₁ a₂ : A}
     (p : Path a₁ a₂) : Path (cl gc a₁) (cl gc a₂) :=
   Path.congrArg (cl gc) p
 
 -- Theorem 39: Trans chain
-def lower_trans (gc : GC A B pA pB) {a₁ a₂ a₃ : A}
+noncomputable def lower_trans (gc : GC A B pA pB) {a₁ a₂ a₃ : A}
     (p : Path a₁ a₂) (q : Path a₂ a₃) :
     Path (gc.lower a₁) (gc.lower a₃) :=
   Path.trans (congrArg_lower gc p) (congrArg_lower gc q)
@@ -354,9 +354,9 @@ theorem congrArg_lower_symm (gc : GC A B pA pB) {a₁ a₂ : A}
 -- Section 14: Fixed Points
 -- ============================================================================
 
-def IsClosed (gc : GC A B pA pB) (a : A) : Prop := cl gc a = a
+noncomputable def IsClosed (gc : GC A B pA pB) (a : A) : Prop := cl gc a = a
 
-def IsOpen (gc : GC A B pA pB) (b : B) : Prop := ker gc b = b
+noncomputable def IsOpen (gc : GC A B pA pB) (b : B) : Prop := ker gc b = b
 
 -- Theorem 42: Upper images closed
 theorem upper_closed (gc : GC A B pA pB)
@@ -368,7 +368,7 @@ theorem upper_closed (gc : GC A B pA pB)
   · exact gc_unit gc (gc.upper b)
 
 -- Theorem 43: Upper-closed path
-def upper_closed_path (gc : GC A B pA pB)
+noncomputable def upper_closed_path (gc : GC A B pA pB)
     (antisymm : ∀ {x y : A}, pA.le x y → pA.le y x → x = y) (b : B) :
     Path (cl gc (gc.upper b)) (gc.upper b) :=
   Path.mk [⟨_, _, upper_closed gc antisymm b⟩] (upper_closed gc antisymm b)
@@ -383,7 +383,7 @@ theorem lower_open (gc : GC A B pA pB)
   · exact gc_lower_mono gc (gc_unit gc a)
 
 -- Theorem 45: Lower-open path
-def lower_open_path (gc : GC A B pA pB)
+noncomputable def lower_open_path (gc : GC A B pA pB)
     (antisymm : ∀ {x y : B}, pB.le x y → pB.le y x → x = y) (a : A) :
     Path (ker gc (gc.lower a)) (gc.lower a) :=
   Path.mk [⟨_, _, lower_open gc antisymm a⟩] (lower_open gc antisymm a)
@@ -401,7 +401,7 @@ theorem triangle_lower (gc : GC A B pA pB)
   · exact gc_lower_mono gc (gc_unit gc a)
 
 -- Theorem 47: Triangle path
-def triangle_lower_path (gc : GC A B pA pB)
+noncomputable def triangle_lower_path (gc : GC A B pA pB)
     (antisymm : ∀ {x y : B}, pB.le x y → pB.le y x → x = y) (a : A) :
     Path (gc.lower (gc.upper (gc.lower a))) (gc.lower a) :=
   Path.mk [⟨_, _, triangle_lower gc antisymm a⟩] (triangle_lower gc antisymm a)
@@ -415,7 +415,7 @@ theorem triangle_upper (gc : GC A B pA pB)
   · exact gc_unit gc (gc.upper b)
 
 -- Theorem 49: Triangle upper path
-def triangle_upper_path (gc : GC A B pA pB)
+noncomputable def triangle_upper_path (gc : GC A B pA pB)
     (antisymm : ∀ {x y : A}, pA.le x y → pA.le y x → x = y) (b : B) :
     Path (gc.upper (gc.lower (gc.upper b))) (gc.upper b) :=
   Path.mk [⟨_, _, triangle_upper gc antisymm b⟩] (triangle_upper gc antisymm b)
@@ -445,12 +445,12 @@ structure GaloisIns (A B : Type) (pA : PreOrd A) (pB : PreOrd B)
   counit_eq : ∀ b, lower (upper b) = b
 
 -- Theorem 54: Galois insertion roundtrip
-def galois_ins_roundtrip (gi : GaloisIns A B pA pB) (b : B) :
+noncomputable def galois_ins_roundtrip (gi : GaloisIns A B pA pB) (b : B) :
     Path (gi.lower (gi.upper b)) b :=
   Path.mk [⟨_, _, gi.counit_eq b⟩] (gi.counit_eq b)
 
 -- Theorem 55: Kernel identity path
-def galois_ins_ker_id (gi : GaloisIns A B pA pB) (b : B) :
+noncomputable def galois_ins_ker_id (gi : GaloisIns A B pA pB) (b : B) :
     Path (ker gi.toGC b) b :=
   Path.mk [⟨_, _, gi.counit_eq b⟩] (gi.counit_eq b)
 
@@ -459,7 +459,7 @@ def galois_ins_ker_id (gi : GaloisIns A B pA pB) (b : B) :
 -- ============================================================================
 
 -- Theorem 56: Dual GC
-def gc_dual (gc : GC A B pA pB) :
+noncomputable def gc_dual (gc : GC A B pA pB) :
     GC B A
       (PreOrd.mk (fun b₁ b₂ => pB.le b₂ b₁) (fun b => pB.le_refl b)
         (fun h1 h2 => pB.le_trans h2 h1))
@@ -473,7 +473,7 @@ def gc_dual (gc : GC A B pA pB) :
     · intro h; exact (gc.gc_adj a b).mp h
 
 -- Theorem 57: Double dual path
-def gc_dual_dual_path (gc : GC A B pA pB) (a : A) :
+noncomputable def gc_dual_dual_path (gc : GC A B pA pB) (a : A) :
     Path ((gc_dual (gc_dual gc)).lower a) (gc.lower a) := Path.refl _
 
 -- ============================================================================
@@ -481,7 +481,7 @@ def gc_dual_dual_path (gc : GC A B pA pB) (a : A) :
 -- ============================================================================
 
 -- Theorem 58: Transport through closure
-def cl_transport_path (gc : GC A B pA pB) {a₁ a₂ : A}
+noncomputable def cl_transport_path (gc : GC A B pA pB) {a₁ a₂ : A}
     (p : Path a₁ a₂) : Path (cl gc a₁) (cl gc a₂) :=
   Path.congrArg (cl gc) p
 
@@ -504,17 +504,17 @@ theorem cl_transport_trans (gc : GC A B pA pB) {a₁ a₂ a₃ : A}
 -- ============================================================================
 
 -- Theorem 61: Lower chain
-def boolNat_lower_chain (p : Path false true) :
+noncomputable def boolNat_lower_chain (p : Path false true) :
     Path (boolNatGC.lower false) (boolNatGC.lower true) :=
   Path.congrArg boolNatGC.lower p
 
 -- Theorem 62: Symm of chain
-def boolNat_lower_chain_symm (p : Path false true) :
+noncomputable def boolNat_lower_chain_symm (p : Path false true) :
     Path (boolNatGC.lower true) (boolNatGC.lower false) :=
   Path.symm (boolNat_lower_chain p)
 
 -- Theorem 63: Upper chain
-def boolNat_upper_chain {m n : Nat} (p : Path m n) :
+noncomputable def boolNat_upper_chain {m n : Nat} (p : Path m n) :
     Path (boolNatGC.upper m) (boolNatGC.upper n) :=
   Path.congrArg boolNatGC.upper p
 
@@ -531,30 +531,30 @@ theorem roundtrip_true : natToBool (boolToNat true) = true := by
   simp [boolToNat, natToBool]
 
 -- Theorem 66: roundtrip false path
-def roundtrip_false_path : Path (natToBool (boolToNat false)) false :=
+noncomputable def roundtrip_false_path : Path (natToBool (boolToNat false)) false :=
   Path.mk [⟨_, _, roundtrip_false⟩] roundtrip_false
 
 -- Theorem 67: roundtrip true path
-def roundtrip_true_path : Path (natToBool (boolToNat true)) true :=
+noncomputable def roundtrip_true_path : Path (natToBool (boolToNat true)) true :=
   Path.mk [⟨_, _, roundtrip_true⟩] roundtrip_true
 
 -- Theorem 68: cl(false) concrete trans
-def cl_false_trans : Path (cl boolNatGC false) false :=
+noncomputable def cl_false_trans : Path (cl boolNatGC false) false :=
   Path.trans (Path.mk [⟨_, _, boolNat_cl_false⟩] boolNat_cl_false) (Path.refl false)
 
 -- ============================================================================
 -- Section 22: Meet/Join on Bool
 -- ============================================================================
 
-def boolMeet (a b : Bool) : Bool := a && b
-def boolJoin (a b : Bool) : Bool := a || b
+noncomputable def boolMeet (a b : Bool) : Bool := a && b
+noncomputable def boolJoin (a b : Bool) : Bool := a || b
 
 -- Theorem 69: Meet commutative
 theorem boolMeet_comm (a b : Bool) : boolMeet a b = boolMeet b a := by
   cases a <;> cases b <;> simp [boolMeet]
 
 -- Theorem 70: Meet comm path
-def boolMeet_comm_path (a b : Bool) :
+noncomputable def boolMeet_comm_path (a b : Bool) :
     Path (boolMeet a b) (boolMeet b a) :=
   Path.mk [⟨_, _, boolMeet_comm a b⟩] (boolMeet_comm a b)
 
@@ -563,7 +563,7 @@ theorem boolJoin_comm (a b : Bool) : boolJoin a b = boolJoin b a := by
   cases a <;> cases b <;> simp [boolJoin]
 
 -- Theorem 72: Join comm path
-def boolJoin_comm_path (a b : Bool) :
+noncomputable def boolJoin_comm_path (a b : Bool) :
     Path (boolJoin a b) (boolJoin b a) :=
   Path.mk [⟨_, _, boolJoin_comm a b⟩] (boolJoin_comm a b)
 
@@ -573,7 +573,7 @@ theorem boolMeet_assoc (a b c : Bool) :
   cases a <;> cases b <;> cases c <;> simp [boolMeet]
 
 -- Theorem 74: Meet assoc path
-def boolMeet_assoc_path (a b c : Bool) :
+noncomputable def boolMeet_assoc_path (a b c : Bool) :
     Path (boolMeet (boolMeet a b) c) (boolMeet a (boolMeet b c)) :=
   Path.mk [⟨_, _, boolMeet_assoc a b c⟩] (boolMeet_assoc a b c)
 
@@ -583,7 +583,7 @@ theorem boolJoin_assoc (a b c : Bool) :
   cases a <;> cases b <;> cases c <;> simp [boolJoin]
 
 -- Theorem 76: Join assoc path
-def boolJoin_assoc_path (a b c : Bool) :
+noncomputable def boolJoin_assoc_path (a b c : Bool) :
     Path (boolJoin (boolJoin a b) c) (boolJoin a (boolJoin b c)) :=
   Path.mk [⟨_, _, boolJoin_assoc a b c⟩] (boolJoin_assoc a b c)
 
@@ -597,7 +597,7 @@ theorem cl_meet_false (a : Bool) :
   simp [boolMeet, cl, boolNatGC, boolToNat, natToBool]
 
 -- Theorem 78: Path
-def cl_meet_false_path (a : Bool) :
+noncomputable def cl_meet_false_path (a : Bool) :
     Path (cl boolNatGC (boolMeet false a)) (cl boolNatGC false) :=
   Path.mk [⟨_, _, cl_meet_false a⟩] (cl_meet_false a)
 
@@ -607,7 +607,7 @@ theorem cl_join_true (a : Bool) :
   simp [boolJoin, cl, boolNatGC, boolToNat, natToBool]
 
 -- Theorem 80: Path
-def cl_join_true_path (a : Bool) :
+noncomputable def cl_join_true_path (a : Bool) :
     Path (cl boolNatGC (boolJoin true a)) (cl boolNatGC true) :=
   Path.mk [⟨_, _, cl_join_true a⟩] (cl_join_true a)
 
@@ -616,7 +616,7 @@ def cl_join_true_path (a : Bool) :
 -- ============================================================================
 
 -- Theorem 81: Closure composition path
-def cl_compose_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (a : A) :
+noncomputable def cl_compose_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (a : A) :
     Path (cl (gc_compose gc₁ gc₂) a)
          (gc₁.upper (gc₂.upper (gc₂.lower (gc₁.lower a)))) := Path.refl _
 
@@ -671,12 +671,12 @@ structure AdjData (A B : Type) (pA : PreOrd A) (pB : PreOrd B) where
   antisymm_B : ∀ {x y : B}, pB.le x y → pB.le y x → x = y
 
 -- Theorem 88: Full adjunction chain
-def adj_chain (ad : AdjData A B pA pB) (a : A) :
+noncomputable def adj_chain (ad : AdjData A B pA pB) (a : A) :
     Path (cl ad.gc (cl ad.gc a)) (cl ad.gc a) :=
   cl_idempotent_path ad.gc ad.antisymm_A a
 
 -- Theorem 89: Triangle chain
-def adj_triangle (ad : AdjData A B pA pB) (a : A) :
+noncomputable def adj_triangle (ad : AdjData A B pA pB) (a : A) :
     Path (ad.gc.lower (ad.gc.upper (ad.gc.lower a))) (ad.gc.lower a) :=
   triangle_lower_path ad.gc ad.antisymm_B a
 
@@ -685,32 +685,32 @@ def adj_triangle (ad : AdjData A B pA pB) (a : A) :
 -- ============================================================================
 
 -- Theorem 90: Bool-Nat adjunction data
-def boolNatAdj : AdjData Bool Nat boolPreOrd natPreOrd where
+noncomputable def boolNatAdj : AdjData Bool Nat boolPreOrd natPreOrd where
   gc := boolNatGC
   antisymm_A := fun h1 h2 => Bool.le_antisymm h1 h2
   antisymm_B := fun h1 h2 => Nat.le'_antisymm h1 h2
 
 -- Theorem 91: Full chain on false
-def boolNat_chain_false :
+noncomputable def boolNat_chain_false :
     Path (cl boolNatAdj.gc (cl boolNatAdj.gc false)) (cl boolNatAdj.gc false) :=
   adj_chain boolNatAdj false
 
 -- Theorem 92: Full chain on true
-def boolNat_chain_true :
+noncomputable def boolNat_chain_true :
     Path (cl boolNatAdj.gc (cl boolNatAdj.gc true)) (cl boolNatAdj.gc true) :=
   adj_chain boolNatAdj true
 
 -- Theorem 93: cl(cl(false)) → false concrete
-def boolNat_full_chain :
+noncomputable def boolNat_full_chain :
     Path (cl boolNatAdj.gc (cl boolNatAdj.gc false)) false :=
   Path.trans boolNat_chain_false boolNat_cl_false_path
 
 -- Theorem 94: Composition id path
-def gc_compose_id_path (gc : GC A B pA pB) (a : A) :
+noncomputable def gc_compose_id_path (gc : GC A B pA pB) (a : A) :
     Path ((gc_compose (gc_id pA) gc).lower a) (gc.lower a) := Path.refl _
 
 -- Theorem 95: Right id path
-def gc_compose_id_right_path (gc : GC A B pA pB) (a : A) :
+noncomputable def gc_compose_id_right_path (gc : GC A B pA pB) (a : A) :
     Path ((gc_compose gc (gc_id pB)).lower a) (gc.lower a) := Path.refl _
 
 end ComputationalPaths.Path.Algebra.GaloisConnectionDeep3

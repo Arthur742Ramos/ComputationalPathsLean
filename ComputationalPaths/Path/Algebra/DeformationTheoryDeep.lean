@@ -76,26 +76,26 @@ structure ObstructionSpace (k : Type u) where
 
 /-- An infinitesimal deformation is a computational path
     from one ring element to its deformation. -/
-def infinitesimalDeformation (A : Type u) (a b : A) : Type u :=
+noncomputable def infinitesimalDeformation (A : Type u) (a b : A) : Type u :=
   Path a b
 
 /-- First-order deformation: path in dual numbers. -/
-def firstOrderDeformation (A : Type u) (x y : A) : Type u :=
+noncomputable def firstOrderDeformation (A : Type u) (x y : A) : Type u :=
   Path x y
 
 /-- Def 1: Reflexivity gives the trivial deformation. -/
-def trivialDeformation (A : Type u) (a : A) :
+noncomputable def trivialDeformation (A : Type u) (a : A) :
     infinitesimalDeformation A a a :=
   Path.refl a
 
 /-- Def 2: Symmetry gives the inverse deformation. -/
-def inverseDeformation {A : Type u} {a b : A}
+noncomputable def inverseDeformation {A : Type u} {a b : A}
     (d : infinitesimalDeformation A a b) :
     infinitesimalDeformation A b a :=
   Path.symm d
 
 /-- Def 3: Transitivity gives composition of deformations. -/
-def composeDeformations {A : Type u} {a b c : A}
+noncomputable def composeDeformations {A : Type u} {a b c : A}
     (d1 : infinitesimalDeformation A a b)
     (d2 : infinitesimalDeformation A b c) :
     infinitesimalDeformation A a c :=
@@ -139,7 +139,7 @@ theorem symm_refl_deformation {A : Type u} (a : A) :
 
 /-- The Kodaira-Spencer map sends a tangent vector to a first-order
     deformation, modeled as congrArg of a path through a family. -/
-def kodairaSpencerMap {A B : Type u} (f : A -> B) {a1 a2 : A}
+noncomputable def kodairaSpencerMap {A B : Type u} (f : A -> B) {a1 a2 : A}
     (p : Path a1 a2) : Path (f a1) (f a2) :=
   Path.congrArg f p
 
@@ -187,7 +187,7 @@ structure FormallySmoothLifting (A : Type u) (a b c : A) where
   commutes : Path.trans upper lifting = lower
 
 /-- Def 4: Trivial lifting is formally smooth. -/
-def trivialSmoothLifting {A : Type u} (a b : A) (p : Path a b) :
+noncomputable def trivialSmoothLifting {A : Type u} (a b : A) (p : Path a b) :
     FormallySmoothLifting A a b b where
   upper    := p
   lower    := p
@@ -214,7 +214,7 @@ theorem etale_commutes {A : Type u} {a b c : A}
   E.commutes
 
 /-- Def 5: Trivial étale data. -/
-def trivialEtaleData {A : Type u} (a b : A) (p : Path a b) :
+noncomputable def trivialEtaleData {A : Type u} (a b : A) (p : Path a b) :
     FormallyEtaleData A a b b where
   upper    := p
   lower    := p
@@ -232,7 +232,7 @@ structure ObstructionClass (A : Type u) (a b : A) where
   vanishes    : Path.trans baseDeform obstruction = obstruction
 
 /-- Def 6: Trivial obstruction class with refl base. -/
-def trivialObstruction {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def trivialObstruction {A : Type u} {a b : A} (p : Path a b) :
     ObstructionClass A a b where
   baseDeform  := Path.refl a
   obstruction := p
@@ -245,7 +245,7 @@ theorem obstruction_vanishes {A : Type u} {a b : A}
   obs.vanishes
 
 /-- Extension step: a path from one Artinian level to the next. -/
-def extensionStep (A : Type u) (a b : A) := Path a b
+noncomputable def extensionStep (A : Type u) (a b : A) := Path a b
 
 /-- Theorem 15: Extension steps compose associatively. -/
 theorem extension_steps_assoc {A : Type u} {a b c d : A}
@@ -284,7 +284,7 @@ theorem h1_compatibility {A : Type u} {a b c d : A}
   h.compat
 
 /-- Def 7: H1 with identity fibers. -/
-def h1IdentityFiber {A : Type u} {a b : A} (p q : Path a b) (e : p = q) :
+noncomputable def h1IdentityFiber {A : Type u} {a b : A} (p q : Path a b) (e : p = q) :
     H1Condition A a b b b where
   left    := p
   right   := q
@@ -328,14 +328,14 @@ theorem h4_is_iso_right {A : Type u} {a b : A} (h : H4Condition A a b) :
   h.roundtrip_r
 
 /-- Def 8: H4 condition implies H2 condition. -/
-def h4ImpliesH2 {A : Type u} {a b : A} (h : H4Condition A a b) :
+noncomputable def h4ImpliesH2 {A : Type u} {a b : A} (h : H4Condition A a b) :
     H2Condition A a b where
   forward  := h.isoForward
   backward := h.isoBackward
   leftInv  := h.roundtrip_l
 
 /-- Def 9: H4 can be symmetrized. -/
-def h4Symmetric {A : Type u} {a b : A} (h : H4Condition A a b) :
+noncomputable def h4Symmetric {A : Type u} {a b : A} (h : H4Condition A a b) :
     H4Condition A b a where
   isoForward  := h.isoBackward
   isoBackward := h.isoForward
@@ -364,7 +364,7 @@ structure KuranishiNeighborhood (A : Type u) (center : A) where
   chart  : Path center center
 
 /-- Def 10: Every point has a trivial Kuranishi neighborhood. -/
-def trivialKuranishi {A : Type u} (a : A) :
+noncomputable def trivialKuranishi {A : Type u} (a : A) :
     KuranishiNeighborhood A a where
   radius := 0
   chart  := Path.refl a
@@ -396,7 +396,7 @@ structure CotangentComplex (A : Type u) (x y z : A) where
   degree1 : Path y z
 
 /-- Def 11: Cotangent complex composite. -/
-def cotangentComposite {A : Type u} {x y z : A}
+noncomputable def cotangentComposite {A : Type u} {x y z : A}
     (C : CotangentComplex A x y z) : Path x z :=
   Path.trans C.degree0 C.degree1
 
@@ -442,21 +442,21 @@ structure ProSystem (A : Type u) (a : A) where
   coherence : Path.trans approx (Path.refl a) = approx
 
 /-- Def 12: Level-0 pro-system is trivial. -/
-def proSystemLevel0 {A : Type u} (a : A) :
+noncomputable def proSystemLevel0 {A : Type u} (a : A) :
     ProSystem A a where
   level     := 0
   approx    := Path.refl a
   coherence := trans_refl_right (Path.refl a)
 
 /-- Def 13: Any loop path gives a pro-system. -/
-def proSystemFromLoop {A : Type u} {a : A} (p : Path a a) :
+noncomputable def proSystemFromLoop {A : Type u} {a : A} (p : Path a a) :
     ProSystem A a where
   level     := 1
   approx    := p
   coherence := trans_refl_right p
 
 /-- Transition maps in a pro-system. -/
-def proTransition {A : Type u} {a b c : A}
+noncomputable def proTransition {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -490,7 +490,7 @@ structure ProRepresentable (k : Type u) where
 -- ============================================================
 
 /-- Def 14: Three-fold deformation composition. -/
-def threefoldDeformation {A : Type u} {a b c d : A}
+noncomputable def threefoldDeformation {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) : Path a d :=
   Path.trans (Path.trans p q) r
 
@@ -542,7 +542,7 @@ structure TangentObstructionSeq (A : Type u) (t d o : A) where
   obstructionMap : Path d o
 
 /-- Def 15: Composite of tangent-obstruction sequence. -/
-def tosComposite {A : Type u} {t d o : A}
+noncomputable def tosComposite {A : Type u} {t d o : A}
     (seq : TangentObstructionSeq A t d o) : Path t o :=
   Path.trans seq.tangentMap seq.obstructionMap
 
@@ -577,7 +577,7 @@ structure DeformationEquiv (A : Type u) (a b : A) where
   right_inv : Path.trans backward forward = Path.refl b
 
 /-- Def 16: Deformation equivalence can be reversed. -/
-def deformationEquivSymm {A : Type u} {a b : A}
+noncomputable def deformationEquivSymm {A : Type u} {a b : A}
     (e : DeformationEquiv A a b) : DeformationEquiv A b a where
   forward   := e.backward
   backward  := e.forward
@@ -585,7 +585,7 @@ def deformationEquivSymm {A : Type u} {a b : A}
   right_inv := e.left_inv
 
 /-- Def 17: Identity deformation equivalence. -/
-def deformationEquivRefl {A : Type u} (a : A) :
+noncomputable def deformationEquivRefl {A : Type u} (a : A) :
     DeformationEquiv A a a where
   forward   := Path.refl a
   backward  := Path.refl a
@@ -620,19 +620,19 @@ structure FormalModuliProblem (A : Type u) (base : A) where
   coherence  : Path.trans thickening (Path.refl base) = thickening
 
 /-- Def 18: Every base point gives a trivial formal moduli problem. -/
-def trivialFormalModuli {A : Type u} (a : A) :
+noncomputable def trivialFormalModuli {A : Type u} (a : A) :
     FormalModuliProblem A a where
   thickening := Path.refl a
   coherence  := trans_refl_right (Path.refl a)
 
 /-- Def 19: Any loop gives a formal moduli problem. -/
-def loopFormalModuli {A : Type u} {a : A} (p : Path a a) :
+noncomputable def loopFormalModuli {A : Type u} {a : A} (p : Path a a) :
     FormalModuliProblem A a where
   thickening := p
   coherence  := trans_refl_right p
 
 /-- Def 20: Thickening composed with itself via trans. -/
-def doubleThickening {A : Type u} {a : A}
+noncomputable def doubleThickening {A : Type u} {a : A}
     (F : FormalModuliProblem A a) : Path a a :=
   Path.trans F.thickening F.thickening
 
@@ -665,7 +665,7 @@ theorem versal_versality_self {A : Type u} {a b : A}
   rfl
 
 /-- Def 21: Versal deformation with trivial factorization. -/
-def versalTrivial {A : Type u} (a : A) :
+noncomputable def versalTrivial {A : Type u} (a : A) :
     VersalDeformation A a a where
   universal := Path.refl a
   versality := fun q => q
@@ -676,7 +676,7 @@ structure MiniversalDeformation (A : Type u) (a b : A)
   minimal : Nat
 
 /-- Def 22: Miniversal deformation exists trivially. -/
-def miniversalTrivial {A : Type u} (a : A) :
+noncomputable def miniversalTrivial {A : Type u} (a : A) :
     MiniversalDeformation A a a where
   universal  := Path.refl a
   versality  := fun q => q
@@ -715,7 +715,7 @@ theorem congrArg_threefold {A B : Type u} (f : A -> B)
 
 /-- A higher obstruction: an equality between paths of deformations
     witnessing an obstruction at the next level. -/
-def higherObstruction {A : Type u} {a b : A} (p q : Path a b) : Prop :=
+noncomputable def higherObstruction {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   p = q
 
 /-- Theorem 51: Trivial higher obstruction from refl. -/
@@ -747,7 +747,7 @@ theorem higher_obstruction_congrArg {A B : Type u} (f : A -> B)
 -- ============================================================
 
 /-- Def 23: Fourfold deformation composition. -/
-def fourfoldDeformation {A : Type u} {a b c d e : A}
+noncomputable def fourfoldDeformation {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) : Path a e :=
   Path.trans (Path.trans (Path.trans p q) r) s
 

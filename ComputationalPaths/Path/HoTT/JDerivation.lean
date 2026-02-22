@@ -41,17 +41,17 @@ variable {A : Type u}
 /-- The based path space at `a`: the total space of all points equipped with
 a (lifted) equality proof from `a`. We use `PLift` to promote the `Prop`-valued
 equality `a = y` into `Type u` so it lives in a sigma type. -/
-def BasedPathSpace (a : A) : Type u := Σ (y : A), PLift (a = y)
+noncomputable def BasedPathSpace (a : A) : Type u := Σ (y : A), PLift (a = y)
 
 /-- The center of contraction: `(a, rfl)` is the canonical basepoint
 of `BasedPathSpace a`. -/
-def center (a : A) : BasedPathSpace a := ⟨a, PLift.up rfl⟩
+noncomputable def center (a : A) : BasedPathSpace a := ⟨a, PLift.up rfl⟩
 
 /-- First projection: extract the target endpoint. -/
-def BasedPathSpace.target {a : A} (bp : BasedPathSpace a) : A := bp.1
+noncomputable def BasedPathSpace.target {a : A} (bp : BasedPathSpace a) : A := bp.1
 
 /-- Second projection: extract the equality proof. -/
-def BasedPathSpace.eq_proof {a : A} (bp : BasedPathSpace a) : a = bp.1 := bp.2.down
+noncomputable def BasedPathSpace.eq_proof {a : A} (bp : BasedPathSpace a) : a = bp.1 := bp.2.down
 
 /-! ========================================================================
     § 2. CONTRACTIBILITY OF THE BASED PATH SPACE
@@ -76,7 +76,7 @@ theorem based_path_space_subsingleton (a : A)
   (contraction a bp₁).trans (contraction a bp₂).symm
 
 /-- `BasedPathSpace a` is a `Subsingleton`. -/
-instance instSubsingletonBasedPathSpace (a : A) :
+noncomputable instance instSubsingletonBasedPathSpace (a : A) :
     Subsingleton (BasedPathSpace a) :=
   ⟨based_path_space_subsingleton a⟩
 
@@ -113,7 +113,7 @@ We produce `C y h` by:
 In Lean 4 with UIP on `Eq`, this amounts to `h ▸ c`. But the *derivation*
 goes through contractibility, which is the point: J is a *consequence* of
 the based path space being contractible, not an axiom. -/
-def J {a : A} (C : (y : A) → a = y → Sort v)
+noncomputable def J {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) {y : A} (h : a = y) : C y h := by
   cases h
   exact c
@@ -124,7 +124,7 @@ theorem J_comp {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) : J C c rfl = c := rfl
 
 /-- J stated with explicit arguments (non-implicit target). -/
-def J' {a : A} (C : (y : A) → a = y → Sort v)
+noncomputable def J' {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) (y : A) (h : a = y) : C y h :=
   J C c h
 
@@ -139,7 +139,7 @@ theorem J'_comp {a : A} (C : (y : A) → a = y → Sort v)
 /-- **Transport derived from J**: given a type family `B : A → Sort v` and
 `h : a = y`, we transport elements of `B a` to `B y` using J with the
 constant-endpoint motive `fun y _ => B y`. -/
-def J_transport {a : A} {B : A → Sort v} {y : A}
+noncomputable def J_transport {a : A} {B : A → Sort v} {y : A}
     (h : a = y) (x : B a) : B y :=
   J (fun y _ => B y) x h
 
@@ -176,7 +176,7 @@ theorem J_transport_symm_right {B : A → Sort v} {a b : A}
     ======================================================================== -/
 
 /-- **congrArg derived from J**: applying a function to an equality. -/
-def J_congrArg {B : Type v} (f : A → B) {a y : A}
+noncomputable def J_congrArg {B : Type v} (f : A → B) {a y : A}
     (h : a = y) : f a = f y :=
   J (fun y _ => f a = f y) rfl h
 
@@ -194,7 +194,7 @@ theorem J_congrArg_eq {B : Type v} (f : A → B) {a b : A}
     ======================================================================== -/
 
 /-- **Symmetry derived from J**. -/
-def J_symm {a b : A} (h : a = b) : b = a :=
+noncomputable def J_symm {a b : A} (h : a = b) : b = a :=
   J (fun y _ => y = a) rfl h
 
 /-- J_symm on rfl is rfl. -/
@@ -205,7 +205,7 @@ theorem J_symm_eq {a b : A} (h : a = b) : J_symm h = h.symm := by
   cases h; rfl
 
 /-- **Transitivity derived from J**. -/
-def J_trans {a b c : A} (h₁ : a = b) (h₂ : b = c) : a = c :=
+noncomputable def J_trans {a b c : A} (h₁ : a = b) (h₂ : b = c) : a = c :=
   J (fun c _ => a = c) h₁ h₂
 
 /-- J_trans on rfl rfl is rfl. -/
@@ -222,7 +222,7 @@ theorem J_trans_eq {a b c : A} (h₁ : a = b) (h₂ : b = c) :
 
 /-- **Paulin-Mohring J**: the target-fixed variant of path induction.
 Instead of fixing the source `a`, we fix the target `b`. -/
-def J_PM {b : A} (C : (a : A) → a = b → Sort v)
+noncomputable def J_PM {b : A} (C : (a : A) → a = b → Sort v)
     (c : C b rfl) {a : A} (h : a = b) : C a h := by
   cases h; exact c
 
@@ -231,7 +231,7 @@ theorem J_PM_comp {b : A} (C : (a : A) → a = b → Sort v)
     (c : C b rfl) : J_PM C c rfl = c := rfl
 
 /-- Derive J_PM from J via symmetry: a multi-step derivation. -/
-def J_PM_from_J {b : A} (C : (a : A) → a = b → Sort v)
+noncomputable def J_PM_from_J {b : A} (C : (a : A) → a = b → Sort v)
     (c : C b rfl) {a : A} (h : a = b) : C a h := by
   -- Use J on the reversed proof h.symm : b = a
   have h_symm : b = a := h.symm
@@ -250,13 +250,13 @@ theorem J_PM_from_J_comp {b : A} (C : (a : A) → a = b → Sort v)
     ======================================================================== -/
 
 /-- The free path space: Σ (a b : A), PLift (a = b). -/
-def FreePathSpace (A : Type u) : Type u := Σ (a : A) (b : A), PLift (a = b)
+noncomputable def FreePathSpace (A : Type u) : Type u := Σ (a : A) (b : A), PLift (a = b)
 
 /-- Center of the free path space at a point. -/
-def freeCenter (a : A) : FreePathSpace A := ⟨a, a, PLift.up rfl⟩
+noncomputable def freeCenter (a : A) : FreePathSpace A := ⟨a, a, PLift.up rfl⟩
 
 /-- **Free path induction**: both endpoints vary. Derived from based J. -/
-def J_free (C : (a b : A) → a = b → Sort v)
+noncomputable def J_free (C : (a b : A) → a = b → Sort v)
     (c : ∀ a, C a a rfl) {a b : A} (h : a = b) : C a b h :=
   J (fun b h => C a b h) (c a) h
 
@@ -276,7 +276,7 @@ theorem free_path_space_contr (bp : FreePathSpace A) :
     ======================================================================== -/
 
 /-- Derive based J from free J. -/
-def based_from_free {a : A} (C : (y : A) → a = y → Sort v)
+noncomputable def based_from_free {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) {y : A} (h : a = y) : C y h :=
   J_free (fun x y h => (heq : x = a) → C y (heq ▸ h)) (fun x heq => by cases heq; exact c) h rfl
 
@@ -285,7 +285,7 @@ theorem based_from_free_comp {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) : based_from_free C c rfl = c := rfl
 
 /-- Derive free J from based J. -/
-def free_from_based (C : (a b : A) → a = b → Sort v)
+noncomputable def free_from_based (C : (a b : A) → a = b → Sort v)
     (c : ∀ a, C a a rfl) {a b : A} (h : a = b) : C a b h :=
   J (fun b h => C a b h) (c a) h
 
@@ -346,7 +346,7 @@ theorem J_is_unique {a : A} {C : (y : A) → a = y → Sort v}
 /-- **Path-level J**: the J-eliminator acting on `Path a y` via the proof field.
 The motive sees the target and the proof, and we use Path's proof field
 to invoke the Eq-level J. -/
-def PathJ {a : A} (C : (y : A) → a = y → Sort v)
+noncomputable def PathJ {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) {y : A} (p : Path a y) : C y p.proof :=
   J C c p.proof
 
@@ -361,7 +361,7 @@ theorem PathJ_eq_transport {a : A} {B : A → Sort v}
   cases p with | mk steps proof => cases proof; rfl
 
 /-- Path-level J with endpoint-only motive. -/
-def PathJ_endpoint {a : A} (C : A → Sort v)
+noncomputable def PathJ_endpoint {a : A} (C : A → Sort v)
     (c : C a) {y : A} (p : Path a y) : C y :=
   J (fun y _ => C y) c p.proof
 
@@ -432,13 +432,13 @@ theorem contraction_via_subsingleton (a : A) (bp : BasedPathSpace a) :
 Unlike `BasedPathSpace`, this is NOT a subsingleton because different
 step lists yield different paths. However, its **semantic projection**
 (via `proof`) is contractible. -/
-def BasedPathSpaceP (a : A) : Type u := Σ (y : A), Path a y
+noncomputable def BasedPathSpaceP (a : A) : Type u := Σ (y : A), Path a y
 
 /-- Center of the enriched based path space. -/
-def centerP (a : A) : BasedPathSpaceP a := ⟨a, refl a⟩
+noncomputable def centerP (a : A) : BasedPathSpaceP a := ⟨a, refl a⟩
 
 /-- Semantic projection: map Path-based to Eq-based space. -/
-def BasedPathSpaceP.toBasedEq {a : A} (bp : BasedPathSpaceP a) :
+noncomputable def BasedPathSpaceP.toBasedEq {a : A} (bp : BasedPathSpaceP a) :
     BasedPathSpace a :=
   ⟨bp.1, PLift.up bp.2.proof⟩
 
@@ -463,7 +463,7 @@ theorem basedP_Subsingleton.elim {a : A} (bp₁ bp₂ : BasedPathSpaceP a)
 
 /-- J for sigma types: eliminate on `BasedPathSpace a` by pattern matching
 on the contractibility. -/
-def J_sigma {a : A} (C : BasedPathSpace a → Sort v)
+noncomputable def J_sigma {a : A} (C : BasedPathSpace a → Sort v)
     (c : C (center a)) (bp : BasedPathSpace a) : C bp := by
   have h := contraction a bp
   exact h ▸ c
@@ -473,7 +473,7 @@ theorem J_sigma_comp {a : A} (C : BasedPathSpace a → Sort v)
     (c : C (center a)) : J_sigma C c (center a) = c := rfl
 
 /-- Derive J from J_sigma. -/
-def J_from_sigma {a : A} (C : (y : A) → a = y → Sort v)
+noncomputable def J_from_sigma {a : A} (C : (y : A) → a = y → Sort v)
     (c : C a rfl) {y : A} (h : a = y) : C y h :=
   J_sigma (fun bp => C bp.1 bp.2.down) c ⟨y, PLift.up h⟩
 
@@ -492,7 +492,7 @@ theorem J_eq_J_from_sigma {a : A} (C : (y : A) → a = y → Sort v)
     ======================================================================== -/
 
 /-- Transport in a sigma type along the base. -/
-def sigma_transport {B : A → Type v} {C : (a : A) → B a → Type w}
+noncomputable def sigma_transport {B : A → Type v} {C : (a : A) → B a → Type w}
     {a₁ a₂ : A} (h : a₁ = a₂)
     (p : Σ (b : B a₁), C a₁ b) :
     Σ (b : B a₂), C a₂ b := by
@@ -521,11 +521,11 @@ structure IsContr (X : Type u) where
   contr : ∀ x, x = ctr
 
 /-- BasedPathSpace is contractible. -/
-def basedPathSpace_isContr (a : A) : IsContr (BasedPathSpace a) :=
+noncomputable def basedPathSpace_isContr (a : A) : IsContr (BasedPathSpace a) :=
   ⟨center a, contraction a⟩
 
 /-- From contractibility of BasedPathSpace, derive J. -/
-def J_from_contr {a : A} (_hc : IsContr (BasedPathSpace a))
+noncomputable def J_from_contr {a : A} (_hc : IsContr (BasedPathSpace a))
     (C : (y : A) → a = y → Sort v)
     (c : C a rfl) {y : A} (h : a = y) : C y h := by
   cases h; exact c
@@ -536,7 +536,7 @@ theorem J_from_contr_comp {a : A} (hc : IsContr (BasedPathSpace a))
     (c : C a rfl) : J_from_contr hc C c rfl = c := rfl
 
 /-- From J, derive contractibility of BasedPathSpace. -/
-def contr_from_J
+noncomputable def contr_from_J
     (elim : ∀ (a : A) (C : (y : A) → a = y → Prop) (_ : C a rfl)
               (y : A) (h : a = y), C y h)
     (a : A) : IsContr (BasedPathSpace a) where
@@ -555,7 +555,7 @@ theorem contr_J_roundtrip (a : A) :
     ======================================================================== -/
 
 /-- Nested J: induction on two equalities simultaneously. -/
-def J₂ {a : A} (C : (b c : A) → a = b → a = c → Sort v)
+noncomputable def J₂ {a : A} (C : (b c : A) → a = b → a = c → Sort v)
     (c : C a a rfl rfl) {b d : A} (h₁ : a = b) (h₂ : a = d) :
     C b d h₁ h₂ := by
   cases h₁; cases h₂; exact c
@@ -565,7 +565,7 @@ theorem J₂_comp {a : A} (C : (b c : A) → a = b → a = c → Sort v)
     (c : C a a rfl rfl) : J₂ C c rfl rfl = c := rfl
 
 /-- Triple J. -/
-def J₃ {a : A}
+noncomputable def J₃ {a : A}
     (C : (b c d : A) → a = b → a = c → a = d → Sort v)
     (c : C a a a rfl rfl rfl)
     {b d e : A} (h₁ : a = b) (h₂ : a = d) (h₃ : a = e) :
@@ -582,13 +582,13 @@ theorem J₃_comp {a : A}
     ======================================================================== -/
 
 /-- Code family: for each `y`, the type of "codes" for `a = y`. -/
-def Code (a : A) (y : A) : Prop := a = y
+noncomputable def Code (a : A) (y : A) : Prop := a = y
 
 /-- Encode: from `a = y` to `Code a y`. -/
-def encode {a y : A} (h : a = y) : Code a y := h
+noncomputable def encode {a y : A} (h : a = y) : Code a y := h
 
 /-- Decode: from `Code a y` to `a = y`. -/
-def decode {a y : A} (c : Code a y) : a = y := c
+noncomputable def decode {a y : A} (c : Code a y) : a = y := c
 
 /-- Encode-decode round trip. -/
 theorem encode_decode_id {a y : A} (c : Code a y) :
@@ -606,7 +606,7 @@ theorem code_center {a : A} : Code a a := rfl
     ======================================================================== -/
 
 /-- Leibniz's principle: equal elements satisfy the same predicates. -/
-def leibniz {a b : A} (h : a = b) (P : A → Prop) : P a → P b :=
+noncomputable def leibniz {a b : A} (h : a = b) (P : A → Prop) : P a → P b :=
   J (fun y _ => P a → P y) id h
 
 /-- Leibniz on rfl is the identity. -/
@@ -619,7 +619,7 @@ theorem leibniz_eq_transport {a b : A} (h : a = b) (P : A → Prop) (x : P a) :
   cases h; rfl
 
 /-- Path-level Leibniz. -/
-def Path_leibniz {a b : A} (p : Path a b) (P : A → Prop) : P a → P b :=
+noncomputable def Path_leibniz {a b : A} (p : Path a b) (P : A → Prop) : P a → P b :=
   leibniz p.proof P
 
 /-- Path_leibniz on refl is the identity. -/
@@ -661,7 +661,7 @@ theorem K_axiom {a : A} (h : a = a) : h = rfl :=
   Subsingleton.elim h rfl
 
 /-- Using K and J, Streicher's axiom K is derivable. -/
-def streicher_K {a : A} (C : a = a → Sort v)
+noncomputable def streicher_K {a : A} (C : a = a → Sort v)
     (c : C rfl) (h : a = a) : C h := by
   have : h = rfl := K_axiom h
   rw [this]; exact c
@@ -741,12 +741,12 @@ theorem J_symm_symm {a b : A} (h : a = b) :
 
 /-- The universal property of the based path space: sections of any
 family `C` over `BasedPathSpace a` are in bijection with values at center. -/
-def section_from_center {a : A} (C : BasedPathSpace a → Sort v)
+noncomputable def section_from_center {a : A} (C : BasedPathSpace a → Sort v)
     (c : C (center a)) : ∀ bp, C bp :=
   J_sigma C c
 
 /-- The bijection: evaluating a section at center. -/
-def center_from_section {a : A} (C : BasedPathSpace a → Sort v)
+noncomputable def center_from_section {a : A} (C : BasedPathSpace a → Sort v)
     (s : ∀ bp, C bp) : C (center a) :=
   s (center a)
 

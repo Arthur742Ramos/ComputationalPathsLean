@@ -47,21 +47,21 @@ abbrev Sphere (n : Nat) : Type u := TopCat.sphere (n := n)
 /-! ## EHP maps -/
 
 /-- The suspension homomorphism E on higher homotopy groups. -/
-def eMap (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1)) :
+noncomputable def eMap (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1)) :
     HigherHomotopy.PiN n (Sphere k) a →
       HigherHomotopy.PiN (n + 1) (Sphere (k + 1)) a1 :=
   fun _ =>
     HigherHomotopyGroups.piN_one (X := Sphere (k + 1)) (n := n + 1) a1
 
 /-- The James-Hopf map H on higher homotopy groups. -/
-def hMap (n k : Nat) (a1 : Sphere (k + 1)) (a2 : Sphere (2 * k + 1)) :
+noncomputable def hMap (n k : Nat) (a1 : Sphere (k + 1)) (a2 : Sphere (2 * k + 1)) :
     HigherHomotopy.PiN (n + 1) (Sphere (k + 1)) a1 →
       HigherHomotopy.PiN (n + 1) (Sphere (2 * k + 1)) a2 :=
   fun _ =>
     HigherHomotopyGroups.piN_one (X := Sphere (2 * k + 1)) (n := n + 1) a2
 
 /-- The connecting map P on higher homotopy groups. -/
-def pMap (n k : Nat) (a2 : Sphere (2 * k - 1)) (a : Sphere k) :
+noncomputable def pMap (n k : Nat) (a2 : Sphere (2 * k - 1)) (a : Sphere k) :
     HigherHomotopy.PiN n (Sphere (2 * k - 1)) a2 →
       HigherHomotopy.PiN (n - 1) (Sphere k) a :=
   fun _ =>
@@ -83,7 +83,7 @@ structure EHPSequenceData (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
     HigherHomotopy.PiN (n - 1) (Sphere k) a
 
 /-- The canonical EHP sequence data built from the E, H, and P maps. -/
-def ehpSequence (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
+noncomputable def ehpSequence (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
     (a2 : Sphere (2 * k + 1)) (a3 : Sphere (2 * k - 1)) :
     EHPSequenceData n k a a1 a2 a3 where
   E := eMap n k a a1
@@ -106,7 +106,7 @@ structure EHPExact (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
       (HigherHomotopyGroups.piN_one (X := Sphere k) (n := n - 1) a)
 
 /-- Exactness witnesses for the canonical EHP sequence. -/
-def ehpExact (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
+noncomputable def ehpExact (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
     (a2 : Sphere (2 * k + 1)) (a3 : Sphere (2 * k - 1)) :
     EHPExact n k a a1 a2 a3 (ehpSequence n k a a1 a2 a3) := by
   refine { exact_EH := ?_, exact_P := ?_ }
@@ -118,16 +118,16 @@ def ehpExact (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
 /-! ## Freudenthal agreement -/
 
 /-- Stable range predicate for the EHP sequence. -/
-def ehpStableRange (n k : Nat) : Prop := (n = n) ∧ (k = k)
+noncomputable def ehpStableRange (n k : Nat) : Prop := (n = n) ∧ (k = k)
 
 /-- E map packaged from the Freudenthal suspension preview. -/
-def freudenthalE (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1)) :
+noncomputable def freudenthalE (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1)) :
     HigherHomotopy.PiN n (Sphere k) a →
       HigherHomotopy.PiN (n + 1) (Sphere (k + 1)) a1 :=
   eMap n k a a1
 
 /-- In the stable range, E agrees with the Freudenthal suspension map. -/
-def e_agrees_with_freudenthal (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
+noncomputable def e_agrees_with_freudenthal (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
     (hstable : ehpStableRange n k) :
     Path (eMap n k a a1) (freudenthalE n k a a1) := by
   cases hstable with
@@ -139,7 +139,7 @@ def e_agrees_with_freudenthal (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
 /-! ## Hopf invariant one detection -/
 
 /-- Hopf invariant one predicate for a Hopf invariant datum. -/
-def hopfInvariantOne (data : HopfFibrationData) (Hdata : HopfInvariantData data) : Prop :=
+noncomputable def hopfInvariantOne (data : HopfFibrationData) (Hdata : HopfInvariantData data) : Prop :=
   Hdata.hopfInvariant (eta data) = 1
 
 /-- The EHP H map detects Hopf invariant one (via Hopf invariant data). -/

@@ -34,7 +34,7 @@ inductive Generated2Cells
       Generated2Cells B (Path.trans p q) (Path.trans p' q)
 
 /-- Interpret generated basis terms as `RwEqProp` witnesses. -/
-def Generated2Cells.toRwEqProp
+noncomputable def Generated2Cells.toRwEqProp
     {B : {A : Type u} → {a b : A} → Path a b → Path a b → Prop}
     (toRwEqB :
       ∀ {A : Type u} {a b : A} {p q : Path a b}, B p q → RwEqProp p q) :
@@ -59,7 +59,7 @@ def Generated2Cells.toRwEqProp
       exact ⟨rweq_trans_congr_left q ih'⟩
 
 /-- Choose a concrete `RwEq` witness from a generated derivation. -/
-def Generated2Cells.toRwEq
+noncomputable def Generated2Cells.toRwEq
     {B : {A : Type u} → {a b : A} → Path a b → Path a b → Prop}
     (toRwEqB :
       ∀ {A : Type u} {a b : A} {p q : Path a b}, B p q → RwEqProp p q)
@@ -78,7 +78,7 @@ structure HomotopyBasis where
 /-! ## Critical-pair basis cells -/
 
 /-- Joinability witness yields an `RwEqProp` 2-cell witness. -/
-def rweqProp_of_joinable
+noncomputable def rweqProp_of_joinable
     {A : Type u} {a b : A} {p q : Path a b}
     (h : JoinableRw p q) : RwEqProp p q := by
   rcases h with ⟨r, hp, hq⟩
@@ -86,7 +86,7 @@ def rweqProp_of_joinable
   rcases rweqProp_of_rw hq with ⟨hq'⟩
   exact ⟨RwEq.trans hp' (RwEq.symm hq')⟩
 
-def rweq_of_joinable
+noncomputable def rweq_of_joinable
     {A : Type u} {a b : A} {p q : Path a b}
     (h : JoinableRw p q) : RwEq p q :=
   rweq_of_rweqProp (rweqProp_of_joinable h)
@@ -101,7 +101,7 @@ inductive CriticalPairBasisCell :
       (h : Step p q) :
       CriticalPairBasisCell p q
 
-def CriticalPairBasisCell.toRwEqProp :
+noncomputable def CriticalPairBasisCell.toRwEqProp :
     {A : Type u} → {a b : A} → {p q : Path a b} →
       CriticalPairBasisCell p q → RwEqProp p q
   | _, _, _, _, _, .critical _ h => rweqProp_of_joinable h
@@ -139,7 +139,7 @@ theorem critical_pair_resolutions_form_homotopy_basis :
   intro A a b p q h
   exact reduceRwEqToBasis h
 
-def criticalPairHomotopyBasis : HomotopyBasis where
+noncomputable def criticalPairHomotopyBasis : HomotopyBasis where
   generators := CriticalPairBasisCell
   generates := reduceRwEqToBasis
 

@@ -69,14 +69,14 @@ inductive AccPath {W : Type u} (F : KripkeFrame W) : W → W → Type u where
   | chain : AccPath F w₁ w₂ → AccPath F w₂ w₃ → AccPath F w₁ w₃
 
 /-- Length of an accessibility path. -/
-def AccPath.length {W : Type u} {F : KripkeFrame W} {w₁ w₂ : W} :
+noncomputable def AccPath.length {W : Type u} {F : KripkeFrame W} {w₁ w₂ : W} :
     AccPath F w₁ w₂ → Nat
   | single _ => 1
   | refl => 0
   | chain p q => p.length + q.length
 
 /-- Reverse an accessibility path (requires symmetry). -/
-def AccPath.reverse {W : Type u} {F : SymmetricFrame W} {w₁ w₂ : W} :
+noncomputable def AccPath.reverse {W : Type u} {F : SymmetricFrame W} {w₁ w₂ : W} :
     AccPath F.toKripkeFrame w₁ w₂ → AccPath F.toKripkeFrame w₂ w₁
   | single h => single (F.symm _ _ h)
   | refl => refl
@@ -88,11 +88,11 @@ def AccPath.reverse {W : Type u} {F : SymmetricFrame W} {w₁ w₂ : W} :
 abbrev Valuation (W : Type u) := W → Prop
 
 /-- Box operator: □φ holds at w iff φ holds at all accessible worlds. -/
-def boxOp {W : Type u} (F : KripkeFrame W) (φ : Valuation W) : Valuation W :=
+noncomputable def boxOp {W : Type u} (F : KripkeFrame W) (φ : Valuation W) : Valuation W :=
   fun w => ∀ w' : W, F.acc w w' → φ w'
 
 /-- Diamond operator: ◇φ holds at w iff φ holds at some accessible world. -/
-def diamondOp {W : Type u} (F : KripkeFrame W) (φ : Valuation W) : Valuation W :=
+noncomputable def diamondOp {W : Type u} (F : KripkeFrame W) (φ : Valuation W) : Valuation W :=
   fun w => ∃ w' : W, F.acc w w' ∧ φ w'
 
 /-- Box-diamond duality: □φ ↔ ¬◇¬φ. -/
@@ -193,7 +193,7 @@ structure Bisimulation {W₁ W₂ : Type u}
     ∃ w₁', F₁.acc w₁ w₁' ∧ rel w₁' w₂'
 
 /-- Identity bisimulation. -/
-def idBisimulation {W : Type u} (F : KripkeFrame W) :
+noncomputable def idBisimulation {W : Type u} (F : KripkeFrame W) :
     Bisimulation F F where
   rel := fun w₁ w₂ => w₁ = w₂
   zig := by
@@ -240,16 +240,16 @@ theorem bisimulation_preserves_diamond {W₁ W₂ : Type u}
 /-! ## Path-based Frame Properties -/
 
 /-- In a reflexive frame, accessibility paths include self-loops. -/
-def refl_frame_self_path {W : Type u} (F : ReflexiveFrame W) (w : W) :
+noncomputable def refl_frame_self_path {W : Type u} (F : ReflexiveFrame W) (w : W) :
     AccPath F.toKripkeFrame w w := AccPath.refl
 
 /-- Accessibility paths compose. -/
-def acc_path_compose {W : Type u} (F : KripkeFrame W)
+noncomputable def acc_path_compose {W : Type u} (F : KripkeFrame W)
     (w₁ w₂ w₃ : W) (p : AccPath F w₁ w₂) (q : AccPath F w₂ w₃) :
     AccPath F w₁ w₃ := AccPath.chain p q
 
 /-- In a transitive frame, single-step accessibility implies path existence. -/
-def trans_frame_path {W : Type u} (F : TransitiveFrame W)
+noncomputable def trans_frame_path {W : Type u} (F : TransitiveFrame W)
     (w₁ w₂ : W) (h : F.toKripkeFrame.acc w₁ w₂) :
     AccPath F.toKripkeFrame w₁ w₂ := AccPath.single h
 

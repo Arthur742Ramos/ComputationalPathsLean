@@ -69,12 +69,12 @@ structure CommRing (R : Type u) where
   mul_add : ∀ a b c, mul a (add b c) = add (mul a b) (mul a c)
 
 /-- Path witnessing associativity of addition. -/
-def CommRing.add_assoc_path {R : Type u} (Ri : CommRing R) (a b c : R) :
+noncomputable def CommRing.add_assoc_path {R : Type u} (Ri : CommRing R) (a b c : R) :
     Path (Ri.add (Ri.add a b) c) (Ri.add a (Ri.add b c)) :=
   Path.stepChain (Ri.add_assoc a b c)
 
 /-- Path witnessing commutativity of addition. -/
-def CommRing.add_comm_path {R : Type u} (Ri : CommRing R) (a b : R) :
+noncomputable def CommRing.add_comm_path {R : Type u} (Ri : CommRing R) (a b : R) :
     Path (Ri.add a b) (Ri.add b a) :=
   Path.stepChain (Ri.add_comm a b)
 
@@ -101,16 +101,16 @@ structure FormalGroupLaw (R : Type u) (Ri : CommRing R) where
   comm : ∀ i j, Path (series.coeff i j) (series.coeff j i)
 
 /-- The additive formal group law: F_a(x,y) = x + y. -/
-private def addCoeff (R : Type u) (Ri : CommRing R) (i j : Nat) : R :=
+private noncomputable def addCoeff (R : Type u) (Ri : CommRing R) (i j : Nat) : R :=
   if i = 1 ∧ j = 0 then Ri.one
   else if i = 0 ∧ j = 1 then Ri.one
   else Ri.zero
 
 /-- Build a reflexive path through congruence and composition. -/
-private def path_self_chain {A : Type u} (a : A) : Path a a :=
+private noncomputable def path_self_chain {A : Type u} (a : A) : Path a a :=
   Path.trans (Path.congrArg (fun x => x) (Path.refl a)) (Path.symm (Path.refl a))
 
-def additiveFGL (R : Type u) (Ri : CommRing R) : FormalGroupLaw R Ri where
+noncomputable def additiveFGL (R : Type u) (Ri : CommRing R) : FormalGroupLaw R Ri where
   series := { coeff := addCoeff R Ri }
   unit_left_0 := by unfold addCoeff; simp; exact path_self_chain _
   unit_left_1 := by unfold addCoeff; simp; exact path_self_chain _
@@ -137,13 +137,13 @@ def additiveFGL (R : Type u) (Ri : CommRing R) : FormalGroupLaw R Ri where
           · simp [h1, h2, h3, h4]; exact path_self_chain _
 
 /-- The multiplicative formal group law: F_m(x,y) = x + y + xy. -/
-private def mulCoeff (R : Type u) (Ri : CommRing R) (i j : Nat) : R :=
+private noncomputable def mulCoeff (R : Type u) (Ri : CommRing R) (i j : Nat) : R :=
   if i = 1 ∧ j = 0 then Ri.one
   else if i = 0 ∧ j = 1 then Ri.one
   else if i = 1 ∧ j = 1 then Ri.one
   else Ri.zero
 
-def multiplicativeFGL (R : Type u) (Ri : CommRing R) : FormalGroupLaw R Ri where
+noncomputable def multiplicativeFGL (R : Type u) (Ri : CommRing R) : FormalGroupLaw R Ri where
   series := { coeff := mulCoeff R Ri }
   unit_left_0 := by unfold mulCoeff; simp; exact path_self_chain _
   unit_left_1 := by unfold mulCoeff; simp; exact path_self_chain _
@@ -198,7 +198,7 @@ structure LazardRing where
 
 /-- Path witnessing that the Lazard ring classifies the additive FGL via
     sending all higher generators to zero. -/
-def lazard_additive_classify (L : LazardRing.{u}) (R : Type u)
+noncomputable def lazard_additive_classify (L : LazardRing.{u}) (R : Type u)
     (Ri : CommRing R) :
     Path (L.classify R Ri (additiveFGL R Ri) (L.ring.zero))
          (L.classify R Ri (additiveFGL R Ri) (L.ring.zero)) :=
@@ -382,25 +382,25 @@ theorem cobordismStep_sound {A : Type u} {a b : A} {p q : Path a b}
 /-! ## RwEq Constructions -/
 
 /-- RwEq: additive FGL unit axiom (first). -/
-def rwEq_additive_unit (R : Type u) (Ri : CommRing R) :
+noncomputable def rwEq_additive_unit (R : Type u) (Ri : CommRing R) :
     let F := additiveFGL R Ri
     RwEq (F.unit_left_0) (F.unit_right_0) :=
   RwEq.refl _
 
 /-- Multi-step Path: additive FGL commutativity coherence. -/
-def additive_comm_path (R : Type u) (Ri : CommRing R) (i j : Nat) :
+noncomputable def additive_comm_path (R : Type u) (Ri : CommRing R) (i j : Nat) :
     Path ((additiveFGL R Ri).series.coeff i j)
          ((additiveFGL R Ri).series.coeff j i) :=
   (additiveFGL R Ri).comm i j
 
 /-- Composite Path: Conner-Floyd round-trip. -/
-def conner_floyd_roundtrip (CF : ConnerFloyd.{u})
+noncomputable def conner_floyd_roundtrip (CF : ConnerFloyd.{u})
     (X : SmoothVar.{u}) (n : Int) (x : CF.baseChange X n) :
     Path (CF.inverse X n (CF.compare X n x)) x :=
   CF.left_inv X n x
 
 /-- Composite Path: universality + naturality coherence. -/
-def universality_naturality (U : Universality.{u})
+noncomputable def universality_naturality (U : Universality.{u})
     (A : OrientedCohomology.{u})
     {X Y : SmoothVar.{u}} (f : VarMor X Y) (n : Int)
     (x : U.omega.group Y n) :

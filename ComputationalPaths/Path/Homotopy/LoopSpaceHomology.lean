@@ -50,17 +50,17 @@ structure GradedMap (M N : GradedGroup) where
   map_zero : ∀ (n : Nat), map n (M.zero n) = N.zero n
 
 /-- `Path`-typed witness that a graded map preserves zero. -/
-def GradedMap.mapZeroPath {M N : GradedGroup} (f : GradedMap M N) (n : Nat) :
+noncomputable def GradedMap.mapZeroPath {M N : GradedGroup} (f : GradedMap M N) (n : Nat) :
     Path (f.map n (M.zero n)) (N.zero n) :=
   Path.stepChain (f.map_zero n)
 
 /-- The identity graded map. -/
-def GradedMap.id' (M : GradedGroup) : GradedMap M M where
+noncomputable def GradedMap.id' (M : GradedGroup) : GradedMap M M where
   map := fun _ x => x
   map_zero := fun _ => rfl
 
 /-- Composition of graded maps. -/
-def GradedMap.comp {M N P : GradedGroup}
+noncomputable def GradedMap.comp {M N P : GradedGroup}
     (g : GradedMap N P) (f : GradedMap M N) :
     GradedMap M P where
   map := fun n x => g.map n (f.map n x)
@@ -101,12 +101,12 @@ theorem PontryaginData.unit_deg (P : PontryaginData) :
 /-! ## Trivial Example: H_*(ΩX) for contractible X -/
 
 /-- The trivial graded group (all components are PUnit). -/
-def trivialGradedGroup : GradedGroup where
+noncomputable def trivialGradedGroup : GradedGroup where
   component := fun _ => PUnit
   zero := fun _ => PUnit.unit
 
 /-- The trivial Pontryagin product (for contractible loop spaces). -/
-def trivialPontryagin : PontryaginData where
+noncomputable def trivialPontryagin : PontryaginData where
   graded := trivialGradedGroup
   mul := fun _ _ _ _ => PUnit.unit
   unit := PUnit.unit
@@ -116,18 +116,18 @@ def trivialPontryagin : PontryaginData where
 /-! ## Integer-valued Example -/
 
 /-- The component type for a graded group concentrated in degree 0 with ℤ. -/
-def intOrUnit : Nat → Type
+noncomputable def intOrUnit : Nat → Type
   | 0 => Int
   | _ + 1 => PUnit
 
 /-- Zero element for the int-or-unit graded group. -/
-def intOrUnitZero : (n : Nat) → intOrUnit n
+noncomputable def intOrUnitZero : (n : Nat) → intOrUnit n
   | 0 => (0 : Int)
   | _ + 1 => PUnit.unit
 
 /-- A graded group concentrated in degree 0 with carrier ℤ.
 This models H₀(ΩX) ≃ ℤ. -/
-def intDeg0 : GradedGroup where
+noncomputable def intDeg0 : GradedGroup where
   component := intOrUnit
   zero := intOrUnitZero
 
@@ -141,7 +141,7 @@ theorem intDeg0_component_succ (n : Nat) :
 /-! ## Loop Space Homology Maps -/
 
 /-- A map of graded groups induced by a loop space map. -/
-def loopSpaceHomologyMap {M N : GradedGroup}
+noncomputable def loopSpaceHomologyMap {M N : GradedGroup}
     (f : (n : Nat) → M.component n → N.component n)
     (hf : ∀ (n : Nat), f n (M.zero n) = N.zero n) :
     GradedMap M N where
@@ -149,17 +149,17 @@ def loopSpaceHomologyMap {M N : GradedGroup}
   map_zero := hf
 
 /-- The zero map between graded groups (sends everything to zero). -/
-def zeroGradedMap (M N : GradedGroup) : GradedMap M N where
+noncomputable def zeroGradedMap (M N : GradedGroup) : GradedMap M N where
   map := fun n _ => N.zero n
   map_zero := fun _ => rfl
 
 /-- The zero map from the trivial graded group to any graded group. -/
-def fromTrivial (N : GradedGroup) : GradedMap trivialGradedGroup N where
+noncomputable def fromTrivial (N : GradedGroup) : GradedMap trivialGradedGroup N where
   map := fun n _ => N.zero n
   map_zero := fun _ => rfl
 
 /-- The zero map from any graded group to the trivial graded group. -/
-def toTrivial (M : GradedGroup) : GradedMap M trivialGradedGroup where
+noncomputable def toTrivial (M : GradedGroup) : GradedMap M trivialGradedGroup where
   map := fun _ _ => PUnit.unit
   map_zero := fun _ => rfl
 
@@ -171,7 +171,7 @@ is graded commutative. -/
 /-- Graded commutativity: a · b = (-1)^{pq} · b · a.
 
 In our simplified setting, we just state the sign rule. -/
-def gradedCommSign (p q : Nat) : Int :=
+noncomputable def gradedCommSign (p q : Nat) : Int :=
   if (p * q) % 2 = 0 then 1 else -1
 
 /-- The sign for degree (0, n) is always +1. -/

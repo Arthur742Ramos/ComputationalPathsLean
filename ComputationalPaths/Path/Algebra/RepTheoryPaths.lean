@@ -57,7 +57,7 @@ structure GroupRep (G : Type u) (V : Type u) where
   action_mul : ∀ g h v, Path (action (grp.mul g h) v) (action g (action h v))
 
 /-- Path.trans composition: associativity of triple action. -/
-def action_triple_assoc {G V : Type u} (ρ : GroupRep G V) (g h k : G) (v : V) :
+noncomputable def action_triple_assoc {G V : Type u} (ρ : GroupRep G V) (g h k : G) (v : V) :
     Path (ρ.action (ρ.grp.mul (ρ.grp.mul g h) k) v)
          (ρ.action g (ρ.action h (ρ.action k v))) :=
   Path.trans
@@ -74,12 +74,12 @@ structure RepMorphism {G V W : Type u} (ρ : GroupRep G V) (σ : GroupRep G W) w
   equivariant : ∀ g v, Path (map (ρ.action g v)) (σ.action g (map v))
 
 /-- Identity intertwiner. -/
-def RepMorphism.id {G V : Type u} (ρ : GroupRep G V) : RepMorphism ρ ρ where
+noncomputable def RepMorphism.id {G V : Type u} (ρ : GroupRep G V) : RepMorphism ρ ρ where
   map := fun v => v
   equivariant := fun _ _ => Path.refl _
 
 /-- Composition of intertwiners using Path.trans. -/
-def RepMorphism.comp {G V W X : Type u} {ρ : GroupRep G V} {σ : GroupRep G W}
+noncomputable def RepMorphism.comp {G V W X : Type u} {ρ : GroupRep G V} {σ : GroupRep G W}
     {τ : GroupRep G X} (f : RepMorphism ρ σ) (g : RepMorphism σ τ) :
     RepMorphism ρ τ where
   map := fun v => g.map (f.map v)
@@ -107,7 +107,7 @@ structure SchurLemma {G V W : Type u} (ρ : GroupRep G V) (σ : GroupRep G W)
   right_inv : ∀ w, Path (f.map (inv w)) w
 
 /-- Path.trans: left-right inverse round-trip for Schur. -/
-def schur_roundtrip {G V W : Type u} {ρ : GroupRep G V} {σ : GroupRep G W}
+noncomputable def schur_roundtrip {G V W : Type u} {ρ : GroupRep G V} {σ : GroupRep G W}
     {f : RepMorphism ρ σ} (sch : SchurLemma ρ σ f) (v : V) :
     Path (sch.inv (f.map (sch.inv (f.map v)))) v :=
   Path.trans
@@ -133,7 +133,7 @@ structure MaschkeData {G V : Type u} (ρ : GroupRep G V) where
   proj_fixes_sub : ∀ v, sub v → Path (proj v) v
 
 /-- Path.trans: composing equivariance with idempotence. -/
-def maschke_equivariant_idem {G V : Type u} {ρ : GroupRep G V}
+noncomputable def maschke_equivariant_idem {G V : Type u} {ρ : GroupRep G V}
     (m : MaschkeData ρ) (g : G) (v : V) :
     Path (m.proj (m.proj (ρ.action g v))) (ρ.action g (m.proj v)) :=
   Path.trans
@@ -177,12 +177,12 @@ structure OrthogonalityWitness (G : Type u) where
   self_inner : Path (ip.inner χ₁ χ₁) delta
 
 /-- Path.symm: orthogonality is symmetric. -/
-def orthogonality_symm {G : Type u} (w : OrthogonalityWitness G) :
+noncomputable def orthogonality_symm {G : Type u} (w : OrthogonalityWitness G) :
     Path w.zero (w.ip.inner w.χ₁ w.χ₂) :=
   Path.symm w.orthogonal_distinct
 
 /-- Path.trans: composing symmetry with orthogonality. -/
-def inner_product_comm_ortho {G : Type u} (w : OrthogonalityWitness G) :
+noncomputable def inner_product_comm_ortho {G : Type u} (w : OrthogonalityWitness G) :
     Path (w.ip.inner w.χ₂ w.χ₁) w.zero :=
   Path.trans
     (w.ip.symmetric w.χ₂ w.χ₁)
@@ -207,7 +207,7 @@ structure RegularRep (G V : Type u) where
     Path (action g f h) (f (grp.mul (grp.inv g) h))
 
 /-- Path.trans: regular representation equivariance composition. -/
-def regular_rep_compose {G V : Type u} (R : RegularRep G V) (g h : G) (f : G → V) :
+noncomputable def regular_rep_compose {G V : Type u} (R : RegularRep G V) (g h : G) (f : G → V) :
     Path (R.action (R.grp.mul g h) f) (R.action g (R.action h f)) :=
   R.action_mul g h f
 

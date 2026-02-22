@@ -43,18 +43,18 @@ namespace AdamsSequence
 variable (A : AdamsSequence.{u})
 
 /-- The distinguished `E₂` representative at bidegree `(0,0)`. -/
-def e2Base : A.pages.term 0 0 :=
+noncomputable def e2Base : A.pages.term 0 0 :=
   A.pages.base 0 0
 
 /-- The `d₂ ∘ d₂ = 0` witness at `(0,0)`. -/
-def d2Boundary :
+noncomputable def d2Boundary :
     Path
       (A.differentials.d 2 0 0 (A.differentials.d 2 0 0 A.e2Base))
       A.e2Base :=
   A.differentials.dSquaredPath 2 0 0
 
 /-- Stabilization witness in the limiting term at `(0,0)`. -/
-def convergenceWitness (r : Nat) :
+noncomputable def convergenceWitness (r : Nat) :
     Path
       (A.convergence.embed 0 0 (A.pages.shift r 0 0 A.e2Base))
       (A.convergence.embed 0 0 A.e2Base) :=
@@ -69,7 +69,7 @@ noncomputable def filtration_rweq (s r : Nat) :
   rweq_of_step (A.filtrationStep s r)
 
 /-- Loop induced by a filtration step and its inverse. -/
-def filtrationLoop (s r : Nat) :
+noncomputable def filtrationLoop (s r : Nat) :
     Path (A.filtration (s + 1) r A.e2Base) (A.filtration (s + 1) r A.e2Base) :=
   Path.trans (A.filtrationPath s r) (Path.symm (A.filtrationPath s r))
 
@@ -79,7 +79,7 @@ noncomputable def filtrationLoop_contracts (s r : Nat) :
   exact rweq_cmpA_inv_right (A.filtrationPath s r)
 
 /-- Boundary witness mapped into the limiting term. -/
-def boundaryInLimit (r : Nat) :
+noncomputable def boundaryInLimit (r : Nat) :
     Path
       (A.convergence.embed 0 0
         (A.differentials.d r 0 0 (A.differentials.d r 0 0 A.e2Base)))
@@ -87,7 +87,7 @@ def boundaryInLimit (r : Nat) :
   A.convergence.boundaryToLimit r 0 0
 
 /-- Shifted `d² = 0` witness mapped into the limiting term. -/
-def shiftedBoundaryInLimit (r : Nat) :
+noncomputable def shiftedBoundaryInLimit (r : Nat) :
     Path
       (A.convergence.embed 0 0
         (A.pages.shift r 0 0
@@ -106,7 +106,7 @@ noncomputable def convergenceWitness_rweq (r : Nat) :
 end AdamsSequence
 
 /-- Canonical trivial Adams package. -/
-def trivialAdamsSequence : AdamsSequence where
+noncomputable def trivialAdamsSequence : AdamsSequence where
   pages := trivialPages
   differentials := trivialDifferentials
   convergence := trivialConvergence

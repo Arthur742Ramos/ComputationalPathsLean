@@ -105,7 +105,7 @@ noncomputable def riemannHilbert_cancel_rweq (M : Obj) :
 end DModulePathData
 
 /-- Build D-module path data from path-level witnesses. -/
-def mkDModulePathData
+noncomputable def mkDModulePathData
     {Obj : Type u}
     (tensor : Obj → Obj → Obj)
     (deRham : Obj → Obj)

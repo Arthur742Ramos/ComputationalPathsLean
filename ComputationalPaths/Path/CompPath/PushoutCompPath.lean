@@ -30,9 +30,9 @@ universe u
 inductive PUnit' : Type u where
   | unit : PUnit'
 
-instance : Inhabited PUnit' := ⟨PUnit'.unit⟩
+noncomputable instance : Inhabited PUnit' := ⟨PUnit'.unit⟩
 
-instance : Subsingleton PUnit' where
+noncomputable instance : Subsingleton PUnit' where
   allEq := by
     intro a b
     cases a <;> cases b <;> rfl
@@ -48,7 +48,7 @@ namespace IsPathConnected
 variable {A : Type u} [h : IsPathConnected A]
 
 /-- Connect any two points in a path-connected space. -/
-def connect (x y : A) : Path x y :=
+noncomputable def connect (x y : A) : Path x y :=
   Path.trans (Path.symm (IsPathConnected.connected x)) (IsPathConnected.connected y)
 
 end IsPathConnected
@@ -62,7 +62,7 @@ inductive PushoutCompPathRel (A : Type u) (B : Type u) (C : Type u)
   | glue (c : C) : PushoutCompPathRel A B C f g (Sum.inl (f c)) (Sum.inr (g c))
 
 /-- Pushout of a span `A ← C → B` as a quotient of `Sum A B`. -/
-def PushoutCompPath (A : Type u) (B : Type u) (C : Type u)
+noncomputable def PushoutCompPath (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) : Type u :=
   Quot (PushoutCompPathRel A B C f g)
 
@@ -74,22 +74,22 @@ variable {f : C → A} {g : C → B}
 /-! ## Point constructors -/
 
 /-- Left injection into the pushout. -/
-def inl (a : A) : PushoutCompPath A B C f g :=
+noncomputable def inl (a : A) : PushoutCompPath A B C f g :=
   Quot.mk _ (Sum.inl a)
 
 /-- Right injection into the pushout. -/
-def inr (b : B) : PushoutCompPath A B C f g :=
+noncomputable def inr (b : B) : PushoutCompPath A B C f g :=
   Quot.mk _ (Sum.inr b)
 
 /-! ## Glue path -/
 
 /-- The gluing path: `inl (f c)` is identified with `inr (g c)`. -/
-def glue (c : C) : Path (inl (f c) : PushoutCompPath A B C f g) (inr (g c)) :=
+noncomputable def glue (c : C) : Path (inl (f c) : PushoutCompPath A B C f g) (inr (g c)) :=
   Path.stepChain <|
     Quot.sound (PushoutCompPathRel.glue (A := A) (B := B) (C := C) (f := f) (g := g) c)
 
 /-- Inverse of the gluing path. -/
-def glueInv (c : C) : Path (inr (g c) : PushoutCompPath A B C f g) (inl (f c)) :=
+noncomputable def glueInv (c : C) : Path (inr (g c) : PushoutCompPath A B C f g) (inl (f c)) :=
   Path.symm (glue (A := A) (B := B) (C := C) (f := f) (g := g) c)
 
 /-! ## Path expressions -/
@@ -121,7 +121,7 @@ inductive PushoutCompPathExpr (A : Type u) (B : Type u) (C : Type u)
       PushoutCompPathExpr A B C f g x z
 
 /-- Interpret a path expression as a computational path. -/
-def exprToPath {x y : PushoutCompPath A B C f g} :
+noncomputable def exprToPath {x y : PushoutCompPath A B C f g} :
     PushoutCompPathExpr A B C f g x y → Path x y
   | PushoutCompPathExpr.glue c => glue (A := A) (B := B) (C := C) (f := f) (g := g) c
   | PushoutCompPathExpr.inlPath p => Path.congrArg (inl (A := A) (B := B) (C := C) (f := f) (g := g)) p
@@ -160,7 +160,7 @@ variable {A : Type u} {B : Type u} {C : Type u}
 variable {f : C → A} {g : C → B}
 
 /-- Reverse the direction of a pushout step. -/
-@[simp] def symm {x y : PushoutCompPath A B C f g} :
+@[simp] noncomputable def symm {x y : PushoutCompPath A B C f g} :
     PushoutStep A B C f g x y → PushoutStep A B C f g y x
   | inlStep p => inlStep (Path.symm p)
   | inrStep p => inrStep (Path.symm p)
@@ -168,7 +168,7 @@ variable {f : C → A} {g : C → B}
   | glueStepInv c => glueStep (A := A) (B := B) (C := C) (f := f) (g := g) c
 
 /-- Interpret a pushout step as a computational path. -/
-def toPath {x y : PushoutCompPath A B C f g} :
+noncomputable def toPath {x y : PushoutCompPath A B C f g} :
     PushoutStep A B C f g x y → Path x y
   | inlStep p =>
       Path.congrArg
@@ -198,7 +198,7 @@ variable {A : Type u} {B : Type u} {C : Type u}
 variable {f : C → A} {g : C → B}
 
 /-- Forget provenance and interpret a `PushoutPath` as a `Path`. -/
-def toPath {x y : PushoutCompPath A B C f g} :
+noncomputable def toPath {x y : PushoutCompPath A B C f g} :
     PushoutPath A B C f g x y → Path x y
   | refl x => Path.refl x
   | cons s rest => Path.trans (PushoutStep.toPath (A := A) (B := B) (C := C) (f := f) (g := g) s)
@@ -209,7 +209,7 @@ end PushoutPath
 /-! ## Expression quotient -/
 
 /-- Two expressions are equivalent if their interpreted paths are rewrite-equal. -/
-def exprRel {x y : PushoutCompPath A B C f g}
+noncomputable def exprRel {x y : PushoutCompPath A B C f g}
     (p q : PushoutCompPathExpr A B C f g x y) : Prop :=
   RwEqProp (exprToPath (A := A) (B := B) (C := C) (f := f) (g := g) p)
     (exprToPath (A := A) (B := B) (C := C) (f := f) (g := g) q)
@@ -232,7 +232,7 @@ def exprRel {x y : PushoutCompPath A B C f g}
   let ⟨h₁'⟩ := h₁; let ⟨h₂'⟩ := h₂; ⟨rweq_trans h₁' h₂'⟩
 
 /-- Setoid on pushout path expressions. -/
-def exprSetoid (x y : PushoutCompPath A B C f g) :
+noncomputable def exprSetoid (x y : PushoutCompPath A B C f g) :
     Setoid (PushoutCompPathExpr A B C f g x y) where
   r := exprRel (A := A) (B := B) (C := C) (f := f) (g := g)
   iseqv := by
@@ -249,7 +249,7 @@ abbrev PushoutCompPathExprQuot (x y : PushoutCompPath A B C f g) : Type u :=
   Quot (exprSetoid (A := A) (B := B) (C := C) (f := f) (g := g) x y).r
 
 /-- Embed an expression into the quotient. -/
-def exprClass {x y : PushoutCompPath A B C f g}
+noncomputable def exprClass {x y : PushoutCompPath A B C f g}
     (p : PushoutCompPathExpr A B C f g x y) : PushoutCompPathExprQuot (A := A) (B := B) (C := C)
       (f := f) (g := g) x y :=
   Quot.mk _ p
@@ -271,26 +271,26 @@ variable {A : Type u} {B : Type u} {C : Type u}
 variable {f : C → A} {g : C → B}
 
 /-- Alias for the left injection. -/
-def inl (a : A) : Pushout A B C f g :=
+noncomputable def inl (a : A) : Pushout A B C f g :=
   PushoutCompPath.inl (A := A) (B := B) (C := C) (f := f) (g := g) a
 
 /-- Alias for the right injection. -/
-def inr (b : B) : Pushout A B C f g :=
+noncomputable def inr (b : B) : Pushout A B C f g :=
   PushoutCompPath.inr (A := A) (B := B) (C := C) (f := f) (g := g) b
 
 /-- Alias for the gluing path. -/
-def glue (c : C) : Path (inl (A := A) (B := B) (C := C) (f := f) (g := g) (f c))
+noncomputable def glue (c : C) : Path (inl (A := A) (B := B) (C := C) (f := f) (g := g) (f c))
     (inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c)) :=
   PushoutCompPath.glue (A := A) (B := B) (C := C) (f := f) (g := g) c
 
 /-- Alias for the left-path constructor. -/
-def inlPath {a a' : A} (p : Path a a') :
+noncomputable def inlPath {a a' : A} (p : Path a a') :
     Path (inl (A := A) (B := B) (C := C) (f := f) (g := g) a)
       (inl (A := A) (B := B) (C := C) (f := f) (g := g) a') :=
   Path.congrArg (inl (A := A) (B := B) (C := C) (f := f) (g := g)) p
 
 /-- Alias for the right-path constructor. -/
-def inrPath {b b' : B} (p : Path b b') :
+noncomputable def inrPath {b b' : B} (p : Path b b') :
     Path (inr (A := A) (B := B) (C := C) (f := f) (g := g) b)
       (inr (A := A) (B := B) (C := C) (f := f) (g := g) b') :=
   Path.congrArg (inr (A := A) (B := B) (C := C) (f := f) (g := g)) p
@@ -322,16 +322,16 @@ namespace Wedge
 variable {A : Type u} {B : Type u}
 variable {a₀ : A} {b₀ : B}
 
-def inl (a : A) : Wedge A B a₀ b₀ :=
+noncomputable def inl (a : A) : Wedge A B a₀ b₀ :=
   Pushout.inl (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) a
 
-def inr (b : B) : Wedge A B a₀ b₀ :=
+noncomputable def inr (b : B) : Wedge A B a₀ b₀ :=
   Pushout.inr (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) b
 
-def wedgeBasepoint : Wedge A B a₀ b₀ :=
+noncomputable def wedgeBasepoint : Wedge A B a₀ b₀ :=
   inl (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) a₀
 
-def glue : Path (inl (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) a₀)
+noncomputable def glue : Path (inl (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) a₀)
     (inr (A := A) (B := B) (a₀ := a₀) (b₀ := b₀) b₀) :=
   Pushout.glue (A := A) (B := B) (C := PUnit') (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit
 
@@ -342,7 +342,7 @@ end Wedge
 /-- For wedge sums where C = PUnit', the glue naturality condition holds trivially
 because all paths in PUnit' are rewrite-equivalent to refl, and congrArg along
 constant functions collapses to refl. -/
-instance instHasGlueNaturalLoopRwEq_Wedge {A : Type u} {B : Type u} (a₀ : A) (b₀ : B) :
+noncomputable instance instHasGlueNaturalLoopRwEq_Wedge {A : Type u} {B : Type u} (a₀ : A) (b₀ : B) :
     Pushout.HasGlueNaturalLoopRwEq (A := A) (B := B) (C := PUnit')
       (f := fun _ => a₀) (g := fun _ => b₀) PUnit'.unit where
   eq := fun c p => by
@@ -395,7 +395,7 @@ instance instHasGlueNaturalLoopRwEq_Wedge {A : Type u} {B : Type u} (a₀ : A) (
 /-! ## Legacy notation -/
 
 /-- Legacy-style basepoint for wedge sums. -/
-@[simp] def Wedge.basepoint {A : Type u} {B : Type u} {a₀ : A} {b₀ : B} : Wedge A B a₀ b₀ :=
+@[simp] noncomputable def Wedge.basepoint {A : Type u} {B : Type u} {a₀ : A} {b₀ : B} : Wedge A B a₀ b₀ :=
   Wedge.wedgeBasepoint (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
 end CompPath
 end Path

@@ -29,7 +29,7 @@ noncomputable def delta {A : Type u} {B : Type v}
         witness := Path.trans movedPath (Path.trans baseLift ω) }
 
 /-- Path-connected components via existence of computational paths. -/
-def ComponentRel {X : Type u} (x y : X) : Prop :=
+noncomputable def ComponentRel {X : Type u} (x y : X) : Prop :=
   Nonempty (Path x y)
 
 theorem componentRel_refl {X : Type u} (x : X) : ComponentRel x x :=
@@ -46,7 +46,7 @@ theorem componentRel_trans {X : Type u} {x y z : X}
   rcases hyz with ⟨q⟩
   exact ⟨Path.trans p q⟩
 
-def componentSetoid (X : Type u) : Setoid X where
+noncomputable def componentSetoid (X : Type u) : Setoid X where
   r := ComponentRel
   iseqv := by
     constructor
@@ -124,7 +124,7 @@ abbrev PB : Type u :=
   Sigma (fun x : B => Path b x)
 
 /-- Path fibration projection `PB → B`. -/
-def pathProjection : PB b → B :=
+noncomputable def pathProjection : PB b → B :=
   fun γ => γ.1
 
 /-- Fiber of `PB → B` over `b`. -/
@@ -174,7 +174,7 @@ abbrev fib1Base : Fib1 (f := f) b :=
   { point := a0, witness := lift0 }
 
 /-- Second stage: fiber of the projection `Fib1 → A`. -/
-def projection1 : Fib1 (f := f) b → A :=
+noncomputable def projection1 : Fib1 (f := f) b → A :=
   fun x => x.point
 
 /-- Second stage: fiber of the projection `Fib1 → A`. -/
@@ -185,7 +185,7 @@ abbrev fib2Base : Fib2 (f := f) b a0 :=
   { point := fib1Base (f := f) (b := b) a0 lift0
     witness := Path.refl a0 }
 
-def projection2 : Fib2 (f := f) b a0 → Fib1 (f := f) b :=
+noncomputable def projection2 : Fib2 (f := f) b a0 → Fib1 (f := f) b :=
   fun y => y.point
 
 /-- Third stage: iterate once more, giving the head of the Puppe sequence. -/

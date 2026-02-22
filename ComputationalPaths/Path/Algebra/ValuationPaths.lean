@@ -21,7 +21,7 @@ universe u
 /-! ## §1 p-adic Valuation -/
 
 /-- p-adic valuation: counts powers of p dividing n. -/
-def padicVal (p : Nat) (n : Nat) : Nat :=
+noncomputable def padicVal (p : Nat) (n : Nat) : Nat :=
   if p ≤ 1 then 0
   else if n = 0 then 0
   else if n % p = 0 then 1 + padicVal p (n / p)
@@ -51,20 +51,20 @@ theorem padicVal_trivial (p : Nat) (hp : p ≤ 1) (n : Nat) :
   simp [padicVal, hp]
 
 /-- Path: v_p(0) = 0. -/
-def padicValZeroPath (p : Nat) : Path (padicVal p 0) 0 :=
+noncomputable def padicValZeroPath (p : Nat) : Path (padicVal p 0) 0 :=
   Path.mk [Step.mk _ _ (padicVal_zero p)] (padicVal_zero p)
 
 /-- Path: v_p(1) = 0. -/
-def padicValOnePath (p : Nat) (hp : p > 1) : Path (padicVal p 1) 0 :=
+noncomputable def padicValOnePath (p : Nat) (hp : p > 1) : Path (padicVal p 1) 0 :=
   Path.mk [Step.mk _ _ (padicVal_one p hp)] (padicVal_one p hp)
 
 /-- Path: trivial valuation is 0. -/
-def padicValTrivialPath (p : Nat) (hp : p ≤ 1) (n : Nat) :
+noncomputable def padicValTrivialPath (p : Nat) (hp : p ≤ 1) (n : Nat) :
     Path (padicVal p n) 0 :=
   Path.mk [Step.mk _ _ (padicVal_trivial p hp n)] (padicVal_trivial p hp n)
 
 /-- Path: v_0(0) = 0 and v_0(1) = 0 agree — 2-step trans chain. -/
-def padicValTrivialChainPath (n : Nat) :
+noncomputable def padicValTrivialChainPath (n : Nat) :
     Path (padicVal 0 n) (padicVal 1 n) :=
   Path.trans
     (padicValTrivialPath 0 (Nat.zero_le 1) n)
@@ -80,17 +80,17 @@ structure UltraMetric (A : Type u) where
   ultra : ∀ a b c, dist a c ≤ max (dist a b) (dist b c)
 
 /-- Path: d(a,a) = 0. -/
-def distSelfPath {A : Type u} (um : UltraMetric A) (a : A) :
+noncomputable def distSelfPath {A : Type u} (um : UltraMetric A) (a : A) :
     Path (um.dist a a) 0 :=
   Path.mk [Step.mk _ _ (um.dist_self a)] (um.dist_self a)
 
 /-- Path: d(a,b) = d(b,a). -/
-def distSymmPath {A : Type u} (um : UltraMetric A) (a b : A) :
+noncomputable def distSymmPath {A : Type u} (um : UltraMetric A) (a b : A) :
     Path (um.dist a b) (um.dist b a) :=
   Path.mk [Step.mk _ _ (um.dist_symm a b)] (um.dist_symm a b)
 
 /-- Path: symmetry round-trip d(a,b) → d(b,a) → d(a,b) — 2-step chain. -/
-def distSymmRoundTrip {A : Type u} (um : UltraMetric A) (a b : A) :
+noncomputable def distSymmRoundTrip {A : Type u} (um : UltraMetric A) (a b : A) :
     Path (um.dist a b) (um.dist a b) :=
   Path.trans (distSymmPath um a b) (distSymmPath um b a)
 
@@ -100,7 +100,7 @@ theorem distSymmRoundTrip_proof {A : Type u} (um : UltraMetric A) (a b : A) :
   Subsingleton.elim _ _
 
 /-- Path: d(a,a) = d(b,b) — both are 0, 2-step chain through 0. -/
-def distSelfEqPath {A : Type u} (um : UltraMetric A) (a b : A) :
+noncomputable def distSelfEqPath {A : Type u} (um : UltraMetric A) (a b : A) :
     Path (um.dist a a) (um.dist b b) :=
   Path.trans
     (distSelfPath um a)
@@ -112,7 +112,7 @@ theorem dist_max_comm {A : Type u} (um : UltraMetric A) (a b c : A) :
   Nat.max_comm _ _
 
 /-- Path: max of distances is commutative. -/
-def distMaxCommPath {A : Type u} (um : UltraMetric A) (a b c : A) :
+noncomputable def distMaxCommPath {A : Type u} (um : UltraMetric A) (a b c : A) :
     Path (max (um.dist a b) (um.dist b c)) (max (um.dist b c) (um.dist a b)) :=
   Path.mk [Step.mk _ _ (dist_max_comm um a b c)] (dist_max_comm um a b c)
 
@@ -155,108 +155,108 @@ theorem vf_val_mul_assoc {F : Type u} (vf : VField F) (a b c : F) :
 /-! ## §4 Valuation Paths -/
 
 /-- Path: val(0) = 0. -/
-def valZeroPath {F : Type u} (vf : VField F) : Path (vf.val vf.zero) 0 :=
+noncomputable def valZeroPath {F : Type u} (vf : VField F) : Path (vf.val vf.zero) 0 :=
   Path.mk [Step.mk _ _ vf.val_zero] vf.val_zero
 
 /-- Path: val(1) = 1. -/
-def valOnePath {F : Type u} (vf : VField F) : Path (vf.val vf.one) 1 :=
+noncomputable def valOnePath {F : Type u} (vf : VField F) : Path (vf.val vf.one) 1 :=
   Path.mk [Step.mk _ _ vf.val_one] vf.val_one
 
 /-- Path: val(a*b) = val(a) * val(b). -/
-def valMulPath {F : Type u} (vf : VField F) (a b : F) :
+noncomputable def valMulPath {F : Type u} (vf : VField F) (a b : F) :
     Path (vf.val (vf.mul a b)) (vf.val a * vf.val b) :=
   Path.mk [Step.mk _ _ (vf.val_mul a b)] (vf.val_mul a b)
 
 /-- Path: val(a*b) = val(b*a) — via congrArg. -/
-def valMulCommPath {F : Type u} (vf : VField F) (a b : F) :
+noncomputable def valMulCommPath {F : Type u} (vf : VField F) (a b : F) :
     Path (vf.val (vf.mul a b)) (vf.val (vf.mul b a)) :=
   Path.congrArg vf.val
     (Path.mk [Step.mk _ _ (vf.mul_comm a b)] (vf.mul_comm a b))
 
 /-- Path: val(a*1) = val(a) — 2-step chain. -/
-def valMulOnePath {F : Type u} (vf : VField F) (a : F) :
+noncomputable def valMulOnePath {F : Type u} (vf : VField F) (a : F) :
     Path (vf.val (vf.mul a vf.one)) (vf.val a) :=
   Path.congrArg vf.val
     (Path.mk [Step.mk _ _ (vf_mul_one vf a)] (vf_mul_one vf a))
 
 /-- Path: val(0*a) = 0 — 2-step chain through val(0)*val(a). -/
-def valMulZeroPath {F : Type u} (vf : VField F) (a : F) :
+noncomputable def valMulZeroPath {F : Type u} (vf : VField F) (a : F) :
     Path (vf.val (vf.mul vf.zero a)) 0 :=
   Path.mk [Step.mk _ _ (vf_mul_zero_val vf a)] (vf_mul_zero_val vf a)
 
 /-- Path: val(a*b) = val(b)*val(a) — 2-step chain. -/
-def valMulFlipPath {F : Type u} (vf : VField F) (a b : F) :
+noncomputable def valMulFlipPath {F : Type u} (vf : VField F) (a b : F) :
     Path (vf.val (vf.mul a b)) (vf.val b * vf.val a) :=
   Path.trans
     (valMulCommPath vf a b)
     (valMulPath vf b a)
 
 /-- Path: val((a*b)*c) = val(a*(b*c)) — via congrArg + assoc. -/
-def valMulAssocPath {F : Type u} (vf : VField F) (a b c : F) :
+noncomputable def valMulAssocPath {F : Type u} (vf : VField F) (a b c : F) :
     Path (vf.val (vf.mul (vf.mul a b) c)) (vf.val (vf.mul a (vf.mul b c))) :=
   Path.congrArg vf.val
     (Path.mk [Step.mk _ _ (vf.mul_assoc a b c)] (vf.mul_assoc a b c))
 
 /-- Path: val(a*(b*c)) = val(a) * (val(b)*val(c)) — 2-step trans. -/
-def valTripleMulPath {F : Type u} (vf : VField F) (a b c : F) :
+noncomputable def valTripleMulPath {F : Type u} (vf : VField F) (a b c : F) :
     Path (vf.val (vf.mul a (vf.mul b c))) (vf.val a * (vf.val b * vf.val c)) :=
   Path.trans
     (valMulPath vf a (vf.mul b c))
     (Path.congrArg (vf.val a * ·) (valMulPath vf b c))
 
 /-- Path: symm of valMulPath. -/
-def valMulSymmPath {F : Type u} (vf : VField F) (a b : F) :
+noncomputable def valMulSymmPath {F : Type u} (vf : VField F) (a b : F) :
     Path (vf.val a * vf.val b) (vf.val (vf.mul a b)) :=
   Path.symm (valMulPath vf a b)
 
 /-! ## §5 Field Addition Paths -/
 
 /-- Path: a + b = b + a. -/
-def addCommPath {F : Type u} (vf : VField F) (a b : F) :
+noncomputable def addCommPath {F : Type u} (vf : VField F) (a b : F) :
     Path (vf.add a b) (vf.add b a) :=
   Path.mk [Step.mk _ _ (vf.add_comm a b)] (vf.add_comm a b)
 
 /-- Path: (a + b) + c = a + (b + c). -/
-def addAssocPath {F : Type u} (vf : VField F) (a b c : F) :
+noncomputable def addAssocPath {F : Type u} (vf : VField F) (a b c : F) :
     Path (vf.add (vf.add a b) c) (vf.add a (vf.add b c)) :=
   Path.mk [Step.mk _ _ (vf.add_assoc a b c)] (vf.add_assoc a b c)
 
 /-- Path: 0 + a = a. -/
-def zeroAddPath {F : Type u} (vf : VField F) (a : F) :
+noncomputable def zeroAddPath {F : Type u} (vf : VField F) (a : F) :
     Path (vf.add vf.zero a) a :=
   Path.mk [Step.mk _ _ (vf.zero_add a)] (vf.zero_add a)
 
 /-- Path: a + 0 = a — 2-step via comm. -/
-def addZeroPath {F : Type u} (vf : VField F) (a : F) :
+noncomputable def addZeroPath {F : Type u} (vf : VField F) (a : F) :
     Path (vf.add a vf.zero) a :=
   Path.trans
     (addCommPath vf a vf.zero)
     (zeroAddPath vf a)
 
 /-- Path: a + (-a) = 0. -/
-def addNegPath {F : Type u} (vf : VField F) (a : F) :
+noncomputable def addNegPath {F : Type u} (vf : VField F) (a : F) :
     Path (vf.add a (vf.neg a)) vf.zero :=
   Path.mk [Step.mk _ _ (vf.add_neg a)] (vf.add_neg a)
 
 /-- Path: 1 * a = a. -/
-def oneMulPath {F : Type u} (vf : VField F) (a : F) :
+noncomputable def oneMulPath {F : Type u} (vf : VField F) (a : F) :
     Path (vf.mul vf.one a) a :=
   Path.mk [Step.mk _ _ (vf.one_mul a)] (vf.one_mul a)
 
 /-- Path: a * 1 = a — 2-step via comm. -/
-def mulOnePath {F : Type u} (vf : VField F) (a : F) :
+noncomputable def mulOnePath {F : Type u} (vf : VField F) (a : F) :
     Path (vf.mul a vf.one) a :=
   Path.trans
     (Path.mk [Step.mk _ _ (vf.mul_comm a vf.one)] (vf.mul_comm a vf.one))
     (oneMulPath vf a)
 
 /-- Path: (a * b) * c = a * (b * c). -/
-def mulAssocPath {F : Type u} (vf : VField F) (a b c : F) :
+noncomputable def mulAssocPath {F : Type u} (vf : VField F) (a b c : F) :
     Path (vf.mul (vf.mul a b) c) (vf.mul a (vf.mul b c)) :=
   Path.mk [Step.mk _ _ (vf.mul_assoc a b c)] (vf.mul_assoc a b c)
 
 /-- Path: a * b = b * a. -/
-def mulCommPath {F : Type u} (vf : VField F) (a b : F) :
+noncomputable def mulCommPath {F : Type u} (vf : VField F) (a b : F) :
     Path (vf.mul a b) (vf.mul b a) :=
   Path.mk [Step.mk _ _ (vf.mul_comm a b)] (vf.mul_comm a b)
 
@@ -268,18 +268,18 @@ structure CauchySeq (A : Type u) (um : UltraMetric A) where
   cauchy : ∀ ε : Nat, ε > 0 → ∃ N, ∀ m n, m ≥ N → n ≥ N → um.dist (seq m) (seq n) ≤ ε
 
 /-- Constant sequence is Cauchy. -/
-def constCauchy {A : Type u} (um : UltraMetric A) (a : A) : CauchySeq A um where
+noncomputable def constCauchy {A : Type u} (um : UltraMetric A) (a : A) : CauchySeq A um where
   seq := fun _ => a
   cauchy := by
     intro ε hε
     exact ⟨0, fun m n _ _ => by rw [um.dist_self]; exact Nat.zero_le ε⟩
 
 /-- Path: constant sequence at any index is the constant. -/
-def constCauchyPath {A : Type u} (um : UltraMetric A) (a : A) (n : Nat) :
+noncomputable def constCauchyPath {A : Type u} (um : UltraMetric A) (a : A) (n : Nat) :
     Path ((constCauchy um a).seq n) a := Path.refl a
 
 /-- Path: distance within constant sequence is 0 — refl. -/
-def constCauchyDistPath {A : Type u} (um : UltraMetric A) (a : A) (m n : Nat) :
+noncomputable def constCauchyDistPath {A : Type u} (um : UltraMetric A) (a : A) (m n : Nat) :
     Path (um.dist ((constCauchy um a).seq m) ((constCauchy um a).seq n)) 0 :=
   distSelfPath um a
 
@@ -296,12 +296,12 @@ theorem abs_max_comm {A : Type u} (nav : NonArchAbs A) (a b : A) :
   Nat.max_comm _ _
 
 /-- Path: max commutativity for absolute values. -/
-def absMaxCommPath {A : Type u} (nav : NonArchAbs A) (a b : A) :
+noncomputable def absMaxCommPath {A : Type u} (nav : NonArchAbs A) (a b : A) :
     Path (max (nav.abs a) (nav.abs b)) (max (nav.abs b) (nav.abs a)) :=
   Path.mk [Step.mk _ _ (abs_max_comm nav a b)] (abs_max_comm nav a b)
 
 /-- Path: max of abs round-trip — 2-step. -/
-def absMaxRoundTrip {A : Type u} (nav : NonArchAbs A) (a b : A) :
+noncomputable def absMaxRoundTrip {A : Type u} (nav : NonArchAbs A) (a b : A) :
     Path (max (nav.abs a) (nav.abs b)) (max (nav.abs a) (nav.abs b)) :=
   Path.trans (absMaxCommPath nav a b) (absMaxCommPath nav b a)
 
@@ -329,7 +329,7 @@ theorem valMul_symm_trans {F : Type u} (vf : VField F) (a b : F) :
 /-! ## §9 Transport in Valued Fields -/
 
 /-- Transport a value along a valuation path. -/
-def valTransport {F : Type u} (vf : VField F) {D : Nat → Type u}
+noncomputable def valTransport {F : Type u} (vf : VField F) {D : Nat → Type u}
     {a b : F} (h : vf.val a = vf.val b) (x : D (vf.val a)) : D (vf.val b) :=
   Path.transport (Path.mk [Step.mk _ _ h] h) x
 
@@ -341,7 +341,7 @@ theorem valTransport_refl {F : Type u} (vf : VField F) {D : Nat → Type u}
 /-! ## §10 Multi-Step Valuation Chains -/
 
 /-- 4-step chain: val((a*b)*c) → val(a*(b*c)) → val(a)*val(b*c) → val(a)*(val(b)*val(c)). -/
-def valTripleDecompPath {F : Type u} (vf : VField F) (a b c : F) :
+noncomputable def valTripleDecompPath {F : Type u} (vf : VField F) (a b c : F) :
     Path (vf.val (vf.mul (vf.mul a b) c))
          (vf.val a * (vf.val b * vf.val c)) :=
   Path.trans
@@ -349,13 +349,13 @@ def valTripleDecompPath {F : Type u} (vf : VField F) (a b c : F) :
     (valTripleMulPath vf a b c)
 
 /-- Commutativity then associativity: val(b*a)*c → val(a*b)*c via congrArg. -/
-def valCommAssocPath {F : Type u} (vf : VField F) (a b c : F) :
+noncomputable def valCommAssocPath {F : Type u} (vf : VField F) (a b c : F) :
     Path (vf.val (vf.mul (vf.mul b a) c)) (vf.val (vf.mul (vf.mul a b) c)) :=
   Path.congrArg (fun x => vf.val (vf.mul x c))
     (Path.mk [Step.mk _ _ (vf.mul_comm b a)] (vf.mul_comm b a))
 
 /-- Full 3-step: val((b*a)*c) → val((a*b)*c) → val(a*(b*c)) → val(a)*(val(b)*val(c)). -/
-def valFullChainPath {F : Type u} (vf : VField F) (a b c : F) :
+noncomputable def valFullChainPath {F : Type u} (vf : VField F) (a b c : F) :
     Path (vf.val (vf.mul (vf.mul b a) c))
          (vf.val a * (vf.val b * vf.val c)) :=
   Path.trans
@@ -363,12 +363,12 @@ def valFullChainPath {F : Type u} (vf : VField F) (a b c : F) :
     (valTripleDecompPath vf a b c)
 
 /-- val(1*a) = val(a) — 2-step through 1*val(a). -/
-def valOneMulPath {F : Type u} (vf : VField F) (a : F) :
+noncomputable def valOneMulPath {F : Type u} (vf : VField F) (a : F) :
     Path (vf.val (vf.mul vf.one a)) (vf.val a) :=
   Path.congrArg vf.val (oneMulPath vf a)
 
 /-- val(a + (-a)) = val(0) = 0 — 2-step chain. -/
-def valAddNegPath {F : Type u} (vf : VField F) (a : F) :
+noncomputable def valAddNegPath {F : Type u} (vf : VField F) (a : F) :
     Path (vf.val (vf.add a (vf.neg a))) 0 :=
   Path.trans
     (Path.congrArg vf.val (addNegPath vf a))

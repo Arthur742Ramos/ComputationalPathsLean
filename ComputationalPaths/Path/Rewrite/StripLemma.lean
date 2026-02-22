@@ -50,17 +50,17 @@ structure DiamondWitness {A : Type u} {a b : A}
   right : Rw r meet
 
 /-- Convert a `Confluence.Join` to a `DiamondWitness`. -/
-def Join.toDiamondWitness {A : Type u} {a b : A}
+noncomputable def Join.toDiamondWitness {A : Type u} {a b : A}
     {q r : Path a b} (j : Join q r) : DiamondWitness q r :=
   { meet := j.meet, left := j.left, right := j.right }
 
 /-- Convert a `DiamondWitness` to a `Confluence.Join`. -/
-def DiamondWitness.toJoin {A : Type u} {a b : A}
+noncomputable def DiamondWitness.toJoin {A : Type u} {a b : A}
     {q r : Path a b} (d : DiamondWitness q r) : Join q r :=
   { meet := d.meet, left := d.left, right := d.right }
 
 /-- A reflexive diamond witness: any path joins with itself. -/
-def DiamondWitness.refl {A : Type u} {a b : A}
+noncomputable def DiamondWitness.refl {A : Type u} {a b : A}
     (p : Path a b) : DiamondWitness p p :=
   { meet := p, left := Rw.refl p, right := Rw.refl p }
 
@@ -73,7 +73,7 @@ theorem diamondWitness_toEq {A : Type u} {a b : A}
   exact h1.trans h2.symm
 
 /-- Symmetric diamond witness. -/
-def DiamondWitness.symm {A : Type u} {a b : A}
+noncomputable def DiamondWitness.symm {A : Type u} {a b : A}
     {q r : Path a b} (d : DiamondWitness q r) : DiamondWitness r q :=
   { meet := d.meet, left := d.right, right := d.left }
 
@@ -87,17 +87,17 @@ structure StripWitness {A : Type u} {a b : A}
   right_rw : Rw r meet
 
 /-- Convert a `StripWitness` to a `Confluence.Join`. -/
-def StripWitness.toJoin {A : Type u} {a b : A}
+noncomputable def StripWitness.toJoin {A : Type u} {a b : A}
     {q r : Path a b} (s : StripWitness q r) : Join q r :=
   { meet := s.meet, left := s.left_rw, right := s.right_rw }
 
 /-- A reflexive strip witness. -/
-def StripWitness.refl {A : Type u} {a b : A}
+noncomputable def StripWitness.refl {A : Type u} {a b : A}
     (p : Path a b) : StripWitness p p :=
   { meet := p, left_rw := Rw.refl p, right_rw := Rw.refl p }
 
 /-- Symmetric strip witness. -/
-def StripWitness.symm {A : Type u} {a b : A}
+noncomputable def StripWitness.symm {A : Type u} {a b : A}
     {q r : Path a b} (s : StripWitness q r) : StripWitness r q :=
   { meet := s.meet, left_rw := s.right_rw, right_rw := s.left_rw }
 
@@ -108,7 +108,7 @@ theorem stripWitness_toEq {A : Type u} {a b : A}
   exact (rw_toEq s.left_rw).trans (rw_toEq s.right_rw).symm
 
 /-- Compose two strip witnesses when the meeting points are equal. -/
-def StripWitness.comp {A : Type u} {a b : A}
+noncomputable def StripWitness.comp {A : Type u} {a b : A}
     {p q r : Path a b}
     (s₁ : StripWitness p q) (s₂ : StripWitness q r)
     (h : s₁.meet = s₂.meet) : StripWitness p r :=
@@ -151,7 +151,7 @@ theorem rw_determines_toEq {p q₁ q₂ : Path a b}
 /-! ## Joinability as a Prop -/
 
 /-- Prop-level joinability: two paths can be joined by Rw. -/
-def Joinable {A : Type u} {a b : A} (p q : Path a b) : Prop :=
+noncomputable def Joinable {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   ∃ s : Path a b, Rw p s ∧ Rw q s
 
 /-- Joinability is reflexive. -/
@@ -297,7 +297,7 @@ theorem strip_trans_refl_right (p : Path a b) :
 /-! ## Width Bounds -/
 
 /-- The "width" of a path: number of steps in its trace. -/
-def stripWidth {A : Type u} {a b : A} (p : Path a b) : Nat :=
+noncomputable def stripWidth {A : Type u} {a b : A} (p : Path a b) : Nat :=
   p.steps.length
 
 @[simp] theorem stripWidth_refl (x : A) : stripWidth (Path.refl x) = 0 := by

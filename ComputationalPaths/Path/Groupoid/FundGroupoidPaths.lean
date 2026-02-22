@@ -23,15 +23,15 @@ structure Mor (A : Type u) (x y : A) where
   path : Path x y
 
 /-- Identity morphism: the reflexive path. -/
-@[simp] def Mor.id (x : A) : Mor A x x :=
+@[simp] noncomputable def Mor.id (x : A) : Mor A x x :=
   ⟨Path.refl x⟩
 
 /-- Composition of morphisms: path concatenation. -/
-@[simp] def Mor.comp {x y z : A} (f : Mor A x y) (g : Mor A y z) : Mor A x z :=
+@[simp] noncomputable def Mor.comp {x y z : A} (f : Mor A x y) (g : Mor A y z) : Mor A x z :=
   ⟨Path.trans f.path g.path⟩
 
 /-- Inverse morphism: path symmetry. -/
-@[simp] def Mor.inv {x y : A} (f : Mor A x y) : Mor A y x :=
+@[simp] noncomputable def Mor.inv {x y : A} (f : Mor A x y) : Mor A y x :=
   ⟨Path.symm f.path⟩
 
 /-- Morphisms from the same path are equal. -/
@@ -82,7 +82,7 @@ theorem inv_id (x : A) : Mor.inv (Mor.id x) = Mor.id x := by
 /-! ## Functors between fundamental groupoids -/
 
 /-- A functor induced by a function. -/
-def mapMor (f : A → B) {x y : A} (m : Mor A x y) : Mor B (f x) (f y) :=
+noncomputable def mapMor (f : A → B) {x y : A} (m : Mor A x y) : Mor B (f x) (f y) :=
   ⟨Path.congrArg f m.path⟩
 
 /-- Functor preserves identity. -/
@@ -119,16 +119,16 @@ structure NatTransPath (f g : A → B) where
   component : (x : A) → Mor B (f x) (g x)
 
 /-- Identity natural transformation. -/
-def NatTransPath.idNat (f : A → B) : NatTransPath f f where
+noncomputable def NatTransPath.idNat (f : A → B) : NatTransPath f f where
   component := fun x => Mor.id (f x)
 
 /-- Vertical composition of natural transformations. -/
-def NatTransPath.vcomp {f g h : A → B}
+noncomputable def NatTransPath.vcomp {f g h : A → B}
     (α : NatTransPath f g) (β : NatTransPath g h) : NatTransPath f h where
   component := fun x => Mor.comp (α.component x) (β.component x)
 
 /-- Inverse of a natural transformation. -/
-def NatTransPath.inv {f g : A → B} (α : NatTransPath f g) : NatTransPath g f where
+noncomputable def NatTransPath.inv {f g : A → B} (α : NatTransPath f g) : NatTransPath g f where
   component := fun x => Mor.inv (α.component x)
 
 /-- Left identity for vertical composition -/
@@ -153,18 +153,18 @@ theorem NatTransPath.vcomp_assoc {f g h k : A → B}
 /-! ## Loop space -/
 
 /-- The loop space at a point. -/
-def LoopSpace (A : Type u) (x : A) := Mor A x x
+noncomputable def LoopSpace (A : Type u) (x : A) := Mor A x x
 
 /-- Loop composition. -/
-def LoopSpace.mul {x : A} (l₁ l₂ : LoopSpace A x) : LoopSpace A x :=
+noncomputable def LoopSpace.mul {x : A} (l₁ l₂ : LoopSpace A x) : LoopSpace A x :=
   Mor.comp l₁ l₂
 
 /-- Loop identity. -/
-def LoopSpace.one (x : A) : LoopSpace A x :=
+noncomputable def LoopSpace.one (x : A) : LoopSpace A x :=
   Mor.id x
 
 /-- Loop inverse. -/
-def LoopSpace.inv' {x : A} (l : LoopSpace A x) : LoopSpace A x :=
+noncomputable def LoopSpace.inv' {x : A} (l : LoopSpace A x) : LoopSpace A x :=
   Mor.inv l
 
 /-- Loop multiplication is associative. -/
@@ -185,11 +185,11 @@ theorem LoopSpace.mul_one {x : A} (l : LoopSpace A x) :
 /-! ## Conjugation and transport -/
 
 /-- Conjugation of a loop by a morphism. -/
-def conjugate {x y : A} (f : Mor A x y) (l : LoopSpace A x) : LoopSpace A y :=
+noncomputable def conjugate {x y : A} (f : Mor A x y) (l : LoopSpace A x) : LoopSpace A y :=
   Mor.comp (Mor.inv f) (Mor.comp l f)
 
 /-- Transport of morphisms along paths in the base. -/
-def transportMor {x y x' y' : A}
+noncomputable def transportMor {x y x' y' : A}
     (p : Path x x') (q : Path y y') (f : Mor A x y) : Mor A x' y' :=
   Mor.comp (⟨Path.symm p⟩) (Mor.comp f ⟨q⟩)
 
@@ -201,7 +201,7 @@ theorem transportMor_refl {x y : A} (f : Mor A x y) :
 /-! ## Discrete groupoid -/
 
 /-- A type is path-discrete if all paths between any two points are equal. -/
-def IsPathDiscrete (A : Type u) : Prop :=
+noncomputable def IsPathDiscrete (A : Type u) : Prop :=
   ∀ (x y : A) (p q : Path x y), p = q
 
 /-- In a path-discrete type, all morphisms agree. -/
@@ -217,12 +217,12 @@ theorem mapMor_const_toEq {x y : A} (b : B) (m : Mor A x y) :
 /-! ## Whiskering in the fundamental groupoid -/
 
 /-- Left whiskering: precompose with a fixed morphism. -/
-def whiskerLeft' {x y z : A} (f : Mor A x y) {g h : Mor A y z}
+noncomputable def whiskerLeft' {x y z : A} (f : Mor A x y) {g h : Mor A y z}
     (e : g = h) : Mor.comp f g = Mor.comp f h :=
   _root_.congrArg (Mor.comp f) e
 
 /-- Right whiskering: postcompose with a fixed morphism. -/
-def whiskerRight' {x y z : A} {f g : Mor A x y} (e : f = g)
+noncomputable def whiskerRight' {x y z : A} {f g : Mor A x y} (e : f = g)
     (h : Mor A y z) : Mor.comp f h = Mor.comp g h :=
   _root_.congrArg (fun t => Mor.comp t h) e
 

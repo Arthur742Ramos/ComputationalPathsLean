@@ -58,10 +58,10 @@ deriving DecidableEq
 namespace Fin'B
 
 /-- Fin' 0 is empty. -/
-def elim0 {C : Sort v} : Fin'B 0 → C := fun x => nomatch x
+noncomputable def elim0 {C : Sort v} : Fin'B 0 → C := fun x => nomatch x
 
 /-- Convert to Nat. -/
-def toNat : {n : Nat} → Fin'B n → Nat
+noncomputable def toNat : {n : Nat} → Fin'B n → Nat
   | _, fzero => 0
   | _, fsucc k => k.toNat + 1
 
@@ -102,28 +102,28 @@ namespace BouquetWord
 variable {n : Nat}
 
 /-- Length of a word. -/
-def length : BouquetWord n → Nat
+noncomputable def length : BouquetWord n → Nat
   | nil => 0
   | cons _ rest => 1 + rest.length
 
 /-- The word with a single generator to the first power. -/
-def singleton (i : Fin'B n) : BouquetWord n :=
+noncomputable def singleton (i : Fin'B n) : BouquetWord n :=
   cons ⟨i, 1, by decide⟩ nil
 
 /-- Concatenation of words (may not be reduced). -/
-def wordConcat : BouquetWord n → BouquetWord n → BouquetWord n
+noncomputable def wordConcat : BouquetWord n → BouquetWord n → BouquetWord n
   | nil, w₂ => w₂
   | cons l rest, w₂ => cons l (wordConcat rest w₂)
 
 /-- Inverse of a word: reverse and negate all powers. -/
-def inverse : BouquetWord n → BouquetWord n
+noncomputable def inverse : BouquetWord n → BouquetWord n
   | nil => nil
   | cons l rest =>
       let hne : -l.power ≠ 0 := fun h => l.power_ne_zero (Int.neg_eq_zero.mp h)
       wordConcat (inverse rest) (cons ⟨l.gen, -l.power, hne⟩ nil)
 
 /-- Check if a word is reduced (no adjacent same generators, no zero powers). -/
-def isReduced : BouquetWord n → Bool
+noncomputable def isReduced : BouquetWord n → Bool
   | nil => true
   | cons _ nil => true
   | cons l₁ (cons l₂ rest) =>
@@ -159,20 +159,20 @@ inductive BouquetRel (n : Nat) : BouquetWord n → BouquetWord n → Prop where
       BouquetRel n (BouquetWord.cons l w₁) (BouquetWord.cons l w₂)
 
 /-- The free group on n generators as a quotient of words by the relation. -/
-def BouquetFreeGroup (n : Nat) : Type := Quot (BouquetRel n)
+noncomputable def BouquetFreeGroup (n : Nat) : Type := Quot (BouquetRel n)
 
 namespace BouquetFreeGroup
 
 variable {n : Nat}
 
 /-- The identity element. -/
-def one : BouquetFreeGroup n := Quot.mk _ BouquetWord.nil
+noncomputable def one : BouquetFreeGroup n := Quot.mk _ BouquetWord.nil
 
 /-- A generator element. -/
-def gen (i : Fin'B n) : BouquetFreeGroup n := Quot.mk _ (BouquetWord.singleton i)
+noncomputable def gen (i : Fin'B n) : BouquetFreeGroup n := Quot.mk _ (BouquetWord.singleton i)
 
 /-- A generator to an integer power. -/
-def genPow (i : Fin'B n) (k : Int) : BouquetFreeGroup n :=
+noncomputable def genPow (i : Fin'B n) (k : Int) : BouquetFreeGroup n :=
   if h : k = 0 then one
   else Quot.mk _ (BouquetWord.cons ⟨i, k, h⟩ BouquetWord.nil)
 
@@ -339,17 +339,17 @@ We establish π₁(BouquetN n) ≃ FreeGroupN n via encode-decode.
 -/
 
 /-- Iterate a loop positively. -/
-def iterateLoopPos {A : Type u} {a : A} (l : Path a a) : Nat → Path a a
+noncomputable def iterateLoopPos {A : Type u} {a : A} (l : Path a a) : Nat → Path a a
   | 0 => Path.refl a
   | k + 1 => Path.trans l (iterateLoopPos l k)
 
 /-- Iterate a loop negatively (using symm). -/
-def iterateLoopNeg {A : Type u} {a : A} (l : Path a a) : Nat → Path a a
+noncomputable def iterateLoopNeg {A : Type u} {a : A} (l : Path a a) : Nat → Path a a
   | 0 => Path.refl a
   | k + 1 => Path.trans (Path.symm l) (iterateLoopNeg l k)
 
 /-- Iterate a loop by an integer. -/
-def iterateLoopInt {A : Type u} {a : A} (l : Path a a) (k : Int) : Path a a :=
+noncomputable def iterateLoopInt {A : Type u} {a : A} (l : Path a a) (k : Int) : Path a a :=
   if k ≥ 0 then iterateLoopPos l k.toNat
   else iterateLoopNeg l (-k).toNat
 
@@ -861,7 +861,7 @@ theorem bouquetWord_zero_trivial :
       exact Fin'B.elim0 l.gen
 
 /-- The bouquet with zero circles is just a point, hence a subsingleton. -/
-instance : Subsingleton (BouquetN.{u} 0) := by
+noncomputable instance : Subsingleton (BouquetN.{u} 0) := by
   -- Unfold the definition: `BouquetN 0 = PUnit'`.
   unfold BouquetN
   simpa [bouquetNData] using (inferInstance : Subsingleton CompPath.PUnit'.{u})
@@ -910,7 +910,7 @@ This establishes that F_n is isomorphic to the n-fold free product of ℤ.
 
 /-- Words in F₁: since there's only one generator (index fzero), every word
     is a sequence of powers of a single generator. -/
-def bouquetWordOnePower : BouquetWord 1 → Int
+noncomputable def bouquetWordOnePower : BouquetWord 1 → Int
   | .nil => 0
   | .cons l rest => l.power + bouquetWordOnePower rest
 
@@ -929,11 +929,11 @@ theorem bouquetWordOnePower_respects_rel (w₁ w₂ : BouquetWord 1) (h : Bouque
       omega
 
 /-- Map from BouquetFreeGroup 1 to Int. -/
-def freeGroupOneToInt : BouquetFreeGroup 1 → Int :=
+noncomputable def freeGroupOneToInt : BouquetFreeGroup 1 → Int :=
   Quot.lift bouquetWordOnePower bouquetWordOnePower_respects_rel
 
 /-- Map from Int to BouquetFreeGroup 1. -/
-def intToFreeGroupOne (k : Int) : BouquetFreeGroup 1 :=
+noncomputable def intToFreeGroupOne (k : Int) : BouquetFreeGroup 1 :=
   if _h : k = 0 then BouquetFreeGroup.one
   else BouquetFreeGroup.genPow Fin'B.fzero k
 
@@ -1049,7 +1049,7 @@ noncomputable def freeGroupOneEquivInt : SimpleEquiv (BouquetFreeGroup 1) Int wh
     IteratedFreeProduct G 1 ≃ G
     IteratedFreeProduct G 2 ≃ G * G
     IteratedFreeProduct G (n+1) ≃ G * IteratedFreeProduct G n -/
-def IteratedFreeProduct (G : Type u) : Nat → Type u
+noncomputable def IteratedFreeProduct (G : Type u) : Nat → Type u
   | 0 => PUnit
   | 1 => G
   | n + 2 => FreeProductWord G (IteratedFreeProduct G (n + 1))
@@ -1065,18 +1065,18 @@ inductive DecomposedLetter (n : Nat) where
   | rest (l : BouquetLetter n) : DecomposedLetter n
 
 /-- Decompose a Fin'B (n+1) index into either fzero or a shifted index. -/
-def decomposeIndex : {n : Nat} → Fin'B (n + 1) → Option (Fin'B n)
+noncomputable def decomposeIndex : {n : Nat} → Fin'B (n + 1) → Option (Fin'B n)
   | 0, Fin'B.fzero => none
   | n + 1, Fin'B.fzero => none
   | n + 1, Fin'B.fsucc i => some i
 
 /-- Check if an index is fzero. -/
-def isFirstGenerator : {n : Nat} → Fin'B (n + 1) → Bool
+noncomputable def isFirstGenerator : {n : Nat} → Fin'B (n + 1) → Bool
   | _, Fin'B.fzero => true
   | _, Fin'B.fsucc _ => false
 
 /-- Project a letter to the first generator or the rest. -/
-def projectLetter {n : Nat} (l : BouquetLetter (n + 1)) : DecomposedLetter n :=
+noncomputable def projectLetter {n : Nat} (l : BouquetLetter (n + 1)) : DecomposedLetter n :=
   match l.gen with
   | Fin'B.fzero => DecomposedLetter.first l.power l.power_ne_zero
   | Fin'B.fsucc i => DecomposedLetter.rest ⟨i, l.power, l.power_ne_zero⟩

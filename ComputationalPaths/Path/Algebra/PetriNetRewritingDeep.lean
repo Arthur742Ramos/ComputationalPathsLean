@@ -18,14 +18,14 @@ structure Place where
   id : Nat
 deriving DecidableEq, Repr
 
-def Marking := Place → Nat
+noncomputable def Marking := Place → Nat
 
-def Marking.zero : Marking := fun _ => 0
-def Marking.add (m₁ m₂ : Marking) : Marking := fun p => m₁ p + m₂ p
-def Marking.le (m₁ m₂ : Marking) : Prop := ∀ p : Place, m₁ p ≤ m₂ p
-def Marking.sub (m₁ m₂ : Marking) : Marking := fun p => m₁ p - m₂ p
+noncomputable def Marking.zero : Marking := fun _ => 0
+noncomputable def Marking.add (m₁ m₂ : Marking) : Marking := fun p => m₁ p + m₂ p
+noncomputable def Marking.le (m₁ m₂ : Marking) : Prop := ∀ p : Place, m₁ p ≤ m₂ p
+noncomputable def Marking.sub (m₁ m₂ : Marking) : Marking := fun p => m₁ p - m₂ p
 
-instance : LE Marking := ⟨Marking.le⟩
+noncomputable instance : LE Marking := ⟨Marking.le⟩
 
 structure Transition where
   name : Nat
@@ -38,7 +38,7 @@ abbrev PetriNet := List Transition
 -- §2  Enabledness and Firing (Step)
 -- ============================================================
 
-def Transition.enabled (t : Transition) (m : Marking) : Prop :=
+noncomputable def Transition.enabled (t : Transition) (m : Marking) : Prop :=
   t.pre ≤ m
 
 inductive Fire (N : PetriNet) : Marking → Marking → Prop where
@@ -82,7 +82,7 @@ theorem FPath.append {N : PetriNet} {a b c : Marking}
 -- §4  Reachability
 -- ============================================================
 
-def Reachable (N : PetriNet) (m m' : Marking) : Prop := FPath N m m'
+noncomputable def Reachable (N : PetriNet) (m m' : Marking) : Prop := FPath N m m'
 
 /-- Theorem 5: Reachability is reflexive. -/
 theorem Reachable.refl (N : PetriNet) (m : Marking) : Reachable N m m :=
@@ -130,9 +130,9 @@ theorem BoundedFPath.weaken {N : PetriNet} {a b : Marking} {n : Nat}
 -- §6  Coverability
 -- ============================================================
 
-def Covers (m m' : Marking) : Prop := m ≤ m'
+noncomputable def Covers (m m' : Marking) : Prop := m ≤ m'
 
-def Coverable (N : PetriNet) (m₀ target : Marking) : Prop :=
+noncomputable def Coverable (N : PetriNet) (m₀ target : Marking) : Prop :=
   ∃ m', Reachable N m₀ m' ∧ Covers target m'
 
 /-- Theorem 11: Reachability implies coverability. -/
@@ -198,10 +198,10 @@ theorem fire_mono {N : PetriNet} {t : Transition} {m₁ m₂ : Marking}
 -- §9  Symmetric Paths (Reversible Petri Nets)
 -- ============================================================
 
-def Transition.rev (t : Transition) : Transition :=
+noncomputable def Transition.rev (t : Transition) : Transition :=
   { name := t.name + 1000, pre := t.post, post := t.pre }
 
-def PetriNet.revClose (N : PetriNet) : PetriNet :=
+noncomputable def PetriNet.revClose (N : PetriNet) : PetriNet :=
   N ++ N.map Transition.rev
 
 inductive SymFPath (N : PetriNet) : Marking → Marking → Prop where
@@ -236,7 +236,7 @@ theorem FPath.toSym {N : PetriNet} {a b : Marking}
 -- §10  Parallel Firing (Concurrent Steps)
 -- ============================================================
 
-def Concurrent (t₁ t₂ : Transition) : Prop :=
+noncomputable def Concurrent (t₁ t₂ : Transition) : Prop :=
   ∀ p, t₁.pre p = 0 ∨ t₂.pre p = 0
 
 inductive ParFire (N : PetriNet) : Marking → Marking → Prop where
@@ -301,7 +301,7 @@ theorem concurrent_diamond {t₁ t₂ : Transition} {m : Marking}
 -- §12  Liveness
 -- ============================================================
 
-def Live (N : PetriNet) (m₀ : Marking) (t : Transition) : Prop :=
+noncomputable def Live (N : PetriNet) (m₀ : Marking) (t : Transition) : Prop :=
   ∀ m, Reachable N m₀ m → ∃ m', Reachable N m m' ∧ t.enabled m'
 
 /-- Theorem 28: Liveness preserved through reachable markings. -/
@@ -310,7 +310,7 @@ theorem Live.of_reachable {N : PetriNet} {m₀ m₁ : Marking} {t : Transition}
     Live N m₁ t :=
   fun m hm => hlive m (Reachable.trans hreach hm)
 
-def DeadlockFree (N : PetriNet) (m₀ : Marking) : Prop :=
+noncomputable def DeadlockFree (N : PetriNet) (m₀ : Marking) : Prop :=
   ∀ m, Reachable N m₀ m → ∃ t, t ∈ N ∧ t.enabled m
 
 /-- Theorem 29: Deadlock‑free implies extendability. -/
@@ -343,7 +343,7 @@ structure OccurrenceNet where
   conditions : List Condition
   initial    : List Nat
 
-def Causal (onet : OccurrenceNet) (i j : Nat) : Prop :=
+noncomputable def Causal (onet : OccurrenceNet) (i j : Nat) : Prop :=
   ∃ e, onet.events[j]? = some e ∧ i ∈ e.causal
 
 inductive CausalPath (onet : OccurrenceNet) : Nat → Nat → Prop where
@@ -356,7 +356,7 @@ theorem CausalPath.trans' {onet : OccurrenceNet} {a b c : Nat}
     CausalPath onet a c :=
   CausalPath.trans p q
 
-def ConcurrentEvents (onet : OccurrenceNet) (i j : Nat) : Prop :=
+noncomputable def ConcurrentEvents (onet : OccurrenceNet) (i j : Nat) : Prop :=
   ¬ CausalPath onet i j ∧ ¬ CausalPath onet j i ∧ i ≠ j
 
 /-- Theorem 32: Concurrent events are symmetric. -/
@@ -368,9 +368,9 @@ theorem ConcurrentEvents.symm {onet : OccurrenceNet} {i j : Nat}
 -- §14  Place Invariants
 -- ============================================================
 
-def WeightVec := Place → Int
+noncomputable def WeightVec := Place → Int
 
-def IsPlaceInvariant (N : PetriNet) (w : WeightVec) : Prop :=
+noncomputable def IsPlaceInvariant (N : PetriNet) (w : WeightVec) : Prop :=
   ∀ t ∈ N, ∀ p, w p * (t.post p : Int) = w p * (t.pre p : Int)
 
 /-- Theorem 33: Zero weight vector is always an invariant. -/
@@ -409,13 +409,13 @@ theorem Marking.add_le_add {a b c d : Marking}
 -- §16  Structural Properties of Nets
 -- ============================================================
 
-def Transition.pure (t : Transition) : Prop :=
+noncomputable def Transition.pure (t : Transition) : Prop :=
   ∀ p, t.pre p = 0 ∨ t.post p = 0
 
-def PetriNet.pure (N : PetriNet) : Prop :=
+noncomputable def PetriNet.pure (N : PetriNet) : Prop :=
   ∀ t ∈ N, Transition.pure t
 
-def Transition.isSource (t : Transition) : Prop :=
+noncomputable def Transition.isSource (t : Transition) : Prop :=
   t.pre = Marking.zero
 
 /-- Theorem 39: Source transitions are always enabled. -/
@@ -426,7 +426,7 @@ theorem source_always_enabled {t : Transition}
   have : t.pre p = 0 := congrFun hsrc p
   omega
 
-def Transition.isSink (t : Transition) : Prop :=
+noncomputable def Transition.isSink (t : Transition) : Prop :=
   t.post = Marking.zero
 
 /-- Theorem 40: Firing a sink can only decrease tokens. -/
@@ -442,7 +442,7 @@ theorem sink_decreases {t : Transition} {m : Marking}
 -- §17  Token Conservation
 -- ============================================================
 
-def totalTokens (places : List Place) (m : Marking) : Nat :=
+noncomputable def totalTokens (places : List Place) (m : Marking) : Nat :=
   places.foldl (fun acc p => acc + m p) 0
 
 /-- Theorem 41: Total tokens in zero marking is 0. -/
@@ -459,7 +459,7 @@ theorem totalTokens_zero (places : List Place) :
 -- §18  Path Equivalence (Confluence)
 -- ============================================================
 
-def Confluent (N : PetriNet) (m₀ : Marking) : Prop :=
+noncomputable def Confluent (N : PetriNet) (m₀ : Marking) : Prop :=
   ∀ m₁ m₂, Reachable N m₀ m₁ → Reachable N m₀ m₂ →
     ∃ m₃, Reachable N m₁ m₃ ∧ Reachable N m₂ m₃
 
@@ -473,7 +473,7 @@ theorem confluent_of_reachable {N : PetriNet} {m₀ m₁ : Marking}
 -- §19  Subnet and Projection
 -- ============================================================
 
-def PetriNet.restrict (N : PetriNet) (sub : List Nat) : PetriNet :=
+noncomputable def PetriNet.restrict (N : PetriNet) (sub : List Nat) : PetriNet :=
   N.filter (fun t => decide (t.name ∈ sub))
 
 /-- Theorem 43: Firing in a subnet is firing in the parent. -/

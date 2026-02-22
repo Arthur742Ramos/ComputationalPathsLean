@@ -35,7 +35,7 @@ variable {A B : Type u}
 /-! ## Suspension map -/
 
 /-- Map on suspensions induced by a function. -/
-def suspensionMap (f : A → B) : Suspension A → Suspension B :=
+noncomputable def suspensionMap (f : A → B) : Suspension A → Suspension B :=
   Quot.lift
     (fun s =>
       match s with
@@ -48,13 +48,13 @@ def suspensionMap (f : A → B) : Suspension A → Suspension B :=
           exact (Suspension.merid (X := B) (f a)).toEq)
 
 /-- `suspensionMap` sends the north pole to the north pole. -/
-def suspensionMap_north (f : A → B) :
+noncomputable def suspensionMap_north (f : A → B) :
     Path (suspensionMap f (Suspension.north (X := A)))
       (Suspension.north (X := B)) :=
   Path.refl _
 
 /-- `suspensionMap` sends the south pole to the south pole. -/
-def suspensionMap_south (f : A → B) :
+noncomputable def suspensionMap_south (f : A → B) :
     Path (suspensionMap f (Suspension.south (X := A)))
       (Suspension.south (X := B)) :=
   Path.refl _
@@ -62,14 +62,14 @@ def suspensionMap_south (f : A → B) :
 /-! ## Barratt-Puppe sequence data -/
 
 /-- Objects in the Barratt-Puppe sequence. -/
-def barrattPuppeObj (f : A → B) : Nat → Type u
+noncomputable def barrattPuppeObj (f : A → B) : Nat → Type u
   | 0 => A
   | 1 => B
   | 2 => Cofiber f
   | Nat.succ (Nat.succ (Nat.succ n)) => Suspension (barrattPuppeObj f n)
 
 /-- Maps in the Barratt-Puppe sequence. -/
-def barrattPuppeMap (f : A → B) :
+noncomputable def barrattPuppeMap (f : A → B) :
     (n : Nat) → barrattPuppeObj f n → barrattPuppeObj f (n + 1)
   | 0 => f
   | 1 => cofiberInclusion (A := A) (B := B) f
@@ -84,21 +84,21 @@ structure BarrattPuppeSequence (A B : Type u) (f : A → B) where
   map : (n : Nat) → obj n → obj (n + 1)
 
 /-- The Barratt-Puppe sequence associated to `f`. -/
-def barrattPuppeSequence (f : A → B) : BarrattPuppeSequence A B f where
+noncomputable def barrattPuppeSequence (f : A → B) : BarrattPuppeSequence A B f where
   obj := barrattPuppeObj f
   map := barrattPuppeMap f
 
 /-! ## Composite-triviality for the first two maps -/
 
 /-- The composite `A → B → Cofiber f` is null. -/
-def barrattPuppe_exact_left (f : A → B) (a : A) :
+noncomputable def barrattPuppe_exact_left (f : A → B) (a : A) :
     Path
       (barrattPuppeMap f 1 (barrattPuppeMap f 0 a))
       (Cofiber.basepoint (A := A) (B := B) (f := f)) :=
   (cofiberSequence_exact (A := A) (B := B) f).exact_left a
 
 /-- The composite `B → Cofiber f → Suspension A` is constant at north. -/
-def barrattPuppe_exact_right (f : A → B) (b : B) :
+noncomputable def barrattPuppe_exact_right (f : A → B) (b : B) :
     Path
       (barrattPuppeMap f 2 (barrattPuppeMap f 1 b))
       (Suspension.north (X := A)) :=

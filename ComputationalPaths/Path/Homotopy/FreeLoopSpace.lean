@@ -54,7 +54,7 @@ abbrev freeLoopEval {X : Type u} : FreeLoopSpace X -> X :=
   Sigma.fst
 
 /-- Constant free loop at a chosen basepoint. -/
-def freeLoopBase {X : Type u} (x0 : X) : FreeLoopSpace X :=
+noncomputable def freeLoopBase {X : Type u} (x0 : X) : FreeLoopSpace X :=
   Sigma.mk x0 (Path.refl x0)
 
 @[simp] theorem freeLoopEval_base {X : Type u} (x0 : X) :
@@ -70,11 +70,11 @@ noncomputable def freeLoopEvalLift {X : Type u} {x y : X}
   Fibration.liftPath (P := fun x => LoopSpace X x) p l
 
 /-- The evaluation fibration `LoopSpace -> FreeLoopSpace -> X`. -/
-def freeLoopFiberSeq (X : Type u) (x0 : X) :
+noncomputable def freeLoopFiberSeq (X : Type u) (x0 : X) :
     FiberSeq (LoopSpace X x0) (FreeLoopSpace X) X :=
   canonicalFiberSeq (P := fun x => LoopSpace X x) x0 (Path.refl x0)
 
-def freeLoopFiberSeq_exact (X : Type u) (x0 : X) :
+noncomputable def freeLoopFiberSeq_exact (X : Type u) (x0 : X) :
     IsExactAt (freeLoopFiberSeq X x0) :=
   canonicalFiberSeq_exact (P := fun x => LoopSpace X x) x0 (Path.refl x0)
 
@@ -92,12 +92,12 @@ abbrev piOneConjClass (X : Type u) (x0 : X) : Type u :=
   OrbitSpace (A := piOneConjAction X x0)
 
 /-- The quotient map PiOne(X, x0) -> conjugacy classes. -/
-def piOneConjClassMap (X : Type u) (x0 : X) :
+noncomputable def piOneConjClassMap (X : Type u) (x0 : X) :
     PiOne X x0 -> piOneConjClass X x0 :=
   orbitMap (A := piOneConjAction X x0)
 
 /-- Free loops map to conjugacy classes in their based fundamental group. -/
-def freeLoopConjClass {X : Type u} (l : FreeLoopSpace X) :
+noncomputable def freeLoopConjClass {X : Type u} (l : FreeLoopSpace X) :
     piOneConjClass X l.1 :=
   piOneConjClassMap X l.1 (PiOne.ofLoop l.2)
 

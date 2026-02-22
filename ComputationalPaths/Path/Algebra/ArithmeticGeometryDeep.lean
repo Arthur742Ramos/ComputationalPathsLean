@@ -29,51 +29,51 @@ namespace PathAbGroup
 
 variable {A : Type u} (G : PathAbGroup A)
 
-def add_assoc_path (a b c : A) :
+noncomputable def add_assoc_path (a b c : A) :
     Path (G.add (G.add a b) c) (G.add a (G.add b c)) :=
   G.add_assoc a b c
 
-def add_comm_path (a b : A) :
+noncomputable def add_comm_path (a b : A) :
     Path (G.add a b) (G.add b a) :=
   G.add_comm a b
 
-def zero_add_path (a : A) :
+noncomputable def zero_add_path (a : A) :
     Path (G.add G.zero a) a :=
   G.zero_add a
 
-def add_zero_path (a : A) :
+noncomputable def add_zero_path (a : A) :
     Path (G.add a G.zero) a :=
   G.add_zero a
 
-def neg_add_path (a : A) :
+noncomputable def neg_add_path (a : A) :
     Path (G.add (G.neg a) a) G.zero :=
   G.add_left_neg a
 
-def add_neg_path (a : A) :
+noncomputable def add_neg_path (a : A) :
     Path (G.add a (G.neg a)) G.zero := by
   exact Path.trans (G.add_comm a (G.neg a)) (G.add_left_neg a)
 
-def add_neg_loop (a : A) :
+noncomputable def add_neg_loop (a : A) :
     Path (G.add a (G.neg a)) (G.add a (G.neg a)) :=
   Path.trans (G.add_neg_path a) (Path.symm (G.add_neg_path a))
 
-def neg_add_loop (a : A) :
+noncomputable def neg_add_loop (a : A) :
     Path (G.add (G.neg a) a) (G.add (G.neg a) a) :=
   Path.trans (G.add_left_neg a) (Path.symm (G.add_left_neg a))
 
-def comm_roundtrip (a b : A) :
+noncomputable def comm_roundtrip (a b : A) :
     Path (G.add a b) (G.add a b) :=
   Path.trans (G.add_comm a b) (G.add_comm b a)
 
-def assoc_roundtrip (a b c : A) :
+noncomputable def assoc_roundtrip (a b c : A) :
     Path (G.add (G.add a b) c) (G.add (G.add a b) c) :=
   Path.trans (G.add_assoc a b c) (Path.symm (G.add_assoc a b c))
 
-def unit_left_roundtrip (a : A) :
+noncomputable def unit_left_roundtrip (a : A) :
     Path (G.add G.zero a) (G.add G.zero a) :=
   Path.trans (G.zero_add a) (Path.symm (G.zero_add a))
 
-def unit_right_roundtrip (a : A) :
+noncomputable def unit_right_roundtrip (a : A) :
     Path (G.add a G.zero) (G.add a G.zero) :=
   Path.trans (G.add_zero a) (Path.symm (G.add_zero a))
 
@@ -103,69 +103,69 @@ abbrev O : E.Point := E.group.zero
 abbrev eadd (P Q : E.Point) : E.Point := E.group.add P Q
 abbrev eneg (P : E.Point) : E.Point := E.group.neg P
 
-def point_add_assoc (P Q R : E.Point) :
+noncomputable def point_add_assoc (P Q R : E.Point) :
     Path (E.eadd (E.eadd P Q) R) (E.eadd P (E.eadd Q R)) :=
   E.group.add_assoc P Q R
 
-def point_add_comm (P Q : E.Point) :
+noncomputable def point_add_comm (P Q : E.Point) :
     Path (E.eadd P Q) (E.eadd Q P) :=
   E.group.add_comm P Q
 
-def point_zero_add (P : E.Point) :
+noncomputable def point_zero_add (P : E.Point) :
     Path (E.eadd E.O P) P :=
   E.group.zero_add P
 
-def point_add_zero (P : E.Point) :
+noncomputable def point_add_zero (P : E.Point) :
     Path (E.eadd P E.O) P :=
   E.group.add_zero P
 
-def point_neg_left (P : E.Point) :
+noncomputable def point_neg_left (P : E.Point) :
     Path (E.eadd (E.eneg P) P) E.O :=
   E.group.add_left_neg P
 
-def point_neg_right (P : E.Point) :
+noncomputable def point_neg_right (P : E.Point) :
     Path (E.eadd P (E.eneg P)) E.O := by
   exact Path.trans (E.point_add_comm P (E.eneg P)) (E.point_neg_left P)
 
-def invMap_is_neg (P : E.Point) :
+noncomputable def invMap_is_neg (P : E.Point) :
     Path (E.invMap P) (E.eneg P) :=
   E.invMap_neg P
 
-def weierstrassSym_is_neg (P : E.Point) :
+noncomputable def weierstrassSym_is_neg (P : E.Point) :
     Path (E.weierstrassSym P) (E.eneg P) :=
   E.weierstrassSym_neg P
 
-def sym_then_inv (P : E.Point) :
+noncomputable def sym_then_inv (P : E.Point) :
     Path (E.invMap (E.weierstrassSym P)) (E.eneg (E.eneg P)) := by
   exact Path.trans
     (Path.congrArg E.invMap (E.weierstrassSym_neg P))
     (E.invMap_neg (E.eneg P))
 
-def inv_then_sym (P : E.Point) :
+noncomputable def inv_then_sym (P : E.Point) :
     Path (E.weierstrassSym (E.invMap P)) (E.eneg (E.eneg P)) := by
   exact Path.trans
     (Path.congrArg E.weierstrassSym (E.invMap_neg P))
     (E.weierstrassSym_neg (E.eneg P))
 
-def scalar_zero_point (P : E.Point) :
+noncomputable def scalar_zero_point (P : E.Point) :
     Path (E.scalarMul 0 P) E.O :=
   E.scalar_zero P
 
-def scalar_one_point (P : E.Point) :
+noncomputable def scalar_one_point (P : E.Point) :
     Path (E.scalarMul 1 P) P :=
   E.scalar_one P
 
-def scalar_add_point (m n : Nat) (P : E.Point) :
+noncomputable def scalar_add_point (m n : Nat) (P : E.Point) :
     Path (E.scalarMul (m + n) P)
       (E.eadd (E.scalarMul m P) (E.scalarMul n P)) :=
   E.scalar_add m n P
 
-def scalar_two_raw (P : E.Point) :
+noncomputable def scalar_two_raw (P : E.Point) :
     Path (E.scalarMul (1 + 1) P)
       (E.eadd (E.scalarMul 1 P) (E.scalarMul 1 P)) :=
   E.scalar_add 1 1 P
 
-def scalar_two_point (P : E.Point) :
+noncomputable def scalar_two_point (P : E.Point) :
     Path (E.scalarMul (1 + 1) P) (E.eadd P P) := by
   have h1 : Path (E.scalarMul 1 P) P := E.scalar_one P
   have h2 :
@@ -177,38 +177,38 @@ def scalar_two_point (P : E.Point) :
     Path.congrArg (fun X => E.eadd P X) h1
   exact Path.trans (E.scalar_two_raw P) (Path.trans h2 h3)
 
-def scalar_three_raw (P : E.Point) :
+noncomputable def scalar_three_raw (P : E.Point) :
     Path (E.scalarMul (2 + 1) P)
       (E.eadd (E.scalarMul 2 P) (E.scalarMul 1 P)) :=
   E.scalar_add 2 1 P
 
-def scalar_add_zero_rule (m : Nat) (P : E.Point) :
+noncomputable def scalar_add_zero_rule (m : Nat) (P : E.Point) :
     Path (E.scalarMul (m + 0) P)
       (E.eadd (E.scalarMul m P) (E.scalarMul 0 P)) :=
   E.scalar_add m 0 P
 
-def scalar_zero_add_rule (m : Nat) (P : E.Point) :
+noncomputable def scalar_zero_add_rule (m : Nat) (P : E.Point) :
     Path (E.scalarMul (0 + m) P)
       (E.eadd (E.scalarMul 0 P) (E.scalarMul m P)) :=
   E.scalar_add 0 m P
 
-def add_comm_roundtrip (P Q : E.Point) :
+noncomputable def add_comm_roundtrip (P Q : E.Point) :
     Path (E.eadd P Q) (E.eadd P Q) :=
   Path.trans (E.point_add_comm P Q) (E.point_add_comm Q P)
 
-def sym_loop (P : E.Point) :
+noncomputable def sym_loop (P : E.Point) :
     Path (E.weierstrassSym P) (E.weierstrassSym P) :=
   Path.trans (E.weierstrassSym_neg P) (Path.symm (E.weierstrassSym_neg P))
 
-def inv_loop (P : E.Point) :
+noncomputable def inv_loop (P : E.Point) :
     Path (E.invMap P) (E.invMap P) :=
   Path.trans (E.invMap_neg P) (Path.symm (E.invMap_neg P))
 
-def scalar_zero_loop (P : E.Point) :
+noncomputable def scalar_zero_loop (P : E.Point) :
     Path (E.scalarMul 0 P) (E.scalarMul 0 P) :=
   Path.trans (E.scalar_zero P) (Path.symm (E.scalar_zero P))
 
-def scalar_one_loop (P : E.Point) :
+noncomputable def scalar_one_loop (P : E.Point) :
     Path (E.scalarMul 1 P) (E.scalarMul 1 P) :=
   Path.trans (E.scalar_one P) (Path.symm (E.scalar_one P))
 
@@ -239,44 +239,44 @@ namespace MordellWeilData
 
 variable {K : Type u} (M : MordellWeilData K)
 
-def mw_add_assoc (x y z : M.MW) :
+noncomputable def mw_add_assoc (x y z : M.MW) :
     Path (M.add (M.add x y) z) (M.add x (M.add y z)) :=
   M.add_assoc x y z
 
-def mw_add_comm (x y : M.MW) :
+noncomputable def mw_add_comm (x y : M.MW) :
     Path (M.add x y) (M.add y x) :=
   M.add_comm x y
 
-def mw_zero_add (x : M.MW) :
+noncomputable def mw_zero_add (x : M.MW) :
     Path (M.add M.zero x) x :=
   M.zero_add x
 
-def mw_add_zero (x : M.MW) :
+noncomputable def mw_add_zero (x : M.MW) :
     Path (M.add x M.zero) x :=
   M.add_zero x
 
-def mw_neg_add (x : M.MW) :
+noncomputable def mw_neg_add (x : M.MW) :
     Path (M.add (M.neg x) x) M.zero :=
   M.add_left_neg x
 
-def mw_add_neg (x : M.MW) :
+noncomputable def mw_add_neg (x : M.MW) :
     Path (M.add x (M.neg x)) M.zero := by
   exact Path.trans (M.add_comm x (M.neg x)) (M.add_left_neg x)
 
-def mw_point_zero :
+noncomputable def mw_point_zero :
     Path (M.toPoint M.zero) M.E.group.zero :=
   M.toPoint_zero
 
-def mw_point_add (x y : M.MW) :
+noncomputable def mw_point_add (x y : M.MW) :
     Path (M.toPoint (M.add x y))
       (M.E.group.add (M.toPoint x) (M.toPoint y)) :=
   M.toPoint_add x y
 
-def mw_point_neg (x : M.MW) :
+noncomputable def mw_point_neg (x : M.MW) :
     Path (M.toPoint (M.neg x)) (M.E.group.neg (M.toPoint x)) :=
   M.toPoint_neg x
 
-def mw_point_add_neg (x : M.MW) :
+noncomputable def mw_point_add_neg (x : M.MW) :
     Path (M.toPoint (M.add x (M.neg x))) M.E.group.zero := by
   have p1 :
       Path (M.toPoint (M.add x (M.neg x)))
@@ -291,19 +291,19 @@ def mw_point_add_neg (x : M.MW) :
     EllipticCurveData.point_neg_right (E := M.E) (P := M.toPoint x)
   exact Path.trans p1 (Path.trans p2 p3)
 
-def mw_rank_loop :
+noncomputable def mw_rank_loop :
     Path M.rank M.rank :=
   Path.refl M.rank
 
-def mw_torsion_loop :
+noncomputable def mw_torsion_loop :
     Path M.torsionRank M.torsionRank :=
   Path.refl M.torsionRank
 
-def mw_comm_roundtrip (x y : M.MW) :
+noncomputable def mw_comm_roundtrip (x y : M.MW) :
     Path (M.add x y) (M.add x y) :=
   Path.trans (M.add_comm x y) (M.add_comm y x)
 
-def mw_assoc_roundtrip (x y z : M.MW) :
+noncomputable def mw_assoc_roundtrip (x y z : M.MW) :
     Path (M.add (M.add x y) z) (M.add (M.add x y) z) :=
   Path.trans (M.add_assoc x y z) (Path.symm (M.add_assoc x y z))
 
@@ -324,46 +324,46 @@ namespace HeightData
 
 variable {K : Type u} {E : EllipticCurveData K} (H : HeightData E)
 
-def height_neg (P : E.Point) :
+noncomputable def height_neg (P : E.Point) :
     Path (H.ht (E.group.neg P)) (H.ht P) :=
   H.quadSym P
 
-def height_zero :
+noncomputable def height_zero :
     Path (H.ht E.group.zero) 0 :=
   H.hzero
 
-def height_double (P : E.Point) :
+noncomputable def height_double (P : E.Point) :
     Path (H.ht (E.group.add P P)) (4 * H.ht P) :=
   H.hdouble P
 
-def height_parallelogram (P Q : E.Point) :
+noncomputable def height_parallelogram (P Q : E.Point) :
     Path (H.ht (E.group.add P Q) + H.ht (E.group.add P (E.group.neg Q)))
       (2 * H.ht P + 2 * H.ht Q) :=
   H.parallelogram P Q
 
-def height_neg_neg (P : E.Point) :
+noncomputable def height_neg_neg (P : E.Point) :
     Path (H.ht (E.group.neg (E.group.neg P))) (H.ht P) :=
   Path.trans (H.quadSym (E.group.neg P)) (H.quadSym P)
 
-def height_neg_loop (P : E.Point) :
+noncomputable def height_neg_loop (P : E.Point) :
     Path (H.ht (E.group.neg P)) (H.ht (E.group.neg P)) :=
   Path.trans (H.quadSym P) (Path.symm (H.quadSym P))
 
-def height_double_neg (P : E.Point) :
+noncomputable def height_double_neg (P : E.Point) :
     Path (H.ht (E.group.add (E.group.neg P) (E.group.neg P))) (4 * H.ht P) := by
   exact Path.trans
     (H.hdouble (E.group.neg P))
     (Path.congrArg (fun n => 4 * n) (H.quadSym P))
 
-def height_zero_loop :
+noncomputable def height_zero_loop :
     Path (H.ht E.group.zero) (H.ht E.group.zero) :=
   Path.trans H.hzero (Path.symm H.hzero)
 
-def height_rhs_loop (P Q : E.Point) :
+noncomputable def height_rhs_loop (P Q : E.Point) :
     Path (2 * H.ht P + 2 * H.ht Q) (2 * H.ht P + 2 * H.ht Q) :=
   Path.refl _
 
-def height_four_mul_loop (P : E.Point) :
+noncomputable def height_four_mul_loop (P : E.Point) :
     Path (4 * H.ht P) (4 * H.ht P) :=
   Path.refl _
 
@@ -385,43 +385,43 @@ namespace NeronTateData
 
 variable {K : Type u} {E : EllipticCurveData K} (N : NeronTateData E)
 
-def pair_symmetry (P Q : E.Point) :
+noncomputable def pair_symmetry (P Q : E.Point) :
     Path (N.pair P Q) (N.pair Q P) :=
   N.Sym P Q
 
-def pair_sym_roundtrip (P Q : E.Point) :
+noncomputable def pair_sym_roundtrip (P Q : E.Point) :
     Path (N.pair P Q) (N.pair P Q) :=
   Path.trans (N.Sym P Q) (N.Sym Q P)
 
-def pair_bilinear_left (P Q R : E.Point) :
+noncomputable def pair_bilinear_left (P Q R : E.Point) :
     Path (N.pair (E.group.add P Q) R) (N.pair P R + N.pair Q R) :=
   N.bilinear_left P Q R
 
-def pair_bilinear_right (P Q R : E.Point) :
+noncomputable def pair_bilinear_right (P Q R : E.Point) :
     Path (N.pair P (E.group.add Q R)) (N.pair P Q + N.pair P R) :=
   N.bilinear_right P Q R
 
-def pair_neg_left_rule (P Q : E.Point) :
+noncomputable def pair_neg_left_rule (P Q : E.Point) :
     Path (N.pair (E.group.neg P) Q) (N.pair P Q) :=
   N.pair_neg_left P Q
 
-def pair_neg_right_rule (P Q : E.Point) :
+noncomputable def pair_neg_right_rule (P Q : E.Point) :
     Path (N.pair P (E.group.neg Q)) (N.pair P Q) :=
   N.pair_neg_right P Q
 
-def pair_neg_neg_left (P Q : E.Point) :
+noncomputable def pair_neg_neg_left (P Q : E.Point) :
     Path (N.pair (E.group.neg (E.group.neg P)) Q) (N.pair P Q) :=
   Path.trans (N.pair_neg_left (E.group.neg P) Q) (N.pair_neg_left P Q)
 
-def pair_neg_neg_right (P Q : E.Point) :
+noncomputable def pair_neg_neg_right (P Q : E.Point) :
     Path (N.pair P (E.group.neg (E.group.neg Q))) (N.pair P Q) :=
   Path.trans (N.pair_neg_right P (E.group.neg Q)) (N.pair_neg_right P Q)
 
-def pair_neg_both (P Q : E.Point) :
+noncomputable def pair_neg_both (P Q : E.Point) :
     Path (N.pair (E.group.neg P) (E.group.neg Q)) (N.pair P Q) :=
   Path.trans (N.pair_neg_left P (E.group.neg Q)) (N.pair_neg_right P Q)
 
-def pair_bilinear_loop (P Q R : E.Point) :
+noncomputable def pair_bilinear_loop (P Q R : E.Point) :
     Path (N.pair (E.group.add P Q) R) (N.pair (E.group.add P Q) R) :=
   Path.trans (N.bilinear_left P Q R) (Path.symm (N.bilinear_left P Q R))
 
@@ -442,31 +442,31 @@ namespace LFunctionData
 
 variable (L : LFunctionData)
 
-def lcoeff_zero_is_one :
+noncomputable def lcoeff_zero_is_one :
     Path (L.coeff 0) 1 :=
   L.a0_one
 
-def leuler_factor_rule (p : Nat) :
+noncomputable def leuler_factor_rule (p : Nat) :
     Path (L.localEuler p) (L.localFactor p 1) :=
   L.euler_factor p
 
-def lcoeff_add_rule (m n : Nat) :
+noncomputable def lcoeff_add_rule (m n : Nat) :
     Path (L.coeff (m + n)) (L.coeff m + L.coeff n) :=
   L.coeff_additive m n
 
-def lfunctional_rule (s : Nat) :
+noncomputable def lfunctional_rule (s : Nat) :
     Path (L.coeff s + L.coeff s) (2 * L.coeff s) :=
   L.functionalSym s
 
-def leuler_roundtrip (p : Nat) :
+noncomputable def leuler_roundtrip (p : Nat) :
     Path (L.localEuler p) (L.localEuler p) :=
   Path.trans (L.euler_factor p) (Path.symm (L.euler_factor p))
 
-def lcoeff_add_roundtrip (m n : Nat) :
+noncomputable def lcoeff_add_roundtrip (m n : Nat) :
     Path (L.coeff (m + n)) (L.coeff (m + n)) :=
   Path.trans (L.coeff_additive m n) (Path.symm (L.coeff_additive m n))
 
-def lfunctional_roundtrip (s : Nat) :
+noncomputable def lfunctional_roundtrip (s : Nat) :
     Path (L.coeff s + L.coeff s) (L.coeff s + L.coeff s) :=
   Path.trans (L.functionalSym s) (Path.symm (L.functionalSym s))
 
@@ -486,36 +486,36 @@ namespace BSDStructure
 
 variable {K : Type u} (B : BSDStructure K)
 
-def bsd_rank_alignment :
+noncomputable def bsd_rank_alignment :
     Path B.analyticRank B.MW.rank :=
   B.rank_match
 
-def bsd_rank_alignment_symm :
+noncomputable def bsd_rank_alignment_symm :
     Path B.MW.rank B.analyticRank :=
   Path.symm B.rank_match
 
-def bsd_leading_term_shape :
+noncomputable def bsd_leading_term_shape :
     Path (B.LF.coeff B.analyticRank + B.regulator) (B.MW.rank + B.shaOrder) :=
   B.leadingTermShape
 
-def bsd_rank_roundtrip :
+noncomputable def bsd_rank_roundtrip :
     Path B.analyticRank B.analyticRank :=
   Path.trans B.rank_match (Path.symm B.rank_match)
 
-def bsd_leading_roundtrip :
+noncomputable def bsd_leading_roundtrip :
     Path (B.LF.coeff B.analyticRank + B.regulator)
       (B.LF.coeff B.analyticRank + B.regulator) :=
   Path.trans B.leadingTermShape (Path.symm B.leadingTermShape)
 
-def bsd_analytic_loop :
+noncomputable def bsd_analytic_loop :
     Path B.analyticRank B.analyticRank :=
   Path.refl _
 
-def bsd_regulator_loop :
+noncomputable def bsd_regulator_loop :
     Path B.regulator B.regulator :=
   Path.refl _
 
-def bsd_sha_loop :
+noncomputable def bsd_sha_loop :
     Path B.shaOrder B.shaOrder :=
   Path.refl _
 
@@ -534,19 +534,19 @@ namespace ModularFormData
 
 variable (M : ModularFormData)
 
-def coeff_zero_rule :
+noncomputable def coeff_zero_rule :
     Path (M.coeff 0) 0 :=
   M.coeff_zero
 
-def coeff_one_rule :
+noncomputable def coeff_one_rule :
     Path (M.coeff 1) 1 :=
   M.coeff_one
 
-def weight_loop :
+noncomputable def weight_loop :
     Path M.weight M.weight :=
   Path.refl _
 
-def level_loop :
+noncomputable def level_loop :
     Path M.level M.level :=
   Path.refl _
 
@@ -563,27 +563,27 @@ namespace HeckeData
 
 variable {M : ModularFormData} (H : HeckeData M)
 
-def hecke_id_rule (f : Nat → Nat) (n : Nat) :
+noncomputable def hecke_id_rule (f : Nat → Nat) (n : Nat) :
     Path (H.T 1 f n) (f n) :=
   H.id_rule f n
 
-def hecke_comm_rule (m n : Nat) (f : Nat → Nat) (k : Nat) :
+noncomputable def hecke_comm_rule (m n : Nat) (f : Nat → Nat) (k : Nat) :
     Path (H.T m (H.T n f) k) (H.T n (H.T m f) k) :=
   H.comm_rule m n f k
 
-def hecke_add_rule (m : Nat) (f g : Nat → Nat) (k : Nat) :
+noncomputable def hecke_add_rule (m : Nat) (f g : Nat → Nat) (k : Nat) :
     Path (H.T m (fun i => f i + g i) k) (H.T m f k + H.T m g k) :=
   H.add_rule m f g k
 
-def hecke_comm_roundtrip (m n : Nat) (f : Nat → Nat) (k : Nat) :
+noncomputable def hecke_comm_roundtrip (m n : Nat) (f : Nat → Nat) (k : Nat) :
     Path (H.T m (H.T n f) k) (H.T m (H.T n f) k) :=
   Path.trans (H.comm_rule m n f k) (H.comm_rule n m f k)
 
-def hecke_id_roundtrip (f : Nat → Nat) (n : Nat) :
+noncomputable def hecke_id_roundtrip (f : Nat → Nat) (n : Nat) :
     Path (H.T 1 f n) (H.T 1 f n) :=
   Path.trans (H.id_rule f n) (Path.symm (H.id_rule f n))
 
-def hecke_add_roundtrip (m : Nat) (f g : Nat → Nat) (k : Nat) :
+noncomputable def hecke_add_roundtrip (m : Nat) (f g : Nat → Nat) (k : Nat) :
     Path (H.T m (fun i => f i + g i) k) (H.T m (fun i => f i + g i) k) :=
   Path.trans (H.add_rule m f g k) (Path.symm (H.add_rule m f g k))
 
@@ -601,31 +601,31 @@ namespace EichlerShimuraData
 
 variable {M : ModularFormData} {H : HeckeData M} (ES : EichlerShimuraData M H)
 
-def eichler_shimura_trace (p : Nat) :
+noncomputable def eichler_shimura_trace (p : Nat) :
     Path (ES.heckeTrace p) (ES.frobTrace p + ES.GamRep p p) :=
   ES.trace_rel p
 
-def gam_symmetry (p q : Nat) :
+noncomputable def gam_symmetry (p q : Nat) :
     Path (ES.GamRep p q) (ES.GamRep q p) :=
   ES.Gam_sym p q
 
-def gam_sym_roundtrip (p q : Nat) :
+noncomputable def gam_sym_roundtrip (p q : Nat) :
     Path (ES.GamRep p q) (ES.GamRep p q) :=
   Path.trans (ES.Gam_sym p q) (ES.Gam_sym q p)
 
-def eichler_trace_roundtrip (p : Nat) :
+noncomputable def eichler_trace_roundtrip (p : Nat) :
     Path (ES.heckeTrace p) (ES.heckeTrace p) :=
   Path.trans (ES.trace_rel p) (Path.symm (ES.trace_rel p))
 
-def hecke_compat_loop (p : Nat) (f : Nat → Nat) (n : Nat) :
+noncomputable def hecke_compat_loop (p : Nat) (f : Nat → Nat) (n : Nat) :
     Path (H.T p f n) (H.T p f n) :=
   ES.hecke_compat p f n
 
-def gam_diag_loop (p : Nat) :
+noncomputable def gam_diag_loop (p : Nat) :
     Path (ES.GamRep p p) (ES.GamRep p p) :=
   Path.refl _
 
-def trace_rhs_loop (p : Nat) :
+noncomputable def trace_rhs_loop (p : Nat) :
     Path (ES.frobTrace p + ES.GamRep p p) (ES.frobTrace p + ES.GamRep p p) :=
   Path.refl _
 
@@ -646,23 +646,23 @@ namespace FaltingsStructure
 
 variable {K : Type u} (F : FaltingsStructure K)
 
-def isogeny_loop :
+noncomputable def isogeny_loop :
     Path F.homCount F.homCount :=
   F.isogenyWitness
 
-def semisimple_loop (n : Nat) :
+noncomputable def semisimple_loop (n : Nat) :
     Path (F.tateModule n) (F.tateModule n) :=
   F.semisimple n
 
-def finite_type_loop :
+noncomputable def finite_type_loop :
     Path F.homCount F.homCount :=
   F.finiteType
 
-def homcount_roundtrip :
+noncomputable def homcount_roundtrip :
     Path F.homCount F.homCount :=
   Path.trans F.isogenyWitness F.finiteType
 
-def tate_roundtrip (n : Nat) :
+noncomputable def tate_roundtrip (n : Nat) :
     Path (F.tateModule n) (F.tateModule n) :=
   Path.trans (F.semisimple n) (Path.symm (F.semisimple n))
 
@@ -685,43 +685,43 @@ namespace PAdicHodgeData
 
 variable {K : Type u} (P : PAdicHodgeData K)
 
-def dR_to_crys (i : Nat) :
+noncomputable def dR_to_crys (i : Nat) :
     Path (P.DdR i) (P.Dcris i) :=
   P.comp_dR_crys i
 
-def crys_to_st (i : Nat) :
+noncomputable def crys_to_st (i : Nat) :
     Path (P.Dcris i) (P.Dst i) :=
   P.comp_crys_st i
 
-def dR_to_st (i : Nat) :
+noncomputable def dR_to_st (i : Nat) :
     Path (P.DdR i) (P.Dst i) :=
   Path.trans (P.comp_dR_crys i) (P.comp_crys_st i)
 
-def st_to_dR (i : Nat) :
+noncomputable def st_to_dR (i : Nat) :
     Path (P.Dst i) (P.DdR i) :=
   Path.symm (P.dR_to_st i)
 
-def filtration_loop (i : Nat) :
+noncomputable def filtration_loop (i : Nat) :
     Path (P.DdR (i + 1)) (P.DdR (i + 1)) :=
   P.filtShift i
 
-def frob_compat_rule (i : Nat) :
+noncomputable def frob_compat_rule (i : Nat) :
     Path (P.frob (P.Dcris i)) (P.Dcris (P.frob i)) :=
   P.frob_compat i
 
-def monodromy_nil_rule (i : Nat) :
+noncomputable def monodromy_nil_rule (i : Nat) :
     Path (P.monodromy (P.monodromy i)) (P.monodromy (P.monodromy i)) :=
   P.monodromy_nil i
 
-def comparison_roundtrip (i : Nat) :
+noncomputable def comparison_roundtrip (i : Nat) :
     Path (P.DdR i) (P.DdR i) :=
   Path.trans (P.dR_to_st i) (Path.symm (P.dR_to_st i))
 
-def frob_roundtrip (i : Nat) :
+noncomputable def frob_roundtrip (i : Nat) :
     Path (P.frob (P.Dcris i)) (P.frob (P.Dcris i)) :=
   Path.trans (P.frob_compat i) (Path.symm (P.frob_compat i))
 
-def monodromy_roundtrip (i : Nat) :
+noncomputable def monodromy_roundtrip (i : Nat) :
     Path (P.monodromy (P.monodromy i)) (P.monodromy (P.monodromy i)) :=
   Path.trans (P.monodromy_nil i) (Path.symm (P.monodromy_nil i))
 

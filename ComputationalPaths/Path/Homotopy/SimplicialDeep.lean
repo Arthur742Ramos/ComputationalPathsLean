@@ -27,7 +27,7 @@ structure SimplicialObj (X : Nat → Type u) where
   deg   : (n : Nat) → (i : Nat) → X n → X (n + 1)
   face_deg_id : ∀ n i x, Path (face n i (deg n i x)) x
 
-def constSimplicial (A : Type u) : SimplicialObj (fun _ => A) where
+noncomputable def constSimplicial (A : Type u) : SimplicialObj (fun _ => A) where
   face := fun _ _ x => x
   deg  := fun _ _ x => x
   face_deg_id := fun _ _ x => Path.refl x
@@ -45,14 +45,14 @@ structure SimplicialHomotopy {X Y : Nat → Type u}
     (f g : SimplicialMap S T) where
   htpy : (n : Nat) → (x : X n) → Path (f.f n x) (g.f n x)
 
-def SimplicialHomotopy.comp {X Y : Nat → Type u}
+noncomputable def SimplicialHomotopy.comp {X Y : Nat → Type u}
     {S : SimplicialObj X} {T : SimplicialObj Y}
     {f g h : SimplicialMap S T}
     (α : SimplicialHomotopy f g) (β : SimplicialHomotopy g h) :
     SimplicialHomotopy f h where
   htpy n x := Path.trans (α.htpy n x) (β.htpy n x)
 
-def SimplicialHomotopy.reverse {X Y : Nat → Type u}
+noncomputable def SimplicialHomotopy.reverse {X Y : Nat → Type u}
     {S : SimplicialObj X} {T : SimplicialObj Y}
     {f g : SimplicialMap S T}
     (α : SimplicialHomotopy f g) : SimplicialHomotopy g f where
@@ -194,13 +194,13 @@ theorem face_inv_conjugate {X : Nat → Type u} (S : SimplicialObj X)
 
 /-! ## 9–10. Simplicial map composition -/
 
-def SimplicialMap.idMap {X : Nat → Type u} (S : SimplicialObj X) :
+noncomputable def SimplicialMap.idMap {X : Nat → Type u} (S : SimplicialObj X) :
     SimplicialMap S S where
   f := fun _ x => x
   comm_face := fun _ _ _ => Path.refl _
   comm_deg  := fun _ _ _ => Path.refl _
 
-def SimplicialMap.comp {X Y Z : Nat → Type u}
+noncomputable def SimplicialMap.comp {X Y Z : Nat → Type u}
     {S : SimplicialObj X} {T : SimplicialObj Y} {U : SimplicialObj Z}
     (φ : SimplicialMap S T) (ψ : SimplicialMap T U) :
     SimplicialMap S U where
@@ -359,7 +359,7 @@ structure HornFiller {X : Nat → Type u} (S : SimplicialObj X)
   filler : X (n + 1)
   fills : ∀ (i : Nat) (hi : i ≠ k), Path (S.face n i filler) (h.faces i hi)
 
-def horn_fillers_agree {X : Nat → Type u} {S : SimplicialObj X}
+noncomputable def horn_fillers_agree {X : Nat → Type u} {S : SimplicialObj X}
     {n k : Nat} {h : Horn S n k}
     (f₁ f₂ : HornFiller S n k h) (i : Nat) (hi : i ≠ k) :
     Path (S.face n i f₁.filler) (S.face n i f₂.filler) :=
@@ -377,11 +377,11 @@ class IsKan {X : Nat → Type u} (S : SimplicialObj X) : Prop where
 
 /-! ## 20–21. Nerve -/
 
-def NerveChain (A : Type u) (a : A) : Nat → Type u
+noncomputable def NerveChain (A : Type u) (a : A) : Nat → Type u
   | 0 => PUnit
   | n + 1 => Path a a × NerveChain A a n
 
-def nerveSimplicial (A : Type u) (a : A) : SimplicialObj (NerveChain A a) where
+noncomputable def nerveSimplicial (A : Type u) (a : A) : SimplicialObj (NerveChain A a) where
   face n _ x := match n, x with
     | 0, _ => PUnit.unit
     | Nat.succ _, (_, rest) => rest
@@ -418,11 +418,11 @@ theorem htpy_triple_comp {X Y : Nat → Type u}
 structure MatchingObj {X : Nat → Type u} (_S : SimplicialObj X) (n : Nat) where
   boundary : Nat → X n
 
-def matchingOf {X : Nat → Type u} (S : SimplicialObj X)
+noncomputable def matchingOf {X : Nat → Type u} (S : SimplicialObj X)
     (n : Nat) (x : X (n+1)) : MatchingObj S n where
   boundary i := S.face n i x
 
-def matching_path {X : Nat → Type u} (S : SimplicialObj X)
+noncomputable def matching_path {X : Nat → Type u} (S : SimplicialObj X)
     (n : Nat) {x y : X (n+1)} (p : Path x y) (i : Nat) :
     Path (S.face n i x) (S.face n i y) :=
   Path.congrArg (S.face n i) p
@@ -435,7 +435,7 @@ theorem matching_path_trans {X : Nat → Type u} (S : SimplicialObj X)
 
 /-! ## 26. Décalage -/
 
-def Dec (X : Nat → Type u) : Nat → Type u := fun n => X (n + 1)
+noncomputable def Dec (X : Nat → Type u) : Nat → Type u := fun n => X (n + 1)
 
 theorem dec_face_trans {X : Nat → Type u} (S : SimplicialObj X)
     (n i : Nat) {x y z : Dec X (n+1)}
@@ -526,7 +526,7 @@ theorem const_0_coskeletal (A : Type u) :
     IsCoskeletal (constSimplicial A) 0 :=
   ⟨fun _ _ _ _ h => h 0⟩
 
-def Skeleton (X : Nat → Type u) (n : Nat) : Nat → Type u :=
+noncomputable def Skeleton (X : Nat → Type u) (n : Nat) : Nat → Type u :=
   fun k => if k ≤ n then X k else PUnit
 
 theorem skeleton_mono {X : Nat → Type u} {n k : Nat} (h : k ≤ n) :

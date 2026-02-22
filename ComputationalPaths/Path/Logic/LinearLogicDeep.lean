@@ -41,7 +41,7 @@ inductive LProp where
   deriving DecidableEq
 
 /-- Linear negation (De Morgan dual). -/
-def LProp.neg : LProp → LProp
+noncomputable def LProp.neg : LProp → LProp
   | atom n => negAtom n
   | negAtom n => atom n
   | tensor A B => par (neg A) (neg B)
@@ -72,11 +72,11 @@ theorem neg_neg (A : LProp) : A.neg.neg = A := by
   | whynot A ih => simp [LProp.neg, ih]
 
 /-- 2. Double negation path. -/
-def neg_neg_path (A : LProp) : Path A.neg.neg A :=
+noncomputable def neg_neg_path (A : LProp) : Path A.neg.neg A :=
   Path.mk [] (neg_neg A)
 
 /-- 3. Negation is an involution via path. -/
-def neg_involution (A B : LProp) (h : A.neg = B) : Path B.neg A :=
+noncomputable def neg_involution (A B : LProp) (h : A.neg = B) : Path B.neg A :=
   Path.mk [] (by rw [← h, neg_neg])
 
 /-! ## Resource Semantics -/
@@ -86,24 +86,24 @@ structure ResourceCtx where
   props : List LProp
 
 /-- 4. Empty context. -/
-def ResourceCtx.empty : ResourceCtx := ⟨[]⟩
+noncomputable def ResourceCtx.empty : ResourceCtx := ⟨[]⟩
 
 /-- 5. Tensor product of contexts. -/
-def ResourceCtx.tensorCtx (Γ Δ : ResourceCtx) : ResourceCtx :=
+noncomputable def ResourceCtx.tensorCtx (Γ Δ : ResourceCtx) : ResourceCtx :=
   ⟨Γ.props ++ Δ.props⟩
 
 /-- 6. Tensor with empty is identity (right). -/
-def tensor_empty_right (Γ : ResourceCtx) :
+noncomputable def tensor_empty_right (Γ : ResourceCtx) :
     Path (ResourceCtx.tensorCtx Γ ResourceCtx.empty) Γ :=
   Path.mk [] (by simp [ResourceCtx.tensorCtx, ResourceCtx.empty])
 
 /-- 7. Tensor with empty is identity (left). -/
-def tensor_empty_left (Γ : ResourceCtx) :
+noncomputable def tensor_empty_left (Γ : ResourceCtx) :
     Path (ResourceCtx.tensorCtx ResourceCtx.empty Γ) Γ :=
   Path.mk [] (by simp [ResourceCtx.tensorCtx, ResourceCtx.empty])
 
 /-- 8. Tensor of contexts is associative. -/
-def tensor_assoc (Γ Δ Θ : ResourceCtx) :
+noncomputable def tensor_assoc (Γ Δ Θ : ResourceCtx) :
     Path (ResourceCtx.tensorCtx (ResourceCtx.tensorCtx Γ Δ) Θ)
          (ResourceCtx.tensorCtx Γ (ResourceCtx.tensorCtx Δ Θ)) :=
   Path.mk [] (by simp [ResourceCtx.tensorCtx, List.append_assoc])
@@ -116,7 +116,7 @@ structure LSequent where
   succ : List LProp
 
 /-- 9. Identity axiom: A ⊢ A. -/
-def axiom_seq (A : LProp) : LSequent := ⟨[A], [A]⟩
+noncomputable def axiom_seq (A : LProp) : LSequent := ⟨[A], [A]⟩
 
 /-- 10. Cut rule structure. -/
 structure CutRule where
@@ -127,25 +127,25 @@ structure CutRule where
   right_has_cut : cutFormula ∈ right.ante
 
 /-- 11. Cut elimination preserves ante/succ sizes (modulo cut formula). -/
-def cut_elim_result (c : CutRule) : LSequent :=
+noncomputable def cut_elim_result (c : CutRule) : LSequent :=
   { ante := c.left.ante ++ c.right.ante.filter (· ≠ c.cutFormula),
     succ := c.left.succ.filter (· ≠ c.cutFormula) ++ c.right.succ }
 
 /-! ## Exponentials -/
 
 /-- 12. Dereliction: !A ⊢ A. -/
-def dereliction (A : LProp) : LSequent := ⟨[LProp.bang A], [A]⟩
+noncomputable def dereliction (A : LProp) : LSequent := ⟨[LProp.bang A], [A]⟩
 
 /-- 13. Contraction: !A ⊢ !A ⊗ !A. -/
-def contraction (A : LProp) : LSequent :=
+noncomputable def contraction (A : LProp) : LSequent :=
   ⟨[LProp.bang A], [LProp.tensor (LProp.bang A) (LProp.bang A)]⟩
 
 /-- 14. Weakening: !A, Γ ⊢ Δ implies Γ ⊢ Δ (dropping !A). -/
-def weakening (A : LProp) (s : LSequent) : LSequent :=
+noncomputable def weakening (A : LProp) (s : LSequent) : LSequent :=
   { ante := s.ante.filter (· ≠ LProp.bang A), succ := s.succ }
 
 /-- 15. Digging: !A ⊢ !!A. -/
-def digging (A : LProp) : LSequent :=
+noncomputable def digging (A : LProp) : LSequent :=
   ⟨[LProp.bang A], [LProp.bang (LProp.bang A)]⟩
 
 /-! ## Phase Semantics -/
@@ -165,18 +165,18 @@ structure Fact (M : PhaseSpace.{u}) where
   closed : ∀ x, set x → set (M.mul M.e x)
 
 /-- 16. Phase space identity fact path. -/
-def phase_id_fact (M : PhaseSpace.{u}) (f : Fact M) (x : M.carrier) (h : f.set x) :
+noncomputable def phase_id_fact (M : PhaseSpace.{u}) (f : Fact M) (x : M.carrier) (h : f.set x) :
     Path (M.mul M.e x) x :=
   Path.mk [] (M.left_id x)
 
 /-- 17. Tensor interpretation in phase semantics. -/
-def phase_tensor (M : PhaseSpace.{u}) (F G : Fact M) : Fact M :=
+noncomputable def phase_tensor (M : PhaseSpace.{u}) (F G : Fact M) : Fact M :=
   { set := fun z => ∃ x y, F.set x ∧ G.set y ∧ M.mul x y = z,
     closed := fun z ⟨x, y, hx, hy, heq⟩ => by
       exact ⟨x, y, hx, hy, by rw [← heq, ← M.assoc, M.left_id]⟩ }
 
 /-- 18. Commutativity of phase tensor. -/
-def phase_tensor_comm (M : PhaseSpace.{u}) (F G : Fact M) (z : M.carrier)
+noncomputable def phase_tensor_comm (M : PhaseSpace.{u}) (F G : Fact M) (z : M.carrier)
     (h : (phase_tensor M F G).set z) :
     (phase_tensor M G F).set z := by
   obtain ⟨x, y, hx, hy, heq⟩ := h
@@ -197,17 +197,17 @@ structure Clique (C : CoherenceSpace.{u}) where
   pairwise_coh : ∀ a b, a ∈ elements → b ∈ elements → C.coh a b
 
 /-- 19. Empty clique. -/
-def empty_clique (C : CoherenceSpace.{u}) : Clique C :=
+noncomputable def empty_clique (C : CoherenceSpace.{u}) : Clique C :=
   ⟨[], fun _ _ h => nomatch h⟩
 
 /-- 20. Singleton clique. -/
-def singleton_clique (C : CoherenceSpace.{u}) (a : C.token) : Clique C :=
+noncomputable def singleton_clique (C : CoherenceSpace.{u}) (a : C.token) : Clique C :=
   ⟨[a], fun x y hx hy => by
     simp [List.mem_singleton] at hx hy
     rw [hx, hy]; exact C.coh_refl a⟩
 
 /-- 21. Web (dual) of a coherence space: incoherence becomes coherence. -/
-def CoherenceSpace.dual (C : CoherenceSpace.{u}) : CoherenceSpace.{u} :=
+noncomputable def CoherenceSpace.dual (C : CoherenceSpace.{u}) : CoherenceSpace.{u} :=
   { token := C.token,
     coh := fun a b => a = b ∨ ¬ C.coh a b,
     coh_refl := fun a => Or.inl rfl,
@@ -215,7 +215,7 @@ def CoherenceSpace.dual (C : CoherenceSpace.{u}) : CoherenceSpace.{u} :=
       (fun h => Or.inr (fun hc => h (C.coh_symm b a hc))) }
 
 /-- 22. Double dual returns to the same token type — path on tokens. -/
-def dual_dual_token (C : CoherenceSpace.{u}) :
+noncomputable def dual_dual_token (C : CoherenceSpace.{u}) :
     Path C.dual.dual.token C.token :=
   Path.refl _
 
@@ -235,16 +235,16 @@ structure ProofNet where
   conclusions : List Nat
 
 /-- 23. Empty proof net. -/
-def ProofNet.empty : ProofNet := ⟨[], [], []⟩
+noncomputable def ProofNet.empty : ProofNet := ⟨[], [], []⟩
 
 /-- 24. Axiom link proof net for A ⊗ A⊥. -/
-def axiom_net (A : LProp) : ProofNet :=
+noncomputable def axiom_net (A : LProp) : ProofNet :=
   { nodes := [A, A.neg],
     links := [PNLink.axiomLink 0 1],
     conclusions := [0, 1] }
 
 /-- 25. Cut elimination on proof nets removes a cut link. -/
-def cut_reduce (pn : ProofNet) : ProofNet :=
+noncomputable def cut_reduce (pn : ProofNet) : ProofNet :=
   { nodes := pn.nodes,
     links := pn.links.filter (fun l => match l with
       | PNLink.cutLink _ _ => false
@@ -271,7 +271,7 @@ inductive MLL where
   | par : MLL → MLL → MLL
 
 /-- MLL negation. -/
-def MLL.neg : MLL → MLL
+noncomputable def MLL.neg : MLL → MLL
   | atom n => negAtom n
   | negAtom n => atom n
   | tensor A B => par (neg A) (neg B)
@@ -286,18 +286,18 @@ theorem mll_neg_neg (A : MLL) : A.neg.neg = A := by
   | par A B ihA ihB => simp [MLL.neg, ihA, ihB]
 
 /-- 29. MLL double negation path. -/
-def mll_neg_neg_path (A : MLL) : Path A.neg.neg A :=
+noncomputable def mll_neg_neg_path (A : MLL) : Path A.neg.neg A :=
   Path.mk [] (mll_neg_neg A)
 
 /-! ## Exponential Laws -/
 
 /-- 30. !A ≅ !!A path (digging coherence). -/
-def bang_idem_seq (A : LProp) :
+noncomputable def bang_idem_seq (A : LProp) :
     Path (axiom_seq (LProp.bang A)).ante (digging A).ante :=
   Path.refl _
 
 /-- 31. Dereliction followed by promotion: !A ⊢ A round-trip. -/
-def dereliction_ante_path (A : LProp) :
+noncomputable def dereliction_ante_path (A : LProp) :
     Path (dereliction A).ante [LProp.bang A] :=
   Path.refl _
 
@@ -314,13 +314,13 @@ theorem contraction_succ (A : LProp) :
 /-! ## Structural Rules and Paths -/
 
 /-- 34. Exchange path: swapping identical elements in antecedent. -/
-def exchange_self (A : LProp) :
+noncomputable def exchange_self (A : LProp) :
     Path ({ ante := [A, A], succ := ([] : List LProp) } : LSequent)
          ({ ante := [A, A], succ := ([] : List LProp) } : LSequent) :=
   Path.refl _
 
 /-- 35. Sequent with permuted context for same formula. -/
-def sequent_ante_append_comm (Γ Δ : List LProp) :
+noncomputable def sequent_ante_append_comm (Γ Δ : List LProp) :
     Path ({ ante := Γ ++ Δ, succ := ([] : List LProp) } : LSequent)
          ({ ante := Γ ++ Δ, succ := ([] : List LProp) } : LSequent) :=
   Path.refl _

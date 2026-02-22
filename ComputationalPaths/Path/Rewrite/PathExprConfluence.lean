@@ -73,7 +73,7 @@ noncomputable def eval_join_of_steps [HasJoinOfRwExpr.{u}]
 /-! ## Trivial join -/
 
 /-- Reflexive chains produce a reflexive join. -/
-def eval_join_of_refl
+noncomputable def eval_join_of_refl
     {A : Type u} {a b : A}
     (p : PathExpr A a b) :
     Confluence.Join (A := A) (a := a) (b := b) (eval p) (eval p) :=
@@ -82,7 +82,7 @@ def eval_join_of_refl
 /-! ## Symmetry -/
 
 /-- The Path-level join is symmetric. -/
-def eval_join_symm
+noncomputable def eval_join_symm
     {A : Type u} {a b : A}
     {p q : Path a b}
     (J : Confluence.Join (A := A) (a := a) (b := b) p q) :
@@ -121,7 +121,7 @@ theorem eval_preserves_rw
   rw [this]
 
 /-- Path witness for eval preservation under rewriting. -/
-def eval_preserves_rw_path
+noncomputable def eval_preserves_rw_path
     {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : Rw p q) :
@@ -142,7 +142,7 @@ theorem eval_rw_normalize_agree
   rw [this]
 
 /-- Path witness that normalized evaluations agree. -/
-def eval_rw_normalize_path
+noncomputable def eval_rw_normalize_path
     {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : Rw p q) :
@@ -160,7 +160,7 @@ theorem eval_join_normalize_agree
   normalize_of_rweq J.rweq
 
 /-- Path witness for normal form agreement. -/
-def eval_join_normalize_path
+noncomputable def eval_join_normalize_path
     {A : Type u} {a b : A}
     {p q : Path a b}
     (J : Confluence.Join (A := A) (a := a) (b := b) p q) :

@@ -55,7 +55,7 @@ structure SitePresheaf (Obj : Type u) where
   restrict_id : ∀ (a : Obj) (x : sections a), restrict rfl x = x
 
 /-- Restriction along a computational Path. -/
-def sitePathRestrict {Obj : Type u} (F : SitePresheaf.{u, v} Obj)
+noncomputable def sitePathRestrict {Obj : Type u} (F : SitePresheaf.{u, v} Obj)
     {a b : Obj} (p : Path a b) : F.sections b → F.sections a :=
   F.restrict p.proof
 
@@ -241,12 +241,12 @@ structure SheafMorphism {Obj : Type u} (F G : Sheaf.{u, v} Obj) where
     map a (F.restrict p x) = G.restrict p (map b x)
 
 /-- Identity sheaf morphism. -/
-def sheafMorphismId {Obj : Type u} (F : Sheaf.{u, v} Obj) : SheafMorphism F F where
+noncomputable def sheafMorphismId {Obj : Type u} (F : Sheaf.{u, v} Obj) : SheafMorphism F F where
   map := fun _ x => x
   natural := fun _ _ => rfl
 
 /-- Composition of sheaf morphisms. -/
-def sheafMorphismComp {Obj : Type u} {F G H : Sheaf.{u, v} Obj}
+noncomputable def sheafMorphismComp {Obj : Type u} {F G H : Sheaf.{u, v} Obj}
     (η : SheafMorphism F G) (θ : SheafMorphism G H) : SheafMorphism F H where
   map := fun a x => θ.map a (η.map a x)
   natural := by

@@ -48,7 +48,7 @@ abbrev pathLocalizationGroupoid (A : Type u) : StrictGroupoid A :=
 /-! ## The localization map -/
 
 /-- Localize a path by passing to its rewrite quotient. -/
-def localize {A : Type u} {a b : A} (p : Path a b) : PathRwQuot A a b :=
+noncomputable def localize {A : Type u} {a b : A} (p : Path a b) : PathRwQuot A a b :=
   Quot.mk _ p
 
 /-- Localization identifies rewrite-equivalent paths. -/
@@ -90,7 +90,7 @@ namespace PathLocalizationMap
 variable {A : Type u} {Hom : A → A → Type v}
 
 /-- Lift a map on paths to the localization. -/
-def lift (F : PathLocalizationMap A Hom) {a b : A} :
+noncomputable def lift (F : PathLocalizationMap A Hom) {a b : A} :
     PathRwQuot A a b → Hom a b :=
   Quot.lift (fun p => F.map p) (fun _ _ h => F.respects h)
 

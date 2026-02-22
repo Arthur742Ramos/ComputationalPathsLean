@@ -54,16 +54,16 @@ abbrev lensSpaceLoopSpace (p q : Nat) : Type u :=
   Path (A := LensSpace p q) (lensSpaceBase p q) (lensSpaceBase p q)
 
 /-- Fundamental loop at the basepoint. -/
-@[simp] def lensSpaceLoop (p q : Nat) : lensSpaceLoopSpace p q :=
+@[simp] noncomputable def lensSpaceLoop (p q : Nat) : lensSpaceLoopSpace p q :=
   Path.stepChain rfl
 
 /-- Iterate the fundamental loop `n` times. -/
-@[simp] def lensSpaceLoopPow (p q : Nat) : Nat → lensSpaceLoopSpace p q
+@[simp] noncomputable def lensSpaceLoopPow (p q : Nat) : Nat → lensSpaceLoopSpace p q
   | 0 => Path.refl (lensSpaceBase p q)
   | Nat.succ n => Path.trans (lensSpaceLoop p q) (lensSpaceLoopPow p q n)
 
 /-- Interpret an element of `Z/p` as a loop path. -/
-@[simp] def lensSpaceDecodePath (p q : Nat) :
+@[simp] noncomputable def lensSpaceDecodePath (p q : Nat) :
     Zp p → lensSpaceLoopSpace p q :=
   fun x => lensSpaceLoopPow p q x.val
 

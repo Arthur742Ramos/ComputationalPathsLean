@@ -53,17 +53,17 @@ structure TwoCat where
 /-! ## Path witnesses for 2-category laws -/
 
 /-- Path witness for left unit. -/
-def TwoCat.id₁_comp_path (C : TwoCat) {a b : C.Obj} (f : C.Mor₁ a b) :
+noncomputable def TwoCat.id₁_comp_path (C : TwoCat) {a b : C.Obj} (f : C.Mor₁ a b) :
     Path (C.comp₁ (C.id₁ a) f) f :=
   Path.stepChain (C.id₁_comp f)
 
 /-- Path witness for right unit. -/
-def TwoCat.comp₁_id_path (C : TwoCat) {a b : C.Obj} (f : C.Mor₁ a b) :
+noncomputable def TwoCat.comp₁_id_path (C : TwoCat) {a b : C.Obj} (f : C.Mor₁ a b) :
     Path (C.comp₁ f (C.id₁ b)) f :=
   Path.stepChain (C.comp₁_id f)
 
 /-- Path witness for associativity. -/
-def TwoCat.assoc₁_path (C : TwoCat) {a b c d : C.Obj}
+noncomputable def TwoCat.assoc₁_path (C : TwoCat) {a b c d : C.Obj}
     (f : C.Mor₁ a b) (g : C.Mor₁ b c) (h : C.Mor₁ c d) :
     Path (C.comp₁ (C.comp₁ f g) h) (C.comp₁ f (C.comp₁ g h)) :=
   Path.stepChain (C.assoc₁ f g h)
@@ -137,13 +137,13 @@ structure HasWhiskering (C : TwoCat) where
     whiskerRight (C.id₂ f) h = C.id₂ (C.comp₁ f h)
 
 /-- Path witness for left whiskering identity. -/
-def HasWhiskering.whiskerLeft_id_path (W : HasWhiskering C)
+noncomputable def HasWhiskering.whiskerLeft_id_path (W : HasWhiskering C)
     {a b c : C.Obj} (h : C.Mor₁ a b) (f : C.Mor₁ b c) :
     Path (W.whiskerLeft h (C.id₂ f)) (C.id₂ (C.comp₁ h f)) :=
   Path.stepChain (W.whiskerLeft_id h f)
 
 /-- Path witness for right whiskering identity. -/
-def HasWhiskering.whiskerRight_id_path (W : HasWhiskering C)
+noncomputable def HasWhiskering.whiskerRight_id_path (W : HasWhiskering C)
     {a b c : C.Obj} (f : C.Mor₁ a b) (h : C.Mor₁ b c) :
     Path (W.whiskerRight (C.id₂ f) h) (C.id₂ (C.comp₁ f h)) :=
   Path.stepChain (W.whiskerRight_id f h)
@@ -188,7 +188,7 @@ structure HasInterchange (C : TwoCat) extends HasWhiskering C where
       C.vComp (hComp₂ α γ) (hComp₂ β δ)
 
 /-- Path witness for interchange. -/
-def HasInterchange.interchange_path (I : HasInterchange C)
+noncomputable def HasInterchange.interchange_path (I : HasInterchange C)
     {a b c : C.Obj}
     {f₁ f₂ f₃ : C.Mor₁ a b} {g₁ g₂ g₃ : C.Mor₁ b c}
     (α : C.Mor₂ f₁ f₂) (β : C.Mor₂ f₂ f₃)
@@ -232,7 +232,7 @@ structure EckmannHiltonData (C : TwoCat) where
   single_is_id : single_mor = C.id₁ pt
 
 /-- Path witness for single_is_id. -/
-def EckmannHiltonData.single_is_id_path (E : EckmannHiltonData C) :
+noncomputable def EckmannHiltonData.single_is_id_path (E : EckmannHiltonData C) :
     Path E.single_mor (C.id₁ E.pt) :=
   Path.stepChain E.single_is_id
 
@@ -268,7 +268,7 @@ structure StrictificationData (C : TwoCat) where
     morMap (C.comp₁ f g) = sComp (morMap f) (morMap g)
 
 /-- Path witness for strictification composition preservation. -/
-def StrictificationData.morMap_comp_path (S : StrictificationData C)
+noncomputable def StrictificationData.morMap_comp_path (S : StrictificationData C)
     {a b c : C.Obj} (f : C.Mor₁ a b) (g : C.Mor₁ b c) :
     Path (S.morMap (C.comp₁ f g)) (S.sComp (S.morMap f) (S.morMap g)) :=
   Path.stepChain (S.morMap_comp f g)
@@ -291,7 +291,7 @@ theorem morMap_comp_path_cancel (S : StrictificationData C)
 /-! ## Transport and congruence -/
 
 /-- Transport a 1-cell along a path on the source. -/
-def transport_mor₁_src (C : TwoCat) {a₁ a₂ b : C.Obj}
+noncomputable def transport_mor₁_src (C : TwoCat) {a₁ a₂ b : C.Obj}
     (p : Path a₁ a₂) (f : C.Mor₁ a₁ b) : C.Mor₁ a₂ b :=
   Path.transport (D := fun a => C.Mor₁ a b) p f
 

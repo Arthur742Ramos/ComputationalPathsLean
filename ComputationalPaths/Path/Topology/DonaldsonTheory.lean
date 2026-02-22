@@ -186,20 +186,20 @@ structure GaugeTransformation (G : LieGroup.{u}) (M : FourManifold.{u})
   action : Connection G M P → Connection G M P
 
 /-- The gauge group acts on connections via Path witnesses. -/
-def gauge_action_path {G : LieGroup.{u}} {M : FourManifold.{u}}
+noncomputable def gauge_action_path {G : LieGroup.{u}} {M : FourManifold.{u}}
     {P : PrincipalBundle G M}
     (gt : GaugeTransformation G M P) (A : Connection G M P) :
     Connection G M P :=
   gt.action A
 
 /-- Identity gauge transformation. -/
-def gaugeId (G : LieGroup.{u}) (M : FourManifold.{u})
+noncomputable def gaugeId (G : LieGroup.{u}) (M : FourManifold.{u})
     (P : PrincipalBundle G M) : GaugeTransformation G M P where
   gauge := fun _ => G.one
   action := _root_.id
 
 /-- Identity gauge transformation preserves the connection. -/
-def gaugeId_preserves {G : LieGroup.{u}} {M : FourManifold.{u}}
+noncomputable def gaugeId_preserves {G : LieGroup.{u}} {M : FourManifold.{u}}
     {P : PrincipalBundle G M} (A : Connection G M P) :
     Path ((gaugeId G M P).action A) A :=
   Path.stepChain rfl
@@ -219,16 +219,16 @@ structure ModuliSpace (G : LieGroup.{u}) (M : FourManifold.{u})
   dim_formula : True
 
 /-- The virtual dimension of the moduli space for SU(2) bundles. -/
-def virtualDimension (_b2p : Nat) (k : Int) : Int :=
+noncomputable def virtualDimension (_b2p : Nat) (k : Int) : Int :=
   8 * k - 3 * (1 + _b2p)
 
 /-- Virtual dimension is linear in k. -/
-def virtualDim_stepChain (b2p : Nat) (k : Int) :
+noncomputable def virtualDim_stepChain (b2p : Nat) (k : Int) :
     Path (virtualDimension b2p k) (8 * k - 3 * (1 + ↑b2p)) :=
   Path.stepChain rfl
 
 /-- Virtual dimension at k=0. -/
-def virtualDim_zero (b2p : Nat) :
+noncomputable def virtualDim_zero (b2p : Nat) :
     Path (virtualDimension b2p 0) (-(3 * (1 + ↑b2p))) := by
   unfold virtualDimension
   simp
@@ -270,7 +270,7 @@ structure Cobordism (M N : FourManifold.{u}) where
   right_boundary : N.carrier → cobordism
 
 /-- A cobordism map on Donaldson invariants. -/
-def cobordism_map_path {M N : FourManifold.{u}}
+noncomputable def cobordism_map_path {M N : FourManifold.{u}}
     (_cob : Cobordism M N)
     (dM : DonaldsonInvariant M) :
     DonaldsonInvariant N where
@@ -313,7 +313,7 @@ structure BubbleTree where
   positive : ∀ i, 0 < energies i
 
 /-- Total energy is sum of bubble energies. -/
-def bubbleTreeEnergy (bt : BubbleTree) : Nat :=
+noncomputable def bubbleTreeEnergy (bt : BubbleTree) : Nat :=
   (List.ofFn bt.energies).foldl (· + ·) 0
 
 /-! ## RwEq Coherence -/
@@ -342,13 +342,13 @@ noncomputable def b2_decomp_rweq (M : FourManifold.{u}) :
   exact rweq_cmpA_refl_right (p := M.b2_decomp)
 
 /-- stepChain for instanton energy via Chern class. -/
-def instanton_energy_stepChain {G : LieGroup.{u}} {M : FourManifold.{u}}
+noncomputable def instanton_energy_stepChain {G : LieGroup.{u}} {M : FourManifold.{u}}
     {P : PrincipalBundle G M} (ie : InstantonEnergy G M P) :
     Path ie.energy P.chernClass.natAbs :=
   ie.energy_eq
 
 /-- Path composition: energy path with trivial instanton zero. -/
-def trivial_energy_path {G : LieGroup.{u}} {M : FourManifold.{u}}
+noncomputable def trivial_energy_path {G : LieGroup.{u}} {M : FourManifold.{u}}
     {P : PrincipalBundle G M} (ti : TrivialInstanton G M P) :
     Path P.chernClass.natAbs 0 :=
   ti.zero_energy

@@ -45,36 +45,36 @@ structure OperatorSpace where
   comp_zero_right : ∀ a, Path (comp a zero) zero
 
 /-- 1. Identity composition on left -/
-def op_comp_id_left (O : OperatorSpace) (a : O.carrier) :
+noncomputable def op_comp_id_left (O : OperatorSpace) (a : O.carrier) :
     Path (O.comp O.idOp a) a :=
   O.comp_id_left a
 
 /-- 2. Identity composition on right -/
-def op_comp_id_right (O : OperatorSpace) (a : O.carrier) :
+noncomputable def op_comp_id_right (O : OperatorSpace) (a : O.carrier) :
     Path (O.comp a O.idOp) a :=
   O.comp_id_right a
 
 /-- 3. Associativity of composition -/
-def op_comp_assoc (O : OperatorSpace) (a b c : O.carrier) :
+noncomputable def op_comp_assoc (O : OperatorSpace) (a b c : O.carrier) :
     Path (O.comp (O.comp a b) c) (O.comp a (O.comp b c)) :=
   O.comp_assoc a b c
 
 /-- 4. Norm of zero operator -/
-def op_norm_zero (O : OperatorSpace) : Path (O.opNorm O.zero) 0 :=
+noncomputable def op_norm_zero (O : OperatorSpace) : Path (O.opNorm O.zero) 0 :=
   O.opNorm_zero
 
 /-- 5. Zero composition on left -/
-def op_zero_comp (O : OperatorSpace) (a : O.carrier) :
+noncomputable def op_zero_comp (O : OperatorSpace) (a : O.carrier) :
     Path (O.comp O.zero a) O.zero :=
   O.comp_zero_left a
 
 /-- 6. Zero composition on right -/
-def op_comp_zero (O : OperatorSpace) (a : O.carrier) :
+noncomputable def op_comp_zero (O : OperatorSpace) (a : O.carrier) :
     Path (O.comp a O.zero) O.zero :=
   O.comp_zero_right a
 
 /-- 7. Triple composition associativity (left to right) -/
-def op_comp_assoc3 (O : OperatorSpace) (a b c d : O.carrier) :
+noncomputable def op_comp_assoc3 (O : OperatorSpace) (a b c d : O.carrier) :
     Path (O.comp (O.comp (O.comp a b) c) d)
          (O.comp a (O.comp b (O.comp c d))) :=
   let step1 : Path (O.comp (O.comp (O.comp a b) c) d)
@@ -86,32 +86,32 @@ def op_comp_assoc3 (O : OperatorSpace) (a b c d : O.carrier) :
   trans step1 step2
 
 /-- 8. Double identity composition -/
-def op_double_id (O : OperatorSpace) :
+noncomputable def op_double_id (O : OperatorSpace) :
     Path (O.comp O.idOp O.idOp) O.idOp :=
   O.comp_id_left O.idOp
 
 /-- 9. Add commutativity -/
-def op_add_comm (O : OperatorSpace) (a b : O.carrier) :
+noncomputable def op_add_comm (O : OperatorSpace) (a b : O.carrier) :
     Path (O.add a b) (O.add b a) :=
   O.add_comm a b
 
 /-- 10. Add zero -/
-def op_add_zero (O : OperatorSpace) (a : O.carrier) :
+noncomputable def op_add_zero (O : OperatorSpace) (a : O.carrier) :
     Path (O.add a O.zero) a :=
   O.add_zero a
 
 /-- 11. Zero add via commutativity -/
-def op_zero_add (O : OperatorSpace) (a : O.carrier) :
+noncomputable def op_zero_add (O : OperatorSpace) (a : O.carrier) :
     Path (O.add O.zero a) a :=
   trans (O.add_comm O.zero a) (O.add_zero a)
 
 /-- 12. Norm of composition with zero on left -/
-def op_norm_zero_comp (O : OperatorSpace) (a : O.carrier) :
+noncomputable def op_norm_zero_comp (O : OperatorSpace) (a : O.carrier) :
     Path (O.opNorm (O.comp O.zero a)) 0 :=
   trans (congrArg O.opNorm (O.comp_zero_left a)) O.opNorm_zero
 
 /-- 13. Norm of composition with zero on right -/
-def op_norm_comp_zero (O : OperatorSpace) (a : O.carrier) :
+noncomputable def op_norm_comp_zero (O : OperatorSpace) (a : O.carrier) :
     Path (O.opNorm (O.comp a O.zero)) 0 :=
   trans (congrArg O.opNorm (O.comp_zero_right a)) O.opNorm_zero
 
@@ -132,7 +132,7 @@ structure SpectrumElement (O : OperatorSpace) where
   eigenvector_exists : Path O.zero O.zero
 
 /-- 14. Resolvent at identity -/
-def resolvent_identity (O : OperatorSpace) :
+noncomputable def resolvent_identity (O : OperatorSpace) :
     ResolventData O where
   op := O.idOp
   scalar := 0
@@ -140,7 +140,7 @@ def resolvent_identity (O : OperatorSpace) :
   resolvent_eq := Path.refl _
 
 /-- 15. Resolvent self-consistency -/
-def resolvent_self (O : OperatorSpace) (rd : ResolventData O) :
+noncomputable def resolvent_self (O : OperatorSpace) (rd : ResolventData O) :
     Path (O.comp rd.resolvent rd.resolvent)
          (O.comp rd.resolvent rd.resolvent) :=
   rd.resolvent_eq
@@ -154,17 +154,17 @@ structure CompactOp (O : OperatorSpace) where
   approx_zero : Path (finite_rank_approx 0) O.zero
 
 /-- 16. First approximation is zero -/
-def compact_approx_zero (O : OperatorSpace) (c : CompactOp O) :
+noncomputable def compact_approx_zero (O : OperatorSpace) (c : CompactOp O) :
     Path (c.finite_rank_approx 0) O.zero :=
   c.approx_zero
 
 /-- 17. Norm of first approximation -/
-def compact_approx_zero_norm (O : OperatorSpace) (c : CompactOp O) :
+noncomputable def compact_approx_zero_norm (O : OperatorSpace) (c : CompactOp O) :
     Path (O.opNorm (c.finite_rank_approx 0)) 0 :=
   trans (congrArg O.opNorm c.approx_zero) O.opNorm_zero
 
 /-- 18. Composition of compact op with zero -/
-def compact_comp_zero (O : OperatorSpace) (c : CompactOp O) :
+noncomputable def compact_comp_zero (O : OperatorSpace) (c : CompactOp O) :
     Path (O.comp c.op O.zero) O.zero :=
   O.comp_zero_right c.op
 
@@ -177,28 +177,28 @@ structure SelfAdjointOp (O : OperatorSpace) where
   self_adj : Path adj op
 
 /-- 19. Self-adjoint identity -/
-def sa_op_is_adj (O : OperatorSpace) (sa : SelfAdjointOp O) :
+noncomputable def sa_op_is_adj (O : OperatorSpace) (sa : SelfAdjointOp O) :
     Path sa.adj sa.op :=
   sa.self_adj
 
 /-- 20. Self-adjoint composition with self -/
-def sa_square_adj (O : OperatorSpace) (sa : SelfAdjointOp O) :
+noncomputable def sa_square_adj (O : OperatorSpace) (sa : SelfAdjointOp O) :
     Path (O.comp sa.adj sa.op) (O.comp sa.op sa.op) :=
   congrArg (O.comp · sa.op) sa.self_adj
 
 /-- 21. Self-adjoint norm consistency -/
-def sa_adj_norm (O : OperatorSpace) (sa : SelfAdjointOp O) :
+noncomputable def sa_adj_norm (O : OperatorSpace) (sa : SelfAdjointOp O) :
     Path (O.opNorm sa.adj) (O.opNorm sa.op) :=
   congrArg O.opNorm sa.self_adj
 
 /-- Identity is self-adjoint. -/
-def selfAdjoint_id (O : OperatorSpace) : SelfAdjointOp O where
+noncomputable def selfAdjoint_id (O : OperatorSpace) : SelfAdjointOp O where
   op := O.idOp
   adj := O.idOp
   self_adj := Path.refl _
 
 /-- Zero is self-adjoint. -/
-def selfAdjoint_zero (O : OperatorSpace) : SelfAdjointOp O where
+noncomputable def selfAdjoint_zero (O : OperatorSpace) : SelfAdjointOp O where
   op := O.zero
   adj := O.zero
   self_adj := Path.refl _
@@ -214,13 +214,13 @@ structure SpectralDecomp (O : OperatorSpace) where
   proj_zero_after : ∀ i, i ≥ numEigenvalues → Path (projections i) O.zero
 
 /-- 22. Projection idempotency -/
-def spectral_proj_idem (O : OperatorSpace) (sd : SpectralDecomp O)
+noncomputable def spectral_proj_idem (O : OperatorSpace) (sd : SpectralDecomp O)
     (i : Nat) :
     Path (O.comp (sd.projections i) (sd.projections i)) (sd.projections i) :=
   sd.proj_idempotent i
 
 /-- 23. Projection triple idempotency -/
-def spectral_proj_triple (O : OperatorSpace) (sd : SpectralDecomp O)
+noncomputable def spectral_proj_triple (O : OperatorSpace) (sd : SpectralDecomp O)
     (i : Nat) :
     Path (O.comp (sd.projections i) (O.comp (sd.projections i) (sd.projections i)))
          (sd.projections i) :=
@@ -228,13 +228,13 @@ def spectral_proj_triple (O : OperatorSpace) (sd : SpectralDecomp O)
     (sd.proj_idempotent i)
 
 /-- 24. Projection beyond eigenvalue count is zero -/
-def spectral_proj_zero_after (O : OperatorSpace) (sd : SpectralDecomp O)
+noncomputable def spectral_proj_zero_after (O : OperatorSpace) (sd : SpectralDecomp O)
     (i : Nat) (h : i ≥ sd.numEigenvalues) :
     Path (sd.projections i) O.zero :=
   sd.proj_zero_after i h
 
 /-- 25. Norm of projection beyond count -/
-def spectral_proj_norm_zero (O : OperatorSpace) (sd : SpectralDecomp O)
+noncomputable def spectral_proj_norm_zero (O : OperatorSpace) (sd : SpectralDecomp O)
     (i : Nat) (h : i ≥ sd.numEigenvalues) :
     Path (O.opNorm (sd.projections i)) 0 :=
   trans (congrArg O.opNorm (sd.proj_zero_after i h)) O.opNorm_zero
@@ -242,39 +242,39 @@ def spectral_proj_norm_zero (O : OperatorSpace) (sd : SpectralDecomp O)
 /-! ## Operator Powers -/
 
 /-- Power of an operator. -/
-def opPower (O : OperatorSpace) (a : O.carrier) : Nat → O.carrier
+noncomputable def opPower (O : OperatorSpace) (a : O.carrier) : Nat → O.carrier
   | 0 => O.idOp
   | n + 1 => O.comp a (opPower O a n)
 
 /-- 26. Zero-th power is identity -/
-def opPower_zero (O : OperatorSpace) (a : O.carrier) :
+noncomputable def opPower_zero (O : OperatorSpace) (a : O.carrier) :
     Path (opPower O a 0) O.idOp :=
   Path.refl _
 
 /-- 27. First power is the operator itself -/
-def opPower_one (O : OperatorSpace) (a : O.carrier) :
+noncomputable def opPower_one (O : OperatorSpace) (a : O.carrier) :
     Path (opPower O a 1) (O.comp a O.idOp) :=
   Path.refl _
 
 /-- 28. First power simplifies via identity -/
-def opPower_one_simp (O : OperatorSpace) (a : O.carrier) :
+noncomputable def opPower_one_simp (O : OperatorSpace) (a : O.carrier) :
     Path (opPower O a 1) a :=
   O.comp_id_right a
 
 /-- 29. Power of zero operator at n+1 -/
-def opPower_zero_op (O : OperatorSpace) (n : Nat) :
+noncomputable def opPower_zero_op (O : OperatorSpace) (n : Nat) :
     Path (opPower O O.zero (n + 1)) O.zero :=
   O.comp_zero_left (opPower O O.zero n)
 
 /-- 30. Power of identity -/
-def opPower_id (O : OperatorSpace) : (n : Nat) →
+noncomputable def opPower_id (O : OperatorSpace) : (n : Nat) →
     Path (opPower O O.idOp n) O.idOp
   | 0 => Path.refl _
   | n + 1 => trans (congrArg (O.comp O.idOp) (opPower_id O n))
                     (O.comp_id_left O.idOp)
 
 /-- 31. Norm of zero power -/
-def norm_opPower_zero_op (O : OperatorSpace) (n : Nat) :
+noncomputable def norm_opPower_zero_op (O : OperatorSpace) (n : Nat) :
     Path (O.opNorm (opPower O O.zero (n + 1))) 0 :=
   trans (congrArg O.opNorm (opPower_zero_op O n)) O.opNorm_zero
 
@@ -288,24 +288,24 @@ structure InvertibleOp (O : OperatorSpace) where
   right_inv : Path (O.comp op inv) O.idOp
 
 /-- Identity is invertible. -/
-def invertible_id (O : OperatorSpace) : InvertibleOp O where
+noncomputable def invertible_id (O : OperatorSpace) : InvertibleOp O where
   op := O.idOp
   inv := O.idOp
   left_inv := O.comp_id_left O.idOp
   right_inv := O.comp_id_left O.idOp
 
 /-- 32. Left inverse property -/
-def inv_left (O : OperatorSpace) (io : InvertibleOp O) :
+noncomputable def inv_left (O : OperatorSpace) (io : InvertibleOp O) :
     Path (O.comp io.inv io.op) O.idOp :=
   io.left_inv
 
 /-- 33. Right inverse property -/
-def inv_right (O : OperatorSpace) (io : InvertibleOp O) :
+noncomputable def inv_right (O : OperatorSpace) (io : InvertibleOp O) :
     Path (O.comp io.op io.inv) O.idOp :=
   io.right_inv
 
 /-- 34. Inverse of inverse (pointwise) -/
-def inv_of_inv (O : OperatorSpace) (io : InvertibleOp O) :
+noncomputable def inv_of_inv (O : OperatorSpace) (io : InvertibleOp O) :
     InvertibleOp O where
   op := io.inv
   inv := io.op
@@ -313,7 +313,7 @@ def inv_of_inv (O : OperatorSpace) (io : InvertibleOp O) :
   right_inv := io.left_inv
 
 /-- 35. Composition of invertible operators -/
-def invertible_comp (O : OperatorSpace) (io₁ io₂ : InvertibleOp O) :
+noncomputable def invertible_comp (O : OperatorSpace) (io₁ io₂ : InvertibleOp O) :
     InvertibleOp O where
   op := O.comp io₁.op io₂.op
   inv := O.comp io₂.inv io₁.inv
@@ -361,12 +361,12 @@ structure OpPolynomial (O : OperatorSpace) where
   eval_id : Path (evaluate O.idOp) (evaluate O.idOp)
 
 /-- 36. Polynomial evaluation at zero -/
-def poly_at_zero (O : OperatorSpace) (p : OpPolynomial O) :
+noncomputable def poly_at_zero (O : OperatorSpace) (p : OpPolynomial O) :
     Path (p.evaluate O.zero) O.zero :=
   p.eval_zero
 
 /-- 37. Norm of polynomial at zero -/
-def poly_norm_at_zero (O : OperatorSpace) (p : OpPolynomial O) :
+noncomputable def poly_norm_at_zero (O : OperatorSpace) (p : OpPolynomial O) :
     Path (O.opNorm (p.evaluate O.zero)) 0 :=
   trans (congrArg O.opNorm p.eval_zero) O.opNorm_zero
 

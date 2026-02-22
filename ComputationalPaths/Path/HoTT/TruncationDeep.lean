@@ -185,18 +185,18 @@ theorem sigma_isContr_fst {B₂ : A → Type v}
 /-! ## Truncation modality properties -/
 
 /-- 26. Modality unit: every element embeds into its propositional truncation. -/
-def trunc_unit (a : A) : Path a a := Path.refl a
+noncomputable def trunc_unit (a : A) : Path a a := Path.refl a
 
 /-- PropTrunc quotient relation. -/
 inductive PTruncRel (A : Type u) : A → A → Prop where
   | identify (a b : A) : PTruncRel A a b
 
 /-- 27. Propositional truncation via Quot. -/
-def PTrunc (A : Type u) : Type u := Quot (PTruncRel A)
+noncomputable def PTrunc (A : Type u) : Type u := Quot (PTruncRel A)
 
-def PTrunc.mk (a : A) : PTrunc A := Quot.mk _ a
+noncomputable def PTrunc.mk (a : A) : PTrunc A := Quot.mk _ a
 
-def PTrunc.path (a b : A) : Path (PTrunc.mk a : PTrunc A) (PTrunc.mk b) :=
+noncomputable def PTrunc.path (a b : A) : Path (PTrunc.mk a : PTrunc A) (PTrunc.mk b) :=
   Path.mk [Step.mk _ _ (Quot.sound (PTruncRel.identify a b))]
     (Quot.sound (PTruncRel.identify a b))
 
@@ -205,7 +205,7 @@ theorem ptrunc_isProp (x y : PTrunc A) : ∀ (p q : x = y), p = q :=
   fun _ _ => Subsingleton.elim _ _
 
 /-- PTrunc elimination. -/
-def PTrunc.lift {C : Type v} (f : A → C) (hprop : ∀ x y : C, x = y) : PTrunc A → C :=
+noncomputable def PTrunc.lift {C : Type v} (f : A → C) (hprop : ∀ x y : C, x = y) : PTrunc A → C :=
   Quot.lift f (fun a b _ => hprop (f a) (f b))
 
 /-- 29. PTrunc.lift computes on mk. -/
@@ -232,11 +232,11 @@ inductive STruncRel (A : Type u) : A → A → Prop where
 
 /-- Set truncation ‖A‖₀. For our purposes this coincides with PTrunc
     but conceptually lives at a different truncation level. -/
-def STrunc (A : Type u) : Type u := Quot (STruncRel A)
+noncomputable def STrunc (A : Type u) : Type u := Quot (STruncRel A)
 
-def STrunc.mk (a : A) : STrunc A := Quot.mk _ a
+noncomputable def STrunc.mk (a : A) : STrunc A := Quot.mk _ a
 
-def STrunc.path (a b : A) : Path (STrunc.mk a : STrunc A) (STrunc.mk b) :=
+noncomputable def STrunc.path (a b : A) : Path (STrunc.mk a : STrunc A) (STrunc.mk b) :=
   Path.mk [Step.mk _ _ (Quot.sound (STruncRel.identify a b))]
     (Quot.sound (STruncRel.identify a b))
 

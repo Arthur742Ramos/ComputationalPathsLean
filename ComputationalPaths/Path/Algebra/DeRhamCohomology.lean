@@ -56,11 +56,11 @@ structure Differential (Ω : GradedSpace.{u}) where
 /-! ## Closed and exact forms -/
 
 /-- A form ω is closed if dω = 0. -/
-def isClosed {Ω : GradedSpace.{u}} (D : Differential Ω) (ω : Ω.Carrier) : Prop :=
+noncomputable def isClosed {Ω : GradedSpace.{u}} (D : Differential Ω) (ω : Ω.Carrier) : Prop :=
   D.d ω = Ω.zero
 
 /-- A form ω is exact if ω = dη for some η. -/
-def isExact {Ω : GradedSpace.{u}} (D : Differential Ω) (ω : Ω.Carrier) : Prop :=
+noncomputable def isExact {Ω : GradedSpace.{u}} (D : Differential Ω) (ω : Ω.Carrier) : Prop :=
   ∃ η : Ω.Carrier, D.d η = ω
 
 /-- Every exact form is closed (consequence of d² = 0). -/
@@ -73,7 +73,7 @@ theorem exact_implies_closed {Ω : GradedSpace.{u}} (D : Differential Ω)
   exact D.d_squared η
 
 /-- Path witness for exact ⟹ closed. -/
-def exact_implies_closed_path {Ω : GradedSpace.{u}} (D : Differential Ω)
+noncomputable def exact_implies_closed_path {Ω : GradedSpace.{u}} (D : Differential Ω)
     (ω : Ω.Carrier) (hω : isExact D ω) :
     Path (D.d ω) Ω.zero :=
   Path.stepChain (exact_implies_closed D ω hω)
@@ -84,7 +84,7 @@ theorem zero_isClosed {Ω : GradedSpace.{u}} (D : Differential Ω) :
   simp [isClosed]; exact D.d_zero
 
 /-- Path witness for zero being closed. -/
-def zero_isClosed_path {Ω : GradedSpace.{u}} (D : Differential Ω) :
+noncomputable def zero_isClosed_path {Ω : GradedSpace.{u}} (D : Differential Ω) :
     Path (D.d Ω.zero) Ω.zero :=
   Path.stepChain D.d_zero
 
@@ -94,7 +94,7 @@ theorem zero_isExact {Ω : GradedSpace.{u}} (D : Differential Ω) :
   ⟨Ω.zero, D.d_zero⟩
 
 /-- d² = 0 as a path. -/
-def d_squared_path {Ω : GradedSpace.{u}} (D : Differential Ω) (ω : Ω.Carrier) :
+noncomputable def d_squared_path {Ω : GradedSpace.{u}} (D : Differential Ω) (ω : Ω.Carrier) :
     Path (D.d (D.d ω)) Ω.zero :=
   Path.stepChain (D.d_squared ω)
 
@@ -114,13 +114,13 @@ structure DeRhamH (Ω : GradedSpace.{u}) (D : Differential Ω) where
   closed : isClosed D representative
 
 /-- The zero class. -/
-def deRhamH_zero {Ω : GradedSpace.{u}} (D : Differential Ω) :
+noncomputable def deRhamH_zero {Ω : GradedSpace.{u}} (D : Differential Ω) :
     DeRhamH Ω D where
   representative := Ω.zero
   closed := zero_isClosed D
 
 /-- Addition of cohomology classes (via representatives). -/
-def deRhamH_add {Ω : GradedSpace.{u}} (D : Differential Ω)
+noncomputable def deRhamH_add {Ω : GradedSpace.{u}} (D : Differential Ω)
     (a b : DeRhamH Ω D)
     (h : isClosed D (Ω.add a.representative b.representative)) :
     DeRhamH Ω D where
@@ -128,7 +128,7 @@ def deRhamH_add {Ω : GradedSpace.{u}} (D : Differential Ω)
   closed := h
 
 /-- Negation of a cohomology class. -/
-def deRhamH_neg {Ω : GradedSpace.{u}} (D : Differential Ω)
+noncomputable def deRhamH_neg {Ω : GradedSpace.{u}} (D : Differential Ω)
     (a : DeRhamH Ω D)
     (h : isClosed D (Ω.neg a.representative)) :
     DeRhamH Ω D where
@@ -143,7 +143,7 @@ theorem deRhamH_add_zero_right {Ω : GradedSpace.{u}} (D : Differential Ω)
   simp [deRhamH_add, deRhamH_zero, Ω.add_zero]
 
 /-- Path for add zero right. -/
-def deRhamH_add_zero_right_path {Ω : GradedSpace.{u}} (D : Differential Ω)
+noncomputable def deRhamH_add_zero_right_path {Ω : GradedSpace.{u}} (D : Differential Ω)
     (a : DeRhamH Ω D)
     (h : isClosed D (Ω.add a.representative Ω.zero)) :
     Path (deRhamH_add D a (deRhamH_zero D) h).representative a.representative :=
@@ -157,7 +157,7 @@ theorem deRhamH_add_zero_left {Ω : GradedSpace.{u}} (D : Differential Ω)
   simp [deRhamH_add, deRhamH_zero, Ω.zero_add]
 
 /-- Path for add zero left. -/
-def deRhamH_add_zero_left_path {Ω : GradedSpace.{u}} (D : Differential Ω)
+noncomputable def deRhamH_add_zero_left_path {Ω : GradedSpace.{u}} (D : Differential Ω)
     (a : DeRhamH Ω D)
     (h : isClosed D (Ω.add Ω.zero a.representative)) :
     Path (deRhamH_add D (deRhamH_zero D) a h).representative a.representative :=
@@ -175,13 +175,13 @@ structure BettiData where
   vanishing : ∀ k : Nat, k > finiteDim → betti k = 0
 
 /-- Euler characteristic χ = Σ (-1)^k b_k. -/
-def eulerCharacteristic (bd : BettiData) : Int :=
+noncomputable def eulerCharacteristic (bd : BettiData) : Int :=
   (List.range (bd.finiteDim + 1)).foldl
     (fun acc k => acc + (if k % 2 = 0 then (bd.betti k : Int) else -(bd.betti k : Int)))
     0
 
 /-- Betti data for a point: b₀ = 1, all others zero. -/
-def pointBetti : BettiData where
+noncomputable def pointBetti : BettiData where
   betti := fun k => if k = 0 then 1 else 0
   finiteDim := 0
   vanishing := by intro k hk; simp; omega
@@ -191,11 +191,11 @@ theorem pointEuler : eulerCharacteristic pointBetti = 1 := by
   native_decide
 
 /-- Path witness for χ(point) = 1. -/
-def pointEuler_path : Path (eulerCharacteristic pointBetti) 1 :=
+noncomputable def pointEuler_path : Path (eulerCharacteristic pointBetti) 1 :=
   Path.stepChain pointEuler
 
 /-- Betti data for S¹: b₀ = 1, b₁ = 1, all others zero. -/
-def circleBetti : BettiData where
+noncomputable def circleBetti : BettiData where
   betti := fun k => if k ≤ 1 then 1 else 0
   finiteDim := 1
   vanishing := by intro k hk; simp; omega
@@ -205,11 +205,11 @@ theorem circleEuler : eulerCharacteristic circleBetti = 0 := by
   native_decide
 
 /-- Path witness for χ(S¹) = 0. -/
-def circleEuler_path : Path (eulerCharacteristic circleBetti) 0 :=
+noncomputable def circleEuler_path : Path (eulerCharacteristic circleBetti) 0 :=
   Path.stepChain circleEuler
 
 /-- Betti data for S²: b₀ = 1, b₁ = 0, b₂ = 1. -/
-def sphere2Betti : BettiData where
+noncomputable def sphere2Betti : BettiData where
   betti := fun k => if k = 0 ∨ k = 2 then 1 else 0
   finiteDim := 2
   vanishing := by intro k hk; simp; omega
@@ -219,11 +219,11 @@ theorem sphere2Euler : eulerCharacteristic sphere2Betti = 2 := by
   native_decide
 
 /-- Path witness for χ(S²) = 2. -/
-def sphere2Euler_path : Path (eulerCharacteristic sphere2Betti) 2 :=
+noncomputable def sphere2Euler_path : Path (eulerCharacteristic sphere2Betti) 2 :=
   Path.stepChain sphere2Euler
 
 /-- Betti data for T² (torus): b₀ = 1, b₁ = 2, b₂ = 1. -/
-def torusBetti : BettiData where
+noncomputable def torusBetti : BettiData where
   betti := fun k => if k = 0 ∨ k = 2 then 1 else if k = 1 then 2 else 0
   finiteDim := 2
   vanishing := by intro k hk; simp [show ¬(k = 0) by omega, show ¬(k = 2) by omega, show ¬(k = 1) by omega]
@@ -233,13 +233,13 @@ theorem torusEuler : eulerCharacteristic torusBetti = 0 := by
   native_decide
 
 /-- Path witness for χ(T²) = 0. -/
-def torusEuler_path : Path (eulerCharacteristic torusBetti) 0 :=
+noncomputable def torusEuler_path : Path (eulerCharacteristic torusBetti) 0 :=
   Path.stepChain torusEuler
 
 /-! ## Genus-g surface Betti numbers -/
 
 /-- Betti data for Σ_g: b₀ = 1, b₁ = 2g, b₂ = 1. -/
-def surfaceBetti (g : Nat) : BettiData where
+noncomputable def surfaceBetti (g : Nat) : BettiData where
   betti := fun k => if k = 0 ∨ k = 2 then 1 else if k = 1 then 2 * g else 0
   finiteDim := 2
   vanishing := by intro k hk; simp [show ¬(k = 0) by omega, show ¬(k = 2) by omega, show ¬(k = 1) by omega]
@@ -257,17 +257,17 @@ theorem surfaceBetti_b2 (g : Nat) : (surfaceBetti g).betti 2 = 1 := by
   simp [surfaceBetti]
 
 /-- Path coherence for b₀. -/
-def surfaceBetti_b0_path (g : Nat) :
+noncomputable def surfaceBetti_b0_path (g : Nat) :
     Path ((surfaceBetti g).betti 0) 1 :=
   Path.stepChain (surfaceBetti_b0 g)
 
 /-- Path coherence for b₁. -/
-def surfaceBetti_b1_path (g : Nat) :
+noncomputable def surfaceBetti_b1_path (g : Nat) :
     Path ((surfaceBetti g).betti 1) (2 * g) :=
   Path.stepChain (surfaceBetti_b1 g)
 
 /-- Path coherence for b₂. -/
-def surfaceBetti_b2_path (g : Nat) :
+noncomputable def surfaceBetti_b2_path (g : Nat) :
     Path ((surfaceBetti g).betti 2) 1 :=
   Path.stepChain (surfaceBetti_b2 g)
 
@@ -277,7 +277,7 @@ theorem surfaceBetti_vanish (g : Nat) (k : Nat) (hk : k > 2) :
   simp [surfaceBetti, show ¬(k = 0) by omega, show ¬(k = 2) by omega, show ¬(k = 1) by omega]
 
 /-- Path for higher Betti vanishing. -/
-def surfaceBetti_vanish_path (g : Nat) (k : Nat) (hk : k > 2) :
+noncomputable def surfaceBetti_vanish_path (g : Nat) (k : Nat) (hk : k > 2) :
     Path ((surfaceBetti g).betti k) 0 :=
   Path.stepChain (surfaceBetti_vanish g k hk)
 
@@ -303,7 +303,7 @@ theorem chainMap_preserves_closed {Ω₁ Ω₂ : GradedSpace.{u}}
   rw [f.commutes ω, hω, f.preserves_zero]
 
 /-- Path witness for chain map preserving closedness. -/
-def chainMap_closed_path {Ω₁ Ω₂ : GradedSpace.{u}}
+noncomputable def chainMap_closed_path {Ω₁ Ω₂ : GradedSpace.{u}}
     {D₁ : Differential Ω₁} {D₂ : Differential Ω₂}
     (f : ChainMap Ω₁ Ω₂ D₁ D₂) (ω : Ω₁.Carrier)
     (hω : isClosed D₁ ω) :
@@ -311,7 +311,7 @@ def chainMap_closed_path {Ω₁ Ω₂ : GradedSpace.{u}}
   Path.stepChain (chainMap_preserves_closed f ω hω)
 
 /-- A chain map induces a map on cohomology. -/
-def chainMapOnH {Ω₁ Ω₂ : GradedSpace.{u}}
+noncomputable def chainMapOnH {Ω₁ Ω₂ : GradedSpace.{u}}
     {D₁ : Differential Ω₁} {D₂ : Differential Ω₂}
     (f : ChainMap Ω₁ Ω₂ D₁ D₂)
     (c : DeRhamH Ω₁ D₁) : DeRhamH Ω₂ D₂ where
@@ -327,7 +327,7 @@ theorem chainMapOnH_zero {Ω₁ Ω₂ : GradedSpace.{u}}
   simp [chainMapOnH, deRhamH_zero]; exact f.preserves_zero
 
 /-- Path for the induced map on zero. -/
-def chainMapOnH_zero_path {Ω₁ Ω₂ : GradedSpace.{u}}
+noncomputable def chainMapOnH_zero_path {Ω₁ Ω₂ : GradedSpace.{u}}
     {D₁ : Differential Ω₁} {D₂ : Differential Ω₂}
     (f : ChainMap Ω₁ Ω₂ D₁ D₂) :
     Path (chainMapOnH f (deRhamH_zero D₁)).representative
@@ -337,7 +337,7 @@ def chainMapOnH_zero_path {Ω₁ Ω₂ : GradedSpace.{u}}
 /-! ## Identity chain map -/
 
 /-- The identity chain map. -/
-def idChainMap (Ω : GradedSpace.{u}) (D : Differential Ω) :
+noncomputable def idChainMap (Ω : GradedSpace.{u}) (D : Differential Ω) :
     ChainMap Ω Ω D D where
   φ := fun ω => ω
   commutes := fun _ => rfl
@@ -349,7 +349,7 @@ theorem idChainMap_onH {Ω : GradedSpace.{u}} (D : Differential Ω)
     (chainMapOnH (idChainMap Ω D) c).representative = c.representative := rfl
 
 /-- Path for identity action on cohomology. -/
-def idChainMap_onH_path {Ω : GradedSpace.{u}} (D : Differential Ω)
+noncomputable def idChainMap_onH_path {Ω : GradedSpace.{u}} (D : Differential Ω)
     (c : DeRhamH Ω D) :
     Path (chainMapOnH (idChainMap Ω D) c).representative c.representative :=
   Path.stepChain (idChainMap_onH D c)
@@ -357,7 +357,7 @@ def idChainMap_onH_path {Ω : GradedSpace.{u}} (D : Differential Ω)
 /-! ## Composition of chain maps -/
 
 /-- Composition of chain maps. -/
-def compChainMap {Ω₁ Ω₂ Ω₃ : GradedSpace.{u}}
+noncomputable def compChainMap {Ω₁ Ω₂ Ω₃ : GradedSpace.{u}}
     {D₁ : Differential Ω₁} {D₂ : Differential Ω₂} {D₃ : Differential Ω₃}
     (f : ChainMap Ω₁ Ω₂ D₁ D₂) (g : ChainMap Ω₂ Ω₃ D₂ D₃) :
     ChainMap Ω₁ Ω₃ D₁ D₃ where
@@ -379,7 +379,7 @@ theorem compChainMap_onH {Ω₁ Ω₂ Ω₃ : GradedSpace.{u}}
       (chainMapOnH g (chainMapOnH f c)).representative := rfl
 
 /-- Path for composition functoriality. -/
-def compChainMap_onH_path {Ω₁ Ω₂ Ω₃ : GradedSpace.{u}}
+noncomputable def compChainMap_onH_path {Ω₁ Ω₂ Ω₃ : GradedSpace.{u}}
     {D₁ : Differential Ω₁} {D₂ : Differential Ω₂} {D₃ : Differential Ω₃}
     (f : ChainMap Ω₁ Ω₂ D₁ D₂) (g : ChainMap Ω₂ Ω₃ D₂ D₃)
     (c : DeRhamH Ω₁ D₁) :

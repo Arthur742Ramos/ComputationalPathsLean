@@ -53,19 +53,19 @@ section Products
 variable {A : Type u} {B : Type v}
 
 /-- Binary product object in the path category. -/
-def Product (A : Type u) (B : Type v) : Type (max u v) :=
+noncomputable def Product (A : Type u) (B : Type v) : Type (max u v) :=
   A × B
 
 /-- First projection from the product. -/
-def productFst (A : Type u) (B : Type v) : Hom (Product A B) A where
+noncomputable def productFst (A : Type u) (B : Type v) : Hom (Product A B) A where
   toFun := Prod.fst
 
 /-- Second projection from the product. -/
-def productSnd (A : Type u) (B : Type v) : Hom (Product A B) B where
+noncomputable def productSnd (A : Type u) (B : Type v) : Hom (Product A B) B where
   toFun := Prod.snd
 
 /-- Pairing map into the product. -/
-def productPair {X : Type w} (f : Hom X A) (g : Hom X B) : Hom X (Product A B) where
+noncomputable def productPair {X : Type w} (f : Hom X A) (g : Hom X B) : Hom X (Product A B) where
   toFun := fun x => (f x, g x)
 
 /-- Pairing followed by the first projection recovers the first component. -/
@@ -87,15 +87,15 @@ abbrev ProductCone (X : Type w) (A : Type u) (B : Type v) : Type (max u v w) :=
   Hom X A × Hom X B
 
 /-- Extract the product cone from a map into the product. -/
-def productConeMap {X : Type w} (h : Hom X (Product A B)) : ProductCone X A B :=
+noncomputable def productConeMap {X : Type w} (h : Hom X (Product A B)) : ProductCone X A B :=
   (⟨fun x => (h x).1⟩, ⟨fun x => (h x).2⟩)
 
 /-- Build the product map from a product cone. -/
-def productConeInv {X : Type w} (c : ProductCone X A B) : Hom X (Product A B) :=
+noncomputable def productConeInv {X : Type w} (c : ProductCone X A B) : Hom X (Product A B) :=
   productPair c.1 c.2
 
 /-- Universal property: maps into the product are equivalent to product cones. -/
-def productConeEquiv {X : Type w} :
+noncomputable def productConeEquiv {X : Type w} :
     SimpleEquiv (Hom X (Product A B)) (ProductCone X A B) where
   toFun := productConeMap (A := A) (B := B)
   invFun := productConeInv (A := A) (B := B)
@@ -116,13 +116,13 @@ def productConeEquiv {X : Type w} :
         rfl
 
 /-- Path witness for the product η-law from the universal property. -/
-def productCone_eta_path {X : Type w} (h : Hom X (Product A B)) :
+noncomputable def productCone_eta_path {X : Type w} (h : Hom X (Product A B)) :
     Path (productConeInv (A := A) (B := B) (X := X)
         (productConeMap (A := A) (B := B) h)) h :=
   Path.stepChain ((productConeEquiv (A := A) (B := B) (X := X)).left_inv h)
 
 /-- Uniqueness of product mediating maps as a computational path. -/
-def productCone_unique_path {X : Type w} {h₁ h₂ : Hom X (Product A B)}
+noncomputable def productCone_unique_path {X : Type w} {h₁ h₂ : Hom X (Product A B)}
     (hc : productConeMap (A := A) (B := B) h₁ =
         productConeMap (A := A) (B := B) h₂) :
     Path h₁ h₂ := by
@@ -153,15 +153,15 @@ section Equalizers
 variable {A : Type u} {B : Type v}
 
 /-- Equalizer of two morphisms in the path category. -/
-def Equalizer (f g : Hom A B) : Type (max u v) :=
+noncomputable def Equalizer (f g : Hom A B) : Type (max u v) :=
   Sigma fun a : A => Path (f a) (g a)
 
 /-- The canonical inclusion into the equalizer. -/
-def equalizerInclusion (f g : Hom A B) : Hom (Equalizer f g) A where
+noncomputable def equalizerInclusion (f g : Hom A B) : Hom (Equalizer f g) A where
   toFun := fun x => x.1
 
 /-- The equalizer inclusion satisfies the equalizing path. -/
-def equalizerInclusion_path {f g : Hom A B} (x : Equalizer f g) :
+noncomputable def equalizerInclusion_path {f g : Hom A B} (x : Equalizer f g) :
     Path (f (equalizerInclusion f g x)) (g (equalizerInclusion f g x)) :=
   x.2
 
@@ -170,23 +170,23 @@ abbrev EqualizerFork (X : Type w) (f g : Hom A B) : Type (max u v w) :=
   Sigma fun h : Hom X A => forall x : X, Path (f (h x)) (g (h x))
 
 /-- Lift a fork into the equalizer. -/
-def equalizerLift {X : Type w} {f g : Hom A B}
+noncomputable def equalizerLift {X : Type w} {f g : Hom A B}
     (h : Hom X A) (p : forall x : X, Path (f (h x)) (g (h x))) :
     Hom X (Equalizer f g) where
   toFun := fun x => ⟨h x, p x⟩
 
 /-- Extract the equalizer fork from a map into the equalizer. -/
-def equalizerForkMap {X : Type w} {f g : Hom A B} (k : Hom X (Equalizer f g)) :
+noncomputable def equalizerForkMap {X : Type w} {f g : Hom A B} (k : Hom X (Equalizer f g)) :
     EqualizerFork X f g :=
   ⟨⟨fun x => (k x).1⟩, fun x => (k x).2⟩
 
 /-- Build the equalizer map from a fork. -/
-def equalizerForkInv {X : Type w} {f g : Hom A B} :
+noncomputable def equalizerForkInv {X : Type w} {f g : Hom A B} :
     EqualizerFork X f g -> Hom X (Equalizer f g)
   | ⟨h, p⟩ => equalizerLift h p
 
 /-- Universal property: maps into the equalizer are equivalent to equalizer forks. -/
-def equalizerForkEquiv {X : Type w} {f g : Hom A B} :
+noncomputable def equalizerForkEquiv {X : Type w} {f g : Hom A B} :
     SimpleEquiv (Hom X (Equalizer f g)) (EqualizerFork X f g) where
   toFun := equalizerForkMap (f := f) (g := g)
   invFun := equalizerForkInv (f := f) (g := g)
@@ -206,14 +206,14 @@ def equalizerForkEquiv {X : Type w} {f g : Hom A B} :
         rfl
 
 /-- Path witness for the equalizer η-law from the universal property. -/
-def equalizerFork_eta_path {X : Type w} {f g : Hom A B}
+noncomputable def equalizerFork_eta_path {X : Type w} {f g : Hom A B}
     (k : Hom X (Equalizer f g)) :
     Path (equalizerForkInv (f := f) (g := g) (X := X)
         (equalizerForkMap (f := f) (g := g) k)) k :=
   Path.stepChain ((equalizerForkEquiv (f := f) (g := g) (X := X)).left_inv k)
 
 /-- Uniqueness of equalizer mediating maps as a computational path. -/
-def equalizerFork_unique_path {X : Type w} {f g : Hom A B}
+noncomputable def equalizerFork_unique_path {X : Type w} {f g : Hom A B}
     {k₁ k₂ : Hom X (Equalizer f g)}
     (hc : equalizerForkMap (f := f) (g := g) k₁ =
         equalizerForkMap (f := f) (g := g) k₂) :
@@ -246,19 +246,19 @@ section Coproducts
 variable {A : Type u} {B : Type v}
 
 /-- Binary coproduct object in the path category. -/
-def Coproduct (A : Type u) (B : Type v) : Type (max u v) :=
+noncomputable def Coproduct (A : Type u) (B : Type v) : Type (max u v) :=
   Sum A B
 
 /-- Left injection into the coproduct. -/
-def coproductInl (A : Type u) (B : Type v) : Hom A (Coproduct A B) where
+noncomputable def coproductInl (A : Type u) (B : Type v) : Hom A (Coproduct A B) where
   toFun := Sum.inl
 
 /-- Right injection into the coproduct. -/
-def coproductInr (A : Type u) (B : Type v) : Hom B (Coproduct A B) where
+noncomputable def coproductInr (A : Type u) (B : Type v) : Hom B (Coproduct A B) where
   toFun := Sum.inr
 
 /-- Recursor out of the coproduct. -/
-def coproductRec {X : Type w} (f : Hom A X) (g : Hom B X) :
+noncomputable def coproductRec {X : Type w} (f : Hom A X) (g : Hom B X) :
     Hom (Coproduct A B) X where
   toFun := fun
     | Sum.inl a => f a
@@ -283,17 +283,17 @@ abbrev CoproductCocone (X : Type w) (A : Type u) (B : Type v) : Type (max u v w)
   Hom A X × Hom B X
 
 /-- Extract the coproduct cocone from a map out of the coproduct. -/
-def coproductCoconeMap {X : Type w} (h : Hom (Coproduct A B) X) :
+noncomputable def coproductCoconeMap {X : Type w} (h : Hom (Coproduct A B) X) :
     CoproductCocone X A B :=
   (⟨fun a => h (Sum.inl a)⟩, ⟨fun b => h (Sum.inr b)⟩)
 
 /-- Build the coproduct map from a cocone. -/
-def coproductCoconeInv {X : Type w} (c : CoproductCocone X A B) :
+noncomputable def coproductCoconeInv {X : Type w} (c : CoproductCocone X A B) :
     Hom (Coproduct A B) X :=
   coproductRec c.1 c.2
 
 /-- Universal property: maps out of the coproduct are equivalent to cocones. -/
-def coproductCoconeEquiv {X : Type w} :
+noncomputable def coproductCoconeEquiv {X : Type w} :
     SimpleEquiv (Hom (Coproduct A B) X) (CoproductCocone X A B) where
   toFun := coproductCoconeMap (A := A) (B := B)
   invFun := coproductCoconeInv (A := A) (B := B)
@@ -313,13 +313,13 @@ def coproductCoconeEquiv {X : Type w} :
         rfl
 
 /-- Path witness for the coproduct η-law from the universal property. -/
-def coproductCocone_eta_path {X : Type w} (h : Hom (Coproduct A B) X) :
+noncomputable def coproductCocone_eta_path {X : Type w} (h : Hom (Coproduct A B) X) :
     Path (coproductCoconeInv (A := A) (B := B) (X := X)
         (coproductCoconeMap (A := A) (B := B) h)) h :=
   Path.stepChain ((coproductCoconeEquiv (A := A) (B := B) (X := X)).left_inv h)
 
 /-- Uniqueness of coproduct mediating maps as a computational path. -/
-def coproductCocone_unique_path {X : Type w}
+noncomputable def coproductCocone_unique_path {X : Type w}
     {h₁ h₂ : Hom (Coproduct A B) X}
     (hc : coproductCoconeMap (A := A) (B := B) h₁ =
         coproductCoconeMap (A := A) (B := B) h₂) :
@@ -356,11 +356,11 @@ inductive CoequalizerRel (f g : Hom A B) : B -> B -> Prop
   | glue (a : A) : CoequalizerRel f g (f a) (g a)
 
 /-- Coequalizer of two morphisms in the path category. -/
-def Coequalizer (f g : Hom A B) : Type v :=
+noncomputable def Coequalizer (f g : Hom A B) : Type v :=
   Quot (CoequalizerRel f g)
 
 /-- The canonical map into the coequalizer. -/
-def coequalizerMk (f g : Hom A B) : Hom B (Coequalizer f g) where
+noncomputable def coequalizerMk (f g : Hom A B) : Hom B (Coequalizer f g) where
   toFun := fun b => Quot.mk (CoequalizerRel f g) b
 
 /-- The coequalizer map identifies `f a` and `g a`. -/
@@ -374,7 +374,7 @@ abbrev CoequalizerCocone (X : Type w) (f g : Hom A B) : Type (max v w) :=
   { h : Hom B X // forall a : A, h (f a) = h (g a) }
 
 /-- Descend a cocone to the coequalizer. -/
-def coequalizerDesc {X : Type w} {f g : Hom A B} (c : CoequalizerCocone X f g) :
+noncomputable def coequalizerDesc {X : Type w} {f g : Hom A B} (c : CoequalizerCocone X f g) :
     Hom (Coequalizer f g) X where
   toFun :=
     Quot.lift
@@ -389,7 +389,7 @@ def coequalizerDesc {X : Type w} {f g : Hom A B} (c : CoequalizerCocone X f g) :
     coequalizerDesc c (Quot.mk (CoequalizerRel f g) b) = c.1 b := rfl
 
 /-- Build a coequalizer cocone from a map out of the coequalizer. -/
-def coequalizerCoconeMap {X : Type w} {f g : Hom A B} (h : Hom (Coequalizer f g) X) :
+noncomputable def coequalizerCoconeMap {X : Type w} {f g : Hom A B} (h : Hom (Coequalizer f g) X) :
     CoequalizerCocone X f g :=
   ⟨
     ⟨fun b => h (Quot.mk (CoequalizerRel f g) b)⟩,
@@ -402,12 +402,12 @@ def coequalizerCoconeMap {X : Type w} {f g : Hom A B} (h : Hom (Coequalizer f g)
   ⟩
 
 /-- Build the coequalizer map from a cocone. -/
-def coequalizerCoconeInv {X : Type w} {f g : Hom A B} :
+noncomputable def coequalizerCoconeInv {X : Type w} {f g : Hom A B} :
     CoequalizerCocone X f g -> Hom (Coequalizer f g) X :=
   fun c => coequalizerDesc c
 
 /-- Universal property: maps out of the coequalizer are equivalent to cocones. -/
-def coequalizerCoconeEquiv {X : Type w} {f g : Hom A B} :
+noncomputable def coequalizerCoconeEquiv {X : Type w} {f g : Hom A B} :
     SimpleEquiv (Hom (Coequalizer f g) X) (CoequalizerCocone X f g) where
   toFun := coequalizerCoconeMap (f := f) (g := g)
   invFun := coequalizerCoconeInv (f := f) (g := g)
@@ -425,14 +425,14 @@ def coequalizerCoconeEquiv {X : Type w} {f g : Hom A B} :
     rfl
 
 /-- Path witness for the coequalizer η-law from the universal property. -/
-def coequalizerCocone_eta_path {X : Type w} {f g : Hom A B}
+noncomputable def coequalizerCocone_eta_path {X : Type w} {f g : Hom A B}
     (h : Hom (Coequalizer f g) X) :
     Path (coequalizerCoconeInv (f := f) (g := g) (X := X)
         (coequalizerCoconeMap (f := f) (g := g) h)) h :=
   Path.stepChain ((coequalizerCoconeEquiv (f := f) (g := g) (X := X)).left_inv h)
 
 /-- Uniqueness of coequalizer mediating maps as a computational path. -/
-def coequalizerCocone_unique_path {X : Type w} {f g : Hom A B}
+noncomputable def coequalizerCocone_unique_path {X : Type w} {f g : Hom A B}
     {h₁ h₂ : Hom (Coequalizer f g) X}
     (hc : coequalizerCoconeMap (f := f) (g := g) h₁ =
         coequalizerCoconeMap (f := f) (g := g) h₂) :
@@ -543,13 +543,13 @@ theorem pathFunctor_preserves_binary_coproducts (F : PathFunctor) {A B X : Type 
   ⟩
 
 /-- Path-level preservation of (binary) limits by a functor. -/
-def PreservesLimits (F : PathFunctor) : Prop :=
+noncomputable def PreservesLimits (F : PathFunctor) : Prop :=
   ∀ {A B X : Type u} (f : Hom X A) (g : Hom X B),
     PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productFst A B)) = F.map f ∧
       PathAlgebraHom.comp (F.map (productPair f g)) (F.map (productSnd A B)) = F.map g
 
 /-- Path-level preservation of (binary) colimits by a functor. -/
-def PreservesColimits (F : PathFunctor) : Prop :=
+noncomputable def PreservesColimits (F : PathFunctor) : Prop :=
   ∀ {A B X : Type u} (f : Hom A X) (g : Hom B X),
     PathAlgebraHom.comp (F.map (coproductInl A B)) (F.map (coproductRec f g)) = F.map f ∧
       PathAlgebraHom.comp (F.map (coproductInr A B)) (F.map (coproductRec f g)) = F.map g

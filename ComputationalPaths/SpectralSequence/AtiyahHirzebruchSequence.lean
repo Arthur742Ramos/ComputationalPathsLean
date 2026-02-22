@@ -73,19 +73,19 @@ namespace AtiyahHirzebruchSequence
 variable (A : AtiyahHirzebruchSequence.{u})
 
 /-- Distinguished `E₂` representative at bidegree `(0,0)`. -/
-def e2Base : A.pages.term 0 0 :=
+noncomputable def e2Base : A.pages.term 0 0 :=
   A.pages.base 0 0
 
 /-- Skeletal filtration class extracted from the distinguished representative. -/
-def skeletalClass (n r : Nat) : A.pages.term 0 0 :=
+noncomputable def skeletalClass (n r : Nat) : A.pages.term 0 0 :=
   A.skeletalFiltration n r A.e2Base
 
 /-- Generalized cohomology filtration class extracted from the distinguished representative. -/
-def kClass (n r : Nat) : A.pages.term 0 0 :=
+noncomputable def kClass (n r : Nat) : A.pages.term 0 0 :=
   A.kFiltration n r A.e2Base
 
 /-- Edge-map witness at filtration level `n` and page `r`. -/
-def edge (n r : Nat) :
+noncomputable def edge (n r : Nat) :
     Path (A.kClass n r) (A.skeletalClass n r) :=
   A.edgePath n r
 
@@ -96,7 +96,7 @@ noncomputable def edge_rweq (n r : Nat) :
   rweq_of_step (A.edgeStep n r)
 
 /-- Chern-character style witness at filtration level `n` and page `r`. -/
-def chernCharacter (n r : Nat) :
+noncomputable def chernCharacter (n r : Nat) :
     Path (A.kClass (n + 1) r) (A.skeletalClass n r) :=
   A.chernPath n r
 
@@ -107,7 +107,7 @@ noncomputable def chern_rweq (n r : Nat) :
   rweq_of_step (A.chernStep n r)
 
 /-- Loop induced by the edge-map witness and its inverse. -/
-def edgeLoop (n r : Nat) :
+noncomputable def edgeLoop (n r : Nat) :
     Path (A.kClass n r) (A.kClass n r) :=
   Path.trans (A.edge n r) (Path.symm (A.edge n r))
 
@@ -117,7 +117,7 @@ noncomputable def edgeLoop_contracts (n r : Nat) :
   exact rweq_cmpA_inv_right (A.edge n r)
 
 /-- Shifted edge-map witness mapped into the limiting term. -/
-def shiftedEdge (n r : Nat) :
+noncomputable def shiftedEdge (n r : Nat) :
     Path
       (A.convergence.embed 0 0 (A.pages.shift r 0 0 (A.kClass n r)))
       (A.convergence.embed 0 0 (A.pages.shift r 0 0 (A.skeletalClass n r))) :=
@@ -126,7 +126,7 @@ def shiftedEdge (n r : Nat) :
     (A.edge n r)
 
 /-- Edge-map witness after stabilization in the skeletal filtration. -/
-def edgeToSkeletalLimit (n r : Nat) :
+noncomputable def edgeToSkeletalLimit (n r : Nat) :
     Path
       (A.convergence.embed 0 0 (A.pages.shift r 0 0 (A.kClass n r)))
       (A.convergence.embed 0 0 (A.skeletalClass n r)) :=
@@ -141,7 +141,7 @@ noncomputable def edgeToSkeletalLimit_rweq (n r : Nat) :
   rweq_cmpA_refl_right (A.edgeToSkeletalLimit n r)
 
 /-- `d² = 0` transported through the generalized cohomology filtration at `(0,0)`. -/
-def kBoundaryCompression (n r : Nat) :
+noncomputable def kBoundaryCompression (n r : Nat) :
     Path
       (A.kFiltration n r
         (A.differentials.d r 0 0 (A.differentials.d r 0 0 A.e2Base)))
@@ -149,7 +149,7 @@ def kBoundaryCompression (n r : Nat) :
   Path.congrArg (A.kFiltration n r) (A.differentials.dSquaredPath r 0 0)
 
 /-- Shifted generalized-cohomology boundary compression mapped into the limit. -/
-def shiftedKBoundaryCompression (n r : Nat) :
+noncomputable def shiftedKBoundaryCompression (n r : Nat) :
     Path
       (A.convergence.embed 0 0
         (A.pages.shift r 0 0
@@ -161,7 +161,7 @@ def shiftedKBoundaryCompression (n r : Nat) :
     (A.kBoundaryCompression n r)
 
 /-- Shifted generalized-cohomology boundaries converge to the stabilized class. -/
-def kBoundaryToLimit (n r : Nat) :
+noncomputable def kBoundaryToLimit (n r : Nat) :
     Path
       (A.convergence.embed 0 0
         (A.pages.shift r 0 0
@@ -181,7 +181,7 @@ noncomputable def kBoundaryToLimit_rweq (n r : Nat) :
 end AtiyahHirzebruchSequence
 
 /-- Canonical trivial Atiyah-Hirzebruch package. -/
-def trivialAtiyahHirzebruchSequence : AtiyahHirzebruchSequence where
+noncomputable def trivialAtiyahHirzebruchSequence : AtiyahHirzebruchSequence where
   pages := trivialPages
   differentials := trivialDifferentials
   convergence := trivialConvergence

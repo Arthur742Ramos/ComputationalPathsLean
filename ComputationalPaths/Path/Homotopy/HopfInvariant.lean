@@ -39,7 +39,7 @@ universe u
 abbrev Sphere (n : Nat) : Type u := TopCat.sphere (n := n)
 
 /-- Hopf invariant map `H : π_{2n-1}(S^n, a) → ℤ`. -/
-def hopfInvariant (n : Nat) (a : Sphere n) :
+noncomputable def hopfInvariant (n : Nat) (a : Sphere n) :
     HigherHomotopy.PiN (2 * n - 1) (Sphere n) a → Int :=
   fun _ => 0
 
@@ -50,7 +50,7 @@ theorem hopfInvariant_eq_zero (n : Nat) (a : Sphere n)
   rfl
 
 /-- `Path` witness that the Hopf invariant is constant at 0. -/
-def hopfInvariant_path_zero (n : Nat) (a : Sphere n)
+noncomputable def hopfInvariant_path_zero (n : Nat) (a : Sphere n)
     (α : HigherHomotopy.PiN (2 * n - 1) (Sphere n) a) :
     ComputationalPaths.Path (hopfInvariant n a α) 0 :=
   ComputationalPaths.Path.stepChain (hopfInvariant_eq_zero n a α)
@@ -58,7 +58,7 @@ def hopfInvariant_path_zero (n : Nat) (a : Sphere n)
 /-! ## Hopf map -/
 
 /-- The Hopf map `eta : S3 -> S2` coming from Hopf fibration data. -/
-def eta (data : HopfFibrationData) : S3 -> S2 :=
+noncomputable def eta (data : HopfFibrationData) : S3 -> S2 :=
   data.proj
 
 /-! ## Hopf invariant data -/
@@ -82,7 +82,7 @@ theorem hopfInvariant_eta_eq (H : HopfInvariantData data) :
   H.hopfInvariant_eta
 
 /-- `Path` witness for `H(eta) = 1`. -/
-def hopfInvariant_eta_path (H : HopfInvariantData data) :
+noncomputable def hopfInvariant_eta_path (H : HopfInvariantData data) :
     ComputationalPaths.Path (H.hopfInvariant (eta data)) 1 :=
   ComputationalPaths.Path.stepChain H.hopfInvariant_eta
 

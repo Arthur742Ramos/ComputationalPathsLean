@@ -635,7 +635,7 @@ end GrothendieckGroupPathData
 /-! ## Section 10: Trivial instances -/
 
 /-- Trivial coherent sheaf path data on `PUnit`. -/
-def trivialCoherentSheafPathData : CoherentSheafPathData PUnit PUnit where
+noncomputable def trivialCoherentSheafPathData : CoherentSheafPathData PUnit PUnit where
   zero := PUnit.unit
   add := fun _ _ => PUnit.unit
   scalarMul := fun _ _ => PUnit.unit
@@ -650,7 +650,7 @@ def trivialCoherentSheafPathData : CoherentSheafPathData PUnit PUnit where
   finiteGenPath := Path.refl True
 
 /-- Trivial Čech cohomology path data on `PUnit`. -/
-def trivialCechCohomologyPathData : CechCohomologyPathData PUnit PUnit PUnit PUnit where
+noncomputable def trivialCechCohomologyPathData : CechCohomologyPathData PUnit PUnit PUnit PUnit where
   zero := PUnit.unit
   add := fun _ _ => PUnit.unit
   coboundaryMap := fun _ => PUnit.unit
@@ -663,7 +663,7 @@ def trivialCechCohomologyPathData : CechCohomologyPathData PUnit PUnit PUnit PUn
   refinementPath := fun _ => Path.refl PUnit.unit
 
 /-- Trivial Grothendieck group path data on `PUnit`. -/
-def trivialGrothendieckGroupPathData : GrothendieckGroupPathData PUnit where
+noncomputable def trivialGrothendieckGroupPathData : GrothendieckGroupPathData PUnit where
   zero := PUnit.unit
   add := fun _ _ => PUnit.unit
   neg := fun _ => PUnit.unit

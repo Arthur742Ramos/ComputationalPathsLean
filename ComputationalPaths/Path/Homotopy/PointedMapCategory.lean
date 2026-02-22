@@ -50,12 +50,12 @@ variable {X Y Z W : PtdType.{u}}
 /-! ## Identity and composition -/
 
 /-- The identity pointed map. -/
-def id (X : PtdType.{u}) : PtdMap X X where
+noncomputable def id (X : PtdType.{u}) : PtdMap X X where
   toFun := _root_.id
   map_pt := rfl
 
 /-- Composition of pointed maps. -/
-def comp (g : PtdMap Y Z) (f : PtdMap X Y) : PtdMap X Z where
+noncomputable def comp (g : PtdMap Y Z) (f : PtdMap X Y) : PtdMap X Z where
   toFun := g.toFun ∘ f.toFun
   map_pt := by
     simp only [Function.comp]
@@ -89,22 +89,22 @@ end PtdMap
 /-! ## Products of pointed types -/
 
 /-- The product of two pointed types. -/
-def PtdProduct (X Y : PtdType.{u}) : PtdType.{u} where
+noncomputable def PtdProduct (X Y : PtdType.{u}) : PtdType.{u} where
   carrier := X.carrier × Y.carrier
   pt := (X.pt, Y.pt)
 
 /-- First projection. -/
-def PtdProduct.fst (X Y : PtdType.{u}) : PtdMap (PtdProduct X Y) X where
+noncomputable def PtdProduct.fst (X Y : PtdType.{u}) : PtdMap (PtdProduct X Y) X where
   toFun := Prod.fst
   map_pt := rfl
 
 /-- Second projection. -/
-def PtdProduct.snd (X Y : PtdType.{u}) : PtdMap (PtdProduct X Y) Y where
+noncomputable def PtdProduct.snd (X Y : PtdType.{u}) : PtdMap (PtdProduct X Y) Y where
   toFun := Prod.snd
   map_pt := rfl
 
 /-- The universal property: pairing of pointed maps. -/
-def PtdProduct.pair {W : PtdType.{u}} (X Y : PtdType.{u})
+noncomputable def PtdProduct.pair {W : PtdType.{u}} (X Y : PtdType.{u})
     (f : PtdMap W X) (g : PtdMap W Y) : PtdMap W (PtdProduct X Y) where
   toFun := fun w => (f.toFun w, g.toFun w)
   map_pt := by simp [PtdProduct, f.map_pt, g.map_pt]
@@ -132,24 +132,24 @@ inductive WedgeRel (X Y : PtdType.{u}) :
   | refl (x : X.carrier ⊕ Y.carrier) : WedgeRel X Y x x
 
 /-- The wedge sum of two pointed types. -/
-def PtdCoproduct (X Y : PtdType.{u}) : PtdType.{u} where
+noncomputable def PtdCoproduct (X Y : PtdType.{u}) : PtdType.{u} where
   carrier := Quot (WedgeRel X Y)
   pt := Quot.mk _ (Sum.inl X.pt)
 
 /-- Left inclusion into the coproduct. -/
-def PtdCoproduct.inl (X Y : PtdType.{u}) : PtdMap X (PtdCoproduct X Y) where
+noncomputable def PtdCoproduct.inl (X Y : PtdType.{u}) : PtdMap X (PtdCoproduct X Y) where
   toFun := fun x => Quot.mk _ (Sum.inl x)
   map_pt := rfl
 
 /-- Right inclusion into the coproduct. -/
-def PtdCoproduct.inr (X Y : PtdType.{u}) : PtdMap Y (PtdCoproduct X Y) where
+noncomputable def PtdCoproduct.inr (X Y : PtdType.{u}) : PtdMap Y (PtdCoproduct X Y) where
   toFun := fun y => Quot.mk _ (Sum.inr y)
   map_pt := Quot.sound (WedgeRel.baseR)
 
 /-! ## Loop space pointed type -/
 
 /-- The loop space of a pointed type. -/
-def loopPtd (X : PtdType.{u}) : PtdType.{u} where
+noncomputable def loopPtd (X : PtdType.{u}) : PtdType.{u} where
   carrier := LoopSpace X.carrier X.pt
   pt := Path.refl X.pt
 
@@ -160,7 +160,7 @@ def loopPtd (X : PtdType.{u}) : PtdType.{u} where
 end PointedMapCategory
 end Path
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end ComputationalPaths

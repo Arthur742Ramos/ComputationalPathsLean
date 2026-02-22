@@ -41,10 +41,10 @@ inductive MFormula where
 namespace MFormula
 
 /-- Top as negation of bottom -/
-def top : MFormula := neg bot
+noncomputable def top : MFormula := neg bot
 
 /-- Biconditional -/
-def biimp (p q : MFormula) : MFormula := conj (impl p q) (impl q p)
+noncomputable def biimp (p q : MFormula) : MFormula := conj (impl p q) (impl q p)
 
 end MFormula
 
@@ -58,23 +58,23 @@ structure KripkeFrame where
   acc : World → World → Prop
 
 /-- Reflexive frame property -/
-def KripkeFrame.isReflexive (F : KripkeFrame) : Prop :=
+noncomputable def KripkeFrame.isReflexive (F : KripkeFrame) : Prop :=
   ∀ w : F.World, F.acc w w
 
 /-- Transitive frame property -/
-def KripkeFrame.isTransitive (F : KripkeFrame) : Prop :=
+noncomputable def KripkeFrame.isTransitive (F : KripkeFrame) : Prop :=
   ∀ w v u : F.World, F.acc w v → F.acc v u → F.acc w u
 
 /-- Symmetric frame property -/
-def KripkeFrame.isSymmetric (F : KripkeFrame) : Prop :=
+noncomputable def KripkeFrame.isSymmetric (F : KripkeFrame) : Prop :=
   ∀ w v : F.World, F.acc w v → F.acc v w
 
 /-- Euclidean frame property -/
-def KripkeFrame.isEuclidean (F : KripkeFrame) : Prop :=
+noncomputable def KripkeFrame.isEuclidean (F : KripkeFrame) : Prop :=
   ∀ w v u : F.World, F.acc w v → F.acc w u → F.acc v u
 
 /-- Serial frame property -/
-def KripkeFrame.isSerial (F : KripkeFrame) : Prop :=
+noncomputable def KripkeFrame.isSerial (F : KripkeFrame) : Prop :=
   ∀ w : F.World, ∃ v : F.World, F.acc w v
 
 -- ============================================================
@@ -87,7 +87,7 @@ structure KripkeModel where
   val : KripkeFrame.World frame → Atom → Prop
 
 /-- Satisfaction relation: model M, world w satisfies formula phi -/
-def KripkeModel.satisfies (M : KripkeModel) : M.frame.World → MFormula → Prop
+noncomputable def KripkeModel.satisfies (M : KripkeModel) : M.frame.World → MFormula → Prop
   | _, MFormula.bot => False
   | w, MFormula.atom a => M.val w a
   | w, MFormula.neg p => ¬ M.satisfies w p
@@ -98,11 +98,11 @@ def KripkeModel.satisfies (M : KripkeModel) : M.frame.World → MFormula → Pro
   | w, MFormula.dia p => ∃ v, M.frame.acc w v ∧ M.satisfies v p
 
 /-- Model validity: formula valid in a model -/
-def KripkeModel.valid (M : KripkeModel) (phi : MFormula) : Prop :=
+noncomputable def KripkeModel.valid (M : KripkeModel) (phi : MFormula) : Prop :=
   ∀ w : M.frame.World, M.satisfies w phi
 
 /-- Frame validity: formula valid on a frame -/
-def KripkeFrame.valid (F : KripkeFrame) (phi : MFormula) : Prop :=
+noncomputable def KripkeFrame.valid (F : KripkeFrame) (phi : MFormula) : Prop :=
   ∀ (val : F.World → Atom → Prop),
     let M : KripkeModel := ⟨F, val⟩
     ∀ w, M.satisfies w phi
@@ -117,12 +117,12 @@ inductive AccPath (F : KripkeFrame) : F.World → F.World → Type where
   | step  : {w v u : F.World} → F.acc w v → AccPath F v u → AccPath F w u
 
 /-- Length of an accessibility path -/
-def AccPath.length {F : KripkeFrame} : {w v : F.World} → AccPath F w v → Nat
+noncomputable def AccPath.length {F : KripkeFrame} : {w v : F.World} → AccPath F w v → Nat
   | _, _, AccPath.here _ => 0
   | _, _, AccPath.step _ rest => 1 + rest.length
 
 /-- Concatenation of accessibility paths -/
-def AccPath.append {F : KripkeFrame} : {w v u : F.World} →
+noncomputable def AccPath.append {F : KripkeFrame} : {w v u : F.World} →
     AccPath F w v → AccPath F v u → AccPath F w u
   | _, _, _, AccPath.here _, q => q
   | _, _, _, AccPath.step h p, q => AccPath.step h (p.append q)
@@ -187,21 +187,21 @@ structure TruthAt (M : KripkeModel) (phi : MFormula) where
   holds : M.satisfies world phi
 
 /-- Def 7: Path between truth witnesses via trans -/
-def truth_path_trans {M : KripkeModel} {phi : MFormula}
+noncomputable def truth_path_trans {M : KripkeModel} {phi : MFormula}
     (a b c : TruthAt M phi)
     (p : Path a b) (q : Path b c) :
     Path a c :=
   Path.trans p q
 
 /-- Def 8: Symmetric path between truth witnesses -/
-def truth_path_symm {M : KripkeModel} {phi : MFormula}
+noncomputable def truth_path_symm {M : KripkeModel} {phi : MFormula}
     (a b : TruthAt M phi)
     (p : Path a b) :
     Path b a :=
   Path.symm p
 
 /-- Def 9: Reflexive path on truth witness -/
-def truth_path_refl {M : KripkeModel} {phi : MFormula}
+noncomputable def truth_path_refl {M : KripkeModel} {phi : MFormula}
     (a : TruthAt M phi) :
     Path a a :=
   Path.refl a
@@ -412,34 +412,34 @@ structure BisimPair (M1 M2 : KripkeModel) (B : Bisimulation M1 M2) where
   related : B.rel w1 w2
 
 /-- Def 27: Path refl on bisimulation pairs -/
-def bisim_pair_refl {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
+noncomputable def bisim_pair_refl {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
     (bp : BisimPair M1 M2 B) :
     Path bp bp :=
   Path.refl bp
 
 /-- Def 28: Path trans on bisimulation pairs -/
-def bisim_pair_trans {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
+noncomputable def bisim_pair_trans {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
     (a b c : BisimPair M1 M2 B)
     (p : Path a b) (q : Path b c) :
     Path a c :=
   Path.trans p q
 
 /-- Def 29: Path symm on bisimulation pairs -/
-def bisim_pair_symm {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
+noncomputable def bisim_pair_symm {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
     (a b : BisimPair M1 M2 B)
     (p : Path a b) :
     Path b a :=
   Path.symm p
 
 /-- Def 30: congrArg lifts through bisim pair w1 projection -/
-def bisim_pair_congrArg_w1 {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
+noncomputable def bisim_pair_congrArg_w1 {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
     (a b : BisimPair M1 M2 B)
     (p : Path a b) :
     Path a.w1 b.w1 :=
   Path.congrArg (fun bp => bp.w1) p
 
 /-- Def 31: congrArg lifts through bisim pair w2 projection -/
-def bisim_pair_congrArg_w2 {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
+noncomputable def bisim_pair_congrArg_w2 {M1 M2 : KripkeModel} {B : Bisimulation M1 M2}
     (a b : BisimPair M1 M2 B)
     (p : Path a b) :
     Path a.w2 b.w2 :=
@@ -474,7 +474,7 @@ theorem bisim_pair_congrArg_symm_w2 {M1 M2 : KripkeModel} {B : Bisimulation M1 M
 -- ============================================================
 
 /-- Subformula closure (simplified as a list) -/
-def subformulas : MFormula → List MFormula
+noncomputable def subformulas : MFormula → List MFormula
   | MFormula.bot => [MFormula.bot]
   | f@(MFormula.atom _) => [f]
   | f@(MFormula.neg p) => f :: subformulas p
@@ -496,13 +496,13 @@ structure FiltWorld (M : KripkeModel) (gam : List MFormula) where
   correct : ∀ f, f ∈ theory ↔ (f ∈ gam ∧ M.satisfies rep f)
 
 /-- Def 36: Path refl for filtration worlds -/
-def filt_world_refl {M : KripkeModel} {gam : List MFormula}
+noncomputable def filt_world_refl {M : KripkeModel} {gam : List MFormula}
     (fw : FiltWorld M gam) :
     Path fw fw :=
   Path.refl fw
 
 /-- Def 37: FiltWorld paths compose -/
-def filt_world_trans {M : KripkeModel} {gam : List MFormula}
+noncomputable def filt_world_trans {M : KripkeModel} {gam : List MFormula}
     (a b c : FiltWorld M gam)
     (p : Path a b) (q : Path b c) :
     Path a c :=
@@ -541,14 +541,14 @@ inductive LTLFormula where
 
 namespace LTLFormula
 
-def eventually (p : LTLFormula) : LTLFormula := luntil (neg bot) p
+noncomputable def eventually (p : LTLFormula) : LTLFormula := luntil (neg bot) p
 
-def globally (p : LTLFormula) : LTLFormula := neg (eventually (neg p))
+noncomputable def globally (p : LTLFormula) : LTLFormula := neg (eventually (neg p))
 
 end LTLFormula
 
 /-- LTL satisfaction on infinite paths -/
-def ltlSat (T : TransSystem) (pi : InfPath T) : Nat → LTLFormula → Prop
+noncomputable def ltlSat (T : TransSystem) (pi : InfPath T) : Nat → LTLFormula → Prop
   | _, LTLFormula.bot => False
   | i, LTLFormula.atom a => T.label (pi.at_ i) a
   | i, LTLFormula.neg p => ¬ ltlSat T pi i p
@@ -586,7 +586,7 @@ structure EModel (Agent : Type) where
   val : World → Atom → Prop
 
 /-- Group accessibility: union of agents' relations -/
-def groupAcc {Agent : Type} (M : EModel Agent) (agents : List Agent) :
+noncomputable def groupAcc {Agent : Type} (M : EModel Agent) (agents : List Agent) :
     M.World → M.World → Prop :=
   fun w v => ∃ a, a ∈ agents ∧ M.acc a w v
 
@@ -596,7 +596,7 @@ inductive TClosure {A : Type} (R : A → A → Prop) : A → A → Prop where
   | step_tc : R x y → TClosure R y z → TClosure R x z
 
 /-- Epistemic satisfaction -/
-def eSat {Agent : Type} (M : EModel Agent) : M.World → EFormula Agent → Prop
+noncomputable def eSat {Agent : Type} (M : EModel Agent) : M.World → EFormula Agent → Prop
   | _, EFormula.bot => False
   | w, EFormula.atom a => M.val w a
   | w, EFormula.neg p => ¬ eSat M w p
@@ -641,12 +641,12 @@ structure BoundedMorphism (F1 F2 : KripkeFrame) where
   back : ∀ w u2, F2.acc (map w) u2 → ∃ v, F1.acc w v ∧ map v = u2
 
 /-- Def 44: Bounded morphism identity via Path.refl -/
-def bmorphism_id_path (F : KripkeFrame) (w : F.World) :
+noncomputable def bmorphism_id_path (F : KripkeFrame) (w : F.World) :
     Path (id w) w :=
   Path.refl w
 
 /-- Def 45: Composition of bounded morphisms -/
-def bmorphism_comp {F1 F2 F3 : KripkeFrame}
+noncomputable def bmorphism_comp {F1 F2 F3 : KripkeFrame}
     (f : BoundedMorphism F1 F2) (g : BoundedMorphism F2 F3) :
     BoundedMorphism F1 F3 where
   map := g.map ∘ f.map
@@ -670,7 +670,7 @@ structure FramePropWitness where
   holds : Prop
 
 /-- Def 46: Path refl for frame property witnesses -/
-def frame_prop_path_refl (w : FramePropWitness) :
+noncomputable def frame_prop_path_refl (w : FramePropWitness) :
     Path w w :=
   Path.refl w
 
@@ -681,7 +681,7 @@ theorem frame_prop_trans_assoc (a b c d : FramePropWitness)
   trans_assoc p q r
 
 /-- Def 48: congrArg on frame property name -/
-def frame_prop_congrArg_name (a b : FramePropWitness)
+noncomputable def frame_prop_congrArg_name (a b : FramePropWitness)
     (p : Path a b) :
     Path a.name b.name :=
   Path.congrArg (fun w => w.name) p
@@ -711,7 +711,7 @@ structure GenSubframe (F : KripkeFrame) where
   closed : ∀ w v, worlds w → F.acc w v → worlds v
 
 /-- Def 51: Generated subframe is itself a frame -/
-def genSubframeToFrame (F : KripkeFrame) (G : GenSubframe F) : KripkeFrame where
+noncomputable def genSubframeToFrame (F : KripkeFrame) (G : GenSubframe F) : KripkeFrame where
   World := { w : F.World // G.worlds w }
   acc := fun ⟨w, _⟩ ⟨v, _⟩ => F.acc w v
 
@@ -741,7 +741,7 @@ theorem genSubframe_sym (F : KripkeFrame) (G : GenSubframe F)
 -- ============================================================
 
 /-- Nesting depth of modal operators -/
-def modalDepth : MFormula → Nat
+noncomputable def modalDepth : MFormula → Nat
   | MFormula.atom _ => 0
   | MFormula.bot => 0
   | MFormula.neg p => modalDepth p
@@ -761,12 +761,12 @@ theorem modalDepth_dia_eq_box (p : MFormula) :
   simp [modalDepth]
 
 /-- Def 57: Path refl on modal depths -/
-def modalDepth_refl (p : MFormula) :
+noncomputable def modalDepth_refl (p : MFormula) :
     Path (modalDepth p) (modalDepth p) :=
   Path.refl (modalDepth p)
 
 /-- Def 58: congrArg lifts modalDepth through formula paths -/
-def modalDepth_congrArg (p q : MFormula) (h : Path p q) :
+noncomputable def modalDepth_congrArg (p q : MFormula) (h : Path p q) :
     Path (modalDepth p) (modalDepth q) :=
   Path.congrArg modalDepth h
 
@@ -782,7 +782,7 @@ structure MCS (logic : MFormula → Prop) where
   closed_mp : ∀ p q, formulas (MFormula.impl p q) → formulas p → formulas q
 
 /-- Canonical frame for a normal modal logic -/
-def canonicalFrame (logic : MFormula → Prop) : KripkeFrame where
+noncomputable def canonicalFrame (logic : MFormula → Prop) : KripkeFrame where
   World := MCS logic
   acc := fun w v => ∀ p, w.formulas (MFormula.box p) → v.formulas p
 
@@ -888,18 +888,18 @@ structure FormulaWorld (M : KripkeModel) where
   world : M.frame.World
 
 /-- Def 71: Path refl on FormulaWorld -/
-def fw_refl {M : KripkeModel} (fw : FormulaWorld M) :
+noncomputable def fw_refl {M : KripkeModel} (fw : FormulaWorld M) :
     Path fw fw :=
   Path.refl fw
 
 /-- Def 72: congrArg extracts formula from FormulaWorld path -/
-def fw_congrArg_formula {M : KripkeModel} (a b : FormulaWorld M)
+noncomputable def fw_congrArg_formula {M : KripkeModel} (a b : FormulaWorld M)
     (p : Path a b) :
     Path a.formula b.formula :=
   Path.congrArg (fun fw => fw.formula) p
 
 /-- Def 73: congrArg extracts world from FormulaWorld path -/
-def fw_congrArg_world {M : KripkeModel} (a b : FormulaWorld M)
+noncomputable def fw_congrArg_world {M : KripkeModel} (a b : FormulaWorld M)
     (p : Path a b) :
     Path a.world b.world :=
   Path.congrArg (fun fw => fw.world) p
@@ -930,7 +930,7 @@ structure MMModel (Mod : Type) where
   val : World → Atom → Prop
 
 /-- Multi-modal satisfaction -/
-def mmSat {Mod : Type} (M : MMModel Mod) : M.World → MMFormula Mod → Prop
+noncomputable def mmSat {Mod : Type} (M : MMModel Mod) : M.World → MMFormula Mod → Prop
   | _, MMFormula.bot => False
   | w, MMFormula.atom a => M.val w a
   | w, MMFormula.neg p => ¬ mmSat M w p
@@ -971,7 +971,7 @@ theorem mm_diamond_monotone {Mod : Type} (M : MMModel Mod) (m : Mod)
 -- ============================================================
 
 /-- Def 78: AccPath length paths via congrArg -/
-def accpath_length_path {F : KripkeFrame} {w v : F.World}
+noncomputable def accpath_length_path {F : KripkeFrame} {w v : F.World}
     (p q : AccPath F w v) (h : Path p q) :
     Path p.length q.length :=
   Path.congrArg AccPath.length h
@@ -1001,18 +1001,18 @@ structure SatWitness (M : KripkeModel) where
   sat : M.satisfies world formula
 
 /-- Def 81: SatWitness refl -/
-def sat_witness_refl {M : KripkeModel} (sw : SatWitness M) :
+noncomputable def sat_witness_refl {M : KripkeModel} (sw : SatWitness M) :
     Path sw sw :=
   Path.refl sw
 
 /-- Def 82: SatWitness trans -/
-def sat_witness_trans {M : KripkeModel} (a b c : SatWitness M)
+noncomputable def sat_witness_trans {M : KripkeModel} (a b c : SatWitness M)
     (p : Path a b) (q : Path b c) :
     Path a c :=
   Path.trans p q
 
 /-- Def 83: SatWitness symm -/
-def sat_witness_symm {M : KripkeModel} (a b : SatWitness M)
+noncomputable def sat_witness_symm {M : KripkeModel} (a b : SatWitness M)
     (p : Path a b) :
     Path b a :=
   Path.symm p
@@ -1036,13 +1036,13 @@ theorem sat_witness_trans_refl_right {M : KripkeModel} (a b : SatWitness M)
   trans_refl_right p
 
 /-- Def 87: congrArg on SatWitness world -/
-def sat_witness_congrArg_world {M : KripkeModel} (a b : SatWitness M)
+noncomputable def sat_witness_congrArg_world {M : KripkeModel} (a b : SatWitness M)
     (p : Path a b) :
     Path a.world b.world :=
   Path.congrArg (fun sw => sw.world) p
 
 /-- Def 88: congrArg on SatWitness formula -/
-def sat_witness_congrArg_formula {M : KripkeModel} (a b : SatWitness M)
+noncomputable def sat_witness_congrArg_formula {M : KripkeModel} (a b : SatWitness M)
     (p : Path a b) :
     Path a.formula b.formula :=
   Path.congrArg (fun sw => sw.formula) p

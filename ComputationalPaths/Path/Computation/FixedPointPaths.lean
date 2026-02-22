@@ -31,12 +31,12 @@ structure MonotoneMap (A : Type u) where
   pres : ∀ {a b : A}, Path a b → Path (func a) (func b)
 
 /-- Identity monotone map. -/
-def MonotoneMap.id (A : Type u) : MonotoneMap A where
+noncomputable def MonotoneMap.id (A : Type u) : MonotoneMap A where
   func := fun x => x
   pres := fun p => p
 
 /-- Composition of monotone maps. -/
-def MonotoneMap.comp {A : Type u} (g f : MonotoneMap A) : MonotoneMap A where
+noncomputable def MonotoneMap.comp {A : Type u} (g f : MonotoneMap A) : MonotoneMap A where
   func := g.func ∘ f.func
   pres := fun p => g.pres (f.pres p)
 
@@ -52,7 +52,7 @@ theorem monotone_comp_pres {A : Type u} (g f : MonotoneMap A)
 /-! ## Iteration -/
 
 /-- Iterate a monotone map n times. -/
-def MonotoneMap.iterate {A : Type u} (f : MonotoneMap A) : Nat → A → A
+noncomputable def MonotoneMap.iterate {A : Type u} (f : MonotoneMap A) : Nat → A → A
   | 0 => fun x => x
   | n + 1 => fun x => f.func (f.iterate n x)
 
@@ -65,7 +65,7 @@ theorem iterate_succ {A : Type u} (f : MonotoneMap A) (n : Nat) (x : A) :
     f.iterate (n + 1) x = f.func (f.iterate n x) := rfl
 
 /-- Iterate preserves paths at any level. -/
-def iterate_pres {A : Type u} (f : MonotoneMap A) (n : Nat)
+noncomputable def iterate_pres {A : Type u} (f : MonotoneMap A) (n : Nat)
     {a b : A} (p : Path a b) : Path (f.iterate n a) (f.iterate n b) := by
   induction n with
   | zero => exact p
@@ -90,12 +90,12 @@ structure IsPostFixedPoint {A : Type u} (f : MonotoneMap A) (x : A) where
   post : Path x (f.func x)
 
 /-- Every fixed point is a pre-fixed point. -/
-def fixed_is_pre {A : Type u} {f : MonotoneMap A} {x : A}
+noncomputable def fixed_is_pre {A : Type u} {f : MonotoneMap A} {x : A}
     (h : IsFixedPoint f x) : IsPreFixedPoint f x :=
   ⟨h.fixed⟩
 
 /-- Every fixed point is a post-fixed point. -/
-def fixed_is_post {A : Type u} {f : MonotoneMap A} {x : A}
+noncomputable def fixed_is_post {A : Type u} {f : MonotoneMap A} {x : A}
     (h : IsFixedPoint f x) : IsPostFixedPoint f x :=
   ⟨Path.symm h.fixed⟩
 
@@ -129,7 +129,7 @@ theorem gfp_fixed {A : Type u} {f : MonotoneMap A} (g : GFP f) :
   ⟨g.isFixed.fixed, rfl⟩
 
 /-- LFP is below GFP via path. -/
-def lfp_below_gfp {A : Type u} {f : MonotoneMap A}
+noncomputable def lfp_below_gfp {A : Type u} {f : MonotoneMap A}
     (l : LFP f) (g : GFP f) : Path l.point g.point :=
   l.least g.point (fixed_is_pre g.isFixed)
 
@@ -158,7 +158,7 @@ structure ParamMonotone (P : Type u) (A : Type u) where
   pres : ∀ (p : P) {a b : A}, Path a b → Path (func p a) (func p b)
 
 /-- Parameterized iteration. -/
-def ParamMonotone.iterate {P A : Type u} (f : ParamMonotone P A)
+noncomputable def ParamMonotone.iterate {P A : Type u} (f : ParamMonotone P A)
     (p : P) : Nat → A → A
   | 0 => fun x => x
   | n + 1 => fun x => f.func p (f.iterate p n x)
@@ -173,7 +173,7 @@ theorem param_iterate_succ {P A : Type u} (f : ParamMonotone P A)
     f.iterate p (n + 1) x = f.func p (f.iterate p n x) := rfl
 
 /-- Parameter change path: if parameter changes, the iterate changes via path. -/
-def param_change_path {P A : Type u} (f : ParamMonotone P A)
+noncomputable def param_change_path {P A : Type u} (f : ParamMonotone P A)
     {p1 p2 : P} (hp : p1 = p2) (n : Nat) (x : A) :
     Path (f.iterate p1 n x) (f.iterate p2 n x) :=
   Path.mk [Step.mk _ _ (by subst hp; rfl)] (by subst hp; rfl)
@@ -221,7 +221,7 @@ theorem fp_symm {A : Type u} {f : MonotoneMap A} {x : A}
   Path.symm_symm h.fixed
 
 /-- Transport along a fixed-point path. -/
-def fp_transport {A : Type u} {f : MonotoneMap A} {x : A}
+noncomputable def fp_transport {A : Type u} {f : MonotoneMap A} {x : A}
     {D : A → Type v} (h : IsFixedPoint f x) (val : D (f.func x)) : D x :=
   Path.transport h.fixed val
 
@@ -239,7 +239,7 @@ theorem fp_congrArg {A : Type u} {B : Type v} {f : MonotoneMap A} {x : A}
 /-! ## Chain Completeness -/
 
 /-- An ascending chain from iteration. -/
-def iterChain {A : Type u} (f : MonotoneMap A) (bot : A)
+noncomputable def iterChain {A : Type u} (f : MonotoneMap A) (bot : A)
     (bot_below : ∀ y : A, Path bot y) : Nat → A :=
   fun n => f.iterate n bot
 
@@ -249,7 +249,7 @@ theorem iter_chain_zero {A : Type u} (f : MonotoneMap A) (bot : A)
     iterChain f bot bot_below 0 = bot := rfl
 
 /-- Consecutive chain elements are connected by paths. -/
-def iter_chain_link {A : Type u} (f : MonotoneMap A) (bot : A)
+noncomputable def iter_chain_link {A : Type u} (f : MonotoneMap A) (bot : A)
     (bot_below : ∀ y : A, Path bot y) (n : Nat) :
     Path (iterChain f bot bot_below n) (iterChain f bot bot_below (n + 1)) := by
   simp [iterChain]

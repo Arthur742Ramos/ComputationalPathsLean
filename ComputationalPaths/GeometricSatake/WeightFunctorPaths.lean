@@ -45,7 +45,7 @@ inductive WeightFunctorRewrite (W : WeightFunctorPathData) : Nat → Nat → Typ
 namespace WeightFunctorRewrite
 
 /-- Interpret a weight-functor rewrite as a computational path. -/
-def toPath {W : WeightFunctorPathData} {a b : Nat}
+noncomputable def toPath {W : WeightFunctorPathData} {a b : Nat}
     (r : WeightFunctorRewrite W a b) : Path a b := by
   cases r with
   | tensor X Y =>
@@ -56,7 +56,7 @@ def toPath {W : WeightFunctorPathData} {a b : Nat}
       exact Path.stepChain (Nat.add_assoc (W.weight X) (W.weight Y) (W.weight Z))
 
 /-- Primitive right-unit normalization step for any weight rewrite path. -/
-def normalizeStep {W : WeightFunctorPathData} {a b : Nat}
+noncomputable def normalizeStep {W : WeightFunctorPathData} {a b : Nat}
     (r : WeightFunctorRewrite W a b) :
     Path.Step (Path.trans r.toPath (Path.refl b)) r.toPath :=
   Path.Step.trans_refl_right r.toPath
@@ -78,33 +78,33 @@ namespace WeightFunctorPathData
 variable (W : WeightFunctorPathData)
 
 /-- Weight path for `((X ⋆ Y) ⋆ Z)` via two tensor-compatibility witnesses. -/
-def tripleTensorLeft (X Y Z : HeckeObject) :
+noncomputable def tripleTensorLeft (X Y Z : HeckeObject) :
     Path (W.weight (convolution (convolution X Y) Z))
       ((W.weight X + W.weight Y) + W.weight Z) :=
   Path.trans (W.tensorPath (convolution X Y) Z)
     (Path.congrArg (fun n => n + W.weight Z) (W.tensorPath X Y))
 
 /-- Weight path for `(X ⋆ (Y ⋆ Z))` via two tensor-compatibility witnesses. -/
-def tripleTensorRight (X Y Z : HeckeObject) :
+noncomputable def tripleTensorRight (X Y Z : HeckeObject) :
     Path (W.weight (convolution X (convolution Y Z)))
       (W.weight X + (W.weight Y + W.weight Z)) :=
   Path.trans (W.tensorPath X (convolution Y Z))
     (Path.congrArg (fun n => W.weight X + n) (W.tensorPath Y Z))
 
 /-- Arithmetic reassociation path on weight sums. -/
-def reassociatePath (X Y Z : HeckeObject) :
+noncomputable def reassociatePath (X Y Z : HeckeObject) :
     Path ((W.weight X + W.weight Y) + W.weight Z)
       (W.weight X + (W.weight Y + W.weight Z)) :=
   WeightFunctorRewrite.toPath (WeightFunctorRewrite.reassociate (W := W) X Y Z)
 
 /-- Weight comparison path from left-associated triple convolution to right-associated sums. -/
-def leftToRightViaSatake (X Y Z : HeckeObject) :
+noncomputable def leftToRightViaSatake (X Y Z : HeckeObject) :
     Path (W.weight (convolution (convolution X Y) Z))
       (W.weight X + (W.weight Y + W.weight Z)) :=
   Path.trans (tripleTensorLeft W X Y Z) (reassociatePath W X Y Z)
 
 /-- Compare the two triple-convolution weight evaluations. -/
-def rightComparison (X Y Z : HeckeObject) :
+noncomputable def rightComparison (X Y Z : HeckeObject) :
     Path (W.weight (convolution (convolution X Y) Z))
       (W.weight (convolution X (convolution Y Z))) :=
   Path.trans (leftToRightViaSatake W X Y Z) (Path.symm (tripleTensorRight W X Y Z))
@@ -134,7 +134,7 @@ noncomputable def rightComparison_cancel_rweq (X Y Z : HeckeObject) :
 end WeightFunctorPathData
 
 /-- Tensor compatibility path for the dominant-coweight weight functor. -/
-def dominantTensorPath (X Y : HeckeObject) :
+noncomputable def dominantTensorPath (X Y : HeckeObject) :
     Path ((convolution X Y).dominantCoweight)
       (X.dominantCoweight + Y.dominantCoweight) := by
   refine Path.stepChain ?_
@@ -143,12 +143,12 @@ def dominantTensorPath (X Y : HeckeObject) :
   simp [convolution]
 
 /-- Unit path for the dominant-coweight weight functor. -/
-def dominantUnitPath : Path unitObj.dominantCoweight 0 := by
+noncomputable def dominantUnitPath : Path unitObj.dominantCoweight 0 := by
   refine Path.stepChain ?_
   simp [unitObj]
 
 /-- Canonical dominant-coweight weight functor for geometric Satake paths. -/
-def dominantWeightFunctor : WeightFunctorPathData where
+noncomputable def dominantWeightFunctor : WeightFunctorPathData where
   weight := fun X => X.dominantCoweight
   tensorPath := fun X Y => by
     simpa using dominantTensorPath X Y
@@ -163,7 +163,7 @@ noncomputable def dominant_tensor_rweq (X Y : HeckeObject) :
   WeightFunctorPathData.tensor_rweq (W := dominantWeightFunctor) X Y
 
 /-- Image under the dominant-weight functor of the spherical fusion normalization path. -/
-def dominantOnFusionNormalizePath (X Y : HeckeObject) :
+noncomputable def dominantOnFusionNormalizePath (X Y : HeckeObject) :
     Path
       (dominantWeightFunctor.weight (convolution (convolution X unitObj) Y))
       (dominantWeightFunctor.weight (convolution X Y)) :=

@@ -68,11 +68,11 @@ structure ContMap (X Y : TopSpace) where
   toFun : X.carrier → Y.carrier
 
 /-- Identity continuous map. -/
-def ContMap.id (X : TopSpace) : ContMap X X where
+noncomputable def ContMap.id (X : TopSpace) : ContMap X X where
   toFun := _root_.id
 
 /-- Composition of continuous maps. -/
-def ContMap.comp {X Y Z : TopSpace}
+noncomputable def ContMap.comp {X Y Z : TopSpace}
     (f : ContMap X Y) (g : ContMap Y Z) : ContMap X Z where
   toFun := g.toFun ∘ f.toFun
 
@@ -83,7 +83,7 @@ theorem ContMap.id_comp {X Y : TopSpace} (f : ContMap X Y) :
   rfl
 
 /-- Path witness for left identity. -/
-def ContMap.id_comp_path {X Y : TopSpace} (f : ContMap X Y) :
+noncomputable def ContMap.id_comp_path {X Y : TopSpace} (f : ContMap X Y) :
     Path (comp (ContMap.id X) f).toFun f.toFun :=
   Path.stepChain (id_comp f)
 
@@ -94,7 +94,7 @@ theorem ContMap.comp_id {X Y : TopSpace} (f : ContMap X Y) :
   rfl
 
 /-- Path witness for right identity. -/
-def ContMap.comp_id_path {X Y : TopSpace} (f : ContMap X Y) :
+noncomputable def ContMap.comp_id_path {X Y : TopSpace} (f : ContMap X Y) :
     Path (comp f (ContMap.id Y)).toFun f.toFun :=
   Path.stepChain (comp_id f)
 
@@ -109,7 +109,7 @@ structure PContMap (X Y : PTopSpace) extends ContMap X.toTopSpace Y.toTopSpace w
   map_pt : toFun X.pt = Y.pt
 
 /-- Path witness for basepoint preservation. -/
-def PContMap.map_pt_path {X Y : PTopSpace} (f : PContMap X Y) :
+noncomputable def PContMap.map_pt_path {X Y : PTopSpace} (f : PContMap X Y) :
     Path (f.toFun X.pt) Y.pt :=
   Path.stepChain f.map_pt
 
@@ -138,7 +138,7 @@ structure VirtualBundle where
   same_base : pos.base = neg.base
 
 /-- Path witness for same base. -/
-def VirtualBundle.same_base_path (V : VirtualBundle) :
+noncomputable def VirtualBundle.same_base_path (V : VirtualBundle) :
     Path V.pos.base V.neg.base :=
   Path.stepChain V.same_base
 
@@ -158,12 +158,12 @@ structure VBundleSum where
   sum_base : sum.base = fst.base
 
 /-- Path witness for sum rank. -/
-def VBundleSum.sum_rank_path (S : VBundleSum) :
+noncomputable def VBundleSum.sum_rank_path (S : VBundleSum) :
     Path S.sum.rank (S.fst.rank + S.snd.rank) :=
   Path.stepChain S.sum_rank
 
 /-- Path witness for sum base. -/
-def VBundleSum.sum_base_path (S : VBundleSum) :
+noncomputable def VBundleSum.sum_base_path (S : VBundleSum) :
     Path S.sum.base S.fst.base :=
   Path.stepChain S.sum_base
 
@@ -183,7 +183,7 @@ structure VBundleTensor where
   tensor_base : tensor.base = fst.base
 
 /-- Path witness for tensor rank. -/
-def VBundleTensor.tensor_rank_path (T : VBundleTensor) :
+noncomputable def VBundleTensor.tensor_rank_path (T : VBundleTensor) :
     Path T.tensor.rank (T.fst.rank * T.snd.rank) :=
   Path.stepChain T.tensor_rank
 
@@ -204,7 +204,7 @@ structure KGroupReduced (X : PTopSpace.{u}) where
   base_eq : X.toTopSpace = X.toTopSpace
 
 /-- The trivial bundle of rank n over X. -/
-def trivBundle (X : TopSpace) (n : Nat) : VBundleData where
+noncomputable def trivBundle (X : TopSpace) (n : Nat) : VBundleData where
   base := X
   total := X
   rank := n
@@ -212,7 +212,7 @@ def trivBundle (X : TopSpace) (n : Nat) : VBundleData where
   trivCover := ⟨fun _ => True, trivial⟩
 
 /-- Path witness: trivial bundle has correct rank. -/
-def trivBundle_rank (X : TopSpace) (n : Nat) :
+noncomputable def trivBundle_rank (X : TopSpace) (n : Nat) :
     Path (trivBundle X n).rank n :=
   Path.refl n
 
@@ -233,7 +233,7 @@ structure KUSpectrum where
     (period2_inv n).toFun ((period2 n).toFun x) = x
 
 /-- Path witness for KU periodicity roundtrip. -/
-def KUSpectrum.period2_path (KU : KUSpectrum) (n : Nat)
+noncomputable def KUSpectrum.period2_path (KU : KUSpectrum) (n : Nat)
     (x : (KU.level n).carrier) :
     Path ((KU.period2_inv n).toFun ((KU.period2 n).toFun x)) x :=
   Path.stepChain (KU.period2_roundtrip n x)
@@ -263,7 +263,7 @@ structure KOSpectrum where
     (period8_inv n).toFun ((period8 n).toFun x) = x
 
 /-- Path witness for KO 8-periodicity. -/
-def KOSpectrum.period8_path (KO : KOSpectrum) (n : Nat)
+noncomputable def KOSpectrum.period8_path (KO : KOSpectrum) (n : Nat)
     (x : (KO.level n).carrier) :
     Path ((KO.period8_inv n).toFun ((KO.period8 n).toFun x)) x :=
   Path.stepChain (KO.period8_roundtrip n x)
@@ -280,13 +280,13 @@ structure Complexification (KO : KOSpectrum) (KU : KUSpectrum) where
       (KU.bond n).toFun (toFun n x)
 
 /-- Path witness for complexification basepoint. -/
-def Complexification.map_pt_path {KO : KOSpectrum} {KU : KUSpectrum}
+noncomputable def Complexification.map_pt_path {KO : KOSpectrum} {KU : KUSpectrum}
     (c : Complexification KO KU) (n : Nat) :
     Path (c.toFun n (KO.level n).pt) (KU.level n).pt :=
   Path.stepChain (c.map_pt n)
 
 /-- Path witness for complexification bonding. -/
-def Complexification.bond_path {KO : KOSpectrum} {KU : KUSpectrum}
+noncomputable def Complexification.bond_path {KO : KOSpectrum} {KU : KUSpectrum}
     (c : Complexification KO KU) (n : Nat)
     (x : (KO.level n).carrier) :
     Path (c.toFun (n + 1) ((KO.bond n).toFun x))
@@ -313,19 +313,19 @@ structure BottPeriodPath where
     bottMap (bottInv y) = y
 
 /-- Path witness for Bott forward-inverse. -/
-def BottPeriodPath.fwd_inv_path (B : BottPeriodPath)
+noncomputable def BottPeriodPath.fwd_inv_path (B : BottPeriodPath)
     (x : (B.ku.level 0).carrier) :
     Path (B.bottInv (B.bottMap x)) x :=
   Path.stepChain (B.fwd_inv x)
 
 /-- Path witness for Bott inverse-forward. -/
-def BottPeriodPath.inv_fwd_path (B : BottPeriodPath)
+noncomputable def BottPeriodPath.inv_fwd_path (B : BottPeriodPath)
     (y : (B.ku.level 2).carrier) :
     Path (B.bottMap (B.bottInv y)) y :=
   Path.stepChain (B.inv_fwd y)
 
 /-- Chain: Bott periodicity composition. -/
-def BottPeriodPath.periodicity_chain (B : BottPeriodPath)
+noncomputable def BottPeriodPath.periodicity_chain (B : BottPeriodPath)
     (x : (B.ku.level 0).carrier)
     (h1 : B.bottInv (B.bottMap x) = x) (h2 : x = x) :
     Path (B.bottInv (B.bottMap x)) x :=
@@ -355,24 +355,24 @@ structure AdamsOp where
     psi k (psi l x) = psi (k * l) x
 
 /-- Path witness for ψ¹ = id. -/
-def AdamsOp.psi_one_path (A : AdamsOp) (x : A.ktype) :
+noncomputable def AdamsOp.psi_one_path (A : AdamsOp) (x : A.ktype) :
     Path (A.psi 1 x) x :=
   Path.stepChain (A.psi_one x)
 
 /-- Path witness for ψ additivity. -/
-def AdamsOp.psi_add_path (A : AdamsOp) (k : Nat) (x y : A.ktype) :
+noncomputable def AdamsOp.psi_add_path (A : AdamsOp) (k : Nat) (x y : A.ktype) :
     Path (A.psi k (A.add x y))
          (A.add (A.psi k x) (A.psi k y)) :=
   Path.stepChain (A.psi_add k x y)
 
 /-- Path witness for ψ composition. -/
-def AdamsOp.psi_comp_path (A : AdamsOp) (k l : Nat)
+noncomputable def AdamsOp.psi_comp_path (A : AdamsOp) (k l : Nat)
     (x : A.ktype) :
     Path (A.psi k (A.psi l x)) (A.psi (k * l) x) :=
   Path.stepChain (A.psi_comp k l x)
 
 /-- Chain of Adams operation paths: ψ¹(ψ¹(x)) = ψ¹(x) = x. -/
-def AdamsOp.psi_one_chain (A : AdamsOp) (x : A.ktype) :
+noncomputable def AdamsOp.psi_one_chain (A : AdamsOp) (x : A.ktype) :
     Path (A.psi 1 (A.psi 1 x)) x :=
   Path.trans
     (Path.stepChain (A.psi_comp 1 1 x))
@@ -402,17 +402,17 @@ structure ThomIsoData where
   inv_roundtrip : ∀ (y : kThom), thomFwd (thomInv y) = y
 
 /-- Path witness for Thom roundtrip. -/
-def ThomIsoData.roundtrip_path (T : ThomIsoData) (x : T.kBase) :
+noncomputable def ThomIsoData.roundtrip_path (T : ThomIsoData) (x : T.kBase) :
     Path (T.thomInv (T.thomFwd x)) x :=
   Path.stepChain (T.roundtrip x)
 
 /-- Path witness for Thom inverse roundtrip. -/
-def ThomIsoData.inv_roundtrip_path (T : ThomIsoData) (y : T.kThom) :
+noncomputable def ThomIsoData.inv_roundtrip_path (T : ThomIsoData) (y : T.kThom) :
     Path (T.thomFwd (T.thomInv y)) y :=
   Path.stepChain (T.inv_roundtrip y)
 
 /-- Path witness for bundle base. -/
-def ThomIsoData.bundle_base_path (T : ThomIsoData) :
+noncomputable def ThomIsoData.bundle_base_path (T : ThomIsoData) :
     Path T.bundle.base T.base :=
   Path.stepChain T.bundle_base
 
@@ -432,12 +432,12 @@ structure AbGroupData (A : Type u) where
   add_neg : ∀ (x : A), add x (neg x) = zero
 
 /-- Path witness for add_zero. -/
-def AbGroupData.add_zero_path {A : Type u} (G : AbGroupData A) (x : A) :
+noncomputable def AbGroupData.add_zero_path {A : Type u} (G : AbGroupData A) (x : A) :
     Path (G.add x G.zero) x :=
   Path.stepChain (G.add_zero x)
 
 /-- Path witness for add_neg. -/
-def AbGroupData.add_neg_path {A : Type u} (G : AbGroupData A) (x : A) :
+noncomputable def AbGroupData.add_neg_path {A : Type u} (G : AbGroupData A) (x : A) :
     Path (G.add x (G.neg x)) G.zero :=
   Path.stepChain (G.add_neg x)
 
@@ -470,7 +470,7 @@ structure AHSSConvergence where
     ∃ (_ : e2.entry p q → target), True
 
 /-- Path witness for AHSS page number. -/
-def AHSSConvergence.page2_path (A : AHSSConvergence) :
+noncomputable def AHSSConvergence.page2_path (A : AHSSConvergence) :
     Path A.e2.pageNum 2 :=
   Path.stepChain A.page2
 
@@ -496,23 +496,23 @@ structure TopKStep (A : Type u) where
   proof : src = tgt
 
 /-- Convert to a Path. -/
-def TopKStep.toPath {A : Type u}
+noncomputable def TopKStep.toPath {A : Type u}
     (s : TopKStep A) : Path s.src s.tgt :=
   Path.stepChain s.proof
 
 /-- Compose two TopK step paths. -/
-def topKChain {A : Type u} {a b c : A}
+noncomputable def topKChain {A : Type u} {a b c : A}
     (h1 : a = b) (h2 : b = c) : Path a c :=
   Path.trans (Path.stepChain h1) (Path.stepChain h2)
 
 /-- Triple chain for TopK steps. -/
-def topKChain3 {A : Type u} {a b c d : A}
+noncomputable def topKChain3 {A : Type u} {a b c d : A}
     (h1 : a = b) (h2 : b = c) (h3 : c = d) : Path a d :=
   Path.trans (Path.trans (Path.stepChain h1) (Path.stepChain h2))
              (Path.stepChain h3)
 
 /-- Symmetry for TopK paths. -/
-def topKSym {A : Type u} {a b : A} (h : a = b) : Path b a :=
+noncomputable def topKSym {A : Type u} {a b : A} (h : a = b) : Path b a :=
   Path.symm (Path.stepChain h)
 
 /-! ## Summary -/

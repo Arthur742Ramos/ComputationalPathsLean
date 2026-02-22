@@ -57,7 +57,7 @@ structure DSheafMorphism {X : SheafSpace.{u}} (F G : DSheaf X) where
       Path (G.res p (map x s)) (map y (F.res p s))
 
 /-- Identity morphism of a sheaf. -/
-def DSheafMorphism.id {X : SheafSpace.{u}} (F : DSheaf X) : DSheafMorphism F F where
+noncomputable def DSheafMorphism.id {X : SheafSpace.{u}} (F : DSheaf X) : DSheafMorphism F F where
   map := fun _ s => s
   map_zero := fun _ => Path.refl _
   naturality := fun _ _ => Path.refl _
@@ -76,7 +76,7 @@ structure SheafComplex (X : SheafSpace.{u}) where
       (diff n).map X.base ((obj (n + 1)).zero X.base) = (obj n).zero X.base
 
 /-- The underlying chain complex of global sections. -/
-def SheafComplex.toChainComplex {X : SheafSpace.{u}} (C : SheafComplex X) :
+noncomputable def SheafComplex.toChainComplex {X : SheafSpace.{u}} (C : SheafComplex X) :
     GrothendieckDuality.ChainComplex.{u} where
   obj := fun n => (C.obj n).sections X.base
   diff := fun n s => (C.diff n).map X.base s
@@ -93,7 +93,7 @@ structure SheafComplexMap {X : SheafSpace.{u}} (C D : SheafComplex X) where
         (map n).map X.base ((C.diff n).map X.base s)
 
 /-- Identity map of a sheaf complex. -/
-def SheafComplexMap.id {X : SheafSpace.{u}} (C : SheafComplex X) :
+noncomputable def SheafComplexMap.id {X : SheafSpace.{u}} (C : SheafComplex X) :
     SheafComplexMap C C where
   map := fun n => DSheafMorphism.id (C.obj n)
   comm := fun _ _ => rfl

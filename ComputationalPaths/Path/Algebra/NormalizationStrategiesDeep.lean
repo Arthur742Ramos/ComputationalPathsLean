@@ -32,22 +32,22 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a     => .nil a
   | .cons s p  => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -71,14 +71,14 @@ inductive Pos where
 deriving DecidableEq, Repr
 
 /-- Depth of a position. -/
-def Pos.depth : Pos → Nat
+noncomputable def Pos.depth : Pos → Nat
   | .here    => 0
   | .left p  => 1 + p.depth
   | .right p => 1 + p.depth
   | .body p  => 1 + p.depth
 
 /-- Term size. -/
-def Term.size : Term → Nat
+noncomputable def Term.size : Term → Nat
   | .var _   => 1
   | .app f x => 1 + f.size + x.size
   | .lam t   => 1 + t.size
@@ -99,11 +99,11 @@ structure RedSystem where
   contract : Term → Redex → Option Term
 
 /-- Result of a single step: new term or stuck. -/
-def RedSystem.step (R : RedSystem) (t : Term) (r : Redex) : Term :=
+noncomputable def RedSystem.step (R : RedSystem) (t : Term) (r : Redex) : Term :=
   (R.contract t r).getD t
 
 /-- Normal form predicate. -/
-def RedSystem.isNF (R : RedSystem) (t : Term) : Prop :=
+noncomputable def RedSystem.isNF (R : RedSystem) (t : Term) : Prop :=
   R.redexes t = []
 
 -- ============================================================
@@ -133,7 +133,7 @@ structure TaggedStrategy (R : RedSystem) extends Strategy R where
 -- ============================================================
 
 /-- Leftmost ordering on positions. -/
-def Pos.le : Pos → Pos → Bool
+noncomputable def Pos.le : Pos → Pos → Bool
   | .here, _           => true
   | _, .here           => false
   | .left p, .left q   => p.le q
@@ -147,11 +147,11 @@ def Pos.le : Pos → Pos → Bool
   | .body p, .body q   => p.le q
 
 /-- Outermost ordering: shallower first. -/
-def Pos.outerLe (p q : Pos) : Bool :=
+noncomputable def Pos.outerLe (p q : Pos) : Bool :=
   p.depth <= q.depth
 
 /-- Innermost ordering: deeper first. -/
-def Pos.innerLe (p q : Pos) : Bool :=
+noncomputable def Pos.innerLe (p q : Pos) : Bool :=
   q.depth <= p.depth
 
 -- ============================================================
@@ -195,7 +195,7 @@ theorem single_length (s : Step α a b) : (Path.single s).length = 1 := rfl
 abbrev RedPath := Path Term
 
 /-- Step recording which redex was contracted. -/
-def redStep (t₁ t₂ : Term) (r : Redex) : Step Term t₁ t₂ :=
+noncomputable def redStep (t₁ t₂ : Term) (r : Redex) : Step Term t₁ t₂ :=
   Step.rule r.name t₁ t₂
 
 /-- Theorem 7: A single reduction step gives a path of length 1. -/
@@ -227,11 +227,11 @@ theorem strat_run_nonneg (run : StratRun R) :
 -- ============================================================
 
 /-- Insertion sort on lists (preserves length). -/
-def insSort (cmp : α → α → Bool) : α → List α → List α
+noncomputable def insSort (cmp : α → α → Bool) : α → List α → List α
   | x, []     => [x]
   | x, y :: ys => if cmp x y then x :: y :: ys else y :: insSort cmp x ys
 
-def listSort (cmp : α → α → Bool) : List α → List α
+noncomputable def listSort (cmp : α → α → Bool) : List α → List α
   | []      => []
   | x :: xs => insSort cmp x (listSort cmp xs)
 
@@ -253,7 +253,7 @@ theorem length_listSort (cmp : α → α → Bool) (xs : List α) :
     simp only [listSort, length_insSort, ih, List.length]
 
 /-- Sort redexes by position ordering. -/
-def sortRedexesBy (rs : List Redex) (cmp : Redex → Redex → Bool) : List Redex :=
+noncomputable def sortRedexesBy (rs : List Redex) (cmp : Redex → Redex → Bool) : List Redex :=
   listSort cmp rs
 
 /-- Theorem 10: Sorted list has same length as original. -/
@@ -262,10 +262,10 @@ theorem sortRedexesBy_length (rs : List Redex) (cmp : Redex → Redex → Bool) 
   length_listSort cmp rs
 
 /-- LO comparator: outer first, then leftmost. -/
-def loCmp (a b : Redex) : Bool := a.pos.outerLe b.pos && a.pos.le b.pos
+noncomputable def loCmp (a b : Redex) : Bool := a.pos.outerLe b.pos && a.pos.le b.pos
 
 /-- RI comparator: inner first, then rightmost. -/
-def riCmp (a b : Redex) : Bool := a.pos.innerLe b.pos && !(a.pos.le b.pos)
+noncomputable def riCmp (a b : Redex) : Bool := a.pos.innerLe b.pos && !(a.pos.le b.pos)
 
 /-- Theorem 11: LO sort preserves length. -/
 theorem loSort_length (rs : List Redex) :
@@ -297,7 +297,7 @@ inductive ParPath : Term → Term → Type where
   | nil  : (t : Term) → ParPath t t
   | step : (ps : ParallelStep) → ParPath ps.target c → ParPath ps.source c
 
-def ParPath.steps : ParPath a b → Nat
+noncomputable def ParPath.steps : ParPath a b → Nat
   | .nil _    => 0
   | .step _ r => 1 + r.steps
 
@@ -347,11 +347,11 @@ theorem app_not_val (f x : Term) : ¬ IsVal (.app f x) := by
 -- ============================================================
 
 /-- Convert a CBN step to a computational step. -/
-def cbnToStep (t₁ t₂ : Term) (_ : CBNStep t₁ t₂) : Step Term t₁ t₂ :=
+noncomputable def cbnToStep (t₁ t₂ : Term) (_ : CBNStep t₁ t₂) : Step Term t₁ t₂ :=
   .rule "cbn" t₁ t₂
 
 /-- Convert a CBV step to a computational step. -/
-def cbvToStep (t₁ t₂ : Term) (_ : CBVStep t₁ t₂) : Step Term t₁ t₂ :=
+noncomputable def cbvToStep (t₁ t₂ : Term) (_ : CBVStep t₁ t₂) : Step Term t₁ t₂ :=
   .rule "cbv" t₁ t₂
 
 /-- Theorem 20: CBN and CBV steps for same redex give same-length paths. -/
@@ -368,7 +368,7 @@ theorem cbn_cbv_single_length (t₁ t₂ : Term)
 abbrev Trace := List Redex
 
 /-- A trace is standard if positions are non-decreasing (leftmost order). -/
-def isStandard : Trace → Prop
+noncomputable def isStandard : Trace → Prop
   | []          => True
   | [_]         => True
   | r₁ :: r₂ :: rest => r₁.pos.le r₂.pos = true ∧ isStandard (r₂ :: rest)
@@ -388,7 +388,7 @@ theorem empty_trace_standard : isStandard ([] : Trace) = True := rfl
 theorem singleton_standard (r : Redex) : isStandard [r] = True := rfl
 
 /-- Rearrangement swap of two adjacent steps. -/
-def swapPath (t₁ t₂ t₃ : Term) (_s₁ : Step Term t₁ t₂) (_s₂ : Step Term t₂ t₃)
+noncomputable def swapPath (t₁ t₂ t₃ : Term) (_s₁ : Step Term t₁ t₂) (_s₂ : Step Term t₂ t₃)
     (t₂' : Term) (s₁' : Step Term t₁ t₂') (s₂' : Step Term t₂' t₃) :
     Path Term t₁ t₃ :=
   (Path.single s₁').trans (Path.single s₂')
@@ -418,7 +418,7 @@ theorem standardization_preserves_endpoints (p : RedPath t₁ t₂) :
 -- ============================================================
 
 /-- A strategy is cofinal if it reaches any reachable NF. -/
-def isCofinal (R : RedSystem) (S : Strategy R) : Prop :=
+noncomputable def isCofinal (R : RedSystem) (S : Strategy R) : Prop :=
   ∀ (t nf : Term), R.isNF nf → Nonempty (RedPath t nf) →
     ∃ (run : StratRun R), run.start = t ∧ run.finish = nf
 
@@ -440,12 +440,12 @@ theorem cofinal_compose_length (p : RedPath a b) (q : RedPath b c) :
 -- ============================================================
 
 /-- A redex is needed if every path to NF contracts it (witness: index exists). -/
-def isNeeded (_r : Redex) (t : Term) (R : RedSystem) : Prop :=
+noncomputable def isNeeded (_r : Redex) (t : Term) (R : RedSystem) : Prop :=
   ∀ (nf : Term) (p : RedPath t nf), R.isNF nf →
     ∃ (i : Nat), i < p.length
 
 /-- A redex is unneeded if some path to NF avoids it. -/
-def isUnneeded (_r : Redex) (t : Term) (R : RedSystem) : Prop :=
+noncomputable def isUnneeded (_r : Redex) (t : Term) (R : RedSystem) : Prop :=
   ∃ (nf : Term) (_p : RedPath t nf), R.isNF nf
 
 /-- Theorem 29: A path to NF witnesses unneeded for any redex. -/
@@ -473,7 +473,7 @@ theorem needed_only_nonneg (run : NeededOnlyRun R) :
 -- ============================================================
 
 /-- Two strategies are equivalent if they reach the same NFs. -/
-def stratEquiv (_R : RedSystem) (_S₁ _S₂ : Strategy _R) : Prop :=
+noncomputable def stratEquiv (_R : RedSystem) (_S₁ _S₂ : Strategy _R) : Prop :=
   ∀ t nf₁ nf₂, _R.isNF nf₁ → _R.isNF nf₂ →
     Nonempty (RedPath t nf₁) → Nonempty (RedPath t nf₂) → nf₁ = nf₂
 
@@ -522,7 +522,7 @@ theorem compose_id_transforms (p : RedPath t₁ t₂) :
     (id (id p)).length = p.length := rfl
 
 /-- A strategy transform is tight if it preserves length. -/
-def isTight (T : StratTransform R) : Prop :=
+noncomputable def isTight (T : StratTransform R) : Prop :=
   ∀ t₁ t₂ (p : RedPath t₁ t₂), (T.transform t₁ t₂ p).length = p.length
 
 -- ============================================================
@@ -542,7 +542,7 @@ theorem roundtrip_length (p : RedPath a b) (q : RedPath b a) :
 -- ============================================================
 
 /-- Maximum redex depth in a list. -/
-def maxDepth : List Redex → Nat
+noncomputable def maxDepth : List Redex → Nat
   | []      => 0
   | r :: rs => max r.pos.depth (maxDepth rs)
 
@@ -594,7 +594,7 @@ theorem development_nil_length (t : Term) :
 -- ============================================================
 
 /-- Finite developments: every development terminates. -/
-def finDev (_R : RedSystem) : Prop :=
+noncomputable def finDev (_R : RedSystem) : Prop :=
   ∀ (t : Term) (_rs : List Redex),
     ∃ (nf : Term) (_p : RedPath t nf), True
 

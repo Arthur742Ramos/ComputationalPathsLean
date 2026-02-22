@@ -100,7 +100,7 @@ structure TwistedKGroup (T : Twist) where
   add_comm : ∀ x y, Path (add x y) (add y x)
 
 /-- Untwisted K-theory: K⁰(X) corresponds to τ = 0. -/
-def untwistedK (T : Twist) (K : TwistedKGroup T) (h : Path K.twist T.zero) :
+noncomputable def untwistedK (T : Twist) (K : TwistedKGroup T) (h : Path K.twist T.zero) :
     TwistedKGroup T :=
   K
 
@@ -114,13 +114,13 @@ structure TwistedKHom (T : Twist) (K₁ K₂ : TwistedKGroup T) where
   pres_zero : Path (map K₁.zero) K₂.zero
 
 /-- Identity twisted K-homomorphism. -/
-def TwistedKHom.id (T : Twist) (K : TwistedKGroup T) : TwistedKHom T K K where
+noncomputable def TwistedKHom.id (T : Twist) (K : TwistedKGroup T) : TwistedKHom T K K where
   map := _root_.id
   pres_add := fun _ _ => Path.refl _
   pres_zero := Path.refl _
 
 /-- Composition of twisted K-homomorphisms. -/
-def TwistedKHom.comp {T : Twist} {K₁ K₂ K₃ : TwistedKGroup T}
+noncomputable def TwistedKHom.comp {T : Twist} {K₁ K₂ K₃ : TwistedKGroup T}
     (f : TwistedKHom T K₁ K₂) (g : TwistedKHom T K₂ K₃) :
     TwistedKHom T K₁ K₃ where
   map := g.map ∘ f.map
@@ -329,44 +329,44 @@ theorem id_comp_twisted (T : Twist) (K₁ K₂ : TwistedKGroup T)
   rfl
 
 /-- The FHT isomorphism round-trips. -/
-def fht_roundtrip (F : FreedHopkinsTeleman) (x : F.equivTwistedK.carrier) :
+noncomputable def fht_roundtrip (F : FreedHopkinsTeleman) (x : F.equivTwistedK.carrier) :
     Path (F.fhtInv (F.fhtMap x)) x :=
   F.fht_bwd_fwd x
 
 /-- The Thom isomorphism composed with its inverse is the identity. -/
-def thom_iso_roundtrip {T : Twist} {E : OrientedVectorBundle}
+noncomputable def thom_iso_roundtrip {T : Twist} {E : OrientedVectorBundle}
     (Th : TwistedThomIso T E) (x : Th.source.carrier) :
     Path (Th.thomInv (Th.thomMap x)) x :=
   Th.thom_bwd_fwd x
 
 /-- Additivity of the Thom map. -/
-def thom_additivity {T : Twist} {E : OrientedVectorBundle}
+noncomputable def thom_additivity {T : Twist} {E : OrientedVectorBundle}
     (Th : TwistedThomIso T E) (x y : Th.source.carrier) :
     Path (Th.thomMap (Th.source.add x y))
          (Th.target.add (Th.thomMap x) (Th.thomMap y)) :=
   Th.thom_hom x y
 
 /-- Twisted K-theory with the zero twist recovers ordinary K-theory. -/
-def zero_twist_ordinary (T : Twist) (K : TwistedKGroup T)
+noncomputable def zero_twist_ordinary (T : Twist) (K : TwistedKGroup T)
     (h : Path K.twist T.zero) :
     Path (untwistedK T K h).twist T.zero :=
   h
 
 /-- Product with identity twist gives the twist sum with zero. -/
-def product_identity_twist (T : Twist) (P : TwistedKProduct T)
+noncomputable def product_identity_twist (T : Twist) (P : TwistedKProduct T)
     (h : Path P.source₂.twist T.zero) :
     Path P.target.twist (T.add P.source₁.twist T.zero) :=
   Path.trans P.twist_sum
     (congrArg (T.add P.source₁.twist) h)
 
 /-- Verlinde algebra fusion is commutative. -/
-def verlinde_comm (R : RepRing) (V : VerlindeAlgebra R)
+noncomputable def verlinde_comm (R : RepRing) (V : VerlindeAlgebra R)
     (x y : V.carrier) :
     Path (V.mul x y) (V.mul y x) :=
   V.mul_comm x y
 
 /-- Chern character of a sum decomposes. -/
-def chern_char_sum {T : Twist} {K : TwistedKGroup T}
+noncomputable def chern_char_sum {T : Twist} {K : TwistedKGroup T}
     (ch : TwistedChernChar T K) (x y : K.carrier) :
     Path (ch.ch (K.add x y)) (ch.cohomAdd (ch.ch x) (ch.ch y)) :=
   ch.ch_add x y

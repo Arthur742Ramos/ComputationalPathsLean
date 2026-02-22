@@ -50,7 +50,7 @@ structure ConfluenceData (A : Type u) (a b : A) where
   rweq_sound : ∀ (p q : Path a b), RwEq p q → p.toEq = q.toEq
 
 /-- The canonical confluence data. -/
-def confluenceData (A : Type u) (a b : A) : ConfluenceData A a b where
+noncomputable def confluenceData (A : Type u) (a b : A) : ConfluenceData A a b where
   has_normal_form := fun p =>
     ⟨Path.normalize p, normalize_isNormal p, by simp⟩
   normal_form_unique := fun nf₁ nf₂ h₁ h₂ => by
@@ -164,7 +164,7 @@ structure ConfluenceReport where
   confluent : Bool
 
 /-- The standard report for the computational path TRS. -/
-def standardReport : ConfluenceReport :=
+noncomputable def standardReport : ConfluenceReport :=
   { criticalPairs := 0, allClose := true, terminates := true, confluent := true }
 
 @[simp] theorem standardReport_confluent : standardReport.confluent = true := rfl

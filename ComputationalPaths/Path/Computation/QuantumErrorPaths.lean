@@ -21,8 +21,8 @@ structure QBit where
   a1 : Nat
 deriving DecidableEq, Repr
 
-@[simp] def qZero : QBit := ⟨1, 0⟩
-@[simp] def qOne  : QBit := ⟨0, 1⟩
+@[simp] noncomputable def qZero : QBit := ⟨1, 0⟩
+@[simp] noncomputable def qOne  : QBit := ⟨0, 1⟩
 
 /-- Error types that can affect a qubit. -/
 inductive ErrorType where
@@ -33,7 +33,7 @@ inductive ErrorType where
 deriving DecidableEq, Repr
 
 /-- Apply an error to a qubit. -/
-@[simp] def applyError (e : ErrorType) (q : QBit) : QBit :=
+@[simp] noncomputable def applyError (e : ErrorType) (q : QBit) : QBit :=
   match e with
   | ErrorType.none => q
   | ErrorType.bitFlip => ⟨q.a1, q.a0⟩
@@ -41,7 +41,7 @@ deriving DecidableEq, Repr
   | ErrorType.both => ⟨q.a1, q.a0⟩  -- bit flip component
 
 /-- Correction operator: same as error (Pauli ops are self-inverse). -/
-@[simp] def applyCorrection (e : ErrorType) (q : QBit) : QBit :=
+@[simp] noncomputable def applyCorrection (e : ErrorType) (q : QBit) : QBit :=
   applyError e q
 
 /-! ## Multi-qubit codewords -/
@@ -54,30 +54,30 @@ structure Reg3 where
 deriving DecidableEq, Repr
 
 /-- Encode a single qubit into 3-qubit repetition code. -/
-@[simp] def encode3 (q : QBit) : Reg3 := ⟨q, q, q⟩
+@[simp] noncomputable def encode3 (q : QBit) : Reg3 := ⟨q, q, q⟩
 
 /-- Decode by majority vote (simplified). -/
-@[simp] def decode3 (r : Reg3) : QBit :=
+@[simp] noncomputable def decode3 (r : Reg3) : QBit :=
   if r.q1 = r.q2 then r.q1
   else if r.q2 = r.q3 then r.q2
   else r.q1
 
 /-- Apply bit-flip error to position i (0-indexed). -/
-@[simp] def flipAt (i : Fin 3) (r : Reg3) : Reg3 :=
+@[simp] noncomputable def flipAt (i : Fin 3) (r : Reg3) : Reg3 :=
   match i with
   | ⟨0, _⟩ => ⟨applyError ErrorType.bitFlip r.q1, r.q2, r.q3⟩
   | ⟨1, _⟩ => ⟨r.q1, applyError ErrorType.bitFlip r.q2, r.q3⟩
   | ⟨2, _⟩ => ⟨r.q1, r.q2, applyError ErrorType.bitFlip r.q3⟩
 
 /-- Syndrome: identifies which qubit (if any) has an error. -/
-@[simp] def syndrome3 (r : Reg3) : Fin 4 :=
+@[simp] noncomputable def syndrome3 (r : Reg3) : Fin 4 :=
   if r.q1 = r.q2 && r.q2 = r.q3 then ⟨0, by omega⟩      -- no error
   else if r.q1 ≠ r.q2 && r.q2 = r.q3 then ⟨1, by omega⟩  -- error on q1
   else if r.q1 = r.q2 && r.q2 ≠ r.q3 then ⟨3, by omega⟩  -- error on q3
   else ⟨2, by omega⟩                                       -- error on q2
 
 /-- Recovery: flip the qubit identified by syndrome. -/
-@[simp] def recover3 (s : Fin 4) (r : Reg3) : Reg3 :=
+@[simp] noncomputable def recover3 (s : Fin 4) (r : Reg3) : Reg3 :=
   match s with
   | ⟨0, _⟩ => r
   | ⟨1, _⟩ => ⟨applyError ErrorType.bitFlip r.q1, r.q2, r.q3⟩
@@ -87,23 +87,23 @@ deriving DecidableEq, Repr
 /-! ## 5-qubit / Shor code types -/
 
 /-- A general n-qubit register. -/
-def RegN (n : Nat) := Fin n → QBit
+noncomputable def RegN (n : Nat) := Fin n → QBit
 
 /-- All-same register. -/
-@[simp] def regConst (n : Nat) (q : QBit) : RegN n := fun _ => q
+@[simp] noncomputable def regConst (n : Nat) (q : QBit) : RegN n := fun _ => q
 
 /-- Error channel: applies errors to specific positions. -/
-def ErrorChannel (n : Nat) := Fin n → ErrorType
+noncomputable def ErrorChannel (n : Nat) := Fin n → ErrorType
 
 /-- No-error channel. -/
-@[simp] def noError (n : Nat) : ErrorChannel n := fun _ => ErrorType.none
+@[simp] noncomputable def noError (n : Nat) : ErrorChannel n := fun _ => ErrorType.none
 
 /-- Single-position error channel. -/
-def singleError (n : Nat) (pos : Fin n) (e : ErrorType) : ErrorChannel n :=
+noncomputable def singleError (n : Nat) (pos : Fin n) (e : ErrorType) : ErrorChannel n :=
   fun i => if i = pos then e else ErrorType.none
 
 /-- Apply an error channel to a register. -/
-@[simp] def applyChannel {n : Nat} (ch : ErrorChannel n) (r : RegN n) : RegN n :=
+@[simp] noncomputable def applyChannel {n : Nat} (ch : ErrorChannel n) (r : RegN n) : RegN n :=
   fun i => applyError (ch i) (r i)
 
 /-! ## Core theorems -/
@@ -111,7 +111,7 @@ def singleError (n : Nat) (pos : Fin n) (e : ErrorType) : ErrorChannel n :=
 -- 1. No error leaves state unchanged
 theorem noError_identity (q : QBit) : applyError ErrorType.none q = q := by rfl
 
-def noError_path (q : QBit) : Path (applyError ErrorType.none q) q :=
+noncomputable def noError_path (q : QBit) : Path (applyError ErrorType.none q) q :=
   Path.mk [Step.mk _ _ (noError_identity q)] (noError_identity q)
 
 -- 2. Bit flip is an involution
@@ -119,7 +119,7 @@ theorem bitFlip_involution (q : QBit) :
     applyError ErrorType.bitFlip (applyError ErrorType.bitFlip q) = q := by
   cases q; simp
 
-def bitFlip_involution_path (q : QBit) :
+noncomputable def bitFlip_involution_path (q : QBit) :
     Path (applyError ErrorType.bitFlip (applyError ErrorType.bitFlip q)) q :=
   Path.mk [Step.mk _ _ (bitFlip_involution q)] (bitFlip_involution q)
 
@@ -128,7 +128,7 @@ theorem correction_undoes_bitFlip (q : QBit) :
     applyCorrection ErrorType.bitFlip (applyError ErrorType.bitFlip q) = q := by
   cases q; simp
 
-def correction_path (q : QBit) :
+noncomputable def correction_path (q : QBit) :
     Path (applyCorrection ErrorType.bitFlip (applyError ErrorType.bitFlip q)) q :=
   Path.mk [Step.mk _ _ (correction_undoes_bitFlip q)] (correction_undoes_bitFlip q)
 
@@ -140,7 +140,7 @@ theorem noError_correction (q : QBit) :
 theorem encode_decode (q : QBit) : decode3 (encode3 q) = q := by
   simp [encode3, decode3]
 
-def encode_decode_path (q : QBit) : Path (decode3 (encode3 q)) q :=
+noncomputable def encode_decode_path (q : QBit) : Path (decode3 (encode3 q)) q :=
   Path.mk [Step.mk _ _ (encode_decode q)] (encode_decode q)
 
 -- 6. Single bit-flip error on position 0 is correctable
@@ -159,17 +159,17 @@ theorem correct_single_flip_2 (q : QBit) :
   simp [flipAt, encode3, decode3, applyError]
 
 -- 9. Path: error correction roundtrip for position 0
-def error_correct_roundtrip_0 (q : QBit) :
+noncomputable def error_correct_roundtrip_0 (q : QBit) :
     Path (decode3 (flipAt ⟨0, by omega⟩ (encode3 q))) q :=
   Path.mk [Step.mk _ _ (correct_single_flip_0 q)] (correct_single_flip_0 q)
 
 -- 9b. Path: error correction roundtrip for position 1
-def error_correct_roundtrip_1 (q : QBit) :
+noncomputable def error_correct_roundtrip_1 (q : QBit) :
     Path (decode3 (flipAt ⟨1, by omega⟩ (encode3 q))) q :=
   Path.mk [Step.mk _ _ (correct_single_flip_1 q)] (correct_single_flip_1 q)
 
 -- 9c. Path: error correction roundtrip for position 2
-def error_correct_roundtrip_2 (q : QBit) :
+noncomputable def error_correct_roundtrip_2 (q : QBit) :
     Path (decode3 (flipAt ⟨2, by omega⟩ (encode3 q))) q :=
   Path.mk [Step.mk _ _ (correct_single_flip_2 q)] (correct_single_flip_2 q)
 
@@ -178,17 +178,17 @@ theorem noError_channel_id {n : Nat} (r : RegN n) :
     applyChannel (noError n) r = r := by
   funext i; simp
 
-def noError_channel_path {n : Nat} (r : RegN n) :
+noncomputable def noError_channel_path {n : Nat} (r : RegN n) :
     Path (applyChannel (noError n) r) r :=
   Path.mk [Step.mk _ _ (noError_channel_id r)] (noError_channel_id r)
 
 -- 11. CongrArg through error application
-def error_congrArg {q1 q2 : QBit} (e : ErrorType) (p : Path q1 q2) :
+noncomputable def error_congrArg {q1 q2 : QBit} (e : ErrorType) (p : Path q1 q2) :
     Path (applyError e q1) (applyError e q2) :=
   Path.congrArg (applyError e) p
 
 -- 12. CongrArg through encoding
-def encode_congrArg {q1 q2 : QBit} (p : Path q1 q2) :
+noncomputable def encode_congrArg {q1 q2 : QBit} (p : Path q1 q2) :
     Path (encode3 q1) (encode3 q2) :=
   Path.congrArg encode3 p
 
@@ -227,7 +227,7 @@ theorem error_comp_none_right (e : ErrorType) (q : QBit) :
     applyError ErrorType.none (applyError e q) = applyError e q := by rfl
 
 -- 18. Path composition for error correction
-def error_correct_compose (q : QBit) :
+noncomputable def error_correct_compose (q : QBit) :
     Path (applyError ErrorType.bitFlip (applyError ErrorType.bitFlip q))
          q :=
   Path.trans
@@ -242,7 +242,7 @@ theorem error_path_symm (q : QBit) :
   exact Subsingleton.elim _ _
 
 /-- Error weight for 3-qubit channel. -/
-def errorWeight3 (ch : ErrorChannel 3) : Nat :=
+noncomputable def errorWeight3 (ch : ErrorChannel 3) : Nat :=
   (if ch ⟨0, by omega⟩ ≠ ErrorType.none then 1 else 0) +
   (if ch ⟨1, by omega⟩ ≠ ErrorType.none then 1 else 0) +
   (if ch ⟨2, by omega⟩ ≠ ErrorType.none then 1 else 0)
@@ -272,7 +272,7 @@ theorem fault_tolerant_summary (q : QBit) :
   ⟨correct_single_flip_0 q, correct_single_flip_1 q, correct_single_flip_2 q⟩
 
 -- 24. Step-level construction for error/correction cycle
-def error_correction_step (q : QBit) : Step QBit :=
+noncomputable def error_correction_step (q : QBit) : Step QBit :=
   ⟨applyError ErrorType.bitFlip (applyError ErrorType.bitFlip q), q,
    bitFlip_involution q⟩
 

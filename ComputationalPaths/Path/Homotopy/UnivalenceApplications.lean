@@ -19,7 +19,7 @@ universe u v w
 /-! ## Equivalences -/
 
 /-- Homotopy between functions. -/
-def Homotopy {A : Type u} {B : Type v} (f g : A → B) : Type (max u v) :=
+noncomputable def Homotopy {A : Type u} {B : Type v} (f g : A → B) : Type (max u v) :=
   (a : A) → f a = g a
 
 /-- A function is an equivalence (biinvertible map). -/
@@ -43,18 +43,18 @@ axiom univalence (A B : Type u) : IsEquiv (@idtoeqv A B)
 
 
 /-- Transport along a universe path is the underlying function. -/
-def transportUniverse {A B : Type u} (p : A = B) : A → B :=
+noncomputable def transportUniverse {A B : Type u} (p : A = B) : A → B :=
   fun a => p ▸ a
 
 /-! ## Transport and path-over -/
 
 /-- Path-over: a path in a dependent type lying over a base path. -/
-def PathOver {A : Type u} (P : A → Type v) {a₁ a₂ : A}
+noncomputable def PathOver {A : Type u} (P : A → Type v) {a₁ a₂ : A}
     (p : a₁ = a₂) (b₁ : P a₁) (b₂ : P a₂) : Type v :=
   p ▸ b₁ = b₂
 
 /-- Dependent transport. -/
-def dtransport {A : Type u} {P : A → Type v} {a₁ a₂ : A}
+noncomputable def dtransport {A : Type u} {P : A → Type v} {a₁ a₂ : A}
     (p : a₁ = a₂) : P a₁ → P a₂ :=
   fun b => p ▸ b
 
@@ -83,13 +83,13 @@ structure StructuredEquiv {S : Type u → Type v} (ss : StandardStructure S)
 /-! ## Object classifier -/
 
 /-- The object classifier: Type itself classifies fibrations. -/
-def objectClassifier : Type (u + 1) := Type u
+noncomputable def objectClassifier : Type (u + 1) := Type u
 
 /-- Classify a fibration by its fiber map. -/
-def classifyFibration {B : Type u} (P : B → Type u) : B → objectClassifier := P
+noncomputable def classifyFibration {B : Type u} (P : B → Type u) : B → objectClassifier := P
 
 /-- Pullback of the universal fibration along a classifying map. -/
-def pullbackUniversal {B : Type u} (χ : B → objectClassifier) :
+noncomputable def pullbackUniversal {B : Type u} (χ : B → objectClassifier) :
     B → Type u := χ
 
 /-! ## Theorems -/

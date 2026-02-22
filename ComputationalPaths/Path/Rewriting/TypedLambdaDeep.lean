@@ -55,23 +55,23 @@ inductive Term : Type where
 namespace Term
 
 /-- Shifting: increase free variables at or above cutoff by d -/
-def shift (d : Nat) (c : Nat) : Term -> Term
+noncomputable def shift (d : Nat) (c : Nat) : Term -> Term
   | var k => if k < c then var k else var (k + d)
   | app t1 t2 => app (shift d c t1) (shift d c t2)
   | lam ty body => lam ty (shift d c.succ body)
 
 /-- Substitution: replace variable j with s -/
-def subst (j : Nat) (s : Term) : Term -> Term
+noncomputable def subst (j : Nat) (s : Term) : Term -> Term
   | var k => if k = j then s else if j < k then var (k - 1) else var k
   | app t1 t2 => app (subst j s t1) (subst j s t2)
   | lam ty body => lam ty (subst j.succ (shift 1 0 s) body)
 
 /-- Beta reduction of (lam ty body) applied to arg -/
-def betaReduce (body arg : Term) : Term :=
+noncomputable def betaReduce (body arg : Term) : Term :=
   subst 0 arg body
 
 /-- Size of a term -/
-def size : Term -> Nat
+noncomputable def size : Term -> Nat
   | var _ => 1
   | app t1 t2 => 1 + size t1 + size t2
   | lam _ body => 1 + size body
@@ -132,19 +132,19 @@ theorem subst_var_gt (j k : Nat) (s : Term) (h : k > j) :
   rw [if_neg hne, if_pos hlt]
 
 /-- Check if term is a value (lambda abstraction) -/
-def isValue : Term -> Bool
+noncomputable def isValue : Term -> Bool
   | lam _ _ => true
   | _ => false
 
 /-- Check if term is in normal form (no redexes) -/
-def isNormalForm : Term -> Bool
+noncomputable def isNormalForm : Term -> Bool
   | var _ => true
   | app (lam _ _) _ => false
   | app t1 t2 => isNormalForm t1 && isNormalForm t2
   | lam _ body => isNormalForm body
 
 /-- Check if in weak head normal form -/
-def isWHNF : Term -> Bool
+noncomputable def isWHNF : Term -> Bool
   | var _ => true
   | lam _ _ => true
   | app (lam _ _) _ => false
@@ -264,11 +264,11 @@ theorem BetaMulti.lamBody (ty : Ty) {body body' : Term}
 -- ═══════════════════════════════════════════════════════════════
 
 /-- A term is in normal form if no beta step is possible -/
-def NormalForm (t : Term) : Prop :=
+noncomputable def NormalForm (t : Term) : Prop :=
   forall t', ¬ BetaStep t t'
 
 /-- A term is in weak head normal form -/
-def WeakHeadNF (t : Term) : Prop :=
+noncomputable def WeakHeadNF (t : Term) : Prop :=
   match t with
   | Term.var _ => True
   | Term.lam _ _ => True
@@ -309,17 +309,17 @@ theorem normalForm_multi_eq {t nf : Term}
 -- ═══════════════════════════════════════════════════════════════
 
 /-- Arrow congruence path (left) -/
-def arrowCongrLeft {A A' : Ty} (B : Ty) (p : Path A A') :
+noncomputable def arrowCongrLeft {A A' : Ty} (B : Ty) (p : Path A A') :
     Path (Ty.arrow A B) (Ty.arrow A' B) :=
   Path.congrArg (Ty.arrow · B) p
 
 /-- Arrow congruence path (right) -/
-def arrowCongrRight (A : Ty) {B B' : Ty} (p : Path B B') :
+noncomputable def arrowCongrRight (A : Ty) {B B' : Ty} (p : Path B B') :
     Path (Ty.arrow A B) (Ty.arrow A B') :=
   Path.congrArg (Ty.arrow A ·) p
 
 /-- Arrow congruence in both positions -/
-def arrowCongr {A A' B B' : Ty} (p1 : Path A A') (p2 : Path B B') :
+noncomputable def arrowCongr {A A' B B' : Ty} (p1 : Path A A') (p2 : Path B B') :
     Path (Ty.arrow A B) (Ty.arrow A' B') :=
   Path.trans (arrowCongrLeft B p1) (arrowCongrRight A' p2)
 
@@ -352,27 +352,27 @@ theorem arrowCongrRight_symm (A : Ty) {B B' : Ty} (p : Path B B') :
 -- ═══════════════════════════════════════════════════════════════
 
 /-- App-left congruence path -/
-def appLeftPath {t1 t1' : Term} (t2 : Term) (p : Path t1 t1') :
+noncomputable def appLeftPath {t1 t1' : Term} (t2 : Term) (p : Path t1 t1') :
     Path (Term.app t1 t2) (Term.app t1' t2) :=
   Path.congrArg (Term.app · t2) p
 
 /-- App-right congruence path -/
-def appRightPath (t1 : Term) {t2 t2' : Term} (p : Path t2 t2') :
+noncomputable def appRightPath (t1 : Term) {t2 t2' : Term} (p : Path t2 t2') :
     Path (Term.app t1 t2) (Term.app t1 t2') :=
   Path.congrArg (Term.app t1 ·) p
 
 /-- Lambda body congruence path -/
-def lamBodyPath (ty : Ty) {body body' : Term} (p : Path body body') :
+noncomputable def lamBodyPath (ty : Ty) {body body' : Term} (p : Path body body') :
     Path (Term.lam ty body) (Term.lam ty body') :=
   Path.congrArg (Term.lam ty ·) p
 
 /-- Lambda type congruence path -/
-def lamTyPath {ty ty' : Ty} (body : Term) (p : Path ty ty') :
+noncomputable def lamTyPath {ty ty' : Ty} (body : Term) (p : Path ty ty') :
     Path (Term.lam ty body) (Term.lam ty' body) :=
   Path.congrArg (Term.lam · body) p
 
 /-- Full app congruence path -/
-def appCongr {t1 t1' t2 t2' : Term}
+noncomputable def appCongr {t1 t1' t2 t2' : Term}
     (p1 : Path t1 t1') (p2 : Path t2 t2') :
     Path (Term.app t1 t2) (Term.app t1' t2') :=
   Path.trans (appLeftPath t2 p1) (appRightPath t1' p2)
@@ -546,7 +546,7 @@ theorem ParRed.toBetaMulti {a b : Term} (h : ParRed a b) : BetaMulti a b := by
 -- ═══════════════════════════════════════════════════════════════
 
 /-- Complete development: reduce all top-level redexes -/
-def completeDev : Term -> Term
+noncomputable def completeDev : Term -> Term
   | Term.var n => Term.var n
   | Term.app (Term.lam _ty body) arg =>
       Term.betaReduce (completeDev body) (completeDev arg)
@@ -581,16 +581,16 @@ structure ConfluenceWitness (a : Term) where
   fromCD : BetaMulti c d
 
 /-- Theorem 56: trivial diamond -/
-def DiamondWitness.trivial (b : Term) : DiamondWitness b b :=
+noncomputable def DiamondWitness.trivial (b : Term) : DiamondWitness b b :=
   { d := b, left := BetaMulti.refl, right := BetaMulti.refl }
 
 /-- Theorem 57: symmetric diamond -/
-def DiamondWitness.symm' {b c : Term} (dw : DiamondWitness b c) :
+noncomputable def DiamondWitness.symm' {b c : Term} (dw : DiamondWitness b c) :
     DiamondWitness c b :=
   { d := dw.d, left := dw.right, right := dw.left }
 
 /-- Theorem 58: confluence from reflexive -/
-def ConfluenceWitness.ofRefl (a : Term) : ConfluenceWitness a :=
+noncomputable def ConfluenceWitness.ofRefl (a : Term) : ConfluenceWitness a :=
   { b := a, c := a, d := a,
     fromAB := BetaMulti.refl, fromAC := BetaMulti.refl,
     fromBD := BetaMulti.refl, fromCD := BetaMulti.refl }
@@ -612,12 +612,12 @@ structure TypedReduction (Gam : Ctx) where
   typePreservedPath : Path src.ty tgt.ty
 
 /-- Theorem 59: identity typed reduction -/
-def TypedReduction.identity (tt' : TypedTerm Gam) :
+noncomputable def TypedReduction.identity (tt' : TypedTerm Gam) :
     TypedReduction Gam :=
   { src := tt', tgt := tt', typePreservedPath := Path.refl tt'.ty }
 
 /-- Theorem 60: composition of typed reductions -/
-def TypedReduction.compose
+noncomputable def TypedReduction.compose
     (r1 r2 : TypedReduction Gam)
     (h : r1.tgt.ty = r2.src.ty) :
     Path r1.src.ty r2.tgt.ty :=
@@ -634,17 +634,17 @@ inductive RedSeq : Term -> Term -> Type where
   | cons : BetaStep a b -> RedSeq b c -> RedSeq a c
 
 /-- Theorem 61: RedSeq to BetaMulti -/
-def RedSeq.toBetaMulti : RedSeq a b -> BetaMulti a b
+noncomputable def RedSeq.toBetaMulti : RedSeq a b -> BetaMulti a b
   | RedSeq.nil => BetaMulti.refl
   | RedSeq.cons hs rest => BetaMulti.step hs rest.toBetaMulti
 
 /-- Theorem 62: RedSeq append -/
-def RedSeq.append : RedSeq a b -> RedSeq b c -> RedSeq a c
+noncomputable def RedSeq.append : RedSeq a b -> RedSeq b c -> RedSeq a c
   | RedSeq.nil, s2 => s2
   | RedSeq.cons hs rest, s2 => RedSeq.cons hs (rest.append s2)
 
 /-- Theorem 63: length of reduction sequence -/
-def RedSeq.length : RedSeq a b -> Nat
+noncomputable def RedSeq.length : RedSeq a b -> Nat
   | RedSeq.nil => 0
   | RedSeq.cons _ rest => 1 + rest.length
 
@@ -677,11 +677,11 @@ structure SNResult (t : Term) where
   seq : BetaMulti t nf
 
 /-- Theorem 68: variable SNResult -/
-def SNResult.ofVar (n : Nat) : SNResult (Term.var n) :=
+noncomputable def SNResult.ofVar (n : Nat) : SNResult (Term.var n) :=
   { nf := Term.var n, isNF := var_normalForm n, seq := BetaMulti.refl }
 
 /-- Theorem 69: normal form gives trivial SNResult -/
-def SNResult.ofNF (t : Term) (h : NormalForm t) : SNResult t :=
+noncomputable def SNResult.ofNF (t : Term) (h : NormalForm t) : SNResult t :=
   { nf := t, isNF := h, seq := BetaMulti.refl }
 
 -- ═══════════════════════════════════════════════════════════════
@@ -689,7 +689,7 @@ def SNResult.ofNF (t : Term) (h : NormalForm t) : SNResult t :=
 -- ═══════════════════════════════════════════════════════════════
 
 /-- The identity combinator: lam A (var 0) -/
-def idCombinator (A : Ty) : Term :=
+noncomputable def idCombinator (A : Ty) : Term :=
   Term.lam A (Term.var 0)
 
 /-- Theorem 70: identity combinator is well-typed -/
@@ -698,7 +698,7 @@ theorem idCombinator_typed (Gam : Ctx) (A : Ty) :
   HasType.tlam (HasType.tvar rfl)
 
 /-- The K combinator: lam A (lam B (var 1)) -/
-def kCombinator (A B : Ty) : Term :=
+noncomputable def kCombinator (A B : Ty) : Term :=
   Term.lam A (Term.lam B (Term.var 1))
 
 /-- Theorem 71: K combinator is well-typed -/
@@ -717,7 +717,7 @@ theorem id_betaReduce (t : Term) :
   simp [Term.betaReduce, Term.subst]
 
 /-- The S combinator -/
-def sCombinator (A B C : Ty) : Term :=
+noncomputable def sCombinator (A B C : Ty) : Term :=
   Term.lam (Ty.arrow A (Ty.arrow B C))
     (Term.lam (Ty.arrow A B)
       (Term.lam A
@@ -737,13 +737,13 @@ structure SubjectReductionWitness (Gam : Ctx) (t t' : Term) (A : Ty) where
   typePath : Path A A  -- type is preserved, so reflexive
 
 /-- Theorem 74: subject reduction witness from identical type -/
-def SubjectReductionWitness.mk' {Gam : Ctx} {t t' : Term} {A : Ty}
+noncomputable def SubjectReductionWitness.mk' {Gam : Ctx} {t t' : Term} {A : Ty}
     (h1 : Gam ⊢ t ::: A) (h2 : Gam ⊢ t' ::: A) :
     SubjectReductionWitness Gam t t' A :=
   { srcTyping := h1, tgtTyping := h2, typePath := Path.refl A }
 
 /-- Theorem 75: chain subject reduction witnesses via Path.trans -/
-def SubjectReductionWitness.chain
+noncomputable def SubjectReductionWitness.chain
     {Gam : Ctx} {t1 t2 t3 : Term} {A : Ty}
     (w1 : SubjectReductionWitness Gam t1 t2 A)
     (w2 : SubjectReductionWitness Gam t2 t3 A) :
@@ -784,7 +784,7 @@ theorem congrArg_id_ty {a b : Ty} (p : Path a b) :
 -- ═══════════════════════════════════════════════════════════════
 
 /-- Path on contexts: extending with equal types -/
-def ctxConsPath {A A' : Ty} (Gam : Ctx) (p : Path A A') :
+noncomputable def ctxConsPath {A A' : Ty} (Gam : Ctx) (p : Path A A') :
     Path (A :: Gam) (A' :: Gam) :=
   Path.congrArg (· :: Gam) p
 

@@ -25,17 +25,17 @@ variable {A : Type u} {B : Type v} {C : Type w}
 /-! ## Path category structure -/
 
 /-- Hom-set in the path groupoid. -/
-@[reducible] def Hom (A : Type u) (x y : A) := Path x y
+@[reducible] noncomputable def Hom (A : Type u) (x y : A) := Path x y
 
 /-- 1. Identity morphism. -/
-@[simp] def Hom.id (x : A) : Hom A x x := Path.refl x
+@[simp] noncomputable def Hom.id (x : A) : Hom A x x := Path.refl x
 
 /-- 2. Composition of morphisms. -/
-@[simp] def Hom.comp {x y z : A} (f : Hom A x y) (g : Hom A y z) : Hom A x z :=
+@[simp] noncomputable def Hom.comp {x y z : A} (f : Hom A x y) (g : Hom A y z) : Hom A x z :=
   Path.trans f g
 
 /-- 3. Inverse morphism (groupoid structure). -/
-@[simp] def Hom.inv {x y : A} (f : Hom A x y) : Hom A y x :=
+@[simp] noncomputable def Hom.inv {x y : A} (f : Hom A x y) : Hom A y x :=
   Path.symm f
 
 /-- 4. Left identity law. -/
@@ -85,21 +85,21 @@ structure PathFunctor (A : Type u) (B : Type v) where
     map (Hom.comp f g) = Hom.comp (map f) (map g)
 
 /-- 11. Every function induces a path functor via congrArg. -/
-def inducedFunctor (f : A → B) : PathFunctor A B where
+noncomputable def inducedFunctor (f : A → B) : PathFunctor A B where
   obj := f
   map := congrArg f
   map_id := fun x => by simp [Hom.id, congrArg]
   map_comp := fun p q => congrArg_trans f p q
 
 /-- 12. Identity functor. -/
-def idFunctor : PathFunctor A A where
+noncomputable def idFunctor : PathFunctor A A where
   obj := id
   map := fun p => congrArg id p
   map_id := fun x => by simp [Hom.id, congrArg]
   map_comp := fun p q => congrArg_trans id p q
 
 /-- 13. Composition of path functors. -/
-def compFunctor (F : PathFunctor A B) (G : PathFunctor B C) : PathFunctor A C where
+noncomputable def compFunctor (F : PathFunctor A B) (G : PathFunctor B C) : PathFunctor A C where
   obj := G.obj ∘ F.obj
   map := fun p => G.map (F.map p)
   map_id := fun x => by
@@ -128,12 +128,12 @@ structure PathNatTrans (F G : PathFunctor A B) where
     Hom.comp (F.map f) (component y) = Hom.comp (component x) (G.map f)
 
 /-- 16. Identity natural transformation. -/
-def idNatTrans (F : PathFunctor A B) : PathNatTrans F F where
+noncomputable def idNatTrans (F : PathFunctor A B) : PathNatTrans F F where
   component := fun x => Hom.id (F.obj x)
   naturality := fun f => by simp [Hom.comp, Hom.id]
 
 /-- 17. Vertical composition of natural transformations. -/
-def vcompNatTrans {F G H : PathFunctor A B}
+noncomputable def vcompNatTrans {F G H : PathFunctor A B}
     (α : PathNatTrans F G) (β : PathNatTrans G H) : PathNatTrans F H where
   component := fun x => Hom.comp (α.component x) (β.component x)
   naturality := fun {x y} f => by
@@ -169,25 +169,25 @@ theorem vcomp_assoc {F G H K : PathFunctor A B}
 /-! ## 2-morphisms and the 2-category structure -/
 
 /-- A 2-morphism is an equality between morphisms. -/
-@[reducible] def TwoMor {x y : A} (f g : Hom A x y) := f = g
+@[reducible] noncomputable def TwoMor {x y : A} (f g : Hom A x y) := f = g
 
 /-- 21. Vertical composition of 2-morphisms. -/
-def TwoMor.vcomp {x y : A} {f g h : Hom A x y}
+noncomputable def TwoMor.vcomp {x y : A} {f g h : Hom A x y}
     (α : TwoMor f g) (β : TwoMor g h) : TwoMor f h :=
   α.trans β
 
 /-- 22. Horizontal composition of 2-morphisms (whiskering). -/
-def TwoMor.hcomp {x y z : A} {f f' : Hom A x y} {g g' : Hom A y z}
+noncomputable def TwoMor.hcomp {x y z : A} {f f' : Hom A x y} {g g' : Hom A y z}
     (α : TwoMor f f') (β : TwoMor g g') : TwoMor (Hom.comp f g) (Hom.comp f' g') := by
   cases α; cases β; rfl
 
 /-- 23. Left whiskering. -/
-def leftWhisker {x y z : A} (f : Hom A x y) {g g' : Hom A y z}
+noncomputable def leftWhisker {x y z : A} (f : Hom A x y) {g g' : Hom A y z}
     (β : TwoMor g g') : TwoMor (Hom.comp f g) (Hom.comp f g') :=
   _root_.congrArg (Hom.comp f) β
 
 /-- 24. Right whiskering. -/
-def rightWhisker {x y z : A} {f f' : Hom A x y} (α : TwoMor f f')
+noncomputable def rightWhisker {x y z : A} {f f' : Hom A x y} (α : TwoMor f f')
     (g : Hom A y z) : TwoMor (Hom.comp f g) (Hom.comp f' g) :=
   _root_.congrArg (fun h => Hom.comp h g) α
 
@@ -271,7 +271,7 @@ theorem comp_inv_quad {v w x y z : A}
 /-! ## Automorphism group -/
 
 /-- The automorphism group at a point: loops. -/
-@[reducible] def Aut (x : A) := Hom A x x
+@[reducible] noncomputable def Aut (x : A) := Hom A x x
 
 /-- 36. Aut forms a monoid under composition: associativity. -/
 theorem aut_comp_assoc (x : A) (f g h : Aut x) :
@@ -348,25 +348,25 @@ structure GIso (x y : A) where
   right_inv_eq : (Hom.comp forward backward).toEq = rfl
 
 /-- 48. Every morphism gives a GIso (since it's a groupoid). -/
-def GIso.ofHom {x y : A} (f : Hom A x y) : GIso x y where
+noncomputable def GIso.ofHom {x y : A} (f : Hom A x y) : GIso x y where
   forward := f
   backward := Hom.inv f
   left_inv_eq := inv_comp_toEq f
   right_inv_eq := comp_inv_toEq f
 
 /-- 49. GIso is reflexive. -/
-def GIso.refl (x : A) : GIso x x :=
+noncomputable def GIso.refl (x : A) : GIso x x :=
   GIso.ofHom (Hom.id x)
 
 /-- 50. GIso is symmetric. -/
-def GIso.symm {x y : A} (iso : GIso x y) : GIso y x where
+noncomputable def GIso.symm {x y : A} (iso : GIso x y) : GIso y x where
   forward := iso.backward
   backward := iso.forward
   left_inv_eq := iso.right_inv_eq
   right_inv_eq := iso.left_inv_eq
 
 /-- 51. GIso is transitive. -/
-def GIso.trans {x y z : A} (iso₁ : GIso x y) (iso₂ : GIso y z) : GIso x z :=
+noncomputable def GIso.trans {x y z : A} (iso₁ : GIso x y) (iso₂ : GIso y z) : GIso x z :=
   GIso.ofHom (Hom.comp iso₁.forward iso₂.forward)
 
 /-- 52. GIso forward ∘ backward has trivial proof (re-derived). -/

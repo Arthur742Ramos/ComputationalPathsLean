@@ -51,11 +51,11 @@ noncomputable def connectingMap_trans_path {B : Type u} {P : B → Type u}
 /-! ## Path-exact sequence routes -/
 
 /-- Left-associated route in a fiber-sequence loop term. -/
-def exactRouteLeft {A : Type u} {a : A} (p q r : LoopSpace A a) : LoopSpace A a :=
+noncomputable def exactRouteLeft {A : Type u} {a : A} (p q r : LoopSpace A a) : LoopSpace A a :=
   Path.trans (Path.trans p q) r
 
 /-- Right-associated route in a fiber-sequence loop term. -/
-def exactRouteRight {A : Type u} {a : A} (p q r : LoopSpace A a) : LoopSpace A a :=
+noncomputable def exactRouteRight {A : Type u} {a : A} (p q r : LoopSpace A a) : LoopSpace A a :=
   Path.trans p (Path.trans q r)
 
 /-- Exactness rerouting is witnessed by the associator 2-cell. -/

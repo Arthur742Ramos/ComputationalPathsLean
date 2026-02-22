@@ -29,7 +29,7 @@ namespace PathPreservingModuliData
 variable {X : Type u} {V : Type v} (M : PathPreservingModuliData X V)
 
 /-- Canonical compatibility path induced by class functoriality. -/
-def canonicalClassCompat :
+noncomputable def canonicalClassCompat :
     Path
       (M.virtualClass.classOf (M.deformation.fiber 0))
       (M.virtualClass.classOf M.deformation.specialFiber) :=
@@ -50,7 +50,7 @@ noncomputable def canonicalClassCompat_refl_right :
   rweq_of_step (Path.Step.trans_refl_right M.canonicalClassCompat)
 
 /-- Invariance path from any fiber to the special fiber in virtual-class space. -/
-def classInvariance (n : Nat) :
+noncomputable def classInvariance (n : Nat) :
     Path
       (M.virtualClass.classOf (M.deformation.fiber n))
       (M.virtualClass.classOf M.deformation.specialFiber) :=

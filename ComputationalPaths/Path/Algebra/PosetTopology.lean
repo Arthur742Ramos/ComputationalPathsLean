@@ -52,11 +52,11 @@ structure PathPoset where
   le_trans : ∀ x y z, le x y → le y z → Path (le x z) True
 
 /-- Strict order (covering) relation. -/
-def PathPoset.lt (P : PathPoset) (x y : P.P) : Prop :=
+noncomputable def PathPoset.lt (P : PathPoset) (x y : P.P) : Prop :=
   P.le x y ∧ x ≠ y
 
 /-- Path.trans: transitivity of poset order. -/
-def poset_trans_compose (P : PathPoset) (x y z : P.P)
+noncomputable def poset_trans_compose (P : PathPoset) (x y z : P.P)
     (hxy : P.le x y) (hyz : P.le y z) :
     Path (P.le x z) True :=
   P.le_trans x y z hxy hyz
@@ -74,7 +74,7 @@ structure Chain (P : PathPoset) where
   strict : elements.Pairwise (fun a b => P.le a b ∧ a ≠ b)
 
 /-- Length of a chain. -/
-def Chain.length {P : PathPoset} (c : Chain P) : Nat :=
+noncomputable def Chain.length {P : PathPoset} (c : Chain P) : Nat :=
   c.elements.length - 1
 
 /-- Maximal chain: not extendable. -/
@@ -97,7 +97,7 @@ structure OrderComplex (P : PathPoset) where
   dim : Nat
 
 /-- Path: faces are closed under subchains. -/
-def face_hereditary {P : PathPoset} (oc : OrderComplex P)
+noncomputable def face_hereditary {P : PathPoset} (oc : OrderComplex P)
     (c₁ c₂ : Chain P) (hf : oc.face c₁)
     (hsub : ∀ x, x ∈ c₂.elements → x ∈ c₁.elements) :
     Path (oc.face c₂) True :=
@@ -119,7 +119,7 @@ structure MobiusFunction (P : PathPoset) where
     Path (mu x y) 0
 
 /-- Path.trans: Möbius diagonal is 1. -/
-def mu_diag_one (P : PathPoset) (mf : MobiusFunction P) (x : P.P) :
+noncomputable def mu_diag_one (P : PathPoset) (mf : MobiusFunction P) (x : P.P) :
     Path (mf.mu x x) 1 :=
   mf.mu_diag x
 
@@ -141,7 +141,7 @@ structure MobiusInversion (P : PathPoset) (mf : MobiusFunction P) where
     ∀ x, Path (app f x) (app f x)
 
 /-- Path.trans: composing inversion with dual. -/
-def inversion_compose {P : PathPoset} {mf : MobiusFunction P}
+noncomputable def inversion_compose {P : PathPoset} {mf : MobiusFunction P}
     (mi : MobiusInversion P mf) (f g : mi.F)
     (h : ∀ y x, P.le x y → Path (mi.app g y) (mi.app g y))
     (y : P.P) :
@@ -162,7 +162,7 @@ structure Shellability (P : PathPoset) (oc : OrderComplex P) where
     Path True True  -- simplified shelling condition
 
 /-- Shellability implies well-behaved homology (Path). -/
-def shellable_homology {P : PathPoset} {oc : OrderComplex P}
+noncomputable def shellable_homology {P : PathPoset} {oc : OrderComplex P}
     (_sh : Shellability P oc) :
     Path True True :=
   Path.refl _
@@ -181,7 +181,7 @@ structure CohenMacaulayPoset (P : PathPoset) where
   cm_shellable : Path True True
 
 /-- Path.trans: CM purity is transitive. -/
-def cm_purity_trans (P : PathPoset) (cm : CohenMacaulayPoset P)
+noncomputable def cm_purity_trans (P : PathPoset) (cm : CohenMacaulayPoset P)
     (c₁ c₂ c₃ : MaximalChain P) :
     Path (c₁.toChain.length) (c₃.toChain.length) :=
   Path.trans (cm.pure c₁ c₂) (cm.pure c₂ c₃)
@@ -204,13 +204,13 @@ structure ELLabeling (P : PathPoset) where
     Path True True
 
 /-- EL-labeling implies shellability (Path). -/
-def el_implies_shellable {P : PathPoset} (_el : ELLabeling P)
+noncomputable def el_implies_shellable {P : PathPoset} (_el : ELLabeling P)
     (_oc : OrderComplex P) :
     Path True True :=
   Path.refl _
 
 /-- Path.trans: EL → shellable → CM chain. -/
-def el_shellable_cm {P : PathPoset} (el : ELLabeling P)
+noncomputable def el_shellable_cm {P : PathPoset} (el : ELLabeling P)
     (oc : OrderComplex P) :
     Path True True :=
   Path.trans (el_implies_shellable el oc) (Path.refl _)
@@ -272,44 +272,44 @@ noncomputable def rwEq_cm_pure (P : PathPoset) (cm : CohenMacaulayPoset P)
 /-! ## Zeta Polynomials and Quillen-Type Fiber Data -/
 
 /-- Interval length proxy in a ranked poset. -/
-def intervalLength (P : PathPoset) (_x y : P.P) : Nat :=
+noncomputable def intervalLength (P : PathPoset) (_x y : P.P) : Nat :=
   0
 
 /-- Coefficient of the zeta polynomial at degree k (simplified). -/
-def zetaPolynomialCoeff (P : PathPoset) (_k : Nat) : Int :=
+noncomputable def zetaPolynomialCoeff (P : PathPoset) (_k : Nat) : Int :=
   0
 
 /-- Evaluation of the zeta polynomial at m (simplified). -/
-def zetaPolynomialEval (P : PathPoset) (m : Nat) : Int :=
+noncomputable def zetaPolynomialEval (P : PathPoset) (m : Nat) : Int :=
   zetaPolynomialCoeff P m
 
 /-- Absolute value of the Möbius function on an interval. -/
-def mobiusAbsolute (P : PathPoset) (mf : MobiusFunction P) (x y : P.P) : Nat :=
+noncomputable def mobiusAbsolute (P : PathPoset) (mf : MobiusFunction P) (x y : P.P) : Nat :=
   Int.natAbs (mf.mu x y)
 
 /-- Reduced Euler characteristic proxy for an order complex. -/
-def reducedEulerCharacteristic (P : PathPoset) (_oc : OrderComplex P) : Int :=
+noncomputable def reducedEulerCharacteristic (P : PathPoset) (_oc : OrderComplex P) : Int :=
   0
 
 /-- Shelling depth statistic. -/
-def shellingDepth (P : PathPoset) (oc : OrderComplex P) (_sh : Shellability P oc) : Nat :=
+noncomputable def shellingDepth (P : PathPoset) (oc : OrderComplex P) (_sh : Shellability P oc) : Nat :=
   oc.dim
 
 /-- Complexity proxy for an EL-labeling. -/
-def elLabelComplexity (P : PathPoset) (_el : ELLabeling P) : Nat :=
+noncomputable def elLabelComplexity (P : PathPoset) (_el : ELLabeling P) : Nat :=
   0
 
 /-- Quillen fiber condition placeholder. -/
-def quillenFiberCondition (P : PathPoset) (_oc : OrderComplex P) : Prop :=
+noncomputable def quillenFiberCondition (P : PathPoset) (_oc : OrderComplex P) : Prop :=
   True
 
 /-- Path witness associated to Quillen's fiber condition. -/
-def quillenFiberWitness (P : PathPoset) (oc : OrderComplex P) :
+noncomputable def quillenFiberWitness (P : PathPoset) (oc : OrderComplex P) :
     Path (quillenFiberCondition P oc) True :=
   Path.refl _
 
 /-- Connectivity degree of the order complex (simplified). -/
-def orderComplexConnectivity (P : PathPoset) (oc : OrderComplex P) : Nat :=
+noncomputable def orderComplexConnectivity (P : PathPoset) (oc : OrderComplex P) : Nat :=
   oc.dim
 
 theorem intervalLength_refl (P : PathPoset) (x y : P.P) :

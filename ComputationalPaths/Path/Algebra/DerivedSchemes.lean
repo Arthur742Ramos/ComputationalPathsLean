@@ -129,14 +129,14 @@ structure SCRMor (R S : SimplicialRing.{u}) where
   map_one : Path (toFun R.one) S.one
 
 /-- Identity morphism. -/
-def SCRMor.id (R : SimplicialRing.{u}) : SCRMor R R where
+noncomputable def SCRMor.id (R : SimplicialRing.{u}) : SCRMor R R where
   toFun := _root_.id
   map_mul := fun _ _ => Path.refl _
   map_add := fun _ _ => Path.refl _
   map_one := Path.refl _
 
 /-- Composition of SCR morphisms. -/
-def SCRMor.comp {R S T : SimplicialRing.{u}} (f : SCRMor R S) (g : SCRMor S T) : SCRMor R T where
+noncomputable def SCRMor.comp {R S T : SimplicialRing.{u}} (f : SCRMor R S) (g : SCRMor S T) : SCRMor R T where
   toFun := g.toFun ∘ f.toFun
   map_mul := fun a b =>
     Path.trans (Path.stepChain (_root_.congrArg g.toFun (f.map_mul a b).proof)) (g.map_mul (f.toFun a) (f.toFun b))
@@ -145,11 +145,11 @@ def SCRMor.comp {R S T : SimplicialRing.{u}} (f : SCRMor R S) (g : SCRMor S T) :
   map_one := Path.trans (Path.stepChain (_root_.congrArg g.toFun f.map_one.proof)) g.map_one
 
 /-- Composing with identity on the right is identity. -/
-def SCRMor.comp_id {R S : SimplicialRing.{u}} (f : SCRMor R S) :
+noncomputable def SCRMor.comp_id {R S : SimplicialRing.{u}} (f : SCRMor R S) :
     Path (f.comp (SCRMor.id S)).toFun f.toFun := Path.refl _
 
 /-- Composing with identity on the left is identity. -/
-def SCRMor.id_comp {R S : SimplicialRing.{u}} (f : SCRMor R S) :
+noncomputable def SCRMor.id_comp {R S : SimplicialRing.{u}} (f : SCRMor R S) :
     Path (SCRMor.id R |>.comp f).toFun f.toFun := Path.refl _
 
 /-! ## Derived Affine Schemes -/
@@ -237,7 +237,7 @@ structure CotangentFunctoriality
     Path (restrict (extend m)) LCB.zero
 
 /-- Distinguished triangle for cotangent complex. -/
-def cotangent_triangle
+noncomputable def cotangent_triangle
     (A B C : SimplicialRing.{u})
     (f : SCRMor A B) (g : SCRMor B C)
     (LBA : CotangentComplex A B f)
@@ -342,7 +342,7 @@ structure DerivedBaseChange
     Path (fX.toFun (prX.toFun z)) (fY.toFun (prY.toFun z))
 
 /-- Base change preserves identity. -/
-def base_change_id (S : DerivedScheme.{u})
+noncomputable def base_change_id (S : DerivedScheme.{u})
     (idS : DerivedSchemeMor S S)
     (h_id : ∀ (s : S.Space), Path (idS.toFun s) s)
     (X : DerivedScheme.{u})
@@ -369,7 +369,7 @@ structure Pi0Ring (R : SimplicialRing.{u}) where
   pi0_comm : ∀ (a b : Carrier), Path (mul a b) (mul b a)
 
 /-- π₀ is functorial: a ring morphism induces a compatible map on π₀. -/
-def pi0_functorial (R S : SimplicialRing.{u})
+noncomputable def pi0_functorial (R S : SimplicialRing.{u})
     (f : SCRMor R S)
     (π₀R : Pi0Ring R) (π₀S : Pi0Ring S)
     (g : π₀R.Carrier → π₀S.Carrier)

@@ -76,7 +76,7 @@ commutator subgroup.
 -/
 
 /-- The commutator of two elements: [a, b] = a · b · a⁻¹ · b⁻¹. -/
-def commutator {G : Type u} (mul : G → G → G) (inv : G → G) (a b : G) : G :=
+noncomputable def commutator {G : Type u} (mul : G → G → G) (inv : G → G) (a b : G) : G :=
   mul (mul a b) (mul (inv a) (inv b))
 
 /-- The abelianization relation for a group (G, mul, inv, e).
@@ -120,23 +120,23 @@ theorem abelianizationRel_equiv (G : Type u) (mul : G → G → G) (inv : G → 
   trans := AbelianizationRel.trans
 
 /-- Setoid for abelianization. -/
-def abelianizationSetoid (G : Type u) (mul : G → G → G) (inv : G → G) (e : G) : Setoid G where
+noncomputable def abelianizationSetoid (G : Type u) (mul : G → G → G) (inv : G → G) (e : G) : Setoid G where
   r := AbelianizationRel G mul inv e
   iseqv := abelianizationRel_equiv G mul inv e
 
 /-- The abelianization G^ab is G quotiented by the abelianization relation.
 
 This is defined as a proper quotient type, not axiomatized. -/
-def Abelianization (G : Type u) (mul : G → G → G) (inv : G → G) (e : G) : Type u :=
+noncomputable def Abelianization (G : Type u) (mul : G → G → G) (inv : G → G) (e : G) : Type u :=
   Quotient (abelianizationSetoid G mul inv e)
 
 /-- The quotient map G → G^ab. -/
-def abelianization_mk {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) :
+noncomputable def abelianization_mk {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) :
     G → Abelianization G mul inv e :=
   Quotient.mk _
 
 /-- Multiplication on the abelianization induced by multiplication on `G`. -/
-def abelianization_mul {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) :
+noncomputable def abelianization_mul {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) :
     Abelianization G mul inv e → Abelianization G mul inv e → Abelianization G mul inv e :=
   Quotient.lift₂
     (fun x y => abelianization_mk mul inv e (mul x y))
@@ -209,11 +209,11 @@ theorem abelianization_is_abelian {G : Type u} (mul : G → G → G) (inv : G �
   exact Quotient.sound (AbelianizationRel.comm a b)
 
 /-- A raw commutativity predicate for a binary operation. -/
-def IsAbelian {G : Type u} (mul : G → G → G) : Prop :=
+noncomputable def IsAbelian {G : Type u} (mul : G → G → G) : Prop :=
   ∀ a b, mul a b = mul b a
 
 /-- Raw group-like laws for a binary operation with inverse and unit. -/
-def IsGroupLike {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) : Prop :=
+noncomputable def IsGroupLike {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) : Prop :=
   (∀ x y z, mul (mul x y) z = mul x (mul y z)) ∧
   (∀ x, mul e x = x) ∧
   (∀ x, mul x e = x) ∧
@@ -221,7 +221,7 @@ def IsGroupLike {G : Type u} (mul : G → G → G) (inv : G → G) (e : G) : Pro
   (∀ x, mul x (inv x) = e)
 
 /-- Raw hom-like predicate for maps respecting mul, inv, and e. -/
-def IsMulHom {G H : Type u} (mulG : G → G → G) (invG : G → G) (eG : G)
+noncomputable def IsMulHom {G H : Type u} (mulG : G → G → G) (invG : G → G) (eG : G)
     (mulH : H → H → H) (invH : H → H) (eH : H) (f : G → H) : Prop :=
   (∀ x y, f (mulG x y) = mulH (f x) (f y)) ∧
   (∀ x, f (invG x) = invH (f x)) ∧
@@ -291,7 +291,7 @@ theorem abelianizationRel_respects {G H : Type u}
         _ = f eG := by rw [hid]
 
 /-- Descend a map that respects AbelianizationRel to the quotient. -/
-def abelianization_desc {G H : Type u}
+noncomputable def abelianization_desc {G H : Type u}
     (mulG : G → G → G) (invG : G → G) (eG : G)
     (f : G → H) (hrel : ∀ {x y}, AbelianizationRel G mulG invG eG x y → f x = f y) :
     Abelianization G mulG invG eG → H :=
@@ -314,7 +314,7 @@ theorem abelianization_desc_unique {G H : Type u}
   simpa [abelianization_desc] using (hg x)
 
 /-- Universal factor map for hom-like maps into abelian targets. -/
-def abelianization_desc_of_hom {G H : Type u}
+noncomputable def abelianization_desc_of_hom {G H : Type u}
     (mulG : G → G → G) (invG : G → G) (eG : G)
     (mulH : H → H → H) (invH : H → H) (eH : H)
     (f : G → H) (hgroup : IsGroupLike mulH invH eH) (hcomm : IsAbelian mulH)
@@ -342,7 +342,7 @@ H₁(X) is defined as the abelianization of π₁(X).
 /-- The first homology group H₁(X, x₀).
 
 By the Hurewicz theorem, H₁(X) ≃ π₁(X)^ab. We define H₁ directly as this. -/
-def H1 (A : Type u) (a : A) : Type u :=
+noncomputable def H1 (A : Type u) (a : A) : Type u :=
   Abelianization (π₁(A, a)) LoopQuot.comp LoopQuot.inv LoopQuot.id
 
 /-- The Hurewicz homomorphism h : π₁(X) → H₁(X).
@@ -399,17 +399,17 @@ theorem abelianizationRel_int_eq {x y : Int} :
   | inv_left x => simpa using (Int.add_left_neg x)
   | inv_right x => simpa using (Int.add_right_neg x)
 
-def abelianization_int_proj : Abelianization Int Int.add Int.neg 0 → Int :=
+noncomputable def abelianization_int_proj : Abelianization Int Int.add Int.neg 0 → Int :=
   Quotient.lift (fun x : Int => x) (by
     intro x y h
     exact abelianizationRel_int_eq (x := x) (y := y) h)
 
 /-- Injection from ℤ into its abelianization. -/
-def abelianization_int_inj : Int → Abelianization Int Int.add Int.neg 0 :=
+noncomputable def abelianization_int_inj : Int → Abelianization Int Int.add Int.neg 0 :=
   abelianization_mk Int.add Int.neg 0
 
 /-- ℤ^ab ≃ ℤ (integers are already abelian). -/
-def int_abelianization_equiv : SimpleEquiv (Abelianization Int Int.add Int.neg 0) Int where
+noncomputable def int_abelianization_equiv : SimpleEquiv (Abelianization Int Int.add Int.neg 0) Int where
   toFun := abelianization_int_proj
   invFun := abelianization_int_inj
   left_inv := by
@@ -459,15 +459,15 @@ theorem figureEight_H1_equiv_int_prod :
 abbrev FigureEightH1 : Type := Int × Int
 
 /-- Addition on `FigureEightH1`. -/
-def figureEightMul : FigureEightH1 → FigureEightH1 → FigureEightH1
+noncomputable def figureEightMul : FigureEightH1 → FigureEightH1 → FigureEightH1
   | (x₁, y₁), (x₂, y₂) => (x₁ + x₂, y₁ + y₂)
 
 /-- Inversion on `FigureEightH1`. -/
-def figureEightInv : FigureEightH1 → FigureEightH1
+noncomputable def figureEightInv : FigureEightH1 → FigureEightH1
   | (x, y) => (-x, -y)
 
 /-- Identity on `FigureEightH1`. -/
-def figureEightOne : FigureEightH1 := (0, 0)
+noncomputable def figureEightOne : FigureEightH1 := (0, 0)
 
 /-- `FigureEightH1` is group-like under componentwise addition. -/
 theorem figureEight_group_like : IsGroupLike figureEightMul figureEightInv figureEightOne := by
@@ -498,7 +498,7 @@ So any word reduces to a^m · b^n for some m, n ∈ ℤ.
 
 The free product word (left elements are from first ℤ, right from second)
 maps to the sum of left elements and sum of right elements. -/
-def figureEight_abelianization_map : CompPath.FreeProductWord Int Int → FigureEightH1
+noncomputable def figureEight_abelianization_map : CompPath.FreeProductWord Int Int → FigureEightH1
   | .nil => (0, 0)
   | .consLeft x rest =>
     let (m, n) := figureEight_abelianization_map rest
@@ -726,7 +726,7 @@ The Hurewicz theorem is used to:
 -/
 
 /-- A space is simply connected if π₁ = {id}. -/
-def IsSimplyConnected (A : Type u) (a : A) : Prop :=
+noncomputable def IsSimplyConnected (A : Type u) (a : A) : Prop :=
   ∀ (α : π₁(A, a)), α = LoopQuot.id
 
 /-- If π₁(X) = {id} (simply connected), then H₁(X) = {0}.
@@ -755,7 +755,7 @@ theorem H1_nontrivial_implies_pi1_nontrivial {A : Type u} {a : A}
   exact hne this
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary

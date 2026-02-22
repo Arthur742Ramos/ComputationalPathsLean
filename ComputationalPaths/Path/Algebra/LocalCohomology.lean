@@ -55,7 +55,7 @@ structure CommRingData (R : Type u) where
 namespace CommRingData
 
 /-- Trivial commutative ring on PUnit. -/
-def trivial : CommRingData PUnit where
+noncomputable def trivial : CommRingData PUnit where
   zero := PUnit.unit
   one := PUnit.unit
   add := fun _ _ => PUnit.unit
@@ -83,7 +83,7 @@ structure IdealData {R : Type u} (ring : CommRingData R) where
   mul_mem : ∀ {a} (r : R), mem a → mem (ring.mul r a)
 
 /-- The whole ring as an ideal. -/
-def IdealData.whole {R : Type u} (ring : CommRingData R) : IdealData ring where
+noncomputable def IdealData.whole {R : Type u} (ring : CommRingData R) : IdealData ring where
   mem := fun _ => True
   zero_mem := trivial
   add_mem := fun _ _ => trivial
@@ -107,7 +107,7 @@ structure ModuleData {R : Type u} (ring : CommRingData R) (M : Type v) where
   add_smul : ∀ r s x, smul (ring.add r s) x = add (smul r x) (smul s x)
 
 /-- Trivial module on PUnit. -/
-def ModuleData.trivial {R : Type u} (ring : CommRingData R) : ModuleData ring PUnit where
+noncomputable def ModuleData.trivial {R : Type u} (ring : CommRingData R) : ModuleData ring PUnit where
   zero := PUnit.unit
   add := fun _ _ => PUnit.unit
   neg := fun _ => PUnit.unit
@@ -144,7 +144,7 @@ structure LocalCohomologyModule {R : Type u} (ring : CommRingData R)
   add_left_neg : ∀ n x, add n (neg n x) x = zero n
 
 /-- Path witness that H^0 is zero when depth > 0. -/
-def localCoh_zero_vanish {R : Type u} {ring : CommRingData R}
+noncomputable def localCoh_zero_vanish {R : Type u} {ring : CommRingData R}
     {I : IdealData ring} {M : Type v} {mod : ModuleData ring M}
     (H : LocalCohomologyModule ring I mod) (x : H.carrier 0)
     (depth_pos : H.carrier 0 → H.carrier 0)
@@ -164,7 +164,7 @@ structure DepthData {R : Type u} (ring : CommRingData R)
     i < value → ∀ x : H.carrier i, Path x (H.zero i)
 
 /-- Trivial depth data with value 0. -/
-def DepthData.zero_depth {R : Type u} {ring : CommRingData R}
+noncomputable def DepthData.zero_depth {R : Type u} {ring : CommRingData R}
     {I : IdealData ring} {M : Type v} (mod : ModuleData ring M) :
     DepthData ring I mod where
   value := 0
@@ -248,10 +248,10 @@ theorem localCohStep_sound {A : Type u} {a b : A} {p q : Path a b}
   | exact_seq _ _ h => exact h
 
 /-- RwEq closure of LocalCohStep. -/
-def LocalCohRwEq {A : Type u} {a b : A} (p q : Path a b) : Prop :=
+noncomputable def LocalCohRwEq {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   ∃ r : Path a b, LocalCohStep p r ∧ LocalCohStep q r
 
-private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
 /-! ## Summary -/
 

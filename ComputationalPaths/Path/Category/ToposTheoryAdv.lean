@@ -105,7 +105,7 @@ structure PointOfTopos (E : GrothendieckTopos) where
   isGeometric  : True
 
 /-- A topos has enough points if stalk functors are jointly conservative. -/
-def HasEnoughPoints (E : GrothendieckTopos) : Prop :=
+noncomputable def HasEnoughPoints (E : GrothendieckTopos) : Prop :=
   True  -- Points jointly detect isomorphisms
 
 -- ============================================================
@@ -134,15 +134,15 @@ structure LocallyConnectedTopos extends GrothendieckTopos where
   hasPi0 : True
 
 /-- Hyperconnected geometric morphism. -/
-def IsHyperconnected (E F : GrothendieckTopos) (_ : GeometricMorphism E F) : Prop :=
+noncomputable def IsHyperconnected (E F : GrothendieckTopos) (_ : GeometricMorphism E F) : Prop :=
   True
 
 /-- Localic geometric morphism. -/
-def IsLocalic (E F : GrothendieckTopos) (_ : GeometricMorphism E F) : Prop :=
+noncomputable def IsLocalic (E F : GrothendieckTopos) (_ : GeometricMorphism E F) : Prop :=
   True
 
 /-- Bounded geometric morphism. -/
-def IsBounded (E F : GrothendieckTopos) (_ : GeometricMorphism E F) : Prop :=
+noncomputable def IsBounded (E F : GrothendieckTopos) (_ : GeometricMorphism E F) : Prop :=
   True
 
 -- ============================================================
@@ -207,7 +207,7 @@ theorem geom_morph_compose (E F G : GrothendieckTopos)
      leftExact := trivial }, trivial⟩
 
 /-- The identity geometric morphism. -/
-def idGeometricMorphism (E : GrothendieckTopos) : GeometricMorphism E E where
+noncomputable def idGeometricMorphism (E : GrothendieckTopos) : GeometricMorphism E E where
   inverseStar := id
   directStar := id
   adjunction := trivial
@@ -308,10 +308,10 @@ structure AtomicConnectedTopos where
   atomic : AtomicToposData toTopos
   connected : True
 
-def isLocallyConnectedTopos (E : GrothendieckTopos) : Prop :=
+noncomputable def isLocallyConnectedTopos (E : GrothendieckTopos) : Prop :=
   ∃ F : LocallyConnectedTopos, F.toGrothendieckTopos = E
 
-def pointsDetectIsomorphisms (E : GrothendieckTopos) : Prop :=
+noncomputable def pointsDetectIsomorphisms (E : GrothendieckTopos) : Prop :=
   True
 
 /-! ## Additional Theorems -/
@@ -418,40 +418,40 @@ theorem deligne_and_barr_are_compatible (E : GrothendieckTopos) : True := by
 
 /-! ## Computational-path topos integration -/
 
-def geometricMorphismPathFunctor {E F : GrothendieckTopos}
+noncomputable def geometricMorphismPathFunctor {E F : GrothendieckTopos}
     (f g : GeometricMorphism E F) : Type _ :=
   Path f g
 
-def geometricMorphismPathCompose {E F : GrothendieckTopos}
+noncomputable def geometricMorphismPathCompose {E F : GrothendieckTopos}
     {f g h : GeometricMorphism E F}
     (p : geometricMorphismPathFunctor f g)
     (q : geometricMorphismPathFunctor g h) :
     geometricMorphismPathFunctor f h :=
   Path.trans p q
 
-def geometricMorphismPathInverse {E F : GrothendieckTopos}
+noncomputable def geometricMorphismPathInverse {E F : GrothendieckTopos}
     {f g : GeometricMorphism E F}
     (p : geometricMorphismPathFunctor f g) :
     geometricMorphismPathFunctor g f :=
   Path.symm p
 
-def classifyingToposUniversalPathSpace (T : GeometricTheory)
+noncomputable def classifyingToposUniversalPathSpace (T : GeometricTheory)
     (_ : ClassifyingTopos T) : Type _ :=
   (D : ClassifyingTopos T) → Path D D
 
-def classifyingToposUniversalPath_base (T : GeometricTheory)
+noncomputable def classifyingToposUniversalPath_base (T : GeometricTheory)
     (C : ClassifyingTopos T) :
     classifyingToposUniversalPathSpace T C :=
   fun D => Path.refl D
 
-def delignePathGeneration (E : GrothendieckTopos) : Type _ :=
+noncomputable def delignePathGeneration (E : GrothendieckTopos) : Type _ :=
   (X : E.Obj) → Path X X
 
-def delignePathGeneration_base (E : GrothendieckTopos) :
+noncomputable def delignePathGeneration_base (E : GrothendieckTopos) :
     delignePathGeneration E :=
   fun X => Path.refl X
 
-def toposPathRewrite {E F : GrothendieckTopos} {f g : GeometricMorphism E F}
+noncomputable def toposPathRewrite {E F : GrothendieckTopos} {f g : GeometricMorphism E F}
     (p q : geometricMorphismPathFunctor f g) : Prop :=
   Path.toEq p = Path.toEq q
 

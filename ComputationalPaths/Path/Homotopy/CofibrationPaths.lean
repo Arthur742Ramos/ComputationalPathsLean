@@ -36,25 +36,25 @@ variable {A B C : Type u}
 /-! ## Mapping Cone Properties -/
 
 /-- The inclusion map from B into Cofiber f. -/
-def cofiberIncl (f : A → B) : B → Cofiber f :=
+noncomputable def cofiberIncl (f : A → B) : B → Cofiber f :=
   cofiberInclusion f
 
 /-- The cofiber basepoint. -/
-def cofiberPt (f : A → B) : Cofiber f :=
+noncomputable def cofiberPt (f : A → B) : Cofiber f :=
   Cofiber.basepoint f
 
 /-- The gluing path in the cofiber: f(a) is identified with the basepoint. -/
-def cofiberGlue (f : A → B) (a : A) :
+noncomputable def cofiberGlue (f : A → B) (a : A) :
     Path (cofiberIncl f (f a)) (cofiberPt f) :=
   Cofiber.glue f a
 
 /-- Inclusion followed by glue gives a null-homotopy of the composite. -/
-def cofiber_composite_null (f : A → B) (a : A) :
+noncomputable def cofiber_composite_null (f : A → B) (a : A) :
     Path (cofiberIncl f (f a)) (cofiberPt f) :=
   cofiberGlue f a
 
 /-- The cofiber sequence is exact: composite A → B → Cf is null. -/
-def cofiber_exact_left (f : A → B) :
+noncomputable def cofiber_exact_left (f : A → B) :
     ∀ a : A, Path (cofiberIncl f (f a)) (cofiberPt f) :=
   fun a => cofiberGlue f a
 
@@ -89,31 +89,31 @@ theorem suspMap_south (f : A → B) :
 /-! ## Iterated Cofiber -/
 
 /-- The cofiber of the inclusion B → Cf is the double cofiber. -/
-def doubleCofiber (f : A → B) : Type u :=
+noncomputable def doubleCofiber (f : A → B) : Type u :=
   Cofiber (cofiberIncl f)
 
 /-- Double cofiber inclusion. -/
-def doubleCofiber_incl (f : A → B) : Cofiber f → doubleCofiber f :=
+noncomputable def doubleCofiber_incl (f : A → B) : Cofiber f → doubleCofiber f :=
   cofiberInclusion (cofiberIncl f)
 
 /-- Double cofiber basepoint. -/
-def doubleCofiber_pt (f : A → B) : doubleCofiber f :=
+noncomputable def doubleCofiber_pt (f : A → B) : doubleCofiber f :=
   Cofiber.basepoint (cofiberIncl f)
 
 /-- The glue in the double cofiber identifies images of B. -/
-def doubleCofiber_glue (f : A → B) (b : B) :
+noncomputable def doubleCofiber_glue (f : A → B) (b : B) :
     Path (doubleCofiber_incl f (cofiberIncl f b)) (doubleCofiber_pt f) :=
   Cofiber.glue (cofiberIncl f) b
 
 /-! ## Coexactness -/
 
 /-- Coexactness at the first stage: composite B → Cf → C(incl) is null. -/
-def coexact_first_stage (f : A → B) (b : B) :
+noncomputable def coexact_first_stage (f : A → B) (b : B) :
     Path (doubleCofiber_incl f (cofiberIncl f b)) (doubleCofiber_pt f) :=
   doubleCofiber_glue f b
 
 /-- The connecting map Cf → ΣA sends B to north. -/
-def connecting_map_on_B (f : A → B) (b : B) :
+noncomputable def connecting_map_on_B (f : A → B) (b : B) :
     Path (cofiberToSuspension f (cofiberIncl f b)) (Suspension.north (X := A)) :=
   Path.refl _
 
@@ -129,18 +129,18 @@ structure ExtendedPuppe (A B : Type u) (f : A → B) where
   connecting : Cofiber f → Suspension A
 
 /-- Construct the extended Puppe sequence from f. -/
-def extendedPuppe (f : A → B) : ExtendedPuppe A B f where
+noncomputable def extendedPuppe (f : A → B) : ExtendedPuppe A B f where
   mapAB := f
   incl := cofiberIncl f
   connecting := cofiberToSuspension f
 
 /-- The first composite in the Puppe sequence is null. -/
-def puppe_exact_1 (f : A → B) (a : A) :
+noncomputable def puppe_exact_1 (f : A → B) (a : A) :
     Path ((extendedPuppe f).incl ((extendedPuppe f).mapAB a)) (cofiberPt f) :=
   cofiberGlue f a
 
 /-- The second composite in the Puppe sequence is null. -/
-def puppe_exact_2 (f : A → B) (b : B) :
+noncomputable def puppe_exact_2 (f : A → B) (b : B) :
     Path ((extendedPuppe f).connecting ((extendedPuppe f).incl b))
          (Suspension.north (X := A)) :=
   Path.refl _
@@ -155,20 +155,20 @@ structure MappingTelescope where
   bond : (n : Nat) → space n → space (n + 1)
 
 /-- The n-th cofiber in a mapping telescope. -/
-def telescopeCofiber (T : MappingTelescope) (n : Nat) : Type u :=
+noncomputable def telescopeCofiber (T : MappingTelescope) (n : Nat) : Type u :=
   Cofiber (T.bond n)
 
 /-- Inclusion of the n-th space into its cofiber. -/
-def telescopeIncl (T : MappingTelescope) (n : Nat) :
+noncomputable def telescopeIncl (T : MappingTelescope) (n : Nat) :
     T.space (n + 1) → telescopeCofiber T n :=
   cofiberInclusion (T.bond n)
 
 /-- The basepoint of the n-th cofiber. -/
-def telescopePt (T : MappingTelescope) (n : Nat) : telescopeCofiber T n :=
+noncomputable def telescopePt (T : MappingTelescope) (n : Nat) : telescopeCofiber T n :=
   Cofiber.basepoint (T.bond n)
 
 /-- Exactness in the mapping telescope. -/
-def telescope_exact (T : MappingTelescope) (n : Nat) (x : T.space n) :
+noncomputable def telescope_exact (T : MappingTelescope) (n : Nat) (x : T.space n) :
     Path (telescopeIncl T n (T.bond n x)) (telescopePt T n) :=
   Cofiber.glue (T.bond n) x
 
@@ -180,12 +180,12 @@ theorem susp_north_preserved :
   rfl
 
 /-- Cofiber of identity is contractible to the basepoint. -/
-def cofiber_id_trivial (a : A) :
+noncomputable def cofiber_id_trivial (a : A) :
     Path (cofiberIncl (fun x : A => x) a) (cofiberPt (fun x : A => x)) :=
   cofiberGlue (fun x : A => x) a
 
 /-- The Puppe sequence for identity is trivial. -/
-def puppe_id_trivial (a : A) :
+noncomputable def puppe_id_trivial (a : A) :
     Path (cofiberToSuspension (fun x : A => x) (cofiberIncl (fun x : A => x) a))
          (Suspension.north (X := A)) :=
   Path.refl _
@@ -201,7 +201,7 @@ structure CofibrationData (A B : Type u) where
     fun a => Cofiber.glue map a
 
 /-- Construct cofibration data from a map. -/
-def mkCofibrationData (f : A → B) : CofibrationData A B where
+noncomputable def mkCofibrationData (f : A → B) : CofibrationData A B where
   map := f
 
 /-- The cofiber glue proof is equal to itself (UIP on proofs). -/

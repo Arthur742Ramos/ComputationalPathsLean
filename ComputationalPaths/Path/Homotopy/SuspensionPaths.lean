@@ -26,7 +26,7 @@ inductive PreSusp (A : Type u) where
   | meridPt : A → PreSusp A
 
 /-- The suspension relation: all meridPt points are identified with south. -/
-def suspRel (A : Type u) : PreSusp A → PreSusp A → Prop
+noncomputable def suspRel (A : Type u) : PreSusp A → PreSusp A → Prop
   | PreSusp.meridPt _, PreSusp.south => True
   | PreSusp.south, PreSusp.meridPt _ => True
   | x, y => x = y
@@ -37,10 +37,10 @@ inductive Susp (A : Type u) where
   | pole : Bool → Susp A
 
 /-- North pole. -/
-def north (A : Type u) : Susp A := Susp.pole true
+noncomputable def north (A : Type u) : Susp A := Susp.pole true
 
 /-- South pole. -/
-def south (A : Type u) : Susp A := Susp.pole false
+noncomputable def south (A : Type u) : Susp A := Susp.pole false
 
 /-- The suspension is decidably equal. -/
 instance : DecidableEq (Susp A) := by
@@ -51,11 +51,11 @@ instance : DecidableEq (Susp A) := by
 /-! ## Paths in the suspension -/
 
 /-- Path from north to north. -/
-def northLoop (A : Type u) : Path (north A) (north A) :=
+noncomputable def northLoop (A : Type u) : Path (north A) (north A) :=
   Path.refl (north A)
 
 /-- Path from south to south. -/
-def southLoop (A : Type u) : Path (south A) (south A) :=
+noncomputable def southLoop (A : Type u) : Path (south A) (south A) :=
   Path.refl (south A)
 
 /-- A pointed type. -/
@@ -66,7 +66,7 @@ structure PType where
 /-! ## Suspension functoriality -/
 
 /-- Map on suspensions induced by a function. -/
-def suspMap (_ : A → B) : Susp A → Susp B
+noncomputable def suspMap (_ : A → B) : Susp A → Susp B
   | Susp.pole b => Susp.pole b
 
 /-- Suspension map preserves north. -/
@@ -85,7 +85,7 @@ theorem suspMap_comp {C : Type w} (f : B → C) (g : A → B) :
   funext x; cases x with | pole b => rfl
 
 /-- Suspension map on paths between poles. -/
-def suspMapPath (f : A → B) {x y : Susp A} (p : Path x y) :
+noncomputable def suspMapPath (f : A → B) {x y : Susp A} (p : Path x y) :
     Path (suspMap f x) (suspMap f y) :=
   Path.congrArg (suspMap f) p
 
@@ -109,12 +109,12 @@ theorem suspMapPath_symm (f : A → B) {x y : Susp A} (p : Path x y) :
 /-! ## Pointed suspension -/
 
 /-- Pointed suspension. -/
-def suspPointed (X : PType) : PType where
+noncomputable def suspPointed (X : PType) : PType where
   carrier := Susp X.carrier
   pt := north X.carrier
 
 /-- Pointed loop space. -/
-def omegaPt (X : PType) : PType where
+noncomputable def omegaPt (X : PType) : PType where
   carrier := Path X.pt X.pt
   pt := Path.refl X.pt
 
@@ -122,7 +122,7 @@ def omegaPt (X : PType) : PType where
 
 /-- Every element of A gives a loop in the loop space of the pointed suspension,
     via the trivial loop (since the suspension is discrete). -/
-def suspUnit (X : PType) (_ : X.carrier) : Path (north X.carrier) (north X.carrier) :=
+noncomputable def suspUnit (X : PType) (_ : X.carrier) : Path (north X.carrier) (north X.carrier) :=
   Path.refl (north X.carrier)
 
 /-- The basepoint maps to the identity loop. -/
@@ -130,7 +130,7 @@ theorem suspUnit_pt (X : PType) :
     suspUnit X X.pt = Path.refl (north X.carrier) := rfl
 
 /-- Counit: map from suspension of loops back. -/
-def suspCounit (X : PType) : Susp (Path X.pt X.pt) → Susp X.carrier
+noncomputable def suspCounit (X : PType) : Susp (Path X.pt X.pt) → Susp X.carrier
   | Susp.pole b => Susp.pole b
 
 /-- Counit preserves north. -/
@@ -144,7 +144,7 @@ theorem suspCounit_south (X : PType) :
 /-! ## Loop operations in the suspension -/
 
 /-- Loop composition at north pole. -/
-def northLoopComp (A : Type u) (p q : Path (north A) (north A)) :
+noncomputable def northLoopComp (A : Type u) (p q : Path (north A) (north A)) :
     Path (north A) (north A) :=
   Path.trans p q
 
@@ -159,7 +159,7 @@ theorem northLoopComp_assoc (A : Type u)
   unfold northLoopComp; exact Path.trans_assoc p q r
 
 /-- Loop inverse at north. -/
-def northLoopInv (A : Type u) (p : Path (north A) (north A)) :
+noncomputable def northLoopInv (A : Type u) (p : Path (north A) (north A)) :
     Path (north A) (north A) :=
   Path.symm p
 
@@ -181,16 +181,16 @@ theorem northLoopComp_refl_right (A : Type u) (p : Path (north A) (north A)) :
 /-! ## Double suspension -/
 
 /-- Double suspension: Susp(Susp A). -/
-def DoubleSusp (A : Type u) := Susp (Susp A)
+noncomputable def DoubleSusp (A : Type u) := Susp (Susp A)
 
 /-- North pole of double suspension. -/
-def doubleSusp_north (A : Type u) : DoubleSusp A := north (Susp A)
+noncomputable def doubleSusp_north (A : Type u) : DoubleSusp A := north (Susp A)
 
 /-- South pole of double suspension. -/
-def doubleSusp_south (A : Type u) : DoubleSusp A := south (Susp A)
+noncomputable def doubleSusp_south (A : Type u) : DoubleSusp A := south (Susp A)
 
 /-- Double suspension map. -/
-def doubleSuspMap (f : A → B) : DoubleSusp A → DoubleSusp B :=
+noncomputable def doubleSuspMap (f : A → B) : DoubleSusp A → DoubleSusp B :=
   suspMap (suspMap f)
 
 /-- Double suspension map preserves north. -/

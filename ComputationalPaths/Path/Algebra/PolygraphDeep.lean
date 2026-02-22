@@ -22,17 +22,17 @@ inductive Path (α : Type) : α → α → Type where
   | step : {a b c : α} → (a = b) → Path α b c → Path α a c
 
 /-- Concatenation (trans) of paths. -/
-def Path.trans {α : Type} {a b c : α} : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans {α : Type} {a b c : α} : Path α a b → Path α b c → Path α a c
   | .refl _, q => q
   | .step h rest, q => .step h (rest.trans q)
 
 /-- Symmetry / inverse of a path. -/
-def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a
+noncomputable def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a
   | .refl _ => .refl _
   | .step h rest => rest.symm.trans (.step h.symm (.refl _))
 
 /-- Path length (number of steps). -/
-def Path.length {α : Type} {a b : α} : Path α a b → Nat
+noncomputable def Path.length {α : Type} {a b : α} : Path α a b → Nat
   | .refl _ => 0
   | .step _ rest => rest.length + 1
 
@@ -51,13 +51,13 @@ inductive PPath (G : Polygraph1) : G.Cell0 → G.Cell0 → Type where
   | cons : {x y z : G.Cell0} → G.Gen1 x y → PPath G y z → PPath G x z
 
 /-- Composition of polygraph paths. -/
-def PPath.comp {G : Polygraph1} {x y z : G.Cell0} :
+noncomputable def PPath.comp {G : Polygraph1} {x y z : G.Cell0} :
     PPath G x y → PPath G y z → PPath G x z
   | .id _, q => q
   | .cons g rest, q => .cons g (rest.comp q)
 
 /-- Length of a polygraph path. -/
-def PPath.length {G : Polygraph1} {x y : G.Cell0} : PPath G x y → Nat
+noncomputable def PPath.length {G : Polygraph1} {x y : G.Cell0} : PPath G x y → Nat
   | .id _ => 0
   | .cons _ rest => rest.length + 1
 
@@ -75,17 +75,17 @@ structure Cell2 {P : Polygraph2} {x y : P.Cell0}
   witness : p = q
 
 /-- Identity 2-cell. -/
-def Cell2.rid {P : Polygraph2} {x y : P.Cell0}
+noncomputable def Cell2.rid {P : Polygraph2} {x y : P.Cell0}
     (p : PPath P.toPolygraph1 x y) : @Cell2 P x y p p := ⟨rfl⟩
 
 /-- Composition of 2-cells. -/
-def Cell2.comp {P : Polygraph2} {x y : P.Cell0}
+noncomputable def Cell2.comp {P : Polygraph2} {x y : P.Cell0}
     {p q r : PPath P.toPolygraph1 x y}
     (σ : @Cell2 P x y p q) (τ : @Cell2 P x y q r) : @Cell2 P x y p r :=
   ⟨σ.witness.trans τ.witness⟩
 
 /-- Inverse of a 2-cell. -/
-def Cell2.inv {P : Polygraph2} {x y : P.Cell0}
+noncomputable def Cell2.inv {P : Polygraph2} {x y : P.Cell0}
     {p q : PPath P.toPolygraph1 x y}
     (σ : @Cell2 P x y p q) : @Cell2 P x y q p :=
   ⟨σ.witness.symm⟩
@@ -103,17 +103,17 @@ structure Cell3 {P : Polygraph2} {x y : P.Cell0}
     (σ τ : @Cell2 P x y p q) where
   witness : σ = τ
 
-def Cell3.rid {P : Polygraph2} {x y : P.Cell0}
+noncomputable def Cell3.rid {P : Polygraph2} {x y : P.Cell0}
     {p q : PPath P.toPolygraph1 x y}
     (σ : @Cell2 P x y p q) : Cell3 σ σ := ⟨rfl⟩
 
-def Cell3.comp' {P : Polygraph2} {x y : P.Cell0}
+noncomputable def Cell3.comp' {P : Polygraph2} {x y : P.Cell0}
     {p q : PPath P.toPolygraph1 x y}
     {σ τ υ : @Cell2 P x y p q}
     (A : Cell3 σ τ) (B : Cell3 τ υ) : Cell3 σ υ :=
   ⟨A.witness.trans B.witness⟩
 
-def Cell3.inv' {P : Polygraph2} {x y : P.Cell0}
+noncomputable def Cell3.inv' {P : Polygraph2} {x y : P.Cell0}
     {p q : PPath P.toPolygraph1 x y}
     {σ τ : @Cell2 P x y p q}
     (A : Cell3 σ τ) : Cell3 τ σ :=
@@ -123,7 +123,7 @@ def Cell3.inv' {P : Polygraph2} {x y : P.Cell0}
 -- §5  Homotopy and equivalence
 -- ============================================================
 
-def Homotopic {P : Polygraph2} {x y : P.Cell0}
+noncomputable def Homotopic {P : Polygraph2} {x y : P.Cell0}
     (p q : PPath P.toPolygraph1 x y) : Prop :=
   Nonempty (@Cell2 P x y p q)
 
@@ -145,21 +145,21 @@ inductive RedSeq (α : Type) (R : α → α → Prop) : α → α → Prop where
   | refl : (a : α) → RedSeq α R a a
   | step : {a b c : α} → R a b → RedSeq α R b c → RedSeq α R a c
 
-def Confluent (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def Confluent (α : Type) (R : α → α → Prop) : Prop :=
   ∀ a b c, RedSeq α R a b → RedSeq α R a c →
     ∃ d, RedSeq α R b d ∧ RedSeq α R c d
 
-def LocallyConfluent (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def LocallyConfluent (α : Type) (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c →
     ∃ d, RedSeq α R b d ∧ RedSeq α R c d
 
-def Terminating (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def Terminating (α : Type) (R : α → α → Prop) : Prop :=
   ∀ f : Nat → α, ¬(∀ n, R (f n) (f (n+1)))
 
-def NormalForm (R : α → α → Prop) (a : α) : Prop :=
+noncomputable def NormalForm (R : α → α → Prop) (a : α) : Prop :=
   ∀ b, ¬R a b
 
-def Diamond (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def Diamond (α : Type) (R : α → α → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
 
 -- ============================================================

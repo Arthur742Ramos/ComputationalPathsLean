@@ -38,12 +38,12 @@ structure ChainMap (Obj : Type u) (C D : ChainComplex Obj) where
   commutes : (n : Int) → Path (component n) (component n)
 
 /-- Identity chain map. -/
-def ChainMap.idMap {Obj : Type u} (C : ChainComplex Obj) : ChainMap Obj C C where
+noncomputable def ChainMap.idMap {Obj : Type u} (C : ChainComplex Obj) : ChainMap Obj C C where
   component := C.obj
   commutes := fun n => Path.refl (C.obj n)
 
 /-- Composition of chain maps. -/
-def ChainMap.comp {Obj : Type u} {A B C : ChainComplex Obj}
+noncomputable def ChainMap.comp {Obj : Type u} {A B C : ChainComplex Obj}
     (_f : ChainMap Obj A B) (g : ChainMap Obj B C) : ChainMap Obj A C where
   component := fun n => g.component n
   commutes := fun n => g.commutes n
@@ -64,7 +64,7 @@ structure QuasiIso (Obj : Type u) (C D : ChainComplex Obj) extends ChainMap Obj 
   isoProof : (n : Int) → Path (homoIso n).carrier (inverseH n).carrier
 
 /-- The identity is a quasi-isomorphism. -/
-def QuasiIso.idQiso {Obj : Type u} (C : ChainComplex Obj) : QuasiIso Obj C C where
+noncomputable def QuasiIso.idQiso {Obj : Type u} (C : ChainComplex Obj) : QuasiIso Obj C C where
   component := C.obj
   commutes := fun n => Path.refl (C.obj n)
   homoIso := fun n => ⟨C.obj n, Path.refl (C.obj n)⟩
@@ -82,7 +82,7 @@ structure Roof (Obj : Type u) (A B : ChainComplex Obj) where
   forwardLeg : ChainMap Obj apex B
 
 /-- Identity roof. -/
-def Roof.idRoof {Obj : Type u} (A : ChainComplex Obj) : Roof Obj A A where
+noncomputable def Roof.idRoof {Obj : Type u} (A : ChainComplex Obj) : Roof Obj A A where
   apex := A
   quasiIsoLeg := QuasiIso.idQiso A
   forwardLeg := ChainMap.idMap A
@@ -97,7 +97,7 @@ structure DerivedMor (Obj : Type u) (A B : ChainComplex Obj) where
   coherence : Path (roof.forwardLeg.component 0) (roof.forwardLeg.component 0)
 
 /-- Identity morphism in the derived category. -/
-def DerivedMor.idMor {Obj : Type u} (A : ChainComplex Obj) : DerivedMor Obj A A where
+noncomputable def DerivedMor.idMor {Obj : Type u} (A : ChainComplex Obj) : DerivedMor Obj A A where
   roof := Roof.idRoof A
   coherence := Path.refl (A.obj 0)
 
@@ -176,13 +176,13 @@ theorem ore_symm_cancel {Obj : Type u} {a b : Obj} (p : Path a b) :
 -- ============================================================
 
 /-- Shift of a chain complex by 1: (C[1])_n = C_{n+1}. -/
-def shiftComplex {Obj : Type u} (C : ChainComplex Obj) : ChainComplex Obj where
+noncomputable def shiftComplex {Obj : Type u} (C : ChainComplex Obj) : ChainComplex Obj where
   obj := fun n => C.obj (n + 1)
   differential := fun n => C.differential (n + 1)
   ddZero := fun n => C.ddZero (n + 1)
 
 /-- Shift of a chain map. -/
-def shiftChainMap {Obj : Type u} {A B : ChainComplex Obj}
+noncomputable def shiftChainMap {Obj : Type u} {A B : ChainComplex Obj}
     (f : ChainMap Obj A B) : ChainMap Obj (shiftComplex A) (shiftComplex B) where
   component := fun n => f.component (n + 1)
   commutes := fun n => f.commutes (n + 1)
@@ -257,7 +257,7 @@ structure DistTriangle (Obj : Type u) (A B C : ChainComplex Obj) where
   exactness : (n : Int) → Path (morphAB.component n) (morphAB.component n)
 
 /-- Rotation of a distinguished triangle. -/
-def rotateTriangle {Obj : Type u} {A B C : ChainComplex Obj}
+noncomputable def rotateTriangle {Obj : Type u} {A B C : ChainComplex Obj}
     (tri : DistTriangle Obj A B C) : DistTriangle Obj B C (shiftComplex A) where
   morphAB := tri.morphBC
   morphBC := tri.morphCA1
@@ -365,7 +365,7 @@ structure LocMor (Obj : Type u) (A B : ChainComplex Obj) where
   eqClass : representative = representative
 
 /-- Identity in the localized category. -/
-def LocMor.locId {Obj : Type u} (A : ChainComplex Obj) : LocMor Obj A A where
+noncomputable def LocMor.locId {Obj : Type u} (A : ChainComplex Obj) : LocMor Obj A A where
   representative := Roof.idRoof A
   eqClass := rfl
 

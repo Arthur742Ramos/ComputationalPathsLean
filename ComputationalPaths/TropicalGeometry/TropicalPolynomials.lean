@@ -5,7 +5,7 @@ noncomputable section
 namespace TropicalGeometry
 
 /-- Evaluate a tropical monomial `(k, a)` at `x` in max-plus convention: `a + k * x`. -/
-def evalMonomial (t : ℕ × ℝ) (x : ℝ) : ℝ :=
+noncomputable def evalMonomial (t : ℕ × ℝ) (x : ℝ) : ℝ :=
   t.2 + (t.1 : ℝ) * x
 
 /-- A finite univariate tropical polynomial given by a nonempty set of monomials. -/
@@ -16,34 +16,34 @@ structure TropicalPolynomial where
 namespace TropicalPolynomial
 
 /-- Tropical evaluation as the maximum of all monomial evaluations. -/
-def eval (p : TropicalPolynomial) (x : ℝ) : ℝ :=
+noncomputable def eval (p : TropicalPolynomial) (x : ℝ) : ℝ :=
   p.terms.sup' p.terms_nonempty (fun t => evalMonomial t x)
 
 /-- Tropical polynomials can be used as functions `ℝ → ℝ` via tropical evaluation. -/
-instance : CoeFun TropicalPolynomial (fun _ => ℝ → ℝ) where
+noncomputable instance : CoeFun TropicalPolynomial (fun _ => ℝ → ℝ) where
   coe p := p.eval
 
 @[simp] theorem coe_eval (p : TropicalPolynomial) (x : ℝ) : p x = p.eval x := rfl
 
 /-- Exponents appearing in the polynomial. -/
-def support (p : TropicalPolynomial) : Finset ℕ :=
+noncomputable def support (p : TropicalPolynomial) : Finset ℕ :=
   p.terms.image Prod.fst
 
 /-- Tropical degree: largest exponent in the support. -/
-def degree (p : TropicalPolynomial) : ℕ :=
+noncomputable def degree (p : TropicalPolynomial) : ℕ :=
   p.support.sup id
 
 /-- Monomials achieving the tropical maximum at `x`. -/
-def activeTerms (p : TropicalPolynomial) (x : ℝ) : Finset (ℕ × ℝ) :=
+noncomputable def activeTerms (p : TropicalPolynomial) (x : ℝ) : Finset (ℕ × ℝ) :=
   p.terms.filter (fun t => evalMonomial t x = p.eval x)
 
 /-- A tropical root is a point where at least two distinct monomials attain the maximum. -/
-def IsRoot (p : TropicalPolynomial) (x : ℝ) : Prop :=
+noncomputable def IsRoot (p : TropicalPolynomial) (x : ℝ) : Prop :=
   ∃ t₁ ∈ p.terms, ∃ t₂ ∈ p.terms, t₁ ≠ t₂ ∧
     evalMonomial t₁ x = p.eval x ∧ evalMonomial t₂ x = p.eval x
 
 /-- The corner locus of a tropical polynomial. -/
-def cornerLocus (p : TropicalPolynomial) : Set ℝ :=
+noncomputable def cornerLocus (p : TropicalPolynomial) : Set ℝ :=
   {x | 2 ≤ (p.activeTerms x).card}
 
 theorem mem_support_of_mem_terms {p : TropicalPolynomial} {n : ℕ} {a : ℝ}
@@ -85,7 +85,7 @@ theorem mem_cornerLocus_iff_isRoot (p : TropicalPolynomial) (x : ℝ) :
 end TropicalPolynomial
 
 /-- Tropical hypersurface associated to a tropical polynomial, defined as its corner locus. -/
-def TropicalHypersurface (p : TropicalPolynomial) : Set ℝ :=
+noncomputable def TropicalHypersurface (p : TropicalPolynomial) : Set ℝ :=
   p.cornerLocus
 
 theorem mem_tropicalHypersurface_iff_isRoot (p : TropicalPolynomial) (x : ℝ) :

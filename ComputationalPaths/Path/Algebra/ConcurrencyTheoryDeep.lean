@@ -78,26 +78,26 @@ structure Independent (a b : CAction) where
 -- ===================================================================
 
 -- Sequential composition of actions (functions)
-def seqComp (f g : Nat → Nat) : Nat → Nat := g ∘ f
+noncomputable def seqComp (f g : Nat → Nat) : Nat → Nat := g ∘ f
 
 -- ===================================================================
 -- DEF 1: Sequential composition is associative via Path
 -- ===================================================================
-def seq_comp_assoc (f g h : Nat → Nat) :
+noncomputable def seq_comp_assoc (f g h : Nat → Nat) :
     Path (seqComp (seqComp f g) h) (seqComp f (seqComp g h)) :=
   Path.refl (seqComp (seqComp f g) h)
 
 -- ===================================================================
 -- DEF 2: Identity is left unit for sequential composition
 -- ===================================================================
-def seq_comp_id_left (f : Nat → Nat) :
+noncomputable def seq_comp_id_left (f : Nat → Nat) :
     Path (seqComp id f) f :=
   Path.refl f
 
 -- ===================================================================
 -- DEF 3: Identity is right unit for sequential composition
 -- ===================================================================
-def seq_comp_id_right (f : Nat → Nat) :
+noncomputable def seq_comp_id_right (f : Nat → Nat) :
     Path (seqComp f id) f :=
   Path.refl f
 
@@ -105,12 +105,12 @@ def seq_comp_id_right (f : Nat → Nat) :
 -- SECTION 4: Diamond Property for Independent Actions
 -- ===================================================================
 
-def addN (n : Nat) : Nat → Nat := fun m => m + n
+noncomputable def addN (n : Nat) : Nat → Nat := fun m => m + n
 
 -- ===================================================================
 -- DEF 4: Additive actions commute (diamond lemma)
 -- ===================================================================
-def diamond_add_comm (n m : Nat) :
+noncomputable def diamond_add_comm (n m : Nat) :
     Path (fun x => addN n (addN m x)) (fun x => addN m (addN n x)) :=
   have h : (fun x => addN n (addN m x)) = (fun x => addN m (addN n x)) := by
     funext x; simp [addN, Nat.add_assoc, Nat.add_comm n m]
@@ -119,14 +119,14 @@ def diamond_add_comm (n m : Nat) :
 -- ===================================================================
 -- DEF 5: Diamond property is symmetric
 -- ===================================================================
-def diamond_symm (n m : Nat) :
+noncomputable def diamond_symm (n m : Nat) :
     Path (fun x => addN m (addN n x)) (fun x => addN n (addN m x)) :=
   (diamond_add_comm n m).symm
 
 -- ===================================================================
 -- DEF 6: Triple diamond via transitivity
 -- ===================================================================
-def triple_diamond (a b c : Nat) :
+noncomputable def triple_diamond (a b c : Nat) :
     Path (fun x => addN a (addN b (addN c x)))
          (fun x => addN c (addN b (addN a x))) :=
   have h : (fun x => addN a (addN b (addN c x))) = (fun x => addN c (addN b (addN a x))) := by
@@ -143,7 +143,7 @@ structure TraceAlphabet where
   independent : Nat → Nat → Bool
 
 /-- Swap two adjacent elements in a list at position i -/
-def swapAt (w : List Nat) (i : Nat) : List Nat :=
+noncomputable def swapAt (w : List Nat) (i : Nat) : List Nat :=
   match w, i with
   | a :: b :: rest, 0 => b :: a :: rest
   | x :: rest, n + 1 => x :: swapAt rest n
@@ -152,20 +152,20 @@ def swapAt (w : List Nat) (i : Nat) : List Nat :=
 -- ===================================================================
 -- DEF 7: Swap is an involution on empty list
 -- ===================================================================
-def swap_involution_nil : Path (swapAt ([] : List Nat) 0) ([] : List Nat) :=
+noncomputable def swap_involution_nil : Path (swapAt ([] : List Nat) 0) ([] : List Nat) :=
   Path.refl []
 
 -- ===================================================================
 -- DEF 8: Swap at position 0 for a two-element list
 -- ===================================================================
-def swap_two (a b : Nat) :
+noncomputable def swap_two (a b : Nat) :
     Path (swapAt [a, b] 0) [b, a] :=
   Path.refl [b, a]
 
 -- ===================================================================
 -- DEF 9: Double swap restores original (two elements)
 -- ===================================================================
-def swap_swap_two (a b : Nat) :
+noncomputable def swap_swap_two (a b : Nat) :
     Path (swapAt (swapAt [a, b] 0) 0) [a, b] :=
   Path.refl [a, b]
 
@@ -176,19 +176,19 @@ def swap_swap_two (a b : Nat) :
 -- ===================================================================
 -- DEF 10: Trace equivalence reflexivity
 -- ===================================================================
-def trace_equiv_refl (w : List Nat) : Path w w :=
+noncomputable def trace_equiv_refl (w : List Nat) : Path w w :=
   Path.refl w
 
 -- ===================================================================
 -- DEF 11: Trace equivalence symmetry
 -- ===================================================================
-def trace_equiv_symm {w1 w2 : List Nat} (p : Path w1 w2) : Path w2 w1 :=
+noncomputable def trace_equiv_symm {w1 w2 : List Nat} (p : Path w1 w2) : Path w2 w1 :=
   p.symm
 
 -- ===================================================================
 -- DEF 12: Trace equivalence transitivity
 -- ===================================================================
-def trace_equiv_trans {w1 w2 w3 : List Nat}
+noncomputable def trace_equiv_trans {w1 w2 w3 : List Nat}
     (p : Path w1 w2) (q : Path w2 w3) : Path w1 w3 :=
   p.trans q
 
@@ -216,7 +216,7 @@ theorem hda_cell_dim_bound (n : Nat) (c : HDACell n) : c.dimension ≤ n :=
 -- ===================================================================
 -- DEF 14: Face directions are distinguishable
 -- ===================================================================
-def face_directions_distinct :
+noncomputable def face_directions_distinct :
     Path (decide (FaceDirection.lower = FaceDirection.upper)) false :=
   Path.refl false
 
@@ -230,7 +230,7 @@ structure Cube (A : Type u) where
   vertices : Fin (2 ^ dim) → A
 
 /-- A 0-cube is just a point -/
-def point_cube (a : A) : Cube A :=
+noncomputable def point_cube (a : A) : Cube A :=
   { dim := 0, vertices := fun _ => a }
 
 -- ===================================================================
@@ -247,7 +247,7 @@ theorem point_cube_vertex (a : A) (i : Fin 1) :
   rfl
 
 /-- An edge cube for a transition -/
-def edge_cube (a b : A) : Cube A :=
+noncomputable def edge_cube (a b : A) : Cube A :=
   { dim := 1, vertices := fun i => if i.val = 0 then a else b }
 
 -- ===================================================================
@@ -283,7 +283,7 @@ structure DPath (A : Type u) where
 -- ===================================================================
 -- DEF 20: DPath identity
 -- ===================================================================
-def dpath_id (a : A) : DPath A :=
+noncomputable def dpath_id (a : A) : DPath A :=
   { source := a, target := a, witness := Path.refl a }
 
 -- ===================================================================
@@ -301,7 +301,7 @@ theorem dpath_id_target (a : A) : (dpath_id a).target = a :=
 -- ===================================================================
 -- DEF 23: DPath composition
 -- ===================================================================
-def dpath_comp {A : Type u} (p : DPath A) (q : DPath A)
+noncomputable def dpath_comp {A : Type u} (p : DPath A) (q : DPath A)
     (h : Path p.target q.source) : DPath A :=
   { source := p.source
     target := q.target
@@ -326,7 +326,7 @@ structure Dihomotopy {A : Type u} (p q : DPath A)
 -- ===================================================================
 -- DEF 25: Reflexive dihomotopy
 -- ===================================================================
-def dihomotopy_refl {A : Type u} (p : DPath A) :
+noncomputable def dihomotopy_refl {A : Type u} (p : DPath A) :
     Dihomotopy p p (Path.refl _) (Path.refl _) :=
   { homotopy := Path.refl p.source }
 
@@ -348,7 +348,7 @@ structure IndependenceRelation (Act : Type u) where
   symm_rel : ∀ a b, rel a b → rel b a
 
 /-- Witness that two natural number actions are independent -/
-def natIndep : IndependenceRelation Nat where
+noncomputable def natIndep : IndependenceRelation Nat where
   rel := fun a b => a ≠ b ∧ (a + b) % 2 = 0
   irrefl := fun a ⟨h, _⟩ => h rfl
   symm_rel := fun a b ⟨h1, h2⟩ => ⟨fun h => h1 h.symm, by rw [Nat.add_comm]; exact h2⟩
@@ -381,7 +381,7 @@ structure PTransition where
   deriving DecidableEq
 
 /-- A marking (state) of a Petri net -/
-def Marking := Place → Nat
+noncomputable def Marking := Place → Nat
 
 /-- A Petri net -/
 structure PetriNet where
@@ -391,13 +391,13 @@ structure PetriNet where
   post : PTransition → Place → Nat
 
 /-- Fire a transition: update the marking -/
-def fire (net : PetriNet) (t : PTransition) (m : Marking) : Marking :=
+noncomputable def fire (net : PetriNet) (t : PTransition) (m : Marking) : Marking :=
   fun p => m p - net.pre t p + net.post t p
 
 -- ===================================================================
 -- DEF 29: Firing identity transition preserves marking
 -- ===================================================================
-def fire_identity (net : PetriNet) (t : PTransition) (m : Marking)
+noncomputable def fire_identity (net : PetriNet) (t : PTransition) (m : Marking)
     (h_pre : ∀ p, net.pre t p = 0) (h_post : ∀ p, net.post t p = 0) :
     Path (fire net t m) m :=
   Path.mk [] (by unfold fire; funext p; simp [h_pre, h_post])
@@ -405,7 +405,7 @@ def fire_identity (net : PetriNet) (t : PTransition) (m : Marking)
 -- ===================================================================
 -- DEF 30: Two fires with identity transitions
 -- ===================================================================
-def fire_seq_refl (net : PetriNet) (t : PTransition) (m : Marking)
+noncomputable def fire_seq_refl (net : PetriNet) (t : PTransition) (m : Marking)
     (h_pre : ∀ p, net.pre t p = 0) (h_post : ∀ p, net.post t p = 0) :
     Path (fire net t (fire net t m)) (fire net t m) :=
   Path.congrArg (fire net t) (fire_identity net t m h_pre h_post)
@@ -428,7 +428,7 @@ structure Unfolding (L : Type u) where
 -- ===================================================================
 -- DEF 31: Unfolding preserves event structure identity
 -- ===================================================================
-def unfolding_events_refl (L : Type u) (u : Unfolding L) :
+noncomputable def unfolding_events_refl (L : Type u) (u : Unfolding L) :
     Path u.eventStr.events u.eventStr.events :=
   Path.refl _
 
@@ -441,7 +441,7 @@ structure ConfigDomain (L : Type u) where
   configs : List (Configuration L)
 
 /-- Empty configuration -/
-def emptyConfig (L : Type u) : Configuration L :=
+noncomputable def emptyConfig (L : Type u) : Configuration L :=
   { events := [], consistent := true }
 
 -- ===================================================================
@@ -472,7 +472,7 @@ structure LabelledES (E : Type u) (L : Type v) where
 -- ===================================================================
 -- DEF 34: Labelling is functorial with respect to Path
 -- ===================================================================
-def labelling_congrArg {E : Type u} {L : Type v}
+noncomputable def labelling_congrArg {E : Type u} {L : Type v}
     (les : LabelledES E L) {e1 e2 : E} (p : Path e1 e2) :
     Path (les.labelling e1) (les.labelling e2) :=
   Path.congrArg les.labelling p
@@ -480,7 +480,7 @@ def labelling_congrArg {E : Type u} {L : Type v}
 -- ===================================================================
 -- DEF 35: Labelling preserves Path composition
 -- ===================================================================
-def labelling_trans {E : Type u} {L : Type v}
+noncomputable def labelling_trans {E : Type u} {L : Type v}
     (les : LabelledES E L) {e1 e2 e3 : E}
     (p : Path e1 e2) (q : Path e2 e3) :
     Path (les.labelling e1) (les.labelling e3) :=
@@ -489,7 +489,7 @@ def labelling_trans {E : Type u} {L : Type v}
 -- ===================================================================
 -- DEF 36: Labelling respects Path symmetry
 -- ===================================================================
-def labelling_symm {E : Type u} {L : Type v}
+noncomputable def labelling_symm {E : Type u} {L : Type v}
     (les : LabelledES E L) {e1 e2 : E} (p : Path e1 e2) :
     Path (les.labelling e2) (les.labelling e1) :=
   (Path.congrArg les.labelling p).symm
@@ -504,7 +504,7 @@ structure Execution (S : Type u) where
   nonempty : states ≠ []
 
 /-- Initial state of an execution -/
-def Execution.initial {S : Type u} (e : Execution S) : S :=
+noncomputable def Execution.initial {S : Type u} (e : Execution S) : S :=
   match h : e.states with
   | [] => absurd h e.nonempty
   | s :: _ => s
@@ -524,7 +524,7 @@ structure ExecHomotopy (S : Type u) (e1 e2 : Execution S) where
 -- ===================================================================
 -- DEF 38: Execution homotopy is reflexive
 -- ===================================================================
-def exec_homotopy_refl {S : Type u} (e : Execution S) : ExecHomotopy S e e :=
+noncomputable def exec_homotopy_refl {S : Type u} (e : Execution S) : ExecHomotopy S e e :=
   { start_eq := Path.refl _ }
 
 -- ===================================================================
@@ -539,34 +539,34 @@ theorem exec_homotopy_refl_path {S : Type u} (e : Execution S) :
 -- ===================================================================
 
 /-- Parallel composition of functions (on product types) -/
-def parComp {A : Type u} {B : Type v} (f : A → A) (g : B → B) : A × B → A × B :=
+noncomputable def parComp {A : Type u} {B : Type v} (f : A → A) (g : B → B) : A × B → A × B :=
   fun ⟨a, b⟩ => (f a, g b)
 
 -- ===================================================================
 -- DEF 40: Parallel composition with identity left
 -- ===================================================================
-def par_id_left {A : Type u} {B : Type v} (g : B → B) :
+noncomputable def par_id_left {A : Type u} {B : Type v} (g : B → B) :
     Path (parComp (A := A) id g) (fun p => (p.1, g p.2)) :=
   Path.refl _
 
 -- ===================================================================
 -- DEF 41: Parallel composition with identity right
 -- ===================================================================
-def par_id_right {A : Type u} {B : Type v} (f : A → A) :
+noncomputable def par_id_right {A : Type u} {B : Type v} (f : A → A) :
     Path (parComp (B := B) f id) (fun p => (f p.1, p.2)) :=
   Path.refl _
 
 -- ===================================================================
 -- DEF 42: Double identity parallel composition
 -- ===================================================================
-def par_id_id {A : Type u} {B : Type v} :
+noncomputable def par_id_id {A : Type u} {B : Type v} :
     Path (parComp (@id A) (@id B)) id :=
   Path.refl _
 
 -- ===================================================================
 -- DEF 43: Parallel composition preserves Path (via congrArg)
 -- ===================================================================
-def par_congrArg_left {A : Type u} {B : Type v}
+noncomputable def par_congrArg_left {A : Type u} {B : Type v}
     {f1 f2 : A → A} (g : B → B) (pf : Path f1 f2) :
     Path (parComp f1 g) (parComp f2 g) :=
   Path.congrArg (fun f => parComp f g) pf
@@ -606,27 +606,27 @@ theorem interleaving_nil_right : ∀ (ys : List A), Interleaving [] ys ys
 -- ===================================================================
 
 /-- Concatenation of action traces -/
-def traceConcat {Act : Type u} (t1 t2 : List Act) : List Act :=
+noncomputable def traceConcat {Act : Type u} (t1 t2 : List Act) : List Act :=
   t1 ++ t2
 
 -- ===================================================================
 -- DEF 47: Trace concatenation is associative
 -- ===================================================================
-def trace_concat_assoc {Act : Type u} (t1 t2 t3 : List Act) :
+noncomputable def trace_concat_assoc {Act : Type u} (t1 t2 t3 : List Act) :
     Path (traceConcat (traceConcat t1 t2) t3) (traceConcat t1 (traceConcat t2 t3)) :=
   Path.mk [] (by unfold traceConcat; rw [List.append_assoc])
 
 -- ===================================================================
 -- DEF 48: Empty trace is left identity
 -- ===================================================================
-def trace_concat_nil_left {Act : Type u} (t : List Act) :
+noncomputable def trace_concat_nil_left {Act : Type u} (t : List Act) :
     Path (traceConcat [] t) t :=
   Path.refl t
 
 -- ===================================================================
 -- DEF 49: Empty trace is right identity
 -- ===================================================================
-def trace_concat_nil_right {Act : Type u} (t : List Act) :
+noncomputable def trace_concat_nil_right {Act : Type u} (t : List Act) :
     Path (traceConcat t []) t :=
   Path.mk [] (by unfold traceConcat; rw [List.append_nil])
 
@@ -634,19 +634,19 @@ def trace_concat_nil_right {Act : Type u} (t : List Act) :
 -- SECTION 20: Concurrent Composition Coherence
 -- ===================================================================
 
-def composeTriple {A : Type u} (f g h : A → A) : A → A := h ∘ g ∘ f
+noncomputable def composeTriple {A : Type u} (f g h : A → A) : A → A := h ∘ g ∘ f
 
 -- ===================================================================
 -- DEF 50: Triple composition with identities
 -- ===================================================================
-def compose_triple_ids {A : Type u} :
+noncomputable def compose_triple_ids {A : Type u} :
     Path (composeTriple (@id A) (@id A) (@id A)) (@id A) :=
   Path.refl _
 
 -- ===================================================================
 -- DEF 51: Path between two composition orders via commutativity
 -- ===================================================================
-def compose_order_path (f g : Nat → Nat)
+noncomputable def compose_order_path (f g : Nat → Nat)
     (comm : ∀ x, f (g x) = g (f x)) :
     Path (f ∘ g) (g ∘ f) :=
   have h : f ∘ g = g ∘ f := funext comm
@@ -655,7 +655,7 @@ def compose_order_path (f g : Nat → Nat)
 -- ===================================================================
 -- DEF 52: congrArg distributes over trans for compositions
 -- ===================================================================
-def congrArg_comp_trans {A B C : Type u} (f : B → C)
+noncomputable def congrArg_comp_trans {A B C : Type u} (f : B → C)
     {x y z : A → B} (p : Path x y) (q : Path y z) :
     Path (f ∘ x) (f ∘ z) :=
   (Path.congrArg (f ∘ ·) p).trans (Path.congrArg (f ∘ ·) q)
@@ -669,11 +669,11 @@ structure Barrier (n : Nat) where
   arrived : Fin n → Bool
 
 /-- Empty barrier: no one arrived -/
-def emptyBarrier (n : Nat) : Barrier n :=
+noncomputable def emptyBarrier (n : Nat) : Barrier n :=
   { arrived := fun _ => false }
 
 /-- Full barrier: everyone arrived -/
-def fullBarrier (n : Nat) : Barrier n :=
+noncomputable def fullBarrier (n : Nat) : Barrier n :=
   { arrived := fun _ => true }
 
 -- ===================================================================
@@ -693,7 +693,7 @@ theorem full_barrier_arrived (n : Nat) (i : Fin n) :
 -- ===================================================================
 -- DEF 55: Path from barrier states via congrArg
 -- ===================================================================
-def barrier_path_congrArg (n : Nat) {b1 b2 : Barrier n}
+noncomputable def barrier_path_congrArg (n : Nat) {b1 b2 : Barrier n}
     (p : Path b1 b2) (i : Fin n) :
     Path (b1.arrived i) (b2.arrived i) :=
   Path.congrArg (fun b => Barrier.arrived b i) p
@@ -713,49 +713,49 @@ inductive Proc where
 -- ===================================================================
 -- DEF 56: Parallel composition path reflexivity
 -- ===================================================================
-def par_proc_refl (p q : Proc) :
+noncomputable def par_proc_refl (p q : Proc) :
     Path (Proc.par p q) (Proc.par p q) :=
   Path.refl _
 
 -- ===================================================================
 -- DEF 57: Choice path reflexivity
 -- ===================================================================
-def choice_proc_refl (p q : Proc) :
+noncomputable def choice_proc_refl (p q : Proc) :
     Path (Proc.choice p q) (Proc.choice p q) :=
   Path.refl _
 
 -- ===================================================================
 -- DEF 58: congrArg for Proc.par left
 -- ===================================================================
-def par_congrArg_proc_left {p1 p2 : Proc} (q : Proc) (h : Path p1 p2) :
+noncomputable def par_congrArg_proc_left {p1 p2 : Proc} (q : Proc) (h : Path p1 p2) :
     Path (Proc.par p1 q) (Proc.par p2 q) :=
   Path.congrArg (fun p => Proc.par p q) h
 
 -- ===================================================================
 -- DEF 59: congrArg for Proc.par right
 -- ===================================================================
-def par_congrArg_proc_right (p : Proc) {q1 q2 : Proc} (h : Path q1 q2) :
+noncomputable def par_congrArg_proc_right (p : Proc) {q1 q2 : Proc} (h : Path q1 q2) :
     Path (Proc.par p q1) (Proc.par p q2) :=
   Path.congrArg (Proc.par p) h
 
 -- ===================================================================
 -- DEF 60: Proc.act preserves paths
 -- ===================================================================
-def act_congrArg (n : Nat) {p1 p2 : Proc} (h : Path p1 p2) :
+noncomputable def act_congrArg (n : Nat) {p1 p2 : Proc} (h : Path p1 p2) :
     Path (Proc.act n p1) (Proc.act n p2) :=
   Path.congrArg (Proc.act n) h
 
 -- ===================================================================
 -- DEF 61: Proc.choice preserves paths left
 -- ===================================================================
-def choice_congrArg_left {p1 p2 : Proc} (q : Proc) (h : Path p1 p2) :
+noncomputable def choice_congrArg_left {p1 p2 : Proc} (q : Proc) (h : Path p1 p2) :
     Path (Proc.choice p1 q) (Proc.choice p2 q) :=
   Path.congrArg (fun p => Proc.choice p q) h
 
 -- ===================================================================
 -- DEF 62: Proc.choice preserves paths right
 -- ===================================================================
-def choice_congrArg_right (p : Proc) {q1 q2 : Proc} (h : Path q1 q2) :
+noncomputable def choice_congrArg_right (p : Proc) {q1 q2 : Proc} (h : Path q1 q2) :
     Path (Proc.choice p q1) (Proc.choice p q2) :=
   Path.congrArg (Proc.choice p) h
 
@@ -771,7 +771,7 @@ structure PathBisim (S : Type u) where
 -- ===================================================================
 -- DEF 63: Identity bisimulation
 -- ===================================================================
-def idBisim (S : Type u) : PathBisim S :=
+noncomputable def idBisim (S : Type u) : PathBisim S :=
   { rel := Eq
     path_witness := fun s1 _ _ => Path.refl s1 }
 
@@ -786,7 +786,7 @@ theorem id_bisim_reflexive (S : Type u) (s : S) : (idBisim S).rel s s :=
 -- ===================================================================
 
 /-- A causal order on events -/
-def CausalOrder (E : Type u) := E → E → Prop
+noncomputable def CausalOrder (E : Type u) := E → E → Prop
 
 /-- Two computations are causally consistent if they have same length -/
 structure CausalConsistency {E : Type u} (ord : CausalOrder E)
@@ -796,7 +796,7 @@ structure CausalConsistency {E : Type u} (ord : CausalOrder E)
 -- ===================================================================
 -- DEF 65: Causal consistency is reflexive
 -- ===================================================================
-def causal_refl {E : Type u} (ord : CausalOrder E) (comp : List E) :
+noncomputable def causal_refl {E : Type u} (ord : CausalOrder E) (comp : List E) :
     CausalConsistency ord comp comp :=
   { len_witness := Path.refl _ }
 
@@ -812,13 +812,13 @@ theorem causal_refl_witness {E : Type u} (ord : CausalOrder E) (comp : List E) :
 -- ===================================================================
 
 /-- A step is a set of concurrently enabled actions -/
-def CStep (Act : Type u) := List Act
+noncomputable def CStep (Act : Type u) := List Act
 
 /-- Step sequence: a sequence of concurrent steps -/
-def StepSeq (Act : Type u) := List (CStep Act)
+noncomputable def StepSeq (Act : Type u) := List (CStep Act)
 
 /-- Flatten a step sequence to a trace -/
-def flattenSteps {Act : Type u} (ss : List (List Act)) : List Act :=
+noncomputable def flattenSteps {Act : Type u} (ss : List (List Act)) : List Act :=
   match ss with
   | [] => []
   | s :: rest => s ++ flattenSteps rest
@@ -832,7 +832,7 @@ theorem flatten_nil {Act : Type u} : flattenSteps ([] : List (List Act)) = ([] :
 -- ===================================================================
 -- DEF 68: Singleton step flattening
 -- ===================================================================
-def flatten_singleton {Act : Type u} (s : List Act) :
+noncomputable def flatten_singleton {Act : Type u} (s : List Act) :
     Path (flattenSteps [s]) (s ++ []) :=
   Path.mk [] (by simp [flattenSteps])
 
@@ -843,14 +843,14 @@ def flatten_singleton {Act : Type u} (s : List Act) :
 -- ===================================================================
 -- DEF 69: Inverse law: p.trans p.symm yields identity path endpoints
 -- ===================================================================
-def inverse_law {A : Type u} {x y : A} (p : Path x y) :
+noncomputable def inverse_law {A : Type u} {x y : A} (p : Path x y) :
     Path x x :=
   p.trans p.symm
 
 -- ===================================================================
 -- DEF 70: Composition chain of paths
 -- ===================================================================
-def path_chain_4 {A : Type u} {a b c d : A}
+noncomputable def path_chain_4 {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Path a d :=
   (p.trans q).trans r
@@ -873,18 +873,18 @@ inductive Move where
   deriving DecidableEq
 
 /-- A play is a sequence of moves -/
-def Play := List Move
+noncomputable def Play := List Move
 
 -- ===================================================================
 -- DEF 72: Empty play path
 -- ===================================================================
-def empty_play_refl : Path ([] : Play) [] :=
+noncomputable def empty_play_refl : Path ([] : Play) [] :=
   Path.refl []
 
 -- ===================================================================
 -- DEF 73: Play extension preserves path
 -- ===================================================================
-def play_cons_path (m : Move) {p1 p2 : Play} (h : Path p1 p2) :
+noncomputable def play_cons_path (m : Move) {p1 p2 : Play} (h : Path p1 p2) :
     Path (m :: p1) (m :: p2) :=
   Path.congrArg (m :: ·) h
 
@@ -899,7 +899,7 @@ structure ESMorphism (L : Type u) (es1 es2 : EventStructure L) where
 -- ===================================================================
 -- DEF 74: Identity morphism
 -- ===================================================================
-def es_id_morphism (L : Type u) (es : EventStructure L) : ESMorphism L es es :=
+noncomputable def es_id_morphism (L : Type u) (es : EventStructure L) : ESMorphism L es es :=
   { map := id }
 
 -- ===================================================================
@@ -912,7 +912,7 @@ theorem es_id_map (L : Type u) (es : EventStructure L) (n : Nat) :
 -- ===================================================================
 -- DEF 76: Morphism composition
 -- ===================================================================
-def es_comp_morphism (L : Type u) {es1 es2 es3 : EventStructure L}
+noncomputable def es_comp_morphism (L : Type u) {es1 es2 es3 : EventStructure L}
     (f : ESMorphism L es1 es2) (g : ESMorphism L es2 es3) : ESMorphism L es1 es3 :=
   { map := g.map ∘ f.map }
 
@@ -927,7 +927,7 @@ theorem es_comp_map (L : Type u) {es1 es2 es3 : EventStructure L}
 -- ===================================================================
 -- DEF 78: Identity morphism is left unit
 -- ===================================================================
-def es_id_comp_left (L : Type u) {es1 es2 : EventStructure L}
+noncomputable def es_id_comp_left (L : Type u) {es1 es2 : EventStructure L}
     (f : ESMorphism L es1 es2) :
     Path (es_comp_morphism L (es_id_morphism L es1) f).map f.map :=
   Path.refl _
@@ -945,7 +945,7 @@ structure Pomset (L : Type u) where
 -- ===================================================================
 -- DEF 79: Pomset labelling via congrArg
 -- ===================================================================
-def pomset_label_path {L : Type u} (p : Pomset L)
+noncomputable def pomset_label_path {L : Type u} (p : Pomset L)
     {i j : Fin p.size} (h : Path i j) :
     Path (p.labels i) (p.labels j) :=
   Path.congrArg p.labels h
@@ -953,7 +953,7 @@ def pomset_label_path {L : Type u} (p : Pomset L)
 -- ===================================================================
 -- DEF 80: Empty pomset
 -- ===================================================================
-def emptyPomset (L : Type u) : Pomset L :=
+noncomputable def emptyPomset (L : Type u) : Pomset L :=
   { size := 0, labels := Fin.elim0, order := Fin.elim0 }
 
 -- ===================================================================
@@ -972,26 +972,26 @@ structure Resource where
   deriving DecidableEq
 
 /-- Separating conjunction of resources -/
-def sepConj (r1 r2 : List Resource) : List Resource := r1 ++ r2
+noncomputable def sepConj (r1 r2 : List Resource) : List Resource := r1 ++ r2
 
 -- ===================================================================
 -- DEF 82: Separating conjunction is associative
 -- ===================================================================
-def sep_conj_assoc (r1 r2 r3 : List Resource) :
+noncomputable def sep_conj_assoc (r1 r2 r3 : List Resource) :
     Path (sepConj (sepConj r1 r2) r3) (sepConj r1 (sepConj r2 r3)) :=
   Path.mk [] (by unfold sepConj; rw [List.append_assoc])
 
 -- ===================================================================
 -- DEF 83: Empty resource is unit left
 -- ===================================================================
-def sep_conj_nil_left (r : List Resource) :
+noncomputable def sep_conj_nil_left (r : List Resource) :
     Path (sepConj [] r) r :=
   Path.refl _
 
 -- ===================================================================
 -- DEF 84: Empty resource is unit right
 -- ===================================================================
-def sep_conj_nil_right (r : List Resource) :
+noncomputable def sep_conj_nil_right (r : List Resource) :
     Path (sepConj r []) r :=
   Path.mk [] (by unfold sepConj; rw [List.append_nil])
 
@@ -1002,7 +1002,7 @@ def sep_conj_nil_right (r : List Resource) :
 -- ===================================================================
 -- DEF 85: Concurrent diamond commutes with Path operations
 -- ===================================================================
-def diamond_path_commute (f g : Nat → Nat)
+noncomputable def diamond_path_commute (f g : Nat → Nat)
     (comm : ∀ x, f (g x) = g (f x))
     (n : Nat) :
     Path (f (g n)) (g (f n)) :=
@@ -1012,7 +1012,7 @@ def diamond_path_commute (f g : Nat → Nat)
 -- ===================================================================
 -- DEF 86: Three-way concurrent diamond
 -- ===================================================================
-def three_way_diamond
+noncomputable def three_way_diamond
     (f g h : Nat → Nat)
     (all_comm : ∀ x, f (g (h x)) = h (g (f x))) :
     Path (f ∘ g ∘ h) (h ∘ g ∘ f) :=
@@ -1026,7 +1026,7 @@ def three_way_diamond
 -- ===================================================================
 -- DEF 87: Grand coherence - composition in groupoid
 -- ===================================================================
-def groupoid_comp {A : Type u} {x y z : A}
+noncomputable def groupoid_comp {A : Type u} {x y z : A}
     (p : Path x y) (q : Path y z) :
     Path x z :=
   p.trans q
@@ -1034,21 +1034,21 @@ def groupoid_comp {A : Type u} {x y z : A}
 -- ===================================================================
 -- DEF 88: Groupoid inverse
 -- ===================================================================
-def groupoid_inv {A : Type u} {x y : A} (p : Path x y) :
+noncomputable def groupoid_inv {A : Type u} {x y : A} (p : Path x y) :
     Path y x :=
   p.symm
 
 -- ===================================================================
 -- DEF 89: Groupoid identity
 -- ===================================================================
-def groupoid_id {A : Type u} (x : A) : Path x x :=
+noncomputable def groupoid_id {A : Type u} (x : A) : Path x x :=
   Path.refl x
 
 -- ===================================================================
 -- DEF 90: Full concurrent coherence: three commuting
 -- actions can be rearranged freely via Path
 -- ===================================================================
-def full_concurrent_coherence
+noncomputable def full_concurrent_coherence
     (f g h : Nat → Nat)
     (fg_comm : ∀ x, f (g x) = g (f x))
     (gh_comm : ∀ x, g (h x) = h (g x))
@@ -1061,14 +1061,14 @@ def full_concurrent_coherence
 -- ===================================================================
 -- DEF 91: congrArg for symmetric path in process composition
 -- ===================================================================
-def congrArg_symm_proc {p1 p2 : Proc} (h : Path p1 p2) :
+noncomputable def congrArg_symm_proc {p1 p2 : Proc} (h : Path p1 p2) :
     Path (Proc.par p2 Proc.nil) (Proc.par p1 Proc.nil) :=
   Path.congrArg (fun p => Proc.par p Proc.nil) h.symm
 
 -- ===================================================================
 -- DEF 92: DPath symmetry witness
 -- ===================================================================
-def dpath_symm {A : Type u} (p : DPath A) : DPath A :=
+noncomputable def dpath_symm {A : Type u} (p : DPath A) : DPath A :=
   { source := p.target, target := p.source, witness := p.witness.symm }
 
 -- ===================================================================

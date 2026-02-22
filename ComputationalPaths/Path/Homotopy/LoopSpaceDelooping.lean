@@ -46,7 +46,7 @@ structure PathSimpleEquiv (α : Type u) (β : Type v) where
   right_inv : ∀ y : β, Path (toFun (invFun y)) y
 
 /-- Convert a `SimpleEquiv` into a `PathSimpleEquiv`. -/
-def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
+noncomputable def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
     PathSimpleEquiv α β :=
   { toFun := e.toFun
     invFun := e.invFun
@@ -54,16 +54,16 @@ def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α
     right_inv := fun y => Path.stepChain (e.right_inv y) }
 
 /-- Loop-deloop adjunction as a `PathSimpleEquiv`. -/
-def loopDeloopAdjunction {G : Type u} (S : StrictGroup G) :
+noncomputable def loopDeloopAdjunction {G : Type u} (S : StrictGroup G) :
     PathSimpleEquiv (piOneBG (S := S)) G :=
   simpleEquivToPathSimpleEquiv (piOneBGEquiv (S := S))
 
 /-- Unit of the loop-deloop adjunction. -/
-def unit {G : Type u} (S : StrictGroup G) : G → piOneBG (S := S) :=
+noncomputable def unit {G : Type u} (S : StrictGroup G) : G → piOneBG (S := S) :=
   (loopDeloopAdjunction (S := S)).invFun
 
 /-- Counit of the loop-deloop adjunction. -/
-def counit {G : Type u} (S : StrictGroup G) : piOneBG (S := S) → G :=
+noncomputable def counit {G : Type u} (S : StrictGroup G) : piOneBG (S := S) → G :=
   (loopDeloopAdjunction (S := S)).toFun
 
 end

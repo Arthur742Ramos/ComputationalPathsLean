@@ -53,7 +53,7 @@ structure SerreClass where
   closed_extension : ∀ {A B C : Type u}, mem A → mem C → mem B
 
 /-- The trivial Serre class containing all types. -/
-def SerreClass.trivial : SerreClass where
+noncomputable def SerreClass.trivial : SerreClass where
   mem := fun _ => True
   mem_unit := True.intro
   closed_equiv := by
@@ -72,11 +72,11 @@ def SerreClass.trivial : SerreClass where
 /-! ## C-isomorphisms -/
 
 /-- The C-kernel of a map at a chosen basepoint. -/
-def cKernel {A B : Type u} (f : A → B) (b0 : B) : Type u :=
+noncomputable def cKernel {A B : Type u} (f : A → B) (b0 : B) : Type u :=
   { a : A // f a = b0 }
 
 /-- The C-cokernel of a map (placeholder). -/
-def cCokernel {A B : Type u} (_f : A → B) : Type u :=
+noncomputable def cCokernel {A B : Type u} (_f : A → B) : Type u :=
   PUnit
 
 /-- A C-isomorphism: kernel and cokernel lie in a Serre class. -/
@@ -115,7 +115,7 @@ structure ModCWhiteheadData (C : SerreClass) {A B : Type u} (f : A → B)
       (HigherHomotopyGroups.piN_one (n := n) (x := f a))
 
 /-- Mod C Whitehead theorem: mod C data plus an equivalence gives Whitehead data. -/
-def modC_whitehead (_C : SerreClass) {A B : Type u} (f : A → B)
+noncomputable def modC_whitehead (_C : SerreClass) {A B : Type u} (f : A → B)
     (w : ModCWhiteheadData _C f) (h : HoTT.IsEquiv f) :
     WhiteheadTheorem.WhiteheadEquiv f :=
   WhiteheadTheorem.whiteheadTheorem f w.toWeakEquivData h
@@ -123,11 +123,11 @@ def modC_whitehead (_C : SerreClass) {A B : Type u} (f : A → B)
 /-! ## Finiteness for spheres -/
 
 /-- Placeholder finiteness predicate for Serre-mod-C statements. -/
-def IsFinite (_A : Type u) : Prop :=
+noncomputable def IsFinite (_A : Type u) : Prop :=
   True
 
 /-- The Serre class of finite types (placeholder). -/
-def finiteSerreClass : SerreClass where
+noncomputable def finiteSerreClass : SerreClass where
   mem := IsFinite
   mem_unit := True.intro
   closed_equiv := by
@@ -149,7 +149,7 @@ theorem piN_sphere_finite_odd (n k : Nat) (_hk : Odd k) (_hneq : n = k → False
     IsFinite (HigherHomotopy.PiN n (Sphere k) a) := by
   exact True.intro
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

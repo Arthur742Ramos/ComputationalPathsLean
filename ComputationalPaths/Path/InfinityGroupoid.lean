@@ -38,7 +38,7 @@ abbrev cellType (A : Type u) : Nat → Type u :=
 
 /-- Coherence at level `n`: any two parallel `n`-cells are connected by an
     `(n+1)`-cell in the tower. -/
-def CoherenceAt (A : Type u) : Nat → Type u
+noncomputable def CoherenceAt (A : Type u) : Nat → Type u
   | 0 => PUnit
   | 1 => PUnit
   | 2 =>
@@ -52,7 +52,7 @@ def CoherenceAt (A : Type u) : Nat → Type u
         DerivationHigh n c1 c2
 
 /-- Canonical coherence witnesses for the computational path tower. -/
-def coherenceAt (A : Type u) : (n : Nat) → CoherenceAt (A := A) n
+noncomputable def coherenceAt (A : Type u) : (n : Nat) → CoherenceAt (A := A) n
   | 0 => PUnit.unit
   | 1 => PUnit.unit
   | 2 => fun d1 d2 => contractibility₃ d1 d2
@@ -67,14 +67,14 @@ structure InfinityGroupoid (A : Type u) where
   coherence : (n : Nat) → CoherenceAt (A := A) n
 
 /-- The canonical infinity-groupoid approximation for computational paths. -/
-def compPathInfinityGroupoid (A : Type u) : InfinityGroupoid A where
+noncomputable def compPathInfinityGroupoid (A : Type u) : InfinityGroupoid A where
   cells := cellType A
   coherence := coherenceAt (A := A)
 
 /-! ## n-groupoid truncations -/
 
 /-- Cell tower truncated at level `n` (higher cells are collapsed to `PUnit`). -/
-def truncCell (A : Type u) (n : Nat) : Nat → Type u
+noncomputable def truncCell (A : Type u) (n : Nat) : Nat → Type u
   | k => if k ≤ n then cellType A k else PUnit
 
 /-- The `n`-groupoid truncation of the infinity-groupoid tower. -/
@@ -85,12 +85,12 @@ structure NGroupoidTruncation (A : Type u) (n : Nat) where
   coherence : CoherenceAt (A := A) n
 
 /-- The canonical `n`-groupoid truncation for computational paths. -/
-def compPathTruncation (A : Type u) (n : Nat) : NGroupoidTruncation A n where
+noncomputable def compPathTruncation (A : Type u) (n : Nat) : NGroupoidTruncation A n where
   cells := truncCell A n
   coherence := coherenceAt (A := A) n
 
 /-- The full tower of `n`-groupoid truncations. -/
-def truncationTower (A : Type u) : (n : Nat) → NGroupoidTruncation A n :=
+noncomputable def truncationTower (A : Type u) : (n : Nat) → NGroupoidTruncation A n :=
   fun n => compPathTruncation A n
 
 /-! ## Truncation functoriality -/
@@ -204,7 +204,7 @@ theorem truncationTower_cells_eq_punit_succ (n : Nat) :
 /-! ## Kan fillers for the truncation tower -/
 
 /-- Canonical Kan filler at truncation level `n`. -/
-def truncationTowerKanFiller (n : Nat) : CoherenceAt (A := A) n :=
+noncomputable def truncationTowerKanFiller (n : Nat) : CoherenceAt (A := A) n :=
   (truncationTower A n).coherence
 
 /-- The truncation tower carries canonical Kan fillers at every level. -/
@@ -355,7 +355,7 @@ theorem adjacent_truncCell_succ_equiv_cellType {n k : Nat} (hk : k ≤ n) :
 /-! ## Coherence interchange laws -/
 
 /-- Canonical interchange witness. -/
-def coherenceInterchange
+noncomputable def coherenceInterchange
     {a b c : A} {f f' : Path a b} {g g' : Path b c}
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Derivation₃

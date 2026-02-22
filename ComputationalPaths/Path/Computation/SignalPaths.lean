@@ -31,7 +31,7 @@ structure SignalSample where
   samplePath : Path valAt valNext
 
 /-- Compose two signal samples in sequence. -/
-def sampleCompose {a b c : Nat}
+noncomputable def sampleCompose {a b c : Nat}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -105,7 +105,7 @@ noncomputable def filter_rweq_inv_left (d : FilterData) :
   rweq_cmpA_inv_left d.filterPath
 
 /-- Cascading two filters in series. -/
-def filterCascade (d1 d2 : FilterData)
+noncomputable def filterCascade (d1 d2 : FilterData)
     (h : d1.outputSample = d2.inputSample) : Path d1.inputSample d2.outputSample :=
   Path.trans d1.filterPath (Path.trans (Path.mk [Step.mk _ _ h] h) d2.filterPath)
 
@@ -118,7 +118,7 @@ structure FrequencyData where
   transformPath : Path timeDomainVal freqDomainVal
 
 /-- The inverse transform path. -/
-def inverseTransform (d : FrequencyData) : Path d.freqDomainVal d.timeDomainVal :=
+noncomputable def inverseTransform (d : FrequencyData) : Path d.freqDomainVal d.timeDomainVal :=
   Path.symm d.transformPath
 
 /-- Round-trip transform cancels (forward then inverse). -/
@@ -149,7 +149,7 @@ structure ModulationData where
   modPath : Path basebandVal modulatedVal
 
 /-- Demodulation path. -/
-def demodulate (d : ModulationData) : Path d.modulatedVal d.basebandVal :=
+noncomputable def demodulate (d : ModulationData) : Path d.modulatedVal d.basebandVal :=
   Path.symm d.modPath
 
 /-- Modulate then demodulate cancels. -/
@@ -251,7 +251,7 @@ theorem congrArg_signal_symm (f : Nat → Nat)
 /-! ## Signal Iteration -/
 
 /-- Iterate a signal processing step n times. -/
-def signalIterate {a : Nat} (p : Path a a) : Nat → Path a a
+noncomputable def signalIterate {a : Nat} (p : Path a a) : Nat → Path a a
   | 0 => Path.refl a
   | n + 1 => Path.trans (signalIterate p n) p
 

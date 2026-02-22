@@ -53,7 +53,7 @@ theorem cellular_id_map : IsCellularMap C C (ContinuousMap.id X) :=
   cellular_id
 
 /-- Cellular approximation of the identity is tautological. -/
-def cellularApprox_id :
+noncomputable def cellularApprox_id :
     CWApproximationData (C := C) (D := C) (ContinuousMap.id X) :=
   cwApproximation_id
 
@@ -64,7 +64,7 @@ theorem cellularApprox_id_map_eq :
 /-! ## Homotopy paths from cellular approximations -/
 
 /-- Extract the homotopy path at a specific point. -/
-def cellularApprox_path_at {f : ContinuousMap X Y}
+noncomputable def cellularApprox_path_at {f : ContinuousMap X Y}
     (approx : CWApproximationData (C := C) (D := D) f) (x : X) :
     Path (approx.map x) (f x) :=
   cwApproximation_path approx x
@@ -83,7 +83,7 @@ theorem cellularApprox_agree_toEq {f : ContinuousMap X Y}
   (cellularApprox_toEq_at a₁ x).trans (cellularApprox_toEq_at a₂ x).symm
 
 /-- Path between two cellular approximations of the same map at a point. -/
-def cellularApprox_agree_path {f : ContinuousMap X Y}
+noncomputable def cellularApprox_agree_path {f : ContinuousMap X Y}
     (a₁ a₂ : CWApproximationData (C := C) (D := D) f) (x : X) :
     Path (a₁.map x) (a₂.map x) :=
   Path.trans (cellularApprox_path_at a₁ x)
@@ -92,7 +92,7 @@ def cellularApprox_agree_path {f : ContinuousMap X Y}
 /-! ## Coherence of composition -/
 
 /-- Given cellular approximations of f and g, compose them. -/
-def cellularApprox_comp {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
+noncomputable def cellularApprox_comp {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
     (af : CWApproximationData (C := C) (D := D) f)
     (ag : CWApproximationData (C := D) (D := E) g) :
     CWApproximationData (C := C) (D := E) (g.comp f) :=
@@ -126,7 +126,7 @@ theorem cellularApprox_path_self_inv {f : ContinuousMap X Y}
   simp
 
 /-- Symmetry of the approximation path. -/
-def cellularApprox_path_symm {f : ContinuousMap X Y}
+noncomputable def cellularApprox_path_symm {f : ContinuousMap X Y}
     (approx : CWApproximationData (C := C) (D := D) f) (x : X) :
     Path (f x) (approx.map x) :=
   Path.symm (cellularApprox_path_at approx x)
@@ -156,19 +156,19 @@ theorem cellular_top_skeleton {f : ContinuousMap X Y}
 /-! ## Path-valued witnesses for cellular properties -/
 
 /-- Path witness that the identity map preserves skeleton membership. -/
-def cellular_id_skeleton_path (n : ENat) (x : X)
+noncomputable def cellular_id_skeleton_path (n : ENat) (x : X)
     (_hx : x ∈ CWComplex.skeleton (C := C) n) :
     Path (ContinuousMap.id X x) x :=
   Path.stepChain rfl
 
 /-- Path witness for composition of cellular maps at a point. -/
-def cellular_comp_path {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
+noncomputable def cellular_comp_path {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
     (x : X) :
     Path ((g.comp f) x) (g (f x)) :=
   Path.stepChain rfl
 
 /-- Composition of cellular maps is associative at points. -/
-def cellular_comp_assoc_path {W : Type u} [TopologicalSpace W] [T2Space W]
+noncomputable def cellular_comp_assoc_path {W : Type u} [TopologicalSpace W] [T2Space W]
     {f : ContinuousMap X Y} {g : ContinuousMap Y Z} {h : ContinuousMap Z W}
     (x : X) :
     Path ((h.comp (g.comp f)) x) (((h.comp g).comp f) x) :=

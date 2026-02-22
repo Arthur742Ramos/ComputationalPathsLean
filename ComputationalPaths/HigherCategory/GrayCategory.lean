@@ -33,24 +33,24 @@ abbrev FourCell {x y : A} {f g : Hom x y} {α β : TwoCell f g}
     (m₁ m₂ : ThreeCell α β) : Type u := Derivation₄ m₁ m₂
 
 /-- Pentagon 3-cell from the underlying bicategorical coherence. -/
-def pentagon3 (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
+noncomputable def pentagon3 (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
     ThreeCell (Bicategory.pentagonLeftPath f g h k) (Bicategory.pentagonRightPath f g h k) :=
   TwoCategory.pentagonIdentity f g h k
 
 /-- Triangle 3-cell from the underlying bicategorical coherence. -/
-def triangle3 (f : Hom a b) (g : Hom b c) :
+noncomputable def triangle3 (f : Hom a b) (g : Hom b c) :
     ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g) :=
   TwoCategory.triangleIdentity f g
 
 /-- Any pentagon 3-cell contracts to the canonical one by a computational 4-cell. -/
-def pentagonContraction (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e)
+noncomputable def pentagonContraction (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e)
     (piCell : ThreeCell (Bicategory.pentagonLeftPath f g h k)
       (Bicategory.pentagonRightPath f g h k)) :
     FourCell (pentagon3 f g h k) piCell :=
   contractibility₄ (pentagon3 f g h k) piCell
 
 /-- Any triangle 3-cell contracts to the canonical one by a computational 4-cell. -/
-def triangleContraction (f : Hom a b) (g : Hom b c)
+noncomputable def triangleContraction (f : Hom a b) (g : Hom b c)
     (tau : ThreeCell (Bicategory.triangleLeftPath f g) (Bicategory.triangleRightPath f g)) :
     FourCell (triangle3 f g) tau :=
   contractibility₄ (triangle3 f g) tau

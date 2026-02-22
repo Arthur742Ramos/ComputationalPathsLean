@@ -48,11 +48,11 @@ structure PtMap (X Y : Pt) where
 
 namespace PtMap
 
-def comp {X Y Z : Pt} (g : PtMap Y Z) (f : PtMap X Y) : PtMap X Z where
+noncomputable def comp {X Y Z : Pt} (g : PtMap Y Z) (f : PtMap X Y) : PtMap X Z where
   toFun := g.toFun ∘ f.toFun
   map_pt := Path.trans (Path.congrArg g.toFun f.map_pt) g.map_pt
 
-def id (X : Pt) : PtMap X X where
+noncomputable def id (X : Pt) : PtMap X X where
   toFun := _root_.id
   map_pt := Path.refl X.pt
 
@@ -67,12 +67,12 @@ structure CPathSpectrum where
   structureMap : (n : Nat) → PtMap (level n) (level (n + 1))
 
 /-- Constant spectrum: all levels are the same type. -/
-def constSpectrum (X : Pt) : CPathSpectrum where
+noncomputable def constSpectrum (X : Pt) : CPathSpectrum where
   level := fun _ => X
   structureMap := fun _ => PtMap.id X
 
 /-- Shift a spectrum by one level. -/
-def shiftSpectrum (E : CPathSpectrum) : CPathSpectrum where
+noncomputable def shiftSpectrum (E : CPathSpectrum) : CPathSpectrum where
   level := fun n => E.level (n + 1)
   structureMap := fun n => E.structureMap (n + 1)
 
@@ -85,12 +85,12 @@ structure SpectrumMap (E F : CPathSpectrum) where
     Path ((mapLevel n).toFun (E.level n).pt) (F.level n).pt
 
 /-- Identity spectrum map. -/
-def SpectrumMap.id (E : CPathSpectrum) : SpectrumMap E E where
+noncomputable def SpectrumMap.id (E : CPathSpectrum) : SpectrumMap E E where
   mapLevel := fun n => PtMap.id (E.level n)
   mapBasePt := fun n => Path.refl (E.level n).pt
 
 /-- Composition of spectrum maps (levelwise). -/
-def SpectrumMap.comp {E F G : CPathSpectrum}
+noncomputable def SpectrumMap.comp {E F G : CPathSpectrum}
     (g : SpectrumMap F G) (f : SpectrumMap E F) : SpectrumMap E G where
   mapLevel := fun n => PtMap.comp (g.mapLevel n) (f.mapLevel n)
   mapBasePt := fun n =>
@@ -99,7 +99,7 @@ def SpectrumMap.comp {E F G : CPathSpectrum}
 /-! ## Stable path spaces -/
 
 /-- Iterate structure maps k times, applied to an element at level 0. -/
-def iterStruct (E : CPathSpectrum) : (k : Nat) → (E.level 0).carrier → (E.level k).carrier
+noncomputable def iterStruct (E : CPathSpectrum) : (k : Nat) → (E.level 0).carrier → (E.level k).carrier
   | 0 => _root_.id
   | k + 1 => (E.structureMap k).toFun ∘ iterStruct E k
 
@@ -109,18 +109,18 @@ structure StablePath (E : CPathSpectrum) (x y : (E.level 0).carrier) where
   witness : Path (iterStruct E stage x) (iterStruct E stage y)
 
 /-- Reflexive stable path at stage 0. -/
-def StablePath.refl (E : CPathSpectrum) (x : (E.level 0).carrier) : StablePath E x x where
+noncomputable def StablePath.refl (E : CPathSpectrum) (x : (E.level 0).carrier) : StablePath E x x where
   stage := 0
   witness := Path.refl x
 
 /-- Symmetric stable path. -/
-def StablePath.symm' {E : CPathSpectrum} {x y : (E.level 0).carrier}
+noncomputable def StablePath.symm' {E : CPathSpectrum} {x y : (E.level 0).carrier}
     (p : StablePath E x y) : StablePath E y x where
   stage := p.stage
   witness := Path.symm p.witness
 
 /-- Transitive stable path. -/
-def StablePath.trans' {E : CPathSpectrum} {x y z : (E.level 0).carrier}
+noncomputable def StablePath.trans' {E : CPathSpectrum} {x y z : (E.level 0).carrier}
     (p : StablePath E x y) (q : StablePath E y z)
     (heq : p.stage = q.stage)
     (ptrans : Path (iterStruct E p.stage x) (iterStruct E p.stage z)) :
@@ -140,7 +140,7 @@ structure SuspensionIsoData (E : CPathSpectrum) (n : Nat) where
     Path (forward.toFun (backward.toFun y)) y
 
 /-- The structure map provides one direction of suspension isomorphism data. -/
-def structureMapAsSuspData (E : CPathSpectrum) (n : Nat)
+noncomputable def structureMapAsSuspData (E : CPathSpectrum) (n : Nat)
     (back : PtMap (E.level (n + 1)) (E.level n))
     (ret : (x : (E.level n).carrier) → Path (back.toFun ((E.structureMap n).toFun x)) x)
     (sec : (y : (E.level (n + 1)).carrier) → Path ((E.structureMap n).toFun (back.toFun y)) y) :
@@ -158,18 +158,18 @@ structure StableHomotopyGroup (E : CPathSpectrum) where
   loopWitness : Path (iterStruct E stage (E.level 0).pt) (iterStruct E stage (E.level 0).pt)
 
 /-- Trivial element of the stable homotopy group. -/
-def StableHomotopyGroup.unit (E : CPathSpectrum) : StableHomotopyGroup E where
+noncomputable def StableHomotopyGroup.unit (E : CPathSpectrum) : StableHomotopyGroup E where
   stage := 0
   loopWitness := Path.refl (E.level 0).pt
 
 /-- Inverse element. -/
-def StableHomotopyGroup.inv {E : CPathSpectrum}
+noncomputable def StableHomotopyGroup.inv {E : CPathSpectrum}
     (g : StableHomotopyGroup E) : StableHomotopyGroup E where
   stage := g.stage
   loopWitness := Path.symm g.loopWitness
 
 /-- Multiplication via path composition. -/
-def StableHomotopyGroup.mul {E : CPathSpectrum}
+noncomputable def StableHomotopyGroup.mul {E : CPathSpectrum}
     (g h : StableHomotopyGroup E) (heq : g.stage = h.stage)
     (hmul : Path (iterStruct E g.stage (E.level 0).pt) (iterStruct E g.stage (E.level 0).pt)) :
     StableHomotopyGroup E where
@@ -185,7 +185,7 @@ structure SmashSpectrum (E F : CPathSpectrum) where
   inclusionR : SpectrumMap F result
 
 /-- The smash product with a constant spectrum is trivially the same spectrum. -/
-def smashWithConst (E : CPathSpectrum) (X : Pt) :
+noncomputable def smashWithConst (E : CPathSpectrum) (X : Pt) :
     SmashSpectrum E (constSpectrum X) where
   result := E
   inclusionL := SpectrumMap.id E

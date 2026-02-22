@@ -140,7 +140,7 @@ end CategoricalEquivalence
 namespace PathEquivalence
 
 /-- Forgetting path witnesses yields a lightweight equivalence of underlying types. -/
-def toSimpleEquiv (E : PathEquivalence C D) : SimpleEquiv C D where
+noncomputable def toSimpleEquiv (E : PathEquivalence C D) : SimpleEquiv C D where
   toFun := E.toFun
   invFun := E.invFun
   left_inv := fun x => Path.toEq ((E.unitIso x).inv)

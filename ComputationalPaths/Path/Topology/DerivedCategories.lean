@@ -100,13 +100,13 @@ structure ChainMap {C : PreAdditiveCategory}
     C.comp (component n) (Y.diff n)
 
 /-- Identity chain map. -/
-def ChainMap.id {C : PreAdditiveCategory} (X : ChainComplex C) :
+noncomputable def ChainMap.id {C : PreAdditiveCategory} (X : ChainComplex C) :
     ChainMap X X where
   component := fun n => C.id (X.obj n)
   comm := fun n => by rw [C.comp_id, C.id_comp]
 
 /-- Composition of chain maps. -/
-def ChainMap.comp {C : PreAdditiveCategory}
+noncomputable def ChainMap.comp {C : PreAdditiveCategory}
     {X Y Z : ChainComplex C}
     (f : ChainMap X Y) (g : ChainMap Y Z) : ChainMap X Z where
   component := fun n => C.comp (f.component n) (g.component n)
@@ -137,7 +137,7 @@ structure QuasiIsoData {C : PreAdditiveCategory}
   id_is_qi : Path f f → isQuasiIso
 
 /-- Trivial quasi-isomorphism data for the identity. -/
-def trivialQI {C : PreAdditiveCategory} (X : ChainComplex C) :
+noncomputable def trivialQI {C : PreAdditiveCategory} (X : ChainComplex C) :
     QuasiIsoData X X (ChainMap.id X) where
   isQuasiIso := True
   id_is_qi := fun _ => trivial
@@ -167,7 +167,7 @@ structure LocalizationData (A : Type u) where
     ∃ G : A → B, ∀ a : A, Nonempty (Path (G (locMap a)) (F a))
 
 /-- Identity localization (inverts nothing). -/
-def trivialLocalization (A : Type u) : LocalizationData A where
+noncomputable def trivialLocalization (A : Type u) : LocalizationData A where
   inverted := fun _ => False
   locObj := fun a => PUnit
   locMap := id
@@ -201,7 +201,7 @@ structure DerivedCatData (C : PreAdditiveCategory) where
     Path (shift.shiftHom T.f) (shift.shiftHom T.f)
 
 /-- Build a derived category data from a triangulated category. -/
-def DerivedCatData.ofTriangulated {C : PreAdditiveCategory}
+noncomputable def DerivedCatData.ofTriangulated {C : PreAdditiveCategory}
     (TC : TriangulatedCategory)
     (hC : TC.cat = C) : DerivedCatData C where
   shift := hC ▸ TC.shift
@@ -247,7 +247,7 @@ structure RightDerivedFunctor
     Path (mapHom (C.comp f g)) (D.comp (mapHom f) (mapHom g))
 
 /-- Identity left derived functor. -/
-def LeftDerivedFunctor.id (C : PreAdditiveCategory)
+noncomputable def LeftDerivedFunctor.id (C : PreAdditiveCategory)
     (DC : DerivedCatData C) : LeftDerivedFunctor C C DC DC where
   obj := fun X => X
   mapHom := fun {_ _} f => f
@@ -256,7 +256,7 @@ def LeftDerivedFunctor.id (C : PreAdditiveCategory)
   shift_comm := fun _X => Path.refl _
 
 /-- Identity right derived functor. -/
-def RightDerivedFunctor.id (C : PreAdditiveCategory)
+noncomputable def RightDerivedFunctor.id (C : PreAdditiveCategory)
     (DC : DerivedCatData C) : RightDerivedFunctor C C DC DC where
   obj := fun X => X
   mapHom := fun {_ _} f => f
@@ -278,7 +278,7 @@ structure DerivedNatTrans
          (D.comp (component X) (G.mapHom f))
 
 /-- Identity natural transformation. -/
-def DerivedNatTrans.id
+noncomputable def DerivedNatTrans.id
     {C D : PreAdditiveCategory}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     (F : LeftDerivedFunctor C D DC DD) :
@@ -287,7 +287,7 @@ def DerivedNatTrans.id
   naturality := fun f => Path.stepChain (by rw [D.comp_id, D.id_comp])
 
 /-- Composition of natural transformations. -/
-def DerivedNatTrans.comp
+noncomputable def DerivedNatTrans.comp
     {C D : PreAdditiveCategory}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     {F G H : LeftDerivedFunctor C D DC DD}
@@ -336,7 +336,7 @@ structure TStructureData (C : PreAdditiveCategory)
     ∃ Y : C.Obj, leZero Y ∧ ∃ _f : C.Hom Y X, True
 
 /-- The heart of a t-structure. -/
-def TStructureData.heart {C : PreAdditiveCategory}
+noncomputable def TStructureData.heart {C : PreAdditiveCategory}
     {DC : DerivedCatData C} (T : TStructureData C DC) :
     C.Obj → Prop :=
   fun X => T.geZero X ∧ T.leZero X
@@ -350,7 +350,7 @@ theorem heart_in_both {C : PreAdditiveCategory}
 /-! ## Coherence theorems -/
 
 /-- Chain map composition is associative via Path. -/
-def chainMap_comp_assoc {C : PreAdditiveCategory}
+noncomputable def chainMap_comp_assoc {C : PreAdditiveCategory}
     {W X Y Z : ChainComplex C}
     (f : ChainMap W X) (g : ChainMap X Y) (h : ChainMap Y Z) :
     ∀ n : Int,
@@ -361,7 +361,7 @@ def chainMap_comp_assoc {C : PreAdditiveCategory}
   exact Path.stepChain (C.assoc _ _ _)
 
 /-- Identity chain map is a left identity. -/
-def chainMap_id_comp {C : PreAdditiveCategory}
+noncomputable def chainMap_id_comp {C : PreAdditiveCategory}
     {X Y : ChainComplex C} (f : ChainMap X Y) :
     ∀ n : Int,
       Path (ChainMap.comp (ChainMap.id X) f |>.component n)
@@ -371,7 +371,7 @@ def chainMap_id_comp {C : PreAdditiveCategory}
   exact Path.stepChain (C.id_comp _)
 
 /-- Identity chain map is a right identity. -/
-def chainMap_comp_id {C : PreAdditiveCategory}
+noncomputable def chainMap_comp_id {C : PreAdditiveCategory}
     {X Y : ChainComplex C} (f : ChainMap X Y) :
     ∀ n : Int,
       Path (ChainMap.comp f (ChainMap.id Y) |>.component n)
@@ -381,7 +381,7 @@ def chainMap_comp_id {C : PreAdditiveCategory}
   exact Path.stepChain (C.comp_id _)
 
 /-- Derived natural transformation composition is associative. -/
-def derivedNatTrans_assoc
+noncomputable def derivedNatTrans_assoc
     {C D : PreAdditiveCategory}
     {DC : DerivedCatData C} {DD : DerivedCatData D}
     {F G H K : LeftDerivedFunctor C D DC DD}

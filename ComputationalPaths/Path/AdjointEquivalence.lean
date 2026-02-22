@@ -162,7 +162,7 @@ variable {F : FundamentalGroupoidFunctor A B}
 variable {G : FundamentalGroupoidFunctor B A}
 
 /-- Adjoint equivalences induce isomorphisms on fundamental groups. -/
-def adjointEquivalence_piOneEquiv (E : AdjointEquivalence F G) (a : A) :
+noncomputable def adjointEquivalence_piOneEquiv (E : AdjointEquivalence F G) (a : A) :
     SimpleEquiv (π₁(A, a)) (π₁(B, F.obj a)) where
   toFun := fun α => F.map α
   invFun := fun β =>

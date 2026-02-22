@@ -60,48 +60,48 @@ variable {a b : A}
 
 /-- Any two derivations with the same source and target are connected.
     This is `contractibility₃` from the main module, reproduced here. -/
-def connect {p q : Path a b} (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
+noncomputable def connect {p q : Path a b} (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
   contractibility₃ d₁ d₂
 
 /-- The groupoid law `vcomp_refl_left` is a special case of contractibility. -/
-def derive_vcomp_refl_left {p q : Path a b} (d : Derivation₂ p q) :
+noncomputable def derive_vcomp_refl_left {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ (.vcomp (.refl p) d) d :=
   connect (.vcomp (.refl p) d) d
 
 /-- The groupoid law `vcomp_refl_right` is a special case of contractibility. -/
-def derive_vcomp_refl_right {p q : Path a b} (d : Derivation₂ p q) :
+noncomputable def derive_vcomp_refl_right {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ (.vcomp d (.refl q)) d :=
   connect (.vcomp d (.refl q)) d
 
 /-- Associativity `vcomp_assoc` is a special case of contractibility. -/
-def derive_vcomp_assoc {p q r s : Path a b}
+noncomputable def derive_vcomp_assoc {p q r s : Path a b}
     (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) (d₃ : Derivation₂ r s) :
     Derivation₃ (.vcomp (.vcomp d₁ d₂) d₃) (.vcomp d₁ (.vcomp d₂ d₃)) :=
   connect (.vcomp (.vcomp d₁ d₂) d₃) (.vcomp d₁ (.vcomp d₂ d₃))
 
 /-- Involution `inv_inv` is a special case of contractibility. -/
-def derive_inv_inv {p q : Path a b} (d : Derivation₂ p q) :
+noncomputable def derive_inv_inv {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ (.inv (.inv d)) d :=
   connect (.inv (.inv d)) d
 
 /-- Left inverse `vcomp_inv_left` is a special case of contractibility. -/
-def derive_vcomp_inv_left {p q : Path a b} (d : Derivation₂ p q) :
+noncomputable def derive_vcomp_inv_left {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ (.vcomp (.inv d) d) (.refl q) :=
   connect (.vcomp (.inv d) d) (.refl q)
 
 /-- Right inverse `vcomp_inv_right` is a special case of contractibility. -/
-def derive_vcomp_inv_right {p q : Path a b} (d : Derivation₂ p q) :
+noncomputable def derive_vcomp_inv_right {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ (.vcomp d (.inv d)) (.refl p) :=
   connect (.vcomp d (.inv d)) (.refl p)
 
 /-- Anti-homomorphism `inv_vcomp` is a special case of contractibility. -/
-def derive_inv_vcomp {p q r : Path a b}
+noncomputable def derive_inv_vcomp {p q r : Path a b}
     (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) :
     Derivation₃ (.inv (.vcomp d₁ d₂)) (.vcomp (.inv d₂) (.inv d₁)) :=
   connect (.inv (.vcomp d₁ d₂)) (.vcomp (.inv d₂) (.inv d₁))
 
 /-- Step equality `step_eq` is a special case of contractibility. -/
-def derive_step_eq {p q : Path a b} (s₁ s₂ : Step p q) :
+noncomputable def derive_step_eq {p q : Path a b} (s₁ s₂ : Step p q) :
     Derivation₃ (.step s₁) (.step s₂) :=
   connect (.step s₁) (.step s₂)
 
@@ -118,7 +118,7 @@ variable {a b c d e : A}
 
 /-- Pentagon coherence is derivable: both composite derivations have the
     same source and target, so they're connected by contractibility. -/
-def derive_pentagon (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
+noncomputable def derive_pentagon (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
     Derivation₃
       (.vcomp (.step (Step.trans_assoc (Path.trans f g) h k))
               (.step (Step.trans_assoc f g (Path.trans h k))))
@@ -128,7 +128,7 @@ def derive_pentagon (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) 
   connect _ _
 
 /-- Triangle coherence is derivable: both sides are derivations with same endpoints. -/
-def derive_triangle (f : Path a b) (g : Path b c) :
+noncomputable def derive_triangle (f : Path a b) (g : Path b c) :
     Derivation₃
       (.vcomp (.step (Step.trans_assoc f (Path.refl b) g))
               (.step (Step.trans_congr_right f (Step.trans_refl_left g))))
@@ -137,7 +137,7 @@ def derive_triangle (f : Path a b) (g : Path b c) :
 
 /-- Interchange is derivable: the two ways of composing 2-cells horizontally
     then vertically vs vertically then horizontally are connected. -/
-def derive_interchange {f f' : Path a b} {g g' : Path b c}
+noncomputable def derive_interchange {f f' : Path a b} {g g' : Path b c}
     (α : Derivation₂ f f') (β : Derivation₂ g g') :
     Derivation₃
       (.vcomp (whiskerRight α g) (whiskerLeft f' β))

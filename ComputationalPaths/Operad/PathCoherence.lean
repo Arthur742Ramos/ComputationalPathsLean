@@ -29,7 +29,7 @@ structure PathCoherentOperad (A : Type u) where
 namespace PathCoherentOperad
 
 /-- Canonical operadic composition from path concatenation. -/
-def canonical (A : Type u) : PathCoherentOperad A where
+noncomputable def canonical (A : Type u) : PathCoherentOperad A where
   compose := fun f g => Path.trans f g
   unit := Path.refl
   assoc_rw := fun f g h =>

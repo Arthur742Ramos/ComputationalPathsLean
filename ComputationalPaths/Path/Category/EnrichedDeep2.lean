@@ -66,23 +66,23 @@ namespace EnrichedPath
 
 variable {V : Type u} {compV : V → V → V} {unitV : V} {tensorV ihomV : V → V → V}
 
-def trans : EnrichedPath V compV unitV tensorV ihomV x y →
+noncomputable def trans : EnrichedPath V compV unitV tensorV ihomV x y →
     EnrichedPath V compV unitV tensorV ihomV y z →
     EnrichedPath V compV unitV tensorV ihomV x z
   | .nil _, q => q
   | .cons s p, q => .cons s (trans p q)
 
-def symm : EnrichedPath V compV unitV tensorV ihomV x y →
+noncomputable def symm : EnrichedPath V compV unitV tensorV ihomV x y →
     EnrichedPath V compV unitV tensorV ihomV y x
   | .nil _ => .nil _
   | .cons s p => trans (symm p) (.cons (.symm s) (.nil _))
 
-def congrArg (f : V → V) : EnrichedPath V compV unitV tensorV ihomV x y →
+noncomputable def congrArg (f : V → V) : EnrichedPath V compV unitV tensorV ihomV x y →
     EnrichedPath V compV unitV tensorV ihomV (f x) (f y)
   | .nil _ => .nil _
   | .cons s p => .cons (.congrArg f s) (congrArg f p)
 
-def length : EnrichedPath V compV unitV tensorV ihomV x y → Nat
+noncomputable def length : EnrichedPath V compV unitV tensorV ihomV x y → Nat
   | .nil _ => 0
   | .cons _ p => 1 + length p
 
@@ -97,161 +97,161 @@ section Theorems
 variable {V : Type u} {compV : V → V → V} {unitV : V} {tensorV ihomV : V → V → V}
 
 -- Shorthand
-private def mk {x y : V} (st : EnrichedStep V compV unitV tensorV ihomV x y) :
+private noncomputable def mk {x y : V} (st : EnrichedStep V compV unitV tensorV ihomV x y) :
     EnrichedPath V compV unitV tensorV ihomV x y := .cons st (.nil _)
 
 -- 1
-def enriched_comp_assoc_path (a b c : V) :
+noncomputable def enriched_comp_assoc_path (a b c : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (compV (compV a b) c) (compV a (compV b c)) :=
   mk (.enriched_comp_assoc a b c)
 
 -- 2
-def enriched_unit_left_path (a : V) :
+noncomputable def enriched_unit_left_path (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (compV unitV a) a :=
   mk (.enriched_unit_left a)
 
 -- 3
-def enriched_unit_right_path (a : V) :
+noncomputable def enriched_unit_right_path (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (compV a unitV) a :=
   mk (.enriched_unit_right a)
 
 -- 4
-def tensor_assoc_path (a b c : V) :
+noncomputable def tensor_assoc_path (a b c : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (tensorV a b) c) (tensorV a (tensorV b c)) :=
   mk (.tensor_assoc a b c)
 
 -- 5
-def tensor_unit_left_path (a : V) :
+noncomputable def tensor_unit_left_path (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (tensorV unitV a) a :=
   mk (.tensor_unit_left a)
 
 -- 6
-def tensor_unit_right_path (a : V) :
+noncomputable def tensor_unit_right_path (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (tensorV a unitV) a :=
   mk (.tensor_unit_right a)
 
 -- 7
-def tensor_braiding_path (a b : V) :
+noncomputable def tensor_braiding_path (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV (tensorV a b) (tensorV b a) :=
   mk (.tensor_symm a b)
 
 -- 8
-def braiding_involutive (a b : V) :
+noncomputable def braiding_involutive (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV (tensorV a b) (tensorV a b) :=
   (mk (.tensor_symm a b)).trans (mk (.tensor_symm b a))
 
 -- 9
-def ihom_tensor_adj_path (a b c : V) :
+noncomputable def ihom_tensor_adj_path (a b c : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (ihomV (tensorV a b) c) (ihomV a (ihomV b c)) :=
   mk (.ihom_tensor_adj a b c)
 
 -- 10
-def vfunctor_comp_path (F : V → V) (a b : V) :
+noncomputable def vfunctor_comp_path (F : V → V) (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV (F (compV a b)) (compV (F a) (F b)) :=
   mk (.vfunctor_comp F a b)
 
 -- 11
-def vfunctor_unit_path (F : V → V) :
+noncomputable def vfunctor_unit_path (F : V → V) :
     EnrichedPath V compV unitV tensorV ihomV (F unitV) unitV :=
   mk (.vfunctor_unit F)
 
 -- 12
-def vnat_assoc_path (a b α : V) :
+noncomputable def vnat_assoc_path (a b α : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (compV α (compV a b)) (compV (compV α a) b) :=
   mk (.vnat_component a b α)
 
 -- 13
-def yoneda_embed_path (hom : V → V → V) (a b : V) :
+noncomputable def yoneda_embed_path (hom : V → V → V) (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (hom a b) (ihomV (hom b a) (hom a a)) :=
   mk (.yoneda_embed hom a b)
 
 -- 14
-def yoneda_lemma_path (F : V → V) (a : V) :
+noncomputable def yoneda_lemma_path (F : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (ihomV a (F a)) (F a) :=
   mk (.yoneda_iso F a)
 
 -- 15
-def day_conv_path (F G : V → V) (a : V) :
+noncomputable def day_conv_path (F G : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (F a) (G a)) (compV (F a) (G a)) :=
   mk (.day_conv F G a)
 
 -- 16
-def day_assoc_path (F G H : V → V) (a : V) :
+noncomputable def day_assoc_path (F G H : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (tensorV (F a) (G a)) (H a))
       (tensorV (F a) (tensorV (G a) (H a))) :=
   mk (.day_assoc F G H a)
 
 -- 17
-def day_unit_path (F : V → V) (a : V) :
+noncomputable def day_unit_path (F : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (tensorV unitV (F a)) (F a) :=
   mk (.day_unit F a)
 
 -- 18
-def enriched_adj_unit_path (a : V) :
+noncomputable def enriched_adj_unit_path (a : V) :
     EnrichedPath V compV unitV tensorV ihomV unitV (compV a a) :=
   mk (.enriched_adj_unit a)
 
 -- 19
-def enriched_adj_counit_path (a : V) :
+noncomputable def enriched_adj_counit_path (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (compV a a) unitV :=
   mk (.enriched_adj_counit a)
 
 -- 20
-def enriched_adj_triangle (a : V) :
+noncomputable def enriched_adj_triangle (a : V) :
     EnrichedPath V compV unitV tensorV ihomV unitV unitV :=
   (mk (.enriched_adj_unit a)).trans (mk (.enriched_adj_counit a))
 
 -- 21
-def weighted_limit_path (W D : V → V) (a : V) :
+noncomputable def weighted_limit_path (W D : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (ihomV (W a) (D a)) (compV (W a) (D a)) :=
   mk (.weighted_limit W D a)
 
 -- 22
-def weighted_colimit_path (W D : V → V) (a : V) :
+noncomputable def weighted_colimit_path (W D : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (W a) (D a)) (compV (W a) (D a)) :=
   mk (.weighted_colimit W D a)
 
 -- 23
-def change_of_base_path (F : V → V) (a b : V) :
+noncomputable def change_of_base_path (F : V → V) (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (F (compV a b)) (compV (F a) (F b)) :=
   mk (.change_of_base F a b)
 
 -- 24
-def tensor_action_path (a b : V) :
+noncomputable def tensor_action_path (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV a (compV a b)) (compV (tensorV a a) b) :=
   mk (.tensor_action a b)
 
 -- 25
-def cotensor_coaction_path (a b : V) :
+noncomputable def cotensor_coaction_path (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (ihomV a (compV a b)) (compV (ihomV a a) b) :=
   mk (.cotensor_coaction a b)
 
 -- 26
-def enriched_monoidal_coh_path (a b c : V) :
+noncomputable def enriched_monoidal_coh_path (a b c : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (compV a b) c) (compV (tensorV a c) (tensorV b c)) :=
   mk (.enriched_monoidal_coh a b c)
 
 -- 27: Day conv via unit elimination
-def day_conv_unit_elim (F : V → V) (a : V) :
+noncomputable def day_conv_unit_elim (F : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV unitV (tensorV (F a) (F a))) (compV (F a) (F a)) :=
   (mk (.tensor_unit_left (tensorV (F a) (F a)))).trans (mk (.day_conv F F a))
 
 -- 28: Functor composition coherence (3-step)
-def vfunctor_comp_coherence (F : V → V) (a b c : V) :
+noncomputable def vfunctor_comp_coherence (F : V → V) (a b c : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (F (compV (compV a b) c)) (compV (F a) (compV (F b) (F c))) :=
   (mk (.congrArg F (.enriched_comp_assoc a b c))).trans
@@ -259,42 +259,42 @@ def vfunctor_comp_coherence (F : V → V) (a b c : V) :
       (.cons (.congrArg (compV (F a)) (.vfunctor_comp F b c)) (.nil _)))
 
 -- 29: Pentagon coherence
-def tensor_pentagon_path (a b c d : V) :
+noncomputable def tensor_pentagon_path (a b c d : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (tensorV (tensorV a b) c) d)
       (tensorV a (tensorV b (tensorV c d))) :=
   (mk (.tensor_assoc (tensorV a b) c d)).trans (mk (.tensor_assoc a b (tensorV c d)))
 
 -- 30: Day conv symmetry
-def day_conv_symm (F G : V → V) (a : V) :
+noncomputable def day_conv_symm (F G : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (F a) (G a)) (compV (G a) (F a)) :=
   (mk (.tensor_symm (F a) (G a))).trans (mk (.day_conv G F a))
 
 -- 31: Adjunction zigzag
-def adj_zigzag (a : V) :
+noncomputable def adj_zigzag (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (compV a a) (compV a a) :=
   (mk (.enriched_adj_counit a)).trans (mk (.enriched_adj_unit a))
 
 -- 32: Unit left-right chain
-def unit_left_right (a : V) :
+noncomputable def unit_left_right (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (compV unitV (compV a unitV)) a :=
   (mk (.enriched_unit_left (compV a unitV))).trans (mk (.enriched_unit_right a))
 
 -- 33: Tensor braid with unit
-def tensor_braid_unit (a : V) :
+noncomputable def tensor_braid_unit (a : V) :
     EnrichedPath V compV unitV tensorV ihomV (tensorV a unitV) (tensorV unitV a) :=
   mk (.tensor_symm a unitV)
 
 -- 34: Three-fold tensor reassociation via congrArg
-def tensor_three_reassoc (a b c d : V) :
+noncomputable def tensor_three_reassoc (a b c d : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (tensorV (tensorV a b) c) d)
       (tensorV (tensorV a (tensorV b c)) d) :=
   mk (.congrArg (tensorV · d) (.tensor_assoc a b c))
 
 -- 35: ihom currying chain (3-step)
-def ihom_currying_chain (a b c d : V) :
+noncomputable def ihom_currying_chain (a b c d : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (ihomV (tensorV (tensorV a b) c) d)
       (ihomV a (ihomV b (ihomV c d))) :=
@@ -303,26 +303,26 @@ def ihom_currying_chain (a b c d : V) :
       (.cons (.congrArg (ihomV a) (.ihom_tensor_adj b c d)) (.nil _)))
 
 -- 36: Day unit chain then tensor right unit
-def day_unit_tensor_chain (F : V → V) (a : V) :
+noncomputable def day_unit_tensor_chain (F : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (tensorV unitV (F a)) unitV) (F a) :=
   (mk (.tensor_unit_right (tensorV unitV (F a)))).trans (mk (.day_unit F a))
 
 -- 37: Functor unit via change of base
-def functor_unit_change_base (F : V → V) (a : V) :
+noncomputable def functor_unit_change_base (F : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (F (compV unitV a)) (compV unitV (F a)) :=
   (mk (.change_of_base F unitV a)).trans
     (.cons (.congrArg (compV · (F a)) (.vfunctor_unit F)) (.nil _))
 
 -- 38: Double braid
-def double_braid_tensor (a b c : V) :
+noncomputable def double_braid_tensor (a b c : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (tensorV a b) c) (tensorV (tensorV b a) c) :=
   mk (.congrArg (tensorV · c) (.tensor_symm a b))
 
 -- 39: Natural transformation composition
-def vnat_comp_path (a b α β : V) :
+noncomputable def vnat_comp_path (a b α β : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (compV β (compV α (compV a b)))
       (compV (compV β (compV α a)) b) :=
@@ -330,38 +330,38 @@ def vnat_comp_path (a b α β : V) :
     (mk (.vnat_component (compV α a) b β))
 
 -- 40: Tensor unit absorption
-def tensor_unit_absorption (a : V) :
+noncomputable def tensor_unit_absorption (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (tensorV unitV a) unitV) a :=
   (mk (.tensor_unit_right (tensorV unitV a))).trans (mk (.tensor_unit_left a))
 
 -- 41: Adj zigzag with comp
-def adj_zigzag_comp (a b : V) :
+noncomputable def adj_zigzag_comp (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (compV a (compV unitV b)) (compV a b) :=
   .cons (.congrArg (compV a) (.enriched_unit_left b)) (.nil _)
 
 -- 42: Triple unit elimination
-def triple_unit_elim (a : V) :
+noncomputable def triple_unit_elim (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (compV unitV (compV unitV a)) a :=
   (mk (.enriched_unit_left (compV unitV a))).trans (mk (.enriched_unit_left a))
 
 -- 43: Cotensored chain
-def cotensor_comp_chain (a b c : V) :
+noncomputable def cotensor_comp_chain (a b c : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (ihomV a (compV a (compV b c))) (compV (ihomV a a) (compV b c)) :=
   mk (.cotensor_coaction a (compV b c))
 
 -- 44: Monoidal distributivity
-def enriched_monoidal_dist (a b c d : V) :
+noncomputable def enriched_monoidal_dist (a b c d : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (compV a b) (compV c d))
       (compV (tensorV a (compV c d)) (tensorV b (compV c d))) :=
   mk (.enriched_monoidal_coh a b (compV c d))
 
 -- 45: Day conv assoc chain
-def day_conv_assoc_chain (F G H : V → V) (a : V) :
+noncomputable def day_conv_assoc_chain (F G H : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (tensorV (F a) (G a)) (H a))
       (compV (F a) (tensorV (G a) (H a))) :=
@@ -369,33 +369,33 @@ def day_conv_assoc_chain (F G H : V → V) (a : V) :
     (.cons (.day_conv (fun x => F x) (fun x => tensorV (G x) (H x)) a) (.nil _))
 
 -- 46: Weighted colimit via tensor
-def weighted_colimit_tensor (W D : V → V) (a : V) :
+noncomputable def weighted_colimit_tensor (W D : V → V) (a : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV (W a) (D a)) (compV (W a) (D a)) :=
   mk (.weighted_colimit W D a)
 
 -- 47: Change base comp chain
-def change_base_comp_chain (F : V → V) (a b c : V) :
+noncomputable def change_base_comp_chain (F : V → V) (a b c : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (F (compV (compV a b) c)) (compV (F (compV a b)) (F c)) :=
   mk (.change_of_base F (compV a b) c)
 
 -- 48: Tensor action with comp
-def tensor_action_comp (a b c : V) :
+noncomputable def tensor_action_comp (a b c : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (tensorV a (compV a (compV b c)))
       (compV (tensorV a a) (compV b c)) :=
   mk (.tensor_action a (compV b c))
 
 -- 49: Yoneda iso + ihom chain
-def yoneda_ihom_chain (F : V → V) (a b : V) :
+noncomputable def yoneda_ihom_chain (F : V → V) (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (ihomV (tensorV a b) (F (tensorV a b)))
       (ihomV a (ihomV b (F (tensorV a b)))) :=
   mk (.ihom_tensor_adj a b (F (tensorV a b)))
 
 -- 50: Comp then tensor action chain
-def comp_tensor_chain (a b : V) :
+noncomputable def comp_tensor_chain (a b : V) :
     EnrichedPath V compV unitV tensorV ihomV
       (compV (tensorV a a) (compV unitV b))
       (compV (tensorV a a) b) :=

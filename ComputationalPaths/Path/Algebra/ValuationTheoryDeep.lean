@@ -32,7 +32,7 @@ structure NonArchimedean (F : Type u) (Gam : Type v) where
   ultrametric : (x y : F) → Path (v.val (add x y)) (max_op (v.val x) (v.val y))
 
 /-- Ultrametric inequality witness via paths with commutativity -/
-def ultrametric_symm {F : Type u} {Gam : Type v}
+noncomputable def ultrametric_symm {F : Type u} {Gam : Type v}
     (na : NonArchimedean F Gam) (x y : F)
     (comm_add : Path (na.add x y) (na.add y x))
     (max_comm : Path (na.max_op (na.v.val x) (na.v.val y))
@@ -41,22 +41,22 @@ def ultrametric_symm {F : Type u} {Gam : Type v}
   Path.trans (na.ultrametric x y) max_comm
 
 -- Def 1: Valuation of zero is canonical
-def val_zero_canonical {F : Type u} {Gam : Type v}
+noncomputable def val_zero_canonical {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) : Path (v.val v.zero_elem) v.gam_zero :=
   v.val_zero
 
 -- Def 2: Valuation of one is canonical
-def val_one_canonical {F : Type u} {Gam : Type v}
+noncomputable def val_one_canonical {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) : Path (v.val v.one_elem) v.gam_one :=
   v.val_one
 
 -- Def 3: Double symmetry of valuation zero
-def val_zero_symm_symm {F : Type u} {Gam : Type v}
+noncomputable def val_zero_symm_symm {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) : Path (v.val v.zero_elem) v.gam_zero :=
   Path.symm (Path.symm v.val_zero)
 
 -- Def 4: Ultrametric via transitivity
-def ultrametric_trans {F : Type u} {Gam : Type v}
+noncomputable def ultrametric_trans {F : Type u} {Gam : Type v}
     (na : NonArchimedean F Gam)
     (x y z : F)
     : Path (na.v.val (na.add (na.add x y) z)) (na.max_op (na.v.val (na.add x y)) (na.v.val z)) :=
@@ -87,12 +87,12 @@ structure ResidueField (F : Type u) (Gam : Type v) (k : Type w) where
     Path (ring.v.val x) (ring.v.val y) → Path (proj x) (proj y)
 
 -- Def 5: Valuation ring contains one
-def valring_contains_one {F : Type u} {Gam : Type v}
+noncomputable def valring_contains_one {F : Type u} {Gam : Type v}
     (vr : ValuationRing F Gam) : Path (vr.v.val vr.v.one_elem) vr.v.gam_one :=
   vr.v.val_one
 
 -- Def 6: Projection compatibility is symmetric
-def proj_compat_symm {F : Type u} {Gam : Type v} {k : Type w}
+noncomputable def proj_compat_symm {F : Type u} {Gam : Type v} {k : Type w}
     (rf : ResidueField F Gam k) (x y : F)
     (hx : rf.ring.mem x) (hy : rf.ring.mem y)
     (p : Path (rf.ring.v.val x) (rf.ring.v.val y))
@@ -100,7 +100,7 @@ def proj_compat_symm {F : Type u} {Gam : Type v} {k : Type w}
   Path.symm (rf.proj_compat x y hx hy p)
 
 -- Def 7: Projection transitivity chain
-def proj_trans {F : Type u} {Gam : Type v} {k : Type w}
+noncomputable def proj_trans {F : Type u} {Gam : Type v} {k : Type w}
     (rf : ResidueField F Gam k) (x y z : F)
     (hx : rf.ring.mem x) (hy : rf.ring.mem y) (hz : rf.ring.mem z)
     (p1 : Path (rf.ring.v.val x) (rf.ring.v.val y))
@@ -120,23 +120,23 @@ structure Completion (F : Type u) (Gam : Type v) (Fhat : Type w) where
   embed_compat : (x : F) → Path (vhat.val (embed x)) (v.val x)
 
 -- Def 8: Embedding preserves zero valuation
-def embed_zero {F : Type u} {Gam : Type v} {Fhat : Type w}
+noncomputable def embed_zero {F : Type u} {Gam : Type v} {Fhat : Type w}
     (c : Completion F Gam Fhat) : Path (c.vhat.val (c.embed c.v.zero_elem)) c.v.gam_zero :=
   Path.trans (c.embed_compat c.v.zero_elem) c.v.val_zero
 
 -- Def 9: Embedding preserves one valuation
-def embed_one {F : Type u} {Gam : Type v} {Fhat : Type w}
+noncomputable def embed_one {F : Type u} {Gam : Type v} {Fhat : Type w}
     (c : Completion F Gam Fhat) : Path (c.vhat.val (c.embed c.v.one_elem)) c.v.gam_one :=
   Path.trans (c.embed_compat c.v.one_elem) c.v.val_one
 
 -- Def 10: Double embedding compat
-def embed_compat_double {F : Type u} {Gam : Type v} {Fhat : Type w}
+noncomputable def embed_compat_double {F : Type u} {Gam : Type v} {Fhat : Type w}
     (c : Completion F Gam Fhat) (x : F)
     : Path (c.vhat.val (c.embed x)) (c.v.val x) :=
   Path.symm (Path.symm (c.embed_compat x))
 
 -- Def 11: Embedding compat chain
-def embed_compat_chain {F : Type u} {Gam : Type v} {Fhat : Type w}
+noncomputable def embed_compat_chain {F : Type u} {Gam : Type v} {Fhat : Type w}
     (c : Completion F Gam Fhat) (x y : F)
     (p : Path (c.v.val x) (c.v.val y))
     : Path (c.vhat.val (c.embed x)) (c.vhat.val (c.embed y)) :=
@@ -162,15 +162,15 @@ structure PAdicAbsVal where
   abs_p : (Σ' (k : Nat), Path (abs_val pv.p) k)
 
 -- Def 12: p-adic valuation of 1 is zero
-def padic_val_one (pv : PAdicVal) : Path (pv.vp 1) 0 :=
+noncomputable def padic_val_one (pv : PAdicVal) : Path (pv.vp 1) 0 :=
   pv.vp_one
 
 -- Def 13: p-adic valuation of p is one
-def padic_val_p (pv : PAdicVal) : Path (pv.vp pv.p) 1 :=
+noncomputable def padic_val_p (pv : PAdicVal) : Path (pv.vp pv.p) 1 :=
   pv.vp_p
 
 -- Def 14: v_p(1) = 0 via double symmetry
-def padic_val_one_symm (pv : PAdicVal) : Path (pv.vp 1) 0 :=
+noncomputable def padic_val_one_symm (pv : PAdicVal) : Path (pv.vp 1) 0 :=
   Path.symm (Path.symm pv.vp_one)
 
 /-- Multiplicativity: v_p(ab) = v_p(a) + v_p(b) -/
@@ -180,20 +180,20 @@ structure PAdicMultiplicative extends PAdicVal where
   multiplicative : (a b : Nat) → Path (vp (mul a b)) (add_nat (vp a) (vp b))
 
 -- Def 15: Multiplicativity at (1, n)
-def padic_mult_one_left (pm : PAdicMultiplicative)
+noncomputable def padic_mult_one_left (pm : PAdicMultiplicative)
     (n : Nat)
     : Path (pm.vp (pm.mul 1 n)) (pm.add_nat (pm.vp 1) (pm.vp n)) :=
   pm.multiplicative 1 n
 
 -- Def 16: Chain from multiplicativity
-def padic_mult_chain (pm : PAdicMultiplicative)
+noncomputable def padic_mult_chain (pm : PAdicMultiplicative)
     (a b : Nat) (c : Nat)
     (hc : Path (pm.add_nat (pm.vp a) (pm.vp b)) c)
     : Path (pm.vp (pm.mul a b)) c :=
   Path.trans (pm.multiplicative a b) hc
 
 -- Def 17: Multiplicativity symmetry
-def padic_mult_symm (pm : PAdicMultiplicative)
+noncomputable def padic_mult_symm (pm : PAdicMultiplicative)
     (a b : Nat)
     : Path (pm.add_nat (pm.vp a) (pm.vp b)) (pm.vp (pm.mul a b)) :=
   Path.symm (pm.multiplicative a b)
@@ -220,12 +220,12 @@ structure PAdicNumbers where
     (Σ' (k : Nat), Path (val (embed x)) k)
 
 -- Def 18: Projection coherence
-def proj_coherence (zp : PAdicIntegers) (n : Nat) (x : zp.carrier)
+noncomputable def proj_coherence (zp : PAdicIntegers) (n : Nat) (x : zp.carrier)
     : (Σ' (k : Nat), Path (zp.proj n x) k) :=
   zp.compat n x
 
 -- Def 19: Embedding valuation existence
-def embed_val_exists (qp : PAdicNumbers) (x : qp.zp.carrier)
+noncomputable def embed_val_exists (qp : PAdicNumbers) (x : qp.zp.carrier)
     : (Σ' (k : Nat), Path (qp.val (qp.embed x)) k) :=
   qp.embed_val x
 
@@ -257,27 +257,27 @@ structure HenselIteration (R : Type u) where
     (Σ' (k : Nat), Path (val_fn (poly.eval (seq n))) k)
 
 -- Def 20: Hensel lift self-coherence
-def hensel_self_coherent {R : Type u} (hl : HenselLift R)
+noncomputable def hensel_self_coherent {R : Type u} (hl : HenselLift R)
     : Path (hl.poly.eval hl.lifted_root) (hl.poly.eval hl.lifted_root) :=
   hl.improvement
 
 -- Def 21: Hensel lift self-coherence via refl
-def hensel_refl {R : Type u} (hl : HenselLift R)
+noncomputable def hensel_refl {R : Type u} (hl : HenselLift R)
     : Path (hl.poly.eval hl.lifted_root) (hl.poly.eval hl.lifted_root) :=
   Path.refl (hl.poly.eval hl.lifted_root)
 
 -- Def 22: Hensel iteration convergence at step n
-def hensel_conv_step {R : Type u} (hi : HenselIteration R) (n : Nat)
+noncomputable def hensel_conv_step {R : Type u} (hi : HenselIteration R) (n : Nat)
     : (Σ' (k : Nat), Path (hi.val_fn (hi.poly.eval (hi.seq n))) k) :=
   hi.convergence n
 
 -- Def 23: Hensel lift quality witness
-def hensel_lift_witness {R : Type u} (hl : HenselLift R)
+noncomputable def hensel_lift_witness {R : Type u} (hl : HenselLift R)
     : (Σ' (k : Nat), Path (hl.val_fn (hl.poly.eval hl.lifted_root)) k) :=
   hl.lift_quality
 
 -- Def 24: Hensel congrArg on polynomial
-def hensel_congrArg {R : Type u} (hl : HenselLift R)
+noncomputable def hensel_congrArg {R : Type u} (hl : HenselLift R)
     (x y : R) (p : Path x y)
     : Path (hl.poly.eval x) (hl.poly.eval y) :=
   Path.congrArg hl.poly.eval p
@@ -305,31 +305,31 @@ structure FundamentalIdentity where
   identity : Path (mul_ef e f) n
 
 -- Def 25: Ramification embedding compatibility
-def ram_embed_compat {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ram_embed_compat {F : Type u} {E : Type v} {Gam : Type w}
     (rd : RamificationData F E Gam) (x : F)
     : Path (rd.vE.val (rd.embed x)) (rd.vF.val x) :=
   rd.embed_compat x
 
 -- Def 26: Embedding compat symmetry
-def ram_embed_symm {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ram_embed_symm {F : Type u} {E : Type v} {Gam : Type w}
     (rd : RamificationData F E Gam) (x : F)
     : Path (rd.vF.val x) (rd.vE.val (rd.embed x)) :=
   Path.symm (rd.embed_compat x)
 
 -- Def 27: Embedding chain
-def ram_embed_chain {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ram_embed_chain {F : Type u} {E : Type v} {Gam : Type w}
     (rd : RamificationData F E Gam) (x y : F)
     (p : Path (rd.vF.val x) (rd.vF.val y))
     : Path (rd.vE.val (rd.embed x)) (rd.vE.val (rd.embed y)) :=
   Path.trans (rd.embed_compat x) (Path.trans p (Path.symm (rd.embed_compat y)))
 
 -- Def 28: Fundamental identity holds
-def fund_identity (fi : FundamentalIdentity)
+noncomputable def fund_identity (fi : FundamentalIdentity)
     : Path (fi.mul_ef fi.e fi.f) fi.n :=
   fi.identity
 
 -- Def 29: Fundamental identity reversed
-def fund_identity_symm (fi : FundamentalIdentity)
+noncomputable def fund_identity_symm (fi : FundamentalIdentity)
     : Path fi.n (fi.mul_ef fi.e fi.f) :=
   Path.symm fi.identity
 
@@ -352,33 +352,33 @@ structure ExtensionUniqueness (F : Type u) (E : Type v) (Gam : Type w) where
   equiv : (x : F) → Path (ext1.vE.val (ext1.embed x)) (ext2.vE.val (ext2.embed x))
 
 -- Def 30: Extension preserves zero
-def ext_preserves_zero {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ext_preserves_zero {F : Type u} {E : Type v} {Gam : Type w}
     (ve : ValuationExtension F E Gam)
     : Path (ve.vE.val (ve.embed ve.vF.zero_elem)) ve.vF.gam_zero :=
   Path.trans (ve.extends_v ve.vF.zero_elem) ve.vF.val_zero
 
 -- Def 31: Extension preserves one
-def ext_preserves_one {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ext_preserves_one {F : Type u} {E : Type v} {Gam : Type w}
     (ve : ValuationExtension F E Gam)
     : Path (ve.vE.val (ve.embed ve.vF.one_elem)) ve.vF.gam_one :=
   Path.trans (ve.extends_v ve.vF.one_elem) ve.vF.val_one
 
 -- Def 32: Extension coherence chain
-def ext_coherence_chain {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ext_coherence_chain {F : Type u} {E : Type v} {Gam : Type w}
     (ve : ValuationExtension F E Gam) (x y : F)
     (p : Path (ve.vF.val x) (ve.vF.val y))
     : Path (ve.vE.val (ve.embed x)) (ve.vE.val (ve.embed y)) :=
   Path.trans (ve.extends_v x) (Path.trans p (Path.symm (ve.extends_v y)))
 
 -- Def 33: Extension uniqueness at zero
-def ext_unique_zero {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ext_unique_zero {F : Type u} {E : Type v} {Gam : Type w}
     (eu : ExtensionUniqueness F E Gam)
     : Path (eu.ext1.vE.val (eu.ext1.embed eu.ext1.vF.zero_elem))
            (eu.ext2.vE.val (eu.ext2.embed eu.ext1.vF.zero_elem)) :=
   eu.equiv eu.ext1.vF.zero_elem
 
 -- Def 34: Extension uniqueness symmetry
-def ext_unique_symm {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ext_unique_symm {F : Type u} {E : Type v} {Gam : Type w}
     (eu : ExtensionUniqueness F E Gam) (x : F)
     : Path (eu.ext2.vE.val (eu.ext2.embed x)) (eu.ext1.vE.val (eu.ext1.embed x)) :=
   Path.symm (eu.equiv x)
@@ -401,13 +401,13 @@ structure OstrowskiWitness where
   archimedean_case : classification = .archimedean → Path (abs_val 1) 1
 
 -- Def 35: Ostrowski trivial case unit
-def ostrowski_trivial (ow : OstrowskiWitness)
+noncomputable def ostrowski_trivial (ow : OstrowskiWitness)
     (h : ow.classification = .trivial)
     : Path (ow.abs_val 1) 1 :=
   ow.trivial_case h
 
 -- Def 36: Ostrowski archimedean unit
-def ostrowski_archimedean (ow : OstrowskiWitness)
+noncomputable def ostrowski_archimedean (ow : OstrowskiWitness)
     (h : ow.classification = .archimedean)
     : Path (ow.abs_val 1) 1 :=
   ow.archimedean_case h
@@ -442,11 +442,11 @@ structure NPWitness (R : Type u) where
   vertex_vals : List Nat
 
 -- Def 37: Newton point reflexivity
-def newton_pt_refl (p : NewtonPoint) : Path p.index p.index :=
+noncomputable def newton_pt_refl (p : NewtonPoint) : Path p.index p.index :=
   Path.refl p.index
 
 -- Def 38: Newton segment start-end via congrArg
-def newton_seg_index (s : NewtonSegment)
+noncomputable def newton_seg_index (s : NewtonSegment)
     (p : Path s.start_pt s.end_pt)
     : Path s.start_pt.index s.end_pt.index :=
   Path.congrArg NewtonPoint.index p
@@ -463,19 +463,19 @@ structure StrongTriangle (F : Type u) where
   strong_ineq : (x y : F) → Path (val_fn (add x y)) (max_fn (val_fn x) (val_fn y))
 
 -- Def 39: Strong triangle via congrArg
-def strong_tri_congrArg {F : Type u} (st : StrongTriangle F)
+noncomputable def strong_tri_congrArg {F : Type u} (st : StrongTriangle F)
     (x y : F) (comm : Path (st.add x y) (st.add y x))
     : Path (st.val_fn (st.add x y)) (st.val_fn (st.add y x)) :=
   Path.congrArg st.val_fn comm
 
 -- Def 40: Strong triangle chain
-def strong_tri_chain {F : Type u} (st : StrongTriangle F)
+noncomputable def strong_tri_chain {F : Type u} (st : StrongTriangle F)
     (x y : F) (comm : Path (st.add x y) (st.add y x))
     : Path (st.val_fn (st.add x y)) (st.max_fn (st.val_fn y) (st.val_fn x)) :=
   Path.trans (Path.congrArg st.val_fn comm) (st.strong_ineq y x)
 
 -- Def 41: Strong triangle reflexive
-def strong_tri_refl {F : Type u} (st : StrongTriangle F)
+noncomputable def strong_tri_refl {F : Type u} (st : StrongTriangle F)
     (x y : F) : Path (st.val_fn (st.add x y)) (st.val_fn (st.add x y)) :=
   Path.refl (st.val_fn (st.add x y))
 
@@ -491,13 +491,13 @@ structure ValEquiv (F : Type u) (Gam : Type v) where
     PProd (Path (v1.val x) g) (Path (v2.val x) g))
 
 -- Def 42: Valuation equivalence at zero
-def val_equiv_zero {F : Type u} {Gam : Type v}
+noncomputable def val_equiv_zero {F : Type u} {Gam : Type v}
     (ve : ValEquiv F Gam) : (Σ' (g : Gam),
     PProd (Path (ve.v1.val ve.v1.zero_elem) g) (Path (ve.v2.val ve.v1.zero_elem) g)) :=
   ve.equiv_witness ve.v1.zero_elem
 
 -- Def 43: Valuation equivalence at one
-def val_equiv_one {F : Type u} {Gam : Type v}
+noncomputable def val_equiv_one {F : Type u} {Gam : Type v}
     (ve : ValEquiv F Gam) : (Σ' (g : Gam),
     PProd (Path (ve.v1.val ve.v1.one_elem) g) (Path (ve.v2.val ve.v1.one_elem) g)) :=
   ve.equiv_witness ve.v1.one_elem
@@ -516,22 +516,22 @@ structure DiscreteValuation (F : Type u) where
   v_one : Path (v one_elem) 0
 
 -- Def 44: Uniformizer has valuation 1
-def uniformizer_val {F : Type u} (dv : DiscreteValuation F)
+noncomputable def uniformizer_val {F : Type u} (dv : DiscreteValuation F)
     : Path (dv.v dv.uniformizer) 1 :=
   dv.v_uniformizer
 
 -- Def 45: One has valuation 0
-def one_val_discrete {F : Type u} (dv : DiscreteValuation F)
+noncomputable def one_val_discrete {F : Type u} (dv : DiscreteValuation F)
     : Path (dv.v dv.one_elem) 0 :=
   dv.v_one
 
 -- Def 46: Uniformizer val double symm
-def uniformizer_val_symm_symm {F : Type u} (dv : DiscreteValuation F)
+noncomputable def uniformizer_val_symm_symm {F : Type u} (dv : DiscreteValuation F)
     : Path (dv.v dv.uniformizer) 1 :=
   Path.symm (Path.symm dv.v_uniformizer)
 
 -- Def 47: CongrArg on discrete valuation
-def dv_congrArg {F : Type u} (dv : DiscreteValuation F)
+noncomputable def dv_congrArg {F : Type u} (dv : DiscreteValuation F)
     (x y : F) (p : Path x y)
     : Path (dv.v x) (dv.v y) :=
   Path.congrArg dv.v p
@@ -549,7 +549,7 @@ structure CDVR (R : Type u) where
     (n : Nat) → (Σ' (k : Int), Path (dv.v (seq n)) k))
 
 -- Def 48: CDVR completion witness
-def cdvr_complete {R : Type u} (c : CDVR R) (seq : Nat → R)
+noncomputable def cdvr_complete {R : Type u} (c : CDVR R) (seq : Nat → R)
     : (Σ' (lim : R), (n : Nat) → (Σ' (k : Int), Path (c.dv.v (seq n)) k)) :=
   c.complete seq
 
@@ -568,17 +568,17 @@ structure Unramified (F : Type u) (E : Type v) (Gam : Type w) where
   ram_idx_one : Path rd.ram_index 1
 
 -- Def 49: Totally ramified has residue degree 1
-def tot_ram_res_one {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def tot_ram_res_one {F : Type u} {E : Type v} {Gam : Type w}
     (tr : TotallyRamified F E Gam) : Path tr.rd.res_degree 1 :=
   tr.res_deg_one
 
 -- Def 50: Unramified has ramification index 1
-def unram_idx_one {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def unram_idx_one {F : Type u} {E : Type v} {Gam : Type w}
     (ur : Unramified F E Gam) : Path ur.rd.ram_index 1 :=
   ur.ram_idx_one
 
 -- Def 51: Totally ramified res degree double symm
-def tot_ram_symm {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def tot_ram_symm {F : Type u} {E : Type v} {Gam : Type w}
     (tr : TotallyRamified F E Gam) : Path tr.rd.res_degree 1 :=
   Path.symm (Path.symm tr.res_deg_one)
 
@@ -617,12 +617,12 @@ structure InertiaData (Gam : Type u) where
   decomposition : Path (product inertia_size decomp_size) total_group_size
 
 -- Def 53: Inertia decomposition
-def inertia_decomp {Gam : Type u} (id_ : InertiaData Gam)
+noncomputable def inertia_decomp {Gam : Type u} (id_ : InertiaData Gam)
     : Path (id_.product id_.inertia_size id_.decomp_size) id_.total_group_size :=
   id_.decomposition
 
 -- Def 54: Inertia decomposition reversed
-def inertia_decomp_symm {Gam : Type u} (id_ : InertiaData Gam)
+noncomputable def inertia_decomp_symm {Gam : Type u} (id_ : InertiaData Gam)
     : Path id_.total_group_size (id_.product id_.inertia_size id_.decomp_size) :=
   Path.symm id_.decomposition
 
@@ -631,7 +631,7 @@ def inertia_decomp_symm {Gam : Type u} (id_ : InertiaData Gam)
 -- ============================================================================
 
 -- Def 55: Valuation path transitivity chain (3-step)
-def val_path_trans3 {F : Type u} {Gam : Type v}
+noncomputable def val_path_trans3 {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) (a b c d : F)
     (p1 : Path (v.val a) (v.val b))
     (p2 : Path (v.val b) (v.val c))
@@ -640,13 +640,13 @@ def val_path_trans3 {F : Type u} {Gam : Type v}
   Path.trans p1 (Path.trans p2 p3)
 
 -- Def 56: Valuation path with congrArg composition
-def val_congrArg_compose {F : Type u} {Gam : Type v}
+noncomputable def val_congrArg_compose {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) (f : F → F) (x y : F) (p : Path x y)
     : Path (v.val (f x)) (v.val (f y)) :=
   Path.congrArg (fun z => v.val (f z)) p
 
 -- Def 57: Symmetry-transitivity interaction
-def val_symm_trans {F : Type u} {Gam : Type v}
+noncomputable def val_symm_trans {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) (a b c : F)
     (p1 : Path (v.val b) (v.val a))
     (p2 : Path (v.val b) (v.val c))
@@ -654,7 +654,7 @@ def val_symm_trans {F : Type u} {Gam : Type v}
   Path.trans (Path.symm p1) p2
 
 -- Def 58: Four-step valuation chain
-def val_path_trans4 {F : Type u} {Gam : Type v}
+noncomputable def val_path_trans4 {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) (a b c d e : F)
     (p1 : Path (v.val a) (v.val b))
     (p2 : Path (v.val b) (v.val c))
@@ -664,28 +664,28 @@ def val_path_trans4 {F : Type u} {Gam : Type v}
   Path.trans p1 (Path.trans p2 (Path.trans p3 p4))
 
 -- Def 59: CongrArg preserves valuation chains
-def congrArg_val_chain {F : Type u} {Gam : Type v} {Gam2 : Type w}
+noncomputable def congrArg_val_chain {F : Type u} {Gam : Type v} {Gam2 : Type w}
     (v : Valuation F Gam) (f : Gam → Gam2) (x y : F)
     (p : Path (v.val x) (v.val y))
     : Path (f (v.val x)) (f (v.val y)) :=
   Path.congrArg f p
 
 -- Def 60: Double congrArg on valuation
-def double_congrArg_val {F : Type u} {Gam : Type v} {Gam2 : Type w} {Gam3 : Type _}
+noncomputable def double_congrArg_val {F : Type u} {Gam : Type v} {Gam2 : Type w} {Gam3 : Type _}
     (v : Valuation F Gam) (f : Gam → Gam2) (g : Gam2 → Gam3)
     (x y : F) (p : Path x y)
     : Path (g (f (v.val x))) (g (f (v.val y))) :=
   Path.congrArg (fun z => g (f (v.val z))) p
 
 -- Def 61: Valuation extension composed with ramification
-def ext_ram_compose {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ext_ram_compose {F : Type u} {E : Type v} {Gam : Type w}
     (ve : ValuationExtension F E Gam) (x y : F)
     (p : Path x y)
     : Path (ve.vE.val (ve.embed x)) (ve.vE.val (ve.embed y)) :=
   Path.congrArg (fun z => ve.vE.val (ve.embed z)) p
 
 -- Def 62: Extension zero-one path
-def ext_zero_one_path {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def ext_zero_one_path {F : Type u} {E : Type v} {Gam : Type w}
     (ve : ValuationExtension F E Gam)
     (p : Path (ve.vF.val ve.vF.zero_elem) (ve.vF.val ve.vF.one_elem))
     : Path (ve.vE.val (ve.embed ve.vF.zero_elem)) (ve.vE.val (ve.embed ve.vF.one_elem)) :=
@@ -693,7 +693,7 @@ def ext_zero_one_path {F : Type u} {E : Type v} {Gam : Type w}
     (Path.trans p (Path.symm (ve.extends_v ve.vF.one_elem)))
 
 -- Def 63: Refl-trans-symm triangle
-def refl_trans_symm_triangle {A : Type u} (x : A)
+noncomputable def refl_trans_symm_triangle {A : Type u} (x : A)
     : Path x x :=
   Path.trans (Path.refl x) (Path.symm (Path.refl x))
 
@@ -709,7 +709,7 @@ structure LocalField (F : Type u) where
   complete_field : F → (Σ' (lim : F), Path lim lim)
 
 -- Def 64: Local field self-coherence
-def local_field_refl {F : Type u} (lf : LocalField F) (x : F)
+noncomputable def local_field_refl {F : Type u} (lf : LocalField F) (x : F)
     : (Σ' (lim : F), Path lim lim) :=
   lf.complete_field x
 
@@ -724,7 +724,7 @@ structure WittVector (k : Type u) where
   ghost_compat : (n : Nat) → (Σ' (g : k), Path (ghost n) g)
 
 -- Def 65: Witt ghost component
-def witt_ghost {k : Type u} (w : WittVector k) (n : Nat)
+noncomputable def witt_ghost {k : Type u} (w : WittVector k) (n : Nat)
     : (Σ' (g : k), Path (w.ghost n) g) :=
   w.ghost_compat n
 
@@ -739,17 +739,17 @@ structure TeichmullerLift (k : Type u) (R : Type v) where
   section_prop : (a : k) → Path (proj (lift a)) a
 
 -- Def 66: Teichmüller section property
-def teichmuller_section {k : Type u} {R : Type v}
+noncomputable def teichmuller_section {k : Type u} {R : Type v}
     (tl : TeichmullerLift k R) (a : k) : Path (tl.proj (tl.lift a)) a :=
   tl.section_prop a
 
 -- Def 67: Teichmüller section symmetry
-def teichmuller_section_symm {k : Type u} {R : Type v}
+noncomputable def teichmuller_section_symm {k : Type u} {R : Type v}
     (tl : TeichmullerLift k R) (a : k) : Path a (tl.proj (tl.lift a)) :=
   Path.symm (tl.section_prop a)
 
 -- Def 68: Teichmüller section chain
-def teichmuller_chain {k : Type u} {R : Type v}
+noncomputable def teichmuller_chain {k : Type u} {R : Type v}
     (tl : TeichmullerLift k R) (a b : k)
     (p : Path a b)
     : Path (tl.proj (tl.lift a)) (tl.proj (tl.lift b)) :=
@@ -767,19 +767,19 @@ structure GaloisValAction (F : Type u) (E : Type v) (Gam : Type w) where
   fixes_base : (x : F) → Path (sigma_action (ve.embed x)) (ve.embed x)
 
 -- Def 69: Galois preserves valuation
-def galois_preserves {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def galois_preserves {F : Type u} {E : Type v} {Gam : Type w}
     (ga : GaloisValAction F E Gam) (x : E)
     : Path (ga.ve.vE.val (ga.sigma_action x)) (ga.ve.vE.val x) :=
   ga.preserves_val x
 
 -- Def 70: Galois fixes base
-def galois_fixes {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def galois_fixes {F : Type u} {E : Type v} {Gam : Type w}
     (ga : GaloisValAction F E Gam) (x : F)
     : Path (ga.sigma_action (ga.ve.embed x)) (ga.ve.embed x) :=
   ga.fixes_base x
 
 -- Def 71: Galois fixes base valuation via chain
-def galois_base_val {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def galois_base_val {F : Type u} {E : Type v} {Gam : Type w}
     (ga : GaloisValAction F E Gam) (x : F)
     : Path (ga.ve.vE.val (ga.sigma_action (ga.ve.embed x))) (ga.ve.vF.val x) :=
   Path.trans
@@ -787,7 +787,7 @@ def galois_base_val {F : Type u} {E : Type v} {Gam : Type w}
     (ga.ve.extends_v x)
 
 -- Def 72: Galois preserves valuation symm
-def galois_preserves_symm {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def galois_preserves_symm {F : Type u} {E : Type v} {Gam : Type w}
     (ga : GaloisValAction F E Gam) (x : E)
     : Path (ga.ve.vE.val x) (ga.ve.vE.val (ga.sigma_action x)) :=
   Path.symm (ga.preserves_val x)
@@ -813,25 +813,25 @@ structure NormMap (F : Type u) (E : Type v) (Gam : Type w) where
   norm_compat : (x : E) → Path (ve.vF.val (norm x)) (ve.vE.val x)
 
 -- Def 73: Norm compatibility
-def norm_compat_witness {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def norm_compat_witness {F : Type u} {E : Type v} {Gam : Type w}
     (nm : NormMap F E Gam) (x : E)
     : Path (nm.ve.vF.val (nm.norm x)) (nm.ve.vE.val x) :=
   nm.norm_compat x
 
 -- Def 74: Norm compatibility symmetry
-def norm_compat_symm {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def norm_compat_symm {F : Type u} {E : Type v} {Gam : Type w}
     (nm : NormMap F E Gam) (x : E)
     : Path (nm.ve.vE.val x) (nm.ve.vF.val (nm.norm x)) :=
   Path.symm (nm.norm_compat x)
 
 -- Def 75: Norm of embedded element
-def norm_embed {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def norm_embed {F : Type u} {E : Type v} {Gam : Type w}
     (nm : NormMap F E Gam) (x : F)
     : Path (nm.ve.vF.val (nm.norm (nm.ve.embed x))) (nm.ve.vF.val x) :=
   Path.trans (nm.norm_compat (nm.ve.embed x)) (nm.ve.extends_v x)
 
 -- Def 76: CongrArg on norm
-def norm_congrArg {F : Type u} {E : Type v} {Gam : Type w}
+noncomputable def norm_congrArg {F : Type u} {E : Type v} {Gam : Type w}
     (nm : NormMap F E Gam) (x y : E) (p : Path x y)
     : Path (nm.norm x) (nm.norm y) :=
   Path.congrArg nm.norm p
@@ -841,21 +841,21 @@ def norm_congrArg {F : Type u} {E : Type v} {Gam : Type w}
 -- ============================================================================
 
 -- Def 77: Double valuation congruence
-def double_val_congr {F : Type u} {Gam : Type v}
+noncomputable def double_val_congr {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) (f g : F → F)
     (x : F) (p : Path (f x) (g x))
     : Path (v.val (f x)) (v.val (g x)) :=
   Path.congrArg v.val p
 
 -- Def 78: Triple path composition on valuations
-def triple_val_comp {F : Type u} {Gam : Type v}
+noncomputable def triple_val_comp {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) (a b c d : F)
     (p1 : Path a b) (p2 : Path b c) (p3 : Path c d)
     : Path (v.val a) (v.val d) :=
   Path.congrArg v.val (Path.trans p1 (Path.trans p2 p3))
 
 -- Def 79: Valuation path with symm inside trans
-def val_symm_inside {F : Type u} {Gam : Type v}
+noncomputable def val_symm_inside {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) (a b c : F)
     (p1 : Path (v.val a) (v.val b))
     (p2 : Path (v.val c) (v.val b))
@@ -863,7 +863,7 @@ def val_symm_inside {F : Type u} {Gam : Type v}
   Path.trans p1 (Path.symm p2)
 
 -- Def 80: Full roundtrip path
-def val_roundtrip {F : Type u} {Gam : Type v}
+noncomputable def val_roundtrip {F : Type u} {Gam : Type v}
     (v : Valuation F Gam) (a b : F)
     (p : Path (v.val a) (v.val b))
     : Path (v.val a) (v.val a) :=

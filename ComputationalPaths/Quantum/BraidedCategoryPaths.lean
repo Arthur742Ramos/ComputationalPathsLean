@@ -38,7 +38,7 @@ namespace BraidedCategoryPathData
 variable {Obj : Type u} (B : BraidedCategoryPathData Obj)
 
 /-- Step witness: right-unit normalization for tensorial path transport. -/
-def tensorMap_step {X1 X2 Y1 Y2 : Obj}
+noncomputable def tensorMap_step {X1 X2 Y1 Y2 : Obj}
     (p : Path X1 X2) (q : Path Y1 Y2) :
     Path.Step
       (Path.trans (B.tensorMap p q) (Path.refl (B.tensor X2 Y2)))
@@ -53,7 +53,7 @@ noncomputable def tensorMap_rweq {X1 X2 Y1 Y2 : Obj}
   rweq_of_step (B.tensorMap_step p q)
 
 /-- Step witness: right-unit normalization for braiding naturality. -/
-def braidNaturality_step {X1 X2 Y1 Y2 : Obj}
+noncomputable def braidNaturality_step {X1 X2 Y1 Y2 : Obj}
     (p : Path X1 X2) (q : Path Y1 Y2) :
     Path.Step
       (Path.trans
@@ -84,7 +84,7 @@ noncomputable def braid_cancel_right (X Y : Obj) :
   rweq_cmpA_inv_right (B.braid X Y)
 
 /-- Step witness: right-unit normalization for the hexagon path. -/
-def hexagon_step (X Y Z : Obj) :
+noncomputable def hexagon_step (X Y Z : Obj) :
     Path.Step
       (Path.trans
         (B.hexagonPath X Y Z)

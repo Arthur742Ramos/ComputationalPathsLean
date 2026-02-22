@@ -40,22 +40,22 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.inv : Step α a b → Step α b a
+noncomputable def Step.inv : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.inv (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -63,12 +63,12 @@ def Path.length : Path α a b → Nat
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   eq : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
-def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.eq.trans τ.eq⟩
-def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
+noncomputable def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.eq.symm⟩
-def Cell2.hcomp {p₁ q₁ : Path α a b} {p₂ q₂ : Path α b c}
+noncomputable def Cell2.hcomp {p₁ q₁ : Path α a b} {p₂ q₂ : Path α b c}
     (σ : Cell2 p₁ q₁) (τ : Cell2 p₂ q₂) : Cell2 (p₁.trans p₂) (q₁.trans q₂) :=
   ⟨by rw [σ.eq, τ.eq]⟩
 
@@ -78,12 +78,12 @@ structure Cell3 {α : Type} {a b : α} {p q : Path α a b}
   eq : σ = τ
 
 /-- Left whiskering via congrArg. -/
-def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
+noncomputable def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
     Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (Path.trans r) σ.eq⟩
 
 /-- Right whiskering via congrArg. -/
-def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
+noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.eq⟩
 
@@ -176,13 +176,13 @@ structure Chain2 (α : Type) {a b : α} (p q : Path α a b) where
   cell : Cell2 p q
 
 /-- Boundary map ∂₁: 1-chain → pair of 0-chains (source, target). -/
-def boundary1_src (c : Chain1 α) : Chain0 α := ⟨c.src⟩
-def boundary1_tgt (c : Chain1 α) : Chain0 α := ⟨c.tgt⟩
+noncomputable def boundary1_src (c : Chain1 α) : Chain0 α := ⟨c.src⟩
+noncomputable def boundary1_tgt (c : Chain1 α) : Chain0 α := ⟨c.tgt⟩
 
 /-- Boundary of a 2-chain: difference of the two 1-chains. -/
-def boundary2_lower {p q : Path α a b} (_ : Chain2 α p q) : Chain1 α :=
+noncomputable def boundary2_lower {p q : Path α a b} (_ : Chain2 α p q) : Chain1 α :=
   ⟨a, b, p⟩
-def boundary2_upper {p q : Path α a b} (_ : Chain2 α p q) : Chain1 α :=
+noncomputable def boundary2_upper {p q : Path α a b} (_ : Chain2 α p q) : Chain1 α :=
   ⟨a, b, q⟩
 
 /-- Theorem 15: ∂∂ = 0 — boundary of boundary is trivial.
@@ -197,7 +197,7 @@ theorem boundary_boundary_tgt {p q : Path α a b} (c : Chain2 α p q) :
   rfl
 
 /-- Composition of 1-chains. -/
-def Chain1.comp (c₁ : Chain1 α) (c₂ : Chain1 α) (h : c₁.tgt = c₂.src) : Chain1 α :=
+noncomputable def Chain1.comp (c₁ : Chain1 α) (c₂ : Chain1 α) (h : c₁.tgt = c₂.src) : Chain1 α :=
   ⟨c₁.src, c₂.tgt, c₁.chain.trans (h ▸ c₂.chain)⟩
 
 /-- Theorem 17: boundary source of composition is source of first chain. -/
@@ -224,7 +224,7 @@ structure Boundary1 (α : Type) (a : α) where
   isTrivial : loop = Path.nil a
 
 /-- Every boundary is a cycle (inclusion). -/
-def Boundary1.toCycle (b : Boundary1 α a) : Cycle1 α a :=
+noncomputable def Boundary1.toCycle (b : Boundary1 α a) : Cycle1 α a :=
   ⟨b.loop⟩
 
 /-- Theorem 19: trans of two cycles is a cycle. -/
@@ -244,7 +244,7 @@ theorem boundary_trans_boundary (b₁ b₂ : Boundary1 α a) :
   rfl
 
 /-- Homology class: quotient of cycles by boundaries (propositional). -/
-def HomologyClass (α : Type) (a : α) (c : Cycle1 α a) : Prop :=
+noncomputable def HomologyClass (α : Type) (a : α) (c : Cycle1 α a) : Prop :=
   ∃ b : Boundary1 α a, c.loop = b.loop
 
 /-- Theorem 22: boundary represents the trivial homology class. -/
@@ -267,11 +267,11 @@ structure SquierComplex (α : Type) where
   cells2 : List ((α × α) × (α × α))
 
 /-- Euler characteristic: #V - #E + #F. -/
-def SquierComplex.euler (S : SquierComplex α) : Int :=
+noncomputable def SquierComplex.euler (S : SquierComplex α) : Int :=
   S.cells0.length - S.cells1.length + S.cells2.length
 
 /-- Finite derivation type predicate. -/
-def SquierComplex.finiteDerType (S : SquierComplex α) : Prop :=
+noncomputable def SquierComplex.finiteDerType (S : SquierComplex α) : Prop :=
   S.cells0.length < Nat.succ S.cells0.length ∧
   S.cells1.length < Nat.succ S.cells1.length ∧
   S.cells2.length < Nat.succ S.cells2.length
@@ -304,7 +304,7 @@ theorem euler_add_edge_face (S : SquierComplex α) (e : α × α)
 -- ============================================================
 
 /-- Two paths are homotopic if connected by a 2-cell. -/
-def Homotopic {α : Type} {a b : α} (p q : Path α a b) : Prop :=
+noncomputable def Homotopic {α : Type} {a b : α} (p q : Path α a b) : Prop :=
   Nonempty (Cell2 p q)
 
 /-- Theorem 28: homotopy is reflexive. -/
@@ -359,7 +359,7 @@ structure CriticalResolution (α : Type) (a : α) extends CriticalPair α a wher
   path2 : Path α tgt2 join
 
 /-- The 2-cell generated by a critical pair resolution. -/
-def CriticalResolution.toCell2 (cr : CriticalResolution α a) :
+noncomputable def CriticalResolution.toCell2 (cr : CriticalResolution α a) :
     Cell2 ((Path.single cr.step1).trans cr.path1)
           ((Path.single cr.step1).trans cr.path1) :=
   Cell2.id _
@@ -402,11 +402,11 @@ structure PathSpace (α : Type) (a : α) where
   path : Path α a endpoint
 
 /-- The basepoint of the path space. -/
-def PathSpace.base (a : α) : PathSpace α a :=
+noncomputable def PathSpace.base (a : α) : PathSpace α a :=
   ⟨a, Path.nil a⟩
 
 /-- Extension: extend a path-space element by one more step. -/
-def PathSpace.extend (ps : PathSpace α a) (s : Step α ps.endpoint c) :
+noncomputable def PathSpace.extend (ps : PathSpace α a) (s : Step α ps.endpoint c) :
     PathSpace α a :=
   ⟨c, ps.path.trans (Path.single s)⟩
 
@@ -424,7 +424,7 @@ theorem pathspace_extend_refl (ps : PathSpace α a) :
 
 /-- Transport in path space: given a 2-cell between paths,
     transport the endpoint data. -/
-def PathSpace.transport {p q : Path α a b} (_c : Cell2 p q) :
+noncomputable def PathSpace.transport {p q : Path α a b} (_c : Cell2 p q) :
     PathSpace α a :=
   ⟨b, q⟩
 
@@ -447,7 +447,7 @@ inductive AnickChain (α : Type) : Nat → α → α → Type where
   | cellN : {n : Nat} → AnickChain α (n + 1) a b → Step α b c → AnickChain α (n + 2) a c
 
 /-- Convert any Anick chain to a path. -/
-def AnickChain.toPath : AnickChain α n a b → Path α a b
+noncomputable def AnickChain.toPath : AnickChain α n a b → Path α a b
   | .point a    => Path.nil a
   | .cell1 s    => Path.single s
   | .cellN ch s => ch.toPath.trans (Path.single s)
@@ -482,12 +482,12 @@ theorem anick_cellN_cellN_assoc (ch : AnickChain α (n + 1) a b)
 -- ============================================================
 
 /-- Lifting a function through steps. -/
-def Step.map (f : α → β) : Step α a b → Step β (f a) (f b)
+noncomputable def Step.map (f : α → β) : Step α a b → Step β (f a) (f b)
   | .refl a     => .refl (f a)
   | .rule n a b => .rule n (f a) (f b)
 
 /-- Lifting a function through paths via congrArg. -/
-def Path.map (f : α → β) : Path α a b → Path β (f a) (f b)
+noncomputable def Path.map (f : α → β) : Path α a b → Path β (f a) (f b)
   | .nil a     => .nil (f a)
   | .cons s p  => .cons (Step.map f s) (Path.map f p)
 
@@ -506,7 +506,7 @@ theorem map_trans (f : α → β) (p : Path α a b) (q : Path α b c) :
   | cons s p ih => simp [Path.trans, Path.map, ih]
 
 /-- congrArg lifts 2-cells through mapping (chain map on 2-chains). -/
-def Cell2.mapF (f : α → β) {p q : Path α a b} (σ : Cell2 p q) :
+noncomputable def Cell2.mapF (f : α → β) {p q : Path α a b} (σ : Cell2 p q) :
     Cell2 (Path.map f p) (Path.map f q) :=
   ⟨congrArg (Path.map f) σ.eq⟩
 
@@ -547,7 +547,7 @@ theorem map_preserves_boundary (f : α → β) (b : Boundary1 α a) :
 -- ============================================================
 
 /-- Tietze move Type I: add a vertex, edge, and face. -/
-def SquierComplex.tietzeI (S : SquierComplex α) (v : α)
+noncomputable def SquierComplex.tietzeI (S : SquierComplex α) (v : α)
     (e : α × α) (f : (α × α) × (α × α)) : SquierComplex α :=
   ⟨v :: S.cells0, e :: S.cells1, f :: S.cells2⟩
 
@@ -559,7 +559,7 @@ theorem euler_tietzeI (S : SquierComplex α) (v : α) (e : α × α)
   omega
 
 /-- Tietze move Type II: add a 1-cell and 2-cell (relation + syzergy). -/
-def SquierComplex.tietzeII (S : SquierComplex α)
+noncomputable def SquierComplex.tietzeII (S : SquierComplex α)
     (e : α × α) (f : (α × α) × (α × α)) : SquierComplex α :=
   ⟨S.cells0, e :: S.cells1, f :: S.cells2⟩
 
@@ -591,15 +591,15 @@ structure SubRewriting (α : Type) where
   sub2_le : sub.cells2.length ≤ ambient.cells2.length
 
 /-- Relative chain counts. -/
-def SubRewriting.rel0 (S : SubRewriting α) : Int :=
+noncomputable def SubRewriting.rel0 (S : SubRewriting α) : Int :=
   (S.ambient.cells0.length : Int) - (S.sub.cells0.length : Int)
-def SubRewriting.rel1 (S : SubRewriting α) : Int :=
+noncomputable def SubRewriting.rel1 (S : SubRewriting α) : Int :=
   (S.ambient.cells1.length : Int) - (S.sub.cells1.length : Int)
-def SubRewriting.rel2 (S : SubRewriting α) : Int :=
+noncomputable def SubRewriting.rel2 (S : SubRewriting α) : Int :=
   (S.ambient.cells2.length : Int) - (S.sub.cells2.length : Int)
 
 /-- Relative Euler characteristic. -/
-def SubRewriting.relEuler (S : SubRewriting α) : Int :=
+noncomputable def SubRewriting.relEuler (S : SubRewriting α) : Int :=
   S.rel0 - S.rel1 + S.rel2
 
 /-- Theorem 60: Euler characteristic splits: ambient = sub + relative. -/
@@ -670,7 +670,7 @@ theorem whisker_decomp' {a b c : α}
 -- ============================================================
 
 /-- Contractibility witness: every path space element connects to its path. -/
-def PathSpace.contract (ps : PathSpace α a) :
+noncomputable def PathSpace.contract (ps : PathSpace α a) :
     Cell2 ps.path ps.path :=
   Cell2.id ps.path
 

@@ -29,17 +29,17 @@ inductive AccPath : World → World → Type where
   | cons : {w v u : World} → AccStep w v → AccPath v u → AccPath w u
 
 /-- Concatenation of accessibility paths -/
-def AccPath.append : {w v u : World} → AccPath w v → AccPath v u → AccPath w u
+noncomputable def AccPath.append : {w v u : World} → AccPath w v → AccPath v u → AccPath w u
   | _, _, _, AccPath.nil _, q => q
   | _, _, _, AccPath.cons s p, q => AccPath.cons s (AccPath.append p q)
 
 /-- Reverse an accessibility path -/
-def AccPath.reverse : {w v : World} → AccPath w v → AccPath v w
+noncomputable def AccPath.reverse : {w v : World} → AccPath w v → AccPath v w
   | _, _, AccPath.nil w => AccPath.nil w
   | _, _, AccPath.cons s p => AccPath.append (AccPath.reverse p) (AccPath.cons (AccStep.symm s) (AccPath.nil _))
 
 /-- CongrArg for accessibility paths under a world mapping -/
-def AccStep.mapWorld (f : World → World)
+noncomputable def AccStep.mapWorld (f : World → World)
     (lift : {w v : World} → AccStep w v → AccStep (f w) (f v))
     {w v : World} (s : AccStep w v) : AccStep (f w) (f v) :=
   lift s
@@ -49,22 +49,22 @@ def AccStep.mapWorld (f : World → World)
 -- ============================================================
 
 /-- A modal proposition assigns truth values at worlds -/
-def ModalProp := World → Prop
+noncomputable def ModalProp := World → Prop
 
 /-- Box: necessarily true = true at all accessible worlds -/
-def boxProp (R : World → World → Prop) (φ : ModalProp) : ModalProp :=
+noncomputable def boxProp (R : World → World → Prop) (φ : ModalProp) : ModalProp :=
   fun w => ∀ v, R w v → φ v
 
 /-- Diamond: possibly true = true at some accessible world -/
-def diamondProp (R : World → World → Prop) (φ : ModalProp) : ModalProp :=
+noncomputable def diamondProp (R : World → World → Prop) (φ : ModalProp) : ModalProp :=
   fun w => ∃ v, R w v ∧ φ v
 
 /-- Path-based box: true at all path-reachable worlds -/
-def pathBox (φ : ModalProp) : ModalProp :=
+noncomputable def pathBox (φ : ModalProp) : ModalProp :=
   fun w => ∀ v, Nonempty (AccPath w v) → φ v
 
 /-- Path-based diamond: true at some path-reachable world -/
-def pathDiamond (φ : ModalProp) : ModalProp :=
+noncomputable def pathDiamond (φ : ModalProp) : ModalProp :=
   fun w => ∃ v, Nonempty (AccPath w v) ∧ φ v
 
 -- ============================================================
@@ -72,23 +72,23 @@ def pathDiamond (φ : ModalProp) : ModalProp :=
 -- ============================================================
 
 /-- Reflexive frame: every world accesses itself -/
-def FrameReflexive (R : World → World → Prop) : Prop :=
+noncomputable def FrameReflexive (R : World → World → Prop) : Prop :=
   ∀ w, R w w
 
 /-- Transitive frame -/
-def FrameTransitive (R : World → World → Prop) : Prop :=
+noncomputable def FrameTransitive (R : World → World → Prop) : Prop :=
   ∀ w v u, R w v → R v u → R w u
 
 /-- Symmetric frame -/
-def FrameSymmetric (R : World → World → Prop) : Prop :=
+noncomputable def FrameSymmetric (R : World → World → Prop) : Prop :=
   ∀ w v, R w v → R v w
 
 /-- Euclidean frame -/
-def FrameEuclidean (R : World → World → Prop) : Prop :=
+noncomputable def FrameEuclidean (R : World → World → Prop) : Prop :=
   ∀ w v u, R w v → R w u → R v u
 
 /-- Serial frame -/
-def FrameSerial (R : World → World → Prop) : Prop :=
+noncomputable def FrameSerial (R : World → World → Prop) : Prop :=
   ∀ w, ∃ v, R w v
 
 -- ============================================================
@@ -269,11 +269,11 @@ inductive Since (R : World → World → Prop) (φ ψ : ModalProp) : World → P
   | step : ∀ w v, φ w → R v w → Since R φ ψ v → Since R φ ψ w
 
 /-- Eventually = True Until ψ -/
-def Eventually (R : World → World → Prop) (ψ : ModalProp) : World → Prop :=
+noncomputable def Eventually (R : World → World → Prop) (ψ : ModalProp) : World → Prop :=
   Until R (fun _ => True) ψ
 
 /-- Always = ¬Eventually ¬φ -/
-def Always (R : World → World → Prop) (φ : ModalProp) : World → Prop :=
+noncomputable def Always (R : World → World → Prop) (φ : ModalProp) : World → Prop :=
   fun w => ¬ Eventually R (fun v => ¬ φ v) w
 
 /-- Until is monotone in the goal -/
@@ -313,14 +313,14 @@ theorem since_mono_right (R : World → World → Prop) (φ ψ₁ ψ₂ : ModalP
 -- ============================================================
 
 /-- A program is a relation between worlds -/
-def Program := World → World → Prop
+noncomputable def Program := World → World → Prop
 
 /-- Sequential composition -/
-def Program.seq (α β : Program) : Program :=
+noncomputable def Program.seq (α β : Program) : Program :=
   fun w u => ∃ v, α w v ∧ β v u
 
 /-- Choice -/
-def Program.choice (α β : Program) : Program :=
+noncomputable def Program.choice (α β : Program) : Program :=
   fun w v => α w v ∨ β w v
 
 /-- Iteration (reflexive-transitive closure) -/
@@ -329,15 +329,15 @@ inductive Program.star (α : Program) : Program where
   | step : ∀ w v u, α w v → Program.star α v u → Program.star α w u
 
 /-- Test program -/
-def Program.test (φ : ModalProp) : Program :=
+noncomputable def Program.test (φ : ModalProp) : Program :=
   fun w v => w = v ∧ φ w
 
 /-- Dynamic box: [α]φ -/
-def dynBox (α : Program) (φ : ModalProp) : ModalProp :=
+noncomputable def dynBox (α : Program) (φ : ModalProp) : ModalProp :=
   fun w => ∀ v, α w v → φ v
 
 /-- Dynamic diamond: ⟨α⟩φ -/
-def dynDiamond (α : Program) (φ : ModalProp) : ModalProp :=
+noncomputable def dynDiamond (α : Program) (φ : ModalProp) : ModalProp :=
   fun w => ∃ v, α w v ∧ φ v
 
 /-- [α;β]φ ↔ [α][β]φ -/
@@ -392,7 +392,7 @@ theorem dynDiamond_choice (α β : Program) (φ : ModalProp) (w : World)
 -- ============================================================
 
 /-- Multi-agent box -/
-def multiBox (R : Nat → World → World → Prop) (i : Nat) (φ : ModalProp) : ModalProp :=
+noncomputable def multiBox (R : Nat → World → World → Prop) (i : Nat) (φ : ModalProp) : ModalProp :=
   fun w => ∀ v, R i w v → φ v
 
 /-- Common knowledge: everyone knows, everyone knows everyone knows, etc. -/
@@ -400,13 +400,13 @@ inductive CommonReach (R : Nat → World → World → Prop) (agents : List Nat)
   | refl : ∀ w, CommonReach R agents w w
   | step : ∀ w v u i, i ∈ agents → R i w v → CommonReach R agents v u → CommonReach R agents w u
 
-def CommonReach.trans' {R : Nat → World → World → Prop} {agents : List Nat}
+noncomputable def CommonReach.trans' {R : Nat → World → World → Prop} {agents : List Nat}
     {w v u : World} (h1 : CommonReach R agents w v) (h2 : CommonReach R agents v u) : CommonReach R agents w u := by
   induction h1 with
   | refl => exact h2
   | step w' m _ i hi hR _ ih => exact CommonReach.step w' m u i hi hR (ih h2)
 
-def commonBox (R : Nat → World → World → Prop) (agents : List Nat) (φ : ModalProp) : ModalProp :=
+noncomputable def commonBox (R : Nat → World → World → Prop) (agents : List Nat) (φ : ModalProp) : ModalProp :=
   fun w => ∀ v, CommonReach R agents w v → φ v
 
 /-- Common knowledge implies individual knowledge -/
@@ -426,7 +426,7 @@ theorem common_box_idempotent (R : Nat → World → World → Prop) (agents : L
 -- ============================================================
 
 /-- Equivalence class of worlds under a set of formulas -/
-def worldEquiv (props : List ModalProp) (w v : World) : Prop :=
+noncomputable def worldEquiv (props : List ModalProp) (w v : World) : Prop :=
   ∀ φ, φ ∈ props → (φ w ↔ φ v)
 
 /-- worldEquiv is reflexive -/

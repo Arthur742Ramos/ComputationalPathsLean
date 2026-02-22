@@ -47,18 +47,18 @@ structure PtMor (A B : PtSet.{u}) where
   map_zero : Path (toFun A.zero) B.zero
 
 /-- The zero morphism. -/
-def zeroMor (A B : PtSet.{u}) : PtMor A B where
+noncomputable def zeroMor (A B : PtSet.{u}) : PtMor A B where
   toFun := fun _ => B.zero
   map_zero := Path.refl _
 
 /-- Composition of morphisms. -/
-def PtMor.comp {A B C : PtSet.{u}} (g : PtMor B C) (f : PtMor A B) :
+noncomputable def PtMor.comp {A B C : PtSet.{u}} (g : PtMor B C) (f : PtMor A B) :
     PtMor A C where
   toFun := g.toFun ∘ f.toFun
   map_zero := Path.trans (Path.congrArg g.toFun f.map_zero) g.map_zero
 
 /-- The identity morphism. -/
-def PtMor.id (A : PtSet.{u}) : PtMor A A where
+noncomputable def PtMor.id (A : PtSet.{u}) : PtMor A A where
   toFun := _root_.id
   map_zero := Path.refl _
 
@@ -72,7 +72,7 @@ structure Filtration (n : Nat) where
   incl : ∀ (p : Fin n), PtMor (piece (p.castSucc)) (piece (p.succ))
 
 /-- The total space is the last piece. -/
-def Filtration.total {n : Nat} (F : Filtration.{u} n) : PtSet.{u} :=
+noncomputable def Filtration.total {n : Nat} (F : Filtration.{u} n) : PtSet.{u} :=
   F.piece ⟨n, Nat.lt_succ_of_le (Nat.le_refl n)⟩
 
 /-! ## Spectral Pages -/
@@ -100,7 +100,7 @@ structure SpectralSeq (bound : Nat) where
 /-! ## Construction from a Filtration -/
 
 /-- The E_0 page of the spectral sequence of a filtration. -/
-def e0Page {n : Nat} (F : Filtration.{u} n) (_hn : 0 < n) :
+noncomputable def e0Page {n : Nat} (F : Filtration.{u} n) (_hn : 0 < n) :
     SpectralPage.{u} (n + 1) where
   term := fun p _ => F.piece p
   diff := fun p _ => zeroMor (F.piece p) (F.piece p)
@@ -110,43 +110,43 @@ def e0Page {n : Nat} (F : Filtration.{u} n) (_hn : 0 < n) :
 
 /-- A spectral sequence **degenerates** at page r₀ if all differentials
 on page r₀ and beyond are zero. -/
-def Degenerates (bound : Nat) (ss : SpectralSeq.{u} bound) (r₀ : Nat) : Type u :=
+noncomputable def Degenerates (bound : Nat) (ss : SpectralSeq.{u} bound) (r₀ : Nat) : Type u :=
   ∀ r : Nat, r₀ ≤ r → ∀ (p q : Fin bound) (x : ((ss.page r).term p q).carrier),
     Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero
 
 /-- For a degenerate spectral sequence, all further differentials are trivial. -/
-def convergence_finite (bound : Nat) (ss : SpectralSeq.{u} bound)
+noncomputable def convergence_finite (bound : Nat) (ss : SpectralSeq.{u} bound)
     (hdeg : Degenerates bound ss 0) (r : Nat) :
     ∀ (p q : Fin bound) (x : ((ss.page r).term p q).carrier),
       Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero :=
   hdeg r (Nat.zero_le r)
 
-def convergence_from_degeneration (bound : Nat) (ss : SpectralSeq.{u} bound)
+noncomputable def convergence_from_degeneration (bound : Nat) (ss : SpectralSeq.{u} bound)
     (hdeg : Degenerates bound ss 0) (r : Nat) (p q : Fin bound)
     (x : ((ss.page r).term p q).carrier) :
     Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero :=
   convergence_finite bound ss hdeg r p q x
 
-def degeneration_monotone (bound : Nat) (ss : SpectralSeq.{u} bound)
+noncomputable def degeneration_monotone (bound : Nat) (ss : SpectralSeq.{u} bound)
     {r₀ r₁ : Nat} (hdeg : Degenerates bound ss r₀) (h01 : r₀ ≤ r₁) :
     Degenerates bound ss r₁ := by
   intro r hr p q x
   exact hdeg r (Nat.le_trans h01 hr) p q x
 
-def convergence_at_page (bound : Nat) (ss : SpectralSeq.{u} bound)
+noncomputable def convergence_at_page (bound : Nat) (ss : SpectralSeq.{u} bound)
     {r₀ r : Nat} (hdeg : Degenerates bound ss r₀) (hr : r₀ ≤ r)
     (p q : Fin bound) (x : ((ss.page r).term p q).carrier) :
     Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero :=
   hdeg r hr p q x
 
-def convergence_from_zero_at_page (bound : Nat) (ss : SpectralSeq.{u} bound)
+noncomputable def convergence_from_zero_at_page (bound : Nat) (ss : SpectralSeq.{u} bound)
     (hdeg : Degenerates bound ss 0) (r : Nat) (p q : Fin bound)
     (x : ((ss.page r).term p q).carrier) :
     Path (((ss.page r).diff p q).toFun x) ((ss.page r).term p q).zero :=
   convergence_at_page bound ss hdeg (Nat.zero_le r) p q x
 
 /-- The E_0 page has zero differentials by construction. -/
-def e0Page_diff_zero {n : Nat} (F : Filtration.{u} n) (hn : 0 < n)
+noncomputable def e0Page_diff_zero {n : Nat} (F : Filtration.{u} n) (hn : 0 < n)
     (p q : Fin (n + 1)) (x : ((e0Page F hn).term p q).carrier) :
     Path (((e0Page F hn).diff p q).toFun x) ((e0Page F hn).term p q).zero :=
   Path.refl _
@@ -165,25 +165,25 @@ structure SpectralMorphism {bound : Nat}
       (((F.page r).diff p q).toFun ((maps r p q).toFun x))
 
 /-- The identity spectral morphism. -/
-def SpectralMorphism.id {bound : Nat} (E : SpectralSeq.{u} bound) :
+noncomputable def SpectralMorphism.id {bound : Nat} (E : SpectralSeq.{u} bound) :
     SpectralMorphism E E where
   maps := fun _ p q => PtMor.id ((E.page _).term p q)
   comm_diff := fun _ _ _ _ => Path.refl _
 
-def differential_naturality {bound : Nat} {E F : SpectralSeq.{u} bound}
+noncomputable def differential_naturality {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ : SpectralMorphism E F) (r : Nat) (p q : Fin bound)
     (x : ((E.page r).term p q).carrier) :
     Path ((φ.maps r p q).toFun (((E.page r).diff p q).toFun x))
       (((F.page r).diff p q).toFun ((φ.maps r p q).toFun x)) :=
   φ.comm_diff r p q x
 
-def differential_naturality_zero {bound : Nat} {E F : SpectralSeq.{u} bound}
+noncomputable def differential_naturality_zero {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ : SpectralMorphism E F) (r : Nat) (p q : Fin bound) :
     Path ((φ.maps r p q).toFun ((E.page r).term p q).zero)
       ((F.page r).term p q).zero :=
   (φ.maps r p q).map_zero
 
-def differential_naturality_twice {bound : Nat} {E F : SpectralSeq.{u} bound}
+noncomputable def differential_naturality_twice {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ : SpectralMorphism E F) (r : Nat) (p q : Fin bound)
     (x : ((E.page r).term p q).carrier) :
     Path
@@ -201,7 +201,7 @@ def differential_naturality_twice {bound : Nat} {E F : SpectralSeq.{u} bound}
     (F.page r).dd_zero p q (f.toFun x)
   exact Path.trans h₁ (Path.trans h₂ h₃)
 
-def comparison_on_differential_input {bound : Nat} {E F : SpectralSeq.{u} bound}
+noncomputable def comparison_on_differential_input {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ ψ : SpectralMorphism E F) (r : Nat) (p q : Fin bound)
     (x : ((E.page r).term p q).carrier)
     (hcmp : ∀ y : ((E.page r).term p q).carrier,
@@ -210,7 +210,7 @@ def comparison_on_differential_input {bound : Nat} {E F : SpectralSeq.{u} bound}
       ((ψ.maps r p q).toFun (((E.page r).diff p q).toFun x)) :=
   hcmp (((E.page r).diff p q).toFun x)
 
-def comparison_via_target_differentials {bound : Nat} {E F : SpectralSeq.{u} bound}
+noncomputable def comparison_via_target_differentials {bound : Nat} {E F : SpectralSeq.{u} bound}
     (φ ψ : SpectralMorphism E F) (r : Nat) (p q : Fin bound)
     (x : ((E.page r).term p q).carrier)
     (hcmp : Path (((F.page r).diff p q).toFun ((φ.maps r p q).toFun x))

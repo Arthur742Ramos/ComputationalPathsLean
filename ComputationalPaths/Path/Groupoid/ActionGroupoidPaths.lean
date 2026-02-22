@@ -37,7 +37,7 @@ structure PathAction (PG : PathGroup G) (X : Type v) where
   act_mul : ∀ (g h : G) (x : X), Path (act (PG.mul g h) x) (act g (act h x))
 
 /-- Action by a single element via congrArg. -/
-def actPath {PG : PathGroup G} (A : PathAction PG X)
+noncomputable def actPath {PG : PathGroup G} (A : PathAction PG X)
     (g : G) {x y : X} (p : Path x y) : Path (A.act g x) (A.act g y) :=
   Path.congrArg (A.act g) p
 
@@ -62,18 +62,18 @@ def actPath {PG : PathGroup G} (A : PathAction PG X)
 /-! ## Orbit paths -/
 
 /-- The orbit of x under g gives a path from act(1,x) to x. -/
-def orbitIdentity {PG : PathGroup G} (A : PathAction PG X) (x : X) :
+noncomputable def orbitIdentity {PG : PathGroup G} (A : PathAction PG X) (x : X) :
     Path (A.act PG.one x) x :=
   A.act_one x
 
 /-- Composing group actions corresponds to path composition. -/
-def orbitCompose {PG : PathGroup G} (A : PathAction PG X)
+noncomputable def orbitCompose {PG : PathGroup G} (A : PathAction PG X)
     (g h : G) (x : X) :
     Path (A.act (PG.mul g h) x) (A.act g (A.act h x)) :=
   A.act_mul g h x
 
 /-- Chain of action paths: act(gh,x) → act(g, act(h,x)) → act(g, x) when act(h,x)=x. -/
-def orbitChain {PG : PathGroup G} (A : PathAction PG X)
+noncomputable def orbitChain {PG : PathGroup G} (A : PathAction PG X)
     (g h : G) (x : X) (hfix : Path (A.act h x) x) :
     Path (A.act (PG.mul g h) x) (A.act g x) :=
   Path.trans (A.act_mul g h x) (actPath A g hfix)
@@ -81,7 +81,7 @@ def orbitChain {PG : PathGroup G} (A : PathAction PG X)
 /-! ## Stabilizer paths -/
 
 /-- The stabilizer of x: group elements that fix x (up to path). -/
-def IsStabilizer {PG : PathGroup G} (A : PathAction PG X) (x : X) (g : G) : Prop :=
+noncomputable def IsStabilizer {PG : PathGroup G} (A : PathAction PG X) (x : X) (g : G) : Prop :=
   A.act g x = x
 
 /-- The identity is in the stabilizer. -/
@@ -90,7 +90,7 @@ theorem one_isStabilizer {PG : PathGroup G} (A : PathAction PG X) (x : X) :
   (A.act_one x).proof
 
 /-- Stabilizer element gives a path from act(g,x) to x. -/
-def stabilizerPathOf {PG : PathGroup G} (A : PathAction PG X)
+noncomputable def stabilizerPathOf {PG : PathGroup G} (A : PathAction PG X)
     (x : X) (g : G) (h : IsStabilizer A x g) : Path (A.act g x) x :=
   Path.mk [Step.mk _ _ h] h
 
@@ -108,7 +108,7 @@ structure Equivariant {PG : PathGroup G}
   equivar : ∀ (g : G) (x : X), Path (toFun (A.act g x)) (B.act g (toFun x))
 
 /-- An equivariant map sends paths to paths. -/
-def Equivariant.mapPath {PG : PathGroup G}
+noncomputable def Equivariant.mapPath {PG : PathGroup G}
     {A : PathAction PG X} {B : PathAction PG Y}
     (f : Equivariant A B) {x y : X} (p : Path x y) :
     Path (f.toFun x) (f.toFun y) :=
@@ -136,7 +136,7 @@ def Equivariant.mapPath {PG : PathGroup G}
   simp [Equivariant.mapPath]
 
 /-- Identity equivariant map. -/
-def Equivariant.idEquiv {PG : PathGroup G}
+noncomputable def Equivariant.idEquiv {PG : PathGroup G}
     (A : PathAction PG X) : Equivariant A A where
   toFun := fun x => x
   equivar := fun _ _ => Path.refl _
@@ -148,7 +148,7 @@ def Equivariant.idEquiv {PG : PathGroup G}
   simp [Equivariant.idEquiv, Equivariant.mapPath]
 
 /-- Composition of equivariant maps. -/
-def Equivariant.comp {PG : PathGroup G}
+noncomputable def Equivariant.comp {PG : PathGroup G}
     {A : PathAction PG X} {B : PathAction PG Y}
     {Z : Type w} {C : PathAction PG Z}
     (g : Equivariant B C) (f : Equivariant A B) :
@@ -171,7 +171,7 @@ theorem Equivariant.comp_mapPath {PG : PathGroup G}
 /-! ## Quotient groupoid -/
 
 /-- The orbit relation as a setoid. -/
-def actionSetoid {PG : PathGroup G} (A : PathAction PG X) : Setoid X where
+noncomputable def actionSetoid {PG : PathGroup G} (A : PathAction PG X) : Setoid X where
   r x y := ∃ g : G, A.act g x = y
   iseqv := {
     refl := fun x => ⟨PG.one, (A.act_one x).proof⟩
@@ -211,27 +211,27 @@ theorem act_path_image {PG : PathGroup G} (A : PathAction PG X)
 /-! ## Additional path constructions -/
 
 /-- Group multiplication path: associativity. -/
-def mulAssocPath (PG : PathGroup G) (a b c : G) :
+noncomputable def mulAssocPath (PG : PathGroup G) (a b c : G) :
     Path (PG.mul (PG.mul a b) c) (PG.mul a (PG.mul b c)) :=
   PG.mul_assoc a b c
 
 /-- Left identity path. -/
-def oneMulPath (PG : PathGroup G) (a : G) :
+noncomputable def oneMulPath (PG : PathGroup G) (a : G) :
     Path (PG.mul PG.one a) a :=
   PG.one_mul a
 
 /-- Right identity path. -/
-def mulOnePath (PG : PathGroup G) (a : G) :
+noncomputable def mulOnePath (PG : PathGroup G) (a : G) :
     Path (PG.mul a PG.one) a :=
   PG.mul_one a
 
 /-- Left inverse path. -/
-def invMulPath (PG : PathGroup G) (a : G) :
+noncomputable def invMulPath (PG : PathGroup G) (a : G) :
     Path (PG.mul (PG.inv a) a) PG.one :=
   PG.inv_mul a
 
 /-- Right inverse path. -/
-def mulInvPath (PG : PathGroup G) (a : G) :
+noncomputable def mulInvPath (PG : PathGroup G) (a : G) :
     Path (PG.mul a (PG.inv a)) PG.one :=
   PG.mul_inv a
 

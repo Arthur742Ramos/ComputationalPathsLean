@@ -41,13 +41,13 @@ namespace MonExpr
 variable {α : Type u}
 
 /-- Semantic interpretation: flatten to a list (free monoid). -/
-def eval : MonExpr α → List α
+noncomputable def eval : MonExpr α → List α
   | unit => []
   | atom a => [a]
   | tensor l r => l.eval ++ r.eval
 
 /-- Collect atoms in left-to-right order. -/
-def atoms : MonExpr α → List α
+noncomputable def atoms : MonExpr α → List α
   | unit => []
   | atom a => [a]
   | tensor l r => l.atoms ++ r.atoms
@@ -59,19 +59,19 @@ theorem eval_eq_atoms (e : MonExpr α) : e.eval = e.atoms := by
   | tensor l r ihl ihr => simp [eval, atoms, ihl, ihr]
 
 /-- Size of an expression. -/
-def size : MonExpr α → Nat
+noncomputable def size : MonExpr α → Nat
   | unit => 1
   | atom _ => 1
   | tensor l r => 1 + l.size + r.size
 
 /-- Depth of nesting. -/
-def depth : MonExpr α → Nat
+noncomputable def depth : MonExpr α → Nat
   | unit => 0
   | atom _ => 0
   | tensor l r => 1 + max l.depth r.depth
 
 /-- Right-associated normal form from a list of atoms. -/
-def ofList : List α → MonExpr α
+noncomputable def ofList : List α → MonExpr α
   | [] => unit
   | [a] => atom a
   | a :: rest => tensor (atom a) (ofList rest)
@@ -89,7 +89,7 @@ theorem eval_ofList (xs : List α) : (ofList xs).eval = xs := by
   rw [eval_eq_atoms]; exact atoms_ofList xs
 
 /-- Normalize: flatten to right-associated form. -/
-def normalize (e : MonExpr α) : MonExpr α :=
+noncomputable def normalize (e : MonExpr α) : MonExpr α :=
   ofList e.atoms
 
 /-- Normalization is idempotent. -/
@@ -205,39 +205,39 @@ theorem atoms_preserved {e₁ e₂ : MonExpr α} (p : MonPath α e₁ e₂) :
   exact eval_preserved p
 
 /-- Shorthand: single associator step forward. -/
-def assocFwd (a b c : MonExpr α) :
+noncomputable def assocFwd (a b c : MonExpr α) :
     MonPath α (MonExpr.tensor a (MonExpr.tensor b c))
              (MonExpr.tensor (MonExpr.tensor a b) c) :=
   step (MonStep.assoc_fwd a b c)
 
 /-- Shorthand: single associator step backward. -/
-def assocBwd (a b c : MonExpr α) :
+noncomputable def assocBwd (a b c : MonExpr α) :
     MonPath α (MonExpr.tensor (MonExpr.tensor a b) c)
              (MonExpr.tensor a (MonExpr.tensor b c)) :=
   step (MonStep.assoc_bwd a b c)
 
 /-- Shorthand: left unitor. -/
-def leftUnit (a : MonExpr α) :
+noncomputable def leftUnit (a : MonExpr α) :
     MonPath α (MonExpr.tensor MonExpr.unit a) a :=
   step (MonStep.left_unitor a)
 
 /-- Shorthand: left unitor inverse. -/
-def leftUnitInv (a : MonExpr α) :
+noncomputable def leftUnitInv (a : MonExpr α) :
     MonPath α a (MonExpr.tensor MonExpr.unit a) :=
   step (MonStep.left_unitor_inv a)
 
 /-- Shorthand: right unitor. -/
-def rightUnit (a : MonExpr α) :
+noncomputable def rightUnit (a : MonExpr α) :
     MonPath α (MonExpr.tensor a MonExpr.unit) a :=
   step (MonStep.right_unitor a)
 
 /-- Shorthand: right unitor inverse. -/
-def rightUnitInv (a : MonExpr α) :
+noncomputable def rightUnitInv (a : MonExpr α) :
     MonPath α a (MonExpr.tensor a MonExpr.unit) :=
   step (MonStep.right_unitor_inv a)
 
 /-- Congruence: apply path on left factor. -/
-def congLeft {a a' : MonExpr α} (b : MonExpr α)
+noncomputable def congLeft {a a' : MonExpr α} (b : MonExpr α)
     (p : MonPath α a a') : MonPath α (MonExpr.tensor a b) (MonExpr.tensor a' b) :=
   match p with
   | refl _ => refl _
@@ -246,7 +246,7 @@ def congLeft {a a' : MonExpr α} (b : MonExpr α)
   | symm p => symm (congLeft b p)
 
 /-- Congruence: apply path on right factor. -/
-def congRight (a : MonExpr α) {b b' : MonExpr α}
+noncomputable def congRight (a : MonExpr α) {b b' : MonExpr α}
     (p : MonPath α b b') : MonPath α (MonExpr.tensor a b) (MonExpr.tensor a b') :=
   match p with
   | refl _ => refl _
@@ -255,7 +255,7 @@ def congRight (a : MonExpr α) {b b' : MonExpr α}
   | symm p => symm (congRight a p)
 
 /-- Congruence: apply paths on both factors. -/
-def congBoth {a a' b b' : MonExpr α}
+noncomputable def congBoth {a a' b b' : MonExpr α}
     (p : MonPath α a a') (q : MonPath α b b') :
     MonPath α (MonExpr.tensor a b) (MonExpr.tensor a' b') :=
   trans (congLeft b p) (congRight a' q)
@@ -265,7 +265,7 @@ end MonPath
 /-! ## Semantic Equivalence -/
 
 /-- Two expressions denote the same element of the free monoid. -/
-def SemEq {α : Type u} (e₁ e₂ : MonExpr α) : Prop :=
+noncomputable def SemEq {α : Type u} (e₁ e₂ : MonExpr α) : Prop :=
   e₁.atoms = e₂.atoms
 
 theorem SemEq.rfl {α : Type u} {e : MonExpr α} : SemEq e e := Eq.refl _
@@ -314,7 +314,7 @@ variable {α : Type u} (a b c d : MonExpr α)
 /-- Pentagon path 1 (top-right route):
   `a⊗(b⊗(c⊗d))` → `a⊗((b⊗c)⊗d)` → `(a⊗(b⊗c))⊗d` → `((a⊗b)⊗c)⊗d`
 -/
-def pentagonPath1 :
+noncomputable def pentagonPath1 :
     MonPath α
       (MonExpr.tensor a (MonExpr.tensor b (MonExpr.tensor c d)))
       (MonExpr.tensor (MonExpr.tensor (MonExpr.tensor a b) c) d) :=
@@ -327,7 +327,7 @@ def pentagonPath1 :
 /-- Pentagon path 2 (bottom-left route):
   `a⊗(b⊗(c⊗d))` → `(a⊗b)⊗(c⊗d)` → `((a⊗b)⊗c)⊗d`
 -/
-def pentagonPath2 :
+noncomputable def pentagonPath2 :
     MonPath α
       (MonExpr.tensor a (MonExpr.tensor b (MonExpr.tensor c d)))
       (MonExpr.tensor (MonExpr.tensor (MonExpr.tensor a b) c) d) :=
@@ -356,7 +356,7 @@ section Triangle
 variable {α : Type u} (a b : MonExpr α)
 
 /-- Triangle path 1: `(a⊗I)⊗b` → `a⊗(I⊗b)` → `a⊗b` -/
-def trianglePath1 :
+noncomputable def trianglePath1 :
     MonPath α
       (MonExpr.tensor (MonExpr.tensor a MonExpr.unit) b)
       (MonExpr.tensor a b) :=
@@ -365,7 +365,7 @@ def trianglePath1 :
     (MonPath.congRight a (MonPath.leftUnit b))
 
 /-- Triangle path 2: `(a⊗I)⊗b` → `a⊗b` via right unitor on left. -/
-def trianglePath2 :
+noncomputable def trianglePath2 :
     MonPath α
       (MonExpr.tensor (MonExpr.tensor a MonExpr.unit) b)
       (MonExpr.tensor a b) :=
@@ -391,13 +391,13 @@ section StructuralPaths
 variable {α : Type u}
 
 /-- Double associator: `a⊗(b⊗(c⊗d))` → `((a⊗b)⊗c)⊗d`. -/
-def doubleAssocFwd (a b c d : MonExpr α) :
+noncomputable def doubleAssocFwd (a b c d : MonExpr α) :
     MonPath α
       (MonExpr.tensor a (MonExpr.tensor b (MonExpr.tensor c d)))
       (MonExpr.tensor (MonExpr.tensor (MonExpr.tensor a b) c) d) :=
   pentagonPath2 a b c d
 
-def doubleAssocBwd (a b c d : MonExpr α) :
+noncomputable def doubleAssocBwd (a b c d : MonExpr α) :
     MonPath α
       (MonExpr.tensor (MonExpr.tensor (MonExpr.tensor a b) c) d)
       (MonExpr.tensor a (MonExpr.tensor b (MonExpr.tensor c d))) :=
@@ -409,11 +409,11 @@ theorem doubleAssoc_roundtrip (a b c d : MonExpr α) :
   Subsingleton.elim _ _
 
 /-- Unit absorption left: `I⊗(I⊗a)` → `a`. -/
-def unitAbsorbLeft (a : MonExpr α) :
+noncomputable def unitAbsorbLeft (a : MonExpr α) :
     MonPath α (MonExpr.tensor MonExpr.unit (MonExpr.tensor MonExpr.unit a)) a :=
   MonPath.trans (MonPath.leftUnit _) (MonPath.leftUnit a)
 
-def unitAbsorbLeft' (a : MonExpr α) :
+noncomputable def unitAbsorbLeft' (a : MonExpr α) :
     MonPath α (MonExpr.tensor MonExpr.unit (MonExpr.tensor MonExpr.unit a)) a :=
   MonPath.trans
     (MonPath.congRight MonExpr.unit (MonPath.leftUnit a))
@@ -424,12 +424,12 @@ theorem unitAbsorb_coherent (a : MonExpr α) :
   Subsingleton.elim _ _
 
 /-- Unit absorption right: `(a⊗I)⊗I` → `a`. -/
-def unitAbsorbRight (a : MonExpr α) :
+noncomputable def unitAbsorbRight (a : MonExpr α) :
     MonPath α (MonExpr.tensor (MonExpr.tensor a MonExpr.unit) MonExpr.unit) a :=
   MonPath.trans (MonPath.rightUnit _) (MonPath.rightUnit a)
 
 /-- Five-fold reassociation: `((((a⊗b)⊗c)⊗d)⊗e)` → `a⊗(b⊗(c⊗(d⊗e)))`. -/
-def assoc5 (a b c d e : MonExpr α) :
+noncomputable def assoc5 (a b c d e : MonExpr α) :
     MonPath α
       (MonExpr.tensor (MonExpr.tensor (MonExpr.tensor (MonExpr.tensor a b) c) d) e)
       (MonExpr.tensor a (MonExpr.tensor b (MonExpr.tensor c (MonExpr.tensor d e)))) :=
@@ -439,7 +439,7 @@ def assoc5 (a b c d e : MonExpr α) :
       (MonPath.assocBwd (MonExpr.tensor a b) c (MonExpr.tensor d e))
       (MonPath.assocBwd a b (MonExpr.tensor c (MonExpr.tensor d e))))
 
-def assoc5' (a b c d e : MonExpr α) :
+noncomputable def assoc5' (a b c d e : MonExpr α) :
     MonPath α
       (MonExpr.tensor (MonExpr.tensor (MonExpr.tensor (MonExpr.tensor a b) c) d) e)
       (MonExpr.tensor a (MonExpr.tensor b (MonExpr.tensor c (MonExpr.tensor d e)))) :=
@@ -484,27 +484,27 @@ namespace BraidPath
 
 variable {α : Type u}
 
-def braidSwap (a b : MonExpr α) :
+noncomputable def braidSwap (a b : MonExpr α) :
     BraidPath α (MonExpr.tensor a b) (MonExpr.tensor b a) :=
   step (BraidStep.braid a b)
 
-def ofMonPath {e₁ e₂ : MonExpr α} : MonPath α e₁ e₂ → BraidPath α e₁ e₂
+noncomputable def ofMonPath {e₁ e₂ : MonExpr α} : MonPath α e₁ e₂ → BraidPath α e₁ e₂
   | MonPath.refl e => refl e
   | MonPath.step s => step (BraidStep.ofMon s)
   | MonPath.trans p q => trans (ofMonPath p) (ofMonPath q)
   | MonPath.symm p => symm (ofMonPath p)
 
-def assocFwd (a b c : MonExpr α) :
+noncomputable def assocFwd (a b c : MonExpr α) :
     BraidPath α (MonExpr.tensor a (MonExpr.tensor b c))
                (MonExpr.tensor (MonExpr.tensor a b) c) :=
   ofMonPath (MonPath.assocFwd a b c)
 
-def assocBwd (a b c : MonExpr α) :
+noncomputable def assocBwd (a b c : MonExpr α) :
     BraidPath α (MonExpr.tensor (MonExpr.tensor a b) c)
                (MonExpr.tensor a (MonExpr.tensor b c)) :=
   ofMonPath (MonPath.assocBwd a b c)
 
-def congLeft {a a' : MonExpr α} (b : MonExpr α)
+noncomputable def congLeft {a a' : MonExpr α} (b : MonExpr α)
     (p : BraidPath α a a') :
     BraidPath α (MonExpr.tensor a b) (MonExpr.tensor a' b) :=
   match p with
@@ -513,7 +513,7 @@ def congLeft {a a' : MonExpr α} (b : MonExpr α)
   | trans p q => trans (congLeft b p) (congLeft b q)
   | symm p => symm (congLeft b p)
 
-def congRight (a : MonExpr α) {b b' : MonExpr α}
+noncomputable def congRight (a : MonExpr α) {b b' : MonExpr α}
     (p : BraidPath α b b') :
     BraidPath α (MonExpr.tensor a b) (MonExpr.tensor a b') :=
   match p with
@@ -533,7 +533,7 @@ variable {α : Type u} (a b c : MonExpr α)
 /-- Hexagon path 1:
   `a⊗(b⊗c)` → `(a⊗b)⊗c` → `c⊗(a⊗b)` → `(c⊗a)⊗b`
 -/
-def hexagonPath1 :
+noncomputable def hexagonPath1 :
     BraidPath α
       (MonExpr.tensor a (MonExpr.tensor b c))
       (MonExpr.tensor (MonExpr.tensor c a) b) :=
@@ -546,7 +546,7 @@ def hexagonPath1 :
 /-- Hexagon path 2:
   `a⊗(b⊗c)` → `a⊗(c⊗b)` → `(a⊗c)⊗b` → `(c⊗a)⊗b`
 -/
-def hexagonPath2 :
+noncomputable def hexagonPath2 :
     BraidPath α
       (MonExpr.tensor a (MonExpr.tensor b c))
       (MonExpr.tensor (MonExpr.tensor c a) b) :=
@@ -608,13 +608,13 @@ variable {α : Type u}
 
 open ComputationalPaths in
 /-- Embed a `MonPath` as a computational `Path` on evaluations. -/
-def toCompPath {e₁ e₂ : MonExpr α} (p : MonPath α e₁ e₂) :
+noncomputable def toCompPath {e₁ e₂ : MonExpr α} (p : MonPath α e₁ e₂) :
     ComputationalPaths.Path (e₁.eval) (e₂.eval) :=
   ⟨[], p.eval_preserved⟩
 
 open ComputationalPaths in
 /-- Embed a `MonStep` as a computational `Path`. -/
-def stepToCompPath {e₁ e₂ : MonExpr α} (s : MonStep α e₁ e₂) :
+noncomputable def stepToCompPath {e₁ e₂ : MonExpr α} (s : MonStep α e₁ e₂) :
     ComputationalPaths.Path (e₁.eval) (e₂.eval) :=
   ⟨[⟨e₁.eval, e₂.eval, s.eval_preserved⟩], s.eval_preserved⟩
 
@@ -647,13 +647,13 @@ theorem unitor_coherence_unit :
   Subsingleton.elim _ _
 
 /-- Associator-unitor interaction: two routes from `(a⊗I)⊗I` to `a`. -/
-def assocUnitorPath (a : MonExpr α) :
+noncomputable def assocUnitorPath (a : MonExpr α) :
     MonPath α
       (MonExpr.tensor (MonExpr.tensor a MonExpr.unit) MonExpr.unit)
       a :=
   MonPath.trans (MonPath.rightUnit _) (MonPath.rightUnit a)
 
-def assocUnitorPath' (a : MonExpr α) :
+noncomputable def assocUnitorPath' (a : MonExpr α) :
     MonPath α
       (MonExpr.tensor (MonExpr.tensor a MonExpr.unit) MonExpr.unit)
       a :=
@@ -669,17 +669,17 @@ theorem assocUnitor_coherent (a : MonExpr α) :
   Subsingleton.elim _ _
 
 /-- Three paths for `I⊗(a⊗I)` → `a`. -/
-def unitSandwich1 (a : MonExpr α) :
+noncomputable def unitSandwich1 (a : MonExpr α) :
     MonPath α (MonExpr.tensor MonExpr.unit (MonExpr.tensor a MonExpr.unit)) a :=
   MonPath.trans (MonPath.leftUnit _) (MonPath.rightUnit a)
 
-def unitSandwich2 (a : MonExpr α) :
+noncomputable def unitSandwich2 (a : MonExpr α) :
     MonPath α (MonExpr.tensor MonExpr.unit (MonExpr.tensor a MonExpr.unit)) a :=
   MonPath.trans
     (MonPath.congRight MonExpr.unit (MonPath.rightUnit a))
     (MonPath.leftUnit a)
 
-def unitSandwich3 (a : MonExpr α) :
+noncomputable def unitSandwich3 (a : MonExpr α) :
     MonPath α (MonExpr.tensor MonExpr.unit (MonExpr.tensor a MonExpr.unit)) a :=
   MonPath.trans
     (MonPath.assocFwd MonExpr.unit a MonExpr.unit)
@@ -788,13 +788,13 @@ section PathAlgebra
 variable {α : Type u}
 
 /-- Horizontal composition of paths (tensor). -/
-def hcomp {a a' b b' : MonExpr α}
+noncomputable def hcomp {a a' b b' : MonExpr α}
     (p : MonPath α a a') (q : MonPath α b b') :
     MonPath α (MonExpr.tensor a b) (MonExpr.tensor a' b') :=
   MonPath.congBoth p q
 
 /-- Vertical composition = path composition. -/
-def vcomp {e₁ e₂ e₃ : MonExpr α}
+noncomputable def vcomp {e₁ e₂ e₃ : MonExpr α}
     (p : MonPath α e₁ e₂) (q : MonPath α e₂ e₃) : MonPath α e₁ e₃ :=
   MonPath.trans p q
 
@@ -831,7 +831,7 @@ section Decidability
 variable {α : Type u} [DecidableEq α]
 
 /-- SemEq is decidable. -/
-instance semEqDecidable (e₁ e₂ : MonExpr α) : Decidable (SemEq e₁ e₂) :=
+noncomputable instance semEqDecidable (e₁ e₂ : MonExpr α) : Decidable (SemEq e₁ e₂) :=
   inferInstanceAs (Decidable (e₁.atoms = e₂.atoms))
 
 /-- Two expressions are semantically equivalent iff they have the same normal form. -/
@@ -907,49 +907,49 @@ section Associahedron
 variable {α : Type u}
 
 /-- Three atoms: two parenthesizations. -/
-def stasheff3_left (a b c : MonExpr α) :=
+noncomputable def stasheff3_left (a b c : MonExpr α) :=
   MonExpr.tensor (MonExpr.tensor a b) c
 
-def stasheff3_right (a b c : MonExpr α) :=
+noncomputable def stasheff3_right (a b c : MonExpr α) :=
   MonExpr.tensor a (MonExpr.tensor b c)
 
-def stasheff3_path (a b c : MonExpr α) :
+noncomputable def stasheff3_path (a b c : MonExpr α) :
     MonPath α (stasheff3_left a b c) (stasheff3_right a b c) :=
   MonPath.assocBwd a b c
 
 /-- Four atoms: five parenthesizations forming the pentagon. -/
-def stasheff4_1 (a b c d : MonExpr α) :=
+noncomputable def stasheff4_1 (a b c d : MonExpr α) :=
   MonExpr.tensor (MonExpr.tensor (MonExpr.tensor a b) c) d
 
-def stasheff4_2 (a b c d : MonExpr α) :=
+noncomputable def stasheff4_2 (a b c d : MonExpr α) :=
   MonExpr.tensor (MonExpr.tensor a (MonExpr.tensor b c)) d
 
-def stasheff4_3 (a b c d : MonExpr α) :=
+noncomputable def stasheff4_3 (a b c d : MonExpr α) :=
   MonExpr.tensor a (MonExpr.tensor (MonExpr.tensor b c) d)
 
-def stasheff4_4 (a b c d : MonExpr α) :=
+noncomputable def stasheff4_4 (a b c d : MonExpr α) :=
   MonExpr.tensor a (MonExpr.tensor b (MonExpr.tensor c d))
 
-def stasheff4_5 (a b c d : MonExpr α) :=
+noncomputable def stasheff4_5 (a b c d : MonExpr α) :=
   MonExpr.tensor (MonExpr.tensor a b) (MonExpr.tensor c d)
 
-def stasheff4_e12 (a b c d : MonExpr α) :
+noncomputable def stasheff4_e12 (a b c d : MonExpr α) :
     MonPath α (stasheff4_1 a b c d) (stasheff4_2 a b c d) :=
   MonPath.congLeft d (MonPath.assocBwd a b c)
 
-def stasheff4_e23 (a b c d : MonExpr α) :
+noncomputable def stasheff4_e23 (a b c d : MonExpr α) :
     MonPath α (stasheff4_2 a b c d) (stasheff4_3 a b c d) :=
   MonPath.assocBwd a (MonExpr.tensor b c) d
 
-def stasheff4_e34 (a b c d : MonExpr α) :
+noncomputable def stasheff4_e34 (a b c d : MonExpr α) :
     MonPath α (stasheff4_3 a b c d) (stasheff4_4 a b c d) :=
   MonPath.congRight a (MonPath.assocBwd b c d)
 
-def stasheff4_e15 (a b c d : MonExpr α) :
+noncomputable def stasheff4_e15 (a b c d : MonExpr α) :
     MonPath α (stasheff4_1 a b c d) (stasheff4_5 a b c d) :=
   MonPath.assocBwd (MonExpr.tensor a b) c d
 
-def stasheff4_e54 (a b c d : MonExpr α) :
+noncomputable def stasheff4_e54 (a b c d : MonExpr α) :
     MonPath α (stasheff4_5 a b c d) (stasheff4_4 a b c d) :=
   MonPath.assocBwd a b (MonExpr.tensor c d)
 
@@ -974,7 +974,7 @@ section FunctorCoherence
 variable {α β : Type u}
 
 /-- A monoidal functor on expressions. -/
-def mapExpr (f : α → β) : MonExpr α → MonExpr β
+noncomputable def mapExpr (f : α → β) : MonExpr α → MonExpr β
   | MonExpr.unit => MonExpr.unit
   | MonExpr.atom a => MonExpr.atom (f a)
   | MonExpr.tensor l r => MonExpr.tensor (mapExpr f l) (mapExpr f r)
@@ -1023,20 +1023,20 @@ section Examples
 
 abbrev NExpr := MonExpr Nat
 
-def ex_left : NExpr :=
+noncomputable def ex_left : NExpr :=
   MonExpr.tensor (MonExpr.tensor (MonExpr.atom 1) (MonExpr.atom 2)) (MonExpr.atom 3)
 
-def ex_right : NExpr :=
+noncomputable def ex_right : NExpr :=
   MonExpr.tensor (MonExpr.atom 1) (MonExpr.tensor (MonExpr.atom 2) (MonExpr.atom 3))
 
 theorem ex_eval_eq : ex_left.eval = ex_right.eval := rfl
 theorem ex_normalize_eq : ex_left.normalize = ex_right.normalize := rfl
 
-def ex_path : MonPath Nat ex_left ex_right :=
+noncomputable def ex_path : MonPath Nat ex_left ex_right :=
   MonPath.assocBwd (MonExpr.atom 1) (MonExpr.atom 2) (MonExpr.atom 3)
 
 /-- Alternative path through unit detour. -/
-def ex_path' : MonPath Nat ex_left ex_right :=
+noncomputable def ex_path' : MonPath Nat ex_left ex_right :=
   MonPath.trans
     (MonPath.trans
       (MonPath.congLeft (MonExpr.atom 3)
@@ -1051,24 +1051,24 @@ def ex_path' : MonPath Nat ex_left ex_right :=
 theorem ex_coherent : ex_path.eval_preserved = ex_path'.eval_preserved :=
   Subsingleton.elim _ _
 
-def ex4_left : NExpr :=
+noncomputable def ex4_left : NExpr :=
   MonExpr.tensor
     (MonExpr.tensor (MonExpr.tensor (MonExpr.atom 1) (MonExpr.atom 2)) (MonExpr.atom 3))
     (MonExpr.atom 4)
 
-def ex4_right : NExpr :=
+noncomputable def ex4_right : NExpr :=
   MonExpr.tensor (MonExpr.atom 1)
     (MonExpr.tensor (MonExpr.atom 2)
       (MonExpr.tensor (MonExpr.atom 3) (MonExpr.atom 4)))
 
 theorem ex4_normalize_eq : ex4_left.normalize = ex4_right.normalize := rfl
 
-def ex4_path1 : MonPath Nat ex4_left ex4_right :=
+noncomputable def ex4_path1 : MonPath Nat ex4_left ex4_right :=
   MonPath.trans
     (MonPath.assocBwd (MonExpr.tensor (MonExpr.atom 1) (MonExpr.atom 2)) (MonExpr.atom 3) (MonExpr.atom 4))
     (MonPath.assocBwd (MonExpr.atom 1) (MonExpr.atom 2) _)
 
-def ex4_path2 : MonPath Nat ex4_left ex4_right :=
+noncomputable def ex4_path2 : MonPath Nat ex4_left ex4_right :=
   MonPath.trans
     (MonPath.congLeft (MonExpr.atom 4)
       (MonPath.assocBwd (MonExpr.atom 1) (MonExpr.atom 2) (MonExpr.atom 3)))

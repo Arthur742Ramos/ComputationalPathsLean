@@ -28,23 +28,23 @@ structure ChainMap (C D : ChainComplex) where
   component : Int → Int → Int
   comm : ∀ n x, component (n - 1) (C.diff n x) = D.diff n (component n x)
 
-@[simp] def zeroComplex : ChainComplex where
+@[simp] noncomputable def zeroComplex : ChainComplex where
   obj := fun _ => 0
   diff := fun _ _ => 0
   diff_sq := by intro _ _; rfl
   diff_zero := by intro _; rfl
 
-@[simp] def idMap (C : ChainComplex) : ChainMap C C where
+@[simp] noncomputable def idMap (C : ChainComplex) : ChainMap C C where
   component := fun _ x => x
   comm := by intro _ _; rfl
 
-@[simp] def zeroMap (C D : ChainComplex) : ChainMap C D where
+@[simp] noncomputable def zeroMap (C D : ChainComplex) : ChainMap C D where
   component := fun _ _ => 0
   comm := by
     intro n x
     simp [D.diff_zero]
 
-@[simp] def compMap {A B C : ChainComplex}
+@[simp] noncomputable def compMap {A B C : ChainComplex}
     (f : ChainMap A B) (g : ChainMap B C) : ChainMap A C where
   component := fun n x => g.component n (f.component n x)
   comm := by
@@ -123,7 +123,7 @@ theorem toEq {a b : Int} (s : DerivedStep a b) : a = b := by
   | neg_cancel x => simpa using Int.add_right_neg x
   | neg_neg x => simpa using Int.neg_neg x
 
-def toPath {a b : Int} (s : DerivedStep a b) : Path a b :=
+noncomputable def toPath {a b : Int} (s : DerivedStep a b) : Path a b :=
   Path.stepChain (toEq s)
 
 theorem toPath_toEq {a b : Int} (s : DerivedStep a b) :
@@ -146,7 +146,7 @@ theorem quasiIso_of_true {C D : ChainComplex} (f : ChainMap C D) :
   intro _
   exact ⟨trivial⟩
 
-def quasiIso_id (C : ChainComplex) : QuasiIso (idMap C) :=
+noncomputable def quasiIso_id (C : ChainComplex) : QuasiIso (idMap C) :=
   ⟨trivial⟩
 
 theorem quasiIso_id_apply (C : ChainComplex) : QuasiIso (idMap C) :=
@@ -158,7 +158,7 @@ structure LocalizationWitness (C D : ChainComplex) where
   right : ChainMap roof D
   leftIsQuasi : QuasiIso left
 
-@[simp] def localizationId (C : ChainComplex) : LocalizationWitness C C where
+@[simp] noncomputable def localizationId (C : ChainComplex) : LocalizationWitness C C where
   roof := C
   left := idMap C
   right := idMap C
@@ -174,7 +174,7 @@ theorem localization_left_quasi {C D : ChainComplex}
 @[simp] theorem localizationId_right_component (C : ChainComplex) (n x : Int) :
     (localizationId C).right.component n x = x := rfl
 
-def localizationRoofLoop {C D : ChainComplex} (L : LocalizationWitness C D) :
+noncomputable def localizationRoofLoop {C D : ChainComplex} (L : LocalizationWitness C D) :
     Path L.roof L.roof :=
   Path.trans (Path.refl L.roof) (Path.refl L.roof)
 
@@ -197,7 +197,7 @@ structure ShiftData where
   Sym_unsym : (C : ChainComplex) → Path (Sym (unsym C)) C
   unsym_Sym : (C : ChainComplex) → Path (unsym (Sym C)) C
 
-@[simp] def idShiftData : ShiftData where
+@[simp] noncomputable def idShiftData : ShiftData where
   Sym := fun C => C
   unsym := fun C => C
   mapSym := fun {C D} f => f
@@ -208,15 +208,15 @@ structure ShiftData where
     (f : ChainMap C D) (n x : Int) :
     (idShiftData.mapSym f).component n x = f.component n x := rfl
 
-def Sym_unsym_path (S : ShiftData) (C : ChainComplex) :
+noncomputable def Sym_unsym_path (S : ShiftData) (C : ChainComplex) :
     Path (S.Sym (S.unsym C)) C :=
   S.Sym_unsym C
 
-def unsym_Sym_path (S : ShiftData) (C : ChainComplex) :
+noncomputable def unsym_Sym_path (S : ShiftData) (C : ChainComplex) :
     Path (S.unsym (S.Sym C)) C :=
   S.unsym_Sym C
 
-def symUnsymLoop (S : ShiftData) (C : ChainComplex) :
+noncomputable def symUnsymLoop (S : ShiftData) (C : ChainComplex) :
     Path (S.Sym (S.unsym C)) (S.Sym (S.unsym C)) :=
   Path.trans (S.Sym_unsym C) (Path.symm (S.Sym_unsym C))
 
@@ -232,7 +232,7 @@ structure DistTriangle (S : ShiftData) where
   g : ChainMap Y Z
   h : ChainMap Z (S.Sym X)
 
-def rotateTriangle (S : ShiftData) (T : DistTriangle S) : DistTriangle S where
+noncomputable def rotateTriangle (S : ShiftData) (T : DistTriangle S) : DistTriangle S where
   X := T.Y
   Y := T.Z
   Z := S.Sym T.X
@@ -240,7 +240,7 @@ def rotateTriangle (S : ShiftData) (T : DistTriangle S) : DistTriangle S where
   g := T.h
   h := S.mapSym T.f
 
-def rotateTwice (S : ShiftData) (T : DistTriangle S) : DistTriangle S :=
+noncomputable def rotateTwice (S : ShiftData) (T : DistTriangle S) : DistTriangle S :=
   rotateTriangle S (rotateTriangle S T)
 
 @[simp] theorem rotateTriangle_X (S : ShiftData) (T : DistTriangle S) :
@@ -258,11 +258,11 @@ def rotateTwice (S : ShiftData) (T : DistTriangle S) : DistTriangle S :=
 @[simp] theorem rotateTwice_X (S : ShiftData) (T : DistTriangle S) :
     (rotateTwice S T).X = T.Z := rfl
 
-def rotateSourcePath (S : ShiftData) (T : DistTriangle S) :
+noncomputable def rotateSourcePath (S : ShiftData) (T : DistTriangle S) :
     Path (rotateTriangle S T).X T.Y :=
   Path.refl T.Y
 
-def rotateSourceLoop (S : ShiftData) (T : DistTriangle S) :
+noncomputable def rotateSourceLoop (S : ShiftData) (T : DistTriangle S) :
     Path T.Y T.Y :=
   Path.trans (Path.symm (rotateSourcePath S T)) (rotateSourcePath S T)
 
@@ -284,14 +284,14 @@ structure DerivedFunctor (S T : ShiftData) where
 
 namespace DerivedFunctor
 
-@[simp] def id (S : ShiftData) : DerivedFunctor S S where
+@[simp] noncomputable def id (S : ShiftData) : DerivedFunctor S S where
   onObj := fun C => C
   onMap := fun {C D} f => f
   preservesQuasi := by
     intro _ _ _ hf
     exact hf
 
-@[simp] def comp {S T U : ShiftData}
+@[simp] noncomputable def comp {S T U : ShiftData}
     (F : DerivedFunctor S T) (G : DerivedFunctor T U) : DerivedFunctor S U where
   onObj := fun C => G.onObj (F.onObj C)
   onMap := fun {C D} f => G.onMap (F.onMap f)
@@ -301,8 +301,8 @@ namespace DerivedFunctor
 
 end DerivedFunctor
 
-@[simp] def leftDerived {S T : ShiftData} (F : DerivedFunctor S T) : DerivedFunctor S T := F
-@[simp] def rightDerived {S T : ShiftData} (F : DerivedFunctor S T) : DerivedFunctor S T := F
+@[simp] noncomputable def leftDerived {S T : ShiftData} (F : DerivedFunctor S T) : DerivedFunctor S T := F
+@[simp] noncomputable def rightDerived {S T : ShiftData} (F : DerivedFunctor S T) : DerivedFunctor S T := F
 
 @[simp] theorem derivedFunctor_id_onObj (S : ShiftData) (C : ChainComplex) :
     (DerivedFunctor.id S).onObj C = C := rfl
@@ -338,7 +338,7 @@ theorem derivedFunctor_comp_preserves_quasi {S T U : ShiftData}
 
 /-! ## Cones, resolutions, Ext and Tor -/
 
-@[simp] def coneComplex {C D : ChainComplex} (_f : ChainMap C D) : ChainComplex where
+@[simp] noncomputable def coneComplex {C D : ChainComplex} (_f : ChainMap C D) : ChainComplex where
   obj := fun n => C.obj (n - 1) + D.obj n
   diff := fun _ _ => 0
   diff_sq := by intro _ _; rfl
@@ -363,17 +363,17 @@ structure InjectiveResolution (C : ChainComplex) where
   fromTarget : ChainMap C target
   quasiFromTarget : QuasiIso fromTarget
 
-@[simp] def Ext (n : Nat) (A B : ChainComplex) : Int :=
+@[simp] noncomputable def Ext (n : Nat) (A B : ChainComplex) : Int :=
   A.obj (Int.ofNat n) + B.obj (Int.ofNat n)
 
-@[simp] def Tor (n : Nat) (A B : ChainComplex) : Int :=
+@[simp] noncomputable def Tor (n : Nat) (A B : ChainComplex) : Int :=
   A.obj (Int.ofNat n) - B.obj (Int.ofNat n)
 
-@[simp] def ExtViaProjective (n : Nat) {A B : ChainComplex}
+@[simp] noncomputable def ExtViaProjective (n : Nat) {A B : ChainComplex}
     (P : ProjectiveResolution A) : Int :=
   Ext n P.source B
 
-@[simp] def TorViaProjective (n : Nat) {A B : ChainComplex}
+@[simp] noncomputable def TorViaProjective (n : Nat) {A B : ChainComplex}
     (P : ProjectiveResolution A) : Int :=
   Tor n P.source B
 
@@ -431,7 +431,7 @@ theorem duality_counit_component (G : GrothendieckDuality)
     (C : ChainComplex) (n x : Int) :
     (G.counit C).component n x = (G.counit C).component n x := rfl
 
-def dualityLoop (G : GrothendieckDuality) (C : ChainComplex) :
+noncomputable def dualityLoop (G : GrothendieckDuality) (C : ChainComplex) :
     Path (G.dual (G.dual C)) (G.dual (G.dual C)) :=
   Path.trans (Path.refl (G.dual (G.dual C))) (Path.refl (G.dual (G.dual C)))
 
@@ -475,7 +475,7 @@ theorem heart_in_ge (T : TStructure) (H : HeartObj T) : T.ge0 H.obj :=
 @[simp] theorem heart_obj_eq (T : TStructure) (H : HeartObj T) :
     H.obj = H.obj := rfl
 
-def heartObjLoop (T : TStructure) (H : HeartObj T) : Path H.obj H.obj :=
+noncomputable def heartObjLoop (T : TStructure) (H : HeartObj T) : Path H.obj H.obj :=
   Path.trans (Path.refl H.obj) (Path.refl H.obj)
 
 theorem heartObjLoop_toEq (T : TStructure) (H : HeartObj T) :
@@ -488,7 +488,7 @@ structure PerverseSheaf (T : TStructure) where
   heartObj : HeartObj T
   perversity : Perversity
 
-def PerverseSheaf.obj {T : TStructure} (P : PerverseSheaf T) : ChainComplex :=
+noncomputable def PerverseSheaf.obj {T : TStructure} (P : PerverseSheaf T) : ChainComplex :=
   P.heartObj.obj
 
 theorem perverse_in_le (T : TStructure) (P : PerverseSheaf T) :
@@ -521,7 +521,7 @@ structure DModule where
   action_zero : ∀ x, action 0 x = x
   sheafPart : SheafObject
 
-@[simp] def deRham (M : DModule) : ChainComplex := M.baseComplex
+@[simp] noncomputable def deRham (M : DModule) : ChainComplex := M.baseComplex
 
 theorem dmodule_action_zero (M : DModule) (x : Int) :
     M.action 0 x = x :=
@@ -536,7 +536,7 @@ theorem dmodule_sheaf_Gam_zero (M : DModule) :
     M.sheafPart.Gam 0 = 0 :=
   M.sheafPart.Gam_zero
 
-def dmoduleActionLoop (M : DModule) (x : Int) : Path (M.action 0 x) x :=
+noncomputable def dmoduleActionLoop (M : DModule) (x : Int) : Path (M.action 0 x) x :=
   Path.trans (Path.refl (M.action 0 x)) (Path.stepChain (M.action_zero x))
 
 theorem dmoduleActionLoop_toEq (M : DModule) (x : Int) :

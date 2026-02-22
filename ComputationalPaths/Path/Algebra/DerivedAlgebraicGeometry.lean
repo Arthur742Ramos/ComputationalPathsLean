@@ -114,14 +114,14 @@ structure SimplicialRing where
     degen n i ((ring n).add a b) = (ring (n + 1)).add (degen n i a) (degen n i b)
 
 /-- Path witness for face preserving addition. -/
-def SimplicialRing.face_add_path (R : SimplicialRing) (n : Nat) (i : Fin (n + 2))
+noncomputable def SimplicialRing.face_add_path (R : SimplicialRing) (n : Nat) (i : Fin (n + 2))
     (a b : R.carrier (n + 1)) :
     Path (R.face n i ((R.ring (n + 1)).add a b))
          ((R.ring n).add (R.face n i a) (R.face n i b)) :=
   Path.stepChain (R.face_add n i a b)
 
 /-- π₀ of a simplicial ring (coequalizer of d₀ and d₁). -/
-def pi0Ring (R : SimplicialRing) : Type u :=
+noncomputable def pi0Ring (R : SimplicialRing) : Type u :=
   Quot (fun a b : R.carrier 0 =>
     ∃ c : R.carrier 1, R.face 0 ⟨0, by omega⟩ c = a ∧
                         R.face 0 ⟨1, by omega⟩ c = b)
@@ -197,7 +197,7 @@ structure CotangentComplexData where
            (cotangent.smul n b (derivation n a)))
 
 /-- Homotopy groups of the cotangent complex. -/
-def cotangentHomotopy (L : CotangentComplexData) (n : Nat) : Type u :=
+noncomputable def cotangentHomotopy (L : CotangentComplexData) (n : Nat) : Type u :=
   Quot (fun a b : L.cotangent.carrier n =>
     ∃ c : L.cotangent.carrier (n + 1),
       L.cotangent.face n ⟨0, by omega⟩ c = a ∧

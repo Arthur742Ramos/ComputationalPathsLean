@@ -27,29 +27,29 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   eq : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
 -- Core path theorems
 
@@ -84,14 +84,14 @@ structure OpenSet where
   uid   : Nat
 deriving DecidableEq, Repr
 
-def mkOpen (l : String) (n : Nat) : OpenSet := ⟨l, n⟩
-def emptyOpen : OpenSet := mkOpen "∅" 0
-def totalOpen : OpenSet := mkOpen "X" 1
+noncomputable def mkOpen (l : String) (n : Nat) : OpenSet := ⟨l, n⟩
+noncomputable def emptyOpen : OpenSet := mkOpen "∅" 0
+noncomputable def totalOpen : OpenSet := mkOpen "X" 1
 
-def interOpen (U V : OpenSet) : OpenSet :=
+noncomputable def interOpen (U V : OpenSet) : OpenSet :=
   mkOpen (U.label ++ "∩" ++ V.label) (U.uid * 10000 + V.uid + 7)
 
-def interOpen3 (U V W : OpenSet) : OpenSet :=
+noncomputable def interOpen3 (U V W : OpenSet) : OpenSet :=
   interOpen (interOpen U V) W
 
 -- ============================================================
@@ -105,29 +105,29 @@ structure Sect where
   sid     : Nat
 deriving DecidableEq, Repr
 
-def mkSect (U : OpenSet) (v : String) (n : Nat) : Sect := ⟨U, v, n⟩
+noncomputable def mkSect (U : OpenSet) (v : String) (n : Nat) : Sect := ⟨U, v, n⟩
 
-def restrict (s : Sect) (V : OpenSet) : Sect :=
+noncomputable def restrict (s : Sect) (V : OpenSet) : Sect :=
   ⟨V, s.value ++ "|" ++ V.label, s.sid * 100 + V.uid⟩
 
-def restrictionStep (s : Sect) (V : OpenSet) : Step Sect s (restrict s V) :=
+noncomputable def restrictionStep (s : Sect) (V : OpenSet) : Step Sect s (restrict s V) :=
   .rule ("ρ_" ++ s.openSet.label ++ "→" ++ V.label) s (restrict s V)
 
-def restrictionPath (s : Sect) (V : OpenSet) : Path Sect s (restrict s V) :=
+noncomputable def restrictionPath (s : Sect) (V : OpenSet) : Path Sect s (restrict s V) :=
   Path.single (restrictionStep s V)
 
 -- ============================================================
 -- §4  Presheaf Functoriality
 -- ============================================================
 
-def restrict2 (s : Sect) (V W : OpenSet) : Sect :=
+noncomputable def restrict2 (s : Sect) (V W : OpenSet) : Sect :=
   restrict (restrict s V) W
 
 theorem restrict_to_self_value (s : Sect) :
     (restrict s s.openSet).value = s.value ++ "|" ++ s.openSet.label := by
   simp [restrict]
 
-def doubleRestrictionPath (s : Sect) (V W : OpenSet) :
+noncomputable def doubleRestrictionPath (s : Sect) (V W : OpenSet) :
     Path Sect s (restrict2 s V W) :=
   (restrictionPath s V).trans (restrictionPath (restrict s V) W)
 
@@ -136,11 +136,11 @@ theorem double_restriction_path_length (s : Sect) (V W : OpenSet) :
   simp [doubleRestrictionPath, restrictionPath, Path.single]
   simp [path_length_trans, Path.length]
 
-def composeRestrictionStep (s : Sect) (V W : OpenSet) :
+noncomputable def composeRestrictionStep (s : Sect) (V W : OpenSet) :
     Step Sect s (restrict2 s V W) :=
   .rule ("ρ_comp_" ++ V.label ++ "_" ++ W.label) s (restrict2 s V W)
 
-def functorialityCell (s : Sect) (V W : OpenSet) :
+noncomputable def functorialityCell (s : Sect) (V W : OpenSet) :
     Cell2 (doubleRestrictionPath s V W) (doubleRestrictionPath s V W) :=
   Cell2.id _
 
@@ -163,11 +163,11 @@ structure MatchingFamily where
   matching : Bool
 deriving Repr
 
-def gluingStep (mf : MatchingFamily) (global : Sect) :
+noncomputable def gluingStep (mf : MatchingFamily) (global : Sect) :
     Step Sect global global :=
   .rule ("glue_" ++ mf.ld.cover.ambient.label) global global
 
-def sheafConditionPath (mf : MatchingFamily) (global : Sect) :
+noncomputable def sheafConditionPath (mf : MatchingFamily) (global : Sect) :
     Path Sect global global :=
   Path.single (gluingStep mf global)
 
@@ -189,10 +189,10 @@ structure GermEquiv (g₁ g₂ : Germ) where
   witness  : OpenSet
   agreeVal : restrict g₁.sect witness = restrict g₂.sect witness
 
-def germEquivStep (g₁ g₂ : Germ) (name : String) : Step Germ g₁ g₂ :=
+noncomputable def germEquivStep (g₁ g₂ : Germ) (name : String) : Step Germ g₁ g₂ :=
   .rule name g₁ g₂
 
-def germEquivPath (g₁ g₂ : Germ) (name : String) : Path Germ g₁ g₂ :=
+noncomputable def germEquivPath (g₁ g₂ : Germ) (name : String) : Path Germ g₁ g₂ :=
   Path.single (germEquivStep g₁ g₂ name)
 
 structure Stalk where
@@ -200,7 +200,7 @@ structure Stalk where
   germs : List Germ
 deriving Repr
 
-def germFromSect (pt : Nat) (s : Sect) : Germ :=
+noncomputable def germFromSect (pt : Nat) (s : Sect) : Germ :=
   { point := pt, sect := s, openNbr := s.openSet }
 
 theorem germ_from_sect_point (pt : Nat) (s : Sect) :
@@ -211,10 +211,10 @@ theorem germ_from_sect_openNbr (pt : Nat) (s : Sect) :
     (germFromSect pt s).openNbr = s.openSet := by
   simp [germFromSect]
 
-def stalkMapStep (pt : Nat) (g g' : Germ) : Step Germ g g' :=
+noncomputable def stalkMapStep (pt : Nat) (g g' : Germ) : Step Germ g g' :=
   .rule ("stalkMap_" ++ toString pt) g g'
 
-def stalkMapPath (pt : Nat) (g g' : Germ) : Path Germ g g' :=
+noncomputable def stalkMapPath (pt : Nat) (g g' : Germ) : Path Germ g g' :=
   Path.single (stalkMapStep pt g g')
 
 -- ============================================================
@@ -233,15 +233,15 @@ structure SheafSect where
   ssid  : Nat
 deriving DecidableEq, Repr
 
-def sheafifyStep (ps : PreSect) (ss : SheafSect) :
+noncomputable def sheafifyStep (ps : PreSect) (ss : SheafSect) :
     Step SheafSect ss ss :=
   .rule ("η_" ++ ps.openS.label) ss ss
 
-def reflectionPath (ss target : SheafSect) :
+noncomputable def reflectionPath (ss target : SheafSect) :
     Path SheafSect ss target :=
   Path.single (.rule "reflect" ss target)
 
-def sheafificationUnitPath (ps : PreSect) (ss : SheafSect) :
+noncomputable def sheafificationUnitPath (ps : PreSect) (ss : SheafSect) :
     Path SheafSect ss ss :=
   Path.single (sheafifyStep ps ss)
 
@@ -249,7 +249,7 @@ theorem sheafification_unit_length (ps : PreSect) (ss : SheafSect) :
     (sheafificationUnitPath ps ss).length = 1 := by
   simp [sheafificationUnitPath, Path.single, Path.length]
 
-def universalFactorPath (ss target intermediate : SheafSect) :
+noncomputable def universalFactorPath (ss target intermediate : SheafSect) :
     Path SheafSect ss target :=
   (Path.single (.rule "η" ss intermediate)).trans
     (Path.single (.rule "factor" intermediate target))
@@ -278,15 +278,15 @@ structure Cochain2 where
   triples    : List (OpenSet × OpenSet × OpenSet × Sect)
 deriving Repr
 
-def coboundary0Step (c0 : Cochain0) (c1 : Cochain1) :
+noncomputable def coboundary0Step (c0 : Cochain0) (c1 : Cochain1) :
     Step Nat c0.sects.length c1.overlaps.length :=
   .rule "δ₀" c0.sects.length c1.overlaps.length
 
-def coboundary1Step (c1 : Cochain1) (c2 : Cochain2) :
+noncomputable def coboundary1Step (c1 : Cochain1) (c2 : Cochain2) :
     Step Nat c1.overlaps.length c2.triples.length :=
   .rule "δ₁" c1.overlaps.length c2.triples.length
 
-def cochainComplexPath (c0 : Cochain0) (c1 : Cochain1) (c2 : Cochain2)
+noncomputable def cochainComplexPath (c0 : Cochain0) (c1 : Cochain1) (c2 : Cochain2)
     (z : Nat) :
     Path Nat c0.sects.length z :=
   (Path.single (coboundary0Step c0 c1)).trans
@@ -307,7 +307,7 @@ structure CechH1 where
   coboundaries : List Cochain1
 deriving Repr
 
-def h1ClassificationStep (bundle : String) (_cocycle : Cochain1) :
+noncomputable def h1ClassificationStep (bundle : String) (_cocycle : Cochain1) :
     Step String bundle bundle :=
   .rule ("H¹_classify_" ++ bundle) bundle bundle
 
@@ -325,23 +325,23 @@ structure EtalePoint where
   germ : Germ
 deriving DecidableEq, Repr
 
-def etaleProj (ep : EtalePoint) : Nat := ep.base
+noncomputable def etaleProj (ep : EtalePoint) : Nat := ep.base
 
 theorem etale_proj_correct (pt : Nat) (g : Germ) :
     etaleProj { base := pt, germ := g } = pt := by
   simp [etaleProj]
 
-def etaleLocalSect (pt : Nat) (g : Germ) : EtalePoint :=
+noncomputable def etaleLocalSect (pt : Nat) (g : Germ) : EtalePoint :=
   { base := pt, germ := g }
 
-def etalePathStep (p₁ p₂ : EtalePoint) : Step EtalePoint p₁ p₂ :=
+noncomputable def etalePathStep (p₁ p₂ : EtalePoint) : Step EtalePoint p₁ p₂ :=
   .rule ("étale_" ++ toString p₁.base ++ "→" ++ toString p₂.base) p₁ p₂
 
-def etalePath (_pts : List EtalePoint) (start finish : EtalePoint) :
+noncomputable def etalePath (_pts : List EtalePoint) (start finish : EtalePoint) :
     Path EtalePoint start finish :=
   Path.single (etalePathStep start finish)
 
-def etaleSectBijPath (_s : Sect) (_ep : EtalePoint) :
+noncomputable def etaleSectBijPath (_s : Sect) (_ep : EtalePoint) :
     Path Nat 0 0 :=
   (Path.single (.rule "sect→étale" 0 1)).trans
     (Path.single (.rule "étale→sect" 1 0))
@@ -362,11 +362,11 @@ structure PushforwardData where
   sec     : Sect
 deriving Repr
 
-def pushforwardStep (pd : PushforwardData) :
+noncomputable def pushforwardStep (pd : PushforwardData) :
     Step Sect pd.sec (restrict pd.sec pd.srcOpen) :=
   .rule ("f_*_" ++ pd.mapName) pd.sec (restrict pd.sec pd.srcOpen)
 
-def pushforwardPath (pd : PushforwardData) :
+noncomputable def pushforwardPath (pd : PushforwardData) :
     Path Sect pd.sec (restrict pd.sec pd.srcOpen) :=
   Path.single (pushforwardStep pd)
 
@@ -381,19 +381,19 @@ structure PullbackData where
   sec     : Sect
 deriving Repr
 
-def pullbackStep (pb : PullbackData) :
+noncomputable def pullbackStep (pb : PullbackData) :
     Step Sect pb.sec (restrict pb.sec pb.tgtOpen) :=
   .rule ("f*_" ++ pb.mapName) pb.sec (restrict pb.sec pb.tgtOpen)
 
-def pullbackPath (pb : PullbackData) :
+noncomputable def pullbackPath (pb : PullbackData) :
     Path Sect pb.sec (restrict pb.sec pb.tgtOpen) :=
   Path.single (pullbackStep pb)
 
-def adjunctionUnitPath (s : Sect) (U V : OpenSet) :
+noncomputable def adjunctionUnitPath (s : Sect) (U V : OpenSet) :
     Path Sect s (restrict (restrict s V) U) :=
   (restrictionPath s V).trans (restrictionPath (restrict s V) U)
 
-def adjunctionCounitPath (s : Sect) (U : OpenSet) :
+noncomputable def adjunctionCounitPath (s : Sect) (U : OpenSet) :
     Path Sect s (restrict s U) :=
   restrictionPath s U
 
@@ -412,11 +412,11 @@ structure DescentDatum where
   uid       : Nat
 deriving Repr
 
-def cocycleStep (ij _jk ik : DescentDatum) :
+noncomputable def cocycleStep (ij _jk ik : DescentDatum) :
     Step DescentDatum ij ik :=
   .rule ("cocycle_" ++ ij.isoLabel) ij ik
 
-def cocyclePath (ij jk ik : DescentDatum) :
+noncomputable def cocyclePath (ij jk ik : DescentDatum) :
     Path DescentDatum ij ik :=
   (Path.single (.rule ("φ_" ++ ij.isoLabel) ij jk)).trans
     (Path.single (.rule ("φ_" ++ jk.isoLabel) jk ik))
@@ -426,11 +426,11 @@ theorem cocycle_path_length (ij jk ik : DescentDatum) :
   simp [cocyclePath, Path.single]
   simp [path_length_trans, Path.length]
 
-def normalizedCocycleStep (d : DescentDatum) :
+noncomputable def normalizedCocycleStep (d : DescentDatum) :
     Step DescentDatum d d :=
   .rule ("φ_ii=id_" ++ d.isoLabel) d d
 
-def normalizedCocyclePath (d : DescentDatum) :
+noncomputable def normalizedCocyclePath (d : DescentDatum) :
     Path DescentDatum d d :=
   Path.single (normalizedCocycleStep d)
 
@@ -438,7 +438,7 @@ theorem normalized_cocycle_length (d : DescentDatum) :
     (normalizedCocyclePath d).length = 1 := by
   simp [normalizedCocyclePath, Path.single, Path.length]
 
-def effectiveDescentPath (ij jk ik result : DescentDatum) :
+noncomputable def effectiveDescentPath (ij jk ik result : DescentDatum) :
     Path DescentDatum ij result :=
   (cocyclePath ij jk ik).trans
     (Path.single (.rule "descend" ik result))
@@ -458,7 +458,7 @@ structure SheafMorphism where
   uid : Nat
 deriving DecidableEq, Repr
 
-def naturalityPath (_φ : SheafMorphism) (U V : OpenSet) (s : Sect) :
+noncomputable def naturalityPath (_φ : SheafMorphism) (U V : OpenSet) (s : Sect) :
     Path Sect s (restrict (restrict s V) U) :=
   (restrictionPath s V).trans (restrictionPath (restrict s V) U)
 
@@ -467,11 +467,11 @@ theorem naturality_path_length (φ : SheafMorphism) (U V : OpenSet) (s : Sect) :
   simp [naturalityPath, restrictionPath, Path.single]
   simp [path_length_trans, Path.length]
 
-def kernelSheafPath (_φ : SheafMorphism) (s : Sect) (U : OpenSet) :
+noncomputable def kernelSheafPath (_φ : SheafMorphism) (s : Sect) (U : OpenSet) :
     Path Sect s (restrict s U) :=
   restrictionPath s U
 
-def imageSheafPath (φ : SheafMorphism) (s t : Sect) (U : OpenSet) :
+noncomputable def imageSheafPath (φ : SheafMorphism) (s t : Sect) (U : OpenSet) :
     Path Sect s (restrict s U) :=
   (Path.single (.rule ("im_" ++ φ.src) s t)).trans
     (Path.single (.rule "sheafify_im" t (restrict s U)))
@@ -485,7 +485,7 @@ theorem image_sheaf_path_length (φ : SheafMorphism) (s t : Sect) (U : OpenSet) 
 -- §13  Exact Sequences of Sheaves
 -- ============================================================
 
-def sesPath (z : Sect) (f g h : Sect) :
+noncomputable def sesPath (z : Sect) (f g h : Sect) :
     Path Sect z z :=
   (Path.single (.rule "inject" z f)).trans
     ((Path.single (.rule "surject" f g)).trans
@@ -497,11 +497,11 @@ theorem ses_path_length (z f g h : Sect) :
   simp [sesPath, Path.single]
   simp [path_length_trans, Path.length]
 
-def connectingMorphismPath (hn hn1 : Nat) :
+noncomputable def connectingMorphismPath (hn hn1 : Nat) :
     Path Nat hn hn1 :=
   Path.single (.rule "δ_connecting" hn hn1)
 
-def longExactPath (a b c d : Nat) :
+noncomputable def longExactPath (a b c d : Nat) :
     Path Nat a d :=
   (Path.single (.rule "H^n(F)" a b)).trans
     ((Path.single (.rule "H^n(G)" b c)).trans
@@ -527,13 +527,13 @@ structure ModuleSheaf where
   uid         : Nat
 deriving DecidableEq, Repr
 
-def tensorModule (M N : ModuleSheaf) : ModuleSheaf :=
+noncomputable def tensorModule (M N : ModuleSheaf) : ModuleSheaf :=
   ⟨M.ringedSpace, M.moduleName ++ "⊗" ++ N.moduleName, M.uid * 100 + N.uid⟩
 
-def homModule (M N : ModuleSheaf) : ModuleSheaf :=
+noncomputable def homModule (M N : ModuleSheaf) : ModuleSheaf :=
   ⟨M.ringedSpace, "Hom(" ++ M.moduleName ++ "," ++ N.moduleName ++ ")", M.uid * 100 + N.uid + 1⟩
 
-def tensorHomAdjPath (M N L : ModuleSheaf) :
+noncomputable def tensorHomAdjPath (M N L : ModuleSheaf) :
     Path ModuleSheaf (tensorModule M N) (homModule N L) :=
   (Path.single (.rule "tensor_adj_unit" (tensorModule M N) (homModule M (homModule N L)))).trans
     (Path.single (.rule "tensor_adj_counit" (homModule M (homModule N L)) (homModule N L)))
@@ -553,11 +553,11 @@ structure LocallyFree where
   cover : Cover
 deriving Repr
 
-def trivializationStep (lf : LocallyFree) (U : OpenSet) :
+noncomputable def trivializationStep (lf : LocallyFree) (U : OpenSet) :
     Step Nat lf.rank lf.rank :=
   .rule ("triv_" ++ U.label) lf.rank lf.rank
 
-def transitionPath (lf : LocallyFree) (U V : OpenSet) :
+noncomputable def transitionPath (lf : LocallyFree) (U V : OpenSet) :
     Path Nat lf.rank lf.rank :=
   (Path.single (trivializationStep lf U)).trans
     ((Path.single (.rule ("g_" ++ U.label ++ V.label) lf.rank lf.rank)).trans
@@ -581,7 +581,7 @@ theorem germ_path_symm_length (g₁ g₂ : Germ) (n : String) :
     (germEquivPath g₁ g₂ n).symm.length ≥ 1 := by
   simp [germEquivPath, Path.single, Path.symm, Path.trans, Path.length]
 
-def germTransPath (g₁ g₂ g₃ : Germ) (n₁ n₂ : String) :
+noncomputable def germTransPath (g₁ g₂ g₃ : Germ) (n₁ n₂ : String) :
     Path Germ g₁ g₃ :=
   (germEquivPath g₁ g₂ n₁).trans (germEquivPath g₂ g₃ n₂)
 
@@ -599,7 +599,7 @@ structure FlasqueSheaf where
   uid  : Nat
 deriving DecidableEq, Repr
 
-def flasqueAcyclicPath (fs : FlasqueSheaf) (n : Nat) :
+noncomputable def flasqueAcyclicPath (fs : FlasqueSheaf) (n : Nat) :
     Path Nat n 0 :=
   (Path.single (.rule ("H^n(" ++ fs.name ++ ")") n 1)).trans
     (Path.single (.rule "flasque_vanish" 1 0))
@@ -614,7 +614,7 @@ structure FineSheaf where
   uid  : Nat
 deriving DecidableEq, Repr
 
-def fineToAcyclicPath (_fs : FineSheaf) :
+noncomputable def fineToAcyclicPath (_fs : FineSheaf) :
     Path Nat 0 0 :=
   (Path.single (.rule "fine→soft" 0 1)).trans
     ((Path.single (.rule "soft→acyclic" 1 2)).trans
@@ -629,7 +629,7 @@ theorem fine_to_acyclic_length (fs : FineSheaf) :
 -- §18  Sheaf Cohomology via Injective Resolutions
 -- ============================================================
 
-def injectiveResolutionPath (f i0 i1 i2 : Nat) :
+noncomputable def injectiveResolutionPath (f i0 i1 i2 : Nat) :
     Path Nat f i2 :=
   (Path.single (.rule "inject_into_I⁰" f i0)).trans
     ((Path.single (.rule "d⁰" i0 i1)).trans
@@ -640,7 +640,7 @@ theorem injective_resolution_length (f i0 i1 i2 : Nat) :
   simp [injectiveResolutionPath, Path.single]
   simp [path_length_trans, Path.length]
 
-def derivedFunctorPath (n src tgt : Nat) :
+noncomputable def derivedFunctorPath (n src tgt : Nat) :
     Path Nat src tgt :=
   (Path.single (.rule ("R^" ++ toString n ++ "_resolve") src (src + 1))).trans
     ((Path.single (.rule ("R^" ++ toString n ++ "_apply") (src + 1) (tgt + 1))).trans
@@ -665,7 +665,7 @@ structure GrothendieckTopology where
   sieves : List Sieve
 deriving Repr
 
-def grothendieckSheafPath (gt : GrothendieckTopology) (s : Sect) (U : OpenSet) :
+noncomputable def grothendieckSheafPath (gt : GrothendieckTopology) (s : Sect) (U : OpenSet) :
     Path Sect s (restrict s U) :=
   (Path.single (.rule ("sieve_match_" ++ gt.name) s s)).trans
     (restrictionPath s U)
@@ -703,7 +703,7 @@ theorem cocycle_normalize_length (d : DescentDatum) :
     (normalizedCocyclePath d).length + (normalizedCocyclePath d).length = 2 := by
   simp [normalizedCocyclePath, Path.single, Path.length]
 
-def sheafRoundTripPath (mf : MatchingFamily) (g : Sect) (U : OpenSet) :
+noncomputable def sheafRoundTripPath (mf : MatchingFamily) (g : Sect) (U : OpenSet) :
     Path Sect g (restrict g U) :=
   (sheafConditionPath mf g).trans (restrictionPath g U)
 
@@ -712,7 +712,7 @@ theorem sheaf_round_trip_length (mf : MatchingFamily) (g : Sect) (U : OpenSet) :
   simp [sheafRoundTripPath, sheafConditionPath, restrictionPath, Path.single]
   simp [path_length_trans, Path.length]
 
-def fullPipelinePath (s : Sect) (_pt : Nat) (_ep : EtalePoint) (U : OpenSet) :
+noncomputable def fullPipelinePath (s : Sect) (_pt : Nat) (_ep : EtalePoint) (U : OpenSet) :
     Path Sect s (restrict s U) :=
   (Path.single (.rule "sect→germ" s s)).trans
     ((Path.single (.rule "germ→étale" s s)).trans

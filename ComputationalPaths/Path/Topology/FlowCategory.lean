@@ -195,7 +195,7 @@ structure ContinuationInverse extends ContinuationData where
   chainHomotopyEquiv : True
 
 /-- Continuation maps induce isomorphisms on Morse homology. -/
-def continuation_iso (C : ContinuationInverse) :
+noncomputable def continuation_iso (C : ContinuationInverse) :
     Path C.f₀.manifold C.f₁.manifold :=
   C.same_manifold
 

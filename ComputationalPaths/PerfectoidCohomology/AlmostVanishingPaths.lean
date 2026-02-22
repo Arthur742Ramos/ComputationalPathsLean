@@ -73,7 +73,7 @@ noncomputable def almostVanishing_cancel_left_rweq
   rweq_cmpA_inv_left (A.almostVanishingPath n ε x hε)
 
 /-- Canonical trivial almost-vanishing package on `PUnit`. -/
-def trivial (R : Type u) : AlmostVanishingPathData R (fun _ => PUnit) where
+noncomputable def trivial (R : Type u) : AlmostVanishingPathData R (fun _ => PUnit) where
   zero := fun _ => PUnit.unit
   scalar := fun _ _ _ => PUnit.unit
   differential := fun _ _ => PUnit.unit

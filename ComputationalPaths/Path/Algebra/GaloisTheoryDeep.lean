@@ -35,15 +35,15 @@ structure FieldExt where
   isFinite : Bool
 
 /-- The trivial extension K ⊆ K has degree 1 -/
-def trivialExt (K : Type) : FieldExt :=
+noncomputable def trivialExt (K : Type) : FieldExt :=
   { base := K, extension := K, degree := 1, isFinite := true }
 
 /-- Degree of a composite extension -/
-def composeDegree (e1 e2 : FieldExt) : Nat :=
+noncomputable def composeDegree (e1 e2 : FieldExt) : Nat :=
   e1.degree * e2.degree
 
 /-- Tower law: [L:K] = [L:M] * [M:K] -/
-def towerLaw (e1 e2 : FieldExt) : FieldExt :=
+noncomputable def towerLaw (e1 e2 : FieldExt) : FieldExt :=
   { base := e1.base, extension := e2.extension,
     degree := composeDegree e1 e2, isFinite := e1.isFinite && e2.isFinite }
 
@@ -58,7 +58,7 @@ theorem towerLaw_degree (e1 e2 : FieldExt) :
   rfl
 
 -- Theorem 3: Path from extension degree to tower product
-def degree_tower_path (e1 e2 : FieldExt) :
+noncomputable def degree_tower_path (e1 e2 : FieldExt) :
     Path (towerLaw e1 e2).degree (composeDegree e1 e2) :=
   Path.refl (composeDegree e1 e2)
 
@@ -72,7 +72,7 @@ inductive ElementKind where
   | transcendental : ElementKind
 
 /-- The degree of an algebraic element -/
-def elementDegree : ElementKind → Nat
+noncomputable def elementDegree : ElementKind → Nat
   | ElementKind.algebraic n => n
   | ElementKind.transcendental => 0
 
@@ -82,11 +82,11 @@ structure Adjunction where
   extDegree : Nat
 
 /-- Simple algebraic extension -/
-def simpleAlgExt (n : Nat) : Adjunction :=
+noncomputable def simpleAlgExt (n : Nat) : Adjunction :=
   { kind := ElementKind.algebraic n, extDegree := n }
 
 /-- Simple transcendental extension -/
-def simpleTransExt : Adjunction :=
+noncomputable def simpleTransExt : Adjunction :=
   { kind := ElementKind.transcendental, extDegree := 0 }
 
 -- Theorem 4: Algebraic extension degree matches minimal poly degree
@@ -95,7 +95,7 @@ theorem algExt_degree (n : Nat) :
   rfl
 
 -- Theorem 5: Path between element degree and extension degree for algebraic
-def alg_element_degree_path (n : Nat) :
+noncomputable def alg_element_degree_path (n : Nat) :
     Path (elementDegree (ElementKind.algebraic n)) (simpleAlgExt n).extDegree :=
   Path.refl n
 
@@ -115,7 +115,7 @@ structure FieldPoly where
   isSplit : Bool
 
 /-- Whether a polynomial splits completely -/
-def fullySplit (p : FieldPoly) : Bool :=
+noncomputable def fullySplit (p : FieldPoly) : Bool :=
   p.numRoots == p.degree
 
 /-- A splitting field datum -/
@@ -125,7 +125,7 @@ structure SplittingField where
   isNormal : Bool
 
 /-- Construct a splitting field where poly splits -/
-def mkSplittingField (deg roots ext : Nat) : SplittingField :=
+noncomputable def mkSplittingField (deg roots ext : Nat) : SplittingField :=
   { poly := { degree := deg, numRoots := roots, isSplit := roots == deg },
     extDegree := ext,
     isNormal := roots == deg }
@@ -136,7 +136,7 @@ theorem split_is_normal (d : Nat) (e : Nat) :
   by simp [mkSplittingField]
 
 -- Theorem 8: Path from normality to full splitting
-def normal_iff_split (d e : Nat) :
+noncomputable def normal_iff_split (d e : Nat) :
     Path (mkSplittingField d d e).isNormal (mkSplittingField d d e).poly.isSplit :=
   by simp [mkSplittingField]; exact Path.refl true
 
@@ -146,7 +146,7 @@ theorem nonsplit_nonnormal (d e : Nat) (h : d > 0) :
   by simp [mkSplittingField]; omega
 
 /-- Normal closure operation -/
-def normalClosure (sf : SplittingField) : SplittingField :=
+noncomputable def normalClosure (sf : SplittingField) : SplittingField :=
   { poly := { degree := sf.poly.degree, numRoots := sf.poly.degree, isSplit := true },
     extDegree := sf.extDegree,
     isNormal := true }
@@ -172,7 +172,7 @@ structure SepData where
   isSeparable : Bool
 
 /-- A polynomial is separable iff all roots are distinct -/
-def mkSepData (deg roots : Nat) : SepData :=
+noncomputable def mkSepData (deg roots : Nat) : SepData :=
   { degree := deg, distinctRoots := roots, isSeparable := roots == deg }
 
 /-- Separable extension -/
@@ -182,7 +182,7 @@ structure SepExt where
   charZero : Bool   -- characteristic zero implies separable
 
 -- Theorem 12: Characteristic zero implies separable
-def charZeroSep (deg ext : Nat) : SepExt :=
+noncomputable def charZeroSep (deg ext : Nat) : SepExt :=
   { sepData := mkSepData deg deg, extDegree := ext, charZero := true }
 
 theorem charZero_is_sep (deg ext : Nat) :
@@ -195,7 +195,7 @@ theorem sep_max_roots (deg ext : Nat) :
   rfl
 
 -- Theorem 14: Path linking char zero to separability
-def charZero_sep_path (deg ext : Nat) :
+noncomputable def charZero_sep_path (deg ext : Nat) :
     Path (charZeroSep deg ext).charZero (charZeroSep deg ext).sepData.isSeparable :=
   by simp [charZeroSep, mkSepData]; exact Path.refl true
 
@@ -216,11 +216,11 @@ structure GaloisGroup where
   isAbelian : Bool
 
 /-- Identity automorphism -/
-def idAut : FieldAut :=
+noncomputable def idAut : FieldAut :=
   { id := 0, order := 1, fixesBase := true }
 
 /-- Compose automorphisms (abstractly) -/
-def composeAut (a b : FieldAut) : FieldAut :=
+noncomputable def composeAut (a b : FieldAut) : FieldAut :=
   { id := a.id + b.id, order := a.order * b.order,
     fixesBase := a.fixesBase && b.fixesBase }
 
@@ -237,7 +237,7 @@ theorem compose_fixes (a b : FieldAut)
   by simp [composeAut, ha, hb]
 
 /-- Trivial Galois group -/
-def trivialGalGroup : GaloisGroup :=
+noncomputable def trivialGalGroup : GaloisGroup :=
   { auts := [idAut], order := 1, isAbelian := true }
 
 -- Theorem 18: Trivial Galois group has order 1
@@ -247,7 +247,7 @@ theorem trivialGal_order : trivialGalGroup.order = 1 := rfl
 theorem trivialGal_abelian : trivialGalGroup.isAbelian = true := rfl
 
 /-- Galois group for degree n cyclic extension -/
-def cyclicGalGroup (n : Nat) : GaloisGroup :=
+noncomputable def cyclicGalGroup (n : Nat) : GaloisGroup :=
   { auts := List.range n |>.map (fun i => { id := i, order := n, fixesBase := true }),
     order := n, isAbelian := true }
 
@@ -256,7 +256,7 @@ theorem cyclicGal_abelian (n : Nat) :
     (cyclicGalGroup n).isAbelian = true := rfl
 
 -- Theorem 21: Path from cyclic group order to extension degree
-def cyclicGal_order_path (n : Nat) :
+noncomputable def cyclicGal_order_path (n : Nat) :
     Path (cyclicGalGroup n).order n :=
   Path.refl n
 
@@ -283,17 +283,17 @@ structure GaloisCorrespondence where
   groupOrder_eq_fieldDeg : Bool
 
 /-- Construct a valid correspondence -/
-def mkCorrespondence (fIdx fDegBase fDegTop sIdx sOrd : Nat) (sNorm : Nat) : GaloisCorrespondence :=
+noncomputable def mkCorrespondence (fIdx fDegBase fDegTop sIdx sOrd : Nat) (sNorm : Nat) : GaloisCorrespondence :=
   { field := { index := fIdx, degree_over_base := fDegBase, degree_to_top := fDegTop },
     subgroup := { index := sIdx, order := sOrd, isNormal := sNorm > 0 },
     groupOrder_eq_fieldDeg := sOrd == fDegTop }
 
 /-- Fixed field of a subgroup -/
-def fixedField (sg : GalSubgroup) (totalDeg : Nat) : IntermediateField :=
+noncomputable def fixedField (sg : GalSubgroup) (totalDeg : Nat) : IntermediateField :=
   { index := sg.index, degree_over_base := totalDeg / sg.order, degree_to_top := sg.order }
 
 /-- Galois group of intermediate field -/
-def galGroupOf (f : IntermediateField) : GalSubgroup :=
+noncomputable def galGroupOf (f : IntermediateField) : GalSubgroup :=
   { index := f.index, order := f.degree_to_top, isNormal := false }
 
 -- Theorem 22: Fixed field degree relation
@@ -307,22 +307,22 @@ theorem galGroupOf_order (f : IntermediateField) :
   rfl
 
 -- Theorem 24: Path encoding the Galois correspondence (field → group → field preserves degree)
-def galois_correspondence_path (f : IntermediateField) :
+noncomputable def galois_correspondence_path (f : IntermediateField) :
     Path (galGroupOf f).order f.degree_to_top :=
   Path.refl f.degree_to_top
 
 -- Theorem 25: Path encoding the reverse correspondence (group → field → group)
-def galois_correspondence_rev_path (sg : GalSubgroup) (totalDeg : Nat) :
+noncomputable def galois_correspondence_rev_path (sg : GalSubgroup) (totalDeg : Nat) :
     Path (fixedField sg totalDeg).degree_to_top sg.order :=
   Path.refl sg.order
 
 -- Theorem 26: Round-trip field → group → field
-def galois_roundtrip_field (f : IntermediateField) (totalDeg : Nat) :
+noncomputable def galois_roundtrip_field (f : IntermediateField) (totalDeg : Nat) :
     Path (fixedField (galGroupOf f) totalDeg).degree_to_top f.degree_to_top :=
   Path.refl f.degree_to_top
 
 -- Theorem 27: Round-trip group → field → group
-def galois_roundtrip_group (sg : GalSubgroup) (totalDeg : Nat) :
+noncomputable def galois_roundtrip_group (sg : GalSubgroup) (totalDeg : Nat) :
     Path (galGroupOf (fixedField sg totalDeg)).order sg.order :=
   Path.refl sg.order
 
@@ -331,7 +331,7 @@ def galois_roundtrip_group (sg : GalSubgroup) (totalDeg : Nat) :
 -- ============================================================================
 
 /-- Mark a subgroup as normal -/
-def normalSubgroup (sg : GalSubgroup) : GalSubgroup :=
+noncomputable def normalSubgroup (sg : GalSubgroup) : GalSubgroup :=
   { sg with isNormal := true }
 
 /-- A normal intermediate extension -/
@@ -342,7 +342,7 @@ structure NormalIntExt where
   subgroupIsNormal : Bool
 
 /-- Fundamental theorem: normal subgroup ↔ normal extension -/
-def normalCorrespondence (f : IntermediateField) (isNorm : Bool) : NormalIntExt :=
+noncomputable def normalCorrespondence (f : IntermediateField) (isNorm : Bool) : NormalIntExt :=
   { field := f,
     subgroup := { index := f.index, order := f.degree_to_top, isNormal := isNorm },
     fieldIsNormal := isNorm,
@@ -359,7 +359,7 @@ theorem normal_ext_gives_normal_sub (f : IntermediateField) :
   rfl
 
 -- Theorem 30: Path between normality of subgroup and extension
-def normal_correspondence_path (f : IntermediateField) (b : Bool) :
+noncomputable def normal_correspondence_path (f : IntermediateField) (b : Bool) :
     Path (normalCorrespondence f b).fieldIsNormal (normalCorrespondence f b).subgroupIsNormal :=
   Path.refl b
 
@@ -378,52 +378,52 @@ inductive LatticeElem where
   | group : GalSubgroup → LatticeElem
 
 /-- Extract the key invariant (the degree / order) -/
-def latticeInvariant : LatticeElem → Nat
+noncomputable def latticeInvariant : LatticeElem → Nat
   | LatticeElem.field f => f.degree_to_top
   | LatticeElem.group g => g.order
 
 /-- Map from field side to group side -/
-def fieldToGroup : LatticeElem → LatticeElem
+noncomputable def fieldToGroup : LatticeElem → LatticeElem
   | LatticeElem.field f => LatticeElem.group (galGroupOf f)
   | other => other
 
 /-- Map from group side to field side -/
-def groupToField (totalDeg : Nat) : LatticeElem → LatticeElem
+noncomputable def groupToField (totalDeg : Nat) : LatticeElem → LatticeElem
   | LatticeElem.group g => LatticeElem.field (fixedField g totalDeg)
   | other => other
 
 -- Theorem 32: Field-to-group preserves invariant
-def fieldToGroup_invariant (f : IntermediateField) :
+noncomputable def fieldToGroup_invariant (f : IntermediateField) :
     Path (latticeInvariant (fieldToGroup (LatticeElem.field f)))
          (latticeInvariant (LatticeElem.field f)) :=
   Path.refl f.degree_to_top
 
 -- Theorem 33: Group-to-field preserves invariant
-def groupToField_invariant (g : GalSubgroup) (totalDeg : Nat) :
+noncomputable def groupToField_invariant (g : GalSubgroup) (totalDeg : Nat) :
     Path (latticeInvariant (groupToField totalDeg (LatticeElem.group g)))
          (latticeInvariant (LatticeElem.group g)) :=
   Path.refl g.order
 
 -- Theorem 34: Composition field→group→field preserves invariant
-def roundtrip_field_path (f : IntermediateField) (totalDeg : Nat) :
+noncomputable def roundtrip_field_path (f : IntermediateField) (totalDeg : Nat) :
     Path (latticeInvariant (groupToField totalDeg (fieldToGroup (LatticeElem.field f))))
          (latticeInvariant (LatticeElem.field f)) :=
   Path.refl f.degree_to_top
 
 -- Theorem 35: Composition group→field→group preserves invariant
-def roundtrip_group_path (g : GalSubgroup) (totalDeg : Nat) :
+noncomputable def roundtrip_group_path (g : GalSubgroup) (totalDeg : Nat) :
     Path (latticeInvariant (fieldToGroup (groupToField totalDeg (LatticeElem.group g))))
          (latticeInvariant (LatticeElem.group g)) :=
   Path.refl g.order
 
 -- Theorem 36: Symmetry of correspondence via Path.symm
-def correspondence_symm (f : IntermediateField) :
+noncomputable def correspondence_symm (f : IntermediateField) :
     Path (latticeInvariant (LatticeElem.field f))
          (latticeInvariant (fieldToGroup (LatticeElem.field f))) :=
   Path.symm (fieldToGroup_invariant f)
 
 -- Theorem 37: Transitivity across triple correspondence via Path.trans
-def correspondence_trans (f : IntermediateField) (totalDeg : Nat) :
+noncomputable def correspondence_trans (f : IntermediateField) (totalDeg : Nat) :
     Path (latticeInvariant (LatticeElem.field f))
          (latticeInvariant (groupToField totalDeg (fieldToGroup (LatticeElem.field f)))) :=
   Path.symm (roundtrip_field_path f totalDeg)
@@ -439,11 +439,11 @@ structure SolvabilityData where
   isSolvable : Bool
 
 /-- Mark a group as solvable -/
-def solvableGroup (len : Nat) : SolvabilityData :=
+noncomputable def solvableGroup (len : Nat) : SolvabilityData :=
   { compositionLength := len, allFactorsAbelian := true, isSolvable := true }
 
 /-- Mark a group as non-solvable -/
-def nonsolvableGroup (len : Nat) : SolvabilityData :=
+noncomputable def nonsolvableGroup (len : Nat) : SolvabilityData :=
   { compositionLength := len, allFactorsAbelian := false, isSolvable := false }
 
 /-- Radical extension data -/
@@ -453,11 +453,11 @@ structure RadicalExt where
   isSolvableByRadicals : Bool
 
 /-- An equation solvable by radicals -/
-def solvableEq (rads : List Nat) : RadicalExt :=
+noncomputable def solvableEq (rads : List Nat) : RadicalExt :=
   { numRadicals := rads.length, radicalDegrees := rads, isSolvableByRadicals := true }
 
 /-- An equation not solvable by radicals -/
-def unsolvableEq : RadicalExt :=
+noncomputable def unsolvableEq : RadicalExt :=
   { numRadicals := 0, radicalDegrees := [], isSolvableByRadicals := false }
 
 -- Theorem 38: Solvable group gives solvable equation
@@ -471,22 +471,22 @@ theorem nonsolvable_group_eq (len : Nat) :
   rfl
 
 -- Theorem 40: Path from solvability of group to radical solvability
-def solvability_path (len : Nat) :
+noncomputable def solvability_path (len : Nat) :
     Path (solvableGroup len).isSolvable (solvableGroup len).allFactorsAbelian :=
   Path.refl true
 
 -- Theorem 41: General quintic is unsolvable (S5 is not solvable)
-def s5Data : SolvabilityData := nonsolvableGroup 4
+noncomputable def s5Data : SolvabilityData := nonsolvableGroup 4
 
 theorem quintic_unsolvable : s5Data.isSolvable = false := rfl
 
 -- Theorem 42: Quadratic is always solvable
-def quadraticSolv : SolvabilityData := solvableGroup 1
+noncomputable def quadraticSolv : SolvabilityData := solvableGroup 1
 
 theorem quadratic_solvable : quadraticSolv.isSolvable = true := rfl
 
 -- Theorem 43: Path linking quadratic solvability
-def quadratic_path :
+noncomputable def quadratic_path :
     Path quadraticSolv.isSolvable quadraticSolv.allFactorsAbelian :=
   Path.refl true
 
@@ -502,7 +502,7 @@ structure CyclotomicExt where
   isCyclic : Bool            -- for prime n, it's cyclic
 
 /-- Euler's totient function (simplified for small values) -/
-def eulerTotient : Nat → Nat
+noncomputable def eulerTotient : Nat → Nat
   | 0 => 0
   | 1 => 1
   | 2 => 1
@@ -514,7 +514,7 @@ def eulerTotient : Nat → Nat
   | n => n - 1  -- approximation for primes
 
 /-- Construct cyclotomic extension for n -/
-def cyclotomicExt (n : Nat) (isPrime : Bool) : CyclotomicExt :=
+noncomputable def cyclotomicExt (n : Nat) (isPrime : Bool) : CyclotomicExt :=
   { n := n,
     degree := eulerTotient n,
     isAbelian := true,         -- always abelian
@@ -541,7 +541,7 @@ theorem cyclotomic7_degree :
   rfl
 
 -- Theorem 48: Path linking cyclotomic abelianness across extensions
-def cyclotomic_abelian_path (n m : Nat) (p q : Bool) :
+noncomputable def cyclotomic_abelian_path (n m : Nat) (p q : Bool) :
     Path (cyclotomicExt n p).isAbelian (cyclotomicExt m q).isAbelian :=
   Path.refl true
 
@@ -559,7 +559,7 @@ structure GaloisDatum where
   solvability : SolvabilityData
 
 /-- Construct a Galois extension -/
-def mkGaloisExt (deg : Nat) (abelian solvable : Bool) : GaloisDatum :=
+noncomputable def mkGaloisExt (deg : Nat) (abelian solvable : Bool) : GaloisDatum :=
   { ext := { base := Unit, extension := Unit, degree := deg, isFinite := true },
     galGrp := { auts := [], order := deg, isAbelian := abelian },
     isSeparable := true,
@@ -570,35 +570,35 @@ def mkGaloisExt (deg : Nat) (abelian solvable : Bool) : GaloisDatum :=
                      isSolvable := solvable } }
 
 -- Theorem 49: Galois extension has matching degree and group order
-def galois_degree_order (deg : Nat) (a s : Bool) :
+noncomputable def galois_degree_order (deg : Nat) (a s : Bool) :
     Path (mkGaloisExt deg a s).ext.degree (mkGaloisExt deg a s).galGrp.order :=
   Path.refl deg
 
 -- Theorem 50: Galois extension is separable and normal
-def galois_sep_normal (deg : Nat) (a s : Bool) :
+noncomputable def galois_sep_normal (deg : Nat) (a s : Bool) :
     Path (mkGaloisExt deg a s).isSeparable (mkGaloisExt deg a s).isNormal :=
   Path.refl true
 
 -- Theorem 51: Path.trans composing degree = order across equal degrees
-def galois_degree_trans (d1 d2 : Nat) (a1 a2 s1 s2 : Bool)
+noncomputable def galois_degree_trans (d1 d2 : Nat) (a1 a2 s1 s2 : Bool)
     (h : d1 = d2) :
     Path (mkGaloisExt d1 a1 s1).ext.degree (mkGaloisExt d2 a2 s2).galGrp.order :=
   h ▸ Path.refl d1
 
 -- Theorem 52: Abelian Galois group implies solvable by radicals
-def abelian_implies_solvable (deg : Nat) :
+noncomputable def abelian_implies_solvable (deg : Nat) :
     Path (mkGaloisExt deg true true).galGrp.isAbelian
          (mkGaloisExt deg true true).solvability.isSolvable :=
   Path.refl true
 
 -- Theorem 53: congrArg through Galois datum projection
-def galois_congrArg_degree (d : Nat) (a s : Bool) :
+noncomputable def galois_congrArg_degree (d : Nat) (a s : Bool) :
     Path (GaloisTheoryDeep.FieldExt.degree (mkGaloisExt d a s).ext)
          (GaloisTheoryDeep.GaloisGroup.order (mkGaloisExt d a s).galGrp) :=
   Path.refl d
 
 -- Theorem 54: symm of the Galois correspondence path
-def galois_symm_correspondence (d : Nat) (a s : Bool) :
+noncomputable def galois_symm_correspondence (d : Nat) (a s : Bool) :
     Path (mkGaloisExt d a s).galGrp.order (mkGaloisExt d a s).ext.degree :=
   Path.symm (galois_degree_order d a s)
 
@@ -617,7 +617,7 @@ structure SubgroupLattice where
   size : Nat
 
 /-- The Galois correspondence reverses order -/
-def reverseIndex (n idx : Nat) : Nat := n - idx
+noncomputable def reverseIndex (n idx : Nat) : Nat := n - idx
 
 -- Theorem 55: Double reversal is identity
 theorem double_reverse (n idx : Nat) (h : idx ≤ n) :
@@ -625,18 +625,18 @@ theorem double_reverse (n idx : Nat) (h : idx ≤ n) :
   by simp [reverseIndex]; omega
 
 -- Theorem 56: Path from double reversal
-def double_reverse_path (n idx : Nat) (h : idx ≤ n) :
+noncomputable def double_reverse_path (n idx : Nat) (h : idx ≤ n) :
     Path (reverseIndex n (reverseIndex n idx)) idx :=
   Path.mk [] (double_reverse n idx h)
 
 -- Theorem 57: Lattice sizes match under correspondence
-def fieldLatticeOf (n : Nat) : FieldLattice :=
+noncomputable def fieldLatticeOf (n : Nat) : FieldLattice :=
   { fields := [], size := n }
 
-def subgroupLatticeOf (n : Nat) : SubgroupLattice :=
+noncomputable def subgroupLatticeOf (n : Nat) : SubgroupLattice :=
   { subgroups := [], size := n }
 
-def lattice_sizes_match (n : Nat) :
+noncomputable def lattice_sizes_match (n : Nat) :
     Path (fieldLatticeOf n).size (subgroupLatticeOf n).size :=
   Path.refl n
 
@@ -645,7 +645,7 @@ def lattice_sizes_match (n : Nat) :
 -- ============================================================================
 
 /-- Q(√2)/Q: degree 2 Galois extension -/
-def sqrtTwoExt : GaloisDatum := mkGaloisExt 2 true true
+noncomputable def sqrtTwoExt : GaloisDatum := mkGaloisExt 2 true true
 
 -- Theorem 58: √2 extension has degree 2
 theorem sqrt2_degree : sqrtTwoExt.ext.degree = 2 := rfl
@@ -657,7 +657,7 @@ theorem sqrt2_galois : sqrtTwoExt.isGalois = true := rfl
 theorem sqrt2_gal_order : sqrtTwoExt.galGrp.order = 2 := rfl
 
 /-- Splitting field of x⁴ - 2 over Q -/
-def x4minus2Ext : GaloisDatum := mkGaloisExt 8 false true
+noncomputable def x4minus2Ext : GaloisDatum := mkGaloisExt 8 false true
 
 -- Theorem 61: x⁴-2 splitting field has degree 8
 theorem x4m2_degree : x4minus2Ext.ext.degree = 8 := rfl
@@ -666,7 +666,7 @@ theorem x4m2_degree : x4minus2Ext.ext.degree = 8 := rfl
 theorem x4m2_nonabelian : x4minus2Ext.galGrp.isAbelian = false := rfl
 
 /-- General quintic: Galois group S₅, not solvable -/
-def quinticExt : GaloisDatum := mkGaloisExt 120 false false
+noncomputable def quinticExt : GaloisDatum := mkGaloisExt 120 false false
 
 -- Theorem 63: Quintic Galois group order is 120 = |S₅|
 theorem quintic_order : quinticExt.galGrp.order = 120 := rfl
@@ -675,7 +675,7 @@ theorem quintic_order : quinticExt.galGrp.order = 120 := rfl
 theorem quintic_not_solvable : quinticExt.solvability.isSolvable = false := rfl
 
 -- Theorem 65: Path connecting quintic non-abelianness and non-solvability
-def quintic_nonab_nonsolv :
+noncomputable def quintic_nonab_nonsolv :
     Path quinticExt.galGrp.isAbelian quinticExt.solvability.isSolvable :=
   Path.refl false
 
@@ -693,7 +693,7 @@ structure ExtChain where
   total_group_order : Nat
 
 /-- A valid extension chain -/
-def validChain (d1 d2 : Nat) : ExtChain :=
+noncomputable def validChain (d1 d2 : Nat) : ExtChain :=
   { bottom_deg := d1, top_deg := d2, total_deg := d1 * d2,
     bot_group_order := d2, top_group_order := d1, total_group_order := d1 * d2 }
 
@@ -703,22 +703,22 @@ theorem chain_tower (d1 d2 : Nat) :
   rfl
 
 -- Theorem 67: Group order matches total degree
-def chain_group_total (d1 d2 : Nat) :
+noncomputable def chain_group_total (d1 d2 : Nat) :
     Path (validChain d1 d2).total_group_order (validChain d1 d2).total_deg :=
   Path.refl (d1 * d2)
 
 -- Theorem 68: Order reversal in chain: bottom degree ↔ top group order
-def chain_order_reversal_bot (d1 d2 : Nat) :
+noncomputable def chain_order_reversal_bot (d1 d2 : Nat) :
     Path (validChain d1 d2).bottom_deg (validChain d1 d2).top_group_order :=
   Path.refl d1
 
 -- Theorem 69: Order reversal in chain: top degree ↔ bottom group order
-def chain_order_reversal_top (d1 d2 : Nat) :
+noncomputable def chain_order_reversal_top (d1 d2 : Nat) :
     Path (validChain d1 d2).top_deg (validChain d1 d2).bot_group_order :=
   Path.refl d2
 
 -- Theorem 70: Full correspondence path via Path.symm
-def chain_full_correspondence (d1 d2 : Nat) :
+noncomputable def chain_full_correspondence (d1 d2 : Nat) :
     Path (validChain d1 d2).total_deg (validChain d1 d2).total_group_order :=
   Path.symm (chain_group_total d1 d2)
 
@@ -733,7 +733,7 @@ structure GaloisMorphism where
   degreeDivisor : Nat  -- target degree divides source degree
 
 /-- Restriction morphism -/
-def restrictionMorphism (big small : GaloisDatum) (div : Nat) : GaloisMorphism :=
+noncomputable def restrictionMorphism (big small : GaloisDatum) (div : Nat) : GaloisMorphism :=
   { source := big, target := small, degreeDivisor := div }
 
 -- Theorem 71: Degree divisibility in restriction
@@ -749,12 +749,12 @@ theorem galois_functorial (d1 d2 d3 : Nat)
   by omega
 
 -- Theorem 73: Naturality square commutes as Path
-def naturality_path (d : Nat) (a s : Bool) :
+noncomputable def naturality_path (d : Nat) (a s : Bool) :
     Path (mkGaloisExt d a s).ext.degree (mkGaloisExt d a s).galGrp.order :=
   Path.refl d
 
 -- Theorem 74: Path.symm gives the inverse direction of naturality
-def naturality_inverse (d : Nat) (a s : Bool) :
+noncomputable def naturality_inverse (d : Nat) (a s : Bool) :
     Path (mkGaloisExt d a s).galGrp.order (mkGaloisExt d a s).ext.degree :=
   Path.symm (naturality_path d a s)
 
@@ -763,7 +763,7 @@ def naturality_inverse (d : Nat) (a s : Bool) :
 -- ============================================================================
 
 /-- Galois closure of an extension -/
-def galoisClosure (e : FieldExt) : GaloisDatum :=
+noncomputable def galoisClosure (e : FieldExt) : GaloisDatum :=
   mkGaloisExt e.degree true true
 
 -- Theorem 75: Galois closure is Galois
@@ -775,7 +775,7 @@ theorem galoisClosure_degree (e : FieldExt) :
     (galoisClosure e).ext.degree = e.degree := rfl
 
 -- Theorem 77: Path from original degree to closure group order
-def galoisClosure_path (e : FieldExt) :
+noncomputable def galoisClosure_path (e : FieldExt) :
     Path (galoisClosure e).ext.degree (galoisClosure e).galGrp.order :=
   Path.refl e.degree
 
@@ -794,7 +794,7 @@ structure GaloisTheoryPackage where
   isGalois : Bool
 
 /-- A complete Galois extension package -/
-def completePackage (deg : Nat) : GaloisTheoryPackage :=
+noncomputable def completePackage (deg : Nat) : GaloisTheoryPackage :=
   { extension := { base := Unit, extension := Unit, degree := deg, isFinite := true },
     splittingFld := { poly := { degree := deg, numRoots := deg, isSplit := true },
                       extDegree := deg, isNormal := true },
@@ -809,13 +809,13 @@ theorem complete_isGalois (deg : Nat) :
     (completePackage deg).isGalois = true := rfl
 
 -- Theorem 79: All three conditions hold (normal + separable + Galois)
-def complete_conditions (deg : Nat) :
+noncomputable def complete_conditions (deg : Nat) :
     Path (completePackage deg).splittingFld.isNormal
          (completePackage deg).separability.isSeparable :=
   Path.refl true
 
 -- Theorem 80: Group order equals extension degree in complete package
-def complete_degree_order (deg : Nat) :
+noncomputable def complete_degree_order (deg : Nat) :
     Path (completePackage deg).extension.degree
          (completePackage deg).galoisGrp.order :=
   Path.refl deg
@@ -825,18 +825,18 @@ theorem complete_solvable (deg : Nat) :
     (completePackage deg).solvability.isSolvable = true := rfl
 
 -- Theorem 82: congrArg through package projection
-def complete_congrArg (deg : Nat) :
+noncomputable def complete_congrArg (deg : Nat) :
     Path (GaloisTheoryPackage.extension (completePackage deg)).degree
          (GaloisTheoryPackage.galoisGrp (completePackage deg)).order :=
   Path.refl deg
 
 -- Theorem 83: Grand unification — degree and group order connected
-def grand_unification (deg : Nat) :
+noncomputable def grand_unification (deg : Nat) :
     Path (completePackage deg).extension.degree (completePackage deg).galoisGrp.order :=
   Path.refl deg
 
 -- Theorem 84: Trans composes two Galois correspondences
-def grand_trans (d : Nat) :
+noncomputable def grand_trans (d : Nat) :
     Path (mkGaloisExt d true true).ext.degree (mkGaloisExt d true true).solvability.compositionLength :=
   Path.trans (galois_degree_order d true true) (Path.refl d)
 

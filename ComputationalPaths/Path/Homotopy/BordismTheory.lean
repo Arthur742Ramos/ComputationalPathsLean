@@ -56,7 +56,7 @@ structure ClosedManifold extends Manifold.{u} where
   closed : True
 
 /-- The dimension of a closed manifold. -/
-def ClosedManifold.dimension (M : ClosedManifold.{u}) : Nat :=
+noncomputable def ClosedManifold.dimension (M : ClosedManifold.{u}) : Nat :=
   M.dim
 
 /-! ## Bordism Data -/
@@ -68,7 +68,7 @@ structure Bordism (M N : Manifold.{u}) where
   cobordism_dim : cobordism.dim = M.dim + 1
 
 /-- Reflexive bordism: every manifold is bordant to itself via the cylinder. -/
-def bordismRefl (M : Manifold.{u}) : Bordism M M where
+noncomputable def bordismRefl (M : Manifold.{u}) : Bordism M M where
   cobordism := {
     carrier := M.carrier
     boundary := M.carrier × Bool
@@ -79,7 +79,7 @@ def bordismRefl (M : Manifold.{u}) : Bordism M M where
   cobordism_dim := rfl
 
 /-- Symmetric bordism: if M is bordant to N, then N is bordant to M. -/
-def bordismSymm {M N : Manifold.{u}} (b : Bordism M N) : Bordism N M where
+noncomputable def bordismSymm {M N : Manifold.{u}} (b : Bordism M N) : Bordism N M where
   cobordism := {
     carrier := b.cobordism.carrier
     boundary := b.cobordism.boundary
@@ -90,7 +90,7 @@ def bordismSymm {M N : Manifold.{u}} (b : Bordism M N) : Bordism N M where
   cobordism_dim := by rw [b.cobordism_dim, b.dim_eq]
 
 /-- Transitive bordism: if M~N and N~P then M~P by gluing cobordisms. -/
-def bordismTrans {M N P : Manifold.{u}}
+noncomputable def bordismTrans {M N P : Manifold.{u}}
     (b₁ : Bordism M N) (b₂ : Bordism N P) : Bordism M P where
   cobordism := {
     carrier := b₁.cobordism.carrier ⊕ b₂.cobordism.carrier
@@ -111,11 +111,11 @@ structure BordismClass (n : Nat) where
   dim_eq : representative.dim = n
 
 /-- Bordism relation on classes. -/
-def bordismRel (n : Nat) : BordismClass.{u} n → BordismClass.{u} n → Prop :=
+noncomputable def bordismRel (n : Nat) : BordismClass.{u} n → BordismClass.{u} n → Prop :=
   fun c₁ c₂ => Nonempty (Bordism c₁.representative c₂.representative)
 
 /-- The n-th bordism group Ω_n as a quotient. -/
-def BordismGroup (n : Nat) : Type (u + 1) := Quot (bordismRel.{u} n)
+noncomputable def BordismGroup (n : Nat) : Type (u + 1) := Quot (bordismRel.{u} n)
 
 /-- The bordism relation is reflexive. -/
 theorem bordismRel_refl {n : Nat} (c : BordismClass.{u} n) :
@@ -136,20 +136,20 @@ theorem bordismRel_trans {n : Nat} {c₁ c₂ c₃ : BordismClass.{u} n}
 /-! ## Disjoint Union Operation -/
 
 /-- Disjoint union of manifolds. -/
-def manifoldDisjointUnion (M N : Manifold.{u}) (_h : M.dim = N.dim) :
+noncomputable def manifoldDisjointUnion (M N : Manifold.{u}) (_h : M.dim = N.dim) :
     Manifold.{u} where
   carrier := M.carrier ⊕ N.carrier
   dim := M.dim
 
 /-- Disjoint union of bordism classes. -/
-def bordismClassDisjointUnion {n : Nat}
+noncomputable def bordismClassDisjointUnion {n : Nat}
     (c₁ c₂ : BordismClass.{u} n) : BordismClass.{u} n where
   representative := manifoldDisjointUnion c₁.representative c₂.representative
       (by rw [c₁.dim_eq, c₂.dim_eq])
   dim_eq := c₁.dim_eq
 
 /-- Path witness: disjoint union preserves dimension. -/
-def disjointUnion_dim_path {n : Nat} (c₁ c₂ : BordismClass.{u} n) :
+noncomputable def disjointUnion_dim_path {n : Nat} (c₁ c₂ : BordismClass.{u} n) :
     Path (bordismClassDisjointUnion c₁ c₂).representative.dim n :=
   Path.stepChain c₁.dim_eq
 
@@ -174,12 +174,12 @@ theorem disjointUnion_comm {n : Nat} (c₁ c₂ : BordismClass.{u} n) :
 /-! ## Empty Manifold (Zero Element) -/
 
 /-- The empty manifold in dimension n. -/
-def emptyManifold (n : Nat) : Manifold.{u} where
+noncomputable def emptyManifold (n : Nat) : Manifold.{u} where
   carrier := PEmpty
   dim := n
 
 /-- The bordism class of the empty manifold. -/
-def emptyBordismClass (n : Nat) : BordismClass.{u} n where
+noncomputable def emptyBordismClass (n : Nat) : BordismClass.{u} n where
   representative := emptyManifold n
   dim_eq := rfl
 
@@ -219,12 +219,12 @@ structure OrientedBordismClass (n : Nat) where
   dim_eq : representative.dim = n
 
 /-- Oriented bordism relation. -/
-def orientedBordismRel (n : Nat) :
+noncomputable def orientedBordismRel (n : Nat) :
     OrientedBordismClass.{u} n → OrientedBordismClass.{u} n → Prop :=
   fun c₁ c₂ => Nonempty (OrientedBordism c₁.representative c₂.representative)
 
 /-- Oriented bordism group. -/
-def OrientedBordismGroup (n : Nat) : Type (u + 1) :=
+noncomputable def OrientedBordismGroup (n : Nat) : Type (u + 1) :=
   Quot (orientedBordismRel.{u} n)
 
 /-! ## Thom Spectrum -/
@@ -242,13 +242,13 @@ structure PontrjaginThom (n : Nat) where
 /-! ## Bordism Ring Structure -/
 
 /-- Cartesian product of manifolds. -/
-def manifoldProduct (M : Manifold.{u}) (N : Manifold.{u}) :
+noncomputable def manifoldProduct (M : Manifold.{u}) (N : Manifold.{u}) :
     Manifold.{u} where
   carrier := M.carrier × N.carrier
   dim := M.dim + N.dim
 
 /-- Product of bordism classes. -/
-def bordismClassProduct {m n : Nat}
+noncomputable def bordismClassProduct {m n : Nat}
     (c₁ : BordismClass.{u} m) (c₂ : BordismClass.{u} n) :
     BordismClass.{u} (m + n) where
   representative := manifoldProduct c₁.representative c₂.representative
@@ -257,7 +257,7 @@ def bordismClassProduct {m n : Nat}
     rw [c₁.dim_eq, c₂.dim_eq]
 
 /-- Path witness: product preserves dimension sum. -/
-def product_dim_path {m n : Nat}
+noncomputable def product_dim_path {m n : Nat}
     (c₁ : BordismClass.{u} m) (c₂ : BordismClass.{u} n) :
     Path
       (bordismClassProduct c₁ c₂).representative.dim
@@ -265,7 +265,7 @@ def product_dim_path {m n : Nat}
   Path.stepChain (bordismClassProduct c₁ c₂).dim_eq
 
 /-- Product with the point is identity up to dimension. -/
-def bordismClassPoint : BordismClass.{u} 0 where
+noncomputable def bordismClassPoint : BordismClass.{u} 0 where
   representative := { carrier := PUnit, dim := 0 }
   dim_eq := rfl
 
@@ -286,18 +286,18 @@ structure BordismInvariant (n : Nat) {R : Type} where
     bordismRel n c₁ c₂ → val c₁ = val c₂
 
 /-- A bordism invariant factors through the bordism group. -/
-def BordismInvariant.factor {n : Nat} {R : Type}
+noncomputable def BordismInvariant.factor {n : Nat} {R : Type}
     (inv : BordismInvariant.{u} n (R := R)) : BordismGroup.{u} n → R :=
   Quot.lift inv.val (fun c₁ c₂ h => inv.invariant c₁ c₂ h)
 
 /-- The dimension is trivially a bordism invariant
     (all classes in Ω_n have dimension n). -/
-def dimensionInvariant (n : Nat) : BordismInvariant.{u} n (R := Nat) where
+noncomputable def dimensionInvariant (n : Nat) : BordismInvariant.{u} n (R := Nat) where
   val := fun c => c.representative.dim
   invariant := fun c₁ c₂ _ => by rw [c₁.dim_eq, c₂.dim_eq]
 
 /-- Path witness: dimension invariant is constant on classes. -/
-def dimension_constant_path {n : Nat} (c : BordismClass.{u} n) :
+noncomputable def dimension_constant_path {n : Nat} (c : BordismClass.{u} n) :
     Path ((dimensionInvariant.{u} n).val c) n :=
   Path.stepChain c.dim_eq
 
@@ -319,28 +319,28 @@ structure EulerCharBordismInvariant (n : Nat) where
 /-! ## Path Coherence -/
 
 /-- Path witness for reflexive bordism dimension. -/
-def bordismRefl_dim_path (M : Manifold.{u}) :
+noncomputable def bordismRefl_dim_path (M : Manifold.{u}) :
     Path (bordismRefl M).cobordism.dim (M.dim + 1) :=
   Path.refl _
 
 /-- Path witness for bordism symmetry preserving cobordism dimension. -/
-def bordismSymm_dim_path {M N : Manifold.{u}} (b : Bordism M N) :
+noncomputable def bordismSymm_dim_path {M N : Manifold.{u}} (b : Bordism M N) :
     Path (bordismSymm b).cobordism.dim b.cobordism.dim :=
   Path.refl _
 
 /-- Path witness for transitivity cobordism dimension. -/
-def bordismTrans_dim_path {M N P : Manifold.{u}}
+noncomputable def bordismTrans_dim_path {M N P : Manifold.{u}}
     (b₁ : Bordism M N) (b₂ : Bordism N P) :
     Path (bordismTrans b₁ b₂).cobordism.dim (M.dim + 1) :=
   Path.refl _
 
 /-- Path witness for empty manifold dimension. -/
-def emptyManifold_dim_path (n : Nat) :
+noncomputable def emptyManifold_dim_path (n : Nat) :
     Path (emptyManifold.{u} n).dim n :=
   Path.refl _
 
 /-- Path witness for product dimension formula. -/
-def manifoldProduct_dim_path (M N : Manifold.{u}) :
+noncomputable def manifoldProduct_dim_path (M N : Manifold.{u}) :
     Path (manifoldProduct M N).dim (M.dim + N.dim) :=
   Path.refl _
 

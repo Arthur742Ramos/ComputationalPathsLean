@@ -48,14 +48,14 @@ inductive RPath (α : Type) (R : α → α → Prop) : α → α → Type where
   | cons  : {a b c : α} → Step α R a b → RPath α R b c → RPath α R a c
 
 /-- Transitivity: concatenation of rewriting paths. -/
-def RPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def RPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
     (p : RPath α R a b) (q : RPath α R b c) : RPath α R a c :=
   match p with
   | .refl _ => q
   | .cons s rest => .cons s (rest.trans q)
 
 /-- A single step as a path. -/
-def RPath.single {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.single {α : Type} {R : α → α → Prop} {a b : α}
     (s : Step α R a b) : RPath α R a b :=
   .cons s (.refl b)
 
@@ -70,35 +70,35 @@ inductive ConvPath (α : Type) (R : α → α → Prop) : α → α → Type whe
   | cons : {a b c : α} → SymStep α R a b → ConvPath α R b c → ConvPath α R a c
 
 /-- Transitivity for convertibility paths. -/
-def ConvPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def ConvPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
     (p : ConvPath α R a b) (q : ConvPath α R b c) : ConvPath α R a c :=
   match p with
   | .refl _ => q
   | .cons s rest => .cons s (rest.trans q)
 
 /-- Symmetry for a single symmetric step. -/
-def SymStep.flip {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def SymStep.flip {α : Type} {R : α → α → Prop} {a b : α}
     (s : SymStep α R a b) : SymStep α R b a :=
   match s with
   | .fwd st => .bwd st
   | .bwd st => .fwd st
 
 /-- Symmetry for convertibility paths. -/
-def ConvPath.symm {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def ConvPath.symm {α : Type} {R : α → α → Prop} {a b : α}
     (p : ConvPath α R a b) : ConvPath α R b a :=
   match p with
   | .refl _ => .refl _
   | .cons s rest => rest.symm.trans (.cons s.flip (.refl _))
 
 /-- Embed a forward rewriting path into a convertibility path. -/
-def RPath.toConv {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.toConv {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) : ConvPath α R a b :=
   match p with
   | .refl _ => .refl _
   | .cons s rest => .cons (.fwd s) rest.toConv
 
 /-- Embed a backward rewriting path into a convertibility path. -/
-def RPath.toConvRev {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.toConvRev {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R b a) : ConvPath α R a b :=
   p.toConv.symm
 
@@ -107,14 +107,14 @@ def RPath.toConvRev {α : Type} {R : α → α → Prop} {a b : α}
 -- ════════════════════════════════════════════════════════════
 
 /-- Length of a rewriting path. -/
-def RPath.length {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.length {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) : Nat :=
   match p with
   | .refl _ => 0
   | .cons _ rest => 1 + rest.length
 
 /-- Length of a convertibility path. -/
-def ConvPath.length {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def ConvPath.length {α : Type} {R : α → α → Prop} {a b : α}
     (p : ConvPath α R a b) : Nat :=
   match p with
   | .refl _ => 0
@@ -203,14 +203,14 @@ theorem toConv_length {α : Type} {R : α → α → Prop} {a b : α}
 -- ════════════════════════════════════════════════════════════
 
 /-- congrArg for steps: map through a compatible function. -/
-def Step.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Step.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {a b : α} (s : Step α R a b) : Step β S (f a) (f b) :=
   match s with
   | .mk r => .mk (hf r)
 
 /-- congrArg for rewriting paths. -/
-def RPath.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def RPath.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {a b : α} (p : RPath α R a b) : RPath β S (f a) (f b) :=
   match p with
@@ -218,7 +218,7 @@ def RPath.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
   | .cons s rest => .cons (s.mapR f hf) (rest.mapR f hf)
 
 /-- congrArg for SymStep. -/
-def SymStep.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def SymStep.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {a b : α} (s : SymStep α R a b) : SymStep β S (f a) (f b) :=
   match s with
@@ -226,7 +226,7 @@ def SymStep.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop
   | .bwd st => .bwd (st.mapR f hf)
 
 /-- congrArg for ConvPath. -/
-def ConvPath.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def ConvPath.mapR {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {a b : α} (p : ConvPath α R a b) : ConvPath β S (f a) (f b) :=
   match p with
@@ -283,12 +283,12 @@ structure Joinable (α : Type) (R : α → α → Prop) (a b : α) where
   right  : RPath α R b target
 
 /-- Joinability is reflexive. -/
-def Joinable.rfl_join {α : Type} {R : α → α → Prop} (a : α) :
+noncomputable def Joinable.rfl_join {α : Type} {R : α → α → Prop} (a : α) :
     Joinable α R a a :=
   ⟨a, .refl a, .refl a⟩
 
 /-- Joinability is symmetric. -/
-def Joinable.symm_join {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def Joinable.symm_join {α : Type} {R : α → α → Prop} {a b : α}
     (j : Joinable α R a b) : Joinable α R b a :=
   ⟨j.target, j.right, j.left⟩
 
@@ -308,23 +308,23 @@ structure DiamondWit (α : Type) (R : α → α → Prop)
   right : RPath α R c peak
 
 /-- Diamond property (one-step): every fork closes in one step. -/
-def HasDiamond (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def HasDiamond (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α), R a b → R a c →
     ∃ d : α, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
 
 /-- Local confluence: every one-step fork joins via multi-step. -/
-def WCR (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def WCR (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α), R a b → R a c →
     ∃ d : α, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
 
 /-- Confluence: every multi-step fork joins. -/
-def CR (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def CR (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α),
     (∃ _ : RPath α R a b, True) → (∃ _ : RPath α R a c, True) →
     ∃ d : α, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
 
 /-- Church-Rosser: convertibility implies joinability. -/
-def ChurchRosser (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def ChurchRosser (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b : α), (∃ _ : ConvPath α R a b, True) →
     ∃ c : α, (∃ _ : RPath α R a c, ∃ _ : RPath α R b c, True)
 
@@ -333,7 +333,7 @@ def ChurchRosser (α : Type) (R : α → α → Prop) : Prop :=
 -- ════════════════════════════════════════════════════════════
 
 /-- Extend a joinable pair by one step on the left. -/
-def Joinable.extendLeft {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def Joinable.extendLeft {α : Type} {R : α → α → Prop} {a b c : α}
     (s : Step α R a b) (j : Joinable α R b c)
     : Joinable α R a c :=
   ⟨j.target, .cons s j.left, j.right⟩
@@ -344,7 +344,7 @@ theorem joinable_extendLeft_length {α : Type} {R : α → α → Prop}
     (j.extendLeft s).left.length = 1 + j.left.length := rfl
 
 /-- Widen joinability on left: if a ↓ b and a' →* a, then a' ↓ b. -/
-def Joinable.widenLeft {α : Type} {R : α → α → Prop} {a a' b : α}
+noncomputable def Joinable.widenLeft {α : Type} {R : α → α → Prop} {a a' b : α}
     (j : Joinable α R a b) (p : RPath α R a' a)
     : Joinable α R a' b :=
   ⟨j.target, p.trans j.left, j.right⟩
@@ -370,7 +370,7 @@ theorem cr_implies_wcr {α : Type} {R : α → α → Prop}
 -- ════════════════════════════════════════════════════════════
 
 /-- a is in normal form with respect to R: no reduction applies. -/
-def IsNF (α : Type) (R : α → α → Prop) (a : α) : Prop :=
+noncomputable def IsNF (α : Type) (R : α → α → Prop) (a : α) : Prop :=
   ∀ b : α, ¬ R a b
 
 /-- a reduces to normal form b. -/
@@ -379,15 +379,15 @@ structure NormalizesTo (α : Type) (R : α → α → Prop) (a b : α) where
   nf   : IsNF α R b
 
 /-- The ARS is weakly normalising: every element has a normal form. -/
-def WN (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def WN (α : Type) (R : α → α → Prop) : Prop :=
   ∀ a : α, ∃ b : α, ∃ _ : NormalizesTo α R a b, True
 
 /-- The ARS is strongly normalising: no infinite reduction sequences. -/
-def SN (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def SN (α : Type) (R : α → α → Prop) : Prop :=
   ∀ a : α, Acc (fun x y => R y x) a
 
 /-- Theorem 25: a normal form is its own normal form. -/
-def nf_self_normalizes {α : Type} {R : α → α → Prop} {a : α}
+noncomputable def nf_self_normalizes {α : Type} {R : α → α → Prop} {a : α}
     (h : IsNF α R a) : NormalizesTo α R a a :=
   ⟨.refl a, h⟩
 
@@ -424,7 +424,7 @@ theorem nf_path_trivial {α : Type} {R : α → α → Prop} {a b : α}
 -- ════════════════════════════════════════════════════════════
 
 /-- Unique normal form property: any two normal forms of a are equal. -/
-def UN (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def UN (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α), NormalizesTo α R a b → NormalizesTo α R a c → b = c
 
 /-- Theorem 29: CR + WN implies unique normal forms. -/
@@ -456,41 +456,41 @@ inductive ParPath (α : Type) (R : α → α → Prop) : α → α → Type wher
   | cons : {a b c : α} → ParStep α R a b → ParPath α R b c → ParPath α R a c
 
 /-- Transitivity for parallel paths. -/
-def ParPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def ParPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
     (p : ParPath α R a b) (q : ParPath α R b c) : ParPath α R a c :=
   match p with
   | .nil _ => q
   | .cons s rest => .cons s (rest.trans q)
 
 /-- Length of a parallel path. -/
-def ParPath.length {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def ParPath.length {α : Type} {R : α → α → Prop} {a b : α}
     (p : ParPath α R a b) : Nat :=
   match p with
   | .nil _ => 0
   | .cons _ rest => 1 + rest.length
 
 /-- Embed a regular step as a parallel step. -/
-def Step.toParStep {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def Step.toParStep {α : Type} {R : α → α → Prop} {a b : α}
     (s : Step α R a b) : ParStep α R a b :=
   match s with
   | .mk r => .step r
 
 /-- Embed a rewriting path into a parallel path. -/
-def RPath.toParPath {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.toParPath {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) : ParPath α R a b :=
   match p with
   | .refl _ => .nil _
   | .cons s rest => .cons s.toParStep rest.toParPath
 
 /-- Embed a parallel step as a rewriting path. -/
-def ParStep.toRPath {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def ParStep.toRPath {α : Type} {R : α → α → Prop} {a b : α}
     (ps : ParStep α R a b) : RPath α R a b :=
   match ps with
   | .refl _ => .refl _
   | .step r => .single (.mk r)
 
 /-- Embed a parallel path as a rewriting path. -/
-def ParPath.toRPath {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def ParPath.toRPath {α : Type} {R : α → α → Prop} {a b : α}
     (p : ParPath α R a b) : RPath α R a b :=
   match p with
   | .nil _ => .refl _
@@ -560,28 +560,28 @@ inductive LPath (α : Type) (R : α → α → Prop) (L : Type) : α → α → 
   | cons : {a b c : α} → LStep α R L a b → LPath α R L b c → LPath α R L a c
 
 /-- Transitivity for labelled paths. -/
-def LPath.trans {α : Type} {R : α → α → Prop} {L : Type} {a b c : α}
+noncomputable def LPath.trans {α : Type} {R : α → α → Prop} {L : Type} {a b c : α}
     (p : LPath α R L a b) (q : LPath α R L b c) : LPath α R L a c :=
   match p with
   | .refl _ => q
   | .cons s rest => .cons s (rest.trans q)
 
 /-- Length of a labelled path. -/
-def LPath.length {α : Type} {R : α → α → Prop} {L : Type} {a b : α}
+noncomputable def LPath.length {α : Type} {R : α → α → Prop} {L : Type} {a b : α}
     (p : LPath α R L a b) : Nat :=
   match p with
   | .refl _ => 0
   | .cons _ rest => 1 + rest.length
 
 /-- Extract the label sequence from a labelled path. -/
-def LPath.labels {α : Type} {R : α → α → Prop} {L : Type} {a b : α}
+noncomputable def LPath.labels {α : Type} {R : α → α → Prop} {L : Type} {a b : α}
     (p : LPath α R L a b) : List L :=
   match p with
   | .refl _ => []
   | .cons (.mk l _) rest => l :: rest.labels
 
 /-- Forget labels: project to an unlabelled path. -/
-def LPath.forget {α : Type} {R : α → α → Prop} {L : Type} {a b : α}
+noncomputable def LPath.forget {α : Type} {R : α → α → Prop} {L : Type} {a b : α}
     (p : LPath α R L a b) : RPath α R a b :=
   match p with
   | .refl _ => .refl _
@@ -644,28 +644,28 @@ inductive DevPath (α : Type) (R : α → α → Prop) : α → α → Type wher
   | fire : {a b c : α} → MarkedStep α R a b → DevPath α R b c → DevPath α R a c
 
 /-- Transitivity for developments. -/
-def DevPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def DevPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
     (p : DevPath α R a b) (q : DevPath α R b c) : DevPath α R a c :=
   match p with
   | .done _ => q
   | .fire m rest => .fire m (rest.trans q)
 
 /-- Length of a development. -/
-def DevPath.length {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def DevPath.length {α : Type} {R : α → α → Prop} {a b : α}
     (p : DevPath α R a b) : Nat :=
   match p with
   | .done _ => 0
   | .fire _ rest => 1 + rest.length
 
 /-- Count fired (marked=true) steps in a development. -/
-def DevPath.firedCount {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def DevPath.firedCount {α : Type} {R : α → α → Prop} {a b : α}
     (p : DevPath α R a b) : Nat :=
   match p with
   | .done _ => 0
   | .fire m rest => (if m.marked then 1 else 0) + rest.firedCount
 
 /-- Forget marking: project development to plain path. -/
-def DevPath.toRPath {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def DevPath.toRPath {α : Type} {R : α → α → Prop} {a b : α}
     (p : DevPath α R a b) : RPath α R a b :=
   match p with
   | .done _ => .refl _
@@ -724,28 +724,28 @@ inductive StdPath (α : Type) (R : α → α → Prop) : α → α → Type wher
   | cons : {a b c : α} → PriorStep α R a b → StdPath α R b c → StdPath α R a c
 
 /-- Transitivity for standard paths. -/
-def StdPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def StdPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
     (p : StdPath α R a b) (q : StdPath α R b c) : StdPath α R a c :=
   match p with
   | .nil _ => q
   | .cons s rest => .cons s (rest.trans q)
 
 /-- Length of a standard path. -/
-def StdPath.length {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def StdPath.length {α : Type} {R : α → α → Prop} {a b : α}
     (p : StdPath α R a b) : Nat :=
   match p with
   | .nil _ => 0
   | .cons _ rest => 1 + rest.length
 
 /-- Forget priorities: project to plain path. -/
-def StdPath.toRPath {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def StdPath.toRPath {α : Type} {R : α → α → Prop} {a b : α}
     (p : StdPath α R a b) : RPath α R a b :=
   match p with
   | .nil _ => .refl _
   | .cons ps rest => .cons ps.step rest.toRPath
 
 /-- Check if a standard path is actually standard (non-decreasing priorities). -/
-def StdPath.isStandard {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def StdPath.isStandard {α : Type} {R : α → α → Prop} {a b : α}
     (p : StdPath α R a b) : Bool :=
   match p with
   | .nil _ => true
@@ -805,11 +805,11 @@ structure Equation (α : Type) where
   right : α
 
 /-- Orient an equation into a rule (left-to-right). -/
-def Equation.orientLR (eq : Equation α) : Rule α :=
+noncomputable def Equation.orientLR (eq : Equation α) : Rule α :=
   ⟨eq.left, eq.right⟩
 
 /-- Orient an equation into a rule (right-to-left). -/
-def Equation.orientRL (eq : Equation α) : Rule α :=
+noncomputable def Equation.orientRL (eq : Equation α) : Rule α :=
   ⟨eq.right, eq.left⟩
 
 /-- Theorem 55: LR then RL gives swap. -/
@@ -826,17 +826,17 @@ structure CompState (α : Type) where
   pending  : List (Equation α)
 
 /-- Add a rule to a completion state. -/
-def CompState.addRule (st : CompState α) (r : Rule α) : CompState α :=
+noncomputable def CompState.addRule (st : CompState α) (r : Rule α) : CompState α :=
   { st with rules := r :: st.rules }
 
 /-- Dequeue an equation from a completion state. -/
-def CompState.dequeue (st : CompState α) : Option (Equation α × CompState α) :=
+noncomputable def CompState.dequeue (st : CompState α) : Option (Equation α × CompState α) :=
   match st.pending with
   | [] => none
   | eq :: rest => some (eq, { st with pending := rest })
 
 /-- Orient and add: orient the first pending equation and add as rule. -/
-def CompState.orientAndAdd (st : CompState α) : Option (CompState α) :=
+noncomputable def CompState.orientAndAdd (st : CompState α) : Option (CompState α) :=
   match st.dequeue with
   | none => none
   | some (eq, st') => some (st'.addRule eq.orientLR)
@@ -868,7 +868,7 @@ theorem compstate_dequeue_length {α : Type} (st : CompState α)
 -- ════════════════════════════════════════════════════════════
 
 /-- Transport a type family along a rewriting path. -/
-def RPath.transportProp {α : Type} {R : α → α → Prop}
+noncomputable def RPath.transportProp {α : Type} {R : α → α → Prop}
     (P : α → Prop) (preserve : ∀ {x y}, R x y → P x → P y)
     {a b : α} (p : RPath α R a b) (pa : P a) : P b :=
   match p with
@@ -898,7 +898,7 @@ theorem transport_trans {α : Type} {R : α → α → Prop}
 -- ════════════════════════════════════════════════════════════
 
 /-- Reverse a rewriting path (as a conv path going backward). -/
-def RPath.reverse {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.reverse {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) : ConvPath α R b a :=
   p.toConv.symm
 
@@ -907,7 +907,7 @@ theorem rpath_reverse_refl {α : Type} {R : α → α → Prop} (a : α) :
     (RPath.refl a : RPath α R a a).reverse = ConvPath.refl a := rfl
 
 /-- Concatenate a forward path and a backward path into a conv path. -/
-def joinToConv {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def joinToConv {α : Type} {R : α → α → Prop} {a b c : α}
     (p : RPath α R a b) (q : RPath α R c b) : ConvPath α R a c :=
   p.toConv.trans q.toConv.symm
 
@@ -917,7 +917,7 @@ theorem joinToConv_refl_left {α : Type} {R : α → α → Prop} {a b : α}
     joinToConv (RPath.refl a) q = q.toConv.symm := rfl
 
 /-- Theorem 64: conv path from joinable witness. -/
-def Joinable.toConvPath {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def Joinable.toConvPath {α : Type} {R : α → α → Prop} {a b : α}
     (j : Joinable α R a b) : ConvPath α R a b :=
   joinToConv j.left j.right
 

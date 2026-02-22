@@ -29,12 +29,12 @@ structure HashFn (M D : Type u) where
   hash : M → D
 
 /-- Two hash functions are path-equal iff they agree pointwise. -/
-def hashPath {M D : Type u} (h1 h2 : HashFn M D) (heq : h1 = h2) :
+noncomputable def hashPath {M D : Type u} (h1 h2 : HashFn M D) (heq : h1 = h2) :
     Path h1 h2 :=
   Path.mk [Step.mk _ _ heq] heq
 
 /-- Composing hash functions. -/
-def hashCompose {M D E : Type u} (h1 : HashFn M D) (h2 : HashFn D E) :
+noncomputable def hashCompose {M D E : Type u} (h1 : HashFn M D) (h2 : HashFn D E) :
     HashFn M E :=
   ⟨h2.hash ∘ h1.hash⟩
 
@@ -45,13 +45,13 @@ theorem hashCompose_assoc {M D E F : Type u}
   rfl
 
 /-- Path witnessing hash composition associativity. -/
-def hashCompose_assoc_path {M D E F : Type u}
+noncomputable def hashCompose_assoc_path {M D E F : Type u}
     (h1 : HashFn M D) (h2 : HashFn D E) (h3 : HashFn E F) :
     Path (hashCompose (hashCompose h1 h2) h3) (hashCompose h1 (hashCompose h2 h3)) :=
   Path.refl _
 
 /-- Identity hash function. -/
-def hashId (M : Type u) : HashFn M M := ⟨id⟩
+noncomputable def hashId (M : Type u) : HashFn M M := ⟨id⟩
 
 /-- Left identity for hash composition. -/
 theorem hashCompose_id_left {M D : Type u} (h : HashFn M D) :
@@ -64,12 +64,12 @@ theorem hashCompose_id_right {M D : Type u} (h : HashFn M D) :
   rfl
 
 /-- Path: left identity. -/
-def hashCompose_id_left_path {M D : Type u} (h : HashFn M D) :
+noncomputable def hashCompose_id_left_path {M D : Type u} (h : HashFn M D) :
     Path (hashCompose (hashId M) h) h :=
   Path.refl _
 
 /-- Path: right identity. -/
-def hashCompose_id_right_path {M D : Type u} (h : HashFn M D) :
+noncomputable def hashCompose_id_right_path {M D : Type u} (h : HashFn M D) :
     Path (hashCompose h (hashId D)) h :=
   Path.refl _
 
@@ -85,11 +85,11 @@ structure OneWayWitness {A B : Type u} (f : FnWithInverse A B) where
   forward_backward : ∀ b : B, f.forward (f.backward b) = f.forward (f.backward b)
 
 /-- Trivial one-way witness (reflexivity). -/
-def trivialOneWay {A B : Type u} (f : FnWithInverse A B) : OneWayWitness f :=
+noncomputable def trivialOneWay {A B : Type u} (f : FnWithInverse A B) : OneWayWitness f :=
   ⟨fun _ => rfl⟩
 
 /-- Path witnessing the one-way property for each input. -/
-def oneWayPath {A B : Type u} (f : FnWithInverse A B) (b : B) :
+noncomputable def oneWayPath {A B : Type u} (f : FnWithInverse A B) (b : B) :
     Path (f.forward (f.backward b)) (f.forward (f.backward b)) :=
   Path.refl _
 
@@ -106,13 +106,13 @@ theorem commitment_binding {M R C : Type u}
     cs.commit m r = cs.commit m r := rfl
 
 /-- Path witnessing binding. -/
-def commitment_binding_path {M R C : Type u}
+noncomputable def commitment_binding_path {M R C : Type u}
     (cs : CommitmentScheme M R C) (m : M) (r : R) :
     Path (cs.commit m r) (cs.commit m r) :=
   Path.refl _
 
 /-- Composing commitment schemes with a hash on the message space. -/
-def commitWithHash {M M' R C : Type u}
+noncomputable def commitWithHash {M M' R C : Type u}
     (h : HashFn M M') (cs : CommitmentScheme M' R C) :
     CommitmentScheme M R C :=
   ⟨fun m r => cs.commit (h.hash m) r, fun _ _ => none⟩
@@ -124,7 +124,7 @@ theorem commitWithHash_id {M R C : Type u}
   rfl
 
 /-- Path for commitment with id hash. -/
-def commitWithHash_id_path {M R C : Type u}
+noncomputable def commitWithHash_id_path {M R C : Type u}
     (cs : CommitmentScheme M R C) (m : M) (r : R) :
     Path ((commitWithHash (hashId M) cs).commit m r) (cs.commit m r) :=
   Path.refl _
@@ -141,7 +141,7 @@ structure SymEncCorrect {P C K : Type u} (s : SymEncScheme P C K) where
   correct : ∀ k m, s.decrypt k (s.encrypt k m) = m
 
 /-- Path witnessing encryption correctness. -/
-def encDecPath {P C K : Type u} (s : SymEncScheme P C K)
+noncomputable def encDecPath {P C K : Type u} (s : SymEncScheme P C K)
     (h : SymEncCorrect s) (k : K) (m : P) :
     Path (s.decrypt k (s.encrypt k m)) m :=
   Path.mk [Step.mk _ _ (h.correct k m)] (h.correct k m)
@@ -153,7 +153,7 @@ theorem double_enc_dec {P C K : Type u} (s : SymEncScheme P C K)
   rw [h.correct, h.correct]
 
 /-- Path for double encryption cancellation. -/
-def double_enc_dec_path {P C K : Type u} (s : SymEncScheme P C K)
+noncomputable def double_enc_dec_path {P C K : Type u} (s : SymEncScheme P C K)
     (h : SymEncCorrect s) (k : K) (m : P) :
     Path (s.decrypt k (s.encrypt k (s.decrypt k (s.encrypt k m)))) m :=
   Path.trans
@@ -161,7 +161,7 @@ def double_enc_dec_path {P C K : Type u} (s : SymEncScheme P C K)
     (encDecPath s h k m)
 
 /-- Encryption is functorial: composing keys. -/
-def encryptTwice {P C K : Type u} (s : SymEncScheme P C K)
+noncomputable def encryptTwice {P C K : Type u} (s : SymEncScheme P C K)
     (k1 k2 : K) (m : P) : C :=
   s.encrypt k2 (s.encrypt k1 m |> s.decrypt k1 |> s.encrypt k1 |> s.decrypt k1)
 
@@ -172,7 +172,7 @@ theorem enc_id_round {P C K : Type u} (s : SymEncScheme P C K)
   rw [h.correct]
 
 /-- Path for enc-dec round trip on plaintext side. -/
-def enc_dec_round_path {P C K : Type u} (s : SymEncScheme P C K)
+noncomputable def enc_dec_round_path {P C K : Type u} (s : SymEncScheme P C K)
     (h : SymEncCorrect s) (k : K) (m : P) :
     Path (s.encrypt k (s.decrypt k (s.encrypt k m))) (s.encrypt k m) :=
   Path.congrArg (s.encrypt k) (encDecPath s h k m)
@@ -190,7 +190,7 @@ structure SigCorrect {M S VK SK : Type u} (ss : SigScheme M S VK SK) where
   correct : ∀ sk m, ss.verify (keypair sk) m (ss.sign sk m) = true
 
 /-- Path witnessing signature correctness. -/
-def sigCorrectPath {M S VK SK : Type u} (ss : SigScheme M S VK SK)
+noncomputable def sigCorrectPath {M S VK SK : Type u} (ss : SigScheme M S VK SK)
     (h : SigCorrect ss) (sk : SK) (m : M) :
     Path (ss.verify (h.keypair sk) m (ss.sign sk m)) true :=
   Path.mk [Step.mk _ _ (h.correct sk m)] (h.correct sk m)
@@ -201,7 +201,7 @@ theorem sign_deterministic {M S VK SK : Type u}
     ss.sign sk m = ss.sign sk m := rfl
 
 /-- Path: signature determinism. -/
-def sign_deterministic_path {M S VK SK : Type u}
+noncomputable def sign_deterministic_path {M S VK SK : Type u}
     (ss : SigScheme M S VK SK) (sk : SK) (m : M) :
     Path (ss.sign sk m) (ss.sign sk m) :=
   Path.refl _
@@ -218,7 +218,7 @@ structure MACCorrect {M T K : Type u} (mac : MACScheme M T K) where
   correct : ∀ k m, mac.verify k m (mac.tag k m) = true
 
 /-- Path witnessing MAC correctness. -/
-def macCorrectPath {M T K : Type u} (mac : MACScheme M T K)
+noncomputable def macCorrectPath {M T K : Type u} (mac : MACScheme M T K)
     (h : MACCorrect mac) (k : K) (m : M) :
     Path (mac.verify k m (mac.tag k m)) true :=
   Path.mk [Step.mk _ _ (h.correct k m)] (h.correct k m)
@@ -230,7 +230,7 @@ structure KDF (K1 K2 : Type u) where
   derive : K1 → K2
 
 /-- Composing KDFs. -/
-def kdfCompose {K1 K2 K3 : Type u} (f : KDF K1 K2) (g : KDF K2 K3) : KDF K1 K3 :=
+noncomputable def kdfCompose {K1 K2 K3 : Type u} (f : KDF K1 K2) (g : KDF K2 K3) : KDF K1 K3 :=
   ⟨g.derive ∘ f.derive⟩
 
 /-- KDF composition is associative. -/
@@ -240,13 +240,13 @@ theorem kdfCompose_assoc {K1 K2 K3 K4 : Type u}
   rfl
 
 /-- Path for KDF composition associativity. -/
-def kdfCompose_assoc_path {K1 K2 K3 K4 : Type u}
+noncomputable def kdfCompose_assoc_path {K1 K2 K3 K4 : Type u}
     (f : KDF K1 K2) (g : KDF K2 K3) (h : KDF K3 K4) :
     Path (kdfCompose (kdfCompose f g) h) (kdfCompose f (kdfCompose g h)) :=
   Path.refl _
 
 /-- Transport encryption key through KDF. -/
-def transportKey {P C K1 K2 : Type u} (s : SymEncScheme P C K2)
+noncomputable def transportKey {P C K1 K2 : Type u} (s : SymEncScheme P C K2)
     (kdf : KDF K1 K2) (k : K1) (m : P) : C :=
   s.encrypt (kdf.derive k) m
 
@@ -258,7 +258,7 @@ theorem transportKey_compose {P C K1 K2 K3 : Type u}
   rfl
 
 /-- Path for KDF transport composition. -/
-def transportKey_compose_path {P C K1 K2 K3 : Type u}
+noncomputable def transportKey_compose_path {P C K1 K2 K3 : Type u}
     (s : SymEncScheme P C K3) (f : KDF K1 K2) (g : KDF K2 K3)
     (k : K1) (m : P) :
     Path (transportKey s g (f.derive k) m) (transportKey s (kdfCompose f g) k m) :=
@@ -272,12 +272,12 @@ inductive MerkleTree (D : Type u) where
   | node : D → MerkleTree D → MerkleTree D → MerkleTree D
 
 /-- Root hash of a Merkle tree. -/
-def merkleRoot {D : Type u} : MerkleTree D → D
+noncomputable def merkleRoot {D : Type u} : MerkleTree D → D
   | .leaf d => d
   | .node d _ _ => d
 
 /-- Depth of a Merkle tree. -/
-def merkleDepth {D : Type u} : MerkleTree D → Nat
+noncomputable def merkleDepth {D : Type u} : MerkleTree D → Nat
   | .leaf _ => 0
   | .node _ l r => 1 + max (merkleDepth l) (merkleDepth r)
 
@@ -286,7 +286,7 @@ theorem merkleDepth_leaf {D : Type u} (d : D) :
     merkleDepth (MerkleTree.leaf d) = 0 := rfl
 
 /-- Path witnessing leaf depth. -/
-def merkleDepth_leaf_path {D : Type u} (d : D) :
+noncomputable def merkleDepth_leaf_path {D : Type u} (d : D) :
     Path (merkleDepth (MerkleTree.leaf d)) 0 :=
   Path.refl _
 
@@ -300,7 +300,7 @@ theorem merkle_root_congr {D : Type u} (t1 t2 : MerkleTree D) (h : t1 = t2) :
   _root_.congrArg merkleRoot h
 
 /-- Path for root congruence. -/
-def merkle_root_congr_path {D : Type u} (t1 t2 : MerkleTree D) (h : t1 = t2) :
+noncomputable def merkle_root_congr_path {D : Type u} (t1 t2 : MerkleTree D) (h : t1 = t2) :
     Path (merkleRoot t1) (merkleRoot t2) :=
   Path.congrArg merkleRoot (Path.mk [Step.mk _ _ h] h)
 

@@ -77,15 +77,15 @@ noncomputable def groupoidFiberAction {P : A → Type u} {a b : A}
 /-! ## Equivalence between coverings and groupoid actions -/
 
 /-- Build the groupoid action associated to a covering space. -/
-def coveringToGroupoidAction (C : Covering A) : GroupoidAction A :=
+noncomputable def coveringToGroupoidAction (C : Covering A) : GroupoidAction A :=
   ⟨fibrationToFunctor (A := A) C.fiber, C.isCovering.fiberIsSet⟩
 
 /-- Forget a groupoid action to obtain the underlying covering space. -/
-def groupoidActionToCovering (G : GroupoidAction A) : Covering A :=
+noncomputable def groupoidActionToCovering (G : GroupoidAction A) : Covering A :=
   ⟨functorToFibration (A := A) G.functor, ⟨G.fiberIsSet⟩⟩
 
 /-- Covering spaces are equivalent to set-valued fundamental groupoid actions. -/
-def coveringGroupoidActionEquiv (A : Type u) :
+noncomputable def coveringGroupoidActionEquiv (A : Type u) :
     SimpleEquiv (Covering A) (GroupoidAction A) where
   toFun := coveringToGroupoidAction
   invFun := groupoidActionToCovering

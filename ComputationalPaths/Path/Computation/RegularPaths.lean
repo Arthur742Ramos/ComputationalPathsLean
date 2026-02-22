@@ -51,27 +51,27 @@ inductive regexMatch {Alpha : Type u} : Regex Alpha → List Alpha → Prop
 /-! ## Path Language -/
 
 /-- A path language is a set of words (lists over Alpha). -/
-def PathLang (Alpha : Type u) := List Alpha → Prop
+noncomputable def PathLang (Alpha : Type u) := List Alpha → Prop
 
 /-- Language of a regex as a PathLang. -/
-def regexLang {Alpha : Type u} (r : Regex Alpha) : PathLang Alpha :=
+noncomputable def regexLang {Alpha : Type u} (r : Regex Alpha) : PathLang Alpha :=
   fun w => regexMatch r w
 
 /-- Empty language. -/
-def emptyLang (Alpha : Type u) : PathLang Alpha := fun _ => False
+noncomputable def emptyLang (Alpha : Type u) : PathLang Alpha := fun _ => False
 
 /-- Epsilon language (contains only the empty word). -/
-def epsilonLang (Alpha : Type u) : PathLang Alpha := fun w => w = []
+noncomputable def epsilonLang (Alpha : Type u) : PathLang Alpha := fun w => w = []
 
 /-- Singleton language. -/
-def singletonLang {Alpha : Type u} (a : Alpha) : PathLang Alpha := fun w => w = [a]
+noncomputable def singletonLang {Alpha : Type u} (a : Alpha) : PathLang Alpha := fun w => w = [a]
 
 /-- Union of two languages. -/
-def langUnion {Alpha : Type u} (L₁ L₂ : PathLang Alpha) : PathLang Alpha :=
+noncomputable def langUnion {Alpha : Type u} (L₁ L₂ : PathLang Alpha) : PathLang Alpha :=
   fun w => L₁ w ∨ L₂ w
 
 /-- Concatenation of two languages. -/
-def langConcat {Alpha : Type u} (L₁ L₂ : PathLang Alpha) : PathLang Alpha :=
+noncomputable def langConcat {Alpha : Type u} (L₁ L₂ : PathLang Alpha) : PathLang Alpha :=
   fun w => ∃ w₁ w₂, L₁ w₁ ∧ L₂ w₂ ∧ w = w₁ ++ w₂
 
 /-- Kleene star of a language. -/
@@ -160,7 +160,7 @@ theorem star_includes_base {Alpha : Type u} (L : PathLang Alpha) (w : List Alpha
 /-! ## Kleene Algebra Path Structure -/
 
 /-- Regex size for structural arguments. -/
-def regexSize {Alpha : Type u} : Regex Alpha → Nat
+noncomputable def regexSize {Alpha : Type u} : Regex Alpha → Nat
   | .empty => 1
   | .epsilon => 1
   | .char _ => 1
@@ -204,7 +204,7 @@ theorem star_empty_nil {Alpha : Type u} (w : List Alpha) :
 /-! ## Path-based Pumping -/
 
 /-- Word length predicate for pumping. -/
-def wordLongEnough {Alpha : Type u} (w : List Alpha) (n : Nat) : Prop :=
+noncomputable def wordLongEnough {Alpha : Type u} (w : List Alpha) (n : Nat) : Prop :=
   w.length ≥ n
 
 /-- Pumping decomposition structure. -/
@@ -238,7 +238,7 @@ inductive StarFree (Alpha : Type u) : Type u
   | complement : StarFree Alpha → StarFree Alpha
 
 /-- Embedding star-free into regex (without complement). -/
-def starFreeToRegexPartial {Alpha : Type u} : StarFree Alpha → Regex Alpha
+noncomputable def starFreeToRegexPartial {Alpha : Type u} : StarFree Alpha → Regex Alpha
   | .empty => .empty
   | .epsilon => .epsilon
   | .char a => .char a
@@ -247,7 +247,7 @@ def starFreeToRegexPartial {Alpha : Type u} : StarFree Alpha → Regex Alpha
   | .complement r => starFreeToRegexPartial r  -- complement not expressible, keep inner
 
 /-- StarFree size. -/
-def starFreeSize {Alpha : Type u} : StarFree Alpha → Nat
+noncomputable def starFreeSize {Alpha : Type u} : StarFree Alpha → Nat
   | .empty => 1
   | .epsilon => 1
   | .char _ => 1
@@ -310,7 +310,7 @@ theorem symm_symm_regex {Alpha : Type u} (r : Regex Alpha) :
     Path.toEq (Path.refl (regexSize r)) := by simp
 
 /-- congrArg for regex size under union. -/
-def congrArg_regex_union {Alpha : Type u} (r₁ r₂ r₃ : Regex Alpha)
+noncomputable def congrArg_regex_union {Alpha : Type u} (r₁ r₂ r₃ : Regex Alpha)
     (h : Path r₂ r₃) :
     Path (Regex.union r₁ r₂) (Regex.union r₁ r₃) :=
   Path.congrArg (Regex.union r₁) h

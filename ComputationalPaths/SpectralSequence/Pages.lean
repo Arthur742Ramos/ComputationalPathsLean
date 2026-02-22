@@ -41,15 +41,15 @@ namespace Pages
 variable (E : Pages)
 
 /-- One-step page advancement from the chosen base term. -/
-def advanceBase (r p q : Nat) : E.term p q :=
+noncomputable def advanceBase (r p q : Nat) : E.term p q :=
   E.shift r p q (E.base p q)
 
 /-- Two-step page advancement from the chosen base term. -/
-def advanceBaseTwice (r p q : Nat) : E.term p q :=
+noncomputable def advanceBaseTwice (r p q : Nat) : E.term p q :=
   E.twoShift r p q (E.base p q)
 
 /-- Coherence witness between chosen two-step and iterated one-step advancement. -/
-def advanceBasePath (r p q : Nat) :
+noncomputable def advanceBasePath (r p q : Nat) :
     Path (E.advanceBaseTwice r p q)
       (E.shift r p q (E.advanceBase (r + 1) p q)) :=
   E.shiftPath r p q (E.base p q)
@@ -74,7 +74,7 @@ noncomputable def shift_cancel_right_rweq (r p q : Nat) (x : E.term p q) :
   rweq_cmpA_inv_right (E.shiftPath r p q x)
 
 /-- Composite loop induced by the chosen page-transition coherence witness. -/
-def transitionLoop (r p q : Nat) (x : E.term p q) :
+noncomputable def transitionLoop (r p q : Nat) (x : E.term p q) :
     Path (E.twoShift r p q x) (E.twoShift r p q x) :=
   Path.trans (E.shiftPath r p q x) (Path.symm (E.shiftPath r p q x))
 
@@ -86,7 +86,7 @@ noncomputable def transitionLoop_contracts (r p q : Nat) (x : E.term p q) :
 end Pages
 
 /-- Trivial page package. -/
-def trivialPages : Pages where
+noncomputable def trivialPages : Pages where
   term := fun _ _ => PUnit
   base := fun _ _ => PUnit.unit
   shift := fun _ _ _ _ => PUnit.unit

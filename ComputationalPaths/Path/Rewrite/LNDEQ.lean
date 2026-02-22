@@ -86,11 +86,11 @@ namespace Instantiation
 variable {i : Instantiation}
 
 /-- Recover the underlying `Step`. -/
-@[simp] def toStep : Step (A := _) i.p i.q :=
+@[simp] noncomputable def toStep : Step (A := _) i.p i.q :=
   i.step
 
 /-- Promote the instantiation to a single-step `Rw`. -/
-@[simp] def toRw : Rw (A := _) i.p i.q :=
+@[simp] noncomputable def toRw : Rw (A := _) i.p i.q :=
   rw_of_step i.step
 
 /-- Promote the instantiation to the symmetric closure. -/
@@ -192,37 +192,37 @@ section
 
 variable {A : Type u}
 
-@[simp] def instSr (a : A) : Instantiation :=
+@[simp] noncomputable def instSr (a : A) : Instantiation :=
   { rule := Rule.sr
     , p := Path.symm (Path.refl a)
     , q := Path.refl a
     , step := Step.symm_refl (A := A) a }
 
-@[simp] def instSs {a b : A} (p : Path a b) : Instantiation :=
+@[simp] noncomputable def instSs {a b : A} (p : Path a b) : Instantiation :=
   { rule := Rule.ss
     , p := Path.symm (Path.symm p)
     , q := p
     , step := Step.symm_symm (A := A) (p := p) }
 
-@[simp] def instTr {x y : A} (p : Path x y) : Instantiation :=
+@[simp] noncomputable def instTr {x y : A} (p : Path x y) : Instantiation :=
   { rule := Rule.tr
     , p := Path.trans p (Path.symm p)
     , q := Path.refl x
     , step := Step.trans_symm (A := A) (p := p) }
 
-@[simp] def instTsr {x y : A} (p : Path x y) : Instantiation :=
+@[simp] noncomputable def instTsr {x y : A} (p : Path x y) : Instantiation :=
   { rule := Rule.tsr
     , p := Path.trans (Path.symm p) p
     , q := Path.refl y
     , step := Step.symm_trans (A := A) (p := p) }
 
-@[simp] def instRrr {x y : A} (p : Path x y) : Instantiation :=
+@[simp] noncomputable def instRrr {x y : A} (p : Path x y) : Instantiation :=
   { rule := Rule.rrr
     , p := Path.trans p (Path.refl y)
     , q := p
     , step := Step.trans_refl_right (A := A) (p := p) }
 
-@[simp] def instLrr {x y : A} (p : Path x y) : Instantiation :=
+@[simp] noncomputable def instLrr {x y : A} (p : Path x y) : Instantiation :=
   { rule := Rule.lrr
     , p := Path.trans (Path.refl x) p
     , q := p
@@ -232,19 +232,19 @@ end
 
 section
 
-@[simp] def instSlr (C : Context A B) {a₁ a₂ : A} (p : Path a₁ a₂) : Instantiation :=
+@[simp] noncomputable def instSlr (C : Context A B) {a₁ a₂ : A} (p : Path a₁ a₂) : Instantiation :=
   { rule := Rule.slr
     , p := Context.substLeft (A := A) (B := B) C (Path.refl (C.fill a₁)) p
     , q := Context.map (A := A) (B := B) C p
     , step := Step.context_subst_left_refl_left (A := A) (B := B) (C := C) (p := p) }
 
-@[simp] def instSrr (C : Context A B) {a₁ a₂ : A} (p : Path a₁ a₂) : Instantiation :=
+@[simp] noncomputable def instSrr (C : Context A B) {a₁ a₂ : A} (p : Path a₁ a₂) : Instantiation :=
   { rule := Rule.srr
     , p := Context.substRight (A := A) (B := B) C p (Path.refl (C.fill a₂))
     , q := Context.map (A := A) (B := B) C p
     , step := Step.context_subst_right_refl_right (A := A) (B := B) (C := C) (p := p) }
 
-@[simp] def instSlss (C : Context A B) {x : B} {a₁ a₂ : A}
+@[simp] noncomputable def instSlss (C : Context A B) {x : B} {a₁ a₂ : A}
     (r : Path x (C.fill a₁)) (p : Path a₁ a₂) : Instantiation :=
   { rule := Rule.slss
     , p := Context.substLeft (A := A) (B := B) C
@@ -253,7 +253,7 @@ section
     , step := Step.context_subst_left_idempotent (A := A) (B := B)
         (C := C) (r := r) (p := p) }
 
-@[simp] def instSlsss (C : Context A B) {x : B} {a₁ a₂ : A}
+@[simp] noncomputable def instSlsss (C : Context A B) {x : B} {a₁ a₂ : A}
     (r : Path x (C.fill a₁)) (p : Path a₁ a₂) : Instantiation :=
   { rule := Rule.slsss
     , p := Path.symm
@@ -265,7 +265,7 @@ section
           (Step.context_subst_left_idempotent (A := A) (B := B)
             (C := C) (r := r) (p := p)) }
 
-@[simp] def instSrsr (C : Context A B) {a₁ a₂ : A} {y : B}
+@[simp] noncomputable def instSrsr (C : Context A B) {a₁ a₂ : A} {y : B}
     (p : Path a₁ a₂) (t : Path (C.fill a₂) y) : Instantiation :=
   { rule := Rule.srsr
     , p := Context.substRight (A := A) (B := B) C p
@@ -274,7 +274,7 @@ section
     , step := Step.context_subst_right_cancel_inner (A := A)
         (B := B) (C := C) (p := p) (t := t) }
 
-@[simp] def instSrrrr (C : Context A B) {a₁ a₂ : A} {y : B}
+@[simp] noncomputable def instSrrrr (C : Context A B) {a₁ a₂ : A} {y : B}
     (p : Path a₁ a₂) (t : Path (C.fill a₂) y) : Instantiation :=
   { rule := Rule.srrrr
     , p := Context.substRight (A := A) (B := B) C (Path.refl a₁)
@@ -283,7 +283,7 @@ section
     , step := Step.context_subst_right_cancel_outer (A := A)
         (B := B) (C := C) (p := p) (t := t) }
 
-@[simp] def instTsbll (C : Context A B) {x : B} {a₁ a₂ : A}
+@[simp] noncomputable def instTsbll (C : Context A B) {x : B} {a₁ a₂ : A}
     (r : Path x (C.fill a₁)) (p : Path a₁ a₂) : Instantiation :=
   { rule := Rule.tsbll
     , p := Path.trans r (Context.map (A := A) (B := B) C p)
@@ -291,7 +291,7 @@ section
     , step := Step.context_subst_left_beta (A := A) (B := B)
         (C := C) (r := r) (p := p) }
 
-@[simp] def instTsbrl (C : Context A B) {a₁ a₂ : A} {y : B}
+@[simp] noncomputable def instTsbrl (C : Context A B) {a₁ a₂ : A} {y : B}
     (p : Path a₁ a₂) (t : Path (C.fill a₂) y) : Instantiation :=
   { rule := Rule.tsbrl
     , p := Path.trans (Context.map (A := A) (B := B) C p) t
@@ -299,7 +299,7 @@ section
     , step := Step.context_subst_right_beta (A := A) (B := B)
         (C := C) (p := p) (t := t) }
 
-@[simp] def instTsblr (C : Context A B) {x : B} {a₁ a₂ : A} {y : B}
+@[simp] noncomputable def instTsblr (C : Context A B) {x : B} {a₁ a₂ : A} {y : B}
     (r : Path x (C.fill a₁)) (p : Path a₁ a₂) (t : Path (C.fill a₂) y) : Instantiation :=
   { rule := Rule.tsblr
     , p := Path.trans (Context.substLeft (A := A) (B := B) C r p) t
@@ -307,7 +307,7 @@ section
     , step := Step.context_subst_left_assoc (A := A) (B := B)
         (C := C) (r := r) (p := p) (t := t) }
 
-@[simp] def instTsbrr (C : Context A B) {a₁ a₂ : A} {y z : B}
+@[simp] noncomputable def instTsbrr (C : Context A B) {a₁ a₂ : A} {y z : B}
     (p : Path a₁ a₂) (t : Path (C.fill a₂) y) (u : Path y z) : Instantiation :=
   { rule := Rule.tsbrr
     , p := Path.trans (Context.substRight (A := A) (B := B) C p t) u
@@ -321,7 +321,7 @@ section
 
 variable {A : Type u} {B : Type u}
 
-@[simp] def instMx2l1 {a₁ a₂ : A} {b₁ b₂ : B}
+@[simp] noncomputable def instMx2l1 {a₁ a₂ : A} {b₁ b₂ : B}
   (p : Path a₁ a₂) (q : Path b₁ b₂) : Instantiation :=
   { rule := Rule.mx2l1
     , p := Path.congrArg Prod.fst
@@ -329,7 +329,7 @@ variable {A : Type u} {B : Type u}
     , q := p
     , step := Step.prod_fst_beta (A := A) (B := B) (p := p) (q := q) }
 
-@[simp] def instMx2l2 {a₁ a₂ : A} {b₁ b₂ : B}
+@[simp] noncomputable def instMx2l2 {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) (q : Path b₁ b₂) : Instantiation :=
   { rule := Rule.mx2l2
     , p := Path.congrArg Prod.fst
@@ -337,7 +337,7 @@ variable {A : Type u} {B : Type u}
     , q := p
     , step := Step.prod_fst_beta (A := A) (B := B) (p := p) (q := q) }
 
-@[simp] def instMx2r1 {a₁ a₂ : A} {b₁ b₂ : B}
+@[simp] noncomputable def instMx2r1 {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) (q : Path b₁ b₂) : Instantiation :=
   { rule := Rule.mx2r1
     , p := Path.congrArg Prod.snd
@@ -346,7 +346,7 @@ variable {A : Type u} {B : Type u}
     , step := Step.prod_snd_beta (A := B) (B := A)
         (p := p) (q := q) }
 
-@[simp] def instMx2r2 {a : A} {b₁ b₂ : B}
+@[simp] noncomputable def instMx2r2 {a : A} {b₁ b₂ : B}
     (q : Path b₁ b₂) : Instantiation :=
   { rule := Rule.mx2r2
     , p := Path.congrArg Prod.snd
@@ -356,7 +356,7 @@ variable {A : Type u} {B : Type u}
     , step := Step.prod_snd_beta (A := B) (B := A)
         (p := Path.refl a) (q := q) }
 
-@[simp] def instMxetaProd {α β : Type u}
+@[simp] noncomputable def instMxetaProd {α β : Type u}
     {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path (A := Prod α β) (a₁, b₁) (a₂, b₂)) : Instantiation :=
   { rule := Rule.mxetaProd
@@ -412,7 +412,7 @@ variable {A : Type u} {α β : Type u}
     , step := Step.context_congr (A := Sum α β) (B := A)
         (C := C) (p := p) (q := q) h }
 
-@[simp] def instSx {a₁ a₂ : α}
+@[simp] noncomputable def instSx {a₁ a₂ : α}
     (p : Path a₁ a₂) : Instantiation :=
   let C : Context α (Sum α β) := ⟨fun a => Sum.inl a⟩
   { rule := Rule.sx
@@ -421,7 +421,7 @@ variable {A : Type u} {α β : Type u}
     , step := Step.context_map_symm (A := α) (B := Sum α β)
         (C := C) (p := p) }
 
-@[simp] def instSxss {a₁ a₂ : α} {b₁ b₂ : β}
+@[simp] noncomputable def instSxss {a₁ a₂ : α} {b₁ b₂ : β}
     (p : Path a₁ a₂) (q : Path b₁ b₂) : Instantiation :=
   { rule := Rule.sxss
     , p := Path.symm (Path.prodMk (p := p) (q := q))
@@ -438,7 +438,7 @@ variable {A : Type u} {α β : Type u}
     , step := Step.context_map_symm (A := Sum α β) (B := A)
         (C := C) (p := p) }
 
-@[simp] def instMxlam {f g : α → A} (p : ∀ x : α, Path (f x) (g x)) (a : α) : Instantiation :=
+@[simp] noncomputable def instMxlam {f g : α → A} (p : ∀ x : α, Path (f x) (g x)) (a : α) : Instantiation :=
   { rule := Rule.mxlam
     , p := Path.congrArg (fun h : α → A => h a)
         (Path.lamCongr (f := f) (g := g) p)
@@ -446,7 +446,7 @@ variable {A : Type u} {α β : Type u}
     , step := Step.fun_app_beta (A := A) (α := α) (f := f) (g := g)
         (p := p) (a := a) }
 
-@[simp] def instSmss {f g : α → A}
+@[simp] noncomputable def instSmss {f g : α → A}
     (p : ∀ x : α, Path (f x) (g x)) : Instantiation :=
   { rule := Rule.smss
     , p := Path.symm (Path.lamCongr (f := f) (g := g) p)
@@ -454,7 +454,7 @@ variable {A : Type u} {α β : Type u}
     , step := Step.lam_congr_symm (α := α) (β := A)
         (f := f) (g := g) (p := p) }
 
-@[simp] def instMxetaFun {α β : Type u}
+@[simp] noncomputable def instMxetaFun {α β : Type u}
     {f g : α → β} (p : Path f g) : Instantiation :=
   { rule := Rule.mxetaFun
     , p := Path.lamCongr (fun x => Path.app p x)
@@ -467,7 +467,7 @@ section
 
 variable {A : Type u} {B : A → Type u}
 
-@[simp] def instMxsigmaFst {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+@[simp] noncomputable def instMxsigmaFst {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
     (p : Path a₁ a₂)
     (q : Path (Path.transport (A := A) (D := fun a => B a) p b₁) b₂) : Instantiation :=
   { rule := Rule.mxsigmaFst
@@ -476,7 +476,7 @@ variable {A : Type u} {B : A → Type u}
     , step := Step.sigma_fst_beta (A := A) (B := B)
         (p := p) (q := q) }
 
-@[simp] def instMxsigmaSnd {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+@[simp] noncomputable def instMxsigmaSnd {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
     (p : Path a₁ a₂)
     (q : Path (Path.transport (A := A) (D := fun a => B a) p b₁) b₂) : Instantiation :=
   { rule := Rule.mxsigmaSnd
@@ -488,14 +488,14 @@ variable {A : Type u} {B : A → Type u}
     , step := Step.sigma_snd_beta (A₀ := A) (B := B)
         (p := p) (q := q) }
 
-@[simp] def instMxetaSigma {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
+@[simp] noncomputable def instMxetaSigma {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
     (p : Path (A := Sigma B) ⟨a₁, b₁⟩ ⟨a₂, b₂⟩) : Instantiation :=
   { rule := Rule.mxetaSigma
     , p := Path.sigmaMk (Path.sigmaFst p) (Path.sigmaSnd p)
     , q := p
     , step := Step.sigma_eta (A := A) (B := B) (p := p) }
 
-@[simp] def instSmsigma (C : DepContext A B)
+@[simp] noncomputable def instSmsigma (C : DepContext A B)
     {a₁ a₂ : A} (p : Path a₁ a₂) : Instantiation :=
   { rule := Rule.smsigma
     , p := Path.symm (DepContext.map (A := A) (B := B) C p)
@@ -509,7 +509,7 @@ section
 
 variable {A : Type u} {B : Type u}
 
-@[simp] def instSmfst {a₁ a₂ : Prod A B}
+@[simp] noncomputable def instSmfst {a₁ a₂ : Prod A B}
     (p : Path a₁ a₂) : Instantiation :=
   let C : Context (Prod A B) A := ⟨Prod.fst⟩
   { rule := Rule.smfst
@@ -518,7 +518,7 @@ variable {A : Type u} {B : Type u}
     , step := Step.context_map_symm (A := Prod A B) (B := A)
         (C := C) (p := p) }
 
-@[simp] def instSmsnd {a₁ a₂ : Prod A B}
+@[simp] noncomputable def instSmsnd {a₁ a₂ : Prod A B}
     (p : Path a₁ a₂) : Instantiation :=
   let C : Context (Prod A B) B := ⟨Prod.snd⟩
   { rule := Rule.smsnd
@@ -533,13 +533,13 @@ section
 
 variable {A : Type u}
 
-@[simp] def instStss {a b c : A} (p : Path a b) (q : Path b c) : Instantiation :=
+@[simp] noncomputable def instStss {a b c : A} (p : Path a b) (q : Path b c) : Instantiation :=
   { rule := Rule.stss
     , p := Path.symm (Path.trans p q)
     , q := Path.trans (Path.symm q) (Path.symm p)
     , step := Step.symm_trans_congr (A := A) (p := p) (q := q) }
 
-@[simp] def instSsbl (C : Context A B) {x : B} {a₁ a₂ : A}
+@[simp] noncomputable def instSsbl (C : Context A B) {x : B} {a₁ a₂ : A}
     (r : Path x (C.fill a₁)) (p : Path a₁ a₂) : Instantiation :=
   { rule := Rule.ssbl
     , p := Path.symm (Path.trans r (Context.map (A := A) (B := B) C p))
@@ -549,7 +549,7 @@ variable {A : Type u}
           (Step.context_subst_left_beta (A := A) (B := B)
             (C := C) (r := r) (p := p)) }
 
-@[simp] def instSsbr (C : Context A B) {a₁ a₂ : A} {y : B}
+@[simp] noncomputable def instSsbr (C : Context A B) {a₁ a₂ : A} {y : B}
     (p : Path a₁ a₂) (t : Path (C.fill a₂) y) : Instantiation :=
   { rule := Rule.ssbr
     , p := Path.symm (Path.trans (Context.map (A := A) (B := B) C p) t)
@@ -559,13 +559,13 @@ variable {A : Type u}
           (Step.context_subst_right_beta (A := A) (B := B)
             (C := C) (p := p) (t := t)) }
 
-@[simp] def instTt {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) : Instantiation :=
+@[simp] noncomputable def instTt {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) : Instantiation :=
   { rule := Rule.tt
     , p := Path.trans (Path.trans p q) r
     , q := Path.trans p (Path.trans q r)
     , step := Step.trans_assoc (A := A) (p := p) (q := q) (r := r) }
 
-@[simp] def instTtsv (C : Context A B) {a₁ a₂ : A} {y : B}
+@[simp] noncomputable def instTtsv (C : Context A B) {a₁ a₂ : A} {y : B}
     (p : Path a₁ a₂) (v : Path (C.fill a₁) y) : Instantiation :=
   { rule := Rule.ttsv
     , p := Path.trans
@@ -579,7 +579,7 @@ variable {A : Type u}
     , step := Step.context_tt_cancel_left (A := A) (B := B)
         (C := C) (p := p) (v := v) }
 
-@[simp] def instTstu (C : Context A B) {a₁ a₂ : A} {x : B}
+@[simp] noncomputable def instTstu (C : Context A B) {a₁ a₂ : A} {x : B}
     (p : Path a₁ a₂) (v : Path x (C.fill a₁)) : Instantiation :=
   { rule := Rule.tstu
     , p := Path.trans
@@ -593,7 +593,7 @@ variable {A : Type u}
 
 /-- Rule 44 (mxc): μ_f(ε_∧(p,q)) ▷ ε_∧(μ_g(p), μ_h(q))
     Product map congruence: congrArg of (g, h) on prodMk equals prodMk of congrArgs -/
-@[simp] def instMxc {A B A' B' : Type u}
+@[simp] noncomputable def instMxc {A B A' B' : Type u}
     {a₁ a₂ : A} {b₁ b₂ : B}
     (g : A → A') (h : B → B')
     (p : Path a₁ a₂) (q : Path b₁ b₂) : Instantiation :=

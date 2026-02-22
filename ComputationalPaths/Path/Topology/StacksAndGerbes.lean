@@ -164,16 +164,16 @@ structure Band (C : Category) where
   action : True
 
 /-- The band of a gerbe, presented as a trivial witness. -/
-def band_of {C : Category} (_G : Gerbe C) : Band C :=
+noncomputable def band_of {C : Category} (_G : Gerbe C) : Band C :=
   { carrier := PUnit, action := True.intro }
 
 /-! ## Cohomological Classification -/
 
 /-- A placeholder for the second cohomology type of the base. -/
-def H2 (_C : Category) : Type u := PUnit
+noncomputable def H2 (_C : Category) : Type u := PUnit
 
 /-- The H^2 class of a gerbe. -/
-def gerbe_class {C : Category} (_G : Gerbe C) : H2 C :=
+noncomputable def gerbe_class {C : Category} (_G : Gerbe C) : H2 C :=
   PUnit.unit
 
 /-- A classification map from gerbes to H^2. -/
@@ -184,7 +184,7 @@ structure GerbeClassification (C : Category) where
   complete : True
 
 /-- Gerbes are classified by H^2 (structural statement). -/
-def gerbes_classified_by_H2 (C : Category) : GerbeClassification C :=
+noncomputable def gerbes_classified_by_H2 (C : Category) : GerbeClassification C :=
   { classify := fun _ => PUnit.unit, complete := True.intro }
 
 

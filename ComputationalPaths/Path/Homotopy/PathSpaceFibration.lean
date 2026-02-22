@@ -40,11 +40,11 @@ inductive LiftEq {A : Type u} (a b : A) : Type u where
   | mk : (a = b) → LiftEq a b
 
 /-- Extract the underlying propositional equality. -/
-def LiftEq.toEq {A : Type u} {a b : A} : LiftEq a b → a = b
+noncomputable def LiftEq.toEq {A : Type u} {a b : A} : LiftEq a b → a = b
   | LiftEq.mk h => h
 
 /-- Reflexivity in the lifted equality type. -/
-def liftEqRefl {A : Type u} (a : A) : LiftEq a a :=
+noncomputable def liftEqRefl {A : Type u} (a : A) : LiftEq a a :=
   LiftEq.mk rfl
 
 
@@ -64,15 +64,15 @@ theorem liftEq_trans_symm {A : Type u} {a b : A} (p : LiftEq a b) :
 /-! ## Path space -/
 
 /-- Based path space `P(X, a)` implemented with propositional equality. -/
-def PathSpace (A : Type u) (a : A) : Type u :=
+noncomputable def PathSpace (A : Type u) (a : A) : Type u :=
   Σ x : A, LiftEq a x
 
 /-- Endpoint projection from the path space to the base. -/
-def pathSpaceProj {A : Type u} {a : A} : PathSpace A a → A :=
+noncomputable def pathSpaceProj {A : Type u} {a : A} : PathSpace A a → A :=
   Sigma.fst
 
 /-- Basepoint in the path space. -/
-def pathSpaceBase (A : Type u) (a : A) : PathSpace A a :=
+noncomputable def pathSpaceBase (A : Type u) (a : A) : PathSpace A a :=
   ⟨a, liftEqRefl a⟩
 
 
@@ -80,7 +80,7 @@ def pathSpaceBase (A : Type u) (a : A) : PathSpace A a :=
 /-! ## Contractibility -/
 
 /-- The based path space is contractible. -/
-def pathSpaceContr (A : Type u) (a : A) : IsContr (PathSpace A a) :=
+noncomputable def pathSpaceContr (A : Type u) (a : A) : IsContr (PathSpace A a) :=
   { center := pathSpaceBase A a
     contr := by
       intro x
@@ -103,12 +103,12 @@ abbrev PathSpaceFiber (A : Type u) (a : A) : Type u :=
   Fiber (pathSpaceProj (A := A) (a := a)) a
 
 /-- The path space fiber is equivalent to the based loop space. -/
-def loopSpaceEquivFiber (A : Type u) (a : A) :
+noncomputable def loopSpaceEquivFiber (A : Type u) (a : A) :
     SimpleEquiv (PathSpaceFiber A a) (LoopSpaceEq A a) :=
   fiberEquivFamily (P := fun x => LiftEq a x) (b := a)
 
 /-- Map from propositional loops to computational loops. -/
-def loopSpaceEqToPath {A : Type u} {a : A} :
+noncomputable def loopSpaceEqToPath {A : Type u} {a : A} :
     LoopSpaceEq A a → LoopSpace A a :=
   fun p => Path.stepChain p.toEq
 
@@ -122,11 +122,11 @@ def loopSpaceEqToPath {A : Type u} {a : A} :
 /-! ## Fiber sequence -/
 
 /-- The canonical path space fiber sequence `Omega -> P -> X`. -/
-def pathSpaceFiberSeq (A : Type u) (a : A) :
+noncomputable def pathSpaceFiberSeq (A : Type u) (a : A) :
     FiberSeq (LoopSpaceEq A a) (PathSpace A a) A :=
   canonicalFiberSeq (P := fun x => LiftEq a x) (b := a) (x₀ := liftEqRefl a)
 
-def pathSpaceFiberSeq_exact (A : Type u) (a : A) :
+noncomputable def pathSpaceFiberSeq_exact (A : Type u) (a : A) :
     IsExactAt (pathSpaceFiberSeq A a) :=
   canonicalFiberSeq_exact (P := fun x => LiftEq a x) (b := a) (x₀ := liftEqRefl a)
 

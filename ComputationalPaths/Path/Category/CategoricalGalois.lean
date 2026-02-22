@@ -53,15 +53,15 @@ structure GaloisCategory where
   coproductDecomp : Prop := True
 
 /-- An object is connected if it cannot be decomposed as a nontrivial coproduct. -/
-def IsConnected (C : GaloisCategory.{u,v}) (x : C.carrier.Obj) : Prop :=
+noncomputable def IsConnected (C : GaloisCategory.{u,v}) (x : C.carrier.Obj) : Prop :=
   True -- placeholder
 
 /-- A Galois object: connected X such that Aut(X) acts transitively on F(X). -/
-def IsGaloisObject (C : GaloisCategory.{u,v}) (x : C.carrier.Obj) : Prop :=
+noncomputable def IsGaloisObject (C : GaloisCategory.{u,v}) (x : C.carrier.Obj) : Prop :=
   IsConnected C x ∧ True -- Aut(X) acts transitively on F(X)
 
 /-- Automorphism group of an object. -/
-def Aut (C : Cat.{u,v}) (x : C.Obj) : Type v := C.Hom x x
+noncomputable def Aut (C : Cat.{u,v}) (x : C.Obj) : Type v := C.Hom x x
 
 /-- The pro-group: inverse system of finite groups. -/
 structure ProfiniteGroup where
@@ -75,7 +75,7 @@ structure ProfiniteGroup where
 /-! ## Fundamental Group and Groupoid -/
 
 /-- The fundamental group of a Galois category at the fiber functor. -/
-def fundamentalGroup (C : GaloisCategory.{u,v}) : ProfiniteGroup.{u,v} where
+noncomputable def fundamentalGroup (C : GaloisCategory.{u,v}) : ProfiniteGroup.{u,v} where
   Index := C.carrier.Obj
   quotient := fun x => Aut C.carrier x
   transition := fun f => C.carrier.id _  -- placeholder transition
@@ -86,7 +86,7 @@ structure Covering (C : GaloisCategory.{u,v}) (X : C.carrier.Obj) where
   projection : C.carrier.Hom total X
 
 /-- The category of coverings of X. -/
-def CoveringCategory (C : GaloisCategory.{u,v}) (X : C.carrier.Obj) : Cat.{max u v, v} where
+noncomputable def CoveringCategory (C : GaloisCategory.{u,v}) (X : C.carrier.Obj) : Cat.{max u v, v} where
   Obj := Covering C X
   Hom := fun E₁ E₂ => C.carrier.Hom E₁.total E₂.total
   id := fun E => C.carrier.id E.total
@@ -101,7 +101,7 @@ structure FundamentalGroupoid (C : GaloisCategory.{u,v}) where
   composePath : {p q r : points} → paths p q → paths q r → paths p r
 
 /-- Profinite completion of a group. -/
-def profiniteCompletion (G : Type u) : ProfiniteGroup.{u,u} where
+noncomputable def profiniteCompletion (G : Type u) : ProfiniteGroup.{u,u} where
   Index := G -- use the type itself as index (placeholder)
   quotient := fun _ => G -- placeholder
   transition := fun x => x  -- identity as placeholder
@@ -131,11 +131,11 @@ noncomputable def classifyingSpace (C : GaloisCategory.{u,v}) : ProSpace.{u} :=
 
 /-- Galois closure of an object: the smallest Galois object through which
     a given covering factors. -/
-def galoisClosure (C : GaloisCategory.{u,v}) (x : C.carrier.Obj)
+noncomputable def galoisClosure (C : GaloisCategory.{u,v}) (x : C.carrier.Obj)
     (hx : IsConnected C x) : C.carrier.Obj := x
 
 /-- Fixed points of a group action: objects invariant under π₁-action. -/
-def fixedPoints (C : GaloisCategory.{u,v}) (x : C.carrier.Obj) : Type u :=
+noncomputable def fixedPoints (C : GaloisCategory.{u,v}) (x : C.carrier.Obj) : Type u :=
   C.fiberFunctor.fiber x
 
 /-! ## Theorems -/

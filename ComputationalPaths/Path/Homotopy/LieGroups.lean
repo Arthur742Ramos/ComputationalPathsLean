@@ -199,7 +199,7 @@ section NTorus
 
 This definition captures the Lie group structure: T^n is the n-fold
 product of the circle group U(1) ≃ SO(2) ≃ S¹. -/
-def TorusN : Nat → Type u
+noncomputable def TorusN : Nat → Type u
   | 0 => PUnit'
   | n + 1 => TorusN n × Circle
 
@@ -211,7 +211,7 @@ instance : DecidableEq (TorusN 0) := fun a b =>
   | .unit, .unit => isTrue rfl
 
 /-- TorusN 0 = PUnit' is a subsingleton. -/
-instance : Subsingleton (TorusN 0) := by
+noncomputable instance : Subsingleton (TorusN 0) := by
   dsimp [TorusN]
   infer_instance
 
@@ -234,19 +234,19 @@ theorem torusN_zero_trivial (α : π₁(TorusN.{u} 0, TorusN.base.{u} 0)) :
         (torusN_zero_pathEq p (Path.refl (TorusN.base.{u} 0)))
 
 /-- T¹ ≃ S¹ -/
-def torusOneEquivCircle : SimpleEquiv (TorusN 1) Circle where
+noncomputable def torusOneEquivCircle : SimpleEquiv (TorusN 1) Circle where
   toFun := fun (_, c) => c
   invFun := fun c => (PUnit'.unit, c)
   left_inv := by intro (u, c); cases u; rfl
   right_inv := by intro c; rfl
 
 /-- The type of n-tuples of integers, representing π₁(T^n). -/
-def IntTuple : Nat → Type
+noncomputable def IntTuple : Nat → Type
   | 0 => Unit
   | n + 1 => IntTuple n × Int
 
 /-- The zero n-tuple. -/
-def IntTuple.zero : (n : Nat) → IntTuple n
+noncomputable def IntTuple.zero : (n : Nat) → IntTuple n
   | 0 => ()
   | n + 1 => (zero n, 0)
 
@@ -310,7 +310,7 @@ simple connectivity in the framework.
 section SimplyConnected
 
 /-- A type is simply connected if π₁ is trivial at every basepoint. -/
-def IsSimplyConnected (A : Type u) : Prop :=
+noncomputable def IsSimplyConnected (A : Type u) : Prop :=
   ∀ (a : A) (α : π₁(A, a)), α = Quot.mk _ (Path.refl a)
 
 /-- S² is simply connected at the basepoint.

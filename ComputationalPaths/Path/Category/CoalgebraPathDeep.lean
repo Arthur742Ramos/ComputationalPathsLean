@@ -42,18 +42,18 @@ structure CoalgHom (F : Type u → Type u) (A B : FCoalgebra F) where
   commutes : (a : A.carrier) → Path (mapF (A.struct a)) (B.struct (morphism a))
 
 /-- Identity coalgebra homomorphism -/
-def coalg_id_hom (F : Type u → Type u) (A : FCoalgebra F) : CoalgHom F A A where
+noncomputable def coalg_id_hom (F : Type u → Type u) (A : FCoalgebra F) : CoalgHom F A A where
   morphism := id
   mapF := id
   commutes := fun a => Path.refl (A.struct a)
 
 /-- Def 1: Identity homomorphism preserves structure -/
-def coalg_id_preserves {F : Type u → Type u} (A : FCoalgebra F) (a : A.carrier) :
+noncomputable def coalg_id_preserves {F : Type u → Type u} (A : FCoalgebra F) (a : A.carrier) :
     Path ((coalg_id_hom F A).mapF (A.struct a)) (A.struct a) :=
   Path.refl (A.struct a)
 
 /-- Composition of coalgebra homomorphisms -/
-def coalg_comp {F : Type u → Type u} {A B C : FCoalgebra F}
+noncomputable def coalg_comp {F : Type u → Type u} {A B C : FCoalgebra F}
     (g : CoalgHom F B C) (f : CoalgHom F A B) : CoalgHom F A C where
   morphism := g.morphism ∘ f.morphism
   mapF := g.mapF ∘ f.mapF
@@ -65,20 +65,20 @@ def coalg_comp {F : Type u → Type u} {A B C : FCoalgebra F}
     Path.trans step1 step2
 
 /-- Def 2: Composition of homomorphisms is associative on morphisms -/
-def coalg_comp_assoc {F : Type u → Type u} {A B C D : FCoalgebra F}
+noncomputable def coalg_comp_assoc {F : Type u → Type u} {A B C D : FCoalgebra F}
     (h : CoalgHom F C D) (g : CoalgHom F B C) (f : CoalgHom F A B) (a : A.carrier) :
     Path ((coalg_comp h (coalg_comp g f)).morphism a)
          ((coalg_comp (coalg_comp h g) f).morphism a) :=
   Path.refl (h.morphism (g.morphism (f.morphism a)))
 
 /-- Def 3: Left identity for composition -/
-def coalg_comp_id_left {F : Type u → Type u} {A B : FCoalgebra F}
+noncomputable def coalg_comp_id_left {F : Type u → Type u} {A B : FCoalgebra F}
     (f : CoalgHom F A B) (a : A.carrier) :
     Path ((coalg_comp (coalg_id_hom F B) f).morphism a) (f.morphism a) :=
   Path.refl (f.morphism a)
 
 /-- Def 4: Right identity for composition -/
-def coalg_comp_id_right {F : Type u → Type u} {A B : FCoalgebra F}
+noncomputable def coalg_comp_id_right {F : Type u → Type u} {A B : FCoalgebra F}
     (f : CoalgHom F A B) (a : A.carrier) :
     Path ((coalg_comp f (coalg_id_hom F A)).morphism a) (f.morphism a) :=
   Path.refl (f.morphism a)
@@ -107,13 +107,13 @@ structure Bisimulation (F : Type u → Type u) (A : FCoalgebra F) where
   isReflexive : (a : A.carrier) → rel a a
 
 /-- Def 7: Reflexivity of bisimulation witnessed by Path -/
-def bisim_refl_path {F : Type u → Type u} {A : FCoalgebra F}
+noncomputable def bisim_refl_path {F : Type u → Type u} {A : FCoalgebra F}
     (B : Bisimulation F A) (a : A.carrier) :
     Path (B.rel a a) (B.rel a a) :=
   Path.refl (B.rel a a)
 
 /-- Def 8: Bisimulation preserves identity via congrArg -/
-def bisim_congrArg {F : Type u → Type u} {A : FCoalgebra F}
+noncomputable def bisim_congrArg {F : Type u → Type u} {A : FCoalgebra F}
     (B : Bisimulation F A) (a b : A.carrier) (p : Path a b) :
     Path (B.rel a a) (B.rel b b) :=
   Path.trans (Path.congrArg (B.rel · a) p) (Path.congrArg (B.rel b ·) p)
@@ -313,7 +313,7 @@ theorem coalg_morph_compat_trans_refl {W : Type u → Type u} {CM : Comonad W}
   Path.trans_refl_right (m.compat a)
 
 /-- Identity morphism of comonad coalgebras -/
-def comonad_coalg_id {W : Type u → Type u} {CM : Comonad W}
+noncomputable def comonad_coalg_id {W : Type u → Type u} {CM : Comonad W}
     (fl : ComonadFunctorLaws W CM) (CA : ComonadCoalgebra W CM) :
     ComonadCoalgMorphism W CM CA CA where
   morph := id
@@ -342,16 +342,16 @@ structure CofreeSeed (F : Type u → Type u) (A : Type u) where
   tail : F A
 
 /-- Extract operation on cofree seed -/
-def cofree_extract {F : Type u → Type u} {A : Type u} (c : CofreeSeed F A) : A :=
+noncomputable def cofree_extract {F : Type u → Type u} {A : Type u} (c : CofreeSeed F A) : A :=
   c.head
 
 /-- Def 32: Extract returns the head -/
-def cofree_extract_head {F : Type u → Type u} {A : Type u} (c : CofreeSeed F A) :
+noncomputable def cofree_extract_head {F : Type u → Type u} {A : Type u} (c : CofreeSeed F A) :
     Path (cofree_extract c) c.head :=
   Path.refl c.head
 
 /-- Def 33: CongrArg through extract -/
-def cofree_extract_congrArg {F : Type u → Type u} {A B : Type u}
+noncomputable def cofree_extract_congrArg {F : Type u → Type u} {A B : Type u}
     (f : A → B) (c : CofreeSeed F A) :
     Path (f (cofree_extract c)) (f c.head) :=
   Path.congrArg f (cofree_extract_head c)
@@ -417,13 +417,13 @@ theorem lambek_right_inv_toEq {F : Type u → Type u} {FC : FinalCoalgebra F}
   Path.toEq_trans_symm (lw.right_inv fa)
 
 /-- Def 41: Lambek roundtrip via left_inv -/
-def lambek_roundtrip {F : Type u → Type u} {FC : FinalCoalgebra F}
+noncomputable def lambek_roundtrip {F : Type u → Type u} {FC : FinalCoalgebra F}
     (lw : LambekWitness F FC) (a : FC.carrier) :
     Path (lw.inv (FC.struct a)) a :=
   lw.left_inv a
 
 /-- Def 42: Lambek congrArg of inv through struct -/
-def lambek_congrArg_inv {F : Type u → Type u} {FC : FinalCoalgebra F}
+noncomputable def lambek_congrArg_inv {F : Type u → Type u} {FC : FinalCoalgebra F}
     (lw : LambekWitness F FC) (a b : FC.carrier) (p : Path a b) :
     Path (lw.inv (FC.struct a)) (lw.inv (FC.struct b)) :=
   Path.congrArg (fun x => lw.inv (FC.struct x)) p
@@ -445,7 +445,7 @@ structure CoalgModalOp (F : Type u → Type u) (A : FCoalgebra F) where
     ((a : A.carrier) → P a → Q a) → (a : A.carrier) → box P a → box Q a
 
 /-- Diamond operator as dual of box -/
-def diamond {F : Type u → Type u} {A : FCoalgebra F}
+noncomputable def diamond {F : Type u → Type u} {A : FCoalgebra F}
     (M : CoalgModalOp F A) (P : A.carrier → Prop) (a : A.carrier) : Prop :=
   ¬ M.box (fun x => ¬ P x) a
 
@@ -465,15 +465,15 @@ structure StreamState (A : Type u) where
   next : StreamState A
 
 /-- Head observation -/
-def stream_head {A : Type u} (s : StreamState A) : A := s.headVal
+noncomputable def stream_head {A : Type u} (s : StreamState A) : A := s.headVal
 
 /-- Def 45: Head observation path -/
-def stream_head_path {A : Type u} (s : StreamState A) :
+noncomputable def stream_head_path {A : Type u} (s : StreamState A) :
     Path (stream_head s) s.headVal :=
   Path.refl s.headVal
 
 /-- Def 46: CongrArg of head observation -/
-def stream_head_congrArg {A B : Type u} (f : A → B) (s t : StreamState A)
+noncomputable def stream_head_congrArg {A B : Type u} (f : A → B) (s t : StreamState A)
     (p : Path s.headVal t.headVal) :
     Path (f s.headVal) (f t.headVal) :=
   Path.congrArg f p
@@ -545,23 +545,23 @@ theorem coalg_congrArg_id {A : Type u} {a b : A} (p : Path a b) :
 -- ========================================================================
 
 /-- Extend operation derived from comonad -/
-def comonad_extend {W : Type u → Type u} (CM : Comonad W) {A B : Type u}
+noncomputable def comonad_extend {W : Type u → Type u} (CM : Comonad W) {A B : Type u}
     (f : W A → B) (wa : W A) : W B :=
   CM.map f (CM.comult wa)
 
 /-- Def 57: Extend definition unfolds -/
-def extend_path {W : Type u → Type u} (CM : Comonad W)
+noncomputable def extend_path {W : Type u → Type u} (CM : Comonad W)
     {A B : Type u} (f : W A → B) (wa : W A) :
     Path (comonad_extend CM f wa) (CM.map f (CM.comult wa)) :=
   Path.refl _
 
 /-- Duplicate = comult -/
-def comonad_duplicate {W : Type u → Type u} (CM : Comonad W)
+noncomputable def comonad_duplicate {W : Type u → Type u} (CM : Comonad W)
     {A : Type u} (wa : W A) : W (W A) :=
   CM.comult wa
 
 /-- Def 58: Duplicate equals comult -/
-def duplicate_is_comult {W : Type u → Type u} (CM : Comonad W)
+noncomputable def duplicate_is_comult {W : Type u → Type u} (CM : Comonad W)
     {A : Type u} (wa : W A) :
     Path (comonad_duplicate CM wa) (CM.comult wa) :=
   Path.refl (CM.comult wa)
@@ -571,14 +571,14 @@ def duplicate_is_comult {W : Type u → Type u} (CM : Comonad W)
 -- ========================================================================
 
 /-- Product of two coalgebras -/
-def coalg_product (F : Type u → Type u) (A B : FCoalgebra F)
+noncomputable def coalg_product (F : Type u → Type u) (A B : FCoalgebra F)
     (pairF : F A.carrier → F B.carrier → F (A.carrier × B.carrier)) :
     FCoalgebra F where
   carrier := A.carrier × B.carrier
   struct := fun ⟨a, b⟩ => pairF (A.struct a) (B.struct b)
 
 /-- Def 59: Product coalgebra structure path -/
-def coalg_product_struct {F : Type u → Type u} (A B : FCoalgebra F)
+noncomputable def coalg_product_struct {F : Type u → Type u} (A B : FCoalgebra F)
     (pairF : F A.carrier → F B.carrier → F (A.carrier × B.carrier))
     (a : A.carrier) (b : B.carrier) :
     Path ((coalg_product F A B pairF).struct (a, b))
@@ -586,7 +586,7 @@ def coalg_product_struct {F : Type u → Type u} (A B : FCoalgebra F)
   Path.refl _
 
 /-- Def 60: First projection path -/
-def coalg_fst_path {A B : Type u}
+noncomputable def coalg_fst_path {A B : Type u}
     (a : A) (b : B) :
     Path (Prod.fst (a, b)) a :=
   Path.refl a
@@ -622,7 +622,7 @@ theorem fixpoint_roundtrip_toEq {F : Type u → Type u}
   Path.toEq_trans_symm (fp.unfold_fold fx)
 
 /-- Def 64: CongrArg of fold through fixed point -/
-def fixpoint_congrArg_fold {F : Type u → Type u}
+noncomputable def fixpoint_congrArg_fold {F : Type u → Type u}
     (fp : CoalgFixedPoint F) (fx fy : F fp.fixType) (p : Path fx fy) :
     Path (fp.fold fx) (fp.fold fy) :=
   Path.congrArg fp.fold p
@@ -675,7 +675,7 @@ theorem ana_commutes_refl {F : Type u → Type u} {FC : FinalCoalgebra F} {A : T
   Path.trans_refl_right (an.commutes a)
 
 /-- Def 69: Anamorphism congrArg -/
-def ana_congrArg {F : Type u → Type u} {FC : FinalCoalgebra F} {A : Type u}
+noncomputable def ana_congrArg {F : Type u → Type u} {FC : FinalCoalgebra F} {A : Type u}
     (an : Anamorphism F FC A) (a b : A) (p : Path a b) :
     Path (an.ana a) (an.ana b) :=
   Path.congrArg an.ana p
@@ -690,7 +690,7 @@ structure CoalgSimulation (F : Type u → Type u) (A B : FCoalgebra F) where
   sim_refl : (a : A.carrier) → (b : B.carrier) → rel a b → Path (rel a b) (rel a b)
 
 /-- Def 70: Simulation relation is path-reflexive -/
-def simulation_path_refl {F : Type u → Type u} {A B : FCoalgebra F}
+noncomputable def simulation_path_refl {F : Type u → Type u} {A B : FCoalgebra F}
     (sim : CoalgSimulation F A B) (a : A.carrier) (b : B.carrier) (h : sim.rel a b) :
     Path (sim.rel a b) (sim.rel a b) :=
   sim.sim_refl a b h
@@ -711,13 +711,13 @@ structure Coiterative (S : Type u) (O : Type u) where
   transition : S → S
 
 /-- Def 72: Observation congrArg -/
-def coiter_congrArg_observe {S O : Type u} (C : Coiterative S O)
+noncomputable def coiter_congrArg_observe {S O : Type u} (C : Coiterative S O)
     (s t : S) (p : Path s t) :
     Path (C.observe s) (C.observe t) :=
   Path.congrArg C.observe p
 
 /-- Def 73: Transition congrArg -/
-def coiter_congrArg_transition {S O : Type u} (C : Coiterative S O)
+noncomputable def coiter_congrArg_transition {S O : Type u} (C : Coiterative S O)
     (s t : S) (p : Path s t) :
     Path (C.transition s) (C.transition t) :=
   Path.congrArg C.transition p

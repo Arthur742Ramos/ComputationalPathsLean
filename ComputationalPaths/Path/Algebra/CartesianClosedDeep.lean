@@ -29,26 +29,26 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
-def Path.congrArg (f : α → β) (lbl : String)
+noncomputable def Path.congrArg (f : α → β) (lbl : String)
     : Path α a b → Path β (f a) (f b)
   | .nil _    => .nil _
   | .cons _ p => .cons (.rule lbl (f _) (f _)) (p.congrArg f lbl)
@@ -120,10 +120,10 @@ inductive Mor where
 deriving DecidableEq, Repr
 
 -- Some fixed objects for examples
-def A₀ := Obj.base "A"
-def B₀ := Obj.base "B"
-def C₀ := Obj.base "C"
-def D₀ := Obj.base "D"
+noncomputable def A₀ := Obj.base "A"
+noncomputable def B₀ := Obj.base "B"
+noncomputable def C₀ := Obj.base "C"
+noncomputable def D₀ := Obj.base "D"
 
 -- ============================================================
 -- §4  CCC Rewriting Steps
@@ -159,22 +159,22 @@ inductive CCStep : Mor → Mor → Type where
 
 abbrev CCPath := Path Mor
 
-def ccstep (a b : Mor) : CCPath a b :=
+noncomputable def ccstep (a b : Mor) : CCPath a b :=
   Path.single (.rule "ccc" a b)
 
 -- ============================================================
 -- §5  Products: Projections, Pairing, Associativity
 -- ============================================================
 
-def prodAssocR (A B C : Obj) : Mor :=
+noncomputable def prodAssocR (A B C : Obj) : Mor :=
   .pair (.comp (.fst A B) (.fst (.prod A B) C))
         (.pair (.comp (.snd A B) (.fst (.prod A B) C)) (.snd (.prod A B) C))
 
-def prodAssocL (A B C : Obj) : Mor :=
+noncomputable def prodAssocL (A B C : Obj) : Mor :=
   .pair (.pair (.fst A (.prod B C)) (.comp (.fst B C) (.snd A (.prod B C))))
         (.comp (.snd B C) (.snd A (.prod B C)))
 
-def prodSwap (A B : Obj) : Mor :=
+noncomputable def prodSwap (A B : Obj) : Mor :=
   .pair (.snd A B) (.fst A B)
 
 theorem thm_pairFst_exists (f g : Mor) (A B : Obj) :
@@ -190,7 +190,7 @@ theorem thm_prod_eta_exists (A B : Obj) :
   ⟨CCStep.pairEta A B, trivial⟩
 
 /-- Swap is self-inverse (2-step path). -/
-def swapSwapPath (A B : Obj) : CCPath
+noncomputable def swapSwapPath (A B : Obj) : CCPath
     (.comp (prodSwap B A) (prodSwap A B))
     (.comp (prodSwap B A) (prodSwap A B)) :=
   let m := Mor.comp (prodSwap B A) (prodSwap A B)
@@ -217,7 +217,7 @@ theorem thm_curryComp_exists (f h : Mor) (A B : Obj) :
   ⟨CCStep.curryComp f h A B, trivial⟩
 
 /-- Beta as path (single step). -/
-def betaPath (f : Mor) (A B C : Obj) : CCPath
+noncomputable def betaPath (f : Mor) (A B C : Obj) : CCPath
     (.comp (.eval_ A B) (.pair (.comp (.curry f) (.fst C A)) (.snd C A)))
     f :=
   ccstep (.comp (.eval_ A B) (.pair (.comp (.curry f) (.fst C A)) (.snd C A))) f
@@ -227,7 +227,7 @@ theorem thm_beta_path_length (f : Mor) (A B C : Obj) :
   simp [betaPath, ccstep, Path.single, Path.length]
 
 /-- Eta as path (single step). -/
-def etaPath (g : Mor) (A B C : Obj) : CCPath
+noncomputable def etaPath (g : Mor) (A B C : Obj) : CCPath
     (.curry (.comp (.eval_ A B) (.pair (.comp g (.fst C A)) (.snd C A))))
     g :=
   ccstep (.curry (.comp (.eval_ A B) (.pair (.comp g (.fst C A)) (.snd C A)))) g
@@ -237,7 +237,7 @@ theorem thm_eta_path_length (g : Mor) (A B C : Obj) :
   simp [etaPath, ccstep, Path.single, Path.length]
 
 /-- Curry naturality path (single step). -/
-def curryNatPath (f h : Mor) (A B : Obj) : CCPath
+noncomputable def curryNatPath (f h : Mor) (A B : Obj) : CCPath
     (.curry (.comp f (.pair (.comp h (.fst A B)) (.snd A B))))
     (.comp (.curry f) h) :=
   ccstep (.curry (.comp f (.pair (.comp h (.fst A B)) (.snd A B)))) (.comp (.curry f) h)
@@ -257,7 +257,7 @@ inductive STLCType where
   | prod : STLCType → STLCType → STLCType
 deriving DecidableEq, Repr
 
-def interpType : STLCType → Obj
+noncomputable def interpType : STLCType → Obj
   | .unit     => .terminal
   | .base s   => .base s
   | .arr a b  => .exp (interpType a) (interpType b)
@@ -324,7 +324,7 @@ theorem thm_nno_succ_step (q f : Mor) :
     ∃ (_ : CCStep (.comp (.rec_ q f) .succ_) (.comp f (.rec_ q f))), True :=
   ⟨CCStep.recSucc q f, trivial⟩
 
-def iterSuccPath : (n : Nat) → CCPath Mor.succ_ Mor.succ_
+noncomputable def iterSuccPath : (n : Nat) → CCPath Mor.succ_ Mor.succ_
   | 0     => .nil Mor.succ_
   | n + 1 => Path.cons (.rule "iter" Mor.succ_ Mor.succ_) (iterSuccPath n)
 
@@ -335,7 +335,7 @@ theorem thm_iter_succ_length (n : Nat) :
   | succ n ih => simp [iterSuccPath, Path.length, ih]; omega
 
 /-- NNO recursion path: rec(q,f) ∘ z ∘ ! followed by rec(q,f) ∘ s. -/
-def nnoTwoStepPath (q f : Mor) (A : Obj) : CCPath
+noncomputable def nnoTwoStepPath (q f : Mor) (A : Obj) : CCPath
     (.comp (.rec_ q f) (.comp .zero_ (.terminal A)))
     (.comp (.rec_ q f) (.comp .zero_ (.terminal A))) :=
   let m := Mor.comp (.rec_ q f) (.comp .zero_ (.terminal A))
@@ -349,7 +349,7 @@ theorem thm_nno_two_step_len (q f : Mor) (A : Obj) :
 -- §9  Distributivity
 -- ============================================================
 
-def distR (A B C : Obj) : Mor :=
+noncomputable def distR (A B C : Obj) : Mor :=
   .copair
     (.comp (.inl (.prod A B) (.prod A C))
            (.pair (.comp (.fst A (.coprod B C)) (.id (.prod A (.coprod B C))))
@@ -358,7 +358,7 @@ def distR (A B C : Obj) : Mor :=
            (.pair (.comp (.fst A (.coprod B C)) (.id (.prod A (.coprod B C))))
                   (.comp (.inr B C) (.comp (.snd A (.coprod B C)) (.id (.prod A (.coprod B C)))))))
 
-def distL (A B C : Obj) : Mor :=
+noncomputable def distL (A B C : Obj) : Mor :=
   .copair
     (.pair (.comp (.fst A B) (.id (.prod A B))) (.comp (.inl B C) (.snd A B)))
     (.pair (.comp (.fst A C) (.id (.prod A C))) (.comp (.inr B C) (.snd A C)))
@@ -375,7 +375,7 @@ theorem thm_dist_nat (A B C : Obj) :
 -- §10  Closed Monoidal Structure
 -- ============================================================
 
-def internalComp (A B C : Obj) : Mor :=
+noncomputable def internalComp (A B C : Obj) : Mor :=
   .curry (.comp (.eval_ B C)
     (.pair (.comp (.fst (.exp B C) (.prod (.exp A B) A))
                   (.fst (.exp B C) (.exp A B)))
@@ -384,11 +384,11 @@ def internalComp (A B C : Obj) : Mor :=
                            (.fst (.exp B C) (.exp A B)))
                     (.snd (.prod (.exp B C) (.exp A B)) A)))))
 
-def internalId (A : Obj) : Mor :=
+noncomputable def internalId (A : Obj) : Mor :=
   .curry (.snd .terminal A)
 
-def tensorHomFwd (f : Mor) : Mor := .curry f
-def tensorHomBwd (g : Mor) : Mor := .uncurry g
+noncomputable def tensorHomFwd (f : Mor) : Mor := .curry f
+noncomputable def tensorHomBwd (g : Mor) : Mor := .uncurry g
 
 theorem thm_tensor_hom_fwd (f : Mor) : tensorHomFwd f = .curry f := by
   simp [tensorHomFwd]
@@ -396,7 +396,7 @@ theorem thm_tensor_hom_fwd (f : Mor) : tensorHomFwd f = .curry f := by
 theorem thm_tensor_hom_bwd (g : Mor) : tensorHomBwd g = .uncurry g := by
   simp [tensorHomBwd]
 
-def strength (A TB : Obj) : Mor :=
+noncomputable def strength (A TB : Obj) : Mor :=
   .pair (.comp (.fst A TB) (.id (.prod A TB))) (.snd A TB)
 
 -- ============================================================
@@ -409,14 +409,14 @@ theorem thm_congrArg_length (f : α → β) (lbl : String) (p : Path α a b) :
   | nil _ => simp [Path.congrArg, Path.length]
   | cons s _ ih => simp [Path.congrArg, Path.length, ih]
 
-def congrArgProd (p : Path Obj a b) (C : Obj) : Path Obj (.prod a C) (.prod b C) :=
+noncomputable def congrArgProd (p : Path Obj a b) (C : Obj) : Path Obj (.prod a C) (.prod b C) :=
   p.congrArg (Obj.prod · C) "prod-cong"
 
 theorem thm_congrArg_prod_length (p : Path Obj a b) (C : Obj) :
     (congrArgProd p C).length = p.length := by
   exact thm_congrArg_length _ _ p
 
-def congrArgExp (p : Path Obj a b) (C : Obj) : Path Obj (.exp C a) (.exp C b) :=
+noncomputable def congrArgExp (p : Path Obj a b) (C : Obj) : Path Obj (.exp C a) (.exp C b) :=
   p.congrArg (Obj.exp C) "exp-cong"
 
 theorem thm_congrArg_exp_length (p : Path Obj a b) (C : Obj) :
@@ -439,7 +439,7 @@ theorem thm_congrArg_nil (f : α → β) (lbl : String) (a : α) :
 -- ============================================================
 
 /-- Pentagon coherence: the five-step product associativity diagram. -/
-def pentagonPath (A B C D : Obj) : CCPath
+noncomputable def pentagonPath (A B C D : Obj) : CCPath
     (.comp (prodAssocR A B (.prod C D)) (prodAssocR (.prod A B) C D))
     (.comp (prodAssocR A B (.prod C D)) (prodAssocR (.prod A B) C D)) :=
   .nil _
@@ -448,7 +448,7 @@ theorem thm_pentagon_coherence (A B C D : Obj) :
     (pentagonPath A B C D).length = 0 := by
   simp [pentagonPath, Path.length]
 
-def trianglePath (A B : Obj) : CCPath
+noncomputable def trianglePath (A B : Obj) : CCPath
     (.comp (.fst A B) (.id (.prod A B)))
     (.comp (.fst A B) (.id (.prod A B))) :=
   .nil _
@@ -457,7 +457,7 @@ theorem thm_triangle_coherence (A B : Obj) :
     (trianglePath A B).length = 0 := by
   simp [trianglePath, Path.length]
 
-def curryNaturalitySquare (f h : Mor) (A B : Obj) : CCPath
+noncomputable def curryNaturalitySquare (f h : Mor) (A B : Obj) : CCPath
     (.curry (.comp f (.pair (.comp h (.fst A B)) (.snd A B))))
     (.comp (.curry f) h) :=
   let src := Mor.curry (.comp f (.pair (.comp h (.fst A B)) (.snd A B)))
@@ -468,7 +468,7 @@ theorem thm_curry_nat_square_len (f h : Mor) (A B : Obj) :
     (curryNaturalitySquare f h A B).length = 1 := by
   simp [curryNaturalitySquare, Path.single, Path.length]
 
-def evalNatPath (A B : Obj) (f : Mor) : CCPath
+noncomputable def evalNatPath (A B : Obj) (f : Mor) : CCPath
     (.comp (.eval_ A B) (.pair (.comp f (.fst (.exp A B) A)) (.snd (.exp A B) A)))
     (.comp (.eval_ A B) (.pair (.comp f (.fst (.exp A B) A)) (.snd (.exp A B) A))) :=
   .nil _
@@ -485,15 +485,15 @@ theorem thm_char_map_property (m : Mor) (A : Obj) :
     ∃ (_ : CCStep (.comp (.char_ m) m) (.comp .true_ (.terminal A))), True :=
   ⟨CCStep.charTrue m A, trivial⟩
 
-def powerObj (A : Obj) : Obj := .exp A .omega
+noncomputable def powerObj (A : Obj) : Obj := .exp A .omega
 
 theorem thm_power_obj_eq (A : Obj) :
     powerObj A = .exp A .omega := by
   simp [powerObj]
 
-def membershipRel (A : Obj) : Mor := .eval_ A .omega
+noncomputable def membershipRel (A : Obj) : Mor := .eval_ A .omega
 
-def singletonMap (A : Obj) : Mor :=
+noncomputable def singletonMap (A : Obj) : Mor :=
   .curry (.named "eq" (.prod A A) .omega)
 
 theorem thm_singleton_is_curry (A : Obj) :
@@ -506,7 +506,7 @@ theorem thm_singleton_is_curry (A : Obj) :
 
 abbrev Ctx := List STLCType
 
-def interpCtx : Ctx → Obj
+noncomputable def interpCtx : Ctx → Obj
   | []      => .terminal
   | [t]     => interpType t
   | t :: ts => .prod (interpType t) (interpCtx ts)
@@ -522,7 +522,7 @@ theorem thm_interpCtx_cons (t : STLCType) (u : STLCType) (us : Ctx) :
     interpCtx (t :: u :: us) = .prod (interpType t) (interpCtx (u :: us)) := by
   simp [interpCtx]
 
-def varProj : (n : Nat) → (Γ : Ctx) → Mor
+noncomputable def varProj : (n : Nat) → (Γ : Ctx) → Mor
   | _, []          => .id .terminal
   | 0, t :: rest   => .fst (interpType t) (interpCtx rest)
   | n+1, t :: rest => .comp (varProj n rest) (.snd (interpType t) (interpCtx rest))
@@ -539,10 +539,10 @@ theorem thm_varProj_succ (n : Nat) (t : STLCType) (Γ : Ctx) :
 -- §15  Substitution = Composition
 -- ============================================================
 
-def weakenMor (A : STLCType) (Γ : Ctx) : Mor :=
+noncomputable def weakenMor (A : STLCType) (Γ : Ctx) : Mor :=
   .snd (interpType A) (interpCtx Γ)
 
-def substMor (s : Mor) (Γ : Ctx) : Mor :=
+noncomputable def substMor (s : Mor) (Γ : Ctx) : Mor :=
   .pair (.id (interpCtx Γ)) s
 
 theorem thm_substMor_def (s : Mor) (Γ : Ctx) :
@@ -557,7 +557,7 @@ theorem thm_subst_is_comp (t : Mor) (s : Mor) (Γ : Ctx) :
 -- §16  Multi-Step Chains
 -- ============================================================
 
-def threeStepChain : CCPath
+noncomputable def threeStepChain : CCPath
     (.comp (.fst A₀ B₀) (.pair (.named "f" A₀ A₀) (.named "g" A₀ B₀)))
     (.comp (.fst A₀ B₀) (.pair (.named "f" A₀ A₀) (.named "g" A₀ B₀))) :=
   let m := Mor.comp (.fst A₀ B₀) (.pair (.named "f" A₀ A₀) (.named "g" A₀ B₀))
@@ -566,7 +566,7 @@ def threeStepChain : CCPath
 theorem thm_three_step_length : threeStepChain.length = 3 := by
   simp [threeStepChain, Path.length]
 
-def composedChain : CCPath
+noncomputable def composedChain : CCPath
     (.comp (.fst A₀ B₀) (.pair (.named "f" A₀ A₀) (.named "g" A₀ B₀)))
     (.comp (.fst A₀ B₀) (.pair (.named "f" A₀ A₀) (.named "g" A₀ B₀))) :=
   let m := Mor.comp (.fst A₀ B₀) (.pair (.named "f" A₀ A₀) (.named "g" A₀ B₀))
@@ -581,7 +581,7 @@ theorem thm_composed_chain_length : composedChain.length = 3 := by
 -- §17  Product Functoriality
 -- ============================================================
 
-def prodMap (f g : Mor) (A B : Obj) : Mor :=
+noncomputable def prodMap (f g : Mor) (A B : Obj) : Mor :=
   .pair (.comp f (.fst A B)) (.comp g (.snd A B))
 
 theorem thm_prodMap_id (A B : Obj) :
@@ -589,7 +589,7 @@ theorem thm_prodMap_id (A B : Obj) :
       .pair (.comp (.id A) (.fst A B)) (.comp (.id B) (.snd A B)) := by
   simp [prodMap]
 
-def prodMapCompPath (f₁ f₂ g₁ g₂ : Mor) (A B : Obj) : CCPath
+noncomputable def prodMapCompPath (f₁ f₂ g₁ g₂ : Mor) (A B : Obj) : CCPath
     (prodMap (.comp f₂ f₁) (.comp g₂ g₁) A B)
     (prodMap (.comp f₂ f₁) (.comp g₂ g₁) A B) :=
   .nil _
@@ -602,7 +602,7 @@ theorem thm_prodMap_comp_len (f₁ f₂ g₁ g₂ : Mor) (A B : Obj) :
 -- §18  Exponential Functoriality
 -- ============================================================
 
-def expMap (f g : Mor) (A B : Obj) : Mor :=
+noncomputable def expMap (f g : Mor) (A B : Obj) : Mor :=
   .curry (.comp g (.comp (.eval_ A B)
     (.pair (.comp (.fst (.exp A B) A) (.id (.prod (.exp A B) A)))
            (.comp f (.snd (.exp A B) A)))))
@@ -692,7 +692,7 @@ theorem thm_assoc_step (f g h : Mor) :
     ∃ (_ : CCStep (.comp (.comp f g) h) (.comp f (.comp g h))), True :=
   ⟨CCStep.assoc f g h, trivial⟩
 
-def idBothPath (f : Mor) (A B : Obj) : CCPath
+noncomputable def idBothPath (f : Mor) (A B : Obj) : CCPath
     (.comp (.id A) (.comp f (.id B)))
     (.comp (.id A) (.comp f (.id B))) :=
   let m := Mor.comp (.id A) (.comp f (.id B))
@@ -710,7 +710,7 @@ theorem thm_terminal_uniq (f : Mor) (A : Obj) :
     ∃ (_ : CCStep f (.terminal A)), True :=
   ⟨CCStep.termUniq f A, trivial⟩
 
-def terminalEqPath (f : Mor) (A : Obj) : CCPath f f :=
+noncomputable def terminalEqPath (f : Mor) (A : Obj) : CCPath f f :=
   Path.cons (.rule "term-uniq" f f) (Path.cons (.rule "term-uniq-inv" f f) (.nil f))
 
 theorem thm_terminal_eq_path_len (f : Mor) (A : Obj) :
@@ -766,14 +766,14 @@ theorem thm_symm_trans (p : Path α a b) (q : Path α b c) :
 -- §28  congrArg with Mor → Mor functions
 -- ============================================================
 
-def congrArgCurry (p : CCPath a b) : CCPath (.curry a) (.curry b) :=
+noncomputable def congrArgCurry (p : CCPath a b) : CCPath (.curry a) (.curry b) :=
   p.congrArg Mor.curry "curry-cong"
 
 theorem thm_congrArg_curry_length (p : CCPath a b) :
     (congrArgCurry p).length = p.length := by
   exact thm_congrArg_length _ _ p
 
-def congrArgComp (p : CCPath a b) (g : Mor) : CCPath (.comp a g) (.comp b g) :=
+noncomputable def congrArgComp (p : CCPath a b) (g : Mor) : CCPath (.comp a g) (.comp b g) :=
   p.congrArg (Mor.comp · g) "comp-cong-left"
 
 theorem thm_congrArg_comp_length (p : CCPath a b) (g : Mor) :

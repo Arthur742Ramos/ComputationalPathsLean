@@ -107,12 +107,12 @@ section Defs
 
 variable {α : Type u} (R : α → α → Prop)
 
-def Diamond : Prop := ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
-def LocallyConfluent : Prop := ∀ a b c, R a b → R a c → ∃ d, RTC' R b d ∧ RTC' R c d
-def Confluent : Prop := ∀ a b c, RTC' R a b → RTC' R a c → ∃ d, RTC' R b d ∧ RTC' R c d
-def SemiConfluent : Prop := ∀ a b c, R a b → RTC' R a c → ∃ d, RTC' R b d ∧ RTC' R c d
-def ChurchRosser : Prop := ∀ a b, STC R a b → ∃ d, RTC' R a d ∧ RTC' R b d
-def IsNF (a : α) : Prop := ∀ b, ¬ R a b
+noncomputable def Diamond : Prop := ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
+noncomputable def LocallyConfluent : Prop := ∀ a b c, R a b → R a c → ∃ d, RTC' R b d ∧ RTC' R c d
+noncomputable def Confluent : Prop := ∀ a b c, RTC' R a b → RTC' R a c → ∃ d, RTC' R b d ∧ RTC' R c d
+noncomputable def SemiConfluent : Prop := ∀ a b c, R a b → RTC' R a c → ∃ d, RTC' R b d ∧ RTC' R c d
+noncomputable def ChurchRosser : Prop := ∀ a b, STC R a b → ∃ d, RTC' R a d ∧ RTC' R b d
+noncomputable def IsNF (a : α) : Prop := ∀ b, ¬ R a b
 
 end Defs
 
@@ -331,7 +331,7 @@ variable {A : Type u} {a b c : A}
 open Confluence
 
 /-- Prop-level joinability for paths. -/
-def PathJoinable (p q : Path a b) : Prop :=
+noncomputable def PathJoinable (p q : Path a b) : Prop :=
   ∃ s : Path a b, Rw p s ∧ Rw q s
 
 theorem pathJoinable_refl (p : Path a b) : PathJoinable p p :=

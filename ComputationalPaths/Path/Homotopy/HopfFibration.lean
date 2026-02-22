@@ -68,19 +68,19 @@ structure HopfFibrationData where
 /-! ## Path witnesses for the Hopf data -/
 
 /-- `Path` witnessing the base-projection condition. -/
-def hopfBaseProj_path (data : HopfFibrationData) :
+noncomputable def hopfBaseProj_path (data : HopfFibrationData) :
     ComputationalPaths.Path (data.proj data.baseTotal) data.base :=
   ComputationalPaths.Path.stepChain data.base_proj
 
 /-- `Path` witnessing that the fiber equivalence round-trip is the identity. -/
-def hopfFiberEquiv_roundtrip_path (data : HopfFibrationData)
+noncomputable def hopfFiberEquiv_roundtrip_path (data : HopfFibrationData)
     (x : Fiber data.proj data.base) :
     ComputationalPaths.Path
       (data.fiberEquiv.invFun (data.fiberEquiv.toFun x)) x :=
   ComputationalPaths.Path.stepChain (data.fiberEquiv.left_inv x)
 
 /-- `Path` witnessing the forward round-trip of the fiber equivalence. -/
-def hopfFiberEquiv_fwd_roundtrip_path (data : HopfFibrationData) (x : S1) :
+noncomputable def hopfFiberEquiv_fwd_roundtrip_path (data : HopfFibrationData) (x : S1) :
     ComputationalPaths.Path
       (data.fiberEquiv.toFun (data.fiberEquiv.invFun x)) x :=
   ComputationalPaths.Path.stepChain (data.fiberEquiv.right_inv x)
@@ -92,7 +92,7 @@ abbrev hopfFiber (data : HopfFibrationData) : Type u :=
   Fiber data.proj data.base
 
 /-- Transport in Hopf fibers along a base path. -/
-def hopfFiberTransport (data : HopfFibrationData) {b₁ b₂ : S2} (p : Path b₁ b₂) :
+noncomputable def hopfFiberTransport (data : HopfFibrationData) {b₁ b₂ : S2} (p : Path b₁ b₂) :
     Fiber data.proj b₁ → Fiber data.proj b₂ :=
   Path.transport (D := fun b => Fiber data.proj b) p
 
@@ -105,7 +105,7 @@ theorem hopfFiberTransport_trans (data : HopfFibrationData) {b₁ b₂ b₃ : S2
     (Path.transport_trans (D := fun b => Fiber data.proj b) p q x)
 
 /-- The Hopf fiber sequence `S¹ → S³ → S²`. -/
-def hopfFiberSeq (data : HopfFibrationData) : FiberSeq S1 S3 S2 where
+noncomputable def hopfFiberSeq (data : HopfFibrationData) : FiberSeq S1 S3 S2 where
   proj := data.proj
   baseB := data.base
   baseE := data.baseTotal
@@ -118,21 +118,21 @@ def hopfFiberSeq (data : HopfFibrationData) : FiberSeq S1 S3 S2 where
 /-! ## Applications -/
 
 /-- The inclusion of the Hopf fiber into the total space. -/
-def hopfFiberIncl (data : HopfFibrationData) : S1 → S3 :=
+noncomputable def hopfFiberIncl (data : HopfFibrationData) : S1 → S3 :=
   (hopfFiberSeq data).incl
 
 /-- The projection of the fiber inclusion is the Hopf basepoint. -/
-def hopfFiberIncl_proj (data : HopfFibrationData) (x : S1) :
+noncomputable def hopfFiberIncl_proj (data : HopfFibrationData) (x : S1) :
     Path (data.proj (hopfFiberIncl data x)) data.base :=
   (hopfFiberSeq data).proj_incl x
 
 /-- `Path` witnessing that the fiber inclusion projects to the base. -/
-def hopfFiberIncl_proj_path (data : HopfFibrationData) (x : S1) :
+noncomputable def hopfFiberIncl_proj_path (data : HopfFibrationData) (x : S1) :
     ComputationalPaths.Path (data.proj (hopfFiberIncl data x)) data.base :=
   (hopfFiberSeq data).proj_incl x
 
 /-- The Hopf fiber sequence is exact at the total space. -/
-def hopfFiberSeq_exact (data : HopfFibrationData) :
+noncomputable def hopfFiberSeq_exact (data : HopfFibrationData) :
     IsExactAt (hopfFiberSeq data) := by
   refine { incl_to_base := ?_, base_from_fiber := ?_ }
   · intro f
@@ -146,7 +146,7 @@ def hopfFiberSeq_exact (data : HopfFibrationData) :
     exact Path.stepChain h''
 
 /-- `Path` witnessing exactness: incl composed with proj yields the base. -/
-def hopfFiberSeq_exact_path (data : HopfFibrationData) (f : S1) :
+noncomputable def hopfFiberSeq_exact_path (data : HopfFibrationData) (f : S1) :
     ComputationalPaths.Path
       (data.proj ((hopfFiberSeq data).incl f))
       data.base :=

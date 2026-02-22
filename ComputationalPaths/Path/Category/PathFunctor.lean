@@ -64,7 +64,7 @@ variable {A : Type u} {B : Type v} {C : Type w}
 -- ============================================================
 
 /-- Every function `f : A → B` induces a path functor via `congrArg`. -/
-def ofFun (f : A → B) : PathFunctor A B where
+noncomputable def ofFun (f : A → B) : PathFunctor A B where
   obj := f
   mapPath := Path.congrArg f
   map_refl := fun a => by simp [Path.congrArg, Path.refl]
@@ -72,7 +72,7 @@ def ofFun (f : A → B) : PathFunctor A B where
   map_symm := fun p => congrArg_symm f p
 
 /-- The identity path functor. -/
-def id : PathFunctor A A where
+noncomputable def id : PathFunctor A A where
   obj := fun a => a
   mapPath := fun p => Path.congrArg (fun x => x) p
   map_refl := fun a => by simp
@@ -96,7 +96,7 @@ def id : PathFunctor A A where
 -- ============================================================
 
 /-- Compose two path functors. -/
-def comp (F : PathFunctor A B) (G : PathFunctor B C) : PathFunctor A C where
+noncomputable def comp (F : PathFunctor A B) (G : PathFunctor B C) : PathFunctor A C where
   obj := fun a => G.obj (F.obj a)
   mapPath := fun p => G.mapPath (F.mapPath p)
   map_refl := fun a => by
@@ -179,10 +179,10 @@ namespace FreePath
 variable {V : Type u} {G : Graph.{u, v} V}
 
 /-- Identity free path (empty walk at a vertex). -/
-def id (v : V) : FreePath G v v := nil v
+noncomputable def id (v : V) : FreePath G v v := nil v
 
 /-- Concatenate two free paths. -/
-def append : {u v w : V} → FreePath G u v → FreePath G v w → FreePath G u w
+noncomputable def append : {u v w : V} → FreePath G u v → FreePath G v w → FreePath G u w
   | _, _, _, nil _, q => q
   | _, _, _, cons e p, q => cons e (append p q)
 
@@ -206,7 +206,7 @@ def append : {u v w : V} → FreePath G u v → FreePath G v w → FreePath G u 
   | cons e p ih => simp [append, ih]
 
 /-- Length of a free path. -/
-def length : {u v : V} → FreePath G u v → Nat
+noncomputable def length : {u v : V} → FreePath G u v → Nat
   | _, _, nil _ => 0
   | _, _, cons _ p => 1 + length p
 
@@ -228,7 +228,7 @@ structure GraphHom {V : Type u} (G : Graph.{u, v} V) (B : Type w)
   mapEdge : {u v : V} → G.Edge u v → Path (f u) (f v)
 
 /-- Extend a graph homomorphism to a functor on free paths. -/
-def FreePath.lift {V : Type u} {G : Graph.{u, v} V} {B : Type w}
+noncomputable def FreePath.lift {V : Type u} {G : Graph.{u, v} V} {B : Type w}
     {f : V → B} (h : GraphHom G B f) :
     {u v : V} → FreePath G u v → Path (f u) (f v)
   | _, _, FreePath.nil v => Path.refl (f v)

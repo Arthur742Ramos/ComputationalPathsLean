@@ -73,7 +73,7 @@ namespace LieAlgebra
 variable {L : Type u} (A : LieAlgebra L)
 
 /-- Abelian Lie algebra: all brackets vanish. -/
-def IsAbelian : Prop :=
+noncomputable def IsAbelian : Prop :=
   ∀ x y, A.bracket x y = A.zero
 
 /-- The additive inverse of zero is zero. -/
@@ -128,7 +128,7 @@ namespace LieIdeal
 variable {L : Type u} {A : LieAlgebra L}
 
 /-- Every ideal defines a subalgebra by restricting both bracket inputs. -/
-def toSubalgebra (I : LieIdeal A) : LieSubalgebra A where
+noncomputable def toSubalgebra (I : LieIdeal A) : LieSubalgebra A where
   carrier := I.carrier
   zero_mem := I.zero_mem
   add_mem := I.add_mem
@@ -138,7 +138,7 @@ def toSubalgebra (I : LieIdeal A) : LieSubalgebra A where
     exact I.bracket_left_mem hy
 
 /-- The whole Lie algebra as an ideal. -/
-def topIdeal (A : LieAlgebra L) : LieIdeal A where
+noncomputable def topIdeal (A : LieAlgebra L) : LieIdeal A where
   carrier := fun _ => True
   zero_mem := trivial
   add_mem := by
@@ -152,7 +152,7 @@ def topIdeal (A : LieAlgebra L) : LieIdeal A where
     trivial
 
 /-- The zero ideal. -/
-def botIdeal (A : LieAlgebra L) : LieIdeal A where
+noncomputable def botIdeal (A : LieAlgebra L) : LieIdeal A where
   carrier := fun x => x = A.zero
   zero_mem := rfl
   add_mem := by
@@ -174,22 +174,22 @@ end LieIdeal
 /-! ## Solvable and nilpotent Lie algebras -/
 
 /-- The derived series: `D⁰ = L`, `Dⁿ⁺¹ = [Dⁿ, Dⁿ]`. -/
-def derivedSeries {L : Type u} (A : LieAlgebra L) : Nat → L → Prop
+noncomputable def derivedSeries {L : Type u} (A : LieAlgebra L) : Nat → L → Prop
   | 0 => fun _ => True
   | n + 1 => fun x =>
       ∃ a, derivedSeries A n a ∧ ∃ b, derivedSeries A n b ∧ A.bracket a b = x
 
 /-- The lower central series: `γ₀ = L`, `γₙ₊₁ = [L, γₙ]`. -/
-def lowerCentralSeries {L : Type u} (A : LieAlgebra L) : Nat → L → Prop
+noncomputable def lowerCentralSeries {L : Type u} (A : LieAlgebra L) : Nat → L → Prop
   | 0 => fun _ => True
   | n + 1 => fun x => ∃ a, ∃ b, lowerCentralSeries A n b ∧ A.bracket a b = x
 
 /-- Solvability: some derived-series term is zero. -/
-def Solvable {L : Type u} (A : LieAlgebra L) : Prop :=
+noncomputable def Solvable {L : Type u} (A : LieAlgebra L) : Prop :=
   ∃ n, ∀ x, derivedSeries A n x → x = A.zero
 
 /-- Nilpotence: some lower-central-series term is zero. -/
-def Nilpotent {L : Type u} (A : LieAlgebra L) : Prop :=
+noncomputable def Nilpotent {L : Type u} (A : LieAlgebra L) : Prop :=
   ∃ n, ∀ x, lowerCentralSeries A n x → x = A.zero
 
 /-- Zero belongs to every derived-series stage. -/
@@ -235,17 +235,17 @@ theorem nilpotent_of_abelian {L : Type u} (A : LieAlgebra L) (hA : A.IsAbelian) 
 /-! ## Cartan subalgebras -/
 
 /-- Relative lower central series on a subset. -/
-def lowerCentralSeriesOn {L : Type u} (A : LieAlgebra L) (S : L → Prop) : Nat → L → Prop
+noncomputable def lowerCentralSeriesOn {L : Type u} (A : LieAlgebra L) (S : L → Prop) : Nat → L → Prop
   | 0 => S
   | n + 1 => fun x =>
       ∃ a, S a ∧ ∃ b, lowerCentralSeriesOn A S n b ∧ A.bracket a b = x
 
 /-- Nilpotence of a subset under the induced lower central series. -/
-def NilpotentOn {L : Type u} (A : LieAlgebra L) (S : L → Prop) : Prop :=
+noncomputable def NilpotentOn {L : Type u} (A : LieAlgebra L) (S : L → Prop) : Prop :=
   ∃ n, ∀ x, lowerCentralSeriesOn A S n x → x = A.zero
 
 /-- The normalizer of a Lie subalgebra. -/
-def LieSubalgebra.normalizer {L : Type u} (A : LieAlgebra L)
+noncomputable def LieSubalgebra.normalizer {L : Type u} (A : LieAlgebra L)
     (H : LieSubalgebra A) : L → Prop :=
   fun x => ∀ ⦃y⦄, H.carrier y → H.carrier (A.bracket x y)
 

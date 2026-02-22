@@ -86,7 +86,7 @@ theorem MPath.trans {a b c : MExpr}
   | step s _ ih => exact MPath.step s (ih q)
 
 /-- Step symmetry. -/
-def MStep.symm : MStep a b → MStep b a
+noncomputable def MStep.symm : MStep a b → MStep b a
   | .idL f   => .idL' f
   | .idL' f  => .idL f
   | .idR f   => .idR' f

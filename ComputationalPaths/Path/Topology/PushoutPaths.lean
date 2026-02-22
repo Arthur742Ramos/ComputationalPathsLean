@@ -34,12 +34,12 @@ theorem pushoutRel_equivalence {C : Type u} {A : Type v} {B : Type w}
     (f : C → A) (g : C → B) : Equivalence (PushoutRel f g) :=
   ⟨PushoutRel.refl, fun h => PushoutRel.symm h, fun h₁ h₂ => PushoutRel.trans h₁ h₂⟩
 
-def pushoutSetoid {C : Type u} {A : Type v} {B : Type w}
+noncomputable def pushoutSetoid {C : Type u} {A : Type v} {B : Type w}
     (f : C → A) (g : C → B) : Setoid (PushoutRaw A B) :=
   ⟨PushoutRel f g, pushoutRel_equivalence f g⟩
 
 /-- The pushout of `f : C → A` and `g : C → B`. -/
-def Pushout {C : Type u} {A : Type v} {B : Type w}
+noncomputable def Pushout {C : Type u} {A : Type v} {B : Type w}
     (f : C → A) (g : C → B) : Type (max v w) :=
   Quotient (pushoutSetoid f g)
 
@@ -49,11 +49,11 @@ variable {C : Type u} {A : Type v} {B : Type w}
 variable {f : C → A} {g : C → B}
 
 /-- Left inclusion into the pushout. -/
-def inl (a : A) : Pushout f g :=
+noncomputable def inl (a : A) : Pushout f g :=
   Quotient.mk (pushoutSetoid f g) (PushoutRaw.inl a)
 
 /-- Right inclusion into the pushout. -/
-def inr (b : B) : Pushout f g :=
+noncomputable def inr (b : B) : Pushout f g :=
   Quotient.mk (pushoutSetoid f g) (PushoutRaw.inr b)
 
 /-- The fundamental gluing equation: `inl (f c) = inr (g c)`. -/
@@ -63,11 +63,11 @@ theorem glue_eq (c : C) : inl (f c) = @inr C A B f g (g c) :=
 /-! ## Gluing paths -/
 
 /-- The gluing path from `inl (f c)` to `inr (g c)`. -/
-def gluePath (c : C) : Path (@inl C A B f g (f c)) (inr (g c)) :=
+noncomputable def gluePath (c : C) : Path (@inl C A B f g (f c)) (inr (g c)) :=
   Path.mk [Step.mk _ _ (glue_eq c)] (glue_eq c)
 
 /-- Reverse gluing path. -/
-def gluePathRev (c : C) : Path (@inr C A B f g (g c)) (inl (f c)) :=
+noncomputable def gluePathRev (c : C) : Path (@inr C A B f g (g c)) (inl (f c)) :=
   Path.symm (gluePath c)
 
 /-- The glue path produces the glue equation. -/
@@ -90,7 +90,7 @@ structure Cocone (f : C → A) (g : C → B) (D : Type x) where
   commute : ∀ c : C, left (f c) = right (g c)
 
 /-- The universal map from the pushout into any cocone target. -/
-def Cocone.desc (cc : Cocone f g D) : Pushout f g → D :=
+noncomputable def Cocone.desc (cc : Cocone f g D) : Pushout f g → D :=
   Quotient.lift (fun r => match r with
     | PushoutRaw.inl a => cc.left a
     | PushoutRaw.inr b => cc.right b)
@@ -109,7 +109,7 @@ theorem Cocone.desc_inr (cc : Cocone f g D) (b : B) :
     cc.desc (inr b) = cc.right b := rfl
 
 /-- The cocone commutation as a computational path. -/
-def Cocone.commutePath (cc : Cocone f g D) (c : C) :
+noncomputable def Cocone.commutePath (cc : Cocone f g D) (c : C) :
     Path (cc.left (f c)) (cc.right (g c)) :=
   Path.mk [Step.mk _ _ (cc.commute c)] (cc.commute c)
 
@@ -136,7 +136,7 @@ theorem Cocone.desc_gluePath (cc : Cocone f g D) (c : C) :
 /-! ## Pushout functoriality -/
 
 /-- A morphism of spans induces a map of pushouts. -/
-def mapPushout {C' : Type u} {A' : Type v} {B' : Type w}
+noncomputable def mapPushout {C' : Type u} {A' : Type v} {B' : Type w}
     {f' : C' → A'} {g' : C' → B'}
     (hC : C → C') (hA : A → A') (hB : B → B')
     (commL : ∀ c, hA (f c) = f' (hC c))
@@ -219,7 +219,7 @@ theorem path_inl_inr_iff (a : A) (b : B) :
 
 /-- Two glue paths compose to give a path between inl-points
 when they share a common right endpoint. -/
-def glueCompose (c₁ c₂ : C) (h : @inr C A B f g (g c₁) = inr (g c₂)) :
+noncomputable def glueCompose (c₁ c₂ : C) (h : @inr C A B f g (g c₁) = inr (g c₂)) :
     Path (@inl C A B f g (f c₁)) (inl (f c₂)) :=
   Path.trans (gluePath c₁)
     (Path.trans (Path.mk [Step.mk _ _ h] h) (gluePathRev c₂))

@@ -46,7 +46,7 @@ inductive ValVal where
 open ValVal
 
 /-- Minimum of two valuation values. -/
-def ValVal.min : ValVal → ValVal → ValVal
+noncomputable def ValVal.min : ValVal → ValVal → ValVal
   | infty, v => v
   | v, infty => v
   | fin a, fin b => if a ≤ b then fin a else fin b

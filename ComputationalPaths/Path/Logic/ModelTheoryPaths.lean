@@ -33,10 +33,10 @@ abbrev ModelPath (s₁ s₂ : ModelState) := Path s₁ s₂
 /-! ## Structures and Interpretations -/
 
 /-- Interpretation function: maps a symbol index to its interpretation state. -/
-def interpret (offset : Nat) : ModelState → ModelState := fun n => n + offset
+noncomputable def interpret (offset : Nat) : ModelState → ModelState := fun n => n + offset
 
 /-- Interpretation path: transporting along an interpretation. -/
-def interpretPath (offset : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
+noncomputable def interpretPath (offset : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
     Path (interpret offset s₁) (interpret offset s₂) :=
   Path.congrArg (interpret offset) p
 
@@ -62,11 +62,11 @@ theorem interpret_zero_toEq (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
 /-! ## Satisfaction relation -/
 
 /-- Satisfaction encoding: a truth-value function on model states. -/
-def satisfies (v : ModelState → Bool) : ModelState → ModelState :=
+noncomputable def satisfies (v : ModelState → Bool) : ModelState → ModelState :=
   fun n => if v n then 1 else 0
 
 /-- Satisfaction path: preserves through equal models. -/
-def satisfiesPath (v : ModelState → Bool) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
+noncomputable def satisfiesPath (v : ModelState → Bool) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
     Path (satisfies v s₁) (satisfies v s₂) :=
   Path.congrArg (satisfies v) p
 
@@ -88,10 +88,10 @@ theorem satisfies_symm (v : ModelState → Bool) (s₁ s₂ : ModelState)
 
 /-- Elementary equivalence: two models satisfy the same sentences.
     Modeled as paths through a theory encoding. -/
-def theoryOf : ModelState → ModelState := fun n => n
+noncomputable def theoryOf : ModelState → ModelState := fun n => n
 
 /-- Theory path: elementarily equivalent models give same theory state. -/
-def theoryPath (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
+noncomputable def theoryPath (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
     Path (theoryOf s₁) (theoryOf s₂) :=
   Path.congrArg theoryOf p
 
@@ -115,7 +115,7 @@ theorem elemEquiv_trans (s₁ s₂ s₃ : ModelState)
 /-! ## Elementary embeddings -/
 
 /-- An elementary embedding is a structure-preserving map between model states. -/
-def embedding (f : ModelState → ModelState) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
+noncomputable def embedding (f : ModelState → ModelState) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
     Path (f s₁) (f s₂) :=
   Path.congrArg f p
 
@@ -147,10 +147,10 @@ theorem embedding_id (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
 /-! ## Diagrams -/
 
 /-- Diagram function: encodes the diagram of a model. -/
-def diagramOp (base : Nat) : ModelState → ModelState := fun n => n + base
+noncomputable def diagramOp (base : Nat) : ModelState → ModelState := fun n => n + base
 
 /-- Diagram path. -/
-def diagramPath (base : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
+noncomputable def diagramPath (base : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
     Path (diagramOp base s₁) (diagramOp base s₂) :=
   Path.congrArg (diagramOp base) p
 
@@ -171,10 +171,10 @@ theorem diagram_symm (base : Nat) (s₁ s₂ : ModelState)
 /-! ## Types (in the model-theoretic sense) -/
 
 /-- Type realization: maps parameters to realized types. -/
-def typeRealize (params : Nat) : ModelState → ModelState := fun n => n * params
+noncomputable def typeRealize (params : Nat) : ModelState → ModelState := fun n => n * params
 
 /-- Type path. -/
-def typePath (params : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
+noncomputable def typePath (params : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
     Path (typeRealize params s₁) (typeRealize params s₂) :=
   Path.congrArg (typeRealize params) p
 
@@ -188,10 +188,10 @@ theorem type_trans (params : Nat) (s₁ s₂ s₃ : ModelState)
 /-! ## Compactness aspects -/
 
 /-- Finite subset encoding. -/
-def finSubset (bound : Nat) : ModelState → ModelState := fun n => n % (bound + 1)
+noncomputable def finSubset (bound : Nat) : ModelState → ModelState := fun n => n % (bound + 1)
 
 /-- Finite subset path. -/
-def finSubsetPath (bound : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
+noncomputable def finSubsetPath (bound : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
     Path (finSubset bound s₁) (finSubset bound s₂) :=
   Path.congrArg (finSubset bound) p
 
@@ -205,10 +205,10 @@ theorem finSubset_trans (bound : Nat) (s₁ s₂ s₃ : ModelState)
 /-! ## Löwenheim-Skolem aspects -/
 
 /-- Cardinality bound function. -/
-def cardBound (bound : Nat) : ModelState → ModelState := fun n => min n bound
+noncomputable def cardBound (bound : Nat) : ModelState → ModelState := fun n => min n bound
 
 /-- Cardinality bound path (downward LS). -/
-def cardBoundPath (bound : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
+noncomputable def cardBoundPath (bound : Nat) (s₁ s₂ : ModelState) (p : ModelPath s₁ s₂) :
     Path (cardBound bound s₁) (cardBound bound s₂) :=
   Path.congrArg (cardBound bound) p
 
@@ -248,7 +248,7 @@ theorem model_transport_symm (P : ModelState → Type u)
 /-! ## Model depth -/
 
 /-- Depth of a model derivation. -/
-def modelDepth {s₁ s₂ : ModelState} (p : ModelPath s₁ s₂) : Nat :=
+noncomputable def modelDepth {s₁ s₂ : ModelState} (p : ModelPath s₁ s₂) : Nat :=
   p.steps.length
 
 /-- Reflexive model has depth 0. -/

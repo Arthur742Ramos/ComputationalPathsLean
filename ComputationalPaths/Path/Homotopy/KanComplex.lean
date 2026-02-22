@@ -94,11 +94,11 @@ structure HornFiller (S : SSetData) (n : Nat) (k : Fin (n + 2))
 /-! ## Inner and Outer Horns -/
 
 /-- An inner horn has 0 < k < n+1. -/
-def InnerHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
+noncomputable def InnerHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
   0 < k.val ∧ k.val < n + 1
 
 /-- An outer horn has k = 0 or k = n+1. -/
-def OuterHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
+noncomputable def OuterHorn (n : Nat) (k : Fin (n + 2)) : Prop :=
   k.val = 0 ∨ k.val = n + 1
 
 /-- Every horn is either inner or outer (when n ≥ 1). -/
@@ -130,7 +130,7 @@ structure InnerKanProperty (S : SSetData) where
     ∀ (horn : HornData S n k), HornFiller S n k horn
 
 /-- Every Kan complex is an inner Kan complex. -/
-def kanToInnerKan (S : SSetData) (kan : KanFillerProperty S) :
+noncomputable def kanToInnerKan (S : SSetData) (kan : KanFillerProperty S) :
     InnerKanProperty S where
   fill := fun n k _ horn => kan.fill n k horn
 
@@ -189,7 +189,7 @@ theorem filler_unique (mk : MinimalKanData S) (n : Nat)
   mk.minimal n k horn f1 f2 hk
 
 /-- `Path`-typed filler uniqueness. -/
-def filler_unique_path (mk : MinimalKanData S) (n : Nat)
+noncomputable def filler_unique_path (mk : MinimalKanData S) (n : Nat)
     (k : Fin (n + 2)) (horn : HornData S n k)
     (f1 f2 : HornFiller S n k horn)
     (hk : S.face n k f1.simplex = S.face n k f2.simplex) :
@@ -235,7 +235,7 @@ structure KanSphereHomotopy (S : SSetData) (bp : SSetBasepoint S) (n : Nat)
   face_last : S.face (n + 1) ⟨n + 2, by omega⟩ simplex = τ.simplex
 
 /-- Homotopy is reflexive (given face-degeneracy identities). -/
-def kanSphereHomotopyRefl {S : SSetData} {bp : SSetBasepoint S}
+noncomputable def kanSphereHomotopyRefl {S : SSetData} {bp : SSetBasepoint S}
     {n : Nat} (σ : KanSphere S bp n)
     (hface0 : S.face (n + 1) ⟨0, by omega⟩ (S.degen (n + 1) ⟨0, by omega⟩ σ.simplex) = σ.simplex)
     (hfaceN : S.face (n + 1) ⟨n + 2, by omega⟩ (S.degen (n + 1) ⟨0, by omega⟩ σ.simplex) = σ.simplex) :
@@ -262,11 +262,11 @@ namespace KanHomotopyGroupData
 variable {S : SSetData} {bp : SSetBasepoint S} {n : Nat}
 
 /-- The homotopy group as a quotient type. -/
-def piN (kh : KanHomotopyGroupData S bp n) : Type u :=
+noncomputable def piN (kh : KanHomotopyGroupData S bp n) : Type u :=
   Quot kh.rel
 
 /-- `Path`-typed reflexivity of the relation. -/
-def rel_refl_path (kh : KanHomotopyGroupData S bp n) (σ : KanSphere S bp n) :
+noncomputable def rel_refl_path (kh : KanHomotopyGroupData S bp n) (σ : KanSphere S bp n) :
     Path (Quot.mk kh.rel σ) (Quot.mk kh.rel σ) :=
   Path.refl (Quot.mk kh.rel σ)
 

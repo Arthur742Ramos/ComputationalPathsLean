@@ -29,24 +29,24 @@ inductive GTerm : Type where
   deriving Repr
 
 /-- The root symbol of a ground term. -/
-def GTerm.rootSym : GTerm → RankedSym
+noncomputable def GTerm.rootSym : GTerm → RankedSym
   | .node f _ => f
 
 /-- The children (subtrees) of a ground term. -/
-def GTerm.children : GTerm → List GTerm
+noncomputable def GTerm.children : GTerm → List GTerm
   | .node _ cs => cs
 
 /-- Depth of a ground term. -/
-def GTerm.depth : GTerm → Nat
+noncomputable def GTerm.depth : GTerm → Nat
   | .node _ [] => 0
   | .node _ cs => 1 + cs.foldl (fun acc c => max acc c.depth) 0
 
 /-- Size (number of nodes) of a ground term. -/
-def GTerm.size : GTerm → Nat
+noncomputable def GTerm.size : GTerm → Nat
   | .node _ cs => 1 + cs.foldl (fun acc c => acc + c.size) 0
 
 /-- A leaf is a node with no children. -/
-def GTerm.isLeaf : GTerm → Bool
+noncomputable def GTerm.isLeaf : GTerm → Bool
   | .node _ [] => true
   | .node _ (_ :: _) => false
 
@@ -72,15 +72,15 @@ structure BUTA where
   finalStates : List TAState
 
 /-- Check if a transition matches a symbol and input states. -/
-def BUTransition.matches (tr : BUTransition) (f : RankedSym) (qs : List TAState) : Bool :=
+noncomputable def BUTransition.matches (tr : BUTransition) (f : RankedSym) (qs : List TAState) : Bool :=
   tr.symbol == f && tr.inputStates == qs
 
 /-- Find applicable transitions in a BUTA. -/
-def BUTA.findTransitions (aut : BUTA) (f : RankedSym) (qs : List TAState) : List TAState :=
+noncomputable def BUTA.findTransitions (aut : BUTA) (f : RankedSym) (qs : List TAState) : List TAState :=
   (aut.transitions.filter (fun tr => tr.matches f qs)).map BUTransition.outputState
 
 /-- Whether a state is final. -/
-def BUTA.isFinal (aut : BUTA) (q : TAState) : Bool :=
+noncomputable def BUTA.isFinal (aut : BUTA) (q : TAState) : Bool :=
   aut.finalStates.any (· == q)
 
 /-! ## Top-Down Tree Automaton (TDTA) -/
@@ -100,7 +100,7 @@ structure TDTA where
   initialStates : List TAState
 
 /-- Find applicable top-down transitions. -/
-def TDTA.findTransitions (aut : TDTA) (q : TAState) (f : RankedSym) : List (List TAState) :=
+noncomputable def TDTA.findTransitions (aut : TDTA) (q : TAState) (f : RankedSym) : List (List TAState) :=
   (aut.transitions.filter (fun tr => tr.inputState == q && tr.symbol == f)).map TDTransition.outputStates
 
 /-! ## Run of a Tree Automaton as a Path -/
@@ -112,7 +112,7 @@ structure RunConfig where
   deriving Repr
 
 /-- A partial run step in the bottom-up run. -/
-def RunConfig.step (rc : RunConfig) (q' : TAState) : RunConfig :=
+noncomputable def RunConfig.step (rc : RunConfig) (q' : TAState) : RunConfig :=
   { rc with state := q' }
 
 /-! ## Recognition Witness -/
@@ -136,14 +136,14 @@ structure BUAccepts (aut : BUTA) (t : GTerm) where
 /-! ## Regular Tree Languages -/
 
 /-- A tree language is a set of ground terms. -/
-def TreeLang := GTerm → Prop
+noncomputable def TreeLang := GTerm → Prop
 
 /-- The language accepted by a BUTA. -/
-def BUTA.lang (aut : BUTA) : TreeLang :=
+noncomputable def BUTA.lang (aut : BUTA) : TreeLang :=
   fun t => ∃ q, q ∈ aut.finalStates ∧ (aut.findTransitions t.rootSym []).any (· == q) = true
 
 /-- A tree language is regular if recognized by some BUTA. -/
-def IsRegularTreeLang (L : TreeLang) : Prop :=
+noncomputable def IsRegularTreeLang (L : TreeLang) : Prop :=
   ∃ aut : BUTA, ∀ t, L t ↔ BUTA.lang aut t
 
 /-! ## Path-based reasoning about automaton configurations -/
@@ -155,16 +155,16 @@ structure AutoConfig where
   deriving DecidableEq, Repr
 
 /-- Identity path on an automaton configuration. -/
-def autoConfigRefl (cfg : AutoConfig) : Path cfg cfg :=
+noncomputable def autoConfigRefl (cfg : AutoConfig) : Path cfg cfg :=
   Path.refl cfg
 
 /-- Transitivity of configuration paths. -/
-def autoConfigTrans {a b c : AutoConfig}
+noncomputable def autoConfigTrans {a b c : AutoConfig}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
 /-- Symmetry of configuration paths. -/
-def autoConfigSymm {a b : AutoConfig}
+noncomputable def autoConfigSymm {a b : AutoConfig}
     (p : Path a b) : Path b a :=
   Path.symm p
 
@@ -202,11 +202,11 @@ structure ProdState where
   deriving DecidableEq, Repr
 
 /-- Encode product state as single state. -/
-def encodeProd (p : ProdState) : TAState :=
+noncomputable def encodeProd (p : ProdState) : TAState :=
   ⟨p.fst.id * 1000 + p.snd.id⟩
 
 /-- Product transition. -/
-def prodTransition (tr1 : BUTransition) (tr2 : BUTransition) : Option BUTransition :=
+noncomputable def prodTransition (tr1 : BUTransition) (tr2 : BUTransition) : Option BUTransition :=
   if tr1.symbol == tr2.symbol && tr1.inputStates.length == tr2.inputStates.length then
     some {
       symbol := tr1.symbol
@@ -218,7 +218,7 @@ def prodTransition (tr1 : BUTransition) (tr2 : BUTransition) : Option BUTransiti
     none
 
 /-- The product automaton for intersection. -/
-def BUTA.product (a1 a2 : BUTA) : BUTA where
+noncomputable def BUTA.product (a1 a2 : BUTA) : BUTA where
   states := Id.run do
     let mut res : List TAState := []
     for s1 in a1.states do
@@ -244,17 +244,17 @@ def BUTA.product (a1 a2 : BUTA) : BUTA where
 /-! ## Union Construction -/
 
 /-- Disjoint union of states. -/
-def disjointState (side : Bool) (q : TAState) : TAState :=
+noncomputable def disjointState (side : Bool) (q : TAState) : TAState :=
   ⟨if side then q.id * 2 + 1 else q.id * 2⟩
 
 /-- Shift a transition to a side of the disjoint union. -/
-def shiftTransition (side : Bool) (tr : BUTransition) : BUTransition where
+noncomputable def shiftTransition (side : Bool) (tr : BUTransition) : BUTransition where
   symbol := tr.symbol
   inputStates := tr.inputStates.map (disjointState side)
   outputState := disjointState side tr.outputState
 
 /-- The union automaton. -/
-def BUTA.union (a1 a2 : BUTA) : BUTA where
+noncomputable def BUTA.union (a1 a2 : BUTA) : BUTA where
   states := a1.states.map (disjointState false) ++ a2.states.map (disjointState true)
   alphabet := a1.alphabet ++ a2.alphabet
   transitions := a1.transitions.map (shiftTransition false) ++
@@ -265,7 +265,7 @@ def BUTA.union (a1 a2 : BUTA) : BUTA where
 /-! ## Complement Construction -/
 
 /-- Complement automaton (assumes deterministic and complete). -/
-def BUTA.complement (aut : BUTA) : BUTA where
+noncomputable def BUTA.complement (aut : BUTA) : BUTA where
   states := aut.states
   alphabet := aut.alphabet
   transitions := aut.transitions
@@ -274,7 +274,7 @@ def BUTA.complement (aut : BUTA) : BUTA where
 /-! ## Path-lifted function application -/
 
 /-- Apply a function on TAState through a path. -/
-def liftStateFun (f : TAState → TAState) {a b : TAState}
+noncomputable def liftStateFun (f : TAState → TAState) {a b : TAState}
     (p : Path a b) : Path (f a) (f b) :=
   Path.congrArg f p
 
@@ -310,21 +310,21 @@ structure RunSegment where
   deriving DecidableEq, Repr
 
 /-- Identity run segment. -/
-def RunSegment.idSeg (q : TAState) : RunSegment :=
+noncomputable def RunSegment.idSeg (q : TAState) : RunSegment :=
   ⟨q, q, 0⟩
 
 /-- Compose two run segments. -/
-def RunSegment.compose (s1 s2 : RunSegment) : RunSegment :=
+noncomputable def RunSegment.compose (s1 s2 : RunSegment) : RunSegment :=
   ⟨s1.startState, s2.endState, s1.depth + s2.depth⟩
 
 /-! ## Deterministic Bottom-Up Tree Automaton -/
 
 /-- A BUTA is deterministic if each (symbol, input-states) pair has at most one transition. -/
-def BUTA.isDeterministic (aut : BUTA) : Prop :=
+noncomputable def BUTA.isDeterministic (aut : BUTA) : Prop :=
   ∀ f qs, (aut.findTransitions f qs).length ≤ 1
 
 /-- A complete BUTA has at least one transition for every (symbol, input-states). -/
-def BUTA.isComplete (aut : BUTA) : Prop :=
+noncomputable def BUTA.isComplete (aut : BUTA) : Prop :=
   ∀ f qs, (aut.findTransitions f qs).length ≥ 1
 
 /-! ## State Equivalence and Myhill-Nerode -/
@@ -335,12 +335,12 @@ inductive Context : Type where
   | node : RankedSym → List Context → Context
 
 /-- Plug a term into a context. -/
-def Context.plug : Context → GTerm → GTerm
+noncomputable def Context.plug : Context → GTerm → GTerm
   | .hole, t => t
   | .node f cs, t => .node f (cs.map (·.plug t))
 
 /-- Myhill-Nerode equivalence for trees. -/
-def mnEquiv (L : TreeLang) (t1 t2 : GTerm) : Prop :=
+noncomputable def mnEquiv (L : TreeLang) (t1 t2 : GTerm) : Prop :=
   ∀ c : Context, L (c.plug t1) ↔ L (c.plug t2)
 
 /-- Theorem 7: MN equivalence is reflexive. -/
@@ -360,7 +360,7 @@ theorem mnEquiv_trans (L : TreeLang) {t1 t2 t3 : GTerm}
 /-! ## Path-Witnessed State Equivalence -/
 
 /-- Two states are equivalent if they accept the same trees. -/
-def stateEquiv (aut : BUTA) (q1 q2 : TAState) : Prop :=
+noncomputable def stateEquiv (aut : BUTA) (q1 q2 : TAState) : Prop :=
   ∀ t : GTerm, (q1 ∈ aut.findTransitions t.rootSym []) ↔
                (q2 ∈ aut.findTransitions t.rootSym [])
 
@@ -442,7 +442,7 @@ structure TreeDecomp where
   core : GTerm
 
 /-- Pump the inner context n times. -/
-def pumpContext : Nat → Context → Context → Context
+noncomputable def pumpContext : Nat → Context → Context → Context
   | 0, _, inner => inner
   | n + 1, outer, inner =>
     match outer with
@@ -450,7 +450,7 @@ def pumpContext : Nat → Context → Context → Context
     | .node f cs => .node f (cs.map (fun c => pumpContext n c inner))
 
 /-- The pumping property for tree languages. -/
-def TreePumpingProp (L : TreeLang) (n : Nat) : Prop :=
+noncomputable def TreePumpingProp (L : TreeLang) (n : Nat) : Prop :=
   ∀ t : GTerm, t.size > n → L t →
     ∃ d : TreeDecomp,
       L (d.outer.plug (d.inner.plug d.core)) ∧
@@ -494,15 +494,15 @@ structure TreeHom where
   preserveArity : ∀ f, (mapSym f).arity = f.arity
 
 /-- Apply a tree homomorphism. -/
-def TreeHom.apply (h : TreeHom) : GTerm → GTerm
+noncomputable def TreeHom.apply (h : TreeHom) : GTerm → GTerm
   | .node f cs => .node (h.mapSym f) (cs.map h.apply)
 
 /-- Image of a tree language under a homomorphism. -/
-def TreeLang.image (L : TreeLang) (h : TreeHom) : TreeLang :=
+noncomputable def TreeLang.image (L : TreeLang) (h : TreeHom) : TreeLang :=
   fun t => ∃ t', L t' ∧ h.apply t' = t
 
 /-- Preimage of a tree language under a homomorphism. -/
-def TreeLang.preimage (L : TreeLang) (h : TreeHom) : TreeLang :=
+noncomputable def TreeLang.preimage (L : TreeLang) (h : TreeHom) : TreeLang :=
   fun t => L (h.apply t)
 
 /-! ## Path Lifting Through Tree Hom -/
@@ -513,7 +513,7 @@ theorem hom_preserves_rootSym (h : TreeHom) (f : RankedSym) (cs : List GTerm) :
   simp [TreeHom.apply, GTerm.rootSym]
 
 /-- Lift a path through tree hom application. -/
-def liftHomPath (h : TreeHom) {t1 t2 : GTerm}
+noncomputable def liftHomPath (h : TreeHom) {t1 t2 : GTerm}
     (p : Path t1 t2) : Path (h.apply t1) (h.apply t2) :=
   Path.congrArg h.apply p
 
@@ -546,20 +546,20 @@ structure StateMap where
   map : TAState → TAState
 
 /-- Apply state map to a transition. -/
-def StateMap.applyTransition (sm : StateMap) (tr : BUTransition) : BUTransition where
+noncomputable def StateMap.applyTransition (sm : StateMap) (tr : BUTransition) : BUTransition where
   symbol := tr.symbol
   inputStates := tr.inputStates.map sm.map
   outputState := sm.map tr.outputState
 
 /-- Apply state map to a BUTA. -/
-def StateMap.applyBUTA (sm : StateMap) (aut : BUTA) : BUTA where
+noncomputable def StateMap.applyBUTA (sm : StateMap) (aut : BUTA) : BUTA where
   states := aut.states.map sm.map
   alphabet := aut.alphabet
   transitions := aut.transitions.map sm.applyTransition
   finalStates := aut.finalStates.map sm.map
 
 /-- Path witnessing state map coherence. -/
-def stateMapPath (sm : StateMap) {q1 q2 : TAState}
+noncomputable def stateMapPath (sm : StateMap) {q1 q2 : TAState}
     (p : Path q1 q2) : Path (sm.map q1) (sm.map q2) :=
   Path.congrArg sm.map p
 
@@ -617,15 +617,15 @@ theorem runSeg_symm_symm {a b : RunSegment}
 /-! ## Tree Language Operations -/
 
 /-- Union of tree languages. -/
-def TreeLang.union (L1 L2 : TreeLang) : TreeLang :=
+noncomputable def TreeLang.union (L1 L2 : TreeLang) : TreeLang :=
   fun t => L1 t ∨ L2 t
 
 /-- Intersection of tree languages. -/
-def TreeLang.inter (L1 L2 : TreeLang) : TreeLang :=
+noncomputable def TreeLang.inter (L1 L2 : TreeLang) : TreeLang :=
   fun t => L1 t ∧ L2 t
 
 /-- Complement of a tree language. -/
-def TreeLang.compl (L : TreeLang) : TreeLang :=
+noncomputable def TreeLang.compl (L : TreeLang) : TreeLang :=
   fun t => ¬ L t
 
 /-- Theorem 30: Double complement is identity. -/
@@ -682,7 +682,7 @@ theorem treeLang_inter_compl (L : TreeLang) (t : GTerm) :
 /-! ## Equivalence of Automata -/
 
 /-- Two automata are equivalent if they recognize the same language. -/
-def autEquiv (a1 a2 : BUTA) : Prop :=
+noncomputable def autEquiv (a1 a2 : BUTA) : Prop :=
   ∀ t, BUTA.lang a1 t ↔ BUTA.lang a2 t
 
 /-- Theorem 37: Automata equivalence is reflexive. -/
@@ -703,11 +703,11 @@ theorem autEquiv_trans {a1 a2 a3 : BUTA}
 /-! ## Path-Based Tree Substitution -/
 
 /-- Substitute at the root: replace root symbol. -/
-def substRoot (t : GTerm) (f : RankedSym) : GTerm :=
+noncomputable def substRoot (t : GTerm) (f : RankedSym) : GTerm :=
   .node f t.children
 
 /-- Path showing substitution coherence. -/
-def substRootPath (f : RankedSym) {t1 t2 : GTerm}
+noncomputable def substRootPath (f : RankedSym) {t1 t2 : GTerm}
     (p : Path t1 t2) : Path (substRoot t1 f) (substRoot t2 f) :=
   Path.congrArg (substRoot · f) p
 
@@ -735,7 +735,7 @@ structure Simulation (a1 a2 : BUTA) where
   preservesFinal : ∀ q, q ∈ a1.finalStates → stateMap q ∈ a2.finalStates
 
 /-- Lift a simulation through a path. -/
-def Simulation.liftPath {a1 a2 : BUTA} (sim : Simulation a1 a2)
+noncomputable def Simulation.liftPath {a1 a2 : BUTA} (sim : Simulation a1 a2)
     {q1 q2 : TAState} (p : Path q1 q2) :
     Path (sim.stateMap q1) (sim.stateMap q2) :=
   Path.congrArg sim.stateMap p
@@ -759,10 +759,10 @@ theorem sim_lift_symm {a1 a2 : BUTA} (sim : Simulation a1 a2)
 /-! ## Projection Paths -/
 
 /-- Project product state to first component. -/
-def projFst (q : TAState) : TAState := ⟨q.id / 1000⟩
+noncomputable def projFst (q : TAState) : TAState := ⟨q.id / 1000⟩
 
 /-- Project product state to second component. -/
-def projSnd (q : TAState) : TAState := ⟨q.id % 1000⟩
+noncomputable def projSnd (q : TAState) : TAState := ⟨q.id % 1000⟩
 
 /-- Theorem 44: Projection paths compose with trans. -/
 theorem proj_fst_trans {q1 q2 q3 : TAState}
@@ -788,7 +788,7 @@ structure ExtTransition where
   deriving DecidableEq, Repr
 
 /-- Composition of extended transitions path. -/
-def extTransPath {e1 e2 : ExtTransition}
+noncomputable def extTransPath {e1 e2 : ExtTransition}
     (p : Path e1 e2) : Path e1.target e2.target :=
   Path.congrArg ExtTransition.target p
 
@@ -816,14 +816,14 @@ structure PowerState where
   deriving DecidableEq, Repr
 
 /-- Singleton powerset state. -/
-def PowerState.singleton (q : TAState) : PowerState := ⟨[q.id]⟩
+noncomputable def PowerState.singleton (q : TAState) : PowerState := ⟨[q.id]⟩
 
 /-- Union of powerset states. -/
-def PowerState.union (ps1 ps2 : PowerState) : PowerState :=
+noncomputable def PowerState.union (ps1 ps2 : PowerState) : PowerState :=
   ⟨(ps1.ids ++ ps2.ids).eraseDups⟩
 
 /-- Path showing determinization preserves structure. -/
-def detPath {ps1 ps2 : PowerState}
+noncomputable def detPath {ps1 ps2 : PowerState}
     (p : Path ps1 ps2) : Path (PowerState.union ps1 ps1) (PowerState.union ps2 ps2) :=
   Path.congrArg (fun ps => PowerState.union ps ps) p
 
@@ -870,7 +870,7 @@ theorem congrArg_refl_state (f : TAState → TAState) (a : TAState) :
   rfl
 
 /-- Theorem 54: Context plug preserves path. -/
-def contextPlugPath (c : Context) {t1 t2 : GTerm}
+noncomputable def contextPlugPath (c : Context) {t1 t2 : GTerm}
     (p : Path t1 t2) : Path (c.plug t1) (c.plug t2) :=
   Path.congrArg c.plug p
 

@@ -60,7 +60,7 @@ inductive EnrichedStep {A : Type u} :
         (Path.trans (Path.symm q) (Path.symm p))
 
 /-- Interpret an enriched step as a primitive `Path.Step`. -/
-def EnrichedStep.toStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def EnrichedStep.toStep {A : Type u} {a b : A} {p q : Path a b}
     (s : EnrichedStep p q) : Path.Step p q :=
   match s with
   | .right_unit p => Path.Step.trans_refl_right p
@@ -71,7 +71,7 @@ def EnrichedStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .symm_distrib p q => Path.Step.symm_trans_congr p q
 
 /-- Lift an enriched step to rewrite equivalence. -/
-def rweq_of_enriched_step {A : Type u} {a b : A}
+noncomputable def rweq_of_enriched_step {A : Type u} {a b : A}
     {p q : Path a b} (s : EnrichedStep p q) : RwEq p q :=
   rweq_of_step (EnrichedStep.toStep s)
 
@@ -132,7 +132,7 @@ noncomputable def rightUnitor_symm_cancel (x : V) :
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (M.rightUnitorPath x))
 
 -- Theorem 7: Symm distributes over assocPath trans
-def assoc_symm_distrib (x y z : V) :
+noncomputable def assoc_symm_distrib (x y z : V) :
     RwEq
       (Path.symm (Path.trans (M.assocPath x y z) (Path.symm (M.assocPath x y z))))
       (Path.trans (Path.symm (Path.symm (M.assocPath x y z)))
@@ -141,7 +141,7 @@ def assoc_symm_distrib (x y z : V) :
     (EnrichedStep.symm_distrib (M.assocPath x y z) (Path.symm (M.assocPath x y z)))
 
 -- Theorem 8: Transport along left unitor is constant
-def transport_leftUnitor_const (x : V) :
+noncomputable def transport_leftUnitor_const (x : V) :
     Path.transport (D := fun _ => V) (M.leftUnitorPath x) (M.tensor M.unit x)
       = M.tensor M.unit x := by
   simp [Path.transport_const]
@@ -200,12 +200,12 @@ noncomputable def leftUnit_inverse_cancel (a b : C.Obj) :
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (C.leftUnitPath a b))
 
 -- Theorem 13: Transport of id along idPath is constant
-def transport_id_const (a : C.Obj) :
+noncomputable def transport_id_const (a : C.Obj) :
     Path.transport (D := fun _ => V) (C.idPath a) M.unit = M.unit := by
   simp [Path.transport_const]
 
 -- Theorem 14: Symm distributes over comp+leftUnit trans
-def comp_leftUnit_symm_distrib (a b c : C.Obj) :
+noncomputable def comp_leftUnit_symm_distrib (a b c : C.Obj) :
     RwEq
       (Path.symm (Path.trans (C.compPath a b c) (Path.symm (C.compPath a b c))))
       (Path.trans (Path.symm (Path.symm (C.compPath a b c)))
@@ -257,7 +257,7 @@ noncomputable def homAction_symm_cancel_left (a b : C.Obj) :
   rweq_of_enriched_step (EnrichedStep.inverse_cancel_left (F.homActionPath a b))
 
 -- Theorem 18: Transport along idPres is constant
-def transport_along_idPres (a : C.Obj) :
+noncomputable def transport_along_idPres (a : C.Obj) :
     Path.transport (D := fun _ => V) (F.idPresPath a) (C.idMorph a)
       = C.idMorph a := by
   simp [Path.transport_const]
@@ -267,7 +267,7 @@ end EnrichedFunctor
 /-! ## Enriched functor composition -/
 
 /-- Compose two enriched functors. -/
-def EnrichedFunctor.comp {V : Type u} {M : MonoidalBase V}
+noncomputable def EnrichedFunctor.comp {V : Type u} {M : MonoidalBase V}
     {C D E : VEnrichedCat V M}
     (F : EnrichedFunctor C D) (G : EnrichedFunctor D E) :
     EnrichedFunctor C E where
@@ -284,7 +284,7 @@ def EnrichedFunctor.comp {V : Type u} {M : MonoidalBase V}
       (G.idPresPath (F.objMap a))
 
 -- Theorem 19: Composed functor homAction is trans of components
-def EnrichedFunctor.comp_homActionPath {V : Type u} {M : MonoidalBase V}
+noncomputable def EnrichedFunctor.comp_homActionPath {V : Type u} {M : MonoidalBase V}
     {C D E : VEnrichedCat V M}
     (F : EnrichedFunctor C D) (G : EnrichedFunctor D E)
     (a b : C.Obj) :
@@ -294,7 +294,7 @@ def EnrichedFunctor.comp_homActionPath {V : Type u} {M : MonoidalBase V}
   rfl
 
 -- Theorem 20: Composed functor idPres is trans of components
-def EnrichedFunctor.comp_idPresPath {V : Type u} {M : MonoidalBase V}
+noncomputable def EnrichedFunctor.comp_idPresPath {V : Type u} {M : MonoidalBase V}
     {C D E : VEnrichedCat V M}
     (F : EnrichedFunctor C D) (G : EnrichedFunctor D E)
     (a : C.Obj) :
@@ -343,7 +343,7 @@ noncomputable def naturality_inverse_cancel (α : EnrichedNatTrans F G) (a b : C
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (α.naturalityPath a b))
 
 -- Theorem 24: Symm distributes over naturality path pair
-def naturality_symm_distrib (α : EnrichedNatTrans F G) (a b : C.Obj) :
+noncomputable def naturality_symm_distrib (α : EnrichedNatTrans F G) (a b : C.Obj) :
     RwEq
       (Path.symm (Path.trans (α.componentPath a) (Path.symm (α.componentPath a))))
       (Path.trans (Path.symm (Path.symm (α.componentPath a)))
@@ -408,7 +408,7 @@ noncomputable def counit_inverse_cancel (b : D.Obj) :
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (adj.counitPath b))
 
 -- Theorem 29: Symm distributes over unit path pair
-def unit_symm_distrib (a : C.Obj) :
+noncomputable def unit_symm_distrib (a : C.Obj) :
     RwEq
       (Path.symm (Path.trans (adj.unitPath a) (Path.symm (adj.unitPath a))))
       (Path.trans (Path.symm (Path.symm (adj.unitPath a)))
@@ -417,7 +417,7 @@ def unit_symm_distrib (a : C.Obj) :
     (EnrichedStep.symm_distrib (adj.unitPath a) (Path.symm (adj.unitPath a)))
 
 -- Theorem 30: Transport along unit is constant
-def transport_unit_const (a : C.Obj) :
+noncomputable def transport_unit_const (a : C.Obj) :
     Path.transport (D := fun _ => V) (adj.unitPath a) (C.idMorph a)
       = C.idMorph a := by
   simp [Path.transport_const]
@@ -455,7 +455,7 @@ noncomputable def coend_inverse_cancel (x y z : V) :
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (D.coendPath x y z))
 
 -- Theorem 33: Symm distributes over coend path pair
-def coend_symm_distrib (x y z : V) :
+noncomputable def coend_symm_distrib (x y z : V) :
     RwEq
       (Path.symm (Path.trans (D.coendPath x y z) (Path.symm (D.coendPath x y z))))
       (Path.trans (Path.symm (Path.symm (D.coendPath x y z)))
@@ -510,13 +510,13 @@ noncomputable def yoneda_inverse_cancel (a b c : C.Obj) :
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (Y.yonedaPath a b c))
 
 -- Theorem 38: Transport along repr is constant
-def transport_repr_const (a b : C.Obj) :
+noncomputable def transport_repr_const (a b : C.Obj) :
     Path.transport (D := fun _ => V) (Y.reprPath a b) (Y.repr a b)
       = Y.repr a b := by
   simp [Path.transport_const]
 
 -- Theorem 39: Repr path symm distributes
-def repr_symm_distrib (a b : C.Obj) :
+noncomputable def repr_symm_distrib (a b : C.Obj) :
     RwEq
       (Path.symm (Path.trans (Y.reprPath a b) (Path.symm (Y.reprPath a b))))
       (Path.trans (Path.symm (Path.symm (Y.reprPath a b)))
@@ -581,13 +581,13 @@ noncomputable def cone_symm_cancel_left (a : C.Obj) :
   rweq_of_enriched_step (EnrichedStep.inverse_cancel_left (W.conePath a))
 
 -- Theorem 45: Transport along cone is constant
-def transport_cone_const (a : C.Obj) :
+noncomputable def transport_cone_const (a : C.Obj) :
     Path.transport (D := fun _ => V) (W.conePath a) W.limitObj
       = W.limitObj := by
   simp [Path.transport_const]
 
 -- Theorem 46: Cone symm distributes
-def cone_symm_distrib (a : C.Obj) :
+noncomputable def cone_symm_distrib (a : C.Obj) :
     RwEq
       (Path.symm (Path.trans (W.conePath a) (Path.symm (W.conePath a))))
       (Path.trans (Path.symm (Path.symm (W.conePath a)))
@@ -638,7 +638,7 @@ noncomputable def proj_symm_cancel_left (a : C.Obj) :
   rweq_of_enriched_step (EnrichedStep.inverse_cancel_left (E.projPath a))
 
 -- Theorem 50: Proj symm distributes
-def proj_symm_distrib (a : C.Obj) :
+noncomputable def proj_symm_distrib (a : C.Obj) :
     RwEq
       (Path.symm (Path.trans (E.projPath a) (Path.symm (E.projPath a))))
       (Path.trans (Path.symm (Path.symm (E.projPath a)))
@@ -681,13 +681,13 @@ noncomputable def monad_mult_inverse_cancel (a : C.Obj) :
   rweq_of_enriched_step (EnrichedStep.inverse_cancel (T.multPath a))
 
 -- Theorem 53: Transport along monad unit is constant
-def transport_monad_unit_const (a : C.Obj) :
+noncomputable def transport_monad_unit_const (a : C.Obj) :
     Path.transport (D := fun _ => V) (T.unitPath a) (C.idMorph a)
       = C.idMorph a := by
   simp [Path.transport_const]
 
 -- Theorem 54: Monad unit symm distributes
-def monad_unit_symm_distrib (a : C.Obj) :
+noncomputable def monad_unit_symm_distrib (a : C.Obj) :
     RwEq
       (Path.symm (Path.trans (T.unitPath a) (Path.symm (T.unitPath a))))
       (Path.trans (Path.symm (Path.symm (T.unitPath a)))

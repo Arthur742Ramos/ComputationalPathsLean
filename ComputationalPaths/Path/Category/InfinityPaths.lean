@@ -35,13 +35,13 @@ structure SimplicialObj (A : Type u) where
   degen : ∀ {n : Nat} (_ : Fin (n + 1)), A → A
 
 /-- Face map applied to a path via congrArg. -/
-def face_map_path {A : Type u} (S : SimplicialObj A)
+noncomputable def face_map_path {A : Type u} (S : SimplicialObj A)
     {n : Nat} (i : Fin (n + 2)) {a b : A} (p : Path a b) :
     Path (S.face i a) (S.face i b) :=
   Path.congrArg (S.face i) p
 
 /-- Degeneracy map applied to a path via congrArg. -/
-def degen_map_path {A : Type u} (S : SimplicialObj A)
+noncomputable def degen_map_path {A : Type u} (S : SimplicialObj A)
     {n : Nat} (i : Fin (n + 1)) {a b : A} (p : Path a b) :
     Path (S.degen i a) (S.degen i b) :=
   Path.congrArg (S.degen i) p
@@ -146,11 +146,11 @@ structure MappingSpace (A : Type u) (x y : A) where
   points : List (Path x y)
 
 /-- The constant mapping space (identity). -/
-def mapping_space_const {A : Type u} (x : A) : MappingSpace A x x :=
+noncomputable def mapping_space_const {A : Type u} (x : A) : MappingSpace A x x :=
   ⟨[Path.refl x]⟩
 
 /-- Composition of mapping spaces via trans. -/
-def mapping_space_comp {A : Type u} {x y z : A}
+noncomputable def mapping_space_comp {A : Type u} {x y z : A}
     (ms₁ : MappingSpace A x y) (ms₂ : MappingSpace A y z) :
     MappingSpace A x z :=
   ⟨(ms₁.points.flatMap (fun p => ms₂.points.map (fun q => Path.trans p q)))⟩
@@ -170,17 +170,17 @@ structure NerveSimplex (A : Type u) (n : Nat) where
   edges : ∀ (i : Fin n), Path (vertices i.castSucc) (vertices i.succ)
 
 /-- 0-simplices of the nerve. -/
-def nerve_zero {A : Type u} (a : A) : NerveSimplex A 0 :=
+noncomputable def nerve_zero {A : Type u} (a : A) : NerveSimplex A 0 :=
   ⟨fun _ => a, fun i => Fin.elim0 i⟩
 
 /-- 1-simplices are just paths. -/
-def nerve_one {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def nerve_one {A : Type u} {a b : A} (p : Path a b) :
     NerveSimplex A 1 where
   vertices := fun i => match i.val with | 0 => a | _ => b
   edges := fun ⟨0, _⟩ => by show Path a b; exact p
 
 /-- 2-simplices encode composition. -/
-def nerve_two {A : Type u} {a b c : A}
+noncomputable def nerve_two {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     NerveSimplex A 2 where
   vertices := fun i => match i.val with | 0 => a | 1 => b | _ => c

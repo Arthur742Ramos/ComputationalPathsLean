@@ -34,26 +34,26 @@ inductive Path : HTTPoint → HTTPoint → Type where
   | nil  : (a : HTTPoint) → Path a a
   | cons : Step a b → Path b c → Path a c
 
-def Path.refl (a : HTTPoint) : Path a a := .nil a
-def Path.single (s : Step a b) : Path a b := .cons s (.nil _)
+noncomputable def Path.refl (a : HTTPoint) : Path a a := .nil a
+noncomputable def Path.single (s : Step a b) : Path a b := .cons s (.nil _)
 
 /-- Theorem 1 – Transitivity (composition of identity proofs). -/
-def Path.trans : Path a b → Path b c → Path a c
+noncomputable def Path.trans : Path a b → Path b c → Path a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
 /-- Theorem 2 – Step inversion. -/
-def Step.symm : Step a b → Step b a
+noncomputable def Step.symm : Step a b → Step b a
   | .refl a   => .refl a
   | .edge n m => .edge m n
 
 /-- Theorem 3 – Path inversion (symmetry of identity). -/
-def Path.symm : Path a b → Path b a
+noncomputable def Path.symm : Path a b → Path b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.single s.symm)
 
 /-- Theorem 4 – Path length. -/
-def Path.length : Path a b → Nat
+noncomputable def Path.length : Path a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -103,14 +103,14 @@ structure PathMotive where
 /-- Theorem 10 – J-eliminator: any property of paths is determined by
     its value on refl. We model J as: given a value for the refl case,
     we can produce a value for any path endpoint that equals the start. -/
-def J_elim (base : PathMotive) (_p : Path a a) : PathMotive := base
+noncomputable def J_elim (base : PathMotive) (_p : Path a a) : PathMotive := base
 
 /-- Theorem 11 – J computation rule: J on refl returns the base case. -/
 theorem J_comp (base : PathMotive) (a : HTTPoint) :
     J_elim base (Path.refl a) = base := rfl
 
 /-- Theorem 12 – Based J: fixing one endpoint. -/
-def J_based (base : PathMotive) (_p : Path a a) : PathMotive := base
+noncomputable def J_based (base : PathMotive) (_p : Path a a) : PathMotive := base
 
 theorem J_based_comp (base : PathMotive) :
     J_based base (Path.refl a) = base := rfl
@@ -120,12 +120,12 @@ theorem J_based_comp (base : PathMotive) :
 -- ============================================================
 
 /-- Map a function over steps. -/
-def ap_step (f : HTTPoint → HTTPoint) : Step a b → Step (f a) (f b)
+noncomputable def ap_step (f : HTTPoint → HTTPoint) : Step a b → Step (f a) (f b)
   | .refl a   => .refl (f a)
   | .edge n m => .edge (match f (.pt n) with | .pt k => k) (match f (.pt m) with | .pt k => k)
 
 /-- Theorem 13 – ap: functorial action on paths. -/
-def ap (f : HTTPoint → HTTPoint) : Path a b → Path (f a) (f b)
+noncomputable def ap (f : HTTPoint → HTTPoint) : Path a b → Path (f a) (f b)
   | .nil a    => .nil (f a)
   | .cons s p => .cons (ap_step f s) (ap f p)
 
@@ -182,7 +182,7 @@ structure DepFamily where
   fiber : HTTPoint → Nat
 
 /-- Theorem 19 – transport along a path (identity type gives coercion). -/
-def transport (_F : DepFamily) (_p : Path a a) (x : Nat) : Nat := x
+noncomputable def transport (_F : DepFamily) (_p : Path a a) (x : Nat) : Nat := x
 
 /-- Theorem 20 – transport on refl is identity. -/
 theorem transport_refl (F : DepFamily) (a : HTTPoint) (x : Nat) :
@@ -198,7 +198,7 @@ theorem transport_trans (F : DepFamily) (p : Path a a) (q : Path a a) (x : Nat) 
 
 /-- Theorem 22 – apd: dependent action. Given a section f of family F,
     transport along p of f(a) = f(b). Over refl this is trivially id. -/
-def apd (F : DepFamily) (f : (a : HTTPoint) → Nat) (_p : Path a a) :
+noncomputable def apd (F : DepFamily) (f : (a : HTTPoint) → Nat) (_p : Path a a) :
     transport F _p (f a) = f a := rfl
 
 /-- Theorem 23 – apd on refl is refl. -/
@@ -215,11 +215,11 @@ structure HTTMap where
   bwd : HTTPoint → HTTPoint
 
 /-- Theorem 24 – Section condition as path. -/
-def is_section (m : HTTMap) : Prop :=
+noncomputable def is_section (m : HTTMap) : Prop :=
   ∀ a, m.fwd (m.bwd a) = a
 
 /-- Theorem 25 – Retraction condition. -/
-def is_retraction (m : HTTMap) : Prop :=
+noncomputable def is_retraction (m : HTTMap) : Prop :=
   ∀ a, m.bwd (m.fwd a) = a
 
 /-- An equivalence is a bi-invertible map. -/
@@ -228,21 +228,21 @@ structure HTTEquiv extends HTTMap where
   retr : is_retraction toHTTMap
 
 /-- Theorem 26 – The identity map is an equivalence. -/
-def HTTEquiv.id_equiv : HTTEquiv where
+noncomputable def HTTEquiv.id_equiv : HTTEquiv where
   fwd := id
   bwd := id
   sect := fun _ => rfl
   retr := fun _ => rfl
 
 /-- Theorem 27 – Equivalences compose. -/
-def HTTEquiv.comp (e₁ : HTTEquiv) (e₂ : HTTEquiv) : HTTEquiv where
+noncomputable def HTTEquiv.comp (e₁ : HTTEquiv) (e₂ : HTTEquiv) : HTTEquiv where
   fwd := e₂.fwd ∘ e₁.fwd
   bwd := e₁.bwd ∘ e₂.bwd
   sect := fun a => by simp [Function.comp]; rw [e₁.sect (e₂.bwd a), e₂.sect a]
   retr := fun a => by simp [Function.comp]; rw [e₂.retr (e₁.fwd a), e₁.retr a]
 
 /-- Theorem 28 – Equivalences invert. -/
-def HTTEquiv.inv (e : HTTEquiv) : HTTEquiv where
+noncomputable def HTTEquiv.inv (e : HTTEquiv) : HTTEquiv where
   fwd := e.bwd
   bwd := e.fwd
   sect := e.retr
@@ -267,7 +267,7 @@ structure TypeCode where
 deriving DecidableEq
 
 /-- Theorem 30 – Univalence map: id-to-equiv (reflexivity gives identity equiv). -/
-def idToEquiv (_p : TypeCode = TypeCode) : HTTEquiv := HTTEquiv.id_equiv
+noncomputable def idToEquiv (_p : TypeCode = TypeCode) : HTTEquiv := HTTEquiv.id_equiv
 
 /-- Theorem 31 – Univalence computation: idToEquiv on refl is id. -/
 theorem univalence_comp : idToEquiv rfl = HTTEquiv.id_equiv := rfl
@@ -293,28 +293,28 @@ structure Path2 (p q : Path a b) where
   eq : p = q
 
 /-- Theorem 34 – Identity 2-path. -/
-def Path2.refl (p : Path a b) : Path2 p p := ⟨rfl⟩
+noncomputable def Path2.refl (p : Path a b) : Path2 p p := ⟨rfl⟩
 
 /-- 3-paths: paths between 2-paths. -/
 structure Path3 {p q : Path a b} (α β : Path2 p q) where
   eq : α = β
 
 /-- Theorem 35 – Identity 3-path. -/
-def Path3.refl {p q : Path a b} (α : Path2 p q) : Path3 α α := ⟨rfl⟩
+noncomputable def Path3.refl {p q : Path a b} (α : Path2 p q) : Path3 α α := ⟨rfl⟩
 
 /-- Theorem 36 – Horizontal composition of 2-paths. -/
-def Path2.hcomp {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+noncomputable def Path2.hcomp {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (α : Path2 p₁ p₂) (β : Path2 q₁ q₂) :
     Path2 (p₁.trans q₁) (p₂.trans q₂) :=
   ⟨by rw [α.eq, β.eq]⟩
 
 /-- Theorem 37 – Vertical composition of 2-paths. -/
-def Path2.vcomp {p q r : Path a b}
+noncomputable def Path2.vcomp {p q r : Path a b}
     (α : Path2 p q) (β : Path2 q r) : Path2 p r :=
   ⟨by rw [α.eq, β.eq]⟩
 
 /-- Theorem 38 – 2-path inversion. -/
-def Path2.symm {p q : Path a b} (α : Path2 p q) : Path2 q p :=
+noncomputable def Path2.symm {p q : Path a b} (α : Path2 p q) : Path2 q p :=
   ⟨by rw [α.eq]⟩
 
 /-- Theorem 39 – Interchange law for 2-paths. -/
@@ -330,17 +330,17 @@ theorem Path2.interchange {p₁ p₂ p₃ : Path a b} {q₁ q₂ q₃ : Path b c
 -- ============================================================
 
 /-- The loop space Ω(X, a) is the type of paths a → a. -/
-def LoopSpace (a : HTTPoint) := Path a a
+noncomputable def LoopSpace (a : HTTPoint) := Path a a
 
 /-- Theorem 40 – Loop space has a group-like structure: identity. -/
-def loop_id (a : HTTPoint) : LoopSpace a := Path.refl a
+noncomputable def loop_id (a : HTTPoint) : LoopSpace a := Path.refl a
 
 /-- Theorem 41 – Loop composition. -/
-def loop_comp {a : HTTPoint} (l₁ l₂ : LoopSpace a) : LoopSpace a :=
+noncomputable def loop_comp {a : HTTPoint} (l₁ l₂ : LoopSpace a) : LoopSpace a :=
   l₁.trans l₂
 
 /-- Theorem 42 – Loop inverse. -/
-def loop_inv {a : HTTPoint} (l : LoopSpace a) : LoopSpace a := l.symm
+noncomputable def loop_inv {a : HTTPoint} (l : LoopSpace a) : LoopSpace a := l.symm
 
 /-- Theorem 43 – Loop comp is associative. -/
 theorem loop_comp_assoc {a : HTTPoint} (l₁ l₂ l₃ : LoopSpace a) :
@@ -360,10 +360,10 @@ theorem loop_comp_id_left {a : HTTPoint} (l : LoopSpace a) :
 -- ============================================================
 
 /-- The double loop space Ω²(X, a). -/
-def LoopSpace2 (a : HTTPoint) := Path2 (Path.refl a) (Path.refl a)
+noncomputable def LoopSpace2 (a : HTTPoint) := Path2 (Path.refl a) (Path.refl a)
 
 /-- Theorem 46 – Double loop composition. -/
-def loop2_comp {a : HTTPoint} (α β : LoopSpace2 a) : LoopSpace2 a :=
+noncomputable def loop2_comp {a : HTTPoint} (α β : LoopSpace2 a) : LoopSpace2 a :=
   α.vcomp β
 
 /-- Theorem 47 – Eckmann–Hilton: double loop composition is commutative
@@ -381,14 +381,14 @@ structure Pi1 (a : HTTPoint) where
   loop : LoopSpace a
 
 /-- Theorem 48 – π₁ identity element. -/
-def Pi1.e (a : HTTPoint) : Pi1 a := ⟨loop_id a⟩
+noncomputable def Pi1.e (a : HTTPoint) : Pi1 a := ⟨loop_id a⟩
 
 /-- Theorem 49 – π₁ multiplication. -/
-def Pi1.mul {a : HTTPoint} (x y : Pi1 a) : Pi1 a :=
+noncomputable def Pi1.mul {a : HTTPoint} (x y : Pi1 a) : Pi1 a :=
   ⟨loop_comp x.loop y.loop⟩
 
 /-- Theorem 50 – π₁ inverse. -/
-def Pi1.inv {a : HTTPoint} (x : Pi1 a) : Pi1 a :=
+noncomputable def Pi1.inv {a : HTTPoint} (x : Pi1 a) : Pi1 a :=
   ⟨loop_inv x.loop⟩
 
 /-- Theorem 51 – π₁ associativity. -/
@@ -436,16 +436,16 @@ theorem assoc_coherence (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d
 -- ============================================================
 
 /-- Theorem 58 – ap maps loops to loops. -/
-def ap_loop (f : HTTPoint → HTTPoint) {a : HTTPoint} (l : LoopSpace a) :
+noncomputable def ap_loop (f : HTTPoint → HTTPoint) {a : HTTPoint} (l : LoopSpace a) :
     LoopSpace (f a) := ap f l
 
 /-- Theorem 59 – Left whiskering of a 2-path by a 1-path. -/
-def whisker_left (r : Path a b) {p q : Path b c} (α : Path2 p q) :
+noncomputable def whisker_left (r : Path a b) {p q : Path b c} (α : Path2 p q) :
     Path2 (r.trans p) (r.trans q) :=
   ⟨congrArg (r.trans ·) α.eq⟩
 
 /-- Theorem 60 – Right whiskering. -/
-def whisker_right {p q : Path a b} (α : Path2 p q) (r : Path b c) :
+noncomputable def whisker_right {p q : Path a b} (α : Path2 p q) (r : Path b c) :
     Path2 (p.trans r) (q.trans r) :=
   ⟨congrArg (·.trans r) α.eq⟩
 
@@ -476,7 +476,7 @@ inductive SuspPath : SuspPt → SuspPt → Type where
   | nil  : (a : SuspPt) → SuspPath a a
   | cons : SuspStep a b → SuspPath b c → SuspPath a c
 
-def SuspPath.trans : SuspPath a b → SuspPath b c → SuspPath a c
+noncomputable def SuspPath.trans : SuspPath a b → SuspPath b c → SuspPath a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
@@ -502,19 +502,19 @@ inductive CirclePath where
   | nil  : CirclePath
   | cons : CircleStep → CirclePath → CirclePath
 
-def CirclePath.trans : CirclePath → CirclePath → CirclePath
+noncomputable def CirclePath.trans : CirclePath → CirclePath → CirclePath
   | .nil, q => q
   | .cons s p, q => .cons s (p.trans q)
 
 /-- Theorem 63 – Circle loop space is non-trivial (we can build distinct loops). -/
-def circle_loop1 : CirclePath :=
+noncomputable def circle_loop1 : CirclePath :=
   .cons .loop .nil
 
-def circle_loop2 : CirclePath :=
+noncomputable def circle_loop2 : CirclePath :=
   .cons .loop (.cons .loop .nil)
 
 /-- Theorem 64 – Loop winding number (length distinguishes loops). -/
-def CirclePath.winding : CirclePath → Nat
+noncomputable def CirclePath.winding : CirclePath → Nat
   | .nil => 0
   | .cons _ p => 1 + p.winding
 
@@ -552,10 +552,10 @@ structure Fiber (f : HTTPoint → HTTPoint) (b : HTTPoint) where
   eq : f pt = b
 
 /-- Theorem 67 – Every point is in the fiber of id. -/
-def fiber_id (b : HTTPoint) : Fiber id b := ⟨b, rfl⟩
+noncomputable def fiber_id (b : HTTPoint) : Fiber id b := ⟨b, rfl⟩
 
 /-- Theorem 68 – Fiber of composition. -/
-def fiber_comp (f g : HTTPoint → HTTPoint) (c : HTTPoint)
+noncomputable def fiber_comp (f g : HTTPoint → HTTPoint) (c : HTTPoint)
     (fb : Fiber g c) (fa : Fiber f fb.pt) :
     Fiber (g ∘ f) c :=
   ⟨fa.pt, by simp [Function.comp]; rw [fa.eq, fb.eq]⟩

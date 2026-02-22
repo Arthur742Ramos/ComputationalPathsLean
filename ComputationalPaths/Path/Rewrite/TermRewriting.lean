@@ -41,7 +41,7 @@ inductive Term where
 namespace Term
 
 /-- Size of a term. -/
-@[simp] def size : Term → Nat
+@[simp] noncomputable def size : Term → Nat
   | .var _ => 1
   | .const _ => 1
   | .app f x => f.size + x.size + 1
@@ -50,25 +50,25 @@ theorem size_pos (t : Term) : 0 < t.size := by
   cases t <;> simp <;> omega
 
 /-- Depth of a term. -/
-@[simp] def depth : Term → Nat
+@[simp] noncomputable def depth : Term → Nat
   | .var _ => 0
   | .const _ => 0
   | .app f x => max f.depth x.depth + 1
 
 /-- Count variable occurrences. -/
-@[simp] def varCount : Term → Nat
+@[simp] noncomputable def varCount : Term → Nat
   | .var _ => 1
   | .const _ => 0
   | .app f x => f.varCount + x.varCount
 
 /-- Check if a variable occurs in a term. -/
-@[simp] def hasVar (n : Nat) : Term → Bool
+@[simp] noncomputable def hasVar (n : Nat) : Term → Bool
   | .var m => n == m
   | .const _ => false
   | .app f x => f.hasVar n || x.hasVar n
 
 /-- A term is ground if it has no variables. -/
-@[simp] def isGround : Term → Bool
+@[simp] noncomputable def isGround : Term → Bool
   | .var _ => false
   | .const _ => true
   | .app f x => f.isGround && x.isGround
@@ -78,13 +78,13 @@ end Term
 /-! ## Substitutions -/
 
 /-- A substitution maps variables to terms. -/
-def Subst := Nat → Term
+noncomputable def Subst := Nat → Term
 
 /-- The identity substitution. -/
-def Subst.id : Subst := Term.var
+noncomputable def Subst.id : Subst := Term.var
 
 /-- Apply a substitution to a term. -/
-@[simp] def applySubst (σ : Subst) : Term → Term
+@[simp] noncomputable def applySubst (σ : Subst) : Term → Term
   | .var n => σ n
   | .const c => .const c
   | .app f x => .app (applySubst σ f) (applySubst σ x)
@@ -97,7 +97,7 @@ def Subst.id : Subst := Term.var
   | app f x ihf ihx => simp [ihf, ihx]
 
 /-- Composition of substitutions. -/
-def Subst.comp (σ τ : Subst) : Subst :=
+noncomputable def Subst.comp (σ τ : Subst) : Subst :=
   fun n => applySubst σ (τ n)
 
 /-- Applying composed substitutions = applying sequentially. -/
@@ -182,18 +182,18 @@ structure CriticalPair where
   right : Term
 
 /-- Joinability of a critical pair. -/
-def CriticalPair.Joinable (rules : List TRule) (cp : CriticalPair) : Prop :=
+noncomputable def CriticalPair.Joinable (rules : List TRule) (cp : CriticalPair) : Prop :=
   ∃ t, TRtc rules cp.left t ∧ TRtc rules cp.right t
 
 /-! ## Confluence -/
 
 /-- Confluence. -/
-def IsConfluent (rules : List TRule) : Prop :=
+noncomputable def IsConfluent (rules : List TRule) : Prop :=
   ∀ a b c, TRtc rules a b → TRtc rules a c →
     ∃ d, TRtc rules b d ∧ TRtc rules c d
 
 /-- Local confluence (weak Church-Rosser). -/
-def IsLocallyConfluent (rules : List TRule) : Prop :=
+noncomputable def IsLocallyConfluent (rules : List TRule) : Prop :=
   ∀ a b c, TStep rules a b → TStep rules a c →
     ∃ d, TRtc rules b d ∧ TRtc rules c d
 
@@ -205,7 +205,7 @@ theorem confluent_implies_lc {rules : List TRule}
 /-! ## Normal Forms -/
 
 /-- A term is in normal form. -/
-def IsNF (rules : List TRule) (t : Term) : Prop :=
+noncomputable def IsNF (rules : List TRule) (t : Term) : Prop :=
   ∀ t', ¬ TStep rules t t'
 
 /-- Normal forms are unique in confluent systems. -/
@@ -248,7 +248,7 @@ theorem const_nf {rules : List TRule} (c : Nat)
 /-! ## Termination -/
 
 /-- Terminating (strongly normalizing). -/
-def IsTerminating (rules : List TRule) : Prop :=
+noncomputable def IsTerminating (rules : List TRule) : Prop :=
   WellFounded (fun a b => TStep rules b a)
 
 /-- Newman's Lemma: WF + WCR → CR. -/
@@ -283,7 +283,7 @@ theorem newman {rules : List TRule}
 /-! ## Substitution as Path Transport -/
 
 /-- Substitution maps paths to paths via congrArg. -/
-def substPath (σ : Subst) {s t : Term}
+noncomputable def substPath (σ : Subst) {s t : Term}
     (p : ComputationalPaths.Path s t) :
     ComputationalPaths.Path (applySubst σ s) (applySubst σ t) :=
   ComputationalPaths.Path.congrArg (applySubst σ) p

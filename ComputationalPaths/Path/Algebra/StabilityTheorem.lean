@@ -41,7 +41,7 @@ structure PersistenceModule where
 /-! ## Shifts and interleavings -/
 
 /-- Shift a persistence module by e. -/
-def shift (M : PersistenceModule) (e : Nat) : PersistenceModule where
+noncomputable def shift (M : PersistenceModule) (e : Nat) : PersistenceModule where
   carrier := fun i => M.carrier (i + e)
   map := fun {_i _j} h => M.map (Nat.add_le_add_right h e)
 
@@ -55,7 +55,7 @@ structure Interleaving (M N : PersistenceModule) (eps : Nat) where
   compat : True
 
 /-- Interleaving distance d_I as a Nat-valued placeholder. -/
-def interleavingDistance (_M _N : PersistenceModule) : Nat := 0
+noncomputable def interleavingDistance (_M _N : PersistenceModule) : Nat := 0
 
 /-- Abbreviation for the interleaving distance. -/
 abbrev dI (M N : PersistenceModule) : Nat := interleavingDistance M N
@@ -78,14 +78,14 @@ structure PersistenceDiagram where
   birth_le_death : forall p, Nat.le (birth p) (death p)
 
 /-- The trivial diagram with a single point at (0, 0). -/
-def trivialDiagram : PersistenceDiagram where
+noncomputable def trivialDiagram : PersistenceDiagram where
   points := PUnit
   birth := fun _ => 0
   death := fun _ => 0
   birth_le_death := fun _ => Nat.le_refl 0
 
 /-- Bottleneck distance d_B between diagrams as a Nat-valued placeholder. -/
-def bottleneckDistance (_D1 _D2 : PersistenceDiagram) : Nat := 0
+noncomputable def bottleneckDistance (_D1 _D2 : PersistenceDiagram) : Nat := 0
 
 /-- Abbreviation for the bottleneck distance. -/
 abbrev dB (D1 D2 : PersistenceDiagram) : Nat := bottleneckDistance D1 D2
@@ -102,7 +102,7 @@ structure QTame (M : PersistenceModule) : Prop where
   finite_rank : forall _ _ : Nat, True
 
 /-- Trivial q-tame witness. -/
-def trivialQTame (M : PersistenceModule) : QTame M :=
+noncomputable def trivialQTame (M : PersistenceModule) : QTame M :=
   QTame.mk (fun _ _ => True.intro)
 
 /-- Structure theorem data for a q-tame module. -/
@@ -115,7 +115,7 @@ structure QTameStructure (M : PersistenceModule) where
   realizes : True
 
 /-- Build a trivial structure theorem for a q-tame module. -/
-def qTame_structure (M : PersistenceModule) (h : QTame M) : QTameStructure M :=
+noncomputable def qTame_structure (M : PersistenceModule) (h : QTame M) : QTameStructure M :=
   { qTame := h, diagram := trivialDiagram, realizes := True.intro }
 
 /-- Algebraic stability: d_B <= d_I for q-tame modules. -/
@@ -129,20 +129,20 @@ theorem algebraic_stability {M N : PersistenceModule}
 /-! ## Sublevel set persistence -/
 
 /-- Sublevel set at level t. -/
-def SublevelSet {X : Type u} (f : X -> Nat) (t : Nat) : Type u :=
+noncomputable def SublevelSet {X : Type u} (f : X -> Nat) (t : Nat) : Type u :=
   {x : X // Nat.le (f x) t}
 
 /-- Persistence module of sublevel sets for f. -/
-def sublevelModule {X : Type u} (f : X -> Nat) : PersistenceModule where
+noncomputable def sublevelModule {X : Type u} (f : X -> Nat) : PersistenceModule where
   carrier := fun t => SublevelSet f t
   map := fun {_i _j} h x => ⟨x.1, Nat.le_trans x.2 h⟩
 
 /-- Absolute distance on Nat. -/
-def natDist (a b : Nat) : Nat :=
+noncomputable def natDist (a b : Nat) : Nat :=
   Nat.max a b - Nat.min a b
 
 /-- Sup-norm bound between two functions. -/
-def supBound {X : Type u} (f g : X -> Nat) (L : Nat) : Prop :=
+noncomputable def supBound {X : Type u} (f g : X -> Nat) (L : Nat) : Prop :=
   forall x, Nat.le (natDist (f x) (g x)) L
 
 /-- Lipschitz stability for sublevel set persistence. -/
@@ -152,7 +152,7 @@ theorem lipschitz_stability {X : Type u} (f g : X -> Nat) (L : Nat)
   dsimp [interleavingDistance]
   exact Nat.zero_le L
 
-private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
 /-! ## Summary -/
 

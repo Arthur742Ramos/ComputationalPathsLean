@@ -46,13 +46,13 @@ structure InheritancePath (A : Type u) where
 -- ============================================================================
 -- THEOREM 1: Identity resolution step
 -- ============================================================================
-def resolution_identity {A : Type u} (a : A) :
+noncomputable def resolution_identity {A : Type u} (a : A) :
     Path a a := Path.refl a
 
 -- ============================================================================
 -- THEOREM 2: Resolution steps compose via trans
 -- ============================================================================
-def resolution_compose {A : Type u} {a b c : A}
+noncomputable def resolution_compose {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -81,7 +81,7 @@ theorem resolution_id_right {A : Type u} {a b : A} (p : Path a b) :
 -- ============================================================================
 -- THEOREM 6: Resolution reversal (backtracking)
 -- ============================================================================
-def resolution_backtrack {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def resolution_backtrack {A : Type u} {a b : A} (p : Path a b) :
     Path b a := Path.symm p
 
 -- ============================================================================
@@ -112,7 +112,7 @@ structure DictPass (A B : Type u) where
 -- ============================================================================
 -- THEOREM 9: Dictionary passing preserves function composition
 -- ============================================================================
-def dictpass_compose {A B C : Type u}
+noncomputable def dictpass_compose {A B C : Type u}
     (dp1 : DictPass A B) (dp2 : DictPass B C) (a : A) :
     Path (dp2.original (dp1.original a)) (dp2.withDict (dp1.withDict a)) :=
   let step1 : Path (dp2.original (dp1.original a))
@@ -126,7 +126,7 @@ def dictpass_compose {A B C : Type u}
 -- ============================================================================
 -- THEOREM 10: Dictionary passing identity
 -- ============================================================================
-def dictpass_id {A : Type u} (a : A) :
+noncomputable def dictpass_id {A : Type u} (a : A) :
     Path (id a) (id a) := Path.refl (id a)
 
 -- ============================================================================
@@ -164,13 +164,13 @@ structure CoherentDiamond {X : Type u} (a b c d : X) extends Diamond a b c d whe
 -- ============================================================================
 -- THEOREM 13: Diamond left path
 -- ============================================================================
-def diamond_left {X : Type u} {a b c d : X} (dia : Diamond a b c d) :
+noncomputable def diamond_left {X : Type u} {a b c d : X} (dia : Diamond a b c d) :
     Path a d := Path.trans dia.left_up dia.left_down
 
 -- ============================================================================
 -- THEOREM 14: Diamond right path
 -- ============================================================================
-def diamond_right {X : Type u} {a b c d : X} (dia : Diamond a b c d) :
+noncomputable def diamond_right {X : Type u} {a b c d : X} (dia : Diamond a b c d) :
     Path a d := Path.trans dia.right_up dia.right_down
 
 -- ============================================================================
@@ -213,20 +213,20 @@ structure ResOracle (A : Type u) where
 -- ============================================================================
 -- THEOREM 18: Initial search state has refl path
 -- ============================================================================
-def initial_search {A : Type u} (a : A) :
+noncomputable def initial_search {A : Type u} (a : A) :
     SearchState a a := ⟨Path.refl a⟩
 
 -- ============================================================================
 -- THEOREM 19: Search step extends path
 -- ============================================================================
-def search_extend {A : Type u} {a b c : A}
+noncomputable def search_extend {A : Type u} {a b c : A}
     (accumulated : Path a b) (step : Path b c) :
     Path a c := Path.trans accumulated step
 
 -- ============================================================================
 -- THEOREM 20: Search can be undone
 -- ============================================================================
-def search_undo {A : Type u} {a b : A}
+noncomputable def search_undo {A : Type u} {a b : A}
     (p : Path a b) : Path b a := Path.symm p
 
 -- ============================================================================
@@ -251,7 +251,7 @@ structure FunDep (A B : Type u) where
 -- ============================================================================
 -- THEOREM 22: Functional dependency yields unique resolution
 -- ============================================================================
-def fundep_unique {A B : Type u} (fd : FunDep A B) (a : A)
+noncomputable def fundep_unique {A B : Type u} (fd : FunDep A B) (a : A)
     (b₁ b₂ : B) (p : Path (fd.determine a) b₁)
     (q : Path (fd.determine a) b₂) :
     Path b₁ b₂ :=
@@ -260,14 +260,14 @@ def fundep_unique {A B : Type u} (fd : FunDep A B) (a : A)
 -- ============================================================================
 -- THEOREM 23: Functional dependency is deterministic
 -- ============================================================================
-def fundep_deterministic {A B : Type u} (fd : FunDep A B) (a : A) :
+noncomputable def fundep_deterministic {A B : Type u} (fd : FunDep A B) (a : A) :
     Path (fd.determine a) (fd.determine a) :=
   Path.refl (fd.determine a)
 
 -- ============================================================================
 -- THEOREM 24: Composed functional dependencies
 -- ============================================================================
-def fundep_compose_refl {A B C : Type u}
+noncomputable def fundep_compose_refl {A B C : Type u}
     (fd1 : FunDep A B) (fd2 : FunDep B C) (a : A) :
     Path (fd2.determine (fd1.determine a)) (fd2.determine (fd1.determine a)) :=
   Path.refl _
@@ -275,7 +275,7 @@ def fundep_compose_refl {A B C : Type u}
 -- ============================================================================
 -- THEOREM 25: Fundep lifts through congrArg
 -- ============================================================================
-def fundep_lift {A B : Type u} (fd : FunDep A B) {a₁ a₂ : A}
+noncomputable def fundep_lift {A B : Type u} (fd : FunDep A B) {a₁ a₂ : A}
     (p : Path a₁ a₂) :
     Path (fd.determine a₁) (fd.determine a₂) :=
   Path.congrArg fd.determine p
@@ -295,7 +295,7 @@ structure TCMorphism (A B : Type u) where
 -- ============================================================================
 -- THEOREM 26: Identity morphism
 -- ============================================================================
-def idMorphism (A : Type u) : TCMorphism A A where
+noncomputable def idMorphism (A : Type u) : TCMorphism A A where
   map := id
   mapPath := id
   presRefl := fun _ => rfl
@@ -310,7 +310,7 @@ theorem id_morphism_path {A : Type u} {a b : A} (p : Path a b) :
 -- ============================================================================
 -- THEOREM 28: Morphism composition
 -- ============================================================================
-def composeMorphism {A B C : Type u}
+noncomputable def composeMorphism {A B C : Type u}
     (f : TCMorphism A B) (g : TCMorphism B C) : TCMorphism A C where
   map := g.map ∘ f.map
   mapPath := g.mapPath ∘ f.mapPath
@@ -325,7 +325,7 @@ def composeMorphism {A B C : Type u}
 -- ============================================================================
 -- THEOREM 29: Morphism preserves symm
 -- ============================================================================
-def morphism_pres_symm {A B : Type u} (m : TCMorphism A B)
+noncomputable def morphism_pres_symm {A B : Type u} (m : TCMorphism A B)
     {a₁ a₂ : A} (p : Path a₁ a₂) :
     Path (m.map a₂) (m.map a₁) :=
   Path.symm (m.mapPath p)
@@ -348,19 +348,19 @@ structure DefaultMethod {A : Type u} (default_impl custom_impl : A) where
 -- ============================================================================
 -- THEOREM 31: Default method can be overridden via path
 -- ============================================================================
-def default_override {A : Type u} {d c : A} (dm : DefaultMethod d c) :
+noncomputable def default_override {A : Type u} {d c : A} (dm : DefaultMethod d c) :
     Path d c := dm.override_path
 
 -- ============================================================================
 -- THEOREM 32: Override is reversible
 -- ============================================================================
-def override_reversible {A : Type u} {d c : A} (dm : DefaultMethod d c) :
+noncomputable def override_reversible {A : Type u} {d c : A} (dm : DefaultMethod d c) :
     Path c d := Path.symm dm.override_path
 
 -- ============================================================================
 -- THEOREM 33: Chained defaults
 -- ============================================================================
-def chained_defaults {A : Type u} {a b c d : A}
+noncomputable def chained_defaults {A : Type u} {a b c d : A}
     (dm1 : DefaultMethod a b) (dm2 : DefaultMethod c d)
     (link : Path b c) :
     Path a d :=
@@ -387,13 +387,13 @@ structure OverlapPair {A : Type u} (inst1 inst2 : A) where
 -- ============================================================================
 -- THEOREM 35: Overlapping instances are coherent
 -- ============================================================================
-def overlap_coherent {A : Type u} {i₁ i₂ : A} (op : OverlapPair i₁ i₂) :
+noncomputable def overlap_coherent {A : Type u} {i₁ i₂ : A} (op : OverlapPair i₁ i₂) :
     Path i₁ i₂ := op.overlap_coherence
 
 -- ============================================================================
 -- THEOREM 36: Triple overlap coherence
 -- ============================================================================
-def triple_overlap {A : Type u} {a b c d : A}
+noncomputable def triple_overlap {A : Type u} {a b c d : A}
     (op1 : OverlapPair a b) (op2 : OverlapPair c d)
     (link : Path b c) :
     Path a d :=
@@ -402,7 +402,7 @@ def triple_overlap {A : Type u} {a b c d : A}
 -- ============================================================================
 -- THEOREM 37: Overlap with identity
 -- ============================================================================
-def overlap_refl {A : Type u} (a : A) :
+noncomputable def overlap_refl {A : Type u} (a : A) :
     OverlapPair a a := ⟨Path.refl a⟩
 
 -- ============================================================================
@@ -416,13 +416,13 @@ structure InstChain {A : Type u} (head tail : A) where
 -- ============================================================================
 -- THEOREM 38: Chain resolution: head to tail
 -- ============================================================================
-def chain_resolve {A : Type u} {h t : A} (ch : InstChain h t) :
+noncomputable def chain_resolve {A : Type u} {h t : A} (ch : InstChain h t) :
     Path h t := ch.fallback
 
 -- ============================================================================
 -- THEOREM 39: Concatenating chains
 -- ============================================================================
-def chain_concat {A : Type u} {a b c d : A}
+noncomputable def chain_concat {A : Type u} {a b c d : A}
     (ch1 : InstChain a b) (ch2 : InstChain c d)
     (link : Path b c) :
     Path a d :=
@@ -431,7 +431,7 @@ def chain_concat {A : Type u} {a b c d : A}
 -- ============================================================================
 -- THEOREM 40: Chain with backtrack
 -- ============================================================================
-def chain_backtrack {A : Type u} {h t : A} (ch : InstChain h t) :
+noncomputable def chain_backtrack {A : Type u} {h t : A} (ch : InstChain h t) :
     Path t h := Path.symm ch.fallback
 
 -- ============================================================================
@@ -492,7 +492,7 @@ structure DerivNode {A : Type u} (parent value : A) where
 -- ============================================================================
 -- THEOREM 46: Derivation path from root
 -- ============================================================================
-def deriv_from_root {A : Type u} {a b c d : A}
+noncomputable def deriv_from_root {A : Type u} {a b c d : A}
     (n1 : DerivNode a b) (n2 : DerivNode c d) (link : Path b c) :
     Path a d :=
   Path.trans (Path.trans n1.edge link) n2.edge
@@ -500,13 +500,13 @@ def deriv_from_root {A : Type u} {a b c d : A}
 -- ============================================================================
 -- THEOREM 47: Single derivation step
 -- ============================================================================
-def deriv_single {A : Type u} {p v : A} (n : DerivNode p v) :
+noncomputable def deriv_single {A : Type u} {p v : A} (n : DerivNode p v) :
     Path p v := n.edge
 
 -- ============================================================================
 -- THEOREM 48: Derivation reversal
 -- ============================================================================
-def deriv_reverse {A : Type u} {p v : A} (n : DerivNode p v) :
+noncomputable def deriv_reverse {A : Type u} {p v : A} (n : DerivNode p v) :
     Path v p := Path.symm n.edge
 
 -- ============================================================================
@@ -522,13 +522,13 @@ structure SuperExtract (D₁ D₂ : Type u) where
 -- ============================================================================
 -- THEOREM 49: Superclass extraction is a retraction
 -- ============================================================================
-def super_retract {D₁ D₂ : Type u} (se : SuperExtract D₁ D₂) (d : D₂) :
+noncomputable def super_retract {D₁ D₂ : Type u} (se : SuperExtract D₁ D₂) (d : D₂) :
     Path (se.project (se.embed d)) d := se.retract d
 
 -- ============================================================================
 -- THEOREM 50: Composed superclass extraction
 -- ============================================================================
-def super_extract_compose {D₁ D₂ D₃ : Type u}
+noncomputable def super_extract_compose {D₁ D₂ D₃ : Type u}
     (se1 : SuperExtract D₁ D₂) (se2 : SuperExtract D₂ D₃) (d : D₃) :
     Path (se2.project (se1.project (se1.embed (se2.embed d)))) d :=
   let step1 : Path (se2.project (se1.project (se1.embed (se2.embed d))))
@@ -540,7 +540,7 @@ def super_extract_compose {D₁ D₂ D₃ : Type u}
 -- ============================================================================
 -- THEOREM 51: CongrArg through superclass projection
 -- ============================================================================
-def super_congrArg {D₁ D₂ : Type u} (se : SuperExtract D₁ D₂)
+noncomputable def super_congrArg {D₁ D₂ : Type u} (se : SuperExtract D₁ D₂)
     {d₁ d₂ : D₁} (p : Path d₁ d₂) :
     Path (se.project d₁) (se.project d₂) :=
   Path.congrArg se.project p
@@ -566,7 +566,7 @@ structure MultiParamTC (A B : Type u) where
 -- ============================================================================
 -- THEOREM 53: Multi-param resolution is functorial in first arg
 -- ============================================================================
-def multiparam_fst {A B : Type u} {a₁ a₂ : A} (b : B)
+noncomputable def multiparam_fst {A B : Type u} {a₁ a₂ : A} (b : B)
     (tc : MultiParamTC A B) (p : Path a₁ a₂) :
     Path (tc.resolve a₁ b) (tc.resolve a₂ b) :=
   Path.congrArg (fun a => tc.resolve a b) p
@@ -574,7 +574,7 @@ def multiparam_fst {A B : Type u} {a₁ a₂ : A} (b : B)
 -- ============================================================================
 -- THEOREM 54: Multi-param resolution is functorial in second arg
 -- ============================================================================
-def multiparam_snd {A B : Type u} (a : A) {b₁ b₂ : B}
+noncomputable def multiparam_snd {A B : Type u} (a : A) {b₁ b₂ : B}
     (tc : MultiParamTC A B) (q : Path b₁ b₂) :
     Path (tc.resolve a b₁) (tc.resolve a b₂) :=
   Path.congrArg (fun b => tc.resolve a b) q
@@ -582,7 +582,7 @@ def multiparam_snd {A B : Type u} (a : A) {b₁ b₂ : B}
 -- ============================================================================
 -- THEOREM 55: Multi-param resolution composition
 -- ============================================================================
-def multiparam_compose {A B : Type u} {a₁ a₂ : A} {b₁ b₂ : B}
+noncomputable def multiparam_compose {A B : Type u} {a₁ a₂ : A} {b₁ b₂ : B}
     (tc : MultiParamTC A B) (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (tc.resolve a₁ b₁) (tc.resolve a₂ b₂) :=
   let step1 := Path.congrArg (fun a => tc.resolve a b₁) p
@@ -600,7 +600,7 @@ structure Canonical {A : Type u} (canonical any_inst : A) where
 -- ============================================================================
 -- THEOREM 56: Canonical instance is unique up to path
 -- ============================================================================
-def canonical_unique {A : Type u} {c₁ c₂ a₁ a₂ : A}
+noncomputable def canonical_unique {A : Type u} {c₁ c₂ a₁ a₂ : A}
     (can1 : Canonical c₁ a₁) (can2 : Canonical c₂ a₂)
     (h : Path c₁ c₂) :
     Path a₁ a₂ :=
@@ -609,7 +609,7 @@ def canonical_unique {A : Type u} {c₁ c₂ a₁ a₂ : A}
 -- ============================================================================
 -- THEOREM 57: Canonical is idempotent
 -- ============================================================================
-def canonical_idempotent {A : Type u} {c a : A} (can : Canonical c a) :
+noncomputable def canonical_idempotent {A : Type u} {c a : A} (can : Canonical c a) :
     Path a c := can.witness
 
 -- ============================================================================
@@ -635,7 +635,7 @@ structure NewtypeDeriving (A B : Type u) where
 -- ============================================================================
 -- THEOREM 59: Newtype deriving preserves paths
 -- ============================================================================
-def newtype_path {A B : Type u} (nt : NewtypeDeriving A B)
+noncomputable def newtype_path {A B : Type u} (nt : NewtypeDeriving A B)
     {a₁ a₂ : A} (p : Path a₁ a₂) :
     Path (nt.wrap a₁) (nt.wrap a₂) :=
   Path.congrArg nt.wrap p
@@ -643,7 +643,7 @@ def newtype_path {A B : Type u} (nt : NewtypeDeriving A B)
 -- ============================================================================
 -- THEOREM 60: Newtype unwrap preserves paths
 -- ============================================================================
-def newtype_unwrap_path {A B : Type u} (nt : NewtypeDeriving A B)
+noncomputable def newtype_unwrap_path {A B : Type u} (nt : NewtypeDeriving A B)
     {b₁ b₂ : B} (p : Path b₁ b₂) :
     Path (nt.unwrap b₁) (nt.unwrap b₂) :=
   Path.congrArg nt.unwrap p
@@ -651,14 +651,14 @@ def newtype_unwrap_path {A B : Type u} (nt : NewtypeDeriving A B)
 -- ============================================================================
 -- THEOREM 61: Newtype round-trip coherence
 -- ============================================================================
-def newtype_roundtrip {A B : Type u} (nt : NewtypeDeriving A B)
+noncomputable def newtype_roundtrip {A B : Type u} (nt : NewtypeDeriving A B)
     (a : A) : Path (nt.unwrap (nt.wrap a)) a :=
   nt.iso1 a
 
 -- ============================================================================
 -- THEOREM 62: Newtype wrap-unwrap coherence
 -- ============================================================================
-def newtype_wrap_unwrap {A B : Type u} (nt : NewtypeDeriving A B)
+noncomputable def newtype_wrap_unwrap {A B : Type u} (nt : NewtypeDeriving A B)
     (b : B) : Path (nt.wrap (nt.unwrap b)) b :=
   nt.iso2 b
 
@@ -682,7 +682,7 @@ structure Constraint {A : Type u} (required provided : A) where
 -- ============================================================================
 -- THEOREM 64: Constraint composition
 -- ============================================================================
-def constraint_compose {A : Type u} {a b c d : A}
+noncomputable def constraint_compose {A : Type u} {a b c d : A}
     (c1 : Constraint a b) (c2 : Constraint c d)
     (link : Path b c) :
     Path a d :=
@@ -691,13 +691,13 @@ def constraint_compose {A : Type u} {a b c d : A}
 -- ============================================================================
 -- THEOREM 65: Constraint is satisfiable (witness)
 -- ============================================================================
-def constraint_satisfiable {A : Type u} {r p : A} (c : Constraint r p) :
+noncomputable def constraint_satisfiable {A : Type u} {r p : A} (c : Constraint r p) :
     Path r p := c.satisfy
 
 -- ============================================================================
 -- THEOREM 66: Constraint reversal
 -- ============================================================================
-def constraint_reverse {A : Type u} {r p : A} (c : Constraint r p) :
+noncomputable def constraint_reverse {A : Type u} {r p : A} (c : Constraint r p) :
     Path p r := Path.symm c.satisfy
 
 -- ============================================================================
@@ -714,13 +714,13 @@ structure EvidenceTranslation (A B : Type u) where
 -- ============================================================================
 -- THEOREM 67: Evidence translation preserves identity
 -- ============================================================================
-def evidence_id {A B : Type u} (et : EvidenceTranslation A B) (a : A) :
+noncomputable def evidence_id {A B : Type u} (et : EvidenceTranslation A B) (a : A) :
     Path (et.back (et.translate a)) a := et.section_ a
 
 -- ============================================================================
 -- THEOREM 68: Evidence translation composes
 -- ============================================================================
-def evidence_compose {A B C : Type u}
+noncomputable def evidence_compose {A B C : Type u}
     (et1 : EvidenceTranslation A B) (et2 : EvidenceTranslation B C) (a : A) :
     Path (et1.back (et2.back (et2.translate (et1.translate a)))) a :=
   let step1 : Path (et2.back (et2.translate (et1.translate a)))
@@ -734,7 +734,7 @@ def evidence_compose {A B C : Type u}
 -- ============================================================================
 -- THEOREM 69: Evidence translation path lifting
 -- ============================================================================
-def evidence_lift {A B : Type u} (et : EvidenceTranslation A B)
+noncomputable def evidence_lift {A B : Type u} (et : EvidenceTranslation A B)
     {a₁ a₂ : A} (p : Path a₁ a₂) :
     Path (et.translate a₁) (et.translate a₂) :=
   Path.congrArg et.translate p
@@ -750,7 +750,7 @@ structure AssocType (Idx : Type u) (Val : Type u) where
 -- ============================================================================
 -- THEOREM 70: Associated type is functorial
 -- ============================================================================
-def assoc_functorial {Idx Val : Type u} (at_ : AssocType Idx Val)
+noncomputable def assoc_functorial {Idx Val : Type u} (at_ : AssocType Idx Val)
     {i₁ i₂ : Idx} (p : Path i₁ i₂) :
     Path (at_.assoc i₁) (at_.assoc i₂) :=
   Path.congrArg at_.assoc p
@@ -786,14 +786,14 @@ structure FullPipeline (A B : Type u) where
 -- ============================================================================
 -- THEOREM 73: Pipeline coherence via congrArg
 -- ============================================================================
-def pipeline_coherent {A B : Type u} (fp : FullPipeline A B) (a : A) :
+noncomputable def pipeline_coherent {A B : Type u} (fp : FullPipeline A B) (a : A) :
     Path (fp.resolve (fp.search a)) (fp.resolve a) :=
   Path.congrArg fp.resolve (fp.coherent a)
 
 -- ============================================================================
 -- THEOREM 74: Pipeline is idempotent up to path
 -- ============================================================================
-def pipeline_idempotent {A B : Type u} (fp : FullPipeline A B)
+noncomputable def pipeline_idempotent {A B : Type u} (fp : FullPipeline A B)
     (a : A) (h : Path (fp.search (fp.search a)) (fp.search a)) :
     Path (fp.resolve (fp.search (fp.search a))) (fp.resolve a) :=
   Path.trans (Path.congrArg fp.resolve h) (Path.congrArg fp.resolve (fp.coherent a))
@@ -801,7 +801,7 @@ def pipeline_idempotent {A B : Type u} (fp : FullPipeline A B)
 -- ============================================================================
 -- THEOREM 75: Two pipelines compose
 -- ============================================================================
-def pipeline_compose {A B C : Type u}
+noncomputable def pipeline_compose {A B C : Type u}
     (fp1 : FullPipeline A B) (fp2 : FullPipeline B C) (a : A) :
     Path (fp2.resolve (fp2.search (fp1.resolve (fp1.search a))))
          (fp2.resolve (fp1.resolve a)) :=
@@ -910,7 +910,7 @@ structure PriorityInstance {A : Type u} (val : A) where
   priority : Nat
 
 /-- Selection between two instances based on priority -/
-def selectInstance {A : Type u} {v₁ v₂ : A}
+noncomputable def selectInstance {A : Type u} {v₁ v₂ : A}
     (_i₁ : PriorityInstance v₁) (_i₂ : PriorityInstance v₂)
     (p : Path v₁ v₂) : Path v₁ v₂ := p
 
@@ -929,15 +929,15 @@ structure LocalInst {A : Type u} (global_ local_ : A) where
   override : Path global_ local_
 
 -- THEOREM 87: Local instance overrides global
-def local_overrides {A : Type u} {g l : A} (li : LocalInst g l) :
+noncomputable def local_overrides {A : Type u} {g l : A} (li : LocalInst g l) :
     Path g l := li.override
 
 -- THEOREM 88: Leaving scope restores global
-def scope_exit {A : Type u} {g l : A} (li : LocalInst g l) :
+noncomputable def scope_exit {A : Type u} {g l : A} (li : LocalInst g l) :
     Path l g := Path.symm li.override
 
 -- THEOREM 89: Nested local instances compose
-def nested_local {A : Type u} {g l₁ l₂ : A}
+noncomputable def nested_local {A : Type u} {g l₁ l₂ : A}
     (li1 : LocalInst g l₁) (li2 : LocalInst l₁ l₂) :
     Path g l₂ := Path.trans li1.override li2.override
 

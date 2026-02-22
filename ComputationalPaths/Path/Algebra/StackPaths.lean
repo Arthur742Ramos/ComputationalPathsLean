@@ -107,7 +107,7 @@ structure FiberedCategory where
 /-- Composing two cartesian lifts via Path.trans.
     Given f : U → V and g : V → W with lifts, the composition
     g ∘ f also has a cartesian lift. -/
-def cartesian_comp (F : FiberedCategory.{u})
+noncomputable def cartesian_comp (F : FiberedCategory.{u})
     {U V W : F.base.Obj} (f : F.base.Hom U V) (g : F.base.Hom V W)
     (ξ : F.total.Obj) (hξ : Path (F.proj.mapObj ξ) W) :
     let lift_g := F.hasLift g ξ hξ
@@ -118,7 +118,7 @@ def cartesian_comp (F : FiberedCategory.{u})
   lift_f.over_source
 
 /-- Transitivity of fibers: Path.trans composes the over-source witnesses. -/
-def fiber_trans {A : Type u} {a b c : A}
+noncomputable def fiber_trans {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -235,7 +235,7 @@ structure InertiaStack (C : SmallCat.{u}) (act : GroupAction C) where
 
 /-- Inertia inherits a group structure via Path.trans on automorphism witnesses.
     If both g and h act as the identity, then g·h also acts as the identity. -/
-def inertia_compose {C : SmallCat.{u}} {act : GroupAction C}
+noncomputable def inertia_compose {C : SmallCat.{u}} {act : GroupAction C}
     (I : InertiaStack C act) (p q : I.autPair) :
     Path (act.act (act.mul (I.toGroupElt p) (I.toGroupElt q)))
          (C.id act.object) :=

@@ -32,26 +32,26 @@ inductive Path (α : Type) : α → α → Type where
   | cons : Step α a b → Path α b c → Path α a c
 
 /-- Path concatenation (1-cell composition). -/
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
 /-- Single step as a path. -/
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
 /-- Step inversion. -/
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
 /-- Path inversion (reversal). -/
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a     => .nil a
   | .cons s p  => p.symm.trans (.cons s.symm (.nil _))
 
 /-- Path length. -/
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -65,20 +65,20 @@ structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   eq : p = q
 
 /-- Identity 2-cell. -/
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
 /-- Vertical composition of 2-cells. -/
-def Cell2.vcomp {α : Type} {a b : α} {p q r : Path α a b}
+noncomputable def Cell2.vcomp {α : Type} {a b : α} {p q r : Path α a b}
     (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.eq.trans τ.eq⟩
 
 /-- Vertical inverse. -/
-def Cell2.vinv {α : Type} {a b : α} {p q : Path α a b}
+noncomputable def Cell2.vinv {α : Type} {a b : α} {p q : Path α a b}
     (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.eq.symm⟩
 
 /-- Horizontal composition of 2-cells. -/
-def Cell2.hcomp {α : Type} {a b c : α}
+noncomputable def Cell2.hcomp {α : Type} {a b c : α}
     {p₁ q₁ : Path α a b} {p₂ q₂ : Path α b c}
     (σ : Cell2 p₁ q₁) (τ : Cell2 p₂ q₂) : Cell2 (p₁.trans p₂) (q₁.trans q₂) :=
   ⟨by rw [σ.eq, τ.eq]⟩
@@ -98,12 +98,12 @@ structure Cell3 {α : Type} {a b : α} {p q : Path α a b}
 
 /-- Left whiskering: pre-compose a fixed path with a 2-cell.
     Implemented via congrArg on Path.trans. -/
-def whiskerL {α : Type} {a b c : α} (r : Path α a b)
+noncomputable def whiskerL {α : Type} {a b c : α} (r : Path α a b)
     {p q : Path α b c} (σ : Cell2 p q) : Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (Path.trans r) σ.eq⟩
 
 /-- Right whiskering: post-compose a 2-cell with a fixed path. -/
-def whiskerR {α : Type} {a b c : α}
+noncomputable def whiskerR {α : Type} {a b c : α}
     {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.eq⟩
@@ -117,7 +117,7 @@ structure ARS (α : Type) where
   rel : α → α → Prop
 
 /-- Normal form: no further rewrites apply. -/
-def ARS.NormalForm (R : ARS α) (a : α) : Prop :=
+noncomputable def ARS.NormalForm (R : ARS α) (a : α) : Prop :=
   ∀ b, ¬ R.rel a b
 
 /-- An element reduces to a normal form. -/
@@ -127,14 +127,14 @@ structure ARS.HasNF (R : ARS α) (a : α) where
   isNF : R.NormalForm nf
 
 /-- Confluence: any two diverging paths can be joined. -/
-def ARS.Confluent (_R : ARS α) : Prop :=
+noncomputable def ARS.Confluent (_R : ARS α) : Prop :=
   ∀ (a b c : α), PathConnected α a b → PathConnected α a c →
     ∃ d, PathConnected α b d ∧ PathConnected α c d
 where
   PathConnected (α : Type) (a b : α) : Prop := Nonempty (Path α a b)
 
 /-- Terminating: no infinite reduction sequences. -/
-def ARS.Terminating (R : ARS α) : Prop :=
+noncomputable def ARS.Terminating (R : ARS α) : Prop :=
   ∀ a, ∃ b, R.NormalForm b ∧ Nonempty (Path α a b)
 
 /-- Convergent = confluent + terminating. -/
@@ -153,7 +153,7 @@ structure DerivationType (α : Type) where
   twoCellGenerators : List ((α × α) × (α × α))
 
 /-- Finite derivation type. -/
-def DerivationType.isFinite (D : DerivationType α) : Prop :=
+noncomputable def DerivationType.isFinite (D : DerivationType α) : Prop :=
   D.objects.length < Nat.succ D.objects.length ∧
   D.oneCells.length < Nat.succ D.oneCells.length ∧
   D.twoCellGenerators.length < Nat.succ D.twoCellGenerators.length
@@ -366,7 +366,7 @@ theorem convergent_has_nf_path (a : α)
   omega
 
 /-- Unique normal forms property. -/
-def UniqueNF (nf_of : α → α) (P : α → α → Prop) : Prop :=
+noncomputable def UniqueNF (nf_of : α → α) (P : α → α → Prop) : Prop :=
   ∀ a b, P a b → nf_of a = nf_of b
 
 /-- Theorem 30: Any two paths to the same NF have a connecting 2-cell. -/
@@ -392,7 +392,7 @@ theorem squier_finiteness (S : SquierData α) :
 -- ============================================================
 
 /-- Lift a 2-cell through a function (congrArg chain). -/
-def Cell2.map {α : Type} {a b : α} {p q : Path α a b}
+noncomputable def Cell2.map {α : Type} {a b : α} {p q : Path α a b}
     (f : Path α a b → Path α a b) (σ : Cell2 p q)
     (_hf : f p = f p) : Cell2 (f p) (f q) :=
   ⟨congrArg f σ.eq⟩
@@ -438,7 +438,7 @@ theorem coherent_pres_unique {p q : Path α a b}
 -- ============================================================
 
 /-- Transport a path along an equality of endpoints. -/
-def Path.transport {a a' : α} (h : a = a') (p : Path α a b) : Path α a' b :=
+noncomputable def Path.transport {a a' : α} (h : a = a') (p : Path α a b) : Path α a' b :=
   h ▸ p
 
 /-- Theorem 37: Transport by rfl is identity. -/

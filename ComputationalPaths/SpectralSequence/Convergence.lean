@@ -43,11 +43,11 @@ namespace Convergence
 variable {E : Pages.{u}} {D : Differentials E} (C : Convergence E D)
 
 /-- Canonical limiting representative at a bidegree. -/
-def eventualTerm (p q : Nat) : C.limit p q :=
+noncomputable def eventualTerm (p q : Nat) : C.limit p q :=
   C.embed p q (E.base p q)
 
 /-- Shifted limiting representative at a bidegree and page. -/
-def shiftedTerm (r p q : Nat) : C.limit p q :=
+noncomputable def shiftedTerm (r p q : Nat) : C.limit p q :=
   C.embed p q (E.shift r p q (E.base p q))
 
 noncomputable def stabilize_rweq (r p q : Nat) :
@@ -57,7 +57,7 @@ noncomputable def stabilize_rweq (r p q : Nat) :
   rweq_of_step (C.stabilizeStep r p q)
 
 /-- Loop induced by stabilization and its inverse. -/
-def stabilizationLoop (r p q : Nat) :
+noncomputable def stabilizationLoop (r p q : Nat) :
     Path (C.shiftedTerm r p q) (C.shiftedTerm r p q) :=
   Path.trans (C.stabilizePath r p q) (Path.symm (C.stabilizePath r p q))
 
@@ -67,14 +67,14 @@ noncomputable def stabilizationLoop_contracts (r p q : Nat) :
   exact rweq_cmpA_inv_right (C.stabilizePath r p q)
 
 /-- Transported boundary witness after shifting. -/
-def boundaryShiftToLimit (r p q : Nat) :
+noncomputable def boundaryShiftToLimit (r p q : Nat) :
     Path
       (C.embed p q (E.shift r p q (D.d r p q (D.d r p q (E.base p q)))))
       (C.embed p q (E.shift r p q (E.base p q))) :=
   Path.congrArg (fun x => C.embed p q (E.shift r p q x)) (D.dSquaredPath r p q)
 
 /-- Composite convergence witness: shifted boundaries converge to the limit base term. -/
-def convergedBoundary (r p q : Nat) :
+noncomputable def convergedBoundary (r p q : Nat) :
     Path
       (C.embed p q (E.shift r p q (D.d r p q (D.d r p q (E.base p q)))))
       (C.eventualTerm p q) :=
@@ -89,7 +89,7 @@ noncomputable def convergedBoundary_normalizes (r p q : Nat) :
 end Convergence
 
 /-- Trivial convergence package over trivial pages and differentials. -/
-def trivialConvergence : Convergence trivialPages trivialDifferentials where
+noncomputable def trivialConvergence : Convergence trivialPages trivialDifferentials where
   limit := fun _ _ => PUnit
   embed := fun _ _ _ => PUnit.unit
   stabilizePath := fun _ _ _ => Path.refl PUnit.unit

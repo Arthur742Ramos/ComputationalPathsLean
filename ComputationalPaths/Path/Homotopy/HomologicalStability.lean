@@ -32,7 +32,7 @@ structure StableRange (S : StabilizationSeq.{u}) where
   grows : ∀ k, ∃ n, k ≤ bound n
 
 /-- A trivial linear stable range. -/
-def linearStableRange (S : StabilizationSeq.{u}) : StableRange S where
+noncomputable def linearStableRange (S : StabilizationSeq.{u}) : StableRange S where
   bound := fun n => n
   mono := Nat.le_succ
   grows := fun k => ⟨k, Nat.le_refl k⟩
@@ -64,7 +64,7 @@ structure HomologicalStabilityData (S : StabilizationSeq.{u}) (hty : HomologyThe
 
 
 /-- A vacuous stability datum: given maps on homology, declare stability trivially. -/
-def trivialStability (S : StabilizationSeq.{u}) (hty : HomologyTheory.{u})
+noncomputable def trivialStability (S : StabilizationSeq.{u}) (hty : HomologyTheory.{u})
     (mapH : (n k : Nat) → hty.H (S.obj n) k → hty.H (S.obj (n + 1)) k) :
     HomologicalStabilityData S hty where
   range := linearStableRange S
@@ -107,7 +107,7 @@ end HomologicalStability
 end Homotopy
 end Path
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 

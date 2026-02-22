@@ -71,7 +71,7 @@ noncomputable def vanishingTransport_cancel_right_rweq
   rweq_cmpA_inv_right (I.vanishingTransportPath n ε x hε)
 
 /-- Canonical trivial perfectoid cohomology infrastructure on `PUnit`. -/
-def trivial (R : Type u) :
+noncomputable def trivial (R : Type u) :
     PerfectoidCohomologyPathInfrastructure R (fun _ => PUnit) (fun _ => PUnit) where
   almost := AlmostVanishingPathData.trivial R
   almostTilt := AlmostVanishingPathData.trivial R

@@ -24,25 +24,25 @@ open ComputationalPaths.Path
 
 /-! ## Primitive recursive combinators as Nat codes -/
 
-def apply (e n : Nat) : Nat := e * (n + 1) + n
+noncomputable def apply (e n : Nat) : Nat := e * (n + 1) + n
 
-def pair (a b : Nat) : Nat := (a + b) * (a + b + 1) / 2 + b
+noncomputable def pair (a b : Nat) : Nat := (a + b) * (a + b + 1) / 2 + b
 
-def fst (n : Nat) : Nat := n / 2
+noncomputable def fst (n : Nat) : Nat := n / 2
 
-def snd (n : Nat) : Nat := n % 2
+noncomputable def snd (n : Nat) : Nat := n % 2
 
-def idCode : Nat := 0
+noncomputable def idCode : Nat := 0
 
-def constCode (n : Nat) : Nat := n + 1
+noncomputable def constCode (n : Nat) : Nat := n + 1
 
 /-! ## Realizability relation -/
 
 /-- e realizes φ: code e witnesses that φ holds. -/
-def Realizes (_e : Nat) (φ : Prop) : Prop := φ
+noncomputable def Realizes (_e : Nat) (φ : Prop) : Prop := φ
 
 /-- Modified realizability: e mr-realizes φ given truth assumption t. -/
-def ModRealizes (_e : Nat) (φ : Prop) (truth : Prop) : Prop := truth → φ
+noncomputable def ModRealizes (_e : Nat) (φ : Prop) (truth : Prop) : Prop := truth → φ
 
 /-! ## Basic theorems -/
 
@@ -132,10 +132,10 @@ theorem realizes_to_modRealizes {e : Nat} {φ : Prop} {t : Prop}
 
 /-! ## Combinatory algebra -/
 
-def sComb (e₁ e₂ e₃ : Nat) : Nat :=
+noncomputable def sComb (e₁ e₂ e₃ : Nat) : Nat :=
   apply (apply e₁ e₃) (apply e₂ e₃)
 
-def kComb (a _b : Nat) : Nat := a
+noncomputable def kComb (a _b : Nat) : Nat := a
 
 -- 18
 theorem kComb_spec (a b : Nat) : kComb a b = a := rfl

@@ -38,45 +38,45 @@ structure NumberField (K : Type u) where
 /-! ## Core field paths via stepChain -/
 
 -- 1.
-def add_comm_step (NF : NumberField A) (a b : A) : Step A :=
+noncomputable def add_comm_step (NF : NumberField A) (a b : A) : Step A :=
   Step.mk (NF.add a b) (NF.add b a) (NF.add_comm a b)
 
-def add_comm_path (NF : NumberField A) (a b : A) :
+noncomputable def add_comm_path (NF : NumberField A) (a b : A) :
     Path (NF.add a b) (NF.add b a) :=
   Path.stepChain (NF.add_comm a b)
 
 -- 2.
-def mul_comm_path (NF : NumberField A) (a b : A) :
+noncomputable def mul_comm_path (NF : NumberField A) (a b : A) :
     Path (NF.mul a b) (NF.mul b a) :=
   Path.stepChain (NF.mul_comm a b)
 
 -- 3.
-def add_assoc_path (NF : NumberField A) (a b c : A) :
+noncomputable def add_assoc_path (NF : NumberField A) (a b c : A) :
     Path (NF.add (NF.add a b) c) (NF.add a (NF.add b c)) :=
   Path.stepChain (NF.add_assoc a b c)
 
 -- 4.
-def mul_assoc_path (NF : NumberField A) (a b c : A) :
+noncomputable def mul_assoc_path (NF : NumberField A) (a b c : A) :
     Path (NF.mul (NF.mul a b) c) (NF.mul a (NF.mul b c)) :=
   Path.stepChain (NF.mul_assoc a b c)
 
 -- 5.
-def add_zero_path (NF : NumberField A) (a : A) :
+noncomputable def add_zero_path (NF : NumberField A) (a : A) :
     Path (NF.add a NF.zero) a :=
   Path.stepChain (NF.add_zero a)
 
 -- 6.
-def mul_one_path (NF : NumberField A) (a : A) :
+noncomputable def mul_one_path (NF : NumberField A) (a : A) :
     Path (NF.mul a NF.one) a :=
   Path.stepChain (NF.mul_one a)
 
 -- 7.
-def add_neg_path (NF : NumberField A) (a : A) :
+noncomputable def add_neg_path (NF : NumberField A) (a : A) :
     Path (NF.add a (NF.neg a)) NF.zero :=
   Path.stepChain (NF.add_neg a)
 
 -- 8.
-def distrib_path (NF : NumberField A) (a b c : A) :
+noncomputable def distrib_path (NF : NumberField A) (a b c : A) :
     Path (NF.mul a (NF.add b c)) (NF.add (NF.mul a b) (NF.mul a c)) :=
   Path.stepChain (NF.distrib a b c)
 
@@ -91,22 +91,22 @@ structure NormTrace (K : Type u) (NF : NumberField K) where
   trace_zero : trace NF.zero = NF.zero
 
 -- 9.
-def norm_mul_path (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
+noncomputable def norm_mul_path (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
     Path (NT.norm (NF.mul a b)) (NF.mul (NT.norm a) (NT.norm b)) :=
   Path.stepChain (NT.norm_mul a b)
 
 -- 10.
-def trace_add_path (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
+noncomputable def trace_add_path (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
     Path (NT.trace (NF.add a b)) (NF.add (NT.trace a) (NT.trace b)) :=
   Path.stepChain (NT.trace_add a b)
 
 -- 11.
-def norm_one_path (NF : NumberField A) (NT : NormTrace A NF) :
+noncomputable def norm_one_path (NF : NumberField A) (NT : NormTrace A NF) :
     Path (NT.norm NF.one) NF.one :=
   Path.stepChain NT.norm_one
 
 -- 12.
-def trace_zero_path (NF : NumberField A) (NT : NormTrace A NF) :
+noncomputable def trace_zero_path (NF : NumberField A) (NT : NormTrace A NF) :
     Path (NT.trace NF.zero) NF.zero :=
   Path.stepChain NT.trace_zero
 
@@ -144,19 +144,19 @@ structure IdealOps (K : Type u) (NF : NumberField K) where
   prod_unit : ∀ I, prod I unit = I
 
 -- 16.
-def ideal_prod_assoc_path (NF : NumberField A) (IO : IdealOps A NF)
+noncomputable def ideal_prod_assoc_path (NF : NumberField A) (IO : IdealOps A NF)
     (I J L : Ideal A NF) :
     Path (IO.prod (IO.prod I J) L) (IO.prod I (IO.prod J L)) :=
   Path.stepChain (IO.prod_assoc I J L)
 
 -- 17.
-def ideal_prod_comm_path (NF : NumberField A) (IO : IdealOps A NF)
+noncomputable def ideal_prod_comm_path (NF : NumberField A) (IO : IdealOps A NF)
     (I J : Ideal A NF) :
     Path (IO.prod I J) (IO.prod J I) :=
   Path.stepChain (IO.prod_comm I J)
 
 -- 18.
-def ideal_prod_unit_path (NF : NumberField A) (IO : IdealOps A NF)
+noncomputable def ideal_prod_unit_path (NF : NumberField A) (IO : IdealOps A NF)
     (I : Ideal A NF) :
     Path (IO.prod I IO.unit) I :=
   Path.stepChain (IO.prod_unit I)
@@ -182,7 +182,7 @@ structure DedekindDomain (K : Type u) (NF : NumberField K) (IO : IdealOps K NF) 
   factorize : ∀ I, prod_list (factor I) = I
 
 -- 20.
-def dedekind_factor_path (NF : NumberField A) (IO : IdealOps A NF)
+noncomputable def dedekind_factor_path (NF : NumberField A) (IO : IdealOps A NF)
     (DD : DedekindDomain A NF IO) (I : Ideal A NF) :
     Path (DD.prod_list (DD.factor I)) I :=
   Path.stepChain (DD.factorize I)
@@ -202,7 +202,7 @@ structure Discriminant (K : Type u) (NF : NumberField K) (NT : NormTrace K NF) w
   disc_formula : disc = NT.norm NF.one
 
 -- 22.
-def disc_path (NF : NumberField A) (NT : NormTrace A NF) (D : Discriminant A NF NT) :
+noncomputable def disc_path (NF : NumberField A) (NT : NormTrace A NF) (D : Discriminant A NF NT) :
     Path D.disc (NT.norm NF.one) :=
   Path.stepChain D.disc_formula
 
@@ -244,7 +244,7 @@ theorem congrArg_trace_trans (NF : NumberField A) (NT : NormTrace A NF)
   simp [congrArg, trans]
 
 -- 28. Step from norm multiplicativity
-def norm_mul_step (NF : NumberField A) (NT : NormTrace A NF) (a b : A) : Step A :=
+noncomputable def norm_mul_step (NF : NumberField A) (NT : NormTrace A NF) (a b : A) : Step A :=
   Step.mk (NT.norm (NF.mul a b)) (NF.mul (NT.norm a) (NT.norm b)) (NT.norm_mul a b)
 
 -- 29. Step map through norm
@@ -257,53 +257,53 @@ theorem norm_mul_step_map (NF : NumberField A) (NT : NormTrace A NF) (f : A → 
 /-! ## Compound paths via trans, symm, congrArg -/
 
 -- 30. Distributivity then commutativity of addends
-def distrib_add_comm_path (NF : NumberField A) (a b c : A) :
+noncomputable def distrib_add_comm_path (NF : NumberField A) (a b c : A) :
     Path (NF.mul a (NF.add b c)) (NF.add (NF.mul a c) (NF.mul a b)) :=
   Path.trans (distrib_path NF a b c)
     (add_comm_path NF (NF.mul a b) (NF.mul a c))
 
 -- 31. Norm through multiplication commutativity
-def norm_mul_comm_path (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
+noncomputable def norm_mul_comm_path (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
     Path (NT.norm (NF.mul a b)) (NT.norm (NF.mul b a)) :=
   congrArg NT.norm (mul_comm_path NF a b)
 
 -- 32. Trace through addition commutativity
-def trace_add_comm_path (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
+noncomputable def trace_add_comm_path (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
     Path (NT.trace (NF.add a b)) (NT.trace (NF.add b a)) :=
   congrArg NT.trace (add_comm_path NF a b)
 
 -- 33. Norm mul + unpack: norm(a*b) → norm(a)*norm(b) → norm(b)*norm(a)
-def norm_mul_comm_chain (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
+noncomputable def norm_mul_comm_chain (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
     Path (NT.norm (NF.mul a b)) (NF.mul (NT.norm b) (NT.norm a)) :=
   Path.trans (norm_mul_path NF NT a b)
     (mul_comm_path NF (NT.norm a) (NT.norm b))
 
 -- 34. Addition associativity pentagon
-def add_assoc_pentagon (NF : NumberField A) (a b c d : A) :
+noncomputable def add_assoc_pentagon (NF : NumberField A) (a b c d : A) :
     Path (NF.add (NF.add (NF.add a b) c) d) (NF.add a (NF.add b (NF.add c d))) :=
   Path.trans (add_assoc_path NF (NF.add a b) c d)
     (add_assoc_path NF a b (NF.add c d))
 
 -- 35. Mul identity roundtrip: (a*1) → a → (a*1)
-def mul_one_roundtrip (NF : NumberField A) (a : A) :
+noncomputable def mul_one_roundtrip (NF : NumberField A) (a : A) :
     Path (NF.mul a NF.one) (NF.mul a NF.one) :=
   Path.trans (mul_one_path NF a) (Path.symm (mul_one_path NF a))
 
 -- 36. Ideal product commutativity + associativity chain
-def ideal_comm_assoc_chain (NF : NumberField A) (IO : IdealOps A NF)
+noncomputable def ideal_comm_assoc_chain (NF : NumberField A) (IO : IdealOps A NF)
     (I J L : Ideal A NF) :
     Path (IO.prod (IO.prod I J) L) (IO.prod (IO.prod J I) L) :=
   congrArg (fun x => IO.prod x L) (ideal_prod_comm_path NF IO I J)
 
 -- 37. Factorization then re-factor (roundtrip)
-def dedekind_factor_roundtrip (NF : NumberField A) (IO : IdealOps A NF)
+noncomputable def dedekind_factor_roundtrip (NF : NumberField A) (IO : IdealOps A NF)
     (DD : DedekindDomain A NF IO) (I : Ideal A NF) :
     Path (DD.prod_list (DD.factor I)) (DD.prod_list (DD.factor I)) :=
   Path.trans (dedekind_factor_path NF IO DD I)
     (Path.symm (dedekind_factor_path NF IO DD I))
 
 -- 38. Norm one then mul one: norm(1) → 1 → mul(1, 1)
-def norm_one_mul_one_path (NF : NumberField A) (NT : NormTrace A NF) :
+noncomputable def norm_one_mul_one_path (NF : NumberField A) (NT : NormTrace A NF) :
     Path (NT.norm NF.one) (NF.mul NF.one NF.one) :=
   Path.trans (norm_one_path NF NT) (Path.symm (mul_one_path NF NF.one))
 

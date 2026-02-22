@@ -129,7 +129,7 @@ noncomputable def dSquared_rweq (p q : Nat) :
 /-! ### Exactness cancellation loops -/
 
 /-- Loop at D induced by exactness at D. -/
-def exactD_Loop (p q : Nat) :
+noncomputable def exactD_Loop (p q : Nat) :
     Path (C.i p q (C.k p q (C.eBase p q)))
       (C.i p q (C.k p q (C.eBase p q))) :=
   Path.trans (C.exactD_Path p q) (Path.symm (C.exactD_Path p q))
@@ -141,7 +141,7 @@ noncomputable def exactD_Loop_contracts (p q : Nat) :
   exact rweq_cmpA_inv_right (C.exactD_Path p q)
 
 /-- Loop at E induced by exactness at E. -/
-def exactE_Loop (p q : Nat) :
+noncomputable def exactE_Loop (p q : Nat) :
     Path (C.j p q (C.i p q (C.dBase p q)))
       (C.j p q (C.i p q (C.dBase p q))) :=
   Path.trans (C.exactE_Path p q) (Path.symm (C.exactE_Path p q))
@@ -153,7 +153,7 @@ noncomputable def exactE_Loop_contracts (p q : Nat) :
   exact rweq_cmpA_inv_right (C.exactE_Path p q)
 
 /-- Loop at D induced by exactness at K vertex. -/
-def exactK_Loop (p q : Nat) :
+noncomputable def exactK_Loop (p q : Nat) :
     Path (C.k p q (C.j p q (C.dBase p q)))
       (C.k p q (C.j p q (C.dBase p q))) :=
   Path.trans (C.exactK_Path p q) (Path.symm (C.exactK_Path p q))
@@ -193,11 +193,11 @@ noncomputable def dSquared_inv_left (p q : Nat) :
 /-! ### The differential d = j ∘ k -/
 
 /-- The differential d = j ∘ k : E → E. -/
-def differential (p q : Nat) (x : C.E p q) : C.E p q :=
+noncomputable def differential (p q : Nat) (x : C.E p q) : C.E p q :=
   C.j p q (C.k p q x)
 
 /-- d² = 0 loop contracts. -/
-def dSquaredLoop (p q : Nat) :
+noncomputable def dSquaredLoop (p q : Nat) :
     Path (C.differential p q (C.differential p q (C.eBase p q)))
       (C.differential p q (C.differential p q (C.eBase p q))) :=
   Path.trans (C.dSquaredPath p q) (Path.symm (C.dSquaredPath p q))
@@ -211,7 +211,7 @@ noncomputable def dSquaredLoop_contracts (p q : Nat) :
 /-! ### Congruence paths through the maps -/
 
 /-- Apply i to the exactness-at-K witness. -/
-def iExactK (p q : Nat) :
+noncomputable def iExactK (p q : Nat) :
     Path (C.i p q (C.k p q (C.j p q (C.dBase p q))))
       (C.i p q (C.dBase p q)) :=
   Path.congrArg (C.i p q) (C.exactK_Path p q)
@@ -223,7 +223,7 @@ noncomputable def iExactK_contracts (p q : Nat) :
   rweq_cmpA_inv_right (C.iExactK p q)
 
 /-- Apply j to the exactness-at-D witness. -/
-def jExactD (p q : Nat) :
+noncomputable def jExactD (p q : Nat) :
     Path (C.j p q (C.i p q (C.k p q (C.eBase p q))))
       (C.j p q (C.dBase p q)) :=
   Path.congrArg (C.j p q) (C.exactD_Path p q)
@@ -235,7 +235,7 @@ noncomputable def jExactD_contracts (p q : Nat) :
   rweq_cmpA_inv_right (C.jExactD p q)
 
 /-- Apply k to the exactness-at-E witness. -/
-def kExactE (p q : Nat) :
+noncomputable def kExactE (p q : Nat) :
     Path (C.k p q (C.j p q (C.i p q (C.dBase p q))))
       (C.k p q (C.eBase p q)) :=
   Path.congrArg (C.k p q) (C.exactE_Path p q)
@@ -247,7 +247,7 @@ noncomputable def kExactE_contracts (p q : Nat) :
   rweq_cmpA_inv_right (C.kExactE p q)
 
 /-- Apply j to the i-exactK path: j(i(k(j(dBase)))) → j(i(dBase)). -/
-def jiExactK (p q : Nat) :
+noncomputable def jiExactK (p q : Nat) :
     Path (C.j p q (C.i p q (C.k p q (C.j p q (C.dBase p q)))))
       (C.j p q (C.i p q (C.dBase p q))) :=
   Path.congrArg (fun x => C.j p q (C.i p q x)) (C.exactK_Path p q)
@@ -259,7 +259,7 @@ noncomputable def jiExactK_contracts (p q : Nat) :
   rweq_cmpA_inv_right (C.jiExactK p q)
 
 /-- Apply k∘j to the exactD witness: k(j(i(k(eBase)))) → k(j(dBase)). -/
-def kjExactD (p q : Nat) :
+noncomputable def kjExactD (p q : Nat) :
     Path (C.k p q (C.j p q (C.i p q (C.k p q (C.eBase p q)))))
       (C.k p q (C.j p q (C.dBase p q))) :=
   Path.congrArg (fun x => C.k p q (C.j p q x)) (C.exactD_Path p q)
@@ -273,37 +273,37 @@ noncomputable def kjExactD_contracts (p q : Nat) :
 /-! ### Derived couple structure -/
 
 /-- The derived D-module is the image of i (represented as same type). -/
-def derivedD (p q : Nat) : Type u := C.D p q
+noncomputable def derivedD (p q : Nat) : Type u := C.D p q
 
 /-- The derived E-module (homology of d = j ∘ k). -/
-def derivedE (p q : Nat) : Type u := C.E p q
+noncomputable def derivedE (p q : Nat) : Type u := C.E p q
 
 /-- The derived i-map. -/
-def derivedI (p q : Nat) (x : C.derivedD p q) : C.derivedD p q :=
+noncomputable def derivedI (p q : Nat) (x : C.derivedD p q) : C.derivedD p q :=
   C.i p q x
 
 /-- The derived j-map. -/
-def derivedJ (p q : Nat) (x : C.derivedD p q) : C.derivedE p q :=
+noncomputable def derivedJ (p q : Nat) (x : C.derivedD p q) : C.derivedE p q :=
   C.j p q x
 
 /-- The derived k-map. -/
-def derivedK (p q : Nat) (x : C.derivedE p q) : C.derivedD p q :=
+noncomputable def derivedK (p q : Nat) (x : C.derivedE p q) : C.derivedD p q :=
   C.k p q x
 
 /-- Exactness at derived D. -/
-def derivedExactD_Path (p q : Nat) :
+noncomputable def derivedExactD_Path (p q : Nat) :
     Path (C.derivedI p q (C.derivedK p q (C.eBase p q)))
       (C.dBase p q) :=
   C.exactD_Path p q
 
 /-- Exactness at derived E. -/
-def derivedExactE_Path (p q : Nat) :
+noncomputable def derivedExactE_Path (p q : Nat) :
     Path (C.derivedJ p q (C.derivedI p q (C.dBase p q)))
       (C.eBase p q) :=
   C.exactE_Path p q
 
 /-- Exactness at derived K vertex. -/
-def derivedExactK_Path (p q : Nat) :
+noncomputable def derivedExactK_Path (p q : Nat) :
     Path (C.derivedK p q (C.derivedJ p q (C.dBase p q)))
       (C.dBase p q) :=
   C.exactK_Path p q
@@ -311,11 +311,11 @@ def derivedExactK_Path (p q : Nat) :
 /-! ### Iterated differential -/
 
 /-- The r-th iterated differential. -/
-def iteratedDifferential (_r p q : Nat) (x : C.E p q) : C.E p q :=
+noncomputable def iteratedDifferential (_r p q : Nat) (x : C.E p q) : C.E p q :=
   C.j p q (C.k p q x)
 
 /-- d² = 0 for the r-th iterated differential. -/
-def iteratedDSquaredPath (_r p q : Nat) :
+noncomputable def iteratedDSquaredPath (_r p q : Nat) :
     Path (C.iteratedDifferential _r p q
         (C.iteratedDifferential _r p q (C.eBase p q)))
       (C.eBase p q) :=
@@ -330,24 +330,24 @@ noncomputable def iteratedDSquared_normalizes (r p q : Nat) :
 /-! ### Edge homomorphisms -/
 
 /-- Edge map from D to E: the j-map itself. -/
-def edgeMap (p q : Nat) (x : C.D p q) : C.E p q :=
+noncomputable def edgeMap (p q : Nat) (x : C.D p q) : C.E p q :=
   C.j p q x
 
 /-- Edge map composed with k returns to D. -/
-def edgeReturn (p q : Nat) (x : C.D p q) : C.D p q :=
+noncomputable def edgeReturn (p q : Nat) (x : C.D p q) : C.D p q :=
   C.k p q (C.edgeMap p q x)
 
 /-- Path: edge return on base is exact. -/
-def edgeReturnPath (p q : Nat) :
+noncomputable def edgeReturnPath (p q : Nat) :
     Path (C.edgeReturn p q (C.dBase p q)) (C.dBase p q) :=
   C.exactK_Path p q
 
 /-- Edge map applied to i-image. -/
-def edgeFromImage (p q : Nat) : C.E p q :=
+noncomputable def edgeFromImage (p q : Nat) : C.E p q :=
   C.edgeMap p q (C.i p q (C.dBase p q))
 
 /-- Path: edge from i-image goes to E-base (exactness at E). -/
-def edgeFromImagePath (p q : Nat) :
+noncomputable def edgeFromImagePath (p q : Nat) :
     Path (C.edgeFromImage p q) (C.eBase p q) :=
   C.exactE_Path p q
 
@@ -372,16 +372,16 @@ noncomputable def edgeReturn_loop_contracts (p q : Nat) :
 /-! ### Transgression -/
 
 /-- Transgression map: d = j ∘ k as a connecting homomorphism. -/
-def transgressionMap (p q : Nat) (x : C.E p q) : C.E p q :=
+noncomputable def transgressionMap (p q : Nat) (x : C.E p q) : C.E p q :=
   C.j p q (C.k p q x)
 
 /-- Transgression is the differential. -/
-def transgressionIsDiff (p q : Nat) (x : C.E p q) :
+noncomputable def transgressionIsDiff (p q : Nat) (x : C.E p q) :
     Path (C.transgressionMap p q x) (C.differential p q x) :=
   Path.refl (C.j p q (C.k p q x))
 
 /-- Transgression squared is zero. -/
-def transgressionSquaredPath (p q : Nat) :
+noncomputable def transgressionSquaredPath (p q : Nat) :
     Path (C.transgressionMap p q (C.transgressionMap p q (C.eBase p q)))
       (C.eBase p q) :=
   C.dSquaredPath p q
@@ -402,7 +402,7 @@ noncomputable def transgression_squared_loop_contracts (p q : Nat) :
 /-! ### Comparison with spectral page structure -/
 
 /-- Extract a Pages structure from an exact couple. -/
-def toPages : Pages.{u} where
+noncomputable def toPages : Pages.{u} where
   term := C.E
   base := C.eBase
   shift := fun _r p q x => C.j p q (C.k p q x)
@@ -414,7 +414,7 @@ def toPages : Pages.{u} where
       (Path.refl (C.j p q (C.k p q (C.j p q (C.k p q x)))))
 
 /-- Extract a Differentials structure from an exact couple. -/
-def toDifferentials : Differentials C.toPages where
+noncomputable def toDifferentials : Differentials C.toPages where
   d := fun _r p q x => C.j p q (C.k p q x)
   dSquaredPath := fun _r p q => C.dSquaredPath p q
   dSquaredStep := fun _r p q =>
@@ -426,11 +426,11 @@ def toDifferentials : Differentials C.toPages where
 /-! ### Boundary operator paths -/
 
 /-- Boundary operator: i ∘ k. -/
-def boundaryOp (p q : Nat) (x : C.E p q) : C.D p q :=
+noncomputable def boundaryOp (p q : Nat) (x : C.E p q) : C.D p q :=
   C.i p q (C.k p q x)
 
 /-- Path: boundary of base element reaches dBase via exactD. -/
-def boundaryBasePath (p q : Nat) :
+noncomputable def boundaryBasePath (p q : Nat) :
     Path (C.boundaryOp p q (C.eBase p q)) (C.dBase p q) :=
   C.exactD_Path p q
 
@@ -447,7 +447,7 @@ noncomputable def boundaryBase_loop_contracts (p q : Nat) :
   rweq_cmpA_inv_right (C.boundaryBasePath p q)
 
 /-- Apply j to boundary: j(i(k(eBase))) → j(dBase). -/
-def jBoundaryPath (p q : Nat) :
+noncomputable def jBoundaryPath (p q : Nat) :
     Path (C.j p q (C.boundaryOp p q (C.eBase p q)))
       (C.j p q (C.dBase p q)) :=
   Path.congrArg (C.j p q) (C.exactD_Path p q)
@@ -467,11 +467,11 @@ noncomputable def jBoundary_loop_contracts (p q : Nat) :
 /-! ### Connecting homomorphism paths -/
 
 /-- Connecting homomorphism: k as a map E → D. -/
-def connecting (p q : Nat) : C.E p q → C.D p q :=
+noncomputable def connecting (p q : Nat) : C.E p q → C.D p q :=
   C.k p q
 
 /-- Path: connecting composed with j ∘ i lands at k(eBase). -/
-def connectingCyclePath (p q : Nat) :
+noncomputable def connectingCyclePath (p q : Nat) :
     Path (C.connecting p q (C.j p q (C.i p q (C.dBase p q))))
       (C.k p q (C.eBase p q)) :=
   Path.congrArg (C.k p q) (C.exactE_Path p q)
@@ -493,7 +493,7 @@ noncomputable def connectingCycle_loop_contracts (p q : Nat) :
 /-! ### Congruence paths for d² = 0 -/
 
 /-- d² = 0 path transported through k: k(d²(eBase)) → k(eBase). -/
-def kDSquaredPath (p q : Nat) :
+noncomputable def kDSquaredPath (p q : Nat) :
     Path (C.k p q (C.j p q (C.k p q (C.j p q (C.k p q (C.eBase p q))))))
       (C.k p q (C.eBase p q)) :=
   Path.congrArg (C.k p q) (C.dSquaredPath p q)
@@ -512,7 +512,7 @@ noncomputable def kDSquared_loop_contracts (p q : Nat) :
   rweq_cmpA_inv_right (C.kDSquaredPath p q)
 
 /-- d² = 0 path transported through i: i(k(d²(eBase))) → i(k(eBase)). -/
-def ikDSquaredPath (p q : Nat) :
+noncomputable def ikDSquaredPath (p q : Nat) :
     Path (C.i p q (C.k p q (C.j p q (C.k p q (C.j p q (C.k p q (C.eBase p q)))))))
       (C.i p q (C.k p q (C.eBase p q))) :=
   Path.congrArg (fun x => C.i p q (C.k p q x)) (C.dSquaredPath p q)
@@ -535,7 +535,7 @@ end ExactCouplePaths
 /-! ### Trivial exact couple -/
 
 /-- Canonical trivial exact couple. -/
-def trivialExactCouplePaths : ExactCouplePaths where
+noncomputable def trivialExactCouplePaths : ExactCouplePaths where
   D := fun _ _ => PUnit
   E := fun _ _ => PUnit
   dBase := fun _ _ => PUnit.unit

@@ -31,14 +31,14 @@ namespace SimpleEquiv
 
 variable {α : Sort u} {β : Sort v} {γ : Sort w} {δ : Sort x}
 
-instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
+noncomputable instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
   ⟨SimpleEquiv.toFun⟩
 
 @[simp] theorem coe_apply (e : SimpleEquiv α β) (x : α) :
     e x = e.toFun x := rfl
 
 /-- Equivalence in the opposite direction. -/
-@[simp] def symm (e : SimpleEquiv α β) : SimpleEquiv β α where
+@[simp] noncomputable def symm (e : SimpleEquiv α β) : SimpleEquiv β α where
   toFun := e.invFun
   invFun := e.toFun
   left_inv := e.right_inv
@@ -51,14 +51,14 @@ instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
     e.symm.invFun x = e x := rfl
 
 /-- Identity equivalence. -/
-@[simp] def refl (α : Sort u) : SimpleEquiv α α where
+@[simp] noncomputable def refl (α : Sort u) : SimpleEquiv α α where
   toFun := id
   invFun := id
   left_inv := by intro x; rfl
   right_inv := by intro x; rfl
 
 /-- Composition of equivalences. -/
-@[simp] def comp (e : SimpleEquiv α β) (f : SimpleEquiv β γ) :
+@[simp] noncomputable def comp (e : SimpleEquiv α β) (f : SimpleEquiv β γ) :
     SimpleEquiv α γ where
   toFun := fun x => f.toFun (e.toFun x)
   invFun := fun z => e.invFun (f.invFun z)
@@ -148,11 +148,11 @@ instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
       using e.left_inv y
 
 /-- Transitivity of equivalences (alias for comp). -/
-@[simp] def trans (e : SimpleEquiv α β) (f : SimpleEquiv β γ) :
+@[simp] noncomputable def trans (e : SimpleEquiv α β) (f : SimpleEquiv β γ) :
     SimpleEquiv α γ := comp e f
 
 /-- Product of two equivalences. -/
-@[simp] def prodBoth' {α' β' γ' δ' : Type u}
+@[simp] noncomputable def prodBoth' {α' β' γ' δ' : Type u}
     (e : SimpleEquiv α' β') (f : SimpleEquiv γ' δ') :
     SimpleEquiv (α' × γ') (β' × δ') where
   toFun := fun (a, c) => (e a, f c)
@@ -165,7 +165,7 @@ instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
     simp [e.right_inv b, f.right_inv d]
 
 /-- Equivalence on the left component of a product. -/
-@[simp] def prodLeft' {α' γ' : Type u} (β' : Type u) (e : SimpleEquiv α' γ') :
+@[simp] noncomputable def prodLeft' {α' γ' : Type u} (β' : Type u) (e : SimpleEquiv α' γ') :
     SimpleEquiv (α' × β') (γ' × β') where
   toFun := fun (a, b) => (e a, b)
   invFun := fun (c, b) => (e.invFun c, b)
@@ -173,7 +173,7 @@ instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
   right_inv := by intro (c, b); simp [e.right_inv c]
 
 /-- Equivalence on the right component of a product. -/
-@[simp] def prodRight' {β' δ' : Type u} (α' : Type u) (e : SimpleEquiv β' δ') :
+@[simp] noncomputable def prodRight' {β' δ' : Type u} (α' : Type u) (e : SimpleEquiv β' δ') :
     SimpleEquiv (α' × β') (α' × δ') where
   toFun := fun (a, b) => (a, e b)
   invFun := fun (a, d) => (a, e.invFun d)
@@ -181,7 +181,7 @@ instance : CoeFun (SimpleEquiv α β) (fun _ => α → β) :=
   right_inv := by intro (a, d); simp [e.right_inv d]
 
 /-- Cast an element along an equality of types. -/
-def cast {α β : Sort u} (h : α = β) (e : SimpleEquiv α γ) : SimpleEquiv β γ :=
+noncomputable def cast {α β : Sort u} (h : α = β) (e : SimpleEquiv α γ) : SimpleEquiv β γ :=
   h ▸ e
 
 

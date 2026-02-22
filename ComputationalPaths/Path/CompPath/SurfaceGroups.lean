@@ -44,17 +44,17 @@ inductive SurfaceClass : Type
   | nonorientable (crosscaps : Nat) (boundary : Nat)
 
 /-- Boundary component count of a surface class. -/
-def SurfaceClass.boundary : SurfaceClass → Nat
+noncomputable def SurfaceClass.boundary : SurfaceClass → Nat
   | orientable _ b => b
   | nonorientable _ b => b
 
 /-- Flag for whether a surface class is orientable. -/
-def SurfaceClass.isOrientable : SurfaceClass → Bool
+noncomputable def SurfaceClass.isOrientable : SurfaceClass → Bool
   | orientable _ _ => true
   | nonorientable _ _ => false
 
 /-- Euler characteristic from surface-classification data. -/
-def surfaceEulerChar : SurfaceClass → Int
+noncomputable def surfaceEulerChar : SurfaceClass → Int
   | SurfaceClass.orientable genus boundary =>
       2 - (2 * Int.ofNat genus) - Int.ofNat boundary
   | SurfaceClass.nonorientable crosscaps boundary =>
@@ -95,21 +95,21 @@ abbrev MappingClass (S : SurfaceData) : Type u :=
   SimpleEquiv S.carrier S.carrier
 
 /-- Identity mapping class. -/
-@[simp] def mappingClassId (S : SurfaceData) : MappingClass S :=
+@[simp] noncomputable def mappingClassId (S : SurfaceData) : MappingClass S :=
   SimpleEquiv.refl S.carrier
 
 /-- Composition of mapping classes. -/
-@[simp] def mappingClassComp {S : SurfaceData}
+@[simp] noncomputable def mappingClassComp {S : SurfaceData}
     (f g : MappingClass S) : MappingClass S :=
   SimpleEquiv.comp f g
 
 /-- Inverse of a mapping class. -/
-@[simp] def mappingClassInv {S : SurfaceData}
+@[simp] noncomputable def mappingClassInv {S : SurfaceData}
     (f : MappingClass S) : MappingClass S :=
   SimpleEquiv.symm f
 
 /-- Strict group structure on mapping classes via composition. -/
-def mappingClassGroup (S : SurfaceData) :
+noncomputable def mappingClassGroup (S : SurfaceData) :
     Algebra.StrictGroup (MappingClass S) where
   mul := mappingClassComp
   one := mappingClassId S
@@ -140,7 +140,7 @@ structure DehnTwistData (S : SurfaceData) where
   twist : SurfaceCurve S → MappingClass S
 
 /-- Integer power of a Dehn twist using the mapping class group structure. -/
-def dehnTwistPow (S : SurfaceData) (D : DehnTwistData S)
+noncomputable def dehnTwistPow (S : SurfaceData) (D : DehnTwistData S)
     (c : SurfaceCurve S) (n : Int) : MappingClass S :=
   Algebra.StrictGroup.zpow (mappingClassGroup S) (D.twist c) n
 
@@ -158,7 +158,7 @@ structure CurveComplex (S : SurfaceData) where
 /-! ## Example surfaces -/
 
 /-- The 2-sphere as a surface datum. -/
-def sphereSurface : SurfaceData where
+noncomputable def sphereSurface : SurfaceData where
   carrier := Sphere2CompPath
   basepoint := Sphere2CompPath.basepoint
   surfClass := SurfaceClass.orientable 0 0
@@ -170,13 +170,13 @@ noncomputable def torusSurface : SurfaceData where
   surfClass := SurfaceClass.orientable 1 0
 
 /-- The Klein bottle as a surface datum. -/
-def kleinBottleSurface : SurfaceData where
+noncomputable def kleinBottleSurface : SurfaceData where
   carrier := KleinBottleCompPath
   basepoint := kleinBottleBase
   surfClass := SurfaceClass.nonorientable 2 0
 
 /-- The Mobius band as a surface datum. -/
-def mobiusBandSurface : SurfaceData where
+noncomputable def mobiusBandSurface : SurfaceData where
   carrier := MobiusBandCompPath
   basepoint := mobiusBandBase
   surfClass := SurfaceClass.nonorientable 1 1

@@ -47,7 +47,7 @@ structure KTheoryRing {M : Type u} (S : StrictMonoid M) where
 namespace KTheoryRing
 
 /-- Identity ring homomorphism. -/
-def ringHomId {R : Type u} (RR : CommRingData R) : RingHom RR RR where
+noncomputable def ringHomId {R : Type u} (RR : CommRingData R) : RingHom RR RR where
   toFun := fun x => x
   map_zero := rfl
   map_one := rfl
@@ -72,7 +72,7 @@ structure AdamsOperationRingHom {M : Type u} (S : StrictMonoid M) (R : KTheoryRi
 namespace AdamsOperationRingHom
 
 /-- Extract the ring homomorphism for psi^k. -/
-def psiRingHom {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
+noncomputable def psiRingHom {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
     (A : AdamsOperationRingHom S R) (k : Nat) : RingHom R.ring R.ring :=
   A.psi_hom k
 
@@ -89,7 +89,7 @@ theorem psiRingHom_apply {M : Type u} {S : StrictMonoid M} {R : KTheoryRing S}
 
 
 /-- The trivial Adams operations as ring homomorphisms. -/
-def trivial {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) :
+noncomputable def trivial {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) :
     AdamsOperationRingHom S R where
   psi := fun _ x => x
   psi_one := by intro _; rfl
@@ -112,12 +112,12 @@ structure JImageMap {M : Type u} (S : StrictMonoid M) where
 namespace JImageMap
 
 /-- The constant J-image map landing at zero. -/
-def trivial {M : Type u} (S : StrictMonoid M) : JImageMap S where
+noncomputable def trivial {M : Type u} (S : StrictMonoid M) : JImageMap S where
   map := fun _ _ => KTheory.zero S
   map_base := by intro _; rfl
 
 /-- Extend the J-homomorphism source to K-theory via the image map. -/
-def fromSource {M : Type u} {S : StrictMonoid M} (J : JImageMap S) (n : Nat) :
+noncomputable def fromSource {M : Type u} {S : StrictMonoid M} (J : JImageMap S) (n : Nat) :
     JSource n → KTheory.K0 S :=
   fun x => J.map n (imageOfJMap n x)
 
@@ -138,7 +138,7 @@ structure AdamsConjecture {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) 
   compatibility : True
 
 /-- Trivial Adams conjecture witness. -/
-def adamsConjectureTrivial {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) :
+noncomputable def adamsConjectureTrivial {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) :
     AdamsConjecture S R where
   adams := AdamsOperationRingHom.trivial S R
   jImage := JImageMap.trivial S

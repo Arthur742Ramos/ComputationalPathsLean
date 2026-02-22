@@ -29,14 +29,14 @@ variable {a b c d : A}
 /-! ## Whiskering Operations -/
 
 /-- Left whiskering of 2-cells. -/
-@[simp] def whiskerLeft (f : Path a b) {g h : Path b c}
+@[simp] noncomputable def whiskerLeft (f : Path a b) {g h : Path b c}
     (eta : TwoCell (A := A) (a := b) (b := c) g h) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f g) (Path.trans f h) :=
   TwoCell.whiskerLeft (A := A) (a := a) (b := b) (c := c)
     (f := f) (g := g) (h := h) eta
 
 /-- Right whiskering of 2-cells. -/
-@[simp] def whiskerRight {f g : Path a b} (h : Path b c)
+@[simp] noncomputable def whiskerRight {f g : Path a b} (h : Path b c)
     (eta : TwoCell (A := A) (a := a) (b := b) f g) :
     TwoCell (A := A) (a := a) (b := c) (Path.trans f h) (Path.trans g h) :=
   TwoCell.whiskerRight (A := A) (a := a) (b := b) (c := c)

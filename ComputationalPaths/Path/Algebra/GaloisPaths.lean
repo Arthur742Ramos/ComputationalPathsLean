@@ -101,11 +101,11 @@ inductive GPath : GExpr → GExpr → Type where
 /-! ## 4. Basic Path Combinators -/
 
 -- 1. Concatenation (synonym for trans)
-def GPath.concat (p : GPath a b) (q : GPath b c) : GPath a c :=
+noncomputable def GPath.concat (p : GPath a b) (q : GPath b c) : GPath a c :=
   GPath.trans p q
 
 -- 2. Length of a path
-def GPath.length : GPath a b → Nat
+noncomputable def GPath.length : GPath a b → Nat
   | .refl _    => 0
   | .step _    => 1
   | .trans p q => p.length + q.length
@@ -133,7 +133,7 @@ theorem gpath_refl_trans_length (p : GPath a b) :
 /-! ## 5. Congruence Lifts -/
 
 -- 8. Lift a path through addition on the left
-def GPath.congr_add_left (p : GPath a b) (c : GExpr) : GPath (.add a c) (.add b c) :=
+noncomputable def GPath.congr_add_left (p : GPath a b) (c : GExpr) : GPath (.add a c) (.add b c) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_add_l s c)
@@ -141,7 +141,7 @@ def GPath.congr_add_left (p : GPath a b) (c : GExpr) : GPath (.add a c) (.add b 
   | .symm p    => .symm (p.congr_add_left c)
 
 -- 9. Lift a path through addition on the right
-def GPath.congr_add_right (c : GExpr) (p : GPath a b) : GPath (.add c a) (.add c b) :=
+noncomputable def GPath.congr_add_right (c : GExpr) (p : GPath a b) : GPath (.add c a) (.add c b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_add_r c s)
@@ -149,7 +149,7 @@ def GPath.congr_add_right (c : GExpr) (p : GPath a b) : GPath (.add c a) (.add c
   | .symm p    => .symm (p.congr_add_right c)
 
 -- 10. Lift a path through multiplication on the left
-def GPath.congr_mul_left (p : GPath a b) (c : GExpr) : GPath (.mul a c) (.mul b c) :=
+noncomputable def GPath.congr_mul_left (p : GPath a b) (c : GExpr) : GPath (.mul a c) (.mul b c) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_mul_l s c)
@@ -157,7 +157,7 @@ def GPath.congr_mul_left (p : GPath a b) (c : GExpr) : GPath (.mul a c) (.mul b 
   | .symm p    => .symm (p.congr_mul_left c)
 
 -- 11. Lift a path through multiplication on the right
-def GPath.congr_mul_right (c : GExpr) (p : GPath a b) : GPath (.mul c a) (.mul c b) :=
+noncomputable def GPath.congr_mul_right (c : GExpr) (p : GPath a b) : GPath (.mul c a) (.mul c b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_mul_r c s)
@@ -165,7 +165,7 @@ def GPath.congr_mul_right (c : GExpr) (p : GPath a b) : GPath (.mul c a) (.mul c
   | .symm p    => .symm (p.congr_mul_right c)
 
 -- 12. Lift a path through negation
-def GPath.congr_neg (p : GPath a b) : GPath (.neg a) (.neg b) :=
+noncomputable def GPath.congr_neg (p : GPath a b) : GPath (.neg a) (.neg b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_neg s)
@@ -173,7 +173,7 @@ def GPath.congr_neg (p : GPath a b) : GPath (.neg a) (.neg b) :=
   | .symm p    => .symm p.congr_neg
 
 -- 13. Lift a path through an automorphism
-def GPath.congr_aut (n : Nat) (p : GPath a b) : GPath (.aut n a) (.aut n b) :=
+noncomputable def GPath.congr_aut (n : Nat) (p : GPath a b) : GPath (.aut n a) (.aut n b) :=
   match p with
   | .refl _    => .refl _
   | .step s    => .step (.congr_aut n s)
@@ -183,51 +183,51 @@ def GPath.congr_aut (n : Nat) (p : GPath a b) : GPath (.aut n a) (.aut n b) :=
 /-! ## 6. Field Automorphism Paths -/
 
 -- 14. Identity automorphism fixes any expression
-def aut_id_path (a : GExpr) : GPath (.aut 0 a) a :=
+noncomputable def aut_id_path (a : GExpr) : GPath (.aut 0 a) a :=
   .step (.aut_id a)
 
 -- 15. Automorphism preserves zero
-def aut_zero_path (n : Nat) : GPath (.aut n .zero) .zero :=
+noncomputable def aut_zero_path (n : Nat) : GPath (.aut n .zero) .zero :=
   .step (.aut_zero n)
 
 -- 16. Automorphism preserves one
-def aut_one_path (n : Nat) : GPath (.aut n .one) .one :=
+noncomputable def aut_one_path (n : Nat) : GPath (.aut n .one) .one :=
   .step (.aut_one n)
 
 -- 17. Automorphism distributes over addition
-def aut_add_path (n : Nat) (a b : GExpr) :
+noncomputable def aut_add_path (n : Nat) (a b : GExpr) :
     GPath (.aut n (.add a b)) (.add (.aut n a) (.aut n b)) :=
   .step (.aut_add n a b)
 
 -- 18. Automorphism distributes over multiplication
-def aut_mul_path (n : Nat) (a b : GExpr) :
+noncomputable def aut_mul_path (n : Nat) (a b : GExpr) :
     GPath (.aut n (.mul a b)) (.mul (.aut n a) (.aut n b)) :=
   .step (.aut_mul n a b)
 
 -- 19. Automorphism inverse cancellation
-def aut_cancel_path (n : Nat) (a : GExpr) :
+noncomputable def aut_cancel_path (n : Nat) (a : GExpr) :
     GPath (.autInv n (.aut n a)) a :=
   .step (.aut_inv_cancel n a)
 
 -- 20. Forward-inverse cancellation
-def inv_aut_cancel_path (n : Nat) (a : GExpr) :
+noncomputable def inv_aut_cancel_path (n : Nat) (a : GExpr) :
     GPath (.aut n (.autInv n a)) a :=
   .step (.inv_aut_cancel n a)
 
 /-! ## 7. Composition of Automorphisms -/
 
 -- 21. Automorphism composition path
-def aut_comp_path (n m : Nat) (a : GExpr) :
+noncomputable def aut_comp_path (n m : Nat) (a : GExpr) :
     GPath (.aut n (.aut m a)) (.aut (n + m) a) :=
   .step (.aut_comp n m a)
 
 -- 22. Identity is left unit for composition: aut 0 ∘ aut m = aut m
-def aut_comp_id_left (m : Nat) (a : GExpr) :
+noncomputable def aut_comp_id_left (m : Nat) (a : GExpr) :
     GPath (.aut 0 (.aut m a)) (.aut m a) :=
   .step (.aut_id (.aut m a))
 
 -- 23. Composition associativity: aut n (aut m (aut k a)) two ways
-def aut_comp_assoc (n m k : Nat) (a : GExpr) :
+noncomputable def aut_comp_assoc (n m k : Nat) (a : GExpr) :
     GPath (.aut n (.aut m (.aut k a))) (.aut (n + (m + k)) a) :=
   .trans (.congr_aut n (.step (.aut_comp m k a))) (.step (.aut_comp n (m + k) a))
 
@@ -239,15 +239,15 @@ structure IsGFixed (n : Nat) (a : GExpr) where
   witness : GPath (.aut n a) a
 
 -- 24. Zero is fixed by every automorphism
-def zero_fixed (n : Nat) : IsGFixed n .zero :=
+noncomputable def zero_fixed (n : Nat) : IsGFixed n .zero :=
   ⟨aut_zero_path n⟩
 
 -- 25. One is fixed by every automorphism
-def one_fixed (n : Nat) : IsGFixed n .one :=
+noncomputable def one_fixed (n : Nat) : IsGFixed n .one :=
   ⟨aut_one_path n⟩
 
 -- 26. Fixed elements closed under addition
-def fixed_add (n : Nat) (a b : GExpr)
+noncomputable def fixed_add (n : Nat) (a b : GExpr)
     (ha : IsGFixed n a) (hb : IsGFixed n b) :
     IsGFixed n (.add a b) :=
   ⟨.trans (aut_add_path n a b)
@@ -255,7 +255,7 @@ def fixed_add (n : Nat) (a b : GExpr)
                   (hb.witness.congr_add_right a))⟩
 
 -- 27. Fixed elements closed under multiplication
-def fixed_mul (n : Nat) (a b : GExpr)
+noncomputable def fixed_mul (n : Nat) (a b : GExpr)
     (ha : IsGFixed n a) (hb : IsGFixed n b) :
     IsGFixed n (.mul a b) :=
   ⟨.trans (aut_mul_path n a b)
@@ -263,12 +263,12 @@ def fixed_mul (n : Nat) (a b : GExpr)
                   (hb.witness.congr_mul_right a))⟩
 
 -- 28. Fixed elements closed under negation
-def fixed_neg (n : Nat) (a : GExpr)
+noncomputable def fixed_neg (n : Nat) (a : GExpr)
     (ha : IsGFixed n a) : IsGFixed n (.neg a) :=
   ⟨.trans (.step (.aut_neg n a)) ha.witness.congr_neg⟩
 
 -- 29. Everything is fixed by the identity automorphism
-def id_fixes_all (a : GExpr) : IsGFixed 0 a :=
+noncomputable def id_fixes_all (a : GExpr) : IsGFixed 0 a :=
   ⟨aut_id_path a⟩
 
 /-! ## 9. Galois Group Structure -/
@@ -279,7 +279,7 @@ structure GGaloisGroup where
   hasId : 0 ∈ auts
 
 /-- An element is in the fixed field of a Galois group. -/
-def IsInFixedField (G : GGaloisGroup) (a : GExpr) : Prop :=
+noncomputable def IsInFixedField (G : GGaloisGroup) (a : GExpr) : Prop :=
   ∀ n, n ∈ G.auts → Nonempty (GPath (.aut n a) a)
 
 -- 30. Zero is in every fixed field
@@ -293,7 +293,7 @@ theorem one_in_fixed_field (G : GGaloisGroup) :
   fun n _ => ⟨aut_one_path n⟩
 
 -- 32. Trivial Galois group {id}
-def trivialGalois : GGaloisGroup :=
+noncomputable def trivialGalois : GGaloisGroup :=
   ⟨[0], by simp⟩
 
 -- 33. Trivial group has order 1
@@ -308,7 +308,7 @@ structure NormalWitness (G : GGaloisGroup) (roots : List GExpr) where
   coherent : ∀ r, permute 0 r = r
 
 -- 34. Identity witness
-def trivialNormalWitness (G : GGaloisGroup) (roots : List GExpr) :
+noncomputable def trivialNormalWitness (G : GGaloisGroup) (roots : List GExpr) :
     NormalWitness G roots where
   permute := fun _ r => r
   preserves := fun _ _ _ hr => hr
@@ -321,7 +321,7 @@ structure SepWitness where
   distinct : roots.Nodup
 
 -- 35. Empty separable witness
-def emptySep : SepWitness := ⟨[], List.nodup_nil⟩
+noncomputable def emptySep : SepWitness := ⟨[], List.nodup_nil⟩
 
 -- 36. Empty witness has no roots
 theorem emptySep_roots : emptySep.roots = [] := rfl
@@ -329,14 +329,14 @@ theorem emptySep_roots : emptySep.roots = [] := rfl
 /-! ## 12. Composite Paths — Field Laws -/
 
 -- 37. a + b + (-b) ~~> a (cancellation)
-def add_cancel_right (a b : GExpr) :
+noncomputable def add_cancel_right (a b : GExpr) :
     GPath (.add (.add a b) (.neg b)) a :=
   .trans (.step (.add_assoc a b (.neg b)))
     (.trans (GPath.congr_add_right a (.step (.add_neg b)))
             (.step (.add_zero a)))
 
 -- 38. Automorphism of a sum, then cancel, yields the original
-def aut_add_cancel (n : Nat) (a b : GExpr) :
+noncomputable def aut_add_cancel (n : Nat) (a b : GExpr) :
     GPath (.aut n (.add (.add a b) (.neg b)))
           (.add (.add (.aut n a) (.aut n b)) (.neg (.aut n b))) :=
   .trans (.step (.aut_add n (.add a b) (.neg b)))
@@ -344,16 +344,16 @@ def aut_add_cancel (n : Nat) (a b : GExpr) :
             (GPath.congr_add_right (.add (.aut n a) (.aut n b)) (.step (.aut_neg n b))))
 
 -- 39. Double negation path
-def neg_neg_path (a : GExpr) : GPath (.neg (.neg a)) a :=
+noncomputable def neg_neg_path (a : GExpr) : GPath (.neg (.neg a)) a :=
   .step (.neg_neg a)
 
 -- 40. Mul distributes over add, witnessed path
-def distrib_path (a b c : GExpr) :
+noncomputable def distrib_path (a b c : GExpr) :
     GPath (.mul a (.add b c)) (.add (.mul a b) (.mul a c)) :=
   .step (.distrib_l a b c)
 
 -- 41. Automorphism commutes with distributivity
-def aut_distrib (n : Nat) (a b c : GExpr) :
+noncomputable def aut_distrib (n : Nat) (a b c : GExpr) :
     GPath (.aut n (.mul a (.add b c)))
           (.add (.mul (.aut n a) (.aut n b)) (.mul (.aut n a) (.aut n c))) :=
   .trans (.step (.aut_mul n a (.add b c)))
@@ -380,7 +380,7 @@ theorem gpath_concat_assoc_length (p : GPath a b) (q : GPath b c) (r : GPath c d
 /-! ## 14. Galois Correspondence Aspects -/
 
 /-- Subgroup inclusion: G₁ ⊆ G₂ as automorphism lists. -/
-def GSubgroup (G₁ G₂ : GGaloisGroup) : Prop :=
+noncomputable def GSubgroup (G₁ G₂ : GGaloisGroup) : Prop :=
   ∀ n, n ∈ G₁.auts → n ∈ G₂.auts
 
 -- 45. Larger group ⟹ smaller fixed field (contravariant)
@@ -402,18 +402,18 @@ theorem gsubgroup_trans (G₁ G₂ G₃ : GGaloisGroup)
 /-! ## 15. Extended Automorphism Paths -/
 
 -- 48. Automorphism applied to a product of fixed elements
-def aut_fixed_mul_path (n : Nat) (a b : GExpr)
+noncomputable def aut_fixed_mul_path (n : Nat) (a b : GExpr)
     (ha : IsGFixed n a) (hb : IsGFixed n b) :
     GPath (.aut n (.mul a b)) (.mul a b) :=
   (fixed_mul n a b ha hb).witness
 
 -- 49. Chain: aut n (aut n⁻¹ a) = a
-def aut_round_trip (n : Nat) (a : GExpr) :
+noncomputable def aut_round_trip (n : Nat) (a : GExpr) :
     GPath (.aut n (.autInv n a)) a :=
   inv_aut_cancel_path n a
 
 -- 50. Inverse round trip
-def autInv_round_trip (n : Nat) (a : GExpr) :
+noncomputable def autInv_round_trip (n : Nat) (a : GExpr) :
     GPath (.autInv n (.aut n a)) a :=
   aut_cancel_path n a
 

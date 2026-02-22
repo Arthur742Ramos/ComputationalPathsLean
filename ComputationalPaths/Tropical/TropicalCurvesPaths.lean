@@ -63,7 +63,7 @@ noncomputable def cycle_cancel_rweq (e : Edge) :
 end TropicalCurvePathData
 
 /-- Trivial tropical-curve path package on `PUnit`. -/
-def trivialTropicalCurvePathData : TropicalCurvePathData PUnit PUnit where
+noncomputable def trivialTropicalCurvePathData : TropicalCurvePathData PUnit PUnit where
   source := fun _ => PUnit.unit
   target := fun _ => PUnit.unit
   weight := fun _ => 1

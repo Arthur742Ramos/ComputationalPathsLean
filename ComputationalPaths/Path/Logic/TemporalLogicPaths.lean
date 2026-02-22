@@ -30,14 +30,14 @@ structure TransSystem (S : Type u) where
   init : S → Prop
 
 /-- A trace: an infinite sequence of states. -/
-def Trace (S : Type u) := Nat → S
+noncomputable def Trace (S : Type u) := Nat → S
 
 /-- A trace is valid if each consecutive pair is a transition. -/
-def validTrace {S : Type u} (T : TransSystem S) (σ : Trace S) : Prop :=
+noncomputable def validTrace {S : Type u} (T : TransSystem S) (σ : Trace S) : Prop :=
   ∀ i : Nat, T.next (σ i) (σ (i + 1))
 
 /-- A trace starts from an initial state. -/
-def initTrace {S : Type u} (T : TransSystem S) (σ : Trace S) : Prop :=
+noncomputable def initTrace {S : Type u} (T : TransSystem S) (σ : Trace S) : Prop :=
   T.init (σ 0)
 
 /-! ## LTL Operators -/
@@ -49,27 +49,27 @@ abbrev StateProp (S : Type u) := S → Prop
 abbrev TraceProp (S : Type u) := Trace S → Nat → Prop
 
 /-- Next operator: Xφ holds at position i iff φ holds at i+1. -/
-def nextOp {S : Type u} (φ : StateProp S) : TraceProp S :=
+noncomputable def nextOp {S : Type u} (φ : StateProp S) : TraceProp S :=
   fun σ i => φ (σ (i + 1))
 
 /-- Always operator: □φ (Gφ) holds at i iff φ holds at all j ≥ i. -/
-def alwaysOp {S : Type u} (φ : StateProp S) : TraceProp S :=
+noncomputable def alwaysOp {S : Type u} (φ : StateProp S) : TraceProp S :=
   fun σ i => ∀ j : Nat, i ≤ j → φ (σ j)
 
 /-- Eventually operator: ◇φ (Fφ) holds at i iff φ holds at some j ≥ i. -/
-def eventuallyOp {S : Type u} (φ : StateProp S) : TraceProp S :=
+noncomputable def eventuallyOp {S : Type u} (φ : StateProp S) : TraceProp S :=
   fun σ i => ∃ j : Nat, i ≤ j ∧ φ (σ j)
 
 /-- Until operator: φ U ψ holds at i iff ψ eventually holds and φ holds until then. -/
-def untilOp {S : Type u} (φ ψ : StateProp S) : TraceProp S :=
+noncomputable def untilOp {S : Type u} (φ ψ : StateProp S) : TraceProp S :=
   fun σ i => ∃ j : Nat, i ≤ j ∧ ψ (σ j) ∧ ∀ k : Nat, i ≤ k → k < j → φ (σ k)
 
 /-- Weak until: φ W ψ = (φ U ψ) ∨ □φ. -/
-def weakUntilOp {S : Type u} (φ ψ : StateProp S) : TraceProp S :=
+noncomputable def weakUntilOp {S : Type u} (φ ψ : StateProp S) : TraceProp S :=
   fun σ i => untilOp φ ψ σ i ∨ alwaysOp φ σ i
 
 /-- Release operator: φ R ψ = ψ W (φ ∧ ψ). -/
-def releaseOp {S : Type u} (φ ψ : StateProp S) : TraceProp S :=
+noncomputable def releaseOp {S : Type u} (φ ψ : StateProp S) : TraceProp S :=
   fun σ i => weakUntilOp ψ (fun s => φ s ∧ ψ s) σ i
 
 /-! ## LTL Theorems -/
@@ -156,21 +156,21 @@ theorem always_of_always {S : Type u} (φ : StateProp S)
 /-! ## CTL Operators -/
 
 /-- CTL universal quantifier: for all traces from a state. -/
-def ctlForAll {S : Type u} (T : TransSystem S) (ψ : TraceProp S)
+noncomputable def ctlForAll {S : Type u} (T : TransSystem S) (ψ : TraceProp S)
     (s : S) : Prop :=
   ∀ σ : Trace S, σ 0 = s → validTrace T σ → ψ σ 0
 
 /-- CTL existential quantifier: exists a trace from a state. -/
-def ctlExists {S : Type u} (T : TransSystem S) (ψ : TraceProp S)
+noncomputable def ctlExists {S : Type u} (T : TransSystem S) (ψ : TraceProp S)
     (s : S) : Prop :=
   ∃ σ : Trace S, σ 0 = s ∧ validTrace T σ ∧ ψ σ 0
 
 /-- AG: for all paths, always. -/
-def agOp {S : Type u} (T : TransSystem S) (φ : StateProp S) : StateProp S :=
+noncomputable def agOp {S : Type u} (T : TransSystem S) (φ : StateProp S) : StateProp S :=
   ctlForAll T (alwaysOp φ)
 
 /-- EF: exists a path, eventually. -/
-def efOp {S : Type u} (T : TransSystem S) (φ : StateProp S) : StateProp S :=
+noncomputable def efOp {S : Type u} (T : TransSystem S) (φ : StateProp S) : StateProp S :=
   ctlExists T (eventuallyOp φ)
 
 /-- AG implies current state. -/
@@ -191,11 +191,11 @@ theorem ef_monotone {S : Type u} (T : TransSystem S) (φ ψ : StateProp S)
 /-! ## Fairness -/
 
 /-- Strong fairness: if φ is enabled infinitely often, it occurs infinitely often. -/
-def strongFairness {S : Type u} (enabled occurs : StateProp S) (σ : Trace S) : Prop :=
+noncomputable def strongFairness {S : Type u} (enabled occurs : StateProp S) (σ : Trace S) : Prop :=
   (∀ i, eventuallyOp enabled σ i) → (∀ i, eventuallyOp occurs σ i)
 
 /-- Weak fairness: if φ is always eventually enabled, it occurs infinitely often. -/
-def weakFairness {S : Type u} (enabled occurs : StateProp S) (σ : Trace S) : Prop :=
+noncomputable def weakFairness {S : Type u} (enabled occurs : StateProp S) (σ : Trace S) : Prop :=
   alwaysOp enabled σ 0 → (∀ i, eventuallyOp occurs σ i)
 
 /-- Strong fairness implies weak fairness. -/
@@ -210,7 +210,7 @@ theorem strong_implies_weak_fairness {S : Type u}
 /-! ## Path-based Model Checking -/
 
 /-- Path for state proposition congruence along state paths. -/
-def stateProp_congrArg {S : Type u} (φ : StateProp S)
+noncomputable def stateProp_congrArg {S : Type u} (φ : StateProp S)
     (s₁ s₂ : S) (p : Path s₁ s₂) :
     Path (φ s₁) (φ s₂) :=
   Path.congrArg φ p
@@ -224,18 +224,18 @@ theorem transport_stateProp {S : Type u} (φ : StateProp S)
     cases proof; simp [Path.transport]
 
 /-- Trans path for temporal composition. -/
-def temporal_trans_path {S : Type u} (s₁ s₂ s₃ : S)
+noncomputable def temporal_trans_path {S : Type u} (s₁ s₂ s₃ : S)
     (p : Path s₁ s₂) (q : Path s₂ s₃) :
     Path s₁ s₃ :=
   Path.trans p q
 
 /-- Symm path for temporal reversal. -/
-def temporal_symm_path {S : Type u} (s₁ s₂ : S) (p : Path s₁ s₂) :
+noncomputable def temporal_symm_path {S : Type u} (s₁ s₂ : S) (p : Path s₁ s₂) :
     Path s₂ s₁ :=
   Path.symm p
 
 /-- CongrArg on transition system traces. -/
-def trace_congrArg_path {S : Type u} (φ : StateProp S)
+noncomputable def trace_congrArg_path {S : Type u} (φ : StateProp S)
     (σ₁ σ₂ : Trace S) (i : Nat) (p : Path (σ₁ i) (σ₂ i)) :
     Path (φ (σ₁ i)) (φ (σ₂ i)) :=
   Path.congrArg φ p
@@ -248,7 +248,7 @@ theorem always_shift {S : Type u} (φ : StateProp S)
   exact h k (Nat.le_trans hij hk)
 
 /-- Trace suffix path. -/
-def traceSuffix {S : Type u} (σ : Trace S) (k : Nat) : Trace S :=
+noncomputable def traceSuffix {S : Type u} (σ : Trace S) (k : Nat) : Trace S :=
   fun i => σ (k + i)
 
 /-- Valid trace suffix is valid. -/

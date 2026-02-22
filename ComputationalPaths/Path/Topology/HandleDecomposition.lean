@@ -49,12 +49,12 @@ structure Handle (n : Nat) where
   cocore : Type u
 
 /-- A 0-handle is a ball D^n. -/
-def zeroHandle (n : Nat) (ball : Type u) : Handle n :=
+noncomputable def zeroHandle (n : Nat) (ball : Type u) : Handle n :=
   { index := 0, index_le := Nat.zero_le n,
     core := PUnit, cocore := ball }
 
 /-- An n-handle is a ball D^n attached along the full boundary. -/
-def topHandle (n : Nat) (ball : Type u) : Handle n :=
+noncomputable def topHandle (n : Nat) (ball : Type u) : Handle n :=
   { index := n, index_le := Nat.le_refl n,
     core := ball, cocore := PUnit }
 
@@ -124,7 +124,7 @@ structure HandleSlide (n : Nat) where
   handle_count_preserved : Path before.handles.length after.handles.length
 
 /-- Handle slides preserve the diffeomorphism type. -/
-def slide_preserves (n : Nat) (s : HandleSlide n) :
+noncomputable def slide_preserves (n : Nat) (s : HandleSlide n) :
     Path s.before.manifold s.after.manifold :=
   s.diffeo
 
@@ -146,7 +146,7 @@ structure HandleCancellation (n : Nat) where
   diffeo : Path before.manifold after.manifold
 
 /-- Handle cancellation preserves the manifold. -/
-def cancel_preserves (n : Nat) (c : HandleCancellation n) :
+noncomputable def cancel_preserves (n : Nat) (c : HandleCancellation n) :
     Path c.before.manifold c.after.manifold :=
   c.diffeo
 
@@ -182,7 +182,7 @@ structure HCobordismTheorem where
   boundaries_diffeo : Path cobordism.lowerBound cobordism.upperBound
 
 /-- The h-cobordism theorem implies boundary diffeomorphism. -/
-def hcobordism_diffeo (H : HCobordismTheorem) :
+noncomputable def hcobordism_diffeo (H : HCobordismTheorem) :
     Path H.cobordism.lowerBound H.cobordism.upperBound :=
   H.boundaries_diffeo
 
@@ -200,7 +200,7 @@ structure HandleEuler (n : Nat) (D : Decomposition n) where
                 (List.range (n + 1))))
 
 /-- The Euler characteristic from handles is a topological invariant. -/
-def handle_euler_eq (n : Nat) (D : Decomposition n) (H : HandleEuler n D) :
+noncomputable def handle_euler_eq (n : Nat) (D : Decomposition n) (H : HandleEuler n D) :
     Int := H.euler
 
 

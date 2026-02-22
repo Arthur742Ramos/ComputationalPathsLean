@@ -136,7 +136,7 @@ structure AtiyahSingerTheorem (D : EllipticOperator) where
   index_theorem : Path analyticIndex.index topologicalData.topIndex
 
 /-- The Atiyah-Singer theorem holds for all elliptic operators. -/
-def atiyahSinger_holds (D : EllipticOperator)
+noncomputable def atiyahSinger_holds (D : EllipticOperator)
     (AS : AtiyahSingerTheorem D) :
     Path AS.analyticIndex.index AS.topologicalData.topIndex :=
   AS.index_theorem

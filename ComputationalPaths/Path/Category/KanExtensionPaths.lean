@@ -27,10 +27,10 @@ structure KanPEF (A : Type u) where
 namespace KanPEF
 variable {A : Type u}
 
-def id : KanPEF A where
+noncomputable def id : KanPEF A where
   obj a := a; mp p := p; mp_refl _ := rfl; mp_trans _ _ := rfl
 
-def comp (F G : KanPEF A) : KanPEF A where
+noncomputable def comp (F G : KanPEF A) : KanPEF A where
   obj a := G.obj (F.obj a)
   mp p := G.mp (F.mp p)
   mp_refl a := by show G.mp (F.mp (Path.refl a)) = _; rw [F.mp_refl, G.mp_refl]
@@ -50,11 +50,11 @@ structure KanNT {A : Type u} (F G : KanPEF A) where
 namespace KanNT
 variable {A : Type u}
 
-def idNT (F : KanPEF A) : KanNT F F where
+noncomputable def idNT (F : KanPEF A) : KanNT F F where
   cmp a := Path.refl (F.obj a)
   nat _ := by simp
 
-def vcomp {F G H : KanPEF A} (η : KanNT F G) (θ : KanNT G H) : KanNT F H where
+noncomputable def vcomp {F G H : KanPEF A} (η : KanNT F G) (θ : KanNT G H) : KanNT F H where
   cmp a := Path.trans (η.cmp a) (θ.cmp a)
   nat p := by
     rw [← Path.trans_assoc, η.nat p, Path.trans_assoc, θ.nat p, ← Path.trans_assoc]
@@ -75,7 +75,7 @@ namespace LKE
 variable {A : Type u}
 
 /-- Left Kan extension along the identity is F itself. -/
-def alongId (F : KanPEF A) : LKE KanPEF.id F where
+noncomputable def alongId (F : KanPEF A) : LKE KanPEF.id F where
   Lan := F
   η := {
     cmp := fun a =>
@@ -98,7 +98,7 @@ theorem alongId_unique_obj (F : KanPEF A) (e : LKE KanPEF.id F)
     (alongId F).Lan.obj a = e.Lan.obj a := (hobj a).symm
 
 /-- Composition of left Kan extensions. -/
-def compLKE {K K' F : KanPEF A} (e₁ : LKE K F) (e₂ : LKE K' e₁.Lan) :
+noncomputable def compLKE {K K' F : KanPEF A} (e₁ : LKE K F) (e₂ : LKE K' e₁.Lan) :
     LKE (KanPEF.comp K K') F where
   Lan := e₂.Lan
   η := {
@@ -143,7 +143,7 @@ namespace RKE
 variable {A : Type u}
 
 /-- Right Kan extension along the identity is F itself. -/
-def alongId (F : KanPEF A) : RKE KanPEF.id F where
+noncomputable def alongId (F : KanPEF A) : RKE KanPEF.id F where
   Ran := F
   ε := {
     cmp := fun a =>
@@ -165,7 +165,7 @@ theorem alongId_unique_obj (F : KanPEF A) (e : RKE KanPEF.id F)
     (alongId F).Ran.obj a = e.Ran.obj a := (hobj a).symm
 
 /-- Composition of right Kan extensions. -/
-def compRKE {K K' F : KanPEF A} (e₁ : RKE K F) (e₂ : RKE K' e₁.Ran) :
+noncomputable def compRKE {K K' F : KanPEF A} (e₁ : RKE K F) (e₂ : RKE K' e₁.Ran) :
     RKE (KanPEF.comp K K') F where
   Ran := e₂.Ran
   ε := {
@@ -215,7 +215,7 @@ structure PointwiseLKE {A : Type u} (K F : KanPEF A) where
 namespace PointwiseLKE
 variable {A : Type u}
 
-def fromAlongId (F : KanPEF A) : PointwiseLKE KanPEF.id F where
+noncomputable def fromAlongId (F : KanPEF A) : PointwiseLKE KanPEF.id F where
   ext := LKE.alongId F
   pointwise a := ⟨F.obj a, rfl⟩
 
@@ -230,7 +230,7 @@ structure PointwiseRKE {A : Type u} (K F : KanPEF A) where
 namespace PointwiseRKE
 variable {A : Type u}
 
-def fromAlongId (F : KanPEF A) : PointwiseRKE KanPEF.id F where
+noncomputable def fromAlongId (F : KanPEF A) : PointwiseRKE KanPEF.id F where
   ext := RKE.alongId F
   pointwise a := ⟨F.obj a, rfl⟩
 

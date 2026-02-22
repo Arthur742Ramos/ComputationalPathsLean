@@ -30,7 +30,7 @@ structure IsContr (A : Type u) where
   contr : (a : A) → Path center a
 
 /-- Path between any two elements of a contractible type. -/
-def isContr_connect (h : IsContr A) (a b : A) : Path a b :=
+noncomputable def isContr_connect (h : IsContr A) (a b : A) : Path a b :=
   Path.trans (Path.symm (h.contr a)) (h.contr b)
 
 /-- The connecting path through the center factors via trans and symm. -/
@@ -40,7 +40,7 @@ theorem isContr_connect_toEq (h : IsContr A) (a b : A) :
   rfl
 
 /-- Contractibility is preserved along a retraction. -/
-def isContr_of_retract {f : A → B} {g : B → A}
+noncomputable def isContr_of_retract {f : A → B} {g : B → A}
     (retr : ∀ b, Path (f (g b)) b)
     (hA : IsContr A) : IsContr B where
   center := f hA.center
@@ -48,12 +48,12 @@ def isContr_of_retract {f : A → B} {g : B → A}
     Path.trans (congrArg f (hA.contr (g b))) (retr b)
 
 /-- Unit is contractible. -/
-def unitIsContr : IsContr Unit where
+noncomputable def unitIsContr : IsContr Unit where
   center := ()
   contr := fun () => refl ()
 
 /-- PUnit is contractible. -/
-def punitIsContr : IsContr PUnit where
+noncomputable def punitIsContr : IsContr PUnit where
   center := PUnit.unit
   contr := fun u => by cases u; exact refl PUnit.unit
 
@@ -64,15 +64,15 @@ structure IsProp (A : Type u) where
   allPaths : (a b : A) → Path a b
 
 /-- A contractible type is a proposition. -/
-def isContr_isProp (h : IsContr A) : IsProp A where
+noncomputable def isContr_isProp (h : IsContr A) : IsProp A where
   allPaths := fun a b => isContr_connect h a b
 
 /-- PUnit is a proposition. -/
-def punitIsProp : IsProp PUnit where
+noncomputable def punitIsProp : IsProp PUnit where
   allPaths := fun u₁ u₂ => by cases u₁; cases u₂; exact refl PUnit.unit
 
 /-- A proposition with an element is contractible. -/
-def isProp_inhabited_isContr (h : IsProp A) (a : A) : IsContr A where
+noncomputable def isProp_inhabited_isContr (h : IsProp A) (a : A) : IsContr A where
   center := a
   contr := h.allPaths a
 
@@ -89,23 +89,23 @@ structure IsSet (A : Type u) where
   proofEq : {a b : A} → (p q : Path a b) → p.toEq = q.toEq
 
 /-- A proposition is a set. -/
-def isProp_isSet : IsSet A where
+noncomputable def isProp_isSet : IsSet A where
   proofEq := fun _ _ => Subsingleton.elim _ _
 
 /-- Nat is a set. -/
-def natIsSet : IsSet Nat where
+noncomputable def natIsSet : IsSet Nat where
   proofEq := fun _ _ => Subsingleton.elim _ _
 
 /-- Bool is a set. -/
-def boolIsSet : IsSet Bool where
+noncomputable def boolIsSet : IsSet Bool where
   proofEq := fun _ _ => Subsingleton.elim _ _
 
 /-- Unit is a set. -/
-def unitIsSet : IsSet Unit where
+noncomputable def unitIsSet : IsSet Unit where
   proofEq := fun _ _ => Subsingleton.elim _ _
 
 /-- Empty is a set. -/
-def emptyIsSet : IsSet Empty where
+noncomputable def emptyIsSet : IsSet Empty where
   proofEq := fun _ _ => Subsingleton.elim _ _
 
 /-! ## n-types -/
@@ -115,11 +115,11 @@ inductive TruncLevel : Type where
   | minus2 : TruncLevel
   | succ : TruncLevel → TruncLevel
 
-def TruncLevel.minus1 : TruncLevel := TruncLevel.succ TruncLevel.minus2
-def TruncLevel.zero : TruncLevel := TruncLevel.succ TruncLevel.minus1
+noncomputable def TruncLevel.minus1 : TruncLevel := TruncLevel.succ TruncLevel.minus2
+noncomputable def TruncLevel.zero : TruncLevel := TruncLevel.succ TruncLevel.minus1
 
 /-- Propositional n-truncation using Lean equality at each level. -/
-def IsTruncProp : TruncLevel → Type u → Prop
+noncomputable def IsTruncProp : TruncLevel → Type u → Prop
   | TruncLevel.minus2, A => Nonempty (IsContr A)
   | TruncLevel.succ _, A => ∀ (a b : A), a = b → True
 
@@ -146,24 +146,24 @@ structure IsConnected (A : Type u) where
   conn : (a b : A) → Path a b
 
 /-- A contractible type is connected. -/
-def isContr_isConnected (h : IsContr A) : IsConnected A where
+noncomputable def isContr_isConnected (h : IsContr A) : IsConnected A where
   inhab := h.center
   conn := fun a b => isContr_connect h a b
 
 /-- Unit is connected. -/
-def unitIsConnected : IsConnected Unit where
+noncomputable def unitIsConnected : IsConnected Unit where
   inhab := ()
   conn := fun () () => refl ()
 
 /-- PUnit is connected. -/
-def punitIsConnected : IsConnected PUnit where
+noncomputable def punitIsConnected : IsConnected PUnit where
   inhab := PUnit.unit
   conn := fun u₁ u₂ => by cases u₁; cases u₂; exact refl PUnit.unit
 
 /-! ## Truncation operations -/
 
 /-- Product of contractible types is contractible. -/
-def prod_isContr (hA : IsContr A) (hB : IsContr B) :
+noncomputable def prod_isContr (hA : IsContr A) (hB : IsContr B) :
     IsContr (A × B) where
   center := (hA.center, hB.center)
   contr := fun (a, b) =>
@@ -171,28 +171,28 @@ def prod_isContr (hA : IsContr A) (hB : IsContr B) :
               (congrArg (Prod.mk a ·) (hB.contr b))
 
 /-- Product of propositions is a proposition. -/
-def prod_isProp (hA : IsProp A) (hB : IsProp B) :
+noncomputable def prod_isProp (hA : IsProp A) (hB : IsProp B) :
     IsProp (A × B) where
   allPaths := fun (a₁, b₁) (a₂, b₂) =>
     Path.trans (congrArg (Prod.mk · b₁) (hA.allPaths a₁ a₂))
               (congrArg (Prod.mk a₂ ·) (hB.allPaths b₁ b₂))
 
 /-- Product of sets is a set. -/
-def prod_isSet : IsSet (A × B) where
+noncomputable def prod_isSet : IsSet (A × B) where
   proofEq := fun _ _ => Subsingleton.elim _ _
 
 /-- Function type into a proposition is a proposition. -/
-def fun_isProp (hB : IsProp B) : IsProp (A → B) where
+noncomputable def fun_isProp (hB : IsProp B) : IsProp (A → B) where
   allPaths := fun f g =>
     Path.mk [Step.mk _ _ (funext fun a => (hB.allPaths (f a) (g a)).proof)]
       (funext fun a => (hB.allPaths (f a) (g a)).proof)
 
 /-- Function type into a set is a set. -/
-def fun_isSet : IsSet (A → B) where
+noncomputable def fun_isSet : IsSet (A → B) where
   proofEq := fun _ _ => Subsingleton.elim _ _
 
 /-- Transport preserves contractibility. -/
-def transport_isContr {D : A → Type v} {a b : A}
+noncomputable def transport_isContr {D : A → Type v} {a b : A}
     (p : Path a b) (h : IsContr (D a)) : IsContr (D b) where
   center := Path.transport p h.center
   contr := fun x => by
@@ -201,7 +201,7 @@ def transport_isContr {D : A → Type v} {a b : A}
     exact h.contr x
 
 /-- Transport preserves propositions. -/
-def transport_isProp {D : A → Type v} {a b : A}
+noncomputable def transport_isProp {D : A → Type v} {a b : A}
     (p : Path a b) (h : IsProp (D a)) : IsProp (D b) where
   allPaths := fun x y => by
     have hp := p.proof
@@ -209,7 +209,7 @@ def transport_isProp {D : A → Type v} {a b : A}
     exact h.allPaths x y
 
 /-- Sigma type over a contractible base is contractible. -/
-def sigma_isContr {B : A → Type v}
+noncomputable def sigma_isContr {B : A → Type v}
     (hA : IsContr A) (hB : IsContr (B hA.center)) :
     IsContr ((a : A) × B a) where
   center := ⟨hA.center, hB.center⟩

@@ -64,7 +64,7 @@ structure VCategory where
 
 /-- Path-enriched category: the canonical V-category where hom-objects
     are computational paths and composition is `Path.trans`. -/
-def pathVCategory (A : Type u) : VCategory where
+noncomputable def pathVCategory (A : Type u) : VCategory where
   Obj := A
   Hom := fun a b => Path a b
   comp := fun f g => Path.trans g f
@@ -88,14 +88,14 @@ structure VFunctor (C D : VCategory) where
   map_id : (a : C.Obj) → mapHom (C.id a) = D.id (obj a)
 
 /-- Identity V-functor. -/
-def VFunctor.identity (C : VCategory) : VFunctor C C where
+noncomputable def VFunctor.identity (C : VCategory) : VFunctor C C where
   obj := fun a => a
   mapHom := fun f => f
   map_comp := fun _ _ => rfl
   map_id := fun _ => rfl
 
 /-- Composition of V-functors. -/
-def VFunctor.comp {C D E : VCategory}
+noncomputable def VFunctor.comp {C D E : VCategory}
     (G : VFunctor D E) (F : VFunctor C D) : VFunctor C E where
   obj := fun a => G.obj (F.obj a)
   mapHom := fun f => G.mapHom (F.mapHom f)
@@ -118,13 +118,13 @@ structure VNatTrans {C D : VCategory} (F G : VFunctor C D) where
     D.comp (component b) (F.mapHom f)
 
 /-- Identity natural transformation. -/
-def VNatTrans.identity {C D : VCategory} (F : VFunctor C D) :
+noncomputable def VNatTrans.identity {C D : VCategory} (F : VFunctor C D) :
     VNatTrans F F where
   component := fun a => D.id (F.obj a)
   naturality := fun f => by simp [D.left_unit, D.right_unit]
 
 /-- Vertical composition of natural transformations. -/
-def VNatTrans.vcomp {C D : VCategory} {F G H : VFunctor C D}
+noncomputable def VNatTrans.vcomp {C D : VCategory} {F G H : VFunctor C D}
     (β : VNatTrans G H) (α : VNatTrans F G) : VNatTrans F H where
   component := fun a => D.comp (β.component a) (α.component a)
   naturality := fun f => by
@@ -213,7 +213,7 @@ structure DayConvolution (C : VCategory) where
     C.Hom (tensor (tensor a b) c) (tensor a (tensor b c))
 
 /-- The convolution product of two "presheaves" (functions to types). -/
-def dayProduct {C : VCategory} (D : DayConvolution C)
+noncomputable def dayProduct {C : VCategory} (D : DayConvolution C)
     (F G : C.Obj → Type u) : C.Obj → Type u :=
   fun x => Σ (ab : C.Obj × C.Obj),
     C.Hom x (D.tensor ab.1 ab.2) × F ab.1 × G ab.2
@@ -222,7 +222,7 @@ def dayProduct {C : VCategory} (D : DayConvolution C)
 
 /-- The enriched Yoneda embedding sends an object to its representable
     presheaf. -/
-def enrichedYoneda (C : VCategory) : C.Obj → (C.Obj → Type u) :=
+noncomputable def enrichedYoneda (C : VCategory) : C.Obj → (C.Obj → Type u) :=
   fun a => fun b => C.Hom b a
 
 /-- The Yoneda lemma: natural transformations from the representable
@@ -246,7 +246,7 @@ structure EnrichedYoneda (C : VCategory) where
     (x : F a) → forward (backward act x) = x
 
 /-- Construct the enriched Yoneda structure for a V-category. -/
-def mkEnrichedYoneda (C : VCategory) : EnrichedYoneda C where
+noncomputable def mkEnrichedYoneda (C : VCategory) : EnrichedYoneda C where
   forward := fun α => α _ (C.id _)
   forward_def := fun _ => rfl
   backward := fun act x _b f => act f x
@@ -348,10 +348,10 @@ structure WeightedColimit (C : VCategory) (D : WeightedDiagram C) where
   cocone : WeightedCocone C D
   isUniversal : True
 
-def HasWeightedLimits (C : VCategory) : Prop :=
+noncomputable def HasWeightedLimits (C : VCategory) : Prop :=
   ∀ D : WeightedDiagram C, Nonempty (WeightedLimit C D)
 
-def HasWeightedColimits (C : VCategory) : Prop :=
+noncomputable def HasWeightedColimits (C : VCategory) : Prop :=
   ∀ D : WeightedDiagram C, Nonempty (WeightedColimit C D)
 
 /-! ## Enriched Yoneda and Adjunctions -/
@@ -404,10 +404,10 @@ structure EnrichedDayConvolution (C : VCategory) where
   convolution : DayConvolution C
   closedUnderConvolution : True
 
-def dayConvolutionUnit {C : VCategory} (D : EnrichedDayConvolution C) : C.Obj :=
+noncomputable def dayConvolutionUnit {C : VCategory} (D : EnrichedDayConvolution C) : C.Obj :=
   D.convolution.unit
 
-def dayConvolutionTensor {C : VCategory} (D : EnrichedDayConvolution C) :
+noncomputable def dayConvolutionTensor {C : VCategory} (D : EnrichedDayConvolution C) :
     C.Obj → C.Obj → C.Obj :=
   D.convolution.tensor
 
@@ -509,10 +509,10 @@ theorem ends_coends_interact_with_day_convolution {C : VCategory}
 
 /-! ## Computational-path enrichment integration -/
 
-def enrichedHomPathSpace {C : VCategory} (x y : C.Obj) : Type u :=
+noncomputable def enrichedHomPathSpace {C : VCategory} (x y : C.Obj) : Type u :=
   Path x y
 
-def enrichedComposeAsPath {C : VCategory} {x y z : C.Obj}
+noncomputable def enrichedComposeAsPath {C : VCategory} {x y z : C.Obj}
     (p : enrichedHomPathSpace x y) (q : enrichedHomPathSpace y z) :
     enrichedHomPathSpace x z :=
   Path.trans p q
@@ -536,19 +536,19 @@ def enrichedComposeAsPath {C : VCategory} {x y z : C.Obj}
     enrichedComposeAsPath p (Path.refl y) = p := by
   simpa [enrichedComposeAsPath] using Path.trans_refl_right p
 
-def enrichedYonedaPathRepresentable {C : VCategory} (x : C.Obj) :
+noncomputable def enrichedYonedaPathRepresentable {C : VCategory} (x : C.Obj) :
     (y : C.Obj) → Type u :=
   fun y => enrichedHomPathSpace y x
 
-def enrichedYonedaRepresenter {C : VCategory} (x : C.Obj) :
+noncomputable def enrichedYonedaRepresenter {C : VCategory} (x : C.Obj) :
     enrichedYonedaPathRepresentable x x :=
   Path.refl x
 
-def enrichedHomRewrite {C : VCategory} {x y : C.Obj}
+noncomputable def enrichedHomRewrite {C : VCategory} {x y : C.Obj}
     (p q : enrichedHomPathSpace x y) : Prop :=
   Path.toEq p = Path.toEq q
 
-def enrichedHomRewriteConfluent {C : VCategory} {x y : C.Obj} : Prop :=
+noncomputable def enrichedHomRewriteConfluent {C : VCategory} {x y : C.Obj} : Prop :=
   ∀ p q r : enrichedHomPathSpace x y,
     enrichedHomRewrite p q → enrichedHomRewrite p r →
       ∃ s : enrichedHomPathSpace x y,

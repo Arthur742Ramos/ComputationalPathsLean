@@ -90,7 +90,7 @@ noncomputable def intersect_comm_cancel_rweq (x y : R) :
 end ChowRingPathData
 
 /-- Trivial Chow-ring path package on `Nat`. -/
-def trivialChowRingPathData : ChowRingPathData Nat where
+noncomputable def trivialChowRingPathData : ChowRingPathData Nat where
   zero := 0
   add := Nat.add
   mul := Nat.mul

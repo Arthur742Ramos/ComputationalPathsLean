@@ -56,7 +56,7 @@ abbrev zero : TruncLevel := nonneg 0
 abbrev one : TruncLevel := nonneg 1
 
 /-- Successor on truncation levels (HoTT: n maps to n+1). -/
-def succ : TruncLevel → TruncLevel
+noncomputable def succ : TruncLevel → TruncLevel
   | negOne => nonneg 0
   | nonneg n => nonneg (n + 1)
 

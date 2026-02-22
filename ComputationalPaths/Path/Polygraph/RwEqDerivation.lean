@@ -46,43 +46,43 @@ inductive RwEqDeriv : Expr → Expr → Type where
 namespace RwEqDeriv
 
 /-- Vertical composition of derivations. -/
-@[simp] def vcomp {p q r : Expr}
+@[simp] noncomputable def vcomp {p q r : Expr}
     (d₁ : RwEqDeriv p q) (d₂ : RwEqDeriv q r) : RwEqDeriv p r :=
   .trans d₁ d₂
 
 /-- Horizontal transport under `symm`. -/
-@[simp] def hsymm {p q : Expr} (d : RwEqDeriv p q) :
+@[simp] noncomputable def hsymm {p q : Expr} (d : RwEqDeriv p q) :
     RwEqDeriv (eSymm p) (eSymm q) :=
   match d with
   | .trans d₁ d₂ => .trans (hsymm d₁) (hsymm d₂)
   | d' => .symm_congr d'
 
 /-- Horizontal transport under right composition (`trans _ t`). -/
-@[simp] def htransLeft (t : Expr) {p q : Expr} (d : RwEqDeriv p q) :
+@[simp] noncomputable def htransLeft (t : Expr) {p q : Expr} (d : RwEqDeriv p q) :
     RwEqDeriv (eTrans p t) (eTrans q t) :=
   match d with
   | .trans d₁ d₂ => .trans (htransLeft t d₁) (htransLeft t d₂)
   | d' => .trans_congr_left t d'
 
 /-- Horizontal transport under left composition (`trans t _`). -/
-@[simp] def htransRight (t : Expr) {p q : Expr} (d : RwEqDeriv p q) :
+@[simp] noncomputable def htransRight (t : Expr) {p q : Expr} (d : RwEqDeriv p q) :
     RwEqDeriv (eTrans t p) (eTrans t q) :=
   match d with
   | .trans d₁ d₂ => .trans (htransRight t d₁) (htransRight t d₂)
   | d' => .trans_congr_right t d'
 
 /-- Horizontal composition in a `trans` context. -/
-@[simp] def hcomp {p p' q q' : Expr}
+@[simp] noncomputable def hcomp {p p' q q' : Expr}
     (dp : RwEqDeriv p p') (dq : RwEqDeriv q q') :
     RwEqDeriv (eTrans p q) (eTrans p' q') :=
   vcomp (htransLeft q dp) (htransRight p' dq)
 
 /-- Two distinct derivations of the same rewrite fact. -/
-def deriv_refl_left : RwEqDeriv (eTrans eRefl eRefl) eRefl :=
+noncomputable def deriv_refl_left : RwEqDeriv (eTrans eRefl eRefl) eRefl :=
   .trans_refl_left eRefl
 
 /-- A second derivation of the same rewrite fact. -/
-def deriv_refl_right : RwEqDeriv (eTrans eRefl eRefl) eRefl :=
+noncomputable def deriv_refl_right : RwEqDeriv (eTrans eRefl eRefl) eRefl :=
   .trans_refl_right eRefl
 
 theorem deriv_refl_left_ne_right : deriv_refl_left ≠ deriv_refl_right := by

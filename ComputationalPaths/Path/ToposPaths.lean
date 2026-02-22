@@ -166,14 +166,14 @@ structure CPNatTrans {C D : CPCategory} (F G : CPFunctor C D) where
     Path (D.comp (F.onHom f) (component B)) (D.comp (component A) (G.onHom f))
 
 /-- Identity functor. -/
-def CPFunctor.idF (C : CPCategory) : CPFunctor C C where
+noncomputable def CPFunctor.idF (C : CPCategory) : CPFunctor C C where
   onObj := _root_.id
   onHom := _root_.id
   map_id := fun A => Path.refl (C.id A)
   map_comp := fun f g => Path.refl (C.comp f g)
 
 /-- Composite functor. -/
-def CPFunctor.compF {C D E : CPCategory} (F : CPFunctor C D) (G : CPFunctor D E) : CPFunctor C E where
+noncomputable def CPFunctor.compF {C D E : CPCategory} (F : CPFunctor C D) (G : CPFunctor D E) : CPFunctor C E where
   onObj := G.onObj ∘ F.onObj
   onHom := G.onHom ∘ F.onHom
   map_id := fun A => Path.trans (Path.congrArg G.onHom (F.map_id A)) (G.map_id (F.onObj A))

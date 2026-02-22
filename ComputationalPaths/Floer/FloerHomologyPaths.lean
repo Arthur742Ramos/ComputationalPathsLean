@@ -48,14 +48,14 @@ namespace FloerHomologyPathData
 variable {Gen : Type u} (F : FloerHomologyPathData Gen)
 
 /-- Composite path comparing continuation transport against PSS transport. -/
-def continuationToPSSPath (x : Gen) :
+noncomputable def continuationToPSSPath (x : Gen) :
     Path (F.continuation (F.differential x)) (F.differential (F.pss x)) :=
   Path.trans
     (F.continuationChainPath x)
     (Path.congrArg F.differential (F.continuationPSSPath x))
 
 /-- Step witness: right-unit normalization for differential-square coherence. -/
-def differentialSquare_step (x : Gen) :
+noncomputable def differentialSquare_step (x : Gen) :
     Path.Step
       (Path.trans (F.differentialSquarePath x) (Path.refl F.zero))
       (F.differentialSquarePath x) :=
@@ -68,7 +68,7 @@ noncomputable def differentialSquare_rweq (x : Gen) :
   rweq_of_step (F.differentialSquare_step x)
 
 /-- Step witness: right-unit normalization for continuation chain compatibility. -/
-def continuationChain_step (x : Gen) :
+noncomputable def continuationChain_step (x : Gen) :
     Path.Step
       (Path.trans (F.continuationChainPath x) (Path.refl (F.differential (F.continuation x))))
       (F.continuationChainPath x) :=
@@ -81,7 +81,7 @@ noncomputable def continuationChain_rweq (x : Gen) :
   rweq_of_step (F.continuationChain_step x)
 
 /-- Step witness: right-unit normalization for PSS chain compatibility. -/
-def pssChain_step (x : Gen) :
+noncomputable def pssChain_step (x : Gen) :
     Path.Step
       (Path.trans (F.pssChainPath x) (Path.refl (F.differential (F.pss x))))
       (F.pssChainPath x) :=
@@ -94,7 +94,7 @@ noncomputable def pssChain_rweq (x : Gen) :
   rweq_of_step (F.pssChain_step x)
 
 /-- Step witness: right-unit normalization for continuation-to-PSS transport. -/
-def continuationToPSS_step (x : Gen) :
+noncomputable def continuationToPSS_step (x : Gen) :
     Path.Step
       (Path.trans (F.continuationToPSSPath x) (Path.refl (F.differential (F.pss x))))
       (F.continuationToPSSPath x) :=
@@ -107,7 +107,7 @@ noncomputable def continuationToPSS_rweq (x : Gen) :
   rweq_of_step (F.continuationToPSS_step x)
 
 /-- Step witness: right-unit normalization for continuation/PSS comparison. -/
-def continuationPSS_step (x : Gen) :
+noncomputable def continuationPSS_step (x : Gen) :
     Path.Step
       (Path.trans (F.continuationPSSPath x) (Path.refl (F.pss x)))
       (F.continuationPSSPath x) :=
@@ -120,7 +120,7 @@ noncomputable def continuationPSS_rweq (x : Gen) :
   rweq_of_step (F.continuationPSS_step x)
 
 /-- Step witness: left-unit normalization for filtration compatibility. -/
-def filtration_step (x : Gen) :
+noncomputable def filtration_step (x : Gen) :
     Path.Step
       (Path.trans (Path.refl (F.actionLevel (F.continuation x))) (F.filtrationPath x))
       (F.filtrationPath x) :=
@@ -147,7 +147,7 @@ noncomputable def continuationToPSS_cancel_rweq (x : Gen) :
 end FloerHomologyPathData
 
 /-- Trivial model instantiating the Floer-homology computational-path interface. -/
-def trivialFloerHomologyPathData : FloerHomologyPathData PUnit where
+noncomputable def trivialFloerHomologyPathData : FloerHomologyPathData PUnit where
   zero := PUnit.unit
   differential := fun _ => PUnit.unit
   continuation := fun _ => PUnit.unit

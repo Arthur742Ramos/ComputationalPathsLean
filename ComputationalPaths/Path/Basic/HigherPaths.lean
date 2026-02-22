@@ -36,14 +36,14 @@ variable {A : Type u} {a b c d : A}
 abbrev Path2 (p q : Path a b) := p = q
 
 /-- Reflexive 2-path. -/
-def refl2 (p : Path a b) : Path2 p p := rfl
+noncomputable def refl2 (p : Path a b) : Path2 p p := rfl
 
 /-- Inverse 2-path. -/
-def symm2 {p q : Path a b} (α : Path2 p q) : Path2 q p :=
+noncomputable def symm2 {p q : Path a b} (α : Path2 p q) : Path2 q p :=
   α.symm
 
 /-- Vertical composition of 2-paths. -/
-def vcomp {p q r : Path a b} (α : Path2 p q) (β : Path2 q r) :
+noncomputable def vcomp {p q r : Path a b} (α : Path2 p q) (β : Path2 q r) :
     Path2 p r :=
   α.trans β
 
@@ -87,7 +87,7 @@ theorem symm2_vcomp {p q r : Path a b}
 
 /-- Horizontal composition of 2-paths: given `α : p₁ = p₂` and `β : q₁ = q₂`,
 produce `trans p₁ q₁ = trans p₂ q₂`. -/
-def hcomp {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+noncomputable def hcomp {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (α : Path2 p₁ p₂) (β : Path2 q₁ q₂) :
     Path2 (trans p₁ q₁) (trans p₂ q₂) := by
   cases α; cases β; rfl

@@ -31,7 +31,7 @@ universe u x
 /-! ## Pullback type -/
 
 /-- Pullback of a span `A → C ← B` as a dependent pair over `A × B`. -/
-def Pullback (A : Type u) (B : Type u) (C : Type u)
+noncomputable def Pullback (A : Type u) (B : Type u) (C : Type u)
     (f : A → C) (g : B → C) : Type u :=
   Sigma fun ab : A × B => Path (f ab.1) (g ab.2)
 
@@ -41,19 +41,19 @@ variable {A : Type u} {B : Type u} {C : Type u}
 variable {f : A → C} {g : B → C}
 
 /-- The underlying product pair of a pullback element. -/
-@[simp] def pair (x : Pullback A B C f g) : A × B := x.1
+@[simp] noncomputable def pair (x : Pullback A B C f g) : A × B := x.1
 
 /-- First projection from the pullback. -/
-@[simp] def fst (x : Pullback A B C f g) : A := x.1.1
+@[simp] noncomputable def fst (x : Pullback A B C f g) : A := x.1.1
 
 /-- Second projection from the pullback. -/
-@[simp] def snd (x : Pullback A B C f g) : B := x.1.2
+@[simp] noncomputable def snd (x : Pullback A B C f g) : B := x.1.2
 
 /-- The commuting path in the pullback. -/
-@[simp] def comm (x : Pullback A B C f g) : Path (f (fst x)) (g (snd x)) := x.2
+@[simp] noncomputable def comm (x : Pullback A B C f g) : Path (f (fst x)) (g (snd x)) := x.2
 
 /-- Constructor for pullback elements. -/
-def mk (a : A) (b : B) (h : Path (f a) (g b)) : Pullback A B C f g :=
+noncomputable def mk (a : A) (b : B) (h : Path (f a) (g b)) : Pullback A B C f g :=
   ⟨(a, b), h⟩
 
 @[simp] theorem pair_mk (a : A) (b : B) (h : Path (f a) (g b)) :
@@ -79,11 +79,11 @@ theorem mk_eta (x : Pullback A B C f g) :
 /-! ## Universal property -/
 
 /-- A pullback cone with vertex `X`. -/
-def Cone (X : Type x) : Type (max u x) :=
+noncomputable def Cone (X : Type x) : Type (max u x) :=
   Σ p : X → A, Σ q : X → B, ∀ x : X, Path (f (p x)) (g (q x))
 
 /-- The canonical lift into the pullback. -/
-def lift {X : Type x} (p : X → A) (q : X → B)
+noncomputable def lift {X : Type x} (p : X → A) (q : X → B)
     (h : ∀ x : X, Path (f (p x)) (g (q x))) :
     X → Pullback A B C f g :=
   fun x => mk (A := A) (B := B) (C := C) (f := f) (g := g) (p x) (q x) (h x)
@@ -101,17 +101,17 @@ def lift {X : Type x} (p : X → A) (q : X → B)
     comm (lift (A := A) (B := B) (C := C) (f := f) (g := g) p q h x) = h x := rfl
 
 /-- Extract the pullback cone from a map into the pullback. -/
-def coneMap {X : Type x} (k : X → Pullback A B C f g) : Cone (A := A) (B := B) (C := C)
+noncomputable def coneMap {X : Type x} (k : X → Pullback A B C f g) : Cone (A := A) (B := B) (C := C)
     (f := f) (g := g) X :=
   ⟨fun x => fst (k x), ⟨fun x => snd (k x), fun x => comm (k x)⟩⟩
 
 /-- Convert a pullback cone into the corresponding map. -/
-def coneInv {X : Type x} : Cone (A := A) (B := B) (C := C) (f := f) (g := g) X →
+noncomputable def coneInv {X : Type x} : Cone (A := A) (B := B) (C := C) (f := f) (g := g) X →
     X → Pullback A B C f g
   | ⟨p, ⟨q, h⟩⟩ => lift (A := A) (B := B) (C := C) (f := f) (g := g) p q h
 
 /-- Universal property: maps into the pullback are equivalent to pullback cones. -/
-def coneEquiv (X : Type x) :
+noncomputable def coneEquiv (X : Type x) :
     SimpleEquiv (X → Pullback A B C f g)
       (Cone (A := A) (B := B) (C := C) (f := f) (g := g) X) where
   toFun := coneMap (A := A) (B := B) (C := C) (f := f) (g := g)
@@ -131,7 +131,7 @@ def coneEquiv (X : Type x) :
 /-! ## Pullback path spaces -/
 
 /-- Pullback path space data between `x` and `y`. -/
-def PathSpace (x y : Pullback A B C f g) : Type u :=
+noncomputable def PathSpace (x y : Pullback A B C f g) : Type u :=
   Sigma fun p : Path (pair x) (pair y) =>
     Path
       (Path.transport (A := A × B)
@@ -139,12 +139,12 @@ def PathSpace (x y : Pullback A B C f g) : Type u :=
       (comm y)
 
 /-- Convert a pullback path into pullback path-space data. -/
-def pathToData {x y : Pullback A B C f g} (p : Path x y) : PathSpace (A := A) (B := B)
+noncomputable def pathToData {x y : Pullback A B C f g} (p : Path x y) : PathSpace (A := A) (B := B)
     (C := C) (f := f) (g := g) x y :=
   ⟨Path.sigmaFst p, Path.sigmaSnd p⟩
 
 /-- Assemble a pullback path from pullback path-space data. -/
-def pathFromData {x y : Pullback A B C f g} :
+noncomputable def pathFromData {x y : Pullback A B C f g} :
     PathSpace (A := A) (B := B) (C := C) (f := f) (g := g) x y → Path x y
   | ⟨p, q⟩ => Path.sigmaMk p q
 

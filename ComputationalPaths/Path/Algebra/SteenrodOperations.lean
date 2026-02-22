@@ -66,16 +66,16 @@ abbrev F2 : Type := Bool
 namespace F2
 
 /-- Addition in ℤ/2 is XOR. -/
-@[inline] def add (a b : F2) : F2 := xor a b
+@[inline] noncomputable def add (a b : F2) : F2 := xor a b
 
 /-- Multiplication in ℤ/2 is AND. -/
-@[inline] def mul (a b : F2) : F2 := a && b
+@[inline] noncomputable def mul (a b : F2) : F2 := a && b
 
 /-- Zero in ℤ/2. -/
-@[inline] def zero : F2 := false
+@[inline] noncomputable def zero : F2 := false
 
 /-- One in ℤ/2. -/
-@[inline] def one : F2 := true
+@[inline] noncomputable def one : F2 := true
 
 @[simp] theorem add_comm (a b : F2) : add a b = add b a := by
   cases a <;> cases b <;> rfl
@@ -117,11 +117,11 @@ namespace F2
   cases a <;> cases b <;> cases c <;> rfl
 
 /-- Path witnessing commutativity of F2 addition. -/
-def add_comm_path (a b : F2) : Path (add a b) (add b a) :=
+noncomputable def add_comm_path (a b : F2) : Path (add a b) (add b a) :=
   Path.stepChain (add_comm a b)
 
 /-- Path witnessing that every F2 element is its own inverse. -/
-def add_self_path (a : F2) : Path (add a a) zero :=
+noncomputable def add_self_path (a : F2) : Path (add a a) zero :=
   Path.stepChain (add_self a)
 
 end F2
@@ -163,12 +163,12 @@ variable (M : GradedF2Module)
   exact M.zero_add n x
 
 /-- Path witnessing that x + 0 = x in a graded module. -/
-def add_zero_path (n : Nat) (x : M.carrier n) :
+noncomputable def add_zero_path (n : Nat) (x : M.carrier n) :
     Path (M.add n x (M.zero n)) x :=
   Path.stepChain (M.add_zero n x)
 
 /-- Path witnessing x + x = 0 (characteristic 2). -/
-def add_self_path (n : Nat) (x : M.carrier n) :
+noncomputable def add_self_path (n : Nat) (x : M.carrier n) :
     Path (M.add n x x) (M.zero n) :=
   Path.stepChain (M.add_self n x)
 
@@ -206,7 +206,7 @@ theorem sq_above_zero (i n : Nat) (hi : i > n) (x : M.carrier n) :
   S.sq_above i n hi x
 
 /-- Path witnessing Sq^i vanishes above the degree. -/
-def sq_above_zero_path (i n : Nat) (hi : i > n) (x : M.carrier n) :
+noncomputable def sq_above_zero_path (i n : Nat) (hi : i > n) (x : M.carrier n) :
     Path (S.sq i n x) (M.zero (n + i)) :=
   Path.stepChain (S.sq_above i n hi x)
 
@@ -225,28 +225,28 @@ theorem sq_add_self (i n : Nat) (x : M.carrier n) :
   M.add_self (n + i) (S.sq i n x)
 
 /-- Path witnessing that Sq^0 acts as identity. -/
-def sq_zero_path (n : Nat) (x : M.carrier n) :
+noncomputable def sq_zero_path (n : Nat) (x : M.carrier n) :
     Path (S.sq 0 n x) (cast (congrArg M.carrier (Nat.add_zero n).symm) x) :=
   Path.stepChain (S.sq_zero_id n x)
 
 /-- Path witnessing Sq^i(0) = 0. -/
-def sq_zero_elem_path (i n : Nat) :
+noncomputable def sq_zero_elem_path (i n : Nat) :
     Path (S.sq i n (M.zero n)) (M.zero (n + i)) :=
   Path.stepChain (S.sq_map_zero i n)
 
 /-- Path witnessing additivity of Sq^i. -/
-def sq_add_path (i n : Nat) (x y : M.carrier n) :
+noncomputable def sq_add_path (i n : Nat) (x y : M.carrier n) :
     Path (S.sq i n (M.add n x y))
          (M.add (n + i) (S.sq i n x) (S.sq i n y)) :=
   Path.stepChain (S.sq_map_add i n x y)
 
 /-- Path witnessing Sq^i(x) + Sq^i(x) = 0 (char 2). -/
-def sq_add_self_path (i n : Nat) (x : M.carrier n) :
+noncomputable def sq_add_self_path (i n : Nat) (x : M.carrier n) :
     Path (M.add (n + i) (S.sq i n x) (S.sq i n x)) (M.zero (n + i)) :=
   Path.stepChain (M.add_self (n + i) (S.sq i n x))
 
 /-- Composite path: Sq^i(x + x) = Sq^i(x) + Sq^i(x) = 0. -/
-def sq_of_add_self_path (i n : Nat) (x : M.carrier n) :
+noncomputable def sq_of_add_self_path (i n : Nat) (x : M.carrier n) :
     Path (S.sq i n (M.add n x x)) (M.zero (n + i)) :=
   Path.trans (sq_add_path S i n x x) (sq_add_self_path S i n x)
 
@@ -264,13 +264,13 @@ We encode these as an algebraic relation on words in the generators.
 -/
 
 /-- Binomial coefficient. -/
-def binomial : Nat → Nat → Nat
+noncomputable def binomial : Nat → Nat → Nat
   | _,     0     => 1
   | 0,     _+1   => 0
   | n+1,   k+1   => binomial n k + binomial n (k + 1)
 
 /-- Binomial coefficient mod 2. -/
-def binomial_mod2 (n k : Nat) : F2 :=
+noncomputable def binomial_mod2 (n k : Nat) : F2 :=
   if binomial n k % 2 = 0 then F2.zero else F2.one
 
 theorem binomial_zero_right (n : Nat) : binomial n 0 = 1 := by
@@ -311,7 +311,7 @@ theorem binomial_self (n : Nat) : binomial n n = 1 := by
 abbrev AdemWord := List Nat
 
 /-- An admissible sequence: each consecutive pair satisfies i_j ≥ 2 · i_{j+1}. -/
-def admissible : AdemWord → Prop
+noncomputable def admissible : AdemWord → Prop
   | [] => True
   | [_] => True
   | a :: b :: rest => a ≥ 2 * b ∧ admissible (b :: rest)
@@ -323,7 +323,7 @@ theorem admissible_nil : admissible [] := trivial
 theorem admissible_singleton (i : Nat) : admissible [i] := trivial
 
 /-- The degree (excess) of an Adem word: sum of all indices. -/
-def ademDegree : AdemWord → Nat
+noncomputable def ademDegree : AdemWord → Nat
   | [] => 0
   | i :: rest => i + ademDegree rest
 
@@ -341,7 +341,7 @@ theorem ademDegree_append (w₁ w₂ : AdemWord) :
     omega
 
 /-- Path witnessing the additivity of degree under word concatenation. -/
-def ademDegree_append_path (w₁ w₂ : AdemWord) :
+noncomputable def ademDegree_append_path (w₁ w₂ : AdemWord) :
     Path (ademDegree (w₁ ++ w₂)) (ademDegree w₁ + ademDegree w₂) :=
   Path.stepChain (ademDegree_append w₁ w₂)
 
@@ -357,7 +357,7 @@ structure AdemRelation where
   hab : a < 2 * b
 
 /-- The left-hand side of an Adem relation: [a, b]. -/
-def AdemRelation.lhs (r : AdemRelation) : AdemWord := [r.a, r.b]
+noncomputable def AdemRelation.lhs (r : AdemRelation) : AdemWord := [r.a, r.b]
 
 /-- The degree of the LHS. -/
 theorem AdemRelation.degree_lhs (r : AdemRelation) :
@@ -365,7 +365,7 @@ theorem AdemRelation.degree_lhs (r : AdemRelation) :
   simp [AdemRelation.lhs, ademDegree]
 
 /-- Path witnessing the degree computation for an Adem LHS. -/
-def AdemRelation.degree_lhs_path (r : AdemRelation) :
+noncomputable def AdemRelation.degree_lhs_path (r : AdemRelation) :
     Path (ademDegree r.lhs) (r.a + r.b) :=
   Path.stepChain r.degree_lhs
 
@@ -386,13 +386,13 @@ structure F2LinComb where
 namespace F2LinComb
 
 /-- The zero linear combination. -/
-def zero : F2LinComb := ⟨[]⟩
+noncomputable def zero : F2LinComb := ⟨[]⟩
 
 /-- Addition: concatenate. -/
-def add (a b : F2LinComb) : F2LinComb := ⟨a.terms ++ b.terms⟩
+noncomputable def add (a b : F2LinComb) : F2LinComb := ⟨a.terms ++ b.terms⟩
 
 /-- A single basis element. -/
-def single (w : AdemWord) : F2LinComb := ⟨[w]⟩
+noncomputable def single (w : AdemWord) : F2LinComb := ⟨[w]⟩
 
 /-- Length of addition. -/
 theorem add_terms_length (a b : F2LinComb) :
@@ -400,7 +400,7 @@ theorem add_terms_length (a b : F2LinComb) :
   simp [add, List.length_append]
 
 /-- Path witnessing length additivity of `add`. -/
-def add_terms_length_path (a b : F2LinComb) :
+noncomputable def add_terms_length_path (a b : F2LinComb) :
     Path (add a b).terms.length (a.terms.length + b.terms.length) :=
   Path.stepChain (add_terms_length a b)
 
@@ -425,18 +425,18 @@ theorem steenrodRel_equiv : Equivalence SteenrodRel where
   trans := SteenrodRel.trans
 
 /-- The Steenrod algebra A₂ as a quotient. -/
-def SteenrodAlgebra : Type := Quot SteenrodRel
+noncomputable def SteenrodAlgebra : Type := Quot SteenrodRel
 
 namespace SteenrodAlgebra
 
 /-- The class of a linear combination. -/
-def mk (x : F2LinComb) : SteenrodAlgebra := Quot.mk _ x
+noncomputable def mk (x : F2LinComb) : SteenrodAlgebra := Quot.mk _ x
 
 /-- The zero element. -/
-def zero : SteenrodAlgebra := mk F2LinComb.zero
+noncomputable def zero : SteenrodAlgebra := mk F2LinComb.zero
 
 /-- Addition in the Steenrod algebra. -/
-def add (x y : SteenrodAlgebra) : SteenrodAlgebra :=
+noncomputable def add (x y : SteenrodAlgebra) : SteenrodAlgebra :=
   Quot.lift
     (fun a => Quot.lift
       (fun b => mk (F2LinComb.add a b))
@@ -450,17 +450,17 @@ def add (x y : SteenrodAlgebra) : SteenrodAlgebra :=
     x
 
 /-- The generator Sq^i. -/
-def sq (i : Nat) : SteenrodAlgebra := mk (F2LinComb.single [i])
+noncomputable def sq (i : Nat) : SteenrodAlgebra := mk (F2LinComb.single [i])
 
 /-- Sq^0 is the class of [0]. -/
 theorem sq_zero_unit : sq 0 = mk (F2LinComb.single [0]) := rfl
 
 /-- Path witnessing Sq^0 = mk(single [0]). -/
-def sq_zero_unit_path : Path (sq 0) (mk (F2LinComb.single [0])) :=
+noncomputable def sq_zero_unit_path : Path (sq 0) (mk (F2LinComb.single [0])) :=
   Path.refl _
 
 /-- Path witnessing that adding a generator to itself yields zero (char 2). -/
-def sq_char2_path (i : Nat) : Path (add (sq i) (sq i)) zero :=
+noncomputable def sq_char2_path (i : Nat) : Path (add (sq i) (sq i)) zero :=
   Path.stepChain (Quot.sound (SteenrodRel.char2 [i]))
 
 end SteenrodAlgebra
@@ -474,7 +474,7 @@ theorem cartan_trivial {M : GradedF2Module} (S : SteenrodData M)
   S.sq_map_zero k n
 
 /-- Path witnessing the Cartan formula for zero elements. -/
-def cartan_trivial_path {M : GradedF2Module} (S : SteenrodData M)
+noncomputable def cartan_trivial_path {M : GradedF2Module} (S : SteenrodData M)
     (k n : Nat) :
     Path (S.sq k n (M.zero n)) (M.zero (n + k)) :=
   Path.stepChain (S.sq_map_zero k n)
@@ -482,7 +482,7 @@ def cartan_trivial_path {M : GradedF2Module} (S : SteenrodData M)
 /-! ## Total Steenrod Square -/
 
 /-- The total Steenrod square components Sq^0, …, Sq^n. -/
-def totalSqComponents {M : GradedF2Module} (S : SteenrodData M)
+noncomputable def totalSqComponents {M : GradedF2Module} (S : SteenrodData M)
     (n : Nat) (x : M.carrier n) : (i : Fin (n + 1)) → M.carrier (n + i.val) :=
   fun i => S.sq i.val n x
 
@@ -495,18 +495,18 @@ theorem totalSq_zero_component {M : GradedF2Module} (S : SteenrodData M)
   exact S.sq_zero_id n x
 
 /-- Path witnessing the Sq^0 component of the total square. -/
-def totalSq_zero_component_path {M : GradedF2Module} (S : SteenrodData M)
+noncomputable def totalSq_zero_component_path {M : GradedF2Module} (S : SteenrodData M)
     (n : Nat) (x : M.carrier n) :
     Path (totalSqComponents S n x ⟨0, Nat.zero_lt_succ n⟩)
          (cast (congrArg M.carrier (Nat.add_zero n).symm) x) :=
   Path.stepChain (totalSq_zero_component S n x)
 
 /-- Path witnessing C(n, 0) = 1. -/
-def binomial_zero_right_path (n : Nat) : Path (binomial n 0) 1 :=
+noncomputable def binomial_zero_right_path (n : Nat) : Path (binomial n 0) 1 :=
   Path.stepChain (binomial_zero_right n)
 
 /-- Path witnessing C(n, n) = 1. -/
-def binomial_self_path (n : Nat) : Path (binomial n n) 1 :=
+noncomputable def binomial_self_path (n : Nat) : Path (binomial n n) 1 :=
   Path.stepChain (binomial_self n)
 
 end SteenrodOperations

@@ -47,11 +47,11 @@ namespace GroupAction
 variable {G : Type u} {X : Type v} {S : StrictGroup G}
 
 /-- Orbit of a point under a group action. -/
-def Orbit (A : GroupAction G S X) (x : X) : X → Prop :=
+noncomputable def Orbit (A : GroupAction G S X) (x : X) : X → Prop :=
   fun y => ∃ g : G, A.act g x = y
 
 /-- Stabilizer of a point: elements fixing it. -/
-def Stabilizer (A : GroupAction G S X) (x : X) : Subgroup G S where
+noncomputable def Stabilizer (A : GroupAction G S X) (x : X) : Subgroup G S where
   carrier := fun g => A.act g x = x
   one_mem := by
     simp [GroupAction.act_one']
@@ -104,7 +104,7 @@ namespace GroupAction
 variable {G : Type u} {X : Type v} {S : StrictGroup G}
 
 /-- Action by a fixed element as a function. -/
-@[simp] def actFun (A : GroupAction G S X) (g : G) : X → X :=
+@[simp] noncomputable def actFun (A : GroupAction G S X) (g : G) : X → X :=
   fun x => A.act g x
 
 /-- Action by a fixed element is invertible with inverse action. -/
@@ -116,7 +116,7 @@ variable {G : Type u} {X : Type v} {S : StrictGroup G}
     _ = x := by simp [S.mul_left_inv, A.act_one]
 
 /-- Action defines a monoid homomorphism into endomorphisms. -/
-@[simp] def actionHom (A : GroupAction G S X) :
+@[simp] noncomputable def actionHom (A : GroupAction G S X) :
     MonoidHom G (X → X) S.toStrictMonoid
       { mul := fun f g => fun x => f (g x)
         one := fun x => x
@@ -133,7 +133,7 @@ variable {G : Type u} {X : Type v} {S : StrictGroup G}
     simp [actFun, GroupAction.act_one']
 
 /-- Conjugation action of a strict group on itself. -/
-@[simp] def conjugationAction (S : StrictGroup G) : GroupAction G S G where
+@[simp] noncomputable def conjugationAction (S : StrictGroup G) : GroupAction G S G where
   act := fun g x => S.mul (S.mul g x) (S.inv g)
   act_one := by
     intro x
@@ -143,7 +143,7 @@ variable {G : Type u} {X : Type v} {S : StrictGroup G}
     simp [S.mul_assoc, StrictGroup.inv_mul_eq]
 
 /-- Product action on X × Y. -/
-@[simp] def productAction {X : Type v} {Y : Type w}
+@[simp] noncomputable def productAction {X : Type v} {Y : Type w}
     (A : GroupAction G S X) (B : GroupAction G S Y) : GroupAction G S (X × Y) where
   act := fun g xy => (A.act g xy.1, B.act g xy.2)
   act_one := by

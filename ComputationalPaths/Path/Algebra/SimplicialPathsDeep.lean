@@ -51,19 +51,19 @@ inductive Path : Simplex → Simplex → Type where
   | cons : Step s t → Path t u → Path s u
 
 /-- Theorem 1 — refl path (identity computation). -/
-def Path.refl (s : Simplex) : Path s s := Path.nil s
+noncomputable def Path.refl (s : Simplex) : Path s s := Path.nil s
 
 /-- Theorem 2 — single step lifted to a path. -/
-def Path.single (st : Step s t) : Path s t :=
+noncomputable def Path.single (st : Step s t) : Path s t :=
   Path.cons st (Path.nil _)
 
 /-- Theorem 3 — trans: sequential composition. -/
-def Path.trans : Path s t → Path t u → Path s u
+noncomputable def Path.trans : Path s t → Path t u → Path s u
   | Path.nil _, q => q
   | Path.cons st p, q => Path.cons st (Path.trans p q)
 
 /-- Step inversion. -/
-def Step.symm : Step s t → Step t s
+noncomputable def Step.symm : Step s t → Step t s
   | Step.face i s t      => Step.face i t s
   | Step.degen i s t     => Step.degen i t s
   | Step.compose s t     => Step.compose t s
@@ -74,12 +74,12 @@ def Step.symm : Step s t → Step t s
   | Step.coherence s t   => Step.coherence t s
 
 /-- Theorem 4 — symm: path inversion (groupoid inverse). -/
-def Path.symm : Path s t → Path t s
+noncomputable def Path.symm : Path s t → Path t s
   | Path.nil s => Path.nil s
   | Path.cons st p => Path.trans (Path.symm p) (Path.single (Step.symm st))
 
 /-- Path length. -/
-def Path.length : Path s t → Nat
+noncomputable def Path.length : Path s t → Nat
   | Path.nil _ => 0
   | Path.cons _ p => 1 + p.length
 
@@ -137,11 +137,11 @@ structure SimplicialMap (X Y : SimplicialSet) where
   map : (n : Dim) → X.cells n → Y.cells n
 
 /-- Identity simplicial map. -/
-def SimplicialMap.id (X : SimplicialSet) : SimplicialMap X X where
+noncomputable def SimplicialMap.id (X : SimplicialSet) : SimplicialMap X X where
   map _ x := x
 
 /-- Composition of simplicial maps. -/
-def SimplicialMap.comp {X Y Z : SimplicialSet}
+noncomputable def SimplicialMap.comp {X Y Z : SimplicialSet}
     (g : SimplicialMap Y Z) (f : SimplicialMap X Y) : SimplicialMap X Z where
   map n x := g.map n (f.map n x)
 
@@ -150,16 +150,16 @@ def SimplicialMap.comp {X Y Z : SimplicialSet}
 -- ============================================================
 
 /-- Face map step: d_i takes an (n+1)-simplex to an n-simplex. -/
-def faceStep (i : Nat) (src : Simplex) : Step src ⟨src.dim - 1, src.label + i⟩ :=
+noncomputable def faceStep (i : Nat) (src : Simplex) : Step src ⟨src.dim - 1, src.label + i⟩ :=
   Step.face i src ⟨src.dim - 1, src.label + i⟩
 
 /-- Degeneracy step: s_i takes an n-simplex to an (n+1)-simplex. -/
-def degenStep (i : Nat) (src : Simplex) : Step src ⟨src.dim + 1, src.label + i⟩ :=
+noncomputable def degenStep (i : Nat) (src : Simplex) : Step src ⟨src.dim + 1, src.label + i⟩ :=
   Step.degen i src ⟨src.dim + 1, src.label + i⟩
 
 /-- Simplicial identity witness: d_i ∘ d_j = d_{j+1} ∘ d_i when i ≤ j.
     Expressed as a coherence path between two composite face step sequences. -/
-def simplicialIdentity_dd (i j : Nat) (s : Simplex) (hij : i ≤ j) :
+noncomputable def simplicialIdentity_dd (i j : Nat) (s : Simplex) (hij : i ≤ j) :
     Path s s :=
   let mid1 : Simplex := ⟨s.dim - 1, s.label + j⟩
   let tgt  : Simplex := ⟨s.dim - 2, s.label + i + j⟩
@@ -181,7 +181,7 @@ theorem simplicialIdentity_dd_length (i j : Nat) (s : Simplex) (h : i ≤ j) :
   simp [simplicialIdentity_dd, Path.trans, Path.single, Path.symm, Path.length]
 
 /-- Simplicial identity witness: s_i ∘ s_j = s_{j+1} ∘ s_i when i ≤ j. -/
-def simplicialIdentity_ss (i j : Nat) (s : Simplex) (hij : i ≤ j) :
+noncomputable def simplicialIdentity_ss (i j : Nat) (s : Simplex) (hij : i ≤ j) :
     Path s s :=
   let mid1 : Simplex := ⟨s.dim + 1, s.label + j⟩
   let tgt  : Simplex := ⟨s.dim + 2, s.label + i + j⟩
@@ -200,7 +200,7 @@ theorem simplicialIdentity_ss_length (i j : Nat) (s : Simplex) (h : i ≤ j) :
   simp [simplicialIdentity_ss, Path.trans, Path.single, Path.symm, Path.length]
 
 /-- Mixed simplicial identity: d_i ∘ s_j when i < j. -/
-def simplicialIdentity_ds_lt (i j : Nat) (s : Simplex) (h : i < j) :
+noncomputable def simplicialIdentity_ds_lt (i j : Nat) (s : Simplex) (h : i < j) :
     Path s s :=
   let mid1 : Simplex := ⟨s.dim + 1, s.label + j⟩
   let tgt  : Simplex := ⟨s.dim, s.label + i + j⟩
@@ -219,7 +219,7 @@ theorem simplicialIdentity_ds_lt_length (i j : Nat) (s : Simplex) (h : i < j) :
   simp [simplicialIdentity_ds_lt, Path.trans, Path.single, Path.symm, Path.length]
 
 /-- Identity: d_i ∘ s_i = id (face cancels matching degeneracy). -/
-def simplicialIdentity_ds_eq (i : Nat) (s : Simplex) :
+noncomputable def simplicialIdentity_ds_eq (i : Nat) (s : Simplex) :
     Path s s :=
   let mid : Simplex := ⟨s.dim + 1, s.label + i⟩
   Path.trans
@@ -246,12 +246,12 @@ structure GeometricRealization where
   realizeStep : (st : Step s t) → Step (⟨(realize s).dim, 0⟩ : Simplex) ⟨(realize t).dim, 0⟩
 
 /-- The geometric realization of a face step lowers dimension. -/
-def geoFaceReduction (gr : GeometricRealization) (i : Nat) (s t : Simplex) :
+noncomputable def geoFaceReduction (gr : GeometricRealization) (i : Nat) (s t : Simplex) :
     Step (⟨(gr.realize s).dim, 0⟩ : Simplex) ⟨(gr.realize t).dim, 0⟩ :=
   gr.realizeStep (Step.face i s t)
 
 /-- Theorem 15 — geometric realization preserves path structure. -/
-def geoRealizePath (gr : GeometricRealization) :
+noncomputable def geoRealizePath (gr : GeometricRealization) :
     Path s t → Path (⟨(gr.realize s).dim, 0⟩ : Simplex) ⟨(gr.realize t).dim, 0⟩
   | Path.nil s => Path.nil _
   | Path.cons st p =>
@@ -294,7 +294,7 @@ structure HornFiller (h : Horn) where
 
 /-- Kan condition: every horn has a filler.
     Modeled as: from any horn config, a path leads to a filled simplex. -/
-def kanFillingPath (h : Horn) (hf : HornFiller h) : Path ⟨h.dim, h.slot⟩ hf.filler :=
+noncomputable def kanFillingPath (h : Horn) (hf : HornFiller h) : Path ⟨h.dim, h.slot⟩ hf.filler :=
   Path.single (Step.hornFill ⟨h.dim, h.slot⟩ hf.filler)
 
 /-- Theorem 18 — Kan filling path has length 1. -/
@@ -303,12 +303,12 @@ theorem kanFilling_length (h : Horn) (hf : HornFiller h) :
 
 /-- Inner Kan condition: horn filling for 0 < k < n.
     Quasi-categories use this weaker condition. -/
-def innerKanCondition (h : Horn) (hf : HornFiller h) (hk : 0 < h.slot ∧ h.slot < h.dim) :
+noncomputable def innerKanCondition (h : Horn) (hf : HornFiller h) (hk : 0 < h.slot ∧ h.slot < h.dim) :
     Path ⟨h.dim, h.slot⟩ hf.filler :=
   kanFillingPath h hf
 
 /-- Theorem 19 — inner Kan extends to full Kan via coherence. -/
-def kanExtension (h : Horn) (hf : HornFiller h) :
+noncomputable def kanExtension (h : Horn) (hf : HornFiller h) :
     Path ⟨h.dim, h.slot⟩ hf.filler :=
   Path.trans
     (Path.single (Step.coherence ⟨h.dim, h.slot⟩ ⟨h.dim, 0⟩))
@@ -321,7 +321,7 @@ theorem kanExtension_length (h : Horn) (hf : HornFiller h) :
     (kanExtension h hf).length = 2 := rfl
 
 /-- Theorem 21 — unique Kan filler (in a Kan complex, fillers agree up to path). -/
-def kanFillerUniqueness (h : Horn) (hf1 hf2 : HornFiller h)
+noncomputable def kanFillerUniqueness (h : Horn) (hf1 hf2 : HornFiller h)
     (heq : hf1.filler = hf2.filler) :
     Path hf1.filler hf2.filler :=
   heq ▸ Path.nil _
@@ -355,14 +355,14 @@ structure NerveSimplex where
 deriving Repr
 
 /-- Nerve dimension = chain length. -/
-def NerveSimplex.dim (ns : NerveSimplex) : Dim := ns.chain.length
+noncomputable def NerveSimplex.dim (ns : NerveSimplex) : Dim := ns.chain.length
 
 /-- The nerve face map: d_i drops the i-th object (composes morphisms i and i+1). -/
-def nerveFace (i : Nat) (ns : NerveSimplex) : NerveSimplex :=
+noncomputable def nerveFace (i : Nat) (ns : NerveSimplex) : NerveSimplex :=
   ⟨ns.chain.eraseIdx i⟩
 
 /-- The nerve degeneracy map: s_i inserts an identity at position i. -/
-def nerveDegen (cat : SmallCat) (i : Nat) (ns : NerveSimplex) (obj : CatObj) : NerveSimplex :=
+noncomputable def nerveDegen (cat : SmallCat) (i : Nat) (ns : NerveSimplex) (obj : CatObj) : NerveSimplex :=
   ⟨(ns.chain.take i) ++ [cat.idMor obj] ++ (ns.chain.drop i)⟩
 
 /-- Theorem 22 — face map decreases chain length. -/
@@ -378,12 +378,12 @@ theorem nerveDegen_length (cat : SmallCat) (i : Nat) (ns : NerveSimplex) (obj : 
   omega
 
 /-- Nerve face as a computational step. -/
-def nerveFaceStep (i : Nat) (ns : NerveSimplex) :
+noncomputable def nerveFaceStep (i : Nat) (ns : NerveSimplex) :
     Step ⟨ns.dim, 0⟩ ⟨(nerveFace i ns).dim, 0⟩ :=
   Step.nerve ⟨ns.dim, 0⟩ ⟨(nerveFace i ns).dim, 0⟩
 
 /-- Theorem 24 — nerve of a category is a Kan complex (2-out-of-3 filling). -/
-def nerveKanPath (ns : NerveSimplex) :
+noncomputable def nerveKanPath (ns : NerveSimplex) :
     Path ⟨ns.dim, 0⟩ ⟨ns.dim, 0⟩ :=
   Path.trans
     (Path.single (Step.nerve ⟨ns.dim, 0⟩ ⟨ns.dim + 1, 0⟩))
@@ -412,20 +412,20 @@ structure SingularSimplex (X : TopSpace) where
   map : Nat → X.points  -- continuous map Δ^n → X (simplified)
 
 /-- The singular complex maps topological data to simplicial data. -/
-def singularToSimplex (ss : SingularSimplex X) : Simplex :=
+noncomputable def singularToSimplex (ss : SingularSimplex X) : Simplex :=
   ⟨ss.dim, 0⟩
 
 /-- Face of a singular simplex via restriction. -/
-def singularFace (i : Nat) (ss : SingularSimplex X) : SingularSimplex X :=
+noncomputable def singularFace (i : Nat) (ss : SingularSimplex X) : SingularSimplex X :=
   ⟨ss.dim - 1, ss.map⟩
 
 /-- Theorem 26 — singular face step. -/
-def singularFaceStep (i : Nat) (ss : SingularSimplex X) :
+noncomputable def singularFaceStep (i : Nat) (ss : SingularSimplex X) :
     Step (singularToSimplex ss) (singularToSimplex (singularFace i ss)) :=
   Step.singular (singularToSimplex ss) (singularToSimplex (singularFace i ss))
 
 /-- Theorem 27 — singular complex functor: composes face steps. -/
-def singularComposePath (i j : Nat) (ss : SingularSimplex X) :
+noncomputable def singularComposePath (i j : Nat) (ss : SingularSimplex X) :
     Path (singularToSimplex ss) (singularToSimplex (singularFace j (singularFace i ss))) :=
   Path.trans
     (Path.single (singularFaceStep i ss))
@@ -455,24 +455,24 @@ structure ChainComplex where
   diff       : (n : Dim) → groups (n + 1) → groups n
 
 /-- The normalized chain complex from a simplicial abelian group. -/
-def normalizedChainComplex (sa : SimplicialAbelianGroup) : ChainComplex where
+noncomputable def normalizedChainComplex (sa : SimplicialAbelianGroup) : ChainComplex where
   groups n := sa.cells n
   zero     := sa.zero
   add      := sa.add
   diff n x := sa.face n 0 x  -- d = Σ(-1)^i d_i, simplified to d_0
 
 /-- Theorem 29 — Dold-Kan forward path (simplicial → chain). -/
-def doldKanForward (sa : SimplicialAbelianGroup) (n : Dim) :
+noncomputable def doldKanForward (sa : SimplicialAbelianGroup) (n : Dim) :
     Path ⟨n, 0⟩ ⟨n, 1⟩ :=
   Path.single (Step.doldKan ⟨n, 0⟩ ⟨n, 1⟩)
 
 /-- Theorem 30 — Dold-Kan backward path (chain → simplicial). -/
-def doldKanBackward (n : Dim) :
+noncomputable def doldKanBackward (n : Dim) :
     Path ⟨n, 1⟩ ⟨n, 0⟩ :=
   Path.single (Step.doldKan ⟨n, 1⟩ ⟨n, 0⟩)
 
 /-- Theorem 31 — Dold-Kan roundtrip (forward then backward = identity up to path). -/
-def doldKanRoundtrip (sa : SimplicialAbelianGroup) (n : Dim) :
+noncomputable def doldKanRoundtrip (sa : SimplicialAbelianGroup) (n : Dim) :
     Path ⟨n, 0⟩ ⟨n, 0⟩ :=
   Path.trans (doldKanForward sa n) (doldKanBackward n)
 
@@ -481,13 +481,13 @@ theorem doldKanRoundtrip_length (sa : SimplicialAbelianGroup) (n : Dim) :
     (doldKanRoundtrip sa n).length = 2 := rfl
 
 /-- Theorem 33 — inverse roundtrip (backward then forward). -/
-def doldKanRoundtripInv (sa : SimplicialAbelianGroup) (n : Dim) :
+noncomputable def doldKanRoundtripInv (sa : SimplicialAbelianGroup) (n : Dim) :
     Path ⟨n, 1⟩ ⟨n, 1⟩ :=
   Path.trans (doldKanBackward n) (doldKanForward sa n)
 
 /-- Theorem 34 — Dold-Kan correspondence is coherent:
     both roundtrips are connected by a coherence path. -/
-def doldKanCoherence (sa : SimplicialAbelianGroup) (n : Dim) :
+noncomputable def doldKanCoherence (sa : SimplicialAbelianGroup) (n : Dim) :
     Path ⟨n, 0⟩ ⟨n, 0⟩ :=
   Path.trans
     (doldKanRoundtrip sa n)
@@ -504,23 +504,23 @@ theorem doldKanCoherence_length (sa : SimplicialAbelianGroup) (n : Dim) :
 -- ============================================================
 
 /-- n-skeleton: simplices of dimension ≤ n. -/
-def isSkeletal (n : Dim) (s : Simplex) : Prop := s.dim ≤ n
+noncomputable def isSkeletal (n : Dim) (s : Simplex) : Prop := s.dim ≤ n
 
 /-- n-coskeleton: determined by simplices of dimension ≤ n. -/
-def isCoskeletal (n : Dim) (s : Simplex) : Prop := s.dim > n
+noncomputable def isCoskeletal (n : Dim) (s : Simplex) : Prop := s.dim > n
 
 /-- Theorem 36 — skeletal inclusion as path. -/
-def skeletalInclusion (s : Simplex) (n : Dim) (h : s.dim ≤ n) :
+noncomputable def skeletalInclusion (s : Simplex) (n : Dim) (h : s.dim ≤ n) :
     Path s ⟨n, s.label⟩ :=
   Path.single (Step.coherence s ⟨n, s.label⟩)
 
 /-- Theorem 37 — coskeletal truncation path. -/
-def coskeletalTruncation (s : Simplex) (n : Dim) (h : s.dim > n) :
+noncomputable def coskeletalTruncation (s : Simplex) (n : Dim) (h : s.dim > n) :
     Path s ⟨n, s.label⟩ :=
   Path.single (Step.compose s ⟨n, s.label⟩)
 
 /-- Theorem 38 — skeletal followed by coskeletal is coherent. -/
-def skeletalCoskeletalRoundtrip (s : Simplex) (n : Dim) :
+noncomputable def skeletalCoskeletalRoundtrip (s : Simplex) (n : Dim) :
     Path s s :=
   Path.trans
     (Path.single (Step.coherence s ⟨n, s.label⟩))
@@ -536,7 +536,7 @@ theorem skCoskRoundtrip_length (s : Simplex) (n : Dim) :
 
 /-- Two simplicial maps are homotopic if connected by a path of intermediate maps.
     Here: witnessed by a path between their images. -/
-def simplicialHomotopy (s t : Simplex) (via : Simplex) :
+noncomputable def simplicialHomotopy (s t : Simplex) (via : Simplex) :
     Path s t :=
   Path.trans
     (Path.single (Step.compose s via))
@@ -547,12 +547,12 @@ theorem simplicialHomotopy_length (s t via : Simplex) :
     (simplicialHomotopy s t via).length = 2 := rfl
 
 /-- Theorem 41 — homotopy is symmetric. -/
-def simplicialHomotopySymm (s t via : Simplex) :
+noncomputable def simplicialHomotopySymm (s t via : Simplex) :
     Path t s :=
   Path.symm (simplicialHomotopy s t via)
 
 /-- Theorem 42 — homotopy is transitive. -/
-def simplicialHomotopyTrans (s t u via1 via2 : Simplex) :
+noncomputable def simplicialHomotopyTrans (s t u via1 via2 : Simplex) :
     Path s u :=
   Path.trans (simplicialHomotopy s t via1) (simplicialHomotopy t u via2)
 
@@ -565,7 +565,7 @@ theorem simplicialHomotopyTrans_length (s t u via1 via2 : Simplex) :
 -- ============================================================
 
 /-- congrArg for path: applying a function to endpoints. -/
-def Path.congrArg (f : Simplex → Simplex)
+noncomputable def Path.congrArg (f : Simplex → Simplex)
     (fStep : (s t : Simplex) → Step s t → Step (f s) (f t)) :
     Path s t → Path (f s) (f t)
   | Path.nil s => Path.nil (f s)
@@ -595,7 +595,7 @@ theorem congrArg_trans (f : Simplex → Simplex)
 -- ============================================================
 
 /-- A property on simplices that can be transported along paths (simplified: path-indexed identity). -/
-def transportWitness (_P : Simplex → Type) (path : Path s t) : Nat :=
+noncomputable def transportWitness (_P : Simplex → Type) (path : Path s t) : Nat :=
   path.length
 
 /-- Theorem 46 — transport over nil gives zero. -/
@@ -613,11 +613,11 @@ theorem transport_trans_sum (P : Simplex → Type) (p : Path s t) (q : Path t u)
 -- ============================================================
 
 /-- Product of two simplices (Eilenberg-Zilber context). -/
-def simplexProduct (s t : Simplex) : Simplex :=
+noncomputable def simplexProduct (s t : Simplex) : Simplex :=
   ⟨s.dim + t.dim, s.label * 1000 + t.label⟩
 
 /-- Theorem 48 — Eilenberg-Zilber map as path: Δ(X×Y) → ΔX ⊗ ΔY. -/
-def eilenbergZilberPath (s t : Simplex) :
+noncomputable def eilenbergZilberPath (s t : Simplex) :
     Path (simplexProduct s t) (simplexProduct s t) :=
   Path.trans
     (Path.single (Step.doldKan (simplexProduct s t) ⟨s.dim, s.label⟩))
@@ -630,7 +630,7 @@ theorem eilenbergZilber_length (s t : Simplex) :
     (eilenbergZilberPath s t).length = 3 := rfl
 
 /-- Theorem 50 — Alexander-Whitney (inverse direction). -/
-def alexanderWhitneyPath (s t : Simplex) :
+noncomputable def alexanderWhitneyPath (s t : Simplex) :
     Path (simplexProduct s t) (simplexProduct s t) :=
   Path.symm (eilenbergZilberPath s t)
 
@@ -640,7 +640,7 @@ def alexanderWhitneyPath (s t : Simplex) :
 
 /-- Theorem 51 — face-face coherence: two different orderings of
     double face maps are connected by a path. -/
-def faceCoherence (i j : Nat) (s : Simplex) :
+noncomputable def faceCoherence (i j : Nat) (s : Simplex) :
     Path s s :=
   let mid1 : Simplex := ⟨s.dim - 1, s.label + i⟩
   let mid2 : Simplex := ⟨s.dim - 1, s.label + j⟩
@@ -658,7 +658,7 @@ theorem faceCoherence_length (i j : Nat) (s : Simplex) :
     (faceCoherence i j s).length = 4 := rfl
 
 /-- Theorem 53 — degen-degen coherence. -/
-def degenCoherence (i j : Nat) (s : Simplex) :
+noncomputable def degenCoherence (i j : Nat) (s : Simplex) :
     Path s s :=
   let mid1 : Simplex := ⟨s.dim + 1, s.label + i⟩
   let mid2 : Simplex := ⟨s.dim + 1, s.label + j⟩

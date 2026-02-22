@@ -48,13 +48,13 @@ inductive SPath (α : Type) (R : α → α → Prop) : α → α → Type where
 
 -- Transitivity
 
-def Path.trans {α R} {a b c : α}
+noncomputable def Path.trans {α R} {a b c : α}
     (p : Path α R a b) (q : Path α R b c) : Path α R a c :=
   match p with
   | .nil _     => q
   | .cons s r  => .cons s (r.trans q)
 
-def SPath.trans {α R} {a b c : α}
+noncomputable def SPath.trans {α R} {a b c : α}
     (p : SPath α R a b) (q : SPath α R b c) : SPath α R a c :=
   match p with
   | .nil _    => q
@@ -62,41 +62,41 @@ def SPath.trans {α R} {a b c : α}
 
 -- Symmetry
 
-def SStep.symm {α R} {a b : α} (s : SStep α R a b) : SStep α R b a :=
+noncomputable def SStep.symm {α R} {a b : α} (s : SStep α R a b) : SStep α R b a :=
   match s with
   | .fwd st => .bwd st
   | .bwd st => .fwd st
 
-def SPath.symm {α R} {a b : α} (p : SPath α R a b) : SPath α R b a :=
+noncomputable def SPath.symm {α R} {a b : α} (p : SPath α R a b) : SPath α R b a :=
   match p with
   | .nil _    => .nil _
   | .cons s r => r.symm.trans (.cons s.symm (.nil _))
 
 -- Length
 
-def Path.length {α R} {a b : α} (p : Path α R a b) : Nat :=
+noncomputable def Path.length {α R} {a b : α} (p : Path α R a b) : Nat :=
   match p with
   | .nil _    => 0
   | .cons _ r => 1 + r.length
 
-def SPath.length {α R} {a b : α} (p : SPath α R a b) : Nat :=
+noncomputable def SPath.length {α R} {a b : α} (p : SPath α R a b) : Nat :=
   match p with
   | .nil _    => 0
   | .cons _ r => 1 + r.length
 
 -- Embed forward path into symmetric path
 
-def Path.toSPath {α R} {a b : α} (p : Path α R a b) : SPath α R a b :=
+noncomputable def Path.toSPath {α R} {a b : α} (p : Path α R a b) : SPath α R a b :=
   match p with
   | .nil _    => .nil _
   | .cons s r => .cons (.fwd s) r.toSPath
 
 -- Single step
 
-def Path.single {α R} {a b : α} (s : Step α R a b) : Path α R a b :=
+noncomputable def Path.single {α R} {a b : α} (s : Step α R a b) : Path α R a b :=
   .cons s (.nil _)
 
-def SPath.single {α R} {a b : α} (s : SStep α R a b) : SPath α R a b :=
+noncomputable def SPath.single {α R} {a b : α} (s : SStep α R a b) : SPath α R a b :=
   .cons s (.nil _)
 
 -- ============================================================
@@ -187,16 +187,16 @@ inductive Path2 (α : Type) (R : α → α → Prop) :
             Path2 α R p q → Path2 α R q r → Path2 α R p r
 
 /-- Vertical composition of 2-paths. -/
-def Path2.trans2 {α R} {a b : α} {p q r : SPath α R a b}
+noncomputable def Path2.trans2 {α R} {a b : α} {p q r : SPath α R a b}
     (h1 : Path2 α R p q) (h2 : Path2 α R q r) : Path2 α R p r :=
   .cons2 h1 h2
 
 /-- Identity 2-path. -/
-def Path2.refl2 {α R} {a b : α} (p : SPath α R a b) : Path2 α R p p :=
+noncomputable def Path2.refl2 {α R} {a b : α} (p : SPath α R a b) : Path2 α R p p :=
   .nil2 p
 
 /-- Symmetry of 2-paths. -/
-def Path2.symm2 {α R} {a b : α} {p q : SPath α R a b}
+noncomputable def Path2.symm2 {α R} {a b : α} {p q : SPath α R a b}
     (h : Path2 α R p q) : Path2 α R q p :=
   match h with
   | .nil2 _     => .nil2 _
@@ -215,7 +215,7 @@ theorem Path2.trans2_nil2 {α R} {a b : α} {p q : SPath α R a b}
 -- Horizontal composition: whiskering
 
 /-- Left whiskering: compose a path on the left of a 2-path. -/
-def Path2.whiskerL {α R} {a b c : α}
+noncomputable def Path2.whiskerL {α R} {a b c : α}
     (r : SPath α R a b)
     {p q : SPath α R b c}
     (h : Path2 α R p q) :
@@ -225,7 +225,7 @@ def Path2.whiskerL {α R} {a b c : α}
   | .cons2 h1 h2 => (whiskerL r h1).trans2 (whiskerL r h2)
 
 /-- Right whiskering: compose a path on the right of a 2-path. -/
-def Path2.whiskerR {α R} {a b c : α}
+noncomputable def Path2.whiskerR {α R} {a b c : α}
     {p q : SPath α R a b}
     (h : Path2 α R p q)
     (r : SPath α R b c) :
@@ -235,7 +235,7 @@ def Path2.whiskerR {α R} {a b c : α}
   | .cons2 h1 h2 => (whiskerR h1 r).trans2 (whiskerR h2 r)
 
 /-- Horizontal composition via whiskering. -/
-def Path2.hcomp {α R} {a b c : α}
+noncomputable def Path2.hcomp {α R} {a b c : α}
     {p₁ q₁ : SPath α R a b}
     {p₂ q₂ : SPath α R b c}
     (h₁ : Path2 α R p₁ q₁) (h₂ : Path2 α R p₂ q₂) :
@@ -287,13 +287,13 @@ inductive Path3 (α : Type) (R : α → α → Prop) :
             Path3 α R h₁ h₂ → Path3 α R h₂ h₃ → Path3 α R h₁ h₃
 
 /-- Trans for 3-paths. -/
-def Path3.trans3 {α R} {a b : α} {p q : SPath α R a b}
+noncomputable def Path3.trans3 {α R} {a b : α} {p q : SPath α R a b}
     {h₁ h₂ h₃ : Path2 α R p q}
     (m1 : Path3 α R h₁ h₂) (m2 : Path3 α R h₂ h₃) : Path3 α R h₁ h₃ :=
   .cons3 m1 m2
 
 /-- Symm for 3-paths. -/
-def Path3.symm3 {α R} {a b : α} {p q : SPath α R a b}
+noncomputable def Path3.symm3 {α R} {a b : α} {p q : SPath α R a b}
     {h₁ h₂ : Path2 α R p q}
     (m : Path3 α R h₁ h₂) : Path3 α R h₂ h₁ :=
   match m with
@@ -340,14 +340,14 @@ theorem whisker_3path_exists {α R} {a b c : α}
 -- ============================================================
 
 /-- Map a function over a step. -/
-def Step.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Step.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (s : Step α R a b) : Step β S (f a) (f b) :=
   match s with
   | .mk r => .mk (hf _ _ r)
 
 /-- congrArg: Map a function over a path (∞-functor on 1-cells). -/
-def Path.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Path.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (p : Path α R a b) : Path β S (f a) (f b) :=
   match p with
@@ -355,7 +355,7 @@ def Path.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
   | .cons s r => .cons (s.map f hf) (r.map f hf)
 
 /-- congrArg on symmetric steps. -/
-def SStep.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def SStep.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (s : SStep α R a b) : SStep β S (f a) (f b) :=
   match s with
@@ -363,7 +363,7 @@ def SStep.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
   | .bwd st => .bwd (st.map f hf)
 
 /-- congrArg on symmetric paths. -/
-def SPath.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def SPath.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (p : SPath α R a b) : SPath β S (f a) (f b) :=
   match p with
@@ -399,7 +399,7 @@ theorem SPath.map_trans {α β : Type} {R : α → α → Prop} {S : β → β �
   | cons s r ih => simp [SPath.trans, SPath.map, ih]
 
 /-- congrArg on 2-paths (∞-functor on 2-cells). -/
-def Path2.map2 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Path2.map2 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} {p q : SPath α R a b}
     (h : Path2 α R p q) :
@@ -423,7 +423,7 @@ theorem Path2.map2_trans2 {α β : Type} {R : α → α → Prop} {S : β → β
   rfl
 
 /-- congrArg on 3-paths (∞-functor on 3-cells). -/
-def Path3.map3 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Path3.map3 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} {p q : SPath α R a b}
     {h₁ h₂ : Path2 α R p q}
@@ -473,11 +473,11 @@ abbrev Loop2 (α : Type) (R : α → α → Prop) (a : α) :=
   Path2 α R (SPath.nil a) (SPath.nil a)
 
 /-- Vertical composition of 2-loops. -/
-def Loop2.vcomp {α R} {a : α} (h₁ h₂ : Loop2 α R a) : Loop2 α R a :=
+noncomputable def Loop2.vcomp {α R} {a : α} (h₁ h₂ : Loop2 α R a) : Loop2 α R a :=
   h₁.trans2 h₂
 
 /-- Horizontal composition of 2-loops (via whiskering). -/
-def Loop2.hcomp {α R} {a : α} (h₁ h₂ : Loop2 α R a) : Loop2 α R a :=
+noncomputable def Loop2.hcomp {α R} {a : α} (h₁ h₂ : Loop2 α R a) : Loop2 α R a :=
   Path2.hcomp h₁ h₂
 
 /-- Theorem 34: hcomp unfolds to Path2.hcomp. -/
@@ -515,14 +515,14 @@ structure TransportData (α : Type) (R : α → α → Prop) (P : α → Type) w
   stepInv : {a b : α} → Step α R a b → P b → P a
 
 /-- Transport along a forward path. -/
-def transportPath {α : Type} {R : α → α → Prop} {P : α → Type}
+noncomputable def transportPath {α : Type} {R : α → α → Prop} {P : α → Type}
     (td : TransportData α R P) {a b : α} (p : Path α R a b) : P a → P b :=
   match p with
   | .nil _    => id
   | .cons s r => transportPath td r ∘ td.stepAct s
 
 /-- Transport along a symmetric path. -/
-def transportSPath {α : Type} {R : α → α → Prop} {P : α → Type}
+noncomputable def transportSPath {α : Type} {R : α → α → Prop} {P : α → Type}
     (td : TransportData α R P) {a b : α} (p : SPath α R a b) : P a → P b :=
   match p with
   | .nil _           => id
@@ -612,7 +612,7 @@ structure InnerHorn (α : Type) (R : α → α → Prop) (a b c : α) where
   right : SPath α R b c
 
 /-- Inner Kan filler. -/
-def innerKanFill {α R} {a b c : α}
+noncomputable def innerKanFill {α R} {a b c : α}
     (horn : InnerHorn α R a b c) : SPath α R a c :=
   horn.left.trans horn.right
 
@@ -666,11 +666,11 @@ structure IsContr (α : Type) (R : α → α → Prop) where
   contract : (x : α) → SPath α R center x
 
 /-- (-1)-truncated: proposition. -/
-def IsProp (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def IsProp (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (x y : α), ∃ _ : SPath α R x y, True
 
 /-- 0-truncated: set (any two parallel paths connected by 2-path). -/
-def IsSet (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def IsSet (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (x y : α) (p q : SPath α R x y),
     ∃ _ : Path2 α R p q, True
 
@@ -679,9 +679,9 @@ inductive TruncLevel : Type where
   | neg2 : TruncLevel
   | succ : TruncLevel → TruncLevel
 
-def TruncLevel.neg1 : TruncLevel := .succ .neg2
-def TruncLevel.zero : TruncLevel := .succ .neg1
-def TruncLevel.one  : TruncLevel := .succ .zero
+noncomputable def TruncLevel.neg1 : TruncLevel := .succ .neg2
+noncomputable def TruncLevel.zero : TruncLevel := .succ .neg1
+noncomputable def TruncLevel.one  : TruncLevel := .succ .zero
 
 /-- Theorem 52: Contractible implies proposition. -/
 theorem contr_isProp {α R} (hc : IsContr α R) : IsProp α R := by
@@ -713,7 +713,7 @@ structure InfGroupoid (α : Type) where
   comp2     : {a b : α} → {p q r : paths a b} → paths2 p q → paths2 q r → paths2 p r
 
 /-- Build an InfGroupoid from our SPath + Path2 tower. -/
-def mkInfGroupoid (α : Type) (R : α → α → Prop) : InfGroupoid α where
+noncomputable def mkInfGroupoid (α : Type) (R : α → α → Prop) : InfGroupoid α where
   rel      := R
   paths    := fun a b => SPath α R a b
   paths2   := fun p q => Path2 α R p q

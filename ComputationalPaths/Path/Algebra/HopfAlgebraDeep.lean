@@ -29,22 +29,22 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -76,30 +76,30 @@ structure HElem where
   uid   : Nat
 deriving DecidableEq, Repr
 
-def mkE (l : String) (n : Nat) : HElem := ⟨l, n⟩
+noncomputable def mkE (l : String) (n : Nat) : HElem := ⟨l, n⟩
 
 -- Distinguished elements
-def unitE : HElem := mkE "1" 0
-def zeroE : HElem := mkE "0" 1
+noncomputable def unitE : HElem := mkE "1" 0
+noncomputable def zeroE : HElem := mkE "0" 1
 
 -- ============================================================
 -- §3  Algebra Operations
 -- ============================================================
 
 /-- Multiplication (algebra product). -/
-def mul (x y : HElem) : HElem :=
+noncomputable def mul (x y : HElem) : HElem :=
   mkE ("(" ++ x.label ++ "·" ++ y.label ++ ")") (x.uid * 1000 + y.uid + 2)
 
 /-- Addition. -/
-def add (x y : HElem) : HElem :=
+noncomputable def add (x y : HElem) : HElem :=
   mkE ("(" ++ x.label ++ "+" ++ y.label ++ ")") (x.uid * 100 + y.uid + 3)
 
 /-- Scalar multiplication. -/
-def smul (k : Nat) (x : HElem) : HElem :=
+noncomputable def smul (k : Nat) (x : HElem) : HElem :=
   mkE (toString k ++ "⬝" ++ x.label) (k * 10 + x.uid + 5)
 
 /-- Negation. -/
-def neg (x : HElem) : HElem :=
+noncomputable def neg (x : HElem) : HElem :=
   mkE ("-" ++ x.label) (x.uid + 9999)
 
 -- ============================================================
@@ -107,26 +107,26 @@ def neg (x : HElem) : HElem :=
 -- ============================================================
 
 /-- Comultiplication Δ(x) = x₍₁₎ ⊗ x₍₂₎ (Sweedler notation). -/
-def comul (x : HElem) : HElem :=
+noncomputable def comul (x : HElem) : HElem :=
   mkE ("Δ(" ++ x.label ++ ")") (x.uid * 7 + 11)
 
 /-- Tensor product. -/
-def tensor (x y : HElem) : HElem :=
+noncomputable def tensor (x y : HElem) : HElem :=
   mkE ("(" ++ x.label ++ "⊗" ++ y.label ++ ")") (x.uid * 500 + y.uid + 13)
 
 /-- Counit ε. -/
-def counit (x : HElem) : HElem :=
+noncomputable def counit (x : HElem) : HElem :=
   mkE ("ε(" ++ x.label ++ ")") (x.uid * 3 + 17)
 
 /-- Sweedler components. -/
-def sw1 (x : HElem) : HElem :=
+noncomputable def sw1 (x : HElem) : HElem :=
   mkE (x.label ++ "₍₁₎") (x.uid * 2 + 100)
 
-def sw2 (x : HElem) : HElem :=
+noncomputable def sw2 (x : HElem) : HElem :=
   mkE (x.label ++ "₍₂₎") (x.uid * 2 + 101)
 
 /-- Twist map τ(a⊗b) = b⊗a. -/
-def twist (x y : HElem) : HElem :=
+noncomputable def twist (x y : HElem) : HElem :=
   tensor y x
 
 -- ============================================================
@@ -134,53 +134,53 @@ def twist (x y : HElem) : HElem :=
 -- ============================================================
 
 /-- Antipode S. -/
-def antipode (x : HElem) : HElem :=
+noncomputable def antipode (x : HElem) : HElem :=
   mkE ("S(" ++ x.label ++ ")") (x.uid * 11 + 19)
 
 -- Composition helper: m(S ⊗ id)(Δx)
-def mulSIdComul (x : HElem) : HElem :=
+noncomputable def mulSIdComul (x : HElem) : HElem :=
   mul (antipode (sw1 x)) (sw2 x)
 
 -- Composition helper: m(id ⊗ S)(Δx)
-def mulIdSComul (x : HElem) : HElem :=
+noncomputable def mulIdSComul (x : HElem) : HElem :=
   mul (sw1 x) (antipode (sw2 x))
 
 -- The unit-counit composite η∘ε
-def unitCounit (x : HElem) : HElem :=
+noncomputable def unitCounit (x : HElem) : HElem :=
   mul unitE (counit x)
 
 -- ============================================================
 -- §6  Algebra Axiom Steps
 -- ============================================================
 
-def mulAssocStep (x y z : HElem) :
+noncomputable def mulAssocStep (x y z : HElem) :
     Step HElem (mul (mul x y) z) (mul x (mul y z)) :=
   .rule "mul-assoc" _ _
 
-def mulUnitLeftStep (x : HElem) : Step HElem (mul unitE x) x :=
+noncomputable def mulUnitLeftStep (x : HElem) : Step HElem (mul unitE x) x :=
   .rule "mul-unit-left" _ _
 
-def mulUnitRightStep (x : HElem) : Step HElem (mul x unitE) x :=
+noncomputable def mulUnitRightStep (x : HElem) : Step HElem (mul x unitE) x :=
   .rule "mul-unit-right" _ _
 
-def addCommStep (x y : HElem) : Step HElem (add x y) (add y x) :=
+noncomputable def addCommStep (x y : HElem) : Step HElem (add x y) (add y x) :=
   .rule "add-comm" _ _
 
-def addAssocStep (x y z : HElem) :
+noncomputable def addAssocStep (x y z : HElem) :
     Step HElem (add (add x y) z) (add x (add y z)) :=
   .rule "add-assoc" _ _
 
-def addZeroStep (x : HElem) : Step HElem (add x zeroE) x :=
+noncomputable def addZeroStep (x : HElem) : Step HElem (add x zeroE) x :=
   .rule "add-zero" _ _
 
-def addNegStep (x : HElem) : Step HElem (add x (neg x)) zeroE :=
+noncomputable def addNegStep (x : HElem) : Step HElem (add x (neg x)) zeroE :=
   .rule "add-neg" _ _
 
-def distribLeftStep (x y z : HElem) :
+noncomputable def distribLeftStep (x y z : HElem) :
     Step HElem (mul x (add y z)) (add (mul x y) (mul x z)) :=
   .rule "distrib-left" _ _
 
-def distribRightStep (x y z : HElem) :
+noncomputable def distribRightStep (x y z : HElem) :
     Step HElem (mul (add x y) z) (add (mul x z) (mul y z)) :=
   .rule "distrib-right" _ _
 
@@ -189,27 +189,27 @@ def distribRightStep (x y z : HElem) :
 -- ============================================================
 
 /-- Coassociativity: (Δ⊗id)Δ = (id⊗Δ)Δ -/
-def coassocLHS (x : HElem) : HElem :=
+noncomputable def coassocLHS (x : HElem) : HElem :=
   tensor (comul (sw1 x)) (sw2 x)
 
-def coassocRHS (x : HElem) : HElem :=
+noncomputable def coassocRHS (x : HElem) : HElem :=
   tensor (sw1 x) (comul (sw2 x))
 
-def coassocStep (x : HElem) :
+noncomputable def coassocStep (x : HElem) :
     Step HElem (coassocLHS x) (coassocRHS x) :=
   .rule "coassoc" _ _
 
 /-- Counit axiom: (ε⊗id)Δ(x) = x -/
-def counitLeftStep (x : HElem) :
+noncomputable def counitLeftStep (x : HElem) :
     Step HElem (mul (counit (sw1 x)) (sw2 x)) x :=
   .rule "counit-left" _ _
 
-def counitRightStep (x : HElem) :
+noncomputable def counitRightStep (x : HElem) :
     Step HElem (mul (sw1 x) (counit (sw2 x))) x :=
   .rule "counit-right" _ _
 
 -- Comultiplication in Sweedler form
-def comulSweedlerStep (x : HElem) :
+noncomputable def comulSweedlerStep (x : HElem) :
     Step HElem (comul x) (tensor (sw1 x) (sw2 x)) :=
   .rule "comul-sweedler" _ _
 
@@ -218,25 +218,25 @@ def comulSweedlerStep (x : HElem) :
 -- ============================================================
 
 /-- Δ is an algebra map: Δ(xy) = Δ(x)Δ(y) -/
-def comulMulLHS (x y : HElem) : HElem := comul (mul x y)
-def comulMulRHS (x y : HElem) : HElem :=
+noncomputable def comulMulLHS (x y : HElem) : HElem := comul (mul x y)
+noncomputable def comulMulRHS (x y : HElem) : HElem :=
   tensor (mul (sw1 x) (sw1 y)) (mul (sw2 x) (sw2 y))
 
-def comulMulStep (x y : HElem) :
+noncomputable def comulMulStep (x y : HElem) :
     Step HElem (comulMulLHS x y) (comulMulRHS x y) :=
   .rule "comul-mul-compat" _ _
 
 /-- Δ(1) = 1⊗1 -/
-def comulUnitStep : Step HElem (comul unitE) (tensor unitE unitE) :=
+noncomputable def comulUnitStep : Step HElem (comul unitE) (tensor unitE unitE) :=
   .rule "comul-unit" _ _
 
 /-- ε is an algebra map: ε(xy) = ε(x)ε(y) -/
-def counitMulStep (x y : HElem) :
+noncomputable def counitMulStep (x y : HElem) :
     Step HElem (counit (mul x y)) (mul (counit x) (counit y)) :=
   .rule "counit-mul" _ _
 
 /-- ε(1) = 1 -/
-def counitUnitStep : Step HElem (counit unitE) unitE :=
+noncomputable def counitUnitStep : Step HElem (counit unitE) unitE :=
   .rule "counit-unit" _ _
 
 -- ============================================================
@@ -244,35 +244,35 @@ def counitUnitStep : Step HElem (counit unitE) unitE :=
 -- ============================================================
 
 /-- m(S⊗id)Δ(x) = η(ε(x)) -/
-def antipodeLeftStep (x : HElem) :
+noncomputable def antipodeLeftStep (x : HElem) :
     Step HElem (mulSIdComul x) (unitCounit x) :=
   .rule "antipode-left" _ _
 
 /-- m(id⊗S)Δ(x) = η(ε(x)) -/
-def antipodeRightStep (x : HElem) :
+noncomputable def antipodeRightStep (x : HElem) :
     Step HElem (mulIdSComul x) (unitCounit x) :=
   .rule "antipode-right" _ _
 
 /-- S(1) = 1 -/
-def antipodeUnitStep : Step HElem (antipode unitE) unitE :=
+noncomputable def antipodeUnitStep : Step HElem (antipode unitE) unitE :=
   .rule "S-unit" _ _
 
 /-- S is anti-multiplicative: S(xy) = S(y)S(x) -/
-def antipodeAntiMulStep (x y : HElem) :
+noncomputable def antipodeAntiMulStep (x y : HElem) :
     Step HElem (antipode (mul x y)) (mul (antipode y) (antipode x)) :=
   .rule "S-anti-mul" _ _
 
 /-- S is anti-comultiplicative: Δ∘S = (S⊗S)∘τ∘Δ -/
-def antipodeAntiComulLHS (x : HElem) : HElem := comul (antipode x)
-def antipodeAntiComulRHS (x : HElem) : HElem :=
+noncomputable def antipodeAntiComulLHS (x : HElem) : HElem := comul (antipode x)
+noncomputable def antipodeAntiComulRHS (x : HElem) : HElem :=
   tensor (antipode (sw2 x)) (antipode (sw1 x))
 
-def antipodeAntiComulStep (x : HElem) :
+noncomputable def antipodeAntiComulStep (x : HElem) :
     Step HElem (antipodeAntiComulLHS x) (antipodeAntiComulRHS x) :=
   .rule "S-anti-comul" _ _
 
 /-- ε∘S = ε -/
-def counitAntipodeStep (x : HElem) :
+noncomputable def counitAntipodeStep (x : HElem) :
     Step HElem (counit (antipode x)) (counit x) :=
   .rule "counit-S" _ _
 
@@ -281,38 +281,38 @@ def counitAntipodeStep (x : HElem) :
 -- ============================================================
 
 /-- R-matrix element. -/
-def rmat (i j : Nat) : HElem :=
+noncomputable def rmat (i j : Nat) : HElem :=
   mkE ("R" ++ toString i ++ toString j) (i * 50 + j + 200)
 
-def rmatInv (i j : Nat) : HElem :=
+noncomputable def rmatInv (i j : Nat) : HElem :=
   mkE ("R⁻¹" ++ toString i ++ toString j) (i * 50 + j + 300)
 
 /-- R-matrix components. -/
-def R₁ : HElem := rmat 1 0
-def R₂ : HElem := rmat 0 1
-def R₁' : HElem := rmatInv 1 0
-def R₂' : HElem := rmatInv 0 1
+noncomputable def R₁ : HElem := rmat 1 0
+noncomputable def R₂ : HElem := rmat 0 1
+noncomputable def R₁' : HElem := rmatInv 1 0
+noncomputable def R₂' : HElem := rmatInv 0 1
 
 /-- Yang-Baxter LHS: R₁₂ R₁₃ R₂₃ -/
-def ybLHS : HElem :=
+noncomputable def ybLHS : HElem :=
   mul (mul (tensor R₁ R₂) (tensor R₁ (mkE "id" 50))) (tensor (mkE "id" 50) (tensor R₁ R₂))
 
 /-- Yang-Baxter RHS: R₂₃ R₁₃ R₁₂ -/
-def ybRHS : HElem :=
+noncomputable def ybRHS : HElem :=
   mul (mul (tensor (mkE "id" 50) (tensor R₁ R₂)) (tensor R₁ (mkE "id" 50))) (tensor R₁ R₂)
 
-def yangBaxterStep : Step HElem ybLHS ybRHS :=
+noncomputable def yangBaxterStep : Step HElem ybLHS ybRHS :=
   .rule "yang-baxter" _ _
 
 /-- Quasi-triangularity: Δᵒᵖ(x) = R·Δ(x)·R⁻¹ -/
-def comulOp (x : HElem) : HElem :=
+noncomputable def comulOp (x : HElem) : HElem :=
   tensor (sw2 x) (sw1 x)
 
-def quasiTriangLHS (x : HElem) : HElem := comulOp x
-def quasiTriangRHS (x : HElem) : HElem :=
+noncomputable def quasiTriangLHS (x : HElem) : HElem := comulOp x
+noncomputable def quasiTriangRHS (x : HElem) : HElem :=
   mul (mul (tensor R₁ R₂) (comul x)) (tensor R₁' R₂')
 
-def quasiTriangStep (x : HElem) :
+noncomputable def quasiTriangStep (x : HElem) :
     Step HElem (quasiTriangLHS x) (quasiTriangRHS x) :=
   .rule "quasi-triang" _ _
 
@@ -321,28 +321,28 @@ def quasiTriangStep (x : HElem) :
 -- ============================================================
 
 /-- Group element as Hopf element. -/
-def grpE (g : String) (n : Nat) : HElem := mkE ("g[" ++ g ++ "]") (n + 400)
+noncomputable def grpE (g : String) (n : Nat) : HElem := mkE ("g[" ++ g ++ "]") (n + 400)
 
 /-- In a group algebra, Δ(g) = g⊗g (group-like). -/
-def groupLikeStep (g : HElem) :
+noncomputable def groupLikeStep (g : HElem) :
     Step HElem (comul g) (tensor g g) :=
   .rule "group-like-comul" _ _
 
 /-- ε(g) = 1 for group-like elements. -/
-def groupLikeCounitStep (g : HElem) :
+noncomputable def groupLikeCounitStep (g : HElem) :
     Step HElem (counit g) unitE :=
   .rule "group-like-counit" _ _
 
 /-- S(g) = g⁻¹ for group-like elements. -/
-def grpInv (g : HElem) : HElem :=
+noncomputable def grpInv (g : HElem) : HElem :=
   mkE (g.label ++ "⁻¹") (g.uid + 5000)
 
-def groupLikeAntipodeStep (g : HElem) :
+noncomputable def groupLikeAntipodeStep (g : HElem) :
     Step HElem (antipode g) (grpInv g) :=
   .rule "group-like-S" _ _
 
 /-- Cocommutative: τ∘Δ = Δ -/
-def cocommStep (x : HElem) :
+noncomputable def cocommStep (x : HElem) :
     Step HElem (comulOp x) (comul x) :=
   .rule "cocomm" _ _
 
@@ -351,25 +351,25 @@ def cocommStep (x : HElem) :
 -- ============================================================
 
 /-- Quantum deformation parameter. -/
-def qParam : HElem := mkE "q" 600
+noncomputable def qParam : HElem := mkE "q" 600
 
 /-- q-commutator: [x,y]_q = xy - q·yx -/
-def qComm (x y : HElem) : HElem :=
+noncomputable def qComm (x y : HElem) : HElem :=
   add (mul x y) (neg (mul qParam (mul y x)))
 
 /-- When q=1, q-commutator becomes ordinary commutator. -/
-def qSpecializeStep (x y : HElem) :
+noncomputable def qSpecializeStep (x y : HElem) :
     Step HElem (qComm x y) (add (mul x y) (neg (mul y x))) :=
   .rule "q-specialize" _ _
 
 /-- Quantum Serre relation step. -/
-def qSerreElem (x y : HElem) : HElem :=
+noncomputable def qSerreElem (x y : HElem) : HElem :=
   add (mul x (mul x y)) (neg (add (mul (smul 2 (mul x y)) x) (mul y (mul x x))))
 
-def qSerreLHS (x y : HElem) : HElem := qSerreElem x y
-def qSerreRHS : HElem := zeroE
+noncomputable def qSerreLHS (x y : HElem) : HElem := qSerreElem x y
+noncomputable def qSerreRHS : HElem := zeroE
 
-def qSerreStep (x y : HElem) :
+noncomputable def qSerreStep (x y : HElem) :
     Step HElem (qSerreLHS x y) qSerreRHS :=
   .rule "q-serre" _ _
 
@@ -378,111 +378,111 @@ def qSerreStep (x y : HElem) :
 -- ============================================================
 
 -- 1: Algebra associativity path
-def mulAssoc_path (x y z : HElem) :
+noncomputable def mulAssoc_path (x y z : HElem) :
     Path HElem (mul (mul x y) z) (mul x (mul y z)) :=
   Path.single (mulAssocStep x y z)
 
 -- 2: Left unit path
-def mulUnitLeft_path (x : HElem) : Path HElem (mul unitE x) x :=
+noncomputable def mulUnitLeft_path (x : HElem) : Path HElem (mul unitE x) x :=
   Path.single (mulUnitLeftStep x)
 
 -- 3: Right unit path
-def mulUnitRight_path (x : HElem) : Path HElem (mul x unitE) x :=
+noncomputable def mulUnitRight_path (x : HElem) : Path HElem (mul x unitE) x :=
   Path.single (mulUnitRightStep x)
 
 -- 4: Comultiplication in Sweedler form
-def comulSweedler_path (x : HElem) :
+noncomputable def comulSweedler_path (x : HElem) :
     Path HElem (comul x) (tensor (sw1 x) (sw2 x)) :=
   Path.single (comulSweedlerStep x)
 
 -- 5: Coassociativity path
-def coassoc_path (x : HElem) :
+noncomputable def coassoc_path (x : HElem) :
     Path HElem (coassocLHS x) (coassocRHS x) :=
   Path.single (coassocStep x)
 
 -- 6: Counit left axiom path
-def counitLeft_path (x : HElem) :
+noncomputable def counitLeft_path (x : HElem) :
     Path HElem (mul (counit (sw1 x)) (sw2 x)) x :=
   Path.single (counitLeftStep x)
 
 -- 7: Counit right axiom path
-def counitRight_path (x : HElem) :
+noncomputable def counitRight_path (x : HElem) :
     Path HElem (mul (sw1 x) (counit (sw2 x))) x :=
   Path.single (counitRightStep x)
 
 -- 8: Bialgebra: Δ is algebra map
-def comulMul_path (x y : HElem) :
+noncomputable def comulMul_path (x y : HElem) :
     Path HElem (comulMulLHS x y) (comulMulRHS x y) :=
   Path.single (comulMulStep x y)
 
 -- 9: Bialgebra: Δ(1)=1⊗1
-def comulUnit_path : Path HElem (comul unitE) (tensor unitE unitE) :=
+noncomputable def comulUnit_path : Path HElem (comul unitE) (tensor unitE unitE) :=
   Path.single comulUnitStep
 
 -- 10: Bialgebra: ε is algebra map
-def counitMul_path (x y : HElem) :
+noncomputable def counitMul_path (x y : HElem) :
     Path HElem (counit (mul x y)) (mul (counit x) (counit y)) :=
   Path.single (counitMulStep x y)
 
 -- 11: Bialgebra: ε(1)=1
-def counitUnit_path : Path HElem (counit unitE) unitE :=
+noncomputable def counitUnit_path : Path HElem (counit unitE) unitE :=
   Path.single counitUnitStep
 
 -- 12: Antipode left axiom
-def antipodeLeft_path (x : HElem) :
+noncomputable def antipodeLeft_path (x : HElem) :
     Path HElem (mulSIdComul x) (unitCounit x) :=
   Path.single (antipodeLeftStep x)
 
 -- 13: Antipode right axiom
-def antipodeRight_path (x : HElem) :
+noncomputable def antipodeRight_path (x : HElem) :
     Path HElem (mulIdSComul x) (unitCounit x) :=
   Path.single (antipodeRightStep x)
 
 -- 14: Antipode is anti-multiplicative
-def antipodeAntiMul_path (x y : HElem) :
+noncomputable def antipodeAntiMul_path (x y : HElem) :
     Path HElem (antipode (mul x y)) (mul (antipode y) (antipode x)) :=
   Path.single (antipodeAntiMulStep x y)
 
 -- 15: S(1)=1
-def antipodeUnit_path : Path HElem (antipode unitE) unitE :=
+noncomputable def antipodeUnit_path : Path HElem (antipode unitE) unitE :=
   Path.single antipodeUnitStep
 
 -- 16: ε∘S = ε
-def counitAntipode_path (x : HElem) :
+noncomputable def counitAntipode_path (x : HElem) :
     Path HElem (counit (antipode x)) (counit x) :=
   Path.single (counitAntipodeStep x)
 
 -- 17: Antipode anti-comultiplicative
-def antipodeAntiComul_path (x : HElem) :
+noncomputable def antipodeAntiComul_path (x : HElem) :
     Path HElem (antipodeAntiComulLHS x) (antipodeAntiComulRHS x) :=
   Path.single (antipodeAntiComulStep x)
 
 -- 18: Yang-Baxter equation
-def yangBaxter_path : Path HElem ybLHS ybRHS :=
+noncomputable def yangBaxter_path : Path HElem ybLHS ybRHS :=
   Path.single yangBaxterStep
 
 -- 19: Quasi-triangularity
-def quasiTriang_path (x : HElem) :
+noncomputable def quasiTriang_path (x : HElem) :
     Path HElem (quasiTriangLHS x) (quasiTriangRHS x) :=
   Path.single (quasiTriangStep x)
 
 -- 20: Group-like comultiplication
-def groupLike_path (g : HElem) :
+noncomputable def groupLike_path (g : HElem) :
     Path HElem (comul g) (tensor g g) :=
   Path.single (groupLikeStep g)
 
 -- 21: Group-like counit
-def groupLikeCounit_path (g : HElem) :
+noncomputable def groupLikeCounit_path (g : HElem) :
     Path HElem (counit g) unitE :=
   Path.single (groupLikeCounitStep g)
 
 -- 22: Group-like antipode
-def groupLikeAntipode_path (g : HElem) :
+noncomputable def groupLikeAntipode_path (g : HElem) :
     Path HElem (antipode g) (grpInv g) :=
   Path.single (groupLikeAntipodeStep g)
 
 -- 23: Cocommutativity
-def cocomm_path (x : HElem) :
+noncomputable def cocomm_path (x : HElem) :
     Path HElem (comulOp x) (comul x) :=
   Path.single (cocommStep x)
 
@@ -491,19 +491,19 @@ def cocomm_path (x : HElem) :
 -- ============================================================
 
 -- 24: Bialgebra Δ(1) then counit: ε(1⊗1) chain
-def comulUnit_counit_chain :
+noncomputable def comulUnit_counit_chain :
     Path HElem (comul unitE) (tensor unitE unitE) :=
   comulUnit_path
 
 -- 25: Hopf axiom full chain left: m(S⊗id)Δ(x) = η(ε(x))
 --     then use unit property
-def hopfLeftFull (x : HElem) :
+noncomputable def hopfLeftFull (x : HElem) :
     Path HElem (mulSIdComul x) (unitCounit x) :=
   antipodeLeft_path x
 
 -- 26: Antipode reverses product, two-step chain:
 --     S(xy) → S(y)S(x) → via assoc
-def antipode_reverse_chain (x y z : HElem) :
+noncomputable def antipode_reverse_chain (x y z : HElem) :
     Path HElem (antipode (mul (mul x y) z))
                (mul (antipode z) (mul (antipode y) (antipode x))) :=
   let step1 := Path.single (antipodeAntiMulStep (mul x y) z)
@@ -515,12 +515,12 @@ def antipode_reverse_chain (x y z : HElem) :
   step1.trans step2
 
 -- 27: Coassociativity then counit extraction
-def coassoc_counit_chain (x : HElem) :
+noncomputable def coassoc_counit_chain (x : HElem) :
     Path HElem (coassocLHS x) (coassocRHS x) :=
   coassoc_path x
 
 -- 28: Group algebra: S(g)·g = 1 via three steps
-def groupAntipodeMul (g : HElem) :
+noncomputable def groupAntipodeMul (g : HElem) :
     Path HElem (mul (antipode g) g) unitE :=
   let s1 : Step HElem (mul (antipode g) g) (mul (grpInv g) g) :=
     .rule "apply-S-group" _ _
@@ -529,7 +529,7 @@ def groupAntipodeMul (g : HElem) :
   (Path.single s1).trans (Path.single s2)
 
 -- 29: g·S(g) = 1
-def groupMulAntipode (g : HElem) :
+noncomputable def groupMulAntipode (g : HElem) :
     Path HElem (mul g (antipode g)) unitE :=
   let s1 : Step HElem (mul g (antipode g)) (mul g (grpInv g)) :=
     .rule "apply-S-group-right" _ _
@@ -538,42 +538,42 @@ def groupMulAntipode (g : HElem) :
   (Path.single s1).trans (Path.single s2)
 
 -- 30: Cocommutative → R-matrix trivial chain
-def cocomm_trivialR (x : HElem) :
+noncomputable def cocomm_trivialR (x : HElem) :
     Path HElem (comulOp x) (comul x) :=
   cocomm_path x
 
 -- 31: Distributivity then comul: Δ(x(y+z)) chain
-def distrib_comul_chain (x y z : HElem) :
+noncomputable def distrib_comul_chain (x y z : HElem) :
     Path HElem (mul x (add y z)) (add (mul x y) (mul x z)) :=
   Path.single (distribLeftStep x y z)
 
 -- 32: q-specialization path
-def qSpecialize_path (x y : HElem) :
+noncomputable def qSpecialize_path (x y : HElem) :
     Path HElem (qComm x y) (add (mul x y) (neg (mul y x))) :=
   Path.single (qSpecializeStep x y)
 
 -- 33: Quantum Serre relation path
-def qSerre_path (x y : HElem) :
+noncomputable def qSerre_path (x y : HElem) :
     Path HElem (qSerreLHS x y) qSerreRHS :=
   Path.single (qSerreStep x y)
 
 -- 34: Full Hopf axiom symmetry: left ↔ right via symm
-def hopf_axiom_symmetry (x : HElem) :
+noncomputable def hopf_axiom_symmetry (x : HElem) :
     Path HElem (unitCounit x) (mulSIdComul x) :=
   (antipodeLeft_path x).symm
 
 -- 35: Sweedler decompose then reassemble
-def sweedler_roundtrip (x : HElem) :
+noncomputable def sweedler_roundtrip (x : HElem) :
     Path HElem (comul x) (tensor (sw1 x) (sw2 x)) :=
   comulSweedler_path x
 
 -- 36: Three-step bialgebra chain: Δ(xy) → tensor form → counit form
-def bialg_chain (x y : HElem) :
+noncomputable def bialg_chain (x y : HElem) :
     Path HElem (comulMulLHS x y) (comulMulRHS x y) :=
   comulMul_path x y
 
 -- 37: Antipode on unit chain: S(1) → 1, then 1·x → x
-def antipodeUnitMul_chain (x : HElem) :
+noncomputable def antipodeUnitMul_chain (x : HElem) :
     Path HElem (mul (antipode unitE) x) x :=
   let s1 := Path.single (.rule "congrArg-mul-S1"
     (mul (antipode unitE) x) (mul unitE x))
@@ -581,7 +581,7 @@ def antipodeUnitMul_chain (x : HElem) :
   s1.trans s2
 
 -- 38: Double antipode path: S(S(x)) → x (involutivity in cocommutative case)
-def doubleAntipode (x : HElem) :
+noncomputable def doubleAntipode (x : HElem) :
     Path HElem (antipode (antipode x)) x :=
   let s1 : Step HElem (antipode (antipode x)) x :=
     .rule "S²=id-cocomm" _ _
@@ -589,19 +589,19 @@ def doubleAntipode (x : HElem) :
 
 -- 39: Convolution product path:
 --     (f * g)(x) = m ∘ (f⊗g) ∘ Δ(x) rewritten
-def convProdLHS (x : HElem) : HElem :=
+noncomputable def convProdLHS (x : HElem) : HElem :=
   mul (antipode (sw1 x)) (sw2 x)
 
-def convProdStep (x : HElem) :
+noncomputable def convProdStep (x : HElem) :
     Step HElem (convProdLHS x) (unitCounit x) :=
   .rule "convolution-antipode" _ _
 
-def convolution_path (x : HElem) :
+noncomputable def convolution_path (x : HElem) :
     Path HElem (convProdLHS x) (unitCounit x) :=
   Path.single (convProdStep x)
 
 -- 40: Add + neg chain: x + (-x) → 0
-def addNeg_path (x : HElem) : Path HElem (add x (neg x)) zeroE :=
+noncomputable def addNeg_path (x : HElem) : Path HElem (add x (neg x)) zeroE :=
   Path.single (addNegStep x)
 
 -- ============================================================
@@ -735,7 +735,7 @@ theorem trans_nil_preserves (p : Path HElem a b) :
   | cons s _ ih => simp [Path.trans, Path.length, ih]
 
 /-- Theorem 25: Bialgebra compatibility: Δ algebra map composed with counit. -/
-def counitApplyStep (x y : HElem) :
+noncomputable def counitApplyStep (x y : HElem) :
     Step HElem (comulMulRHS x y) (counit (mul x y)) :=
   .rule "apply-counit" _ _
 
@@ -758,7 +758,7 @@ structure Confluence (α : Type) (a : α) where
   rightJ  : Path α target2 joinpt
 
 /-- Theorem 26: Hopf algebra confluence — left and right antipode axioms join at η∘ε. -/
-def hopf_confluence (x : HElem) :
+noncomputable def hopf_confluence (x : HElem) :
     Confluence HElem (tensor (mulSIdComul x) (mulIdSComul x)) :=
   { target1 := tensor (unitCounit x) (mulIdSComul x)
     target2 := tensor (mulSIdComul x) (unitCounit x)
@@ -779,14 +779,14 @@ theorem hopf_confluence_total (x : HElem) :
 -- ============================================================
 
 /-- Primitive element: Δ(x) = x⊗1 + 1⊗x -/
-def primComulTarget (x : HElem) : HElem :=
+noncomputable def primComulTarget (x : HElem) : HElem :=
   add (tensor x unitE) (tensor unitE x)
 
-def primStep (x : HElem) : Step HElem (comul x) (primComulTarget x) :=
+noncomputable def primStep (x : HElem) : Step HElem (comul x) (primComulTarget x) :=
   .rule "primitive-comul" _ _
 
 -- 41: Primitive element comultiplication
-def primitive_path (x : HElem) :
+noncomputable def primitive_path (x : HElem) :
     Path HElem (comul x) (primComulTarget x) :=
   Path.single (primStep x)
 
@@ -796,12 +796,12 @@ theorem primitive_len (x : HElem) :
   simp [primitive_path, Path.single, Path.length]
 
 /-- S(x) = -x for primitive elements: two-step chain. -/
-def primAntipodeStep1 (x : HElem) :
+noncomputable def primAntipodeStep1 (x : HElem) :
     Step HElem (antipode x) (neg x) :=
   .rule "S-primitive" _ _
 
 -- 42: Primitive antipode
-def primAntipode_path (x : HElem) :
+noncomputable def primAntipode_path (x : HElem) :
     Path HElem (antipode x) (neg x) :=
   Path.single (primAntipodeStep1 x)
 
@@ -812,10 +812,10 @@ theorem primAntipode_len (x : HElem) :
 
 /-- Theorem 30: Primitive elements form a Lie algebra:
     [x,y] primitive if x,y primitive. Two-step path. -/
-def primBracket (x y : HElem) : HElem :=
+noncomputable def primBracket (x y : HElem) : HElem :=
   add (mul x y) (neg (mul y x))
 
-def primBracketPrim_path (x y : HElem) :
+noncomputable def primBracketPrim_path (x y : HElem) :
     Path HElem (comul (primBracket x y)) (primComulTarget (primBracket x y)) :=
   Path.single (.rule "prim-bracket-prim" _ _)
 
@@ -828,24 +828,24 @@ theorem primBracketPrim_len (x y : HElem) :
 -- ============================================================
 
 /-- Left integral: Σ h₁·Λ ⊗ h₂ = Λ ⊗ h (simplification). -/
-def integralE : HElem := mkE "Λ" 700
+noncomputable def integralE : HElem := mkE "Λ" 700
 
-def leftIntegralStep (h : HElem) :
+noncomputable def leftIntegralStep (h : HElem) :
     Step HElem (mul h integralE) (mul (counit h) integralE) :=
   .rule "left-integral" _ _
 
 -- 43: Left integral path
-def leftIntegral_path (h : HElem) :
+noncomputable def leftIntegral_path (h : HElem) :
     Path HElem (mul h integralE) (mul (counit h) integralE) :=
   Path.single (leftIntegralStep h)
 
 /-- Right integral: Λ·h = ε(h)·Λ -/
-def rightIntegralStep (h : HElem) :
+noncomputable def rightIntegralStep (h : HElem) :
     Step HElem (mul integralE h) (mul integralE (counit h)) :=
   .rule "right-integral" _ _
 
 -- 44: Right integral path
-def rightIntegral_path (h : HElem) :
+noncomputable def rightIntegral_path (h : HElem) :
     Path HElem (mul integralE h) (mul integralE (counit h)) :=
   Path.single (rightIntegralStep h)
 
@@ -864,20 +864,20 @@ theorem rightIntegral_len (h : HElem) :
 -- ============================================================
 
 /-- Action of H on module M: h ▷ m. -/
-def act (h m : HElem) : HElem :=
+noncomputable def act (h m : HElem) : HElem :=
   mkE (h.label ++ "▷" ++ m.label) (h.uid * 20 + m.uid + 800)
 
 /-- Module algebra axiom: h▷(mn) = Σ(h₁▷m)(h₂▷n). -/
-def modAlgLHS (h m n : HElem) : HElem := act h (mul m n)
-def modAlgRHS (h m n : HElem) : HElem :=
+noncomputable def modAlgLHS (h m n : HElem) : HElem := act h (mul m n)
+noncomputable def modAlgRHS (h m n : HElem) : HElem :=
   mul (act (sw1 h) m) (act (sw2 h) n)
 
-def modAlgStep (h m n : HElem) :
+noncomputable def modAlgStep (h m n : HElem) :
     Step HElem (modAlgLHS h m n) (modAlgRHS h m n) :=
   .rule "module-algebra" _ _
 
 -- 45: Module algebra compatibility
-def modAlg_path (h m n : HElem) :
+noncomputable def modAlg_path (h m n : HElem) :
     Path HElem (modAlgLHS h m n) (modAlgRHS h m n) :=
   Path.single (modAlgStep h m n)
 
@@ -887,12 +887,12 @@ theorem modAlg_len (h m n : HElem) :
   simp [modAlg_path, Path.single, Path.length]
 
 /-- Unit of module: h▷1 = ε(h)·1 -/
-def modUnitStep (h : HElem) :
+noncomputable def modUnitStep (h : HElem) :
     Step HElem (act h unitE) (mul (counit h) unitE) :=
   .rule "module-unit" _ _
 
 -- 46: Module unit path
-def modUnit_path (h : HElem) :
+noncomputable def modUnit_path (h : HElem) :
     Path HElem (act h unitE) (mul (counit h) unitE) :=
   Path.single (modUnitStep h)
 
@@ -906,22 +906,22 @@ theorem modUnit_len (h : HElem) :
 -- ============================================================
 
 /-- Smash product element (h # m). -/
-def smash (h m : HElem) : HElem :=
+noncomputable def smash (h m : HElem) : HElem :=
   mkE ("(" ++ h.label ++ "#" ++ m.label ++ ")") (h.uid * 30 + m.uid + 900)
 
 /-- Smash multiplication: (h#m)(k#n) = Σ h·k₁ # (k₂▷m)·n -/
-def smashMulLHS (h m k n : HElem) : HElem :=
+noncomputable def smashMulLHS (h m k n : HElem) : HElem :=
   mul (smash h m) (smash k n)
 
-def smashMulRHS (h m k n : HElem) : HElem :=
+noncomputable def smashMulRHS (h m k n : HElem) : HElem :=
   smash (mul h (sw1 k)) (mul (act (sw2 k) m) n)
 
-def smashMulStep (h m k n : HElem) :
+noncomputable def smashMulStep (h m k n : HElem) :
     Step HElem (smashMulLHS h m k n) (smashMulRHS h m k n) :=
   .rule "smash-mul" _ _
 
 -- 47: Smash product multiplication
-def smashMul_path (h m k n : HElem) :
+noncomputable def smashMul_path (h m k n : HElem) :
     Path HElem (smashMulLHS h m k n) (smashMulRHS h m k n) :=
   Path.single (smashMulStep h m k n)
 
@@ -935,7 +935,7 @@ theorem smashMul_len (h m k n : HElem) :
 -- ============================================================
 
 /-- Theorem 37: Bialgebra + antipode chain is consistent. -/
-def antipodeTensorStep (x y : HElem) :
+noncomputable def antipodeTensorStep (x y : HElem) :
     Step HElem (comulMulRHS x y) (tensor (antipode (sw1 x)) (antipode (sw2 y))) :=
   .rule "apply-antipode-tensor" _ _
 
@@ -956,7 +956,7 @@ theorem antipode_compose_len (x : HElem) :
   exact path_length_trans (antipodeLeft_path x) ((antipodeRight_path x).symm)
 
 /-- Theorem 40: Full Hopf chain — 4 steps through algebra, coalgebra, antipode. -/
-def fullHopfChain (x : HElem) : Path HElem (mul unitE x) x :=
+noncomputable def fullHopfChain (x : HElem) : Path HElem (mul unitE x) x :=
   mulUnitLeft_path x
 
 theorem fullHopfChain_len (x : HElem) :

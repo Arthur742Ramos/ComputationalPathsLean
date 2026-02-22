@@ -27,7 +27,7 @@ structure CoveringProj (E : Type v) (A : Type u) where
     lift e ha (Path.refl a) = e
 
 /-- The lifted endpoint. -/
-def liftEndpoint (C : CoveringProj E A) {a b : A} (e : E)
+noncomputable def liftEndpoint (C : CoveringProj E A) {a b : A} (e : E)
     (he : C.proj e = a) (p : Path a b) : E :=
   C.lift e he p
 
@@ -44,7 +44,7 @@ theorem proj_liftEndpoint (C : CoveringProj E A) {a b : A} (e : E)
   C.lift_proj e he p
 
 /-- Path in the total space from the lift endpoint to itself (identity). -/
-def liftEndpointReflPath (C : CoveringProj E A) {a : A} (e : E)
+noncomputable def liftEndpointReflPath (C : CoveringProj E A) {a : A} (e : E)
     (he : C.proj e = a) :
     Path (liftEndpoint C e he (Path.refl a)) e :=
   Path.mk [Step.mk _ _ (liftEndpoint_refl C e he)] (liftEndpoint_refl C e he)
@@ -58,18 +58,18 @@ structure DeckTransformation (C : CoveringProj E A) where
   proj_comm : ∀ e, C.proj (toFun e) = C.proj e
 
 /-- Identity deck transformation. -/
-def DeckTransformation.idDeck (C : CoveringProj E A) : DeckTransformation C where
+noncomputable def DeckTransformation.idDeck (C : CoveringProj E A) : DeckTransformation C where
   toFun := fun e => e
   proj_comm := fun _ => rfl
 
 /-- Composition of deck transformations. -/
-def DeckTransformation.comp {C : CoveringProj E A}
+noncomputable def DeckTransformation.comp {C : CoveringProj E A}
     (σ τ : DeckTransformation C) : DeckTransformation C where
   toFun := fun e => σ.toFun (τ.toFun e)
   proj_comm := fun e => (σ.proj_comm (τ.toFun e)).trans (τ.proj_comm e)
 
 /-- Inverse of a deck transformation (given an inverse function). -/
-def DeckTransformation.inv {C : CoveringProj E A}
+noncomputable def DeckTransformation.inv {C : CoveringProj E A}
     (σ : DeckTransformation C) (invFun : E → E)
     (_left_inv : ∀ e, invFun (σ.toFun e) = e)
     (right_inv : ∀ e, σ.toFun (invFun e) = e) : DeckTransformation C where
@@ -79,7 +79,7 @@ def DeckTransformation.inv {C : CoveringProj E A}
     rw [right_inv] at h; exact h.symm
 
 /-- Deck transformations act on paths via congrArg. -/
-def DeckTransformation.mapPath {C : CoveringProj E A}
+noncomputable def DeckTransformation.mapPath {C : CoveringProj E A}
     (σ : DeckTransformation C) {e₁ e₂ : E} (p : Path e₁ e₂) :
     Path (σ.toFun e₁) (σ.toFun e₂) :=
   Path.congrArg σ.toFun p
@@ -119,7 +119,7 @@ theorem DeckTransformation.comp_mapPath {C : CoveringProj E A}
 /-! ## Projection paths -/
 
 /-- Project a path in the total space to a path in the base. -/
-def projPath (C : CoveringProj E A) {e₁ e₂ : E}
+noncomputable def projPath (C : CoveringProj E A) {e₁ e₂ : E}
     (p : Path e₁ e₂) : Path (C.proj e₁) (C.proj e₂) :=
   Path.congrArg C.proj p
 
@@ -147,7 +147,7 @@ theorem deck_proj_eq {C : CoveringProj E A}
   σ.proj_comm e
 
 /-- Deck transformation commutes with projection (as a path). -/
-def deck_proj_path {C : CoveringProj E A}
+noncomputable def deck_proj_path {C : CoveringProj E A}
     (σ : DeckTransformation C) (e : E) :
     Path (C.proj (σ.toFun e)) (C.proj e) :=
   Path.mk [Step.mk _ _ (σ.proj_comm e)] (σ.proj_comm e)
@@ -155,7 +155,7 @@ def deck_proj_path {C : CoveringProj E A}
 /-! ## Monodromy -/
 
 /-- The monodromy of a loop: the endpoint of lifting a loop. -/
-def monodromy (C : CoveringProj E A) {a : A} (e : E)
+noncomputable def monodromy (C : CoveringProj E A) {a : A} (e : E)
     (he : C.proj e = a) (γ : Path a a) : E :=
   liftEndpoint C e he γ
 
@@ -166,11 +166,11 @@ theorem monodromy_refl (C : CoveringProj E A) {a : A} (e : E)
   liftEndpoint_refl C e he
 
 /-- The fiber over a point. -/
-def Fiber (C : CoveringProj E A) (a : A) : Type v :=
+noncomputable def Fiber (C : CoveringProj E A) (a : A) : Type v :=
   { e : E // C.proj e = a }
 
 /-- Monodromy acts on fibers. -/
-def monodromyFiber (C : CoveringProj E A) {a : A}
+noncomputable def monodromyFiber (C : CoveringProj E A) {a : A}
     (γ : Path a a) (fe : Fiber C a) : Fiber C a :=
   ⟨monodromy C fe.val fe.property γ,
    proj_liftEndpoint C fe.val fe.property γ⟩
@@ -186,7 +186,7 @@ theorem monodromyFiber_refl (C : CoveringProj E A) {a : A}
 /-! ## Trivial covering -/
 
 /-- The trivial covering space: A × F → A. -/
-def trivialCovering (A : Type u) (F : Type v) : CoveringProj (A × F) A where
+noncomputable def trivialCovering (A : Type u) (F : Type v) : CoveringProj (A × F) A where
   proj := Prod.fst
   lift := fun ⟨a₀, f⟩ ha p =>
     ⟨(Path.transport (D := fun _ => A) ((Path.mk [Step.mk _ _ ha] ha) |>.trans p) a₀ : A), f⟩

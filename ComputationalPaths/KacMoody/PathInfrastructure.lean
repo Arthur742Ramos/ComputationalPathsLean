@@ -52,7 +52,7 @@ noncomputable def simpleAction_cancel_rweq (i : I) :
   rweq_cmpA_inv_left (K.simpleActionPath i)
 
 /-- Transport the Serre relation along a simple Weyl action. -/
-def transportedSerrePath (i j : I) :
+noncomputable def transportedSerrePath (i j : I) :
     Path
       (K.act (K.weyl.simpleRef i)
         (K.algebra.adPower 2 (K.algebra.simpleRoot i) (K.algebra.simpleRoot j)))
@@ -60,7 +60,7 @@ def transportedSerrePath (i j : I) :
   K.actPath (Path.refl (K.weyl.simpleRef i)) (K.algebra.serrePath i j)
 
 /-- Primitive normalization step for transported Serre relations. -/
-def transportedSerreStep (i j : I) :
+noncomputable def transportedSerreStep (i j : I) :
     Path.Step
       (Path.trans
         (transportedSerrePath K i j)
@@ -77,7 +77,7 @@ noncomputable def transportedSerre_rweq (i j : I) :
   rweq_of_step (transportedSerreStep K i j)
 
 /-- Involutivity transported to the Lie action on a simple root. -/
-def reflectionSquarePath (i : I) :
+noncomputable def reflectionSquarePath (i : I) :
     Path
       (K.act
         (K.weyl.mul (K.weyl.simpleRef i) (K.weyl.simpleRef i))
@@ -86,7 +86,7 @@ def reflectionSquarePath (i : I) :
   K.actPath (K.weyl.involutivePath i) (Path.refl (K.algebra.simpleRoot i))
 
 /-- Primitive normalization step for reflection-square transport. -/
-def reflectionSquareStep (i : I) :
+noncomputable def reflectionSquareStep (i : I) :
     Path.Step
       (Path.trans
         (reflectionSquarePath K i)

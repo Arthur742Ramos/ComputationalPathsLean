@@ -82,7 +82,7 @@ structure FaceLattice (P : ConvexPolytope.{u}) where
   le_top : ∀ i, le i top
 
 /-- The face lattice is graded by dimension (Path). -/
-def face_lattice_graded {P : ConvexPolytope.{u}} (FL : FaceLattice P)
+noncomputable def face_lattice_graded {P : ConvexPolytope.{u}} (FL : FaceLattice P)
     (i : FL.I) : Path (Face.face_dim (FL.face i)) (Face.face_dim (FL.face i)) :=
   FL.le_refl i
 
@@ -105,7 +105,7 @@ structure EulerFormula (P : ConvexPolytope.{u}) (fv : FVector P) where
   euler : Path alt_sum 0
 
 /-- Euler characteristic = 1 for contractible polytopes (Path). -/
-def euler_char_one (P : ConvexPolytope.{u}) :
+noncomputable def euler_char_one (P : ConvexPolytope.{u}) :
     Path (1 : Int) 1 :=
   Path.refl 1
 
@@ -121,7 +121,7 @@ structure HVector (P : ConvexPolytope.{u}) where
   nonneg : ∀ (i : Fin (P.dim + 1)), Path (h i) (h i)
 
 /-- Sum of h-vector entries (for a simplicial polytope, = number of facets + ...). -/
-def h_sum {P : ConvexPolytope.{u}} (hv : HVector P) :
+noncomputable def h_sum {P : ConvexPolytope.{u}} (hv : HVector P) :
     Path (hv.h ⟨0, by omega⟩) (hv.h ⟨0, by omega⟩) :=
   hv.nonneg ⟨0, by omega⟩
 
@@ -137,7 +137,7 @@ structure DehnSommerville (P : ConvexPolytope.{u}) (hv : HVector P) where
   h0_hd : Path (hv.h ⟨0, by omega⟩) (hv.h ⟨P.dim, by omega⟩)
 
 /-- Path.trans: chaining Dehn-Sommerville with h_0 = 1. -/
-def dehn_sommerville_chain {P : ConvexPolytope.{u}} {hv : HVector P}
+noncomputable def dehn_sommerville_chain {P : ConvexPolytope.{u}} {hv : HVector P}
     (ds : DehnSommerville P hv) :
     Path (hv.h ⟨0, by omega⟩) (hv.h ⟨P.dim, by omega⟩) :=
   Path.trans hv.h_zero (Path.trans (Path.symm hv.h_zero) ds.h0_hd)
@@ -156,7 +156,7 @@ structure PolytopeDuality (P : ConvexPolytope.{u}) where
   double_dual : Path P.dim P.dim
 
 /-- Path.symm: duality is involutive on dimension. -/
-def duality_involutive {P : ConvexPolytope.{u}} (d : PolytopeDuality P) :
+noncomputable def duality_involutive {P : ConvexPolytope.{u}} (d : PolytopeDuality P) :
     Path P.dim P.dim :=
   Path.trans d.same_dim (Path.symm d.same_dim)
 

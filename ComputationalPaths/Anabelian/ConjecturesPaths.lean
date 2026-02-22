@@ -73,7 +73,7 @@ noncomputable def homConjecture_cancel_rweq (X : Obj) :
 end AnabelianConjecturePaths
 
 /-- Build anabelian conjecture data from primary path-level witnesses. -/
-def mkAnabelianConjecturePaths
+noncomputable def mkAnabelianConjecturePaths
     {Obj : Type u}
     (etalePi1 : Obj → Obj)
     (sectionLift : Obj → Obj)
@@ -88,7 +88,7 @@ def mkAnabelianConjecturePaths
   homConjectureStep := fun X => Path.Step.trans_refl_left (homConjecturePath X)
 
 /-- Canonical identity-model package for conjectural anabelian paths. -/
-def trivialAnabelianConjecturePaths (Obj : Type u) : AnabelianConjecturePaths Obj where
+noncomputable def trivialAnabelianConjecturePaths (Obj : Type u) : AnabelianConjecturePaths Obj where
   etalePi1 := fun X => X
   sectionLift := fun X => X
   sectionConjecturePath := fun X => Path.refl X

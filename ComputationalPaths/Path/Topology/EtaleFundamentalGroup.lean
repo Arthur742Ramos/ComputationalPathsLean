@@ -58,11 +58,11 @@ structure EtaleCoverHom {X : Scheme.{u}} (Y Z : FiniteEtaleCover X) where
   comm : ∀ y, Path (Z.map (toFun y)) (Y.map y)
 
 /-- Identity morphism of a finite etale cover. -/
-def coverId {X : Scheme.{u}} (Y : FiniteEtaleCover X) : EtaleCoverHom Y Y :=
+noncomputable def coverId {X : Scheme.{u}} (Y : FiniteEtaleCover X) : EtaleCoverHom Y Y :=
   { toFun := fun y => y, comm := fun _ => Path.refl _ }
 
 /-- Composition of morphisms of finite etale covers. -/
-def coverComp {X : Scheme.{u}} {Y Z W : FiniteEtaleCover X}
+noncomputable def coverComp {X : Scheme.{u}} {Y Z W : FiniteEtaleCover X}
     (f : EtaleCoverHom Y Z) (g : EtaleCoverHom Z W) : EtaleCoverHom Y W :=
   { toFun := fun y => g.toFun (f.toFun y)
     comm := fun y => Path.trans (g.comm (f.toFun y)) (f.comm y) }
@@ -70,7 +70,7 @@ def coverComp {X : Scheme.{u}} {Y Z W : FiniteEtaleCover X}
 /-! ## Fiber Functor -/
 
 /-- The fiber of a cover at a geometric point. -/
-def fiber {X : Scheme.{u}} (x : GeometricPoint X) (Y : FiniteEtaleCover X) : Type u :=
+noncomputable def fiber {X : Scheme.{u}} (x : GeometricPoint X) (Y : FiniteEtaleCover X) : Type u :=
   { y : Y.carrier // Y.map y = x.point }
 
 /-- The fiber functor on finite etale covers. -/
@@ -83,7 +83,7 @@ structure FiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) where
   functorial : True
 
 /-- The canonical fiber functor given by geometric fibers. -/
-def geometricFiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) : FiberFunctor X x :=
+noncomputable def geometricFiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) : FiberFunctor X x :=
   { onObj := fiber x
     onHom := fun {_ _} f y => ⟨f.toFun y.1, (f.comm y.1).proof.trans y.2⟩
     functorial := True.intro }
@@ -154,7 +154,7 @@ structure ComplexVariety where
   /-- Topology on the complex points. -/
   topology : TopologicalSpace scheme.carrier
 
-instance (X : ComplexVariety) : TopologicalSpace X.scheme.carrier :=
+noncomputable instance (X : ComplexVariety) : TopologicalSpace X.scheme.carrier :=
   X.topology
 
 /-- The topological fundamental group of a complex variety. -/

@@ -38,7 +38,7 @@ structure CWData (A : Type u) where
   skeleton_incl : Nat → A → A
 
 /-- The n-skeleton is defined by cells up to dimension n. -/
-def skeleton (cw : CWData.{u} A) (n : Nat) : List (Σ k, Cell k A) :=
+noncomputable def skeleton (cw : CWData.{u} A) (n : Nat) : List (Σ k, Cell k A) :=
   (List.range (n + 1)).flatMap (cw.cells)
 
 /-- The 0-skeleton is just the 0-cells. -/
@@ -55,12 +55,12 @@ structure CellularMap (A B : Type u) (cwA : CWData A) (cwB : CWData B) where
     Path (toFun (cwA.skeleton_incl n x)) (cwB.skeleton_incl n (toFun x))
 
 /-- Identity cellular map. -/
-def CellularMap.id (A : Type u) (cw : CWData A) : CellularMap A A cw cw where
+noncomputable def CellularMap.id (A : Type u) (cw : CWData A) : CellularMap A A cw cw where
   toFun := _root_.id
   preserves_skeleton := fun _ _ => Path.refl _
 
 /-- Composition of cellular maps. -/
-def CellularMap.comp {A B C : Type u} {cwA : CWData A} {cwB : CWData B} {cwC : CWData C}
+noncomputable def CellularMap.comp {A B C : Type u} {cwA : CWData A} {cwB : CWData B} {cwC : CWData C}
     (g : CellularMap B C cwB cwC) (f : CellularMap A B cwA cwB) :
     CellularMap A C cwA cwC where
   toFun := g.toFun ∘ f.toFun
@@ -70,7 +70,7 @@ def CellularMap.comp {A B C : Type u} {cwA : CWData A} {cwB : CWData B} {cwC : C
       (g.preserves_skeleton n (f.toFun x))
 
 /-- Cellular map congruence: applying a cellular map to a path. -/
-def CellularMap.mapPath {A B : Type u} {cwA : CWData A} {cwB : CWData B}
+noncomputable def CellularMap.mapPath {A B : Type u} {cwA : CWData A} {cwB : CWData B}
     (f : CellularMap A B cwA cwB) {x y : A} (p : Path x y) :
     Path (f.toFun x) (f.toFun y) :=
   Path.congrArg f.toFun p
@@ -105,12 +105,12 @@ structure CellAttachment (A : Type u) (n : Nat) where
   attachPath : Path attachingPoint cellCenter
 
 /-- After attaching a cell, we get a path from the boundary to the cell. -/
-def CellAttachment.witness {A : Type u} {n : Nat}
+noncomputable def CellAttachment.witness {A : Type u} {n : Nat}
     (att : CellAttachment A n) : Path att.attachingPoint att.cellCenter :=
   att.attachPath
 
 /-- Composition of cell attachments (attaching two cells in sequence). -/
-def CellAttachment.compose {A : Type u} {n m : Nat}
+noncomputable def CellAttachment.compose {A : Type u} {n m : Nat}
     (att1 : CellAttachment A n) (att2 : CellAttachment A m)
     (h : att1.cellCenter = att2.attachingPoint) :
     Path att1.attachingPoint att2.cellCenter :=
@@ -119,11 +119,11 @@ def CellAttachment.compose {A : Type u} {n m : Nat}
 /-! ## Euler characteristic -/
 
 /-- Cell count at dimension n. -/
-def cellCount (cw : CWData.{u} A) (n : Nat) : Nat :=
+noncomputable def cellCount (cw : CWData.{u} A) (n : Nat) : Nat :=
   (cw.cells n).length
 
 /-- Alternating sum for Euler characteristic (finite computation). -/
-def eulerCharBounded (cw : CWData.{u} A) (maxDim : Nat) : Int :=
+noncomputable def eulerCharBounded (cw : CWData.{u} A) (maxDim : Nat) : Int :=
   (List.range (maxDim + 1)).foldl
     (fun acc k => acc + if k % 2 = 0 then (cellCount cw k : Int) else -(cellCount cw k : Int))
     0
@@ -147,7 +147,7 @@ structure CellularDifferential (A : Type u) where
   d_sq : ∀ n x, d n (d (n + 1) x) = (group n).zero
 
 /-- d² = 0 as a path. -/
-def CellularDifferential.d_sq_path (cd : CellularDifferential A) (n : Nat)
+noncomputable def CellularDifferential.d_sq_path (cd : CellularDifferential A) (n : Nat)
     (x : (cd.group (n + 2)).carrier) :
     Path (cd.d n (cd.d (n + 1) x)) (cd.group n).zero :=
   Path.mk [Step.mk _ _ (cd.d_sq n x)] (cd.d_sq n x)
@@ -174,23 +174,23 @@ structure Subcomplex (A : Type u) (cw : CWData A) where
   compatible : ∀ n x, pred x → pred (cw.skeleton_incl n x)
 
 /-- Path within a subcomplex: both endpoints satisfy the predicate. -/
-def Subcomplex.pathIn {A : Type u} {cw : CWData A} (sub : Subcomplex A cw)
+noncomputable def Subcomplex.pathIn {A : Type u} {cw : CWData A} (sub : Subcomplex A cw)
     {x y : A} (p : Path x y) (hx : sub.pred x) : sub.pred x :=
   hx
 
 /-- The full complex is a subcomplex. -/
-def Subcomplex.full (A : Type u) (cw : CWData A) : Subcomplex A cw where
+noncomputable def Subcomplex.full (A : Type u) (cw : CWData A) : Subcomplex A cw where
   pred := fun _ => True
   compatible := fun _ _ _ => trivial
 
 /-- Intersection of subcomplexes. -/
-def Subcomplex.inter {A : Type u} {cw : CWData A}
+noncomputable def Subcomplex.inter {A : Type u} {cw : CWData A}
     (s1 s2 : Subcomplex A cw) : Subcomplex A cw where
   pred := fun x => s1.pred x ∧ s2.pred x
   compatible := fun n x ⟨h1, h2⟩ => ⟨s1.compatible n x h1, s2.compatible n x h2⟩
 
 /-- Union of subcomplexes. -/
-def Subcomplex.union {A : Type u} {cw : CWData A}
+noncomputable def Subcomplex.union {A : Type u} {cw : CWData A}
     (s1 s2 : Subcomplex A cw) : Subcomplex A cw where
   pred := fun x => s1.pred x ∨ s2.pred x
   compatible := fun n x h => h.elim (fun h1 => Or.inl (s1.compatible n x h1))
@@ -204,25 +204,25 @@ structure CellularHomotopy {A B : Type u} {cwA : CWData A} {cwB : CWData B}
   homotopy : ∀ x : A, Path (f.toFun x) (g.toFun x)
 
 /-- Reflexive cellular homotopy. -/
-def CellularHomotopy.refl {A B : Type u} {cwA : CWData A} {cwB : CWData B}
+noncomputable def CellularHomotopy.refl {A B : Type u} {cwA : CWData A} {cwB : CWData B}
     (f : CellularMap A B cwA cwB) : CellularHomotopy f f where
   homotopy := fun _ => Path.refl _
 
 /-- Symmetric cellular homotopy. -/
-def CellularHomotopy.symm {A B : Type u} {cwA : CWData A} {cwB : CWData B}
+noncomputable def CellularHomotopy.symm {A B : Type u} {cwA : CWData A} {cwB : CWData B}
     {f g : CellularMap A B cwA cwB} (h : CellularHomotopy f g) :
     CellularHomotopy g f where
   homotopy := fun x => Path.symm (h.homotopy x)
 
 /-- Transitive cellular homotopy. -/
-def CellularHomotopy.trans {A B : Type u} {cwA : CWData A} {cwB : CWData B}
+noncomputable def CellularHomotopy.trans {A B : Type u} {cwA : CWData A} {cwB : CWData B}
     {f g h : CellularMap A B cwA cwB}
     (α : CellularHomotopy f g) (β : CellularHomotopy g h) :
     CellularHomotopy f h where
   homotopy := fun x => Path.trans (α.homotopy x) (β.homotopy x)
 
 /-- Transport along a cellular homotopy. -/
-def CellularHomotopy.transport {A B : Type u} {cwA : CWData A} {cwB : CWData B}
+noncomputable def CellularHomotopy.transport {A B : Type u} {cwA : CWData A} {cwB : CWData B}
     {f g : CellularMap A B cwA cwB} (h : CellularHomotopy f g)
     {P : B → Type v} {x : A} (px : P (f.toFun x)) : P (g.toFun x) :=
   Path.transport (D := P) (h.homotopy x) px

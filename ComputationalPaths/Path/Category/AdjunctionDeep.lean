@@ -32,14 +32,14 @@ structure PathFunctor (A : Type u) where
 namespace PathFunctor
 
 /-- Identity functor. -/
-def id : PathFunctor A where
+noncomputable def id : PathFunctor A where
   obj := fun a => a
   map := fun p => p
   map_id := fun _ => rfl
   map_comp := fun _ _ => rfl
 
 /-- Composition of path functors. Multi-step: verify laws using both components. -/
-def comp (F G : PathFunctor A) : PathFunctor A where
+noncomputable def comp (F G : PathFunctor A) : PathFunctor A where
   obj := G.obj ∘ F.obj
   map := fun p => G.map (F.map p)
   map_id := fun a => by
@@ -174,7 +174,7 @@ end AdjointEquiv
 
 /-- Given adjunctions F ⊣ G and F' ⊣ G', a mate sends
     σ : F'a → Fa to mate(σ) : Ga → G'a via η' ∘ G'σ ∘ G'ε. -/
-def mate {F G F' G' : PathFunctor A}
+noncomputable def mate {F G F' G' : PathFunctor A}
     (adj1 : PathAdjunction F G) (adj2 : PathAdjunction F' G')
     (σ : (a : A) → Path (F'.obj a) (F.obj a))
     (a : A) : Path (G.obj a) (G'.obj a) :=
@@ -182,7 +182,7 @@ def mate {F G F' G' : PathFunctor A}
     (G'.map (Path.trans (σ (G.obj a)) (adj1.counit a)))
 
 /-- Mate of identity morphisms using a single adjunction. -/
-def mate_self {F G : PathFunctor A}
+noncomputable def mate_self {F G : PathFunctor A}
     (adj : PathAdjunction F G) (a : A) : Path (G.obj a) (G.obj a) :=
   Path.trans (adj.unit (G.obj a)) (G.map (adj.counit a))
 
@@ -196,21 +196,21 @@ theorem mate_self_is_refl {F G : PathFunctor A}
 /-! ## Monad from Adjunction -/
 
 /-- The monad T = GF arising from an adjunction. -/
-def monadObj (F G : PathFunctor A) (a : A) : A := G.obj (F.obj a)
+noncomputable def monadObj (F G : PathFunctor A) (a : A) : A := G.obj (F.obj a)
 
 /-- Monad action on paths. -/
-def monadMap (F G : PathFunctor A) {a b : A} (p : Path a b) :
+noncomputable def monadMap (F G : PathFunctor A) {a b : A} (p : Path a b) :
     Path (monadObj F G a) (monadObj F G b) :=
   G.map (F.map p)
 
 /-- Monad unit η : a → T(a) from the adjunction unit. -/
-def monadUnit {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
+noncomputable def monadUnit {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
     Path a (monadObj F G a) :=
   adj.unit a
 
 /-- Monad multiplication μ : T²(a) → T(a).
     μ_a = G(ε_{F(a)}). -/
-def monadMult {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
+noncomputable def monadMult {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
     Path (monadObj F G (monadObj F G a)) (monadObj F G a) :=
   G.map (adj.counit (F.obj a))
 
@@ -237,20 +237,20 @@ theorem monad_right_unit {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A
 /-! ## Comonad from Adjunction -/
 
 /-- Comonad object W = FG. -/
-def comonadObj (F G : PathFunctor A) (a : A) : A := F.obj (G.obj a)
+noncomputable def comonadObj (F G : PathFunctor A) (a : A) : A := F.obj (G.obj a)
 
 /-- Comonad action on paths. -/
-def comonadMap (F G : PathFunctor A) {a b : A} (p : Path a b) :
+noncomputable def comonadMap (F G : PathFunctor A) {a b : A} (p : Path a b) :
     Path (comonadObj F G a) (comonadObj F G b) :=
   F.map (G.map p)
 
 /-- Comonad counit ε : W(a) → a. -/
-def comonadCounit {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
+noncomputable def comonadCounit {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
     Path (comonadObj F G a) a :=
   adj.counit a
 
 /-- Comonad comultiplication δ : W(a) → W²(a). -/
-def comonadComult {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
+noncomputable def comonadComult {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
     Path (comonadObj F G a) (comonadObj F G (comonadObj F G a)) :=
   F.map (adj.unit (G.obj a))
 
@@ -278,13 +278,13 @@ theorem comonad_right_counit {F G : PathFunctor A} (adj : PathAdjunction F G) (a
 
 /-- Forward direction: Path(Fa, b) → Path(a, Gb).
     Multi-step: compose unit with G.map. -/
-def homBijFwd {F G : PathFunctor A} (adj : PathAdjunction F G)
+noncomputable def homBijFwd {F G : PathFunctor A} (adj : PathAdjunction F G)
     {a b : A} (f : Path (F.obj a) b) : Path a (G.obj b) :=
   Path.trans (adj.unit a) (G.map f)
 
 /-- Backward direction: Path(a, Gb) → Path(Fa, b).
     Multi-step: compose F.map with counit. -/
-def homBijBwd {F G : PathFunctor A} (adj : PathAdjunction F G)
+noncomputable def homBijBwd {F G : PathFunctor A} (adj : PathAdjunction F G)
     {a b : A} (g : Path a (G.obj b)) : Path (F.obj a) b :=
   Path.trans (F.map g) (adj.counit b)
 
@@ -340,7 +340,7 @@ theorem leftKan_preserves_comp (lk : LeftKan K) {a b c : A}
   lk.lan.map_comp f g
 
 /-- Left Kan monad unit from adjunction unit. -/
-def leftKan_monadUnit (lk : LeftKan K) (a : A) :
+noncomputable def leftKan_monadUnit (lk : LeftKan K) (a : A) :
     Path a (monadObj lk.lan K a) :=
   monadUnit lk.adj a
 
@@ -356,12 +356,12 @@ structure RightKan (K : PathFunctor A) where
   adj : PathAdjunction K ran
 
 /-- Right Kan extension unit via the adjunction. -/
-def rightKan_unit (rk : RightKan K) (a : A) :
+noncomputable def rightKan_unit (rk : RightKan K) (a : A) :
     Path a (rk.ran.obj (K.obj a)) :=
   rk.adj.unit a
 
 /-- Right Kan comonad counit from adjunction counit. -/
-def rightKan_comonadCounit (rk : RightKan K) (a : A) :
+noncomputable def rightKan_comonadCounit (rk : RightKan K) (a : A) :
     Path (comonadObj K rk.ran a) a :=
   comonadCounit rk.adj a
 
@@ -375,7 +375,7 @@ structure MonadAlgebra {F G : PathFunctor A} (adj : PathAdjunction F G) where
 
 /-- Free algebra on a: carrier is monadObj a, struct_map is μ_a.
     unit_law is the right unit law of the monad. -/
-def freeAlgebra {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
+noncomputable def freeAlgebra {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
     MonadAlgebra adj where
   carrier := monadObj F G a
   struct_map := monadMult adj a
@@ -395,7 +395,7 @@ structure ComonadCoalgebra {F G : PathFunctor A} (adj : PathAdjunction F G) wher
 
 /-- Cofree coalgebra: carrier is comonadObj a, struct_map is δ_a.
     Uses the left counit law. -/
-def cofreeCoalgebra {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
+noncomputable def cofreeCoalgebra {F G : PathFunctor A} (adj : PathAdjunction F G) (a : A) :
     ComonadCoalgebra adj where
   carrier := comonadObj F G a
   struct_map := comonadComult adj a

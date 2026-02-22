@@ -34,17 +34,17 @@ structure Cat where
 variable {C : Cat.{u,v}}
 
 /-- Identity path for morphism composition with identity on the left. -/
-def comp_id_left_path {A B : C.Obj} (f : C.Hom A B) :
+noncomputable def comp_id_left_path {A B : C.Obj} (f : C.Hom A B) :
     Path (C.comp (C.id A) f) f :=
   Path.mk [Step.mk _ _ (C.comp_id_left f)] (C.comp_id_left f)
 
 /-- Identity path for morphism composition with identity on the right. -/
-def comp_id_right_path {A B : C.Obj} (f : C.Hom A B) :
+noncomputable def comp_id_right_path {A B : C.Obj} (f : C.Hom A B) :
     Path (C.comp f (C.id B)) f :=
   Path.mk [Step.mk _ _ (C.comp_id_right f)] (C.comp_id_right f)
 
 /-- Associativity path for triple composition. -/
-def comp_assoc_path {A B D E : C.Obj}
+noncomputable def comp_assoc_path {A B D E : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (h : C.Hom D E) :
     Path (C.comp (C.comp f g) h) (C.comp f (C.comp g h)) :=
   Path.mk [Step.mk _ _ (C.comp_assoc f g h)] (C.comp_assoc f g h)
@@ -67,14 +67,14 @@ structure Terminal (C : Cat.{u,v}) where
   bang : (A : C.Obj) → C.Hom A one
   unique : ∀ {A : C.Obj} (f : C.Hom A one), f = bang A
 
-def terminal_unique_path (T : Terminal C) {A : C.Obj} (f : C.Hom A T.one) :
+noncomputable def terminal_unique_path (T : Terminal C) {A : C.Obj} (f : C.Hom A T.one) :
     Path f (T.bang A) :=
   Path.mk [Step.mk _ _ (T.unique f)] (T.unique f)
 
 theorem terminal_unique_path_toEq (T : Terminal C) {A : C.Obj} (f : C.Hom A T.one) :
     (terminal_unique_path T f).toEq = T.unique f := rfl
 
-def terminal_morphisms_equal (T : Terminal C) {A : C.Obj}
+noncomputable def terminal_morphisms_equal (T : Terminal C) {A : C.Obj}
     (f g : C.Hom A T.one) : Path f g :=
   Path.trans (terminal_unique_path T f) (Path.symm (terminal_unique_path T g))
 
@@ -94,7 +94,7 @@ structure SubobjectClassifier (C : Cat.{u,v}) (T : Terminal C) where
 
 variable {T : Terminal C}
 
-def subobj_pullback_path (Ω : SubobjectClassifier C T)
+noncomputable def subobj_pullback_path (Ω : SubobjectClassifier C T)
     {A B : C.Obj} (m : C.Hom A B) :
     Path (C.comp (T.bang A) Ω.true_arrow) (C.comp m (Ω.chi m)) :=
   Path.mk [Step.mk _ _ (Ω.pullback_condition m)] (Ω.pullback_condition m)
@@ -104,7 +104,7 @@ theorem subobj_pullback_path_toEq (Ω : SubobjectClassifier C T)
     (subobj_pullback_path Ω m).toEq = Ω.pullback_condition m := rfl
 
 /-- The truth morphism viewed as a subobject characteristic map. -/
-def truth_char_path (Ω : SubobjectClassifier C T) :
+noncomputable def truth_char_path (Ω : SubobjectClassifier C T) :
     Path Ω.true_arrow Ω.true_arrow :=
   Path.refl Ω.true_arrow
 
@@ -125,15 +125,15 @@ structure InternalLogic (C : Cat.{u,v}) (T : Terminal C) (Ω : SubobjectClassifi
 
 variable {Ω : SubobjectClassifier C T}
 
-def and_idempotent_path (L : InternalLogic C T Ω) :
+noncomputable def and_idempotent_path (L : InternalLogic C T Ω) :
     Path (C.comp Ω.true_arrow L.andOp) Ω.true_arrow :=
   Path.mk [Step.mk _ _ L.and_idempotent] L.and_idempotent
 
-def or_absorb_true_path (L : InternalLogic C T Ω) :
+noncomputable def or_absorb_true_path (L : InternalLogic C T Ω) :
     Path (C.comp Ω.true_arrow L.orOp) Ω.true_arrow :=
   Path.mk [Step.mk _ _ L.or_absorb_true] L.or_absorb_true
 
-def imp_true_true_path (L : InternalLogic C T Ω) :
+noncomputable def imp_true_true_path (L : InternalLogic C T Ω) :
     Path (C.comp Ω.true_arrow L.impOp) Ω.true_arrow :=
   Path.mk [Step.mk _ _ L.imp_true_true] L.imp_true_true
 
@@ -147,17 +147,17 @@ theorem imp_true_true_path_toEq (L : InternalLogic C T Ω) :
     (imp_true_true_path L).toEq = L.imp_true_true := rfl
 
 /-- Conjunction of two truth arrows equals truth. -/
-def and_truth_chain (L : InternalLogic C T Ω) :
+noncomputable def and_truth_chain (L : InternalLogic C T Ω) :
     Path (C.comp Ω.true_arrow L.andOp) Ω.true_arrow :=
   and_idempotent_path L
 
 /-- Disjunction absorbs truth via path chain. -/
-def or_truth_chain (L : InternalLogic C T Ω) :
+noncomputable def or_truth_chain (L : InternalLogic C T Ω) :
     Path (C.comp Ω.true_arrow L.orOp) Ω.true_arrow :=
   or_absorb_true_path L
 
 /-- Implication truth → truth = truth via path. -/
-def imp_truth_chain (L : InternalLogic C T Ω) :
+noncomputable def imp_truth_chain (L : InternalLogic C T Ω) :
     Path (C.comp Ω.true_arrow L.impOp) Ω.true_arrow :=
   imp_true_true_path L
 
@@ -174,7 +174,7 @@ structure PowerObject (C : Cat.{u,v}) (T : Terminal C) (Ω : SubobjectClassifier
 
 variable {P : PowerObject C T Ω}
 
-def eval_transpose_path {A : C.Obj} (φ : C.Hom A Ω.Ω) :
+noncomputable def eval_transpose_path {A : C.Obj} (φ : C.Hom A Ω.Ω) :
     Path (C.comp (P.transpose φ) (P.eval A)) φ :=
   Path.mk [Step.mk _ _ (P.eval_transpose φ)] (P.eval_transpose φ)
 
@@ -182,7 +182,7 @@ theorem eval_transpose_path_toEq {A : C.Obj} (φ : C.Hom A Ω.Ω) :
     (eval_transpose_path (P := P) φ).toEq = P.eval_transpose φ := rfl
 
 /-- Power object membership is self-classifying. -/
-def pow_self_classify (A : C.Obj) :
+noncomputable def pow_self_classify (A : C.Obj) :
     Path (P.mem A) (P.mem A) :=
   Path.refl (P.mem A)
 
@@ -207,15 +207,15 @@ structure MBLanguage (C : Cat.{u,v}) (T : Terminal C) (Ω : SubobjectClassifier 
 
 variable {MB : MBLanguage C T Ω}
 
-def mb_term_interp_path (t : MB.Term) :
+noncomputable def mb_term_interp_path (t : MB.Term) :
     Path (MB.interpTerm t) (MB.interpTerm t) :=
   Path.refl (MB.interpTerm t)
 
-def mb_formula_interp_path (φ : MB.Formula) :
+noncomputable def mb_formula_interp_path (φ : MB.Formula) :
     Path (MB.interpFormula φ) (MB.interpFormula φ) :=
   Path.refl (MB.interpFormula φ)
 
-def mb_true_interp_path :
+noncomputable def mb_true_interp_path :
     Path (MB.interpFormula MB.trueFormula) Ω.true_arrow :=
   Path.mk [Step.mk _ _ MB.true_interp] MB.true_interp
 
@@ -223,25 +223,25 @@ theorem mb_true_interp_path_toEq :
     (mb_true_interp_path (MB := MB)).toEq = MB.true_interp := rfl
 
 /-- Congruence: and-formula interpretation under path transport. -/
-def mb_and_congruence (φ ψ : MB.Formula) :
+noncomputable def mb_and_congruence (φ ψ : MB.Formula) :
     Path (MB.interpFormula (MB.andFormula φ ψ))
          (MB.interpFormula (MB.andFormula φ ψ)) :=
   Path.refl _
 
 /-- Congruence: or-formula interpretation under path transport. -/
-def mb_or_congruence (φ ψ : MB.Formula) :
+noncomputable def mb_or_congruence (φ ψ : MB.Formula) :
     Path (MB.interpFormula (MB.orFormula φ ψ))
          (MB.interpFormula (MB.orFormula φ ψ)) :=
   Path.refl _
 
 /-- Congruence: implication formula interpretation. -/
-def mb_imp_congruence (φ ψ : MB.Formula) :
+noncomputable def mb_imp_congruence (φ ψ : MB.Formula) :
     Path (MB.interpFormula (MB.impFormula φ ψ))
          (MB.interpFormula (MB.impFormula φ ψ)) :=
   Path.refl _
 
 /-- Congruence: negation formula interpretation. -/
-def mb_neg_congruence (φ : MB.Formula) :
+noncomputable def mb_neg_congruence (φ : MB.Formula) :
     Path (MB.interpFormula (MB.negFormula φ))
          (MB.interpFormula (MB.negFormula φ)) :=
   Path.refl _
@@ -283,35 +283,35 @@ structure Hyperdoctrine (C : Cat.{u,v}) where
 variable {H : Hyperdoctrine C}
 
 /-- Substitution preserves identity path. -/
-def subst_id_path {A : C.Obj} (φ : H.Pred A) :
+noncomputable def subst_id_path {A : C.Obj} (φ : H.Pred A) :
     Path (H.subst (C.id A) φ) φ :=
   Path.mk [Step.mk _ _ (H.subst_id φ)] (H.subst_id φ)
 
 /-- Substitution composition path: functoriality. -/
-def subst_comp_path {A B D : C.Obj}
+noncomputable def subst_comp_path {A B D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (φ : H.Pred D) :
     Path (H.subst (C.comp f g) φ) (H.subst f (H.subst g φ)) :=
   Path.mk [Step.mk _ _ (H.subst_comp f g φ)] (H.subst_comp f g φ)
 
 /-- Substitution distributes over meet. -/
-def subst_meet_path {A B : C.Obj}
+noncomputable def subst_meet_path {A B : C.Obj}
     (f : C.Hom A B) (φ ψ : H.Pred B) :
     Path (H.subst f (H.meet φ ψ)) (H.meet (H.subst f φ) (H.subst f ψ)) :=
   Path.mk [Step.mk _ _ (H.subst_meet f φ ψ)] (H.subst_meet f φ ψ)
 
 /-- Substitution distributes over join. -/
-def subst_join_path {A B : C.Obj}
+noncomputable def subst_join_path {A B : C.Obj}
     (f : C.Hom A B) (φ ψ : H.Pred B) :
     Path (H.subst f (H.join φ ψ)) (H.join (H.subst f φ) (H.subst f ψ)) :=
   Path.mk [Step.mk _ _ (H.subst_join f φ ψ)] (H.subst_join f φ ψ)
 
 /-- Substitution preserves top element. -/
-def subst_top_path {A B : C.Obj} (f : C.Hom A B) :
+noncomputable def subst_top_path {A B : C.Obj} (f : C.Hom A B) :
     Path (H.subst f (H.top B)) (H.top A) :=
   Path.mk [Step.mk _ _ (H.subst_top f)] (H.subst_top f)
 
 /-- Substitution preserves bottom element. -/
-def subst_bot_path {A B : C.Obj} (f : C.Hom A B) :
+noncomputable def subst_bot_path {A B : C.Obj} (f : C.Hom A B) :
     Path (H.subst f (H.bot B)) (H.bot A) :=
   Path.mk [Step.mk _ _ (H.subst_bot f)] (H.subst_bot f)
 
@@ -337,7 +337,7 @@ theorem subst_bot_path_toEq {A B : C.Obj} (f : C.Hom A B) :
     (subst_bot_path (H := H) f).toEq = H.subst_bot f := rfl
 
 /-- Triple substitution coherence: f ∘ g ∘ h. -/
-def subst_triple_coherence {A B D E : C.Obj}
+noncomputable def subst_triple_coherence {A B D E : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (h : C.Hom D E) (φ : H.Pred E) :
     Path (H.subst (C.comp (C.comp f g) h) φ)
          (H.subst f (H.subst g (H.subst h φ))) :=
@@ -354,7 +354,7 @@ theorem subst_triple_coherence_consistent {A B D E : C.Obj}
                (H.subst_comp f g (H.subst h φ)) := rfl
 
 /-- Substitution along associativity path. -/
-def subst_assoc_path {A B D E : C.Obj}
+noncomputable def subst_assoc_path {A B D E : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (h : C.Hom D E) (φ : H.Pred E) :
     Path (H.subst (C.comp (C.comp f g) h) φ)
          (H.subst (C.comp f (C.comp g h)) φ) :=
@@ -366,13 +366,13 @@ theorem subst_assoc_path_toEq {A B D E : C.Obj}
       _root_.congrArg (fun m => H.subst m φ) (C.comp_assoc f g h) := rfl
 
 /-- Meet absorption: meet with top. -/
-def meet_top_chain {A : C.Obj} (φ : H.Pred A)
+noncomputable def meet_top_chain {A : C.Obj} (φ : H.Pred A)
     (h : H.meet φ (H.top A) = φ) :
     Path (H.meet φ (H.top A)) φ :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Join absorption: join with bottom. -/
-def join_bot_chain {A : C.Obj} (φ : H.Pred A)
+noncomputable def join_bot_chain {A : C.Obj} (φ : H.Pred A)
     (h : H.join φ (H.bot A) = φ) :
     Path (H.join φ (H.bot A)) φ :=
   Path.mk [Step.mk _ _ h] h
@@ -400,7 +400,7 @@ section QHPaths
 variable {QH : QuantifiedHyperdoctrine C}
 
 /-- Beck-Chevalley condition as a path. -/
-def beck_chevalley_path {A B D E : C.Obj}
+noncomputable def beck_chevalley_path {A B D E : C.Obj}
     (f : C.Hom A B) (g : C.Hom D E) (h : C.Hom A D) (k : C.Hom B E)
     (sq : C.comp f k = C.comp h g) (φ : QH.Pred D) :
     Path (QH.substQ k (QH.exists_ g φ)) (QH.exists_ f (QH.substQ h φ)) :=
@@ -408,7 +408,7 @@ def beck_chevalley_path {A B D E : C.Obj}
     (QH.beck_chevalley_exists f g h k sq φ)
 
 /-- Frobenius reciprocity as a path. -/
-def frobenius_path {A B : C.Obj}
+noncomputable def frobenius_path {A B : C.Obj}
     (f : C.Hom A B) (φ : QH.Pred A) (ψ : QH.Pred B) :
     Path (QH.exists_ f (QH.meetQ φ (QH.substQ f ψ)))
          (QH.meetQ (QH.exists_ f φ) ψ) :=
@@ -439,7 +439,7 @@ structure KripkeJoyal (C : Cat.{u,v}) (T : Terminal C) (Ω : SubobjectClassifier
 
 variable {KJ : KripkeJoyal C T Ω}
 
-def kj_forces_true_path (U : C.Obj) :
+noncomputable def kj_forces_true_path (U : C.Obj) :
     Path (KJ.forces U Ω.true_arrow) (KJ.forces U Ω.true_arrow) :=
   Path.refl _
 
@@ -447,7 +447,7 @@ theorem kj_forces_true_path_toEq (U : C.Obj) :
     (kj_forces_true_path (KJ := KJ) U).toEq = rfl := rfl
 
 /-- Kripke-Joyal truth is always forced. -/
-def kj_truth_witness (U : C.Obj) : KJ.forces U Ω.true_arrow :=
+noncomputable def kj_truth_witness (U : C.Obj) : KJ.forces U Ω.true_arrow :=
   KJ.forces_true U
 
 /-! ## Geometric morphisms -/
@@ -461,12 +461,12 @@ structure GeometricMorphism (E F : Cat.{u,v}) where
   counit : (B : F.Obj) → F.Hom (directObj (inverseObj B)) B
   unit : (A : E.Obj) → E.Hom A (inverseObj (directObj A))
 
-def geom_counit_path {E F : Cat.{u,v}}
+noncomputable def geom_counit_path {E F : Cat.{u,v}}
     (GM : GeometricMorphism E F) (B : F.Obj) :
     Path (GM.counit B) (GM.counit B) :=
   Path.refl _
 
-def geom_unit_path {E F : Cat.{u,v}}
+noncomputable def geom_unit_path {E F : Cat.{u,v}}
     (GM : GeometricMorphism E F) (A : E.Obj) :
     Path (GM.unit A) (GM.unit A) :=
   Path.refl _
@@ -480,7 +480,7 @@ theorem geom_unit_path_toEq {E F : Cat.{u,v}}
     (geom_unit_path GM A).toEq = rfl := rfl
 
 /-- Composition of the direct image with the counit. -/
-def geom_direct_counit_chain {E F : Cat.{u,v}}
+noncomputable def geom_direct_counit_chain {E F : Cat.{u,v}}
     (GM : GeometricMorphism E F) (B : F.Obj) :
     Path (GM.directObj (GM.inverseObj B)) (GM.directObj (GM.inverseObj B)) :=
   Path.refl _
@@ -502,20 +502,20 @@ structure LogicalFunctor (E F : Cat.{u,v})
 variable {E F : Cat.{u,v}} {TE : Terminal E} {TF : Terminal F}
          {ΩE : SubobjectClassifier E TE} {ΩF : SubobjectClassifier F TF}
 
-def logical_preserves_id_path (LF : LogicalFunctor E F TE TF ΩE ΩF) (A : E.Obj) :
+noncomputable def logical_preserves_id_path (LF : LogicalFunctor E F TE TF ΩE ΩF) (A : E.Obj) :
     Path (LF.mapHom (E.id A)) (F.id (LF.mapObj A)) :=
   Path.mk [Step.mk _ _ (LF.preserves_id A)] (LF.preserves_id A)
 
-def logical_preserves_comp_path (LF : LogicalFunctor E F TE TF ΩE ΩF)
+noncomputable def logical_preserves_comp_path (LF : LogicalFunctor E F TE TF ΩE ΩF)
     {A B D : E.Obj} (f : E.Hom A B) (g : E.Hom B D) :
     Path (LF.mapHom (E.comp f g)) (F.comp (LF.mapHom f) (LF.mapHom g)) :=
   Path.mk [Step.mk _ _ (LF.preserves_comp f g)] (LF.preserves_comp f g)
 
-def logical_preserves_terminal_path (LF : LogicalFunctor E F TE TF ΩE ΩF) :
+noncomputable def logical_preserves_terminal_path (LF : LogicalFunctor E F TE TF ΩE ΩF) :
     Path (LF.mapObj TE.one) TF.one :=
   Path.mk [Step.mk _ _ LF.preserves_terminal] LF.preserves_terminal
 
-def logical_preserves_omega_path (LF : LogicalFunctor E F TE TF ΩE ΩF) :
+noncomputable def logical_preserves_omega_path (LF : LogicalFunctor E F TE TF ΩE ΩF) :
     Path (LF.mapObj ΩE.Ω) ΩF.Ω :=
   Path.mk [Step.mk _ _ LF.preserves_omega] LF.preserves_omega
 
@@ -534,7 +534,7 @@ theorem logical_preserves_omega_path_toEq (LF : LogicalFunctor E F TE TF ΩE ΩF
     (logical_preserves_omega_path LF).toEq = LF.preserves_omega := rfl
 
 /-- Logical functor preserves triple composition. -/
-def logical_preserves_triple_comp (LF : LogicalFunctor E F TE TF ΩE ΩF)
+noncomputable def logical_preserves_triple_comp (LF : LogicalFunctor E F TE TF ΩE ΩF)
     {A B D G : E.Obj} (f : E.Hom A B) (g : E.Hom B D) (h : E.Hom D G) :
     Path (LF.mapHom (E.comp (E.comp f g) h))
          (F.comp (F.comp (LF.mapHom f) (LF.mapHom g)) (LF.mapHom h)) :=
@@ -565,13 +565,13 @@ structure ClassTopos (C : Cat.{u,v}) (T : Terminal C)
   generic_model_obj : GeomTheory.Sort_ theory → C.Obj
   generic_model_rel : GeomTheory.RelSymbol theory → C.Hom T.one Ω.Ω
 
-def class_topos_model_path {D : Cat.{u,v}} {TD : Terminal D}
+noncomputable def class_topos_model_path {D : Cat.{u,v}} {TD : Terminal D}
     {ΩD : SubobjectClassifier D TD}
     (CT : ClassTopos D TD ΩD) (s : CT.theory.Sort_) :
     Path (CT.generic_model_obj s) (CT.generic_model_obj s) :=
   Path.refl _
 
-def class_topos_rel_path {D : Cat.{u,v}} {TD : Terminal D}
+noncomputable def class_topos_rel_path {D : Cat.{u,v}} {TD : Terminal D}
     {ΩD : SubobjectClassifier D TD}
     (CT : ClassTopos D TD ΩD) (r : CT.theory.RelSymbol) :
     Path (CT.generic_model_rel r) (CT.generic_model_rel r) :=
@@ -604,19 +604,19 @@ structure HeytingAlgebra where
   meet_top : ∀ (a : carrier), meet_ a top_ = a
   join_bot : ∀ (a : carrier), join_ a bot_ = a
 
-def heyting_meet_comm_path (HA : HeytingAlgebra) (a b : HA.carrier) :
+noncomputable def heyting_meet_comm_path (HA : HeytingAlgebra) (a b : HA.carrier) :
     Path (HA.meet_ a b) (HA.meet_ b a) :=
   Path.mk [Step.mk _ _ (HA.meet_comm a b)] (HA.meet_comm a b)
 
-def heyting_join_comm_path (HA : HeytingAlgebra) (a b : HA.carrier) :
+noncomputable def heyting_join_comm_path (HA : HeytingAlgebra) (a b : HA.carrier) :
     Path (HA.join_ a b) (HA.join_ b a) :=
   Path.mk [Step.mk _ _ (HA.join_comm a b)] (HA.join_comm a b)
 
-def heyting_meet_top_path (HA : HeytingAlgebra) (a : HA.carrier) :
+noncomputable def heyting_meet_top_path (HA : HeytingAlgebra) (a : HA.carrier) :
     Path (HA.meet_ a HA.top_) a :=
   Path.mk [Step.mk _ _ (HA.meet_top a)] (HA.meet_top a)
 
-def heyting_join_bot_path (HA : HeytingAlgebra) (a : HA.carrier) :
+noncomputable def heyting_join_bot_path (HA : HeytingAlgebra) (a : HA.carrier) :
     Path (HA.join_ a HA.bot_) a :=
   Path.mk [Step.mk _ _ (HA.join_bot a)] (HA.join_bot a)
 
@@ -633,7 +633,7 @@ theorem heyting_join_bot_path_toEq (HA : HeytingAlgebra) (a : HA.carrier) :
     (heyting_join_bot_path HA a).toEq = HA.join_bot a := rfl
 
 /-- Meet double commutativity: swapping twice returns to start. -/
-def heyting_meet_double_comm (HA : HeytingAlgebra) (a b : HA.carrier) :
+noncomputable def heyting_meet_double_comm (HA : HeytingAlgebra) (a b : HA.carrier) :
     Path (HA.meet_ a b) (HA.meet_ a b) :=
   Path.trans (heyting_meet_comm_path HA a b) (heyting_meet_comm_path HA b a)
 
@@ -642,7 +642,7 @@ theorem heyting_meet_double_comm_toEq (HA : HeytingAlgebra) (a b : HA.carrier) :
       Eq.trans (HA.meet_comm a b) (HA.meet_comm b a) := rfl
 
 /-- Join double commutativity. -/
-def heyting_join_double_comm (HA : HeytingAlgebra) (a b : HA.carrier) :
+noncomputable def heyting_join_double_comm (HA : HeytingAlgebra) (a b : HA.carrier) :
     Path (HA.join_ a b) (HA.join_ a b) :=
   Path.trans (heyting_join_comm_path HA a b) (heyting_join_comm_path HA b a)
 
@@ -651,25 +651,25 @@ theorem heyting_join_double_comm_toEq (HA : HeytingAlgebra) (a b : HA.carrier) :
       Eq.trans (HA.join_comm a b) (HA.join_comm b a) := rfl
 
 /-- CongrArg path for meet: congruence in left argument. -/
-def heyting_meet_congrArg_left (HA : HeytingAlgebra)
+noncomputable def heyting_meet_congrArg_left (HA : HeytingAlgebra)
     {a a' : HA.carrier} (h : Path a a') (b : HA.carrier) :
     Path (HA.meet_ a b) (HA.meet_ a' b) :=
   Path.congrArg (fun x => HA.meet_ x b) h
 
 /-- CongrArg path for meet: congruence in right argument. -/
-def heyting_meet_congrArg_right (HA : HeytingAlgebra)
+noncomputable def heyting_meet_congrArg_right (HA : HeytingAlgebra)
     (a : HA.carrier) {b b' : HA.carrier} (h : Path b b') :
     Path (HA.meet_ a b) (HA.meet_ a b') :=
   Path.congrArg (fun x => HA.meet_ a x) h
 
 /-- CongrArg path for join: congruence in left argument. -/
-def heyting_join_congrArg_left (HA : HeytingAlgebra)
+noncomputable def heyting_join_congrArg_left (HA : HeytingAlgebra)
     {a a' : HA.carrier} (h : Path a a') (b : HA.carrier) :
     Path (HA.join_ a b) (HA.join_ a' b) :=
   Path.congrArg (fun x => HA.join_ x b) h
 
 /-- CongrArg path for join: congruence in right argument. -/
-def heyting_join_congrArg_right (HA : HeytingAlgebra)
+noncomputable def heyting_join_congrArg_right (HA : HeytingAlgebra)
     (a : HA.carrier) {b b' : HA.carrier} (h : Path b b') :
     Path (HA.join_ a b) (HA.join_ a b') :=
   Path.congrArg (fun x => HA.join_ a x) h

@@ -36,11 +36,11 @@ open Step
 /-! ## The lens space loop generator -/
 
 /-- The fundamental loop at the lens space basepoint. -/
-@[simp] def lensLoop (p q : Nat) : lensSpaceLoopSpace p q :=
+@[simp] noncomputable def lensLoop (p q : Nat) : lensSpaceLoopSpace p q :=
   lensSpaceLoop p q
 
 /-- Power of the fundamental loop. -/
-@[simp] def lensLoopNPow (p q : Nat) : Nat → lensSpaceLoopSpace p q
+@[simp] noncomputable def lensLoopNPow (p q : Nat) : Nat → lensSpaceLoopSpace p q
   | 0 => Path.refl (lensSpaceBase p q)
   | Nat.succ n => Path.trans (lensLoopNPow p q n) (lensLoop p q)
 

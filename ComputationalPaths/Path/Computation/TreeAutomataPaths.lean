@@ -29,7 +29,7 @@ inductive RTree (Sigma : Type u) : Type u
   | node : Sigma → List (RTree Sigma) → RTree Sigma
 
 /-- Tree size (number of nodes). -/
-def treeSize {Sigma : Type u} : RTree Sigma → Nat
+noncomputable def treeSize {Sigma : Type u} : RTree Sigma → Nat
   | .leaf _ => 1
   | .node _ children => 1 + children.foldl (fun acc c => acc + treeSize c) 0
 
@@ -38,7 +38,7 @@ theorem treeSize_pos {Sigma : Type u} (t : RTree Sigma) : 0 < treeSize t := by
   cases t <;> simp [treeSize] <;> omega
 
 /-- Tree depth. -/
-def treeDepth {Sigma : Type u} : RTree Sigma → Nat
+noncomputable def treeDepth {Sigma : Type u} : RTree Sigma → Nat
   | .leaf _ => 0
   | .node _ children => 1 + children.foldl (fun acc c => max acc (treeDepth c)) 0
 
@@ -47,7 +47,7 @@ theorem leaf_depth {Sigma : Type u} (a : Sigma) : treeDepth (RTree.leaf a) = 0 :
   simp [treeDepth]
 
 /-- Tree yield: leaves read left to right. -/
-def treeYield {Sigma : Type u} : RTree Sigma → List Sigma
+noncomputable def treeYield {Sigma : Type u} : RTree Sigma → List Sigma
   | .leaf a => [a]
   | .node _ children => children.foldl (fun acc c => acc ++ treeYield c) []
 
@@ -106,13 +106,13 @@ inductive tdAccepts {Q Sigma : Type u} (A : TDTreeAuto Q Sigma) : Q → RTree Si
       tdAccepts A q (RTree.node f children)
 
 /-- TD automaton accepts a tree starting from initial state. -/
-def tdAcceptsTree {Q Sigma : Type u} (A : TDTreeAuto Q Sigma) (t : RTree Sigma) : Prop :=
+noncomputable def tdAcceptsTree {Q Sigma : Type u} (A : TDTreeAuto Q Sigma) (t : RTree Sigma) : Prop :=
   tdAccepts A A.q₀ t
 
 /-! ## Product Construction for Tree Automata -/
 
 /-- Product of two BU tree automata. -/
-def ProductBUTA {Q₁ Q₂ Sigma : Type u}
+noncomputable def ProductBUTA {Q₁ Q₂ Sigma : Type u}
     (A₁ : BUTreeAuto Q₁ Sigma) (A₂ : BUTreeAuto Q₂ Sigma) :
     BUTreeAuto (Q₁ × Q₂) Sigma where
   δLeaf := fun a => (A₁.δLeaf a, A₂.δLeaf a)
@@ -136,26 +136,26 @@ structure TreeRewriteRule (Sigma : Type u) where
   rhs : RTree Sigma
 
 /-- One-step tree rewrite at root. -/
-def treeRewriteRoot {Sigma : Type u} (rule : TreeRewriteRule Sigma)
+noncomputable def treeRewriteRoot {Sigma : Type u} (rule : TreeRewriteRule Sigma)
     (t : RTree Sigma) (_ : t = rule.lhs) : RTree Sigma :=
   rule.rhs
 
 /-- Path witness for tree rewriting. -/
-def treeRewritePath {Sigma : Type u} (rule : TreeRewriteRule Sigma)
+noncomputable def treeRewritePath {Sigma : Type u} (rule : TreeRewriteRule Sigma)
     (h : rule.lhs = rule.rhs) : Path rule.lhs rule.rhs :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Reflexive tree rewrite. -/
-def treeRewriteRefl {Sigma : Type u} (t : RTree Sigma) :
+noncomputable def treeRewriteRefl {Sigma : Type u} (t : RTree Sigma) :
     Path t t := Path.refl t
 
 /-- Symmetric tree rewrite path. -/
-def treeRewriteSymm {Sigma : Type u} {t₁ t₂ : RTree Sigma}
+noncomputable def treeRewriteSymm {Sigma : Type u} {t₁ t₂ : RTree Sigma}
     (p : Path t₁ t₂) : Path t₂ t₁ :=
   Path.symm p
 
 /-- Transitive tree rewrite path. -/
-def treeRewriteTrans {Sigma : Type u} {t₁ t₂ t₃ : RTree Sigma}
+noncomputable def treeRewriteTrans {Sigma : Type u} {t₁ t₂ t₃ : RTree Sigma}
     (p : Path t₁ t₂) (q : Path t₂ t₃) : Path t₁ t₃ :=
   Path.trans p q
 
@@ -167,7 +167,7 @@ structure GroundTransducer (Sigma : Type u) where
   rules : List (TreeRewriteRule Sigma)
 
 /-- Transducer produces tree via rule application. -/
-def transducerApply {Sigma : Type u} [DecidableEq (RTree Sigma)]
+noncomputable def transducerApply {Sigma : Type u} [DecidableEq (RTree Sigma)]
     (G : GroundTransducer Sigma) (t : RTree Sigma) :
     RTree Sigma :=
   match G.rules.find? (fun r => t = r.lhs) with
@@ -189,18 +189,18 @@ theorem transducer_id {Sigma : Type u} [DecidableEq (RTree Sigma)]
 /-! ## Regular Tree Languages -/
 
 /-- A tree language: set of trees. -/
-def TreeLang (Sigma : Type u) := RTree Sigma → Prop
+noncomputable def TreeLang (Sigma : Type u) := RTree Sigma → Prop
 
 /-- Language recognized by a BU tree automaton. -/
 noncomputable def buLang {Q Sigma : Type u} (A : BUTreeAuto Q Sigma) : TreeLang Sigma :=
   fun t => buAccepts A t
 
 /-- Union of tree languages. -/
-def treeLangUnion {Sigma : Type u} (L₁ L₂ : TreeLang Sigma) : TreeLang Sigma :=
+noncomputable def treeLangUnion {Sigma : Type u} (L₁ L₂ : TreeLang Sigma) : TreeLang Sigma :=
   fun t => L₁ t ∨ L₂ t
 
 /-- Intersection of tree languages. -/
-def treeLangInter {Sigma : Type u} (L₁ L₂ : TreeLang Sigma) : TreeLang Sigma :=
+noncomputable def treeLangInter {Sigma : Type u} (L₁ L₂ : TreeLang Sigma) : TreeLang Sigma :=
   fun t => L₁ t ∧ L₂ t
 
 /-- Union is commutative. -/
@@ -266,7 +266,7 @@ theorem symm_symm_tree {Sigma : Type u} (t : RTree Sigma) :
     Path.toEq (treeRewriteRefl t) := by simp
 
 /-- congrArg for tree node construction. -/
-def congrArg_tree_node {Sigma : Type u} (f : Sigma)
+noncomputable def congrArg_tree_node {Sigma : Type u} (f : Sigma)
     {cs₁ cs₂ : List (RTree Sigma)} (h : Path cs₁ cs₂) :
     Path (RTree.node f cs₁) (RTree.node f cs₂) :=
   Path.congrArg (RTree.node f) h

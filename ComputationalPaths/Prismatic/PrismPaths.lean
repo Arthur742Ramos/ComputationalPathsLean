@@ -27,7 +27,7 @@ inductive PrismStep {A : Type u} :
       PrismStep (Path.trans (Path.symm p) p) (Path.refl b)
 
 /-- Interpret a prism step as a primitive `Path.Step`. -/
-def PrismStep.toStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def PrismStep.toStep {A : Type u} {a b : A} {p q : Path a b}
     (s : PrismStep p q) : Path.Step p q :=
   match s with
   | .delta_right_unit p => Path.Step.trans_refl_right p
@@ -92,12 +92,12 @@ noncomputable def prism_condition_cancel_rweq :
   rweq_of_prism_step (PrismStep.nygaard_cancel P.prismConditionPath)
 
 /-- Transport of Frobenius along a base path. -/
-def frobeniusTransport {x y : A} (p : Path x y) :
+noncomputable def frobeniusTransport {x y : A} (p : Path x y) :
     Path (P.frobenius x) (P.frobenius y) :=
   Path.congrArg P.frobenius p
 
 /-- Round-trip path induced by the prism generator condition. -/
-def generatorRoundTrip : Path P.idealGenerator P.idealGenerator :=
+noncomputable def generatorRoundTrip : Path P.idealGenerator P.idealGenerator :=
   Path.trans (Path.symm P.prismConditionPath) P.prismConditionPath
 
 noncomputable def generator_roundtrip_rweq :
@@ -107,7 +107,7 @@ noncomputable def generator_roundtrip_rweq :
 end PrismPathData
 
 /-- Trivial prism package on `PUnit`. -/
-def trivialPrismPathData : PrismPathData PUnit where
+noncomputable def trivialPrismPathData : PrismPathData PUnit where
   frobenius := fun _ => PUnit.unit
   delta := fun _ => PUnit.unit
   idealGenerator := PUnit.unit

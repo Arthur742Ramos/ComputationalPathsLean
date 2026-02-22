@@ -41,7 +41,7 @@ noncomputable def bracketCompatCancelLeft (x y : A) :
   rweq_cmpA_inv_left (D.bracketCompat x y)
 
 /-- Convert a DGLie Maurer-Cartan element to the compatible L-infinity one. -/
-def toLInfinityMaurerCartan
+noncomputable def toLInfinityMaurerCartan
     (mc : MaurerCartanPaths.MaurerCartanElement D.dg) :
     LInfinityPaths.MaurerCartanElement D.linf where
   element := mc.element
@@ -57,7 +57,7 @@ def toLInfinityMaurerCartan
           (Path.symm D.zeroCompat)))
 
 /-- Primitive normalization step for converted MC equations. -/
-def toLInfinityStep
+noncomputable def toLInfinityStep
     (mc : MaurerCartanPaths.MaurerCartanElement D.dg) :
     Path.Step
       (Path.trans (toLInfinityMaurerCartan D mc).equation (Path.refl D.linf.zero))

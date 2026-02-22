@@ -54,7 +54,7 @@ structure PoincareDualityData (n : Nat) where
   dualityInv : (k : Nat) → groups.homology (n - k) → groups.cohomology k
 
 /-- Poincaré duality for a point (n = 0). -/
-def pointDuality : PoincareDualityData 0 where
+noncomputable def pointDuality : PoincareDualityData 0 where
   groups := {
     homology := fun _ => PUnit
     cohomology := fun _ => PUnit
@@ -83,7 +83,7 @@ structure OddDimensionalEuler where
   chi_zero : euler.chi = 0
 
 /-- Example: χ(S¹) = 0. -/
-def circleEuler : OddDimensionalEuler where
+noncomputable def circleEuler : OddDimensionalEuler where
   dim := 1
   euler := { betti := fun k => match k with | 0 => 1 | 1 => 1 | _ => 0, chi := 0 }
   chi_zero := rfl
@@ -98,7 +98,7 @@ structure IntersectionForm where
   signature : Int
 
 /-- The intersection form of S⁴. -/
-def s4IntersectionForm : IntersectionForm where
+noncomputable def s4IntersectionForm : IntersectionForm where
   rank := 0
   signature := 0
 
@@ -147,7 +147,7 @@ end PoincareDuality
 end Homotopy
 end Path
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end ComputationalPaths

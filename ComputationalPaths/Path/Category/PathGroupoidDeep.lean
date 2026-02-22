@@ -26,14 +26,14 @@ variable {A : Type u} {B : Type v} {C : Type w}
 abbrev Mor (a b : A) := Path a b
 
 /-- Identity morphism at a point. -/
-def idMor (a : A) : Mor a a := Path.refl a
+noncomputable def idMor (a : A) : Mor a a := Path.refl a
 
 /-- Composition of morphisms in the path groupoid. -/
-def comp {a b c : A} (f : Mor a b) (g : Mor b c) : Mor a c :=
+noncomputable def comp {a b c : A} (f : Mor a b) (g : Mor b c) : Mor a c :=
   Path.trans f g
 
 /-- Inverse morphism in the path groupoid. -/
-def inv {a b : A} (f : Mor a b) : Mor b a :=
+noncomputable def inv {a b : A} (f : Mor a b) : Mor b a :=
   Path.symm f
 
 /-! ## 2. Groupoid Axioms -/
@@ -81,7 +81,7 @@ theorem inv_id (a : A) : inv (idMor a) = idMor a :=
 
 /-- A functor between path groupoids induced by a function f : A → B.
     On objects: f. On morphisms: congrArg f. -/
-def mapMor (f : A → B) {a b : A} (p : Mor a b) : Mor (f a) (f b) :=
+noncomputable def mapMor (f : A → B) {a b : A} (p : Mor a b) : Mor (f a) (f b) :=
   Path.congrArg f p
 
 /-- Theorem 9: Functors preserve identity morphisms. -/
@@ -132,7 +132,7 @@ theorem naturality_toEq (f g : A → B)
   simp
 
 /-- Theorem 15: Identity natural transformation (eta_a = refl). -/
-def natTransId (f : A → B) : NatTrans f f :=
+noncomputable def natTransId (f : A → B) : NatTrans f f :=
   ⟨fun a => idMor (f a)⟩
 
 /-- Theorem 16: Identity natural transformation component is idMor. -/
@@ -140,7 +140,7 @@ theorem natTransId_component (f : A → B) (a : A) :
     (natTransId f).component a = idMor (f a) := rfl
 
 /-- Vertical composition of natural transformations. -/
-def natTransVComp {f g h : A → B}
+noncomputable def natTransVComp {f g h : A → B}
     (eta : NatTrans f g) (eps : NatTrans g h) : NatTrans f h :=
   ⟨fun a => comp (eta.component a) (eps.component a)⟩
 
@@ -168,7 +168,7 @@ theorem natTransVComp_assoc {f g h k : A → B}
   exact comp_assoc (eta.component a) (eps.component a) (mu.component a)
 
 /-- Inverse natural transformation. -/
-def natTransInv {f g : A → B} (eta : NatTrans f g) : NatTrans g f :=
+noncomputable def natTransInv {f g : A → B} (eta : NatTrans f g) : NatTrans g f :=
   ⟨fun a => inv (eta.component a)⟩
 
 /-- Theorem 20: Inverse involution for natural transformations. -/
@@ -191,12 +191,12 @@ theorem natTransVComp_inv_left_toEq {f g : A → B}
 /-! ## 5. Horizontal Composition (Whiskering) -/
 
 /-- Left whiskering: precompose a natural transformation with a functor. -/
-def whiskerLeft (h : C → A) {f g : A → B} (eta : NatTrans f g) :
+noncomputable def whiskerLeft (h : C → A) {f g : A → B} (eta : NatTrans f g) :
     NatTrans (fun x => f (h x)) (fun x => g (h x)) :=
   ⟨fun c => eta.component (h c)⟩
 
 /-- Right whiskering: postcompose a natural transformation with a functor. -/
-def whiskerRight {f g : A → B} (eta : NatTrans f g) (h : B → C) :
+noncomputable def whiskerRight {f g : A → B} (eta : NatTrans f g) (h : B → C) :
     NatTrans (fun x => h (f x)) (fun x => h (g x)) :=
   ⟨fun a => mapMor h (eta.component a)⟩
 
@@ -239,16 +239,16 @@ theorem mapMor_inv_comm (f : A → B) {a b : A} (p : Mor a b) :
 /-! ## 7. Automorphism Groups at a Point -/
 
 /-- The automorphism group at a point: loops (paths from a to a). -/
-def Aut (a : A) := Mor a a
+noncomputable def Aut (a : A) := Mor a a
 
 /-- Theorem 29: The identity loop. -/
-def autId (a : A) : Aut a := idMor a
+noncomputable def autId (a : A) : Aut a := idMor a
 
 /-- Theorem 30: Composition of automorphisms. -/
-def autComp {a : A} (f g : Aut a) : Aut a := comp f g
+noncomputable def autComp {a : A} (f g : Aut a) : Aut a := comp f g
 
 /-- Theorem 31: Inverse of automorphism. -/
-def autInv {a : A} (f : Aut a) : Aut a := inv f
+noncomputable def autInv {a : A} (f : Aut a) : Aut a := inv f
 
 /-- Theorem 32: Left unit for Aut composition. -/
 theorem autComp_id_left {a : A} (f : Aut a) :
@@ -288,7 +288,7 @@ theorem autInv_comp {a : A} (f g : Aut a) :
 /-! ## 8. Conjugation in the Automorphism Group -/
 
 /-- Conjugation of an automorphism by a path. -/
-def conjugate {a b : A} (p : Mor a b) (f : Aut a) : Aut b :=
+noncomputable def conjugate {a b : A} (p : Mor a b) (f : Aut a) : Aut b :=
   comp (inv p) (comp f p)
 
 /-- Theorem 39: Conjugation by identity is identity (propositional toEq). -/
@@ -320,7 +320,7 @@ theorem conjugate_comp {a b c : A} (p : Mor a b) (q : Mor b c) (f : Aut a) :
 /-! ## 9. Functor-Induced Group Homomorphisms -/
 
 /-- A function f : A → B induces a group homomorphism Aut(a) → Aut(f a). -/
-def autMap (f : A → B) {a : A} (loop : Aut a) : Aut (f a) :=
+noncomputable def autMap (f : A → B) {a : A} (loop : Aut a) : Aut (f a) :=
   mapMor f loop
 
 /-- Theorem 42: autMap preserves identity. -/
@@ -351,27 +351,27 @@ theorem autMap_compose (f : B → C) (g : A → B) {a : A} (p : Aut a) :
 /-! ## 10. Path Groupoid as Self-Enriched Category -/
 
 /-- The hom-Path between two morphisms: a 2-morphism (equality of paths). -/
-def Hom2 {a b : A} (f g : Mor a b) := f = g
+noncomputable def Hom2 {a b : A} (f g : Mor a b) := f = g
 
 /-- Theorem 47: Reflexivity of 2-morphisms. -/
-def hom2Refl {a b : A} (f : Mor a b) : Hom2 f f := rfl
+noncomputable def hom2Refl {a b : A} (f : Mor a b) : Hom2 f f := rfl
 
 /-- Theorem 48: Symmetry of 2-morphisms. -/
-def hom2Symm {a b : A} {f g : Mor a b} (h : Hom2 f g) : Hom2 g f :=
+noncomputable def hom2Symm {a b : A} {f g : Mor a b} (h : Hom2 f g) : Hom2 g f :=
   h.symm
 
 /-- Theorem 49: Transitivity of 2-morphisms. -/
-def hom2Trans {a b : A} {f g h : Mor a b}
+noncomputable def hom2Trans {a b : A} {f g h : Mor a b}
     (alpha : Hom2 f g) (beta : Hom2 g h) : Hom2 f h :=
   alpha.trans beta
 
 /-- Left whiskering of 2-morphisms by a 1-morphism. -/
-def hom2WhiskerLeft {a b c : A} {f g : Mor a b} (alpha : Hom2 f g)
+noncomputable def hom2WhiskerLeft {a b c : A} {f g : Mor a b} (alpha : Hom2 f g)
     (h : Mor b c) : Hom2 (comp f h) (comp g h) :=
   congrArg (fun t => comp t h) alpha
 
 /-- Right whiskering of 2-morphisms by a 1-morphism. -/
-def hom2WhiskerRight {a b c : A} (h : Mor a b)
+noncomputable def hom2WhiskerRight {a b c : A} (h : Mor a b)
     {f g : Mor b c} (alpha : Hom2 f g) : Hom2 (comp h f) (comp h g) :=
   congrArg (fun t => comp h t) alpha
 
@@ -395,14 +395,14 @@ structure CoveringFunctor (A : Type u) where
     (x : fiber a) → lift (comp p q) x = lift q (lift p x)
 
 /-- Theorem 51: The constant covering functor. -/
-def constCovering (A : Type u) (F : Type v) : CoveringFunctor A where
+noncomputable def constCovering (A : Type u) (F : Type v) : CoveringFunctor A where
   fiber := fun _ => F
   lift := fun _ x => x
   lift_id := fun _ _ => rfl
   lift_comp := fun _ _ _ => rfl
 
 /-- Theorem 52: The transport covering functor for a type family. -/
-def transportCovering {A : Type u} (D : A → Type v) : CoveringFunctor A where
+noncomputable def transportCovering {A : Type u} (D : A → Type v) : CoveringFunctor A where
   fiber := D
   lift := fun p x => Path.transport p x
   lift_id := fun _ _ => rfl
@@ -415,13 +415,13 @@ structure CoveringMorphism {A : Type u} (F G : CoveringFunctor A) where
     fiberMap b (F.lift p x) = G.lift p (fiberMap a x)
 
 /-- Theorem 53: Identity morphism of covering functors. -/
-def coveringMorphismId {A : Type u} (F : CoveringFunctor A) :
+noncomputable def coveringMorphismId {A : Type u} (F : CoveringFunctor A) :
     CoveringMorphism F F where
   fiberMap := fun _ x => x
   naturality := fun _ _ => rfl
 
 /-- Theorem 54: Composition of covering morphisms. -/
-def coveringMorphismComp {A : Type u} {F G H : CoveringFunctor A}
+noncomputable def coveringMorphismComp {A : Type u} {F G H : CoveringFunctor A}
     (alpha : CoveringMorphism F G) (beta : CoveringMorphism G H) :
     CoveringMorphism F H where
   fiberMap := fun a x => beta.fiberMap a (alpha.fiberMap a x)

@@ -27,15 +27,15 @@ axiom HPushout.glue {A B C : Type u} {f : C → A} {g : C → B}
     (c : C) : @HPushout.inl A B C f g (f c) = @HPushout.inr A B C f g (g c)
 
 /-- Cofiber (mapping cone) of a map f : A → B. -/
-def Cofiber {A B : Type u} (f : A → B) : Type u :=
+noncomputable def Cofiber {A B : Type u} (f : A → B) : Type u :=
   HPushout f (fun _ : A => PUnit.unit)
 
 /-- Wedge sum A ∨ B. -/
-def Wedge (A B : Type u) (a₀ : A) (b₀ : B) : Type u :=
+noncomputable def Wedge (A B : Type u) (a₀ : A) (b₀ : B) : Type u :=
   HPushout (fun (_ : PUnit.{u+1}) => a₀) (fun (_ : PUnit.{u+1}) => b₀)
 
 /-- Join A * B as a pushout. -/
-def Join (A B : Type u) : Type u :=
+noncomputable def Join (A B : Type u) : Type u :=
   HPushout (fun (p : A × B) => p.1) (fun (p : A × B) => p.2)
 
 
@@ -49,7 +49,7 @@ structure PointedPushout (A B C : Type u) (a₀ : A) (b₀ : B)
 /-! ## Cofiber sequence -/
 
 /-- The cofiber inclusion. -/
-def cofiberInclusion {A B : Type u} (f : A → B) :
+noncomputable def cofiberInclusion {A B : Type u} (f : A → B) :
     B → Cofiber f :=
   fun b => HPushout.inl b
 

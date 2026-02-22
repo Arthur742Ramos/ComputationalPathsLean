@@ -53,7 +53,7 @@ namespace InternalLogic
 variable {sc}
 
 /-- Interpret formulas into global truth values of Ω. -/
-def eval (L : InternalLogic sc) : Formula C T sc → TruthValue sc
+noncomputable def eval (L : InternalLogic sc) : Formula C T sc → TruthValue sc
   | .atom p => p
   | .top => L.top
   | .bot => L.bot

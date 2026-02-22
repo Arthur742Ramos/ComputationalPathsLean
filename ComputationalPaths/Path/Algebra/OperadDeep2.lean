@@ -31,11 +31,11 @@ structure OPerm (n : Nat) where
   fwd_bwd : ∀ i, fwd (bwd i) = i
   bwd_fwd : ∀ i, bwd (fwd i) = i
 
-def OPerm.id (n : Nat) : OPerm n where
+noncomputable def OPerm.id (n : Nat) : OPerm n where
   fwd := _root_.id; bwd := _root_.id
   fwd_bwd := fun _ => rfl; bwd_fwd := fun _ => rfl
 
-def OPerm.comp {n : Nat} (σ τ : OPerm n) : OPerm n where
+noncomputable def OPerm.comp {n : Nat} (σ τ : OPerm n) : OPerm n where
   fwd := σ.fwd ∘ τ.fwd
   bwd := τ.bwd ∘ σ.bwd
   fwd_bwd i := by
@@ -45,7 +45,7 @@ def OPerm.comp {n : Nat} (σ τ : OPerm n) : OPerm n where
     show τ.bwd (σ.bwd (σ.fwd (τ.fwd i))) = i
     rw [σ.bwd_fwd, τ.bwd_fwd]
 
-def OPerm.inv {n : Nat} (σ : OPerm n) : OPerm n where
+noncomputable def OPerm.inv {n : Nat} (σ : OPerm n) : OPerm n where
   fwd := σ.bwd; bwd := σ.fwd
   fwd_bwd := σ.bwd_fwd; bwd_fwd := σ.fwd_bwd
 
@@ -92,18 +92,18 @@ structure Operad extends GradedCollection.{u} where
     action (OPerm.comp σ τ) x = action σ (action τ x)
 
 -- 1. Path-valued action identity
-def Operad.action_id_path (O : Operad.{u}) {n : Nat} (x : O.arity n) :
+noncomputable def Operad.action_id_path (O : Operad.{u}) {n : Nat} (x : O.arity n) :
     Path (O.action (OPerm.id n) x) x :=
   Path.stepChain (O.action_id x)
 
 -- 2. Path-valued action composition
-def Operad.action_comp_path (O : Operad.{u}) {n : Nat}
+noncomputable def Operad.action_comp_path (O : Operad.{u}) {n : Nat}
     (σ τ : OPerm n) (x : O.arity n) :
     Path (O.action (OPerm.comp σ τ) x) (O.action σ (O.action τ x)) :=
   Path.stepChain (O.action_comp σ τ x)
 
 -- 3. Action by inverse is an involution
-def Operad.action_inv_path (O : Operad.{u}) {n : Nat}
+noncomputable def Operad.action_inv_path (O : Operad.{u}) {n : Nat}
     (σ : OPerm n) (x : O.arity n) :
     Path (O.action (OPerm.inv σ) (O.action σ x)) x := by
   have h := O.action_comp (OPerm.inv σ) σ x
@@ -137,7 +137,7 @@ structure Equivariant (O : Operad.{u}) where
     O.circI (O.action σ f) i g = O.circI f (σ.fwd i) g
 
 -- 7. Path-valued equivariance
-def Equivariant.path {O : Operad.{u}} (eq : Equivariant O) {n m : Nat}
+noncomputable def Equivariant.path {O : Operad.{u}} (eq : Equivariant O) {n m : Nat}
     (f : O.arity (n + 1)) (σ : OPerm (n + 1))
     (i : Fin (n + 1)) (g : O.arity (m + 1)) :
     Path (O.circI (O.action σ f) i g) (O.circI f (σ.fwd i) g) :=
@@ -151,7 +151,7 @@ structure QuadraticDatum where
   rel : (gen × gen) → Prop
 
 -- 9. Koszul dual
-def QuadraticDatum.koszulDual (Q : QuadraticDatum.{u}) : QuadraticDatum.{u} where
+noncomputable def QuadraticDatum.koszulDual (Q : QuadraticDatum.{u}) : QuadraticDatum.{u} where
   gen := Q.gen
   rel := fun p => ¬ Q.rel p
 
@@ -163,7 +163,7 @@ theorem QuadraticDatum.koszulDual_involutive (Q : QuadraticDatum.{u}) :
   exact propext ⟨fun h => Classical.byContradiction h, fun h hn => hn h⟩
 
 -- 11. Path-valued Koszul involutivity
-def QuadraticDatum.koszulDual_path (Q : QuadraticDatum.{u}) :
+noncomputable def QuadraticDatum.koszulDual_path (Q : QuadraticDatum.{u}) :
     Path Q.koszulDual.koszulDual.rel Q.rel :=
   Path.stepChain Q.koszulDual_involutive
 
@@ -185,7 +185,7 @@ structure BarComplex (P : GradedCollection.{u}) where
     codiff (n - 1) (codiff n x) = bar.zero (n - 1 - 1)
 
 -- 14. Path-valued d² = 0
-def BarComplex.codiff_sq_path {P : GradedCollection.{u}} (B : BarComplex P)
+noncomputable def BarComplex.codiff_sq_path {P : GradedCollection.{u}} (B : BarComplex P)
     (n : Int) (x : B.bar.deg n) :
     Path (B.codiff (n - 1) (B.codiff n x)) (B.bar.zero (n - 1 - 1)) :=
   Path.stepChain (B.codiff_sq n x)
@@ -198,7 +198,7 @@ structure CobarComplex (C : GradedCollection.{u}) where
     diff (n + 1) (diff n x) = cobar.zero (n + 1 + 1)
 
 -- 16. Path-valued d² = 0 for cobar
-def CobarComplex.diff_sq_path {C : GradedCollection.{u}} (Ω : CobarComplex C)
+noncomputable def CobarComplex.diff_sq_path {C : GradedCollection.{u}} (Ω : CobarComplex C)
     (n : Int) (x : Ω.cobar.deg n) :
     Path (Ω.diff (n + 1) (Ω.diff n x)) (Ω.cobar.zero (n + 1 + 1)) :=
   Path.stepChain (Ω.diff_sq n x)
@@ -210,11 +210,11 @@ structure TwistingMorphism (C P : GradedCollection.{u}) where
   alpha : (n : Nat) → C.arity n → P.arity n
 
 -- 18. Identity twisting morphism
-def TwistingMorphism.idTwist (P : GradedCollection.{u}) : TwistingMorphism P P where
+noncomputable def TwistingMorphism.idTwist (P : GradedCollection.{u}) : TwistingMorphism P P where
   alpha := fun _ x => x
 
 -- 19. Path from identity twisting morphism
-def TwistingMorphism.idTwist_path (P : GradedCollection.{u}) (n : Nat)
+noncomputable def TwistingMorphism.idTwist_path (P : GradedCollection.{u}) (n : Nat)
     (x : P.arity n) :
     Path ((TwistingMorphism.idTwist P).alpha n x) x :=
   Path.refl _
@@ -235,7 +235,7 @@ structure AInfOperad where
   stasheff : ∀ (n : Nat), (f g : mu (n + 2)) → f = g
 
 -- 22. A∞ contractibility path
-def AInfOperad.contract_path (O : AInfOperad.{u}) (n : Nat)
+noncomputable def AInfOperad.contract_path (O : AInfOperad.{u}) (n : Nat)
     (f g : O.mu (n + 2)) : Path f g :=
   Path.stepChain (O.stasheff n f g)
 
@@ -259,7 +259,7 @@ structure EInfOperad where
     action σ x = x → σ = OPerm.id n
 
 -- 25. E∞ contractibility path
-def EInfOperad.contractible_path (E : EInfOperad.{u}) {n : Nat}
+noncomputable def EInfOperad.contractible_path (E : EInfOperad.{u}) {n : Nat}
     (x y : E.ops n) : Path x y :=
   Path.stepChain (E.contractible x y)
 
@@ -280,10 +280,10 @@ theorem EInfOperad.action_contractible (E : EInfOperad.{u}) {n : Nat}
 structure GCMorphism (P Q : GradedCollection.{u}) where
   map : (n : Nat) → P.arity n → Q.arity n
 
-def GCMorphism.id (P : GradedCollection.{u}) : GCMorphism P P where
+noncomputable def GCMorphism.id (P : GradedCollection.{u}) : GCMorphism P P where
   map := fun _ x => x
 
-def GCMorphism.comp {P Q R : GradedCollection.{u}}
+noncomputable def GCMorphism.comp {P Q R : GradedCollection.{u}}
     (g : GCMorphism Q R) (f : GCMorphism P Q) : GCMorphism P R where
   map := fun n x => g.map n (f.map n x)
 
@@ -303,15 +303,15 @@ theorem GCMorphism.comp_assoc {P Q R S : GradedCollection.{u}}
   cases h; cases g; cases f; rfl
 
 -- 31-33. Path-valued morphism laws
-def GCMorphism.comp_id_path {P Q : GradedCollection.{u}} (f : GCMorphism P Q) :
+noncomputable def GCMorphism.comp_id_path {P Q : GradedCollection.{u}} (f : GCMorphism P Q) :
     Path (GCMorphism.comp f (GCMorphism.id P)) f :=
   Path.stepChain (GCMorphism.comp_id f)
 
-def GCMorphism.id_comp_path {P Q : GradedCollection.{u}} (f : GCMorphism P Q) :
+noncomputable def GCMorphism.id_comp_path {P Q : GradedCollection.{u}} (f : GCMorphism P Q) :
     Path (GCMorphism.comp (GCMorphism.id Q) f) f :=
   Path.stepChain (GCMorphism.id_comp f)
 
-def GCMorphism.comp_assoc_path {P Q R S : GradedCollection.{u}}
+noncomputable def GCMorphism.comp_assoc_path {P Q R S : GradedCollection.{u}}
     (h : GCMorphism R S) (g : GCMorphism Q R) (f : GCMorphism P Q) :
     Path (GCMorphism.comp h (GCMorphism.comp g f))
          (GCMorphism.comp (GCMorphism.comp h g) f) :=
@@ -320,14 +320,14 @@ def GCMorphism.comp_assoc_path {P Q R S : GradedCollection.{u}}
 /-! ## Endomorphism operad -/
 
 -- 34. Endomorphism operad
-def EndOperad (X : Type u) : GradedCollection.{u} where
+noncomputable def EndOperad (X : Type u) : GradedCollection.{u} where
   arity := fun n => (Fin n → X) → X
 
-def EndOperad.unitOp (X : Type u) : (EndOperad X).arity 1 :=
+noncomputable def EndOperad.unitOp (X : Type u) : (EndOperad X).arity 1 :=
   fun f => f ⟨0, by omega⟩
 
 -- 35. Composition in End(X)
-def EndOperad.circI (X : Type u) {n m : Nat}
+noncomputable def EndOperad.circI (X : Type u) {n m : Nat}
     (f : (EndOperad X).arity (n + 1)) (i : Fin (n + 1))
     (g : (EndOperad X).arity (m + 1)) :
     (EndOperad X).arity (n + m + 1) :=
@@ -343,11 +343,11 @@ def EndOperad.circI (X : Type u) {n m : Nat}
 /-! ## Suspension/desuspension -/
 
 -- 36. Suspension of a graded collection
-def GradedCollection.susp (P : GradedCollection.{u}) : GradedCollection.{u} where
+noncomputable def GradedCollection.susp (P : GradedCollection.{u}) : GradedCollection.{u} where
   arity := fun n => P.arity (n + 1)
 
 -- 37. Desuspension
-def GradedCollection.desusp (P : GradedCollection.{u}) : GradedCollection.{u} where
+noncomputable def GradedCollection.desusp (P : GradedCollection.{u}) : GradedCollection.{u} where
   arity := fun n => match n with | 0 => PEmpty | n + 1 => P.arity n
 
 -- 38. Suspension-desuspension recovery
@@ -367,7 +367,7 @@ theorem FreeTree.leaf_injective {P : GradedCollection.{u}} {X : Type u}
     (x y : X) (h : FreeTree.leaf (P := P) x = FreeTree.leaf y) : x = y := by
   injection h
 
-def FreeTree.leaf_injective_path {P : GradedCollection.{u}} {X : Type u}
+noncomputable def FreeTree.leaf_injective_path {P : GradedCollection.{u}} {X : Type u}
     (x y : X) (h : FreeTree.leaf (P := P) x = FreeTree.leaf y) : Path x y :=
   Path.stepChain (FreeTree.leaf_injective x y h)
 
@@ -385,13 +385,13 @@ structure AlgMorphism {P : GradedCollection.{u}} {X Y : Type u}
     f (A.act op args) = B.act op (f ∘ args)
 
 -- 43. Identity algebra morphism
-def AlgMorphism.id {P : GradedCollection.{u}} {X : Type u}
+noncomputable def AlgMorphism.id {P : GradedCollection.{u}} {X : Type u}
     (A : OperadAlg P X) : AlgMorphism A A where
   f := _root_.id
   compat := fun _ _ => rfl
 
 -- 44. Composition of algebra morphisms
-def AlgMorphism.comp {P : GradedCollection.{u}} {X Y Z : Type u}
+noncomputable def AlgMorphism.comp {P : GradedCollection.{u}} {X Y Z : Type u}
     {A : OperadAlg P X} {B : OperadAlg P Y} {C : OperadAlg P Z}
     (g : AlgMorphism B C) (φ : AlgMorphism A B) : AlgMorphism A C where
   f := g.f ∘ φ.f
@@ -421,7 +421,7 @@ theorem OPerm.double_inv_id {n : Nat} (σ : OPerm n) :
   rw [OPerm.comp_inv, OPerm.inv_comp, OPerm.comp_id]
 
 -- 48. Path-valued double inverse
-def OPerm.double_inv_id_path {n : Nat} (σ : OPerm n) :
+noncomputable def OPerm.double_inv_id_path {n : Nat} (σ : OPerm n) :
     Path (OPerm.comp (OPerm.comp σ (OPerm.inv σ)) (OPerm.comp (OPerm.inv σ) σ))
          (OPerm.id n) :=
   Path.stepChain (OPerm.double_inv_id σ)

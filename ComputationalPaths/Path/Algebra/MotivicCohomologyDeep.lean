@@ -31,12 +31,12 @@ structure SmoothSchemeData (α : Type u) where
   dimension : Nat
   label : String
 
-def affineSpace (k : α) (n : Nat) : SmoothSchemeData α where
+noncomputable def affineSpace (k : α) (n : Nat) : SmoothSchemeData α where
   basePoint := k
   dimension := n
   label := s!"A{n}"
 
-def renameScheme (X : SmoothSchemeData α) (newLabel : String) : SmoothSchemeData α where
+noncomputable def renameScheme (X : SmoothSchemeData α) (newLabel : String) : SmoothSchemeData α where
   basePoint := X.basePoint
   dimension := X.dimension
   label := newLabel
@@ -63,41 +63,41 @@ structure BlochHigherChowData (α : Type u) where
   generatorCount : Nat
   coefficientTag : String
 
-def chowZero (X : SmoothSchemeData α) (p : Nat) : BlochHigherChowData α where
+noncomputable def chowZero (X : SmoothSchemeData α) (p : Nat) : BlochHigherChowData α where
   scheme := X
   codim := p
   simplicialLevel := 0
   generatorCount := 0
   coefficientTag := "Z"
 
-def chowShift (C : BlochHigherChowData α) (k : Nat) : BlochHigherChowData α where
+noncomputable def chowShift (C : BlochHigherChowData α) (k : Nat) : BlochHigherChowData α where
   scheme := C.scheme
   codim := C.codim
   simplicialLevel := C.simplicialLevel + k
   generatorCount := C.generatorCount
   coefficientTag := C.coefficientTag
 
-def chowProduct (C D : BlochHigherChowData α) : BlochHigherChowData α where
+noncomputable def chowProduct (C D : BlochHigherChowData α) : BlochHigherChowData α where
   scheme := C.scheme
   codim := C.codim + D.codim
   simplicialLevel := C.simplicialLevel + D.simplicialLevel
   generatorCount := C.generatorCount + D.generatorCount
   coefficientTag := C.coefficientTag
 
-def chowBoundary (C : BlochHigherChowData α) : BlochHigherChowData α where
+noncomputable def chowBoundary (C : BlochHigherChowData α) : BlochHigherChowData α where
   scheme := C.scheme
   codim := C.codim
   simplicialLevel := C.simplicialLevel + 1
   generatorCount := C.generatorCount
   coefficientTag := C.coefficientTag
 
-def chowReflPath (C : BlochHigherChowData α) : Path C C :=
+noncomputable def chowReflPath (C : BlochHigherChowData α) : Path C C :=
   Path.refl C
 
-def chowTwoStepPath (C : BlochHigherChowData α) : Path C C :=
+noncomputable def chowTwoStepPath (C : BlochHigherChowData α) : Path C C :=
   Path.trans (Path.refl C) (Path.refl C)
 
-def chowTransportName (C : BlochHigherChowData α) : String :=
+noncomputable def chowTransportName (C : BlochHigherChowData α) : String :=
   C.scheme.label ++ ":" ++ C.coefficientTag
 
 theorem chowZero_codim (X : SmoothSchemeData α) (p : Nat) :
@@ -148,37 +148,37 @@ structure MotivicComplexData (α : Type u) where
   weight : Int
   objectName : String
 
-def motivicComplexShift (M : MotivicComplexData α) (n : Int) : MotivicComplexData α where
+noncomputable def motivicComplexShift (M : MotivicComplexData α) (n : Int) : MotivicComplexData α where
   scheme := M.scheme
   degree := M.degree + n
   weight := M.weight
   objectName := M.objectName ++ "[shift]"
 
-def motivicComplexTwist (M : MotivicComplexData α) (q : Int) : MotivicComplexData α where
+noncomputable def motivicComplexTwist (M : MotivicComplexData α) (q : Int) : MotivicComplexData α where
   scheme := M.scheme
   degree := M.degree
   weight := M.weight + q
   objectName := M.objectName ++ "(twist)"
 
-def motivicComplexCone (M N : MotivicComplexData α) : MotivicComplexData α where
+noncomputable def motivicComplexCone (M N : MotivicComplexData α) : MotivicComplexData α where
   scheme := M.scheme
   degree := M.degree + 1
   weight := M.weight + N.weight
   objectName := "Cone(" ++ M.objectName ++ "," ++ N.objectName ++ ")"
 
-def motivicComplexWeightZero (X : SmoothSchemeData α) : MotivicComplexData α where
+noncomputable def motivicComplexWeightZero (X : SmoothSchemeData α) : MotivicComplexData α where
   scheme := X
   degree := 0
   weight := 0
   objectName := "Z(0)"
 
-def motivicComplexLoopPath (M : MotivicComplexData α) : Path M M :=
+noncomputable def motivicComplexLoopPath (M : MotivicComplexData α) : Path M M :=
   Path.refl M
 
-def motivicComplexTwoStepPath (M : MotivicComplexData α) : Path M M :=
+noncomputable def motivicComplexTwoStepPath (M : MotivicComplexData α) : Path M M :=
   Path.trans (Path.refl M) (Path.refl M)
 
-def motivicComplexMapName (M : MotivicComplexData α) : String :=
+noncomputable def motivicComplexMapName (M : MotivicComplexData α) : String :=
   M.scheme.label ++ "::" ++ M.objectName
 
 theorem motivicComplexShift_degree (M : MotivicComplexData α) (n : Int) :
@@ -233,41 +233,41 @@ structure VoevodskyMotiveData (α : Type u) where
   effective : Bool
   motiveName : String
 
-def motiveOfScheme (X : SmoothSchemeData α) : VoevodskyMotiveData α where
+noncomputable def motiveOfScheme (X : SmoothSchemeData α) : VoevodskyMotiveData α where
   scheme := X
   twist := 0
   shift := 0
   effective := true
   motiveName := "M(" ++ X.label ++ ")"
 
-def tateMotive (X : SmoothSchemeData α) (n : Int) : VoevodskyMotiveData α where
+noncomputable def tateMotive (X : SmoothSchemeData α) (n : Int) : VoevodskyMotiveData α where
   scheme := X
   twist := n
   shift := 2 * n
   effective := true
   motiveName := "Z(" ++ toString n ++ ")"
 
-def motiveTensor (M N : VoevodskyMotiveData α) : VoevodskyMotiveData α where
+noncomputable def motiveTensor (M N : VoevodskyMotiveData α) : VoevodskyMotiveData α where
   scheme := M.scheme
   twist := M.twist + N.twist
   shift := M.shift + N.shift
   effective := M.effective && N.effective
   motiveName := M.motiveName ++ "⊗" ++ N.motiveName
 
-def motiveDual (M : VoevodskyMotiveData α) : VoevodskyMotiveData α where
+noncomputable def motiveDual (M : VoevodskyMotiveData α) : VoevodskyMotiveData α where
   scheme := M.scheme
   twist := -M.twist
   shift := -M.shift
   effective := M.effective
   motiveName := M.motiveName ++ "_dual"
 
-def motiveRealizationName (M : VoevodskyMotiveData α) : String :=
+noncomputable def motiveRealizationName (M : VoevodskyMotiveData α) : String :=
   "Real(" ++ M.motiveName ++ ")"
 
-def motiveSelfPath (M : VoevodskyMotiveData α) : Path M M :=
+noncomputable def motiveSelfPath (M : VoevodskyMotiveData α) : Path M M :=
   Path.refl M
 
-def motiveTwoStepPath (M : VoevodskyMotiveData α) : Path M M :=
+noncomputable def motiveTwoStepPath (M : VoevodskyMotiveData α) : Path M M :=
   Path.trans (Path.refl M) (Path.refl M)
 
 theorem motiveOfScheme_shift (X : SmoothSchemeData α) :
@@ -333,21 +333,21 @@ structure SymGamIndex where
   Sym : Nat
   Gam : Nat
 
-def SymGamIndex.swap (s : SymGamIndex) : SymGamIndex where
+noncomputable def SymGamIndex.swap (s : SymGamIndex) : SymGamIndex where
   Sym := s.Gam
   Gam := s.Sym
 
-def symGamDiagonal (n : Nat) : SymGamIndex where
+noncomputable def symGamDiagonal (n : Nat) : SymGamIndex where
   Sym := n
   Gam := n
 
-def mixedTatePure (M : VoevodskyMotiveData α) (w : Int) : MixedTateData α where
+noncomputable def mixedTatePure (M : VoevodskyMotiveData α) (w : Int) : MixedTateData α where
   motive := M
   minWeight := w
   maxWeight := w
   splitByWeight := true
 
-def weightFiltrationOfMixedTate (T : MixedTateData α) : WeightFiltrationData α where
+noncomputable def weightFiltrationOfMixedTate (T : MixedTateData α) : WeightFiltrationData α where
   motive := T.motive
   minWeight := T.minWeight
   maxWeight := T.maxWeight
@@ -355,7 +355,7 @@ def weightFiltrationOfMixedTate (T : MixedTateData α) : WeightFiltrationData α
   SymIndex := 0
   GamIndex := 0
 
-def weightTruncation (W : WeightFiltrationData α) (a b : Int) : WeightFiltrationData α where
+noncomputable def weightTruncation (W : WeightFiltrationData α) (a b : Int) : WeightFiltrationData α where
   motive := W.motive
   minWeight := a
   maxWeight := b
@@ -363,16 +363,16 @@ def weightTruncation (W : WeightFiltrationData α) (a b : Int) : WeightFiltratio
   SymIndex := W.SymIndex
   GamIndex := W.GamIndex
 
-def mixedTateLoop (T : MixedTateData α) : Path T T :=
+noncomputable def mixedTateLoop (T : MixedTateData α) : Path T T :=
   Path.refl T
 
-def mixedTateTwoStep (T : MixedTateData α) : Path T T :=
+noncomputable def mixedTateTwoStep (T : MixedTateData α) : Path T T :=
   Path.trans (Path.refl T) (Path.refl T)
 
-def weightRange (W : WeightFiltrationData α) : Nat :=
+noncomputable def weightRange (W : WeightFiltrationData α) : Nat :=
   Int.natAbs (W.maxWeight - W.minWeight)
 
-def weightPieceName (W : WeightFiltrationData α) : String :=
+noncomputable def weightPieceName (W : WeightFiltrationData α) : String :=
   "W[" ++ toString W.minWeight ++ "," ++ toString W.maxWeight ++ "]"
 
 theorem mixedTatePure_bounds (M : VoevodskyMotiveData α) (w : Int) :
@@ -438,47 +438,47 @@ structure RegulatorMapData (α : Type u) where
   mapName : String
   compatibleWeight : Bool
 
-def beilinsonBalanced (M : VoevodskyMotiveData α) (r : Nat) : BeilinsonConjectureData α where
+noncomputable def beilinsonBalanced (M : VoevodskyMotiveData α) (r : Nat) : BeilinsonConjectureData α where
   motive := M
   expectedRank := r
   regulatorRank := r
   lOrder := r
   predictsIso := true
 
-def regulatorIdentity (C : BlochHigherChowData α) (M : MotivicComplexData α) :
+noncomputable def regulatorIdentity (C : BlochHigherChowData α) (M : MotivicComplexData α) :
     RegulatorMapData α where
   source := C
   target := M
   mapName := "id_reg"
   compatibleWeight := true
 
-def regulatorCompose (f g : RegulatorMapData α) : RegulatorMapData α where
+noncomputable def regulatorCompose (f g : RegulatorMapData α) : RegulatorMapData α where
   source := f.source
   target := g.target
   mapName := f.mapName ++ " ; " ++ g.mapName
   compatibleWeight := f.compatibleWeight && g.compatibleWeight
 
-def regulatorBetti (C : BlochHigherChowData α) (M : MotivicComplexData α) :
+noncomputable def regulatorBetti (C : BlochHigherChowData α) (M : MotivicComplexData α) :
     RegulatorMapData α where
   source := C
   target := M
   mapName := "reg_Betti"
   compatibleWeight := true
 
-def regulatorEtale (C : BlochHigherChowData α) (M : MotivicComplexData α) :
+noncomputable def regulatorEtale (C : BlochHigherChowData α) (M : MotivicComplexData α) :
     RegulatorMapData α where
   source := C
   target := M
   mapName := "reg_Etale"
   compatibleWeight := true
 
-def beilinsonPath (B : BeilinsonConjectureData α) : Path B B :=
+noncomputable def beilinsonPath (B : BeilinsonConjectureData α) : Path B B :=
   Path.refl B
 
-def regulatorLoop (f : RegulatorMapData α) : Path f f :=
+noncomputable def regulatorLoop (f : RegulatorMapData α) : Path f f :=
   Path.refl f
 
-def regulatorTwoStep (f : RegulatorMapData α) : Path f f :=
+noncomputable def regulatorTwoStep (f : RegulatorMapData α) : Path f f :=
   Path.trans (Path.refl f) (Path.refl f)
 
 theorem beilinsonBalanced_predicts (M : VoevodskyMotiveData α) (r : Nat) :
@@ -542,31 +542,31 @@ structure NormResidueIsoData (α : Type u) where
   targetEtaleRank : Nat
   isIsomorphism : Bool
 
-def milnorKZero (k : α) : MilnorKData α where
+noncomputable def milnorKZero (k : α) : MilnorKData α where
   field := k
   degree := 0
   symbolCount := 1
   relationTag := "K0"
 
-def milnorKOne (k : α) : MilnorKData α where
+noncomputable def milnorKOne (k : α) : MilnorKData α where
   field := k
   degree := 1
   symbolCount := 1
   relationTag := "K1"
 
-def milnorProduct (A B : MilnorKData α) : MilnorKData α where
+noncomputable def milnorProduct (A B : MilnorKData α) : MilnorKData α where
   field := A.field
   degree := A.degree + B.degree
   symbolCount := A.symbolCount + B.symbolCount
   relationTag := A.relationTag ++ "*" ++ B.relationTag
 
-def milnorSteinbergPath (K : MilnorKData α) : Path K K :=
+noncomputable def milnorSteinbergPath (K : MilnorKData α) : Path K K :=
   Path.refl K
 
-def milnorTwoStepPath (K : MilnorKData α) : Path K K :=
+noncomputable def milnorTwoStepPath (K : MilnorKData α) : Path K K :=
   Path.trans (Path.refl K) (Path.refl K)
 
-def normResidueStatement (k : α) (p n r : Nat) : NormResidueIsoData α where
+noncomputable def normResidueStatement (k : α) (p n r : Nat) : NormResidueIsoData α where
   field := k
   prime := p
   degree := n
@@ -574,10 +574,10 @@ def normResidueStatement (k : α) (p n r : Nat) : NormResidueIsoData α where
   targetEtaleRank := r
   isIsomorphism := true
 
-def normResiduePath (N : NormResidueIsoData α) : Path N N :=
+noncomputable def normResiduePath (N : NormResidueIsoData α) : Path N N :=
   Path.refl N
 
-def normResidueTwoStepPath (N : NormResidueIsoData α) : Path N N :=
+noncomputable def normResidueTwoStepPath (N : NormResidueIsoData α) : Path N N :=
   Path.trans (Path.refl N) (Path.refl N)
 
 theorem milnorKZero_degree (k : α) : (milnorKZero k).degree = 0 := rfl
@@ -639,14 +639,14 @@ structure EtaleComparisonData (α : Type u) where
   comparisonWeight : Int
   comparisonHolds : Bool
 
-def etaleCohShift (E : EtaleCohData α) (d t : Nat) : EtaleCohData α where
+noncomputable def etaleCohShift (E : EtaleCohData α) (d t : Nat) : EtaleCohData α where
   scheme := E.scheme
   degree := E.degree + d
   twist := E.twist + t
   finiteCoefficients := E.finiteCoefficients
   rank := E.rank
 
-def etaleComparisonIdentity (M : MotivicComplexData α) (E : EtaleCohData α) :
+noncomputable def etaleComparisonIdentity (M : MotivicComplexData α) (E : EtaleCohData α) :
     EtaleComparisonData α where
   motivic := M
   etale := E
@@ -654,22 +654,22 @@ def etaleComparisonIdentity (M : MotivicComplexData α) (E : EtaleCohData α) :
   comparisonWeight := M.weight
   comparisonHolds := true
 
-def etaleComparisonLoop (C : EtaleComparisonData α) : Path C C :=
+noncomputable def etaleComparisonLoop (C : EtaleComparisonData α) : Path C C :=
   Path.refl C
 
-def etaleComparisonTwoStep (C : EtaleComparisonData α) : Path C C :=
+noncomputable def etaleComparisonTwoStep (C : EtaleComparisonData α) : Path C C :=
   Path.trans (Path.refl C) (Path.refl C)
 
-def etaleComparisonTransportName (C : EtaleComparisonData α) : String :=
+noncomputable def etaleComparisonTransportName (C : EtaleComparisonData α) : String :=
   C.motivic.objectName ++ "=>" ++ C.etale.scheme.label
 
-def etaleComparisonToRegulator (C : EtaleComparisonData α) : RegulatorMapData α where
+noncomputable def etaleComparisonToRegulator (C : EtaleComparisonData α) : RegulatorMapData α where
   source := chowZero C.motivic.scheme 0
   target := C.motivic
   mapName := "reg_from_etale_comp"
   compatibleWeight := C.comparisonHolds
 
-def etaleComparisonRestrict (C : EtaleComparisonData α) (d : Int) : EtaleComparisonData α where
+noncomputable def etaleComparisonRestrict (C : EtaleComparisonData α) (d : Int) : EtaleComparisonData α where
   motivic := C.motivic
   etale := C.etale
   comparisonDegree := C.comparisonDegree + d

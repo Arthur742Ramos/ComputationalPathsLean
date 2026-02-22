@@ -67,7 +67,7 @@ variable {Higgs : Type u} {Coulomb : Type v}
 variable (M : Mirror3DPathData Higgs Coulomb)
 
 /-- Composite path from mass deformation to Coulomb dualization data. -/
-def dualizedMassPath (h : Higgs) :
+noncomputable def dualizedMassPath (h : Higgs) :
     Path (M.mirrorToCoulomb (M.massShift h))
       (M.mirrorToCoulomb (M.mirrorToHiggs (M.fiShift (M.mirrorToCoulomb h)))) :=
   Path.trans
@@ -75,7 +75,7 @@ def dualizedMassPath (h : Higgs) :
     (Path.symm (M.coulombRoundTripPath (M.fiShift (M.mirrorToCoulomb h))))
 
 /-- Step witness: right-unit normalization for Higgs round-trip coherence. -/
-def higgsRoundTrip_step (h : Higgs) :
+noncomputable def higgsRoundTrip_step (h : Higgs) :
     Path.Step
       (Path.trans (M.higgsRoundTripPath h) (Path.refl h))
       (M.higgsRoundTripPath h) :=
@@ -88,7 +88,7 @@ noncomputable def higgsRoundTrip_rweq (h : Higgs) :
   rweq_of_step (M.higgsRoundTrip_step h)
 
 /-- Step witness: right-unit normalization for Coulomb round-trip coherence. -/
-def coulombRoundTrip_step (c : Coulomb) :
+noncomputable def coulombRoundTrip_step (c : Coulomb) :
     Path.Step
       (Path.trans (M.coulombRoundTripPath c) (Path.refl c))
       (M.coulombRoundTripPath c) :=
@@ -101,7 +101,7 @@ noncomputable def coulombRoundTrip_rweq (c : Coulomb) :
   rweq_of_step (M.coulombRoundTrip_step c)
 
 /-- Step witness: right-unit normalization for mass/FI mirror compatibility. -/
-def massFI_step (h : Higgs) :
+noncomputable def massFI_step (h : Higgs) :
     Path.Step
       (Path.trans
         (M.massFIPath h)
@@ -118,7 +118,7 @@ noncomputable def massFI_rweq (h : Higgs) :
   rweq_of_step (M.massFI_step h)
 
 /-- Step witness: right-unit normalization for mapped Higgs paths. -/
-def mirrorMap_step {a b : Higgs} (p : Path a b) :
+noncomputable def mirrorMap_step {a b : Higgs} (p : Path a b) :
     Path.Step
       (Path.trans (M.mirrorMap p) (Path.refl (M.mirrorToCoulomb b)))
       (M.mirrorMap p) :=
@@ -131,7 +131,7 @@ noncomputable def mirrorMap_rweq {a b : Higgs} (p : Path a b) :
   rweq_of_step (M.mirrorMap_step p)
 
 /-- Step witness: right-unit normalization for the dualized mass comparison. -/
-def dualizedMass_step (h : Higgs) :
+noncomputable def dualizedMass_step (h : Higgs) :
     Path.Step
       (Path.trans
         (M.dualizedMassPath h)
@@ -159,7 +159,7 @@ noncomputable def dualizedMass_cancel_rweq (h : Higgs) :
 end Mirror3DPathData
 
 /-- Trivial model instantiating the 3d mirror-symmetry path interface. -/
-def trivialMirror3DPathData : Mirror3DPathData PUnit PUnit where
+noncomputable def trivialMirror3DPathData : Mirror3DPathData PUnit PUnit where
   mirrorToCoulomb := fun _ => PUnit.unit
   mirrorToHiggs := fun _ => PUnit.unit
   massShift := fun _ => PUnit.unit

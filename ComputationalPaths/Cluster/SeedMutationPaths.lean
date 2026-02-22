@@ -34,7 +34,7 @@ namespace SeedPathData
 variable {ι : Type u} {Val : Type v} (S : SeedPathData ι Val)
 
 /-- Step witness: right-unit normalization for matrix skew-symmetry paths. -/
-def skew_step (i j : ι) :
+noncomputable def skew_step (i j : ι) :
     Path.Step
       (Path.trans (S.skewPath i j) (Path.refl (-(S.exchangeMatrix j i))))
       (S.skewPath i j) :=
@@ -69,7 +69,7 @@ variable {ι : Type u} {Val : Type v} {S : SeedPathData ι Val}
 variable (M : MutationPathData S)
 
 /-- Step witness: right-unit normalization for the exchange relation path. -/
-def exchange_step :
+noncomputable def exchange_step :
     Path.Step
       (Path.trans (M.exchangePath) (Path.refl (M.add M.posMonomial M.negMonomial)))
       (M.exchangePath) :=
@@ -82,7 +82,7 @@ noncomputable def exchange_rweq :
   rweq_of_step (M.exchange_step)
 
 /-- Step witness: left-unit normalization for mutation involutivity. -/
-def mutation_involutive_step :
+noncomputable def mutation_involutive_step :
     Path.Step
       (Path.trans
         (Path.refl (M.mutateAt M.direction (M.mutateAt M.direction (S.vars M.direction))))
@@ -107,13 +107,13 @@ noncomputable def exchange_cancel_rweq :
 end MutationPathData
 
 /-- Trivial seed package over `PUnit`. -/
-def trivialSeedPathData : SeedPathData PUnit PUnit where
+noncomputable def trivialSeedPathData : SeedPathData PUnit PUnit where
   exchangeMatrix := fun _ _ => 0
   vars := fun _ => PUnit.unit
   skewPath := fun _ _ => Path.stepChain (by simp)
 
 /-- Trivial mutation package over the trivial seed. -/
-def trivialMutationPathData : MutationPathData trivialSeedPathData where
+noncomputable def trivialMutationPathData : MutationPathData trivialSeedPathData where
   direction := PUnit.unit
   mul := fun _ _ => PUnit.unit
   add := fun _ _ => PUnit.unit

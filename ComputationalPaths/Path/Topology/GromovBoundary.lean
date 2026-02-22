@@ -58,7 +58,7 @@ theorem ray_diverges {X : Type u} {M : MetricData X} {basepoint : X}
   omega
 
 /-- Convert a geodesic ray to a sequence at infinity. -/
-def rayToSeq {X : Type u} {M : MetricData X} {basepoint : X}
+noncomputable def rayToSeq {X : Type u} {M : MetricData X} {basepoint : X}
     (r : GeodesicRay M basepoint) : SeqAtInfinity M basepoint where
   seq := r.point
   diverges := ray_diverges r
@@ -67,7 +67,7 @@ def rayToSeq {X : Type u} {M : MetricData X} {basepoint : X}
 
 /-- Two geodesic rays are equivalent if their Gromov product diverges
     (i.e. they fellow-travel). -/
-def RayEquiv {X : Type u} (M : MetricData X) (basepoint : X)
+noncomputable def RayEquiv {X : Type u} (M : MetricData X) (basepoint : X)
     (r₁ r₂ : GeodesicRay M basepoint) : Prop :=
   ∀ N : Nat, ∃ n₀ : Nat, ∀ n, n ≥ n₀ →
     M.gromovProduct basepoint (r₁.point n) (r₂.point n) ≥ N
@@ -97,11 +97,11 @@ theorem rayEquiv_symm {X : Type u} {M : MetricData X} {basepoint : X}
 
 /-- The Gromov boundary of a metric space as a quotient of geodesic rays
     by the fellow-travelling equivalence. -/
-def GromovBoundary {X : Type u} (M : MetricData X) (basepoint : X) : Type u :=
+noncomputable def GromovBoundary {X : Type u} (M : MetricData X) (basepoint : X) : Type u :=
   Quot (RayEquiv M basepoint)
 
 /-- Project a geodesic ray to its boundary class. -/
-def toBoundaryClass {X : Type u} {M : MetricData X} {basepoint : X}
+noncomputable def toBoundaryClass {X : Type u} {M : MetricData X} {basepoint : X}
     (r : GeodesicRay M basepoint) : GromovBoundary M basepoint :=
   Quot.mk _ r
 
@@ -112,13 +112,13 @@ theorem equiv_boundary_eq {X : Type u} {M : MetricData X} {basepoint : X}
   Quot.sound h
 
 /-- Convert boundary equivalence into a computational path. -/
-def equiv_boundary_path {X : Type u} {M : MetricData X} {basepoint : X}
+noncomputable def equiv_boundary_path {X : Type u} {M : MetricData X} {basepoint : X}
     {r₁ r₂ : GeodesicRay M basepoint} (h : RayEquiv M basepoint r₁ r₂) :
     Path (toBoundaryClass r₁) (toBoundaryClass r₂) :=
   Path.stepChain (equiv_boundary_eq h)
 
 /-- Path composition turns boundary equivalence into a loop. -/
-def boundary_class_loop {X : Type u} {M : MetricData X} {basepoint : X}
+noncomputable def boundary_class_loop {X : Type u} {M : MetricData X} {basepoint : X}
     {r₁ r₂ : GeodesicRay M basepoint} (h : RayEquiv M basepoint r₁ r₂) :
     Path (toBoundaryClass r₁) (toBoundaryClass r₁) :=
   Path.trans (equiv_boundary_path h) (Path.symm (equiv_boundary_path h))
@@ -135,14 +135,14 @@ structure BoundaryOpenBall {X : Type u} (M : MetricData X) (basepoint : X) where
 
 /-- Membership in a boundary open ball: a ray belongs if its Gromov product
     with the center ray eventually exceeds the radius. -/
-def BoundaryOpenBall.mem {X : Type u} {M : MetricData X} {basepoint : X}
+noncomputable def BoundaryOpenBall.mem {X : Type u} {M : MetricData X} {basepoint : X}
     (B : BoundaryOpenBall M basepoint) (r : GeodesicRay M basepoint) : Prop :=
   ∃ n₀ : Nat, ∀ n, n ≥ n₀ →
     M.gromovProduct basepoint (B.center.point n) (r.point n) ≥ B.radius
 
 /-- A subset of the boundary is open if every boundary point in U has a
     neighborhood ball contained in U. -/
-def BoundaryOpen {X : Type u} (M : MetricData X) (basepoint : X)
+noncomputable def BoundaryOpen {X : Type u} (M : MetricData X) (basepoint : X)
     (U : GromovBoundary M basepoint → Prop) : Prop :=
   ∀ r : GeodesicRay M basepoint, U (toBoundaryClass r) →
     ∃ B : BoundaryOpenBall M basepoint, B.mem r ∧
@@ -158,7 +158,7 @@ structure BoundaryTopology {X : Type u} (M : MetricData X) (basepoint : X) where
   mk_ball : ∀ r n, (balls r n).center = r ∧ (balls r n).radius = n
 
 /-- Canonical boundary topology via basic open balls. -/
-def canonicalTopology {X : Type u} (M : MetricData X) (basepoint : X) :
+noncomputable def canonicalTopology {X : Type u} (M : MetricData X) (basepoint : X) :
     BoundaryTopology M basepoint where
   balls := fun r n => { center := r, radius := n }
   mk_ball := by intro r n; exact ⟨rfl, rfl⟩
@@ -175,16 +175,16 @@ structure FreeGroupBoundaryPoint (Gen : Type u) where
   reduced : ∀ n, word (n + 1) ≠ Algebra.CayleyGraphPaths.SignedGen.inv (word n)
 
 /-- The boundary of a free group on generators Gen. -/
-def FreeGroupBoundary (Gen : Type u) : Type u :=
+noncomputable def FreeGroupBoundary (Gen : Type u) : Type u :=
   FreeGroupBoundaryPoint Gen
 
 /-- Two free group boundary points agree up to depth n. -/
-def freeGroupAgreeUpTo {Gen : Type u}
+noncomputable def freeGroupAgreeUpTo {Gen : Type u}
     (p q : FreeGroupBoundary Gen) (n : Nat) : Prop :=
   ∀ k, k < n → p.word k = q.word k
 
 /-- Free group boundary distance as the first disagreement depth. -/
-def freeGroupBoundaryClose {Gen : Type u}
+noncomputable def freeGroupBoundaryClose {Gen : Type u}
     (p q : FreeGroupBoundary Gen) (n : Nat) : Prop :=
   freeGroupAgreeUpTo p q n ∧ (n > 0 → p.word (n - 1) = q.word (n - 1))
 
@@ -200,11 +200,11 @@ structure HyperbolicSpaceBoundary (dim : Nat) where
 
 /-- Two boundary points of hyperbolic space are equivalent if their directions
     are positive scalar multiples. -/
-def hsBoundaryEquiv {dim : Nat} (p q : HyperbolicSpaceBoundary dim) : Prop :=
+noncomputable def hsBoundaryEquiv {dim : Nat} (p q : HyperbolicSpaceBoundary dim) : Prop :=
   ∃ (c : Int), c > 0 ∧ ∀ i, q.direction i = c * p.direction i
 
 /-- Projective boundary of hyperbolic space. -/
-def ProjectiveBoundary (dim : Nat) : Type :=
+noncomputable def ProjectiveBoundary (dim : Nat) : Type :=
   Quot (@hsBoundaryEquiv dim)
 
 /-! ## Visual Metric -/
@@ -227,7 +227,7 @@ structure VisualMetric {X : Type u} (M : MetricData X) (basepoint : X) where
   dist_comm : ∀ r₁ r₂, visualDist r₁ r₂ = visualDist r₂ r₁
 
 /-- Construct a trivial visual metric (all distances zero) as a baseline. -/
-def trivialVisualMetric {X : Type u} (M : MetricData X) (basepoint : X) :
+noncomputable def trivialVisualMetric {X : Type u} (M : MetricData X) (basepoint : X) :
     VisualMetric M basepoint where
   base := 2
   base_ge_two := Nat.le_refl _

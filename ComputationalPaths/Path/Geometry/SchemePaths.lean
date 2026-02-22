@@ -21,11 +21,11 @@ universe u
 
 abbrev R := Int
 
-@[simp] def rzero : R := 0
-@[simp] def rone : R := 1
-@[simp] def radd (a b : R) : R := a + b
-@[simp] def rmul (a b : R) : R := a * b
-@[simp] def rneg (a : R) : R := -a
+@[simp] noncomputable def rzero : R := 0
+@[simp] noncomputable def rone : R := 1
+@[simp] noncomputable def radd (a b : R) : R := a + b
+@[simp] noncomputable def rmul (a b : R) : R := a * b
+@[simp] noncomputable def rneg (a : R) : R := -a
 
 /-! ## Ideals as predicates -/
 
@@ -36,14 +36,14 @@ structure Ideal where
   neg_mem : ∀ a, mem a → mem (rneg a)
   mul_mem : ∀ r a, mem a → mem (rmul r a)
 
-def zeroIdeal : Ideal where
+noncomputable def zeroIdeal : Ideal where
   mem := fun a => a = 0
   zero_mem := rfl
   add_mem := fun a b ha hb => by simp [radd, ha, hb]
   neg_mem := fun a ha => by simp [rneg, ha]
   mul_mem := fun r a ha => by simp [rmul, ha]
 
-def unitIdeal : Ideal where
+noncomputable def unitIdeal : Ideal where
   mem := fun _ => True
   zero_mem := trivial
   add_mem := fun _ _ _ _ => trivial
@@ -63,12 +63,12 @@ structure LocElem where
   den : R
   den_ne_zero : den ≠ 0
 
-@[simp] def locZero : LocElem where
+@[simp] noncomputable def locZero : LocElem where
   num := rzero
   den := rone
   den_ne_zero := by decide
 
-@[simp] def locOne : LocElem where
+@[simp] noncomputable def locOne : LocElem where
   num := rone
   den := rone
   den_ne_zero := by decide
@@ -144,7 +144,7 @@ theorem RStep.toEq {s t : R} : RStep s t → s = t
   | .negAddDist _ _ => Int.neg_add ..
   | .mulNegOne _ => by show _ * -1 = -_; rw [Int.mul_neg, Int.mul_one]
 
-def RStep.toPath {s t : R} (h : RStep s t) : Path s t :=
+noncomputable def RStep.toPath {s t : R} (h : RStep s t) : Path s t :=
   Path.mk [⟨s, t, h.toEq⟩] h.toEq
 
 /-! ## Core ring theorems (1-20) -/
@@ -154,7 +154,7 @@ theorem ring_add_comm (a b : R) : radd a b = radd b a :=
   (RStep.addComm a b).toEq
 
 -- 2. Path for add comm
-def ring_add_comm_path (a b : R) : Path (radd a b) (radd b a) :=
+noncomputable def ring_add_comm_path (a b : R) : Path (radd a b) (radd b a) :=
   (RStep.addComm a b).toPath
 
 -- 3. Multiplication is commutative
@@ -162,7 +162,7 @@ theorem ring_mul_comm (a b : R) : rmul a b = rmul b a :=
   (RStep.mulComm a b).toEq
 
 -- 4. Path for mul comm
-def ring_mul_comm_path (a b : R) : Path (rmul a b) (rmul b a) :=
+noncomputable def ring_mul_comm_path (a b : R) : Path (rmul a b) (rmul b a) :=
   (RStep.mulComm a b).toPath
 
 -- 5. Addition is associative
@@ -170,7 +170,7 @@ theorem ring_add_assoc (a b c : R) : radd (radd a b) c = radd a (radd b c) :=
   (RStep.addAssoc a b c).toEq
 
 -- 6. Path for add assoc
-def ring_add_assoc_path (a b c : R) :
+noncomputable def ring_add_assoc_path (a b c : R) :
     Path (radd (radd a b) c) (radd a (radd b c)) :=
   (RStep.addAssoc a b c).toPath
 
@@ -221,7 +221,7 @@ theorem ring_neg_neg (a : R) : rneg (rneg a) = a :=
   (RStep.negNeg a).toEq
 
 -- 18. Path for double negation
-def ring_neg_neg_path (a : R) : Path (rneg (rneg a)) a :=
+noncomputable def ring_neg_neg_path (a : R) : Path (rneg (rneg a)) a :=
   (RStep.negNeg a).toPath
 
 -- 19. Negation distributes over addition
@@ -235,116 +235,116 @@ theorem ring_mul_neg_one (a : R) : rmul a (rneg rone) = rneg a :=
 /-! ## Scheme path theorems (21-35) -/
 
 -- 21. Product associator path
-def prod_assoc_path (X Y Z : SchObj) :
+noncomputable def prod_assoc_path (X Y Z : SchObj) :
     SchPath (.prod (.prod X Y) Z) (.prod X (.prod Y Z)) :=
   SchPath.step (SchStep.prodAssoc X Y Z)
 
 -- 22. Product with terminal (right)
-def prod_terminal_right_path (X : SchObj) : SchPath (.prod X .terminal) X :=
+noncomputable def prod_terminal_right_path (X : SchObj) : SchPath (.prod X .terminal) X :=
   SchPath.step (SchStep.prodTerminalRight X)
 
 -- 23. Product with terminal (left)
-def prod_terminal_left_path (X : SchObj) : SchPath (.prod .terminal X) X :=
+noncomputable def prod_terminal_left_path (X : SchObj) : SchPath (.prod .terminal X) X :=
   SchPath.step (SchStep.prodTerminalLeft X)
 
 -- 24. Empty is initial
-def empty_initial (X : SchObj) : SchPath .empty X :=
+noncomputable def empty_initial (X : SchObj) : SchPath .empty X :=
   SchPath.step (SchStep.emptyMap X)
 
 -- 25. Terminal map exists for any X
-def terminal_map (X : SchObj) : SchPath X .terminal :=
+noncomputable def terminal_map (X : SchObj) : SchPath X .terminal :=
   SchPath.step (SchStep.terminalMap X)
 
 -- 26. Localization at 1 retracts to ring
-def loc_one_retract : SchPath (.loc 1) .ring :=
+noncomputable def loc_one_retract : SchPath (.loc 1) .ring :=
   SchPath.step SchStep.locRefl
 
 -- 27. Localization inclusion
-def loc_incl (f : R) : SchPath .ring (.loc f) :=
+noncomputable def loc_incl (f : R) : SchPath .ring (.loc f) :=
   SchPath.step (SchStep.locIncl f)
 
 -- 28. Localization transitivity
-def loc_trans_path (f g : R) : SchPath (.loc f) (.loc (rmul f g)) :=
+noncomputable def loc_trans_path (f g : R) : SchPath (.loc f) (.loc (rmul f g)) :=
   SchPath.step (SchStep.locTrans f g)
 
 -- 29. Composite: ring → loc f → loc (f*g)
-def ring_to_loc_fg (f g : R) : SchPath .ring (.loc (rmul f g)) :=
+noncomputable def ring_to_loc_fg (f g : R) : SchPath .ring (.loc (rmul f g)) :=
   SchPath.trans (SchPath.step (SchStep.locIncl f))
                 (SchPath.step (SchStep.locTrans f g))
 
 -- 30. Product symmetry
-def prod_symm_path (X Y : SchObj) : SchPath (.prod X Y) (.prod Y X) :=
+noncomputable def prod_symm_path (X Y : SchObj) : SchPath (.prod X Y) (.prod Y X) :=
   SchPath.step (SchStep.prodSymm X Y)
 
 -- 31. Product symmetry involution (via SchPath)
-def prod_symm_roundtrip (X Y : SchObj) : SchPath (.prod X Y) (.prod X Y) :=
+noncomputable def prod_symm_roundtrip (X Y : SchObj) : SchPath (.prod X Y) (.prod X Y) :=
   SchPath.trans (SchPath.step (SchStep.prodSymm X Y))
                 (SchPath.step (SchStep.prodSymm Y X))
 
 -- 32. SchPath reflexivity + transitivity
-def schpath_refl_trans {X Y : SchObj} (p : SchPath X Y) : SchPath X Y :=
+noncomputable def schpath_refl_trans {X Y : SchObj} (p : SchPath X Y) : SchPath X Y :=
   SchPath.trans (SchPath.refl X) p
 
 -- 33. SchPath composition
-def schpath_compose {X Y Z : SchObj} (p : SchPath X Y) (q : SchPath Y Z) : SchPath X Z :=
+noncomputable def schpath_compose {X Y Z : SchObj} (p : SchPath X Y) (q : SchPath Y Z) : SchPath X Z :=
   SchPath.trans p q
 
 -- 34. SchPath symmetry then forward = roundtrip
-def schpath_symm_trans {X Y : SchObj} (p : SchPath X Y) : SchPath X X :=
+noncomputable def schpath_symm_trans {X Y : SchObj} (p : SchPath X Y) : SchPath X X :=
   SchPath.trans p (SchPath.symm p)
 
 -- 35. Projection paths
-def proj_left_path (X Y : SchObj) : SchPath (.prod X Y) X :=
+noncomputable def proj_left_path (X Y : SchObj) : SchPath (.prod X Y) X :=
   SchPath.step (SchStep.projLeft X Y)
 
 /-! ## Compound ring path constructions (36-45) -/
 
 -- 36. Distributivity path chain
-def distrib_path_chain (a b c : R) :
+noncomputable def distrib_path_chain (a b c : R) :
     Path (rmul a (radd b c)) (radd (rmul a b) (rmul a c)) :=
   (RStep.distribLeft a b c).toPath
 
 -- 37. Zero annihilation path
-def zero_annihil_path (a : R) : Path (rmul a rzero) rzero :=
+noncomputable def zero_annihil_path (a : R) : Path (rmul a rzero) rzero :=
   (RStep.mulZero a).toPath
 
 -- 38. Congruence through add (left)
-def radd_congrArg_left {a₁ a₂ : R} (h : Path a₁ a₂) (b : R) :
+noncomputable def radd_congrArg_left {a₁ a₂ : R} (h : Path a₁ a₂) (b : R) :
     Path (radd a₁ b) (radd a₂ b) :=
   Path.congrArg (fun x => radd x b) h
 
 -- 39. Congruence through mul (left)
-def rmul_congrArg_left {a₁ a₂ : R} (h : Path a₁ a₂) (b : R) :
+noncomputable def rmul_congrArg_left {a₁ a₂ : R} (h : Path a₁ a₂) (b : R) :
     Path (rmul a₁ b) (rmul a₂ b) :=
   Path.congrArg (fun x => rmul x b) h
 
 -- 40. Congruence through add (right)
-def radd_congrArg_right (a : R) {b₁ b₂ : R} (h : Path b₁ b₂) :
+noncomputable def radd_congrArg_right (a : R) {b₁ b₂ : R} (h : Path b₁ b₂) :
     Path (radd a b₁) (radd a b₂) :=
   Path.congrArg (radd a) h
 
 -- 41. Composite: a*(b+c) → a*b + a*c → a*c + a*b
-def distrib_then_comm_path (a b c : R) :
+noncomputable def distrib_then_comm_path (a b c : R) :
     Path (rmul a (radd b c)) (radd (rmul a c) (rmul a b)) :=
   Path.trans
     (RStep.distribLeft a b c).toPath
     (RStep.addComm (rmul a b) (rmul a c)).toPath
 
 -- 42. Associativity then commutativity: (a+b)+c → a+(b+c) → (b+c)+a
-def assoc_then_comm_path (a b c : R) :
+noncomputable def assoc_then_comm_path (a b c : R) :
     Path (radd (radd a b) c) (radd (radd b c) a) :=
   Path.trans
     (RStep.addAssoc a b c).toPath
     (RStep.addComm a (radd b c)).toPath
 
 -- 43. Negation roundtrip via step paths
-def neg_roundtrip (a : R) : Path a a :=
+noncomputable def neg_roundtrip (a : R) : Path a a :=
   Path.trans
     (Path.symm (RStep.addZero a).toPath)
     (RStep.addZero a).toPath
 
 -- 44. Mul assoc backward: a*(b*c) ← (a*b)*c
-def mul_assoc_symm_path (a b c : R) :
+noncomputable def mul_assoc_symm_path (a b c : R) :
     Path (rmul a (rmul b c)) (rmul (rmul a b) c) :=
   Path.symm (RStep.mulAssoc a b c).toPath
 

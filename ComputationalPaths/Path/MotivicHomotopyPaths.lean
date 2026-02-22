@@ -47,7 +47,7 @@ structure A1Homotopy (X : Type u) (A1 : Type v) (a b : X) where
   baseCoherence : evalPath basePoint = basePath
 
 /-- Two A¹-homotopies compose via path trans at each parameter. -/
-def A1Homotopy.comp {X : Type u} {A1 : Type v} {a b c : X}
+noncomputable def A1Homotopy.comp {X : Type u} {A1 : Type v} {a b c : X}
     (h₁ : A1Homotopy X A1 a b) (h₂ : A1Homotopy X A1 b c) :
     A1Homotopy X A1 a c where
   evalPath := fun t => Path.trans (h₁.evalPath t) (h₂.evalPath t)
@@ -56,7 +56,7 @@ def A1Homotopy.comp {X : Type u} {A1 : Type v} {a b c : X}
   baseCoherence := rfl
 
 /-- Reverse an A¹-homotopy via path symm. -/
-def A1Homotopy.reverse {X : Type u} {A1 : Type v} {a b : X}
+noncomputable def A1Homotopy.reverse {X : Type u} {A1 : Type v} {a b : X}
     (h : A1Homotopy X A1 a b) :
     A1Homotopy X A1 b a where
   evalPath := fun t => Path.symm (h.evalPath t)
@@ -72,7 +72,7 @@ theorem A1Homotopy.comp_reverse_base_proof {X : Type u} {A1 : Type v} {a b : X}
     cases p; rfl
 
 /-- A¹-constant homotopy: every parameter gives refl. -/
-def A1Homotopy.const (X : Type u) (A1 : Type v) (a : X) (t₀ : A1) :
+noncomputable def A1Homotopy.const (X : Type u) (A1 : Type v) (a : X) (t₀ : A1) :
     A1Homotopy X A1 a a where
   evalPath := fun _ => Path.refl a
   basePoint := t₀
@@ -86,7 +86,7 @@ theorem A1Homotopy.const_comp_const {X : Type u} {A1 : Type v} (a : X) (t₀ : A
   simp [A1Homotopy.comp, A1Homotopy.const, Path.refl]
 
 /-- Functorial action on A¹-homotopy via congrArg. -/
-def A1Homotopy.map {X : Type u} {Y : Type v} {A1 : Type w} {a b : X}
+noncomputable def A1Homotopy.map {X : Type u} {Y : Type v} {A1 : Type w} {a b : X}
     (f : X → Y) (h : A1Homotopy X A1 a b) :
     A1Homotopy Y A1 (f a) (f b) where
   evalPath := fun t => Path.congrArg f (h.evalPath t)
@@ -117,7 +117,7 @@ structure NisnevichSquare (U V W X : Type u) where
   commPath : ∀ u : U, Path (right (top u)) (bottom (left u))
 
 /-- Symmetry of the square: transposing gives the inverse commutativity path. -/
-def NisnevichSquare.transpose {U V W X : Type u}
+noncomputable def NisnevichSquare.transpose {U V W X : Type u}
     (sq : NisnevichSquare U V W X) :
     NisnevichSquare U W V X where
   top := sq.left
@@ -133,7 +133,7 @@ theorem NisnevichSquare.transpose_twice_comm {U V W X : Type u}
   simp [NisnevichSquare.transpose]
 
 /-- Horizontal pasting of two Nisnevich squares. -/
-def NisnevichSquare.hpaste {U V W X Y Z : Type u}
+noncomputable def NisnevichSquare.hpaste {U V W X Y Z : Type u}
     (sq1 : NisnevichSquare U V W X)
     (sq2 : NisnevichSquare V Y X Z)
     (hRight : ∀ v : V, Path (sq2.left v) (sq1.right v)) :
@@ -149,7 +149,7 @@ def NisnevichSquare.hpaste {U V W X Y Z : Type u}
     Path.trans p1 (Path.trans p2 p3)
 
 /-- Functorial action on a Nisnevich square via congrArg. -/
-def NisnevichSquare.mapTarget {U V W X Y : Type u}
+noncomputable def NisnevichSquare.mapTarget {U V W X Y : Type u}
     (sq : NisnevichSquare U V W X) (f : X → Y) :
     NisnevichSquare U V W Y where
   top := sq.top
@@ -175,7 +175,7 @@ structure GmSphere (G : Type u) where
   leftInvPath : ∀ x : G, Path (mul (inv x) x) unit
 
 /-- Functorial action on Gm-sphere: mapping right-inverse through f. -/
-def GmSphere.mapRightInv {G H : Type u} (f : G → H)
+noncomputable def GmSphere.mapRightInv {G H : Type u} (f : G → H)
     (gm : GmSphere G) (hm : GmSphere H)
     (fMul : ∀ x y, Path (f (gm.mul x y)) (hm.mul (f x) (f y)))
     (fUnit : Path (f gm.unit) hm.unit)
@@ -184,7 +184,7 @@ def GmSphere.mapRightInv {G H : Type u} (f : G → H)
   hm.rightInvPath (f x)
 
 /-- Right-inverse followed by symm of left-inverse: a composed path. -/
-def GmSphere.rightLeftComposed {G : Type u} (gm : GmSphere G) (x : G) :
+noncomputable def GmSphere.rightLeftComposed {G : Type u} (gm : GmSphere G) (x : G) :
     Path (gm.mul x (gm.inv x)) (gm.mul (gm.inv x) x) :=
   Path.trans (gm.rightInvPath x) (Path.symm (gm.leftInvPath x))
 
@@ -194,7 +194,7 @@ structure SimplicialSphere (S : Type u) where
   suspPath : ∀ x : S, Path x base
 
 /-- Any simplicial sphere is path-connected: path between any two points. -/
-def SimplicialSphere.connected {S : Type u} (ss : SimplicialSphere S)
+noncomputable def SimplicialSphere.connected {S : Type u} (ss : SimplicialSphere S)
     (x y : S) : Path x y :=
   Path.trans (ss.suspPath x) (Path.symm (ss.suspPath y))
 
@@ -214,7 +214,7 @@ structure MotivicSphere (S : Type u) (p q : Nat) where
   connectPath : ∀ x : S, Path x base
 
 /-- Bigraded sphere connectivity via trans and symm. -/
-def MotivicSphere.bigraded_connected {S : Type u} {p q : Nat}
+noncomputable def MotivicSphere.bigraded_connected {S : Type u} {p q : Nat}
     (ms : MotivicSphere S p q) (x y : S) :
     Path x y :=
   Path.trans (ms.connectPath x) (Path.symm (ms.connectPath y))
@@ -236,31 +236,31 @@ structure ThomSpace (E B : Type u) where
   collapsePath : ∀ e : E, Path e (zeroSection (proj e))
 
 /-- Thom collapse composed with zero section projects to identity path on B. -/
-def ThomSpace.collapse_section_proj {E B : Type u}
+noncomputable def ThomSpace.collapse_section_proj {E B : Type u}
     (ts : ThomSpace E B) (b : B) :
     Path (ts.proj (ts.zeroSection b)) b :=
   ts.sectionPath b
 
 /-- Thom space functoriality: mapping the base via congrArg. -/
-def ThomSpace.mapBase {E B C : Type u}
+noncomputable def ThomSpace.mapBase {E B C : Type u}
     (ts : ThomSpace E B) (f : B → C) :
     ∀ b : B, Path (f (ts.proj (ts.zeroSection b))) (f b) :=
   fun b => Path.congrArg f (ts.sectionPath b)
 
 /-- Composing two section paths gives a compound path. -/
-def ThomSpace.double_section {E B : Type u}
+noncomputable def ThomSpace.double_section {E B : Type u}
     (ts : ThomSpace E B) (b : B) :
     Path (ts.proj (ts.zeroSection (ts.proj (ts.zeroSection b)))) (ts.proj (ts.zeroSection b)) :=
   ts.sectionPath (ts.proj (ts.zeroSection b))
 
 /-- Double section then sectionPath gives a path to b via trans. -/
-def ThomSpace.double_to_base {E B : Type u}
+noncomputable def ThomSpace.double_to_base {E B : Type u}
     (ts : ThomSpace E B) (b : B) :
     Path (ts.proj (ts.zeroSection (ts.proj (ts.zeroSection b)))) b :=
   Path.trans (ts.double_section b) (ts.sectionPath b)
 
 /-- Collapse then project gives a loop in B at proj e. -/
-def ThomSpace.collapse_proj_loop {E B : Type u}
+noncomputable def ThomSpace.collapse_proj_loop {E B : Type u}
     (ts : ThomSpace E B) (e : E) :
     Path (ts.proj e) (ts.proj (ts.zeroSection (ts.proj e))) :=
   Path.congrArg ts.proj (ts.collapsePath e)
@@ -275,7 +275,7 @@ structure MotivicCohomOp (X : Type u) (n m : Nat) where
   naturalityPath : ∀ (f : X → X) (x : X), Path (op (f x)) (f (op x))
 
 /-- Composition of cohomology operations via trans. -/
-def MotivicCohomOp.comp {X : Type u} {n m k : Nat}
+noncomputable def MotivicCohomOp.comp {X : Type u} {n m k : Nat}
     (θ₁ : MotivicCohomOp X n m) (θ₂ : MotivicCohomOp X m k) :
     MotivicCohomOp X n k where
   op := θ₂.op ∘ θ₁.op
@@ -287,7 +287,7 @@ def MotivicCohomOp.comp {X : Type u} {n m k : Nat}
     Path.trans p1 p2
 
 /-- Identity cohomology operation. -/
-def MotivicCohomOp.identity (X : Type u) (n : Nat) :
+noncomputable def MotivicCohomOp.identity (X : Type u) (n : Nat) :
     MotivicCohomOp X n n where
   op := fun a => a
   naturalityPath := fun f a => Path.refl (f a)
@@ -326,39 +326,39 @@ structure KGroupComm (K : Type u) extends KGroup K where
   commPath : ∀ x y : K, Path (add x y) (add y x)
 
 /-- Left-inverse path via commutativity and addNeg: neg(x) + x = 0. -/
-def KGroup.leftInvPath {K : Type u} (kg : KGroup K)
+noncomputable def KGroup.leftInvPath {K : Type u} (kg : KGroup K)
     (commPath : ∀ x y : K, Path (kg.add x y) (kg.add y x))
     (x : K) :
     Path (kg.add (kg.neg x) x) kg.zero :=
   Path.trans (commPath (kg.neg x) x) (kg.addNegPath x)
 
 /-- Path from x + (y + z) to (x + y) + z via symm of assocPath. -/
-def KGroup.assoc_symm {K : Type u} (kg : KGroup K)
+noncomputable def KGroup.assoc_symm {K : Type u} (kg : KGroup K)
     (x y z : K) :
     Path (kg.add x (kg.add y z)) (kg.add (kg.add x y) z) :=
   Path.symm (kg.assocPath x y z)
 
 /-- Functorial action on K-groups via congrArg. -/
-def KGroup.mapAdd {K : Type u} (kg : KGroup K) (f : K → K)
+noncomputable def KGroup.mapAdd {K : Type u} (kg : KGroup K) (f : K → K)
     (fAdd : ∀ x y, Path (f (kg.add x y)) (kg.add (f x) (f y)))
     (x y : K) :
     Path (f (kg.add x y)) (kg.add (f x) (f y)) :=
   fAdd x y
 
 /-- Composing addZero and assoc paths. -/
-def KGroup.addZero_assoc {K : Type u} (kg : KGroup K) (x y : K) :
+noncomputable def KGroup.addZero_assoc {K : Type u} (kg : KGroup K) (x y : K) :
     Path (kg.add (kg.add kg.zero x) y) (kg.add x y) :=
   let p1 := kg.assocPath kg.zero x y
   let p2 := kg.addZeroPath (kg.add x y)
   Path.trans p1 p2
 
 /-- addNeg then symm of addZero gives a composed path. -/
-def KGroup.neg_then_zero {K : Type u} (kg : KGroup K) (x : K) :
+noncomputable def KGroup.neg_then_zero {K : Type u} (kg : KGroup K) (x : K) :
     Path (kg.add x (kg.neg x)) (kg.add kg.zero (kg.add x (kg.neg x))) :=
   Path.symm (kg.addZeroPath (kg.add x (kg.neg x)))
 
 /-- Full cancellation path: (0 + x) + neg(x) = 0. -/
-def KGroup.full_cancel {K : Type u} (kg : KGroup K) (x : K) :
+noncomputable def KGroup.full_cancel {K : Type u} (kg : KGroup K) (x : K) :
     Path (kg.add (kg.add kg.zero x) (kg.neg x)) kg.zero :=
   let p1 := kg.assocPath kg.zero x (kg.neg x)
   let p2 := kg.addZeroPath (kg.add x (kg.neg x))
@@ -389,7 +389,7 @@ structure SliceTower (X : Type u) (n : Nat) where
     Path (incl ⟨i.val + 1, h⟩ (connect i h x)) (incl i x)
 
 /-- The slice filtration is functorial via congrArg on inclusions. -/
-def SliceTower.mapTarget {X Y : Type u} {n : Nat}
+noncomputable def SliceTower.mapTarget {X Y : Type u} {n : Nat}
     (st : SliceTower X n) (f : X → Y) :
     SliceTower Y n where
   layer := st.layer
@@ -399,7 +399,7 @@ def SliceTower.mapTarget {X Y : Type u} {n : Nat}
     Path.congrArg f (st.coherencePath i h x)
 
 /-- Composing coherence paths across two consecutive levels. -/
-def SliceTower.double_coherence {X : Type u} {n : Nat}
+noncomputable def SliceTower.double_coherence {X : Type u} {n : Nat}
     (st : SliceTower X n)
     (i : Fin n) (h1 : i.val + 1 < n) (h2 : i.val + 2 < n)
     (x : st.layer i) :
@@ -428,7 +428,7 @@ structure EffectiveSlice (X : Type u) where
   sliceCoherence : ∀ e : effPart, Path (sliceProj (effIncl e)) (sliceOfEff e)
 
 /-- Functoriality of effective slice via congrArg. -/
-def EffectiveSlice.mapX {X Y : Type u}
+noncomputable def EffectiveSlice.mapX {X Y : Type u}
     (es : EffectiveSlice X) (f : X → Y) (g : Y → es.slicePart)
     (gf : ∀ x, Path (g (f x)) (es.sliceProj x)) :
     ∀ e : es.effPart, Path (g (f (es.effIncl e))) (es.sliceOfEff e) :=
@@ -447,13 +447,13 @@ structure MotivicFiberSeq (F E B : Type u) where
     Path (incl (kernelPath e h)) e
 
 /-- The fiber sequence is natural: mapping via a function on B. -/
-def MotivicFiberSeq.mapBase {F E B B' : Type u}
+noncomputable def MotivicFiberSeq.mapBase {F E B B' : Type u}
     (fs : MotivicFiberSeq F E B) (fB : B → B') :
     ∀ f : F, Path (fB (fs.proj (fs.incl f))) (fB fs.basePoint) :=
   fun f => Path.congrArg fB (fs.fiberPath f)
 
 /-- Fiber sequence: symm of fiberPath gives a path back. -/
-def MotivicFiberSeq.fiber_symm {F E B : Type u}
+noncomputable def MotivicFiberSeq.fiber_symm {F E B : Type u}
     (fs : MotivicFiberSeq F E B) (f : F) :
     Path fs.basePoint (fs.proj (fs.incl f)) :=
   Path.symm (fs.fiberPath f)
@@ -474,7 +474,7 @@ structure MotivicStabilization (C : Type u) where
   counitPath : ∀ x : C, Path (susp (loops x)) x
 
 /-- Double suspension path via congrArg. -/
-def MotivicStabilization.doubleSusp {C : Type u}
+noncomputable def MotivicStabilization.doubleSusp {C : Type u}
     (ms : MotivicStabilization C) (x : C) :
     Path x (ms.loops (ms.susp (ms.loops (ms.susp x)))) :=
   let p1 := ms.unitPath x
@@ -482,7 +482,7 @@ def MotivicStabilization.doubleSusp {C : Type u}
   Path.trans p1 p2
 
 /-- Double loops path via congrArg and counit. -/
-def MotivicStabilization.doubleLoops {C : Type u}
+noncomputable def MotivicStabilization.doubleLoops {C : Type u}
     (ms : MotivicStabilization C) (x : C) :
     Path (ms.susp (ms.loops (ms.susp (ms.loops x)))) x :=
   let p1 := Path.congrArg (fun y => ms.susp (ms.loops y)) (ms.counitPath x)
@@ -498,7 +498,7 @@ theorem MotivicStabilization.triangle_toEq {C : Type u}
       (ms.counitPath (ms.susp x))).toEq := rfl
 
 /-- Stabilization is functorial: mapping via congrArg. -/
-def MotivicStabilization.mapUnit {C D : Type u}
+noncomputable def MotivicStabilization.mapUnit {C D : Type u}
     (ms : MotivicStabilization C) (f : C → D)
     (fSusp : ∀ x, Path (f (ms.susp x)) (f (ms.susp x)))
     (fLoops : ∀ x, Path (f (ms.loops x)) (f (ms.loops x)))
@@ -518,7 +518,7 @@ structure PuppeExactness (A B C : Type u) where
   liftPath : ∀ b : B, ∀ h : Path (g b) baseC, Path (f (kernelLift b h)) b
 
 /-- Composition of two exact sequences at the proof level. -/
-def PuppeExactness.compose_exact {A B C D : Type u}
+noncomputable def PuppeExactness.compose_exact {A B C D : Type u}
     (ex1 : PuppeExactness A B C)
     (ex2 : PuppeExactness B C D)
     (a : A) :
@@ -526,25 +526,25 @@ def PuppeExactness.compose_exact {A B C D : Type u}
   Path.congrArg ex2.g (ex1.composePath a)
 
 /-- The lift followed by f is identity-like via path. -/
-def PuppeExactness.lift_compose {A B C : Type u}
+noncomputable def PuppeExactness.lift_compose {A B C : Type u}
     (ex : PuppeExactness A B C) (a : A) :
     Path (ex.f (ex.kernelLift (ex.f a) (ex.composePath a))) (ex.f a) :=
   ex.liftPath (ex.f a) (ex.composePath a)
 
 /-- Applying congrArg g to the liftPath gives composePath-level data. -/
-def PuppeExactness.naturality_lift {A B C : Type u}
+noncomputable def PuppeExactness.naturality_lift {A B C : Type u}
     (ex : PuppeExactness A B C) (b : B) (h : Path (ex.g b) ex.baseC) :
     Path (ex.g (ex.f (ex.kernelLift b h))) ex.baseC :=
   ex.composePath (ex.kernelLift b h)
 
 /-- g applied to liftPath gives a path via congrArg. -/
-def PuppeExactness.g_liftPath {A B C : Type u}
+noncomputable def PuppeExactness.g_liftPath {A B C : Type u}
     (ex : PuppeExactness A B C) (b : B) (h : Path (ex.g b) ex.baseC) :
     Path (ex.g (ex.f (ex.kernelLift b h))) (ex.g b) :=
   Path.congrArg ex.g (ex.liftPath b h)
 
 /-- Full exactness: g_liftPath then h gives a path to baseC. -/
-def PuppeExactness.full_exact {A B C : Type u}
+noncomputable def PuppeExactness.full_exact {A B C : Type u}
     (ex : PuppeExactness A B C) (b : B) (h : Path (ex.g b) ex.baseC) :
     Path (ex.g (ex.f (ex.kernelLift b h))) ex.baseC :=
   Path.trans (ex.g_liftPath b h) h

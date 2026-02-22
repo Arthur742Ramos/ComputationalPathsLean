@@ -156,7 +156,7 @@ theorem congrArg_mulAssoc_right (a b c d : X) :
   Path.symm_symm _
 
 /-- 22. congrArg loopInv on invInv -/
-def loopInvInvInvPath (a : X) :
+noncomputable def loopInvInvInvPath (a : X) :
     Path (G.loopInv (G.loopInv (G.loopInv a))) (G.loopInv a) :=
   Path.congrArg G.loopInv (G.invInvPath a)
 
@@ -166,7 +166,7 @@ def loopInvInvInvPath (a : X) :
   Path.trans_refl_right _
 
 /-- 24. congrArg loopInv on mulInvL -/
-def invMulInvLPath (a : X) :
+noncomputable def invMulInvLPath (a : X) :
     Path (G.loopInv (G.loopMul (G.loopInv a) a)) (G.loopInv G.loopUnit) :=
   Path.congrArg G.loopInv (G.mulInvLPath a)
 
@@ -195,7 +195,7 @@ def invMulInvLPath (a : X) :
   Path.symm_symm _
 
 /-- 29. congrArg loopInv on conjugate -/
-def invConjugatePath (g x : X) :
+noncomputable def invConjugatePath (g x : X) :
     Path (G.loopInv (G.conjugate g x))
          (G.loopInv (G.loopMul g (G.loopMul x (G.loopInv g)))) :=
   Path.congrArg G.loopInv (G.conjugatePath g x)
@@ -211,7 +211,7 @@ def invConjugatePath (g x : X) :
   Path.symm_symm _
 
 /-- 32. congrArg (loopMul h ·) on conjugate -/
-def mulConjugatePath (h g x : X) :
+noncomputable def mulConjugatePath (h g x : X) :
     Path (G.loopMul h (G.conjugate g x))
          (G.loopMul h (G.loopMul g (G.loopMul x (G.loopInv g)))) :=
   Path.congrArg (G.loopMul h) (G.conjugatePath g x)
@@ -252,7 +252,7 @@ theorem congrArg_symm_conjugate (g x : X) :
   Path.symm_symm _
 
 /-- 39. congrArg loopInv on bpChangeMul -/
-def invBpChangeMulPath (a b : X) :
+noncomputable def invBpChangeMulPath (a b : X) :
     Path (G.loopInv (G.basepointChange (G.loopMul a b)))
          (G.loopInv (G.loopMul (G.basepointChange a) (G.basepointChange b))) :=
   Path.congrArg G.loopInv (G.bpChangeMulPath a b)
@@ -268,7 +268,7 @@ def invBpChangeMulPath (a b : X) :
   Path.symm_symm _
 
 /-- 42. congrArg basepointChange on mulAssoc -/
-def bpChangeAssocPath (a b c : X) :
+noncomputable def bpChangeAssocPath (a b c : X) :
     Path (G.basepointChange (G.loopMul (G.loopMul a b) c))
          (G.basepointChange (G.loopMul a (G.loopMul b c))) :=
   Path.congrArg G.basepointChange (G.mulAssocPath a b c)
@@ -289,7 +289,7 @@ theorem congrArg_symm_bpChangeAssoc (a b c : X) :
 -- ============================================================
 
 /-- 45. Triple multiplication path: assoc then assoc -/
-def tripleAssocPath (a b c d : X) :
+noncomputable def tripleAssocPath (a b c d : X) :
     Path (G.loopMul (G.loopMul (G.loopMul a b) c) d)
          (G.loopMul a (G.loopMul b (G.loopMul c d))) :=
   Path.trans
@@ -317,13 +317,13 @@ def tripleAssocPath (a b c d : X) :
   Path.symm_symm _
 
 /-- 50. congrArg loopInv on tripleAssoc -/
-def invTripleAssocPathFG (a b c d : X) :
+noncomputable def invTripleAssocPathFG (a b c d : X) :
     Path (G.loopInv (G.loopMul (G.loopMul (G.loopMul a b) c) d))
          (G.loopInv (G.loopMul a (G.loopMul b (G.loopMul c d)))) :=
   Path.congrArg G.loopInv (G.tripleAssocPath a b c d)
 
 /-- 51. Alternative triple-assoc: via congrArg -/
-def tripleAssocAltPath (a b c d : X) :
+noncomputable def tripleAssocAltPath (a b c d : X) :
     Path (G.loopMul (G.loopMul (G.loopMul a b) c) d)
          (G.loopMul a (G.loopMul b (G.loopMul c d))) :=
   Path.trans
@@ -354,7 +354,7 @@ def tripleAssocAltPath (a b c d : X) :
   rfl
 
 /-- 56. congrArg loopInv on tripleAssoc -/
-def invTripleAssocPath (a b c d : X) :
+noncomputable def invTripleAssocPath (a b c d : X) :
     Path (G.loopInv (G.loopMul (G.loopMul (G.loopMul a b) c) d))
          (G.loopInv (G.loopMul a (G.loopMul b (G.loopMul c d)))) :=
   Path.congrArg G.loopInv (G.tripleAssocPath a b c d)
@@ -365,7 +365,7 @@ def invTripleAssocPath (a b c d : X) :
   Path.trans_refl_right _
 
 /-- 58. congrArg basepointChange on tripleAssoc -/
-def bpChangeTripleAssocPath (a b c d : X) :
+noncomputable def bpChangeTripleAssocPath (a b c d : X) :
     Path (G.basepointChange (G.loopMul (G.loopMul (G.loopMul a b) c) d))
          (G.basepointChange (G.loopMul a (G.loopMul b (G.loopMul c d)))) :=
   Path.congrArg G.basepointChange (G.tripleAssocPath a b c d)
@@ -377,7 +377,7 @@ def bpChangeTripleAssocPath (a b c d : X) :
   Path.trans_refl_right _
 
 /-- 60. congrArg (loopMul · e) on tripleAssoc -/
-def mulTripleAssocPath (a b c d e : X) :
+noncomputable def mulTripleAssocPath (a b c d e : X) :
     Path (G.loopMul (G.loopMul (G.loopMul (G.loopMul a b) c) d) e)
          (G.loopMul (G.loopMul a (G.loopMul b (G.loopMul c d))) e) :=
   Path.congrArg (G.loopMul · e) (G.tripleAssocPath a b c d)

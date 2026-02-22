@@ -65,7 +65,7 @@ structure TopologyData (X : Type u) where
     isOpen (fun x => U x ∧ V x)
 
 /-- A set is closed when its complement is open. -/
-def isClosed {X : Type u} (τ : TopologyData X) (C : X → Prop) : Prop :=
+noncomputable def isClosed {X : Type u} (τ : TopologyData X) (C : X → Prop) : Prop :=
   τ.isOpen (fun x => ¬ C x)
 
 /-! ## Borel Hierarchy -/
@@ -90,15 +90,15 @@ inductive BorelSet (X : Type u) (τ : TopologyData X) :
     BorelSet X τ (BorelLevel.succ β) S
 
 /-- Σ⁰₁ (open sets). -/
-def Sigma01 (X : Type u) (τ : TopologyData X) (S : X → Prop) : Prop :=
+noncomputable def Sigma01 (X : Type u) (τ : TopologyData X) (S : X → Prop) : Prop :=
   BorelSet X τ BorelLevel.zero S
 
 /-- Π⁰₁ (closed sets). -/
-def Pi01 (X : Type u) (τ : TopologyData X) (S : X → Prop) : Prop :=
+noncomputable def Pi01 (X : Type u) (τ : TopologyData X) (S : X → Prop) : Prop :=
   ∃ U : X → Prop, Sigma01 X τ U ∧ S = fun x => ¬ U x
 
 /-- Σ⁰₂ (Fσ sets). -/
-def Sigma02 (X : Type u) (τ : TopologyData X) (S : X → Prop) : Prop :=
+noncomputable def Sigma02 (X : Type u) (τ : TopologyData X) (S : X → Prop) : Prop :=
   BorelSet X τ (BorelLevel.succ BorelLevel.zero) S
 
 /-- Complement of open is Π⁰₁. -/
@@ -164,7 +164,7 @@ structure SuslinWitness (X : Type u) (τ : TopologyData X) where
   borel_membership : BorelSet X τ borel_level S
 
 /-- Complementarity: compose analytic_eq and coanalytic_eq. -/
-def suslin_complementarity_path {X : Type u} {τ : TopologyData X}
+noncomputable def suslin_complementarity_path {X : Type u} {τ : TopologyData X}
     (sw : SuslinWitness X τ) (x : X) :
     Path (sw.is_analytic.pred x : Prop) (¬ sw.is_coanalytic.pred x : Prop) :=
   -- analytic_eq : pred x = S x
@@ -189,7 +189,7 @@ structure PolishSpace (X : Type u) extends TopologyData X where
   complete : (s : Nat → X) → (modulus : Nat → Nat) → X
 
 /-- Density as a Path from the density statement to True. -/
-def density_path {X : Type u} (P : PolishSpace X)
+noncomputable def density_path {X : Type u} (P : PolishSpace X)
     (U : X → Prop) (hU : P.isOpen U) (hne : ∃ x, U x) :
     Path (∃ n, U (P.dense_seq n) : Prop) True :=
   Path.stepChain (by
@@ -199,7 +199,7 @@ def density_path {X : Type u} (P : PolishSpace X)
 /-! ## Baire Space Topology -/
 
 /-- The Baire space ℕ^ℕ topology. -/
-def BaireTopology : TopologyData (Nat → Nat) where
+noncomputable def BaireTopology : TopologyData (Nat → Nat) where
   isOpen := fun U => ∀ f, U f → ∃ n, ∀ g, (∀ i, i < n → f i = g i) → U g
   open_univ := fun _ _ => ⟨0, fun _ _ => trivial⟩
   open_empty := fun _ h => False.elim h
@@ -211,11 +211,11 @@ def BaireTopology : TopologyData (Nat → Nat) where
        hn₂ g (fun i hi => hg i (Nat.lt_of_lt_of_le hi (Nat.le_max_right _ _)))⟩⟩
 
 /-- The Cantor space 2^ℕ embeds into Baire space. -/
-def CantorToBaire : (Nat → Bool) → (Nat → Nat) :=
+noncomputable def CantorToBaire : (Nat → Bool) → (Nat → Nat) :=
   fun f n => if f n then 1 else 0
 
 /-- Path: Cantor embedding definition. -/
-def cantor_baire_path (f : Nat → Bool) (n : Nat) :
+noncomputable def cantor_baire_path (f : Nat → Bool) (n : Nat) :
     Path (CantorToBaire f n) (if f n then 1 else 0) :=
   Path.refl _
 
@@ -264,13 +264,13 @@ structure WadgeReducible (X : Type u) (τ : TopologyData X)
   reduces : (x : X) → Path (A x : Prop) (B (reduce x) : Prop)
 
 /-- Wadge reducibility is reflexive. -/
-def WadgeReducible.refl_wadge {X : Type u} (τ : TopologyData X)
+noncomputable def WadgeReducible.refl_wadge {X : Type u} (τ : TopologyData X)
     (A : X → Prop) : WadgeReducible X τ A A where
   reduce := id
   reduces := fun x => Path.refl (A x)
 
 /-- Wadge reducibility is transitive via Path.trans. -/
-def WadgeReducible.trans_wadge {X : Type u} {τ : TopologyData X}
+noncomputable def WadgeReducible.trans_wadge {X : Type u} {τ : TopologyData X}
     {A B C : X → Prop}
     (h₁ : WadgeReducible X τ A B) (h₂ : WadgeReducible X τ B C) :
     WadgeReducible X τ A C where
@@ -278,7 +278,7 @@ def WadgeReducible.trans_wadge {X : Type u} {τ : TopologyData X}
   reduces := fun x => Path.trans (h₁.reduces x) (h₂.reduces (h₁.reduce x))
 
 /-- Triple transitivity. -/
-def wadge_triple_trans {X : Type u} {τ : TopologyData X}
+noncomputable def wadge_triple_trans {X : Type u} {τ : TopologyData X}
     {A B C D : X → Prop}
     (h₁ : WadgeReducible X τ A B)
     (h₂ : WadgeReducible X τ B C)

@@ -39,7 +39,7 @@ structure CriticalPair where
   right_step : CStep source right
 
 /-- Critical pair: `trans_refl_left` vs `trans_assoc` on `trans (trans refl p) q`. -/
-def cp_refl_left_assoc (p q : Expr) : CriticalPair where
+noncomputable def cp_refl_left_assoc (p q : Expr) : CriticalPair where
   source := .trans (.trans .refl p) q
   left := .trans p q
   right := .trans .refl (.trans p q)
@@ -55,7 +55,7 @@ theorem cp_refl_left_assoc_resolves (p q : Expr) :
          CRTC.single (.trans_refl_left (.trans p q))⟩
 
 /-- Critical pair: `trans_symm` vs `trans_assoc` on `trans (trans p (symm p)) q`. -/
-def cp_symm_assoc (p q : Expr) : CriticalPair where
+noncomputable def cp_symm_assoc (p q : Expr) : CriticalPair where
   source := .trans (.trans p (.symm p)) q
   left := .trans .refl q
   right := .trans p (.trans (.symm p) q)
@@ -70,7 +70,7 @@ theorem cp_symm_assoc_resolves (p q : Expr) :
          CRTC.single (.trans_cancel_left p q)⟩
 
 /-- Critical pair: `symm_trans` vs `trans_assoc` on `trans (trans (symm p) p) q`. -/
-def cp_symm_trans_assoc (p q : Expr) : CriticalPair where
+noncomputable def cp_symm_trans_assoc (p q : Expr) : CriticalPair where
   source := .trans (.trans (.symm p) p) q
   left := .trans .refl q
   right := .trans (.symm p) (.trans p q)
@@ -85,7 +85,7 @@ theorem cp_symm_trans_assoc_resolves (p q : Expr) :
          CRTC.single (.trans_cancel_right p q)⟩
 
 /-- Critical pair: `trans_refl_right` vs `trans_assoc` on `trans (trans p refl) q`. -/
-def cp_refl_right_assoc (p q : Expr) : CriticalPair where
+noncomputable def cp_refl_right_assoc (p q : Expr) : CriticalPair where
   source := .trans (.trans p .refl) q
   left := .trans p q
   right := .trans p (.trans .refl q)
@@ -101,7 +101,7 @@ theorem cp_refl_right_assoc_resolves (p q : Expr) :
 
 /-- Critical pair: `trans_assoc` overlap:
     `trans (trans (trans p q) r) s` can be rewritten two ways by trans_assoc. -/
-def cp_assoc_assoc (p q r s : Expr) : CriticalPair where
+noncomputable def cp_assoc_assoc (p q r s : Expr) : CriticalPair where
   source := .trans (.trans (.trans p q) r) s
   left := .trans (.trans p q) (.trans r s)
   right := .trans (.trans p (.trans q r)) s
@@ -130,7 +130,7 @@ theorem convergent :
   exact ⟨confluence, Expr.termination⟩
 
 /-- **Decidable word problem**: Checked via reduced word comparison. -/
-def decidable_wp : ∀ e₁ e₂ : Expr, Decidable (toRW e₁ = toRW e₂) :=
+noncomputable def decidable_wp : ∀ e₁ e₂ : Expr, Decidable (toRW e₁ = toRW e₂) :=
   fun e₁ e₂ => toRW_eq_decidable e₁ e₂
 
 /-- **Squier's hypotheses verified**: The completed groupoid TRS is

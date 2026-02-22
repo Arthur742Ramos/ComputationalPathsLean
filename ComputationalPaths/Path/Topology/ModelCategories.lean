@@ -91,7 +91,7 @@ inductive MorphismClass where
   deriving DecidableEq
 
 /-- Predicate: a class is one of the three basic ones. -/
-def MorphismClass.isBasic : MorphismClass → Prop
+noncomputable def MorphismClass.isBasic : MorphismClass → Prop
   | .weq => True
   | .cof => True
   | .fib => True
@@ -124,7 +124,7 @@ theorem TwoOfThreeData.symm_weq {A : Type u} (T : TwoOfThreeData A)
   exact T.symm_closed f hf
 
 /-- The trivial two-of-three data where every path is a weak equivalence. -/
-def trivialTwoOfThreeData (A : Type u) : TwoOfThreeData A where
+noncomputable def trivialTwoOfThreeData (A : Type u) : TwoOfThreeData A where
   isWeq := fun _ => True
   refl_weq := fun _ => trivial
   comp_closed := fun _ _ _ _ => trivial
@@ -178,7 +178,7 @@ structure RetractDiagram {A : Type u} {a b c d : A}
   right_comm : True
 
 /-- Retract diagrams compose. -/
-def retract_trans {A : Type u} {a b c d e f : A}
+noncomputable def retract_trans {A : Type u} {a b c d e f : A}
     {p : Path a b} {q : Path c d} {r : Path e f}
     (R1 : RetractDiagram p q) (R2 : RetractDiagram q r) :
     RetractDiagram p r :=
@@ -230,7 +230,7 @@ structure FunctorialFactSystem (A : Type u) where
     True
 
 /-- Identity factorization: factors through b via (p, refl). -/
-def trivialFunctorialFact (A : Type u) : FunctorialFactSystem A where
+noncomputable def trivialFunctorialFact (A : Type u) : FunctorialFactSystem A where
   mid := fun {_ b} _ => b
   leftFact := fun p => p
   rightFact := fun {_ b} _ => Path.refl b
@@ -257,7 +257,7 @@ structure ModelCatData (A : Type u) extends ModelCategory A where
     trivCofFib.rightClass p ↔ fib p
 
 /-- Trivial model category data on computational paths. -/
-def trivialModelCatData (A : Type u) : ModelCatData A where
+noncomputable def trivialModelCatData (A : Type u) : ModelCatData A where
   toModelCategory := pathModelCategory A
   twoOfThree := trivialTwoOfThreeData A
   weq_agree := fun {_ _} p => ⟨fun _ => path_is_weak_equivalence (A := A) p, fun _ => trivial⟩
@@ -386,7 +386,7 @@ structure HomotopyFunctionComplex (A : Type u) (M : ModelCatData A) where
     Path (A := hom a b) (comp_map f (id_elem b)) f
 
 /-- Trivial homotopy function complex (uses Path directly). -/
-def trivialHFC (A : Type u) (M : ModelCatData A) : HomotopyFunctionComplex A M where
+noncomputable def trivialHFC (A : Type u) (M : ModelCatData A) : HomotopyFunctionComplex A M where
   hom := fun a b => Path a b
   comp_map := fun f g => Path.trans f g
   id_elem := fun a => Path.refl a

@@ -45,12 +45,12 @@ namespace FloerComplexPathData
 variable {Gen : Type u} (F : FloerComplexPathData Gen)
 
 /-- Transport of differential-square along continuation. -/
-def continuationOfSquarePath (x : Gen) :
+noncomputable def continuationOfSquarePath (x : Gen) :
     Path (F.continuation (F.differential (F.differential x))) (F.continuation F.zero) :=
   Path.congrArg F.continuation (F.differentialSquarePath x)
 
 /-- Step witness: right-unit normalization for differential-square coherence. -/
-def differentialSquare_step (x : Gen) :
+noncomputable def differentialSquare_step (x : Gen) :
     Path.Step
       (Path.trans (F.differentialSquarePath x) (Path.refl F.zero))
       (F.differentialSquarePath x) :=
@@ -63,7 +63,7 @@ noncomputable def differentialSquare_rweq (x : Gen) :
   rweq_of_step (F.differentialSquare_step x)
 
 /-- Step witness: right-unit normalization for continuation-chain compatibility. -/
-def continuationChain_step (x : Gen) :
+noncomputable def continuationChain_step (x : Gen) :
     Path.Step
       (Path.trans (F.continuationChainPath x) (Path.refl (F.differential (F.continuation x))))
       (F.continuationChainPath x) :=
@@ -76,7 +76,7 @@ noncomputable def continuationChain_rweq (x : Gen) :
   rweq_of_step (F.continuationChain_step x)
 
 /-- Step witness: left-unit normalization for action filtration transport. -/
-def actionFiltration_step (x : Gen) :
+noncomputable def actionFiltration_step (x : Gen) :
     Path.Step
       (Path.trans (Path.refl (F.actionLevel (F.continuation x))) (F.actionFiltrationPath x))
       (F.actionFiltrationPath x) :=
@@ -89,7 +89,7 @@ noncomputable def actionFiltration_rweq (x : Gen) :
   rweq_of_step (F.actionFiltration_step x)
 
 /-- Step witness: right-unit normalization for continued differential-square paths. -/
-def continuationOfSquare_step (x : Gen) :
+noncomputable def continuationOfSquare_step (x : Gen) :
     Path.Step
       (Path.trans (F.continuationOfSquarePath x) (Path.refl (F.continuation F.zero)))
       (F.continuationOfSquarePath x) :=
@@ -108,7 +108,7 @@ noncomputable def continuationChain_cancel_rweq (x : Gen) :
   rweq_cmpA_inv_left (F.continuationChainPath x)
 
 /-- Bridge from chain-level data to the Floer-homology path package. -/
-def toFloerHomologyPathData : FloerHomologyPathData Gen where
+noncomputable def toFloerHomologyPathData : FloerHomologyPathData Gen where
   zero := F.zero
   differential := F.differential
   continuation := F.continuation
@@ -123,7 +123,7 @@ def toFloerHomologyPathData : FloerHomologyPathData Gen where
 end FloerComplexPathData
 
 /-- Trivial model instantiating the Floer-complex computational-path interface. -/
-def trivialFloerComplexPathData : FloerComplexPathData PUnit where
+noncomputable def trivialFloerComplexPathData : FloerComplexPathData PUnit where
   zero := PUnit.unit
   differential := fun _ => PUnit.unit
   continuation := fun _ => PUnit.unit

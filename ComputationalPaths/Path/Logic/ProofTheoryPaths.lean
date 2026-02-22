@@ -33,24 +33,24 @@ abbrev ProofPath (s₁ s₂ : ProofState) := Path s₁ s₂
 /-! ## Proof constructors as path operations -/
 
 /-- Assumption rule: identity on proof states. -/
-def assumeOp : ProofState → ProofState := id
+noncomputable def assumeOp : ProofState → ProofState := id
 
 /-- Introduction rule: advances proof state. -/
-def introOp : ProofState → ProofState := fun n => n + 1
+noncomputable def introOp : ProofState → ProofState := fun n => n + 1
 
 /-- Elimination rule: processes proof state. -/
-def elimOp : ProofState → ProofState := fun n => 2 * n
+noncomputable def elimOp : ProofState → ProofState := fun n => 2 * n
 
 /-- Application rule (modus ponens). -/
-def appOp : ProofState → ProofState := fun n => n + 2
+noncomputable def appOp : ProofState → ProofState := fun n => n + 2
 
 /-- Abstraction (lambda). -/
-def absOp : ProofState → ProofState := fun n => 3 * n
+noncomputable def absOp : ProofState → ProofState := fun n => 3 * n
 
 /-! ## Introduction paths -/
 
 /-- Introduction path: applying intro rule along a derivation. -/
-def introPath (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
+noncomputable def introPath (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
     Path (introOp s₁) (introOp s₂) :=
   Path.congrArg introOp p
 
@@ -69,7 +69,7 @@ theorem intro_symm (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
 /-! ## Elimination paths -/
 
 /-- Elimination path: applying elim rule along a derivation. -/
-def elimPath (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
+noncomputable def elimPath (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
     Path (elimOp s₁) (elimOp s₂) :=
   Path.congrArg elimOp p
 
@@ -88,7 +88,7 @@ theorem elim_symm (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
 /-! ## Cut elimination as path normalization -/
 
 /-- Cut as composition of proof paths. -/
-def cutPath (s₁ s₂ s₃ : ProofState)
+noncomputable def cutPath (s₁ s₂ s₃ : ProofState)
     (p : ProofPath s₁ s₂) (q : ProofPath s₂ s₃) : ProofPath s₁ s₃ :=
   Path.trans p q
 
@@ -134,12 +134,12 @@ theorem symm_over_trans (s₁ s₂ s₃ : ProofState)
 /-! ## Curry-Howard correspondence -/
 
 /-- Application path: modus ponens as path operation. -/
-def appPath (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
+noncomputable def appPath (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
     Path (appOp s₁) (appOp s₂) :=
   Path.congrArg appOp p
 
 /-- Abstraction path: lambda abstraction as path operation. -/
-def absPath (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
+noncomputable def absPath (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
     Path (absOp s₁) (absOp s₂) :=
   Path.congrArg absOp p
 
@@ -176,7 +176,7 @@ theorem beta_compose (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
 /-! ## Proof terms and depth -/
 
 /-- Proof depth: number of steps in a proof path. -/
-def proofDepth {s₁ s₂ : ProofState} (p : ProofPath s₁ s₂) : Nat :=
+noncomputable def proofDepth {s₁ s₂ : ProofState} (p : ProofPath s₁ s₂) : Nat :=
   p.steps.length
 
 /-- Reflexive proof has depth 0. -/
@@ -223,7 +223,7 @@ theorem proof_transport_symm (P : ProofState → Type u)
 /-! ## Structural rules -/
 
 /-- Weakening: adding unused hypotheses. -/
-def weakenProof (extra : Nat) (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
+noncomputable def weakenProof (extra : Nat) (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
     ProofPath (s₁ + extra) (s₂ + extra) :=
   Path.congrArg (· + extra) p
 
@@ -242,7 +242,7 @@ theorem weaken_symm (extra : Nat) (s₁ s₂ : ProofState)
   simp [weakenProof]
 
 /-- Contraction: merging duplicate hypotheses. -/
-def contractProof (f : ProofState → ProofState) (s₁ s₂ : ProofState)
+noncomputable def contractProof (f : ProofState → ProofState) (s₁ s₂ : ProofState)
     (p : ProofPath s₁ s₂) : ProofPath (f s₁) (f s₂) :=
   Path.congrArg f p
 
@@ -254,7 +254,7 @@ theorem contract_trans (f : ProofState → ProofState) (s₁ s₂ s₃ : ProofSt
   simp [contractProof]
 
 /-- Exchange: reordering hypotheses via composed congruence. -/
-def exchangeProof (f g : ProofState → ProofState) (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
+noncomputable def exchangeProof (f g : ProofState → ProofState) (s₁ s₂ : ProofState) (p : ProofPath s₁ s₂) :
     ProofPath (f (g s₁)) (f (g s₂)) :=
   Path.congrArg f (Path.congrArg g p)
 

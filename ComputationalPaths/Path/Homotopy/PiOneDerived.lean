@@ -76,7 +76,7 @@ noncomputable def piOneProdPunitEquiv {A : Type u} (a : A) :
 
 end Path
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end ComputationalPaths

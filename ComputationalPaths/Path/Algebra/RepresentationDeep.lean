@@ -29,22 +29,22 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -91,7 +91,7 @@ structure FinGroup where
   e_mem    : e ∈ elems
   nonempty : elems.length > 0
 
-def FinGroup.order (G : FinGroup) : Nat := G.elems.length
+noncomputable def FinGroup.order (G : FinGroup) : Nat := G.elems.length
 
 -- ============================================================
 -- §3  Representations
@@ -154,8 +154,8 @@ structure RepPair where
   combined : Nat
 deriving DecidableEq, Repr
 
-def directSum (d1 d2 : Nat) : RepPair := ⟨d1, d2, d1 + d2⟩
-def tensorProd (d1 d2 : Nat) : RepPair := ⟨d1, d2, d1 * d2⟩
+noncomputable def directSum (d1 d2 : Nat) : RepPair := ⟨d1, d2, d1 + d2⟩
+noncomputable def tensorProd (d1 d2 : Nat) : RepPair := ⟨d1, d2, d1 * d2⟩
 
 -- Theorem 5: Direct sum dimension
 theorem direct_sum_dim (d1 d2 : Nat) :
@@ -533,7 +533,7 @@ structure RepRingElem where
   coeffs : List Int
 deriving DecidableEq, Repr
 
-def repRingAdd (a b : RepRingElem) : RepRingElem :=
+noncomputable def repRingAdd (a b : RepRingElem) : RepRingElem :=
   ⟨List.zipWith (· + ·) a.coeffs b.coeffs⟩
 
 -- Theorem 39: Empty rep ring element
@@ -629,7 +629,7 @@ theorem path_id_left_neutral (p : Path α a b) :
     Path.trans (.nil a) p = p := by simp [Path.trans]
 
 -- Theorem 47: Congruence — mapping preserves path structure
-def mapPath (f : α → β) : Path α a b → Path β (f a) (f b)
+noncomputable def mapPath (f : α → β) : Path α a b → Path β (f a) (f b)
   | .nil a => .nil (f a)
   | .cons (.refl a) p => .cons (.refl (f a)) (mapPath f p)
   | .cons (.rule n a b) p => .cons (.rule n (f a) (f b)) (mapPath f p)

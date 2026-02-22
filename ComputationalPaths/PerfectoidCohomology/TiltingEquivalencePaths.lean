@@ -78,7 +78,7 @@ noncomputable def fromTo_cancel_right_rweq (n : Int) (x : H n) :
   rweq_cmpA_inv_right (T.fromToPath n x)
 
 /-- Canonical trivial tilting equivalence package on `PUnit`. -/
-def trivial (R : Type u) :
+noncomputable def trivial (R : Type u) :
     TiltingEquivalencePathData
       (AlmostVanishingPathData.trivial R)
       (AlmostVanishingPathData.trivial R) where

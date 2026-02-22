@@ -58,20 +58,20 @@ namespace LieAlgebra
 variable {L : Type u} (A : LieAlgebra L)
 
 /-- Path witness for left additive identity. -/
-def add_zero_path (x : L) : Path (A.add A.zero x) x :=
+noncomputable def add_zero_path (x : L) : Path (A.add A.zero x) x :=
   Path.stepChain (A.add_zero x)
 
 /-- Path witness for left additive inverse. -/
-def add_left_neg_path (x : L) : Path (A.add (A.neg x) x) A.zero :=
+noncomputable def add_left_neg_path (x : L) : Path (A.add (A.neg x) x) A.zero :=
   Path.stepChain (A.add_left_neg x)
 
 /-- Path witness for bracket skew-symmetry. -/
-def bracket_skew_path (x y : L) :
+noncomputable def bracket_skew_path (x y : L) :
     Path (A.bracket x y) (A.neg (A.bracket y x)) :=
   Path.stepChain (A.bracket_skew x y)
 
 /-- Path witness for the Jacobi identity. -/
-def jacobi_path (x y z : L) :
+noncomputable def jacobi_path (x y z : L) :
     Path (A.add (A.bracket x (A.bracket y z))
       (A.add (A.bracket y (A.bracket z x)) (A.bracket z (A.bracket x y))))
       A.zero :=
@@ -113,19 +113,19 @@ namespace LieModule
 variable {L : Type u} {M : Type v} {A : LieAlgebra L} (Mod : LieModule L M A)
 
 /-- Path witness for left additive identity in the module. -/
-def add_zero_path (m : M) : Path (Mod.add Mod.zero m) m :=
+noncomputable def add_zero_path (m : M) : Path (Mod.add Mod.zero m) m :=
   Path.stepChain (Mod.add_zero m)
 
 /-- Path witness for left additive inverse in the module. -/
-def add_left_neg_path (m : M) : Path (Mod.add (Mod.neg m) m) Mod.zero :=
+noncomputable def add_left_neg_path (m : M) : Path (Mod.add (Mod.neg m) m) Mod.zero :=
   Path.stepChain (Mod.add_left_neg m)
 
 /-- Path witness for the action on zero. -/
-def action_zero_path (x : L) : Path (Mod.action x Mod.zero) Mod.zero :=
+noncomputable def action_zero_path (x : L) : Path (Mod.action x Mod.zero) Mod.zero :=
   Path.stepChain (Mod.action_zero x)
 
 /-- Path witness for the bracket-action compatibility. -/
-def action_bracket_path (x y : L) (m : M) :
+noncomputable def action_bracket_path (x y : L) (m : M) :
     Path (Mod.action (A.bracket x y) m)
       (Mod.add (Mod.action x (Mod.action y m))
         (Mod.neg (Mod.action y (Mod.action x m)))) :=
@@ -136,34 +136,34 @@ end LieModule
 /-! ## Cochains -/
 
 /-- Lie algebra n-cochains with values in a module. -/
-def LieCochain (L : Type u) (M : Type v) (n : Nat) : Type (max u v) :=
+noncomputable def LieCochain (L : Type u) (M : Type v) (n : Nat) : Type (max u v) :=
   (Fin n -> L) -> M
 
 variable {L : Type u} {M : Type v} {A : LieAlgebra L} (Mod : LieModule L M A)
 
 /-- Constant zero cochain. -/
-def cochainZero (n : Nat) : LieCochain L M n :=
+noncomputable def cochainZero (n : Nat) : LieCochain L M n :=
   fun _ => Mod.zero
 
 /-- Pointwise addition of cochains. -/
-def cochainAdd (n : Nat) (f g : LieCochain L M n) : LieCochain L M n :=
+noncomputable def cochainAdd (n : Nat) (f g : LieCochain L M n) : LieCochain L M n :=
   fun x => Mod.add (f x) (g x)
 
 /-- Pointwise negation of a cochain. -/
-def cochainNeg (n : Nat) (f : LieCochain L M n) : LieCochain L M n :=
+noncomputable def cochainNeg (n : Nat) (f : LieCochain L M n) : LieCochain L M n :=
   fun x => Mod.neg (f x)
 
 /-- Pointwise Path between cochains. -/
-def CochainPath {n : Nat} (f g : LieCochain L M n) : Type (max u v) :=
+noncomputable def CochainPath {n : Nat} (f g : LieCochain L M n) : Type (max u v) :=
   forall x, Path (f x) (g x)
 
 /-- Reflexivity of pointwise Path. -/
-def cochainPath_refl {n : Nat} (f : LieCochain L M n) :
+noncomputable def cochainPath_refl {n : Nat} (f : LieCochain L M n) :
     CochainPath f f :=
   fun x => Path.refl (f x)
 
 /-- Build a cochain Path from definitional equality. -/
-def cochainPath_ofEq {n : Nat} {f g : LieCochain L M n} (h : f = g) :
+noncomputable def cochainPath_ofEq {n : Nat} {f g : LieCochain L M n} (h : f = g) :
     CochainPath f g := by
   intro x
   exact Path.stepChain (by
@@ -186,7 +186,7 @@ variable {L : Type u} {M : Type v} {A : LieAlgebra L}
   {Mod : LieModule L M A} (D : LieDifferential L M A Mod)
 
 /-- Path witness of the square-zero law. -/
-def d_sq_zero_path (n : Nat) (f : LieCochain L M n) :
+noncomputable def d_sq_zero_path (n : Nat) (f : LieCochain L M n) :
     Path (D.d (n + 1) (D.d n f)) (cochainZero (Mod := Mod) (n + 2)) :=
   Path.stepChain (D.d_sq_zero n f)
 
@@ -204,13 +204,13 @@ structure LieCocycle (L : Type u) (M : Type v)
 /-! ## Cohomology quotient -/
 
 /-- Pointwise Path relation on cocycles. -/
-def cocycleRel {L : Type u} {M : Type v} {A : LieAlgebra L}
+noncomputable def cocycleRel {L : Type u} {M : Type v} {A : LieAlgebra L}
     {Mod : LieModule L M A} {D : LieDifferential L M A Mod} {n : Nat}
     (f g : LieCocycle L M A Mod D n) : Prop :=
   Nonempty (CochainPath f.cochain g.cochain)
 
 /-- Lie algebra cohomology as a quotient by pointwise Path. -/
-def LieCohomology (L : Type u) (M : Type v)
+noncomputable def LieCohomology (L : Type u) (M : Type v)
     (A : LieAlgebra L) (Mod : LieModule L M A)
     (D : LieDifferential L M A Mod) (n : Nat) : Type (max u v) :=
   Quot (cocycleRel (L := L) (M := M) (A := A) (Mod := Mod) (D := D) (n := n))

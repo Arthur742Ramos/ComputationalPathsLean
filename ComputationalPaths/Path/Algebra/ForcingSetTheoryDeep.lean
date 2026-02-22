@@ -30,7 +30,7 @@ section PathAPI
 
 variable {A : Type u} {a b c d : A}
 
-def atomicPath (h : a = b) : Path a b :=
+noncomputable def atomicPath (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 @[simp] theorem atomicPath_toEq (h : a = b) :
@@ -113,7 +113,7 @@ structure ForcingPoset (Cond : Type u) where
   trans : ∀ {p q r : Cond}, le p q → le q r → le p r
   antisymm : ∀ {p q : Cond}, le p q → le q p → p = q
 
-def Stronger {Cond : Type u} (P : ForcingPoset Cond) (p q : Cond) : Prop :=
+noncomputable def Stronger {Cond : Type u} (P : ForcingPoset Cond) (p q : Cond) : Prop :=
   P.le p q
 
 @[simp] theorem stronger_def {Cond : Type u} (P : ForcingPoset Cond) (p q : Cond) :
@@ -145,7 +145,7 @@ structure ForcingCondition (Cond : Type u) where
 @[simp] theorem forcingCondition_carrier_mk {Cond : Type u} (p : Cond) :
     (ForcingCondition.mk p).carrier = p := rfl
 
-def conditionPath {Cond : Type u} {p q : Cond} (h : p = q) :
+noncomputable def conditionPath {Cond : Type u} {p q : Cond} (h : p = q) :
     Path (ForcingCondition.mk p) (ForcingCondition.mk q) :=
   Path.mk
     [Step.mk (ForcingCondition.mk p) (ForcingCondition.mk q)
@@ -192,7 +192,7 @@ structure ForcingFilter {Cond : Type u} (P : ForcingPoset Cond) where
   upward : ∀ {p q : Cond}, mem p → P.le p q → mem q
   directed : ∀ {p q : Cond}, mem p → mem q → ∃ r : Cond, mem r ∧ P.le r p ∧ P.le r q
 
-def principalFilter {Cond : Type u} (P : ForcingPoset Cond) (seed : Cond) :
+noncomputable def principalFilter {Cond : Type u} (P : ForcingPoset Cond) (seed : Cond) :
     ForcingFilter P where
   mem := fun q => P.le seed q
   upward := by
@@ -224,9 +224,9 @@ theorem principalFilter_directed {Cond : Type u}
     ∃ r : Cond, (principalFilter P seed).mem r ∧ P.le r p ∧ P.le r q :=
   (principalFilter P seed).directed hp hq
 
-def DenseSet (Cond : Type u) : Type u := Cond → Prop
+noncomputable def DenseSet (Cond : Type u) : Type u := Cond → Prop
 
-def Dense {Cond : Type u} (P : ForcingPoset Cond) (D : DenseSet Cond) : Prop :=
+noncomputable def Dense {Cond : Type u} (P : ForcingPoset Cond) (D : DenseSet Cond) : Prop :=
   ∀ p : Cond, ∃ q : Cond, P.le q p ∧ D q
 
 theorem dense_witness {Cond : Type u} (P : ForcingPoset Cond)
@@ -295,7 +295,7 @@ structure ForcingName (Cond : Type u) (Val : Type v) where
     (s : List Cond) (x : Val) :
     (ForcingName.mk s x).value = x := rfl
 
-def mapName {Cond : Type u} {Val : Type v} {Val' : Type w}
+noncomputable def mapName {Cond : Type u} {Val : Type v} {Val' : Type w}
     (f : Val → Val') (tau : ForcingName Cond Val) :
     ForcingName Cond Val' :=
   ForcingName.mk tau.support (f tau.value)
@@ -322,7 +322,7 @@ def mapName {Cond : Type u} {Val : Type v} {Val' : Type w}
   cases tau
   rfl
 
-def namePath {Cond : Type u} {Val : Type v}
+noncomputable def namePath {Cond : Type u} {Val : Type v}
     {tau sig : ForcingName Cond Val} (h : tau = sig) :
     Path tau sig :=
   Path.mk [Step.mk tau sig h] h
@@ -344,12 +344,12 @@ inductive Formula (Sym : Type u) where
   | and : Formula Sym → Formula Sym → Formula Sym
   | imp : Formula Sym → Formula Sym → Formula Sym
 
-def Forces {Cond : Type u} (P : ForcingPoset Cond)
+noncomputable def Forces {Cond : Type u} (P : ForcingPoset Cond)
     (Gam : ForcingFilter P) (p : Cond) {Sym : Type v}
     (phi : Formula Sym) : Prop :=
   Gam.mem p
 
-def HoldsInExtension {Cond : Type u} (P : ForcingPoset Cond)
+noncomputable def HoldsInExtension {Cond : Type u} (P : ForcingPoset Cond)
     (Gam : ForcingFilter P) {Sym : Type v} (phi : Formula Sym) : Prop :=
   ∃ p : Cond, Forces P Gam p phi
 
@@ -410,7 +410,7 @@ structure TruthLemmaPack {Cond : Type u} (P : ForcingPoset Cond)
   forward : ∀ phi : Formula Sym, (∃ p : Cond, Forces P Gam p phi) → HoldsInExtension P Gam phi
   backward : ∀ phi : Formula Sym, HoldsInExtension P Gam phi → (∃ p : Cond, Forces P Gam p phi)
 
-def mkTruthLemmaPack {Cond : Type u} (P : ForcingPoset Cond)
+noncomputable def mkTruthLemmaPack {Cond : Type u} (P : ForcingPoset Cond)
     (Gam : ForcingFilter P) (Sym : Type v) :
     TruthLemmaPack P Gam Sym where
   forward := truth_lemma_forward (P := P) (Gam := Gam)
@@ -435,15 +435,15 @@ inductive BoolVal where
   | top : BoolVal
 deriving DecidableEq, Repr
 
-def bNot : BoolVal → BoolVal
+noncomputable def bNot : BoolVal → BoolVal
   | BoolVal.bot => BoolVal.top
   | BoolVal.top => BoolVal.bot
 
-def bAnd : BoolVal → BoolVal → BoolVal
+noncomputable def bAnd : BoolVal → BoolVal → BoolVal
   | BoolVal.top, BoolVal.top => BoolVal.top
   | _, _ => BoolVal.bot
 
-def bOr : BoolVal → BoolVal → BoolVal
+noncomputable def bOr : BoolVal → BoolVal → BoolVal
   | BoolVal.bot, BoolVal.bot => BoolVal.bot
   | _, _ => BoolVal.top
 
@@ -499,7 +499,7 @@ def bOr : BoolVal → BoolVal → BoolVal
 structure BooleanValuedModel (Obj : Type u) where
   eval : Obj → BoolVal
 
-def evalPath {Obj : Type u} (M : BooleanValuedModel Obj) {x y : Obj}
+noncomputable def evalPath {Obj : Type u} (M : BooleanValuedModel Obj) {x y : Obj}
     (p : Path x y) : Path (M.eval x) (M.eval y) :=
   Path.congrArg M.eval p
 
@@ -547,7 +547,7 @@ structure IndependenceResult where
   intro h
   exact h
 
-def IndependenceWitness (R : IndependenceResult) : Prop :=
+noncomputable def IndependenceWitness (R : IndependenceResult) : Prop :=
   R.relativelyConsistent ∧ R.independentFromBase
 
 theorem witness_left (R : IndependenceResult) :
@@ -572,10 +572,10 @@ theorem card_monotone (C : CardinalArithmetic) {m n : Nat}
     (h : m ≤ n) : C.card m ≤ C.card n :=
   C.monotone h
 
-def CHStatement (C : CardinalArithmetic) : Prop :=
+noncomputable def CHStatement (C : CardinalArithmetic) : Prop :=
   C.card (Nat.succ 0) = C.card 0 + 1
 
-def GCHStatement (C : CardinalArithmetic) : Prop :=
+noncomputable def GCHStatement (C : CardinalArithmetic) : Prop :=
   ∀ n : Nat, C.card (Nat.succ n) = C.card n + 1
 
 theorem gch_step (C : CardinalArithmetic) (h : GCHStatement C) (n : Nat) :
@@ -599,7 +599,7 @@ structure ConsistencyProofStructure where
   baseTheoryConsistent : Prop
   forcingExtensionConsistent : Prop
 
-def relativeConsistency
+noncomputable def relativeConsistency
     (S : ConsistencyProofStructure) : Prop :=
   S.baseTheoryConsistent → S.forcingExtensionConsistent
 
@@ -620,7 +620,7 @@ structure GCHIndependencePackage where
   modelOfGCH : Prop
   modelOfNotGCH : Prop
 
-def gchIndependent (P : GCHIndependencePackage) : Prop :=
+noncomputable def gchIndependent (P : GCHIndependencePackage) : Prop :=
   P.modelOfGCH ∧ P.modelOfNotGCH
 
 theorem gchIndependent_left (P : GCHIndependencePackage) :
@@ -637,7 +637,7 @@ theorem gchIndependent_intro (P : GCHIndependencePackage)
     (h1 : P.modelOfGCH) (h2 : P.modelOfNotGCH) :
     gchIndependent P := ⟨h1, h2⟩
 
-def gchIndependenceResult (P : GCHIndependencePackage) :
+noncomputable def gchIndependenceResult (P : GCHIndependencePackage) :
     IndependenceResult :=
   { Sym := "GCH"
     relativelyConsistent := P.modelOfGCH

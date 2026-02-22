@@ -29,10 +29,10 @@ structure CPOElem where
   deriving DecidableEq
 
 /-- Bottom element of a CPO. -/
-def bot : CPOElem := ⟨0⟩
+noncomputable def bot : CPOElem := ⟨0⟩
 
 /-- Approximation path: a ⊑ b witnessed by a path from a to b. -/
-def approxPath (a b : CPOElem) (h : a = b) : Path a b :=
+noncomputable def approxPath (a b : CPOElem) (h : a = b) : Path a b :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Every element is above bottom (when they coincide at bot). -/
@@ -44,7 +44,7 @@ structure CPOChain where
   links : ∀ n, Path (elems n) (elems (n + 1))
 
 /-- Chain with constant value. -/
-def constChain (a : CPOElem) : CPOChain where
+noncomputable def constChain (a : CPOElem) : CPOChain where
   elems := fun _ => a
   links := fun _ => Path.refl a
 
@@ -59,7 +59,7 @@ structure LUB (c : CPOChain) (sup : CPOElem) where
   bound : ∀ n, Path (c.elems n) sup
 
 /-- LUB of a constant chain is the element itself. -/
-def constChainLUB (a : CPOElem) : LUB (constChain a) a where
+noncomputable def constChainLUB (a : CPOElem) : LUB (constChain a) a where
   bound := fun _ => Path.refl a
 
 /-- The bound path at any index for constant chain is refl. -/
@@ -75,7 +75,7 @@ structure ScottCont (f : CPOElem → CPOElem) where
     ∀ n, Path (f (c.elems n)) (f (c.elems (n + 1)))
 
 /-- Identity function is Scott-continuous. -/
-def scottContId : ScottCont id where
+noncomputable def scottContId : ScottCont id where
   mono := fun _ _ p => p
   preserveChain := fun c n => c.links n
 
@@ -84,7 +84,7 @@ theorem scottContId_mono (a b : CPOElem) (p : Path a b) :
     scottContId.mono a b p = p := rfl
 
 /-- Composition of Scott-continuous functions. -/
-def scottContComp (f g : CPOElem → CPOElem)
+noncomputable def scottContComp (f g : CPOElem → CPOElem)
     (sf : ScottCont f) (sg : ScottCont g) : ScottCont (f ∘ g) where
   mono := fun a b p => sf.mono _ _ (sg.mono a b p)
   preserveChain := fun c n => sf.mono _ _ (sg.preserveChain c n)
@@ -97,12 +97,12 @@ theorem scottContComp_mono (f g : CPOElem → CPOElem)
 /-! ## Fixed Point Theory -/
 
 /-- Iteration of a function from bottom. -/
-def iterate (f : CPOElem → CPOElem) : Nat → CPOElem
+noncomputable def iterate (f : CPOElem → CPOElem) : Nat → CPOElem
   | 0 => bot
   | n + 1 => f (iterate f n)
 
 /-- Kleene chain: the chain bot ⊑ f(bot) ⊑ f²(bot) ⊑ ... -/
-def kleeneChain (f : CPOElem → CPOElem) (sf : ScottCont f)
+noncomputable def kleeneChain (f : CPOElem → CPOElem) (sf : ScottCont f)
     (hBot : ∀ x, Path bot x) : CPOChain where
   elems := iterate f
   links := fun n => by
@@ -126,12 +126,12 @@ structure FixedPoint (f : CPOElem → CPOElem) (x : CPOElem) where
   backward : Path x (f x)
 
 /-- Fixed point round-trip composes to a loop. -/
-def fixedPointLoop {f : CPOElem → CPOElem} {x : CPOElem}
+noncomputable def fixedPointLoop {f : CPOElem → CPOElem} {x : CPOElem}
     (fp : FixedPoint f x) : Path (f x) (f x) :=
   Path.trans fp.forward fp.backward
 
 /-- If f x = x propositionally, we get a fixed point. -/
-def fixedPointOfEq (f : CPOElem → CPOElem) (x : CPOElem)
+noncomputable def fixedPointOfEq (f : CPOElem → CPOElem) (x : CPOElem)
     (h : f x = x) : FixedPoint f x where
   forward := Path.mk [Step.mk _ _ h] h
   backward := Path.symm (Path.mk [Step.mk _ _ h] h)
@@ -155,7 +155,7 @@ structure Compact (a : CPOElem) where
   selfApprox : WayBelow a a
 
 /-- Bot is compact (trivially way-below itself). -/
-def botCompact : Compact bot where
+noncomputable def botCompact : Compact bot where
   selfApprox := {
     approxPath := Path.refl bot
     finiteness := Nat.zero_lt_succ 0
@@ -174,7 +174,7 @@ structure BasisElem (target : CPOElem) where
   approx : Path basis target
 
 /-- Every element is a trivial basis for itself if compact. -/
-def selfBasis (a : CPOElem) (hc : Compact a) : BasisElem a where
+noncomputable def selfBasis (a : CPOElem) (hc : Compact a) : BasisElem a where
   basis := a
   compact := hc
   approx := Path.refl a
@@ -191,7 +191,7 @@ structure AlgebraicDomain where
 /-! ## Continuous Functions Preserve Structure -/
 
 /-- Scott-continuous maps preserve way-below approximation paths. -/
-def scottCont_preserves_wayBelow (f : CPOElem → CPOElem) (sf : ScottCont f)
+noncomputable def scottCont_preserves_wayBelow (f : CPOElem → CPOElem) (sf : ScottCont f)
     {a b : CPOElem} (wb : WayBelow a b) :
     Path (f a) (f b) :=
   sf.mono a b wb.approxPath
@@ -204,7 +204,7 @@ theorem scottCont_refl_proof (f : CPOElem → CPOElem) (sf : ScottCont f)
 /-! ## Chain Composition -/
 
 /-- Composing two chains sharing a midpoint. -/
-def chainConcat (c1 : CPOChain) (_c2 : CPOChain)
+noncomputable def chainConcat (c1 : CPOChain) (_c2 : CPOChain)
     (_h : c1.elems 0 = _c2.elems 0) : CPOChain where
   elems := c1.elems
   links := c1.links
@@ -222,12 +222,12 @@ inductive Lifted (α : Type u) where
   deriving DecidableEq
 
 /-- Path from bottom to any lifted element. -/
-def liftedBot {α : Type u} [DecidableEq α] (x : Lifted α) (h : Lifted.bottom = x) :
+noncomputable def liftedBot {α : Type u} [DecidableEq α] (x : Lifted α) (h : Lifted.bottom = x) :
     Path (Lifted.bottom : Lifted α) x :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Flat domain: paths between equal lifted elements. -/
-def flat_domain_paths {α : Type u} [DecidableEq α] (a b : α) (h : a = b) :
+noncomputable def flat_domain_paths {α : Type u} [DecidableEq α] (a b : α) (h : a = b) :
     Path (Lifted.up a) (Lifted.up b) :=
   Path.mk [Step.mk _ _ (h ▸ rfl)] (h ▸ rfl)
 
@@ -243,7 +243,7 @@ structure Deflation (f : CPOElem → CPOElem) where
   below : ∀ x, Path (f x) x
 
 /-- A deflation's fixed points form a sub-CPO. -/
-def deflation_fixedPoint (f : CPOElem → CPOElem) (d : Deflation f) (x : CPOElem) :
+noncomputable def deflation_fixedPoint (f : CPOElem → CPOElem) (d : Deflation f) (x : CPOElem) :
     FixedPoint f (f x) :=
   fixedPointOfEq f (f x) (d.idempotent x)
 

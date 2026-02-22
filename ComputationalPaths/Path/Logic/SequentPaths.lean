@@ -48,7 +48,7 @@ inductive Formula : Type where
 namespace Formula
 
 /-- Size of a formula (number of connectives). -/
-def size : Formula → Nat
+noncomputable def size : Formula → Nat
   | atom _ => 1
   | top => 1
   | bot => 1
@@ -93,10 +93,10 @@ end Formula
 abbrev DerivState := Nat
 
 /-- Initial derivation state. -/
-def initState : DerivState := 0
+noncomputable def initState : DerivState := 0
 
 /-- Advance the derivation state. -/
-def advanceState (s : DerivState) : DerivState := s + 1
+noncomputable def advanceState (s : DerivState) : DerivState := s + 1
 
 /-- A sequent derivation as a path between derivation states. -/
 abbrev DerivPath (s₁ s₂ : DerivState) := Path s₁ s₂
@@ -104,7 +104,7 @@ abbrev DerivPath (s₁ s₂ : DerivState) := Path s₁ s₂
 /-! ## Cut Rule as Path Composition -/
 
 /-- Cut rule as trans: composing two derivation paths. -/
-def cut_as_trans (s₁ s₂ s₃ : DerivState)
+noncomputable def cut_as_trans (s₁ s₂ s₃ : DerivState)
     (p : DerivPath s₁ s₂) (q : DerivPath s₂ s₃) : DerivPath s₁ s₃ :=
   Path.trans p q
 
@@ -151,7 +151,7 @@ theorem cut_symm_trans (s₁ s₂ s₃ : DerivState)
 
 /-- Weakening: adding an unused formula doesn't change the derivation state path.
     Modeled as congrArg through a weakening function. -/
-def weakenPath (extra : Nat) (s₁ s₂ : DerivState) (p : DerivPath s₁ s₂) :
+noncomputable def weakenPath (extra : Nat) (s₁ s₂ : DerivState) (p : DerivPath s₁ s₂) :
     DerivPath (s₁ + extra) (s₂ + extra) :=
   Path.congrArg (· + extra) p
 
@@ -175,7 +175,7 @@ theorem weaken_zero_toEq (s₁ s₂ : DerivState) (p : DerivPath s₁ s₂) :
   simp [weakenPath, Path.congrArg]
 
 /-- Contraction: collapsing duplicate derivation states. -/
-def contractPath (f : DerivState → DerivState) (s₁ s₂ : DerivState)
+noncomputable def contractPath (f : DerivState → DerivState) (s₁ s₂ : DerivState)
     (p : DerivPath s₁ s₂) : DerivPath (f s₁) (f s₂) :=
   Path.congrArg f p
 
@@ -195,7 +195,7 @@ theorem contract_symm (f : DerivState → DerivState) (s₁ s₂ : DerivState)
   simp [contractPath]
 
 /-- Exchange: reordering modeled by composing two congruence maps. -/
-def exchangePath (f g : DerivState → DerivState)
+noncomputable def exchangePath (f g : DerivState → DerivState)
     (s₁ s₂ : DerivState) (p : DerivPath s₁ s₂) :
     DerivPath (f (g s₁)) (f (g s₂)) :=
   Path.congrArg f (Path.congrArg g p)
@@ -209,7 +209,7 @@ theorem exchange_eq_comp (f g : DerivState → DerivState)
 /-! ## Sub-formula Property -/
 
 /-- All formulas appearing in a list. -/
-def allSubFormulas : List Formula → List Formula
+noncomputable def allSubFormulas : List Formula → List Formula
   | [] => []
   | f :: rest => f :: allSubFormulas rest
 
@@ -256,7 +256,7 @@ theorem transport_symm_deriv (P : DerivState → Type u)
 /-! ## Derivation Depth -/
 
 /-- Depth of a derivation as the number of steps. -/
-def derivationDepth {s₁ s₂ : DerivState} (p : DerivPath s₁ s₂) : Nat :=
+noncomputable def derivationDepth {s₁ s₂ : DerivState} (p : DerivPath s₁ s₂) : Nat :=
   p.steps.length
 
 /-- The identity derivation has depth 0. -/

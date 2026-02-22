@@ -46,7 +46,7 @@ structure ConcState (A : Type u) where
   snd : A
 
 /-- Path between concurrent states from component paths. -/
-def concPath {A : Type u} {a₁ a₂ b₁ b₂ : A}
+noncomputable def concPath {A : Type u} {a₁ a₂ b₁ b₂ : A}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (ConcState.mk a₁ b₁) (ConcState.mk a₂ b₂) :=
   (Path.congrArg (fun x => ConcState.mk x b₁) p).trans
@@ -109,14 +109,14 @@ theorem independent_commute {A : Type u} {a b : A}
   cases ep; cases eq1; rfl
 
 /-- 7. Serialization: a concurrent path can be decomposed into sequential paths. -/
-def serialize_left {A : Type u} {a₁ a₂ b₁ b₂ : A}
+noncomputable def serialize_left {A : Type u} {a₁ a₂ b₁ b₂ : A}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (ConcState.mk a₁ b₁) (ConcState.mk a₂ b₂) :=
   (Path.congrArg (fun x => ConcState.mk x b₁) p).trans
     (Path.congrArg (fun y => ConcState.mk a₂ y) q)
 
 /-- 8. Serialization: right-first ordering. -/
-def serialize_right {A : Type u} {a₁ a₂ b₁ b₂ : A}
+noncomputable def serialize_right {A : Type u} {a₁ a₂ b₁ b₂ : A}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (ConcState.mk a₁ b₁) (ConcState.mk a₂ b₂) :=
   (Path.congrArg (fun y => ConcState.mk a₁ y) q).trans
@@ -139,7 +139,7 @@ theorem serialize_left_eq_concPath {A : Type u} {a₁ a₂ b₁ b₂ : A}
 /-! ## Confluence Properties -/
 
 /-- 11. Reflexive path is confluent with any path. -/
-def confluence_refl {A : Type u} (a : A) (_p : Path a a) :
+noncomputable def confluence_refl {A : Type u} (a : A) (_p : Path a a) :
     Path a a :=
   Path.refl a
 
@@ -157,13 +157,13 @@ theorem concPath_transport {A : Type u} (D : ConcState A → Type u)
   cases ep; cases eq1; rfl
 
 /-- 13. Projection path from concurrent state (first component). -/
-def concFst {A : Type u} {a₁ a₂ b₁ b₂ : A}
+noncomputable def concFst {A : Type u} {a₁ a₂ b₁ b₂ : A}
     (p : Path (ConcState.mk a₁ b₁) (ConcState.mk a₂ b₂)) :
     Path a₁ a₂ :=
   Path.congrArg ConcState.fst p
 
 /-- 14. Projection path from concurrent state (second component). -/
-def concSnd {A : Type u} {a₁ a₂ b₁ b₂ : A}
+noncomputable def concSnd {A : Type u} {a₁ a₂ b₁ b₂ : A}
     (p : Path (ConcState.mk a₁ b₁) (ConcState.mk a₂ b₂)) :
     Path b₁ b₂ :=
   Path.congrArg ConcState.snd p
@@ -185,7 +185,7 @@ theorem concSnd_concPath {A : Type u} {a₁ a₂ b₁ b₂ : A}
 /-! ## Parallel Composition Laws -/
 
 /-- 17. Congruence of a binary operation along two paths. -/
-def congr₂ {A B C : Type u} (f : A → B → C)
+noncomputable def congr₂ {A B C : Type u} (f : A → B → C)
     {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (f a₁ b₁) (f a₂ b₂) :=
@@ -218,12 +218,12 @@ theorem congr₂_trans {A B C : Type u} (f : A → B → C)
   cases ep1; cases ep2; cases eq1; cases eq2; rfl
 
 /-- 21. Concurrent state congruence from function. -/
-def concMap {A B : Type u} (f : A → B) :
+noncomputable def concMap {A B : Type u} (f : A → B) :
     ConcState A → ConcState B :=
   fun s => ConcState.mk (f s.fst) (f s.snd)
 
 /-- 22. concMap preserves paths. -/
-def concMap_path {A B : Type u} (f : A → B)
+noncomputable def concMap_path {A B : Type u} (f : A → B)
     {s₁ s₂ : ConcState A} (p : Path s₁ s₂) :
     Path (concMap f s₁) (concMap f s₂) :=
   Path.congrArg (concMap f) p
@@ -238,12 +238,12 @@ theorem concMap_concPath {A B : Type u} (f : A → B)
   cases ep; cases eq1; rfl
 
 /-- 24. Identity concMap is identity. -/
-def concMap_id {A : Type u} (s : ConcState A) :
+noncomputable def concMap_id {A : Type u} (s : ConcState A) :
     Path (concMap id s) s := by
   cases s; exact Path.refl _
 
 /-- 25. Composition of concMaps. -/
-def concMap_comp {A B C : Type u} (f : A → B) (g : B → C)
+noncomputable def concMap_comp {A B C : Type u} (f : A → B) (g : B → C)
     (s : ConcState A) :
     Path (concMap g (concMap f s)) (concMap (g ∘ f) s) := by
   cases s; exact Path.refl _

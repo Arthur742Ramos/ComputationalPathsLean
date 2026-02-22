@@ -28,7 +28,7 @@ structure PathOrder (A : Type u) where
   le_antisymm : ∀ {a b : A} (p q : Path a b), le p q → le q p → p = q
 
 /-- The discrete order where every path is only comparable to itself -/
-def discreteOrder : PathOrder A where
+noncomputable def discreteOrder : PathOrder A where
   le := fun p q => p = q
   le_refl := fun _ => rfl
   le_trans := fun _ _ _ h1 h2 => h1.trans h2
@@ -98,7 +98,7 @@ structure MonotonePath (OA : PathOrder A) (OB : PathOrder B) (f : A → B) where
     OA.le p q → OB.le (mapPath p) (mapPath q)
 
 /-- CongrArg gives a monotone map for any compatible order -/
-def congrArgMono (f : A → B) (O : PathOrder A) (OB : PathOrder B)
+noncomputable def congrArgMono (f : A → B) (O : PathOrder A) (OB : PathOrder B)
     (h : ∀ {a b : A} (p q : Path a b), O.le p q →
       OB.le (congrArg f p) (congrArg f q)) :
     MonotonePath O OB f where
@@ -162,7 +162,7 @@ structure PathFixedPoint (A : Type u) where
   isFixed : ∀ (a : A), endo (fixedPt a) = fixedPt a
 
 /-- The reflexive path is always a fixed point of identity -/
-def refl_fixed_id : PathFixedPoint A where
+noncomputable def refl_fixed_id : PathFixedPoint A where
   endo := fun p => p
   fixedPt := fun a => Path.refl a
   isFixed := fun _ => rfl
@@ -173,7 +173,7 @@ theorem fixed_idem (F : PathFixedPoint A) (a : A) :
   rw [F.isFixed, F.isFixed]
 
 /-- N-fold application of endo at fixed point -/
-def iterEndo (F : PathFixedPoint A) (a : A) : Nat → Path a a
+noncomputable def iterEndo (F : PathFixedPoint A) (a : A) : Nat → Path a a
   | 0 => F.fixedPt a
   | n+1 => F.endo (iterEndo F a n)
 

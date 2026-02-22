@@ -36,7 +36,7 @@ variable {L R : {a b : A} → Path a b → Prop}
 variable {a b : A} {f : Path a b}
 
 /-- The composite map produced by the factorization witness. -/
-def composite (F : FactorizationWitness A L R f) : Path a b :=
+noncomputable def composite (F : FactorizationWitness A L R f) : Path a b :=
   Path.trans F.left F.right
 
 noncomputable def right_unit_rweq (F : FactorizationWitness A L R f) :
@@ -67,7 +67,7 @@ namespace WeakFactorizationSystemPaths
 variable {A : Type u} (W : WeakFactorizationSystemPaths A)
 
 /-- Composite associated to the chosen factorization of `f`. -/
-def factorComposite {a b : A} (f : Path a b) : Path a b :=
+noncomputable def factorComposite {a b : A} (f : Path a b) : Path a b :=
   (W.factor f).composite
 
 theorem factor_right_unit_step {a b : A} (f : Path a b) :
@@ -89,7 +89,7 @@ noncomputable def factor_left_unit_rweq {a b : A} (f : Path a b) :
 end WeakFactorizationSystemPaths
 
 /-- The trivial weak factorization system where every path lies in both classes. -/
-def trivialWeakFactorizationSystem (A : Type u) : WeakFactorizationSystemPaths A where
+noncomputable def trivialWeakFactorizationSystem (A : Type u) : WeakFactorizationSystemPaths A where
   leftClass := fun _ => True
   rightClass := fun _ => True
   factor := by
@@ -150,7 +150,7 @@ noncomputable def fib_factor_rweq {a b : A} (f : Path a b) :
 end ModelStructurePaths
 
 /-- The trivial model structure induced by the trivial weak factorization system. -/
-def trivialModelStructurePaths (A : Type u) : ModelStructurePaths A where
+noncomputable def trivialModelStructurePaths (A : Type u) : ModelStructurePaths A where
   weakEquivalence := fun _ => True
   cofibration := fun _ => True
   fibration := fun _ => True

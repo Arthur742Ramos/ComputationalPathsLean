@@ -43,7 +43,7 @@ class SmoothRing (R : Type u) where
 
 /-! ## Core Path API usage -/
 
-def mkStepPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
+noncomputable def mkStepPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 @[simp] theorem mkStepPath_toEq {A : Type u} {a b : A} (h : a = b) :
@@ -124,21 +124,21 @@ structure SmoothManifold (M : Type u) (C : Type v) where
   chart_unchart : ∀ c : C, Path (chart (unchart c)) c
   unchart_chart : ∀ m : M, Path (unchart (chart m)) m
 
-def transition {M : Type u} {C : Type v}
+noncomputable def transition {M : Type u} {C : Type v}
     (S T : SmoothManifold M C) (c : C) : C :=
   T.chart (S.unchart c)
 
-def transitionSelfPath {M : Type u} {C : Type v}
+noncomputable def transitionSelfPath {M : Type u} {C : Type v}
     (S : SmoothManifold M C) (c : C) :
     Path (transition S S c) c :=
   S.chart_unchart c
 
-def unchartChartPath {M : Type u} {C : Type v}
+noncomputable def unchartChartPath {M : Type u} {C : Type v}
     (S : SmoothManifold M C) (m : M) :
     Path (S.unchart (S.chart m)) m :=
   S.unchart_chart m
 
-def transitionCongr {M : Type u} {C : Type v}
+noncomputable def transitionCongr {M : Type u} {C : Type v}
     (S T : SmoothManifold M C) {c1 c2 : C}
     (h : Path c1 c2) : Path (transition S T c1) (transition S T c2) :=
   Path.congrArg T.chart (Path.congrArg S.unchart h)
@@ -196,58 +196,58 @@ theorem transitionSelfPath_right_unit {M : Type u} {C : Type v}
 structure Tangent (M : Type u) (R : Type v) (p : M) where
   comp : R
 
-def zeroTangent {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def zeroTangent {M : Type u} {R : Type v} [ring : SmoothRing R]
     (p : M) : Tangent M R p :=
   ⟨ring.zero⟩
 
-def addTangent {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addTangent {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (v w : Tangent M R p) : Tangent M R p :=
   ⟨ring.add v.comp w.comp⟩
 
-def negTangent {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def negTangent {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (v : Tangent M R p) : Tangent M R p :=
   ⟨ring.neg v.comp⟩
 
-def scaleTangent {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def scaleTangent {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (k : R) (v : Tangent M R p) : Tangent M R p :=
   ⟨ring.mul k v.comp⟩
 
-def tangentAddCommPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def tangentAddCommPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (v w : Tangent M R p) :
     Path (addTangent v w).comp (addTangent w v).comp :=
   ring.add_comm v.comp w.comp
 
-def tangentAddAssocPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def tangentAddAssocPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (u1 v1 w1 : Tangent M R p) :
     Path (addTangent (addTangent u1 v1) w1).comp (addTangent u1 (addTangent v1 w1)).comp :=
   ring.add_assoc u1.comp v1.comp w1.comp
 
-def tangentAddZeroLeftPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def tangentAddZeroLeftPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (v : Tangent M R p) :
     Path (addTangent (zeroTangent p) v).comp v.comp :=
   ring.zero_add v.comp
 
-def tangentAddZeroRightPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def tangentAddZeroRightPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (v : Tangent M R p) :
     Path (addTangent v (zeroTangent p)).comp v.comp :=
   ring.add_zero v.comp
 
-def tangentAddNegRightPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def tangentAddNegRightPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (v : Tangent M R p) :
     Path (addTangent v (negTangent v)).comp ring.zero :=
   ring.add_neg v.comp
 
-def tangentScaleOnePath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def tangentScaleOnePath {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (v : Tangent M R p) :
     Path (scaleTangent ring.one v).comp v.comp :=
   ring.one_mul v.comp
 
-def tangentScaleAssocPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def tangentScaleAssocPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (a b : R) (v : Tangent M R p) :
     Path (scaleTangent a (scaleTangent b v)).comp (scaleTangent (ring.mul a b) v).comp :=
   Path.symm (ring.mul_assoc a b v.comp)
 
-def tangentScaleDistribPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def tangentScaleDistribPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     {p : M} (k : R) (v w : Tangent M R p) :
     Path (scaleTangent k (addTangent v w)).comp (addTangent (scaleTangent k v) (scaleTangent k w)).comp :=
   ring.left_distrib k v.comp w.comp
@@ -317,59 +317,59 @@ theorem tangentScaleDistribPath_symm_symm {M : Type u} {R : Type v} [ring : Smoo
 structure VectorField (M : Type u) (R : Type v) where
   val : (p : M) → Tangent M R p
 
-def zeroField {M : Type u} {R : Type v} [ring : SmoothRing R] : VectorField M R :=
+noncomputable def zeroField {M : Type u} {R : Type v} [ring : SmoothRing R] : VectorField M R :=
   ⟨fun p => zeroTangent p⟩
 
-def addField {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addField {M : Type u} {R : Type v} [ring : SmoothRing R]
     (X Y : VectorField M R) : VectorField M R :=
   ⟨fun p => addTangent (X.val p) (Y.val p)⟩
 
-def negField {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def negField {M : Type u} {R : Type v} [ring : SmoothRing R]
     (X : VectorField M R) : VectorField M R :=
   ⟨fun p => negTangent (X.val p)⟩
 
-def scaleField {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def scaleField {M : Type u} {R : Type v} [ring : SmoothRing R]
     (k : R) (X : VectorField M R) : VectorField M R :=
   ⟨fun p => scaleTangent k (X.val p)⟩
 
-def lieBracket {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def lieBracket {M : Type u} {R : Type v} [ring : SmoothRing R]
     (X Y : VectorField M R) (p : M) : R :=
   ring.add (ring.mul (X.val p).comp (Y.val p).comp)
            (ring.neg (ring.mul (Y.val p).comp (X.val p).comp))
 
-def zeroFieldEvalPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def zeroFieldEvalPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (p : M) :
     Path ((zeroField (M := M) (R := R)).val p).comp ring.zero :=
   Path.refl _
 
-def addFieldCommPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addFieldCommPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (X Y : VectorField M R) (p : M) :
     Path ((addField X Y).val p).comp ((addField Y X).val p).comp :=
   tangentAddCommPath (X.val p) (Y.val p)
 
-def addFieldAssocPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addFieldAssocPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (X Y Z : VectorField M R) (p : M) :
     Path ((addField (addField X Y) Z).val p).comp ((addField X (addField Y Z)).val p).comp :=
   tangentAddAssocPath (X.val p) (Y.val p) (Z.val p)
 
-def addFieldZeroLeftPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addFieldZeroLeftPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (X : VectorField M R) (p : M) :
     Path ((addField (zeroField (M := M) (R := R)) X).val p).comp (X.val p).comp :=
   tangentAddZeroLeftPath (X.val p)
 
-def addFieldZeroRightPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addFieldZeroRightPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (X : VectorField M R) (p : M) :
     Path ((addField X (zeroField (M := M) (R := R))).val p).comp (X.val p).comp :=
   tangentAddZeroRightPath (X.val p)
 
-def lieBracketExpandPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def lieBracketExpandPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (X Y : VectorField M R) (p : M) :
     Path (lieBracket X Y p)
          (ring.add (ring.mul (X.val p).comp (Y.val p).comp)
                    (ring.neg (ring.mul (Y.val p).comp (X.val p).comp))) :=
   Path.refl _
 
-def lieBracketSelfZeroPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def lieBracketSelfZeroPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (X : VectorField M R) (p : M) :
     Path (lieBracket X X p) ring.zero :=
   ring.add_neg (ring.mul (X.val p).comp (X.val p).comp)
@@ -418,64 +418,64 @@ structure OneForm (M : Type u) (R : Type v) where
 structure TwoForm (M : Type u) (R : Type v) where
   eval : M → R → R → R
 
-def zeroOneForm {M : Type u} {R : Type v} [ring : SmoothRing R] : OneForm M R :=
+noncomputable def zeroOneForm {M : Type u} {R : Type v} [ring : SmoothRing R] : OneForm M R :=
   ⟨fun _ _ => ring.zero⟩
 
-def addOneForm {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addOneForm {M : Type u} {R : Type v} [ring : SmoothRing R]
     (om ta : OneForm M R) : OneForm M R :=
   ⟨fun p v => ring.add (om.eval p v) (ta.eval p v)⟩
 
-def scaleOneForm {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def scaleOneForm {M : Type u} {R : Type v} [ring : SmoothRing R]
     (k : R) (om : OneForm M R) : OneForm M R :=
   ⟨fun p v => ring.mul k (om.eval p v)⟩
 
-def wedge {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def wedge {M : Type u} {R : Type v} [ring : SmoothRing R]
     (om ta : OneForm M R) : TwoForm M R :=
   ⟨fun p v w =>
     ring.add (ring.mul (om.eval p v) (ta.eval p w))
              (ring.neg (ring.mul (om.eval p w) (ta.eval p v)))⟩
 
-def exteriorD {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def exteriorD {M : Type u} {R : Type v} [ring : SmoothRing R]
     (f : M → R) : OneForm M R :=
   ⟨fun p v => ring.mul (f p) v⟩
 
-def zeroOneFormEvalPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def zeroOneFormEvalPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (p : M) (v : R) :
     Path ((zeroOneForm (M := M) (R := R)).eval p v) ring.zero :=
   Path.refl _
 
-def addOneFormCommPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addOneFormCommPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (om ta : OneForm M R) (p : M) (v : R) :
     Path ((addOneForm om ta).eval p v) ((addOneForm ta om).eval p v) :=
   ring.add_comm (om.eval p v) (ta.eval p v)
 
-def addOneFormAssocPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addOneFormAssocPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (om ta sg : OneForm M R) (p : M) (v : R) :
     Path ((addOneForm (addOneForm om ta) sg).eval p v)
          ((addOneForm om (addOneForm ta sg)).eval p v) :=
   ring.add_assoc (om.eval p v) (ta.eval p v) (sg.eval p v)
 
-def addOneFormZeroLeftPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addOneFormZeroLeftPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (om : OneForm M R) (p : M) (v : R) :
     Path ((addOneForm (zeroOneForm (M := M) (R := R)) om).eval p v) (om.eval p v) :=
   ring.zero_add (om.eval p v)
 
-def addOneFormZeroRightPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def addOneFormZeroRightPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (om : OneForm M R) (p : M) (v : R) :
     Path ((addOneForm om (zeroOneForm (M := M) (R := R))).eval p v) (om.eval p v) :=
   ring.add_zero (om.eval p v)
 
-def scaleOneFormOnePath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def scaleOneFormOnePath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (om : OneForm M R) (p : M) (v : R) :
     Path ((scaleOneForm ring.one om).eval p v) (om.eval p v) :=
   ring.one_mul (om.eval p v)
 
-def wedgeDiagZeroPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def wedgeDiagZeroPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (om ta : OneForm M R) (p : M) (v : R) :
     Path ((wedge om ta).eval p v v) ring.zero :=
   ring.add_neg (ring.mul (om.eval p v) (ta.eval p v))
 
-def exteriorDDistribPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def exteriorDDistribPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (f : M → R) (p : M) (v w1 : R) :
     Path ((exteriorD f).eval p (ring.add v w1))
          (ring.add ((exteriorD f).eval p v) ((exteriorD f).eval p w1)) :=
@@ -527,36 +527,36 @@ theorem exteriorDDistribPath_symm_symm {M : Type u} {R : Type v} [ring : SmoothR
 structure Connection (M : Type u) (R : Type v) where
   transport : (p : M) → R → Tangent M R p → Tangent M R p
 
-def flatConnection {M : Type u} {R : Type v} : Connection M R :=
+noncomputable def flatConnection {M : Type u} {R : Type v} : Connection M R :=
   ⟨fun _ _ v => v⟩
 
-def parallelTransport {M : Type u} {R : Type v}
+noncomputable def parallelTransport {M : Type u} {R : Type v}
     (Gam : Connection M R) (p : M)
     (dirs : List R) (v : Tangent M R p) : Tangent M R p :=
   dirs.foldl (fun acc d => Gam.transport p d acc) v
 
-def flatTransportPath {M : Type u} {R : Type v}
+noncomputable def flatTransportPath {M : Type u} {R : Type v}
     (p : M) (d : R) (v : Tangent M R p) :
     Path ((flatConnection (M := M) (R := R)).transport p d v).comp v.comp :=
   Path.refl _
 
-def parallelNilPath {M : Type u} {R : Type v}
+noncomputable def parallelNilPath {M : Type u} {R : Type v}
     (Gam : Connection M R) (p : M) (v : Tangent M R p) :
     Path (parallelTransport Gam p [] v).comp v.comp :=
   Path.refl _
 
-def parallelConsPath {M : Type u} {R : Type v}
+noncomputable def parallelConsPath {M : Type u} {R : Type v}
     (Gam : Connection M R) (p : M) (d : R) (dirs : List R) (v : Tangent M R p) :
     Path (parallelTransport Gam p (d :: dirs) v).comp
          (parallelTransport Gam p dirs (Gam.transport p d v)).comp :=
   Path.refl _
 
-def flatParallelSinglePath {M : Type u} {R : Type v}
+noncomputable def flatParallelSinglePath {M : Type u} {R : Type v}
     (p : M) (d : R) (v : Tangent M R p) :
     Path (parallelTransport (flatConnection (M := M) (R := R)) p [d] v).comp v.comp :=
   Path.refl _
 
-def flatParallelTwoPath {M : Type u} {R : Type v}
+noncomputable def flatParallelTwoPath {M : Type u} {R : Type v}
     (p : M) (d1 d2 : R) (v : Tangent M R p) :
     Path (parallelTransport (flatConnection (M := M) (R := R)) p [d1, d2] v).comp v.comp :=
   Path.refl _
@@ -570,7 +570,7 @@ noncomputable def flatParallelAllPath {M : Type u} {R : Type v}
   | cons d ds ih =>
       simpa [parallelTransport, flatConnection] using (ih (v := v))
 
-def curvature {M : Type u} {R : Type v}
+noncomputable def curvature {M : Type u} {R : Type v}
     (Gam : Connection M R) (p : M) (d1 d2 : R) (v : Tangent M R p) :
     Tangent M R p × Tangent M R p :=
   let t1 := Gam.transport p d1 v
@@ -579,13 +579,13 @@ def curvature {M : Type u} {R : Type v}
   let t21 := Gam.transport p d1 t2
   (t12, t21)
 
-def flatCurvatureComponentPath {M : Type u} {R : Type v}
+noncomputable def flatCurvatureComponentPath {M : Type u} {R : Type v}
     (p : M) (d1 d2 : R) (v : Tangent M R p) :
     Path (curvature (flatConnection (M := M) (R := R)) p d1 d2 v).1.comp
          (curvature (flatConnection (M := M) (R := R)) p d1 d2 v).2.comp :=
   Path.refl _
 
-def flatCurvatureSwapPath {M : Type u} {R : Type v}
+noncomputable def flatCurvatureSwapPath {M : Type u} {R : Type v}
     (p : M) (d1 d2 : R) (v : Tangent M R p) :
     Path (curvature (flatConnection (M := M) (R := R)) p d1 d2 v)
          (curvature (flatConnection (M := M) (R := R)) p d2 d1 v) :=
@@ -636,37 +636,37 @@ theorem flatCurvatureSwapPath_symm_symm {M : Type u} {R : Type v}
 structure Geodesic (M : Type u) where
   points : List M
 
-def trivialGeodesic {M : Type u} (x : M) : Geodesic M :=
+noncomputable def trivialGeodesic {M : Type u} (x : M) : Geodesic M :=
   ⟨[x]⟩
 
-def geodesicLength {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def geodesicLength {M : Type u} {R : Type v} [ring : SmoothRing R]
     (dist : M → M → R) : List M → R
   | [] => ring.zero
   | [_] => ring.zero
   | x :: y :: rest => ring.add (dist x y) (geodesicLength dist (y :: rest))
 
-def geodesicLengthNilPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def geodesicLengthNilPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (dist : M → M → R) :
     Path (geodesicLength dist []) ring.zero :=
   Path.refl _
 
-def geodesicLengthSinglePath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def geodesicLengthSinglePath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (dist : M → M → R) (x : M) :
     Path (geodesicLength dist [x]) ring.zero :=
   Path.refl _
 
-def geodesicLengthTwoPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def geodesicLengthTwoPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (dist : M → M → R) (x y : M) :
     Path (geodesicLength dist [x, y]) (ring.add (dist x y) ring.zero) :=
   Path.refl _
 
-def geodesicLengthConsPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def geodesicLengthConsPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (dist : M → M → R) (x y : M) (rest : List M) :
     Path (geodesicLength dist (x :: y :: rest))
          (ring.add (dist x y) (geodesicLength dist (y :: rest))) :=
   Path.refl _
 
-def trivialGeodesicLengthPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def trivialGeodesicLengthPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (dist : M → M → R) (x : M) :
     Path (geodesicLength dist (trivialGeodesic x).points) ring.zero :=
   Path.refl _
@@ -703,17 +703,17 @@ structure RiemannianMetric (M : Type u) (R : Type v) [ring : SmoothRing R] where
   self : ∀ x, Path (dist x x) ring.zero
   symm : ∀ x y, Path (dist x y) (dist y x)
 
-def metricSelfPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def metricSelfPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (Sym : RiemannianMetric M R) (x : M) :
     Path (Sym.dist x x) ring.zero :=
   Sym.self x
 
-def metricSymmPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def metricSymmPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (Sym : RiemannianMetric M R) (x y : M) :
     Path (Sym.dist x y) (Sym.dist y x) :=
   Sym.symm x y
 
-def metricDoubleSwapPath {M : Type u} {R : Type v} [ring : SmoothRing R]
+noncomputable def metricDoubleSwapPath {M : Type u} {R : Type v} [ring : SmoothRing R]
     (Sym : RiemannianMetric M R) (x y : M) :
     Path (Sym.dist x y) (Sym.dist x y) :=
   Path.trans (Sym.symm x y) (Sym.symm y x)
@@ -741,10 +741,10 @@ theorem metricDoubleSwapPath_symm_symm {M : Type u} {R : Type v} [ring : SmoothR
 structure GamConnection (M : Type u) (R : Type v) where
   conn : Connection M R
 
-def GamConnection.flat {M : Type u} {R : Type v} : GamConnection M R :=
+noncomputable def GamConnection.flat {M : Type u} {R : Type v} : GamConnection M R :=
   ⟨flatConnection⟩
 
-def gamFlatTransportPath {M : Type u} {R : Type v}
+noncomputable def gamFlatTransportPath {M : Type u} {R : Type v}
     (p : M) (d : R) (v : Tangent M R p) :
     Path ((GamConnection.flat (M := M) (R := R)).conn.transport p d v).comp v.comp :=
   Path.refl _

@@ -58,11 +58,11 @@ structure CellComplex where
     σ.dim + 1 = τ.dim
 
 /-- Cells of a given dimension. -/
-def cellsOfDim (K : CellComplex) (d : Nat) : List Cell :=
+noncomputable def cellsOfDim (K : CellComplex) (d : Nat) : List Cell :=
   K.cells.filter (fun c => c.dim == d)
 
 /-- Number of k-cells. -/
-def numCells (K : CellComplex) (k : Nat) : Nat :=
+noncomputable def numCells (K : CellComplex) (k : Nat) : Nat :=
   (cellsOfDim K k).length
 
 /-! ## Discrete Morse Functions -/
@@ -77,7 +77,7 @@ structure DiscreteMorseFunction (K : CellComplex) where
   morse_condition : True
 
 /-- A cell is critical if it has no exceptional face or coface. -/
-def isCritical (K : CellComplex) (_f : DiscreteMorseFunction K) (c : Cell) : Prop :=
+noncomputable def isCritical (K : CellComplex) (_f : DiscreteMorseFunction K) (c : Cell) : Prop :=
   c ∈ K.cells ∧ True  -- the Morse condition ensures at most one exception
 
 /-- The set of critical cells. -/
@@ -105,7 +105,7 @@ structure GradientVectorField (K : CellComplex) where
     p.1.id = q.1.id → p = q
 
 /-- Unmatched cells in a gradient field are critical. -/
-def unmatchedCells (K : CellComplex) (V : GradientVectorField K) : List Cell :=
+noncomputable def unmatchedCells (K : CellComplex) (V : GradientVectorField K) : List Cell :=
   K.cells.filter (fun c =>
     !(V.pairs.any (fun p => p.1.id == c.id || p.2.id == c.id)))
 
@@ -127,7 +127,7 @@ structure AcyclicMatching (K : CellComplex) extends GradientVectorField K where
     vp.cellSequence.head? ≠ vp.cellSequence.getLast?
 
 /-- An acyclic matching determines the critical cells. -/
-def matchingCriticalCells (K : CellComplex)
+noncomputable def matchingCriticalCells (K : CellComplex)
     (M : AcyclicMatching K) : List Cell :=
   unmatchedCells K M.toGradientVectorField
 
@@ -154,7 +154,7 @@ inductive DiscMorseStep : Prop
   | critical_identify : DiscMorseStep
 
 /-- Every DiscMorseStep is valid. -/
-def discMorseStep_valid : DiscMorseStep → True
+noncomputable def discMorseStep_valid : DiscMorseStep → True
   | DiscMorseStep.collapse => trivial
   | DiscMorseStep.uncollapse => trivial
   | DiscMorseStep.gradient_pair => trivial
@@ -171,7 +171,7 @@ structure CollapseSequence (K : CellComplex) where
   remainder_critical : ∀ c, c ∈ remainder → c ∈ K.cells
 
 /-- Collapse preserves homotopy type (Path witness). -/
-def collapse_homotopy_path (K : CellComplex) (e : ElementaryCollapse K) :
+noncomputable def collapse_homotopy_path (K : CellComplex) (e : ElementaryCollapse K) :
     Path (e.face.dim + 1) e.coface.dim :=
   e.dim_rel
 
@@ -199,7 +199,7 @@ structure DiscreteMorseInequalities (K : CellComplex) where
                      (List.range (n + 1))))
 
 /-- Weak discrete Morse inequality. -/
-def weak_discrete_morse (K : CellComplex) (I : DiscreteMorseInequalities K)
+noncomputable def weak_discrete_morse (K : CellComplex) (I : DiscreteMorseInequalities K)
     (k : Nat) : I.critCount k ≥ I.betti k :=
   I.weak k
 
@@ -218,7 +218,7 @@ structure OptimalDiscreteMorse (K : CellComplex) where
 
 /-- Optimal discrete Morse functions witness equality of critical
     and Betti numbers. -/
-def optimal_eq (K : CellComplex) (O : OptimalDiscreteMorse K) (k : Nat) :
+noncomputable def optimal_eq (K : CellComplex) (O : OptimalDiscreteMorse K) (k : Nat) :
     Path (O.critCount k) (O.betti k) :=
   O.optimal k
 

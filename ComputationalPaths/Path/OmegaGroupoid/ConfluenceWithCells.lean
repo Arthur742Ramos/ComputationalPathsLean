@@ -50,18 +50,18 @@ structure Cell₂ {A : Type u} {a b : A} where
   step : Step source target
 
 /-- The propositional equality witness of a cell. -/
-def Cell₂.toEq {a b : A} (c : Cell₂ (A := A) (a := a) (b := b)) :
+noncomputable def Cell₂.toEq {a b : A} (c : Cell₂ (A := A) (a := a) (b := b)) :
     c.source.toEq = c.target.toEq :=
   step_toEq c.step
 
 /-- Convert a Cell₂ to a Derivation₂. -/
-def Cell₂.toDeriv {a b : A} (c : Cell₂ (A := A) (a := a) (b := b)) :
+noncomputable def Cell₂.toDeriv {a b : A} (c : Cell₂ (A := A) (a := a) (b := b)) :
     Derivation₂ c.source c.target :=
   Derivation₂.step c.step
 
 /-- The inverse cell can be built as a Derivation₂ (via inv), though
 not as a Cell₂ (since Step is one-directional). -/
-def Cell₂.invDeriv {a b : A} (c : Cell₂ (A := A) (a := a) (b := b)) :
+noncomputable def Cell₂.invDeriv {a b : A} (c : Cell₂ (A := A) (a := a) (b := b)) :
     Derivation₂ c.target c.source :=
   Derivation₂.inv (c.toDeriv)
 
@@ -80,12 +80,12 @@ inductive CellChain₂ {A : Type u} {a b : A} :
 namespace CellChain₂
 
 /-- The length of a cell chain. -/
-def length {p q : Path a b} : CellChain₂ p q → Nat
+noncomputable def length {p q : Path a b} : CellChain₂ p q → Nat
   | nil _ => 0
   | cons _ rest => rest.length + 1
 
 /-- Concatenate two cell chains. -/
-def append {p q r : Path a b} :
+noncomputable def append {p q r : Path a b} :
     CellChain₂ p q → CellChain₂ q r → CellChain₂ p r
   | nil _, chain₂ => chain₂
   | cons step rest, chain₂ => cons step (rest.append chain₂)
@@ -110,12 +110,12 @@ theorem length_append {p q r : Path a b}
     omega
 
 /-- Convert a cell chain to a Derivation₂. -/
-def toDeriv {p q : Path a b} : CellChain₂ p q → Derivation₂ p q
+noncomputable def toDeriv {p q : Path a b} : CellChain₂ p q → Derivation₂ p q
   | nil _ => Derivation₂.refl _
   | cons step rest => Derivation₂.vcomp (Derivation₂.step step) rest.toDeriv
 
 /-- The RwEq witness of a cell chain. -/
-def toRwEq {p q : Path a b} (c : CellChain₂ p q) : RwEq p q :=
+noncomputable def toRwEq {p q : Path a b} (c : CellChain₂ p q) : RwEq p q :=
   c.toDeriv.toRwEq
 
 /-- The toEq witness: all paths in a chain have the same toEq. -/
@@ -145,14 +145,14 @@ contractibility₃. -/
 
 /-- Any two cell chains between the same paths produce derivations
 that are connected by a 3-cell. -/
-def cellChain_coherence {p q : Path a b}
+noncomputable def cellChain_coherence {p q : Path a b}
     (c₁ c₂ : CellChain₂ p q) :
     Derivation₃ c₁.toDeriv c₂.toDeriv :=
   contractibility₃ c₁.toDeriv c₂.toDeriv
 
 /-- A cell chain is coherent with any other derivation between the same
 paths. -/
-def cellChain_derivation_coherence {p q : Path a b}
+noncomputable def cellChain_derivation_coherence {p q : Path a b}
     (c : CellChain₂ p q) (d : Derivation₂ p q) :
     Derivation₃ c.toDeriv d :=
   contractibility₃ c.toDeriv d
@@ -171,16 +171,16 @@ structure CellComplex {A : Type u} {a b : A} (p q : Path a b) where
   deriv : Derivation₂ p q := chain.toDeriv
 
 /-- Build a cell complex from a single step. -/
-def CellComplex.ofStep {p q : Path a b} (s : Step p q) :
+noncomputable def CellComplex.ofStep {p q : Path a b} (s : Step p q) :
     CellComplex p q :=
   { chain := CellChain₂.cons s (CellChain₂.nil q) }
 
 /-- Build a cell complex from reflexivity. -/
-def CellComplex.refl (p : Path a b) : CellComplex p p :=
+noncomputable def CellComplex.refl (p : Path a b) : CellComplex p p :=
   { chain := CellChain₂.nil p }
 
 /-- The length of a cell complex is the length of its chain. -/
-def CellComplex.length {p q : Path a b} (cx : CellComplex p q) : Nat :=
+noncomputable def CellComplex.length {p q : Path a b} (cx : CellComplex p q) : Nat :=
   cx.chain.length
 
 /-- Reflexive cell complex has length 0. -/
@@ -194,43 +194,43 @@ def CellComplex.length {p q : Path a b} (cx : CellComplex p q) : Nat :=
 /-! ## Concrete Cellular Decompositions -/
 
 /-- Cellular decomposition of the associativity law. -/
-def assoc_cell (p : Path a b) (q : Path b c) (r : Path c d) :
+noncomputable def assoc_cell (p : Path a b) (q : Path b c) (r : Path c d) :
     CellComplex (Path.trans (Path.trans p q) r)
                 (Path.trans p (Path.trans q r)) :=
   CellComplex.ofStep (Step.trans_assoc p q r)
 
 /-- Cellular decomposition of the left unit law. -/
-def unit_left_cell (p : Path a b) :
+noncomputable def unit_left_cell (p : Path a b) :
     CellComplex (Path.trans (Path.refl a) p) p :=
   CellComplex.ofStep (Step.trans_refl_left p)
 
 /-- Cellular decomposition of the right unit law. -/
-def unit_right_cell (p : Path a b) :
+noncomputable def unit_right_cell (p : Path a b) :
     CellComplex (Path.trans p (Path.refl b)) p :=
   CellComplex.ofStep (Step.trans_refl_right p)
 
 /-- Cellular decomposition of the right inverse law. -/
-def inv_right_cell (p : Path a b) :
+noncomputable def inv_right_cell (p : Path a b) :
     CellComplex (Path.trans p (Path.symm p)) (Path.refl a) :=
   CellComplex.ofStep (Step.trans_symm p)
 
 /-- Cellular decomposition of the left inverse law. -/
-def inv_left_cell (p : Path a b) :
+noncomputable def inv_left_cell (p : Path a b) :
     CellComplex (Path.trans (Path.symm p) p) (Path.refl b) :=
   CellComplex.ofStep (Step.symm_trans p)
 
 /-- Cellular decomposition of double inverse. -/
-def inv_inv_cell (p : Path a b) :
+noncomputable def inv_inv_cell (p : Path a b) :
     CellComplex (Path.symm (Path.symm p)) p :=
   CellComplex.ofStep (Step.symm_symm p)
 
 /-- Cellular decomposition of symm_refl. -/
-def symm_refl_cell (x : A) :
+noncomputable def symm_refl_cell (x : A) :
     CellComplex (Path.symm (Path.refl x)) (Path.refl x) :=
   CellComplex.ofStep (Step.symm_refl x)
 
 /-- Cellular decomposition of anti-homomorphism. -/
-def anti_hom_cell (p : Path a b) (q : Path b c) :
+noncomputable def anti_hom_cell (p : Path a b) (q : Path b c) :
     CellComplex (Path.symm (Path.trans p q))
                 (Path.trans (Path.symm q) (Path.symm p)) :=
   CellComplex.ofStep (Step.symm_trans_congr p q)
@@ -250,14 +250,14 @@ theorem groupoid_cells_length_one :
 /-! ## 3-Cell Coherence Between Cellular Decompositions -/
 
 /-- Two different cellular decompositions of associativity are coherent. -/
-def assoc_cell_coherence (p : Path a b) (q : Path b c) (r : Path c d)
+noncomputable def assoc_cell_coherence (p : Path a b) (q : Path b c) (r : Path c d)
     (cx : CellComplex (Path.trans (Path.trans p q) r)
                        (Path.trans p (Path.trans q r))) :
     Derivation₃ cx.deriv (assoc_cell p q r).deriv :=
   contractibility₃ cx.deriv (assoc_cell p q r).deriv
 
 /-- Two different cellular decompositions of the left unit are coherent. -/
-def unit_left_cell_coherence (p : Path a b)
+noncomputable def unit_left_cell_coherence (p : Path a b)
     (cx : CellComplex (Path.trans (Path.refl a) p) p) :
     Derivation₃ cx.deriv (unit_left_cell p).deriv :=
   contractibility₃ cx.deriv (unit_left_cell p).deriv
@@ -266,7 +266,7 @@ def unit_left_cell_coherence (p : Path a b)
 
 /-- The pentagon coherence can be expressed cellularly: the two paths around
 the pentagon are cell chains that are connected by a 3-cell. -/
-def pentagon_cell (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
+noncomputable def pentagon_cell (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
     Derivation₃
       (Derivation₂.vcomp
         (Derivation₂.step (Step.trans_assoc (Path.trans f g) h k))

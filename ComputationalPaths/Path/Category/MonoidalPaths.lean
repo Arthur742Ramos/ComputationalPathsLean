@@ -34,11 +34,11 @@ variable {a b c d e f' : A}
 /-! ## Tensor product of paths -/
 
 /-- The tensor product of paths is path composition (concatenation of traces). -/
-@[simp] def PathTensor (p : Path a b) (q : Path b c) : Path a c :=
+@[simp] noncomputable def PathTensor (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
 /-- The unit for the path tensor is the reflexive path. -/
-@[simp] def PathUnit (a : A) : Path a a :=
+@[simp] noncomputable def PathUnit (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Associator coherence -/

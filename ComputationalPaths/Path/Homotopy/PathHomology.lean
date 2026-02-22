@@ -34,19 +34,19 @@ universe u
 /-! ## Cycles and Boundaries -/
 
 /-- Cycles in degree 1: elements of `ker d₁` in a 3-term chain complex. -/
-def Cycles (C : ChainComplex3.{u}) : Type u :=
+noncomputable def Cycles (C : ChainComplex3.{u}) : Type u :=
   Kernel C.d₁
 
 /-- Boundary elements viewed in the cycle set. -/
-def boundaryToCycle (C : ChainComplex3.{u}) (x : C.C₂.carrier) : Cycles C :=
+noncomputable def boundaryToCycle (C : ChainComplex3.{u}) (x : C.C₂.carrier) : Cycles C :=
   ⟨C.d₂.toFun x, C.dd_zero x⟩
 
 /-- Predicate asserting that a cycle is a boundary. -/
-def isBoundary (C : ChainComplex3.{u}) (x : Cycles C) : Prop :=
+noncomputable def isBoundary (C : ChainComplex3.{u}) (x : Cycles C) : Prop :=
   ∃ z, boundaryToCycle C z = x
 
 /-- Homology relation: two cycles are equivalent if they are equal or both boundaries. -/
-def HomologyRel (C : ChainComplex3.{u}) : Cycles C → Cycles C → Prop :=
+noncomputable def HomologyRel (C : ChainComplex3.{u}) : Cycles C → Cycles C → Prop :=
   fun x y => x = y ∨ (isBoundary C x ∧ isBoundary C y)
 
 /-- Homology relation is reflexive. -/
@@ -86,22 +86,22 @@ theorem homologyRel_equiv (C : ChainComplex3.{u}) : Equivalence (HomologyRel C) 
   trans := homologyRel_trans C
 
 /-- The setoid of cycles modulo boundaries. -/
-def homologySetoid (C : ChainComplex3.{u}) : Setoid (Cycles C) where
+noncomputable def homologySetoid (C : ChainComplex3.{u}) : Setoid (Cycles C) where
   r := HomologyRel C
   iseqv := homologyRel_equiv C
 
 /-- Homology of a 3-term path chain complex (degree 1). -/
-def Homology (C : ChainComplex3.{u}) : Type u :=
+noncomputable def Homology (C : ChainComplex3.{u}) : Type u :=
   Quotient (homologySetoid C)
 
 /-- The zero homology class. -/
-def homology_zero (C : ChainComplex3.{u}) : Homology C :=
+noncomputable def homology_zero (C : ChainComplex3.{u}) : Homology C :=
   Quotient.mk _ (kernel_zero C.d₁)
 
 /-! ## Induced Maps on Homology -/
 
 /-- Map cycles along a chain map. -/
-def mapCycles {C D : ChainComplex3.{u}} (f : ChainMap3 C D) : Cycles C → Cycles D :=
+noncomputable def mapCycles {C D : ChainComplex3.{u}} (f : ChainMap3 C D) : Cycles C → Cycles D :=
   fun x =>
     ⟨f.f₁.toFun x.1, by
       have hx : C.d₁.toFun x.1 = C.C₀.zero := x.2
@@ -130,7 +130,7 @@ theorem mapCycles_respects_rel {C D : ChainComplex3.{u}} (f : ChainMap3 C D)
     exact Or.inr ⟨mapCycles_isBoundary f hxy.1, mapCycles_isBoundary f hxy.2⟩
 
 /-- Induced map on homology from a chain map. -/
-def homologyMap {C D : ChainComplex3.{u}} (f : ChainMap3 C D) : Homology C → Homology D :=
+noncomputable def homologyMap {C D : ChainComplex3.{u}} (f : ChainMap3 C D) : Homology C → Homology D :=
   Quotient.lift
     (fun x => Quotient.mk _ (mapCycles f x))
     (by

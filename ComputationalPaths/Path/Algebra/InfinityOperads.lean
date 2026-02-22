@@ -66,7 +66,7 @@ structure Vertex where
   arity_eq : arity = inputs.length
 
 /-- Path witness for vertex arity. -/
-def Vertex.arity_path (v : Vertex) : Path v.arity v.inputs.length :=
+noncomputable def Vertex.arity_path (v : Vertex) : Path v.arity v.inputs.length :=
   Path.stepChain v.arity_eq
 
 /-- A planar rooted tree. -/
@@ -85,12 +85,12 @@ structure PlanarTree where
   numVertices_eq : numVertices = vertices.length
 
 /-- Path witness for tree vertex count. -/
-def PlanarTree.numVertices_path (T : PlanarTree) :
+noncomputable def PlanarTree.numVertices_path (T : PlanarTree) :
     Path T.numVertices T.vertices.length :=
   Path.stepChain T.numVertices_eq
 
 /-- The corolla: a tree with one vertex. -/
-def corolla (n : Nat) : PlanarTree where
+noncomputable def corolla (n : Nat) : PlanarTree where
   vertices := [{ inputs := (List.range n).map (fun i => Edge.mk i)
                  output := Edge.mk n
                  arity := n
@@ -102,7 +102,7 @@ def corolla (n : Nat) : PlanarTree where
   numVertices_eq := rfl
 
 /-- The unit tree: no vertices, one edge. -/
-def unitTree : PlanarTree where
+noncomputable def unitTree : PlanarTree where
   vertices := []
   edges := [Edge.mk 0]
   root := Edge.mk 0
@@ -111,11 +111,11 @@ def unitTree : PlanarTree where
   numVertices_eq := rfl
 
 /-- Path witness: unit tree has zero vertices. -/
-def unitTree_numVertices : Path unitTree.numVertices 0 :=
+noncomputable def unitTree_numVertices : Path unitTree.numVertices 0 :=
   Path.refl 0
 
 /-- Path witness: corolla has one vertex. -/
-def corolla_numVertices (n : Nat) : Path (corolla n).numVertices 1 :=
+noncomputable def corolla_numVertices (n : Nat) : Path (corolla n).numVertices 1 :=
   Path.refl 1
 
 /-! ## Tree Morphisms -/
@@ -130,18 +130,18 @@ structure TreeMorphism (S T : PlanarTree) where
   edge_compat : True
 
 /-- Path witness for root preservation. -/
-def TreeMorphism.root_path {S T : PlanarTree} (f : TreeMorphism S T) :
+noncomputable def TreeMorphism.root_path {S T : PlanarTree} (f : TreeMorphism S T) :
     Path (f.edgeMap S.root) T.root :=
   Path.stepChain f.root_pres
 
 /-- Identity tree morphism. -/
-def TreeMorphism.id (T : PlanarTree) : TreeMorphism T T where
+noncomputable def TreeMorphism.id (T : PlanarTree) : TreeMorphism T T where
   edgeMap := fun e => e
   root_pres := rfl
   edge_compat := trivial
 
 /-- Composition of tree morphisms. -/
-def TreeMorphism.comp {S T U : PlanarTree}
+noncomputable def TreeMorphism.comp {S T U : PlanarTree}
     (f : TreeMorphism S T) (g : TreeMorphism T U) :
     TreeMorphism S U where
   edgeMap := fun e => g.edgeMap (f.edgeMap e)
@@ -149,7 +149,7 @@ def TreeMorphism.comp {S T U : PlanarTree}
   edge_compat := trivial
 
 /-- Path witness for composition root preservation. -/
-def TreeMorphism.comp_root_path {S T U : PlanarTree}
+noncomputable def TreeMorphism.comp_root_path {S T U : PlanarTree}
     (f : TreeMorphism S T) (g : TreeMorphism T U) :
     Path ((TreeMorphism.comp f g).edgeMap S.root) U.root :=
   Path.stepChain (TreeMorphism.comp f g).root_pres
@@ -162,7 +162,7 @@ theorem TreeMorphism.id_comp {S T : PlanarTree}
   rfl
 
 /-- Path witness for left identity. -/
-def TreeMorphism.id_comp_path {S T : PlanarTree}
+noncomputable def TreeMorphism.id_comp_path {S T : PlanarTree}
     (f : TreeMorphism S T) :
     Path (TreeMorphism.comp (TreeMorphism.id S) f).edgeMap f.edgeMap :=
   Path.stepChain (TreeMorphism.id_comp f)
@@ -175,7 +175,7 @@ theorem TreeMorphism.comp_id {S T : PlanarTree}
   rfl
 
 /-- Path witness for right identity. -/
-def TreeMorphism.comp_id_path {S T : PlanarTree}
+noncomputable def TreeMorphism.comp_id_path {S T : PlanarTree}
     (f : TreeMorphism S T) :
     Path (TreeMorphism.comp f (TreeMorphism.id T)).edgeMap f.edgeMap :=
   Path.stepChain (TreeMorphism.comp_id f)
@@ -200,13 +200,13 @@ structure DendroidalSet where
       restrict f (restrict g x)
 
 /-- Path witness for identity restriction. -/
-def DendroidalSet.restrict_id_path (D : DendroidalSet)
+noncomputable def DendroidalSet.restrict_id_path (D : DendroidalSet)
     (T : PlanarTree) (x : D.dendrex T) :
     Path (D.restrict (TreeMorphism.id T) x) x :=
   Path.stepChain (D.restrict_id T x)
 
 /-- Path witness for composition of restrictions. -/
-def DendroidalSet.restrict_comp_path (D : DendroidalSet)
+noncomputable def DendroidalSet.restrict_comp_path (D : DendroidalSet)
     {S T U : PlanarTree}
     (f : TreeMorphism S T) (g : TreeMorphism T U)
     (x : D.dendrex U) :
@@ -224,7 +224,7 @@ structure DendroidalMap (X Y : DendroidalSet) where
     toFun S (X.restrict f x) = Y.restrict f (toFun T x)
 
 /-- Path witness for naturality. -/
-def DendroidalMap.natural_path {X Y : DendroidalSet}
+noncomputable def DendroidalMap.natural_path {X Y : DendroidalSet}
     (φ : DendroidalMap X Y) {S T : PlanarTree}
     (f : TreeMorphism S T) (x : X.dendrex T) :
     Path (φ.toFun S (X.restrict f x))
@@ -232,12 +232,12 @@ def DendroidalMap.natural_path {X Y : DendroidalSet}
   Path.stepChain (φ.natural f x)
 
 /-- Identity map of dendroidal sets. -/
-def DendroidalMap.id (X : DendroidalSet) : DendroidalMap X X where
+noncomputable def DendroidalMap.id (X : DendroidalSet) : DendroidalMap X X where
   toFun := fun _ x => x
   natural := by intros; rfl
 
 /-- Composition of dendroidal maps. -/
-def DendroidalMap.comp {X Y Z : DendroidalSet}
+noncomputable def DendroidalMap.comp {X Y Z : DendroidalSet}
     (φ : DendroidalMap X Y) (ψ : DendroidalMap Y Z) :
     DendroidalMap X Z where
   toFun := fun T x => ψ.toFun T (φ.toFun T x)
@@ -252,7 +252,7 @@ theorem DendroidalMap.id_comp {X Y : DendroidalSet}
   rfl
 
 /-- Path witness for left identity. -/
-def DendroidalMap.id_comp_path {X Y : DendroidalSet}
+noncomputable def DendroidalMap.id_comp_path {X Y : DendroidalSet}
     (φ : DendroidalMap X Y) :
     Path (DendroidalMap.comp (DendroidalMap.id X) φ).toFun φ.toFun :=
   Path.stepChain (DendroidalMap.id_comp φ)
@@ -264,7 +264,7 @@ theorem DendroidalMap.comp_id {X Y : DendroidalSet}
   rfl
 
 /-- Path witness for right identity. -/
-def DendroidalMap.comp_id_path {X Y : DendroidalSet}
+noncomputable def DendroidalMap.comp_id_path {X Y : DendroidalSet}
     (φ : DendroidalMap X Y) :
     Path (DendroidalMap.comp φ (DendroidalMap.id Y)).toFun φ.toFun :=
   Path.stepChain (DendroidalMap.comp_id φ)
@@ -283,7 +283,7 @@ structure DendroidalFace (D : DendroidalSet) (T : PlanarTree) where
   compat : ∀ (x : D.dendrex T), faceMap x = D.restrict incl x
 
 /-- Path witness for face compatibility. -/
-def DendroidalFace.compat_path {D : DendroidalSet} {T : PlanarTree}
+noncomputable def DendroidalFace.compat_path {D : DendroidalSet} {T : PlanarTree}
     (F : DendroidalFace D T) (x : D.dendrex T) :
     Path (F.faceMap x) (D.restrict F.incl x) :=
   Path.stepChain (F.compat x)
@@ -303,7 +303,7 @@ structure InnerHorn (D : DendroidalSet) where
       D.restrict f (partialData T g)
 
 /-- Path witness for inner horn coherence. -/
-def InnerHorn.coherent_path {D : DendroidalSet} (H : InnerHorn D)
+noncomputable def InnerHorn.coherent_path {D : DendroidalSet} (H : InnerHorn D)
     {S T : PlanarTree} (f : TreeMorphism S T)
     (g : TreeMorphism T H.tree) :
     Path (H.partialData S (TreeMorphism.comp f g))
@@ -319,7 +319,7 @@ structure InnerHornFiller (D : DendroidalSet) (H : InnerHorn D) where
     D.restrict f filler = H.partialData T f
 
 /-- Path witness for filler extending data. -/
-def InnerHornFiller.extends_path {D : DendroidalSet} {H : InnerHorn D}
+noncomputable def InnerHornFiller.extends_path {D : DendroidalSet} {H : InnerHorn D}
     (F : InnerHornFiller D H) (T : PlanarTree)
     (f : TreeMorphism T H.tree) :
     Path (D.restrict f F.filler) (H.partialData T f) :=
@@ -332,7 +332,7 @@ structure InfinityOperad extends DendroidalSet where
     InnerHornFiller toDendroidalSet H
 
 /-- Path witness for ∞-operad horn filling. -/
-def InfinityOperad.fill_path (O : InfinityOperad) (H : InnerHorn O.toDendroidalSet)
+noncomputable def InfinityOperad.fill_path (O : InfinityOperad) (H : InnerHorn O.toDendroidalSet)
     (T : PlanarTree) (f : TreeMorphism T H.tree) :
     Path (O.restrict f (O.innerKan H).filler)
          (H.partialData T f) :=
@@ -359,14 +359,14 @@ structure Bidendrex (X Y : DendroidalSet) where
     restrictRight T (TreeMorphism.id U) x = x
 
 /-- Path witness for left restriction identity. -/
-def Bidendrex.restrictLeft_id_path {X Y : DendroidalSet}
+noncomputable def Bidendrex.restrictLeft_id_path {X Y : DendroidalSet}
     (B : Bidendrex X Y) (T U : PlanarTree)
     (x : B.carrier T U) :
     Path (B.restrictLeft (TreeMorphism.id T) U x) x :=
   Path.stepChain (B.restrictLeft_id T U x)
 
 /-- Path witness for right restriction identity. -/
-def Bidendrex.restrictRight_id_path {X Y : DendroidalSet}
+noncomputable def Bidendrex.restrictRight_id_path {X Y : DendroidalSet}
     (B : Bidendrex X Y) (T U : PlanarTree)
     (x : B.carrier T U) :
     Path (B.restrictRight T (TreeMorphism.id U) x) x :=
@@ -398,7 +398,7 @@ structure BVTensorSymmetry (bv1 bv2 : BVTensor) where
     inv.toFun T (sym.toFun T x) = x
 
 /-- Path witness for BV tensor symmetry. -/
-def BVTensorSymmetry.roundtrip_path {bv1 bv2 : BVTensor}
+noncomputable def BVTensorSymmetry.roundtrip_path {bv1 bv2 : BVTensor}
     (S : BVTensorSymmetry bv1 bv2) (T : PlanarTree)
     (x : bv1.tensor.dendrex T) :
     Path (S.inv.toFun T (S.sym.toFun T x)) x :=
@@ -425,13 +425,13 @@ structure ColoredOp where
     comp (identity c) f = f
 
 /-- Path witness for left unitality. -/
-def ColoredOp.comp_id_left_path (O : ColoredOp) {c d : O.Color}
+noncomputable def ColoredOp.comp_id_left_path (O : ColoredOp) {c d : O.Color}
     (f : O.Ops [c] d) :
     Path (O.comp f (O.identity c)) f :=
   Path.stepChain (O.comp_id_left f)
 
 /-- Path witness for right unitality. -/
-def ColoredOp.comp_id_right_path (O : ColoredOp) {c : O.Color}
+noncomputable def ColoredOp.comp_id_right_path (O : ColoredOp) {c : O.Color}
     (f : O.Ops [c] c) :
     Path (O.comp (O.identity c) f) f :=
   Path.stepChain (O.comp_id_right f)
@@ -452,7 +452,7 @@ structure OperadicNerve (O : ColoredOp) where
     ∃ (e : Edge), e = Edge.mk 0
 
 /-- Path witness for unit tree labeling. -/
-def OperadicNerve.unit_path {O : ColoredOp}
+noncomputable def OperadicNerve.unit_path {O : ColoredOp}
     (N : OperadicNerve O) (x : N.nerve.dendrex unitTree) :
     Path (N.label unitTree x (Edge.mk 0))
          (N.label unitTree x (Edge.mk 0)) :=
@@ -485,17 +485,17 @@ structure InfOperadStep (A : Type u) where
   proof : src = tgt
 
 /-- Convert to a Path. -/
-def InfOperadStep.toPath {A : Type u}
+noncomputable def InfOperadStep.toPath {A : Type u}
     (s : InfOperadStep A) : Path s.src s.tgt :=
   Path.stepChain s.proof
 
 /-- Compose two ∞-operad step paths. -/
-def infOperadChain {A : Type u} {a b c : A}
+noncomputable def infOperadChain {A : Type u} {a b c : A}
     (h1 : a = b) (h2 : b = c) : Path a c :=
   Path.trans (Path.stepChain h1) (Path.stepChain h2)
 
 /-- Triple chain of ∞-operad steps. -/
-def infOperadChain3 {A : Type u} {a b c d : A}
+noncomputable def infOperadChain3 {A : Type u} {a b c d : A}
     (h1 : a = b) (h2 : b = c) (h3 : c = d) : Path a d :=
   Path.trans (Path.trans (Path.stepChain h1) (Path.stepChain h2))
              (Path.stepChain h3)

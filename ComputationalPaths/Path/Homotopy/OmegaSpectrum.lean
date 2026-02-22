@@ -37,14 +37,14 @@ structure OmegaSpectrum where
   structureMap : (n : Nat) → PointedMap (level n) (loopPointed (level (n + 1)))
 
 /-- Constant pointed map to the basepoint. -/
-def basepointMap (X Y : Pointed) : PointedMap X Y where
+noncomputable def basepointMap (X Y : Pointed) : PointedMap X Y where
   toFun := fun _ => Y.pt
   map_pt := rfl
 
 namespace OmegaSpectrum
 
 /-- Shift an Omega-spectrum by one level. -/
-def shift (E : OmegaSpectrum) : OmegaSpectrum where
+noncomputable def shift (E : OmegaSpectrum) : OmegaSpectrum where
   level := fun n => E.level (n + 1)
   structureMap := fun n => E.structureMap (n + 1)
 
@@ -63,7 +63,7 @@ noncomputable def pathOmegaSpectrum (X : Pointed) : OmegaSpectrum where
     basepointMap (iteratedLoopPointed n X) (loopPointed (iteratedLoopPointed (n + 1) X))
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

@@ -51,7 +51,7 @@ inductive GrpStep {G : Type u} (pg : PathGroup G) : G → G → Type u where
   | invL (a : G) : GrpStep pg (pg.mul (pg.inv a) a) pg.e
 
 /-- Soundness of group steps. -/
-def GrpStep.sound {G : Type u} {pg : PathGroup G} : GrpStep pg a b → a = b
+noncomputable def GrpStep.sound {G : Type u} {pg : PathGroup G} : GrpStep pg a b → a = b
   | .assoc a b c => pg.mul_assoc a b c
   | .identL a => pg.e_mul a
   | .identR a => pg.mul_e a
@@ -59,7 +59,7 @@ def GrpStep.sound {G : Type u} {pg : PathGroup G} : GrpStep pg a b → a = b
   | .invL a => pg.inv_mul a
 
 /-- Convert a group step to a computational path. -/
-def GrpStep.toPath {G : Type u} {pg : PathGroup G} (s : GrpStep pg a b) : Path a b :=
+noncomputable def GrpStep.toPath {G : Type u} {pg : PathGroup G} (s : GrpStep pg a b) : Path a b :=
   Path.mk [Step.mk a b s.sound] s.sound
 
 -- ============================================================
@@ -79,13 +79,13 @@ inductive RepStep {G : Type u} {V : Type v} {pg : PathGroup G}
   | mulAct (g h : G) (v : V) : RepStep rep (rep.rho (pg.mul g h) v) (rep.rho g (rep.rho h v))
 
 /-- Soundness for representation steps. -/
-def RepStep.sound {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def RepStep.sound {G : Type u} {V : Type v} {pg : PathGroup G}
     {rep : Representation G V pg} : RepStep rep a b → a = b
   | .identAct v => rep.rho_e v
   | .mulAct g h v => rep.rho_mul g h v
 
 /-- Convert a rep step to a path. -/
-def RepStep.toPath {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def RepStep.toPath {G : Type u} {V : Type v} {pg : PathGroup G}
     {rep : Representation G V pg} (s : RepStep rep a b) : Path a b :=
   Path.mk [Step.mk a b s.sound] s.sound
 
@@ -94,27 +94,27 @@ def RepStep.toPath {G : Type u} {V : Type v} {pg : PathGroup G}
 -- ============================================================
 
 -- 1. Associativity path
-def groupAssocPath {G : Type u} (pg : PathGroup G) (a b c : G) :
+noncomputable def groupAssocPath {G : Type u} (pg : PathGroup G) (a b c : G) :
     Path (pg.mul (pg.mul a b) c) (pg.mul a (pg.mul b c)) :=
   (GrpStep.assoc a b c : GrpStep pg _ _).toPath
 
 -- 2. Left identity path
-def groupIdentLeftPath {G : Type u} (pg : PathGroup G) (a : G) :
+noncomputable def groupIdentLeftPath {G : Type u} (pg : PathGroup G) (a : G) :
     Path (pg.mul pg.e a) a :=
   (GrpStep.identL a : GrpStep pg _ _).toPath
 
 -- 3. Right identity path
-def groupIdentRightPath {G : Type u} (pg : PathGroup G) (a : G) :
+noncomputable def groupIdentRightPath {G : Type u} (pg : PathGroup G) (a : G) :
     Path (pg.mul a pg.e) a :=
   (GrpStep.identR a : GrpStep pg _ _).toPath
 
 -- 4. Right inverse path
-def groupInvRightPath {G : Type u} (pg : PathGroup G) (a : G) :
+noncomputable def groupInvRightPath {G : Type u} (pg : PathGroup G) (a : G) :
     Path (pg.mul a (pg.inv a)) pg.e :=
   (GrpStep.invR a : GrpStep pg _ _).toPath
 
 -- 5. Left inverse path
-def groupInvLeftPath {G : Type u} (pg : PathGroup G) (a : G) :
+noncomputable def groupInvLeftPath {G : Type u} (pg : PathGroup G) (a : G) :
     Path (pg.mul (pg.inv a) a) pg.e :=
   (GrpStep.invL a : GrpStep pg _ _).toPath
 
@@ -123,13 +123,13 @@ def groupInvLeftPath {G : Type u} (pg : PathGroup G) (a : G) :
 -- ============================================================
 
 -- 6. Identity acts trivially
-def rho_identity_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_identity_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (v : V) :
     Path (rep.rho pg.e v) v :=
   (RepStep.identAct v : RepStep rep _ _).toPath
 
 -- 7. Multiplication respects action
-def rho_mul_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_mul_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g h : G) (v : V) :
     Path (rep.rho (pg.mul g h) v) (rep.rho g (rep.rho h v)) :=
   (RepStep.mulAct g h v : RepStep rep _ _).toPath
@@ -139,58 +139,58 @@ def rho_mul_path {G : Type u} {V : Type v} {pg : PathGroup G}
 -- ============================================================
 
 -- 8. Assoc roundtrip: (ab)c → a(bc) → (ab)c (2 steps)
-def assoc_roundtrip {G : Type u} (pg : PathGroup G) (a b c : G) :
+noncomputable def assoc_roundtrip {G : Type u} (pg : PathGroup G) (a b c : G) :
     Path (pg.mul (pg.mul a b) c) (pg.mul (pg.mul a b) c) :=
   Path.trans (groupAssocPath pg a b c) (Path.symm (groupAssocPath pg a b c))
 
 -- 9. Identity roundtrip: ea → a → ea via symm (1 + 1 step)
-def identL_roundtrip {G : Type u} (pg : PathGroup G) (a : G) :
+noncomputable def identL_roundtrip {G : Type u} (pg : PathGroup G) (a : G) :
     Path (pg.mul pg.e a) (pg.mul pg.e a) :=
   Path.trans (groupIdentLeftPath pg a) (Path.symm (groupIdentLeftPath pg a))
 
 -- 10. a(a⁻¹) → e → (a⁻¹)a⁻¹⁻¹... let's do: a·e → a via identR
 -- and symm: a → a·e
-def embed_in_unit {G : Type u} (pg : PathGroup G) (a : G) :
+noncomputable def embed_in_unit {G : Type u} (pg : PathGroup G) (a : G) :
     Path a (pg.mul a pg.e) :=
   Path.symm (groupIdentRightPath pg a)
 
 -- 11. Two-step: a·(a⁻¹·a) → a·e ... no, invL gives a⁻¹·a → e.
 -- congrArg: a · (a⁻¹ · a) → a · e → a (2 steps)
-def mul_invL_cancel {G : Type u} (pg : PathGroup G) (a : G) :
+noncomputable def mul_invL_cancel {G : Type u} (pg : PathGroup G) (a : G) :
     Path (pg.mul a (pg.mul (pg.inv a) a)) (pg.mul a pg.e) :=
   Path.congrArg (pg.mul a) (groupInvLeftPath pg a)
 
 -- 12. Full: a · (a⁻¹ · a) → a · e → a (2 steps)
-def mul_invL_elim {G : Type u} (pg : PathGroup G) (a : G) :
+noncomputable def mul_invL_elim {G : Type u} (pg : PathGroup G) (a : G) :
     Path (pg.mul a (pg.mul (pg.inv a) a)) a :=
   Path.trans (mul_invL_cancel pg a) (groupIdentRightPath pg a)
 
 -- 13. (a·b)·b⁻¹ → a·(b·b⁻¹) → a·e → a (3 steps)
-def mul_invR_elim {G : Type u} (pg : PathGroup G) (a b : G) :
+noncomputable def mul_invR_elim {G : Type u} (pg : PathGroup G) (a b : G) :
     Path (pg.mul (pg.mul a b) (pg.inv b)) a :=
   Path.trans (groupAssocPath pg a b (pg.inv b))
     (Path.trans (Path.congrArg (pg.mul a) (groupInvRightPath pg b))
                 (groupIdentRightPath pg a))
 
 -- 14. (e·a)·b → a·b via congrArg on left (1 step via congrArg)
-def identL_context {G : Type u} (pg : PathGroup G) (a b : G) :
+noncomputable def identL_context {G : Type u} (pg : PathGroup G) (a b : G) :
     Path (pg.mul (pg.mul pg.e a) b) (pg.mul a b) :=
   Path.congrArg (fun x => pg.mul x b) (groupIdentLeftPath pg a)
 
 -- 15. a·(e·b) → a·b via congrArg on right
-def identR_context {G : Type u} (pg : PathGroup G) (a b : G) :
+noncomputable def identR_context {G : Type u} (pg : PathGroup G) (a b : G) :
     Path (pg.mul a (pg.mul pg.e b)) (pg.mul a b) :=
   Path.congrArg (pg.mul a) (groupIdentLeftPath pg b)
 
 -- 16. Double assoc: ((ab)c)d → (a(bc))d → a((bc)d) → a(b(cd)) (3 steps)
-def double_assoc {G : Type u} (pg : PathGroup G) (a b c d : G) :
+noncomputable def double_assoc {G : Type u} (pg : PathGroup G) (a b c d : G) :
     Path (pg.mul (pg.mul (pg.mul a b) c) d) (pg.mul a (pg.mul b (pg.mul c d))) :=
   Path.trans (groupAssocPath pg (pg.mul a b) c d)
     (Path.trans (groupAssocPath pg a b (pg.mul c d))
                 (Path.refl _))
 
 -- 17. Inv of product: (ab)⁻¹ · (ab) → e  (single invL step)
-def inv_prod_left {G : Type u} (pg : PathGroup G) (a b : G) :
+noncomputable def inv_prod_left {G : Type u} (pg : PathGroup G) (a b : G) :
     Path (pg.mul (pg.inv (pg.mul a b)) (pg.mul a b)) pg.e :=
   groupInvLeftPath pg (pg.mul a b)
 
@@ -204,7 +204,7 @@ theorem rho_inv_cancel {G : Type u} {V : Type v} {pg : PathGroup G}
     rep.rho (pg.inv g) (rep.rho g v) = v := by
   rw [← rep.rho_mul, pg.inv_mul, rep.rho_e]
 
-def rho_inv_cancel_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_inv_cancel_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V) :
     Path (rep.rho (pg.inv g) (rep.rho g v)) v :=
   Path.trans
@@ -219,7 +219,7 @@ theorem rho_cancel_inv {G : Type u} {V : Type v} {pg : PathGroup G}
     rep.rho g (rep.rho (pg.inv g) v) = v := by
   rw [← rep.rho_mul, pg.mul_inv, rep.rho_e]
 
-def rho_cancel_inv_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_cancel_inv_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V) :
     Path (rep.rho g (rep.rho (pg.inv g) v)) v :=
   Path.trans
@@ -229,7 +229,7 @@ def rho_cancel_inv_path {G : Type u} {V : Type v} {pg : PathGroup G}
       (rho_identity_path rep v))
 
 -- 20. rho(e·g)(v) → rho(g)(v)  (2 steps: mulAct then identAct in inner)
-def rho_eg_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_eg_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V) :
     Path (rep.rho (pg.mul pg.e g) v) (rep.rho g v) :=
   Path.trans
@@ -237,19 +237,19 @@ def rho_eg_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rho_identity_path rep (rep.rho g v))
 
 -- 21. rho(g·e)(v) → rho(g)(v)  (2 steps)
-def rho_ge_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_ge_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V) :
     Path (rep.rho (pg.mul g pg.e) v) (rep.rho g v) :=
   Path.congrArg (fun x => rep.rho x v) (groupIdentRightPath pg g)
 
 -- 22. Alternative rho(e·g)(v) → rho(g)(v) via congrArg on group level
-def rho_eg_path_alt {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_eg_path_alt {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V) :
     Path (rep.rho (pg.mul pg.e g) v) (rep.rho g v) :=
   Path.congrArg (fun x => rep.rho x v) (groupIdentLeftPath pg g)
 
 -- 23. rho((gh)k)(v) → rho(g(hk))(v) via congrArg
-def rho_assoc_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_assoc_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g h k : G) (v : V) :
     Path (rep.rho (pg.mul (pg.mul g h) k) v)
          (rep.rho (pg.mul g (pg.mul h k)) v) :=
@@ -260,19 +260,19 @@ def rho_assoc_path {G : Type u} {V : Type v} {pg : PathGroup G}
 -- ============================================================
 
 /-- The trivial representation: every group element acts as the identity. -/
-def trivialRep (G : Type u) (V : Type v) (pg : PathGroup G) :
+noncomputable def trivialRep (G : Type u) (V : Type v) (pg : PathGroup G) :
     Representation G V pg where
   rho := fun _ v => v
   rho_e := fun _ => rfl
   rho_mul := fun _ _ _ => rfl
 
 -- 24. Trivial rep path (refl, since rho g v = v definitionally)
-def trivialRep_path {G : Type u} {V : Type v} (pg : PathGroup G)
+noncomputable def trivialRep_path {G : Type u} {V : Type v} (pg : PathGroup G)
     (g : G) (v : V) : Path ((trivialRep G V pg).rho g v) v :=
   Path.refl v
 
 -- 25. Trivial rep: any group element acts the same way
-def trivialRep_const_path {G : Type u} {V : Type v} (pg : PathGroup G)
+noncomputable def trivialRep_const_path {G : Type u} {V : Type v} (pg : PathGroup G)
     (g h : G) (v : V) :
     Path ((trivialRep G V pg).rho g v) ((trivialRep G V pg).rho h v) :=
   Path.refl v
@@ -282,7 +282,7 @@ def trivialRep_const_path {G : Type u} {V : Type v} (pg : PathGroup G)
 -- ============================================================
 
 /-- Direct sum of two representations on product space. -/
-def directSum {G : Type u} {V W : Type v} {pg : PathGroup G}
+noncomputable def directSum {G : Type u} {V W : Type v} {pg : PathGroup G}
     (rep1 : Representation G V pg) (rep2 : Representation G W pg) :
     Representation G (V × W) pg where
   rho := fun g vw => (rep1.rho g vw.1, rep2.rho g vw.2)
@@ -290,7 +290,7 @@ def directSum {G : Type u} {V W : Type v} {pg : PathGroup G}
   rho_mul := by intro g h ⟨v, w⟩; simp [rep1.rho_mul, rep2.rho_mul]
 
 -- 26. Direct sum identity path
-def directSum_identity_path {G : Type u} {V W : Type v} {pg : PathGroup G}
+noncomputable def directSum_identity_path {G : Type u} {V W : Type v} {pg : PathGroup G}
     (rep1 : Representation G V pg) (rep2 : Representation G W pg)
     (vw : V × W) :
     Path ((directSum rep1 rep2).rho pg.e vw) vw :=
@@ -298,7 +298,7 @@ def directSum_identity_path {G : Type u} {V W : Type v} {pg : PathGroup G}
   Path.mk [Step.mk _ _ eq] eq
 
 -- 27. Direct sum mul path
-def directSum_mul_path {G : Type u} {V W : Type v} {pg : PathGroup G}
+noncomputable def directSum_mul_path {G : Type u} {V W : Type v} {pg : PathGroup G}
     (rep1 : Representation G V pg) (rep2 : Representation G W pg)
     (g h : G) (vw : V × W) :
     Path ((directSum rep1 rep2).rho (pg.mul g h) vw)
@@ -315,15 +315,15 @@ structure Character (G : Type u) where
   chi : G → Int
 
 /-- Character of trivial representation. -/
-def trivialChar (G : Type u) (dim : Int) : Character G where
+noncomputable def trivialChar (G : Type u) (dim : Int) : Character G where
   chi := fun _ => dim
 
 /-- Sum of characters. -/
-def charSum {G : Type u} (c1 c2 : Character G) : Character G where
+noncomputable def charSum {G : Type u} (c1 c2 : Character G) : Character G where
   chi := fun g => c1.chi g + c2.chi g
 
 /-- Product of characters. -/
-def charProd {G : Type u} (c1 c2 : Character G) : Character G where
+noncomputable def charProd {G : Type u} (c1 c2 : Character G) : Character G where
   chi := fun g => c1.chi g * c2.chi g
 
 /-- Domain-specific step for character arithmetic. -/
@@ -336,7 +336,7 @@ inductive CharStep {G : Type u} : Int → Int → Type where
   | addZeroR (a : Int) : CharStep (a + 0) a
   | mulOneR (a : Int) : CharStep (a * 1) a
 
-def CharStep.sound : @CharStep G a b → a = b
+noncomputable def CharStep.sound : @CharStep G a b → a = b
   | .addComm a b => Int.add_comm a b
   | .addAssoc a b c => Int.add_assoc a b c
   | .mulComm a b => Int.mul_comm a b
@@ -345,48 +345,48 @@ def CharStep.sound : @CharStep G a b → a = b
   | .addZeroR a => Int.add_zero a
   | .mulOneR a => Int.mul_one a
 
-def CharStep.toPath (s : @CharStep G a b) : Path a b :=
+noncomputable def CharStep.toPath (s : @CharStep G a b) : Path a b :=
   Path.mk [Step.mk a b s.sound] s.sound
 
 -- 28. Trivial character is constant (refl)
-def trivialChar_path (G : Type u) (dim : Int) (g h : G) :
+noncomputable def trivialChar_path (G : Type u) (dim : Int) (g h : G) :
     Path ((trivialChar G dim).chi g) ((trivialChar G dim).chi h) :=
   Path.refl dim
 
 -- 29. Character sum commutativity
-def charSum_comm_path {G : Type u} (c1 c2 : Character G) (g : G) :
+noncomputable def charSum_comm_path {G : Type u} (c1 c2 : Character G) (g : G) :
     Path ((charSum c1 c2).chi g) ((charSum c2 c1).chi g) :=
   (CharStep.addComm (c1.chi g) (c2.chi g) : @CharStep G _ _).toPath
 
 -- 30. Character sum associativity
-def charSum_assoc_path {G : Type u} (c1 c2 c3 : Character G) (g : G) :
+noncomputable def charSum_assoc_path {G : Type u} (c1 c2 c3 : Character G) (g : G) :
     Path ((charSum (charSum c1 c2) c3).chi g) ((charSum c1 (charSum c2 c3)).chi g) :=
   (CharStep.addAssoc (c1.chi g) (c2.chi g) (c3.chi g) : @CharStep G _ _).toPath
 
 -- 31. Character product commutativity
-def charProd_comm_path {G : Type u} (c1 c2 : Character G) (g : G) :
+noncomputable def charProd_comm_path {G : Type u} (c1 c2 : Character G) (g : G) :
     Path ((charProd c1 c2).chi g) ((charProd c2 c1).chi g) :=
   (CharStep.mulComm (c1.chi g) (c2.chi g) : @CharStep G _ _).toPath
 
 -- 32. Character product associativity
-def charProd_assoc_path {G : Type u} (c1 c2 c3 : Character G) (g : G) :
+noncomputable def charProd_assoc_path {G : Type u} (c1 c2 c3 : Character G) (g : G) :
     Path ((charProd (charProd c1 c2) c3).chi g)
          ((charProd c1 (charProd c2 c3)).chi g) :=
   (CharStep.mulAssoc (c1.chi g) (c2.chi g) (c3.chi g) : @CharStep G _ _).toPath
 
 -- 33. Character product distributes over sum
-def charProd_distrib_path {G : Type u} (c1 c2 c3 : Character G) (g : G) :
+noncomputable def charProd_distrib_path {G : Type u} (c1 c2 c3 : Character G) (g : G) :
     Path ((charProd c1 (charSum c2 c3)).chi g)
          ((charSum (charProd c1 c2) (charProd c1 c3)).chi g) :=
   (CharStep.distrib (c1.chi g) (c2.chi g) (c3.chi g) : @CharStep G _ _).toPath
 
 -- 34. Character sum comm roundtrip (2 steps)
-def charSum_comm_roundtrip {G : Type u} (c1 c2 : Character G) (g : G) :
+noncomputable def charSum_comm_roundtrip {G : Type u} (c1 c2 : Character G) (g : G) :
     Path ((charSum c1 c2).chi g) ((charSum c1 c2).chi g) :=
   Path.trans (charSum_comm_path c1 c2 g) (charSum_comm_path c2 c1 g)
 
 -- 35. Character prod comm + assoc chain (2 steps)
-def charProd_comm_assoc {G : Type u} (c1 c2 c3 : Character G) (g : G) :
+noncomputable def charProd_comm_assoc {G : Type u} (c1 c2 c3 : Character G) (g : G) :
     Path ((charProd (charProd c1 c2) c3).chi g)
          ((charProd c1 (charProd c3 c2)).chi g) :=
   Path.trans
@@ -404,7 +404,7 @@ structure IntertwiningMap {G : Type u} {V W : Type v} {pg : PathGroup G}
   equivariant : ∀ g v, f (rep1.rho g v) = rep2.rho g (f v)
 
 -- 36. Equivariance path (single domain step)
-def intertwining_path {G : Type u} {V W : Type v} {pg : PathGroup G}
+noncomputable def intertwining_path {G : Type u} {V W : Type v} {pg : PathGroup G}
     {rep1 : Representation G V pg} {rep2 : Representation G W pg}
     (phi : IntertwiningMap rep1 rep2) (g : G) (v : V) :
     Path (phi.f (rep1.rho g v)) (rep2.rho g (phi.f v)) :=
@@ -412,7 +412,7 @@ def intertwining_path {G : Type u} {V W : Type v} {pg : PathGroup G}
   Path.mk [Step.mk _ _ eq] eq
 
 /-- Composition of intertwining maps. -/
-def intertwiningComp {G : Type u} {V W X : Type v} {pg : PathGroup G}
+noncomputable def intertwiningComp {G : Type u} {V W X : Type v} {pg : PathGroup G}
     {r1 : Representation G V pg} {r2 : Representation G W pg}
     {r3 : Representation G X pg}
     (phi : IntertwiningMap r1 r2) (psi : IntertwiningMap r2 r3) :
@@ -423,7 +423,7 @@ def intertwiningComp {G : Type u} {V W X : Type v} {pg : PathGroup G}
     rw [phi.equivariant, psi.equivariant]
 
 -- 37. Composition equivariance via 2-step trans
-def intertwiningComp_path {G : Type u} {V W X : Type v} {pg : PathGroup G}
+noncomputable def intertwiningComp_path {G : Type u} {V W X : Type v} {pg : PathGroup G}
     {r1 : Representation G V pg} {r2 : Representation G W pg}
     {r3 : Representation G X pg}
     (phi : IntertwiningMap r1 r2) (psi : IntertwiningMap r2 r3)
@@ -434,13 +434,13 @@ def intertwiningComp_path {G : Type u} {V W X : Type v} {pg : PathGroup G}
     (intertwining_path psi g (phi.f v))
 
 /-- Identity intertwining map. -/
-def intertwiningId {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def intertwiningId {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) : IntertwiningMap rep rep where
   f := id
   equivariant := fun _ _ => rfl
 
 -- 38. Identity intertwining equivariance (refl)
-def intertwiningId_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def intertwiningId_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V) :
     Path ((intertwiningId rep).f (rep.rho g v)) (rep.rho g ((intertwiningId rep).f v)) :=
   Path.refl _
@@ -450,12 +450,12 @@ def intertwiningId_path {G : Type u} {V : Type v} {pg : PathGroup G}
 -- ============================================================
 
 /-- Predicate for G-invariant elements. -/
-def IsInvariant {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def IsInvariant {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (v : V) : Prop :=
   ∀ g, rep.rho g v = v
 
 -- 39. Invariant vector path from hypothesis
-def invariant_fixed_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def invariant_fixed_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (v : V) (hv : IsInvariant rep v) (g : G) :
     Path (rep.rho g v) v :=
   let eq := hv g
@@ -467,7 +467,7 @@ theorem trivialRep_all_invariant {G : Type u} {V : Type v} (pg : PathGroup G)
   fun _ => rfl
 
 -- 41. Invariant identity path (refl since rho_e v = v)
-def invariant_identity_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def invariant_identity_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (v : V) :
     Path (rep.rho pg.e v) v :=
   rho_identity_path rep v
@@ -477,7 +477,7 @@ def invariant_identity_path {G : Type u} {V : Type v} {pg : PathGroup G}
 -- ============================================================
 
 /-- Conjugation: g · h = g h g⁻¹. -/
-def conjugate {G : Type u} (pg : PathGroup G) (g h : G) : G :=
+noncomputable def conjugate {G : Type u} (pg : PathGroup G) (g h : G) : G :=
   pg.mul g (pg.mul h (pg.inv g))
 
 -- 42. Conjugation by e: e·h·e⁻¹ → e·(h·e⁻¹) → h·e⁻¹ → h·e → ...
@@ -491,20 +491,20 @@ theorem conjugate_e_eq {G : Type u} (pg : PathGroup G) (h : G) :
     rw [pg.e_mul] at h1; exact h1
   rw [inv_e, pg.mul_e, pg.e_mul]
 
-def conjugate_e_path {G : Type u} (pg : PathGroup G) (h : G) :
+noncomputable def conjugate_e_path {G : Type u} (pg : PathGroup G) (h : G) :
     Path (conjugate pg pg.e h) h :=
   let eq := conjugate_e_eq pg h
   Path.mk [Step.mk _ _ eq] eq
 
 -- 43. Class function: constant functions are class functions
-def IsClassFunction {G : Type u} (pg : PathGroup G) (f : G → Int) : Prop :=
+noncomputable def IsClassFunction {G : Type u} (pg : PathGroup G) (f : G → Int) : Prop :=
   ∀ g h, f (conjugate pg g h) = f h
 
 theorem const_is_class_function {G : Type u} (pg : PathGroup G) (n : Int) :
     IsClassFunction pg (fun _ => n) :=
   fun _ _ => rfl
 
-def const_class_function_path {G : Type u} (pg : PathGroup G) (n : Int) (g h : G) :
+noncomputable def const_class_function_path {G : Type u} (pg : PathGroup G) (n : Int) (g h : G) :
     Path ((fun _ : G => n) (conjugate pg g h)) ((fun _ : G => n) h) :=
   Path.refl n
 
@@ -514,7 +514,7 @@ def const_class_function_path {G : Type u} (pg : PathGroup G) (n : Int) (g h : G
 
 -- 44. rho((ab)c)(v) → rho(a(bc))(v) → rho(a)(rho(bc)(v)) → rho(a)(rho(b)(rho(c)(v)))
 -- Full 3-step expansion
-def rho_triple_expand {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_triple_expand {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (a b c : G) (v : V) :
     Path (rep.rho (pg.mul (pg.mul a b) c) v)
          (rep.rho a (rep.rho b (rep.rho c v))) :=
@@ -523,13 +523,13 @@ def rho_triple_expand {G : Type u} {V : Type v} {pg : PathGroup G}
       (Path.congrArg (rep.rho a) (rho_mul_path rep b c v)))
 
 -- 45. rho(g)(rho(e)(v)) → rho(g)(v) via congrArg + identAct
-def rho_g_after_e {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_g_after_e {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V) :
     Path (rep.rho g (rep.rho pg.e v)) (rep.rho g v) :=
   Path.congrArg (rep.rho g) (rho_identity_path rep v)
 
 -- 46. Symm of rho_mul: rho(g)(rho(h)(v)) → rho(gh)(v)
-def rho_mul_symm {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_mul_symm {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g h : G) (v : V) :
     Path (rep.rho g (rep.rho h v)) (rep.rho (pg.mul g h) v) :=
   Path.symm (rho_mul_path rep g h v)
@@ -542,39 +542,39 @@ theorem rho_eg_coherence {G : Type u} {V : Type v} {pg : PathGroup G}
   apply Subsingleton.elim
 
 -- 48. rho_e comp path: rho(e)(rho(g)(v)) → rho(g)(v)
-def rho_e_comp_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_e_comp_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V) :
     Path (rep.rho pg.e (rep.rho g v)) (rep.rho g v) :=
   rho_identity_path rep (rep.rho g v)
 
 -- 49. Trans chain: rho(e)(rho(e)(v)) → rho(e)(v) → v (2 steps)
-def rho_double_e_path {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def rho_double_e_path {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (v : V) :
     Path (rep.rho pg.e (rep.rho pg.e v)) v :=
   Path.trans (rho_identity_path rep (rep.rho pg.e v))
              (rho_identity_path rep v)
 
 -- 50. Inv cancel roundtrip: v → rho(g)(rho(g⁻¹)(v)) → v
-def inv_cancel_roundtrip {G : Type u} {V : Type v} {pg : PathGroup G}
+noncomputable def inv_cancel_roundtrip {G : Type u} {V : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (g : G) (v : V) :
     Path v v :=
   Path.trans (Path.symm (rho_cancel_inv_path rep g v))
              (rho_cancel_inv_path rep g v)
 
 -- 51. Direct sum cancel: (rep ⊕ triv) identity then back
-def directSum_triv_identity {G : Type u} {V W : Type v} {pg : PathGroup G}
+noncomputable def directSum_triv_identity {G : Type u} {V W : Type v} {pg : PathGroup G}
     (rep : Representation G V pg) (vw : V × W) :
     Path ((directSum rep (trivialRep G W pg)).rho pg.e vw) vw :=
   directSum_identity_path rep (trivialRep G W pg) vw
 
 -- 52. Character sum + distrib chain (2 steps)
-def char_sum_distrib_chain {G : Type u} (c1 c2 c3 : Character G) (g : G) :
+noncomputable def char_sum_distrib_chain {G : Type u} (c1 c2 c3 : Character G) (g : G) :
     Path ((charProd c1 (charSum c2 c3)).chi g)
          ((charSum (charProd c1 c2) (charProd c1 c3)).chi g) :=
   charProd_distrib_path c1 c2 c3 g
 
 -- 53. Character: distrib then comm (2 steps)
-def char_distrib_then_comm {G : Type u} (c1 c2 c3 : Character G) (g : G) :
+noncomputable def char_distrib_then_comm {G : Type u} (c1 c2 c3 : Character G) (g : G) :
     Path ((charProd c1 (charSum c2 c3)).chi g)
          ((charSum (charProd c1 c3) (charProd c1 c2)).chi g) :=
   Path.trans
@@ -582,7 +582,7 @@ def char_distrib_then_comm {G : Type u} (c1 c2 c3 : Character G) (g : G) :
     (charSum_comm_path (charProd c1 c2) (charProd c1 c3) g)
 
 -- 54. Intertwining: phi equivariant + back (roundtrip)
-def intertwining_roundtrip {G : Type u} {V W : Type v} {pg : PathGroup G}
+noncomputable def intertwining_roundtrip {G : Type u} {V W : Type v} {pg : PathGroup G}
     {rep1 : Representation G V pg} {rep2 : Representation G W pg}
     (phi : IntertwiningMap rep1 rep2) (g : G) (v : V) :
     Path (phi.f (rep1.rho g v)) (phi.f (rep1.rho g v)) :=
@@ -590,7 +590,7 @@ def intertwining_roundtrip {G : Type u} {V W : Type v} {pg : PathGroup G}
              (Path.symm (intertwining_path phi g v))
 
 -- 55. Group: left identity = right identity at e (e·e = e via both)
-def double_e_path {G : Type u} (pg : PathGroup G) :
+noncomputable def double_e_path {G : Type u} (pg : PathGroup G) :
     Path (pg.mul pg.e pg.e) pg.e :=
   groupIdentLeftPath pg pg.e
 

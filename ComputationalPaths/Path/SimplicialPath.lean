@@ -55,11 +55,11 @@ structure SimplicialPath (X : Nat → Type u) where
 /-! ## Simplicial paths -/
 
 /-- Constant family of loop paths at a basepoint. -/
-def pathSimplices (A : Type u) (a : A) : Nat → Type u :=
+noncomputable def pathSimplices (A : Type u) (a : A) : Nat → Type u :=
   fun _ => Path a a
 
 /-- Simplicial structure on constant path families via identities. -/
-def simplicialPath (A : Type u) (a : A) :
+noncomputable def simplicialPath (A : Type u) (a : A) :
     SimplicialPath (pathSimplices A a) where
   face := fun _ _ x => x
   degeneracy := fun _ _ x => x
@@ -76,21 +76,21 @@ def simplicialPath (A : Type u) (a : A) :
 /-! ## Simplicial identities -/
 
 /-- The face-face identity holds in any simplicial path structure (as a Path). -/
-def face_face_path {X : Nat → Type u} (S : SimplicialPath X)
+noncomputable def face_face_path {X : Nat → Type u} (S : SimplicialPath X)
     (n : Nat) (i j : Nat) (x : X (n + 2)) :
     Path (S.face n i (S.face (n + 1) j x))
          (S.face n j (S.face (n + 1) i x)) :=
   S.face_face n i j x
 
 /-- The degeneracy-degeneracy identity holds as a Path. -/
-def degeneracy_degeneracy_path {X : Nat → Type u} (S : SimplicialPath X)
+noncomputable def degeneracy_degeneracy_path {X : Nat → Type u} (S : SimplicialPath X)
     (n : Nat) (i j : Nat) (x : X n) :
     Path (S.degeneracy (n + 1) i (S.degeneracy n j x))
          (S.degeneracy (n + 1) j (S.degeneracy n i x)) :=
   S.degeneracy_degeneracy n i j x
 
 /-- The face-degeneracy identity holds as a Path. -/
-def face_degeneracy_path {X : Nat → Type u} (S : SimplicialPath X)
+noncomputable def face_degeneracy_path {X : Nat → Type u} (S : SimplicialPath X)
     (n : Nat) (i j : Nat) (x : X n) :
     Path (S.face n i (S.degeneracy n j x)) x :=
   S.face_degeneracy n i j x
@@ -109,7 +109,7 @@ structure AugmentedSimplicialPath (X : Nat → Type u) (B : Type u) extends
       Path (augmentation (face 0 i x)) (augmentation (face 0 0 x))
 
 /-- Augmented simplicial structure on the constant path family. -/
-def augmentedSimplicialPath (A : Type u) (a : A) :
+noncomputable def augmentedSimplicialPath (A : Type u) (a : A) :
     AugmentedSimplicialPath (pathSimplices A a) (Path a a) where
   toSimplicialPath := simplicialPath A a
   augmentation := fun x => x
@@ -127,7 +127,7 @@ structure TruncatedSimplicialPath (X : Fin (n + 1) → Type u) where
   degeneracy : (k : Fin n) → Nat → X k.castSucc → X k.succ
 
 /-- 0-truncated simplicial object: just a type. -/
-def trivialTruncated (A : Type u) :
+noncomputable def trivialTruncated (A : Type u) :
     TruncatedSimplicialPath (n := 0) (fun _ => A) where
   face := fun k => Fin.elim0 k
   degeneracy := fun k => Fin.elim0 k
@@ -137,12 +137,12 @@ def trivialTruncated (A : Type u) :
 /-- The nerve of a path space at a basepoint is the simplicial set whose
 n-simplices are (n+1)-tuples of composable paths. We model this as
 iterated loop paths. -/
-def nerveSimplices (A : Type u) (a : A) : Nat → Type u
+noncomputable def nerveSimplices (A : Type u) (a : A) : Nat → Type u
   | 0 => PUnit
   | n + 1 => Path a a × nerveSimplices A a n
 
 /-- The nerve has a natural simplicial structure (using constant face/degeneracy). -/
-def nerveSimplicialPath (A : Type u) (a : A) :
+noncomputable def nerveSimplicialPath (A : Type u) (a : A) :
     SimplicialPath (nerveSimplices A a) where
   face := fun n _ x => match n, x with
     | 0, _ => PUnit.unit
@@ -171,7 +171,7 @@ structure SimplicialMap {X Y : Nat → Type u}
     Path (map (n + 1) (S.degeneracy n i x)) (T.degeneracy n i (map n x))
 
 /-- The identity simplicial map. -/
-def SimplicialMap.id {X : Nat → Type u} (S : SimplicialPath X) :
+noncomputable def SimplicialMap.id {X : Nat → Type u} (S : SimplicialPath X) :
     SimplicialMap S S where
   map := fun _ x => x
   map_face := by
@@ -182,7 +182,7 @@ def SimplicialMap.id {X : Nat → Type u} (S : SimplicialPath X) :
     exact Path.refl _
 
 /-- Composition of simplicial maps. -/
-def SimplicialMap.comp {X Y Z : Nat → Type u}
+noncomputable def SimplicialMap.comp {X Y Z : Nat → Type u}
     {S : SimplicialPath X} {T : SimplicialPath Y} {U : SimplicialPath Z}
     (f : SimplicialMap S T) (g : SimplicialMap T U) :
     SimplicialMap S U where
@@ -208,20 +208,20 @@ structure SimplicialHomotopy {X Y : Nat → Type u}
   homotopy : (n : Nat) → (x : X n) → Path (f.map n x) (g.map n x)
 
 /-- The trivial homotopy (identity). -/
-def SimplicialHomotopy.refl {X Y : Nat → Type u}
+noncomputable def SimplicialHomotopy.refl {X Y : Nat → Type u}
     {S : SimplicialPath X} {T : SimplicialPath Y}
     (f : SimplicialMap S T) : SimplicialHomotopy f f where
   homotopy := fun _ x => Path.refl (f.map _ x)
 
 /-- Symmetry of simplicial homotopy. -/
-def SimplicialHomotopy.symm {X Y : Nat → Type u}
+noncomputable def SimplicialHomotopy.symm {X Y : Nat → Type u}
     {S : SimplicialPath X} {T : SimplicialPath Y}
     {f g : SimplicialMap S T}
     (h : SimplicialHomotopy f g) : SimplicialHomotopy g f where
   homotopy := fun n x => Path.symm (h.homotopy n x)
 
 /-- Transitivity of simplicial homotopy. -/
-def SimplicialHomotopy.trans {X Y : Nat → Type u}
+noncomputable def SimplicialHomotopy.trans {X Y : Nat → Type u}
     {S : SimplicialPath X} {T : SimplicialPath Y}
     {f g h : SimplicialMap S T}
     (hfg : SimplicialHomotopy f g)
@@ -248,18 +248,18 @@ theorem constant_is_0_coskeletal (A : Type u) (a : A) :
 /-! ## Geometric realization type -/
 
 /-- The geometric realization type collects all simplices. -/
-def GeometricRealizationType {X : Nat → Type u}
+noncomputable def GeometricRealizationType {X : Nat → Type u}
     (_S : SimplicialPath X) : Type u :=
   (n : Nat) × X n
 
 /-- Inclusion of n-simplices into the realization. -/
-def includeSimplices {X : Nat → Type u}
+noncomputable def includeSimplices {X : Nat → Type u}
     (S : SimplicialPath X) (n : Nat) (x : X n) :
     GeometricRealizationType S :=
   ⟨n, x⟩
 
 /-- The dimension of a simplex in the realization. -/
-def simplexDimension {X : Nat → Type u}
+noncomputable def simplexDimension {X : Nat → Type u}
     (_S : SimplicialPath X) (σ : GeometricRealizationType _S) : Nat :=
   σ.1
 

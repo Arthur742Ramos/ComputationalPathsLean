@@ -43,27 +43,27 @@ namespace PathPointedMap
 variable {X Y Z : Pointed}
 
 /-- Composition of path-pointed maps. -/
-def comp (g : PathPointedMap Y Z) (f : PathPointedMap X Y) : PathPointedMap X Z where
+noncomputable def comp (g : PathPointedMap Y Z) (f : PathPointedMap X Y) : PathPointedMap X Z where
   toFun := g.toFun ∘ f.toFun
   map_pt := Path.trans (Path.congrArg g.toFun f.map_pt) g.map_pt
 
 /-- Identity path-pointed map. -/
-def id (X : Pointed) : PathPointedMap X X where
+noncomputable def id (X : Pointed) : PathPointedMap X X where
   toFun := _root_.id
   map_pt := Path.refl X.pt
 
 /-- View a `PointedMap` as a `PathPointedMap`. -/
-def ofPointedMap (f : PointedMap X Y) : PathPointedMap X Y where
+noncomputable def ofPointedMap (f : PointedMap X Y) : PathPointedMap X Y where
   toFun := f.toFun
   map_pt := Path.stepChain f.map_pt
 
 /-- Forget a `PathPointedMap` into a `PointedMap`. -/
-def toPointedMap (f : PathPointedMap X Y) : PointedMap X Y where
+noncomputable def toPointedMap (f : PathPointedMap X Y) : PointedMap X Y where
   toFun := f.toFun
   map_pt := Path.toEq f.map_pt
 
 /-- Constant map to the basepoint as a path-pointed map. -/
-def basepointMap (X Y : Pointed) : PathPointedMap X Y where
+noncomputable def basepointMap (X Y : Pointed) : PathPointedMap X Y where
   toFun := fun _ => Y.pt
   map_pt := Path.refl Y.pt
 

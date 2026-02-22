@@ -22,38 +22,38 @@ universe u
 /-- A polynomial over integers represented as a list of coefficients. -/
 abbrev Poly := List Int
 
-def zeroPoly : Poly := []
-def constPoly (c : Int) : Poly := [c]
+noncomputable def zeroPoly : Poly := []
+noncomputable def constPoly (c : Int) : Poly := [c]
 
 /-- Add two polynomials (coefficient-wise). -/
-def polyAdd : Poly → Poly → Poly
+noncomputable def polyAdd : Poly → Poly → Poly
   | [], q => q
   | p, [] => p
   | (a :: as), (b :: bs) => (a + b) :: polyAdd as bs
 
 /-- Negate all coefficients. -/
-def polyNeg : Poly → Poly
+noncomputable def polyNeg : Poly → Poly
   | [] => []
   | (a :: as) => (-a) :: polyNeg as
 
 /-- Scalar multiplication. -/
-def polyScale (c : Int) : Poly → Poly
+noncomputable def polyScale (c : Int) : Poly → Poly
   | [] => []
   | (a :: as) => (c * a) :: polyScale c as
 
 /-- Evaluate a polynomial at a point. -/
-def polyEval (p : Poly) (x : Int) : Int :=
+noncomputable def polyEval (p : Poly) (x : Int) : Int :=
   p.foldr (fun a acc => a + acc * x) 0
 
 /-- Degree (length). -/
-def polyDeg (p : Poly) : Nat := p.length
+noncomputable def polyDeg (p : Poly) : Nat := p.length
 
 /-! ## Addition identity -/
 
 theorem polyAdd_nil_right (p : Poly) : polyAdd p [] = p := by
   cases p <;> rfl
 
-def polyAdd_zero_right_path (p : Poly) : Path (polyAdd p zeroPoly) p :=
+noncomputable def polyAdd_zero_right_path (p : Poly) : Path (polyAdd p zeroPoly) p :=
   Path.mk [Step.mk _ _ (polyAdd_nil_right p)] (polyAdd_nil_right p)
 
 /-! ## Commutativity via well-founded recursion -/
@@ -66,7 +66,7 @@ theorem polyAdd_comm (p q : Poly) : polyAdd p q = polyAdd q p := by
     | nil => simp [polyAdd]
     | cons b bs => simp [polyAdd, Int.add_comm a b, ih bs]
 
-def polyAdd_comm_path (p q : Poly) : Path (polyAdd p q) (polyAdd q p) :=
+noncomputable def polyAdd_comm_path (p q : Poly) : Path (polyAdd p q) (polyAdd q p) :=
   Path.mk [Step.mk _ _ (polyAdd_comm p q)] (polyAdd_comm p q)
 
 /-! ## Associativity -/
@@ -83,7 +83,7 @@ theorem polyAdd_assoc (p q r : Poly) :
       | nil => simp [polyAdd]
       | cons c cs => simp [polyAdd, Int.add_assoc a b c, ih bs cs]
 
-def polyAdd_assoc_path (p q r : Poly) :
+noncomputable def polyAdd_assoc_path (p q r : Poly) :
     Path (polyAdd (polyAdd p q) r) (polyAdd p (polyAdd q r)) :=
   Path.mk [Step.mk _ _ (polyAdd_assoc p q r)] (polyAdd_assoc p q r)
 
@@ -94,7 +94,7 @@ theorem polyNeg_neg (p : Poly) : polyNeg (polyNeg p) = p := by
   | nil => rfl
   | cons a as ih => simp [polyNeg, Int.neg_neg, ih]
 
-def polyNeg_neg_path (p : Poly) : Path (polyNeg (polyNeg p)) p :=
+noncomputable def polyNeg_neg_path (p : Poly) : Path (polyNeg (polyNeg p)) p :=
   Path.mk [Step.mk _ _ (polyNeg_neg p)] (polyNeg_neg p)
 
 /-! ## Scalar multiplication -/
@@ -104,7 +104,7 @@ theorem polyScale_one (p : Poly) : polyScale 1 p = p := by
   | nil => rfl
   | cons a as ih => simp [polyScale, ih]
 
-def polyScale_one_path (p : Poly) : Path (polyScale 1 p) p :=
+noncomputable def polyScale_one_path (p : Poly) : Path (polyScale 1 p) p :=
   Path.mk [Step.mk _ _ (polyScale_one p)] (polyScale_one p)
 
 theorem polyScale_zero (p : Poly) : polyScale 0 p = List.replicate p.length 0 := by
@@ -116,13 +116,13 @@ theorem polyScale_zero (p : Poly) : polyScale 0 p = List.replicate p.length 0 :=
 
 theorem polyEval_nil (x : Int) : polyEval [] x = 0 := rfl
 
-def polyEval_zero_path (x : Int) : Path (polyEval zeroPoly x) 0 :=
+noncomputable def polyEval_zero_path (x : Int) : Path (polyEval zeroPoly x) 0 :=
   Path.mk [Step.mk _ _ (polyEval_nil x)] (polyEval_nil x)
 
 theorem polyEval_const (c x : Int) : polyEval [c] x = c := by
   simp [polyEval, List.foldr]
 
-def polyEval_const_path (c x : Int) : Path (polyEval (constPoly c) x) c :=
+noncomputable def polyEval_const_path (c x : Int) : Path (polyEval (constPoly c) x) c :=
   Path.mk [Step.mk _ _ (polyEval_const c x)] (polyEval_const c x)
 
 theorem polyEval_cons (a : Int) (as : Poly) (x : Int) :
@@ -133,12 +133,12 @@ theorem polyEval_cons (a : Int) (as : Poly) (x : Int) :
 
 theorem polyDeg_nil : polyDeg zeroPoly = 0 := rfl
 
-def polyDeg_zero_path : Path (polyDeg zeroPoly) 0 :=
+noncomputable def polyDeg_zero_path : Path (polyDeg zeroPoly) 0 :=
   Path.mk [Step.mk _ _ polyDeg_nil] polyDeg_nil
 
 theorem polyDeg_const (c : Int) : polyDeg (constPoly c) = 1 := rfl
 
-def polyDeg_const_path (c : Int) : Path (polyDeg (constPoly c)) 1 :=
+noncomputable def polyDeg_const_path (c : Int) : Path (polyDeg (constPoly c)) 1 :=
   Path.mk [Step.mk _ _ (polyDeg_const c)] (polyDeg_const c)
 
 theorem polyDeg_cons (a : Int) (as : Poly) :
@@ -169,7 +169,7 @@ theorem polyAdd_assoc_step_count (p q r : Poly) :
 /-! ## Composed paths -/
 
 /-- Rearrangement: `(p + q) + r → p + (r + q)` via associativity then commutativity. -/
-def polyAdd_rearrange_path (p q r : Poly) :
+noncomputable def polyAdd_rearrange_path (p q r : Poly) :
     Path (polyAdd (polyAdd p q) r) (polyAdd p (polyAdd r q)) :=
   Path.trans (polyAdd_assoc_path p q r)
     (Path.congrArg (polyAdd p) (polyAdd_comm_path q r))

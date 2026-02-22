@@ -73,7 +73,7 @@ inductive ModFormAdvStep (R : Type u) : R → R → Prop where
   | rankin_selberg {ring : PathRing R} (a : R) : ModFormAdvStep a a
 
 /-- Every step yields a Path. -/
-def ModFormAdvStep.toPath {R : Type u} {a b : R}
+noncomputable def ModFormAdvStep.toPath {R : Type u} {a b : R}
     (s : ModFormAdvStep R a b) : Path a b :=
   match s with
   | .hecke_mult _ _ => Path.refl _
@@ -98,7 +98,7 @@ structure CuspForm (R : Type u) (ring : PathRing R) extends ModularForm R ring w
 /-! ## q-expansion functoriality -/
 
 /-- q-expansion is the Fourier coefficient function. -/
-def qExpansion {R : Type u} {ring : PathRing R} (f : ModularForm R ring) : Nat → R :=
+noncomputable def qExpansion {R : Type u} {ring : PathRing R} (f : ModularForm R ring) : Nat → R :=
   f.fourierCoeff
 
 /-- Coefficient map used to transport q-expansions. -/
@@ -108,11 +108,11 @@ structure QExpansionCoeffMap (R : Type u) (S : Type v) where
 namespace QExpansionCoeffMap
 
 /-- Identity map on coefficients. -/
-def id (R : Type u) : QExpansionCoeffMap R R where
+noncomputable def id (R : Type u) : QExpansionCoeffMap R R where
   toFun := fun x => x
 
 /-- Composition of coefficient maps. -/
-def comp {R : Type u} {S : Type v} {T : Type w}
+noncomputable def comp {R : Type u} {S : Type v} {T : Type w}
     (ψ : QExpansionCoeffMap S T) (φ : QExpansionCoeffMap R S) :
     QExpansionCoeffMap R T where
   toFun := fun x => ψ.toFun (φ.toFun x)
@@ -120,12 +120,12 @@ def comp {R : Type u} {S : Type v} {T : Type w}
 end QExpansionCoeffMap
 
 /-- Map a q-expansion coefficientwise. -/
-def mapQExpansion {R : Type u} {S : Type v}
+noncomputable def mapQExpansion {R : Type u} {S : Type v}
     (φ : QExpansionCoeffMap R S) (q : Nat → R) : Nat → S :=
   fun n => φ.toFun (q n)
 
 /-- Map a modular form coefficientwise. -/
-def mapModularForm {R : Type u} {S : Type v}
+noncomputable def mapModularForm {R : Type u} {S : Type v}
     {ringR : PathRing R} (ringS : PathRing S)
     (φ : QExpansionCoeffMap R S) (f : ModularForm R ringR) :
     ModularForm S ringS where
@@ -198,14 +198,14 @@ namespace HeckeAlgebraData
 variable {R : Type u} {ring : PathRing R}
 
 /-- Multi-step: T_1 is the identity for multiplication. -/
-def t_one_mul (H : HeckeAlgebraData R ring) (x : H.carrier) :
+noncomputable def t_one_mul (H : HeckeAlgebraData R ring) (x : H.carrier) :
     Path (H.algStr.mul (H.heckeT 1) x) x :=
   Path.trans
     (Path.congrArg (fun t => H.algStr.mul t x) H.t_one)
     (H.algStr.one_mul x)
 
 /-- Symmetry: commutativity of Hecke operators. -/
-def hecke_comm (H : HeckeAlgebraData R ring) (m n : Nat) :
+noncomputable def hecke_comm (H : HeckeAlgebraData R ring) (m n : Nat) :
     Path (H.algStr.mul (H.heckeT m) (H.heckeT n))
       (H.algStr.mul (H.heckeT n) (H.heckeT m)) :=
   H.algStr.mul_comm (H.heckeT m) (H.heckeT n)
@@ -264,12 +264,12 @@ namespace HeckeEigenform
 variable {R : Type u} {ring : PathRing R}
 
 /-- Multi-step: eigenvalue via coefficient. -/
-def eigenvalue_path (E : HeckeEigenform R ring) (p : Nat) :
+noncomputable def eigenvalue_path (E : HeckeEigenform R ring) (p : Nat) :
     Path (E.eigenvalue p) (E.form.fourierCoeff p) :=
   Path.trans (E.eigen_eq_coeff p) (Path.refl _)
 
 /-- Symmetry: coefficient is eigenvalue. -/
-def coeff_eigenvalue (E : HeckeEigenform R ring) (p : Nat) :
+noncomputable def coeff_eigenvalue (E : HeckeEigenform R ring) (p : Nat) :
     Path (E.form.fourierCoeff p) (E.eigenvalue p) :=
   Path.symm (E.eigen_eq_coeff p)
 
@@ -336,7 +336,7 @@ namespace AtkinLehnerData
 variable {R : Type u} {ring : PathRing R}
 
 /-- Multi-step: involution is of order 2. -/
-def order_two (A : AtkinLehnerData R ring) :
+noncomputable def order_two (A : AtkinLehnerData R ring) :
     Path (ring.mul A.eigenSign A.eigenSign) ring.one :=
   Path.trans A.sign_sq (Path.refl _)
 
@@ -378,12 +378,12 @@ namespace GaloisRepFromEigenform
 variable {R : Type u} {ring : PathRing R}
 
 /-- Multi-step: dimension is 2. -/
-def is_two_dim (G : GaloisRepFromEigenform R ring) :
+noncomputable def is_two_dim (G : GaloisRepFromEigenform R ring) :
     Path G.dim 2 :=
   Path.trans G.dim_two (Path.refl _)
 
 /-- Trace-eigenvalue compatibility (multi-step). -/
-def trace_eigen (G : GaloisRepFromEigenform R ring) (p : Nat) :
+noncomputable def trace_eigen (G : GaloisRepFromEigenform R ring) (p : Nat) :
     Path (G.eigenform.eigenvalue p) (G.eigenform.form.fourierCoeff p) :=
   Path.trans (G.eigenform.eigen_eq_coeff p) (Path.refl _)
 
@@ -424,7 +424,7 @@ namespace HidaFamily
 variable {R : Type u} {ring : PathRing R}
 
 /-- Multi-step: rank is 1. -/
-def is_rank_one (H : HidaFamily R ring) :
+noncomputable def is_rank_one (H : HidaFamily R ring) :
     Path H.rank_one 1 :=
   Path.trans H.rank_witness (Path.refl _)
 
@@ -454,12 +454,12 @@ namespace ThetaSeriesData
 variable {R : Type u} {ring : PathRing R}
 
 /-- Multi-step: weight from dimension. -/
-def weight_from_dim (T : ThetaSeriesData R ring) :
+noncomputable def weight_from_dim (T : ThetaSeriesData R ring) :
     Path T.weight (T.formDim / 2) :=
   Path.trans T.weight_formula (Path.refl _)
 
 /-- Symmetry: dimension from weight. -/
-def dim_from_weight (T : ThetaSeriesData R ring) :
+noncomputable def dim_from_weight (T : ThetaSeriesData R ring) :
     Path (T.formDim / 2) T.weight :=
   Path.symm T.weight_formula
 
@@ -502,12 +502,12 @@ structure DimFormulaData where
 namespace DimFormulaData
 
 /-- Symmetry: from decomposition back. -/
-def decomposition_symm (D : DimFormulaData) :
+noncomputable def decomposition_symm (D : DimFormulaData) :
     Path (D.dimS + D.dimE) D.dimM :=
   Path.symm D.decomposition
 
 /-- Round-trip. -/
-def round_trip (D : DimFormulaData) :
+noncomputable def round_trip (D : DimFormulaData) :
     Path D.dimM D.dimM :=
   Path.trans D.decomposition (Path.symm D.decomposition)
 
@@ -534,17 +534,17 @@ namespace RankinSelbergData
 variable {R : Type u} {ring : PathRing R}
 
 /-- Multi-step: RS coefficient via eigenvalues. -/
-def rs_via_eigen (RS : RankinSelbergData R ring) (p : Nat) :
+noncomputable def rs_via_eigen (RS : RankinSelbergData R ring) (p : Nat) :
     Path (RS.rsCoeff p) (ring.mul (RS.form1.eigenvalue p) (RS.form2.eigenvalue p)) :=
   Path.trans (RS.euler_product p) (Path.refl _)
 
 /-- Symmetry: eigenvalue product back to RS coefficient. -/
-def eigen_to_rs (RS : RankinSelbergData R ring) (p : Nat) :
+noncomputable def eigen_to_rs (RS : RankinSelbergData R ring) (p : Nat) :
     Path (ring.mul (RS.form1.eigenvalue p) (RS.form2.eigenvalue p)) (RS.rsCoeff p) :=
   Path.symm (RS.euler_product p)
 
 /-- Multi-step: RS with eigenform expansion. -/
-def rs_expanded (RS : RankinSelbergData R ring) (p : Nat) :
+noncomputable def rs_expanded (RS : RankinSelbergData R ring) (p : Nat) :
     Path (RS.rsCoeff p)
       (ring.mul (RS.form1.form.fourierCoeff p) (RS.form2.form.fourierCoeff p)) :=
   Path.trans (RS.euler_product p)
@@ -559,19 +559,19 @@ end RankinSelbergData
 /-! ## RwEq multi-step constructions -/
 
 /-- Multi-step: Hecke eigenvalue via normalization and coefficient. -/
-def hecke_eigen_via_normalized {R : Type u} {ring : PathRing R}
+noncomputable def hecke_eigen_via_normalized {R : Type u} {ring : PathRing R}
     (E : HeckeEigenform R ring) (p : Nat) :
     Path (E.eigenvalue p) (E.form.fourierCoeff p) :=
   Path.trans (E.eigen_eq_coeff p) (Path.refl _)
 
 /-- Cusp form vanishing constant term (multi-step). -/
-def cusp_vanishing {R : Type u} {ring : PathRing R}
+noncomputable def cusp_vanishing {R : Type u} {ring : PathRing R}
     (f : CuspForm R ring) :
     Path (f.fourierCoeff 0) ring.zero :=
   Path.trans (Path.symm f.constantTerm_eq) f.vanish_infty
 
 /-- Dimension decomposition round-trip (multi-step). -/
-def dim_decomp_roundtrip (D : DimFormulaData) :
+noncomputable def dim_decomp_roundtrip (D : DimFormulaData) :
     Path D.dimM D.dimM :=
   Path.trans D.decomposition (Path.symm D.decomposition)
 

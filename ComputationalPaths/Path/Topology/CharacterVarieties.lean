@@ -290,13 +290,13 @@ structure SpectralNetwork (sg : SurfaceGroup) where
 /-! ## Theorems -/
 
 /-- Goldman symplectic form is skew-symmetric. -/
-def goldman_skew (sg : SurfaceGroup) (G : LieGroupData)
+noncomputable def goldman_skew (sg : SurfaceGroup) (G : LieGroupData)
     (ω : GoldmanSymplecticForm sg G) (a b : Int) :
     Path (ω.pairing a b) (-(ω.pairing b a)) :=
   ω.skewSymmetric a b
 
 /-- Goldman bracket satisfies the Jacobi identity. -/
-def goldman_jacobi (sg : SurfaceGroup) (G : LieGroupData)
+noncomputable def goldman_jacobi (sg : SurfaceGroup) (G : LieGroupData)
     (br : GoldmanBracket sg G) (a b c : Int) :
     Path (br.bracket a (br.bracket b c) + br.bracket b (br.bracket c a) +
           br.bracket c (br.bracket a b)) 0 :=
@@ -332,7 +332,7 @@ theorem tangent_is_group_cohomology (sg : SurfaceGroup) (G : LieGroupData)
     (sl : SmoothLocus sg G) : True := sl.tangent_is_cohomology
 
 /-- Surface group generators satisfy the relation. -/
-def surface_group_relation (sg : SurfaceGroup) :
+noncomputable def surface_group_relation (sg : SurfaceGroup) :
     Path sg.numGenerators (2 * sg.genus) := sg.gen_eq
 
 /-- Spectral curve satisfies Riemann-Hurwitz. -/

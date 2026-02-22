@@ -30,31 +30,31 @@ structure DPair (A : Type u) (B : A → Type v) where
   snd : B fst
 
 /-- 1. Path between Σ-type first projections from equality. -/
-def dpair_fst_path {A : Type u} {B : A → Type v}
+noncomputable def dpair_fst_path {A : Type u} {B : A → Type v}
     (p q : DPair A B) (h : p = q) :
     Path p.fst q.fst :=
   Path.mk [] (by subst h; rfl)
 
 /-- 2. Reflexivity of Σ-type paths. -/
-def dpair_path_refl {A : Type u} {B : A → Type v}
+noncomputable def dpair_path_refl {A : Type u} {B : A → Type v}
     (p : DPair A B) :
     Path p.fst p.fst :=
   Path.refl _
 
 /-- 3. Symmetry of Σ-type first projection paths. -/
-def dpair_fst_symm {A : Type u} {B : A → Type v}
+noncomputable def dpair_fst_symm {A : Type u} {B : A → Type v}
     (p q : DPair A B) (h : p = q) :
     Path q.fst p.fst :=
   Path.symm (dpair_fst_path p q h)
 
 /-- 4. Transitivity of Σ-type first projection paths. -/
-def dpair_fst_trans {A : Type u} {B : A → Type v}
+noncomputable def dpair_fst_trans {A : Type u} {B : A → Type v}
     (p q r : DPair A B) (h₁ : p = q) (h₂ : q = r) :
     Path p.fst r.fst :=
   Path.trans (dpair_fst_path p q h₁) (dpair_fst_path q r h₂)
 
 /-- 5. Constructing a DPair path from component equalities. -/
-def dpair_ext {A : Type u} {B : A → Type v}
+noncomputable def dpair_ext {A : Type u} {B : A → Type v}
     (p q : DPair A B) (h₁ : p.fst = q.fst)
     (h₂ : h₁ ▸ p.snd = q.snd) :
     Path p q :=
@@ -67,25 +67,25 @@ structure DFun (A : Type u) (B : A → Type v) where
   app : (a : A) → B a
 
 /-- 6. Pointwise equality of dependent functions yields a path. -/
-def dfun_ext_path {A : Type u} {B : A → Type v}
+noncomputable def dfun_ext_path {A : Type u} {B : A → Type v}
     (f g : DFun A B) (h : f = g) (a : A) :
     Path (f.app a) (g.app a) :=
   Path.mk [] (by subst h; rfl)
 
 /-- 7. Reflexivity of Π-type application paths. -/
-def dfun_app_refl {A : Type u} {B : A → Type v}
+noncomputable def dfun_app_refl {A : Type u} {B : A → Type v}
     (f : DFun A B) (a : A) :
     Path (f.app a) (f.app a) :=
   Path.refl _
 
 /-- 8. Symmetry of Π-type application paths. -/
-def dfun_app_symm {A : Type u} {B : A → Type v}
+noncomputable def dfun_app_symm {A : Type u} {B : A → Type v}
     (f g : DFun A B) (h : f = g) (a : A) :
     Path (g.app a) (f.app a) :=
   Path.symm (dfun_ext_path f g h a)
 
 /-- 9. Composition of Π-type application paths. -/
-def dfun_app_trans {A : Type u} {B : A → Type v}
+noncomputable def dfun_app_trans {A : Type u} {B : A → Type v}
     (f g h : DFun A B) (hfg : f = g) (hgh : g = h) (a : A) :
     Path (f.app a) (h.app a) :=
   Path.trans (dfun_ext_path f g hfg a) (dfun_ext_path g h hgh a)
@@ -93,7 +93,7 @@ def dfun_app_trans {A : Type u} {B : A → Type v}
 /-! ## Transport -/
 
 /-- 10. Transport along a path in a dependent type. -/
-def transport {A : Type u} (B : A → Type v) {a₁ a₂ : A}
+noncomputable def transport {A : Type u} (B : A → Type v) {a₁ a₂ : A}
     (p : Path a₁ a₂) (b : B a₁) : B a₂ :=
   p.proof ▸ b
 
@@ -126,11 +126,11 @@ inductive WType (A : Type u) (B : A → Type v) where
   | sup : (a : A) → (B a → WType A B) → WType A B
 
 /-- 14. W-type label extraction. -/
-def WType.label {A : Type u} {B : A → Type v} : WType A B → A
+noncomputable def WType.label {A : Type u} {B : A → Type v} : WType A B → A
   | sup a _ => a
 
 /-- 15. W-type children extraction. -/
-def WType.children {A : Type u} {B : A → Type v} : (w : WType A B) → (B w.label → WType A B)
+noncomputable def WType.children {A : Type u} {B : A → Type v} : (w : WType A B) → (B w.label → WType A B)
   | sup _ f => f
 
 /-- 16. W-type reconstruction: a W-type is determined by its label and children. -/
@@ -139,19 +139,19 @@ theorem wtype_eta {A : Type u} {B : A → Type v} (w : WType A B) :
   cases w; rfl
 
 /-- 17. Path from equal W-type labels. -/
-def wtype_label_path {A : Type u} {B : A → Type v}
+noncomputable def wtype_label_path {A : Type u} {B : A → Type v}
     (w₁ w₂ : WType A B) (h : w₁ = w₂) :
     Path w₁.label w₂.label :=
   Path.mk [] (by subst h; rfl)
 
 /-- W-type recursion principle. -/
-def WType.rec' {A : Type u} {B : A → Type v} {C : Type w}
+noncomputable def WType.rec' {A : Type u} {B : A → Type v} {C : Type w}
     (f : (a : A) → (B a → WType A B) → (B a → C) → C) :
     WType A B → C
   | sup a g => f a g (fun b => WType.rec' f (g b))
 
 /-- 18. W-type recursion on equal trees gives equal results. -/
-def wtype_rec_path {A : Type u} {B : A → Type v} {C : Type w}
+noncomputable def wtype_rec_path {A : Type u} {B : A → Type v} {C : Type w}
     (f : (a : A) → (B a → WType A B) → (B a → C) → C)
     (w₁ w₂ : WType A B) (h : w₁ = w₂) :
     Path (WType.rec' f w₁) (WType.rec' f w₂) :=
@@ -165,21 +165,21 @@ structure ULevel where
   deriving DecidableEq
 
 /-- 19. Universe level zero. -/
-def ULevel.zero : ULevel := ⟨0⟩
+noncomputable def ULevel.zero : ULevel := ⟨0⟩
 
 /-- 20. Universe level successor. -/
-def ULevel.succ (l : ULevel) : ULevel := ⟨l.level + 1⟩
+noncomputable def ULevel.succ (l : ULevel) : ULevel := ⟨l.level + 1⟩
 
 /-- 21. Universe level maximum. -/
-def ULevel.max (l₁ l₂ : ULevel) : ULevel := ⟨Nat.max l₁.level l₂.level⟩
+noncomputable def ULevel.max (l₁ l₂ : ULevel) : ULevel := ⟨Nat.max l₁.level l₂.level⟩
 
 /-- 22. Path between universe levels with same index. -/
-def ulevel_path (l₁ l₂ : ULevel) (h : l₁.level = l₂.level) :
+noncomputable def ulevel_path (l₁ l₂ : ULevel) (h : l₁.level = l₂.level) :
     Path l₁ l₂ :=
   Path.mk [] (by cases l₁; cases l₂; simp at h; rw [h])
 
 /-- 23. succ is injective on universe levels via paths. -/
-def ulevel_succ_inj (l₁ l₂ : ULevel) (h : ULevel.succ l₁ = ULevel.succ l₂) :
+noncomputable def ulevel_succ_inj (l₁ l₂ : ULevel) (h : ULevel.succ l₁ = ULevel.succ l₂) :
     Path l₁ l₂ := by
   have heq : l₁.level = l₂.level := by
     simp [ULevel.succ, ULevel.mk.injEq] at h
@@ -187,24 +187,24 @@ def ulevel_succ_inj (l₁ l₂ : ULevel) (h : ULevel.succ l₁ = ULevel.succ l�
   exact ulevel_path l₁ l₂ heq
 
 /-- 24. max is commutative via paths. -/
-def ulevel_max_comm (l₁ l₂ : ULevel) :
+noncomputable def ulevel_max_comm (l₁ l₂ : ULevel) :
     Path (ULevel.max l₁ l₂) (ULevel.max l₂ l₁) :=
   Path.mk [] (by simp [ULevel.max, Nat.max_comm])
 
 /-- 25. max is associative via paths. -/
-def ulevel_max_assoc (l₁ l₂ l₃ : ULevel) :
+noncomputable def ulevel_max_assoc (l₁ l₂ l₃ : ULevel) :
     Path (ULevel.max (ULevel.max l₁ l₂) l₃) (ULevel.max l₁ (ULevel.max l₂ l₃)) :=
   Path.mk [] (by simp [ULevel.max, Nat.max_assoc])
 
 /-- 26. max with zero is identity. -/
-def ulevel_max_zero (l : ULevel) :
+noncomputable def ulevel_max_zero (l : ULevel) :
     Path (ULevel.max l ULevel.zero) l :=
   Path.mk [] (by simp [ULevel.max, ULevel.zero])
 
 /-! ## Ap and Apd -/
 
 /-- 27. Ap: applying a function to a path (functorial action). -/
-def ap {A : Type u} {B : Type v} (f : A → B) {a₁ a₂ : A}
+noncomputable def ap {A : Type u} {B : Type v} (f : A → B) {a₁ a₂ : A}
     (p : Path a₁ a₂) : Path (f a₁) (f a₂) :=
   Path.mk (p.steps.map (Step.map f)) (by rw [p.proof])
 
@@ -228,17 +228,17 @@ structure Fiber {A : Type u} {B : Type v} (f : A → B) (b : B) where
   over : f point = b
 
 /-- 30. Path between fiber points when fibers are equal. -/
-def fiber_path {A : Type u} {B : Type v} {f : A → B} {b : B}
+noncomputable def fiber_path {A : Type u} {B : Type v} {f : A → B} {b : B}
     (x y : Fiber f b) (h : x = y) :
     Path x.point y.point :=
   Path.mk [] (by subst h; rfl)
 
 /-- 31. Fiber of id is trivial. -/
-def fiber_id_center {A : Type u} (a : A) : Fiber id a :=
+noncomputable def fiber_id_center {A : Type u} (a : A) : Fiber id a :=
   ⟨a, rfl⟩
 
 /-- 32. Any fiber of id is path-connected to the center. -/
-def fiber_id_contract {A : Type u} (a : A) (fib : Fiber id a) :
+noncomputable def fiber_id_contract {A : Type u} (a : A) (fib : Fiber id a) :
     Path fib.point a :=
   Path.mk [Step.mk fib.point a fib.over] fib.over
 
@@ -252,16 +252,16 @@ structure IsProp (A : Type u) where
   allEq : (a b : A) → Path a b
 
 /-- 33. Contractible types have all-paths. -/
-def contr_all_paths {A : Type u} (c : IsContr A) (a b : A) :
+noncomputable def contr_all_paths {A : Type u} (c : IsContr A) (a b : A) :
     Path a b :=
   Path.trans (c.contract a) (Path.symm (c.contract b))
 
 /-- 34. Contractible types are propositions. -/
-def contr_is_prop {A : Type u} (c : IsContr A) : IsProp A :=
+noncomputable def contr_is_prop {A : Type u} (c : IsContr A) : IsProp A :=
   ⟨fun a b => contr_all_paths c a b⟩
 
 /-- 35. Propositions are closed under products. -/
-def prop_prod {A : Type u} {B : Type v} (pA : IsProp A) (pB : IsProp B) :
+noncomputable def prop_prod {A : Type u} {B : Type v} (pA : IsProp A) (pB : IsProp B) :
     IsProp (A × B) :=
   ⟨fun ⟨a₁, b₁⟩ ⟨a₂, b₂⟩ =>
     Path.mk []
@@ -276,19 +276,19 @@ structure PathOver {A : Type u} (B : A → Type v) {a₁ a₂ : A}
   over : transport B p b₁ = b₂
 
 /-- 36. PathOver reflexivity. -/
-def PathOver.rfl' {A : Type u} {B : A → Type v} {a : A} (b : B a) :
+noncomputable def PathOver.rfl' {A : Type u} {B : A → Type v} {a : A} (b : B a) :
     PathOver B (Path.refl a) b b :=
   ⟨rfl⟩
 
 /-- 37. PathOver yields a path in the fiber. -/
-def pathover_to_path {A : Type u} {B : A → Type v} {a₁ a₂ : A}
+noncomputable def pathover_to_path {A : Type u} {B : A → Type v} {a₁ a₂ : A}
     {p : Path a₁ a₂} {b₁ : B a₁} {b₂ : B a₂}
     (po : PathOver B p b₁ b₂) :
     Path (transport B p b₁) b₂ :=
   Path.mk [] po.over
 
 /-- 38. Composition of PathOvers. -/
-def PathOver.trans' {A : Type u} {B : A → Type v} {a₁ a₂ a₃ : A}
+noncomputable def PathOver.trans' {A : Type u} {B : A → Type v} {a₁ a₂ a₃ : A}
     {p : Path a₁ a₂} {q : Path a₂ a₃}
     {b₁ : B a₁} {b₂ : B a₂} {b₃ : B a₃}
     (po₁ : PathOver B p b₁ b₂) (po₂ : PathOver B q b₂ b₃) :
@@ -309,19 +309,19 @@ structure TypeFormer where
   arity : Nat
 
 /-- 40. Σ-type former. -/
-def sigmaFormer : TypeFormer := ⟨"Σ", 2⟩
+noncomputable def sigmaFormer : TypeFormer := ⟨"Σ", 2⟩
 
 /-- 41. Π-type former. -/
-def piFormer : TypeFormer := ⟨"Π", 2⟩
+noncomputable def piFormer : TypeFormer := ⟨"Π", 2⟩
 
 /-- 42. W-type former. -/
-def wFormer : TypeFormer := ⟨"W", 2⟩
+noncomputable def wFormer : TypeFormer := ⟨"W", 2⟩
 
 /-- 43. Identity type former. -/
-def idFormer : TypeFormer := ⟨"Id", 3⟩
+noncomputable def idFormer : TypeFormer := ⟨"Id", 3⟩
 
 /-- 44. Type formers with same data are path-connected. -/
-def typeFormer_path (t₁ t₂ : TypeFormer) (hn : t₁.name = t₂.name)
+noncomputable def typeFormer_path (t₁ t₂ : TypeFormer) (hn : t₁.name = t₂.name)
     (ha : t₁.arity = t₂.arity) : Path t₁ t₂ :=
   Path.mk [] (by cases t₁; cases t₂; simp at hn ha; rw [hn, ha])
 

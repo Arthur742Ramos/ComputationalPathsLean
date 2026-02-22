@@ -62,7 +62,7 @@ structure Convergent2Polygraph where
     ∃ d, RTC step b d ∧ RTC step c d
 
 /-- The completed groupoid TRS is a convergent 2-polygraph. -/
-def groupoidPolygraph : Convergent2Polygraph where
+noncomputable def groupoidPolygraph : Convergent2Polygraph where
   step := CStep
   terminating := cstep_termination
   confluent := confluence
@@ -92,7 +92,7 @@ structure Generating3Cell where
 /-! ## Concrete Generating 3-Cells for the Groupoid TRS -/
 
 /-- CP1: `trans_refl_left` vs `trans_assoc` on `trans (trans refl p) q`. -/
-def gen3_refl_left_assoc (p q : Expr) : Generating3Cell where
+noncomputable def gen3_refl_left_assoc (p q : Expr) : Generating3Cell where
   source := .trans (.trans .refl p) q
   left := .trans p q
   right := .trans .refl (.trans p q)
@@ -101,7 +101,7 @@ def gen3_refl_left_assoc (p q : Expr) : Generating3Cell where
   join_right := CRTC.single (.trans_refl_left (.trans p q))
 
 /-- CP2: `trans_symm` vs `trans_assoc` on `trans (trans p (symm p)) q`. -/
-def gen3_symm_assoc (p q : Expr) : Generating3Cell where
+noncomputable def gen3_symm_assoc (p q : Expr) : Generating3Cell where
   source := .trans (.trans p (.symm p)) q
   left := .trans .refl q
   right := .trans p (.trans (.symm p) q)
@@ -110,7 +110,7 @@ def gen3_symm_assoc (p q : Expr) : Generating3Cell where
   join_right := CRTC.single (.trans_cancel_left p q)
 
 /-- CP3: `symm_trans` vs `trans_assoc` on `trans (trans (symm p) p) q`. -/
-def gen3_symm_trans_assoc (p q : Expr) : Generating3Cell where
+noncomputable def gen3_symm_trans_assoc (p q : Expr) : Generating3Cell where
   source := .trans (.trans (.symm p) p) q
   left := .trans .refl q
   right := .trans (.symm p) (.trans p q)
@@ -119,7 +119,7 @@ def gen3_symm_trans_assoc (p q : Expr) : Generating3Cell where
   join_right := CRTC.single (.trans_cancel_right p q)
 
 /-- CP4: `trans_refl_right` vs `trans_assoc` on `trans (trans p refl) q`. -/
-def gen3_refl_right_assoc (p q : Expr) : Generating3Cell where
+noncomputable def gen3_refl_right_assoc (p q : Expr) : Generating3Cell where
   source := .trans (.trans p .refl) q
   left := .trans p q
   right := .trans p (.trans .refl q)
@@ -128,7 +128,7 @@ def gen3_refl_right_assoc (p q : Expr) : Generating3Cell where
   join_right := CRTC.trans_congr_right p (CRTC.single (.trans_refl_left q))
 
 /-- CP5: `trans_assoc` overlap (Mac Lane pentagon) on `trans (trans (trans p q) r) s`. -/
-def gen3_assoc_assoc (p q r s : Expr) : Generating3Cell where
+noncomputable def gen3_assoc_assoc (p q r s : Expr) : Generating3Cell where
   source := .trans (.trans (.trans p q) r) s
   left := .trans (.trans p q) (.trans r s)
   right := .trans (.trans p (.trans q r)) s
@@ -150,7 +150,7 @@ structure CoherentPresentation where
   generators_resolve_cps : True  -- witnessing existence
 
 /-- CP6: `symm_trans_congr` vs `symm_congr ∘ trans_refl_left` on `symm (trans refl p)`. -/
-def gen3_symm_congr_refl_left (p : Expr) : Generating3Cell where
+noncomputable def gen3_symm_congr_refl_left (p : Expr) : Generating3Cell where
   source := .symm (.trans .refl p)
   left := .trans (.symm p) (.symm .refl)
   right := .symm p
@@ -161,7 +161,7 @@ def gen3_symm_congr_refl_left (p : Expr) : Generating3Cell where
   join_right := .refl _
 
 /-- CP7: `symm_trans_congr` vs `symm_congr ∘ trans_refl_right` on `symm (trans p refl)`. -/
-def gen3_symm_congr_refl_right (p : Expr) : Generating3Cell where
+noncomputable def gen3_symm_congr_refl_right (p : Expr) : Generating3Cell where
   source := .symm (.trans p .refl)
   left := .trans (.symm .refl) (.symm p)
   right := .symm p
@@ -172,7 +172,7 @@ def gen3_symm_congr_refl_right (p : Expr) : Generating3Cell where
   join_right := .refl _
 
 /-- CP8: `trans_cancel_left` vs `trans_assoc` on `trans (trans p (trans (symm p) q)) r`. -/
-def gen3_cancel_left_assoc (p q r : Expr) : Generating3Cell where
+noncomputable def gen3_cancel_left_assoc (p q r : Expr) : Generating3Cell where
   source := .trans (.trans p (.trans (.symm p) q)) r
   left := .trans q r
   right := .trans p (.trans (.trans (.symm p) q) r)
@@ -184,7 +184,7 @@ def gen3_cancel_left_assoc (p q r : Expr) : Generating3Cell where
       (CRTC.single (.trans_cancel_left p (.trans q r)))
 
 /-- CP9: `trans_cancel_right` vs `trans_assoc` on `trans (trans (symm p) (trans p q)) r`. -/
-def gen3_cancel_right_assoc (p q r : Expr) : Generating3Cell where
+noncomputable def gen3_cancel_right_assoc (p q r : Expr) : Generating3Cell where
   source := .trans (.trans (.symm p) (.trans p q)) r
   left := .trans q r
   right := .trans (.symm p) (.trans (.trans p q) r)
@@ -197,7 +197,7 @@ def gen3_cancel_right_assoc (p q r : Expr) : Generating3Cell where
 
 /-- The completed groupoid TRS has a coherent presentation with 9 generating
     3-cell families (one per critical pair family). -/
-def coherentPresentation_groupoid : CoherentPresentation where
+noncomputable def coherentPresentation_groupoid : CoherentPresentation where
   poly := groupoidPolygraph
   numGenerators := 9
   generators_resolve_cps := trivial

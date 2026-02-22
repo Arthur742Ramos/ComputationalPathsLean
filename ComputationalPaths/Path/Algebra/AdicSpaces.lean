@@ -71,7 +71,7 @@ inductive AdicStep (R : Type u) : R → R → Prop where
   | topology (a : R) : AdicStep R a a
 
 /-- Every AdicStep yields a Path. -/
-def AdicStep.toPath {R : Type u} {a b : R}
+noncomputable def AdicStep.toPath {R : Type u} {a b : R}
     (s : AdicStep R a b) : Path a b :=
   match s with
   | .valuation_bound _ => Path.refl _
@@ -130,12 +130,12 @@ namespace HuberPairData
 variable {R : Type u}
 
 /-- Zero is in both R+ and A₀. -/
-def zero_everywhere (HP : HuberPairData R) :
+noncomputable def zero_everywhere (HP : HuberPairData R) :
     HP.ringOfDef HP.zero ∧ HP.plus HP.zero :=
   ⟨HP.zero_in_ringOfDef, HP.plus_zero⟩
 
 /-- One is in both R+ and A₀. -/
-def one_everywhere (HP : HuberPairData R) :
+noncomputable def one_everywhere (HP : HuberPairData R) :
     HP.ringOfDef HP.one ∧ HP.plus HP.one :=
   ⟨HP.one_in_ringOfDef, HP.plus_one⟩
 
@@ -181,14 +181,14 @@ namespace ContinuousValuationData
 variable {R : Type u} {HR : HuberRingData R}
 
 /-- Multi-step: valuation of a product via zero. -/
-def val_zero_mul (CV : ContinuousValuationData R HR) (a : R) :
+noncomputable def val_zero_mul (CV : ContinuousValuationData R HR) (a : R) :
     Path (CV.val (HR.mul HR.zero a)) (CV.valueGroup.mul_val CV.valueGroup.zero_val (CV.val a)) :=
   Path.trans
     (CV.val_mul HR.zero a)
     (Path.congrArg (fun x => CV.valueGroup.mul_val x (CV.val a)) CV.val_zero)
 
 /-- Multi-step: v(1·a) = v(a). -/
-def val_one_mul (CV : ContinuousValuationData R HR) (a : R) :
+noncomputable def val_one_mul (CV : ContinuousValuationData R HR) (a : R) :
     Path (CV.val (HR.mul HR.one a)) (CV.val a) :=
   Path.trans
     (CV.val_mul HR.one a)
@@ -197,7 +197,7 @@ def val_one_mul (CV : ContinuousValuationData R HR) (a : R) :
       (CV.valueGroup.one_mul (CV.val a)))
 
 /-- Symmetry: one value from identity. -/
-def one_val_symm (CV : ContinuousValuationData R HR) :
+noncomputable def one_val_symm (CV : ContinuousValuationData R HR) :
     Path CV.valueGroup.one_val (CV.val HR.one) :=
   Path.symm CV.val_one
 
@@ -263,27 +263,27 @@ namespace RationalSubsetData
 variable {R : Type u} {HR : HuberPairData R}
 
 /-- Multi-step: localization preserves zero. -/
-def loc_zero (RS : RationalSubsetData R HR) :
+noncomputable def loc_zero (RS : RationalSubsetData R HR) :
     Path (RS.locMap HR.zero) RS.locRing.zero :=
   Path.trans (RS.loc_eq HR.zero) RS.loc_hom.map_zero
 
 /-- Multi-step: localization preserves one. -/
-def loc_one (RS : RationalSubsetData R HR) :
+noncomputable def loc_one (RS : RationalSubsetData R HR) :
     Path (RS.locMap HR.one) RS.locRing.one :=
   Path.trans (RS.loc_eq HR.one) RS.loc_hom.map_one
 
 /-- Multi-step: g · g⁻¹ = 1 in the localization, composed with loc. -/
-def g_invertible (RS : RationalSubsetData R HR) :
+noncomputable def g_invertible (RS : RationalSubsetData R HR) :
     Path (RS.locRing.mul (RS.locMap RS.denominator) RS.g_unit) RS.locRing.one :=
   Path.trans RS.g_unit_spec (Path.refl _)
 
 /-- Symmetry: one from g·g⁻¹. -/
-def one_from_g (RS : RationalSubsetData R HR) :
+noncomputable def one_from_g (RS : RationalSubsetData R HR) :
     Path RS.locRing.one (RS.locRing.mul (RS.locMap RS.denominator) RS.g_unit) :=
   Path.symm RS.g_unit_spec
 
 /-- Commutativity of the unit witness. -/
-def g_unit_comm (RS : RationalSubsetData R HR) :
+noncomputable def g_unit_comm (RS : RationalSubsetData R HR) :
     Path (RS.locRing.mul RS.g_unit (RS.locMap RS.denominator)) RS.locRing.one :=
   Path.trans (RS.locRing.mul_comm RS.g_unit (RS.locMap RS.denominator)) RS.g_unit_spec
 
@@ -328,19 +328,19 @@ namespace StructurePresheafData
 variable {R : Type u} {HR : HuberPairData R}
 
 /-- Multi-step: restriction preserves zero. -/
-def restrict_zero (SP : StructurePresheafData R HR)
+noncomputable def restrict_zero (SP : StructurePresheafData R HR)
     (U V : RationalSubsetData R HR) :
     Path (SP.restrict U V (SP.sections U).zero) (SP.sections V).zero :=
   Path.trans (SP.restrict_eq U V (SP.sections U).zero) (SP.restrict_hom U V).map_zero
 
 /-- Multi-step: identity restriction is the identity on zero. -/
-def restrict_id_zero (SP : StructurePresheafData R HR)
+noncomputable def restrict_id_zero (SP : StructurePresheafData R HR)
     (U : RationalSubsetData R HR) :
     Path ((SP.restrict_hom U U).toFun (SP.sections U).zero) (SP.sections U).zero :=
   Path.trans (SP.restrict_id U (SP.sections U).zero) (Path.refl _)
 
 /-- Composed: double restriction via composition law. -/
-def restrict_comp_witness (SP : StructurePresheafData R HR)
+noncomputable def restrict_comp_witness (SP : StructurePresheafData R HR)
     (U V W : RationalSubsetData R HR) (a : R) :
     Path ((SP.restrict_hom U W).toFun a)
          ((SP.restrict_hom V W).toFun ((SP.restrict_hom U V).toFun a)) :=
@@ -410,17 +410,17 @@ variable {R : Type u} {S : Type v}
 variable {AR : AdicSpaceData R} {AS : AdicSpaceData S}
 
 /-- Multi-step: morphism preserves zero. -/
-def morph_zero (M : AdicMorphismData R S AR AS) :
+noncomputable def morph_zero (M : AdicMorphismData R S AR AS) :
     Path (M.ringMap AR.huberPair.zero) AS.huberPair.zero :=
   Path.trans (M.ring_eq AR.huberPair.zero) M.ring_hom.map_zero
 
 /-- Multi-step: morphism preserves one. -/
-def morph_one (M : AdicMorphismData R S AR AS) :
+noncomputable def morph_one (M : AdicMorphismData R S AR AS) :
     Path (M.ringMap AR.huberPair.one) AS.huberPair.one :=
   Path.trans (M.ring_eq AR.huberPair.one) M.ring_hom.map_one
 
 /-- Composed: morphism preserves addition. -/
-def morph_add (M : AdicMorphismData R S AR AS) (a b : R) :
+noncomputable def morph_add (M : AdicMorphismData R S AR AS) (a b : R) :
     Path (M.ringMap (AR.huberPair.add a b))
          (AS.huberPair.add (M.ringMap a) (M.ringMap b)) :=
   Path.trans (M.ring_eq (AR.huberPair.add a b))
@@ -432,7 +432,7 @@ def morph_add (M : AdicMorphismData R S AR AS) (a b : R) :
           (Path.symm (M.ring_eq b)))))
 
 /-- Symmetry: zero of S comes from morphism. -/
-def zero_from_morph (M : AdicMorphismData R S AR AS) :
+noncomputable def zero_from_morph (M : AdicMorphismData R S AR AS) :
     Path AS.huberPair.zero (M.ringMap AR.huberPair.zero) :=
   Path.symm (morph_zero M)
 
@@ -469,19 +469,19 @@ end AdicMorphismData
 /-! ## RwEq multi-step constructions -/
 
 /-- Multi-step: value group identity law composed with valuation. -/
-def val_identity_chain {R : Type u} {HR : HuberRingData R}
+noncomputable def val_identity_chain {R : Type u} {HR : HuberRingData R}
     (CV : ContinuousValuationData R HR) (a : R) :
     Path (CV.val (HR.mul HR.one a)) (CV.val a) :=
   CV.val_one_mul a
 
 /-- Multi-step: localization of g then multiplication by g⁻¹ gives 1. -/
-def loc_g_chain {R : Type u} {HR : HuberPairData R}
+noncomputable def loc_g_chain {R : Type u} {HR : HuberPairData R}
     (RS : RationalSubsetData R HR) :
     Path (RS.locRing.mul (RS.locMap RS.denominator) RS.g_unit) RS.locRing.one :=
   Path.trans RS.g_unit_spec (Path.refl _)
 
 /-- Symmetry: structure presheaf restriction identity. -/
-def presheaf_id_symm {R : Type u} {HR : HuberPairData R}
+noncomputable def presheaf_id_symm {R : Type u} {HR : HuberPairData R}
     (SP : StructurePresheafData R HR) (U : RationalSubsetData R HR) (a : R) :
     Path a ((SP.restrict_hom U U).toFun a) :=
   Path.symm (SP.restrict_id U a)

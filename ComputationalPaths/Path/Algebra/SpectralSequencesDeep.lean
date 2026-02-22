@@ -31,10 +31,10 @@ universe u
 structure BiGraded where
   val : Nat → Nat → Nat
 
-def BiGraded.zero : BiGraded := ⟨fun _ _ => 0⟩
-def BiGraded.const (c : Nat) : BiGraded := ⟨fun _ _ => c⟩
-def BiGraded.add (A B : BiGraded) : BiGraded := ⟨fun p q => A.val p q + B.val p q⟩
-def BiGraded.shift (A : BiGraded) (dp dq : Nat) : BiGraded :=
+noncomputable def BiGraded.zero : BiGraded := ⟨fun _ _ => 0⟩
+noncomputable def BiGraded.const (c : Nat) : BiGraded := ⟨fun _ _ => c⟩
+noncomputable def BiGraded.add (A B : BiGraded) : BiGraded := ⟨fun p q => A.val p q + B.val p q⟩
+noncomputable def BiGraded.shift (A : BiGraded) (dp dq : Nat) : BiGraded :=
   ⟨fun p q => if p ≥ dp ∧ q ≥ dq then A.val (p - dp) (q - dq) else 0⟩
 
 -- ============================================================================
@@ -50,7 +50,7 @@ structure ExactCouple where
   j : Nat → Nat   -- D → E
   k : Nat → Nat   -- E → D
 
-def ExactCouple.differential (ec : ExactCouple) (n : Nat) : Nat :=
+noncomputable def ExactCouple.differential (ec : ExactCouple) (n : Nat) : Nat :=
   ec.j (ec.k n)
 
 /-- The derived couple replaces D with im(i) and E with ker(d)/im(d). -/
@@ -59,7 +59,7 @@ structure DerivedCouple where
   E' : Nat → Nat
   parent : ExactCouple
 
-def ExactCouple.derive (ec : ExactCouple) : DerivedCouple :=
+noncomputable def ExactCouple.derive (ec : ExactCouple) : DerivedCouple :=
   { D' := ec.i, E' := ec.differential, parent := ec }
 
 -- ============================================================================
@@ -73,7 +73,7 @@ structure Filtration where
   descending : ∀ k, k < length → level (k + 1) ≤ level k
 
 /-- Associated graded of a filtration at level k. -/
-def Filtration.assocGraded (F : Filtration) (k : Nat) : Nat :=
+noncomputable def Filtration.assocGraded (F : Filtration) (k : Nat) : Nat :=
   F.level k - (if k + 1 ≤ F.length then F.level (k + 1) else 0)
 
 -- ============================================================================
@@ -86,14 +86,14 @@ structure Page where
   entry : Nat → Nat → Nat
   differential : Nat → Nat → Nat
 
-def Page.zero_page : Page :=
+noncomputable def Page.zero_page : Page :=
   { r := 0, entry := fun _ _ => 0, differential := fun _ _ => 0 }
 
-def Page.const_page (c : Nat) (r : Nat) : Page :=
+noncomputable def Page.const_page (c : Nat) (r : Nat) : Page :=
   { r := r, entry := fun _ _ => c, differential := fun _ _ => 0 }
 
 /-- Next page: homology of current page (simplified as entry - differential). -/
-def Page.next (pg : Page) : Page :=
+noncomputable def Page.next (pg : Page) : Page :=
   { r := pg.r + 1,
     entry := fun p q => pg.entry p q - pg.differential p q,
     differential := fun _ _ => 0 }
@@ -106,7 +106,7 @@ def Page.next (pg : Page) : Page :=
 theorem bigraded_zero_val (p q : Nat) : BiGraded.zero.val p q = 0 := by
   simp [BiGraded.zero]
 
-def bigraded_zero_val_path (p q : Nat) :
+noncomputable def bigraded_zero_val_path (p q : Nat) :
     Path (BiGraded.zero.val p q) 0 :=
   Path.stepChain (bigraded_zero_val p q)
 
@@ -114,7 +114,7 @@ def bigraded_zero_val_path (p q : Nat) :
 theorem bigraded_const_val (c p q : Nat) : (BiGraded.const c).val p q = c := by
   simp [BiGraded.const]
 
-def bigraded_const_val_path (c p q : Nat) :
+noncomputable def bigraded_const_val_path (c p q : Nat) :
     Path ((BiGraded.const c).val p q) c :=
   Path.stepChain (bigraded_const_val c p q)
 
@@ -123,7 +123,7 @@ theorem bigraded_add_val (A B : BiGraded) (p q : Nat) :
     (BiGraded.add A B).val p q = A.val p q + B.val p q := by
   simp [BiGraded.add]
 
-def bigraded_add_val_path (A B : BiGraded) (p q : Nat) :
+noncomputable def bigraded_add_val_path (A B : BiGraded) (p q : Nat) :
     Path ((BiGraded.add A B).val p q) (A.val p q + B.val p q) :=
   Path.stepChain (bigraded_add_val A B p q)
 
@@ -132,7 +132,7 @@ theorem bigraded_add_zero (A : BiGraded) (p q : Nat) :
     (BiGraded.add A BiGraded.zero).val p q = A.val p q := by
   simp [BiGraded.add, BiGraded.zero]
 
-def bigraded_add_zero_path (A : BiGraded) (p q : Nat) :
+noncomputable def bigraded_add_zero_path (A : BiGraded) (p q : Nat) :
     Path ((BiGraded.add A BiGraded.zero).val p q) (A.val p q) :=
   Path.stepChain (bigraded_add_zero A p q)
 
@@ -141,7 +141,7 @@ theorem bigraded_zero_add (A : BiGraded) (p q : Nat) :
     (BiGraded.add BiGraded.zero A).val p q = A.val p q := by
   simp [BiGraded.add, BiGraded.zero]
 
-def bigraded_zero_add_path (A : BiGraded) (p q : Nat) :
+noncomputable def bigraded_zero_add_path (A : BiGraded) (p q : Nat) :
     Path ((BiGraded.add BiGraded.zero A).val p q) (A.val p q) :=
   Path.stepChain (bigraded_zero_add A p q)
 
@@ -150,7 +150,7 @@ theorem bigraded_add_comm (A B : BiGraded) (p q : Nat) :
     (BiGraded.add A B).val p q = (BiGraded.add B A).val p q := by
   simp [BiGraded.add]; omega
 
-def bigraded_add_comm_path (A B : BiGraded) (p q : Nat) :
+noncomputable def bigraded_add_comm_path (A B : BiGraded) (p q : Nat) :
     Path ((BiGraded.add A B).val p q) ((BiGraded.add B A).val p q) :=
   Path.stepChain (bigraded_add_comm A B p q)
 
@@ -160,7 +160,7 @@ theorem bigraded_add_assoc (A B C : BiGraded) (p q : Nat) :
     (BiGraded.add A (BiGraded.add B C)).val p q := by
   simp [BiGraded.add]; omega
 
-def bigraded_add_assoc_path (A B C : BiGraded) (p q : Nat) :
+noncomputable def bigraded_add_assoc_path (A B C : BiGraded) (p q : Nat) :
     Path ((BiGraded.add (BiGraded.add A B) C).val p q)
          ((BiGraded.add A (BiGraded.add B C)).val p q) :=
   Path.stepChain (bigraded_add_assoc A B C p q)
@@ -169,14 +169,14 @@ def bigraded_add_assoc_path (A B C : BiGraded) (p q : Nat) :
 theorem page_zero_r : Page.zero_page.r = 0 := by
   simp [Page.zero_page]
 
-def page_zero_r_path : Path Page.zero_page.r 0 :=
+noncomputable def page_zero_r_path : Path Page.zero_page.r 0 :=
   Path.stepChain page_zero_r
 
 -- 9. Page zero entry is always 0
 theorem page_zero_entry (p q : Nat) : Page.zero_page.entry p q = 0 := by
   simp [Page.zero_page]
 
-def page_zero_entry_path (p q : Nat) :
+noncomputable def page_zero_entry_path (p q : Nat) :
     Path (Page.zero_page.entry p q) 0 :=
   Path.stepChain (page_zero_entry p q)
 
@@ -185,7 +185,7 @@ theorem page_const_entry (c r p q : Nat) :
     (Page.const_page c r).entry p q = c := by
   simp [Page.const_page]
 
-def page_const_entry_path (c r p q : Nat) :
+noncomputable def page_const_entry_path (c r p q : Nat) :
     Path ((Page.const_page c r).entry p q) c :=
   Path.stepChain (page_const_entry c r p q)
 
@@ -193,7 +193,7 @@ def page_const_entry_path (c r p q : Nat) :
 theorem page_next_r (pg : Page) : pg.next.r = pg.r + 1 := by
   simp [Page.next]
 
-def page_next_r_path (pg : Page) :
+noncomputable def page_next_r_path (pg : Page) :
     Path pg.next.r (pg.r + 1) :=
   Path.stepChain (page_next_r pg)
 
@@ -201,7 +201,7 @@ def page_next_r_path (pg : Page) :
 theorem page_next_zero_r : Page.zero_page.next.r = 1 := by
   simp [Page.zero_page, Page.next]
 
-def page_next_zero_r_path : Path Page.zero_page.next.r 1 :=
+noncomputable def page_next_zero_r_path : Path Page.zero_page.next.r 1 :=
   Path.stepChain page_next_zero_r
 
 -- 13. Next of zero page has entry 0
@@ -209,7 +209,7 @@ theorem page_next_zero_entry (p q : Nat) :
     Page.zero_page.next.entry p q = 0 := by
   simp [Page.zero_page, Page.next]
 
-def page_next_zero_entry_path (p q : Nat) :
+noncomputable def page_next_zero_entry_path (p q : Nat) :
     Path (Page.zero_page.next.entry p q) 0 :=
   Path.stepChain (page_next_zero_entry p q)
 
@@ -217,7 +217,7 @@ def page_next_zero_entry_path (p q : Nat) :
 theorem page_next_next_r (pg : Page) : pg.next.next.r = pg.r + 2 := by
   simp [Page.next]
 
-def page_next_next_r_path (pg : Page) :
+noncomputable def page_next_next_r_path (pg : Page) :
     Path pg.next.next.r (pg.r + 2) :=
   Path.stepChain (page_next_next_r pg)
 
@@ -225,7 +225,7 @@ def page_next_next_r_path (pg : Page) :
 theorem page_const_r (c r : Nat) : (Page.const_page c r).r = r := by
   simp [Page.const_page]
 
-def page_const_r_path (c r : Nat) :
+noncomputable def page_const_r_path (c r : Nat) :
     Path (Page.const_page c r).r r :=
   Path.stepChain (page_const_r c r)
 
@@ -234,7 +234,7 @@ theorem derive_E'_eq_differential (ec : ExactCouple) (n : Nat) :
     (ec.derive).E' n = ec.differential n := by
   simp [ExactCouple.derive]
 
-def derive_E'_path (ec : ExactCouple) (n : Nat) :
+noncomputable def derive_E'_path (ec : ExactCouple) (n : Nat) :
     Path ((ec.derive).E' n) (ec.differential n) :=
   Path.stepChain (derive_E'_eq_differential ec n)
 
@@ -243,7 +243,7 @@ theorem derive_D'_eq_i (ec : ExactCouple) (n : Nat) :
     (ec.derive).D' n = ec.i n := by
   simp [ExactCouple.derive]
 
-def derive_D'_path (ec : ExactCouple) (n : Nat) :
+noncomputable def derive_D'_path (ec : ExactCouple) (n : Nat) :
     Path ((ec.derive).D' n) (ec.i n) :=
   Path.stepChain (derive_D'_eq_i ec n)
 
@@ -263,11 +263,11 @@ structure SerreData where
   totalRank : Nat → Nat
 
 /-- E_2 page of Serre spectral sequence: E_2^{p,q} = H_p(B; H_q(F)). -/
-def SerreData.e2 (sd : SerreData) (p q : Nat) : Nat :=
+noncomputable def SerreData.e2 (sd : SerreData) (p q : Nat) : Nat :=
   sd.baseRank p * sd.fibreRank q
 
 /-- Convergence: sum of E_2 page along total degree n should approach H_n(E). -/
-def SerreData.e2_total (sd : SerreData) (n : Nat) : Nat :=
+noncomputable def SerreData.e2_total (sd : SerreData) (n : Nat) : Nat :=
   (List.range (n + 1)).foldl (fun acc k => acc + sd.e2 k (n - k)) 0
 
 -- 19. E_2 with zero fibre rank is zero
@@ -275,7 +275,7 @@ theorem serre_e2_zero_fibre (sd : SerreData) (hf : ∀ q, sd.fibreRank q = 0) (p
     sd.e2 p q = 0 := by
   simp [SerreData.e2, hf]
 
-def serre_e2_zero_fibre_path (sd : SerreData) (hf : ∀ q, sd.fibreRank q = 0) (p q : Nat) :
+noncomputable def serre_e2_zero_fibre_path (sd : SerreData) (hf : ∀ q, sd.fibreRank q = 0) (p q : Nat) :
     Path (sd.e2 p q) 0 :=
   Path.stepChain (serre_e2_zero_fibre sd hf p q)
 
@@ -284,7 +284,7 @@ theorem serre_e2_zero_base (sd : SerreData) (hb : ∀ p, sd.baseRank p = 0) (p q
     sd.e2 p q = 0 := by
   simp [SerreData.e2, hb]
 
-def serre_e2_zero_base_path (sd : SerreData) (hb : ∀ p, sd.baseRank p = 0) (p q : Nat) :
+noncomputable def serre_e2_zero_base_path (sd : SerreData) (hb : ∀ p, sd.baseRank p = 0) (p q : Nat) :
     Path (sd.e2 p q) 0 :=
   Path.stepChain (serre_e2_zero_base sd hb p q)
 
@@ -293,7 +293,7 @@ theorem serre_e2_fibre_one (sd : SerreData) (hf : ∀ q, sd.fibreRank q = 1) (p 
     sd.e2 p q = sd.baseRank p := by
   simp [SerreData.e2, hf]
 
-def serre_e2_fibre_one_path (sd : SerreData) (hf : ∀ q, sd.fibreRank q = 1) (p q : Nat) :
+noncomputable def serre_e2_fibre_one_path (sd : SerreData) (hf : ∀ q, sd.fibreRank q = 1) (p q : Nat) :
     Path (sd.e2 p q) (sd.baseRank p) :=
   Path.stepChain (serre_e2_fibre_one sd hf p q)
 
@@ -302,7 +302,7 @@ theorem serre_e2_base_one (sd : SerreData) (hb : ∀ p, sd.baseRank p = 1) (p q 
     sd.e2 p q = sd.fibreRank q := by
   simp [SerreData.e2, hb]
 
-def serre_e2_base_one_path (sd : SerreData) (hb : ∀ p, sd.baseRank p = 1) (p q : Nat) :
+noncomputable def serre_e2_base_one_path (sd : SerreData) (hb : ∀ p, sd.baseRank p = 1) (p q : Nat) :
     Path (sd.e2 p q) (sd.fibreRank q) :=
   Path.stepChain (serre_e2_base_one sd hb p q)
 
@@ -315,7 +315,7 @@ structure AHData where
   cellRank : Nat → Nat
   coeffRank : Nat → Nat
 
-def AHData.e2 (ah : AHData) (p q : Nat) : Nat :=
+noncomputable def AHData.e2 (ah : AHData) (p q : Nat) : Nat :=
   ah.cellRank p * ah.coeffRank q
 
 -- 23. AH E_2 zero cells
@@ -323,7 +323,7 @@ theorem ah_e2_zero_cells (ah : AHData) (hc : ∀ p, ah.cellRank p = 0) (p q : Na
     ah.e2 p q = 0 := by
   simp [AHData.e2, hc]
 
-def ah_e2_zero_cells_path (ah : AHData) (hc : ∀ p, ah.cellRank p = 0) (p q : Nat) :
+noncomputable def ah_e2_zero_cells_path (ah : AHData) (hc : ∀ p, ah.cellRank p = 0) (p q : Nat) :
     Path (ah.e2 p q) 0 :=
   Path.stepChain (ah_e2_zero_cells ah hc p q)
 
@@ -332,7 +332,7 @@ theorem ah_e2_zero_coeff (ah : AHData) (hk : ∀ q, ah.coeffRank q = 0) (p q : N
     ah.e2 p q = 0 := by
   simp [AHData.e2, hk]
 
-def ah_e2_zero_coeff_path (ah : AHData) (hk : ∀ q, ah.coeffRank q = 0) (p q : Nat) :
+noncomputable def ah_e2_zero_coeff_path (ah : AHData) (hk : ∀ q, ah.coeffRank q = 0) (p q : Nat) :
     Path (ah.e2 p q) 0 :=
   Path.stepChain (ah_e2_zero_coeff ah hk p q)
 
@@ -341,7 +341,7 @@ theorem ah_e2_comm_factor (ah : AHData) (p q : Nat) :
     ah.cellRank p * ah.coeffRank q = ah.coeffRank q * ah.cellRank p := by
   exact Nat.mul_comm _ _
 
-def ah_e2_comm_factor_path (ah : AHData) (p q : Nat) :
+noncomputable def ah_e2_comm_factor_path (ah : AHData) (p q : Nat) :
     Path (ah.cellRank p * ah.coeffRank q) (ah.coeffRank q * ah.cellRank p) :=
   Path.stepChain (ah_e2_comm_factor ah p q)
 
@@ -354,9 +354,9 @@ structure AdamsData where
   extRank : Nat → Nat → Nat   -- Ext^{s,t}
   target : Nat → Nat          -- stable homotopy groups
 
-def AdamsData.e2 (ad : AdamsData) (s t : Nat) : Nat := ad.extRank s t
+noncomputable def AdamsData.e2 (ad : AdamsData) (s t : Nat) : Nat := ad.extRank s t
 
-def AdamsData.stem (ad : AdamsData) (n : Nat) : Nat :=
+noncomputable def AdamsData.stem (ad : AdamsData) (n : Nat) : Nat :=
   (List.range (n + 1)).foldl (fun acc s => acc + ad.extRank s (s + n)) 0
 
 -- 26. Adams E_2 is Ext
@@ -364,7 +364,7 @@ theorem adams_e2_eq_ext (ad : AdamsData) (s t : Nat) :
     ad.e2 s t = ad.extRank s t := by
   simp [AdamsData.e2]
 
-def adams_e2_eq_ext_path (ad : AdamsData) (s t : Nat) :
+noncomputable def adams_e2_eq_ext_path (ad : AdamsData) (s t : Nat) :
     Path (ad.e2 s t) (ad.extRank s t) :=
   Path.stepChain (adams_e2_eq_ext ad s t)
 
@@ -373,7 +373,7 @@ theorem adams_e2_zero (ad : AdamsData) (hz : ∀ s t, ad.extRank s t = 0) (s t :
     ad.e2 s t = 0 := by
   simp [AdamsData.e2, hz]
 
-def adams_e2_zero_path (ad : AdamsData) (hz : ∀ s t, ad.extRank s t = 0) (s t : Nat) :
+noncomputable def adams_e2_zero_path (ad : AdamsData) (hz : ∀ s t, ad.extRank s t = 0) (s t : Nat) :
     Path (ad.e2 s t) 0 :=
   Path.stepChain (adams_e2_zero ad hz s t)
 
@@ -392,7 +392,7 @@ theorem edge_id_compose (e : EdgeHom) (hid : ∀ n, e.edgeMap n = n) (n : Nat) :
     e.edgeMap (e.edgeMap n) = n := by
   simp [hid]
 
-def edge_id_compose_path (e : EdgeHom) (hid : ∀ n, e.edgeMap n = n) (n : Nat) :
+noncomputable def edge_id_compose_path (e : EdgeHom) (hid : ∀ n, e.edgeMap n = n) (n : Nat) :
     Path (e.edgeMap (e.edgeMap n)) n :=
   Path.stepChain (edge_id_compose e hid n)
 
@@ -400,7 +400,7 @@ def edge_id_compose_path (e : EdgeHom) (hid : ∀ n, e.edgeMap n = n) (n : Nat) 
 theorem edge_zero_map (e : EdgeHom) (hz : e.edgeMap 0 = 0) :
     e.edgeMap 0 = 0 := hz
 
-def edge_zero_map_path (e : EdgeHom) (hz : e.edgeMap 0 = 0) :
+noncomputable def edge_zero_map_path (e : EdgeHom) (hz : e.edgeMap 0 = 0) :
     Path (e.edgeMap 0) 0 :=
   Path.stepChain hz
 
@@ -418,7 +418,7 @@ structure Transgression where
 theorem trans_zero (t : Transgression) (hz : t.transMap 0 = 0) :
     t.transMap 0 = 0 := hz
 
-def trans_zero_path (t : Transgression) (hz : t.transMap 0 = 0) :
+noncomputable def trans_zero_path (t : Transgression) (hz : t.transMap 0 = 0) :
     Path (t.transMap 0) 0 :=
   Path.stepChain hz
 
@@ -426,7 +426,7 @@ def trans_zero_path (t : Transgression) (hz : t.transMap 0 = 0) :
 theorem trans_id (t : Transgression) (hid : ∀ n, t.transMap n = n) (n : Nat) :
     t.transMap n = n := hid n
 
-def trans_id_path (t : Transgression) (hid : ∀ n, t.transMap n = n) (n : Nat) :
+noncomputable def trans_id_path (t : Transgression) (hid : ∀ n, t.transMap n = n) (n : Nat) :
     Path (t.transMap n) n :=
   Path.stepChain (hid n)
 
@@ -445,7 +445,7 @@ theorem diff_cubed_zero (diff : Differential) (n : Nat) :
     diff.d (diff.d (diff.d n)) = 0 := by
   rw [diff.d_squared_zero]
 
-def diff_cubed_zero_path (diff : Differential) (n : Nat) :
+noncomputable def diff_cubed_zero_path (diff : Differential) (n : Nat) :
     Path (diff.d (diff.d (diff.d n))) 0 :=
   Path.stepChain (diff_cubed_zero diff n)
 
@@ -454,23 +454,23 @@ theorem diff_zero_zero (diff : Differential) (_h0 : diff.d 0 = 0) :
     diff.d (diff.d 0) = 0 := by
   rw [diff.d_squared_zero]
 
-def diff_zero_zero_path (diff : Differential) (h0 : diff.d 0 = 0) :
+noncomputable def diff_zero_zero_path (diff : Differential) (h0 : diff.d 0 = 0) :
     Path (diff.d (diff.d 0)) 0 :=
   Path.stepChain (diff_zero_zero diff h0)
 
 -- 34. Zero differential
-def Differential.zero : Differential :=
+noncomputable def Differential.zero : Differential :=
   { deg := 0, d := fun _ => 0, d_squared_zero := fun _ => rfl }
 
 theorem diff_zero_d (n : Nat) : Differential.zero.d n = 0 := rfl
 
-def diff_zero_d_path (n : Nat) : Path (Differential.zero.d n) 0 :=
+noncomputable def diff_zero_d_path (n : Nat) : Path (Differential.zero.d n) 0 :=
   Path.stepChain (diff_zero_d n)
 
 -- 35. Zero differential deg
 theorem diff_zero_deg : Differential.zero.deg = 0 := rfl
 
-def diff_zero_deg_path : Path Differential.zero.deg 0 :=
+noncomputable def diff_zero_deg_path : Path Differential.zero.deg 0 :=
   Path.stepChain diff_zero_deg
 
 -- ============================================================================
@@ -487,7 +487,7 @@ structure Convergence where
 theorem convergence_eq (c : Convergence) (p q : Nat) :
     c.eInfty p q = c.assocGraded p q := c.converges p q
 
-def convergence_eq_path (c : Convergence) (p q : Nat) :
+noncomputable def convergence_eq_path (c : Convergence) (p q : Nat) :
     Path (c.eInfty p q) (c.assocGraded p q) :=
   Path.stepChain (c.converges p q)
 
@@ -501,7 +501,7 @@ theorem convergence_zero_einf (c : Convergence)
     c.assocGraded p q = 0 := by
   have h := c.converges p q; rw [hz] at h; exact h.symm
 
-def convergence_zero_path (c : Convergence)
+noncomputable def convergence_zero_path (c : Convergence)
     (hz : ∀ p q, c.eInfty p q = 0) (p q : Nat) :
     Path (c.assocGraded p q) 0 :=
   Path.stepChain (convergence_zero_einf c hz p q)
@@ -516,18 +516,18 @@ theorem const_filt_graded_zero (v : Nat) (k : Nat) (hk : k + 1 ≤ 5) :
   simp [Filtration.assocGraded, hk, Nat.sub_self]
 
 -- 40. Sum of Nat list
-def natSum : List Nat → Nat
+noncomputable def natSum : List Nat → Nat
   | [] => 0
   | x :: xs => x + natSum xs
 
 theorem natSum_nil : natSum [] = 0 := rfl
-def natSum_nil_path : Path (natSum []) 0 := Path.stepChain natSum_nil
+noncomputable def natSum_nil_path : Path (natSum []) 0 := Path.stepChain natSum_nil
 
 -- 41. natSum singleton
 theorem natSum_singleton (n : Nat) : natSum [n] = n := by
   simp [natSum]
 
-def natSum_singleton_path (n : Nat) : Path (natSum [n]) n :=
+noncomputable def natSum_singleton_path (n : Nat) : Path (natSum [n]) n :=
   Path.stepChain (natSum_singleton n)
 
 -- 42. natSum append
@@ -537,7 +537,7 @@ theorem natSum_append (xs ys : List Nat) :
   | nil => simp [natSum]
   | cons x xs ih => simp [natSum, ih]; omega
 
-def natSum_append_path (xs ys : List Nat) :
+noncomputable def natSum_append_path (xs ys : List Nat) :
     Path (natSum (xs ++ ys)) (natSum xs + natSum ys) :=
   Path.stepChain (natSum_append xs ys)
 
@@ -552,26 +552,26 @@ structure ChainComplex where
   d_squared : ∀ n, d (d n) = 0
 
 -- 43. Chain complex from differential
-def chainOfDiff (diff : Differential) : ChainComplex :=
+noncomputable def chainOfDiff (diff : Differential) : ChainComplex :=
   { obj := fun n => n, d := diff.d, d_squared := diff.d_squared_zero }
 
 theorem chain_of_diff_d (diff : Differential) (n : Nat) :
     (chainOfDiff diff).d n = diff.d n := rfl
 
-def chain_of_diff_d_path (diff : Differential) (n : Nat) :
+noncomputable def chain_of_diff_d_path (diff : Differential) (n : Nat) :
     Path ((chainOfDiff diff).d n) (diff.d n) :=
   Path.stepChain (chain_of_diff_d diff n)
 
 -- 44. Zero chain complex
-def ChainComplex.zero : ChainComplex :=
+noncomputable def ChainComplex.zero : ChainComplex :=
   { obj := fun _ => 0, d := fun _ => 0, d_squared := fun _ => rfl }
 
 theorem chain_zero_obj (n : Nat) : ChainComplex.zero.obj n = 0 := rfl
-def chain_zero_obj_path (n : Nat) : Path (ChainComplex.zero.obj n) 0 :=
+noncomputable def chain_zero_obj_path (n : Nat) : Path (ChainComplex.zero.obj n) 0 :=
   Path.stepChain (chain_zero_obj n)
 
 theorem chain_zero_d (n : Nat) : ChainComplex.zero.d n = 0 := rfl
-def chain_zero_d_path (n : Nat) : Path (ChainComplex.zero.d n) 0 :=
+noncomputable def chain_zero_d_path (n : Nat) : Path (ChainComplex.zero.d n) 0 :=
   Path.stepChain (chain_zero_d n)
 
 -- ============================================================================
@@ -579,7 +579,7 @@ def chain_zero_d_path (n : Nat) : Path (ChainComplex.zero.d n) 0 :=
 -- ============================================================================
 
 -- Helper: iterate page advancement
-def Page.advance : Nat → Page → Page
+noncomputable def Page.advance : Nat → Page → Page
   | 0, pg => pg
   | n + 1, pg => Page.advance n pg.next
 
@@ -590,7 +590,7 @@ theorem page_advance_r (pg : Page) (k : Nat) :
   | zero => simp [Page.advance]
   | succ k ih => simp [Page.advance, ih, Page.next]; omega
 
-def page_advance_r_path (pg : Page) (k : Nat) :
+noncomputable def page_advance_r_path (pg : Page) (k : Nat) :
     Path (Page.advance k pg).r (pg.r + k) :=
   Path.stepChain (page_advance_r pg k)
 
@@ -599,7 +599,7 @@ theorem page_zero_advance_r (k : Nat) :
     (Page.advance k Page.zero_page).r = k := by
   rw [page_advance_r]; simp [Page.zero_page]
 
-def page_zero_advance_r_path (k : Nat) :
+noncomputable def page_zero_advance_r_path (k : Nat) :
     Path (Page.advance k Page.zero_page).r k :=
   Path.stepChain (page_zero_advance_r k)
 
@@ -607,7 +607,7 @@ def page_zero_advance_r_path (k : Nat) :
 theorem page_next3_r (pg : Page) : pg.next.next.next.r = pg.r + 3 := by
   simp [Page.next]
 
-def page_next3_r_path (pg : Page) :
+noncomputable def page_next3_r_path (pg : Page) :
     Path pg.next.next.next.r (pg.r + 3) :=
   Path.stepChain (page_next3_r pg)
 
@@ -620,7 +620,7 @@ theorem serre_e2_mul (sd : SerreData) (p q : Nat) :
     sd.e2 p q = sd.baseRank p * sd.fibreRank q := by
   simp [SerreData.e2]
 
-def serre_e2_mul_path (sd : SerreData) (p q : Nat) :
+noncomputable def serre_e2_mul_path (sd : SerreData) (p q : Nat) :
     Path (sd.e2 p q) (sd.baseRank p * sd.fibreRank q) :=
   Path.stepChain (serre_e2_mul sd p q)
 
@@ -629,7 +629,7 @@ theorem serre_e2_comm (sd : SerreData) (p q : Nat) :
     sd.baseRank p * sd.fibreRank q = sd.fibreRank q * sd.baseRank p := by
   exact Nat.mul_comm _ _
 
-def serre_e2_comm_path (sd : SerreData) (p q : Nat) :
+noncomputable def serre_e2_comm_path (sd : SerreData) (p q : Nat) :
     Path (sd.baseRank p * sd.fibreRank q) (sd.fibreRank q * sd.baseRank p) :=
   Path.stepChain (serre_e2_comm sd p q)
 
@@ -638,7 +638,7 @@ theorem serre_e2_zero_zero (sd : SerreData) :
     sd.e2 0 0 = sd.baseRank 0 * sd.fibreRank 0 := by
   simp [SerreData.e2]
 
-def serre_e2_zero_zero_path (sd : SerreData) :
+noncomputable def serre_e2_zero_zero_path (sd : SerreData) :
     Path (sd.e2 0 0) (sd.baseRank 0 * sd.fibreRank 0) :=
   Path.stepChain (serre_e2_zero_zero sd)
 
@@ -647,37 +647,37 @@ def serre_e2_zero_zero_path (sd : SerreData) :
 -- ============================================================================
 
 -- 51. Trans chain: bigraded zero add then comm
-def bigraded_zero_add_comm_path (A : BiGraded) (p q : Nat) :
+noncomputable def bigraded_zero_add_comm_path (A : BiGraded) (p q : Nat) :
     Path ((BiGraded.add BiGraded.zero A).val p q) ((BiGraded.add A BiGraded.zero).val p q) :=
   Path.trans (bigraded_zero_add_path A p q) (Path.symm (bigraded_add_zero_path A p q))
 
 -- 52. Trans chain: page next r via two steps
-def page_next_r_via_succ (pg : Page) :
+noncomputable def page_next_r_via_succ (pg : Page) :
     Path pg.next.r (pg.r + 1) :=
   page_next_r_path pg
 
 -- 53. Symmetry path: from target back to source
-def serre_e2_sym_path (sd : SerreData) (hf : ∀ q, sd.fibreRank q = 1) (p q : Nat) :
+noncomputable def serre_e2_sym_path (sd : SerreData) (hf : ∀ q, sd.fibreRank q = 1) (p q : Nat) :
     Path (sd.baseRank p) (sd.e2 p q) :=
   Path.symm (serre_e2_fibre_one_path sd hf p q)
 
 -- 54. congrArg through Nat.succ
-def page_next_r_succ_path (pg : Page) :
+noncomputable def page_next_r_succ_path (pg : Page) :
     Path (Nat.succ pg.next.r) (Nat.succ (pg.r + 1)) :=
   Path.congrArg Nat.succ (page_next_r_path pg)
 
 -- 55. Transport along page equality
-def transport_page_entry (pg : Page) (_p _q : Nat)
+noncomputable def transport_page_entry (pg : Page) (_p _q : Nat)
     (D : Nat → Type) (x : D (pg.next.r)) : D (pg.r + 1) :=
   Path.transport (page_next_r_path pg) x
 
 -- 56. Adams E_2 path combined with symmetry
-def adams_e2_sym_path (ad : AdamsData) (s t : Nat) :
+noncomputable def adams_e2_sym_path (ad : AdamsData) (s t : Nat) :
     Path (ad.extRank s t) (ad.e2 s t) :=
   Path.symm (adams_e2_eq_ext_path ad s t)
 
 -- 57. Chain of convergence and zero
-def convergence_chain_path (c : Convergence) (hz : ∀ p q, c.eInfty p q = 0) (p q : Nat) :
+noncomputable def convergence_chain_path (c : Convergence) (hz : ∀ p q, c.eInfty p q = 0) (p q : Nat) :
     Path (c.eInfty p q) 0 :=
   Path.trans (convergence_eq_path c p q) (convergence_zero_path c hz p q)
 
@@ -685,21 +685,21 @@ def convergence_chain_path (c : Convergence) (hz : ∀ p q, c.eInfty p q = 0) (p
 theorem natSum_pair (a b : Nat) : natSum [a, b] = a + b := by
   simp [natSum]
 
-def natSum_pair_path (a b : Nat) : Path (natSum [a, b]) (a + b) :=
+noncomputable def natSum_pair_path (a b : Nat) : Path (natSum [a, b]) (a + b) :=
   Path.stepChain (natSum_pair a b)
 
 -- 59. natSum three elements
 theorem natSum_triple (a b c : Nat) : natSum [a, b, c] = a + b + c := by
   simp [natSum]; omega
 
-def natSum_triple_path (a b c : Nat) : Path (natSum [a, b, c]) (a + b + c) :=
+noncomputable def natSum_triple_path (a b c : Nat) : Path (natSum [a, b, c]) (a + b + c) :=
   Path.stepChain (natSum_triple a b c)
 
 -- 60. Differential zero squared
 theorem diff_zero_sq (n : Nat) : Differential.zero.d (Differential.zero.d n) = 0 :=
   Differential.zero.d_squared_zero n
 
-def diff_zero_sq_path (n : Nat) :
+noncomputable def diff_zero_sq_path (n : Nat) :
     Path (Differential.zero.d (Differential.zero.d n)) 0 :=
   Path.stepChain (diff_zero_sq n)
 

@@ -33,11 +33,11 @@ structure MonotoneRw (A : Type u) extends OrderedRwSys A where
   mono : ∀ a b, rw a b → ord a b
 
 /-- Encoding a monotone rewrite step as a `Step`. -/
-def monoStep (_M : MonotoneRw A) {a b : A} (h : a = b) : Step A :=
+noncomputable def monoStep (_M : MonotoneRw A) {a b : A} (h : a = b) : Step A :=
   Step.mk a b h
 
 /-- A single monotone step composes to a `Path`. -/
-def monoStepPath (_M : MonotoneRw A) {a b : A} (h : a = b) : Path a b :=
+noncomputable def monoStepPath (_M : MonotoneRw A) {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Two monotone paths compose: step-lists concatenate. -/
@@ -78,7 +78,7 @@ theorem orderSorted_two_step (OS : OrderSortedRw A) {a b c : A}
   OS.hierarchy.subsort_trans _ _ _ (OS.sort_pres b c hbc) (OS.sort_pres a b hab)
 
 /-- Sort-preserving path: `congrArg sortOf` witnesses the chain. -/
-def sortPathWitness (OS : OrderSortedRw A) {a b : A} (p : Path a b) :
+noncomputable def sortPathWitness (OS : OrderSortedRw A) {a b : A} (p : Path a b) :
     Path (OS.sortOf a) (OS.sortOf b) :=
   Path.congrArg OS.sortOf p
 
@@ -125,7 +125,7 @@ structure PathOrdering (A : Type u) where
   cmp_lt_trans : ∀ a b c,
     cmp a b = .lt → cmp b c = .lt → cmp a c = .lt
 
-def poLt (PO : PathOrdering A) (a b : A) : Prop :=
+noncomputable def poLt (PO : PathOrdering A) (a b : A) : Prop :=
   PO.cmp a b = .lt
 
 theorem poLt_trans (PO : PathOrdering A) {a b c : A}
@@ -151,7 +151,7 @@ theorem rpo_sub_chain (R : RPO A) {a b c : A}
   R.sub_lt a c (R.sub_trans a b c h1 h2)
 
 /-- RPO witness as a `Path` from `cmp a b` to `.lt`. -/
-def rpoWitness (R : RPO A) {a b : A} (h : R.isSub a b) :
+noncomputable def rpoWitness (R : RPO A) {a b : A} (h : R.isSub a b) :
     Path (R.cmp a b) .lt :=
   Path.mk [Step.mk _ _ (R.sub_lt a b h)] (R.sub_lt a b h)
 
@@ -169,7 +169,7 @@ theorem kbo_wt_lt (K : KBO A) {a b : A} (h : K.weight a < K.weight b) :
   K.wt_lt a b h
 
 /-- KBO weight-decrease witness as a `Path`. -/
-def kboWtPath (K : KBO A) {a b : A} (h : K.weight a < K.weight b) :
+noncomputable def kboWtPath (K : KBO A) {a b : A} (h : K.weight a < K.weight b) :
     Path (K.cmp a b) .lt :=
   Path.mk [Step.mk _ _ (K.wt_lt a b h)] (K.wt_lt a b h)
 

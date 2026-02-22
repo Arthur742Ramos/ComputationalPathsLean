@@ -28,7 +28,7 @@ universe u v
 /-! ## A-infinity algebras -/
 
 /-- Multiary multiplication represented by lists. -/
-def AInfinityMul (A : Type u) : Type u := List A → A
+noncomputable def AInfinityMul (A : Type u) : Type u := List A → A
 
 /-- A-infinity algebra data with path-based associativity and units. -/
 structure AInfinityAlgebra (A : Type u) where
@@ -50,25 +50,25 @@ namespace AInfinityAlgebra
 variable {A : Type u} (S : AInfinityAlgebra A)
 
 /-- Unary multiplication. -/
-def mul1 (x : A) : A := S.mul [x]
+noncomputable def mul1 (x : A) : A := S.mul [x]
 
 /-- Binary multiplication. -/
-def mul2 (x y : A) : A := S.mul [x, y]
+noncomputable def mul2 (x y : A) : A := S.mul [x, y]
 
 /-- Ternary multiplication. -/
-def mul3 (x y z : A) : A := S.mul [x, y, z]
+noncomputable def mul3 (x y z : A) : A := S.mul [x, y, z]
 
 /-- Associator specialized to binary multiplication. -/
-def mul2_assoc (x y z : A) :
+noncomputable def mul2_assoc (x y z : A) :
     Path (S.mul [S.mul [x, y], z]) (S.mul [x, y, z]) :=
   S.assoc [] [x, y] [z]
 
 /-- Left unit on a single element. -/
-def unit_left_one (x : A) : Path (S.mul [S.unit, x]) (S.mul [x]) :=
+noncomputable def unit_left_one (x : A) : Path (S.mul [S.unit, x]) (S.mul [x]) :=
   S.unit_left [x]
 
 /-- Right unit on a single element. -/
-def unit_right_one (x : A) : Path (S.mul [x, S.unit]) (S.mul [x]) :=
+noncomputable def unit_right_one (x : A) : Path (S.mul [x, S.unit]) (S.mul [x]) :=
   S.unit_right [x]
 
 /-- Expansion of unary multiplication. -/
@@ -130,7 +130,7 @@ namespace AInfinityHom
 variable {A : Type u} {B : Type v}
 variable {S : AInfinityAlgebra A} {T : AInfinityAlgebra B}
 
-instance : CoeFun (AInfinityHom A B S T) (fun _ => A → B) :=
+noncomputable instance : CoeFun (AInfinityHom A B S T) (fun _ => A → B) :=
   ⟨AInfinityHom.toFun⟩
 
 /-- Morphisms preserve nullary multiplication. -/

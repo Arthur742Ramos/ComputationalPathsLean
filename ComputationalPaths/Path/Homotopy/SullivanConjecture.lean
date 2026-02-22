@@ -63,24 +63,24 @@ structure FiniteCWComplex where
 /-! ## Pointed mapping spaces -/
 
 /-- Constant pointed map to the basepoint. -/
-def basepointMap (X Y : Pointed.{u}) : PointedMap X Y where
+noncomputable def basepointMap (X Y : Pointed.{u}) : PointedMap X Y where
   toFun := fun _ => Y.pt
   map_pt := rfl
 
 /-- The pointed mapping space Map_+(X, Y). -/
-def MapPlus (X Y : Pointed.{u}) : Pointed.{u} where
+noncomputable def MapPlus (X Y : Pointed.{u}) : Pointed.{u} where
   carrier := PointedMap X Y
   pt := basepointMap X Y
 
 /-- The classifying space of a group as a pointed type. -/
-def classifyingPointed {G : Type u} (cs : ClassifyingSpaceData G) : Pointed.{u} where
+noncomputable def classifyingPointed {G : Type u} (cs : ClassifyingSpaceData G) : Pointed.{u} where
   carrier := cs.BG
   pt := cs.base
 
 /-! ## Homotopy types and p-completion -/
 
 /-- The trivial abelian group used for placeholder homotopy groups. -/
-def trivialAbelianGroup : AbelianGroup.{u} where
+noncomputable def trivialAbelianGroup : AbelianGroup.{u} where
   carrier := PUnit
   zero := PUnit.unit
   add := fun _ _ => PUnit.unit
@@ -92,12 +92,12 @@ def trivialAbelianGroup : AbelianGroup.{u} where
   add_comm := fun _ _ => rfl
 
 /-- View a type as a homotopy type with trivial homotopy groups. -/
-def trivialHomotopyType (X : Type u) : HomotopyType.{u} where
+noncomputable def trivialHomotopyType (X : Type u) : HomotopyType.{u} where
   carrier := X
   homotopyGroup := fun _ => trivialAbelianGroup
 
 /-- The homotopy type underlying Map_+(X, Y). -/
-def mapPlusHomotopyType (X Y : Pointed.{u}) : HomotopyType.{u} :=
+noncomputable def mapPlusHomotopyType (X Y : Pointed.{u}) : HomotopyType.{u} :=
   trivialHomotopyType (PointedMap X Y)
 
 /-- A Bousfield-Kan p-completion of a homotopy type. -/
@@ -108,7 +108,7 @@ structure BousfieldKanCompletion (X : HomotopyType.{u}) (p : Prime) where
   isComplete : True
 
 /-- Trivial p-completion data (identity completion). -/
-def trivialPCompletion (X : HomotopyType.{u}) (p : Prime) : PCompletion X p.val where
+noncomputable def trivialPCompletion (X : HomotopyType.{u}) (p : Prime) : PCompletion X p.val where
   completed := X
   complMap := fun x => x
   groupCompletion := fun n =>
@@ -117,7 +117,7 @@ def trivialPCompletion (X : HomotopyType.{u}) (p : Prime) : PCompletion X p.val 
   groups_agree := fun n => GroupIso.refl (X.homotopyGroup n)
 
 /-- The trivial Bousfield-Kan completion. -/
-def bousfieldKanCompletion (X : HomotopyType.{u}) (p : Prime) :
+noncomputable def bousfieldKanCompletion (X : HomotopyType.{u}) (p : Prime) :
     BousfieldKanCompletion X p where
   completion := trivialPCompletion X p
   isComplete := trivial
@@ -130,7 +130,7 @@ structure WeaklyContractible (X : Type u) where
   witness : True
 
 /-- Trivial weak contractibility witness. -/
-def weaklyContractible (X : Type u) : WeaklyContractible X :=
+noncomputable def weaklyContractible (X : Type u) : WeaklyContractible X :=
   { witness := trivial }
 
 /-! ## Unstable modules and Lannes T-functor -/
@@ -152,7 +152,7 @@ structure LannesTFunctor where
   left_exact : True
 
 /-- The identity Lannes T-functor. -/
-def lannesTFunctorId : LannesTFunctor where
+noncomputable def lannesTFunctorId : LannesTFunctor where
   obj := fun M => M
   left_exact := trivial
 
@@ -171,7 +171,7 @@ structure MillerTheorem (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex) wher
     WeaklyContractible completion.completion.completed.carrier
 
 /-- A trivial witness of Miller's theorem (placeholder). -/
-def millerTheorem (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
+noncomputable def millerTheorem (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
     (cs : ClassifyingSpaceData G.carrier) : MillerTheorem p G X where
   classifying := cs
   completion :=
@@ -191,7 +191,7 @@ structure SullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComp
   t_characterization : True
 
 /-- A trivial Sullivan conjecture witness (placeholder). -/
-def sullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
+noncomputable def sullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
     (cs : ClassifyingSpaceData G.carrier) (U : UnstableModule) :
     SullivanConjectureData p G X where
   miller := millerTheorem p G X cs
@@ -252,7 +252,7 @@ theorem mapPlus_is_pointed (X Y : Pointed.{u}) :
     (MapPlus X Y).carrier = PointedMap X Y := by
   rfl
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

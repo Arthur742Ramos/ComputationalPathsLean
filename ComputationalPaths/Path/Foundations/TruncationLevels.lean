@@ -30,25 +30,25 @@ theorem eq_of_contr (h : IsContr A) (x y : A) : x = y :=
   (h.contr x).symm.trans (h.contr y)
 
 /-- A type with a point and all equalities is contractible. -/
-def ofEqCenter (c : A) (h : ∀ x, x = c) : IsContr A :=
+noncomputable def ofEqCenter (c : A) (h : ∀ x, x = c) : IsContr A :=
   ⟨c, fun x => (h x).symm⟩
 
 /-- The unit type is contractible. -/
-def unitContr : IsContr Unit :=
+noncomputable def unitContr : IsContr Unit :=
   ⟨(), fun _ => rfl⟩
 
 /-- A subsingleton with an element is contractible. -/
-def ofSubsingleton [Subsingleton A] (a : A) : IsContr A :=
+noncomputable def ofSubsingleton [Subsingleton A] (a : A) : IsContr A :=
   ⟨a, fun x => Subsingleton.elim a x⟩
 
 /-- Product of contractible types is contractible. -/
-def prodContr {B : Type v} (ha : IsContr A) (hb : IsContr B) :
+noncomputable def prodContr {B : Type v} (ha : IsContr A) (hb : IsContr B) :
     IsContr (A × B) :=
   ⟨(ha.center, hb.center), fun ⟨a, b⟩ =>
     Prod.ext (ha.eq_of_contr ha.center a) (hb.eq_of_contr hb.center b)⟩
 
 /-- Sigma over contractible base with contractible fibers. -/
-def sigmaContr {B : A → Type v} (ha : IsContr A) (hb : ∀ x, IsContr (B x)) :
+noncomputable def sigmaContr {B : A → Type v} (ha : IsContr A) (hb : ∀ x, IsContr (B x)) :
     IsContr (Σ x, B x) :=
   ⟨⟨ha.center, (hb ha.center).center⟩, fun ⟨a, b⟩ => by
     obtain rfl := ha.contr a
@@ -64,7 +64,7 @@ end IsContr
 /-! ## Propositions: all elements equal -/
 
 /-- A type is a proposition if any two elements are equal. -/
-def IsProp (A : Type u) : Prop :=
+noncomputable def IsProp (A : Type u) : Prop :=
   ∀ (x y : A), x = y
 
 namespace IsProp
@@ -72,7 +72,7 @@ namespace IsProp
 variable {A : Type u}
 
 /-- A proposition with a point is contractible. -/
-def toContr (h : IsProp A) (a : A) : IsContr A :=
+noncomputable def toContr (h : IsProp A) (a : A) : IsContr A :=
   ⟨a, fun x => h a x⟩
 
 /-- Contractible → proposition. -/
@@ -103,7 +103,7 @@ end IsProp
 /-! ## Sets: UIP holds -/
 
 /-- A type is a set if the equality type between any two elements is a proposition. -/
-def IsSet (A : Type u) : Prop :=
+noncomputable def IsSet (A : Type u) : Prop :=
   ∀ (x y : A) (p q : x = y), p = q
 
 namespace IsSet
@@ -158,7 +158,7 @@ end IsSet
 /-! ## Groupoids: equality of equalities satisfies UIP -/
 
 /-- A type is a 1-groupoid if for all x y : A, the equality x = y satisfies UIP. -/
-def IsGroupoid (A : Type u) : Prop :=
+noncomputable def IsGroupoid (A : Type u) : Prop :=
   ∀ (x y : A) (p q : x = y) (r s : p = q), r = s
 
 namespace IsGroupoid
@@ -185,7 +185,7 @@ end IsGroupoid
 /-- Truncation level predicate (purely Prop-valued).
   We define the first few levels directly to avoid universe issues
   with Lean's `Eq` living in `Prop` rather than `Type u`. -/
-def IsTruncLevel : Nat → Type u → Prop
+noncomputable def IsTruncLevel : Nat → Type u → Prop
   | 0 => IsProp
   | 1 => IsSet
   | (n + 2) => IsGroupoid  -- For n ≥ 2, all collapse to groupoid in UIP
@@ -231,7 +231,7 @@ namespace Hedberg
 variable {A : Type u}
 
 /-- A constant endofunction on equalities via decidability. -/
-private def constPath (dec : DecidableEq A) (x y : A) :
+private noncomputable def constPath (dec : DecidableEq A) (x y : A) :
     x = y → x = y :=
   fun _ =>
     match dec x y with

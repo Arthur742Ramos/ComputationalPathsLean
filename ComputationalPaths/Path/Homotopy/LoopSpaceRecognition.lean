@@ -68,15 +68,15 @@ theorem inv_pt : G.inv X.pt = X.pt := by
   exact h
 
 /-- `Path` witness that unit laws hold. -/
-def mul_pt_left_path (x : X.carrier) : Path (G.mul X.pt x) x :=
+noncomputable def mul_pt_left_path (x : X.carrier) : Path (G.mul X.pt x) x :=
   Path.stepChain (G.mul_pt_left x)
 
 /-- `Path` witness for right unit. -/
-def mul_pt_right_path (x : X.carrier) : Path (G.mul x X.pt) x :=
+noncomputable def mul_pt_right_path (x : X.carrier) : Path (G.mul x X.pt) x :=
   Path.stepChain (G.mul_pt_right x)
 
 /-- `Path` witness for associativity. -/
-def mul_assoc_path (x y z : X.carrier) :
+noncomputable def mul_assoc_path (x y z : X.carrier) :
     Path (G.mul (G.mul x y) z) (G.mul x (G.mul y z)) :=
   Path.stepChain (G.mul_assoc x y z)
 
@@ -85,7 +85,7 @@ end GroupLikeE1Space
 /-! ## Bar construction -/
 
 /-- A simplicial level of the bar construction: lists of elements. -/
-def BarLevel (M : Type u) (n : Nat) : Type u :=
+noncomputable def BarLevel (M : Type u) (n : Nat) : Type u :=
   { l : List M // l.length = n }
 
 /-- The bar construction on a monoid, modeled as a quotient of lists. -/
@@ -96,12 +96,12 @@ structure BarConstruction (M : Type u) (S : StrictMonoid M) where
   level_def : ∀ n, level n = BarLevel M n
 
 /-- Canonical bar construction from a strict monoid. -/
-def canonicalBar (M : Type u) (_S : StrictMonoid M) : BarConstruction M _S where
+noncomputable def canonicalBar (M : Type u) (_S : StrictMonoid M) : BarConstruction M _S where
   level := fun n => BarLevel M n
   level_def := fun _ => rfl
 
 /-- Face map d_i in the bar construction: multiply adjacent entries. -/
-def barFace {M : Type u} (_S : StrictMonoid M) (n : Nat) (i : Fin (n + 1)) :
+noncomputable def barFace {M : Type u} (_S : StrictMonoid M) (n : Nat) (i : Fin (n + 1)) :
     BarLevel M (n + 1) → BarLevel M n
   | ⟨l, hl⟩ => by
     refine ⟨l.take i.val ++ l.drop (i.val + 1), ?_⟩
@@ -109,7 +109,7 @@ def barFace {M : Type u} (_S : StrictMonoid M) (n : Nat) (i : Fin (n + 1)) :
     omega
 
 /-- Degeneracy map s_i in the bar construction: insert the unit. -/
-def barDegeneracy {M : Type u} (S : StrictMonoid M) (n : Nat) (i : Fin (n + 1)) :
+noncomputable def barDegeneracy {M : Type u} (S : StrictMonoid M) (n : Nat) (i : Fin (n + 1)) :
     BarLevel M n → BarLevel M (n + 1)
   | ⟨l, hl⟩ => by
     refine ⟨l.take i.val ++ [S.one] ++ l.drop i.val, ?_⟩
@@ -140,7 +140,7 @@ namespace DeloopingData
 variable {X : Pointed}
 
 /-- The identity delooping: the loop space deloops to itself via loopPointed. -/
-def trivial (X : Pointed) : DeloopingData (loopPointed X) where
+noncomputable def trivial (X : Pointed) : DeloopingData (loopPointed X) where
   deloop := X
   toLoop := fun l => l
   fromLoop := fun l => l
@@ -169,7 +169,7 @@ structure MayRecognition (X : Pointed) where
         (e1.mul x y)
 
 /-- Given delooping data for a group-like E1 space, construct the recognition. -/
-def recognitionFromDelooping {X : Pointed}
+noncomputable def recognitionFromDelooping {X : Pointed}
     (e1 : GroupLikeE1Space X)
     (d : DeloopingData X)
     (h : ∀ x y : X.carrier,

@@ -185,7 +185,7 @@ structure SurgeryExactSeq where
   exact_at_N : True
 
 /-- The surgery exact sequence is exact. -/
-def surgery_exact (S : SurgeryExactSeq) : True := S.exact_at_S
+noncomputable def surgery_exact (S : SurgeryExactSeq) : True := S.exact_at_S
 
 /-! ## Surgery Below the Middle Dimension -/
 
@@ -205,7 +205,7 @@ structure SurgeryBelowMiddle (n : Nat) where
   is_connected : Path connectivity connectivity
 
 /-- Below middle dimension, surgery always works. -/
-def surgery_below_works (n : Nat) (S : SurgeryBelowMiddle n) :
+noncomputable def surgery_below_works (n : Nat) (S : SurgeryBelowMiddle n) :
     S.connectivity ≥ n / 2 :=
   S.conn_ge
 

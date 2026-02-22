@@ -45,19 +45,19 @@ structure AlgebraicCycleData (α : Type u) where
   deriving Repr, BEq
 
 /-- Zero cycle -/
-def AlgebraicCycleData.zero (x : α) (codim : Nat) : AlgebraicCycleData α :=
+noncomputable def AlgebraicCycleData.zero (x : α) (codim : Nat) : AlgebraicCycleData α :=
   { variety := x, codimension := codim, components := [],
     multiplicities := [], isEffective := true }
 
 /-- Sum of cycles -/
-def AlgebraicCycleData.add (c₁ c₂ : AlgebraicCycleData α) : AlgebraicCycleData α :=
+noncomputable def AlgebraicCycleData.add (c₁ c₂ : AlgebraicCycleData α) : AlgebraicCycleData α :=
   { variety := c₁.variety, codimension := c₁.codimension,
     components := c₁.components ++ c₂.components,
     multiplicities := c₁.multiplicities ++ c₂.multiplicities,
     isEffective := c₁.isEffective && c₂.isEffective }
 
 /-- Degree of a zero-cycle -/
-def AlgebraicCycleData.degree (c : AlgebraicCycleData α) : Int :=
+noncomputable def AlgebraicCycleData.degree (c : AlgebraicCycleData α) : Int :=
   c.multiplicities.foldl (· + ·) 0
 
 theorem algebraicCycle_zero_degree (x : α) (codim : Nat) :
@@ -89,12 +89,12 @@ structure ChowGroupData (α : Type u) where
   deriving Repr
 
 /-- Intersection product on Chow groups -/
-def ChowGroupData.intersect (ch₁ ch₂ : ChowGroupData α) : ChowGroupData α :=
+noncomputable def ChowGroupData.intersect (ch₁ ch₂ : ChowGroupData α) : ChowGroupData α :=
   { variety := ch₁.variety, codimension := ch₁.codimension + ch₂.codimension,
     generators := [], rank := 0 }
 
 /-- Path witnessing rational equivalence -/
-def rationalEquivPath {α : Type u} (c : AlgebraicCycleData α) :
+noncomputable def rationalEquivPath {α : Type u} (c : AlgebraicCycleData α) :
     Path c c :=
   Path.refl c
 
@@ -112,12 +112,12 @@ structure HigherChowGroupData (α : Type u) where
   deriving Repr, BEq
 
 /-- CH^p(X, 0) = CH^p(X) -/
-def HigherChowGroupData.classical (ch : ChowGroupData α) : HigherChowGroupData α :=
+noncomputable def HigherChowGroupData.classical (ch : ChowGroupData α) : HigherChowGroupData α :=
   { variety := ch.variety, codimension := ch.codimension,
     simplicialDegree := 0, generators := [], rank := ch.rank }
 
 /-- Path witnessing relation to K-theory: CH^p(X, n) ≅ gr^p K_n(X) -/
-def chowToKTheoryPath {α : Type u} (hcg : HigherChowGroupData α) :
+noncomputable def chowToKTheoryPath {α : Type u} (hcg : HigherChowGroupData α) :
     Path hcg hcg :=
   Path.refl hcg
 
@@ -138,12 +138,12 @@ structure CycleMapData (α : Type u) where
   deriving Repr
 
 /-- Cycle class map cl: CH^p(X) → H^{2p}(X) -/
-def CycleMapData.classMap (ch : ChowGroupData α) : CycleMapData α :=
+noncomputable def CycleMapData.classMap (ch : ChowGroupData α) : CycleMapData α :=
   { source := ch, targetCohomDegree := 2 * ch.codimension,
     targetCoefficients := "Z_l", isInjective := false, isSurjective := false }
 
 /-- Comparison map from cycle classes to singular cohomology over `ℂ`. -/
-def CycleMapData.singularComparison (ch : ChowGroupData α) : CycleMapData α :=
+noncomputable def CycleMapData.singularComparison (ch : ChowGroupData α) : CycleMapData α :=
   { (CycleMapData.classMap ch) with targetCoefficients := "Z" }
 
 theorem cycleMap_classMap_even_degree (ch : ChowGroupData α) :
@@ -159,7 +159,7 @@ theorem cycleMap_singularComparison_coefficients (ch : ChowGroupData α) :
     (CycleMapData.singularComparison ch).targetCoefficients = "Z" := rfl
 
 /-- Path witnessing functoriality of cycle map -/
-def cycleMapFunctorialPath {α : Type u} (cm : CycleMapData α) :
+noncomputable def cycleMapFunctorialPath {α : Type u} (cm : CycleMapData α) :
     Path cm cm :=
   Path.refl cm
 
@@ -181,17 +181,17 @@ structure BlochKatoData where
   deriving Repr, BEq
 
 /-- The norm residue isomorphism: K^M_n(F)/ℓ → H^n(F, μ_ℓ^⊗n) -/
-def BlochKatoData.normResidue (p : Nat) (f : String) (n r : Nat) : BlochKatoData :=
+noncomputable def BlochKatoData.normResidue (p : Nat) (f : String) (n r : Nat) : BlochKatoData :=
   { prime := p, field := f, degree := n,
     milnorKTheoryRank := r, galoisCohomRank := r }
 
 /-- Path witnessing Bloch–Kato isomorphism -/
-def blochKatoPath (bk : BlochKatoData) :
+noncomputable def blochKatoPath (bk : BlochKatoData) :
     Path bk bk :=
   Path.refl bk
 
 /-- Hilbert 90 as degree-1 case -/
-def hilbert90 (f : String) : BlochKatoData :=
+noncomputable def hilbert90 (f : String) : BlochKatoData :=
   BlochKatoData.normResidue 0 f 1 1
 
 -- ============================================================================
@@ -208,12 +208,12 @@ structure MotivicSpectralData (α : Type u) where
   deriving Repr
 
 /-- Atiyah–Hirzebruch type spectral sequence -/
-def MotivicSpectralData.atiyahHirzebruch (x : α) : MotivicSpectralData α :=
+noncomputable def MotivicSpectralData.atiyahHirzebruch (x : α) : MotivicSpectralData α :=
   { variety := x, e2Page := [], convergesTo := "K-theory",
     isDegenerate := false, degeneracyPage := 2 }
 
 /-- Path from E_r page to E_{r+1} (differential) -/
-def spectralDifferentialPath {α : Type u} (ms : MotivicSpectralData α) :
+noncomputable def spectralDifferentialPath {α : Type u} (ms : MotivicSpectralData α) :
     Path ms ms :=
   Path.refl ms
 
@@ -231,23 +231,23 @@ structure VoevodskyMotiveData (α : Type u) where
   deriving Repr, BEq
 
 /-- Tate motive Z(n)[2n] -/
-def VoevodskyMotiveData.tate (x : α) (n : Int) : VoevodskyMotiveData α :=
+noncomputable def VoevodskyMotiveData.tate (x : α) (n : Int) : VoevodskyMotiveData α :=
   { variety := x, twists := n, shifts := 2 * n,
     isDirect := true, label := s!"Z({n})" }
 
 /-- Motive of a smooth projective variety -/
-def VoevodskyMotiveData.ofVariety (x : α) : VoevodskyMotiveData α :=
+noncomputable def VoevodskyMotiveData.ofVariety (x : α) : VoevodskyMotiveData α :=
   { variety := x, twists := 0, shifts := 0, isDirect := true, label := "M(X)" }
 
 /-- Tensor product of motives -/
-def VoevodskyMotiveData.tensor (m₁ m₂ : VoevodskyMotiveData α) :
+noncomputable def VoevodskyMotiveData.tensor (m₁ m₂ : VoevodskyMotiveData α) :
     VoevodskyMotiveData α :=
   { variety := m₁.variety, twists := m₁.twists + m₂.twists,
     shifts := m₁.shifts + m₂.shifts, isDirect := true,
     label := m₁.label ++ " x " ++ m₂.label }
 
 /-- Dual motive -/
-def VoevodskyMotiveData.dual (m : VoevodskyMotiveData α) :
+noncomputable def VoevodskyMotiveData.dual (m : VoevodskyMotiveData α) :
     VoevodskyMotiveData α :=
   { variety := m.variety, twists := -m.twists, shifts := -m.shifts,
     isDirect := m.isDirect, label := m.label ++ "_dual" }
@@ -264,7 +264,7 @@ structure DistTriangleData (α : Type u) where
   deriving Repr
 
 /-- Gysin/localization triangle -/
-def DistTriangleData.gysin (open_ closed complement : VoevodskyMotiveData α) :
+noncomputable def DistTriangleData.gysin (open_ closed complement : VoevodskyMotiveData α) :
     DistTriangleData α :=
   { vertex1 := closed, vertex2 := open_, vertex3 := complement }
 
@@ -281,13 +281,13 @@ structure MotivicSteenrodData (α : Type u) where
   deriving Repr
 
 /-- Motivic Steenrod square -/
-def MotivicSteenrodData.sq (n : Nat) (m : VoevodskyMotiveData α) :
+noncomputable def MotivicSteenrodData.sq (n : Nat) (m : VoevodskyMotiveData α) :
     MotivicSteenrodData α :=
   { prime := 2, degree := n, source := m,
     target := { m with shifts := m.shifts + n } }
 
 /-- Path witnessing Adem relation -/
-def motivicAdemPath {α : Type u} (s : MotivicSteenrodData α) :
+noncomputable def motivicAdemPath {α : Type u} (s : MotivicSteenrodData α) :
     Path s s :=
   Path.refl s
 

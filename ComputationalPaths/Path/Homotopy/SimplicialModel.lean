@@ -51,7 +51,7 @@ abbrev Map (M : MappingSpaceData A) (a b : A) : SSetData :=
   M.map a b
 
 /-- Mapping spaces are Kan. -/
-def map_is_kan (M : MappingSpaceData A) (a b : A) :
+noncomputable def map_is_kan (M : MappingSpaceData A) (a b : A) :
     KanFillerProperty (Map M a b) :=
   M.kan a b
 
@@ -100,7 +100,7 @@ abbrev mappingSpace (M : SimplicialModelCategory A) (a b : A) : SSetData :=
   M.enrichment.map a b
 
 /-- Mapping spaces are Kan. -/
-def mappingSpace_is_kan (M : SimplicialModelCategory A) (a b : A) :
+noncomputable def mappingSpace_is_kan (M : SimplicialModelCategory A) (a b : A) :
     KanFillerProperty (mappingSpace M a b) :=
   M.enrichment.kan a b
 

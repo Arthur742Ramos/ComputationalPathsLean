@@ -17,10 +17,10 @@ universe u v w
 
 /-! ## Elementary path witnesses -/
 
-def edgePath {A : Type u} {a b : A} (h : a = b) : Path a b :=
+noncomputable def edgePath {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
-def reflPathViaMk {A : Type u} (a : A) : Path a a :=
+noncomputable def reflPathViaMk {A : Type u} (a : A) : Path a a :=
   Path.mk [] rfl
 
 @[simp] theorem edgePath_toEq {A : Type u} {a b : A} (h : a = b) :
@@ -83,20 +83,20 @@ structure OpetopicType (A : Type u) where
   id_left : (x : A) → Path (Gam Id x) x
   id_right : (x : A) → Path (Gam x Id) x
 
-def assocSym {A : Type u} (O : OpetopicType A) (x y z : A) :
+noncomputable def assocSym {A : Type u} (O : OpetopicType A) (x y z : A) :
     Path (O.Gam x (O.Gam y z)) (O.Gam (O.Gam x y) z) :=
   symm (O.assoc x y z)
 
-def assocChain {A : Type u} (O : OpetopicType A) (x y z w : A) :
+noncomputable def assocChain {A : Type u} (O : OpetopicType A) (x y z w : A) :
     Path (O.Gam (O.Gam (O.Gam x y) z) w) (O.Gam x (O.Gam y (O.Gam z w))) :=
   trans (O.assoc (O.Gam x y) z w) (O.assoc x y (O.Gam z w))
 
-def coherenceRouteLeft {A : Type u} (O : OpetopicType A) (x y z w : A) :
+noncomputable def coherenceRouteLeft {A : Type u} (O : OpetopicType A) (x y z w : A) :
     Path (O.Gam (O.Gam (O.Gam x y) z) w) (O.Gam x (O.Gam y (O.Gam z w))) :=
   trans (trans (O.assoc (O.Gam x y) z w) (O.assoc x y (O.Gam z w)))
     (refl (O.Gam x (O.Gam y (O.Gam z w))))
 
-def coherenceRouteRight {A : Type u} (O : OpetopicType A) (x y z w : A) :
+noncomputable def coherenceRouteRight {A : Type u} (O : OpetopicType A) (x y z w : A) :
     Path (O.Gam (O.Gam (O.Gam x y) z) w) (O.Gam x (O.Gam y (O.Gam z w))) :=
   trans (O.assoc (O.Gam x y) z w)
     (trans (O.assoc x y (O.Gam z w)) (refl (O.Gam x (O.Gam y (O.Gam z w)))))
@@ -164,7 +164,7 @@ theorem id_right_refl_trans {A : Type u} (O : OpetopicType A) (x : A) :
     trans (refl (O.Gam x O.Id)) (O.id_right x) = O.id_right x :=
   trans_refl_left (O.id_right x)
 
-def whisker_assoc {A : Type u} (O : OpetopicType A) (f : A → A) (x y z : A) :
+noncomputable def whisker_assoc {A : Type u} (O : OpetopicType A) (f : A → A) (x y z : A) :
     Path (f (O.Gam (O.Gam x y) z)) (f (O.Gam x (O.Gam y z))) :=
   congrArg f (O.assoc x y z)
 
@@ -196,15 +196,15 @@ structure ZoomComplex (A : Type u) where
   zoom : Nat → A → A
   contract : (n : Nat) → (x : A) → Path (zoom (n + 1) x) (zoom n x)
 
-def zoom_congr {A : Type u} (Z : ZoomComplex A) (n : Nat) {x y : A}
+noncomputable def zoom_congr {A : Type u} (Z : ZoomComplex A) (n : Nat) {x y : A}
     (p : Path x y) : Path (Z.zoom n x) (Z.zoom n y) :=
   congrArg (fun t => Z.zoom n t) p
 
-def contractTwo {A : Type u} (Z : ZoomComplex A) (n : Nat) (x : A) :
+noncomputable def contractTwo {A : Type u} (Z : ZoomComplex A) (n : Nat) (x : A) :
     Path (Z.zoom (n + 2) x) (Z.zoom n x) :=
   trans (Z.contract (n + 1) x) (Z.contract n x)
 
-def contractThree {A : Type u} (Z : ZoomComplex A) (n : Nat) (x : A) :
+noncomputable def contractThree {A : Type u} (Z : ZoomComplex A) (n : Nat) (x : A) :
     Path (Z.zoom (n + 3) x) (Z.zoom n x) :=
   trans (Z.contract (n + 2) x) (contractTwo Z n x)
 
@@ -274,7 +274,7 @@ structure UniversalCell {A : Type u} (O : OpetopicType A) where
   leftFactor : Path (O.Gam src mediator) tgt
   rightFactor : Path (O.Gam mediator src) tgt
 
-def composeViaUniversal {A : Type u} (O : OpetopicType A) (U : UniversalCell O) :
+noncomputable def composeViaUniversal {A : Type u} (O : OpetopicType A) (U : UniversalCell O) :
     Path (O.Gam U.src U.mediator) (O.Gam U.mediator U.src) :=
   trans U.leftFactor (symm U.rightFactor)
 
@@ -339,7 +339,7 @@ structure OpetopicCategory (Obj : Type u) (Mor : Type v) where
   id_left : (f : Mor) → Path (Gam (Id (src f)) f) f
   id_right : (f : Mor) → Path (Gam f (Id (tgt f))) f
 
-def catAssocChain {Obj : Type u} {Mor : Type v} (C : OpetopicCategory Obj Mor)
+noncomputable def catAssocChain {Obj : Type u} {Mor : Type v} (C : OpetopicCategory Obj Mor)
     (f g h k : Mor) : Path (C.Gam (C.Gam (C.Gam f g) h) k) (C.Gam f (C.Gam g (C.Gam h k))) :=
   trans (C.assoc (C.Gam f g) h k) (C.assoc f g (C.Gam h k))
 
@@ -445,7 +445,7 @@ inductive Multitope (A : Type u) where
   | unit : Multitope A
   | join : Multitope A → Multitope A → Multitope A
 
-def multitopeMap {A : Type u} {B : Type v} (f : A → B) : Multitope A → Multitope B
+noncomputable def multitopeMap {A : Type u} {B : Type v} (f : A → B) : Multitope A → Multitope B
   | .atom a => .atom (f a)
   | .unit => .unit
   | .join x y => .join (multitopeMap f x) (multitopeMap f y)

@@ -74,7 +74,7 @@ noncomputable def inertiaCompat_cancel_rweq (ρ : Rep) :
 end LocalLanglandsPathData
 
 /-- Build local Langlands path data from primary path-level witnesses. -/
-def mkLocalLanglandsPathData
+noncomputable def mkLocalLanglandsPathData
     {Rep : Type u} {Param : Type v}
     (toParameter : Rep → Param)
     (frobeniusTwist : Rep → Rep)

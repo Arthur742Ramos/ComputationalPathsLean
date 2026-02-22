@@ -67,7 +67,7 @@ inductive ArithClass
   | pi1 : Nat → ArithClass
 
 /-- Path: Δ⁰ₙ = Σ⁰ₙ ∩ Π⁰ₙ (recorded as self-Path). -/
-def delta_is_intersection (n : Nat) :
+noncomputable def delta_is_intersection (n : Nat) :
     Path (ArithClass.delta n) (ArithClass.delta n) :=
   Path.refl _
 
@@ -115,13 +115,13 @@ structure Pi11CA0 extends ATR0 where
 /-! ## Implications -/
 
 /-- WKL₀ extends RCA₀. -/
-def wkl_extends_rca (W : WKL0) : RCA0 := W.toRCA0
+noncomputable def wkl_extends_rca (W : WKL0) : RCA0 := W.toRCA0
 
 /-- ACA₀ extends RCA₀. -/
-def aca_extends_rca (A : ACA0) : RCA0 := A.toRCA0
+noncomputable def aca_extends_rca (A : ACA0) : RCA0 := A.toRCA0
 
 /-- ACA₀ implies WKL₀ (simplified). -/
-def aca_implies_wkl (A : ACA0) : WKL0 where
+noncomputable def aca_implies_wkl (A : ACA0) : WKL0 where
   toRCA0 := A.toRCA0
   BinTree := fun _ => True
   isInfinite := fun _ => True
@@ -129,7 +129,7 @@ def aca_implies_wkl (A : ACA0) : WKL0 where
     ⟨fun _ => A.zero, fun _ => Or.inl rfl⟩
 
 /-- Big Five chain as a Path. -/
-def big_five_chain : Path (True : Prop) True := Path.refl _
+noncomputable def big_five_chain : Path (True : Prop) True := Path.refl _
 
 /-! ## Conservation Results -/
 
@@ -141,21 +141,21 @@ structure ConservationResult where
   conservation : Path (True : Prop) True
 
 /-- WKL₀ is Π⁰₂-conservative over RCA₀. -/
-def wkl_pi02_conservation : ConservationResult where
+noncomputable def wkl_pi02_conservation : ConservationResult where
   stronger := "WKL₀"
   weaker := "RCA₀"
   formula_class := ArithClass.pi 2
   conservation := Path.refl _
 
 /-- WKL₀ is Π¹₁-conservative over RCA₀. -/
-def wkl_pi11_conservation : ConservationResult where
+noncomputable def wkl_pi11_conservation : ConservationResult where
   stronger := "WKL₀"
   weaker := "RCA₀"
   formula_class := ArithClass.pi1 1
   conservation := Path.refl _
 
 /-- Composition of conservation via Path.trans. -/
-def conservation_compose (c₁ c₂ : ConservationResult)
+noncomputable def conservation_compose (c₁ c₂ : ConservationResult)
     (_ : c₁.weaker = c₂.stronger) : ConservationResult where
   stronger := c₁.stronger
   weaker := c₂.weaker
@@ -180,7 +180,7 @@ structure ReverseEquivalence where
   reverse : Path (True : Prop) True
 
 /-- WKL₀ ↔ IVT over RCA₀. -/
-def wkl_equiv_ivt : ReverseEquivalence where
+noncomputable def wkl_equiv_ivt : ReverseEquivalence where
   base := "RCA₀"
   axiom_system := "WKL₀"
   theorem_statement := True
@@ -188,7 +188,7 @@ def wkl_equiv_ivt : ReverseEquivalence where
   reverse := Path.refl _
 
 /-- ACA₀ ↔ Bolzano-Weierstrass over RCA₀. -/
-def aca_equiv_bw : ReverseEquivalence where
+noncomputable def aca_equiv_bw : ReverseEquivalence where
   base := "RCA₀"
   axiom_system := "ACA₀"
   theorem_statement := True
@@ -196,7 +196,7 @@ def aca_equiv_bw : ReverseEquivalence where
   reverse := Path.refl _
 
 /-- ACA₀ ↔ monotone convergence over RCA₀. -/
-def aca_equiv_monotone_conv : ReverseEquivalence where
+noncomputable def aca_equiv_monotone_conv : ReverseEquivalence where
   base := "RCA₀"
   axiom_system := "ACA₀"
   theorem_statement := True
@@ -204,7 +204,7 @@ def aca_equiv_monotone_conv : ReverseEquivalence where
   reverse := Path.refl _
 
 /-- ATR₀ ↔ comparability of well-orderings over RCA₀. -/
-def atr_equiv_comparability : ReverseEquivalence where
+noncomputable def atr_equiv_comparability : ReverseEquivalence where
   base := "RCA₀"
   axiom_system := "ATR₀"
   theorem_statement := True
@@ -212,7 +212,7 @@ def atr_equiv_comparability : ReverseEquivalence where
   reverse := Path.refl _
 
 /-- Two equivalences for the same axiom system yield T₁ ↔ T₂. -/
-def equiv_via_system (e₁ e₂ : ReverseEquivalence)
+noncomputable def equiv_via_system (e₁ e₂ : ReverseEquivalence)
     (_ : e₁.axiom_system = e₂.axiom_system) :
     Path (True : Prop) True :=
   Path.trans (Path.trans e₁.forward (Path.symm e₁.reverse))
@@ -233,7 +233,7 @@ structure BetaModel extends OmegaModel where
     sets (fun n => ∃ s, T n s) → Path (True : Prop) True
 
 /-- β-model satisfies ATR₀. -/
-def beta_model_atr (_ : BetaModel) : Path (True : Prop) True :=
+noncomputable def beta_model_atr (_ : BetaModel) : Path (True : Prop) True :=
   Path.refl _
 
 /-! ## Coded Sets -/
@@ -254,7 +254,7 @@ structure EffectiveTR where
 /-! ## Conservation Chain -/
 
 /-- Multi-step: chain of conservation results. -/
-def conservation_chain : Path (True : Prop) True :=
+noncomputable def conservation_chain : Path (True : Prop) True :=
   Path.trans wkl_pi02_conservation.conservation
     wkl_pi11_conservation.conservation
 
@@ -277,7 +277,7 @@ structure BigFiveHierarchy where
   aca_base : Path aca.toRCA0 rca
 
 /-- The hierarchy is linear (via Path.trans). -/
-def hierarchy_linear (H : BigFiveHierarchy) :
+noncomputable def hierarchy_linear (H : BigFiveHierarchy) :
     Path H.wkl.toRCA0 H.aca.toRCA0 :=
   Path.trans H.wkl_base (Path.symm H.aca_base)
 

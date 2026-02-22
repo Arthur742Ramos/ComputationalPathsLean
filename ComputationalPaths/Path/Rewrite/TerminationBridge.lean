@@ -50,7 +50,7 @@ metadata evolves deterministically.  We package this via the steps-length
 measure. -/
 
 /-- The steps-length of a path as a complexity measure. -/
-def complexity (p : Path a b) : Nat := p.steps.length
+noncomputable def complexity (p : Path a b) : Nat := p.steps.length
 
 /-- Refl has complexity 0. -/
 @[simp] theorem complexity_refl (x : A) : complexity (Path.refl x) = 0 := by
@@ -125,7 +125,7 @@ structure TermConfData where
   allPairsClose : Bool
 
 /-- Standard data for the computational path TRS. -/
-def standardTermConfData : TermConfData :=
+noncomputable def standardTermConfData : TermConfData :=
   { ruleCount := 50      -- approximately 50 rules in Step
   , maxRank := 49        -- Rule.rank goes up to 49
   , criticalPairCount := 0  -- in the minimal PathExpr core

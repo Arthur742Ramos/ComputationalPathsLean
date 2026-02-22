@@ -278,49 +278,49 @@ structure GrothendieckSS {O₁ : Type u} {H₁ : O₁ → O₁ → Type v}
     §18  PUnit witnesses — trivial instantiation for all structures
     ================================================================ -/
 
-private def pp' {a b : PUnit} : @Path PUnit a b := by
+private noncomputable def pp' {a b : PUnit} : @Path PUnit a b := by
   cases a; cases b; exact Path.refl _
 
-private def puOps : CatOps PUnit (fun _ _ => PUnit) where
+private noncomputable def puOps : CatOps PUnit (fun _ _ => PUnit) where
   id := fun _ => .unit; comp := fun _ _ => .unit
   zero := fun _ _ => .unit; add := fun _ _ => .unit; neg := fun _ => .unit
 
-private def puCC : ChainCx puOps :=
+private noncomputable def puCC : ChainCx puOps :=
   { obj := fun _ => .unit, d := fun _ => .unit, d_sq := fun _ => pp' }
 
-private def puCoCC : CochainCx puOps :=
+private noncomputable def puCoCC : CochainCx puOps :=
   { obj := fun _ => .unit, d := fun _ => .unit, d_sq := fun _ => pp' }
 
-private def puPR : ProjRes puOps PUnit.unit :=
+private noncomputable def puPR : ProjRes puOps PUnit.unit :=
   { complex := puCC, augment := .unit }
 
-private def puIR : InjRes puOps PUnit.unit :=
+private noncomputable def puIR : InjRes puOps PUnit.unit :=
   { complex := puCoCC, augment := .unit }
 
-private def puCM : ChainMap puOps puCC puCC :=
+private noncomputable def puCM : ChainMap puOps puCC puCC :=
   { f := fun _ => .unit, comm := fun _ => pp' }
 
-private def puExt : ExtGrp puOps PUnit.unit PUnit.unit :=
+private noncomputable def puExt : ExtGrp puOps PUnit.unit PUnit.unit :=
   { value := fun _ => .unit, res := puIR }
 
-private def puTor : TorGrp puOps PUnit.unit PUnit.unit :=
+private noncomputable def puTor : TorGrp puOps PUnit.unit PUnit.unit :=
   { value := fun _ => .unit, res := puPR }
 
-private def puHom (n : Nat) : HomologyAt puOps puCC n :=
+private noncomputable def puHom (n : Nat) : HomologyAt puOps puCC n :=
   { cycles := .unit, boundaries := .unit, homology := .unit,
     cycleInc := .unit, bdryInc := .unit, proj := .unit,
     bdry_zero := pp' }
 
-private def puSES : ShortExact puOps PUnit.unit PUnit.unit PUnit.unit :=
+private noncomputable def puSES : ShortExact puOps PUnit.unit PUnit.unit PUnit.unit :=
   { inc := .unit, pr := .unit, comp_zero := pp' }
 
-private def puSS : SpectralSeq puOps :=
+private noncomputable def puSS : SpectralSeq puOps :=
   { E := fun _ _ _ => .unit, d := fun _ _ _ => .unit }
 
-private def puFun : FunctorData puOps puOps :=
+private noncomputable def puFun : FunctorData puOps puOps :=
   { mapObj := fun _ => .unit, mapMor := fun _ => .unit, map_id := fun _ => pp' }
 
-private def puConnecting : ConnectingData puOps PUnit.unit PUnit.unit PUnit.unit :=
+private noncomputable def puConnecting : ConnectingData puOps PUnit.unit PUnit.unit PUnit.unit :=
   { ses := puSES,
     homA := fun _ => .unit, homB := fun _ => .unit, homC := fun _ => .unit,
     iStar := fun _ => .unit, pStar := fun _ => .unit, delta := fun _ => .unit,
@@ -442,7 +442,7 @@ theorem ss_conv_roundtrip (ss : SpectralSeq puOps) (cv : SSConvergence puOps ss)
     (Path.trans (cv.conv p q) (Path.symm (cv.conv p q))).toEq = rfl := by simp
 
 -- 20: Deep congrArg on d²: mapping through a function preserves zero
-def d_sq_congrArg {Obj : Type u} {Hom : Obj → Obj → Type v}
+noncomputable def d_sq_congrArg {Obj : Type u} {Hom : Obj → Obj → Type v}
     {ops : CatOps Obj Hom}
     (C : ChainCx ops) (n : Nat)
     (f : Hom (C.obj (n + 2)) (C.obj n) → Hom (C.obj (n + 2)) (C.obj n)) :
@@ -451,7 +451,7 @@ def d_sq_congrArg {Obj : Type u} {Hom : Obj → Obj → Type v}
   Path.congrArg f (C.d_sq n)
 
 -- 21: Deep: chain map comm congrArg through an endomorphism
-def chain_map_comm_congrArg {Obj : Type u} {Hom : Obj → Obj → Type v}
+noncomputable def chain_map_comm_congrArg {Obj : Type u} {Hom : Obj → Obj → Type v}
     {ops : CatOps Obj Hom} {C D : ChainCx ops}
     (fm : ChainMap ops C D) (n : Nat)
     (g : Hom (C.obj (n + 1)) (D.obj n) → Hom (C.obj (n + 1)) (D.obj n)) :
@@ -460,7 +460,7 @@ def chain_map_comm_congrArg {Obj : Type u} {Hom : Obj → Obj → Type v}
   Path.congrArg g (fm.comm n)
 
 -- 22: Deep 3-step trans chain: d_sq composed via congrArg + trans
-def d_sq_deep_trans {Obj : Type u} {Hom : Obj → Obj → Type v}
+noncomputable def d_sq_deep_trans {Obj : Type u} {Hom : Obj → Obj → Type v}
     {ops : CatOps Obj Hom}
     (C : ChainCx ops) (n : Nat)
     (f : Hom (C.obj (n + 2)) (C.obj n) → Hom (C.obj (n + 2)) (C.obj n)) :
@@ -542,7 +542,7 @@ theorem pu_ses_d_sq_chain (n : Nat) :
     rfl := by simp
 
 -- 32: Deep: double congrArg through nested function applications
-def double_congrArg_d_sq
+noncomputable def double_congrArg_d_sq
     {Obj : Type u} {Hom : Obj → Obj → Type v}
     {ops : CatOps Obj Hom}
     (C : ChainCx ops) (n : Nat)
@@ -563,7 +563,7 @@ theorem trans_congrArg_compose
                (Path.congrArg f (Path.symm (C.d_sq n))) := by simp
 
 -- 34: Deep: 4-fold nested congrArg
-def quad_congrArg_d_sq
+noncomputable def quad_congrArg_d_sq
     {Obj : Type u} {Hom : Obj → Obj → Type v}
     {ops : CatOps Obj Hom}
     (C : ChainCx ops) (n : Nat)

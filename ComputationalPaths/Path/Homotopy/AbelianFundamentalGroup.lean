@@ -41,7 +41,7 @@ structure PiOneOps (G : Type u) where
   mul_one : ∀ x, mul x one = x
 
 /-- A pi_1-style multiplication is abelian when it commutes. -/
-def PiOneAbelian (G : Type u) (ops : PiOneOps G) : Prop :=
+noncomputable def PiOneAbelian (G : Type u) (ops : PiOneOps G) : Prop :=
   ∀ x y : G, ops.mul x y = ops.mul y x
 
 /-- Interchange data for two multiplications with a common unit. -/
@@ -84,11 +84,11 @@ theorem piOne_comm_of_interchange {G : Type u} {ops : PiOneOps G}
 /-! ## Torus pi_1 (Z x Z) -/
 
 /-- Componentwise addition on integer pairs. -/
-def intProdAdd (x y : Int × Int) : Int × Int :=
+noncomputable def intProdAdd (x y : Int × Int) : Int × Int :=
   (x.1 + y.1, x.2 + y.2)
 
 /-- Zero element in `Int × Int`. -/
-def intProdZero : Int × Int :=
+noncomputable def intProdZero : Int × Int :=
   (0, 0)
 
 @[simp] theorem intProdAdd_zero_left (x : Int × Int) :

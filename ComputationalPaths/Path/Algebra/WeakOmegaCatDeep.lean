@@ -42,45 +42,45 @@ inductive SPath (α : Type) (R : α → α → Prop) : α → α → Type where
   | nil  : (a : α) → SPath α R a a
   | cons : {a b c : α} → SStep α R a b → SPath α R b c → SPath α R a c
 
-def Path.trans {α R} {a b c : α}
+noncomputable def Path.trans {α R} {a b c : α}
     (p : Path α R a b) (q : Path α R b c) : Path α R a c :=
   match p with
   | .nil _    => q
   | .cons s r => .cons s (r.trans q)
 
-def SPath.trans {α R} {a b c : α}
+noncomputable def SPath.trans {α R} {a b c : α}
     (p : SPath α R a b) (q : SPath α R b c) : SPath α R a c :=
   match p with
   | .nil _    => q
   | .cons s r => .cons s (r.trans q)
 
-def SStep.symm {α R} {a b : α} (s : SStep α R a b) : SStep α R b a :=
+noncomputable def SStep.symm {α R} {a b : α} (s : SStep α R a b) : SStep α R b a :=
   match s with
   | .fwd st => .bwd st
   | .bwd st => .fwd st
 
-def SPath.symm {α R} {a b : α} (p : SPath α R a b) : SPath α R b a :=
+noncomputable def SPath.symm {α R} {a b : α} (p : SPath α R a b) : SPath α R b a :=
   match p with
   | .nil _    => .nil _
   | .cons s r => r.symm.trans (.cons s.symm (.nil _))
 
-def Path.length {α R} {a b : α} (p : Path α R a b) : Nat :=
+noncomputable def Path.length {α R} {a b : α} (p : Path α R a b) : Nat :=
   match p with
   | .nil _    => 0
   | .cons _ r => 1 + r.length
 
-def SPath.length {α R} {a b : α} (p : SPath α R a b) : Nat :=
+noncomputable def SPath.length {α R} {a b : α} (p : SPath α R a b) : Nat :=
   match p with
   | .nil _    => 0
   | .cons _ r => 1 + r.length
 
-def Path.single {α R} {a b : α} (s : Step α R a b) : Path α R a b :=
+noncomputable def Path.single {α R} {a b : α} (s : Step α R a b) : Path α R a b :=
   .cons s (.nil _)
 
-def SPath.single {α R} {a b : α} (s : SStep α R a b) : SPath α R a b :=
+noncomputable def SPath.single {α R} {a b : α} (s : SStep α R a b) : SPath α R a b :=
   .cons s (.nil _)
 
-def Path.toSPath {α R} {a b : α} (p : Path α R a b) : SPath α R a b :=
+noncomputable def Path.toSPath {α R} {a b : α} (p : Path α R a b) : SPath α R a b :=
   match p with
   | .nil _    => .nil _
   | .cons s r => .cons (.fwd s) r.toSPath
@@ -97,11 +97,11 @@ structure GlobularSet where
   Mor3   : {a b : Obj} → {p q : Mor a b} → Mor2 p q → Mor2 p q → Type  -- 3-cells
 
 /-- Source of a 1-cell. -/
-def GlobularSet.src {G : GlobularSet} {a b : G.Obj}
+noncomputable def GlobularSet.src {G : GlobularSet} {a b : G.Obj}
     (_ : G.Mor a b) : G.Obj := a
 
 /-- Target of a 1-cell. -/
-def GlobularSet.tgt {G : GlobularSet} {a b : G.Obj}
+noncomputable def GlobularSet.tgt {G : GlobularSet} {a b : G.Obj}
     (_ : G.Mor a b) : G.Obj := b
 
 /-- Theorem 1: Globular identity s∘s = s∘t for 2-cells.
@@ -116,7 +116,7 @@ theorem globular_ts_eq_tt {G : GlobularSet} {a b : G.Obj}
     G.tgt p = G.tgt q := by rfl
 
 /-- Build a GlobularSet from our path tower (using Unit for higher cells). -/
-def pathGlobularSet (α : Type) (R : α → α → Prop) : GlobularSet where
+noncomputable def pathGlobularSet (α : Type) (R : α → α → Prop) : GlobularSet where
   Obj  := α
   Mor  := fun a b => SPath α R a b
   Mor2 := fun _ _ => Unit
@@ -162,13 +162,13 @@ inductive Cell4 (α : Type) (R : α → α → Prop) :
 
 -- Symmetry at each level
 
-def Cell2.symm2 {α R} {a b : α} {p q : SPath α R a b}
+noncomputable def Cell2.symm2 {α R} {a b : α} {p q : SPath α R a b}
     (h : Cell2 α R p q) : Cell2 α R q p :=
   match h with
   | .refl2 _      => .refl2 _
   | .trans2 h1 h2 => h2.symm2.trans2 h1.symm2
 
-def Cell3.symm3 {α R} {a b : α} {p q : SPath α R a b}
+noncomputable def Cell3.symm3 {α R} {a b : α} {p q : SPath α R a b}
     {h₁ h₂ : Cell2 α R p q}
     (m : Cell3 α R h₁ h₂) : Cell3 α R h₂ h₁ :=
   match m with
@@ -180,17 +180,17 @@ def Cell3.symm3 {α R} {a b : α} {p q : SPath α R a b}
 -- ============================================================
 
 /-- 0-composition: sequential composition of 1-cells = trans. -/
-def comp0 {α R} {a b c : α}
+noncomputable def comp0 {α R} {a b c : α}
     (p : SPath α R a b) (q : SPath α R b c) : SPath α R a c :=
   p.trans q
 
 /-- 1-composition: vertical composition of 2-cells = trans2. -/
-def comp1 {α R} {a b : α} {p q r : SPath α R a b}
+noncomputable def comp1 {α R} {a b : α} {p q r : SPath α R a b}
     (h₁ : Cell2 α R p q) (h₂ : Cell2 α R q r) : Cell2 α R p r :=
   .trans2 h₁ h₂
 
 /-- 2-composition: vertical composition of 3-cells = trans3. -/
-def comp2 {α R} {a b : α} {p q : SPath α R a b}
+noncomputable def comp2 {α R} {a b : α} {p q : SPath α R a b}
     {h₁ h₂ h₃ : Cell2 α R p q}
     (m₁ : Cell3 α R h₁ h₂) (m₂ : Cell3 α R h₂ h₃) : Cell3 α R h₁ h₃ :=
   .trans3 m₁ m₂
@@ -216,17 +216,17 @@ theorem comp2_eq_trans3 {α R} {a b : α} {p q : SPath α R a b}
 -- ============================================================
 
 /-- Identity 1-cell = refl path. -/
-def id1 {α R} (a : α) : SPath α R a a := SPath.nil a
+noncomputable def id1 {α R} (a : α) : SPath α R a a := SPath.nil a
 
 /-- Identity 2-cell = refl 2-cell. -/
-def id2 {α R} {a b : α} (p : SPath α R a b) : Cell2 α R p p := Cell2.refl2 p
+noncomputable def id2 {α R} {a b : α} (p : SPath α R a b) : Cell2 α R p p := Cell2.refl2 p
 
 /-- Identity 3-cell = refl 3-cell. -/
-def id3 {α R} {a b : α} {p q : SPath α R a b}
+noncomputable def id3 {α R} {a b : α} {p q : SPath α R a b}
     (h : Cell2 α R p q) : Cell3 α R h h := Cell3.refl3 h
 
 /-- Identity 4-cell = refl 4-cell. -/
-def id4 {α R} {a b : α} {p q : SPath α R a b}
+noncomputable def id4 {α R} {a b : α} {p q : SPath α R a b}
     {h₁ h₂ : Cell2 α R p q}
     (m : Cell3 α R h₁ h₂) : Cell4 α R m m := Cell4.refl4 m
 
@@ -314,7 +314,7 @@ theorem symm3_refl3 {α R} {a b : α} {p q : SPath α R a b}
 
 /-- The associator 2-cell: (p∘q)∘r ⇒ p∘(q∘r).
     At level 0 this is definitional, so we get refl2. -/
-def associator {α R} {a b c d : α}
+noncomputable def associator {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
     Cell2 α R (comp0 (comp0 p q) r) (comp0 p (comp0 q r)) := by
   rw [comp0_assoc]
@@ -327,7 +327,7 @@ theorem associator_eq_refl {α R} {a b c d : α}
   exact ⟨associator p q r, trivial⟩
 
 /-- The associator inverse. -/
-def associatorInv {α R} {a b c d : α}
+noncomputable def associatorInv {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
     Cell2 α R (comp0 p (comp0 q r)) (comp0 (comp0 p q) r) :=
   (associator p q r).symm2
@@ -344,13 +344,13 @@ theorem associator_inv_comp {α R} {a b c d : α}
 -- ============================================================
 
 /-- Left unitor: id∘f ⇒ f. Definitional since nil.trans p = p. -/
-def leftUnitor {α R} {a b : α} (p : SPath α R a b) :
+noncomputable def leftUnitor {α R} {a b : α} (p : SPath α R a b) :
     Cell2 α R (comp0 (id1 a) p) p := by
   simp [comp0, id1, SPath.trans]
   exact Cell2.refl2 p
 
 /-- Right unitor: f∘id ⇒ f. -/
-def rightUnitor {α R} {a b : α} (p : SPath α R a b) :
+noncomputable def rightUnitor {α R} {a b : α} (p : SPath α R a b) :
     Cell2 α R (comp0 p (id1 b)) p := by
   rw [comp0_nil_right]
   exact Cell2.refl2 p
@@ -366,12 +366,12 @@ theorem rightUnitor_exists {α R} {a b : α} (p : SPath α R a b) :
   exact ⟨rightUnitor p, trivial⟩
 
 /-- Left unitor inverse. -/
-def leftUnitorInv {α R} {a b : α} (p : SPath α R a b) :
+noncomputable def leftUnitorInv {α R} {a b : α} (p : SPath α R a b) :
     Cell2 α R p (comp0 (id1 a) p) :=
   (leftUnitor p).symm2
 
 /-- Right unitor inverse. -/
-def rightUnitorInv {α R} {a b : α} (p : SPath α R a b) :
+noncomputable def rightUnitorInv {α R} {a b : α} (p : SPath α R a b) :
     Cell2 α R p (comp0 p (id1 b)) :=
   (rightUnitor p).symm2
 
@@ -385,7 +385,7 @@ theorem leftUnitor_roundtrip {α R} {a b : α} (p : SPath α R a b) :
 -- ============================================================
 
 /-- Left whiskering: a 1-cell on the left of a 2-cell. -/
-def Cell2.whiskerL {α R} {a b c : α}
+noncomputable def Cell2.whiskerL {α R} {a b c : α}
     (r : SPath α R a b) {p q : SPath α R b c}
     (h : Cell2 α R p q) : Cell2 α R (r.trans p) (r.trans q) :=
   match h with
@@ -393,7 +393,7 @@ def Cell2.whiskerL {α R} {a b c : α}
   | .trans2 h1 h2 => (h1.whiskerL r).trans2 (h2.whiskerL r)
 
 /-- Right whiskering. -/
-def Cell2.whiskerR {α R} {a b c : α}
+noncomputable def Cell2.whiskerR {α R} {a b c : α}
     {p q : SPath α R a b} (h : Cell2 α R p q)
     (r : SPath α R b c) : Cell2 α R (p.trans r) (q.trans r) :=
   match h with
@@ -401,7 +401,7 @@ def Cell2.whiskerR {α R} {a b c : α}
   | .trans2 h1 h2 => (h1.whiskerR r).trans2 (h2.whiskerR r)
 
 /-- Horizontal composition via whiskering. -/
-def Cell2.hcomp {α R} {a b c : α}
+noncomputable def Cell2.hcomp {α R} {a b c : α}
     {p₁ q₁ : SPath α R a b} {p₂ q₂ : SPath α R b c}
     (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R p₂ q₂) :
     Cell2 α R (p₁.trans p₂) (q₁.trans q₂) :=
@@ -479,34 +479,34 @@ theorem interchange_id {α R} {a b c : α}
 -- §12  congrArg as ω-Functor
 -- ============================================================
 
-def Step.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Step.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (s : Step α R a b) : Step β S (f a) (f b) :=
   match s with
   | .mk r => .mk (hf _ _ r)
 
-def SStep.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def SStep.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (s : SStep α R a b) : SStep β S (f a) (f b) :=
   match s with
   | .fwd st => .fwd (st.map f hf)
   | .bwd st => .bwd (st.map f hf)
 
-def Path.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Path.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (p : Path α R a b) : Path β S (f a) (f b) :=
   match p with
   | .nil _    => .nil _
   | .cons s r => .cons (s.map f hf) (r.map f hf)
 
-def SPath.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def SPath.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (p : SPath α R a b) : SPath β S (f a) (f b) :=
   match p with
   | .nil _    => .nil _
   | .cons s r => .cons (s.map f hf) (r.map f hf)
 
-def Cell2.map2 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Cell2.map2 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} {p q : SPath α R a b}
     (h : Cell2 α R p q) : Cell2 β S (p.map f hf) (q.map f hf) :=
@@ -514,7 +514,7 @@ def Cell2.map2 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
   | .refl2 _      => .refl2 _
   | .trans2 h1 h2 => .trans2 (h1.map2 f hf) (h2.map2 f hf)
 
-def Cell3.map3 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Cell3.map3 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} {p q : SPath α R a b}
     {h₁ h₂ : Cell2 α R p q}
@@ -669,7 +669,7 @@ structure TransportData (α : Type) (R : α → α → Prop) (P : α → Type) w
   stepAct : {a b : α} → Step α R a b → P a → P b
   stepInv : {a b : α} → Step α R a b → P b → P a
 
-def transportPath {α : Type} {R : α → α → Prop} {P : α → Type}
+noncomputable def transportPath {α : Type} {R : α → α → Prop} {P : α → Type}
     (td : TransportData α R P) {a b : α} (p : Path α R a b) : P a → P b :=
   match p with
   | .nil _    => id
@@ -703,7 +703,7 @@ structure InnerHorn (α : Type) (R : α → α → Prop) (a b c : α) where
   left  : SPath α R a b
   right : SPath α R b c
 
-def innerKanFill {α R} {a b c : α}
+noncomputable def innerKanFill {α R} {a b c : α}
     (horn : InnerHorn α R a b c) : SPath α R a c :=
   horn.left.trans horn.right
 
@@ -738,8 +738,8 @@ inductive TruncLevel : Type where
   | neg2 : TruncLevel
   | succ : TruncLevel → TruncLevel
 
-def TruncLevel.neg1 : TruncLevel := .succ .neg2
-def TruncLevel.zero : TruncLevel := .succ .neg1
+noncomputable def TruncLevel.neg1 : TruncLevel := .succ .neg2
+noncomputable def TruncLevel.zero : TruncLevel := .succ .neg1
 
 /-- Theorem 58: neg1 definition. -/
 theorem truncLevel_neg1 : TruncLevel.neg1 = TruncLevel.succ .neg2 := by rfl
@@ -764,7 +764,7 @@ structure WeakOmegaCat (α : Type) where
   vcomp2 : {a b : α} → {p q r : cell1 a b} → cell2 p q → cell2 q r → cell2 p r
 
 /-- Build a WeakOmegaCat from our path tower. -/
-def mkWeakOmegaCat (α : Type) (R : α → α → Prop) : WeakOmegaCat α where
+noncomputable def mkWeakOmegaCat (α : Type) (R : α → α → Prop) : WeakOmegaCat α where
   rel     := R
   cell1   := fun a b => SPath α R a b
   cell2   := fun p q => Cell2 α R p q
@@ -805,10 +805,10 @@ abbrev Loop (α : Type) (R : α → α → Prop) (a : α) := SPath α R a a
 abbrev Loop2 (α : Type) (R : α → α → Prop) (a : α) :=
   Cell2 α R (SPath.nil a) (SPath.nil a)
 
-def Loop2.vcomp {α R} {a : α} (h₁ h₂ : Loop2 α R a) : Loop2 α R a :=
+noncomputable def Loop2.vcomp {α R} {a : α} (h₁ h₂ : Loop2 α R a) : Loop2 α R a :=
   h₁.trans2 h₂
 
-def Loop2.hcomp {α R} {a : α} (h₁ h₂ : Loop2 α R a) : Loop2 α R a :=
+noncomputable def Loop2.hcomp {α R} {a : α} (h₁ h₂ : Loop2 α R a) : Loop2 α R a :=
   Cell2.hcomp h₁ h₂
 
 /-- Theorem 65: vcomp unfolds correctly. -/

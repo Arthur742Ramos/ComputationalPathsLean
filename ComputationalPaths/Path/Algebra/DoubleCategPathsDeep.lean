@@ -66,19 +66,19 @@ inductive HPath : HEdge → HEdge → Type where
   | cons : HStep a b → HPath b c → HPath a c
 
 /-- Theorem 1 — horizontal refl. -/
-def HPath.refl (a : HEdge) : HPath a a := HPath.nil a
+noncomputable def HPath.refl (a : HEdge) : HPath a a := HPath.nil a
 
 /-- Theorem 2 — single horizontal step to path. -/
-def HPath.single (s : HStep a b) : HPath a b :=
+noncomputable def HPath.single (s : HStep a b) : HPath a b :=
   HPath.cons s (HPath.nil _)
 
 /-- Theorem 3 — horizontal trans: sequential composition. -/
-def HPath.trans : HPath a b → HPath b c → HPath a c
+noncomputable def HPath.trans : HPath a b → HPath b c → HPath a c
   | HPath.nil _, q => q
   | HPath.cons s p, q => HPath.cons s (HPath.trans p q)
 
 /-- Step inversion (horizontal). -/
-def HStep.symm : HStep a b → HStep b a
+noncomputable def HStep.symm : HStep a b → HStep b a
   | HStep.compose a b   => HStep.compose b a
   | HStep.identity a    => HStep.identity a
   | HStep.assoc a b     => HStep.assoc b a
@@ -87,12 +87,12 @@ def HStep.symm : HStep a b → HStep b a
   | HStep.functor a b   => HStep.functor b a
 
 /-- Theorem 4 — horizontal symm: path inversion. -/
-def HPath.symm : HPath a b → HPath b a
+noncomputable def HPath.symm : HPath a b → HPath b a
   | HPath.nil a    => HPath.nil a
   | HPath.cons s p => HPath.trans (HPath.symm p) (HPath.single (HStep.symm s))
 
 /-- Horizontal path length. -/
-def HPath.length : HPath a b → Nat
+noncomputable def HPath.length : HPath a b → Nat
   | HPath.nil _    => 0
   | HPath.cons _ p => 1 + HPath.length p
 
@@ -115,19 +115,19 @@ inductive VPath : VEdge → VEdge → Type where
   | cons : VStep a b → VPath b c → VPath a c
 
 /-- Theorem 5 — vertical refl. -/
-def VPath.refl (a : VEdge) : VPath a a := VPath.nil a
+noncomputable def VPath.refl (a : VEdge) : VPath a a := VPath.nil a
 
 /-- Theorem 6 — single vertical step to path. -/
-def VPath.single (s : VStep a b) : VPath a b :=
+noncomputable def VPath.single (s : VStep a b) : VPath a b :=
   VPath.cons s (VPath.nil _)
 
 /-- Theorem 7 — vertical trans: sequential composition. -/
-def VPath.trans : VPath a b → VPath b c → VPath a c
+noncomputable def VPath.trans : VPath a b → VPath b c → VPath a c
   | VPath.nil _, q => q
   | VPath.cons s p, q => VPath.cons s (VPath.trans p q)
 
 /-- Step inversion (vertical). -/
-def VStep.symm : VStep a b → VStep b a
+noncomputable def VStep.symm : VStep a b → VStep b a
   | VStep.compose a b   => VStep.compose b a
   | VStep.identity a    => VStep.identity a
   | VStep.assoc a b     => VStep.assoc b a
@@ -136,12 +136,12 @@ def VStep.symm : VStep a b → VStep b a
   | VStep.functor a b   => VStep.functor b a
 
 /-- Theorem 8 — vertical symm: path inversion. -/
-def VPath.symm : VPath a b → VPath b a
+noncomputable def VPath.symm : VPath a b → VPath b a
   | VPath.nil a    => VPath.nil a
   | VPath.cons s p => VPath.trans (VPath.symm p) (VPath.single (VStep.symm s))
 
 /-- Vertical path length. -/
-def VPath.length : VPath a b → Nat
+noncomputable def VPath.length : VPath a b → Nat
   | VPath.nil _    => 0
   | VPath.cons _ p => 1 + VPath.length p
 
@@ -170,19 +170,19 @@ inductive SqPath : Square → Square → Type where
   | cons : SqStep a b → SqPath b c → SqPath a c
 
 /-- Theorem 9 — square refl. -/
-def SqPath.refl (a : Square) : SqPath a a := SqPath.nil a
+noncomputable def SqPath.refl (a : Square) : SqPath a a := SqPath.nil a
 
 /-- Theorem 10 — single square step to path. -/
-def SqPath.single (s : SqStep a b) : SqPath a b :=
+noncomputable def SqPath.single (s : SqStep a b) : SqPath a b :=
   SqPath.cons s (SqPath.nil _)
 
 /-- Theorem 11 — square trans. -/
-def SqPath.trans : SqPath a b → SqPath b c → SqPath a c
+noncomputable def SqPath.trans : SqPath a b → SqPath b c → SqPath a c
   | SqPath.nil _, q => q
   | SqPath.cons s p, q => SqPath.cons s (SqPath.trans p q)
 
 /-- Step inversion (square). -/
-def SqStep.symm : SqStep a b → SqStep b a
+noncomputable def SqStep.symm : SqStep a b → SqStep b a
   | SqStep.hcomp a b        => SqStep.hcomp b a
   | SqStep.vcomp a b        => SqStep.vcomp b a
   | SqStep.identity a       => SqStep.identity a
@@ -197,12 +197,12 @@ def SqStep.symm : SqStep a b → SqStep b a
   | SqStep.mate a b         => SqStep.mate b a
 
 /-- Theorem 12 — square symm. -/
-def SqPath.symm : SqPath a b → SqPath b a
+noncomputable def SqPath.symm : SqPath a b → SqPath b a
   | SqPath.nil a    => SqPath.nil a
   | SqPath.cons s p => SqPath.trans (SqPath.symm p) (SqPath.single (SqStep.symm s))
 
 /-- Square path length. -/
-def SqPath.length : SqPath a b → Nat
+noncomputable def SqPath.length : SqPath a b → Nat
   | SqPath.nil _    => 0
   | SqPath.cons _ p => 1 + SqPath.length p
 
@@ -288,7 +288,7 @@ theorem sqpath_single_length (s : SqStep a b) : SqPath.length (SqPath.single s) 
 -- ============================================================
 
 /-- Horizontal composition of two squares (boundary matching assumed via indices). -/
-def sq_hcomp (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def sq_hcomp (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.hcomp s₁ s₂)
 
 /-- Theorem 25 — hcomp has length 1. -/
@@ -306,7 +306,7 @@ theorem sq_hcomp_symm_length (s₁ s₂ : Square) :
 -- ============================================================
 
 /-- Vertical composition of two squares. -/
-def sq_vcomp (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def sq_vcomp (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.vcomp s₁ s₂)
 
 /-- Theorem 27 — vcomp has length 1. -/
@@ -324,7 +324,7 @@ theorem sq_vcomp_symm_length (s₁ s₂ : Square) :
 -- ============================================================
 
 /-- Interchange: hcomp then vcomp = vcomp then hcomp, as a square path. -/
-def interchange_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def interchange_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.interchange s₁ s₂)
 
 /-- Theorem 29 — interchange is a single step. -/
@@ -333,7 +333,7 @@ theorem interchange_length (s₁ s₂ : Square) :
   simp [interchange_cell, SqPath.single, SqPath.length]
 
 /-- Theorem 30 — interchange is invertible (groupoid). -/
-def interchange_inv (s₁ s₂ : Square) : SqPath s₂ s₁ :=
+noncomputable def interchange_inv (s₁ s₂ : Square) : SqPath s₂ s₁ :=
   SqPath.symm (interchange_cell s₁ s₂)
 
 /-- Theorem 31 — interchange round-trip length. -/
@@ -352,15 +352,15 @@ theorem interchange_triple (s₁ s₂ s₃ : Square) :
 -- ============================================================
 
 /-- Companion: a horizontal edge "lifted" to a square. -/
-def companion_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def companion_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.companion s₁ s₂)
 
 /-- Conjoint: a vertical edge "lifted" to a square. -/
-def conjoint_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def conjoint_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.conjoint s₁ s₂)
 
 /-- Connection: turning horizontal to vertical direction. -/
-def connection_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def connection_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.connection s₁ s₂)
 
 /-- Theorem 33 — companion is a single step. -/
@@ -395,7 +395,7 @@ theorem companion_connection_conjoint (s₁ s₂ s₃ s₄ : Square) :
 -- ============================================================
 
 /-- Fold: collapse vertical direction, producing a bicategory 2-cell. -/
-def fold_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def fold_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.fold s₁ s₂)
 
 /-- Theorem 38 — fold is a single step. -/
@@ -423,19 +423,19 @@ theorem fold_roundtrip (s₁ s₂ : Square) :
 -- ============================================================
 
 /-- congrArg horizontal: apply a function to each horizontal step. -/
-def HPath.congrArg (f : HEdge → HEdge) (mkStep : (a b : HEdge) → HStep (f a) (f b))
+noncomputable def HPath.congrArg (f : HEdge → HEdge) (mkStep : (a b : HEdge) → HStep (f a) (f b))
     : HPath a b → HPath (f a) (f b)
   | HPath.nil _    => HPath.nil (f _)
   | HPath.cons _ p => HPath.cons (mkStep _ _) (HPath.congrArg f mkStep p)
 
 /-- congrArg vertical: apply a function to each vertical step. -/
-def VPath.congrArg (f : VEdge → VEdge) (mkStep : (a b : VEdge) → VStep (f a) (f b))
+noncomputable def VPath.congrArg (f : VEdge → VEdge) (mkStep : (a b : VEdge) → VStep (f a) (f b))
     : VPath a b → VPath (f a) (f b)
   | VPath.nil _    => VPath.nil (f _)
   | VPath.cons _ p => VPath.cons (mkStep _ _) (VPath.congrArg f mkStep p)
 
 /-- congrArg square: apply a function to each square step. -/
-def SqPath.congrArg (f : Square → Square) (mkStep : (a b : Square) → SqStep (f a) (f b))
+noncomputable def SqPath.congrArg (f : Square → Square) (mkStep : (a b : Square) → SqStep (f a) (f b))
     : SqPath a b → SqPath (f a) (f b)
   | SqPath.nil _    => SqPath.nil (f _)
   | SqPath.cons _ p => SqPath.cons (mkStep _ _) (SqPath.congrArg f mkStep p)
@@ -493,7 +493,7 @@ structure HMonad where
   mult : HPath carrier carrier
 
 /-- Build a horizontal monad from identity step. -/
-def HMonad.trivial (e : HEdge) : HMonad :=
+noncomputable def HMonad.trivial (e : HEdge) : HMonad :=
   { carrier := e, unit := HPath.refl e, mult := HPath.refl e }
 
 /-- Theorem 48 — trivial HMonad unit has length 0. -/
@@ -527,7 +527,7 @@ structure VMonad where
   mult : VPath carrier carrier
 
 /-- Trivial vertical monad. -/
-def VMonad.trivial (e : VEdge) : VMonad :=
+noncomputable def VMonad.trivial (e : VEdge) : VMonad :=
   { carrier := e, unit := VPath.refl e, mult := VPath.refl e }
 
 /-- Theorem 52 — trivial VMonad unit has length 0. -/
@@ -550,7 +550,7 @@ theorem vmonad_left_unit (e : VEdge) (p : VPath e e) :
 -- ============================================================
 
 /-- A cartesian lift: given a vertical edge and a square target, produce a cartesian square. -/
-def cartesian_lift (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def cartesian_lift (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.cartesian s₁ s₂)
 
 /-- Theorem 55 — cartesian lift is a single step. -/
@@ -578,11 +578,11 @@ theorem cartesian_inv_length (s₁ s₂ : Square) :
 -- ============================================================
 
 /-- Lax comparison cell: preserves composition up to a directed 2-cell. -/
-def lax_comparison (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def lax_comparison (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.lax s₁ s₂)
 
 /-- Oplax comparison cell: reversed direction. -/
-def oplax_comparison (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def oplax_comparison (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.oplax s₁ s₂)
 
 /-- Theorem 59 — lax comparison length. -/
@@ -615,7 +615,7 @@ theorem oplax_naturality_length (s₁ s₂ s₃ : Square) :
 -- ============================================================
 
 /-- Mate: given adjunctions, mate bijection as a square path. -/
-def mate_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
+noncomputable def mate_cell (s₁ s₂ : Square) : SqPath s₁ s₂ :=
   SqPath.single (SqStep.mate s₁ s₂)
 
 /-- Theorem 64 — mate is a single step. -/
@@ -643,7 +643,7 @@ theorem mate_interchange_length (s₁ s₂ s₃ : Square) :
 -- ============================================================
 
 /-- Transport a square along a vertical path by composing with cartesian lifts. -/
-def transport_along_vpath : VPath a b → (s : Square) → SqPath s s
+noncomputable def transport_along_vpath : VPath a b → (s : Square) → SqPath s s
   | VPath.nil _, s    => SqPath.refl s
   | VPath.cons _ p, s =>
     SqPath.trans (SqPath.single (SqStep.cartesian s s))
@@ -693,7 +693,7 @@ theorem sqpath_trans_refl_right_length (p : SqPath a b) :
 -- ============================================================
 
 /-- Build a horizontal associativity chain of n steps. -/
-def hpath_assoc_chain (e : HEdge) : Nat → HPath e e
+noncomputable def hpath_assoc_chain (e : HEdge) : Nat → HPath e e
   | 0     => HPath.refl e
   | n + 1 => HPath.trans (HPath.single (HStep.assoc e e)) (hpath_assoc_chain e n)
 
@@ -704,7 +704,7 @@ theorem hpath_assoc_chain_length (e : HEdge) (n : Nat) :
   | zero => simp [hpath_assoc_chain, HPath.refl, HPath.length]
   | succ n ih => simp [hpath_assoc_chain, hpath_trans_length, HPath.single, HPath.length, ih]; omega
 /-- Build a vertical assoc chain. -/
-def vpath_assoc_chain (e : VEdge) : Nat → VPath e e
+noncomputable def vpath_assoc_chain (e : VEdge) : Nat → VPath e e
   | 0     => VPath.refl e
   | n + 1 => VPath.trans (VPath.single (VStep.assoc e e)) (vpath_assoc_chain e n)
 
@@ -715,7 +715,7 @@ theorem vpath_assoc_chain_length (e : VEdge) (n : Nat) :
   | zero => simp [vpath_assoc_chain, VPath.refl, VPath.length]
   | succ n ih => simp [vpath_assoc_chain, vpath_trans_length, VPath.single, VPath.length, ih]; omega
 /-- Build a square interchange chain. -/
-def sq_interchange_chain (s : Square) : Nat → SqPath s s
+noncomputable def sq_interchange_chain (s : Square) : Nat → SqPath s s
   | 0     => SqPath.refl s
   | n + 1 => SqPath.trans (SqPath.single (SqStep.interchange s s)) (sq_interchange_chain s n)
 
@@ -773,7 +773,7 @@ theorem sqpath_symm_length (p : SqPath a b) :
 -- ============================================================
 
 /-- A 5-step coherence path: hcomp, vcomp, interchange, fold, mate. -/
-def deep_coherence_5 (s₁ s₂ s₃ s₄ s₅ s₆ : Square) : SqPath s₁ s₆ :=
+noncomputable def deep_coherence_5 (s₁ s₂ s₃ s₄ s₅ s₆ : Square) : SqPath s₁ s₆ :=
   SqPath.trans (sq_hcomp s₁ s₂)
     (SqPath.trans (sq_vcomp s₂ s₃)
       (SqPath.trans (interchange_cell s₃ s₄)
@@ -786,7 +786,7 @@ theorem deep_coherence_5_length (s₁ s₂ s₃ s₄ s₅ s₆ : Square) :
         SqPath.single, SqPath.trans, SqPath.length, sqpath_trans_length]
 
 /-- A 4-step path: companion, connection, conjoint, cartesian. -/
-def deep_connection_4 (s₁ s₂ s₃ s₄ s₅ : Square) : SqPath s₁ s₅ :=
+noncomputable def deep_connection_4 (s₁ s₂ s₃ s₄ s₅ : Square) : SqPath s₁ s₅ :=
   SqPath.trans (companion_cell s₁ s₂)
     (SqPath.trans (connection_cell s₂ s₃)
       (SqPath.trans (conjoint_cell s₃ s₄) (cartesian_lift s₄ s₅)))
@@ -798,7 +798,7 @@ theorem deep_connection_4_length (s₁ s₂ s₃ s₄ s₅ : Square) :
         SqPath.single, SqPath.trans, SqPath.length, sqpath_trans_length]
 
 /-- A 3-step lax path: lax, interchange, oplax. -/
-def lax_interchange_oplax (s₁ s₂ s₃ s₄ : Square) : SqPath s₁ s₄ :=
+noncomputable def lax_interchange_oplax (s₁ s₂ s₃ s₄ : Square) : SqPath s₁ s₄ :=
   SqPath.trans (lax_comparison s₁ s₂)
     (SqPath.trans (interchange_cell s₂ s₃) (oplax_comparison s₃ s₄))
 

@@ -68,7 +68,7 @@ noncomputable def transportReflCancelRwEq (i : Fin B.curve.nPoints) (ψ : B.Bloc
   rweq_cmpA_inv_right (B.transport_refl i ψ)
 
 /-- Composite transport coherence with explicit unit insertions (left-associated). -/
-def transportCompWithUnitsLeft {i j k : Fin B.curve.nPoints}
+noncomputable def transportCompWithUnitsLeft {i j k : Fin B.curve.nPoints}
     (p : Path (B.curve.mark i) (B.curve.mark j))
     (q : Path (B.curve.mark j) (B.curve.mark k))
     (ψ : B.Block) :
@@ -76,7 +76,7 @@ def transportCompWithUnitsLeft {i j k : Fin B.curve.nPoints}
   Path.trans (Path.trans (B.transport_comp p q ψ) (Path.refl _)) (Path.refl _)
 
 /-- Composite transport coherence with explicit unit insertions (right-associated). -/
-def transportCompWithUnitsRight {i j k : Fin B.curve.nPoints}
+noncomputable def transportCompWithUnitsRight {i j k : Fin B.curve.nPoints}
     (p : Path (B.curve.mark i) (B.curve.mark j))
     (q : Path (B.curve.mark j) (B.curve.mark k))
     (ψ : B.Block) :
@@ -149,13 +149,13 @@ noncomputable def vacuumInsertRightUnitRwEq (i : Fin B.curve.nPoints) (a : V.Sta
 end ConformalBlockOPECompat
 
 /-- One-point marked curve on `PUnit`. -/
-def unitMarkedCurve : MarkedCurve where
+noncomputable def unitMarkedCurve : MarkedCurve where
   Carrier := PUnit
   nPoints := 1
   mark := fun _ => PUnit.unit
 
 /-- Trivial conformal block datum with identity transport. -/
-def trivialConformalBlockData (V : VertexAlgebraData.{u}) : ConformalBlockData V where
+noncomputable def trivialConformalBlockData (V : VertexAlgebraData.{u}) : ConformalBlockData V where
   curve := unitMarkedCurve
   Block := V.State
   insert := fun _ a => a
@@ -164,7 +164,7 @@ def trivialConformalBlockData (V : VertexAlgebraData.{u}) : ConformalBlockData V
   transport_comp := fun {_ _ _} _ _ ψ => Path.refl ψ
 
 /-- Canonical compatibility from any OPE data to the trivial conformal block. -/
-def trivialOPECompat {V : VertexAlgebraData.{u}} (O : OPEData V) :
+noncomputable def trivialOPECompat {V : VertexAlgebraData.{u}} (O : OPEData V) :
     ConformalBlockOPECompat O (trivialConformalBlockData V) where
   fuse := fun _ a b n => O.coeff a b n
   fusion_assoc := fun _ a b c m n => O.assoc a b c m n

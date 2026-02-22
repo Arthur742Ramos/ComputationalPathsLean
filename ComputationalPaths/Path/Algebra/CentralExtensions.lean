@@ -55,12 +55,12 @@ structure GroupData (G : Type u) where
   mul_left_inv : ∀ x, mul (inv x) x = one
 
 /-- Path-valued left identity. -/
-def GroupData.one_mul_path {G : Type u} (D : GroupData G) (x : G) :
+noncomputable def GroupData.one_mul_path {G : Type u} (D : GroupData G) (x : G) :
     Path (D.mul D.one x) x :=
   Path.stepChain (D.one_mul x)
 
 /-- Path-valued associativity. -/
-def GroupData.mul_assoc_path {G : Type u} (D : GroupData G) (x y z : G) :
+noncomputable def GroupData.mul_assoc_path {G : Type u} (D : GroupData G) (x y z : G) :
     Path (D.mul (D.mul x y) z) (D.mul x (D.mul y z)) :=
   Path.stepChain (D.mul_assoc x y z)
 
@@ -111,7 +111,7 @@ structure TwoCocycle (G : Type u) (A : Type v) (gd : GroupData G) (ad : AbelianG
          (ad.mul (toFun g (gd.mul h k)) (toFun h k))
 
 /-- Trivial 2-cocycle. -/
-def TwoCocycle.trivial (G : Type u) (A : Type v) (gd : GroupData G)
+noncomputable def TwoCocycle.trivial (G : Type u) (A : Type v) (gd : GroupData G)
     (ad : AbelianGroupData A) : TwoCocycle G A gd ad where
   toFun := fun _ _ => ad.one
   normalized_left := fun _ => Path.refl _
@@ -149,7 +149,7 @@ structure SchurMultiplier (G : Type u) where
     Path (ext.projection (ext.extension.one)) ext.quotient_grp.one
 
 /-- Trivial Schur multiplier. -/
-def SchurMultiplier.trivialUnit (G : Type u) (gd : GroupData G) : SchurMultiplier G where
+noncomputable def SchurMultiplier.trivialUnit (G : Type u) (gd : GroupData G) : SchurMultiplier G where
   grp := gd
   carrier := PUnit
   abelian := {
@@ -255,7 +255,7 @@ structure H2Group (G : Type u) (A : Type v) where
   classify_trivial : Path (classify (TwoCocycle.trivial G A grp coeff)) zero
 
 /-- Trivial H² on PUnit. -/
-def H2Group.trivialUnit (G : Type u) (gd : GroupData G) : H2Group G PUnit where
+noncomputable def H2Group.trivialUnit (G : Type u) (gd : GroupData G) : H2Group G PUnit where
   grp := gd
   coeff := {
     mul := fun _ _ => PUnit.unit
@@ -292,7 +292,7 @@ inductive CentralExtStep : {A : Type u} → A → A → Type (u + 1)
       CentralExtStep (ext.projection (ext.injection a)) ext.quotient_grp.one
 
 /-- CentralExtStep implies Path. -/
-def centralExtStep_to_path {A : Type u} {a b : A} (h : CentralExtStep a b) :
+noncomputable def centralExtStep_to_path {A : Type u} {a b : A} (h : CentralExtStep a b) :
     Path a b := by
   cases h with
   | cocycle_normalize => rename_i f g; exact f.normalized_left g

@@ -30,26 +30,26 @@ variable {p : Path a b} {q : Path b c}
 variable {x : D a} {y : D b} {z : D c}
 
 /-- Reflexive dependent path over `refl`. -/
-@[simp] def refl (x : D a) : PathOver D (Path.refl a) x x :=
+@[simp] noncomputable def refl (x : D a) : PathOver D (Path.refl a) x x :=
   ⟨rfl⟩
 
 /-- Construct a pathover from a transport equation. -/
-def ofTransportEq (p : Path a b) (x : D a) (y : D b)
+noncomputable def ofTransportEq (p : Path a b) (x : D a) (y : D b)
     (h : Path.transport (D := D) p x = y) : PathOver D p x y :=
   ⟨h⟩
 
 /-- Every pathover yields a propositional transport equation. -/
-def toTransportEq (po : PathOver D p x y) :
+noncomputable def toTransportEq (po : PathOver D p x y) :
     Path.transport (D := D) p x = y :=
   po.eq
 
 /-- Compose dependent paths along composed base paths. -/
-def trans (po₁ : PathOver D p x y) (po₂ : PathOver D q y z) :
+noncomputable def trans (po₁ : PathOver D p x y) (po₂ : PathOver D q y z) :
     PathOver D (Path.trans p q) x z :=
   ⟨by rw [Path.transport_trans]; rw [po₁.eq]; exact po₂.eq⟩
 
 /-- Inverse of a dependent path. -/
-def symm (po : PathOver D p x y) :
+noncomputable def symm (po : PathOver D p x y) :
     PathOver D (Path.symm p) y x :=
   ⟨by rw [← po.eq]; exact Path.transport_symm_left (D := D) p x⟩
 
@@ -59,7 +59,7 @@ theorem subsingleton (po₁ po₂ : PathOver D p x y) :
   cases po₁; cases po₂; rfl
 
 /-- Pathover from `apd`. -/
-def ofApd (f : ∀ x, D x) (p : Path a b) :
+noncomputable def ofApd (f : ∀ x, D x) (p : Path a b) :
     PathOver D p (f a) (f b) :=
   ⟨(Path.apd f p).toEq⟩
 
@@ -151,11 +151,11 @@ namespace SigmaPath
 variable {A : Type u} {D : A → Type v}
 
 /-- Forward direction: sigma equality gives base equality and fiber equation. -/
-def decompose {s₁ s₂ : Σ x, D x} (h : s₁ = s₂) :
+noncomputable def decompose {s₁ s₂ : Σ x, D x} (h : s₁ = s₂) :
     (s₁.1 = s₂.1) := congrArg Sigma.fst h
 
 /-- Backward direction: a base equality plus fiber alignment gives sigma equality. -/
-def compose {a₁ a₂ : A} {b₁ : D a₁} {b₂ : D a₂}
+noncomputable def compose {a₁ a₂ : A} {b₁ : D a₁} {b₂ : D a₂}
     (p : a₁ = a₂) (h : p ▸ b₁ = b₂) :
     (⟨a₁, b₁⟩ : Σ x, D x) = ⟨a₂, b₂⟩ := by
   cases p; cases h; rfl

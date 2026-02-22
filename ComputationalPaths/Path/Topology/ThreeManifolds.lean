@@ -87,7 +87,7 @@ structure Handlebody where
   boundary : Type u
 
 /-- The standard handlebody of genus g. -/
-def standardHandlebody (g : Nat) : Handlebody.{0} :=
+noncomputable def standardHandlebody (g : Nat) : Handlebody.{0} :=
   { carrier := Unit, genus := g, boundary := Unit }
 
 /-! ## Heegaard Decomposition -/
@@ -130,7 +130,7 @@ structure HeegaardGenus (M : ThreeManifold.{u}) where
   genus_eq : Path witness.genus minGenus
 
 /-- S³ has Heegaard genus 0. -/
-def sphere3_genus_zero : HeegaardGenus ⟨Unit, trivial, trivial⟩ :=
+noncomputable def sphere3_genus_zero : HeegaardGenus ⟨Unit, trivial, trivial⟩ :=
   { minGenus := 0,
     witness := {
       genus := 0,
@@ -203,7 +203,7 @@ structure PrimeDecomposition (M : ThreeManifold.{u}) where
   unique : True
 
 /-- Kneser-Milnor existence theorem. -/
-def kneser_milnor_existence (_M : ThreeManifold.{u}) :
+noncomputable def kneser_milnor_existence (_M : ThreeManifold.{u}) :
     True := trivial
 
 /-! ## JSJ Decomposition -/
@@ -313,7 +313,7 @@ structure LickorishWallace (M : ThreeManifold.{u}) where
   result_eq : Path M.carrier M.carrier
 
 /-- Integer surgery: Dehn surgery with q = 1. -/
-def integerSurgery (M : ThreeManifold.{u}) (K : Knot M) (n : Int) :
+noncomputable def integerSurgery (M : ThreeManifold.{u}) (K : Knot M) (n : Int) :
     DehnSurgeryData M :=
   { knot := K, p := n, q := 1, q_nonzero := by omega,
     result := M }

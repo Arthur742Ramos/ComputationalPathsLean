@@ -26,23 +26,23 @@ inductive Interval : Type where
   | pt
   deriving DecidableEq, Repr
 
-def i0 : Interval := Interval.pt
-def i1 : Interval := Interval.pt
+noncomputable def i0 : Interval := Interval.pt
+noncomputable def i1 : Interval := Interval.pt
 
 /-- Preferred symmetry name in this file. -/
-def Sym {A : Type u} {a b : A} (p : Path a b) : Path b a :=
+noncomputable def Sym {A : Type u} {a b : A} (p : Path a b) : Path b a :=
   Path.symm p
 
-def seg : Path i0 i1 :=
+noncomputable def seg : Path i0 i1 :=
   Path.mk [Step.mk i0 i1 rfl] rfl
 
-def segSym : Path i1 i0 :=
+noncomputable def segSym : Path i1 i0 :=
   Sym seg
 
-def segLoop0 : Path i0 i0 :=
+noncomputable def segLoop0 : Path i0 i0 :=
   Path.trans seg segSym
 
-def segLoop1 : Path i1 i1 :=
+noncomputable def segLoop1 : Path i1 i1 :=
   Path.trans segSym seg
 
 theorem interval_thm01_seg_steps :
@@ -106,22 +106,22 @@ theorem interval_thm13_segLoop1_refl_left :
 
 abbrev Cube := Nat → Interval
 
-def face (x : Interval) (k : Nat) (c : Cube) : Cube :=
+noncomputable def face (x : Interval) (k : Nat) (c : Cube) : Cube :=
   fun n => if n = k then x else c n
 
-def face0 (k : Nat) (c : Cube) : Cube :=
+noncomputable def face0 (k : Nat) (c : Cube) : Cube :=
   face i0 k c
 
-def face1 (k : Nat) (c : Cube) : Cube :=
+noncomputable def face1 (k : Nat) (c : Cube) : Cube :=
   face i1 k c
 
-def degen (k : Nat) (c : Cube) : Cube :=
+noncomputable def degen (k : Nat) (c : Cube) : Cube :=
   fun n => c (if n ≤ k then n else n - 1)
 
-def constCube (x : Interval) : Cube :=
+noncomputable def constCube (x : Interval) : Cube :=
   fun _ => x
 
-def face0Path (k : Nat) (c : Cube) : Path (face0 k c) (face0 k c) :=
+noncomputable def face0Path (k : Nat) (c : Cube) : Path (face0 k c) (face0 k c) :=
   Path.refl (face0 k c)
 
 theorem cube_thm14_face0_hit (k : Nat) (c : Cube) :
@@ -214,16 +214,16 @@ structure KanBox where
   back : Cube
   side : Nat → Cube
 
-def composition (B : KanBox) : Cube :=
+noncomputable def composition (B : KanBox) : Cube :=
   B.front
 
-def filling (B : KanBox) : Cube :=
+noncomputable def filling (B : KanBox) : Cube :=
   B.front
 
-def compPath (B : KanBox) : Path (composition B) (filling B) :=
+noncomputable def compPath (B : KanBox) : Path (composition B) (filling B) :=
   Path.mk [Step.mk (composition B) (filling B) rfl] rfl
 
-def fillPath (B : KanBox) : Path (filling B) (composition B) :=
+noncomputable def fillPath (B : KanBox) : Path (filling B) (composition B) :=
   Path.symm (compPath B)
 
 theorem kan_thm31_composition_eq_filling (B : KanBox) :
@@ -289,19 +289,19 @@ structure GlueType (A B : Type u) where
   equiv : EquivData A B
   uaPath : Path A B
 
-def reflEquiv (A : Type u) : EquivData A A where
+noncomputable def reflEquiv (A : Type u) : EquivData A A where
   toFun := fun a => a
   invFun := fun a => a
   leftInv := by intro a; rfl
   rightInv := by intro a; rfl
 
-def reflGlue (A : Type u) : GlueType A A where
+noncomputable def reflGlue (A : Type u) : GlueType A A where
   equiv := reflEquiv A
   uaPath := Path.refl A
 
 abbrev Gam (A : Type u) := Nat → A
 
-def GlueCarrier (A B : Type u) : Type u := Sum A B
+noncomputable def GlueCarrier (A B : Type u) : Type u := Sum A B
 
 theorem glue_thm43_reflEquiv_left (A : Type u) (a : A) :
     (reflEquiv A).invFun ((reflEquiv A).toFun a) = a := rfl
@@ -407,15 +407,15 @@ inductive Circle : Type where
   | base
   deriving DecidableEq, Repr
 
-def circleBase : Circle := Circle.base
+noncomputable def circleBase : Circle := Circle.base
 
-def circleLoop : Path circleBase circleBase :=
+noncomputable def circleLoop : Path circleBase circleBase :=
   Path.mk [Step.mk circleBase circleBase rfl] rfl
 
-def circleLoop2 : Path circleBase circleBase :=
+noncomputable def circleLoop2 : Path circleBase circleBase :=
   Path.trans circleLoop circleLoop
 
-def circleLoopInv : Path circleBase circleBase :=
+noncomputable def circleLoopInv : Path circleBase circleBase :=
   Path.symm circleLoop
 
 theorem hit_thm62_circleLoop_toEq :
@@ -459,15 +459,15 @@ inductive Torus : Type where
   | base
   deriving DecidableEq, Repr
 
-def torusBase : Torus := Torus.base
+noncomputable def torusBase : Torus := Torus.base
 
-def torusMerid : Path torusBase torusBase :=
+noncomputable def torusMerid : Path torusBase torusBase :=
   Path.mk [Step.mk torusBase torusBase rfl] rfl
 
-def torusLong : Path torusBase torusBase :=
+noncomputable def torusLong : Path torusBase torusBase :=
   torusMerid
 
-def torusComm :
+noncomputable def torusComm :
     Path (Path.trans torusMerid torusLong) (Path.trans torusLong torusMerid) :=
   Path.mk [Step.mk (Path.trans torusMerid torusLong) (Path.trans torusLong torusMerid) rfl] rfl
 
@@ -522,13 +522,13 @@ inductive Susp (A : Type u) : Type u where
   | pt
   deriving DecidableEq, Repr
 
-def north {A : Type u} : Susp A := Susp.pt
-def south {A : Type u} : Susp A := Susp.pt
+noncomputable def north {A : Type u} : Susp A := Susp.pt
+noncomputable def south {A : Type u} : Susp A := Susp.pt
 
-def suspMerid {A : Type u} (_a : A) : Path (north (A := A)) (south (A := A)) :=
+noncomputable def suspMerid {A : Type u} (_a : A) : Path (north (A := A)) (south (A := A)) :=
   Path.mk [Step.mk (north (A := A)) (south (A := A)) rfl] rfl
 
-def suspLoop {A : Type u} (a b : A) : Path (north (A := A)) (north (A := A)) :=
+noncomputable def suspLoop {A : Type u} (a b : A) : Path (north (A := A)) (north (A := A)) :=
   Path.trans (suspMerid a) (Path.symm (suspMerid b))
 
 theorem susp_thm80_merid_toEq {A : Type u} (a : A) :

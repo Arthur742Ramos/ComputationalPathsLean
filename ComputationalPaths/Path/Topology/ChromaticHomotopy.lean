@@ -142,7 +142,7 @@ structure ChromConv where
   right_inv : ∀ k x, Path (toHolim k (fromHolim k x)) x
 
 /-- Chromatic convergence equivalence at each level. -/
-def chromatic_conv_equiv (C : ChromConv.{u}) :
+noncomputable def chromatic_conv_equiv (C : ChromConv.{u}) :
     ∀ k x, Path (C.fromHolim k (C.toHolim k x)) x :=
   C.left_inv
 
@@ -155,12 +155,12 @@ inductive ChromStep {T : ChromConv.{u}} :
       ChromStep (T.fromHolim k (T.toHolim k x)) x
 
 /-- Interpret a ChromStep as a Path. -/
-def chromStepPath {T : ChromConv.{u}} {k : Nat}
+noncomputable def chromStepPath {T : ChromConv.{u}} {k : Nat}
     {a b : T.spectrum.level k} : ChromStep a b → Path a b
   | ChromStep.convergence_retract k x => T.left_inv k x
 
 /-- Compose two chromatic steps. -/
-def chrom_steps_compose {T : ChromConv.{u}} {k : Nat}
+noncomputable def chrom_steps_compose {T : ChromConv.{u}} {k : Nat}
     {a b c : T.spectrum.level k}
     (s1 : ChromStep a b) (s2 : ChromStep b c) : Path a c :=
   Path.trans (chromStepPath s1) (chromStepPath s2)
@@ -207,7 +207,7 @@ structure ThickClassification where
   classified : ∀ (C : ThickSubcategory.{u}), chromaticType C ≥ 0
 
 /-- Classification gives non-negative type. -/
-def thick_classification_nonneg (T : ThickClassification.{u}) :
+noncomputable def thick_classification_nonneg (T : ThickClassification.{u}) :
     ∀ C, T.chromaticType C ≥ 0 :=
   T.classified
 

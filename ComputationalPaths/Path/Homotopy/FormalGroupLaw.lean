@@ -143,7 +143,7 @@ structure HondaFormalGroup (p : Prime) (n : Nat) where
   honda_relation : True
 
 /-- Type alias for the Honda formal group Gamma_n. -/
-def HondaGamma (p : Prime) (n : Nat) : Type (u + 1) :=
+noncomputable def HondaGamma (p : Prime) (n : Nat) : Type (u + 1) :=
   HondaFormalGroup (p := p) n
 
 /-! ## Logarithms and exponentials -/

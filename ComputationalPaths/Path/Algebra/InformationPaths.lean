@@ -33,7 +33,7 @@ structure EntropyData where
   normPath : Path (distribution.foldl (· + ·) 0) totalWeight
 
 /-- Two entropy data are equivalent if they have the same entropy value. -/
-def entropyEquiv (d1 d2 : EntropyData) : Prop :=
+noncomputable def entropyEquiv (d1 d2 : EntropyData) : Prop :=
   d1.entropyVal = d2.entropyVal
 
 /-- Entropy equivalence is reflexive. -/
@@ -49,7 +49,7 @@ theorem entropyEquiv_trans {d1 d2 d3 : EntropyData}
     entropyEquiv d1 d3 := h1.trans h2
 
 /-- Path from entropy equivalence. -/
-def entropyEquiv_path {d1 d2 : EntropyData}
+noncomputable def entropyEquiv_path {d1 d2 : EntropyData}
     (h : entropyEquiv d1 d2) : Path d1.entropyVal d2.entropyVal :=
   Path.mk [Step.mk _ _ h] h
 
@@ -129,7 +129,7 @@ structure MutualInfoData where
   miPath : Path (mutualInfo + jointEntropy) sumEntropies
 
 /-- Mutual information path composition. -/
-def mi_composed_path (d : MutualInfoData) :
+noncomputable def mi_composed_path (d : MutualInfoData) :
     Path (d.mutualInfo + d.jointEntropy) (d.entropyX + d.entropyY) :=
   Path.trans d.miPath d.sumPath
 
@@ -273,13 +273,13 @@ theorem dist_congrArg {d1 d2 : List Nat}
   _root_.congrArg (fun l => l.foldl (· + ·) 0) h
 
 /-- Path from congrArg on distributions. -/
-def dist_congrArg_path {d1 d2 : List Nat}
+noncomputable def dist_congrArg_path {d1 d2 : List Nat}
     (h : d1 = d2) : Path (d1.foldl (· + ·) 0) (d2.foldl (· + ·) 0) :=
   Path.mk [Step.mk _ _ (_root_.congrArg (fun l => l.foldl (· + ·) 0) h)]
     (_root_.congrArg (fun l => l.foldl (· + ·) 0) h)
 
 /-- Transport for entropy-indexed data. -/
-def entropy_transport {P : Nat → Type v} {n1 n2 : Nat}
+noncomputable def entropy_transport {P : Nat → Type v} {n1 n2 : Nat}
     (h : n1 = n2) (x : P n1) : P n2 :=
   Path.transport (Path.mk [Step.mk _ _ h] h) x
 
@@ -296,21 +296,21 @@ theorem info_path_assoc {a b c d : Nat}
   simp
 
 /-- CongrArg through addition for information quantities. -/
-def info_congrArg_add {a b : Nat} (c : Nat) (p : Path a b) :
+noncomputable def info_congrArg_add {a b : Nat} (c : Nat) (p : Path a b) :
     Path (a + c) (b + c) :=
   Path.congrArg (· + c) p
 
 /-! ## Trivial Instances -/
 
 /-- Trivial entropy data. -/
-def trivialEntropy : EntropyData where
+noncomputable def trivialEntropy : EntropyData where
   distribution := [1]
   entropyVal := 0
   totalWeight := 1
   normPath := Path.refl 1
 
 /-- Trivial joint entropy data. -/
-def trivialJointEntropy : JointEntropyData where
+noncomputable def trivialJointEntropy : JointEntropyData where
   jointEntropy := 2
   marginalX := 1
   marginalY := 1
@@ -318,7 +318,7 @@ def trivialJointEntropy : JointEntropyData where
   chainPath := Path.refl 2
 
 /-- Trivial mutual information. -/
-def trivialMI : MutualInfoData where
+noncomputable def trivialMI : MutualInfoData where
   entropyX := 1
   entropyY := 1
   jointEntropy := 1
@@ -328,14 +328,14 @@ def trivialMI : MutualInfoData where
   miPath := Path.refl 2
 
 /-- Trivial KL divergence. -/
-def trivialKL : KLDivData where
+noncomputable def trivialKL : KLDivData where
   klVal := 0
   crossEntropy := 0
   entropyP := 0
   klPath := Path.refl 0
 
 /-- Trivial source coding. -/
-def trivialCoding : SourceCodingData where
+noncomputable def trivialCoding : SourceCodingData where
   rate := 2
   entropy := 1
   slack := 1

@@ -87,46 +87,46 @@ noncomputable def intCoeff : CechCoeff where
   add_neg := Int.add_right_neg
 
 /-- A Čech 0-cochain assigns a coefficient to each index. -/
-def Cochain0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) : Type (max u v) :=
+noncomputable def Cochain0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) : Type (max u v) :=
   U.Index → G.Carrier
 
 /-- A Čech 1-cochain assigns a coefficient to each 1-simplex. -/
-def Cochain1 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) : Type (max u v) :=
+noncomputable def Cochain1 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) : Type (max u v) :=
   Nerve1 U → G.Carrier
 
 /-- A Čech 2-cochain assigns a coefficient to each 2-simplex. -/
-def Cochain2 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) : Type (max u v) :=
+noncomputable def Cochain2 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) : Type (max u v) :=
   Nerve2 U → G.Carrier
 
 /-! ## Coboundary maps -/
 
 /-- The zero cochain: assigns zero everywhere. -/
-def zeroCochain0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
+noncomputable def zeroCochain0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
     Cochain0 U G :=
   fun _ => G.zero
 
 /-- Addition of 0-cochains. -/
-def addCochain0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
+noncomputable def addCochain0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
     (f g : Cochain0 U G) : Cochain0 U G :=
   fun i => G.add (f i) (g i)
 
 /-- Negation of 0-cochains. -/
-def negCochain0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
+noncomputable def negCochain0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
     (f : Cochain0 U G) : Cochain0 U G :=
   fun i => G.neg (f i)
 
 /-- Zero 1-cochain. -/
-def zeroCochain1 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
+noncomputable def zeroCochain1 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
     Cochain1 U G :=
   fun _ => G.zero
 
 /-- Addition of 1-cochains. -/
-def addCochain1 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
+noncomputable def addCochain1 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
     (f g : Cochain1 U G) : Cochain1 U G :=
   fun σ => G.add (f σ) (g σ)
 
 /-- Negation of 1-cochains. -/
-def negCochain1 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
+noncomputable def negCochain1 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
     (f : Cochain1 U G) : Cochain1 U G :=
   fun σ => G.neg (f σ)
 
@@ -134,7 +134,7 @@ def negCochain1 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
 
 /-- The coboundary δ⁰ : C⁰ → C¹ sends a 0-cochain f to the 1-cochain
     (δ⁰f)(i₀,i₁) = f(i₁) - f(i₀). -/
-def coboundary0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
+noncomputable def coboundary0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
     (f : Cochain0 U G) : Cochain1 U G :=
   fun σ => G.add (f σ.i₁) (G.neg (f σ.i₀))
 
@@ -166,7 +166,7 @@ structure CechH0 {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) where
   isGlobal : ∀ σ : Nerve1 U, section_ σ.i₀ = section_ σ.i₁
 
 /-- The constant 0-cochain is always a global section. -/
-def cechH0Const {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
+noncomputable def cechH0Const {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
     (c : G.Carrier) : CechH0 U G where
   section_ := fun _ => c
   isGlobal := fun _ => rfl
@@ -177,7 +177,7 @@ theorem cechH0Const_zero_eq {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
   rfl
 
 /-- Path witness for constant section coherence. -/
-def cechH0Const_zero_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
+noncomputable def cechH0Const_zero_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
     Path (cechH0Const U G G.zero).section_ (zeroCochain0 U G) :=
   Path.stepChain (cechH0Const_zero_eq U G)
 
@@ -190,7 +190,7 @@ theorem coboundary0_zero {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
   simp [coboundary0, zeroCochain0, zeroCochain1, G.add_neg]
 
 /-- Path witness for δ⁰(0) = 0. -/
-def coboundary0_zero_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
+noncomputable def coboundary0_zero_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :
     Path (coboundary0 U G (zeroCochain0 U G)) (zeroCochain1 U G) :=
   Path.stepChain (coboundary0_zero U G)
 
@@ -211,7 +211,7 @@ theorem coboundary0_additive_pointwise {X : Type u} (U : OpenCover X) (G : CechC
 /-! ## Refinement induces maps on cohomology -/
 
 /-- A refinement map induces a pullback on 0-cochains. -/
-def refinePullback0 {X : Type u} {U V : OpenCover X} (r : Refinement U V)
+noncomputable def refinePullback0 {X : Type u} {U V : OpenCover X} (r : Refinement U V)
     (G : CechCoeff.{v}) (f : Cochain0 V G) : Cochain0 U G :=
   fun i => f (r.refineMap i)
 
@@ -221,7 +221,7 @@ theorem refinePullback0_zero {X : Type u} {U V : OpenCover X} (r : Refinement U 
     refinePullback0 r G (zeroCochain0 V G) = zeroCochain0 U G := rfl
 
 /-- Path witness for pullback of zero. -/
-def refinePullback0_zero_path {X : Type u} {U V : OpenCover X} (r : Refinement U V)
+noncomputable def refinePullback0_zero_path {X : Type u} {U V : OpenCover X} (r : Refinement U V)
     (G : CechCoeff.{v}) :
     Path (refinePullback0 r G (zeroCochain0 V G)) (zeroCochain0 U G) :=
   Path.stepChain (refinePullback0_zero r G)
@@ -233,7 +233,7 @@ theorem refinePullback0_add {X : Type u} {U V : OpenCover X} (r : Refinement U V
       addCochain0 U G (refinePullback0 r G f) (refinePullback0 r G g) := rfl
 
 /-- Path witness for pullback of sum. -/
-def refinePullback0_add_path {X : Type u} {U V : OpenCover X} (r : Refinement U V)
+noncomputable def refinePullback0_add_path {X : Type u} {U V : OpenCover X} (r : Refinement U V)
     (G : CechCoeff.{v}) (f g : Cochain0 V G) :
     Path (refinePullback0 r G (addCochain0 V G f g))
          (addCochain0 U G (refinePullback0 r G f) (refinePullback0 r G g)) :=
@@ -242,7 +242,7 @@ def refinePullback0_add_path {X : Type u} {U V : OpenCover X} (r : Refinement U 
 /-! ## Identity refinement -/
 
 /-- The identity refinement of a cover to itself. -/
-def idRefinement {X : Type u} (U : OpenCover X) : Refinement U U where
+noncomputable def idRefinement {X : Type u} (U : OpenCover X) : Refinement U U where
   refineMap := id
   refineIncl := fun _ _ h => h
 
@@ -252,7 +252,7 @@ theorem idRefinement_pullback {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
     refinePullback0 (idRefinement U) G f = f := rfl
 
 /-- Path witness for identity refinement. -/
-def idRefinement_pullback_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
+noncomputable def idRefinement_pullback_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
     (f : Cochain0 U G) :
     Path (refinePullback0 (idRefinement U) G f) f :=
   Path.stepChain (idRefinement_pullback U G f)
@@ -260,7 +260,7 @@ def idRefinement_pullback_path {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}
 /-! ## Composition of refinements -/
 
 /-- Composition of refinements. -/
-def compRefinement {X : Type u} {U V W : OpenCover X}
+noncomputable def compRefinement {X : Type u} {U V W : OpenCover X}
     (r : Refinement U V) (s : Refinement V W) : Refinement U W where
   refineMap := s.refineMap ∘ r.refineMap
   refineIncl := fun i x h => s.refineIncl (r.refineMap i) x (r.refineIncl i x h)
@@ -273,7 +273,7 @@ theorem compRefinement_pullback {X : Type u} {U V W : OpenCover X}
       refinePullback0 r G (refinePullback0 s G f) := rfl
 
 /-- Path witness for composed refinement pullback. -/
-def compRefinement_pullback_path {X : Type u} {U V W : OpenCover X}
+noncomputable def compRefinement_pullback_path {X : Type u} {U V W : OpenCover X}
     (r : Refinement U V) (s : Refinement V W) (G : CechCoeff.{v})
     (f : Cochain0 W G) :
     Path (refinePullback0 (compRefinement r s) G f)
@@ -286,13 +286,13 @@ def compRefinement_pullback_path {X : Type u} {U V W : OpenCover X}
 abbrev PointSpace : Type := PUnit
 
 /-- The trivial cover of a point. -/
-def pointCover : OpenCover PointSpace where
+noncomputable def pointCover : OpenCover PointSpace where
   Index := PUnit
   cover := fun _ _ => True
   total := fun _ => ⟨PUnit.unit, trivial⟩
 
 /-- H⁰ of a point is the coefficient group: every section is global. -/
-def cechH0Point (G : CechCoeff.{v}) (c : G.Carrier) : CechH0 pointCover G where
+noncomputable def cechH0Point (G : CechCoeff.{v}) (c : G.Carrier) : CechH0 pointCover G where
   section_ := fun _ => c
   isGlobal := fun _ => rfl
 
@@ -301,7 +301,7 @@ theorem cechH0Point_unique (G : CechCoeff.{v}) (c : G.Carrier) :
     (cechH0Point G c).section_ = fun _ => c := rfl
 
 /-- Path witness for H⁰ uniqueness on a point. -/
-def cechH0Point_path (G : CechCoeff.{v}) (c : G.Carrier) :
+noncomputable def cechH0Point_path (G : CechCoeff.{v}) (c : G.Carrier) :
     Path (cechH0Point G c).section_ (fun _ => c) :=
   Path.stepChain (cechH0Point_unique G c)
 
@@ -310,7 +310,7 @@ def cechH0Point_path (G : CechCoeff.{v}) (c : G.Carrier) :
 /-- The coboundary map squares to zero in a trivial sense:
     for 0-cochains, δ¹ ∘ δ⁰ = 0. This is the fundamental
     property of the Čech complex. We record the type signature. -/
-def cechComplexProperty {X : Type u} (U : OpenCover X) (_G : CechCoeff.{v}) :=
+noncomputable def cechComplexProperty {X : Type u} (U : OpenCover X) (_G : CechCoeff.{v}) :=
   ∀ _f : Cochain0 U _G, ∀ _σ : Nerve2 U,
     ∃ _ : True, True  -- placeholder: d² = 0
 

@@ -67,14 +67,14 @@ structure Diffeomorphism (M : Type u) where
   right_inv : ∀ x, Path (toFun (invFun x)) x
 
 /-- Identity diffeomorphism. -/
-def Diffeomorphism.id (M : Type u) : Diffeomorphism M where
+noncomputable def Diffeomorphism.id (M : Type u) : Diffeomorphism M where
   toFun := _root_.id
   invFun := _root_.id
   left_inv := fun x => Path.refl x
   right_inv := fun x => Path.refl x
 
 /-- Composition of diffeomorphisms. -/
-def Diffeomorphism.comp {M : Type u}
+noncomputable def Diffeomorphism.comp {M : Type u}
     (g f : Diffeomorphism M) : Diffeomorphism M where
   toFun := g.toFun ∘ f.toFun
   invFun := f.invFun ∘ g.invFun
@@ -84,7 +84,7 @@ def Diffeomorphism.comp {M : Type u}
     Path.trans (Path.congrArg g.toFun (f.right_inv (g.invFun x))) (g.right_inv x)
 
 /-- Inverse of a diffeomorphism. -/
-def Diffeomorphism.symm {M : Type u}
+noncomputable def Diffeomorphism.symm {M : Type u}
     (f : Diffeomorphism M) : Diffeomorphism M where
   toFun := f.invFun
   invFun := f.toFun
@@ -103,7 +103,7 @@ structure Isotopy (M : Type u) where
   steps : Nat
 
 /-- The endpoint of an isotopy. -/
-def Isotopy.endpoint {M : Type u} (φ : Isotopy M) : Diffeomorphism M :=
+noncomputable def Isotopy.endpoint {M : Type u} (φ : Isotopy M) : Diffeomorphism M :=
   φ.family φ.steps
 
 /-! ## Moser's Isotopy Lemma -/
@@ -157,7 +157,7 @@ structure MoserStability (M : Type u) (S : Type v) where
 
 /-- Corollary: two symplectic forms in the same cohomology class on a
     closed manifold are symplectomorphic. -/
-def moser_stability_corollary (M : Type u) (S : Type v)
+noncomputable def moser_stability_corollary (M : Type u) (S : Type v)
     (ms : MoserStability M S) : Diffeomorphism M :=
   ms.isotopy.endpoint
 

@@ -67,7 +67,7 @@ variable {a b c d : A}
 
 /-- Trace for associativity: `(p ⬝ q) ⬝ r ▷ p ⬝ (q ⬝ r)`.
     This is a single-step trace. -/
-def assocTrace : List TraceEntry :=
+noncomputable def assocTrace : List TraceEntry :=
   [{ label := StepLabel.transAssoc
      description := "(p ⬝ q) ⬝ r ▷ p ⬝ (q ⬝ r)" }]
 
@@ -76,19 +76,19 @@ theorem assocTrace_length : assocTrace.length = 1 := by rfl
 
 /-- Trace for left unit elimination: `refl ⬝ p ▷ p`.
     Single-step trace. -/
-def unitLeftTrace : List TraceEntry :=
+noncomputable def unitLeftTrace : List TraceEntry :=
   [{ label := StepLabel.transReflLeft
      description := "refl ⬝ p ▷ p" }]
 
 /-- Trace for right unit elimination: `p ⬝ refl ▷ p`.
     Single-step trace. -/
-def unitRightTrace : List TraceEntry :=
+noncomputable def unitRightTrace : List TraceEntry :=
   [{ label := StepLabel.transReflRight
      description := "p ⬝ refl ▷ p" }]
 
 /-- Trace for right inverse cancellation: `p ⬝ p⁻¹ ▷ refl`.
     Single-step trace. -/
-def inverseTrace : List TraceEntry :=
+noncomputable def inverseTrace : List TraceEntry :=
   [{ label := StepLabel.transSym
      description := "p ⬝ p⁻¹ ▷ refl" }]
 
@@ -98,7 +98,7 @@ def inverseTrace : List TraceEntry :=
     2. Left unit (under congr): `(refl ⬝ p) ⬝ p⁻¹ ▷ p ⬝ p⁻¹`
     3. Right inverse: `p ⬝ p⁻¹ ▷ refl`
 -/
-def fullNormTrace : List TraceEntry :=
+noncomputable def fullNormTrace : List TraceEntry :=
   [ { label := StepLabel.transReflRight
       description := "((refl ⬝ p) ⬝ p⁻¹) ⬝ refl ▷ (refl ⬝ p) ⬝ p⁻¹" }
   , { label := StepLabel.congrLeft
@@ -143,7 +143,7 @@ variable {a b c : A}
     1. Associativity: `(p ⬝ refl) ⬝ q ▷ p ⬝ (refl ⬝ q)`
     2. Right congr + left unit: `p ⬝ (refl ⬝ q) ▷ p ⬝ q`
 -/
-def triangleTrace : List TraceEntry :=
+noncomputable def triangleTrace : List TraceEntry :=
   [ { label := StepLabel.transAssoc
       description := "(p ⬝ refl) ⬝ q ▷ p ⬝ (refl ⬝ q)" }
   , { label := StepLabel.congrRight
@@ -178,7 +178,7 @@ variable {a b c d e : A}
     1. Outer associator: `((pq)r)s → (pq)(rs)`
     2. Inner associator: `(pq)(rs) → p(q(rs))`
 -/
-def pentagonLeftTrace : List TraceEntry :=
+noncomputable def pentagonLeftTrace : List TraceEntry :=
   [ { label := StepLabel.transAssoc
       description := "((pq)r)s → (pq)(rs)" }
   , { label := StepLabel.transAssoc
@@ -190,7 +190,7 @@ def pentagonLeftTrace : List TraceEntry :=
     2. Outer associator: `(p(qr))s → p((qr)s)`
     3. Congr + associator: `p((qr)s) → p(q(rs))`
 -/
-def pentagonRightTrace : List TraceEntry :=
+noncomputable def pentagonRightTrace : List TraceEntry :=
   [ { label := StepLabel.other "trans_assoc + congr_left"
       description := "((pq)r)s → (p(qr))s" }
   , { label := StepLabel.transAssoc
@@ -241,7 +241,7 @@ section InverseTrace
 variable {a b : A}
 
 /-- Trace for `(p⁻¹)⁻¹ → p` via double symmetry cancellation. -/
-def doubleSymmTrace : List TraceEntry :=
+noncomputable def doubleSymmTrace : List TraceEntry :=
   [{ label := StepLabel.symmSymm
      description := "(p⁻¹)⁻¹ ▷ p" }]
 
@@ -253,7 +253,7 @@ theorem doubleSym_rw (p : Path a b) :
   rw_of_step (Step.symm_symm p)
 
 /-- Trace for `refl⁻¹ → refl` via symmetry of reflexivity. -/
-def symmReflTrace : List TraceEntry :=
+noncomputable def symmReflTrace : List TraceEntry :=
   [{ label := StepLabel.symmRefl
      description := "refl⁻¹ ▷ refl" }]
 

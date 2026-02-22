@@ -61,7 +61,7 @@ structure BasicOpen (R : CRing.{u}) where
   element : R.carrier
 
 /-- Membership of a point in a basic open set -/
-def BasicOpen.contains (R : CRing.{u}) (Df : BasicOpen R) (p : Spec R) : Prop :=
+noncomputable def BasicOpen.contains (R : CRing.{u}) (Df : BasicOpen R) (p : Spec R) : Prop :=
   ¬ p.point.elements Df.element
 
 -- ============================================================
@@ -80,12 +80,12 @@ structure Stalk (R : CRing.{u}) (p : Spec R) where
   locMap : R.carrier → carrier
 
 /-- Theorem 1: Localization map preserves ring identity -/
-def localization_preserves_one (R : CRing.{u}) (f : R.carrier)
+noncomputable def localization_preserves_one (R : CRing.{u}) (f : R.carrier)
     (Lf : LocalizationAt R f) : Path (Lf.locMap R.one) (Lf.locMap R.one) :=
   Path.refl (Lf.locMap R.one)
 
 /-- Theorem 2: Double localization coherence -/
-def double_localization_coherence (R : CRing.{u}) (f g : R.carrier)
+noncomputable def double_localization_coherence (R : CRing.{u}) (f g : R.carrier)
     (Lf : LocalizationAt R f) (Lfg : LocalizationAt R (R.mul f g))
     (collapse : Lf.carrier → Lfg.carrier)
     (compat : (r : R.carrier) → Path (collapse (Lf.locMap r)) (Lfg.locMap r))
@@ -93,7 +93,7 @@ def double_localization_coherence (R : CRing.{u}) (f g : R.carrier)
   fun r => compat r
 
 /-- Theorem 3: Localization is functorial via paths -/
-def localization_functorial (R : CRing.{u}) (f g : R.carrier)
+noncomputable def localization_functorial (R : CRing.{u}) (f g : R.carrier)
     (Lf : LocalizationAt R f) (Lg : LocalizationAt R g)
     (phi : Lf.carrier → Lg.carrier)
     (nat : (r : R.carrier) → Path (phi (Lf.locMap r)) (Lg.locMap r))
@@ -101,7 +101,7 @@ def localization_functorial (R : CRing.{u}) (f g : R.carrier)
   nat r
 
 /-- Theorem 4: Localization map applied to equal elements gives equal results -/
-def localization_congrArg (R : CRing.{u}) (f : R.carrier)
+noncomputable def localization_congrArg (R : CRing.{u}) (f : R.carrier)
     (Lf : LocalizationAt R f)
     (r s : R.carrier) (p : Path r s)
     : Path (Lf.locMap r) (Lf.locMap s) :=
@@ -117,21 +117,21 @@ structure Presheaf (R : CRing.{u}) where
   restrict : (U V : BasicOpen R) → sections U → sections V
 
 /-- Theorem 5: Restriction composed with identity -/
-def restrict_identity (R : CRing.{u}) (F : Presheaf R) (U : BasicOpen R)
+noncomputable def restrict_identity (R : CRing.{u}) (F : Presheaf R) (U : BasicOpen R)
     (s : F.sections U)
     (refl_compat : Path (F.restrict U U s) s)
     : Path (F.restrict U U s) s :=
   refl_compat
 
 /-- Theorem 6: Restriction transitivity via Path.trans -/
-def restrict_trans (R : CRing.{u}) (F : Presheaf R)
+noncomputable def restrict_trans (R : CRing.{u}) (F : Presheaf R)
     (U V W : BasicOpen R) (s : F.sections U)
     (p1 : Path (F.restrict V W (F.restrict U V s)) (F.restrict U W s))
     : Path (F.restrict V W (F.restrict U V s)) (F.restrict U W s) :=
   p1
 
 /-- Theorem 7: congrArg for restriction maps -/
-def restrict_congrArg (R : CRing.{u}) (F : Presheaf R) (U V : BasicOpen R)
+noncomputable def restrict_congrArg (R : CRing.{u}) (F : Presheaf R) (U V : BasicOpen R)
     (s t : F.sections U)
     (p : Path s t)
     : Path (F.restrict U V s) (F.restrict U V t) :=
@@ -167,7 +167,7 @@ structure StructureSheaf (R : CRing.{u}) where
   globalToLocal : (U : BasicOpen R) → R.carrier → (localRing U).carrier
 
 /-- Theorem 8: Structure sheaf restriction is path-coherent -/
-def structure_sheaf_restriction_coherence (R : CRing.{u}) (OX : StructureSheaf R)
+noncomputable def structure_sheaf_restriction_coherence (R : CRing.{u}) (OX : StructureSheaf R)
     (U V W : BasicOpen R) (s : (OX.localRing U).carrier)
     (coh : Path (OX.restrictionMap V W (OX.restrictionMap U V s))
                 (OX.restrictionMap U W s))
@@ -176,7 +176,7 @@ def structure_sheaf_restriction_coherence (R : CRing.{u}) (OX : StructureSheaf R
   coh
 
 /-- Theorem 9: Global sections of O_X recover R -/
-def global_sections_recover_ring (R : CRing.{u}) (OX : StructureSheaf R)
+noncomputable def global_sections_recover_ring (R : CRing.{u}) (OX : StructureSheaf R)
     (globalOpen : BasicOpen R)
     (iso_to : R.carrier → (OX.localRing globalOpen).carrier)
     (iso_from : (OX.localRing globalOpen).carrier → R.carrier)
@@ -185,7 +185,7 @@ def global_sections_recover_ring (R : CRing.{u}) (OX : StructureSheaf R)
   roundtrip r
 
 /-- Theorem 10: Stalk at a prime is the localization at p -/
-def stalk_is_localization (R : CRing.{u}) (p : Spec R)
+noncomputable def stalk_is_localization (R : CRing.{u}) (p : Spec R)
     (OX : StructureSheaf R) (stalk : Stalk R p)
     (colim_map : (U : BasicOpen R) → (OX.localRing U).carrier → stalk.carrier)
     (compat : (U V : BasicOpen R) → (s : (OX.localRing U).carrier) →
@@ -195,7 +195,7 @@ def stalk_is_localization (R : CRing.{u}) (p : Spec R)
   compat U V s
 
 /-- Theorem 11: Stalk congrArg -/
-def stalk_congrArg (R : CRing.{u}) (p : Spec R)
+noncomputable def stalk_congrArg (R : CRing.{u}) (p : Spec R)
     (stk : Stalk R p) (r s : R.carrier) (eq : Path r s)
     : Path (stk.locMap r) (stk.locMap s) :=
   Path.congrArg stk.locMap eq
@@ -216,7 +216,7 @@ structure Scheme where
   localRings : points → CRing.{u}
 
 /-- Theorem 12: An affine scheme is a scheme -/
-def affine_is_scheme (X : AffineScheme.{u}) : Scheme.{u} where
+noncomputable def affine_is_scheme (X : AffineScheme.{u}) : Scheme.{u} where
   points := Spec X.ring
   topology := fun _ => True
   localRings := fun _ => X.structureSheaf.localRing ⟨X.ring.one⟩
@@ -244,13 +244,13 @@ structure RingHom (R S : CRing.{u}) where
   preserves_mul : (a b : R.carrier) → Path (map (R.mul a b)) (S.mul (map a) (map b))
 
 /-- Theorem 14: Ring hom induces map on Spec -/
-def ring_hom_induces_spec_map (R S : CRing.{u}) (phi : RingHom R S)
+noncomputable def ring_hom_induces_spec_map (R S : CRing.{u}) (phi : RingHom R S)
     (pullback : Spec S → Spec R)
     (p : Spec S) : Path (pullback p) (pullback p) :=
   Path.refl (pullback p)
 
 /-- Theorem 15: Composition of ring homs on Spec is contravariant -/
-def spec_contravariant (R S T : CRing.{u}) (f : RingHom R S) (g : RingHom S T)
+noncomputable def spec_contravariant (R S T : CRing.{u}) (f : RingHom R S) (g : RingHom S T)
     (specF : Spec S → Spec R) (specG : Spec T → Spec S)
     (specGF : Spec T → Spec R)
     (comp_compat : (p : Spec T) → Path (specF (specG p)) (specGF p))
@@ -258,7 +258,7 @@ def spec_contravariant (R S T : CRing.{u}) (f : RingHom R S) (g : RingHom S T)
   comp_compat p
 
 /-- Theorem 16: Identity ring hom gives identity on Spec -/
-def spec_identity (R : CRing.{u}) (idMap : Spec R → Spec R)
+noncomputable def spec_identity (R : CRing.{u}) (idMap : Spec R → Spec R)
     (is_id : (p : Spec R) → Path (idMap p) p)
     (p : Spec R) : Path (idMap p) p :=
   is_id p
@@ -268,7 +268,7 @@ structure SchemeMorphism (X Y : Scheme.{u}) where
   baseMap : X.points → Y.points
 
 /-- Theorem 17: Scheme morphism composition -/
-def scheme_morphism_comp (X Y Z : Scheme.{u})
+noncomputable def scheme_morphism_comp (X Y Z : Scheme.{u})
     (f : SchemeMorphism X Y) (g : SchemeMorphism Y Z)
     : SchemeMorphism X Z where
   baseMap := fun x => g.baseMap (f.baseMap x)
@@ -287,21 +287,21 @@ structure FiberProduct (X Y S : Scheme.{u}) where
   commutes : (p : carrier) → Path (toS_X (projX p)) (toS_Y (projY p))
 
 /-- Theorem 18: Fiber product is symmetric via Path.symm -/
-def fiber_product_symmetric (X Y S : Scheme.{u})
+noncomputable def fiber_product_symmetric (X Y S : Scheme.{u})
     (XxY : FiberProduct X Y S)
     (p : XxY.carrier)
     : Path (XxY.toS_Y (XxY.projY p)) (XxY.toS_X (XxY.projX p)) :=
   Path.symm (XxY.commutes p)
 
 /-- Theorem 19: Fiber product projection coherence -/
-def fiber_product_proj_coherence (X Y S : Scheme.{u})
+noncomputable def fiber_product_proj_coherence (X Y S : Scheme.{u})
     (XxY : FiberProduct X Y S)
     (p q : XxY.carrier) (h : Path p q)
     : Path (XxY.projX p) (XxY.projX q) :=
   Path.congrArg XxY.projX h
 
 /-- Theorem 20: Base change preserves fiber product square -/
-def base_change_square (X Y S : Scheme.{u})
+noncomputable def base_change_square (X Y S : Scheme.{u})
     (XxY : FiberProduct X Y S)
     (p : XxY.carrier)
     : Path (XxY.toS_X (XxY.projX p)) (XxY.toS_Y (XxY.projY p)) :=
@@ -326,7 +326,7 @@ structure DiagonalMorphism (X S : Scheme.{u}) (XxX : FiberProduct X X S) where
   isDelta' : (x : X.points) → Path (XxX.projY (delta x)) x
 
 /-- Theorem 22: Diagonal is a section of projection -/
-def diagonal_section (X S : Scheme.{u}) (XxX : FiberProduct X X S)
+noncomputable def diagonal_section (X S : Scheme.{u}) (XxX : FiberProduct X X S)
     (diag : DiagonalMorphism X S XxX)
     (x : X.points)
     : Path (XxX.projX (diag.delta x)) x :=
@@ -342,12 +342,12 @@ structure Proper (X S : Scheme.{u}) extends Separated X S where
   isFiniteType : Bool
 
 /-- Theorem 23: Proper implies separated -/
-def proper_implies_separated (X S : Scheme.{u}) (prop : Proper X S)
+noncomputable def proper_implies_separated (X S : Scheme.{u}) (prop : Proper X S)
     : Separated X S :=
   prop.toSeparated
 
 /-- Theorem 24: Composition of separated morphisms is separated -/
-def separated_comp (X Y S : Scheme.{u})
+noncomputable def separated_comp (X Y S : Scheme.{u})
     (sepXY : Separated X Y) (sepYS : Separated Y S)
     : Separated X S where
   isSep := sepXY.isSep && sepYS.isSep
@@ -369,7 +369,7 @@ structure QCohSheaf (X : AffineScheme.{u}) where
   localization : BasicOpen X.ring → Module X.ring
 
 /-- Theorem 25: QCoh sheaf restriction compatibility via paths -/
-def qcoh_restrict_compat (X : AffineScheme.{u}) (F : QCohSheaf X)
+noncomputable def qcoh_restrict_compat (X : AffineScheme.{u}) (F : QCohSheaf X)
     (U V : BasicOpen X.ring)
     (restrictMod : (F.localization U).carrier → (F.localization V).carrier)
     (m n : (F.localization U).carrier)
@@ -378,7 +378,7 @@ def qcoh_restrict_compat (X : AffineScheme.{u}) (F : QCohSheaf X)
   Path.congrArg restrictMod p
 
 /-- Theorem 26: Module localization compatibility -/
-def module_localization_compat (R : CRing.{u}) (M : Module R)
+noncomputable def module_localization_compat (R : CRing.{u}) (M : Module R)
     (f : R.carrier)
     (Rf : LocalizationAt R f) (Mf : Module R)
     (tensor : R.carrier → M.carrier → Mf.carrier)
@@ -393,7 +393,7 @@ structure CoherentSheaf (X : AffineScheme.{u}) extends QCohSheaf X where
   isFinitelyGenerated : Bool
 
 /-- Theorem 27: Kernel of coherent sheaves is coherent (path witness) -/
-def kernel_coherent (X : AffineScheme.{u})
+noncomputable def kernel_coherent (X : AffineScheme.{u})
     (F G : CoherentSheaf X)
     (phi : F.module.carrier → G.module.carrier)
     (kerMod : Module X.ring)
@@ -403,7 +403,7 @@ def kernel_coherent (X : AffineScheme.{u})
   ker_prop k
 
 /-- Theorem 28: Short exact sequence coherence -/
-def short_exact_coherence (X : AffineScheme.{u})
+noncomputable def short_exact_coherence (X : AffineScheme.{u})
     (A B C : Module X.ring)
     (inc : A.carrier → B.carrier) (proj : B.carrier → C.carrier)
     (exact_at_B : (a : A.carrier) → Path (proj (inc a)) C.zero)
@@ -421,7 +421,7 @@ structure PresheafNatTrans (R : CRing.{u}) (F G : Presheaf R) where
     Path (G.restrict U V (component U s)) (component V (F.restrict U V s))
 
 /-- Theorem 29: Vertical composition of natural transformations -/
-def nat_trans_vcomp (R : CRing.{u}) (F G H : Presheaf R)
+noncomputable def nat_trans_vcomp (R : CRing.{u}) (F G H : Presheaf R)
     (alpha : PresheafNatTrans R F G) (beta : PresheafNatTrans R G H)
     (U V : BasicOpen R) (s : F.sections U)
     : Path (H.restrict U V (beta.component U (alpha.component U s)))
@@ -429,20 +429,20 @@ def nat_trans_vcomp (R : CRing.{u}) (F G H : Presheaf R)
   beta.naturality U V (alpha.component U s)
 
 /-- Theorem 30: Natural transformation naturality square -/
-def nat_trans_square (R : CRing.{u}) (F G : Presheaf R)
+noncomputable def nat_trans_square (R : CRing.{u}) (F G : Presheaf R)
     (eta : PresheafNatTrans R F G) (U V : BasicOpen R) (s : F.sections U)
     : Path (G.restrict U V (eta.component U s))
            (eta.component V (F.restrict U V s)) :=
   eta.naturality U V s
 
 /-- Theorem 31: Identity natural transformation -/
-def nat_trans_id (R : CRing.{u}) (F : Presheaf R)
+noncomputable def nat_trans_id (R : CRing.{u}) (F : Presheaf R)
     : PresheafNatTrans R F F where
   component := fun _ s => s
   naturality := fun U V s => Path.refl (F.restrict U V s)
 
 /-- Theorem 32: Naturality of composition via Path.trans -/
-def nat_trans_comp_naturality (R : CRing.{u}) (F G H : Presheaf R)
+noncomputable def nat_trans_comp_naturality (R : CRing.{u}) (F G H : Presheaf R)
     (alpha : PresheafNatTrans R F G) (beta : PresheafNatTrans R G H)
     (U V : BasicOpen R) (s : F.sections U)
     : Path (H.restrict U V (beta.component U (alpha.component U s)))
@@ -452,7 +452,7 @@ def nat_trans_comp_naturality (R : CRing.{u}) (F G H : Presheaf R)
   Path.trans step1 step2
 
 /-- Theorem 33: Inverse natural transformation roundtrip -/
-def nat_trans_inverse_coherence (R : CRing.{u}) (F G : Presheaf R)
+noncomputable def nat_trans_inverse_coherence (R : CRing.{u}) (F G : Presheaf R)
     (eta : PresheafNatTrans R F G)
     (eta_inv : PresheafNatTrans R G F)
     (U : BasicOpen R) (s : F.sections U)
@@ -478,7 +478,7 @@ structure Cech1Cocycle (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R) wher
   transitions : (i j : cov.indexSet) → F.sections (cov.opens i)
 
 /-- Theorem 34: Čech cocycle condition via Path -/
-def cech_cocycle_condition (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
+noncomputable def cech_cocycle_condition (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
     (g : Cech1Cocycle R F cov)
     (i j k : cov.indexSet)
     (gij : F.sections (cov.opens i))
@@ -488,7 +488,7 @@ def cech_cocycle_condition (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
   cocycle
 
 /-- Theorem 35: Čech coboundary is trivial on cocycles -/
-def cech_coboundary_trivial (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
+noncomputable def cech_coboundary_trivial (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
     (z : Cech0Cocycle R F cov)
     (i j : cov.indexSet)
     (cobdry : Path (F.restrict (cov.opens i) (cov.opens j) (z.sections i))
@@ -498,7 +498,7 @@ def cech_coboundary_trivial (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
   cobdry
 
 /-- Theorem 36: Refinement map on Čech cocycles -/
-def cech_refinement (R : CRing.{u}) (F : Presheaf R)
+noncomputable def cech_refinement (R : CRing.{u}) (F : Presheaf R)
     (cov1 cov2 : OpenCover R)
     (refine : cov2.indexSet → cov1.indexSet)
     (z : Cech0Cocycle R F cov1)
@@ -512,14 +512,14 @@ def cech_refinement (R : CRing.{u}) (F : Presheaf R)
   compat j
 
 /-- Theorem 37: Čech-to-derived functor comparison -/
-def cech_to_derived (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
+noncomputable def cech_to_derived (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
     (H0_cech H0_derived : Type u)
     (comparison : H0_cech → H0_derived)
     (c : H0_cech) : Path (comparison c) (comparison c) :=
   Path.refl (comparison c)
 
 /-- Theorem 38: Refinement functoriality via congrArg -/
-def cech_refinement_functorial (R : CRing.{u}) (F : Presheaf R)
+noncomputable def cech_refinement_functorial (R : CRing.{u}) (F : Presheaf R)
     (cov : OpenCover R)
     (H0 : Type u) (ref1 ref2 : H0 → H0)
     (comp : H0 → H0)
@@ -548,20 +548,20 @@ structure Proj (S : GradedRing.{u}) where
   point : HomogeneousPrimeIdeal S
 
 /-- Theorem 39: Proj has a structure sheaf via degree-zero localization -/
-def proj_structure_sheaf (S : GradedRing.{u})
+noncomputable def proj_structure_sheaf (S : GradedRing.{u})
     (OProj : BasicOpen S.ring → CRing.{u})
     (f : BasicOpen S.ring) (s : (OProj f).carrier) : Path s s :=
   Path.refl s
 
 /-- Theorem 40: D+(f) is affine for Proj -/
-def dplus_is_affine (S : GradedRing.{u}) (f : S.ring.carrier)
+noncomputable def dplus_is_affine (S : GradedRing.{u}) (f : S.ring.carrier)
     (affineChart : AffineScheme.{u})
     (iso : Proj S → Spec affineChart.ring)
     (p : Proj S) : Path (iso p) (iso p) :=
   Path.refl (iso p)
 
 /-- Theorem 41: Proj inclusion via graded maps -/
-def proj_graded_map (S T : GradedRing.{u})
+noncomputable def proj_graded_map (S T : GradedRing.{u})
     (phi : RingHom S.ring T.ring)
     (induced : Proj T → Proj S)
     (p q : Proj T) (h : Path p q)
@@ -580,7 +580,7 @@ structure SchemeGluingData where
   glueMap : (i j : indexSet) → overlaps i j → (charts i).points
 
 /-- Theorem 42: Gluing cocycle condition -/
-def gluing_cocycle (gd : SchemeGluingData.{u})
+noncomputable def gluing_cocycle (gd : SchemeGluingData.{u})
     (i j : gd.indexSet)
     (phi_ij : gd.overlaps i j → gd.overlaps j i)
     (phi_ji : gd.overlaps j i → gd.overlaps i j)
@@ -590,14 +590,14 @@ def gluing_cocycle (gd : SchemeGluingData.{u})
   cocycle
 
 /-- Theorem 43: Glued scheme unique isomorphism -/
-def gluing_unique (X Y : Scheme.{u})
+noncomputable def gluing_unique (X Y : Scheme.{u})
     (isoXY : X.points → Y.points) (isoYX : Y.points → X.points)
     (roundtrip : (x : X.points) → Path (isoYX (isoXY x)) x)
     (x : X.points) : Path (isoYX (isoXY x)) x :=
   roundtrip x
 
 /-- Theorem 44: Sheaf gluing locality -/
-def sheaf_gluing_locality (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
+noncomputable def sheaf_gluing_locality (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
     (U : BasicOpen R)
     (s t : F.sections U)
     (local_eq : (i : cov.indexSet) →
@@ -619,7 +619,7 @@ structure DVR where
   inclusion : ring.carrier → fractionField.carrier
 
 /-- Theorem 45: Valuative criterion of separatedness -/
-def valuative_separatedness (X S : Scheme.{u})
+noncomputable def valuative_separatedness (X S : Scheme.{u})
     (R : DVR.{u})
     (lift1 lift2 : Spec R.ring → X.points)
     (agree : (p : Spec R.ring) → Path (lift1 p) (lift2 p))
@@ -627,7 +627,7 @@ def valuative_separatedness (X S : Scheme.{u})
   agree p
 
 /-- Theorem 46: Valuative criterion of properness -/
-def valuative_properness (X S : Scheme.{u}) (prop : Proper X S)
+noncomputable def valuative_properness (X S : Scheme.{u}) (prop : Proper X S)
     (R : DVR.{u})
     (generic_pt : Spec R.fractionField → X.points)
     (lift : Spec R.ring → X.points)
@@ -636,7 +636,7 @@ def valuative_properness (X S : Scheme.{u}) (prop : Proper X S)
   extends_generic q
 
 /-- Theorem 47: Uniqueness of valuative lift via Path.symm -/
-def valuative_lift_unique (X S : Scheme.{u})
+noncomputable def valuative_lift_unique (X S : Scheme.{u})
     (R : DVR.{u}) (lift1 lift2 : Spec R.ring → X.points)
     (agree : (p : Spec R.ring) → Path (lift1 p) (lift2 p))
     (p : Spec R.ring) : Path (lift2 p) (lift1 p) :=
@@ -652,7 +652,7 @@ structure TensorProduct (R : CRing.{u}) (M N : Module R) where
   tensor : M.carrier → N.carrier → carrier
 
 /-- Theorem 48: Tensor product symmetry -/
-def tensor_symmetric (R : CRing.{u}) (M N : Module R)
+noncomputable def tensor_symmetric (R : CRing.{u}) (M N : Module R)
     (MtN : TensorProduct R M N) (NtM : TensorProduct R N M)
     (swap : MtN.carrier → NtM.carrier)
     (swap_inv : NtM.carrier → MtN.carrier)
@@ -661,7 +661,7 @@ def tensor_symmetric (R : CRing.{u}) (M N : Module R)
   roundtrip x
 
 /-- Theorem 49: Base change of a quasi-coherent sheaf -/
-def base_change_qcoh (X Y : AffineScheme.{u})
+noncomputable def base_change_qcoh (X Y : AffineScheme.{u})
     (phi : RingHom X.ring Y.ring)
     (F : QCohSheaf X)
     (pullbackF : QCohSheaf Y)
@@ -670,7 +670,7 @@ def base_change_qcoh (X Y : AffineScheme.{u})
   Path.refl s
 
 /-- Theorem 50: Projection formula via paths -/
-def projection_formula (R : CRing.{u}) (M N : Module R)
+noncomputable def projection_formula (R : CRing.{u}) (M N : Module R)
     (MtN : TensorProduct R M N)
     (f : M.carrier → M.carrier)
     (proj_form : (m : M.carrier) → (n : N.carrier) →

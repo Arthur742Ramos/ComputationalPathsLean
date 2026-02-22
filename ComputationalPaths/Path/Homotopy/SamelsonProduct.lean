@@ -32,7 +32,7 @@ universe u
 variable {A : Type u} {a : A}
 
 /-- The Samelson product on loops: the loop commutator. -/
-@[simp] def samelson (p q : LoopSpace A a) : LoopSpace A a :=
+@[simp] noncomputable def samelson (p q : LoopSpace A a) : LoopSpace A a :=
   Path.trans (Path.trans (Path.trans p q) (Path.symm p)) (Path.symm q)
 
 /-- Samelson product respects rewrite equivalence in both variables. -/

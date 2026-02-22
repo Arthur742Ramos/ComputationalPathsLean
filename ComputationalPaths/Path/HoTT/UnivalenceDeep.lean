@@ -29,13 +29,13 @@ structure Equiv' (A : Type u) (B : Type v) where
   toFun : A → B
   isEquiv : QInv toFun
 
-def Equiv'.refl (A : Type u) : Equiv' A A :=
+noncomputable def Equiv'.refl (A : Type u) : Equiv' A A :=
   ⟨fun x => x, ⟨fun x => x, fun a => Path.refl a, fun b => Path.refl b⟩⟩
 
-def Equiv'.symm (e : Equiv' A B) : Equiv' B A :=
+noncomputable def Equiv'.symm (e : Equiv' A B) : Equiv' B A :=
   ⟨e.isEquiv.inv, ⟨e.toFun, e.isEquiv.retr, e.isEquiv.sect⟩⟩
 
-def Equiv'.trans (e₁ : Equiv' A B) (e₂ : Equiv' B C) : Equiv' A C where
+noncomputable def Equiv'.trans (e₁ : Equiv' A B) (e₂ : Equiv' B C) : Equiv' A C where
   toFun := e₂.toFun ∘ e₁.toFun
   isEquiv :=
     { inv := e₁.isEquiv.inv ∘ e₂.isEquiv.inv
@@ -67,22 +67,22 @@ structure BiInv (f : A → B) where
   left : HasLeftInverse f
   right : HasRightInverse f
 
-def qinvToBiInv {f : A → B} (e : QInv f) : BiInv f where
+noncomputable def qinvToBiInv {f : A → B} (e : QInv f) : BiInv f where
   left := ⟨e.inv, e.sect⟩
   right := ⟨e.inv, e.retr⟩
 
-def qinvToHAE {f : A → B} (e : QInv f) : IsHAE f where
+noncomputable def qinvToHAE {f : A → B} (e : QInv f) : IsHAE f where
   inv := e.inv
   sect := e.sect
   retr := e.retr
   coh := fun _ => Subsingleton.elim _ _
 
-def qinvInv {f : A → B} (e : QInv f) : QInv e.inv where
+noncomputable def qinvInv {f : A → B} (e : QInv f) : QInv e.inv where
   inv := f
   sect := fun b => e.retr b
   retr := fun a => e.sect a
 
-def biInvToQInv {f : A → B} (e : BiInv f) : QInv f where
+noncomputable def biInvToQInv {f : A → B} (e : BiInv f) : QInv f where
   inv := e.left.linv
   sect := e.left.sect
   retr := fun b =>
@@ -100,7 +100,7 @@ def biInvToQInv {f : A → B} (e : BiInv f) : QInv f where
         _ = f (e.right.rinv b) := by rw [hsect]
         _ = b := hretr b)
 
-def transportEquiv' {D : A → Type v} {a b : A} (p : Path a b) :
+noncomputable def transportEquiv' {D : A → Type v} {a b : A} (p : Path a b) :
     Equiv' (D a) (D b) where
   toFun := Path.transport p
   isEquiv :=
@@ -343,13 +343,13 @@ theorem congrArg_equiv_trans {A B C : Type u}
 
 /-! ## 31. Equiv forward then inverse gives section -/
 
-def equiv_fwd_inv_path {A B : Type u} (e : Equiv' A B) (a : A) :
+noncomputable def equiv_fwd_inv_path {A B : Type u} (e : Equiv' A B) (a : A) :
     Path (e.isEquiv.inv (e.toFun a)) a :=
   e.isEquiv.sect a
 
 /-! ## 32. Equiv inverse then forward gives retraction -/
 
-def equiv_inv_fwd_path {A B : Type u} (e : Equiv' A B) (b : B) :
+noncomputable def equiv_inv_fwd_path {A B : Type u} (e : Equiv' A B) (b : B) :
     Path (e.toFun (e.isEquiv.inv b)) b :=
   e.isEquiv.retr b
 

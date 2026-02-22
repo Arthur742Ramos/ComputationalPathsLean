@@ -173,7 +173,7 @@ structure HirzebruchSignature (k : Nat) (M : OrientedManifold (4 * k)) where
   theorem_eq : Path sigData.signature lPoly.lGenus
 
 /-- The Hirzebruch signature theorem holds. -/
-def hirzebruch_signature_eq (k : Nat) (M : OrientedManifold (4 * k))
+noncomputable def hirzebruch_signature_eq (k : Nat) (M : OrientedManifold (4 * k))
     (H : HirzebruchSignature k M) :
     Path H.sigData.signature H.lPoly.lGenus :=
   H.theorem_eq

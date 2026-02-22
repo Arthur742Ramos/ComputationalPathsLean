@@ -57,7 +57,7 @@ structure HopkinsSmithPeriodicity (p : Prime) (n : Nat) where
   choice_unique : True
 
 /-- Trivial periodicity witness choosing identity maps. -/
-def hopkinsSmithPeriodicity (p : Prime) (n : Nat) : HopkinsSmithPeriodicity p n where
+noncomputable def hopkinsSmithPeriodicity (p : Prime) (n : Nat) : HopkinsSmithPeriodicity p n where
   vnSelfMap := fun _X =>
     { selfMap := fun x => x
       period := 1
@@ -75,7 +75,7 @@ structure HopkinsSmithThickSubcategory (p : Prime) where
   height_unique : True
 
 /-- Trivial thick subcategory classification. -/
-def hopkinsSmithThickSubcategory (p : Prime) : HopkinsSmithThickSubcategory p where
+noncomputable def hopkinsSmithThickSubcategory (p : Prime) : HopkinsSmithThickSubcategory p where
   classification :=
     { classify := fun _ => 0
       wellDefined := trivial }
@@ -108,7 +108,7 @@ structure MoravaKBousfieldClass (p : Prime) (n : Nat) where
   height_distinct : True
 
 /-- A canonical Bousfield class for a given Morava K-theory. -/
-def moravaKBousfieldClass {p : Prime} {n : Nat} (K : MoravaKTheory p n) :
+noncomputable def moravaKBousfieldClass {p : Prime} {n : Nat} (K : MoravaKTheory p n) :
     MoravaKBousfieldClass p n where
   theory := K
   bousfield :=
@@ -130,7 +130,7 @@ structure BousfieldClassFiltration (p : Prime) where
   conservative : True
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

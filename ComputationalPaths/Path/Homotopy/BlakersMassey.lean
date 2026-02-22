@@ -35,7 +35,7 @@ structure PushoutSquare (A B C P : Type u)
   comm : (c : C) → Path (inl (f c)) (inr (g c))
 
 /-- The canonical pushout square for the computational pushout type. -/
-def canonicalSquare (A B C : Type u) (f : C → A) (g : C → B) :
+noncomputable def canonicalSquare (A B C : Type u) (f : C → A) (g : C → B) :
     PushoutSquare A B C (CompPath.PushoutCompPath A B C f g) f g
       (CompPath.PushoutCompPath.inl (A := A) (B := B) (C := C) (f := f) (g := g))
       (CompPath.PushoutCompPath.inr (A := A) (B := B) (C := C) (f := f) (g := g)) where

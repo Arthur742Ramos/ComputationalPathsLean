@@ -50,19 +50,19 @@ variable {S : EtaleSitePathData Obj Cover}
 variable (C : EtaleComparisonPathData S Coeff)
 
 /-- Comparison map transported along a base path using singular functoriality. -/
-def comparisonAlong {U V : Obj} (p : Path U V) (n : Nat) :
+noncomputable def comparisonAlong {U V : Obj} (p : Path U V) (n : Nat) :
     Path (C.etaleCohomology n U) (C.singularCohomology n V) :=
   Path.trans (C.comparisonPath n U) (C.singularMap p n)
 
 /-- Naturality path between the two comparison transports. -/
-def comparisonNaturalityAlong {U V : Obj} (p : Path U V) (n : Nat) :
+noncomputable def comparisonNaturalityAlong {U V : Obj} (p : Path U V) (n : Nat) :
     Path
       (C.comparisonAlong p n)
       (Path.trans (C.etaleMap p n) (C.comparisonPath n V)) :=
   C.comparisonNaturality p n
 
 /-- Step witness: right-unit normalization for comparison maps. -/
-def comparison_step (n : Nat) (U : Obj) :
+noncomputable def comparison_step (n : Nat) (U : Obj) :
     Path.Step
       (Path.trans (C.comparisonPath n U)
         (Path.refl (C.singularCohomology n U)))
@@ -77,7 +77,7 @@ noncomputable def comparison_rweq (n : Nat) (U : Obj) :
   rweq_of_step (C.comparison_step n U)
 
 /-- Step witness: right-unit normalization for transported comparison maps. -/
-def comparisonAlong_step {U V : Obj} (p : Path U V) (n : Nat) :
+noncomputable def comparisonAlong_step {U V : Obj} (p : Path U V) (n : Nat) :
     Path.Step
       (Path.trans (C.comparisonAlong p n)
         (Path.refl (C.singularCohomology n V)))
@@ -98,7 +98,7 @@ noncomputable def comparisonAlong_cancel_rweq {U V : Obj} (p : Path U V) (n : Na
   rweq_cmpA_inv_left (C.comparisonAlong p n)
 
 /-- Step witness: right-unit normalization for naturality paths. -/
-def comparisonNaturality_step {U V : Obj} (p : Path U V) (n : Nat) :
+noncomputable def comparisonNaturality_step {U V : Obj} (p : Path U V) (n : Nat) :
     Path.Step
       (Path.trans (C.comparisonNaturalityAlong p n)
         (Path.refl (Path.trans (C.etaleMap p n) (C.comparisonPath n V))))
@@ -115,7 +115,7 @@ noncomputable def comparisonNaturality_rweq {U V : Obj} (p : Path U V) (n : Nat)
 end EtaleComparisonPathData
 
 /-- Trivial comparison package over the trivial etale site. -/
-def trivialEtaleComparisonPathData :
+noncomputable def trivialEtaleComparisonPathData :
     EtaleComparisonPathData EtaleSitePaths.trivialEtaleSitePathData Nat where
   etaleCohomology := fun _ _ => 0
   singularCohomology := fun _ _ => 0

@@ -55,13 +55,13 @@ private theorem sum_inr_ne_inl (b : B) (a : A) : Sum.inr b ≠ Sum.inl a := by
   cases h
 
 /-- Path code for coproducts: paths stay within each summand, otherwise empty. -/
-def coproductPathCode : Coproduct A B → Coproduct A B → Type u
+noncomputable def coproductPathCode : Coproduct A B → Coproduct A B → Type u
   | Sum.inl a, Sum.inl a' => Path a a'
   | Sum.inr b, Sum.inr b' => Path b b'
   | _, _ => PEmpty.{u+1}
 
 /-- Encode a coproduct path into its summand path code. -/
-def coproductPathEncode {x y : Coproduct A B} (p : Path x y) :
+noncomputable def coproductPathEncode {x y : Coproduct A B} (p : Path x y) :
     coproductPathCode (A := A) (B := B) x y := by
   cases x with
   | inl a =>
@@ -78,7 +78,7 @@ def coproductPathEncode {x y : Coproduct A B} (p : Path x y) :
           exact Path.stepChain (Sum.inr.injEq b b' ▸ p.toEq)
 
 /-- Decode a coproduct path code back to a path in the coproduct. -/
-def coproductPathDecode {x y : Coproduct A B}
+noncomputable def coproductPathDecode {x y : Coproduct A B}
     (c : coproductPathCode (A := A) (B := B) x y) : Path x y := by
   cases x with
   | inl a =>
@@ -182,7 +182,7 @@ abbrev ConnectedCoproduct : Type u :=
     (CompPath.IsPathConnected.base (A := B))
 
 /-- Basepoint for the connected coproduct. -/
-@[simp] def connectedCoproductBasepoint : ConnectedCoproduct (A := A) (B := B) :=
+@[simp] noncomputable def connectedCoproductBasepoint : ConnectedCoproduct (A := A) (B := B) :=
   Wedge.basepoint (A := A) (B := B)
     (a₀ := CompPath.IsPathConnected.base (A := A))
     (b₀ := CompPath.IsPathConnected.base (A := B))

@@ -40,37 +40,37 @@ structure DRing (A : Type u) where
 /-! ## Path constructions for ring axioms -/
 
 /-- Addition commutativity path. -/
-def dr_add_comm_path (R : DRing A) (a b : A) :
+noncomputable def dr_add_comm_path (R : DRing A) (a b : A) :
     Path (R.add a b) (R.add b a) :=
   Path.mk [Step.mk _ _ (R.add_comm a b)] (R.add_comm a b)
 
 /-- Multiplication commutativity path. -/
-def dr_mul_comm_path (R : DRing A) (a b : A) :
+noncomputable def dr_mul_comm_path (R : DRing A) (a b : A) :
     Path (R.mul a b) (R.mul b a) :=
   Path.mk [Step.mk _ _ (R.mul_comm a b)] (R.mul_comm a b)
 
 /-- Addition associativity path. -/
-def dr_add_assoc_path (R : DRing A) (a b c : A) :
+noncomputable def dr_add_assoc_path (R : DRing A) (a b c : A) :
     Path (R.add (R.add a b) c) (R.add a (R.add b c)) :=
   Path.mk [Step.mk _ _ (R.add_assoc a b c)] (R.add_assoc a b c)
 
 /-- Multiplication associativity path. -/
-def dr_mul_assoc_path (R : DRing A) (a b c : A) :
+noncomputable def dr_mul_assoc_path (R : DRing A) (a b c : A) :
     Path (R.mul (R.mul a b) c) (R.mul a (R.mul b c)) :=
   Path.mk [Step.mk _ _ (R.mul_assoc a b c)] (R.mul_assoc a b c)
 
 /-- Distributivity path. -/
-def dr_distrib_path (R : DRing A) (a b c : A) :
+noncomputable def dr_distrib_path (R : DRing A) (a b c : A) :
     Path (R.mul a (R.add b c)) (R.add (R.mul a b) (R.mul a c)) :=
   Path.mk [Step.mk _ _ (R.distrib a b c)] (R.distrib a b c)
 
 /-- Zero absorbs multiplication path. -/
-def dr_mul_zero_path (R : DRing A) (a : A) :
+noncomputable def dr_mul_zero_path (R : DRing A) (a : A) :
     Path (R.mul a R.zero) R.zero :=
   Path.mk [Step.mk _ _ (R.mul_zero a)] (R.mul_zero a)
 
 /-- Additive inverse path. -/
-def dr_add_neg_path (R : DRing A) (a : A) :
+noncomputable def dr_add_neg_path (R : DRing A) (a : A) :
     Path (R.add a (R.neg a)) R.zero :=
   Path.mk [Step.mk _ _ (R.add_neg a)] (R.add_neg a)
 
@@ -83,7 +83,7 @@ structure LinearDiophSol (R : DRing A) (a b c : A) where
   sol : R.add (R.mul a x) (R.mul b y) = c
 
 /-- Path witnessing a solution to ax + by = c. -/
-def linear_dioph_path (R : DRing A) (a b c : A) (S : LinearDiophSol R a b c) :
+noncomputable def linear_dioph_path (R : DRing A) (a b c : A) (S : LinearDiophSol R a b c) :
     Path (R.add (R.mul a S.x) (R.mul b S.y)) c :=
   Path.mk [Step.mk _ _ S.sol] S.sol
 
@@ -111,7 +111,7 @@ structure PythTriple (R : DRing A) where
   pyth : R.add (R.mul a a) (R.mul b b) = R.mul c c
 
 /-- Path witnessing a Pythagorean triple. -/
-def pyth_path (R : DRing A) (T : PythTriple R) :
+noncomputable def pyth_path (R : DRing A) (T : PythTriple R) :
     Path (R.add (R.mul T.a T.a) (R.mul T.b T.b)) (R.mul T.c T.c) :=
   Path.mk [Step.mk _ _ T.pyth] T.pyth
 
@@ -142,7 +142,7 @@ structure SumTwoSquares (R : DRing A) (n : A) where
   repr : R.add (R.mul a a) (R.mul b b) = n
 
 /-- Path for sum-of-two-squares representation. -/
-def sos_path (R : DRing A) (n : A) (S : SumTwoSquares R n) :
+noncomputable def sos_path (R : DRing A) (n : A) (S : SumTwoSquares R n) :
     Path (R.add (R.mul S.a S.a) (R.mul S.b S.b)) n :=
   Path.mk [Step.mk _ _ S.repr] S.repr
 
@@ -162,7 +162,7 @@ structure SumFourSquares (R : DRing A) (n : A) where
   repr : R.add (R.add (R.mul a a) (R.mul b b)) (R.add (R.mul c c) (R.mul d d)) = n
 
 /-- Path for sum of four squares. -/
-def s4s_path (R : DRing A) (n : A) (S : SumFourSquares R n) :
+noncomputable def s4s_path (R : DRing A) (n : A) (S : SumFourSquares R n) :
     Path (R.add (R.add (R.mul S.a S.a) (R.mul S.b S.b))
                 (R.add (R.mul S.c S.c) (R.mul S.d S.d))) n :=
   Path.mk [Step.mk _ _ S.repr] S.repr
@@ -176,7 +176,7 @@ structure PellSol (R : DRing A) (D : A) where
   pell : R.mul x x = R.add R.one (R.mul D (R.mul y y))
 
 /-- Path for a Pell equation solution. -/
-def pell_path (R : DRing A) (D : A) (S : PellSol R D) :
+noncomputable def pell_path (R : DRing A) (D : A) (S : PellSol R D) :
     Path (R.mul S.x S.x) (R.add R.one (R.mul D (R.mul S.y S.y))) :=
   Path.mk [Step.mk _ _ S.pell] S.pell
 
@@ -203,13 +203,13 @@ structure FermatDescent (R : DRing A) where
   descend_measure : ∀ n, prop n → measure (descendTo n) = R.mul (measure n) R.zero
 
 /-- Path for descent measure collapse. -/
-def descent_measure_path (R : DRing A) (FD : FermatDescent R) (n : A)
+noncomputable def descent_measure_path (R : DRing A) (FD : FermatDescent R) (n : A)
     (h : FD.prop n) :
     Path (FD.measure (FD.descendTo n)) (R.mul (FD.measure n) R.zero) :=
   Path.mk [Step.mk _ _ (FD.descend_measure n h)] (FD.descend_measure n h)
 
 /-- Descent measure reaches zero via mul_zero. -/
-def descent_to_zero_path (R : DRing A) (FD : FermatDescent R) (n : A)
+noncomputable def descent_to_zero_path (R : DRing A) (FD : FermatDescent R) (n : A)
     (h : FD.prop n) :
     Path (FD.measure (FD.descendTo n)) R.zero :=
   trans (descent_measure_path R FD n h)
@@ -228,7 +228,7 @@ structure BrahmaguptaFib (R : DRing A) where
              (R.add (R.mul a d) (R.mul b c)))
 
 /-- Path for Brahmagupta-Fibonacci identity. -/
-def bf_path (R : DRing A) (BF : BrahmaguptaFib R) (a b c d : A) :
+noncomputable def bf_path (R : DRing A) (BF : BrahmaguptaFib R) (a b c d : A) :
     Path (R.mul (R.add (R.mul a a) (R.mul b b)) (R.add (R.mul c c) (R.mul d d)))
          (R.add
            (R.mul (R.add (R.mul a c) (R.neg (R.mul b d)))
@@ -263,7 +263,7 @@ theorem congrArg_trans_ring {B : Type u} (R : DRing A) (f : A → B)
   simp [congrArg, trans]
 
 /-- Step from Pythagorean triple. -/
-def pyth_step (R : DRing A) (T : PythTriple R) : Step A :=
+noncomputable def pyth_step (R : DRing A) (T : PythTriple R) : Step A :=
   Step.mk (R.add (R.mul T.a T.a) (R.mul T.b T.b)) (R.mul T.c T.c) T.pyth
 
 /-- Symm of Pythagorean step. -/

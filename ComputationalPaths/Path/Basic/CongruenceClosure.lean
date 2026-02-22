@@ -15,7 +15,7 @@ abbrev RwEqWitnessSet (A : Type u) : Type u :=
   ∀ {a b : A} {p q : Path a b}, RwEq p q → Prop
 
 /-- Seed relation induced by a witness set. -/
-def SeedRel {A : Type u} (W : RwEqWitnessSet A)
+noncomputable def SeedRel {A : Type u} (W : RwEqWitnessSet A)
     {a b : A} (p q : Path a b) : Prop :=
   ∃ h : RwEq p q, W h
 
@@ -68,7 +68,7 @@ theorem closure_is_equivalence {A : Type u} (W : RwEqWitnessSet A) (a b : A) :
   · intro p q r hpq hqr
     exact closure_trans (W := W) hpq hqr
 
-def closureSetoid {A : Type u} (W : RwEqWitnessSet A) (a b : A) :
+noncomputable def closureSetoid {A : Type u} (W : RwEqWitnessSet A) (a b : A) :
     Setoid (Path a b) where
   r := fun p q => computeClosure W p q
   iseqv := closure_is_equivalence W a b
@@ -119,7 +119,7 @@ noncomputable def closure_sound {A : Type u} {W : RwEqWitnessSet A}
   rweq_of_rweqProp (closure_sound_prop (W := W) h)
 
 /-- Canonical map from closure relation to the free groupoid quotient `PathRwQuot`. -/
-@[simp] def toPathRwQuot {A : Type u} {a b : A} (p : Path a b) : PathRwQuot A a b :=
+@[simp] noncomputable def toPathRwQuot {A : Type u} {a b : A} (p : Path a b) : PathRwQuot A a b :=
   Quot.mk _ p
 
 theorem closure_toPathRwQuot_eq {A : Type u} {W : RwEqWitnessSet A}
@@ -131,7 +131,7 @@ abbrev ClosureQuot {A : Type u} (W : RwEqWitnessSet A) (a b : A) : Type u :=
   Quot (fun p q : Path a b => computeClosure W p q)
 
 /-- Connection to the free groupoid quotient: every closure class has a canonical image. -/
-def closureToFreeGroupoidQuot {A : Type u} (W : RwEqWitnessSet A) {a b : A} :
+noncomputable def closureToFreeGroupoidQuot {A : Type u} (W : RwEqWitnessSet A) {a b : A} :
     ClosureQuot W a b → PathRwQuot A a b :=
   Quot.lift (fun p => toPathRwQuot p)
     (fun _ _ hpq => closure_toPathRwQuot_eq (W := W) hpq)
@@ -141,7 +141,7 @@ def closureToFreeGroupoidQuot {A : Type u} (W : RwEqWitnessSet A) {a b : A} :
     closureToFreeGroupoidQuot (A := A) W (Quot.mk _ p) = toPathRwQuot p := rfl
 
 /-- Maximal witness set: every `RwEq` proof is available as a seed. -/
-def allWitnesses (A : Type u) : RwEqWitnessSet A :=
+noncomputable def allWitnesses (A : Type u) : RwEqWitnessSet A :=
   fun {_ _} {_ _} _ => True
 
 theorem computeClosure_of_rweq {A : Type u}

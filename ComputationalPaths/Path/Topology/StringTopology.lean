@@ -73,7 +73,7 @@ inductive StringStep (L : FreeLoopSpace.{u}) :
       StringStep L γ γ
 
 /-- Interpret a string step as a path. -/
-def stringStepPath {L : FreeLoopSpace.{u}} {a b : L.loop} :
+noncomputable def stringStepPath {L : FreeLoopSpace.{u}} {a b : L.loop} :
     StringStep L a b → Path a b
   | StringStep.periodicity _ _ => Path.refl _
 
@@ -229,13 +229,13 @@ structure GoldmanTuraev (L : FreeLoopSpace.{u}) where
 /-! ## Summary -/
 
 /-- Loop product composition is path-associative. -/
-def loop_product_assoc_path {L : FreeLoopSpace.{u}}
+noncomputable def loop_product_assoc_path {L : FreeLoopSpace.{u}}
     (P : LoopProductData L) (a b c : L.loop) :
     Path (P.prod (P.prod a b) c) (P.prod a (P.prod b c)) :=
   P.assoc a b c
 
 /-- BV operator squares to identity on loops (up to path). -/
-def bv_involutive {L : FreeLoopSpace.{u}}
+noncomputable def bv_involutive {L : FreeLoopSpace.{u}}
     (B : BVOperator L) (γ : L.loop) :
     Path (B.delta (B.delta γ)) γ :=
   B.delta_squared γ

@@ -39,7 +39,7 @@ inductive Delooping (G : Type u) : Type u
   | base : Delooping G
 
 /-- Basepoint of the delooping space. -/
-@[simp] def deloopingBase (G : Type u) : Delooping G :=
+@[simp] noncomputable def deloopingBase (G : Type u) : Delooping G :=
   Delooping.base
 
 /-- Alias for the delooping space `BG`. -/
@@ -63,7 +63,7 @@ section Eval
 variable {G : Type u} (S : StrictGroup G)
 
 /-- Evaluate a loop expression into the strict group. -/
-@[simp] def deloopingExprEval : DeloopingLoopExpr G → G
+@[simp] noncomputable def deloopingExprEval : DeloopingLoopExpr G → G
   | DeloopingExpr.loop g => g
   | DeloopingExpr.refl => S.one
   | DeloopingExpr.symm p => S.inv (deloopingExprEval p)
@@ -79,7 +79,7 @@ variable {G H : Type u}
 variable {S : StrictGroup G} {T : StrictGroup H}
 
 /-- Map loop expressions along a group homomorphism. -/
-@[simp] def deloopingExprMap (f : GroupHom G H S T) : DeloopingExpr G → DeloopingExpr H
+@[simp] noncomputable def deloopingExprMap (f : GroupHom G H S T) : DeloopingExpr G → DeloopingExpr H
   | DeloopingExpr.loop g => DeloopingExpr.loop (f g)
   | DeloopingExpr.refl => DeloopingExpr.refl
   | DeloopingExpr.symm p => DeloopingExpr.symm (deloopingExprMap f p)
@@ -158,11 +158,11 @@ section Quotient
 variable {G : Type u} (S : StrictGroup G)
 
 /-- Two loop expressions are equivalent when they evaluate to the same element. -/
-def DeloopingRel (p q : DeloopingLoopExpr G) : Prop :=
+noncomputable def DeloopingRel (p q : DeloopingLoopExpr G) : Prop :=
   deloopingExprEval (S := S) p = deloopingExprEval (S := S) q
 
 /-- Setoid of loop expressions modulo evaluation. -/
-def deloopingSetoid : Setoid (DeloopingLoopExpr G) where
+noncomputable def deloopingSetoid : Setoid (DeloopingLoopExpr G) where
   r := DeloopingRel (S := S)
   iseqv := by
     refine ⟨?refl, ?symm, ?trans⟩
@@ -189,7 +189,7 @@ abbrev OmegaBG (S : StrictGroup G) : Type u :=
     exact hpq)
 
 /-- Decode a group element as a loop class. -/
-@[simp] def deloopingOmegaDecode :
+@[simp] noncomputable def deloopingOmegaDecode :
     G → DeloopingOmega (S := S) :=
   fun g => Quot.mk _ (DeloopingExpr.loop g)
 
@@ -233,7 +233,7 @@ theorem deloopingRel_map (f : GroupHom G H S T)
   simpa [deloopingExprEval_map (S := S) (T := T) f] using _root_.congrArg f h
 
 /-- Map loop quotients along a group homomorphism. -/
-def deloopingOmegaMap (f : GroupHom G H S T) :
+noncomputable def deloopingOmegaMap (f : GroupHom G H S T) :
     DeloopingOmega (S := S) → DeloopingOmega (S := T) :=
   Quot.lift
     (fun p => Quot.mk _ (deloopingExprMap (S := S) (T := T) f p))
@@ -300,7 +300,7 @@ section PiOneMaps
 variable {H : Type u} {T : StrictGroup H}
 
 /-- The induced map on `π₁(BG)` from a group homomorphism. -/
-def piOneBGMap (f : GroupHom G H S T) :
+noncomputable def piOneBGMap (f : GroupHom G H S T) :
     piOneBG (S := S) → piOneBG (S := T) :=
   deloopingOmegaMap (S := S) (T := T) f
 

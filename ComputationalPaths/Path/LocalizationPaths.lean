@@ -33,11 +33,11 @@ namespace Fraction
 variable {A : Type u} {a b c : A}
 
 /-- Composite path of a fraction. -/
-def toPath (f : Fraction a b c) : Path a c :=
+noncomputable def toPath (f : Fraction a b c) : Path a c :=
   trans (symm f.weq) f.mor
 
 /-- Identity fraction. -/
-def idFrac (a : A) : Fraction a a a :=
+noncomputable def idFrac (a : A) : Fraction a a a :=
   ⟨refl a, refl a⟩
 
 -- 1
@@ -51,7 +51,7 @@ theorem toPath_steps (f : Fraction a b c) :
   rfl
 
 /-- Fraction symmetry: swap the legs. -/
-def symmFrac (fr : Fraction a b c) : Fraction c b a :=
+noncomputable def symmFrac (fr : Fraction a b c) : Fraction c b a :=
   ⟨fr.mor, fr.weq⟩
 
 -- 3
@@ -78,7 +78,7 @@ namespace FractionPath
 variable {A : Type u} {a c : A}
 
 /-- Build from a direct path. -/
-def ofPath (p : Path a c) : FractionPath a c :=
+noncomputable def ofPath (p : Path a c) : FractionPath a c :=
   { mid := a
     frac := ⟨refl a, p⟩
     path := p
@@ -108,7 +108,7 @@ theorem ore_path_witness {A : Type u} {a b c : A} (ore : OreCondition a b c)
   ore.square f s
 
 -- 8
-def oreRefl {A : Type u} (a : A) : OreCondition a a a :=
+noncomputable def oreRefl {A : Type u} (a : A) : OreCondition a a a :=
   { apex := a
     compB := refl a
     compC := refl a
@@ -124,10 +124,10 @@ namespace LeftFraction
 
 variable {A : Type u} {a b c : A}
 
-def toPath (f : LeftFraction a b c) : Path a c :=
+noncomputable def toPath (f : LeftFraction a b c) : Path a c :=
   trans f.mor (symm f.weq)
 
-def idFrac (a : A) : LeftFraction a a a :=
+noncomputable def idFrac (a : A) : LeftFraction a a a :=
   ⟨refl a, refl a⟩
 
 -- 9
@@ -156,7 +156,7 @@ theorem left_ore_path_witness {A : Type u} {a b c : A}
   ore.square f s
 
 -- 12
-def leftOreRefl {A : Type u} (a : A) : LeftOreCondition a a a :=
+noncomputable def leftOreRefl {A : Type u} (a : A) : LeftOreCondition a a a :=
   { apex := a
     compB := refl a
     compC := refl a
@@ -173,22 +173,22 @@ namespace Zigzag
 
 variable {A : Type u}
 
-def append {a b c : A} : @Zigzag A a b → @Zigzag A b c → @Zigzag A a c
+noncomputable def append {a b c : A} : @Zigzag A a b → @Zigzag A b c → @Zigzag A a c
   | nil _, z => z
   | forward p z₁, z₂ => forward p (append z₁ z₂)
   | backward p z₁, z₂ => backward p (append z₁ z₂)
 
-def reverse {a b : A} : @Zigzag A a b → @Zigzag A b a
+noncomputable def reverse {a b : A} : @Zigzag A a b → @Zigzag A b a
   | nil a => nil a
   | forward p z => append (reverse z) (backward p (nil _))
   | backward p z => append (reverse z) (forward p (nil _))
 
-def collapse {a b : A} : @Zigzag A a b → Path a b
+noncomputable def collapse {a b : A} : @Zigzag A a b → Path a b
   | nil a => refl a
   | forward p z => trans p (collapse z)
   | backward p z => trans (symm p) (collapse z)
 
-def ofPath {a b : A} (p : Path a b) : @Zigzag A a b :=
+noncomputable def ofPath {a b : A} (p : Path a b) : @Zigzag A a b :=
   forward p (nil b)
 
 -- 13
@@ -196,10 +196,10 @@ theorem collapse_ofPath_toEq {a b : A} (p : Path a b) :
     (ofPath p).collapse.toEq = p.toEq := by
   simp [ofPath, collapse, toEq]
 
-def zigzag_trans {a b c : A} (z₁ : @Zigzag A a b) (z₂ : @Zigzag A b c) : @Zigzag A a c :=
+noncomputable def zigzag_trans {a b c : A} (z₁ : @Zigzag A a b) (z₂ : @Zigzag A b c) : @Zigzag A a c :=
   append z₁ z₂
 
-def zigzag_symm {a b : A} (z : @Zigzag A a b) : @Zigzag A b a :=
+noncomputable def zigzag_symm {a b : A} (z : @Zigzag A a b) : @Zigzag A b a :=
   reverse z
 
 -- 14
@@ -216,7 +216,7 @@ theorem collapse_zigzag_trans_toEq {a b c : A} (z₁ : @Zigzag A a b) (z₂ : @Z
       (trans z₁.collapse z₂.collapse).toEq :=
   collapse_append_toEq z₁ z₂
 
-def length {a b : A} : @Zigzag A a b → Nat
+noncomputable def length {a b : A} : @Zigzag A a b → Nat
   | nil _ => 0
   | forward _ z => 1 + length z
   | backward _ z => 1 + length z
@@ -258,13 +258,13 @@ theorem map_trans_toEq (F : LocalizationFunctor A B) {a b c : A}
       (trans (F.mapPath p) (F.mapPath q)).toEq := by
   rw [F.map_trans]
 
-def idFunctor : LocalizationFunctor A A :=
+noncomputable def idFunctor : LocalizationFunctor A A :=
   { obj := fun a => a
     mapPath := fun p => p
     map_refl := fun _ => rfl
     map_trans := fun _ _ => rfl }
 
-def comp (F : LocalizationFunctor A B) (G : LocalizationFunctor B C) :
+noncomputable def comp (F : LocalizationFunctor A B) (G : LocalizationFunctor B C) :
     LocalizationFunctor A C :=
   { obj := fun a => G.obj (F.obj a)
     mapPath := fun p => G.mapPath (F.mapPath p)
@@ -322,14 +322,14 @@ namespace DwyerKanZigzag
 
 variable {A : Type u} {W : {a b : A} → Path a b → Prop}
 
-def idDK (a : A) : DwyerKanZigzag W a a :=
+noncomputable def idDK (a : A) : DwyerKanZigzag W a a :=
   ⟨Zigzag.nil a⟩
 
-def composeDK {a b c : A} (z₁ : DwyerKanZigzag W a b)
+noncomputable def composeDK {a b c : A} (z₁ : DwyerKanZigzag W a b)
     (z₂ : DwyerKanZigzag W b c) : DwyerKanZigzag W a c :=
   ⟨Zigzag.append z₁.zigzag z₂.zigzag⟩
 
-def collapse {a b : A} (z : DwyerKanZigzag W a b) : Path a b :=
+noncomputable def collapse {a b : A} (z : DwyerKanZigzag W a b) : Path a b :=
   z.zigzag.collapse
 
 -- 26
@@ -381,7 +381,7 @@ theorem mapPath_unit_toEq (a : A) :
 theorem idempotent_toEq (a : A) :
     (R.idempotent a).toEq = (R.idempotent a).toEq := rfl
 
-def toLocalizationFunctor : LocalizationFunctor A A :=
+noncomputable def toLocalizationFunctor : LocalizationFunctor A A :=
   { obj := R.L
     mapPath := R.mapPath
     map_refl := R.map_refl
@@ -494,7 +494,7 @@ structure PathCone {A : Type u} (apex : A) (n : Nat) where
   verts : Fin n → A
   legs : (i : Fin n) → Path apex (verts i)
 
-def mapCone {A : Type u} {B : Type v}
+noncomputable def mapCone {A : Type u} {B : Type v}
     (F : LocalizationFunctor A B) {apex : A} {n : Nat}
     (cone : PathCone apex n) :
     @PathCone B (F.obj apex) n :=
@@ -525,7 +525,7 @@ structure PathCocone {A : Type u} (nadir : A) (n : Nat) where
   verts : Fin n → A
   legs : (i : Fin n) → Path (verts i) nadir
 
-def mapCocone {A : Type u} {B : Type v}
+noncomputable def mapCocone {A : Type u} {B : Type v}
     (F : LocalizationFunctor A B) {nadir : A} {n : Nat}
     (cocone : PathCocone nadir n) :
     @PathCocone B (F.obj nadir) n :=
@@ -540,7 +540,7 @@ theorem mapCocone_leg {A : Type u} {B : Type v}
 
 /-! ## Section 15: Local objects -/
 
-def IsLocal {A : Type u} (W : {x y : A} → Path x y → Prop) (a : A) : Prop :=
+noncomputable def IsLocal {A : Type u} (W : {x y : A} → Path x y → Prop) (a : A) : Prop :=
   ∀ {x y : A} (w : Path x y), W w →
     Function.Surjective (fun (q : Path y a) => (trans w q).toEq)
 

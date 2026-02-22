@@ -35,7 +35,7 @@ variable {a b c d : A}
 
 /-- The trace of a path endomorphism is the endomorphism applied to the identity
 path. This extracts the "loop" of a self-map on the path space. -/
-@[simp] def PathTrace (f : Path a a → Path a a) : Path a a :=
+@[simp] noncomputable def PathTrace (f : Path a a → Path a a) : Path a a :=
   f (Path.refl a)
 
 /-- The trace of the identity endomorphism is the identity path. -/
@@ -128,7 +128,7 @@ theorem trace_refl_const :
 
 /-- Feedback: iterate an endomorphism, applying it to its own output.
 This models the feedback loop in traced monoidal categories. -/
-@[simp] def feedback (f : Path a a → Path a a) (n : Nat) : Path a a :=
+@[simp] noncomputable def feedback (f : Path a a → Path a a) (n : Nat) : Path a a :=
   match n with
   | 0 => Path.refl a
   | n + 1 => f (feedback f n)

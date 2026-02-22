@@ -46,12 +46,12 @@ variable {Base : Type u} {Fiber : Type v} {Total : Type w}
 variable (S : SYZFibrationPathData Base Fiber Total)
 
 /-- Composite path from transported fiber to double-dualized fiber. -/
-def fiberMirrorComparison (b : Base) :
+noncomputable def fiberMirrorComparison (b : Base) :
     Path (S.fiberAt (S.proj (S.sectionMap b))) (S.dualFiber (S.dualFiber (S.fiberAt b))) :=
   Path.trans (S.transportPath b) (Path.symm (S.dualInvolutionPath b))
 
 /-- Step witness: right-unit normalization for section projection coherence. -/
-def section_step (b : Base) :
+noncomputable def section_step (b : Base) :
     Path.Step
       (Path.trans (S.sectionProjPath b) (Path.refl b))
       (S.sectionProjPath b) :=
@@ -64,7 +64,7 @@ noncomputable def section_rweq (b : Base) :
   rweq_of_step (S.section_step b)
 
 /-- Step witness: left-unit normalization for fiber transport coherence. -/
-def transport_step (b : Base) :
+noncomputable def transport_step (b : Base) :
     Path.Step
       (Path.trans (Path.refl (S.fiberAt (S.proj (S.sectionMap b)))) (S.transportPath b))
       (S.transportPath b) :=
@@ -77,7 +77,7 @@ noncomputable def transport_rweq (b : Base) :
   rweq_of_step (S.transport_step b)
 
 /-- Step witness: right-unit normalization for dual involution coherence. -/
-def dualInvolution_step (b : Base) :
+noncomputable def dualInvolution_step (b : Base) :
     Path.Step
       (Path.trans (S.dualInvolutionPath b) (Path.refl (S.fiberAt b)))
       (S.dualInvolutionPath b) :=
@@ -90,7 +90,7 @@ noncomputable def dualInvolution_rweq (b : Base) :
   rweq_of_step (S.dualInvolution_step b)
 
 /-- Step witness: right-unit normalization for monodromy-dual compatibility. -/
-def monodromyDual_step (b : Base) (x : Fiber) :
+noncomputable def monodromyDual_step (b : Base) (x : Fiber) :
     Path.Step
       (Path.trans
         (S.monodromyDualPath b x)
@@ -121,7 +121,7 @@ noncomputable def fiberMirrorComparison_cancel_rweq (b : Base) :
 end SYZFibrationPathData
 
 /-- Trivial model instantiating the SYZ computational-path interface. -/
-def trivialSYZFibrationPathData : SYZFibrationPathData PUnit PUnit PUnit where
+noncomputable def trivialSYZFibrationPathData : SYZFibrationPathData PUnit PUnit PUnit where
   proj := fun _ => PUnit.unit
   sectionMap := fun _ => PUnit.unit
   fiberAt := fun _ => PUnit.unit

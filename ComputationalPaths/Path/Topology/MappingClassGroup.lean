@@ -137,13 +137,13 @@ theorem mcg_action_functoriality_assoc {surf : SurfaceData.{u}} {X : Type v}
           simpa using A.act_mul g h (A.act k x)
 
 /-- Path-valued identity functoriality witness. -/
-def mcg_action_functoriality_id_path {surf : SurfaceData.{u}} {X : Type v}
+noncomputable def mcg_action_functoriality_id_path {surf : SurfaceData.{u}} {X : Type v}
     (M : MCG surf) (A : GroupAction M.carrier M.group X) (x : X) :
     Path (A.act M.group.one x) x :=
   Path.stepChain (A.act_one x)
 
 /-- Path-valued multiplicative functoriality witness. -/
-def mcg_action_functoriality_comp_path {surf : SurfaceData.{u}} {X : Type v}
+noncomputable def mcg_action_functoriality_comp_path {surf : SurfaceData.{u}} {X : Type v}
     (M : MCG surf) (A : GroupAction M.carrier M.group X)
     (g h : M.carrier) (x : X) :
     Path (A.act (M.group.mul g h) x) (A.act g (A.act h x)) :=
@@ -192,19 +192,19 @@ structure LanternRelation (surf : SurfaceData.{u}) where
   lantern_path : Path surf surf
 
 /-- The lantern relation path is self-consistent under RwEq. -/
-def lantern_self_rweq (_surf : SurfaceData.{u}) (L : LanternRelation _surf) :
+noncomputable def lantern_self_rweq (_surf : SurfaceData.{u}) (L : LanternRelation _surf) :
     let p := L.lantern_path
     _root_.ComputationalPaths.Path.RwEq p p :=
   _root_.ComputationalPaths.Path.RwEq.refl _
 
 /-- Extract the path witness for disjoint Dehn twist commutativity. -/
-def disjoint_commutativity_path {surf : SurfaceData.{u}}
+noncomputable def disjoint_commutativity_path {surf : SurfaceData.{u}}
     (R : DisjointCommutativity surf) :
     Path surf surf :=
   R.comm_path
 
 /-- The inverse path for disjoint Dehn twist commutativity. -/
-def disjoint_commutativity_symm_path {surf : SurfaceData.{u}}
+noncomputable def disjoint_commutativity_symm_path {surf : SurfaceData.{u}}
     (R : DisjointCommutativity surf) :
     Path surf surf :=
   Path.symm R.comm_path
@@ -224,12 +224,12 @@ noncomputable def disjoint_commutativity_symm_self_rweq {surf : SurfaceData.{u}}
   RwEq.refl _
 
 /-- Extract the path witness for the braid relation of Dehn twists. -/
-def braid_relation_path {surf : SurfaceData.{u}} (R : BraidRelation surf) :
+noncomputable def braid_relation_path {surf : SurfaceData.{u}} (R : BraidRelation surf) :
     Path surf surf :=
   R.braid_path
 
 /-- The inverse path for the braid relation of Dehn twists. -/
-def braid_relation_symm_path {surf : SurfaceData.{u}}
+noncomputable def braid_relation_symm_path {surf : SurfaceData.{u}}
     (R : BraidRelation surf) :
     Path surf surf :=
   Path.symm R.braid_path
@@ -249,12 +249,12 @@ noncomputable def braid_relation_symm_self_rweq {surf : SurfaceData.{u}}
   RwEq.refl _
 
 /-- Extract the path witness for the lantern relation. -/
-def lantern_relation_path {surf : SurfaceData.{u}} (L : LanternRelation surf) :
+noncomputable def lantern_relation_path {surf : SurfaceData.{u}} (L : LanternRelation surf) :
     Path surf surf :=
   L.lantern_path
 
 /-- The inverse path for the lantern relation. -/
-def lantern_relation_symm_path {surf : SurfaceData.{u}}
+noncomputable def lantern_relation_symm_path {surf : SurfaceData.{u}}
     (L : LanternRelation surf) :
     Path surf surf :=
   Path.symm L.lantern_path
@@ -274,7 +274,7 @@ noncomputable def lantern_relation_symm_self_rweq {surf : SurfaceData.{u}}
   RwEq.refl _
 
 /-- Composite Dehn twist relation path from commutativity and braid relations. -/
-def dehn_twist_relation_chain {surf : SurfaceData.{u}}
+noncomputable def dehn_twist_relation_chain {surf : SurfaceData.{u}}
     (D : DisjointCommutativity surf) (B : BraidRelation surf) :
     Path surf surf :=
   Path.trans D.comm_path B.braid_path
@@ -437,7 +437,7 @@ structure ReducibleClass (surf : SurfaceData.{u}) where
 
 /-- Every mapping class of the same MCG with the same element has
     the same Nielsen-Thurston type. -/
-def nt_classification_unique (_surf : SurfaceData.{u})
+noncomputable def nt_classification_unique (_surf : SurfaceData.{u})
     (_mcg : MCG _surf)
     (_n1 _n2 : NielsenThurston _surf)
     (_same_mcg1 : Path _n1.mcg _mcg)

@@ -66,7 +66,7 @@ structure PathBialgebra where
   bialgebra_compat : ∀ (a b : A), Path (comul (mul a b)) (comul (mul a b))
 
 /-- Path: associativity chain mul(mul(mul a b) c) d = mul a (mul b (mul c d)). -/
-def assoc_chain (B : PathBialgebra) (a b c d : B.A) :
+noncomputable def assoc_chain (B : PathBialgebra) (a b c d : B.A) :
     Path (B.mul (B.mul (B.mul a b) c) d) (B.mul a (B.mul b (B.mul c d))) :=
   -- (ab)c)d → (ab)(cd) → a(b(cd))
   Path.trans (B.mul_assoc (B.mul a b) c d)
@@ -113,14 +113,14 @@ structure PathHopfAlgebra where
   antipode_one : Path (antipode one) one
 
 /-- Path.trans: antipode applied to both sides. -/
-def antipode_lr (H : PathHopfAlgebra) (a : H.A) :
+noncomputable def antipode_lr (H : PathHopfAlgebra) (a : H.A) :
     Path (List.foldl H.add H.zero
       (List.map (fun p => H.mul (H.antipode p.1) p.2) (H.comul a)))
       (H.counit a) :=
   H.antipode_left a
 
 /-- Path.symm: reverse the antipode-anti relation. -/
-def antipode_anti_symm (H : PathHopfAlgebra) (a b : H.A) :
+noncomputable def antipode_anti_symm (H : PathHopfAlgebra) (a b : H.A) :
     Path (H.mul (H.antipode b) (H.antipode a)) (H.antipode (H.mul a b)) :=
   Path.symm (H.antipode_anti a b)
 
@@ -134,11 +134,11 @@ structure Composition where
   pos : ∀ p, p ∈ parts → p > 0
 
 /-- Size of a composition. -/
-def Composition.size (alpha : Composition) : Nat :=
+noncomputable def Composition.size (alpha : Composition) : Nat :=
   alpha.parts.foldl (· + ·) 0
 
 /-- Refinement order on compositions. -/
-def Composition.refines (alpha beta : Composition) : Prop :=
+noncomputable def Composition.refines (alpha beta : Composition) : Prop :=
   alpha.size = beta.size
 
 /-! ## Quasisymmetric Functions -/
@@ -164,7 +164,7 @@ structure QSymAlgebra where
   qsym_hopf : Path hopf.one hopf.one
 
 /-- Path: QSym product is well-defined. -/
-def qsym_product_wd (Q : QSymAlgebra) (alpha beta : Composition) :
+noncomputable def qsym_product_wd (Q : QSymAlgebra) (alpha beta : Composition) :
     Path (Q.hopf.mul (Q.monoQSym alpha) (Q.monoQSym beta))
          (Q.hopf.mul (Q.monoQSym alpha) (Q.monoQSym beta)) :=
   Q.mono_product alpha beta
@@ -191,7 +191,7 @@ structure NSymAlgebra where
     Path (hopf.antipode (ribbon alpha)) (hopf.antipode (ribbon alpha))
 
 /-- Path.trans: NSym-QSym duality chain. -/
-def nsym_qsym_chain (N : NSymAlgebra) (Q : QSymAlgebra) (alpha : Composition) :
+noncomputable def nsym_qsym_chain (N : NSymAlgebra) (Q : QSymAlgebra) (alpha : Composition) :
     Path (N.ribbon alpha) (N.ribbon alpha) :=
   Path.trans (N.nsym_qsym_dual Q alpha) (Path.refl _)
 
@@ -225,7 +225,7 @@ structure MRAlgebra where
     Path (hopf.antipode (basis sigma)) (hopf.antipode (basis sigma))
 
 /-- Path: FQSym product well-defined. -/
-def mr_product_wd (mr : MRAlgebra) (sigma tau : Perm) :
+noncomputable def mr_product_wd (mr : MRAlgebra) (sigma tau : Perm) :
     Path (mr.hopf.mul (mr.basis sigma) (mr.basis tau))
          (mr.hopf.mul (mr.basis sigma) (mr.basis tau)) :=
   mr.shifted_shuffle sigma tau
@@ -254,13 +254,13 @@ structure DendriformAlgebra where
     Path (succ (dadd (prec x y) (succ x y)) z) (succ x (succ y z))
 
 /-- Path.trans: dendriform associativity from axioms. -/
-def dendri_assoc (DA : DendriformAlgebra) (x y z : DA.D) :
+noncomputable def dendri_assoc (DA : DendriformAlgebra) (x y z : DA.D) :
     Path (DA.prec (DA.prec x y) z)
          (DA.prec x (DA.dadd (DA.prec y z) (DA.succ y z))) :=
   DA.dendri_1 x y z
 
 /-- Path.symm: reverse dendriform axiom 2. -/
-def dendri_2_symm (DA : DendriformAlgebra) (x y z : DA.D) :
+noncomputable def dendri_2_symm (DA : DendriformAlgebra) (x y z : DA.D) :
     Path (DA.succ x (DA.prec y z)) (DA.prec (DA.succ x y) z) :=
   Path.symm (DA.dendri_2 x y z)
 

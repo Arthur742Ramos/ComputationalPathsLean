@@ -244,12 +244,12 @@ theorem normalize_congrArg_toEq {B : Type v} (f : A → B) (p : Path a b) :
 /-! ## NormalForm operations -/
 
 /-- Compose two NormalForms. -/
-def normalForm_trans (nf₁ : Path.NormalForm A a b) (nf₂ : Path.NormalForm A b c) :
+noncomputable def normalForm_trans (nf₁ : Path.NormalForm A a b) (nf₂ : Path.NormalForm A b c) :
     Path.NormalForm A a c :=
   Path.normalizeForm (Path.trans nf₁.path nf₂.path)
 
 /-- Invert a NormalForm. -/
-def normalForm_symm (nf : Path.NormalForm A a b) :
+noncomputable def normalForm_symm (nf : Path.NormalForm A a b) :
     Path.NormalForm A b a :=
   Path.normalizeForm (Path.symm nf.path)
 
@@ -269,15 +269,15 @@ theorem normalForm_eq (nf₁ nf₂ : Path.NormalForm A a b) :
   Subsingleton.elim nf₁ nf₂
 
 /-- Build a NormalForm from a propositional equality. -/
-def normalForm_ofEq (h : a = b) : Path.NormalForm A a b :=
+noncomputable def normalForm_ofEq (h : a = b) : Path.NormalForm A a b :=
   ⟨Path.stepChain h, Path.isNormal_ofEq h⟩
 
 /-- Build a NormalForm by normalizing any path. -/
-def normalForm_ofPath (p : Path a b) : Path.NormalForm A a b :=
+noncomputable def normalForm_ofPath (p : Path a b) : Path.NormalForm A a b :=
   Path.normalizeForm p
 
 /-- Extract the underlying equality from a NormalForm. -/
-def normalForm_toEq (nf : Path.NormalForm A a b) : a = b :=
+noncomputable def normalForm_toEq (nf : Path.NormalForm A a b) : a = b :=
   nf.path.toEq
 
 /-- The extracted equality matches the path's equality. -/

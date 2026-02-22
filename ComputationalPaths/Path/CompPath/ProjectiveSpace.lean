@@ -34,7 +34,7 @@ inductive RealProjective2CompPath : Type u
   | base : RealProjective2CompPath
 
 /-- Basepoint of RP^2. -/
-@[simp] def realProjective2CompPathBase : RealProjective2CompPath :=
+@[simp] noncomputable def realProjective2CompPathBase : RealProjective2CompPath :=
   RealProjective2CompPath.base
 
 /-- Path expressions for RP^2 with a loop generator. -/
@@ -45,7 +45,7 @@ inductive RealProjective2CompPathExpr : Type u
   | trans (p q : RealProjective2CompPathExpr) : RealProjective2CompPathExpr
 
 /-- Iterate the RP^2 loop expression. -/
-@[simp] def realProjective2CompPathLoopExprPow :
+@[simp] noncomputable def realProjective2CompPathLoopExprPow :
     Nat → RealProjective2CompPathExpr
   | 0 => RealProjective2CompPathExpr.refl
   | Nat.succ n =>
@@ -53,7 +53,7 @@ inductive RealProjective2CompPathExpr : Type u
         RealProjective2CompPathExpr.loop
 
 /-- Encode RP^2 loop expressions by parity (Z2). -/
-def realProjective2CompPathEncodeExpr :
+noncomputable def realProjective2CompPathEncodeExpr :
     RealProjective2CompPathExpr → RealProjectiveZ2
   | RealProjective2CompPathExpr.loop => true
   | RealProjective2CompPathExpr.refl => false
@@ -82,13 +82,13 @@ def realProjective2CompPathEncodeExpr :
       xor (realProjective2CompPathEncodeExpr p) (realProjective2CompPathEncodeExpr q) := rfl
 
 /-- Loop-expression relation: same parity. -/
-def realProjective2CompPathRel
+noncomputable def realProjective2CompPathRel
     (p q : RealProjective2CompPathExpr) :
     Prop :=
   realProjective2CompPathEncodeExpr p = realProjective2CompPathEncodeExpr q
 
 /-- Setoid on RP^2 loop expressions by parity. -/
-def realProjective2CompPathSetoid :
+noncomputable def realProjective2CompPathSetoid :
     Setoid RealProjective2CompPathExpr
     where
   r := realProjective2CompPathRel
@@ -113,7 +113,7 @@ abbrev realProjective2CompPathPiOne : Type u :=
     exact hpq)
 
 /-- Decode a parity bit into the canonical loop class. -/
-@[simp] def realProjective2CompPathDecode :
+@[simp] noncomputable def realProjective2CompPathDecode :
     RealProjectiveZ2 → realProjective2CompPathPiOne :=
   fun b =>
     Quot.mk _
@@ -179,25 +179,25 @@ noncomputable def realProjective2CompPathLoopEq :
 /-! ## Real projective spaces -/
 
 /-- Real projective space RP^n in the computational-path model. -/
-def RealProjectiveSpace : Nat → Type u
+noncomputable def RealProjectiveSpace : Nat → Type u
   | 0 => PUnit'
   | Nat.succ 0 => CircleCompPath
   | Nat.succ (Nat.succ _) => RealProjective2CompPath
 
 /-- Basepoint of RP^n in the model. -/
-@[simp] def realProjectiveSpaceBase : (n : Nat) → RealProjectiveSpace n
+@[simp] noncomputable def realProjectiveSpaceBase : (n : Nat) → RealProjectiveSpace n
   | 0 => PUnit'.unit
   | Nat.succ 0 => circleCompPathBase
   | Nat.succ (Nat.succ _) => realProjective2CompPathBase
 
 /-- Model for pi_1(RP^n) by dimension. -/
-def realProjectivePiOne : Nat → Type u
+noncomputable def realProjectivePiOne : Nat → Type u
   | 0 => PUnit'
   | Nat.succ 0 => circleCompPathPiOne
   | Nat.succ (Nat.succ _) => realProjective2CompPathPiOne
 
 /-- Group model for pi_1(RP^n) by dimension. -/
-def realProjectivePiOneModel : Nat → Type
+noncomputable def realProjectivePiOneModel : Nat → Type
   | 0 => Unit
   | Nat.succ 0 => Int
   | Nat.succ (Nat.succ _) => RealProjectiveZ2

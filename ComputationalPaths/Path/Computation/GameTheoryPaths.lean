@@ -35,11 +35,11 @@ structure Profile (S1 S2 : Type u) where
   s2 : S2
 
 /-- Payoff for player 1 at a profile. -/
-def payoff1_at {S1 S2 : Type u} (g : Game S1 S2) (p : Profile S1 S2) : Int :=
+noncomputable def payoff1_at {S1 S2 : Type u} (g : Game S1 S2) (p : Profile S1 S2) : Int :=
   g.payoff1 p.s1 p.s2
 
 /-- Payoff for player 2 at a profile. -/
-def payoff2_at {S1 S2 : Type u} (g : Game S1 S2) (p : Profile S1 S2) : Int :=
+noncomputable def payoff2_at {S1 S2 : Type u} (g : Game S1 S2) (p : Profile S1 S2) : Int :=
   g.payoff2 p.s1 p.s2
 
 /-- Equal profiles yield equal payoffs (player 1). -/
@@ -53,13 +53,13 @@ theorem payoff2_eq_of_profile_eq {S1 S2 : Type u} (g : Game S1 S2)
   subst h; rfl
 
 /-- Path between profiles induces path between payoffs. -/
-def payoff1_path {S1 S2 : Type u} (g : Game S1 S2)
+noncomputable def payoff1_path {S1 S2 : Type u} (g : Game S1 S2)
     {p q : Profile S1 S2} (h : p = q) :
     Path (payoff1_at g p) (payoff1_at g q) :=
   Path.congrArg (payoff1_at g) (Path.mk [Step.mk _ _ h] h)
 
 /-- Path between profiles induces path between payoffs (player 2). -/
-def payoff2_path {S1 S2 : Type u} (g : Game S1 S2)
+noncomputable def payoff2_path {S1 S2 : Type u} (g : Game S1 S2)
     {p q : Profile S1 S2} (h : p = q) :
     Path (payoff2_at g p) (payoff2_at g q) :=
   Path.congrArg (payoff2_at g) (Path.mk [Step.mk _ _ h] h)
@@ -77,7 +77,7 @@ theorem zerosum_neg {S1 S2 : Type u} (g : ZeroSumGame S1 S2)
   omega
 
 /-- Path witnessing zero-sum negation. -/
-def zerosum_neg_path {S1 S2 : Type u} (g : ZeroSumGame S1 S2)
+noncomputable def zerosum_neg_path {S1 S2 : Type u} (g : ZeroSumGame S1 S2)
     (s1 : S1) (s2 : S2) : Path (g.payoff2 s1 s2) (-g.payoff1 s1 s2) :=
   Path.mk [Step.mk _ _ (zerosum_neg g s1 s2)] (zerosum_neg g s1 s2)
 
@@ -90,12 +90,12 @@ theorem zerosum_profile_eq {S1 S2 : Type u} (g : ZeroSumGame S1 S2)
 /-! ## Best Response -/
 
 /-- Player 1's best response: no other strategy yields higher payoff. -/
-def IsBestResponse1 {S1 S2 : Type u} (g : Game S1 S2)
+noncomputable def IsBestResponse1 {S1 S2 : Type u} (g : Game S1 S2)
     (s1 : S1) (s2 : S2) : Prop :=
   ∀ s1' : S1, g.payoff1 s1 s2 ≥ g.payoff1 s1' s2
 
 /-- Player 2's best response. -/
-def IsBestResponse2 {S1 S2 : Type u} (g : Game S1 S2)
+noncomputable def IsBestResponse2 {S1 S2 : Type u} (g : Game S1 S2)
     (s1 : S1) (s2 : S2) : Prop :=
   ∀ s2' : S2, g.payoff2 s1 s2 ≥ g.payoff2 s1 s2'
 
@@ -111,7 +111,7 @@ theorem best_response2_self {S1 S2 : Type u} (g : Game S1 S2)
 /-! ## Nash Equilibrium -/
 
 /-- A Nash equilibrium: both strategies are best responses. -/
-def IsNashEquilibrium {S1 S2 : Type u} (g : Game S1 S2)
+noncomputable def IsNashEquilibrium {S1 S2 : Type u} (g : Game S1 S2)
     (p : Profile S1 S2) : Prop :=
   IsBestResponse1 g p.s1 p.s2 ∧ IsBestResponse2 g p.s1 p.s2
 
@@ -122,7 +122,7 @@ theorem nash_eq_of_profile_eq {S1 S2 : Type u} (g : Game S1 S2)
   subst h; exact hn
 
 /-- Transport of Nash equilibrium along a profile path. -/
-def nash_transport {S1 S2 : Type u} (g : Game S1 S2)
+noncomputable def nash_transport {S1 S2 : Type u} (g : Game S1 S2)
     {p q : Profile S1 S2} (h : p = q) :
     IsNashEquilibrium g p → IsNashEquilibrium g q :=
   Path.transport (D := fun pr => IsNashEquilibrium g pr) (Path.mk [Step.mk _ _ h] h)
@@ -136,11 +136,11 @@ theorem nash_Subsingleton.elim {S1 S2 : Type u} (g : Game S1 S2)
 /-! ## Dominant Strategies -/
 
 /-- A strategy s1 is dominant for player 1. -/
-def IsDominant1 {S1 S2 : Type u} (g : Game S1 S2) (s1 : S1) : Prop :=
+noncomputable def IsDominant1 {S1 S2 : Type u} (g : Game S1 S2) (s1 : S1) : Prop :=
   ∀ s2 : S2, IsBestResponse1 g s1 s2
 
 /-- A strategy s2 is dominant for player 2. -/
-def IsDominant2 {S1 S2 : Type u} (g : Game S1 S2) (s2 : S2) : Prop :=
+noncomputable def IsDominant2 {S1 S2 : Type u} (g : Game S1 S2) (s2 : S2) : Prop :=
   ∀ s1 : S1, IsBestResponse2 g s1 s2
 
 /-- Dominant strategy pair forms Nash equilibrium. -/
@@ -159,7 +159,7 @@ theorem dominant1_eq_game {S1 S2 : Type u} {g1 g2 : Game S1 S2}
 /-! ## Pareto Optimality -/
 
 /-- A profile is Pareto dominated if another profile improves both payoffs. -/
-def ParetoImproves {S1 S2 : Type u} (g : Game S1 S2)
+noncomputable def ParetoImproves {S1 S2 : Type u} (g : Game S1 S2)
     (p q : Profile S1 S2) : Prop :=
   payoff1_at g q ≥ payoff1_at g p ∧
   payoff2_at g q ≥ payoff2_at g p ∧
@@ -174,7 +174,7 @@ theorem pareto_irrefl {S1 S2 : Type u} (g : Game S1 S2)
   | inr h => exact absurd h (lt_irrefl _)
 
 /-- A profile is Pareto optimal if no profile Pareto improves it. -/
-def IsParetoOptimal {S1 S2 : Type u} (g : Game S1 S2)
+noncomputable def IsParetoOptimal {S1 S2 : Type u} (g : Game S1 S2)
     (p : Profile S1 S2) : Prop :=
   ∀ q : Profile S1 S2, ¬ParetoImproves g p q
 
@@ -193,7 +193,7 @@ structure GameMorphism (S1 S2 T1 T2 : Type u)
   mapS2 : S2 → T2
 
 /-- Identity game morphism. -/
-def GameMorphism.id {S1 S2 : Type u} (g : Game S1 S2) :
+noncomputable def GameMorphism.id {S1 S2 : Type u} (g : Game S1 S2) :
     GameMorphism S1 S2 S1 S2 g g where
   mapS1 := fun x => x
   mapS2 := fun x => x
@@ -205,7 +205,7 @@ theorem game_morph_id_profile {S1 S2 : Type u} (g : Game S1 S2)
   simp [GameMorphism.id]
 
 /-- Composition of game morphisms. -/
-def GameMorphism.comp {S1 S2 T1 T2 U1 U2 : Type u}
+noncomputable def GameMorphism.comp {S1 S2 T1 T2 U1 U2 : Type u}
     {g : Game S1 S2} {h : Game T1 T2} {k : Game U1 U2}
     (f2 : GameMorphism T1 T2 U1 U2 h k)
     (f1 : GameMorphism S1 S2 T1 T2 g h) :
@@ -214,7 +214,7 @@ def GameMorphism.comp {S1 S2 T1 T2 U1 U2 : Type u}
   mapS2 := f2.mapS2 ∘ f1.mapS2
 
 /-- Morphism maps profiles. -/
-def GameMorphism.mapProfile {S1 S2 T1 T2 : Type u}
+noncomputable def GameMorphism.mapProfile {S1 S2 T1 T2 : Type u}
     {g : Game S1 S2} {h : Game T1 T2}
     (f : GameMorphism S1 S2 T1 T2 g h) (p : Profile S1 S2) : Profile T1 T2 :=
   ⟨f.mapS1 p.s1, f.mapS2 p.s2⟩
@@ -228,12 +228,12 @@ theorem morph_id_profile {S1 S2 : Type u} (g : Game S1 S2)
 /-! ## Game Equivalences as Paths -/
 
 /-- Path between games induced by equality. -/
-def gamePath {S1 S2 : Type u} {g1 g2 : Game S1 S2} (h : g1 = g2) :
+noncomputable def gamePath {S1 S2 : Type u} {g1 g2 : Game S1 S2} (h : g1 = g2) :
     Path g1 g2 :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Transport of profiles along game path. -/
-def profileTransport {S1 S2 : Type u}
+noncomputable def profileTransport {S1 S2 : Type u}
     {p1 p2 : Profile S1 S2} (h : p1 = p2)
     (P : Profile S1 S2 → Type v) (x : P p1) : P p2 :=
   Path.transport (Path.mk [Step.mk _ _ h] h) x
@@ -261,7 +261,7 @@ structure MixedStrategy (S : Type u) where
   support : List (Nat × S)
 
 /-- Pure strategy as a mixed strategy with weight 1. -/
-def pureToMixed {S : Type u} (s : S) : MixedStrategy S :=
+noncomputable def pureToMixed {S : Type u} (s : S) : MixedStrategy S :=
   ⟨[(1, s)]⟩
 
 /-- Two pure strategies are equal iff their underlying strategies are. -/
@@ -272,14 +272,14 @@ theorem pureToMixed_eq {S : Type u} {s1 s2 : S} :
   · intro h; subst h; rfl
 
 /-- Path from pure strategy equality. -/
-def pureStrategyPath {S : Type u} {s1 s2 : S} (h : s1 = s2) :
+noncomputable def pureStrategyPath {S : Type u} {s1 s2 : S} (h : s1 = s2) :
     Path (pureToMixed s1) (pureToMixed s2) :=
   Path.congrArg pureToMixed (Path.mk [Step.mk _ _ h] h)
 
 /-! ## Utility and CongrArg -/
 
 /-- Utility function type. -/
-def Utility (S1 S2 : Type u) := S1 → S2 → Int
+noncomputable def Utility (S1 S2 : Type u) := S1 → S2 → Int
 
 /-- CongrArg for utility through strategy path. -/
 theorem utility_congrArg {S1 S2 : Type u}
@@ -287,7 +287,7 @@ theorem utility_congrArg {S1 S2 : Type u}
     u s1 s2 = u s1' s2 := by subst h; rfl
 
 /-- Path from utility congruence. -/
-def utility_path {S1 S2 : Type u}
+noncomputable def utility_path {S1 S2 : Type u}
     (u : Utility S1 S2) {s1 s1' : S1} (h : s1 = s1') (s2 : S2) :
     Path (u s1 s2) (u s1' s2) :=
   Path.mk [Step.mk _ _ (utility_congrArg u h s2)] (utility_congrArg u h s2)
@@ -302,11 +302,11 @@ theorem utility_path_trans_proof {S1 S2 : Type u}
 /-! ## Symmetric Games -/
 
 /-- A game is symmetric if swapping players preserves structure. -/
-def IsSymmetric {S : Type u} (g : Game S S) : Prop :=
+noncomputable def IsSymmetric {S : Type u} (g : Game S S) : Prop :=
   ∀ s1 s2, g.payoff1 s1 s2 = g.payoff2 s2 s1
 
 /-- In a symmetric game, swap yields same payoff path. -/
-def symmetric_payoff_path {S : Type u} (g : Game S S)
+noncomputable def symmetric_payoff_path {S : Type u} (g : Game S S)
     (hsym : IsSymmetric g) (s1 s2 : S) :
     Path (g.payoff1 s1 s2) (g.payoff2 s2 s1) :=
   Path.mk [Step.mk _ _ (hsym s1 s2)] (hsym s1 s2)

@@ -43,7 +43,7 @@ variable {A B C : Type u}
 /-! ## Functorial action -/
 
 /-- Lift a function through the path space. -/
-def PSM.fmap (f : A → B) : PSM A → PSM B
+noncomputable def PSM.fmap (f : A → B) : PSM A → PSM B
   | ⟨a, b, h⟩ => ⟨f a, f b, _root_.congrArg f h⟩
 
 @[simp] theorem PSM.fmap_fst (f : A → B) (x : PSM A) :
@@ -63,7 +63,7 @@ def PSM.fmap (f : A → B) : PSM A → PSM B
 /-! ## Monad unit (η) -/
 
 /-- Diagonal embedding: `a ↦ (a, a, rfl)`. -/
-def PSM.eta (a : A) : PSM A := ⟨a, a, rfl⟩
+noncomputable def PSM.eta (a : A) : PSM A := ⟨a, a, rfl⟩
 
 @[simp] theorem PSM.fmap_eta (f : A → B) (a : A) :
     PSM.fmap f (PSM.eta a) = PSM.eta (f a) := rfl
@@ -71,7 +71,7 @@ def PSM.eta (a : A) : PSM A := ⟨a, a, rfl⟩
 /-! ## Monad multiplication (μ) -/
 
 /-- Multiplication: flatten a nested path space by composing equalities. -/
-def PSM.mu : PSM (PSM A) → PSM A
+noncomputable def PSM.mu : PSM (PSM A) → PSM A
   | ⟨s, t, h⟩ => by cases h; exact ⟨s.fst, s.snd, s.eq⟩
 
 /-! ## Monad laws -/
@@ -97,7 +97,7 @@ def PSM.mu : PSM (PSM A) → PSM A
 abbrev Kleisli (A B : Type u) := A → PSM B
 
 /-- Kleisli composition. -/
-def kleisliComp (g : Kleisli B C) (f : Kleisli A B) : Kleisli A C :=
+noncomputable def kleisliComp (g : Kleisli B C) (f : Kleisli A B) : Kleisli A C :=
   fun a => PSM.mu (PSM.fmap g (f a))
 
 /-- Left identity. -/

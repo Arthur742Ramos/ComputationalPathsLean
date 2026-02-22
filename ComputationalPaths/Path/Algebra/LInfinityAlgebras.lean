@@ -51,11 +51,11 @@ structure GradedSpace where
   add_neg : ∀ n (x : obj n), add n (neg n x) x = zero n
 
 /-- Path-valued addition laws. -/
-def GradedSpace.add_zero_path (V : GradedSpace) (n : Int) (x : V.obj n) :
+noncomputable def GradedSpace.add_zero_path (V : GradedSpace) (n : Int) (x : V.obj n) :
     Path (V.add n (V.zero n) x) x :=
   Path.stepChain (V.add_zero n x)
 
-def GradedSpace.add_neg_path (V : GradedSpace) (n : Int) (x : V.obj n) :
+noncomputable def GradedSpace.add_neg_path (V : GradedSpace) (n : Int) (x : V.obj n) :
     Path (V.add n (V.neg n x) x) (V.zero n) :=
   Path.stepChain (V.add_neg n x)
 
@@ -73,12 +73,12 @@ structure GradedLieAlgebra extends GradedSpace where
     bracket m n x (zero n) = zero (m + n)
 
 /-- Path-valued bracket-zero laws. -/
-def GradedLieAlgebra.bracket_zero_left_path (L : GradedLieAlgebra)
+noncomputable def GradedLieAlgebra.bracket_zero_left_path (L : GradedLieAlgebra)
     (m n : Int) (y : L.obj n) :
     Path (L.bracket m n (L.zero m) y) (L.zero (m + n)) :=
   Path.stepChain (L.bracket_zero_left m n y)
 
-def GradedLieAlgebra.bracket_zero_right_path (L : GradedLieAlgebra)
+noncomputable def GradedLieAlgebra.bracket_zero_right_path (L : GradedLieAlgebra)
     (m n : Int) (x : L.obj m) :
     Path (L.bracket m n x (L.zero n)) (L.zero (m + n)) :=
   Path.stepChain (L.bracket_zero_right m n x)
@@ -103,17 +103,17 @@ structure LInfinityData (A : Type u) where
   add_zero_left : ∀ (x : A), add zero x = x
 
 /-- Path-valued l₁² = 0. -/
-def LInfinityData.l1_squared_path {A : Type u} (L : LInfinityData A) (x : A) :
+noncomputable def LInfinityData.l1_squared_path {A : Type u} (L : LInfinityData A) (x : A) :
     Path (L.l 1 (fun _ => L.l 1 (fun _ => x))) (L.l 1 (fun _ => L.zero)) :=
   Path.stepChain (L.l1_squared x)
 
 /-- Path-valued l₁(0) = 0. -/
-def LInfinityData.l1_zero_path {A : Type u} (L : LInfinityData A) :
+noncomputable def LInfinityData.l1_zero_path {A : Type u} (L : LInfinityData A) :
     Path (L.l 1 (fun _ => L.zero)) L.zero :=
   Path.stepChain L.l1_zero
 
 /-- Path-valued addition identity. -/
-def LInfinityData.add_zero_path {A : Type u} (L : LInfinityData A) (x : A) :
+noncomputable def LInfinityData.add_zero_path {A : Type u} (L : LInfinityData A) (x : A) :
     Path (L.add L.zero x) x :=
   Path.stepChain (L.add_zero_left x)
 
@@ -138,7 +138,7 @@ structure LInfinityMorphismData {A : Type u} {B : Type v}
          (f 1 (fun _ => L.l 1 (fun _ => x)))
 
 /-- Identity L-infinity morphism. -/
-def LInfinityMorphismData.id {A : Type u} (L : LInfinityData A) :
+noncomputable def LInfinityMorphismData.id {A : Type u} (L : LInfinityData A) :
     LInfinityMorphismData L L where
   f := fun n inputs =>
     match n with
@@ -147,7 +147,7 @@ def LInfinityMorphismData.id {A : Type u} (L : LInfinityData A) :
   chain_map := fun _ => Path.refl _
 
 /-- Composition of L-infinity morphisms (on the f_1 component). -/
-def LInfinityMorphismData.comp₁ {A : Type u} {B : Type v} {C : Type u}
+noncomputable def LInfinityMorphismData.comp₁ {A : Type u} {B : Type v} {C : Type u}
     {L : LInfinityData A} {M : LInfinityData B} {N : LInfinityData C}
     (g : LInfinityMorphismData M N) (f : LInfinityMorphismData L M) :
     A → C :=
@@ -165,7 +165,7 @@ structure MCElementLInf {A : Type u} (L : LInfinityData A) where
     L.add (L.l 1 (fun _ => element)) (L.l 2 (fun _ => element)) = L.zero
 
 /-- Path-valued MC equation. -/
-def MCElementLInf.mc_path {A : Type u} {L : LInfinityData A}
+noncomputable def MCElementLInf.mc_path {A : Type u} {L : LInfinityData A}
     (mc : MCElementLInf L) :
     Path (L.add (L.l 1 (fun _ => mc.element)) (L.l 2 (fun _ => mc.element)))
          L.zero :=
@@ -197,7 +197,7 @@ structure HomotopyTransferData {A : Type u} {B : Type v}
   transferred : LInfinityData B
 
 /-- Path-valued retract condition. -/
-def HomotopyTransferData.retract_path {A : Type u} {B : Type v}
+noncomputable def HomotopyTransferData.retract_path {A : Type u} {B : Type v}
     {L : LInfinityData A}
     (H : @HomotopyTransferData A B L) (x : B) :
     Path (H.p (H.i x)) x :=
@@ -225,7 +225,7 @@ structure DGLAData (A : Type u) where
   bracket_zero : ∀ (y : A), bracket zero y = zero
 
 /-- Convert a DGLA to an L-infinity algebra. -/
-def dglaToLInfinity {A : Type u} (L : DGLAData A) : LInfinityData A where
+noncomputable def dglaToLInfinity {A : Type u} (L : DGLAData A) : LInfinityData A where
   zero := L.zero
   add := L.add
   l := fun n inputs =>
@@ -240,7 +240,7 @@ def dglaToLInfinity {A : Type u} (L : DGLAData A) : LInfinityData A where
   add_zero_left := L.add_zero_left
 
 /-- Path-valued d² = 0 for DGLAs. -/
-def DGLAData.d_squared_path {A : Type u} (L : DGLAData A) (x : A) :
+noncomputable def DGLAData.d_squared_path {A : Type u} (L : DGLAData A) (x : A) :
     Path (L.d (L.d x)) L.zero :=
   Path.stepChain (L.d_squared x)
 
@@ -256,7 +256,7 @@ structure StrictLInfinityMorphism {A : Type u} {B : Type v}
     M.l 1 (fun _ => f1 x) = f1 (L.l 1 (fun _ => x))
 
 /-- Path-valued chain map condition. -/
-def StrictLInfinityMorphism.chain_map_path {A : Type u} {B : Type v}
+noncomputable def StrictLInfinityMorphism.chain_map_path {A : Type u} {B : Type v}
     {L : LInfinityData A} {M : LInfinityData B}
     (φ : StrictLInfinityMorphism L M) (x : A) :
     Path (M.l 1 (fun _ => φ.f1 x))

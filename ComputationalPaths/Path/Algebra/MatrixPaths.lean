@@ -24,36 +24,36 @@ universe u
 /-! ## Matrix representation -/
 
 /-- A matrix as a function from indices to integers. -/
-def Mat (n m : Nat) := Fin n → Fin m → Int
+noncomputable def Mat (n m : Nat) := Fin n → Fin m → Int
 
 /-- Zero matrix. -/
-def zeroMat (n m : Nat) : Mat n m := fun _ _ => 0
+noncomputable def zeroMat (n m : Nat) : Mat n m := fun _ _ => 0
 
 /-- Identity matrix. -/
-def idMat (n : Nat) : Mat n n := fun i j => if i = j then 1 else 0
+noncomputable def idMat (n : Nat) : Mat n n := fun i j => if i = j then 1 else 0
 
 /-- Matrix addition. -/
-def matAdd {n m : Nat} (A B : Mat n m) : Mat n m :=
+noncomputable def matAdd {n m : Nat} (A B : Mat n m) : Mat n m :=
   fun i j => A i j + B i j
 
 /-- Matrix scalar multiplication. -/
-def matScale {n m : Nat} (c : Int) (A : Mat n m) : Mat n m :=
+noncomputable def matScale {n m : Nat} (c : Int) (A : Mat n m) : Mat n m :=
   fun i j => c * A i j
 
 /-- Matrix negation. -/
-def matNeg {n m : Nat} (A : Mat n m) : Mat n m :=
+noncomputable def matNeg {n m : Nat} (A : Mat n m) : Mat n m :=
   fun i j => -(A i j)
 
 /-- Matrix transpose. -/
-def matTrans {n m : Nat} (A : Mat n m) : Mat m n :=
+noncomputable def matTrans {n m : Nat} (A : Mat n m) : Mat m n :=
   fun i j => A j i
 
 /-- Trace of a square matrix. -/
-def matTrace {n : Nat} (A : Mat n n) : Int :=
+noncomputable def matTrace {n : Nat} (A : Mat n n) : Int :=
   (List.finRange n).foldl (fun acc i => acc + A i i) 0
 
 /-- Matrix multiplication. -/
-def matMul {n m p : Nat} (A : Mat n m) (B : Mat m p) : Mat n p :=
+noncomputable def matMul {n m p : Nat} (A : Mat n m) (B : Mat m p) : Mat n p :=
   fun i k => (List.finRange m).foldl (fun acc j => acc + A i j * B j k) 0
 
 /-! ## Matrix laws as equalities (semantic) -/
@@ -166,7 +166,7 @@ inductive MatObj (n m : Nat) : Type
 namespace MatObj
 
 /-- Evaluate a matrix expression. -/
-def eval : MatObj n m → Mat n m
+noncomputable def eval : MatObj n m → Mat n m
   | base A => A
   | zero => zeroMat n m
   | add A B => matAdd (eval A) (eval B)
@@ -222,7 +222,7 @@ theorem eval_eq : {A B : MatObj n m} → (s : MatStep A B) → MatObj.eval A = M
   | _, _, scaleCong c s => _root_.congrArg (matScale c) (eval_eq s)
 
 /-- Interpret a step as a `Path`. -/
-def toPath : {A B : MatObj n m} → (s : MatStep A B) → Path (MatObj.eval A) (MatObj.eval B)
+noncomputable def toPath : {A B : MatObj n m} → (s : MatStep A B) → Path (MatObj.eval A) (MatObj.eval B)
   | _, _, addCongL s C => Path.congrArg (fun X => matAdd X (MatObj.eval C)) (toPath s)
   | _, _, addCongR C s => Path.congrArg (fun X => matAdd (MatObj.eval C) X) (toPath s)
   | _, _, negCong s => Path.congrArg matNeg (toPath s)
@@ -240,7 +240,7 @@ inductive MatPath : MatObj n m → MatObj n m → Type
 
 namespace MatPath
 
-def toPath {A B : MatObj n m} : MatPath A B → Path (MatObj.eval A) (MatObj.eval B)
+noncomputable def toPath {A B : MatObj n m} : MatPath A B → Path (MatObj.eval A) (MatObj.eval B)
   | refl _ => Path.refl _
   | step s => MatStep.toPath s
   | trans p q => Path.trans (toPath p) (toPath q)
@@ -256,46 +256,46 @@ section Export
 
 variable {n m : Nat}
 
-def matAdd_comm_path (A B : Mat n m) : Path (matAdd A B) (matAdd B A) :=
+noncomputable def matAdd_comm_path (A B : Mat n m) : Path (matAdd A B) (matAdd B A) :=
   Path.mk [Step.mk _ _ (matAdd_comm A B)] (matAdd_comm A B)
 
-def matAdd_assoc_path (A B C : Mat n m) :
+noncomputable def matAdd_assoc_path (A B C : Mat n m) :
     Path (matAdd (matAdd A B) C) (matAdd A (matAdd B C)) :=
   Path.mk [Step.mk _ _ (matAdd_assoc A B C)] (matAdd_assoc A B C)
 
-def matAdd_zero_right_path (A : Mat n m) : Path (matAdd A (zeroMat n m)) A :=
+noncomputable def matAdd_zero_right_path (A : Mat n m) : Path (matAdd A (zeroMat n m)) A :=
   Path.mk [Step.mk _ _ (matAdd_zero_right A)] (matAdd_zero_right A)
 
-def matAdd_zero_left_path (A : Mat n m) : Path (matAdd (zeroMat n m) A) A :=
+noncomputable def matAdd_zero_left_path (A : Mat n m) : Path (matAdd (zeroMat n m) A) A :=
   Path.mk [Step.mk _ _ (matAdd_zero_left A)] (matAdd_zero_left A)
 
-def matAdd_neg_path (A : Mat n m) : Path (matAdd A (matNeg A)) (zeroMat n m) :=
+noncomputable def matAdd_neg_path (A : Mat n m) : Path (matAdd A (matNeg A)) (zeroMat n m) :=
   Path.mk [Step.mk _ _ (matAdd_neg_right A)] (matAdd_neg_right A)
 
-def matScale_one_path (A : Mat n m) : Path (matScale 1 A) A :=
+noncomputable def matScale_one_path (A : Mat n m) : Path (matScale 1 A) A :=
   Path.mk [Step.mk _ _ (matScale_one A)] (matScale_one A)
 
-def matScale_zero_path (A : Mat n m) : Path (matScale 0 A) (zeroMat n m) :=
+noncomputable def matScale_zero_path (A : Mat n m) : Path (matScale 0 A) (zeroMat n m) :=
   Path.mk [Step.mk _ _ (matScale_zero A)] (matScale_zero A)
 
-def matScale_add_path (c : Int) (A B : Mat n m) :
+noncomputable def matScale_add_path (c : Int) (A B : Mat n m) :
     Path (matScale c (matAdd A B)) (matAdd (matScale c A) (matScale c B)) :=
   Path.mk [Step.mk _ _ (matScale_add c A B)] (matScale_add c A B)
 
-def matTrans_trans_path (A : Mat n m) : Path (matTrans (matTrans A)) A :=
+noncomputable def matTrans_trans_path (A : Mat n m) : Path (matTrans (matTrans A)) A :=
   Path.mk [Step.mk _ _ (matTrans_trans A)] (matTrans_trans A)
 
-def matTrans_add_path (A B : Mat n m) :
+noncomputable def matTrans_add_path (A B : Mat n m) :
     Path (matTrans (matAdd A B)) (matAdd (matTrans A) (matTrans B)) :=
   Path.mk [Step.mk _ _ (matTrans_add A B)] (matTrans_add A B)
 
-def matTrans_zero_path : Path (matTrans (zeroMat n m)) (zeroMat m n) :=
+noncomputable def matTrans_zero_path : Path (matTrans (zeroMat n m)) (zeroMat m n) :=
   Path.mk [Step.mk _ _ (matTrans_zero (n := n) (m := m))] (matTrans_zero (n := n) (m := m))
 
-def matNeg_neg_path (A : Mat n m) : Path (matNeg (matNeg A)) A :=
+noncomputable def matNeg_neg_path (A : Mat n m) : Path (matNeg (matNeg A)) A :=
   Path.mk [Step.mk _ _ (matNeg_neg A)] (matNeg_neg A)
 
-def idMat_trans_path (n : Nat) : Path (matTrans (idMat n)) (idMat n) :=
+noncomputable def idMat_trans_path (n : Nat) : Path (matTrans (idMat n)) (idMat n) :=
   Path.mk [Step.mk _ _ (idMat_trans n)] (idMat_trans n)
 
 end Export

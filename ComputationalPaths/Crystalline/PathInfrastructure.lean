@@ -37,7 +37,7 @@ noncomputable def unitComparison_rweq (x : X) :
   rweq_of_step (I.unitComparisonStep x)
 
 /-- Trivial crystalline path infrastructure on `PUnit`. -/
-def trivial (Ring : Type u) : CrystallinePathInfrastructure Ring PUnit where
+noncomputable def trivial (Ring : Type u) : CrystallinePathInfrastructure Ring PUnit where
   deRhamWitt := DeRhamWittPaths.trivialDeRhamWittPathData Ring
   comparison := CrystallineComparisonPaths.trivialCrystallineComparisonPathData Ring
   unitComparisonStep := fun _ => Path.Step.trans_refl_right (Path.refl PUnit.unit)

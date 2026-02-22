@@ -35,7 +35,7 @@ structure PresheafNatTrans {A : Type u} (F G : Presheaf.{u, v} A) where
     app a (F.restrict p x) = G.restrict p (app b x)
 
 /-- Restrict a presheaf along a computational Path. -/
-def pathRestrict {A : Type u} (F : Presheaf.{u, v} A) {a b : A}
+noncomputable def pathRestrict {A : Type u} (F : Presheaf.{u, v} A) {a b : A}
     (p : Path a b) : F.obj b → F.obj a :=
   F.restrict p.proof
 
@@ -53,7 +53,7 @@ theorem pathRestrict_irrel {A : Type u} (F : Presheaf.{u, v} A)
 /-! ## §2 Representable Presheaves -/
 
 /-- Representable presheaf at `c`: sections over `a` are Paths from `a` to `c`. -/
-def representable (A : Type u) (c : A) : Presheaf.{u, u} A where
+noncomputable def representable (A : Type u) (c : A) : Presheaf.{u, u} A where
   obj := fun a => Path a c
   restrict := fun {a b} p q => Path.mk q.steps (p.trans q.proof)
   restrict_id := by intro a x; cases x; congr 1
@@ -64,13 +64,13 @@ theorem representable_obj_at (A : Type u) (c : A) :
     (representable A c).obj c = Path c c := rfl
 
 /-- The canonical section: refl. -/
-def representable_id_section (A : Type u) (c : A) :
+noncomputable def representable_id_section (A : Type u) (c : A) :
     (representable A c).obj c := Path.refl c
 
 /-! ## §3 Yoneda Map -/
 
 /-- Yoneda forward: F.obj c → Hom(repr(c), F). -/
-def yonedaForward {A : Type u} (F : Presheaf.{u, u} A) (c : A) (x : F.obj c) :
+noncomputable def yonedaForward {A : Type u} (F : Presheaf.{u, u} A) (c : A) (x : F.obj c) :
     PresheafNatTrans (representable A c) F where
   app := fun a p => F.restrict p.proof x
   natural := by
@@ -80,7 +80,7 @@ def yonedaForward {A : Type u} (F : Presheaf.{u, u} A) (c : A) (x : F.obj c) :
     rw [F.restrict_comp]
 
 /-- Yoneda backward: evaluate at refl. -/
-def yonedaBackward {A : Type u} (F : Presheaf.{u, u} A) (c : A)
+noncomputable def yonedaBackward {A : Type u} (F : Presheaf.{u, u} A) (c : A)
     (η : PresheafNatTrans (representable A c) F) : F.obj c :=
   η.app c (Path.refl c)
 
@@ -100,12 +100,12 @@ theorem yoneda_other_direction {A : Type u} (F : Presheaf.{u, u} A)
 /-! ## §4 Presheaf Category -/
 
 /-- Identity nat trans. -/
-def natTransId {A : Type u} (F : Presheaf.{u, v} A) : PresheafNatTrans F F where
+noncomputable def natTransId {A : Type u} (F : Presheaf.{u, v} A) : PresheafNatTrans F F where
   app := fun _ x => x
   natural := fun _ _ => rfl
 
 /-- Composition of nat trans. -/
-def natTransComp {A : Type u} {F G H : Presheaf.{u, v} A}
+noncomputable def natTransComp {A : Type u} {F G H : Presheaf.{u, v} A}
     (η : PresheafNatTrans F G) (θ : PresheafNatTrans G H) : PresheafNatTrans F H where
   app := fun a x => θ.app a (η.app a x)
   natural := by intro a b p x; rw [η.natural p x, θ.natural p (η.app b x)]
@@ -130,7 +130,7 @@ theorem natTransComp_assoc {A : Type u} {F G H K : Presheaf.{u, v} A}
 /-! ## §5 Yoneda Embedding -/
 
 /-- Yoneda embedding: Path a→b gives nat trans repr(b) → repr(a). -/
-def yonedaEmbedPath {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def yonedaEmbedPath {A : Type u} {a b : A} (p : Path a b) :
     PresheafNatTrans (representable A b) (representable A a) where
   app := fun c q => Path.mk q.steps (q.proof.trans p.proof.symm)
   natural := by
@@ -148,10 +148,10 @@ theorem yonedaEmbed_irrel {A : Type u} {a b : A} (p q : Path a b) (c : A) (r : P
 
 /-! ## §6 Mono/Epi -/
 
-def isMonoNatTrans {A : Type u} {F G : Presheaf.{u, v} A} (η : PresheafNatTrans F G) : Prop :=
+noncomputable def isMonoNatTrans {A : Type u} {F G : Presheaf.{u, v} A} (η : PresheafNatTrans F G) : Prop :=
   ∀ a (x y : F.obj a), η.app a x = η.app a y → x = y
 
-def isEpiNatTrans {A : Type u} {F G : Presheaf.{u, v} A} (η : PresheafNatTrans F G) : Prop :=
+noncomputable def isEpiNatTrans {A : Type u} {F G : Presheaf.{u, v} A} (η : PresheafNatTrans F G) : Prop :=
   ∀ a (y : G.obj a), ∃ x : F.obj a, η.app a x = y
 
 theorem natTransId_isMono {A : Type u} (F : Presheaf.{u, v} A) :
@@ -177,19 +177,19 @@ theorem natTransComp_isEpi {A : Type u} {F G H : Presheaf.{u, v} A}
 
 /-! ## §7 Constant/Terminal/Product Presheaves -/
 
-def constPresheaf (A : Type u) (S : Type u) : Presheaf.{u, u} A where
+noncomputable def constPresheaf (A : Type u) (S : Type u) : Presheaf.{u, u} A where
   obj := fun _ => S
   restrict := fun _ x => x
   restrict_id := fun _ _ => rfl
   restrict_comp := fun _ _ _ => rfl
 
-def terminalPresheaf (A : Type u) : Presheaf.{u, u} A where
+noncomputable def terminalPresheaf (A : Type u) : Presheaf.{u, u} A where
   obj := fun _ => PUnit
   restrict := fun _ _ => PUnit.unit
   restrict_id := fun _ x => by cases x; rfl
   restrict_comp := fun _ _ x => by cases x; rfl
 
-def toTerminal {A : Type u} (F : Presheaf.{u, u} A) :
+noncomputable def toTerminal {A : Type u} (F : Presheaf.{u, u} A) :
     PresheafNatTrans F (terminalPresheaf A) where
   app := fun _ _ => PUnit.unit
   natural := fun _ _ => rfl
@@ -198,19 +198,19 @@ theorem toTerminal_unique {A : Type u} (F : Presheaf.{u, u} A)
     (η θ : PresheafNatTrans F (terminalPresheaf A)) (a : A) (x : F.obj a) :
     η.app a x = θ.app a x := by cases η.app a x; cases θ.app a x; rfl
 
-def presheafProd {A : Type u} (F G : Presheaf.{u, v} A) : Presheaf.{u, v} A where
+noncomputable def presheafProd {A : Type u} (F G : Presheaf.{u, v} A) : Presheaf.{u, v} A where
   obj := fun a => F.obj a × G.obj a
   restrict := fun p ⟨x, y⟩ => (F.restrict p x, G.restrict p y)
   restrict_id := by intro a ⟨x, y⟩; simp [F.restrict_id, G.restrict_id]
   restrict_comp := by
     intro a b c p q ⟨x, y⟩; simp [F.restrict_comp, G.restrict_comp]
 
-def presheafFst {A : Type u} (F G : Presheaf.{u, v} A) :
+noncomputable def presheafFst {A : Type u} (F G : Presheaf.{u, v} A) :
     PresheafNatTrans (presheafProd F G) F where
   app := fun _ ⟨x, _⟩ => x
   natural := fun _ _ => rfl
 
-def presheafSnd {A : Type u} (F G : Presheaf.{u, v} A) :
+noncomputable def presheafSnd {A : Type u} (F G : Presheaf.{u, v} A) :
     PresheafNatTrans (presheafProd F G) G where
   app := fun _ ⟨_, y⟩ => y
   natural := fun _ _ => rfl
@@ -224,7 +224,7 @@ theorem presheafProd_jointly_mono {A : Type u} (F G : Presheaf.{u, v} A)
 
 /-! ## §8 Path-Transport and Coherence -/
 
-def presheafTransport {A : Type u} (F : Presheaf.{u, v} A)
+noncomputable def presheafTransport {A : Type u} (F : Presheaf.{u, v} A)
     {a b : A} (p : Path a b) (x : F.obj a) : F.obj b :=
   F.restrict p.proof.symm x
 
@@ -241,7 +241,7 @@ theorem constPresheaf_restrict_trivial {A : Type u} (S : Type u)
     {a b : A} (p : a = b) (x : S) :
     (constPresheaf A S).restrict p x = x := rfl
 
-def constNatTrans {A : Type u} (S : Type u) (F : Presheaf.{u, u} A)
+noncomputable def constNatTrans {A : Type u} (S : Type u) (F : Presheaf.{u, u} A)
     (f : ∀ a, S → F.obj a)
     (hnat : ∀ {a b : A} (p : a = b) (x : S), f a x = F.restrict p (f b x)) :
     PresheafNatTrans (constPresheaf A S) F where

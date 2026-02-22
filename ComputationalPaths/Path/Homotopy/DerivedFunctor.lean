@@ -64,7 +64,7 @@ structure FunctorOn (A : Type u) (B : Type u) (f : A -> B) where
         FundamentalGroupoid.comp' B (map p) (map q)
 
 /-- View a fixed-object functor as a fundamental groupoid functor. -/
-def FunctorOn.toFunctor {A B : Type u} {f : A -> B}
+noncomputable def FunctorOn.toFunctor {A B : Type u} {f : A -> B}
     (F : FunctorOn A B f) : FundamentalGroupoidFunctor A B where
   obj := f
   map := F.map
@@ -97,13 +97,13 @@ def FunctorOn.toFunctor {A B : Type u} {f : A -> B}
 /-! ## Localization lift -/
 
 /-- View a pre-functor as a localization map on paths. -/
-def PreFunctor.localizationMap {A B : Type u} {f : A -> B}
+noncomputable def PreFunctor.localizationMap {A B : Type u} {f : A -> B}
     (F : PreFunctor A B f) :
     PathLocalizationMap A (fun a b => FundamentalGroupoid.Hom B (f a) (f b)) :=
   { map := F.map, respects := fun h => (F.respects_rweq h).toEq }
 
 /-- The induced map on quotient paths. -/
-def PreFunctor.derivedMap {A B : Type u} {f : A -> B}
+noncomputable def PreFunctor.derivedMap {A B : Type u} {f : A -> B}
     (F : PreFunctor A B f) {a b : A} :
     FundamentalGroupoid.Hom A a b ->
       FundamentalGroupoid.Hom B (f a) (f b) :=
@@ -112,7 +112,7 @@ def PreFunctor.derivedMap {A B : Type u} {f : A -> B}
 /-! ## Left and right derived functors -/
 
 /-- Left derived functor on the fundamental groupoid. -/
-def leftDerivedFunctorOn {A B : Type u} {f : A -> B}
+noncomputable def leftDerivedFunctorOn {A B : Type u} {f : A -> B}
     (F : PreFunctor A B f) : FunctorOn A B f where
   map := F.derivedMap
   map_id := by
@@ -157,17 +157,17 @@ def leftDerivedFunctorOn {A B : Type u} {f : A -> B}
         simpa [FundamentalGroupoid.comp'] using (F.map_trans p q).toEq
 
 /-- Right derived functor on the fundamental groupoid. -/
-def rightDerivedFunctorOn {A B : Type u} {f : A -> B}
+noncomputable def rightDerivedFunctorOn {A B : Type u} {f : A -> B}
     (F : PreFunctor A B f) : FunctorOn A B f :=
   leftDerivedFunctorOn F
 
 /-- Left derived functor as a fundamental groupoid functor. -/
-def leftDerivedFunctor {A B : Type u} {f : A -> B}
+noncomputable def leftDerivedFunctor {A B : Type u} {f : A -> B}
     (F : PreFunctor A B f) : FundamentalGroupoidFunctor A B :=
   (leftDerivedFunctorOn F).toFunctor
 
 /-- Right derived functor as a fundamental groupoid functor. -/
-def rightDerivedFunctor {A B : Type u} {f : A -> B}
+noncomputable def rightDerivedFunctor {A B : Type u} {f : A -> B}
     (F : PreFunctor A B f) : FundamentalGroupoidFunctor A B :=
   (rightDerivedFunctorOn F).toFunctor
 

@@ -36,20 +36,20 @@ inductive Path : Pt → Pt → Type where
 -- ============================================================
 
 /-- Theorem 1 – transitivity of paths. -/
-def Path.trans : Path a b → Path b c → Path a c
+noncomputable def Path.trans : Path a b → Path b c → Path a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Step.symm : Step a b → Step b a
+noncomputable def Step.symm : Step a b → Step b a
   | .edge n m => .edge m n
   | .refl a   => .refl a
 
 /-- Theorem 2 – path inversion. -/
-def Path.symm : Path a b → Path b a
+noncomputable def Path.symm : Path a b → Path b a
   | .nil a   => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path a b → Nat
+noncomputable def Path.length : Path a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -105,11 +105,11 @@ structure Transport (F : Fiber) (x y : Pt) where
   map : Nat → Nat
 
 /-- Default transport (identity map). -/
-def Transport.idT (F : Fiber) (x : Pt) : Transport F x x :=
+noncomputable def Transport.idT (F : Fiber) (x : Pt) : Transport F x x :=
   { map := fun n => n }
 
 /-- Compose transports. -/
-def Transport.comp (t1 : Transport F x y) (t2 : Transport F y z) : Transport F x z :=
+noncomputable def Transport.comp (t1 : Transport F x y) (t2 : Transport F y z) : Transport F x z :=
   { map := fun n => t2.map (t1.map n) }
 
 /-- Theorem 8 – transport identity is left unit. -/
@@ -138,7 +138,7 @@ structure TotalElem (F : Fiber) where
 deriving DecidableEq, Repr
 
 /-- Projection from total space to base. -/
-def TotalElem.proj (e : TotalElem F) : Pt := e.base
+noncomputable def TotalElem.proj (e : TotalElem F) : Pt := e.base
 
 /-- Steps in the total space. -/
 inductive TotalStep (F : Fiber) : TotalElem F → TotalElem F → Type where
@@ -153,7 +153,7 @@ inductive TotalPath (F : Fiber) : TotalElem F → TotalElem F → Type where
   | cons : TotalStep F e1 e2 → TotalPath F e2 e3 → TotalPath F e1 e3
 
 /-- Theorem 11 – total path transitivity. -/
-def TotalPath.trans : TotalPath F e1 e2 → TotalPath F e2 e3 → TotalPath F e1 e3
+noncomputable def TotalPath.trans : TotalPath F e1 e2 → TotalPath F e2 e3 → TotalPath F e1 e3
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
@@ -166,7 +166,7 @@ theorem totalPath_trans_nil : (p : TotalPath F e1 e2) →
     rw [totalPath_trans_nil p]
 
 /-- Theorem 13 – total path length. -/
-def TotalPath.projLength : TotalPath F e1 e2 → Nat
+noncomputable def TotalPath.projLength : TotalPath F e1 e2 → Nat
   | .nil _ => 0
   | .cons _ p => 1 + p.projLength
 
@@ -187,7 +187,7 @@ structure Section' (F : Fiber) where
   sec : Pt → Nat
 
 /-- Two sections are pointwise equal. -/
-def Section'.agree (s1 s2 : Section' F) : Prop :=
+noncomputable def Section'.agree (s1 s2 : Section' F) : Prop :=
   ∀ x : Pt, s1.sec x = s2.sec x
 
 /-- Theorem 15 – section agreement is reflexive. -/
@@ -208,7 +208,7 @@ theorem section_agree_trans {s1 s2 s3 : Section' F}
 -- ============================================================
 
 /-- J-eliminator: path structure determines a Nat measure. -/
-def pathMeasure : Path a b → Nat
+noncomputable def pathMeasure : Path a b → Nat
   | .nil _ => 0
   | .cons _ p => 1 + pathMeasure p
 
@@ -243,11 +243,11 @@ structure BasedPath (a : Pt) where
   path : Path a endpoint
 
 /-- The center of contraction: (a, refl a). -/
-def basedPathCenter (a : Pt) : BasedPath a :=
+noncomputable def basedPathCenter (a : Pt) : BasedPath a :=
   { endpoint := a, path := .nil a }
 
 /-- Contract by path length to show "all based paths connect to center." -/
-def basedPathRank (bp : BasedPath a) : Nat := bp.path.length
+noncomputable def basedPathRank (bp : BasedPath a) : Nat := bp.path.length
 
 /-- Theorem 22 – center has rank 0. -/
 theorem center_rank_zero (a : Pt) : basedPathRank (basedPathCenter a) = 0 := rfl
@@ -273,21 +273,21 @@ structure FibEquiv (F G : Fiber) where
   left_inv  : ∀ x n, inv_map x (to_map x n) = n
 
 /-- Theorem 25 – identity equivalence. -/
-def FibEquiv.idE (F : Fiber) : FibEquiv F F :=
+noncomputable def FibEquiv.idE (F : Fiber) : FibEquiv F F :=
   { to_map := fun _ n => n
     inv_map := fun _ n => n
     right_inv := fun _ _ => rfl
     left_inv := fun _ _ => rfl }
 
 /-- Theorem 26 – equivalence inverse. -/
-def FibEquiv.symm (e : FibEquiv F G) : FibEquiv G F :=
+noncomputable def FibEquiv.symm (e : FibEquiv F G) : FibEquiv G F :=
   { to_map := e.inv_map
     inv_map := e.to_map
     right_inv := e.left_inv
     left_inv := e.right_inv }
 
 /-- Theorem 27 – equivalence composition. -/
-def FibEquiv.comp (e1 : FibEquiv F G) (e2 : FibEquiv G H) : FibEquiv F H :=
+noncomputable def FibEquiv.comp (e1 : FibEquiv F G) (e2 : FibEquiv G H) : FibEquiv F H :=
   { to_map := fun x n => e2.to_map x (e1.to_map x n)
     inv_map := fun x n => e1.inv_map x (e2.inv_map x n)
     right_inv := fun x n => by
@@ -309,7 +309,7 @@ theorem fibEquiv_symm_symm (e : FibEquiv F G) : e.symm.symm = e := rfl
 -- ============================================================
 
 /-- Path between fibers (pointwise equality of fiber cardinalities). -/
-def FibPath (F G : Fiber) : Prop := ∀ x : Pt, F.fib x = G.fib x
+noncomputable def FibPath (F G : Fiber) : Prop := ∀ x : Pt, F.fib x = G.fib x
 
 /-- Theorem 30 – FibPath is reflexive. -/
 theorem fibPath_refl (F : Fiber) : FibPath F F := fun _ => rfl
@@ -323,7 +323,7 @@ theorem fibPath_trans {F G H : Fiber} (h1 : FibPath F G) (h2 : FibPath G H) : Fi
   fun x => (h1 x).trans (h2 x)
 
 /-- Univalence direction: path → equivalence (transport along fiber path). -/
-def pathToEquiv (_h : FibPath F G) : FibEquiv F G :=
+noncomputable def pathToEquiv (_h : FibPath F G) : FibEquiv F G :=
   { to_map := fun _ n => n
     inv_map := fun _ n => n
     right_inv := fun _ _ => rfl
@@ -338,7 +338,7 @@ theorem pathToEquiv_refl (F : Fiber) :
 -- ============================================================
 
 /-- apd: given a section s and a base path, track the fiber values. -/
-def apd_values (s : Section' F) : Path a b → List Nat
+noncomputable def apd_values (s : Section' F) : Path a b → List Nat
   | .nil x => [s.sec x]
   | .cons _ p => s.sec a :: apd_values s p
 
@@ -375,7 +375,7 @@ structure PtMap where
   fn : Pt → Pt
 
 /-- Pointwise path between maps. -/
-def PtMap.homotopy (f g : PtMap) : Prop :=
+noncomputable def PtMap.homotopy (f g : PtMap) : Prop :=
   ∀ x : Pt, f.fn x = g.fn x
 
 /-- Theorem 37 – homotopy is reflexive. -/
@@ -394,7 +394,7 @@ theorem homotopy_trans {f g h : PtMap} (h1 : PtMap.homotopy f g) (h2 : PtMap.hom
 theorem id_homotopy_self : PtMap.homotopy ⟨id⟩ ⟨id⟩ := fun _ => rfl
 
 /-- Composition of maps. -/
-def PtMap.comp (f g : PtMap) : PtMap := ⟨fun x => f.fn (g.fn x)⟩
+noncomputable def PtMap.comp (f g : PtMap) : PtMap := ⟨fun x => f.fn (g.fn x)⟩
 
 /-- Theorem 41 – homotopy respected by post-composition (congrArg). -/
 theorem homotopy_comp_right {g1 g2 : PtMap} (h : PtMap.homotopy g1 g2) (f : PtMap) :
@@ -428,7 +428,7 @@ structure SigmaPathData (F : Fiber) (e1 e2 : TotalElem F) where
   fiberShift : Nat
 
 /-- Theorem 46 – reflexivity SigmaPathData. -/
-def sigmaPathRefl (F : Fiber) (e : TotalElem F) : SigmaPathData F e e :=
+noncomputable def sigmaPathRefl (F : Fiber) (e : TotalElem F) : SigmaPathData F e e :=
   { basePath := .nil e.base, fiberShift := 0 }
 
 /-- Theorem 47 – SigmaPathData determines total path length lower bound. -/
@@ -440,7 +440,7 @@ theorem sigmaPath_length_bound (sp : SigmaPathData F e1 e2) :
 -- ============================================================
 
 /-- Transport along a path given step-wise transport maps. -/
-def transportAlongPath (tStep : (x y : Pt) → Step x y → Nat → Nat) :
+noncomputable def transportAlongPath (tStep : (x y : Pt) → Step x y → Nat → Nat) :
     Path x y → Nat → Nat
   | .nil _, n => n
   | .cons s p, n => transportAlongPath tStep p (tStep _ _ s n)
@@ -475,11 +475,11 @@ inductive Path2 : Path a b → Path a b → Type where
   | symm2  : Path2 p q → Path2 q p
 
 /-- Theorem 51 – 2-path reflexivity via trans2. -/
-def path2_refl_trans (h : Path2 p q) : Path2 p q :=
+noncomputable def path2_refl_trans (h : Path2 p q) : Path2 p q :=
   Path2.trans2 h (.refl2 q)
 
 /-- Depth of a 2-path proof. -/
-def Path2.depth : Path2 p q → Nat
+noncomputable def Path2.depth : Path2 p q → Nat
   | .refl2 _ => 0
   | .trans2 h1 h2 => 1 + max h1.depth h2.depth
   | .symm2 h => 1 + h.depth
@@ -496,7 +496,7 @@ theorem path2_symm_depth (h : Path2 p q) :
 -- ============================================================
 
 /-- Pullback of a fiber along a map. -/
-def Fiber.pullback (F : Fiber) (f : PtMap) : Fiber :=
+noncomputable def Fiber.pullback (F : Fiber) (f : PtMap) : Fiber :=
   { fib := fun x => F.fib (f.fn x) }
 
 /-- Theorem 54 – pullback along id is the original fiber. -/
@@ -515,11 +515,11 @@ structure FibMap (F G : Fiber) where
   map : (x : Pt) → Nat → Nat
 
 /-- Identity fiberwise map. -/
-def FibMap.idM (F : Fiber) : FibMap F F :=
+noncomputable def FibMap.idM (F : Fiber) : FibMap F F :=
   { map := fun _ n => n }
 
 /-- Compose fiberwise maps. -/
-def FibMap.comp (m1 : FibMap F G) (m2 : FibMap G H) : FibMap F H :=
+noncomputable def FibMap.comp (m1 : FibMap F G) (m2 : FibMap G H) : FibMap F H :=
   { map := fun x n => m2.map x (m1.map x n) }
 
 /-- Theorem 56 – id is left unit. -/
@@ -541,7 +541,7 @@ theorem fibMap_comp_assoc (m1 : FibMap F G) (m2 : FibMap G H) (m3 : FibMap H K) 
 -- ============================================================
 
 /-- A fiber is n-truncated if its values are bounded. -/
-def Fiber.isTrunc (F : Fiber) (n : Nat) : Prop :=
+noncomputable def Fiber.isTrunc (F : Fiber) (n : Nat) : Prop :=
   ∀ x : Pt, F.fib x ≤ n
 
 /-- Theorem 59 – if fiber is n-truncated, it's (n+1)-truncated. -/
@@ -559,7 +559,7 @@ theorem const_fiber_trunc (k : Nat) :
 -- ============================================================
 
 /-- Encode: from a path, extract a code (its length). -/
-def encodePath : Path a b → Nat := Path.length
+noncomputable def encodePath : Path a b → Nat := Path.length
 
 /-- Theorem 61 – encode of nil is 0. -/
 theorem encode_nil (a : Pt) : encodePath (Path.nil a) = 0 := rfl

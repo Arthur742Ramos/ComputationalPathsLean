@@ -53,7 +53,7 @@ variable {Obj : Type u}
 variable (T : TwoRepresentationPathData Obj)
 
 /-- Step witness: left-unit normalization for horizontal composition cells. -/
-def comp_step {X Y Z : Obj} (p : Path X Y) (q : Path Y Z) :
+noncomputable def comp_step {X Y Z : Obj} (p : Path X Y) (q : Path Y Z) :
     Path.Step
       (Path.trans
         (Path.refl (Path.trans (T.actMor p) (T.actMor q)))
@@ -70,7 +70,7 @@ noncomputable def comp_rweq {X Y Z : Obj} (p : Path X Y) (q : Path Y Z) :
   rweq_of_step (T.comp_step p q)
 
 /-- Step witness: right-unit normalization for whiskering cells. -/
-def whisker_step {X Y : Obj} (p : Path X Y) :
+noncomputable def whisker_step {X Y : Obj} (p : Path X Y) :
     Path.Step
       (Path.trans
         (T.whisker2Cell p)
@@ -87,7 +87,7 @@ noncomputable def whisker_rweq {X Y : Obj} (p : Path X Y) :
   rweq_of_step (T.whisker_step p)
 
 /-- Step witness: right-unit normalization for mate cells. -/
-def mate_step {X Y : Obj} (p : Path X Y) :
+noncomputable def mate_step {X Y : Obj} (p : Path X Y) :
     Path.Step
       (Path.trans
         (T.mate2Cell p)
@@ -104,7 +104,7 @@ noncomputable def mate_rweq {X Y : Obj} (p : Path X Y) :
   rweq_of_step (T.mate_step p)
 
 /-- Two-step mate composite used in 2-representation coherence checks. -/
-def doubleMatePath {X Y : Obj} (p : Path X Y) :
+noncomputable def doubleMatePath {X Y : Obj} (p : Path X Y) :
     Path (Path.symm (Path.symm (T.actMor p)))
       (T.actMor p) :=
   Path.stepChain (Path.symm_symm (T.actMor p))
@@ -143,7 +143,7 @@ variable {T : TwoRepresentationPathData Obj}
 variable (B : QuantumTwoRepBridge Obj Q T)
 
 /-- Step witness: right-unit normalization for crossing-action transport. -/
-def crossingAction_step (X Y : Obj) :
+noncomputable def crossingAction_step (X Y : Obj) :
     Path.Step
       (Path.trans
         (B.crossingActionPath X Y)
@@ -174,7 +174,7 @@ noncomputable def fAction_cancel_rweq (X : Obj) :
 end QuantumTwoRepBridge
 
 /-- Trivial 2-representation used as a base computational-path model. -/
-def trivialTwoRepresentationPathData : TwoRepresentationPathData PUnit where
+noncomputable def trivialTwoRepresentationPathData : TwoRepresentationPathData PUnit where
   actObj := fun _ => PUnit.unit
   actMor := fun {_ _} _ => Path.refl PUnit.unit
   id2Cell := fun _ => Path.refl PUnit.unit
@@ -183,7 +183,7 @@ def trivialTwoRepresentationPathData : TwoRepresentationPathData PUnit where
   mate2Cell := fun _ => Path.refl (Path.refl PUnit.unit)
 
 /-- Trivial bridge between the trivial categorified quantum group and 2-representation. -/
-def trivialQuantumTwoRepBridge :
+noncomputable def trivialQuantumTwoRepBridge :
     QuantumTwoRepBridge PUnit
       trivialCatQuantumGroupPathData
       trivialTwoRepresentationPathData where

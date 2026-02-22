@@ -104,7 +104,7 @@ structure StableShiftData (C : PreAdditiveCategory) where
     Path (unshift (shift.shiftObj X)) X
 
 /-- Build a StableShiftData from a ShiftFunctor and chosen inverse witnesses. -/
-def StableShiftData.ofShift (C : PreAdditiveCategory)
+noncomputable def StableShiftData.ofShift (C : PreAdditiveCategory)
     (T : ShiftFunctor C)
     (unshift : C.Obj → C.Obj)
     (shift_unshift : ∀ X : C.Obj, Path (T.shiftObj (unshift X)) X)
@@ -138,7 +138,7 @@ structure ExactTriangleData (C : PreAdditiveCategory)
                        (C.zero triangle.Y (S.shift.shiftObj triangle.X))
 
 /-- Build an exact triangle from a triangle where all composites are zero. -/
-def ExactTriangleData.ofZeroComposites
+noncomputable def ExactTriangleData.ofZeroComposites
     {C : PreAdditiveCategory} {S : StableShiftData C}
     (T : Triangle C S.shift)
     (hgf : C.comp T.f T.g = C.zero T.X T.Z)
@@ -153,7 +153,7 @@ def ExactTriangleData.ofZeroComposites
 /-! ## Rotation of exact triangles -/
 
 /-- Rotate a triangle: X → Y → Z → ΣX becomes Y → Z → ΣX → ΣY. -/
-def rotateTriangle {C : PreAdditiveCategory} {S : StableShiftData C}
+noncomputable def rotateTriangle {C : PreAdditiveCategory} {S : StableShiftData C}
     (T : Triangle C S.shift) : Triangle C S.shift where
   X := T.Y
   Y := T.Z
@@ -175,7 +175,7 @@ structure RotationData {C : PreAdditiveCategory} {S : StableShiftData C}
     C.zero (rotateTriangle E.triangle).X (rotateTriangle E.triangle).Z
 
 /-- Trivial rotation data. -/
-def trivialRotation {C : PreAdditiveCategory} {S : StableShiftData C}
+noncomputable def trivialRotation {C : PreAdditiveCategory} {S : StableShiftData C}
     (E : ExactTriangleData C S)
     (hcomp : C.comp E.triangle.g E.triangle.h =
       C.zero E.triangle.Y (S.shift.shiftObj E.triangle.X)) :
@@ -208,7 +208,7 @@ structure OctahedralData {C : PreAdditiveCategory}
     (C.comp u_map v_map)
 
 /-- Trivial octahedral data (all identities). -/
-def trivialOctahedral {C : PreAdditiveCategory}
+noncomputable def trivialOctahedral {C : PreAdditiveCategory}
     {S : StableShiftData C}
     (E : ExactTriangleData C S) : OctahedralData (S := S) where
   f_tri := E
@@ -263,7 +263,7 @@ structure TriangulatedFromStable
     Path (rotateTriangle T).f T.g
 
 /-- Build triangulated structure from a stable model category. -/
-def triangulatedFromStable
+noncomputable def triangulatedFromStable
     (C : PreAdditiveCategory)
     (SM : StableModelCatData C) : TriangulatedFromStable C SM where
   distinguished := fun _ => True
@@ -299,7 +299,7 @@ structure StableEquivData
       E'.triangle.Y = obj E.triangle.Y
 
 /-- Identity stable equivalence. -/
-def stableEquivId
+noncomputable def stableEquivId
     (C : PreAdditiveCategory)
     (SM : StableModelCatData C) : StableEquivData C C SM SM where
   obj := id

@@ -45,21 +45,21 @@ structure Perm (n : Nat) where
   right_inv : ∀ i, toFun (invFun i) = i
 
 /-- Identity permutation. -/
-def Perm.id (n : Nat) : Perm n where
+noncomputable def Perm.id (n : Nat) : Perm n where
   toFun := _root_.id
   invFun := _root_.id
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
 /-- Composition of permutations. -/
-def Perm.comp {n : Nat} (σ τ : Perm n) : Perm n where
+noncomputable def Perm.comp {n : Nat} (σ τ : Perm n) : Perm n where
   toFun := σ.toFun ∘ τ.toFun
   invFun := τ.invFun ∘ σ.invFun
   left_inv := fun i => by simp [Function.comp, τ.left_inv, σ.left_inv]
   right_inv := fun i => by simp [Function.comp, σ.right_inv, τ.right_inv]
 
 /-- Inverse permutation. -/
-def Perm.inv {n : Nat} (σ : Perm n) : Perm n where
+noncomputable def Perm.inv {n : Nat} (σ : Perm n) : Perm n where
   toFun := σ.invFun
   invFun := σ.toFun
   left_inv := σ.right_inv
@@ -100,17 +100,17 @@ namespace CleanOperad
 variable (O : CleanOperad)
 
 /-- `Path`-valued action identity. -/
-def action_id_path {n : Nat} (x : O.ops n) :
+noncomputable def action_id_path {n : Nat} (x : O.ops n) :
     Path (O.action (Perm.id n) x) x :=
   Path.stepChain (O.action_id x)
 
 /-- `Path`-valued action composition. -/
-def action_comp_path {n : Nat} (σ τ : Perm n) (x : O.ops n) :
+noncomputable def action_comp_path {n : Nat} (σ τ : Perm n) (x : O.ops n) :
     Path (O.action (Perm.comp σ τ) x) (O.action σ (O.action τ x)) :=
   Path.stepChain (O.action_comp σ τ x)
 
 /-- The trivial operad: one operation at each arity with trivial action. -/
-def trivial : CleanOperad where
+noncomputable def trivial : CleanOperad where
   ops := fun _ => Unit
   unit := ()
   action := fun _ x => x
@@ -133,7 +133,7 @@ structure OperadAlgebra (O : CleanOperad) where
     act (O.action σ θ) xs = act θ (xs ∘ σ.invFun)
 
 /-- The trivial algebra over any operad. -/
-def OperadAlgebra.trivial (O : CleanOperad) : OperadAlgebra O where
+noncomputable def OperadAlgebra.trivial (O : CleanOperad) : OperadAlgebra O where
   carrier := Unit
   act := fun _ _ => ()
   equivariant := fun _ _ _ => rfl
@@ -147,13 +147,13 @@ structure OperadAlgebraHom {O : CleanOperad} (A B : OperadAlgebra O) where
     toFun (A.act θ xs) = B.act θ (toFun ∘ xs)
 
 /-- Identity algebra morphism. -/
-def OperadAlgebraHom.id {O : CleanOperad} (A : OperadAlgebra O) :
+noncomputable def OperadAlgebraHom.id {O : CleanOperad} (A : OperadAlgebra O) :
     OperadAlgebraHom A A where
   toFun := _root_.id
   map_act := fun _ _ => rfl
 
 /-- Composition of algebra morphisms. -/
-def OperadAlgebraHom.comp {O : CleanOperad} {A B C : OperadAlgebra O}
+noncomputable def OperadAlgebraHom.comp {O : CleanOperad} {A B C : OperadAlgebra O}
     (g : OperadAlgebraHom B C) (f : OperadAlgebraHom A B) :
     OperadAlgebraHom A C where
   toFun := g.toFun ∘ f.toFun
@@ -175,7 +175,7 @@ inductive FreeOperadTree (C : Collection) : Type u
   | node : {n : Nat} → C.ops n → (Fin n → FreeOperadTree C) → FreeOperadTree C
 
 /-- Arity of a free operad tree (number of leaves). -/
-def FreeOperadTree.arity {C : Collection} : FreeOperadTree C → Nat
+noncomputable def FreeOperadTree.arity {C : Collection} : FreeOperadTree C → Nat
   | FreeOperadTree.leaf => 1
   | FreeOperadTree.node (n := n) _ children =>
       Fin.foldl n (fun acc i => acc + (children i).arity) 0
@@ -204,13 +204,13 @@ structure OperadMorphism (O P : CleanOperad) where
 namespace OperadMorphism
 
 /-- Identity operad morphism. -/
-def id (O : CleanOperad) : OperadMorphism O O where
+noncomputable def id (O : CleanOperad) : OperadMorphism O O where
   map := fun x => x
   map_unit := rfl
   map_equivariant := fun _ _ => rfl
 
 /-- Composition of operad morphisms. -/
-def comp {O P Q : CleanOperad}
+noncomputable def comp {O P Q : CleanOperad}
     (g : OperadMorphism P Q) (f : OperadMorphism O P) : OperadMorphism O Q where
   map := fun x => g.map (f.map x)
   map_unit := by rw [f.map_unit, g.map_unit]

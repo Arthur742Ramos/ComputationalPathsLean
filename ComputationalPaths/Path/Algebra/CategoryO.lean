@@ -94,7 +94,7 @@ structure WeightDecomp (O : CategoryOData.{u}) (M : O.cat.Obj) where
          (O.cat.id (O.weightSpace M (toWeight wt_)))
 
 /-- Path.trans: composing weight decomposition maps. -/
-def weight_decomp_roundtrip (O : CategoryOData.{u}) (M : O.cat.Obj)
+noncomputable def weight_decomp_roundtrip (O : CategoryOData.{u}) (M : O.cat.Obj)
     (wd : WeightDecomp O M) (wt_ : wd.supportWeights) :
     Path (O.cat.comp (wd.inclusion wt_) (wd.projection wt_))
          (O.cat.id (O.weightSpace M (wd.toWeight wt_))) :=
@@ -142,19 +142,19 @@ structure Block (O : CategoryOData.{u}) (cc : CentralCharacter O) where
   hom : (M N : obj) → O.cat.Hom (toObj M) (toObj N)
 
 /-- Path.trans: block decomposition — composing the character constraint. -/
-def block_char_trans {O : CategoryOData.{u}} {cc : CentralCharacter O}
+noncomputable def block_char_trans {O : CategoryOData.{u}} {cc : CentralCharacter O}
     (B : Block O cc) (M N : B.obj) :
     Path (cc.charOf (B.toObj M)) (cc.charOf (B.toObj N)) :=
   Path.trans (B.has_char M) (Path.symm (B.has_char N))
 
 /-- Path.congrArg on block character transitions. -/
-def block_char_trans_congr {O : CategoryOData.{u}} {cc : CentralCharacter O}
+noncomputable def block_char_trans_congr {O : CategoryOData.{u}} {cc : CentralCharacter O}
     (B : Block O cc) (M N : B.obj) (f : cc.CChar → cc.CChar) :
     Path (f (cc.charOf (B.toObj M))) (f (cc.charOf (B.toObj N))) :=
   Path.congrArg f (block_char_trans B M N)
 
 /-- Path.trans for associativity of block composition. -/
-def block_triple_compose {O : CategoryOData.{u}} {cc : CentralCharacter O}
+noncomputable def block_triple_compose {O : CategoryOData.{u}} {cc : CentralCharacter O}
     (B : Block O cc) (L M N : B.obj) :
     Path (O.cat.comp (O.cat.comp (B.hom L M) (B.hom M N)) (O.cat.id (B.toObj N)))
          (O.cat.comp (B.hom L M) (B.hom M N)) :=
@@ -176,7 +176,7 @@ structure ProjectiveCover (O : CategoryOData.{u}) (M : O.cat.Obj) where
   indecomposable : True
 
 /-- Path.trans: composing the lifting property with surjection. -/
-def projective_lift_compose {O : CategoryOData.{u}} {M : O.cat.Obj}
+noncomputable def projective_lift_compose {O : CategoryOData.{u}} {M : O.cat.Obj}
     (pc : ProjectiveCover O M) (N : O.cat.Obj)
     (q : O.cat.Hom N M) :
     ∃ (g : O.cat.Hom pc.P N), O.cat.comp g q = pc.surj := by
@@ -204,7 +204,7 @@ structure TiltingModule (O : CategoryOData.{u}) where
     Path (O.cat.comp (stdInclusion i) (O.cat.id T)) (stdInclusion i)
 
 /-- Path.trans for tilting module filtration compatibility. -/
-def tilting_std_id {O : CategoryOData.{u}} (tm : TiltingModule O) (i : Fin tm.stdLength) :
+noncomputable def tilting_std_id {O : CategoryOData.{u}} (tm : TiltingModule O) (i : Fin tm.stdLength) :
     Path (O.cat.comp (tm.stdInclusion i) (O.cat.id tm.T)) (tm.stdInclusion i) :=
   tm.std_compat i
 
@@ -220,7 +220,7 @@ structure KLPolynomial where
   degree_bound : coeffs.length ≤ degree + 1
 
 /-- Evaluate a KL polynomial at a given value. -/
-def KLPolynomial.eval (p : KLPolynomial) (q : Nat) : Nat :=
+noncomputable def KLPolynomial.eval (p : KLPolynomial) (q : Nat) : Nat :=
   p.coeffs.foldl (fun acc c => acc * q + c) 0
 
 /-- Kazhdan-Lusztig data: multiplicities of simples in Verma modules. -/
@@ -239,7 +239,7 @@ structure KLData (O : CategoryOData.{u}) where
   identity_poly : Path ((klPoly identity_idx identity_idx).coeffs) [1]
 
 /-- Path.trans: multiplicity computation for the identity element. -/
-def kl_identity_mult {O : CategoryOData.{u}} (kl : KLData O) :
+noncomputable def kl_identity_mult {O : CategoryOData.{u}} (kl : KLData O) :
     Path (kl.multiplicity kl.identity_idx kl.identity_idx)
          ((kl.klPoly kl.identity_idx kl.identity_idx).eval 1) :=
   kl.mult_eq_eval kl.identity_idx kl.identity_idx

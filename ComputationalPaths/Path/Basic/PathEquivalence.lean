@@ -38,13 +38,13 @@ namespace PathMap
 variable {A : Type u} {B : Type v} {C : Type w}
 
 /-- The identity path map. -/
-@[simp] def id : PathMap A A where
+@[simp] noncomputable def id : PathMap A A where
   toFun := _root_.id
   mapPath := fun p => congrArg _root_.id p
   map_refl := fun a => by simp [congrArg]
 
 /-- Composition of path maps. -/
-@[simp] def comp (g : PathMap B C) (f : PathMap A B) : PathMap A C where
+@[simp] noncomputable def comp (g : PathMap B C) (f : PathMap A B) : PathMap A C where
   toFun := g.toFun ∘ f.toFun
   mapPath := fun p => g.mapPath (f.mapPath p)
   map_refl := fun a => by
@@ -52,13 +52,13 @@ variable {A : Type u} {B : Type v} {C : Type w}
     rw [f.map_refl, g.map_refl]
 
 /-- `congrArg` gives a path map for any function. -/
-def ofFun (f : A → B) : PathMap A B where
+noncomputable def ofFun (f : A → B) : PathMap A B where
   toFun := f
   mapPath := fun p => Path.congrArg f p
   map_refl := fun a => by simp
 
 /-- A path map preserving `trans`. -/
-def preserves_trans (F : PathMap A B)
+noncomputable def preserves_trans (F : PathMap A B)
     (htrans : ∀ {a b c : A} (p : Path a b) (q : Path b c),
       F.mapPath (trans p q) = trans (F.mapPath p) (F.mapPath q)) :
     ∀ {a b c : A} (p : Path a b) (q : Path b c),
@@ -84,7 +84,7 @@ namespace SectRetract
 variable {A : Type u} {B : Type v}
 
 /-- Identity section-retraction. -/
-@[simp] def id : SectRetract A A where
+@[simp] noncomputable def id : SectRetract A A where
   sect := _root_.id
   retr := _root_.id
   sect_path := fun p => congrArg _root_.id p
@@ -124,7 +124,7 @@ namespace PathEquiv
 variable {A : Type u} {B : Type v} {C : Type w}
 
 /-- Identity equivalence. -/
-@[simp] def refl : PathEquiv A A where
+@[simp] noncomputable def refl : PathEquiv A A where
   toFun := _root_.id
   invFun := _root_.id
   mapPath := fun p => congrArg _root_.id p
@@ -135,7 +135,7 @@ variable {A : Type u} {B : Type v} {C : Type w}
   inv_refl := fun a => by simp
 
 /-- Symmetric equivalence. -/
-@[simp] def symm (e : PathEquiv A B) : PathEquiv B A where
+@[simp] noncomputable def symm (e : PathEquiv A B) : PathEquiv B A where
   toFun := e.invFun
   invFun := e.toFun
   mapPath := e.invPath
@@ -146,7 +146,7 @@ variable {A : Type u} {B : Type v} {C : Type w}
   inv_refl := e.map_refl
 
 /-- Transitive composition of equivalences. -/
-def trans (e₁ : PathEquiv A B) (e₂ : PathEquiv B C) : PathEquiv A C where
+noncomputable def trans (e₁ : PathEquiv A B) (e₂ : PathEquiv B C) : PathEquiv A C where
   toFun := e₂.toFun ∘ e₁.toFun
   invFun := e₁.invFun ∘ e₂.invFun
   mapPath := fun p => e₂.mapPath (e₁.mapPath p)
@@ -184,7 +184,7 @@ theorem right_inv_toFun (e : PathEquiv A B) (b : B) :
   e.right_inv b
 
 /-- An equivalence yields a section-retraction pair. -/
-def toSectRetract (e : PathEquiv A B) : SectRetract A B where
+noncomputable def toSectRetract (e : PathEquiv A B) : SectRetract A B where
   sect := e.toFun
   retr := e.invFun
   sect_path := e.mapPath
@@ -218,7 +218,7 @@ namespace HalfAdjEquiv
 variable {A : Type u} {B : Type v}
 
 /-- The identity is a half-adjoint equivalence. -/
-@[simp] def refl : HalfAdjEquiv A A where
+@[simp] noncomputable def refl : HalfAdjEquiv A A where
   toFun := _root_.id
   invFun := _root_.id
   mapPath := fun p => congrArg _root_.id p
@@ -232,7 +232,7 @@ variable {A : Type u} {B : Type v}
 /-- Every `PathEquiv` can be promoted to a `HalfAdjEquiv` because
 the coherence condition holds: `congrArg f (ofEq h)` and `ofEq (congrArg f h)`
 agree when the proof fields are proof-irrelevant. -/
-def ofPathEquiv (e : PathEquiv A B) : HalfAdjEquiv A B where
+noncomputable def ofPathEquiv (e : PathEquiv A B) : HalfAdjEquiv A B where
   toFun := e.toFun
   invFun := e.invFun
   mapPath := e.mapPath
@@ -246,7 +246,7 @@ def ofPathEquiv (e : PathEquiv A B) : HalfAdjEquiv A B where
     constructor
 
 /-- A half-adjoint equivalence is symmetric. -/
-def symm (e : HalfAdjEquiv A B) : HalfAdjEquiv B A :=
+noncomputable def symm (e : HalfAdjEquiv A B) : HalfAdjEquiv B A :=
   ofPathEquiv e.toPathEquiv.symm
 
 /-- The underlying `PathEquiv` of a `HalfAdjEquiv`. -/
@@ -264,7 +264,7 @@ end HalfAdjEquiv
 /-! ## congrArg as path equivalence -/
 
 /-- An injective function with a retraction gives a path equivalence. -/
-def pathEquivOfEquiv (f : A → B) (g : B → A)
+noncomputable def pathEquivOfEquiv (f : A → B) (g : B → A)
     (hfg : ∀ a, g (f a) = a) (hgf : ∀ b, f (g b) = b) :
     PathEquiv A B where
   toFun := f

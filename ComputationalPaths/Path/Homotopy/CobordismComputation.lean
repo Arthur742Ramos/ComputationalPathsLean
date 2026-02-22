@@ -98,7 +98,7 @@ structure ToddGenus where
   normalize : True
 
 /-- The trivial Todd genus with PUnit as target. -/
-def trivialToddGenus : ToddGenus where
+noncomputable def trivialToddGenus : ToddGenus where
   target := PUnit
   genus := fun _ _ => PUnit.unit
   additive := True.intro

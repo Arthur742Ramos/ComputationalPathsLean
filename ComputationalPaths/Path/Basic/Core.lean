@@ -46,11 +46,11 @@ namespace Step
 variable {A : Type u} {B : Type v}
 
 /-- Reverse the direction of a rewrite step. -/
-@[simp] def symm (s : Step A) : Step A :=
+@[simp] noncomputable def symm (s : Step A) : Step A :=
   Step.mk s.tgt s.src s.proof.symm
 
 /-- Map a rewrite step through a function. -/
-@[simp] def map (f : A → B) (s : Step A) : Step B :=
+@[simp] noncomputable def map (f : A → B) (s : Step A) : Step B :=
   Step.mk (f s.src) (f s.tgt) (_root_.congrArg f s.proof)
 
 @[simp] theorem symm_symm (s : Step A) : symm (symm s) = s := by
@@ -98,19 +98,19 @@ variable {a1 a2 a3 : A} {b1 b2 b3 : B}
 
 /-- Extract the propositional equality witnessed by a path.  This is the
 semantic equality; the trace `steps` does not affect `toEq`. -/
-@[simp] def toEq (p : Path a b) : a = b :=
+@[simp] noncomputable def toEq (p : Path a b) : a = b :=
   p.proof
 
 /-- Reflexive path (empty sequence of rewrites). -/
-@[simp] def refl (a : A) : Path a a :=
+@[simp] noncomputable def refl (a : A) : Path a a :=
   Path.mk [] rfl
 
 /-- Path consisting of a single rewrite step. -/
-@[simp] def ofEq (h : a = b) : Path a b :=
+@[simp] noncomputable def ofEq (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 /-- Path consisting of a single explicit step-chain witness. -/
-@[simp] def stepChain (h : a = b) : Path a b :=
+@[simp] noncomputable def stepChain (h : a = b) : Path a b :=
   Path.mk [Step.mk a b h] h
 
 @[simp] theorem toEq_ofEq (h : a = b) : toEq (ofEq h) = h := rfl
@@ -125,23 +125,23 @@ This reflects proof irrelevance (UIP) for Lean's `Eq` in `Prop`. -/
   simp [ofEq]
 
 /-- Compose two paths, concatenating their step lists. -/
-@[simp] def trans (p : Path a b) (q : Path b c) : Path a c :=
+@[simp] noncomputable def trans (p : Path a b) (q : Path b c) : Path a c :=
   Path.mk (p.steps ++ q.steps) (p.proof.trans q.proof)
 
 /-- Reverse a path by reversing and inverting each step. -/
-@[simp] def symm (p : Path a b) : Path b a :=
+@[simp] noncomputable def symm (p : Path a b) : Path b a :=
   Path.mk (p.steps.reverse.map Step.symm) p.proof.symm
 
 /-- Paper notation `invA` for symmetry of computational paths. -/
-@[simp] def invA (p : Path a b) : Path b a :=
+@[simp] noncomputable def invA (p : Path a b) : Path b a :=
   symm p
 
 /-- Paper notation `cmpA` for path composition. -/
-@[simp] def cmpA (p : Path a b) (q : Path b c) : Path a c :=
+@[simp] noncomputable def cmpA (p : Path a b) (q : Path b c) : Path a c :=
   trans p q
 
 /-- Cast an element from `D a` to `D b` given a path `p : Path a b`. -/
-def cast {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
+noncomputable def cast {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
   Eq.recOn p.proof x
 
 @[simp] theorem cast_refl {D : A → Sort v} (x : D a) :
@@ -258,12 +258,12 @@ theorem trace_symm_involutive (steps : List (Step A)) :
     _ = steps := hmap
 
 /-- Left whiskering of a 2-path by postcomposition. -/
-@[simp] def whiskerLeft {p p' : Path a b} (h : p = p') (q : Path b c) :
+@[simp] noncomputable def whiskerLeft {p p' : Path a b} (h : p = p') (q : Path b c) :
     trans p q = trans p' q :=
   _root_.congrArg (fun t => trans t q) h
 
 /-- Right whiskering of a 2-path by precomposition. -/
-@[simp] def whiskerRight (p : Path a b) {q q' : Path b c} (h : q = q') :
+@[simp] noncomputable def whiskerRight (p : Path a b) {q q' : Path b c} (h : q = q') :
     trans p q = trans p q' :=
   _root_.congrArg (fun t => trans p t) h
 
@@ -394,7 +394,7 @@ theorem symm_trans_steps_concat (p : Path a b) (q : Path b c) :
 /-! ## Transport bridge -/
 
 /-- Transport along a path. -/
-def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
+noncomputable def transport {D : A → Sort v} (p : Path a b) (x : D a) : D b :=
   Eq.recOn p.proof x
 
 @[simp] theorem transport_refl {D : A → Sort v} (x : D a) :
@@ -419,7 +419,7 @@ variable (f : ∀ x : A, B x)
 variable {a b : A}
 
 /-- Apply a dependent function to a path, yielding the transported result. -/
-@[simp] def apd (p : Path a b) :
+@[simp] noncomputable def apd (p : Path a b) :
     Path (transport (A := A) (D := fun x => B x) p (f a)) (f b) := by
   cases p with
   | mk steps h =>
@@ -488,7 +488,7 @@ equality computes to `Eq.mpr`. -/
       rfl
 
 /-- Substitution along a path, following the paper's notation. -/
-def subst {D : A → Sort v} (x : D a) (p : Path a b) : D b :=
+noncomputable def subst {D : A → Sort v} (x : D a) (p : Path a b) : D b :=
   transport p x
 
 @[simp] theorem subst_refl {D : A → Sort v} (x : D a) :
@@ -524,7 +524,7 @@ def subst {D : A → Sort v} (x : D a) (p : Path a b) : D b :=
 /-- Transport across two independent path arguments.  The value is first
 carried along the `A`-component, and the resulting element is transported
 along the `B`-component. -/
-@[simp] def transport₂ {A : Type u} {B : Type v}
+@[simp] noncomputable def transport₂ {A : Type u} {B : Type v}
     {D : A → B → Sort w}
     {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) (q : Path b₁ b₂) (x : D a₁ b₁) : D a₂ b₂ :=
@@ -633,7 +633,7 @@ along the `B`-component. -/
           simp [transport₂, transport]
 
 /-- Substitution across two arguments, mirroring the binary transport. -/
-@[simp] def subst₂ {A : Type u} {B : Type v}
+@[simp] noncomputable def subst₂ {A : Type u} {B : Type v}
     {D : A → B → Sort w}
     {a₁ a₂ : A} {b₁ b₂ : B}
     (x : D a₁ b₁) (p : Path a₁ a₂) (q : Path b₁ b₂) : D a₂ b₂ :=
@@ -694,7 +694,7 @@ along the `B`-component. -/
   transport₂_const (D := D) p q x
 
 /-- Congruence of unary functions along paths. -/
-@[simp] def congrArg (f : A → B) (p : Path a b) :
+@[simp] noncomputable def congrArg (f : A → B) (p : Path a b) :
     Path (f a) (f b) :=
   Path.mk (p.steps.map (Step.map f)) (_root_.congrArg f p.proof)
 

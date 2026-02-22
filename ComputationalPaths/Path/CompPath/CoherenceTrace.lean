@@ -56,7 +56,7 @@ structure CoherenceStep where
   deriving Inhabited, Repr
 
 /-- A coherence trace: sequence of labeled steps. -/
-def CoherenceTraceData : Type := List CoherenceStep
+noncomputable def CoherenceTraceData : Type := List CoherenceStep
 
 /-! ## Pentagon identity trace -/
 
@@ -85,7 +85,7 @@ Then the other side:
 4. `(p(qr))s → p((qr)s)` — outer associator
 5. `p((qr)s) → p(q(rs))` — inner associator under congr_left
 Both sides arrive at `p(q(rs))`, showing the pentagon commutes. -/
-def pentagonTrace : CoherenceTraceData :=
+noncomputable def pentagonTrace : CoherenceTraceData :=
   [ { rule := "trans_assoc"
       description := "((p⬝q)⬝r)⬝s ▷ (p⬝q)⬝(r⬝s)  [outer α]" }
   , { rule := "trans_assoc"
@@ -158,7 +158,7 @@ In path algebra:
 2. `p⬝(refl⬝q) → p⬝q` — left unitor under right congruence
 Or alternatively:
 3. `(p⬝refl)⬝q → p⬝q` — right unitor under left congruence -/
-def triangleTrace : CoherenceTraceData :=
+noncomputable def triangleTrace : CoherenceTraceData :=
   [ { rule := "trans_assoc"
       description := "(p⬝refl)⬝q ▷ p⬝(refl⬝q)  [associator]" }
   , { rule := "trans_refl_left + congr_right"
@@ -259,13 +259,13 @@ noncomputable def macLane_coherence_4fold_all {a b c d e : A}
 /-! ## Coherence trace extraction -/
 
 /-- Extract the trace from the pentagon left path (2 steps). -/
-def pentagonLeftTrace : CoherenceTraceData :=
+noncomputable def pentagonLeftTrace : CoherenceTraceData :=
   [ { rule := "trans_assoc", description := "((pq)r)s → (pq)(rs)" }
   , { rule := "trans_assoc", description := "(pq)(rs) → p(q(rs))" }
   ]
 
 /-- Extract the trace from the pentagon right path (3 steps). -/
-def pentagonRightTrace : CoherenceTraceData :=
+noncomputable def pentagonRightTrace : CoherenceTraceData :=
   [ { rule := "trans_assoc + congr_left", description := "((pq)r)s → (p(qr))s" }
   , { rule := "trans_assoc", description := "(p(qr))s → p((qr)s)" }
   , { rule := "trans_assoc + congr_right", description := "p((qr)s) → p(q(rs))" }

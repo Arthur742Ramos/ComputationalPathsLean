@@ -39,7 +39,7 @@ universe u v w
 
 /-- The figure-eight space: wedge sum of two circles sharing a common basepoint.
 Topologically, this is two circles joined at a single point, forming an "8" shape. -/
-def FigureEight : Type u := Wedge Circle.{u} Circle.{u} circleBase circleBase
+noncomputable def FigureEight : Type u := Wedge Circle.{u} Circle.{u} circleBase circleBase
 
 namespace FigureEight
 
@@ -57,7 +57,7 @@ structure PathSimpleEquiv (α : Type u) (β : Type v) where
   right_inv : ∀ y : β, Path (toFun (invFun y)) y
 
 /-- Convert a `SimpleEquiv` into a `PathSimpleEquiv`. -/
-def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
+noncomputable def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
     PathSimpleEquiv α β :=
   { toFun := e.toFun
     invFun := e.invFun

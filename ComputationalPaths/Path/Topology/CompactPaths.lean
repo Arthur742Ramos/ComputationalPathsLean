@@ -50,17 +50,17 @@ structure FiniteCover {A : Type u} (C : OpenCover A) where
   covers : ∀ a : A, ∃ i, i ∈ indices ∧ C.sets i a
 
 /-- The trivial cover by a single universal set. -/
-def trivialCover (A : Type u) : OpenCover A where
+noncomputable def trivialCover (A : Type u) : OpenCover A where
   sets := fun _ _ => True
   covers := fun _ => ⟨0, trivial⟩
 
 /-- The trivial cover has a finite subcover. -/
-def trivialFiniteCover (A : Type u) : FiniteCover (trivialCover A) where
+noncomputable def trivialFiniteCover (A : Type u) : FiniteCover (trivialCover A) where
   indices := [0]
   covers := fun _ => ⟨0, by simp, trivial⟩
 
 /-- Path between finite cover indices. -/
-def finite_cover_path (A : Type u) :
+noncomputable def finite_cover_path (A : Type u) :
     Path (trivialFiniteCover A).indices [0] :=
   Path.refl _
 
@@ -88,7 +88,7 @@ theorem compact_prop {A : Type u} (h1 h2 : PathCompact A) : h1 = h2 := by
 /-! ## Sequential Compactness -/
 
 /-- A sequence in a type. -/
-def Sequence (A : Type u) := Nat → A
+noncomputable def Sequence (A : Type u) := Nat → A
 
 /-- A subsequence extracted by a monotone index function. -/
 structure Subsequence {A : Type u} (s : Sequence A) where
@@ -112,7 +112,7 @@ theorem const_seq_convergent {A : Type u} (a : A) :
   ⟨0, fun _ _ => rfl⟩
 
 /-- Path from a constant subsequence to its limit. -/
-def const_subseq_path {A : Type u} (a : A) (n : Nat) :
+noncomputable def const_subseq_path {A : Type u} (a : A) (n : Nat) :
     Path ((fun _ : Nat => a) n) a :=
   Path.refl a
 
@@ -141,7 +141,7 @@ theorem connected_loop {A : Type u} (hc : PathConnected A) (a b : A) :
   exact ⟨Path.trans p (Path.symm p)⟩
 
 /-- Path witnessing connected loop. -/
-def connected_loop_path {A : Type u} (a : A) : Path a a :=
+noncomputable def connected_loop_path {A : Type u} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Compact Rewriting = Terminating -/
@@ -152,7 +152,7 @@ structure RewriteSystem (A : Type u) where
   step : A → A → Prop
 
 /-- A rewriting system is terminating (strongly normalizing). -/
-def Terminating {A : Type u} (R : RewriteSystem A) : Prop :=
+noncomputable def Terminating {A : Type u} (R : RewriteSystem A) : Prop :=
   ∀ s : Sequence A, ¬ (∀ n, R.step (s n) (s (n + 1)))
 
 /-- A rewriting system is compact if every reduction sequence
@@ -173,11 +173,11 @@ theorem empty_compact_rewriting {A : Type u} [Inhabited A] :
   ⟨fun _ => ⟨default, fun ⟨_, h⟩ => h⟩⟩
 
 /-- Path from a rewrite step. -/
-def rewrite_step_path {A : Type u} {a b : A} (h : a = b) : Path a b :=
+noncomputable def rewrite_step_path {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Composing rewrite step paths. -/
-def rewrite_chain_path {A : Type u} {a b c : A} (h1 : a = b) (h2 : b = c) :
+noncomputable def rewrite_chain_path {A : Type u} {a b c : A} (h1 : a = b) (h2 : b = c) :
     Path a c :=
   Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.mk [Step.mk _ _ h2] h2)
 
@@ -193,7 +193,7 @@ structure PathTree (A : Type u) where
   child_path : ∀ a, ∀ c, c ∈ children a → Path a c
 
 /-- The depth of a path tree (maximum path length from root). -/
-def treeDepth {A : Type u} (_t : PathTree A) : Nat → Nat
+noncomputable def treeDepth {A : Type u} (_t : PathTree A) : Nat → Nat
   | 0 => 1
   | n + 1 => n + 2  -- simplified; real depth would traverse
 
@@ -214,22 +214,22 @@ structure KoenigPath {A : Type u} (t : PathTree A) where
   follows : ∀ n, path_seq (n + 1) ∈ t.children (path_seq n)
 
 /-- Path from König sequence start to root. -/
-def koenig_start_path {A : Type u} {t : PathTree A} (k : KoenigPath t) :
+noncomputable def koenig_start_path {A : Type u} {t : PathTree A} (k : KoenigPath t) :
     Path (k.path_seq 0) t.root :=
   Path.mk [Step.mk _ _ k.starts] k.starts
 
 /-- Each König step gives a path. -/
-def koenig_step_path {A : Type u} {t : PathTree A} (k : KoenigPath t) (n : Nat) :
+noncomputable def koenig_step_path {A : Type u} {t : PathTree A} (k : KoenigPath t) (n : Nat) :
     Path (k.path_seq n) (k.path_seq (n + 1)) :=
   t.child_path (k.path_seq n) (k.path_seq (n + 1)) (k.follows n)
 
 /-- Composing two König steps. -/
-def koenig_two_step_path {A : Type u} {t : PathTree A} (k : KoenigPath t) (n : Nat) :
+noncomputable def koenig_two_step_path {A : Type u} {t : PathTree A} (k : KoenigPath t) (n : Nat) :
     Path (k.path_seq n) (k.path_seq (n + 2)) :=
   Path.trans (koenig_step_path k n) (koenig_step_path k (n + 1))
 
 /-- The composite path from root to the n-th node. -/
-def koenig_prefix_path {A : Type u} {t : PathTree A} (k : KoenigPath t) :
+noncomputable def koenig_prefix_path {A : Type u} {t : PathTree A} (k : KoenigPath t) :
     (n : Nat) → Path t.root (k.path_seq n)
   | 0 => Path.symm (koenig_start_path k)
   | n + 1 => Path.trans (koenig_prefix_path k n) (koenig_step_path k n)
@@ -249,7 +249,7 @@ structure PathReduction (A : Type u) where
   correct : ∀ {a b : A} (p : Path a b), (reduce p).toEq = p.toEq
 
 /-- The identity reduction. -/
-def idReduction (A : Type u) : PathReduction A where
+noncomputable def idReduction (A : Type u) : PathReduction A where
   reduce := fun p => p
   correct := fun _ => rfl
 
@@ -264,7 +264,7 @@ theorem id_reduction_idem {A : Type u} {a b : A} (p : Path a b) :
   rfl
 
 /-- CongrArg through reduction. -/
-def reduction_congrArg {A : Type u} {B : Type v} (R : PathReduction A)
+noncomputable def reduction_congrArg {A : Type u} {B : Type v} (R : PathReduction A)
     {a b : A} (f : A → B) (p : Path a b) :
     Path (f a) (f b) :=
   Path.congrArg f (R.reduce p)

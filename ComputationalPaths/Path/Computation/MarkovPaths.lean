@@ -41,7 +41,7 @@ structure TransMatrix (S : Type u) where
   stateSpace : StateSpace S
 
 /-- Two transition matrices are equal when they agree on all pairs. -/
-def transMatEquiv {S : Type u} (m1 m2 : TransMatrix S) : Prop :=
+noncomputable def transMatEquiv {S : Type u} (m1 m2 : TransMatrix S) : Prop :=
   ∀ i j : S, m1.trans i j = m2.trans i j
 
 /-- Transition matrix equivalence is reflexive. -/
@@ -205,7 +205,7 @@ theorem balance_trans_refl {S : Type u} (d : DetailedBalance S) :
   simp
 
 /-- Detailed balance symmetry. -/
-def balance_reverse {S : Type u} (d : DetailedBalance S) :
+noncomputable def balance_reverse {S : Type u} (d : DetailedBalance S) :
     Path d.piJ_Pji d.piI_Pij :=
   Path.symm d.balancePath
 
@@ -262,12 +262,12 @@ theorem trans_congrArg {S : Type u} (m : TransMatrix S) (i : S)
   _root_.congrArg (m.trans i) h
 
 /-- Path from congrArg on transitions. -/
-def trans_congrArg_path {S : Type u} (m : TransMatrix S) (i : S)
+noncomputable def trans_congrArg_path {S : Type u} (m : TransMatrix S) (i : S)
     {j1 j2 : S} (h : j1 = j2) : Path (m.trans i j1) (m.trans i j2) :=
   Path.mk [Step.mk _ _ (_root_.congrArg (m.trans i) h)] (_root_.congrArg (m.trans i) h)
 
 /-- Transport for state-indexed data. -/
-def state_transport {S : Type u} {P : S → Type v}
+noncomputable def state_transport {S : Type u} {P : S → Type v}
     {s1 s2 : S} (h : s1 = s2) (x : P s1) : P s2 :=
   Path.transport (Path.mk [Step.mk _ _ h] h) x
 
@@ -279,7 +279,7 @@ theorem state_transport_refl {S : Type u} {P : S → Type v}
 /-! ## Path Composition for Multi-step Transitions -/
 
 /-- Compose two transition paths. -/
-def multi_step_path {a b c : Nat}
+noncomputable def multi_step_path {a b c : Nat}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -292,16 +292,16 @@ theorem multi_step_assoc {a b c d : Nat}
 /-! ## Trivial Instances -/
 
 /-- Trivial state space on Bool. -/
-def trivialStateSpace : StateSpace Bool where
+noncomputable def trivialStateSpace : StateSpace Bool where
   states := [true, false]
 
 /-- Trivial transition matrix. -/
-def trivialTransMatrix : TransMatrix Bool where
+noncomputable def trivialTransMatrix : TransMatrix Bool where
   trans := fun _ _ => 1
   stateSpace := trivialStateSpace
 
 /-- Trivial Chapman-Kolmogorov data. -/
-def trivialCK : ChapmanKolmogorov Bool where
+noncomputable def trivialCK : ChapmanKolmogorov Bool where
   state_i := true
   state_j := false
   probNM := 2
@@ -309,7 +309,7 @@ def trivialCK : ChapmanKolmogorov Bool where
   ckPath := Path.refl 2
 
 /-- Trivial stationary data. -/
-def trivialStationary : StationaryData Bool where
+noncomputable def trivialStationary : StationaryData Bool where
   distribution := fun _ => 1
   matrix := trivialTransMatrix
   stateVal := true
@@ -318,7 +318,7 @@ def trivialStationary : StationaryData Bool where
   stationaryPath := Path.refl 1
 
 /-- Trivial detailed balance. -/
-def trivialBalance : DetailedBalance Bool where
+noncomputable def trivialBalance : DetailedBalance Bool where
   state_i := true
   state_j := false
   piI_Pij := 1

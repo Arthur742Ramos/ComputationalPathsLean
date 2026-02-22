@@ -80,7 +80,7 @@ noncomputable def S1Rec_id : S1Rec S1 :=
   { baseImg := base, loopImg := loop }
 
 /-- Theorem 7: S1 recursion into a type with trivial loop gives refl. -/
-def S1Rec_const (a : A) : S1Rec A :=
+noncomputable def S1Rec_const (a : A) : S1Rec A :=
   { baseImg := a, loopImg := Path.refl a }
 
 /-- Theorem 8: Composing loop with refl on the left. -/
@@ -130,7 +130,7 @@ structure IntervalRec (A : Type u) where
   segImg  : Path zeroImg oneImg
 
 /-- Theorem 13: Interval recursion into a point gives constant map. -/
-def IntervalRec_const (a : A) : IntervalRec A :=
+noncomputable def IntervalRec_const (a : A) : IntervalRec A :=
   { zeroImg := a, oneImg := a, segImg := Path.refl a }
 
 /-- Theorem 14: Interval contraction - segment reversed and composed. -/
@@ -191,11 +191,11 @@ structure SuspRec (A : Type u) (B : Type v) where
   meridImg : A → Path northImg southImg
 
 /-- Theorem 22: Suspension of Empty has trivially no meridians. -/
-def SuspRec_empty (n s : B) : SuspRec Empty B :=
+noncomputable def SuspRec_empty (n s : B) : SuspRec Empty B :=
   { northImg := n, southImg := s, meridImg := fun e => Empty.elim e }
 
 /-- Theorem 23: Suspension of Unit yields a single meridian. -/
-def SuspRec_unit (n s : B) (p : Path n s) : SuspRec Unit B :=
+noncomputable def SuspRec_unit (n s : B) (p : Path n s) : SuspRec Unit B :=
   { northImg := n, southImg := s, meridImg := fun _ => p }
 
 /-- Theorem 24: Associativity of triple meridian composition. -/
@@ -351,7 +351,7 @@ structure PushoutRecData (Ap : Type u) (Bp : Type v) (D : Type w) where
   inrImg  : Bp → D
 
 /-- Theorem 40: Pushout recursion for constant map. -/
-def PushoutRecData_const {Ap : Type u} {Bp : Type v} (d : D) : PushoutRecData Ap Bp D :=
+noncomputable def PushoutRecData_const {Ap : Type u} {Bp : Type v} (d : D) : PushoutRecData Ap Bp D :=
   { inlImg := fun _ => d,
     inrImg := fun _ => d }
 
@@ -458,7 +458,7 @@ structure TorusRec (X : Type u) where
   surfImg  : Path.trans loopAImg loopBImg = Path.trans loopBImg loopAImg
 
 /-- Theorem 54: Torus recursion into a point. -/
-def TorusRec_const (x : X) : TorusRec X :=
+noncomputable def TorusRec_const (x : X) : TorusRec X :=
   { baseImg := x,
     loopAImg := Path.refl x,
     loopBImg := Path.refl x,
@@ -498,7 +498,7 @@ structure EncodeDecode (A : Type u) (a₀ : A) where
   encode     : ∀ (x : A), Path a₀ x → Code x
 
 /-- Theorem 59: For any type, identity encode-decode using Path itself as code. -/
-def EncodeDecode_id (A : Type u) (a₀ : A) : EncodeDecode A a₀ :=
+noncomputable def EncodeDecode_id (A : Type u) (a₀ : A) : EncodeDecode A a₀ :=
   { Code := fun x => Path a₀ x,
     encode_pt := Path.refl a₀,
     decode := fun _ c => c,
@@ -619,18 +619,18 @@ end HITPathAlgebra
 -- ============================================================================
 
 /-- A 2-path (path of paths) between paths in a HIT. -/
-def Path2 {A : Type u} {a b : A} (p q : Path a b) := p = q
+noncomputable def Path2 {A : Type u} {a b : A} (p q : Path a b) := p = q
 
 /-- Theorem 79: Refl 2-path. -/
-def Path2.refl2 {a b : A} (p : Path a b) : Path2 p p := rfl
+noncomputable def Path2.refl2 {a b : A} (p : Path a b) : Path2 p p := rfl
 
 /-- Theorem 80: Symmetry of 2-paths. -/
-def Path2.symm2 {a b : A} {p q : Path a b}
+noncomputable def Path2.symm2 {a b : A} {p q : Path a b}
     (alpha : Path2 p q) : Path2 q p :=
   alpha.symm
 
 /-- Theorem 81: Transitivity of 2-paths. -/
-def Path2.trans2 {a b : A} {p q r : Path a b}
+noncomputable def Path2.trans2 {a b : A} {p q r : Path a b}
     (alpha : Path2 p q) (beta : Path2 q r) : Path2 p r :=
   alpha.trans beta
 

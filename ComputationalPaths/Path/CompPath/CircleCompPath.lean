@@ -35,7 +35,7 @@ inductive CircleCompPath : Type u
   | base : CircleCompPath
 
 /-- Base point of the circle. -/
-@[simp] def circleCompPathBase : CircleCompPath := CircleCompPath.base
+@[simp] noncomputable def circleCompPathBase : CircleCompPath := CircleCompPath.base
 
 /-! ## Path expressions with a loop generator -/
 
@@ -50,19 +50,19 @@ inductive CircleCompPathExpr : CircleCompPath → CircleCompPath → Type u
 /-! ## Loop expressions and powers -/
 
 /-- The formal loop generator expression. -/
-@[simp] def circleCompPathLoopExpr :
+@[simp] noncomputable def circleCompPathLoopExpr :
     CircleCompPathExpr circleCompPathBase circleCompPathBase :=
   CircleCompPathExpr.loop
 
 /-- Iterate the loop generator `n` times at the expression level. -/
-@[simp] def circleCompPathLoopExprPow :
+@[simp] noncomputable def circleCompPathLoopExprPow :
     Nat → CircleCompPathExpr circleCompPathBase circleCompPathBase
   | 0 => CircleCompPathExpr.refl circleCompPathBase
   | Nat.succ n =>
       CircleCompPathExpr.trans (circleCompPathLoopExprPow n) circleCompPathLoopExpr
 
 /-- Integer iteration at the expression level. -/
-@[simp] def circleCompPathLoopExprZPow :
+@[simp] noncomputable def circleCompPathLoopExprZPow :
     Int → CircleCompPathExpr circleCompPathBase circleCompPathBase
   | Int.ofNat n => circleCompPathLoopExprPow n
   | Int.negSucc n =>
@@ -128,12 +128,12 @@ noncomputable def circleCompPathEncodeExpr' :
 /-! ## Loop quotient and pi_1 -/
 
 /-- Loop expression relation: same winding number. -/
-def circleCompPathRel
+noncomputable def circleCompPathRel
     (p q : CircleCompPathExpr circleCompPathBase circleCompPathBase) : Prop :=
   circleCompPathEncodeExpr' p = circleCompPathEncodeExpr' q
 
 /-- Setoid on loop expressions by winding number. -/
-def circleCompPathSetoid :
+noncomputable def circleCompPathSetoid :
     Setoid (CircleCompPathExpr circleCompPathBase circleCompPathBase) where
   r := circleCompPathRel
   iseqv := by
@@ -156,7 +156,7 @@ abbrev circleCompPathPiOne : Type u :=
     exact hpq)
 
 /-- Decode an integer to the canonical loop expression class. -/
-@[simp] def circleCompPathDecode : Int → circleCompPathPiOne :=
+@[simp] noncomputable def circleCompPathDecode : Int → circleCompPathPiOne :=
   fun z => Quot.mk _ (circleCompPathLoopExprZPow z)
 
 /-- Encoding after decoding is the identity on integers. -/
@@ -213,7 +213,7 @@ abbrev circlePiOne : Type u := circleCompPathPiOne
   circleCompPathEncode
 
 /-- Alias for the π₁ decode map, matching the legacy name. -/
-@[simp] def circleDecode : Int → circlePiOne :=
+@[simp] noncomputable def circleDecode : Int → circlePiOne :=
   circleCompPathDecode
 
 /-- Chosen equality proof used to seed the loop generator. -/
@@ -239,11 +239,11 @@ noncomputable def circleLoopEq : circleBase = circleBase :=
   circleLoopPathZPow
 
 /-- Alias for the fundamental loop in π₁. -/
-@[simp] def circlePiOneLoop : circlePiOne :=
+@[simp] noncomputable def circlePiOneLoop : circlePiOne :=
   circleDecode 1
 
 /-- Alias for the loop z-power in the quotient. -/
-@[simp] def circleLoopZPow : Int → circlePiOne :=
+@[simp] noncomputable def circleLoopZPow : Int → circlePiOne :=
   circleDecode
 
 @[simp] theorem circleDecode_zero : circleDecode 0 = circleLoopZPow 0 := rfl

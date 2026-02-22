@@ -28,41 +28,41 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   eq : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
-def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
+noncomputable def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.eq.trans τ.eq⟩
 
-def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
+noncomputable def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.eq.symm⟩
 
-def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
+noncomputable def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
     Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (Path.trans r) σ.eq⟩
 
-def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
+noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.eq⟩
 
@@ -126,19 +126,19 @@ structure VSpace where
   dim : Nat
 deriving DecidableEq, Repr
 
-def VSpace.tensor (V W : VSpace) : VSpace :=
+noncomputable def VSpace.tensor (V W : VSpace) : VSpace :=
   ⟨V.dim * W.dim⟩
 
-def VSpace.trivial : VSpace := ⟨1⟩
+noncomputable def VSpace.trivial : VSpace := ⟨1⟩
 
 /-- Linear map between vector spaces (abstract). -/
 structure LinMap (V W : VSpace) where
   label : String
 deriving DecidableEq, Repr
 
-def LinMap.id (V : VSpace) : LinMap V V := ⟨"id"⟩
+noncomputable def LinMap.id (V : VSpace) : LinMap V V := ⟨"id"⟩
 
-def LinMap.comp (f : LinMap V W) (g : LinMap W X) : LinMap V X :=
+noncomputable def LinMap.comp (f : LinMap V W) (g : LinMap W X) : LinMap V X :=
   ⟨f.label ++ " ∘ " ++ g.label⟩
 
 -- ============================================================
@@ -146,7 +146,7 @@ def LinMap.comp (f : LinMap V W) (g : LinMap W X) : LinMap V X :=
 -- ============================================================
 
 /-- TQFT assigns a state space to each manifold. -/
-def stateSpace : Manifold → VSpace
+noncomputable def stateSpace : Manifold → VSpace
   | .empty       => VSpace.trivial
   | .circle      => ⟨2⟩
   | .sphere      => ⟨1⟩
@@ -155,12 +155,12 @@ def stateSpace : Manifold → VSpace
   | .disjoint m₁ m₂ => (stateSpace m₁).tensor (stateSpace m₂)
 
 /-- TQFT assigns a linear map to each cobordism step. -/
-def tqftStep : Cob a b → LinMap (stateSpace a) (stateSpace b)
+noncomputable def tqftStep : Cob a b → LinMap (stateSpace a) (stateSpace b)
   | .refl _     => LinMap.id (stateSpace a)
   | .rule n _ _ => ⟨"Z[" ++ n ++ "]"⟩
 
 /-- TQFT functor on a path (composite cobordism). -/
-def tqftPath : CobPath a b → LinMap (stateSpace a) (stateSpace b)
+noncomputable def tqftPath : CobPath a b → LinMap (stateSpace a) (stateSpace b)
   | .nil _    => LinMap.id (stateSpace a)
   | .cons s p => LinMap.comp (tqftStep s) (tqftPath p)
 
@@ -267,7 +267,7 @@ theorem cob_trans_nil_right (p : CobPath a b) :
 -- ============================================================
 
 /-- Partition function Z(M) for a closed manifold — dimension of state space. -/
-def partitionFn (m : Manifold) : Nat := (stateSpace m).dim
+noncomputable def partitionFn (m : Manifold) : Nat := (stateSpace m).dim
 
 -- Theorem 18: Partition function of empty manifold
 theorem partition_empty : partitionFn .empty = 1 := by
@@ -309,7 +309,7 @@ structure FinGroup where
 
 /-- DW model: number of homomorphisms from π₁(M) to G, divided by |G|.
     For genus-g surface, |Hom(π₁(Σ_g), G)| = |G|^(2g-1) when g ≥ 1. -/
-def dwStateCount (G : FinGroup) (m : Manifold) : Nat :=
+noncomputable def dwStateCount (G : FinGroup) (m : Manifold) : Nat :=
   match m with
   | .empty   => 1
   | .circle  => G.order
@@ -344,7 +344,7 @@ theorem dw_genus_zero (G : FinGroup) : dwStateCount G (.genus 0) = 1 := by
 -- ============================================================
 
 /-- Disjoint union of cobordism paths (monoidal product). -/
-def CobPath.disjoint (p : CobPath a b) (q : CobPath c d) :
+noncomputable def CobPath.disjoint (p : CobPath a b) (q : CobPath c d) :
     CobPath (Manifold.disjoint a c) (Manifold.disjoint b d) :=
   match p, q with
   | .nil _, .nil _ => .nil _
@@ -368,7 +368,7 @@ theorem stateSpace_empty_tensor (m : Manifold) :
 -- ============================================================
 
 /-- Orientation reversal of a manifold. -/
-def Manifold.rev : Manifold → Manifold
+noncomputable def Manifold.rev : Manifold → Manifold
   | .empty       => .empty
   | .circle      => .circle
   | .sphere      => .sphere
@@ -443,7 +443,7 @@ structure ExtCob where
   label   : String
 deriving Repr
 
-def ExtCob.cornerCount (c : ExtCob) : Nat := c.corners.length
+noncomputable def ExtCob.cornerCount (c : ExtCob) : Nat := c.corners.length
 
 -- Theorem 41: Extended cobordism with no corners is ordinary
 theorem ext_cob_no_corners (c : ExtCob) (h : c.corners = []) :
@@ -465,7 +465,7 @@ inductive TQFTRule where
 deriving DecidableEq, Repr
 
 /-- Coherence path between two equal TQFT computations. -/
-def coherencePath (r : TQFTRule) (v : VSpace) : Path VSpace v v :=
+noncomputable def coherencePath (r : TQFTRule) (v : VSpace) : Path VSpace v v :=
   Path.single (Step.rule (toString (repr r)) v v)
 
 -- Theorem 42: Coherence path has length 1

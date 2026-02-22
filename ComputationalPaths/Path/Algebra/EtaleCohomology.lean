@@ -49,7 +49,7 @@ structure EtaleMorphismData (α : Type u) where
   deriving Repr, BEq
 
 /-- Construct a standard étale morphism -/
-def EtaleMorphismData.standard (s t : α) (n : Nat) : EtaleMorphismData α :=
+noncomputable def EtaleMorphismData.standard (s t : α) (n : Nat) : EtaleMorphismData α :=
   { source := s, target := t, fiberCardinality := n, isFlat := true, isUnramified := true }
 
 /-- An étale cover is a collection of étale morphisms that are jointly surjective -/
@@ -70,11 +70,11 @@ structure EtaleSiteData (α : Type u) where
   deriving Repr
 
 /-- Empty étale site over a base -/
-def EtaleSiteData.empty (x : α) : EtaleSiteData α :=
+noncomputable def EtaleSiteData.empty (x : α) : EtaleSiteData α :=
   { baseScheme := x, objects := [], covers := [] }
 
 /-- Add an étale morphism to the site -/
-def EtaleSiteData.addMorphism (site : EtaleSiteData α) (m : EtaleMorphismData α) : EtaleSiteData α :=
+noncomputable def EtaleSiteData.addMorphism (site : EtaleSiteData α) (m : EtaleMorphismData α) : EtaleSiteData α :=
   { site with objects := m :: site.objects }
 
 -- ============================================================================
@@ -90,7 +90,7 @@ structure EtaleSheafData (α : Type u) where
   deriving Repr
 
 /-- Constant sheaf associated to a set -/
-def EtaleSheafData.constant (site : EtaleSiteData α) (a : α) : EtaleSheafData α :=
+noncomputable def EtaleSheafData.constant (site : EtaleSiteData α) (a : α) : EtaleSheafData α :=
   { site := site, sections := [a], restrictionCount := 0, satisfiesGluing := true }
 
 /-- Sheaf of ℓ-adic integers (modeled abstractly) -/
@@ -114,11 +114,11 @@ structure EtaleCohomGroupData (α : Type u) where
   deriving Repr
 
 /-- H^0 is global sections -/
-def EtaleCohomGroupData.h0 (x : α) (sh : EtaleSheafData α) : EtaleCohomGroupData α :=
+noncomputable def EtaleCohomGroupData.h0 (x : α) (sh : EtaleSheafData α) : EtaleCohomGroupData α :=
   { scheme := x, sheaf := sh, degree := 0, generators := sh.sections, rank := sh.sections.length }
 
 /-- Euler characteristic from cohomology data -/
-def eulerCharEtale (groups : List (EtaleCohomGroupData α)) : Nat :=
+noncomputable def eulerCharEtale (groups : List (EtaleCohomGroupData α)) : Nat :=
   groups.foldl (fun acc g => acc + g.rank) 0
 
 -- ============================================================================
@@ -134,12 +134,12 @@ structure GaloisActionData (α : Type u) where
   deriving Repr
 
 /-- Path witnessing Galois equivariance -/
-def galoisEquivariancePath {α : Type u} (act : GaloisActionData α) :
+noncomputable def galoisEquivariancePath {α : Type u} (act : GaloisActionData α) :
     Path act.cohomGroup act.cohomGroup :=
   Path.refl act.cohomGroup
 
 /-- Frobenius action at a prime -/
-def frobeniusAction (act : GaloisActionData α) (_p : Nat) : GaloisActionData α :=
+noncomputable def frobeniusAction (act : GaloisActionData α) (_p : Nat) : GaloisActionData α :=
   { act with isUnramified := true }
 
 -- ============================================================================
@@ -155,7 +155,7 @@ structure ProperBaseChangeData (α : Type u) where
   deriving Repr
 
 /-- Path witnessing proper base change isomorphism -/
-def properBaseChangePath {α : Type u} (pbc : ProperBaseChangeData α) :
+noncomputable def properBaseChangePath {α : Type u} (pbc : ProperBaseChangeData α) :
     Path pbc.cohomGroup pbc.cohomGroup :=
   Path.refl pbc.cohomGroup
 
@@ -178,7 +178,7 @@ structure SmoothBaseChangeData (α : Type u) where
   deriving Repr
 
 /-- Path witnessing smooth base change -/
-def smoothBaseChangePath {α : Type u} (sbc : SmoothBaseChangeData α) :
+noncomputable def smoothBaseChangePath {α : Type u} (sbc : SmoothBaseChangeData α) :
     Path sbc.cohomGroup sbc.cohomGroup :=
   Path.refl sbc.cohomGroup
 
@@ -195,12 +195,12 @@ structure PoincareDualityData (α : Type u) where
   deriving Repr
 
 /-- Path witnessing Poincaré duality pairing -/
-def poincareDualityPath {α : Type u} (pd : PoincareDualityData α) :
+noncomputable def poincareDualityPath {α : Type u} (pd : PoincareDualityData α) :
     Path pd.cohomGroup pd.cohomGroup :=
   Path.refl pd.cohomGroup
 
 /-- Duality degree computation -/
-def dualDegree (n i : Nat) : Nat := 2 * n - i
+noncomputable def dualDegree (n i : Nat) : Nat := 2 * n - i
 
 -- ============================================================================
 -- Section 9: EtaleStep Rewrite Relation
@@ -243,12 +243,12 @@ structure ZetaFunctionData (α : Type u) where
   deriving Repr
 
 /-- Rationality: zeta function is a rational function (Path witness) -/
-def zetaRationalityPath {α : Type u} (zd : ZetaFunctionData α) :
+noncomputable def zetaRationalityPath {α : Type u} (zd : ZetaFunctionData α) :
     Path zd zd :=
   Path.refl zd
 
 /-- Functional equation from Poincaré duality -/
-def functionalEquationPath {α : Type u} (zd : ZetaFunctionData α) :
+noncomputable def functionalEquationPath {α : Type u} (zd : ZetaFunctionData α) :
     Path zd zd :=
   Path.refl zd
 

@@ -29,7 +29,7 @@ A simple measure on paths used for termination arguments.
 
 namespace Path
 
-@[simp] def stepsLength {A : Type u} {a b : A} (p : Path a b) : Nat :=
+@[simp] noncomputable def stepsLength {A : Type u} {a b : A} (p : Path a b) : Nat :=
   p.steps.length
 
 end Path
@@ -43,7 +43,7 @@ Numeric ranking of rules compatible with Definition 3.21 from the paper.
 namespace Rule
 
 /-- Numeric ranking compatible with the textual order in Definition 3.21. -/
-@[simp] def rank : Rule → Nat
+@[simp] noncomputable def rank : Rule → Nat
   | Rule.sr => 0
   | Rule.ss => 1
   | Rule.tr => 2
@@ -117,7 +117,7 @@ structure Precedence where
 
 namespace Precedence
 
-@[simp] def default : Precedence :=
+@[simp] noncomputable def default : Precedence :=
   { rank := Rule.rank }
 
 @[simp] theorem wellFounded (P : Precedence) :
@@ -139,7 +139,7 @@ witnesses must be constructed explicitly when needed.
 
 namespace LNDEQ
 
-@[simp] def Instantiation.rank (i : Instantiation) : Nat :=
+@[simp] noncomputable def Instantiation.rank (i : Instantiation) : Nat :=
   Rule.rank i.rule
 
 end LNDEQ
@@ -167,7 +167,7 @@ namespace Symbol
 
 /-- Precedence compatible with `Rule.rank`, with `nf` sitting below the entire
 rule enumeration. -/
-@[simp] def rank : Symbol → Nat
+@[simp] noncomputable def rank : Symbol → Nat
   | Symbol.nf => 0
   | Symbol.rule r => Rule.rank r + 1
   | Symbol.pathLen len => len
@@ -187,16 +187,16 @@ structure Term where
 namespace Term
 
 /-- Combined measure: symbol rank plus path length contribution. -/
-@[simp] def measure (t : Term) : Nat :=
+@[simp] noncomputable def measure (t : Term) : Nat :=
   Symbol.rank t.symbol + t.pathLenSum
 
 /-- Recursive path ordering specialised to our signature.
     rpoLt s t means s is strictly smaller than t in the RPO. -/
-def rpoLt (s t : Term) : Prop :=
+noncomputable def rpoLt (s t : Term) : Prop :=
   Symbol.rank s.symbol < Symbol.rank t.symbol ∧ s.pathLenSum ≤ t.pathLenSum
 
 /-- rpoGt is the inverse: s is strictly greater than t. -/
-def rpoGt (s t : Term) : Prop := rpoLt t s
+noncomputable def rpoGt (s t : Term) : Prop := rpoLt t s
 
 theorem rpoLt_measure {s t : Term} (h : rpoLt s t) :
     s.measure < t.measure := by
@@ -219,17 +219,17 @@ theorem rpoLt_wf : WellFounded rpoLt := by
 end Term
 
 /-- Canonical normal-form term. -/
-@[simp] def canonicalTerm : Term :=
+@[simp] noncomputable def canonicalTerm : Term :=
   { symbol := Symbol.nf, pathLenSum := 0 }
 
 namespace LNDEQ
 
 /-- Encode a concrete path as an RPO term weighted by its length. -/
-@[simp] def pathTerm {A : Type u} {a b : A} (p : Path a b) : Term :=
+@[simp] noncomputable def pathTerm {A : Type u} {a b : A} (p : Path a b) : Term :=
   { symbol := Symbol.pathLen (Path.stepsLength p), pathLenSum := 0 }
 
 /-- Instantiations become RPO terms by turning their tagged rule into a symbol. -/
-@[simp] def instRpoTerm (i : Instantiation) : Term :=
+@[simp] noncomputable def instRpoTerm (i : Instantiation) : Term :=
   { symbol := Symbol.rule i.rule
   , pathLenSum := Path.stepsLength i.p + Path.stepsLength i.q }
 
@@ -258,7 +258,7 @@ Complexity measures for derivations (lists of instantiations).
 sum of the corresponding rule ranks.  This is a convenient bookkeeping device
 when replaying termination proofs that resemble multiset extensions of the
 precedence relation. -/
-def derivationComplexity (xs : List Instantiation) : Nat :=
+noncomputable def derivationComplexity (xs : List Instantiation) : Nat :=
   xs.foldl (fun acc i => acc + LNDEQ.Instantiation.rank i) 0
 
 @[simp] theorem derivationComplexity_nil : derivationComplexity [] = 0 := rfl
@@ -282,7 +282,7 @@ theorem derivationComplexity_cons (i : Instantiation)
   omega
 
 /-- RPO measure for an instantiation. -/
-def instMeasure (i : Instantiation) : Nat :=
+noncomputable def instMeasure (i : Instantiation) : Nat :=
   (RecursivePathOrdering.LNDEQ.instRpoTerm i).measure
 
 theorem instMeasure_pos (i : Instantiation) : 0 < instMeasure i := by
@@ -291,7 +291,7 @@ theorem instMeasure_pos (i : Instantiation) : 0 < instMeasure i := by
   omega
 
 /-- Aggregate RPO measure for a derivation (list of instantiations). -/
-def derivationMeasure (xs : List Instantiation) : Nat :=
+noncomputable def derivationMeasure (xs : List Instantiation) : Nat :=
   xs.foldl (fun acc i => acc + instMeasure i) 0
 
 @[simp] theorem derivationMeasure_nil : derivationMeasure [] = 0 := rfl

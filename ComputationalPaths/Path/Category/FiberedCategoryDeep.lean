@@ -55,7 +55,7 @@ structure CartesianMorphism (fib : Fibration) {e e' : fib.E.Obj}
     Path g₁ g₂
 
 /-- Def 1: Cartesian morphisms compose (reflexivity witness) -/
-def cartesian_comp_stable (fib : Fibration)
+noncomputable def cartesian_comp_stable (fib : Fibration)
     {a b c : fib.E.Obj}
     (phi : fib.E.Hom a b) (psi : fib.E.Hom b c)
     (f : fib.B.Hom (fib.p.obj a) (fib.p.obj b))
@@ -66,12 +66,12 @@ def cartesian_comp_stable (fib : Fibration)
   Path.refl (fib.E.comp phi psi)
 
 /-- Def 2: Identity morphism is trivially cartesian -/
-def id_is_cartesian (fib : Fibration) (e : fib.E.Obj) :
+noncomputable def id_is_cartesian (fib : Fibration) (e : fib.E.Obj) :
     Path (fib.E.id e) (fib.E.id e) :=
   Path.refl (fib.E.id e)
 
 /-- Def 3: Cartesian lift uniqueness via Path -/
-def cartesian_lift_unique (fib : Fibration)
+noncomputable def cartesian_lift_unique (fib : Fibration)
     {e e' : fib.E.Obj}
     (phi : fib.E.Hom e e')
     (f : fib.B.Hom (fib.p.obj e) (fib.p.obj e'))
@@ -93,14 +93,14 @@ structure Cleavage (fib : Fibration) where
     fib.E.Hom (lift b b' f e' h) e'
 
 /-- Def 4: Cleavage provides consistent lifts -/
-def cleavage_consistency (fib : Fibration) (cl : Cleavage fib)
+noncomputable def cleavage_consistency (fib : Fibration) (cl : Cleavage fib)
     (b b' : fib.B.Obj) (f : fib.B.Hom b b')
     (e' : fib.E.Obj) (h : fib.p.obj e' = b') :
     Path (cl.liftMor b b' f e' h) (cl.liftMor b b' f e' h) :=
   Path.refl (cl.liftMor b b' f e' h)
 
 /-- Def 5: Cleavage lift is stable under refl -/
-def cleavage_lift_refl (fib : Fibration) (cl : Cleavage fib)
+noncomputable def cleavage_lift_refl (fib : Fibration) (cl : Cleavage fib)
     (b : fib.B.Obj) (f : fib.B.Hom b b)
     (e : fib.E.Obj) (h : fib.p.obj e = b) :
     Path (cl.lift b b f e h) (cl.lift b b f e h) :=
@@ -119,20 +119,20 @@ structure FiberHom (fib : Fibration) (b : fib.B.Obj)
   mor : fib.E.Hom x.total y.total
 
 /-- Def 6: Fiber identity -/
-def fiber_id (fib : Fibration) (b : fib.B.Obj)
+noncomputable def fiber_id (fib : Fibration) (b : fib.B.Obj)
     (x : FiberObj fib b) :
     Path (fib.E.id x.total) (fib.E.id x.total) :=
   Path.refl (fib.E.id x.total)
 
 /-- Def 7: Fiber composition -/
-def fiber_comp (fib : Fibration) (b : fib.B.Obj)
+noncomputable def fiber_comp (fib : Fibration) (b : fib.B.Obj)
     (x y z : FiberObj fib b)
     (f : FiberHom fib b x y) (g : FiberHom fib b y z) :
     Path (fib.E.comp f.mor g.mor) (fib.E.comp f.mor g.mor) :=
   Path.refl (fib.E.comp f.mor g.mor)
 
 /-- Def 8: Fiber composition associativity via Path -/
-def fiber_comp_assoc (fib : Fibration) (b : fib.B.Obj)
+noncomputable def fiber_comp_assoc (fib : Fibration) (b : fib.B.Obj)
     (x y z w : FiberObj fib b)
     (f : FiberHom fib b x y) (g : FiberHom fib b y z)
     (h : FiberHom fib b z w)
@@ -151,14 +151,14 @@ structure Transport (fib : Fibration) (cl : Cleavage fib) where
   baseMor : fib.B.Hom src tgt
 
 /-- Def 9: Transport preserves fiber objects -/
-def transport_preserves_fiber (fib : Fibration) (cl : Cleavage fib)
+noncomputable def transport_preserves_fiber (fib : Fibration) (cl : Cleavage fib)
     (t : Transport fib cl) (e : FiberObj fib t.tgt) :
     Path (cl.lift t.src t.tgt t.baseMor e.total e.over)
          (cl.lift t.src t.tgt t.baseMor e.total e.over) :=
   Path.refl _
 
 /-- Def 10: Transport composition coherence -/
-def transport_comp_coherence
+noncomputable def transport_comp_coherence
     {A : Type u}
     (liftFG liftComp : A)
     (coh : Path liftFG liftComp) :
@@ -166,7 +166,7 @@ def transport_comp_coherence
   coh
 
 /-- Def 11: Transport identity coherence -/
-def transport_id_coherence
+noncomputable def transport_id_coherence
     {A : Type u}
     (liftId target : A)
     (coh : Path liftId target) :
@@ -174,7 +174,7 @@ def transport_id_coherence
   coh
 
 /-- Def 12: Transport associativity via Path.trans -/
-def transport_assoc
+noncomputable def transport_assoc
     {A : Type u}
     (x y z : A)
     (p : Path x y) (q : Path y z) :
@@ -182,7 +182,7 @@ def transport_assoc
   Path.trans p q
 
 /-- Def 13: Transport inverse via Path.symm -/
-def transport_inverse
+noncomputable def transport_inverse
     {A : Type u}
     (x y : A)
     (p : Path x y) :
@@ -219,13 +219,13 @@ structure GrothendieckHom (B : Cat) (F : PseudoFunctor B)
   fibMor : (F.fiber x.base).Hom x.fib (F.transport baseMor y.fib)
 
 /-- Def 15: Grothendieck identity -/
-def grothendieck_id (B : Cat) (F : PseudoFunctor B)
+noncomputable def grothendieck_id (B : Cat) (F : PseudoFunctor B)
     (x : GrothendieckObj B F) :
     Path (F.transport (B.id x.base) x.fib) x.fib :=
   F.transportId x.base x.fib
 
 /-- Def 16: Grothendieck composition coherence -/
-def grothendieck_comp_coherence (B : Cat) (F : PseudoFunctor B)
+noncomputable def grothendieck_comp_coherence (B : Cat) (F : PseudoFunctor B)
     {a b c : B.Obj} (f : B.Hom a b) (g : B.Hom b c)
     (x : (F.fiber c).Obj) :
     Path (F.transport (B.comp f g) x) (F.transport f (F.transport g x)) :=
@@ -245,7 +245,7 @@ theorem grothendieck_transport_comp_natural (B : Cat) (F : PseudoFunctor B)
   rfl
 
 /-- Def 19: Double transport identity via Path.trans -/
-def double_transport_id (B : Cat) (F : PseudoFunctor B)
+noncomputable def double_transport_id (B : Cat) (F : PseudoFunctor B)
     (a : B.Obj) (x : (F.fiber a).Obj) :
     Path (F.transport (B.id a) (F.transport (B.id a) x)) x :=
   Path.trans
@@ -271,7 +271,7 @@ structure CocycleCondition (B : Cat) (F : PseudoFunctor B)
                (F.transport proj2 d.localSection)
 
 /-- Def 20: Cocycle condition is symmetric -/
-def cocycle_symmetric (B : Cat) (F : PseudoFunctor B)
+noncomputable def cocycle_symmetric (B : Cat) (F : PseudoFunctor B)
     (d : DescentDatum B F) (cc : CocycleCondition B F d) :
     Path (F.transport cc.proj2 d.localSection)
          (F.transport cc.proj1 d.localSection) :=
@@ -284,13 +284,13 @@ structure EffectiveDescent (B : Cat) (F : PseudoFunctor B)
   restrict : Path (F.transport d.coverMor globalSection) d.localSection
 
 /-- Def 21: Effective descent restriction is coherent -/
-def effective_descent_coherent (B : Cat) (F : PseudoFunctor B)
+noncomputable def effective_descent_coherent (B : Cat) (F : PseudoFunctor B)
     (d : DescentDatum B F) (ed : EffectiveDescent B F d) :
     Path (F.transport d.coverMor ed.globalSection) d.localSection :=
   ed.restrict
 
 /-- Def 22: Effective descent is unique up to Path -/
-def effective_descent_unique (B : Cat) (F : PseudoFunctor B)
+noncomputable def effective_descent_unique (B : Cat) (F : PseudoFunctor B)
     (d : DescentDatum B F)
     (ed1 ed2 : EffectiveDescent B F d)
     (p : Path ed1.globalSection ed2.globalSection) :
@@ -316,13 +316,13 @@ structure SplitFibration (B : Cat) (F : PseudoFunctor B) where
     Path (F.transport (B.comp f g) x) (F.transport f (F.transport g x))
 
 /-- Def 24: Split fibration identity is strict -/
-def split_fib_strict_id (B : Cat) (F : PseudoFunctor B)
+noncomputable def split_fib_strict_id (B : Cat) (F : PseudoFunctor B)
     (sf : SplitFibration B F) (a : B.Obj) (x : (F.fiber a).Obj) :
     Path (F.transport (B.id a) x) x :=
   sf.strictId a x
 
 /-- Def 25: Split fibration composition is strict -/
-def split_fib_strict_comp (B : Cat) (F : PseudoFunctor B)
+noncomputable def split_fib_strict_comp (B : Cat) (F : PseudoFunctor B)
     (sf : SplitFibration B F)
     {a b c : B.Obj} (f : B.Hom a b) (g : B.Hom b c)
     (x : (F.fiber c).Obj) :
@@ -331,7 +331,7 @@ def split_fib_strict_comp (B : Cat) (F : PseudoFunctor B)
   sf.strictComp f g x
 
 /-- Def 26: Split fibration double identity via trans -/
-def split_fib_double_id (B : Cat) (F : PseudoFunctor B)
+noncomputable def split_fib_double_id (B : Cat) (F : PseudoFunctor B)
     (sf : SplitFibration B F) (a : B.Obj) (x : (F.fiber a).Obj) :
     Path (F.transport (B.id a) (F.transport (B.id a) x)) x :=
   Path.trans
@@ -339,7 +339,7 @@ def split_fib_double_id (B : Cat) (F : PseudoFunctor B)
     (sf.strictId a x)
 
 /-- Def 27: Split fibration symm consistency -/
-def split_fib_symm_id (B : Cat) (F : PseudoFunctor B)
+noncomputable def split_fib_symm_id (B : Cat) (F : PseudoFunctor B)
     (sf : SplitFibration B F) (a : B.Obj) (x : (F.fiber a).Obj) :
     Path x (F.transport (B.id a) x) :=
   Path.symm (sf.strictId a x)
@@ -358,7 +358,7 @@ structure CocartesianMorphism (fib : Fibration) {e e' : fib.E.Obj}
     Path g₁ g₂
 
 /-- Def 28: Cocartesian lifts compose -/
-def cocartesian_comp (fib : Fibration)
+noncomputable def cocartesian_comp (fib : Fibration)
     {a b c : fib.E.Obj}
     (phi : fib.E.Hom a b) (psi : fib.E.Hom b c)
     (f : fib.B.Hom (fib.p.obj a) (fib.p.obj b))
@@ -369,7 +369,7 @@ def cocartesian_comp (fib : Fibration)
   Path.refl _
 
 /-- Def 29: Cocartesian lift uniqueness -/
-def cocartesian_lift_unique (fib : Fibration)
+noncomputable def cocartesian_lift_unique (fib : Fibration)
     {e e' : fib.E.Obj}
     (phi : fib.E.Hom e e')
     (f : fib.B.Hom (fib.p.obj e) (fib.p.obj e'))
@@ -393,14 +393,14 @@ structure Bifibration extends Fibration where
     toFibration.E.Obj
 
 /-- Def 30: Bifibration cartesian lift exists -/
-def bifib_cartesian_exists (bf : Bifibration)
+noncomputable def bifib_cartesian_exists (bf : Bifibration)
     (e' : bf.E.Obj) (b : bf.B.Obj)
     (f : bf.B.Hom b (bf.p.obj e')) :
     Path (bf.hasCartesian e' b f) (bf.hasCartesian e' b f) :=
   Path.refl _
 
 /-- Def 31: Bifibration cocartesian lift exists -/
-def bifib_cocartesian_exists (bf : Bifibration)
+noncomputable def bifib_cocartesian_exists (bf : Bifibration)
     (e : bf.E.Obj) (b' : bf.B.Obj)
     (f : bf.B.Hom (bf.p.obj e) b') :
     Path (bf.hasCocartesian e b' f) (bf.hasCocartesian e b' f) :=
@@ -475,13 +475,13 @@ structure FiberFunctor (B : Cat) (F : PseudoFunctor B)
   onObjPath : (x : (F.fiber b).Obj) → Path (onObj x) (F.transport f x)
 
 /-- Def 41: Fiber functor preserves identity path -/
-def fiber_functor_id (B : Cat) (F : PseudoFunctor B)
+noncomputable def fiber_functor_id (B : Cat) (F : PseudoFunctor B)
     (a : B.Obj) (x : (F.fiber a).Obj) :
     Path (F.transport (B.id a) x) x :=
   F.transportId a x
 
 /-- Def 42: Fiber functor composition coherence -/
-def fiber_functor_comp (B : Cat) (F : PseudoFunctor B)
+noncomputable def fiber_functor_comp (B : Cat) (F : PseudoFunctor B)
     {a b c : B.Obj} (f : B.Hom a b) (g : B.Hom b c)
     (x : (F.fiber c).Obj) :
     Path (F.transport (B.comp f g) x)
@@ -489,14 +489,14 @@ def fiber_functor_comp (B : Cat) (F : PseudoFunctor B)
   F.transportComp f g x
 
 /-- Def 43: Fiber functor applied to paths -/
-def fiber_functor_map_path (B : Cat) (F : PseudoFunctor B)
+noncomputable def fiber_functor_map_path (B : Cat) (F : PseudoFunctor B)
     {a b : B.Obj} (f : B.Hom a b)
     (x y : (F.fiber b).Obj) (p : Path x y) :
     Path (F.transport f x) (F.transport f y) :=
   Path.congrArg (F.transport f) p
 
 /-- Def 44: Fiber functor composition with identity -/
-def fiber_functor_comp_id (B : Cat) (F : PseudoFunctor B)
+noncomputable def fiber_functor_comp_id (B : Cat) (F : PseudoFunctor B)
     (a b : B.Obj) (f : B.Hom a b) (x : (F.fiber b).Obj) :
     Path (F.transport f (F.transport (B.id b) x))
          (F.transport f x) :=
@@ -513,14 +513,14 @@ structure PseudoNatTrans (B : Cat) (F G : PseudoFunctor B) where
          (G.transport f (component b x))
 
 /-- Def 45: Pseudonatural transformation identity naturality -/
-def pseudonat_id_naturality (B : Cat) (F G : PseudoFunctor B)
+noncomputable def pseudonat_id_naturality (B : Cat) (F G : PseudoFunctor B)
     (alpha : PseudoNatTrans B F G) (a : B.Obj) (x : (F.fiber a).Obj) :
     Path (alpha.component a (F.transport (B.id a) x))
          (G.transport (B.id a) (alpha.component a x)) :=
   alpha.naturality (B.id a) x
 
 /-- Def 46: Pseudonatural transformation preserves transport paths -/
-def pseudonat_preserves_transport (B : Cat) (F G : PseudoFunctor B)
+noncomputable def pseudonat_preserves_transport (B : Cat) (F G : PseudoFunctor B)
     (alpha : PseudoNatTrans B F G)
     {a b : B.Obj} (f : B.Hom a b)
     (x y : (F.fiber b).Obj) (p : Path x y) :
@@ -529,7 +529,7 @@ def pseudonat_preserves_transport (B : Cat) (F G : PseudoFunctor B)
   Path.congrArg (alpha.component a) (Path.congrArg (F.transport f) p)
 
 /-- Def 47: Pseudonatural composition coherence -/
-def pseudonat_comp_coherence (B : Cat) (F G : PseudoFunctor B)
+noncomputable def pseudonat_comp_coherence (B : Cat) (F G : PseudoFunctor B)
     (alpha : PseudoNatTrans B F G)
     {a b c : B.Obj} (f : B.Hom a b) (g : B.Hom b c)
     (x : (F.fiber c).Obj) :
@@ -542,7 +542,7 @@ def pseudonat_comp_coherence (B : Cat) (F G : PseudoFunctor B)
 /-! ## Coherence Cells -/
 
 /-- Def 48: Pentagon coherence for transport -/
-def pentagon_coherence (B : Cat) (F : PseudoFunctor B)
+noncomputable def pentagon_coherence (B : Cat) (F : PseudoFunctor B)
     {a b c d : B.Obj}
     (f : B.Hom a b) (g : B.Hom b c) (h : B.Hom c d)
     (x : (F.fiber d).Obj)
@@ -555,7 +555,7 @@ def pentagon_coherence (B : Cat) (F : PseudoFunctor B)
   Path.trans compFGH (Path.congrArg (F.transport f) compGH)
 
 /-- Def 49: Triangle coherence for transport with identity -/
-def triangle_coherence (B : Cat) (F : PseudoFunctor B)
+noncomputable def triangle_coherence (B : Cat) (F : PseudoFunctor B)
     {a b : B.Obj} (f : B.Hom a b)
     (x : (F.fiber b).Obj)
     (idTransp : Path (F.transport (B.id b) x) x)
@@ -566,14 +566,14 @@ def triangle_coherence (B : Cat) (F : PseudoFunctor B)
   Path.trans compFId (Path.congrArg (F.transport f) idTransp)
 
 /-- Def 50: Whiskering transport paths -/
-def whisker_transport
+noncomputable def whisker_transport
     {A : Type u} (f : A → A) {x y : A}
     (p : Path x y) :
     Path (f x) (f y) :=
   Path.congrArg f p
 
 /-- Def 51: Horizontal composition of transport paths -/
-def horizontal_comp_transport
+noncomputable def horizontal_comp_transport
     {A : Type u} (f g : A → A)
     {x y : A}
     (alpha : (z : A) → Path (f z) (g z))
@@ -582,7 +582,7 @@ def horizontal_comp_transport
   Path.trans (alpha x) (Path.congrArg g p)
 
 /-- Def 52: Interchange via trans -/
-def interchange_transport
+noncomputable def interchange_transport
     {A : Type u} {x y z : A}
     (alpha : Path x y)
     (beta : Path y z) :
@@ -590,7 +590,7 @@ def interchange_transport
   Path.trans alpha beta
 
 /-- Def 53: Cartesian morphism isomorphism criterion -/
-def cartesian_iso_criterion (fib : Fibration)
+noncomputable def cartesian_iso_criterion (fib : Fibration)
     {e e' : fib.E.Obj}
     (phi : fib.E.Hom e e')
     (psi : fib.E.Hom e' e)
@@ -600,7 +600,7 @@ def cartesian_iso_criterion (fib : Fibration)
   left_inv
 
 /-- Def 54: Descent is functorial -/
-def descent_functorial (B : Cat) (F : PseudoFunctor B)
+noncomputable def descent_functorial (B : Cat) (F : PseudoFunctor B)
     (d : DescentDatum B F)
     (x y : (F.fiber d.targetObj).Obj)
     (p : Path x y) :
@@ -615,7 +615,7 @@ theorem fiber_equivalence_toEq
   simp
 
 /-- Def 56: Transport along composite is coherent -/
-def transport_composite_coherence
+noncomputable def transport_composite_coherence
     (B : Cat) (F : PseudoFunctor B)
     {a b c : B.Obj} (f : B.Hom a b) (g : B.Hom b c)
     (x y : (F.fiber c).Obj) (p : Path x y) :
@@ -632,7 +632,7 @@ theorem split_fib_symmetry_toEq (B : Cat) (F : PseudoFunctor B)
   simp
 
 /-- Def 58: Pseudofunctor naturality composition -/
-def pseudofunctor_comp_transport (B : Cat) (F G : PseudoFunctor B)
+noncomputable def pseudofunctor_comp_transport (B : Cat) (F G : PseudoFunctor B)
     (alpha : PseudoNatTrans B F G)
     {a b : B.Obj} (f : B.Hom a b) (x : (F.fiber b).Obj) :
     Path (alpha.component a (F.transport f x))
@@ -640,7 +640,7 @@ def pseudofunctor_comp_transport (B : Cat) (F G : PseudoFunctor B)
   alpha.naturality f x
 
 /-- Def 59: Triple transport via trans -/
-def triple_transport
+noncomputable def triple_transport
     (B : Cat) (F : PseudoFunctor B)
     {a b c d : B.Obj}
     (f : B.Hom a b) (g : B.Hom b c) (h : B.Hom c d)
@@ -667,7 +667,7 @@ theorem transport_groupoid_law_toEq
   simp
 
 /-- Def 63: Left whiskering of pseudonatural transformation -/
-def pseudonat_whisker_left (B : Cat) (F G : PseudoFunctor B)
+noncomputable def pseudonat_whisker_left (B : Cat) (F G : PseudoFunctor B)
     (alpha : PseudoNatTrans B F G)
     {a b : B.Obj} (f : B.Hom a b)
     (x y : (F.fiber b).Obj) (p : Path x y) :
@@ -676,7 +676,7 @@ def pseudonat_whisker_left (B : Cat) (F G : PseudoFunctor B)
   Path.congrArg (G.transport f) (Path.congrArg (alpha.component b) p)
 
 /-- Def 64: Right whiskering of pseudonatural transformation -/
-def pseudonat_whisker_right (B : Cat) (F G : PseudoFunctor B)
+noncomputable def pseudonat_whisker_right (B : Cat) (F G : PseudoFunctor B)
     (alpha : PseudoNatTrans B F G)
     {a b : B.Obj} (f : B.Hom a b)
     (x y : (F.fiber b).Obj) (p : Path x y) :
@@ -692,7 +692,7 @@ theorem congrArg_comp_path
   congrArg_comp f g p
 
 /-- Def 66: Effective descent combined with transport -/
-def descent_transport_combine (B : Cat) (F : PseudoFunctor B)
+noncomputable def descent_transport_combine (B : Cat) (F : PseudoFunctor B)
     (d : DescentDatum B F) (ed : EffectiveDescent B F d)
     {a : B.Obj} (f : B.Hom a d.coverObj) :
     Path (F.transport f (F.transport d.coverMor ed.globalSection))
@@ -700,14 +700,14 @@ def descent_transport_combine (B : Cat) (F : PseudoFunctor B)
   Path.congrArg (F.transport f) ed.restrict
 
 /-- Def 67: Transport path along comp then simplify -/
-def transport_comp_then_id (B : Cat) (F : PseudoFunctor B)
+noncomputable def transport_comp_then_id (B : Cat) (F : PseudoFunctor B)
     {a b : B.Obj} (f : B.Hom a b) (x : (F.fiber b).Obj) :
     Path (F.transport f (F.transport (B.id b) x))
          (F.transport f x) :=
   Path.congrArg (F.transport f) (F.transportId b x)
 
 /-- Def 68: Split fibration triple identity -/
-def split_fib_triple_id (B : Cat) (F : PseudoFunctor B)
+noncomputable def split_fib_triple_id (B : Cat) (F : PseudoFunctor B)
     (sf : SplitFibration B F) (a : B.Obj) (x : (F.fiber a).Obj) :
     Path (F.transport (B.id a) (F.transport (B.id a) (F.transport (B.id a) x))) x :=
   Path.trans

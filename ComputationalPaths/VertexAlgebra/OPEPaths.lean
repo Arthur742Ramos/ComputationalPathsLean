@@ -37,12 +37,12 @@ namespace OPEData
 variable {V : VertexAlgebraData.{u}} (O : OPEData V)
 
 /-- Associator with two explicit right-unit insertions (left-associated form). -/
-def assocWithUnitsLeft (a b c : V.State) (m n : Int) :
+noncomputable def assocWithUnitsLeft (a b c : V.State) (m n : Int) :
     Path (O.coeff a (O.coeff b c n) m) (O.coeff (O.coeff a b m) c n) :=
   Path.trans (Path.trans (O.assoc a b c m n) (Path.refl _)) (Path.refl _)
 
 /-- Associator with two explicit right-unit insertions (right-associated form). -/
-def assocWithUnitsRight (a b c : V.State) (m n : Int) :
+noncomputable def assocWithUnitsRight (a b c : V.State) (m n : Int) :
     Path (O.coeff a (O.coeff b c n) m) (O.coeff (O.coeff a b m) c n) :=
   Path.trans (O.assoc a b c m n) (Path.trans (Path.refl _) (Path.refl _))
 
@@ -98,12 +98,12 @@ noncomputable def vacuumCancelRwEq (a : V.State) :
 end OPEData
 
 /-- Trivial one-state vertex-algebra data. -/
-def unitVertexAlgebraData : VertexAlgebraData where
+noncomputable def unitVertexAlgebraData : VertexAlgebraData where
   State := PUnit
   vacuum := PUnit.unit
 
 /-- Trivial OPE coefficients on the one-state vertex algebra. -/
-def unitOPEData : OPEData unitVertexAlgebraData where
+noncomputable def unitOPEData : OPEData unitVertexAlgebraData where
   coeff := fun _ _ _ => PUnit.unit
   vacuum_left := fun _ => Path.refl PUnit.unit
   assoc := fun _ _ _ _ _ => Path.refl PUnit.unit

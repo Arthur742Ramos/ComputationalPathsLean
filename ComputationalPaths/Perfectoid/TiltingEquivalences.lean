@@ -93,13 +93,13 @@ variable {R : Type u} {Rflat : Type v}
 variable {rR : PerfectoidMulData R} {rRf : PerfectoidMulData Rflat}
 
 /-- Characteristic path for the tilt-then-untilt round trip. -/
-def charRoundTrip
+noncomputable def charRoundTrip
     (T : TiltingPathInfrastructure R Rflat rR rRf) :
     Path T.primeFlat T.primeFlat :=
   Path.trans T.primePath T.primeInvPath
 
 /-- Characteristic path for the untilt-then-tilt round trip. -/
-def charRoundTripInv
+noncomputable def charRoundTripInv
     (T : TiltingPathInfrastructure R Rflat rR rRf) :
     Path T.primeR T.primeR :=
   Path.trans T.primeInvPath T.primePath
@@ -115,7 +115,7 @@ noncomputable def char_roundtrip_inv_rweq
   rweq_of_step T.prime_roundtrip_inv_step
 
 /-- Right-unit normalized path for one-step sharp multiplicativity. -/
-def sharpMulNormalized
+noncomputable def sharpMulNormalized
     (T : TiltingPathInfrastructure R Rflat rR rRf) (a : Rflat) :
     Path
       (rR.mul (T.forward.sharp a) (T.forward.sharp a))

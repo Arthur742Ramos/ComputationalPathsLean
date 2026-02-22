@@ -34,32 +34,32 @@ variable {A : Type u} {B : Type v} {C : Type w}
 -- ============================================================================
 
 /-- A 2-cell between 1-cells f g : A → B is a pointwise Path. -/
-def Cell2 (f g : A → B) := (a : A) → Path (f a) (g a)
+noncomputable def Cell2 (f g : A → B) := (a : A) → Path (f a) (g a)
 
 /-- Identity 2-cell. -/
-def id2 (f : A → B) : Cell2 f f :=
+noncomputable def id2 (f : A → B) : Cell2 f f :=
   fun a => Path.refl (f a)
 
 /-- Vertical composition of 2-cells. -/
-def vcomp {f g h : A → B}
+noncomputable def vcomp {f g h : A → B}
     (α : Cell2 f g) (β : Cell2 g h) : Cell2 f h :=
   fun a => Path.trans (α a) (β a)
 
 /-- Horizontal composition of 2-cells via congrArg. -/
-def hcomp {f g : A → B} {h k : B → C}
+noncomputable def hcomp {f g : A → B} {h k : B → C}
     (α : Cell2 f g) (β : Cell2 h k) : Cell2 (h ∘ f) (k ∘ g) :=
   fun a => Path.trans (Path.congrArg h (α a)) (β (g a))
 
 /-- Left whiskering: compose a 1-cell on the left with a 2-cell. -/
-def whiskerL (h : B → C) {f g : A → B} (α : Cell2 f g) : Cell2 (h ∘ f) (h ∘ g) :=
+noncomputable def whiskerL (h : B → C) {f g : A → B} (α : Cell2 f g) : Cell2 (h ∘ f) (h ∘ g) :=
   fun a => Path.congrArg h (α a)
 
 /-- Right whiskering: compose a 1-cell on the right with a 2-cell. -/
-def whiskerR {h k : B → C} (β : Cell2 h k) (f : A → B) : Cell2 (h ∘ f) (k ∘ f) :=
+noncomputable def whiskerR {h k : B → C} (β : Cell2 h k) (f : A → B) : Cell2 (h ∘ f) (k ∘ f) :=
   fun a => β (f a)
 
 /-- Vertical inverse of a 2-cell. -/
-def vinv {f g : A → B} (α : Cell2 f g) : Cell2 g f :=
+noncomputable def vinv {f g : A → B} (α : Cell2 f g) : Cell2 g f :=
   fun a => Path.symm (α a)
 
 -- ============================================================================
@@ -186,7 +186,7 @@ theorem hcomp_id_id (f : A → B) (h : B → C) :
   funext a; simp [hcomp, id2]
 
 /-- Alternative horizontal composition (whiskerR then whiskerL). -/
-def hcomp' {f g : A → B} {h k : B → C}
+noncomputable def hcomp' {f g : A → B} {h k : B → C}
     (α : Cell2 f g) (β : Cell2 h k) : Cell2 (h ∘ f) (k ∘ g) :=
   fun a => Path.trans (β (f a)) (Path.congrArg k (α a))
 
@@ -225,12 +225,12 @@ structure Adjunction2 (f : A → B) (g : B → A) where
   counit : Cell2 (f ∘ g) (fun b => b)
 
 /-- Theorem 24: Triangle identity cell for left adjoint. -/
-def triangleL {f : A → B} {g : B → A}
+noncomputable def triangleL {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) : Cell2 f f :=
   fun a => Path.trans (Path.congrArg f (adj.unit a)) (adj.counit (f a))
 
 /-- Theorem 25: Triangle identity cell for right adjoint. -/
-def triangleR {f : A → B} {g : B → A}
+noncomputable def triangleR {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) : Cell2 g g :=
   fun b => Path.trans (adj.unit (g b)) (Path.congrArg g (adj.counit b))
 
@@ -250,7 +250,7 @@ structure AdjTriangle (f : A → B) (g : B → A) extends Adjunction2 f g where
   triR : ∀ b, (triangleR toAdjunction2 b).toEq = rfl
 
 /-- Theorem 28: Identity adjunction. -/
-def idAdjunction : Adjunction2 (fun a : A => a) (fun a : A => a) where
+noncomputable def idAdjunction : Adjunction2 (fun a : A => a) (fun a : A => a) where
   unit   := id2 (fun a => a)
   counit := id2 (fun a => a)
 
@@ -265,7 +265,7 @@ theorem idAdj_triangleR_toEq (a : A) :
   simp [triangleR, idAdjunction, id2]
 
 /-- Theorem 31: Full identity adjunction with triangles. -/
-def idAdjTriangle : AdjTriangle (fun a : A => a) (fun a : A => a) where
+noncomputable def idAdjTriangle : AdjTriangle (fun a : A => a) (fun a : A => a) where
   unit   := id2 (fun a => a)
   counit := id2 (fun a => a)
   triL := idAdj_triangleL_toEq
@@ -276,13 +276,13 @@ def idAdjTriangle : AdjTriangle (fun a : A => a) (fun a : A => a) where
 -- ============================================================================
 
 /-- Theorem 32: Forward mates: given f ⊣ g and σ : k → l ∘ f, produce mate at toEq. -/
-def mate_forward_eq {f : A → B} {g : B → A}
+noncomputable def mate_forward_eq {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) {k l : A → C}
     (σ : Cell2 k l) (b : B) : k (g b) = l (g b) :=
   (σ (g b)).toEq
 
 /-- Theorem 33: Backward mates via congrArg and unit. -/
-def mate_backward {f : A → B} {g : B → A}
+noncomputable def mate_backward {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) {k l : A → C}
     (τ : ∀ b, k (g b) = l (g b)) : Cell2 k l :=
   fun a =>
@@ -304,7 +304,7 @@ theorem mate_roundtrip_toEq {f : A → B} {g : B → A}
 -- ============================================================================
 
 /-- Theorem 35: Composing adjunctions: if f ⊣ g and h ⊣ k, then (h ∘ f) ⊣ (g ∘ k). -/
-def compAdjunction {f : A → B} {g : B → A} {h : B → C} {k : C → B}
+noncomputable def compAdjunction {f : A → B} {g : B → A} {h : B → C} {k : C → B}
     (adj₁ : Adjunction2 f g) (adj₂ : Adjunction2 h k) :
     Adjunction2 (fun a => h (f a)) (fun c => g (k c)) where
   unit := fun a =>
@@ -345,7 +345,7 @@ theorem twoFunctor_preserves_vinv_toEq {F₀ : Type u → Type v}
   simp [vinv]
 
 /-- Theorem 39: Identity 2-functor. -/
-def idTwoFunctor : TwoFunctor (id : Type u → Type u) where
+noncomputable def idTwoFunctor : TwoFunctor (id : Type u → Type u) where
   map₁ := fun f => f
   map₂ := fun α => α
   map₂_id := fun _ => rfl
@@ -363,7 +363,7 @@ structure TwoNatTrans {F₀ G₀ : Type u → Type v}
     Cell2 (G.map₁ f ∘ component X) (component Y ∘ F.map₁ f)
 
 /-- Theorem 40: Identity 2-natural transformation. -/
-def idTwoNatTrans {F₀ : Type u → Type v} (F : TwoFunctor F₀) :
+noncomputable def idTwoNatTrans {F₀ : Type u → Type v} (F : TwoFunctor F₀) :
     TwoNatTrans F F where
   component := fun _ x => x
   naturality := fun _ => id2 _
@@ -384,7 +384,7 @@ structure Monad2 (T : A → A) where
   μ : Cell2 (T ∘ T) T
 
 /-- Theorem 42: Every adjunction gives a monad. -/
-def monadFromAdj {f : A → B} {g : B → A}
+noncomputable def monadFromAdj {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) : Monad2 (g ∘ f) where
   η := adj.unit
   μ := fun a => Path.congrArg g (adj.counit (f a))

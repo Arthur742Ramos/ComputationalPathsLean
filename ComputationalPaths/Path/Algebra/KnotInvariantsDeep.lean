@@ -35,7 +35,7 @@ inductive CrossingSign where
   deriving DecidableEq, Repr
 
 /-- Flip a crossing sign. -/
-def CrossingSign.flip : CrossingSign → CrossingSign
+noncomputable def CrossingSign.flip : CrossingSign → CrossingSign
   | .pos => .neg
   | .neg => .pos
 
@@ -49,7 +49,7 @@ def CrossingSign.flip : CrossingSign → CrossingSign
     CrossingSign.neg.flip = CrossingSign.pos := rfl
 
 /-- Numerical value of a crossing sign: +1 or −1. -/
-def CrossingSign.toInt : CrossingSign → Int
+noncomputable def CrossingSign.toInt : CrossingSign → Int
   | .pos => 1
   | .neg => -1
 
@@ -75,11 +75,11 @@ structure KnotDiagram where
   deriving DecidableEq, Repr
 
 /-- The number of crossings. -/
-def KnotDiagram.crossingNumber (d : KnotDiagram) : Nat :=
+noncomputable def KnotDiagram.crossingNumber (d : KnotDiagram) : Nat :=
   d.crossings.length
 
 /-- The empty diagram (unknot). -/
-def KnotDiagram.unknot : KnotDiagram := ⟨[]⟩
+noncomputable def KnotDiagram.unknot : KnotDiagram := ⟨[]⟩
 
 @[simp] theorem unknot_crossingNumber :
     KnotDiagram.unknot.crossingNumber = 0 := rfl
@@ -87,13 +87,13 @@ def KnotDiagram.unknot : KnotDiagram := ⟨[]⟩
 /-! ## §2 Writhe -/
 
 /-- Sum of crossing signs. -/
-def KnotDiagram.writhe (d : KnotDiagram) : Int :=
+noncomputable def KnotDiagram.writhe (d : KnotDiagram) : Int :=
   d.crossings.foldl (fun acc c => acc + c.sign.toInt) 0
 
 @[simp] theorem unknot_writhe : KnotDiagram.unknot.writhe = 0 := rfl
 
 /-- Writhe of a single-crossing diagram. -/
-def singleCrossing (s : CrossingSign) (o u : StrandId) : KnotDiagram :=
+noncomputable def singleCrossing (s : CrossingSign) (o u : StrandId) : KnotDiagram :=
   ⟨[⟨0, s, o, u⟩]⟩
 
 @[simp] theorem singleCrossing_crossingNumber (s : CrossingSign) (o u : StrandId) :
@@ -118,18 +118,18 @@ structure ReidemeisterMove where
   deriving DecidableEq
 
 /-- Construct a rewrite Step from a Reidemeister move. -/
-def ReidemeisterMove.toStep (m : ReidemeisterMove) : Step KnotDiagram :=
+noncomputable def ReidemeisterMove.toStep (m : ReidemeisterMove) : Step KnotDiagram :=
   Step.mk m.source m.target m.equiv
 
 /-- Construct a Path from a single Reidemeister move. -/
-def ReidemeisterMove.toPath (m : ReidemeisterMove) :
+noncomputable def ReidemeisterMove.toPath (m : ReidemeisterMove) :
     Path m.source m.target :=
   Path.mk [m.toStep] m.equiv
 
 /-! ## §4 Knot equivalence as paths -/
 
 /-- Two diagrams are knot-equivalent if there is a Path between them. -/
-def knotEquiv (d₁ d₂ : KnotDiagram) : Prop :=
+noncomputable def knotEquiv (d₁ d₂ : KnotDiagram) : Prop :=
   Nonempty (Path d₁ d₂)
 
 theorem knotEquiv_refl (d : KnotDiagram) : knotEquiv d d :=
@@ -152,18 +152,18 @@ structure KnotInvariant (R : Type v) where
   preserved : ∀ {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂), val d₁ = val d₂
 
 /-- Compose an invariant with a function. -/
-def KnotInvariant.map {R S : Type v} (f : R → S) (inv : KnotInvariant R) :
+noncomputable def KnotInvariant.map {R S : Type v} (f : R → S) (inv : KnotInvariant R) :
     KnotInvariant S where
   val := f ∘ inv.val
   preserved := fun p => _root_.congrArg f (inv.preserved p)
 
 /-- The crossing number as an invariant (trivially: path implies equality). -/
-def crossingNumberInv : KnotInvariant Nat where
+noncomputable def crossingNumberInv : KnotInvariant Nat where
   val := KnotDiagram.crossingNumber
   preserved := fun p => _root_.congrArg KnotDiagram.crossingNumber p.toEq
 
 /-- Writhe as an invariant. -/
-def writheInv : KnotInvariant Int where
+noncomputable def writheInv : KnotInvariant Int where
   val := KnotDiagram.writhe
   preserved := fun p => _root_.congrArg KnotDiagram.writhe p.toEq
 
@@ -195,18 +195,18 @@ structure LaurentPoly where
   deriving DecidableEq, Repr
 
 /-- Zero polynomial. -/
-def LaurentPoly.zero : LaurentPoly := ⟨[]⟩
+noncomputable def LaurentPoly.zero : LaurentPoly := ⟨[]⟩
 
 /-- Monomial A^n. -/
-def LaurentPoly.monomial (coeff power : Int) : LaurentPoly :=
+noncomputable def LaurentPoly.monomial (coeff power : Int) : LaurentPoly :=
   ⟨[(coeff, power)]⟩
 
 /-- Addition of Laurent polynomials (naive concatenation). -/
-def LaurentPoly.add (p q : LaurentPoly) : LaurentPoly :=
+noncomputable def LaurentPoly.add (p q : LaurentPoly) : LaurentPoly :=
   ⟨p.terms ++ q.terms⟩
 
 /-- Scalar multiplication. -/
-def LaurentPoly.smul (c : Int) (p : LaurentPoly) : LaurentPoly :=
+noncomputable def LaurentPoly.smul (c : Int) (p : LaurentPoly) : LaurentPoly :=
   ⟨p.terms.map (fun (a, b) => (c * a, b))⟩
 
 @[simp] theorem LaurentPoly.add_zero (p : LaurentPoly) :
@@ -229,7 +229,7 @@ structure KauffmanBracket where
   invariance : ∀ {d₁ d₂ : KnotDiagram}, Path d₁ d₂ → bracket d₁ = bracket d₂
 
 /-- A Kauffman bracket is a knot invariant. -/
-def KauffmanBracket.toInvariant (kb : KauffmanBracket) : KnotInvariant LaurentPoly where
+noncomputable def KauffmanBracket.toInvariant (kb : KauffmanBracket) : KnotInvariant LaurentPoly where
   val := kb.bracket
   preserved := kb.invariance
 
@@ -247,11 +247,11 @@ structure KauffmanState where
   deriving DecidableEq, Repr
 
 /-- Number of A-smoothings in a state. -/
-def KauffmanState.countA (s : KauffmanState) : Nat :=
+noncomputable def KauffmanState.countA (s : KauffmanState) : Nat :=
   s.assignments.filter (· == .typeA) |>.length
 
 /-- Number of B-smoothings in a state. -/
-def KauffmanState.countB (s : KauffmanState) : Nat :=
+noncomputable def KauffmanState.countB (s : KauffmanState) : Nat :=
   s.assignments.filter (· == .typeB) |>.length
 
 /-- Total assignments = A-count + B-count. -/
@@ -266,18 +266,18 @@ theorem KauffmanState.count_total (s : KauffmanState) :
 /-! ## §9 Paths between diagram transformations -/
 
 /-- A diagram transformation is a function on diagrams. -/
-def DiagramTransform := KnotDiagram → KnotDiagram
+noncomputable def DiagramTransform := KnotDiagram → KnotDiagram
 
 /-- Identity transformation. -/
-def DiagramTransform.id : DiagramTransform := _root_.id
+noncomputable def DiagramTransform.id : DiagramTransform := _root_.id
 
 /-- Composition of transformations. -/
-def DiagramTransform.comp (f g : DiagramTransform) : DiagramTransform :=
+noncomputable def DiagramTransform.comp (f g : DiagramTransform) : DiagramTransform :=
   fun d => f (g d)
 
 /-- Path coherence: applying a transformation to equivalent diagrams
     gives equivalent results. -/
-def transform_preserves_equiv (f : DiagramTransform)
+noncomputable def transform_preserves_equiv (f : DiagramTransform)
     {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path (f d₁) (f d₂) :=
   Path.congrArg f p
@@ -306,19 +306,19 @@ structure MoveSequence (d₁ d₂ : KnotDiagram) where
   moveCount : Nat
 
 /-- Empty sequence (no moves). -/
-def MoveSequence.empty (d : KnotDiagram) : MoveSequence d d where
+noncomputable def MoveSequence.empty (d : KnotDiagram) : MoveSequence d d where
   path := Path.refl d
   moveCount := 0
 
 /-- Concatenate move sequences. -/
-def MoveSequence.append {d₁ d₂ d₃ : KnotDiagram}
+noncomputable def MoveSequence.append {d₁ d₂ d₃ : KnotDiagram}
     (s₁ : MoveSequence d₁ d₂) (s₂ : MoveSequence d₂ d₃) :
     MoveSequence d₁ d₃ where
   path := Path.trans s₁.path s₂.path
   moveCount := s₁.moveCount + s₂.moveCount
 
 /-- Reverse a move sequence. -/
-def MoveSequence.reverse {d₁ d₂ : KnotDiagram}
+noncomputable def MoveSequence.reverse {d₁ d₂ : KnotDiagram}
     (s : MoveSequence d₁ d₂) : MoveSequence d₂ d₁ where
   path := Path.symm s.path
   moveCount := s.moveCount
@@ -388,7 +388,7 @@ theorem writhe_preserved {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
   writheInv.preserved p
 
 /-- Writhe path from diagram equivalence. -/
-def writhePath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
+noncomputable def writhePath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path d₁.writhe d₂.writhe :=
   Path.congrArg KnotDiagram.writhe p
 
@@ -415,16 +415,16 @@ structure MoveProfile where
   deriving DecidableEq, Repr
 
 /-- Total moves. -/
-def MoveProfile.total (p : MoveProfile) : Nat :=
+noncomputable def MoveProfile.total (p : MoveProfile) : Nat :=
   p.r1Count + p.r2Count + p.r3Count
 
 /-- Empty profile. -/
-def MoveProfile.empty : MoveProfile := ⟨0, 0, 0⟩
+noncomputable def MoveProfile.empty : MoveProfile := ⟨0, 0, 0⟩
 
 @[simp] theorem MoveProfile.empty_total : MoveProfile.empty.total = 0 := rfl
 
 /-- Add profiles. -/
-def MoveProfile.add (p q : MoveProfile) : MoveProfile :=
+noncomputable def MoveProfile.add (p q : MoveProfile) : MoveProfile :=
   ⟨p.r1Count + q.r1Count, p.r2Count + q.r2Count, p.r3Count + q.r3Count⟩
 
 theorem MoveProfile.add_comm (p q : MoveProfile) :
@@ -444,12 +444,12 @@ structure KnotGroupPresentation where
   deriving DecidableEq, Repr
 
 /-- Extract a presentation from a diagram (Wirtinger). -/
-def KnotDiagram.wirtingerPresentation (d : KnotDiagram) : KnotGroupPresentation where
+noncomputable def KnotDiagram.wirtingerPresentation (d : KnotDiagram) : KnotGroupPresentation where
   generators := d.crossings.length
   relations := d.crossings.map (fun c => [c.sign.toInt])
 
 /-- Wirtinger presentation path: equivalent diagrams → same presentation. -/
-def wirtingerPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
+noncomputable def wirtingerPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path d₁.wirtingerPresentation d₂.wirtingerPresentation :=
   Path.congrArg KnotDiagram.wirtingerPresentation p
 
@@ -463,11 +463,11 @@ theorem wirtingerPath_trans {d₁ d₂ d₃ : KnotDiagram}
 /-! ## §16 Mirror image and connected sum -/
 
 /-- Flip a crossing's sign. -/
-def Crossing.flipSign (c : Crossing) : Crossing :=
+noncomputable def Crossing.flipSign (c : Crossing) : Crossing :=
   { c with sign := c.sign.flip }
 
 /-- Mirror image: flip all crossing signs. -/
-def KnotDiagram.mirror (d : KnotDiagram) : KnotDiagram :=
+noncomputable def KnotDiagram.mirror (d : KnotDiagram) : KnotDiagram :=
   ⟨d.crossings.map Crossing.flipSign⟩
 
 /-- Double flip on a crossing is identity. -/
@@ -488,7 +488,7 @@ def KnotDiagram.mirror (d : KnotDiagram) : KnotDiagram :=
       simp [List.map, Crossing.flipSign_flipSign, ih]
 
 /-- Mirror path: equivalent diagrams have equivalent mirrors. -/
-def mirrorPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
+noncomputable def mirrorPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path d₁.mirror d₂.mirror :=
   Path.congrArg KnotDiagram.mirror p
 
@@ -506,7 +506,7 @@ theorem mirrorPath_symm {d₁ d₂ : KnotDiagram}
   Path.congrArg_symm KnotDiagram.mirror p
 
 /-- Connected sum of two diagrams. -/
-def KnotDiagram.connectedSum (d₁ d₂ : KnotDiagram) : KnotDiagram :=
+noncomputable def KnotDiagram.connectedSum (d₁ d₂ : KnotDiagram) : KnotDiagram :=
   ⟨d₁.crossings ++ d₂.crossings⟩
 
 /-- Connected sum with unknot is identity (right). -/
@@ -534,12 +534,12 @@ theorem connectedSum_assoc (d₁ d₂ d₃ : KnotDiagram) :
 /-! ## §17 Path-level connected sum functoriality -/
 
 /-- Connected sum is functorial on paths (left). -/
-def connectedSumPathLeft (d : KnotDiagram) {d₁ d₂ : KnotDiagram}
+noncomputable def connectedSumPathLeft (d : KnotDiagram) {d₁ d₂ : KnotDiagram}
     (p : Path d₁ d₂) : Path (d₁.connectedSum d) (d₂.connectedSum d) :=
   Path.congrArg (fun x => x.connectedSum d) p
 
 /-- Connected sum is functorial on paths (right). -/
-def connectedSumPathRight {d₁ d₂ : KnotDiagram} (d : KnotDiagram)
+noncomputable def connectedSumPathRight {d₁ d₂ : KnotDiagram} (d : KnotDiagram)
     (p : Path d₁ d₂) : Path (d.connectedSum d₁) (d.connectedSum d₂) :=
   Path.congrArg (d.connectedSum ·) p
 
@@ -567,7 +567,7 @@ theorem bracket_unique (kb₁ kb₂ : KauffmanBracket)
   (agree_base d₁).trans (_root_.congrArg kb₂.bracket p.toEq)
 
 /-- Bracket invariance implies writhe-normalized bracket is also invariant. -/
-def normalizedBracketInv (kb : KauffmanBracket) : KnotInvariant LaurentPoly where
+noncomputable def normalizedBracketInv (kb : KauffmanBracket) : KnotInvariant LaurentPoly where
   val := fun d => kb.bracket d
   preserved := fun p => kb.invariance p
 
@@ -579,7 +579,7 @@ structure PolyInvariant (R : Type v) where
   invariance : ∀ {d₁ d₂ : KnotDiagram}, Path d₁ d₂ → compute d₁ = compute d₂
 
 /-- Path between computed values. -/
-def PolyInvariant.computePath {R : Type v}
+noncomputable def PolyInvariant.computePath {R : Type v}
     (inv : PolyInvariant R) {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path (inv.compute d₁) (inv.compute d₂) :=
   Path.congrArg inv.compute p
@@ -602,13 +602,13 @@ structure Tangle where
   deriving DecidableEq, Repr
 
 /-- Compose tangles vertically. -/
-def Tangle.vcomp (t₁ t₂ : Tangle) (_h : t₁.outputs = t₂.inputs) : Tangle where
+noncomputable def Tangle.vcomp (t₁ t₂ : Tangle) (_h : t₁.outputs = t₂.inputs) : Tangle where
   diagram := t₁.diagram.connectedSum t₂.diagram
   inputs := t₁.inputs
   outputs := t₂.outputs
 
 /-- Tangle equivalence via paths on underlying diagrams. -/
-def tangleEquiv (t₁ t₂ : Tangle) : Prop :=
+noncomputable def tangleEquiv (t₁ t₂ : Tangle) : Prop :=
   t₁.inputs = t₂.inputs ∧ t₁.outputs = t₂.outputs ∧
   Nonempty (Path t₁.diagram t₂.diagram)
 
@@ -628,11 +628,11 @@ structure LinkDiagram where
   deriving DecidableEq, Repr
 
 /-- Linking number type. -/
-def LinkDiagram.crossingNumberOfLink (l : LinkDiagram) : Nat :=
+noncomputable def LinkDiagram.crossingNumberOfLink (l : LinkDiagram) : Nat :=
   l.diagram.crossingNumber
 
 /-- Link equivalence. -/
-def linkEquiv (l₁ l₂ : LinkDiagram) : Prop :=
+noncomputable def linkEquiv (l₁ l₂ : LinkDiagram) : Prop :=
   l₁.components = l₂.components ∧ Nonempty (Path l₁.diagram l₂.diagram)
 
 theorem linkEquiv_refl (l : LinkDiagram) : linkEquiv l l :=
@@ -641,10 +641,10 @@ theorem linkEquiv_refl (l : LinkDiagram) : linkEquiv l l :=
 /-! ## §22 Path-level operations on crossing signs -/
 
 /-- Crossing sign path: equivalent diagrams induce paths on sign lists. -/
-def signListOf (d : KnotDiagram) : List CrossingSign :=
+noncomputable def signListOf (d : KnotDiagram) : List CrossingSign :=
   d.crossings.map Crossing.sign
 
-def signListPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
+noncomputable def signListPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path (signListOf d₁) (signListOf d₂) :=
   Path.congrArg signListOf p
 
@@ -671,7 +671,7 @@ structure ColoringInvariant (n : Nat) where
   preserved : ∀ {d₁ d₂ : KnotDiagram}, Path d₁ d₂ → count d₁ = count d₂
 
 /-- A coloring invariant is a knot invariant. -/
-def ColoringInvariant.toKnotInvariant {n : Nat} (ci : ColoringInvariant n) :
+noncomputable def ColoringInvariant.toKnotInvariant {n : Nat} (ci : ColoringInvariant n) :
     KnotInvariant Nat where
   val := ci.count
   preserved := ci.preserved
@@ -684,11 +684,11 @@ structure GaussCode where
   deriving DecidableEq, Repr
 
 /-- Extract Gauss code from diagram. -/
-def KnotDiagram.toGaussCode (d : KnotDiagram) : GaussCode :=
+noncomputable def KnotDiagram.toGaussCode (d : KnotDiagram) : GaussCode :=
   ⟨d.crossings.map (fun c => (c.id, c.sign == .pos))⟩
 
 /-- Gauss code path. -/
-def gaussCodePath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
+noncomputable def gaussCodePath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path d₁.toGaussCode d₂.toGaussCode :=
   Path.congrArg KnotDiagram.toGaussCode p
 
@@ -701,7 +701,7 @@ theorem gaussCodePath_trans {d₁ d₂ d₃ : KnotDiagram}
 /-! ## §25 Invariant algebra: product and sum of invariants -/
 
 /-- Product of two invariants. -/
-def KnotInvariant.prod {R S : Type v} (i₁ : KnotInvariant R) (i₂ : KnotInvariant S) :
+noncomputable def KnotInvariant.prod {R S : Type v} (i₁ : KnotInvariant R) (i₂ : KnotInvariant S) :
     KnotInvariant (R × S) where
   val := fun d => (i₁.val d, i₂.val d)
   preserved := fun p => by
@@ -710,7 +710,7 @@ def KnotInvariant.prod {R S : Type v} (i₁ : KnotInvariant R) (i₂ : KnotInvar
     exact Prod.ext h₁ h₂
 
 /-- Pairing writhe and crossing number. -/
-def writhe_crossingNumber_pair : KnotInvariant (Int × Nat) :=
+noncomputable def writhe_crossingNumber_pair : KnotInvariant (Int × Nat) :=
   writheInv.prod crossingNumberInv
 
 /-- Paired invariant coherence. -/
@@ -790,7 +790,7 @@ structure StateSumDecomposition where
     sumOverStates d states = sumOverStates d states
 
 /-- State sum is preserved by paths. -/
-def stateSumPath (ssd : StateSumDecomposition)
+noncomputable def stateSumPath (ssd : StateSumDecomposition)
     {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂)
     (states : List KauffmanState) :
     Path (ssd.sumOverStates d₁ states) (ssd.sumOverStates d₂ states) :=
@@ -803,17 +803,17 @@ structure DTCode where
   code : List Int
   deriving DecidableEq, Repr
 
-def KnotDiagram.toDTCode (d : KnotDiagram) : DTCode :=
+noncomputable def KnotDiagram.toDTCode (d : KnotDiagram) : DTCode :=
   ⟨d.crossings.map (fun c => c.sign.toInt * (c.id + 1))⟩
 
-def dtCodePath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
+noncomputable def dtCodePath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path d₁.toDTCode d₂.toDTCode :=
   Path.congrArg KnotDiagram.toDTCode p
 
 /-! ## §33 Composite invariants -/
 
 /-- Triple invariant: writhe × crossing number × sign list. -/
-def tripleInvariant : KnotInvariant (Int × Nat × List CrossingSign) where
+noncomputable def tripleInvariant : KnotInvariant (Int × Nat × List CrossingSign) where
   val := fun d => (d.writhe, d.crossingNumber, signListOf d)
   preserved := fun p => by
     have hp := p.toEq
@@ -842,7 +842,7 @@ theorem knot_whiskerRight {d₁ d₂ d₃ : KnotDiagram}
 /-! ## §35 Step-level operations -/
 
 /-- A Step between knot diagrams. -/
-def knotStep (d₁ d₂ : KnotDiagram) (h : d₁ = d₂) : Step KnotDiagram :=
+noncomputable def knotStep (d₁ d₂ : KnotDiagram) (h : d₁ = d₂) : Step KnotDiagram :=
   Step.mk d₁ d₂ h
 
 /-- Symmetry of knot step. -/
@@ -850,17 +850,17 @@ theorem knotStep_symm (d₁ d₂ : KnotDiagram) (h : d₁ = d₂) :
     (knotStep d₁ d₂ h).symm = knotStep d₂ d₁ h.symm := rfl
 
 /-- Path from a single knot step. -/
-def pathOfKnotStep (d₁ d₂ : KnotDiagram) (h : d₁ = d₂) :
+noncomputable def pathOfKnotStep (d₁ d₂ : KnotDiagram) (h : d₁ = d₂) :
     Path d₁ d₂ :=
   Path.mk [knotStep d₁ d₂ h] h
 
 /-! ## §36 Equivalence classes -/
 
 /-- Knot type: quotient by knot equivalence. -/
-def KnotType := Quot (fun d₁ d₂ : KnotDiagram => knotEquiv d₁ d₂)
+noncomputable def KnotType := Quot (fun d₁ d₂ : KnotDiagram => knotEquiv d₁ d₂)
 
 /-- Projection to knot type. -/
-def KnotDiagram.toKnotType (d : KnotDiagram) : KnotType :=
+noncomputable def KnotDiagram.toKnotType (d : KnotDiagram) : KnotType :=
   Quot.mk _ d
 
 /-- Equivalent diagrams project to the same knot type. -/
@@ -892,11 +892,11 @@ theorem knot_eckmann_hilton {d₁ d₂ : KnotDiagram}
 /-! ## §39 Strand counting -/
 
 /-- Number of distinct strands (over-strands). -/
-def KnotDiagram.strandCount (d : KnotDiagram) : Nat :=
+noncomputable def KnotDiagram.strandCount (d : KnotDiagram) : Nat :=
   (d.crossings.map Crossing.over).eraseDups.length
 
 /-- Strand count path. -/
-def strandCountPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
+noncomputable def strandCountPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path d₁.strandCount d₂.strandCount :=
   Path.congrArg KnotDiagram.strandCount p
 
@@ -943,11 +943,11 @@ theorem invariant_map_comp {R S T : Type v}
 /-! ## §42 Diagram complexity -/
 
 /-- Complexity of a diagram: crossing number + strand count. -/
-def KnotDiagram.complexity (d : KnotDiagram) : Nat :=
+noncomputable def KnotDiagram.complexity (d : KnotDiagram) : Nat :=
   d.crossingNumber + d.strandCount
 
 /-- Complexity path. -/
-def complexityPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
+noncomputable def complexityPath {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂) :
     Path d₁.complexity d₂.complexity :=
   Path.congrArg KnotDiagram.complexity p
 
@@ -966,7 +966,7 @@ structure MonoidInvariant (M : Type v) [Mul M] [One M] where
   unknot_val : val KnotDiagram.unknot = 1
 
 /-- Monoid invariant to knot invariant. -/
-def MonoidInvariant.toKnotInvariant {M : Type v} [Mul M] [One M]
+noncomputable def MonoidInvariant.toKnotInvariant {M : Type v} [Mul M] [One M]
     (mi : MonoidInvariant M) : KnotInvariant M where
   val := mi.val
   preserved := mi.preserved
@@ -974,7 +974,7 @@ def MonoidInvariant.toKnotInvariant {M : Type v} [Mul M] [One M]
 /-! ## §44 Path equivalence of move sequences -/
 
 /-- Two move sequences are path-equivalent if their paths are equal. -/
-def moveSeqEquiv {d₁ d₂ : KnotDiagram}
+noncomputable def moveSeqEquiv {d₁ d₂ : KnotDiagram}
     (s₁ s₂ : MoveSequence d₁ d₂) : Prop :=
   s₁.path = s₂.path
 
@@ -993,7 +993,7 @@ theorem moveSeqEquiv_trans {d₁ d₂ : KnotDiagram}
 /-! ## §45 Invariant product algebra -/
 
 /-- Product of three invariants. -/
-def KnotInvariant.triple {R S T : Type v}
+noncomputable def KnotInvariant.triple {R S T : Type v}
     (i₁ : KnotInvariant R) (i₂ : KnotInvariant S) (i₃ : KnotInvariant T) :
     KnotInvariant (R × S × T) where
   val := fun d => (i₁.val d, i₂.val d, i₃.val d)
@@ -1010,7 +1010,7 @@ structure RMatrix (R : Type v) where
   matrix : List (List R)
 
 /-- The identity R-matrix (2×2). -/
-def RMatrix.identity [Zero R] [One R] : RMatrix R where
+noncomputable def RMatrix.identity [Zero R] [One R] : RMatrix R where
   matrix := [[1, 0], [0, 1]]
 
 /-! ## §47 Functorial invariant -/
@@ -1024,7 +1024,7 @@ structure KnotFunctor (C : Type v) where
     mapPath (Path.trans p q) = (mapPath p).trans (mapPath q)
 
 /-- A knot functor gives a knot invariant. -/
-def KnotFunctor.toInvariant {C : Type v} (F : KnotFunctor C) : KnotInvariant C where
+noncomputable def KnotFunctor.toInvariant {C : Type v} (F : KnotFunctor C) : KnotInvariant C where
   val := F.obj
   preserved := F.mapPath
 
@@ -1050,7 +1050,7 @@ structure KnotCategory where
   comp : ∀ {x y z}, hom x y → hom y z → hom x z
 
 /-- The knot diagram category instance. -/
-def knotDiagramCategory : KnotCategory where
+noncomputable def knotDiagramCategory : KnotCategory where
   obj := KnotDiagram
   hom := Path
   id := Path.refl
@@ -1065,7 +1065,7 @@ structure InvariantFamily (I : Type v) (R : Type v) where
     (inv i).preserved p = (inv i).preserved q
 
 /-- Construct a coherent invariant family from any family. -/
-def mkInvariantFamily {I R : Type v} (f : I → KnotDiagram → R)
+noncomputable def mkInvariantFamily {I R : Type v} (f : I → KnotDiagram → R)
     (h : ∀ i {d₁ d₂ : KnotDiagram}, Path d₁ d₂ → f i d₁ = f i d₂) :
     InvariantFamily I R where
   inv := fun i => ⟨f i, h i⟩
@@ -1098,7 +1098,7 @@ theorem zero_crossings_is_unknot (d : KnotDiagram) (h : d.crossings = []) :
   cases d; simp [KnotDiagram.unknot] at *; exact h
 
 /-- Path from zero-crossing diagram to unknot. -/
-def zero_crossings_path (d : KnotDiagram) (h : d.crossings = []) :
+noncomputable def zero_crossings_path (d : KnotDiagram) (h : d.crossings = []) :
     Path d KnotDiagram.unknot :=
   Path.mk [Step.mk d .unknot (zero_crossings_is_unknot d h)]
     (zero_crossings_is_unknot d h)

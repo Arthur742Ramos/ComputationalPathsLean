@@ -27,11 +27,11 @@ structure Fiber (f : A → B) (b : B) where
   path : Path (f point) b
 
 /-- Construct a fiber from a point and an equality. -/
-def Fiber.ofEq (f : A → B) {a : A} {b : B} (h : f a = b) : Fiber f b :=
+noncomputable def Fiber.ofEq (f : A → B) {a : A} {b : B} (h : f a = b) : Fiber f b :=
   ⟨a, Path.mk [Step.mk _ _ h] h⟩
 
 /-- The canonical fiber element at `f a`. -/
-def Fiber.canonical (f : A → B) (a : A) : Fiber f (f a) :=
+noncomputable def Fiber.canonical (f : A → B) (a : A) : Fiber f (f a) :=
   ⟨a, refl (f a)⟩
 
 /-! ## Contractible types -/
@@ -42,16 +42,16 @@ structure IsContr (A : Type u) where
   contr : (a : A) → Path center a
 
 /-- A contractible type has a path between any two elements. -/
-def isContr_path {h : IsContr A} (a b : A) : Path a b :=
+noncomputable def isContr_path {h : IsContr A} (a b : A) : Path a b :=
   Path.trans (Path.symm (h.contr a)) (h.contr b)
 
 /-- The unit type is contractible. -/
-def unitContr : IsContr Unit where
+noncomputable def unitContr : IsContr Unit where
   center := ()
   contr := fun () => refl ()
 
 /-- PUnit is contractible. -/
-def punitContr : IsContr PUnit where
+noncomputable def punitContr : IsContr PUnit where
   center := PUnit.unit
   contr := fun u => by cases u; exact refl PUnit.unit
 
@@ -64,13 +64,13 @@ structure QInv (f : A → B) where
   retr : (b : B) → Path (f (inv b)) b
 
 /-- The identity has a quasi-inverse. -/
-def idQInv : QInv (fun x : A => x) where
+noncomputable def idQInv : QInv (fun x : A => x) where
   inv := fun x => x
   sect := fun a => refl a
   retr := fun b => refl b
 
 /-- An equivalence has a quasi-inverse going back. -/
-def qinvInv {f : A → B} (e : QInv f) : QInv e.inv where
+noncomputable def qinvInv {f : A → B} (e : QInv f) : QInv e.inv where
   inv := f
   sect := fun b => e.retr b
   retr := fun a => e.sect a
@@ -93,7 +93,7 @@ structure BiInv (f : A → B) where
   right : HasRightInverse f
 
 /-- A quasi-inverse yields a bi-invertible map. -/
-def qinvToBiInv {f : A → B} (e : QInv f) : BiInv f where
+noncomputable def qinvToBiInv {f : A → B} (e : QInv f) : BiInv f where
   left := ⟨e.inv, e.sect⟩
   right := ⟨e.inv, e.retr⟩
 
@@ -130,14 +130,14 @@ structure IsHAE (f : A → B) where
 
 /-- Every quasi-inverse can be upgraded to a half-adjoint equivalence
 (coherence holds by proof irrelevance). -/
-def qinvToHAE {f : A → B} (e : QInv f) : IsHAE f where
+noncomputable def qinvToHAE {f : A → B} (e : QInv f) : IsHAE f where
   inv := e.inv
   sect := e.sect
   retr := e.retr
   coh := fun _ => Subsingleton.elim _ _
 
 /-- A half-adjoint equivalence yields a quasi-inverse. -/
-def haeToQInv {f : A → B} (e : IsHAE f) : QInv f where
+noncomputable def haeToQInv {f : A → B} (e : IsHAE f) : QInv f where
   inv := e.inv
   sect := e.sect
   retr := e.retr
@@ -152,15 +152,15 @@ structure Equiv (A : Type u) (B : Type v) where
 notation:25 A " ≃ₚ " B => Equiv A B
 
 /-- The identity equivalence. -/
-def Equiv.refl (A : Type u) : A ≃ₚ A :=
+noncomputable def Equiv.refl (A : Type u) : A ≃ₚ A :=
   ⟨fun x => x, idQInv⟩
 
 /-- Symmetry of equivalences. -/
-def Equiv.symm (e : A ≃ₚ B) : B ≃ₚ A :=
+noncomputable def Equiv.symm (e : A ≃ₚ B) : B ≃ₚ A :=
   ⟨e.isEquiv.inv, qinvInv e.isEquiv⟩
 
 /-- Composition of equivalences. -/
-def Equiv.trans (e₁ : A ≃ₚ B) (e₂ : B ≃ₚ C) : A ≃ₚ C where
+noncomputable def Equiv.trans (e₁ : A ≃ₚ B) (e₂ : B ≃ₚ C) : A ≃ₚ C where
   toFun := e₂.toFun ∘ e₁.toFun
   isEquiv :=
     { inv := e₁.isEquiv.inv ∘ e₂.isEquiv.inv
@@ -197,23 +197,23 @@ theorem equiv_trans_sect (e₁ : A ≃ₚ B) (e₂ : B ≃ₚ C) (a : A) :
 /-! ## Fiber properties -/
 
 /-- The fiber of the identity is a singleton. -/
-def fiberIdSingleton (a : A) : Fiber (fun x : A => x) a :=
+noncomputable def fiberIdSingleton (a : A) : Fiber (fun x : A => x) a :=
   Fiber.canonical (fun x => x) a
 
 /-- The fiber of a quasi-inverse over any point is inhabited. -/
-def fiberEquivInhabited {f : A → B} (e : QInv f) (b : B) :
+noncomputable def fiberEquivInhabited {f : A → B} (e : QInv f) (b : B) :
     Fiber f b :=
   ⟨e.inv b, e.retr b⟩
 
 /-- Two fiber elements have paths in the base connected via the fiber. -/
-def fiber_path {f : A → B} {b : B}
+noncomputable def fiber_path {f : A → B} {b : B}
     (x y : Fiber f b) : Path (f x.point) (f y.point) :=
   Path.trans x.path (Path.symm y.path)
 
 /-! ## Transport as equivalence -/
 
 /-- Transport along a path is an equivalence. -/
-def transportEquiv {D : A → Type v} {a b : A} (p : Path a b) :
+noncomputable def transportEquiv {D : A → Type v} {a b : A} (p : Path a b) :
     D a ≃ₚ D b where
   toFun := Path.transport p
   isEquiv :=
@@ -267,7 +267,7 @@ theorem congrArg_trans_eq {f : A → B} {a b c : A}
   Path.congrArg_trans f p q
 
 /-- Equivalence from IsContr to Unit. -/
-def contrToUnit (h : IsContr A) : A ≃ₚ Unit where
+noncomputable def contrToUnit (h : IsContr A) : A ≃ₚ Unit where
   toFun := fun _ => ()
   isEquiv :=
     { inv := fun _ => h.center

@@ -54,13 +54,13 @@ structure ConnectedCoverMap {A : Type u} {n m : Nat}
   comm : ∀ x, D.proj (toFun x) = C.proj x
 
 /-- The identity connected cover map. -/
-def ConnectedCoverMap.idMap {A : Type u} {n : Nat} (C : ConnectedCover A n) :
+noncomputable def ConnectedCoverMap.idMap {A : Type u} {n : Nat} (C : ConnectedCover A n) :
     ConnectedCoverMap C C where
   toFun := _root_.id
   comm := fun _ => rfl
 
 /-- Composition of connected cover maps. -/
-def ConnectedCoverMap.comp {A : Type u} {n m k : Nat}
+noncomputable def ConnectedCoverMap.comp {A : Type u} {n m k : Nat}
     {C : ConnectedCover A n} {D : ConnectedCover A m} {E : ConnectedCover A k}
     (g : ConnectedCoverMap D E) (f : ConnectedCoverMap C D) :
     ConnectedCoverMap C E where
@@ -73,12 +73,12 @@ def ConnectedCoverMap.comp {A : Type u} {n m k : Nat}
 
 /-- A stage of the Whitehead tower. Stage n is the n-connected cover.
 In our simplified model, each stage is the space itself. -/
-def WhiteheadStage (A : Type u) (n : Nat) : ConnectedCover A n where
+noncomputable def WhiteheadStage (A : Type u) (n : Nat) : ConnectedCover A n where
   cover := A
   proj := _root_.id
 
 /-- The projection map from stage (n+1) to stage n. -/
-def stageMap (A : Type u) (n : Nat) :
+noncomputable def stageMap (A : Type u) (n : Nat) :
     ConnectedCoverMap (WhiteheadStage A (n + 1)) (WhiteheadStage A n) where
   toFun := _root_.id
   comm := fun _ => rfl
@@ -93,12 +93,12 @@ structure WhiteheadTowerData (A : Type u) where
   bond : (n : Nat) → ConnectedCoverMap (stage (n + 1)) (stage n)
 
 /-- The canonical Whitehead tower of a type. -/
-def whiteheadTower (A : Type u) : WhiteheadTowerData A where
+noncomputable def whiteheadTower (A : Type u) : WhiteheadTowerData A where
   stage := WhiteheadStage A
   bond := stageMap A
 
 /-- The composite projection from stage n to the base space. -/
-def compositeProj (A : Type u) (n : Nat) :
+noncomputable def compositeProj (A : Type u) (n : Nat) :
     (whiteheadTower A).stage n |>.cover → A :=
   (whiteheadTower A).stage n |>.proj
 
@@ -125,12 +125,12 @@ theorem stage_cover_eq (A : Type u) (n : Nat) :
 
 /-- The fiber of the map X⟨n+1⟩ → X⟨n⟩ at a point.
 Mathematically, this should be K(πₙ₊₁(X), n), an Eilenberg-MacLane space. -/
-def towerFiber (A : Type u) (n : Nat) (a : A) :=
+noncomputable def towerFiber (A : Type u) (n : Nat) (a : A) :=
   { x : (whiteheadTower A).stage (n + 1) |>.cover //
     ((whiteheadTower A).bond n).toFun x = a }
 
 /-- The fiber at any point is inhabited (since the bond is the identity). -/
-def towerFiber_inhabited (A : Type u) (n : Nat) (a : A) :
+noncomputable def towerFiber_inhabited (A : Type u) (n : Nat) (a : A) :
     towerFiber A n a :=
   ⟨a, rfl⟩
 
@@ -170,36 +170,36 @@ theorem stage_two_description :
 /-! ## Computational-path tower laws -/
 
 /-- Stage-map action is tracked by a computational path. -/
-def stageMap_path (A : Type u) (n : Nat) (x : (WhiteheadStage A (n + 1)).cover) :
+noncomputable def stageMap_path (A : Type u) (n : Nat) (x : (WhiteheadStage A (n + 1)).cover) :
     Path ((stageMap A n).toFun x) x :=
   Path.stepChain rfl
 
 /-- Bond-map action is tracked by a computational path. -/
-def towerBond_path (A : Type u) (n : Nat) (x : A) :
+noncomputable def towerBond_path (A : Type u) (n : Nat) (x : A) :
     Path (((whiteheadTower A).bond n).toFun x) x :=
   Path.stepChain (tower_bond_comm A n x)
 
 /-- Two successive bond maps contract by computational path. -/
-def towerBond_comp_path (A : Type u) (n : Nat) (x : A) :
+noncomputable def towerBond_comp_path (A : Type u) (n : Nat) (x : A) :
     Path (((whiteheadTower A).bond n).toFun (((whiteheadTower A).bond (n + 1)).toFun x)) x :=
   Path.stepChain (tower_bond_comp A n x)
 
 /-- The canonical point in each tower fiber projects back by computational path. -/
-def towerFiber_base_path (A : Type u) (n : Nat) (a : A) :
+noncomputable def towerFiber_base_path (A : Type u) (n : Nat) (a : A) :
     Path (towerFiber_inhabited A n a).val a :=
   Path.stepChain rfl
 
 /-- Any stage cover identifies with the ambient space by computational path. -/
-def stageCover_path (A : Type u) (n : Nat) :
+noncomputable def stageCover_path (A : Type u) (n : Nat) :
     Path ((WhiteheadStage A n).cover) A :=
   Path.stepChain (stage_cover_eq A n)
 
 /-- Stage zero identifies with the ambient space by computational path. -/
-def stageZero_path (A : Type u) :
+noncomputable def stageZero_path (A : Type u) :
     Path ((WhiteheadStage A 0).cover) A :=
   Path.stepChain (stage_zero_is_space A)
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end WhiteheadTower

@@ -29,7 +29,7 @@ structure GradedMor (M N : GradedModule.{u}) (dp dq : Int) where
   map_zero : ∀ p q, Path (apply p q (M.zero p q)) (N.zero (p + dp) (q + dq))
 
 /-- The zero morphism. -/
-def GradedMor.zeroMor (M N : GradedModule.{u}) (dp dq : Int) : GradedMor M N dp dq where
+noncomputable def GradedMor.zeroMor (M N : GradedModule.{u}) (dp dq : Int) : GradedMor M N dp dq where
   apply _ _ _ := N.zero _ _
   map_zero _ _ := Path.refl _
 
@@ -47,7 +47,7 @@ structure SpectralSeq where
 /-! ## Basic differential properties -/
 
 /-- d applied to zero is zero. -/
-def d_zero_is_zero {r : Nat} (E : SpectralPage.{u} r) (p q : Int) :
+noncomputable def d_zero_is_zero {r : Nat} (E : SpectralPage.{u} r) (p q : Int) :
     Path (E.diff p q (E.zero p q)) (E.zero (p + r) (q + 1 - r)) :=
   E.diff_zero p q
 
@@ -58,7 +58,7 @@ structure DDZero (E : SpectralPage.{u} r) where
          (E.zero (p + r + r) (q + 1 - r + 1 - r))
 
 /-- From d²=0, d³ = 0 by a 3-step chain: congrArg d on d²=0, then d(0)=0. -/
-def ddd_zero {r : Nat} (E : SpectralPage.{u} r) (dd : DDZero E)
+noncomputable def ddd_zero {r : Nat} (E : SpectralPage.{u} r) (dd : DDZero E)
     (p q : Int) (x : E.obj p q) :
     Path (E.diff (p + r + r) (q + 1 - r + 1 - r)
            (E.diff (p + r) (q + 1 - r) (E.diff p q x)))
@@ -68,7 +68,7 @@ def ddd_zero {r : Nat} (E : SpectralPage.{u} r) (dd : DDZero E)
     (E.diff_zero (p + r + r) (q + 1 - r + 1 - r))
 
 /-- d⁴ = 0 from d²=0 by a 5-step chain. -/
-def dddd_zero {r : Nat} (E : SpectralPage.{u} r) (dd : DDZero E)
+noncomputable def dddd_zero {r : Nat} (E : SpectralPage.{u} r) (dd : DDZero E)
     (p q : Int) (x : E.obj p q) :
     Path (E.diff (p + r + r + r) (q + 1 - r + 1 - r + 1 - r)
            (E.diff (p + r + r) (q + 1 - r + 1 - r)
@@ -93,19 +93,19 @@ structure ExactCouple where
   k_zero : ∀ p q, Path (k p q (E.zero p q)) (D.zero p (q + 1))
 
 /-- The derived differential d = j ∘ k on an exact couple. -/
-def ExactCouple.d (C : ExactCouple.{u}) (p q : Int) (x : C.E.obj p q) :
+noncomputable def ExactCouple.d (C : ExactCouple.{u}) (p q : Int) (x : C.E.obj p q) :
     C.E.obj p (q + 1) :=
   C.j p (q + 1) (C.k p q x)
 
 /-- d maps zero to zero: k sends 0 to 0, then j sends 0 to 0 (3-step). -/
-def ExactCouple.d_zero (C : ExactCouple.{u}) (p q : Int) :
+noncomputable def ExactCouple.d_zero (C : ExactCouple.{u}) (p q : Int) :
     Path (C.d p q (C.E.zero p q)) (C.E.zero p (q + 1)) :=
   Path.trans
     (Path.congrArg (C.j p (q + 1)) (C.k_zero p q))
     (C.j_zero p (q + 1))
 
 /-- d² on zero: 5-step chain via congrArg and d_zero. -/
-def ExactCouple.dd_zero (C : ExactCouple.{u}) (p q : Int) :
+noncomputable def ExactCouple.dd_zero (C : ExactCouple.{u}) (p q : Int) :
     Path (C.d p (q + 1) (C.d p q (C.E.zero p q)))
          (C.E.zero p (q + 1 + 1)) :=
   Path.trans
@@ -113,7 +113,7 @@ def ExactCouple.dd_zero (C : ExactCouple.{u}) (p q : Int) :
     (C.d_zero p (q + 1))
 
 /-- d³ on zero: 7-step chain. -/
-def ExactCouple.ddd_zero (C : ExactCouple.{u}) (p q : Int) :
+noncomputable def ExactCouple.ddd_zero (C : ExactCouple.{u}) (p q : Int) :
     Path (C.d p (q + 1 + 1) (C.d p (q + 1) (C.d p q (C.E.zero p q))))
          (C.E.zero p (q + 1 + 1 + 1)) :=
   Path.trans
@@ -121,7 +121,7 @@ def ExactCouple.ddd_zero (C : ExactCouple.{u}) (p q : Int) :
     (C.d_zero p (q + 1 + 1))
 
 /-- i applied twice to zero is zero (3-step). -/
-def ExactCouple.ii_zero (C : ExactCouple.{u}) (p q : Int) :
+noncomputable def ExactCouple.ii_zero (C : ExactCouple.{u}) (p q : Int) :
     Path (C.i (p + 1) q (C.i p q (C.D.zero p q)))
          (C.D.zero (p + 1 + 1) q) :=
   Path.trans
@@ -129,7 +129,7 @@ def ExactCouple.ii_zero (C : ExactCouple.{u}) (p q : Int) :
     (C.i_zero (p + 1) q)
 
 /-- j ∘ i on zero: i sends 0 to 0, then j sends 0 to 0 (3-step). -/
-def ExactCouple.ji_zero (C : ExactCouple.{u}) (p q : Int) :
+noncomputable def ExactCouple.ji_zero (C : ExactCouple.{u}) (p q : Int) :
     Path (C.j (p + 1) q (C.i p q (C.D.zero p q)))
          (C.E.zero (p + 1) q) :=
   Path.trans
@@ -137,7 +137,7 @@ def ExactCouple.ji_zero (C : ExactCouple.{u}) (p q : Int) :
     (C.j_zero (p + 1) q)
 
 /-- k ∘ j on zero: j sends 0 to 0, then k sends 0 to 0 (3-step). -/
-def ExactCouple.kj_zero (C : ExactCouple.{u}) (p q : Int) :
+noncomputable def ExactCouple.kj_zero (C : ExactCouple.{u}) (p q : Int) :
     Path (C.k p q (C.j p q (C.D.zero p q)))
          (C.D.zero p (q + 1)) :=
   Path.trans
@@ -145,7 +145,7 @@ def ExactCouple.kj_zero (C : ExactCouple.{u}) (p q : Int) :
     (C.k_zero p q)
 
 /-- i ∘ k ∘ j on zero: 5-step chain. -/
-def ExactCouple.ikj_zero (C : ExactCouple.{u}) (p q : Int) :
+noncomputable def ExactCouple.ikj_zero (C : ExactCouple.{u}) (p q : Int) :
     Path (C.i p (q + 1) (C.k p q (C.j p q (C.D.zero p q))))
          (C.D.zero (p + 1) (q + 1)) :=
   Path.trans
@@ -162,7 +162,7 @@ structure PathFiltration (n : Nat) where
   incl_zero : ∀ k, Path (incl k (zero k.castSucc)) (zero k.succ)
 
 /-- Total object is the top level. -/
-def PathFiltration.total {n : Nat} (F : PathFiltration.{u} n) : Type u :=
+noncomputable def PathFiltration.total {n : Nat} (F : PathFiltration.{u} n) : Type u :=
   F.level ⟨n, Nat.lt_succ_of_le (Nat.le_refl n)⟩
 
 /-! ## Convergence -/
@@ -194,13 +194,13 @@ structure SpectralMor (E F : SpectralSeq.{u}) where
          ((F.page r).diff p q (maps r p q x))
 
 /-- Identity morphism. -/
-def SpectralMor.id (E : SpectralSeq.{u}) : SpectralMor E E where
+noncomputable def SpectralMor.id (E : SpectralSeq.{u}) : SpectralMor E E where
   maps _ _ _ x := x
   maps_zero _ _ _ := Path.refl _
   comm _ _ _ _ := Path.refl _
 
 /-- Composition (3-step proof for zero, 4-step for comm). -/
-def SpectralMor.comp {E F G : SpectralSeq.{u}}
+noncomputable def SpectralMor.comp {E F G : SpectralSeq.{u}}
     (ψ : SpectralMor F G) (φ : SpectralMor E F) : SpectralMor E G where
   maps r p q x := ψ.maps r p q (φ.maps r p q x)
   maps_zero r p q :=
@@ -211,14 +211,14 @@ def SpectralMor.comp {E F G : SpectralSeq.{u}}
       (ψ.comm r p q (φ.maps r p q x))
 
 /-- Two morphisms agree on zero (3-step via trans/symm). -/
-def SpectralMor.agree_zero {E F : SpectralSeq.{u}}
+noncomputable def SpectralMor.agree_zero {E F : SpectralSeq.{u}}
     (φ ψ : SpectralMor E F) (r : Nat) (p q : Int) :
     Path (φ.maps r p q ((E.page r).toGradedModule.zero p q))
          (ψ.maps r p q ((E.page r).toGradedModule.zero p q)) :=
   Path.trans (φ.maps_zero r p q) (Path.symm (ψ.maps_zero r p q))
 
 /-- Naturality of d²: φ commutes with d applied twice (5-step chain). -/
-def SpectralMor.comm_dd {E F : SpectralSeq.{u}} (φ : SpectralMor E F)
+noncomputable def SpectralMor.comm_dd {E F : SpectralSeq.{u}} (φ : SpectralMor E F)
     (r : Nat) (p q : Int) (x : (E.page r).obj p q) :
     Path (φ.maps r (p + ↑r + ↑r) (q + 1 - ↑r + 1 - ↑r)
            ((E.page r).diff (p + r) (q + 1 - r) ((E.page r).diff p q x)))
@@ -229,7 +229,7 @@ def SpectralMor.comm_dd {E F : SpectralSeq.{u}} (φ : SpectralMor E F)
     (Path.congrArg ((F.page r).diff (p + ↑r) (q + 1 - ↑r)) (φ.comm r p q x))
 
 /-- Composition commutes with d (6-step). -/
-def comp_comm_d {E F G : SpectralSeq.{u}}
+noncomputable def comp_comm_d {E F G : SpectralSeq.{u}}
     (φ : SpectralMor E F) (ψ : SpectralMor F G)
     (r : Nat) (p q : Int) (x : (E.page r).obj p q) :
     Path (ψ.maps r (p + ↑r) (q + 1 - ↑r)
@@ -240,7 +240,7 @@ def comp_comm_d {E F G : SpectralSeq.{u}}
     (ψ.comm r p q (φ.maps r p q x))
 
 /-- If φ = ψ pointwise, d ∘ φ = d ∘ ψ. -/
-def d_respect_pointwise {E F : SpectralSeq.{u}}
+noncomputable def d_respect_pointwise {E F : SpectralSeq.{u}}
     (φ ψ : SpectralMor E F) (r : Nat) (p q : Int)
     (heq : ∀ x, Path (φ.maps r p q x) (ψ.maps r p q x))
     (x : (E.page r).obj p q) :
@@ -249,7 +249,7 @@ def d_respect_pointwise {E F : SpectralSeq.{u}}
   Path.congrArg ((F.page r).diff p q) (heq x)
 
 /-- Pointwise equal morphisms have equal compositions with d (4-step). -/
-def comm_pointwise {E F : SpectralSeq.{u}}
+noncomputable def comm_pointwise {E F : SpectralSeq.{u}}
     (φ ψ : SpectralMor E F) (r : Nat) (p q : Int)
     (heq : ∀ a b (x : (E.page r).obj a b), Path (φ.maps r a b x) (ψ.maps r a b x))
     (x : (E.page r).obj p q) :
@@ -276,7 +276,7 @@ structure SerreSS where
                               (baseH.zero p 0)
 
 /-- Fiber projection through d maps zero correctly (3-step). -/
-def SerreSS.fiber_d_zero (S : SerreSS.{u}) (p q : Int) :
+noncomputable def SerreSS.fiber_d_zero (S : SerreSS.{u}) (p q : Int) :
     Path (S.e2_fiber (p + 2) (q + 1 - 2)
            ((S.ss.page 2).diff p q ((S.ss.page 2).toGradedModule.zero p q)))
          (S.fiberH.zero (q + 1 - 2) 0) :=
@@ -286,7 +286,7 @@ def SerreSS.fiber_d_zero (S : SerreSS.{u}) (p q : Int) :
     (S.e2_fiber_zero (p + 2) (q + 1 - 2))
 
 /-- Base projection through d maps zero correctly (3-step). -/
-def SerreSS.base_d_zero (S : SerreSS.{u}) (p q : Int) :
+noncomputable def SerreSS.base_d_zero (S : SerreSS.{u}) (p q : Int) :
     Path (S.e2_base (p + 2) (q + 1 - 2)
            ((S.ss.page 2).diff p q ((S.ss.page 2).toGradedModule.zero p q)))
          (S.baseH.zero (p + 2) 0) :=
@@ -296,7 +296,7 @@ def SerreSS.base_d_zero (S : SerreSS.{u}) (p q : Int) :
     (S.e2_base_zero (p + 2) (q + 1 - 2))
 
 /-- Fiber and base projections of d(0) are both zero: combined 5-step. -/
-def SerreSS.fiber_base_d_zero (S : SerreSS.{u}) (p q : Int) :
+noncomputable def SerreSS.fiber_base_d_zero (S : SerreSS.{u}) (p q : Int) :
     Path (S.e2_fiber (p + 2) (q + 1 - 2)
            ((S.ss.page 2).diff p q ((S.ss.page 2).toGradedModule.zero p q)))
          (S.fiberH.zero (q + 1 - 2) 0)
@@ -320,7 +320,7 @@ structure MultSS extends SpectralSeq.{u} where
          ((page r).toGradedModule.zero (p₁ + p₂) (q₁ + q₂))
 
 /-- d(0·y) = d(0) = 0: differential of product with zero (5-step). -/
-def MultSS.d_mul_zero_l (M : MultSS.{u}) (r : Nat)
+noncomputable def MultSS.d_mul_zero_l (M : MultSS.{u}) (r : Nat)
     (p₁ q₁ p₂ q₂ : Int) (y : (M.page r).obj p₂ q₂) :
     Path ((M.page r).diff (p₁ + p₂) (q₁ + q₂)
            (M.mul r p₁ q₁ p₂ q₂ ((M.page r).toGradedModule.zero p₁ q₁) y))
@@ -331,7 +331,7 @@ def MultSS.d_mul_zero_l (M : MultSS.{u}) (r : Nat)
     ((M.page r).diff_zero (p₁ + p₂) (q₁ + q₂))
 
 /-- d(x·0) = d(0) = 0: symmetric version (5-step). -/
-def MultSS.d_mul_zero_r (M : MultSS.{u}) (r : Nat)
+noncomputable def MultSS.d_mul_zero_r (M : MultSS.{u}) (r : Nat)
     (p₁ q₁ p₂ q₂ : Int) (x : (M.page r).obj p₁ q₁) :
     Path ((M.page r).diff (p₁ + p₂) (q₁ + q₂)
            (M.mul r p₁ q₁ p₂ q₂ x ((M.page r).toGradedModule.zero p₂ q₂)))
@@ -342,7 +342,7 @@ def MultSS.d_mul_zero_r (M : MultSS.{u}) (r : Nat)
     ((M.page r).diff_zero (p₁ + p₂) (q₁ + q₂))
 
 /-- 0·0 = 0 and d(0·0) = 0: 7-step combining mul and diff. -/
-def MultSS.d_mul_zero_zero (M : MultSS.{u}) (r : Nat)
+noncomputable def MultSS.d_mul_zero_zero (M : MultSS.{u}) (r : Nat)
     (p₁ q₁ p₂ q₂ : Int) :
     Path ((M.page r).diff (p₁ + p₂) (q₁ + q₂)
            (M.mul r p₁ q₁ p₂ q₂
@@ -360,7 +360,7 @@ structure EdgeMorphism (ss : SpectralSeq.{u}) (p q : Int) where
                     ((ss.page 0).toGradedModule.zero p q)
 
 /-- Edge naturality under spectral morphisms (symm). -/
-def edge_naturality {E F : SpectralSeq.{u}}
+noncomputable def edge_naturality {E F : SpectralSeq.{u}}
     (φ : SpectralMor E F) (p q : Int)
     (eE : EdgeMorphism E p q) (eF : EdgeMorphism F p q)
     (hcompat : ∀ x, Path (eF.edge (φ.maps 2 p q x))
@@ -371,7 +371,7 @@ def edge_naturality {E F : SpectralSeq.{u}}
   Path.symm (hcompat x)
 
 /-- Edge on zero element: compose edge_zero with φ (4-step). -/
-def edge_zero_compat {E F : SpectralSeq.{u}}
+noncomputable def edge_zero_compat {E F : SpectralSeq.{u}}
     (φ : SpectralMor E F) (p q : Int)
     (eE : EdgeMorphism E p q) (eF : EdgeMorphism F p q)
     (hcompat : ∀ x, Path (eF.edge (φ.maps 2 p q x))
@@ -396,7 +396,7 @@ structure MappingCone {E F : SpectralSeq.{u}} (φ : SpectralMor E F) where
          ((E.page r).toGradedModule.zero p q)
 
 /-- In mapping cone, incl ∘ proj on d(x) = 0 (direct application). -/
-def MappingCone.incl_proj_d_zero {E F : SpectralSeq.{u}} {φ : SpectralMor E F}
+noncomputable def MappingCone.incl_proj_d_zero {E F : SpectralSeq.{u}} {φ : SpectralMor E F}
     (mc : MappingCone φ) (r : Nat) (p q : Int) (x : (F.page r).obj p q) :
     Path (mc.proj.maps r (p + ↑r) (q + 1 - ↑r)
            (mc.incl.maps r (p + ↑r) (q + 1 - ↑r) ((F.page r).diff p q x)))
@@ -404,7 +404,7 @@ def MappingCone.incl_proj_d_zero {E F : SpectralSeq.{u}} {φ : SpectralMor E F}
   mc.incl_proj_zero r (p + ↑r) (q + 1 - ↑r) ((F.page r).diff p q x)
 
 /-- Mapping cone: proj ∘ incl ∘ d of zero is zero (5-step). -/
-def MappingCone.proj_incl_d_zero_elem {E F : SpectralSeq.{u}} {φ : SpectralMor E F}
+noncomputable def MappingCone.proj_incl_d_zero_elem {E F : SpectralSeq.{u}} {φ : SpectralMor E F}
     (mc : MappingCone φ) (r : Nat) (p q : Int) :
     Path (mc.proj.maps r (p + ↑r) (q + 1 - ↑r)
            (mc.incl.maps r (p + ↑r) (q + 1 - ↑r)
@@ -424,7 +424,7 @@ structure GysinData where
     Path ((ss.page r).diff p q x) ((ss.page r).toGradedModule.zero (p + r) (q + 1 - r))
 
 /-- Gysin: d on zero of a vanishing row is zero. -/
-def GysinData.d_vanish_zero (G : GysinData.{u}) (r : Nat) (p q : Int)
+noncomputable def GysinData.d_vanish_zero (G : GysinData.{u}) (r : Nat) (p q : Int)
     (hq0 : q ≠ 0) (hqn : q ≠ (G.fiberDim : Int)) :
     Path ((G.ss.page r).diff p q ((G.ss.page r).toGradedModule.zero p q))
          ((G.ss.page r).toGradedModule.zero (p + ↑r) (q + 1 - ↑r)) :=
@@ -440,7 +440,7 @@ structure Transgression (ss : SpectralSeq.{u}) (r : Nat) (p q : Int) where
                     ((ss.page r).toGradedModule.zero (p + r) (q + 1 - r))
 
 /-- Transgression = d on zero: 3-step chain through is_diff and diff_zero. -/
-def Transgression.trans_eq_d_zero {ss : SpectralSeq.{u}} {r : Nat} {p q : Int}
+noncomputable def Transgression.trans_eq_d_zero {ss : SpectralSeq.{u}} {r : Nat} {p q : Int}
     (τ : Transgression ss r p q) :
     Path (τ.trans_map ((ss.page r).toGradedModule.zero p q))
          ((ss.page r).toGradedModule.zero (p + ↑r) (q + 1 - ↑r)) :=
@@ -449,7 +449,7 @@ def Transgression.trans_eq_d_zero {ss : SpectralSeq.{u}} {r : Nat} {p q : Int}
     ((ss.page r).diff_zero p q)
 
 /-- Two transgressions for same d agree (4-step via symm). -/
-def Transgression.agree {ss : SpectralSeq.{u}} {r : Nat} {p q : Int}
+noncomputable def Transgression.agree {ss : SpectralSeq.{u}} {r : Nat} {p q : Int}
     (τ₁ τ₂ : Transgression ss r p q) (x : (ss.page r).obj p q) :
     Path (τ₁.trans_map x) (τ₂.trans_map x) :=
   Path.trans (τ₁.is_diff x) (Path.symm (τ₂.is_diff x))
@@ -463,28 +463,28 @@ structure FilteredComplex (n : Nat) where
   diff_zero : ∀ k, Path (diff k (F.zero k)) (F.zero k)
 
 /-- d² on zero in a filtered complex: 3-step. -/
-def FilteredComplex.dd_zero {n : Nat} (C : FilteredComplex.{u} n) (k : Fin (n + 1)) :
+noncomputable def FilteredComplex.dd_zero {n : Nat} (C : FilteredComplex.{u} n) (k : Fin (n + 1)) :
     Path (C.diff k (C.diff k (C.F.zero k))) (C.F.zero k) :=
   Path.trans
     (Path.congrArg (C.diff k) (C.diff_zero k))
     (C.diff_zero k)
 
 /-- d³ on zero: 5-step. -/
-def FilteredComplex.ddd_zero {n : Nat} (C : FilteredComplex.{u} n) (k : Fin (n + 1)) :
+noncomputable def FilteredComplex.ddd_zero {n : Nat} (C : FilteredComplex.{u} n) (k : Fin (n + 1)) :
     Path (C.diff k (C.diff k (C.diff k (C.F.zero k)))) (C.F.zero k) :=
   Path.trans
     (Path.congrArg (C.diff k) (C.dd_zero k))
     (C.diff_zero k)
 
 /-- d⁴ on zero: 7-step. -/
-def FilteredComplex.dddd_zero {n : Nat} (C : FilteredComplex.{u} n) (k : Fin (n + 1)) :
+noncomputable def FilteredComplex.dddd_zero {n : Nat} (C : FilteredComplex.{u} n) (k : Fin (n + 1)) :
     Path (C.diff k (C.diff k (C.diff k (C.diff k (C.F.zero k))))) (C.F.zero k) :=
   Path.trans
     (Path.congrArg (C.diff k) (C.ddd_zero k))
     (C.diff_zero k)
 
 /-- Differential commutes with inclusion on zero (3-step). -/
-def FilteredComplex.diff_incl_zero {n : Nat} (C : FilteredComplex.{u} n)
+noncomputable def FilteredComplex.diff_incl_zero {n : Nat} (C : FilteredComplex.{u} n)
     (k : Fin n)
     (hcompat : ∀ x, Path (C.F.incl k (C.diff k.castSucc x))
                           (C.diff k.succ (C.F.incl k x))) :

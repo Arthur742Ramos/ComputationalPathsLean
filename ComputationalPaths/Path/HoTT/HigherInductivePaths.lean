@@ -22,12 +22,12 @@ universe u v w
 /-! ## Circle: loop algebra -/
 
 /-- The n-fold loop on the circle for natural numbers. -/
-def Circle.loopN : Nat → Path Circle.base Circle.base
+noncomputable def Circle.loopN : Nat → Path Circle.base Circle.base
   | 0     => Path.refl Circle.base
   | n + 1 => Path.trans (Circle.loopN n) Circle.loop
 
 /-- The n-fold inverse loop on the circle. -/
-def Circle.loopNeg : Nat → Path Circle.base Circle.base
+noncomputable def Circle.loopNeg : Nat → Path Circle.base Circle.base
   | 0     => Path.refl Circle.base
   | n + 1 => Path.trans (Circle.loopNeg n) (Path.symm Circle.loop)
 
@@ -56,7 +56,7 @@ theorem circle_loop_triple_assoc :
 
 /-! ## 5. CongrArg of circle rec through loop -/
 
-def Circle.rec' {D : Type v} (b : D) (l : Path b b) : Circle → D :=
+noncomputable def Circle.rec' {D : Type v} (b : D) (l : Path b b) : Circle → D :=
   Pushouts.Pushout.lift
     (fun _ => b)
     (fun _ => b)
@@ -101,7 +101,7 @@ theorem circle_loopN_symm_proof (n : Nat) :
 /-! ## Winding number -/
 
 /-- The winding number extracted from a loop: count of steps. -/
-def windingNumber (l : Path Circle.base Circle.base) : Nat :=
+noncomputable def windingNumber (l : Path Circle.base Circle.base) : Nat :=
   l.steps.length
 
 /-! ## 10. Winding number of refl is 0 -/
@@ -270,7 +270,7 @@ theorem pullback_proj_coherent {A B C : Type u} {f : A → C} {g : B → C}
 
 /-! ## 32. Pullback of identity maps -/
 
-def pullback_id_proj {A : Type u} (p : Pullback' (id : A → A) (id : A → A)) : A :=
+noncomputable def pullback_id_proj {A : Type u} (p : Pullback' (id : A → A) (id : A → A)) : A :=
   p.fst
 
 theorem pullback_id_fst' {A : Type u} (a : A) (p : Path a a) :
@@ -319,22 +319,22 @@ inductive SmashRel (A B : Type u) (a₀ : A) (b₀ : B) :
   | right (b : B) : SmashRel A B a₀ b₀ (a₀, b) (a₀, b₀)
 
 /-- The smash product A ∧ B. -/
-def Smash (A B : Type u) (a₀ : A) (b₀ : B) : Type u :=
+noncomputable def Smash (A B : Type u) (a₀ : A) (b₀ : B) : Type u :=
   Quot (SmashRel A B a₀ b₀)
 
-def Smash.mk {A B : Type u} {a₀ : A} {b₀ : B} (a : A) (b : B) :
+noncomputable def Smash.mk {A B : Type u} {a₀ : A} {b₀ : B} (a : A) (b : B) :
     Smash A B a₀ b₀ :=
   Quot.mk _ (a, b)
 
 /-- Left collapse path in smash product. -/
-def Smash.leftPath {A B : Type u} {a₀ : A} {b₀ : B} (a : A) :
+noncomputable def Smash.leftPath {A B : Type u} {a₀ : A} {b₀ : B} (a : A) :
     Path (Smash.mk (a₀ := a₀) (b₀ := b₀) a b₀)
          (Smash.mk (a₀ := a₀) (b₀ := b₀) a₀ b₀) :=
   Path.mk [Step.mk _ _ (Quot.sound (SmashRel.left a))]
            (Quot.sound (SmashRel.left a))
 
 /-- Right collapse path in smash product. -/
-def Smash.rightPath {A B : Type u} {a₀ : A} {b₀ : B} (b : B) :
+noncomputable def Smash.rightPath {A B : Type u} {a₀ : A} {b₀ : B} (b : B) :
     Path (Smash.mk (a₀ := a₀) (b₀ := b₀) a₀ b)
          (Smash.mk (a₀ := a₀) (b₀ := b₀) a₀ b₀) :=
   Path.mk [Step.mk _ _ (Quot.sound (SmashRel.right b))]
@@ -417,7 +417,7 @@ theorem hitquot_cls_symm' {A : Type u} {R : A → A → Prop}
 /-! ## Hopf fibration structure -/
 
 /-- The fiber family for the Hopf fibration: over S² = Susp(S¹), fiber = S¹. -/
-def HopfFiber : Pushouts.Susp Circle → Type :=
+noncomputable def HopfFiber : Pushouts.Susp Circle → Type :=
   Pushouts.Pushout.lift
     (fun _ => Circle)
     (fun _ => Circle)
@@ -447,10 +447,10 @@ theorem hopf_fiber_const (l : Circle) :
 /-! ## Total space structure -/
 
 /-- Total space of the Hopf fibration (as Sigma type). -/
-def HopfTotal : Type := Σ (p : Pushouts.Susp Circle), HopfFiber p
+noncomputable def HopfTotal : Type := Σ (p : Pushouts.Susp Circle), HopfFiber p
 
 /-- Projection from total space. -/
-def hopfProj : HopfTotal → Pushouts.Susp Circle := Sigma.fst
+noncomputable def hopfProj : HopfTotal → Pushouts.Susp Circle := Sigma.fst
 
 /-! ## 52. Hopf projection on north fiber -/
 
@@ -459,7 +459,7 @@ theorem hopf_proj_north (x : Circle) :
 
 /-! ## 53. Hopf section over north -/
 
-def hopfSection_north : Circle → HopfTotal :=
+noncomputable def hopfSection_north : Circle → HopfTotal :=
   fun x => ⟨Pushouts.Susp.north, x⟩
 
 theorem hopf_section_proj (x : Circle) :
@@ -467,10 +467,10 @@ theorem hopf_section_proj (x : Circle) :
 
 /-! ## Sphere constructions -/
 
-def S0 : Type := Bool
-def S1' : Type := Circle
-def S2' : Type := Pushouts.Susp S1'
-def S3' : Type := Pushouts.Susp S2'
+noncomputable def S0 : Type := Bool
+noncomputable def S1' : Type := Circle
+noncomputable def S2' : Type := Pushouts.Susp S1'
+noncomputable def S3' : Type := Pushouts.Susp S2'
 
 /-! ## 54. S2 merid path step count -/
 

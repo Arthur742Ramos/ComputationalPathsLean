@@ -72,14 +72,14 @@ namespace PointedMap
 variable {X Y Z : Pointed}
 
 /-- Composition of pointed maps. -/
-def comp (g : PointedMap Y Z) (f : PointedMap X Y) : PointedMap X Z where
+noncomputable def comp (g : PointedMap Y Z) (f : PointedMap X Y) : PointedMap X Z where
   toFun := g.toFun ∘ f.toFun
   map_pt := by
     simp only [Function.comp]
     rw [f.map_pt, g.map_pt]
 
 /-- Identity pointed map. -/
-def id (X : Pointed) : PointedMap X X where
+noncomputable def id (X : Pointed) : PointedMap X X where
   toFun := _root_.id
   map_pt := rfl
 
@@ -93,20 +93,20 @@ The suspension ΣX has north pole as its basepoint.
 /-! ## Suspension (computational pushout) -/
 
 /-- Suspension as a pushout of unit types. -/
-def Suspension (X : Type u) : Type u :=
+noncomputable def Suspension (X : Type u) : Type u :=
   CompPath.Pushout PUnit' PUnit' X (fun _ => PUnit'.unit) (fun _ => PUnit'.unit)
 
 namespace Suspension
 
-def north : Suspension X :=
+noncomputable def north : Suspension X :=
   CompPath.Pushout.inl (A := PUnit') (B := PUnit') (C := X)
     (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) PUnit'.unit
 
-def south : Suspension X :=
+noncomputable def south : Suspension X :=
   CompPath.Pushout.inr (A := PUnit') (B := PUnit') (C := X)
     (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) PUnit'.unit
 
-def merid (x : X) : Path (north (X := X)) (south (X := X)) :=
+noncomputable def merid (x : X) : Path (north (X := X)) (south (X := X)) :=
   CompPath.Pushout.glue (A := PUnit') (B := PUnit') (C := X)
     (f := fun _ => PUnit'.unit) (g := fun _ => PUnit'.unit) x
 
@@ -120,7 +120,7 @@ noncomputable def suspPointed (X : Type u) : Pointed where
   pt := Suspension.north (X := X)
 
 /-- Loop space of a pointed type. -/
-def loopPointed (Y : Pointed) : Pointed where
+noncomputable def loopPointed (Y : Pointed) : Pointed where
   carrier := LoopSpace Y.carrier Y.pt
   pt := Path.refl Y.pt
 

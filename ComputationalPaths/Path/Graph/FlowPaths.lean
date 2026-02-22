@@ -37,17 +37,17 @@ structure Flow {V : Type u} (N : FlowNetwork V) where
     Path (flow v v) (flow v v)  -- placeholder for conservation
 
 /-- The value of a flow (total flow out of source). -/
-def flowValue {V : Type u} {N : FlowNetwork V} (_f : Flow N) (outflow : Nat) : Nat :=
+noncomputable def flowValue {V : Type u} {N : FlowNetwork V} (_f : Flow N) (outflow : Nat) : Nat :=
   outflow
 
 /-! ## Residual graph -/
 
 /-- Residual capacity between two vertices. -/
-def residualCapacity {V : Type u} {N : FlowNetwork V} (f : Flow N) (u v : V) : Nat :=
+noncomputable def residualCapacity {V : Type u} {N : FlowNetwork V} (f : Flow N) (u v : V) : Nat :=
   (N.capacity u v - f.flow u v) + f.flow v u
 
 /-- A vertex in the residual graph has positive residual capacity. -/
-def residualEdge {V : Type u} {N : FlowNetwork V} (f : Flow N) (u v : V) : Prop :=
+noncomputable def residualEdge {V : Type u} {N : FlowNetwork V} (f : Flow N) (u v : V) : Prop :=
   residualCapacity f u v > 0
 
 /-! ## Augmenting paths -/
@@ -60,7 +60,7 @@ structure AugmentingPath {V : Type u} {N : FlowNetwork V} (f : Flow N) where
   ends_at_sink : Path (vertices.getLast?) (some N.sink)
 
 /-- Bottleneck capacity of an augmenting path. -/
-def bottleneck {V : Type u} {N : FlowNetwork V} {f : Flow N}
+noncomputable def bottleneck {V : Type u} {N : FlowNetwork V} {f : Flow N}
     (_ap : AugmentingPath f) (minCap : Nat) : Nat :=
   minCap
 
@@ -73,14 +73,14 @@ structure Cut {V : Type u} (N : FlowNetwork V) where
   sink_out : ¬ inS N.sink
 
 /-- Cut capacity given a capacity sum. -/
-def cutCapacity {V : Type u} {N : FlowNetwork V}
+noncomputable def cutCapacity {V : Type u} {N : FlowNetwork V}
     (_c : Cut N) (capSum : Nat) : Nat :=
   capSum
 
 /-! ## Path-based flow properties -/
 
 /-- Zero flow: all edges have zero flow. -/
-def zeroFlow {V : Type u} (N : FlowNetwork V) : Flow N :=
+noncomputable def zeroFlow {V : Type u} (N : FlowNetwork V) : Flow N :=
   { flow := fun _ _ => 0
     capacity_bound := fun _ _ => Nat.zero_le _
     conservation := fun _ _ _ => Path.refl 0 }
@@ -96,7 +96,7 @@ theorem residual_zero_flow {V : Type u} (N : FlowNetwork V) (u v : V) :
   simp [residualCapacity, zeroFlow]
 
 /-- Trivial cut: source side contains only source. -/
-def trivialCut {V : Type u} (N : FlowNetwork V) : Cut N :=
+noncomputable def trivialCut {V : Type u} (N : FlowNetwork V) : Cut N :=
   { inS := fun v => v = N.source
     source_in := rfl
     sink_out := fun h => N.source_ne_sink h.symm }
@@ -110,13 +110,13 @@ theorem flow_conservation_path {V : Type u} {N : FlowNetwork V}
   rfl
 
 /-- congrArg on flow function. -/
-def congrArg_flow {V : Type u} {N : FlowNetwork V}
+noncomputable def congrArg_flow {V : Type u} {N : FlowNetwork V}
     (f : Flow N) {a b : V} (p : Path a b) (v : V) :
     Path (f.flow a v) (f.flow b v) :=
   Path.congrArg (fun x => f.flow x v) p
 
 /-- congrArg on second flow argument. -/
-def congrArg_flow2 {V : Type u} {N : FlowNetwork V}
+noncomputable def congrArg_flow2 {V : Type u} {N : FlowNetwork V}
     (f : Flow N) (u : V) {a b : V} (p : Path a b) :
     Path (f.flow u a) (f.flow u b) :=
   Path.congrArg (fun x => f.flow u x) p

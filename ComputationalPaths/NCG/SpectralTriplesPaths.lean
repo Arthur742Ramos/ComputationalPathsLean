@@ -105,7 +105,7 @@ noncomputable def gradingSquare_two_refl_rweq (v : H) :
       (S.gradingSquare_rweq v))
 
 /-- Roundtrip along the reality path and its inverse. -/
-def reality_roundtrip (v : H) :
+noncomputable def reality_roundtrip (v : H) :
     Path (S.chargeConj (S.grading v)) (S.chargeConj (S.grading v)) :=
   Path.trans (S.realityPath v) (Path.symm (S.realityPath v))
 
@@ -116,7 +116,7 @@ noncomputable def reality_roundtrip_rweq (v : H) :
 end SpectralTriplePathData
 
 /-- Canonical identity-like spectral data with explicit Step witnesses. -/
-def identitySpectralTriplePathData (H A : Type u) [Inhabited H] [Inhabited A] :
+noncomputable def identitySpectralTriplePathData (H A : Type u) [Inhabited H] [Inhabited A] :
     SpectralTriplePathData H A where
   zeroVec := default
   oneAlg := default

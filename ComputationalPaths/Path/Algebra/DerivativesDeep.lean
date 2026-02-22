@@ -23,27 +23,27 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans {α : Type} {a b c : α}
+noncomputable def Path.trans {α : Type} {a b c : α}
     (p : Path α a b) (q : Path α b c) : Path α a c :=
   match p with
   | .nil _ => q
   | .cons s rest => .cons s (rest.trans q)
 
-def Path.length {α : Type} {a b : α} : Path α a b → Nat
+noncomputable def Path.length {α : Type} {a b : α} : Path α a b → Nat
   | .nil _ => 0
   | .cons _ rest => 1 + rest.length
 
-def Step.symm {α : Type} {a b : α} : Step α a b → Step α b a
+noncomputable def Step.symm {α : Type} {a b : α} : Step α a b → Step α b a
   | .mk name a b => .mk (name ++ "⁻¹") b a
 
-def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a
+noncomputable def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a
   | .nil a => .nil a
   | .cons s rest => rest.symm.trans (.cons s.symm (.nil _))
 
-def Path.single {α : Type} {a b : α} (s : Step α a b) : Path α a b :=
+noncomputable def Path.single {α : Type} {a b : α} (s : Step α a b) : Path α a b :=
   .cons s (.nil b)
 
-def Path.map {α β : Type} (f : α → β) {a b : α}
+noncomputable def Path.map {α β : Type} (f : α → β) {a b : α}
     (p : Path α a b) : Path β (f a) (f b) :=
   match p with
   | .nil a => .nil (f a)
@@ -65,7 +65,7 @@ inductive TyF where
   | mu     : TyF → TyF
 deriving DecidableEq, Repr
 
-def TyF.varCount : TyF → Nat
+noncomputable def TyF.varCount : TyF → Nat
   | .zero => 0
   | .one => 0
   | .var => 1
@@ -74,7 +74,7 @@ def TyF.varCount : TyF → Nat
   | .comp f g => f.varCount * g.varCount
   | .mu f => f.varCount
 
-def TyF.size : TyF → Nat
+noncomputable def TyF.size : TyF → Nat
   | .zero => 1
   | .one => 1
   | .var => 1
@@ -87,7 +87,7 @@ def TyF.size : TyF → Nat
 -- §3  Formal Derivative
 -- ============================================================
 
-def TyF.deriv : TyF → TyF
+noncomputable def TyF.deriv : TyF → TyF
   | .zero     => .zero
   | .one      => .zero
   | .var      => .one
@@ -96,7 +96,7 @@ def TyF.deriv : TyF → TyF
   | .comp f g => .prod (.comp f.deriv g) g.deriv
   | .mu f     => .mu (.sum .one (.prod f.deriv (.mu f)))
 
-def TyF.deriv2 (f : TyF) : TyF := f.deriv.deriv
+noncomputable def TyF.deriv2 (f : TyF) : TyF := f.deriv.deriv
 
 -- ============================================================
 -- §4  Rewrite steps with full congruence
@@ -279,7 +279,7 @@ inductive TreeCtx where
   | right : BTree → Nat → TreeCtx → TreeCtx
 deriving DecidableEq, Repr
 
-def TreeCtx.depth : TreeCtx → Nat
+noncomputable def TreeCtx.depth : TreeCtx → Nat
   | .top => 0
   | .left ctx _ _ => 1 + ctx.depth
   | .right _ _ ctx => 1 + ctx.depth
@@ -289,22 +289,22 @@ structure Zipper where
   ctx   : TreeCtx
 deriving DecidableEq, Repr
 
-def Zipper.plug : Zipper → BTree
+noncomputable def Zipper.plug : Zipper → BTree
   | ⟨t, .top⟩ => t
   | ⟨t, .left ctx v r⟩ => Zipper.plug ⟨.node t v r, ctx⟩
   | ⟨t, .right l v ctx⟩ => Zipper.plug ⟨.node l v t, ctx⟩
 termination_by z => z.ctx.depth
 decreasing_by all_goals simp_wf; simp [TreeCtx.depth]
 
-def Zipper.goLeft : Zipper → Option Zipper
+noncomputable def Zipper.goLeft : Zipper → Option Zipper
   | ⟨.node l v r, ctx⟩ => some ⟨l, .left ctx v r⟩
   | ⟨.leaf, _⟩ => none
 
-def Zipper.goRight : Zipper → Option Zipper
+noncomputable def Zipper.goRight : Zipper → Option Zipper
   | ⟨.node l v r, ctx⟩ => some ⟨r, .right l v ctx⟩
   | ⟨.leaf, _⟩ => none
 
-def Zipper.goUp : Zipper → Option Zipper
+noncomputable def Zipper.goUp : Zipper → Option Zipper
   | ⟨_, .top⟩ => none
   | ⟨t, .left ctx v r⟩ => some ⟨.node t v r, ctx⟩
   | ⟨t, .right l v ctx⟩ => some ⟨.node l v t, ctx⟩
@@ -380,7 +380,7 @@ structure ListOneHole (α : Type) where
   suffix_ : List α
 deriving Repr
 
-def ListOneHole.plug {α : Type} (ctx : ListOneHole α) (a : α) : List α :=
+noncomputable def ListOneHole.plug {α : Type} (ctx : ListOneHole α) (a : α) : List α :=
   ctx.prefix_ ++ [a] ++ ctx.suffix_
 
 /-- Theorem 34: Plugging into empty context gives singleton. -/
@@ -428,7 +428,7 @@ theorem chain_const_inner_path :
 -- §12  McBride's Dissection
 -- ============================================================
 
-def TyF.dissect : TyF → TyF
+noncomputable def TyF.dissect : TyF → TyF
   | .zero => .zero
   | .one => .zero
   | .var => .one
@@ -463,14 +463,14 @@ theorem dissect_prod (f g : TyF) :
 inductive NavAction where
   | left | right | up | modify (f : Nat → Nat)
 
-def applyNav : Zipper → NavAction → Option Zipper
+noncomputable def applyNav : Zipper → NavAction → Option Zipper
   | z, .left => z.goLeft
   | z, .right => z.goRight
   | z, .up => z.goUp
   | ⟨.node l v r, ctx⟩, .modify f => some ⟨.node l (f v) r, ctx⟩
   | ⟨.leaf, _⟩, .modify _ => none
 
-def applyNavs : Zipper → List NavAction → Option Zipper
+noncomputable def applyNavs : Zipper → List NavAction → Option Zipper
   | z, [] => some z
   | z, a :: as => match applyNav z a with
     | some z' => applyNavs z' as
@@ -561,8 +561,8 @@ theorem deriv_one_times_x_path :
 -- §16  Recursive type derivatives
 -- ============================================================
 
-def listF : TyF := .mu (.sum .one (.prod .var .var))
-def treeF : TyF := .mu (.sum .one (.prod .var .var))
+noncomputable def listF : TyF := .mu (.sum .one (.prod .var .var))
+noncomputable def treeF : TyF := .mu (.sum .one (.prod .var .var))
 
 /-- Theorem 58: List and tree have same code. -/
 theorem tree_list_same : treeF = listF := rfl

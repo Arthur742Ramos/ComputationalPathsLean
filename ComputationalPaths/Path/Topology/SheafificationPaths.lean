@@ -134,7 +134,7 @@ structure SheafificationFunctor (X : TopologicalSpace.{u}) where
   comparison : ∀ (F : Presheaf.{u, v} X), PresheafMorphism F (associated F).toPresheaf
 
 /-- The comparison map from a presheaf to its sheafification. -/
-def comparisonMap {X : TopologicalSpace.{u}} (S : SheafificationFunctor.{u, v} X)
+noncomputable def comparisonMap {X : TopologicalSpace.{u}} (S : SheafificationFunctor.{u, v} X)
     (F : Presheaf.{u, v} X) : PresheafMorphism F (S.associated F).toPresheaf :=
   S.comparison F
 
@@ -176,13 +176,13 @@ structure ContinuousMap (X Y : TopologicalSpace.{u}) where
   image_le : ∀ {U V : X.Opens}, X.le U V → Y.le (image U) (image V)
 
 /-- Direct image presheaf along a continuous map. -/
-def directImage {X Y : TopologicalSpace.{u}} (f : ContinuousMap X Y)
+noncomputable def directImage {X Y : TopologicalSpace.{u}} (f : ContinuousMap X Y)
     (F : Presheaf.{u, v} X) : Presheaf.{u, v} Y where
   sections := fun V => F.sections (f.preimage V)
   restrict := fun {_U _V} hUV s => F.restrict (f.preimage_le hUV) s
 
 /-- Inverse image presheaf along a continuous map. -/
-def inverseImage {X Y : TopologicalSpace.{u}} (f : ContinuousMap X Y)
+noncomputable def inverseImage {X Y : TopologicalSpace.{u}} (f : ContinuousMap X Y)
     (F : Presheaf.{u, v} Y) : Presheaf.{u, v} X where
   sections := fun U => F.sections (f.image U)
   restrict := fun {_U _V} hUV s => F.restrict (f.image_le hUV) s

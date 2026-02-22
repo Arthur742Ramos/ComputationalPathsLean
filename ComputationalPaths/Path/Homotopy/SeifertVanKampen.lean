@@ -43,7 +43,7 @@ noncomputable abbrev seifertVanKampenEquiv (c0 : C)
 
 end Path
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end ComputationalPaths

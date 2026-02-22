@@ -33,7 +33,7 @@ universe u
 /-! ## Core confluence evaluation -/
 
 /-- Join at the Path level from two PathExpr rewrite chains. -/
-def confluence_eval
+noncomputable def confluence_eval
     {A : Type u} {a b : A}
     {p q r : PathExpr A a b}
     (hq : PathExpr.Rw p q) (hr : PathExpr.Rw p r) :
@@ -45,7 +45,7 @@ def confluence_eval
   exact Confluence.join_refl (PathExpr.eval q)
 
 /-- Join at the Path level from two single-step PathExpr rewrites. -/
-def confluence_eval_of_steps
+noncomputable def confluence_eval_of_steps
     {A : Type u} {a b : A}
     {p q r : PathExpr A a b}
     (hq : PathExpr.Step p q) (_hr : PathExpr.Step p r) :
@@ -55,7 +55,7 @@ def confluence_eval_of_steps
 /-! ## Reflexive chains -/
 
 /-- A reflexive rewrite chain produces a reflexive join. -/
-def confluence_eval_refl
+noncomputable def confluence_eval_refl
     {A : Type u} {a b : A}
     (p : PathExpr A a b) :
     Confluence.Join (A := A) (a := a) (b := b) (PathExpr.eval p) (PathExpr.eval p) :=
@@ -64,7 +64,7 @@ def confluence_eval_refl
 /-! ## Symmetry of evaluated joins -/
 
 /-- Evaluated join data can be swapped. -/
-def confluence_eval_symm
+noncomputable def confluence_eval_symm
     {A : Type u} {a b : A}
     {p q : Path a b}
     (J : Confluence.Join (A := A) (a := a) (b := b) p q) :
@@ -83,7 +83,7 @@ theorem eval_rw_preserves_toEq
   rw [this]
 
 /-- Path witness that eval is invariant under rewriting. -/
-def eval_rw_path_witness
+noncomputable def eval_rw_path_witness
     {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : PathExpr.Rw p q) :
@@ -105,7 +105,7 @@ theorem eval_deterministic
   rw [← hq', ← hr']
 
 /-- Path witness for determinism. -/
-def eval_deterministic_path
+noncomputable def eval_deterministic_path
     {A : Type u} {a b : A}
     {p q r : PathExpr A a b}
     (hq : PathExpr.Rw p q) (hr : PathExpr.Rw p r) :
@@ -142,7 +142,7 @@ theorem eval_symm_rw
   rw [this]
 
 /-- Path witness for symm of rewritten expression. -/
-def eval_symm_rw_path
+noncomputable def eval_symm_rw_path
     {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : PathExpr.Rw p q) :
@@ -174,7 +174,7 @@ theorem eval_trans_rw_right
   rw [this]
 
 /-- Path witness for left rewriting in trans. -/
-def eval_trans_rw_left_path
+noncomputable def eval_trans_rw_left_path
     {A : Type u} {a b c : A}
     {p q : PathExpr A a b}
     (r : PathExpr A b c)
@@ -184,7 +184,7 @@ def eval_trans_rw_left_path
   Path.stepChain (eval_trans_rw_left r h)
 
 /-- Path witness for right rewriting in trans. -/
-def eval_trans_rw_right_path
+noncomputable def eval_trans_rw_right_path
     {A : Type u} {a b c : A}
     (p : PathExpr A a b)
     {q r : PathExpr A b c}
@@ -205,7 +205,7 @@ theorem eval_rw_normalize_eq
   rw [this]
 
 /-- Path witness for normal form agreement. -/
-def eval_rw_normalize_path
+noncomputable def eval_rw_normalize_path
     {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : PathExpr.Rw p q) :
@@ -225,7 +225,7 @@ This module provides the evaluated confluence interface for PathExpr rewrites:
 5. `eval_symm_rw_path` / `eval_trans_rw_*`: interactions with constructors
 -/
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end ConfluenceProofPathExpr

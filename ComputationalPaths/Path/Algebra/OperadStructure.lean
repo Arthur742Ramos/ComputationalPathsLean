@@ -26,7 +26,7 @@ abbrev Loop' (A : Type u) (a : A) : Type u :=
   Path (A := A) a a
 
 /-- N-ary composition of loops by iterated `Path.trans`. -/
-@[simp] def gammaN {A : Type u} {a : A} : List (Loop' A a) → Loop' A a
+@[simp] noncomputable def gammaN {A : Type u} {a : A} : List (Loop' A a) → Loop' A a
   | [] => Path.refl a
   | p :: ps => Path.trans p (gammaN ps)
 
@@ -104,7 +104,7 @@ structure PathGroupoidAction (A : Type u) (a : A) (X : Type v) where
     action (Path.trans p q) x = action p (action q x)
 
 /-- An operad algebra is a groupoid action. -/
-@[simp] def PathOperadAlgebra.toGroupoid {A : Type u} {a : A} {X : Type v}
+@[simp] noncomputable def PathOperadAlgebra.toGroupoid {A : Type u} {a : A} {X : Type v}
     (alg : PathOperadAlgebra A a X) : PathGroupoidAction A a X where
   action := alg.act
   action_respects_rweq := alg.act_respects_rweq
@@ -112,7 +112,7 @@ structure PathGroupoidAction (A : Type u) (a : A) (X : Type v) where
   action_comp := alg.act_gamma
 
 /-- A groupoid action is an operad algebra. -/
-@[simp] def PathGroupoidAction.toAlgebra {A : Type u} {a : A} {X : Type v}
+@[simp] noncomputable def PathGroupoidAction.toAlgebra {A : Type u} {a : A} {X : Type v}
     (grp : PathGroupoidAction A a X) : PathOperadAlgebra A a X where
   act := grp.action
   act_respects_rweq := grp.action_respects_rweq

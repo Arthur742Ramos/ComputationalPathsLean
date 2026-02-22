@@ -96,7 +96,7 @@ structure ElementarySubgroup (R : Type u) where
   mem_inv : ∀ a, mem a → mem (stableGL.grp.inv a)
 
 /-- K₁(R) = GL(R) / E(R), the abelianization of the stable GL. -/
-def K1Group (R : Type u) (E : ElementarySubgroup R) : Type u :=
+noncomputable def K1Group (R : Type u) (E : ElementarySubgroup R) : Type u :=
   Quot (fun a b : E.stableGL.carrier => E.mem (E.stableGL.grp.mul a (E.stableGL.grp.inv b)))
 
 /-- The determinant map K₁(R) → R× (structural). -/
@@ -146,13 +146,13 @@ structure BassFundamental (R : Type u) where
   splitting : (i : Nat) → ∀ x : kR i, Path (retract i (inclusion i x)) x
 
 /-- Congruence of the Bass splitting path under inclusion. -/
-def bass_splitting_congr {R : Type u} (B : BassFundamental R)
+noncomputable def bass_splitting_congr {R : Type u} (B : BassFundamental R)
     (i : Nat) (x : B.kR i) :
     Path (B.inclusion i (B.retract i (B.inclusion i x))) (B.inclusion i x) :=
   Path.congrArg (B.inclusion i) (B.splitting i x)
 
 /-- Two-step loop from the Bass splitting witness. -/
-def bass_splitting_loop {R : Type u} (B : BassFundamental R)
+noncomputable def bass_splitting_loop {R : Type u} (B : BassFundamental R)
     (i : Nat) (x : B.kR i) :
     Path (B.inclusion i x) (B.inclusion i x) :=
   Path.trans (Path.symm (bass_splitting_congr B i x)) (bass_splitting_congr B i x)
@@ -199,7 +199,7 @@ structure Devissage where
   right_inv : (i : Nat) → ∀ x : kC i, Path (inclusion i (inverse i x)) x
 
 /-- Devissage gives an isomorphism at each level. -/
-def devissage_iso (D : Devissage) (i : Nat) :
+noncomputable def devissage_iso (D : Devissage) (i : Nat) :
     ∀ x : D.kA i, Path (D.inverse i (D.inclusion i x)) x :=
   D.left_inv i
 

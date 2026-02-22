@@ -20,7 +20,7 @@ namespace Path
 
 universe u
 
-private def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
+private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 
 end Path
 end ComputationalPaths

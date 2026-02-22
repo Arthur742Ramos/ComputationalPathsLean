@@ -75,7 +75,7 @@ noncomputable def spectralCompat_cancel_rweq (F : BunObj) :
 end GeometricLanglandsPathData
 
 /-- Build geometric Langlands path data from primary path-level witnesses. -/
-def mkGeometricLanglandsPathData
+noncomputable def mkGeometricLanglandsPathData
     {BunObj : Type u} {SpecObj : Type v}
     (heckeModify : BunObj → BunObj)
     (eigensheaf : BunObj → BunObj)

@@ -36,7 +36,7 @@ namespace ClusterAlgebras
 
 universe u v
 
-private def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
+private noncomputable def pathOfEqChain {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.stepChain h
 
 /-! ## Exchange Matrices -/
@@ -51,7 +51,7 @@ structure ExchangeMatrix (n : Nat) where
   diag_zero : ∀ i, Path (entry i i) 0
 
 /-- Trivial exchange matrix (all zeros). -/
-def ExchangeMatrix.zero (n : Nat) : ExchangeMatrix n where
+noncomputable def ExchangeMatrix.zero (n : Nat) : ExchangeMatrix n where
   entry := fun _ _ => 0
   skew_symm := fun _ _ => pathOfEqChain (by simp)
   diag_zero := fun _ => Path.refl _
@@ -66,14 +66,14 @@ structure Seed (n : Nat) where
   vars : Fin n → Type u
 
 /-- A concrete seed with ℕ-valued cluster variables. -/
-def Seed.natSeed (n : Nat) (B : ExchangeMatrix n) : Seed n where
+noncomputable def Seed.natSeed (n : Nat) (B : ExchangeMatrix n) : Seed n where
   matrix := B
   vars := fun _ => Nat
 
 /-! ## Mutation -/
 
 /-- Mutated matrix entry at direction k. -/
-def mutateEntry (n : Nat) (B : ExchangeMatrix n) (k i j : Fin n) : Int :=
+noncomputable def mutateEntry (n : Nat) (B : ExchangeMatrix n) (k i j : Fin n) : Int :=
   if i = k ∨ j = k then
     -(B.entry i j)
   else
@@ -98,7 +98,7 @@ structure MutatedSeed (n : Nat) (S : Seed n) (k : Fin n) where
   diag_preserved : ∀ i, Path (new_matrix.entry i i) 0
 
 /-- Trivial mutation (identity). -/
-def MutatedSeed.identity (n : Nat) (S : Seed n) (k : Fin n) : MutatedSeed n S k where
+noncomputable def MutatedSeed.identity (n : Nat) (S : Seed n) (k : Fin n) : MutatedSeed n S k where
   new_matrix := S.matrix
   skew_preserved := S.matrix.skew_symm
   diag_preserved := S.matrix.diag_zero
@@ -173,7 +173,7 @@ structure LaurentPhenomenon (n : Nat) where
     Path lp.one lp.one
 
 /-- Trivial Laurent phenomenon witness. -/
-def LaurentPhenomenon.trivial (n : Nat) (S : Seed n) : LaurentPhenomenon n where
+noncomputable def LaurentPhenomenon.trivial (n : Nat) (S : Seed n) : LaurentPhenomenon n where
   initial := S
   lp := { R := Nat, zero := 0, one := 1, add := (· + ·), mul := (· * ·), eval := fun _ => 0 }
   is_laurent := fun _ =>
@@ -214,7 +214,7 @@ structure FiniteTypeClassification (n : Nat) where
   count_correct : Path num_clusters num_clusters
 
 /-- Type A_n has n(n+3)/2 cluster variables. -/
-def typeA_count (n : Nat) : Nat := n * (n + 3) / 2
+noncomputable def typeA_count (n : Nat) : Nat := n * (n + 3) / 2
 
 /-- Type A_1 has 2 cluster variables. -/
 theorem typeA1_count : typeA_count 1 = 2 := by rfl
@@ -229,7 +229,7 @@ inductive ClusterStep : {A : Type _} → A → A → Type _ where
   | mk {A : Type _} {a b : A} (p : Path a b) : ClusterStep a b
 
 /-- ClusterStep implies Path. -/
-def clusterStep_to_path {A : Type _} {a b : A} (h : ClusterStep a b) :
+noncomputable def clusterStep_to_path {A : Type _} {a b : A} (h : ClusterStep a b) :
     Path a b := by
   cases h with
   | mk p => exact p
@@ -255,54 +255,54 @@ theorem symm_symm_exchange {n : Nat} (er : ExchangeRelation n) :
 /-! ## Cluster Categories, Positivity, and Caldero-Chapoton -/
 
 /-- Objects in the (simplified) cluster category. -/
-def clusterCategoryObject (n : Nat) : Type := Fin n
+noncomputable def clusterCategoryObject (n : Nat) : Type := Fin n
 
 /-- Morphisms in the (simplified) cluster category. -/
-def clusterCategoryMorphism (n : Nat) : Type :=
+noncomputable def clusterCategoryMorphism (n : Nat) : Type :=
   clusterCategoryObject n → clusterCategoryObject n
 
 /-- Identity morphism in the cluster category. -/
-def clusterCategoryId (n : Nat) : clusterCategoryMorphism n :=
+noncomputable def clusterCategoryId (n : Nat) : clusterCategoryMorphism n :=
   fun x => x
 
 /-- Composition of morphisms in the cluster category. -/
-def clusterCategoryComp (n : Nat) (f g : clusterCategoryMorphism n) :
+noncomputable def clusterCategoryComp (n : Nat) (f g : clusterCategoryMorphism n) :
     clusterCategoryMorphism n :=
   fun x => g (f x)
 
 /-- Unit path witness for cluster-category composition. -/
-def clusterCategoryUnitPath (n : Nat) (f : clusterCategoryMorphism n) :
+noncomputable def clusterCategoryUnitPath (n : Nat) (f : clusterCategoryMorphism n) :
     Path (clusterCategoryComp n (clusterCategoryId n) f)
          (clusterCategoryComp n (clusterCategoryId n) f) :=
   Path.refl _
 
 /-- Number of vertices in the exchange graph (finite-type proxy). -/
-def exchangeGraphVertices (n : Nat) (fc : FiniteTypeClassification n) : Nat :=
+noncomputable def exchangeGraphVertices (n : Nat) (fc : FiniteTypeClassification n) : Nat :=
   fc.num_clusters
 
 /-- Number of edges in the exchange graph (simplified count). -/
-def exchangeGraphEdges (n : Nat) (fc : FiniteTypeClassification n) : Nat :=
+noncomputable def exchangeGraphEdges (n : Nat) (fc : FiniteTypeClassification n) : Nat :=
   fc.num_clusters + n
 
 /-- Denominator degree of a cluster variable in Laurent expansion. -/
-def laurentDenominatorDegree (n : Nat) (cv : ClusterVariable n) : Nat :=
+noncomputable def laurentDenominatorDegree (n : Nat) (cv : ClusterVariable n) : Nat :=
   cv.index.1
 
 /-- Positivity coefficient count for a mutation sequence. -/
-def positivityCoefficient (n : Nat) (_lp : LaurentPhenomenon n)
+noncomputable def positivityCoefficient (n : Nat) (_lp : LaurentPhenomenon n)
     (mutations : List (Fin n)) : Nat :=
   mutations.length
 
 /-- Norm of a g-vector placeholder. -/
-def gVectorNorm (n : Nat) (i : Fin n) : Nat :=
+noncomputable def gVectorNorm (n : Nat) (i : Fin n) : Nat :=
   i.1
 
 /-- Norm of a c-vector placeholder. -/
-def cVectorNorm (n : Nat) (i : Fin n) : Nat :=
+noncomputable def cVectorNorm (n : Nat) (i : Fin n) : Nat :=
   i.1
 
 /-- Fomin-Zelevinsky rank associated to Dynkin type. -/
-def fzFiniteTypeRank : DynkinType → Nat
+noncomputable def fzFiniteTypeRank : DynkinType → Nat
   | .A n => n
   | .B n => n
   | .C n => n
@@ -314,15 +314,15 @@ def fzFiniteTypeRank : DynkinType → Nat
   | .G2 => 2
 
 /-- Finite-type witness (simplified). -/
-def fzFiniteTypeWitness (n : Nat) (fc : FiniteTypeClassification n) : Prop :=
+noncomputable def fzFiniteTypeWitness (n : Nat) (fc : FiniteTypeClassification n) : Prop :=
   fc.num_clusters ≥ n
 
 /-- Caldero-Chapoton character (simplified as a natural number). -/
-def calderoChapotonMap (n : Nat) (cv : ClusterVariable n) : Nat :=
+noncomputable def calderoChapotonMap (n : Nat) (cv : ClusterVariable n) : Nat :=
   cv.index.1 + 1
 
 /-- Trace-level invariant derived from Caldero-Chapoton data. -/
-def calderoChapotonTrace (n : Nat) (cv : ClusterVariable n) : Nat :=
+noncomputable def calderoChapotonTrace (n : Nat) (cv : ClusterVariable n) : Nat :=
   calderoChapotonMap n cv + laurentDenominatorDegree n cv
 
 theorem clusterCategoryUnit_left (n : Nat) (f : clusterCategoryMorphism n) :

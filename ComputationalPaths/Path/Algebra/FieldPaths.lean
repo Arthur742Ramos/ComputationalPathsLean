@@ -48,10 +48,10 @@ namespace FieldExpr
 variable {V : Type u}
 
 /-- Subtraction as syntactic sugar. -/
-def sub (a b : FieldExpr V) : FieldExpr V := add a (neg b)
+noncomputable def sub (a b : FieldExpr V) : FieldExpr V := add a (neg b)
 
 /-- Squaring. -/
-def sq (a : FieldExpr V) : FieldExpr V := mul a a
+noncomputable def sq (a : FieldExpr V) : FieldExpr V := mul a a
 
 end FieldExpr
 
@@ -104,17 +104,17 @@ variable {V : Type u}
 
 /-! ### Composition helpers -/
 
-def trans3 {a b c d : FieldExpr V}
+noncomputable def trans3 {a b c d : FieldExpr V}
     (p : FieldPath V a b) (q : FieldPath V b c) (r : FieldPath V c d) :
     FieldPath V a d :=
   FieldPath.trans p (FieldPath.trans q r)
 
-def trans4 {a b c d e : FieldExpr V}
+noncomputable def trans4 {a b c d e : FieldExpr V}
     (p : FieldPath V a b) (q : FieldPath V b c)
     (r : FieldPath V c d) (s : FieldPath V d e) : FieldPath V a e :=
   FieldPath.trans p (FieldPath.trans q (FieldPath.trans r s))
 
-def trans5 {a b c d e f : FieldExpr V}
+noncomputable def trans5 {a b c d e f : FieldExpr V}
     (p : FieldPath V a b) (q : FieldPath V b c)
     (r : FieldPath V c d) (s : FieldPath V d e)
     (t : FieldPath V e f) : FieldPath V a f :=
@@ -122,7 +122,7 @@ def trans5 {a b c d e f : FieldExpr V}
 
 /-! ### Congruence lifting -/
 
-def congr_add_left {a b : FieldExpr V} (c : FieldExpr V)
+noncomputable def congr_add_left {a b : FieldExpr V} (c : FieldExpr V)
     (p : FieldPath V a b) : FieldPath V (.add a c) (.add b c) := by
   induction p with
   | refl _ => exact FieldPath.refl _
@@ -130,7 +130,7 @@ def congr_add_left {a b : FieldExpr V} (c : FieldExpr V)
   | trans _ _ ih1 ih2 => exact FieldPath.trans ih1 ih2
   | symm _ ih => exact FieldPath.symm ih
 
-def congr_add_right {a b : FieldExpr V} (c : FieldExpr V)
+noncomputable def congr_add_right {a b : FieldExpr V} (c : FieldExpr V)
     (p : FieldPath V a b) : FieldPath V (.add c a) (.add c b) := by
   induction p with
   | refl _ => exact FieldPath.refl _
@@ -138,7 +138,7 @@ def congr_add_right {a b : FieldExpr V} (c : FieldExpr V)
   | trans _ _ ih1 ih2 => exact FieldPath.trans ih1 ih2
   | symm _ ih => exact FieldPath.symm ih
 
-def congr_mul_left {a b : FieldExpr V} (c : FieldExpr V)
+noncomputable def congr_mul_left {a b : FieldExpr V} (c : FieldExpr V)
     (p : FieldPath V a b) : FieldPath V (.mul a c) (.mul b c) := by
   induction p with
   | refl _ => exact FieldPath.refl _
@@ -146,7 +146,7 @@ def congr_mul_left {a b : FieldExpr V} (c : FieldExpr V)
   | trans _ _ ih1 ih2 => exact FieldPath.trans ih1 ih2
   | symm _ ih => exact FieldPath.symm ih
 
-def congr_mul_right {a b : FieldExpr V} (c : FieldExpr V)
+noncomputable def congr_mul_right {a b : FieldExpr V} (c : FieldExpr V)
     (p : FieldPath V a b) : FieldPath V (.mul c a) (.mul c b) := by
   induction p with
   | refl _ => exact FieldPath.refl _
@@ -154,7 +154,7 @@ def congr_mul_right {a b : FieldExpr V} (c : FieldExpr V)
   | trans _ _ ih1 ih2 => exact FieldPath.trans ih1 ih2
   | symm _ ih => exact FieldPath.symm ih
 
-def congr_neg {a b : FieldExpr V}
+noncomputable def congr_neg {a b : FieldExpr V}
     (p : FieldPath V a b) : FieldPath V (.neg a) (.neg b) := by
   induction p with
   | refl _ => exact FieldPath.refl _
@@ -162,7 +162,7 @@ def congr_neg {a b : FieldExpr V}
   | trans _ _ ih1 ih2 => exact FieldPath.trans ih1 ih2
   | symm _ ih => exact FieldPath.symm ih
 
-def congr_inv {a b : FieldExpr V}
+noncomputable def congr_inv {a b : FieldExpr V}
     (p : FieldPath V a b) : FieldPath V (.inv a) (.inv b) := by
   induction p with
   | refl _ => exact FieldPath.refl _
@@ -170,12 +170,12 @@ def congr_inv {a b : FieldExpr V}
   | trans _ _ ih1 ih2 => exact FieldPath.trans ih1 ih2
   | symm _ ih => exact FieldPath.symm ih
 
-def congr_add {a b c d : FieldExpr V}
+noncomputable def congr_add {a b c d : FieldExpr V}
     (p : FieldPath V a b) (q : FieldPath V c d) :
     FieldPath V (.add a c) (.add b d) :=
   FieldPath.trans (congr_add_left c p) (congr_add_right b q)
 
-def congr_mul {a b c d : FieldExpr V}
+noncomputable def congr_mul {a b c d : FieldExpr V}
     (p : FieldPath V a b) (q : FieldPath V c d) :
     FieldPath V (.mul a c) (.mul b d) :=
   FieldPath.trans (congr_mul_left c p) (congr_mul_right b q)
@@ -481,7 +481,7 @@ theorem distrib_cancel (a b c : FieldExpr V) :
 /-! ## Theorems 51–55: Soundness and evaluation -/
 
 /-- Evaluation of a FieldExpr in a concrete type. -/
-def eval {F : Type u} (z o : F) (ad : F → F → F) (ml : F → F → F)
+noncomputable def eval {F : Type u} (z o : F) (ad : F → F → F) (ml : F → F → F)
     (ng : F → F) (iv : F → F) (env : V → F) : FieldExpr V → F
   | .zero => z
   | .one => o
@@ -525,7 +525,7 @@ structure FieldInterp (F : Type u) (V : Type u) where
   neg_add_distrib_eq : ∀ a b, neg (add a b) = add (neg a) (neg b)
 
 /-- Evaluate a FieldExpr using an interpretation. -/
-def evalInterp {F V : Type u} (fi : FieldInterp F V) : FieldExpr V → F :=
+noncomputable def evalInterp {F V : Type u} (fi : FieldInterp F V) : FieldExpr V → F :=
   eval fi.zero fi.one fi.add fi.mul fi.neg fi.inv fi.env
 
 /-- Theorem 51: A single FieldStep preserves evaluation. -/
@@ -586,7 +586,7 @@ theorem path_sound {F V : Type u} (fi : FieldInterp F V)
   | symm _ ih => exact ih.symm
 
 /-- Theorem 53: Lift a FieldPath to a library Path on evaluations. -/
-def lift_to_path {F V : Type u} (fi : FieldInterp F V)
+noncomputable def lift_to_path {F V : Type u} (fi : FieldInterp F V)
     {a b : FieldExpr V} (p : FieldPath V a b) :
     Path (evalInterp fi a) (evalInterp fi b) :=
   Path.mk [Step.mk _ _ (path_sound fi p)] (path_sound fi p)

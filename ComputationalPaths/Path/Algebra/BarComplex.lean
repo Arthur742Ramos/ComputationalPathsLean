@@ -55,7 +55,7 @@ structure BarResolution (X : PointedSet.{u}) extends BarComplex.{u} where
 namespace BarComplex
 
 /-- The trivial bar complex with constant object and zero differentials. -/
-def trivial (X : PointedSet.{u}) : BarComplex.{u} where
+noncomputable def trivial (X : PointedSet.{u}) : BarComplex.{u} where
   obj := fun _ => X
   d := fun _ => zeroHom X X
   d_comp_zero := by
@@ -75,7 +75,7 @@ end BarComplex
 namespace BarResolution
 
 /-- The trivial bar resolution with zero differentials and identity augmentation. -/
-def trivial (X : PointedSet.{u}) : BarResolution X where
+noncomputable def trivial (X : PointedSet.{u}) : BarResolution X where
   obj := fun _ => X
   d := fun _ => zeroHom X X
   d_comp_zero := by

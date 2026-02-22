@@ -47,34 +47,34 @@ inductive Rw {P : TwoPolygraph} {a b : P.Obj} :
   | tail {p q r : P.OneCell a b} : Rw p q → P.TwoCell q r → Rw p r
 
 /-- Reflexive closure for polygraph rewrites. -/
-@[simp] def rw_refl {P : TwoPolygraph} {a b : P.Obj} (p : P.OneCell a b) :
+@[simp] noncomputable def rw_refl {P : TwoPolygraph} {a b : P.Obj} (p : P.OneCell a b) :
     Rw p p :=
   Rw.refl p
 
 /-- Lift a single step into the multi-step closure. -/
-@[simp] def rw_of_step {P : TwoPolygraph} {a b : P.Obj}
+@[simp] noncomputable def rw_of_step {P : TwoPolygraph} {a b : P.Obj}
     {p q : P.OneCell a b} (h : P.TwoCell p q) :
     Rw p q :=
   Rw.tail (Rw.refl p) h
 
 /-- Local confluence for a 2-polygraph. -/
-def LocallyConfluent (P : TwoPolygraph) : Prop :=
+noncomputable def LocallyConfluent (P : TwoPolygraph) : Prop :=
   ∀ {a b} {p q r : P.OneCell a b},
     P.TwoCell p q → P.TwoCell p r →
       ∃ s, Rw (P := P) q s ∧ Rw (P := P) r s
 
 /-- Confluence for the multi-step rewrite closure. -/
-def Confluent (P : TwoPolygraph) : Prop :=
+noncomputable def Confluent (P : TwoPolygraph) : Prop :=
   ∀ {a b} {p q r : P.OneCell a b},
     Rw (P := P) p q → Rw (P := P) p r →
       ∃ s, Rw (P := P) q s ∧ Rw (P := P) r s
 
 /-- Termination: every hom-set has a well-founded step relation. -/
-def Terminating (P : TwoPolygraph) : Prop :=
+noncomputable def Terminating (P : TwoPolygraph) : Prop :=
   ∀ {a b}, WellFounded (fun p q : P.OneCell a b => P.TwoCell q p)
 
 /-- A 2-polygraph is convergent when it is terminating and confluent. -/
-def Convergent (P : TwoPolygraph) : Prop :=
+noncomputable def Convergent (P : TwoPolygraph) : Prop :=
   Terminating P ∧ Confluent P
 
 end TwoPolygraph
@@ -89,7 +89,7 @@ structure ThreePolygraph extends TwoPolygraph where
       TwoCell p q → TwoCell p q → Prop
 
 /-- A 3-polygraph is coherent if every pair of parallel 2-cells is connected. -/
-def Coherent (P : ThreePolygraph) : Prop :=
+noncomputable def Coherent (P : ThreePolygraph) : Prop :=
   ∀ {a b} {p q : P.OneCell a b} (α β : P.TwoCell p q),
     P.ThreeCell a b p q α β
 
@@ -103,7 +103,7 @@ structure CoherentPresentation where
 /-! ## Homotopical completion -/
 
 /-- The homotopical completion adds 3-cells given by proof equality. -/
-def homotopicalCompletion (P : TwoPolygraph) : ThreePolygraph :=
+noncomputable def homotopicalCompletion (P : TwoPolygraph) : ThreePolygraph :=
   { Obj := P.Obj
     OneCell := P.OneCell
     TwoCell := P.TwoCell
@@ -116,7 +116,7 @@ theorem homotopicalCompletion_coherent (P : TwoPolygraph) :
   apply Subsingleton.elim
 
 /-- The canonical coherent presentation obtained from homotopical completion. -/
-def homotopicalCompletionPresentation (P : TwoPolygraph) : CoherentPresentation :=
+noncomputable def homotopicalCompletionPresentation (P : TwoPolygraph) : CoherentPresentation :=
   { polygraph := homotopicalCompletion P
     coherent := homotopicalCompletion_coherent P }
 
@@ -131,18 +131,18 @@ theorem squier_theorem (P : TwoPolygraph) (h : TwoPolygraph.Convergent P) :
 /-! ## Path rewriting instance -/
 
 /-- The computational-path rewrite system as a 2-polygraph. -/
-def pathTwoPolygraph (A : Type u) : TwoPolygraph :=
+noncomputable def pathTwoPolygraph (A : Type u) : TwoPolygraph :=
   { Obj := A
     OneCell := fun a b => Path a b
     TwoCell := fun {a b} p q =>
       Nonempty (RwEq (A := A) (a := a) (b := b) p q) }
 
 /-- The path 3-polygraph obtained via homotopical completion. -/
-def pathThreePolygraph (A : Type u) : ThreePolygraph :=
+noncomputable def pathThreePolygraph (A : Type u) : ThreePolygraph :=
   homotopicalCompletion (pathTwoPolygraph A)
 
 /-- The path rewrite system as a coherent presentation. -/
-def pathCoherentPresentation (A : Type u) : CoherentPresentation :=
+noncomputable def pathCoherentPresentation (A : Type u) : CoherentPresentation :=
   homotopicalCompletionPresentation (pathTwoPolygraph A)
 
 /-! ## Summary -/

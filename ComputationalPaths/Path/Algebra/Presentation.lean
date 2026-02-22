@@ -37,7 +37,7 @@ structure GroupoidPresentation {A : Type u} (a : A) where
   generator_sound : ∀ {p q : Loop' a}, Generators p q → Relations p q
 
 /-- Canonical presentation: generators are `Step`, relations are `RwEq`. -/
-def stepPresentation {A : Type u} (a : A) : GroupoidPresentation a where
+noncomputable def stepPresentation {A : Type u} (a : A) : GroupoidPresentation a where
   Generators := fun p q => Nonempty (Step p q)
   Relations := fun p q => Nonempty (RwEq p q)
   generator_sound := fun ⟨h⟩ => ⟨RwEq.step h⟩
@@ -65,7 +65,7 @@ structure PresentationEquiv {A : Type u} {a : A}
   fromRel : ∀ {p q : Loop' a}, Q.Relations p q → P.Relations p q
 
 /-- Tietze move: add a redundant generator whose relation is derivable from `RwEq`. -/
-def tietzeAddGenerator {A : Type u} {a : A}
+noncomputable def tietzeAddGenerator {A : Type u} {a : A}
     (g₁ g₂ : Loop' a) (hg : RwEq g₁ g₂) :
     GroupoidPresentation a where
   Generators := fun p q => Nonempty (Step p q) ∨ (p = g₁ ∧ q = g₂)
@@ -77,14 +77,14 @@ def tietzeAddGenerator {A : Type u} {a : A}
     | Or.inr ⟨hp, hq⟩ => subst hp; subst hq; exact ⟨hg⟩
 
 /-- Adding a redundant generator preserves the presented groupoid. -/
-def tietzeAddGenerator_equiv {A : Type u} {a : A}
+noncomputable def tietzeAddGenerator_equiv {A : Type u} {a : A}
     (g₁ g₂ : Loop' a) (hg : RwEq g₁ g₂) :
     PresentationEquiv (tietzeAddGenerator g₁ g₂ hg) (stepPresentation a) where
   toRel := fun h => h
   fromRel := fun h => h
 
 /-- Tietze move: add a redundant relation that already follows from existing relations. -/
-def tietzeAddRelation {A : Type u} {a : A}
+noncomputable def tietzeAddRelation {A : Type u} {a : A}
     (r₁ r₂ : Loop' a) (hr : RwEq r₁ r₂) :
     GroupoidPresentation a where
   Generators := fun p q => Nonempty (Step p q)
@@ -92,7 +92,7 @@ def tietzeAddRelation {A : Type u} {a : A}
   generator_sound := fun ⟨h⟩ => Or.inl ⟨RwEq.step h⟩
 
 /-- Adding a redundant relation preserves the presented groupoid. -/
-def tietzeAddRelation_equiv {A : Type u} {a : A}
+noncomputable def tietzeAddRelation_equiv {A : Type u} {a : A}
     (r₁ r₂ : Loop' a) (hr : RwEq r₁ r₂) :
     PresentationEquiv (tietzeAddRelation r₁ r₂ hr) (stepPresentation a) where
   toRel := by
@@ -105,7 +105,7 @@ def tietzeAddRelation_equiv {A : Type u} {a : A}
 /-! ## Word Problem -/
 
 /-- The word problem: are two loops related by `RwEq` in the presented groupoid? -/
-def WordProblem {A : Type u} (a : A) (p q : Loop' a) : Prop :=
+noncomputable def WordProblem {A : Type u} (a : A) (p q : Loop' a) : Prop :=
   (stepPresentation a).Relations p q
 
 /-- The word problem is equivalent to `Nonempty (RwEq p q)`. -/
@@ -114,7 +114,7 @@ theorem wordProblem_iff {A : Type u} {a : A} {p q : Loop' a} :
   Iff.rfl
 
 /-- Classical decidability of the word problem. -/
-instance wordProblemDecidable {A : Type u}
+noncomputable instance wordProblemDecidable {A : Type u}
     (a : A) (p q : Loop' a) : Decidable (WordProblem a p q) := by
   classical
   exact Classical.propDecidable _

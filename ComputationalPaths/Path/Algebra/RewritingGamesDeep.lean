@@ -31,22 +31,22 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.inv : Step α a b → Step α b a
+noncomputable def Step.inv : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.inv : Path α a b → Path α b a
+noncomputable def Path.inv : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.inv.trans (.cons s.inv (.nil _))
 
-def Path.len : Path α a b → Nat
+noncomputable def Path.len : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.len
 
@@ -54,25 +54,25 @@ def Path.len : Path α a b → Nat
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   witness : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
-def Cell2.vcomp {p q r : Path α a b}
+noncomputable def Cell2.vcomp {p q r : Path α a b}
     (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.witness.trans τ.witness⟩
 
-def Cell2.vinv {p q : Path α a b}
+noncomputable def Cell2.vinv {p q : Path α a b}
     (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.witness.symm⟩
 
-def whiskerL (r : Path α a b)
+noncomputable def whiskerL (r : Path α a b)
     {p q : Path α b c} (σ : Cell2 p q) : Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (Path.trans r) σ.witness⟩
 
-def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
+noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.witness⟩
 
-def Cell2.hcomp {a b c : α}
+noncomputable def Cell2.hcomp {a b c : α}
     {p₁ q₁ : Path α a b} {p₂ q₂ : Path α b c}
     (σ : Cell2 p₁ q₁) (τ : Cell2 p₂ q₂) : Cell2 (p₁.trans p₂) (q₁.trans q₂) :=
   ⟨by rw [σ.witness, τ.witness]⟩
@@ -112,9 +112,9 @@ theorem len_cons (s : Step α a b) (p : Path α b c) :
 
 abbrev Play (α : Type) (a b : α) := Path α a b
 
-def Play.empty (a : α) : Play α a a := Path.nil a
-def Play.concat (p : Play α a b) (q : Play α b c) : Play α a c := p.trans q
-def Play.moves (p : Play α a b) : Nat := p.len
+noncomputable def Play.empty (a : α) : Play α a a := Path.nil a
+noncomputable def Play.concat (p : Play α a b) (q : Play α b c) : Play α a c := p.trans q
+noncomputable def Play.moves (p : Play α a b) : Nat := p.len
 
 -- Theorem 1
 theorem play_concat_assoc (p : Play α a b) (q : Play α b c) (r : Play α c d) :
@@ -142,13 +142,13 @@ theorem play_moves_concat (p : Play α a b) (q : Play α b c) :
 structure Strategy (α : Type) where
   choose : (a : α) → Option (Σ b : α, Step α a b)
 
-def Strategy.comp (σ₁ σ₂ : Strategy α) : Strategy α where
+noncomputable def Strategy.comp (σ₁ σ₂ : Strategy α) : Strategy α where
   choose a := σ₁.choose a |>.orElse (fun _ => σ₂.choose a)
 
-def IsNormalForm (σ : Strategy α) (a : α) : Prop :=
+noncomputable def IsNormalForm (σ : Strategy α) (a : α) : Prop :=
   σ.choose a = none
 
-def idStrategy : Strategy α where
+noncomputable def idStrategy : Strategy α where
   choose _ := none
 
 -- Theorem 5
@@ -169,7 +169,7 @@ structure NormWitness (α : Type) (a nf : α) where
   strategy : Strategy α
   isNF     : IsNormalForm strategy nf
 
-def NormWitness.compose
+noncomputable def NormWitness.compose
     (w₁ : NormWitness α a b) (w₂ : NormWitness α b c) :
     NormWitness α a c where
   play     := w₁.play.trans w₂.play
@@ -194,9 +194,9 @@ theorem norm_compose_len
 structure GameTree (α : Type) (a : α) where
   branches : List (Σ b : α, Path α a b)
 
-def GameTree.branchCount (t : GameTree α a) : Nat := t.branches.length
-def GameTree.isLeaf (t : GameTree α a) : Prop := t.branches = []
-def GameTree.isLinear (t : GameTree α a) : Prop := t.branchCount ≤ 1
+noncomputable def GameTree.branchCount (t : GameTree α a) : Nat := t.branches.length
+noncomputable def GameTree.isLeaf (t : GameTree α a) : Prop := t.branches = []
+noncomputable def GameTree.isLinear (t : GameTree α a) : Prop := t.branchCount ≤ 1
 
 -- Theorem 8
 theorem leaf_no_branches (t : GameTree α a) (h : t.isLeaf) :
@@ -216,7 +216,7 @@ theorem depth_concat (p : Path α a b) (q : Path α b c) :
 -- §6  Positional Strategies and congrArg Lifting
 -- ============================================================
 
-def liftStrategy (f : α → α) (σ : Strategy α) : Strategy α where
+noncomputable def liftStrategy (f : α → α) (σ : Strategy α) : Strategy α where
   choose a := σ.choose a
 
 -- Theorem 11
@@ -227,7 +227,7 @@ theorem lift_comp_strategy (f g : α → α) (σ : Strategy α) :
 theorem lift_id_is_id (f : α → α) :
     liftStrategy f (idStrategy (α := α)) = idStrategy := rfl
 
-def Cell2.mapFn (f : Path α a b → Path α a b) {p q : Path α a b}
+noncomputable def Cell2.mapFn (f : Path α a b → Path α a b) {p q : Path α a b}
     (σ : Cell2 p q) : Cell2 (f p) (f q) :=
   ⟨congrArg f σ.witness⟩
 
@@ -258,7 +258,7 @@ structure Diamond (α : Type) where
 structure ChurchRosser (α : Type) where
   cr : {a b c : α} → Path α a b → Path α a c → Joinable α b c
 
-def selfJoinable (a : α) : Joinable α a a where
+noncomputable def selfJoinable (a : α) : Joinable α a a where
   target := a
   left   := Path.nil a
   right  := Path.nil a
@@ -271,7 +271,7 @@ theorem selfJoinable_left (a : α) :
 theorem selfJoinable_right (a : α) :
     (selfJoinable a).right = Path.nil a := rfl
 
-def diamondToJoinable (D : Diamond α) (s₁ : Step α a b) (s₂ : Step α a c) :
+noncomputable def diamondToJoinable (D : Diamond α) (s₁ : Step α a b) (s₂ : Step α a c) :
     Joinable α b c :=
   let ⟨d, l, r⟩ := D.diamond s₁ s₂
   { target := d, left := Path.single l, right := Path.single r }
@@ -281,7 +281,7 @@ theorem diamond_join_single (D : Diamond α) (s₁ : Step α a b) (s₂ : Step �
     (diamondToJoinable D s₁ s₂).left.len ≤ 1 := by
   simp [diamondToJoinable, Path.single, Path.len]
 
-def Joinable.swap (j : Joinable α b c) : Joinable α c b where
+noncomputable def Joinable.swap (j : Joinable α b c) : Joinable α c b where
   target := j.target
   left := j.right
   right := j.left
@@ -328,13 +328,13 @@ structure Equilibrium (α : Type) (gp : GamePair α) (a : α) where
   isNF₁  : IsNormalForm gp.σ₁ nf
   isNF₂  : IsNormalForm gp.σ₂ nf
 
-def Equilibrium.toJoinable (eq : Equilibrium α gp a) :
+noncomputable def Equilibrium.toJoinable (eq : Equilibrium α gp a) :
     Joinable α a a where
   target := eq.nf
   left   := eq.play₁
   right  := eq.play₂
 
-def trivialEquilibrium (gp : GamePair α) (a : α)
+noncomputable def trivialEquilibrium (gp : GamePair α) (a : α)
     (h₁ : IsNormalForm gp.σ₁ a) (h₂ : IsNormalForm gp.σ₂ a) :
     Equilibrium α gp a where
   nf := a; play₁ := Path.nil a; play₂ := Path.nil a
@@ -358,7 +358,7 @@ inductive Player where
   | O | P
 deriving DecidableEq
 
-def Player.swap : Player → Player
+noncomputable def Player.swap : Player → Player
   | .O => .P
   | .P => .O
 
@@ -370,10 +370,10 @@ structure TaggedStep (α : Type) (a b : α) where
   player : Player
   step   : Step α a b
 
-def taggedToPath (s : TaggedStep α a b) : Path α a b :=
+noncomputable def taggedToPath (s : TaggedStep α a b) : Path α a b :=
   Path.single s.step
 
-def taggedCompose (s₁ : TaggedStep α a b) (s₂ : TaggedStep α b c) :
+noncomputable def taggedCompose (s₁ : TaggedStep α a b) (s₂ : TaggedStep α b c) :
     Path α a c :=
   (taggedToPath s₁).trans (taggedToPath s₂)
 
@@ -388,7 +388,7 @@ theorem taggedCompose_len (s₁ : TaggedStep α a b) (s₂ : TaggedStep α b c) 
 structure InnocentStrategy (α : Type) where
   response : (a : α) → Option (Σ b : α, Step α a b)
 
-def InnocentStrategy.comp (σ₁ σ₂ : InnocentStrategy α) : InnocentStrategy α where
+noncomputable def InnocentStrategy.comp (σ₁ σ₂ : InnocentStrategy α) : InnocentStrategy α where
   response a := (σ₁.response a).orElse (fun _ => σ₂.response a)
 
 -- Theorem 28
@@ -399,7 +399,7 @@ theorem innocent_comp_assoc (σ₁ σ₂ σ₃ : InnocentStrategy α) :
   simp only [Option.orElse]
   cases σ₁.response a <;> rfl
 
-def InnocentStrategy.toStrategy (σ : InnocentStrategy α) : Strategy α where
+noncomputable def InnocentStrategy.toStrategy (σ : InnocentStrategy α) : Strategy α where
   choose := σ.response
 
 -- Theorem 29
@@ -420,7 +420,7 @@ structure FairJoin (α : Type) (b c : α) where
   left   : FairPlayWitness α b target
   right  : FairPlayWitness α c target
 
-def fairSelf (a : α) : FairPlayWitness α a a where
+noncomputable def fairSelf (a : α) : FairPlayWitness α a a where
   play := Path.nil a; ruleLog := []; lenEq := rfl
 
 -- Theorem 30
@@ -437,7 +437,7 @@ inductive GameFormula (α : Type) where
   | conj  : GameFormula α → GameFormula α → GameFormula α
   | disj  : GameFormula α → GameFormula α → GameFormula α
 
-def satisfies (σ : Strategy α) (a : α) : GameFormula α → Prop
+noncomputable def satisfies (σ : Strategy α) (a : α) : GameFormula α → Prop
   | .atom p    => p a
   | .exist φ   => ∃ b : α, ∃ _ : Step α a b, satisfies σ b φ
   | .univ φ    => ∀ b : α, ∀ _ : Step α a b, satisfies σ b φ
@@ -461,14 +461,14 @@ theorem satisfies_disj_comm (σ : Strategy α) (a : α) (φ ψ : GameFormula α)
 structure ParityGame (α : Type) where
   priority : α → Nat
 
-def ParityGame.owner (pg : ParityGame α) (a : α) : Player :=
+noncomputable def ParityGame.owner (pg : ParityGame α) (a : α) : Player :=
   if pg.priority a % 2 == 0 then .P else .O
 
-def maxPriority (pg : ParityGame α) : Path α a b → Nat
+noncomputable def maxPriority (pg : ParityGame α) : Path α a b → Nat
   | .nil a    => pg.priority a
   | .cons _ p => max (pg.priority a) (maxPriority pg p)
 
-def proponentWins (pg : ParityGame α) (p : Path α a b) : Prop :=
+noncomputable def proponentWins (pg : ParityGame α) (p : Path α a b) : Prop :=
   maxPriority pg p % 2 = 0
 
 -- Theorem 33
@@ -529,7 +529,7 @@ theorem vcomp_vinv {p q : Path α a b} (σ : Cell2 p q) :
 -- §16  congrArg / Whisker Chains
 -- ============================================================
 
-def doubleWhisker (l : Path α a b) {p q : Path α b c} (σ : Cell2 p q)
+noncomputable def doubleWhisker (l : Path α a b) {p q : Path α b c} (σ : Cell2 p q)
     (r : Path α c d) : Cell2 (l.trans p |>.trans r) (l.trans q |>.trans r) :=
   whiskerR (whiskerL l σ) r
 
@@ -580,7 +580,7 @@ theorem interchange_clean
 structure WinPath (α : Type) (σ : Strategy α) (a b : α) where
   play : Path α a b
 
-def WinPath.compose (w₁ : WinPath α σ a b) (w₂ : WinPath α σ b c) :
+noncomputable def WinPath.compose (w₁ : WinPath α σ a b) (w₂ : WinPath α σ b c) :
     WinPath α σ a c where
   play := w₁.play.trans w₂.play
 
@@ -641,7 +641,7 @@ structure Cospan (α : Type) (b : α) where
   left  : Path α left_src b
   right : Path α right_src b
 
-def Joinable.toCospan (j : Joinable α b c) : Cospan α j.target where
+noncomputable def Joinable.toCospan (j : Joinable α b c) : Cospan α j.target where
   left_src := b; right_src := c; left := j.left; right := j.right
 
 -- Theorem 54
@@ -694,12 +694,12 @@ theorem congrArg_inv {p q : Path α a b} (h : p = q) :
     p.inv = q.inv :=
   congrArg Path.inv h
 
-def Cell2.transMap {p₁ p₂ : Path α a b} {q₁ q₂ : Path α b c}
+noncomputable def Cell2.transMap {p₁ p₂ : Path α a b} {q₁ q₂ : Path α b c}
     (σ : Cell2 p₁ p₂) (τ : Cell2 q₁ q₂) :
     Cell2 (p₁.trans q₁) (p₂.trans q₂) :=
   Cell2.hcomp σ τ
 
-def Cell2.invMap {p q : Path α a b}
+noncomputable def Cell2.invMap {p q : Path α a b}
     (σ : Cell2 p q) : Cell2 p.inv q.inv :=
   ⟨congrArg Path.inv σ.witness⟩
 
@@ -770,14 +770,14 @@ theorem len_trans_ge_right (p : Path α a b) (q : Path α b c) :
 -- §25  Game Determinacy — Further Results
 -- ============================================================
 
-def crSpanToCospan (cr : ChurchRosser α) (sp : Span α a) :
+noncomputable def crSpanToCospan (cr : ChurchRosser α) (sp : Span α a) :
     Joinable α sp.left_end sp.right_end :=
   cr.cr sp.left sp.right
 
-def crSymm (cr : ChurchRosser α) : ChurchRosser α where
+noncomputable def crSymm (cr : ChurchRosser α) : ChurchRosser α where
   cr := fun p q => (cr.cr q p).swap
 
-def diamondCR1 (D : Diamond α) (s₁ : Step α a b) (s₂ : Step α a c) :
+noncomputable def diamondCR1 (D : Diamond α) (s₁ : Step α a b) (s₂ : Step α a c) :
     Joinable α b c :=
   diamondToJoinable D s₁ s₂
 

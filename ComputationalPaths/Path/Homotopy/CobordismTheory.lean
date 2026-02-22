@@ -52,15 +52,15 @@ structure ClosedManifold (n : Nat) where
   carrier : Type u
 
 /-- The empty manifold in dimension n. -/
-def emptyManifold (n : Nat) : ClosedManifold.{u} n where
+noncomputable def emptyManifold (n : Nat) : ClosedManifold.{u} n where
   carrier := PEmpty
 
 /-- Disjoint union of closed manifolds. -/
-def disjointUnion {n : Nat} (M N : ClosedManifold.{u} n) : ClosedManifold.{u} n where
+noncomputable def disjointUnion {n : Nat} (M N : ClosedManifold.{u} n) : ClosedManifold.{u} n where
   carrier := Sum M.carrier N.carrier
 
 /-- Cartesian product of closed manifolds. -/
-def productManifold {m n : Nat} (M : ClosedManifold.{u} m) (N : ClosedManifold.{u} n) :
+noncomputable def productManifold {m n : Nat} (M : ClosedManifold.{u} m) (N : ClosedManifold.{u} n) :
     ClosedManifold.{u} (m + n) where
   carrier := Prod M.carrier N.carrier
 
@@ -76,7 +76,7 @@ structure CompactCobordism {n : Nat} (M N : ClosedManifold.{u} n) where
   rightBdy : N.carrier → total
 
 /-- The cobordism relation on closed n-manifolds. -/
-def CobordismRelation {n : Nat} (M N : ClosedManifold.{u} n) : Prop :=
+noncomputable def CobordismRelation {n : Nat} (M N : ClosedManifold.{u} n) : Prop :=
   Nonempty (CompactCobordism M N)
 
 /-- Cobordism is reflexive: M x [0,1] gives a cobordism M to M. -/
@@ -105,16 +105,16 @@ theorem cobordism_transitive {n : Nat} {M N P : ClosedManifold.{u} n}
 /-! ## Cobordism Groups and Ring -/
 
 /-- The n-th unoriented cobordism group. -/
-def UnorientedCobordismGroup (n : Nat) : Type (u + 1) :=
+noncomputable def UnorientedCobordismGroup (n : Nat) : Type (u + 1) :=
   Quot (@CobordismRelation.{u} n)
 
 /-- Embed a manifold into its cobordism class. -/
-def toCobordismClass {n : Nat} (M : ClosedManifold.{u} n) :
+noncomputable def toCobordismClass {n : Nat} (M : ClosedManifold.{u} n) :
     UnorientedCobordismGroup.{u} n :=
   Quot.mk _ M
 
 /-- The zero element: the empty manifold. -/
-def cobordismZero (n : Nat) : UnorientedCobordismGroup.{u} n :=
+noncomputable def cobordismZero (n : Nat) : UnorientedCobordismGroup.{u} n :=
   toCobordismClass (emptyManifold n)
 
 /-- The graded cobordism ring structure. -/
@@ -151,12 +151,12 @@ structure OrientedClosedManifold (n : Nat) where
   orientation : Orientation manifold
 
 /-- Oriented cobordism relation. -/
-def OrientedCobordismRelation {n : Nat}
+noncomputable def OrientedCobordismRelation {n : Nat}
     (M N : OrientedClosedManifold.{u} n) : Prop :=
   Nonempty (CompactCobordism M.manifold N.manifold)
 
 /-- Oriented cobordism group. -/
-def OrientedCobordismGroup (n : Nat) : Type (u + 1) :=
+noncomputable def OrientedCobordismGroup (n : Nat) : Type (u + 1) :=
   Quot (@OrientedCobordismRelation.{u} n)
 
 /-! ## Thom Spaces and Thom Spectra -/

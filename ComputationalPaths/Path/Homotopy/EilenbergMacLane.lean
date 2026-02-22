@@ -55,7 +55,7 @@ abbrev KSpaceHomotopy {G : Type u} {n : Nat} (X Y : KSpace G n) : Type u :=
     (HigherHomotopy.PiN n Y.carrier Y.base)
 
 /-- Any two K(G,n) spaces are equivalent at the level of πₙ. -/
-def kSpaceUniqueUpToHomotopy {G : Type u} {n : Nat} (X Y : KSpace G n) :
+noncomputable def kSpaceUniqueUpToHomotopy {G : Type u} {n : Nat} (X Y : KSpace G n) :
     KSpaceHomotopy X Y :=
   SimpleEquiv.comp X.piNEquiv (SimpleEquiv.symm Y.piNEquiv)
 

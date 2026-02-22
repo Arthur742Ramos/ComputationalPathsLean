@@ -32,7 +32,7 @@ namespace Expr
 
 /-! ## Measures -/
 
-@[simp] def size : Expr → Nat
+@[simp] noncomputable def size : Expr → Nat
   | atom _ => 1
   | refl => 1
   | symm e => e.size + 1
@@ -40,7 +40,7 @@ namespace Expr
 
 theorem size_pos (e : Expr) : 0 < e.size := by cases e <;> simp <;> omega
 
-@[simp] def weight : Expr → Nat
+@[simp] noncomputable def weight : Expr → Nat
   | atom _ => 4
   | refl => 4
   | symm e => 2 * e.weight + 1
@@ -49,7 +49,7 @@ theorem size_pos (e : Expr) : 0 < e.size := by cases e <;> simp <;> omega
 theorem weight_ge_four (e : Expr) : 4 ≤ e.weight := by
   induction e <;> simp_all <;> omega
 
-@[simp] def leftWeight : Expr → Nat
+@[simp] noncomputable def leftWeight : Expr → Nat
   | atom _ => 0
   | refl => 0
   | symm e => e.leftWeight
@@ -123,7 +123,7 @@ theorem step_lex_decrease {p q : Expr} (h : Step p q) :
 
 /-! ## Well-foundedness machinery -/
 
-private def NatLex : Nat × Nat → Nat × Nat → Prop :=
+private noncomputable def NatLex : Nat × Nat → Nat × Nat → Prop :=
   fun a b => a.1 < b.1 ∨ (a.1 = b.1 ∧ a.2 < b.2)
 
 private theorem natLex_acc : ∀ w l : Nat, Acc NatLex (w, l) := by
@@ -142,7 +142,7 @@ private theorem natLex_acc : ∀ w l : Nat, Acc NatLex (w, l) := by
 private theorem natLex_wf : WellFounded NatLex :=
   ⟨fun ⟨w, l⟩ => natLex_acc w l⟩
 
-def termMeasure (e : Expr) : Nat × Nat := (e.weight, e.leftWeight)
+noncomputable def termMeasure (e : Expr) : Nat × Nat := (e.weight, e.leftWeight)
 
 theorem step_measure_lt {p q : Expr} (h : Step p q) :
     NatLex (termMeasure q) (termMeasure p) :=

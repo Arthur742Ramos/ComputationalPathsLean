@@ -32,7 +32,7 @@ structure NetworkEdge (N : Type u) where
   edgePath : Path src tgt
 
 /-- Compose network edges into a route. -/
-def routeCompose {N : Type u} {a b c : N}
+noncomputable def routeCompose {N : Type u} {a b c : N}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
@@ -251,7 +251,7 @@ theorem congrArg_route_symm {N M : Type u} (f : N → M)
 /-! ## Multi-Hop Routing -/
 
 /-- Iterated hop through network. -/
-def multiHop {N : Type u} {a : N} (p : Path a a) : Nat → Path a a
+noncomputable def multiHop {N : Type u} {a : N} (p : Path a a) : Nat → Path a a
   | 0 => Path.refl a
   | n + 1 => Path.trans (multiHop p n) p
 

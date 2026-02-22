@@ -67,31 +67,31 @@ abbrev WaldhausenAdditivity :=
 /-! ## A-theory of spaces -/
 
 /-- Add a disjoint basepoint to a space. -/
-def addBasepoint (X : Type u) : PtdType.{u} where
+noncomputable def addBasepoint (X : Type u) : PtdType.{u} where
   carrier := Option X
   pt := none
 
 /-- Suspension spectrum of a space with a disjoint basepoint (skeletal). -/
-def suspensionSpectrum (X : Type u) : Spectrum.{u} where
+noncomputable def suspensionSpectrum (X : Type u) : Spectrum.{u} where
   level := fun _ => (addBasepoint X).carrier
   basepoint := fun _ => (addBasepoint X).pt
 
 /-- Smooth Whitehead spectrum placeholder. -/
-def whiteheadDiff (_X : Type u) : Spectrum.{u} where
+noncomputable def whiteheadDiff (_X : Type u) : Spectrum.{u} where
   level := fun _ => PUnit
   basepoint := fun _ => PUnit.unit
 
 /-- Levelwise product of spectra (skeletal). -/
-def spectrumProd (A B : Spectrum.{u}) : Spectrum.{u} where
+noncomputable def spectrumProd (A B : Spectrum.{u}) : Spectrum.{u} where
   level := fun n => A.level n × B.level n
   basepoint := fun n => (A.basepoint n, B.basepoint n)
 
 /-- A-theory of a space, modeled as a spectrum product. -/
-def ATheory (X : Type u) : Spectrum.{u} :=
+noncomputable def ATheory (X : Type u) : Spectrum.{u} :=
   spectrumProd (suspensionSpectrum X) (whiteheadDiff X)
 
 /-- The A-theory splitting A(X) = Sigma^infty X_+ x Wh^Diff(X). -/
-def aTheorySplitting (X : Type u) :
+noncomputable def aTheorySplitting (X : Type u) :
     Path (ATheory X)
       (spectrumProd (suspensionSpectrum X) (whiteheadDiff X)) :=
   Path.refl _
@@ -111,7 +111,7 @@ abbrev DennisTrace (A : Homotopy.THH.RingSpectrum) :=
   Homotopy.THH.DennisTrace A
 
 /-- The degree-n Dennis trace map K_n(R) → THH_n(R). -/
-def dennisTraceMap {A : Homotopy.THH.RingSpectrum}
+noncomputable def dennisTraceMap {A : Homotopy.THH.RingSpectrum}
     (D : DennisTrace A) (n : Nat) :
     D.kGroups n → D.thhGroups n :=
   D.trace n

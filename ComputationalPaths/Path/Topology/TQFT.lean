@@ -52,128 +52,128 @@ structure WittenChernSimonsData where
   partition : Cobordism Nat → Int
 
 
-def idCobordism {Obj : Type u} (x : Obj) : Cobordism Obj where
+noncomputable def idCobordism {Obj : Type u} (x : Obj) : Cobordism Obj where
   src := x
   tgt := x
   genus := 0
   boundaryCount := 0
 
 
-def composeCobordism {Obj : Type u} (W1 W2 : Cobordism Obj) : Cobordism Obj where
+noncomputable def composeCobordism {Obj : Type u} (W1 W2 : Cobordism Obj) : Cobordism Obj where
   src := W1.src
   tgt := W2.tgt
   genus := W1.genus + W2.genus
   boundaryCount := W1.boundaryCount + W2.boundaryCount
 
 
-def tensorCobordism {Obj : Type u} (W1 W2 : Cobordism Obj) : Cobordism Obj where
+noncomputable def tensorCobordism {Obj : Type u} (W1 W2 : Cobordism Obj) : Cobordism Obj where
   src := W1.src
   tgt := W2.tgt
   genus := W1.genus + W2.genus
   boundaryCount := W1.boundaryCount + W2.boundaryCount
 
 
-def composePath {Obj : Type u} (W1 W2 : Cobordism Obj) :
+noncomputable def composePath {Obj : Type u} (W1 W2 : Cobordism Obj) :
     Path (composeCobordism W1 W2) (composeCobordism W1 W2) :=
   Path.refl _
 
 
-def tensorPath {Obj : Type u} (W1 W2 : Cobordism Obj) :
+noncomputable def tensorPath {Obj : Type u} (W1 W2 : Cobordism Obj) :
     Path (tensorCobordism W1 W2) (tensorCobordism W1 W2) :=
   Path.refl _
 
 
-def evaluateOnPoint {Obj : Type u} {A : Type v}
+noncomputable def evaluateOnPoint {Obj : Type u} {A : Type v}
     (Z : ExtendedTQFTData Obj A) (x : Obj) : A :=
   Z.assignObj x
 
 
-def evaluateOnCircle {Obj : Type u} {A : Type v}
+noncomputable def evaluateOnCircle {Obj : Type u} {A : Type v}
     (Z : ExtendedTQFTData Obj A) (circleObj : Obj) : A :=
   Z.assignObj circleObj
 
 
-def foldTensor {A : Type v} (T : MonoidalTarget A) : List A → A
+noncomputable def foldTensor {A : Type v} (T : MonoidalTarget A) : List A → A
   | [] => T.unit
   | x :: xs => T.tensor x (foldTensor T xs)
 
 
-def factorizationValue {A : Type v}
+noncomputable def factorizationValue {A : Type v}
     (F : FactorizationHomologyData A) (n : Nat) : A :=
   F.localValue n
 
 
-def factorizationBoundary {A : Type v}
+noncomputable def factorizationBoundary {A : Type v}
     (F : FactorizationHomologyData A) (m n : Nat) : A :=
   F.glue (F.localValue m) (F.localValue n)
 
 
-def rtInvariant (R : ReshetikhinTuraevData) (W : Cobordism Nat) : Nat :=
+noncomputable def rtInvariant (R : ReshetikhinTuraevData) (W : Cobordism Nat) : Nat :=
   R.invariant W
 
 
-def wcsPartition (W : WittenChernSimonsData) (M : Cobordism Nat) : Int :=
+noncomputable def wcsPartition (W : WittenChernSimonsData) (M : Cobordism Nat) : Int :=
   W.partition M
 
 
-def mappingClassAction (R : ReshetikhinTuraevData)
+noncomputable def mappingClassAction (R : ReshetikhinTuraevData)
     (g : Nat) (W : Cobordism Nat) : Nat :=
   R.invariant { W with genus := W.genus + g }
 
 
-def anyonFusion (MTC : ModularTensorCategoryData)
+noncomputable def anyonFusion (MTC : ModularTensorCategoryData)
     (a b : MTC.Obj) : MTC.Obj :=
   MTC.tensor a b
 
 
-def anyonBraiding (MTC : ModularTensorCategoryData)
+noncomputable def anyonBraiding (MTC : ModularTensorCategoryData)
     (a b : MTC.Obj) : MTC.Obj :=
   MTC.braiding a b
 
 
-def anyonTwist (MTC : ModularTensorCategoryData)
+noncomputable def anyonTwist (MTC : ModularTensorCategoryData)
     (a : MTC.Obj) : MTC.Obj :=
   MTC.twist a
 
 
-def stateSpace {Obj : Type u} {A : Type v}
+noncomputable def stateSpace {Obj : Type u} {A : Type v}
     (Z : ExtendedTQFTData Obj A) (boundary : Obj) : A :=
   Z.assignObj boundary
 
 
-def closedState {Obj : Type u} {A : Type v}
+noncomputable def closedState {Obj : Type u} {A : Type v}
     (Z : ExtendedTQFTData Obj A) (W : Cobordism Obj) : A :=
   Z.assignCob W
 
 
-def gluingAmplitude {Obj : Type u} {A : Type v}
+noncomputable def gluingAmplitude {Obj : Type u} {A : Type v}
     (Z : ExtendedTQFTData Obj A) (a b : A) : A :=
   Z.target.tensor a b
 
 
-def surgeryKernel {Obj : Type u} (W : Cobordism Obj) : Nat :=
+noncomputable def surgeryKernel {Obj : Type u} (W : Cobordism Obj) : Nat :=
   W.genus + W.boundaryCount
 
 
-def framingCorrection (k : Int) (n : Nat) : Int :=
+noncomputable def framingCorrection (k : Int) (n : Nat) : Int :=
   k + Int.ofNat n
 
 
-def quantumDimension {MTC : ModularTensorCategoryData}
+noncomputable def quantumDimension {MTC : ModularTensorCategoryData}
     (qdim : MTC.Obj → Nat) (a : MTC.Obj) : Nat :=
   qdim a
 
 
-def totalQuantumDimension {MTC : ModularTensorCategoryData}
+noncomputable def totalQuantumDimension {MTC : ModularTensorCategoryData}
     (qdim : MTC.Obj → Nat) (objs : List MTC.Obj) : Nat :=
   objs.foldl (fun acc x => acc + qdim x) 0
 
 
-def cobordismTrace {Obj : Type u} (W : Cobordism Obj) : Nat :=
+noncomputable def cobordismTrace {Obj : Type u} (W : Cobordism Obj) : Nat :=
   W.genus * (W.boundaryCount + 1)
 
 
-def handleShift {Obj : Type u} (W : Cobordism Obj) (k : Nat) : Cobordism Obj :=
+noncomputable def handleShift {Obj : Type u} (W : Cobordism Obj) (k : Nat) : Cobordism Obj :=
   { W with genus := W.genus + k }
 
 

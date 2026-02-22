@@ -43,7 +43,7 @@ universe u v
 /-! ## Thom spaces -/
 
 /-- Turn a base type with a chosen basepoint into a pointed type. -/
-def basePointed (B : Type u) (b : B) : Pointed :=
+noncomputable def basePointed (B : Type u) (b : B) : Pointed :=
   { carrier := B, pt := b }
 
 /-- Thom space data for a vector bundle. -/
@@ -60,11 +60,11 @@ namespace ThomSpace
 variable {K B Total V : Type u} {bundle : VectorBundleData K B Total V}
 
 /-- The basepoint of the Thom space. -/
-def basepoint (Th : ThomSpace bundle) : Th.space.carrier :=
+noncomputable def basepoint (Th : ThomSpace bundle) : Th.space.carrier :=
   Th.space.pt
 
 /-- Basepoint path is reflexive. -/
-def basepoint_path (Th : ThomSpace bundle) : Path (basepoint Th) (basepoint Th) :=
+noncomputable def basepoint_path (Th : ThomSpace bundle) : Path (basepoint Th) (basepoint Th) :=
   Path.refl (basepoint Th)
 
 end ThomSpace
@@ -101,13 +101,13 @@ variable {H : ReducedCohomologyTheory} {K B Total V : Type u}
     {bundle : VectorBundleData K B Total V} {Th : ThomSpace bundle} {b0 : B}
 
 /-- Left inverse path for the Thom isomorphism. -/
-def left_inv_path (T : ThomIsomorphism H bundle Th b0) (n : Nat)
+noncomputable def left_inv_path (T : ThomIsomorphism H bundle Th b0) (n : Nat)
     (x : H.cohomology n (basePointed B b0)) :
     Path ((T.iso n).invFun ((T.iso n).toFun x)) x :=
   (T.iso n).left_inv x
 
 /-- Right inverse path for the Thom isomorphism. -/
-def right_inv_path (T : ThomIsomorphism H bundle Th b0) (n : Nat)
+noncomputable def right_inv_path (T : ThomIsomorphism H bundle Th b0) (n : Nat)
     (y : H.cohomology (n + T.degree) Th.space) :
     Path ((T.iso n).toFun ((T.iso n).invFun y)) y :=
   (T.iso n).right_inv y

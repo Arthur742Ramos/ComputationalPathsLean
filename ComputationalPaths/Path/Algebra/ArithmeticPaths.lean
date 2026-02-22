@@ -29,7 +29,7 @@ inductive AExpr where
 namespace AExpr
 
 /-- Evaluation to Nat. -/
-@[simp] def eval : AExpr → Nat
+@[simp] noncomputable def eval : AExpr → Nat
   | .lit n    => n
   | .zero     => 0
   | .one      => 1
@@ -38,7 +38,7 @@ namespace AExpr
   | .mul a b  => a.eval * b.eval
 
 /-- Expression size (for termination arguments). -/
-@[simp] def size : AExpr → Nat
+@[simp] noncomputable def size : AExpr → Nat
   | .lit _    => 1
   | .zero     => 1
   | .one      => 1
@@ -125,7 +125,7 @@ theorem eval_eq {e₁ e₂ : AExpr} (s : AStep e₁ e₂) : e₁.eval = e₂.eva
 
 -- 9
 /-- A step lifts to a `Path` on evaluation values. -/
-def toCorePath {e₁ e₂ : AExpr} (s : AStep e₁ e₂) :
+noncomputable def toCorePath {e₁ e₂ : AExpr} (s : AStep e₁ e₂) :
     Path e₁.eval e₂.eval :=
   ⟨[⟨e₁.eval, e₂.eval, s.eval_eq⟩], s.eval_eq⟩
 
@@ -153,13 +153,13 @@ theorem eval_eq {e₁ e₂ : AExpr} (p : APath e₁ e₂) : e₁.eval = e₂.eva
 
 -- 11
 /-- Lift an APath to a core `Path` on Nat. -/
-def toCorePath {e₁ e₂ : AExpr} (p : APath e₁ e₂) :
+noncomputable def toCorePath {e₁ e₂ : AExpr} (p : APath e₁ e₂) :
     Path e₁.eval e₂.eval :=
   ⟨[⟨e₁.eval, e₂.eval, p.eval_eq⟩], p.eval_eq⟩
 
 -- 12
 /-- Number of constructors in a path. -/
-@[simp] def depth {e₁ e₂ : AExpr} : APath e₁ e₂ → Nat
+@[simp] noncomputable def depth {e₁ e₂ : AExpr} : APath e₁ e₂ → Nat
   | .refl _      => 0
   | .step _      => 1
   | .trans p q   => p.depth + q.depth
@@ -186,52 +186,52 @@ end APath
 
 -- 17
 /-- `(a + 0) ⟶ a` -/
-def add_zero_elim (a : AExpr) : APath (.add a .zero) a :=
+noncomputable def add_zero_elim (a : AExpr) : APath (.add a .zero) a :=
   .step (.add_zero_r a)
 
 -- 18
 /-- `(0 + a) ⟶ a` -/
-def zero_add_elim (a : AExpr) : APath (.add .zero a) a :=
+noncomputable def zero_add_elim (a : AExpr) : APath (.add .zero a) a :=
   .step (.add_zero_l a)
 
 -- 19
 /-- `(a * 1) ⟶ a` -/
-def mul_one_elim (a : AExpr) : APath (.mul a .one) a :=
+noncomputable def mul_one_elim (a : AExpr) : APath (.mul a .one) a :=
   .step (.mul_one_r a)
 
 -- 20
 /-- `(1 * a) ⟶ a` -/
-def one_mul_elim (a : AExpr) : APath (.mul .one a) a :=
+noncomputable def one_mul_elim (a : AExpr) : APath (.mul .one a) a :=
   .step (.mul_one_l a)
 
 -- 21
 /-- `(a * 0) ⟶ 0` -/
-def mul_zero_elim (a : AExpr) : APath (.mul a .zero) .zero :=
+noncomputable def mul_zero_elim (a : AExpr) : APath (.mul a .zero) .zero :=
   .step (.mul_zero_r a)
 
 -- 22
 /-- `(a + b) ⟶ (b + a)` -/
-def add_swap (a b : AExpr) : APath (.add a b) (.add b a) :=
+noncomputable def add_swap (a b : AExpr) : APath (.add a b) (.add b a) :=
   .step (.add_comm a b)
 
 -- 23
 /-- `(a * b) ⟶ (b * a)` -/
-def mul_swap (a b : AExpr) : APath (.mul a b) (.mul b a) :=
+noncomputable def mul_swap (a b : AExpr) : APath (.mul a b) (.mul b a) :=
   .step (.mul_comm a b)
 
 -- 24
 /-- `((a + b) + c) ⟶ (a + (b + c))` -/
-def add_reassoc (a b c : AExpr) : APath (.add (.add a b) c) (.add a (.add b c)) :=
+noncomputable def add_reassoc (a b c : AExpr) : APath (.add (.add a b) c) (.add a (.add b c)) :=
   .step (.add_assoc a b c)
 
 -- 25
 /-- `((a * b) * c) ⟶ (a * (b * c))` -/
-def mul_reassoc (a b c : AExpr) : APath (.mul (.mul a b) c) (.mul a (.mul b c)) :=
+noncomputable def mul_reassoc (a b c : AExpr) : APath (.mul (.mul a b) c) (.mul a (.mul b c)) :=
   .step (.mul_assoc a b c)
 
 -- 26
 /-- Swapping twice returns to start. -/
-def add_comm_involutive (a b : AExpr) : APath (.add a b) (.add a b) :=
+noncomputable def add_comm_involutive (a b : AExpr) : APath (.add a b) (.add a b) :=
   .trans (.step (.add_comm a b)) (.step (.add_comm b a))
 
 -- 27
@@ -240,13 +240,13 @@ theorem add_comm_involutive_eval (a b : AExpr) :
 
 -- 28
 /-- `(a + b) + 0 ⟶ b + a` via two steps -/
-def add_then_zero_then_comm (a b : AExpr) :
+noncomputable def add_then_zero_then_comm (a b : AExpr) :
     APath (.add (.add a b) .zero) (.add b a) :=
   .trans (.step (.add_zero_r (.add a b))) (.step (.add_comm a b))
 
 -- 29
 /-- Left-distributing then reassociating. -/
-def distrib_then_reassoc (a b c d : AExpr) :
+noncomputable def distrib_then_reassoc (a b c d : AExpr) :
     APath (.mul a (.add b (.add c d)))
           (.add (.mul a b) (.add (.mul a c) (.mul a d))) :=
   .trans
@@ -255,17 +255,17 @@ def distrib_then_reassoc (a b c d : AExpr) :
 
 -- 30
 /-- `succ (lit n) ⟶ lit (n+1)` -/
-def succ_reduce (n : Nat) : APath (.succ (.lit n)) (.lit (n + 1)) :=
+noncomputable def succ_reduce (n : Nat) : APath (.succ (.lit n)) (.lit (n + 1)) :=
   .step (.succ_lit n)
 
 -- 31
 /-- `(a + succ b) ⟶ succ (a + b)` -/
-def add_succ_path (a b : AExpr) : APath (.add a (.succ b)) (.succ (.add a b)) :=
+noncomputable def add_succ_path (a b : AExpr) : APath (.add a (.succ b)) (.succ (.add a b)) :=
   .step (.add_succ a b)
 
 -- 32
 /-- `succ(a) + b ⟶ succ(a + b)` -/
-def succ_add_path (a b : AExpr) : APath (.add (.succ a) b) (.succ (.add a b)) :=
+noncomputable def succ_add_path (a b : AExpr) : APath (.add (.succ a) b) (.succ (.add a b)) :=
   .step (.succ_add a b)
 
 /-! ## Algebraic Coherence Theorems -/
@@ -292,7 +292,7 @@ theorem trans_eval {e₁ e₂ e₃ : AExpr} (p : APath e₁ e₂) (q : APath e�
 
 -- 36
 /-- Congruence: if `a ⟶ b` then `a + c ⟶ b + c`. -/
-def cong_add_left {a b : AExpr} (c : AExpr) : APath a b → APath (.add a c) (.add b c)
+noncomputable def cong_add_left {a b : AExpr} (c : AExpr) : APath a b → APath (.add a c) (.add b c)
   | .refl _      => .refl _
   | .step s      => .step (.cong_add_l c s)
   | .trans p q   => .trans (cong_add_left c p) (cong_add_left c q)
@@ -300,7 +300,7 @@ def cong_add_left {a b : AExpr} (c : AExpr) : APath a b → APath (.add a c) (.a
 
 -- 37
 /-- Congruence: if `a ⟶ b` then `c + a ⟶ c + b`. -/
-def cong_add_right (c : AExpr) {a b : AExpr} : APath a b → APath (.add c a) (.add c b)
+noncomputable def cong_add_right (c : AExpr) {a b : AExpr} : APath a b → APath (.add c a) (.add c b)
   | .refl _      => .refl _
   | .step s      => .step (.cong_add_r c s)
   | .trans p q   => .trans (cong_add_right c p) (cong_add_right c q)
@@ -308,7 +308,7 @@ def cong_add_right (c : AExpr) {a b : AExpr} : APath a b → APath (.add c a) (.
 
 -- 38
 /-- Congruence: if `a ⟶ b` then `a * c ⟶ b * c`. -/
-def cong_mul_left {a b : AExpr} (c : AExpr) : APath a b → APath (.mul a c) (.mul b c)
+noncomputable def cong_mul_left {a b : AExpr} (c : AExpr) : APath a b → APath (.mul a c) (.mul b c)
   | .refl _      => .refl _
   | .step s      => .step (.cong_mul_l c s)
   | .trans p q   => .trans (cong_mul_left c p) (cong_mul_left c q)
@@ -316,7 +316,7 @@ def cong_mul_left {a b : AExpr} (c : AExpr) : APath a b → APath (.mul a c) (.m
 
 -- 39
 /-- Congruence under succ. -/
-def cong_succ {a b : AExpr} : APath a b → APath (.succ a) (.succ b)
+noncomputable def cong_succ {a b : AExpr} : APath a b → APath (.succ a) (.succ b)
   | .refl _      => .refl _
   | .step s      => .step (.cong_succ s)
   | .trans p q   => .trans (cong_succ p) (cong_succ q)
@@ -384,7 +384,7 @@ theorem refl_depth_zero (e : AExpr) : (APath.refl e).depth = 0 := rfl
 /-! ## Iterated Operations -/
 
 /-- Sum of n copies of an expression. -/
-@[simp] def iterAdd (e : AExpr) : Nat → AExpr
+@[simp] noncomputable def iterAdd (e : AExpr) : Nat → AExpr
   | 0     => .zero
   | n + 1 => .add e (iterAdd e n)
 
@@ -400,7 +400,7 @@ theorem iterAdd_one_eval (e : AExpr) : (iterAdd e 1).eval = e.eval := by simp
 
 -- 49
 /-- Path from `iterAdd e 1` to `e` via zero elimination. -/
-def iterAdd_one_path (e : AExpr) : APath (iterAdd e 1) e :=
+noncomputable def iterAdd_one_path (e : AExpr) : APath (iterAdd e 1) e :=
   add_zero_elim e
 
 -- 50

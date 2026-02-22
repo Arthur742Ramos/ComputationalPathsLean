@@ -60,7 +60,7 @@ structure PrimeIdealData {R : Type u} (ring : SpecRing R) where
 
 /-! ## Basic open sets D(f) -/
 
-def basicOpen {R : Type u} (ring : SpecRing R) (f : R)
+noncomputable def basicOpen {R : Type u} (ring : SpecRing R) (f : R)
     (p : PrimeIdealData ring) : Prop :=
   ¬ p.mem f
 
@@ -112,7 +112,7 @@ structure MultSet {R : Type u} (ring : SpecRing R) where
   mul_mem : ∀ a b, mem a → mem b → mem (ring.mul a b)
 
 -- 6
-def primeComplement {R : Type u} {ring : SpecRing R}
+noncomputable def primeComplement {R : Type u} {ring : SpecRing R}
     (p : PrimeIdealData ring) : MultSet ring where
   mem := fun r => ¬ p.mem r
   one_mem := p.not_mem_one
@@ -127,7 +127,7 @@ structure LocalizationData {R : Type u} (ring : SpecRing R)
   den : R
   den_mem : S.mem den
 
-def fracEquiv {R : Type u} {ring : SpecRing R} {S : MultSet ring}
+noncomputable def fracEquiv {R : Type u} {ring : SpecRing R} {S : MultSet ring}
     (x y : LocalizationData ring S) : Prop :=
   ∃ t : R, S.mem t ∧
     ring.mul t (ring.add (ring.mul x.num y.den)
@@ -143,7 +143,7 @@ theorem fracEquiv_refl {R : Type u} {ring : SpecRing R} {S : MultSet ring}
   rw [h1, h]
 
 -- 8
-def fracEquivReflPath {R : Type u} {ring : SpecRing R} {S : MultSet ring}
+noncomputable def fracEquivReflPath {R : Type u} {ring : SpecRing R} {S : MultSet ring}
     (x : LocalizationData ring S) :
     Path (fracEquiv x x) True :=
   Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => fracEquiv_refl x⟩)]
@@ -151,18 +151,18 @@ def fracEquivReflPath {R : Type u} {ring : SpecRing R} {S : MultSet ring}
 
 /-! ## Localization at a prime -/
 
-def localizeAtPrime {R : Type u} {ring : SpecRing R}
+noncomputable def localizeAtPrime {R : Type u} {ring : SpecRing R}
     (p : PrimeIdealData ring) :=
   LocalizationData ring (primeComplement p)
 
 -- 9
-def toLocalization {R : Type u} {ring : SpecRing R}
+noncomputable def toLocalization {R : Type u} {ring : SpecRing R}
     (p : PrimeIdealData ring) (r : R) : localizeAtPrime p :=
   ⟨r, ring.one, p.not_mem_one⟩
 
 /-! ## Vanishing ideal V(S) -/
 
-def vanishing {R : Type u} (ring : SpecRing R)
+noncomputable def vanishing {R : Type u} (ring : SpecRing R)
     (S : R → Prop) (p : PrimeIdealData ring) : Prop :=
   ∀ f, S f → p.mem f
 
@@ -207,7 +207,7 @@ theorem basicOpen_eq_compl_vanishing {R : Type u} (ring : SpecRing R)
 
 /-! ## Ring powers -/
 
-def ringPow {R : Type u} (ring : SpecRing R) (f : R) : Nat → R
+noncomputable def ringPow {R : Type u} (ring : SpecRing R) (f : R) : Nat → R
   | 0 => ring.one
   | n + 1 => ring.mul f (ringPow ring f n)
 
@@ -240,7 +240,7 @@ structure SheafSection {R : Type u} (ring : SpecRing R) (f : R) where
   den : R
   den_power : ∃ n : Nat, den = ringPow ring f n
 
-def sectionEquiv {R : Type u} {ring : SpecRing R} {f : R}
+noncomputable def sectionEquiv {R : Type u} {ring : SpecRing R} {f : R}
     (s t : SheafSection ring f) : Prop :=
   ∃ k : Nat,
     ring.mul (ringPow ring f k)
@@ -248,21 +248,21 @@ def sectionEquiv {R : Type u} {ring : SpecRing R} {f : R}
                 (ring.neg (ring.mul t.num s.den))) = ring.zero
 
 -- 18
-def zeroSection {R : Type u} (ring : SpecRing R) (f : R) :
+noncomputable def zeroSection {R : Type u} (ring : SpecRing R) (f : R) :
     SheafSection ring f :=
   ⟨ring.zero, ring.one, ⟨0, rfl⟩⟩
 
 -- 19
-def oneSection {R : Type u} (ring : SpecRing R) (f : R) :
+noncomputable def oneSection {R : Type u} (ring : SpecRing R) (f : R) :
     SheafSection ring f :=
   ⟨ring.one, ring.one, ⟨0, rfl⟩⟩
 
 /-! ## Nilradical and reduced rings -/
 
-def isNilpotent {R : Type u} (ring : SpecRing R) (f : R) : Prop :=
+noncomputable def isNilpotent {R : Type u} (ring : SpecRing R) (f : R) : Prop :=
   ∃ n : Nat, ringPow ring f n = ring.zero
 
-def isReduced {R : Type u} (ring : SpecRing R) : Prop :=
+noncomputable def isReduced {R : Type u} (ring : SpecRing R) : Prop :=
   ∀ f, isNilpotent ring f → f = ring.zero
 
 -- 20
@@ -285,7 +285,7 @@ structure SpecHom {R : Type u} {S : Type v}
   map_mul : ∀ a b, Path (toFun (rR.mul a b)) (rS.mul (toFun a) (toFun b))
 
 -- 21
-def specMap {R : Type u} {S : Type v}
+noncomputable def specMap {R : Type u} {S : Type v}
     {rR : SpecRing R} {rS : SpecRing S}
     (φ : SpecHom rR rS)
     (q : PrimeIdealData rS) : PrimeIdealData rR where
@@ -313,7 +313,7 @@ theorem specMap_basicOpen {R : Type u} {S : Type v}
   ⟨fun h => h, fun h => h⟩
 
 -- 23
-def specHomId {R : Type u} (rR : SpecRing R) : SpecHom rR rR where
+noncomputable def specHomId {R : Type u} (rR : SpecRing R) : SpecHom rR rR where
   toFun := id
   map_zero := Path.refl _
   map_one := Path.refl _
@@ -327,7 +327,7 @@ theorem specMap_id_mem {R : Type u} {rR : SpecRing R}
   ⟨fun h => h, fun h => h⟩
 
 -- 25
-def specHomComp {R S T : Type u}
+noncomputable def specHomComp {R S T : Type u}
     {rR : SpecRing R} {rS : SpecRing S} {rT : SpecRing T}
     (φ : SpecHom rR rS) (ψ : SpecHom rS rT) : SpecHom rR rT where
   toFun := ψ.toFun ∘ φ.toFun

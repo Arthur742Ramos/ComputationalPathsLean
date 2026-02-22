@@ -37,7 +37,7 @@ variable {A : Type u} {a : A}
 /-! ## Loop Group Structure -/
 
 /-- The strict group structure on the loop quotient. -/
-@[simp] def loopGroupStructure (A : Type u) (a : A) : Algebra.StrictGroup (LoopQuot A a) :=
+@[simp] noncomputable def loopGroupStructure (A : Type u) (a : A) : Algebra.StrictGroup (LoopQuot A a) :=
   { mul := LoopQuot.comp
     one := LoopQuot.id
     mul_assoc := LoopQuot.comp_assoc
@@ -54,11 +54,11 @@ variable {A : Type u} {a : A}
 /-! ## Conjugation and Commutators -/
 
 /-- Conjugation in the loop group. -/
-@[simp] def conj (x y : LoopQuot A a) : LoopQuot A a :=
+@[simp] noncomputable def conj (x y : LoopQuot A a) : LoopQuot A a :=
   Algebra.StrictGroup.conj (loopGroupStructure A a) x y
 
 /-- Commutator in the loop group. -/
-@[simp] def commutator (x y : LoopQuot A a) : LoopQuot A a :=
+@[simp] noncomputable def commutator (x y : LoopQuot A a) : LoopQuot A a :=
   Algebra.StrictGroup.commutator (loopGroupStructure A a) x y
 
 /-- Conjugation by the identity loop is identity. -/
@@ -113,11 +113,11 @@ variable {A : Type u} {a : A}
 /-! ## Power Laws -/
 
 /-- Natural powers in the loop group. -/
-@[simp] def pow (x : LoopQuot A a) : Nat → LoopQuot A a :=
+@[simp] noncomputable def pow (x : LoopQuot A a) : Nat → LoopQuot A a :=
   Algebra.StrictGroup.pow (loopGroupStructure A a) x
 
 /-- Integer powers in the loop group. -/
-@[simp] def zpow (x : LoopQuot A a) : Int → LoopQuot A a :=
+@[simp] noncomputable def zpow (x : LoopQuot A a) : Int → LoopQuot A a :=
   Algebra.StrictGroup.zpow (loopGroupStructure A a) x
 
 @[simp] theorem pow_zero (x : LoopQuot A a) : pow (A := A) (a := a) x 0 = LoopQuot.id := by
@@ -171,7 +171,7 @@ end LoopGroupAlgebra
 end Homotopy
 end Path
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end ComputationalPaths

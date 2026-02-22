@@ -60,7 +60,7 @@ structure MorseFunctionExt where
   gradientLike : True
 
 /-- Morse number: count of critical points of index k. -/
-def morseNumberExt (f : MorseFunctionExt) (k : Nat) : Nat :=
+noncomputable def morseNumberExt (f : MorseFunctionExt) (k : Nat) : Nat :=
   (f.criticalPoints.filter (fun p => f.index p == k)).length
 
 /-! ## Morse-Bott Theory -/
@@ -370,7 +370,7 @@ theorem morse_bott_converges (f : MorseBottFunction) (ss : MorseBottSpectralSeq 
 theorem bott_periodicity (bp : BottPeriodicity) : True := bp.periodicity
 
 /-- Morse homology is isomorphic to singular homology. -/
-def morse_singular_iso (msi : MorseSingularIsomorphism) (k : Nat) :
+noncomputable def morse_singular_iso (msi : MorseSingularIsomorphism) (k : Nat) :
     Path (msi.morseH.betti k) (msi.singularBetti k) :=
   msi.iso k
 

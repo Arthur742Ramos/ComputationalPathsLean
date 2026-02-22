@@ -48,7 +48,7 @@ namespace Letter
 variable {G : Type u}
 
 /-- Flip orientation. -/
-@[simp] def flip (l : Letter G) : Letter G := ⟨l.gen, !l.pos⟩
+@[simp] noncomputable def flip (l : Letter G) : Letter G := ⟨l.gen, !l.pos⟩
 
 @[simp] theorem flip_flip (l : Letter G) : l.flip.flip = l := by
   simp [flip, Bool.not_not]
@@ -72,24 +72,24 @@ namespace FreeWord
 variable {G : Type u}
 
 /-- Empty word (identity). -/
-@[simp] def ε : FreeWord G := ⟨[]⟩
+@[simp] noncomputable def ε : FreeWord G := ⟨[]⟩
 
 /-- Single positive generator. -/
-def gen (g : G) : FreeWord G := ⟨[⟨g, true⟩]⟩
+noncomputable def gen (g : G) : FreeWord G := ⟨[⟨g, true⟩]⟩
 
 /-- Single negative generator. -/
-def genInv (g : G) : FreeWord G := ⟨[⟨g, false⟩]⟩
+noncomputable def genInv (g : G) : FreeWord G := ⟨[⟨g, false⟩]⟩
 
 /-- Concatenation. -/
-@[simp] def mul (w₁ w₂ : FreeWord G) : FreeWord G :=
+@[simp] noncomputable def mul (w₁ w₂ : FreeWord G) : FreeWord G :=
   ⟨w₁.letters ++ w₂.letters⟩
 
 /-- Formal inverse: reverse and flip each letter. -/
-@[simp] def inv (w : FreeWord G) : FreeWord G :=
+@[simp] noncomputable def inv (w : FreeWord G) : FreeWord G :=
   ⟨(w.letters.map Letter.flip).reverse⟩
 
 /-- Word length. -/
-@[simp] def len (w : FreeWord G) : Nat := w.letters.length
+@[simp] noncomputable def len (w : FreeWord G) : Nat := w.letters.length
 
 /-! ### FreeWord algebra -/
 
@@ -158,19 +158,19 @@ namespace RelCtx
 variable {G : Type u} {R : Type v} {P : GroupPres G R}
 
 /-- Source word of a relation-context application. -/
-def src (rc : RelCtx G R P) : FreeWord G :=
+noncomputable def src (rc : RelCtx G R P) : FreeWord G :=
   let r := P.rels rc.ridx
   let core := if rc.fwd then r.lhs else r.rhs
   FreeWord.mul (FreeWord.mul rc.left core) rc.right
 
 /-- Target word of a relation-context application. -/
-def tgt (rc : RelCtx G R P) : FreeWord G :=
+noncomputable def tgt (rc : RelCtx G R P) : FreeWord G :=
   let r := P.rels rc.ridx
   let core := if rc.fwd then r.rhs else r.lhs
   FreeWord.mul (FreeWord.mul rc.left core) rc.right
 
 /-- Invert a relation step (swap direction). -/
-def invert (rc : RelCtx G R P) : RelCtx G R P :=
+noncomputable def invert (rc : RelCtx G R P) : RelCtx G R P :=
   { rc with fwd := !rc.fwd }
 
 theorem invert_src (rc : RelCtx G R P) :
@@ -202,13 +202,13 @@ abbrev Derivation (G : Type u) := List (DerivStep G)
 namespace Derivation
 variable {G : Type u}
 
-def nil : Derivation G := []
-def single (s : DerivStep G) : Derivation G := [s]
-def comp (d₁ d₂ : Derivation G) : Derivation G := d₁ ++ d₂
-def dlen (d : Derivation G) : Nat := d.length
+noncomputable def nil : Derivation G := []
+noncomputable def single (s : DerivStep G) : Derivation G := [s]
+noncomputable def comp (d₁ d₂ : Derivation G) : Derivation G := d₁ ++ d₂
+noncomputable def dlen (d : Derivation G) : Nat := d.length
 
 /-- Reverse a derivation: reverse order and flip each step's direction. -/
-def inv (d : Derivation G) : Derivation G :=
+noncomputable def inv (d : Derivation G) : Derivation G :=
   (d.map fun s => { s with fwd := !s.fwd }).reverse
 
 theorem dlen_nil : dlen (nil : Derivation G) = 0 := rfl
@@ -246,9 +246,9 @@ deriving DecidableEq
 namespace WTerm
 variable {G : Type u}
 
-def one : WTerm G := ⟨FreeWord.ε⟩
-def mk_mul (a b : WTerm G) : WTerm G := ⟨FreeWord.mul a.w b.w⟩
-def mk_inv (a : WTerm G) : WTerm G := ⟨FreeWord.inv a.w⟩
+noncomputable def one : WTerm G := ⟨FreeWord.ε⟩
+noncomputable def mk_mul (a b : WTerm G) : WTerm G := ⟨FreeWord.mul a.w b.w⟩
+noncomputable def mk_inv (a : WTerm G) : WTerm G := ⟨FreeWord.inv a.w⟩
 
 /-! ### Core algebra for WTerm -/
 
@@ -277,55 +277,55 @@ section WordPaths
 variable {G : Type u}
 
 /-- Path witnessing associativity of free-word multiplication. -/
-def assocPath (u v w : FreeWord G) :
+noncomputable def assocPath (u v w : FreeWord G) :
     Path (A := FreeWord G) (FreeWord.mul (FreeWord.mul u v) w)
       (FreeWord.mul u (FreeWord.mul v w)) :=
   Path.mk [Step.mk _ _ (FreeWord.mul_assoc u v w)] (FreeWord.mul_assoc u v w)
 
 /-- Path witnessing left unit. -/
-def leftUnitPath (w : FreeWord G) :
+noncomputable def leftUnitPath (w : FreeWord G) :
     Path (A := FreeWord G) (FreeWord.mul FreeWord.ε w) w :=
   Path.mk [Step.mk _ _ (FreeWord.ε_mul w)] (FreeWord.ε_mul w)
 
 /-- Path witnessing right unit. -/
-def rightUnitPath (w : FreeWord G) :
+noncomputable def rightUnitPath (w : FreeWord G) :
     Path (A := FreeWord G) (FreeWord.mul w FreeWord.ε) w :=
   Path.mk [Step.mk _ _ (FreeWord.mul_ε w)] (FreeWord.mul_ε w)
 
 /-- Path witnessing anti-homomorphism of inverse. -/
-def invMulPath (u v : FreeWord G) :
+noncomputable def invMulPath (u v : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.inv (FreeWord.mul u v))
       (FreeWord.mul (FreeWord.inv v) (FreeWord.inv u)) :=
   Path.mk [Step.mk _ _ (FreeWord.inv_mul u v)] (FreeWord.inv_mul u v)
 
 /-- Path witnessing double-inverse cancellation. -/
-def invInvPath (w : FreeWord G) :
+noncomputable def invInvPath (w : FreeWord G) :
     Path (A := FreeWord G) (FreeWord.inv (FreeWord.inv w)) w :=
   Path.mk [Step.mk _ _ (FreeWord.inv_inv w)] (FreeWord.inv_inv w)
 
 /-- Path witnessing length additivity. -/
-def lenMulPath (u v : FreeWord G) :
+noncomputable def lenMulPath (u v : FreeWord G) :
     Path (A := Nat) (FreeWord.len (FreeWord.mul u v))
       (FreeWord.len u + FreeWord.len v) :=
   Path.mk [Step.mk _ _ (FreeWord.len_mul u v)] (FreeWord.len_mul u v)
 
 /-- Path witnessing length invariance under inversion. -/
-def lenInvPath (w : FreeWord G) :
+noncomputable def lenInvPath (w : FreeWord G) :
     Path (A := Nat) (FreeWord.len (FreeWord.inv w)) (FreeWord.len w) :=
   Path.mk [Step.mk _ _ (FreeWord.len_inv w)] (FreeWord.len_inv w)
 
 /-! ### Multi-step reassociation paths -/
 
 /-- Four-fold reassociation: 2-step trans chain. -/
-def assoc4Path (a b c d : FreeWord G) :
+noncomputable def assoc4Path (a b c d : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.mul (FreeWord.mul (FreeWord.mul a b) c) d)
       (FreeWord.mul a (FreeWord.mul b (FreeWord.mul c d))) :=
   Path.trans (assocPath (FreeWord.mul a b) c d) (assocPath a b (FreeWord.mul c d))
 
 /-- Alternative 4-fold reassociation via congrArg (3-step). -/
-def assoc4Path' (a b c d : FreeWord G) :
+noncomputable def assoc4Path' (a b c d : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.mul (FreeWord.mul (FreeWord.mul a b) c) d)
       (FreeWord.mul a (FreeWord.mul b (FreeWord.mul c d))) :=
@@ -340,7 +340,7 @@ theorem pentagon_coherence (a b c d : FreeWord G) :
     (assoc4Path a b c d).proof = (assoc4Path' a b c d).proof := rfl
 
 /-- Five-fold reassociation: 3-step trans chain. -/
-def assoc5Path (a b c d e₅ : FreeWord G) :
+noncomputable def assoc5Path (a b c d e₅ : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.mul (FreeWord.mul (FreeWord.mul (FreeWord.mul a b) c) d) e₅)
       (FreeWord.mul a (FreeWord.mul b (FreeWord.mul c (FreeWord.mul d e₅)))) :=
@@ -351,12 +351,12 @@ def assoc5Path (a b c d e₅ : FreeWord G) :
       (assocPath a b (FreeWord.mul c (FreeWord.mul d e₅))))
 
 /-- Triangle coherence: right-unit + assoc = congrArg-unit + assoc + congrArg-unit. -/
-def trianglePath (a b : FreeWord G) :
+noncomputable def trianglePath (a b : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.mul (FreeWord.mul a FreeWord.ε) b) (FreeWord.mul a b) :=
   Path.congrArg (fun x => FreeWord.mul x b) (rightUnitPath a)
 
-def trianglePath' (a b : FreeWord G) :
+noncomputable def trianglePath' (a b : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.mul (FreeWord.mul a FreeWord.ε) b) (FreeWord.mul a b) :=
   Path.trans
@@ -369,53 +369,53 @@ theorem triangle_coherence (a b : FreeWord G) :
 /-! ### Functorial paths: congrArg for word operations -/
 
 /-- Left multiplication is functorial: if u₁ ≡ u₂ via path, so is u₁ · v ≡ u₂ · v. -/
-def mulLeftMap {u₁ u₂ : FreeWord G} (p : Path u₁ u₂) (v : FreeWord G) :
+noncomputable def mulLeftMap {u₁ u₂ : FreeWord G} (p : Path u₁ u₂) (v : FreeWord G) :
     Path (A := FreeWord G) (FreeWord.mul u₁ v) (FreeWord.mul u₂ v) :=
   Path.congrArg (fun x => FreeWord.mul x v) p
 
 /-- Right multiplication is functorial. -/
-def mulRightMap (u : FreeWord G) {v₁ v₂ : FreeWord G} (p : Path v₁ v₂) :
+noncomputable def mulRightMap (u : FreeWord G) {v₁ v₂ : FreeWord G} (p : Path v₁ v₂) :
     Path (A := FreeWord G) (FreeWord.mul u v₁) (FreeWord.mul u v₂) :=
   Path.congrArg (FreeWord.mul u) p
 
 /-- Inversion is functorial. -/
-def invMap {w₁ w₂ : FreeWord G} (p : Path w₁ w₂) :
+noncomputable def invMap {w₁ w₂ : FreeWord G} (p : Path w₁ w₂) :
     Path (A := FreeWord G) (FreeWord.inv w₁) (FreeWord.inv w₂) :=
   Path.congrArg FreeWord.inv p
 
 /-- Length is functorial. -/
-def lenMap {w₁ w₂ : FreeWord G} (p : Path w₁ w₂) :
+noncomputable def lenMap {w₁ w₂ : FreeWord G} (p : Path w₁ w₂) :
     Path (A := Nat) (FreeWord.len w₁) (FreeWord.len w₂) :=
   Path.congrArg FreeWord.len p
 
 /-! ### Composed functorial paths -/
 
 /-- 2-step left-mul trans chain. -/
-def mulLeftTrans {u₁ u₂ u₃ : FreeWord G}
+noncomputable def mulLeftTrans {u₁ u₂ u₃ : FreeWord G}
     (p : Path u₁ u₂) (q : Path u₂ u₃) (v : FreeWord G) :
     Path (A := FreeWord G) (FreeWord.mul u₁ v) (FreeWord.mul u₃ v) :=
   Path.trans (mulLeftMap p v) (mulLeftMap q v)
 
 /-- 2-step right-mul trans chain. -/
-def mulRightTrans (u : FreeWord G) {v₁ v₂ v₃ : FreeWord G}
+noncomputable def mulRightTrans (u : FreeWord G) {v₁ v₂ v₃ : FreeWord G}
     (p : Path v₁ v₂) (q : Path v₂ v₃) :
     Path (A := FreeWord G) (FreeWord.mul u v₁) (FreeWord.mul u v₃) :=
   Path.trans (mulRightMap u p) (mulRightMap u q)
 
 /-- Left-mul symm. -/
-def mulLeftSymm {u₁ u₂ : FreeWord G} (p : Path u₁ u₂) (v : FreeWord G) :
+noncomputable def mulLeftSymm {u₁ u₂ : FreeWord G} (p : Path u₁ u₂) (v : FreeWord G) :
     Path (A := FreeWord G) (FreeWord.mul u₂ v) (FreeWord.mul u₁ v) :=
   Path.symm (mulLeftMap p v)
 
 /-- Right-mul symm. -/
-def mulRightSymm (u : FreeWord G) {v₁ v₂ : FreeWord G} (p : Path v₁ v₂) :
+noncomputable def mulRightSymm (u : FreeWord G) {v₁ v₂ : FreeWord G} (p : Path v₁ v₂) :
     Path (A := FreeWord G) (FreeWord.mul u v₂) (FreeWord.mul u v₁) :=
   Path.symm (mulRightMap u p)
 
 /-! ### Complex multi-step chains -/
 
 /-- Inverse distributes over product, then right-unit cancellation: 2-step chain. -/
-def invMulRightUnitPath (u v : FreeWord G) :
+noncomputable def invMulRightUnitPath (u v : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.mul (FreeWord.inv (FreeWord.mul u v)) FreeWord.ε)
       (FreeWord.mul (FreeWord.inv v) (FreeWord.inv u)) :=
@@ -424,7 +424,7 @@ def invMulRightUnitPath (u v : FreeWord G) :
     (rightUnitPath (FreeWord.mul (FreeWord.inv v) (FreeWord.inv u)))
 
 /-- Left-unit followed by associativity: 2-step chain. -/
-def leftUnitAssocPath (u v w : FreeWord G) :
+noncomputable def leftUnitAssocPath (u v w : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.mul FreeWord.ε (FreeWord.mul (FreeWord.mul u v) w))
       (FreeWord.mul u (FreeWord.mul v w)) :=
@@ -433,21 +433,21 @@ def leftUnitAssocPath (u v w : FreeWord G) :
     (assocPath u v w)
 
 /-- Inner reassociation: ((ab)(cd)) → (a(b(cd))). -/
-def innerAssocPath (a b c d : FreeWord G) :
+noncomputable def innerAssocPath (a b c d : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.mul (FreeWord.mul a b) (FreeWord.mul c d))
       (FreeWord.mul a (FreeWord.mul b (FreeWord.mul c d))) :=
   assocPath a b (FreeWord.mul c d)
 
 /-- 3-step chain: inverse distribute + assoc + right-unit. -/
-def invDistribAssocPath (u v w : FreeWord G) :
+noncomputable def invDistribAssocPath (u v w : FreeWord G) :
     Path (A := FreeWord G)
       (FreeWord.mul (FreeWord.inv (FreeWord.mul u v)) w)
       (FreeWord.mul (FreeWord.mul (FreeWord.inv v) (FreeWord.inv u)) w) :=
   mulLeftMap (invMulPath u v) w
 
 /-- Triple length: 2-step chain. -/
-def lenTriplePath (a b c : FreeWord G) :
+noncomputable def lenTriplePath (a b c : FreeWord G) :
     Path (A := Nat)
       (FreeWord.len (FreeWord.mul (FreeWord.mul a b) c))
       (FreeWord.len a + FreeWord.len b + FreeWord.len c) :=
@@ -456,7 +456,7 @@ def lenTriplePath (a b c : FreeWord G) :
     (Path.congrArg (· + FreeWord.len c) (lenMulPath a b))
 
 /-- Inv-of-product length: 2-step chain. -/
-def lenInvMulPath (u v : FreeWord G) :
+noncomputable def lenInvMulPath (u v : FreeWord G) :
     Path (A := Nat)
       (FreeWord.len (FreeWord.inv (FreeWord.mul u v)))
       (FreeWord.len u + FreeWord.len v) :=
@@ -469,30 +469,30 @@ end WordPaths
 section WTermPaths
 variable {G : Type u}
 
-def wtAssocPath (a b c : WTerm G) :
+noncomputable def wtAssocPath (a b c : WTerm G) :
     Path (WTerm.mk_mul (WTerm.mk_mul a b) c) (WTerm.mk_mul a (WTerm.mk_mul b c)) :=
   Path.mk [Step.mk _ _ (WTerm.mul_assoc_eq a b c)] (WTerm.mul_assoc_eq a b c)
 
-def wtLeftUnitPath (a : WTerm G) :
+noncomputable def wtLeftUnitPath (a : WTerm G) :
     Path (WTerm.mk_mul WTerm.one a) a :=
   Path.mk [Step.mk _ _ (WTerm.one_mul_eq a)] (WTerm.one_mul_eq a)
 
-def wtRightUnitPath (a : WTerm G) :
+noncomputable def wtRightUnitPath (a : WTerm G) :
     Path (WTerm.mk_mul a WTerm.one) a :=
   Path.mk [Step.mk _ _ (WTerm.mul_one_eq a)] (WTerm.mul_one_eq a)
 
-def wtInvInvPath (a : WTerm G) :
+noncomputable def wtInvInvPath (a : WTerm G) :
     Path (WTerm.mk_inv (WTerm.mk_inv a)) a :=
   Path.mk [Step.mk _ _ (WTerm.inv_inv_eq a)] (WTerm.inv_inv_eq a)
 
 /-- Pentagon for WTerm: 2-step chain. -/
-def wtPentagonPath (a b c d : WTerm G) :
+noncomputable def wtPentagonPath (a b c d : WTerm G) :
     Path (WTerm.mk_mul (WTerm.mk_mul (WTerm.mk_mul a b) c) d)
       (WTerm.mk_mul a (WTerm.mk_mul b (WTerm.mk_mul c d))) :=
   Path.trans (wtAssocPath (WTerm.mk_mul a b) c d) (wtAssocPath a b (WTerm.mk_mul c d))
 
 /-- Alt pentagon via congrArg: 3-step chain. -/
-def wtPentagonPath' (a b c d : WTerm G) :
+noncomputable def wtPentagonPath' (a b c d : WTerm G) :
     Path (WTerm.mk_mul (WTerm.mk_mul (WTerm.mk_mul a b) c) d)
       (WTerm.mk_mul a (WTerm.mk_mul b (WTerm.mk_mul c d))) :=
   Path.trans
@@ -505,11 +505,11 @@ theorem wt_pentagon_coherence (a b c d : WTerm G) :
     (wtPentagonPath a b c d).proof = (wtPentagonPath' a b c d).proof := rfl
 
 /-- Triangle for WTerm: coherence. -/
-def wtTrianglePath (a b : WTerm G) :
+noncomputable def wtTrianglePath (a b : WTerm G) :
     Path (WTerm.mk_mul (WTerm.mk_mul a WTerm.one) b) (WTerm.mk_mul a b) :=
   Path.congrArg (fun x => WTerm.mk_mul x b) (wtRightUnitPath a)
 
-def wtTrianglePath' (a b : WTerm G) :
+noncomputable def wtTrianglePath' (a b : WTerm G) :
     Path (WTerm.mk_mul (WTerm.mk_mul a WTerm.one) b) (WTerm.mk_mul a b) :=
   Path.trans
     (wtAssocPath a WTerm.one b)
@@ -530,32 +530,32 @@ structure TwoCell {A : Type u} {a b : A} (p q : Path a b) where
 namespace TwoCell
 variable {A : Type u} {a b c : A}
 
-def ofUIP (p q : Path a b) : TwoCell p q := ⟨rfl⟩
-def rfl' (p : Path a b) : TwoCell p p := ⟨Eq.refl _⟩
-def symm' {p q : Path a b} (t : TwoCell p q) : TwoCell q p := ⟨t.eq.symm⟩
+noncomputable def ofUIP (p q : Path a b) : TwoCell p q := ⟨rfl⟩
+noncomputable def rfl' (p : Path a b) : TwoCell p p := ⟨Eq.refl _⟩
+noncomputable def symm' {p q : Path a b} (t : TwoCell p q) : TwoCell q p := ⟨t.eq.symm⟩
 
-def trans' {p q r : Path a b} (t₁ : TwoCell p q) (t₂ : TwoCell q r) : TwoCell p r :=
+noncomputable def trans' {p q r : Path a b} (t₁ : TwoCell p q) (t₂ : TwoCell q r) : TwoCell p r :=
   ⟨t₁.eq.trans t₂.eq⟩
 
 /-- Horizontal composition of 2-cells. -/
-def hcomp {p₁ q₁ : Path a b} {p₂ q₂ : Path b c}
+noncomputable def hcomp {p₁ q₁ : Path a b} {p₂ q₂ : Path b c}
     (_ : TwoCell p₁ q₁) (_ : TwoCell p₂ q₂) :
     TwoCell (Path.trans p₁ p₂) (Path.trans q₁ q₂) := ofUIP _ _
 
 /-- Left whiskering. -/
-def whiskerL (p : Path a b) {q r : Path b c} (_ : TwoCell q r) :
+noncomputable def whiskerL (p : Path a b) {q r : Path b c} (_ : TwoCell q r) :
     TwoCell (Path.trans p q) (Path.trans p r) := ofUIP _ _
 
 /-- Right whiskering. -/
-def whiskerR {p q : Path a b} (_ : TwoCell p q) (r : Path b c) :
+noncomputable def whiskerR {p q : Path a b} (_ : TwoCell p q) (r : Path b c) :
     TwoCell (Path.trans p r) (Path.trans q r) := ofUIP _ _
 
 /-- Congruence of 2-cells under congrArg. -/
-def congrMap (f : A → A) {p q : Path a b} (_ : TwoCell p q) :
+noncomputable def congrMap (f : A → A) {p q : Path a b} (_ : TwoCell p q) :
     TwoCell (Path.congrArg f p) (Path.congrArg f q) := ofUIP _ _
 
 /-- Congruence of 2-cells under symm. -/
-def symmMap {p q : Path a b} (_ : TwoCell p q) :
+noncomputable def symmMap {p q : Path a b} (_ : TwoCell p q) :
     TwoCell (Path.symm p) (Path.symm q) := ofUIP _ _
 
 /-! ### 2-cell groupoid laws -/
@@ -603,11 +603,11 @@ namespace Syzygy
 variable {G : Type u}
 
 /-- Swap the two paths: inverse 2-cell. -/
-def inv (s : Syzygy G) : Syzygy G :=
+noncomputable def inv (s : Syzygy G) : Syzygy G :=
   { s with pathL := s.pathR, pathR := s.pathL }
 
 /-- Vertical composition of syzygies. -/
-def vcomp (s₁ s₂ : Syzygy G) : Syzygy G where
+noncomputable def vcomp (s₁ s₂ : Syzygy G) : Syzygy G where
   src := s₁.src
   tgt := s₂.tgt
   pathL := Derivation.comp s₁.pathL s₂.pathL
@@ -644,34 +644,34 @@ structure CoherentPres (G : Type u) where
 namespace CoherentPres
 variable {G : Type u}
 
-def numGens (C : CoherentPres G) : Nat := C.genSet.length
-def numRels (C : CoherentPres G) : Nat := C.relations.length
-def numSyz  (C : CoherentPres G) : Nat := C.syzygies.length
+noncomputable def numGens (C : CoherentPres G) : Nat := C.genSet.length
+noncomputable def numRels (C : CoherentPres G) : Nat := C.relations.length
+noncomputable def numSyz  (C : CoherentPres G) : Nat := C.syzygies.length
 
 /-- Euler characteristic of the presentation 2-complex: χ = |G| - |R| + |S|. -/
-def eulerChar (C : CoherentPres G) : Int :=
+noncomputable def eulerChar (C : CoherentPres G) : Int :=
   (C.numGens : Int) - (C.numRels : Int) + (C.numSyz : Int)
 
 /-- A presentation is aspherical when it needs no syzygies. -/
-def isAspherical (C : CoherentPres G) : Prop := C.syzygies = []
+noncomputable def isAspherical (C : CoherentPres G) : Prop := C.syzygies = []
 
 /-! ### Tietze transformations -/
 
 /-- Add a generator + its defining relation. -/
-def addGen [DecidableEq G] (C : CoherentPres G) (g : G) (defn : FreeWord G) :
+noncomputable def addGen [DecidableEq G] (C : CoherentPres G) (g : G) (defn : FreeWord G) :
     CoherentPres G where
   genSet := C.genSet ++ [g]
   relations := C.relations ++ [(FreeWord.gen g, defn)]
   syzygies := C.syzygies
 
 /-- Add a redundant relation. -/
-def addRel (C : CoherentPres G) (l r : FreeWord G) : CoherentPres G where
+noncomputable def addRel (C : CoherentPres G) (l r : FreeWord G) : CoherentPres G where
   genSet := C.genSet
   relations := C.relations ++ [(l, r)]
   syzygies := C.syzygies
 
 /-- Add a syzygy (2-cell). -/
-def addSyz (C : CoherentPres G) (s : List Nat × List Nat) : CoherentPres G where
+noncomputable def addSyz (C : CoherentPres G) (s : List Nat × List Nat) : CoherentPres G where
   genSet := C.genSet
   relations := C.relations
   syzygies := C.syzygies ++ [s]
@@ -732,10 +732,10 @@ inductive TietzeOp (G : Type u) where
 namespace TietzeSeq
 variable {G : Type u}
 
-def nil : TietzeSeq G := ⟨[]⟩
-def single (t : TietzeOp G) : TietzeSeq G := ⟨[t]⟩
-def comp (s₁ s₂ : TietzeSeq G) : TietzeSeq G := ⟨s₁.ops ++ s₂.ops⟩
-def tlen (s : TietzeSeq G) : Nat := s.ops.length
+noncomputable def nil : TietzeSeq G := ⟨[]⟩
+noncomputable def single (t : TietzeOp G) : TietzeSeq G := ⟨[t]⟩
+noncomputable def comp (s₁ s₂ : TietzeSeq G) : TietzeSeq G := ⟨s₁.ops ++ s₂.ops⟩
+noncomputable def tlen (s : TietzeSeq G) : Nat := s.ops.length
 
 theorem comp_len (s₁ s₂ : TietzeSeq G) :
     (comp s₁ s₂).tlen = s₁.tlen + s₂.tlen := by
@@ -765,21 +765,21 @@ namespace SubgroupFilter
 variable {G : Type u}
 
 /-- The trivial subgroup. -/
-def trivial : SubgroupFilter G where
+noncomputable def trivial : SubgroupFilter G where
   mem w := w = FreeWord.ε
   mem_ε := rfl
   mem_mul := fun u v hu hv => by ext; simp [FreeWord.mul, hu, hv]
   mem_inv := fun w hw => by simp [hw]
 
 /-- The whole group. -/
-def whole : SubgroupFilter G where
+noncomputable def whole : SubgroupFilter G where
   mem _ := True
   mem_ε := True.intro
   mem_mul := fun _ _ _ _ => True.intro
   mem_inv := fun _ _ => True.intro
 
 /-- Intersection of two subgroup filters. -/
-def inter (F₁ F₂ : SubgroupFilter G) : SubgroupFilter G where
+noncomputable def inter (F₁ F₂ : SubgroupFilter G) : SubgroupFilter G where
   mem w := F₁.mem w ∧ F₂.mem w
   mem_ε := ⟨F₁.mem_ε, F₂.mem_ε⟩
   mem_mul := fun u v ⟨h₁u, h₂u⟩ ⟨h₁v, h₂v⟩ =>
@@ -799,10 +799,10 @@ end SubgroupFilter
 section RankDeficiency
 variable {G : Type u}
 
-def presRank (C : CoherentPres G) : Int :=
+noncomputable def presRank (C : CoherentPres G) : Int :=
   (C.numGens : Int) - (C.numRels : Int)
 
-def deficiency (C : CoherentPres G) : Int :=
+noncomputable def deficiency (C : CoherentPres G) : Int :=
   (C.numGens : Int) - (C.numRels : Int)
 
 theorem presRank_eq_deficiency (C : CoherentPres G) :
@@ -826,7 +826,7 @@ section SpecificPres
 variable {G : Type u}
 
 /-- Free group: no relations, no syzygies. -/
-def freeGroupPres (gens : List G) : CoherentPres G where
+noncomputable def freeGroupPres (gens : List G) : CoherentPres G where
   genSet := gens; relations := []; syzygies := []
 
 theorem freeGroupPres_rank (gens : List G) :
@@ -846,7 +846,7 @@ theorem freeGroupPres_eulerChar (gens : List G) :
         CoherentPres.numRels, CoherentPres.numSyz]
 
 /-- Cyclic group Z_n. -/
-def cyclicPres (g : G) (n : Nat) : CoherentPres G where
+noncomputable def cyclicPres (g : G) (n : Nat) : CoherentPres G where
   genSet := [g]
   relations := [(⟨List.replicate n ⟨g, true⟩⟩, FreeWord.ε)]
   syzygies := []
@@ -877,7 +877,7 @@ end SpecificPres
 section FreeProduct
 variable {G : Type u}
 
-def freeProduct (C₁ C₂ : CoherentPres G) : CoherentPres G where
+noncomputable def freeProduct (C₁ C₂ : CoherentPres G) : CoherentPres G where
   genSet := C₁.genSet ++ C₂.genSet
   relations := C₁.relations ++ C₂.relations
   syzygies := C₁.syzygies ++ C₂.syzygies
@@ -916,9 +916,9 @@ structure WordRWS (G : Type u) where
 namespace WordRWS
 variable {G : Type u}
 
-def numRules (S : WordRWS G) : Nat := S.rules.length
+noncomputable def numRules (S : WordRWS G) : Nat := S.rules.length
 
-def toPres (S : WordRWS G) : CoherentPres G where
+noncomputable def toPres (S : WordRWS G) : CoherentPres G where
   genSet := []; relations := S.rules; syzygies := []
 
 theorem toPres_aspherical (S : WordRWS G) :
@@ -941,7 +941,7 @@ namespace CayleyEdge
 variable {G : Type u}
 
 /-- Cayley edge → computational path. -/
-def toPath (e : CayleyEdge G) :
+noncomputable def toPath (e : CayleyEdge G) :
     Path (A := FreeWord G) e.src.word e.tgt.word :=
   Path.mk [Step.mk e.src.word e.tgt.word e.conn] e.conn
 
@@ -956,11 +956,11 @@ structure CayleyPath (G : Type u) where
 namespace CayleyPath
 variable {G : Type u}
 
-def trivial (v : CayleyVertex G) : CayleyPath G where
+noncomputable def trivial (v : CayleyVertex G) : CayleyPath G where
   verts := [v]; edges := []
   compat := Or.inr ⟨rfl, Nat.le.refl⟩
 
-def plen (p : CayleyPath G) : Nat := p.edges.length
+noncomputable def plen (p : CayleyPath G) : Nat := p.edges.length
 
 theorem trivial_plen (v : CayleyVertex G) : (trivial v).plen = 0 := rfl
 
@@ -978,11 +978,11 @@ structure PresMorphism (C₁ C₂ : CoherentPres G) where
 
 namespace PresMorphism
 
-def id' (C : CoherentPres G) : PresMorphism C C where
+noncomputable def id' (C : CoherentPres G) : PresMorphism C C where
   onGens := fun x => x
   relBound := Nat.le.refl
 
-def comp' {C₁ C₂ C₃ : CoherentPres G}
+noncomputable def comp' {C₁ C₂ C₃ : CoherentPres G}
     (f : PresMorphism C₂ C₃) (g : PresMorphism C₁ C₂) :
     PresMorphism C₁ C₃ where
   onGens := f.onGens ∘ g.onGens

@@ -93,7 +93,7 @@ structure QUEAlgebra where
   antipode : A → A
 
 /-- Path.trans: K involution via double inverse. -/
-def K_double_inv (U : QUEAlgebra.{u}) (i : U.rank) :
+noncomputable def K_double_inv (U : QUEAlgebra.{u}) (i : U.rank) :
     Path (U.mul (U.K i) (U.mul (U.Kinv i) (U.K i))) (U.mul (U.K i) U.one) :=
   Path.congrArg (U.mul (U.K i)) (U.K_inv_left i)
 
@@ -140,7 +140,7 @@ structure CrystalBase (U : QUEAlgebra.{u}) where
     Path (wt b') (wt b')  -- simplified: weight shift
 
 /-- Path.trans: composing Kashiwara operators. -/
-def kashiwara_compose {U : QUEAlgebra.{u}} (cb : CrystalBase U)
+noncomputable def kashiwara_compose {U : QUEAlgebra.{u}} (cb : CrystalBase U)
     (i : U.rank) (b : cb.B) :
     Path (cb.kashiwara_e i b) (cb.kashiwara_e i b) :=
   Path.refl _
@@ -173,7 +173,7 @@ structure CanonicalBasis (U : QUEAlgebra.{u}) where
   positivity : True
 
 /-- Path.trans: bar involution double application. -/
-def bar_double {U : QUEAlgebra.{u}} (cb : CanonicalBasis U) (a : U.A) :
+noncomputable def bar_double {U : QUEAlgebra.{u}} (cb : CanonicalBasis U) (a : U.A) :
     Path (cb.bar (cb.bar a)) a :=
   cb.bar_invol a
 
@@ -198,7 +198,7 @@ structure TensorProductRule (U : QUEAlgebra.{u})
     Path (B1.wt (left b')) (B1.wt (left b'))
 
 /-- Path.trans: composing tensor products associatively. -/
-def tensor_assoc {U : QUEAlgebra.{u}}
+noncomputable def tensor_assoc {U : QUEAlgebra.{u}}
     {B1 B2 B3 : CrystalBase U}
     (t12 : TensorProductRule U B1 B2)
     (_t123 : TensorProductRule U B1 B3)
@@ -225,12 +225,12 @@ structure RMatrixAction (U : QUEAlgebra.{u}) (ρ : QRep U) where
           (ρ.action a v', ρ.action a w'))
 
 /-- Braiding on triple tensor products for Yang-Baxter. -/
-def R12 {V : Type u} (R : V × V → V × V) (x : V × V × V) : V × V × V :=
+noncomputable def R12 {V : Type u} (R : V × V → V × V) (x : V × V × V) : V × V × V :=
   let (a, b, c) := x
   let (a', b') := R (a, b)
   (a', b', c)
 
-def R23 {V : Type u} (R : V × V → V × V) (x : V × V × V) : V × V × V :=
+noncomputable def R23 {V : Type u} (R : V × V → V × V) (x : V × V × V) : V × V × V :=
   let (a, b, c) := x
   let (b', c') := R (b, c)
   (a, b', c')
@@ -244,14 +244,14 @@ structure YangBaxterPath (U : QUEAlgebra.{u}) (ρ : QRep U)
          (R23 rm.rmat (R12 rm.rmat (R23 rm.rmat x)))
 
 /-- Path.trans: Yang-Baxter implies braid relation. -/
-def yang_baxter_braid {U : QUEAlgebra.{u}} {ρ : QRep U} {rm : RMatrixAction U ρ}
+noncomputable def yang_baxter_braid {U : QUEAlgebra.{u}} {ρ : QRep U} {rm : RMatrixAction U ρ}
     (yb : YangBaxterPath U ρ rm) (x : ρ.V × ρ.V × ρ.V) :
     Path (R12 rm.rmat (R23 rm.rmat (R12 rm.rmat x)))
          (R23 rm.rmat (R12 rm.rmat (R23 rm.rmat x))) :=
   yb.yang_baxter x
 
 /-- Path.symm: Yang-Baxter in reverse direction. -/
-def yang_baxter_reverse {U : QUEAlgebra.{u}} {ρ : QRep U} {rm : RMatrixAction U ρ}
+noncomputable def yang_baxter_reverse {U : QUEAlgebra.{u}} {ρ : QRep U} {rm : RMatrixAction U ρ}
     (yb : YangBaxterPath U ρ rm) (x : ρ.V × ρ.V × ρ.V) :
     Path (R23 rm.rmat (R12 rm.rmat (R23 rm.rmat x)))
          (R12 rm.rmat (R23 rm.rmat (R12 rm.rmat x))) :=

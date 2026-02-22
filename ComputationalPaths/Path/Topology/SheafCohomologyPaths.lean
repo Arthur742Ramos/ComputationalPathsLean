@@ -76,12 +76,12 @@ structure Sheaf (U : OpenCover.{u, v}) extends Presheaf U where
   condition : SheafCondition toPresheaf
 
 /-- The glued global element of a matching family. -/
-def glue_global {U : OpenCover.{u, v}} (S : Sheaf U) (m : MatchingFamily S.toPresheaf) :
+noncomputable def glue_global {U : OpenCover.{u, v}} (S : Sheaf U) (m : MatchingFamily S.toPresheaf) :
     S.globalSections :=
   S.condition.glue m
 
 /-- Glued elements restrict to the matching family. -/
-def glue_restrict {U : OpenCover.{u, v}} (S : Sheaf U) (m : MatchingFamily S.toPresheaf)
+noncomputable def glue_restrict {U : OpenCover.{u, v}} (S : Sheaf U) (m : MatchingFamily S.toPresheaf)
     (i : U.index) :
     Path (S.restrictGlobal i (glue_global S m)) (m.localData i) :=
   S.condition.glue_restrict m i
@@ -137,7 +137,7 @@ structure SheafCohomology {U : OpenCover.{u, v}} (S : Sheaf U) where
   grp_structure : ∀ (n : Nat), StrictGroup (grp n)
 
 /-- The degree-n sheaf cohomology group. -/
-def sheaf_cohomology_group {U : OpenCover.{u, v}} {S : Sheaf U}
+noncomputable def sheaf_cohomology_group {U : OpenCover.{u, v}} {S : Sheaf U}
     (H : SheafCohomology S) (n : Nat) : Type v :=
   H.grp n
 
@@ -166,7 +166,7 @@ structure LongExactSequence {U : OpenCover.{u, v}} (S : ShortExactSheaves U) whe
   exact : ∀ (n : Nat), Path n n
 
 /-- The connecting morphism in the long exact sequence. -/
-def connecting_map {U : OpenCover.{u, v}} {S : ShortExactSheaves U}
+noncomputable def connecting_map {U : OpenCover.{u, v}} {S : ShortExactSheaves U}
     (L : LongExactSequence S) (n : Nat) :
     L.rightCohomology.grp n → L.leftCohomology.grp (n + 1) :=
   L.delta n
@@ -187,12 +187,12 @@ structure LeraySpectralSequence {U : OpenCover.{u, v}} (S : Sheaf U) where
   converges : ∀ (n : Nat), Path n n
 
 /-- The Leray spectral sequence converges (structural witness). -/
-def leray_converges {U : OpenCover.{u, v}} {S : Sheaf U}
+noncomputable def leray_converges {U : OpenCover.{u, v}} {S : Sheaf U}
     (L : LeraySpectralSequence S) (n : Nat) : Path n n :=
   L.converges n
 
 /-- Rewrite-equivalent convergence witnesses induce equivalent transports. -/
-def leray_converges_transport {U : OpenCover.{u, v}} {S : Sheaf U}
+noncomputable def leray_converges_transport {U : OpenCover.{u, v}} {S : Sheaf U}
     (L : LeraySpectralSequence S) (n : Nat) {q : Path n n}
     (h : RwEq (L.converges n) q) :
     Path (transport (D := fun m : Nat => Path n m) (L.converges n) (Path.refl n))
@@ -202,7 +202,7 @@ def leray_converges_transport {U : OpenCover.{u, v}} {S : Sheaf U}
     (p := L.converges n) (q := q) h (Path.refl n)
 
 /-- Composition of transport witnesses along two Leray convergence rewrites. -/
-def leray_converges_transport_comp {U : OpenCover.{u, v}} {S : Sheaf U}
+noncomputable def leray_converges_transport_comp {U : OpenCover.{u, v}} {S : Sheaf U}
     (L : LeraySpectralSequence S) (n : Nat) {q r : Path n n}
     (h₁ : RwEq (L.converges n) q) (h₂ : RwEq q r) :
     Path (transport (D := fun m : Nat => Path n m) (L.converges n) (Path.refl n))

@@ -27,41 +27,41 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   witness : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
 
-def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
+noncomputable def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.witness.trans τ.witness⟩
 
-def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
+noncomputable def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.witness.symm⟩
 
-def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
+noncomputable def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
     Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (Path.trans r) σ.witness⟩
 
-def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
+noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.witness⟩
 
@@ -102,19 +102,19 @@ structure ChainComplex where
 deriving DecidableEq, Repr
 
 /-- Degree shift [n]. -/
-def ChainComplex.shift (C : ChainComplex) (n : Int) : ChainComplex :=
+noncomputable def ChainComplex.shift (C : ChainComplex) (n : Int) : ChainComplex :=
   { name := C.name ++ "[" ++ toString n ++ "]"
     id := C.id * 1000 + n.toNat
     differentialSquareZero := C.differentialSquareZero }
 
 /-- Direct sum. -/
-def ChainComplex.directSum (C D : ChainComplex) : ChainComplex :=
+noncomputable def ChainComplex.directSum (C D : ChainComplex) : ChainComplex :=
   { name := C.name ++ " ⊕ " ++ D.name
     id := C.id * 10000 + D.id
     differentialSquareZero := C.differentialSquareZero && D.differentialSquareZero }
 
 /-- Zero complex. -/
-def ChainComplex.zero : ChainComplex :=
+noncomputable def ChainComplex.zero : ChainComplex :=
   { name := "0", id := 0, differentialSquareZero := true }
 
 -- ============================================================
@@ -129,10 +129,10 @@ structure ChainMap where
   commutesDifferential : Bool  -- witnesses f∘d = d∘f
 deriving Repr
 
-def ChainMap.id (C : ChainComplex) : ChainMap :=
+noncomputable def ChainMap.id (C : ChainComplex) : ChainMap :=
   ⟨C, C, "id_" ++ C.name, true⟩
 
-def ChainMap.comp (f : ChainMap) (g : ChainMap) (_ : f.target = g.source) : ChainMap :=
+noncomputable def ChainMap.comp (f : ChainMap) (g : ChainMap) (_ : f.target = g.source) : ChainMap :=
   ⟨f.source, g.target, g.name ++ " ∘ " ++ f.name,
    f.commutesDifferential && g.commutesDifferential⟩
 
@@ -141,24 +141,24 @@ def ChainMap.comp (f : ChainMap) (g : ChainMap) (_ : f.target = g.source) : Chai
 -- ============================================================
 
 /-- A chain homotopy is a computational path step between chain maps. -/
-def HomotopyStep (f g : ChainMap) (_h : f.source = g.source) (_h' : f.target = g.target) :
+noncomputable def HomotopyStep (f g : ChainMap) (_h : f.source = g.source) (_h' : f.target = g.target) :
     Step ChainMap f g :=
   Step.rule ("homotopy:" ++ f.name ++ "~" ++ g.name) f g
 
 /-- Chain homotopy equivalence = path between chain maps. -/
-def ChainHomotopy (f g : ChainMap) := Path ChainMap f g
+noncomputable def ChainHomotopy (f g : ChainMap) := Path ChainMap f g
 
 /-- Reflexive: any chain map is homotopic to itself. -/
-def ChainHomotopy.refl (f : ChainMap) : ChainHomotopy f f :=
+noncomputable def ChainHomotopy.refl (f : ChainMap) : ChainHomotopy f f :=
   Path.nil f
 
 /-- Transitive: compose homotopies by trans. -/
-def ChainHomotopy.compose {f g h : ChainMap} (p : ChainHomotopy f g) (q : ChainHomotopy g h) :
+noncomputable def ChainHomotopy.compose {f g h : ChainMap} (p : ChainHomotopy f g) (q : ChainHomotopy g h) :
     ChainHomotopy f h :=
   p.trans q
 
 /-- Symmetric: reverse homotopy. -/
-def ChainHomotopy.reverse {f g : ChainMap} (p : ChainHomotopy f g) : ChainHomotopy g f :=
+noncomputable def ChainHomotopy.reverse {f g : ChainMap} (p : ChainHomotopy f g) : ChainHomotopy g f :=
   p.symm
 
 -- ============================================================
@@ -195,7 +195,7 @@ structure KMor (X Y : KObj) where
   tgt_ok : representative.target = Y.complex
 
 /-- Two K-morphisms are equal if connected by a homotopy path. -/
-def KMor.homotopic {X Y : KObj} (f g : KMor X Y) : Prop :=
+noncomputable def KMor.homotopic {X Y : KObj} (f g : KMor X Y) : Prop :=
   ∃ (_ : ChainHomotopy f.representative g.representative), True
 
 /-- Theorem 1: Homotopy equivalence is reflexive. -/
@@ -240,14 +240,14 @@ inductive DCStep : ChainComplex → ChainComplex → Type where
   | shift : (n : Int) → DCStep C (C.shift n)
 
 /-- Derived-category path = zigzag of chain maps and roofs. -/
-def DCPath := Path ChainComplex
+noncomputable def DCPath := Path ChainComplex
 
 /-- Single chain map as a derived-category path. -/
-def dcMapPath (f : ChainMap) : DCPath f.source f.target :=
+noncomputable def dcMapPath (f : ChainMap) : DCPath f.source f.target :=
   Path.single (Step.rule ("map:" ++ f.name) f.source f.target)
 
 /-- Compose derived-category paths. -/
-def dcCompose {A B C : ChainComplex} (p : DCPath A B) (q : DCPath B C) : DCPath A C :=
+noncomputable def dcCompose {A B C : ChainComplex} (p : DCPath A B) (q : DCPath B C) : DCPath A C :=
   p.trans q
 
 /-- Theorem 3: Derived-category path composition is associative. -/
@@ -280,7 +280,7 @@ structure Triangle where
   hTgt : h.target = X.shift 1
 
 /-- Rotation of a triangle. -/
-def Triangle.rotate (T : Triangle) : Triangle :=
+noncomputable def Triangle.rotate (T : Triangle) : Triangle :=
   { X := T.Y, Y := T.Z, Z := T.X.shift 1
     f := T.g, g := T.h
     h := ⟨T.X.shift 1, T.Y.shift 1, "rotate_" ++ T.f.name, T.f.commutesDifferential⟩
@@ -343,7 +343,7 @@ theorem left_derived_idem (F : AdditiveFunctor) (LD : LeftDerived F) (C : ChainC
   rfl
 
 /-- Path witnessing the derived-functor computation. -/
-def leftDerivedPath (F : AdditiveFunctor) (LD : LeftDerived F) (C : ChainComplex) :
+noncomputable def leftDerivedPath (F : AdditiveFunctor) (LD : LeftDerived F) (C : ChainComplex) :
     Path ChainComplex (F.mapObj (LD.resolve C)) (F.mapObj (LD.resolve C)) :=
   Path.nil _
 
@@ -368,7 +368,7 @@ theorem right_derived_idem (F : AdditiveFunctor) (RD : RightDerived F) (C : Chai
   rfl
 
 /-- Path for right-derived computation. -/
-def rightDerivedPath (F : AdditiveFunctor) (RD : RightDerived F) (C : ChainComplex) :
+noncomputable def rightDerivedPath (F : AdditiveFunctor) (RD : RightDerived F) (C : ChainComplex) :
     Path ChainComplex (F.mapObj (RD.resolve C)) (F.mapObj (RD.resolve C)) :=
   Path.nil _
 
@@ -383,13 +383,13 @@ theorem right_derived_path_length (F : AdditiveFunctor) (RD : RightDerived F)
 -- ============================================================
 
 /-- The mapping cone of a chain map. -/
-def mappingCone (f : ChainMap) : ChainComplex :=
+noncomputable def mappingCone (f : ChainMap) : ChainComplex :=
   { name := "Cone(" ++ f.name ++ ")"
     id := f.source.id * 100 + f.target.id
     differentialSquareZero := f.commutesDifferential }
 
 /-- Cone of identity map. -/
-def coneOfId (C : ChainComplex) : ChainComplex :=
+noncomputable def coneOfId (C : ChainComplex) : ChainComplex :=
   mappingCone (ChainMap.id C)
 
 /-- Theorem 13: Cone of identity is exact (differential square zero). -/
@@ -398,7 +398,7 @@ theorem cone_id_dsz (C : ChainComplex) :
   simp [coneOfId, mappingCone, ChainMap.id]
 
 /-- The canonical triangle associated to f. -/
-def mappingConeTriangle (f : ChainMap) : Triangle :=
+noncomputable def mappingConeTriangle (f : ChainMap) : Triangle :=
   { X := f.source
     Y := f.target
     Z := mappingCone f
@@ -438,7 +438,7 @@ structure OctahedralData where
   gfTgt : gf.target = Z
 
 /-- Path witnessing the octahedral relation. -/
-def octahedralPath (od : OctahedralData) :
+noncomputable def octahedralPath (od : OctahedralData) :
     Path ChainComplex (mappingCone od.f) (mappingCone od.f) :=
   let s1 := Step.rule "oct:cone(f)→cone(gf)" (mappingCone od.f) (mappingCone od.gf)
   let s2 := Step.rule "oct:cone(gf)→cone(g)" (mappingCone od.gf) (mappingCone od.g)
@@ -460,7 +460,7 @@ theorem octahedral_path_symm_length (od : OctahedralData) :
 -- ============================================================
 
 /-- Ext computation path: Ext^n(A,B) via injective resolution of B. -/
-def extPath (A _B : ChainComplex) : Path ChainComplex A A :=
+noncomputable def extPath (A _B : ChainComplex) : Path ChainComplex A A :=
   let s1 := Step.rule "resolve_inj(B)" A A
   let s2 := Step.rule "apply_Hom(A,-)" A A
   let s3 := Step.rule "take_homology" A A
@@ -472,7 +472,7 @@ theorem ext_path_length (A B : ChainComplex) :
   simp [extPath, Path.trans, Path.single, Path.length]
 
 /-- Tor computation path: Tor_n(A,B) via projective resolution of A. -/
-def torPath (_A B : ChainComplex) : Path ChainComplex B B :=
+noncomputable def torPath (_A B : ChainComplex) : Path ChainComplex B B :=
   let s1 := Step.rule "resolve_proj(A)" B B
   let s2 := Step.rule "apply_(-⊗B)" B B
   let s3 := Step.rule "take_homology" B B
@@ -488,7 +488,7 @@ theorem tor_path_length (A B : ChainComplex) :
 -- ============================================================
 
 /-- Step in the long exact sequence: H_n(X) → H_n(Y) → H_n(Z) → H_{n-1}(X). -/
-def lesPath (T : Triangle) : Path ChainComplex T.X T.X :=
+noncomputable def lesPath (T : Triangle) : Path ChainComplex T.X T.X :=
   let s1 := Step.rule "H(f)" T.X T.Y
   let s2 := Step.rule "H(g)" T.Y T.Z
   let s3 := Step.rule "connecting" T.Z T.X
@@ -540,7 +540,7 @@ theorem whiskerR_id (p : Path α a b) (r : Path α b c) :
 -- ============================================================
 
 /-- Direct sum path: C ⊕ 0 ≅ C witnessed by a path. -/
-def directSumZeroPath (C : ChainComplex) :
+noncomputable def directSumZeroPath (C : ChainComplex) :
     Path ChainComplex (ChainComplex.directSum C ChainComplex.zero)
                        (ChainComplex.directSum C ChainComplex.zero) :=
   Path.nil _
@@ -551,7 +551,7 @@ theorem direct_sum_zero_path_length (C : ChainComplex) :
   simp [directSumZeroPath, Path.length]
 
 /-- Shift path: C[0] ≅ C. -/
-def shiftZeroPath (C : ChainComplex) :
+noncomputable def shiftZeroPath (C : ChainComplex) :
     Path ChainComplex (C.shift 0) (C.shift 0) :=
   Path.nil _
 
@@ -561,7 +561,7 @@ theorem shift_zero_path_length (C : ChainComplex) :
   simp [shiftZeroPath, Path.length]
 
 /-- Double shift path: C[m][n] ~ C[m+n]. -/
-def doubleShiftPath (C : ChainComplex) (m n : Int) :
+noncomputable def doubleShiftPath (C : ChainComplex) (m n : Int) :
     Path ChainComplex ((C.shift m).shift n) ((C.shift m).shift n) :=
   let s := Step.rule "shift_add" ((C.shift m).shift n) ((C.shift m).shift n)
   Path.single s
@@ -576,7 +576,7 @@ theorem double_shift_path_length (C : ChainComplex) (m n : Int) :
 -- ============================================================
 
 /-- Path of quasi-isomorphisms. -/
-def qiPath (f g : ChainMap) (_hf : QuasiIso f) (_hg : QuasiIso g)
+noncomputable def qiPath (f g : ChainMap) (_hf : QuasiIso f) (_hg : QuasiIso g)
     (h1 : f.target = g.source) :
     Path ChainMap f (f.comp g h1) :=
   Path.single (Step.rule ("qi_compose") f (f.comp g h1))
@@ -598,7 +598,7 @@ theorem qi_path_symm_length (f g : ChainMap) (_hf : QuasiIso f) (_hg : QuasiIso 
 -- ============================================================
 
 /-- Homotopy limit computation: tower of fibrations. -/
-def holimPath (cs : List ChainComplex) : Path ChainComplex ChainComplex.zero ChainComplex.zero :=
+noncomputable def holimPath (cs : List ChainComplex) : Path ChainComplex ChainComplex.zero ChainComplex.zero :=
   cs.foldl (fun acc c =>
     acc.trans (Path.single (Step.rule ("holim_step:" ++ c.name) ChainComplex.zero ChainComplex.zero))
   ) (Path.nil _)
@@ -612,7 +612,7 @@ theorem holim_singleton (C : ChainComplex) : (holimPath [C]).length = 1 := by
   simp [holimPath, Path.trans, Path.single, Path.length]
 
 /-- Homotopy colimit computation. -/
-def hocolimPath (cs : List ChainComplex) : Path ChainComplex ChainComplex.zero ChainComplex.zero :=
+noncomputable def hocolimPath (cs : List ChainComplex) : Path ChainComplex ChainComplex.zero ChainComplex.zero :=
   cs.foldl (fun acc c =>
     acc.trans (Path.single (Step.rule ("hocolim_step:" ++ c.name) ChainComplex.zero ChainComplex.zero))
   ) (Path.nil _)
@@ -632,7 +632,7 @@ structure SpectralPage where
   differentialLength : Nat  -- d_r has bidegree (-r, r-1)
 
 /-- Path from page 0 to page n via page turns. -/
-def spectralPath : (n : Nat) → Path Nat 0 n
+noncomputable def spectralPath : (n : Nat) → Path Nat 0 n
   | 0 => Path.nil 0
   | n + 1 => (spectralPath n).trans (Path.single (Step.rule ("page_turn_" ++ toString n) n (n + 1)))
 
@@ -660,7 +660,7 @@ theorem exact_functor_name (F : ExactFunctor) :
     F.name = F.toAdditiveFunctor.name := rfl
 
 /-- Adjunction path: L ⊣ R witnessed by unit and counit. -/
-def adjunctionPath (_L _R : AdditiveFunctor) :
+noncomputable def adjunctionPath (_L _R : AdditiveFunctor) :
     Path String "L⊣R" "L⊣R" :=
   let s1 := Step.rule "unit:Id→RL" "L⊣R" "L⊣R"
   let s2 := Step.rule "counit:LR→Id" "L⊣R" "L⊣R"
@@ -683,7 +683,7 @@ structure TStructure where
   truncAbove : ChainComplex → ChainComplex  -- τ≥n
 
 /-- Truncation path: C → τ≤n C → τ≥n τ≤n C. -/
-def truncationPath (t : TStructure) (C : ChainComplex) :
+noncomputable def truncationPath (t : TStructure) (C : ChainComplex) :
     Path ChainComplex C (t.truncAbove (t.truncBelow C)) :=
   let s1 := Step.rule "τ≤n" C (t.truncBelow C)
   let s2 := Step.rule "τ≥n" (t.truncBelow C) (t.truncAbove (t.truncBelow C))
@@ -723,7 +723,7 @@ structure LeftFraction where
   sQI : QuasiIso s
 
 /-- Path representing fraction composition. -/
-def fractionComposePath (lf₁ lf₂ : LeftFraction)
+noncomputable def fractionComposePath (lf₁ lf₂ : LeftFraction)
     (_ : lf₁.target = lf₂.source) :
     Path ChainComplex lf₁.source lf₁.source :=
   let s1 := Step.rule "frac_compose_1" lf₁.source lf₁.source
@@ -741,7 +741,7 @@ theorem fraction_compose_length (lf₁ lf₂ : LeftFraction) (h : lf₁.target =
 -- ============================================================
 
 /-- Verdier quotient step: kill a subcategory. -/
-def verdierStep (C : ChainComplex) (sub : ChainComplex) :
+noncomputable def verdierStep (C : ChainComplex) (sub : ChainComplex) :
     Path ChainComplex C C :=
   let s1 := Step.rule ("kill:" ++ sub.name) C C
   let s2 := Step.rule ("quotient_reduce") C C
@@ -767,7 +767,7 @@ structure CompactObj where
   isCompact : Bool  -- Hom(C, -) commutes with coproducts
 
 /-- Path verifying compactness via finite presentation. -/
-def compactWitnessPath (co : CompactObj) :
+noncomputable def compactWitnessPath (co : CompactObj) :
     Path ChainComplex co.complex co.complex :=
   let s1 := Step.rule "finite_presentation" co.complex co.complex
   let s2 := Step.rule "hom_commutes_coprod" co.complex co.complex

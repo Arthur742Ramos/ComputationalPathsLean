@@ -32,29 +32,29 @@ structure Relation (T : Type u) where
   tuples : List T
 
 /-- Empty relation. -/
-def Relation.empty (T : Type u) : Relation T := ⟨[]⟩
+noncomputable def Relation.empty (T : Type u) : Relation T := ⟨[]⟩
 
 /-- Singleton relation. -/
-def Relation.singleton {T : Type u} (t : T) : Relation T := ⟨[t]⟩
+noncomputable def Relation.singleton {T : Type u} (t : T) : Relation T := ⟨[t]⟩
 
 /-- Cardinality. -/
-def Relation.card {T : Type u} (r : Relation T) : Nat := r.tuples.length
+noncomputable def Relation.card {T : Type u} (r : Relation T) : Nat := r.tuples.length
 
 /-! ## Relational operations -/
 
-def selection {T : Type u} (r : Relation T) (p : T → Bool) : Relation T :=
+noncomputable def selection {T : Type u} (r : Relation T) (p : T → Bool) : Relation T :=
   ⟨r.tuples.filter p⟩
 
-def projection {T : Type u} {S : Type v} (r : Relation T) (f : T → S) : Relation S :=
+noncomputable def projection {T : Type u} {S : Type v} (r : Relation T) (f : T → S) : Relation S :=
   ⟨r.tuples.map f⟩
 
-def union {T : Type u} (r1 r2 : Relation T) : Relation T :=
+noncomputable def union {T : Type u} (r1 r2 : Relation T) : Relation T :=
   ⟨r1.tuples ++ r2.tuples⟩
 
-def crossProduct {T S : Type u} (r1 : Relation T) (r2 : Relation S) : Relation (T × S) :=
+noncomputable def crossProduct {T S : Type u} (r1 : Relation T) (r2 : Relation S) : Relation (T × S) :=
   ⟨r1.tuples.flatMap (fun t => r2.tuples.map (fun s => (t, s)))⟩
 
-def equiJoin {T S : Type u} (r1 : Relation T) (r2 : Relation S) (p : T × S → Bool) :
+noncomputable def equiJoin {T S : Type u} (r1 : Relation T) (r2 : Relation S) (p : T × S → Bool) :
     Relation (T × S) :=
   ⟨(crossProduct r1 r2).tuples.filter p⟩
 
@@ -192,123 +192,123 @@ theorem union_card_assoc {T : Type u} (r1 r2 r3 : Relation T) :
 /-! ## Path witnesses — zero Path.mk -/
 
 -- 24
-def selection_true_path {T : Type u} (r : Relation T) :
+noncomputable def selection_true_path {T : Type u} (r : Relation T) :
     Path (selection r (fun _ => true)) r :=
   ⟨[], selection_true r⟩
 
 -- 25
-def selection_false_path {T : Type u} (r : Relation T) :
+noncomputable def selection_false_path {T : Type u} (r : Relation T) :
     Path (selection r (fun _ => false)) (Relation.empty T) :=
   ⟨[], selection_false r⟩
 
 -- 26
-def selection_compose_path {T : Type u} (r : Relation T) (p q : T → Bool) :
+noncomputable def selection_compose_path {T : Type u} (r : Relation T) (p q : T → Bool) :
     Path (selection (selection r p) q) (selection r (fun t => q t && p t)) :=
   ⟨[], selection_compose r p q⟩
 
 -- 27
-def selection_comm_path {T : Type u} (r : Relation T) (p q : T → Bool) :
+noncomputable def selection_comm_path {T : Type u} (r : Relation T) (p q : T → Bool) :
     Path (selection (selection r p) q) (selection (selection r q) p) :=
   ⟨[], selection_comm r p q⟩
 
 -- 28
-def selection_union_path {T : Type u} (r1 r2 : Relation T) (p : T → Bool) :
+noncomputable def selection_union_path {T : Type u} (r1 r2 : Relation T) (p : T → Bool) :
     Path (selection (union r1 r2) p) (union (selection r1 p) (selection r2 p)) :=
   ⟨[], selection_union r1 r2 p⟩
 
 -- 29
-def union_empty_left_path {T : Type u} (r : Relation T) :
+noncomputable def union_empty_left_path {T : Type u} (r : Relation T) :
     Path (union (Relation.empty T) r) r :=
   Path.refl r
 
 -- 30
-def union_empty_right_path {T : Type u} (r : Relation T) :
+noncomputable def union_empty_right_path {T : Type u} (r : Relation T) :
     Path (union r (Relation.empty T)) r :=
   ⟨[], union_empty_right r⟩
 
 -- 31
-def union_assoc_path {T : Type u} (r1 r2 r3 : Relation T) :
+noncomputable def union_assoc_path {T : Type u} (r1 r2 r3 : Relation T) :
     Path (union (union r1 r2) r3) (union r1 (union r2 r3)) :=
   ⟨[], union_assoc r1 r2 r3⟩
 
 -- 32
-def projection_id_path {T : Type u} (r : Relation T) :
+noncomputable def projection_id_path {T : Type u} (r : Relation T) :
     Path (projection r id) r :=
   ⟨[], projection_id r⟩
 
 -- 33
-def projection_compose_path {T : Type u} {S : Type v} {U : Type u}
+noncomputable def projection_compose_path {T : Type u} {S : Type v} {U : Type u}
     (r : Relation T) (f : T → S) (g : S → U) :
     Path (projection (projection r f) g) (projection r (g ∘ f)) :=
   ⟨[], projection_compose r f g⟩
 
 -- 34
-def projection_union_path {T : Type u} {S : Type v}
+noncomputable def projection_union_path {T : Type u} {S : Type v}
     (r1 r2 : Relation T) (f : T → S) :
     Path (projection (union r1 r2) f) (union (projection r1 f) (projection r2 f)) :=
   ⟨[], projection_union r1 r2 f⟩
 
 -- 35
-def equiJoin_true_path {T S : Type u} (r1 : Relation T) (r2 : Relation S) :
+noncomputable def equiJoin_true_path {T S : Type u} (r1 : Relation T) (r2 : Relation S) :
     Path (equiJoin r1 r2 (fun _ => true)) (crossProduct r1 r2) :=
   ⟨[], equiJoin_true r1 r2⟩
 
 -- 36
-def selection_idempotent_path {T : Type u} (r : Relation T) (p : T → Bool) :
+noncomputable def selection_idempotent_path {T : Type u} (r : Relation T) (p : T → Bool) :
     Path (selection (selection r p) p) (selection r p) :=
   ⟨[], selection_idempotent r p⟩
 
 -- 37
-def card_congr {T : Type u} {r1 r2 : Relation T} (p : Path r1 r2) :
+noncomputable def card_congr {T : Type u} {r1 r2 : Relation T} (p : Path r1 r2) :
     Path r1.card r2.card :=
   Path.congrArg Relation.card p
 
 -- 38
-def card_of_union_path {T : Type u} (r1 r2 : Relation T) :
+noncomputable def card_of_union_path {T : Type u} (r1 r2 : Relation T) :
     Path (union r1 r2).card (r1.card + r2.card) :=
   ⟨[], union_card r1 r2⟩
 
 -- 39
-def selection_false_card_path {T : Type u} (r : Relation T) :
+noncomputable def selection_false_card_path {T : Type u} (r : Relation T) :
     Path (selection r (fun _ => false)).card 0 :=
   Path.congrArg Relation.card (selection_false_path r)
 
 -- 40
-def sel_union_card_path {T : Type u} (r1 r2 : Relation T) (p : T → Bool) :
+noncomputable def sel_union_card_path {T : Type u} (r1 r2 : Relation T) (p : T → Bool) :
     Path (selection (union r1 r2) p).card (union (selection r1 p) (selection r2 p)).card :=
   Path.congrArg Relation.card (selection_union_path r1 r2 p)
 
 -- 41
-def card_union_comm_path {T : Type u} (r1 r2 : Relation T) :
+noncomputable def card_union_comm_path {T : Type u} (r1 r2 : Relation T) :
     Path (union r1 r2).card (union r2 r1).card :=
   ⟨[], card_union_comm r1 r2⟩
 
 /-! ## Composed paths -/
 
 -- 42
-def selection_true_then_id_path {T : Type u} (r : Relation T) :
+noncomputable def selection_true_then_id_path {T : Type u} (r : Relation T) :
     Path (projection (selection r (fun _ => true)) id) r :=
   Path.trans
     (Path.congrArg (projection · id) (selection_true_path r))
     (projection_id_path r)
 
 -- 43
-def union_assoc_four {T : Type u} (r1 r2 r3 r4 : Relation T) :
+noncomputable def union_assoc_four {T : Type u} (r1 r2 r3 r4 : Relation T) :
     Path (union (union (union r1 r2) r3) r4) (union r1 (union r2 (union r3 r4))) :=
   ⟨[], by simp [union, List.append_assoc]⟩
 
 -- 44
-def selection_symm_path {T : Type u} (r : Relation T) :
+noncomputable def selection_symm_path {T : Type u} (r : Relation T) :
     Path r (selection r (fun _ => true)) :=
   Path.symm (selection_true_path r)
 
 -- 45
-def selection_round_trip {T : Type u} (r : Relation T) :
+noncomputable def selection_round_trip {T : Type u} (r : Relation T) :
     Path r r :=
   Path.trans (selection_symm_path r) (selection_true_path r)
 
 -- 46
-def union_empty_right_via_card {T : Type u} (r : Relation T) :
+noncomputable def union_empty_right_via_card {T : Type u} (r : Relation T) :
     Path (union r (Relation.empty T)).card r.card :=
   Path.congrArg Relation.card (union_empty_right_path r)
 

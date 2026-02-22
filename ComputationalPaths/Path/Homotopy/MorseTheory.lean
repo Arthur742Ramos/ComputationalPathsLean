@@ -59,11 +59,11 @@ structure CriticalPoint (A : Type u) where
   criticalValue : Nat
 
 /-- The sublevel set f⁻¹(-∞, c]. -/
-def sublevelSet {A : Type u} (f : A → Nat) (c : Nat) : Type u :=
+noncomputable def sublevelSet {A : Type u} (f : A → Nat) (c : Nat) : Type u :=
   { a : A // f a ≤ c }
 
 /-- Inclusion of sublevel sets for c₁ ≤ c₂. -/
-def sublevelInclusion {A : Type u} {f : A → Nat} {c₁ c₂ : Nat}
+noncomputable def sublevelInclusion {A : Type u} {f : A → Nat} {c₁ c₂ : Nat}
     (h : c₁ ≤ c₂) : sublevelSet f c₁ → sublevelSet f c₂ :=
   fun ⟨a, ha⟩ => ⟨a, Nat.le_trans ha h⟩
 
@@ -97,11 +97,11 @@ structure HandleDecomposition where
     i.val < j.val → (handles.get i).level ≤ (handles.get j).level
 
 /-- The number of handles of a given dimension (Betti number upper bound). -/
-def HandleDecomposition.countDim (hd : HandleDecomposition) (k : Nat) : Nat :=
+noncomputable def HandleDecomposition.countDim (hd : HandleDecomposition) (k : Nat) : Nat :=
   hd.handles.filter (fun h => h.dim = k) |>.length
 
 /-- A Morse function induces a handle decomposition. -/
-def MorseFunction.toHandleDecomposition {A : Type u} (mf : MorseFunction A) :
+noncomputable def MorseFunction.toHandleDecomposition {A : Type u} (mf : MorseFunction A) :
     HandleDecomposition where
   handles := mf.criticalPoints.map (fun ⟨_, idx⟩ => HandleData.mk idx 0)
   levelOrdered := by
@@ -118,7 +118,7 @@ theorem MorseFunction.handle_count_eq_critical_count {A : Type u}
 
 /-- If there are no critical values in [c₁, c₂], the sublevel sets are
     Path-equivalent (homotopy invariance). -/
-def sublevel_path_of_no_critical {A : Type u} {mf : MorseFunction A}
+noncomputable def sublevel_path_of_no_critical {A : Type u} {mf : MorseFunction A}
     {c₁ c₂ : Nat} (h_le : c₁ ≤ c₂)
     (_h_no_crit : ∀ cp ∈ mf.criticalPoints, ¬(c₁ ≤ mf.f cp.1 ∧ mf.f cp.1 ≤ c₂))
     (x : sublevelSet mf.f c₁) :
@@ -127,7 +127,7 @@ def sublevel_path_of_no_critical {A : Type u} {mf : MorseFunction A}
 
 /-- Path witness for the canonical retraction of the upper sublevel set
     back to the lower one (when no critical points intervene). -/
-def sublevel_retraction_path {A : Type u} {mf : MorseFunction A}
+noncomputable def sublevel_retraction_path {A : Type u} {mf : MorseFunction A}
     {c₁ c₂ : Nat} (_h_le : c₁ ≤ c₂)
     (_h_no_crit : ∀ cp ∈ mf.criticalPoints, ¬(c₁ ≤ mf.f cp.1 ∧ mf.f cp.1 ≤ c₂))
     (x : sublevelSet mf.f c₁) :
@@ -148,7 +148,7 @@ structure CellAttachment where
   boundary_eq : cellDim = boundaryDim + 1
 
 /-- A critical point of index k ≥ 1 gives a k-cell attachment. -/
-def sublevel_cell_attachment (cp : CriticalPoint A) (h : cp.index ≥ 1) :
+noncomputable def sublevel_cell_attachment (cp : CriticalPoint A) (h : cp.index ≥ 1) :
     CellAttachment where
   cellDim := cp.index
   level := cp.criticalValue
@@ -174,13 +174,13 @@ structure MorseInequalities where
 
 /-- The strong Morse inequality: alternating sums.
     Σ_{i=0}^{k} (-1)^{k-i} c_i ≥ Σ_{i=0}^{k} (-1)^{k-i} b_i. -/
-def alternatingSum (f : Nat → Nat) (k : Nat) : Int :=
+noncomputable def alternatingSum (f : Nat → Nat) (k : Nat) : Int :=
   (List.range (k + 1)).foldl
     (fun acc i => acc + (-1 : Int) ^ (k - i) * (f i : Int)) 0
 
 /-- The Euler characteristic from Morse data equals the alternating sum
     of handle counts. -/
-def morseEulerChar (hd : HandleDecomposition) : Int :=
+noncomputable def morseEulerChar (hd : HandleDecomposition) : Int :=
   alternatingSum hd.countDim
     (hd.handles.foldl (fun m h => max m h.dim) 0)
 
@@ -229,7 +229,7 @@ structure MorseSmaleComplex (A : Type u) where
     fl.source ∈ criticalPts ∧ fl.target ∈ criticalPts
 
 /-- The number of flow lines from index k to index k-1 critical points. -/
-def MorseSmaleComplex.flowCount {A : Type u} (msc : MorseSmaleComplex A)
+noncomputable def MorseSmaleComplex.flowCount {A : Type u} (msc : MorseSmaleComplex A)
     (k : Nat) : Nat :=
   msc.flowLines.filter (fun fl => fl.source.index = k) |>.length
 
@@ -243,7 +243,7 @@ structure PerfectMorseFunction (A : Type u) extends MorseFunction A where
   perfect : ∀ k : Nat, betti k = (toMorseFunction.toHandleDecomposition).countDim k
 
 /-- A perfect Morse function satisfies the weak Morse inequalities as equalities. -/
-def PerfectMorseFunction.toMorseInequalities {A : Type u}
+noncomputable def PerfectMorseFunction.toMorseInequalities {A : Type u}
     (pmf : PerfectMorseFunction A) :
     MorseInequalities where
   decomposition := pmf.toMorseFunction.toHandleDecomposition
@@ -253,7 +253,7 @@ def PerfectMorseFunction.toMorseInequalities {A : Type u}
 /-! ## Path Coherence for Morse Data -/
 
 /-- Path witness that sublevel inclusion is functorial. -/
-def sublevelInclusion_functorial_path {A : Type u} {f : A → Nat}
+noncomputable def sublevelInclusion_functorial_path {A : Type u} {f : A → Nat}
     {c₁ c₂ c₃ : Nat} (h₁ : c₁ ≤ c₂) (h₂ : c₂ ≤ c₃)
     (x : sublevelSet f c₁) :
     Path
@@ -262,21 +262,21 @@ def sublevelInclusion_functorial_path {A : Type u} {f : A → Nat}
   Path.stepChain rfl
 
 /-- Path witness for handle decomposition count invariance. -/
-def handle_count_path {hd : HandleDecomposition} {k : Nat} :
+noncomputable def handle_count_path {hd : HandleDecomposition} {k : Nat} :
     Path
       (hd.countDim k)
       ((hd.handles.filter (fun h => h.dim = k)).length) :=
   Path.refl _
 
 /-- Path witness that cell attachment dimension matches the Morse index. -/
-def cell_attachment_index_path (cp : CriticalPoint A) (h : cp.index ≥ 1) :
+noncomputable def cell_attachment_index_path (cp : CriticalPoint A) (h : cp.index ≥ 1) :
     Path
       (sublevel_cell_attachment cp h).cellDim
       cp.index :=
   Path.refl _
 
 /-- The empty handle decomposition has zero handles. -/
-def emptyHandleDecomposition : HandleDecomposition where
+noncomputable def emptyHandleDecomposition : HandleDecomposition where
   handles := []
   levelOrdered := by
     intro i
@@ -288,7 +288,7 @@ theorem empty_countDim (k : Nat) :
 
 /-- A single critical point of index k gives a decomposition with exactly
     one k-handle. -/
-def singleHandleDecomposition (k : Nat) (level : Nat) : HandleDecomposition where
+noncomputable def singleHandleDecomposition (k : Nat) (level : Nat) : HandleDecomposition where
   handles := [HandleData.mk k level]
   levelOrdered := by
     intro ⟨i, hi⟩ ⟨j, hj⟩ hij

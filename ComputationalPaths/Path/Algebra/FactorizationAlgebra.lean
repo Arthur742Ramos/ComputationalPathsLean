@@ -65,7 +65,7 @@ structure DiskFamily (S : FactorizationSite) (U : S.Open) where
     ∀ i j : Fin arity, i ≠ j → S.disjoint (disk i) (disk j)
 
 /-- The empty disk family. -/
-def DiskFamily.empty (S : FactorizationSite) (U : S.Open) : DiskFamily S U :=
+noncomputable def DiskFamily.empty (S : FactorizationSite) (U : S.Open) : DiskFamily S U :=
   { arity := 0
     disk := fun i => nomatch i
     inU := fun i => nomatch i
@@ -94,7 +94,7 @@ namespace PrefactorizationAlgebra
 variable {S : FactorizationSite} (A : PrefactorizationAlgebra S)
 
 /-- The empty configuration applied to the unit. -/
-def emptyUnit {U : S.Open} : A.value U :=
+noncomputable def emptyUnit {U : S.Open} : A.value U :=
   A.empty_act A.unit
 
 end PrefactorizationAlgebra
@@ -129,13 +129,13 @@ namespace FactorizationAlgebraHom
 variable {S : FactorizationSite}
 
 /-- Identity factorization algebra morphism. -/
-def id (A : FactorizationAlgebra S) : FactorizationAlgebraHom A A :=
+noncomputable def id (A : FactorizationAlgebra S) : FactorizationAlgebraHom A A :=
   { toFun := fun _ x => x
     map_factorize := fun _ _ => rfl
     map_empty := fun _ => rfl }
 
 /-- Composition of factorization algebra morphisms. -/
-def comp {A B C : FactorizationAlgebra S}
+noncomputable def comp {A B C : FactorizationAlgebra S}
     (g : FactorizationAlgebraHom B C) (f : FactorizationAlgebraHom A B) :
     FactorizationAlgebraHom A C :=
   { toFun := fun U x => g.toFun U (f.toFun U x)
@@ -161,7 +161,7 @@ end FactorizationAlgebraHom
 /-! ## Locally constant factorization algebras -/
 
 /-- Locally constant condition: disks related by inclusion are equivalent. -/
-def IsLocallyConstant {S : FactorizationSite} (A : PrefactorizationAlgebra S) : Prop :=
+noncomputable def IsLocallyConstant {S : FactorizationSite} (A : PrefactorizationAlgebra S) : Prop :=
   ∀ {U V : S.Open},
     S.isDisk U →
     S.isDisk V →
@@ -180,13 +180,13 @@ namespace LocallyConstantFA
 variable {S : FactorizationSite} (A : LocallyConstantFA S)
 
 /-- Access the locally constant equivalence for a disk inclusion. -/
-def locallyConstant_equiv {U V : S.Open}
+noncomputable def locallyConstant_equiv {U V : S.Open}
     (hU : S.isDisk U) (hV : S.isDisk V) (hUV : S.incl U V) :
     Nonempty (SimpleEquiv (A.algebra.value U) (A.algebra.value V)) :=
   A.locally_constant hU hV hUV
 
 /-- Factorization homology of a locally constant algebra. -/
-def factorizationHomology : Type v :=
+noncomputable def factorizationHomology : Type v :=
   A.algebra.value S.whole
 
 end LocallyConstantFA
@@ -198,22 +198,22 @@ abbrev LocallyConstantFAOnRn (n : Nat) : Type (u + 1) :=
   EnAlgebra n
 
 /-- E_n-algebras are locally constant factorization algebras on R^n. -/
-def enAsLocallyConstant (n : Nat) :
+noncomputable def enAsLocallyConstant (n : Nat) :
     SimpleEquiv (EnAlgebra n) (LocallyConstantFAOnRn n) :=
   SimpleEquiv.refl (EnAlgebra n)
 
 /-- Factorization homology on R^n is the underlying carrier of the E_n-algebra. -/
-def factorizationHomologyRn {n : Nat} (A : LocallyConstantFAOnRn n) : Type :=
+noncomputable def factorizationHomologyRn {n : Nat} (A : LocallyConstantFAOnRn n) : Type :=
   A.carrier
 
 /-! ## Factorization homology and nonabelian Poincare duality -/
 
 /-- Factorization homology of a factorization algebra: value on the global open. -/
-def factorizationHomology {S : FactorizationSite} (A : FactorizationAlgebra S) : Type :=
+noncomputable def factorizationHomology {S : FactorizationSite} (A : FactorizationAlgebra S) : Type :=
   A.value S.whole
 
 /-- Induced map on factorization homology. -/
-def factorizationHomologyMap {S : FactorizationSite}
+noncomputable def factorizationHomologyMap {S : FactorizationSite}
     {A B : FactorizationAlgebra S} (f : FactorizationAlgebraHom A B) :
     factorizationHomology A → factorizationHomology B :=
   f.toFun S.whole
@@ -228,7 +228,7 @@ structure NonabelianPoincareDuality {S : FactorizationSite}
   equivalence : SimpleEquiv (factorizationHomology A.algebra) target
 
 /-- Trivial duality data (identity equivalence). -/
-def NonabelianPoincareDuality.trivial {S : FactorizationSite}
+noncomputable def NonabelianPoincareDuality.trivial {S : FactorizationSite}
     (A : LocallyConstantFA S) : NonabelianPoincareDuality A :=
   { target := factorizationHomology A.algebra
     equivalence := SimpleEquiv.refl _ }
@@ -241,7 +241,7 @@ structure NonabelianPoincareDualityRn (n : Nat) (A : LocallyConstantFAOnRn n) wh
   equivalence : SimpleEquiv (factorizationHomologyRn A) target
 
 /-- Trivial R^n duality data (identity equivalence). -/
-def NonabelianPoincareDualityRn.trivial (n : Nat) (A : LocallyConstantFAOnRn n) :
+noncomputable def NonabelianPoincareDualityRn.trivial (n : Nat) (A : LocallyConstantFAOnRn n) :
     NonabelianPoincareDualityRn n A :=
   { target := factorizationHomologyRn A
     equivalence := SimpleEquiv.refl _ }

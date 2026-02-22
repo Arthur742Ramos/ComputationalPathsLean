@@ -51,13 +51,13 @@ variable {G : Grp.{u}}
 
 /-! ## 1: Identity intertwiner -/
 
-def repMorphism_id (ρ : Rep G) : RepMorphism ρ ρ where
+noncomputable def repMorphism_id (ρ : Rep G) : RepMorphism ρ ρ where
   map := id
   equivariant := fun _ _ => Path.refl _
 
 /-! ## 2: Composition of intertwiners -/
 
-def repMorphism_comp {ρ σ τ : Rep G}
+noncomputable def repMorphism_comp {ρ σ τ : Rep G}
     (f : RepMorphism ρ σ) (g : RepMorphism σ τ) : RepMorphism ρ τ where
   map := g.map ∘ f.map
   equivariant := fun gh v =>
@@ -69,14 +69,14 @@ def repMorphism_comp {ρ σ τ : Rep G}
 
 /-! ## 3: Composition preserves equivariance (explicit) -/
 
-def repMorphism_comp_equivariant {ρ σ τ : Rep G}
+noncomputable def repMorphism_comp_equivariant {ρ σ τ : Rep G}
     (f : RepMorphism ρ σ) (g : RepMorphism σ τ) (gh : G.carrier) (v : ρ.V) :
     Path (g.map (f.map (ρ.act gh v))) (τ.act gh (g.map (f.map v))) :=
   (repMorphism_comp f g).equivariant gh v
 
 /-! ## 4: Left unit law for intertwiner composition -/
 
-def repMorphism_comp_id_left {ρ σ : Rep G} (f : RepMorphism ρ σ)
+noncomputable def repMorphism_comp_id_left {ρ σ : Rep G} (f : RepMorphism ρ σ)
     (g : G.carrier) (v : ρ.V) :
     Path ((repMorphism_comp (repMorphism_id ρ) f).map (ρ.act g v))
          (σ.act g (f.map v)) :=
@@ -91,21 +91,21 @@ structure Irreducible (ρ : Rep G) where
 
 /-! ## 5: Schur's lemma: endomorphism reduces to scalar -/
 
-def schur_endomorphism_scalar (ρ : Rep G) (irr : Irreducible ρ)
+noncomputable def schur_endomorphism_scalar (ρ : Rep G) (irr : Irreducible ρ)
     (f : RepMorphism ρ ρ) (v : ρ.V) :
     Path (f.map v) (irr.scalar f v) :=
   irr.is_scalar f v
 
 /-! ## 6: Schur composition of two endomorphisms -/
 
-def schur_comp_scalar (ρ : Rep G) (irr : Irreducible ρ)
+noncomputable def schur_comp_scalar (ρ : Rep G) (irr : Irreducible ρ)
     (f g : RepMorphism ρ ρ) (v : ρ.V) :
     Path ((repMorphism_comp f g).map v) (irr.scalar (repMorphism_comp f g) v) :=
   irr.is_scalar (repMorphism_comp f g) v
 
 /-! ## 7: Schur equivariance + scalar factorization -/
 
-def schur_equivariant_scalar (ρ : Rep G) (irr : Irreducible ρ)
+noncomputable def schur_equivariant_scalar (ρ : Rep G) (irr : Irreducible ρ)
     (f : RepMorphism ρ ρ) (gh : G.carrier) (v : ρ.V) :
     Path (f.map (ρ.act gh v)) (ρ.act gh (irr.scalar f v)) :=
   let step1 : Path (f.map (ρ.act gh v)) (ρ.act gh (f.map v)) :=
@@ -131,21 +131,21 @@ structure CompletelyReducible (ρ : Rep G) where
 
 /-! ## 8: Maschke projection equivariance -/
 
-def maschke_proj_equivariant (ρ : Rep G) (cr : CompletelyReducible ρ)
+noncomputable def maschke_proj_equivariant (ρ : Rep G) (cr : CompletelyReducible ρ)
     (g : G.carrier) (v : ρ.V) :
     Path (cr.projSub (ρ.act g v)) (ρ.act g (cr.projSub v)) :=
   cr.proj_equivariant g v
 
 /-! ## 9: Maschke complement equivariance -/
 
-def maschke_comp_equivariant (ρ : Rep G) (cr : CompletelyReducible ρ)
+noncomputable def maschke_comp_equivariant (ρ : Rep G) (cr : CompletelyReducible ρ)
     (g : G.carrier) (v : ρ.V) :
     Path (cr.projComp (ρ.act g v)) (ρ.act g (cr.projComp v)) :=
   cr.comp_equivariant g v
 
 /-! ## 10: Maschke + Schur: projection is scalar on irreducible -/
 
-def maschke_schur_proj_scalar (ρ : Rep G) (irr : Irreducible ρ)
+noncomputable def maschke_schur_proj_scalar (ρ : Rep G) (irr : Irreducible ρ)
     (cr : CompletelyReducible ρ) (v : ρ.V) :
     Path (cr.projSub v)
          (irr.scalar ⟨cr.projSub, cr.proj_equivariant⟩ v) :=
@@ -163,13 +163,13 @@ structure Character (G : Grp.{u}) where
 
 /-! ## 11: Character class function property -/
 
-def character_class_fn (ch : Character G) (g h : G.carrier) :
+noncomputable def character_class_fn (ch : Character G) (g h : G.carrier) :
     Path (ch.χ (G.mul (G.mul g h) (G.inv g))) (ch.χ h) :=
   ch.class_fn g h
 
 /-! ## 12: Character conjugation invariance (two-step) -/
 
-def character_conjugation_two (ch : Character G) (g₁ g₂ h : G.carrier) :
+noncomputable def character_conjugation_two (ch : Character G) (g₁ g₂ h : G.carrier) :
     Path (ch.χ (G.mul (G.mul g₁ (G.mul (G.mul g₂ h) (G.inv g₂))) (G.inv g₁)))
          (ch.χ h) :=
   let step1 := ch.class_fn g₁ (G.mul (G.mul g₂ h) (G.inv g₂))
@@ -187,7 +187,7 @@ structure CharacterOrthogonality (G : Grp.{u}) where
 
 /-! ## 13: Orthogonality for distinct characters -/
 
-def char_orthogonal (orth : CharacterOrthogonality G)
+noncomputable def char_orthogonal (orth : CharacterOrthogonality G)
     (i j : Nat) (hij : i ≠ j) :
     Path (orth.inner (orth.chars i) (orth.chars j)) G.one :=
   orth.orthogonality i j hij
@@ -204,26 +204,26 @@ structure TensorRep (G : Grp.{u}) (ρ σ : Rep G) where
 
 /-! ## 14: Tensor action on identity -/
 
-def tensor_act_one (ρ σ : Rep G) (T : TensorRep G ρ σ) (t : T.tensor) :
+noncomputable def tensor_act_one (ρ σ : Rep G) (T : TensorRep G ρ σ) (t : T.tensor) :
     Path (T.tensorAct G.one t) t :=
   T.tensorAct_one t
 
 /-! ## 15: Tensor action on product -/
 
-def tensor_act_mul (ρ σ : Rep G) (T : TensorRep G ρ σ) (g h : G.carrier) (t : T.tensor) :
+noncomputable def tensor_act_mul (ρ σ : Rep G) (T : TensorRep G ρ σ) (g h : G.carrier) (t : T.tensor) :
     Path (T.tensorAct (G.mul g h) t) (T.tensorAct g (T.tensorAct h t)) :=
   T.tensorAct_mul g h t
 
 /-! ## 16: Tensor pair equivariance -/
 
-def tensor_pair_equivariant (ρ σ : Rep G) (T : TensorRep G ρ σ)
+noncomputable def tensor_pair_equivariant (ρ σ : Rep G) (T : TensorRep G ρ σ)
     (g : G.carrier) (v : ρ.V) (w : σ.V) :
     Path (T.tensorAct g (T.pair v w)) (T.pair (ρ.act g v) (σ.act g w)) :=
   T.pair_act g v w
 
 /-! ## 17: Tensor double action via trans -/
 
-def tensor_double_action (ρ σ : Rep G) (T : TensorRep G ρ σ)
+noncomputable def tensor_double_action (ρ σ : Rep G) (T : TensorRep G ρ σ)
     (g h : G.carrier) (v : ρ.V) (w : σ.V) :
     Path (T.tensorAct (G.mul g h) (T.pair v w))
          (T.pair (ρ.act g (ρ.act h v)) (σ.act g (σ.act h w))) :=
@@ -258,28 +258,28 @@ structure InducedRep (G H : Grp.{u}) (ρ : Rep H) where
 
 /-! ## 18: Induced representation identity action -/
 
-def induced_act_one (G H : Grp.{u}) (ρ : Rep H) (ind : InducedRep G H ρ)
+noncomputable def induced_act_one (G H : Grp.{u}) (ρ : Rep H) (ind : InducedRep G H ρ)
     (v : ind.indV) :
     Path (ind.indAct G.one v) v :=
   ind.indAct_one v
 
 /-! ## 19: Induced representation composition -/
 
-def induced_act_mul (G H : Grp.{u}) (ρ : Rep H) (ind : InducedRep G H ρ)
+noncomputable def induced_act_mul (G H : Grp.{u}) (ρ : Rep H) (ind : InducedRep G H ρ)
     (g₁ g₂ : G.carrier) (v : ind.indV) :
     Path (ind.indAct (G.mul g₁ g₂) v) (ind.indAct g₁ (ind.indAct g₂ v)) :=
   ind.indAct_mul g₁ g₂ v
 
 /-! ## 20: Frobenius reciprocity witness -/
 
-def frobenius_reciprocity (G H : Grp.{u}) (ρ : Rep H) (ind : InducedRep G H ρ)
+noncomputable def frobenius_reciprocity (G H : Grp.{u}) (ρ : Rep H) (ind : InducedRep G H ρ)
     (h : H.carrier) (v : ind.indV) :
     Path (ind.restrict (ind.indAct (ind.incl h) v)) (ρ.act h (ind.restrict v)) :=
   ind.restrict_equivariant h v
 
 /-! ## 21: Frobenius reciprocity with double action -/
 
-def frobenius_double (G H : Grp.{u}) (ρ : Rep H) (ind : InducedRep G H ρ)
+noncomputable def frobenius_double (G H : Grp.{u}) (ρ : Rep H) (ind : InducedRep G H ρ)
     (h₁ h₂ : H.carrier) (v : ind.indV) :
     Path (ind.restrict (ind.indAct (ind.incl (H.mul h₁ h₂)) v))
          (ρ.act h₁ (ρ.act h₂ (ind.restrict v))) :=
@@ -311,13 +311,13 @@ structure GroupAlgebra (G : Grp.{u}) where
 
 /-! ## 22: Group algebra embedding preserves multiplication -/
 
-def groupAlg_embed_mul (ga : GroupAlgebra G) (g h : G.carrier) :
+noncomputable def groupAlg_embed_mul (ga : GroupAlgebra G) (g h : G.carrier) :
     Path (ga.embed (G.mul g h)) (ga.algMul (ga.embed g) (ga.embed h)) :=
   ga.embed_mul g h
 
 /-! ## 23: Group algebra triple product via trans -/
 
-def groupAlg_triple_product (ga : GroupAlgebra G) (g h k : G.carrier) :
+noncomputable def groupAlg_triple_product (ga : GroupAlgebra G) (g h k : G.carrier) :
     Path (ga.embed (G.mul (G.mul g h) k))
          (ga.algMul (ga.embed g) (ga.algMul (ga.embed h) (ga.embed k))) :=
   let step1 : Path (ga.embed (G.mul (G.mul g h) k))
@@ -333,13 +333,13 @@ def groupAlg_triple_product (ga : GroupAlgebra G) (g h k : G.carrier) :
 
 /-! ## 24: Group algebra identity embedding -/
 
-def groupAlg_embed_one (ga : GroupAlgebra G) :
+noncomputable def groupAlg_embed_one (ga : GroupAlgebra G) :
     Path (ga.embed G.one) ga.algOne :=
   ga.embed_one
 
 /-! ## 25: Group algebra embedding inverse coherence -/
 
-def groupAlg_embed_inv_mul (ga : GroupAlgebra G) (g : G.carrier) :
+noncomputable def groupAlg_embed_inv_mul (ga : GroupAlgebra G) (g : G.carrier) :
     Path (ga.embed (G.mul g (G.inv g))) ga.algOne :=
   let step1 : Path (ga.embed (G.mul g (G.inv g)))
                    (ga.algMul (ga.embed g) (ga.embed (G.inv g))) :=
@@ -364,13 +364,13 @@ structure PeterWeyl (G : Grp.{u}) where
 
 /-! ## 26: Peter-Weyl irreducibility witness -/
 
-def peter_weyl_irred (pw : PeterWeyl G) (n : Nat) :
+noncomputable def peter_weyl_irred (pw : PeterWeyl G) (n : Nat) :
     Irreducible (pw.irreps n) :=
   pw.irred n
 
 /-! ## 27: Peter-Weyl Schur on n-th irrep -/
 
-def peter_weyl_schur (pw : PeterWeyl G) (n : Nat)
+noncomputable def peter_weyl_schur (pw : PeterWeyl G) (n : Nat)
     (f : RepMorphism (pw.irreps n) (pw.irreps n)) (v : (pw.irreps n).V) :
     Path (f.map v) ((pw.irred n).scalar f v) :=
   (pw.irred n).is_scalar f v
@@ -389,19 +389,19 @@ structure WeightLattice where
 
 /-! ## 28: Weight lattice identity -/
 
-def weight_add_zero (wl : WeightLattice.{u}) (w : wl.weights) :
+noncomputable def weight_add_zero (wl : WeightLattice.{u}) (w : wl.weights) :
     Path (wl.add w wl.zero) w :=
   wl.add_zero w
 
 /-! ## 29: Weight lattice inverse -/
 
-def weight_add_neg (wl : WeightLattice.{u}) (w : wl.weights) :
+noncomputable def weight_add_neg (wl : WeightLattice.{u}) (w : wl.weights) :
     Path (wl.add w (wl.neg w)) wl.zero :=
   wl.add_neg w
 
 /-! ## 30: Weight lattice double inverse via trans -/
 
-def weight_double_neg (wl : WeightLattice.{u}) (w : wl.weights) :
+noncomputable def weight_double_neg (wl : WeightLattice.{u}) (w : wl.weights) :
     Path (wl.add (wl.add w (wl.neg w)) (wl.neg wl.zero))
          (wl.neg wl.zero) :=
   let step1 : Path (wl.add (wl.add w (wl.neg w)) (wl.neg wl.zero))
@@ -413,7 +413,7 @@ def weight_double_neg (wl : WeightLattice.{u}) (w : wl.weights) :
 
 /-! ## 31: Weight lattice associativity four-fold -/
 
-def weight_assoc_four (wl : WeightLattice.{u}) (a b c d : wl.weights) :
+noncomputable def weight_assoc_four (wl : WeightLattice.{u}) (a b c d : wl.weights) :
     Path (wl.add (wl.add (wl.add a b) c) d)
          (wl.add a (wl.add b (wl.add c d))) :=
   let step1 := wl.add_assoc (wl.add a b) c d
@@ -443,19 +443,19 @@ structure RepRing (G : Grp.{u}) where
 
 /-! ## 32: Rep ring addition commutes -/
 
-def repRing_add_comm (rr : RepRing G) (a b : rr.elem) :
+noncomputable def repRing_add_comm (rr : RepRing G) (a b : rr.elem) :
     Path (rr.add a b) (rr.add b a) :=
   rr.add_comm a b
 
 /-! ## 33: Rep ring multiplication associativity -/
 
-def repRing_mul_assoc (rr : RepRing G) (a b c : rr.elem) :
+noncomputable def repRing_mul_assoc (rr : RepRing G) (a b c : rr.elem) :
     Path (rr.mul (rr.mul a b) c) (rr.mul a (rr.mul b c)) :=
   rr.mul_assoc a b c
 
 /-! ## 34: Rep ring triple add commutation -/
 
-def repRing_triple_add_comm (rr : RepRing G) (a b c : rr.elem) :
+noncomputable def repRing_triple_add_comm (rr : RepRing G) (a b c : rr.elem) :
     Path (rr.add (rr.add a b) c) (rr.add c (rr.add a b)) :=
   let step1 : Path (rr.add (rr.add a b) c) (rr.add c (rr.add a b)) :=
     rr.add_comm (rr.add a b) c
@@ -463,7 +463,7 @@ def repRing_triple_add_comm (rr : RepRing G) (a b c : rr.elem) :
 
 /-! ## 35: Rep ring identity chain -/
 
-def repRing_identity_chain (rr : RepRing G) (a : rr.elem) :
+noncomputable def repRing_identity_chain (rr : RepRing G) (a : rr.elem) :
     Path (rr.mul (rr.mul a rr.one) rr.one) a :=
   let step1 : Path (rr.mul (rr.mul a rr.one) rr.one)
                    (rr.mul a rr.one) :=
@@ -473,19 +473,19 @@ def repRing_identity_chain (rr : RepRing G) (a : rr.elem) :
 
 /-! ## 36: Action on identity element -/
 
-def rep_act_one_v (ρ : Rep G) (v : ρ.V) :
+noncomputable def rep_act_one_v (ρ : Rep G) (v : ρ.V) :
     Path (ρ.act G.one v) v :=
   ρ.act_one v
 
 /-! ## 37: Action composition (g * h) -/
 
-def rep_act_mul (ρ : Rep G) (g h : G.carrier) (v : ρ.V) :
+noncomputable def rep_act_mul (ρ : Rep G) (g h : G.carrier) (v : ρ.V) :
     Path (ρ.act (G.mul g h) v) (ρ.act g (ρ.act h v)) :=
   ρ.act_mul g h v
 
 /-! ## 38: Triple action via trans chain -/
 
-def rep_triple_action (ρ : Rep G) (g h k : G.carrier) (v : ρ.V) :
+noncomputable def rep_triple_action (ρ : Rep G) (g h k : G.carrier) (v : ρ.V) :
     Path (ρ.act (G.mul (G.mul g h) k) v)
          (ρ.act g (ρ.act h (ρ.act k v))) :=
   let step1 : Path (ρ.act (G.mul (G.mul g h) k) v)
@@ -498,7 +498,7 @@ def rep_triple_action (ρ : Rep G) (g h k : G.carrier) (v : ρ.V) :
 
 /-! ## 39: Action by inverse cancels -/
 
-def rep_act_inv_cancel (ρ : Rep G) (g : G.carrier) (v : ρ.V) :
+noncomputable def rep_act_inv_cancel (ρ : Rep G) (g : G.carrier) (v : ρ.V) :
     Path (ρ.act (G.mul g (G.inv g)) v) v :=
   let step1 : Path (ρ.act (G.mul g (G.inv g)) v)
                    (ρ.act g (ρ.act (G.inv g) v)) :=
@@ -510,7 +510,7 @@ def rep_act_inv_cancel (ρ : Rep G) (g : G.carrier) (v : ρ.V) :
 
 /-! ## 40: Group associativity + action coherence -/
 
-def rep_assoc_action (ρ : Rep G) (g h k : G.carrier) (v : ρ.V) :
+noncomputable def rep_assoc_action (ρ : Rep G) (g h k : G.carrier) (v : ρ.V) :
     Path (ρ.act (G.mul g (G.mul h k)) v)
          (ρ.act g (ρ.act h (ρ.act k v))) :=
   let step1 : Path (ρ.act (G.mul g (G.mul h k)) v)
@@ -523,21 +523,21 @@ def rep_assoc_action (ρ : Rep G) (g h k : G.carrier) (v : ρ.V) :
 
 /-! ## 41: Group associativity witness via action -/
 
-def group_assoc_via_action (ρ : Rep G) (g h k : G.carrier) (v : ρ.V) :
+noncomputable def group_assoc_via_action (ρ : Rep G) (g h k : G.carrier) (v : ρ.V) :
     Path (ρ.act (G.mul (G.mul g h) k) v)
          (ρ.act (G.mul g (G.mul h k)) v) :=
   Path.congrArg (fun x => ρ.act x v) (G.mul_assoc g h k)
 
 /-! ## 42: Intertwiner on identity action -/
 
-def intertwiner_on_identity {ρ σ : Rep G}
+noncomputable def intertwiner_on_identity {ρ σ : Rep G}
     (f : RepMorphism ρ σ) (v : ρ.V) :
     Path (f.map (ρ.act G.one v)) (σ.act G.one (f.map v)) :=
   f.equivariant G.one v
 
 /-! ## 43: Intertwiner + identity simplification -/
 
-def intertwiner_identity_simplify {ρ σ : Rep G}
+noncomputable def intertwiner_identity_simplify {ρ σ : Rep G}
     (f : RepMorphism ρ σ) (v : ρ.V) :
     Path (f.map (ρ.act G.one v)) (f.map v) :=
   let step1 : Path (f.map (ρ.act G.one v)) (σ.act G.one (f.map v)) :=
@@ -548,7 +548,7 @@ def intertwiner_identity_simplify {ρ σ : Rep G}
 
 /-! ## 44: Intertwiner on double action -/
 
-def intertwiner_double_action {ρ σ : Rep G}
+noncomputable def intertwiner_double_action {ρ σ : Rep G}
     (f : RepMorphism ρ σ) (g h : G.carrier) (v : ρ.V) :
     Path (f.map (ρ.act g (ρ.act h v))) (σ.act g (σ.act h (f.map v))) :=
   let step1 : Path (f.map (ρ.act g (ρ.act h v)))
@@ -561,7 +561,7 @@ def intertwiner_double_action {ρ σ : Rep G}
 
 /-! ## 45: Triple composition of intertwiners -/
 
-def repMorphism_triple_comp {ρ σ τ υ : Rep G}
+noncomputable def repMorphism_triple_comp {ρ σ τ υ : Rep G}
     (f : RepMorphism ρ σ) (g : RepMorphism σ τ) (h : RepMorphism τ υ)
     (gh : G.carrier) (v : ρ.V) :
     Path (h.map (g.map (f.map (ρ.act gh v)))) (υ.act gh (h.map (g.map (f.map v)))) :=

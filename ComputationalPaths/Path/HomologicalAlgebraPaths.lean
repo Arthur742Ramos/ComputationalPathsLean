@@ -44,7 +44,7 @@ inductive HomStep {A : Type u} :
   | symm_distrib {a b c : A} (p : Path a b) (q : Path b c) :
       HomStep (Path.symm (Path.trans p q)) (Path.trans (Path.symm q) (Path.symm p))
 
-def HomStep.toStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def HomStep.toStep {A : Type u} {a b : A} {p q : Path a b}
     (s : HomStep p q) : Path.Step p q :=
   match s with
   | .right_unit p => Path.Step.trans_refl_right p
@@ -54,7 +54,7 @@ def HomStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .assoc p q r => Path.Step.trans_assoc p q r
   | .symm_distrib p q => Path.Step.symm_trans_congr p q
 
-def rweq_of_hom_step {A : Type u} {a b : A}
+noncomputable def rweq_of_hom_step {A : Type u} {a b : A}
     {p q : Path a b} (s : HomStep p q) : RwEq p q :=
   rweq_of_step (HomStep.toStep s)
 
@@ -87,7 +87,7 @@ noncomputable def addAssoc_rweq (x y z : A) :
     RwEq (Path.trans (G.addAssocPath x y z) (Path.refl _)) (G.addAssocPath x y z) :=
   rweq_of_hom_step (HomStep.right_unit (G.addAssocPath x y z))
 
-def addZero_transport_const {B : Type v} (x : A) (b : B) :
+noncomputable def addZero_transport_const {B : Type v} (x : A) (b : B) :
     Path.transport (D := fun _ => B) (G.addZeroPath x) b = b := by
   simp [Path.transport_const]
 
@@ -106,7 +106,7 @@ namespace HomData
 variable {A B C : Type u}
 variable {GA : AbelianData A} {GB : AbelianData B} {GC : AbelianData C}
 
-def comp (f : HomData GA GB) (g : HomData GB GC) : HomData GA GC where
+noncomputable def comp (f : HomData GA GB) (g : HomData GB GC) : HomData GA GC where
   map := g.map ∘ f.map
   mapAddPath x y :=
     Path.trans (Path.congrArg g.map (f.mapAddPath x y))
@@ -114,7 +114,7 @@ def comp (f : HomData GA GB) (g : HomData GB GC) : HomData GA GC where
   mapZeroPath :=
     Path.trans (Path.congrArg g.map f.mapZeroPath) g.mapZeroPath
 
-def id' (GA : AbelianData A) : HomData GA GA where
+noncomputable def id' (GA : AbelianData A) : HomData GA GA where
   map := fun x => x
   mapAddPath _ _ := Path.refl _
   mapZeroPath := Path.refl _
@@ -123,7 +123,7 @@ noncomputable def mapZero_rweq (f : HomData GA GB) :
     RwEq (Path.trans f.mapZeroPath (Path.refl _)) f.mapZeroPath :=
   rweq_of_hom_step (HomStep.right_unit f.mapZeroPath)
 
-def mapZero_transport_const {D : Type v} (f : HomData GA GB) (d : D) :
+noncomputable def mapZero_transport_const {D : Type v} (f : HomData GA GB) (d : D) :
     Path.transport (D := fun _ => D) f.mapZeroPath d = d := by
   simp [Path.transport_const]
 
@@ -151,7 +151,7 @@ noncomputable def imgToKer_cancel_rweq (a : A) :
     RwEq (Path.trans (E.imgToKer a) (Path.symm (E.imgToKer a))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (E.imgToKer a))
 
-def imgToKer_transport_const {D : Type v} (a : A) (d : D) :
+noncomputable def imgToKer_transport_const {D : Type v} (a : A) (d : D) :
     Path.transport (D := fun _ => D) (E.imgToKer a) d = d := by
   simp [Path.transport_const]
 
@@ -171,7 +171,7 @@ variable {A B C : Type u}
 variable {GA : AbelianData A} {GB : AbelianData B} {GC : AbelianData C}
 variable (S : ShortExactData GA GB GC)
 
-def compositionZeroPath (a : A) : Path (S.proj.map (S.inc.map a)) GC.zero :=
+noncomputable def compositionZeroPath (a : A) : Path (S.proj.map (S.inc.map a)) GC.zero :=
   S.exact.imgToKer a
 
 noncomputable def compositionZero_cancel_rweq (a : A) :
@@ -215,7 +215,7 @@ noncomputable def rightSq_cancel_rweq (b : B) :
   rweq_of_hom_step (HomStep.inverse_cancel (S.rightSqPath b))
 
 /-- Connecting homomorphism via path chasing. -/
-def connectingPath (c : C) (kerP : Path (S.γ.map c) GC'.zero)
+noncomputable def connectingPath (c : C) (kerP : Path (S.γ.map c) GC'.zero)
     (b : B) (liftP : Path (S.g.map b) c) :
     Path (S.g'.map (S.β.map b)) GC'.zero :=
   Path.trans
@@ -229,19 +229,19 @@ noncomputable def connecting_rweq (c : C) (kerP : Path (S.γ.map c) GC'.zero)
       (S.connectingPath c kerP b liftP) :=
   rweq_of_hom_step (HomStep.right_unit (S.connectingPath c kerP b liftP))
 
-def connecting_transport_const {D : Type v}
+noncomputable def connecting_transport_const {D : Type v}
     (c : C) (kerP : Path (S.γ.map c) GC'.zero)
     (b : B) (liftP : Path (S.g.map b) c) (d : D) :
     Path.transport (D := fun _ => D) (S.connectingPath c kerP b liftP) d = d := by
   simp [Path.transport_const]
 
 /-- Snake lemma: the connecting path makes a long exact sequence piece. -/
-def snake_exactness_path (a : A)
+noncomputable def snake_exactness_path (a : A)
     (kerP : Path (S.γ.map (S.g.map (S.f.map a))) GC'.zero) :
     Path (S.g'.map (S.β.map (S.f.map a))) GC'.zero :=
   S.connectingPath (S.g.map (S.f.map a)) kerP (S.f.map a) (Path.refl _)
 
-def snake_coherence (a : A)
+noncomputable def snake_coherence (a : A)
     (kerP : Path (S.γ.map (S.g.map (S.f.map a))) GC'.zero) :
     (Path.trans
       (S.snake_exactness_path a kerP)
@@ -272,7 +272,7 @@ variable (F : FiveLemmaData A₁ A₂ A₃ A₄ A₅ B₁ B₂ B₃ B₄ B₅
               GA₁ GA₂ GA₃ GA₄ GA₅ GB₁ GB₂ GB₃ GB₄ GB₅)
 
 /-- Five lemma coherence: the square paths compose trivially. -/
-def five_lemma_coherence (a : A₃) :
+noncomputable def five_lemma_coherence (a : A₃) :
     (Path.trans (F.sqR a) (Path.symm (F.sqR a))).toEq = rfl := by
   apply Subsingleton.elim
 
@@ -303,11 +303,11 @@ noncomputable def connect_cancel_rweq (n : Int) (c : C) :
     RwEq (Path.trans (L.connectPath n c) (Path.symm (L.connectPath n c))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (L.connectPath n c))
 
-def connect_transport_const {D : Type v} (n : Int) (c : C) (d : D) :
+noncomputable def connect_transport_const {D : Type v} (n : Int) (c : C) (d : D) :
     Path.transport (D := fun _ => D) (L.connectPath n c) d = d := by
   simp [Path.transport_const]
 
-def connect_periodicity (n : Int) (c : C) :
+noncomputable def connect_periodicity (n : Int) (c : C) :
     (Path.trans (L.connectPath n c) (Path.symm (L.connectPath n c))).toEq = rfl := by
   apply Subsingleton.elim
 
@@ -336,7 +336,7 @@ noncomputable def liftPath_cancel_rweq (p : P) :
     RwEq (Path.trans (Proj.liftPath p) (Path.symm (Proj.liftPath p))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (Proj.liftPath p))
 
-def liftPath_transport_const {D : Type v} (p : P) (d : D) :
+noncomputable def liftPath_transport_const {D : Type v} (p : P) (d : D) :
     Path.transport (D := fun _ => D) (Proj.liftPath p) d = d := by
   simp [Path.transport_const]
 
@@ -365,7 +365,7 @@ noncomputable def extPath_cancel_rweq (a : A) :
     RwEq (Path.trans (Inj.extPath a) (Path.symm (Inj.extPath a))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (Inj.extPath a))
 
-def extPath_transport_const {D : Type v} (a : A) (d : D) :
+noncomputable def extPath_transport_const {D : Type v} (a : A) (d : D) :
     Path.transport (D := fun _ => D) (Inj.extPath a) d = d := by
   simp [Path.transport_const]
 
@@ -392,11 +392,11 @@ noncomputable def ddZero_cancel_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (R.ddZeroPath n x) (Path.symm (R.ddZeroPath n x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (R.ddZeroPath n x))
 
-def ddZero_transport_const {D : Type v} (n : Nat) (x : A) (d : D) :
+noncomputable def ddZero_transport_const {D : Type v} (n : Nat) (x : A) (d : D) :
     Path.transport (D := fun _ => D) (R.ddZeroPath n x) d = d := by
   simp [Path.transport_const]
 
-def ddRoundTrip (n : Nat) (x : A) :
+noncomputable def ddRoundTrip (n : Nat) (x : A) :
     Path (R.diff n (R.diff (n + 1) x)) (R.diff n (R.diff (n + 1) x)) :=
   Path.trans (R.ddZeroPath n x) (Path.symm (R.ddZeroPath n x))
 
@@ -428,7 +428,7 @@ noncomputable def ddStar_cancel_rweq (n : Nat) (b : B) :
     RwEq (Path.trans (E.ddStarZeroPath n b) (Path.symm (E.ddStarZeroPath n b))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (E.ddStarZeroPath n b))
 
-def ddStar_transport_const {D : Type v} (n : Nat) (b : B) (d : D) :
+noncomputable def ddStar_transport_const {D : Type v} (n : Nat) (b : B) (d : D) :
     Path.transport (D := fun _ => D) (E.ddStarZeroPath n b) d = d := by
   simp [Path.transport_const]
 
@@ -456,7 +456,7 @@ noncomputable def ddTensor_cancel_rweq (n : Nat) (b : B) :
     RwEq (Path.trans (T.ddTensorZeroPath n b) (Path.symm (T.ddTensorZeroPath n b))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (T.ddTensorZeroPath n b))
 
-def tor_coherence (n : Nat) (b : B) :
+noncomputable def tor_coherence (n : Nat) (b : B) :
     (Path.trans (T.ddTensorZeroPath n b) (Path.symm (T.ddTensorZeroPath n b))).toEq = rfl := by
   apply Subsingleton.elim
 
@@ -491,11 +491,11 @@ noncomputable def directSumDd_cancel_rweq (n : Nat) (a : A) (c : C) :
       (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (H.directSumDdPath n a c))
 
-def directSumDd_transport_const {D : Type v} (n : Nat) (a : A) (c : C) (d : D) :
+noncomputable def directSumDd_transport_const {D : Type v} (n : Nat) (a : A) (c : C) (d : D) :
     Path.transport (D := fun _ => D) (H.directSumDdPath n a c) d = d := by
   simp [Path.transport_const]
 
-def horseshoe_coherence (n : Nat) (a : A) (c : C) :
+noncomputable def horseshoe_coherence (n : Nat) (a : A) (c : C) :
     (Path.trans (H.directSumDdPath n a c)
       (Path.symm (H.directSumDdPath n a c))).toEq = rfl := by
   apply Subsingleton.elim
@@ -526,7 +526,7 @@ noncomputable def roundTrip_cancel_rweq (n : Nat) (x : A) :
     RwEq (Path.trans (R.roundTripPath n x) (Path.symm (R.roundTripPath n x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (R.roundTripPath n x))
 
-def comm_transport_const {D : Type v} (n : Nat) (x : A) (d : D) :
+noncomputable def comm_transport_const {D : Type v} (n : Nat) (x : A) (d : D) :
     Path.transport (D := fun _ => D) (R.commPath n x) d = d := by
   simp [Path.transport_const]
 
@@ -573,7 +573,7 @@ namespace DoubleComplexData
 variable {A : Type u} {GA : AbelianData A}
 variable (D : DoubleComplexData A GA)
 
-def totalDiff (n : Int) (x : A) : A := GA.add (D.dH n 0 x) (D.dV n 0 x)
+noncomputable def totalDiff (n : Int) (x : A) : A := GA.add (D.dH n 0 x) (D.dV n 0 x)
 
 noncomputable def dHdH_rweq (p q : Int) (x : A) :
     RwEq (Path.trans (D.dHdHPath p q x) (Path.refl _)) (D.dHdHPath p q x) :=
@@ -587,7 +587,7 @@ noncomputable def antiComm_rweq (p q : Int) (x : A) :
     RwEq (Path.trans (D.antiCommPath p q x) (Path.refl _)) (D.antiCommPath p q x) :=
   rweq_of_hom_step (HomStep.right_unit (D.antiCommPath p q x))
 
-def dHdH_transport_const {B : Type v} (p q : Int) (x : A) (b : B) :
+noncomputable def dHdH_transport_const {B : Type v} (p q : Int) (x : A) (b : B) :
     Path.transport (D := fun _ => B) (D.dHdHPath p q x) b = b := by
   simp [Path.transport_const]
 
@@ -617,7 +617,7 @@ noncomputable def chainComm_cancel_rweq (n : Int) (x : A) :
     RwEq (Path.trans (M.chainCommPath n x) (Path.symm (M.chainCommPath n x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (M.chainCommPath n x))
 
-def chainComm_transport_const {D : Type v} (n : Int) (x : A) (d : D) :
+noncomputable def chainComm_transport_const {D : Type v} (n : Int) (x : A) (d : D) :
     Path.transport (D := fun _ => D) (M.chainCommPath n x) d = d := by
   simp [Path.transport_const]
 
@@ -659,12 +659,12 @@ noncomputable def exactA_cancel_rweq (n : Nat) (m : M) :
     RwEq (Path.trans (E.exactAPath n m) (Path.symm (E.exactAPath n m))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (E.exactAPath n m))
 
-def ext_three_step_coherence (n : Nat) (m : M) :
+noncomputable def ext_three_step_coherence (n : Nat) (m : M) :
     (Path.trans (E.exactBPath n m)
       (Path.symm (E.exactBPath n m))).toEq = rfl := by
   apply Subsingleton.elim
 
-def exactB_transport_const {D : Type v} (n : Nat) (m : M) (d : D) :
+noncomputable def exactB_transport_const {D : Type v} (n : Nat) (m : M) (d : D) :
     Path.transport (D := fun _ => D) (E.exactBPath n m) d = d := by
   simp [Path.transport_const]
 
@@ -690,11 +690,11 @@ noncomputable def forward_backward_rweq (n : Nat) (a : A) :
     RwEq (Path.trans (D.forwardPath n a) (Path.symm (D.forwardPath n a))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (D.forwardPath n a))
 
-def forwardBackwardRoundTrip (n : Nat) (a : A) :
+noncomputable def forwardBackwardRoundTrip (n : Nat) (a : A) :
     Path (D.syzygy n (D.syzygy (n + 1) a)) (D.syzygy n (D.syzygy (n + 1) a)) :=
   Path.trans (D.forwardPath n a) (D.backwardPath n a)
 
-def shift_coherence (n : Nat) (a : A) :
+noncomputable def shift_coherence (n : Nat) (a : A) :
     (Path.trans (D.forwardPath n a)
       (Path.symm (D.forwardPath n a))).toEq = rfl := by
   apply Subsingleton.elim
@@ -726,7 +726,7 @@ noncomputable def homotopy_cancel_rweq (n : Int) (x : A) :
     RwEq (Path.trans (H.homotopyPath n x) (Path.symm (H.homotopyPath n x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (H.homotopyPath n x))
 
-def homotopy_transport_const {D : Type v} (n : Int) (x : A) (d : D) :
+noncomputable def homotopy_transport_const {D : Type v} (n : Int) (x : A) (d : D) :
     Path.transport (D := fun _ => D) (H.homotopyPath n x) d = d := by
   simp [Path.transport_const]
 
@@ -754,7 +754,7 @@ noncomputable def ddR_cancel_rweq (r : Nat) (p q : Int) (x : A) :
     RwEq (Path.trans (S.ddRPath r p q x) (Path.symm (S.ddRPath r p q x))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (S.ddRPath r p q x))
 
-def ddR_transport_const {D : Type v} (r : Nat) (p q : Int) (x : A) (d : D) :
+noncomputable def ddR_transport_const {D : Type v} (r : Nat) (p q : Int) (x : A) (d : D) :
     Path.transport (D := fun _ => D) (S.ddRPath r p q x) d = d := by
   simp [Path.transport_const]
 
@@ -795,7 +795,7 @@ noncomputable def cokernel_cancel_rweq (f : A → A) (y : A) :
     RwEq (Path.trans (C.cokernelPath f y) (Path.symm (C.cokernelPath f y))) (Path.refl _) :=
   rweq_of_hom_step (HomStep.inverse_cancel (C.cokernelPath f y))
 
-def kernel_cokernel_coherence (f : A → A) (x : A) :
+noncomputable def kernel_cokernel_coherence (f : A → A) (x : A) :
     (Path.trans (C.kernelPath f x) (Path.symm (C.kernelPath f x))).toEq = rfl := by
   apply Subsingleton.elim
 

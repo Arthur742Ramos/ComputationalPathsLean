@@ -63,7 +63,7 @@ theorem meet_idem (BA : PathBoolAlg A)
 /-! ## Boolean ordering -/
 
 /-- `p ≤ q` iff `meet p q = p`. -/
-def boolLe (BA : PathBoolAlg A) {a b : A} (p q : Path a b) : Prop :=
+noncomputable def boolLe (BA : PathBoolAlg A) {a b : A} (p q : Path a b) : Prop :=
   BA.meet p q = p
 
 theorem boolLe_refl (BA : PathBoolAlg A) {a b : A} (p : Path a b) :

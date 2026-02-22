@@ -34,12 +34,12 @@ structure PHom (A B : PSet.{u}) where
   map_zero : toFun A.zero = B.zero
 
 /-- Identity pointed map. -/
-def PHom.id (A : PSet.{u}) : PHom A A where
+noncomputable def PHom.id (A : PSet.{u}) : PHom A A where
   toFun := _root_.id
   map_zero := rfl
 
 /-- Composition of pointed maps. -/
-def PHom.comp {A B C : PSet.{u}} (g : PHom B C) (f : PHom A B) : PHom A C where
+noncomputable def PHom.comp {A B C : PSet.{u}} (g : PHom B C) (f : PHom A B) : PHom A C where
   toFun := g.toFun ∘ f.toFun
   map_zero := by simp [Function.comp, f.map_zero, g.map_zero]
 
@@ -61,7 +61,7 @@ theorem PHom.comp_id {A B : PSet.{u}} (f : PHom A B) :
     PHom.comp f (PHom.id A) = f := by apply PHom.ext; rfl
 
 /-- The zero map. -/
-def zeroHom (A B : PSet.{u}) : PHom A B where
+noncomputable def zeroHom (A B : PSet.{u}) : PHom A B where
   toFun := fun _ => B.zero
   map_zero := rfl
 
@@ -87,7 +87,7 @@ theorem ChainComplex3.d_comp_zero (cc : ChainComplex3.{u}) :
 /-! ## Exactness -/
 
 /-- Exactness at C₁: ker(d₁) = im(d₂). We model this as a Prop. -/
-def IsExact (cc : ChainComplex3.{u}) : Prop :=
+noncomputable def IsExact (cc : ChainComplex3.{u}) : Prop :=
   (∀ y : cc.C₁.carrier, cc.d₁.toFun y = cc.C₀.zero →
     ∃ x : cc.C₂.carrier, cc.d₂.toFun x = y) ∧
   (∀ x : cc.C₂.carrier, cc.d₁.toFun (cc.d₂.toFun x) = cc.C₀.zero)
@@ -108,7 +108,7 @@ structure ChainMap (cc dd : ChainComplex3.{u}) where
   comm₂ : ∀ x, f₁.toFun (cc.d₂.toFun x) = dd.d₂.toFun (f₂.toFun x)
 
 /-- Identity chain map. -/
-def ChainMap.id (cc : ChainComplex3.{u}) : ChainMap cc cc where
+noncomputable def ChainMap.id (cc : ChainComplex3.{u}) : ChainMap cc cc where
   f₀ := PHom.id cc.C₀
   f₁ := PHom.id cc.C₁
   f₂ := PHom.id cc.C₂
@@ -116,7 +116,7 @@ def ChainMap.id (cc : ChainComplex3.{u}) : ChainMap cc cc where
   comm₂ := fun _ => rfl
 
 /-- Composition of chain maps. -/
-def ChainMap.comp {cc dd ee : ChainComplex3.{u}}
+noncomputable def ChainMap.comp {cc dd ee : ChainComplex3.{u}}
     (g : ChainMap dd ee) (f : ChainMap cc dd) : ChainMap cc ee where
   f₀ := PHom.comp g.f₀ f.f₀
   f₁ := PHom.comp g.f₁ f.f₁
@@ -141,11 +141,11 @@ theorem ChainMap.comp_id {cc dd : ChainComplex3.{u}} (f : ChainMap cc dd) :
 /-! ## Homology -/
 
 /-- The kernel of a pointed map (as a predicate). -/
-def PHom.ker {A B : PSet.{u}} (f : PHom A B) : A.carrier → Prop :=
+noncomputable def PHom.ker {A B : PSet.{u}} (f : PHom A B) : A.carrier → Prop :=
   fun x => f.toFun x = B.zero
 
 /-- The image of a pointed map (as a predicate). -/
-def PHom.im {A B : PSet.{u}} (f : PHom A B) : B.carrier → Prop :=
+noncomputable def PHom.im {A B : PSet.{u}} (f : PHom A B) : B.carrier → Prop :=
   fun y => ∃ x, f.toFun x = y
 
 /-- Zero is in the kernel. -/
@@ -177,7 +177,7 @@ structure Differential (G : GradedType.{u}) where
   d : (n : Int) → G.obj n → G.obj (n - 1)
 
 /-- d² = 0 condition for a differential, at the type level via paths. -/
-def DSqZero (G : GradedType.{u}) (δ : Differential G)
+noncomputable def DSqZero (G : GradedType.{u}) (δ : Differential G)
     (zero : (n : Int) → G.obj n) : Prop :=
   ∀ (n : Int) (x : G.obj n), δ.d (n - 1) (δ.d n x) = zero (n - 1 - 1)
 
@@ -189,7 +189,7 @@ structure ChainCpx where
   d_sq : DSqZero graded diff basepoint
 
 /-- Path witnessing d²=0 as a computational path. -/
-def dsq_path (cc : ChainCpx.{u}) (n : Int) (x : cc.graded.obj n) :
+noncomputable def dsq_path (cc : ChainCpx.{u}) (n : Int) (x : cc.graded.obj n) :
     Path (cc.diff.d (n - 1) (cc.diff.d n x)) (cc.basepoint (n - 1 - 1)) :=
   Path.mk [Step.mk _ _ (cc.d_sq n x)] (cc.d_sq n x)
 
@@ -204,7 +204,7 @@ structure ChainHomotopy (cc dd : ChainComplex3.{u}) (f g : ChainMap cc dd) where
     Path (dd.d₂.toFun (h₁.toFun x)) (dd.d₂.toFun (h₁.toFun x))
 
 /-- Reflexive chain homotopy: f ~ f. -/
-def ChainHomotopy.refl (cc dd : ChainComplex3.{u}) (f : ChainMap cc dd) :
+noncomputable def ChainHomotopy.refl (cc dd : ChainComplex3.{u}) (f : ChainMap cc dd) :
     ChainHomotopy cc dd f f where
   h₀ := zeroHom cc.C₀ dd.C₁
   h₁ := zeroHom cc.C₁ dd.C₂
@@ -230,7 +230,7 @@ theorem ShortExact.gf_zero (ses : ShortExact.{u}) (a : ses.A.carrier) :
   exact ⟨a, rfl⟩
 
 /-- Path witnessing g ∘ f = 0. -/
-def ShortExact.gf_zero_path (ses : ShortExact.{u}) (a : ses.A.carrier) :
+noncomputable def ShortExact.gf_zero_path (ses : ShortExact.{u}) (a : ses.A.carrier) :
     Path (ses.g.toFun (ses.f.toFun a)) ses.C.zero :=
   Path.mk [Step.mk _ _ (ses.gf_zero a)] (ses.gf_zero a)
 
@@ -250,7 +250,7 @@ structure MayerVietorisData where
   comm : ∀ x, jA.toFun (iA.toFun x) = jB.toFun (iB.toFun x)
 
 /-- Commutativity as a path. -/
-def MayerVietorisData.comm_path (mv : MayerVietorisData.{u}) (x : mv.AB.carrier) :
+noncomputable def MayerVietorisData.comm_path (mv : MayerVietorisData.{u}) (x : mv.AB.carrier) :
     Path (mv.jA.toFun (mv.iA.toFun x)) (mv.jB.toFun (mv.iB.toFun x)) :=
   Path.mk [Step.mk _ _ (mv.comm x)] (mv.comm x)
 

@@ -39,14 +39,14 @@ inductive RPath (α : Type) (R : α → α → Prop) : α → α → Type where
   | cons : {a b c : α} → Step α R a b → RPath α R b c → RPath α R a c
 
 /-- Transitivity: concatenation of rewriting paths. -/
-def RPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def RPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
     (p : RPath α R a b) (q : RPath α R b c) : RPath α R a c :=
   match p with
   | .refl _ => q
   | .cons s rest => .cons s (rest.trans q)
 
 /-- A single step lifted to a path. -/
-def RPath.single {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.single {α : Type} {R : α → α → Prop} {a b : α}
     (s : Step α R a b) : RPath α R a b :=
   .cons s (.refl b)
 
@@ -61,28 +61,28 @@ inductive EqPath (α : Type) (R : α → α → Prop) : α → α → Type where
   | cons : {a b c : α} → SymStep α R a b → EqPath α R b c → EqPath α R a c
 
 /-- Transitivity for equivalence paths. -/
-def EqPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def EqPath.trans {α : Type} {R : α → α → Prop} {a b c : α}
     (p : EqPath α R a b) (q : EqPath α R b c) : EqPath α R a c :=
   match p with
   | .refl _ => q
   | .cons s rest => .cons s (rest.trans q)
 
 /-- Symmetry for symmetric steps. -/
-def SymStep.symm {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def SymStep.symm {α : Type} {R : α → α → Prop} {a b : α}
     (s : SymStep α R a b) : SymStep α R b a :=
   match s with
   | .fwd st => .bwd st
   | .bwd st => .fwd st
 
 /-- Symmetry for equivalence paths. -/
-def EqPath.symm {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def EqPath.symm {α : Type} {R : α → α → Prop} {a b : α}
     (p : EqPath α R a b) : EqPath α R b a :=
   match p with
   | .refl _ => .refl _
   | .cons s rest => rest.symm.trans (.cons s.symm (.refl _))
 
 /-- Embed a forward rewriting path into an equivalence path. -/
-def RPath.toEqPath {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.toEqPath {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) : EqPath α R a b :=
   match p with
   | .refl _ => .refl _
@@ -93,14 +93,14 @@ def RPath.toEqPath {α : Type} {R : α → α → Prop} {a b : α}
 -- ============================================================
 
 /-- Length of a rewriting path. -/
-def RPath.length {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.length {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) : Nat :=
   match p with
   | .refl _ => 0
   | .cons _ rest => 1 + rest.length
 
 /-- Length of an equivalence path. -/
-def EqPath.length {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def EqPath.length {α : Type} {R : α → α → Prop} {a b : α}
     (p : EqPath α R a b) : Nat :=
   match p with
   | .refl _ => 0
@@ -119,21 +119,21 @@ structure DiamondWitness (α : Type) (R : α → α → Prop)
   right : RPath α R c d
 
 /-- The diamond property: every one-step divergence has a diamond witness. -/
-def DiamondProp (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def DiamondProp (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α), R a b → R a c → ∃ d, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
 
 /-- Local confluence: diamond on single steps (weak Church-Rosser). -/
-def LocallyConfluent (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def LocallyConfluent (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α), R a b → R a c →
     ∃ d, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
 
 /-- Full confluence: diamond on multi-step paths. -/
-def Confluent (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def Confluent (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α), (∃ _ : RPath α R a b, True) → (∃ _ : RPath α R a c, True) →
     ∃ d, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
 
 /-- Church-Rosser property: equivalence implies joinability. -/
-def ChurchRosser (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def ChurchRosser (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b : α), (∃ _ : EqPath α R a b, True) →
     ∃ c, (∃ _ : RPath α R a c, ∃ _ : RPath α R b c, True)
 
@@ -231,14 +231,14 @@ theorem toEqPath_length {α : Type} {R : α → α → Prop} {a b : α}
 -- ============================================================
 
 /-- Lift a step through a function (congrArg for steps). -/
-def Step.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Step.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {a b : α} (s : Step α R a b) : Step β S (f a) (f b) :=
   match s with
   | .mk r => .mk (hf r)
 
 /-- congrArg: lift a rewriting path through a function. -/
-def RPath.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def RPath.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {a b : α} (p : RPath α R a b) : RPath β S (f a) (f b) :=
   match p with
@@ -270,7 +270,7 @@ theorem rpath_map_length {α β : Type} {R : α → α → Prop} {S : β → β 
   | cons _ _ ih => simp [RPath.map, RPath.length, ih]
 
 /-- Lift a symmetric step through a function. -/
-def SymStep.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def SymStep.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {a b : α} (s : SymStep α R a b) : SymStep β S (f a) (f b) :=
   match s with
@@ -278,7 +278,7 @@ def SymStep.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
   | .bwd st => .bwd (st.map f hf)
 
 /-- congrArg for equivalence paths. -/
-def EqPath.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def EqPath.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {a b : α} (p : EqPath α R a b) : EqPath β S (f a) (f b) :=
   match p with
@@ -328,7 +328,7 @@ structure Joinable (α : Type) (R : α → α → Prop) (b c : α) where
 
 /-- Paste two diamond witnesses vertically:
     if b →* d₁ ←* c and d₁ →* d₂ ←* e, get b →* d₂ ←* e via trans. -/
-def Joinable.pasteVert {α : Type} {R : α → α → Prop}
+noncomputable def Joinable.pasteVert {α : Type} {R : α → α → Prop}
     {b c d : α}
     (j₁ : Joinable α R b c)
     (j₂ : Joinable α R j₁.target d) :
@@ -353,7 +353,7 @@ theorem paste_vert_right {α : Type} {R : α → α → Prop}
 
 /-- Compose two joinability witnesses when targets align:
     if b →* d ←* c and c →* d ←* e (same target d), get b →* d ←* e. -/
-def Joinable.compose {α : Type} {R : α → α → Prop}
+noncomputable def Joinable.compose {α : Type} {R : α → α → Prop}
     {b c e : α}
     (j₁ : Joinable α R b c)
     (j₂ : Joinable α R c e)
@@ -370,7 +370,7 @@ theorem compose_target {α : Type} {R : α → α → Prop}
   rfl
 
 /-- A trivial diamond: refl on both sides. -/
-def Joinable.trivial {α : Type} {R : α → α → Prop} (a : α) :
+noncomputable def Joinable.trivial {α : Type} {R : α → α → Prop} (a : α) :
     Joinable α R a a :=
   ⟨a, .refl a, .refl a⟩
 
@@ -389,13 +389,13 @@ theorem joinable_trivial_right {α : Type} {R : α → α → Prop} (a : α) :
 -- ============================================================
 
 /-- Transport a predicate along a single rewrite step. -/
-def StepTransport {α : Type} {R : α → α → Prop}
+noncomputable def StepTransport {α : Type} {R : α → α → Prop}
     (P : α → Type) (tr : ∀ {x y}, Step α R x y → P x → P y)
     {a b : α} (s : Step α R a b) : P a → P b :=
   tr s
 
 /-- Transport along a rewriting path (iterated step transport). -/
-def RPath.transport {α : Type} {R : α → α → Prop}
+noncomputable def RPath.transport {α : Type} {R : α → α → Prop}
     (P : α → Type) (tr : ∀ {x y}, Step α R x y → P x → P y)
     {a b : α} (p : RPath α R a b) : P a → P b :=
   match p with
@@ -430,7 +430,7 @@ theorem transport_single {α : Type} {R : α → α → Prop}
   rfl
 
 /-- Transport of a Prop along a path (property preservation). -/
-def RPath.transportProp {α : Type} {R : α → α → Prop}
+noncomputable def RPath.transportProp {α : Type} {R : α → α → Prop}
     (P : α → Prop) (inv : ∀ {x y}, R x y → P x → P y)
     {a b : α} (p : RPath α R a b) : P a → P b :=
   match p with
@@ -493,7 +493,7 @@ structure ExtCriticalPair (α : Type) (R : α → α → Prop) where
   right_path : RPath α R source right_target
 
 /-- Theorem 31: A single-step critical pair embeds into extended. -/
-def CriticalPair.toExt {α : Type} {R : α → α → Prop}
+noncomputable def CriticalPair.toExt {α : Type} {R : α → α → Prop}
     (cp : CriticalPair α R) : ExtCriticalPair α R :=
   ⟨cp.source, cp.left_target, cp.right_target,
    .single cp.left_step, .single cp.right_step⟩
@@ -514,16 +514,16 @@ inductive ParStep (α : Type) (R : α → α → Prop) : α → α → Prop wher
   | step : {a b : α} → R a b → ParStep α R a b
 
 /-- Parallel path: sequence of parallel steps. -/
-def ParPath (α : Type) (R : α → α → Prop) := RPath α (ParStep α R)
+noncomputable def ParPath (α : Type) (R : α → α → Prop) := RPath α (ParStep α R)
 
 /-- Embed a single R-step into a parallel step. -/
-def Step.toParStep {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def Step.toParStep {α : Type} {R : α → α → Prop} {a b : α}
     (s : Step α R a b) : Step α (ParStep α R) a b :=
   match s with
   | .mk r => .mk (.step r)
 
 /-- Embed a rewriting path into a parallel path. -/
-def RPath.toParPath {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def RPath.toParPath {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) : RPath α (ParStep α R) a b :=
   match p with
   | .refl _ => .refl _
@@ -564,11 +564,11 @@ structure Rule (α : Type) where
   rhs : α
 
 /-- Orient an equation left-to-right. -/
-def Equation.orientLR {α : Type} (eq : Equation α) : Rule α :=
+noncomputable def Equation.orientLR {α : Type} (eq : Equation α) : Rule α :=
   ⟨eq.lhs, eq.rhs⟩
 
 /-- Orient an equation right-to-left. -/
-def Equation.orientRL {α : Type} (eq : Equation α) : Rule α :=
+noncomputable def Equation.orientRL {α : Type} (eq : Equation α) : Rule α :=
   ⟨eq.rhs, eq.lhs⟩
 
 /-- Theorem 36: orientLR then orientRL gives flipped rule. -/
@@ -601,7 +601,7 @@ structure CompletionState (α : Type) where
   pending  : List (Equation α)
 
 /-- One completion step: orient a pending equation as a new rule. -/
-def CompletionState.orientNext {α : Type}
+noncomputable def CompletionState.orientNext {α : Type}
     (st : CompletionState α) (eq : Equation α) (rest : List (Equation α))
     (h : st.pending = eq :: rest) : CompletionState α :=
   ⟨st.rules ++ [eq.orientLR], rest⟩
@@ -630,18 +630,18 @@ structure PathCell2 {α : Type} {R : α → α → Prop} {a b : α}
   eq : p = q
 
 /-- Identity 2-cell. -/
-def PathCell2.id {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def PathCell2.id {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) : PathCell2 p p :=
   ⟨rfl⟩
 
 /-- Vertical composition of 2-cells. -/
-def PathCell2.vcomp {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def PathCell2.vcomp {α : Type} {R : α → α → Prop} {a b : α}
     {p q r : RPath α R a b}
     (σ : PathCell2 p q) (τ : PathCell2 q r) : PathCell2 p r :=
   ⟨σ.eq.trans τ.eq⟩
 
 /-- Horizontal composition of 2-cells via path trans. -/
-def PathCell2.hcomp {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def PathCell2.hcomp {α : Type} {R : α → α → Prop} {a b c : α}
     {p₁ q₁ : RPath α R a b} {p₂ q₂ : RPath α R b c}
     (σ : PathCell2 p₁ q₁) (τ : PathCell2 p₂ q₂) :
     PathCell2 (p₁.trans p₂) (q₁.trans q₂) :=
@@ -692,13 +692,13 @@ theorem pathcell2_unique {α : Type} {R : α → α → Prop} {a b : α}
 -- ============================================================
 
 /-- Left whiskering: extend a 2-cell on the left. -/
-def whiskerL {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def whiskerL {α : Type} {R : α → α → Prop} {a b c : α}
     (r : RPath α R a b) {p q : RPath α R b c} (σ : PathCell2 p q) :
     PathCell2 (r.trans p) (r.trans q) :=
   ⟨by rw [σ.eq]⟩
 
 /-- Right whiskering: extend a 2-cell on the right. -/
-def whiskerR {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def whiskerR {α : Type} {R : α → α → Prop} {a b c : α}
     {p q : RPath α R a b} (σ : PathCell2 p q) (r : RPath α R b c) :
     PathCell2 (p.trans r) (q.trans r) :=
   ⟨by rw [σ.eq]⟩
@@ -736,7 +736,7 @@ theorem whiskerR_vcomp {α : Type} {R : α → α → Prop} {a b c : α}
 -- ============================================================
 
 /-- Well-founded termination: no infinite reduction chains. -/
-def Terminating (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def Terminating (α : Type) (R : α → α → Prop) : Prop :=
   WellFounded (fun a b => R b a)
 
 /-- Theorem 50: If a relation is terminating and locally confluent,
@@ -767,7 +767,7 @@ theorem eqpath_symm_single_fwd {α : Type} {R : α → α → Prop} {a b : α}
 -- ============================================================
 
 /-- Map a joinability witness through a function. -/
-def Joinable.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def Joinable.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {b c : α} (j : Joinable α R b c) : Joinable β S (f b) (f c) :=
   ⟨f j.target, j.left.map f hf, j.right.map f hf⟩
@@ -780,7 +780,7 @@ theorem joinable_map_target {α β : Type} {R : α → α → Prop} {S : β → 
   rfl
 
 /-- Map a critical pair through a function. -/
-def CriticalPair.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+noncomputable def CriticalPair.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     (cp : CriticalPair α R) : CriticalPair β S :=
   ⟨f cp.source, f cp.left_target, f cp.right_target,
@@ -797,11 +797,11 @@ theorem critical_pair_map_source {α β : Type} {R : α → α → Prop} {S : β
 -- ============================================================
 
 /-- A rewriting system is complete if confluent and terminating. -/
-def Complete (α : Type) (R : α → α → Prop) : Prop :=
+noncomputable def Complete (α : Type) (R : α → α → Prop) : Prop :=
   Confluent α R ∧ Terminating α R
 
 /-- Normal form: no reduction possible. -/
-def NormalForm (α : Type) (R : α → α → Prop) (a : α) : Prop :=
+noncomputable def NormalForm (α : Type) (R : α → α → Prop) (a : α) : Prop :=
   ∀ b, ¬ R a b
 
 /-- Theorem 54: refl is the only path from a normal form. -/
@@ -842,13 +842,13 @@ theorem toEqPath_single_symm {α : Type} {R : α → α → Prop} {a b : α}
 -- ============================================================
 
 /-- Extend a joinable witness on the left with a path. -/
-def Joinable.extendLeft {α : Type} {R : α → α → Prop}
+noncomputable def Joinable.extendLeft {α : Type} {R : α → α → Prop}
     {a b c : α} (p : RPath α R a b) (j : Joinable α R b c) :
     Joinable α R a c :=
   ⟨j.target, p.trans j.left, j.right⟩
 
 /-- Extend a joinable witness on the right with a path. -/
-def Joinable.extendRight {α : Type} {R : α → α → Prop}
+noncomputable def Joinable.extendRight {α : Type} {R : α → α → Prop}
     {b a c : α} (j : Joinable α R b c) (p : RPath α R a c) :
     Joinable α R b a :=
   ⟨j.target, j.left, p.trans j.right⟩
@@ -876,7 +876,7 @@ theorem extendLeft_target {α : Type} {R : α → α → Prop}
 -- ============================================================
 
 /-- Reverse a path (only for symmetric closure). -/
-def RPath.reverse {α : Type} {R : α → α → Prop}
+noncomputable def RPath.reverse {α : Type} {R : α → α → Prop}
     (symR : ∀ {x y}, R x y → R y x)
     {a b : α} (p : RPath α R a b) : RPath α R b a :=
   match p with
@@ -942,7 +942,7 @@ theorem toParPath_single {α : Type} {R : α → α → Prop} {a b : α}
 -- ============================================================
 
 /-- Compose two maps. -/
-def RPath.mapMap {α β γ : Type}
+noncomputable def RPath.mapMap {α β γ : Type}
     {R : α → α → Prop} {S : β → β → Prop} {T : γ → γ → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     (g : β → γ) (hg : ∀ {x y}, S x y → T (g x) (g y))
@@ -1007,7 +1007,7 @@ theorem transport_length_zero {α : Type} {R : α → α → Prop}
 -- ============================================================
 
 /-- Symmetric joinable: swap left and right. -/
-def Joinable.swap {α : Type} {R : α → α → Prop}
+noncomputable def Joinable.swap {α : Type} {R : α → α → Prop}
     {b c : α} (j : Joinable α R b c) : Joinable α R c b :=
   ⟨j.target, j.right, j.left⟩
 
@@ -1031,7 +1031,7 @@ theorem joinable_trivial_swap {α : Type} {R : α → α → Prop} (a : α) :
 -- ============================================================
 
 /-- Two consecutive steps form a 2-step path. -/
-def twoStepPath {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def twoStepPath {α : Type} {R : α → α → Prop} {a b c : α}
     (s₁ : Step α R a b) (s₂ : Step α R b c) : RPath α R a c :=
   .cons s₁ (.cons s₂ (.refl c))
 
@@ -1048,7 +1048,7 @@ theorem twoStepPath_eq_trans {α : Type} {R : α → α → Prop} {a b c : α}
   rfl
 
 /-- Three consecutive steps. -/
-def threeStepPath {α : Type} {R : α → α → Prop} {a b c d : α}
+noncomputable def threeStepPath {α : Type} {R : α → α → Prop} {a b c d : α}
     (s₁ : Step α R a b) (s₂ : Step α R b c) (s₃ : Step α R c d) : RPath α R a d :=
   .cons s₁ (.cons s₂ (.cons s₃ (.refl d)))
 
@@ -1087,12 +1087,12 @@ theorem map_preserves_path {α β : Type} {R : α → α → Prop} {S : β → �
 -- ============================================================
 
 /-- Embed a backward step into an EqPath. -/
-def EqPath.bwdSingle {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def EqPath.bwdSingle {α : Type} {R : α → α → Prop} {a b : α}
     (s : Step α R b a) : EqPath α R a b :=
   .cons (.bwd s) (.refl b)
 
 /-- Embed a forward step into an EqPath. -/
-def EqPath.fwdSingle {α : Type} {R : α → α → Prop} {a b : α}
+noncomputable def EqPath.fwdSingle {α : Type} {R : α → α → Prop} {a b : α}
     (s : Step α R a b) : EqPath α R a b :=
   .cons (.fwd s) (.refl b)
 
@@ -1141,7 +1141,7 @@ structure Cospan (α : Type) (R : α → α → Prop) where
   right_leg : RPath α R right_foot nadir
 
 /-- Theorem 84: a joinable witness is a cospan. -/
-def Joinable.toCospan {α : Type} {R : α → α → Prop}
+noncomputable def Joinable.toCospan {α : Type} {R : α → α → Prop}
     {b c : α} (j : Joinable α R b c) : Cospan α R :=
   ⟨b, c, j.target, j.left, j.right⟩
 
@@ -1152,7 +1152,7 @@ theorem cospan_nadir_eq_target {α : Type} {R : α → α → Prop}
   rfl
 
 /-- Make a span from a critical pair (extended). -/
-def ExtCriticalPair.toSpan {α : Type} {R : α → α → Prop}
+noncomputable def ExtCriticalPair.toSpan {α : Type} {R : α → α → Prop}
     (cp : ExtCriticalPair α R) : Span α R :=
   ⟨cp.source, cp.left_target, cp.right_target, cp.left_path, cp.right_path⟩
 
@@ -1166,7 +1166,7 @@ theorem span_apex_eq_source {α : Type} {R : α → α → Prop}
 -- ============================================================
 
 /-- Append a step at the end of a path. -/
-def RPath.snoc {α : Type} {R : α → α → Prop} {a b c : α}
+noncomputable def RPath.snoc {α : Type} {R : α → α → Prop} {a b c : α}
     (p : RPath α R a b) (s : Step α R b c) : RPath α R a c :=
   p.trans (.single s)
 
@@ -1222,7 +1222,7 @@ structure ConfluenceCert (α : Type) (R : α → α → Prop)
   source_right : RPath α R a c
 
 /-- Theorem 92: a confluence cert yields a joinable. -/
-def ConfluenceCert.toJoinable {α : Type} {R : α → α → Prop}
+noncomputable def ConfluenceCert.toJoinable {α : Type} {R : α → α → Prop}
     {a b c : α} (cert : ConfluenceCert α R a b c) :
     Joinable α R b c :=
   ⟨cert.witness, cert.left_path, cert.right_path⟩
@@ -1234,7 +1234,7 @@ theorem cert_joinable_target {α : Type} {R : α → α → Prop}
   rfl
 
 /-- Theorem 94: trivial cert from refl paths. -/
-def ConfluenceCert.trivial {α : Type} {R : α → α → Prop} (a : α) :
+noncomputable def ConfluenceCert.trivial {α : Type} {R : α → α → Prop} (a : α) :
     ConfluenceCert α R a a a :=
   ⟨a, .refl a, .refl a, .refl a, .refl a⟩
 

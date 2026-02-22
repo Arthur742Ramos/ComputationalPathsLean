@@ -39,22 +39,22 @@ structure PathEndoMap (A : Type u) (a : A) where
   map_refl : mapPath (Path.refl a) = Path.refl a
 
 /-- Simple path map: a function that transforms paths. -/
-def SimplePathMap (A : Type u) (a b : A) (c d : A) :=
+noncomputable def SimplePathMap (A : Type u) (a b : A) (c d : A) :=
   Path a b → Path c d
 
 /-- Evaluation map: apply a path map to a path. -/
-@[simp] def pathEval (f : SimplePathMap A a b c d) (p : Path a b) : Path c d :=
+@[simp] noncomputable def pathEval (f : SimplePathMap A a b c d) (p : Path a b) : Path c d :=
   f p
 
 /-- Curry: given a function on pairs of paths, produce a function from
 the first path to a function on the second path. -/
-@[simp] def pathCurry {e f' : A}
+@[simp] noncomputable def pathCurry {e f' : A}
     (g : Path a b → Path c d → Path e f') :
     Path a b → (Path c d → Path e f') :=
   g
 
 /-- Uncurry: given a curried function, produce a function on pairs. -/
-@[simp] def pathUncurry {e f' : A}
+@[simp] noncomputable def pathUncurry {e f' : A}
     (g : Path a b → (Path c d → Path e f')) :
     Path a b → Path c d → Path e f' :=
   g
@@ -72,11 +72,11 @@ theorem uncurry_curry {e f' : A}
 /-! ## Exponential transpose -/
 
 /-- Exponential transpose: given `h : P × Q → R`, produce `h' : P → (Q → R)`. -/
-@[simp] def pathExpTranspose {B C : Type u} (h : A × B → C) : A → B → C :=
+@[simp] noncomputable def pathExpTranspose {B C : Type u} (h : A × B → C) : A → B → C :=
   fun a b => h (a, b)
 
 /-- Inverse exponential transpose. -/
-@[simp] def pathExpTransposeInv {B C : Type u} (h : A → B → C) : A × B → C :=
+@[simp] noncomputable def pathExpTransposeInv {B C : Type u} (h : A → B → C) : A × B → C :=
   fun ⟨a, b⟩ => h a b
 
 /-- Transpose roundtrip. -/
@@ -92,11 +92,11 @@ theorem exp_transpose_inv_roundtrip {B C : Type u} (h : A → B → C) :
 /-! ## Path function space operations -/
 
 /-- Identity path map: maps paths to themselves. -/
-@[simp] def pathMapId : SimplePathMap A a b a b :=
+@[simp] noncomputable def pathMapId : SimplePathMap A a b a b :=
   fun p => p
 
 /-- Composition of path maps. -/
-@[simp] def pathMapComp {e f' : A}
+@[simp] noncomputable def pathMapComp {e f' : A}
     (g : SimplePathMap A c d e f') (f : SimplePathMap A a b c d) :
     SimplePathMap A a b e f' :=
   fun p => g (f p)
@@ -119,7 +119,7 @@ theorem pathMapComp_assoc {e f' g h : A}
 /-! ## Cartesian structure -/
 
 /-- Product of paths as a path in the product type. -/
-@[simp] def pathProd {B : Type u} {b1 b2 : B}
+@[simp] noncomputable def pathProd {B : Type u} {b1 b2 : B}
     (p : Path a b) (q : Path b1 b2) : Path (a, b1) (b, b2) :=
   Path.mk (p.steps.map (Step.map (·, b1)) ++ q.steps.map (Step.map (b, ·)))
     (by cases p with
@@ -127,12 +127,12 @@ theorem pathMapComp_assoc {e f' g h : A}
           | mk _ proof_q => cases proof_p; cases proof_q; rfl)
 
 /-- Projection from product path (first component). -/
-@[simp] def pathFst {B : Type u} {b1 b2 : B}
+@[simp] noncomputable def pathFst {B : Type u} {b1 b2 : B}
     (p : Path (a, b1) (b, b2)) : Path a b :=
   Path.congrArg Prod.fst p
 
 /-- Projection from product path (second component). -/
-@[simp] def pathSnd {B : Type u} {b1 b2 : B}
+@[simp] noncomputable def pathSnd {B : Type u} {b1 b2 : B}
     (p : Path (a, b1) (b, b2)) : Path b1 b2 :=
   Path.congrArg Prod.snd p
 
@@ -164,7 +164,7 @@ theorem pathEval_comp {e f' : A}
     pathEval (pathMapComp g f) p = pathEval g (pathEval f p) := rfl
 
 /-- Constant path map: sends everything to the identity path. -/
-@[simp] def pathMapConst (c : A) : SimplePathMap A a b c c :=
+@[simp] noncomputable def pathMapConst (c : A) : SimplePathMap A a b c c :=
   fun _ => Path.refl c
 
 /-- Constant map always yields identity path. -/
@@ -172,7 +172,7 @@ theorem pathMapConst_val (c : A) (p : Path a b) :
     pathMapConst c p = Path.refl c := rfl
 
 /-- Path map from congrArg. -/
-def pathMapOfFun {B : Type u} (f : A → B) (a b : A) :
+noncomputable def pathMapOfFun {B : Type u} (f : A → B) (a b : A) :
     Path a b → Path (f a) (f b) :=
   fun p => Path.congrArg f p
 
@@ -191,7 +191,7 @@ theorem pathMapOfFun_trans {B : Type u} (f : A → B) {a b c : A}
 /-! ## Transport as internal hom -/
 
 /-- Transport can be viewed as a map in the internal hom. -/
-@[simp] def transportAsMap {D : A → Sort v} {a b : A} (p : Path a b) :
+@[simp] noncomputable def transportAsMap {D : A → Sort v} {a b : A} (p : Path a b) :
     D a → D b :=
   Path.transport p
 
@@ -210,12 +210,12 @@ theorem transportAsMap_trans {D : A → Sort v} {a b c : A}
 /-! ## PathEndoMap coherence -/
 
 /-- The identity endomorphism. -/
-def PathEndoMap.id (a : A) : PathEndoMap A a where
+noncomputable def PathEndoMap.id (a : A) : PathEndoMap A a where
   mapPath := fun p => p
   map_refl := rfl
 
 /-- Composition of path endomorphisms. -/
-def PathEndoMap.comp (f g : PathEndoMap A a) : PathEndoMap A a where
+noncomputable def PathEndoMap.comp (f g : PathEndoMap A a) : PathEndoMap A a where
   mapPath := fun p => f.mapPath (g.mapPath p)
   map_refl := by rw [g.map_refl, f.map_refl]
 

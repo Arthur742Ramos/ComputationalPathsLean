@@ -36,7 +36,7 @@ theorem transport_trans_eq {D : A → Type v} {a b c : A}
   Path.transport_trans p q x
 
 /-- The Path witness for transport-trans decomposition. -/
-def transport_trans_path {D : A → Type v} {a b c : A}
+noncomputable def transport_trans_path {D : A → Type v} {a b c : A}
     (p : Path a b) (q : Path b c) (x : D a) :
     Path (Path.transport (D := D) (Path.trans p q) x)
          (Path.transport (D := D) q (Path.transport (D := D) p x)) :=
@@ -75,13 +75,13 @@ theorem transport_symm_cancel' {D : A → Type v} {a b : A}
   Path.transport_symm_right p y
 
 /-- Path witness: `symm p` undoes `p`. -/
-def transport_symm_cancel_path {D : A → Type v} {a b : A}
+noncomputable def transport_symm_cancel_path {D : A → Type v} {a b : A}
     (p : Path a b) (x : D a) :
     Path (Path.transport (D := D) (Path.symm p) (Path.transport (D := D) p x)) x :=
   Path.stepChain (transport_symm_cancel p x)
 
 /-- Path witness: `p` undoes `symm p`. -/
-def transport_symm_cancel_path' {D : A → Type v} {a b : A}
+noncomputable def transport_symm_cancel_path' {D : A → Type v} {a b : A}
     (p : Path a b) (y : D b) :
     Path (Path.transport (D := D) p (Path.transport (D := D) (Path.symm p) y)) y :=
   Path.stepChain (transport_symm_cancel' p y)
@@ -119,7 +119,7 @@ structure DepPath {D : A → Type v} {a b : A}
   eq : Path.transport (D := D) p x = y
 
 /-- Reflexive dependent path over `refl`. -/
-def depPath_refl {D : A → Type v} {a : A} (x : D a) :
+noncomputable def depPath_refl {D : A → Type v} {a : A} (x : D a) :
     DepPath (Path.refl a) x x :=
   ⟨rfl⟩
 
@@ -224,7 +224,7 @@ theorem transport_natural {D E : A → Type v}
   cases p with | mk steps proof => cases proof; rfl
 
 /-- Naturality as a Path witness. -/
-def transport_natural_path {D E : A → Type v}
+noncomputable def transport_natural_path {D E : A → Type v}
     (g : ∀ x : A, D x → E x) {a b : A}
     (p : Path a b) (x : D a) :
     Path (Path.transport (D := E) p (g a x))
@@ -269,7 +269,7 @@ theorem transport_bijective {D : A → Type v} {a b : A}
 /-! ## RwEq witnesses for transport laws -/
 
 /-- Path coherence: double symm transport = single transport. -/
-def transport_symm_symm_path {D : A → Type v} {a b : A}
+noncomputable def transport_symm_symm_path {D : A → Type v} {a b : A}
     (p : Path a b) (x : D a) :
     Path (Path.transport (D := D) (Path.symm (Path.symm p)) x)
          (Path.transport (D := D) p x) :=

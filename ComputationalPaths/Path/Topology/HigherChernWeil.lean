@@ -197,7 +197,7 @@ structure PontryaginClasses where
   whitney_product : True
 
 /-- The first Pontryagin class p₁ ∈ H⁴(M; ℤ). -/
-def firstPontryagin (P : PontryaginClasses) : P.cohomRing :=
+noncomputable def firstPontryagin (P : PontryaginClasses) : P.cohomRing :=
   P.pontryagin 1
 
 /-- Half the first Pontryagin class: the obstruction to String structure. -/
@@ -375,13 +375,13 @@ structure CharClasses2Bundle where
 /-! ## Theorems -/
 
 /-- Chern-Weil map is a ring homomorphism. Multi-step proof. -/
-def cw_ring_hom (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) (P Q : CW.source.carrier) :
+noncomputable def cw_ring_hom (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) (P Q : CW.source.carrier) :
     Path (CW.cwMap (CW.source.mul P Q)) (CW.targetMul (CW.cwMap P) (CW.cwMap Q)) :=
   CW.pres_mul P Q
 
 /-- CW map preserves addition and multiplication simultaneously.
     Multi-step Path proof using trans. -/
-def cw_preserves_sum_product (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+noncomputable def cw_preserves_sum_product (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
     (P Q R : CW.source.carrier) :
     Path (CW.cwMap (CW.source.add P (CW.source.mul Q R)))
          (CW.targetAdd (CW.cwMap P) (CW.targetMul (CW.cwMap Q) (CW.cwMap R))) :=
@@ -390,37 +390,37 @@ def cw_preserves_sum_product (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
     (Path.congrArg (CW.targetAdd (CW.cwMap P)) (CW.pres_mul Q R))
 
 /-- p₀ is the identity in cohomology. -/
-def pontryagin_zero_is_one (P : PontryaginClasses) :
+noncomputable def pontryagin_zero_is_one (P : PontryaginClasses) :
     Path (P.pontryagin 0) P.one :=
   P.p_zero
 
 /-- The fake flatness condition expressed via Path composition.
     Multi-step proof. -/
-def fake_flat_boundary (M : DiffCrossedModule2) (C : Connection2 M)
+noncomputable def fake_flat_boundary (M : DiffCrossedModule2) (C : Connection2 M)
     (x : C.base) :
     Path (C.curvFA x) (M.dt (C.connB x)) :=
   C.fake_flat x
 
 /-- dt is compatible with the bracket. -/
-def dt_hom (M : DiffCrossedModule2) (X Y : M.hAlg.carrier) :
+noncomputable def dt_hom (M : DiffCrossedModule2) (X Y : M.hAlg.carrier) :
     Path (M.dt (M.hAlg.bracket X Y)) (M.gAlg.bracket (M.dt X) (M.dt Y)) :=
   M.dt_bracket X Y
 
 /-- Infinitesimal Peiffer implies a specific relation between
     the action and the bracket. Multi-step proof. -/
-def peiffer_bracket_relation (M : DiffCrossedModule2)
+noncomputable def peiffer_bracket_relation (M : DiffCrossedModule2)
     (Y₁ Y₂ : M.hAlg.carrier) :
     Path (M.dact (M.dt Y₁) Y₂) (M.hAlg.bracket Y₁ Y₂) :=
   M.inf_peiffer Y₁ Y₂
 
 /-- Invariant polynomial ring is commutative. -/
-def inv_poly_comm (𝔤 : LieAlgebra) (R : InvPolyRing 𝔤)
+noncomputable def inv_poly_comm (𝔤 : LieAlgebra) (R : InvPolyRing 𝔤)
     (P Q : R.carrier) :
     Path (R.mul P Q) (R.mul Q P) :=
   R.mul_comm P Q
 
 /-- Higher CW map for 𝔤 preserves sums. -/
-def higher_cw_additive (M : DiffCrossedModule2) (HCW : HigherChernWeilHom M)
+noncomputable def higher_cw_additive (M : DiffCrossedModule2) (HCW : HigherChernWeilHom M)
     (P Q : HCW.sourceG.carrier) :
     Path (HCW.cwMapG (HCW.sourceG.add P Q))
          (HCW.targetAdd (HCW.cwMapG P) (HCW.cwMapG Q)) :=
@@ -428,7 +428,7 @@ def higher_cw_additive (M : DiffCrossedModule2) (HCW : HigherChernWeilHom M)
 
 /-- Combining CW for 𝔤 and 𝔥: both maps applied to sums decompose.
     Multi-step proof. -/
-def higher_cw_both_additive (M : DiffCrossedModule2)
+noncomputable def higher_cw_both_additive (M : DiffCrossedModule2)
     (HCW : HigherChernWeilHom M)
     (P Q : HCW.sourceG.carrier) (R S : HCW.sourceH.carrier) :
     Path (HCW.targetAdd (HCW.cwMapG (HCW.sourceG.add P Q))
@@ -438,29 +438,29 @@ def higher_cw_both_additive (M : DiffCrossedModule2)
   Path.stepChain (by rw [(HCW.pres_add_G P Q).proof, (HCW.pres_add_H R S).proof])
 
 /-- ½p₁ doubles to p₁. -/
-def halfP1_double (P : PontryaginClasses) (hp : HalfP1 P) :
+noncomputable def halfP1_double (P : PontryaginClasses) (hp : HalfP1 P) :
     Path (P.add hp.halfClass hp.halfClass) (firstPontryagin P) :=
   hp.double_is_p1
 
 /-- Differential cohomology ring associativity composed with identity.
     Multi-step Path proof. -/
-def diff_cohom_assoc_unit (CC : CharClasses2Bundle)
+noncomputable def diff_cohom_assoc_unit (CC : CharClasses2Bundle)
     (a b : CC.diffCohom) :
     Path (CC.diffAdd (CC.diffAdd a b) CC.diffZero) (CC.diffAdd a b) :=
   CC.add_zero (CC.diffAdd a b)
 
 /-- CW of zero polynomial is zero class. -/
-def cw_zero (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
+noncomputable def cw_zero (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
     Path (CW.cwMap CW.source.zero) CW.targetZero :=
   CW.pres_zero
 
 /-- CW of one is one (the constant function 1 maps to [1]). -/
-def cw_one (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
+noncomputable def cw_one (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
     Path (CW.cwMap CW.source.one) CW.targetOne :=
   CW.pres_one
 
 /-- Lie bracket distributes over addition (left). -/
-def bracket_distributes (𝔤 : LieAlgebra) (X Y Z : 𝔤.carrier) :
+noncomputable def bracket_distributes (𝔤 : LieAlgebra) (X Y Z : 𝔤.carrier) :
     Path (𝔤.bracket (𝔤.add X Y) Z)
          (𝔤.add (𝔤.bracket X Z) (𝔤.bracket Y Z)) :=
   𝔤.bracket_add_left X Y Z
@@ -468,31 +468,31 @@ def bracket_distributes (𝔤 : LieAlgebra) (X Y Z : 𝔤.carrier) :
 /-! ## Path-theoretic structural theorems -/
 
 /-- The Chern-Weil map preserves additive structure as a Path-algebra morphism law. -/
-def cw_path_algebra_pres_add (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+noncomputable def cw_path_algebra_pres_add (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
     (P Q : CW.source.carrier) :
     Path (CW.cwMap (CW.source.add P Q))
          (CW.targetAdd (CW.cwMap P) (CW.cwMap Q)) :=
   CW.pres_add P Q
 
 /-- The Chern-Weil map preserves multiplicative structure as a Path-algebra morphism law. -/
-def cw_path_algebra_pres_mul (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+noncomputable def cw_path_algebra_pres_mul (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
     (P Q : CW.source.carrier) :
     Path (CW.cwMap (CW.source.mul P Q))
          (CW.targetMul (CW.cwMap P) (CW.cwMap Q)) :=
   CW.pres_mul P Q
 
 /-- The Chern-Weil map sends additive unit to additive unit. -/
-def cw_path_algebra_pres_zero (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
+noncomputable def cw_path_algebra_pres_zero (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
     Path (CW.cwMap CW.source.zero) CW.targetZero :=
   CW.pres_zero
 
 /-- The Chern-Weil map sends multiplicative unit to multiplicative unit. -/
-def cw_path_algebra_pres_one (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
+noncomputable def cw_path_algebra_pres_one (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤) :
     Path (CW.cwMap CW.source.one) CW.targetOne :=
   CW.pres_one
 
 /-- Bundled Path-algebra morphism statement for the Chern-Weil homomorphism. -/
-def cw_path_algebra_morphism (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+noncomputable def cw_path_algebra_morphism (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
     (P Q : CW.source.carrier) :
     (Path (CW.cwMap (CW.source.add P Q))
           (CW.targetAdd (CW.cwMap P) (CW.cwMap Q))) ×
@@ -501,41 +501,41 @@ def cw_path_algebra_morphism (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
   ⟨CW.pres_add P Q, CW.pres_mul P Q⟩
 
 /-- Naturality of characteristic classes under pullback. -/
-def characteristic_class_naturality (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+noncomputable def characteristic_class_naturality (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
     (N : ChernWeilNaturality 𝔤 CW) (P : CW.source.carrier) :
     Path (N.pullbackMap (CW.cwMap P)) (CW.cwMap P) :=
   N.naturality P
 
 /-- Naturality is compatible with additive characteristic-class expressions. -/
-def characteristic_class_naturality_add (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+noncomputable def characteristic_class_naturality_add (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
     (N : ChernWeilNaturality 𝔤 CW) (P Q : CW.source.carrier) :
     Path (N.pullbackMap (CW.cwMap (CW.source.add P Q)))
          (N.pullbackMap (CW.targetAdd (CW.cwMap P) (CW.cwMap Q))) :=
   Path.congrArg N.pullbackMap (CW.pres_add P Q)
 
 /-- Naturality is compatible with multiplicative characteristic-class expressions. -/
-def characteristic_class_naturality_mul (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
+noncomputable def characteristic_class_naturality_mul (𝔤 : LieAlgebra) (CW : ChernWeilHom 𝔤)
     (N : ChernWeilNaturality 𝔤 CW) (P Q : CW.source.carrier) :
     Path (N.pullbackMap (CW.cwMap (CW.source.mul P Q)))
          (N.pullbackMap (CW.targetMul (CW.cwMap P) (CW.cwMap Q))) :=
   Path.congrArg N.pullbackMap (CW.pres_mul P Q)
 
 /-- Higher Chern-Weil map on the 𝔤-side preserves addition. -/
-def higher_cw_path_algebra_pres_add_g (M : DiffCrossedModule2)
+noncomputable def higher_cw_path_algebra_pres_add_g (M : DiffCrossedModule2)
     (HCW : HigherChernWeilHom M) (P Q : HCW.sourceG.carrier) :
     Path (HCW.cwMapG (HCW.sourceG.add P Q))
          (HCW.targetAdd (HCW.cwMapG P) (HCW.cwMapG Q)) :=
   HCW.pres_add_G P Q
 
 /-- Higher Chern-Weil map on the 𝔥-side preserves addition. -/
-def higher_cw_path_algebra_pres_add_h (M : DiffCrossedModule2)
+noncomputable def higher_cw_path_algebra_pres_add_h (M : DiffCrossedModule2)
     (HCW : HigherChernWeilHom M) (P Q : HCW.sourceH.carrier) :
     Path (HCW.cwMapH (HCW.sourceH.add P Q))
          (HCW.targetAdd (HCW.cwMapH P) (HCW.cwMapH Q)) :=
   HCW.pres_add_H P Q
 
 /-- Joint additive decomposition for higher Chern-Weil characteristic classes. -/
-def higher_cw_path_algebra_pair_additive (M : DiffCrossedModule2)
+noncomputable def higher_cw_path_algebra_pair_additive (M : DiffCrossedModule2)
     (HCW : HigherChernWeilHom M)
     (P Q : HCW.sourceG.carrier) (R S : HCW.sourceH.carrier) :
     Path (HCW.targetAdd (HCW.cwMapG (HCW.sourceG.add P Q))

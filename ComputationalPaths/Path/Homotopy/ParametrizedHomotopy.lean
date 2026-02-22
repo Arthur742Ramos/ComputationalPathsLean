@@ -54,18 +54,18 @@ structure ExSpace (B : Type u) where
   section_proj : ∀ (b : B), proj (section_ b) = b
 
 /-- The trivial ex-space: B itself. -/
-def trivialExSpace (B : Type u) : ExSpace B where
+noncomputable def trivialExSpace (B : Type u) : ExSpace B where
   total := B
   proj := _root_.id
   section_ := _root_.id
   section_proj := fun _ => rfl
 
 /-- The fiber of an ex-space over a point b. -/
-def ExSpace.fiber {B : Type u} (E : ExSpace B) (b : B) : Type u :=
+noncomputable def ExSpace.fiber {B : Type u} (E : ExSpace B) (b : B) : Type u :=
   { x : E.total // E.proj x = b }
 
 /-- The section lands in the fiber. -/
-def ExSpace.sectionInFiber {B : Type u} (E : ExSpace B) (b : B) :
+noncomputable def ExSpace.sectionInFiber {B : Type u} (E : ExSpace B) (b : B) :
     E.fiber b where
   val := E.section_ b
   property := E.section_proj b
@@ -82,13 +82,13 @@ structure ExMap {B : Type u} (E₁ E₂ : ExSpace B) where
   section_comm : ∀ (b : B), toFun (E₁.section_ b) = E₂.section_ b
 
 /-- Identity ex-map. -/
-def ExMap.id {B : Type u} (E : ExSpace B) : ExMap E E where
+noncomputable def ExMap.id {B : Type u} (E : ExSpace B) : ExMap E E where
   toFun := _root_.id
   proj_comm := fun _ => rfl
   section_comm := fun _ => rfl
 
 /-- Composition of ex-maps. -/
-def ExMap.comp {B : Type u} {E₁ E₂ E₃ : ExSpace B}
+noncomputable def ExMap.comp {B : Type u} {E₁ E₂ E₃ : ExSpace B}
     (g : ExMap E₂ E₃) (f : ExMap E₁ E₂) : ExMap E₁ E₃ where
   toFun := g.toFun ∘ f.toFun
   proj_comm := fun x => by
@@ -117,7 +117,7 @@ structure FiberwiseHomotopy {B : Type u} {E₁ E₂ : ExSpace B}
   fiberwise : ∀ (x : E₁.total), E₂.proj (homotopy x) = E₁.proj x
 
 /-- Reflexive fiberwise homotopy. -/
-def FiberwiseHomotopy.refl {B : Type u} {E₁ E₂ : ExSpace B}
+noncomputable def FiberwiseHomotopy.refl {B : Type u} {E₁ E₂ : ExSpace B}
     (f : ExMap E₁ E₂) : FiberwiseHomotopy f f where
   homotopy := f.toFun
   at_zero := fun _ => rfl
@@ -133,7 +133,7 @@ structure FiberwiseSmash {B : Type u} (E₁ E₂ : ExSpace B) where
   fiberwise_smash : ∀ (_b : B), True
 
 /-- Trivial fiberwise smash. -/
-def trivialFiberwiseSmash {B : Type u} (E₁ E₂ : ExSpace B) :
+noncomputable def trivialFiberwiseSmash {B : Type u} (E₁ E₂ : ExSpace B) :
     FiberwiseSmash E₁ E₂ where
   result := trivialExSpace B
   fiberwise_smash := fun _ => trivial
@@ -148,7 +148,7 @@ structure ParametrizedSpectrum (B : Type u) where
   structureMap : ∀ (n : Nat), ExMap (level n) (level (n + 1))
 
 /-- The constant parametrized spectrum over B with fiber E. -/
-def constantParamSpectrum (B : Type u) (E : Pointed) :
+noncomputable def constantParamSpectrum (B : Type u) (E : Pointed) :
     ParametrizedSpectrum B where
   level := fun _ => {
     total := B × E.carrier
@@ -173,7 +173,7 @@ structure LocalCoefficients (B : Type u) where
   transport_refl : ∀ (b : B) (x : fiber b), transport rfl x = x
 
 /-- Constant local coefficients. -/
-def constantCoefficients (B : Type u) (A : Type u) :
+noncomputable def constantCoefficients (B : Type u) (A : Type u) :
     LocalCoefficients B where
   fiber := fun _ => A
   transport := fun _ x => x
@@ -189,7 +189,7 @@ structure TwistedCohomology (B : Type u) (L : LocalCoefficients B) where
   reduces_ordinary : True
 
 /-- Trivial twisted cohomology. -/
-def trivialTwistedCohomology (B : Type u) (L : LocalCoefficients B) :
+noncomputable def trivialTwistedCohomology (B : Type u) (L : LocalCoefficients B) :
     TwistedCohomology B L where
   H := fun _ => PUnit
   zero := fun _ => PUnit.unit
@@ -284,7 +284,7 @@ theorem ParametrizedSpectrum.structureMap_comp {B : Type u}
 
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

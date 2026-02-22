@@ -77,7 +77,7 @@ inductive MirrorStep (M : MirrorPair.{u}) :
       MirrorStep M (M.cyX.hodge p q) (M.cyXCheck.hodge (M.cyX.complexDim - p) q)
 
 /-- Interpret a mirror step as a path. -/
-def mirrorStepPath {M : MirrorPair.{u}} {a b : Nat} :
+noncomputable def mirrorStepPath {M : MirrorPair.{u}} {a b : Nat} :
     MirrorStep M a b → Path a b
   | MirrorStep.hodge_mirror p q => M.mirror_hodge p q
 
@@ -246,18 +246,18 @@ structure FourierMukai (CY₁ CY₂ : CalabiYau.{u}) where
 /-! ## Summary -/
 
 /-- Mirror Hodge diamond is a path. -/
-def mirror_hodge_path (M : MirrorPair.{u}) (p q : Nat) :
+noncomputable def mirror_hodge_path (M : MirrorPair.{u}) (p q : Nat) :
     Path (M.cyX.hodge p q) (M.cyXCheck.hodge (M.cyX.complexDim - p) q) :=
   M.mirror_hodge p q
 
 /-- Derived category composition is associative. -/
-def derived_comp_assoc {CY : CalabiYau.{u}} (D : DerivedCategory CY)
+noncomputable def derived_comp_assoc {CY : CalabiYau.{u}} (D : DerivedCategory CY)
     {W X Y Z : D.objects} (f : D.hom W X) (g : D.hom X Y) (h : D.hom Y Z) :
     Path (D.comp (D.comp f g) h) (D.comp f (D.comp g h)) :=
   D.comp_assoc f g h
 
 /-- Fourier-Mukai functoriality. -/
-def fm_functorial {CY₁ CY₂ : CalabiYau.{u}}
+noncomputable def fm_functorial {CY₁ CY₂ : CalabiYau.{u}}
     (FM : FourierMukai CY₁ CY₂) {X Y Z : FM.source.objects}
     (f : FM.source.hom X Y) (g : FM.source.hom Y Z) :
     Path (FM.morMap (FM.source.comp f g))

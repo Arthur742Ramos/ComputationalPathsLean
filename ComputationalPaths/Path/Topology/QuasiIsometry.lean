@@ -53,7 +53,7 @@ variable {X : Type u} {Y : Type v}
 variable {MX : MetricData X} {MY : MetricData Y}
 
 /-- Identity is a (1, 0)-quasi-isometric map. -/
-def id (M : MetricData X) : QuasiIsometricMap M M 1 0 where
+noncomputable def id (M : MetricData X) : QuasiIsometricMap M M 1 0 where
   toFun := fun x => x
   upper_bound := by
     intro x₁ x₂
@@ -63,12 +63,12 @@ def id (M : MetricData X) : QuasiIsometricMap M M 1 0 where
     simp [Nat.one_mul]
 
 /-- The identity map yields a computational path on points. -/
-def id_path (M : MetricData X) (x : X) :
+noncomputable def id_path (M : MetricData X) (x : X) :
     Path ((id M).toFun x) x :=
   Path.stepChain rfl
 
 /-- Composing the identity path with its inverse gives a loop. -/
-def id_path_loop (M : MetricData X) (x : X) : Path x x :=
+noncomputable def id_path_loop (M : MetricData X) (x : X) : Path x x :=
   Path.trans (Path.symm (id_path (M:=M) x)) (id_path (M:=M) x)
 
 end QuasiIsometricMap
@@ -92,7 +92,7 @@ structure QuasiIsometry {X : Type u} {Y : Type v}
   backward_forward : ∀ x, MX.dist (backward.toFun (forward.toFun x)) x ≤ coarseBound
 
 /-- Symmetry of distance yields a loop along a quasi-isometry round-trip. -/
-def forward_backward_dist_loop {X : Type u} {Y : Type v}
+noncomputable def forward_backward_dist_loop {X : Type u} {Y : Type v}
     {MX : MetricData X} {MY : MetricData Y} {lam eps : Nat}
     (qi : QuasiIsometry MX MY lam eps) (y : Y) :
     Path (MY.dist (qi.forward.toFun (qi.backward.toFun y)) y)
@@ -105,14 +105,14 @@ def forward_backward_dist_loop {X : Type u} {Y : Type v}
 
 /-- A property of metric spaces is a quasi-isometry invariant if it is
     preserved by quasi-isometries. -/
-def QuasiIsometryInvariant (P : {X : Type u} → MetricData X → Prop) : Prop :=
+noncomputable def QuasiIsometryInvariant (P : {X : Type u} → MetricData X → Prop) : Prop :=
   ∀ {X Y : Type u} (MX : MetricData X) (MY : MetricData Y)
     (lam eps : Nat),
     (∃ _qi : QuasiIsometry MX MY lam eps, True) →
     P MX → P MY
 
 /-- δ-hyperbolicity is a quasi-isometry invariant (statement only). -/
-def hyperbolicity_qi_invariant : Prop :=
+noncomputable def hyperbolicity_qi_invariant : Prop :=
   ∀ {X Y : Type u} (HX : DeltaHyperbolic X) (MY : MetricData Y)
     (lam eps : Nat),
     (∃ _qi : QuasiIsometry HX.toMetricData MY lam eps, True) →
@@ -153,7 +153,7 @@ variable {X : Type u} {Y : Type v}
 variable {MX : MetricData X} {MY : MetricData Y}
 
 /-- Identity is a 1-Lipschitz map. -/
-def id (M : MetricData X) : LipschitzMap M M 1 where
+noncomputable def id (M : MetricData X) : LipschitzMap M M 1 where
   toFun := fun x => x
   lipschitz := by
     intro x₁ x₂
@@ -183,7 +183,7 @@ structure SeparatedNet {X : Type u} (M : MetricData X) (R : Nat)
     by isometries on a proper geodesic metric space X, then the group
     is finitely generated and quasi-isometric to X.
     We state this as a proposition. -/
-def MilnorSvarcLemma
+noncomputable def MilnorSvarcLemma
     {X : Type u}
     (MX : MetricData X)
     (G : Type u)
@@ -198,7 +198,7 @@ def MilnorSvarcLemma
 
 /-- Quasi-geodesic stability: in a δ-hyperbolic space, quasi-geodesics with
     the same endpoints fellow-travel. -/
-def QuasiGeodesicStability {X : Type u} (H : DeltaHyperbolic X)
+noncomputable def QuasiGeodesicStability {X : Type u} (H : DeltaHyperbolic X)
     (lam eps : Nat) : Prop :=
   ∃ R : Nat,
     ∀ (qg₁ qg₂ : QuasiGeodesic H.toMetricData lam eps),

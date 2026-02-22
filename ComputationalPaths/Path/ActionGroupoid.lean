@@ -38,7 +38,7 @@ variable {G : Type u} {X : Type v} {S : StrictGroup G}
 variable (A : GroupAction G S X)
 
 /-- Act on a computational path by applying the group action to its endpoints. -/
-def pathAction (g : G) {x y : X} :
+noncomputable def pathAction (g : G) {x y : X} :
     Path x y → Path (A.act g x) (A.act g y) :=
   Path.congrArg (A.act g)
 
@@ -61,7 +61,7 @@ def pathAction (g : G) {x y : X} :
 
 
 /-- Act on rewrite-quotiented paths by applying the group action to endpoints. -/
-def pathQuotAction (g : G) {x y : X} :
+noncomputable def pathQuotAction (g : G) {x y : X} :
     PathRwQuot X x y → PathRwQuot X (A.act g x) (A.act g y) :=
   PathRwQuot.congrArg X X (A.act g)
 
@@ -94,7 +94,7 @@ section LoopActions
 variable {A : Type u} {a b : A}
 
 /-- Left action of the loop group on the path space `PathRwQuot A a b`. -/
-def leftPathAction (A : Type u) (a b : A) :
+noncomputable def leftPathAction (A : Type u) (a b : A) :
     GroupAction (LoopQuot A a) (LoopGroupAlgebra.loopGroupStructure A a)
       (PathRwQuot A a b) where
   act := fun g p => PathRwQuot.trans g p
@@ -106,7 +106,7 @@ def leftPathAction (A : Type u) (a b : A) :
     simp [LoopGroupAlgebra.loopGroupStructure, PathRwQuot.trans_assoc]
 
 /-- Right action of the loop group on the path space, encoded via inversion. -/
-def rightPathAction (A : Type u) (a b : A) :
+noncomputable def rightPathAction (A : Type u) (a b : A) :
     GroupAction (LoopQuot A b) (LoopGroupAlgebra.loopGroupStructure A b)
       (PathRwQuot A a b) where
   act := fun g p => PathRwQuot.trans p (LoopQuot.inv g)
@@ -134,7 +134,7 @@ theorem leftPathOrbit (p q : PathRwQuot A a b) :
   simp [leftPathAction, PathRwQuot.trans_assoc]
 
 /-- The left loop action identifies the path space with the loop group (torsor). -/
-def leftPathOrbitEquiv (p : PathRwQuot A a b) :
+noncomputable def leftPathOrbitEquiv (p : PathRwQuot A a b) :
     SimpleEquiv (LoopQuot A a) (PathRwQuot A a b) where
   toFun := fun g => PathRwQuot.trans g p
   invFun := fun q => PathRwQuot.trans q (PathRwQuot.symm p)

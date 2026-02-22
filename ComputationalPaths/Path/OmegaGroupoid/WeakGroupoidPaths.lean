@@ -14,12 +14,12 @@ variable {X : Type u}
 
 abbrev Cell (x y : X) : Type u := Path x y
 
-@[simp] def id (x : X) : Cell x x := Path.refl x
+@[simp] noncomputable def id (x : X) : Cell x x := Path.refl x
 
-@[simp] def comp {x y z : X} (p : Cell x y) (q : Cell y z) : Cell x z :=
+@[simp] noncomputable def comp {x y z : X} (p : Cell x y) (q : Cell y z) : Cell x z :=
   Path.trans p q
 
-@[simp] def inv {x y : X} (p : Cell x y) : Cell y x :=
+@[simp] noncomputable def inv {x y : X} (p : Cell x y) : Cell y x :=
   Path.symm p
 
 noncomputable def assoc {x y z w : X} (p : Cell x y) (q : Cell y z) (r : Cell z w) :

@@ -38,7 +38,7 @@ structure PathSimpleEquiv (α : Type u) (β : Type v) where
   right_inv : ∀ y : β, Path (toFun (invFun y)) y
 
 /-- Convert a `PathSimpleEquiv` into a `SimpleEquiv`. -/
-def pathSimpleEquivToSimpleEquiv {α : Type u} {β : Type v}
+noncomputable def pathSimpleEquivToSimpleEquiv {α : Type u} {β : Type v}
     (e : PathSimpleEquiv α β) : SimpleEquiv α β :=
   { toFun := e.toFun
     invFun := e.invFun
@@ -60,7 +60,7 @@ class HasTorusPiOneEncode : Type u where
   torusDecode_encode : ∀ x : torusPiOne, Path (torusDecode (encode x)) x
 
 /-- Winding-number map specialised from `HasTorusPiOneEncode`. -/
-@[simp] def torusPiOneEncode [HasTorusPiOneEncode] : torusPiOne → Int × Int :=
+@[simp] noncomputable def torusPiOneEncode [HasTorusPiOneEncode] : torusPiOne → Int × Int :=
   HasTorusPiOneEncode.encode
 
 noncomputable def torusPiOneEncode_torusDecode [HasTorusPiOneEncode] (z : Int × Int) :

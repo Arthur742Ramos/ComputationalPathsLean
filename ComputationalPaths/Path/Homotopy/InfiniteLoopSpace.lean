@@ -64,7 +64,7 @@ structure InfLoopSpace where
     PointedMap (delooping n) (loopPointed (delooping (n + 1)))
 
 /-- The trivial infinite loop space: a single point. -/
-def trivialInfLoop : InfLoopSpace where
+noncomputable def trivialInfLoop : InfLoopSpace where
   space := { carrier := Unit, pt := () }
   delooping := fun _ => { carrier := Unit, pt := () }
   level_zero := rfl
@@ -83,18 +83,18 @@ structure SpectrumObject where
     PointedMap (level n) (loopPointed (level (n + 1)))
 
 /-- Convert an OmegaSpectrum to a SpectrumObject. -/
-def SpectrumObject.ofOmega (E : Homotopy.OmegaSpectrum) : SpectrumObject where
+noncomputable def SpectrumObject.ofOmega (E : Homotopy.OmegaSpectrum) : SpectrumObject where
   level := E.level
   adjointMap := E.structureMap
 /-- The zeroth space of a spectrum is an infinite loop space. -/
-def omegaInfiniteFromSpectrum (E : SpectrumObject) : InfLoopSpace where
+noncomputable def omegaInfiniteFromSpectrum (E : SpectrumObject) : InfLoopSpace where
   space := E.level 0
   delooping := E.level
   level_zero := rfl
   structureMap := E.adjointMap
 
 /-- Constant spectrum: every level is the same pointed type. -/
-def constantSpectrumObject (X : Pointed) : SpectrumObject where
+noncomputable def constantSpectrumObject (X : Pointed) : SpectrumObject where
   level := fun _ => X
   adjointMap := fun _ =>
     { toFun := fun _ => Path.refl X.pt
@@ -112,7 +112,7 @@ structure ConnectiveCover (E : SpectrumObject) where
   map : (n : Nat) → PointedMap (cover.level n) (E.level n)
 
 /-- Trivial connective cover: the spectrum itself. -/
-def ConnectiveCover.trivial (E : SpectrumObject) : ConnectiveCover E where
+noncomputable def ConnectiveCover.trivial (E : SpectrumObject) : ConnectiveCover E where
   cover := E
   map := fun n => PointedMap.id (E.level n)
 
@@ -137,21 +137,21 @@ structure InfLoopMachine where
 
 /-- The trivial infinite loop space machine: sends everything to the
     constant spectrum. -/
-def trivialMachine : InfLoopMachine where
+noncomputable def trivialMachine : InfLoopMachine where
   apply := fun inp => constantSpectrumObject (inp.input 0)
   level_zero_map := fun inp => PointedMap.id (inp.input 0)
 
 /-! ## Shift and truncation -/
 
 /-- Shift a spectrum object by k levels. -/
-def SpectrumObject.shift (E : SpectrumObject) (k : Nat) : SpectrumObject where
+noncomputable def SpectrumObject.shift (E : SpectrumObject) (k : Nat) : SpectrumObject where
   level := fun n => E.level (n + k)
   adjointMap := fun n =>
     have h : n + k + 1 = n + 1 + k := by omega
     h ▸ E.adjointMap (n + k)
 
 /-- The underlying infinite loop space of a shifted spectrum. -/
-def shiftedInfLoop (E : SpectrumObject) (k : Nat) : InfLoopSpace :=
+noncomputable def shiftedInfLoop (E : SpectrumObject) (k : Nat) : InfLoopSpace :=
   omegaInfiniteFromSpectrum (E.shift k)
 
 /-- Two spectra are equivalent if there are levelwise pointed equivalences. -/
@@ -166,7 +166,7 @@ structure SpectrumEquiv (E F : SpectrumObject) where
   right_inv : ∀ n y, (toMap n).toFun ((invMap n).toFun y) = y
 
 /-- Identity spectrum equivalence. -/
-def SpectrumEquiv.refl (E : SpectrumObject) : SpectrumEquiv E E where
+noncomputable def SpectrumEquiv.refl (E : SpectrumObject) : SpectrumEquiv E E where
   toMap := fun n => PointedMap.id (E.level n)
   invMap := fun n => PointedMap.id (E.level n)
   left_inv := fun _ _ => rfl
@@ -188,7 +188,7 @@ def SpectrumEquiv.refl (E : SpectrumObject) : SpectrumEquiv E E where
 
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

@@ -36,7 +36,7 @@ structure Filtration (A : Type u) where
   monotone : ∀ {n m : Nat}, n ≤ m → ∀ {x : A}, level n x → level m x
 
 /-- The associated graded piece at index n. -/
-def AssociatedGraded {A : Type u} (F : Filtration A) (n : Nat) : Type u :=
+noncomputable def AssociatedGraded {A : Type u} (F : Filtration A) (n : Nat) : Type u :=
   {x : A // F.level n x}
 
 /-! ## Spectral pages -/
@@ -89,32 +89,32 @@ structure PageSuccessor {r : Nat} (E : SpectralPage.{u} r) where
 /-! ## Trivial PUnit instances -/
 
 /-- The trivial filtration on PUnit. -/
-def punitFiltration : Filtration PUnit where
+noncomputable def punitFiltration : Filtration PUnit where
   level := fun _ _ => True
   monotone := fun _ _ => id
 
 /-- The trivial spectral page with all terms PUnit. -/
-def trivialSpectralPage (r : Nat) : SpectralPage.{0} r where
+noncomputable def trivialSpectralPage (r : Nat) : SpectralPage.{0} r where
   term := fun _ _ => PUnit
   zero := fun _ _ => PUnit.unit
   d := fun _ _ _ => PUnit.unit
   d_squared_zero := fun _ _ _ => Path.stepChain rfl
 
 /-- The trivial convergence data for PUnit. -/
-def trivialConvergence (r : Nat) :
+noncomputable def trivialConvergence (r : Nat) :
     Convergence punitFiltration (r := r) (trivialSpectralPage r) where
   compare := fun _ _ _ => ⟨PUnit.unit, True.intro⟩
   compare_path := fun _ _ {_ _} _ => Path.stepChain rfl
 
 /-- The trivial edge homomorphism for PUnit. -/
-def trivialEdgeHomomorphism (r : Nat) :
+noncomputable def trivialEdgeHomomorphism (r : Nat) :
     EdgeHomomorphism punitFiltration (r := r) (trivialSpectralPage r) where
   map := fun _ _ => PUnit.unit
   respects_filtration := fun _ _ => True.intro
   map_path := fun _ {_ _} _ => Path.stepChain rfl
 
 /-- The trivial page successor for PUnit. -/
-def trivialPageSuccessor (r : Nat) :
+noncomputable def trivialPageSuccessor (r : Nat) :
     PageSuccessor (trivialSpectralPage r) where
   next := trivialSpectralPage (r + 1)
   proj := fun _ _ _ => PUnit.unit

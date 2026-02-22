@@ -81,7 +81,7 @@ structure StandardSymplectic (n : Nat) where
 
 /-- The standard symplectic form ω₀ = Σ dqᵢ ∧ dpᵢ on ℤ²ⁿ, represented
     abstractly. -/
-def standardForm (n : Nat) : TwoForm (StandardSymplectic n) Int where
+noncomputable def standardForm (n : Nat) : TwoForm (StandardSymplectic n) Int where
   eval := fun _ _ => 0
   scalarZero := 0
   skewSymm := fun _ _ _ => rfl
@@ -102,7 +102,7 @@ structure Symplectomorphism (M N : SymplecticManifold.{u}) where
   preserves_form : True
 
 /-- Identity symplectomorphism. -/
-def Symplectomorphism.id (M : SymplecticManifold.{u}) : Symplectomorphism M M where
+noncomputable def Symplectomorphism.id (M : SymplecticManifold.{u}) : Symplectomorphism M M where
   toFun := _root_.id
   invFun := _root_.id
   left_inv := fun x => Path.refl x
@@ -110,7 +110,7 @@ def Symplectomorphism.id (M : SymplecticManifold.{u}) : Symplectomorphism M M wh
   preserves_form := trivial
 
 /-- Composition of symplectomorphisms. -/
-def Symplectomorphism.comp {M N P : SymplecticManifold.{u}}
+noncomputable def Symplectomorphism.comp {M N P : SymplecticManifold.{u}}
     (g : Symplectomorphism N P) (f : Symplectomorphism M N) :
     Symplectomorphism M P where
   toFun := g.toFun ∘ f.toFun
@@ -120,7 +120,7 @@ def Symplectomorphism.comp {M N P : SymplecticManifold.{u}}
   preserves_form := trivial
 
 /-- Inverse of a symplectomorphism. -/
-def Symplectomorphism.symm {M N : SymplecticManifold.{u}}
+noncomputable def Symplectomorphism.symm {M N : SymplecticManifold.{u}}
     (f : Symplectomorphism M N) : Symplectomorphism N M where
   toFun := f.invFun
   invFun := f.toFun
@@ -154,7 +154,7 @@ structure HamiltonianIsotopy (M : SymplecticManifold.{u}) where
 
 /-- Two symplectomorphisms are Hamiltonian isotopic if connected by
     a Hamiltonian isotopy. -/
-def HamiltonianIsotopic (M : SymplecticManifold.{u})
+noncomputable def HamiltonianIsotopic (M : SymplecticManifold.{u})
     (_f _g : Symplectomorphism M M) : Prop :=
   ∃ _ : HamiltonianIsotopy M, True
 
@@ -166,7 +166,7 @@ abbrev SymplectoPath (M : SymplecticManifold.{u})
   Path f g
 
 /-- `Path.trans` composes Hamiltonian-isotopy paths. -/
-def hamiltonianIsotopy_compose {M : SymplecticManifold.{u}}
+noncomputable def hamiltonianIsotopy_compose {M : SymplecticManifold.{u}}
     {f g h : Symplectomorphism M M}
     (p : SymplectoPath M f g) (q : SymplectoPath M g h) :
     SymplectoPath M f h :=

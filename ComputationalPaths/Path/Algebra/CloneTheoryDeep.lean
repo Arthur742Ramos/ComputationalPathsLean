@@ -17,14 +17,14 @@ universe u v
 -- ============================================================================
 
 /-- An n-ary operation on a type A -/
-def NaryOp (A : Type u) (n : Nat) : Type u := (Fin n → A) → A
+noncomputable def NaryOp (A : Type u) (n : Nat) : Type u := (Fin n → A) → A
 
 /-- The i-th projection operation of arity n -/
-def proj {A : Type u} (n : Nat) (i : Fin n) : NaryOp A n :=
+noncomputable def proj {A : Type u} (n : Nat) (i : Fin n) : NaryOp A n :=
   fun args => args i
 
 /-- Superposition: compose an m-ary op with m n-ary ops -/
-def superpose {A : Type u} {m n : Nat}
+noncomputable def superpose {A : Type u} {m n : Nat}
     (f : NaryOp A m) (gs : Fin m → NaryOp A n) : NaryOp A n :=
   fun args => f (fun i => gs i args)
 
@@ -41,17 +41,17 @@ structure Clone (A : Type u) where
 -- ============================================================================
 
 /-- Theorem 1: Projection extracts the correct component -/
-def proj_applies {A : Type u} (n : Nat) (i : Fin n) (args : Fin n → A) :
+noncomputable def proj_applies {A : Type u} (n : Nat) (i : Fin n) (args : Fin n → A) :
     Path (proj n i args) (args i) :=
   Path.refl (args i)
 
 /-- Theorem 2: Superposition with projections is identity -/
-def superpose_proj_id {A : Type u} {n : Nat} (f : NaryOp A n) (args : Fin n → A) :
+noncomputable def superpose_proj_id {A : Type u} {n : Nat} (f : NaryOp A n) (args : Fin n → A) :
     Path (superpose f (fun i => proj n i) args) (f args) :=
   Path.refl (f args)
 
 /-- Theorem 3: Superposition is associative -/
-def superpose_assoc {A : Type u} {k m n : Nat}
+noncomputable def superpose_assoc {A : Type u} {k m n : Nat}
     (f : NaryOp A k) (gs : Fin k → NaryOp A m) (hs : Fin m → NaryOp A n)
     (args : Fin n → A) :
     Path (superpose (superpose f gs) hs args)
@@ -59,13 +59,13 @@ def superpose_assoc {A : Type u} {k m n : Nat}
   Path.refl (f (fun i => gs i (fun j => hs j args)))
 
 /-- Theorem 4: Projection composed with superposition -/
-def proj_superpose {A : Type u} {m n : Nat}
+noncomputable def proj_superpose {A : Type u} {m n : Nat}
     (i : Fin m) (gs : Fin m → NaryOp A n) (args : Fin n → A) :
     Path (superpose (proj m i) gs args) (gs i args) :=
   Path.refl (gs i args)
 
 /-- Theorem 5: Superposition respects paths in the outer function -/
-def superpose_congr_outer {A : Type u} {m n : Nat}
+noncomputable def superpose_congr_outer {A : Type u} {m n : Nat}
     (f₁ f₂ : NaryOp A m) (gs : Fin m → NaryOp A n)
     (p : Path f₁ f₂) (args : Fin n → A) :
     Path (superpose f₁ gs args) (superpose f₂ gs args) :=
@@ -109,21 +109,21 @@ theorem generated_closed {A : Type u}
 -- ============================================================================
 
 /-- An m-ary relation on A -/
-def NaryRel (A : Type u) (m : Nat) : Type u := (Fin m → A) → Prop
+noncomputable def NaryRel (A : Type u) (m : Nat) : Type u := (Fin m → A) → Prop
 
 /-- An n-ary operation f preserves an m-ary relation R -/
-def Preserves {A : Type u} {n m : Nat} (f : NaryOp A n) (R : NaryRel A m) : Prop :=
+noncomputable def Preserves {A : Type u} {n m : Nat} (f : NaryOp A n) (R : NaryRel A m) : Prop :=
   ∀ (tuples : Fin n → Fin m → A),
     (∀ j : Fin n, R (tuples j)) →
     R (fun k => f (fun j => tuples j k))
 
 /-- Pol(R): all operations preserving relation set R -/
-def PolSet {A : Type u} (rels : (m : Nat) → NaryRel A m → Prop)
+noncomputable def PolSet {A : Type u} (rels : (m : Nat) → NaryRel A m → Prop)
     (n : Nat) (f : NaryOp A n) : Prop :=
   ∀ (m : Nat) (R : NaryRel A m), rels m R → Preserves f R
 
 /-- Inv(F): all relations preserved by operation set F -/
-def InvSet {A : Type u} (ops : (n : Nat) → NaryOp A n → Prop)
+noncomputable def InvSet {A : Type u} (ops : (n : Nat) → NaryOp A n → Prop)
     (m : Nat) (R : NaryRel A m) : Prop :=
   ∀ (n : Nat) (f : NaryOp A n), ops n f → Preserves f R
 
@@ -195,32 +195,32 @@ theorem inv_pol_inv {A : Type u} (ops : (n : Nat) → NaryOp A n → Prop)
 -- ============================================================================
 
 /-- A constant operation returning c at any arity -/
-def constOp {A : Type u} (n : Nat) (c : A) : NaryOp A n :=
+noncomputable def constOp {A : Type u} (n : Nat) (c : A) : NaryOp A n :=
   fun _ => c
 
 /-- Theorem 18: Constant operation ignores arguments -/
-def constOp_ignores {A : Type u} (n : Nat) (c : A)
+noncomputable def constOp_ignores {A : Type u} (n : Nat) (c : A)
     (args₁ args₂ : Fin n → A) :
     Path (constOp n c args₁) (constOp n c args₂) :=
   Path.refl c
 
 /-- Theorem 19: Superposing with constant operations yields constant -/
-def superpose_const {A : Type u} {m n : Nat}
+noncomputable def superpose_const {A : Type u} {m n : Nat}
     (f : NaryOp A m) (c : A) (args : Fin n → A) :
     Path (superpose f (fun _ => constOp n c) args) (f (fun _ => c)) :=
   Path.refl (f (fun _ => c))
 
 /-- A unary operation as a 1-ary NaryOp -/
-def unaryToNary {A : Type u} (f : A → A) : NaryOp A 1 :=
+noncomputable def unaryToNary {A : Type u} (f : A → A) : NaryOp A 1 :=
   fun args => f (args ⟨0, Nat.zero_lt_one⟩)
 
 /-- Theorem 20: Unary-to-nary conversion applies correctly -/
-def unary_nary_applies {A : Type u} (f : A → A) (a : A) :
+noncomputable def unary_nary_applies {A : Type u} (f : A → A) (a : A) :
     Path (unaryToNary f (fun _ => a)) (f a) :=
   Path.refl (f a)
 
 /-- A binary operation as a 2-ary NaryOp -/
-def binaryToNary {A : Type u} (f : A → A → A) : NaryOp A 2 :=
+noncomputable def binaryToNary {A : Type u} (f : A → A → A) : NaryOp A 2 :=
   fun args => f (args ⟨0, by omega⟩) (args ⟨1, by omega⟩)
 
 -- ============================================================================
@@ -228,7 +228,7 @@ def binaryToNary {A : Type u} (f : A → A → A) : NaryOp A 2 :=
 -- ============================================================================
 
 /-- Theorem 21: Commutative + associative implies medial law -/
-def comm_assoc_medial {A : Type u} (f : A → A → A)
+noncomputable def comm_assoc_medial {A : Type u} (f : A → A → A)
     (hc : ∀ x y : A, Path (f x y) (f y x))
     (ha : ∀ x y z : A, Path (f (f x y) z) (f x (f y z)))
     (a b c d : A) :
@@ -244,14 +244,14 @@ def comm_assoc_medial {A : Type u} (f : A → A → A)
   Path.trans step1 (Path.trans step6 step7)
 
 /-- Theorem 22: Idempotent + commutative gives absorption-like path -/
-def idem_comm_path {A : Type u} (f : A → A → A)
+noncomputable def idem_comm_path {A : Type u} (f : A → A → A)
     (hi : ∀ x : A, Path (f x x) x)
     (hc : ∀ x y : A, Path (f x y) (f y x))
     (x : A) : Path (f x x) x :=
   hi x
 
 /-- Theorem 23: Associativity chain of length 4 -/
-def assoc_chain4 {A : Type u} (f : A → A → A)
+noncomputable def assoc_chain4 {A : Type u} (f : A → A → A)
     (ha : ∀ x y z : A, Path (f (f x y) z) (f x (f y z)))
     (a b c d : A) :
     Path (f (f (f a b) c) d) (f a (f b (f c d))) :=
@@ -268,17 +268,17 @@ structure MaltsevOp (A : Type u) where
   right_id : ∀ x y : A, Path (op y y x) x
 
 /-- Theorem 24: Maltsev operation path coherence -/
-def maltsev_coherence {A : Type u} (m : MaltsevOp A) (x : A) :
+noncomputable def maltsev_coherence {A : Type u} (m : MaltsevOp A) (x : A) :
     Path (m.op x x x) x :=
   m.left_id x x
 
 /-- Theorem 25: Maltsev double application -/
-def maltsev_double {A : Type u} (m : MaltsevOp A) (x y : A) :
+noncomputable def maltsev_double {A : Type u} (m : MaltsevOp A) (x y : A) :
     Path (m.op (m.op x y y) y y) x :=
   Path.trans (Path.congrArg (fun z => m.op z y y) (m.left_id x y)) (m.left_id x y)
 
 /-- Theorem 26: Maltsev symmetry path -/
-def maltsev_symm_path {A : Type u} (m : MaltsevOp A) (x y : A) :
+noncomputable def maltsev_symm_path {A : Type u} (m : MaltsevOp A) (x y : A) :
     Path (m.op (m.op y y x) (m.op x y y) (m.op x y y)) x :=
   let s1 := Path.congrArg (fun z => m.op z (m.op x y y) (m.op x y y)) (m.right_id x y)
   let s2 := Path.congrArg (fun z => m.op x z (m.op x y y)) (m.left_id x y)
@@ -286,7 +286,7 @@ def maltsev_symm_path {A : Type u} (m : MaltsevOp A) (x y : A) :
   Path.trans s1 (Path.trans s2 (Path.trans s3 (m.left_id x x)))
 
 /-- Theorem 27: Maltsev right identity composed -/
-def maltsev_right_double {A : Type u} (m : MaltsevOp A) (x y : A) :
+noncomputable def maltsev_right_double {A : Type u} (m : MaltsevOp A) (x y : A) :
     Path (m.op y y (m.op y y x)) x :=
   Path.trans (Path.congrArg (fun z => m.op y y z) (m.right_id x y)) (m.right_id x y)
 
@@ -302,17 +302,17 @@ structure MajorityOp (A : Type u) where
   maj3 : ∀ x y : A, Path (op y x x) x
 
 /-- Theorem 28: Majority operation is idempotent -/
-def majority_idempotent {A : Type u} (m : MajorityOp A) (x : A) :
+noncomputable def majority_idempotent {A : Type u} (m : MajorityOp A) (x : A) :
     Path (m.op x x x) x :=
   m.maj1 x x
 
 /-- Theorem 29: Majority op: congruence on first argument -/
-def majority_congr1 {A : Type u} (m : MajorityOp A) (x y z : A) (p : Path x y) :
+noncomputable def majority_congr1 {A : Type u} (m : MajorityOp A) (x y z : A) (p : Path x y) :
     Path (m.op x z z) (m.op y z z) :=
   Path.congrArg (fun w => m.op w z z) p
 
 /-- Theorem 30: Majority op: transitive chain -/
-def majority_chain {A : Type u} (m : MajorityOp A) (x y : A) :
+noncomputable def majority_chain {A : Type u} (m : MajorityOp A) (x y : A) :
     Path (m.op (m.op x x y) x y) (m.op x x y) :=
   Path.congrArg (fun w => m.op w x y) (m.maj1 x y)
 
@@ -322,18 +322,18 @@ structure NUOp (A : Type u) (k : Nat) where
   idem : ∀ x : A, Path (op (fun _ => x)) x
 
 /-- Theorem 31: NU operation is idempotent -/
-def nu_idempotent {A : Type u} {k : Nat} (nu : NUOp A k) (x : A) :
+noncomputable def nu_idempotent {A : Type u} {k : Nat} (nu : NUOp A k) (x : A) :
     Path (nu.op (fun _ => x)) x :=
   nu.idem x
 
 /-- Theorem 32: NU op congruence -/
-def nu_const_congr {A : Type u} {k : Nat} (nu : NUOp A k)
+noncomputable def nu_const_congr {A : Type u} {k : Nat} (nu : NUOp A k)
     (x y : A) (p : Path x y) :
     Path (nu.op (fun _ => x)) (nu.op (fun _ => y)) :=
   Path.congrArg (fun z => nu.op (fun _ => z)) p
 
 /-- Theorem 33: NU idempotency composes with path -/
-def nu_idem_trans {A : Type u} {k : Nat} (nu : NUOp A k)
+noncomputable def nu_idem_trans {A : Type u} {k : Nat} (nu : NUOp A k)
     (x y : A) (p : Path x y) :
     Path (nu.op (fun _ => x)) y :=
   Path.trans (nu.idem x) p
@@ -353,17 +353,17 @@ structure JonssonTerms (A : Type u) (n : Nat) where
     Path (terms ⟨2 * i + 1, by omega⟩ x z z) (terms ⟨2 * i + 2, by omega⟩ x z z)
 
 /-- Theorem 34: First Jónsson term is left projection -/
-def jonsson_first_proj {A : Type u} {n : Nat} (j : JonssonTerms A n) (x y z : A) :
+noncomputable def jonsson_first_proj {A : Type u} {n : Nat} (j : JonssonTerms A n) (x y z : A) :
     Path (j.terms ⟨0, by omega⟩ x y z) x :=
   j.first_eq x y z
 
 /-- Theorem 35: Last Jónsson term is right projection -/
-def jonsson_last_proj {A : Type u} {n : Nat} (j : JonssonTerms A n) (x y z : A) :
+noncomputable def jonsson_last_proj {A : Type u} {n : Nat} (j : JonssonTerms A n) (x y z : A) :
     Path (j.terms ⟨2 * n, by omega⟩ x y z) z :=
   j.last_eq x y z
 
 /-- Theorem 36: Jónsson first term on diagonal -/
-def jonsson_first_diag {A : Type u} {n : Nat} (j : JonssonTerms A n) (x z : A) :
+noncomputable def jonsson_first_diag {A : Type u} {n : Nat} (j : JonssonTerms A n) (x z : A) :
     Path (j.terms ⟨0, by omega⟩ x x z) x :=
   j.first_eq x x z
 
@@ -375,49 +375,49 @@ def jonsson_first_diag {A : Type u} {n : Nat} (j : JonssonTerms A n) (x z : A) :
 abbrev BoolOp (n : Nat) := NaryOp Bool n
 
 /-- AND as binary NaryOp -/
-def boolAnd : BoolOp 2 :=
+noncomputable def boolAnd : BoolOp 2 :=
   fun args => args ⟨0, by omega⟩ && args ⟨1, by omega⟩
 
 /-- OR as binary NaryOp -/
-def boolOr : BoolOp 2 :=
+noncomputable def boolOr : BoolOp 2 :=
   fun args => args ⟨0, by omega⟩ || args ⟨1, by omega⟩
 
 /-- NOT as unary NaryOp -/
-def boolNot : BoolOp 1 :=
+noncomputable def boolNot : BoolOp 1 :=
   fun args => !args ⟨0, by omega⟩
 
 /-- Theorem 37: AND is idempotent -/
-def and_idempotent (b : Bool) :
+noncomputable def and_idempotent (b : Bool) :
     Path (boolAnd (fun _ => b)) b := by
   cases b <;> exact Path.refl _
 
 /-- Theorem 38: OR is idempotent -/
-def or_idempotent (b : Bool) :
+noncomputable def or_idempotent (b : Bool) :
     Path (boolOr (fun _ => b)) b := by
   cases b <;> exact Path.refl _
 
 /-- Theorem 39: NOT is involutive -/
-def not_involutive (b : Bool) :
+noncomputable def not_involutive (b : Bool) :
     Path (boolNot (fun _ => boolNot (fun _ => b))) b := by
   cases b <;> exact Path.refl _
 
 /-- Theorem 40: AND preserves true -/
-def and_preserves_true :
+noncomputable def and_preserves_true :
     Path (boolAnd (fun _ => true)) true :=
   Path.refl true
 
 /-- Theorem 41: OR preserves false -/
-def or_preserves_false :
+noncomputable def or_preserves_false :
     Path (boolOr (fun _ => false)) false :=
   Path.refl false
 
 /-- Theorem 42: Superposition of AND with projections -/
-def and_superpose_proj (args : Fin 2 → Bool) :
+noncomputable def and_superpose_proj (args : Fin 2 → Bool) :
     Path (superpose boolAnd (fun i => proj 2 i) args) (boolAnd args) :=
   Path.refl _
 
 /-- A Boolean operation is monotone -/
-def BoolMonotone {n : Nat} (f : BoolOp n) : Prop :=
+noncomputable def BoolMonotone {n : Nat} (f : BoolOp n) : Prop :=
   ∀ (args₁ args₂ : Fin n → Bool),
     (∀ i, args₁ i = true → args₂ i = true) →
     f args₁ = true → f args₂ = true
@@ -434,7 +434,7 @@ theorem and_monotone : BoolMonotone boolAnd := by
 -- ============================================================================
 
 /-- Theorem 44: Double superposition coherence -/
-def double_superpose_coherence {A : Type u} {k m n : Nat}
+noncomputable def double_superpose_coherence {A : Type u} {k m n : Nat}
     (f : NaryOp A k) (gs : Fin k → NaryOp A m) (hs : Fin m → NaryOp A n)
     (args : Fin n → A) :
     Path (superpose (superpose f gs) hs args)
@@ -442,13 +442,13 @@ def double_superpose_coherence {A : Type u} {k m n : Nat}
   Path.refl _
 
 /-- Theorem 45: Superposition with single argument -/
-def superpose_single_proj {A : Type u} {n : Nat}
+noncomputable def superpose_single_proj {A : Type u} {n : Nat}
     (f : NaryOp A 1) (g : NaryOp A n) (args : Fin n → A) :
     Path (superpose f (fun _ => g) args) (f (fun _ => g args)) :=
   Path.refl _
 
 /-- Theorem 46: Triple composition of superpositions -/
-def triple_superpose {A : Type u} {a b c d : Nat}
+noncomputable def triple_superpose {A : Type u} {a b c d : Nat}
     (f : NaryOp A a) (gs : Fin a → NaryOp A b)
     (hs : Fin b → NaryOp A c) (ks : Fin c → NaryOp A d)
     (args : Fin d → A) :
@@ -457,7 +457,7 @@ def triple_superpose {A : Type u} {a b c d : Nat}
   Path.refl _
 
 /-- Theorem 47: Identity superposition at each component -/
-def superpose_id_component {A : Type u} {n : Nat}
+noncomputable def superpose_id_component {A : Type u} {n : Nat}
     (f : NaryOp A n) (args : Fin n → A) :
     Path (superpose f (fun j => proj n j) args) (f args) :=
   Path.refl (f args)
@@ -497,7 +497,7 @@ theorem inv_closed_conj {A : Type u} (ops : (n : Nat) → NaryOp A n → Prop)
 -- ============================================================================
 
 /-- Clone intersection -/
-def cloneInter {A : Type u} (C₁ C₂ : Clone A) : Clone A where
+noncomputable def cloneInter {A : Type u} (C₁ C₂ : Clone A) : Clone A where
   ops := fun n f => C₁.ops n f ∧ C₂.ops n f
   has_proj := fun n i => ⟨C₁.has_proj n i, C₂.has_proj n i⟩
   closed_super := fun f gs ⟨hf₁, hf₂⟩ hgs =>
@@ -510,7 +510,7 @@ theorem clone_inter_has_proj {A : Type u} (C₁ C₂ : Clone A) (n : Nat) (i : F
   ⟨C₁.has_proj n i, C₂.has_proj n i⟩
 
 /-- The smallest clone (only projections) -/
-def trivialClone (A : Type u) : Clone A where
+noncomputable def trivialClone (A : Type u) : Clone A where
   ops := fun n f => ∃ i : Fin n, f = proj n i
   has_proj := fun n i => ⟨i, rfl⟩
   closed_super := by
@@ -528,7 +528,7 @@ theorem trivial_clone_proj {A : Type u} (n : Nat) (i : Fin n) :
 -- ============================================================================
 
 /-- An operation is idempotent -/
-def IsIdempotent {A : Type u} {n : Nat} (f : NaryOp A n) : Prop :=
+noncomputable def IsIdempotent {A : Type u} {n : Nat} (f : NaryOp A n) : Prop :=
   ∀ x : A, f (fun _ => x) = x
 
 /-- Theorem 53: Projection is idempotent -/
@@ -548,7 +548,7 @@ theorem superpose_idempotent {A : Type u} {m n : Nat}
   exact hf x
 
 /-- Theorem 55: Idempotent projection path -/
-def proj_idem_path {A : Type u} (n : Nat) (i : Fin n) (x : A) :
+noncomputable def proj_idem_path {A : Type u} (n : Nat) (i : Fin n) (x : A) :
     Path (proj n i (fun _ => x)) x :=
   Path.refl x
 
@@ -563,12 +563,12 @@ structure AbsorptionPair (A : Type u) where
   absorb : ∀ x y : A, Path (f x (g x y)) x
 
 /-- Theorem 56: Absorption pair coherence on diagonal -/
-def absorption_identity {A : Type u} (ab : AbsorptionPair A) (x : A) :
+noncomputable def absorption_identity {A : Type u} (ab : AbsorptionPair A) (x : A) :
     Path (ab.f x (ab.g x x)) x :=
   ab.absorb x x
 
 /-- Theorem 57: Double absorption -/
-def double_absorption {A : Type u} (ab : AbsorptionPair A) (x y : A) :
+noncomputable def double_absorption {A : Type u} (ab : AbsorptionPair A) (x y : A) :
     Path (ab.f x (ab.g x (ab.f x (ab.g x y)))) x :=
   let inner := ab.absorb x y
   let step1 : Path (ab.g x (ab.f x (ab.g x y))) (ab.g x x) :=
@@ -584,12 +584,12 @@ structure CubeTerm (A : Type u) where
   cube2 : ∀ x y : A, Path (op x x y) x
 
 /-- Theorem 58: Cube term is idempotent -/
-def cube_idempotent {A : Type u} (ct : CubeTerm A) (x : A) :
+noncomputable def cube_idempotent {A : Type u} (ct : CubeTerm A) (x : A) :
     Path (ct.op x x x) x :=
   ct.cube2 x x
 
 /-- Theorem 59: Cube term composition path -/
-def cube_compose {A : Type u} (ct : CubeTerm A) (x y : A) :
+noncomputable def cube_compose {A : Type u} (ct : CubeTerm A) (x y : A) :
     Path (ct.op (ct.op x y x) (ct.op x y x) y) (ct.op x y x) :=
   ct.cube2 (ct.op x y x) y
 
@@ -603,19 +603,19 @@ structure TaylorOp (A : Type u) (n : Nat) where
   idempotent : ∀ x : A, Path (op (fun _ => x)) x
 
 /-- Theorem 60: Taylor op idempotency composes with congruence -/
-def taylor_idem_congr {A : Type u} {n : Nat} (t : TaylorOp A n)
+noncomputable def taylor_idem_congr {A : Type u} {n : Nat} (t : TaylorOp A n)
     (x y : A) (p : Path x y) :
     Path (t.op (fun _ => x)) y :=
   Path.trans (t.idempotent x) p
 
 /-- Theorem 61: Taylor op on constant function via congrArg -/
-def taylor_const_path {A : Type u} {n : Nat} (t : TaylorOp A n)
+noncomputable def taylor_const_path {A : Type u} {n : Nat} (t : TaylorOp A n)
     (x y : A) (p : Path x y) :
     Path (t.op (fun _ => x)) (t.op (fun _ => y)) :=
   Path.congrArg (fun z => t.op (fun _ => z)) p
 
 /-- Theorem 62: Taylor idempotency symmetric form -/
-def taylor_idem_symm {A : Type u} {n : Nat} (t : TaylorOp A n) (x : A) :
+noncomputable def taylor_idem_symm {A : Type u} {n : Nat} (t : TaylorOp A n) (x : A) :
     Path x (t.op (fun _ => x)) :=
   Path.symm (t.idempotent x)
 
@@ -631,17 +631,17 @@ structure PixleyOp (A : Type u) where
   ax3 : ∀ x y : A, Path (op y y x) x
 
 /-- Theorem 63: Pixley operation is idempotent -/
-def pixley_idempotent {A : Type u} (p : PixleyOp A) (x : A) :
+noncomputable def pixley_idempotent {A : Type u} (p : PixleyOp A) (x : A) :
     Path (p.op x x x) x :=
   p.ax1 x x
 
 /-- Theorem 64: Pixley is also a Maltsev operation -/
-def pixley_is_maltsev {A : Type u} (p : PixleyOp A) :
+noncomputable def pixley_is_maltsev {A : Type u} (p : PixleyOp A) :
     MaltsevOp A :=
   ⟨p.op, p.ax1, p.ax3⟩
 
 /-- Theorem 65: Pixley double application -/
-def pixley_double {A : Type u} (px : PixleyOp A) (x y : A) :
+noncomputable def pixley_double {A : Type u} (px : PixleyOp A) (x y : A) :
     Path (px.op (px.op x y y) (px.op x y x) (px.op y y x)) x :=
   let s1 := Path.congrArg (fun z => px.op z (px.op x y x) (px.op y y x)) (px.ax1 x y)
   let s2 := Path.congrArg (fun z => px.op x z (px.op y y x)) (px.ax2 x y)
@@ -660,17 +660,17 @@ structure SemilatticeOp (A : Type u) where
   idem : ∀ x : A, Path (op x x) x
 
 /-- Theorem 66: Semilattice 4-fold associativity -/
-def semilattice_assoc4 {A : Type u} (s : SemilatticeOp A) (a b c d : A) :
+noncomputable def semilattice_assoc4 {A : Type u} (s : SemilatticeOp A) (a b c d : A) :
     Path (s.op (s.op (s.op a b) c) d) (s.op a (s.op b (s.op c d))) :=
   Path.trans (s.assoc (s.op a b) c d) (s.assoc a b (s.op c d))
 
 /-- Theorem 67: Semilattice commutativity with congruence -/
-def semilattice_comm_congr {A : Type u} (s : SemilatticeOp A) (a b c : A) :
+noncomputable def semilattice_comm_congr {A : Type u} (s : SemilatticeOp A) (a b c : A) :
     Path (s.op (s.op a b) c) (s.op (s.op b a) c) :=
   Path.congrArg (fun z => s.op z c) (s.comm a b)
 
 /-- Theorem 68: Semilattice idempotent-comm chain -/
-def semilattice_idem_chain {A : Type u} (s : SemilatticeOp A) (x : A) :
+noncomputable def semilattice_idem_chain {A : Type u} (s : SemilatticeOp A) (x : A) :
     Path (s.op (s.op x x) x) x :=
   Path.trans (Path.congrArg (fun z => s.op z x) (s.idem x)) (s.idem x)
 
@@ -688,13 +688,13 @@ structure CloneHom {A B : Type u} (C : Clone A) (D : Clone B) where
     Path (maps n (superpose f gs)) (superpose (maps m f) (fun i => maps n (gs i)))
 
 /-- Theorem 69: Clone homomorphism preserves projections -/
-def clone_hom_proj {A B : Type u} {C : Clone A} {D : Clone B}
+noncomputable def clone_hom_proj {A B : Type u} {C : Clone A} {D : Clone B}
     (h : CloneHom C D) (n : Nat) (i : Fin n) :
     Path (h.maps n (proj n i)) (proj n i) :=
   h.preserves_proj n i
 
 /-- Theorem 70: Clone hom identity superposition -/
-def clone_hom_id_super {A B : Type u} {C : Clone A} {D : Clone B}
+noncomputable def clone_hom_id_super {A B : Type u} {C : Clone A} {D : Clone B}
     (h : CloneHom C D) {n : Nat} (f : NaryOp A n) (hf : C.ops n f) :
     Path (h.maps n (superpose f (fun i => proj n i)))
          (superpose (h.maps n f) (fun i => h.maps n (proj n i))) :=

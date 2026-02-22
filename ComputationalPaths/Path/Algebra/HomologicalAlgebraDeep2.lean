@@ -286,45 +286,45 @@ structure GrothendieckSS {O₁ : Type u} {H₁ : O₁ → O₁ → Type v}
     PUnit instantiations: everything lives in `PUnit` with trivial hom
     ================================================================ -/
 
-private def pp' : @Path PUnit a b := by cases a; cases b; exact Path.refl _
+private noncomputable def pp' : @Path PUnit a b := by cases a; cases b; exact Path.refl _
 
-private def puOps : CatOps PUnit (fun _ _ => PUnit) where
+private noncomputable def puOps : CatOps PUnit (fun _ _ => PUnit) where
   id := fun _ => .unit; comp := fun _ _ => .unit; zero := fun _ _ => .unit
   add := fun _ _ => .unit; neg := fun _ => .unit
 
-private def puCC : ChainComplex puOps :=
+private noncomputable def puCC : ChainComplex puOps :=
   { obj := fun _ => .unit, d := fun _ => .unit, d_sq := fun _ => pp' }
 
-private def puCoCC : CochainComplex puOps :=
+private noncomputable def puCoCC : CochainComplex puOps :=
   { obj := fun _ => .unit, d := fun _ => .unit, d_sq := fun _ => pp' }
 
-private def puPR : ProjRes puOps PUnit.unit :=
+private noncomputable def puPR : ProjRes puOps PUnit.unit :=
   { complex := puCC, augment := .unit }
 
-private def puIR : InjRes puOps PUnit.unit :=
+private noncomputable def puIR : InjRes puOps PUnit.unit :=
   { complex := puCoCC, augment := .unit }
 
-private def puExt : ExtGrp puOps PUnit.unit PUnit.unit :=
+private noncomputable def puExt : ExtGrp puOps PUnit.unit PUnit.unit :=
   { value := fun _ => .unit, res := puIR }
 
-private def puTor : TorGrp puOps PUnit.unit PUnit.unit :=
+private noncomputable def puTor : TorGrp puOps PUnit.unit PUnit.unit :=
   { value := fun _ => .unit, res := puPR }
 
-private def puHom (n : Nat) : HomologyAt puOps puCC n :=
+private noncomputable def puHom (n : Nat) : HomologyAt puOps puCC n :=
   { cycles := .unit, boundaries := .unit, homology := .unit,
     cycleInc := .unit, bdryInc := .unit, proj := .unit,
     bdry_zero := pp' }
 
-private def puSS : SpectralSeq puOps :=
+private noncomputable def puSS : SpectralSeq puOps :=
   { E := fun _ _ _ => .unit, d := fun _ _ _ => .unit }
 
-private def puSES : ShortExact puOps PUnit.unit PUnit.unit PUnit.unit :=
+private noncomputable def puSES : ShortExact puOps PUnit.unit PUnit.unit PUnit.unit :=
   { inc := .unit, pr := .unit, comp_zero := pp' }
 
-private def puCM : ChainMap puOps puCC puCC :=
+private noncomputable def puCM : ChainMap puOps puCC puCC :=
   { f := fun _ => .unit, comm := fun _ => pp' }
 
-private def puFun : FunctorData puOps puOps :=
+private noncomputable def puFun : FunctorData puOps puOps :=
   { mapObj := fun _ => .unit, mapMor := fun _ => .unit, map_id := fun _ => pp' }
 
 -- Theorem 1: Chain complexes exist

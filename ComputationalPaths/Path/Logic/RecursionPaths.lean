@@ -34,27 +34,27 @@ abbrev CompPath (s₁ s₂ : CompState) := Path s₁ s₂
 /-! ## Primitive recursive functions as path operations -/
 
 /-- Zero function: constant 0. -/
-def zeroFn : CompState → CompState := fun _ => 0
+noncomputable def zeroFn : CompState → CompState := fun _ => 0
 
 /-- Successor function. -/
-def succFn : CompState → CompState := fun n => n + 1
+noncomputable def succFn : CompState → CompState := fun n => n + 1
 
 /-- Projection (identity). -/
-def projFn : CompState → CompState := id
+noncomputable def projFn : CompState → CompState := id
 
 /-- Composition of recursive functions. -/
-def compFn (f g : CompState → CompState) : CompState → CompState := fun n => f (g n)
+noncomputable def compFn (f g : CompState → CompState) : CompState → CompState := fun n => f (g n)
 
 /-- Primitive recursion base case. -/
-def prBase : CompState → CompState := fun n => n
+noncomputable def prBase : CompState → CompState := fun n => n
 
 /-- Primitive recursion step. -/
-def prStep (step : CompState → CompState) : CompState → CompState := fun n => step n
+noncomputable def prStep (step : CompState → CompState) : CompState → CompState := fun n => step n
 
 /-! ## Zero function paths -/
 
 /-- Zero function maps everything to 0. -/
-def zeroPath (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
+noncomputable def zeroPath (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
     Path (zeroFn s₁) (zeroFn s₂) :=
   Path.congrArg zeroFn p
 
@@ -76,7 +76,7 @@ theorem zero_symm (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
 /-! ## Successor paths -/
 
 /-- Successor path. -/
-def succPath (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
+noncomputable def succPath (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
     Path (succFn s₁) (succFn s₂) :=
   Path.congrArg succFn p
 
@@ -95,7 +95,7 @@ theorem succ_symm (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
 /-! ## Composition paths -/
 
 /-- Composition path: applying composed functions along a derivation. -/
-def compPath (f g : CompState → CompState) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
+noncomputable def compPath (f g : CompState → CompState) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
     Path (compFn f g s₁) (compFn f g s₂) :=
   Path.congrArg (compFn f g) p
 
@@ -121,16 +121,16 @@ theorem comp_nested (f g : CompState → CompState) (s₁ s₂ : CompState)
 /-! ## Turing machine configurations as paths -/
 
 /-- Tape head position shift. -/
-def headShift (delta : Nat) : CompState → CompState := fun n => n + delta
+noncomputable def headShift (delta : Nat) : CompState → CompState := fun n => n + delta
 
 /-- Tape write operation. -/
-def tapeWrite (symbol : Nat) : CompState → CompState := fun n => n * symbol
+noncomputable def tapeWrite (symbol : Nat) : CompState → CompState := fun n => n * symbol
 
 /-- State transition function. -/
-def stateTransition (newState : Nat) : CompState → CompState := fun _ => newState
+noncomputable def stateTransition (newState : Nat) : CompState → CompState := fun _ => newState
 
 /-- Head shift path. -/
-def headShiftPath (delta : Nat) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
+noncomputable def headShiftPath (delta : Nat) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
     Path (headShift delta s₁) (headShift delta s₂) :=
   Path.congrArg (headShift delta) p
 
@@ -149,7 +149,7 @@ theorem headShift_symm (delta : Nat) (s₁ s₂ : CompState)
   simp [headShiftPath]
 
 /-- Tape write path. -/
-def tapeWritePath (symbol : Nat) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
+noncomputable def tapeWritePath (symbol : Nat) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
     Path (tapeWrite symbol s₁) (tapeWrite symbol s₂) :=
   Path.congrArg (tapeWrite symbol) p
 
@@ -163,11 +163,11 @@ theorem tapeWrite_trans (symbol : Nat) (s₁ s₂ s₃ : CompState)
 /-! ## Halting characterization -/
 
 /-- Halting predicate encoding: 1 for halting, 0 for non-halting. -/
-def haltEncode (halts : CompState → Bool) : CompState → CompState :=
+noncomputable def haltEncode (halts : CompState → Bool) : CompState → CompState :=
   fun n => if halts n then 1 else 0
 
 /-- Halting path. -/
-def haltPath (halts : CompState → Bool) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
+noncomputable def haltPath (halts : CompState → Bool) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
     Path (haltEncode halts s₁) (haltEncode halts s₂) :=
   Path.congrArg (haltEncode halts) p
 
@@ -188,7 +188,7 @@ theorem halt_symm (halts : CompState → Bool) (s₁ s₂ : CompState)
 /-! ## Reducibility -/
 
 /-- Many-one reduction: f reduces A to B. -/
-def reduction (f : CompState → CompState) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
+noncomputable def reduction (f : CompState → CompState) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
     Path (f s₁) (f s₂) :=
   Path.congrArg f p
 
@@ -220,7 +220,7 @@ theorem reduction_id (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
 /-! ## Rice's theorem aspects -/
 
 /-- Index set encoding: maps program indices to property values. -/
-def indexSet (prop : CompState → CompState) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
+noncomputable def indexSet (prop : CompState → CompState) (s₁ s₂ : CompState) (p : CompPath s₁ s₂) :
     Path (prop s₁) (prop s₂) :=
   Path.congrArg prop p
 
@@ -241,7 +241,7 @@ theorem indexSet_symm (prop : CompState → CompState) (s₁ s₂ : CompState)
 /-! ## Computation depth and transport -/
 
 /-- Computation depth: number of steps in a computation path. -/
-def compDepth {s₁ s₂ : CompState} (p : CompPath s₁ s₂) : Nat :=
+noncomputable def compDepth {s₁ s₂ : CompState} (p : CompPath s₁ s₂) : Nat :=
   p.steps.length
 
 /-- Reflexive computation has depth 0. -/

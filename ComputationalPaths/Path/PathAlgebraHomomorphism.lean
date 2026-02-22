@@ -38,11 +38,11 @@ namespace PathAlgebraHom
 
 variable {A : Type u} {B : Type v} {C : Type w} {D : Type x}
 
-instance : CoeFun (PathAlgebraHom A B) (fun _ => A → B) :=
+noncomputable instance : CoeFun (PathAlgebraHom A B) (fun _ => A → B) :=
   ⟨PathAlgebraHom.toFun⟩
 
 /-- Action on paths induced by a homomorphism. -/
-@[simp] def map (f : PathAlgebraHom A B) {a b : A} (p : Path a b) :
+@[simp] noncomputable def map (f : PathAlgebraHom A B) {a b : A} (p : Path a b) :
     Path (f a) (f b) :=
   Path.congrArg f.toFun p
 
@@ -66,11 +66,11 @@ instance : CoeFun (PathAlgebraHom A B) (fun _ => A → B) :=
 /-! ## Category structure -/
 
 /-- Identity homomorphism. -/
-@[simp] def id (A : Type u) : PathAlgebraHom A A where
+@[simp] noncomputable def id (A : Type u) : PathAlgebraHom A A where
   toFun := fun x => x
 
 /-- Composition of path algebra homomorphisms. -/
-@[simp] def comp (f : PathAlgebraHom A B) (g : PathAlgebraHom B C) :
+@[simp] noncomputable def comp (f : PathAlgebraHom A B) (g : PathAlgebraHom B C) :
     PathAlgebraHom A C where
   toFun := fun a => g.toFun (f.toFun a)
 
@@ -122,28 +122,28 @@ namespace PathAlgebraIso
 variable {A : Type u} {B : Type v} {C : Type w}
 
 /-- View a path algebra isomorphism as a `SimpleEquiv`. -/
-@[simp] def toSimpleEquiv (e : PathAlgebraIso A B) : SimpleEquiv A B where
+@[simp] noncomputable def toSimpleEquiv (e : PathAlgebraIso A B) : SimpleEquiv A B where
   toFun := e.toHom
   invFun := e.invHom
   left_inv := e.left_inv
   right_inv := e.right_inv
 
 /-- Identity isomorphism. -/
-@[simp] def refl (A : Type u) : PathAlgebraIso A A where
+@[simp] noncomputable def refl (A : Type u) : PathAlgebraIso A A where
   toHom := PathAlgebraHom.id A
   invHom := PathAlgebraHom.id A
   left_inv := by intro x; rfl
   right_inv := by intro x; rfl
 
 /-- Inverse isomorphism. -/
-@[simp] def symm (e : PathAlgebraIso A B) : PathAlgebraIso B A where
+@[simp] noncomputable def symm (e : PathAlgebraIso A B) : PathAlgebraIso B A where
   toHom := e.invHom
   invHom := e.toHom
   left_inv := e.right_inv
   right_inv := e.left_inv
 
 /-- Composition of path algebra isomorphisms. -/
-@[simp] def comp (e₁ : PathAlgebraIso A B) (e₂ : PathAlgebraIso B C) :
+@[simp] noncomputable def comp (e₁ : PathAlgebraIso A B) (e₂ : PathAlgebraIso B C) :
     PathAlgebraIso A C where
   toHom := PathAlgebraHom.comp e₁.toHom e₂.toHom
   invHom := PathAlgebraHom.comp e₂.invHom e₁.invHom

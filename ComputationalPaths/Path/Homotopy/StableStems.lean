@@ -92,34 +92,34 @@ Named generators for the stable stems.
 -/
 
 /-- η ∈ πₛ₁: the stable Hopf map -/
-def eta : StableStem1 := ⟨1, by omega⟩
+noncomputable def eta : StableStem1 := ⟨1, by omega⟩
 
 /-- η² ∈ πₛ₂: composition of η with itself -/
-def etaSquared : StableStem2 := ⟨1, by omega⟩
+noncomputable def etaSquared : StableStem2 := ⟨1, by omega⟩
 
 /-- ν ∈ πₛ₃: the quaternionic Hopf map -/
-def nu : StableStem3 := ⟨1, by omega⟩
+noncomputable def nu : StableStem3 := ⟨1, by omega⟩
 
 /-- ν² ∈ πₛ₆: composition of ν with itself -/
-def nuSquared : StableStem6 := ⟨1, by omega⟩
+noncomputable def nuSquared : StableStem6 := ⟨1, by omega⟩
 
 /-- σ ∈ πₛ₇: the octonionic Hopf map -/
-def sigma : StableStem7 := ⟨1, by omega⟩
+noncomputable def sigma : StableStem7 := ⟨1, by omega⟩
 
 /-- ησ ∈ πₛ₈: composition of η and σ -/
-def etaSigma : StableStem8 := (⟨1, by omega⟩, ⟨0, by omega⟩)
+noncomputable def etaSigma : StableStem8 := (⟨1, by omega⟩, ⟨0, by omega⟩)
 
 /-- ε ∈ πₛ₈: the other generator -/
-def epsilon : StableStem8 := (⟨0, by omega⟩, ⟨1, by omega⟩)
+noncomputable def epsilon : StableStem8 := (⟨0, by omega⟩, ⟨1, by omega⟩)
 
 /-- η²σ ∈ πₛ₉ -/
-def etaSquaredSigma : StableStem9 := (⟨1, by omega⟩, ⟨0, by omega⟩, ⟨0, by omega⟩)
+noncomputable def etaSquaredSigma : StableStem9 := (⟨1, by omega⟩, ⟨0, by omega⟩, ⟨0, by omega⟩)
 
 /-- ηε ∈ πₛ₉ -/
-def etaEpsilon : StableStem9 := (⟨0, by omega⟩, ⟨1, by omega⟩, ⟨0, by omega⟩)
+noncomputable def etaEpsilon : StableStem9 := (⟨0, by omega⟩, ⟨1, by omega⟩, ⟨0, by omega⟩)
 
 /-- μ ∈ πₛ₉ -/
-def mu : StableStem9 := (⟨0, by omega⟩, ⟨0, by omega⟩, ⟨1, by omega⟩)
+noncomputable def mu : StableStem9 := (⟨0, by omega⟩, ⟨0, by omega⟩, ⟨1, by omega⟩)
 
 /-! ## Order Theorems
 
@@ -162,7 +162,7 @@ theorem stableStem8_generators : ∀ x : StableStem8,
 theorem stableStem9_generators : ∀ x : StableStem9, 
     ∃ a b c : Z2, x = (a, b, c) := fun (a, b, c) => ⟨a, b, c, rfl⟩
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end StableStems

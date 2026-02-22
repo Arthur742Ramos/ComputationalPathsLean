@@ -78,7 +78,7 @@ noncomputable def cycleMap_cancel_right_rweq (n : Int) (x : C.term n) :
   rweq_cmpA_inv_right (M.cycleMapPath n x)
 
 /-- Constant cycle map package sending everything to chosen zero classes. -/
-def constant
+noncomputable def constant
     {X : Type u}
     (C : MotivicComplexPathData X)
     (H : Int → Type v)

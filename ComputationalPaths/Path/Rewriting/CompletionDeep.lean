@@ -44,7 +44,7 @@ inductive Term where
 namespace Term
 
 /-- Size of a term (number of constructors). -/
-@[simp] def size : Term → Nat
+@[simp] noncomputable def size : Term → Nat
   | .var _ => 1
   | .const _ => 1
   | .app f a => f.size + a.size + 1
@@ -52,7 +52,7 @@ namespace Term
 theorem size_pos (t : Term) : 0 < t.size := by cases t <;> simp <;> omega
 
 /-- Weight of a term with base weight w₀. -/
-@[simp] def weight (w₀ : Nat) : Term → Nat
+@[simp] noncomputable def weight (w₀ : Nat) : Term → Nat
   | .var _ => w₀
   | .const _ => w₀
   | .app f a => f.weight w₀ + a.weight w₀ + w₀
@@ -61,19 +61,19 @@ theorem weight_pos (w₀ : Nat) (hw : 0 < w₀) (t : Term) : 0 < t.weight w₀ :
   cases t <;> simp <;> omega
 
 /-- Depth of a term (longest path to a leaf). -/
-@[simp] def depth : Term → Nat
+@[simp] noncomputable def depth : Term → Nat
   | .var _ => 0
   | .const _ => 0
   | .app f a => max f.depth a.depth + 1
 
 /-- Variable count. -/
-@[simp] def varCount : Term → Nat
+@[simp] noncomputable def varCount : Term → Nat
   | .var _ => 1
   | .const _ => 0
   | .app f a => f.varCount + a.varCount
 
 /-- Substitution: replace variable n with term s. -/
-def substVar (n : Nat) (s : Term) : Term → Term
+noncomputable def substVar (n : Nat) (s : Term) : Term → Term
   | .var m => if m = n then s else .var m
   | .const c => .const c
   | .app f a => .app (substVar n s f) (substVar n s a)
@@ -88,13 +88,13 @@ theorem substVar_app (n : Nat) (s f a : Term) :
 abbrev Subst := Nat → Term
 
 /-- Apply a substitution to a term. -/
-@[simp] def applySubst (σ : Subst) : Term → Term
+@[simp] noncomputable def applySubst (σ : Subst) : Term → Term
   | .var n => σ n
   | .const c => .const c
   | .app f a => .app (f.applySubst σ) (a.applySubst σ)
 
 /-- Identity substitution. -/
-def idSubst : Subst := fun n => .var n
+noncomputable def idSubst : Subst := fun n => .var n
 
 @[simp] theorem applySubst_id (t : Term) : t.applySubst idSubst = t := by
   induction t with
@@ -113,7 +113,7 @@ structure Env (A : Type u) where
   appOp : A → A → A
 
 /-- Interpret a Term into type A via an environment. -/
-@[simp] def Term.interp {A : Type u} (env : Env A) : Term → A
+@[simp] noncomputable def Term.interp {A : Type u} (env : Env A) : Term → A
   | .var n => env.varVal n
   | .const n => env.constVal n
   | .app f a => env.appOp (f.interp env) (a.interp env)
@@ -139,14 +139,14 @@ inductive Position where
   deriving DecidableEq, Repr
 
 /-- Read the subterm at a given position, if it exists. -/
-@[simp] def Term.atPos : Term → Position → Option Term
+@[simp] noncomputable def Term.atPos : Term → Position → Option Term
   | t, .here => some t
   | .app f _, .left p => f.atPos p
   | .app _ a, .right p => a.atPos p
   | _, _ => none
 
 /-- Replace the subterm at a given position. -/
-@[simp] def Term.replaceAt : Term → Position → Term → Term
+@[simp] noncomputable def Term.replaceAt : Term → Position → Term → Term
   | _, .here, s => s
   | .app f a, .left p, s => .app (f.replaceAt p s) a
   | .app f a, .right p, s => .app f (a.replaceAt p s)
@@ -173,16 +173,16 @@ structure RewritePath where
   deriving Repr
 
 /-- Empty rewrite path (no steps). -/
-def RewritePath.nil (t : Term) : RewritePath :=
+noncomputable def RewritePath.nil (t : Term) : RewritePath :=
   { steps := [], src := t, tgt := t }
 
 /-- Extend a rewrite path by one step. -/
-def RewritePath.cons (step : RewriteStep) (rest : RewritePath)
+noncomputable def RewritePath.cons (step : RewriteStep) (rest : RewritePath)
     (h : step.tgtTerm = rest.src) : RewritePath :=
   { steps := step :: rest.steps, src := step.srcTerm, tgt := rest.tgt }
 
 /-- Length of a rewrite path. -/
-def RewritePath.length (rp : RewritePath) : Nat := rp.steps.length
+noncomputable def RewritePath.length (rp : RewritePath) : Nat := rp.steps.length
 
 /-! ## Overlaps and Critical Pairs -/
 
@@ -223,7 +223,7 @@ inductive Orientation where
   deriving DecidableEq, Repr
 
 /-- Orient a critical pair to produce a new rule (if possible). -/
-def orientCP (cp : CriticalPair) (orient : Orientation) : Option Rule :=
+noncomputable def orientCP (cp : CriticalPair) (orient : Orientation) : Option Rule :=
   match orient with
   | .leftToRight => some { lhs := cp.target1, rhs := cp.target2 }
   | .rightToLeft => some { lhs := cp.target2, rhs := cp.target1 }
@@ -248,11 +248,11 @@ structure CompletionPath where
   deriving Repr
 
 /-- Empty completion path. -/
-def CompletionPath.nil (trs : TRS) : CompletionPath :=
+noncomputable def CompletionPath.nil (trs : TRS) : CompletionPath :=
   { steps := [], initial := trs, final := trs }
 
 /-- Length of a completion path. -/
-def CompletionPath.length (cp : CompletionPath) : Nat := cp.steps.length
+noncomputable def CompletionPath.length (cp : CompletionPath) : Nat := cp.steps.length
 
 /-! ## Semantic Path Algebra: Terms interpreted as computational paths -/
 
@@ -262,7 +262,7 @@ variable {A : Type u} (env : Env A)
 /-! ### 1. Rewrite rule as a path between interpretations -/
 
 /-- Given a rule and a proof that its sides interpret equally, we get a Path. -/
-def rulePath (r : Rule) (h : r.lhs.interp env = r.rhs.interp env) :
+noncomputable def rulePath (r : Rule) (h : r.lhs.interp env = r.rhs.interp env) :
     Path (r.lhs.interp env) (r.rhs.interp env) :=
   Path.mk [Step.mk _ _ h] h
 
@@ -378,7 +378,7 @@ theorem quadruple_reverse {a b c d e : A}
 
 /-! ### 13. Critical pair join: the path connecting two divergent reductions -/
 
-def criticalPairJoin {a b c : A}
+noncomputable def criticalPairJoin {a b c : A}
     (reduce₁ : Path a b) (reduce₂ : Path a c) : Path b c :=
   Path.trans (Path.symm reduce₁) reduce₂
 
@@ -830,7 +830,7 @@ variable {A : Type u}
 
 /-! ### 55. Overlap concatenation: path from overlap point -/
 
-def overlapConcat {a b c d : A}
+noncomputable def overlapConcat {a b c d : A}
     (left : Path a b) (right : Path a c) (join : Path c d) : Path b d :=
   Path.trans (Path.symm left) (Path.trans right join)
 
@@ -1166,7 +1166,7 @@ theorem normal_form_unique_transport {D : A → Sort u} {nf₁ nf₂ : A}
 
 /-! ### 93. Normalization path: source reduces to normal form -/
 
-def normalizationPath {a nf : A} (reduce : Path a nf) : Path a nf := reduce
+noncomputable def normalizationPath {a nf : A} (reduce : Path a nf) : Path a nf := reduce
 
 /-! ### 94. Two normalization paths give same result -/
 

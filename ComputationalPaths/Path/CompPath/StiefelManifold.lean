@@ -33,15 +33,15 @@ universe u
 /-! ## Stiefel manifold model -/
 
 /-- Computational-path model for the real Stiefel manifold `V_k(R^n)`. -/
-def StiefelManifoldCompPath (_n _k : Nat) : Type u := PUnit'
+noncomputable def StiefelManifoldCompPath (_n _k : Nat) : Type u := PUnit'
 
 /-- The Stiefel manifold model is a subsingleton. -/
-instance (n k : Nat) : Subsingleton (StiefelManifoldCompPath n k) := by
+noncomputable instance (n k : Nat) : Subsingleton (StiefelManifoldCompPath n k) := by
   dsimp [StiefelManifoldCompPath]
   infer_instance
 
 /-- Basepoint of the Stiefel manifold model. -/
-@[simp] def stiefelManifoldBase (n k : Nat) : StiefelManifoldCompPath n k :=
+@[simp] noncomputable def stiefelManifoldBase (n k : Nat) : StiefelManifoldCompPath n k :=
   PUnit'.unit
 
 /-! ## Loop space helpers -/
@@ -52,16 +52,16 @@ abbrev stiefelManifoldLoopSpace (n k : Nat) : Type u :=
     (stiefelManifoldBase n k) (stiefelManifoldBase n k)
 
 /-- Fundamental loop at the Stiefel manifold basepoint. -/
-@[simp] def stiefelManifoldLoop (n k : Nat) : stiefelManifoldLoopSpace n k :=
+@[simp] noncomputable def stiefelManifoldLoop (n k : Nat) : stiefelManifoldLoopSpace n k :=
   Path.stepChain rfl
 
 /-- Iterate the fundamental loop `m` times. -/
-@[simp] def stiefelManifoldLoopPow (n k : Nat) : Nat → stiefelManifoldLoopSpace n k
+@[simp] noncomputable def stiefelManifoldLoopPow (n k : Nat) : Nat → stiefelManifoldLoopSpace n k
   | 0 => Path.refl (stiefelManifoldBase n k)
   | Nat.succ m => Path.trans (stiefelManifoldLoop n k) (stiefelManifoldLoopPow n k m)
 
 /-- Interpret a natural number as a loop path. -/
-@[simp] def stiefelManifoldDecodePath (n k : Nat) :
+@[simp] noncomputable def stiefelManifoldDecodePath (n k : Nat) :
     Nat → stiefelManifoldLoopSpace n k :=
   stiefelManifoldLoopPow n k
 

@@ -46,22 +46,22 @@ inductive KBTerm : Type where
 namespace KBTerm
 
 /-- Size of a term (no mutual recursion needed). -/
-def size : KBTerm → Nat
+noncomputable def size : KBTerm → Nat
   | .var _ => 1
   | .app _ args => 1 + args.length
 
 /-- Numeric code for tie-breaking. -/
-def code : KBTerm → Nat
+noncomputable def code : KBTerm → Nat
   | .var n => 2 * n
   | .app f _ => 2 * f + 1
 
 /-- Weight-based ordering: (size, code) lexicographic. -/
-def greater (lhs rhs : KBTerm) : Bool :=
+noncomputable def greater (lhs rhs : KBTerm) : Bool :=
   rhs.size < lhs.size || (rhs.size == lhs.size && rhs.code < lhs.code)
 
 end KBTerm
 
-instance : BEq KBTerm where
+noncomputable instance : BEq KBTerm where
   beq := fun a b => match a, b with
     | .var n, .var m => n == m
     | .app f as, .app g bs => f == g && as.length == bs.length
@@ -72,23 +72,23 @@ instance : BEq KBTerm where
 namespace KBEncoding
 
 /-- Function symbol indices for path constructors. -/
-def op_refl : Nat := 0
-def op_symm : Nat := 1
-def op_trans : Nat := 2
+noncomputable def op_refl : Nat := 0
+noncomputable def op_symm : Nat := 1
+noncomputable def op_trans : Nat := 2
 
-@[simp] def encode_refl : KBTerm := .app op_refl []
-@[simp] def encode_symm (p : KBTerm) : KBTerm := .app op_symm [p]
-@[simp] def encode_trans (p q : KBTerm) : KBTerm := .app op_trans [p, q]
+@[simp] noncomputable def encode_refl : KBTerm := .app op_refl []
+@[simp] noncomputable def encode_symm (p : KBTerm) : KBTerm := .app op_symm [p]
+@[simp] noncomputable def encode_trans (p q : KBTerm) : KBTerm := .app op_trans [p, q]
 
 /-- Encode a GroupoidTRS expression as a KBTerm. -/
-@[simp] def encodeExpr : Expr → KBTerm
+@[simp] noncomputable def encodeExpr : Expr → KBTerm
   | .atom n => .var n
   | .refl => encode_refl
   | .symm e => encode_symm (encodeExpr e)
   | .trans e₁ e₂ => encode_trans (encodeExpr e₁) (encodeExpr e₂)
 
 /-- Decode a KBTerm back to a GroupoidTRS expression. -/
-@[simp] def decodeExpr : KBTerm → Expr
+@[simp] noncomputable def decodeExpr : KBTerm → Expr
   | .var n => .atom n
   | .app 0 [] => .refl
   | .app 1 [p] => .symm (decodeExpr p)
@@ -104,7 +104,7 @@ def op_trans : Nat := 2
   | trans e₁ e₂ ih₁ ih₂ => simp [encodeExpr, decodeExpr, op_trans, ih₁, ih₂]
 
 /-- Encode a GroupoidTRS expression as a GExpr for the KnuthBendix module. -/
-@[simp] def exprToGExpr : Expr → GExpr
+@[simp] noncomputable def exprToGExpr : Expr → GExpr
   | .atom n => .atom n
   | .refl => .refl
   | .symm e => .sym (exprToGExpr e)
@@ -119,22 +119,22 @@ structure KBEquation where
   rhs : KBTerm
   deriving Repr
 
-instance : BEq KBEquation := ⟨fun a b => a.lhs == b.lhs && a.rhs == b.rhs⟩
+noncomputable instance : BEq KBEquation := ⟨fun a b => a.lhs == b.lhs && a.rhs == b.rhs⟩
 
 structure KBRule where
   lhs : KBTerm
   rhs : KBTerm
   deriving Repr
 
-instance : BEq KBRule := ⟨fun a b => a.lhs == b.lhs && a.rhs == b.rhs⟩
+noncomputable instance : BEq KBRule := ⟨fun a b => a.lhs == b.lhs && a.rhs == b.rhs⟩
 
-def KBRule.oriented (r : KBRule) : Prop :=
+noncomputable def KBRule.oriented (r : KBRule) : Prop :=
   KBTerm.greater r.lhs r.rhs = true
 
-def KBRule.toEquation (r : KBRule) : KBEquation :=
+noncomputable def KBRule.toEquation (r : KBRule) : KBEquation :=
   { lhs := r.lhs, rhs := r.rhs }
 
-def orientEquation (e : KBEquation) : Option KBRule :=
+noncomputable def orientEquation (e : KBEquation) : Option KBRule :=
   if KBTerm.greater e.lhs e.rhs then
     some ⟨e.lhs, e.rhs⟩
   else if KBTerm.greater e.rhs e.lhs then
@@ -142,7 +142,7 @@ def orientEquation (e : KBEquation) : Option KBRule :=
   else
     none
 
-def orientEquations : List KBEquation → List KBRule × List KBEquation
+noncomputable def orientEquations : List KBEquation → List KBRule × List KBEquation
   | [] => ([], [])
   | e :: es =>
     let tail := orientEquations es
@@ -152,17 +152,17 @@ def orientEquations : List KBEquation → List KBRule × List KBEquation
 
 /-! ## Rewriting -/
 
-def rewriteRootWithRule? (r : KBRule) (t : KBTerm) : Option KBTerm :=
+noncomputable def rewriteRootWithRule? (r : KBRule) (t : KBTerm) : Option KBTerm :=
   if t == r.lhs then some r.rhs else none
 
-def rewriteOnce? : List KBRule → KBTerm → Option KBTerm
+noncomputable def rewriteOnce? : List KBRule → KBTerm → Option KBTerm
   | [], _ => none
   | r :: rs, t =>
     match rewriteRootWithRule? r t with
     | some u => some u
     | none => rewriteOnce? rs t
 
-def normalizeWithFuel : Nat → List KBRule → KBTerm → KBTerm
+noncomputable def normalizeWithFuel : Nat → List KBRule → KBTerm → KBTerm
   | 0, _, t => t
   | fuel + 1, rules, t =>
     match rewriteOnce? rules t with
@@ -177,22 +177,22 @@ theorem normalizeWithFuel_stable {rules : List KBRule} {t : KBTerm}
   | zero => rfl
   | succ fuel => simp [normalizeWithFuel, h]
 
-def simplifyRule (rules : List KBRule) (r : KBRule) : KBRule :=
+noncomputable def simplifyRule (rules : List KBRule) (r : KBRule) : KBRule :=
   { lhs := normalizeWithFuel (r.lhs.size + 1) rules r.lhs
     rhs := normalizeWithFuel (r.rhs.size + 1) rules r.rhs }
 
 /-! ## Inter-reduction -/
 
-def ruleIsTrivial (r : KBRule) : Bool := r.lhs == r.rhs
+noncomputable def ruleIsTrivial (r : KBRule) : Bool := r.lhs == r.rhs
 
-def deleteTrivialRules (rules : List KBRule) : List KBRule :=
+noncomputable def deleteTrivialRules (rules : List KBRule) : List KBRule :=
   rules.filter (fun r => !ruleIsTrivial r)
 
-def composeRule (rules : List KBRule) (r : KBRule) : KBRule :=
+noncomputable def composeRule (rules : List KBRule) (r : KBRule) : KBRule :=
   { lhs := r.lhs
     rhs := normalizeWithFuel (r.rhs.size + 1) rules r.rhs }
 
-def interReduceStep (rules : List KBRule) : List KBRule :=
+noncomputable def interReduceStep (rules : List KBRule) : List KBRule :=
   deleteTrivialRules (rules.map (composeRule rules))
 
 /-! ## Superposition and critical pairs -/
@@ -205,7 +205,7 @@ structure CPair where
   second : KBRule
   deriving Repr
 
-def rootSuperpose (r₁ r₂ : KBRule) : List CPair :=
+noncomputable def rootSuperpose (r₁ r₂ : KBRule) : List CPair :=
   if r₁.lhs == r₂.lhs then
     [{ peak := r₂.lhs
        left := r₁.rhs
@@ -214,13 +214,13 @@ def rootSuperpose (r₁ r₂ : KBRule) : List CPair :=
        second := r₂ }]
   else []
 
-def superposeTwo (r₁ r₂ : KBRule) : List CPair :=
+noncomputable def superposeTwo (r₁ r₂ : KBRule) : List CPair :=
   rootSuperpose r₁ r₂
 
-def superposeRules (rules : List KBRule) : List CPair :=
+noncomputable def superposeRules (rules : List KBRule) : List CPair :=
   (rules.map (fun r₁ => rules.map (fun r₂ => superposeTwo r₁ r₂))).flatten.flatten
 
-def CPair.toEquation (cp : CPair) : KBEquation :=
+noncomputable def CPair.toEquation (cp : CPair) : KBEquation :=
   { lhs := cp.left, rhs := cp.right }
 
 /-! ## Completion loop: orient, superpose, inter-reduce -/
@@ -230,28 +230,28 @@ structure CompletionState where
   rules : List KBRule
   deriving Repr
 
-def orientationPass (st : CompletionState) : CompletionState :=
+noncomputable def orientationPass (st : CompletionState) : CompletionState :=
   let oriented := orientEquations st.pending
   { pending := oriented.2
     rules := st.rules ++ oriented.1 }
 
-def superpositionPass (st : CompletionState) : CompletionState :=
+noncomputable def superpositionPass (st : CompletionState) : CompletionState :=
   let cps := superposeRules st.rules
   { pending := st.pending ++ cps.map CPair.toEquation
     rules := st.rules }
 
-def interReductionPass (st : CompletionState) : CompletionState :=
+noncomputable def interReductionPass (st : CompletionState) : CompletionState :=
   { pending := st.pending
     rules := interReduceStep st.rules }
 
-def completionStep (st : CompletionState) : CompletionState :=
+noncomputable def completionStep (st : CompletionState) : CompletionState :=
   interReductionPass (superpositionPass (orientationPass st))
 
-def completionLoop : Nat → CompletionState → CompletionState
+noncomputable def completionLoop : Nat → CompletionState → CompletionState
   | 0, st => st
   | fuel + 1, st => completionLoop fuel (completionStep st)
 
-def complete (fuel : Nat) (eqs : List KBEquation) : CompletionState :=
+noncomputable def complete (fuel : Nat) (eqs : List KBEquation) : CompletionState :=
   completionLoop fuel { pending := eqs, rules := [] }
 
 /-! ## Equational theory and soundness -/
@@ -290,7 +290,7 @@ inductive RuleShape where
   deriving Repr
 
 /-- Map each of the 78 StepRules to its groupoid shape. -/
-def stepRuleShape : StepRule → RuleShape
+noncomputable def stepRuleShape : StepRule → RuleShape
   | .symm_refl => .symmRefl
   | .symm_symm => .symmSymm
   | .trans_refl_left => .transReflLeft
@@ -304,7 +304,7 @@ def stepRuleShape : StepRule → RuleShape
   | _ => .identity
 
 /-- The (LHS, RHS) Expr pair for each rule shape. -/
-def shapeExprPair : RuleShape → Expr × Expr
+noncomputable def shapeExprPair : RuleShape → Expr × Expr
   | .symmRefl => (.symm .refl, .refl)
   | .symmSymm => (.symm (.symm (.atom 0)), .atom 0)
   | .transReflLeft => (.trans .refl (.atom 0), .atom 0)
@@ -323,24 +323,24 @@ def shapeExprPair : RuleShape → Expr × Expr
     (.trans (.symm (.atom 0)) (.trans (.atom 0) (.atom 1)), .atom 1)
   | .identity => (.trans .refl (.atom 0), .atom 0)
 
-def stepRuleExprPair (r : StepRule) : Expr × Expr :=
+noncomputable def stepRuleExprPair (r : StepRule) : Expr × Expr :=
   shapeExprPair (stepRuleShape r)
 
 /-- Concrete KB rule for each catalogued Step constructor. -/
-def StepToKBRule (r : StepRule) : KBRule :=
+noncomputable def StepToKBRule (r : StepRule) : KBRule :=
   let pair := stepRuleExprPair r
   { lhs := KBEncoding.encodeExpr pair.1
     rhs := KBEncoding.encodeExpr pair.2 }
 
 /-- All 78 rules encoded as KB rules. -/
-def orientedStepRules78 : List KBRule :=
+noncomputable def orientedStepRules78 : List KBRule :=
   allStepRules.map StepToKBRule
 
 theorem orientedStepRules78_length : orientedStepRules78.length = 78 := by
   simp [orientedStepRules78, allStepRules]
 
 /-- The 10 core groupoid rules (the ones that are distinct shapes). -/
-def groupoidRules : List KBRule := [
+noncomputable def groupoidRules : List KBRule := [
   -- symm_refl: symm(refl) → refl
   { lhs := KBEncoding.encode_symm KBEncoding.encode_refl
     rhs := KBEncoding.encode_refl },
@@ -381,7 +381,7 @@ theorem groupoidRules_length : groupoidRules.length = 10 := by rfl
 /-! ## Termination of oriented rules via GroupoidTRS weight -/
 
 /-- Lexicographic ordering on pairs. -/
-def NatLex : Nat × Nat → Nat × Nat → Prop :=
+noncomputable def NatLex : Nat × Nat → Nat × Nat → Prop :=
   fun a b => a.1 < b.1 ∨ (a.1 = b.1 ∧ a.2 < b.2)
 
 private theorem natLex_acc : ∀ w l : Nat, Acc NatLex (w, l) := by
@@ -401,7 +401,7 @@ private theorem natLex_wf : WellFounded NatLex :=
   ⟨fun ⟨w, l⟩ => natLex_acc w l⟩
 
 /-- Weight-based termination check for a KB rule. -/
-def KBRule.measureOriented (r : KBRule) : Prop :=
+noncomputable def KBRule.measureOriented (r : KBRule) : Prop :=
   NatLex
     (Expr.weight (KBEncoding.decodeExpr r.rhs), Expr.leftWeight (KBEncoding.decodeExpr r.rhs))
     (Expr.weight (KBEncoding.decodeExpr r.lhs), Expr.leftWeight (KBEncoding.decodeExpr r.lhs))
@@ -419,7 +419,7 @@ theorem StepToKBRule_measureOriented (r : StepRule) :
   exact shape_measure_decrease (stepRuleShape r)
 
 /-- The one-step relation induced by the 78-rule system on Expr. -/
-def Step78Rel (q p : Expr) : Prop :=
+noncomputable def Step78Rel (q p : Expr) : Prop :=
   ∃ r : StepRule, p = (stepRuleExprPair r).1 ∧ q = (stepRuleExprPair r).2
 
 theorem step78_measure_decrease {p q : Expr} (h : Step78Rel q p) :
@@ -436,7 +436,7 @@ theorem orient_all_78_terminating : WellFounded Step78Rel :=
 /-! ## Bridge to the GExpr/CStep completed system -/
 
 /-- Each rule shape maps to a concrete CStep reduction chain. -/
-def shapeToCRtc (s : RuleShape) :
+noncomputable def shapeToCRtc (s : RuleShape) :
     CRtc (KBEncoding.exprToGExpr (shapeExprPair s).1)
          (KBEncoding.exprToGExpr (shapeExprPair s).2) := by
   cases s with

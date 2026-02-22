@@ -38,23 +38,23 @@ namespace Vec
 variable {α : Type u}
 
 /-- Singleton vector. -/
-def singleton (x : α) : Vec α 1 :=
+noncomputable def singleton (x : α) : Vec α 1 :=
   Vec.cons x Vec.nil
 
 /-- Convenience constructor for length-2 vectors. -/
-def of2 (a b : α) : Vec α 2 :=
+noncomputable def of2 (a b : α) : Vec α 2 :=
   Vec.cons a (Vec.cons b Vec.nil)
 
 /-- Convenience constructor for length-3 vectors. -/
-def of3 (a b c : α) : Vec α 3 :=
+noncomputable def of3 (a b c : α) : Vec α 3 :=
   Vec.cons a (Vec.cons b (Vec.cons c Vec.nil))
 
 /-- Convenience constructor for length-4 vectors. -/
-def of4 (a b c d : α) : Vec α 4 :=
+noncomputable def of4 (a b c d : α) : Vec α 4 :=
   Vec.cons a (Vec.cons b (Vec.cons c (Vec.cons d Vec.nil)))
 
 /-- Split a vector at a fixed length. -/
-def split : {m n : Nat} → Vec α (m + n) → Vec α m × Vec α n
+noncomputable def split : {m n : Nat} → Vec α (m + n) → Vec α m × Vec α n
   | 0, n, xs =>
       (Vec.nil, by
         simpa [Nat.zero_add] using xs)
@@ -76,7 +76,7 @@ inductive AssocTree : Type u
   | node : AssocTree → AssocTree → AssocTree
 
 /-- Number of leaves in a parenthesization tree. -/
-def AssocTree.arity : AssocTree → Nat
+noncomputable def AssocTree.arity : AssocTree → Nat
   | AssocTree.leaf => 1
   | AssocTree.node t1 t2 => AssocTree.arity t1 + AssocTree.arity t2
 
@@ -84,11 +84,11 @@ def AssocTree.arity : AssocTree → Nat
 abbrev AssocOp := AssocTree
 
 /-- Unit operation (single leaf). -/
-def AssocOp.unit : AssocOp :=
+noncomputable def AssocOp.unit : AssocOp :=
   AssocTree.leaf
 
 /-- Graft operations into the leaves of a parenthesization tree. -/
-def AssocOp.graft : (op : AssocOp) → Vec AssocOp (AssocTree.arity op) → AssocOp
+noncomputable def AssocOp.graft : (op : AssocOp) → Vec AssocOp (AssocTree.arity op) → AssocOp
   | AssocTree.leaf, Vec.cons op Vec.nil => op
   | AssocTree.node t1 t2, ops =>
       let (ops1, ops2) := Vec.split
@@ -105,7 +105,7 @@ structure Operad (Op : Type u) where
   graft : (f : Op) → Vec Op (arity f) → Op
 
 /-- Operad of associative parenthesizations. -/
-def assocOperad : Operad AssocOp where
+noncomputable def assocOperad : Operad AssocOp where
   arity := AssocTree.arity
   unit := AssocOp.unit
   graft := AssocOp.graft
@@ -128,7 +128,7 @@ structure OperadAction (Op : Type u) (O : Operad Op) (X : Type v) where
   act : (op : Op) → Vec X (O.arity op) → X
 
 /-- Evaluate a parenthesization tree on loop space inputs. -/
-def AssocTree.eval {A : Type u} {a : A} :
+noncomputable def AssocTree.eval {A : Type u} {a : A} :
     (t : AssocTree) →
       Vec (LoopSpace A a) (AssocTree.arity t) → LoopSpace A a
   | AssocTree.leaf, Vec.cons p Vec.nil => p
@@ -138,27 +138,27 @@ def AssocTree.eval {A : Type u} {a : A} :
       LoopSpace.comp (AssocTree.eval t1 xs1) (AssocTree.eval t2 xs2)
 
 /-- Action of a tree operation on loop space. -/
-def AssocOp.act {A : Type u} {a : A} (op : AssocOp) :
+noncomputable def AssocOp.act {A : Type u} {a : A} (op : AssocOp) :
     Vec (LoopSpace A a) (AssocTree.arity op) → LoopSpace A a :=
   AssocTree.eval op
 
 /-- The associative operad action on loop spaces by concatenation. -/
-def loopOperadAction (A : Type u) (a : A) :
+noncomputable def loopOperadAction (A : Type u) (a : A) :
     OperadAction AssocOp assocOperad (LoopSpace A a) where
   act := fun op xs => AssocOp.act op xs
 
 /-! ## Operad Laws from Path Composition -/
 
 /-- Binary composition tree. -/
-def assocTreeBinary : AssocOp :=
+noncomputable def assocTreeBinary : AssocOp :=
   AssocTree.node AssocTree.leaf AssocTree.leaf
 
 /-- Left-associated arity-3 tree. -/
-def assocTreeTripleLeft : AssocOp :=
+noncomputable def assocTreeTripleLeft : AssocOp :=
   AssocTree.node (AssocTree.node AssocTree.leaf AssocTree.leaf) AssocTree.leaf
 
 /-- Right-associated arity-3 tree. -/
-def assocTreeTripleRight : AssocOp :=
+noncomputable def assocTreeTripleRight : AssocOp :=
   AssocTree.node AssocTree.leaf (AssocTree.node AssocTree.leaf AssocTree.leaf)
 
 /-- Binary grafting is tree node formation. -/
@@ -294,13 +294,13 @@ inductive Symm2 where
 deriving DecidableEq
 
 /-- Composition in the group `S₂`. -/
-def Symm2.comp : Symm2 → Symm2 → Symm2
+noncomputable def Symm2.comp : Symm2 → Symm2 → Symm2
   | Symm2.id, σ => σ
   | Symm2.swap, Symm2.id => Symm2.swap
   | Symm2.swap, Symm2.swap => Symm2.id
 
 /-- Action of `S₂` on binary input vectors. -/
-def Symm2.actVec2 {α : Type u} : Symm2 → Vec α 2 → Vec α 2
+noncomputable def Symm2.actVec2 {α : Type u} : Symm2 → Vec α 2 → Vec α 2
   | Symm2.id, xs => xs
   | Symm2.swap, Vec.cons x (Vec.cons y Vec.nil) => Vec.of2 y x
 
@@ -424,13 +424,13 @@ theorem assocTreeTripleRight_arity : AssocTree.arity assocTreeTripleRight = 3 :=
 /-! ## Associahedron Coherence -/
 
 /-- Left-associated arity-4 operation. -/
-def assocTreeLeft : AssocOp :=
+noncomputable def assocTreeLeft : AssocOp :=
   AssocTree.node
     (AssocTree.node (AssocTree.node AssocTree.leaf AssocTree.leaf) AssocTree.leaf)
     AssocTree.leaf
 
 /-- Right-associated arity-4 operation. -/
-def assocTreeRight : AssocOp :=
+noncomputable def assocTreeRight : AssocOp :=
   AssocTree.node AssocTree.leaf
     (AssocTree.node AssocTree.leaf (AssocTree.node AssocTree.leaf AssocTree.leaf))
 
@@ -443,7 +443,7 @@ noncomputable def associahedron_k4 {A : Type u} {a : A}
     Vec.split, LoopSpace.comp] using
       (RwEq.refl (LoopSpace.comp p (LoopSpace.comp q (LoopSpace.comp r s))))
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end OperadicStructure

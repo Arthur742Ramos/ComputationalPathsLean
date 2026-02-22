@@ -37,13 +37,13 @@ structure MeasurableFunc (X Y : Type u) where
   sigmaY : SigmaAlgebra Y
 
 /-- Identity is measurable. -/
-def measurableId (X : Type u) (σ : SigmaAlgebra X) : MeasurableFunc X X where
+noncomputable def measurableId (X : Type u) (σ : SigmaAlgebra X) : MeasurableFunc X X where
   func := id
   sigmaX := σ
   sigmaY := σ
 
 /-- Composition of measurable functions. -/
-def measurableComp {X Y Z : Type u}
+noncomputable def measurableComp {X Y Z : Type u}
     (g : MeasurableFunc Y Z) (f : MeasurableFunc X Y) :
     MeasurableFunc X Z where
   func := g.func ∘ f.func
@@ -70,7 +70,7 @@ structure Measure (X : Type u) where
   emptyPath : Path (meas 0) emptyVal
 
 /-- Two measures are equivalent when they agree everywhere. -/
-def measureEquiv {X : Type u} (m1 m2 : Measure X) : Prop :=
+noncomputable def measureEquiv {X : Type u} (m1 m2 : Measure X) : Prop :=
   ∀ n : Nat, m1.meas n = m2.meas n
 
 /-- Measure equivalence is reflexive. -/
@@ -103,7 +103,7 @@ structure AdditivityData where
   additivePath : Path measUnion sumVal
 
 /-- Composed additivity path: union measure = sum of individual measures. -/
-def additivity_path (d : AdditivityData) : Path d.measUnion (d.measA + d.measB) :=
+noncomputable def additivity_path (d : AdditivityData) : Path d.measUnion (d.measA + d.measB) :=
   Path.trans d.additivePath d.sumPath
 
 /-- Additivity path trans refl. -/
@@ -269,7 +269,7 @@ structure OuterMeasureData where
   sumPath : Path sumVal (measA + measB)
 
 /-- Outer measure subadditivity composed path. -/
-def outer_subadd_path (d : OuterMeasureData) : Path d.outerVal (d.measA + d.measB) :=
+noncomputable def outer_subadd_path (d : OuterMeasureData) : Path d.outerVal (d.measA + d.measB) :=
   Path.trans d.subaddPath d.sumPath
 
 /-- Outer measure associativity. -/
@@ -300,12 +300,12 @@ theorem meas_congrArg {X : Type u} (m : Measure X) {n1 n2 : Nat}
   _root_.congrArg m.meas h
 
 /-- Path from congrArg on measure. -/
-def meas_congrArg_path {X : Type u} (m : Measure X) {n1 n2 : Nat}
+noncomputable def meas_congrArg_path {X : Type u} (m : Measure X) {n1 n2 : Nat}
     (h : n1 = n2) : Path (m.meas n1) (m.meas n2) :=
   Path.mk [Step.mk _ _ (_root_.congrArg m.meas h)] (_root_.congrArg m.meas h)
 
 /-- Transport of measure data along index equality. -/
-def meas_transport {P : Nat → Type v} {n1 n2 : Nat}
+noncomputable def meas_transport {P : Nat → Type v} {n1 n2 : Nat}
     (h : n1 = n2) (x : P n1) : P n2 :=
   Path.transport (Path.mk [Step.mk _ _ h] h) x
 
@@ -316,20 +316,20 @@ theorem meas_transport_refl {P : Nat → Type v} (n : Nat) (x : P n) :
 /-! ## Trivial Instances -/
 
 /-- Trivial sigma algebra on Unit. -/
-def trivialSigma : SigmaAlgebra Unit where
+noncomputable def trivialSigma : SigmaAlgebra Unit where
   measurable := fun _ => True
   emptyMeas := trivial
   fullMeas := trivial
 
 /-- Trivial measure on Unit. -/
-def trivialMeasure : Measure Unit where
+noncomputable def trivialMeasure : Measure Unit where
   sigma := trivialSigma
   meas := fun _ => 0
   emptyVal := 0
   emptyPath := Path.refl 0
 
 /-- Trivial additivity data. -/
-def trivialAdditivity : AdditivityData where
+noncomputable def trivialAdditivity : AdditivityData where
   measA := 0
   measB := 0
   measUnion := 0
@@ -338,7 +338,7 @@ def trivialAdditivity : AdditivityData where
   additivePath := Path.refl 0
 
 /-- Trivial null set. -/
-def trivialNull : NullSetData where
+noncomputable def trivialNull : NullSetData where
   measVal := 0
   nullPath := Path.refl 0
 

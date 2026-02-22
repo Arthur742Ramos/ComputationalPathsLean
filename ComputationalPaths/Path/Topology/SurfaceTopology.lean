@@ -79,14 +79,14 @@ structure EulerCharacteristic (S : ClosedSurface.{u}) where
   nonorientable_formula : S.orientable = false → Path chi (2 - (genus : Int))
 
 /-- Sphere has χ = 2. -/
-def sphere_euler : EulerCharacteristic
+noncomputable def sphere_euler : EulerCharacteristic
     ⟨⟨Unit, true, 0⟩, Path.refl _⟩ :=
   { chi := 2, genus := 0,
     orientable_formula := fun _ => Path.refl _,
     nonorientable_formula := fun h => absurd h (by decide) }
 
 /-- Torus has χ = 0. -/
-def torus_euler : EulerCharacteristic
+noncomputable def torus_euler : EulerCharacteristic
     ⟨⟨Unit, true, 0⟩, Path.refl _⟩ :=
   { chi := 0, genus := 1,
     orientable_formula := fun _ => Path.refl _,
@@ -133,7 +133,7 @@ structure SurfaceClassification (S : ClosedSurface.{u}) where
   unique : True
 
 /-- The sphere is classified as sphere. -/
-def sphere_classification :
+noncomputable def sphere_classification :
     SurfaceClassification ⟨⟨Unit, true, 0⟩, Path.refl _⟩ :=
   { surfType := SurfaceType.sphere,
     orient_match := rfl,
@@ -159,7 +159,7 @@ structure PolygonWord where
   each_twice : True
 
 /-- Standard polygon word for the torus: aba⁻¹b⁻¹. -/
-def torusWord : PolygonWord :=
+noncomputable def torusWord : PolygonWord :=
   { word := [
       ⟨0, true⟩, ⟨1, true⟩,
       ⟨0, false⟩, ⟨1, false⟩
@@ -168,7 +168,7 @@ def torusWord : PolygonWord :=
     each_twice := trivial }
 
 /-- Standard polygon word for the Klein bottle: abab⁻¹. -/
-def kleinBottleWord : PolygonWord :=
+noncomputable def kleinBottleWord : PolygonWord :=
   { word := [
       ⟨0, true⟩, ⟨1, true⟩,
       ⟨0, true⟩, ⟨1, false⟩
@@ -177,14 +177,14 @@ def kleinBottleWord : PolygonWord :=
     each_twice := trivial }
 
 /-- Standard polygon word for RP²: aa. -/
-def rp2Word : PolygonWord :=
+noncomputable def rp2Word : PolygonWord :=
   { word := [⟨0, true⟩, ⟨0, true⟩],
     numLabels := 1,
     each_twice := trivial }
 
 /-- Standard polygon word for genus g orientable surface:
     a₁b₁a₁⁻¹b₁⁻¹ ... aₘbₘaₘ⁻¹bₘ⁻¹. -/
-def orientableWord (g : Nat) : PolygonWord :=
+noncomputable def orientableWord (g : Nat) : PolygonWord :=
   { word := (List.range g).flatMap (fun i =>
       [⟨2*i, true⟩, ⟨2*i+1, true⟩,
        ⟨2*i, false⟩, ⟨2*i+1, false⟩]),
@@ -201,7 +201,7 @@ structure PolygonSurface where
   well_formed : True
 
 /-- The torus arises from the identification aba⁻¹b⁻¹. -/
-def torusSurface : PolygonSurface.{0} :=
+noncomputable def torusSurface : PolygonSurface.{0} :=
   { word := torusWord,
     surface := ⟨⟨Unit, true, 0⟩, Path.refl _⟩,
     well_formed := trivial }
@@ -246,7 +246,7 @@ structure FundamentalGroupPresentation (g : Nat) where
   relation : FundamentalRelation g
 
 /-- The torus has fundamental group ℤ × ℤ. -/
-def torus_pi1 : FundamentalGroupPresentation 1 :=
+noncomputable def torus_pi1 : FundamentalGroupPresentation 1 :=
   { numGenerators := 2,
     gen_count := Path.refl _,
     numRelations := 1,
@@ -271,7 +271,7 @@ structure Genus (S : ClosedSurface.{u}) where
 /-- The genus is a topological invariant: if two Genus records share the
     same surface, orientability, and Euler characteristic genus, their
     genus values agree. -/
-def genus_invariant (_S : ClosedSurface.{u})
+noncomputable def genus_invariant (_S : ClosedSurface.{u})
     (g1 g2 : Genus _S)
     (same_euler_genus : Path g1.euler_eq.genus g2.euler_eq.genus)
     (g1_eq : Path g1.g g1.euler_eq.genus)
@@ -304,7 +304,7 @@ structure GaussBonnet (S : ClosedSurface.{u}) where
   equation : Path totalCurvature euler.chi
 
 /-- Sphere has positive total curvature. -/
-def sphere_gauss_bonnet :
+noncomputable def sphere_gauss_bonnet :
     GaussBonnet ⟨⟨Unit, true, 0⟩, Path.refl _⟩ :=
   { euler := sphere_euler,
     totalCurvature := 2,

@@ -60,7 +60,7 @@ theorem reduceList_append {A : Type u} (a0 : A) :
 
 
 /-- Relation identifying lists after removing basepoint occurrences. -/
-def JamesRel {A : Type u} (a0 : A) (l1 l2 : List A) : Prop :=
+noncomputable def JamesRel {A : Type u} (a0 : A) (l1 l2 : List A) : Prop :=
   reduceList a0 l1 = reduceList a0 l2
 
 
@@ -69,11 +69,11 @@ def JamesRel {A : Type u} (a0 : A) (l1 l2 : List A) : Prop :=
 /-! ## James construction -/
 
 /-- The James construction on a pointed type. -/
-def JamesConstruction (X : SuspensionLoop.Pointed) : Type u :=
+noncomputable def JamesConstruction (X : SuspensionLoop.Pointed) : Type u :=
   Quot (JamesRel X.pt)
 
 /-- Basepoint in the James construction (empty list). -/
-def jamesBase (X : SuspensionLoop.Pointed) : JamesConstruction X :=
+noncomputable def jamesBase (X : SuspensionLoop.Pointed) : JamesConstruction X :=
   Quot.mk _ []
 
 /-- Concatenation on the James construction. -/
@@ -106,7 +106,7 @@ noncomputable def jamesMul (X : SuspensionLoop.Pointed) :
 
 
 /-- The James construction as a pointed type. -/
-def jamesPointed (X : SuspensionLoop.Pointed) : SuspensionLoop.Pointed where
+noncomputable def jamesPointed (X : SuspensionLoop.Pointed) : SuspensionLoop.Pointed where
   carrier := JamesConstruction X
   pt := jamesBase X
 
@@ -115,14 +115,14 @@ def jamesPointed (X : SuspensionLoop.Pointed) : SuspensionLoop.Pointed where
 variable {X : SuspensionLoop.Pointed}
 
 /-- The basic loop in the suspension associated to a point. -/
-def loopOfElem (X : SuspensionLoop.Pointed) (x : X.carrier) :
+noncomputable def loopOfElem (X : SuspensionLoop.Pointed) (x : X.carrier) :
     LoopSpace (Suspension X.carrier) (Suspension.north (X := X.carrier)) :=
   Path.trans
     (Suspension.merid (X := X.carrier) x)
     (Path.symm (Suspension.merid (X := X.carrier) X.pt))
 
 /-- Fold a list into the loop space of the suspension. -/
-def loopOfList (X : SuspensionLoop.Pointed) :
+noncomputable def loopOfList (X : SuspensionLoop.Pointed) :
     List X.carrier →
       LoopSpace (Suspension X.carrier) (Suspension.north (X := X.carrier))
   | [] => Path.refl (Suspension.north (X := X.carrier))

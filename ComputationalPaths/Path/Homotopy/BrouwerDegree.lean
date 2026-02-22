@@ -62,17 +62,17 @@ attribute [simp] BrouwerDegreeData.degree_id BrouwerDegreeData.degree_const
 namespace BrouwerDegreeData
 
 /-- `Path` witnessing that the identity has degree 1. -/
-def degree_id_path (D : BrouwerDegreeData X) :
+noncomputable def degree_id_path (D : BrouwerDegreeData X) :
     ComputationalPaths.Path (D.degree (ContinuousMap.id X)) 1 :=
   ComputationalPaths.Path.stepChain D.degree_id
 
 /-- `Path` witnessing that constant maps have degree 0. -/
-def degree_const_path (D : BrouwerDegreeData X) (x : X) :
+noncomputable def degree_const_path (D : BrouwerDegreeData X) (x : X) :
     ComputationalPaths.Path (D.degree (ContinuousMap.const X x)) 0 :=
   ComputationalPaths.Path.stepChain (D.degree_const x)
 
 /-- `Path` witnessing homotopy invariance of the degree. -/
-def degree_homotopy_path (D : BrouwerDegreeData X) {f g : C(X, X)}
+noncomputable def degree_homotopy_path (D : BrouwerDegreeData X) {f g : C(X, X)}
     (h : ContinuousMap.Homotopic f g) :
     ComputationalPaths.Path (D.degree f) (D.degree g) :=
   ComputationalPaths.Path.stepChain (D.homotopy_invariant h)
@@ -87,7 +87,7 @@ theorem degree_of_no_fixed_point (D : BrouwerDegreeData X) (f : C(X, X))
     _ = 0 := D.degree_const x
 
 /-- `Path` witnessing that no-fixed-point maps have degree 0. -/
-def degree_of_no_fp_path (D : BrouwerDegreeData X) (f : C(X, X))
+noncomputable def degree_of_no_fp_path (D : BrouwerDegreeData X) (f : C(X, X))
     (h : ∀ x, f x ≠ x) :
     ComputationalPaths.Path (D.degree f) 0 :=
   ComputationalPaths.Path.stepChain (degree_of_no_fixed_point D f h)
@@ -119,7 +119,7 @@ theorem brouwer_fixed_point (D : BrouwerDegreeData X) (f : C(X, X))
   fixed_point_of_homotopic_id D f h
 
 /-- `Path` witnessing that a map homotopic to id has degree 1. -/
-def degree_of_homotopic_id_path (D : BrouwerDegreeData X) (f : C(X, X))
+noncomputable def degree_of_homotopic_id_path (D : BrouwerDegreeData X) (f : C(X, X))
     (h : ContinuousMap.Homotopic f (ContinuousMap.id X)) :
     ComputationalPaths.Path (D.degree f) 1 :=
   ComputationalPaths.Path.trans (degree_homotopy_path D h) (degree_id_path D)

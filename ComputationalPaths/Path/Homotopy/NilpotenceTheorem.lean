@@ -57,23 +57,23 @@ structure SuspensionSelfMap (p : Prime) (X : FinitePLocalSpectrum p) where
 
 /-- Nilpotence of a suspension self-map, expressed as the existence of an
     iterate that vanishes (placeholder). -/
-def selfMapNilpotent {p : Prime} {X : FinitePLocalSpectrum p}
+noncomputable def selfMapNilpotent {p : Prime} {X : FinitePLocalSpectrum p}
     (_f : SuspensionSelfMap p X) : Prop :=
   ∃ _k : Nat, True
 
 /-! ## MU_+ detection -/
 
 /-- The reduced complex cobordism theory MU_+ as a placeholder cohomology theory. -/
-def muPlus : ReducedCohomologyTheory :=
+noncomputable def muPlus : ReducedCohomologyTheory :=
   ReducedCohomologyTheory.trivial
 
 /-- MU_+ applied to a suspension self-map (placeholder). -/
-def muPlusOnMap {p : Prime} {X : FinitePLocalSpectrum p}
+noncomputable def muPlusOnMap {p : Prime} {X : FinitePLocalSpectrum p}
     (f : SuspensionSelfMap p X) : SuspensionSelfMap p X :=
   f
 
 /-- Nilpotence after applying MU_+ (placeholder). -/
-def muPlusNilpotent {p : Prime} {X : FinitePLocalSpectrum p}
+noncomputable def muPlusNilpotent {p : Prime} {X : FinitePLocalSpectrum p}
     (f : SuspensionSelfMap p X) : Prop :=
   selfMapNilpotent (muPlusOnMap f)
 
@@ -96,7 +96,7 @@ abbrev VnSelfMap (p : Prime) (n : Nat) : Type (u + 1) :=
   ChromaticHomotopy.PeriodicityData.{u} p n
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

@@ -28,39 +28,39 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a     => .refl a
   | .rule n a b => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.cons s.symm (.nil _))
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
 structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   eq : p = q
 
-def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
-def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
+noncomputable def Cell2.id (p : Path α a b) : Cell2 p p := ⟨rfl⟩
+noncomputable def Cell2.vcomp {p q r : Path α a b} (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.eq.trans τ.eq⟩
-def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
+noncomputable def Cell2.vinv {p q : Path α a b} (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.eq.symm⟩
 
-def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
+noncomputable def whiskerL (r : Path α a b) {p q : Path α b c} (σ : Cell2 p q) :
     Cell2 (r.trans p) (r.trans q) :=
   ⟨congrArg (Path.trans r) σ.eq⟩
 
-def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
+noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) :
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.eq⟩
 
@@ -108,15 +108,15 @@ structure Spectrum where
   spaceBase  : Int → Nat
   mapName    : Int → String
 
-def Spectrum.space (E : Spectrum) (n : Int) : PtSpace :=
+noncomputable def Spectrum.space (E : Spectrum) (n : Int) : PtSpace :=
   ⟨E.spaceName n, E.spaceBase n⟩
 
 /-- Suspension of a pointed space. -/
-def suspend (X : PtSpace) : PtSpace :=
+noncomputable def suspend (X : PtSpace) : PtSpace :=
   ⟨"Σ(" ++ X.name ++ ")", X.basePt⟩
 
 /-- Loop space of a pointed space. -/
-def loopSpace (X : PtSpace) : PtSpace :=
+noncomputable def loopSpace (X : PtSpace) : PtSpace :=
   ⟨"Ω(" ++ X.name ++ ")", X.basePt⟩
 
 /-- Theorem 5: Suspension preserves base-point. -/
@@ -126,7 +126,7 @@ theorem suspend_basePt (X : PtSpace) : (suspend X).basePt = X.basePt := rfl
 theorem loopSpace_basePt (X : PtSpace) : (loopSpace X).basePt = X.basePt := rfl
 
 /-- Iterated loop space. -/
-def iterLoop : Nat → PtSpace → PtSpace
+noncomputable def iterLoop : Nat → PtSpace → PtSpace
   | 0,     X => X
   | n + 1, X => loopSpace (iterLoop n X)
 
@@ -151,23 +151,23 @@ structure SpecState where
 deriving DecidableEq, Repr
 
 /-- Make a SpecState from a spectrum at level n. -/
-def Spectrum.stateAt (E : Spectrum) (n : Int) : SpecState :=
+noncomputable def Spectrum.stateAt (E : Spectrum) (n : Int) : SpecState :=
   ⟨n, E.spaceName n⟩
 
 abbrev SpecPath (a b : SpecState) := Path SpecState a b
 
 /-- Suspension step: apply Σ at a level. -/
-def mkSuspendPath (n : Int) (name : String) :
+noncomputable def mkSuspendPath (n : Int) (name : String) :
     SpecPath (SpecState.mk n name) (SpecState.mk n ("Σ(" ++ name ++ ")")) :=
   Path.single (Step.rule "Σ" (SpecState.mk n name) (SpecState.mk n ("Σ(" ++ name ++ ")")))
 
 /-- Structure map step: go from level n to n+1. -/
-def mkStructPath (n : Int) (s1 s2 : String) :
+noncomputable def mkStructPath (n : Int) (s1 s2 : String) :
     SpecPath (SpecState.mk n s1) (SpecState.mk (n + 1) s2) :=
   Path.single (Step.rule "σ" (SpecState.mk n s1) (SpecState.mk (n + 1) s2))
 
 /-- Loop adjunction step. -/
-def mkLoopPath (n : Int) (name : String) :
+noncomputable def mkLoopPath (n : Int) (name : String) :
     SpecPath (SpecState.mk (n + 1) name) (SpecState.mk n ("Ω(" ++ name ++ ")")) :=
   Path.single (Step.rule "Ω-adj" (SpecState.mk (n + 1) name)
                                    (SpecState.mk n ("Ω(" ++ name ++ ")")))
@@ -183,7 +183,7 @@ theorem structPath_length (n : Int) (s1 s2 : String) :
   unfold mkStructPath; simp [Path.single, Path.length]
 
 /-- Compose: suspend then apply structure map (2-step path). -/
-def suspThenStruct (n : Int) (s0 s1 : String) :
+noncomputable def suspThenStruct (n : Int) (s0 s1 : String) :
     SpecPath (SpecState.mk n s0) (SpecState.mk (n + 1) s1) :=
   (mkSuspendPath n s0).trans (mkStructPath n ("Σ(" ++ s0 ++ ")") s1)
 
@@ -194,7 +194,7 @@ theorem suspThenStruct_length (n : Int) (s0 s1 : String) :
   simp [Path.single, Path.trans, Path.length]
 
 /-- Ω round trip: loop then deloop. -/
-def omegaRoundTrip (n : Int) (name : String) :
+noncomputable def omegaRoundTrip (n : Int) (name : String) :
     SpecPath (SpecState.mk (n + 1) name) (SpecState.mk (n + 1) name) :=
   (mkLoopPath n name).trans
     (Path.single (Step.rule "deloop"
@@ -218,7 +218,7 @@ structure HomotopyGroup where
 deriving DecidableEq, Repr
 
 /-- The n-th stable homotopy group. -/
-def stableGroup (E : Spectrum) (n : Int) : HomotopyGroup :=
+noncomputable def stableGroup (E : Spectrum) (n : Int) : HomotopyGroup :=
   ⟨E.spaceName n, n⟩
 
 /-- Theorem 13: stableGroup is deterministic. -/
@@ -228,12 +228,12 @@ theorem stableGroup_det (E : Spectrum) (n : Int) :
 abbrev HGrpPath (a b : HomotopyGroup) := Path HomotopyGroup a b
 
 /-- Suspension isomorphism for homotopy groups. -/
-def suspIso (g : HomotopyGroup) :
+noncomputable def suspIso (g : HomotopyGroup) :
     HGrpPath g ⟨g.specName, g.degree + 1⟩ :=
   Path.single (Step.rule "Σ-iso" g ⟨g.specName, g.degree + 1⟩)
 
 /-- Double suspension isomorphism (2-step). -/
-def doubleSuspIso (g : HomotopyGroup) :
+noncomputable def doubleSuspIso (g : HomotopyGroup) :
     HGrpPath g ⟨g.specName, g.degree + 1 + 1⟩ :=
   let g1 : HomotopyGroup := ⟨g.specName, g.degree + 1⟩
   (Path.single (Step.rule "Σ-iso₁" g g1)).trans
@@ -254,7 +254,7 @@ theorem doubleSuspIso_length (g : HomotopyGroup) :
 -- ============================================================
 
 /-- Smash product of two spectra. -/
-def smashSpectrum (E F : Spectrum) : Spectrum where
+noncomputable def smashSpectrum (E F : Spectrum) : Spectrum where
   spaceName n := "(" ++ E.spaceName n ++ " ∧ " ++ F.spaceName n ++ ")"
   spaceBase n := E.spaceBase n
   mapName n := "σ_∧(" ++ toString n ++ ")"
@@ -279,7 +279,7 @@ structure AbGroup where
 deriving DecidableEq, Repr
 
 /-- Eilenberg-MacLane spectrum H(A). -/
-def eilenbergMacLane (A : AbGroup) : Spectrum where
+noncomputable def eilenbergMacLane (A : AbGroup) : Spectrum where
   spaceName n := if n ≥ 0 then "K(" ++ A.name ++ "," ++ toString n ++ ")" else "•"
   spaceBase _ := 0
   mapName n := "σ_EM(" ++ toString n ++ ")"
@@ -300,7 +300,7 @@ theorem em_basePt (A : AbGroup) (n : Int) :
     (eilenbergMacLane A).spaceBase n = 0 := rfl
 
 /-- EM structure path: from level n to n+1. -/
-def emStructurePath (A : AbGroup) (n : Int) :
+noncomputable def emStructurePath (A : AbGroup) (n : Int) :
     SpecPath ((eilenbergMacLane A).stateAt n)
              ((eilenbergMacLane A).stateAt (n + 1)) :=
   mkStructPath n ((eilenbergMacLane A).spaceName n)
@@ -323,7 +323,7 @@ structure SpecMap where
 deriving DecidableEq, Repr
 
 /-- Cofiber spectrum name. -/
-def cofiberName (f : SpecMap) : String := "C(" ++ f.mapLabel ++ ")"
+noncomputable def cofiberName (f : SpecMap) : String := "C(" ++ f.mapLabel ++ ")"
 
 /-- An exact triangle: E →[f] F →[i] C(f) →[∂] ΣE. -/
 structure ExactTriangle where
@@ -332,7 +332,7 @@ structure ExactTriangle where
   mapLabel : String
 
 /-- Path witnessing exact triangle (3-step). -/
-def exactTrianglePath (t : ExactTriangle) :
+noncomputable def exactTrianglePath (t : ExactTriangle) :
     Path String t.eName ("Σ" ++ t.eName) :=
   (Path.single (Step.rule "f" t.eName t.fName)).trans
     ((Path.single (Step.rule "i" t.fName ("C(" ++ t.mapLabel ++ ")"))).trans
@@ -345,7 +345,7 @@ theorem exactTriangle_length (t : ExactTriangle) :
   simp [Path.single, Path.trans, Path.length]
 
 /-- Extended exact triangle (5-step). -/
-def exactTriangle5 (t : ExactTriangle) :
+noncomputable def exactTriangle5 (t : ExactTriangle) :
     Path String t.eName ("ΣC(" ++ t.mapLabel ++ ")") :=
   (exactTrianglePath t).trans
     ((Path.single (Step.rule "Σf" ("Σ" ++ t.eName) ("Σ" ++ t.fName))).trans
@@ -371,7 +371,7 @@ inductive StHoObj where
 deriving DecidableEq, Repr
 
 /-- Size of a stable homotopy object. -/
-def StHoObj.size : StHoObj → Nat
+noncomputable def StHoObj.size : StHoObj → Nat
   | .spec _    => 1
   | .susp X    => 1 + X.size
   | .desusp X  => 1 + X.size
@@ -385,12 +385,12 @@ theorem stHoObj_size_pos (X : StHoObj) : X.size > 0 := by
 abbrev StHoPath (a b : StHoObj) := Path StHoObj a b
 
 /-- Cancel suspension-desuspension. -/
-def cancelSuspDesusp (X : StHoObj) :
+noncomputable def cancelSuspDesusp (X : StHoObj) :
     StHoPath (StHoObj.susp (StHoObj.desusp X)) X :=
   Path.single (Step.rule "Σ∘Σ⁻¹≃id" (StHoObj.susp (StHoObj.desusp X)) X)
 
 /-- Cancel desuspension-suspension. -/
-def cancelDesuspSusp (X : StHoObj) :
+noncomputable def cancelDesuspSusp (X : StHoObj) :
     StHoPath (StHoObj.desusp (StHoObj.susp X)) X :=
   Path.single (Step.rule "Σ⁻¹∘Σ≃id" (StHoObj.desusp (StHoObj.susp X)) X)
 
@@ -405,12 +405,12 @@ theorem cancel_desusp_susp_length (X : StHoObj) :
   unfold cancelDesuspSusp; simp [Path.single, Path.length]
 
 /-- Smash commutativity path. -/
-def smashCommPath (X Y : StHoObj) :
+noncomputable def smashCommPath (X Y : StHoObj) :
     StHoPath (StHoObj.smash X Y) (StHoObj.smash Y X) :=
   Path.single (Step.rule "∧-comm" (StHoObj.smash X Y) (StHoObj.smash Y X))
 
 /-- Double commutativity = round trip. -/
-def smashCommRoundTrip (X Y : StHoObj) :
+noncomputable def smashCommRoundTrip (X Y : StHoObj) :
     StHoPath (StHoObj.smash X Y) (StHoObj.smash X Y) :=
   (smashCommPath X Y).trans (smashCommPath Y X)
 
@@ -421,7 +421,7 @@ theorem smashComm_roundTrip_length (X Y : StHoObj) :
   simp [Path.single, Path.trans, Path.length]
 
 /-- Smash associativity path. -/
-def smashAssocPath (X Y Z : StHoObj) :
+noncomputable def smashAssocPath (X Y Z : StHoObj) :
     StHoPath (StHoObj.smash (StHoObj.smash X Y) Z) (StHoObj.smash X (StHoObj.smash Y Z)) :=
   Path.single (Step.rule "∧-assoc"
     (StHoObj.smash (StHoObj.smash X Y) Z)
@@ -433,7 +433,7 @@ theorem smashAssoc_length (X Y Z : StHoObj) :
   unfold smashAssocPath; simp [Path.single, Path.length]
 
 /-- Full cofiber sequence: X → Y → C(f) → ΣX (3 steps). -/
-def cofiberSequence3 (X Y : StHoObj) :
+noncomputable def cofiberSequence3 (X Y : StHoObj) :
     StHoPath X (StHoObj.susp X) :=
   (Path.single (Step.rule "f" X Y)).trans
     ((Path.single (Step.rule "i" Y (StHoObj.cofib X Y))).trans
@@ -446,7 +446,7 @@ theorem cofiberSeq3_length (X Y : StHoObj) :
   simp [Path.single, Path.trans, Path.length]
 
 /-- Extended cofiber sequence (5 steps). -/
-def cofiberSequence5 (X Y : StHoObj) :
+noncomputable def cofiberSequence5 (X Y : StHoObj) :
     StHoPath X (StHoObj.susp (StHoObj.cofib X Y)) :=
   (cofiberSequence3 X Y).trans
     ((Path.single (Step.rule "Σf" (StHoObj.susp X) (StHoObj.susp Y))).trans
@@ -471,15 +471,15 @@ structure SSPage where
 deriving DecidableEq, Repr
 
 /-- Differential: d_r shifts filtration. -/
-def ssDifferential (p : SSPage) : SSPage :=
+noncomputable def ssDifferential (p : SSPage) : SSPage :=
   ⟨p.page, p.sIdx + p.page, p.tIdx + p.page - 1, "d(" ++ p.grp ++ ")"⟩
 
 /-- Next page via homology. -/
-def ssNextPage (p : SSPage) : SSPage :=
+noncomputable def ssNextPage (p : SSPage) : SSPage :=
   ⟨p.page + 1, p.sIdx, p.tIdx, "H(" ++ p.grp ++ ")"⟩
 
 /-- Path: differential then homology. -/
-def ssStepPath (p : SSPage) : Path SSPage p (ssNextPage p) :=
+noncomputable def ssStepPath (p : SSPage) : Path SSPage p (ssNextPage p) :=
   (Path.single (Step.rule "d_r" p (ssDifferential p))).trans
     (Path.single (Step.rule "H" (ssDifferential p) (ssNextPage p)))
 
@@ -489,7 +489,7 @@ theorem ssStep_length (p : SSPage) :
   unfold ssStepPath; simp [Path.single, Path.trans, Path.length]
 
 /-- Two pages of SS. -/
-def ssTwoPages (p : SSPage) : Path SSPage p (ssNextPage (ssNextPage p)) :=
+noncomputable def ssTwoPages (p : SSPage) : Path SSPage p (ssNextPage (ssNextPage p)) :=
   (ssStepPath p).trans (ssStepPath (ssNextPage p))
 
 /-- Theorem 32: Two pages = 4 steps. -/
@@ -512,7 +512,7 @@ theorem ssDiff_page (p : SSPage) : (ssDifferential p).page = p.page := rfl
 structure Filtration where
   levels : List String
 
-def Filtration.len (f : Filtration) : Nat := f.levels.length
+noncomputable def Filtration.len (f : Filtration) : Nat := f.levels.length
 
 /-- Theorem 35: Empty filtration has length 0. -/
 theorem filtration_empty_len : Filtration.len ⟨[]⟩ = 0 := rfl
@@ -527,13 +527,13 @@ theorem filtration_cons_len (s : String) (rest : List String) :
 -- ============================================================
 
 /-- Functorial square: map then structure-map (2-step). -/
-def functorialSquare (n : Int) (srcN tgtN tgtN1 : String) :
+noncomputable def functorialSquare (n : Int) (srcN tgtN tgtN1 : String) :
     SpecPath (SpecState.mk n srcN) (SpecState.mk (n + 1) tgtN1) :=
   (Path.single (Step.rule "f_n" (SpecState.mk n srcN) (SpecState.mk n tgtN))).trans
     (Path.single (Step.rule "σ_F" (SpecState.mk n tgtN) (SpecState.mk (n + 1) tgtN1)))
 
 /-- Alternative: structure-map then map. -/
-def functorialSquareAlt (n : Int) (srcN srcN1 tgtN1 : String) :
+noncomputable def functorialSquareAlt (n : Int) (srcN srcN1 tgtN1 : String) :
     SpecPath (SpecState.mk n srcN) (SpecState.mk (n + 1) tgtN1) :=
   (Path.single (Step.rule "σ_E" (SpecState.mk n srcN) (SpecState.mk (n + 1) srcN1))).trans
     (Path.single (Step.rule "f_{n+1}" (SpecState.mk (n + 1) srcN1) (SpecState.mk (n + 1) tgtN1)))
@@ -558,13 +558,13 @@ theorem functorial_coherence_length (n : Int) (a b c d : String) :
 -- ============================================================
 
 /-- Wedge of spectra. -/
-def wedgeSpectrum (E F : Spectrum) : Spectrum where
+noncomputable def wedgeSpectrum (E F : Spectrum) : Spectrum where
   spaceName n := E.spaceName n ++ " ∨ " ++ F.spaceName n
   spaceBase _ := 0
   mapName n := "σ_∨(" ++ toString n ++ ")"
 
 /-- Product of spectra. -/
-def prodSpectrum (E F : Spectrum) : Spectrum where
+noncomputable def prodSpectrum (E F : Spectrum) : Spectrum where
   spaceName n := E.spaceName n ++ " × " ++ F.spaceName n
   spaceBase _ := 0
   mapName n := "σ_×(" ++ toString n ++ ")"
@@ -578,7 +578,7 @@ theorem prod_basePt (E F : Spectrum) (n : Int) :
     (prodSpectrum E F).spaceBase n = 0 := rfl
 
 /-- Inclusion wedge → product (1-step path). -/
-def wedgeToProduct (E F : Spectrum) (n : Int) :
+noncomputable def wedgeToProduct (E F : Spectrum) (n : Int) :
     SpecPath ((wedgeSpectrum E F).stateAt n) ((prodSpectrum E F).stateAt n) :=
   Path.single (Step.rule "∨↪×" ((wedgeSpectrum E F).stateAt n) ((prodSpectrum E F).stateAt n))
 
@@ -592,10 +592,10 @@ theorem wedgeToProduct_length (E F : Spectrum) (n : Int) :
 -- ============================================================
 
 /-- Chromatic level. -/
-def chromaticLevel (k : Nat) : String := "L_{E(" ++ toString k ++ ")}"
+noncomputable def chromaticLevel (k : Nat) : String := "L_{E(" ++ toString k ++ ")}"
 
 /-- Chromatic tower path: L_n → L_{n-1} → ... → L_0. -/
-def chromaticTowerPath : (n : Nat) → Path String (chromaticLevel n) (chromaticLevel 0)
+noncomputable def chromaticTowerPath : (n : Nat) → Path String (chromaticLevel n) (chromaticLevel 0)
   | 0     => Path.nil (chromaticLevel 0)
   | k + 1 =>
     (Path.single (Step.rule ("L" ++ toString (k+1) ++ "→" ++ toString k)
@@ -615,7 +615,7 @@ theorem chromaticTower_length : (n : Nat) → (chromaticTowerPath n).length = n
 -- ============================================================
 
 /-- Thom isomorphism as path step. -/
-def thomIsoPath (baseName groupName : String) :
+noncomputable def thomIsoPath (baseName groupName : String) :
     Path String ("H*(" ++ baseName ++ ";" ++ groupName ++ ")")
                 ("H*₊ₙ(Th;" ++ groupName ++ ")") :=
   Path.single (Step.rule "ThomIso"
@@ -632,7 +632,7 @@ theorem thomIso_length (b g : String) :
 -- ============================================================
 
 /-- Connective cover: kill negative levels. -/
-def connectiveCover (E : Spectrum) : Spectrum where
+noncomputable def connectiveCover (E : Spectrum) : Spectrum where
   spaceName n := if n ≥ 0 then E.spaceName n else "•"
   spaceBase n := if n ≥ 0 then E.spaceBase n else 0
   mapName n := "σ_conn(" ++ toString n ++ ")"

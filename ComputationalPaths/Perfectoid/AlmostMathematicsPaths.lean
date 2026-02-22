@@ -96,7 +96,7 @@ variable {R : Type u} {S : Type v}
 variable {aR : AlmostData R} {aS : AlmostData S}
 
 /-- Extension multiplicativity with explicit right-unit insertion. -/
-def extMulNormalized
+noncomputable def extMulNormalized
     (A : AlmostPurityPaths R S aR aS) (x y : R) :
     Path
       (A.ext.toFun (aR.mul x y))

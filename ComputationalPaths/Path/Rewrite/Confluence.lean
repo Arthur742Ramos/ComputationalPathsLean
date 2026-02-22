@@ -37,7 +37,7 @@ noncomputable def Join.rweq {A : Type u} {a b : A}
     (Quot.mk _ p : PathRwQuot A a b) = Quot.mk _ q :=
   Quot.sound J.rweq
 
-@[simp] def join_refl {A : Type u} {a b : A} (p : Path a b) :
+@[simp] noncomputable def join_refl {A : Type u} {a b : A} (p : Path a b) :
     Join (A := A) (a := a) (b := b) p p :=
   { meet := p, left := Rw.refl p, right := Rw.refl p }
 
@@ -51,7 +51,7 @@ class HasJoinOfRw : Type (u + 1) where
       {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
       Join (A := A) (a := a) (b := b) q r
 
-@[simp] def join_of_rw [h : HasJoinOfRw.{u}]
+@[simp] noncomputable def join_of_rw [h : HasJoinOfRw.{u}]
     {A : Type u} {a b : A} {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
     Join (A := A) (a := a) (b := b) q r :=
   h.join_of_rw (hq := hq) (hr := hr)
@@ -61,13 +61,13 @@ noncomputable section
 variable [HasJoinOfRw.{u}]
 
 /-- Join witnesses built from confluence of rewrites. -/
-@[simp] def of_rw {A : Type u} {a b : A}
+@[simp] noncomputable def of_rw {A : Type u} {a b : A}
     {p q r : Path a b} (hq : Rw p q) (hr : Rw p r) :
     Join (A := A) (a := a) (b := b) q r :=
   join_of_rw hq hr
 
 /-- Joining the targets of two single-step reductions. -/
-@[simp] def of_steps {A : Type u} {a b : A}
+@[simp] noncomputable def of_steps {A : Type u} {a b : A}
     {p q r : Path a b} (hq : Step (A := A) (a := a) (b := b) p q)
     (hr : Step (A := A) (a := a) (b := b) p r) :
     Join (A := A) (a := a) (b := b) q r :=
@@ -80,7 +80,7 @@ namespace LNDEQ
 
 /-- LNDEQ instantiations produce concrete join witnesses whenever their sources
 agree.  This version takes explicit type parameters to avoid heterogeneous equality issues. -/
-@[simp] def Instantiation.join
+@[simp] noncomputable def Instantiation.join
     {A : Type u} {a b : A}
     {p q r : Path a b}
     (step₁ : Step (A := A) p q)
@@ -121,7 +121,7 @@ variable {A : Type u} {B : Type u}
 variable {a₁ a₂ : A} {b₁ b₂ : B}
 
 /-- Critical pair between the two `fst` β-rules. -/
-@[simp] def mx2_fst (p : Path a₁ a₂) (q : Path b₁ b₂) :
+@[simp] noncomputable def mx2_fst (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Join (A := A) (a := a₁) (b := a₂)
       (Builder.instMx2l1 (A := A) (B := B) (p := p) (q := q)).q
       (Builder.instMx2l2 (A := A) (B := B) (p := p) (q := q)).q :=
@@ -137,7 +137,7 @@ variable {A : Type u} {B : Type u}
 variable {a : A} {b₁ b₂ : B}
 
 /-- Critical pair witnessing that both `snd` β-rules agree when the left path is reflexive. -/
-@[simp] def mx2_snd (q : Path b₁ b₂) :
+@[simp] noncomputable def mx2_snd (q : Path b₁ b₂) :
     Join (A := B) (a := b₁) (b := b₂)
       (Builder.instMx2r1 (A := A) (B := B)
         (p := Path.refl (A := A) a) (q := q)).q
@@ -153,7 +153,7 @@ section AssocUnits
 variable {A : Type u} {a b c : A}
 
 /-- Associativity overlaps with right-unit when the tail is reflexive. -/
-@[simp] def tt_rrr (p : Path a b) (q : Path b c) :
+@[simp] noncomputable def tt_rrr (p : Path a b) (q : Path b c) :
     Join (A := A) (a := a) (b := c)
       (Builder.instTt (A := A) (p := p) (q := q) (r := Path.refl c)).q
       (Builder.instRrr (A := A)
@@ -163,7 +163,7 @@ variable {A : Type u} {a b c : A}
     (Builder.instRrr (A := A) (p := Path.trans (A := A) (p := p) (q := q))).step
 
 /-- Associativity overlaps with left-unit when the head is reflexive. -/
-@[simp] def tt_lrr (q : Path a b) (r : Path b c) :
+@[simp] noncomputable def tt_lrr (q : Path a b) (r : Path b c) :
     Join (A := A) (a := a) (b := c)
       (Builder.instTt (A := A) (p := Path.refl a) (q := q) (r := r)).q
       (Builder.instLrr (A := A)
@@ -182,7 +182,7 @@ variable {a₁ a₂ : A}
 variable {x y : B}
 
 /-- Associativity overlaps with the left cancellation rule `ttsv`. -/
-@[simp] def tt_ttsv
+@[simp] noncomputable def tt_ttsv
     (p : Path a₁ a₂) (v : Path (C.fill a₁) y) :
     Join (A := B) (a := C.fill a₁) (b := y)
       (Builder.instTt (A := B)
@@ -227,7 +227,7 @@ variable {x y : B}
     (p := shared) (q := i₁.q) (r := i₂.q) h_left h_right
 
 /-- Associativity overlaps with the right cancellation rule `tstu`. -/
-@[simp] def tt_tstu
+@[simp] noncomputable def tt_tstu
     (p : Path a₁ a₂) (v : Path x (C.fill a₁)) :
     Join (A := B) (a := x) (b := C.fill a₁)
       (Builder.instTt (A := B)
@@ -253,7 +253,7 @@ variable {a₁ a₂ : A}
 
 /-- `tsbll` overlaps with the reflexive `slr` rule when the left proof is
 reflexive, yielding identical sources and hence a direct join witness. -/
-@[simp] def tsbll_slr (p : Path a₁ a₂) :
+@[simp] noncomputable def tsbll_slr (p : Path a₁ a₂) :
     Join (A := B) (a := C.fill a₁) (b := C.fill a₂)
       (Builder.instTsbll (A := A) (B := B) (C := C)
         (r := Path.refl (C.fill a₁)) (p := p)).q
@@ -265,7 +265,7 @@ reflexive, yielding identical sources and hence a direct join witness. -/
 
 /-- The right-sided counterparts `tsbrl` and `srr` also overlap when the
 trailing witness is reflexive, so they admit the same canonical join. -/
-@[simp] def tsbrl_srr (p : Path a₁ a₂) :
+@[simp] noncomputable def tsbrl_srr (p : Path a₁ a₂) :
     Join (A := B) (a := C.fill a₁) (b := C.fill a₂)
       (Builder.instTsbrl (A := A) (B := B) (C := C)
         (p := p) (t := Path.refl (C.fill a₂))).q
@@ -276,7 +276,7 @@ trailing witness is reflexive, so they admit the same canonical join. -/
     (Builder.instSrr (A := A) (B := B) (C := C) (p := p)).step
 
 /-- Reflexive witnesses trigger both `srsr` and `srrrr` reductions from the same source. -/
-@[simp] def srsr_srrrr {a : A} {y : B}
+@[simp] noncomputable def srsr_srrrr {a : A} {y : B}
     (t : Path (C.fill a) y) :
     Join (A := B) (a := C.fill a) (b := y)
       (Builder.instSrsr (A := A) (B := B) (C := C)
@@ -305,7 +305,7 @@ variable (r : Path x (C.fill a₁)) (p : Path a₁ a₂)
 /-- Symmetry distributes over both the associativity rule (`stss`) and the
 contexted substitution rule (`ssbl`).  When instantiated with matching
 arguments the two reductions share a source, giving a critical-pair join. -/
-@[simp] def stss_ssbl :
+@[simp] noncomputable def stss_ssbl :
     Join (A := B) (a := C.fill a₂) (b := x)
       (Builder.instStss (A := B)
         (p := r)
@@ -317,7 +317,7 @@ arguments the two reductions share a source, giving a critical-pair join. -/
       (q := Context.map (A := A) (B := B) C p)).step
     (Builder.instSsbl (A := A) (B := B) (C := C) (r := r) (p := p)).step
 
-@[simp] def stss_ssbr
+@[simp] noncomputable def stss_ssbr
     {a₁ a₂ : A} {y : B}
     (p : Path a₁ a₂) (t : Path (C.fill a₂) y) :
     Join (A := B) (a := y) (b := C.fill a₁)
@@ -342,7 +342,7 @@ variable {B : A → Type u}
 
 variable {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
 
-@[simp] def mxsigma_fst_eta
+@[simp] noncomputable def mxsigma_fst_eta
     (p : Path (Sigma.mk a₁ b₁) (Sigma.mk a₂ b₂)) :
     Join (A := A) (a := a₁) (b := a₂)
       (Builder.instMxsigmaFst (A := A) (B := B)
@@ -375,7 +375,7 @@ end CriticalPairs
 /-! ## Structural properties of Join -/
 
 /-- Join is symmetric: if p and q join, then q and p join. -/
-@[simp] def Join.symm {A : Type u} {a b : A}
+@[simp] noncomputable def Join.symm {A : Type u} {a b : A}
     {p q : Path a b} (J : Join (A := A) (a := a) (b := b) p q) :
     Join (A := A) (a := a) (b := b) q p :=
   { meet := J.meet, left := J.right, right := J.left }

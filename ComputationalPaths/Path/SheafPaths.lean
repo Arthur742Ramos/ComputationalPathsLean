@@ -45,7 +45,7 @@ inductive SheafStep {A : Type u} :
   | symm_distrib {a b c : A} (p : Path a b) (q : Path b c) :
       SheafStep (Path.symm (Path.trans p q)) (Path.trans (Path.symm q) (Path.symm p))
 
-def SheafStep.toStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def SheafStep.toStep {A : Type u} {a b : A} {p q : Path a b}
     (s : SheafStep p q) : Path.Step p q :=
   match s with
   | .right_unit p => Path.Step.trans_refl_right p
@@ -55,7 +55,7 @@ def SheafStep.toStep {A : Type u} {a b : A} {p q : Path a b}
   | .assoc p q r => Path.Step.trans_assoc p q r
   | .symm_distrib p q => Path.Step.symm_trans_congr p q
 
-def rweq_of_sheaf_step {A : Type u} {a b : A}
+noncomputable def rweq_of_sheaf_step {A : Type u} {a b : A}
     {p q : Path a b} (s : SheafStep p q) : RwEq p q :=
   rweq_of_step (SheafStep.toStep s)
 
@@ -96,11 +96,11 @@ noncomputable def restrictComp_cancel_rweq (U V W : O) (s : A) :
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (F.restrictCompPath U V W s))
 
-def restrictId_transport_const {B : Type w} (U : O) (s : A) (b : B) :
+noncomputable def restrictId_transport_const {B : Type w} (U : O) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (F.restrictIdPath U s) b = b := by
   simp [Path.transport_const]
 
-def restrictComp_transport_const {B : Type w} (U V W : O) (s : A) (b : B) :
+noncomputable def restrictComp_transport_const {B : Type w} (U V W : O) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (F.restrictCompPath U V W s) b = b := by
   simp [Path.transport_const]
 
@@ -132,7 +132,7 @@ noncomputable def naturality_cancel_rweq (U V : O) (s : A) :
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (η.naturalityPath U V s))
 
-def naturality_transport_const {C : Type w} (U V : O) (s : A) (c : C) :
+noncomputable def naturality_transport_const {C : Type w} (U V : O) (s : A) (c : C) :
     Path.transport (D := fun _ => C) (η.naturalityPath U V s) c = c := by
   simp [Path.transport_const]
 
@@ -174,7 +174,7 @@ noncomputable def gluing_cancel_rweq (cover : List O) (ls : O → A) (U : O) :
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (S.gluingPath cover ls U))
 
-def gluing_transport_const {B : Type w} (cover : List O) (ls : O → A) (U : O) (b : B) :
+noncomputable def gluing_transport_const {B : Type w} (cover : List O) (ls : O → A) (U : O) (b : B) :
     Path.transport (D := fun _ => B) (S.gluingPath cover ls U) b = b := by
   simp [Path.transport_const]
 
@@ -207,7 +207,7 @@ noncomputable def germ_cancel_rweq :
     RwEq (Path.trans s.germPath (Path.symm s.germPath)) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel s.germPath)
 
-def germ_transport_const {B : Type w} (b : B) :
+noncomputable def germ_transport_const {B : Type w} (b : B) :
     Path.transport (D := fun _ => B) s.germPath b = b := by
   simp [Path.transport_const]
 
@@ -236,7 +236,7 @@ noncomputable def unit_cancel_rweq (U V : O) (s : A) :
     RwEq (Path.trans (Sh.unitPath U V s) (Path.symm (Sh.unitPath U V s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (Sh.unitPath U V s))
 
-def unit_transport_const {B : Type w} (U V : O) (s : A) (b : B) :
+noncomputable def unit_transport_const {B : Type w} (U V : O) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (Sh.unitPath U V s) b = b := by
   simp [Path.transport_const]
 
@@ -269,11 +269,11 @@ noncomputable def augment_rweq :
     RwEq (Path.trans H.augmentPath (Path.refl _)) H.augmentPath :=
   rweq_of_sheaf_step (SheafStep.right_unit H.augmentPath)
 
-def dd_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+noncomputable def dd_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (H.ddPath n s) b = b := by
   simp [Path.transport_const]
 
-def augment_transport_const {B : Type w} (b : B) :
+noncomputable def augment_transport_const {B : Type w} (b : B) :
     Path.transport (D := fun _ => B) H.augmentPath b = b := by
   simp [Path.transport_const]
 
@@ -316,11 +316,11 @@ noncomputable def comparisonComm_cancel_rweq (n : Nat) (s : A) :
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (C.comparisonCommPath n s))
 
-def ddCech_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+noncomputable def ddCech_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (C.ddCechPath n s) b = b := by
   simp [Path.transport_const]
 
-def comparisonComm_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+noncomputable def comparisonComm_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (C.comparisonCommPath n s) b = b := by
   simp [Path.transport_const]
 
@@ -365,7 +365,7 @@ noncomputable def projRestrict_cancel_rweq (U V : O) (s : A) :
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (E.projRestrictPath U V s))
 
-def exact_transport_const {B : Type w} (s : A) (b : B) :
+noncomputable def exact_transport_const {B : Type w} (s : A) (b : B) :
     Path.transport (D := fun _ => B) (E.exactPath s) b = b := by
   simp [Path.transport_const]
 
@@ -413,11 +413,11 @@ noncomputable def exactF_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (L.exactFPath n s) (Path.symm (L.exactFPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (L.exactFPath n s))
 
-def three_step_coherence (n : Nat) (s : A) :
+noncomputable def three_step_coherence (n : Nat) (s : A) :
     (Path.trans (L.exactGPath n s) (Path.symm (L.exactGPath n s))).toEq = rfl := by
   apply Subsingleton.elim
 
-def exactG_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+noncomputable def exactG_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (L.exactGPath n s) b = b := by
   simp [Path.transport_const]
 
@@ -453,7 +453,7 @@ noncomputable def directRestrictComp_cancel_rweq (U V W : O₂) (s : A) :
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (D.directRestrictCompPath U V W s))
 
-def directRestrictId_transport_const {B : Type w} (U : O₂) (s : A) (b : B) :
+noncomputable def directRestrictId_transport_const {B : Type w} (U : O₂) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (D.directRestrictIdPath U s) b = b := by
   simp [Path.transport_const]
 
@@ -480,11 +480,11 @@ noncomputable def extend_cancel_rweq (V : O) (s : A) :
     RwEq (Path.trans (Fl.extendPath V s) (Path.symm (Fl.extendPath V s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (Fl.extendPath V s))
 
-def flasque_acyclic (V : O) (s : A) :
+noncomputable def flasque_acyclic (V : O) (s : A) :
     (Path.trans (Fl.extendPath V s) (Path.symm (Fl.extendPath V s))).toEq = rfl := by
   apply Subsingleton.elim
 
-def extend_transport_const {B : Type w} (V : O) (s : A) (b : B) :
+noncomputable def extend_transport_const {B : Type w} (V : O) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (Fl.extendPath V s) b = b := by
   simp [Path.transport_const]
 
@@ -517,7 +517,7 @@ noncomputable def oneMul_cancel_rweq (x : A) :
     RwEq (Path.trans (R.oneMulPath x) (Path.symm (R.oneMulPath x))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (R.oneMulPath x))
 
-def mulAssoc_transport_const {B : Type w} (x y z : A) (b : B) :
+noncomputable def mulAssoc_transport_const {B : Type w} (x y z : A) (b : B) :
     Path.transport (D := fun _ => B) (R.mulAssocPath x y z) b = b := by
   simp [Path.transport_const]
 
@@ -564,7 +564,7 @@ noncomputable def actionOne_cancel_rweq (m : A) :
       (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (M.actionOnePath m))
 
-def actionAssoc_transport_const {B : Type w} (r s m : A) (b : B) :
+noncomputable def actionAssoc_transport_const {B : Type w} (r s m : A) (b : B) :
     Path.transport (D := fun _ => B) (M.actionAssocPath r s m) b = b := by
   simp [Path.transport_const]
 
@@ -593,7 +593,7 @@ noncomputable def dd_cancel_rweq (n : Nat) (s : A) :
     RwEq (Path.trans (E.ddPath n s) (Path.symm (E.ddPath n s))) (Path.refl _) :=
   rweq_of_sheaf_step (SheafStep.inverse_cancel (E.ddPath n s))
 
-def dd_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
+noncomputable def dd_transport_const {B : Type w} (n : Nat) (s : A) (b : B) :
     Path.transport (D := fun _ => B) (E.ddPath n s) b = b := by
   simp [Path.transport_const]
 

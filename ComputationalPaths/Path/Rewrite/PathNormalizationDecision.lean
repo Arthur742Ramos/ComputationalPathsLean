@@ -48,7 +48,7 @@ variable {A : Type u} {a b : A}
   simp [normalize]
 
 /-- Equality of normal forms is decidable (in fact, always true). -/
-def normalize_decidable (p q : Path a b) :
+noncomputable def normalize_decidable (p q : Path a b) :
     Decidable (normalize (A := A) (a := a) (b := b) p =
       normalize (A := A) (a := a) (b := b) q) := by
   exact isTrue (normalize_eq_of_toEq (A := A) (a := a) (b := b) p q)
@@ -76,7 +76,7 @@ theorem expr_terminating :
 /-! ## Word problems and rewrite equality -/
 
 /-- Word problem for path expressions: do two expressions rewrite to a common term? -/
-def ExprWordProblem {A : Type u} {a b : A}
+noncomputable def ExprWordProblem {A : Type u} {a b : A}
     (p q : PathExpr A a b) : Prop :=
   ∃ r, PathExpr.Rw p r ∧ PathExpr.Rw q r
 

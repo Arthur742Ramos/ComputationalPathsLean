@@ -561,7 +561,7 @@ end AffineSchemePathData
 /-! ## Section 12: Trivial instances -/
 
 /-- Trivial commutative ring path data on `PUnit`. -/
-def trivialCRingPathData : CRingPathData PUnit where
+noncomputable def trivialCRingPathData : CRingPathData PUnit where
   zero := PUnit.unit
   one := PUnit.unit
   add := fun _ _ => PUnit.unit
@@ -577,7 +577,7 @@ def trivialCRingPathData : CRingPathData PUnit where
   distribPath := fun _ _ _ => Path.refl PUnit.unit
 
 /-- Trivial Spec path data on `PUnit`. -/
-def trivialSpecPathData : SpecPathData PUnit PUnit where
+noncomputable def trivialSpecPathData : SpecPathData PUnit PUnit where
   ring := trivialCRingPathData
   vanishing := fun _ _ => True
   basicOpen := fun _ _ => True

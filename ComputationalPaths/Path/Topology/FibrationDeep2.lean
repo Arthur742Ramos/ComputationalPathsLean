@@ -36,13 +36,13 @@ structure Fibration where
 
 /-! ## Fiber transport -/
 
-def fiberTransport (fib : Fibration.{u}) {b₁ b₂ : fib.B}
+noncomputable def fiberTransport (fib : Fibration.{u}) {b₁ b₂ : fib.B}
     (p : Path b₁ b₂) (f : fib.F) : fib.F :=
   Path.transport (D := fun _ => fib.F) p f
 
 /-! ## 1: Fiber transport over refl -/
 
-def fiberTransport_refl (fib : Fibration.{u}) (b : fib.B) (f : fib.F) :
+noncomputable def fiberTransport_refl (fib : Fibration.{u}) (b : fib.B) (f : fib.F) :
     Path (fiberTransport fib (Path.refl b) f) f := by
   unfold fiberTransport
   simp [Path.transport]
@@ -50,7 +50,7 @@ def fiberTransport_refl (fib : Fibration.{u}) (b : fib.B) (f : fib.F) :
 
 /-! ## 2: Fiber transport over trans -/
 
-def fiberTransport_trans (fib : Fibration.{u}) {b₁ b₂ b₃ : fib.B}
+noncomputable def fiberTransport_trans (fib : Fibration.{u}) {b₁ b₂ b₃ : fib.B}
     (p : Path b₁ b₂) (q : Path b₂ b₃) (f : fib.F) :
     Path (fiberTransport fib (Path.trans p q) f)
          (fiberTransport fib q (fiberTransport fib p f)) := by
@@ -60,7 +60,7 @@ def fiberTransport_trans (fib : Fibration.{u}) {b₁ b₂ b₃ : fib.B}
 
 /-! ## 3: Fiber transport over symm left -/
 
-def fiberTransport_symm_left (fib : Fibration.{u}) {b₁ b₂ : fib.B}
+noncomputable def fiberTransport_symm_left (fib : Fibration.{u}) {b₁ b₂ : fib.B}
     (p : Path b₁ b₂) (f : fib.F) :
     Path (fiberTransport fib (Path.symm p) (fiberTransport fib p f)) f := by
   unfold fiberTransport
@@ -69,7 +69,7 @@ def fiberTransport_symm_left (fib : Fibration.{u}) {b₁ b₂ : fib.B}
 
 /-! ## 4: Fiber transport over symm right -/
 
-def fiberTransport_symm_right (fib : Fibration.{u}) {b₁ b₂ : fib.B}
+noncomputable def fiberTransport_symm_right (fib : Fibration.{u}) {b₁ b₂ : fib.B}
     (p : Path b₁ b₂) (g : fib.F) :
     Path (fiberTransport fib p (fiberTransport fib (Path.symm p) g)) g := by
   unfold fiberTransport
@@ -92,14 +92,14 @@ structure SerreFibration extends Fibration.{u} where
 
 /-! ## 5: Lifting the identity path -/
 
-def lift_refl_path (sfib : SerreFibration.{u}) (e₀ : sfib.E)
+noncomputable def lift_refl_path (sfib : SerreFibration.{u}) (e₀ : sfib.E)
     (over : Path (sfib.proj e₀) (sfib.proj e₀)) :
     PathLifting sfib.toFibration (Path.refl (sfib.proj e₀)) e₀ :=
   sfib.homotopyLifting (Path.refl _) e₀ over
 
 /-! ## 6: Lifting a composed path -/
 
-def lift_trans_path (sfib : SerreFibration.{u})
+noncomputable def lift_trans_path (sfib : SerreFibration.{u})
     {b₁ b₂ b₃ : sfib.B}
     (γ₁ : Path b₁ b₂) (γ₂ : Path b₂ b₃)
     (e₀ : sfib.E) (over : Path (sfib.proj e₀) b₁) :
@@ -108,7 +108,7 @@ def lift_trans_path (sfib : SerreFibration.{u})
 
 /-! ## 7: Lift endpoint lies over target -/
 
-def lift_trans_endpoint_over (sfib : SerreFibration.{u})
+noncomputable def lift_trans_endpoint_over (sfib : SerreFibration.{u})
     {b₁ b₂ b₃ : sfib.B}
     (γ₁ : Path b₁ b₂) (γ₂ : Path b₂ b₃)
     (e₀ : sfib.E) (over : Path (sfib.proj e₀) b₁) :
@@ -126,7 +126,7 @@ structure FibrationMorphism (fib₁ fib₂ : Fibration.{u}) where
 
 /-! ## 8: Identity morphism -/
 
-def fibMorphism_id (fib : Fibration.{u}) : FibrationMorphism fib fib where
+noncomputable def fibMorphism_id (fib : Fibration.{u}) : FibrationMorphism fib fib where
   baseMap := id
   totalMap := id
   fiberMap := id
@@ -135,7 +135,7 @@ def fibMorphism_id (fib : Fibration.{u}) : FibrationMorphism fib fib where
 
 /-! ## 9: Composition of morphisms -/
 
-def fibMorphism_comp {fib₁ fib₂ fib₃ : Fibration.{u}}
+noncomputable def fibMorphism_comp {fib₁ fib₂ fib₃ : Fibration.{u}}
     (φ : FibrationMorphism fib₁ fib₂) (ψ : FibrationMorphism fib₂ fib₃) :
     FibrationMorphism fib₁ fib₃ where
   baseMap := ψ.baseMap ∘ φ.baseMap
@@ -150,7 +150,7 @@ def fibMorphism_comp {fib₁ fib₂ fib₃ : Fibration.{u}}
 
 /-! ## 10: Comp projection coherence -/
 
-def fibMorphism_comp_proj {fib₁ fib₂ fib₃ : Fibration.{u}}
+noncomputable def fibMorphism_comp_proj {fib₁ fib₂ fib₃ : Fibration.{u}}
     (φ : FibrationMorphism fib₁ fib₂) (ψ : FibrationMorphism fib₂ fib₃)
     (e : fib₁.E) :
     Path (fib₃.proj (ψ.totalMap (φ.totalMap e)))
@@ -159,7 +159,7 @@ def fibMorphism_comp_proj {fib₁ fib₂ fib₃ : Fibration.{u}}
 
 /-! ## 11: Left unit law -/
 
-def fibMorphism_comp_id_left (fib₁ fib₂ : Fibration.{u})
+noncomputable def fibMorphism_comp_id_left (fib₁ fib₂ : Fibration.{u})
     (φ : FibrationMorphism fib₁ fib₂) (e : fib₁.E) :
     Path (fib₂.proj ((fibMorphism_comp (fibMorphism_id fib₁) φ).totalMap e))
          (φ.baseMap (fib₁.proj e)) :=
@@ -167,7 +167,7 @@ def fibMorphism_comp_id_left (fib₁ fib₂ : Fibration.{u})
 
 /-! ## 12: Section commutes under composition -/
 
-def fibMorphism_comp_section {fib₁ fib₂ fib₃ : Fibration.{u}}
+noncomputable def fibMorphism_comp_section {fib₁ fib₂ fib₃ : Fibration.{u}}
     (φ : FibrationMorphism fib₁ fib₂) (ψ : FibrationMorphism fib₂ fib₃)
     (b : fib₁.B) :
     Path (ψ.totalMap (φ.totalMap (fib₁.section_ b)))
@@ -186,14 +186,14 @@ structure PullbackFibration (fib : Fibration.{u}) (A : Type u) where
 
 /-! ## 13: Pullback fiber transport -/
 
-def pullback_fiberTransport (fib : Fibration.{u}) (A : Type u)
+noncomputable def pullback_fiberTransport (fib : Fibration.{u}) (A : Type u)
     (pb : PullbackFibration fib A) {a₁ a₂ : A}
     (p : Path a₁ a₂) (f : fib.F) : fib.F :=
   fiberTransport fib (Path.congrArg pb.pullMap p) f
 
 /-! ## 14: Pullback transport over refl -/
 
-def pullback_transport_refl (fib : Fibration.{u}) (A : Type u)
+noncomputable def pullback_transport_refl (fib : Fibration.{u}) (A : Type u)
     (pb : PullbackFibration fib A) (a : A) (f : fib.F) :
     Path (pullback_fiberTransport fib A pb (Path.refl a) f) f := by
   unfold pullback_fiberTransport fiberTransport
@@ -202,7 +202,7 @@ def pullback_transport_refl (fib : Fibration.{u}) (A : Type u)
 
 /-! ## 15: Pullback transport over trans -/
 
-def pullback_transport_trans (fib : Fibration.{u}) (A : Type u)
+noncomputable def pullback_transport_trans (fib : Fibration.{u}) (A : Type u)
     (pb : PullbackFibration fib A) {a₁ a₂ a₃ : A}
     (p : Path a₁ a₂) (q : Path a₂ a₃) (f : fib.F) :
     Path (pullback_fiberTransport fib A pb (Path.trans p q) f)
@@ -233,27 +233,27 @@ structure FiberSequence where
 
 /-! ## 16: Fiber sequence exactness -/
 
-def fiberSeq_exact (fs : FiberSequence.{u}) (f : fs.F) :
+noncomputable def fiberSeq_exact (fs : FiberSequence.{u}) (f : fs.F) :
     Path (fs.proj (fs.incl f))
          (fs.proj (fs.incl (fs.connecting (fs.proj (fs.incl f))))) :=
   fs.exact_at_E f
 
 /-! ## 17: Connecting map roundtrip -/
 
-def connecting_roundtrip (fs : FiberSequence.{u}) (b : fs.B) :
+noncomputable def connecting_roundtrip (fs : FiberSequence.{u}) (b : fs.B) :
     Path (fs.proj (fs.incl (fs.connecting b))) b :=
   fs.incl_connecting b
 
 /-! ## 18: Connecting map via congrArg chain -/
 
-def connecting_congrArg_chain (fs : FiberSequence.{u}) (b : fs.B) :
+noncomputable def connecting_congrArg_chain (fs : FiberSequence.{u}) (b : fs.B) :
     Path (fs.connecting (fs.proj (fs.incl (fs.connecting b))))
          (fs.connecting b) :=
   Path.congrArg fs.connecting (fs.incl_connecting b)
 
 /-! ## 19: Double connecting via exactness + connecting roundtrip -/
 
-def double_connecting_path (fs : FiberSequence.{u}) (b : fs.B) :
+noncomputable def double_connecting_path (fs : FiberSequence.{u}) (b : fs.B) :
     Path (fs.proj (fs.incl (fs.connecting (fs.proj (fs.incl (fs.connecting b))))))
          b :=
   Path.trans (fs.incl_connecting (fs.proj (fs.incl (fs.connecting b))))
@@ -275,21 +275,21 @@ structure LongExactData where
 
 /-! ## 20: LES exactness at E -/
 
-def les_exact_at_E (led : LongExactData.{u}) (n : Nat) (f : led.F) :
+noncomputable def les_exact_at_E (led : LongExactData.{u}) (n : Nat) (f : led.F) :
     Path (led.proj_n n (led.incl_n n f))
          (led.proj_n n (led.incl_n n (led.boundary n (led.proj_n n (led.incl_n n f))))) :=
   led.exact_incl_proj n f
 
 /-! ## 21: LES exactness at B -/
 
-def les_exact_at_B (led : LongExactData.{u}) (n : Nat) (e : led.E) :
+noncomputable def les_exact_at_B (led : LongExactData.{u}) (n : Nat) (e : led.E) :
     Path (led.boundary n (led.proj_n n e))
          (led.boundary n (led.proj_n n (led.incl_n n (led.boundary n (led.proj_n n e))))) :=
   led.exact_proj_bound n e
 
 /-! ## 22: LES boundary via congrArg -/
 
-def les_boundary_congrArg (led : LongExactData.{u}) (n : Nat) (f : led.F) :
+noncomputable def les_boundary_congrArg (led : LongExactData.{u}) (n : Nat) (f : led.F) :
     Path (led.boundary n (led.proj_n n (led.incl_n n f)))
          (led.boundary n (led.proj_n n (led.incl_n n (led.boundary n (led.proj_n n (led.incl_n n f)))))) :=
   Path.congrArg (led.boundary n) (led.exact_incl_proj n f)
@@ -309,28 +309,28 @@ structure LESMorphism (led₁ led₂ : LongExactData.{u}) where
 
 /-! ## 23: LES morphism inclusion naturality -/
 
-def les_morphism_incl_nat (led₁ led₂ : LongExactData.{u})
+noncomputable def les_morphism_incl_nat (led₁ led₂ : LongExactData.{u})
     (m : LESMorphism led₁ led₂) (n : Nat) (f : led₁.F) :
     Path (led₂.incl_n n (m.mapF f)) (m.mapE (led₁.incl_n n f)) :=
   m.commutes_incl n f
 
 /-! ## 24: LES morphism proj naturality -/
 
-def les_morphism_proj_nat (led₁ led₂ : LongExactData.{u})
+noncomputable def les_morphism_proj_nat (led₁ led₂ : LongExactData.{u})
     (m : LESMorphism led₁ led₂) (n : Nat) (e : led₁.E) :
     Path (led₂.proj_n n (m.mapE e)) (m.mapB (led₁.proj_n n e)) :=
   m.commutes_proj n e
 
 /-! ## 25: LES morphism boundary naturality -/
 
-def les_morphism_boundary_nat (led₁ led₂ : LongExactData.{u})
+noncomputable def les_morphism_boundary_nat (led₁ led₂ : LongExactData.{u})
     (m : LESMorphism led₁ led₂) (n : Nat) (b : led₁.B) :
     Path (led₂.boundary n (m.mapB b)) (m.mapF (led₁.boundary n b)) :=
   m.commutes_boundary n b
 
 /-! ## 26: LES morphism proj-incl composition naturality -/
 
-def les_morphism_proj_incl (led₁ led₂ : LongExactData.{u})
+noncomputable def les_morphism_proj_incl (led₁ led₂ : LongExactData.{u})
     (m : LESMorphism led₁ led₂) (n : Nat) (f : led₁.F) :
     Path (led₂.proj_n n (led₂.incl_n n (m.mapF f)))
          (m.mapB (led₁.proj_n n (led₁.incl_n n f))) :=
@@ -355,19 +355,19 @@ structure FibrationRetraction (fib : Fibration.{u}) where
 
 /-! ## 27: Section proj is identity -/
 
-def section_proj_id (fib : Fibration.{u}) (s : FibrationSection fib) (b : fib.B) :
+noncomputable def section_proj_id (fib : Fibration.{u}) (s : FibrationSection fib) (b : fib.B) :
     Path (fib.proj (s.sec b)) b :=
   s.is_section b
 
 /-! ## 28: Retraction roundtrip -/
 
-def retraction_roundtrip (fib : Fibration.{u}) (r : FibrationRetraction fib) (f : fib.F) :
+noncomputable def retraction_roundtrip (fib : Fibration.{u}) (r : FibrationRetraction fib) (f : fib.F) :
     Path (r.retr (r.incl f)) f :=
   r.is_retraction f
 
 /-! ## 29: Section transport coherence -/
 
-def section_transport_coherence (fib : Fibration.{u}) (s : FibrationSection fib)
+noncomputable def section_transport_coherence (fib : Fibration.{u}) (s : FibrationSection fib)
     {b₁ b₂ : fib.B} (p : Path b₁ b₂) :
     Path (fib.proj (Path.transport (D := fun _ => fib.E) p (s.sec b₁)))
          (fib.proj (s.sec b₂)) := by
@@ -379,7 +379,7 @@ def section_transport_coherence (fib : Fibration.{u}) (s : FibrationSection fib)
 
 /-! ## 30: Double section via trans -/
 
-def section_double_proj (fib : Fibration.{u}) (s : FibrationSection fib)
+noncomputable def section_double_proj (fib : Fibration.{u}) (s : FibrationSection fib)
     (b : fib.B) :
     Path (fib.proj (s.sec (fib.proj (s.sec b)))) b :=
   let step1 : Path (fib.proj (s.sec (fib.proj (s.sec b)))) (fib.proj (s.sec b)) :=
@@ -389,7 +389,7 @@ def section_double_proj (fib : Fibration.{u}) (s : FibrationSection fib)
 
 /-! ## 31: Triple section -/
 
-def section_triple_proj (fib : Fibration.{u}) (s : FibrationSection fib) (b : fib.B) :
+noncomputable def section_triple_proj (fib : Fibration.{u}) (s : FibrationSection fib) (b : fib.B) :
     Path (fib.proj (s.sec (fib.proj (s.sec (fib.proj (s.sec b)))))) b :=
   let step1 := Path.congrArg (fun x => fib.proj (s.sec (fib.proj (s.sec x)))) (s.is_section b)
   let step2 := section_double_proj fib s b
@@ -405,20 +405,20 @@ structure PrincipalFibration extends Fibration.{u} where
 
 /-! ## 32: Principal action preserves fibers -/
 
-def principal_action_fiber (pfib : PrincipalFibration.{u}) (g : pfib.G) (e : pfib.E) :
+noncomputable def principal_action_fiber (pfib : PrincipalFibration.{u}) (g : pfib.G) (e : pfib.E) :
     Path (pfib.proj (pfib.action g e)) (pfib.proj e) :=
   pfib.action_proj g e
 
 /-! ## 33: Two-step action preservation -/
 
-def principal_action_fiber_two (pfib : PrincipalFibration.{u})
+noncomputable def principal_action_fiber_two (pfib : PrincipalFibration.{u})
     (g₁ g₂ : pfib.G) (e : pfib.E) :
     Path (pfib.proj (pfib.action g₁ (pfib.action g₂ e))) (pfib.proj e) :=
   Path.trans (pfib.action_proj g₁ (pfib.action g₂ e)) (pfib.action_proj g₂ e)
 
 /-! ## 34: Free action injectivity -/
 
-def principal_free_action (pfib : PrincipalFibration.{u})
+noncomputable def principal_free_action (pfib : PrincipalFibration.{u})
     (g₁ g₂ : pfib.G) (e : pfib.E)
     (h : Path (pfib.action g₁ e) (pfib.action g₂ e)) :
     Path g₁ g₂ :=
@@ -431,7 +431,7 @@ structure CoveringSpace extends Fibration.{u} where
 
 /-! ## 35: Covering discreteness -/
 
-def covering_fiber_discrete (cov : CoveringSpace.{u}) (f₁ f₂ : cov.F)
+noncomputable def covering_fiber_discrete (cov : CoveringSpace.{u}) (f₁ f₂ : cov.F)
     (p : Path f₁ f₂) : f₁ = f₂ :=
   cov.fiberDiscrete f₁ f₂ p
 
@@ -444,7 +444,7 @@ structure HurewiczFibration extends Fibration.{u} where
 
 /-! ## 36: Hurewicz lift endpoint -/
 
-def hurewicz_lift_endpoint (hfib : HurewiczFibration.{u})
+noncomputable def hurewicz_lift_endpoint (hfib : HurewiczFibration.{u})
     {b₁ b₂ : hfib.B} (γ : Path b₁ b₂) (e₀ : hfib.E)
     (over : Path (hfib.proj e₀) b₁) :
     Path (hfib.proj (hfib.fullLifting γ e₀ over).1) b₂ :=
@@ -452,7 +452,7 @@ def hurewicz_lift_endpoint (hfib : HurewiczFibration.{u})
 
 /-! ## 37: Hurewicz to Serre -/
 
-def hurewicz_to_serre (hfib : HurewiczFibration.{u}) : SerreFibration.{u} where
+noncomputable def hurewicz_to_serre (hfib : HurewiczFibration.{u}) : SerreFibration.{u} where
   toFibration := hfib.toFibration
   homotopyLifting := fun γ e₀ over =>
     let lifted := hfib.fullLifting γ e₀ over
@@ -472,21 +472,21 @@ structure FibrationConnection (fib : Fibration.{u}) where
 
 /-! ## 38: Connection lift over refl -/
 
-def connection_lift_refl (fib : Fibration.{u}) (conn : FibrationConnection fib)
+noncomputable def connection_lift_refl (fib : Fibration.{u}) (conn : FibrationConnection fib)
     (e : fib.E) :
     Path (conn.horizontalLift (Path.refl (fib.proj e)) e) e :=
   conn.lift_refl e
 
 /-! ## 39: Connection lift projects correctly -/
 
-def connection_lift_proj (fib : Fibration.{u}) (conn : FibrationConnection fib)
+noncomputable def connection_lift_proj (fib : Fibration.{u}) (conn : FibrationConnection fib)
     {b₁ b₂ : fib.B} (γ : Path b₁ b₂) (e : fib.E) (over : Path (fib.proj e) b₁) :
     Path (fib.proj (conn.horizontalLift γ e)) b₂ :=
   conn.lift_proj γ e over
 
 /-! ## 40: Morphism preserves section -/
 
-def fibMorphism_preserves_section {fib₁ fib₂ : Fibration.{u}}
+noncomputable def fibMorphism_preserves_section {fib₁ fib₂ : Fibration.{u}}
     (φ : FibrationMorphism fib₁ fib₂)
     (s : FibrationSection fib₁) (b : fib₁.B) :
     Path (fib₂.proj (φ.totalMap (s.sec b))) (φ.baseMap b) :=
@@ -495,7 +495,7 @@ def fibMorphism_preserves_section {fib₁ fib₂ : Fibration.{u}}
 
 /-! ## 41: Morphism preserves retraction -/
 
-def fibMorphism_preserves_retraction {fib₁ fib₂ : Fibration.{u}}
+noncomputable def fibMorphism_preserves_retraction {fib₁ fib₂ : Fibration.{u}}
     (φ : FibrationMorphism fib₁ fib₂)
     (r : FibrationRetraction fib₁) (f : fib₁.F) :
     Path (φ.fiberMap (r.retr (r.incl f))) (φ.fiberMap f) :=
@@ -503,7 +503,7 @@ def fibMorphism_preserves_retraction {fib₁ fib₂ : Fibration.{u}}
 
 /-! ## 42: Fiber sequence transport -/
 
-def fiberSeq_transport (fs : FiberSequence.{u}) {b₁ b₂ : fs.B}
+noncomputable def fiberSeq_transport (fs : FiberSequence.{u}) {b₁ b₂ : fs.B}
     (p : Path b₁ b₂) :
     Path (Path.transport (D := fun _ => fs.F) p (fs.connecting b₁))
          (fs.connecting b₂) := by
@@ -515,7 +515,7 @@ def fiberSeq_transport (fs : FiberSequence.{u}) {b₁ b₂ : fs.B}
 
 /-! ## 43: Fiber transport functoriality (three-step) -/
 
-def fiberTransport_three_step (fib : Fibration.{u})
+noncomputable def fiberTransport_three_step (fib : Fibration.{u})
     {b₁ b₂ b₃ b₄ : fib.B}
     (p : Path b₁ b₂) (q : Path b₂ b₃) (r : Path b₃ b₄) (f : fib.F) :
     Path (fiberTransport fib (Path.trans (Path.trans p q) r) f)
@@ -526,7 +526,7 @@ def fiberTransport_three_step (fib : Fibration.{u})
 
 /-! ## 44: Fiber transport inverse roundtrip -/
 
-def fiberTransport_inverse_roundtrip (fib : Fibration.{u})
+noncomputable def fiberTransport_inverse_roundtrip (fib : Fibration.{u})
     {b₁ b₂ : fib.B} (p : Path b₁ b₂) (f : fib.F) :
     Path (fiberTransport fib (Path.trans p (Path.symm p)) f) f :=
   let step1 := fiberTransport_trans fib p (Path.symm p) f
@@ -535,7 +535,7 @@ def fiberTransport_inverse_roundtrip (fib : Fibration.{u})
 
 /-! ## 45: LES morphism boundary-incl composition -/
 
-def les_morphism_boundary_incl (led₁ led₂ : LongExactData.{u})
+noncomputable def les_morphism_boundary_incl (led₁ led₂ : LongExactData.{u})
     (m : LESMorphism led₁ led₂) (n : Nat) (b : led₁.B) :
     Path (led₂.incl_n n (led₂.boundary n (m.mapB b)))
          (m.mapE (led₁.incl_n n (led₁.boundary n b))) :=

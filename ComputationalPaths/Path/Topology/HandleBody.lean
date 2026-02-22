@@ -188,7 +188,7 @@ structure HandleSlideData (n : Nat) where
   diffeo_path : Path before after
 
 /-- Handle slide preserves the diffeomorphism type. -/
-def slide_preserves_diffeo (n : Nat) (s : HandleSlideData.{u} n) :
+noncomputable def slide_preserves_diffeo (n : Nat) (s : HandleSlideData.{u} n) :
     Path s.before s.after := s.diffeo_path
 
 /-- In a Kirby diagram, a handle slide corresponds to band-summing
@@ -229,7 +229,7 @@ structure HandleCancellation (n : Nat) where
   cancel_path : Path before after
 
 /-- Cancellation preserves the manifold. -/
-def cancel_preserves (n : Nat) (c : HandleCancellation.{u} n) :
+noncomputable def cancel_preserves (n : Nat) (c : HandleCancellation.{u} n) :
     Path c.before c.after := c.cancel_path
 
 /-- RwEq witness: cancellation followed by re-introduction gives identity. -/

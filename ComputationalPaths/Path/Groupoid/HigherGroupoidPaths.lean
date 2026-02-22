@@ -20,17 +20,17 @@ variable {a b c d : A}
 /-! ## 2-paths: equalities between paths -/
 
 /-- A 2-path is an equality between paths. -/
-def TwoPath (p q : Path a b) : Prop := p = q
+noncomputable def TwoPath (p q : Path a b) : Prop := p = q
 
 /-- Reflexive 2-path. -/
-def twoRefl (p : Path a b) : TwoPath p p := rfl
+noncomputable def twoRefl (p : Path a b) : TwoPath p p := rfl
 
 /-- Symmetric 2-path. -/
-def twoSymm {p q : Path a b} (α : TwoPath p q) : TwoPath q p :=
+noncomputable def twoSymm {p q : Path a b} (α : TwoPath p q) : TwoPath q p :=
   Eq.symm α
 
 /-- Transitive 2-path (vertical composition). -/
-def twoTrans {p q r : Path a b} (α : TwoPath p q) (β : TwoPath q r) :
+noncomputable def twoTrans {p q r : Path a b} (α : TwoPath p q) (β : TwoPath q r) :
     TwoPath p r :=
   Eq.trans α β
 
@@ -71,7 +71,7 @@ theorem vcomp_symm_right {p q : Path a b} (α : TwoPath p q) :
 
 /-- Horizontal composition of 2-paths: given α : p₁ = p₂ and β : q₁ = q₂,
     produce trans p₁ q₁ = trans p₂ q₂. -/
-def hcomp {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
+noncomputable def hcomp {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
     (α : TwoPath p₁ p₂) (β : TwoPath q₁ q₂) :
     TwoPath (Path.trans p₁ q₁) (Path.trans p₂ q₂) := by
   subst α; subst β; exact twoRefl _
@@ -82,12 +82,12 @@ theorem hcomp_refl_refl (p : Path a b) (q : Path b c) :
   rfl
 
 /-- Left whiskering: precompose a 2-path with a 1-path. -/
-def whiskerL (p : Path a b) {q₁ q₂ : Path b c} (β : TwoPath q₁ q₂) :
+noncomputable def whiskerL (p : Path a b) {q₁ q₂ : Path b c} (β : TwoPath q₁ q₂) :
     TwoPath (Path.trans p q₁) (Path.trans p q₂) :=
   hcomp (twoRefl p) β
 
 /-- Right whiskering: postcompose a 2-path with a 1-path. -/
-def whiskerR {p₁ p₂ : Path a b} (α : TwoPath p₁ p₂) (q : Path b c) :
+noncomputable def whiskerR {p₁ p₂ : Path a b} (α : TwoPath p₁ p₂) (q : Path b c) :
     TwoPath (Path.trans p₁ q) (Path.trans p₂ q) :=
   hcomp α (twoRefl q)
 
@@ -128,7 +128,7 @@ theorem hcomp_eq_vcomp {x : A}
 /-! ## Functoriality on 2-paths -/
 
 /-- A function maps 2-paths to 2-paths via congrArg. -/
-def map2 (f : A → B) {p q : Path a b} (α : TwoPath p q) :
+noncomputable def map2 (f : A → B) {p q : Path a b} (α : TwoPath p q) :
     TwoPath (Path.congrArg f p) (Path.congrArg f q) := by
   subst α; exact twoRefl _
 
@@ -162,7 +162,7 @@ theorem map2_hcomp (f : A → B) {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
 /-! ## 3-paths and coherence -/
 
 /-- A 3-path is an equality between 2-paths (always trivially true). -/
-def ThreePath {p q : Path a b} (α β : TwoPath p q) : Prop := α = β
+noncomputable def ThreePath {p q : Path a b} (α β : TwoPath p q) : Prop := α = β
 
 /-- All 3-paths exist and are unique. -/
 theorem threePath_exists {p q : Path a b} (α β : TwoPath p q) :
@@ -177,17 +177,17 @@ theorem threePath_comp {p q : Path a b} {α β γ : TwoPath p q}
 /-! ## Naturality of associator as a 2-path -/
 
 /-- The associator as a 2-path. -/
-def assoc2 (p : Path a b) (q : Path b c) (r : Path c d) :
+noncomputable def assoc2 (p : Path a b) (q : Path b c) (r : Path c d) :
     TwoPath (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   Path.trans_assoc p q r
 
 /-- The left unitor as a 2-path. -/
-def leftUnitor2 (p : Path a b) :
+noncomputable def leftUnitor2 (p : Path a b) :
     TwoPath (Path.trans (Path.refl a) p) p :=
   Path.trans_refl_left p
 
 /-- The right unitor as a 2-path. -/
-def rightUnitor2 (p : Path a b) :
+noncomputable def rightUnitor2 (p : Path a b) :
     TwoPath (Path.trans p (Path.refl b)) p :=
   Path.trans_refl_right p
 
@@ -215,7 +215,7 @@ theorem triangle_2path (p : Path a b) (q : Path b c) :
 /-! ## Symm as 2-path functor -/
 
 /-- Symmetry maps 2-paths covariantly. -/
-def symm2 {p q : Path a b} (α : TwoPath p q) :
+noncomputable def symm2 {p q : Path a b} (α : TwoPath p q) :
     TwoPath (Path.symm p) (Path.symm q) := by
   subst α; exact twoRefl _
 
@@ -226,7 +226,7 @@ theorem symm2_vcomp {p q r : Path a b}
   Subsingleton.elim _ _
 
 /-- Double symmetry as a 2-path. -/
-def symmSymm2 (p : Path a b) :
+noncomputable def symmSymm2 (p : Path a b) :
     TwoPath (Path.symm (Path.symm p)) p :=
   Path.symm_symm p
 

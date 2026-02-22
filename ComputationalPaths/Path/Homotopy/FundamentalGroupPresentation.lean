@@ -91,7 +91,7 @@ inductive TorusRelation where
   | comm
 
 /-- Componentwise addition on `ℤ × ℤ`. -/
-def intProdAdd (x y : Int × Int) : Int × Int :=
+noncomputable def intProdAdd (x y : Int × Int) : Int × Int :=
   (x.1 + y.1, x.2 + y.2)
 
 /-- Presentation of π₁(T²) with two commuting generators. -/

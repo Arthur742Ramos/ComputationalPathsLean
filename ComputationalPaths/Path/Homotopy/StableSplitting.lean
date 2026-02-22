@@ -34,23 +34,23 @@ universe u v
 /-! ## Basic pointed constructions -/
 
 /-- The pointed unit type. -/
-def unitPtd : PtdType.{u} :=
+noncomputable def unitPtd : PtdType.{u} :=
   { carrier := ULift Unit, pt := ⟨()⟩ }
 
 /-- Suspension of a pointed type as a pointed type. -/
-def suspPtd (X : PtdType.{u}) : PtdType.{u} where
+noncomputable def suspPtd (X : PtdType.{u}) : PtdType.{u} where
   carrier := SuspensionLoop.Suspension X.carrier
   pt := SuspensionLoop.Suspension.north (X := X.carrier)
 
 /-- Iterated suspension of a pointed type. -/
-def iteratedSuspensionPtd : Nat → PtdType.{u} → PtdType.{u}
+noncomputable def iteratedSuspensionPtd : Nat → PtdType.{u} → PtdType.{u}
   | 0, X => X
   | n + 1, X => suspPtd (iteratedSuspensionPtd n X)
 
 /-! ## Smash powers -/
 
 /-- Smash power X^{∧ n}. -/
-def smashPower : Nat → PtdType.{u} → PtdType.{u}
+noncomputable def smashPower : Nat → PtdType.{u} → PtdType.{u}
   | 0, _ => unitPtd
   | n + 1, X => SmashProduct.Smash X (smashPower n X)
 
@@ -68,13 +68,13 @@ inductive IndexedWedgeRel {ι : Type u} (X : ι → PtdType.{v}) :
   | refl (x) : IndexedWedgeRel (X := X) x x
 
 /-- Wedge (coproduct) over an index type, identifying basepoints. -/
-def IndexedWedge {ι : Type u} [Inhabited ι] (X : ι → PtdType.{v}) :
+noncomputable def IndexedWedge {ι : Type u} [Inhabited ι] (X : ι → PtdType.{v}) :
     PtdType.{max u v} where
   carrier := Quot (IndexedWedgeRel X)
   pt := Quot.mk _ ⟨default, (X default).pt⟩
 
 /-- Inclusion of a summand into the indexed wedge (same-universe version). -/
-def indexedWedgeIn {ι : Type u} [Inhabited ι] (X : ι → PtdType.{u}) (i : ι) :
+noncomputable def indexedWedgeIn {ι : Type u} [Inhabited ι] (X : ι → PtdType.{u}) (i : ι) :
     PtdMap (X i) (IndexedWedge X) where
   toFun := fun x => Quot.mk _ ⟨i, x⟩
   map_pt := by
@@ -95,7 +95,7 @@ structure PtdEquiv (X Y : PtdType.{u}) where
   right_inv : Path (PtdMap.comp toMap invMap) (PtdMap.id Y)
 
 /-- Identity pointed equivalence. -/
-def PtdEquiv.refl (X : PtdType.{u}) : PtdEquiv X X where
+noncomputable def PtdEquiv.refl (X : PtdType.{u}) : PtdEquiv X X where
   toMap := PtdMap.id X
   invMap := PtdMap.id X
   left_inv := Path.stepChain (PtdMap.id_comp (PtdMap.id X))
@@ -111,22 +111,22 @@ structure StableSplittingData (X Y : PtdType.{u}) where
   equiv : PtdEquiv (iteratedSuspensionPtd level X) Y
 
 /-- Trivial stable splitting at level 0. -/
-def stableSplittingData_refl (X : PtdType.{u}) : StableSplittingData X X where
+noncomputable def stableSplittingData_refl (X : PtdType.{u}) : StableSplittingData X X where
   level := 0
   equiv := PtdEquiv.refl X
 
 /-! ## Snaith splitting data -/
 
 /-- Loop-suspension of a pointed type. -/
-def loopSigmaPtd (X : PtdType.{u}) : PtdType.{u} :=
+noncomputable def loopSigmaPtd (X : PtdType.{u}) : PtdType.{u} :=
   loopPtd (suspPtd X)
 
 /-- Summand in the Snaith splitting: the symmetric smash power. -/
-def snaithSummand (X : PtdType.{u}) : Nat → PtdType.{u} :=
+noncomputable def snaithSummand (X : PtdType.{u}) : Nat → PtdType.{u} :=
   fun n => symmetricSmash (Nat.succ n) X
 
 /-- Wedge of Snaith summands. -/
-def snaithWedge (X : PtdType.{u}) : PtdType.{u} :=
+noncomputable def snaithWedge (X : PtdType.{u}) : PtdType.{u} :=
   IndexedWedge (snaithSummand X)
 
 /-- Snaith splitting data for a pointed type. -/

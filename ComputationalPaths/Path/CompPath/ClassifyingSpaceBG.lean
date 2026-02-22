@@ -37,7 +37,7 @@ universe u
 /-! ## Classifying space basepoint -/
 
 /-- The basepoint of the classifying space `BG`. -/
-@[simp] def bgBase (G : Type u) : BG G :=
+@[simp] noncomputable def bgBase (G : Type u) : BG G :=
   deloopingBase G
 
 /-! ## Bar construction -/
@@ -48,22 +48,22 @@ abbrev BarConstruction (G : Type u) (S : StrictGroup G) :
   Homotopy.LoopSpaceRecognition.BarConstruction G S.toStrictMonoid
 
 /-- Canonical bar construction on a strict group. -/
-def barConstruction (G : Type u) (S : StrictGroup G) : BarConstruction G S :=
+noncomputable def barConstruction (G : Type u) (S : StrictGroup G) : BarConstruction G S :=
   Homotopy.LoopSpaceRecognition.canonicalBar G S.toStrictMonoid
 
 /-! ## Milnor join and the universal bundle -/
 
 /-- Iterated join of `G` with itself. -/
-def JoinPower (G : Type u) : Nat → Type u
+noncomputable def JoinPower (G : Type u) : Nat → Type u
   | 0 => G
   | Nat.succ n => Join G (JoinPower G n)
 
 /-- Milnor join: the sigma type of all finite joins of `G`. -/
-def MilnorJoin (G : Type u) : Type u :=
+noncomputable def MilnorJoin (G : Type u) : Type u :=
   Σ n : Nat, JoinPower G n
 
 /-- Include a group element as the first stage of the Milnor join. -/
-def milnorJoinStage {G : Type u} (g : G) : MilnorJoin G :=
+noncomputable def milnorJoinStage {G : Type u} (g : G) : MilnorJoin G :=
   ⟨0, g⟩
 
 /-- The universal total space `EG`, modeled as the Milnor join. -/
@@ -75,7 +75,7 @@ abbrev egStage {G : Type u} (g : G) : EG G :=
   milnorJoinStage g
 
 /-- The projection `EG → BG`, constant to the basepoint. -/
-def egProj (G : Type u) : EG G → BG G :=
+noncomputable def egProj (G : Type u) : EG G → BG G :=
   fun _ => bgBase G
 
 /-- Data for a universal bundle `EG → BG`. -/
@@ -88,7 +88,7 @@ structure UniversalBundle (G : Type u) (S : StrictGroup G) where
   proj : EG → BG
 
 /-- The canonical Milnor join bundle over `BG`. -/
-def universalBundle (G : Type u) (S : StrictGroup G) : UniversalBundle G S :=
+noncomputable def universalBundle (G : Type u) (S : StrictGroup G) : UniversalBundle G S :=
   { EG := EG G
     BG := BG G
     proj := egProj G }

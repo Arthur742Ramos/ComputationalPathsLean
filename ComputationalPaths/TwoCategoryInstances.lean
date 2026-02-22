@@ -20,7 +20,7 @@ universe u
 
 /-- Canonical strict 2-category: 0-cells = types, 1-cells = functions,
     2-cells = `PLift (f = g)` (propositional equality lifted to `Type 0`). -/
-def EqTwoCat : StrictTwoCategory.{u+1, u, 0} where
+noncomputable def EqTwoCat : StrictTwoCategory.{u+1, u, 0} where
   Obj   := Type u
   Hom   := fun A B => (A → B)
   TwoHom := fun f g => PLift (f = g)
@@ -65,21 +65,21 @@ private theorem plift_eq_subsingleton {α : Prop} (a b : PLift α) : a = b := by
 -- §2  HasVcompAssoc — vertical composition is associative
 -- ============================================================
 
-instance instHasVcompAssoc_EqTwoCat : HasVcompAssoc EqTwoCat.{u} where
+noncomputable instance instHasVcompAssoc_EqTwoCat : HasVcompAssoc EqTwoCat.{u} where
   vcomp_assoc := fun _ _ _ => plift_eq_subsingleton _ _
 
 -- ============================================================
 -- §3  HasHcompFunctorial — hcomp preserves identities
 -- ============================================================
 
-instance instHasHcompFunctorial_EqTwoCat : HasHcompFunctorial EqTwoCat.{u} where
+noncomputable instance instHasHcompFunctorial_EqTwoCat : HasHcompFunctorial EqTwoCat.{u} where
   hcomp_id := fun _ _ => plift_eq_subsingleton _ _
 
 -- ============================================================
 -- §4  HasInterchange — the interchange law
 -- ============================================================
 
-instance instHasInterchange_EqTwoCat : HasInterchange EqTwoCat.{u} where
+noncomputable instance instHasInterchange_EqTwoCat : HasInterchange EqTwoCat.{u} where
   interchange := fun _ _ _ _ => plift_eq_subsingleton _ _
 
 end ComputationalPaths

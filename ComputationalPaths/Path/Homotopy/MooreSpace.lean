@@ -51,18 +51,18 @@ abbrev Homotopy (X Y : MooreSpace G n) : Type u :=
   SimpleEquiv (PiN X) (PiN Y)
 
 /-- Any two Moore spaces M(G,n) are equivalent at the level of pi_n. -/
-def uniqueUpToHomotopy (X Y : MooreSpace G n) : Homotopy X Y :=
+noncomputable def uniqueUpToHomotopy (X Y : MooreSpace G n) : Homotopy X Y :=
   SimpleEquiv.comp X.piNEquiv (SimpleEquiv.symm Y.piNEquiv)
 
 /-! ## Path witnesses -/
 
 /-- `Path` witness for the pi_n round-trip. -/
-def roundtrip_path (X : MooreSpace G n) (x : PiN X) :
+noncomputable def roundtrip_path (X : MooreSpace G n) (x : PiN X) :
     ComputationalPaths.Path (X.piNEquiv.invFun (X.piNEquiv.toFun x)) x :=
   ComputationalPaths.Path.stepChain (X.piNEquiv.left_inv x)
 
 /-- `Path` witness for the forward round-trip. -/
-def fwdRoundtrip_path (X : MooreSpace G n) (y : G) :
+noncomputable def fwdRoundtrip_path (X : MooreSpace G n) (y : G) :
     ComputationalPaths.Path (X.piNEquiv.toFun (X.piNEquiv.invFun y)) y :=
   ComputationalPaths.Path.stepChain (X.piNEquiv.right_inv y)
 

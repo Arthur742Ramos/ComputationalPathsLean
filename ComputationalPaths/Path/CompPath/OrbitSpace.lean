@@ -33,7 +33,7 @@ abbrev SubgroupCarrier (H : Subgroup G S) : Type u :=
   {g : G // H.carrier g}
 
 /-- Strict group structure induced by a subgroup. -/
-def subgroupStrictGroup (H : Subgroup G S) : StrictGroup (SubgroupCarrier H) := by
+noncomputable def subgroupStrictGroup (H : Subgroup G S) : StrictGroup (SubgroupCarrier H) := by
   refine
     { mul := ?_
       one := ?_
@@ -65,7 +65,7 @@ def subgroupStrictGroup (H : Subgroup G S) : StrictGroup (SubgroupCarrier H) := 
     exact S.mul_right_inv x.1
 
 /-- Left multiplication action of a subgroup on its ambient group. -/
-def subgroupLeftAction (H : Subgroup G S) :
+noncomputable def subgroupLeftAction (H : Subgroup G S) :
     GroupAction (SubgroupCarrier H) (subgroupStrictGroup H) G where
   act := fun h g => S.mul h.1 g
   act_one := by
@@ -82,16 +82,16 @@ abbrev OrbitSpace (H : Subgroup G S) : Type u :=
   EquivariantPaths.OrbitSpace (A := subgroupLeftAction (S := S) H)
 
 /-- Projection `G → G/H`. -/
-def orbitMap (H : Subgroup G S) : G → OrbitSpace (S := S) H :=
+noncomputable def orbitMap (H : Subgroup G S) : G → OrbitSpace (S := S) H :=
   EquivariantPaths.orbitMap (A := subgroupLeftAction (S := S) H)
 
 /-- Path in `G/H` induced by left multiplication by a subgroup element. -/
-def orbitPath (H : Subgroup G S) (h : SubgroupCarrier H) (x : G) :
+noncomputable def orbitPath (H : Subgroup G S) (h : SubgroupCarrier H) (x : G) :
     Path (orbitMap (S := S) H x) (orbitMap (S := S) H (S.mul h.1 x)) :=
   Path.stepChain (EquivariantPaths.orbitMap_act (A := subgroupLeftAction (S := S) H) h x)
 
 /-- Path in `G/H` induced by left multiplication by a member of `H`. -/
-def orbitPath_of_mem (H : Subgroup G S) {h : G} (hh : H.carrier h) (x : G) :
+noncomputable def orbitPath_of_mem (H : Subgroup G S) {h : G} (hh : H.carrier h) (x : G) :
     Path (orbitMap (S := S) H x) (orbitMap (S := S) H (S.mul h x)) :=
   orbitPath (H := H) ⟨h, hh⟩ x
 

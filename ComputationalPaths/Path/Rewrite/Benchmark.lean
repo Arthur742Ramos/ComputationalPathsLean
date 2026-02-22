@@ -50,17 +50,17 @@ theorem total_cstep_constructors : 13 = 13 := rfl
 /-! ## Expression Complexity Examples -/
 
 /-- Build a right-associated chain of atoms: `trans a₀ (trans a₁ (... aₙ))`. -/
-def atomChain : Nat → Expr
+noncomputable def atomChain : Nat → Expr
   | 0 => .atom 0
   | n + 1 => .trans (.atom n) (atomChain n)
 
 /-- Build a deeply nested symm tower: `symm (symm (... (atom 0)))`. -/
-def symmTower : Nat → Expr
+noncomputable def symmTower : Nat → Expr
   | 0 => .atom 0
   | n + 1 => .symm (symmTower n)
 
 /-- Build a left-associated chain: `trans (trans (... (trans a₀ a₁)) ...) aₙ`. -/
-def leftChain : Nat → Expr
+noncomputable def leftChain : Nat → Expr
   | 0 => .atom 0
   | n + 1 => .trans (leftChain n) (.atom (n + 1))
 

@@ -227,7 +227,7 @@ inductive CWStep : Prop
   | relative_seq : CWStep
 
 /-- CWStep validity. -/
-def cwStep_valid : CWStep → True
+noncomputable def cwStep_valid : CWStep → True
   | CWStep.attach_cell => trivial
   | CWStep.collapse_cell => trivial
   | CWStep.cellular_approx => trivial
@@ -247,17 +247,17 @@ noncomputable def cell_dim_rweq (n : Nat) (c : CWCell n) :
   rweq_cmpA_refl_right c.dim_eq
 
 /-- Cellular chain rank is consistent (Path witness). -/
-def chain_rank_cell_count (X : CWComplex) (C : CellularChainComplex X)
+noncomputable def chain_rank_cell_count (X : CWComplex) (C : CellularChainComplex X)
     (n : Nat) : Path (C.chainRank n) (X.structure_.cellCount n) :=
   C.rank_eq n
 
 /-- Relative rank computation (Path witness). -/
-def relative_rank_path (P : CWPair) (R : RelativeChainComplex P) (n : Nat) :
+noncomputable def relative_rank_path (P : CWPair) (R : RelativeChainComplex P) (n : Nat) :
     Path (R.relRank n) (P.total.structure_.cellCount n - P.subCellCount n) :=
   R.rank_eq n
 
 /-- Cellular-singular isomorphism (Path witness). -/
-def cellular_singular_path (X : CWComplex) (I : CellularSingularIso X) (n : Nat) :
+noncomputable def cellular_singular_path (X : CWComplex) (I : CellularSingularIso X) (n : Nat) :
     Path (I.cellBetti n) (I.singBetti n) :=
   I.betti_agree n
 

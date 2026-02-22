@@ -34,33 +34,33 @@ universe u v
 /-- Permission levels: 0=none, 1=read, 2=write, 3=execute, 4=admin -/
 abbrev PermLevel := Nat
 
-def permNone : PermLevel := 0
-def permRead : PermLevel := 1
-def permWrite : PermLevel := 2
-def permExecute : PermLevel := 3
-def permAdmin : PermLevel := 4
+noncomputable def permNone : PermLevel := 0
+noncomputable def permRead : PermLevel := 1
+noncomputable def permWrite : PermLevel := 2
+noncomputable def permExecute : PermLevel := 3
+noncomputable def permAdmin : PermLevel := 4
 
 /-- Grant maps 0 to 1 (none → read) -/
-def grantRead (n : Nat) : Nat := n + 1
+noncomputable def grantRead (n : Nat) : Nat := n + 1
 
 /-- Identity on permissions -/
-def permId (n : Nat) : Nat := n
+noncomputable def permId (n : Nat) : Nat := n
 
 theorem permId_eq (n : Nat) : permId n = n := rfl
 
 /-- Theorem 1: permId is identity, giving a path -/
-def permId_path (n : Nat) : Path (permId n) n :=
+noncomputable def permId_path (n : Nat) : Path (permId n) n :=
   Path.refl n
 
 /-- Double application of identity -/
 theorem permId_double (n : Nat) : permId (permId n) = n := rfl
 
 /-- Theorem 2: Double identity path via trans -/
-def permId_double_path (n : Nat) : Path (permId (permId n)) n :=
+noncomputable def permId_double_path (n : Nat) : Path (permId (permId n)) n :=
   Path.trans (Path.congrArg permId (permId_path n)) (permId_path n)
 
 /-- Theorem 3: Triple identity path via trans -/
-def permId_triple_path (n : Nat) : Path (permId (permId (permId n))) n :=
+noncomputable def permId_triple_path (n : Nat) : Path (permId (permId (permId n))) n :=
   Path.trans (Path.congrArg permId (permId_double_path n)) (permId_path n)
 
 -- ============================================================================
@@ -70,25 +70,25 @@ def permId_triple_path (n : Nat) : Path (permId (permId (permId n))) n :=
 /-- Security level: 0=unclassified, 1=confidential, 2=secret, 3=topSecret -/
 abbrev SecLevel := Nat
 
-def secUnclass : SecLevel := 0
-def secConf : SecLevel := 1
-def secSecret : SecLevel := 2
-def secTop : SecLevel := 3
+noncomputable def secUnclass : SecLevel := 0
+noncomputable def secConf : SecLevel := 1
+noncomputable def secSecret : SecLevel := 2
+noncomputable def secTop : SecLevel := 3
 
 /-- Clearance check: max of subject and object levels -/
-def clearanceMax (a b : Nat) : Nat := Nat.max a b
+noncomputable def clearanceMax (a b : Nat) : Nat := Nat.max a b
 
 theorem clearanceMax_self (n : Nat) : clearanceMax n n = n := Nat.max_self n
 
 /-- Theorem 4: Self-clearance path -/
-def clearanceMax_self_path (n : Nat) : Path (clearanceMax n n) n :=
+noncomputable def clearanceMax_self_path (n : Nat) : Path (clearanceMax n n) n :=
   Path.stepChain (clearanceMax_self n)
 
 /-- Theorem 5: Clearance max is commutative -/
 theorem clearanceMax_comm (a b : Nat) : clearanceMax a b = clearanceMax b a :=
   Nat.max_comm a b
 
-def clearanceMax_comm_path (a b : Nat) : Path (clearanceMax a b) (clearanceMax b a) :=
+noncomputable def clearanceMax_comm_path (a b : Nat) : Path (clearanceMax a b) (clearanceMax b a) :=
   Path.stepChain (clearanceMax_comm a b)
 
 /-- Theorem 6: Clearance max is associative -/
@@ -96,7 +96,7 @@ theorem clearanceMax_assoc (a b c : Nat) :
     clearanceMax (clearanceMax a b) c = clearanceMax a (clearanceMax b c) :=
   Nat.max_assoc a b c
 
-def clearanceMax_assoc_path (a b c : Nat) :
+noncomputable def clearanceMax_assoc_path (a b c : Nat) :
     Path (clearanceMax (clearanceMax a b) c) (clearanceMax a (clearanceMax b c)) :=
   Path.stepChain (clearanceMax_assoc a b c)
 
@@ -104,19 +104,19 @@ def clearanceMax_assoc_path (a b c : Nat) :
 -- Section 3: Minimum Clearance (Meet in Lattice)
 -- ============================================================================
 
-def clearanceMin (a b : Nat) : Nat := Nat.min a b
+noncomputable def clearanceMin (a b : Nat) : Nat := Nat.min a b
 
 theorem clearanceMin_self (n : Nat) : clearanceMin n n = n := Nat.min_self n
 
 /-- Theorem 7: Self-min clearance path -/
-def clearanceMin_self_path (n : Nat) : Path (clearanceMin n n) n :=
+noncomputable def clearanceMin_self_path (n : Nat) : Path (clearanceMin n n) n :=
   Path.stepChain (clearanceMin_self n)
 
 /-- Theorem 8: Min clearance is commutative -/
 theorem clearanceMin_comm (a b : Nat) : clearanceMin a b = clearanceMin b a :=
   Nat.min_comm a b
 
-def clearanceMin_comm_path (a b : Nat) : Path (clearanceMin a b) (clearanceMin b a) :=
+noncomputable def clearanceMin_comm_path (a b : Nat) : Path (clearanceMin a b) (clearanceMin b a) :=
   Path.stepChain (clearanceMin_comm a b)
 
 /-- Theorem 9: Min clearance is associative -/
@@ -124,7 +124,7 @@ theorem clearanceMin_assoc (a b c : Nat) :
     clearanceMin (clearanceMin a b) c = clearanceMin a (clearanceMin b c) :=
   Nat.min_assoc a b c
 
-def clearanceMin_assoc_path (a b c : Nat) :
+noncomputable def clearanceMin_assoc_path (a b c : Nat) :
     Path (clearanceMin (clearanceMin a b) c) (clearanceMin a (clearanceMin b c)) :=
   Path.stepChain (clearanceMin_assoc a b c)
 
@@ -139,17 +139,17 @@ structure DelegState where
   deriving DecidableEq
 
 /-- Effective clearance of a delegation state -/
-def effectiveClearance (s : DelegState) : Nat := s.clearance
+noncomputable def effectiveClearance (s : DelegState) : Nat := s.clearance
 
 /-- Transfer clearance between principals preserves level -/
-def transferClearance (newPid : Nat) (s : DelegState) : DelegState :=
+noncomputable def transferClearance (newPid : Nat) (s : DelegState) : DelegState :=
   { principalId := newPid, clearance := s.clearance }
 
 /-- Theorem 10: Transfer preserves effective clearance -/
 theorem transfer_preserves_clearance (pid : Nat) (s : DelegState) :
     effectiveClearance (transferClearance pid s) = effectiveClearance s := rfl
 
-def transfer_preserves_clearance_path (pid : Nat) (s : DelegState) :
+noncomputable def transfer_preserves_clearance_path (pid : Nat) (s : DelegState) :
     Path (effectiveClearance (transferClearance pid s)) (effectiveClearance s) :=
   Path.refl _
 
@@ -158,20 +158,20 @@ theorem double_transfer_clearance (p1 p2 : Nat) (s : DelegState) :
     effectiveClearance (transferClearance p2 (transferClearance p1 s))
     = effectiveClearance s := rfl
 
-def double_transfer_path (p1 p2 : Nat) (s : DelegState) :
+noncomputable def double_transfer_path (p1 p2 : Nat) (s : DelegState) :
     Path (effectiveClearance (transferClearance p2 (transferClearance p1 s)))
          (effectiveClearance s) :=
   Path.refl _
 
 /-- Identity transfer (same principal) -/
-def idTransfer (s : DelegState) : DelegState :=
+noncomputable def idTransfer (s : DelegState) : DelegState :=
   transferClearance s.principalId s
 
 theorem idTransfer_clearance (s : DelegState) :
     effectiveClearance (idTransfer s) = effectiveClearance s := rfl
 
 /-- Theorem 12: Identity transfer path -/
-def idTransfer_path (s : DelegState) :
+noncomputable def idTransfer_path (s : DelegState) :
     Path (effectiveClearance (idTransfer s)) (effectiveClearance s) :=
   Path.refl _
 
@@ -183,35 +183,35 @@ def idTransfer_path (s : DelegState) :
 abbrev PolicyDecision := Nat
 
 /-- Combine two policy decisions via max (most permissive wins) -/
-def policyOr (a b : Nat) : Nat := Nat.max a b
+noncomputable def policyOr (a b : Nat) : Nat := Nat.max a b
 
 /-- Combine two policy decisions via min (least permissive wins) -/
-def policyAnd (a b : Nat) : Nat := Nat.min a b
+noncomputable def policyAnd (a b : Nat) : Nat := Nat.min a b
 
 /-- Theorem 13: Policy OR is commutative -/
-def policyOr_comm_path (a b : Nat) : Path (policyOr a b) (policyOr b a) :=
+noncomputable def policyOr_comm_path (a b : Nat) : Path (policyOr a b) (policyOr b a) :=
   Path.stepChain (Nat.max_comm a b)
 
 /-- Theorem 14: Policy OR is associative -/
-def policyOr_assoc_path (a b c : Nat) :
+noncomputable def policyOr_assoc_path (a b c : Nat) :
     Path (policyOr (policyOr a b) c) (policyOr a (policyOr b c)) :=
   Path.stepChain (Nat.max_assoc a b c)
 
 /-- Theorem 15: Policy AND is commutative -/
-def policyAnd_comm_path (a b : Nat) : Path (policyAnd a b) (policyAnd b a) :=
+noncomputable def policyAnd_comm_path (a b : Nat) : Path (policyAnd a b) (policyAnd b a) :=
   Path.stepChain (Nat.min_comm a b)
 
 /-- Theorem 16: Policy AND is associative -/
-def policyAnd_assoc_path (a b c : Nat) :
+noncomputable def policyAnd_assoc_path (a b c : Nat) :
     Path (policyAnd (policyAnd a b) c) (policyAnd a (policyAnd b c)) :=
   Path.stepChain (Nat.min_assoc a b c)
 
 /-- Theorem 17: Policy OR is idempotent -/
-def policyOr_idem_path (a : Nat) : Path (policyOr a a) a :=
+noncomputable def policyOr_idem_path (a : Nat) : Path (policyOr a a) a :=
   Path.stepChain (Nat.max_self a)
 
 /-- Theorem 18: Policy AND is idempotent -/
-def policyAnd_idem_path (a : Nat) : Path (policyAnd a a) a :=
+noncomputable def policyAnd_idem_path (a : Nat) : Path (policyAnd a a) a :=
   Path.stepChain (Nat.min_self a)
 
 -- ============================================================================
@@ -219,16 +219,16 @@ def policyAnd_idem_path (a : Nat) : Path (policyAnd a a) a :=
 -- ============================================================================
 
 /-- Theorem 19: Compose two commutations via trans -/
-def policyOr_double_comm (a b : Nat) : Path (policyOr a b) (policyOr a b) :=
+noncomputable def policyOr_double_comm (a b : Nat) : Path (policyOr a b) (policyOr a b) :=
   Path.trans (policyOr_comm_path a b) (policyOr_comm_path b a)
 
 /-- Theorem 20: Associativity chain: left-to-right-to-left -/
-def policy_assoc_roundtrip (a b c : Nat) :
+noncomputable def policy_assoc_roundtrip (a b c : Nat) :
     Path (policyOr (policyOr a b) c) (policyOr (policyOr a b) c) :=
   Path.trans (policyOr_assoc_path a b c) (Path.symm (policyOr_assoc_path a b c))
 
 /-- Theorem 21: Symm of policyOr commutation -/
-def policyOr_comm_symm (a b : Nat) : Path (policyOr b a) (policyOr a b) :=
+noncomputable def policyOr_comm_symm (a b : Nat) : Path (policyOr b a) (policyOr a b) :=
   Path.symm (policyOr_comm_path a b)
 
 /-- Theorem 22: Symm of symm is identity -/
@@ -249,7 +249,7 @@ theorem policy_path_assoc (a b : Nat) :
 -- ============================================================================
 
 /-- Role-to-permission mapping: role id → permission level -/
-def rolePermission : Nat → Nat
+noncomputable def rolePermission : Nat → Nat
   | 0 => 1  -- viewer → read
   | 1 => 2  -- editor → write
   | 2 => 3  -- operator → execute
@@ -257,7 +257,7 @@ def rolePermission : Nat → Nat
   | _ => 0  -- unknown → none
 
 /-- User-to-role mapping -/
-def userRole : Nat → Nat
+noncomputable def userRole : Nat → Nat
   | 0 => 0  -- user0 → viewer
   | 1 => 1  -- user1 → editor
   | 2 => 2  -- user2 → operator
@@ -265,18 +265,18 @@ def userRole : Nat → Nat
   | _ => 0  -- default → viewer
 
 /-- Composed mapping: user → permission -/
-def userPermission (uid : Nat) : Nat := rolePermission (userRole uid)
+noncomputable def userPermission (uid : Nat) : Nat := rolePermission (userRole uid)
 
 /-- Theorem 24: user0 gets read permission -/
 theorem user0_permission : userPermission 0 = 1 := rfl
 
-def user0_permission_path : Path (userPermission 0) 1 :=
+noncomputable def user0_permission_path : Path (userPermission 0) 1 :=
   Path.refl 1
 
 /-- Theorem 25: user3 gets admin permission -/
 theorem user3_permission : userPermission 3 = 4 := rfl
 
-def user3_permission_path : Path (userPermission 3) 4 :=
+noncomputable def user3_permission_path : Path (userPermission 3) 4 :=
   Path.refl 4
 
 /-- Theorem 26: congrArg through rolePermission preserves paths -/
@@ -289,25 +289,25 @@ theorem rbac_role_congr_example (n : Nat) :
 -- ============================================================================
 
 /-- Attribute evaluation: maps attribute score to access decision -/
-def attrEval (score : Nat) : Nat := Nat.min score 4
+noncomputable def attrEval (score : Nat) : Nat := Nat.min score 4
 
 theorem attrEval_idem_high (n : Nat) (h : n ≤ 4) : attrEval (attrEval n) = attrEval n := by
   simp [attrEval, Nat.min_eq_left h]
 
 /-- Theorem 27: Attribute evaluation is idempotent for bounded inputs -/
-def attrEval_idem_path (n : Nat) (h : n ≤ 4) :
+noncomputable def attrEval_idem_path (n : Nat) (h : n ≤ 4) :
     Path (attrEval (attrEval n)) (attrEval n) :=
   Path.stepChain (attrEval_idem_high n h)
 
 /-- Combining attributes via max -/
-def attrCombine (a b : Nat) : Nat := Nat.max a b
+noncomputable def attrCombine (a b : Nat) : Nat := Nat.max a b
 
 /-- Theorem 28: Attribute combination is commutative -/
-def attrCombine_comm_path (a b : Nat) : Path (attrCombine a b) (attrCombine b a) :=
+noncomputable def attrCombine_comm_path (a b : Nat) : Path (attrCombine a b) (attrCombine b a) :=
   Path.stepChain (Nat.max_comm a b)
 
 /-- Theorem 29: Attribute combination is associative -/
-def attrCombine_assoc_path (a b c : Nat) :
+noncomputable def attrCombine_assoc_path (a b c : Nat) :
     Path (attrCombine (attrCombine a b) c) (attrCombine a (attrCombine b c)) :=
   Path.stepChain (Nat.max_assoc a b c)
 
@@ -319,34 +319,34 @@ def attrCombine_assoc_path (a b c : Nat) :
 abbrev FlowLabel := Nat
 
 /-- Join of flow labels (least upper bound) -/
-def flowJoin (a b : Nat) : Nat := Nat.max a b
+noncomputable def flowJoin (a b : Nat) : Nat := Nat.max a b
 
 /-- Meet of flow labels (greatest lower bound) -/
-def flowMeet (a b : Nat) : Nat := Nat.min a b
+noncomputable def flowMeet (a b : Nat) : Nat := Nat.min a b
 
 /-- Theorem 30: Flow join self -/
-def flowJoin_self_path (n : Nat) : Path (flowJoin n n) n :=
+noncomputable def flowJoin_self_path (n : Nat) : Path (flowJoin n n) n :=
   Path.stepChain (Nat.max_self n)
 
 /-- Theorem 31: Flow join commutative -/
-def flowJoin_comm_path (a b : Nat) : Path (flowJoin a b) (flowJoin b a) :=
+noncomputable def flowJoin_comm_path (a b : Nat) : Path (flowJoin a b) (flowJoin b a) :=
   Path.stepChain (Nat.max_comm a b)
 
 /-- Theorem 32: Flow join associative -/
-def flowJoin_assoc_path (a b c : Nat) :
+noncomputable def flowJoin_assoc_path (a b c : Nat) :
     Path (flowJoin (flowJoin a b) c) (flowJoin a (flowJoin b c)) :=
   Path.stepChain (Nat.max_assoc a b c)
 
 /-- Theorem 33: Flow meet self -/
-def flowMeet_self_path (n : Nat) : Path (flowMeet n n) n :=
+noncomputable def flowMeet_self_path (n : Nat) : Path (flowMeet n n) n :=
   Path.stepChain (Nat.min_self n)
 
 /-- Theorem 34: Flow meet commutative -/
-def flowMeet_comm_path (a b : Nat) : Path (flowMeet a b) (flowMeet b a) :=
+noncomputable def flowMeet_comm_path (a b : Nat) : Path (flowMeet a b) (flowMeet b a) :=
   Path.stepChain (Nat.min_comm a b)
 
 /-- Theorem 35: Flow meet associative -/
-def flowMeet_assoc_path (a b c : Nat) :
+noncomputable def flowMeet_assoc_path (a b c : Nat) :
     Path (flowMeet (flowMeet a b) c) (flowMeet a (flowMeet b c)) :=
   Path.stepChain (Nat.min_assoc a b c)
 
@@ -355,20 +355,20 @@ def flowMeet_assoc_path (a b c : Nat) :
 -- ============================================================================
 
 /-- Map flow label to clearance level (functorial) -/
-def flowToClearance (fl : Nat) : Nat := fl
+noncomputable def flowToClearance (fl : Nat) : Nat := fl
 
 /-- Theorem 36: congrArg preserves flow join self -/
-def noninterference_join_self (n : Nat) :
+noncomputable def noninterference_join_self (n : Nat) :
     Path (flowToClearance (flowJoin n n)) (flowToClearance n) :=
   Path.congrArg flowToClearance (flowJoin_self_path n)
 
 /-- Theorem 37: congrArg preserves flow join commutativity -/
-def noninterference_join_comm (a b : Nat) :
+noncomputable def noninterference_join_comm (a b : Nat) :
     Path (flowToClearance (flowJoin a b)) (flowToClearance (flowJoin b a)) :=
   Path.congrArg flowToClearance (flowJoin_comm_path a b)
 
 /-- Theorem 38: congrArg preserves flow join associativity -/
-def noninterference_join_assoc (a b c : Nat) :
+noncomputable def noninterference_join_assoc (a b c : Nat) :
     Path (flowToClearance (flowJoin (flowJoin a b) c))
          (flowToClearance (flowJoin a (flowJoin b c))) :=
   Path.congrArg flowToClearance (flowJoin_assoc_path a b c)
@@ -399,17 +399,17 @@ structure BLPState where
   deriving DecidableEq
 
 /-- Read allowed when subject level ≥ object level (no read up) -/
-def blpReadCheck (s : BLPState) : Nat := Nat.max s.subjectLevel s.objectLevel
+noncomputable def blpReadCheck (s : BLPState) : Nat := Nat.max s.subjectLevel s.objectLevel
 
 /-- Write check: subject level ≤ object level (no write down) -/
-def blpWriteCheck (s : BLPState) : Nat := Nat.min s.subjectLevel s.objectLevel
+noncomputable def blpWriteCheck (s : BLPState) : Nat := Nat.min s.subjectLevel s.objectLevel
 
 /-- Theorem 41: BLP read check for equal levels -/
 theorem blp_read_equal (n : Nat) :
     blpReadCheck { subjectLevel := n, objectLevel := n } = n :=
   Nat.max_self n
 
-def blp_read_equal_path (n : Nat) :
+noncomputable def blp_read_equal_path (n : Nat) :
     Path (blpReadCheck { subjectLevel := n, objectLevel := n }) n :=
   Path.stepChain (blp_read_equal n)
 
@@ -418,33 +418,33 @@ theorem blp_write_equal (n : Nat) :
     blpWriteCheck { subjectLevel := n, objectLevel := n } = n :=
   Nat.min_self n
 
-def blp_write_equal_path (n : Nat) :
+noncomputable def blp_write_equal_path (n : Nat) :
     Path (blpWriteCheck { subjectLevel := n, objectLevel := n }) n :=
   Path.stepChain (blp_write_equal n)
 
 /-- Theorem 43: BLP read then write at equal levels chains to same -/
-def blp_read_write_equal (n : Nat) :
+noncomputable def blp_read_write_equal (n : Nat) :
     Path (blpReadCheck { subjectLevel := n, objectLevel := n })
          (blpWriteCheck { subjectLevel := n, objectLevel := n }) :=
   Path.trans (blp_read_equal_path n) (Path.symm (blp_write_equal_path n))
 
 /-- Extract subject level from BLP state -/
-def blpSubject (s : BLPState) : Nat := s.subjectLevel
+noncomputable def blpSubject (s : BLPState) : Nat := s.subjectLevel
 
 /-- Extract object level from BLP state -/
-def blpObject (s : BLPState) : Nat := s.objectLevel
+noncomputable def blpObject (s : BLPState) : Nat := s.objectLevel
 
 /-- Construct BLP state from subject level -/
-def mkBLPWithSubject (objLvl : Nat) (subLvl : Nat) : BLPState :=
+noncomputable def mkBLPWithSubject (objLvl : Nat) (subLvl : Nat) : BLPState :=
   { subjectLevel := subLvl, objectLevel := objLvl }
 
 /-- Theorem 44: congrArg through blpReadCheck preserves max-self -/
-def blp_congr_read (n : Nat) :
+noncomputable def blp_congr_read (n : Nat) :
     Path (blpReadCheck (mkBLPWithSubject n n)) n :=
   Path.stepChain (blp_read_equal n)
 
 /-- Theorem 45: Symm of BLP read equal -/
-def blp_read_equal_symm (n : Nat) :
+noncomputable def blp_read_equal_symm (n : Nat) :
     Path n (blpReadCheck { subjectLevel := n, objectLevel := n }) :=
   Path.symm (blp_read_equal_path n)
 
@@ -453,14 +453,14 @@ def blp_read_equal_symm (n : Nat) :
 -- ============================================================================
 
 /-- Declassification: cap at a maximum level -/
-def declassify (maxLevel : Nat) (currentLevel : Nat) : Nat :=
+noncomputable def declassify (maxLevel : Nat) (currentLevel : Nat) : Nat :=
   Nat.min currentLevel maxLevel
 
 theorem declassify_self (n : Nat) : declassify n n = n :=
   Nat.min_self n
 
 /-- Theorem 46: Self-declassification is identity -/
-def declassify_self_path (n : Nat) : Path (declassify n n) n :=
+noncomputable def declassify_self_path (n : Nat) : Path (declassify n n) n :=
   Path.stepChain (declassify_self n)
 
 theorem declassify_idem (m n : Nat) :
@@ -468,12 +468,12 @@ theorem declassify_idem (m n : Nat) :
   simp [declassify, Nat.min_assoc]
 
 /-- Theorem 47: Declassification is idempotent -/
-def declassify_idem_path (m n : Nat) :
+noncomputable def declassify_idem_path (m n : Nat) :
     Path (declassify m (declassify m n)) (declassify m n) :=
   Path.stepChain (declassify_idem m n)
 
 /-- Theorem 48: Double declassification path via trans -/
-def declassify_double_idem (m n : Nat) :
+noncomputable def declassify_double_idem (m n : Nat) :
     Path (declassify m (declassify m (declassify m n))) (declassify m n) :=
   Path.trans
     (Path.congrArg (declassify m) (declassify_idem_path m n))
@@ -484,28 +484,28 @@ def declassify_double_idem (m n : Nat) :
 -- ============================================================================
 
 /-- Trust level: higher means more trusted -/
-def trustLevel : Nat → Nat
+noncomputable def trustLevel : Nat → Nat
   | 0 => 3  -- internal → high trust
   | 1 => 2  -- dmz → medium trust
   | 2 => 1  -- partner → low trust
   | _ => 0  -- external → no trust
 
 /-- Compose trust with clearance -/
-def trustClearance (domain : Nat) : Nat := Nat.min (trustLevel domain) 3
+noncomputable def trustClearance (domain : Nat) : Nat := Nat.min (trustLevel domain) 3
 
 theorem trustClearance_internal : trustClearance 0 = 3 := rfl
 theorem trustClearance_dmz : trustClearance 1 = 2 := rfl
 theorem trustClearance_partner : trustClearance 2 = 1 := rfl
 
 /-- Theorem 49: Trust clearance paths -/
-def trustClearance_internal_path : Path (trustClearance 0) 3 :=
+noncomputable def trustClearance_internal_path : Path (trustClearance 0) 3 :=
   Path.refl 3
 
-def trustClearance_dmz_path : Path (trustClearance 1) 2 :=
+noncomputable def trustClearance_dmz_path : Path (trustClearance 1) 2 :=
   Path.refl 2
 
 /-- Theorem 50: Trust composition via congrArg -/
-def trustCompose (n : Nat) : Path (Nat.max (trustLevel n) (trustLevel n)) (trustLevel n) :=
+noncomputable def trustCompose (n : Nat) : Path (Nat.max (trustLevel n) (trustLevel n)) (trustLevel n) :=
   Path.stepChain (Nat.max_self (trustLevel n))
 
 -- ============================================================================
@@ -513,30 +513,30 @@ def trustCompose (n : Nat) : Path (Nat.max (trustLevel n) (trustLevel n)) (trust
 -- ============================================================================
 
 /-- Access decision combines policy and clearance -/
-def accessDecision (policyResult clearance : Nat) : Nat :=
+noncomputable def accessDecision (policyResult clearance : Nat) : Nat :=
   Nat.min policyResult clearance
 
 /-- Theorem 51: Access decision is commutative -/
-def accessDecision_comm_path (a b : Nat) :
+noncomputable def accessDecision_comm_path (a b : Nat) :
     Path (accessDecision a b) (accessDecision b a) :=
   Path.stepChain (Nat.min_comm a b)
 
 /-- Theorem 52: Access decision is associative -/
-def accessDecision_assoc_path (a b c : Nat) :
+noncomputable def accessDecision_assoc_path (a b c : Nat) :
     Path (accessDecision (accessDecision a b) c) (accessDecision a (accessDecision b c)) :=
   Path.stepChain (Nat.min_assoc a b c)
 
 /-- Theorem 53: Access decision is idempotent -/
-def accessDecision_idem_path (a : Nat) : Path (accessDecision a a) a :=
+noncomputable def accessDecision_idem_path (a : Nat) : Path (accessDecision a a) a :=
   Path.stepChain (Nat.min_self a)
 
 /-- Theorem 54: Symm of access decision commutativity -/
-def accessDecision_comm_symm (a b : Nat) :
+noncomputable def accessDecision_comm_symm (a b : Nat) :
     Path (accessDecision b a) (accessDecision a b) :=
   Path.symm (accessDecision_comm_path a b)
 
 /-- Theorem 55: Double commutation round trip -/
-def accessDecision_double_comm (a b : Nat) :
+noncomputable def accessDecision_double_comm (a b : Nat) :
     Path (accessDecision a b) (accessDecision a b) :=
   Path.trans (accessDecision_comm_path a b) (accessDecision_comm_symm a b)
 
@@ -545,7 +545,7 @@ def accessDecision_double_comm (a b : Nat) :
 -- ============================================================================
 
 /-- Theorem 56: Trans of commutativity paths is well-formed -/
-def delegation_comm_chain (a b : Nat) :
+noncomputable def delegation_comm_chain (a b : Nat) :
     Path (flowJoin a b) (flowJoin b a) :=
   flowJoin_comm_path a b
 
@@ -580,26 +580,26 @@ theorem delegation_symm_trans (a b : Nat) :
 -- ============================================================================
 
 /-- Audit score: accumulated access count -/
-def auditScore (accesses : Nat) : Nat := accesses
+noncomputable def auditScore (accesses : Nat) : Nat := accesses
 
 theorem auditScore_id (n : Nat) : auditScore n = n := rfl
 
 /-- Theorem 61: Audit score identity path -/
-def auditScore_path (n : Nat) : Path (auditScore n) n :=
+noncomputable def auditScore_path (n : Nat) : Path (auditScore n) n :=
   Path.refl n
 
 /-- Audit combination -/
-def auditCombine (a b : Nat) : Nat := a + b
+noncomputable def auditCombine (a b : Nat) : Nat := a + b
 
 theorem auditCombine_zero_left (n : Nat) : auditCombine 0 n = n := Nat.zero_add n
 theorem auditCombine_zero_right (n : Nat) : auditCombine n 0 = n := Nat.add_zero n
 
 /-- Theorem 62: Audit zero left identity -/
-def auditCombine_zero_left_path (n : Nat) : Path (auditCombine 0 n) n :=
+noncomputable def auditCombine_zero_left_path (n : Nat) : Path (auditCombine 0 n) n :=
   Path.stepChain (auditCombine_zero_left n)
 
 /-- Theorem 63: Audit zero right identity -/
-def auditCombine_zero_right_path (n : Nat) : Path (auditCombine n 0) n :=
+noncomputable def auditCombine_zero_right_path (n : Nat) : Path (auditCombine n 0) n :=
   Path.stepChain (auditCombine_zero_right n)
 
 /-- Theorem 64: Audit combination is associative -/
@@ -607,7 +607,7 @@ theorem auditCombine_assoc (a b c : Nat) :
     auditCombine (auditCombine a b) c = auditCombine a (auditCombine b c) :=
   Nat.add_assoc a b c
 
-def auditCombine_assoc_path (a b c : Nat) :
+noncomputable def auditCombine_assoc_path (a b c : Nat) :
     Path (auditCombine (auditCombine a b) c) (auditCombine a (auditCombine b c)) :=
   Path.stepChain (auditCombine_assoc a b c)
 
@@ -616,7 +616,7 @@ theorem auditCombine_comm (a b : Nat) :
     auditCombine a b = auditCombine b a :=
   Nat.add_comm a b
 
-def auditCombine_comm_path (a b : Nat) :
+noncomputable def auditCombine_comm_path (a b : Nat) :
     Path (auditCombine a b) (auditCombine b a) :=
   Path.stepChain (auditCombine_comm a b)
 
@@ -625,15 +625,15 @@ def auditCombine_comm_path (a b : Nat) :
 -- ============================================================================
 
 /-- Map access decision to a flow label -/
-def decisionToFlow (d : Nat) : Nat := Nat.min d 3
+noncomputable def decisionToFlow (d : Nat) : Nat := Nat.min d 3
 
 /-- Theorem 66: congrArg through decisionToFlow on commutativity -/
-def decision_flow_comm (a b : Nat) :
+noncomputable def decision_flow_comm (a b : Nat) :
     Path (decisionToFlow (accessDecision a b)) (decisionToFlow (accessDecision b a)) :=
   Path.congrArg decisionToFlow (accessDecision_comm_path a b)
 
 /-- Theorem 67: congrArg through decisionToFlow on associativity -/
-def decision_flow_assoc (a b c : Nat) :
+noncomputable def decision_flow_assoc (a b c : Nat) :
     Path (decisionToFlow (accessDecision (accessDecision a b) c))
          (decisionToFlow (accessDecision a (accessDecision b c))) :=
   Path.congrArg decisionToFlow (accessDecision_assoc_path a b c)
@@ -658,20 +658,20 @@ theorem decision_flow_congr_trans (a b : Nat) :
 -- ============================================================================
 
 /-- Map clearance to effective permission -/
-def clearanceToPermission (c : Nat) : Nat := Nat.min c 4
+noncomputable def clearanceToPermission (c : Nat) : Nat := Nat.min c 4
 
 /-- Theorem 70: congrArg of clearance max self through permission -/
-def crossDomain_max_self (n : Nat) :
+noncomputable def crossDomain_max_self (n : Nat) :
     Path (clearanceToPermission (clearanceMax n n)) (clearanceToPermission n) :=
   Path.congrArg clearanceToPermission (clearanceMax_self_path n)
 
 /-- Theorem 71: congrArg of clearance max comm through permission -/
-def crossDomain_max_comm (a b : Nat) :
+noncomputable def crossDomain_max_comm (a b : Nat) :
     Path (clearanceToPermission (clearanceMax a b)) (clearanceToPermission (clearanceMax b a)) :=
   Path.congrArg clearanceToPermission (clearanceMax_comm_path a b)
 
 /-- Theorem 72: Trans of cross-domain paths -/
-def crossDomain_roundtrip (a b : Nat) :
+noncomputable def crossDomain_roundtrip (a b : Nat) :
     Path (clearanceToPermission (clearanceMax a b))
          (clearanceToPermission (clearanceMax a b)) :=
   Path.trans (crossDomain_max_comm a b) (crossDomain_max_comm b a)
@@ -696,7 +696,7 @@ theorem policy_fourfold_assoc (a b : Nat) :
   trans_assoc_fourfold _ _ _ _
 
 /-- Theorem 75: congrArg on composed function -/
-def composed_functorial (n : Nat) :
+noncomputable def composed_functorial (n : Nat) :
     Path (decisionToFlow (clearanceToPermission (clearanceMax n n)))
          (decisionToFlow (clearanceToPermission n)) :=
   Path.congrArg (fun x => decisionToFlow (clearanceToPermission x))

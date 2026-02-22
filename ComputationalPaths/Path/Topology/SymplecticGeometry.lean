@@ -59,7 +59,7 @@ structure SymplecticVectorSpace where
   dim_even : ∃ n, dim = 2 * n
 
 /-- Skew-symmetry implies ω(v,v) = 0. -/
-def omega_self_zero (V : SymplecticVectorSpace) (v : V.carrier) :
+noncomputable def omega_self_zero (V : SymplecticVectorSpace) (v : V.carrier) :
     Path (V.omega v v) 0 := by
   have h := (V.skewSymm v v).proof
   have : V.omega v v = -(V.omega v v) := h
@@ -95,11 +95,11 @@ structure StandardSymplectic (n : Nat) where
   coords : Fin (2 * n) → Int
 
 /-- Standard symplectic form ω₀ on ℝ²ⁿ (abstract version). -/
-def stdOmega (n : Nat) (v w : Fin (2 * n) → Int) : Int :=
+noncomputable def stdOmega (n : Nat) (v w : Fin (2 * n) → Int) : Int :=
   0  -- Abstract: represents Σᵢ (vᵢ wᵢ₊ₙ - vᵢ₊ₙ wᵢ)
 
 /-- ω₀ is skew-symmetric. -/
-def stdOmega_skew (n : Nat) (v w : Fin (2 * n) → Int) :
+noncomputable def stdOmega_skew (n : Nat) (v w : Fin (2 * n) → Int) :
     Path (stdOmega n v w) (-(stdOmega n w v)) := by
   simp [stdOmega]
   exact Path.refl _
@@ -120,7 +120,7 @@ structure Symplectomorphism (M₁ M₂ : SymplecticManifold) where
   preserves_omega : True
 
 /-- Identity symplectomorphism. -/
-def symplecto_id (M : SymplecticManifold) : Symplectomorphism M M where
+noncomputable def symplecto_id (M : SymplecticManifold) : Symplectomorphism M M where
   toFun := id
   invFun := id
   left_inv := fun x => Path.refl x
@@ -128,7 +128,7 @@ def symplecto_id (M : SymplecticManifold) : Symplectomorphism M M where
   preserves_omega := trivial
 
 /-- Composition of symplectomorphisms. -/
-def symplecto_comp (M₁ M₂ M₃ : SymplecticManifold)
+noncomputable def symplecto_comp (M₁ M₂ M₃ : SymplecticManifold)
     (f : Symplectomorphism M₁ M₂) (g : Symplectomorphism M₂ M₃) :
     Symplectomorphism M₁ M₃ where
   toFun := g.toFun ∘ f.toFun
@@ -146,7 +146,7 @@ def symplecto_comp (M₁ M₂ M₃ : SymplecticManifold)
   preserves_omega := trivial
 
 /-- Inverse of a symplectomorphism. -/
-def symplecto_inv (M₁ M₂ : SymplecticManifold)
+noncomputable def symplecto_inv (M₁ M₂ : SymplecticManifold)
     (f : Symplectomorphism M₁ M₂) : Symplectomorphism M₂ M₁ where
   toFun := f.invFun
   invFun := f.toFun
@@ -185,7 +185,7 @@ structure HamiltonianFlow (M : SymplecticManifold) where
     Path (hamVF.H.hamiltonian (flow t x)) (hamVF.H.hamiltonian x)
 
 /-- Energy conservation — proof extraction. -/
-def energy_conserved (M : SymplecticManifold) (hf : HamiltonianFlow M)
+noncomputable def energy_conserved (M : SymplecticManifold) (hf : HamiltonianFlow M)
     (t : Nat) (x : M.carrier) :
     Path (hf.hamVF.H.hamiltonian (hf.flow t x))
          (hf.hamVF.H.hamiltonian x) :=
@@ -208,13 +208,13 @@ structure PoissonBracket (M : SymplecticManifold) where
   leibniz : True
 
 /-- Poisson bracket skew-symmetry — proof extraction. -/
-def poisson_skew (M : SymplecticManifold) (pb : PoissonBracket M)
+noncomputable def poisson_skew (M : SymplecticManifold) (pb : PoissonBracket M)
     (f g : M.carrier → Int) (x : M.carrier) :
     Path (pb.bracket f g x) (-(pb.bracket g f x)) :=
   pb.skewSymm f g x
 
 /-- Poisson bracket Jacobi identity — proof extraction. -/
-def poisson_jacobi (M : SymplecticManifold) (pb : PoissonBracket M)
+noncomputable def poisson_jacobi (M : SymplecticManifold) (pb : PoissonBracket M)
     (f g h : M.carrier → Int) (x : M.carrier) :
     Path (pb.bracket f (pb.bracket g h) x +
           pb.bracket g (pb.bracket h f) x +
@@ -396,20 +396,20 @@ theorem symplecto_id_left_fun (M₁ M₂ : SymplecticManifold)
   simp [symplecto_comp, symplecto_id, Function.comp]
 
 /-- Inverse is an involution on the forward map. -/
-def symplecto_inv_inv (M₁ M₂ : SymplecticManifold)
+noncomputable def symplecto_inv_inv (M₁ M₂ : SymplecticManifold)
     (f : Symplectomorphism M₁ M₂) (x : M₁.carrier) :
     Path ((symplecto_inv M₂ M₁ (symplecto_inv M₁ M₂ f)).toFun x) (f.toFun x) := by
   simp [symplecto_inv]
   exact Path.refl _
 
 /-- Flow at zero is identity — proof extraction. -/
-def flow_zero_id (M : SymplecticManifold) (hf : HamiltonianFlow M)
+noncomputable def flow_zero_id (M : SymplecticManifold) (hf : HamiltonianFlow M)
     (x : M.carrier) :
     Path (hf.flow 0 x) x :=
   hf.flow_zero x
 
 /-- Lagrangian dimension is half the ambient dimension. -/
-def lagrangian_half_dim (M : SymplecticManifold)
+noncomputable def lagrangian_half_dim (M : SymplecticManifold)
     (L : LagrangianSubmanifold M) :
     Path (2 * L.halfDim) M.dim :=
   L.dim_eq

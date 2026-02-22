@@ -80,37 +80,37 @@ structure AbelianGroupData (G : Type u) where
   neg_add : ∀ a, add (neg a) a = zero
 
 /-- Path witness for associativity. -/
-def AbelianGroupData.assocPath {G : Type u} (grp : AbelianGroupData G)
+noncomputable def AbelianGroupData.assocPath {G : Type u} (grp : AbelianGroupData G)
     (a b c : G) : Path (grp.add (grp.add a b) c) (grp.add a (grp.add b c)) :=
   Path.stepChain (grp.add_assoc a b c)
 
 /-- Path witness for commutativity. -/
-def AbelianGroupData.commPath {G : Type u} (grp : AbelianGroupData G)
+noncomputable def AbelianGroupData.commPath {G : Type u} (grp : AbelianGroupData G)
     (a b : G) : Path (grp.add a b) (grp.add b a) :=
   Path.stepChain (grp.add_comm a b)
 
 /-- Path witness for left identity. -/
-def AbelianGroupData.zeroAddPath {G : Type u} (grp : AbelianGroupData G)
+noncomputable def AbelianGroupData.zeroAddPath {G : Type u} (grp : AbelianGroupData G)
     (a : G) : Path (grp.add grp.zero a) a :=
   Path.stepChain (grp.zero_add a)
 
 /-- Path witness for right identity. -/
-def AbelianGroupData.addZeroPath {G : Type u} (grp : AbelianGroupData G)
+noncomputable def AbelianGroupData.addZeroPath {G : Type u} (grp : AbelianGroupData G)
     (a : G) : Path (grp.add a grp.zero) a :=
   Path.stepChain (grp.add_zero a)
 
 /-- Path witness for right inverse. -/
-def AbelianGroupData.addNegPath {G : Type u} (grp : AbelianGroupData G)
+noncomputable def AbelianGroupData.addNegPath {G : Type u} (grp : AbelianGroupData G)
     (a : G) : Path (grp.add a (grp.neg a)) grp.zero :=
   Path.stepChain (grp.add_neg a)
 
 /-- Path witness for left inverse. -/
-def AbelianGroupData.negAddPath {G : Type u} (grp : AbelianGroupData G)
+noncomputable def AbelianGroupData.negAddPath {G : Type u} (grp : AbelianGroupData G)
     (a : G) : Path (grp.add (grp.neg a) a) grp.zero :=
   Path.stepChain (grp.neg_add a)
 
 /-- Step chain: a + b + (-b) = a. -/
-def AbelianGroupData.addCancelChain {G : Type u} (grp : AbelianGroupData G)
+noncomputable def AbelianGroupData.addCancelChain {G : Type u} (grp : AbelianGroupData G)
     (a b : G) :
     Path (grp.add (grp.add a b) (grp.neg b)) a :=
   Path.trans
@@ -120,7 +120,7 @@ def AbelianGroupData.addCancelChain {G : Type u} (grp : AbelianGroupData G)
       (Path.stepChain (grp.add_zero a)))
 
 /-- Step chain: (a + b) + (c + d) = (a + c) + (b + d) via commutativity. -/
-def AbelianGroupData.interchangeChain {G : Type u} (grp : AbelianGroupData G)
+noncomputable def AbelianGroupData.interchangeChain {G : Type u} (grp : AbelianGroupData G)
     (a b c d : G)
     (h : grp.add (grp.add a b) (grp.add c d) =
          grp.add (grp.add a c) (grp.add b d)) :
@@ -129,7 +129,7 @@ def AbelianGroupData.interchangeChain {G : Type u} (grp : AbelianGroupData G)
   Path.stepChain h
 
 /-- Trivial abelian group on PUnit. -/
-def trivialAbelianGroup : AbelianGroupData PUnit where
+noncomputable def trivialAbelianGroup : AbelianGroupData PUnit where
   zero := PUnit.unit
   add := fun _ _ => PUnit.unit
   neg := fun _ => PUnit.unit
@@ -183,13 +183,13 @@ structure EMSpaceData (G : Type u) (n : Nat) where
   connected : NConnected space n
 
 /-- Path witness for π_n at basepoint. -/
-def EMSpaceData.basePointPath {G : Type u} {n : Nat}
+noncomputable def EMSpaceData.basePointPath {G : Type u} {n : Nat}
     (K : EMSpaceData G n) :
     Path (K.pi_n_iso K.base) K.abelian.zero :=
   Path.stepChain K.pi_n_base
 
 /-- Step chain: the isomorphism composes with group operations. -/
-def EMSpaceData.isoAddChain {G : Type u} {n : Nat}
+noncomputable def EMSpaceData.isoAddChain {G : Type u} {n : Nat}
     (K : EMSpaceData G n) (x _y : K.space)
     (h : K.pi_n_iso x = K.abelian.add (K.pi_n_iso x) K.abelian.zero) :
     Path (K.pi_n_iso x) (K.abelian.add (K.pi_n_iso x) K.abelian.zero) :=
@@ -214,19 +214,19 @@ structure LoopSpaceEM (G : Type u) (n : Nat) where
     knToLoop (loopToKn p) = p
 
 /-- Path witness for forward-backward. -/
-def LoopSpaceEM.fbPath {G : Type u} {n : Nat}
+noncomputable def LoopSpaceEM.fbPath {G : Type u} {n : Nat}
     (L : LoopSpaceEM G n) (x : L.kn.space) :
     Path (L.loopToKn (L.knToLoop x)) x :=
   Path.stepChain (L.forward_backward x)
 
 /-- Path witness for backward-forward. -/
-def LoopSpaceEM.bfPath {G : Type u} {n : Nat}
+noncomputable def LoopSpaceEM.bfPath {G : Type u} {n : Nat}
     (L : LoopSpaceEM G n) (p : Path L.kn1.base L.kn1.base) :
     Path (L.knToLoop (L.loopToKn p)) p :=
   Path.stepChain (L.backward_forward p)
 
 /-- Step chain: round trip preserves group structure. -/
-def LoopSpaceEM.roundTripChain {G : Type u} {n : Nat}
+noncomputable def LoopSpaceEM.roundTripChain {G : Type u} {n : Nat}
     (L : LoopSpaceEM G n) (x : L.kn.space) :
     Path (L.loopToKn (L.knToLoop (L.loopToKn (L.knToLoop x))))
          x :=
@@ -281,19 +281,19 @@ structure PostnikovTowerData (X : Type u) where
   compat : ∀ n x, connecting n (truncation (n + 1) x) = truncation n x
 
 /-- Path witness for basepoint compatibility. -/
-def PostnikovTowerData.baseCompatPath {X : Type u} (T : PostnikovTowerData X)
+noncomputable def PostnikovTowerData.baseCompatPath {X : Type u} (T : PostnikovTowerData X)
     (n : Nat) :
     Path (T.connecting n (T.bases (n + 1))) (T.bases n) :=
   Path.stepChain (T.connecting_base n)
 
 /-- Path witness for truncation compatibility. -/
-def PostnikovTowerData.truncCompatPath {X : Type u} (T : PostnikovTowerData X)
+noncomputable def PostnikovTowerData.truncCompatPath {X : Type u} (T : PostnikovTowerData X)
     (n : Nat) (x : X) :
     Path (T.connecting n (T.truncation (n + 1) x)) (T.truncation n x) :=
   Path.stepChain (T.compat n x)
 
 /-- Step chain: double connecting maps are compatible. -/
-def PostnikovTowerData.doubleConnectingChain {X : Type u}
+noncomputable def PostnikovTowerData.doubleConnectingChain {X : Type u}
     (T : PostnikovTowerData X) (n : Nat) (x : X) :
     Path (T.connecting n (T.connecting (n + 1) (T.truncation (n + 2) x)))
          (T.truncation n x) :=
@@ -302,7 +302,7 @@ def PostnikovTowerData.doubleConnectingChain {X : Type u}
     (Path.stepChain (T.compat n x))
 
 /-- Triple connecting chain. -/
-def PostnikovTowerData.tripleConnectingChain {X : Type u}
+noncomputable def PostnikovTowerData.tripleConnectingChain {X : Type u}
     (T : PostnikovTowerData X) (n : Nat) (x : X) :
     Path (T.connecting n (T.connecting (n + 1)
       (T.connecting (n + 2) (T.truncation (n + 3) x))))
@@ -353,13 +353,13 @@ structure TruncationMap (X Y : Type u) (n : Nat) where
   naturality : ∀ x, stageMap (stageX.truncation x) = stageY.truncation (map x)
 
 /-- Path witness for truncation naturality. -/
-def TruncationMap.naturalityPath {X Y : Type u} {n : Nat}
+noncomputable def TruncationMap.naturalityPath {X Y : Type u} {n : Nat}
     (T : TruncationMap X Y n) (x : X) :
     Path (T.stageMap (T.stageX.truncation x)) (T.stageY.truncation (T.map x)) :=
   Path.stepChain (T.naturality x)
 
 /-- Step chain: naturality composed with another truncation. -/
-def TruncationMap.compNaturalityPath {X Y : Type u} {n : Nat}
+noncomputable def TruncationMap.compNaturalityPath {X Y : Type u} {n : Nat}
     (T : TruncationMap X Y n) (x₁ x₂ : X)
     (hx : x₁ = x₂) :
     Path (T.stageMap (T.stageX.truncation x₁)) (T.stageMap (T.stageX.truncation x₂)) :=
@@ -379,13 +379,13 @@ structure WhiteheadTowerData (X : Type u) where
   connecting_base : ∀ k, connecting k (bases (k + 1)) = bases k
 
 /-- Path witness for Whitehead tower basepoint compatibility. -/
-def WhiteheadTowerData.baseCompatPath {X : Type u}
+noncomputable def WhiteheadTowerData.baseCompatPath {X : Type u}
     (W : WhiteheadTowerData X) (n : Nat) :
     Path (W.connecting n (W.bases (n + 1))) (W.bases n) :=
   Path.stepChain (W.connecting_base n)
 
 /-- Step chain: double connecting in Whitehead tower. -/
-def WhiteheadTowerData.doubleConnectChain {X : Type u}
+noncomputable def WhiteheadTowerData.doubleConnectChain {X : Type u}
     (W : WhiteheadTowerData X) (n : Nat) :
     Path (W.connecting n (W.connecting (n + 1) (W.bases (n + 2))))
          (W.bases n) :=

@@ -32,7 +32,7 @@ class IsHSet (A : Type u) : Prop where
 
 /-- A type satisfies Axiom K if every loop is RwEq to refl.
     This is the computational paths analog of the "K axiom" in type theory. -/
-def AxiomK (A : Type u) : Prop :=
+noncomputable def AxiomK (A : Type u) : Prop :=
   ∀ (a : A) (p : Path a a), RwEqProp p (Path.refl a)
 
 /-- Subsingleton types satisfy Axiom K: any loop rewrites to reflexivity.
@@ -176,10 +176,10 @@ theorem subsingleton_pi1_of_subsingleton (A : Type u) [Subsingleton A] (a : A) :
     (pi1_trivial_of_subsingleton (A := A) (a := a) x).trans
     (pi1_trivial_of_subsingleton (A := A) (a := a) y).symm
 
-instance : IsHSet Unit := by
+noncomputable instance : IsHSet Unit := by
   exact isHSet_of_subsingleton (A := Unit)
 
-instance : IsHSet Empty := by
+noncomputable instance : IsHSet Empty := by
   exact isHSet_of_subsingleton (A := Empty)
 
 end ComputationalPaths.Path

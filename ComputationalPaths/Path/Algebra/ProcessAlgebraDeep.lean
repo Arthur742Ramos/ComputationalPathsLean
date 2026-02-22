@@ -42,7 +42,7 @@ inductive Action where
   deriving DecidableEq
 
 /-- Complement of an action (for CCS synchronization) -/
-def Action.complement : Action → Action
+noncomputable def Action.complement : Action → Action
   | Action.send n => Action.recv n
   | Action.recv n => Action.send n
   | a => a
@@ -87,7 +87,7 @@ local notation:45 P " ∥ₚ " Q => A.par P Q
 -- Def 1: Choice is commutative (Path witness)
 -- ============================================================
 
-def choice_comm_path (P Q : A.Proc) :
+noncomputable def choice_comm_path (P Q : A.Proc) :
     Path (P ⊕ₚ Q) (Q ⊕ₚ P) :=
   Path.stepChain (A.choice_comm P Q)
 
@@ -95,7 +95,7 @@ def choice_comm_path (P Q : A.Proc) :
 -- Def 2: Choice is associative (Path witness)
 -- ============================================================
 
-def choice_assoc_path (P Q R : A.Proc) :
+noncomputable def choice_assoc_path (P Q R : A.Proc) :
     Path (A.choice (A.choice P Q) R) (A.choice P (A.choice Q R)) :=
   Path.stepChain (A.choice_assoc P Q R)
 
@@ -103,7 +103,7 @@ def choice_assoc_path (P Q R : A.Proc) :
 -- Def 3: Choice with nil is identity (Path witness)
 -- ============================================================
 
-def choice_nil_path (P : A.Proc) :
+noncomputable def choice_nil_path (P : A.Proc) :
     Path (P ⊕ₚ 𝟎) P :=
   Path.stepChain (A.choice_nil P)
 
@@ -111,7 +111,7 @@ def choice_nil_path (P : A.Proc) :
 -- Def 4: Parallel is commutative (Path witness)
 -- ============================================================
 
-def par_comm_path (P Q : A.Proc) :
+noncomputable def par_comm_path (P Q : A.Proc) :
     Path (P ∥ₚ Q) (Q ∥ₚ P) :=
   Path.stepChain (A.par_comm P Q)
 
@@ -119,7 +119,7 @@ def par_comm_path (P Q : A.Proc) :
 -- Def 5: Parallel is associative (Path witness)
 -- ============================================================
 
-def par_assoc_path (P Q R : A.Proc) :
+noncomputable def par_assoc_path (P Q R : A.Proc) :
     Path (A.par (A.par P Q) R) (A.par P (A.par Q R)) :=
   Path.stepChain (A.par_assoc P Q R)
 
@@ -127,7 +127,7 @@ def par_assoc_path (P Q R : A.Proc) :
 -- Def 6: Parallel with nil is identity (Path witness)
 -- ============================================================
 
-def par_nil_path (P : A.Proc) :
+noncomputable def par_nil_path (P : A.Proc) :
     Path (P ∥ₚ 𝟎) P :=
   Path.stepChain (A.par_nil P)
 
@@ -135,7 +135,7 @@ def par_nil_path (P : A.Proc) :
 -- Def 7: Nil is left identity for choice (derived via trans)
 -- ============================================================
 
-def choice_nil_left_path (P : A.Proc) :
+noncomputable def choice_nil_left_path (P : A.Proc) :
     Path (𝟎 ⊕ₚ P) P :=
   Path.trans (choice_comm_path A 𝟎 P) (choice_nil_path A P)
 
@@ -143,7 +143,7 @@ def choice_nil_left_path (P : A.Proc) :
 -- Def 8: Nil is left identity for parallel (derived via trans)
 -- ============================================================
 
-def par_nil_left_path (P : A.Proc) :
+noncomputable def par_nil_left_path (P : A.Proc) :
     Path (𝟎 ∥ₚ P) P :=
   Path.trans (par_comm_path A 𝟎 P) (par_nil_path A P)
 
@@ -151,21 +151,21 @@ def par_nil_left_path (P : A.Proc) :
 -- Def 9: Structural congruence groupoid reflexivity
 -- ============================================================
 
-def sc_groupoid_refl (P : A.Proc) : Path P P :=
+noncomputable def sc_groupoid_refl (P : A.Proc) : Path P P :=
   Path.refl P
 
 -- ============================================================
 -- Def 10: Structural congruence groupoid symmetry
 -- ============================================================
 
-def sc_groupoid_symm {P Q : A.Proc} (p : Path P Q) : Path Q P :=
+noncomputable def sc_groupoid_symm {P Q : A.Proc} (p : Path P Q) : Path Q P :=
   Path.symm p
 
 -- ============================================================
 -- Def 11: Structural congruence groupoid transitivity
 -- ============================================================
 
-def sc_groupoid_trans {P Q R : A.Proc}
+noncomputable def sc_groupoid_trans {P Q R : A.Proc}
     (p : Path P Q) (q : Path Q R) : Path P R :=
   Path.trans p q
 
@@ -173,7 +173,7 @@ def sc_groupoid_trans {P Q R : A.Proc}
 -- Def 12: Choice associativity pentagon (left)
 -- ============================================================
 
-def choice_assoc_pentagon_left (P Q R S : A.Proc) :
+noncomputable def choice_assoc_pentagon_left (P Q R S : A.Proc) :
     Path (A.choice (A.choice (A.choice P Q) R) S)
          (A.choice (A.choice P Q) (A.choice R S)) :=
   choice_assoc_path A (A.choice P Q) R S
@@ -182,7 +182,7 @@ def choice_assoc_pentagon_left (P Q R S : A.Proc) :
 -- Def 13: Choice associativity pentagon (right)
 -- ============================================================
 
-def choice_assoc_pentagon_right (P Q R S : A.Proc) :
+noncomputable def choice_assoc_pentagon_right (P Q R S : A.Proc) :
     Path (A.choice (A.choice P Q) (A.choice R S))
          (A.choice P (A.choice Q (A.choice R S))) :=
   choice_assoc_path A P Q (A.choice R S)
@@ -191,7 +191,7 @@ def choice_assoc_pentagon_right (P Q R S : A.Proc) :
 -- Def 14: Pentagon composite path for choice
 -- ============================================================
 
-def choice_pentagon_composite (P Q R S : A.Proc) :
+noncomputable def choice_pentagon_composite (P Q R S : A.Proc) :
     Path (A.choice (A.choice (A.choice P Q) R) S)
          (A.choice P (A.choice Q (A.choice R S))) :=
   Path.trans
@@ -202,7 +202,7 @@ def choice_pentagon_composite (P Q R S : A.Proc) :
 -- Def 15: Parallel associativity pentagon composite
 -- ============================================================
 
-def par_pentagon_composite (P Q R S : A.Proc) :
+noncomputable def par_pentagon_composite (P Q R S : A.Proc) :
     Path (A.par (A.par (A.par P Q) R) S)
          (A.par P (A.par Q (A.par R S))) :=
   Path.trans
@@ -213,7 +213,7 @@ def par_pentagon_composite (P Q R S : A.Proc) :
 -- Def 16: Congruence for choice left under Path
 -- ============================================================
 
-def choice_cong_left (Q : A.Proc) {P P' : A.Proc}
+noncomputable def choice_cong_left (Q : A.Proc) {P P' : A.Proc}
     (p : Path P P') :
     Path (P ⊕ₚ Q) (P' ⊕ₚ Q) :=
   Path.congrArg (A.choice · Q) p
@@ -222,7 +222,7 @@ def choice_cong_left (Q : A.Proc) {P P' : A.Proc}
 -- Def 17: Congruence for choice right under Path
 -- ============================================================
 
-def choice_cong_right (P : A.Proc) {Q Q' : A.Proc}
+noncomputable def choice_cong_right (P : A.Proc) {Q Q' : A.Proc}
     (p : Path Q Q') :
     Path (P ⊕ₚ Q) (P ⊕ₚ Q') :=
   Path.congrArg (A.choice P ·) p
@@ -231,7 +231,7 @@ def choice_cong_right (P : A.Proc) {Q Q' : A.Proc}
 -- Def 18: Congruence for parallel left under Path
 -- ============================================================
 
-def par_cong_left (Q : A.Proc) {P P' : A.Proc}
+noncomputable def par_cong_left (Q : A.Proc) {P P' : A.Proc}
     (p : Path P P') :
     Path (P ∥ₚ Q) (P' ∥ₚ Q) :=
   Path.congrArg (A.par · Q) p
@@ -240,7 +240,7 @@ def par_cong_left (Q : A.Proc) {P P' : A.Proc}
 -- Def 19: Congruence for parallel right under Path
 -- ============================================================
 
-def par_cong_right (P : A.Proc) {Q Q' : A.Proc}
+noncomputable def par_cong_right (P : A.Proc) {Q Q' : A.Proc}
     (p : Path Q Q') :
     Path (P ∥ₚ Q) (P ∥ₚ Q') :=
   Path.congrArg (A.par P ·) p
@@ -249,7 +249,7 @@ def par_cong_right (P : A.Proc) {Q Q' : A.Proc}
 -- Def 20: Congruence for prefix under Path
 -- ============================================================
 
-def prefix_cong (a : Action) {P Q : A.Proc}
+noncomputable def prefix_cong (a : Action) {P Q : A.Proc}
     (p : Path P Q) :
     Path (a ⬝ P) (a ⬝ Q) :=
   Path.congrArg (A.pre a ·) p
@@ -258,7 +258,7 @@ def prefix_cong (a : Action) {P Q : A.Proc}
 -- Def 21: Congruence for restriction under Path
 -- ============================================================
 
-def restrict_cong (n : Nat) {P Q : A.Proc}
+noncomputable def restrict_cong (n : Nat) {P Q : A.Proc}
     (p : Path P Q) :
     Path (A.restrict n P) (A.restrict n Q) :=
   Path.congrArg (A.restrict n ·) p
@@ -267,7 +267,7 @@ def restrict_cong (n : Nat) {P Q : A.Proc}
 -- Def 22: Congruence for relabeling under Path
 -- ============================================================
 
-def relabel_cong (m n : Nat) {P Q : A.Proc}
+noncomputable def relabel_cong (m n : Nat) {P Q : A.Proc}
     (p : Path P Q) :
     Path (A.relabel m n P) (A.relabel m n Q) :=
   Path.congrArg (A.relabel m n ·) p
@@ -276,7 +276,7 @@ def relabel_cong (m n : Nat) {P Q : A.Proc}
 -- Def 23: Bicong for choice (both sides)
 -- ============================================================
 
-def choice_bicong {P P' Q Q' : A.Proc}
+noncomputable def choice_bicong {P P' Q Q' : A.Proc}
     (p1 : Path P P') (p2 : Path Q Q') :
     Path (P ⊕ₚ Q) (P' ⊕ₚ Q') :=
   Path.trans (choice_cong_left A Q p1) (choice_cong_right A P' p2)
@@ -285,7 +285,7 @@ def choice_bicong {P P' Q Q' : A.Proc}
 -- Def 24: Bicong for parallel (both sides)
 -- ============================================================
 
-def par_bicong {P P' Q Q' : A.Proc}
+noncomputable def par_bicong {P P' Q Q' : A.Proc}
     (p1 : Path P P') (p2 : Path Q Q') :
     Path (P ∥ₚ Q) (P' ∥ₚ Q') :=
   Path.trans (par_cong_left A Q p1) (par_cong_right A P' p2)
@@ -294,7 +294,7 @@ def par_bicong {P P' Q Q' : A.Proc}
 -- Def 25: Choice comm + assoc yields rearrangement
 -- ============================================================
 
-def choice_rearrange (P Q R : A.Proc) :
+noncomputable def choice_rearrange (P Q R : A.Proc) :
     Path (A.choice (A.choice P Q) R) (A.choice Q (A.choice P R)) :=
   let step1 := choice_cong_left A R (choice_comm_path A P Q)
   let step2 := choice_assoc_path A Q P R
@@ -304,7 +304,7 @@ def choice_rearrange (P Q R : A.Proc) :
 -- Def 26: Parallel comm + assoc yields rearrangement
 -- ============================================================
 
-def par_rearrange (P Q R : A.Proc) :
+noncomputable def par_rearrange (P Q R : A.Proc) :
     Path (A.par (A.par P Q) R) (A.par Q (A.par P R)) :=
   let step1 := par_cong_left A R (par_comm_path A P Q)
   let step2 := par_assoc_path A Q P R
@@ -314,7 +314,7 @@ def par_rearrange (P Q R : A.Proc) :
 -- Def 27: Four-process choice normalization
 -- ============================================================
 
-def choice_normalize_four (P Q R S : A.Proc) :
+noncomputable def choice_normalize_four (P Q R S : A.Proc) :
     Path (A.choice (A.choice (A.choice P Q) R) S)
          (A.choice P (A.choice Q (A.choice R S))) :=
   Path.trans
@@ -325,7 +325,7 @@ def choice_normalize_four (P Q R S : A.Proc) :
 -- Def 28: Four-process parallel normalization
 -- ============================================================
 
-def par_normalize_four (P Q R S : A.Proc) :
+noncomputable def par_normalize_four (P Q R S : A.Proc) :
     Path (A.par (A.par (A.par P Q) R) S)
          (A.par P (A.par Q (A.par R S))) :=
   Path.trans
@@ -336,7 +336,7 @@ def par_normalize_four (P Q R S : A.Proc) :
 -- Def 29: Five-process choice normalization
 -- ============================================================
 
-def choice_normalize_five (P Q R S T : A.Proc) :
+noncomputable def choice_normalize_five (P Q R S T : A.Proc) :
     Path (A.choice (A.choice (A.choice (A.choice P Q) R) S) T)
          (A.choice P (A.choice Q (A.choice R (A.choice S T)))) :=
   let s1 := choice_assoc_path A (A.choice (A.choice P Q) R) S T
@@ -348,7 +348,7 @@ def choice_normalize_five (P Q R S T : A.Proc) :
 -- Def 30: Five-process parallel normalization
 -- ============================================================
 
-def par_normalize_five (P Q R S T : A.Proc) :
+noncomputable def par_normalize_five (P Q R S T : A.Proc) :
     Path (A.par (A.par (A.par (A.par P Q) R) S) T)
          (A.par P (A.par Q (A.par R (A.par S T)))) :=
   let s1 := par_assoc_path A (A.par (A.par P Q) R) S T
@@ -360,7 +360,7 @@ def par_normalize_five (P Q R S T : A.Proc) :
 -- Def 31: Reverse normalization via symm
 -- ============================================================
 
-def choice_denormalize_four (P Q R S : A.Proc) :
+noncomputable def choice_denormalize_four (P Q R S : A.Proc) :
     Path (A.choice P (A.choice Q (A.choice R S)))
          (A.choice (A.choice (A.choice P Q) R) S) :=
   Path.symm (choice_normalize_four A P Q R S)
@@ -369,7 +369,7 @@ def choice_denormalize_four (P Q R S : A.Proc) :
 -- Def 32: Reverse parallel normalization via symm
 -- ============================================================
 
-def par_denormalize_four (P Q R S : A.Proc) :
+noncomputable def par_denormalize_four (P Q R S : A.Proc) :
     Path (A.par P (A.par Q (A.par R S)))
          (A.par (A.par (A.par P Q) R) S) :=
   Path.symm (par_normalize_four A P Q R S)
@@ -547,7 +547,7 @@ theorem congrArg_symm_restrict (n : Nat) {P Q : A.Proc}
 -- Def 50: Nested restriction congruence
 -- ============================================================
 
-def restrict_nested_cong (n m : Nat) {P Q : A.Proc}
+noncomputable def restrict_nested_cong (n m : Nat) {P Q : A.Proc}
     (p : Path P Q) :
     Path (A.restrict n (A.restrict m P)) (A.restrict n (A.restrict m Q)) :=
   restrict_cong A n (restrict_cong A m p)
@@ -556,7 +556,7 @@ def restrict_nested_cong (n m : Nat) {P Q : A.Proc}
 -- Def 51: Choice comm inside parallel
 -- ============================================================
 
-def par_inner_choice_comm (P Q R : A.Proc) :
+noncomputable def par_inner_choice_comm (P Q R : A.Proc) :
     Path (A.par (A.choice P Q) R) (A.par (A.choice Q P) R) :=
   par_cong_left A R (choice_comm_path A P Q)
 
@@ -564,7 +564,7 @@ def par_inner_choice_comm (P Q R : A.Proc) :
 -- Def 52: Parallel comm inside choice
 -- ============================================================
 
-def choice_inner_par_comm (P Q R : A.Proc) :
+noncomputable def choice_inner_par_comm (P Q R : A.Proc) :
     Path (A.choice (A.par P Q) R) (A.choice (A.par Q P) R) :=
   choice_cong_left A R (par_comm_path A P Q)
 
@@ -572,7 +572,7 @@ def choice_inner_par_comm (P Q R : A.Proc) :
 -- Def 53: MacLane coherence alternative path
 -- ============================================================
 
-def choice_coherence_alt (P Q R S : A.Proc) :
+noncomputable def choice_coherence_alt (P Q R S : A.Proc) :
     Path (A.choice (A.choice (A.choice P Q) R) S)
          (A.choice P (A.choice Q (A.choice R S))) :=
   let inner := choice_cong_left A S (choice_assoc_path A P Q R)
@@ -593,7 +593,7 @@ theorem groupoid_roundtrip {P Q : A.Proc} (p : Path P Q) :
 -- Def 55: Compound congruence: prefix + choice
 -- ============================================================
 
-def compound_prefix_choice (a : Action) (R : A.Proc)
+noncomputable def compound_prefix_choice (a : Action) (R : A.Proc)
     {P Q : A.Proc} (p : Path P Q) :
     Path (A.choice (A.pre a P) R) (A.choice (A.pre a Q) R) :=
   choice_cong_left A R (prefix_cong A a p)
@@ -602,7 +602,7 @@ def compound_prefix_choice (a : Action) (R : A.Proc)
 -- Def 56: Compound congruence: prefix + parallel
 -- ============================================================
 
-def compound_prefix_par (a : Action) (R : A.Proc)
+noncomputable def compound_prefix_par (a : Action) (R : A.Proc)
     {P Q : A.Proc} (p : Path P Q) :
     Path (A.par (A.pre a P) R) (A.par (A.pre a Q) R) :=
   par_cong_left A R (prefix_cong A a p)
@@ -611,7 +611,7 @@ def compound_prefix_par (a : Action) (R : A.Proc)
 -- Def 57: Six-process choice normalization
 -- ============================================================
 
-def choice_normalize_six (P Q R S T U : A.Proc) :
+noncomputable def choice_normalize_six (P Q R S T U : A.Proc) :
     Path (A.choice (A.choice (A.choice (A.choice (A.choice P Q) R) S) T) U)
          (A.choice P (A.choice Q (A.choice R (A.choice S (A.choice T U))))) :=
   let s1 := choice_assoc_path A (A.choice (A.choice (A.choice P Q) R) S) T U
@@ -624,7 +624,7 @@ def choice_normalize_six (P Q R S T U : A.Proc) :
 -- Def 58: Choice nil absorption chain
 -- ============================================================
 
-def choice_nil_absorb (P Q : A.Proc) :
+noncomputable def choice_nil_absorb (P Q : A.Proc) :
     Path (A.choice (A.choice P 𝟎) (A.choice Q 𝟎))
          (A.choice P Q) :=
   choice_bicong A (choice_nil_path A P) (choice_nil_path A Q)
@@ -633,7 +633,7 @@ def choice_nil_absorb (P Q : A.Proc) :
 -- Def 59: Parallel nil absorption chain
 -- ============================================================
 
-def par_nil_absorb (P Q : A.Proc) :
+noncomputable def par_nil_absorb (P Q : A.Proc) :
     Path (A.par (A.par P 𝟎) (A.par Q 𝟎))
          (A.par P Q) :=
   par_bicong A (par_nil_path A P) (par_nil_path A Q)
@@ -642,7 +642,7 @@ def par_nil_absorb (P Q : A.Proc) :
 -- Def 60: Mixed: choice inside parallel congruence
 -- ============================================================
 
-def mixed_choice_in_par {P P' Q Q' : A.Proc} (R S : A.Proc)
+noncomputable def mixed_choice_in_par {P P' Q Q' : A.Proc} (R S : A.Proc)
     (p : Path P P') (q : Path Q Q') :
     Path (A.par (A.choice P R) (A.choice Q S))
          (A.par (A.choice P' R) (A.choice Q' S)) :=
@@ -682,21 +682,21 @@ inductive MultiStep : CProc → List Action → CProc → Prop where
   | step : LTS P a Q → MultiStep Q t R → MultiStep P (a :: t) R
 
 /-- The set of traces a process can perform -/
-def hasTrace (P : CProc) (t : List Action) : Prop :=
+noncomputable def hasTrace (P : CProc) (t : List Action) : Prop :=
   ∃ Q, MultiStep P t Q
 
 /-- Trace equivalence -/
-def TraceEquiv (P Q : CProc) : Prop :=
+noncomputable def TraceEquiv (P Q : CProc) : Prop :=
   ∀ t, hasTrace P t ↔ hasTrace Q t
 
 /-- A relation is a strong bisimulation -/
-def IsStrongBisim (R : CProc → CProc → Prop) : Prop :=
+noncomputable def IsStrongBisim (R : CProc → CProc → Prop) : Prop :=
   ∀ P Q, R P Q →
     (∀ a P', (P —[a]→ P') → ∃ Q', (Q —[a]→ Q') ∧ R P' Q') ∧
     (∀ a Q', (Q —[a]→ Q') → ∃ P', (P —[a]→ P') ∧ R P' Q')
 
 /-- Strong bisimilarity -/
-def StrongBisim (P Q : CProc) : Prop :=
+noncomputable def StrongBisim (P Q : CProc) : Prop :=
   ∃ R, IsStrongBisim R ∧ R P Q
 
 /-- Weak (tau-star) transition -/
@@ -705,23 +705,23 @@ inductive TauStar : CProc → CProc → Prop where
   | step : LTS P Action.tau Q → TauStar Q R → TauStar P R
 
 /-- Weak transition -/
-def WeakTrans (P : CProc) (a : Action) (Q : CProc) : Prop :=
+noncomputable def WeakTrans (P : CProc) (a : Action) (Q : CProc) : Prop :=
   match a with
   | Action.tau => TauStar P Q
   | _ => ∃ P' Q', TauStar P P' ∧ (P' —[a]→ Q') ∧ TauStar Q' Q
 
 /-- A relation is a weak bisimulation -/
-def IsWeakBisim (R : CProc → CProc → Prop) : Prop :=
+noncomputable def IsWeakBisim (R : CProc → CProc → Prop) : Prop :=
   ∀ P Q, R P Q →
     (∀ a P', (P —[a]→ P') → ∃ Q', WeakTrans Q a Q' ∧ R P' Q') ∧
     (∀ a Q', (Q —[a]→ Q') → ∃ P', WeakTrans P a P' ∧ R P' Q')
 
 /-- Weak bisimilarity -/
-def WeakBisim (P Q : CProc) : Prop :=
+noncomputable def WeakBisim (P Q : CProc) : Prop :=
   ∃ R, IsWeakBisim R ∧ R P Q
 
 /-- A relation is a branching bisimulation -/
-def IsBranchingBisim (R : CProc → CProc → Prop) : Prop :=
+noncomputable def IsBranchingBisim (R : CProc → CProc → Prop) : Prop :=
   ∀ P Q, R P Q →
     (∀ a P', (P —[a]→ P') →
       (a = Action.tau ∧ R P' Q) ∨
@@ -731,7 +731,7 @@ def IsBranchingBisim (R : CProc → CProc → Prop) : Prop :=
       (∃ P₁ P', TauStar P P₁ ∧ (P₁ —[a]→ P') ∧ R P₁ Q ∧ R P' Q'))
 
 /-- Branching bisimilarity -/
-def BranchingBisim (P Q : CProc) : Prop :=
+noncomputable def BranchingBisim (P Q : CProc) : Prop :=
   ∃ R, IsBranchingBisim R ∧ R P Q
 
 -- ============================================================
@@ -749,7 +749,7 @@ inductive HML where
   | neg : HML → HML
 
 /-- Satisfaction relation -/
-def satisfies : CProc → HML → Prop
+noncomputable def satisfies : CProc → HML → Prop
   | _, HML.tt => True
   | _, HML.ff => False
   | P, HML.conj φ ψ => satisfies P φ ∧ satisfies P ψ

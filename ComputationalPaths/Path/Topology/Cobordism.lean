@@ -32,7 +32,7 @@ structure CobordismWitness (n : Nat) (_M _N : ClosedManifold.{u} n) where
   boundary : True
   compact : True
 
-def areCobordant (n : Nat) (M N : ClosedManifold.{u} n) : Prop :=
+noncomputable def areCobordant (n : Nat) (M N : ClosedManifold.{u} n) : Prop :=
   Nonempty (CobordismWitness n M N)
 
 /-! ## Cobordism Ring -/
@@ -64,17 +64,17 @@ structure CobordismRing where
   unit : component 0
   mul_comm : ∀ m n (_x : component m) (_y : component n), True
 
-def unorientedCobordismRing : CobordismRing.{u} where
+noncomputable def unorientedCobordismRing : CobordismRing.{u} where
   component _ := PUnit
   mul _ _ _ _ := PUnit.unit
   unit := PUnit.unit
   mul_comm _ _ _ _ := trivial
-def orientedCobordismRing : CobordismRing.{u} where
+noncomputable def orientedCobordismRing : CobordismRing.{u} where
   component _ := PUnit
   mul _ _ _ _ := PUnit.unit
   unit := PUnit.unit
   mul_comm _ _ _ _ := trivial
-def complexCobordismRing : CobordismRing.{u} where
+noncomputable def complexCobordismRing : CobordismRing.{u} where
   component _ := PUnit
   mul _ _ _ _ := PUnit.unit
   unit := PUnit.unit
@@ -101,7 +101,7 @@ structure ThomSpectrumMU where
   structureMap : ∀ n, space n → space (n + 1)
   ringSpectrum : True
 
-def pontryaginThomCollapse (_n _k : Nat) : Type u := PUnit
+noncomputable def pontryaginThomCollapse (_n _k : Nat) : Type u := PUnit
 
 /-! ## Formal Group Laws -/
 
@@ -112,14 +112,14 @@ structure FormalGroupLaw (R : Type u) where
   comm : ∀ i j, coeff i j = coeff j i
   assoc : True
 
-def additiveFGL (R : Type u) [Zero R] : FormalGroupLaw R where
+noncomputable def additiveFGL (R : Type u) [Zero R] : FormalGroupLaw R where
   coeff := fun _ _ => 0
   unit_right := trivial
   unit_left := trivial
   comm := fun _ _ => rfl
   assoc := trivial
 
-def multiplicativeFGL (R : Type u) [Zero R] : FormalGroupLaw R where
+noncomputable def multiplicativeFGL (R : Type u) [Zero R] : FormalGroupLaw R where
   coeff := fun _ _ => 0
   unit_right := trivial
   unit_left := trivial
@@ -131,7 +131,7 @@ structure LazardRing where
   universalFGL : FormalGroupLaw carrier
   universal : True
 
-def lazardRing : LazardRing.{u} where
+noncomputable def lazardRing : LazardRing.{u} where
   carrier := PUnit
   universalFGL := { coeff := fun _ _ => PUnit.unit, unit_right := trivial, unit_left := trivial, comm := fun _ _ => rfl, assoc := trivial }
   universal := trivial
@@ -142,7 +142,7 @@ structure FGLIsomorphism (R : Type u) (_F _G : FormalGroupLaw R) where
   strict : True
   compat : True
 
-def fglFromSpectrum (_E : ThomSpectrumMU.{u}) : FormalGroupLaw (Type u) where
+noncomputable def fglFromSpectrum (_E : ThomSpectrumMU.{u}) : FormalGroupLaw (Type u) where
   coeff _ _ := PUnit
   unit_right := trivial
   unit_left := trivial
@@ -156,7 +156,7 @@ structure LandweberExact where
   fgl : FormalGroupLaw ring_
   exactness : True
 
-def landweberHomology (_L : LandweberExact.{u}) : Nat → Type u := fun _ => PUnit
+noncomputable def landweberHomology (_L : LandweberExact.{u}) : Nat → Type u := fun _ => PUnit
 
 /-! ### Theorems -/
 

@@ -97,12 +97,12 @@ theorem inducedPi1_comp (f : A → B) (g : B → E) (a : A) :
 /-! ## Fiber Sequence Exactness -/
 
 /-- The canonical fiber sequence is exact (re-export from Fibration). -/
-def canonicalSeq_exact {P : B → Type u} (b : B) (x₀ : P b) :
+noncomputable def canonicalSeq_exact {P : B → Type u} (b : B) (x₀ : P b) :
     IsExactAt (canonicalFiberSeq b x₀) :=
   canonicalFiberSeq_exact b x₀
 
 /-- The inclusion maps fiber elements to the total space over the basepoint. -/
-def fiber_incl_proj {P : B → Type u} (b : B) (x₀ : P b) (f : P b) :
+noncomputable def fiber_incl_proj {P : B → Type u} (b : B) (x₀ : P b) (f : P b) :
     Path ( (canonicalFiberSeq b x₀).proj ((canonicalFiberSeq b x₀).incl f)) b :=
   (canonicalFiberSeq b x₀).proj_incl f
 

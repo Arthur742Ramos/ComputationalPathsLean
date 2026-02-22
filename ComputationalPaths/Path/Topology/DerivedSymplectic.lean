@@ -30,20 +30,20 @@ structure DerivedSymplecticMorphism where
   lagrangian : LagrangianCorrespondenceData
 
 /-- Shifted symplectic forms as higher-path rewrite steps. -/
-def shiftedSymplecticRewriteStep (x y : ShiftedSymplecticData)
+noncomputable def shiftedSymplecticRewriteStep (x y : ShiftedSymplecticData)
     (h : x = y) : Step ShiftedSymplecticData :=
   Step.mk x y h
 
 /-- Lagrangian correspondences as computational path morphisms. -/
-def lagrangianPathMorphism (x y : DerivedSymplecticMorphism)
+noncomputable def lagrangianPathMorphism (x y : DerivedSymplecticMorphism)
     (h : x = y) : Path x y :=
   Path.stepChain h
 
-def derivedSymplecticRewrite {x y : ShiftedSymplecticData}
+noncomputable def derivedSymplecticRewrite {x y : ShiftedSymplecticData}
     (p q : Path x y) : Prop :=
   ∃ r : Path y y, q = Path.trans p r
 
-def derivedSymplecticConfluent : Prop :=
+noncomputable def derivedSymplecticConfluent : Prop :=
   ∀ {x y : ShiftedSymplecticData} (p q₁ q₂ : Path x y),
     derivedSymplecticRewrite p q₁ →
     derivedSymplecticRewrite p q₂ →

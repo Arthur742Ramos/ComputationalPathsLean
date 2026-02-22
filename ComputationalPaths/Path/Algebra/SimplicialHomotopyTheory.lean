@@ -64,7 +64,7 @@ structure SimplicialSetData where
     face n i x = face n i x
 
 /-- Path witness for the simplicial identity. -/
-def SimplicialSetData.face_face_path (S : SimplicialSetData.{u})
+noncomputable def SimplicialSetData.face_face_path (S : SimplicialSetData.{u})
     (n : Nat) (i : Fin (n + 2)) (x : S.simplex (n + 1)) :
     Path (S.face n i x) (S.face n i x) :=
   Path.refl _
@@ -109,7 +109,7 @@ structure GeometricRealizationData where
          (simplexMap n (sset.face n i x))
 
 /-- Trivial geometric realization using the disjoint union. -/
-def trivialRealization (S : SimplicialSetData.{u}) :
+noncomputable def trivialRealization (S : SimplicialSetData.{u}) :
     GeometricRealizationData.{u} where
   sset := S
   realization := Σ n, S.simplex n
@@ -147,14 +147,14 @@ structure DoldKanPath where
     Path ((equiv.Γ (equiv.N S)).carrier n) (S.carrier n)
 
 /-- Build a DoldKanPath from DoldKanEquivalenceData. -/
-def DoldKanPath.stepChainuiv (dk : DoldKanEquivalenceData.{u}) :
+noncomputable def DoldKanPath.stepChainuiv (dk : DoldKanEquivalenceData.{u}) :
     DoldKanPath.{u} where
   equiv := dk
   NΓ_path := fun C n => Path.stepChain (dk.NΓ_carrier C n)
   ΓN_path := fun S n => Path.stepChain (dk.ΓN_carrier S n)
 
 /-- The trivial Dold-Kan Path equivalence. -/
-def trivialDoldKanPath : DoldKanPath.{u} :=
+noncomputable def trivialDoldKanPath : DoldKanPath.{u} :=
   DoldKanPath.stepChainuiv trivialDoldKan
 
 /-! ## Simplicial model structure -/
@@ -188,7 +188,7 @@ structure SimplicialModelStructure where
     ∃ _U : SimplicialSetData.{u}, True
 
 /-- The trivial simplicial model structure. -/
-def trivialSimplicialModel : SimplicialModelStructure.{u} where
+noncomputable def trivialSimplicialModel : SimplicialModelStructure.{u} where
   isWeq := fun _ _ => True
   isCof := fun _ _ => True
   isFib := fun _ _ => True

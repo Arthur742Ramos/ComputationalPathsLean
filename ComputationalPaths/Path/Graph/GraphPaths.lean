@@ -51,35 +51,35 @@ structure Walk {V : Type u} (G : Graph V) (s t : V) where
   end_eq : Path (vertices.getLast?) (some t)
 
 /-- The trivial walk staying at one vertex. -/
-def Walk.trivial {V : Type u} (G : Graph V) (v : V) : Walk G v v :=
+noncomputable def Walk.trivial {V : Type u} (G : Graph V) (v : V) : Walk G v v :=
   { vertices := [v]
     start_eq := Path.refl (some v)
     end_eq := Path.refl (some v) }
 
 /-- Walk length as number of edges. -/
-def Walk.length {V : Type u} {G : Graph V} {s t : V} (w : Walk G s t) : Nat :=
+noncomputable def Walk.length {V : Type u} {G : Graph V} {s t : V} (w : Walk G s t) : Nat :=
   w.vertices.length - 1
 
 /-- Connectivity: two vertices are connected if a walk exists. -/
-def Connected {V : Type u} (G : Graph V) (s t : V) : Prop :=
+noncomputable def Connected {V : Type u} (G : Graph V) (s t : V) : Prop :=
   Nonempty (Walk G s t)
 
 /-- A graph is fully connected if all vertex pairs are connected. -/
-def FullyConnected {V : Type u} (G : Graph V) : Prop :=
+noncomputable def FullyConnected {V : Type u} (G : Graph V) : Prop :=
   ∀ (s t : V), Connected G s t
 
 /-! ## Step and Path constructions for edges -/
 
 /-- Build a computational Step from an equality of vertex values. -/
-def vertexStep {V : Type u} {a b : V} (h : a = b) : Step V :=
+noncomputable def vertexStep {V : Type u} {a b : V} (h : a = b) : Step V :=
   Step.mk a b h
 
 /-- Build a computational Path from a vertex equality. -/
-def vertexPath {V : Type u} {a b : V} (h : a = b) : Path a b :=
+noncomputable def vertexPath {V : Type u} {a b : V} (h : a = b) : Path a b :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Path from vertex to itself via reflexivity. -/
-def vertexRefl {V : Type u} (v : V) : Path v v :=
+noncomputable def vertexRefl {V : Type u} (v : V) : Path v v :=
   Path.refl v
 
 /-! ## Graph morphisms -/
@@ -91,12 +91,12 @@ structure GraphMorphism {V : Type u} {W : Type v}
   preserves_adj : ∀ {u v : V}, G.adj u v → H.adj (mapV u) (mapV v)
 
 /-- Identity graph morphism. -/
-def GraphMorphism.id {V : Type u} (G : Graph V) : GraphMorphism G G :=
+noncomputable def GraphMorphism.id {V : Type u} (G : Graph V) : GraphMorphism G G :=
   { mapV := fun v => v
     preserves_adj := fun h => h }
 
 /-- Composition of graph morphisms. -/
-def GraphMorphism.comp {V : Type u} {W : Type v} {X : Type u}
+noncomputable def GraphMorphism.comp {V : Type u} {W : Type v} {X : Type u}
     {G : Graph V} {H : Graph W} {K : Graph X}
     (f : GraphMorphism G H) (g : GraphMorphism H K) : GraphMorphism G K :=
   { mapV := fun v => g.mapV (f.mapV v)
@@ -123,14 +123,14 @@ theorem subgraph_adj_inherited {V : Type u} {G : Graph V} (S : Subgraph G)
   S.adj_closed hu hv h
 
 /-- Full subgraph (all vertices). -/
-def fullSubgraph {V : Type u} (G : Graph V) : Subgraph G :=
+noncomputable def fullSubgraph {V : Type u} (G : Graph V) : Subgraph G :=
   { vertexPred := fun _ => True
     adj_closed := fun _ _ h => h }
 
 /-! ## Degree and neighborhood -/
 
 /-- Neighborhood predicate. -/
-def neighborhood {V : Type u} (G : Graph V) (v : V) : V → Prop :=
+noncomputable def neighborhood {V : Type u} (G : Graph V) (v : V) : V → Prop :=
   fun u => G.adj v u
 
 /-- Neighborhood symmetry: u in N(v) iff v in N(u). -/
@@ -204,7 +204,7 @@ theorem congrArg_symm_graph {V : Type u} {W : Type v}
 /-! ## Complement graph -/
 
 /-- The complement graph: edges where the original has none. -/
-def complementGraph {V : Type u} [DecidableEq V] (G : Graph V)
+noncomputable def complementGraph {V : Type u} [DecidableEq V] (G : Graph V)
     (adj_dec : ∀ u v, Decidable (G.adj u v)) : Graph V :=
   { adj := fun u v => u ≠ v ∧ ¬ G.adj u v
     adj_symm := fun ⟨hne, hnadj⟩ => ⟨fun h => hne h.symm, fun h => hnadj (G.adj_symm h)⟩

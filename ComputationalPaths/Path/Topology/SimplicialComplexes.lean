@@ -47,7 +47,7 @@ structure Simplex where
   nonempty : vertices ≠ []
 
 /-- Dimension of a simplex. -/
-def simplexDim (s : Simplex) : Nat :=
+noncomputable def simplexDim (s : Simplex) : Nat :=
   s.vertices.length - 1
 
 /-- An abstract simplicial complex: downward-closed family of finite sets. -/
@@ -65,11 +65,11 @@ structure SimplicialComplex where
     ∀ v, v ∈ s.vertices → v ∈ vertexSet
 
 /-- Number of k-simplices. -/
-def numSimplices (K : SimplicialComplex) (k : Nat) : Nat :=
+noncomputable def numSimplices (K : SimplicialComplex) (k : Nat) : Nat :=
   (K.simplices.filter (fun s => simplexDim s == k)).length
 
 /-- The Euler characteristic of a simplicial complex. -/
-def eulerChar (K : SimplicialComplex) (maxDim : Nat) : Int :=
+noncomputable def eulerChar (K : SimplicialComplex) (maxDim : Nat) : Int :=
   List.foldl (· + ·) 0
     (List.map (fun k => if k % 2 == 0 then (numSimplices K k : Int)
                         else -(numSimplices K k : Int))
@@ -86,13 +86,13 @@ structure SimplicialMap (K L : SimplicialComplex) where
     ∃ t, t ∈ L.simplices ∧ t.vertices = s.vertices.map vertexMap
 
 /-- Composition of simplicial maps. -/
-def simplicialMapComp (K L M : SimplicialComplex)
+noncomputable def simplicialMapComp (K L M : SimplicialComplex)
     (f : SimplicialMap K L) (g : SimplicialMap L M) :
     Nat → Nat :=
   fun v => g.vertexMap (f.vertexMap v)
 
 /-- Identity simplicial map. -/
-def simplicialMapId (K : SimplicialComplex) :
+noncomputable def simplicialMapId (K : SimplicialComplex) :
     SimplicialMap K K where
   vertexMap := id
   preserves := fun s hs => ⟨s, hs, by simp [List.map_id]⟩
@@ -204,7 +204,7 @@ inductive SimplicialStep : Prop
   | approximate : SimplicialStep
 
 /-- SimplicialStep validity. -/
-def simplicialStep_valid : SimplicialStep → True
+noncomputable def simplicialStep_valid : SimplicialStep → True
   | SimplicialStep.face_inclusion => trivial
   | SimplicialStep.boundary_apply => trivial
   | SimplicialStep.nerve_construct => trivial
@@ -212,12 +212,12 @@ def simplicialStep_valid : SimplicialStep → True
   | SimplicialStep.approximate => trivial
 
 /-- Chain rank equals simplex count (Path witness). -/
-def chain_rank_path (K : SimplicialComplex) (C : SimplicialChainComplex K)
+noncomputable def chain_rank_path (K : SimplicialComplex) (C : SimplicialChainComplex K)
     (k : Nat) : Path (C.chainRank k) (numSimplices K k) :=
   C.rank_eq k
 
 /-- Simplicial isomorphism round-trip (Path witness). -/
-def iso_roundtrip (K L : SimplicialComplex) (I : SimplicialIso K L) (v : Nat) :
+noncomputable def iso_roundtrip (K L : SimplicialComplex) (I : SimplicialIso K L) (v : Nat) :
     Path (I.backward.vertexMap (I.forward.vertexMap v)) v :=
   I.left_inv v
 

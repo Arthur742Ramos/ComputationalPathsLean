@@ -33,7 +33,7 @@ inductive Gate where
 deriving DecidableEq, Repr
 
 /-- Evaluate a unary gate. -/
-@[simp] def evalUnary (g : Gate) (x : Bool) : Bool :=
+@[simp] noncomputable def evalUnary (g : Gate) (x : Bool) : Bool :=
   match g with
   | Gate.notG => !x
   | Gate.idG => x
@@ -42,7 +42,7 @@ deriving DecidableEq, Repr
   | _ => x
 
 /-- Evaluate a binary gate. -/
-@[simp] def evalBinary (g : Gate) (x y : Bool) : Bool :=
+@[simp] noncomputable def evalBinary (g : Gate) (x y : Bool) : Bool :=
   match g with
   | Gate.andG => x && y
   | Gate.orG  => x || y
@@ -53,17 +53,17 @@ deriving DecidableEq, Repr
 /-! ## Circuit representation -/
 
 /-- A simple circuit: a function from n input bits to m output bits. -/
-def Circuit (n m : Nat) := (Fin n → Bool) → (Fin m → Bool)
+noncomputable def Circuit (n m : Nat) := (Fin n → Bool) → (Fin m → Bool)
 
 /-- Identity circuit. -/
-@[simp] def circId (n : Nat) : Circuit n n := fun inp => inp
+@[simp] noncomputable def circId (n : Nat) : Circuit n n := fun inp => inp
 
 /-- Compose two circuits sequentially. -/
-@[simp] def circComp {a b c : Nat} (f : Circuit a b) (g : Circuit b c) : Circuit a c :=
+@[simp] noncomputable def circComp {a b c : Nat} (f : Circuit a b) (g : Circuit b c) : Circuit a c :=
   fun inp => g (f inp)
 
 /-- Parallel composition (product). -/
-def circPar {a b c d : Nat} (f : Circuit a b) (g : Circuit c d) :
+noncomputable def circPar {a b c d : Nat} (f : Circuit a b) (g : Circuit c d) :
     Circuit (a + c) (b + d) :=
   fun inp =>
     fun k =>
@@ -73,24 +73,24 @@ def circPar {a b c d : Nat} (f : Circuit a b) (g : Circuit c d) :
         g (fun i => inp ⟨a + i.val, by omega⟩) ⟨k.val - b, by omega⟩
 
 /-- Constant true circuit (all outputs true). -/
-@[simp] def circTrue (m : Nat) : Circuit 0 m := fun _ _ => true
+@[simp] noncomputable def circTrue (m : Nat) : Circuit 0 m := fun _ _ => true
 
 /-- Constant false circuit (all outputs false). -/
-@[simp] def circFalse (m : Nat) : Circuit 0 m := fun _ _ => false
+@[simp] noncomputable def circFalse (m : Nat) : Circuit 0 m := fun _ _ => false
 
 /-- NOT circuit: negate each bit. -/
-@[simp] def circNot (n : Nat) : Circuit n n := fun inp i => !inp i
+@[simp] noncomputable def circNot (n : Nat) : Circuit n n := fun inp i => !inp i
 
 /-- AND circuit: single output AND of two inputs. -/
-@[simp] def circAnd : Circuit 2 1 :=
+@[simp] noncomputable def circAnd : Circuit 2 1 :=
   fun inp _ => inp ⟨0, by omega⟩ && inp ⟨1, by omega⟩
 
 /-- OR circuit: single output OR of two inputs. -/
-@[simp] def circOr : Circuit 2 1 :=
+@[simp] noncomputable def circOr : Circuit 2 1 :=
   fun inp _ => inp ⟨0, by omega⟩ || inp ⟨1, by omega⟩
 
 /-- XOR circuit. -/
-@[simp] def circXor : Circuit 2 1 :=
+@[simp] noncomputable def circXor : Circuit 2 1 :=
   fun inp _ => xor (inp ⟨0, by omega⟩) (inp ⟨1, by omega⟩)
 
 /-! ## Circuit depth (path length) -/
@@ -102,12 +102,12 @@ structure AnnotatedCircuit (n m : Nat) where
   depth : Nat
 
 /-- Sequential composition increases depth additively. -/
-@[simp] def seqComp {a b c : Nat} (f : AnnotatedCircuit a b) (g : AnnotatedCircuit b c) :
+@[simp] noncomputable def seqComp {a b c : Nat} (f : AnnotatedCircuit a b) (g : AnnotatedCircuit b c) :
     AnnotatedCircuit a c :=
   ⟨circComp f.circuit g.circuit, f.depth + g.depth⟩
 
 /-- Parallel composition takes max depth. -/
-def parComp {a b c d : Nat} (f : AnnotatedCircuit a b) (g : AnnotatedCircuit c d) :
+noncomputable def parComp {a b c d : Nat} (f : AnnotatedCircuit a b) (g : AnnotatedCircuit c d) :
     AnnotatedCircuit (a + c) (b + d) :=
   ⟨circPar f.circuit g.circuit, max f.depth g.depth⟩
 
@@ -123,7 +123,7 @@ theorem circComp_id_left {n m : Nat} (f : Circuit n m) :
     circComp (circId n) f = f := by
   funext inp; simp [Function.comp]
 
-def circComp_id_left_path {n m : Nat} (f : Circuit n m) :
+noncomputable def circComp_id_left_path {n m : Nat} (f : Circuit n m) :
     Path (circComp (circId n) f) f :=
   Path.mk [Step.mk _ _ (circComp_id_left f)] (circComp_id_left f)
 
@@ -132,7 +132,7 @@ theorem circComp_id_right {n m : Nat} (f : Circuit n m) :
     circComp f (circId m) = f := by
   funext inp; simp [Function.comp]
 
-def circComp_id_right_path {n m : Nat} (f : Circuit n m) :
+noncomputable def circComp_id_right_path {n m : Nat} (f : Circuit n m) :
     Path (circComp f (circId m)) f :=
   Path.mk [Step.mk _ _ (circComp_id_right f)] (circComp_id_right f)
 
@@ -142,7 +142,7 @@ theorem circComp_assoc {a b c d : Nat}
     circComp (circComp f g) h = circComp f (circComp g h) := by
   funext inp; simp [Function.comp]
 
-def circComp_assoc_path {a b c d : Nat}
+noncomputable def circComp_assoc_path {a b c d : Nat}
     (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) :
     Path (circComp (circComp f g) h) (circComp f (circComp g h)) :=
   Path.mk [Step.mk _ _ (circComp_assoc f g h)] (circComp_assoc f g h)
@@ -152,12 +152,12 @@ theorem circNot_involution (n : Nat) :
     circComp (circNot n) (circNot n) = circId n := by
   funext inp i; simp [Function.comp, Bool.not_not]
 
-def circNot_involution_path (n : Nat) :
+noncomputable def circNot_involution_path (n : Nat) :
     Path (circComp (circNot n) (circNot n)) (circId n) :=
   Path.mk [Step.mk _ _ (circNot_involution n)] (circNot_involution n)
 
 -- 6. Roundtrip path from NOT involution
-def circNot_roundtrip (n : Nat) : Path (circId n) (circId n) :=
+noncomputable def circNot_roundtrip (n : Nat) : Path (circId n) (circId n) :=
   Path.trans
     (Path.symm (circNot_involution_path n))
     (circNot_involution_path n)
@@ -175,14 +175,14 @@ theorem parComp_depth {a b c d : Nat}
   rfl
 
 -- 9. Depth zero circuit is just rewiring
-def depthZeroCirc (n : Nat) : AnnotatedCircuit n n :=
+noncomputable def depthZeroCirc (n : Nat) : AnnotatedCircuit n n :=
   ⟨circId n, 0⟩
 
 theorem depthZero_is_id (n : Nat) : (depthZeroCirc n).circuit = circId n := by
   rfl
 
 -- 10. Circuit equivalence: two circuits are equivalent if they compute the same function
-def CircEquiv {n m : Nat} (f g : Circuit n m) : Prop :=
+noncomputable def CircEquiv {n m : Nat} (f g : Circuit n m) : Prop :=
   ∀ inp, f inp = g inp
 
 -- 11. CircEquiv is reflexive
@@ -204,7 +204,7 @@ theorem circEquiv_to_eq {n m : Nat} {f g : Circuit n m}
     (h : CircEquiv f g) : f = g := by
   funext inp; exact h inp
 
-def circEquiv_path {n m : Nat} {f g : Circuit n m}
+noncomputable def circEquiv_path {n m : Nat} {f g : Circuit n m}
     (h : CircEquiv f g) : Path f g :=
   Path.mk [Step.mk _ _ (circEquiv_to_eq h)] (circEquiv_to_eq h)
 
@@ -261,13 +261,13 @@ theorem xor_self (x : Bool) : xor x x = false := by
 /-! ## Path constructions from circuit identities -/
 
 -- 26. CongrArg for circuit composition
-def circComp_congrArg_left {a b c : Nat} {f₁ f₂ : Circuit a b}
+noncomputable def circComp_congrArg_left {a b c : Nat} {f₁ f₂ : Circuit a b}
     (h : Path f₁ f₂) (g : Circuit b c) :
     Path (circComp f₁ g) (circComp f₂ g) :=
   Path.congrArg (fun f => circComp f g) h
 
 -- 27. CongrArg in second position
-def circComp_congrArg_right {a b c : Nat}
+noncomputable def circComp_congrArg_right {a b c : Nat}
     (f : Circuit a b) {g₁ g₂ : Circuit b c}
     (h : Path g₁ g₂) :
     Path (circComp f g₁) (circComp f g₂) :=
@@ -289,7 +289,7 @@ theorem circComp_congrArg_trans {a b c : Nat} {f₁ f₂ f₃ : Circuit a b}
   exact (Path.congrArg_trans _ h₁ h₂).symm
 
 -- 30. Three-circuit composition path
-def three_circuit_path {a b c d : Nat}
+noncomputable def three_circuit_path {a b c d : Nat}
     (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) :
     Path (circComp (circComp f g) h) (circComp f (circComp g h)) :=
   circComp_assoc_path f g h
@@ -314,11 +314,11 @@ theorem four_circuit_coherence {a b c d e : Nat}
   funext inp; simp [Function.comp]
 
 -- 34. Step-level construction
-def circuit_step {n m : Nat} (f : Circuit n m) : Step (Circuit n m) :=
+noncomputable def circuit_step {n m : Nat} (f : Circuit n m) : Step (Circuit n m) :=
   ⟨f, f, rfl⟩
 
 -- 35. Transport of circuit along a parameter path
-def circuit_transport {A : Type} {a b : A} (f : A → Circuit 2 1) (p : Path a b) :
+noncomputable def circuit_transport {A : Type} {a b : A} (f : A → Circuit 2 1) (p : Path a b) :
     Path (f a) (f b) :=
   Path.congrArg f p
 
@@ -346,7 +346,7 @@ theorem circuit_congrArg_comp {n m k : Nat}
   exact Path.congrArg_comp g f p
 
 -- 40. NOT composed with identity path
-def not_id_path (n : Nat) :
+noncomputable def not_id_path (n : Nat) :
     Path (circComp (circNot n) (circId n)) (circNot n) :=
   Path.mk [Step.mk _ _ (circComp_id_right (circNot n))] (circComp_id_right (circNot n))
 

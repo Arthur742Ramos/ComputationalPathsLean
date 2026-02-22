@@ -43,14 +43,14 @@ structure FormalDiff (α : Type u) where
 namespace FormalDiff
 
 /-- A formal difference is zero when both entries coincide. -/
-def IsZero {α : Type u} (x : FormalDiff α) : Prop :=
+noncomputable def IsZero {α : Type u} (x : FormalDiff α) : Prop :=
   x.pos = x.neg
 
 @[simp] theorem isZero_mk {α : Type u} (x y : α) :
     IsZero (FormalDiff.mk x y) ↔ x = y := Iff.rfl
 
 /-- Map a formal difference componentwise. -/
-def map {α : Type u} {β : Type v} (f : α → β) (x : FormalDiff α) : FormalDiff β :=
+noncomputable def map {α : Type u} {β : Type v} (f : α → β) (x : FormalDiff α) : FormalDiff β :=
   ⟨f x.pos, f x.neg⟩
 
 @[simp] theorem map_pos {α : Type u} {β : Type v}
@@ -82,15 +82,15 @@ abbrev C1 (A : Type u) : Type u := OneCell A
 abbrev C2 (A : Type u) : Type u := TwoCell A
 
 /-- `∂₁(path) = target - source`. -/
-def boundary1 {A : Type u} (x : C1 A) : FormalDiff (C0 A) :=
+noncomputable def boundary1 {A : Type u} (x : C1 A) : FormalDiff (C0 A) :=
   ⟨x.tgt, x.src⟩
 
 /-- `∂₂(witness) = path₂ - path₁`. -/
-def boundary2 {A : Type u} (x : C2 A) : FormalDiff (C1 A) :=
+noncomputable def boundary2 {A : Type u} (x : C2 A) : FormalDiff (C1 A) :=
   ⟨⟨x.src, x.tgt, x.path₂⟩, ⟨x.src, x.tgt, x.path₁⟩⟩
 
 /-- Extend `∂₁` to formal differences of 1-cells. -/
-def boundary1OnDiff {A : Type u} (x : FormalDiff (C1 A)) :
+noncomputable def boundary1OnDiff {A : Type u} (x : FormalDiff (C1 A)) :
     FormalDiff (FormalDiff (C0 A)) :=
   ⟨boundary1 x.pos, boundary1 x.neg⟩
 
@@ -113,7 +113,7 @@ theorem d_comp_d_eq_zero {A : Type u} (x : C2 A) :
         (h := rweq_symm h)
 
 /-- Build a 2-cell directly from a primitive `Step`. -/
-def twoCellOfStep {A : Type u} {a b : A}
+noncomputable def twoCellOfStep {A : Type u} {a b : A}
     {p q : Path a b} (h : Step p q) : C2 A where
   src := a
   tgt := b
@@ -132,11 +132,11 @@ theorem d_comp_d_eq_zero_of_step {A : Type u} {a b : A}
 /-! ## First homology and the fundamental group -/
 
 /-- Boundaries of 2-cells induce the loop relation used for first homology. -/
-def boundary1Rel {A : Type u} (a : A) (p q : Path a a) : Prop :=
+noncomputable def boundary1Rel {A : Type u} (a : A) (p q : Path a a) : Prop :=
   Nonempty (RwEq p q)
 
 /-- Setoid for first homology at basepoint `a`. -/
-def boundary1Setoid {A : Type u} (a : A) : Setoid (Path a a) where
+noncomputable def boundary1Setoid {A : Type u} (a : A) : Setoid (Path a a) where
   r := boundary1Rel a
   iseqv :=
     { refl := by
@@ -157,7 +157,7 @@ abbrev H1 (A : Type u) (a : A) : Type u :=
   Quot (boundary1Setoid (A := A) a).r
 
 /-- Comparison map `H₁ → π₁`. -/
-def h1ToPi1 {A : Type u} {a : A} : H1 A a → π₁(A, a) :=
+noncomputable def h1ToPi1 {A : Type u} {a : A} : H1 A a → π₁(A, a) :=
   Quot.lift
     (fun p : Path a a => Quot.mk _ p)
     (by
@@ -165,7 +165,7 @@ def h1ToPi1 {A : Type u} {a : A} : H1 A a → π₁(A, a) :=
       exact Quot.sound h)
 
 /-- Comparison map `π₁ → H₁`. -/
-def pi1ToH1 {A : Type u} {a : A} : π₁(A, a) → H1 A a :=
+noncomputable def pi1ToH1 {A : Type u} {a : A} : π₁(A, a) → H1 A a :=
   Quot.lift
     (fun p : Path a a => Quot.mk _ p)
     (by
@@ -185,7 +185,7 @@ def pi1ToH1 {A : Type u} {a : A} : π₁(A, a) → H1 A a :=
   rfl
 
 /-- `H₁` is equivalent to the fundamental group `π₁`. -/
-def h1EquivPi1 (A : Type u) (a : A) : SimpleEquiv (H1 A a) (π₁(A, a)) where
+noncomputable def h1EquivPi1 (A : Type u) (a : A) : SimpleEquiv (H1 A a) (π₁(A, a)) where
   toFun := h1ToPi1
   invFun := pi1ToH1
   left_inv := pi1ToH1_h1ToPi1
@@ -205,24 +205,24 @@ structure ThreeCell (A : Type u) where
 namespace ThreeCell
 
 /-- Left 2-cell boundary of a 3-cell. -/
-def leftBoundary {A : Type u} (x : ThreeCell A) : C2 A :=
+noncomputable def leftBoundary {A : Type u} (x : ThreeCell A) : C2 A :=
   ⟨x.src, x.tgt, x.path₁, x.path₂, x.leftWitness⟩
 
 /-- Right 2-cell boundary of a 3-cell. -/
-def rightBoundary {A : Type u} (x : ThreeCell A) : C2 A :=
+noncomputable def rightBoundary {A : Type u} (x : ThreeCell A) : C2 A :=
   ⟨x.src, x.tgt, x.path₁, x.path₂, x.rightWitness⟩
 
 end ThreeCell
 
 /-- `∂₃` sends a 3-cell to the formal difference of its two 2-cell boundaries. -/
-def boundary3 {A : Type u} (x : ThreeCell A) : FormalDiff (C2 A) :=
+noncomputable def boundary3 {A : Type u} (x : ThreeCell A) : FormalDiff (C2 A) :=
   ⟨x.rightBoundary, x.leftBoundary⟩
 
 /-- Two 2-cells are equivalent in `H₂` when they differ by a 3-cell boundary. -/
-def boundary2Rel {A : Type u} (x y : C2 A) : Prop :=
+noncomputable def boundary2Rel {A : Type u} (x y : C2 A) : Prop :=
   boundary2 (A := A) x = boundary2 (A := A) y
 
-def boundary2Setoid (A : Type u) : Setoid (C2 A) where
+noncomputable def boundary2Setoid (A : Type u) : Setoid (C2 A) where
   r := boundary2Rel (A := A)
   iseqv :=
     { refl := by intro x; rfl
@@ -262,7 +262,7 @@ structure FinitePathComplex (A : Type u) where
   cells2 : List (C2 A)
 
 /-- Euler characteristic `χ = #C₀ - #C₁ + #C₂`. -/
-def eulerCharacteristic {A : Type u} (K : FinitePathComplex A) : Int :=
+noncomputable def eulerCharacteristic {A : Type u} (K : FinitePathComplex A) : Int :=
   Int.ofNat K.cells0.length - Int.ofNat K.cells1.length + Int.ofNat K.cells2.length
 
 @[simp] theorem euler_empty {A : Type u} :

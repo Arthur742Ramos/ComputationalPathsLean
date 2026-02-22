@@ -34,7 +34,7 @@ variable {A : Type u}
 /-! ## J-elimination for computational paths -/
 
 /-- J-eliminator on the underlying propositional equality of paths. -/
-def pathJ_toEq {a : A} (C : (b : A) → a = b → Sort v)
+noncomputable def pathJ_toEq {a : A} (C : (b : A) → a = b → Sort v)
     (base : C a rfl) {b : A} (p : Path a b) : C b p.toEq := by
   cases p with
   | mk steps proof =>
@@ -42,7 +42,7 @@ def pathJ_toEq {a : A} (C : (b : A) → a = b → Sort v)
       exact base
 
 /-- Path induction for motives that are stable under equality of `toEq`. -/
-def pathJ {a : A}
+noncomputable def pathJ {a : A}
     (C : (b : A) → Path a b → Sort v)
     (respect :
       ∀ {b : A} {p q : Path a b}, p.toEq = q.toEq → C b p → C b q)
@@ -85,13 +85,13 @@ noncomputable def transport_of_rweq {a b : A} {D : A → Sort v}
   exact transport_of_toEq_eq (D := D) (p := p) (q := q) (h := rweq_toEq h) x
 
 /-- Rewrite-equivalent paths induce path-equivalent transported terms. -/
-def transport_path_of_rweq {a b : A} {D : A → Type v}
+noncomputable def transport_path_of_rweq {a b : A} {D : A → Type v}
     {p q : Path a b} (h : RwEq p q) (x : D a) :
     Path (transport (D := D) p x) (transport (D := D) q x) :=
   Path.stepChain (transport_of_rweq (D := D) (p := p) (q := q) h x)
 
 /-- Compose transport witnesses along two rewrite equalities. -/
-def transport_path_of_rweq_comp {a b : A} {D : A → Type v}
+noncomputable def transport_path_of_rweq_comp {a b : A} {D : A → Type v}
     {p q r : Path a b} (h₁ : RwEq p q) (h₂ : RwEq q r) (x : D a) :
     Path (transport (D := D) p x) (transport (D := D) r x) :=
   Path.trans

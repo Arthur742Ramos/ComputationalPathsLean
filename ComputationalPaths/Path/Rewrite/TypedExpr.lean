@@ -71,14 +71,14 @@ namespace TExpr
 The forgetful functor that strips type annotations. -/
 
 /-- Erase type information, producing an untyped `Expr`. -/
-@[simp] def erase : TExpr a b → Expr
+@[simp] noncomputable def erase : TExpr a b → Expr
   | .atom n _ _ => .atom n
   | .refl _ => .refl
   | .symm e => .symm (erase e)
   | .trans e₁ e₂ => .trans (erase e₁) (erase e₂)
 
 /-- Size of a typed expression (matches `Expr.size` after erasure). -/
-@[simp] def size : TExpr a b → Nat
+@[simp] noncomputable def size : TExpr a b → Nat
   | .atom _ _ _ => 1
   | .refl _ => 1
   | .symm e => e.size + 1
@@ -199,7 +199,7 @@ Since the untyped system has unique normal forms and erasure preserves
 steps, we can define typed normal forms via the untyped system. -/
 
 /-- Typed normal form: the expression has no typed rewrite steps. -/
-def IsTypedNF (e : TExpr a b) : Prop := ∀ e' : TExpr a b, ¬ TCStep e e'
+noncomputable def IsTypedNF (e : TExpr a b) : Prop := ∀ e' : TExpr a b, ¬ TCStep e e'
 
 /-- If the erasure of a typed expression is in untyped normal form,
     then the typed expression is in typed normal form. -/
@@ -224,7 +224,7 @@ theorem erase_preserves_size (e : TExpr a b) :
     e.erase.size = e.size := (size_eq_erase_size e).symm
 
 /-- The typed word problem is decidable (via erasure to the untyped system). -/
-instance typedRwEq_decidable (e₁ e₂ : TExpr a b) :
+noncomputable instance typedRwEq_decidable (e₁ e₂ : TExpr a b) :
     Decidable (toRW e₁.erase = toRW e₂.erase) :=
   inferInstance
 

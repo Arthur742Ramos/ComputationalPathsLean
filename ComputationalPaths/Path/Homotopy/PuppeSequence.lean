@@ -37,7 +37,7 @@ abbrev PuppeSequence (A B : Type u) (f : A → B) : Type u :=
   CofiberSequence.PuppeSequence A B f
 
 /-- The Puppe sequence `A → B → Cofiber f → Suspension A`. -/
-def puppeSequence (f : A → B) : PuppeSequence A B f :=
+noncomputable def puppeSequence (f : A → B) : PuppeSequence A B f :=
   CofiberSequence.puppeSequence (A := A) (B := B) f
 
 /-! ## Exactness (composite is trivial) -/
@@ -47,18 +47,18 @@ abbrev PuppeSequenceExact (A B : Type u) (f : A → B) : Type u :=
   CofiberSequence.CofiberSequenceExact A B f
 
 /-- Exactness data for the Puppe sequence: composites are null. -/
-def puppeSequence_exact (f : A → B) : PuppeSequenceExact A B f :=
+noncomputable def puppeSequence_exact (f : A → B) : PuppeSequenceExact A B f :=
   CofiberSequence.cofiberSequence_exact (A := A) (B := B) f
 
 /-- The composite `A → B → Cofiber f` is null via the glue paths. -/
-def puppe_exact_left (f : A → B) (a : A) :
+noncomputable def puppe_exact_left (f : A → B) (a : A) :
     Path
       (cofiberInclusion (A := A) (B := B) f (f a))
       (Cofiber.basepoint (A := A) (B := B) (f := f)) :=
   (puppeSequence_exact (A := A) (B := B) f).exact_left a
 
 /-- The composite `B → Cofiber f → Suspension A` is constant at north. -/
-def puppe_exact_right (f : A → B) (b : B) :
+noncomputable def puppe_exact_right (f : A → B) (b : B) :
     Path
       (cofiberToSuspension (A := A) (B := B) f
         (cofiberInclusion (A := A) (B := B) f b))

@@ -386,18 +386,18 @@ section FlowRewrite
 
 variable {M : RiemannianManifold}
 
-def flowRewriteStep (x y : RicciFlow M)
+noncomputable def flowRewriteStep (x y : RicciFlow M)
     (h : x = y) : Step (RicciFlow M) :=
   Step.mk x y h
 
-def ricciFlowPathWitness (x y : RicciFlow M)
+noncomputable def ricciFlowPathWitness (x y : RicciFlow M)
     (h : x = y) : Path x y :=
   Path.stepChain h
 
-def flowRewrite {x y : RicciFlow M} (p q : Path x y) : Prop :=
+noncomputable def flowRewrite {x y : RicciFlow M} (p q : Path x y) : Prop :=
   ∃ r : Path y y, q = Path.trans p r
 
-def flowRewriteConfluent : Prop :=
+noncomputable def flowRewriteConfluent : Prop :=
   ∀ {x y : RicciFlow M} (p q₁ q₂ : Path x y),
     flowRewrite p q₁ →
     flowRewrite p q₂ →

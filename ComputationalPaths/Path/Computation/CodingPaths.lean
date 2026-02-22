@@ -17,21 +17,21 @@ open ComputationalPaths.Path
 /-! ## Code words -/
 
 /-- A code word of length n over Bool. -/
-def CodeWord (n : Nat) := Fin n → Bool
+noncomputable def CodeWord (n : Nat) := Fin n → Bool
 
 /-- The all-zero code word. -/
-@[simp] def zeroWord (n : Nat) : CodeWord n := fun _ => false
+@[simp] noncomputable def zeroWord (n : Nat) : CodeWord n := fun _ => false
 
 /-- XOR of two code words. -/
-@[simp] def xorWords (n : Nat) (w1 w2 : CodeWord n) : CodeWord n :=
+@[simp] noncomputable def xorWords (n : Nat) (w1 w2 : CodeWord n) : CodeWord n :=
   fun i => xor (w1 i) (w2 i)
 
 /-- Bitwise NOT of a code word. -/
-@[simp] def notWord (n : Nat) (w : CodeWord n) : CodeWord n :=
+@[simp] noncomputable def notWord (n : Nat) (w : CodeWord n) : CodeWord n :=
   fun i => !w i
 
 /-- Hamming weight: number of true positions. -/
-def hammingWeight (n : Nat) (w : CodeWord n) : Nat :=
+noncomputable def hammingWeight (n : Nat) (w : CodeWord n) : Nat :=
   (List.ofFn (fun i => if w i then 1 else 0)).foldl (· + ·) 0
 
 /-! ## XOR algebra — genuine proofs -/
@@ -88,54 +88,54 @@ theorem hammingWeight_zero (n : Nat) : hammingWeight n (zeroWord n) = 0 := by
 /-! ## Path constructions from XOR algebra -/
 
 -- 10. XOR self path via refl (definitional equality)
-def xor_self_path (n : Nat) (w : CodeWord n) :
+noncomputable def xor_self_path (n : Nat) (w : CodeWord n) :
     Path (xorWords n w w) (zeroWord n) :=
   ⟨[⟨xorWords n w w, zeroWord n, xor_self_zero n w⟩], xor_self_zero n w⟩
 
 -- 11. XOR commutativity path
-def xor_comm_path (n : Nat) (w1 w2 : CodeWord n) :
+noncomputable def xor_comm_path (n : Nat) (w1 w2 : CodeWord n) :
     Path (xorWords n w1 w2) (xorWords n w2 w1) :=
   ⟨[⟨xorWords n w1 w2, xorWords n w2 w1, xor_comm n w1 w2⟩], xor_comm n w1 w2⟩
 
 -- 12. XOR associativity path
-def xor_assoc_path (n : Nat) (w1 w2 w3 : CodeWord n) :
+noncomputable def xor_assoc_path (n : Nat) (w1 w2 w3 : CodeWord n) :
     Path (xorWords n (xorWords n w1 w2) w3) (xorWords n w1 (xorWords n w2 w3)) :=
   ⟨[⟨_, _, xor_assoc n w1 w2 w3⟩], xor_assoc n w1 w2 w3⟩
 
 -- 13. XOR zero right path via refl
-def xor_zero_right_path (n : Nat) (w : CodeWord n) :
+noncomputable def xor_zero_right_path (n : Nat) (w : CodeWord n) :
     Path (xorWords n w (zeroWord n)) w :=
   ⟨[⟨_, _, xor_zero_right n w⟩], xor_zero_right n w⟩
 
 -- 14. NOT involution path
-def not_not_path (n : Nat) (w : CodeWord n) :
+noncomputable def not_not_path (n : Nat) (w : CodeWord n) :
     Path (notWord n (notWord n w)) w :=
   ⟨[⟨_, _, not_not_id n w⟩], not_not_id n w⟩
 
 -- 15. CongrArg: XOR preserves paths on left
-def xor_congrArg_left {n : Nat} {w1 w2 : CodeWord n} (w3 : CodeWord n)
+noncomputable def xor_congrArg_left {n : Nat} {w1 w2 : CodeWord n} (w3 : CodeWord n)
     (p : Path w1 w2) : Path (xorWords n w1 w3) (xorWords n w2 w3) :=
   Path.congrArg (fun w => xorWords n w w3) p
 
 -- 16. CongrArg: XOR preserves paths on right
-def xor_congrArg_right {n : Nat} (w1 : CodeWord n) {w2 w3 : CodeWord n}
+noncomputable def xor_congrArg_right {n : Nat} (w1 : CodeWord n) {w2 w3 : CodeWord n}
     (p : Path w2 w3) : Path (xorWords n w1 w2) (xorWords n w1 w3) :=
   Path.congrArg (xorWords n w1) p
 
 -- 17. Symm of XOR comm path
-def xor_comm_symm_path (n : Nat) (w1 w2 : CodeWord n) :
+noncomputable def xor_comm_symm_path (n : Nat) (w1 w2 : CodeWord n) :
     Path (xorWords n w2 w1) (xorWords n w1 w2) :=
   Path.symm (xor_comm_path n w1 w2)
 
 -- 18. Trans: chain XOR identities
-def xor_chain_path (n : Nat) (w1 w2 w3 : CodeWord n) :
+noncomputable def xor_chain_path (n : Nat) (w1 w2 w3 : CodeWord n) :
     Path (xorWords n (xorWords n w1 w2) w3) (xorWords n w1 (xorWords n w2 w3)) :=
   xor_assoc_path n w1 w2 w3
 
 /-! ## Parity -/
 
 /-- Parity (XOR fold of all bits). -/
-@[simp] def parity : (n : Nat) → CodeWord n → Bool
+@[simp] noncomputable def parity : (n : Nat) → CodeWord n → Bool
   | 0, _ => false
   | n + 1, w => xor (w ⟨0, by omega⟩) (parity n (fun i => w ⟨i.val + 1, by omega⟩))
 
@@ -149,11 +149,11 @@ theorem parity_zero : ∀ (n : Nat), parity n (zeroWord n) = false := by
     exact ih
 
 -- 20. Parity path: zero word has false parity
-def parity_zero_path (n : Nat) : Path (parity n (zeroWord n)) false :=
+noncomputable def parity_zero_path (n : Nat) : Path (parity n (zeroWord n)) false :=
   ⟨[⟨_, _, parity_zero n⟩], parity_zero n⟩
 
 -- 21. CongrArg through parity
-def parity_congrArg {n : Nat} {w1 w2 : CodeWord n} (p : Path w1 w2) :
+noncomputable def parity_congrArg {n : Nat} {w1 w2 : CodeWord n} (p : Path w1 w2) :
     Path (parity n w1) (parity n w2) :=
   Path.congrArg (parity n) p
 
@@ -164,10 +164,10 @@ structure LinearCode (n k : Nat) where
   encode : CodeWord k → CodeWord n
 
 /-- Identity code. -/
-@[simp] def identityCode (n : Nat) : LinearCode n n := ⟨id⟩
+@[simp] noncomputable def identityCode (n : Nat) : LinearCode n n := ⟨id⟩
 
 /-- Repetition code: repeat the single bit. -/
-@[simp] def repetitionCode (r : Nat) : LinearCode r 1 :=
+@[simp] noncomputable def repetitionCode (r : Nat) : LinearCode r 1 :=
   ⟨fun w => fun _ => w ⟨0, by omega⟩⟩
 
 -- 22. Identity code preserves words
@@ -175,7 +175,7 @@ theorem identityCode_encode (n : Nat) (w : CodeWord n) :
     (identityCode n).encode w = w := rfl
 
 -- 23. Identity code path via refl
-def identityCode_path (n : Nat) (w : CodeWord n) :
+noncomputable def identityCode_path (n : Nat) (w : CodeWord n) :
     Path ((identityCode n).encode w) w :=
   Path.refl w
 
@@ -185,14 +185,14 @@ theorem repetition_uniform (r : Nat) (w : CodeWord 1) (i j : Fin r) :
   simp [repetitionCode]
 
 -- 25. Repetition path
-def repetition_path (r : Nat) (w : CodeWord 1) (i j : Fin r) :
+noncomputable def repetition_path (r : Nat) (w : CodeWord 1) (i j : Fin r) :
     Path ((repetitionCode r).encode w i) ((repetitionCode r).encode w j) :=
   ⟨[⟨_, _, repetition_uniform r w i j⟩], repetition_uniform r w i j⟩
 
 /-! ## Code composition -/
 
 /-- Compose codes: encode with inner, then outer. -/
-@[simp] def codeCompose {n1 n2 k : Nat}
+@[simp] noncomputable def codeCompose {n1 n2 k : Nat}
     (inner : LinearCode n1 k) (outer : LinearCode n2 n1) :
     LinearCode n2 k :=
   ⟨outer.encode ∘ inner.encode⟩
@@ -203,7 +203,7 @@ theorem codeCompose_assoc {n1 n2 n3 k : Nat}
     codeCompose (codeCompose c1 c2) c3 = codeCompose c1 (codeCompose c2 c3) := by rfl
 
 -- 27. Code compose associativity path via refl
-def codeCompose_assoc_path {n1 n2 n3 k : Nat}
+noncomputable def codeCompose_assoc_path {n1 n2 n3 k : Nat}
     (c1 : LinearCode n1 k) (c2 : LinearCode n2 n1) (c3 : LinearCode n3 n2) :
     Path (codeCompose (codeCompose c1 c2) c3)
          (codeCompose c1 (codeCompose c2 c3)) :=
@@ -218,11 +218,11 @@ theorem codeCompose_id_left {n k : Nat} (c : LinearCode n k) :
     codeCompose (identityCode k) c = c := by rfl
 
 -- 30. Right identity path via refl
-def codeCompose_id_right_path {n k : Nat} (c : LinearCode n k) :
+noncomputable def codeCompose_id_right_path {n k : Nat} (c : LinearCode n k) :
     Path (codeCompose c (identityCode n)) c := Path.refl _
 
 -- 31. Left identity path via refl
-def codeCompose_id_left_path {n k : Nat} (c : LinearCode n k) :
+noncomputable def codeCompose_id_left_path {n k : Nat} (c : LinearCode n k) :
     Path (codeCompose (identityCode k) c) c := Path.refl _
 
 /-! ## Syndrome decoding -/
@@ -232,7 +232,7 @@ structure ParityCheck (n m : Nat) where
   check : CodeWord n → CodeWord m
 
 /-- Syndrome of a word. -/
-@[simp] def syndrome {n m : Nat} (H : ParityCheck n m) (w : CodeWord n) : CodeWord m :=
+@[simp] noncomputable def syndrome {n m : Nat} (H : ParityCheck n m) (w : CodeWord n) : CodeWord m :=
   H.check w
 
 /-- Valid code word: zero syndrome. -/
@@ -240,25 +240,25 @@ structure ValidCodeWord {n m : Nat} (H : ParityCheck n m) (w : CodeWord n) where
   valid : H.check w = zeroWord m
 
 -- 32. Valid syndrome path
-def validSyndromePath {n m : Nat} (H : ParityCheck n m)
+noncomputable def validSyndromePath {n m : Nat} (H : ParityCheck n m)
     (w : CodeWord n) (v : ValidCodeWord H w) :
     Path (syndrome H w) (zeroWord m) :=
   ⟨[⟨syndrome H w, zeroWord m, v.valid⟩], v.valid⟩
 
 -- 33. CongrArg through encode
-def encode_congrArg {n k : Nat} (c : LinearCode n k) {w1 w2 : CodeWord k}
+noncomputable def encode_congrArg {n k : Nat} (c : LinearCode n k) {w1 w2 : CodeWord k}
     (p : Path w1 w2) : Path (c.encode w1) (c.encode w2) :=
   Path.congrArg c.encode p
 
 -- 34. CongrArg through syndrome
-def syndrome_congrArg {n m : Nat} (H : ParityCheck n m) {w1 w2 : CodeWord n}
+noncomputable def syndrome_congrArg {n m : Nat} (H : ParityCheck n m) {w1 w2 : CodeWord n}
     (p : Path w1 w2) : Path (syndrome H w1) (syndrome H w2) :=
   Path.congrArg (syndrome H) p
 
 /-! ## Path algebra on code words -/
 
 -- 35. Trans of XOR paths
-def xor_trans_path (n : Nat) (w : CodeWord n) :
+noncomputable def xor_trans_path (n : Nat) (w : CodeWord n) :
     Path (xorWords n w (zeroWord n)) w :=
   Path.trans (xor_zero_right_path n w) (Path.refl w)
 

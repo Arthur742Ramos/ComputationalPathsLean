@@ -34,7 +34,7 @@ inductive CauchyStep : (α : Type) → Type 1
   | equiv_refl (A : Type) : CauchyStep A
   | limit_unique (A : Type) : CauchyStep A
 
-def CauchyStep.toStep {A : Type} (_ : CauchyStep A) (a : A) :
+noncomputable def CauchyStep.toStep {A : Type} (_ : CauchyStep A) (a : A) :
     ComputationalPaths.Step A :=
   ComputationalPaths.Step.mk a a rfl
 
@@ -45,15 +45,15 @@ structure CRat where
   den : Nat
   den_pos : 0 < den
 
-def CRat.zero : CRat := ⟨0, 1, by omega⟩
-def CRat.one : CRat := ⟨1, 1, by omega⟩
+noncomputable def CRat.zero : CRat := ⟨0, 1, by omega⟩
+noncomputable def CRat.one : CRat := ⟨1, 1, by omega⟩
 
-def CRat.add (p q : CRat) : CRat :=
+noncomputable def CRat.add (p q : CRat) : CRat :=
   ⟨p.num * q.den + q.num * p.den, p.den * q.den, Nat.mul_pos p.den_pos q.den_pos⟩
 
-def CRat.neg (p : CRat) : CRat := ⟨-p.num, p.den, p.den_pos⟩
-def CRat.sub (p q : CRat) : CRat := CRat.add p (CRat.neg q)
-def CRat.le_rat (p q : CRat) : Prop := p.num * q.den ≤ q.num * p.den
+noncomputable def CRat.neg (p : CRat) : CRat := ⟨-p.num, p.den, p.den_pos⟩
+noncomputable def CRat.sub (p q : CRat) : CRat := CRat.add p (CRat.neg q)
+noncomputable def CRat.le_rat (p q : CRat) : Prop := p.num * q.den ≤ q.num * p.den
 
 /-! ## Constructive Real Numbers -/
 
@@ -68,18 +68,18 @@ structure CREquiv (x y : ConstructiveReal) where
   equiv_witness : (k n : Nat) → n ≥ equiv_modulus k → Path (True : Prop) True
 
 /-- CREquiv is reflexive. -/
-def CREquiv.rfl_equiv (x : ConstructiveReal) : CREquiv x x where
+noncomputable def CREquiv.rfl_equiv (x : ConstructiveReal) : CREquiv x x where
   equiv_modulus := fun _ => 0
   equiv_witness := fun _ _ _ => Path.refl _
 
 /-- CREquiv is symmetric. -/
-def CREquiv.symm_equiv {x y : ConstructiveReal}
+noncomputable def CREquiv.symm_equiv {x y : ConstructiveReal}
     (e : CREquiv x y) : CREquiv y x where
   equiv_modulus := e.equiv_modulus
   equiv_witness := fun k n hn => e.equiv_witness k n hn
 
 /-- CREquiv is transitive. -/
-def CREquiv.trans_equiv {x y z : ConstructiveReal}
+noncomputable def CREquiv.trans_equiv {x y z : ConstructiveReal}
     (e₁ : CREquiv x y) (e₂ : CREquiv y z) : CREquiv x z where
   equiv_modulus := fun k => max (e₁.equiv_modulus k) (e₂.equiv_modulus k)
   equiv_witness := fun k n hn =>
@@ -88,30 +88,30 @@ def CREquiv.trans_equiv {x y z : ConstructiveReal}
 
 /-! ## Arithmetic -/
 
-def CRAdd (x y : ConstructiveReal) : ConstructiveReal where
+noncomputable def CRAdd (x y : ConstructiveReal) : ConstructiveReal where
   seq := fun n => CRat.add (x.seq n) (y.seq n)
   modulus := fun k => max (x.modulus k) (y.modulus k)
 
-def CRZero : ConstructiveReal where
+noncomputable def CRZero : ConstructiveReal where
   seq := fun _ => CRat.zero
   modulus := fun _ => 0
 
-def CRNeg (x : ConstructiveReal) : ConstructiveReal where
+noncomputable def CRNeg (x : ConstructiveReal) : ConstructiveReal where
   seq := fun n => CRat.neg (x.seq n)
   modulus := x.modulus
 
 /-- Commutativity of addition (num component). -/
-def add_comm_num (x y : ConstructiveReal) (n : Nat) :
+noncomputable def add_comm_num (x y : ConstructiveReal) (n : Nat) :
     Path ((CRAdd x y).seq n).num ((CRAdd y x).seq n).num :=
   Path.stepChain (by simp [CRAdd, CRat.add]; omega)
 
 /-- Commutativity of addition (den component). -/
-def add_comm_den (x y : ConstructiveReal) (n : Nat) :
+noncomputable def add_comm_den (x y : ConstructiveReal) (n : Nat) :
     Path ((CRAdd x y).seq n).den ((CRAdd y x).seq n).den :=
   Path.stepChain (by simp [CRAdd, CRat.add]; exact Nat.mul_comm _ _)
 
 /-- Full path for addition commutativity. -/
-def add_comm_path (x y : ConstructiveReal) :
+noncomputable def add_comm_path (x y : ConstructiveReal) :
     Path (CRAdd x y).seq (CRAdd y x).seq :=
   Path.stepChain (by
     funext n; simp only [CRAdd, CRat.add]
@@ -120,7 +120,7 @@ def add_comm_path (x y : ConstructiveReal) :
     · exact Nat.mul_comm _ _)
 
 /-- Zero right identity. -/
-def add_zero_num (x : ConstructiveReal) (n : Nat) :
+noncomputable def add_zero_num (x : ConstructiveReal) (n : Nat) :
     Path ((CRAdd x CRZero).seq n).num (x.seq n).num :=
   Path.stepChain (by simp [CRAdd, CRZero, CRat.add, CRat.zero])
 
@@ -133,7 +133,7 @@ structure ConstructiveConvergence where
   converges : (k n : Nat) → n ≥ rate k → CREquiv (cseq n) limit
 
 /-- Limit uniqueness. -/
-def limit_unique_witness {c₁ c₂ : ConstructiveConvergence}
+noncomputable def limit_unique_witness {c₁ c₂ : ConstructiveConvergence}
     (hseq : ∀ n, c₁.cseq n = c₂.cseq n) : CREquiv c₁.limit c₂.limit :=
   let N := max (c₁.rate 0) (c₂.rate 0)
   let h₁ := c₁.converges 0 N (Nat.le_max_left _ _)
@@ -150,7 +150,7 @@ structure ConstructiveContinuity where
   continuity_witness : (k : Nat) → (x y : ConstructiveReal) →
     CREquiv x y → CREquiv (func x) (func y)
 
-def ConstructiveContinuity.compose
+noncomputable def ConstructiveContinuity.compose
     (f g : ConstructiveContinuity) : ConstructiveContinuity where
   func := fun x => f.func (g.func x)
   modulus_of_continuity := fun k =>
@@ -159,7 +159,7 @@ def ConstructiveContinuity.compose
     f.continuity_witness k (g.func x) (g.func y)
       (g.continuity_witness (f.modulus_of_continuity k) x y hxy)
 
-def ConstructiveContinuity.id_cont : ConstructiveContinuity where
+noncomputable def ConstructiveContinuity.id_cont : ConstructiveContinuity where
   func := fun x => x
   modulus_of_continuity := fun k => k
   continuity_witness := fun _ _ _ hxy => hxy

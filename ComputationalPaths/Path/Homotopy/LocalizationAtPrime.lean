@@ -37,15 +37,15 @@ universe u
 /-! ## Prime sets and p-localization -/
 
 /-- The singleton prime set determined by a prime. -/
-def primeSetAt (p : Prime) : PrimeSet :=
+noncomputable def primeSetAt (p : Prime) : PrimeSet :=
   PrimeSet.singleton p.val
 
-private def trivialSLocalGroup (G : AbelianGroup.{u}) (S : PrimeSet) :
+private noncomputable def trivialSLocalGroup (G : AbelianGroup.{u}) (S : PrimeSet) :
     SLocalGroup S where
   toAbelianGroup := G
   isLocal := trivial
 
-private def trivialLocalizedGroup (G : AbelianGroup.{u}) (S : PrimeSet) :
+private noncomputable def trivialLocalizedGroup (G : AbelianGroup.{u}) (S : PrimeSet) :
     LocalizedGroup G S where
   localized := trivialSLocalGroup G S
   locMap := GroupHom.id G
@@ -57,7 +57,7 @@ abbrev PLocalization (X : HomotopyType.{u}) (p : Prime) :=
   SpaceLocalization X (primeSetAt p)
 
 /-- The identity p-localization. -/
-def trivialPLocalization (X : HomotopyType.{u}) (p : Prime) : PLocalization X p where
+noncomputable def trivialPLocalization (X : HomotopyType.{u}) (p : Prime) : PLocalization X p where
   localized := X
   locMap := fun x => x
   groupLocalization := fun n =>
@@ -71,7 +71,7 @@ abbrev PCompletionAt (X : HomotopyType.{u}) (p : Prime) :=
   PCompletion X p.val
 
 /-- The identity p-completion. -/
-def trivialPCompletion (X : HomotopyType.{u}) (p : Prime) : PCompletionAt X p where
+noncomputable def trivialPCompletion (X : HomotopyType.{u}) (p : Prime) : PCompletionAt X p where
   completed := X
   complMap := fun x => x
   groupCompletion := fun n =>
@@ -82,7 +82,7 @@ def trivialPCompletion (X : HomotopyType.{u}) (p : Prime) : PCompletionAt X p wh
 /-! ## Rationalization helper -/
 
 /-- The identity rationalization. -/
-def trivialRationalization (X : HomotopyType.{u}) : Rationalization X where
+noncomputable def trivialRationalization (X : HomotopyType.{u}) : Rationalization X where
   rationalized := X
   ratMap := fun x => x
   groupRationalization := fun n =>
@@ -108,7 +108,7 @@ structure ArithmeticSquare (X : HomotopyType.{u}) (p : Prime) where
   pullback : True
 
 /-- The identity arithmetic square. -/
-def trivialArithmeticSquare (X : HomotopyType.{u}) (p : Prime) :
+noncomputable def trivialArithmeticSquare (X : HomotopyType.{u}) (p : Prime) :
     ArithmeticSquare X p where
   pLocalization := trivialPLocalization X p
   pCompletion := trivialPCompletion X p
@@ -126,7 +126,7 @@ structure ArithmeticSquarePullback (X : HomotopyType.{u}) (p : Prime)
   reconstruct_id : forall x, reconstruct x = x
 
 /-- Trivial pullback witness. -/
-def trivialArithmeticPullback (X : HomotopyType.{u}) (p : Prime) :
+noncomputable def trivialArithmeticPullback (X : HomotopyType.{u}) (p : Prime) :
     ArithmeticSquarePullback X p (trivialArithmeticSquare X p) where
   reconstruct := fun x => x
   reconstruct_id := fun _ => rfl
@@ -141,12 +141,12 @@ structure FractureTheorem (X : HomotopyType.{u}) (p : Prime) where
   pullback : ArithmeticSquarePullback X p square
 
 /-- Trivial fracture theorem. -/
-def fractureTheorem (X : HomotopyType.{u}) (p : Prime) : FractureTheorem X p where
+noncomputable def fractureTheorem (X : HomotopyType.{u}) (p : Prime) : FractureTheorem X p where
   square := trivialArithmeticSquare X p
   pullback := trivialArithmeticPullback X p
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

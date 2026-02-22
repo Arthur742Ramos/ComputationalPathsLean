@@ -83,7 +83,7 @@ variable (A : Type u)
 
 This packages the `StrictGroupoid.quotient` construction with explicit
 terminology connecting to classical algebraic topology. -/
-def FundamentalGroupoid : StrictGroupoid A :=
+noncomputable def FundamentalGroupoid : StrictGroupoid A :=
   StrictGroupoid.quotient A
 
 /-- Objects of the fundamental groupoid are points of A. -/
@@ -95,18 +95,18 @@ abbrev FundamentalGroupoid.Hom (a b : A) : Type u :=
   PathRwQuot A a b
 
 /-- The identity morphism at a point a (the reflexive path class). -/
-def FundamentalGroupoid.id' (a : A) : FundamentalGroupoid.Hom A a a :=
+noncomputable def FundamentalGroupoid.id' (a : A) : FundamentalGroupoid.Hom A a a :=
   PathRwQuot.refl a
 
 /-- Composition in the fundamental groupoid (path concatenation). -/
-def FundamentalGroupoid.comp' {a b c : A}
+noncomputable def FundamentalGroupoid.comp' {a b c : A}
     (p : FundamentalGroupoid.Hom A a b)
     (q : FundamentalGroupoid.Hom A b c) :
     FundamentalGroupoid.Hom A a c :=
   PathRwQuot.trans p q
 
 /-- Inverse in the fundamental groupoid (path reversal). -/
-def FundamentalGroupoid.inv' {a b : A}
+noncomputable def FundamentalGroupoid.inv' {a b : A}
     (p : FundamentalGroupoid.Hom A a b) :
     FundamentalGroupoid.Hom A b a :=
   PathRwQuot.symm p
@@ -174,7 +174,7 @@ variable {A : Type u}
 
 /-- Conjugation by a path: given p : a → b, we get a map π₁(A, a) → π₁(A, b)
     by α ↦ p⁻¹ · α · p. -/
-def conjugateByPath {a b : A} (p : FundamentalGroupoid.Hom A a b) :
+noncomputable def conjugateByPath {a b : A} (p : FundamentalGroupoid.Hom A a b) :
     π₁(A, a) → π₁(A, b) :=
   fun α => FundamentalGroupoid.comp' A
     (FundamentalGroupoid.inv' A p)
@@ -237,7 +237,7 @@ theorem conjugateByPath_inv {a b : A} (p : FundamentalGroupoid.Hom A a b)
   exact hx.trans hy.symm
 
 /-- The inverse conjugation map. -/
-def conjugateByPathInv {a b : A} (p : FundamentalGroupoid.Hom A a b) :
+noncomputable def conjugateByPathInv {a b : A} (p : FundamentalGroupoid.Hom A a b) :
     π₁(A, b) → π₁(A, a) :=
   conjugateByPath (FundamentalGroupoid.inv' A p)
 
@@ -307,7 +307,7 @@ variable {A : Type u} {B : Type u}
 
 /-- A function f : A → B induces a map on morphisms in the fundamental groupoid.
     This is the functorial action of Π₁ on morphisms. -/
-def fundamentalGroupoidMap (f : A → B) {a a' : A}
+noncomputable def fundamentalGroupoidMap (f : A → B) {a a' : A}
     (p : FundamentalGroupoid.Hom A a a') :
     FundamentalGroupoid.Hom B (f a) (f a') :=
   PathRwQuot.congrArg A B f p
@@ -331,7 +331,7 @@ theorem fundamentalGroupoidMap_comp (f : A → B) {a b c : A}
 /-- The induced map on fundamental groups.
 
     Given f : A → B, we get f_* : π₁(A, a) → π₁(B, f a). -/
-def inducedPiOneMap (f : A → B) (a : A) :
+noncomputable def inducedPiOneMap (f : A → B) (a : A) :
     π₁(A, a) → π₁(B, f a) :=
   fundamentalGroupoidMap f
 
@@ -463,7 +463,7 @@ open CoveringClassification
 variable {A : Type u}
 
 /-- Predicate on Π₁-automorphisms: the loop class lifts to the chosen fiber point. -/
-def coveringLoopLiftsHom {P : A → Type u} {a : A}
+noncomputable def coveringLoopLiftsHom {P : A → Type u} {a : A}
     (pc : PointedCovering P a) :
     FundamentalGroupoid.Hom A a a → Prop :=
   Quot.lift

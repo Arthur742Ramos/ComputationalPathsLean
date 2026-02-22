@@ -16,34 +16,34 @@ namespace AdditiveCombin
 structure AdditiveSet where
   carrier : List Int
 
-def AdditiveSet.card (A : AdditiveSet) : Nat :=
+noncomputable def AdditiveSet.card (A : AdditiveSet) : Nat :=
   A.carrier.length
 
-def AdditiveSet.empty : AdditiveSet :=
+noncomputable def AdditiveSet.empty : AdditiveSet :=
   ⟨[]⟩
 
-def AdditiveSet.singleton (a : Int) : AdditiveSet :=
+noncomputable def AdditiveSet.singleton (a : Int) : AdditiveSet :=
   ⟨[a]⟩
 
-def sumset (A B : AdditiveSet) : AdditiveSet :=
+noncomputable def sumset (A B : AdditiveSet) : AdditiveSet :=
   ⟨A.carrier.map (fun a => a + Int.ofNat B.card)⟩
 
-def diffset (A B : AdditiveSet) : AdditiveSet :=
+noncomputable def diffset (A B : AdditiveSet) : AdditiveSet :=
   ⟨A.carrier.map (fun a => a - Int.ofNat B.card)⟩
 
-def dilation (k : Int) (A : AdditiveSet) : AdditiveSet :=
+noncomputable def dilation (k : Int) (A : AdditiveSet) : AdditiveSet :=
   ⟨A.carrier.map (fun a => k * a)⟩
 
-def translate (t : Int) (A : AdditiveSet) : AdditiveSet :=
+noncomputable def translate (t : Int) (A : AdditiveSet) : AdditiveSet :=
   ⟨A.carrier.map (fun a => a + t)⟩
 
-def additiveEnergy (A : AdditiveSet) : Nat :=
+noncomputable def additiveEnergy (A : AdditiveSet) : Nat :=
   A.card * A.card
 
-def doublingConstant (A : AdditiveSet) : Nat :=
+noncomputable def doublingConstant (A : AdditiveSet) : Nat :=
   (sumset A A).card
 
-def triplingConstant (A : AdditiveSet) : Nat :=
+noncomputable def triplingConstant (A : AdditiveSet) : Nat :=
   (sumset (sumset A A) A).card
 
 structure PlunneckeGraph where
@@ -51,38 +51,38 @@ structure PlunneckeGraph where
   B : AdditiveSet
   layers : Nat
 
-def plunneckeMagnification (G : PlunneckeGraph) : Nat :=
+noncomputable def plunneckeMagnification (G : PlunneckeGraph) : Nat :=
   G.layers + G.A.card + G.B.card
 
 structure RuzsaModel where
   A : AdditiveSet
   B : AdditiveSet
 
-def ruzsaDistance (R : RuzsaModel) : Nat :=
+noncomputable def ruzsaDistance (R : RuzsaModel) : Nat :=
   R.A.card + R.B.card
 
 structure FreimanModel where
   A : AdditiveSet
   rank : Nat
 
-def freimanDimensionBound (F : FreimanModel) : Nat :=
+noncomputable def freimanDimensionBound (F : FreimanModel) : Nat :=
   F.rank + F.A.card
 
 structure BSGDatum where
   A : AdditiveSet
   energy : Nat
 
-def bsgDenseSubsetSize (B : BSGDatum) : Nat :=
+noncomputable def bsgDenseSubsetSize (B : BSGDatum) : Nat :=
   B.energy / (B.A.card + 1)
 
 structure Progression3 where
   a : Int
   d : Int
 
-def isThreeTermAP (x y z : Int) : Prop :=
+noncomputable def isThreeTermAP (x y z : Int) : Prop :=
   y - x = z - y
 
-def countThreeTermAP (A : AdditiveSet) : Nat :=
+noncomputable def countThreeTermAP (A : AdditiveSet) : Nat :=
   A.card
 
 structure GreenTaoWitness where
@@ -90,14 +90,14 @@ structure GreenTaoWitness where
   progressionLength : Nat
   progressionLength_pos : 0 < progressionLength
 
-def greenTaoLength (G : GreenTaoWitness) : Nat :=
+noncomputable def greenTaoLength (G : GreenTaoWitness) : Nat :=
   G.progressionLength
 
 structure PolynomialMethodDatum where
   ambientDim : Nat
   capSetSize : Nat
 
-def capSetUpperBound (P : PolynomialMethodDatum) : Nat :=
+noncomputable def capSetUpperBound (P : PolynomialMethodDatum) : Nat :=
   P.ambientDim + P.capSetSize
 
 structure SumProductDatum where
@@ -105,19 +105,19 @@ structure SumProductDatum where
   plusSet : AdditiveSet
   mulSet : AdditiveSet
 
-def sumProductLowerBound (S : SumProductDatum) : Nat :=
+noncomputable def sumProductLowerBound (S : SumProductDatum) : Nat :=
   S.plusSet.card + S.mulSet.card
 
-def popularDifference (A : AdditiveSet) : Nat :=
+noncomputable def popularDifference (A : AdditiveSet) : Nat :=
   if A.card = 0 then 0 else 1
 
-def additiveQuadruples (A : AdditiveSet) : Nat :=
+noncomputable def additiveQuadruples (A : AdditiveSet) : Nat :=
   A.card * A.card * A.card
 
-def balogSzemerediEnergy (B : BSGDatum) : Nat :=
+noncomputable def balogSzemerediEnergy (B : BSGDatum) : Nat :=
   B.energy + B.A.card
 
-def plunneckeRuzsaBound (G : PlunneckeGraph) : Nat :=
+noncomputable def plunneckeRuzsaBound (G : PlunneckeGraph) : Nat :=
   plunneckeMagnification G + G.layers
 
 theorem additiveSet_card_empty :
@@ -190,11 +190,11 @@ theorem balogSzemerediEnergy_nonneg (B : BSGDatum) :
 theorem plunneckeRuzsaBound_nonneg (G : PlunneckeGraph) :
     0 ≤ plunneckeRuzsaBound G := Nat.zero_le _
 
-def plunnecke_path_refl (G : PlunneckeGraph) :
+noncomputable def plunnecke_path_refl (G : PlunneckeGraph) :
     Path (plunneckeMagnification G) (plunneckeMagnification G) :=
   Path.refl _
 
-def plunnecke_path_trans (G : PlunneckeGraph) :
+noncomputable def plunnecke_path_trans (G : PlunneckeGraph) :
     Path (plunneckeMagnification G) (plunneckeMagnification G) :=
   Path.trans (Path.refl _) (Path.refl _)
 

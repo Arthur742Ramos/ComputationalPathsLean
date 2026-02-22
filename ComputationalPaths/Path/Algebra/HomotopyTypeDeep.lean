@@ -31,25 +31,25 @@ inductive Path : HPoint → HPoint → Type where
   | nil  : (a : HPoint) → Path a a
   | cons : Step a b → Path b c → Path a c
 
-def Path.refl (a : HPoint) : Path a a := .nil a
-def Path.single (s : Step a b) : Path a b := .cons s (.nil _)
+noncomputable def Path.refl (a : HPoint) : Path a a := .nil a
+noncomputable def Path.single (s : Step a b) : Path a b := .cons s (.nil _)
 
 /-- Theorem 1 – trans. -/
-def Path.trans : Path a b → Path b c → Path a c
+noncomputable def Path.trans : Path a b → Path b c → Path a c
   | .nil _, q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Step.symm : Step a b → Step b a
+noncomputable def Step.symm : Step a b → Step b a
   | .edge n m => .edge m n
   | .refl a   => .refl a
 
 /-- Theorem 2 – path inversion. -/
-def Path.symm : Path a b → Path b a
+noncomputable def Path.symm : Path a b → Path b a
   | .nil a   => .nil a
   | .cons s p => p.symm.trans (.single s.symm)
 
 /-- Theorem 3 – path length. -/
-def Path.length : Path a b → Nat
+noncomputable def Path.length : Path a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -94,10 +94,10 @@ theorem step_symm_symm : (s : Step a b) → s.symm.symm = s
 -- §4  congrArg / ap
 -- ============================================================
 
-def ap_id_step : Step a b → Step a b := id
+noncomputable def ap_id_step : Step a b → Step a b := id
 
 /-- Theorem 10 – ap_id on paths. -/
-def ap_id_path : Path a b → Path a b
+noncomputable def ap_id_path : Path a b → Path a b
   | .nil a    => .nil a
   | .cons s p => .cons (ap_id_step s) (ap_id_path p)
 
@@ -126,7 +126,7 @@ theorem ap_id_length : (p : Path a b) → (ap_id_path p).length = p.length
 -- §5  Transport
 -- ============================================================
 
-def transport_endpoint : Path a b → HPoint
+noncomputable def transport_endpoint : Path a b → HPoint
   | .nil a    => a
   | .cons _ p => transport_endpoint p
 
@@ -152,7 +152,7 @@ theorem transport_endpoint_correct : (p : Path a b) →
 -- ============================================================
 
 /-- Theorem 17 – J-eliminator: induction on Path structure. -/
-def J_elim {C : (b : HPoint) → Path a b → Prop}
+noncomputable def J_elim {C : (b : HPoint) → Path a b → Prop}
     (base : C a (.nil a))
     (step : ∀ {b c} (s : Step a b) (q : Path b c), C c (.cons s q))
     (b : HPoint) (p : Path a b) : C b p := by
@@ -186,12 +186,12 @@ inductive Path2 : Path a b → Path a b → Type where
   | refl2 : (p : Path a b) → Path2 p p
   | trans2 : Path2 p q → Path2 q r → Path2 p r
 
-def Path2.symm2 : Path2 p q → Path2 q p
+noncomputable def Path2.symm2 : Path2 p q → Path2 q p
   | .refl2 p    => .refl2 p
   | .trans2 α β => .trans2 β.symm2 α.symm2
 
 /-- Theorem 21 – 2-path refl constructor. -/
-def Path2.rfl2 (p : Path a b) : Path2 p p := .refl2 p
+noncomputable def Path2.rfl2 (p : Path a b) : Path2 p p := .refl2 p
 
 /-- Theorem 22 – 2-refl is left unit (definitional). -/
 theorem path2_refl_trans (α : Path2 p q) :
@@ -207,9 +207,9 @@ theorem path2_symm_refl (p : Path a b) :
 
 abbrev Loop (a : HPoint) := Path a a
 
-def Loop.comp (l₁ l₂ : Loop a) : Loop a := l₁.trans l₂
-def Loop.inv (l : Loop a) : Loop a := l.symm
-def Loop.trivial (a : HPoint) : Loop a := Path.refl a
+noncomputable def Loop.comp (l₁ l₂ : Loop a) : Loop a := l₁.trans l₂
+noncomputable def Loop.inv (l : Loop a) : Loop a := l.symm
+noncomputable def Loop.trivial (a : HPoint) : Loop a := Path.refl a
 
 /-- Theorem 24 – loop comp assoc (definitional). -/
 theorem loop_comp_assoc (l₁ l₂ l₃ : Loop a) :
@@ -235,9 +235,9 @@ deriving DecidableEq, Repr
 /-- A loop on S¹ as a list of directed steps. -/
 abbrev S1Loop := List S1Dir
 
-def s1_length (l : S1Loop) : Nat := l.length
+noncomputable def s1_length (l : S1Loop) : Nat := l.length
 
-def s1_trans (p q : S1Loop) : S1Loop := p ++ q
+noncomputable def s1_trans (p q : S1Loop) : S1Loop := p ++ q
 
 /-- Theorem 27 – S1 trans assoc. -/
 theorem s1_trans_assoc (p q r : S1Loop) :
@@ -253,10 +253,10 @@ theorem s1_trans_nil_left (p : S1Loop) : s1_trans [] p = p := by
   simp [s1_trans]
 
 /-- Theorem 30 – fundamental loop. -/
-def fundamental_loop : S1Loop := [.fwd]
+noncomputable def fundamental_loop : S1Loop := [.fwd]
 
 /-- Theorem 31 – n-fold loop. -/
-def loop_power : Nat → S1Loop
+noncomputable def loop_power : Nat → S1Loop
   | 0 => []
   | n + 1 => s1_trans fundamental_loop (loop_power n)
 
@@ -286,12 +286,12 @@ theorem s1_length_trans (p q : S1Loop) :
 -- §11  Winding number
 -- ============================================================
 
-def dir_val : S1Dir → Int
+noncomputable def dir_val : S1Dir → Int
   | .fwd  => 1
   | .bwd  => -1
   | .stay => 0
 
-def winding : S1Loop → Int
+noncomputable def winding : S1Loop → Int
   | []     => 0
   | d :: l => dir_val d + winding l
 
@@ -319,7 +319,7 @@ theorem winding_trans : (p q : S1Loop) →
     rw [ih]; omega
 
 /-- Theorem 39 – backward loop winding. -/
-def backward_loop : S1Loop := [.bwd]
+noncomputable def backward_loop : S1Loop := [.bwd]
 theorem winding_backward : winding backward_loop = -1 := rfl
 
 /-- Theorem 40 – fwd then bwd = 0. -/
@@ -343,16 +343,16 @@ inductive SuspPath : SuspPt → SuspPt → Type where
   | nil  : (a : SuspPt) → SuspPath a a
   | cons : SuspStep a b → SuspPath b c → SuspPath a c
 
-def SuspPath.length : SuspPath a b → Nat
+noncomputable def SuspPath.length : SuspPath a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
-def SuspPath.trans : SuspPath a b → SuspPath b c → SuspPath a c
+noncomputable def SuspPath.trans : SuspPath a b → SuspPath b c → SuspPath a c
   | .nil _, q    => q
   | .cons s p, q => .cons s (p.trans q)
 
 /-- Theorem 41 – meridian path. -/
-def meridian_path : SuspPath .north .south := .cons .merid (.nil _)
+noncomputable def meridian_path : SuspPath .north .south := .cons .merid (.nil _)
 
 /-- Theorem 42 – meridian length. -/
 theorem meridian_length : meridian_path.length = 1 := rfl
@@ -387,7 +387,7 @@ structure Pointwise (f g : HPoint → HPoint) where
   agree : ∀ x, f x = g x
 
 /-- Theorem 46 – funext witness. -/
-def funext_witness (_f _g : HPoint → HPoint) (_pw : Pointwise _f _g)
+noncomputable def funext_witness (_f _g : HPoint → HPoint) (_pw : Pointwise _f _g)
     : Path (.mk 0) (.mk 0) := .nil _
 
 /-- Theorem 47 – funext for same function is refl. -/
@@ -405,15 +405,15 @@ structure HEquiv (A B : Type) where
   ret : ∀ a, bwd (fwd a) = a
 
 /-- Theorem 48 – HEquiv reflexive. -/
-def HEquiv.refl (A : Type) : HEquiv A A :=
+noncomputable def HEquiv.refl (A : Type) : HEquiv A A :=
   ⟨id, id, fun _ => rfl, fun _ => rfl⟩
 
 /-- Theorem 49 – HEquiv symmetric. -/
-def HEquiv.symm (e : HEquiv A B) : HEquiv B A :=
+noncomputable def HEquiv.symm (e : HEquiv A B) : HEquiv B A :=
   ⟨e.bwd, e.fwd, e.ret, e.sec⟩
 
 /-- Theorem 50 – HEquiv transitive. -/
-def HEquiv.trans (e₁ : HEquiv A B) (e₂ : HEquiv B C) : HEquiv A C where
+noncomputable def HEquiv.trans (e₁ : HEquiv A B) (e₂ : HEquiv B C) : HEquiv A C where
   fwd := e₂.fwd ∘ e₁.fwd
   bwd := e₁.bwd ∘ e₂.bwd
   sec := fun c => by simp [Function.comp]; rw [e₁.sec, e₂.sec]
@@ -437,10 +437,10 @@ structure IsContr (α : Type) where
   contract : ∀ x, x = center
 
 /-- Theorem 52 – Unit is contractible. -/
-def unit_contr : IsContr Unit := ⟨(), fun _ => rfl⟩
+noncomputable def unit_contr : IsContr Unit := ⟨(), fun _ => rfl⟩
 
 /-- Theorem 53 – contractible types are equivalent. -/
-def contr_equiv (hA : IsContr α) (hB : IsContr β) : HEquiv α β where
+noncomputable def contr_equiv (hA : IsContr α) (hB : IsContr β) : HEquiv α β where
   fwd := fun _ => hB.center
   bwd := fun _ => hA.center
   sec := fun b => (hB.contract b).symm
@@ -451,7 +451,7 @@ structure Fiber (f : HPoint → HPoint) (b : HPoint) where
   witness : f point = b
 
 /-- Theorem 54 – fiber of id is inhabited. -/
-def fiber_id (b : HPoint) : Fiber id b := ⟨b, rfl⟩
+noncomputable def fiber_id (b : HPoint) : Fiber id b := ⟨b, rfl⟩
 
 -- ============================================================
 -- §16  Truncation levels
@@ -462,10 +462,10 @@ inductive TruncLevel where
   | succ   : TruncLevel → TruncLevel
 deriving DecidableEq, Repr
 
-def TruncLevel.minus1 : TruncLevel := .succ .minus2
-def TruncLevel.zero : TruncLevel := .succ .minus1
+noncomputable def TruncLevel.minus1 : TruncLevel := .succ .minus2
+noncomputable def TruncLevel.zero : TruncLevel := .succ .minus1
 
-def TruncLevel.add : TruncLevel → Nat → TruncLevel
+noncomputable def TruncLevel.add : TruncLevel → Nat → TruncLevel
   | t, 0     => t
   | t, n + 1 => .succ (t.add n)
 
@@ -483,13 +483,13 @@ theorem trunclevel_add_succ (t : TruncLevel) (n : Nat) :
 abbrev Loop2 (a : HPoint) := Path2 (Path.refl a) (Path.refl a)
 
 /-- Theorem 57 – Loop2 composition. -/
-def loop2_comp (α β : Loop2 a) : Loop2 a := .trans2 α β
+noncomputable def loop2_comp (α β : Loop2 a) : Loop2 a := .trans2 α β
 
 /-- Theorem 58 – Loop2 trivial. -/
-def loop2_trivial (a : HPoint) : Loop2 a := .refl2 _
+noncomputable def loop2_trivial (a : HPoint) : Loop2 a := .refl2 _
 
 /-- Theorem 59 – Loop2 inverse. -/
-def loop2_inv (α : Loop2 a) : Loop2 a := α.symm2
+noncomputable def loop2_inv (α : Loop2 a) : Loop2 a := α.symm2
 
 -- ============================================================
 -- §18  Coherence
@@ -530,7 +530,7 @@ theorem roundtrip_length (p : Path a b) :
 -- §20  Encode–decode for π₁(S¹)
 -- ============================================================
 
-def encode : S1Loop → Int := winding
+noncomputable def encode : S1Loop → Int := winding
 
 /-- Theorem 65 – encode nil. -/
 theorem encode_nil : encode [] = 0 := rfl

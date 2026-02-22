@@ -28,22 +28,22 @@ inductive Path (α : Type) : α → α → Type where
   | nil  : (a : α) → Path α a a
   | cons : Step α a b → Path α b c → Path α a c
 
-def Path.single (s : Step α a b) : Path α a b :=
+noncomputable def Path.single (s : Step α a b) : Path α a b :=
   .cons s (.nil _)
 
-def Path.trans : Path α a b → Path α b c → Path α a c
+noncomputable def Path.trans : Path α a b → Path α b c → Path α a c
   | .nil _,    q => q
   | .cons s p, q => .cons s (p.trans q)
 
-def Step.symm : Step α a b → Step α b a
+noncomputable def Step.symm : Step α a b → Step α b a
   | .refl a       => .refl a
   | .rule n a b   => .rule (n ++ "⁻¹") b a
 
-def Path.symm : Path α a b → Path α b a
+noncomputable def Path.symm : Path α a b → Path α b a
   | .nil a    => .nil a
   | .cons s p => p.symm.trans (.single s.symm)
 
-def Path.length : Path α a b → Nat
+noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
@@ -110,22 +110,22 @@ inductive CExpr where
 deriving DecidableEq, Repr
 
 -- Notation helpers
-def μ (n : Nat) : CExpr := CExpr.op ⟨"μ" ++ toString n, n, 0⟩
-def η_op : CExpr := CExpr.op ⟨"η", 0, 0⟩
-def m_op (n : Nat) : CExpr := CExpr.op ⟨"m" ++ toString n, n, 0⟩
-def e_op (n : Nat) : CExpr := CExpr.op ⟨"e" ++ toString n, n, 0⟩
+noncomputable def μ (n : Nat) : CExpr := CExpr.op ⟨"μ" ++ toString n, n, 0⟩
+noncomputable def η_op : CExpr := CExpr.op ⟨"η", 0, 0⟩
+noncomputable def m_op (n : Nat) : CExpr := CExpr.op ⟨"m" ++ toString n, n, 0⟩
+noncomputable def e_op (n : Nat) : CExpr := CExpr.op ⟨"e" ++ toString n, n, 0⟩
 
 -- ============================================================
 -- §3  Associativity Paths
 -- ============================================================
 
 /-- Theorem 5: Associativity of γ-composition. -/
-def assocPath (f g h : CExpr) :
+noncomputable def assocPath (f g h : CExpr) :
     Path CExpr (CExpr.comp (CExpr.comp f g) h) (CExpr.comp f (CExpr.comp g h)) :=
   .single (.rule "γ-assoc" _ _)
 
 /-- Theorem 6: Double associativity — four-fold composition. -/
-def assocPath4 (f g h k : CExpr) :
+noncomputable def assocPath4 (f g h k : CExpr) :
     Path CExpr (CExpr.comp (CExpr.comp (CExpr.comp f g) h) k)
                (CExpr.comp f (CExpr.comp g (CExpr.comp h k))) :=
   let mid₁ := CExpr.comp (CExpr.comp f g) (CExpr.comp h k)
@@ -146,17 +146,17 @@ theorem assocPath4_length (f g h k : CExpr) :
 -- ============================================================
 
 /-- Theorem 9: Left unit — composing with identity on left. -/
-def leftUnitPath (f : CExpr) (c : Nat) :
+noncomputable def leftUnitPath (f : CExpr) (c : Nat) :
     Path CExpr (CExpr.comp (CExpr.ident c) f) f :=
   .single (.rule "unit-left" _ _)
 
 /-- Theorem 10: Right unit — composing with identity on right. -/
-def rightUnitPath (f : CExpr) (c : Nat) :
+noncomputable def rightUnitPath (f : CExpr) (c : Nat) :
     Path CExpr (CExpr.comp f (CExpr.ident c)) f :=
   .single (.rule "unit-right" _ _)
 
 /-- Theorem 11: Unit coherence — left then right. -/
-def unitCoherencePath (f : CExpr) (c₁ c₂ : Nat) :
+noncomputable def unitCoherencePath (f : CExpr) (c₁ c₂ : Nat) :
     Path CExpr (CExpr.comp (CExpr.ident c₁) (CExpr.comp f (CExpr.ident c₂))) f :=
   let mid := CExpr.comp f (CExpr.ident c₂)
   Path.trans
@@ -172,18 +172,18 @@ theorem unitCoherence_length (f : CExpr) (c₁ c₂ : Nat) :
 -- ============================================================
 
 /-- Theorem 13: Equivariance — permutation commutes with composition. -/
-def equivariancePath (f g : CExpr) (σ : Nat) :
+noncomputable def equivariancePath (f g : CExpr) (σ : Nat) :
     Path CExpr (CExpr.perm (CExpr.comp f g) σ)
                (CExpr.comp (CExpr.perm f σ) (CExpr.perm g σ)) :=
   .single (.rule "Σ-equivariance" _ _)
 
 /-- Theorem 14: Double permutation — σ then τ composes. -/
-def doublePerm (x : CExpr) (σ τ : Nat) :
+noncomputable def doublePerm (x : CExpr) (σ τ : Nat) :
     Path CExpr (CExpr.perm (CExpr.perm x σ) τ) (CExpr.perm x (σ + τ)) :=
   .single (.rule "Σ-compose" _ _)
 
 /-- Theorem 15: Equivariance + associativity composite path. -/
-def equivAssocPath (f g h : CExpr) (σ : Nat) :
+noncomputable def equivAssocPath (f g h : CExpr) (σ : Nat) :
     Path CExpr (CExpr.perm (CExpr.comp (CExpr.comp f g) h) σ)
                (CExpr.comp (CExpr.perm f σ) (CExpr.comp (CExpr.perm g σ) (CExpr.perm h σ))) :=
   let mid₁ := CExpr.comp (CExpr.perm (CExpr.comp f g) σ) (CExpr.perm h σ)
@@ -203,12 +203,12 @@ theorem equivAssocPath_length (f g h : CExpr) (σ : Nat) :
 -- ============================================================
 
 /-- Theorem 17: Free operad inclusion preserves identity. -/
-def freeUnitPath (c : Nat) :
+noncomputable def freeUnitPath (c : Nat) :
     Path CExpr (CExpr.ident c) (CExpr.ident c) :=
   .nil _
 
 /-- Theorem 18: Free operad composition path — roundtrip. -/
-def freeCompPath (f g : CExpr) :
+noncomputable def freeCompPath (f g : CExpr) :
     Path CExpr (CExpr.comp f g) (CExpr.comp f g) :=
   let x := CExpr.comp f g
   Path.trans
@@ -216,12 +216,12 @@ def freeCompPath (f g : CExpr) :
     (.single (.rule "free-contract" x x))
 
 /-- Theorem 19: Free operad associativity. -/
-def freeAssocPath (f g h : CExpr) :
+noncomputable def freeAssocPath (f g h : CExpr) :
     Path CExpr (CExpr.comp (CExpr.comp f g) h) (CExpr.comp f (CExpr.comp g h)) :=
   .single (.rule "free-assoc" _ _)
 
 /-- Theorem 20: Free operad respects unit. -/
-def freeUnitCompPath (f : CExpr) (c : Nat) :
+noncomputable def freeUnitCompPath (f : CExpr) (c : Nat) :
     Path CExpr (CExpr.comp (CExpr.ident c) f) f :=
   .single (.rule "free-unit" _ _)
 
@@ -230,11 +230,11 @@ def freeUnitCompPath (f : CExpr) (c : Nat) :
 -- ============================================================
 
 /-- Algebra action expression. -/
-def algAction (op : CExpr) (carrier : Nat) : CExpr :=
+noncomputable def algAction (op : CExpr) (carrier : Nat) : CExpr :=
   CExpr.comp op (CExpr.ident carrier)
 
 /-- Theorem 21: Algebra action respects associativity. -/
-def algAssocPath (f g : CExpr) (c : Nat) :
+noncomputable def algAssocPath (f g : CExpr) (c : Nat) :
     Path CExpr (algAction (CExpr.comp f g) c) (algAction f c) :=
   let lhs := algAction (CExpr.comp f g) c
   let mid := CExpr.comp f (algAction g c)
@@ -243,12 +243,12 @@ def algAssocPath (f g : CExpr) (c : Nat) :
     (.single (.rule "alg-assoc₂" mid (algAction f c)))
 
 /-- Theorem 22: Algebra action respects unit. -/
-def algUnitPath (c : Nat) :
+noncomputable def algUnitPath (c : Nat) :
     Path CExpr (algAction (CExpr.ident c) c) (CExpr.ident c) :=
   .single (.rule "alg-unit" _ _)
 
 /-- Theorem 23: Algebra morphism path. -/
-def algMorphismPath (op : CExpr) (c₁ c₂ : Nat) :
+noncomputable def algMorphismPath (op : CExpr) (c₁ c₂ : Nat) :
     Path CExpr (algAction op c₁) (algAction op c₂) :=
   .single (.rule "alg-morphism" _ _)
 
@@ -261,12 +261,12 @@ theorem algAssocPath_length (f g : CExpr) (c : Nat) :
 -- ============================================================
 
 /-- Theorem 25: Koszul dual path. -/
-def koszulPath (x : CExpr) :
+noncomputable def koszulPath (x : CExpr) :
     Path CExpr x (CExpr.dual x) :=
   .single (.rule "koszul" _ _)
 
 /-- Theorem 26: Double Koszul — dual of dual. -/
-def doubleKoszulPath (x : CExpr) :
+noncomputable def doubleKoszulPath (x : CExpr) :
     Path CExpr x (CExpr.dual (CExpr.dual x)) :=
   let mid := CExpr.dual x
   Path.trans
@@ -274,13 +274,13 @@ def doubleKoszulPath (x : CExpr) :
     (.single (.rule "koszul₂" mid (CExpr.dual mid)))
 
 /-- Theorem 27: Koszul respects composition. -/
-def koszulCompPath (f g : CExpr) :
+noncomputable def koszulCompPath (f g : CExpr) :
     Path CExpr (CExpr.dual (CExpr.comp f g))
                (CExpr.comp (CExpr.dual g) (CExpr.dual f)) :=
   .single (.rule "koszul-comp" _ _)
 
 /-- Theorem 28: Koszul + equivariance. -/
-def koszulEquivPath (x : CExpr) (σ : Nat) :
+noncomputable def koszulEquivPath (x : CExpr) (σ : Nat) :
     Path CExpr (CExpr.dual (CExpr.perm x σ)) (CExpr.perm (CExpr.dual x) σ) :=
   .single (.rule "koszul-equivar" _ _)
 
@@ -293,7 +293,7 @@ theorem doubleKoszulPath_length (x : CExpr) :
 -- ============================================================
 
 /-- Theorem 30: A∞ Stasheff relation — composition of higher multiplications. -/
-def ainfStasheffPath (n : Nat) :
+noncomputable def ainfStasheffPath (n : Nat) :
     Path CExpr (CExpr.comp (m_op n) (m_op 2))
                (CExpr.comp (m_op 2) (m_op n)) :=
   let mid := CExpr.comp (m_op (n + 1)) (CExpr.ident 0)
@@ -302,7 +302,7 @@ def ainfStasheffPath (n : Nat) :
     (.single (.rule "A∞-stasheff₂" mid _))
 
 /-- Theorem 31: A∞ higher composition. -/
-def ainfHigherPath (n k : Nat) :
+noncomputable def ainfHigherPath (n k : Nat) :
     Path CExpr (CExpr.comp (m_op n) (m_op k)) (m_op (n + k - 1)) :=
   let mid := CExpr.comp (m_op (n + k - 1)) (CExpr.ident 0)
   Path.trans
@@ -310,7 +310,7 @@ def ainfHigherPath (n k : Nat) :
     (.single (.rule "A∞-reduce" mid _))
 
 /-- Theorem 32: A∞ unitality. -/
-def ainfUnitPath :
+noncomputable def ainfUnitPath :
     Path CExpr (CExpr.comp (m_op 2) (CExpr.ident 0)) (m_op 1) :=
   .single (.rule "A∞-unit" _ _)
 
@@ -323,17 +323,17 @@ theorem ainfStasheff_length (n : Nat) :
 -- ============================================================
 
 /-- Theorem 34: E∞ commutativity — permutation acts trivially up to path. -/
-def einfCommPath (n : Nat) (σ : Nat) :
+noncomputable def einfCommPath (n : Nat) (σ : Nat) :
     Path CExpr (CExpr.perm (e_op n) σ) (e_op n) :=
   .single (.rule "E∞-comm" _ _)
 
 /-- Theorem 35: E∞ includes A∞. -/
-def einfIncludesAinf (n : Nat) :
+noncomputable def einfIncludesAinf (n : Nat) :
     Path CExpr (m_op n) (e_op n) :=
   .single (.rule "E∞-includes-A∞" _ _)
 
 /-- Theorem 36: E∞ composition coherence. -/
-def einfCompCoherence (n k : Nat) :
+noncomputable def einfCompCoherence (n k : Nat) :
     Path CExpr (CExpr.comp (e_op n) (e_op k)) (e_op (n + k - 1)) :=
   let mid := CExpr.comp (e_op (n + k - 1)) (CExpr.ident 0)
   Path.trans
@@ -341,7 +341,7 @@ def einfCompCoherence (n k : Nat) :
     (.single (.rule "E∞-reduce" mid _))
 
 /-- Theorem 37: E∞ full path: A∞ → E∞ → reduced. -/
-def einfFullPath (n k : Nat) :
+noncomputable def einfFullPath (n k : Nat) :
     Path CExpr (CExpr.comp (m_op n) (m_op k)) (e_op (n + k - 1)) :=
   let mid₁ := CExpr.comp (e_op n) (e_op k)
   let mid₂ := CExpr.comp (e_op (n + k - 1)) (CExpr.ident 0)
@@ -360,17 +360,17 @@ theorem einfFullPath_length (n k : Nat) :
 -- ============================================================
 
 /-- Theorem 39: Bar-cobar adjunction path — Ω(B(P)) ≃ P. -/
-def barCobarAdjPath (p : CExpr) :
+noncomputable def barCobarAdjPath (p : CExpr) :
     Path CExpr (CExpr.cobar (CExpr.bar p)) p :=
   .single (.rule "ΩB≃id" _ _)
 
 /-- Theorem 40: Cobar-bar path — B(Ω(C)) ≃ C. -/
-def cobarBarPath (c : CExpr) :
+noncomputable def cobarBarPath (c : CExpr) :
     Path CExpr (CExpr.bar (CExpr.cobar c)) c :=
   .single (.rule "BΩ≃id" _ _)
 
 /-- Theorem 41: Bar-cobar roundtrip. -/
-def barCobarRoundtrip (p : CExpr) :
+noncomputable def barCobarRoundtrip (p : CExpr) :
     Path CExpr p p :=
   Path.trans
     (barCobarAdjPath p).symm
@@ -381,13 +381,13 @@ theorem barCobarRoundtrip_length (p : CExpr) :
     (barCobarRoundtrip p).length = 2 := rfl
 
 /-- Theorem 43: Bar respects composition (up to path). -/
-def barCompPath (f g : CExpr) :
+noncomputable def barCompPath (f g : CExpr) :
     Path CExpr (CExpr.bar (CExpr.comp f g))
                (CExpr.comp (CExpr.bar f) (CExpr.bar g)) :=
   .single (.rule "B-lax-monoidal" _ _)
 
 /-- Theorem 44: Bar-cobar on A∞ operad. -/
-def barCobarAinfPath (n : Nat) :
+noncomputable def barCobarAinfPath (n : Nat) :
     Path CExpr (CExpr.cobar (CExpr.bar (m_op n))) (m_op n) :=
   barCobarAdjPath (m_op n)
 
@@ -396,12 +396,12 @@ def barCobarAinfPath (n : Nat) :
 -- ============================================================
 
 /-- Theorem 45: Homotopy transfer along retract. -/
-def transferPath (source target : CExpr) :
+noncomputable def transferPath (source target : CExpr) :
     Path CExpr (CExpr.transf source target) target :=
   .single (.rule "homotopy-transfer" _ _)
 
 /-- Theorem 46: Transfer respects composition. -/
-def transferCompPath (f g target : CExpr) :
+noncomputable def transferCompPath (f g target : CExpr) :
     Path CExpr (CExpr.transf (CExpr.comp f g) target) target :=
   let mid := CExpr.transf f (CExpr.transf g target)
   Path.trans
@@ -409,12 +409,12 @@ def transferCompPath (f g target : CExpr) :
     (.single (.rule "transfer-comp₂" mid _))
 
 /-- Theorem 47: Transfer is functorial. -/
-def transferFunctorialPath (a b c : CExpr) :
+noncomputable def transferFunctorialPath (a b c : CExpr) :
     Path CExpr (CExpr.transf a (CExpr.transf b c)) (CExpr.transf a c) :=
   .single (.rule "transfer-functorial" _ _)
 
 /-- Theorem 48: Transfer respects A∞ structure. -/
-def transferAinfPath (n : Nat) (target : CExpr) :
+noncomputable def transferAinfPath (n : Nat) (target : CExpr) :
     Path CExpr (CExpr.transf (m_op n) target) target :=
   .single (.rule "transfer-A∞" _ _)
 
@@ -427,7 +427,7 @@ theorem transferCompPath_length (f g target : CExpr) :
 -- ============================================================
 
 /-- Theorem 50: Pentagon path — five associativity paths form a cycle. -/
-def pentagonPath (a b c d : CExpr) :
+noncomputable def pentagonPath (a b c d : CExpr) :
     Path CExpr (CExpr.comp (CExpr.comp (CExpr.comp a b) c) d)
                (CExpr.comp (CExpr.comp (CExpr.comp a b) c) d) :=
   let e₁ := CExpr.comp (CExpr.comp a b) (CExpr.comp c d)
@@ -446,7 +446,7 @@ theorem pentagonPath_length (a b c d : CExpr) :
     (pentagonPath a b c d).length = 5 := rfl
 
 /-- Theorem 52: Triangle path — unit + associativity coherence. -/
-def trianglePath (f g : CExpr) (c : Nat) :
+noncomputable def trianglePath (f g : CExpr) (c : Nat) :
     Path CExpr (CExpr.comp (CExpr.comp f (CExpr.ident c)) g) (CExpr.comp f g) :=
   let mid := CExpr.comp f (CExpr.comp (CExpr.ident c) g)
   Path.trans
@@ -468,12 +468,12 @@ structure Confluent (p : Path CExpr a b) (q : Path CExpr a c) where
   right  : Path CExpr c target
 
 /-- Theorem 54: Unit paths are confluent with associativity. -/
-def unitAssocConfluent (f : CExpr) (c : Nat) :
+noncomputable def unitAssocConfluent (f : CExpr) (c : Nat) :
     Confluent (rightUnitPath f c) (rightUnitPath f c) :=
   ⟨ f, .nil f, .nil f ⟩
 
 /-- Theorem 55: Reflexive paths are trivially confluent. -/
-def reflConfluent (x : CExpr) :
+noncomputable def reflConfluent (x : CExpr) :
     Confluent (Path.nil x) (Path.nil x) :=
   ⟨x, .nil x, .nil x⟩
 
@@ -482,7 +482,7 @@ def reflConfluent (x : CExpr) :
 -- ============================================================
 
 /-- Lift a path through CExpr.bar (functorial action on paths). -/
-def congrBar : Path CExpr a b → Path CExpr (CExpr.bar a) (CExpr.bar b)
+noncomputable def congrBar : Path CExpr a b → Path CExpr (CExpr.bar a) (CExpr.bar b)
   | .nil e => .nil (CExpr.bar e)
   | .cons (.refl e) rest => congrBar rest
   | .cons (.rule n x y) rest =>
@@ -495,7 +495,7 @@ theorem congrBar_nil (x : CExpr) :
     congrBar (Path.nil x) = Path.nil (CExpr.bar x) := rfl
 
 /-- Lift a path through CExpr.dual (functorial action on paths). -/
-def congrDual : Path CExpr a b → Path CExpr (CExpr.dual a) (CExpr.dual b)
+noncomputable def congrDual : Path CExpr a b → Path CExpr (CExpr.dual a) (CExpr.dual b)
   | .nil e => .nil (CExpr.dual e)
   | .cons (.refl e) rest => congrDual rest
   | .cons (.rule n x y) rest =>
@@ -529,7 +529,7 @@ theorem path_reversible (p : Path CExpr a b) :
   ⟨p.symm, symm_length p⟩
 
 /-- Theorem 60: Grand composite path using all step types. -/
-def grandPath : Path CExpr (μ 2) (μ 2) :=
+noncomputable def grandPath : Path CExpr (μ 2) (μ 2) :=
   let e₁ := CExpr.comp (μ 2) (μ 2)
   let e₂ := CExpr.perm e₁ 0
   let e₃ := CExpr.dual e₂

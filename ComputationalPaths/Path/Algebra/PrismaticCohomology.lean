@@ -75,7 +75,7 @@ inductive PrismaticStep (R : Type u) : R → R → Prop where
   | breuil_kisin (a : R) : PrismaticStep a a
 
 /-- Every PrismaticStep yields a Path. -/
-def PrismaticStep.toPath {R : Type u} {a b : R}
+noncomputable def PrismaticStep.toPath {R : Type u} {a b : R}
     (s : PrismaticStep R a b) : Path a b :=
   match s with
   | .delta_map _ => Path.refl _
@@ -120,20 +120,20 @@ namespace DeltaRingData
 variable {A : Type u}
 
 /-- Multi-step: φ preserves zero via the homomorphism. -/
-def phi_zero (D : DeltaRingData A) : Path (D.phi D.zero) D.zero :=
+noncomputable def phi_zero (D : DeltaRingData A) : Path (D.phi D.zero) D.zero :=
   Path.trans (D.phi_eq D.zero) D.phi_hom.map_zero
 
 /-- Multi-step: φ preserves one. -/
-def phi_one (D : DeltaRingData A) : Path (D.phi D.one) D.one :=
+noncomputable def phi_one (D : DeltaRingData A) : Path (D.phi D.one) D.one :=
   Path.trans (D.phi_eq D.one) D.phi_hom.map_one
 
 /-- Symmetry: zero from δ. -/
-def zero_from_delta_zero (D : DeltaRingData A) :
+noncomputable def zero_from_delta_zero (D : DeltaRingData A) :
     Path D.zero (D.delta D.zero) :=
   Path.symm D.delta_zero
 
 /-- Multi-step: φ preserves addition. -/
-def phi_add (D : DeltaRingData A) (a b : A) :
+noncomputable def phi_add (D : DeltaRingData A) (a b : A) :
     Path (D.phi (D.add a b)) (D.add (D.phi a) (D.phi b)) :=
   Path.trans (D.phi_eq (D.add a b))
     (Path.trans (D.phi_hom.map_add a b)
@@ -144,7 +144,7 @@ def phi_add (D : DeltaRingData A) (a b : A) :
           (Path.symm (D.phi_eq b)))))
 
 /-- Multi-step: φ preserves multiplication. -/
-def phi_mul (D : DeltaRingData A) (a b : A) :
+noncomputable def phi_mul (D : DeltaRingData A) (a b : A) :
     Path (D.phi (D.mul a b)) (D.mul (D.phi a) (D.phi b)) :=
   Path.trans (D.phi_eq (D.mul a b))
     (Path.trans (D.phi_hom.map_mul a b)
@@ -207,22 +207,22 @@ namespace PrismData
 variable {A : Type u}
 
 /-- Multi-step: the prism condition φ(d)·q = p. -/
-def prism_cond_witness (P : PrismData A) :
+noncomputable def prism_cond_witness (P : PrismData A) :
     Path (P.mul (P.phi P.generator) P.phi_gen_div_p) P.p_elem :=
   Path.trans P.prism_condition (Path.refl _)
 
 /-- Symmetry: p from the prism condition. -/
-def p_from_prism (P : PrismData A) :
+noncomputable def p_from_prism (P : PrismData A) :
     Path P.p_elem (P.mul (P.phi P.generator) P.phi_gen_div_p) :=
   Path.symm P.prism_condition
 
 /-- Commutativity of the prism condition. -/
-def prism_cond_comm (P : PrismData A) :
+noncomputable def prism_cond_comm (P : PrismData A) :
     Path (P.mul P.phi_gen_div_p (P.phi P.generator)) P.p_elem :=
   Path.trans (P.mul_comm P.phi_gen_div_p (P.phi P.generator)) P.prism_condition
 
 /-- Multi-step: p decomposition in I + φ(I)·A. -/
-def p_decompose (P : PrismData A) :
+noncomputable def p_decompose (P : PrismData A) :
     Path P.p_elem (P.add P.p_in_sum (P.mul (P.phi P.generator) P.p_in_sum')) :=
   Path.trans P.p_in_sum_spec (Path.refl _)
 
@@ -248,22 +248,22 @@ namespace PerfectPrismData
 variable {A : Type u}
 
 /-- Multi-step: φ is a bijection (right inverse). -/
-def phi_bij_right (PP : PerfectPrismData A) (a : A) :
+noncomputable def phi_bij_right (PP : PerfectPrismData A) (a : A) :
     Path (PP.phi (PP.phi_inv a)) a :=
   Path.trans (PP.phi_right_inv a) (Path.refl _)
 
 /-- Multi-step: φ is a bijection (left inverse). -/
-def phi_bij_left (PP : PerfectPrismData A) (a : A) :
+noncomputable def phi_bij_left (PP : PerfectPrismData A) (a : A) :
     Path (PP.phi_inv (PP.phi a)) a :=
   Path.trans (PP.phi_left_inv a) (Path.refl _)
 
 /-- Symmetry: a from φ⁻¹ ∘ φ. -/
-def a_from_phi_inv (PP : PerfectPrismData A) (a : A) :
+noncomputable def a_from_phi_inv (PP : PerfectPrismData A) (a : A) :
     Path a (PP.phi_inv (PP.phi a)) :=
   Path.symm (PP.phi_left_inv a)
 
 /-- Composed: φ of φ⁻¹ of φ gives φ. -/
-def phi_phi_inv_phi (PP : PerfectPrismData A) (a : A) :
+noncomputable def phi_phi_inv_phi (PP : PerfectPrismData A) (a : A) :
     Path (PP.phi (PP.phi_inv (PP.phi a))) (PP.phi a) :=
   Path.trans
     (Path.congrArg PP.phi (PP.phi_left_inv a))
@@ -348,17 +348,17 @@ variable {A : Type u} {R : Type v}
 variable {PA : PrismData A} {rR : PathRing R}
 
 /-- Multi-step: Frobenius on cohomology preserves zero. -/
-def phi_cohom_zero (PC : PrismaticCohomData A R PA rR) :
+noncomputable def phi_cohom_zero (PC : PrismaticCohomData A R PA rR) :
     Path (PC.phi_cohom PC.cohomRing.zero) PC.cohomRing.zero :=
   Path.trans (PC.phi_cohom_eq PC.cohomRing.zero) PC.phi_cohom_hom.map_zero
 
 /-- Multi-step: Frobenius preserves one. -/
-def phi_cohom_one (PC : PrismaticCohomData A R PA rR) :
+noncomputable def phi_cohom_one (PC : PrismaticCohomData A R PA rR) :
     Path (PC.phi_cohom PC.cohomRing.one) PC.cohomRing.one :=
   Path.trans (PC.phi_cohom_eq PC.cohomRing.one) PC.phi_cohom_hom.map_one
 
 /-- Symmetry: zero from connection flatness. -/
-def flat_connection_symm (PC : PrismaticCohomData A R PA rR) (c : PC.CohomType) :
+noncomputable def flat_connection_symm (PC : PrismaticCohomData A R PA rR) (c : PC.CohomType) :
     Path PC.cohomRing.zero (PC.connection (PC.connection c)) :=
   Path.symm (PC.connection_flat c)
 
@@ -426,17 +426,17 @@ variable {A : Type u} {R : Type v} {C : Type w}
 variable {PA : PrismData A} {rR : PathRing R} {rC : PathRing C}
 
 /-- Multi-step: divided Frobenius of zero. -/
-def div_frob_zero (N : NygaardData A R C PA rR rC) :
+noncomputable def div_frob_zero (N : NygaardData A R C PA rR rC) :
     Path (N.divided_frob rC.zero) rC.zero :=
   Path.trans N.divided_frob_zero (Path.refl _)
 
 /-- Symmetry: zero from divided Frobenius. -/
-def zero_from_div_frob (N : NygaardData A R C PA rR rC) :
+noncomputable def zero_from_div_frob (N : NygaardData A R C PA rR rC) :
     Path rC.zero (N.divided_frob rC.zero) :=
   Path.symm N.divided_frob_zero
 
 /-- Predicate expressing exhaustiveness of the Nygaard filtration. -/
-def FiltrationExhaustive (N : NygaardData A R C PA rR rC) : Prop :=
+noncomputable def FiltrationExhaustive (N : NygaardData A R C PA rR rC) : Prop :=
   ∀ c : C, ∃ n : Nat, N.mem c
 
 /-- If every element is in Nygaard filtration, then the filtration is exhaustive. -/
@@ -477,17 +477,17 @@ variable {A : Type u} {R : Type v} {C : Type w}
 variable {PA : PrismData A} {rR : PathRing R} {rC : PathRing C}
 
 /-- Multi-step: comparison preserves zero. -/
-def comp_zero (HT : HodgeTateComparison A R C PA rR rC) :
+noncomputable def comp_zero (HT : HodgeTateComparison A R C PA rR rC) :
     Path (HT.compMap rC.zero) rC.zero :=
   Path.trans (HT.comp_eq rC.zero) HT.comp_hom.map_zero
 
 /-- Composed: right inverse then left inverse. -/
-def comp_roundtrip (HT : HodgeTateComparison A R C PA rR rC) (c : C) :
+noncomputable def comp_roundtrip (HT : HodgeTateComparison A R C PA rR rC) (c : C) :
     Path (HT.compInv (HT.compMap c)) c :=
   Path.trans (HT.comp_left_inv c) (Path.refl _)
 
 /-- Symmetry: identity from comparison. -/
-def comp_roundtrip_symm (HT : HodgeTateComparison A R C PA rR rC) (c : C) :
+noncomputable def comp_roundtrip_symm (HT : HodgeTateComparison A R C PA rR rC) (c : C) :
     Path c (HT.compInv (HT.compMap c)) :=
   Path.symm (HT.comp_left_inv c)
 
@@ -516,12 +516,12 @@ variable {A : Type u} {R : Type v} {C : Type w}
 variable {PA : PrismData A} {rR : PathRing R} {rC : PathRing C}
 
 /-- Multi-step: crystalline comparison preserves zero. -/
-def crys_zero (CC : CrystallineComparison A R C PA rR rC) :
+noncomputable def crys_zero (CC : CrystallineComparison A R C PA rR rC) :
     Path (CC.crysMap rC.zero) rC.zero :=
   Path.trans (CC.crys_eq rC.zero) CC.crys_hom.map_zero
 
 /-- Symmetry: zero from crystalline map. -/
-def zero_from_crys (CC : CrystallineComparison A R C PA rR rC) :
+noncomputable def zero_from_crys (CC : CrystallineComparison A R C PA rR rC) :
     Path rC.zero (CC.crysMap rC.zero) :=
   Path.symm (crys_zero CC)
 
@@ -553,22 +553,22 @@ theorem prismatic_comparison_frobenius_path
 /-! ## RwEq multi-step constructions -/
 
 /-- Multi-step: δ(0) = 0 then φ(0) = 0 chain. -/
-def delta_phi_zero_chain {A : Type u} (D : DeltaRingData A) :
+noncomputable def delta_phi_zero_chain {A : Type u} (D : DeltaRingData A) :
     Path (D.delta D.zero) D.zero :=
   Path.trans D.delta_zero (Path.refl _)
 
 /-- Multi-step: prism condition composed with commutativity. -/
-def prism_cond_full {A : Type u} (P : PrismData A) :
+noncomputable def prism_cond_full {A : Type u} (P : PrismData A) :
     Path (P.mul P.phi_gen_div_p (P.phi P.generator)) P.p_elem :=
   Path.trans (P.mul_comm P.phi_gen_div_p (P.phi P.generator)) P.prism_condition
 
 /-- Symmetry chain: perfect prism φ bijectivity. -/
-def perfect_phi_chain {A : Type u} (PP : PerfectPrismData A) (a : A) :
+noncomputable def perfect_phi_chain {A : Type u} (PP : PerfectPrismData A) (a : A) :
     Path a (PP.phi_inv (PP.phi a)) :=
   Path.symm (PP.phi_left_inv a)
 
 /-- Multi-step: Nygaard divided Frobenius of zero via symmetry. -/
-def nygaard_zero_symm {A : Type u} {R : Type v} {C : Type w}
+noncomputable def nygaard_zero_symm {A : Type u} {R : Type v} {C : Type w}
     {PA : PrismData A} {rR : PathRing R} {rC : PathRing C}
     (N : NygaardData A R C PA rR rC) :
     Path rC.zero (N.divided_frob rC.zero) :=

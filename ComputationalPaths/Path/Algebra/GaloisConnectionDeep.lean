@@ -60,11 +60,11 @@ variable {leA : A → A → Prop} {leB : B → B → Prop} {leC : C → C → Pr
 -- ============================================================================
 
 /-- The closure operator g . f derived from a Galois connection. -/
-def closureOp (gc : GaloisConn A B leA leB) : A → A :=
+noncomputable def closureOp (gc : GaloisConn A B leA leB) : A → A :=
   fun a => gc.upper (gc.lower a)
 
 -- Theorem 1: Path witness: closure operator definition
-def closureOp_def (gc : GaloisConn A B leA leB) (a : A) :
+noncomputable def closureOp_def (gc : GaloisConn A B leA leB) (a : A) :
     Path (closureOp gc a) (gc.upper (gc.lower a)) :=
   Path.refl (closureOp gc a)
 
@@ -79,7 +79,7 @@ theorem closure_monotone (gc : GaloisConn A B leA leB)
   gc.upper_mono (gc.lower_mono h)
 
 -- Theorem 4: Path witness for closure composition
-def closure_comp_path (gc : GaloisConn A B leA leB) (a : A) :
+noncomputable def closure_comp_path (gc : GaloisConn A B leA leB) (a : A) :
     Path (closureOp gc a) (gc.upper (gc.lower a)) :=
   Path.refl _
 
@@ -88,11 +88,11 @@ def closure_comp_path (gc : GaloisConn A B leA leB) (a : A) :
 -- ============================================================================
 
 /-- The interior operator f . g (dual of closure). -/
-def interiorOp (gc : GaloisConn A B leA leB) : B → B :=
+noncomputable def interiorOp (gc : GaloisConn A B leA leB) : B → B :=
   fun b => gc.lower (gc.upper b)
 
 -- Theorem 5: Interior definition path
-def interiorOp_def (gc : GaloisConn A B leA leB) (b : B) :
+noncomputable def interiorOp_def (gc : GaloisConn A B leA leB) (b : B) :
     Path (interiorOp gc b) (gc.lower (gc.upper b)) :=
   Path.refl _
 
@@ -139,25 +139,25 @@ theorem interior_idempotent_ge
 -- ============================================================================
 
 -- Theorem 12: Double closure unfolds
-def double_closure_path (gc : GaloisConn A B leA leB) (a : A) :
+noncomputable def double_closure_path (gc : GaloisConn A B leA leB) (a : A) :
     Path (closureOp gc (closureOp gc a))
          (gc.upper (gc.lower (gc.upper (gc.lower a)))) :=
   Path.refl _
 
 -- Theorem 13: Double interior unfolds
-def double_interior_path (gc : GaloisConn A B leA leB) (b : B) :
+noncomputable def double_interior_path (gc : GaloisConn A B leA leB) (b : B) :
     Path (interiorOp gc (interiorOp gc b))
          (gc.lower (gc.upper (gc.lower (gc.upper b)))) :=
   Path.refl _
 
 -- Theorem 14: Closure then interior
-def closure_interior_path (gc : GaloisConn A B leA leB) (a : A) :
+noncomputable def closure_interior_path (gc : GaloisConn A B leA leB) (a : A) :
     Path (interiorOp gc (gc.lower a))
          (gc.lower (gc.upper (gc.lower a))) :=
   Path.refl _
 
 -- Theorem 15: Interior then closure
-def interior_closure_path (gc : GaloisConn A B leA leB) (b : B) :
+noncomputable def interior_closure_path (gc : GaloisConn A B leA leB) (b : B) :
     Path (closureOp gc (gc.upper b))
          (gc.upper (gc.lower (gc.upper b))) :=
   Path.refl _
@@ -167,7 +167,7 @@ def interior_closure_path (gc : GaloisConn A B leA leB) (b : B) :
 -- ============================================================================
 
 -- Theorem 16: Composition of Galois connections
-def composeGC
+noncomputable def composeGC
     (gc₁ : GaloisConn A B leA leB)
     (gc₂ : GaloisConn B C leB leC) :
     GaloisConn A C leA leC where
@@ -181,7 +181,7 @@ def composeGC
   transB := gc₂.transB
 
 -- Theorem 17: Composed closure path
-def composed_closure_path
+noncomputable def composed_closure_path
     (gc₁ : GaloisConn A B leA leB)
     (gc₂ : GaloisConn B C leB leC) (a : A) :
     Path (closureOp (composeGC gc₁ gc₂) a)
@@ -189,14 +189,14 @@ def composed_closure_path
   Path.refl _
 
 -- Theorem 18: Composed lower is composition path
-def composed_lower_path
+noncomputable def composed_lower_path
     (gc₁ : GaloisConn A B leA leB)
     (gc₂ : GaloisConn B C leB leC) (a : A) :
     Path ((composeGC gc₁ gc₂).lower a) (gc₂.lower (gc₁.lower a)) :=
   Path.refl _
 
 -- Theorem 19: Composed upper is composition path
-def composed_upper_path
+noncomputable def composed_upper_path
     (gc₁ : GaloisConn A B leA leB)
     (gc₂ : GaloisConn B C leB leC) (c : C) :
     Path ((composeGC gc₁ gc₂).upper c) (gc₁.upper (gc₂.upper c)) :=
@@ -223,21 +223,21 @@ theorem upper_image_closed_le (gc : GaloisConn A B leA leB) (b : B) :
   gc.upper_mono (gc.counit b)
 
 -- Theorem 22: Build a ClosedElement from image of upper
-def closedFromUpper (gc : GaloisConn A B leA leB) (b : B) :
+noncomputable def closedFromUpper (gc : GaloisConn A B leA leB) (b : B) :
     ClosedElement gc where
   val := gc.upper b
   closed_le := upper_image_closed_le gc b
   closed_ge := upper_image_closed_ge gc b
 
 -- Theorem 23: Closure of any element produces a closed element
-def closureIsClosed (gc : GaloisConn A B leA leB) (a : A) :
+noncomputable def closureIsClosed (gc : GaloisConn A B leA leB) (a : A) :
     ClosedElement gc where
   val := closureOp gc a
   closed_le := closure_idempotent_le gc a
   closed_ge := closure_idempotent_ge gc a
 
 -- Theorem 24: Path witness for closureIsClosed val
-def closureIsClosed_val (gc : GaloisConn A B leA leB) (a : A) :
+noncomputable def closureIsClosed_val (gc : GaloisConn A B leA leB) (a : A) :
     Path (closureIsClosed gc a).val (closureOp gc a) :=
   Path.refl _
 
@@ -262,14 +262,14 @@ theorem lower_image_open_ge (gc : GaloisConn A B leA leB) (a : A) :
   gc.lower_mono (gc.unit a)
 
 -- Theorem 27: Build an OpenElement from image of lower
-def openFromLower (gc : GaloisConn A B leA leB) (a : A) :
+noncomputable def openFromLower (gc : GaloisConn A B leA leB) (a : A) :
     OpenElement gc where
   val := gc.lower a
   open_le := lower_image_open_le gc a
   open_ge := lower_image_open_ge gc a
 
 -- Theorem 28: Interior of any element produces an open element
-def interiorIsOpen (gc : GaloisConn A B leA leB) (b : B) :
+noncomputable def interiorIsOpen (gc : GaloisConn A B leA leB) (b : B) :
     OpenElement gc where
   val := interiorOp gc b
   open_le := interior_idempotent_le gc b
@@ -288,7 +288,7 @@ structure ClosureOperator (A : Type u) (leA : A → A → Prop) where
   idem_ge   : ∀ a, leA (cl a) (cl (cl a))
 
 -- Theorem 29: Every Galois connection induces a closure operator
-def gcToClosureOp (gc : GaloisConn A B leA leB) :
+noncomputable def gcToClosureOp (gc : GaloisConn A B leA leB) :
     ClosureOperator A leA where
   cl := closureOp gc
   extensive := closure_extensive gc
@@ -297,7 +297,7 @@ def gcToClosureOp (gc : GaloisConn A B leA leB) :
   idem_ge := closure_idempotent_ge gc
 
 -- Theorem 30: Path witness: gcToClosureOp's cl is closureOp
-def gcToClosureOp_cl_path (gc : GaloisConn A B leA leB) :
+noncomputable def gcToClosureOp_cl_path (gc : GaloisConn A B leA leB) :
     Path (gcToClosureOp gc).cl (closureOp gc) :=
   Path.refl _
 
@@ -312,25 +312,25 @@ structure GaloisInsertion (A : Type u) (B : Type v)
   counit_eq : ∀ (b : B), Path (lower (upper b)) b
 
 -- Theorem 31: In a Galois insertion, interior is identity (path witness)
-def insertion_interior_id
+noncomputable def insertion_interior_id
     (gi : GaloisInsertion A B leA leB) (b : B) :
     Path (interiorOp gi.toGaloisConn b) b :=
   gi.counit_eq b
 
 -- Theorem 32: f . g . f = f in a Galois insertion
-def insertion_lower_upper_lower
+noncomputable def insertion_lower_upper_lower
     (gi : GaloisInsertion A B leA leB) (a : A) :
     Path (gi.lower (gi.upper (gi.lower a))) (gi.lower a) :=
   gi.counit_eq (gi.lower a)
 
 -- Theorem 33: congrArg witness for insertion
-def insertion_congrArg
+noncomputable def insertion_congrArg
     (gi : GaloisInsertion A B leA leB) (f : B → C) (b : B) :
     Path (f (gi.lower (gi.upper b))) (f b) :=
   Path.congrArg f (gi.counit_eq b)
 
 -- Theorem 34: Double interior in insertion is still identity
-def insertion_double_interior
+noncomputable def insertion_double_interior
     (gi : GaloisInsertion A B leA leB) (b : B) :
     Path (interiorOp gi.toGaloisConn (interiorOp gi.toGaloisConn b))
          b :=
@@ -347,25 +347,25 @@ structure GCEquiv (gc₁ gc₂ : GaloisConn A B leA leB) where
   upper_eq : ∀ b, Path (gc₁.upper b) (gc₂.upper b)
 
 -- Theorem 35: GCEquiv is reflexive
-def GCEquiv.rfl (gc : GaloisConn A B leA leB) : GCEquiv gc gc where
+noncomputable def GCEquiv.rfl (gc : GaloisConn A B leA leB) : GCEquiv gc gc where
   lower_eq _ := Path.refl _
   upper_eq _ := Path.refl _
 
 -- Theorem 36: GCEquiv is symmetric
-def GCEquiv.symm' {gc₁ gc₂ : GaloisConn A B leA leB}
+noncomputable def GCEquiv.symm' {gc₁ gc₂ : GaloisConn A B leA leB}
     (e : GCEquiv gc₁ gc₂) : GCEquiv gc₂ gc₁ where
   lower_eq a := Path.symm (e.lower_eq a)
   upper_eq b := Path.symm (e.upper_eq b)
 
 -- Theorem 37: GCEquiv is transitive
-def GCEquiv.trans'
+noncomputable def GCEquiv.trans'
     {gc₁ gc₂ gc₃ : GaloisConn A B leA leB}
     (e₁ : GCEquiv gc₁ gc₂) (e₂ : GCEquiv gc₂ gc₃) : GCEquiv gc₁ gc₃ where
   lower_eq a := Path.trans (e₁.lower_eq a) (e₂.lower_eq a)
   upper_eq b := Path.trans (e₁.upper_eq b) (e₂.upper_eq b)
 
 -- Theorem 38: Closure operators from equivalent GCs agree
-def equiv_closure_path
+noncomputable def equiv_closure_path
     {gc₁ gc₂ : GaloisConn A B leA leB}
     (e : GCEquiv gc₁ gc₂) (a : A) :
     Path (closureOp gc₁ a) (closureOp gc₂ a) :=
@@ -383,14 +383,14 @@ structure FixedPoint (cl : ClosureOperator A leA) where
   fixed_ge : leA val (cl.cl val)
 
 -- Theorem 39: Closure of a yields a fixed point
-def closureFixedPoint (cl : ClosureOperator A leA) (a : A) :
+noncomputable def closureFixedPoint (cl : ClosureOperator A leA) (a : A) :
     FixedPoint cl where
   val := cl.cl a
   fixed_le := cl.idem_le a
   fixed_ge := cl.idem_ge a
 
 -- Theorem 40: Path witness for the fixed point value
-def closureFixedPoint_val (cl : ClosureOperator A leA) (a : A) :
+noncomputable def closureFixedPoint_val (cl : ClosureOperator A leA) (a : A) :
     Path (closureFixedPoint cl a).val (cl.cl a) :=
   Path.refl _
 
@@ -460,17 +460,17 @@ structure ClosureEquiv (cl₁ cl₂ : ClosureOperator A leA) where
   cl_eq : ∀ a, Path (cl₁.cl a) (cl₂.cl a)
 
 -- Theorem 49: ClosureEquiv is reflexive
-def ClosureEquiv.rfl (cl : ClosureOperator A leA) : ClosureEquiv cl cl where
+noncomputable def ClosureEquiv.rfl (cl : ClosureOperator A leA) : ClosureEquiv cl cl where
   cl_eq _ := Path.refl _
 
 -- Theorem 50: ClosureEquiv is symmetric
-def ClosureEquiv.symm'
+noncomputable def ClosureEquiv.symm'
     {cl₁ cl₂ : ClosureOperator A leA}
     (e : ClosureEquiv cl₁ cl₂) : ClosureEquiv cl₂ cl₁ where
   cl_eq a := Path.symm (e.cl_eq a)
 
 -- Theorem 51: ClosureEquiv is transitive
-def ClosureEquiv.trans'
+noncomputable def ClosureEquiv.trans'
     {cl₁ cl₂ cl₃ : ClosureOperator A leA}
     (e₁ : ClosureEquiv cl₁ cl₂) (e₂ : ClosureEquiv cl₂ cl₃) :
     ClosureEquiv cl₁ cl₃ where
@@ -481,12 +481,12 @@ def ClosureEquiv.trans'
 -- ============================================================================
 
 /-- Product order on pairs. -/
-def prodLe {A : Type u} {B : Type v}
+noncomputable def prodLe {A : Type u} {B : Type v}
     (leA : A → A → Prop) (leB : B → B → Prop) : A × B → A × B → Prop :=
   fun p q => leA p.1 q.1 ∧ leB p.2 q.2
 
 -- Theorem 52: Product of two Galois connections
-def productGC
+noncomputable def productGC
     {A₁ : Type u} {B₁ : Type v} {A₂ : Type u} {B₂ : Type v}
     {leA₁ : A₁ → A₁ → Prop} {leB₁ : B₁ → B₁ → Prop}
     {leA₂ : A₂ → A₂ → Prop} {leB₂ : B₂ → B₂ → Prop}
@@ -503,7 +503,7 @@ def productGC
   transB h₁ h₂ := ⟨gc₁.transB h₁.1 h₂.1, gc₂.transB h₁.2 h₂.2⟩
 
 -- Theorem 53: Product closure is component-wise
-def product_closure_path
+noncomputable def product_closure_path
     {A₁ : Type u} {B₁ : Type v} {A₂ : Type u} {B₂ : Type v}
     {leA₁ : A₁ → A₁ → Prop} {leB₁ : B₁ → B₁ → Prop}
     {leA₂ : A₂ → A₂ → Prop} {leB₂ : B₂ → B₂ → Prop}
@@ -519,7 +519,7 @@ def product_closure_path
 -- ============================================================================
 
 -- Theorem 54: Identity Galois connection
-def idGC (reflA : ∀ a : A, leA a a)
+noncomputable def idGC (reflA : ∀ a : A, leA a a)
     (trA : ∀ {a b c : A}, leA a b → leA b c → leA a c) :
     GaloisConn A A leA leA where
   lower := id
@@ -532,7 +532,7 @@ def idGC (reflA : ∀ a : A, leA a a)
   transB := trA
 
 -- Theorem 55: Identity GC closure is identity (path)
-def idGC_closure_path
+noncomputable def idGC_closure_path
     (reflA : ∀ a : A, leA a a)
     (trA : ∀ {a b c : A}, leA a b → leA b c → leA a c)
     (a : A) :
@@ -544,7 +544,7 @@ def idGC_closure_path
 -- ============================================================================
 
 -- Theorem 56: Opposite Galois connection (flip the adjunction)
-def opGC (gc : GaloisConn A B leA leB) :
+noncomputable def opGC (gc : GaloisConn A B leA leB) :
     GaloisConn B A (fun b₁ b₂ => leB b₂ b₁) (fun a₁ a₂ => leA a₂ a₁) where
   lower := gc.upper
   upper := gc.lower
@@ -556,12 +556,12 @@ def opGC (gc : GaloisConn A B leA leB) :
   transB h₁ h₂ := gc.transA h₂ h₁
 
 -- Theorem 57: Double opposite lower is original
-def opGC_involutive_lower (gc : GaloisConn A B leA leB) (a : A) :
+noncomputable def opGC_involutive_lower (gc : GaloisConn A B leA leB) (a : A) :
     Path ((opGC (opGC gc)).lower a) (gc.lower a) :=
   Path.refl _
 
 -- Theorem 58: Double opposite upper is original
-def opGC_involutive_upper (gc : GaloisConn A B leA leB) (b : B) :
+noncomputable def opGC_involutive_upper (gc : GaloisConn A B leA leB) (b : B) :
     Path ((opGC (opGC gc)).upper b) (gc.upper b) :=
   Path.refl _
 
@@ -570,28 +570,28 @@ def opGC_involutive_upper (gc : GaloisConn A B leA leB) (b : B) :
 -- ============================================================================
 
 -- Theorem 59: Transport closure across GCEquiv
-def transport_closure
+noncomputable def transport_closure
     {gc₁ gc₂ : GaloisConn A B leA leB}
     (e : GCEquiv gc₁ gc₂) (a : A) :
     Path (closureOp gc₁ a) (closureOp gc₂ a) :=
   equiv_closure_path e a
 
 -- Theorem 60: Symmetry of transported closure
-def transport_closure_symm
+noncomputable def transport_closure_symm
     {gc₁ gc₂ : GaloisConn A B leA leB}
     (e : GCEquiv gc₁ gc₂) (a : A) :
     Path (closureOp gc₂ a) (closureOp gc₁ a) :=
   Path.symm (equiv_closure_path e a)
 
 -- Theorem 61: congrArg through closure with equiv
-def equiv_closure_congrArg
+noncomputable def equiv_closure_congrArg
     {gc₁ gc₂ : GaloisConn A B leA leB}
     (e : GCEquiv gc₁ gc₂) (f : A → C) (a : A) :
     Path (f (closureOp gc₁ a)) (f (closureOp gc₂ a)) :=
   Path.congrArg f (equiv_closure_path e a)
 
 -- Theorem 62: congrArg for double closure
-def double_closure_congrArg
+noncomputable def double_closure_congrArg
     (gc : GaloisConn A B leA leB) (f : A → C) (a : A) :
     Path (f (closureOp gc (closureOp gc a)))
          (f (gc.upper (gc.lower (gc.upper (gc.lower a))))) :=
@@ -609,13 +609,13 @@ structure GCMorphism
   upper_path : ∀ b, Path (gc₁.upper b) (gc₂.upper b)
 
 -- Theorem 63: Identity morphism
-def GCMorphism.id (gc : GaloisConn A B leA leB) :
+noncomputable def GCMorphism.id (gc : GaloisConn A B leA leB) :
     GCMorphism gc gc where
   lower_path _ := Path.refl _
   upper_path _ := Path.refl _
 
 -- Theorem 64: Composition of morphisms
-def GCMorphism.comp
+noncomputable def GCMorphism.comp
     {gc₁ gc₂ gc₃ : GaloisConn A B leA leB}
     (m₁ : GCMorphism gc₁ gc₂) (m₂ : GCMorphism gc₂ gc₃) :
     GCMorphism gc₁ gc₃ where
@@ -623,14 +623,14 @@ def GCMorphism.comp
   upper_path b := Path.trans (m₁.upper_path b) (m₂.upper_path b)
 
 -- Theorem 65: Inverse morphism
-def GCMorphism.inv
+noncomputable def GCMorphism.inv
     {gc₁ gc₂ : GaloisConn A B leA leB}
     (m : GCMorphism gc₁ gc₂) : GCMorphism gc₂ gc₁ where
   lower_path a := Path.symm (m.lower_path a)
   upper_path b := Path.symm (m.upper_path b)
 
 -- Theorem 66: Morphism induces closure equiv
-def GCMorphism.toClosureEquiv
+noncomputable def GCMorphism.toClosureEquiv
     {gc₁ gc₂ : GaloisConn A B leA leB}
     (m : GCMorphism gc₁ gc₂) :
     ClosureEquiv (gcToClosureOp gc₁) (gcToClosureOp gc₂) where
@@ -641,7 +641,7 @@ def GCMorphism.toClosureEquiv
 -- ============================================================================
 
 -- Theorem 67: Trans of two closure paths
-def closure_path_trans
+noncomputable def closure_path_trans
     {gc₁ gc₂ gc₃ : GaloisConn A B leA leB}
     (e₁ : GCEquiv gc₁ gc₂) (e₂ : GCEquiv gc₂ gc₃) (a : A) :
     Path (closureOp gc₁ a) (closureOp gc₃ a) :=
@@ -718,7 +718,7 @@ structure AdjunctionHom (A : Type u) (B : Type v)
   right_adj : ∀ {a : A} {b : B}, leA a (g b) → leB (f a) b
 
 -- Theorem 75: GaloisConn gives AdjunctionHom
-def gcToAdjHom (gc : GaloisConn A B leA leB) :
+noncomputable def gcToAdjHom (gc : GaloisConn A B leA leB) :
     AdjunctionHom A B leA leB gc.lower gc.upper where
   left_adj h := gc.transA (gc.unit _) (gc.upper_mono h)
   right_adj h := gc.transB (gc.lower_mono h) (gc.counit _)
@@ -734,7 +734,7 @@ theorem closure_preserves_leA
   closure_monotone gc h
 
 -- Theorem 77: Applying a function to closure path via congrArg
-def closure_congrArg_func
+noncomputable def closure_congrArg_func
     (gc : GaloisConn A B leA leB) (f : A → C) (a : A) :
     Path (f (closureOp gc a)) (f (gc.upper (gc.lower a))) :=
   Path.refl _

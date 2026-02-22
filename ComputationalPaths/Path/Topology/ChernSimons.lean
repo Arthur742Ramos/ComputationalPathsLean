@@ -56,39 +56,39 @@ structure ConnectionSpace (B : Type u) (G : Type v) (S : StrictGroup G) where
 variable {B : Type u} {G : Type v} {S : StrictGroup G}
 
 /-- Flatness witness: curvature equals the zero curvature value. -/
-def IsFlat (T : ConnectionSpace B G S) (A : T.Conn) : Type w :=
+noncomputable def IsFlat (T : ConnectionSpace B G S) (A : T.Conn) : Type w :=
   Path (T.curvature A) T.zeroCurv
 
 /-- Gauge action preserves flatness. -/
-def flat_gauge (T : ConnectionSpace B G S) (g : G) {A : T.Conn} :
+noncomputable def flat_gauge (T : ConnectionSpace B G S) (g : G) {A : T.Conn} :
     IsFlat T A → IsFlat T (T.action.act g A) := by
   intro h
   exact Path.trans (T.curvature_gauge g A) h
 
 /-- The Chern-Simons functional associated to a connection space. -/
-def ChernSimonsFunctional (T : ConnectionSpace B G S) : T.Conn → T.Scalar :=
+noncomputable def ChernSimonsFunctional (T : ConnectionSpace B G S) : T.Conn → T.Scalar :=
   T.cs
 
 /-! ## Gauge equivalence -/
 
 /-- Path-valued gauge equivalence between connections. -/
-def GaugePath (T : ConnectionSpace B G S) (A B : T.Conn) : Type _ :=
+noncomputable def GaugePath (T : ConnectionSpace B G S) (A B : T.Conn) : Type _ :=
   Σ g : G, Path (T.action.act g A) B
 
 /-- Forget the path witness to obtain the usual orbit relation. -/
-def gaugePath_to_orbit (T : ConnectionSpace B G S) {A B : T.Conn}
+noncomputable def gaugePath_to_orbit (T : ConnectionSpace B G S) {A B : T.Conn}
     (h : GaugePath T A B) : T.action.Orbit A B := by
   rcases h with ⟨g, p⟩
   exact ⟨g, Path.toEq p⟩
 
 /-- Reflexive gauge path. -/
-def gaugePath_refl (T : ConnectionSpace B G S) (A : T.Conn) :
+noncomputable def gaugePath_refl (T : ConnectionSpace B G S) (A : T.Conn) :
     GaugePath T A A := by
   refine ⟨S.one, ?_⟩
   exact Path.stepChain (T.action.act_one A)
 
 /-- Symmetry of gauge paths. -/
-def gaugePath_symm (T : ConnectionSpace B G S) {A B : T.Conn} :
+noncomputable def gaugePath_symm (T : ConnectionSpace B G S) {A B : T.Conn} :
     GaugePath T A B → GaugePath T B A := by
   intro h
   rcases h with ⟨g, p⟩
@@ -102,7 +102,7 @@ def gaugePath_symm (T : ConnectionSpace B G S) {A B : T.Conn} :
   exact ⟨S.inv g, Path.stepChain hBA⟩
 
 /-- Transitivity of gauge paths. -/
-def gaugePath_trans (T : ConnectionSpace B G S) {A B C : T.Conn} :
+noncomputable def gaugePath_trans (T : ConnectionSpace B G S) {A B C : T.Conn} :
     GaugePath T A B → GaugePath T B C → GaugePath T A C := by
   intro h1 h2
   rcases h1 with ⟨g, p⟩
@@ -116,7 +116,7 @@ def gaugePath_trans (T : ConnectionSpace B G S) {A B C : T.Conn} :
   exact Path.trans (Path.stepChain hmul.symm) q
 
 /-- Chern-Simons functional respects gauge paths. -/
-def cs_gauge_path (T : ConnectionSpace B G S) {A B : T.Conn}
+noncomputable def cs_gauge_path (T : ConnectionSpace B G S) {A B : T.Conn}
     (h : GaugePath T A B) : Path (T.cs A) (T.cs B) := by
   rcases h with ⟨g, p⟩
   exact Path.trans (Path.symm (T.cs_gauge g A)) (Path.congrArg T.cs p)
@@ -131,12 +131,12 @@ structure FlatConnection (T : ConnectionSpace B G S) where
   flat : IsFlat T conn
 
 /-- Gauge relation on flat connections. -/
-def flatGaugeRel (T : ConnectionSpace B G S) :
+noncomputable def flatGaugeRel (T : ConnectionSpace B G S) :
     FlatConnection T → FlatConnection T → Prop :=
   fun x y => T.action.Orbit x.conn y.conn
 
 /-- Moduli of flat connections up to gauge. -/
-def FlatModuli (T : ConnectionSpace B G S) : Type _ :=
+noncomputable def FlatModuli (T : ConnectionSpace B G S) : Type _ :=
   Quot (flatGaugeRel (T := T))
 
 /-! ## Witten invariants -/

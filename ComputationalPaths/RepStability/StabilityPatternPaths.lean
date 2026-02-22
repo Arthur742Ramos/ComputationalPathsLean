@@ -24,7 +24,7 @@ inductive StabilityPatternStep : Type
   | central
 
 /-- Iterated application of an endomap. -/
-def stagedShift {Carrier : Type u} (f : Carrier → Carrier) : Nat → Carrier → Carrier
+noncomputable def stagedShift {Carrier : Type u} (f : Carrier → Carrier) : Nat → Carrier → Carrier
   | 0, x => x
   | n + 1, x => f (stagedShift f n x)
 
@@ -47,7 +47,7 @@ variable {Carrier : Type u}
 variable (S : StabilityPatternPathData Carrier)
 
 /-- Stage `n` of the shifted stability process. -/
-def stage (n : Nat) (x : Carrier) : Carrier :=
+noncomputable def stage (n : Nat) (x : Carrier) : Carrier :=
   stagedShift S.shift n x
 
 @[simp] theorem stage_zero (x : Carrier) :
@@ -57,13 +57,13 @@ def stage (n : Nat) (x : Carrier) : Carrier :=
     S.stage (n + 1) x = S.shift (S.stage n x) := rfl
 
 /-- Central-stability witness transported to stage `n`. -/
-def centralAtStage (n : Nat) (x : Carrier) :
+noncomputable def centralAtStage (n : Nat) (x : Carrier) :
     Path (S.detectStable (S.shift (S.stage n x)))
       (S.shift (S.detectStable (S.stage n x))) :=
   S.centralStabilityPath (S.stage n x)
 
 /-- Composite path: idempotent detection followed by central stability. -/
-def centralDetectPath (x : Carrier) :
+noncomputable def centralDetectPath (x : Carrier) :
     Path (S.detectStable (S.detectStable (S.shift x)))
       (S.shift (S.detectStable x)) :=
   Path.trans
@@ -85,7 +85,7 @@ noncomputable def centralDetect_cancel_rweq (x : Carrier) :
   rweq_cmpA_inv_left (S.centralDetectPath x)
 
 /-- Step witness: right-unit normalization for detector idempotence. -/
-def detectIdempotent_step (x : Carrier) :
+noncomputable def detectIdempotent_step (x : Carrier) :
     Path.Step
       (Path.trans (S.detectIdempotentPath x) (Path.refl (S.detectStable x)))
       (S.detectIdempotentPath x) :=
@@ -98,7 +98,7 @@ noncomputable def detectIdempotent_rweq (x : Carrier) :
   rweq_of_step (S.detectIdempotent_step x)
 
 /-- Step witness: left-unit normalization for periodicity coherence. -/
-def periodicity_step (n : Nat) (x : Carrier) :
+noncomputable def periodicity_step (n : Nat) (x : Carrier) :
     Path.Step
       (Path.trans (Path.refl (S.stage (n + S.period) x)) (S.periodicityPath n x))
       (S.periodicityPath n x) :=
@@ -111,7 +111,7 @@ noncomputable def periodicity_rweq (n : Nat) (x : Carrier) :
   rweq_of_step (S.periodicity_step n x)
 
 /-- Two-period contraction obtained by composing periodicity twice. -/
-def periodicityDoublePath (n : Nat) (x : Carrier) :
+noncomputable def periodicityDoublePath (n : Nat) (x : Carrier) :
     Path (S.stage ((n + S.period) + S.period) x) (S.stage n x) :=
   Path.trans (S.periodicityPath (n + S.period) x) (S.periodicityPath n x)
 
@@ -142,7 +142,7 @@ end StabilityPatternPathData
 open FIModulePaths
 
 /-- Coarse stability pattern extracted from an FI-module stabilization map. -/
-def coarsePatternOfFIModule {Carrier : Type u}
+noncomputable def coarsePatternOfFIModule {Carrier : Type u}
     (F : FIModulePathData Carrier) : StabilityPatternPathData Carrier where
   shift := F.stabilize F.stableRange
   detectStable := fun x => x
@@ -153,7 +153,7 @@ def coarsePatternOfFIModule {Carrier : Type u}
     Path.refl (stagedShift (F.stabilize F.stableRange) n x)
 
 /-- Trivial model instantiating the stability-pattern computational interface. -/
-def trivialStabilityPatternPathData : StabilityPatternPathData PUnit where
+noncomputable def trivialStabilityPatternPathData : StabilityPatternPathData PUnit where
   shift := fun _ => PUnit.unit
   detectStable := fun _ => PUnit.unit
   period := 0

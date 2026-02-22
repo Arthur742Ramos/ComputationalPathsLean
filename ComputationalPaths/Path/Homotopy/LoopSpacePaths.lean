@@ -19,17 +19,17 @@ variable {A : Type u} {B : Type v} {C : Type w}
 /-! ## Based loop space -/
 
 /-- The based loop space Ω(A, a) is the type of paths from a to a. -/
-def Omega (A : Type u) (a : A) : Type u := Path a a
+noncomputable def Omega (A : Type u) (a : A) : Type u := Path a a
 
 /-- The constant loop at a. -/
-def omega_id {A : Type u} (a : A) : Omega A a := Path.refl a
+noncomputable def omega_id {A : Type u} (a : A) : Omega A a := Path.refl a
 
 /-- Loop composition via path trans. -/
-def omega_comp {a : A} (p q : Omega A a) : Omega A a :=
+noncomputable def omega_comp {a : A} (p q : Omega A a) : Omega A a :=
   Path.trans p q
 
 /-- Loop inverse via path symm. -/
-def omega_inv {a : A} (p : Omega A a) : Omega A a :=
+noncomputable def omega_inv {a : A} (p : Omega A a) : Omega A a :=
   Path.symm p
 
 /-! ## Loop space group laws -/
@@ -81,18 +81,18 @@ theorem omega_inv_id (a : A) :
 /-! ## Higher loop spaces: 2-loops (paths between loops) -/
 
 /-- A 2-loop is an equality between loops. -/
-def TwoLoop {a : A} (p q : Omega A a) : Prop := p = q
+noncomputable def TwoLoop {a : A} (p q : Omega A a) : Prop := p = q
 
 /-- Reflexive 2-loop. -/
-def twoLoop_refl {a : A} (p : Omega A a) : TwoLoop p p := rfl
+noncomputable def twoLoop_refl {a : A} (p : Omega A a) : TwoLoop p p := rfl
 
 /-- 2-loop composition via Eq.trans. -/
-def twoLoop_comp {a : A} {p q r : Omega A a} (α : TwoLoop p q) (β : TwoLoop q r) :
+noncomputable def twoLoop_comp {a : A} {p q r : Omega A a} (α : TwoLoop p q) (β : TwoLoop q r) :
     TwoLoop p r :=
   Eq.trans α β
 
 /-- 2-loop inverse via Eq.symm. -/
-def twoLoop_inv {a : A} {p q : Omega A a} (α : TwoLoop p q) : TwoLoop q p :=
+noncomputable def twoLoop_inv {a : A} {p q : Omega A a} (α : TwoLoop p q) : TwoLoop q p :=
   Eq.symm α
 
 /-- All 2-loops between the same endpoints are equal (proof irrelevance). -/
@@ -135,7 +135,7 @@ theorem twoLoop_comp_assoc {a : A} {p q r s : Omega A a}
 /-! ## Loop space functoriality -/
 
 /-- Map a function over the loop space via congrArg. -/
-def omega_map (f : A → B) {a : A} (p : Omega A a) : Omega B (f a) :=
+noncomputable def omega_map (f : A → B) {a : A} (p : Omega A a) : Omega B (f a) :=
   Path.congrArg f p
 
 /-- The loop space functor preserves the identity loop. -/
@@ -181,7 +181,7 @@ theorem omega_map_id_fun {a : A} (p : Omega A a) :
 /-! ## Transport in loop spaces -/
 
 /-- Transport a loop along a path between base points via conjugation. -/
-def omega_transport {a b : A} (p : Path a b) (l : Omega A a) : Omega A b :=
+noncomputable def omega_transport {a b : A} (p : Path a b) (l : Omega A a) : Omega A b :=
   Path.trans (Path.symm p) (Path.trans l p)
 
 /-- Transport preserves the identity loop (propositionally). -/
@@ -199,7 +199,7 @@ theorem omega_transport_refl_path {a : A} (l : Omega A a) :
 /-! ## Conjugation in loop spaces -/
 
 /-- Conjugation of a loop by another loop: g⁻¹ ∘ l ∘ g. -/
-def omega_conj {a : A} (g l : Omega A a) : Omega A a :=
+noncomputable def omega_conj {a : A} (g l : Omega A a) : Omega A a :=
   omega_comp (omega_inv g) (omega_comp l g)
 
 /-- Conjugation by the identity is trivial. -/
@@ -217,7 +217,7 @@ theorem omega_conj_id_loop_toEq {a : A} (g : Omega A a) :
 /-! ## Power operations -/
 
 /-- n-fold power of a loop. -/
-def omega_pow {a : A} (p : Omega A a) : Nat → Omega A a
+noncomputable def omega_pow {a : A} (p : Omega A a) : Nat → Omega A a
   | 0 => omega_id a
   | n + 1 => omega_comp (omega_pow p n) p
 
@@ -248,11 +248,11 @@ theorem omega_pow_id (a : A) (n : Nat) :
 /-! ## Loop space of a product -/
 
 /-- Loop in a product projects to first component. -/
-def omega_prod_fst {a : A} {b : B} (p : Omega (A × B) (a, b)) : Omega A a :=
+noncomputable def omega_prod_fst {a : A} {b : B} (p : Omega (A × B) (a, b)) : Omega A a :=
   Path.congrArg Prod.fst p
 
 /-- Loop in a product projects to second component. -/
-def omega_prod_snd {a : A} {b : B} (p : Omega (A × B) (a, b)) : Omega B b :=
+noncomputable def omega_prod_snd {a : A} {b : B} (p : Omega (A × B) (a, b)) : Omega B b :=
   Path.congrArg Prod.snd p
 
 /-- Projection preserves identity loop (fst). -/

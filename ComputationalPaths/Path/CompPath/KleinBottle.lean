@@ -30,7 +30,7 @@ inductive KleinBottleCompPath : Type u
   | base : KleinBottleCompPath
 
 /-- Basepoint of the Klein bottle. -/
-@[simp] def kleinBottleBase : KleinBottleCompPath := KleinBottleCompPath.base
+@[simp] noncomputable def kleinBottleBase : KleinBottleCompPath := KleinBottleCompPath.base
 
 /-! ## Path expressions with two loop generators -/
 
@@ -45,31 +45,31 @@ inductive KleinBottleExpr : KleinBottleCompPath → KleinBottleCompPath → Type
 
 /-! ## Loop powers -/
 
-@[simp] def kleinBottleLoopAExprPow :
+@[simp] noncomputable def kleinBottleLoopAExprPow :
     Nat → KleinBottleExpr kleinBottleBase kleinBottleBase
   | 0 => KleinBottleExpr.refl kleinBottleBase
   | Nat.succ n =>
       KleinBottleExpr.trans (kleinBottleLoopAExprPow n) KleinBottleExpr.loopA
 
-@[simp] def kleinBottleLoopBExprPow :
+@[simp] noncomputable def kleinBottleLoopBExprPow :
     Nat → KleinBottleExpr kleinBottleBase kleinBottleBase
   | 0 => KleinBottleExpr.refl kleinBottleBase
   | Nat.succ n =>
       KleinBottleExpr.trans (kleinBottleLoopBExprPow n) KleinBottleExpr.loopB
 
-@[simp] def kleinBottleLoopAExprZPow :
+@[simp] noncomputable def kleinBottleLoopAExprZPow :
     Int → KleinBottleExpr kleinBottleBase kleinBottleBase
   | Int.ofNat n => kleinBottleLoopAExprPow n
   | Int.negSucc n => KleinBottleExpr.symm (kleinBottleLoopAExprPow (Nat.succ n))
 
-@[simp] def kleinBottleLoopBExprZPow :
+@[simp] noncomputable def kleinBottleLoopBExprZPow :
     Int → KleinBottleExpr kleinBottleBase kleinBottleBase
   | Int.ofNat n => kleinBottleLoopBExprPow n
   | Int.negSucc n => KleinBottleExpr.symm (kleinBottleLoopBExprPow (Nat.succ n))
 
 /-! ## Parity and semidirect product encoding -/
 
-def natParity : Nat → Bool
+noncomputable def natParity : Nat → Bool
   | 0 => false
   | Nat.succ n => !natParity n
 
@@ -77,7 +77,7 @@ def natParity : Nat → Bool
 
 @[simp] theorem natParity_succ (n : Nat) : natParity (Nat.succ n) = !natParity n := rfl
 
-def kleinBottleParity : Int → Bool
+noncomputable def kleinBottleParity : Int → Bool
   | Int.ofNat n => natParity n
   | Int.negSucc n => natParity (Nat.succ n)
 
@@ -87,7 +87,7 @@ def kleinBottleParity : Int → Bool
 @[simp] theorem kleinBottleParity_negSucc (n : Nat) :
     kleinBottleParity (Int.negSucc n) = natParity (Nat.succ n) := rfl
 
-def kleinBottleAct (m n : Int) : Int :=
+noncomputable def kleinBottleAct (m n : Int) : Int :=
   if kleinBottleParity m then -n else n
 
 @[simp] theorem kleinBottleAct_ofNat (m : Nat) (n : Int) :
@@ -106,10 +106,10 @@ def kleinBottleAct (m n : Int) : Int :=
 @[simp] theorem kleinBottleAct_zero_exp (n : Int) : kleinBottleAct 0 n = n := by
   simp [kleinBottleAct, kleinBottleParity, natParity]
 
-def kleinBottleMul : (Int × Int) → (Int × Int) → (Int × Int)
+noncomputable def kleinBottleMul : (Int × Int) → (Int × Int) → (Int × Int)
   | (m, n), (m', n') => (m + m', kleinBottleAct m' n + n')
 
-def kleinBottleInv : (Int × Int) → (Int × Int)
+noncomputable def kleinBottleInv : (Int × Int) → (Int × Int)
   | (m, n) => (-m, -kleinBottleAct m n)
 
 /-! ## Encoding loop expressions -/
@@ -197,9 +197,9 @@ noncomputable def kleinBottleLoopBEq : kleinBottleBase = kleinBottleBase :=
 
 abbrev kleinBottlePiOne : Type := Int × Int
 
-@[simp] def kleinBottleEncode : kleinBottlePiOne → Int × Int := fun x => x
+@[simp] noncomputable def kleinBottleEncode : kleinBottlePiOne → Int × Int := fun x => x
 
-@[simp] def kleinBottleDecode : Int × Int → kleinBottlePiOne := fun x => x
+@[simp] noncomputable def kleinBottleDecode : Int × Int → kleinBottlePiOne := fun x => x
 
 /-! ## pi_1(K) equiv Z x Z (semidirect presentation) -/
 

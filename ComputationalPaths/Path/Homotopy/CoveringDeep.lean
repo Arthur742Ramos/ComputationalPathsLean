@@ -60,7 +60,7 @@ theorem liftPath_unique (cov : CoveringMap E B)
 /-! ## 2. Monodromy action -/
 
 /-- The fiber of the covering map over a point `b`. -/
-def Fiber (cov : CoveringMap E B) (b : B) : Type u :=
+noncomputable def Fiber (cov : CoveringMap E B) (b : B) : Type u :=
   { e : E // cov.proj e = b }
 
 /-- The monodromy transport: given a loop `γ` at `b` (a `Path b b`), we get
@@ -146,7 +146,7 @@ variable {E B : Type u} {cov : CoveringMap E B}
 
 /-- A deck transformation maps a `Step` in `E` to another `Step` in `E`,
     preserving the projection to `B`.  Uses `congrArg` on the step proof. -/
-def mapStep (φ : DeckTransformation cov) (s : Step E) : Step E where
+noncomputable def mapStep (φ : DeckTransformation cov) (s : Step E) : Step E where
   src := φ.toFun s.src
   tgt := φ.toFun s.tgt
   proof := _root_.congrArg φ.toFun s.proof
@@ -154,7 +154,7 @@ def mapStep (φ : DeckTransformation cov) (s : Step E) : Step E where
 /-- A deck transformation maps a `Path` in `E` to another `Path` in `E`,
     preserving the projection to `B`.  This uses the same step-mapping
     mechanism as `Path.congrArg`. -/
-def mapPath (φ : DeckTransformation cov) {a b : E}
+noncomputable def mapPath (φ : DeckTransformation cov) {a b : E}
     (p : Path a b) : Path (φ.toFun a) (φ.toFun b) :=
   Path.congrArg φ.toFun p
 
@@ -175,7 +175,7 @@ noncomputable def mapPath_preserves_rweq (φ : DeckTransformation cov)
     (rweq_congrArg_of_rweq (f := φ.toFun) (p := p) (q := q) h)
 
 /-- Composition of deck transformations. -/
-def comp (φ ψ : DeckTransformation cov) : DeckTransformation cov where
+noncomputable def comp (φ ψ : DeckTransformation cov) : DeckTransformation cov where
   toFun := φ.toFun ∘ ψ.toFun
   inv := ψ.inv ∘ φ.inv
   left_inv e := by simp [Function.comp, φ.left_inv, ψ.left_inv]
@@ -183,7 +183,7 @@ def comp (φ ψ : DeckTransformation cov) : DeckTransformation cov where
   commutes e := by simp [Function.comp, φ.commutes, ψ.commutes]
 
 /-- The identity deck transformation. -/
-def id : DeckTransformation cov where
+noncomputable def id : DeckTransformation cov where
   toFun := _root_.id
   inv := _root_.id
   left_inv _ := rfl
@@ -212,7 +212,7 @@ end DeckTransformation
 /-- The stabilizer subgroup: loops in the base whose monodromy fixes a
     chosen basepoint `e₀` in the fiber.  Expressed as a predicate on loops
     (a subgroup of π₁(B, b₀) modulo `RwEq`). -/
-def stabilizerSubgroup (cov : CoveringMap E B)
+noncomputable def stabilizerSubgroup (cov : CoveringMap E B)
     (b₀ : B) (e₀ : Fiber cov b₀) (γ : Path b₀ b₀) : Prop :=
   monodromy cov γ e₀ = e₀
 

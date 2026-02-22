@@ -26,7 +26,7 @@ inductive ScanningStep {Y : Type v} :
       ScanningStep (Path.trans (Path.symm p) p) (Path.refl b)
 
 /-- Interpret scanning-specific steps as primitive path rewrite steps. -/
-def ScanningStep.toStep {Y : Type v} {a b : Y} {p q : Path a b}
+noncomputable def ScanningStep.toStep {Y : Type v} {a b : Y} {p q : Path a b}
     (s : ScanningStep p q) : Path.Step p q :=
   match s with
   | .right_unit p => Path.Step.trans_refl_right p
@@ -63,7 +63,7 @@ noncomputable def commutation_rweq (x : X) :
   rweq_of_scanning_step (S.commutationStep x)
 
 /-- Left-unit normalization packaged as a domain-specific scanning step. -/
-def commutation_left_unit_step (x : X) :
+noncomputable def commutation_left_unit_step (x : X) :
     ScanningStep
       (Path.trans (Path.refl (S.scan (S.sourceStabilize x))) (S.commutationPath x))
       (S.commutationPath x) :=
@@ -82,7 +82,7 @@ noncomputable def commutation_cancel_rweq (x : X) :
   rweq_cmpA_inv_left (S.commutationPath x)
 
 /-- Two-step scanning comparison path along two stabilization stages. -/
-def twoStepScanningPath (x : X) :
+noncomputable def twoStepScanningPath (x : X) :
     Path
       (S.scan (S.sourceStabilize (S.sourceStabilize x)))
       (S.targetShift (S.targetShift (S.scan x))) :=
@@ -101,7 +101,7 @@ noncomputable def two_step_rweq (x : X) :
 end ScanningMapData
 
 /-- Trivial model instantiating the scanning-map computational-path interface. -/
-def trivialScanningMapData : ScanningMapData PUnit PUnit where
+noncomputable def trivialScanningMapData : ScanningMapData PUnit PUnit where
   sourceStabilize := fun _ => PUnit.unit
   targetShift := fun _ => PUnit.unit
   scan := fun _ => PUnit.unit

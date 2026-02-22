@@ -69,16 +69,16 @@ namespace FiberBundleData
 variable {B : Type u} {E : Type u} {F : Type u}
 
 /-- The fiber over a point b, as a subtype of E. -/
-def fiberAt (bd : FiberBundleData B E F) (b : B) : Type u :=
+noncomputable def fiberAt (bd : FiberBundleData B E F) (b : B) : Type u :=
   Fiber bd.proj b
 
 /-- Map from a fiber to the model fiber F. -/
-def fiberToModel (bd : FiberBundleData B E F) (b : B) :
+noncomputable def fiberToModel (bd : FiberBundleData B E F) (b : B) :
     Fiber bd.proj b → F :=
   bd.fiberEquiv b
 
 /-- Map from the model fiber F to a fiber. -/
-def modelToFiber (bd : FiberBundleData B E F) (b : B) :
+noncomputable def modelToFiber (bd : FiberBundleData B E F) (b : B) :
     F → Fiber bd.proj b :=
   (bd.fiberEquiv b).invFun
 
@@ -94,13 +94,13 @@ theorem model_roundtrip (bd : FiberBundleData B E F) (b : B)
   (bd.fiberEquiv b).right_inv f
 
 /-- `Path`-typed round-trip from fiber. -/
-def fiber_roundtrip_path (bd : FiberBundleData B E F) (b : B)
+noncomputable def fiber_roundtrip_path (bd : FiberBundleData B E F) (b : B)
     (x : Fiber bd.proj b) :
     Path (bd.modelToFiber b (bd.fiberToModel b x)) x :=
   Path.stepChain (fiber_roundtrip bd b x)
 
 /-- `Path`-typed round-trip from model. -/
-def model_roundtrip_path (bd : FiberBundleData B E F) (b : B)
+noncomputable def model_roundtrip_path (bd : FiberBundleData B E F) (b : B)
     (f : F) : Path (bd.fiberToModel b (bd.modelToFiber b f)) f :=
   Path.stepChain (model_roundtrip bd b f)
 
@@ -133,7 +133,7 @@ namespace LocalTrivializationSimple
 variable {B : Type u} {E : Type u} {F : Type u}
 
 /-- Convert a simple trivialization to a `SimpleEquiv` at each point. -/
-def toEquiv (lt : LocalTrivializationSimple B E F) (b : B) :
+noncomputable def toEquiv (lt : LocalTrivializationSimple B E F) (b : B) :
     SimpleEquiv (Fiber lt.proj b) F where
   toFun := lt.trivialize b
   invFun := lt.untrivialize b
@@ -141,19 +141,19 @@ def toEquiv (lt : LocalTrivializationSimple B E F) (b : B) :
   right_inv := lt.right_inv b
 
 /-- A simple trivialization yields a `FiberBundleData`. -/
-def toFiberBundleData (lt : LocalTrivializationSimple B E F) :
+noncomputable def toFiberBundleData (lt : LocalTrivializationSimple B E F) :
     FiberBundleData B E F where
   proj := lt.proj
   fiberEquiv := lt.toEquiv
 
 /-- `Path`-typed left inverse. -/
-def left_inv_path (lt : LocalTrivializationSimple B E F) (b : B)
+noncomputable def left_inv_path (lt : LocalTrivializationSimple B E F) (b : B)
     (x : Fiber lt.proj b) :
     Path (lt.untrivialize b (lt.trivialize b x)) x :=
   Path.stepChain (lt.left_inv b x)
 
 /-- `Path`-typed right inverse. -/
-def right_inv_path (lt : LocalTrivializationSimple B E F) (b : B)
+noncomputable def right_inv_path (lt : LocalTrivializationSimple B E F) (b : B)
     (f : F) : Path (lt.trivialize b (lt.untrivialize b f)) f :=
   Path.stepChain (lt.right_inv b f)
 
@@ -181,14 +181,14 @@ namespace TransitionFunction
 variable {F : Type u}
 
 /-- The identity transition function. -/
-def id : TransitionFunction F where
+noncomputable def id : TransitionFunction F where
   toFun := _root_.id
   invFun := _root_.id
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
 /-- Composition of transition functions. -/
-def comp (g h : TransitionFunction F) : TransitionFunction F where
+noncomputable def comp (g h : TransitionFunction F) : TransitionFunction F where
   toFun := g.toFun ∘ h.toFun
   invFun := h.invFun ∘ g.invFun
   left_inv := fun f => by
@@ -199,7 +199,7 @@ def comp (g h : TransitionFunction F) : TransitionFunction F where
     rw [h.right_inv, g.right_inv]
 
 /-- Inverse of a transition function. -/
-def inv (t : TransitionFunction F) : TransitionFunction F where
+noncomputable def inv (t : TransitionFunction F) : TransitionFunction F where
   toFun := t.invFun
   invFun := t.toFun
   left_inv := t.right_inv
@@ -230,19 +230,19 @@ theorem inv_comp (t : TransitionFunction F) :
   exact t.left_inv f
 
 /-- `Path`-typed id_comp. -/
-def id_comp_path (t : TransitionFunction F) (f : F) :
+noncomputable def id_comp_path (t : TransitionFunction F) (f : F) :
     Path ((comp id t).toFun f) (t.toFun f) :=
   Path.stepChain (id_comp t f)
 
 /-- `Path`-typed comp_inv. -/
-def comp_inv_path (t : TransitionFunction F) (f : F) :
+noncomputable def comp_inv_path (t : TransitionFunction F) (f : F) :
     Path ((comp t (inv t)).toFun f) f :=
   Path.stepChain (comp_inv t f)
 
 end TransitionFunction
 
 /-- Transition function between two trivializations of the same projection. -/
-def transitionSimple {B : Type u} {E : Type u} {F : Type u}
+noncomputable def transitionSimple {B : Type u} {E : Type u} {F : Type u}
     (proj : E → B)
     (triv1 : (b : B) → Fiber proj b → F)
     (untriv1 : (b : B) → F → Fiber proj b)
@@ -277,12 +277,12 @@ structure CocycleData (F : Type u) where
   cocycle : ∀ f, g13.toFun f = (TransitionFunction.comp g12 g23).toFun f
 
 /-- `Path`-typed cocycle condition. -/
-def transition_cocycle {F : Type u} (cd : CocycleData F) (f : F) :
+noncomputable def transition_cocycle {F : Type u} (cd : CocycleData F) (f : F) :
     Path (cd.g13.toFun f) ((TransitionFunction.comp cd.g12 cd.g23).toFun f) :=
   Path.stepChain (cd.cocycle f)
 
 /-- Trivial cocycle data where all transitions are identity. -/
-def trivialCocycle (F : Type u) : CocycleData F where
+noncomputable def trivialCocycle (F : Type u) : CocycleData F where
   g12 := TransitionFunction.id
   g23 := TransitionFunction.id
   g13 := TransitionFunction.id
@@ -328,14 +328,14 @@ theorem structureGroup_inv (G : StructureGroup F)
   G.inv_mem hg
 
 /-- The maximal structure group: all automorphisms of F. -/
-def maximal : StructureGroup F where
+noncomputable def maximal : StructureGroup F where
   mem := fun _ => True
   id_mem := trivial
   comp_mem := fun _ _ => trivial
   inv_mem := fun _ => trivial
 
 /-- The trivial structure group: only the identity. -/
-def trivial : StructureGroup F where
+noncomputable def trivial : StructureGroup F where
   mem := fun g => ∀ f, g.toFun f = f
   id_mem := fun _ => rfl
   comp_mem := fun hg hh f => by simp [TransitionFunction.comp, Function.comp, hh f, hg f]
@@ -354,7 +354,7 @@ The trivial bundle is the product projection B × F → B.
 -/
 
 /-- The trivial bundle B × F → B. -/
-def trivialBundle (B : Type u) (F : Type u) :
+noncomputable def trivialBundle (B : Type u) (F : Type u) :
     FiberBundleData B (B × F) F where
   proj := Prod.fst
   fiberEquiv := fun b => {
@@ -374,7 +374,7 @@ theorem trivialBundle_transition (B : Type u) (F : Type u) (b : B) :
   fun f => (trivialBundle B F).model_roundtrip b f
 
 /-- `Path`-typed trivial bundle transition. -/
-def trivialBundle_transition_path (B : Type u) (F : Type u) (b : B) (f : F) :
+noncomputable def trivialBundle_transition_path (B : Type u) (F : Type u) (b : B) (f : F) :
     Path ((trivialBundle B F).fiberToModel b
       ((trivialBundle B F).modelToFiber b f)) f :=
   Path.stepChain (trivialBundle_transition B F b f)
@@ -386,17 +386,17 @@ has fibers (f*E)_a = E_{f(a)}.
 -/
 
 /-- The total space of a pullback bundle. -/
-def PullbackTotal {A : Type u} {B : Type u} {E : Type u}
+noncomputable def PullbackTotal {A : Type u} {B : Type u} {E : Type u}
     (f : A → B) (proj : E → B) : Type u :=
   { p : A × E // f p.1 = proj p.2 }
 
 /-- Projection from pullback total space to A. -/
-def pullbackProj {A : Type u} {B : Type u} {E : Type u}
+noncomputable def pullbackProj {A : Type u} {B : Type u} {E : Type u}
     (f : A → B) (proj : E → B) : PullbackTotal f proj → A :=
   fun ⟨p, _⟩ => p.1
 
 /-- Fiber of the pullback over a point a is equivalent to the fiber over f(a). -/
-def pullbackFiberEquiv {A : Type u} {B : Type u} {E : Type u}
+noncomputable def pullbackFiberEquiv {A : Type u} {B : Type u} {E : Type u}
     (f : A → B) (proj : E → B) (a : A) :
     SimpleEquiv (Fiber (pullbackProj f proj) a) (Fiber proj (f a)) where
   toFun := fun ⟨⟨⟨a', e⟩, hfe⟩, ha⟩ => by
@@ -410,7 +410,7 @@ def pullbackFiberEquiv {A : Type u} {B : Type u} {E : Type u}
   right_inv := fun ⟨e, he⟩ => rfl
 
 /-- Pullback of a fiber bundle along a map. -/
-def pullbackBundle {A : Type u} {B : Type u} {E : Type u} {F : Type u}
+noncomputable def pullbackBundle {A : Type u} {B : Type u} {E : Type u} {F : Type u}
     (f : A → B) (bd : FiberBundleData B E F) :
     FiberBundleData A (PullbackTotal f bd.proj) F where
   proj := pullbackProj f bd.proj
@@ -418,7 +418,7 @@ def pullbackBundle {A : Type u} {B : Type u} {E : Type u} {F : Type u}
     SimpleEquiv.trans (pullbackFiberEquiv f bd.proj a) (bd.fiberEquiv (f a))
 
 /-- `Path`-typed pullback fiber round-trip. -/
-def pullbackBundle_roundtrip_path {A : Type u} {B : Type u} {E : Type u} {F : Type u}
+noncomputable def pullbackBundle_roundtrip_path {A : Type u} {B : Type u} {E : Type u} {F : Type u}
     (f : A → B) (bd : FiberBundleData B E F) (a : A) (x : Fiber (pullbackProj f bd.proj) a) :
     Path ((pullbackBundle f bd).modelToFiber a ((pullbackBundle f bd).fiberToModel a x)) x :=
   Path.stepChain ((pullbackBundle f bd).fiber_roundtrip a x)
@@ -426,36 +426,36 @@ def pullbackBundle_roundtrip_path {A : Type u} {B : Type u} {E : Type u} {F : Ty
 /-! ## Additional computational-path bundle laws -/
 
 /-- Identity transition map acts as a computational path witness. -/
-def transition_id_toFun_path {F : Type u} (f : F) :
+noncomputable def transition_id_toFun_path {F : Type u} (f : F) :
     Path (TransitionFunction.id.toFun f) f :=
   Path.stepChain rfl
 
 /-- Composition of transition maps is computationally tracked by a path witness. -/
-def transition_comp_toFun_path {F : Type u}
+noncomputable def transition_comp_toFun_path {F : Type u}
     (g h : TransitionFunction F) (f : F) :
     Path ((TransitionFunction.comp g h).toFun f) (g.toFun (h.toFun f)) :=
   Path.stepChain rfl
 
 /-- Inverse-then-map transition route contracts to identity by computational path. -/
-def transition_inv_comp_toFun_path {F : Type u}
+noncomputable def transition_inv_comp_toFun_path {F : Type u}
     (t : TransitionFunction F) (f : F) :
     Path ((TransitionFunction.comp (TransitionFunction.inv t) t).toFun f) f :=
   Path.stepChain (TransitionFunction.inv_comp t f)
 
 /-- Map-then-inverse transition route contracts to identity by computational path. -/
-def transition_comp_inv_toFun_path {F : Type u}
+noncomputable def transition_comp_inv_toFun_path {F : Type u}
     (t : TransitionFunction F) (f : F) :
     Path ((TransitionFunction.comp t (TransitionFunction.inv t)).toFun f) f :=
   Path.stepChain (TransitionFunction.comp_inv t f)
 
 /-- Trivial bundle fibers satisfy round-trip by computational path. -/
-def trivialBundle_fiber_roundtrip_path₂ (B : Type u) (F : Type u) (b : B)
+noncomputable def trivialBundle_fiber_roundtrip_path₂ (B : Type u) (F : Type u) (b : B)
     (x : Fiber (trivialBundle B F).proj b) :
     Path ((trivialBundle B F).modelToFiber b ((trivialBundle B F).fiberToModel b x)) x :=
   (trivialBundle B F).fiber_roundtrip_path b x
 
 /-- Pullback bundle model points satisfy round-trip by computational path. -/
-def pullbackBundle_model_roundtrip_path {A : Type u} {B : Type u} {E : Type u} {F : Type u}
+noncomputable def pullbackBundle_model_roundtrip_path {A : Type u} {B : Type u} {E : Type u} {F : Type u}
     (f : A → B) (bd : FiberBundleData B E F) (a : A) (y : F) :
     Path ((pullbackBundle f bd).fiberToModel a ((pullbackBundle f bd).modelToFiber a y)) y :=
   Path.stepChain ((pullbackBundle f bd).model_roundtrip a y)

@@ -65,7 +65,7 @@ structure HoFunctor (A : Type u) (B : Type v) (F : A → B) where
 namespace HoFunctor
 
 /-- Identity functor on a homotopy category. -/
-def id (A : Type u) : HoFunctor A A (fun x => x) where
+noncomputable def id (A : Type u) : HoFunctor A A (fun x => x) where
   map := fun p => p
   map_id := fun _ => Path.refl _
   map_comp := fun _ _ => Path.refl _
@@ -111,7 +111,7 @@ structure QuillenEquivalence {A : Type u} {B : Type v}
   derived_equivalence : True
 
 /-- Identity Quillen equivalence. -/
-def identityQuillenEquivalence {A : Type u} (M : ModelCategory A) :
+noncomputable def identityQuillenEquivalence {A : Type u} (M : ModelCategory A) :
     QuillenEquivalence M M where
   adjunction := identityQuillenAdjunction (M := M)
   derived_equivalence := trivial

@@ -32,7 +32,7 @@ inductive Player where
   deriving Repr, BEq, DecidableEq
 
 /-- Switch player. -/
-def Player.swap : Player → Player
+noncomputable def Player.swap : Player → Player
   | O => P
   | P => O
 
@@ -51,15 +51,15 @@ structure Play (M : Type u) (A : Arena M) where
   moves : List M
 
 /-- Empty play. -/
-def Play.empty {M : Type u} (A : Arena M) : Play M A :=
+noncomputable def Play.empty {M : Type u} (A : Arena M) : Play M A :=
   ⟨[]⟩
 
 /-- Extend a play with a new move. -/
-def Play.extend {M : Type u} {A : Arena M} (p : Play M A) (m : M) : Play M A :=
+noncomputable def Play.extend {M : Type u} {A : Arena M} (p : Play M A) (m : M) : Play M A :=
   ⟨p.moves ++ [m]⟩
 
 /-- Length of a play. -/
-def Play.length {M : Type u} {A : Arena M} (p : Play M A) : Nat :=
+noncomputable def Play.length {M : Type u} {A : Arena M} (p : Play M A) : Nat :=
   p.moves.length
 
 /-- Empty play has length 0. -/
@@ -83,7 +83,7 @@ theorem strategy_deterministic {M : Type u} {A : Arena M}
     s.respond p = s.respond p := rfl
 
 /-- The empty (always-pass) strategy. -/
-def Strategy.pass {M : Type u} (A : Arena M) : Strategy M A :=
+noncomputable def Strategy.pass {M : Type u} (A : Arena M) : Strategy M A :=
   ⟨fun _ => none⟩
 
 /-- The pass strategy always returns none. -/
@@ -93,7 +93,7 @@ theorem pass_responds_none {M : Type u} (A : Arena M) (p : Play M A) :
 /-! ## Strategy Paths -/
 
 /-- Path between strategies: they agree on all plays. -/
-def strategyPath {M : Type u} {A : Arena M}
+noncomputable def strategyPath {M : Type u} {A : Arena M}
     (s1 s2 : Strategy M A) (h : s1 = s2) : Path s1 s2 :=
   Path.mk [Step.mk _ _ h] h
 
@@ -104,7 +104,7 @@ theorem strategy_eq_respond {M : Type u} {A : Arena M}
   subst h; rfl
 
 /-- Path from strategy equivalence. -/
-def strategyEqPath {M : Type u} {A : Arena M}
+noncomputable def strategyEqPath {M : Type u} {A : Arena M}
     {s1 s2 : Strategy M A} (h : ∀ p, s1.respond p = s2.respond p) :
     s1.respond = s2.respond :=
   funext h
@@ -112,7 +112,7 @@ def strategyEqPath {M : Type u} {A : Arena M}
 /-! ## Copycat Strategy -/
 
 /-- A copycat strategy copies the last opponent move. -/
-def copycatStrategy {M : Type u} (A : Arena M) [DecidableEq M] :
+noncomputable def copycatStrategy {M : Type u} (A : Arena M) [DecidableEq M] :
     Strategy M A where
   respond := fun p =>
     match p.moves.getLast? with
@@ -137,12 +137,12 @@ structure ComposedStrategy (M1 M2 : Type u)
   strat2 : Strategy M2 C.arena2
 
 /-- Projection to first component strategy. -/
-def ComposedStrategy.proj1 {M1 M2 : Type u} {C : ComposedArena M1 M2}
+noncomputable def ComposedStrategy.proj1 {M1 M2 : Type u} {C : ComposedArena M1 M2}
     (cs : ComposedStrategy M1 M2 C) : Strategy M1 C.arena1 :=
   cs.strat1
 
 /-- Projection to second component strategy. -/
-def ComposedStrategy.proj2 {M1 M2 : Type u} {C : ComposedArena M1 M2}
+noncomputable def ComposedStrategy.proj2 {M1 M2 : Type u} {C : ComposedArena M1 M2}
     (cs : ComposedStrategy M1 M2 C) : Strategy M2 C.arena2 :=
   cs.strat2
 
@@ -166,7 +166,7 @@ structure WinningStrategy (M : Type u) (A : Arena M) extends Strategy M A where
   condition : WinCondition M A
 
 /-- Two winning conditions are equivalent if they agree on all plays. -/
-def winCondEquiv {M : Type u} {A : Arena M}
+noncomputable def winCondEquiv {M : Type u} {A : Arena M}
     (w1 w2 : WinCondition M A) : Prop :=
   ∀ p : Play M A, w1.wins p ↔ w2.wins p
 
@@ -196,7 +196,7 @@ structure ArenaMorphism (M1 M2 : Type u) (A1 : Arena M1) (A2 : Arena M2) where
   pres_polarity : ∀ m : M1, A2.polarity (mapMove m) = A1.polarity m
 
 /-- Identity arena morphism. -/
-def ArenaMorphism.id {M : Type u} (A : Arena M) : ArenaMorphism M M A A where
+noncomputable def ArenaMorphism.id {M : Type u} (A : Arena M) : ArenaMorphism M M A A where
   mapMove := fun m => m
   pres_polarity := fun _ => rfl
 
@@ -205,7 +205,7 @@ theorem arena_morph_id_map {M : Type u} {A : Arena M} (m : M) :
     (ArenaMorphism.id A).mapMove m = m := rfl
 
 /-- Composition of arena morphisms. -/
-def ArenaMorphism.comp {M1 M2 M3 : Type u}
+noncomputable def ArenaMorphism.comp {M1 M2 M3 : Type u}
     {A1 : Arena M1} {A2 : Arena M2} {A3 : Arena M3}
     (g : ArenaMorphism M2 M3 A2 A3) (f : ArenaMorphism M1 M2 A1 A2) :
     ArenaMorphism M1 M3 A1 A3 where
@@ -215,7 +215,7 @@ def ArenaMorphism.comp {M1 M2 M3 : Type u}
     rw [g.pres_polarity, f.pres_polarity]
 
 /-- Morphisms transform plays. -/
-def ArenaMorphism.mapPlay {M1 M2 : Type u} {A1 : Arena M1} {A2 : Arena M2}
+noncomputable def ArenaMorphism.mapPlay {M1 M2 : Type u} {A1 : Arena M1} {A2 : Arena M2}
     (f : ArenaMorphism M1 M2 A1 A2) (p : Play M1 A1) : Play M2 A2 :=
   ⟨p.moves.map f.mapMove⟩
 
@@ -232,12 +232,12 @@ theorem morph_empty_play {M1 M2 : Type u} {A1 : Arena M1} {A2 : Arena M2}
 /-! ## Game Path Algebra -/
 
 /-- Path between plays induced by a path between arenas. -/
-def playPath {M : Type u} {A : Arena M}
+noncomputable def playPath {M : Type u} {A : Arena M}
     {p1 p2 : Play M A} (h : p1 = p2) : Path p1 p2 :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Transport of play properties along paths. -/
-def playTransport {M : Type u} {A : Arena M}
+noncomputable def playTransport {M : Type u} {A : Arena M}
     {P : Play M A → Type v} {p1 p2 : Play M A}
     (h : p1 = p2) (x : P p1) : P p2 :=
   Path.transport (Path.mk [Step.mk _ _ h] h) x

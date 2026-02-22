@@ -121,7 +121,7 @@ structure SpinCovering (n : Nat) (spin : SpinGroup.{u} n) where
   hom_one : Path (coverMap spin.one) (coverMap spin.one)
 
 /-- The covering map preserves identity. -/
-def spinCover_one_path {n : Nat} {spin : SpinGroup.{u} n}
+noncomputable def spinCover_one_path {n : Nat} {spin : SpinGroup.{u} n}
     (cov : SpinCovering n spin) :
     Path (cov.coverMap spin.one) (cov.coverMap spin.one) :=
   Path.stepChain rfl
@@ -225,13 +225,13 @@ structure DiracOperator {M : RiemannianManifold.{u}}
   self_adjoint : True
 
 /-- The square of the Dirac operator. -/
-def diracSquare {M : RiemannianManifold.{u}}
+noncomputable def diracSquare {M : RiemannianManifold.{u}}
     {ss : SpinStructure M} {sb : SpinorBundle M ss}
     (d : DiracOperator sb) (s : sb.sections) : sb.sections :=
   d.dirac (d.dirac s)
 
 /-- Dirac operator maps zero to zero. -/
-def dirac_zero_path {M : RiemannianManifold.{u}}
+noncomputable def dirac_zero_path {M : RiemannianManifold.{u}}
     {ss : SpinStructure M} {sb : SpinorBundle M ss}
     (d : DiracOperator sb) :
     Path (diracSquare d sb.zero) (d.dirac (d.dirac sb.zero)) :=
@@ -339,12 +339,12 @@ noncomputable def spinorRep_one_rweq {n : Nat} {spin : SpinGroup.{u} n}
   exact rweq_cmpA_refl_right (p := sr.rep_one s)
 
 /-- stepChain for quadratic form evaluation. -/
-def quad_eval_zero {V S : Type u} (q : QuadraticForm V S) :
+noncomputable def quad_eval_zero {V S : Type u} (q : QuadraticForm V S) :
     Path (q.eval q.zeroV) q.zeroS :=
   q.eval_zero
 
 /-- stepChain for fiber size. -/
-def fiber_size_path {n : Nat} {spin : SpinGroup.{u} n}
+noncomputable def fiber_size_path {n : Nat} {spin : SpinGroup.{u} n}
     (cov : SpinCovering n spin) :
     Path cov.fiber_size 2 :=
   cov.fiber_is_two

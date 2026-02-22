@@ -128,27 +128,27 @@ theorem transport₂_injective {B' : Type v}
 /-! ## Path coherence witnesses -/
 
 /-- The `ofEq` witness that double symmetry transport is idempotent. -/
-def transport_symm_symm_path {D : A → Type v}
+noncomputable def transport_symm_symm_path {D : A → Type v}
     {a b : A} (p : Path a b) (x : D a) :
     Path (Path.transport (Path.symm (Path.symm p)) x)
          (Path.transport p x) :=
   Path.stepChain (transport_symm_symm p x)
 
 /-- The `ofEq` witness for transport along a composite path. -/
-def transport_trans_path {D : A → Type v}
+noncomputable def transport_trans_path {D : A → Type v}
     {a b c : A} (p : Path a b) (q : Path b c) (x : D a) :
     Path (Path.transport (Path.trans p q) x)
          (Path.transport q (Path.transport p x)) :=
   Path.stepChain (Path.transport_trans p q x)
 
 /-- The `ofEq` witness for left-cancellation of transport. -/
-def transport_cancel_left_path {D : A → Type v}
+noncomputable def transport_cancel_left_path {D : A → Type v}
     {a b : A} (p : Path a b) (x : D a) :
     Path (Path.transport (Path.symm p) (Path.transport p x)) x :=
   Path.stepChain (Path.transport_symm_left p x)
 
 /-- The `ofEq` witness for right-cancellation of transport. -/
-def transport_cancel_right_path {D : A → Type v}
+noncomputable def transport_cancel_right_path {D : A → Type v}
     {a b : A} (p : Path a b) (y : D b) :
     Path (Path.transport p (Path.transport (Path.symm p) y)) y :=
   Path.stepChain (Path.transport_symm_right p y)

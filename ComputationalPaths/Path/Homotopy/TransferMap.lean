@@ -54,12 +54,12 @@ structure DeckTransformation {X : Type u} (cov : FiniteCovering X) where
   commutes : ∀ e : cov.TotalSpace, cov.proj (transform e) = cov.proj e
 
 /-- The identity deck transformation. -/
-def deckId {X : Type u} (cov : FiniteCovering X) : DeckTransformation cov where
+noncomputable def deckId {X : Type u} (cov : FiniteCovering X) : DeckTransformation cov where
   transform := id
   commutes := fun _ => rfl
 
 /-- Composition of deck transformations. -/
-def deckComp {X : Type u} {cov : FiniteCovering X}
+noncomputable def deckComp {X : Type u} {cov : FiniteCovering X}
     (d₁ d₂ : DeckTransformation cov) : DeckTransformation cov where
   transform := d₁.transform ∘ d₂.transform
   commutes := by
@@ -74,7 +74,7 @@ theorem deckComp_assoc {X : Type u} {cov : FiniteCovering X}
   simp [deckComp]; rfl
 
 /-- Path witness for deck composition associativity. -/
-def deckComp_assoc_path {X : Type u} {cov : FiniteCovering X}
+noncomputable def deckComp_assoc_path {X : Type u} {cov : FiniteCovering X}
     (d₁ d₂ d₃ : DeckTransformation cov) :
     Path (deckComp (deckComp d₁ d₂) d₃)
          (deckComp d₁ (deckComp d₂ d₃)) :=
@@ -87,7 +87,7 @@ theorem deckComp_id_left {X : Type u} {cov : FiniteCovering X}
   simp [deckComp, deckId]
 
 /-- Path for left identity. -/
-def deckComp_id_left_path {X : Type u} {cov : FiniteCovering X}
+noncomputable def deckComp_id_left_path {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) :
     Path (deckComp (deckId cov) d) d :=
   Path.stepChain (deckComp_id_left d)
@@ -99,7 +99,7 @@ theorem deckComp_id_right {X : Type u} {cov : FiniteCovering X}
   simp [deckComp, deckId]
 
 /-- Path for right identity. -/
-def deckComp_id_right_path {X : Type u} {cov : FiniteCovering X}
+noncomputable def deckComp_id_right_path {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) :
     Path (deckComp d (deckId cov)) d :=
   Path.stepChain (deckComp_id_right d)
@@ -110,7 +110,7 @@ theorem deckId_commutes_eq {X : Type u} (cov : FiniteCovering X)
     cov.proj ((deckId cov).transform e) = cov.proj e := rfl
 
 /-- Path for identity commuting. -/
-def deckId_commutes_path {X : Type u} (cov : FiniteCovering X)
+noncomputable def deckId_commutes_path {X : Type u} (cov : FiniteCovering X)
     (e : cov.TotalSpace) :
     Path (cov.proj ((deckId cov).transform e)) (cov.proj e) :=
   Path.refl _
@@ -124,7 +124,7 @@ abbrev LoopAt (X : Type u) (x : X) : Type u :=
 /-- Transfer map on loops: given a pointed covering, map loops downstairs
     to loops upstairs. In our model, since the total space projection
     induces an inclusion on loop spaces, the transfer "sums over sheets." -/
-def transferLoop {X : Type u} {x₀ : X}
+noncomputable def transferLoop {X : Type u} {x₀ : X}
     (cov : PointedCovering X x₀)
     (lift : LoopAt X x₀ → LoopAt cov.TotalSpace cov.baseLift) :
     LoopAt X x₀ → LoopAt cov.TotalSpace cov.baseLift :=
@@ -138,7 +138,7 @@ theorem transferLoop_refl {X : Type u} {x₀ : X}
     transferLoop cov lift (Path.refl x₀) = Path.refl cov.baseLift := h
 
 /-- Path witness for transfer of identity loop. -/
-def transferLoop_refl_path {X : Type u} {x₀ : X}
+noncomputable def transferLoop_refl_path {X : Type u} {x₀ : X}
     (cov : PointedCovering X x₀)
     (lift : LoopAt X x₀ → LoopAt cov.TotalSpace cov.baseLift)
     (h : lift (Path.refl x₀) = Path.refl cov.baseLift) :
@@ -149,7 +149,7 @@ def transferLoop_refl_path {X : Type u} {x₀ : X}
 
 /-- The norm map: sum over all deck transformations.
     In our model, we iterate a deck transformation n times. -/
-def normIterate {X : Type u} {cov : FiniteCovering X}
+noncomputable def normIterate {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) : Nat → cov.TotalSpace → cov.TotalSpace
   | 0 => id
   | n + 1 => d.transform ∘ normIterate d n
@@ -160,7 +160,7 @@ theorem normIterate_zero {X : Type u} {cov : FiniteCovering X}
     normIterate d 0 e = e := rfl
 
 /-- Path for zero iteration. -/
-def normIterate_zero_path {X : Type u} {cov : FiniteCovering X}
+noncomputable def normIterate_zero_path {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) (e : cov.TotalSpace) :
     Path (normIterate d 0 e) e :=
   Path.refl e
@@ -171,7 +171,7 @@ theorem normIterate_one {X : Type u} {cov : FiniteCovering X}
     normIterate d 1 e = d.transform e := rfl
 
 /-- Path for single iteration. -/
-def normIterate_one_path {X : Type u} {cov : FiniteCovering X}
+noncomputable def normIterate_one_path {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) (e : cov.TotalSpace) :
     Path (normIterate d 1 e) (d.transform e) :=
   Path.refl _
@@ -182,7 +182,7 @@ theorem normIterate_succ {X : Type u} {cov : FiniteCovering X}
     normIterate d (n + 1) e = d.transform (normIterate d n e) := rfl
 
 /-- Path for successor iteration. -/
-def normIterate_succ_path {X : Type u} {cov : FiniteCovering X}
+noncomputable def normIterate_succ_path {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) (n : Nat) (e : cov.TotalSpace) :
     Path (normIterate d (n + 1) e) (d.transform (normIterate d n e)) :=
   Path.refl _
@@ -200,7 +200,7 @@ theorem normIterate_commutes {X : Type u} {cov : FiniteCovering X}
     rw [d.commutes (normIterate d n e), ih e]
 
 /-- Path for iteration commuting with projection. -/
-def normIterate_commutes_path {X : Type u} {cov : FiniteCovering X}
+noncomputable def normIterate_commutes_path {X : Type u} {cov : FiniteCovering X}
     (d : DeckTransformation cov) (n : Nat) (e : cov.TotalSpace) :
     Path (cov.proj (normIterate d n e)) (cov.proj e) :=
   Path.stepChain (normIterate_commutes d n e)
@@ -208,11 +208,11 @@ def normIterate_commutes_path {X : Type u} {cov : FiniteCovering X}
 /-! ## Index and degree -/
 
 /-- Index of a covering: the number of sheets. -/
-def coveringIndex {X : Type u} (cov : FiniteCovering X) : Nat :=
+noncomputable def coveringIndex {X : Type u} (cov : FiniteCovering X) : Nat :=
   cov.sheets
 
 /-- The trivial covering (identity) has index 1. -/
-def trivialCovering (X : Type u) : FiniteCovering X where
+noncomputable def trivialCovering (X : Type u) : FiniteCovering X where
   TotalSpace := X
   proj := id
   sheets := 1
@@ -223,7 +223,7 @@ theorem trivialCovering_index (X : Type u) :
     coveringIndex (trivialCovering X) = 1 := rfl
 
 /-- Path for trivial covering index. -/
-def trivialCovering_index_path (X : Type u) :
+noncomputable def trivialCovering_index_path (X : Type u) :
     Path (coveringIndex (trivialCovering X)) 1 :=
   Path.refl 1
 
@@ -237,7 +237,7 @@ theorem doubleCovering_index {X : Type u} (cov : DoubleCovering X) :
   cov.is_double
 
 /-- Path for double covering index. -/
-def doubleCovering_index_path {X : Type u} (cov : DoubleCovering X) :
+noncomputable def doubleCovering_index_path {X : Type u} (cov : DoubleCovering X) :
     Path (coveringIndex cov.toFiniteCovering) 2 :=
   Path.stepChain (doubleCovering_index cov)
 
@@ -256,7 +256,7 @@ structure ComposedCovering (X : Type u) where
   middleProj : Middle → X
 
 /-- The total index of a composed covering. -/
-def composedIndex {X : Type u} (cc : ComposedCovering X) : Nat :=
+noncomputable def composedIndex {X : Type u} (cc : ComposedCovering X) : Nat :=
   cc.upper.sheets * cc.lower.sheets
 
 /-- Total index is the product. -/
@@ -264,7 +264,7 @@ theorem composedIndex_eq {X : Type u} (cc : ComposedCovering X) :
     composedIndex cc = cc.upper.sheets * cc.lower.sheets := rfl
 
 /-- Path for composed index. -/
-def composedIndex_path {X : Type u} (cc : ComposedCovering X) :
+noncomputable def composedIndex_path {X : Type u} (cc : ComposedCovering X) :
     Path (composedIndex cc) (cc.upper.sheets * cc.lower.sheets) :=
   Path.refl _
 
@@ -305,13 +305,13 @@ structure CoveringMorphism {X : Type u} (cov₁ cov₂ : FiniteCovering X) where
   commutes : ∀ e : cov₁.TotalSpace, cov₂.proj (totalMap e) = cov₁.proj e
 
 /-- Identity morphism of coverings. -/
-def coveringMorphismId {X : Type u} (cov : FiniteCovering X) :
+noncomputable def coveringMorphismId {X : Type u} (cov : FiniteCovering X) :
     CoveringMorphism cov cov where
   totalMap := id
   commutes := fun _ => rfl
 
 /-- Composition of covering morphisms. -/
-def coveringMorphismComp {X : Type u} {c₁ c₂ c₃ : FiniteCovering X}
+noncomputable def coveringMorphismComp {X : Type u} {c₁ c₂ c₃ : FiniteCovering X}
     (f : CoveringMorphism c₁ c₂) (g : CoveringMorphism c₂ c₃) :
     CoveringMorphism c₁ c₃ where
   totalMap := g.totalMap ∘ f.totalMap
@@ -327,7 +327,7 @@ theorem coveringMorphismComp_id_right {X : Type u} {c₁ c₂ : FiniteCovering X
   simp [coveringMorphismComp, coveringMorphismId]
 
 /-- Path for composition with identity. -/
-def coveringMorphismComp_id_path {X : Type u} {c₁ c₂ : FiniteCovering X}
+noncomputable def coveringMorphismComp_id_path {X : Type u} {c₁ c₂ : FiniteCovering X}
     (f : CoveringMorphism c₁ c₂) :
     Path (coveringMorphismComp f (coveringMorphismId c₂)) f :=
   Path.stepChain (coveringMorphismComp_id_right f)
@@ -339,7 +339,7 @@ theorem coveringMorphismComp_id_left {X : Type u} {c₁ c₂ : FiniteCovering X}
   simp [coveringMorphismComp, coveringMorphismId]
 
 /-- Path for left identity. -/
-def coveringMorphismComp_id_left_path {X : Type u} {c₁ c₂ : FiniteCovering X}
+noncomputable def coveringMorphismComp_id_left_path {X : Type u} {c₁ c₂ : FiniteCovering X}
     (f : CoveringMorphism c₁ c₂) :
     Path (coveringMorphismComp (coveringMorphismId c₁) f) f :=
   Path.stepChain (coveringMorphismComp_id_left f)
@@ -354,7 +354,7 @@ theorem coveringMorphismComp_assoc {X : Type u}
   simp [coveringMorphismComp]; rfl
 
 /-- Path for associativity. -/
-def coveringMorphismComp_assoc_path {X : Type u}
+noncomputable def coveringMorphismComp_assoc_path {X : Type u}
     {c₁ c₂ c₃ c₄ : FiniteCovering X}
     (f : CoveringMorphism c₁ c₂) (g : CoveringMorphism c₂ c₃)
     (h : CoveringMorphism c₃ c₄) :
@@ -365,7 +365,7 @@ def coveringMorphismComp_assoc_path {X : Type u}
 /-! ## Euler characteristic and transfer -/
 
 /-- Transfer multiplies the Euler characteristic by the index. -/
-def transferEuler {X : Type u} (cov : FiniteCovering X)
+noncomputable def transferEuler {X : Type u} (cov : FiniteCovering X)
     (chiX : Int) : Int :=
   cov.sheets * chiX
 
@@ -375,7 +375,7 @@ theorem transferEuler_zero {X : Type u} (cov : FiniteCovering X) :
   simp [transferEuler]
 
 /-- Path for transfer of zero. -/
-def transferEuler_zero_path {X : Type u} (cov : FiniteCovering X) :
+noncomputable def transferEuler_zero_path {X : Type u} (cov : FiniteCovering X) :
     Path (transferEuler cov 0) 0 :=
   Path.stepChain (transferEuler_zero (cov := cov))
 
@@ -385,14 +385,14 @@ theorem transferEuler_trivial (X : Type u) (chi : Int) :
   simp [transferEuler, trivialCovering]
 
 /-- Path for trivial transfer. -/
-def transferEuler_trivial_path (X : Type u) (chi : Int) :
+noncomputable def transferEuler_trivial_path (X : Type u) (chi : Int) :
     Path (transferEuler (trivialCovering X) chi) chi :=
   Path.stepChain (transferEuler_trivial X chi)
 
 /-! ## HoTT-style transfer witnesses -/
 
 /-- Transfer acts on HoTT-style paths via ap. -/
-def transferAp {X : Type u} {x₀ : X}
+noncomputable def transferAp {X : Type u} {x₀ : X}
     (cov : PointedCovering X x₀)
     (liftFun : X → cov.TotalSpace)
     (p : Path x₀ x₀) :
@@ -407,7 +407,7 @@ theorem transferAp_refl {X : Type u} {x₀ : X}
   simp [transferAp, HoTT.ap]
 
 /-- Path for transfer ap on refl. -/
-def transferAp_refl_path {X : Type u} {x₀ : X}
+noncomputable def transferAp_refl_path {X : Type u} {x₀ : X}
     (cov : PointedCovering X x₀)
     (liftFun : X → cov.TotalSpace) :
     Path (transferAp cov liftFun (Path.refl x₀)) (Path.refl (liftFun x₀)) :=
@@ -423,7 +423,7 @@ theorem transferAp_trans {X : Type u} {x₀ : X}
   simp [transferAp, HoTT.ap]
 
 /-- Path for transfer distributing over trans. -/
-def transferAp_trans_path {X : Type u} {x₀ : X}
+noncomputable def transferAp_trans_path {X : Type u} {x₀ : X}
     (cov : PointedCovering X x₀)
     (liftFun : X → cov.TotalSpace)
     (p q : Path x₀ x₀) :
@@ -442,7 +442,7 @@ theorem transferAp_symm {X : Type u} {x₀ : X}
   simp [transferAp, HoTT.ap]
 
 /-- Path for transfer commuting with symm. -/
-def transferAp_symm_path {X : Type u} {x₀ : X}
+noncomputable def transferAp_symm_path {X : Type u} {x₀ : X}
     (cov : PointedCovering X x₀)
     (liftFun : X → cov.TotalSpace)
     (p : Path x₀ x₀) :

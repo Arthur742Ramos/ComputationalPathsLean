@@ -32,34 +32,34 @@ noncomputable section
 /-! ## Nielsen-Schreier base case: Path witnesses -/
 
 /-- Path witness for the Nielsen-Schreier rank formula base case. -/
-def freeGroup_rank_formula_one_path (k : Nat) :
+noncomputable def freeGroup_rank_formula_one_path (k : Nat) :
     Path (freeGroupRank 1) (1 + k * (1 - 1)) :=
   freeGroup_rank_formula_one k
 
 /-- Path witness for the generator power form in F1. -/
-def intToFreeGroupOne_eq_genPow_path (k : Int) :
+noncomputable def intToFreeGroupOne_eq_genPow_path (k : Int) :
     Path (intToFreeGroupOne k) (BouquetFreeGroup.genPow Fin'B.fzero k) :=
   intToFreeGroupOne_eq_genPow k
 
 /-- Path witness for multiplication in F1 under the Int encoding. -/
-def freeGroupOneToInt_mul_path (x y : BouquetFreeGroup 1) :
+noncomputable def freeGroupOneToInt_mul_path (x y : BouquetFreeGroup 1) :
     Path (freeGroupOneToInt (BouquetFreeGroup.mul x y))
       (freeGroupOneToInt x + freeGroupOneToInt y) :=
   Path.stepChain (freeGroupOneToInt_mul x y)
 
 /-- Path witness for powers in F1 under the Int encoding. -/
-def freeGroupOneToInt_pow_path (x : BouquetFreeGroup 1) (k : Nat) :
+noncomputable def freeGroupOneToInt_pow_path (x : BouquetFreeGroup 1) (k : Nat) :
     Path (freeGroupOneToInt (BouquetFreeGroup.pow (n := 1) x k))
       ((Int.ofNat k) * freeGroupOneToInt x) :=
   Path.stepChain (freeGroupOneToInt_pow x k)
 
 /-- Path witness of the Int -> F1 -> Int round-trip. -/
-def freeGroupOneToInt_intToFreeGroupOne_path (k : Int) :
+noncomputable def freeGroupOneToInt_intToFreeGroupOne_path (k : Int) :
     Path (freeGroupOneToInt (intToFreeGroupOne k)) k :=
   Path.stepChain (freeGroupOneToInt_intToFreeGroupOne k)
 
 /-- Path witness of the F1 -> Int -> F1 round-trip. -/
-def intToFreeGroupOne_freeGroupOneToInt_path (x : BouquetFreeGroup 1) :
+noncomputable def intToFreeGroupOne_freeGroupOneToInt_path (x : BouquetFreeGroup 1) :
     Path (intToFreeGroupOne (freeGroupOneToInt x)) x := by
   refine Path.stepChain ?_
   refine Quot.inductionOn x ?_

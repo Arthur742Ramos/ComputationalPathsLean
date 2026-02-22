@@ -38,7 +38,7 @@ universe u
 /-! ## Join space -/
 
 /-- Join of `X` and `Y` as the computational pushout of the projections. -/
-def JoinSpace (X : Type u) (Y : Type u) : Type u :=
+noncomputable def JoinSpace (X : Type u) (Y : Type u) : Type u :=
   Pushout (A := X) (B := Y) (C := X × Y) Prod.fst Prod.snd
 
 namespace JoinSpace
@@ -46,30 +46,30 @@ namespace JoinSpace
 variable {X : Type u} {Y : Type u}
 
 /-- Left inclusion into the join. -/
-def inl (x : X) : JoinSpace X Y :=
+noncomputable def inl (x : X) : JoinSpace X Y :=
   Pushout.inl (A := X) (B := Y) (C := X × Y) (f := Prod.fst) (g := Prod.snd) x
 
 /-- Right inclusion into the join. -/
-def inr (y : Y) : JoinSpace X Y :=
+noncomputable def inr (y : Y) : JoinSpace X Y :=
   Pushout.inr (A := X) (B := Y) (C := X × Y) (f := Prod.fst) (g := Prod.snd) y
 
 /-- Glue path connecting left and right points for each `(x, y)`. -/
-def glue (x : X) (y : Y) :
+noncomputable def glue (x : X) (y : Y) :
     Path (inl (X := X) (Y := Y) x) (inr (X := X) (Y := Y) y) :=
   Pushout.glue (A := X) (B := Y) (C := X × Y) (f := Prod.fst) (g := Prod.snd) (x, y)
 
 /-- Inverse glue path from right to left. -/
-def glueInv (x : X) (y : Y) :
+noncomputable def glueInv (x : X) (y : Y) :
     Path (inr (X := X) (Y := Y) y) (inl (X := X) (Y := Y) x) :=
   Path.symm (glue x y)
 
 /-- Triangle: glue(x,y) ⬝ glueInv(x',y) connects inl x to inl x'. -/
-def glueTri (x x' : X) (y : Y) :
+noncomputable def glueTri (x x' : X) (y : Y) :
     Path (inl (X := X) (Y := Y) x) (inl (X := X) (Y := Y) x') :=
   Path.trans (glue x y) (glueInv x' y)
 
 /-- Dual triangle: glueInv(x,y) ⬝ glue(x,y') connects inr y to inr y'. -/
-def glueTriR (x : X) (y y' : Y) :
+noncomputable def glueTriR (x : X) (y y' : Y) :
     Path (inr (X := X) (Y := Y) y) (inr (X := X) (Y := Y) y') :=
   Path.trans (glueInv x y) (glue x y')
 
@@ -95,7 +95,7 @@ abbrev Join (X : Type u) (Y : Type u) : Type u := JoinSpace X Y
 
 /-- Functoriality of the join: maps `f : X₁ → X₂` and `g : Y₁ → Y₂`
     induce a map `X₁ * Y₁ → X₂ * Y₂`. -/
-def joinMap {X₁ X₂ Y₁ Y₂ : Type u}
+noncomputable def joinMap {X₁ X₂ Y₁ Y₂ : Type u}
     (f : X₁ → X₂) (g : Y₁ → Y₂) : JoinSpace X₁ Y₁ → JoinSpace X₂ Y₂ :=
   Quot.lift
     (fun s => match s with
@@ -123,14 +123,14 @@ theorem joinMap_id {X Y : Type u} (z : JoinSpace X Y) :
   cases s <;> rfl
 
 /-- Path witness: joinMap id id is the identity. -/
-def joinMap_id_path {X Y : Type u} (z : JoinSpace X Y) :
+noncomputable def joinMap_id_path {X Y : Type u} (z : JoinSpace X Y) :
     Path (joinMap (id : X → X) (id : Y → Y) z) z :=
   Path.stepChain (joinMap_id z)
 
 /-! ## Symmetry of the join -/
 
 /-- Symmetry map: X * Y → Y * X. -/
-def joinSymmMap {X Y : Type u} : JoinSpace X Y → JoinSpace Y X :=
+noncomputable def joinSymmMap {X Y : Type u} : JoinSpace X Y → JoinSpace Y X :=
   Quot.lift
     (fun s => match s with
       | Sum.inl x => JoinSpace.inr (X := Y) (Y := X) x
@@ -157,30 +157,30 @@ theorem joinSymmMap_involutive {X Y : Type u} (z : JoinSpace X Y) :
   cases s <;> rfl
 
 /-- Path witness of the double symmetry involution. -/
-def joinSymmMap_involutive_path {X Y : Type u} (z : JoinSpace X Y) :
+noncomputable def joinSymmMap_involutive_path {X Y : Type u} (z : JoinSpace X Y) :
     Path (joinSymmMap (joinSymmMap z)) z :=
   Path.stepChain (joinSymmMap_involutive z)
 
 /-! ## Join with unit -/
 
 /-- Join with the unit type X * 1. -/
-def JoinUnit (X : Type u) : Type u := JoinSpace X PUnit'
+noncomputable def JoinUnit (X : Type u) : Type u := JoinSpace X PUnit'
 
 /-- Left inclusion into X * 1. -/
-def joinUnitInl {X : Type u} (x : X) : JoinUnit X :=
+noncomputable def joinUnitInl {X : Type u} (x : X) : JoinUnit X :=
   JoinSpace.inl x
 
 /-- The cone point of X * 1. -/
-def joinUnitConePoint (X : Type u) : JoinUnit X :=
+noncomputable def joinUnitConePoint (X : Type u) : JoinUnit X :=
   JoinSpace.inr PUnit'.unit
 
 /-- X * 1 is a cone: every point inl x is connected to the cone point. -/
-def joinUnitGlue {X : Type u} (x : X) :
+noncomputable def joinUnitGlue {X : Type u} (x : X) :
     Path (joinUnitInl x) (joinUnitConePoint X) :=
   JoinSpace.glue x PUnit'.unit
 
 /-- X * 1 is path-connected (the cone contracts to the cone point). -/
-instance joinUnit_connected {X : Type u} [Nonempty X] :
+noncomputable instance joinUnit_connected {X : Type u} [Nonempty X] :
     IsPathConnected (JoinUnit X) where
   base := joinUnitConePoint X
   connected := fun z =>
@@ -194,10 +194,10 @@ instance joinUnit_connected {X : Type u} [Nonempty X] :
 /-! ## Join with empty -/
 
 /-- Join with the empty type. -/
-def JoinEmpty (X : Type u) : Type u := JoinSpace X PEmpty
+noncomputable def JoinEmpty (X : Type u) : Type u := JoinSpace X PEmpty
 
 /-- Left inclusion is the only way into X * 0. -/
-def joinEmptyInl {X : Type u} (x : X) : JoinEmpty X :=
+noncomputable def joinEmptyInl {X : Type u} (x : X) : JoinEmpty X :=
   JoinSpace.inl x
 
 /-! ## Transport along glue paths -/
@@ -211,7 +211,7 @@ theorem joinSpace_transport_glue_const
 /-! ## Iterated join -/
 
 /-- Iterated join: X^{*n} = X * X * ⋯ * X (n copies). -/
-def iterJoin (X : Type u) : Nat → Type u
+noncomputable def iterJoin (X : Type u) : Nat → Type u
   | 0 => PUnit'
   | 1 => X
   | Nat.succ (Nat.succ n) => JoinSpace X (iterJoin X (n + 1))
@@ -227,10 +227,10 @@ theorem iterJoin_two (X : Type u) :
     iterJoin X 2 = JoinSpace X X := rfl
 
 /-- Path witnesses for iterated join equalities. -/
-def iterJoin_zero_path (X : Type u) :
+noncomputable def iterJoin_zero_path (X : Type u) :
     Path (iterJoin X 0) PUnit' := Path.refl _
 
-def iterJoin_one_path (X : Type u) :
+noncomputable def iterJoin_one_path (X : Type u) :
     Path (iterJoin X 1) X := Path.refl _
 
 /-! ## Summary -/

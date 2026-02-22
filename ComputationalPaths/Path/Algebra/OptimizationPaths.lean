@@ -34,7 +34,7 @@ structure FeasibleSol (P : OptProblem A) where
   isFeasible : P.feasible point
 
 /-- Path between objective values of two feasible solutions -/
-def objectivePath (P : OptProblem A) (s₁ s₂ : FeasibleSol P)
+noncomputable def objectivePath (P : OptProblem A) (s₁ s₂ : FeasibleSol P)
     (h : P.objective s₁.point = P.objective s₂.point) :
     Path (P.objective s₁.point) (P.objective s₂.point) :=
   Path.mk [Step.mk _ _ h] h
@@ -91,11 +91,11 @@ structure DescentIter (A : Type u) where
   isFixed : step fixedPt = fixedPt
 
 /-- Path witnessing the fixed point -/
-def fixedPath (D : DescentIter A) : Path (D.step D.fixedPt) D.fixedPt :=
+noncomputable def fixedPath (D : DescentIter A) : Path (D.step D.fixedPt) D.fixedPt :=
   Path.mk [Step.mk _ _ D.isFixed] D.isFixed
 
 /-- The n-fold iteration of the step map -/
-def iterStep (D : DescentIter A) : Nat → A → A
+noncomputable def iterStep (D : DescentIter A) : Nat → A → A
   | 0, a => a
   | n+1, a => D.step (iterStep D n a)
 
@@ -115,7 +115,7 @@ theorem iterStep_fixedPt (D : DescentIter A) (n : Nat) :
   | succ n ih => simp [iterStep, ih, D.isFixed]
 
 /-- Path from iterated fixed point to fixed point -/
-def iterFixedPath (D : DescentIter A) (n : Nat) :
+noncomputable def iterFixedPath (D : DescentIter A) (n : Nat) :
     Path (iterStep D n D.fixedPt) D.fixedPt :=
   Path.mk [Step.mk _ _ (iterStep_fixedPt D n)] (iterStep_fixedPt D n)
 
@@ -140,7 +140,7 @@ structure DualPair (A : Type u) where
   duality : ∀ a : A, Path (primal (dual a)) (dual (primal a))
 
 /-- Weak duality: symmetric of the duality path -/
-def weakDualPath (D : DualPair A) (a : A) :
+noncomputable def weakDualPath (D : DualPair A) (a : A) :
     Path (D.dual (D.primal a)) (D.primal (D.dual a)) :=
   Path.symm (D.duality a)
 
@@ -172,7 +172,7 @@ structure KKTCondition (A : Type u) where
     Path (gradient a) (constraint (multiplier a))
 
 /-- Symm of stationarity gives reverse direction -/
-def kkt_reverse (K : KKTCondition A) (a : A) :
+noncomputable def kkt_reverse (K : KKTCondition A) (a : A) :
     Path (K.constraint (K.multiplier a)) (K.gradient a) :=
   Path.symm (K.stationarity a)
 
@@ -196,7 +196,7 @@ theorem kkt_congrArg_reverse (K : KKTCondition A) (f : A → B) (a : A) :
 /-! ## Pareto optimality -/
 
 /-- Path from applying a function to equal points -/
-def paretoObjectivePath (f : A → A)
+noncomputable def paretoObjectivePath (f : A → A)
     (a b : A) (h : f a = f b) :
     Path (f a) (f b) :=
   Path.mk [Step.mk _ _ h] h

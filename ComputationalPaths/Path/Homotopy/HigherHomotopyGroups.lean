@@ -38,7 +38,7 @@ abbrev PiN (n : Nat) (X : Type u) (x : X) : Type u :=
   HigherHomotopy.PiN n X x
 
 /-- Multiplication on πₙ in the computational-path model. -/
-def piN_mul (n : Nat) (x : X) : PiN n X x → PiN n X x → PiN n X x :=
+noncomputable def piN_mul (n : Nat) (x : X) : PiN n X x → PiN n X x → PiN n X x :=
   match n with
   | 0 => fun _ _ => PUnit.unit
   | 1 => PiOne.mul (A := X) (a := x)
@@ -46,7 +46,7 @@ def piN_mul (n : Nat) (x : X) : PiN n X x → PiN n X x → PiN n X x :=
   | _ + 3 => fun _ _ => PUnit.unit
 
 /-- Identity in πₙ in the computational-path model. -/
-def piN_one (n : Nat) (x : X) : PiN n X x :=
+noncomputable def piN_one (n : Nat) (x : X) : PiN n X x :=
   match n with
   | 0 => PUnit.unit
   | 1 => PiOne.id (A := X) (a := x)
@@ -54,14 +54,14 @@ def piN_one (n : Nat) (x : X) : PiN n X x :=
   | _ + 3 => PUnit.unit
 
 /-- Inverse in πₙ in the computational-path model. -/
-def piN_inv (n : Nat) (x : X) : PiN n X x → PiN n X x :=
+noncomputable def piN_inv (n : Nat) (x : X) : PiN n X x → PiN n X x :=
   match n with
   | 0 => fun _ => PUnit.unit
   | 1 => PiOne.inv (A := X) (a := x)
   | 2 => HigherHomotopy.PiTwo.inv (A := X) (a := x)
   | _ + 3 => fun _ => PUnit.unit
 
-def piN_mul_assoc (n : Nat) [Nat.AtLeastTwo n] {x : X}
+noncomputable def piN_mul_assoc (n : Nat) [Nat.AtLeastTwo n] {x : X}
     (a b c : PiN n X x) :
     Path
       (piN_mul n x (piN_mul n x a b) c)
@@ -84,7 +84,7 @@ def piN_mul_assoc (n : Nat) [Nat.AtLeastTwo n] {x : X}
               cases c
               exact Path.refl _
 
-def piN_one_mul (n : Nat) [Nat.AtLeastTwo n] {x : X}
+noncomputable def piN_one_mul (n : Nat) [Nat.AtLeastTwo n] {x : X}
     (a : PiN n X x) :
     Path (piN_mul n x (piN_one n x) a) a := by
   cases n with
@@ -103,7 +103,7 @@ def piN_one_mul (n : Nat) [Nat.AtLeastTwo n] {x : X}
               cases a
               exact Path.refl _
 
-def piN_mul_one (n : Nat) [Nat.AtLeastTwo n] {x : X}
+noncomputable def piN_mul_one (n : Nat) [Nat.AtLeastTwo n] {x : X}
     (a : PiN n X x) :
     Path (piN_mul n x a (piN_one n x)) a := by
   cases n with
@@ -122,7 +122,7 @@ def piN_mul_one (n : Nat) [Nat.AtLeastTwo n] {x : X}
               cases a
               exact Path.refl _
 
-def piN_inv_mul_self (n : Nat) [Nat.AtLeastTwo n] {x : X}
+noncomputable def piN_inv_mul_self (n : Nat) [Nat.AtLeastTwo n] {x : X}
     (a : PiN n X x) :
     Path (piN_mul n x (piN_inv n x a) a) (piN_one n x) := by
   cases n with
@@ -141,7 +141,7 @@ def piN_inv_mul_self (n : Nat) [Nat.AtLeastTwo n] {x : X}
               cases a
               exact Path.refl _
 
-def piN_mul_inv_self (n : Nat) [Nat.AtLeastTwo n] {x : X}
+noncomputable def piN_mul_inv_self (n : Nat) [Nat.AtLeastTwo n] {x : X}
     (a : PiN n X x) :
     Path (piN_mul n x a (piN_inv n x a)) (piN_one n x) := by
   cases n with
@@ -160,7 +160,7 @@ def piN_mul_inv_self (n : Nat) [Nat.AtLeastTwo n] {x : X}
               cases a
               exact Path.refl _
 
-def piN_mul_comm (n : Nat) [Nat.AtLeastTwo n] {x : X}
+noncomputable def piN_mul_comm (n : Nat) [Nat.AtLeastTwo n] {x : X}
     (a b : PiN n X x) :
     Path (piN_mul n x a b) (piN_mul n x b a) := by
   cases n with

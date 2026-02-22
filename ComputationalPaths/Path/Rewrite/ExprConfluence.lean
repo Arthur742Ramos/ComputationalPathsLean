@@ -47,7 +47,7 @@ noncomputable instance instHasJoinOfRwExpr : HasJoinOfRwExpr.{u} where
 /-! ## Reflexive join combinators -/
 
 /-- Joining an expression with itself is trivial. -/
-def join_refl_left {A : Type u} {a b : A}
+noncomputable def join_refl_left {A : Type u} {a b : A}
     (p : PathExpr A a b) :
     Join p p :=
   { meet := p, left := Rw.refl p, right := Rw.refl p }
@@ -55,7 +55,7 @@ def join_refl_left {A : Type u} {a b : A}
 /-! ## Symmetry of join data -/
 
 /-- Join data is symmetric: if p joins with q then q joins with p. -/
-def join_swap {A : Type u} {a b : A}
+noncomputable def join_swap {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (J : Join p q) :
     Join q p :=
@@ -78,7 +78,7 @@ theorem join_eval_eq {A : Type u} {a b : A}
   rw [join_eq' J]
 
 /-- Path witness that joined evaluations agree. -/
-def join_eval_path {A : Type u} {a b : A}
+noncomputable def join_eval_path {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (J : Join p q) :
     Path (eval p) (eval q) :=
@@ -123,7 +123,7 @@ theorem join_sides_complexity_eq {A : Type u} {a b : A}
 /-! ## Join from equal expressions -/
 
 /-- Equal expressions are trivially joinable. -/
-def join_of_eq {A : Type u} {a b : A}
+noncomputable def join_of_eq {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : p = q) :
     Join p q := by
@@ -133,24 +133,24 @@ def join_of_eq {A : Type u} {a b : A}
 /-! ## Atom-specific lemmas -/
 
 /-- Two atom expressions wrapping the same path are joinable. -/
-def join_atom_atom {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def join_atom_atom {A : Type u} {a b : A} (p : Path a b) :
     Join (PathExpr.atom p) (PathExpr.atom p) :=
   join_refl_left (PathExpr.atom p)
 
 /-- Eval of an atom join gives a reflexive path. -/
-def join_atom_eval_path {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def join_atom_eval_path {A : Type u} {a b : A} (p : Path a b) :
     Path (eval (PathExpr.atom p)) (eval (PathExpr.atom p)) :=
   Path.refl (eval (PathExpr.atom p))
 
 /-- Refl expression is joinable with itself. -/
-def join_refl_refl {A : Type u} (a : A) :
+noncomputable def join_refl_refl {A : Type u} (a : A) :
     Join (PathExpr.refl a) (PathExpr.refl a) :=
   join_refl_left (PathExpr.refl a)
 
 /-! ## Structural join preservation -/
 
 /-- Symmetry preserves joinability: if p joins with q, then symm p joins with symm q. -/
-def join_symm_symm {A : Type u} {a b : A}
+noncomputable def join_symm_symm {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (J : Join p q) :
     Join
@@ -158,7 +158,7 @@ def join_symm_symm {A : Type u} {a b : A}
   exact join_of_eq (by rw [join_eq' J])
 
 /-- Transitivity (composition) preserves joinability on both sides. -/
-def join_trans_trans {A : Type u} {a b c : A}
+noncomputable def join_trans_trans {A : Type u} {a b c : A}
     {p₁ q₁ : PathExpr A a b}
     {p₂ q₂ : PathExpr A b c}
     (J₁ : Join p₁ q₁)
@@ -171,7 +171,7 @@ def join_trans_trans {A : Type u} {a b c : A}
 
 /-- Transitivity of join: if p joins with q and q joins with r,
     then p joins with r. -/
-def join_trans' {A : Type u} {a b : A}
+noncomputable def join_trans' {A : Type u} {a b : A}
     {p q r : PathExpr A a b}
     (J₁ : Join p q)
     (J₂ : Join q r) :
@@ -225,7 +225,7 @@ theorem eval_invariant_rw {A : Type u} {a b : A}
   rw [← this]
 
 /-- Path witness for eval invariance under Rw. -/
-def eval_invariant_rw_path {A : Type u} {a b : A}
+noncomputable def eval_invariant_rw_path {A : Type u} {a b : A}
     {p q : PathExpr A a b}
     (h : Rw p q) : Path (eval p) (eval q) :=
   Path.stepChain (eval_invariant_rw h)

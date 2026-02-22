@@ -42,13 +42,13 @@ structure Configuration (E : Type u) (es : EventStructure E) where
   conflict_free : ∀ e₁ e₂, events e₁ → events e₂ → ¬ es.conflict e₁ e₂
 
 /-- The empty configuration. -/
-def emptyConfig {E : Type u} (es : EventStructure E) : Configuration E es where
+noncomputable def emptyConfig {E : Type u} (es : EventStructure E) : Configuration E es where
   events := fun _ => False
   causal_closed := fun _ _ h _ => h.elim
   conflict_free := fun _ _ h _ => h.elim
 
 /-- A configuration inclusion: C₁ ⊆ C₂. -/
-def configInclusion {E : Type u} {es : EventStructure E}
+noncomputable def configInclusion {E : Type u} {es : EventStructure E}
     (c₁ c₂ : Configuration E es) : Prop :=
   ∀ e, c₁.events e → c₂.events e
 
@@ -59,7 +59,7 @@ structure ESState (E : Type u) where
   active : E → Prop
 
 /-- Path from extending a configuration by one event (when already present). -/
-def extendPath_refl {E : Type u} (s : ESState E) :
+noncomputable def extendPath_refl {E : Type u} (s : ESState E) :
     Path s s :=
   Path.refl s
 
@@ -89,12 +89,12 @@ theorem emptyConfig_least {E : Type u} {es : EventStructure E}
   fun _ h => h.elim
 
 /-- 5. Path for reflexive causality. -/
-def causal_refl_path {E : Type u} (_es : EventStructure E) (e : E) :
+noncomputable def causal_refl_path {E : Type u} (_es : EventStructure E) (e : E) :
     Path e e :=
   Path.refl e
 
 /-- 6. Path for transitive causality. -/
-def causal_trans_path {E : Type u} {a b c : E}
+noncomputable def causal_trans_path {E : Type u} {a b c : E}
     (p : Path a b) (q : Path b c) :
     Path a c :=
   p.trans q
@@ -112,7 +112,7 @@ theorem esstate_eq {E : Type u} (s₁ s₂ : ESState E)
   cases s₁; cases s₂; simp at h; exact h ▸ rfl
 
 /-- 9. ESState path from predicate path. -/
-def esstate_path {E : Type u} {p₁ p₂ : E → Prop}
+noncomputable def esstate_path {E : Type u} {p₁ p₂ : E → Prop}
     (h : Path p₁ p₂) :
     Path (ESState.mk p₁) (ESState.mk p₂) :=
   Path.congrArg ESState.mk h
@@ -136,7 +136,7 @@ structure LabeledEvent (E : Type u) (L : Type u) where
   label : L
 
 /-- 12. Labeled event path from component paths. -/
-def labeledEvent_path {E L : Type u} {e₁ e₂ : E} {l₁ l₂ : L}
+noncomputable def labeledEvent_path {E L : Type u} {e₁ e₂ : E} {l₁ l₂ : L}
     (pe : Path e₁ e₂) (pl : Path l₁ l₂) :
     Path (LabeledEvent.mk e₁ l₁) (LabeledEvent.mk e₂ l₂) :=
   (Path.congrArg (fun e => LabeledEvent.mk e l₁) pe).trans
@@ -162,7 +162,7 @@ theorem stable_conflict_prop {E : Type u} (ses : StableES E)
   ses.stability e₁ e₂ e₃ hc hcaus
 
 /-- Confusion-free: no event has both a conflict and a causal choice. -/
-def confusionFree {E : Type u} (es : EventStructure E) : Prop :=
+noncomputable def confusionFree {E : Type u} (es : EventStructure E) : Prop :=
   ∀ e₁ e₂ e₃,
     es.conflict e₁ e₂ →
     es.causality e₁ e₃ →
@@ -176,7 +176,7 @@ theorem stable_is_confusion_free {E : Type u} (ses : StableES E) :
 /-! ## Domain of Configurations -/
 
 /-- The domain (causal history) of an event in a configuration. -/
-def eventDomain {E : Type u} (es : EventStructure E)
+noncomputable def eventDomain {E : Type u} (es : EventStructure E)
     (c : Configuration E es) (e : E) : E → Prop :=
   fun e' => c.events e' ∧ es.causality e' e
 
@@ -200,7 +200,7 @@ theorem eventDomain_monotone {E : Type u} (es : EventStructure E)
   fun e'' ⟨hc, hce⟩ => ⟨hc, es.causal_trans e'' e e' hce hcaus⟩
 
 /-- 19. Path for domain inclusion via causality. -/
-def domain_inclusion_path {E : Type u} (es : EventStructure E)
+noncomputable def domain_inclusion_path {E : Type u} (es : EventStructure E)
     (c : Configuration E es) {e₁ e₂ : E}
     (_hcaus : es.causality e₁ e₂) :
     Path (eventDomain es c e₁) (eventDomain es c e₁) :=
@@ -220,13 +220,13 @@ theorem config_conflict_free {E : Type u} (es : EventStructure E)
   c.conflict_free e₁ e₂ h₁ h₂
 
 /-- 22. ESState congruence. -/
-def esstate_congrArg {E : Type u} {A : Type u} (f : ESState E → A)
+noncomputable def esstate_congrArg {E : Type u} {A : Type u} (f : ESState E → A)
     {s₁ s₂ : ESState E} (p : Path s₁ s₂) :
     Path (f s₁) (f s₂) :=
   Path.congrArg f p
 
 /-- 23. Conflict irreflexivity via path. -/
-def conflict_irrefl_path {E : Type u} (es : EventStructure E) (e : E) :
+noncomputable def conflict_irrefl_path {E : Type u} (es : EventStructure E) (e : E) :
     ¬ es.conflict e e :=
   es.conflict_irrefl e
 
@@ -238,7 +238,7 @@ theorem causal_trans_via_path {E : Type u} (es : EventStructure E)
   es.causal_trans e₁ e₂ e₃ h₁ h₂
 
 /-- 25. ESState pair path. -/
-def esstate_pair_path {E : Type u} {s₁ s₂ t₁ t₂ : ESState E}
+noncomputable def esstate_pair_path {E : Type u} {s₁ s₂ t₁ t₂ : ESState E}
     (p : Path s₁ s₂) (q : Path t₁ t₂) :
     Path (s₁, t₁) (s₂, t₂) :=
   (Path.congrArg (fun s => (s, t₁)) p).trans

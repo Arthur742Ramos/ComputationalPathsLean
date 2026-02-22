@@ -36,7 +36,7 @@ abbrev Loop (A : Type u) (a : A) : Type u :=
 
 /-- Quotient relation for the `n`-truncation of based loops.
     At level 0 everything is identified; at level ≥ 1 we use `RwEqProp`. -/
-def truncRel (A : Type u) (a : A) : Nat → Loop A a → Loop A a → Prop
+noncomputable def truncRel (A : Type u) (a : A) : Nat → Loop A a → Loop A a → Prop
   | 0, _, _ => True
   | _ + 1, p, q => RwEqProp p q
 
@@ -69,7 +69,7 @@ abbrev τ (n : Nat) (A : Type u) (a : A) : Type u :=
   Quot (truncSetoid A a n).r
 
 /-- Class of a loop in the `n`-truncation quotient. -/
-def truncClass (n : Nat) {A : Type u} {a : A} (p : Loop A a) : τ n A a :=
+noncomputable def truncClass (n : Nat) {A : Type u} {a : A} (p : Loop A a) : τ n A a :=
   Quot.mk _ p
 
 /-- At positive levels, `RwEq`-related loops have equal classes. -/

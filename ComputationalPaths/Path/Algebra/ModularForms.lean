@@ -37,11 +37,11 @@ inductive ModularWord : Type
   | mul : ModularWord → ModularWord → ModularWord
 
 /-- The word `ST`. -/
-def modularST : ModularWord :=
+noncomputable def modularST : ModularWord :=
   ModularWord.mul ModularWord.S ModularWord.T
 
 /-- The word `(ST)^3`. -/
-def modularSTCube : ModularWord :=
+noncomputable def modularSTCube : ModularWord :=
   ModularWord.mul (ModularWord.mul modularST modularST) modularST
 
 /-- Primitive rewrite rules for modular words. -/
@@ -93,7 +93,7 @@ structure ModularForm {H : Type u} {R : Type v} (data : ModularData H R) (k : Na
       (data.weight k w z (toFun z))
 
 /-- Modular forms respect step rewrites through action congruence. -/
-def modularForm_step {H : Type u} {R : Type v}
+noncomputable def modularForm_step {H : Type u} {R : Type v}
     {data : ModularData H R} {k : Nat}
     (f : ModularForm data k) {w w'} (h : ModularStep w w') (z : H) :
     Path (f.toFun (data.action.act w z)) (f.toFun (data.action.act w' z)) :=
@@ -102,7 +102,7 @@ def modularForm_step {H : Type u} {R : Type v}
 /-! ## q-expansions and special classes of forms -/
 
 /-- q-expansions as coefficient functions. -/
-def QExpansion (R : Type u) : Type u := Nat → R
+noncomputable def QExpansion (R : Type u) : Type u := Nat → R
 
 /-- A q-expansion map respecting Path equality of functions. -/
 structure QExpansionMap (H : Type u) (R : Type v) where
@@ -113,12 +113,12 @@ structure QExpansionMap (H : Type u) (R : Type v) where
     ∀ {f g : H → R}, (∀ z, Path (f z) (g z)) → ∀ n, Path (qexp f n) (qexp g n)
 
 /-- q-expansion of a modular form. -/
-def qExpansion {H : Type u} {R : Type v} (qmap : QExpansionMap H R)
+noncomputable def qExpansion {H : Type u} {R : Type v} (qmap : QExpansionMap H R)
     {data : ModularData H R} {k : Nat} (f : ModularForm data k) : QExpansion R :=
   qmap.qexp f.toFun
 
 /-- q-expansion respects Path equality of modular forms. -/
-def qExpansion_congr {H : Type u} {R : Type v} (qmap : QExpansionMap H R)
+noncomputable def qExpansion_congr {H : Type u} {R : Type v} (qmap : QExpansionMap H R)
     {data : ModularData H R} {k : Nat} {f g : ModularForm data k}
     (h : ∀ z, Path (f.toFun z) (g.toFun z)) :
     ∀ n, Path (qExpansion qmap f n) (qExpansion qmap g n) :=
@@ -132,7 +132,7 @@ structure CoeffData (R : Type u) where
   one : R
 
 /-- Constant term of a q-expansion. -/
-def constantTerm {R : Type u} (q : QExpansion R) : R := q 0
+noncomputable def constantTerm {R : Type u} (q : QExpansion R) : R := q 0
 
 /-- Eisenstein series: modular forms with constant term 1. -/
 structure EisensteinSeries {H : Type u} {R : Type v}
@@ -165,7 +165,7 @@ structure HeckeOperators {H : Type u} {R : Type v}
       Path (apply m (apply n f)) (apply n (apply m f))
 
 /-- Projection of Hecke commutativity. -/
-def hecke_comm {H : Type u} {R : Type v}
+noncomputable def hecke_comm {H : Type u} {R : Type v}
     {data : ModularData H R} {k : Nat} (ops : HeckeOperators data k)
     (m n : Nat) (f : ModularForm data k) :
     Path (ops.apply m (ops.apply n f)) (ops.apply n (ops.apply m f)) :=
@@ -189,7 +189,7 @@ structure HeckeEigenform {H : Type u} {R : Type v}
     Path ((ops.apply n form).toFun z) (scalar.smul (eigenvalue n) (form.toFun z))
 
 /-- Projection of the eigenform path witness. -/
-def hecke_eigen_path {H : Type u} {R : Type v}
+noncomputable def hecke_eigen_path {H : Type u} {R : Type v}
     {data : ModularData H R} {k : Nat}
     {ops : HeckeOperators data k} {scalar : ScalarAction R}
     (f : HeckeEigenform data k ops scalar) (n : Nat) (z : H) :

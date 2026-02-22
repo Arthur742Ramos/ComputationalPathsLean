@@ -113,7 +113,7 @@ noncomputable def homotopy_lifting_loops (cov : UniqueCoveringMap E B)
 /-! ## 3. Fiber transport -/
 
 /-- The fiber `Fib b` of the covering map over a point `b ∈ B`. -/
-def Fib (cov : CoveringMap E B) (b : B) := { e : E // cov.proj e = b }
+noncomputable def Fib (cov : CoveringMap E B) (b : B) := { e : E // cov.proj e = b }
 
 /-- Transport an element of the fiber along a path in the base, using
     step-by-step lifting.  This is a repackaging of `liftStepList` that

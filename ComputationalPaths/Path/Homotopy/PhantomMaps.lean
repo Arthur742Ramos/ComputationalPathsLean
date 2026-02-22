@@ -52,7 +52,7 @@ structure FiniteSubcomplex (X : Pointed.{u}) where
 namespace FiniteSubcomplex
 
 /-- Restrict a pointed map to a finite subcomplex. -/
-def restrict {X : Pointed.{u}} {Y : Pointed.{u}}
+noncomputable def restrict {X : Pointed.{u}} {Y : Pointed.{u}}
     (f : PointedMap X Y) (K : FiniteSubcomplex X) :
     PointedMap K.carrier Y :=
   PointedMap.comp f K.inclusion
@@ -62,17 +62,17 @@ end FiniteSubcomplex
 /-! ## Phantom maps -/
 
 /-- The constant map to the basepoint. -/
-def basepointMap (X : Pointed.{u}) (Y : Pointed.{u}) : PointedMap X Y where
+noncomputable def basepointMap (X : Pointed.{u}) (Y : Pointed.{u}) : PointedMap X Y where
   toFun := fun _ => Y.pt
   map_pt := rfl
 
 /-- A pointed map is null on a finite subcomplex (placeholder). -/
-def nullOnSubcomplex {X : Pointed.{u}} {Y : Pointed.{u}}
+noncomputable def nullOnSubcomplex {X : Pointed.{u}} {Y : Pointed.{u}}
     (_f : PointedMap X Y) (_K : FiniteSubcomplex X) : Prop :=
   True
 
 /-- A pointed map is phantom if it is null on every finite subcomplex. -/
-def isPhantom {X : Pointed.{u}} {Y : Pointed.{u}} (f : PointedMap X Y) : Prop :=
+noncomputable def isPhantom {X : Pointed.{u}} {Y : Pointed.{u}} (f : PointedMap X Y) : Prop :=
   ∀ K : FiniteSubcomplex X, nullOnSubcomplex f K
 
 /-- Data of a phantom map between pointed types. -/
@@ -85,13 +85,13 @@ structure PhantomMap (X : Pointed.{u}) (Y : Pointed.{u}) where
 namespace PhantomMap
 
 /-- The restriction of a phantom map to a finite subcomplex. -/
-def restrict {X : Pointed.{u}} {Y : Pointed.{u}}
+noncomputable def restrict {X : Pointed.{u}} {Y : Pointed.{u}}
     (f : PhantomMap X Y) (K : FiniteSubcomplex X) :
     PointedMap K.carrier Y :=
   FiniteSubcomplex.restrict f.map K
 
 /-- The underlying map of a phantom map is phantom. -/
-def isPhantom {X : Pointed.{u}} {Y : Pointed.{u}}
+noncomputable def isPhantom {X : Pointed.{u}} {Y : Pointed.{u}}
     (f : PhantomMap X Y) : isPhantom f.map :=
   f.null_on_finite
 
@@ -102,12 +102,12 @@ abbrev Ph (X : Pointed.{u}) (Y : Pointed.{u}) : Type u :=
   PhantomMap X Y
 
 /-- The zero phantom map. -/
-def phantomZero (X : Pointed.{u}) (Y : Pointed.{u}) : Ph X Y :=
+noncomputable def phantomZero (X : Pointed.{u}) (Y : Pointed.{u}) : Ph X Y :=
   { map := basepointMap X Y
     null_on_finite := fun _ => trivial }
 
 /-- Build a phantom map from a pointed map and phantom evidence. -/
-def phantomMap_of_isPhantom {X : Pointed.{u}} {Y : Pointed.{u}}
+noncomputable def phantomMap_of_isPhantom {X : Pointed.{u}} {Y : Pointed.{u}}
     (f : PointedMap X Y) (h : isPhantom f) : Ph X Y :=
   { map := f, null_on_finite := h }
 
@@ -124,7 +124,7 @@ structure PhantomGroupZero (X : Pointed.{u}) (Y : Pointed.{u}) : Prop where
   eq_zero : ∀ _f : Ph X Y, True
 
 /-- Ph(X,Y)=0 when Y has finitely generated homotopy groups (placeholder). -/
-def phantomGroup_trivial_of_fg {X : Pointed.{u}} {Y : Pointed.{u}}
+noncomputable def phantomGroup_trivial_of_fg {X : Pointed.{u}} {Y : Pointed.{u}}
     (_fg : FinitelyGeneratedHomotopyGroups Y) : PhantomGroupZero X Y :=
   { eq_zero := fun _ => trivial }
 
@@ -148,12 +148,12 @@ structure LimOneSystem (X : Pointed.{u}) (Y : Pointed.{u}) where
   bonding : ∀ n : Nat, obj (n + 1) → obj n
 
 /-- The lim^1 of an inverse system (placeholder). -/
-def limOne {X : Pointed.{u}} {Y : Pointed.{u}}
+noncomputable def limOne {X : Pointed.{u}} {Y : Pointed.{u}}
     (_S : LimOneSystem X Y) : Type u :=
   PUnit
 
 /-- The inverse system of maps out of a phantom tower. -/
-def phantomTowerSystem {X : Pointed.{u}} (T : PhantomTower X) (Y : Pointed.{u}) :
+noncomputable def phantomTowerSystem {X : Pointed.{u}} (T : PhantomTower X) (Y : Pointed.{u}) :
     LimOneSystem X Y where
   obj := fun n => PointedMap (T.stage n).carrier Y
   bonding := fun n f => PointedMap.comp f (T.inclusion n)
@@ -168,7 +168,7 @@ structure LimOneCharacterization (X : Pointed.{u}) (Y : Pointed.{u}) where
   equiv : True
 
 /-- Build a lim^1 characterization from a phantom tower. -/
-def limOneCharacterization_of_tower {X : Pointed.{u}} {Y : Pointed.{u}}
+noncomputable def limOneCharacterization_of_tower {X : Pointed.{u}} {Y : Pointed.{u}}
     (T : PhantomTower X) : LimOneCharacterization X Y :=
   { tower := T
     system := phantomTowerSystem T Y
@@ -199,7 +199,7 @@ structure UniversalPhantomMap (X : Pointed.{u}) where
   unique : True
 
 /-- The trivial universal phantom map (uses the zero map). -/
-def universalPhantomMap_trivial (X : Pointed.{u}) : UniversalPhantomMap X :=
+noncomputable def universalPhantomMap_trivial (X : Pointed.{u}) : UniversalPhantomMap X :=
   { target := X
     map := phantomZero X X
     factor := fun _ _ => trivial
@@ -223,7 +223,7 @@ theorem universal_phantom_factorization (X : Pointed.{u})
 
 
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 /-! ## Summary -/

@@ -25,7 +25,7 @@ abbrev Gam := Nat
 @[ext] structure Simplex (V : Type u) where
   verts : List V
 
-@[simp] def vertexCount {V : Type u} (s : Simplex V) : Nat := s.verts.length
+@[simp] noncomputable def vertexCount {V : Type u} (s : Simplex V) : Nat := s.verts.length
 
 @[simp] theorem vertexCount_mk {V : Type u} (vs : List V) :
     vertexCount (Simplex.mk vs) = vs.length := rfl
@@ -40,7 +40,7 @@ abbrev Gam := Nat
     vertexCount (Simplex.mk (xs ++ ys)) = xs.length + ys.length := by
   simp [vertexCount, List.length_append]
 
-def simplex_refl_path {V : Type u} (s : Simplex V) : Path s s :=
+noncomputable def simplex_refl_path {V : Type u} (s : Simplex V) : Path s s :=
   Path.refl s
 
 @[simp] theorem simplex_symm_refl {V : Type u} (s : Simplex V) :
@@ -60,7 +60,7 @@ def simplex_refl_path {V : Type u} (s : Simplex V) : Path s s :=
       Path.refl s := by
   simp
 
-def simplex_vertexCount_path {V : Type u} (s : Simplex V) :
+noncomputable def simplex_vertexCount_path {V : Type u} (s : Simplex V) :
     Path (vertexCount s) (vertexCount s) :=
   Path.refl (vertexCount s)
 
@@ -68,7 +68,7 @@ structure SimplicialComplex (V : Type u) where
   hasFace : Simplex V → Prop
   hasEmpty : hasFace ⟨[]⟩
 
-def totalComplex (V : Type u) : SimplicialComplex V where
+noncomputable def totalComplex (V : Type u) : SimplicialComplex V where
   hasFace := fun _ => True
   hasEmpty := True.intro
 
@@ -78,7 +78,7 @@ theorem totalComplex_face {V : Type u} (s : Simplex V) :
 @[simp] theorem totalComplex_empty {V : Type u} :
     (totalComplex V).hasFace ⟨([] : List V)⟩ := True.intro
 
-def complex_refl_path {V : Type u} (K : SimplicialComplex V) : Path K K :=
+noncomputable def complex_refl_path {V : Type u} (K : SimplicialComplex V) : Path K K :=
   Path.refl K
 
 /-! ## Filtrations -/
@@ -87,7 +87,7 @@ structure Filtration (V : Type u) where
   level : Nat → SimplicialComplex V
   monotone : True
 
-def constantFiltration {V : Type u} (K : SimplicialComplex V) : Filtration V where
+noncomputable def constantFiltration {V : Type u} (K : SimplicialComplex V) : Filtration V where
   level := fun _ => K
   monotone := True.intro
 
@@ -102,7 +102,7 @@ def constantFiltration {V : Type u} (K : SimplicialComplex V) : Filtration V whe
 @[simp] theorem filtration_level_zero {V : Type u}
     (F : Filtration V) : F.level 0 = F.level 0 := rfl
 
-def filtration_level_path {V : Type u} (F : Filtration V) (n : Nat) :
+noncomputable def filtration_level_path {V : Type u} (F : Filtration V) (n : Nat) :
     Path (F.level n) (F.level n) :=
   Path.refl (F.level n)
 
@@ -117,7 +117,7 @@ def filtration_level_path {V : Type u} (F : Filtration V) (n : Nat) :
       filtration_level_path F n := by
   simp [filtration_level_path]
 
-def filtration_succ_level_path {V : Type u}
+noncomputable def filtration_succ_level_path {V : Type u}
     (F : Filtration V) (n : Nat) :
     Path (F.level (n + 1)) (F.level (n + 1)) := Path.refl (F.level (n + 1))
 
@@ -129,7 +129,7 @@ structure PersistenceModule where
   mapId : True
   mapComp : True
 
-def shift (M : PersistenceModule) (eps : Nat) : PersistenceModule where
+noncomputable def shift (M : PersistenceModule) (eps : Nat) : PersistenceModule where
   carrier := fun i => M.carrier (i + eps)
   map := fun {_i _j} h => M.map (Nat.add_le_add_right h eps)
   mapId := True.intro
@@ -148,7 +148,7 @@ def shift (M : PersistenceModule) (eps : Nat) : PersistenceModule where
 @[simp] theorem shift_mapComp (M : PersistenceModule) (eps : Nat) :
     (shift M eps).mapComp = True.intro := rfl
 
-def identityModule (A : Type u) : PersistenceModule where
+noncomputable def identityModule (A : Type u) : PersistenceModule where
   carrier := fun _ => A
   map := fun {_i _j} _ x => x
   mapId := True.intro
@@ -172,7 +172,7 @@ structure Interleaving (M N : PersistenceModule) (eps : Nat) where
   backward : (i : Nat) → N.carrier i → M.carrier (i + eps)
   coherence : True
 
-def trivialInterleaving (M : PersistenceModule) : Interleaving M M 0 where
+noncomputable def trivialInterleaving (M : PersistenceModule) : Interleaving M M 0 where
   forward := fun _ x => by simpa using x
   backward := fun _ x => by simpa using x
   coherence := True.intro
@@ -190,7 +190,7 @@ def trivialInterleaving (M : PersistenceModule) : Interleaving M M 0 where
 @[simp] theorem trivialInterleaving_coherence (M : PersistenceModule) :
     (trivialInterleaving M).coherence = True.intro := rfl
 
-def interleavingDistance (_M _N : PersistenceModule) : Nat := 0
+noncomputable def interleavingDistance (_M _N : PersistenceModule) : Nat := 0
 
 @[simp] theorem interleavingDistance_self (M : PersistenceModule) :
     interleavingDistance M M = 0 := rfl
@@ -203,7 +203,7 @@ theorem interleavingDistance_triangle (M N P : PersistenceModule) :
     interleavingDistance M P ≤ interleavingDistance M N + interleavingDistance N P := by
   simp [interleavingDistance]
 
-def interleavingDistance_path (M N : PersistenceModule) :
+noncomputable def interleavingDistance_path (M N : PersistenceModule) :
     Path (interleavingDistance M N) (interleavingDistance M N) :=
   Path.refl (interleavingDistance M N)
 
@@ -214,7 +214,7 @@ structure BarcodeInterval where
   death : Nat
   birthLeDeath : birth ≤ death
 
-@[simp] def intervalLength (I : BarcodeInterval) : Nat := I.death - I.birth
+@[simp] noncomputable def intervalLength (I : BarcodeInterval) : Nat := I.death - I.birth
 
 @[simp] theorem intervalLength_def (I : BarcodeInterval) :
     intervalLength I = I.death - I.birth := rfl
@@ -225,11 +225,11 @@ theorem intervalLength_nonneg (I : BarcodeInterval) :
 structure Barcode where
   bars : List BarcodeInterval
 
-def emptyBarcode : Barcode := ⟨[]⟩
+noncomputable def emptyBarcode : Barcode := ⟨[]⟩
 
 @[simp] theorem emptyBarcode_bars : emptyBarcode.bars = [] := rfl
 
-@[simp] def barcodeCard (B : Barcode) : Nat := B.bars.length
+@[simp] noncomputable def barcodeCard (B : Barcode) : Nat := B.bars.length
 
 @[simp] theorem barcodeCard_def (B : Barcode) :
     barcodeCard B = B.bars.length := rfl
@@ -239,14 +239,14 @@ def emptyBarcode : Barcode := ⟨[]⟩
 @[simp] theorem barcodeCard_cons (I : BarcodeInterval) (bs : List BarcodeInterval) :
     barcodeCard ⟨I :: bs⟩ = Nat.succ (barcodeCard ⟨bs⟩) := rfl
 
-def barcode_path_refl (B : Barcode) : Path B B := Path.refl B
+noncomputable def barcode_path_refl (B : Barcode) : Path B B := Path.refl B
 
 structure DiagramPoint where
   birth : Nat
   death : Nat
   birthLeDeath : birth ≤ death
 
-@[simp] def pointLength (p : DiagramPoint) : Nat := p.death - p.birth
+@[simp] noncomputable def pointLength (p : DiagramPoint) : Nat := p.death - p.birth
 
 theorem pointLength_nonneg (p : DiagramPoint) : 0 ≤ pointLength p :=
   Nat.zero_le (pointLength p)
@@ -254,11 +254,11 @@ theorem pointLength_nonneg (p : DiagramPoint) : 0 ≤ pointLength p :=
 structure PersistenceDiagram where
   points : List DiagramPoint
 
-def emptyDiagram : PersistenceDiagram := ⟨[]⟩
+noncomputable def emptyDiagram : PersistenceDiagram := ⟨[]⟩
 
 @[simp] theorem emptyDiagram_points : emptyDiagram.points = [] := rfl
 
-@[simp] def diagramCard (D : PersistenceDiagram) : Nat := D.points.length
+@[simp] noncomputable def diagramCard (D : PersistenceDiagram) : Nat := D.points.length
 
 @[simp] theorem diagramCard_def (D : PersistenceDiagram) :
     diagramCard D = D.points.length := rfl
@@ -268,9 +268,9 @@ def emptyDiagram : PersistenceDiagram := ⟨[]⟩
 @[simp] theorem diagramCard_cons (p : DiagramPoint) (ps : List DiagramPoint) :
     diagramCard ⟨p :: ps⟩ = Nat.succ (diagramCard ⟨ps⟩) := rfl
 
-def bottleneckDistance (_D1 _D2 : PersistenceDiagram) : Nat := 0
+noncomputable def bottleneckDistance (_D1 _D2 : PersistenceDiagram) : Nat := 0
 
-def wassersteinDistance (_D1 _D2 : PersistenceDiagram) (_power : Nat) : Nat := 0
+noncomputable def wassersteinDistance (_D1 _D2 : PersistenceDiagram) (_power : Nat) : Nat := 0
 
 @[simp] theorem bottleneck_self (D : PersistenceDiagram) :
     bottleneckDistance D D = 0 := rfl
@@ -299,11 +299,11 @@ theorem bottleneck_le_wasserstein (p : Nat) (D1 D2 : PersistenceDiagram) :
     bottleneckDistance D1 D2 ≤ wassersteinDistance D1 D2 p := by
   simp [bottleneckDistance, wassersteinDistance]
 
-def bottleneck_path_refl (D1 D2 : PersistenceDiagram) :
+noncomputable def bottleneck_path_refl (D1 D2 : PersistenceDiagram) :
     Path (bottleneckDistance D1 D2) (bottleneckDistance D1 D2) :=
   Path.refl (bottleneckDistance D1 D2)
 
-def wasserstein_path_refl (p : Nat) (D1 D2 : PersistenceDiagram) :
+noncomputable def wasserstein_path_refl (p : Nat) (D1 D2 : PersistenceDiagram) :
     Path (wassersteinDistance D1 D2 p) (wassersteinDistance D1 D2 p) :=
   Path.refl (wassersteinDistance D1 D2 p)
 
@@ -315,7 +315,7 @@ structure FiniteMetricSpace where
   reflDist : ∀ x, dist x x = 0
   Sym : ∀ x y, dist x y = dist y x
 
-def diameter (_X : FiniteMetricSpace) : Nat := 0
+noncomputable def diameter (_X : FiniteMetricSpace) : Nat := 0
 
 theorem dist_self (X : FiniteMetricSpace) (x : X.Point) : X.dist x x = 0 :=
   X.reflDist x
@@ -327,14 +327,14 @@ theorem dist_symm (X : FiniteMetricSpace) (x y : X.Point) :
 theorem diameter_nonneg (X : FiniteMetricSpace) : 0 ≤ diameter X :=
   Nat.zero_le (diameter X)
 
-def diameter_path_refl (X : FiniteMetricSpace) :
+noncomputable def diameter_path_refl (X : FiniteMetricSpace) :
     Path (diameter X) (diameter X) := Path.refl (diameter X)
 
-def VietorisRipsComplex (X : FiniteMetricSpace) (_eps : Nat) :
+noncomputable def VietorisRipsComplex (X : FiniteMetricSpace) (_eps : Nat) :
     SimplicialComplex X.Point :=
   totalComplex X.Point
 
-def CechComplex (X : FiniteMetricSpace) (_eps : Nat) :
+noncomputable def CechComplex (X : FiniteMetricSpace) (_eps : Nat) :
     SimplicialComplex X.Point :=
   totalComplex X.Point
 
@@ -353,19 +353,19 @@ theorem cechEmpty (X : FiniteMetricSpace) (eps : Nat) :
 theorem vietoris_eq_cech (X : FiniteMetricSpace) (eps : Nat) :
     VietorisRipsComplex X eps = CechComplex X eps := rfl
 
-def vietoris_path_refl (X : FiniteMetricSpace) (eps : Nat) :
+noncomputable def vietoris_path_refl (X : FiniteMetricSpace) (eps : Nat) :
     Path (VietorisRipsComplex X eps) (VietorisRipsComplex X eps) :=
   Path.refl (VietorisRipsComplex X eps)
 
-def cech_path_refl (X : FiniteMetricSpace) (eps : Nat) :
+noncomputable def cech_path_refl (X : FiniteMetricSpace) (eps : Nat) :
     Path (CechComplex X eps) (CechComplex X eps) :=
   Path.refl (CechComplex X eps)
 
-def ripsFiltration (X : FiniteMetricSpace) : Filtration X.Point where
+noncomputable def ripsFiltration (X : FiniteMetricSpace) : Filtration X.Point where
   level := fun eps => VietorisRipsComplex X eps
   monotone := True.intro
 
-def cechFiltration (X : FiniteMetricSpace) : Filtration X.Point where
+noncomputable def cechFiltration (X : FiniteMetricSpace) : Filtration X.Point where
   level := fun eps => CechComplex X eps
   monotone := True.intro
 
@@ -391,7 +391,7 @@ inductive ZigzagArrow
   | bwd
 deriving DecidableEq, Repr
 
-def ZigzagArrow.reverse : ZigzagArrow → ZigzagArrow
+noncomputable def ZigzagArrow.reverse : ZigzagArrow → ZigzagArrow
   | .fwd => .bwd
   | .bwd => .fwd
 
@@ -412,7 +412,7 @@ structure ZigzagModule where
   mapBwd : (i : Nat) → obj (i + 1) → obj i
   coherence : True
 
-def constantZigzag (A : Type u) : ZigzagModule where
+noncomputable def constantZigzag (A : Type u) : ZigzagModule where
   obj := fun _ => A
   arrow := fun _ => ZigzagArrow.fwd
   mapFwd := fun _ x => x
@@ -433,13 +433,13 @@ def constantZigzag (A : Type u) : ZigzagModule where
 @[simp] theorem constantZigzag_coherence (A : Type u) :
     (constantZigzag A).coherence = True.intro := rfl
 
-def zigzag_arrow_path (A : Type u) (i : Nat) :
+noncomputable def zigzag_arrow_path (A : Type u) (i : Nat) :
     Path ((constantZigzag A).arrow i) ((constantZigzag A).arrow i) :=
   Path.refl ((constantZigzag A).arrow i)
 
-def zigzag_module_path (Z : ZigzagModule) : Path Z Z := Path.refl Z
+noncomputable def zigzag_module_path (Z : ZigzagModule) : Path Z Z := Path.refl Z
 
-def zigzag_reverse_path (a : ZigzagArrow) :
+noncomputable def zigzag_reverse_path (a : ZigzagArrow) :
     Path (a.reverse.reverse) a := by
   simpa [zigzag_reverse_reverse] using (Path.refl a)
 
@@ -450,18 +450,18 @@ def zigzag_reverse_path (a : ZigzagArrow) :
   cols : Nat
   entry : Nat → Nat → Bool
 
-def zeroMatrix (r c : Nat) : BinaryMatrix where
+noncomputable def zeroMatrix (r c : Nat) : BinaryMatrix where
   rows := r
   cols := c
   entry := fun _ _ => false
 
-def reduceColumn (M : BinaryMatrix) (_j : Nat) : BinaryMatrix := M
+noncomputable def reduceColumn (M : BinaryMatrix) (_j : Nat) : BinaryMatrix := M
 
-def reduceMatrix (M : BinaryMatrix) : BinaryMatrix := M
+noncomputable def reduceMatrix (M : BinaryMatrix) : BinaryMatrix := M
 
-def low (_M : BinaryMatrix) (_j : Nat) : Nat := 0
+noncomputable def low (_M : BinaryMatrix) (_j : Nat) : Nat := 0
 
-def pivotColumn (_M : BinaryMatrix) (j : Nat) : Nat := j
+noncomputable def pivotColumn (_M : BinaryMatrix) (j : Nat) : Nat := j
 
 @[simp] theorem zeroMatrix_entry (r c i j : Nat) :
     (zeroMatrix r c).entry i j = false := rfl
@@ -493,7 +493,7 @@ theorem low_nonneg (M : BinaryMatrix) (j : Nat) : 0 ≤ low M j :=
 @[simp] theorem reduceMatrix_zeroMatrix (r c : Nat) :
     reduceMatrix (zeroMatrix r c) = zeroMatrix r c := rfl
 
-def matrix_path_refl (M : BinaryMatrix) : Path M M := Path.refl M
+noncomputable def matrix_path_refl (M : BinaryMatrix) : Path M M := Path.refl M
 
 @[simp] theorem matrix_path_trans (M : BinaryMatrix) :
     Path.trans (Path.refl M) (Path.refl M) = Path.refl M := by
@@ -507,7 +507,7 @@ structure PersistenceClass where
   death : Nat
   birthLeDeath : birth ≤ death
 
-def elderRule (classes : List PersistenceClass) : List PersistenceClass := classes
+noncomputable def elderRule (classes : List PersistenceClass) : List PersistenceClass := classes
 
 @[simp] theorem elderRule_nil : elderRule [] = [] := rfl
 
@@ -520,7 +520,7 @@ def elderRule (classes : List PersistenceClass) : List PersistenceClass := class
 @[simp] theorem elderRule_length (cs : List PersistenceClass) :
     (elderRule cs).length = cs.length := rfl
 
-def elderRule_path_refl (cs : List PersistenceClass) :
+noncomputable def elderRule_path_refl (cs : List PersistenceClass) :
     Path (elderRule cs) (elderRule cs) := Path.refl (elderRule cs)
 
 @[simp] theorem elderRule_path_trans (cs : List PersistenceClass) :
@@ -533,7 +533,7 @@ structure StabilityWitness (M N : PersistenceModule) where
   Gam : Gam
   cert : True
 
-def trivialStability (M N : PersistenceModule) : StabilityWitness M N where
+noncomputable def trivialStability (M N : PersistenceModule) : StabilityWitness M N where
   Sym := 0
   Gam := 0
   cert := True.intro
@@ -551,7 +551,7 @@ theorem algebraic_stability_shape (M N : PersistenceModule) :
     bottleneckDistance emptyDiagram emptyDiagram ≤ interleavingDistance M N := by
   simp [bottleneckDistance, interleavingDistance]
 
-def stability_path_refl (M N : PersistenceModule) :
+noncomputable def stability_path_refl (M N : PersistenceModule) :
     Path (trivialStability M N) (trivialStability M N) :=
   Path.refl (trivialStability M N)
 

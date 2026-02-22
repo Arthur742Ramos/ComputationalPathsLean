@@ -387,13 +387,13 @@ variable {A : Type u} {B : Type u}
   | tail _ step ih =>
       exact Rw.tail ih (F.step_congr step)
 
-@[simp] def ofContext (C : Context A B) : RewriteLift A B where
+@[simp] noncomputable def ofContext (C : Context A B) : RewriteLift A B where
   obj := C.fill
   map := fun {_ _} p => Context.map (A := A) (B := B) C p
   step_congr := fun {_ _ _ _} step =>
     Step.context_congr (A := A) (B := B) C step
 
-@[simp] def ofBiContextLeft (K : BiContext A B C) (b₀ : B) :
+@[simp] noncomputable def ofBiContextLeft (K : BiContext A B C) (b₀ : B) :
   RewriteLift A C where
   obj := fun a => K.fill a b₀
   map := fun {_ _} p =>
@@ -402,7 +402,7 @@ variable {A : Type u} {B : Type u}
     Step.biContext_mapLeft_congr (A := A) (B := B) (C := C)
       (K := K) (b := b₀) step
 
-@[simp] def ofBiContextRight (K : BiContext A B C) (a : A) :
+@[simp] noncomputable def ofBiContextRight (K : BiContext A B C) (a : A) :
   RewriteLift B C where
   obj := fun b => K.fill a b
   map := fun {_ _} p =>

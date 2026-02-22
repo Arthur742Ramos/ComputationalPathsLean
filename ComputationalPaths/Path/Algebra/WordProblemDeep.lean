@@ -29,7 +29,7 @@ inductive Letter (α : Type u) where
 namespace Letter
 
 /-- Invert a letter. -/
-@[simp] def inv : Letter α → Letter α
+@[simp] noncomputable def inv : Letter α → Letter α
   | pos a => neg a
   | neg a => pos a
 
@@ -53,13 +53,13 @@ abbrev Word (α : Type u) := List (Letter α)
 namespace Word
 
 /-- The empty word. -/
-@[simp] def empty : Word α := []
+@[simp] noncomputable def empty : Word α := []
 
 /-- Concatenation of words. -/
-@[simp] def concat (w₁ w₂ : Word α) : Word α := w₁ ++ w₂
+@[simp] noncomputable def concat (w₁ w₂ : Word α) : Word α := w₁ ++ w₂
 
 /-- Formal inverse of a word: reverse and invert each letter. -/
-@[simp] def inv (w : Word α) : Word α := (w.map Letter.inv).reverse
+@[simp] noncomputable def inv (w : Word α) : Word α := (w.map Letter.inv).reverse
 
 -- Theorem 4
 @[simp] theorem inv_empty : inv (α := α) [] = [] := by simp [inv]
@@ -124,14 +124,14 @@ structure FreeMonoid (α : Type u) where
 namespace FreeMonoid
 
 -- Theorem 11
-@[simp] def one : FreeMonoid α := ⟨[]⟩
+@[simp] noncomputable def one : FreeMonoid α := ⟨[]⟩
 
 -- Theorem 12
-@[simp] def mul (m₁ m₂ : FreeMonoid α) : FreeMonoid α :=
+@[simp] noncomputable def mul (m₁ m₂ : FreeMonoid α) : FreeMonoid α :=
   ⟨m₁.word ++ m₂.word⟩
 
 -- Theorem 13
-@[simp] def gen (a : α) : FreeMonoid α := ⟨[Letter.pos a]⟩
+@[simp] noncomputable def gen (a : α) : FreeMonoid α := ⟨[Letter.pos a]⟩
 
 -- Theorem 14
 @[simp] theorem mul_one (m : FreeMonoid α) : mul m one = m := by
@@ -155,22 +155,22 @@ section FreeMonoidPaths
 variable {α : Type u}
 
 -- Theorem 17: Path witness for right identity
-def freeMonoid_mul_one_path (m : FreeMonoid α) :
+noncomputable def freeMonoid_mul_one_path (m : FreeMonoid α) :
     Path (FreeMonoid.mul m FreeMonoid.one) m :=
   Path.mk [Step.mk _ _ (FreeMonoid.mul_one m)] (FreeMonoid.mul_one m)
 
 -- Theorem 18: Path witness for left identity
-def freeMonoid_one_mul_path (m : FreeMonoid α) :
+noncomputable def freeMonoid_one_mul_path (m : FreeMonoid α) :
     Path (FreeMonoid.mul FreeMonoid.one m) m :=
   Path.mk [Step.mk _ _ (FreeMonoid.one_mul m)] (FreeMonoid.one_mul m)
 
 -- Theorem 19: Path witness for associativity
-def freeMonoid_assoc_path (a b c : FreeMonoid α) :
+noncomputable def freeMonoid_assoc_path (a b c : FreeMonoid α) :
     Path (FreeMonoid.mul (FreeMonoid.mul a b) c) (FreeMonoid.mul a (FreeMonoid.mul b c)) :=
   Path.mk [Step.mk _ _ (FreeMonoid.mul_assoc a b c)] (FreeMonoid.mul_assoc a b c)
 
 -- Theorem 20: Composed path: ((a·b)·c)·d = a·(b·(c·d))
-def freeMonoid_assoc4_path (a b c d : FreeMonoid α) :
+noncomputable def freeMonoid_assoc4_path (a b c d : FreeMonoid α) :
     Path (FreeMonoid.mul (FreeMonoid.mul (FreeMonoid.mul a b) c) d)
          (FreeMonoid.mul a (FreeMonoid.mul b (FreeMonoid.mul c d))) :=
   Path.trans
@@ -179,7 +179,7 @@ def freeMonoid_assoc4_path (a b c d : FreeMonoid α) :
       (Path.congrArg (FreeMonoid.mul a) (freeMonoid_assoc_path b c d)))
 
 -- Theorem 21: Symmetry of associativity path
-def freeMonoid_assoc_symm_path (a b c : FreeMonoid α) :
+noncomputable def freeMonoid_assoc_symm_path (a b c : FreeMonoid α) :
     Path (FreeMonoid.mul a (FreeMonoid.mul b c)) (FreeMonoid.mul (FreeMonoid.mul a b) c) :=
   Path.symm (freeMonoid_assoc_path a b c)
 
@@ -201,7 +201,7 @@ end FreeMonoidPaths
 /-! ## Reduced words (normal forms) -/
 
 /-- A word is *reduced* if it contains no adjacent inverse pair. -/
-def IsReduced : Word α → Prop
+noncomputable def IsReduced : Word α → Prop
   | [] => True
   | [_] => True
   | l₁ :: l₂ :: rest => l₁.inv ≠ l₂ ∧ IsReduced (l₂ :: rest)
@@ -225,17 +225,17 @@ structure NormalForm (α : Type u) where
 namespace NormalForm
 
 -- Theorem 27
-def empty : NormalForm α := ⟨[], isReduced_nil⟩
+noncomputable def empty : NormalForm α := ⟨[], isReduced_nil⟩
 
 -- Theorem 28
-def singleton (l : Letter α) : NormalForm α := ⟨[l], isReduced_singleton l⟩
+noncomputable def singleton (l : Letter α) : NormalForm α := ⟨[l], isReduced_singleton l⟩
 
 end NormalForm
 
 /-! ## Word length and reduction -/
 
 /-- Length of a word. -/
-@[simp] def wordLen (w : Word α) : Nat := w.length
+@[simp] noncomputable def wordLen (w : Word α) : Nat := w.length
 
 -- Theorem 29: reduction strictly decreases length
 theorem reduction_decreases_length {α : Type u} {w₁ w₂ : Word α}
@@ -246,7 +246,7 @@ theorem reduction_decreases_length {α : Type u} {w₁ w₂ : Word α}
     omega
 
 -- Theorem 30: Path witness for length decrease
-def reduction_length_path {α : Type u} {w₁ w₂ : Word α}
+noncomputable def reduction_length_path {α : Type u} {w₁ w₂ : Word α}
     (h : WReduction α w₁ w₂) : Path (wordLen w₁) (wordLen w₂ + 2) :=
   Path.mk [Step.mk _ _ (reduction_decreases_length h).symm]
           (reduction_decreases_length h).symm
@@ -296,15 +296,15 @@ theorem rtclosure_to_srtclosure {T : Type u} {R : T → T → Prop} {a b : T}
 /-! ## Diamond property and Church-Rosser -/
 
 /-- The diamond (or local confluence) property. -/
-def DiamondProperty {T : Type u} (R : T → T → Prop) : Prop :=
+noncomputable def DiamondProperty {T : Type u} (R : T → T → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, R b d ∧ R c d
 
 /-- Confluence: the diamond property for the reflexive-transitive closure. -/
-def Confluent {T : Type u} (R : T → T → Prop) : Prop :=
+noncomputable def Confluent {T : Type u} (R : T → T → Prop) : Prop :=
   ∀ a b c, RTClosure R a b → RTClosure R a c → ∃ d, RTClosure R b d ∧ RTClosure R c d
 
 /-- Church-Rosser: equivalent elements have a common reduct. -/
-def ChurchRosser {T : Type u} (R : T → T → Prop) : Prop :=
+noncomputable def ChurchRosser {T : Type u} (R : T → T → Prop) : Prop :=
   ∀ a b, SRTClosure R a b → ∃ d, RTClosure R a d ∧ RTClosure R b d
 
 -- Theorem 35: confluence implies Church-Rosser
@@ -342,7 +342,7 @@ theorem confluent_unique_nf {T : Type u} {R : T → T → Prop}
   exact h1.trans h2.symm
 
 -- Theorem 37: unique normal form path witness
-def unique_nf_path {T : Type u} {R : T → T → Prop}
+noncomputable def unique_nf_path {T : Type u} {R : T → T → Prop}
     (hConf : Confluent R)
     {a nf₁ nf₂ : T}
     (h₁ : RTClosure R a nf₁)
@@ -356,11 +356,11 @@ def unique_nf_path {T : Type u} {R : T → T → Prop}
 /-! ## Local confluence and Newman's Lemma setup -/
 
 /-- Local confluence (weak Church-Rosser). -/
-def LocallyConfluent {T : Type u} (R : T → T → Prop) : Prop :=
+noncomputable def LocallyConfluent {T : Type u} (R : T → T → Prop) : Prop :=
   ∀ a b c, R a b → R a c → ∃ d, RTClosure R b d ∧ RTClosure R c d
 
 /-- Well-foundedness (termination). -/
-def Terminating {T : Type u} (R : T → T → Prop) : Prop :=
+noncomputable def Terminating {T : Type u} (R : T → T → Prop) : Prop :=
   WellFounded (fun b a => R a b)
 
 -- Theorem 38: confluence implies local confluence
@@ -383,7 +383,7 @@ section PathWitnesses
 variable {α : Type u}
 
 -- Theorem 40: congruence of word concat under paths
-def concatCongrPath {w₁ w₁' w₂ w₂' : Word α}
+noncomputable def concatCongrPath {w₁ w₁' w₂ w₂' : Word α}
     (p₁ : Path w₁ w₁') (p₂ : Path w₂ w₂') :
     Path (Word.concat w₁ w₂) (Word.concat w₁' w₂') :=
   Path.trans
@@ -405,7 +405,7 @@ theorem concatCongrPath_refl_left {w₁ w₂ w₂' : Word α}
   Subsingleton.elim _ _
 
 -- Theorem 43: multi-step path composition: pentagon
-def freeMonoid_pentagon_path (a b c d : FreeMonoid α) :
+noncomputable def freeMonoid_pentagon_path (a b c d : FreeMonoid α) :
     Path (FreeMonoid.mul (FreeMonoid.mul (FreeMonoid.mul a b) c) d)
          (FreeMonoid.mul a (FreeMonoid.mul b (FreeMonoid.mul c d))) :=
   Path.trans
@@ -435,14 +435,14 @@ structure FreeGroup (α : Type u) where
 namespace FreeGroup
 
 -- Theorem 46
-@[simp] def one : FreeGroup α := ⟨[]⟩
+@[simp] noncomputable def one : FreeGroup α := ⟨[]⟩
 
 -- Theorem 47
-@[simp] def mul (g₁ g₂ : FreeGroup α) : FreeGroup α :=
+@[simp] noncomputable def mul (g₁ g₂ : FreeGroup α) : FreeGroup α :=
   ⟨g₁.word ++ g₂.word⟩
 
 -- Theorem 48
-@[simp] def inv (g : FreeGroup α) : FreeGroup α :=
+@[simp] noncomputable def inv (g : FreeGroup α) : FreeGroup α :=
   ⟨Word.inv g.word⟩
 
 -- Theorem 49
@@ -459,16 +459,16 @@ namespace FreeGroup
   simp [mul, List.append_assoc]
 
 -- Theorem 52: path witness for group associativity
-def mul_assoc_path (a b c : FreeGroup α) :
+noncomputable def mul_assoc_path (a b c : FreeGroup α) :
     Path (mul (mul a b) c) (mul a (mul b c)) :=
   Path.mk [Step.mk _ _ (mul_assoc a b c)] (mul_assoc a b c)
 
 -- Theorem 53: path witness for right identity
-def mul_one_path (g : FreeGroup α) : Path (mul g one) g :=
+noncomputable def mul_one_path (g : FreeGroup α) : Path (mul g one) g :=
   Path.mk [Step.mk _ _ (mul_one g)] (mul_one g)
 
 -- Theorem 54: path witness for left identity
-def one_mul_path (g : FreeGroup α) : Path (mul one g) g :=
+noncomputable def one_mul_path (g : FreeGroup α) : Path (mul one g) g :=
   Path.mk [Step.mk _ _ (one_mul g)] (one_mul g)
 
 end FreeGroup
@@ -488,7 +488,7 @@ structure OrientedSystem (T : Type u) where
 namespace OrientedSystem
 
 -- Theorem 55: an oriented system induces a relation
-def induced {T : Type u} (sys : OrientedSystem T) (a b : T) : Prop :=
+noncomputable def induced {T : Type u} (sys : OrientedSystem T) (a b : T) : Prop :=
   ∃ r ∈ sys.rules, r.lhs = a ∧ r.rhs = b
 
 end OrientedSystem
@@ -504,11 +504,11 @@ structure CriticalPair (T : Type u) where
   pathRight : Path source right
 
 /-- A critical pair is joinable if both sides have a common reduct. -/
-def CriticalPair.isJoinable {T : Type u} (cp : CriticalPair T) : Prop :=
+noncomputable def CriticalPair.isJoinable {T : Type u} (cp : CriticalPair T) : Prop :=
   ∃ d : T, ∃ _ : Path cp.left d, ∃ _ : Path cp.right d, True
 
 -- Theorem 56: trivial critical pair (same target)
-def trivialCriticalPair {T : Type u} (s t : T) (p : Path s t) :
+noncomputable def trivialCriticalPair {T : Type u} (s t : T) (p : Path s t) :
     CriticalPair T :=
   ⟨t, t, s, p, p⟩
 
@@ -537,11 +537,11 @@ inductive PresEquiv {α : Type u} (pres : MonoidPresentation α) :
       PresEquiv pres w₂ w₃ → PresEquiv pres w₁ w₃
 
 -- Theorem 58: presentation equivalence is reflexive
-def presEquiv_refl {α : Type u} (pres : MonoidPresentation α) (w : Word α) :
+noncomputable def presEquiv_refl {α : Type u} (pres : MonoidPresentation α) (w : Word α) :
     PresEquiv pres w w := PresEquiv.refl w
 
 -- Theorem 59: presentation equivalence as setoid
-def presentationSetoid {α : Type u} (pres : MonoidPresentation α) : Setoid (Word α) where
+noncomputable def presentationSetoid {α : Type u} (pres : MonoidPresentation α) : Setoid (Word α) where
   r := PresEquiv pres
   iseqv := {
     refl := fun w => PresEquiv.refl w
@@ -557,7 +557,7 @@ theorem concat_length {α : Type u} (w₁ w₂ : Word α) :
   simp [wordLen, Word.concat, List.length_append]
 
 -- Theorem 61: path witness for concat length
-def concat_length_path {α : Type u} (w₁ w₂ : Word α) :
+noncomputable def concat_length_path {α : Type u} (w₁ w₂ : Word α) :
     Path (wordLen (Word.concat w₁ w₂)) (wordLen w₁ + wordLen w₂) :=
   Path.mk [Step.mk _ _ (concat_length w₁ w₂)] (concat_length w₁ w₂)
 
@@ -566,13 +566,13 @@ theorem inv_length {α : Type u} (w : Word α) : wordLen (Word.inv w) = wordLen 
   simp [wordLen, Word.inv, List.length_reverse, List.length_map]
 
 -- Theorem 63: path witness for inverse length preservation
-def inv_length_path {α : Type u} (w : Word α) : Path (wordLen (Word.inv w)) (wordLen w) :=
+noncomputable def inv_length_path {α : Type u} (w : Word α) : Path (wordLen (Word.inv w)) (wordLen w) :=
   Path.mk [Step.mk _ _ (inv_length w)] (inv_length w)
 
 /-! ## Rewrite step counting -/
 
 /-- Count the number of steps in a Path. -/
-@[simp] def pathStepCount {T : Type u} {a b : T} (p : Path a b) : Nat :=
+@[simp] noncomputable def pathStepCount {T : Type u} {a b : T} (p : Path a b) : Nat :=
   p.steps.length
 
 -- Theorem 64: refl has 0 steps
@@ -606,11 +606,11 @@ structure DecoratedReduction (T : Type u) where
   composedPath : Path start finish
 
 -- Theorem 68: empty decorated reduction
-def emptyReduction {T : Type u} (t : T) : DecoratedReduction T :=
+noncomputable def emptyReduction {T : Type u} (t : T) : DecoratedReduction T :=
   ⟨t, t, [], Path.refl t⟩
 
 -- Theorem 69: extend a decorated reduction
-def extendReduction {T : Type u} {b c : T}
+noncomputable def extendReduction {T : Type u} {b c : T}
     (dr : DecoratedReduction T)
     (hstart : dr.finish = b)
     (p : Path b c) : DecoratedReduction T :=
@@ -619,7 +619,7 @@ def extendReduction {T : Type u} {b c : T}
    Path.trans (hstart ▸ dr.composedPath) p⟩
 
 -- Theorem 70: concatenation of decorated reductions
-def concatReduction {T : Type u}
+noncomputable def concatReduction {T : Type u}
     (dr₁ dr₂ : DecoratedReduction T)
     (h : dr₁.finish = dr₂.start) : DecoratedReduction T :=
   ⟨dr₁.start, dr₂.finish,
@@ -634,12 +634,12 @@ structure Normalizer (T : Type u) where
   isIdempotent : ∀ t, normalize (normalize t) = normalize t
 
 -- Theorem 71: idempotence as path
-def normalizer_idempotent_path {T : Type u} (norm : Normalizer T) (t : T) :
+noncomputable def normalizer_idempotent_path {T : Type u} (norm : Normalizer T) (t : T) :
     Path (norm.normalize (norm.normalize t)) (norm.normalize t) :=
   Path.mk [Step.mk _ _ (norm.isIdempotent t)] (norm.isIdempotent t)
 
 -- Theorem 72: normalization paths compose via congrArg
-def normalizer_compose_path {T : Type u} (norm : Normalizer T)
+noncomputable def normalizer_compose_path {T : Type u} (norm : Normalizer T)
     {a b : T} (p : Path a b) : Path (norm.normalize a) (norm.normalize b) :=
   Path.congrArg norm.normalize p
 
@@ -662,7 +662,7 @@ theorem congruenceClass_rep_refl {T : Type u} (cls : CongruenceClass T)
   Subsingleton.elim _ _
 
 -- Theorem 75: transitivity within a congruence class
-def congruenceClass_trans {T : Type u} (cls : CongruenceClass T)
+noncomputable def congruenceClass_trans {T : Type u} (cls : CongruenceClass T)
     {m₁ m₂ : T} (h₁ : m₁ ∈ cls.members) (h₂ : m₂ ∈ cls.members) :
     Path m₁ m₂ :=
   Path.trans (cls.paths m₁ h₁) (Path.symm (cls.paths m₂ h₂))
@@ -691,7 +691,7 @@ theorem completeSystem_unique_nf {T : Type u} (cs : CompleteSystem T)
   confluent_unique_nf cs.isConfluent h₁ h₂ hnf₁ hnf₂
 
 -- Theorem 78: path witness for complete system normal form uniqueness
-def completeSystem_nf_path {T : Type u} (cs : CompleteSystem T)
+noncomputable def completeSystem_nf_path {T : Type u} (cs : CompleteSystem T)
     {a nf₁ nf₂ : T}
     (h₁ : RTClosure (OrientedSystem.induced cs.sys) a nf₁)
     (h₂ : RTClosure (OrientedSystem.induced cs.sys) a nf₂)
@@ -732,32 +732,32 @@ section WordPathAlgebra
 variable {α : Type u}
 
 -- Theorem 83: assoc path for word concat
-def word_concat_assoc_path (u v w : Word α) :
+noncomputable def word_concat_assoc_path (u v w : Word α) :
     Path (Word.concat (Word.concat u v) w) (Word.concat u (Word.concat v w)) :=
   Path.mk [Step.mk _ _ (Word.concat_assoc u v w)] (Word.concat_assoc u v w)
 
 -- Theorem 84: unit path for word concat
-def word_concat_empty_path (w : Word α) :
+noncomputable def word_concat_empty_path (w : Word α) :
     Path (Word.concat w Word.empty) w :=
   Path.mk [Step.mk _ _ (Word.concat_empty w)] (Word.concat_empty w)
 
 -- Theorem 85: inv path
-def word_inv_inv_path (w : Word α) :
+noncomputable def word_inv_inv_path (w : Word α) :
     Path (Word.inv (Word.inv w)) w :=
   Path.mk [Step.mk _ _ (Word.inv_inv w)] (Word.inv_inv w)
 
 -- Theorem 86: inv distributes over concat
-def word_inv_concat_path (u v : Word α) :
+noncomputable def word_inv_concat_path (u v : Word α) :
     Path (Word.inv (Word.concat u v)) (Word.concat (Word.inv v) (Word.inv u)) :=
   Path.mk [Step.mk _ _ (Word.inv_concat u v)] (Word.inv_concat u v)
 
 -- Theorem 87: chain: inv(inv(concat u v)) = concat u v
-def word_inv_inv_concat_path (u v : Word α) :
+noncomputable def word_inv_inv_concat_path (u v : Word α) :
     Path (Word.inv (Word.inv (Word.concat u v))) (Word.concat u v) :=
   word_inv_inv_path (Word.concat u v)
 
 -- Theorem 88: five-fold assoc chain via simple composition
-def word_concat_assoc5_path (a b c d e : Word α) :
+noncomputable def word_concat_assoc5_path (a b c d e : Word α) :
     Path (Word.concat (Word.concat (Word.concat (Word.concat a b) c) d) e)
          (Word.concat a (Word.concat b (Word.concat c (Word.concat d e)))) :=
   have : Word.concat (Word.concat (Word.concat (Word.concat a b) c) d) e =
@@ -787,11 +787,11 @@ end WordPathAlgebra
 /-! ## Word homomorphisms -/
 
 /-- A word homomorphism maps generators. -/
-def letterMap {α β : Type u} (f : α → β) : Letter α → Letter β
+noncomputable def letterMap {α β : Type u} (f : α → β) : Letter α → Letter β
   | Letter.pos a => Letter.pos (f a)
   | Letter.neg a => Letter.neg (f a)
 
-def wordMap {α β : Type u} (f : α → β) (w : Word α) : Word β :=
+noncomputable def wordMap {α β : Type u} (f : α → β) (w : Word α) : Word β :=
   w.map (letterMap f)
 
 -- Theorem 92: wordMap preserves empty
@@ -804,7 +804,7 @@ theorem wordMap_concat {α β : Type u} (f : α → β) (w₁ w₂ : Word α) :
   simp [wordMap, Word.concat, List.map_append]
 
 -- Theorem 94: path witness for wordMap concat distribution
-def wordMap_concat_path {α β : Type u} (f : α → β) (w₁ w₂ : Word α) :
+noncomputable def wordMap_concat_path {α β : Type u} (f : α → β) (w₁ w₂ : Word α) :
     Path (wordMap f (Word.concat w₁ w₂))
          (Word.concat (wordMap f w₁) (wordMap f w₂)) :=
   Path.mk [Step.mk _ _ (wordMap_concat f w₁ w₂)] (wordMap_concat f w₁ w₂)
@@ -823,19 +823,19 @@ theorem wordMap_comp {α β γ : Type u} (f : α → β) (g : β → γ) (w : Wo
   exact letterMap_comp f g l
 
 -- Theorem 97: path from wordMap composition
-def wordMap_comp_path {α β γ : Type u} (f : α → β) (g : β → γ) (w : Word α) :
+noncomputable def wordMap_comp_path {α β γ : Type u} (f : α → β) (g : β → γ) (w : Word α) :
     Path (wordMap g (wordMap f w)) (wordMap (g ∘ f) w) :=
   Path.mk [Step.mk _ _ (wordMap_comp f g w)] (wordMap_comp f g w)
 
 -- Theorem 98: congrArg of wordMap
-def wordMap_congrArg_path {α β : Type u} (f : α → β) {w₁ w₂ : Word α}
+noncomputable def wordMap_congrArg_path {α β : Type u} (f : α → β) {w₁ w₂ : Word α}
     (p : Path w₁ w₂) : Path (wordMap f w₁) (wordMap f w₂) :=
   Path.congrArg (wordMap f) p
 
 /-! ## Additional path constructions -/
 
 -- Theorem 99: congrArg for binary functions
-def congrArg₂Path {T₁ T₂ S : Type u} {a₁ b₁ : T₁} {a₂ b₂ : T₂}
+noncomputable def congrArg₂Path {T₁ T₂ S : Type u} {a₁ b₁ : T₁} {a₂ b₂ : T₂}
     (f : T₁ → T₂ → S) (p₁ : Path a₁ b₁) (p₂ : Path a₂ b₂) :
     Path (f a₁ a₂) (f b₁ b₂) :=
   Path.trans
@@ -857,7 +857,7 @@ theorem congrArg₂Path_refl_right {T₁ T₂ S : Type u} {a₁ b₁ : T₁} {a 
 /-! ## Rewriting equivalence classes -/
 
 /-- Two elements are rewrite-equivalent if connected by SRTClosure. -/
-def rewriteEquiv {T : Type u} (R : T → T → Prop) (a b : T) : Prop :=
+noncomputable def rewriteEquiv {T : Type u} (R : T → T → Prop) (a b : T) : Prop :=
   SRTClosure R a b
 
 -- Theorem 102: rewrite equivalence is reflexive
@@ -875,7 +875,7 @@ theorem rewriteEquiv_trans {T : Type u} {R : T → T → Prop} {a b c : T}
     rewriteEquiv R a c := SRTClosure.trans h₁ h₂
 
 -- Theorem 105: equivalence classes form a setoid
-def rewriteSetoid {T : Type u} (R : T → T → Prop) : Setoid T where
+noncomputable def rewriteSetoid {T : Type u} (R : T → T → Prop) : Setoid T where
   r := rewriteEquiv R
   iseqv := {
     refl := rewriteEquiv_refl R

@@ -43,7 +43,7 @@ variable {A : Type u}
 /-! ## Fiber Actions as Group Actions -/
 
 /-- The strict group structure on `LoopQuot` used for fiber actions. -/
-@[simp] def loopGroupStructure (A : Type u) (a : A) : StrictGroup (LoopQuot A a) :=
+@[simp] noncomputable def loopGroupStructure (A : Type u) (a : A) : StrictGroup (LoopQuot A a) :=
   LoopGroupAlgebra.loopGroupStructure A a
 
 /-- The π₁-action on fibers packaged as a strict group action. -/

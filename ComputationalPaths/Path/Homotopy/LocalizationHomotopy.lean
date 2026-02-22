@@ -34,7 +34,7 @@ structure GroupHom (G H : AbelianGroup.{u}) where
   map_add : ∀ a b, toFun (G.add a b) = H.add (toFun a) (toFun b)
 
 /-- Identity homomorphism. -/
-def GroupHom.id (G : AbelianGroup.{u}) : GroupHom G G where
+noncomputable def GroupHom.id (G : AbelianGroup.{u}) : GroupHom G G where
   toFun := _root_.id
   map_zero := rfl
   map_add := fun _ _ => rfl
@@ -47,7 +47,7 @@ structure GroupIso (G H : AbelianGroup.{u}) where
   left_inv : ∀ x, inverse.toFun (forward.toFun x) = x
 
 /-- The identity isomorphism. -/
-def GroupIso.refl (G : AbelianGroup.{u}) : GroupIso G G where
+noncomputable def GroupIso.refl (G : AbelianGroup.{u}) : GroupIso G G where
   forward := GroupHom.id G
   inverse := GroupHom.id G
   right_inv := fun _ => rfl
@@ -60,11 +60,11 @@ structure PrimeSet where
   mem : Nat → Prop
 
 /-- The empty set of primes. -/
-def PrimeSet.empty : PrimeSet where
+noncomputable def PrimeSet.empty : PrimeSet where
   mem := fun _ => False
 
 /-- A singleton prime set. -/
-def PrimeSet.singleton (p : Nat) : PrimeSet where
+noncomputable def PrimeSet.singleton (p : Nat) : PrimeSet where
   mem := fun q => q = p
 
 /-! ## S-Localization of Groups -/
@@ -95,7 +95,7 @@ structure IsRational (G : AbelianGroup.{u}) where
   witness : GroupIso G G
 
 /-- Any group is trivially rational in the identity sense. -/
-def isRational_self (G : AbelianGroup.{u}) : IsRational G where
+noncomputable def isRational_self (G : AbelianGroup.{u}) : IsRational G where
   witness := GroupIso.refl G
 
 /-! ## Space Localization -/
@@ -167,7 +167,7 @@ theorem localizationRel_equiv (S : PrimeSet) :
   trans := LocalizationRel.trans
 
 /-- The trivial localization. -/
-def trivialLocalization (X : HomotopyType.{u}) :
+noncomputable def trivialLocalization (X : HomotopyType.{u}) :
     LocalizationRel (PrimeSet.mk (fun _ => True)) X X :=
   LocalizationRel.refl X
 
@@ -190,7 +190,7 @@ end LocalizationHomotopy
 end Homotopy
 end Path
 
-private def pathAnchor {A : Type} (a : A) : Path a a :=
+private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
 
 end ComputationalPaths

@@ -44,7 +44,7 @@ structure PathSimpleEquiv (α : Type u) (β : Type v) where
   right_inv : ∀ y : β, Path (toFun (invFun y)) y
 
 /-- Convert a `SimpleEquiv` into a `PathSimpleEquiv`. -/
-def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
+noncomputable def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α β) :
     PathSimpleEquiv α β :=
   { toFun := e.toFun
     invFun := e.invFun
@@ -52,17 +52,17 @@ def simpleEquivToPathSimpleEquiv {α : Type u} {β : Type v} (e : SimpleEquiv α
     right_inv := fun y => Path.stepChain (e.right_inv y) }
 
 /-- Loop-suspension adjunction as a `PathSimpleEquiv`. -/
-def loopSpaceSuspensionAdjunction (X Y : SuspensionLoop.Pointed) :
+noncomputable def loopSpaceSuspensionAdjunction (X Y : SuspensionLoop.Pointed) :
     PathSimpleEquiv (PointedMap (sigmaPointed X) Y) (PointedMap X (omegaEqPointed Y)) :=
   simpleEquivToPathSimpleEquiv (LoopSpaceAdjunction.suspLoopAdjunction (X := X) (Y := Y))
 
 /-- Unit of the loop-suspension adjunction. -/
-def unit (X : SuspensionLoop.Pointed) :
+noncomputable def unit (X : SuspensionLoop.Pointed) :
     PointedMap X (omegaEqPointed (sigmaPointed X)) :=
   LoopSpaceAdjunction.unit X
 
 /-- Counit of the loop-suspension adjunction. -/
-def counit (Y : SuspensionLoop.Pointed) :
+noncomputable def counit (Y : SuspensionLoop.Pointed) :
     PointedMap (sigmaPointed (omegaEqPointed Y)) Y :=
   LoopSpaceAdjunction.counit Y
 
@@ -73,12 +73,12 @@ end
 /-! ## Theorems -/
 
 /-- A PathSimpleEquiv has an inverse map. -/
-def pathSimpleEquiv_has_inverse {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
+noncomputable def pathSimpleEquiv_has_inverse {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
     ∀ y : β, Path (e.toFun (e.invFun y)) y :=
   e.right_inv
 
 /-- Left inverse law of a PathSimpleEquiv. -/
-def pathSimpleEquiv_has_left_inv {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
+noncomputable def pathSimpleEquiv_has_left_inv {α : Type u} {β : Type v} (e : PathSimpleEquiv α β) :
     ∀ x : α, Path (e.invFun (e.toFun x)) x :=
   e.left_inv
 
@@ -110,21 +110,21 @@ theorem counit_type (Y : SuspensionLoop.Pointed) :
   rfl
 
 /-- The adjunction round-trip on the forward direction. -/
-def adjunction_roundtrip_forward (X Y : SuspensionLoop.Pointed)
+noncomputable def adjunction_roundtrip_forward (X Y : SuspensionLoop.Pointed)
     (f : PointedMap (sigmaPointed X) Y) :
     Path ((loopSpaceSuspensionAdjunction X Y).invFun
       ((loopSpaceSuspensionAdjunction X Y).toFun f)) f :=
   (loopSpaceSuspensionAdjunction X Y).left_inv f
 
 /-- The adjunction round-trip on the inverse direction. -/
-def adjunction_roundtrip_inverse (X Y : SuspensionLoop.Pointed)
+noncomputable def adjunction_roundtrip_inverse (X Y : SuspensionLoop.Pointed)
     (g : PointedMap X (omegaEqPointed Y)) :
     Path ((loopSpaceSuspensionAdjunction X Y).toFun
       ((loopSpaceSuspensionAdjunction X Y).invFun g)) g :=
   (loopSpaceSuspensionAdjunction X Y).right_inv g
 
 /-- Identity PathSimpleEquiv for any type. -/
-def pathSimpleEquivId (α : Type u) : PathSimpleEquiv α α :=
+noncomputable def pathSimpleEquivId (α : Type u) : PathSimpleEquiv α α :=
   { toFun := _root_.id
     invFun := _root_.id
     left_inv := fun x => Path.refl x

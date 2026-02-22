@@ -38,7 +38,7 @@ inductive TStructureStep {Obj : Type u} :
         (Path.trans p (Path.trans q r))
 
 /-- Interpret a t-structure step as a primitive `Path.Step`. -/
-def TStructureStep.toStep {Obj : Type u} {a b : Obj} {p q : Path a b}
+noncomputable def TStructureStep.toStep {Obj : Type u} {a b : Obj} {p q : Path a b}
     (s : TStructureStep p q) : Path.Step p q :=
   match s with
   | .trunc_ge_right_unit p => Path.Step.trans_refl_right p
@@ -105,7 +105,7 @@ namespace TStructurePaths
 variable {Obj : Type u} {T : TriangulatedPaths Obj} (S : TStructurePaths Obj T)
 
 /-- Heart predicate as intersection of the two truncation halves. -/
-def heart (X : Obj) : Prop :=
+noncomputable def heart (X : Obj) : Prop :=
   S.nonNeg X ∧ S.nonPos X
 
 theorem heart_shift_closed (X : Obj) :
@@ -114,28 +114,28 @@ theorem heart_shift_closed (X : Obj) :
   exact ⟨S.shift_nonNeg X hX.1, S.shift_nonPos X hX.2⟩
 
 /-- Primitive step witness for non-negative truncation unit normalization. -/
-def trunc_ge_step (X : Obj) :
+noncomputable def trunc_ge_step (X : Obj) :
     Path.Step
       (Path.trans (S.truncGEUnit X) (Path.refl (S.truncGE X)))
       (S.truncGEUnit X) :=
   TStructureStep.toStep (S.truncGEStep X)
 
 /-- Primitive step witness for non-positive truncation counit normalization. -/
-def trunc_le_step (X : Obj) :
+noncomputable def trunc_le_step (X : Obj) :
     Path.Step
       (Path.trans (Path.refl (S.truncLE X)) (S.truncLECounit X))
       (S.truncLECounit X) :=
   TStructureStep.toStep (S.truncLEStep X)
 
 /-- Primitive step witness for truncation adjunction cancellation. -/
-def adjunction_step (X : Obj) :
+noncomputable def adjunction_step (X : Obj) :
     Path.Step
       (Path.trans (Path.symm (S.truncGEUnit X)) (S.truncGEUnit X))
       (Path.refl (S.truncGE X)) :=
   TStructureStep.toStep (S.adjunctionStep X)
 
 /-- Primitive step witness for shifted truncation-unit normalization. -/
-def shifted_trunc_ge_step (X : Obj) :
+noncomputable def shifted_trunc_ge_step (X : Obj) :
     Path.Step
       (Path.trans
         (T.shiftPath (S.truncGEUnit X))
@@ -254,7 +254,7 @@ noncomputable def trunc_adjunction_unit_assoc_rweq (X : Obj) :
 end TStructurePaths
 
 /-- Trivial t-structure package over any triangulated path data. -/
-def trivialTStructurePaths (Obj : Type u) (T : TriangulatedPaths Obj) :
+noncomputable def trivialTStructurePaths (Obj : Type u) (T : TriangulatedPaths Obj) :
     TStructurePaths Obj T where
   nonNeg := fun _ => True
   nonPos := fun _ => True

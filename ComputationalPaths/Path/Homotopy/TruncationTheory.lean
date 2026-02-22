@@ -24,33 +24,33 @@ inductive TruncIndex : Type where
 
 namespace TruncIndex
 
-def negOne : TruncIndex := succ negTwo
-def zero   : TruncIndex := succ negOne
-def one    : TruncIndex := succ zero
+noncomputable def negOne : TruncIndex := succ negTwo
+noncomputable def zero   : TruncIndex := succ negOne
+noncomputable def one    : TruncIndex := succ zero
 
 /-- Embedding of natural numbers as truncation indices. -/
-def ofNat : Nat → TruncIndex
+noncomputable def ofNat : Nat → TruncIndex
   | 0     => zero
   | n + 1 => succ (ofNat n)
 
 end TruncIndex
 
 /-- A type has h-level n (is n-truncated). -/
-def IsOfHLevel : TruncIndex → Type u → Prop
+noncomputable def IsOfHLevel : TruncIndex → Type u → Prop
   | TruncIndex.negTwo,  A => ∃ a : A, ∀ b, a = b
   | TruncIndex.succ n, A => ∀ (a b : A), IsOfHLevel n (Path a b)
 
 /-- Contractible types: h-level −2. -/
-def IsContr (A : Type u) : Prop := IsOfHLevel TruncIndex.negTwo A
+noncomputable def IsContr (A : Type u) : Prop := IsOfHLevel TruncIndex.negTwo A
 
 /-- Propositions: h-level −1. -/
-def IsProp (A : Type u) : Prop := IsOfHLevel TruncIndex.negOne A
+noncomputable def IsProp (A : Type u) : Prop := IsOfHLevel TruncIndex.negOne A
 
 /-- Sets: h-level 0. -/
-def IsSet (A : Type u) : Prop := IsOfHLevel TruncIndex.zero A
+noncomputable def IsSet (A : Type u) : Prop := IsOfHLevel TruncIndex.zero A
 
 /-- Groupoids: h-level 1. -/
-def IsGroupoid (A : Type u) : Prop := IsOfHLevel TruncIndex.one A
+noncomputable def IsGroupoid (A : Type u) : Prop := IsOfHLevel TruncIndex.one A
 
 /-! ## n-truncation -/
 
@@ -76,10 +76,10 @@ axiom Trunc.ind {n : TruncIndex} {A : Type u}
     (x : Trunc n A) → P x
 
 /-- Propositional truncation is −1-truncation. -/
-def PropTrunc (A : Type u) : Type u := Trunc TruncIndex.negOne A
+noncomputable def PropTrunc (A : Type u) : Type u := Trunc TruncIndex.negOne A
 
 /-- Set truncation is 0-truncation. -/
-def SetTrunc (A : Type u) : Type u := Trunc TruncIndex.zero A
+noncomputable def SetTrunc (A : Type u) : Type u := Trunc TruncIndex.zero A
 
 /-- The truncation monad unit. -/
 noncomputable def truncUnit {n : TruncIndex} {A : Type u} : A → Trunc n A := Trunc.mk
@@ -93,18 +93,18 @@ noncomputable def truncBind {n : TruncIndex} {A : Type u} {B : Type v}
 /-! ## n-connectedness -/
 
 /-- A type is n-connected if ‖A‖ₙ is contractible. -/
-def IsNConn (n : TruncIndex) (A : Type u) : Prop :=
+noncomputable def IsNConn (n : TruncIndex) (A : Type u) : Prop :=
   IsContr (Trunc n A)
 
 /-- A map is n-connected if its fibers are n-connected. -/
-def IsNConnMap (n : TruncIndex) {A B : Type u} (f : A → B) : Prop :=
+noncomputable def IsNConnMap (n : TruncIndex) {A B : Type u} (f : A → B) : Prop :=
   ∀ b, IsNConn n { a : A // f a = b }
 
 
 /-! ## Postnikov tower -/
 
 /-- The n-th stage of the Postnikov tower of A. -/
-def PostnikovStage (n : TruncIndex) (A : Type u) : Type u :=
+noncomputable def PostnikovStage (n : TruncIndex) (A : Type u) : Type u :=
   Trunc n A
 
 
@@ -115,7 +115,7 @@ noncomputable def toPostnikov {n : TruncIndex} {A : Type u} : A → PostnikovSta
 /-! ## Whitehead tower (connected covers) -/
 
 /-- The n-connected cover of A: the fiber of A → P_n(A). -/
-def ConnectedCover (n : TruncIndex) (A : Type u) (a₀ : A) : Type u :=
+noncomputable def ConnectedCover (n : TruncIndex) (A : Type u) (a₀ : A) : Type u :=
   { a : A // @Trunc.mk n A a = @Trunc.mk n A a₀ }  -- simplified
 
 /-- The inclusion from the connected cover. -/

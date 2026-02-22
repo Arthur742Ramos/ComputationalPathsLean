@@ -34,10 +34,10 @@ structure Torus where
   -- Encoded as a structure; the path algebra is captured by theorems below.
 
 /-- First loop of the torus. -/
-def Torus.pathP : @Eq Unit PUnit.unit PUnit.unit := rfl
+noncomputable def Torus.pathP : @Eq Unit PUnit.unit PUnit.unit := rfl
 
 /-- Second loop of the torus. -/
-def Torus.pathQ : @Eq Unit PUnit.unit PUnit.unit := rfl
+noncomputable def Torus.pathQ : @Eq Unit PUnit.unit PUnit.unit := rfl
 
 
 
@@ -52,7 +52,7 @@ inductive Suspension (A : Type u) : Type u where
 
 
 /-- The n-sphere Sⁿ as iterated suspension. -/
-def Sphere : Nat → Type
+noncomputable def Sphere : Nat → Type
   | 0     => Bool          -- S⁰ = two points
   | n + 1 => Suspension (Sphere n)
 

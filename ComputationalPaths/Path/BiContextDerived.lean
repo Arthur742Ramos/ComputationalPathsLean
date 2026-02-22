@@ -129,7 +129,7 @@ theorem map2_refl_right_toEq (K : BiContext A B C)
 /-! ## Concrete BiContext constructions -/
 
 /-- The addition bi-context on natural numbers. -/
-def addContext : BiContext Nat Nat Nat :=
+noncomputable def addContext : BiContext Nat Nat Nat :=
   ⟨fun a b => a + b⟩
 
 /-- Mapping a path through the left component of addition. -/
@@ -147,11 +147,11 @@ theorem addContext_mapRight_toEq (a : Nat) (b₁ b₂ : Nat)
   simp [addContext]
 
 /-- The multiplication bi-context on natural numbers. -/
-def mulContext : BiContext Nat Nat Nat :=
+noncomputable def mulContext : BiContext Nat Nat Nat :=
   ⟨fun a b => a * b⟩
 
 /-- The pairing bi-context (same universe). -/
-def pairContext' {α β : Type u} : BiContext α β (α × β) :=
+noncomputable def pairContext' {α β : Type u} : BiContext α β (α × β) :=
   ⟨fun a b => (a, b)⟩
 
 /-- Mapping through pairContext gives prodMk at toEq level. -/
@@ -164,7 +164,7 @@ theorem pairContext_map2_toEq {α β : Type u} {a₁ a₂ : α} {b₁ b₂ : β}
 /-! ## Context composition -/
 
 /-- The identity context. -/
-def idContext : Context A A := ⟨fun a => a⟩
+noncomputable def idContext : Context A A := ⟨fun a => a⟩
 
 /-- Mapping through the identity context is the identity on paths. -/
 theorem idContext_map {a b : A} (p : Path a b) :
@@ -183,12 +183,12 @@ theorem comp_idContext_left {B' : Type v} (C' : Context A B') :
 /-! ## Path coherence witnesses -/
 
 /-- Path witness: `mapLeft` with `refl` yields `refl`. -/
-def mapLeft_refl_path (K : BiContext A B C) (a : A) (b : B) :
+noncomputable def mapLeft_refl_path (K : BiContext A B C) (a : A) (b : B) :
     Path (K.fill a b) (K.fill a b) :=
   Path.refl (K.fill a b)
 
 /-- Path witness: `map2` symmetry decomposition. -/
-def map2_symm_path (K : BiContext A B C)
+noncomputable def map2_symm_path (K : BiContext A B C)
     {a₁ a₂ : A} {b₁ b₂ : B}
     (p : Path a₁ a₂) (q : Path b₁ b₂) :
     Path (K.fill a₂ b₂) (K.fill a₁ b₁) :=

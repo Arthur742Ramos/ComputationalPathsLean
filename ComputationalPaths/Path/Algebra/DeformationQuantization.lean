@@ -79,7 +79,7 @@ structure PoissonManifold (S : Type u) where
   poisson : PoissonBracket S funAlg
 
 /-- Poisson bracket of f with itself is zero (from antisymmetry). -/
-def poisson_self_zero {S : Type u} (pm : PoissonManifold S)
+noncomputable def poisson_self_zero {S : Type u} (pm : PoissonManifold S)
     (f : pm.funAlg.carrier) :
     Path (pm.poisson.bracket f f) (pm.poisson.bracket f f) :=
   pm.poisson.antisymm f f
@@ -107,7 +107,7 @@ structure FormalDeformation (S : Type u) (A : CommAlgebra S) where
   assoc_order : True
 
 /-- The star product is the sum f ★ g = Σ ℏⁿ Bₙ(f, g). -/
-def starProduct_zeroth {S : Type u} {A : CommAlgebra S}
+noncomputable def starProduct_zeroth {S : Type u} {A : CommAlgebra S}
     (fd : FormalDeformation S A) (f g : A.carrier) :
     Path (fd.biDiffOps 0 f g) (A.mul f g) :=
   fd.zeroth_order f g
@@ -137,7 +137,7 @@ structure StarProductEquiv (S : Type u) (pm : PoissonManifold S)
   intertwine : True
 
 /-- Gauge transformation identity path. -/
-def starEquiv_gauge_id {S : Type u} {pm : PoissonManifold S}
+noncomputable def starEquiv_gauge_id {S : Type u} {pm : PoissonManifold S}
     {star1 star2 : StarProduct S pm}
     (eq : StarProductEquiv S pm star1 star2) :
     Path (eq.gauge pm.funAlg.one) pm.funAlg.one :=
@@ -166,7 +166,7 @@ structure MoyalProduct (n : Nat) where
   noncomm : True
 
 /-- Moyal product associativity path. -/
-def moyal_assoc_path {n : Nat} (mp : MoyalProduct.{u} n)
+noncomputable def moyal_assoc_path {n : Nat} (mp : MoyalProduct.{u} n)
     (f g h : mp.funSpace) :
     Path (mp.moyalMul (mp.moyalMul f g) h)
          (mp.moyalMul f (mp.moyalMul g h)) :=
@@ -201,18 +201,18 @@ structure WeylAlgebra (n : Nat) where
   ccr : True
 
 /-- The commutator in the Weyl algebra: [a, b] = ab - ba. -/
-def weylCommutator {n : Nat} (W : WeylAlgebra.{u} n)
+noncomputable def weylCommutator {n : Nat} (W : WeylAlgebra.{u} n)
     (a b : W.carrier) : W.carrier :=
   W.add (W.mul a b) (W.mul b a)
 
 /-- Weyl algebra is an associative stepChain path. -/
-def weyl_assoc_path {n : Nat} (W : WeylAlgebra.{u} n)
+noncomputable def weyl_assoc_path {n : Nat} (W : WeylAlgebra.{u} n)
     (a b c : W.carrier) :
     Path (W.mul (W.mul a b) c) (W.mul a (W.mul b c)) :=
   W.mul_assoc a b c
 
 /-- Weyl algebra identity stepChain. -/
-def weyl_one_mul_path {n : Nat} (W : WeylAlgebra.{u} n)
+noncomputable def weyl_one_mul_path {n : Nat} (W : WeylAlgebra.{u} n)
     (a : W.carrier) :
     Path (W.mul W.one a) a :=
   W.one_mul a
@@ -279,7 +279,7 @@ structure StarProductClassification (S : Type u) (pm : PoissonManifold S) where
     True
 
 /-- Characteristic class path via stepChain. -/
-def charClass_path {S : Type u} {pm : PoissonManifold S}
+noncomputable def charClass_path {S : Type u} {pm : PoissonManifold S}
     (cl : StarProductClassification S pm) (sp : StarProduct S pm) :
     Path (cl.charClass sp) (cl.charClass sp) :=
   Path.stepChain rfl
@@ -311,7 +311,7 @@ structure StrictDeformation (S : Type u) (A : CommAlgebra S) where
   continuous : True
 
 /-- Strict deformation at zero gives original algebra. -/
-def strict_fiber_zero {S : Type u} {A : CommAlgebra S}
+noncomputable def strict_fiber_zero {S : Type u} {A : CommAlgebra S}
     (sd : StrictDeformation S A) :
     Path (sd.fiber 0) A.carrier :=
   sd.fiber_zero

@@ -26,7 +26,7 @@ deriving DecidableEq, Repr
 infixl:70 " ∘ₑ " => EF.comp
 
 /-- Flatten an endofunctor expression (strip identities). -/
-def EF.flatten : EF → List Nat
+noncomputable def EF.flatten : EF → List Nat
   | .id       => []
   | .prim n   => [n]
   | .comp f g => f.flatten ++ g.flatten
@@ -69,7 +69,7 @@ theorem DPath.trans {a b c : EF}
   | step s _ ih => exact DPath.step s (ih q)
 
 /-- Step symmetry. -/
-def DStep.symm : DStep a b → DStep b a
+noncomputable def DStep.symm : DStep a b → DStep b a
   | .idL f  => .idL' f
   | .idL' f => .idL f
   | .idR f  => .idR' f
@@ -122,13 +122,13 @@ structure DistLawData where
   distLaw : Nat  -- the distributive law ST → TS
 deriving DecidableEq, Repr
 
-def dl_S (d : DistLawData) : EF := .prim d.S.T
-def dl_T (d : DistLawData) : EF := .prim d.T.T
-def dl_etaS (d : DistLawData) : EF := .prim d.S.eta
-def dl_muS (d : DistLawData) : EF := .prim d.S.mu
-def dl_etaT (d : DistLawData) : EF := .prim d.T.eta
-def dl_muT (d : DistLawData) : EF := .prim d.T.mu
-def dl_law (d : DistLawData) : EF := .prim d.distLaw
+noncomputable def dl_S (d : DistLawData) : EF := .prim d.S.T
+noncomputable def dl_T (d : DistLawData) : EF := .prim d.T.T
+noncomputable def dl_etaS (d : DistLawData) : EF := .prim d.S.eta
+noncomputable def dl_muS (d : DistLawData) : EF := .prim d.S.mu
+noncomputable def dl_etaT (d : DistLawData) : EF := .prim d.T.eta
+noncomputable def dl_muT (d : DistLawData) : EF := .prim d.T.mu
+noncomputable def dl_law (d : DistLawData) : EF := .prim d.distLaw
 
 -- ============================================================
 -- §6  Compatibility conditions as path equations
@@ -180,7 +180,7 @@ theorem mult_compat_T_path (d : DistLawData) :
 -- ============================================================
 
 /-- The composite functor TS. -/
-def compositeMonad (d : DistLawData) : EF := dl_T d ∘ₑ dl_S d
+noncomputable def compositeMonad (d : DistLawData) : EF := dl_T d ∘ₑ dl_S d
 
 /-- Theorem 10: Composite monad unit path — id absorbed. -/
 theorem composite_unit_path (d : DistLawData) :
@@ -224,9 +224,9 @@ structure LiftingDatum where
   lift : Nat
 deriving DecidableEq, Repr
 
-def ld_S (l : LiftingDatum) : EF := .prim l.S
-def ld_T (l : LiftingDatum) : EF := .prim l.T
-def ld_lift (l : LiftingDatum) : EF := .prim l.lift
+noncomputable def ld_S (l : LiftingDatum) : EF := .prim l.S
+noncomputable def ld_T (l : LiftingDatum) : EF := .prim l.T
+noncomputable def ld_lift (l : LiftingDatum) : EF := .prim l.lift
 
 /-- Theorem 15: Lifting commutes: lift·S → S·lift. -/
 theorem lifting_commute (l : LiftingDatum) :
@@ -259,8 +259,8 @@ structure FactSys where
   R : Nat
 deriving DecidableEq, Repr
 
-def fs_L (f : FactSys) : EF := .prim f.L
-def fs_R (f : FactSys) : EF := .prim f.R
+noncomputable def fs_L (f : FactSys) : EF := .prim f.L
+noncomputable def fs_R (f : FactSys) : EF := .prim f.R
 
 /-- Theorem 19: Factorization swap: R·L → L·R. -/
 theorem factorization_path (f : FactSys) :
@@ -332,9 +332,9 @@ structure MixedDistLaw where
   mixLaw : Nat  -- TG → GT
 deriving DecidableEq, Repr
 
-def mdl_T (m : MixedDistLaw) : EF := .prim m.T
-def mdl_G (m : MixedDistLaw) : EF := .prim m.G
-def mdl_law (m : MixedDistLaw) : EF := .prim m.mixLaw
+noncomputable def mdl_T (m : MixedDistLaw) : EF := .prim m.T
+noncomputable def mdl_G (m : MixedDistLaw) : EF := .prim m.G
+noncomputable def mdl_law (m : MixedDistLaw) : EF := .prim m.mixLaw
 
 /-- Theorem 26: Mixed law swap path. -/
 theorem mixed_swap_path (m : MixedDistLaw) :
@@ -402,7 +402,7 @@ theorem flatten_assoc (f g h : EF) :
 -- ============================================================
 
 /-- Power of an endofunctor. -/
-def EF.pow : EF → Nat → EF
+noncomputable def EF.pow : EF → Nat → EF
   | _, 0 => .id
   | f, n + 1 => f ∘ₑ f.pow n
 

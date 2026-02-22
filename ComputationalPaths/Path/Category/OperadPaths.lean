@@ -42,12 +42,12 @@ structure Operad where
     γ η (fun _ => f) = f
 
 /-- Path witness for the right unit law. -/
-def Operad.γ_unit_right_path (O : Operad) {n : Nat} (f : O.Ops n) :
+noncomputable def Operad.γ_unit_right_path (O : Operad) {n : Nat} (f : O.Ops n) :
     Path (O.γ f (fun _ => O.η)) f :=
   Path.stepChain (O.γ_unit_right f)
 
 /-- Path witness for the left unit law. -/
-def Operad.γ_unit_left_path (O : Operad) (f : O.Ops 1) :
+noncomputable def Operad.γ_unit_left_path (O : Operad) (f : O.Ops 1) :
     Path (O.γ O.η (fun _ => f)) f :=
   Path.stepChain (O.γ_unit_left f)
 
@@ -91,21 +91,21 @@ structure Perm (n : Nat) where
   right_inv : ∀ i, toFun (invFun i) = i
 
 /-- Identity permutation. -/
-def Perm.id (n : Nat) : Perm n where
+noncomputable def Perm.id (n : Nat) : Perm n where
   toFun := _root_.id
   invFun := _root_.id
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
 /-- Composition of permutations. -/
-def Perm.comp {n : Nat} (σ τ : Perm n) : Perm n where
+noncomputable def Perm.comp {n : Nat} (σ τ : Perm n) : Perm n where
   toFun := σ.toFun ∘ τ.toFun
   invFun := τ.invFun ∘ σ.invFun
   left_inv := fun i => by simp [Function.comp, τ.left_inv, σ.left_inv]
   right_inv := fun i => by simp [Function.comp, σ.right_inv, τ.right_inv]
 
 /-- Inverse permutation. -/
-def Perm.inv {n : Nat} (σ : Perm n) : Perm n where
+noncomputable def Perm.inv {n : Nat} (σ : Perm n) : Perm n where
   toFun := σ.invFun
   invFun := σ.toFun
   left_inv := σ.right_inv
@@ -127,12 +127,12 @@ structure SymOperad extends Operad where
     act (act f σ) τ = act f (Perm.comp σ τ)
 
 /-- Path witness for action-identity law. -/
-def SymOperad.act_id_path (O : SymOperad) {n : Nat} (f : O.Ops n) :
+noncomputable def SymOperad.act_id_path (O : SymOperad) {n : Nat} (f : O.Ops n) :
     Path (O.act f (Perm.id n)) f :=
   Path.stepChain (O.act_id f)
 
 /-- Path witness for action-composition law. -/
-def SymOperad.act_comp_path (O : SymOperad) {n : Nat}
+noncomputable def SymOperad.act_comp_path (O : SymOperad) {n : Nat}
     (f : O.Ops n) (σ τ : Perm n) :
     Path (O.act (O.act f σ) τ) (O.act f (Perm.comp σ τ)) :=
   Path.stepChain (O.act_comp f σ τ)
@@ -172,12 +172,12 @@ structure OperadMorphism (O P : Operad) where
   map_unit : mapOps O.η = P.η
 
 /-- Path witness for unit preservation. -/
-def OperadMorphism.map_unit_path (φ : OperadMorphism O P) :
+noncomputable def OperadMorphism.map_unit_path (φ : OperadMorphism O P) :
     Path (φ.mapOps O.η) P.η :=
   Path.stepChain φ.map_unit
 
 /-- Identity operad morphism. -/
-def OperadMorphism.idMorphism (O : Operad) : OperadMorphism O O where
+noncomputable def OperadMorphism.idMorphism (O : Operad) : OperadMorphism O O where
   mapOps := fun f => f
   map_unit := rfl
 
@@ -187,7 +187,7 @@ theorem idMorphism_map_unit_refl (O : Operad) :
   rfl
 
 /-- Composition of operad morphisms. -/
-def OperadMorphism.comp (φ : OperadMorphism O P) (ψ : OperadMorphism P Q) :
+noncomputable def OperadMorphism.comp (φ : OperadMorphism O P) (ψ : OperadMorphism P Q) :
     OperadMorphism O Q where
   mapOps := fun f => ψ.mapOps (φ.mapOps f)
   map_unit := by rw [φ.map_unit, ψ.map_unit]
@@ -215,7 +215,7 @@ inductive OpTree (Gen : Nat → Type u) : Type u
   | node : {n : Nat} → Gen n → (Fin n → OpTree Gen) → OpTree Gen
 
 /-- Count nodes in a tree. -/
-def OpTree.nodeCount {Gen : Nat → Type u} : OpTree Gen → Nat
+noncomputable def OpTree.nodeCount {Gen : Nat → Type u} : OpTree Gen → Nat
   | OpTree.leaf => 0
   | OpTree.node _ children =>
     1 + (List.ofFn (fun i => (children i).nodeCount)).foldl (· + ·) 0
@@ -225,7 +225,7 @@ theorem OpTree.nodeCount_leaf {Gen : Nat → Type u} :
     (OpTree.leaf (Gen := Gen)).nodeCount = 0 := rfl
 
 /-- Path from node count of leaf to 0. -/
-def OpTree.nodeCount_leaf_path {Gen : Nat → Type u} :
+noncomputable def OpTree.nodeCount_leaf_path {Gen : Nat → Type u} :
     Path (OpTree.leaf (Gen := Gen)).nodeCount 0 :=
   Path.refl 0
 
@@ -246,7 +246,7 @@ structure SimpleAlgebra (O : Operad) (X : Type v) where
   act₁_unit : (x : X) → act₁ O.η x = x
 
 /-- Path witness for unit action. -/
-def SimpleAlgebra.act₁_unit_path {O : Operad} {X : Type v}
+noncomputable def SimpleAlgebra.act₁_unit_path {O : Operad} {X : Type v}
     (A : SimpleAlgebra O X) (x : X) :
     Path (A.act₁ O.η x) x :=
   Path.stepChain (A.act₁_unit x)
@@ -268,7 +268,7 @@ theorem act₁_unit_path_cancel {O : Operad} {X : Type v}
 /-! ## Transport across operadic paths -/
 
 /-- Transport an operation along an arity path. -/
-def transport_ops (O : Operad) {n m : Nat} (p : Path n m)
+noncomputable def transport_ops (O : Operad) {n m : Nat} (p : Path n m)
     (f : O.Ops n) : O.Ops m :=
   Path.transport (D := O.Ops) p f
 

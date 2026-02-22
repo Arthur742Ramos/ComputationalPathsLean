@@ -33,30 +33,30 @@ abbrev PathMonomial (A : Type u) (a : A) : Type u := Int × Loop A a
 abbrev FreePathAlgebra (A : Type u) (a : A) : Type u := List (PathMonomial A a)
 
 /-- Addition of formal sums is concatenation. -/
-def fpaAdd {A : Type u} {a : A}
+noncomputable def fpaAdd {A : Type u} {a : A}
     (x y : FreePathAlgebra A a) : FreePathAlgebra A a :=
   x ++ y
 
 /-- Multiply two monomials: multiply coefficients, compose loops. -/
-def mulMonomial {A : Type u} {a : A}
+noncomputable def mulMonomial {A : Type u} {a : A}
     (m₁ m₂ : PathMonomial A a) : PathMonomial A a :=
   (m₁.1 * m₂.1, Path.trans m₁.2 m₂.2)
 
 /-- Bilinear extension of monomial multiplication.
     We spell it out to avoid `flatMap`/`flatten` definitional issues. -/
-def fpaMul {A : Type u} {a : A} :
+noncomputable def fpaMul {A : Type u} {a : A} :
     FreePathAlgebra A a → FreePathAlgebra A a → FreePathAlgebra A a
   | [], _ => []
   | (m :: ms), ys => (ys.map (mulMonomial m)) ++ fpaMul ms ys
 
 /-- Unit element: 1 · refl. -/
-def fpaOne {A : Type u} (a : A) : FreePathAlgebra A a :=
+noncomputable def fpaOne {A : Type u} (a : A) : FreePathAlgebra A a :=
   [(1, Path.refl a)]
 
 /-! ## Augmentation on free algebra -/
 
 /-- Sum of coefficients — the augmentation before quotienting. -/
-def coeffSum {A : Type u} {a : A} : FreePathAlgebra A a → Int
+noncomputable def coeffSum {A : Type u} {a : A} : FreePathAlgebra A a → Int
   | [] => 0
   | (n, _) :: xs => n + coeffSum xs
 
@@ -118,13 +118,13 @@ inductive AlgRwEq {A : Type u} {a : A} :
       AlgRwEq x y → AlgRwEq (fpaMul x z) (fpaMul y z)
 
 /-- Smart constructor from a concrete RwEq witness. -/
-def AlgRwEq.ofRwEq {A : Type u} {a : A}
+noncomputable def AlgRwEq.ofRwEq {A : Type u} {a : A}
     (n : Int) {p q : Loop A a} (h : RwEq p q) :
     @AlgRwEq A a [(n, p)] [(n, q)] :=
   AlgRwEq.loop n ⟨h⟩
 
 /-- Smart constructor from a Step witness. -/
-def AlgRwEq.ofStep {A : Type u} {a : A}
+noncomputable def AlgRwEq.ofStep {A : Type u} {a : A}
     (n : Int) {p q : Loop A a} (h : Step p q) :
     @AlgRwEq A a [(n, p)] [(n, q)] :=
   AlgRwEq.loop n ⟨RwEq.step h⟩
@@ -152,11 +152,11 @@ theorem coeffSum_respects_AlgRwEq {A : Type u} {a : A}
       rw [coeffSum_fpaMul, coeffSum_fpaMul, ih]
 
 /-- The path algebra k[Π₁(A,a)] — the quotient of the free algebra by AlgRwEq. -/
-def kPiOne (A : Type u) (a : A) : Type u :=
+noncomputable def kPiOne (A : Type u) (a : A) : Type u :=
   Quot (@AlgRwEq A a)
 
 /-- Quotient constructor. -/
-def kPiOne.mk {A : Type u} {a : A}
+noncomputable def kPiOne.mk {A : Type u} {a : A}
     (x : FreePathAlgebra A a) : kPiOne A a :=
   Quot.mk _ x
 
@@ -187,11 +187,11 @@ noncomputable def kPiOne.qmul {A : Type u} {a : A} :
         exact Quot.sound (AlgRwEq.mul_right y' h))
 
 /-- Zero in the quotient. -/
-def kPiOne.qzero {A : Type u} (a : A) : kPiOne A a :=
+noncomputable def kPiOne.qzero {A : Type u} (a : A) : kPiOne A a :=
   kPiOne.mk []
 
 /-- One in the quotient. -/
-def kPiOne.qone {A : Type u} (a : A) : kPiOne A a :=
+noncomputable def kPiOne.qone {A : Type u} (a : A) : kPiOne A a :=
   kPiOne.mk (fpaOne a)
 
 /-- Associativity of monomial multiplication follows from Step.trans_assoc. -/
@@ -265,7 +265,7 @@ theorem augmentation_surjective {A : Type u} {a : A} :
   simp [coeffSum]
 
 /-- The augmentation ideal: kernel of ε. -/
-def AugmentationIdeal {A : Type u} {a : A} (x : kPiOne A a) : Prop :=
+noncomputable def AugmentationIdeal {A : Type u} {a : A} (x : kPiOne A a) : Prop :=
   augmentation x = 0
 
 /-- Subtype for the augmentation ideal. -/
@@ -273,7 +273,7 @@ abbrev AugIdeal (A : Type u) (a : A) : Type u :=
   { x : kPiOne A a // AugmentationIdeal x }
 
 /-- Inclusion map AugIdeal ↪ k[Π₁]. -/
-def iotaAugIdeal {A : Type u} {a : A} : AugIdeal A a → kPiOne A a :=
+noncomputable def iotaAugIdeal {A : Type u} {a : A} : AugIdeal A a → kPiOne A a :=
   Subtype.val
 
 /-- The inclusion is injective. -/
@@ -297,7 +297,7 @@ theorem augmentation_step_witness {A : Type u} {a : A}
 /-- Fox derivative ∂/∂gᵢ on the free algebra.
     The base derivative maps everything to zero; actual generators would
     specialize this. The zero map trivially satisfies Leibniz. -/
-def foxDerivRaw {A : Type u} {a : A} (_gi : Loop A a) :
+noncomputable def foxDerivRaw {A : Type u} {a : A} (_gi : Loop A a) :
     FreePathAlgebra A a → FreePathAlgebra A a :=
   fun _ => []
 
@@ -358,7 +358,7 @@ theorem foxLeibniz {A : Type u} {a : A}
 
 /-- Leibniz rule Step witness: the RwEq chain justifying that
     refl · p rewrites to p, using Step.trans_refl_left. -/
-def foxLeibniz_step_witness {A : Type u} {a : A} (p : Loop A a) :
+noncomputable def foxLeibniz_step_witness {A : Type u} {a : A} (p : Loop A a) :
     RwEq (Path.trans (Path.refl a) p) p :=
   RwEq.step (Step.trans_refl_left p)
 

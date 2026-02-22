@@ -113,11 +113,11 @@ structure HermitianForm (R : Type u) (Ri : RingWithInvolution R) where
   form_zero_left : ∀ y, Path (form module.zero y) Ri.zero
 
 /-- A symmetric form is a Hermitian form with ε = 1. -/
-def SymmetricForm (R : Type u) (Ri : RingWithInvolution R) :=
+noncomputable def SymmetricForm (R : Type u) (Ri : RingWithInvolution R) :=
   { H : HermitianForm R Ri // H.epsilon = Ri.one }
 
 /-- A skew-symmetric form is a Hermitian form with ε = -1. -/
-def SkewSymmetricForm (R : Type u) (Ri : RingWithInvolution R) :=
+noncomputable def SkewSymmetricForm (R : Type u) (Ri : RingWithInvolution R) :=
   { H : HermitianForm R Ri // H.epsilon = Ri.neg Ri.one }
 
 /-! ## Metabolic Forms -/
@@ -156,7 +156,7 @@ structure HyperbolicForm (R : Type u) (Ri : RingWithInvolution R) where
   lagrangian_incl : module.carrier → carrier
 
 /-- Every hyperbolic form is metabolic (Path witness for self-orthogonality). -/
-def hyperbolic_is_metabolic (R : Type u) (Ri : RingWithInvolution R)
+noncomputable def hyperbolic_is_metabolic (R : Type u) (Ri : RingWithInvolution R)
     (form_data : HermitianForm R Ri)
     (lag_carrier : Type u)
     (lag_incl : lag_carrier → form_data.module.carrier)
@@ -242,7 +242,7 @@ structure HyperbolicMap (R : Type u) (Ri : RingWithInvolution R) where
     Path (gw.classOf M.form) gw.zero
 
 /-- The composition Forget ∘ Hyp doubles the class (Path witness). -/
-def forget_hyp_double (R : Type u) (Ri : RingWithInvolution R)
+noncomputable def forget_hyp_double (R : Type u) (Ri : RingWithInvolution R)
     (F : ForgetfulMap R Ri) (H : HyperbolicMap R Ri)
     (h_gw : F.gw = H.gw) :
     Path (F.forget F.gw.zero) F.k0_zero :=
@@ -271,7 +271,7 @@ structure Periodicity4 (R : Type u) (Ri : RingWithInvolution R) where
          ((gw (n + 4)).add (forward n a) (forward n b))
 
 /-- 8-fold periodicity is a consequence of 4-fold (Path composition). -/
-def periodicity8_roundtrip (R : Type u) (Ri : RingWithInvolution R)
+noncomputable def periodicity8_roundtrip (R : Type u) (Ri : RingWithInvolution R)
     (P : Periodicity4 R Ri) (n : Int)
     (x : (P.gw n).carrier) :
     Path (P.backward n (P.forward n x)) x :=
@@ -302,7 +302,7 @@ structure HermitianDevissage (R k : Type u) (Ri : RingWithInvolution R)
     Path (reduce (gwR.add a b)) (gwk.add (reduce a) (reduce b))
 
 /-- Devissage coherence: lift ∘ reduce ∘ lift = lift (composite Path). -/
-def devissage_coherence (R k : Type u) (Ri : RingWithInvolution R)
+noncomputable def devissage_coherence (R k : Type u) (Ri : RingWithInvolution R)
     (Ki : RingWithInvolution k) (D : HermitianDevissage R k Ri Ki)
     (y : D.gwk.carrier) :
     Path (D.lift (D.reduce (D.lift y))) (D.lift y) :=
@@ -343,14 +343,14 @@ noncomputable def rwEq_metabolic (R : Type u) (Ri : RingWithInvolution R)
   RwEq.refl _
 
 /-- Multi-step Path: devissage round-trip is identity. -/
-def devissage_roundtrip (R k : Type u) (Ri : RingWithInvolution R)
+noncomputable def devissage_roundtrip (R k : Type u) (Ri : RingWithInvolution R)
     (Ki : RingWithInvolution k) (D : HermitianDevissage R k Ri Ki)
     (x : D.gwR.carrier) :
     Path (D.lift (D.reduce x)) x :=
   D.left_inv x
 
 /-- Composite Path: double periodicity gives 8-fold. -/
-def double_periodicity_path (R : Type u) (Ri : RingWithInvolution R)
+noncomputable def double_periodicity_path (R : Type u) (Ri : RingWithInvolution R)
     (P : Periodicity4 R Ri) (n : Int) (x : (P.gw n).carrier) :
     Path (P.backward n (P.forward n x)) x :=
   P.left_inv n x
@@ -367,7 +367,7 @@ theorem symm_symm_hermitian {A : Type u} {a b : A} (p : Path a b) :
   simp
 
 /-- Composite Path: metabolic ⊕ metabolic = 0 via trans. -/
-def metabolic_sum_zero (R : Type u) (Ri : RingWithInvolution R)
+noncomputable def metabolic_sum_zero (R : Type u) (Ri : RingWithInvolution R)
     (G : GWGroup R Ri) (M₁ M₂ : MetabolicForm R Ri) :
     Path (G.add (G.classOf M₁.form) (G.classOf M₂.form)) G.zero :=
   Path.trans

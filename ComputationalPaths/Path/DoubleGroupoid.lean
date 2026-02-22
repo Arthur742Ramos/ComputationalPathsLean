@@ -51,14 +51,14 @@ variable {a b c : A}
 /-! ## Double groupoid operations on paths -/
 
 /-- Vertical composition of squares in the path double groupoid. -/
-@[simp] def squareVComp {p q r : Path a b}
+@[simp] noncomputable def squareVComp {p q r : Path a b}
     (η : TwoCell (A := A) (a := a) (b := b) p q)
     (θ : TwoCell (A := A) (a := a) (b := b) q r) :
     TwoCell (A := A) (a := a) (b := b) p r :=
   TwoCell.comp (A := A) (a := a) (b := b) (p := p) (q := q) (r := r) η θ
 
 /-- Horizontal composition of squares in the path double groupoid. -/
-@[simp] def squareHComp {f g : Path a b} {h k : Path b c}
+@[simp] noncomputable def squareHComp {f g : Path a b} {h k : Path b c}
     (η : TwoCell (A := A) (a := a) (b := b) f g)
     (θ : TwoCell (A := A) (a := b) (b := c) h k) :
     TwoCell (A := A) (a := a) (b := c)
@@ -80,7 +80,7 @@ compositions. -/
     (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)
 
 /-- The computational-path double groupoid. -/
-def pathDoubleGroupoid (A : Type u) : DoubleGroupoid (Obj := A) where
+noncomputable def pathDoubleGroupoid (A : Type u) : DoubleGroupoid (Obj := A) where
   toWeakTwoGroupoid := weakTwoGroupoid A
   interchange := by
     intro a b c f₀ f₁ f₂ g₀ g₁ g₂ η₁ η₂ θ₁ θ₂

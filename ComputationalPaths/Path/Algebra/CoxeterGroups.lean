@@ -50,7 +50,7 @@ structure CoxeterMatrix where
   off_diag : ∀ s t, s ≠ t → Path (m s t ≥ 2) True
 
 /-- Path.trans: symmetry of Coxeter matrix is involutive. -/
-def coxeter_symm_invol (M : CoxeterMatrix) (s t : M.S) :
+noncomputable def coxeter_symm_invol (M : CoxeterMatrix) (s t : M.S) :
     Path (M.m s t) (M.m s t) :=
   Path.trans (M.symm s t) (M.symm t s)
 
@@ -80,7 +80,7 @@ structure CoxeterGroup (M : CoxeterMatrix) where
   mul_inv : ∀ a, Path (mul a (inv a)) one
 
 /-- Path.trans: s⁴ = e from involution squared. -/
-def involution_double {M : CoxeterMatrix} (G : CoxeterGroup M) (s : M.S) :
+noncomputable def involution_double {M : CoxeterMatrix} (G : CoxeterGroup M) (s : M.S) :
     Path (G.mul (G.mul (G.gen s) (G.gen s)) (G.mul (G.gen s) (G.gen s))) (G.mul G.one G.one) :=
   Path.congrArg (fun x => G.mul x (G.mul (G.gen s) (G.gen s)))
     (G.involution s) |>.trans (Path.congrArg (G.mul G.one) (G.involution s))
@@ -106,7 +106,7 @@ structure CoxeterLength (M : CoxeterMatrix) (G : CoxeterGroup M) where
   length_inv : ∀ x, Path (length (G.inv x)) (length x)
 
 /-- Path.trans: length respects multiplication. -/
-def length_mul {M : CoxeterMatrix} {G : CoxeterGroup M}
+noncomputable def length_mul {M : CoxeterMatrix} {G : CoxeterGroup M}
     (l : CoxeterLength M G) (x y : G.W) :
     Path (l.length (G.mul x y) ≤ l.length x + l.length y) True :=
   l.length_triangle x y
@@ -152,7 +152,7 @@ structure BruhatOrder (M : CoxeterMatrix) (G : CoxeterGroup M)
     Path (l.length u < l.length v) True
 
 /-- Path.trans: Bruhat transitivity composition. -/
-def bruhat_trans_compose {M : CoxeterMatrix} {G : CoxeterGroup M}
+noncomputable def bruhat_trans_compose {M : CoxeterMatrix} {G : CoxeterGroup M}
     {l : CoxeterLength M G} (bo : BruhatOrder M G l)
     (u v w : G.W) (huv : bo.bruhat u v) (hvw : bo.bruhat v w) :
     Path (bo.bruhat u w) True :=
@@ -208,7 +208,7 @@ structure HeckeAlgebra (M : CoxeterMatrix) (G : CoxeterGroup M) where
   basis_one : ∀ h, Path (mul (basis G.one) h) h
 
 /-- Path.trans: quadratic relation applied twice. -/
-def quadratic_double {M : CoxeterMatrix} {G : CoxeterGroup M}
+noncomputable def quadratic_double {M : CoxeterMatrix} {G : CoxeterGroup M}
     (ha : HeckeAlgebra M G) (s : M.S) :
     Path (ha.mul (ha.basis (G.gen s)) (ha.basis (G.gen s)))
          (ha.add (ha.smul ha.q (ha.basis G.one)) (ha.smul ha.q (ha.basis (G.gen s)))) :=

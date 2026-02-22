@@ -19,13 +19,13 @@ inductive Path (α : Type) : α → α → Type where
   | step : {a b c : α} → (a = b) → Path α b c → Path α a c
 
 /-- Concatenation of 1-paths. -/
-def Path.trans {α : Type} {a b c : α} : Path α a b → Path α b c → Path α a c :=
+noncomputable def Path.trans {α : Type} {a b c : α} : Path α a b → Path α b c → Path α a c :=
   fun p q => match p with
   | .refl _ => q
   | .step h rest => .step h (rest.trans q)
 
 /-- Symmetry / inverse of a 1-path. -/
-def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a :=
+noncomputable def Path.symm {α : Type} {a b : α} : Path α a b → Path α b a :=
   fun p => match p with
   | .refl _ => .refl _
   | .step h rest => rest.symm.trans (.step h.symm (.refl _))
@@ -39,16 +39,16 @@ structure Cell2 {α : Type} {a b : α} (p q : Path α a b) where
   eq : p = q
 
 /-- Identity 2-cell. -/
-def Cell2.id {α : Type} {a b : α} (p : Path α a b) : Cell2 p p :=
+noncomputable def Cell2.id {α : Type} {a b : α} (p : Path α a b) : Cell2 p p :=
   ⟨rfl⟩
 
 /-- Vertical composition of 2-cells. -/
-def Cell2.vcomp {α : Type} {a b : α} {p q r : Path α a b}
+noncomputable def Cell2.vcomp {α : Type} {a b : α} {p q r : Path α a b}
     (σ : Cell2 p q) (τ : Cell2 q r) : Cell2 p r :=
   ⟨σ.eq.trans τ.eq⟩
 
 /-- Horizontal composition of 2-cells via path concatenation. -/
-def Cell2.hcomp {α : Type} {a b c : α} {p₁ q₁ : Path α a b} {p₂ q₂ : Path α b c}
+noncomputable def Cell2.hcomp {α : Type} {a b c : α} {p₁ q₁ : Path α a b} {p₂ q₂ : Path α b c}
     (σ : Cell2 p₁ q₁) (τ : Cell2 p₂ q₂) : Cell2 (p₁.trans p₂) (q₁.trans q₂) :=
   ⟨by rw [σ.eq, τ.eq]⟩
 
@@ -62,7 +62,7 @@ structure Cell3 {α : Type} {a b : α} {p q : Path α a b}
   eq : σ = τ
 
 /-- Identity 3-cell. -/
-def Cell3.id {α : Type} {a b : α} {p q : Path α a b}
+noncomputable def Cell3.id {α : Type} {a b : α} {p q : Path α a b}
     (σ : Cell2 p q) : Cell3 σ σ :=
   ⟨rfl⟩
 
@@ -71,12 +71,12 @@ def Cell3.id {α : Type} {a b : α} {p q : Path α a b}
 -- ============================================================
 
 /-- Left whiskering: compose a fixed path on the left of a 2-cell. -/
-def whiskerL {α : Type} {a b c : α} (r : Path α a b)
+noncomputable def whiskerL {α : Type} {a b c : α} (r : Path α a b)
     {p q : Path α b c} (σ : Cell2 p q) : Cell2 (r.trans p) (r.trans q) :=
   ⟨by rw [σ.eq]⟩
 
 /-- Right whiskering: compose a fixed path on the right of a 2-cell. -/
-def whiskerR {α : Type} {a b c : α}
+noncomputable def whiskerR {α : Type} {a b c : α}
     {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c) : Cell2 (p.trans r) (q.trans r) :=
   ⟨by rw [σ.eq]⟩
 
@@ -189,7 +189,7 @@ theorem hcomp_assoc_cell2 {α : Type} {a b c d : α}
   cases σ₁; cases σ₂; cases σ₃; rfl
 
 /-- Theorem 17: Inverse 2-cell (vertical inverse). -/
-def Cell2.vinv {α : Type} {a b : α} {p q : Path α a b}
+noncomputable def Cell2.vinv {α : Type} {a b : α} {p q : Path α a b}
     (σ : Cell2 p q) : Cell2 q p :=
   ⟨σ.eq.symm⟩
 

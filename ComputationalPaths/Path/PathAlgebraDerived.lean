@@ -215,7 +215,7 @@ noncomputable def rweq_whisker_inv_right (p : Path a b) (q : Path b c) :
 /-! ## Conjugation -/
 
 /-- Conjugation by a path: `p · q · p⁻¹`. -/
-def conjugate (p : Path a b) (q : Path b b) : Path a a :=
+noncomputable def conjugate (p : Path a b) (q : Path b b) : Path a a :=
   trans (trans p q) (symm p)
 
 /-- Conjugation by refl is a no-op. -/

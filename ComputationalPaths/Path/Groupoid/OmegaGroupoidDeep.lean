@@ -31,26 +31,26 @@ abbrev Cell4 {a b : A} {p q : Path a b} {α β : Cell2 p q}
 /-! ## Vertical composition at each level -/
 
 /-- 1. Vertical composition of 2-cells is trans. -/
-def vcomp2 {a b : A} {p q r : Path a b}
+noncomputable def vcomp2 {a b : A} {p q r : Path a b}
     (α : Cell2 p q) (β : Cell2 q r) : Cell2 p r :=
   Path.trans α β
 
 /-- 2. Vertical inverse of a 2-cell. -/
-def vinv2 {a b : A} {p q : Path a b} (α : Cell2 p q) : Cell2 q p :=
+noncomputable def vinv2 {a b : A} {p q : Path a b} (α : Cell2 p q) : Cell2 q p :=
   Path.symm α
 
 /-- 3. Vertical composition of 3-cells. -/
-def vcomp3 {a b : A} {p q : Path a b} {α β γ : Cell2 p q}
+noncomputable def vcomp3 {a b : A} {p q : Path a b} {α β γ : Cell2 p q}
     (φ : Cell3 α β) (ψ : Cell3 β γ) : Cell3 α γ :=
   Path.trans φ ψ
 
 /-- 4. Vertical inverse of a 3-cell. -/
-def vinv3 {a b : A} {p q : Path a b} {α β : Cell2 p q}
+noncomputable def vinv3 {a b : A} {p q : Path a b} {α β : Cell2 p q}
     (φ : Cell3 α β) : Cell3 β α :=
   Path.symm φ
 
 /-- 5. Vertical composition of 4-cells. -/
-def vcomp4 {a b : A} {p q : Path a b} {α β : Cell2 p q}
+noncomputable def vcomp4 {a b : A} {p q : Path a b} {α β : Cell2 p q}
     {φ ψ χ : Cell3 α β}
     (Φ : Cell4 φ ψ) (Ψ : Cell4 ψ χ) : Cell4 φ χ :=
   Path.trans Φ Ψ
@@ -109,24 +109,24 @@ theorem vinv3_vcomp3 {a b : A} {p q : Path a b}
 /-! ## Horizontal composition of 2-cells via whiskering -/
 
 /-- 14. Left whiskering: a 1-cell pre-composed with a 2-cell. -/
-def whiskerL {a b c : A} (p : Path a b)
+noncomputable def whiskerL {a b c : A} (p : Path a b)
     {q r : Path b c} (α : Cell2 q r) : Cell2 (Path.trans p q) (Path.trans p r) :=
   Path.congrArg (fun t => Path.trans p t) α
 
 /-- 15. Right whiskering: a 2-cell post-composed with a 1-cell. -/
-def whiskerR {a b c : A}
+noncomputable def whiskerR {a b c : A}
     {p q : Path a b} (α : Cell2 p q) (r : Path b c) :
     Cell2 (Path.trans p r) (Path.trans q r) :=
   Path.congrArg (fun t => Path.trans t r) α
 
 /-- 16. Horizontal composition via whiskering (right then left). -/
-def hcomp2 {a b c : A} {p p' : Path a b} {q q' : Path b c}
+noncomputable def hcomp2 {a b c : A} {p p' : Path a b} {q q' : Path b c}
     (α : Cell2 p p') (β : Cell2 q q') :
     Cell2 (Path.trans p q) (Path.trans p' q') :=
   Path.trans (whiskerR α q) (whiskerL p' β)
 
 /-- 17. Alternative horizontal composition (left then right). -/
-def hcomp2' {a b c : A} {p p' : Path a b} {q q' : Path b c}
+noncomputable def hcomp2' {a b c : A} {p p' : Path a b} {q q' : Path b c}
     (α : Cell2 p p') (β : Cell2 q q') :
     Cell2 (Path.trans p q) (Path.trans p' q') :=
   Path.trans (whiskerL p β) (whiskerR α q')
@@ -197,18 +197,18 @@ theorem vcomp2_middle_four {a b : A} {p q r s t : Path a b}
 /-! ## Coherence cells -/
 
 /-- 25. Associator 2-cell. -/
-def assoc_cell {a b c d : A}
+noncomputable def assoc_cell {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Cell2 (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   Path.mk [Step.mk _ _ (Path.trans_assoc p q r)] (Path.trans_assoc p q r)
 
 /-- 26. Left unitor 2-cell. -/
-def lunitor {a b : A} (p : Path a b) :
+noncomputable def lunitor {a b : A} (p : Path a b) :
     Cell2 (Path.trans (Path.refl a) p) p :=
   Path.mk [Step.mk _ _ (Path.trans_refl_left p)] (Path.trans_refl_left p)
 
 /-- 27. Right unitor 2-cell. -/
-def runitor {a b : A} (p : Path a b) :
+noncomputable def runitor {a b : A} (p : Path a b) :
     Cell2 (Path.trans p (Path.refl b)) p :=
   Path.mk [Step.mk _ _ (Path.trans_refl_right p)] (Path.trans_refl_right p)
 
@@ -234,13 +234,13 @@ theorem triangle_coherence {a b c : A}
 /-! ## Whiskering at level 3 -/
 
 /-- 30. 3-cell left whiskering. -/
-def whiskerL3 {a b : A} {p q : Path a b}
+noncomputable def whiskerL3 {a b : A} {p q : Path a b}
     (α : Cell2 p q) {β γ : Cell2 q q}
     (φ : Cell3 β γ) : Cell3 (vcomp2 α β) (vcomp2 α γ) :=
   Path.congrArg (fun t => Path.trans α t) φ
 
 /-- 31. 3-cell right whiskering. -/
-def whiskerR3 {a b : A} {p q : Path a b}
+noncomputable def whiskerR3 {a b : A} {p q : Path a b}
     {α β : Cell2 p p} (φ : Cell3 α β)
     (γ : Cell2 p q) : Cell3 (vcomp2 α γ) (vcomp2 β γ) :=
   Path.congrArg (fun t => Path.trans t γ) φ

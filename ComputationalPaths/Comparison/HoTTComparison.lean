@@ -16,7 +16,7 @@ universe u v
 
 abbrev HoTTId {A : Type u} (a b : A) : Type u := a = b
 
-def hottJ {A : Type u} {a : A}
+noncomputable def hottJ {A : Type u} {a : A}
     (C : (b : A) → HoTTId a b → Sort v)
     (crefl : C a rfl) {b : A} (p : HoTTId a b) : C b p := by
   cases p
@@ -26,7 +26,7 @@ def hottJ {A : Type u} {a : A}
     (C : (b : A) → HoTTId a b → Sort v) (crefl : C a rfl) :
     hottJ C crefl rfl = crefl := rfl
 
-def hottTransport {A : Type u} (B : A → Sort v) {a b : A}
+noncomputable def hottTransport {A : Type u} (B : A → Sort v) {a b : A}
     (p : HoTTId a b) (x : B a) : B b :=
   Eq.recOn p x
 
@@ -34,7 +34,7 @@ def hottTransport {A : Type u} (B : A → Sort v) {a b : A}
     {a : A} (x : B a) :
     hottTransport B (p := (rfl : HoTTId a a)) x = x := rfl
 
-def hottApd {A : Type u} {B : A → Sort v}
+noncomputable def hottApd {A : Type u} {B : A → Sort v}
     (f : (x : A) → B x) {a b : A} (p : HoTTId a b) :
     hottTransport B p (f a) = f b := by
   cases p
@@ -47,15 +47,15 @@ abbrev CompPathStep {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   ComputationalPaths.Path.Step p q
 abbrev CompPathRwEq {A : Type u} {a b : A} (p q : Path a b) : Type u := RwEq p q
 
-@[simp] def compPathTrans {A : Type u} {a b c : A}
+@[simp] noncomputable def compPathTrans {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) : Path a c :=
   Path.trans p q
 
-@[simp] def compPathSymm {A : Type u} {a b : A}
+@[simp] noncomputable def compPathSymm {A : Type u} {a b : A}
     (p : Path a b) : Path b a :=
   Path.symm p
 
-@[simp] def compPathTrace {A : Type u} {a b : A}
+@[simp] noncomputable def compPathTrace {A : Type u} {a b : A}
     (p : Path a b) : List (ComputationalPaths.Step A) :=
   p.steps
 
@@ -67,7 +67,7 @@ noncomputable def compPathAssocRwEq {A : Type u} {a b c d : A}
 
 /-! ## (3) Every HoTT identity gives a CompPath -/
 
-@[simp] def compPathOfHoTTId {A : Type u} {a b : A}
+@[simp] noncomputable def compPathOfHoTTId {A : Type u} {a b : A}
     (p : HoTTId a b) : Path a b :=
   Path.mk [] p
 
@@ -87,7 +87,7 @@ noncomputable theorem compPathOfHoTTId_right_unit_rw
 
 /-! ## (4) What ComputationalPaths has beyond HoTT's primitive identity interface -/
 
-def tracedLoop {A : Type u} (a : A) : Path a a :=
+noncomputable def tracedLoop {A : Type u} (a : A) : Path a a :=
   Path.stepChain (rfl : a = a)
 
 theorem tracedLoop_has_explicit_step {A : Type u} (a : A) :
@@ -153,7 +153,7 @@ structure IsOneTruncation (A : Type u) (a b : A) where
   level3_contractible :
     ∀ {p q : Path a b} (d₁ d₂ : Derivation2 p q), Nonempty (Derivation3 d₁ d₂)
 
-@[simp] def toPathRwQuot {A : Type u} {a b : A}
+@[simp] noncomputable def toPathRwQuot {A : Type u} {a b : A}
     (p : Path a b) : PathRwQuot A a b :=
   Quot.mk _ p
 

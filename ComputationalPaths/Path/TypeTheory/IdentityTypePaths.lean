@@ -62,18 +62,18 @@ theorem pathJ_apply {A : Type u} {a : A}
 /-! ## Identity in product types -/
 
 /-- Paths in product types decompose into component paths. -/
-def prodPathSplit {A : Type u} {B : Type v}
+noncomputable def prodPathSplit {A : Type u} {B : Type v}
     {p q : A × B} (h : Path p q) :
     Path p.1 q.1 :=
   Path.congrArg Prod.fst h
 
-def prodPathSplit2 {A : Type u} {B : Type v}
+noncomputable def prodPathSplit2 {A : Type u} {B : Type v}
     {p q : A × B} (h : Path p q) :
     Path p.2 q.2 :=
   Path.congrArg Prod.snd h
 
 /-- Path in a product from component paths. -/
-def prodPathJoin {A : Type u} {B : Type v}
+noncomputable def prodPathJoin {A : Type u} {B : Type v}
     {a₁ a₂ : A} {b₁ b₂ : B}
     (pa : Path a₁ a₂) (pb : Path b₁ b₂) :
     Path (a₁, b₁) (a₂, b₂) := by
@@ -113,12 +113,12 @@ theorem prodPathSplit_symm {A : Type u} {B : Type v}
 /-! ## Identity in sum types -/
 
 /-- Congruence for Sum.inl. -/
-def sumInlPath {A : Type u} {B : Type v} {a₁ a₂ : A}
+noncomputable def sumInlPath {A : Type u} {B : Type v} {a₁ a₂ : A}
     (p : Path a₁ a₂) : Path (Sum.inl a₁ : A ⊕ B) (Sum.inl a₂) :=
   Path.congrArg Sum.inl p
 
 /-- Congruence for Sum.inr. -/
-def sumInrPath {A : Type u} {B : Type v} {b₁ b₂ : B}
+noncomputable def sumInrPath {A : Type u} {B : Type v} {b₁ b₂ : B}
     (p : Path b₁ b₂) : Path (Sum.inr b₁ : A ⊕ B) (Sum.inr b₂) :=
   Path.congrArg Sum.inr p
 
@@ -153,7 +153,7 @@ theorem sumInrPath_symm {A : Type u} {B : Type v} {b₁ b₂ : B}
 /-! ## Identity in function types (function extensionality paths) -/
 
 /-- Pointwise path between functions gives a path between functions. -/
-def funextPath {A : Type u} {B : Type v} {f g : A → B}
+noncomputable def funextPath {A : Type u} {B : Type v} {f g : A → B}
     (h : ∀ x, Path (f x) (g x)) : Path f g :=
   Path.mk [Step.mk _ _ (funext fun x => (h x).toEq)] (funext fun x => (h x).toEq)
 
@@ -162,14 +162,14 @@ theorem funextPath_toEq {A : Type u} {B : Type v} {f g : A → B}
     (funextPath h).toEq = funext (fun x => (h x).toEq) := rfl
 
 /-- Reflexivity of funext path. -/
-def funextReflPath {A : Type u} {B : Type v} (f : A → B) :
+noncomputable def funextReflPath {A : Type u} {B : Type v} (f : A → B) :
     Path f f := Path.refl f
 
 theorem funextPath_refl {A : Type u} {B : Type v} (f : A → B) :
     (funextReflPath f).toEq = rfl := rfl
 
 /-- Apply a path between functions at a point. -/
-def happly {A : Type u} {B : Type v} {f g : A → B}
+noncomputable def happly {A : Type u} {B : Type v} {f g : A → B}
     (p : Path f g) (x : A) : Path (f x) (g x) :=
   Path.congrArg (fun h => h x) p
 
@@ -200,7 +200,7 @@ theorem path_toEq_unique {A : Type u} {a b : A} (p q : Path a b) :
     p.toEq = q.toEq := rfl
 
 /-- Decidable equality gives a canonical path. -/
-def decEqPath {A : Type u} [DecidableEq A] (a b : A) (h : a = b) : Path a b :=
+noncomputable def decEqPath {A : Type u} [DecidableEq A] (a b : A) (h : a = b) : Path a b :=
   Path.mk [Step.mk _ _ h] h
 
 theorem decEqPath_toEq {A : Type u} [DecidableEq A] (a b : A) (h : a = b) :
@@ -242,7 +242,7 @@ theorem singleton_contractible {A : Type u} (a b : A) (p : a = b) :
   cases p; rfl
 
 /-- Path version of singleton contractibility. -/
-def singletonContractPath {A : Type u} (a b : A) (p : a = b) :
+noncomputable def singletonContractPath {A : Type u} (a b : A) (p : a = b) :
     Path (⟨a, PLift.up rfl⟩ : Σ x, PLift (a = x)) ⟨b, PLift.up p⟩ :=
   Path.mk [Step.mk _ _ (singleton_contractible a b p)] (singleton_contractible a b p)
 
@@ -252,7 +252,7 @@ theorem singletonContractPath_refl {A : Type u} (a : A) :
 /-! ## Sigma type paths -/
 
 /-- First projection of a sigma path. -/
-def sigmaFstPath {A : Type u} {B : A → Type v}
+noncomputable def sigmaFstPath {A : Type u} {B : A → Type v}
     {s₁ s₂ : Sigma B} (p : Path s₁ s₂) : Path s₁.1 s₂.1 :=
   Path.congrArg Sigma.fst p
 

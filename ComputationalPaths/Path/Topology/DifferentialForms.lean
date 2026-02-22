@@ -90,11 +90,11 @@ structure WedgeProduct (V : VectorSpace) where
   bilinear : True
 
 /-- Graded commutativity sign: (-1)^{pq}. -/
-def gradedSign (p q : Nat) : Int :=
+noncomputable def gradedSign (p q : Nat) : Int :=
   if (p * q) % 2 = 0 then 1 else -1
 
 /-- The graded sign is symmetric in a sense: (-1)^{pq} = (-1)^{qp}. -/
-def gradedSign_comm (p q : Nat) :
+noncomputable def gradedSign_comm (p q : Nat) :
     Path (gradedSign p q) (gradedSign q p) := by
   unfold gradedSign
   rw [Nat.mul_comm]
@@ -179,7 +179,7 @@ structure ExteriorDerivative (Ω : DiffFormAlgebra) where
          (Ω.add (p + 1) (d p ω₁) (d p ω₂))
 
 /-- d² = 0 as a standalone proof extraction. -/
-def d_squared_zero (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω)
+noncomputable def d_squared_zero (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω)
     (p : Nat) (ω : Ω.forms p) :
     Path (ed.d (p + 1) (ed.d p ω)) (Ω.zero (p + 2)) :=
   ed.d_squared p ω
@@ -246,7 +246,7 @@ structure Pullback (ΩM ΩN : DiffFormAlgebra) where
   functorial : True
 
 /-- Pullback commutes with exterior derivative — proof extraction. -/
-def pullback_commutes_d (ΩM ΩN : DiffFormAlgebra)
+noncomputable def pullback_commutes_d (ΩM ΩN : DiffFormAlgebra)
     (pb : Pullback ΩM ΩN) (ed_M : ExteriorDerivative ΩM)
     (ed_N : ExteriorDerivative ΩN) (p : Nat) (ω : ΩN.forms p) :
     Path (pb.pullback (p + 1) (ed_N.d p ω))
@@ -303,7 +303,7 @@ structure DeRhamComplex (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω) wher
     Path (ed.d (p + 1) (ed.d p ω)) (Ω.zero (p + 2))
 
 /-- de Rham complex is indeed a complex — follows from d² = 0. -/
-def deRham_is_complex (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω)
+noncomputable def deRham_is_complex (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω)
     (p : Nat) (ω : Ω.forms p) :
     Path (ed.d (p + 1) (ed.d p ω)) (Ω.zero (p + 2)) :=
   ed.d_squared p ω
@@ -341,7 +341,7 @@ structure StokesTheorem (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω) wher
     Path (integrate_M (ed.d (Ω.dim - 1) ω)) (integrate_bdy ω)
 
 /-- Stokes' theorem — proof extraction. -/
-def stokes_formula (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω)
+noncomputable def stokes_formula (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω)
     (st : StokesTheorem Ω ed) (ω : Ω.forms (Ω.dim - 1)) :
     Path (st.integrate_M (ed.d (Ω.dim - 1) ω)) (st.integrate_bdy ω) :=
   st.stokes ω
@@ -376,7 +376,7 @@ structure DeRhamTheorem (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω) wher
   iso : ∀ p, Path (deRham.betti p) (singularBetti p)
 
 /-- de Rham isomorphism — proof extraction. -/
-def deRham_iso (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω)
+noncomputable def deRham_iso (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω)
     (thm : DeRhamTheorem Ω ed) (p : Nat) :
     Path (thm.deRham.betti p) (thm.singularBetti p) :=
   thm.iso p
@@ -390,7 +390,7 @@ theorem d_squared_path_refl (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω)
   rfl
 
 /-- Graded sign is self-inverse: (-1)^{pq} · (-1)^{pq} = 1. -/
-def gradedSign_self_inverse (p q : Nat) :
+noncomputable def gradedSign_self_inverse (p q : Nat) :
     Path (gradedSign p q * gradedSign p q) 1 := by
   simp [gradedSign]
   split <;> exact Path.refl 1

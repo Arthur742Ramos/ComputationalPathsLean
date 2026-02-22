@@ -68,7 +68,7 @@ inductive CubicalStep (α : Type u) : α → α → Type u where
   | cubical_id : ∀ (a b c : α), CubicalStep α a b → CubicalStep α b c → CubicalStep α a c
 
 /-- A cubical path is a Path built from CubicalStep. -/
-def CubicalPath (α : Type u) (a b : α) : Type u :=
+noncomputable def CubicalPath (α : Type u) (a b : α) : Type u :=
   Path a b
 
 /-! ## The Cube Category -/
@@ -245,7 +245,7 @@ structure CubicalRwEq (α : Type u) (a b : α) where
     (Path.trans backward forward) (Path.trans backward forward)
 
 /-- Triangulation-cubification adjunction RwEq. -/
-def triangulation_adj_rweq (C S : Type u) (t : TriangulationData C S)
+noncomputable def triangulation_adj_rweq (C S : Type u) (t : TriangulationData C S)
     (c : CubificationData C S) (tu : TriangulationUnit C S t c)
     (n : Nat) (x : c.source.simplices n) :
     CubicalRwEq (t.target.simplices n) (tu.unit n x) (tu.unit n x) :=
@@ -270,14 +270,14 @@ structure ConnectionCoherence (C : Type u) extends ConnectionData C where
       (conn_join (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (conn_meet n i x))
 
 /-- Idempotency of connections. -/
-def conn_meet_idempotent (C : Type u) (cc : ConnectionCoherence C)
+noncomputable def conn_meet_idempotent (C : Type u) (cc : ConnectionCoherence C)
     (n : Nat) (i : Fin (n + 1)) (x : cc.graded.cells n) :
     Path
       (cc.conn_meet (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (cc.conn_meet n i x))
       (cc.conn_meet (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (cc.conn_meet n i x)) :=
   Path.refl _
 
-def conn_join_idempotent (C : Type u) (cc : ConnectionCoherence C)
+noncomputable def conn_join_idempotent (C : Type u) (cc : ConnectionCoherence C)
     (n : Nat) (i : Fin (n + 1)) (x : cc.graded.cells n) :
     Path
       (cc.conn_join (n + 1) ⟨i.val, Nat.lt_succ_of_lt i.isLt⟩ (cc.conn_join n i x))
@@ -299,7 +299,7 @@ structure CubicalMorphism (C : Type u) (src tgt : CubicalSetData C) where
       (map (n + 1) (src.degen n i x))
 
 /-- Identity cubical morphism. -/
-def CubicalMorphism.id (C : Type u) (csd : CubicalSetData C) :
+noncomputable def CubicalMorphism.id (C : Type u) (csd : CubicalSetData C) :
     CubicalMorphism C csd csd :=
   { map := fun _ x => x
     face_comm := fun _ _ _ _ => Path.refl _

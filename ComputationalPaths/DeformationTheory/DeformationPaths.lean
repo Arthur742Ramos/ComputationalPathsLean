@@ -148,7 +148,7 @@ structure CriticalPairAt {A : Type u} {a b : A} (p : Path a b) where
 
 namespace CriticalPairAt
 
-def Joinable {A : Type u} {a b : A} {p : Path a b}
+noncomputable def Joinable {A : Type u} {a b : A} {p : Path a b}
     (cp : CriticalPairAt p) : Prop :=
   ∃ r : Path a b, RwEq cp.left r ∧ RwEq cp.right r
 
@@ -162,7 +162,7 @@ noncomputable def right_rweq {A : Type u} {a b : A} {p : Path a b}
 
 end CriticalPairAt
 
-def PathDeformation.ExtendableAlong
+noncomputable def PathDeformation.ExtendableAlong
     {A : Type u} {a b : A} {p₀ : Path a b}
     (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal) : Prop :=
   cp.Joinable

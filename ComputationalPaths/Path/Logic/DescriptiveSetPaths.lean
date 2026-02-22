@@ -33,7 +33,7 @@ structure Topology (X : Type u) where
   open_union_pair : ∀ U V, isOpen U → isOpen V → isOpen (fun x => U x ∨ V x)
 
 /-- Closed sets are complements of open sets. -/
-def isClosed {X : Type u} (τ : Topology X) (C : X → Prop) : Prop :=
+noncomputable def isClosed {X : Type u} (τ : Topology X) (C : X → Prop) : Prop :=
   τ.isOpen (fun x => ¬ C x)
 
 /-! ## Borel Hierarchy -/
@@ -52,17 +52,17 @@ structure BorelSet (X : Type u) (τ : Topology X) where
   level : BorelLevel
 
 /-- Open Borel set. -/
-def mkOpenBorel {X : Type u} (τ : Topology X) (U : X → Prop) (h : τ.isOpen U) :
+noncomputable def mkOpenBorel {X : Type u} (τ : Topology X) (U : X → Prop) (h : τ.isOpen U) :
     BorelSet X τ :=
   ⟨U, BorelLevel.open_⟩
 
 /-- Closed Borel set. -/
-def mkClosedBorel {X : Type u} (τ : Topology X) (C : X → Prop) (h : isClosed τ C) :
+noncomputable def mkClosedBorel {X : Type u} (τ : Topology X) (C : X → Prop) (h : isClosed τ C) :
     BorelSet X τ :=
   ⟨C, BorelLevel.closed_⟩
 
 /-- Complement of a Borel set. -/
-def BorelSet.compl {X : Type u} {τ : Topology X} (B : BorelSet X τ) :
+noncomputable def BorelSet.compl {X : Type u} {τ : Topology X} (B : BorelSet X τ) :
     BorelSet X τ :=
   ⟨fun x => ¬ B.set x, match B.level with
     | BorelLevel.open_ => BorelLevel.closed_
@@ -80,20 +80,20 @@ theorem borel_compl_compl_set {X : Type u} {τ : Topology X} (B : BorelSet X τ)
 /-! ## Baire Category -/
 
 /-- A set is dense if it intersects every nonempty open set. -/
-def isDense {X : Type u} (τ : Topology X) (D : X → Prop) : Prop :=
+noncomputable def isDense {X : Type u} (τ : Topology X) (D : X → Prop) : Prop :=
   ∀ U, τ.isOpen U → (∃ x, U x) → ∃ x, U x ∧ D x
 
 /-- A set is nowhere dense if every open set has an open subset missing it. -/
-def isNowhereDense {X : Type u} (τ : Topology X) (N : X → Prop) : Prop :=
+noncomputable def isNowhereDense {X : Type u} (τ : Topology X) (N : X → Prop) : Prop :=
   ∀ U, τ.isOpen U → (∃ x, U x) → ∃ x, U x ∧ ¬ N x
 
 /-- A set is meager (first category). -/
-def isMeager {X : Type u} (τ : Topology X) (M : X → Prop) : Prop :=
+noncomputable def isMeager {X : Type u} (τ : Topology X) (M : X → Prop) : Prop :=
   ∃ f : Nat → X → Prop, (∀ x, M x → ∃ i, f i x) ∧
     ∀ i, isNowhereDense τ (f i)
 
 /-- A set is comeager if its complement is meager. -/
-def isComeager {X : Type u} (τ : Topology X) (C : X → Prop) : Prop :=
+noncomputable def isComeager {X : Type u} (τ : Topology X) (C : X → Prop) : Prop :=
   isMeager τ (fun x => ¬ C x)
 
 /-- The universe is dense. -/
@@ -140,11 +140,11 @@ theorem nowhere_dense_subset {X : Type u} (τ : Topology X) (N M : X → Prop)
 /-! ## Perfect Set Property -/
 
 /-- A point is isolated in S. -/
-def isIsolated {X : Type u} (τ : Topology X) (S : X → Prop) (x : X) : Prop :=
+noncomputable def isIsolated {X : Type u} (τ : Topology X) (S : X → Prop) (x : X) : Prop :=
   ∃ U, τ.isOpen U ∧ U x ∧ ∀ y, U y → S y → y = x
 
 /-- A set is perfect if closed and has no isolated points. -/
-def isPerfect {X : Type u} (τ : Topology X) (S : X → Prop) : Prop :=
+noncomputable def isPerfect {X : Type u} (τ : Topology X) (S : X → Prop) : Prop :=
   isClosed τ S ∧ ∀ x, S x → ¬ isIsolated τ S x
 
 /-- In a perfect set, every open neighborhood contains another point. -/
@@ -167,7 +167,7 @@ theorem perfect_two_points {X : Type u} (τ : Topology X) (S : X → Prop)
 /-! ## Cantor-Bendixson -/
 
 /-- The derived set: limit points. -/
-def derivedSet {X : Type u} (τ : Topology X) (S : X → Prop) : X → Prop :=
+noncomputable def derivedSet {X : Type u} (τ : Topology X) (S : X → Prop) : X → Prop :=
   fun x => ∀ U, τ.isOpen U → U x → ∃ y, U y ∧ S y ∧ y ≠ x
 
 /-- Points in a perfect set are limit points. -/
@@ -180,7 +180,7 @@ theorem perfect_subset_derived {X : Type u} (τ : Topology X) (S : X → Prop)
 /-! ## Path-based Constructions -/
 
 /-- CongrArg path for set membership. -/
-def set_congrArg {X : Type u} (S : X → Prop) (x₁ x₂ : X) (p : Path x₁ x₂) :
+noncomputable def set_congrArg {X : Type u} (S : X → Prop) (x₁ x₂ : X) (p : Path x₁ x₂) :
     Path (S x₁) (S x₂) :=
   Path.congrArg S p
 
@@ -193,38 +193,38 @@ theorem transport_membership {X : Type u} (S : X → Prop)
     cases proof; simp [Path.transport]
 
 /-- Trans path for topology. -/
-def topology_trans_path {X : Type u} (x₁ x₂ x₃ : X)
+noncomputable def topology_trans_path {X : Type u} (x₁ x₂ x₃ : X)
     (p : Path x₁ x₂) (q : Path x₂ x₃) :
     Path x₁ x₃ :=
   Path.trans p q
 
 /-- Symm path for topology. -/
-def topology_symm_path {X : Type u} (x₁ x₂ : X) (p : Path x₁ x₂) :
+noncomputable def topology_symm_path {X : Type u} (x₁ x₂ : X) (p : Path x₁ x₂) :
     Path x₂ x₁ :=
   Path.symm p
 
 /-- CongrArg on open sets. -/
-def open_congrArg {X : Type u} (τ : Topology X) (U₁ U₂ : X → Prop)
+noncomputable def open_congrArg {X : Type u} (τ : Topology X) (U₁ U₂ : X → Prop)
     (p : Path U₁ U₂) : Path (τ.isOpen U₁) (τ.isOpen U₂) :=
   Path.congrArg τ.isOpen p
 
 /-- CongrArg on closed sets. -/
-def closed_congrArg {X : Type u} (τ : Topology X) (C₁ C₂ : X → Prop)
+noncomputable def closed_congrArg {X : Type u} (τ : Topology X) (C₁ C₂ : X → Prop)
     (p : Path C₁ C₂) : Path (isClosed τ C₁) (isClosed τ C₂) :=
   Path.congrArg (isClosed τ) p
 
 /-- CongrArg on dense sets. -/
-def dense_congrArg {X : Type u} (τ : Topology X) (D₁ D₂ : X → Prop)
+noncomputable def dense_congrArg {X : Type u} (τ : Topology X) (D₁ D₂ : X → Prop)
     (p : Path D₁ D₂) : Path (isDense τ D₁) (isDense τ D₂) :=
   Path.congrArg (isDense τ) p
 
 /-- CongrArg on meager. -/
-def meager_congrArg {X : Type u} (τ : Topology X) (M₁ M₂ : X → Prop)
+noncomputable def meager_congrArg {X : Type u} (τ : Topology X) (M₁ M₂ : X → Prop)
     (p : Path M₁ M₂) : Path (isMeager τ M₁) (isMeager τ M₂) :=
   Path.congrArg (isMeager τ) p
 
 /-- CongrArg on perfect. -/
-def perfect_congrArg {X : Type u} (τ : Topology X) (S₁ S₂ : X → Prop)
+noncomputable def perfect_congrArg {X : Type u} (τ : Topology X) (S₁ S₂ : X → Prop)
     (p : Path S₁ S₂) : Path (isPerfect τ S₁) (isPerfect τ S₂) :=
   Path.congrArg (isPerfect τ) p
 
@@ -237,7 +237,7 @@ theorem transport_open {X : Type u} (τ : Topology X)
     cases proof; simp [Path.transport]
 
 /-- CongrArg on derived set. -/
-def derived_congrArg {X : Type u} (τ : Topology X) (S₁ S₂ : X → Prop)
+noncomputable def derived_congrArg {X : Type u} (τ : Topology X) (S₁ S₂ : X → Prop)
     (p : Path S₁ S₂) (x : X) :
     Path (derivedSet τ S₁ x) (derivedSet τ S₂ x) :=
   Path.congrArg (fun S => derivedSet τ S x) p

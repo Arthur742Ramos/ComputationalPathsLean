@@ -59,41 +59,41 @@ abbrev Pi5S2 : Type := Z2
 /-! ## Distinguished elements -/
 
 /-- Zero element of Z/2Z. -/
-def z2_zero : Z2 := ⟨0, by decide⟩
+noncomputable def z2_zero : Z2 := ⟨0, by decide⟩
 
 /-- One element of Z/2Z. -/
-def z2_one : Z2 := ⟨1, by decide⟩
+noncomputable def z2_one : Z2 := ⟨1, by decide⟩
 
 /-- The Hopf generator eta in pi_3(S2). -/
-def eta : Pi3S2 := (1 : Int)
+noncomputable def eta : Pi3S2 := (1 : Int)
 
 /-- The suspension generator nu in pi_4(S3). -/
-def nu : Pi4S3 := z2_one
+noncomputable def nu : Pi4S3 := z2_one
 
 /-- The low-stem generator sigma in pi_5(S2). -/
-def sigma : Pi5S2 := z2_one
+noncomputable def sigma : Pi5S2 := z2_one
 
 /-! ## Path-level normal forms -/
 
 /-- Path witness that eta is already in normal form. -/
-def eta_normal_form : Path eta (1 : Pi3S2) := Path.refl _
+noncomputable def eta_normal_form : Path eta (1 : Pi3S2) := Path.refl _
 
 /-- Path witness that nu is already in normal form. -/
-def nu_normal_form : Path nu z2_one := Path.refl _
+noncomputable def nu_normal_form : Path nu z2_one := Path.refl _
 
 /-- Path witness that sigma is already in normal form. -/
-def sigma_normal_form : Path sigma z2_one := Path.refl _
+noncomputable def sigma_normal_form : Path sigma z2_one := Path.refl _
 
 /-! ## Computations as equivalences -/
 
 /-- pi_3(S2) is Z, via the Hopf fibration. -/
-def pi3S2_equiv_int : SimpleEquiv Pi3S2 Int := SimpleEquiv.refl _
+noncomputable def pi3S2_equiv_int : SimpleEquiv Pi3S2 Int := SimpleEquiv.refl _
 
 /-- pi_4(S3) is Z/2, via suspension and the EHP sequence. -/
-def pi4S3_equiv_z2 : SimpleEquiv Pi4S3 Z2 := SimpleEquiv.refl _
+noncomputable def pi4S3_equiv_z2 : SimpleEquiv Pi4S3 Z2 := SimpleEquiv.refl _
 
 /-- pi_4(S2) is Z/2. -/
-def pi4S2_equiv_z2 : SimpleEquiv Pi4S2 Z2 := SimpleEquiv.refl _
+noncomputable def pi4S2_equiv_z2 : SimpleEquiv Pi4S2 Z2 := SimpleEquiv.refl _
 
 
 

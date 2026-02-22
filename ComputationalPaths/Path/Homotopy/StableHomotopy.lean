@@ -52,7 +52,7 @@ structure OmegaSpectrum where
   structureMap : (n : Nat) → PointedMap (level n) (omegaEqPointed (level (n + 1)))
 
 /-- Constant pointed map to the basepoint. -/
-def basepointMap (X Y : Pointed) : PointedMap X Y where
+noncomputable def basepointMap (X Y : Pointed) : PointedMap X Y where
   toFun := fun _ => Y.pt
   map_pt := rfl
 
@@ -81,14 +81,14 @@ noncomputable def pathSpectrum (X : Pointed) : Spectrum :=
 /-! ## Stabilized suspension-loop adjunction -/
 
 /-- Identity path equivalence. -/
-def pathSimpleEquivRefl (α : Type u) : PathSimpleEquiv α α :=
+noncomputable def pathSimpleEquivRefl (α : Type u) : PathSimpleEquiv α α :=
   { toFun := id
     invFun := id
     left_inv := fun x => Path.refl x
     right_inv := fun x => Path.refl x }
 
 /-- Composition of path equivalences. -/
-def pathSimpleEquivComp {α β γ : Type u} (e : PathSimpleEquiv α β)
+noncomputable def pathSimpleEquivComp {α β γ : Type u} (e : PathSimpleEquiv α β)
     (f : PathSimpleEquiv β γ) : PathSimpleEquiv α γ :=
   { toFun := fun x => f.toFun (e.toFun x)
     invFun := fun z => e.invFun (f.invFun z)
@@ -107,7 +107,7 @@ noncomputable def iteratedSigmaPointed : Nat → Pointed → Pointed
   | n + 1, X => sigmaPointed (iteratedSigmaPointed n X)
 
 /-- n-fold propositional loop space as a pointed type (OmegaEq^n X). -/
-def iteratedOmegaEqPointed : Nat → Pointed → Pointed
+noncomputable def iteratedOmegaEqPointed : Nat → Pointed → Pointed
   | 0, Y => Y
   | n + 1, Y => iteratedOmegaEqPointed n (omegaEqPointed Y)
 
@@ -160,20 +160,20 @@ noncomputable def stableAdjunction_right_inverse (n : Nat) (X Y : Pointed)
   (stableAdjunction n X Y).right_inv g
 
 /-- Freudenthal preview sends the reflexive loop to the suspension base loop. -/
-def freudenthal_preview_basepoint (X : Pointed) :
+noncomputable def freudenthal_preview_basepoint (X : Pointed) :
     Path
       ((FreudenthalSuspension.freudenthalPreview X).toFun (Path.refl X.pt))
       (FreudenthalSuspension.suspBaseLoop (X := X.carrier) X.pt) :=
   (FreudenthalSuspension.freudenthalPreview X).basepoint
 
 /-- The Freudenthal preview map is definitionally the suspension map. -/
-def freudenthal_preview_toFun_def (X : Pointed) :
+noncomputable def freudenthal_preview_toFun_def (X : Pointed) :
     Path (FreudenthalSuspension.freudenthalPreview X).toFun
       (FreudenthalSuspension.suspensionMap (X := X.carrier) X.pt) :=
   Path.stepChain rfl
 
 /-- Basepoint path witness for the suspension map in Freudenthal preview form. -/
-def freudenthal_suspensionMap_basepoint (X : Pointed) :
+noncomputable def freudenthal_suspensionMap_basepoint (X : Pointed) :
     Path
       (FreudenthalSuspension.suspensionMap (X := X.carrier) X.pt (Path.refl X.pt))
       (FreudenthalSuspension.suspBaseLoop (X := X.carrier) X.pt) :=
@@ -217,7 +217,7 @@ noncomputable def canonicalSWDuality_right_inverse (n : Nat) (X : Pointed)
 /-! ## Stable homotopy groups of spheres (basic stems) -/
 
 /-- Stable homotopy groups in the basic stem range. -/
-def StablePi : Nat → Type
+noncomputable def StablePi : Nat → Type
   | 1 => StableStems.StableStem1
   | 2 => StableStems.StableStem2
   | 3 => StableStems.StableStem3
@@ -230,56 +230,56 @@ def StablePi : Nat → Type
   | _ => Unit
 
 /-- pi_s_1 is Z2. -/
-def stablePi_one_def : Path (StablePi 1) StableStems.Z2 :=
+noncomputable def stablePi_one_def : Path (StablePi 1) StableStems.Z2 :=
   Path.stepChain rfl
 
 /-- pi_s_2 is Z2. -/
-def stablePi_two_def : Path (StablePi 2) StableStems.Z2 :=
+noncomputable def stablePi_two_def : Path (StablePi 2) StableStems.Z2 :=
   Path.stepChain rfl
 
 /-- pi_s_3 is Z24. -/
-def stablePi_three_def : Path (StablePi 3) StableStems.Z24 :=
+noncomputable def stablePi_three_def : Path (StablePi 3) StableStems.Z24 :=
   Path.stepChain rfl
 
 /-- pi_s_4 is trivial. -/
-def stablePi_four_trivial : ∀ x : StablePi 4, Path x () := fun x =>
+noncomputable def stablePi_four_trivial : ∀ x : StablePi 4, Path x () := fun x =>
   Path.stepChain (StableStems.stableStem4_trivial x)
 
 /-- pi_s_5 is trivial. -/
-def stablePi_five_trivial : ∀ x : StablePi 5, Path x () := fun x =>
+noncomputable def stablePi_five_trivial : ∀ x : StablePi 5, Path x () := fun x =>
   Path.stepChain (StableStems.stableStem5_trivial x)
 
 /-- pi_s_7 is Z240. -/
-def stablePi_seven_def : Path (StablePi 7) StableStems.Z240 :=
+noncomputable def stablePi_seven_def : Path (StablePi 7) StableStems.Z240 :=
   Path.stepChain rfl
 
 /-- The eta class has order two in the first stable stem. -/
-def stablePi_one_two_torsion :
+noncomputable def stablePi_one_two_torsion :
     Path ((2 : Nat) • StableStems.eta) (0 : StableStems.StableStem1) :=
   Path.stepChain StableStems.two_eta_zero
 
 /-- The eta-squared class has order two in the second stable stem. -/
-def stablePi_two_two_torsion :
+noncomputable def stablePi_two_two_torsion :
     Path ((2 : Nat) • StableStems.etaSquared) (0 : StableStems.StableStem2) :=
   Path.stepChain StableStems.two_etaSquared_zero
 
 /-- The nu class has order twenty-four in the third stable stem. -/
-def stablePi_three_twentyfour_torsion :
+noncomputable def stablePi_three_twentyfour_torsion :
     Path ((24 : Nat) • StableStems.nu) (0 : StableStems.StableStem3) :=
   Path.stepChain StableStems.twentyfour_nu_zero
 
 /-- The sigma class has order two hundred forty in the seventh stable stem. -/
-def stablePi_seven_twohundredforty_torsion :
+noncomputable def stablePi_seven_twohundredforty_torsion :
     Path ((240 : Nat) • StableStems.sigma) (0 : StableStems.StableStem7) :=
   Path.stepChain StableStems.twohundredforty_sigma_zero
 
 /-- pi_s_8 is generated by a Z2 x Z2 basis. -/
-def stablePi_eight_generators :
+noncomputable def stablePi_eight_generators :
     ∀ x : StablePi 8, Σ a b : StableStems.Z2, Path x (a, b)
   | (a, b) => ⟨a, b, Path.refl (a, b)⟩
 
 /-- pi_s_9 is generated by a Z2 x Z2 x Z2 basis. -/
-def stablePi_nine_generators :
+noncomputable def stablePi_nine_generators :
     ∀ x : StablePi 9, Σ a b c : StableStems.Z2, Path x (a, b, c)
   | (a, b, c) => ⟨a, b, c, Path.refl (a, b, c)⟩
 
@@ -369,7 +369,7 @@ noncomputable def cp_pathSpectrum_level_path (X : Pointed) (n : Nat) :
   Path.stepChain rfl
 
 /-- Every stable stem element has a reflexive computational-path witness. -/
-def cp_stablePi_refl (n : Nat) (x : StablePi n) : Path x x :=
+noncomputable def cp_stablePi_refl (n : Nat) (x : StablePi n) : Path x x :=
   Path.refl x
 
 /-- Left round-trip for canonical Spanier-Whitehead duality data. -/

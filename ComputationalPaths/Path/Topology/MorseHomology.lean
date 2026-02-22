@@ -54,11 +54,11 @@ structure MorseFunction where
   index_le_dim : ∀ p, p ∈ criticalPoints → index p ≤ dim
 
 /-- The set of critical points of a given index. -/
-def critPointsOfIndex (f : MorseFunction) (k : Nat) : List f.manifold :=
+noncomputable def critPointsOfIndex (f : MorseFunction) (k : Nat) : List f.manifold :=
   f.criticalPoints.filter (fun p => f.index p == k)
 
 /-- Critical point count of index k. -/
-def morseNumber (f : MorseFunction) (k : Nat) : Nat :=
+noncomputable def morseNumber (f : MorseFunction) (k : Nat) : Nat :=
   (critPointsOfIndex f k).length
 
 /-! ## Gradient Flow Lines -/
@@ -156,7 +156,7 @@ structure MorseInequalities (f : MorseFunction) where
                 (List.range (f.dim + 1))))
 
 /-- The weak Morse inequality holds. -/
-def weak_morse_ineq (f : MorseFunction) (I : MorseInequalities f)
+noncomputable def weak_morse_ineq (f : MorseFunction) (I : MorseInequalities f)
     (k : Nat) : morseNumber f k ≥ I.homology.betti k :=
   I.weak k
 
@@ -173,7 +173,7 @@ structure LacunaryPrinciple (f : MorseFunction) where
   equality : ∀ k, Path (morseNumber f k) (homology.betti k)
 
 /-- Under the lacunary principle, Morse and Betti numbers coincide. -/
-def lacunary_eq (f : MorseFunction) (L : LacunaryPrinciple f) (k : Nat) :
+noncomputable def lacunary_eq (f : MorseFunction) (L : LacunaryPrinciple f) (k : Nat) :
     Path (morseNumber f k) (L.homology.betti k) :=
   L.equality k
 
@@ -188,7 +188,7 @@ structure PerfectMorseFunction extends MorseFunction where
   perfect : ∀ k, Path (morseNumber toMorseFunction k) (homology.betti k)
 
 /-- A perfect Morse function witnesses c_k = b_k. -/
-def perfect_eq (f : PerfectMorseFunction) (k : Nat) :
+noncomputable def perfect_eq (f : PerfectMorseFunction) (k : Nat) :
     Path (morseNumber f.toMorseFunction k) (f.homology.betti k) :=
   f.perfect k
 

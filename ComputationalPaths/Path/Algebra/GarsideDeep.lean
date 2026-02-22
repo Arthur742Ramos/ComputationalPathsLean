@@ -34,10 +34,10 @@ inductive BraidGen where
 
 namespace BraidGen
 
-def index : BraidGen → Nat
+noncomputable def index : BraidGen → Nat
   | pos i => i | neg i => i
 
-def inv : BraidGen → BraidGen
+noncomputable def inv : BraidGen → BraidGen
   | pos i => neg i | neg i => pos i
 
 -- 1
@@ -57,9 +57,9 @@ abbrev BraidWord := List BraidGen
 
 namespace BraidWord
 
-def empty : BraidWord := []
-def mul (w₁ w₂ : BraidWord) : BraidWord := w₁ ++ w₂
-def inv (w : BraidWord) : BraidWord := (w.map BraidGen.inv).reverse
+noncomputable def empty : BraidWord := []
+noncomputable def mul (w₁ w₂ : BraidWord) : BraidWord := w₁ ++ w₂
+noncomputable def inv (w : BraidWord) : BraidWord := (w.map BraidGen.inv).reverse
 
 -- 4
 theorem mul_empty_left (w : BraidWord) : mul empty w = w := by simp [mul, empty]
@@ -86,29 +86,29 @@ end BraidWord
 /-! ## Path-witnessed word algebra -/
 
 -- 10
-def path_mul_empty_left (w : BraidWord) :
+noncomputable def path_mul_empty_left (w : BraidWord) :
     Path (BraidWord.mul BraidWord.empty w) w :=
   Path.stepChain (BraidWord.mul_empty_left w)
 
 -- 11
-def path_mul_empty_right (w : BraidWord) :
+noncomputable def path_mul_empty_right (w : BraidWord) :
     Path (BraidWord.mul w BraidWord.empty) w :=
   Path.stepChain (BraidWord.mul_empty_right w)
 
 -- 12
-def path_mul_assoc (w₁ w₂ w₃ : BraidWord) :
+noncomputable def path_mul_assoc (w₁ w₂ w₃ : BraidWord) :
     Path (BraidWord.mul (BraidWord.mul w₁ w₂) w₃)
          (BraidWord.mul w₁ (BraidWord.mul w₂ w₃)) :=
   Path.stepChain (BraidWord.mul_assoc w₁ w₂ w₃)
 
 -- 13
-def path_inv_mul (w₁ w₂ : BraidWord) :
+noncomputable def path_inv_mul (w₁ w₂ : BraidWord) :
     Path (BraidWord.inv (BraidWord.mul w₁ w₂))
          (BraidWord.mul (BraidWord.inv w₂) (BraidWord.inv w₁)) :=
   Path.stepChain (BraidWord.inv_mul w₁ w₂)
 
 -- 14
-def path_inv_inv (w : BraidWord) :
+noncomputable def path_inv_inv (w : BraidWord) :
     Path (BraidWord.inv (BraidWord.inv w)) w :=
   Path.stepChain (BraidWord.inv_inv w)
 
@@ -124,7 +124,7 @@ theorem path_assoc_roundtrip (w₁ w₂ w₃ : BraidWord) :
 
 /-! ## Braid relations -/
 
-def farApart (i j : Nat) : Prop := i + 2 ≤ j ∨ j + 2 ≤ i
+noncomputable def farApart (i j : Nat) : Prop := i + 2 ≤ j ∨ j + 2 ≤ i
 
 /-- Braid equivalence on words. -/
 inductive BraidEquiv : BraidWord → BraidWord → Prop where
@@ -179,41 +179,41 @@ end BraidEquiv
 /-! ## Braid group as quotient -/
 
 /-- The braid group: quotient of braid words by braid equivalence. -/
-def BraidElem := Quot BraidEquiv
+noncomputable def BraidElem := Quot BraidEquiv
 
 namespace BraidElem
 
 /-- Construct a braid group element from a word. -/
-def mk (w : BraidWord) : BraidElem := Quot.mk BraidEquiv w
+noncomputable def mk (w : BraidWord) : BraidElem := Quot.mk BraidEquiv w
 
 /-- Braid-equivalent words map to equal elements. -/
 theorem sound {w₁ w₂ : BraidWord} (h : BraidEquiv w₁ w₂) :
     mk w₁ = mk w₂ := Quot.sound h
 
 /-- Path witness for braid equivalence in the quotient. -/
-def equivPath {w₁ w₂ : BraidWord} (h : BraidEquiv w₁ w₂) :
+noncomputable def equivPath {w₁ w₂ : BraidWord} (h : BraidEquiv w₁ w₂) :
     Path (mk w₁) (mk w₂) :=
   Path.stepChain (sound h)
 
 -- 22: far commutation path
-def farCommPath (p s : BraidWord) (i j : Nat) (h : farApart i j) :
+noncomputable def farCommPath (p s : BraidWord) (i j : Nat) (h : farApart i j) :
     Path (mk (p ++ [BraidGen.pos i, BraidGen.pos j] ++ s))
          (mk (p ++ [BraidGen.pos j, BraidGen.pos i] ++ s)) :=
   equivPath (BraidEquiv.farComm p s i j h)
 
 -- 23: Yang-Baxter path
-def yangBaxterPath (p s : BraidWord) (i : Nat) :
+noncomputable def yangBaxterPath (p s : BraidWord) (i : Nat) :
     Path (mk (p ++ [BraidGen.pos i, BraidGen.pos (i+1), BraidGen.pos i] ++ s))
          (mk (p ++ [BraidGen.pos (i+1), BraidGen.pos i, BraidGen.pos (i+1)] ++ s)) :=
   equivPath (BraidEquiv.yangBaxter p s i)
 
 -- 24: free reduction path
-def freeReducePath (p s : BraidWord) (i : Nat) :
+noncomputable def freeReducePath (p s : BraidWord) (i : Nat) :
     Path (mk (p ++ [BraidGen.pos i, BraidGen.neg i] ++ s)) (mk (p ++ s)) :=
   equivPath (BraidEquiv.freeReduce p s i)
 
 -- 25: free reduction inverse path
-def freeReduceInvPath (p s : BraidWord) (i : Nat) :
+noncomputable def freeReduceInvPath (p s : BraidWord) (i : Nat) :
     Path (mk (p ++ [BraidGen.neg i, BraidGen.pos i] ++ s)) (mk (p ++ s)) :=
   equivPath (BraidEquiv.freeReduceInv p s i)
 
@@ -246,13 +246,13 @@ theorem equivPath_trans_symm_cancel {w₁ w₂ : BraidWord}
     (Path.trans (equivPath h) (Path.symm (equivPath h))).toEq = rfl := by simp
 
 -- 31: multi-step path (3 steps)
-def threeStepPath {w₁ w₂ w₃ w₄ : BraidWord}
+noncomputable def threeStepPath {w₁ w₂ w₃ w₄ : BraidWord}
     (h₁ : BraidEquiv w₁ w₂) (h₂ : BraidEquiv w₂ w₃) (h₃ : BraidEquiv w₃ w₄) :
     Path (mk w₁) (mk w₄) :=
   Path.trans (equivPath h₁) (Path.trans (equivPath h₂) (equivPath h₃))
 
 -- 32: multi-step path (4 steps)
-def fourStepPath {w₁ w₂ w₃ w₄ w₅ : BraidWord}
+noncomputable def fourStepPath {w₁ w₂ w₃ w₄ w₅ : BraidWord}
     (h₁ : BraidEquiv w₁ w₂) (h₂ : BraidEquiv w₂ w₃)
     (h₃ : BraidEquiv w₃ w₄) (h₄ : BraidEquiv w₄ w₅) :
     Path (mk w₁) (mk w₅) :=
@@ -260,7 +260,7 @@ def fourStepPath {w₁ w₂ w₃ w₄ w₅ : BraidWord}
     (Path.trans (equivPath h₃) (equivPath h₄)))
 
 -- 33: join from common ancestor
-def joinPath {w w₁ w₂ : BraidWord}
+noncomputable def joinPath {w w₁ w₂ : BraidWord}
     (h₁ : BraidEquiv w w₁) (h₂ : BraidEquiv w w₂) :
     Path (mk w₁) (mk w₂) :=
   Path.trans (Path.symm (equivPath h₁)) (equivPath h₂)
@@ -280,7 +280,7 @@ end BraidElem
 
 /-! ## Positive braid words -/
 
-def isPositive (w : BraidWord) : Prop := ∀ g ∈ w, ∃ i, g = BraidGen.pos i
+noncomputable def isPositive (w : BraidWord) : Prop := ∀ g ∈ w, ∃ i, g = BraidGen.pos i
 
 -- 36
 theorem isPositive_empty : isPositive BraidWord.empty := by intro g hg; cases hg
@@ -306,13 +306,13 @@ structure SimpleElement (n : Nat) where
 namespace SimpleElement
 
 -- 39
-def identity (n : Nat) : SimpleElement n where
+noncomputable def identity (n : Nat) : SimpleElement n where
   word := []
   generators_bounded := by intro g hg; cases hg
   positive := isPositive_empty
 
 -- 40
-def generator (n i : Nat) (hi : i < n) : SimpleElement n where
+noncomputable def generator (n i : Nat) (hi : i < n) : SimpleElement n where
   word := [BraidGen.pos i]
   generators_bounded := by intro g hg; simp at hg; exact ⟨i, hg, hi⟩
   positive := isPositive_singleton i
@@ -322,17 +322,17 @@ theorem generator_word (n i : Nat) (hi : i < n) :
     (generator n i hi).word = [BraidGen.pos i] := rfl
 
 -- 42
-def identity_word_path (n : Nat) : Path (identity n).word BraidWord.empty := Path.refl []
+noncomputable def identity_word_path (n : Nat) : Path (identity n).word BraidWord.empty := Path.refl []
 
 end SimpleElement
 
 /-- Descending sequence σ_{k-1} σ_{k-2} … σ_0. -/
-def descendingWord : Nat → BraidWord
+noncomputable def descendingWord : Nat → BraidWord
   | 0 => []
   | k + 1 => BraidGen.pos k :: descendingWord k
 
 /-- Garside element Δ_n. -/
-def garsideWord : Nat → BraidWord
+noncomputable def garsideWord : Nat → BraidWord
   | 0 => []
   | k + 1 => garsideWord k ++ descendingWord k
 
@@ -366,27 +366,27 @@ structure LeftNormalForm (n : Nat) where
 namespace LeftNormalForm
 
 -- 47
-def identity (n : Nat) : LeftNormalForm n where
+noncomputable def identity (n : Nat) : LeftNormalForm n where
   deltaExp := 0; factors := []; noIdentityFactors := by intro s hs; cases hs
 
 -- 48
 theorem identity_deltaExp (n : Nat) : (identity n).deltaExp = 0 := rfl
 
 -- 49
-def delta (n : Nat) : LeftNormalForm n where
+noncomputable def delta (n : Nat) : LeftNormalForm n where
   deltaExp := 1; factors := []; noIdentityFactors := by intro s hs; cases hs
 
 -- 50
 theorem delta_deltaExp (n : Nat) : (delta n).deltaExp = 1 := rfl
 
-def inf_ (nf : LeftNormalForm n) : Int := nf.deltaExp
-def sup_ (nf : LeftNormalForm n) : Int := nf.deltaExp + nf.factors.length
+noncomputable def inf_ (nf : LeftNormalForm n) : Int := nf.deltaExp
+noncomputable def sup_ (nf : LeftNormalForm n) : Int := nf.deltaExp + nf.factors.length
 
 -- 51
 theorem inf_le_sup (nf : LeftNormalForm n) : nf.inf_ ≤ nf.sup_ := by
   simp [inf_, sup_]; omega
 
-def canonicalLength (nf : LeftNormalForm n) : Nat := nf.factors.length
+noncomputable def canonicalLength (nf : LeftNormalForm n) : Nat := nf.factors.length
 
 -- 52
 theorem identity_canonicalLength (n : Nat) : (identity n).canonicalLength = 0 := rfl
@@ -405,7 +405,7 @@ structure NormalFormMap (n : Nat) where
 namespace NormalFormMap
 
 -- 53: normalization path in quotient
-def normalize_path (nfm : NormalFormMap n) (w : BraidWord) :
+noncomputable def normalize_path (nfm : NormalFormMap n) (w : BraidWord) :
     Path (BraidElem.mk w) (BraidElem.mk (nfm.normalize w)) :=
   BraidElem.equivPath (nfm.equiv w)
 
@@ -428,12 +428,12 @@ theorem wordProblem_iff (nfm : NormalFormMap n) (w₁ w₂ : BraidWord) :
   ⟨nfm.respects w₁ w₂, equal_nf_implies_equiv nfm⟩
 
 -- 57: idempotent path
-def idempotent_path (nfm : NormalFormMap n) (w : BraidWord) :
+noncomputable def idempotent_path (nfm : NormalFormMap n) (w : BraidWord) :
     Path (nfm.normalize (nfm.normalize w)) (nfm.normalize w) :=
   Path.stepChain (nfm.idempotent w)
 
 -- 58: normal form diamond — w₁ → nf(w₁) = nf(w₂) → w₂
-def normalFormDiamondPath (nfm : NormalFormMap n) {w₁ w₂ : BraidWord}
+noncomputable def normalFormDiamondPath (nfm : NormalFormMap n) {w₁ w₂ : BraidWord}
     (h : BraidEquiv w₁ w₂) : Path (BraidElem.mk w₁) (BraidElem.mk w₂) :=
   let nf_eq := equiv_implies_equal_nf nfm h -- nf(w₁) = nf(w₂)
   Path.trans (normalize_path nfm w₁)
@@ -447,7 +447,7 @@ theorem diamondPath_toEq (nfm : NormalFormMap n) {w₁ w₂ : BraidWord}
     (normalFormDiamondPath nfm h).toEq = (BraidElem.equivPath h).toEq := by simp
 
 -- 60: roundtrip
-def roundTrip (nfm : NormalFormMap n) (w : BraidWord) :
+noncomputable def roundTrip (nfm : NormalFormMap n) (w : BraidWord) :
     Path (BraidElem.mk w) (BraidElem.mk w) :=
   Path.trans (normalize_path nfm w) (Path.symm (normalize_path nfm w))
 
@@ -473,7 +473,7 @@ end NormalFormMap
 structure WordProblemSolution (w₁ w₂ : BraidWord) where
   equivalent : BraidEquiv w₁ w₂
 
-def wordProblemPath {w₁ w₂ : BraidWord} (sol : WordProblemSolution w₁ w₂) :
+noncomputable def wordProblemPath {w₁ w₂ : BraidWord} (sol : WordProblemSolution w₁ w₂) :
     Path (BraidElem.mk w₁) (BraidElem.mk w₂) :=
   BraidElem.equivPath sol.equivalent
 
@@ -483,13 +483,13 @@ theorem wordProblem_unique_path {w₁ w₂ : BraidWord}
     (wordProblemPath s₁).toEq = (wordProblemPath s₂).toEq := by simp
 
 -- 65
-def wordProblem_trans {w₁ w₂ w₃ : BraidWord}
+noncomputable def wordProblem_trans {w₁ w₂ w₃ : BraidWord}
     (s₁ : WordProblemSolution w₁ w₂) (s₂ : WordProblemSolution w₂ w₃) :
     WordProblemSolution w₁ w₃ :=
   ⟨BraidEquiv.trans s₁.equivalent s₂.equivalent⟩
 
 -- 66
-def wordProblem_symm {w₁ w₂ : BraidWord}
+noncomputable def wordProblem_symm {w₁ w₂ : BraidWord}
     (s : WordProblemSolution w₁ w₂) : WordProblemSolution w₂ w₁ :=
   ⟨BraidEquiv.symm s.equivalent⟩
 
@@ -507,7 +507,7 @@ theorem wordProblem_symm_path {w₁ w₂ : BraidWord}
 
 /-! ## Confluence -/
 
-def Confluent (R : BraidWord → BraidWord → Prop) : Prop :=
+noncomputable def Confluent (R : BraidWord → BraidWord → Prop) : Prop :=
   ∀ w w₁ w₂, R w w₁ → R w w₂ → ∃ w₃, R w₁ w₃ ∧ R w₂ w₃
 
 -- 69: confluence in quotient
@@ -529,7 +529,7 @@ theorem all_paths_agree {w₁ w₂ : BraidWord}
 
 /-! ## Garside structure -/
 
-def LeftDivisible (a b : BraidWord) : Prop :=
+noncomputable def LeftDivisible (a b : BraidWord) : Prop :=
   ∃ c, BraidEquiv (BraidWord.mul a c) b
 
 -- 72
@@ -558,13 +558,13 @@ theorem empty_divides_delta (gs : GarsideStructure n) :
     LeftDivisible [] gs.delta_ := leftDivisible_empty gs.delta_
 
 -- 76: word problem solver
-def solveWordProblem (gs : GarsideStructure n) (w₁ w₂ : BraidWord)
+noncomputable def solveWordProblem (gs : GarsideStructure n) (w₁ w₂ : BraidWord)
     (h : gs.normalForm.normalize w₁ = gs.normalForm.normalize w₂) :
     WordProblemSolution w₁ w₂ :=
   ⟨NormalFormMap.equal_nf_implies_equiv gs.normalForm h⟩
 
 -- 77: word problem path
-def solveWordProblem_path (gs : GarsideStructure n) (w₁ w₂ : BraidWord)
+noncomputable def solveWordProblem_path (gs : GarsideStructure n) (w₁ w₂ : BraidWord)
     (h : gs.normalForm.normalize w₁ = gs.normalForm.normalize w₂) :
     Path (BraidElem.mk w₁) (BraidElem.mk w₂) :=
   wordProblemPath (solveWordProblem gs w₁ w₂ h)
@@ -612,13 +612,13 @@ structure DecyclingOp (n : Nat) where
     ∃ c, BraidEquiv (BraidWord.mul (BraidWord.mul c w) (BraidWord.inv c)) (decycle w)
 
 -- 82: cycling path
-def cyclingPath (cop : CyclingOp n) (w : BraidWord)
+noncomputable def cyclingPath (cop : CyclingOp n) (w : BraidWord)
     (h : BraidEquiv (cop.cycle w) w) :
     Path (BraidElem.mk (cop.cycle w)) (BraidElem.mk w) :=
   BraidElem.equivPath h
 
 -- 83: decycling path
-def decyclingPath (dop : DecyclingOp n) (w : BraidWord)
+noncomputable def decyclingPath (dop : DecyclingOp n) (w : BraidWord)
     (h : BraidEquiv (dop.decycle w) w) :
     Path (BraidElem.mk (dop.decycle w)) (BraidElem.mk w) :=
   BraidElem.equivPath h
@@ -633,7 +633,7 @@ theorem cycling_decycling_compose (cop : CyclingOp n) (dop : DecyclingOp n)
 
 /-! ## Conjugacy -/
 
-def BraidConjugate (w₁ w₂ : BraidWord) : Prop :=
+noncomputable def BraidConjugate (w₁ w₂ : BraidWord) : Prop :=
   ∃ c, BraidEquiv (BraidWord.mul (BraidWord.mul c w₁) (BraidWord.inv c)) w₂
 
 -- 85
@@ -641,7 +641,7 @@ theorem braidConjugate_refl (w : BraidWord) : BraidConjugate w w :=
   ⟨[], by simp [BraidWord.mul, BraidWord.inv]; exact BraidEquiv.refl w⟩
 
 -- 86: conjugacy path
-def conjugacyPath {w₁ w₂ : BraidWord} (c : BraidWord)
+noncomputable def conjugacyPath {w₁ w₂ : BraidWord} (c : BraidWord)
     (h : BraidEquiv (BraidWord.mul (BraidWord.mul c w₁) (BraidWord.inv c)) w₂) :
     Path (BraidElem.mk (BraidWord.mul (BraidWord.mul c w₁) (BraidWord.inv c)))
          (BraidElem.mk w₂) :=
@@ -680,7 +680,7 @@ theorem posBraidEquiv_to_braidEquiv {w₁ w₂ : BraidWord}
   | trans _ _ ih₁ ih₂ => exact BraidEquiv.trans ih₁ ih₂
 
 -- 89: positive equivalence path
-def posBraidEquivPath {w₁ w₂ : BraidWord} (h : PosBraidEquiv w₁ w₂) :
+noncomputable def posBraidEquivPath {w₁ w₂ : BraidWord} (h : PosBraidEquiv w₁ w₂) :
     Path (BraidElem.mk w₁) (BraidElem.mk w₂) :=
   BraidElem.equivPath (posBraidEquiv_to_braidEquiv h)
 
@@ -748,7 +748,7 @@ structure GarsideProgram (n : Nat) where
 namespace GarsideProgram
 
 -- 97
-def decideWordProblem (gp : GarsideProgram n) (w₁ w₂ : BraidWord)
+noncomputable def decideWordProblem (gp : GarsideProgram n) (w₁ w₂ : BraidWord)
     (h : gp.garside.normalForm.normalize w₁ = gp.garside.normalForm.normalize w₂) :
     Path (BraidElem.mk w₁) (BraidElem.mk w₂) :=
   GarsideStructure.solveWordProblem_path gp.garside w₁ w₂ h
@@ -839,24 +839,24 @@ structure NormalizationStep where
 /-! ## Summary statistics -/
 
 -- 109: identity element in quotient
-def braidIdentity : BraidElem := BraidElem.mk []
+noncomputable def braidIdentity : BraidElem := BraidElem.mk []
 
 -- 110: identity path
-def braidIdentityPath : Path braidIdentity braidIdentity := Path.refl braidIdentity
+noncomputable def braidIdentityPath : Path braidIdentity braidIdentity := Path.refl braidIdentity
 
 -- 111: generator in quotient
-def braidGenerator (i : Nat) : BraidElem := BraidElem.mk [BraidGen.pos i]
+noncomputable def braidGenerator (i : Nat) : BraidElem := BraidElem.mk [BraidGen.pos i]
 
 -- 112: inverse generator in quotient
-def braidInvGenerator (i : Nat) : BraidElem := BraidElem.mk [BraidGen.neg i]
+noncomputable def braidInvGenerator (i : Nat) : BraidElem := BraidElem.mk [BraidGen.neg i]
 
 -- 113: σ_i σ_i⁻¹ = identity (path)
-def generator_cancel_path (i : Nat) :
+noncomputable def generator_cancel_path (i : Nat) :
     Path (BraidElem.mk [BraidGen.pos i, BraidGen.neg i]) braidIdentity :=
   BraidElem.equivPath (BraidEquiv.generator_inv_cancel i)
 
 -- 114: σ_i⁻¹ σ_i = identity (path)
-def inv_generator_cancel_path (i : Nat) :
+noncomputable def inv_generator_cancel_path (i : Nat) :
     Path (BraidElem.mk [BraidGen.neg i, BraidGen.pos i]) braidIdentity :=
   BraidElem.equivPath (BraidEquiv.inv_generator_cancel i)
 

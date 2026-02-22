@@ -20,7 +20,7 @@ namespace PartialDeformation
 
 variable {A : Type u} {a b : A} {p₀ : Path a b} {n : Nat}
 
-@[simp] def terminal (D : PartialDeformation p₀ n) : Path a b :=
+@[simp] noncomputable def terminal (D : PartialDeformation p₀ n) : Path a b :=
   D.pathAt n
 
 noncomputable def prefixRwEq (D : PartialDeformation p₀ n) :
@@ -84,7 +84,7 @@ variable {A : Type u} {a b : A} {p₀ : Path a b} {n : Nat}
 variable {D : PartialDeformation p₀ n}
 
 /-- Primary obstruction loop at the target endpoint. -/
-@[simp] def obstructionLoop (oc : ObstructionCocycle D) : Path b b :=
+@[simp] noncomputable def obstructionLoop (oc : ObstructionCocycle D) : Path b b :=
   Path.trans (Path.symm oc.left) oc.right
 
 /-- Obstruction cocycle represented as an `RwEq` class. -/
@@ -93,15 +93,15 @@ noncomputable def obstructionClass (oc : ObstructionCocycle D) :
   rweqClassOf oc.obstructionLoop
 
 /-- Joinability phrased at the `RwEq` level. -/
-def Joinable (oc : ObstructionCocycle D) : Prop :=
+noncomputable def Joinable (oc : ObstructionCocycle D) : Prop :=
   ∃ r : Path a b, RwEq oc.left r ∧ RwEq oc.right r
 
 /-- Joinability in the `Rw` sense, as used in `CriticalPairs.lean`. -/
-def RwJoinable (oc : ObstructionCocycle D) : Prop :=
+noncomputable def RwJoinable (oc : ObstructionCocycle D) : Prop :=
   JoinableRw oc.left oc.right
 
 /-- Vanishing of the primary obstruction class. -/
-def Vanishes (oc : ObstructionCocycle D) : Prop :=
+noncomputable def Vanishes (oc : ObstructionCocycle D) : Prop :=
   RwEqProp oc.obstructionLoop (Path.refl b)
 
 /-- Two choices of extension data with `RwEq`-equivalent branches. -/
@@ -197,7 +197,7 @@ noncomputable def secondaryClass (τ : TodaRepresentative oc) :
     RwEqClass (A := A) (x := b) (y := b) :=
   rweqClassOf τ.secondary
 
-def GaugeEquivalent (τ₁ τ₂ : TodaRepresentative oc) : Prop :=
+noncomputable def GaugeEquivalent (τ₁ τ₂ : TodaRepresentative oc) : Prop :=
   RwEq τ₁.secondary τ₂.secondary
 
 theorem secondaryClass_eq_of_gauge
@@ -207,7 +207,7 @@ theorem secondaryClass_eq_of_gauge
   exact Quot.sound (rweqProp_of_rweq h)
 
 /-- Toda bracket as a right coset in the space of `RwEq` classes. -/
-def todaCoset (τ : TodaRepresentative oc) :
+noncomputable def todaCoset (τ : TodaRepresentative oc) :
     Set (RwEqClass (A := A) (x := b) (y := b)) :=
   fun cls => ∃ γ : Path b b, cls = rweqClassOf (Path.trans τ.secondary γ)
 

@@ -26,7 +26,7 @@ inductive OperadAlgebraStep {A : Type u} :
       OperadAlgebraStep (Path.trans p (Path.symm p)) (Path.refl a)
 
 /-- Interpret an operadic-algebra domain step as a primitive `Path.Step`. -/
-def OperadAlgebraStep.toStep {A : Type u} {a b : A} {p q : Path a b}
+noncomputable def OperadAlgebraStep.toStep {A : Type u} {a b : A} {p q : Path a b}
     (s : OperadAlgebraStep p q) : Path.Step p q :=
   match s with
   | .right_unit p => Path.Step.trans_refl_right p
@@ -82,7 +82,7 @@ noncomputable def equivariant_rweq
   rweq_of_operad_algebra_step (D.equivariantStep σ θ xs)
 
 /-- Round-trip path for a symmetry action witness. -/
-def actionRoundTrip
+noncomputable def actionRoundTrip
     {n : Nat} (σ : Path.Algebra.OperadTheory.Perm n) (θ : O.ops n) (xs : Fin n → A) :
     Path (D.act (O.action σ θ) xs) (D.act (O.action σ θ) xs) :=
   Path.trans (D.equivariantPath σ θ xs) (Path.symm (D.equivariantPath σ θ xs))
@@ -94,13 +94,13 @@ noncomputable def action_roundtrip_rweq
   exact rweq_cmpA_inv_right (D.equivariantPath σ θ xs)
 
 /-- Transport operad action data along a map of carrier types. -/
-def mapPath {B : Type w} (f : A → B) {x y : A} (p : Path x y) : Path (f x) (f y) :=
+noncomputable def mapPath {B : Type w} (f : A → B) {x y : A} (p : Path x y) : Path (f x) (f y) :=
   Path.congrArg f p
 
 end AlgebraOverOperadPathData
 
 /-- The trivial path-preserving algebra over any operad. -/
-def AlgebraOverOperadPathData.trivial (O : Path.Algebra.OperadTheory.CleanOperad) :
+noncomputable def AlgebraOverOperadPathData.trivial (O : Path.Algebra.OperadTheory.CleanOperad) :
     AlgebraOverOperadPathData O Unit where
   act := fun _ _ => ()
   unitActionPath := fun _ => Path.refl ()
@@ -110,7 +110,7 @@ def AlgebraOverOperadPathData.trivial (O : Path.Algebra.OperadTheory.CleanOperad
 
 /-- Upgrade an `OperadTheory.OperadAlgebra` to path-preserving coherence data,
 using an explicit unit path witness. -/
-def AlgebraOverOperadPathData.ofOperadAlgebra
+noncomputable def AlgebraOverOperadPathData.ofOperadAlgebra
     (O : Path.Algebra.OperadTheory.CleanOperad)
     (alg : Path.Algebra.OperadTheory.OperadAlgebra O)
     (unitPath : ∀ x : alg.carrier, Path (alg.act O.unit (fun _ => x)) x) :
@@ -159,7 +159,7 @@ noncomputable def map_action_rweq
   rweq_of_operad_algebra_step (f.mapActionStep θ xs)
 
 /-- Identity path-preserving operadic algebra morphism. -/
-def id (X : AlgebraOverOperadPathData O A) :
+noncomputable def id (X : AlgebraOverOperadPathData O A) :
     OperadAlgebraMorphismPathData X X where
   toFun := _root_.id
   mapActionPath := fun _ _ => Path.refl _

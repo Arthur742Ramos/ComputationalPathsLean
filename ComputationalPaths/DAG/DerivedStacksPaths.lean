@@ -60,7 +60,7 @@ noncomputable def descent_cancel_rweq {X Y : Obj}
 end DerivedStackPaths
 
 /-- Trivial derived-stack package with identity pullback and canonical steps. -/
-def trivialDerivedStackPaths (Obj : Type u) : DerivedStackPaths Obj where
+noncomputable def trivialDerivedStackPaths (Obj : Type u) : DerivedStackPaths Obj where
   atlas := fun _ => PUnit
   prestack := fun _ => PUnit
   pullback := fun _ _ => PUnit.unit

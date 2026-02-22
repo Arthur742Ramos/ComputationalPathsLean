@@ -34,23 +34,23 @@ section OrbitPath
 variable {G : Type u} {X : Type v} {S : StrictGroup G}
 
 /-- Path-valued orbit relation for a strict group action. -/
-def OrbitPath (A : GroupAction G S X) (x y : X) : Type (max u v) :=
+noncomputable def OrbitPath (A : GroupAction G S X) (x y : X) : Type (max u v) :=
   Σ g : G, Path (A.act g x) y
 
 /-- Forget the path witness to obtain the usual orbit relation. -/
-def orbitPath_to_orbit (A : GroupAction G S X) {x y : X} (h : OrbitPath A x y) :
+noncomputable def orbitPath_to_orbit (A : GroupAction G S X) {x y : X} (h : OrbitPath A x y) :
     A.Orbit x y := by
   rcases h with ⟨g, p⟩
   exact ⟨g, Path.toEq p⟩
 
 /-- Reflexive orbit path. -/
-def orbitPath_refl (A : GroupAction G S X) (x : X) :
+noncomputable def orbitPath_refl (A : GroupAction G S X) (x : X) :
     OrbitPath A x x := by
   refine ⟨S.one, ?_⟩
   exact Path.stepChain (GroupAction.act_one' A x)
 
 /-- Symmetry of orbit paths. -/
-def orbitPath_symm (A : GroupAction G S X) {x y : X} :
+noncomputable def orbitPath_symm (A : GroupAction G S X) {x y : X} :
     OrbitPath A x y → OrbitPath A y x := by
   intro h
   rcases h with ⟨g, p⟩
@@ -63,7 +63,7 @@ def orbitPath_symm (A : GroupAction G S X) {x y : X} :
   exact ⟨S.inv g, Path.stepChain hsymm⟩
 
 /-- Transitivity of orbit paths. -/
-def orbitPath_trans (A : GroupAction G S X) {x y z : X} :
+noncomputable def orbitPath_trans (A : GroupAction G S X) {x y z : X} :
     OrbitPath A x y → OrbitPath A y z → OrbitPath A x z := by
   intro h1 h2
   rcases h1 with ⟨g, p⟩
@@ -132,7 +132,7 @@ namespace IsHomogeneous
 variable {A : GroupAction G S X} [h : IsHomogeneous A]
 
 /-- Retrieve the orbit path between two points in a homogeneous action. -/
-def orbitPath (x y : X) : OrbitPath A x y :=
+noncomputable def orbitPath (x y : X) : OrbitPath A x y :=
   IsHomogeneous.transitive x y
 
 /-- Homogeneous actions are transitive in the usual orbit sense. -/
