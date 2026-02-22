@@ -379,12 +379,14 @@ theorem positive_scalar_preserved (flow : RicciFlowData) (mp : MaximumPrinciple 
 /-- Identity step is a left unit up to RwEq. -/
 def ricciStep_id_left (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
     RwEq (RicciStep.comp (RicciStep.identity g₀) s).step_eq s.step_eq := by
-  simp [RicciStep.comp, RicciStep.identity]
+  simpa [RicciStep.comp, RicciStep.identity] using
+    (RwEq.step (Step.trans_refl_right s.step_eq))
 
 /-- Identity step is a right unit up to RwEq. -/
 def ricciStep_id_right (g₀ g₁ : RiemannianMetric) (s : RicciStep g₀ g₁) :
     RwEq (RicciStep.comp s (RicciStep.identity g₁)).step_eq s.step_eq := by
-  simp [RicciStep.comp, RicciStep.identity]
+  simpa [RicciStep.comp, RicciStep.identity] using
+    (RwEq.step (Step.trans_refl_left s.step_eq))
 
 /-- F-entropy is non-decreasing under the flow. -/
 theorem fentropy_gradient_flow (flow : RicciFlowData) (fm : FEntropyMonotonicity flow)
