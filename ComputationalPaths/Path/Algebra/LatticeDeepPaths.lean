@@ -18,7 +18,6 @@ THREE GATES:
 -/
 
 import ComputationalPaths.Path.Basic
-import Mathlib.Order.MinMax
 
 namespace ComputationalPaths.Path.Algebra.LatticeDeepPaths
 
@@ -50,92 +49,61 @@ def latTop (n : Nat) : LatElem := ⟨n⟩
 
 /-! ## Equality-level lattice laws (used only to justify primitive steps) -/
 
+private theorem latElem_ext {a b : LatElem} (h : a.val = b.val) : a = b := by
+  cases a; cases b; simp at h; exact congrArg _ h
+
 theorem meet_comm (a b : LatElem) : meet a b = meet b a := by
-  simp [meet, Nat.min_comm]
+  apply latElem_ext; simp [meet, Nat.min_comm]
 
 theorem join_comm (a b : LatElem) : join a b = join b a := by
-  simp [join, Nat.max_comm]
+  apply latElem_ext; simp [join, Nat.max_comm]
 
 theorem meet_assoc (a b c : LatElem) : meet (meet a b) c = meet a (meet b c) := by
-  simp [meet, Nat.min_assoc]
+  apply latElem_ext; simp [meet, Nat.min_assoc]
 
 theorem join_assoc (a b c : LatElem) : join (join a b) c = join a (join b c) := by
-  simp [join, Nat.max_assoc]
+  apply latElem_ext; simp [join, Nat.max_assoc]
 
 theorem meet_idem (a : LatElem) : meet a a = a := by
-  simp [meet]
+  apply latElem_ext; simp [meet]
 
 theorem join_idem (a : LatElem) : join a a = a := by
-  simp [join]
+  apply latElem_ext; simp [join]
 
 theorem join_bot (a : LatElem) : join latBot a = a := by
-  simp [join, latBot]
+  apply latElem_ext; simp [join, latBot]
 
 theorem meet_bot_left (a : LatElem) : meet latBot a = latBot := by
-  simp [meet, latBot]
+  apply latElem_ext; simp [meet, latBot]
 
 theorem meet_bot_right (a : LatElem) : meet a latBot = latBot := by
-  simp [meet, latBot]
+  apply latElem_ext; simp [meet, latBot]
 
 theorem join_bot_right (a : LatElem) : join a latBot = a := by
-  simp [join, latBot]
+  apply latElem_ext; simp [join, latBot]
 
 /-- Absorption: `a ∧ (a ∨ b) = a`. -/
 theorem absorption_meet_join (a b : LatElem) : meet a (join a b) = a := by
-  cases a with
-  | mk av =>
-    cases b with
-    | mk bv =>
-      -- `min av (max av bv) = av` since `av ≤ max av bv`.
-      simp [meet, join, Nat.min_eq_left, le_max_left]
+  apply latElem_ext; simp [meet, join]; omega
 
 /-- Absorption: `a ∨ (a ∧ b) = a`. -/
 theorem absorption_join_meet (a b : LatElem) : join a (meet a b) = a := by
-  cases a with
-  | mk av =>
-    cases b with
-    | mk bv =>
-      -- `max av (min av bv) = av` since `min av bv ≤ av`.
-      simp [join, meet, max_eq_left, min_le_left]
+  apply latElem_ext; simp [join, meet]; omega
 
 /-- Distributive law: `a ∧ (b ∨ c) = (a ∧ b) ∨ (a ∧ c)`. -/
 theorem distributive_meet_join (a b c : LatElem) :
     meet a (join b c) = join (meet a b) (meet a c) := by
-  cases a with
-  | mk av =>
-    cases b with
-    | mk bv =>
-      cases c with
-      | mk cv =>
-        -- `min a (max b c) = max (min a b) (min a c)`
-        simp [meet, join, min_max_distrib_left]
+  apply latElem_ext; simp [meet, join]; omega
 
 /-- Dual distributive: `a ∨ (b ∧ c) = (a ∨ b) ∧ (a ∨ c)`. -/
 theorem distributive_join_meet (a b c : LatElem) :
     join a (meet b c) = meet (join a b) (join a c) := by
-  cases a with
-  | mk av =>
-    cases b with
-    | mk bv =>
-      cases c with
-      | mk cv =>
-        -- `max a (min b c) = min (max a b) (max a c)`
-        simp [join, meet, max_min_distrib_left]
+  apply latElem_ext; simp [join, meet]; omega
 
 /-- Modular law: if a ≤ c then a ∨ (b ∧ c) = (a ∨ b) ∧ c. -/
 theorem modular_law (a b c : LatElem) (h : a.val ≤ c.val) :
     join a (meet b c) = meet (join a b) c := by
-  cases a with
-  | mk av =>
-    cases b with
-    | mk bv =>
-      cases c with
-      | mk cv =>
-        -- from distributivity: `max av (min bv cv) = min (max av bv) (max av cv)`
-        -- and since `av ≤ cv`, we have `max av cv = cv`.
-        have hmax : max av cv = cv := max_eq_right h
-        -- reduce to `Nat` equation
-        simp [join, meet, max_min_distrib_left, hmax]
+  apply latElem_ext; simp [join, meet]; omega
 
 /-! ## A small rewriting language: `YourObj` / `YourStep` / `YourPath` -/
 

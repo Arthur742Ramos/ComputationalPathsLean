@@ -204,7 +204,7 @@ noncomputable def map_unmap_rweq (E : CategoricalEquivalence C D F G) {x y : C}
       (rweq_trans hCancel (rweq_cmpA_refl_left q))
 
 /-- Categorical equivalences induce equivalences on path spaces. -/
-def inducedPathEquiv (E : CategoricalEquivalence C D F G) (x y : C) :
+noncomputable def inducedPathEquiv (E : CategoricalEquivalence C D F G) (x y : C) :
     RwPathEquiv x y (F x) (F y) where
   toFun := mapPath E
   invFun := unmapPath E

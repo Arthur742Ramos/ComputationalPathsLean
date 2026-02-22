@@ -247,7 +247,7 @@ theorem cohomology_homotopy_invariance (T : InfinityTopos.{u,v})
   intros; rfl
 
 /-- Mayer-Vietoris: for a pushout X = U ∪_W V, there is a long exact sequence. -/
-noncomputable theorem mayer_vietoris (T : InfinityTopos.{u,v})
+theorem mayer_vietoris (T : InfinityTopos.{u,v})
     (U V W X A : T.carrier.Obj) (n : Nat)
     (i : T.carrier.Hom X W) :
     ∃ (connecting : cohomology T W A n → cohomology T X A (n + 1)), True :=
