@@ -2390,12 +2390,16 @@ theorem pushoutPiOneInl_mul (α β : π₁(A, f c₀)) :
   | _ p =>
     induction β using Quot.ind with
     | _ q =>
+      change Quot.mk _ (Pushout.inlPath (Path.trans p q)) =
+        Quot.mk _ (Path.trans (Pushout.inlPath p) (Pushout.inlPath q))
       apply Quot.sound
       simp [Pushout.inlPath]
 
 theorem pushoutPiOneInl_zero :
     pushoutPiOneInl (A := A) (B := B) (C := C) (f := f) (g := g) c₀ (0 : π₁(A, f c₀)) =
       Quot.mk _ (Path.refl (Pushout.inl (f c₀))) := by
+  change Quot.mk _ (Pushout.inlPath (Path.refl (f c₀))) =
+    Quot.mk _ (Path.refl (Pushout.inl (f c₀)))
   apply Quot.sound
   simp [Pushout.inlPath]
 
@@ -2408,6 +2412,20 @@ theorem pushoutPiOneInr_mul (β₁ β₂ : π₁(B, g c₀)) :
   | _ p =>
     induction β₂ using Quot.ind with
     | _ q =>
+      let glue₀ := Pushout.glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀
+      change Quot.mk _ (Path.trans glue₀
+        (Path.trans
+          (Pushout.inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.trans p q))
+          (Path.symm glue₀))) =
+        Quot.mk _ (Path.trans
+          (Path.trans glue₀
+            (Path.trans
+              (Pushout.inrPath (A := A) (B := B) (C := C) (f := f) (g := g) p)
+              (Path.symm glue₀)))
+          (Path.trans glue₀
+            (Path.trans
+              (Pushout.inrPath (A := A) (B := B) (C := C) (f := f) (g := g) q)
+              (Path.symm glue₀))))
       apply Quot.sound
       -- Expand conjugation and reassociate/cancel to match the conjugate of `p ⋅ q`.
       -- This is standard: (g p g⁻¹) ⋅ (g q g⁻¹) = g (p ⋅ q) g⁻¹.
@@ -2422,8 +2440,6 @@ theorem pushoutPiOneInr_mul (β₁ β₂ : π₁(B, g c₀)) :
         simp [Pushout.inrPath]
 
       -- Now compare the two conjugation composites up to RwEq.
-      let glue₀ := Pushout.glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀
-
       -- Right side is:
       -- (glue ⋅ inrPath p ⋅ glue⁻¹) ⋅ (glue ⋅ inrPath q ⋅ glue⁻¹)
       -- = glue ⋅ inrPath p ⋅ (glue⁻¹ ⋅ glue) ⋅ inrPath q ⋅ glue⁻¹
@@ -2610,7 +2626,7 @@ theorem pushoutPiOneInr_mul (β₁ β₂ : π₁(B, g c₀)) :
       -- Chain everything together.
       -- The chain above rewrites the product of conjugates into the conjugate of `p ⋅ q`,
       -- so we take `symm` to match the goal's direction.
-      exact
+      exact rweqProp_of_rweq <|
         (RwEq.trans hassoc1
             (RwEq.trans hassoc2
               (RwEq.trans hmid (RwEq.trans hmid2 hfin)))).symm
@@ -2620,18 +2636,24 @@ theorem pushoutDecode_consLeft (α : π₁(A, f c₀)) (rest : PushoutCode A B C
       piOneMul
         (pushoutPiOneInl (A := A) (B := B) (C := C) (f := f) (g := g) c₀ α)
         (pushoutDecode (A := A) (B := B) (C := C) (f := f) (g := g) c₀ rest) := by
-  rfl
+  simp [pushoutDecode, pushoutPiOneInl]
 
 theorem pushoutDecode_consRight (β : π₁(B, g c₀)) (rest : PushoutCode A B C f g c₀) :
     pushoutDecode (A := A) (B := B) (C := C) (f := f) (g := g) c₀ (.consRight β rest) =
       piOneMul
         (pushoutPiOneInr (A := A) (B := B) (C := C) (f := f) (g := g) c₀ β)
         (pushoutDecode (A := A) (B := B) (C := C) (f := f) (g := g) c₀ rest) := by
-  rfl
+  simp [pushoutDecode, pushoutPiOneInr]
 
 theorem pushoutPiOneInr_zero :
     pushoutPiOneInr (A := A) (B := B) (C := C) (f := f) (g := g) c₀ (0 : π₁(B, g c₀)) =
       Quot.mk _ (Path.refl (Pushout.inl (f c₀))) := by
+  change Quot.mk _ (Path.trans
+      (Pushout.glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀)
+      (Path.trans
+        (Pushout.inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.refl (g c₀)))
+        (Path.symm (Pushout.glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀)))) =
+    Quot.mk _ (Path.refl (Pushout.inl (f c₀)))
   -- Conjugation of the identity loop is the identity.
   apply Quot.sound
   let glue₀ := Pushout.glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀
@@ -2649,8 +2671,7 @@ theorem pushoutPiOneInr_zero :
             (Path.symm glue₀)))
         (Path.trans glue₀ (Path.symm glue₀)) := by
     exact rweq_trans_congr_right _ (rweq_trans_congr_left _ hinr)
-  exact
-    RwEq.trans hstep (rweq_cmpA_inv_right glue₀)
+  exact rweqProp_of_rweq (RwEq.trans hstep (rweq_cmpA_inv_right glue₀))
 
 theorem pushoutDecode_respects_freeGroupStep
     {w₁ w₂ : PushoutCode A B C f g c₀}
@@ -3448,9 +3469,9 @@ theorem wedgeFreeProductDecode_eq_pushoutDecode (a₀ : A) (b₀ : B) :
   induction w with
   | nil => rfl
   | consLeft α rest ih =>
-      simp only [wedgeFreeProductDecode, pushoutDecode, ih]
+      simp only [wedgeFreeProductDecode, pushoutDecode_consLeft, pushoutPiOneInl, ih]
   | consRight β rest ih =>
-      simp only [wedgeFreeProductDecode, pushoutDecode, ih, Wedge.glue]
+      simp only [wedgeFreeProductDecode, pushoutDecode_consRight, pushoutPiOneInr, ih, Wedge.glue]
 
 /-! Decode after encode gives back the original loop (at π₁ level).
 

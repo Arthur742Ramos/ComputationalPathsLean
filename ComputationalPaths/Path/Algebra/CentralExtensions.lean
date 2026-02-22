@@ -146,7 +146,7 @@ structure SchurMultiplier (G : Type u) where
   abelian : AbelianGroupData carrier
   /-- For every central extension, the kernel relates to the multiplier. -/
   universal : ∀ (E : Type v) (ext : CentralExtension carrier E G),
-    Path (ext.projection (ext.extension.one)) grp.one
+    Path (ext.projection (ext.extension.one)) ext.quotient_grp.one
 
 /-- Trivial Schur multiplier. -/
 def SchurMultiplier.trivialUnit (G : Type u) (gd : GroupData G) : SchurMultiplier G where
@@ -162,8 +162,35 @@ def SchurMultiplier.trivialUnit (G : Type u) (gd : GroupData G) : SchurMultiplie
     mul_left_inv := fun _ => rfl
     mul_comm := fun _ _ => rfl
   }
-  universal := fun _ ext => by
-    exact ext.exact_at_E PUnit.unit
+  universal := fun _ ext =>
+    -- π(1_E) = 1_G because π is a group homomorphism
+    -- Proof: 1·1 = 1, so π(1·1) = π(1), but also π(1·1) = π(1)·π(1)
+    -- Hence π(1) = π(1)·π(1), and by left-cancel with π(1)⁻¹ we get π(1) = 1
+    let e := ext.extension.one
+    let πe := ext.projection e
+    have h_proj_mul := (ext.proj_mul e e).toEq
+    have h_one_mul := congr_arg ext.projection (ext.extension.one_mul e)
+    -- πe = πe * πe
+    have h_idem : πe = ext.quotient_grp.mul πe πe := by
+      rw [← h_one_mul, h_proj_mul]
+    -- inv(πe) * πe = 1
+    have h_left_inv := ext.quotient_grp.mul_left_inv πe
+    -- inv(πe) * (πe * πe) = (inv(πe) * πe) * πe = 1 * πe = πe
+    -- But also inv(πe) * πe = 1, so from idempotence:
+    -- 1 = inv(πe) * πe = inv(πe) * (πe * πe)
+    --   = (inv(πe) * πe) * πe = 1 * πe = πe
+    Path.stepChain (by
+      have := ext.quotient_grp.mul_left_inv πe
+      -- this : mul (inv πe) πe = one
+      calc πe = ext.quotient_grp.mul ext.quotient_grp.one πe := by
+                rw [ext.quotient_grp.one_mul]
+            _ = ext.quotient_grp.mul (ext.quotient_grp.mul (ext.quotient_grp.inv πe) πe) πe := by
+                rw [this]
+            _ = ext.quotient_grp.mul (ext.quotient_grp.inv πe) (ext.quotient_grp.mul πe πe) := by
+                rw [ext.quotient_grp.mul_assoc]
+            _ = ext.quotient_grp.mul (ext.quotient_grp.inv πe) πe := by
+                rw [← h_idem]
+            _ = ext.quotient_grp.one := this)
 
 /-! ## Universal Central Extension -/
 
@@ -200,7 +227,7 @@ structure StemExtension (A : Type u) (E : Type v) (G : Type w)
                   (extension.mul (extension.inv x) (extension.inv y))
   /-- Every element of A is a product of commutators. -/
   stem_property : ∀ a : A,
-    ∃ x y : E, Path (injection a) (commutator x y)
+    ∃ x y : E, (injection a) = (commutator x y)
 
 /-! ## H² Group Data -/
 
@@ -252,7 +279,7 @@ def H2Group.trivialUnit (G : Type u) (gd : GroupData G) : H2Group G PUnit where
 /-! ## Rewrite Steps -/
 
 /-- Rewrite steps for central extension reasoning. -/
-inductive CentralExtStep : {A : Type u} → A → A → Prop
+inductive CentralExtStep : {A : Type u} → A → A → Type (u + 1)
   | cocycle_normalize {G A : Type u} {gd : GroupData G} {ad : AbelianGroupData A}
       {f : TwoCocycle G A gd ad} {g : G} :
       CentralExtStep (f.toFun gd.one g) ad.one
