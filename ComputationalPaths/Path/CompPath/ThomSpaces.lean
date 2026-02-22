@@ -49,7 +49,7 @@ abbrev ThomIsomorphism (H : ReducedCohomologyTheory) {K B Total V : Type u}
   Homotopy.ThomSpectra.ThomIsomorphism H bundle Th b0
 
 /-- Basepointed helper used in Thom constructions (alias). -/
-abbrev thomBasePointed (B : Type u) (b : B) : SuspensionLoop.Pointed :=
+noncomputable def thomBasePointed (B : Type u) (b : B) : SuspensionLoop.Pointed :=
   Homotopy.ThomSpectra.basePointed B b
 
 /-! ## Orientation theory -/

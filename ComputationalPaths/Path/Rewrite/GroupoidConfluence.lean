@@ -234,14 +234,14 @@ inductive Gen where
   deriving DecidableEq
 
 namespace Gen
-noncomputable def inv : Gen → Gen | .pos n => .neg n | .neg n => .pos n
+def inv : Gen → Gen | .pos n => .neg n | .neg n => .pos n
 @[simp] theorem inv_inv (g : Gen) : g.inv.inv = g := by cases g <;> rfl
 theorem inv_ne (g : Gen) : g.inv ≠ g := by cases g <;> simp [inv]
-noncomputable def toExpr : Gen → Expr | .pos n => .atom n | .neg n => .symm (.atom n)
+def toExpr : Gen → Expr | .pos n => .atom n | .neg n => .symm (.atom n)
 end Gen
 
 /-- No adjacent inverse pair. -/
-noncomputable def Reduced : List Gen → Prop
+def Reduced : List Gen → Prop
   | [] | [_] => True
   | g :: h :: rest => g.inv ≠ h ∧ Reduced (h :: rest)
 
@@ -249,7 +249,7 @@ theorem reduced_tail {g : Gen} {w : List Gen} (h : Reduced (g :: w)) :
     Reduced w := by cases w with | nil => trivial | cons _ _ => exact h.2
 
 /-- Prepend with cancellation. -/
-noncomputable def prepend (g : Gen) : List Gen → List Gen
+def prepend (g : Gen) : List Gen → List Gen
   | [] => [g]
   | h :: rest => if g.inv = h then rest else g :: h :: rest
 
@@ -297,7 +297,7 @@ theorem prepend_inv_cancel (g : Gen) (w : List Gen) (hw : Reduced w) :
       rw [h1', prepend_cancel g (k :: rest)]
 
 /-- Concatenation with cancellation at junction. -/
-noncomputable def rwAppend : List Gen → List Gen → List Gen
+def rwAppend : List Gen → List Gen → List Gen
   | [], w₂ => w₂
   | g :: rest, w₂ => prepend g (rwAppend rest w₂)
 
@@ -350,7 +350,7 @@ theorem rwAppend_single (g : Gen) (w : List Gen) :
     rwAppend [g] w = prepend g w := rfl
 
 /-- Inversion. -/
-noncomputable def rwInv : List Gen → List Gen
+def rwInv : List Gen → List Gen
   | [] => []
   | g :: rest => rwAppend (rwInv rest) [g.inv]
 
@@ -456,7 +456,7 @@ group. This is the homomorphism from the term algebra to the free group
 that makes the groupoid TRS sound. -/
 
 /-- Semantic interpretation of an expression as a reduced word. -/
-noncomputable def toRW : Expr → List Gen
+def toRW : Expr → List Gen
   | .atom n => [.pos n]
   | .refl => []
   | .symm e => rwInv (toRW e)
@@ -467,7 +467,7 @@ noncomputable def expr_eq_decidable (e₁ e₂ : Expr) : Decidable (e₁ = e₂)
   inferInstance
 
 /-- Equality of interpreted free-group words is decidable. -/
-noncomputable def toRW_eq_decidable (e₁ e₂ : Expr) : Decidable (toRW e₁ = toRW e₂) :=
+def toRW_eq_decidable (e₁ e₂ : Expr) : Decidable (toRW e₁ = toRW e₂) :=
   inferInstance
 
 theorem toRW_reduced : ∀ (e : Expr), Reduced (toRW e)
@@ -525,13 +525,13 @@ and `reach_symm` as building blocks. -/
 
 /-- Convert a reduced word back to an Expr.
     `[] ↦ refl`, `[g] ↦ g.toExpr`, `g :: rest ↦ trans g.toExpr (rwToExpr rest)` -/
-noncomputable def rwToExpr : List Gen → Expr
+def rwToExpr : List Gen → Expr
   | [] => .refl
   | [g] => g.toExpr
   | g :: h :: rest => .trans g.toExpr (rwToExpr (h :: rest))
 
 /-- The canonical form. -/
-noncomputable def canon (e : Expr) : Expr := rwToExpr (toRW e)
+def canon (e : Expr) : Expr := rwToExpr (toRW e)
 
 @[simp] theorem toRW_gen_toExpr (g : Gen) : toRW g.toExpr = [g] := by
   cases g <;> rfl

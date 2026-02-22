@@ -19,8 +19,8 @@ universe u v w
 /-! ## Equivalences -/
 
 /-- Homotopy between functions. -/
-noncomputable def Homotopy {A : Type u} {B : Type v} (f g : A → B) : Type u :=
-  (a : A) → f a = g a
+noncomputable def Homotopy {A : Type u} {B : Type v} (f g : A → B) : Prop :=
+  ∀ (a : A), f a = g a
 
 /-- A function is an equivalence (biinvertible map). -/
 structure IsEquiv {A : Type u} {B : Type v} (f : A → B) where
@@ -40,11 +40,17 @@ infixl:25 " ≃' " => Equiv'
 /-- Identity-to-equivalence: given A = B, transport gives A ≃' B. -/
 noncomputable def idtoeqv {A B : Type u} (p : A = B) : Equiv' A B :=
   ⟨fun a => p ▸ a, ⟨fun b => p ▸ b,
-    fun a => by cases p; rfl,
-    fun b => by cases p; rfl⟩⟩
+    fun a => by subst p; rfl,
+    fun b => by subst p; rfl⟩⟩
 
-/-- The univalence axiom: idtoeqv is itself an equivalence. -/
-axiom univalence (A B : Type u) : IsEquiv (@idtoeqv A B)
+/-- The univalence axiom: idtoeqv has an inverse (stated as data). -/
+axiom univalence_inv (A B : Type u) : Equiv' A B → (A = B)
+/-- The univalence section: roundtripping through idtoeqv ∘ ua is the identity. -/
+axiom univalence_sect (A B : Type u) (e : Equiv' A B) :
+    idtoeqv (univalence_inv A B e) = e
+/-- The univalence retraction: roundtripping through ua ∘ idtoeqv is the identity. -/
+axiom univalence_retr (A B : Type u) (p : A = B) :
+    univalence_inv A B (idtoeqv p) = p
 
 
 /-- Transport along a universe path is the underlying function. -/

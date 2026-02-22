@@ -71,7 +71,7 @@ abbrev EG (G : Type u) : Type u :=
   MilnorJoin G
 
 /-- Include a group element into `EG`. -/
-abbrev egStage {G : Type u} (g : G) : EG G :=
+noncomputable def egStage {G : Type u} (g : G) : EG G :=
   milnorJoinStage g
 
 /-- The projection `EG → BG`, constant to the basepoint. -/

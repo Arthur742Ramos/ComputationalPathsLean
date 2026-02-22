@@ -85,12 +85,14 @@ structure SymmetricSequence (S : Type u) where
   /-- Σ_n action on level n. -/
   sigma_action : (n : Nat) → PermAction (level n)
 
-/-- Equivariant map between symmetric sequences. -/
+/-- Equivariant map between symmetric sequences with shared group. -/
 structure SymSeqMorphism (S : Type u) (src tgt : SymmetricSequence S) where
   map : (n : Nat) → src.level n → tgt.level n
+  /-- Carriers of the symmetric group actions match. -/
+  carrier_eq : ∀ (n : Nat), (src.sigma_action n).carrier = (tgt.sigma_action n).carrier
   equivariant : ∀ (n : Nat) (g : (src.sigma_action n).carrier) (x : src.level n),
-    Path       (map n ((src.sigma_action n).act g x))
-      ((tgt.sigma_action n).act g (map n x))
+    Path (map n ((src.sigma_action n).act g x))
+      ((tgt.sigma_action n).act (_root_.cast (carrier_eq n) g) (map n x))
 
 /-! ## Day Convolution -/
 
@@ -242,7 +244,7 @@ structure SmashAssocRwEq (S : Type u) (E F G : LevelData S)
     Path       (forward n (backward n y)) y
 
 /-- Smash associativity coherence as a concrete theorem. -/
-theorem smash_assoc_coherence (S : Type u)
+noncomputable def smash_assoc_coherence (S : Type u)
     (E F G : LevelData S)
     (EF : SmashProductData S E F)
     (EFG_left : SmashProductData S EF.result G)
@@ -270,10 +272,10 @@ noncomputable def SpectrumMap.comp (S : Type u) {a b c : LevelData S}
     structure_compat := fun n x =>
       Path.trans
         (g.structure_compat n (f.level_map n x))
-        (Path.refl _) }
+        (Path.congrArg (g.level_map (n + 1)) (f.structure_compat n x)) }
 
 /-- Ω-spectrum map composition preserves the Ω-property. -/
-theorem omega_spectrum_compose (S : Type u) (E F : OmegaSpectrum S)
+noncomputable def omega_spectrum_compose (S : Type u) (E F : OmegaSpectrum S)
     (f : SpectrumMap S E.levels F.levels)
     (n : Nat) (x : E.levels.space n) :
     Path
@@ -302,7 +304,7 @@ structure StableFibration (S : Type u) (src tgt : LevelData S) extends
       (src.structure_map n x)
 
 /-- Every stable equivalence between Ω-spectra is a levelwise equivalence. -/
-theorem stable_equiv_of_omega (S : Type u) (E F : OmegaSpectrum S)
+noncomputable def stable_equiv_of_omega (S : Type u) (E F : OmegaSpectrum S)
     (f : StableEquivalenceData S E.levels F.levels)
     (n : Nat) (x : E.levels.space n) :
     Path

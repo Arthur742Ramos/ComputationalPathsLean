@@ -32,8 +32,6 @@ free product collapses to the trivial group regardless of what π₁(C) is.
 -/
 
 import ComputationalPaths.Path.HIT.Pushout
--- import ComputationalPaths.Path.HIT.PushoutPaths  -- does not exist
--- import ComputationalPaths.Path.HIT.Circle  -- does not exist
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Sets
@@ -44,11 +42,20 @@ namespace Path
 
 universe u
 
+/-! ## Circle as Suspension of Bool -/
+
+/-- The circle S¹, defined as the suspension of Bool. -/
+abbrev Circle : Type u := Suspension (ULift.{u} Bool)
+
+instance nonemptyULiftBool : Nonempty (ULift.{u} Bool) := ⟨⟨true⟩⟩
+noncomputable instance nonemptyCircle : Nonempty (Circle : Type u) :=
+  ⟨@Suspension.north (ULift.{u} Bool)⟩
+
 /-! ## The 2-Sphere as Suspension of S¹ -/
 
 /-- The 2-sphere S², defined as the suspension of the circle.
     S² = Σ(S¹) = Pushout PUnit' PUnit' Circle -/
-noncomputable def Sphere2 : Type u := Suspension Circle
+abbrev Sphere2 : Type u := Suspension Circle
 
 namespace Sphere2
 
@@ -67,9 +74,9 @@ noncomputable def basepoint : Sphere2 := north
 
 noncomputable instance : Nonempty Sphere2 := ⟨basepoint⟩
 
-noncomputable instance : Subsingleton Sphere2 := by
-  unfold Sphere2 Suspension
-  infer_instance
+noncomputable instance subsingletonSphere2 : Subsingleton (Sphere2 : Type u) :=
+  @Pushout.instSubsingleton_of_subsingleton_of_nonempty
+    PUnit' PUnit' Circle (fun _ => PUnit'.unit) (fun _ => PUnit'.unit) _ _ _
 
 /-! ## Path Connectivity of S²
 
@@ -118,7 +125,7 @@ theorem punit_pi1_trivial :
   induction α using Quot.ind with
   | _ p =>
     apply Quot.sound
-    exact punit_loops_rweq p (Path.refl _)
+    exact (punit_loops_rweq p (Path.refl _) : rwEqRel _ _ _ p (Path.refl _))
 
 /-- The trivial group structure: π₁(PUnit') ≃ Unit. -/
 noncomputable def punit_pi1_equiv_unit :
@@ -154,10 +161,10 @@ By SVK:
 -/
 
 /-- The constant map from Circle to PUnit'. -/
-noncomputable def circleToNorth : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
+noncomputable def circleToNorth : Circle → PUnit'.{u} := fun _ => PUnit'.unit
 
 /-- The constant map from Circle to PUnit'. -/
-noncomputable def circleToSouth : Circle.{u} → PUnit'.{u} := fun _ => PUnit'.unit
+noncomputable def circleToSouth : Circle → PUnit'.{u} := fun _ => PUnit'.unit
 
 /-! ## Key Lemmas for Trivial Decode
 
@@ -198,7 +205,7 @@ theorem trivial_left_inclusion
     (α : π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u}))) :
     (Quot.lift
       (fun p => Quot.mk _ (Pushout.inlPath p))
-      (fun _ _ hp => Quot.sound (rweq_congrArg_of_rweq Pushout.inl hp))
+      (fun _ _ hp => Quot.sound (rweqProp_of_rweq (rweq_congrArg_of_rweq Pushout.inl (rweq_of_rweqProp hp))))
       α : π₁(Pushout PUnit'.{u} PUnit'.{u} C f g, Pushout.inl (f c₀))) =
     Quot.mk _ (Path.refl _) := by
   -- Since α : π₁(PUnit'), we have α = Quot.mk _ refl
@@ -218,9 +225,9 @@ theorem trivial_right_inclusion
           (Pushout.glue c₀)
           (Path.trans (Pushout.inrPath q)
             (Path.symm (Pushout.glue c₀)))))
-      (fun _ _ hq => Quot.sound (
+      (fun _ _ hq => Quot.sound (rweqProp_of_rweq (
         rweq_trans_congr_right _ (rweq_trans_congr_left _
-          (rweq_congrArg_of_rweq Pushout.inr hq))))
+          (rweq_congrArg_of_rweq Pushout.inr (rweq_of_rweqProp hq))))))
       β : π₁(Pushout PUnit'.{u} PUnit'.{u} C f g, Pushout.inl (f c₀))) =
     Quot.mk _ (Path.refl _) := by
   -- Since β : π₁(PUnit'), we have β = Quot.mk _ refl
@@ -231,53 +238,16 @@ theorem trivial_right_inclusion
   show Quot.mk _ (Path.trans (Pushout.glue c₀)
     (Path.trans (Path.refl _) (Path.symm (Pushout.glue c₀)))) = Quot.mk _ (Path.refl _)
   apply Quot.sound
-  exact glue_conj_refl_rweq c₀
+  exact rweqProp_of_rweq (glue_conj_refl_rweq c₀)
 
-/-- The decode function on words over trivial groups produces the identity element.
-    This is the key lemma: when both factors π₁(A) and π₁(B) are trivial,
-    every word in the free product decodes to refl. -/
-theorem trivial_decode
-    {C : Type u} (f : C → PUnit'.{u}) (g : C → PUnit'.{u}) (c₀ : C)
-    (w : FreeProductWord
-      (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u})))
-      (π₁(PUnit'.{u}, (PUnit'.unit : PUnit'.{u})))) :
-    pushoutDecode (f := f) (g := g) c₀ w = Quot.mk _ (Path.refl _) := by
-  induction w with
-  | nil =>
-      -- decode nil = Quot.mk _ refl by definition
-      rfl
-  | consLeft α rest ih =>
-      -- decode (consLeft α rest) = piOneMul (αInPushout) (decode rest)
-      -- By trivial_left_inclusion: αInPushout = Quot.mk _ refl
-      -- By ih: decode rest = Quot.mk _ refl
-      -- By piOneMul_refl_left: piOneMul (Quot.mk _ refl) x = x
-      simp only [pushoutDecode]
-      rw [trivial_left_inclusion c₀ α]
-      rw [ih]
-      exact piOneMul_refl_left _
-  | consRight β rest ih =>
-      -- decode (consRight β rest) = piOneMul (βInPushout) (decode rest)
-      -- By trivial_right_inclusion: βInPushout = Quot.mk _ refl
-      -- By ih: decode rest = Quot.mk _ refl
-      -- By piOneMul_refl_left: piOneMul (Quot.mk _ refl) x = x
-      simp only [pushoutDecode]
-      rw [trivial_right_inclusion c₀ β]
-      rw [ih]
-      exact piOneMul_refl_left _
+/- The decode function and amalgamated free product triviality theorems
+   require FreeProductWord / AmalgamatedFreeProduct from CompPath.PushoutPaths.
+   The main theorem sphere2_pi1_trivial below uses pi1_trivial_of_subsingleton
+   instead, which provides a direct proof.
 
-/-- Every element of the amalgamated free product over trivial groups is one. -/
-theorem amalg_trivial_is_one
-    {C : Type u} (f : C → PUnit'.{u}) (g : C → PUnit'.{u}) (c₀ : C) :
-    ∀ (x : AmalgamatedFreeProduct (π₁(PUnit'.{u}, f c₀)) (π₁(PUnit'.{u}, g c₀))
-            (π₁(C, c₀)) (piOneFmap c₀) (piOneGmap c₀)),
-    pushoutDecodeAmalg (f := f) (g := g) c₀ x = Quot.mk _ (Path.refl _) := by
-  intro x
-  induction x using Quot.ind with
-  | _ w =>
-      -- pushoutDecodeAmalg (Quot.mk _ w) = pushoutDecode c₀ w
-      simp only [pushoutDecodeAmalg]
-      -- The decode of any word over trivial groups is refl
-      exact trivial_decode f g c₀ w
+theorem trivial_decode ...
+theorem amalg_trivial_is_one ...
+-/
 
 /-- The fundamental group of S² is trivial.
 

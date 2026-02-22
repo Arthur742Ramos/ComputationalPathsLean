@@ -128,12 +128,12 @@ structure FiniteChainData where
   rank : Nat → Nat
 
 /-- Euler characteristic as alternating sum of ranks. -/
-noncomputable def eulerChar (data : FiniteChainData) : Int :=
+def eulerChar (data : FiniteChainData) : Int :=
   (List.range (data.dim + 1)).foldl
     (fun acc n => acc + (-1 : Int) ^ n * Int.ofNat (data.rank n)) 0
 
 /-- Euler characteristic of empty complex is zero. -/
-noncomputable def eulerChar_empty : Int :=
+def eulerChar_empty : Int :=
   eulerChar { dim := 0, rank := fun _ => 0 }
 
 /-- Path witness: Euler characteristic of empty complex is zero. -/

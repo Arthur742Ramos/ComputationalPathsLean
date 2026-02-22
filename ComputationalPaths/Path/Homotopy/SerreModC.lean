@@ -18,6 +18,9 @@ and n != k.
 import Mathlib.Algebra.Ring.Parity
 import Mathlib.Topology.Category.TopCat.Sphere
 import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
+import ComputationalPaths.Path.Homotopy.HurewiczTheorem
+import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
+import ComputationalPaths.Path.Homotopy.HoTT
 
 namespace HurewiczTheorem
 
@@ -25,6 +28,14 @@ namespace HurewiczTheorem
 structure HurewiczData (G H : Type u) where
   toFun : G → H
   oneH : H
+
+/-- Hurewicz identity iso (trivial scaffold). -/
+noncomputable def HurewiczIso (G H : Type u) : Type u :=
+  HurewiczData G H
+
+/-- Identity Hurewicz iso. -/
+noncomputable def hurewiczIdIso (G : Type u) (mul : G → G → G) (one : G) : HurewiczIso G G :=
+  { toFun := id, oneH := one }
 
 end HurewiczTheorem
 
@@ -47,9 +58,6 @@ noncomputable def whiteheadTheorem {A B : Type u} (f : A → B)
   ⟨True.intro⟩
 
 end WhiteheadTheorem
-import ComputationalPaths.Path.Homotopy.HurewiczTheorem
-import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
-import ComputationalPaths.Path.Homotopy.HoTT
 
 namespace ComputationalPaths
 namespace Path

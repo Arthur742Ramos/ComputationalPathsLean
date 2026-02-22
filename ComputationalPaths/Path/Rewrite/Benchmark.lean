@@ -81,31 +81,31 @@ theorem symmTower_size (n : Nat) : (symmTower n).size = n + 1 := by
 Concrete expressions and their normal forms, verified by computation. -/
 
 /-- `trans refl (atom 0)` normalizes to `atom 0`. -/
-theorem norm_ex1 : canon (.trans .refl (.atom 0)) = .atom 0 := by decide
+theorem norm_ex1 : canon (.trans .refl (.atom 0)) = .atom 0 := by rfl
 
 /-- `symm (symm (atom 0))` normalizes to `atom 0`. -/
-theorem norm_ex2 : canon (.symm (.symm (.atom 0))) = .atom 0 := by decide
+theorem norm_ex2 : canon (.symm (.symm (.atom 0))) = .atom 0 := by rfl
 
 /-- `trans (atom 0) (symm (atom 0))` normalizes to `refl`. -/
-theorem norm_ex3 : canon (.trans (.atom 0) (.symm (.atom 0))) = .refl := by decide
+theorem norm_ex3 : canon (.trans (.atom 0) (.symm (.atom 0))) = .refl := by rfl
 
 /-- `trans (symm (atom 0)) (atom 0)` normalizes to `refl`. -/
-theorem norm_ex4 : canon (.trans (.symm (.atom 0)) (.atom 0)) = .refl := by decide
+theorem norm_ex4 : canon (.trans (.symm (.atom 0)) (.atom 0)) = .refl := by rfl
 
 /-- `trans (trans (atom 0) (atom 1)) (atom 2)` normalizes to right-associated form. -/
 theorem norm_ex5 : canon (.trans (.trans (.atom 0) (.atom 1)) (.atom 2)) =
-    .trans (.atom 0) (.trans (.atom 1) (.atom 2)) := by decide
+    .trans (.atom 0) (.trans (.atom 1) (.atom 2)) := by rfl
 
 /-- `symm (trans (atom 0) (atom 1))` normalizes to `trans (symm (atom 1)) (symm (atom 0))`. -/
 theorem norm_ex6 : canon (.symm (.trans (.atom 0) (.atom 1))) =
-    .trans (.symm (.atom 1)) (.symm (.atom 0)) := by decide
+    .trans (.symm (.atom 1)) (.symm (.atom 0)) := by rfl
 
 /-- A complex expression with cancellation. -/
 theorem norm_ex7 :
-    canon (.trans (.atom 0) (.trans (.symm (.atom 0)) (.atom 1))) = .atom 1 := by decide
+    canon (.trans (.atom 0) (.trans (.symm (.atom 0)) (.atom 1))) = .atom 1 := by rfl
 
 /-- Double symm tower normalizes. -/
-theorem norm_ex8 : canon (.symm (.symm (.symm (.symm (.atom 0))))) = .atom 0 := by decide
+theorem norm_ex8 : canon (.symm (.symm (.symm (.symm (.atom 0))))) = .atom 0 := by rfl
 
 /-! ## Free Group Interpretation Examples -/
 
@@ -120,11 +120,11 @@ theorem toRW_symm_atom0 : toRW (.symm (.atom 0)) = [Gen.neg 0] := rfl
 
 /-- Interpretation of `trans (atom 0) (atom 1)`. -/
 theorem toRW_trans_01 :
-    toRW (.trans (.atom 0) (.atom 1)) = [Gen.pos 0, Gen.pos 1] := by decide
+    toRW (.trans (.atom 0) (.atom 1)) = [Gen.pos 0, Gen.pos 1] := by rfl
 
 /-- Cancellation in the free group. -/
 theorem toRW_cancel :
-    toRW (.trans (.atom 0) (.symm (.atom 0))) = [] := by decide
+    toRW (.trans (.atom 0) (.symm (.atom 0))) = [] := by rfl
 
 /-! ## Word Problem Examples -/
 

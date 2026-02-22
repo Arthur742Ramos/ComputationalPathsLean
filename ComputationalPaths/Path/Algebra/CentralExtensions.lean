@@ -169,10 +169,12 @@ noncomputable def SchurMultiplier.trivialUnit (G : Type u) (gd : GroupData G) : 
     let e := ext'.extension.one
     let πe := ext'.projection e
     have h_proj_mul := (ext'.proj_mul e e).toEq
-    have h_one_mul := congrArg ext'.projection (ext'.extension.one_mul e)
+    have h_one_mul := _root_.congrArg ext'.projection (ext'.extension.one_mul e)
     -- πe = πe * πe
     have h_idem : πe = ext'.quotient_grp.mul πe πe := by
-      rw [← h_one_mul, h_proj_mul]
+      show ext'.projection e = ext'.quotient_grp.mul (ext'.projection e) (ext'.projection e)
+      rw [← h_proj_mul]
+      exact _root_.congrArg ext'.projection (ext'.extension.one_mul e).symm
     -- inv(πe) * πe = 1
     have h_left_inv := ext'.quotient_grp.mul_left_inv πe
     -- inv(πe) * (πe * πe) = (inv(πe) * πe) * πe = 1 * πe = πe

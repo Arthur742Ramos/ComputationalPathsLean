@@ -55,7 +55,7 @@ noncomputable def smashPower : Nat → PtdType.{u} → PtdType.{u}
   | n + 1, X => SmashProduct.Smash X (smashPower n X)
 
 /-- Formal symmetric smash power (symmetric quotient to be added later). -/
-abbrev symmetricSmash (n : Nat) (X : PtdType.{u}) : PtdType.{u} :=
+noncomputable def symmetricSmash (n : Nat) (X : PtdType.{u}) : PtdType.{u} :=
   smashPower n X
 
 /-! ## Indexed wedges -/

@@ -63,7 +63,7 @@ NbE = evaluate then quote. In our setting:
 
 /-- Normalization by Evaluation: interpret into the free group, then
     reify the reduced word back to an expression. -/
-@[simp] noncomputable def nbe (e : Expr) : Expr := canon e
+@[simp] def nbe (e : Expr) : Expr := canon e
 
 /-! ## Correctness: NbE Agrees with Rewriting -/
 

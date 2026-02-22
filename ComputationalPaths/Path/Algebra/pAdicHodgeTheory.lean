@@ -107,13 +107,13 @@ structure PadicField where
 /-- Rewrite steps for period ring computations. -/
 inductive PeriodRingStep (R : Type u) : R → R → Type (u + 1) where
   | frobenius_phi {F : PathField R} (a : R) :
-      PeriodRingStep (F.mul a a) (F.mul a a)
+      PeriodRingStep R (F.mul a a) (F.mul a a)
   | filtration_shift {F : PathField R} (a : R) :
-      PeriodRingStep a a
+      PeriodRingStep R a a
   | galois_action {F : PathField R} (a : R) :
-      PeriodRingStep a a
+      PeriodRingStep R a a
   | theta_map {F : PathField R} (a b : R) :
-      PeriodRingStep (F.add a b) (F.add a b)
+      PeriodRingStep R (F.add a b) (F.add a b)
 
 /-- Every `PeriodRingStep` gives a `Path`. -/
 noncomputable def PeriodRingStep.toPath {R : Type u} {a b : R}
@@ -238,7 +238,7 @@ structure PeriodRingBst (K : Type u) (F : PathField K) where
     Path (monodromy (phi x)) (ring.mul scaling (phi (monodromy x)))
   /-- N is nilpotent (eventually zero). -/
   monodromy_nilpotent_iter : Nat → carrier → carrier
-  monodromy_nilpotent : ∀ x, ∃ n, Path (monodromy_nilpotent_iter n x) ring.zero
+  monodromy_nilpotent : ∀ x, Σ n, Path (monodromy_nilpotent_iter n x) ring.zero
 
 /-! ## Filtered φ-modules -/
 

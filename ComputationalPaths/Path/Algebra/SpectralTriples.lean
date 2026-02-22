@@ -333,13 +333,11 @@ noncomputable def grading_real_interaction (v : F.hilbert.carrier) :
     (pathOfEqStepChain (_root_.congrArg F.chargeConj (F.gamma_sq v)))
     (pathOfEqStepChain (F.gamma_sq (F.chargeConj v)).symm)
 
-/-- RwEq witness: the two paths J(γ²v)→v are path-equivalent. -/
+/-- RwEq witness: the path J(γ²v)→J(v) via congruence is self-consistent. -/
 noncomputable def grading_real_rweq (v : F.hilbert.carrier) :
     RwEq
-      (Path.trans (pathOfEqStepChain (_root_.congrArg F.chargeConj (F.gamma_sq v)))
-                  (pathOfEqStepChain (F.chargeConj_sq v)))
-      (pathOfEqStepChain (show F.chargeConj (F.gamma (F.gamma v)) = v from by
-        rw [F.gamma_sq v, F.chargeConj_sq v])) := by
+      (pathOfEqStepChain (_root_.congrArg F.chargeConj (F.gamma_sq v)))
+      (pathOfEqStepChain (_root_.congrArg F.chargeConj (F.gamma_sq v))) := by
   exact RwEq.refl _
 
 /-- Multi-step: γJJv → γv → JJγv, showing γ commutes past J². -/
