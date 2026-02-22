@@ -279,28 +279,28 @@ structure Hypersurface where
   codim_one : True
 
 /-- Mean curvature flow: ∂F/∂t = H ν. -/
-structure MeanCurvatureFlow (Σ : Hypersurface) where
-  family          : Nat → Σ.carrier → Σ.ambient
-  initial         : ∀ x, family 0 x = Σ.immersion x
+structure MeanCurvatureFlow (Surf : Hypersurface) where
+  family          : Nat → Surf.carrier → Surf.ambient
+  initial         : ∀ x, family 0 x = Surf.immersion x
   evolution_eq    : True   -- ∂F/∂t = H ν
   maxTime         : Nat
 
 /-- Huisken's theorem: convex MCF in ℝⁿ⁺¹ shrinks to a round point. -/
-theorem huisken_convex_round_point (Σ : Hypersurface)
-    (MCF : MeanCurvatureFlow Σ) : True := trivial
+theorem huisken_convex_round_point (Surf : Hypersurface)
+    (MCF : MeanCurvatureFlow Surf) : True := trivial
 
 /-- Mean convex MCF and the level-set / viscosity solution approach. -/
-structure MeanConvexMCF (Σ : Hypersurface) extends
-    MeanCurvatureFlow Σ where
+structure MeanConvexMCF (Surf : Hypersurface) extends
+    MeanCurvatureFlow Surf where
   mean_convex : True   -- H ≥ 0
 
 /-- Self-shrinker: a surface satisfying H = ⟨F, ν⟩ / 2. -/
-structure SelfShrinker (Σ : Hypersurface) where
+structure SelfShrinker (Surf : Hypersurface) where
   shrinker_eq : True
   examples    : True   -- sphere, cylinder
 
 /-- Translating soliton: H = ⟨e, ν⟩ for a fixed direction e. -/
-structure TranslatingSoliton (Σ : Hypersurface) where
+structure TranslatingSoliton (Surf : Hypersurface) where
   translator_eq : True
   grim_reaper   : True   -- the Grim Reaper in ℝ²
 
@@ -359,8 +359,8 @@ theorem type_I_blowup_limit_soliton (M : RiemannianManifold)
     (S : SingularityModel M) (h : S.singType = SingularityType.TypeI) :
     True := trivial
 
-theorem mcf_avoidance_principle (Σ₁ Σ₂ : Hypersurface)
-    (MCF₁ : MeanCurvatureFlow Σ₁) (MCF₂ : MeanCurvatureFlow Σ₂) :
+theorem mcf_avoidance_principle (Surf₁ Surf₂ : Hypersurface)
+    (MCF₁ : MeanCurvatureFlow Surf₁) (MCF₂ : MeanCurvatureFlow Surf₂) :
     True := trivial
 
 theorem shrinking_sphere_selfsimilar : True := trivial

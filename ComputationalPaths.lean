@@ -123,3 +123,6 @@ import ComputationalPaths.Topos
 import ComputationalPaths.Tropical
 import ComputationalPaths.TropicalGeometry
 import ComputationalPaths.VertexAlgebra
+-- Auto-wired orphan parent modules
+import ComputationalPaths.Path.Computation
+import ComputationalPaths.Path.Logic

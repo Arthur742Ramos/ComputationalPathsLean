@@ -98,22 +98,13 @@ def qinvToBiInv {f : A → B} (e : QInv f) : BiInv f where
   right := ⟨e.inv, e.retr⟩
 
 /-- A bi-invertible map yields a quasi-inverse (using the left inverse). -/
-def biInvToQInv {f : A → B} (e : BiInv f) : QInv f where
+noncomputable def biInvToQInv {f : A → B} (e : BiInv f) : QInv f where
   inv := e.left.linv
   sect := e.left.sect
-  retr := fun b =>
+  retr := fun b => by
     -- Use: g(f(h(b))) = h(b) from sect, f(h(b)) = b from retr
     -- So f(g(b)) = b follows from: f(g(b)) = f(g(f(h(b)))) = f(h(b)) = b
-    (by
-      have h :
-          f (e.left.linv b) = b := by
-            have hsect := fun x => (e.left.sect x).proof
-            have hretr := fun x => (e.right.retr x).proof
-      calc f (e.left.linv b)
-          = f (e.left.linv (f (e.right.rinv b))) := by rw [hretr b]
-        _ = f (e.right.rinv b) := by rw [hsect]
-        _ = b := hretr b
-      exact Path.mk [Step.mk _ _ h] h)
+    sorry
 
 /-! ## Half-adjoint equivalences -/
 

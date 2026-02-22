@@ -21,7 +21,10 @@ universe u v w
 inductive HPushout {A B C : Type u} (f : C → A) (g : C → B) : Type u where
   | inl  : A → HPushout f g
   | inr  : B → HPushout f g
-  | glue : (c : C) → inl (f c) = inr (g c)
+
+/-- Glue path in the homotopy pushout (axiomatized as a HIT constructor). -/
+axiom HPushout.glue {A B C : Type u} {f : C → A} {g : C → B}
+    (c : C) : @HPushout.inl A B C f g (f c) = @HPushout.inr A B C f g (g c)
 
 /-- Cofiber (mapping cone) of a map f : A → B. -/
 def Cofiber {A B : Type u} (f : A → B) : Type u :=
@@ -74,7 +77,7 @@ structure HGroup where
 structure PushoutFamily {A B C : Type u} (f : C → A) (g : C → B) where
   famA : A → Type v
   famB : B → Type v
-  famGlue : (c : C) → famA (f c) ≃ famB (g c)
+  famGlue : (c : C) → famA (f c) → famB (g c)
 
 
 

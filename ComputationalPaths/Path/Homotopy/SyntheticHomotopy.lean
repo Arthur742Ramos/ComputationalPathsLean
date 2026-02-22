@@ -41,7 +41,9 @@ def IteratedLoopSpace : Nat → PType → PType
 inductive Susp (A : Type u) : Type u where
   | north : Susp A
   | south : Susp A
-  | merid : A → north = south
+
+/-- Merid path in the suspension (axiomatized as a HIT constructor). -/
+axiom Susp.merid {A : Type u} : A → @Susp.north A = @Susp.south A
 
 /-- Pointed suspension. -/
 def PSusp (A : PType) : PType :=
@@ -60,7 +62,9 @@ def PSusp (A : PType) : PType :=
 /-- The type S¹ (circle). -/
 inductive Circle : Type where
   | base : Circle
-  | loop : base = base
+
+/-- Loop path in the circle (axiomatized as a HIT constructor). -/
+axiom Circle.loop : @Circle.base = @Circle.base
 
 
 
@@ -77,10 +81,17 @@ inductive Circle : Type where
 inductive HoPushout {A B C : Type u} (f : C → A) (g : C → B) : Type u where
   | inl  : A → HoPushout f g
   | inr  : B → HoPushout f g
-  | glue : (c : C) → inl (f c) = inr (g c)
+
+/-- Glue path in the homotopy pushout (axiomatized as a HIT constructor). -/
+axiom HoPushout.glue {A B C : Type u} {f : C → A} {g : C → B}
+    (c : C) : @HoPushout.inl A B C f g (f c) = @HoPushout.inr A B C f g (g c)
 
 
 /-! ## Theorems -/
+
+/-- The n-th homotopy group πₙ(A) as a type. -/
+def HomotopyGroup (n : Nat) (A : PType) : Type :=
+  (IteratedLoopSpace n A).carrier
 
 
 

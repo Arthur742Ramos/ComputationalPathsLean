@@ -102,7 +102,7 @@ noncomputable def counit_inv_hom_rweq (E : CategoricalEquivalence C D) (y : D) :
   rweq_of_step (E.counit_inv_hom_step y)
 
 /-- Computational witness that the unit component is a path isomorphism. -/
-def unitIsoWitness (E : CategoricalEquivalence C D) (x : C) :
+noncomputable def unitIsoWitness (E : CategoricalEquivalence C D) (x : C) :
     PathIso x (E.invFun (E.toFun x)) where
   hom := E.unit x
   inv := Path.symm (E.unit x)
@@ -110,7 +110,7 @@ def unitIsoWitness (E : CategoricalEquivalence C D) (x : C) :
   inv_hom := E.unit_inv_hom_rweq x
 
 /-- Computational witness that the counit component is a path isomorphism. -/
-def counitIsoWitness (E : CategoricalEquivalence C D) (y : D) :
+noncomputable def counitIsoWitness (E : CategoricalEquivalence C D) (y : D) :
     PathIso (E.toFun (E.invFun y)) y where
   hom := E.counit y
   inv := Path.symm (E.counit y)
@@ -129,7 +129,7 @@ structure PathEquivalence (C : Type u) (D : Type v) where
 namespace CategoricalEquivalence
 
 /-- Every categorical equivalence induces a path equivalence. -/
-def toPathEquivalence (E : CategoricalEquivalence C D) : PathEquivalence C D where
+noncomputable def toPathEquivalence (E : CategoricalEquivalence C D) : PathEquivalence C D where
   toFun := E.toFun
   invFun := E.invFun
   unitIso := E.unitIsoWitness
@@ -149,13 +149,13 @@ def toSimpleEquiv (E : PathEquivalence C D) : SimpleEquiv C D where
 end PathEquivalence
 
 /-- Categorical equivalences induce path equivalences. -/
-def categoricalEquivalence_induces_pathEquivalence
+noncomputable def categoricalEquivalence_induces_pathEquivalence
     (E : CategoricalEquivalence C D) :
     PathEquivalence C D :=
   E.toPathEquivalence
 
 /-- Categorical equivalences induce equivalences of underlying types. -/
-def categoricalEquivalence_induces_simpleEquiv
+noncomputable def categoricalEquivalence_induces_simpleEquiv
     (E : CategoricalEquivalence C D) :
     SimpleEquiv C D :=
   (categoricalEquivalence_induces_pathEquivalence E).toSimpleEquiv

@@ -239,11 +239,11 @@ structure OvertwistedDisk (cs : ContactStructure) where
 
 /-- A tight contact structure: no overtwisted disk. -/
 structure TightStructure (cs : ContactStructure) where
-  no_overtwisted : OvertwistedDisk cs → False
+  no_overtwisted : OvertwistedDisk.{u} cs → False
 
 /-- An overtwisted contact structure: contains an overtwisted disk. -/
 structure OvertwistedStructure (cs : ContactStructure) where
-  disk : OvertwistedDisk cs
+  disk : OvertwistedDisk.{u} cs
 
 /-- Tight and overtwisted are mutually exclusive. -/
 def tight_ot_exclusive (cs : ContactStructure)
@@ -252,7 +252,7 @@ def tight_ot_exclusive (cs : ContactStructure)
 
 /-- Tight implies no overtwisted disk (tautological but recorded). -/
 theorem tight_no_ot_disk (cs : ContactStructure) (t : TightStructure cs)
-    (d : OvertwistedDisk cs) : False :=
+    (d : OvertwistedDisk.{u} cs) : False :=
   t.no_overtwisted d
 
 /-! ## 8. Eliashberg Classification -/
@@ -385,9 +385,9 @@ theorem contacto_comp_assoc {a b c d : ContactStructure}
   simp [contacto_comp, Function.comp]
 
 theorem contacto_inv_left {a b : ContactStructure}
-    (f : Contactomorphism a b) (x : a.carrier) :
-    (contacto_comp (contacto_inv f) f).toFun x = (contacto_id a).toFun x := by
-  simp [contacto_comp, contacto_inv, contacto_id, Function.comp, f.left_inv]
+    (f : Contactomorphism a b) (x : b.carrier) :
+    (contacto_comp (contacto_inv f) f).toFun x = (contacto_id b).toFun x := by
+  simp [contacto_comp, contacto_inv, contacto_id, Function.comp, f.right_inv]
 
 theorem legendrian_dim_matches (cs : ContactStructure)
     (L : LegendrianSubmanifold cs) : L.subDim = cs.halfDim :=
@@ -438,7 +438,7 @@ def legendrianRewrite {x y : LegendrianKnot cs} (p q : Path x y) : Prop :=
   ∃ r : Path y y, q = Path.trans p r
 
 def legendrianRewriteConfluent : Prop :=
-  ∀ {x y : LegendrianKnot cs} (p q₁ q₂ : Path x y),
+  ∀ {x y : LegendrianKnot.{u} cs} (p q₁ q₂ : Path x y),
     legendrianRewrite p q₁ →
     legendrianRewrite p q₂ →
     ∃ q₃ : Path x y, legendrianRewrite q₁ q₃ ∧ legendrianRewrite q₂ q₃

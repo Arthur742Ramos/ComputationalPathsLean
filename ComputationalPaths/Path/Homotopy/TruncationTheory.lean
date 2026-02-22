@@ -38,7 +38,7 @@ end TruncIndex
 /-- A type has h-level n (is n-truncated). -/
 def IsOfHLevel : TruncIndex → Type u → Prop
   | TruncIndex.negTwo,  A => ∃ a : A, ∀ b, a = b
-  | TruncIndex.succ n, A => ∀ (a b : A), IsOfHLevel n (a = b)
+  | TruncIndex.succ n, A => ∀ (a b : A), IsOfHLevel n (ULift (a = b))
 
 /-- Contractible types: h-level −2. -/
 def IsContr (A : Type u) : Prop := IsOfHLevel TruncIndex.negTwo A
@@ -82,10 +82,10 @@ def PropTrunc (A : Type u) : Type u := Trunc TruncIndex.negOne A
 def SetTrunc (A : Type u) : Type u := Trunc TruncIndex.zero A
 
 /-- The truncation monad unit. -/
-def truncUnit {n : TruncIndex} {A : Type u} : A → Trunc n A := Trunc.mk
+noncomputable def truncUnit {n : TruncIndex} {A : Type u} : A → Trunc n A := Trunc.mk
 
 /-- The truncation monad bind. -/
-def truncBind {n : TruncIndex} {A : Type u} {B : Type v}
+noncomputable def truncBind {n : TruncIndex} {A : Type u} {B : Type v}
     (hB : IsOfHLevel n (Trunc n B))
     (f : A → Trunc n B) : Trunc n A → Trunc n B :=
   Trunc.elim hB f
@@ -109,17 +109,17 @@ def PostnikovStage (n : TruncIndex) (A : Type u) : Type u :=
 
 
 /-- The tower map A → P_n(A). -/
-def toPostnikov {n : TruncIndex} {A : Type u} : A → PostnikovStage n A :=
+noncomputable def toPostnikov {n : TruncIndex} {A : Type u} : A → PostnikovStage n A :=
   Trunc.mk
 
 /-! ## Whitehead tower (connected covers) -/
 
 /-- The n-connected cover of A: the fiber of A → P_n(A). -/
 def ConnectedCover (n : TruncIndex) (A : Type u) (a₀ : A) : Type u :=
-  { a : A // Trunc.mk a = Trunc.mk a₀ }  -- simplified
+  { a : A // @Trunc.mk n A a = @Trunc.mk n A a₀ }  -- simplified
 
 /-- The inclusion from the connected cover. -/
-def connectedCoverInclusion {n : TruncIndex} {A : Type u} {a₀ : A} :
+noncomputable def connectedCoverInclusion {n : TruncIndex} {A : Type u} {a₀ : A} :
     ConnectedCover n A a₀ → A :=
   fun ⟨a, _⟩ => a
 

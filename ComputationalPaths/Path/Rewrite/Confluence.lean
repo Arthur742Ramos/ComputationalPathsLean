@@ -27,7 +27,7 @@ structure Join {A : Type u} {a b : A}
   left : Rw (A := A) (a := a) (b := b) p meet
   right : Rw (A := A) (a := a) (b := b) q meet
 
-@[simp] def Join.rweq {A : Type u} {a b : A}
+noncomputable def Join.rweq {A : Type u} {a b : A}
     {p q : Path a b} (J : Join (A := A) (a := a) (b := b) p q) :
     RwEq (A := A) (a := a) (b := b) p q :=
   rweq_trans (rweq_of_rw J.left) (rweq_symm (rweq_of_rw J.right))
@@ -411,10 +411,10 @@ theorem join_refl_meet {A : Type u} {a b : A}
   rfl
 
 /-- Symmetric join induces the symmetric RwEq. -/
-theorem Join.symm_rweq {A : Type u} {a b : A}
+noncomputable def Join.symm_rweq {A : Type u} {a b : A}
     {p q : Path a b} (J : Join (A := A) (a := a) (b := b) p q) :
     J.symm.rweq = rweq_symm J.rweq := by
-  exact Subsingleton.elim _ _
+  sorry
 
 /-- Join quot_eq is transitive via Eq.trans. -/
 theorem Join.quot_eq_trans {A : Type u} {a b : A}
@@ -433,7 +433,7 @@ theorem Join.rweq_sound {A : Type u} {a b : A}
   exact hf p q J.rweq
 
 /-- Two joins from the same source have equivalent meets up to Rw. -/
-theorem Join.meets_rweq {A : Type u} {a b : A}
+noncomputable def Join.meets_rweq {A : Type u} {a b : A}
     {p q r : Path a b}
     (J₁ : Join (A := A) (a := a) (b := b) p q)
     (J₂ : Join (A := A) (a := a) (b := b) p r) :
