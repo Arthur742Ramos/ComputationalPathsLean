@@ -38,7 +38,7 @@ end TruncIndex
 /-- A type has h-level n (is n-truncated). -/
 def IsOfHLevel : TruncIndex → Type u → Prop
   | TruncIndex.negTwo,  A => ∃ a : A, ∀ b, a = b
-  | TruncIndex.succ n, A => ∀ (a b : A), IsOfHLevel n (ULift (a = b))
+  | TruncIndex.succ n, A => ∀ (a b : A), IsOfHLevel n (Path a b)
 
 /-- Contractible types: h-level −2. -/
 def IsContr (A : Type u) : Prop := IsOfHLevel TruncIndex.negTwo A

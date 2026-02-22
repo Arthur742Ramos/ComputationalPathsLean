@@ -14,6 +14,9 @@ namespace ComputationalPaths.CwF
 open ComputationalPaths
 open ComputationalPaths.Path
 
+/-- Alias for the rewrite step relation to disambiguate from Core.Step. -/
+private abbrev RwStep := @ComputationalPaths.Path.Step
+
 universe u
 
 /-! ## Core CwF data from computational paths -/
@@ -125,7 +128,7 @@ def sigmaFstBetaStep {A : Type u} {B : A → Type u}
     {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
     (p : Path a₁ a₂)
     (q : Path (Path.transport (A := A) (D := fun a => B a) p b₁) b₂) :
-    Step (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q))
+    RwStep (A := A) (Path.sigmaFst (B := B) (Path.sigmaMk (B := B) p q))
       (Path.stepChain (A := A) p.toEq) :=
   Step.sigma_fst_beta (A := A) (B := B) p q
 
@@ -133,7 +136,7 @@ def sigmaSndBetaStep {A : Type u} {B : A → Type u}
     {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
     (p : Path a₁ a₂)
     (q : Path (Path.transport (A := A) (D := fun a => B a) p b₁) b₂) :
-    Step (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
+    RwStep (A := B a₂) (Path.sigmaSnd (B := B) (Path.sigmaMk (B := B) p q))
       (Path.stepChain
         (A := B a₂)
         (a := Path.transport (A := A) (D := fun a => B a)
@@ -145,7 +148,7 @@ def sigmaSndBetaStep {A : Type u} {B : A → Type u}
 def sigmaEtaStep {A : Type u} {B : A → Type u}
     {a₁ a₂ : A} {b₁ : B a₁} {b₂ : B a₂}
     (p : Path (Sigma.mk a₁ b₁) (Sigma.mk a₂ b₂)) :
-    Step (Path.sigmaMk (B := B) (Path.sigmaFst (B := B) p) (Path.sigmaSnd (B := B) p)) p :=
+    RwStep (A := Sigma B) (Path.sigmaMk (B := B) (Path.sigmaFst (B := B) p) (Path.sigmaSnd (B := B) p)) p :=
   Step.sigma_eta p
 
 def sigmaFstBetaRwEq {A : Type u} {B : A → Type u}
@@ -177,12 +180,12 @@ def sigmaEtaRwEq {A : Type u} {B : A → Type u}
 
 def piBetaStep {α β : Type u} {f g : α → β}
     (p : ∀ x : α, Path (f x) (g x)) (a : α) :
-    Step (Path.app (Path.lamCongr p) a) (p a) := by
+    RwStep (A := β) (Path.app (Path.lamCongr p) a) (p a) := by
   simpa [Path.app] using (Step.fun_app_beta (A := β) (α := α) p a)
 
 def piEtaStep {α β : Type u} {f g : α → β}
     (p : Path f g) :
-    Step (Path.lamCongr (fun x => Path.app p x)) p :=
+    RwStep (A := (α → β)) (Path.lamCongr (fun x => Path.app p x)) p :=
   Step.fun_eta (α := α) (β := β) (p := p)
 
 def piBetaRwEq {α β : Type u} {f g : α → β}

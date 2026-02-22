@@ -89,7 +89,7 @@ agree.  This version takes explicit type parameters to avoid heterogeneous equal
   Confluence.of_steps (A := A) (a := a) (b := b)
     (p := p) (q := q) (r := r) step₁ step₂
 
-@[simp] theorem Instantiation.join_rweq
+noncomputable def Instantiation.join_rweq
     {A : Type u} {a b : A}
     {p q r : Path a b}
     (step₁ : Step (A := A) p q)

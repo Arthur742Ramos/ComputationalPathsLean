@@ -32,7 +32,7 @@ def Cofiber {A B : Type u} (f : A → B) : Type u :=
 
 /-- Wedge sum A ∨ B. -/
 def Wedge (A B : Type u) (a₀ : A) (b₀ : B) : Type u :=
-  HPushout (fun _ : Unit => a₀) (fun _ : Unit => b₀)
+  HPushout (fun (_ : PUnit.{u+1}) => a₀) (fun (_ : PUnit.{u+1}) => b₀)
 
 /-- Join A * B as a pushout. -/
 def Join (A B : Type u) : Type u :=

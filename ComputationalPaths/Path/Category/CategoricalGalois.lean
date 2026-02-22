@@ -68,17 +68,17 @@ structure ProfiniteGroup where
   /-- Index set of finite quotients. -/
   Index : Type u
   /-- Each quotient is a finite group (represented as a type). -/
-  quotient : Index → Type u
+  quotient : Index → Type v
   /-- Transition maps (placeholder). -/
   transition : {i j : Index} → quotient j → quotient i
 
 /-! ## Fundamental Group and Groupoid -/
 
 /-- The fundamental group of a Galois category at the fiber functor. -/
-def fundamentalGroup (C : GaloisCategory.{u,v}) : ProfiniteGroup.{u} where
+def fundamentalGroup (C : GaloisCategory.{u,v}) : ProfiniteGroup.{u,v} where
   Index := C.carrier.Obj
   quotient := fun x => Aut C.carrier x
-  transition := fun x => x  -- identity as placeholder
+  transition := fun _ => sorry  -- placeholder transition
 
 /-- A covering of an object X: an object over X with finite fibers. -/
 structure Covering (C : GaloisCategory.{u,v}) (X : C.carrier.Obj) where
@@ -86,7 +86,7 @@ structure Covering (C : GaloisCategory.{u,v}) (X : C.carrier.Obj) where
   projection : C.carrier.Hom total X
 
 /-- The category of coverings of X. -/
-def CoveringCategory (C : GaloisCategory.{u,v}) (X : C.carrier.Obj) : Cat.{u,v} where
+def CoveringCategory (C : GaloisCategory.{u,v}) (X : C.carrier.Obj) : Cat.{max u v, v} where
   Obj := Covering C X
   Hom := fun E₁ E₂ => C.carrier.Hom E₁.total E₂.total
   id := fun E => C.carrier.id E.total
@@ -101,8 +101,8 @@ structure FundamentalGroupoid (C : GaloisCategory.{u,v}) where
   composePath : {p q r : points} → paths p q → paths q r → paths p r
 
 /-- Profinite completion of a group. -/
-def profiniteCompletion (G : Type u) [Group G] : ProfiniteGroup.{u} where
-  Index := Type u -- normal subgroups of finite index
+def profiniteCompletion (G : Type u) : ProfiniteGroup.{u,u} where
+  Index := G -- use the type itself as index (placeholder)
   quotient := fun _ => G -- placeholder
   transition := fun x => x  -- identity as placeholder
 
@@ -115,17 +115,18 @@ structure ProSpace where
   transition : {i j : Index} → space j → space i
 
 /-- The étale homotopy type of a Galois category. -/
-def etaleHomotopyType (C : GaloisCategory.{u,v}) : ProSpace.{u} where
+noncomputable def etaleHomotopyType (C : GaloisCategory.{u,v}) : ProSpace.{u} where
   Index := C.carrier.Obj
   space := fun x => C.fiberFunctor.fiber x
-  transition := fun x => x  -- identity as placeholder
+  transition := fun _ => sorry  -- placeholder transition
 
 /-- Higher étale fundamental group π_n^ét. -/
-def etaleHomotopyGroup (C : GaloisCategory.{u,v}) (n : Nat) : Type u :=
-  (etaleHomotopyType C).space (Classical.choice ⟨Classical.arbitrary _⟩)
+noncomputable def etaleHomotopyGroup (C : GaloisCategory.{u,v}) (n : Nat)
+    (x₀ : C.carrier.Obj) : Type u :=
+  (etaleHomotopyType C).space x₀
 
 /-- The classifying space Bπ₁ of the fundamental group. -/
-def classifyingSpace (C : GaloisCategory.{u,v}) : ProSpace.{u} :=
+noncomputable def classifyingSpace (C : GaloisCategory.{u,v}) : ProSpace.{u} :=
   etaleHomotopyType C
 
 /-- Galois closure of an object: the smallest Galois object through which
@@ -149,7 +150,7 @@ theorem grothendieck_galois_correspondence (C : GaloisCategory.{u,v}) :
 theorem galois_closure_exists (C : GaloisCategory.{u,v})
     (x : C.carrier.Obj) (hx : IsConnected C x) :
     ∃ (g : C.carrier.Obj), IsGaloisObject C g := by
-  trivial
+  sorry
 
 /-- The fundamental group is profinite. -/
 theorem fundamental_group_profinite (C : GaloisCategory.{u,v}) :

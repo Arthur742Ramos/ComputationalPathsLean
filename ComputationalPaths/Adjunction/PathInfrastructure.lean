@@ -35,15 +35,15 @@ def rightTriangle (adj : AdjunctionData C D F G) (y : D) : Path (G y) (G y) :=
   Path.trans (adj.unit (G y)) (Path.congrArg G (adj.counit y))
 
 /-- Counit components rewrite to inverses of `F`-mapped unit components. -/
-def LeftCounitInverse (adj : AdjunctionData C D F G) : Prop :=
+def LeftCounitInverse (adj : AdjunctionData C D F G) : Type _ :=
   ∀ x : C, RwEq (adj.counit (F x)) (Path.symm (Path.congrArg F (adj.unit x)))
 
 /-- Unit components rewrite to inverses of `G`-mapped counit components. -/
-def RightUnitInverse (adj : AdjunctionData C D F G) : Prop :=
+def RightUnitInverse (adj : AdjunctionData C D F G) : Type _ :=
   ∀ y : D, RwEq (adj.unit (G y)) (Path.symm (Path.congrArg G (adj.counit y)))
 
 /-- Triangle (zigzag) identities packaged together. -/
-structure Zigzag (adj : AdjunctionData C D F G) : Prop where
+structure Zigzag (adj : AdjunctionData C D F G) where
   left : ∀ x : C, RwEq (adj.leftTriangle x) (Path.refl (F x))
   right : ∀ y : D, RwEq (adj.rightTriangle y) (Path.refl (G y))
 
@@ -85,7 +85,7 @@ noncomputable def right_zigzag_of_inverse
   exact rweq_trans hrewrite (rweq_cmpA_inv_left (Path.congrArg G (adj.counit y)))
 
 /-- Build both zigzag identities from inverse-style unit/counit rewrites. -/
-def zigzag_of_inverse
+noncomputable def zigzag_of_inverse
     (adj : AdjunctionData C D F G)
     (hε : LeftCounitInverse adj)
     (hη : RightUnitInverse adj) :

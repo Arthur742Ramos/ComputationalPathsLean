@@ -34,6 +34,9 @@ namespace OmegaGroupoid
 open ComputationalPaths
 open ComputationalPaths.Path
 
+/-- Alias for the rewrite step relation to disambiguate from Core.Step. -/
+private abbrev RwStep := @ComputationalPaths.Path.Step
+
 universe u
 
 variable {A : Type u}
@@ -154,12 +157,12 @@ theorem godement_interchange_toEq {a b c : A}
     rweq_toEq (godement_left α β) = rweq_toEq (godement_right α β) := by
   rfl
 
-/-- Godement interchange for single steps: given `Step f f'` and `Step g g'`,
+/-- Godement interchange for single steps: given `Path.Step f f'` and `Path.Step g g'`,
     both whiskering orders produce explicitly equal witnesses.
     Uses **Rule 75** (trans_congr_left) and **Rule 76** (trans_congr_right). -/
 noncomputable def godement_step_left {a b c : A}
     {f f' : Path a b} {g g' : Path b c}
-    (sf : Step f f') (sg : Step g g') :
+    (sf : RwStep (A := A) f f') (sg : RwStep (A := A) g g') :
     RwEq (Path.trans f g) (Path.trans f' g') :=
   RwEq.trans
     (RwEq.step (Step.trans_congr_left g sf))
@@ -167,7 +170,7 @@ noncomputable def godement_step_left {a b c : A}
 
 noncomputable def godement_step_right {a b c : A}
     {f f' : Path a b} {g g' : Path b c}
-    (sf : Step f f') (sg : Step g g') :
+    (sf : RwStep (A := A) f f') (sg : RwStep (A := A) g g') :
     RwEq (Path.trans f g) (Path.trans f' g') :=
   RwEq.trans
     (RwEq.step (Step.trans_congr_right f sg))
@@ -176,7 +179,7 @@ noncomputable def godement_step_right {a b c : A}
 /-- Godement for individual steps: both orders give the same `toEq`. -/
 theorem godement_step_coherence {a b c : A}
     {f f' : Path a b} {g g' : Path b c}
-    (sf : Step f f') (sg : Step g g') :
+    (sf : RwStep (A := A) f f') (sg : RwStep (A := A) g g') :
     rweq_toEq (godement_step_left sf sg) =
       rweq_toEq (godement_step_right sf sg) := by
   rfl

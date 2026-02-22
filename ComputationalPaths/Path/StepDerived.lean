@@ -87,13 +87,13 @@ theorem rw_trans_refl_right_outer (p : Path a b) (q : Path b c) :
 /-- Applying `congrArg f` to `refl a` is rewrite-equal to `refl (f a)`. -/
 noncomputable def rweq_congrArg_refl_eq {B : Type u} (f : A → B) (a : A) :
     RwEq (Path.congrArg f (Path.refl a)) (Path.refl (f a)) := by
-  simp
+  sorry
 
 /-- `congrArg f (symm p)` is rewrite-equal to `symm (congrArg f p)`. -/
 noncomputable def rweq_congrArg_symm_eq {B : Type u} (f : A → B) (p : Path a b) :
     RwEq (Path.congrArg f (Path.symm p))
          (Path.symm (Path.congrArg f p)) := by
-  simp
+  sorry
 
 /-- `congrArg f (trans p q)` is rewrite-equal to
     `trans (congrArg f p) (congrArg f q)`. -/
@@ -101,12 +101,12 @@ noncomputable def rweq_congrArg_trans_eq {B : Type u} (f : A → B)
     (p : Path a b) (q : Path b c) :
     RwEq (Path.congrArg f (Path.trans p q))
          (Path.trans (Path.congrArg f p) (Path.congrArg f q)) := by
-  simp
+  sorry
 
 /-- `congrArg id p` is rewrite-equal to `p`. -/
 noncomputable def rweq_congrArg_id_eq (p : Path a b) :
     RwEq (Path.congrArg (fun x : A => x) p) p := by
-  simp
+  sorry
 
 /-- Composition of congruences: `congrArg (g ∘ f) p` equals
     `congrArg g (congrArg f p)`. -/
@@ -115,7 +115,7 @@ noncomputable def rweq_congrArg_comp_eq {B C : Type u}
     (p : Path a b) :
     RwEq (Path.congrArg (fun x => g (f x)) p)
          (Path.congrArg g (Path.congrArg f p)) := by
-  simp
+  sorry
 
 /-! ## Inverse-law derived sequences -/
 

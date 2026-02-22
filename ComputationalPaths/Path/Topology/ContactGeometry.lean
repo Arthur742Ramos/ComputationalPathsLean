@@ -238,20 +238,20 @@ structure OvertwistedDisk (cs : ContactStructure) where
   bdy_tangent : True
 
 /-- A tight contact structure: no overtwisted disk. -/
-structure TightStructure (cs : ContactStructure) where
+structure TightStructure (cs : ContactStructure.{u}) where
   no_overtwisted : OvertwistedDisk.{u} cs → False
 
 /-- An overtwisted contact structure: contains an overtwisted disk. -/
-structure OvertwistedStructure (cs : ContactStructure) where
+structure OvertwistedStructure (cs : ContactStructure.{u}) where
   disk : OvertwistedDisk.{u} cs
 
 /-- Tight and overtwisted are mutually exclusive. -/
-def tight_ot_exclusive (cs : ContactStructure)
-    (tight : TightStructure cs) (ot : OvertwistedStructure cs) : False :=
+def tight_ot_exclusive (cs : ContactStructure.{u})
+    (tight : TightStructure.{u} cs) (ot : OvertwistedStructure.{u} cs) : False :=
   tight.no_overtwisted ot.disk
 
 /-- Tight implies no overtwisted disk (tautological but recorded). -/
-theorem tight_no_ot_disk (cs : ContactStructure) (t : TightStructure cs)
+theorem tight_no_ot_disk (cs : ContactStructure.{u}) (t : TightStructure.{u} cs)
     (d : OvertwistedDisk.{u} cs) : False :=
   t.no_overtwisted d
 
@@ -437,8 +437,9 @@ def legendrianIsotopyPath (x y : LegendrianKnot cs)
 def legendrianRewrite {x y : LegendrianKnot cs} (p q : Path x y) : Prop :=
   ∃ r : Path y y, q = Path.trans p r
 
-def legendrianRewriteConfluent : Prop :=
-  ∀ {x y : LegendrianKnot.{u} cs} (p q₁ q₂ : Path x y),
+def legendrianRewriteConfluent {cs : ContactStructure.{u}}
+    {x y : LegendrianKnot.{u} cs} : Prop :=
+  ∀ (p q₁ q₂ : Path x y),
     legendrianRewrite p q₁ →
     legendrianRewrite p q₂ →
     ∃ q₃ : Path x y, legendrianRewrite q₁ q₃ ∧ legendrianRewrite q₂ q₃

@@ -24,7 +24,7 @@ structure PType where
 
 /-- The loop space Ω(A, a₀) as the type of paths a₀ = a₀. -/
 def LoopSpace (A : PType) : PType :=
-  ⟨A.pt = A.pt, rfl⟩
+  ⟨PLift (A.pt = A.pt), ⟨rfl⟩⟩
 
 /-- The n-fold iterated loop space Ωⁿ(A). -/
 def IteratedLoopSpace : Nat → PType → PType
