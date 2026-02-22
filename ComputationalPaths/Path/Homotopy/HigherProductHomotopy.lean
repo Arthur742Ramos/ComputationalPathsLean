@@ -234,9 +234,9 @@ theorem prodHigherPiN_encode_comp {A B : Type u} (a : A) (b : B) (n : Nat)
               prodPiOneEncode, LoopQuot.comp]
             apply Prod.ext
             · apply Quot.sound
-              exact rweq_congrArg_trans (A := A × B) (f := Prod.fst) (p := p₁) (q := p₂)
+              exact rweqProp_of_rweq (rweq_congrArg_trans (A := A × B) (f := Prod.fst) (p := p₁) (q := p₂))
             · apply Quot.sound
-              exact rweq_congrArg_trans (A := A × B) (f := Prod.snd) (p := p₁) (q := p₂)
+              exact rweqProp_of_rweq (rweq_congrArg_trans (A := A × B) (f := Prod.snd) (p := p₁) (q := p₂))
       | succ n =>
           cases n with
           | zero =>
@@ -271,9 +271,9 @@ theorem prodHigherPiN_encode_inv {A B : Type u} (a : A) (b : B) (n : Nat)
               prodPiOneEncode, LoopQuot.inv]
             apply Prod.ext
             · apply Quot.sound
-              exact rweq_congrArg_symm (A := A × B) (f := Prod.fst) (p := p)
+              exact rweqProp_of_rweq (rweq_congrArg_symm (A := A × B) (f := Prod.fst) (p := p))
             · apply Quot.sound
-              exact rweq_congrArg_symm (A := A × B) (f := Prod.snd) (p := p)
+              exact rweqProp_of_rweq (rweq_congrArg_symm (A := A × B) (f := Prod.snd) (p := p))
       | succ n =>
           cases n with
           | zero =>

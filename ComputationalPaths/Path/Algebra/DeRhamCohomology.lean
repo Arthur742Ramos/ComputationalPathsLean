@@ -175,13 +175,13 @@ structure BettiData where
   vanishing : ∀ k : Nat, k > finiteDim → betti k = 0
 
 /-- Euler characteristic χ = Σ (-1)^k b_k. -/
-noncomputable def eulerCharacteristic (bd : BettiData) : Int :=
+def eulerCharacteristic (bd : BettiData) : Int :=
   (List.range (bd.finiteDim + 1)).foldl
     (fun acc k => acc + (if k % 2 = 0 then (bd.betti k : Int) else -(bd.betti k : Int)))
     0
 
 /-- Betti data for a point: b₀ = 1, all others zero. -/
-noncomputable def pointBetti : BettiData where
+def pointBetti : BettiData where
   betti := fun k => if k = 0 then 1 else 0
   finiteDim := 0
   vanishing := by intro k hk; simp; omega
@@ -195,7 +195,7 @@ noncomputable def pointEuler_path : Path (eulerCharacteristic pointBetti) 1 :=
   Path.stepChain pointEuler
 
 /-- Betti data for S¹: b₀ = 1, b₁ = 1, all others zero. -/
-noncomputable def circleBetti : BettiData where
+def circleBetti : BettiData where
   betti := fun k => if k ≤ 1 then 1 else 0
   finiteDim := 1
   vanishing := by intro k hk; simp; omega
@@ -209,7 +209,7 @@ noncomputable def circleEuler_path : Path (eulerCharacteristic circleBetti) 0 :=
   Path.stepChain circleEuler
 
 /-- Betti data for S²: b₀ = 1, b₁ = 0, b₂ = 1. -/
-noncomputable def sphere2Betti : BettiData where
+def sphere2Betti : BettiData where
   betti := fun k => if k = 0 ∨ k = 2 then 1 else 0
   finiteDim := 2
   vanishing := by intro k hk; simp; omega
@@ -223,7 +223,7 @@ noncomputable def sphere2Euler_path : Path (eulerCharacteristic sphere2Betti) 2 
   Path.stepChain sphere2Euler
 
 /-- Betti data for T² (torus): b₀ = 1, b₁ = 2, b₂ = 1. -/
-noncomputable def torusBetti : BettiData where
+def torusBetti : BettiData where
   betti := fun k => if k = 0 ∨ k = 2 then 1 else if k = 1 then 2 else 0
   finiteDim := 2
   vanishing := by intro k hk; simp [show ¬(k = 0) by omega, show ¬(k = 2) by omega, show ¬(k = 1) by omega]
@@ -239,7 +239,7 @@ noncomputable def torusEuler_path : Path (eulerCharacteristic torusBetti) 0 :=
 /-! ## Genus-g surface Betti numbers -/
 
 /-- Betti data for Σ_g: b₀ = 1, b₁ = 2g, b₂ = 1. -/
-noncomputable def surfaceBetti (g : Nat) : BettiData where
+def surfaceBetti (g : Nat) : BettiData where
   betti := fun k => if k = 0 ∨ k = 2 then 1 else if k = 1 then 2 * g else 0
   finiteDim := 2
   vanishing := by intro k hk; simp [show ¬(k = 0) by omega, show ¬(k = 2) by omega, show ¬(k = 1) by omega]
@@ -257,17 +257,17 @@ theorem surfaceBetti_b2 (g : Nat) : (surfaceBetti g).betti 2 = 1 := by
   simp [surfaceBetti]
 
 /-- Path coherence for b₀. -/
-noncomputable def surfaceBetti_b0_path (g : Nat) :
+def surfaceBetti_b0_path (g : Nat) :
     Path ((surfaceBetti g).betti 0) 1 :=
   Path.stepChain (surfaceBetti_b0 g)
 
 /-- Path coherence for b₁. -/
-noncomputable def surfaceBetti_b1_path (g : Nat) :
+def surfaceBetti_b1_path (g : Nat) :
     Path ((surfaceBetti g).betti 1) (2 * g) :=
   Path.stepChain (surfaceBetti_b1 g)
 
 /-- Path coherence for b₂. -/
-noncomputable def surfaceBetti_b2_path (g : Nat) :
+def surfaceBetti_b2_path (g : Nat) :
     Path ((surfaceBetti g).betti 2) 1 :=
   Path.stepChain (surfaceBetti_b2 g)
 
@@ -277,7 +277,7 @@ theorem surfaceBetti_vanish (g : Nat) (k : Nat) (hk : k > 2) :
   simp [surfaceBetti, show ¬(k = 0) by omega, show ¬(k = 2) by omega, show ¬(k = 1) by omega]
 
 /-- Path for higher Betti vanishing. -/
-noncomputable def surfaceBetti_vanish_path (g : Nat) (k : Nat) (hk : k > 2) :
+def surfaceBetti_vanish_path (g : Nat) (k : Nat) (hk : k > 2) :
     Path ((surfaceBetti g).betti k) 0 :=
   Path.stepChain (surfaceBetti_vanish g k hk)
 

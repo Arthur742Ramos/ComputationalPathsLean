@@ -32,7 +32,7 @@ noncomputable def eval {A : Type u} {a b : A} : PathExpr A a b → Path a b
   | .trans e₁ e₂ => Path.trans (eval e₁) (eval e₂)
 
 /-- Size of a `PathExpr`. -/
-noncomputable def size {A : Type u} {a b : A} : PathExpr A a b → Nat
+def size {A : Type u} {a b : A} : PathExpr A a b → Nat
   | .atom _ => 1
   | .refl _ => 1
   | .symm e => 1 + size e

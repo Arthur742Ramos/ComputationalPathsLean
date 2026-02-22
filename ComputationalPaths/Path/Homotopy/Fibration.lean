@@ -246,7 +246,7 @@ theorem inducedPi1Map_id (a : A) :
     unfold inducedPi1Map inducedLoopMap
     apply Quot.sound
     -- congrArg id l ≈ l
-    exact rweq_of_eq (Path.congrArg_id l)
+    exact rweqProp_of_rweq (rweq_of_eq (Path.congrArg_id l))
 
 /-- Induced map respects composition. -/
 theorem inducedPi1Map_comp (f : A → B) (g : B → E) (a : A) :
@@ -257,7 +257,7 @@ theorem inducedPi1Map_comp (f : A → B) (g : B → E) (a : A) :
     unfold inducedPi1Map inducedLoopMap Function.comp
     apply Quot.sound
     -- congrArg (g ∘ f) l ≈ congrArg g (congrArg f l)
-    exact rweq_of_eq (Path.congrArg_comp g f l)
+    exact rweqProp_of_rweq (rweq_of_eq (Path.congrArg_comp g f l))
 
 /-! ## Long Exact Sequence Preview
 
@@ -363,6 +363,7 @@ noncomputable def longExactSequence {P : B → Type u} (b : B) (x₀ : P b) :
       -- So symm gives: congrArg proj (congrArg (⟨b,·⟩) l) = congrArg (proj ∘ (⟨b,·⟩)) l
       -- And proj ∘ (fun x => ⟨b, x⟩) = const b
       -- Finally, rweq_congrArg_const gives the result
+      apply rweqProp_of_rweq
       apply rweq_trans (rweq_symm (rweq_of_eq (Path.congrArg_comp Total.proj (fun x => ⟨b, x⟩) l)))
       exact rweq_congrArg_const b l
   exact_at_B := fun β => by

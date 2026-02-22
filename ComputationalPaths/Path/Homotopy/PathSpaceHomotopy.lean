@@ -38,7 +38,7 @@ universe u
 /-! ## Contractibility -/
 
 /-- Based path spaces are contractible. -/
-abbrev pathSpaceContr (A : Type u) (a : A) : IsContr (PathSpace A a) :=
+noncomputable abbrev pathSpaceContr (A : Type u) (a : A) : IsContr (PathSpace A a) :=
   PathSpaceFibration.pathSpaceContr A a
 
 /-- All elements of a based path space are connected to the basepoint. -/
@@ -55,7 +55,7 @@ theorem pathSpace_connected (A : Type u) (a : A) :
 /-! ## Evaluation map as a fibration -/
 
 /-- The evaluation (endpoint) map of the based path space. -/
-abbrev pathSpaceEval {A : Type u} {a : A} : PathSpace A a → A :=
+noncomputable abbrev pathSpaceEval {A : Type u} {a : A} : PathSpace A a → A :=
   pathSpaceProj (A := A) (a := a)
 
 /-- Path lifting for the evaluation map (the fibration structure). -/

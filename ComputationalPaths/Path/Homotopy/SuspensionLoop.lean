@@ -153,7 +153,7 @@ noncomputable def adjMap {X : Type u} (x₀ : X) {Y : Pointed}
     When x = x₀, the path hf.symm · p · p⁻¹ · hf collapses to refl by:
     1. p · p⁻¹ ≈ refl (inverse law)
     2. hf.symm · refl · hf ≈ hf.symm · hf ≈ refl (unit and inverse laws) -/
-theorem adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
+noncomputable def adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
     (f : Suspension X → Y.carrier) (hf : f (Suspension.north (X := X)) = Y.pt) :
     RwEq (adjMap x₀ f hf x₀) (Path.refl Y.pt) := by
   -- Expand the definition at `x₀`: the two meridian images coincide.
@@ -206,7 +206,7 @@ theorem adjMap_basepoint_rweq {X : Type u} (x₀ : X) {Y : Pointed}
 /-- The adjunction map sends basepoint to refl when the input sends north to the basepoint.
     Proof: When x = x₀, the path goes Y.pt → f(north) → f(south) → f(north) → Y.pt,
     which is trivial since it's hf.symm · p · p⁻¹ · hf = refl at the equality level. -/
-theorem adjMap_basepoint {X : Type u} (x₀ : X) {Y : Pointed}
+noncomputable def adjMap_basepoint {X : Type u} (x₀ : X) {Y : Pointed}
     (f : Suspension X → Y.carrier) (hf : f (Suspension.north (X := X)) = Y.pt) :
     RwEq (adjMap x₀ f hf x₀) (Path.refl Y.pt) :=
   adjMap_basepoint_rweq x₀ f hf
@@ -222,7 +222,7 @@ noncomputable def inducedPi1FromPointed' {A B : Type u} (a : A) (f : A → B) :
     π₁(A, a) → π₁(B, f a) :=
   Quot.lift
     (fun l => Quot.mk _ (Path.congrArg f l))
-    (fun _ _ h => Quot.sound (rweq_context_map_of_rweq ⟨f⟩ h))
+    (fun _ _ h => Quot.sound (rweqProp_of_rweq (rweq_context_map_of_rweq ⟨f⟩ h)))
 
 /-- Induced map on π₁ from a pointed map (general version). -/
 noncomputable def inducedPi1FromPointed {X Y : Pointed}
@@ -251,7 +251,7 @@ structure IsPathConnectedPointed (X : Pointed) where
 structure IsSimplyConnected (X : Pointed) extends IsPathConnectedPointed X where
   /-- π₁ is trivial. -/
   pi1_trivial : ∀ l : LoopSpace X.carrier X.pt,
-    Quot.mk RwEq l = Quot.mk RwEq (Path.refl X.pt)
+    Quot.mk rwEqRel l = Quot.mk rwEqRel (Path.refl X.pt)
 
 /-- The suspension of a non-empty space has path-connected structure.
     For the proof that π₁(ΣX) = 1, see `CompPath/SphereCompPath.lean` which proves this

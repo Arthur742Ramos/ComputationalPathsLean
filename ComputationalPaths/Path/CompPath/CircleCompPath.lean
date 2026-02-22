@@ -35,7 +35,7 @@ inductive CircleCompPath : Type u
   | base : CircleCompPath
 
 /-- Base point of the circle. -/
-@[simp] noncomputable def circleCompPathBase : CircleCompPath := CircleCompPath.base
+@[simp] def circleCompPathBase : CircleCompPath := CircleCompPath.base
 
 /-! ## Path expressions with a loop generator -/
 

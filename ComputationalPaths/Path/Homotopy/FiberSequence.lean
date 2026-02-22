@@ -16,7 +16,7 @@ namespace FiberSequence
 universe u
 
 /-- A 2-cell between parallel computational paths. -/
-abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Prop := RwEq p q
+abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Type u := RwEq p q
 
 /-- Projection in a fiber sequence preserves the associator 2-cell on loops. -/
 theorem proj_assoc_two_cell {F E B : Type u}

@@ -181,7 +181,7 @@ theorem torusLoop2_snd_toEq :
 /-- Euler characteristic of the torus.
     χ(T²) = V - E + F = 1 - 2 + 1 = 0
     (CW structure: 1 vertex, 2 edges, 1 face). -/
-noncomputable def torusEulerChar : Int := 0
+def torusEulerChar : Int := 0
 
 /-- The CW cell count data for the torus. -/
 structure TorusCWData where
@@ -190,7 +190,7 @@ structure TorusCWData where
   faces : Nat := 1
 
 /-- The standard CW structure on the torus. -/
-noncomputable def torusStdCW : TorusCWData := { vertices := 1, edges := 2, faces := 1 }
+def torusStdCW : TorusCWData := { vertices := 1, edges := 2, faces := 1 }
 
 /-- The Euler characteristic computes from the CW data. -/
 theorem torusEuler_from_CW :
@@ -314,7 +314,7 @@ theorem torusDiagonal_base :
 noncomputable def torusStdCoveringDegree : Nat := 2
 
 /-- The genus of the torus is 1. -/
-noncomputable def torusGenus : Nat := 1
+def torusGenus : Nat := 1
 
 /-- The genus–Euler characteristic relation: χ = 2 - 2g. -/
 theorem torusGenus_euler : (2 : Int) - 2 * torusGenus = torusEulerChar := rfl

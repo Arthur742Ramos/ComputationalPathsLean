@@ -30,7 +30,7 @@ universe u v
 /-! ## Localization data -/
 
 /-- The path category on a type `A`, viewed as a weak category of paths. -/
-abbrev pathCategory (A : Type u) : WeakCategory A :=
+noncomputable abbrev pathCategory (A : Type u) : WeakCategory A :=
   WeakCategory.identity A
 
 /-- Weak equivalences in the path category are rewrite equalities. -/
@@ -38,11 +38,11 @@ abbrev pathWeakEquiv {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   Nonempty (RwEq p q)
 
 /-- The localization of the path category at rewrite equalities. -/
-abbrev pathLocalization (A : Type u) : StrictCategory A :=
+noncomputable abbrev pathLocalization (A : Type u) : StrictCategory A :=
   StrictCategory.quotient A
 
 /-- The localized groupoid obtained from the path category. -/
-abbrev pathLocalizationGroupoid (A : Type u) : StrictGroupoid A :=
+noncomputable abbrev pathLocalizationGroupoid (A : Type u) : StrictGroupoid A :=
   StrictGroupoid.quotient A
 
 /-! ## The localization map -/

@@ -36,15 +36,15 @@ theorem add_mod_mod (a b p : Nat) : (a + b % p) % p = (a + b) % p := by
 /-! ## Group operations on ℤ/p -/
 
 /-- Addition in ℤ/p. -/
-noncomputable def zpAdd (p : Nat) (hp : p > 0) (a b : Zp p) : Zp p :=
+def zpAdd (p : Nat) (hp : p > 0) (a b : Zp p) : Zp p :=
   ⟨(a.val + b.val) % p, Nat.mod_lt _ hp⟩
 
 /-- Zero in ℤ/p. -/
-noncomputable def zpZero (p : Nat) (hp : p > 0) : Zp p :=
+def zpZero (p : Nat) (hp : p > 0) : Zp p :=
   ⟨0, hp⟩
 
 /-- Negation in ℤ/p. -/
-noncomputable def zpNeg (p : Nat) (hp : p > 0) (a : Zp p) : Zp p :=
+def zpNeg (p : Nat) (hp : p > 0) (a : Zp p) : Zp p :=
   ⟨(p - a.val) % p, Nat.mod_lt _ hp⟩
 
 /-- Right identity for ℤ/p addition. -/
@@ -60,12 +60,12 @@ theorem zpAdd_zero_left (p : Nat) (hp : p > 0) (a : Zp p) :
   exact Fin.ext (Nat.mod_eq_of_lt a.isLt)
 
 /-- Path witness for right identity. -/
-noncomputable def zpAdd_zero_right_path (p : Nat) (hp : p > 0) (a : Zp p) :
+def zpAdd_zero_right_path (p : Nat) (hp : p > 0) (a : Zp p) :
     Path (zpAdd p hp a (zpZero p hp)) a :=
   Path.stepChain (zpAdd_zero_right p hp a)
 
 /-- Path witness for left identity. -/
-noncomputable def zpAdd_zero_left_path (p : Nat) (hp : p > 0) (a : Zp p) :
+def zpAdd_zero_left_path (p : Nat) (hp : p > 0) (a : Zp p) :
     Path (zpAdd p hp (zpZero p hp) a) a :=
   Path.stepChain (zpAdd_zero_left p hp a)
 
@@ -76,7 +76,7 @@ theorem zpAdd_comm (p : Nat) (hp : p > 0) (a b : Zp p) :
   exact Fin.ext (by simp [Nat.add_comm])
 
 /-- Path witness for commutativity. -/
-noncomputable def zpAdd_comm_path (p : Nat) (hp : p > 0) (a b : Zp p) :
+def zpAdd_comm_path (p : Nat) (hp : p > 0) (a b : Zp p) :
     Path (zpAdd p hp a b) (zpAdd p hp b a) :=
   Path.stepChain (zpAdd_comm p hp a b)
 
@@ -88,14 +88,14 @@ theorem zpAdd_assoc (p : Nat) (hp : p > 0) (a b c : Zp p) :
                     rw [mod_add_mod, add_mod_mod, Nat.add_assoc])
 
 /-- Path witness for associativity. -/
-noncomputable def zpAdd_assoc_path (p : Nat) (hp : p > 0) (a b c : Zp p) :
+def zpAdd_assoc_path (p : Nat) (hp : p > 0) (a b c : Zp p) :
     Path (zpAdd p hp (zpAdd p hp a b) c) (zpAdd p hp a (zpAdd p hp b c)) :=
   Path.stepChain (zpAdd_assoc p hp a b c)
 
 /-! ## Multiplication on ℤ/p -/
 
 /-- Multiplication in ℤ/p. -/
-noncomputable def zpMul (p : Nat) (hp : p > 0) (a b : Zp p) : Zp p :=
+def zpMul (p : Nat) (hp : p > 0) (a b : Zp p) : Zp p :=
   ⟨(a.val * b.val) % p, Nat.mod_lt _ hp⟩
 
 /-- Multiplication by zero gives zero. -/
@@ -104,7 +104,7 @@ theorem zpMul_zero_right (p : Nat) (hp : p > 0) (a : Zp p) :
   simp [zpMul, zpZero]
 
 /-- Path witness for multiplication by zero. -/
-noncomputable def zpMul_zero_path (p : Nat) (hp : p > 0) (a : Zp p) :
+def zpMul_zero_path (p : Nat) (hp : p > 0) (a : Zp p) :
     Path (zpMul p hp a (zpZero p hp)) (zpZero p hp) :=
   Path.stepChain (zpMul_zero_right p hp a)
 
@@ -115,22 +115,22 @@ theorem zpMul_comm (p : Nat) (hp : p > 0) (a b : Zp p) :
   exact Fin.ext (by simp [Nat.mul_comm])
 
 /-- Path witness for multiplicative commutativity. -/
-noncomputable def zpMul_comm_path (p : Nat) (hp : p > 0) (a b : Zp p) :
+def zpMul_comm_path (p : Nat) (hp : p > 0) (a b : Zp p) :
     Path (zpMul p hp a b) (zpMul p hp b a) :=
   Path.stepChain (zpMul_comm p hp a b)
 
 /-! ## Lens space loop group structure -/
 
 /-- The loop group operation: concatenation of loops at the lens space basepoint. -/
-noncomputable def loopMul (p q : Nat) (α β : lensSpaceLoopSpace p q) : lensSpaceLoopSpace p q :=
+def loopMul (p q : Nat) (α β : lensSpaceLoopSpace p q) : lensSpaceLoopSpace p q :=
   Path.trans α β
 
 /-- The identity loop. -/
-noncomputable def loopId (p q : Nat) : lensSpaceLoopSpace p q :=
+def loopId (p q : Nat) : lensSpaceLoopSpace p q :=
   Path.refl (lensSpaceBase p q)
 
 /-- The inverse loop. -/
-noncomputable def loopInv (p q : Nat) (α : lensSpaceLoopSpace p q) : lensSpaceLoopSpace p q :=
+def loopInv (p q : Nat) (α : lensSpaceLoopSpace p q) : lensSpaceLoopSpace p q :=
   Path.symm α
 
 /-- Left identity for loop multiplication. -/
@@ -144,12 +144,12 @@ theorem loopMul_id_right (p q : Nat) (α : lensSpaceLoopSpace p q) :
   unfold loopMul loopId; exact Path.trans_refl_right α
 
 /-- Path witness for left identity. -/
-noncomputable def loopMul_id_left_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
+def loopMul_id_left_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
     Path (loopMul p q (loopId p q) α) α :=
   Path.stepChain (loopMul_id_left p q α)
 
 /-- Path witness for right identity. -/
-noncomputable def loopMul_id_right_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
+def loopMul_id_right_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
     Path (loopMul p q α (loopId p q)) α :=
   Path.stepChain (loopMul_id_right p q α)
 
@@ -159,7 +159,7 @@ theorem loopMul_assoc (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
   unfold loopMul; exact Path.trans_assoc α β γ
 
 /-- Path witness for loop associativity. -/
-noncomputable def loopMul_assoc_path (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
+def loopMul_assoc_path (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
     Path (loopMul p q (loopMul p q α β) γ)
          (loopMul p q α (loopMul p q β γ)) :=
   Path.stepChain (loopMul_assoc p q α β γ)
@@ -180,7 +180,7 @@ theorem loopInv_mul (p q : Nat) (α β : lensSpaceLoopSpace p q) :
   unfold loopInv loopMul; exact Path.symm_trans α β
 
 /-- Path for inverse distribution. -/
-noncomputable def loopInv_mul_path (p q : Nat) (α β : lensSpaceLoopSpace p q) :
+def loopInv_mul_path (p q : Nat) (α β : lensSpaceLoopSpace p q) :
     Path (loopInv p q (loopMul p q α β))
          (loopMul p q (loopInv p q β) (loopInv p q α)) :=
   Path.stepChain (loopInv_mul p q α β)
@@ -191,26 +191,26 @@ theorem loopInv_inv (p q : Nat) (α : lensSpaceLoopSpace p q) :
   unfold loopInv; exact Path.symm_symm α
 
 /-- Path for double inverse. -/
-noncomputable def loopInv_inv_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
+def loopInv_inv_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
     Path (loopInv p q (loopInv p q α)) α :=
   Path.stepChain (loopInv_inv p q α)
 
 /-! ## Specific lens spaces -/
 
 /-- L(2,1) ≅ RP³: the real projective 3-space. -/
-noncomputable def rp3AsLens_h1 : Zp 2 := ⟨1, by omega⟩
+def rp3AsLens_h1 : Zp 2 := ⟨1, by omega⟩
 
 /-- The H₁ of RP³ has order 2. -/
 theorem rp3_h1_order : zpAdd 2 (by omega) rp3AsLens_h1 rp3AsLens_h1 = zpZero 2 (by omega) := by
   simp [rp3AsLens_h1, zpAdd, zpZero]
 
 /-- Path witness for H₁(RP³) having order 2. -/
-noncomputable def rp3_h1_order_path :
+def rp3_h1_order_path :
     Path (zpAdd 2 (by omega) rp3AsLens_h1 rp3AsLens_h1) (zpZero 2 (by omega)) :=
   Path.stepChain rp3_h1_order
 
 /-- L(3,1): a lens space with ℤ/3 fundamental group. -/
-noncomputable def l31_h1 : Zp 3 := ⟨1, by omega⟩
+def l31_h1 : Zp 3 := ⟨1, by omega⟩
 
 /-- The generator of ℤ/3 has order 3. -/
 theorem l31_h1_order :
@@ -219,13 +219,13 @@ theorem l31_h1_order :
   simp [l31_h1, zpAdd, zpZero]
 
 /-- Path for ℤ/3 order. -/
-noncomputable def l31_h1_order_path :
+def l31_h1_order_path :
     Path (zpAdd 3 (by omega) (zpAdd 3 (by omega) l31_h1 l31_h1) l31_h1)
          (zpZero 3 (by omega)) :=
   Path.stepChain l31_h1_order
 
 /-- L(5,1): generator of ℤ/5 has order 5. -/
-noncomputable def l51_gen : Zp 5 := ⟨1, by omega⟩
+def l51_gen : Zp 5 := ⟨1, by omega⟩
 
 /-- 5 * generator = 0 in ℤ/5. -/
 theorem l51_order :
@@ -235,7 +235,7 @@ theorem l51_order :
   native_decide
 
 /-- Path for ℤ/5 order. -/
-noncomputable def l51_order_path :
+def l51_order_path :
     Path (zpAdd 5 (by omega) (zpAdd 5 (by omega) (zpAdd 5 (by omega)
       (zpAdd 5 (by omega) l51_gen l51_gen) l51_gen) l51_gen) l51_gen)
     (zpZero 5 (by omega)) :=
@@ -253,24 +253,24 @@ structure LensCovering (p q : Nat) (hp : p > 0) where
   divides : p % sheets = 0
 
 /-- The universal cover of L(p,q) has p sheets. -/
-noncomputable def universalCover (p q : Nat) (hp : p > 0) : LensCovering p q hp where
+def universalCover (p q : Nat) (hp : p > 0) : LensCovering p q hp where
   sheets := p
   sheets_pos := hp
   divides := Nat.mod_self p
 
 /-- The trivial (identity) cover has 1 sheet. -/
-noncomputable def trivialCover (p q : Nat) (hp : p > 0) : LensCovering p q hp where
+def trivialCover (p q : Nat) (hp : p > 0) : LensCovering p q hp where
   sheets := 1
   sheets_pos := by omega
   divides := Nat.mod_one p
 
 /-- Path: universal cover has p sheets. -/
-noncomputable def universalCover_sheets_path (p q : Nat) (hp : p > 0) :
+def universalCover_sheets_path (p q : Nat) (hp : p > 0) :
     Path (universalCover p q hp).sheets p :=
   Path.refl p
 
 /-- Path: trivial cover has 1 sheet. -/
-noncomputable def trivialCover_sheets_path (p q : Nat) (hp : p > 0) :
+def trivialCover_sheets_path (p q : Nat) (hp : p > 0) :
     Path (trivialCover p q hp).sheets 1 :=
   Path.refl 1
 
@@ -286,12 +286,12 @@ theorem lensSpaceLoopPow_zero (p q : Nat) :
     lensSpaceLoopPow p q 0 = Path.refl (lensSpaceBase p q) := rfl
 
 /-- Path witness for loop power zero. -/
-noncomputable def lensSpaceLoopPow_zero_path (p q : Nat) :
+def lensSpaceLoopPow_zero_path (p q : Nat) :
     Path (lensSpaceLoopPow p q 0) (Path.refl (lensSpaceBase p q)) :=
   Path.stepChain (lensSpaceLoopPow_zero p q)
 
 /-- Path witness for loop power successor. -/
-noncomputable def lensSpaceLoopPow_succ_path (p q n : Nat) :
+def lensSpaceLoopPow_succ_path (p q n : Nat) :
     Path (lensSpaceLoopPow p q (n + 1))
          (Path.trans (lensSpaceLoop p q) (lensSpaceLoopPow p q n)) :=
   Path.stepChain (lensSpaceLoopPow_succ p q n)
@@ -302,7 +302,7 @@ theorem lensSpaceDecodePath_zero (p q : Nat) (_hp : p > 0) :
   simp [lensSpaceDecodePath, zpZero]
 
 /-- Path witness for decode at zero. -/
-noncomputable def lensSpaceDecodePath_zero_path (p q : Nat) (hp : p > 0) :
+def lensSpaceDecodePath_zero_path (p q : Nat) (hp : p > 0) :
     Path (lensSpaceDecodePath p q (zpZero p hp))
          (Path.refl (lensSpaceBase p q)) :=
   Path.stepChain (lensSpaceDecodePath_zero p q hp)
@@ -318,12 +318,12 @@ theorem lensSpacePiOneEquivZp_inv_is_id (p : Nat) (x : Zp p) :
     (lensSpacePiOneEquivZp p).invFun x = x := rfl
 
 /-- Path witness for forward direction. -/
-noncomputable def lensSpacePiOneEquivZp_path (p : Nat) (x : lensSpacePiOne p) :
+def lensSpacePiOneEquivZp_path (p : Nat) (x : lensSpacePiOne p) :
     Path ((lensSpacePiOneEquivZp p).toFun x) x :=
   Path.refl x
 
 /-- Path witness for backward direction. -/
-noncomputable def lensSpacePiOneEquivZp_inv_path (p : Nat) (x : Zp p) :
+def lensSpacePiOneEquivZp_inv_path (p : Nat) (x : Zp p) :
     Path ((lensSpacePiOneEquivZp p).invFun x) x :=
   Path.refl x
 
@@ -332,21 +332,21 @@ theorem lensSpacePiOneEquivZp_roundtrip (p : Nat) (x : lensSpacePiOne p) :
     (lensSpacePiOneEquivZp p).invFun ((lensSpacePiOneEquivZp p).toFun x) = x := rfl
 
 /-- Path for round-trip. -/
-noncomputable def lensSpacePiOneEquivZp_roundtrip_path (p : Nat) (x : lensSpacePiOne p) :
+def lensSpacePiOneEquivZp_roundtrip_path (p : Nat) (x : lensSpacePiOne p) :
     Path ((lensSpacePiOneEquivZp p).invFun ((lensSpacePiOneEquivZp p).toFun x)) x :=
   Path.refl x
 
 /-! ## Euler characteristic of lens spaces -/
 
 /-- Euler characteristic of an odd-dimensional lens space L(p,q) is 0. -/
-noncomputable def lensEulerChar (_p : Nat) (_hp : _p > 0) : Int := 0
+def lensEulerChar (_p : Nat) (_hp : _p > 0) : Int := 0
 
 /-- Euler characteristic of L(p,q) is always 0. -/
 theorem lensEulerChar_zero (p : Nat) (hp : p > 0) :
     lensEulerChar p hp = 0 := rfl
 
 /-- Path witness for lens space Euler characteristic. -/
-noncomputable def lensEulerChar_path (p : Nat) (hp : p > 0) :
+def lensEulerChar_path (p : Nat) (hp : p > 0) :
     Path (lensEulerChar p hp) 0 :=
   Path.refl 0
 
@@ -358,7 +358,7 @@ theorem lensSpaceLoopPow_one (p q : Nat) :
       Path.trans (lensSpaceLoop p q) (Path.refl (lensSpaceBase p q)) := rfl
 
 /-- Path for loop power one. -/
-noncomputable def lensSpaceLoopPow_one_path (p q : Nat) :
+def lensSpaceLoopPow_one_path (p q : Nat) :
     Path (lensSpaceLoopPow p q 1)
          (Path.trans (lensSpaceLoop p q) (Path.refl (lensSpaceBase p q))) :=
   Path.refl _

@@ -192,14 +192,14 @@ theorem loopA_mul_inv_trivial :
     (Quot.mk _ (Path.trans loopA (Path.symm loopA)) : FigureEightPiOne) =
       Quot.mk _ (Path.refl base) := by
   apply Quot.sound
-  exact rweq_of_step (Step.trans_symm loopA)
+  exact rweqProp_of_rweq (rweq_of_step (Step.trans_symm loopA))
 
 /-- loopB composed with its inverse is trivial in π₁. -/
 theorem loopB_mul_inv_trivial :
     (Quot.mk _ (Path.trans loopB (Path.symm loopB)) : FigureEightPiOne) =
       Quot.mk _ (Path.refl base) := by
   apply Quot.sound
-  exact rweq_of_step (Step.trans_symm loopB)
+  exact rweqProp_of_rweq (rweq_of_step (Step.trans_symm loopB))
 
 /-- loopAClass and loopBClass generate the full fundamental group. -/
 theorem loopAB_generate :

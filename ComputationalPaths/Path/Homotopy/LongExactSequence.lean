@@ -69,6 +69,7 @@ theorem exact_at_totalSpace {P : B → Type u} (b : B) (x₀ : P b) :
     apply Quot.sound
     -- congrArg (Total.proj ∘ (⟨b, ·⟩)) l ≈ refl b
     -- since Total.proj ∘ (fun x => ⟨b, x⟩) = fun _ => b
+    apply rweqProp_of_rweq
     apply rweq_trans (rweq_symm (rweq_of_eq (Path.congrArg_comp Total.proj (fun x => ⟨b, x⟩) l)))
     exact rweq_congrArg_const b l
 
