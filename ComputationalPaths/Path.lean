@@ -679,7 +679,9 @@ import ComputationalPaths.Path.Algebra.TopKTheory
 import ComputationalPaths.Path.Algebra.ToposPathsDeep
 import ComputationalPaths.Path.Algebra.ToposTheoryDeep
 import ComputationalPaths.Path.Algebra.TorFunctor
+import ComputationalPaths.Path.Algebra.TStructureDeep
 import ComputationalPaths.Path.Algebra.TriangulatedDeep
+import ComputationalPaths.Path.Algebra.DerivedAdjunctionDeep
 import ComputationalPaths.Path.Algebra.TropicalGeometryDeep
 import ComputationalPaths.Path.Algebra.TropicalPaths
 import ComputationalPaths.Path.Algebra.TypeTheoreticFibDeep
