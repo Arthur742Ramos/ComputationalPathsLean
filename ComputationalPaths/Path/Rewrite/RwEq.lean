@@ -58,18 +58,6 @@ inductive RwEq {A : Type u} {a b : A} : Path a b → Path a b → Type u
 abbrev RwEqProp {A : Type u} {a b : A} (p q : Path a b) : Prop :=
   Nonempty (RwEq p q)
 
-/-- All rewrite derivations between the same endpoints are equal (coherence axiom).
-    This is the computational paths analogue of proof irrelevance: any two
-    witnesses of rewrite equivalence `RwEq p q` are equal, reflecting that
-    the 2-category of computational paths is a (2,1)-category where
-    parallel 2-cells are unique. -/
-axiom rweq_proof_irrelevance {A : Type u} {a b : A}
-    {p q : Path a b} (h₁ h₂ : RwEq p q) : h₁ = h₂
-
-noncomputable instance instSubsingletonRwEq {A : Type u} {a b : A}
-    {p q : Path a b} : Subsingleton (RwEq p q) :=
-  ⟨rweq_proof_irrelevance⟩
-
 noncomputable def rweqProp_of_rweq {A : Type u} {a b : A}
     {p q : Path a b} (h : RwEq p q) : RwEqProp p q :=
   ⟨h⟩
