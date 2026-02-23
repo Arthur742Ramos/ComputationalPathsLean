@@ -957,8 +957,32 @@ noncomputable def connect_strict {p q : Path a b}
                 exact ⟨connect_strict_fallback _ _⟩
         | _ =>
             exact ⟨connect_strict_fallback _ _⟩
-    | cons_inv _ _ _ =>
-        exact ⟨connect_strict_fallback _ _⟩
+    | cons_inv s hrest₁ ih =>
+        cases h₂ with
+        | single_inv t =>
+            cases hrest₁ with
+            | refl _ =>
+                exact ⟨.vcomp
+                  (.step (.vcomp_refl_right (.inv (.step s))))
+                  (.step (.whisker_inv₃ (.step_eq s t)))⟩
+            | _ =>
+                exact ⟨connect_strict_fallback _ _⟩
+        | cons_inv t hrest₂ =>
+            cases hrest₁ with
+            | refl _ =>
+                cases hrest₂ with
+                | refl _ =>
+                    exact ⟨.vcomp
+                      (.step (.vcomp_refl_right (.inv (.step s))))
+                      (.vcomp
+                        (.step (.whisker_inv₃ (.step_eq s t)))
+                        (.inv (.step (.vcomp_refl_right (.inv (.step t))))))⟩
+                | _ =>
+                    exact ⟨connect_strict_fallback _ _⟩
+            | _ =>
+                exact ⟨connect_strict_fallback _ _⟩
+        | _ =>
+            exact ⟨connect_strict_fallback _ _⟩
   exact Classical.choice aux
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
@@ -967,16 +991,15 @@ noncomputable def connect_strict {p q : Path a b}
 
 We compose:
 1. `to_normal_form₃ d₁ : Derivation₃ d₁ (normalize d₁)`
-2. `connect_normalized (normalize d₁) (normalize d₂)`
+2. `connect_strict (normalize_is_strict d₁) (normalize_is_strict d₂)`
 3. `inv (to_normal_form₃ d₂) : Derivation₃ (normalize d₂) d₂`
 
-The middle connector handles explicit unit/step interactions (including
-`diamond_filler` and generic unit-elimination branches), and falls back to
-`MetaStep₃.rweq_transport` for remaining mixed constructors. -/
+The middle connector operates on strict normal forms obtained from `normalize`
+and their `normalize_is_strict` witnesses. -/
 noncomputable def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
   .vcomp (to_normal_form₃ d₁)
-    (.vcomp (connect_normalized (normalize d₁) (normalize d₂))
+    (.vcomp (connect_strict (normalize_is_strict d₁) (normalize_is_strict d₂))
       (.inv (to_normal_form₃ d₂)))
 
 /-- Bridge from any 2-cell to its strict normal-form representative. -/

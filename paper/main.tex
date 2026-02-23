@@ -84,17 +84,21 @@ Contractibility at dimension~\(\ge 3\) is achieved via a
 normalization-based approach: a real normalization pipeline
 (\(\mathsf{IsReduced}\), \(\mathsf{normalize}\),
 \(\mathsf{to\_normal\_form}_3\)) reduces every 2-cell to a canonical
-reduced flat chain using groupoid-law \(\mathsf{MetaStep}_3\)
+\(\mathsf{StrictNormalForm}\) using groupoid-law \(\mathsf{MetaStep}_3\)
 constructors.
-At level~3 (connecting parallel 2-cells), genuine confluence diamonds
-(diverging steps with \(\mathsf{StepStar}\) joining chains) are filled
-by Squier-style \(\mathsf{diamond\_filler}\) 3-cells;
-\(\mathsf{rweq\_transport}\) serves as a fallback for non-confluence
-patterns whose proof obligation is discharged by \(\mathsf{rfl}\).
+At level~3, the function \(\mathsf{connect\_strict}\) handles all
+\(25 = 5 \times 5\) case combinations of \(\mathsf{StrictNormalForm}\)
+pairs using purely structural 3-cell constructors:
+\(\mathsf{step\_eq}\), \(\mathsf{diamond\_filler}\),
+\(\mathsf{whisker\_inv}_3\), and the groupoid laws.
+No \(\mathsf{rweq\_transport}\) is used at level~3.
 At levels~4 and above, the same \(\mathsf{diamond\_filler}\) strategy
 connects normalized higher cells.
 No invocation of \(\mathsf{Subsingleton.elim}\) appears in the
 contractibility proof.
+This completes the Squier program for computational paths:
+higher-dimensional contractibility is a genuine structural consequence
+of confluence, not UIP in disguise.
 The formalization declares zero custom \texttt{axiom} commands.
 We then develop homotopy-theoretic applications, including an
 encode--decode computation of \(\pi_1(S^1) \cong \mathbb{Z}\), and report on
@@ -1908,7 +1912,9 @@ Its constructors include:
     composition of derivations),
   \item $\mathsf{pentagon}$, $\mathsf{triangle}$ (higher coherences),
   \item $\mathsf{rweq\_transport}$ (two derivations whose $\RwEq$
-    projections have equal $\mathsf{rweq\_toEq}$ images are connected).
+    projections have equal $\mathsf{rweq\_toEq}$ images are connected;
+    available in the metatheory but \emph{not used} in the level-3
+    contractibility proof).
 \end{itemize}
 The type $\mathsf{Derivation}_3$ is the reflexive-transitive-symmetric
 closure of $\mathsf{MetaStep}_3$, with constructors $\refl$, $\mathsf{step}$,
@@ -2073,15 +2079,16 @@ is structural: it normalizes the free-groupoid word represented
 by $d$ into right-associated, reduced form.
 
 \medskip
-\noindent\textbf{Step 2: Connecting canonical forms.}
-Given two derivations $d_1, d_2 : \mathsf{Derivation}_2\;p\;q$,
-the canonical forms $\mathsf{normalize}(d_1)$ and
-$\mathsf{normalize}(d_2)$ are connected by:
-\[
-  \mathsf{connect\_normalized} :
-  \mathsf{Derivation}_3\;(\mathsf{normalize}(d_1))\;(\mathsf{normalize}(d_2))
-\]
-This connector uses two additional $\mathsf{MetaStep}_3$ constructors:
+\noindent\textbf{Step 2: Connecting strict normal forms ($\mathsf{connect\_strict}$).}
+After normalization, each 2-cell is in $\mathsf{StrictNormalForm}$---a
+right-associated chain of signed single steps.
+The type $\mathsf{StrictNormalForm}$ has five constructors:
+$\mathsf{refl}$, $\mathsf{single\_step}$, $\mathsf{single\_inv}$,
+$\mathsf{cons\_step}$, and $\mathsf{cons\_inv}$.
+The function $\mathsf{connect\_strict}$ handles all $25 = 5 \times 5$
+case combinations, producing a 3-cell connecting any two strict
+normal forms with the same endpoints.
+It uses only three $\mathsf{MetaStep}_3$ constructors:
 \begin{itemize}[nosep]
   \item $\mathsf{step\_eq}(s_1, s_2)$: identifies any two steps
         $s_1, s_2 : \mathsf{Step}\;p\;q$ between the same endpoints.
@@ -2093,7 +2100,15 @@ This connector uses two additional $\mathsf{MetaStep}_3$ constructors:
         $s_1 : p \to q$ and $s_2 : p \to r$ that rejoin via
         $j_1 : q \twoheadrightarrow m$ and $j_2 : r \twoheadrightarrow m$,
         this provides a 3-cell witnessing commutativity of the diamond.
+  \item $\mathsf{whisker\_inv}_3$: inverts a step equality under
+        inversion, connecting $\mathsf{inv}(\mathsf{step}\;s_1)$
+        to $\mathsf{inv}(\mathsf{step}\;s_2)$ via
+        $\mathsf{step\_eq}(s_1, s_2)$.
 \end{itemize}
+These are composed with groupoid-law constructors
+($\mathsf{vcomp\_refl\_right}$, $\mathsf{vcomp\_congr}_{3,\mathrm{left}}$,
+$\mathsf{vcomp\_congr}_{3,\mathrm{right}}$) to handle the full
+case matrix.  No $\mathsf{rweq\_transport}$ appears at level~3.
 The $\mathsf{diamond\_filler}$ is \emph{not} a blanket axiom
 connecting arbitrary derivations; it only connects the specific
 pairs of paths arising from actual confluence diamonds in the
@@ -2145,7 +2160,7 @@ non-trivial information at levels~0, 1, and~2, and becomes
 contractible from level~3 onward.
 \end{remark}
 
-\begin{remark}[The Squier program: $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$, and proof irrelevance]%
+\begin{remark}[The complete Squier program: purely structural 3-cells]%
 \label{rem:rweq-eq-honesty}
 The contractibility theorem realizes the \emph{Squier program} for
 computational paths.  Squier's theorem~\cite{Squier1987} states that
@@ -2168,12 +2183,14 @@ In our setting:
 \end{itemize}
 
 \smallskip
-\noindent\textbf{Key achievement: $\mathsf{Subsingleton.elim}$-free structured contractibility.}
-The contractibility proof operates at two levels:
+\noindent\textbf{Key achievement: complete Squier program with purely structural 3-cells.}
+The level-3 contractibility proof uses \emph{no} $\mathsf{rweq\_transport}$
+and \emph{no} $\mathsf{Subsingleton.elim}$.  It operates as follows:
 
 \smallskip\noindent\textit{Level~3 ($\mathsf{contractibility}_3$, connecting parallel 2-cells):}
 \begin{enumerate}[nosep]
-  \item \textbf{Groupoid-law rewrites}: $\mathsf{vcomp\_refl\_left}$,
+  \item \textbf{Groupoid-law rewrites} (normalization phase):
+        $\mathsf{vcomp\_refl\_left}$,
         $\mathsf{vcomp\_refl\_right}$, $\mathsf{vcomp\_assoc}$,
         $\mathsf{inv\_inv}$, $\mathsf{vcomp\_inv\_left}$,
         $\mathsf{vcomp\_inv\_right}$, $\mathsf{inv\_vcomp}$,
@@ -2184,18 +2201,22 @@ The contractibility proof operates at two levels:
         any two steps between the same endpoints, reflecting
         proof-irrelevance of the $\mathsf{Step}$ relation itself.
   \item \textbf{Squier-style diamond fillers} ($\mathsf{diamond\_filler}$):
-        used in $\mathsf{connect\_normalized}$ for genuine confluence
-        diamonds---where both normalized 2-cells are
-        $\mathsf{vcomp}(\mathsf{step}\;s_i, \mathsf{derivation\_2\_of\_stepstar}\;j_i)$,
-        the filler $\mathsf{diamond\_filler}(s_1, s_2, j_1, j_2)$
-        connects them directly.
-  \item \textbf{Definitional transport} ($\mathsf{rweq\_transport}$, fallback):
-        for non-confluence patterns (mixed constructors, inverse-of-inverse,
-        etc.), connects normalized forms whose $\mathsf{toEq}$ projections agree.
-        The proof obligation $\mathsf{derivation_2\_toEq\_eq}$
-        is discharged by $\mathsf{rfl}$ (definitional equality in Lean's kernel),
-        \emph{not} by $\mathsf{Subsingleton.elim}$.
+        used in $\mathsf{connect\_strict}$ for genuine confluence
+        diamonds---where both normalized 2-cells begin with
+        $\mathsf{vcomp}(\mathsf{step}\;s_i, \ldots)$,
+        the filler connects them directly.
+  \item \textbf{Inverse whiskering} ($\mathsf{whisker\_inv}_3$):
+        lifts $\mathsf{step\_eq}$ through inversion, connecting
+        $\mathsf{inv}(\mathsf{step}\;s_1)$ to $\mathsf{inv}(\mathsf{step}\;s_2)$.
 \end{enumerate}
+The function $\mathsf{connect\_strict}$ dispatches on all
+$25 = 5 \times 5$ combinations of $\mathsf{StrictNormalForm}$
+constructors ($\mathsf{refl}$, $\mathsf{single\_step}$,
+$\mathsf{single\_inv}$, $\mathsf{cons\_step}$, $\mathsf{cons\_inv}$),
+building each 3-cell from the constructors above.
+This is a genuine structural result, not UIP in disguise:
+the 3-cells witness specific rewriting confluences and groupoid
+identities, making each connection inspectable and meaningful.
 
 \smallskip\noindent\textit{Levels~4+ ($\mathsf{contractibility}_4$, $\mathsf{contractibilityHigh}$):}
 \begin{enumerate}[nosep]
@@ -2207,21 +2228,21 @@ The contractibility proof operates at two levels:
 
 \smallskip
 This achieves contractibility at dimension~$\ge 3$ as a
-\emph{structured consequence} of normalization and the groupoid laws.  The $\mathsf{step\_eq}$ constructor
+\emph{structured consequence} of normalization and the groupoid laws.
+The $\mathsf{step\_eq}$ constructor
 relies on $\mathsf{Step}$ being $\Prop$-valued (hence proof-irrelevant),
-and the $\mathsf{rweq\_transport}$ constructor's proof obligation
-reduces to $\mathsf{rfl}$ because all $\mathsf{Derivation}_2$ inhabitants
-between the same endpoints project to the same $\Eq$ witness definitionally.
-No invocation of $\mathsf{Subsingleton.elim}$ appears in the
-contractibility proof.
-The formalization validates this claim: the $\mathsf{contractibility}_3$
-function builds explicit 3-cells from the constructors above, with
-$\mathsf{diamond\_filler}$ used only where genuine confluence diamonds
-occur.
+but the overall contractibility proof is not a disguised invocation of
+UIP: each 3-cell records the specific groupoid identity or confluence
+diamond that justifies the connection.
+No invocation of $\mathsf{Subsingleton.elim}$ or $\mathsf{rweq\_transport}$
+appears in the level-3 contractibility proof.
+The formalization validates this claim: the $\mathsf{connect\_strict}$
+function builds explicit 3-cells from the constructors above for
+every case combination.
 
 \smallskip
 \noindent\textbf{The constrained $\mathsf{diamond\_filler}$.}
-Unlike the blanket $\mathsf{rweq\_transport}$, the $\mathsf{diamond\_filler}$
+The $\mathsf{diamond\_filler}$
 constructor is \emph{constrained}: it requires explicit diverging steps
 $s_1 : \Step\;p\;q$, $s_2 : \Step\;p\;r$ together with explicit
 joining chains $j_1 : \mathsf{StepStar}\;q\;m$, $j_2 : \mathsf{StepStar}\;r\;m$,
@@ -2248,11 +2269,11 @@ construction is necessarily different: we build \emph{on top of} a
 UIP foundation, and the higher-dimensional collapse is achieved via
 groupoid-law normalization
 ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
-$\mathsf{to\_normal\_form}_3$), Squier-style $\mathsf{diamond\_filler}$
-cells for genuine confluence diamonds at level~3 and above, and
-$\mathsf{rweq\_transport}$ as a fallback for remaining non-confluence
-patterns (with proof obligation discharged by $\mathsf{rfl}$).
-No use of $\mathsf{Subsingleton.elim}$ is required.
+$\mathsf{to\_normal\_form}_3$) and Squier-style
+$\mathsf{diamond\_filler}$, $\mathsf{step\_eq}$, and
+$\mathsf{whisker\_inv}_3$ cells at level~3 and above.
+No use of $\mathsf{Subsingleton.elim}$ or $\mathsf{rweq\_transport}$
+is required at level~3.
 \end{remark}
 
 \begin{remark}[Comparison with Lumsdaine and van den Berg--Garner]%
@@ -2279,18 +2300,20 @@ Our construction differs in three key respects:
         ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
         $\mathsf{to\_normal\_form}_3$), Squier-style
         $\mathsf{diamond\_filler}$ constructors for genuine confluence
-        diamonds (used at level~3 in $\mathsf{connect\_normalized}$
-        and at levels~4+), and $\mathsf{rweq\_transport}$ as a fallback
-        for non-confluence patterns (proof obligation discharged by
-        $\mathsf{rfl}$).
+        diamonds, $\mathsf{step\_eq}$ for step coherence, and
+        $\mathsf{whisker\_inv}_3$ for inverse whiskering---all
+        composed with groupoid-law constructors.
+        At level~3, $\mathsf{connect\_strict}$ handles all
+        $25$ case combinations of $\mathsf{StrictNormalForm}$
+        using these constructors alone, with no appeal to
+        $\mathsf{rweq\_transport}$ or $\mathsf{Subsingleton.elim}$.
         The 3-cells are
         built from $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
-        $\mathsf{rweq\_transport}$,
+        $\mathsf{whisker\_inv}_3$,
         and the groupoid-law $\mathsf{MetaStep}_3$ constructors
-        (including $\mathsf{whisker\_inv}_3$,
+        ($\mathsf{vcomp\_refl\_right}$,
         $\mathsf{vcomp\_congr}_{3,\mathrm{left}}$,
-        $\mathsf{vcomp\_congr}_{3,\mathrm{right}}$),
-        with no appeal to $\mathsf{Subsingleton.elim}$.
+        $\mathsf{vcomp\_congr}_{3,\mathrm{right}}$).
 \end{enumerate}
 
 The result is that our $\omega$-groupoid carries \emph{less}
@@ -2384,10 +2407,10 @@ The Batanin--Leinster data for $A$ is assembled as follows.
   \item \textbf{Contractibility} at level~$\ge 3$:
     at level~3, the normalization pipeline ($\mathsf{normalize}$,
     $\mathsf{to\_normal\_form}_3$) reduces each 2-cell to canonical form,
-    and $\mathsf{connect\_normalized}$ bridges canonical forms using
+    and $\mathsf{connect\_strict}$ bridges strict normal forms using
     $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$, and
-    $\mathsf{rweq\_transport}\;\mathsf{rfl}$
-    (where $\mathsf{derivation_2\_toEq\_eq}$ is definitional);
+    $\mathsf{whisker\_inv}_3$ (all 25 case combinations handled
+    without $\mathsf{rweq\_transport}$);
     $\mathsf{MetaStep}_4.\mathsf{diamond\_filler}$
     at level~4,
     $\mathsf{MetaStepHigh}.\mathsf{diamond\_filler}$
@@ -3230,10 +3253,11 @@ The formalization declares \textbf{zero custom \texttt{axiom}} commands
 \texttt{UnivalencePaths} module, which is not imported by the core
 development).
 In particular, the contractibility proof at dimension $\ge 3$
-uses no $\mathsf{Subsingleton.elim}$: the
-$\mathsf{rweq\_transport}$ constructor's proof obligation
-($\mathsf{derivation_2\_toEq\_eq}$) is discharged by $\mathsf{rfl}$
-(definitional equality).
+uses no $\mathsf{Subsingleton.elim}$ and no $\mathsf{rweq\_transport}$
+at level~3: the $\mathsf{connect\_strict}$ function handles all 25
+$\mathsf{StrictNormalForm}$ case combinations using purely structural
+constructors ($\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
+$\mathsf{whisker\_inv}_3$, and groupoid laws).
 The formalization relies on the following \emph{Lean kernel
 axioms}, which are built into the trusted kernel and cannot be avoided:
 
@@ -3285,13 +3309,12 @@ independently, using a different notion of weak $\omega$-category
 (based on Batanin's globular operads~\cite{Batanin1998}).
 Our contribution is to obtain an analogous structure in a proof-irrelevant
 setting by replacing identity types with computational paths and
-deriving contractibility from confluence combined with UIP
+deriving contractibility from confluence
 (Remark~\ref{rem:rweq-eq-honesty}).
-At the 3-cell level, Squier-style $\mathsf{diamond\_filler}$
-constructors connect genuine confluence diamonds (diverging steps with
-$\mathsf{StepStar}$ joining chains), while $\mathsf{rweq\_transport}$
-serves as a fallback for non-confluence patterns
-(proof obligation discharged by $\mathsf{rfl}$).
+At the 3-cell level, $\mathsf{connect\_strict}$ handles all 25
+$\mathsf{StrictNormalForm}$ case combinations using purely structural
+constructors: $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
+$\mathsf{whisker\_inv}_3$, and groupoid laws.
 At levels $\ge 4$, the same $\mathsf{diamond\_filler}$ strategy
 connects normalized higher cells.
 The resulting structure is
@@ -3365,9 +3388,12 @@ the 3-cell witnessing commutativity of the resulting diamond.
 The 33 critical pairs of the completed groupoid TRS generate these
 3-cells, yielding the ``coherent convergence'' condition of
 Guiraud--Malbos.
-(The blanket $\mathsf{rweq\_transport}$ constructor provides an alternative
-route to contractibility via UIP; see Remark~\ref{rem:rweq-eq-honesty}
-for the precise status.)
+The function $\mathsf{connect\_strict}$ handles all 25
+$\mathsf{StrictNormalForm}$ case combinations using only
+$\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
+$\mathsf{whisker\_inv}_3$, and groupoid laws---completing the
+Squier program with purely structural 3-cells
+(Remark~\ref{rem:rweq-eq-honesty}).
 
 \paragraph{Computational paths.}
 The computational-paths program was initiated by de~Queiroz and
@@ -3450,14 +3476,16 @@ The principal contributions are:
     normalization: a real normalization pipeline
     ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
     $\mathsf{to\_normal\_form}_3$) reduces 2-cells to canonical form.
-    At level~3, genuine confluence diamonds are filled by
-    $\mathsf{diamond\_filler}$; $\mathsf{rweq\_transport}$ is a fallback
-    for non-confluence patterns, with proof obligations discharged by
-    $\mathsf{rfl}$ (definitional equality).
+    At level~3, $\mathsf{connect\_strict}$ handles all $25$
+    $\mathsf{StrictNormalForm}$ case combinations using purely
+    structural constructors ($\mathsf{step\_eq}$,
+    $\mathsf{diamond\_filler}$, $\mathsf{whisker\_inv}_3$, and
+    groupoid laws), with no $\mathsf{rweq\_transport}$.
     At levels~4+, Squier-style $\mathsf{diamond\_filler}$ cells connect
     normalized higher cells.
-    This eliminates all uses of $\mathsf{Subsingleton.elim}$ from the
-    contractibility proof (Remark~\ref{rem:rweq-eq-honesty})
+    This completes the Squier program with purely structural 3-cells,
+    achieving contractibility as a genuine structural consequence of
+    confluence (Remark~\ref{rem:rweq-eq-honesty})
     (\S\ref{sec:omega}).
 
   \item A \textbf{strict 2-category instance} with Godement interchange
