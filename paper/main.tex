@@ -86,12 +86,13 @@ normalization-based approach: a real normalization pipeline
 \(\mathsf{to\_normal\_form}_3\)) reduces every 2-cell to a canonical
 reduced flat chain using groupoid-law \(\mathsf{MetaStep}_3\)
 constructors.
-At level~3 (connecting parallel 2-cells), the normalized forms are
-joined via the \(\mathsf{rweq\_transport}\) constructor, whose proof
-obligation \(\mathsf{derivation_2\_toEq\_eq}\) is discharged by
-\(\mathsf{rfl}\) (definitional equality on normalized forms).
-At levels~4 and above, Squier-style \(\mathsf{diamond\_filler}\)
-3-cells connect normalized higher cells across confluence diamonds.
+At level~3 (connecting parallel 2-cells), genuine confluence diamonds
+(diverging steps with \(\mathsf{StepStar}\) joining chains) are filled
+by Squier-style \(\mathsf{diamond\_filler}\) 3-cells;
+\(\mathsf{rweq\_transport}\) serves as a fallback for non-confluence
+patterns whose proof obligation is discharged by \(\mathsf{rfl}\).
+At levels~4 and above, the same \(\mathsf{diamond\_filler}\) strategy
+connects normalized higher cells.
 No invocation of \(\mathsf{Subsingleton.elim}\) appears in the
 contractibility proof.
 The formalization declares zero custom \texttt{axiom} commands.
@@ -2182,8 +2183,15 @@ The contractibility proof operates at two levels:
   \item \textbf{Step coherence} ($\mathsf{step\_eq}$): identifies
         any two steps between the same endpoints, reflecting
         proof-irrelevance of the $\mathsf{Step}$ relation itself.
-  \item \textbf{Definitional transport} ($\mathsf{rweq\_transport}$):
-        connects normalized forms whose $\mathsf{toEq}$ projections agree.
+  \item \textbf{Squier-style diamond fillers} ($\mathsf{diamond\_filler}$):
+        used in $\mathsf{connect\_normalized}$ for genuine confluence
+        diamonds---where both normalized 2-cells are
+        $\mathsf{vcomp}(\mathsf{step}\;s_i, \mathsf{derivation\_2\_of\_stepstar}\;j_i)$,
+        the filler $\mathsf{diamond\_filler}(s_1, s_2, j_1, j_2)$
+        connects them directly.
+  \item \textbf{Definitional transport} ($\mathsf{rweq\_transport}$, fallback):
+        for non-confluence patterns (mixed constructors, inverse-of-inverse,
+        etc.), connects normalized forms whose $\mathsf{toEq}$ projections agree.
         The proof obligation $\mathsf{derivation_2\_toEq\_eq}$
         is discharged by $\mathsf{rfl}$ (definitional equality in Lean's kernel),
         \emph{not} by $\mathsf{Subsingleton.elim}$.
@@ -2240,9 +2248,10 @@ construction is necessarily different: we build \emph{on top of} a
 UIP foundation, and the higher-dimensional collapse is achieved via
 groupoid-law normalization
 ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
-$\mathsf{to\_normal\_form}_3$), the $\mathsf{rweq\_transport}$
-constructor at level~3 whose proof obligation is definitional ($\mathsf{rfl}$),
-and Squier-style $\mathsf{diamond\_filler}$ cells at levels~4 and above.
+$\mathsf{to\_normal\_form}_3$), Squier-style $\mathsf{diamond\_filler}$
+cells for genuine confluence diamonds at level~3 and above, and
+$\mathsf{rweq\_transport}$ as a fallback for remaining non-confluence
+patterns (with proof obligation discharged by $\mathsf{rfl}$).
 No use of $\mathsf{Subsingleton.elim}$ is required.
 \end{remark}
 
@@ -2268,14 +2277,15 @@ Our construction differs in three key respects:
   \item \textbf{Contractibility mechanism.} Higher-dimensional
         contractibility is derived via a real normalization pipeline
         ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
-        $\mathsf{to\_normal\_form}_3$), the $\mathsf{rweq\_transport}$
-        constructor for connecting normalized 2-cells, and
-        Squier-style $\mathsf{diamond\_filler}$ constructors at levels~4+.
-        At level~3, the proof obligation for $\mathsf{rweq\_transport}$
-        is discharged by $\mathsf{rfl}$ (definitional equality on
-        normalized forms).
+        $\mathsf{to\_normal\_form}_3$), Squier-style
+        $\mathsf{diamond\_filler}$ constructors for genuine confluence
+        diamonds (used at level~3 in $\mathsf{connect\_normalized}$
+        and at levels~4+), and $\mathsf{rweq\_transport}$ as a fallback
+        for non-confluence patterns (proof obligation discharged by
+        $\mathsf{rfl}$).
         The 3-cells are
-        built from $\mathsf{step\_eq}$, $\mathsf{rweq\_transport}$,
+        built from $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
+        $\mathsf{rweq\_transport}$,
         and the groupoid-law $\mathsf{MetaStep}_3$ constructors
         (including $\mathsf{whisker\_inv}_3$,
         $\mathsf{vcomp\_congr}_{3,\mathrm{left}}$,
@@ -3277,10 +3287,13 @@ Our contribution is to obtain an analogous structure in a proof-irrelevant
 setting by replacing identity types with computational paths and
 deriving contractibility from confluence combined with UIP
 (Remark~\ref{rem:rweq-eq-honesty}).
-At the 3-cell level, the $\mathsf{rweq\_transport}$ constructor
-connects normalized forms via definitionally-equal proofs ($\mathsf{rfl}$),
-while Squier-style $\mathsf{diamond\_filler}$ constructors at levels $\ge 4$
-connect normalized higher cells across confluence diamonds.
+At the 3-cell level, Squier-style $\mathsf{diamond\_filler}$
+constructors connect genuine confluence diamonds (diverging steps with
+$\mathsf{StepStar}$ joining chains), while $\mathsf{rweq\_transport}$
+serves as a fallback for non-confluence patterns
+(proof obligation discharged by $\mathsf{rfl}$).
+At levels $\ge 4$, the same $\mathsf{diamond\_filler}$ strategy
+connects normalized higher cells.
 The resulting structure is
 genuinely non-degenerate at levels 0--2 but contractible above,
 in contrast to the Lumsdaine/vdBG construction which is
@@ -3437,8 +3450,10 @@ The principal contributions are:
     normalization: a real normalization pipeline
     ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
     $\mathsf{to\_normal\_form}_3$) reduces 2-cells to canonical form.
-    At level~3, normalized forms are connected via $\mathsf{rweq\_transport}$
-    with proof obligations discharged by $\mathsf{rfl}$ (definitional equality).
+    At level~3, genuine confluence diamonds are filled by
+    $\mathsf{diamond\_filler}$; $\mathsf{rweq\_transport}$ is a fallback
+    for non-confluence patterns, with proof obligations discharged by
+    $\mathsf{rfl}$ (definitional equality).
     At levels~4+, Squier-style $\mathsf{diamond\_filler}$ cells connect
     normalized higher cells.
     This eliminates all uses of $\mathsf{Subsingleton.elim}$ from the
