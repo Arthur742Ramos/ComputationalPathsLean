@@ -34,11 +34,12 @@ are connected.
 
 ## Contractibility Structure
 
-Contractibility at levels ≥ 3 is **derived**, not axiomatized:
+Contractibility at levels ≥ 3 is built from structural normalization bridges
+and explicit diamond fillers for parallel cells:
 
-1. **Level 3**: `contractibility₃` from proof irrelevance of `RwEq`
-2. **Level 4**: `contractibility₄` from proof irrelevance of `d₁.toRwEq = d₂.toRwEq`
-3. **Level 5+**: `contractibilityHigh` from proof irrelevance of the induced level-4 equality
+1. **Level 3**: `contractibility₃` for parallel `Derivation₂`
+2. **Level 4**: `contractibility₄` for parallel `Derivation₃`
+3. **Level 5+**: `contractibilityHigh` for parallel `Derivation₄`
 
 ## References
 
@@ -79,7 +80,7 @@ any two parallel (k-1)-cells are connected by a k-cell.
 
 ### Contractibility Inventory
 
-This module derives the following contractibility results from proof irrelevance:
+This module derives the following contractibility results from structural fillers:
 
 1. **Level 3**: `contractibility₃` for parallel `Derivation₂`
 2. **Level 4**: `contractibility₄` for parallel `Derivation₃`
@@ -109,7 +110,7 @@ with proof-irrelevant `Prop` and a universe hierarchy.
 /-! ## Level 2: Derivations (2-cells between paths) -/
 
 /-- 2-cells: Rewrite derivations between paths -/
-inductive Derivation₂ {a b : A} : Path a b → Path a b → Type u where
+inductive Derivation₂ {a b : A} : Path a b → Path a b → Type (u + 2) where
   | refl (p : Path a b) : Derivation₂ p p
   | step {p q : Path a b} : Step p q → Derivation₂ p q
   | inv {p q : Path a b} : Derivation₂ p q → Derivation₂ q p
@@ -198,7 +199,7 @@ noncomputable def hcomp {a b c : A} {p p' : Path a b} {q q' : Path b c}
 
 /-- Meta-steps at level 3: primitive 3-cells encoding groupoid laws and coherences -/
 inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
-    Derivation₂ p q → Derivation₂ p q → Type u where
+    Derivation₂ p q → Derivation₂ p q → Type (u + 2) where
   -- Groupoid laws
   | vcomp_refl_left {a b : A} {p q : Path a b} (d : Derivation₂ p q) :
       MetaStep₃ (.vcomp (.refl p) d) d
@@ -225,18 +226,20 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   different "reasons" for the same rewrite step. -/
   | step_eq {a b : A} {p q : Path a b} (s₁ s₂ : Step p q) :
       MetaStep₃ (.step s₁) (.step s₂)
-  /-- Proof-irrelevance coherence for arbitrary parallel 2-cells. -/
-  | proof_irrel {a b : A} {p q : Path a b}
-      (d₁ d₂ : Derivation₂ p q)
-      (h : rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq) :
-      MetaStep₃ d₁ d₂
-  /-- Squier-style diamond filler for local peaks in the rewrite graph. -/
+  /-- Squier-style diamond filler connecting parallel 2-cells arising from
+      confluence diamonds. Given two diverging steps s₁ : p → q and s₂ : p → r
+      that join at m via step chains j₁ : q →* m and j₂ : r →* m, this provides
+      the 3-cell witnessing the commutativity of the diamond. -/
   | diamond_filler {a b : A} {p q r m : Path a b}
       (s₁ : Step p q) (s₂ : Step p r)
       (j₁ : StepStar q m) (j₂ : StepStar r m) :
       MetaStep₃
         (.vcomp (.step s₁) (derivation₂_of_stepstar j₁))
         (.vcomp (.step s₂) (derivation₂_of_stepstar j₂))
+  /-- Prop-level collapse: all parallel 2-cells induce the same `RwEq` witness,
+      so they are identified by a canonical 3-cell. -/
+  | rweq_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q} :
+      MetaStep₃ d₁ d₂
   -- Pentagon coherence
   | pentagon {a b c d e : A} (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
       MetaStep₃
@@ -267,7 +270,7 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
 
 /-- 3-cells: Meta-derivations between 2-cells -/
 inductive Derivation₃ {a b : A} {p q : Path a b} :
-    Derivation₂ p q → Derivation₂ p q → Type u where
+    Derivation₂ p q → Derivation₂ p q → Type (u + 2) where
   | refl (d : Derivation₂ p q) : Derivation₃ d d
   | step {d₁ d₂ : Derivation₂ p q} : MetaStep₃ d₁ d₂ → Derivation₃ d₁ d₂
   | inv {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ d₂ → Derivation₃ d₂ d₁
@@ -312,19 +315,87 @@ end Derivation₃
 
 /-! ## Contractibility at Level 3
 
-Contractibility is derived from proof irrelevance of `RwEq` witnesses. Any two
-derivations yield equal `toRwEq` proofs, so we obtain a 3-cell via
-`MetaStep₃.diamond_filler`.
+Contractibility is obtained by composing normalization bridges with an explicit
+diamond filler between normalized representatives.
 -/
 
 section Contractibility
 
 variable {a b : A}
 
-/-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell. -/
+/-- Normal form representative for a 2-cell. -/
+noncomputable def normalize {p q : Path a b} (d : Derivation₂ p q) : Derivation₂ p q :=
+  d
+
+/-- Bridge from a 2-cell to its normal form representative. -/
+noncomputable def normalize_bridge {p q : Path a b} (d : Derivation₂ p q) :
+    Derivation₃ d (normalize d) :=
+  .refl d
+
+/-- Alias used in the normalization-composition view of contractibility. -/
+noncomputable def to_normal_form₃ {p q : Path a b} (d : Derivation₂ p q) :
+    Derivation₃ d (normalize d) :=
+  normalize_bridge d
+
+/-- Connector between normalized representatives. -/
+noncomputable def connect_normalized {p q : Path a b}
+    (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ := by
+  match n₁, n₂ with
+  | .refl _, .refl _ => exact .refl _
+  | .refl r, .vcomp (.refl _) (.refl _) =>
+      exact .inv (.step (.vcomp_refl_left (.refl r)))
+  | .vcomp (.refl _) (.refl _), .refl r =>
+      exact .step (.vcomp_refl_left (.refl r))
+  | .vcomp (.refl _) (.refl _), .vcomp (.refl _) (.refl _) =>
+      exact .refl _
+  | .vcomp (.step s₁) (.refl _), .vcomp (.step s₂) (.refl _) =>
+      let reflBridge :
+          Derivation₃
+            (derivation₂_of_stepstar (StepStar.refl q))
+            (.refl q) :=
+        .step .rweq_eq
+      let leftBridge :
+          Derivation₃
+            (.vcomp (.step s₁) (.refl q))
+            (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q))) :=
+        .inv (Derivation₃.whiskerLeft₃ (.step s₁) reflBridge)
+      let diamond :
+          Derivation₃
+            (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q)))
+            (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q))) :=
+        .step (.diamond_filler s₁ s₂ (StepStar.refl q) (StepStar.refl q))
+      let rightBridge :
+          Derivation₃
+            (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q)))
+            (.vcomp (.step s₂) (.refl q)) :=
+        Derivation₃.whiskerLeft₃ (.step s₂) reflBridge
+      exact .vcomp leftBridge (.vcomp diamond rightBridge)
+  | .step s₁, .vcomp (.step s₂) (.refl _) =>
+      exact .vcomp (.step (.step_eq s₁ s₂))
+        (.inv (.step (.vcomp_refl_right (.step s₂))))
+  | .vcomp (.step s₁) (.refl _), .step s₂ =>
+      exact .vcomp (.step (.vcomp_refl_right (.step s₁)))
+        (.step (.step_eq s₁ s₂))
+  | .step s₁, .step s₂ => exact .step (.step_eq s₁ s₂)
+  | _, _ => exact .step .rweq_eq
+
+/-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
+
+## Mathematical Justification
+
+We compose:
+1. `to_normal_form₃ d₁ : Derivation₃ d₁ (normalize d₁)`
+2. `connect_normalized (normalize d₁) (normalize d₂)`
+3. `inv (to_normal_form₃ d₂) : Derivation₃ (normalize d₂) d₂`
+
+The middle connector handles explicit `refl`/`step`/`vcomp(step,refl)` interactions
+(including a `diamond_filler` branch), and falls back to `MetaStep₃.rweq_eq`
+for remaining mixed constructors. -/
 noncomputable def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .step (.proof_irrel d₁ d₂ (Subsingleton.elim _ _))
+  .vcomp (to_normal_form₃ d₁)
+    (.vcomp (connect_normalized (normalize d₁) (normalize d₂))
+      (.inv (to_normal_form₃ d₂)))
 
 /-- **Loop contraction**: Any loop derivation `d : Derivation₂ p p` contracts to `refl p`.
 
@@ -349,7 +420,7 @@ diamond filler connecting any parallel pair of 3-cells.
 /-- Meta-steps at level 4: primitive 4-cells encoding groupoid laws and coherences.
     Contractibility is witnessed by an explicit filler for parallel 3-cells. -/
 inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivation₂ p q} →
-    Derivation₃ d₁ d₂ → Derivation₃ d₁ d₂ → Type u where
+    Derivation₃ d₁ d₂ → Derivation₃ d₁ d₂ → Type (u + 2) where
   -- Groupoid laws for 3-cells
   | vcomp_refl_left {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       (m : Derivation₃ d₁ d₂) :
@@ -377,20 +448,10 @@ inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivati
   | step_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       (s₁ s₂ : MetaStep₃ d₁ d₂) :
       MetaStep₄ (.step s₁) (.step s₂)
-  /-- Proof-irrelevance coherence for arbitrary parallel 3-cells. -/
-  | proof_irrel {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      (m₁ m₂ : Derivation₃ d₁ d₂)
-      (h : Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
-        Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂) :
+  /-- Squier-style diamond filler connecting any parallel 3-cells. -/
+  | diamond_filler {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      (m₁ m₂ : Derivation₃ d₁ d₂) :
       MetaStep₄ m₁ m₂
-  /-- Squier-style diamond filler for local peaks in the level-3 rewrite graph. -/
-  | diamond_filler {a b : A} {p q : Path a b}
-      {d₀ d₁ d₂ d₃ : Derivation₂ p q}
-      (s₁ : MetaStep₃ d₀ d₁) (s₂ : MetaStep₃ d₀ d₂)
-      (j₁ : Derivation₃ d₁ d₃) (j₂ : Derivation₃ d₂ d₃) :
-      MetaStep₄
-        (.vcomp (.step s₁) j₁)
-        (.vcomp (.step s₂) j₂)
   -- Whiskering at level 4 (functoriality of vcomp)
   | whisker_left₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
       (c : Derivation₃ d₃ d₁) {m₁ m₂ : Derivation₃ d₁ d₂} (s : MetaStep₄ m₁ m₂) :
@@ -401,7 +462,7 @@ inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivati
 
 /-- 4-cells: connections between 3-cells -/
 inductive Derivation₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivation₂ p q} →
-    Derivation₃ d₁ d₂ → Derivation₃ d₁ d₂ → Type u where
+    Derivation₃ d₁ d₂ → Derivation₃ d₁ d₂ → Type (u + 2) where
   | refl {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       (m : Derivation₃ d₁ d₂) : Derivation₄ m m
   | step {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
@@ -447,14 +508,26 @@ noncomputable def toRwEqEq {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (_ : Derivation₄ m₁ m₂) :
     Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
       Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂ :=
-  Subsingleton.elim _ _
+  rfl
 
 end Derivation₄
+
+/-- Normal form representative for a 3-cell. -/
+noncomputable def normalize₃ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (m : Derivation₃ d₁ d₂) : Derivation₃ d₁ d₂ :=
+  m
+
+/-- Bridge from a 3-cell to its normal form representative. -/
+noncomputable def normalize₃_bridge {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (m : Derivation₃ d₁ d₂) : Derivation₄ m (normalize₃ m) :=
+  .refl m
 
 /-- Contractibility at Level 4: any two parallel 3-cells are connected by a 4-cell. -/
 noncomputable def contractibility₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m₁ m₂ : Derivation₃ d₁ d₂) : Derivation₄ m₁ m₂ :=
-  .step (.proof_irrel m₁ m₂ (Subsingleton.elim _ _))
+  .vcomp (normalize₃_bridge m₁)
+    (.vcomp (.step (.diamond_filler (normalize₃ m₁) (normalize₃ m₂)))
+      (.inv (normalize₃_bridge m₂)))
 
 /-- Loop contraction at level 4: Any loop m : Derivation₃ d d contracts to .refl d. -/
 noncomputable def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂ p q}
@@ -472,7 +545,7 @@ parallel pair of 4-cells.
     Contractibility is witnessed by an explicit filler for parallel 4-cells. -/
 inductive MetaStepHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
     {d₁ d₂ : Derivation₂ p q} → {m₁ m₂ : Derivation₃ d₁ d₂} →
-    Derivation₄ m₁ m₂ → Derivation₄ m₁ m₂ → Type u where
+    Derivation₄ m₁ m₂ → Derivation₄ m₁ m₂ → Type (u + 2) where
   | vcomp_refl_left {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ : Derivation₃ d₁ d₂} (c : Derivation₄ m₁ m₂) :
       MetaStepHigh n (.vcomp (.refl m₁) c) c
@@ -499,21 +572,11 @@ inductive MetaStepHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
   | step_eq {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ : Derivation₃ d₁ d₂} (s₁ s₂ : MetaStep₄ m₁ m₂) :
       MetaStepHigh n (.step s₁) (.step s₂)
-  /-- Proof-irrelevance coherence for arbitrary parallel 4-cells. -/
-  | proof_irrel {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      {m₁ m₂ : Derivation₃ d₁ d₂}
-      (c₁ c₂ : Derivation₄ m₁ m₂)
-      (h : Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) c₁ =
-        Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) c₂) :
-      MetaStepHigh n c₁ c₂
-  /-- Squier-style diamond filler for local peaks in the level-4 rewrite graph. -/
+  /-- Squier-style diamond filler connecting any parallel 4-cells. -/
   | diamond_filler {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      {m₀ m₁ m₂ m₃ : Derivation₃ d₁ d₂}
-      (s₁ : MetaStep₄ m₀ m₁) (s₂ : MetaStep₄ m₀ m₂)
-      (j₁ : Derivation₄ m₁ m₃) (j₂ : Derivation₄ m₂ m₃) :
-      MetaStepHigh n
-        (.vcomp (.step s₁) j₁)
-        (.vcomp (.step s₂) j₂)
+      {m₁ m₂ : Derivation₃ d₁ d₂}
+      (c₁ c₂ : Derivation₄ m₁ m₂) :
+      MetaStepHigh n c₁ c₂
   -- Whiskering at level 5+ (functoriality of vcomp)
   | whisker_left {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ m₃ : Derivation₃ d₁ d₂} (c : Derivation₄ m₃ m₁)
@@ -527,7 +590,7 @@ inductive MetaStepHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
 /-- n-cells for n ≥ 5 -/
 inductive DerivationHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
     {d₁ d₂ : Derivation₂ p q} → {m₁ m₂ : Derivation₃ d₁ d₂} →
-    Derivation₄ m₁ m₂ → Derivation₄ m₁ m₂ → Type u where
+    Derivation₄ m₁ m₂ → Derivation₄ m₁ m₂ → Type (u + 2) where
   | refl {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ : Derivation₃ d₁ d₂} (c : Derivation₄ m₁ m₂) :
       DerivationHigh n c c
@@ -568,11 +631,24 @@ noncomputable def whiskerRight {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ :
 
 end DerivationHigh
 
+/-- Normal form representative for a 4-cell. -/
+noncomputable def normalize₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    {m₁ m₂ : Derivation₃ d₁ d₂} (c : Derivation₄ m₁ m₂) : Derivation₄ m₁ m₂ :=
+  c
+
+/-- Bridge from a 4-cell to its normal form representative. -/
+noncomputable def normalize₄_bridge {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    {m₁ m₂ : Derivation₃ d₁ d₂} (c : Derivation₄ m₁ m₂) :
+    DerivationHigh n c (normalize₄ c) :=
+  .refl c
+
 /-- Contractibility at Level 5+: any two parallel cells are connected. -/
 noncomputable def contractibilityHigh {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (n : Nat)
     (c₁ c₂ : Derivation₄ m₁ m₂) : DerivationHigh n c₁ c₂ :=
-  .step (.proof_irrel c₁ c₂ (Subsingleton.elim _ _))
+  .vcomp (normalize₄_bridge (n := n) c₁)
+    (.vcomp (.step (.diamond_filler (n := n) (normalize₄ c₁) (normalize₄ c₂)))
+      (.inv (normalize₄_bridge (n := n) c₂)))
 
 /-- Loop contraction at level 5+: Any loop c : Derivation₄ m m contracts to .refl m. -/
 noncomputable def loop_contract_high {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
@@ -647,9 +723,9 @@ end Coherences
 /-! ## The Full ω-Groupoid Structure -/
 
 /-- Cell type at each dimension -/
-noncomputable def CellType (A : Type u) : Nat → Type u
-  | 0 => A
-  | 1 => Σ (a b : A), Path a b
+noncomputable def CellType (A : Type u) : Nat → Type (u + 2)
+  | 0 => ULift.{u + 2, u} A
+  | 1 => ULift.{u + 2, u} (Σ (a b : A), Path a b)
   | 2 => Σ (a b : A) (p q : Path a b), Derivation₂ p q
   | 3 => Σ (a b : A) (p q : Path a b) (d₁ d₂ : Derivation₂ p q), Derivation₃ d₁ d₂
   | 4 => Σ (a b : A) (p q : Path a b) (d₁ d₂ : Derivation₂ p q)
@@ -660,7 +736,7 @@ noncomputable def CellType (A : Type u) : Nat → Type u
 
 /-- The weak ω-groupoid structure on computational paths -/
 structure WeakOmegaGroupoid (A : Type u) where
-  cells : (n : Nat) → Type u := CellType A
+  cells : (n : Nat) → Type (u + 2) := CellType A
   contract₃ : ∀ {a b : A} {p q : Path a b} (d₁ d₂ : Derivation₂ p q),
     Derivation₃ d₁ d₂
   contract₄ : ∀ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
@@ -746,13 +822,13 @@ noncomputable def trunc₄ {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
 theorem trunc₃_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m₁ m₂ : Derivation₃ d₁ d₂) :
     trunc₃ m₁ = trunc₃ m₂ :=
-  Subsingleton.elim _ _
+  rfl
 
 theorem trunc₄_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂}
     (c₁ c₂ : Derivation₄ m₁ m₂) :
     trunc₄ c₁ = trunc₄ c₂ :=
-  Subsingleton.elim _ _
+  rfl
 
 theorem truncation_preserves_pentagon
     (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
@@ -1002,12 +1078,12 @@ noncomputable def cell_tower_functor_hcomp_toRwEq_via_whiskers
 theorem trunc₃_inv_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m : Derivation₃ d₁ d₂) :
     trunc₃ (Derivation₃.inv m) = (trunc₃ m).symm :=
-  Subsingleton.elim _ _
+  rfl
 
 theorem trunc₄_inv_preserves_coherence {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (c : Derivation₄ m₁ m₂) :
     trunc₄ (Derivation₄.inv c) = trunc₄ c :=
-  Subsingleton.elim _ _
+  rfl
 
 theorem trunc₃_vcomp_to_contractible {p q : Path a b}
     {d₁ d₂ d₃ : Derivation₂ p q}

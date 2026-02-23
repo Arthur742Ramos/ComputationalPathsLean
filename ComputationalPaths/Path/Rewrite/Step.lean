@@ -879,37 +879,6 @@ inductive Step :
 @[simp] noncomputable def Step.unit_right {A : Type u} {a b : A} (p : Path a b) : Path a b :=
   Step.trans p (Step.refl b)
 
-attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
-  Step.trans_refl_right Step.trans_symm Step.symm_trans Step.symm_trans_congr
-  Step.trans_assoc Step.map2_subst Step.prod_fst_beta Step.prod_snd_beta
-  Step.prod_rec_beta Step.prod_eta Step.prod_mk_symm Step.prod_map_congrArg
-  Step.sigma_fst_beta Step.sigma_snd_beta Step.sigma_eta
-  Step.sigma_mk_symm
-  Step.sum_rec_inl_beta Step.sum_rec_inr_beta Step.fun_app_beta Step.fun_eta Step.apd_refl
-  Step.transport_refl_beta Step.transport_trans_beta Step.transport_symm_left_beta
-  Step.transport_symm_right_beta Step.transport_sigmaMk_fst_beta
-  Step.transport_sigmaMk_dep_beta Step.subst_sigmaMk_dep_beta
-  Step.context_congr Step.context_map_symm Step.context_tt_cancel_left Step.context_tt_cancel_right
-  Step.context_subst_left_beta Step.context_subst_left_of_right
-  Step.context_subst_left_assoc Step.context_subst_right_beta Step.context_subst_right_assoc
-  Step.context_subst_left_refl_right Step.context_subst_left_refl_left
-  Step.context_subst_right_refl_left Step.context_subst_right_refl_right
-  Step.context_subst_left_idempotent Step.context_subst_right_cancel_inner
-  Step.context_subst_right_cancel_outer
-  Step.depContext_congr Step.depContext_map_symm Step.depContext_subst_left_beta
-  Step.depContext_subst_left_assoc Step.depContext_subst_right_beta
-  Step.depContext_subst_right_assoc Step.depContext_subst_left_refl_right
-  Step.depContext_subst_left_refl_left Step.depContext_subst_right_refl_left
-  Step.depContext_subst_right_refl_right Step.depContext_subst_left_idempotent
-  Step.depContext_subst_right_cancel_inner
-  Step.depBiContext_mapLeft_congr Step.depBiContext_mapRight_congr
-  Step.depBiContext_map2_congr_left Step.depBiContext_map2_congr_right
-  Step.biContext_mapLeft_congr Step.biContext_mapRight_congr
-  Step.biContext_map2_congr_left Step.biContext_map2_congr_right
-  Step.mapLeft_congr Step.mapRight_congr Step.mapLeft_ofEq Step.mapRight_ofEq
-  Step.symm_congr Step.trans_congr_left Step.trans_congr_right
-  Step.trans_cancel_left Step.trans_cancel_right
-
 @[simp] theorem step_toEq {A : Type u} {a b : A}
     {p q : Path a b} (h : Step p q) :
     p.toEq = q.toEq := by
@@ -1061,7 +1030,7 @@ attribute [simp] Step.symm_refl Step.symm_symm Step.trans_refl_left
 
 /-- Reflexive-transitive closure of `Step`, used for critical-pair joins. -/
 inductive StepStar :
-  {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+  {A : Type u} → {a b : A} → Path a b → Path a b → Type (u + 1)
   | refl {A : Type u} {a b : A} (p : Path a b) :
       StepStar p p
   | tail {A : Type u} {a b : A} {p q r : Path a b} :
@@ -1082,8 +1051,8 @@ noncomputable def two {A : Type u} {a b : A} {p q r : Path a b}
 end StepStar
 
 /-- Two reducts are joinable when they have a common `StepStar` descendant. -/
-noncomputable def Step.Joinable {A : Type u} {a b : A} (p q : Path a b) : Prop :=
-  ∃ r, StepStar p r ∧ StepStar q r
+inductive Step.Joinable {A : Type u} {a b : A} (p q : Path a b) : Prop where
+  | intro (r : Path a b) (hp : StepStar p r) (hq : StepStar q r) : Step.Joinable p q
 
 /-- Joinability is symmetric. -/
 theorem Step.Joinable.symm {A : Type u} {a b : A} {p q : Path a b} :
