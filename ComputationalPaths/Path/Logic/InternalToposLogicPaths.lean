@@ -199,7 +199,7 @@ noncomputable def bc_exist_subst {A B C D : Type u} (bc : BeckChevalley A B C D)
     (P : A → Prop) (d : D) :
     Path (canonExist bc.g (fun c => canonExist bc.h P c) d)
          (canonExist bc.g (fun c => ∃ a, bc.h a = c ∧ P a) d) :=
-  Path.mk [] (by simp [canonExist, canonForall])
+  Path.mk [] (by simp [canonExist])
 
 /-! ## §4 Mitchell-Bénabou Language -/
 
@@ -379,10 +379,10 @@ noncomputable def discreteInternalCat (A : Type u) : InternalCat where
   id := fun _ => rfl
   comp := fun h₁ h₂ => h₁.trans h₂
 
-/-- 43. Path: composition in discrete category is transitivity. -/
-noncomputable def discrete_comp_path (A : Type u) (a b c : A) (h₁ : a = b) (h₂ : b = c) :
-    Path ((discreteInternalCat A).comp h₁ h₂) (h₁.trans h₂) :=
-  Path.refl _
+/-- 43. In the discrete category, comp h₁ h₂ equals h₁.trans h₂ (trivially, by definition). -/
+theorem discrete_comp_eq (A : Type u) (a b c : A) (h₁ : a = b) (h₂ : b = c) :
+    (discreteInternalCat A).comp h₁ h₂ = h₁.trans h₂ :=
+  rfl
 
 /-! ## §9 Slice Categories and Local Cartesian Closure -/
 

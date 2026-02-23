@@ -214,7 +214,7 @@ The Eckmann-Hilton argument shows these coincide and are commutative.
 section OmegaSquared
 
 /-- The double loop space Ω²(A, a): 2-cells from `refl a` to `refl a`. -/
-abbrev OmegaTwo (A : Type u) (a : A) : Type u :=
+abbrev OmegaTwo (A : Type u) (a : A) : Type (u + 2) :=
   Derivation₂ (Path.refl a) (Path.refl a)
 
 variable {a : A}

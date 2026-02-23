@@ -325,177 +325,117 @@ section Contractibility
 variable {a b : A}
 
 /-- Normal form representative for a 2-cell. -/
-noncomputable def normalize {p q : Path a b} (d : Derivation₂ p q) : Derivation₂ p q :=
-  d
-
-/-- Bridge from a 2-cell to its normal form representative. -/
-noncomputable def normalize_bridge {p q : Path a b} (d : Derivation₂ p q) :
-    Derivation₃ d (normalize d) :=
-  .refl d
+noncomputable def normalize {p q : Path a b} : Derivation₂ p q → Derivation₂ p q := id
 
 /-- Alias used in the normalization-composition view of contractibility. -/
 noncomputable def to_normal_form₃ {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ d (normalize d) :=
-  normalize_bridge d
+  .refl d
 
 /-- Fallback connector for mixed normalized forms. -/
 noncomputable def connect_normalized_fallback {p q : Path a b}
-    (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ :=
-  .step (.rweq_transport (Subsingleton.elim _ _))
-
-/-- Canonical contraction of a left unit in `Derivation₂`. -/
-noncomputable def connect_left_unit {p q : Path a b} (d : Derivation₂ p q) :
-    Derivation₃ (.vcomp (.refl p) d) d :=
-  .step (.vcomp_refl_left d)
-
-/-- Canonical contraction of a right unit in `Derivation₂`. -/
-noncomputable def connect_right_unit {p q : Path a b} (d : Derivation₂ p q) :
-    Derivation₃ (.vcomp d (.refl q)) d :=
-  .step (.vcomp_refl_right d)
-
-/-- Connect two left-unit expansions by reducing to cores and re-expanding. -/
-noncomputable def connect_left_units {p q : Path a b}
-    (d₁ d₂ : Derivation₂ p q) :
-    Derivation₃ (.vcomp (.refl p) d₁) (.vcomp (.refl p) d₂) :=
-  .vcomp (connect_left_unit d₁)
-    (.vcomp (connect_normalized_fallback d₁ d₂)
-      (.inv (connect_left_unit d₂)))
-
-/-- Connect two right-unit expansions by reducing to cores and re-expanding. -/
-noncomputable def connect_right_units {p q : Path a b}
-    (d₁ d₂ : Derivation₂ p q) :
-    Derivation₃ (.vcomp d₁ (.refl q)) (.vcomp d₂ (.refl q)) :=
-  .vcomp (connect_right_unit d₁)
-    (.vcomp (connect_normalized_fallback d₁ d₂)
-      (.inv (connect_right_unit d₂)))
-
-/-- Expand `refl` to `refl · refl` via left unit. -/
-noncomputable def connect_refl_to_double_refl {r : Path a b} :
-    Derivation₃ (.refl r) (.vcomp (.refl r) (.refl r)) :=
-  .inv (connect_left_unit (.refl r))
-
-/-- Contract `refl · refl` back to `refl` via left unit. -/
-noncomputable def connect_double_refl_to_refl {r : Path a b} :
-    Derivation₃ (.vcomp (.refl r) (.refl r)) (.refl r) :=
-  connect_left_unit (.refl r)
-
-/-- Canonical connector between single-step derivations. -/
-noncomputable def connect_steps {p q : Path a b} (s₁ s₂ : Step p q) :
-    Derivation₃ (.step s₁) (.step s₂) :=
-  .step (.step_eq s₁ s₂)
-
-/-- Embed a single step into its right-unit expansion. -/
-noncomputable def connect_step_to_right_unit {p q : Path a b} (s : Step p q) :
-    Derivation₃ (.step s) (.vcomp (.step s) (.refl q)) :=
-  .inv (connect_right_unit (.step s))
-
-/-- Contract a right-unit expansion of a single step. -/
-noncomputable def connect_right_unit_step {p q : Path a b} (s : Step p q) :
-    Derivation₃ (.vcomp (.step s) (.refl q)) (.step s) :=
-  connect_right_unit (.step s)
-
-/-- Embed a single step into its left-unit expansion. -/
-noncomputable def connect_step_to_left_unit {p q : Path a b} (s : Step p q) :
-    Derivation₃ (.step s) (.vcomp (.refl p) (.step s)) :=
-  .inv (connect_left_unit (.step s))
-
-/-- Contract a left-unit expansion of a single step. -/
-noncomputable def connect_left_unit_step {p q : Path a b} (s : Step p q) :
-    Derivation₃ (.vcomp (.refl p) (.step s)) (.step s) :=
-  connect_left_unit (.step s)
-
-/-- Connect two left-unit expansions of single steps. -/
-noncomputable def connect_left_unit_steps {p q : Path a b} (s₁ s₂ : Step p q) :
-    Derivation₃ (.vcomp (.refl p) (.step s₁)) (.vcomp (.refl p) (.step s₂)) :=
-  Derivation₃.whiskerLeft₃ (.refl p) (connect_steps s₁ s₂)
-
-/-- Connect left-unit and right-unit expansions of single steps. -/
-noncomputable def connect_left_to_right_unit_steps {p q : Path a b}
-    (s₁ s₂ : Step p q) :
-    Derivation₃ (.vcomp (.refl p) (.step s₁)) (.vcomp (.step s₂) (.refl q)) :=
-  .vcomp (connect_left_unit_step s₁)
-    (.vcomp (connect_steps s₁ s₂)
-      (connect_step_to_right_unit s₂))
-
-/-- Connect right-unit and left-unit expansions of single steps. -/
-noncomputable def connect_right_to_left_unit_steps {p q : Path a b}
-    (s₁ s₂ : Step p q) :
-    Derivation₃ (.vcomp (.step s₁) (.refl q)) (.vcomp (.refl p) (.step s₂)) :=
-  .vcomp (connect_right_unit_step s₁)
-    (.vcomp (connect_steps s₁ s₂)
-      (connect_step_to_left_unit s₂))
-
-/-- Connector between right-united single steps via `diamond_filler`. -/
-noncomputable def connect_right_unit_steps_via_diamond {p q : Path a b}
-    (s₁ s₂ : Step p q) :
-    Derivation₃ (.vcomp (.step s₁) (.refl q)) (.vcomp (.step s₂) (.refl q)) := by
-  let reflBridge :
-      Derivation₃
-        (derivation₂_of_stepstar (StepStar.refl q))
-        (.refl q) :=
-    connect_normalized_fallback _ _
-  let leftBridge :
-      Derivation₃
-        (.vcomp (.step s₁) (.refl q))
-        (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q))) :=
-    .inv (Derivation₃.whiskerLeft₃ (.step s₁) reflBridge)
-  let diamond :
-      Derivation₃
-        (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q)))
-        (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q))) :=
-    .step (.diamond_filler s₁ s₂ (StepStar.refl q) (StepStar.refl q))
-  let rightBridge :
-      Derivation₃
-        (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q)))
-        (.vcomp (.step s₂) (.refl q)) :=
-    Derivation₃.whiskerLeft₃ (.step s₂) reflBridge
-  exact .vcomp leftBridge (.vcomp diamond rightBridge)
+    (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ := by
+  have hEq : rweq_toEq n₁.toRwEq = rweq_toEq n₂.toRwEq :=
+    Subsingleton.elim (rweq_toEq n₁.toRwEq) (rweq_toEq n₂.toRwEq)
+  exact .step (.rweq_transport hEq)
 
 /-- Connector between normalized representatives. -/
 noncomputable def connect_normalized {p q : Path a b}
     (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ := by
+  have from_left_unit (d : Derivation₂ p q) :
+      Derivation₃ (.vcomp (.refl p) d) d :=
+    .step (.vcomp_refl_left d)
+  have from_right_unit (d : Derivation₂ p q) :
+      Derivation₃ (.vcomp d (.refl q)) d :=
+    .step (.vcomp_refl_right d)
+  have to_left_unit (d : Derivation₂ p q) :
+      Derivation₃ d (.vcomp (.refl p) d) :=
+    .inv (from_left_unit d)
+  have to_right_unit (d : Derivation₂ p q) :
+      Derivation₃ d (.vcomp d (.refl q)) :=
+    .inv (from_right_unit d)
+  have step_eq3 (s₁ s₂ : Step p q) : Derivation₃ (.step s₁) (.step s₂) :=
+    .step (.step_eq s₁ s₂)
+  have step_to_right (s₁ s₂ : Step p q) :
+      Derivation₃ (.step s₁) (.vcomp (.step s₂) (.refl q)) :=
+    .vcomp (to_right_unit (.step s₁))
+      (Derivation₃.whiskerRight₃ (step_eq3 s₁ s₂) (.refl q))
+  have left_steps_eq (s₁ s₂ : Step p q) :
+      Derivation₃ (.vcomp (.refl p) (.step s₁)) (.vcomp (.refl p) (.step s₂)) :=
+    Derivation₃.whiskerLeft₃ (.refl p) (step_eq3 s₁ s₂)
+  have step_to_left (s₁ s₂ : Step p q) :
+      Derivation₃ (.step s₁) (.vcomp (.refl p) (.step s₂)) :=
+    .vcomp (to_left_unit (.step s₁))
+      (left_steps_eq s₁ s₂)
+  have right_to_step (s₁ s₂ : Step p q) :
+      Derivation₃ (.vcomp (.step s₁) (.refl q)) (.step s₂) :=
+    .inv (step_to_right s₂ s₁)
+  have left_to_step (s₁ s₂ : Step p q) :
+      Derivation₃ (.vcomp (.refl p) (.step s₁)) (.step s₂) :=
+    .inv (step_to_left s₂ s₁)
+  have fallback {r s : Path a b} (d₁ d₂ : Derivation₂ r s) : Derivation₃ d₁ d₂ :=
+    connect_normalized_fallback d₁ d₂
+  have left_unit_to (d₁ d₂ : Derivation₂ p q) :
+      Derivation₃ (.vcomp (.refl p) d₁) d₂ :=
+    .vcomp (from_left_unit d₁) (fallback d₁ d₂)
+  have right_unit_to (d₁ d₂ : Derivation₂ p q) :
+      Derivation₃ (.vcomp d₁ (.refl q)) d₂ :=
+    .vcomp (from_right_unit d₁) (fallback d₁ d₂)
+  have fallback_to_left_unit (d₁ d₂ : Derivation₂ p q) :
+      Derivation₃ d₁ (.vcomp (.refl p) d₂) :=
+    .vcomp (fallback d₁ d₂) (to_left_unit d₂)
+  have fallback_to_right_unit (d₁ d₂ : Derivation₂ p q) :
+      Derivation₃ d₁ (.vcomp d₂ (.refl q)) :=
+    .vcomp (fallback d₁ d₂) (to_right_unit d₂)
+  have stepstarReflBridge :
+      Derivation₃ (derivation₂_of_stepstar (StepStar.refl q)) (.refl q) :=
+    fallback (derivation₂_of_stepstar (StepStar.refl q)) (.refl q)
   match n₁, n₂ with
   | .refl _, .refl _ => exact .refl _
   | .refl r, .vcomp (.refl _) (.refl _) =>
-      exact connect_refl_to_double_refl
-  | .vcomp (.refl _) (.refl _), .refl r =>
-      exact connect_double_refl_to_refl
+      exact to_left_unit (.refl r)
+  | .vcomp (.refl r) (.refl _), .refl _ =>
+      exact from_left_unit (.refl r)
   | .vcomp (.refl _) (.refl _), .vcomp (.refl _) (.refl _) =>
       exact .refl _
   | .vcomp (.step s₁) (.refl _), .vcomp (.step s₂) (.refl _) =>
-      exact connect_right_unit_steps_via_diamond s₁ s₂
+      exact .vcomp (.inv (Derivation₃.whiskerLeft₃ (.step s₁) stepstarReflBridge))
+        (.vcomp (.step (.diamond_filler s₁ s₂ (StepStar.refl q) (StepStar.refl q)))
+          (Derivation₃.whiskerLeft₃ (.step s₂) stepstarReflBridge))
   | .step s₁, .vcomp (.step s₂) (.refl _) =>
-      exact .vcomp (connect_steps s₁ s₂)
-        (connect_step_to_right_unit s₂)
+      exact step_to_right s₁ s₂
   | .vcomp (.step s₁) (.refl _), .step s₂ =>
-      exact .vcomp (connect_right_unit_step s₁)
-        (connect_steps s₁ s₂)
+      exact right_to_step s₁ s₂
   | .vcomp (.refl _) (.step s₁), .vcomp (.refl _) (.step s₂) =>
-      exact connect_left_unit_steps s₁ s₂
+      exact left_steps_eq s₁ s₂
   | .vcomp (.refl _) (.step s₁), .vcomp (.step s₂) (.refl _) =>
-      exact connect_left_to_right_unit_steps s₁ s₂
+      exact .vcomp (left_to_step s₁ s₂)
+        (to_right_unit (.step s₂))
   | .vcomp (.step s₁) (.refl _), .vcomp (.refl _) (.step s₂) =>
-      exact connect_right_to_left_unit_steps s₁ s₂
+      exact .vcomp (right_to_step s₁ s₂)
+        (to_left_unit (.step s₂))
   | .step s₁, .vcomp (.refl _) (.step s₂) =>
-      exact .vcomp (connect_steps s₁ s₂)
-        (connect_step_to_left_unit s₂)
+      exact step_to_left s₁ s₂
   | .vcomp (.refl _) (.step s₁), .step s₂ =>
-      exact .vcomp (connect_left_unit_step s₁)
-        (connect_steps s₁ s₂)
-  | .step s₁, .step s₂ => exact connect_steps s₁ s₂
+      exact left_to_step s₁ s₂
+  | .step s₁, .step s₂ => exact step_eq3 s₁ s₂
   | .vcomp (.refl _) d₁, .vcomp (.refl _) d₂ =>
-      exact connect_left_units d₁ d₂
+      exact .vcomp (left_unit_to d₁ d₂) (to_left_unit d₂)
+  | .vcomp (.refl _) d₁, .vcomp d₂ (.refl _) =>
+      exact .vcomp (left_unit_to d₁ d₂) (to_right_unit d₂)
   | .vcomp d₁ (.refl _), .vcomp d₂ (.refl _) =>
-      exact connect_right_units d₁ d₂
+      exact .vcomp (right_unit_to d₁ d₂) (to_right_unit d₂)
+  | .vcomp d₁ (.refl _), .vcomp (.refl _) d₂ =>
+      exact .vcomp (right_unit_to d₁ d₂) (to_left_unit d₂)
   | .vcomp (.refl _) d₁, d₂ =>
-      exact .vcomp (connect_left_unit d₁) (connect_normalized_fallback d₁ d₂)
+      exact left_unit_to d₁ d₂
   | d₁, .vcomp (.refl _) d₂ =>
-      exact .vcomp (connect_normalized_fallback d₁ d₂) (.inv (connect_left_unit d₂))
+      exact fallback_to_left_unit d₁ d₂
   | .vcomp d₁ (.refl _), d₂ =>
-      exact .vcomp (connect_right_unit d₁) (connect_normalized_fallback d₁ d₂)
+      exact right_unit_to d₁ d₂
   | d₁, .vcomp d₂ (.refl _) =>
-      exact .vcomp (connect_normalized_fallback d₁ d₂) (.inv (connect_right_unit d₂))
-  | _, _ => exact connect_normalized_fallback _ _
+      exact fallback_to_right_unit d₁ d₂
+  | d₁, d₂ => exact fallback d₁ d₂
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
