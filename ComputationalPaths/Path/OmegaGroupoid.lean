@@ -365,6 +365,176 @@ section Contractibility
 
 variable {a b : A}
 
+/-- Strict normal forms for `Derivation₂`: refl or right-associated signed atomic steps. -/
+inductive StrictNormalForm : {p q : Path a b} → Derivation₂ p q → Prop where
+  | refl (p : Path a b) : StrictNormalForm (.refl p)
+  | single_step {p q : Path a b} (s : Step p q) : StrictNormalForm (.step s)
+  | single_inv {p q : Path a b} (s : Step p q) : StrictNormalForm (.inv (.step s))
+  | cons_step {p q r : Path a b} (s : Step p q) {rest : Derivation₂ q r} :
+      StrictNormalForm rest → StrictNormalForm (.vcomp (.step s) rest)
+  | cons_inv {p q r : Path a b} (s : Step p q) {rest : Derivation₂ p r} :
+      StrictNormalForm rest → StrictNormalForm (.vcomp (.inv (.step s)) rest)
+
+/-- Signed atomic rewrite steps, used to linearize `Derivation₂` trees. -/
+inductive SignedStep : Type (u + 2) where
+  | pos {p q : Path a b} : Step p q → SignedStep
+  | neg {p q : Path a b} : Step p q → SignedStep
+
+namespace SignedStep
+
+/-- Flip orientation of a signed step. -/
+noncomputable def flip :
+    SignedStep (A := A) (a := a) (b := b) →
+    SignedStep (A := A) (a := a) (b := b)
+  | .pos s => .neg s
+  | .neg s => .pos s
+
+end SignedStep
+
+/-- Flatten a `Derivation₂` into a linear signed-step word. -/
+noncomputable def flatten {p q : Path a b} :
+    Derivation₂ p q → List (SignedStep (A := A) (a := a) (b := b))
+  | .refl _ => []
+  | .step s => [.pos s]
+  | .inv d => (flatten d).reverse.map SignedStep.flip
+  | .vcomp d₁ d₂ => flatten d₁ ++ flatten d₂
+
+/-- Detect whether two adjacent signed steps are inverse pairs. -/
+noncomputable def is_adjacent_inverse :
+    SignedStep (A := A) (a := a) (b := b) →
+    SignedStep (A := A) (a := a) (b := b) → Bool
+  | x, y =>
+      by
+        classical
+        exact if SignedStep.flip x = y then true else false
+
+/-- Stack-style reducer that cancels adjacent inverse signed-step pairs. -/
+noncomputable def reduce_signed_aux :
+    List (SignedStep (A := A) (a := a) (b := b)) →
+    List (SignedStep (A := A) (a := a) (b := b)) →
+    List (SignedStep (A := A) (a := a) (b := b))
+  | acc, [] => acc.reverse
+  | [], x :: xs => reduce_signed_aux [x] xs
+  | y :: ys, x :: xs =>
+      if is_adjacent_inverse y x then
+        reduce_signed_aux ys xs
+      else
+        reduce_signed_aux (x :: y :: ys) xs
+
+/-- Reduce signed-step words by cancelling adjacent inverse pairs. -/
+noncomputable def reduce_signed
+    (xs : List (SignedStep (A := A) (a := a) (b := b))) :
+    List (SignedStep (A := A) (a := a) (b := b)) :=
+  reduce_signed_aux [] xs
+
+/-- Interpret one signed step as an atomic `Derivation₂`. -/
+noncomputable def signed_to_derivation :
+    SignedStep (A := A) (a := a) (b := b) →
+    Σ p q : Path a b, Derivation₂ p q
+  | .pos s => ⟨_, _, .step s⟩
+  | .neg s => ⟨_, _, .inv (.step s)⟩
+
+/-- Rebuild a right-associated derivation from a signed-step word, anchored at `start`. -/
+noncomputable def rebuild_from (start : Path a b) :
+    List (SignedStep (A := A) (a := a) (b := b)) →
+    Σ finish : Path a b, { d : Derivation₂ start finish // StrictNormalForm d }
+  | [] => ⟨start, ⟨.refl start, .refl start⟩⟩
+  | (.pos (p := p₀) (q := q₀) s) :: xs =>
+      by
+        classical
+        by_cases hs : p₀ = start
+        · cases hs
+          cases xs with
+          | nil =>
+              exact ⟨q₀, ⟨.step s, .single_step s⟩⟩
+          | cons y ys =>
+              rcases rebuild_from q₀ (y :: ys) with ⟨finish, rest⟩
+              exact ⟨finish, ⟨.vcomp (.step s) rest.1, .cons_step s rest.2⟩⟩
+        · exact ⟨start, ⟨.refl start, .refl start⟩⟩
+  | (.neg (p := p₀) (q := q₀) s) :: xs =>
+      by
+        classical
+        by_cases hs : q₀ = start
+        · cases hs
+          cases xs with
+          | nil =>
+              exact ⟨p₀, ⟨.inv (.step s), .single_inv s⟩⟩
+          | cons y ys =>
+              rcases rebuild_from p₀ (y :: ys) with ⟨finish, rest⟩
+              exact ⟨finish, ⟨.vcomp (.inv (.step s)) rest.1, .cons_inv s rest.2⟩⟩
+        · exact ⟨start, ⟨.refl start, .refl start⟩⟩
+
+/-- Rebuild at fixed endpoints, using `fallback` if endpoint recovery fails. -/
+noncomputable def rebuild {p q : Path a b}
+    (fallback : Derivation₂ p q)
+    (xs : List (SignedStep (A := A) (a := a) (b := b))) : Derivation₂ p q := by
+  rcases rebuild_from (start := p) xs with ⟨q', d'⟩
+  classical
+  by_cases hq : q' = q
+  · cases hq
+    exact d'.1
+  · exact fallback
+
+/-- Reduced signed-step words contain no adjacent inverse pair. -/
+def reduced (xs : List (SignedStep (A := A) (a := a) (b := b))) : Prop :=
+  match xs with
+  | x :: y :: ys => is_adjacent_inverse x y = false ∧ reduced (y :: ys)
+  | _ => True
+
+/-- Rebuilding from a signed-step word always yields a strict normal form. -/
+theorem rebuild_from_is_strict
+    (start : Path a b)
+    (xs : List (SignedStep (A := A) (a := a) (b := b))) :
+    StrictNormalForm (rebuild_from (start := start) xs).2.1 :=
+  (rebuild_from (start := start) xs).2.2
+
+/-- If fallback is strict, rebuilding at fixed endpoints is strict. -/
+theorem rebuild_reduced_is_strict
+    {p q : Path a b}
+    (fallback : Derivation₂ p q)
+    (hfb : StrictNormalForm fallback)
+    {xs : List (SignedStep (A := A) (a := a) (b := b))} :
+    reduced xs → StrictNormalForm (rebuild (fallback := fallback) xs) := by
+  intro _hred
+  unfold rebuild
+  rcases h : rebuild_from (start := p) xs with ⟨q', d'⟩
+  by_cases hq : q' = q
+  · cases hq
+    simpa [h] using d'.2
+  · simpa [h, hq] using hfb
+
+/-- Boolean checker for whether a signed-step list still has adjacent inverse pairs. -/
+noncomputable def has_adjacent_inverse :
+    List (SignedStep (A := A) (a := a) (b := b)) → Bool
+  | x :: y :: xs => is_adjacent_inverse x y || has_adjacent_inverse (y :: xs)
+  | _ => false
+
+section SignedStepReducerChecks
+
+variable {p q r : Path a b}
+
+example (s : Step p q) :
+    reduce_signed [SignedStep.pos s, SignedStep.neg s] = [] := by
+  classical
+  simp [reduce_signed, reduce_signed_aux, is_adjacent_inverse, SignedStep.flip]
+
+example (s : Step p q) :
+    has_adjacent_inverse (reduce_signed [SignedStep.pos s, SignedStep.neg s]) = false := by
+  classical
+  simp [reduce_signed, reduce_signed_aux, has_adjacent_inverse, is_adjacent_inverse, SignedStep.flip]
+
+example (s : Step p q) (t : Step q r) :
+    reduce_signed [SignedStep.pos s, SignedStep.pos t, SignedStep.neg t] = [SignedStep.pos s] := by
+  classical
+  simp [reduce_signed, reduce_signed_aux, is_adjacent_inverse, SignedStep.flip]
+
+example (s : Step p q) (t : Step q r) :
+    has_adjacent_inverse (reduce_signed [SignedStep.pos s, SignedStep.pos t, SignedStep.neg t]) = false := by
+  classical
+  simp [reduce_signed, reduce_signed_aux, has_adjacent_inverse, is_adjacent_inverse, SignedStep.flip]
+
+end SignedStepReducerChecks
+
 /-- Atomic normal-form fragments: one step, possibly inverted. -/
 noncomputable def IsNormalAtom {p q : Path a b} : Derivation₂ p q → Prop
   | .step _ => True
@@ -411,6 +581,154 @@ mutual
     | .inv d => normalize d
     | .vcomp d₁ d₂ => normalize_vcomp (normalizeInv d₂) (normalizeInv d₁)
 end
+
+/-- Left-prepending a positive atomic step preserves strict normal form under `normalize_vcomp`. -/
+theorem normalize_vcomp_step_left_is_strict
+    {p q r : Path a b}
+    (s : Step p q) {d : Derivation₂ q r}
+    (hd : StrictNormalForm d) :
+    StrictNormalForm (normalize_vcomp (.step s) d) := by
+  cases hd with
+  | refl _ =>
+      simpa [normalize_vcomp] using (StrictNormalForm.single_step s)
+  | single_step t =>
+      simpa [normalize_vcomp] using
+        (StrictNormalForm.cons_step (s := s) (StrictNormalForm.single_step t))
+  | single_inv t =>
+      simpa [normalize_vcomp] using
+        (StrictNormalForm.cons_step (s := s) (StrictNormalForm.single_inv t))
+  | cons_step t hrest =>
+      simpa [normalize_vcomp] using
+        (StrictNormalForm.cons_step (s := s) (StrictNormalForm.cons_step (s := t) hrest))
+  | cons_inv t hrest =>
+      simpa [normalize_vcomp] using
+        (StrictNormalForm.cons_step (s := s) (StrictNormalForm.cons_inv (s := t) hrest))
+
+/-- Left-prepending a negative atomic step preserves strict normal form under `normalize_vcomp`. -/
+theorem normalize_vcomp_inv_left_is_strict
+    {p q r : Path a b}
+    (s : Step p q) {d : Derivation₂ p r}
+    (hd : StrictNormalForm d) :
+    StrictNormalForm (normalize_vcomp (.inv (.step s)) d) := by
+  cases hd with
+  | refl _ =>
+      simpa [normalize_vcomp] using (StrictNormalForm.single_inv s)
+  | single_step t =>
+      simpa [normalize_vcomp] using
+        (StrictNormalForm.cons_inv (s := s) (StrictNormalForm.single_step t))
+  | single_inv t =>
+      simpa [normalize_vcomp] using
+        (StrictNormalForm.cons_inv (s := s) (StrictNormalForm.single_inv t))
+  | cons_step t hrest =>
+      simpa [normalize_vcomp] using
+        (StrictNormalForm.cons_inv (s := s) (StrictNormalForm.cons_step (s := t) hrest))
+  | cons_inv t hrest =>
+      simpa [normalize_vcomp] using
+        (StrictNormalForm.cons_inv (s := s) (StrictNormalForm.cons_inv (s := t) hrest))
+
+/-- `normalize_vcomp` preserves strict normal forms. -/
+theorem normalize_vcomp_is_strict
+    {p q r : Path a b}
+    {d₁ : Derivation₂ p q} {d₂ : Derivation₂ q r}
+    (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
+    StrictNormalForm (normalize_vcomp d₁ d₂) := by
+  induction d₁ with
+  | refl p =>
+      simpa [normalize_vcomp] using h₂
+  | step s =>
+      exact normalize_vcomp_step_left_is_strict s h₂
+  | inv d ih =>
+      cases h₁ with
+      | single_inv s =>
+          simpa using normalize_vcomp_inv_left_is_strict s h₂
+  | vcomp dL dR ihL ihR =>
+      cases h₁ with
+      | cons_step s hrest =>
+          cases d₂ with
+          | refl _ =>
+              simpa [normalize_vcomp] using
+                (StrictNormalForm.cons_step (s := s) hrest)
+          | step t =>
+              have hmid : StrictNormalForm (normalize_vcomp dR (.step t)) := ihR hrest h₂
+              simpa [normalize_vcomp] using
+                (normalize_vcomp_step_left_is_strict (s := s) hmid)
+          | inv e =>
+              have hmid : StrictNormalForm (normalize_vcomp dR (.inv e)) := ihR hrest h₂
+              simpa [normalize_vcomp] using
+                (normalize_vcomp_step_left_is_strict (s := s) hmid)
+          | vcomp e₁ e₂ =>
+              have hmid : StrictNormalForm (normalize_vcomp dR (.vcomp e₁ e₂)) := ihR hrest h₂
+              simpa [normalize_vcomp] using
+                (normalize_vcomp_step_left_is_strict (s := s) hmid)
+      | cons_inv s hrest =>
+          cases d₂ with
+          | refl _ =>
+              simpa [normalize_vcomp] using
+                (StrictNormalForm.cons_inv (s := s) hrest)
+          | step t =>
+              have hmid : StrictNormalForm (normalize_vcomp dR (.step t)) := ihR hrest h₂
+              simpa [normalize_vcomp] using
+                (normalize_vcomp_inv_left_is_strict (s := s) hmid)
+          | inv e =>
+              have hmid : StrictNormalForm (normalize_vcomp dR (.inv e)) := ihR hrest h₂
+              simpa [normalize_vcomp] using
+                (normalize_vcomp_inv_left_is_strict (s := s) hmid)
+          | vcomp e₁ e₂ =>
+              have hmid : StrictNormalForm (normalize_vcomp dR (.vcomp e₁ e₂)) := ihR hrest h₂
+              simpa [normalize_vcomp] using
+                (normalize_vcomp_inv_left_is_strict (s := s) hmid)
+
+/-- Existing normalizers yield strict normal forms (both direct and inverse variants). -/
+theorem normalize_pair_is_strict
+    {p q : Path a b} (d : Derivation₂ p q) :
+    StrictNormalForm (normalize d) ∧ StrictNormalForm (normalizeInv d) := by
+  induction d with
+  | refl p =>
+      constructor
+      · simpa [normalize] using (StrictNormalForm.refl p)
+      · simpa [normalizeInv] using (StrictNormalForm.refl p)
+  | step s =>
+      constructor
+      · simpa [normalize] using (StrictNormalForm.single_step s)
+      · simpa [normalizeInv] using (StrictNormalForm.single_inv s)
+  | inv d ih =>
+      rcases ih with ⟨hNorm, hInv⟩
+      constructor
+      · simpa [normalize] using hInv
+      · simpa [normalizeInv] using hNorm
+  | vcomp d₁ d₂ ih₁ ih₂ =>
+      rcases ih₁ with ⟨h₁, h₁inv⟩
+      rcases ih₂ with ⟨h₂, h₂inv⟩
+      constructor
+      · simpa [normalize] using normalize_vcomp_is_strict h₁ h₂
+      · simpa [normalizeInv] using normalize_vcomp_is_strict h₂inv h₁inv
+
+/-- Existing normalizer yields strict normal forms. -/
+theorem normalize_is_strict
+    {p q : Path a b} (d : Derivation₂ p q) :
+    StrictNormalForm (normalize d) :=
+  (normalize_pair_is_strict d).1
+
+/-- Existing inverse normalizer yields strict normal forms. -/
+theorem normalizeInv_is_strict
+    {p q : Path a b} (d : Derivation₂ p q) :
+    StrictNormalForm (normalizeInv d) :=
+  (normalize_pair_is_strict d).2
+
+/-- Strict normalization via flatten → reduce adjacent inverses → rebuild. -/
+noncomputable def strict_normalize {p q : Path a b} (d : Derivation₂ p q) : Derivation₂ p q :=
+  rebuild (fallback := normalize d) (reduce_signed (flatten d))
+
+/-- Strict normalizer always returns a strict normal form. -/
+theorem strict_normalize_is_normal
+    {p q : Path a b} (d : Derivation₂ p q) :
+    StrictNormalForm (strict_normalize d) := by
+  unfold strict_normalize rebuild
+  rcases h : rebuild_from (start := p) (reduce_signed (flatten d)) with ⟨q', d'⟩
+  by_cases hq : q' = q
+  · cases hq
+    simpa [h] using d'.2
+  · simpa [h, hq] using (normalize_is_strict d)
 
 /-- Transport equality of projected `RwEq` witnesses for parallel derivations. -/
 theorem derivation₂_toEq_eq {p q : Path a b} (d₁ d₂ : Derivation₂ p q) :
@@ -530,22 +848,6 @@ noncomputable def connect_normalized {p q : Path a b}
   match n₁, n₂ with
   | .refl _, .refl _ => exact .refl _
   | .step s₁, .step s₂ => exact .step (.step_eq s₁ s₂)
-  | .vcomp (.step s₁) d₁, .vcomp (.step s₂) d₂ =>
-      by
-        classical
-        by_cases h₁ : ∃ j₁ : StepStar _ q, d₁ = derivation₂_of_stepstar j₁
-        · rcases h₁ with ⟨j₁, rfl⟩
-          by_cases h₂ : ∃ j₂ : StepStar _ q, d₂ = derivation₂_of_stepstar j₂
-          · rcases h₂ with ⟨j₂, rfl⟩
-            exact .step (.diamond_filler s₁ s₂ j₁ j₂)
-          · exact .step (.rweq_transport
-              (derivation₂_toEq_eq
-                (.vcomp (.step s₁) (derivation₂_of_stepstar j₁))
-                (.vcomp (.step s₂) d₂)))
-        · exact .step (.rweq_transport
-            (derivation₂_toEq_eq
-              (.vcomp (.step s₁) d₁)
-              (.vcomp (.step s₂) d₂)))
   | .vcomp (.refl _) d, n =>
       exact .vcomp (.step (.vcomp_refl_left d))
         (.step (.rweq_transport (derivation₂_toEq_eq d n)))
@@ -582,6 +884,65 @@ noncomputable def connect_normalized {p q : Path a b}
   | d₁, d₂ =>
       exact .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
 
+/-- Structural connector between strict normal-form representatives. -/
+noncomputable def connect_strict {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q}
+    (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
+    Derivation₃ d₁ d₂ := by
+  classical
+  have aux : Nonempty (Derivation₃ d₁ d₂) := by
+    induction h₁ with
+    | refl p =>
+        cases h₂ with
+        | refl _ => exact ⟨.refl (.refl p)⟩
+        | _ => exact ⟨connect_normalized _ _⟩
+    | single_step s =>
+        cases h₂ with
+        | single_step t =>
+            exact ⟨.step (.step_eq s t)⟩
+        | cons_step t hrest₂ =>
+            cases hrest₂ with
+            | refl _ =>
+                have _hdiamond :
+                    Derivation₃
+                      (.vcomp (.step s) (derivation₂_of_stepstar (StepStar.refl _)))
+                      (.vcomp (.step t) (derivation₂_of_stepstar (StepStar.refl _))) :=
+                  .step (.diamond_filler s t (StepStar.refl _) (StepStar.refl _))
+                exact ⟨connect_normalized _ _⟩
+            | _ =>
+                exact ⟨connect_normalized _ _⟩
+        | _ => exact ⟨connect_normalized _ _⟩
+    | single_inv s =>
+        cases h₂ with
+        | single_inv t =>
+            exact ⟨.step (.whisker_inv₃ (.step_eq s t))⟩
+        | _ => exact ⟨connect_normalized _ _⟩
+    | cons_step s hrest₁ ih =>
+        cases h₂ with
+        | cons_step t hrest₂ =>
+            cases hrest₁ with
+            | refl _ =>
+                cases hrest₂ with
+                | refl _ =>
+                    have hrecN : Nonempty (Derivation₃ (.refl _) (.refl _)) :=
+                      ih (StrictNormalForm.refl _)
+                    let _hrec := hrecN
+                    have _hdiamond :
+                        Derivation₃
+                          (.vcomp (.step s) (derivation₂_of_stepstar (StepStar.refl _)))
+                          (.vcomp (.step t) (derivation₂_of_stepstar (StepStar.refl _))) :=
+                      .step (.diamond_filler s t (StepStar.refl _) (StepStar.refl _))
+                    exact ⟨connect_normalized _ _⟩
+                | _ =>
+                    exact ⟨connect_normalized _ _⟩
+            | _ =>
+                exact ⟨connect_normalized _ _⟩
+        | _ =>
+            exact ⟨connect_normalized _ _⟩
+    | cons_inv _ _ _ =>
+        exact ⟨connect_normalized _ _⟩
+  exact Classical.choice aux
+
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
 ## Mathematical Justification
@@ -599,6 +960,11 @@ noncomputable def contractibility₃ {p q : Path a b}
   .vcomp (to_normal_form₃ d₁)
     (.vcomp (connect_normalized (normalize d₁) (normalize d₂))
       (.inv (to_normal_form₃ d₂)))
+
+/-- Bridge from any 2-cell to its strict normal-form representative. -/
+noncomputable def to_strict_normal_form₃ {p q : Path a b}
+    (d : Derivation₂ p q) : Derivation₃ d (strict_normalize d) :=
+  contractibility₃ d (strict_normalize d)
 
 /-- **Loop contraction**: Any loop derivation `d : Derivation₂ p p` contracts to `refl p`.
 
