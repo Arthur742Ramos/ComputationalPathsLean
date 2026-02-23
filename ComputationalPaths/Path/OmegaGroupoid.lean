@@ -337,6 +337,11 @@ noncomputable def to_normal_form₃ {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ d (normalize d) :=
   normalize_bridge d
 
+/-- Fallback connector for mixed normalized forms. -/
+noncomputable def connect_normalized_fallback {p q : Path a b}
+    (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ :=
+  .step .rweq_eq
+
 /-- Connector between normalized representatives. -/
 noncomputable def connect_normalized {p q : Path a b}
     (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ := by
@@ -353,7 +358,7 @@ noncomputable def connect_normalized {p q : Path a b}
           Derivation₃
             (derivation₂_of_stepstar (StepStar.refl q))
             (.refl q) :=
-        .step .rweq_eq
+        connect_normalized_fallback _ _
       let leftBridge :
           Derivation₃
             (.vcomp (.step s₁) (.refl q))
@@ -378,6 +383,14 @@ noncomputable def connect_normalized {p q : Path a b}
         (.step (.step_eq s₁ s₂))
   | .vcomp (.refl _) (.step s₁), .vcomp (.refl _) (.step s₂) =>
       exact Derivation₃.whiskerLeft₃ (.refl _) (.step (.step_eq s₁ s₂))
+  | .vcomp (.refl _) (.step s₁), .vcomp (.step s₂) (.refl _) =>
+      exact .vcomp (.step (.vcomp_refl_left (.step s₁)))
+        (.vcomp (.step (.step_eq s₁ s₂))
+          (.inv (.step (.vcomp_refl_right (.step s₂)))))
+  | .vcomp (.step s₁) (.refl _), .vcomp (.refl _) (.step s₂) =>
+      exact .vcomp (.step (.vcomp_refl_right (.step s₁)))
+        (.vcomp (.step (.step_eq s₁ s₂))
+          (.inv (.step (.vcomp_refl_left (.step s₂)))))
   | .step s₁, .vcomp (.refl _) (.step s₂) =>
       exact .vcomp (.step (.step_eq s₁ s₂))
         (.inv (.step (.vcomp_refl_left (.step s₂))))
@@ -385,7 +398,15 @@ noncomputable def connect_normalized {p q : Path a b}
       exact .vcomp (.step (.vcomp_refl_left (.step s₁)))
         (.step (.step_eq s₁ s₂))
   | .step s₁, .step s₂ => exact .step (.step_eq s₁ s₂)
-  | _, _ => exact .step .rweq_eq
+  | .vcomp (.refl _) d₁, d₂ =>
+      exact .vcomp (.step (.vcomp_refl_left d₁)) (connect_normalized_fallback d₁ d₂)
+  | d₁, .vcomp (.refl _) d₂ =>
+      exact .vcomp (connect_normalized_fallback d₁ d₂) (.inv (.step (.vcomp_refl_left d₂)))
+  | .vcomp d₁ (.refl _), d₂ =>
+      exact .vcomp (.step (.vcomp_refl_right d₁)) (connect_normalized_fallback d₁ d₂)
+  | d₁, .vcomp d₂ (.refl _) =>
+      exact .vcomp (connect_normalized_fallback d₁ d₂) (.inv (.step (.vcomp_refl_right d₂)))
+  | _, _ => exact connect_normalized_fallback _ _
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
@@ -396,9 +417,9 @@ We compose:
 2. `connect_normalized (normalize d₁) (normalize d₂)`
 3. `inv (to_normal_form₃ d₂) : Derivation₃ (normalize d₂) d₂`
 
-The middle connector handles explicit `refl`/`step`/`vcomp(step,refl)` interactions
-(including a `diamond_filler` branch), and falls back to `MetaStep₃.rweq_eq`
-for remaining mixed constructors. -/
+The middle connector handles explicit unit/step interactions (including
+`diamond_filler` and generic unit-elimination branches), and falls back to
+`MetaStep₃.rweq_eq` for remaining mixed constructors. -/
 noncomputable def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
   .vcomp (to_normal_form₃ d₁)

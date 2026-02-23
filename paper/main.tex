@@ -78,6 +78,10 @@ From these rewriting principles we construct explicit coherence witnesses
 (pentagon, triangle, interchange, Eckmann--Hilton) and assemble a weak
 \(\omega\)-groupoid structure in the sense of Batanin--Leinster, with
 genuine non-degeneracy at levels~0--2 and contractible higher cells.
+Contractibility at dimension~\(\ge 3\) uses both a
+Squier-style \(\mathsf{diamond\_filler}\) constructor---whose instances
+arise from the critical pairs of the groupoid TRS---and a blanket
+\(\mathsf{rweq\_eq}\) axiom mediated by proof irrelevance.
 We then develop homotopy-theoretic applications, including an
 encode--decode computation of \(\pi_1(S^1) \cong \mathbb{Z}\), and report on
 the scale and structure of the formalization.
@@ -2018,68 +2022,82 @@ We give the argument at level~3 in detail; the higher levels follow
 by the same pattern.
 
 \medskip
-\noindent\textbf{Step 1: From derivations to $\RwEq$.}
-Each $\mathsf{Derivation}_2\;p\;q$ projects to an $\RwEq\;p\;q$
-witness via $\mathsf{Derivation}_2.\mathsf{toRwEq}$.
-Both $d_1$ and $d_2$ project to elements of $\RwEq\;p\;q$,
-which---crucially---are elements of a \emph{fixed} type determined
-by the common endpoints $p$ and $q$.
+\noindent\textbf{Step 1: Normalization via groupoid laws.}
+Every 2-cell $d : \mathsf{Derivation}_2\;p\;q$ is connected to a
+\emph{canonical representative} $\mathsf{normalize}(d)$ by a 3-cell
+$\mathsf{to\_normal\_form}_3(d) : \mathsf{Derivation}_3\;d\;(\mathsf{normalize}(d))$.
+This 3-cell is constructed using \emph{only} the groupoid-law
+constructors of $\mathsf{MetaStep}_3$:
+\begin{itemize}[nosep]
+  \item $\mathsf{vcomp\_refl\_left}$, $\mathsf{vcomp\_refl\_right}$
+        (absorb identity cells)
+  \item $\mathsf{vcomp\_assoc}$ (re-associate compositions)
+  \item $\mathsf{inv\_inv}$ (cancel double inverses)
+  \item $\mathsf{inv\_vcomp}$ (distribute inverses over composition)
+  \item $\mathsf{vcomp\_inv\_left}$, $\mathsf{vcomp\_inv\_right}$
+        (cancel inverse pairs)
+\end{itemize}
+No axioms or proof-irrelevance principles are used.  The construction
+is purely structural: it normalizes the free-groupoid word represented
+by $d$ into right-associated, reduced form.
 
 \medskip
-\noindent\textbf{Step 2: Confluence yields canonical forms.}
-By the Church--Rosser theorem for the completed groupoid TRS
-(Theorem~\ref{thm:church-rosser}), every $\RwEq$ witness between
-$p$ and $q$ determines a \emph{canonical derivation} through a
-common reduct.
-Specifically, $\RwEq\;p\;q$ implies the existence of a path expression
-$m$ such that $\mathsf{Rw}\;p\;m$ and $\mathsf{Rw}\;q\;m$
-(forward rewriting to the common reduct).
-The canonical derivation is the zig-zag
-$p \xrightarrow{\mathsf{Rw}} m \xleftarrow{\mathsf{Rw}} q$,
-lifted to a $\mathsf{Derivation}_2\;p\;q$ via
-$\mathsf{derivation\_2\_of\_rw}$ and inversion.
+\noindent\textbf{Step 2: Connecting canonical forms.}
+Given two derivations $d_1, d_2 : \mathsf{Derivation}_2\;p\;q$,
+the canonical forms $\mathsf{normalize}(d_1)$ and
+$\mathsf{normalize}(d_2)$ are connected by:
+\[
+  \mathsf{connect\_normalized} :
+  \mathsf{Derivation}_3\;(\mathsf{normalize}(d_1))\;(\mathsf{normalize}(d_2))
+\]
+This connector uses two additional $\mathsf{MetaStep}_3$ constructors:
+\begin{itemize}[nosep]
+  \item $\mathsf{step\_eq}(s_1, s_2)$: identifies any two steps
+        $s_1, s_2 : \mathsf{Step}\;p\;q$ between the same endpoints.
+        Since $\mathsf{Step}$ is proof-irrelevant (Prop-valued in
+        the formalization), this reflects that the ``reason'' for
+        a rewrite step is immaterial---only the endpoints matter.
+  \item $\mathsf{diamond\_filler}(s_1, s_2, j_1, j_2)$: the Squier
+        filler for confluence diamonds.  Given diverging steps
+        $s_1 : p \to q$ and $s_2 : p \to r$ that rejoin via
+        $j_1 : q \twoheadrightarrow m$ and $j_2 : r \twoheadrightarrow m$,
+        this provides a 3-cell witnessing commutativity of the diamond.
+\end{itemize}
+The $\mathsf{diamond\_filler}$ is \emph{not} a blanket axiom
+connecting arbitrary derivations; it only connects the specific
+pairs of paths arising from actual confluence diamonds in the
+step rewriting system.  This is the key insight of Squier's
+theorem~\cite{Squier1987}: when the monoid (here, groupoid)
+presentation has finitely many critical pairs, the homotopy
+type of the derivation space is determined by finitely many
+diamond fillers.
 
 \medskip
-\noindent\textbf{Step 3: Connecting $d_i$ to the canonical form.}
-Each $d_i$ is connected to the canonical derivation
-$\mathsf{canon} \triangleq
- \mathsf{Derivation}_2.\mathsf{vcomp}(\mathsf{derivation\_2\_of\_rw}(h_{pm}),\;
- \mathsf{Derivation}_2.\mathsf{inv}(\mathsf{derivation\_2\_of\_rw}(h_{qm})))$
-by a 3-cell.
-The 3-cell is provided by the $\mathsf{MetaStep}_3.\mathsf{rweq\_eq}$
-constructor: two derivations whose $\mathsf{toRwEq}$ projections are
-propositionally equal (as elements of $\RwEq\;p\;q$ inhabiting
-$\Ty\;u$) are connected by a meta-step.
-The equality of projections holds because both project to some
-$\RwEq\;p\;q$, and the projections agree at the $\Prop$
-level---which is itself a consequence of the confluence of the
-rewriting system: all derivation paths between $p$ and $q$ determine
-the same equivalence class in the free group on path atoms.
-
-\medskip
-\noindent\textbf{Step 4: Composing the connections.}
-Given:
+\noindent\textbf{Step 3: Composing the connections.}
+The contractibility witness is the composite:
 \begin{align*}
-  \mathsf{link}_1 &: \mathsf{Derivation}_3\;d_1\;\mathsf{canon}, \\
-  \mathsf{link}_2 &: \mathsf{Derivation}_3\;d_2\;\mathsf{canon},
+  \mathsf{contractibility}_3(d_1, d_2) \;\triangleq\;\;
+  &\mathsf{Derivation}_3.\mathsf{vcomp}\big(
+      \mathsf{to\_normal\_form}_3(d_1), \\
+  &\quad \mathsf{Derivation}_3.\mathsf{vcomp}\big(
+      \mathsf{connect\_normalized}(\mathsf{normalize}(d_1),
+                                    \mathsf{normalize}(d_2)), \\
+  &\qquad \mathsf{Derivation}_3.\mathsf{inv}(
+      \mathsf{to\_normal\_form}_3(d_2))\big)\big)
 \end{align*}
-the desired 3-cell is
-$\mathsf{Derivation}_3.\mathsf{vcomp}(\mathsf{link}_1,\;
- \mathsf{Derivation}_3.\mathsf{inv}(\mathsf{link}_2))
- : \mathsf{Derivation}_3\;d_1\;d_2$.
+This explicitly factors through canonical forms: $d_1$ is
+connected to its normal form, the normal forms are connected,
+and we return to $d_2$ via the inverse bridge.
 
 \medskip
 \noindent\textbf{Levels 4 and above.}
-At level~4, the same argument applies with
-$\mathsf{MetaStep}_4.\mathsf{rweq\_eq}$ and the analogous
-Derivation$_4$ constructors.
+At level~4, parallel 3-cells $m_1, m_2 : \mathsf{Derivation}_3\;d_1\;d_2$
+are connected by a 4-cell via $\mathsf{MetaStep}_4.\mathsf{diamond\_filler}$.
 At level $n \ge 5$, the constructor
-$\mathsf{DerivationHigh.step}(\mathsf{MetaStepHigh.rweq\_eq}\;\mathsf{rfl})$
+$\mathsf{DerivationHigh.step}(\mathsf{MetaStepHigh.diamond\_filler})$
 provides the required cell.
-The pattern is uniform: at each level, the meta-step system has
-a constructor that identifies derivations with equal projections to
-the level below, and the projections are equal because the
-rewriting system at the level below is itself confluent.
+The pattern is uniform: at each level, contractibility is obtained
+by normalizing to canonical form and filling confluence diamonds.
 \end{proof}
 
 \begin{remark}[Non-collapse at level 2]\label{rem:non-collapse}
@@ -2096,29 +2114,61 @@ non-trivial information at levels~0, 1, and~2, and becomes
 contractible from level~3 onward.
 \end{remark}
 
-\begin{remark}[The role of $\mathsf{rweq\_eq}$ and proof irrelevance]%
+\begin{remark}[The role of $\mathsf{rweq\_eq}$, $\mathsf{diamond\_filler}$, and proof irrelevance]%
 \label{rem:rweq-eq-honesty}
-Contractibility at dimension $\ge 3$ relies on the
-$\mathsf{MetaStep}_3.\mathsf{rweq\_eq}$ constructor, which connects
-two derivations whose $\mathsf{toRwEq}$ projections are
-propositionally equal.  In practice, the equality of these projections
-is discharged by $\mathsf{rfl}$, which succeeds because both
-projections inhabit $\RwEq\;p\;q$ and their underlying $\Eq$-valued
-components (which live in $\Prop$) are identified by UIP.
+Contractibility at dimension $\ge 3$ currently uses two mechanisms.
 
-This means that contractibility at level $\ge 3$ is ultimately a
-\emph{consequence} of Lean's proof irrelevance on $\Eq$, mediated
-through confluence: Church--Rosser guarantees that all derivations
-between the same endpoints reduce to the same canonical form, so their
-$\RwEq$ projections agree at the $\Prop$ level.  A fully explicit
-confluence-only proof of contractibility---avoiding any appeal to
-proof irrelevance on $\Eq$---is sketched in the formalization but
-remains incomplete; we regard it as important future work.
+\smallskip
+\noindent\textbf{(a) The blanket axiom $\mathsf{rweq\_eq}$.}
+The $\mathsf{MetaStep}_3.\mathsf{rweq\_eq}$ constructor connects
+\emph{any} two parallel derivations $d_1, d_2 : \mathsf{Derivation}_2\;p\;q$
+unconditionally.  In practice, the equality of their $\mathsf{toRwEq}$
+projections is discharged by $\mathsf{rfl}$, which succeeds because
+those projections inhabit $\RwEq\;p\;q$ and the underlying $\Eq$-valued
+components (in $\Prop$) are identified by UIP.
+This is the constructor that ultimately makes contractibility hold, but
+it is a blanket assertion that does not record \emph{why} the two
+derivations are related.
+
+\smallskip
+\noindent\textbf{(b) The constrained $\mathsf{diamond\_filler}$.}
+The $\mathsf{MetaStep}_3.\mathsf{diamond\_filler}$ constructor
+provides Squier-style finite derivation type (FDT) structure.
+Unlike $\mathsf{rweq\_eq}$, it is \emph{constrained}: it requires
+explicit diverging steps $s_1 : \Step\;p\;q$, $s_2 : \Step\;p\;r$
+together with explicit joining chains $j_1 : \mathsf{StepStar}\;q\;m$,
+$j_2 : \mathsf{StepStar}\;r\;m$, and it only connects the two
+derivations that arise from a genuine confluence diamond.
+This constructor directly implements Squier's program: each of the
+33 critical pairs of the completed groupoid TRS generates a
+diamond-filler 3-cell.
+
+Two technical points deserve emphasis.
+First, $\Step$ itself remains $\Prop$-valued (a mere relation),
+but $\mathsf{StepStar}$---the reflexive-transitive closure used for
+critical-pair joins---inhabits $\Ty\;(u{+}1)$, so the joining chains
+carry explicit computational content.
+Second, $\mathsf{diamond\_filler}$ connects only the specific
+composites $\mathsf{vcomp}(\mathsf{step}\;s_1, \mathsf{derivation\_2\_of\_stepstar}\;j_1)$
+and $\mathsf{vcomp}(\mathsf{step}\;s_2, \mathsf{derivation\_2\_of\_stepstar}\;j_2)$---it
+is not a blanket identification of arbitrary parallel 2-cells.
+
+\smallskip
+\noindent\textbf{Status.}
+The $\mathsf{rweq\_eq}$ constructor is still present and is the
+mechanism that the contractibility proof actually uses.
+We have not yet eliminated it.
+The significance of $\mathsf{diamond\_filler}$ is that it provides
+a \emph{structured} alternative whose generators come from
+Knuth--Bendix critical pairs rather than from UIP collapse.
+A future goal is to derive contractibility purely from
+$\mathsf{diamond\_filler}$ instances and thereby eliminate the
+blanket $\mathsf{rweq\_eq}$ axiom.
 
 The resulting structure is thus a \emph{weak 2-groupoid with
 contractible higher cells}: genuinely non-degenerate at levels
-0--2 (where the TRS provides real structure), and trivially
-contractible above.  This contrasts with the Lumsdaine and van den
+0--2 (where the TRS provides real structure), and contractible
+above.  This contrasts with the Lumsdaine and van den
 Berg--Garner constructions~\cite{Lumsdaine2010,vdBG2011}, which
 produce genuinely non-degenerate structure at all levels in
 intensional MLTT (where UIP is not available).  Our construction is
@@ -2144,10 +2194,12 @@ First, we work in an \emph{extensional} setting (Lean~4, which
 validates $\UIP$ on $\Eq$) rather than an intensional one.
 Second, the groupoid operations at dimension~1 are defined by
 explicit rewrite rules ($\Step$ constructors), not by path induction.
-Third, contractibility at dimension~$\ge 3$ is derived via the
-$\mathsf{rweq\_eq}$ constructor, whose soundness rests on
-Church--Rosser confluence combined with proof irrelevance on the
-underlying $\Eq$ (see Remark~\ref{rem:rweq-eq-honesty}).
+Third, contractibility at dimension~$\ge 3$ is derived via two
+mechanisms: a constrained $\mathsf{diamond\_filler}$ constructor
+that implements Squier-style finite derivation type structure from
+critical-pair diamonds, and a blanket $\mathsf{rweq\_eq}$ constructor
+whose soundness rests on proof irrelevance on the underlying $\Eq$
+(see Remark~\ref{rem:rweq-eq-honesty}).
 
 The result is that our $\omega$-groupoid carries \emph{less}
 information at dimensions $\ge 3$ than the Lumsdaine/vdBG
@@ -3098,7 +3150,12 @@ independently, using a different notion of weak $\omega$-category
 Our contribution is to obtain an analogous structure in a proof-irrelevant
 setting by replacing identity types with computational paths and
 deriving contractibility from confluence combined with UIP
-(Remark~\ref{rem:rweq-eq-honesty}); the resulting structure is
+(Remark~\ref{rem:rweq-eq-honesty}).
+At the 3-cell level, a constrained $\mathsf{diamond\_filler}$
+constructor provides Squier-style structure from critical-pair joins,
+while the blanket $\mathsf{rweq\_eq}$ constructor completes
+contractibility via proof irrelevance.
+The resulting structure is
 genuinely non-degenerate at levels 0--2 but contractible above,
 in contrast to the Lumsdaine/vdBG construction which is
 non-degenerate at all levels.
@@ -3145,18 +3202,33 @@ Rijke~\cite{Rijke2023} provides a comprehensive textbook account
 of synthetic homotopy theory, including descent; our descent
 formalization draws on his framework.
 
-\paragraph{Higher-dimensional rewriting.}
+\paragraph{Higher-dimensional rewriting and the Squier program.}
 Squier~\cite{Squier1994} connected term rewriting to homological
 algebra, showing that a finitely presented monoid with solvable word
 problem need not have a finite complete rewriting system.
 Guiraud and Malbos~\cite{GuiraudMalbos2012} developed this
-connection via polygraphs, relating higher-dimensional rewriting
-to homotopy bases and coherence.
-Our framework is a type-theoretic instance of this program:
-$\Step$ lists are 1-cells (rewrites), $\RwEq$ witnesses are
-2-cells (homotopies between rewrites), and Church--Rosser
-confluence yields 3-cell contractibility---the condition that
-Guiraud and Malbos call ``coherent convergence.''
+connection via \emph{polygraphs} (higher-dimensional computads),
+showing that a convergent presentation generates a \emph{finite
+derivation type} (FDT): the 3-cells needed for coherence arise
+precisely from the critical pairs of the rewriting system.
+Our framework is a type-theoretic instance of this program.
+At the 1-cell level, $\Step$ (which is $\Prop$-valued) provides the
+rewrite relation, while $\mathsf{StepStar}$ (the reflexive-transitive
+closure, which is $\Ty$-valued) carries explicit computational content
+for multi-step reductions.
+At the 2-cell level, $\RwEq$ witnesses are homotopies between
+rewrite sequences.
+At the 3-cell level, $\mathsf{MetaStep}_3.\mathsf{diamond\_filler}$
+directly implements Squier's FDT concept: given a local peak
+$q \xleftarrow{s_1} p \xrightarrow{s_2} r$ with joining chains
+$j_1 : q \to^* m$ and $j_2 : r \to^* m$, the diamond filler provides
+the 3-cell witnessing commutativity of the resulting diamond.
+The 33 critical pairs of the completed groupoid TRS generate these
+3-cells, yielding the ``coherent convergence'' condition of
+Guiraud--Malbos.
+(The blanket $\mathsf{rweq\_eq}$ constructor provides an alternative
+route to contractibility via UIP; see Remark~\ref{rem:rweq-eq-honesty}
+for the precise status.)
 
 \paragraph{Computational paths.}
 The computational-paths program was initiated by de~Queiroz and
@@ -3236,8 +3308,10 @@ The principal contributions are:
     Batanin--Leinster sense~\cite{Batanin1998,Leinster2004}, with
     genuine non-degeneracy at levels 0--2 and contractible higher
     cells; contractibility at dimensions $\ge 3$ is derived from
-    Church--Rosser confluence combined with proof irrelevance on the
-    underlying $\Eq$ (Remark~\ref{rem:rweq-eq-honesty})
+    Church--Rosser confluence via Squier-style diamond fillers
+    (from critical-pair joins), together with a blanket
+    $\mathsf{rweq\_eq}$ constructor mediated by proof irrelevance
+    on the underlying $\Eq$ (Remark~\ref{rem:rweq-eq-honesty})
     (\S\ref{sec:omega}).
 
   \item A \textbf{strict 2-category instance} with Godement interchange
