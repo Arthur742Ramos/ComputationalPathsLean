@@ -365,128 +365,206 @@ section Contractibility
 
 variable {a b : A}
 
-/-- Normal form representative for a 2-cell. -/
-noncomputable def normalize {p q : Path a b} : Derivation₂ p q → Derivation₂ p q := id
+/-- Atomic normal-form fragments: one step, possibly inverted. -/
+noncomputable def IsNormalAtom {p q : Path a b} : Derivation₂ p q → Prop
+  | .step _ => True
+  | .inv (.step _) => True
+  | _ => False
 
-/-- Alias used in the normalization-composition view of contractibility. -/
-noncomputable def to_normal_form₃ {p q : Path a b} (d : Derivation₂ p q) :
-    Derivation₃ d (normalize d) :=
-  .refl d
+/-- Right-associated chains of atomic fragments, with no unit factors. -/
+noncomputable def IsNormalChain {p q : Path a b} : Derivation₂ p q → Prop
+  | .step _ => True
+  | .inv (.step _) => True
+  | .vcomp d₁ d₂ => IsNormalAtom d₁ ∧ IsNormalChain d₂
+  | _ => False
 
-/-- Fallback connector for mixed normalized forms. -/
-noncomputable def connect_normalized_fallback {p q : Path a b}
-    (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ := by
-  have hEq : rweq_toEq n₁.toRwEq = rweq_toEq n₂.toRwEq :=
-    Subsingleton.elim (rweq_toEq n₁.toRwEq) (rweq_toEq n₂.toRwEq)
-  exact .step (.rweq_transport hEq)
+/-- Normal forms are either `refl` or a right-associated atomic chain. -/
+noncomputable def IsNormalForm {p q : Path a b} (d : Derivation₂ p q) : Prop :=
+  match d with
+  | .refl _ => True
+  | d' => IsNormalChain d'
+
+/-- Packaged normal-form witness. -/
+abbrev NormalDerivation₂ {p q : Path a b} := { d : Derivation₂ p q // IsNormalForm d }
+
+/-- Normalize vertical composition by removing units and right-associating. -/
+noncomputable def normalize_vcomp {p q r : Path a b} :
+    Derivation₂ p q → Derivation₂ q r → Derivation₂ p r
+  | .refl _, d => d
+  | d, .refl _ => d
+  | .vcomp d₁ d₂, d₃ => normalize_vcomp d₁ (normalize_vcomp d₂ d₃)
+  | d₁, d₂ => .vcomp d₁ d₂
+
+mutual
+  /-- Recursive normalizer for `Derivation₂`.
+  Criteria: right-assoc, no `inv (inv _)`, no unit factors, inverse distributed. -/
+  noncomputable def normalize {p q : Path a b} : Derivation₂ p q → Derivation₂ p q
+    | .refl p => .refl p
+    | .step s => .step s
+    | .inv d => normalizeInv d
+    | .vcomp d₁ d₂ => normalize_vcomp (normalize d₁) (normalize d₂)
+
+  /-- Normalizer for inverse forms, distributing `inv` recursively. -/
+  noncomputable def normalizeInv {p q : Path a b} : Derivation₂ p q → Derivation₂ q p
+    | .refl p => .refl p
+    | .step s => .inv (.step s)
+    | .inv d => normalize d
+    | .vcomp d₁ d₂ => normalize_vcomp (normalizeInv d₂) (normalizeInv d₁)
+end
+
+/-- Transport equality of projected `RwEq` witnesses for parallel derivations. -/
+theorem derivation₂_toEq_eq {p q : Path a b} (d₁ d₂ : Derivation₂ p q) :
+    rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq :=
+  rfl
+
+/-- Groupoid-law witness for `normalize_vcomp`. -/
+noncomputable def to_normalize_vcomp₃ {p q r : Path a b} :
+    (d₁ : Derivation₂ p q) → (d₂ : Derivation₂ q r) →
+    Derivation₃ (.vcomp d₁ d₂) (normalize_vcomp d₁ d₂)
+  | .refl _, d₂ =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.step (MetaStep₃.vcomp_refl_left d₂))
+  | .step s, .refl _ =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.step (MetaStep₃.vcomp_refl_right (.step s)))
+  | .step s, .step t =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.refl (.vcomp (.step s) (.step t)))
+  | .step s, .inv d =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.refl (.vcomp (.step s) (.inv d)))
+  | .step s, .vcomp d₁ d₂ =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.refl (.vcomp (.step s) (.vcomp d₁ d₂)))
+  | .inv d, .refl _ =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.step (MetaStep₃.vcomp_refl_right (.inv d)))
+  | .inv d, .step t =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.refl (.vcomp (.inv d) (.step t)))
+  | .inv d, .inv e =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.refl (.vcomp (.inv d) (.inv e)))
+  | .inv d, .vcomp d₁ d₂ =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.refl (.vcomp (.inv d) (.vcomp d₁ d₂)))
+  | .vcomp d₁ d₂, .refl _ =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.step (MetaStep₃.vcomp_refl_right (.vcomp d₁ d₂)))
+  | .vcomp d₁ d₂, .step s =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.vcomp
+            (Derivation₃.step (MetaStep₃.vcomp_assoc d₁ d₂ (.step s)))
+            (Derivation₃.vcomp
+              (Derivation₃.whiskerLeft₃ d₁ (to_normalize_vcomp₃ d₂ (.step s)))
+              (to_normalize_vcomp₃ d₁ (normalize_vcomp d₂ (.step s)))))
+  | .vcomp d₁ d₂, .inv d₃ =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.vcomp
+            (Derivation₃.step (MetaStep₃.vcomp_assoc d₁ d₂ (.inv d₃)))
+            (Derivation₃.vcomp
+              (Derivation₃.whiskerLeft₃ d₁ (to_normalize_vcomp₃ d₂ (.inv d₃)))
+              (to_normalize_vcomp₃ d₁ (normalize_vcomp d₂ (.inv d₃)))))
+  | .vcomp d₁ d₂, .vcomp d₃ d₄ =>
+      by
+        simpa [normalize_vcomp] using
+          (Derivation₃.vcomp
+            (Derivation₃.step (MetaStep₃.vcomp_assoc d₁ d₂ (.vcomp d₃ d₄)))
+            (Derivation₃.vcomp
+              (Derivation₃.whiskerLeft₃ d₁ (to_normalize_vcomp₃ d₂ (.vcomp d₃ d₄)))
+              (to_normalize_vcomp₃ d₁ (normalize_vcomp d₂ (.vcomp d₃ d₄)))))
+
+mutual
+  /-- Build `Derivation₃ d (normalize d)` using only groupoid-law meta-steps. -/
+  noncomputable def to_normal_form₃ {p q : Path a b} (d : Derivation₂ p q) :
+      Derivation₃ d (normalize d) :=
+    match d with
+    | .refl p => .refl (.refl p)
+    | .step s => .refl (.step s)
+    | .inv d' => to_normal_form_inv₃ d'
+    | .vcomp d₁ d₂ =>
+        .vcomp
+          (Derivation₃.whiskerRight₃ (to_normal_form₃ d₁) d₂)
+          (.vcomp
+            (Derivation₃.whiskerLeft₃ (normalize d₁) (to_normal_form₃ d₂))
+            (to_normalize_vcomp₃ (normalize d₁) (normalize d₂)))
+
+  /-- Inverse-specialized branch of `to_normal_form₃`. -/
+  noncomputable def to_normal_form_inv₃ {p q : Path a b} (d : Derivation₂ p q) :
+      Derivation₃ (.inv d) (normalizeInv d) :=
+    match d with
+    | .refl p =>
+        .vcomp
+          (.inv (.step (.vcomp_refl_right (.inv (.refl p)))))
+          (.step (.vcomp_inv_left (.refl p)))
+    | .step s => .refl (.inv (.step s))
+    | .inv d' =>
+        .vcomp
+          (.step (.inv_inv d'))
+          (to_normal_form₃ d')
+    | .vcomp d₁ d₂ =>
+        .vcomp
+          (.step (.inv_vcomp d₁ d₂))
+          (.vcomp
+            (Derivation₃.whiskerRight₃ (to_normal_form_inv₃ d₂) (.inv d₁))
+            (.vcomp
+              (Derivation₃.whiskerLeft₃ (normalizeInv d₂) (to_normal_form_inv₃ d₁))
+              (to_normalize_vcomp₃ (normalizeInv d₂) (normalizeInv d₁))))
+end
 
 /-- Connector between normalized representatives. -/
 noncomputable def connect_normalized {p q : Path a b}
     (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ := by
-  have from_left_unit (d : Derivation₂ p q) :
-      Derivation₃ (.vcomp (.refl p) d) d :=
-    .step (.vcomp_refl_left d)
-  have from_right_unit (d : Derivation₂ p q) :
-      Derivation₃ (.vcomp d (.refl q)) d :=
-    .step (.vcomp_refl_right d)
-  have to_left_unit (d : Derivation₂ p q) :
-      Derivation₃ d (.vcomp (.refl p) d) :=
-    .inv (from_left_unit d)
-  have to_right_unit (d : Derivation₂ p q) :
-      Derivation₃ d (.vcomp d (.refl q)) :=
-    .inv (from_right_unit d)
-  have step_eq3 (s₁ s₂ : Step p q) : Derivation₃ (.step s₁) (.step s₂) :=
-    .step (.step_eq s₁ s₂)
-  have step_to_right (s₁ s₂ : Step p q) :
-      Derivation₃ (.step s₁) (.vcomp (.step s₂) (.refl q)) :=
-    .vcomp (to_right_unit (.step s₁))
-      (Derivation₃.whiskerRight₃ (step_eq3 s₁ s₂) (.refl q))
-  have left_steps_eq (s₁ s₂ : Step p q) :
-      Derivation₃ (.vcomp (.refl p) (.step s₁)) (.vcomp (.refl p) (.step s₂)) :=
-    Derivation₃.whiskerLeft₃ (.refl p) (step_eq3 s₁ s₂)
-  have step_to_left (s₁ s₂ : Step p q) :
-      Derivation₃ (.step s₁) (.vcomp (.refl p) (.step s₂)) :=
-    .vcomp (to_left_unit (.step s₁))
-      (left_steps_eq s₁ s₂)
-  have right_to_step (s₁ s₂ : Step p q) :
-      Derivation₃ (.vcomp (.step s₁) (.refl q)) (.step s₂) :=
-    .inv (step_to_right s₂ s₁)
-  have left_to_step (s₁ s₂ : Step p q) :
-      Derivation₃ (.vcomp (.refl p) (.step s₁)) (.step s₂) :=
-    .inv (step_to_left s₂ s₁)
-  have fallback {r s : Path a b} (d₁ d₂ : Derivation₂ r s) : Derivation₃ d₁ d₂ :=
-    connect_normalized_fallback d₁ d₂
-  have left_unit_to (d₁ d₂ : Derivation₂ p q) :
-      Derivation₃ (.vcomp (.refl p) d₁) d₂ :=
-    .vcomp (from_left_unit d₁) (fallback d₁ d₂)
-  have right_unit_to (d₁ d₂ : Derivation₂ p q) :
-      Derivation₃ (.vcomp d₁ (.refl q)) d₂ :=
-    .vcomp (from_right_unit d₁) (fallback d₁ d₂)
-  have fallback_to_left_unit (d₁ d₂ : Derivation₂ p q) :
-      Derivation₃ d₁ (.vcomp (.refl p) d₂) :=
-    .vcomp (fallback d₁ d₂) (to_left_unit d₂)
-  have fallback_to_right_unit (d₁ d₂ : Derivation₂ p q) :
-      Derivation₃ d₁ (.vcomp d₂ (.refl q)) :=
-    .vcomp (fallback d₁ d₂) (to_right_unit d₂)
-  have stepstarReflBridge :
-      Derivation₃ (derivation₂_of_stepstar (StepStar.refl q)) (.refl q) :=
-    fallback (derivation₂_of_stepstar (StepStar.refl q)) (.refl q)
   match n₁, n₂ with
   | .refl _, .refl _ => exact .refl _
-  | .refl r, .vcomp (.refl _) (.refl _) =>
-      exact to_left_unit (.refl r)
-  | .vcomp (.refl r) (.refl _), .refl _ =>
-      exact from_left_unit (.refl r)
-  | .vcomp (.refl _) (.refl _), .vcomp (.refl _) (.refl _) =>
-      exact .refl _
-  | .vcomp (.step s₁) (.refl _), .vcomp (.step s₂) (.refl _) =>
-      exact .vcomp (.inv (Derivation₃.whiskerLeft₃ (.step s₁) stepstarReflBridge))
-        (.vcomp (.step (.diamond_filler s₁ s₂ (StepStar.refl q) (StepStar.refl q)))
-          (Derivation₃.whiskerLeft₃ (.step s₂) stepstarReflBridge))
-  | .step s₁, .vcomp (.step s₂) (.refl _) =>
-      exact step_to_right s₁ s₂
-  | .vcomp (.step s₁) (.refl _), .step s₂ =>
-      exact right_to_step s₁ s₂
-  | .vcomp (.refl _) (.step s₁), .vcomp (.refl _) (.step s₂) =>
-      exact left_steps_eq s₁ s₂
-  | .vcomp (.refl _) (.step s₁), .vcomp (.step s₂) (.refl _) =>
-      exact .vcomp (left_to_step s₁ s₂)
-        (to_right_unit (.step s₂))
-  | .vcomp (.step s₁) (.refl _), .vcomp (.refl _) (.step s₂) =>
-      exact .vcomp (right_to_step s₁ s₂)
-        (to_left_unit (.step s₂))
-  | .step s₁, .vcomp (.refl _) (.step s₂) =>
-      exact step_to_left s₁ s₂
-  | .vcomp (.refl _) (.step s₁), .step s₂ =>
-      exact left_to_step s₁ s₂
-  | .step s₁, .step s₂ => exact step_eq3 s₁ s₂
-  | .vcomp (.refl _) d₁, .vcomp (.refl _) d₂ =>
-      exact .vcomp (left_unit_to d₁ d₂) (to_left_unit d₂)
-  | .vcomp (.refl _) d₁, .vcomp d₂ (.refl _) =>
-      exact .vcomp (left_unit_to d₁ d₂) (to_right_unit d₂)
-  | .vcomp d₁ (.refl _), .vcomp d₂ (.refl _) =>
-      exact .vcomp (right_unit_to d₁ d₂) (to_right_unit d₂)
-  | .vcomp d₁ (.refl _), .vcomp (.refl _) d₂ =>
-      exact .vcomp (right_unit_to d₁ d₂) (to_left_unit d₂)
-  | .vcomp (.refl _) d₁, d₂ =>
-      exact left_unit_to d₁ d₂
-  | d₁, .vcomp (.refl _) d₂ =>
-      exact fallback_to_left_unit d₁ d₂
-  | .vcomp d₁ (.refl _), d₂ =>
-      exact right_unit_to d₁ d₂
-  | d₁, .vcomp d₂ (.refl _) =>
-      exact fallback_to_right_unit d₁ d₂
-  -- Case: inv of steps — connect via Step proof irrelevance, wrap in inv
+  | .step s₁, .step s₂ => exact .step (.step_eq s₁ s₂)
+  | .vcomp (.refl _) d, n =>
+      exact .vcomp (.step (.vcomp_refl_left d))
+        (.step (.rweq_transport (derivation₂_toEq_eq d n)))
+  | n, .vcomp (.refl _) d =>
+      exact .vcomp
+        (.step (.rweq_transport (derivation₂_toEq_eq n d)))
+        (.inv (.step (.vcomp_refl_left d)))
+  | .vcomp d (.refl _), n =>
+      exact .vcomp (.step (.vcomp_refl_right d))
+        (.step (.rweq_transport (derivation₂_toEq_eq d n)))
+  | n, .vcomp d (.refl _) =>
+      exact .vcomp
+        (.step (.rweq_transport (derivation₂_toEq_eq n d)))
+        (.inv (.step (.vcomp_refl_right d)))
+  | .inv (.inv d), n =>
+      exact .vcomp (.step (.inv_inv d))
+        (.step (.rweq_transport (derivation₂_toEq_eq d n)))
+  | n, .inv (.inv d) =>
+      exact .vcomp
+        (.step (.rweq_transport (derivation₂_toEq_eq n d)))
+        (.inv (.step (.inv_inv d)))
+  | .inv (.vcomp d₁ d₂), n =>
+      exact .vcomp (.step (.inv_vcomp d₁ d₂))
+        (.step (.rweq_transport
+          (derivation₂_toEq_eq (.vcomp (.inv d₂) (.inv d₁)) n)))
+  | n, .inv (.vcomp d₁ d₂) =>
+      exact .vcomp
+        (.step (.rweq_transport
+          (derivation₂_toEq_eq n (.vcomp (.inv d₂) (.inv d₁)))))
+        (.inv (.step (.inv_vcomp d₁ d₂)))
   | .inv (.step s₁), .inv (.step s₂) =>
-      have h : s₁ = s₂ := Subsingleton.elim s₁ s₂
-      exact h ▸ .refl _
-  -- Case: vcomp of two steps — whiskerRight₃ and whiskerLeft₃ via step_eq
-  | .vcomp (.step s₁) (.step s₂), .vcomp (.step t₁) (.step t₂) =>
-      exact fallback (.vcomp (.step s₁) (.step s₂)) (.vcomp (.step t₁) (.step t₂))
-  -- Case: vcomp of step with inv — combine step_eq with recursive connection
-  | .vcomp (.step s₁) (.inv d₁), .vcomp (.step s₂) (.inv d₂) =>
-      exact fallback (.vcomp (.step s₁) (.inv d₁)) (.vcomp (.step s₂) (.inv d₂))
-  | d₁, d₂ => exact fallback d₁ d₂
+      exact .step (.rweq_transport
+        (derivation₂_toEq_eq (.inv (.step s₁)) (.inv (.step s₂))))
+  | d₁, d₂ =>
+      exact .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
