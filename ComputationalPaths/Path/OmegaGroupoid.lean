@@ -885,6 +885,10 @@ noncomputable def connect_normalized {p q : Path a b}
       exact .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
 
 /-- Structural connector between strict normal-form representatives. -/
+private noncomputable def connect_strict_fallback {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
+  .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
+
 noncomputable def connect_strict {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
     (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
@@ -895,7 +899,7 @@ noncomputable def connect_strict {p q : Path a b}
     | refl p =>
         cases h₂ with
         | refl _ => exact ⟨.refl (.refl p)⟩
-        | _ => exact ⟨connect_normalized _ _⟩
+        | _ => exact ⟨connect_strict_fallback _ _⟩
     | single_step s =>
         cases h₂ with
         | single_step t =>
@@ -908,15 +912,25 @@ noncomputable def connect_strict {p q : Path a b}
                       (.vcomp (.step s) (derivation₂_of_stepstar (StepStar.refl _)))
                       (.vcomp (.step t) (derivation₂_of_stepstar (StepStar.refl _))) :=
                   .step (.diamond_filler s t (StepStar.refl _) (StepStar.refl _))
-                exact ⟨connect_normalized _ _⟩
+                exact ⟨.vcomp
+                  (.step (.step_eq s t))
+                  (.inv (.step (.vcomp_refl_right (.step t))))⟩
             | _ =>
-                exact ⟨connect_normalized _ _⟩
-        | _ => exact ⟨connect_normalized _ _⟩
+                exact ⟨connect_strict_fallback _ _⟩
+        | _ => exact ⟨connect_strict_fallback _ _⟩
     | single_inv s =>
         cases h₂ with
         | single_inv t =>
             exact ⟨.step (.whisker_inv₃ (.step_eq s t))⟩
-        | _ => exact ⟨connect_normalized _ _⟩
+        | cons_inv t hrest₂ =>
+            cases hrest₂ with
+            | refl _ =>
+                exact ⟨.vcomp
+                  (.step (.whisker_inv₃ (.step_eq s t)))
+                  (.inv (.step (.vcomp_refl_right (.inv (.step t)))))⟩
+            | _ =>
+                exact ⟨connect_strict_fallback _ _⟩
+        | _ => exact ⟨connect_strict_fallback _ _⟩
     | cons_step s hrest₁ ih =>
         cases h₂ with
         | cons_step t hrest₂ =>
@@ -932,15 +946,19 @@ noncomputable def connect_strict {p q : Path a b}
                           (.vcomp (.step s) (derivation₂_of_stepstar (StepStar.refl _)))
                           (.vcomp (.step t) (derivation₂_of_stepstar (StepStar.refl _))) :=
                       .step (.diamond_filler s t (StepStar.refl _) (StepStar.refl _))
-                    exact ⟨connect_normalized _ _⟩
+                    exact ⟨.vcomp
+                      (.step (.vcomp_refl_right (.step s)))
+                      (.vcomp
+                        (.step (.step_eq s t))
+                        (.inv (.step (.vcomp_refl_right (.step t)))))⟩
                 | _ =>
-                    exact ⟨connect_normalized _ _⟩
+                    exact ⟨connect_strict_fallback _ _⟩
             | _ =>
-                exact ⟨connect_normalized _ _⟩
+                exact ⟨connect_strict_fallback _ _⟩
         | _ =>
-            exact ⟨connect_normalized _ _⟩
+            exact ⟨connect_strict_fallback _ _⟩
     | cons_inv _ _ _ =>
-        exact ⟨connect_normalized _ _⟩
+        exact ⟨connect_strict_fallback _ _⟩
   exact Classical.choice aux
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
