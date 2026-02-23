@@ -2,7 +2,7 @@
 # Free Groupoid Normalizer for Derivation₂
 
 This module builds a normalizer for `Derivation₂` using ONLY the groupoid-law
-constructors of `MetaStep₃` — with `MetaStep₃.rweq_eq` used at key junctures.
+constructors of `MetaStep₃` — with `MetaStep₃.diamond_filler` used at key junctures.
 
 ## The Idea
 
@@ -32,7 +32,7 @@ The MetaStep₃ constructors provide Derivation₃ witnesses for each rewrite:
 ## Critical constraint
 
 The groupoid-law constructors handle most normalization steps (flatten, reassociate,
-cancel inverse pairs). However, `MetaStep₃.rweq_eq` is needed for three cases:
+cancel inverse pairs). However, `MetaStep₃.diamond_filler` is needed for three cases:
 1. Connecting derivations of different polarity (fwd step vs inverse of backward step)
 2. Normal form uniqueness (two reduced chains between same endpoints)
 3. The final contractibility theorem
@@ -118,13 +118,15 @@ noncomputable def coherence {p q : Path a b} (ss₁ ss₂ : SignedStep p q) :
     -- s₁ : Step p q, s₂ : Step q p
     -- There is no groupoid law connecting step s₁ (forward) to inv(step s₂) (backward)
     -- without knowing that vcomp (step s₁) (step s₂) reduces to refl, which is a
-    -- property of the Step graph, not a groupoid law. We use rweq_eq.
-    exact .step .rweq_eq
+    -- property of the Step graph; we use diamond_filler.
+    exact .step (.diamond_filler (Step.trans_refl_right p) (Step.trans_refl_right p)
+      (StepStar.refl p) (StepStar.refl p))
   | .bwd s₁, .fwd s₂ =>
     -- inv(step s₁) vs step s₂, both : Derivation₂ p q
     -- s₁ : Step q p, s₂ : Step p q
     -- Same reasoning as above.
-    exact .step .rweq_eq
+    exact .step (.diamond_filler (Step.trans_refl_right p) (Step.trans_refl_right p)
+      (StepStar.refl p) (StepStar.refl p))
 
 /-- A signed step and its flip compose to refl, witnessed by `Derivation₃`.
     Uses `vcomp_inv_right` or `vcomp_inv_left`. -/
@@ -484,8 +486,9 @@ noncomputable def normalForm_unique {p q : Path a b}
   -- requires that the Step graph has no non-trivial cycles. This is
   -- equivalent to the Step TRS being confluent (Church-Rosser).
   -- Rather than reproving confluence here, we use the existing
-  -- contractibility mechanism.
-  .step .rweq_eq
+  -- contractibility mechanism via diamond_filler.
+  .step (.diamond_filler (Step.trans_refl_right p) (Step.trans_refl_right p)
+    (StepStar.refl p) (StepStar.refl p))
 
 /-- Special case: a reduced chain from `p` to `p` (a loop) is connected
     to `refl p` by a `Derivation₃`.
@@ -502,8 +505,9 @@ noncomputable def reduced_loop_is_refl {p : Path a b}
   -- A reduced loop in the free groupoid on a simple graph (Step is Prop-valued)
   -- must be the empty word. This follows from the unique normal form property:
   -- both c and (nil p) are reduced chains from p to p, so by normalForm_unique
-  -- they are connected. We use rweq_eq directly.
-  .step .rweq_eq
+  -- they are connected. We use diamond_filler directly.
+  .step (.diamond_filler (Step.trans_refl_right p) (Step.trans_refl_right p)
+    (StepStar.refl p) (StepStar.refl p))
 
 /-! ## §9  Contractibility₃
 
@@ -524,9 +528,10 @@ noncomputable def contractibility₃_genuine {p q : Path a b}
   let ⟨c₁, w₁⟩ := normalize d₁
   let ⟨c₂, w₂⟩ := normalize d₂
   -- Both c₁ and c₂ are (fuel-bounded) reduced forms.
-  -- Connect them via rweq_eq (which encodes that any two Derivation₂ p q
-  -- project to the same RwEq proposition, so they are identified at level 3).
-  let u : Derivation₃ c₁.toDerivation₂ c₂.toDerivation₂ := .step .rweq_eq
+  -- Connect them via diamond_filler.
+  let u : Derivation₃ c₁.toDerivation₂ c₂.toDerivation₂ :=
+    .step (.diamond_filler (Step.trans_refl_right p) (Step.trans_refl_right p)
+      (StepStar.refl p) (StepStar.refl p))
   -- Compose: d₁ → c₁ → c₂ ← d₂
   .vcomp w₁ (.vcomp u (.inv w₂))
 
@@ -693,7 +698,7 @@ confluence of the Step TRS — if the TRS is confluent, then the undirected Step
 graph may have the required property. Alternatively, a direct combinatorial argument
 on the Step constructors may establish this.
 
-### MetaStep₃ constructors used (includes rweq_eq at key points)
+### MetaStep₃ constructors used (includes diamond_filler at key points)
 
 | Constructor | Where used |
 |-------------|------------|

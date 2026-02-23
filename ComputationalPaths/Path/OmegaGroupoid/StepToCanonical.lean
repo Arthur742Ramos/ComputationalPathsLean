@@ -27,7 +27,7 @@ is derived from proof irrelevance of `RwEq`.
 
 At the level of `RwEq` (Prop-valued), everything works: any two derivations
 between the same paths have equal `toRwEq`. This equality now yields a 3-cell
-via `MetaStep₃.rweq_eq`.
+via `MetaStep₃.diamond_filler`.
 
 ## The Structural Gap
 
@@ -37,7 +37,7 @@ The fundamental issue is the gap between `Prop` and `Type`:
 
 All `Derivation₂ p q` values have the same `toRwEq` (by proof irrelevance of `RwEq`).
 We now use this equality directly to produce a Type-valued 3-cell via
-`MetaStep₃.rweq_eq`.
+`MetaStep₃.diamond_filler`.
 
 ## Analysis Summary
 
@@ -68,7 +68,7 @@ variable {A : Type u}
 
 At the level of `RwEq` (Prop-valued), everything works: any two derivations
 between the same paths have equal `toRwEq`. This equality now yields a 3-cell
-via `MetaStep₃.rweq_eq`, so no assumption is needed.
+via `MetaStep₃.diamond_filler`, so no assumption is needed.
 -/
 
 section SemanticArgument

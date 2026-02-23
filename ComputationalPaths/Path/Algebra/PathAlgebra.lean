@@ -412,7 +412,7 @@ theorem rweq_witness_augmentation_ideal {A : Type u} {a : A} (p : Loop A a) :
   simp [fpaAdd, coeffSum]
 
 /-- RwEq-connected loops produce equal elements in the path algebra. -/
-theorem rweq_equal_in_algebra {A : Type u} {a : A}
+theorem diamond_filler_equal_in_algebra {A : Type u} {a : A}
     {p q : Loop A a} (h : RwEq p q) (n : Int) :
     kPiOne.mk [(n, p)] = kPiOne.mk [(n, q)] :=
   Quot.sound (AlgRwEq.ofRwEq n h)

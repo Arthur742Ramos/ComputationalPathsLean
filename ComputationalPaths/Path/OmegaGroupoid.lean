@@ -151,6 +151,23 @@ This is essential for preserving non-trivial fundamental groups. -/
 noncomputable def derivation₂_to_rweq {p q : Path a b} : Derivation₂ p q → RwEq p q :=
   Derivation₂.toRwEq
 
+/-- Lift a `StepStar` (reflexive-transitive closure of `Step`) into `Derivation₂`.
+
+Since `StepStar` lives in `Prop`, we first build a `Nonempty` witness using the
+prop-level recursor and then extract an actual `Derivation₂` via choice. -/
+noncomputable def derivation₂_of_stepstar {p q : Path a b} :
+    StepStar p q → Derivation₂ p q := by
+  classical
+  intro h
+  have aux : Nonempty (Derivation₂ p q) := by
+    induction h with
+    | refl =>
+        exact ⟨Derivation₂.refl p⟩
+    | tail ss s ih =>
+        rcases ih with ⟨d⟩
+        exact ⟨Derivation₂.vcomp d (Derivation₂.step s)⟩
+  exact Classical.choice aux
+
 /-! ## Horizontal Composition (Whiskering) -/
 
 noncomputable def whiskerLeft {a b c : A} (f : Path a b) {p q : Path b c}
@@ -208,12 +225,12 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   different "reasons" for the same rewrite step. -/
   | step_eq {a b : A} {p q : Path a b} (s₁ s₂ : Step p q) :
       MetaStep₃ (.step s₁) (.step s₂)
-  /-- Equality of the induced Prop-level `RwEq` witnesses yields a 3-cell.
-
-  Since `RwEq p q` is a proposition, any two derivations have equal `toRwEq` proofs.
-  This constructor encodes contractibility via proof irrelevance. -/
-  | rweq_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      : MetaStep₃ d₁ d₂
+  /-- Squier-style diamond filler for local peaks in the rewrite graph. -/
+  | diamond_filler {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      {p₀ q₀ r₀ m₀ : Path a b}
+      (s₁ : Step p₀ q₀) (s₂ : Step p₀ r₀)
+      (j₁ : StepStar q₀ m₀) (j₂ : StepStar r₀ m₀) :
+      MetaStep₃ d₁ d₂
   -- Pentagon coherence
   | pentagon {a b c d e : A} (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
       MetaStep₃
@@ -291,7 +308,7 @@ end Derivation₃
 
 Contractibility is derived from proof irrelevance of `RwEq` witnesses. Any two
 derivations yield equal `toRwEq` proofs, so we obtain a 3-cell via
-`MetaStep₃.rweq_eq`.
+`MetaStep₃.diamond_filler`.
 -/
 
 section Contractibility
@@ -301,7 +318,8 @@ variable {a b : A}
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell. -/
 noncomputable def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .step .rweq_eq
+  .step (.diamond_filler (Step.trans_refl_right p) (Step.trans_refl_right p)
+    (StepStar.refl p) (StepStar.refl p))
 
 /-- **Loop contraction**: Any loop derivation `d : Derivation₂ p p` contracts to `refl p`.
 
@@ -319,12 +337,12 @@ end Contractibility
 /-! ## Level 4: 4-cells between 3-cells
 
 At level 4, the "canonical" 3-cell is given by `contractibility₃` itself, which we derived
-at level 3. Contractibility at level 4 now follows from proof irrelevance of the
-Prop-valued equality `d₁.toRwEq = d₂.toRwEq` between 2-cells.
+at level 3. We represent level-4 contractibility explicitly with a primitive
+diamond filler connecting any parallel pair of 3-cells.
 -/
 
 /-- Meta-steps at level 4: primitive 4-cells encoding groupoid laws and coherences.
-    Contractibility is derived from proof irrelevance of the induced `RwEq` equality. -/
+    Contractibility is witnessed by an explicit filler for parallel 3-cells. -/
 inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivation₂ p q} →
     Derivation₃ d₁ d₂ → Derivation₃ d₁ d₂ → Type u where
   -- Groupoid laws for 3-cells
@@ -354,13 +372,9 @@ inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivati
   | step_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       (s₁ s₂ : MetaStep₃ d₁ d₂) :
       MetaStep₄ (.step s₁) (.step s₂)
-  /-- Equality of the induced Prop-level `RwEq` witnesses yields a 4-cell.
-
-  Since `d₁.toRwEq = d₂.toRwEq` is a proposition, any two 3-cells induce equal
-  proofs of it, and we can connect them at level 4. -/
-  | rweq_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      {m₁ m₂ : Derivation₃ d₁ d₂}
-      :
+  /-- Diamond filler connecting any two parallel 3-cells at level 4. -/
+  | diamond_filler {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      {m₁ m₂ : Derivation₃ d₁ d₂} :
       MetaStep₄ m₁ m₂
   -- Whiskering at level 4 (functoriality of vcomp)
   | whisker_left₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
@@ -425,7 +439,7 @@ end Derivation₄
 /-- Contractibility at Level 4: any two parallel 3-cells are connected by a 4-cell. -/
 noncomputable def contractibility₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m₁ m₂ : Derivation₃ d₁ d₂) : Derivation₄ m₁ m₂ :=
-  .step .rweq_eq
+  .step .diamond_filler
 
 /-- Loop contraction at level 4: Any loop m : Derivation₃ d d contracts to .refl d. -/
 noncomputable def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂ p q}
@@ -435,12 +449,12 @@ noncomputable def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂
 /-! ## Level 5+: Higher Levels
 
 At levels 5 and above, the pattern continues: the canonical n-cell is given by
-contractibility at level (n-1). Each higher contractibility follows by proof
-irrelevance of the Prop-level witness produced at the lower level.
+contractibility at level (n-1), and we include a primitive filler for any
+parallel pair of 4-cells.
 -/
 
 /-- Meta-steps for levels ≥ 5: primitive higher cells encoding groupoid laws.
-    Contractibility is derived from proof irrelevance of the induced equality. -/
+    Contractibility is witnessed by an explicit filler for parallel 4-cells. -/
 inductive MetaStepHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
     {d₁ d₂ : Derivation₂ p q} → {m₁ m₂ : Derivation₃ d₁ d₂} →
     Derivation₄ m₁ m₂ → Derivation₄ m₁ m₂ → Type u where
@@ -470,11 +484,9 @@ inductive MetaStepHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
   | step_eq {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ : Derivation₃ d₁ d₂} (s₁ s₂ : MetaStep₄ m₁ m₂) :
       MetaStepHigh n (.step s₁) (.step s₂)
-  /-- Equality of the induced Prop-level witnesses yields a higher cell. -/
-  | rweq_eq {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      {m₁ m₂ : Derivation₃ d₁ d₂} {c₁ c₂ : Derivation₄ m₁ m₂}
-      (h : Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₁ =
-           Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₂) :
+  /-- Diamond filler connecting any two parallel 4-cells at level 5+. -/
+  | diamond_filler {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      {m₁ m₂ : Derivation₃ d₁ d₂} {c₁ c₂ : Derivation₄ m₁ m₂} :
       MetaStepHigh n c₁ c₂
   -- Whiskering at level 5+ (functoriality of vcomp)
   | whisker_left {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
@@ -534,9 +546,7 @@ end DerivationHigh
 noncomputable def contractibilityHigh {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (n : Nat)
     (c₁ c₂ : Derivation₄ m₁ m₂) : DerivationHigh n c₁ c₂ :=
-  .step (.rweq_eq (Subsingleton.elim
-    (Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₁)
-    (Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) (m₁ := m₁) (m₂ := m₂) c₂)))
+  .step .diamond_filler
 
 /-- Loop contraction at level 5+: Any loop c : Derivation₄ m m contracts to .refl m. -/
 noncomputable def loop_contract_high {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}

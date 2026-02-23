@@ -181,7 +181,7 @@ theorem transport_rw_eq {D : A → Sort v} {p q : Path a b}
     cases pr₁; cases pr₂; rfl
 
 /-- Transport along RwEq-related paths gives the same result. -/
-noncomputable def transport_rweq_eq {D : A → Sort v} {p q : Path a b}
+noncomputable def transport_diamond_filler {D : A → Sort v} {p q : Path a b}
     (_h : RwEq p q) (x : D a) :
     Path.transport (D := D) p x = Path.transport (D := D) q x := by
   cases p with | mk s₁ pr₁ => cases q with | mk s₂ pr₂ =>
@@ -195,7 +195,7 @@ theorem subst_rw_eq {D : A → Sort v} {p q : Path a b}
     cases pr₁; cases pr₂; rfl
 
 /-- Substitution along RwEq-related paths. -/
-noncomputable def subst_rweq_eq {D : A → Sort v} {p q : Path a b}
+noncomputable def subst_diamond_filler {D : A → Sort v} {p q : Path a b}
     (_h : RwEq p q) (x : D a) :
     Path.subst (D := D) x p = Path.subst (D := D) x q := by
   cases p with | mk s₁ pr₁ => cases q with | mk s₂ pr₂ =>

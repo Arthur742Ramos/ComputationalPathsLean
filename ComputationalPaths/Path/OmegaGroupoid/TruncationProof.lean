@@ -35,14 +35,16 @@ argument is:
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.GroupoidProofs
+import ComputationalPaths.Path.OmegaGroupoid.Normalizer
 import ComputationalPaths.Path.Rewrite.ConfluenceDeep
 namespace ComputationalPaths.Path.OmegaGroupoid.TruncationProof
 
 open ComputationalPaths
 open ComputationalPaths.Path
 open ComputationalPaths.Path.OmegaGroupoid
-open ComputationalPaths.Path.Confluence
+open ComputationalPaths.Confluence
 
 universe u
 
@@ -151,9 +153,14 @@ variable {A : Type u} {a b : A}
 /-- Build a `Derivation₂` from `Rw` (forward rewriting). -/
 noncomputable def derivation₂_of_rw {p q : Path a b} (h : Rw p q) :
     Derivation₂ p q := by
-  induction h with
-  | refl p => exact Derivation₂.refl p
-  | tail _ s ih => exact Derivation₂.vcomp ih (Derivation₂.step s)
+  classical
+  have aux : Nonempty (Derivation₂ p q) := by
+    induction h with
+    | refl => exact ⟨Derivation₂.refl p⟩
+    | tail _ s ih =>
+        rcases ih with ⟨d⟩
+        exact ⟨Derivation₂.vcomp d (Derivation₂.step s)⟩
+  exact Classical.choice aux
 
 /-- Build a `Derivation₂` from `RwEq`. -/
 noncomputable def derivation₂_of_rweq {p q : Path a b} (h : RwEq p q) :
@@ -173,8 +180,12 @@ noncomputable def canonical_derivation
     (hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d : Derivation₂ p q) :
     Σ (m : Path a b), Derivation₂ p m × Derivation₂ q m := by
+  classical
   have h_rweq := d.toRwEq
-  have ⟨m, hpm, hqm⟩ := church_rosser_rweq hConf h_rweq
+  have hJoin : Nonempty ({m : Path a b // Rw p m ∧ Rw q m}) := by
+    rcases church_rosser_rweq hConf h_rweq with ⟨m, hpm, hqm⟩
+    exact ⟨⟨m, hpm, hqm⟩⟩
+  rcases Classical.choice hJoin with ⟨m, hpm, hqm⟩
   exact ⟨m, derivation₂_of_rw hpm, derivation₂_of_rw hqm⟩
 
 /-- The canonical `Derivation₂ p q` built from confluence:
@@ -189,32 +200,14 @@ noncomputable def canonical_via_confluence
 /-- **Key lemma**: Any `Derivation₂` is connected to its canonical form
     by a `Derivation₃` (3-cell).
     
-    The 3-cell is constructed using the groupoid laws at level 3:
-    both `d` and `canonical_via_confluence d` are derivations between
-    the same endpoints, so `MetaStep₃.rweq_eq` connects them — but
-    we construct the actual connection via the explicit groupoid-law
-    meta-steps rather than through `Subsingleton.elim`.
-    
-    The connection goes through the canonical form by:
-    1. Both derivations project to the same `RwEq p q`
-    2. The `RwEq p q` gives a common reduct `m` by Church–Rosser
-    3. The groupoid laws (unit, assoc, inv) provide explicit
-       `MetaStep₃` constructors connecting any derivation to the
-       canonical zig-zag form. -/
+    We use the explicit normalizer witness
+    `Normalizer.contractibility₃_genuine`, which is built from groupoid-law
+    `MetaStep₃` constructors plus `diamond_filler` for local peaks. -/
 noncomputable def connect_to_canonical
     (hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ d (canonical_via_confluence hConf d) := by
-  -- Both d and the canonical form are Derivation₂ p q, so
-  -- d.toRwEq and (canonical_via_confluence hConf d).toRwEq are both
-  -- proofs of RwEq p q.  We build the 3-cell through the groupoid
-  -- meta-step `MetaStep₃.rweq_eq`, which encodes that two derivations
-  -- with equal RwEq projections are connected.  The equality of the
-  -- RwEq projections follows because RwEq is a Prop and hence any two
-  -- inhabitants are definitionally equal — this is the *rewriting-system
-  -- level* fact (any two proofs that p and q are rewrite-equivalent are
-  -- the same proposition), not a higher-type-theoretic trick.
-  exact Derivation₃.step (MetaStep₃.rweq_eq rfl)
+  exact Normalizer.contractibility₃_genuine d (canonical_via_confluence hConf d)
 
 /-- **Contractibility at level 3 from confluence**.
 
@@ -240,7 +233,7 @@ noncomputable def confluence_contractibility₃
   -- Connect d₁ to canon
   have link₁ : Derivation₃ d₁ canon := connect_to_canonical hConf d₁
   -- Connect d₂ to canon — both are Derivation₂ p q, so we get a 3-cell
-  have link₂ : Derivation₃ d₂ canon := connect_to_canonical hConf d₂
+  have link₂ : Derivation₃ d₂ canon := Normalizer.contractibility₃_genuine d₂ canon
   exact ThreeCell.by_canonical canon link₁ link₂
 
 /-- Alternative: directly build a `Derivation₃` from confluence,
@@ -487,12 +480,9 @@ structure OmegaGroupoidExplicit (A : Type u) where
 /-- Construct the explicit ω-groupoid.
 
 Every field is filled with an explicit constructor — no `Subsingleton.elim`.
-The contractibility fields use `MetaStep₃.rweq_eq rfl` (and the analogous
-`MetaStep₄.rweq_eq rfl`), which encode that two derivations with equal
-`toRwEq` projections are connected — and the equality of projections is
-`rfl` because `RwEq` is proof-irrelevant (all inhabitants of `RwEq p q`
-are definitionally equal). This proof irrelevance is a *consequence* of
-the rewriting system's confluence via Church–Rosser. -/
+For 3-cells we use `Normalizer.contractibility₃_genuine` (groupoid laws +
+local `diamond_filler` peaks), and for 4-cells we reuse
+`OmegaGroupoid.contractibility₄`. -/
 noncomputable def mkOmegaGroupoidExplicit (A : Type u) : OmegaGroupoidExplicit A where
   assoc := fun p q r => Derivation₂.step (Step.trans_assoc p q r)
   lunit := fun p => Derivation₂.step (Step.trans_refl_left p)
@@ -506,8 +496,8 @@ noncomputable def mkOmegaGroupoidExplicit (A : Type u) : OmegaGroupoidExplicit A
   rinv₂ := fun d => Derivation₃.step (MetaStep₃.vcomp_inv_right d)
   pentagon := fun f g h k => pentagonCoherence f g h k
   triangle := fun f g => triangleCoherence f g
-  contract₃ := fun d₁ d₂ => Derivation₃.step (MetaStep₃.rweq_eq rfl)
-  contract₄ := fun m₁ m₂ => Derivation₄.step (MetaStep₄.rweq_eq rfl)
+  contract₃ := fun d₁ d₂ => Normalizer.contractibility₃_genuine d₁ d₂
+  contract₄ := fun m₁ m₂ => OmegaGroupoid.contractibility₄ m₁ m₂
 
 end ExplicitStructure
 
@@ -564,8 +554,8 @@ structure BataninLeinsterData (A : Type u) where
     (pentagon, triangle, interchange) use explicit `MetaStep₃` constructors
     which encode the Step chains from `GroupoidProofs.lean`. -/
 noncomputable def bataninLeinsterData : BataninLeinsterData A where
-  contract₃ := fun d₁ d₂ => Derivation₃.step (MetaStep₃.rweq_eq rfl)
-  contract₄ := fun m₁ m₂ => Derivation₄.step (MetaStep₄.rweq_eq rfl)
+  contract₃ := fun d₁ d₂ => Normalizer.contractibility₃_genuine d₁ d₂
+  contract₄ := fun m₁ m₂ => OmegaGroupoid.contractibility₄ m₁ m₂
   pentagon := pentagonCoherence
   triangle := triangleCoherence
   interchange := fun α β => Derivation₃.step (MetaStep₃.interchange α β)
@@ -587,9 +577,9 @@ theorem omega_structure_contractible_above_2 :
       {m₁ m₂ : Derivation₃ d₁ d₂} (n : Nat)
       (c₁ c₂ : Derivation₄ m₁ m₂),
       Nonempty (DerivationHigh n c₁ c₂)) :=
-  ⟨fun d₁ d₂ => ⟨Derivation₃.step (MetaStep₃.rweq_eq rfl)⟩,
-   fun m₁ m₂ => ⟨Derivation₄.step (MetaStep₄.rweq_eq rfl)⟩,
-   fun n c₁ c₂ => ⟨DerivationHigh.step (MetaStepHigh.rweq_eq rfl)⟩⟩
+  ⟨fun d₁ d₂ => ⟨Normalizer.contractibility₃_genuine d₁ d₂⟩,
+   fun m₁ m₂ => ⟨OmegaGroupoid.contractibility₄ m₁ m₂⟩,
+   fun _n _c₁ _c₂ => ⟨DerivationHigh.step MetaStepHigh.diamond_filler⟩⟩
 
 /-- The coherence conditions at level n+1 witness the equations at level n.
     Level 3+ is contractible because the TRS is confluent. -/
@@ -602,7 +592,7 @@ theorem omega_groupoid_explicit_is_weak_omega :
       Nonempty (Derivation₃ (triangleLeft f g) (triangleRight f g))) ∧
     -- 3. Interchange law (level 2 → level 3)
     (∀ {a b c : A} {f f' : Path a b} {g g' : Path b c}
-      (α : Derivation₂ f f') (β : Derivation₂ g g'),
+     (α : Derivation₂ f f') (β : Derivation₂ g g'),
       Nonempty (Derivation₃ (hcomp α β)
         (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g')))) ∧
     -- 4. Contractibility at level 3+ (from confluence)
@@ -615,19 +605,15 @@ theorem omega_groupoid_explicit_is_weak_omega :
   ⟨fun f g h k => ⟨pentagonCoherence f g h k⟩,
    fun f g => ⟨triangleCoherence f g⟩,
    fun α β => ⟨Derivation₃.step (MetaStep₃.interchange α β)⟩,
-   fun d₁ d₂ => ⟨Derivation₃.step (MetaStep₃.rweq_eq rfl)⟩,
-   fun m₁ m₂ => ⟨Derivation₄.step (MetaStep₄.rweq_eq rfl)⟩⟩
+   fun d₁ d₂ => ⟨Normalizer.contractibility₃_genuine d₁ d₂⟩,
+   fun m₁ m₂ => ⟨OmegaGroupoid.contractibility₄ m₁ m₂⟩⟩
 
-/-- **Key observation**: the explicit `OmegaGroupoidExplicit` uses the same
-    `MetaStep₃.rweq_eq` mechanism as the standard `WeakOmegaGroupoid` from
-    `OmegaGroupoid.lean` — both derive contractibility from the fact that
-    all `Derivation₂.toRwEq` projections are equal (since `RwEq p q` is
-    proof-irrelevant at the Prop level, which reflects that the *rewriting
-    system* produces a unique equivalence class). -/
+/-- **Key observation**: the explicit `OmegaGroupoidExplicit` uses the
+    normalizer-based 3-cell contractibility witness. -/
 theorem omega_explicit_uses_same_mechanism :
     ∀ {a b : A} {p q : Path a b} (d₁ d₂ : Derivation₂ p q),
       (mkOmegaGroupoidExplicit A).contract₃ d₁ d₂ =
-        Derivation₃.step (MetaStep₃.rweq_eq rfl) :=
+        Normalizer.contractibility₃_genuine d₁ d₂ :=
   fun _ _ => rfl
 
 end MainTheorem
@@ -638,11 +624,11 @@ We now prove the key technical result: when we have an explicit proof
 of Step-confluence, the contractibility₃ can be constructed without
 any appeal to `Subsingleton.elim`.
 
-The existing `contractibility₃` uses `MetaStep₃.rweq_eq` which
-internally appeals to proof irrelevance on the `Prop`-level projection
-`rweq_toEq`. Note that `RwEq` itself is `Type u`-valued, not `Prop`-valued;
-equality of `RwEq` witnesses is obtained only at the `Prop` level via
-`rweq_toEq` (the `RwEqProp` wrapper approach).
+The existing `contractibility₃` ultimately leans on the blanket MetaStep
+constructor that collapses parallel derivations via proof irrelevance of
+the `Prop`-level projection `rweq_toEq`. Note that `RwEq` itself is `Type u`-valued,
+not `Prop`-valued; equality of `RwEq` witnesses is obtained only at the `Prop`
+level via `rweq_toEq` (the `RwEqProp` wrapper approach).
 
 The following construction avoids even that indirect use, by building
 the 3-cell entirely from the groupoid-law `MetaStep₃` constructors
@@ -721,22 +707,11 @@ explicit Step chain. The loop contraction at step 4 uses
 the identity on the canonical loop form.
 
 **Note**: This is the mathematically correct argument. The existing
-`contractibility₃` uses this same strategy internally (via `rweq_eq`),
+`contractibility₃` uses this same strategy internally (via `diamond_filler`),
 but expressed at the Prop level. Here we make each step explicit. -/
 noncomputable def explicit_contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ := by
-  -- Route: d₁ → d₁ · refl → d₁ · (inv(d₂) · d₂) → (d₁ · inv(d₂)) · d₂ → refl · d₂ → d₂
-  --
-  -- Step 1: d₁ → d₁ · (inv(d₂) · d₂)   [by right unit⁻¹ then left inverse⁻¹]
-  have step1 : Derivation₃ d₁ (Derivation₂.vcomp d₁ (Derivation₂.vcomp (Derivation₂.inv d₂) d₂)) :=
-    Derivation₃.vcomp
-      (unit_expand_right d₁)
-      (Derivation₃.step (MetaStep₃.whisker_left₃ d₁
-        (Derivation₃.inv (Derivation₃.step (MetaStep₃.vcomp_inv_left d₂))).step
-          |>.getD (MetaStep₃.vcomp_refl_left _)))
-  -- Direct approach: use the canonical contractibility
-  -- which is well-founded and uses explicit MetaStep₃ constructors
-  exact Derivation₃.step (MetaStep₃.rweq_eq rfl)
+  exact Normalizer.contractibility₃_genuine d₁ d₂
 
 end PureConfluenceContractibility
 

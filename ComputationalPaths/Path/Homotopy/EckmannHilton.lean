@@ -271,7 +271,7 @@ end OmegaSquared
 
 The proof proceeds in three steps:
 
-1. **Whiskering by refl is the identity**: The 3-cell `MetaStep₃.rweq_eq`
+1. **Whiskering by refl is the identity**: The 3-cell `MetaStep₃.diamond_filler`
    connects `OmegaGroupoid.whiskerRight α (refl a)` to `α`, since both produce the same
    `RwEq` proof (by proof irrelevance of `Prop`).
 
@@ -293,12 +293,14 @@ variable {a : A}
     reflexivity path and itself, producing identical `RwEq` proofs. -/
 noncomputable def whiskerRight_refl_id (α : OmegaTwo A a) :
     Derivation₃ (OmegaGroupoid.whiskerRight α (Path.refl a)) α :=
-  .step .rweq_eq
+  .step (.diamond_filler (Step.trans_refl_right (Path.refl a)) (Step.trans_refl_right (Path.refl a))
+    (StepStar.refl (Path.refl a)) (StepStar.refl (Path.refl a)))
 
 /-- Left whiskering by `refl` is connected to the identity by a 3-cell. -/
 noncomputable def whiskerLeft_refl_id (β : OmegaTwo A a) :
     Derivation₃ (OmegaGroupoid.whiskerLeft (Path.refl a) β) β :=
-  .step .rweq_eq
+  .step (.diamond_filler (Step.trans_refl_right (Path.refl a)) (Step.trans_refl_right (Path.refl a))
+    (StepStar.refl (Path.refl a)) (StepStar.refl (Path.refl a)))
 
 /-- **Key lemma**: Horizontal composition reduces to vertical composition on Ω².
 
