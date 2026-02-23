@@ -10,7 +10,6 @@ No sorry, no admit, no bare Path.ofEq wrappers.
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.HoTT.TruncationPaths
 import ComputationalPaths.Path.HoTT.TransportDeep
-import ComputationalPaths.Path.HoTT.UnivalenceDeep
 import ComputationalPaths.Path.HoTT.EquivalencePaths
 
 namespace ComputationalPaths.Path.HoTT.ModalHoTT
@@ -18,7 +17,6 @@ namespace ComputationalPaths.Path.HoTT.ModalHoTT
 open ComputationalPaths.Path
 open ComputationalPaths.Path.HoTT.Truncation
 open ComputationalPaths.Path.HoTT.TransportDeep
-open ComputationalPaths.Path.HoTT.UnivalenceDeep
 
 universe u v w
 

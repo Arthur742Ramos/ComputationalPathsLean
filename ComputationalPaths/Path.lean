@@ -450,7 +450,6 @@ import ComputationalPaths.Path.TypeTheory.CwFDeep
 import ComputationalPaths.Path.TypeTheory.IdentityTypeDeep
 import ComputationalPaths.Path.HoTT.PathAlgebraDeep
 import ComputationalPaths.Path.HoTT.TransportDeep
-import ComputationalPaths.Path.HoTT.UnivalenceDeep
 import ComputationalPaths.Path.Homotopy.CubicalDeep
 import ComputationalPaths.Path.Algebra.CompletionDeep
 import ComputationalPaths.Path.StableHomotopyPaths
@@ -554,7 +553,6 @@ import ComputationalPaths.Path.Algebra.GrobnerPaths
 import ComputationalPaths.Path.Algebra.GroupoidLawsDeep
 import ComputationalPaths.Path.Algebra.HermitianKTheory
 import ComputationalPaths.Path.Algebra.HigherDimensionalRewritingDeep
-import ComputationalPaths.Path.Algebra.HigherInductiveDeep
 import ComputationalPaths.Path.Algebra.HigherToposTheoryDeep
 import ComputationalPaths.Path.Algebra.HomCommAlgDeep
 import ComputationalPaths.Path.Algebra.HomTypeTheoryDeep
@@ -834,7 +832,6 @@ import ComputationalPaths.Path.HoTT.PathInductionPaths
 import ComputationalPaths.Path.HoTT.PushoutPaths
 import ComputationalPaths.Path.HoTT.TruncationDeep
 import ComputationalPaths.Path.HoTT.TruncationPaths
-import ComputationalPaths.Path.HoTT.UnivalencePaths
 import ComputationalPaths.Path.HoTT.ModalHoTT
 import ComputationalPaths.Path.HoTT.SyntheticHomotopy
 import ComputationalPaths.Path.HoTT.Descent
@@ -853,11 +850,9 @@ import ComputationalPaths.Path.Homotopy.FibrationDeep
 import ComputationalPaths.Path.Homotopy.FibrationPaths
 import ComputationalPaths.Path.Homotopy.FreeLoopSpace
 import ComputationalPaths.Path.Homotopy.FreudenthalSuspension
-import ComputationalPaths.Path.Homotopy.HigherInductiveTypes
 import ComputationalPaths.Path.Homotopy.HigherToposDeep2
 import ComputationalPaths.Path.Homotopy.HomotopyGroupPaths
 import ComputationalPaths.Path.Homotopy.HomotopyLimitDeep
-import ComputationalPaths.Path.Homotopy.HomotopyPushout
 import ComputationalPaths.Path.Homotopy.InfinityCatDeep2
 import ComputationalPaths.Path.Homotopy.KTheoryPaths
 -- import ComputationalPaths.Path.Homotopy.LocalizationAtPrime  -- circular: imports ComputationalPaths
@@ -879,9 +874,6 @@ import ComputationalPaths.Path.Homotopy.StableHomotopyPaths
 import ComputationalPaths.Path.Homotopy.StableStems
 import ComputationalPaths.Path.Homotopy.SuspensionDeep
 import ComputationalPaths.Path.Homotopy.SuspensionPaths
-import ComputationalPaths.Path.Homotopy.SyntheticHomotopy
-import ComputationalPaths.Path.Homotopy.TruncationTheory
-import ComputationalPaths.Path.Homotopy.UnivalenceApplications
 import ComputationalPaths.Path.Homotopy.UnstableStemsLow
 import ComputationalPaths.Path.LocalizationPaths
 import ComputationalPaths.Path.Logic.CategoricalLogicDeep

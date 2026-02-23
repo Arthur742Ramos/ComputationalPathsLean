@@ -11,7 +11,7 @@ universe u
 /-! # Univalence Analog for Computational Paths
 
 This module investigates the computational-paths analog of the univalence
-axiom from HoTT.  The main results are:
+principle from HoTT.  The main results are:
 
 1. **PathEquiv**: an equivalence principle for computational paths.
 2. **idToEquiv**: a `Path A B` gives rise to a path-equivalence via transport.

@@ -76,12 +76,15 @@ Church--Rosser confluence for the completed groupoid fragment via a
 free-group interpretation.
 From these rewriting principles we construct explicit coherence witnesses
 (pentagon, triangle, interchange, Eckmann--Hilton) and assemble a weak
-\(\omega\)-groupoid structure in the sense of Batanin--Leinster, with
-genuine non-degeneracy at levels~0--2 and contractible higher cells.
+\(\omega\)-groupoid structure inspired by Batanin--Leinster, with
+genuine non-degeneracy at levels~0--2 and contractible higher cells
+(an \emph{adapted} Batanin--Leinster structure, not the genuinely
+non-degenerate one of Lumsdaine or van den Berg--Garner).
 Contractibility at dimension~\(\ge 3\) uses both a
 Squier-style \(\mathsf{diamond\_filler}\) constructor---whose instances
 arise from the critical pairs of the groupoid TRS---and a blanket
-\(\mathsf{rweq\_eq}\) axiom mediated by proof irrelevance.
+\(\mathsf{rweq\_transport}\) constructor mediated by proof irrelevance
+on the underlying \(\Eq\).
 We then develop homotopy-theoretic applications, including an
 encode--decode computation of \(\pi_1(S^1) \cong \mathbb{Z}\), and report on
 the scale and structure of the formalization.
@@ -1151,8 +1154,11 @@ critical-pair analysis for the type-former rules.
 The coherence laws of higher category theory---pentagon, triangle,
 interchange, Eckmann--Hilton, and inverse coherences---are established
 as explicit $\RwEq$ witnesses constructed from $\Step$ chains.
-No coherence proof in the formalization invokes
-$\mathsf{Subsingleton.elim}$ at the $\RwEq$ level.
+By ``explicit'' we mean that each coherence witness is a concrete term
+whose structure records which rewrite rules were applied and in what order;
+no coherence proof in the formalization invokes
+$\mathsf{Subsingleton.elim}$ at the $\RwEq$ level (though the underlying
+$\mathsf{Step}$ relation is $\Prop$-valued and therefore proof-irrelevant).
 
 \subsection{Pentagon coherence}\label{subsec:pentagon}
 
@@ -1890,8 +1896,8 @@ Its constructors include:
   \item $\mathsf{interchange}$ (the interchange law for horizontal
     composition of derivations),
   \item $\mathsf{pentagon}$, $\mathsf{triangle}$ (higher coherences),
-  \item $\mathsf{rweq\_eq}$ (two derivations with equal $\RwEq$
-    projections are connected).
+  \item $\mathsf{rweq\_transport}$ (two derivations whose $\RwEq$
+    projections have equal $\mathsf{rweq\_toEq}$ images are connected).
 \end{itemize}
 The type $\mathsf{Derivation}_3$ is the reflexive-transitive-symmetric
 closure of $\mathsf{MetaStep}_3$, with constructors $\refl$, $\mathsf{step}$,
@@ -2037,8 +2043,10 @@ constructors of $\mathsf{MetaStep}_3$:
   \item $\mathsf{vcomp\_inv\_left}$, $\mathsf{vcomp\_inv\_right}$
         (cancel inverse pairs)
 \end{itemize}
-No axioms or proof-irrelevance principles are used.  The construction
-is purely structural: it normalizes the free-groupoid word represented
+The normalization step itself uses no custom axioms.
+However, $\mathsf{Step}$ is $\Prop$-valued, so its proof irrelevance is
+inherited from Lean's kernel.  The construction
+is structural: it normalizes the free-groupoid word represented
 by $d$ into right-associated, reduced form.
 
 \medskip
@@ -2114,7 +2122,7 @@ non-trivial information at levels~0, 1, and~2, and becomes
 contractible from level~3 onward.
 \end{remark}
 
-\begin{remark}[The Squier program: $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$, and no proof irrelevance]%
+\begin{remark}[The Squier program: $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$, and proof irrelevance]%
 \label{rem:rweq-eq-honesty}
 The contractibility theorem realizes the \emph{Squier program} for
 computational paths.  Squier's theorem~\cite{Squier1987} states that
@@ -2137,9 +2145,10 @@ In our setting:
 \end{itemize}
 
 \smallskip
-\noindent\textbf{Key achievement: no blanket axioms.}
-The $\mathsf{MetaStep}_3.\mathsf{rweq\_eq}$ constructor remains available
-in the formalization as a fallback, but the primary contractibility proof
+\noindent\textbf{Key achievement: structured contractibility.}
+The $\mathsf{MetaStep}_3.\mathsf{rweq\_transport}$ constructor remains available
+in the formalization as a fallback (and \emph{does} rely on proof irrelevance
+of the underlying $\Eq$ via $\mathsf{rweq\_toEq}$), but the primary contractibility proof
 via $\mathsf{contractibility}_3$ uses only:
 \begin{enumerate}[nosep]
   \item \textbf{Groupoid-law rewrites}: $\mathsf{vcomp\_refl\_left}$,
@@ -2155,8 +2164,11 @@ via $\mathsf{contractibility}_3$ uses only:
 \end{enumerate}
 
 This achieves the Squier program explicitly: contractibility at
-dimension $\ge 3$ is a \emph{constructive consequence} of confluence
-and the groupoid laws, not an appeal to proof irrelevance on $\Eq$.
+dimension $\ge 3$ is a \emph{structured consequence} of confluence
+and the groupoid laws.  Note, however, that the $\mathsf{step\_eq}$ constructor
+relies on $\mathsf{Step}$ being $\Prop$-valued (hence proof-irrelevant),
+and the $\mathsf{rweq\_transport}$ fallback appeals to proof irrelevance
+on the underlying $\Eq$ via $\mathsf{rweq\_toEq}$.
 The formalization validates this claim: the $\mathsf{contractibility}_3$
 function builds explicit 3-cells from the constructors above, with
 $\mathsf{diamond\_filler}$ used only where genuine confluence diamonds
@@ -2164,7 +2176,7 @@ occur.
 
 \smallskip
 \noindent\textbf{The constrained $\mathsf{diamond\_filler}$.}
-Unlike the blanket $\mathsf{rweq\_eq}$, the $\mathsf{diamond\_filler}$
+Unlike the blanket $\mathsf{rweq\_transport}$, the $\mathsf{diamond\_filler}$
 constructor is \emph{constrained}: it requires explicit diverging steps
 $s_1 : \Step\;p\;q$, $s_2 : \Step\;p\;r$ together with explicit
 joining chains $j_1 : \mathsf{StepStar}\;q\;m$, $j_2 : \mathsf{StepStar}\;r\;m$,
@@ -2188,9 +2200,9 @@ Unlike the Lumsdaine and van den Berg--Garner
 constructions~\cite{Lumsdaine2010,vdBG2011}, which produce genuinely
 non-degenerate structure at all levels in intensional MLTT, our
 construction is necessarily different: we build \emph{on top of} a
-UIP foundation, but the higher-dimensional collapse is achieved via
-explicit Squier-style diamond fillers rather than by appealing to
-proof irrelevance on $\Eq$.
+UIP foundation, and the higher-dimensional collapse is achieved via
+Squier-style diamond fillers together with proof irrelevance
+on $\Eq$ (through the $\mathsf{step\_eq}$ and $\mathsf{rweq\_transport}$ constructors).
 \end{remark}
 
 \begin{remark}[Comparison with Lumsdaine and van den Berg--Garner]%
@@ -2213,9 +2225,11 @@ Our construction differs in three key respects:
         dimension~1 are defined by explicit rewrite rules ($\Step$
         constructors), not by path induction.
   \item \textbf{Contractibility mechanism.} Higher-dimensional
-        contractibility is derived via explicit Squier-style diamond
-        fillers and groupoid-law normalization, \emph{not} via
-        appeal to proof irrelevance on $\Eq$.  The 3-cells are
+        contractibility is derived via Squier-style diamond
+        fillers and groupoid-law normalization; the
+        $\mathsf{step\_eq}$ constructor relies on $\mathsf{Step}$ being
+        $\Prop$-valued (proof-irrelevant), while higher levels use
+        blanket $\mathsf{diamond\_filler}$ constructors.  The 3-cells are
         built from $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
         and the groupoid-law $\mathsf{MetaStep}_3$ constructors.
 \end{enumerate}
@@ -2271,9 +2285,11 @@ For any type $A : \Ty\;u$, the cell tower
   \big(A,\;\Path,\;\mathsf{Derivation}_2,\;
   \mathsf{Derivation}_3,\;\mathsf{Derivation}_4,\;\ldots\big)
 \]
-carries the structure of a weak $\omega$-groupoid in the
-Batanin--Leinster sense: it satisfies conditions
-\ref{BL1}--\ref{BL7}.
+carries the structure of a weak $\omega$-groupoid in an
+adapted Batanin--Leinster sense: it satisfies conditions
+\ref{BL1}--\ref{BL7}, with the caveat that levels $\ge 3$ are
+contractible (via $\mathsf{rweq\_transport}$ and $\mathsf{diamond\_filler}$)
+rather than genuinely non-degenerate.
 \end{theorem}
 
 \begin{proof}
@@ -2307,11 +2323,11 @@ The Batanin--Leinster data for $A$ is assembled as follows.
      $\mathsf{vcomp\_inv\_right}$, $\mathsf{inv\_inv}$,
      $\mathsf{inv\_vcomp}$).
   \item \textbf{Contractibility} at level~$\ge 3$:
-    $\mathsf{MetaStep}_3.\mathsf{rweq\_eq}\;\mathsf{rfl}$
-    at level~3,
-    $\mathsf{MetaStep}_4.\mathsf{rweq\_eq}\;\mathsf{rfl}$
+    $\mathsf{MetaStep}_3.\mathsf{rweq\_transport}\;\mathsf{rfl}$
+    at level~3 (using proof irrelevance of $\Eq$),
+    $\mathsf{MetaStep}_4.\mathsf{diamond\_filler}$
     at level~4,
-    $\mathsf{MetaStepHigh}.\mathsf{rweq\_eq}\;\mathsf{rfl}$
+    $\mathsf{MetaStepHigh}.\mathsf{diamond\_filler}$
     at level~$\ge 5$.
 \end{itemize}
 Each field of the $\mathsf{OmegaGroupoidExplicit}$ structure
@@ -3014,8 +3030,8 @@ but, in the stable range, an equivalence.
 \section{Higher Categorical Extensions}\label{sec:higher-cat}
 % ======================================================================
 
-The computational-path framework extends naturally to higher-categorical
-and algebro-geometric settings.
+The computational-path framework has been extended toward higher-categorical
+and algebro-geometric settings, though these extensions vary in depth.
 At the \PS\ level, the formalization includes colored operads
 and operadic algebras
 ($A_\infty$, $E_\infty$), spectra and stable homotopy categories with
@@ -3024,13 +3040,17 @@ sequences with $d_r \circ d_r = 0$ witnessed by explicit $\Step$ chains,
 triangulated categories with octahedral axiom coherence, Grothendieck
 toposes with descent data and path-level cocycle conditions, and sheaf
 cohomology.
+These \PS-level modules define well-typed structures and proofs, but
+the proofs are routine constructions (case splits, structural recursion)
+rather than deep mathematical arguments.
 At the SO (statement-only) level, the formalization provides type-checked
 interfaces for condensed mathematics, perfectoid spaces, motivic
 homotopy theory, and approximately 30 further domains (see Appendix~\ref{app:modules}).
 These SO-level modules define structures and state theorems that
 type-check against the core framework, but their proofs are
-infrastructure for future development rather than substantive
-mathematical verification.
+\textbf{scaffolding for future development, not substantive
+mathematical verification}: they do not carry the mathematical content
+that a full formalization of these theories would require.
 Full details are available in the source
 repository.
 
@@ -3140,6 +3160,35 @@ SO-level module is fully type-checked but may construct its
 proofs by assembling well-typed terms without deep
 mathematical insight at every step.
 
+\subsection{Axiom disclosure}\label{subsec:axiom-disclosure}
+
+The formalization declares \textbf{no custom \texttt{axiom}} commands
+(with the exception of the $\mathsf{ua'}$ family in the experimental
+\texttt{UnivalencePaths} module, which is not imported by the core
+development).
+However, the formalization relies on the following \emph{Lean kernel
+axioms}, which are built into the trusted kernel and cannot be avoided:
+
+\begin{enumerate}[nosep]
+  \item \textbf{Propositional extensionality} ($\mathsf{propext}$):
+    two propositions with the same truth value are equal.
+  \item \textbf{Quotient types} ($\mathsf{Quot}$, $\mathsf{Quot.mk}$,
+    $\mathsf{Quot.lift}$, $\mathsf{Quot.sound}$):
+    used for $\mathsf{PathRwQuot}$ and the fundamental group quotient.
+  \item \textbf{Function extensionality} ($\mathsf{funext}$):
+    used in several path congruence proofs.
+  \item \textbf{Classical choice} ($\mathsf{Classical.choice}$):
+    used in $\mathsf{rweq\_toEq}$ and several noncomputable definitions.
+\end{enumerate}
+
+\noindent
+The use of $\mathsf{Classical.choice}$ means that certain definitions
+(notably $\mathsf{rweq\_toEq}$ and functions built on it) are
+\texttt{noncomputable}.
+The $\mathsf{Step}$ relation is $\Prop$-valued, so it inherits proof
+irrelevance from Lean's kernel---this is essential for the
+$\mathsf{step\_eq}$ constructor of $\mathsf{MetaStep}_3$.
+
 % ======================================================================
 \section{Related Work}\label{sec:related}
 % ======================================================================
@@ -3172,8 +3221,9 @@ deriving contractibility from confluence combined with UIP
 (Remark~\ref{rem:rweq-eq-honesty}).
 At the 3-cell level, a constrained $\mathsf{diamond\_filler}$
 constructor provides Squier-style structure from critical-pair joins,
-while the blanket $\mathsf{rweq\_eq}$ constructor completes
-contractibility via proof irrelevance.
+while the $\mathsf{rweq\_transport}$ constructor (at level~3) and
+blanket $\mathsf{diamond\_filler}$ constructors (at levels $\ge 4$) complete
+contractibility, ultimately relying on proof irrelevance of $\Eq$.
 The resulting structure is
 genuinely non-degenerate at levels 0--2 but contractible above,
 in contrast to the Lumsdaine/vdBG construction which is
@@ -3245,7 +3295,7 @@ the 3-cell witnessing commutativity of the resulting diamond.
 The 33 critical pairs of the completed groupoid TRS generate these
 3-cells, yielding the ``coherent convergence'' condition of
 Guiraud--Malbos.
-(The blanket $\mathsf{rweq\_eq}$ constructor provides an alternative
+(The blanket $\mathsf{rweq\_transport}$ constructor provides an alternative
 route to contractibility via UIP; see Remark~\ref{rem:rweq-eq-honesty}
 for the precise status.)
 
@@ -3323,13 +3373,13 @@ The principal contributions are:
     that record the precise sequence of rewrite rules applied
     (\S\ref{sec:coherence}).
 
-  \item A \textbf{weak $\omega$-groupoid structure} in the
-    Batanin--Leinster sense~\cite{Batanin1998,Leinster2004}, with
+  \item A \textbf{weak $\omega$-groupoid structure} adapted from the
+    Batanin--Leinster framework~\cite{Batanin1998,Leinster2004}, with
     genuine non-degeneracy at levels 0--2 and contractible higher
-    cells; contractibility at dimensions $\ge 3$ is derived from
+    cells; contractibility at dimensions $\ge 3$ relies on
     Church--Rosser confluence via Squier-style diamond fillers
-    (from critical-pair joins), together with a blanket
-    $\mathsf{rweq\_eq}$ constructor mediated by proof irrelevance
+    (from critical-pair joins), together with the
+    $\mathsf{rweq\_transport}$ constructor which appeals to proof irrelevance
     on the underlying $\Eq$ (Remark~\ref{rem:rweq-eq-honesty})
     (\S\ref{sec:omega}).
 
