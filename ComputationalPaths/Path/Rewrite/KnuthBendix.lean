@@ -482,5 +482,24 @@ theorem completion_has_finite_derivation_type :
       cp ∈ squierWitness.criticalBranchings :=
   squierWitness.covers
 
+/-- **No bidirectional steps for the 78-rule system**: We cannot have both
+    `Step78Rel q p` and `Step78Rel p q` for any expressions p and q.
+
+    This follows from `step78_measure_decrease`: every rule strictly decreases
+    the lexicographic measure `(weight, leftWeight)`. -/
+theorem step78_no_bidirectional {p q : Expr} :
+    ¬(Step78Rel q p ∧ Step78Rel p q) := by
+  intro ⟨s₁, s₂⟩
+  have h₁ := step78_measure_decrease s₁
+  have h₂ := step78_measure_decrease s₂
+  -- Both h₁ and h₂ assert lexicographic decrease, which is contradictory
+  rcases h₁ with hlt₁ | ⟨heq₁, hlt₁'⟩
+  · rcases h₂ with hlt₂ | ⟨heq₂, hlt₂'⟩
+    · exact Nat.lt_asymm hlt₁ hlt₂
+    · exact Nat.ne_of_lt hlt₁ heq₂.symm
+  · rcases h₂ with hlt₂ | ⟨heq₂, hlt₂'⟩
+    · exact Nat.ne_of_lt hlt₂ heq₁.symm
+    · exact Nat.lt_asymm hlt₁' hlt₂'
+
 end Rewriting
 end ComputationalPaths

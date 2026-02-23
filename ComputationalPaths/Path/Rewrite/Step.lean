@@ -1593,6 +1593,124 @@ theorem critical_pair_symm_congr_symm_trans_joinable
   · exact StepStar.single (Step.symm_refl b)
   · exact StepStar.single (Step.trans_symm (Path.symm p))
 
+/-! ## Lexicographic termination measure scaffold -/
+
+/-- Size companion for path-weight calculations (analogous to `Expr.size`). -/
+@[simp] noncomputable def size {A : Type u} {a b : A} (p : Path a b) : Nat :=
+  p.steps.length + 1
+
+/-- Primary weight component (analogous to `Expr.weight`). -/
+@[simp] noncomputable def weight {A : Type u} {a b : A} (p : Path a b) : Nat :=
+  2 * p.steps.length + 4
+
+/-- Secondary weight component (analogous to `Expr.leftWeight`). -/
+@[simp] noncomputable def leftWeight {A : Type u} {a b : A} (p : Path a b) : Nat :=
+  p.steps.length
+
+/-- Lexicographic termination helper `(weight, leftWeight)` for `Path`. -/
+@[simp] noncomputable def termMeasure {A : Type u} {a b : A} (p : Path a b) : Nat × Nat :=
+  (p.weight, p.leftWeight)
+
+/-- Weight lower bound matching the groupoid-trs baseline constant. -/
+theorem weight_ge_four {A : Type u} {a b : A} (p : Path a b) : 4 ≤ p.weight := by
+  simp [weight]
+
+theorem size_pos {A : Type u} {a b : A} (p : Path a b) : 0 < p.size := by
+  simp [size]
+
+private noncomputable def NatLex : Nat × Nat → Nat × Nat → Prop :=
+  fun x y => x.1 < y.1 ∨ (x.1 = y.1 ∧ x.2 < y.2)
+
+private theorem natLex_irrefl (x : Nat × Nat) : ¬ NatLex x x := by
+  intro h
+  rcases h with hlt | ⟨heq, hlt⟩
+  · exact Nat.lt_irrefl _ hlt
+  · exact Nat.lt_irrefl _ hlt
+
+private theorem natLex_trans {x y z : Nat × Nat}
+    (hxy : NatLex x y) (hyz : NatLex y z) : NatLex x z := by
+  rcases hxy with hxy | ⟨hxyEq, hxyLt⟩
+  · rcases hyz with hyz | ⟨hyzEq, _⟩
+    · exact Or.inl (Nat.lt_trans hxy hyz)
+    · exact Or.inl (hyzEq ▸ hxy)
+  · rcases hyz with hyz | ⟨hyzEq, hyzLt⟩
+    · exact Or.inl (hxyEq ▸ hyz)
+    · exact Or.inr ⟨hxyEq.trans hyzEq, Nat.lt_trans hxyLt hyzLt⟩
+
+private theorem natLex_asymm {x y : Nat × Nat}
+    (hxy : NatLex x y) (hyx : NatLex y x) : False :=
+  natLex_irrefl x (natLex_trans hxy hyx)
+
+private theorem termMeasure_lt_of_weight_lt
+    {A : Type u} {a b : A} {p q : Path a b}
+    (h : q.weight < p.weight) : NatLex q.termMeasure p.termMeasure :=
+  Or.inl h
+
+private theorem termMeasure_lt_of_leftWeight_lt
+    {A : Type u} {a b : A} {p q : Path a b}
+    (hw : q.weight = p.weight)
+    (hl : q.leftWeight < p.leftWeight) :
+    NatLex q.termMeasure p.termMeasure :=
+  Or.inr ⟨hw, hl⟩
+
+@[simp] theorem weight_symm {A : Type u} {a b : A} (p : Path a b) :
+    (Path.symm p).weight = p.weight := by
+  simp [weight]
+
+@[simp] theorem leftWeight_symm {A : Type u} {a b : A} (p : Path a b) :
+    (Path.symm p).leftWeight = p.leftWeight := by
+  simp [leftWeight]
+
+@[simp] theorem weight_trans {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    (Path.trans p q).weight = 2 * (p.steps.length + q.steps.length) + 4 := by
+  simp [weight]
+
+@[simp] theorem leftWeight_trans {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    (Path.trans p q).leftWeight = p.leftWeight + q.leftWeight := by
+  simp [leftWeight]
+
+theorem weight_lt_under_symm
+    {A : Type u} {a b : A} {p q : Path a b}
+    (h : q.weight < p.weight) :
+    (Path.symm q).weight < (Path.symm p).weight := by
+  simpa [weight] using h
+
+theorem leftWeight_lt_under_symm
+    {A : Type u} {a b : A} {p q : Path a b}
+    (h : q.leftWeight < p.leftWeight) :
+    (Path.symm q).leftWeight < (Path.symm p).leftWeight := by
+  simpa [leftWeight] using h
+
+theorem weight_lt_under_trans_left
+    {A : Type u} {a b c : A} {p q : Path a b} (r : Path b c)
+    (h : q.weight < p.weight) :
+    (Path.trans q r).weight < (Path.trans p r).weight := by
+  simp [weight] at h ⊢
+  omega
+
+theorem weight_lt_under_trans_right
+    {A : Type u} {a b c : A} (p : Path a b) {q r : Path b c}
+    (h : r.weight < q.weight) :
+    (Path.trans p r).weight < (Path.trans p q).weight := by
+  simp [weight] at h ⊢
+  omega
+
+theorem leftWeight_lt_under_trans_left
+    {A : Type u} {a b c : A} {p q : Path a b} (r : Path b c)
+    (h : q.leftWeight < p.leftWeight) :
+    (Path.trans q r).leftWeight < (Path.trans p r).leftWeight := by
+  simp [leftWeight] at h ⊢
+  omega
+
+theorem leftWeight_lt_under_trans_right
+    {A : Type u} {a b c : A} (p : Path a b) {q r : Path b c}
+    (h : r.leftWeight < q.leftWeight) :
+    (Path.trans p r).leftWeight < (Path.trans p q).leftWeight := by
+  simp [leftWeight] at h ⊢
+  omega
+
 /-! ## Lightweight complexity measure -/
 
 /-- Complexity of a path expression, measured by trace length. -/

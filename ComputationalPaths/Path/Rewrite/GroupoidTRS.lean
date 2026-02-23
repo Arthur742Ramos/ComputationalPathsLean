@@ -163,5 +163,30 @@ theorem termination : WellFounded (fun q p : Expr => Step p q) :=
 theorem acc_step (e : Expr) : Acc (fun q p => Step p q) e :=
   termination.apply e
 
+/-- **No bidirectional steps**: For any expressions p and q, we cannot have
+    both `Step p q` and `Step q p`.
+
+    This follows directly from termination: every step strictly decreases
+    the lexicographic measure `(weight, leftWeight)`. Having both directions
+    would require the measure to both decrease and increase, which is impossible.
+
+    This theorem is crucial for proving that "mixed polarity" cases in
+    derivation normal forms are unreachable. -/
+theorem no_bidirectional_step {p q : Expr} :
+    ¬(Step p q ∧ Step q p) := by
+  intro ⟨s₁, s₂⟩
+  have h₁ := step_lex_decrease s₁
+  have h₂ := step_lex_decrease s₂
+  -- h₁ : q.weight < p.weight ∨ (q.weight = p.weight ∧ q.leftWeight < p.leftWeight)
+  -- h₂ : p.weight < q.weight ∨ (p.weight = q.weight ∧ p.leftWeight < q.leftWeight)
+  -- These form a lexicographic contradiction
+  rcases h₁ with hlt₁ | ⟨heq₁, hlt₁'⟩
+  · rcases h₂ with hlt₂ | ⟨heq₂, hlt₂'⟩
+    · exact Nat.lt_asymm hlt₁ hlt₂
+    · exact Nat.ne_of_lt hlt₁ heq₂.symm
+  · rcases h₂ with hlt₂ | ⟨heq₂, hlt₂'⟩
+    · exact Nat.ne_of_lt hlt₂ heq₁.symm
+    · exact Nat.lt_asymm hlt₁' hlt₂'
+
 end Expr
 end ComputationalPaths.Path.Rewrite.GroupoidTRS

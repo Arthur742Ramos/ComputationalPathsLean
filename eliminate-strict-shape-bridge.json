@@ -1,0 +1,104 @@
+{
+  "task": "MISSION: Eliminate strict-shape-bridge \u2014 the FINAL axiom\n\n## THE PROBLEM\n`strict-shape-bridge` connects ANY two parallel 2-cells with NO precondition. This is UIP in disguise:\n```lean\n| strict-shape-bridge (d\u2081 d\u2082 : Derivation\u2082 p q) : MetaStep\u2083 d\u2081 d\u2082\n```\n\n## CURRENT USES (must all be eliminated)\n1. Lines 911, 921, 936, 943, 963, 968: bridging `.refl q` to `derivation\u2082_of_stepstar (StepStar.refl q)` or `rest` to `derivation\u2082_of_stepstar st`\n2. Lines 928, 955, 975: fallback when `derivation_to_stepstar?` returns `none` (inverse steps)\n3. Line 977: catch-all case for unhandled patterns (cons_inv \u00d7 cons_inv, mixed forward/inverse)\n4. Line 982: `connect_normalized` blanket use\n\n## KEY INSIGHT: derivation\u2082_of_stepstar IS THE IDENTITY\nLook at `derivation\u2082_of_stepstar (StepStar.refl q)` - this is literally `.refl q`.\nThe bridge from `.refl q` to `.refl q` should be `.refl`, not `strict-shape-bridge`.\n\nFor non-refl cases:\n- `StepStar.single s` \u2192 `.step s`\n- `StepStar.tail st t` \u2192 `.vcomp (derivation\u2082_of_stepstar st) (.step t)`\n\nSo `derivation_to_stepstar?` extracts a `StepStar` from a forward-only derivation, and `derivation\u2082_of_stepstar` converts it back. These should be DEFINITIONALLY equal for forward-only derivations!\n\n## STRATEGY\n\n### Step 1: Prove that derivation\u2082_of_stepstar inverts derivation_to_stepstar?\nAdd a theorem:\n```lean\ntheorem derivation_of_stepstar_roundtrip {p q : Path a b} (d : Derivation\u2082 p q) (st : StepStar p q)\n    (h : derivation_to_stepstar? d = some st) : derivation\u2082_of_stepstar st = d := by\n  -- Induction on derivation structure\n  sorry\n```\n\nIf this is true (or true up to groupoid coherence), then the bridge is trivial (.refl or structural coherence).\n\n### Step 2: Handle the inverse cases\nFor `cons_inv \u00d7 cons_inv`:\n```lean\n| .vcomp (.inv (.step s\u2081)) rest\u2081, .vcomp (.inv (.step s\u2082)) rest\u2082 =>\n    -- Use whisker_inv\u2083 + recursion\n```\n\n### Step 3: Mixed forward/inverse cases\nThese may require analyzing whether they can have the same endpoints. If not, eliminate them.\n\n## ALLOWED CONSTRUCTORS ONLY:\n- step_eq, diamond_filler, whisker_inv\u2083\n- groupoid coherences (pentagon, triangle, interchange, vcomp_assoc, vcomp_refl_left/right, inv_inv)\n- whiskering (whisker_left\u2083, whisker_right\u2083, vcomp_congr\u2083_left/right)\n- identity (.refl)\n\nNO strict-shape-bridge. NO rweq_transport. Build must pass with zero sorry.\n\nThis may require weeks of mathematical work. DO NOT GIVE UP. Iterate until complete.",
+  "steps": [
+    {
+      "number": 1,
+      "description": "Audit and classify every `strict-shape-bridge` use (`rg -n \"strict-shape-bridge|derivation_to_stepstar\\\\?|connect_normalized\"`), tagging each as refl-bridge, `none` fallback, inverse/inverse, mixed, or catch-all; verify the list matches the 10 cited lines.",
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "tokens_used": 0,
+      "skip_condition": null,
+      "depends_on": null
+    },
+    {
+      "number": 2,
+      "description": "Add helper lemmas for forward-only derivations, starting with `derivation_to_stepstar? (derivation\u2082_of_stepstar st) = some st` by induction on `st`; verify with `#check` and local `simp` tests in the target file.",
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "tokens_used": 0,
+      "skip_condition": null,
+      "depends_on": null
+    },
+    {
+      "number": 3,
+      "description": "Prove `derivation_of_stepstar_roundtrip` (or a coherence-equivalent version if definitional equality is insufficient) by induction on `d` plus case analysis on `h : derivation_to_stepstar? d = some st`; verify the theorem closes without `sorry`.",
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "tokens_used": 0,
+      "skip_condition": null,
+      "depends_on": null
+    },
+    {
+      "number": 4,
+      "description": "Replace the six refl/forward bridge sites (911, 921, 936, 943, 963, 968) with `.refl`/`rfl`/`simpa` via the roundtrip lemmas and existing associativity/unit coherences; verify those branches no longer mention `strict-shape-bridge`.",
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "tokens_used": 0,
+      "skip_condition": null,
+      "depends_on": null
+    },
+    {
+      "number": 5,
+      "description": "Replace the three `none` fallbacks (928, 955, 975) with explicit inverse-aware constructions, including the `cons_inv \u00d7 cons_inv` branch via `whisker_inv\u2083` + recursion + allowed coherence constructors; verify each branch is total and typed.",
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "tokens_used": 0,
+      "skip_condition": null,
+      "depends_on": null
+    },
+    {
+      "number": 6,
+      "description": "Eliminate mixed forward/inverse catch-all behavior by proving either endpoint impossibility lemmas or explicit coherence derivations for each remaining mixed pattern; verify no wildcard branch needs an axiom-like connector.",
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "tokens_used": 0,
+      "skip_condition": null,
+      "depends_on": null
+    },
+    {
+      "number": 7,
+      "description": "Rewrite `connect_normalized` (line 982 use) to be fully structural over handled constructors (`step_eq`, `diamond_filler`, whiskering, groupoid coherences, `.refl`) and remove the line-977 catch-all; verify pattern matching is exhaustive.",
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "tokens_used": 0,
+      "skip_condition": null,
+      "depends_on": null
+    },
+    {
+      "number": 8,
+      "description": "Delete `strict-shape-bridge` from `MetaStep\u2083`, fix resulting compile errors minimally, then verify completion with `rg -n \"strict-shape-bridge\"` (no hits), `rg -n \"\\\\bsorry\\\\b|^axiom \"` (no new hits), `lake build ComputationalPaths.Path...<target module>`, and final `lake build`.",
+      "status": "pending",
+      "result": null,
+      "error": null,
+      "started_at": null,
+      "completed_at": null,
+      "tokens_used": 0,
+      "skip_condition": null,
+      "depends_on": null
+    }
+  ],
+  "created_at": "2026-02-23T18:52:48.185394",
+  "completed_at": null,
+  "total_tokens": 0
+}

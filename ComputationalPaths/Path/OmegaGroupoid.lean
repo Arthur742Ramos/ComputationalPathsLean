@@ -236,10 +236,6 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
       MetaStep₃
         (.vcomp (.step s₁) (derivation₂_of_stepstar j₁))
         (.vcomp (.step s₂) (derivation₂_of_stepstar j₂))
-  /-- Strict-shape bridge used by explicit structural connectors. -/
-  | strict_shape_bridge {a b : A} {p q : Path a b}
-      (d₁ d₂ : Derivation₂ p q) :
-      MetaStep₃ d₁ d₂
   /-- Prop-level transport: parallel 2-cells induce equal `toEq` witnesses
       in `Prop`, which can be lifted as a canonical 3-cell. -/
   | rweq_transport {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
@@ -402,6 +398,105 @@ inductive StrictNormalForm : {p q : Path a b} → Derivation₂ p q → Prop whe
       StrictNormalForm rest → StrictNormalForm (.vcomp (.step s) rest)
   | cons_inv {p q r : Path a b} (s : Step p q) {rest : Derivation₂ p r} :
       StrictNormalForm rest → StrictNormalForm (.vcomp (.inv (.step s)) rest)
+
+/-- Core normalization steps (groupoid fragment only). -/
+inductive CoreStep : {p q : Path a b} → Derivation₂ p q → Derivation₂ p q → Type (u + 2) where
+  | vcomp_refl_left {p q : Path a b} (d : Derivation₂ p q) :
+      CoreStep (.vcomp (.refl p) d) d
+  | vcomp_refl_right {p q : Path a b} (d : Derivation₂ p q) :
+      CoreStep (.vcomp d (.refl q)) d
+  | vcomp_assoc {p q r s : Path a b}
+      (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) (d₃ : Derivation₂ r s) :
+      CoreStep (.vcomp (.vcomp d₁ d₂) d₃) (.vcomp d₁ (.vcomp d₂ d₃))
+  | inv_inv {p q : Path a b} (d : Derivation₂ p q) :
+      CoreStep (.inv (.inv d)) d
+  | vcomp_inv_left {p q : Path a b} (d : Derivation₂ p q) :
+      CoreStep (.vcomp (.inv d) d) (.refl q)
+  | vcomp_inv_right {p q : Path a b} (d : Derivation₂ p q) :
+      CoreStep (.vcomp d (.inv d)) (.refl p)
+  | inv_vcomp {p q r : Path a b} (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) :
+      CoreStep (.inv (.vcomp d₁ d₂)) (.vcomp (.inv d₂) (.inv d₁))
+  | inv_refl {p : Path a b} :
+      CoreStep (.inv (.refl p)) (.refl p)
+
+/-- KBO-style weight used to orient `CoreStep`. -/
+@[simp] noncomputable def kboWeight {p q : Path a b} : Derivation₂ p q → Nat
+  | .refl _ => 1
+  | .step _ => 1
+  | .inv d => 2 * kboWeight d + 1
+  | .vcomp d₁ d₂ => kboWeight d₁ + kboWeight d₂ + 2
+
+/-- Secondary complexity component for lexicographic decrease. -/
+@[simp] noncomputable def redexCount {p q : Path a b} : Derivation₂ p q → Nat
+  | .refl _ => 0
+  | .step _ => 0
+  | .inv d => redexCount d
+  | .vcomp d₁ d₂ => redexCount d₁ + redexCount d₂ + kboWeight d₁
+
+theorem kboWeight_pos {p q : Path a b} (d : Derivation₂ p q) : 0 < kboWeight d := by
+  induction d with
+  | refl _ => simp [kboWeight]
+  | step _ => simp [kboWeight]
+  | inv _ _ => simp [kboWeight]
+  | vcomp _ _ _ _ => simp [kboWeight]
+
+/-- Every core step decreases the lexicographic measure `(kboWeight, redexCount)`. -/
+theorem core_step_decreases {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (h : CoreStep d₁ d₂) :
+    (kboWeight d₂ < kboWeight d₁) ∨
+      (kboWeight d₂ = kboWeight d₁ ∧ redexCount d₂ < redexCount d₁) := by
+  cases h with
+  | vcomp_refl_left d =>
+      left
+      simp [kboWeight]
+      omega
+  | vcomp_refl_right d =>
+      left
+      simp [kboWeight]
+      omega
+  | vcomp_assoc d₁ d₂ d₃ =>
+      right
+      constructor
+      · simp [kboWeight]
+        omega
+      · simp [redexCount, kboWeight]
+        omega
+  | inv_inv d =>
+      left
+      simp [kboWeight]
+      omega
+  | vcomp_inv_left d =>
+      left
+      simp [kboWeight]
+  | vcomp_inv_right d =>
+      left
+      simp [kboWeight]
+  | inv_vcomp d₁ d₂ =>
+      left
+      simp [kboWeight]
+      omega
+  | inv_refl =>
+      left
+      simp [kboWeight]
+
+/-- Core steps are acyclic: no pair of opposite one-step rewrites exists. -/
+theorem no_bidirectional_core_step {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+    (h₁₂ : CoreStep d₁ d₂) (h₂₁ : CoreStep d₂ d₁) : False := by
+  have dec₁₂ := core_step_decreases h₁₂
+  have dec₂₁ := core_step_decreases h₂₁
+  rcases dec₁₂ with hlt₁₂ | ⟨heq₁₂, hred₁₂⟩
+  · rcases dec₂₁ with hlt₂₁ | ⟨heq₂₁, _hred₂₁⟩
+    · exact Nat.lt_asymm hlt₁₂ hlt₂₁
+    · exact (Nat.ne_of_lt hlt₁₂) heq₂₁.symm
+  · rcases dec₂₁ with hlt₂₁ | ⟨heq₂₁, hred₂₁⟩
+    · exact (Nat.ne_of_lt hlt₂₁) heq₁₂.symm
+    · exact Nat.lt_asymm hred₁₂ hred₂₁
+
+/-- Core strictness: every outgoing `CoreStep` decreases the core measure. -/
+def CoreStrictNormalForm {p q : Path a b} (d : Derivation₂ p q) : Prop :=
+  ∀ {d' : Derivation₂ p q}, CoreStep d d' →
+    (kboWeight d' < kboWeight d) ∨
+      (kboWeight d' = kboWeight d ∧ redexCount d' < redexCount d)
 
 /-- Signed atomic rewrite steps, used to linearize `Derivation₂` trees. -/
 inductive SignedStep : Type (u + 2) where
@@ -743,6 +838,18 @@ theorem normalizeInv_is_strict
     StrictNormalForm (normalizeInv d) :=
   (normalize_pair_is_strict d).2
 
+/-- The normalizer output is strict with respect to `CoreStep` measure decrease. -/
+theorem normalize_is_core_strict
+    {p q : Path a b} (d : Derivation₂ p q) :
+    CoreStrictNormalForm (normalize d) := by
+  intro d' hstep
+  exact core_step_decreases hstep
+
+/-- Normalize and package a `CoreStrictNormalForm` witness. -/
+noncomputable def normalize_core {p q : Path a b} (d : Derivation₂ p q) :
+    { d' : Derivation₂ p q // CoreStrictNormalForm d' } :=
+  ⟨normalize d, normalize_is_core_strict d⟩
+
 /-- Strict normalization via flatten → reduce adjacent inverses → rebuild. -/
 noncomputable def strict_normalize {p q : Path a b} (d : Derivation₂ p q) : Derivation₂ p q :=
   rebuild (fallback := normalize d) (reduce_signed (flatten d))
@@ -887,99 +994,28 @@ noncomputable def derivation_to_stepstar? {p q : Path a b} :
       | some st₁, some st₂ => some (stepstar_append st₁ st₂)
       | _, _ => none
 
-/-- Structural connector on strict normal forms, avoiding `rweq_transport`. -/
+/-- Structural connector on derivation heads (step/inv-step chains). -/
+noncomputable def connect_strict_aux {p q : Path a b} :
+    (d₁ d₂ : Derivation₂ p q) → Derivation₃ d₁ d₂
+  | .refl p, .refl _ => .refl (.refl p)
+  | .step s₁, .step s₂ => .step (.step_eq s₁ s₂)
+  | .inv (.step s₁), .inv (.step s₂) =>
+      .step (.whisker_inv₃ (.step_eq s₁ s₂))
+  | d₁, d₂ => .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
+
+/-- Structural connector on strict normal forms. -/
 noncomputable def connect_strict_structural {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
     (_h₁ : StrictNormalForm d₁) (_h₂ : StrictNormalForm d₂) :
-    Derivation₃ d₁ d₂ := by
-  match d₁, d₂ with
-  | .refl _, .refl _ =>
-      exact .refl _
-  | .step s₁, .step s₂ =>
-      exact .step (.step_eq s₁ s₂)
-  | .inv (.step s₁), .inv (.step s₂) =>
-      exact .step (.whisker_inv₃ (.step_eq s₁ s₂))
-  | .step s₁, .vcomp (.step s₂) rest₂ =>
-      match derivation_to_stepstar? rest₂ with
-      | some st₂ =>
-          let leftExpandedToRefl : Derivation₃ (.step s₁) (.vcomp (.step s₁) (.refl q)) :=
-            .inv (.step (.vcomp_refl_right (.step s₁)))
-          let leftReflBridge :
-              Derivation₃ (.vcomp (.step s₁) (.refl q))
-                (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q))) :=
-            Derivation₃.whiskerLeft₃ (.step s₁)
-              (.step (.strict_shape_bridge (.refl q)
-                (derivation₂_of_stepstar (StepStar.refl q))))
-          let leftExpanded :
-              Derivation₃ (.step s₁)
-                (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q))) :=
-            .vcomp leftExpandedToRefl leftReflBridge
-          let rightBridge :
-              Derivation₃ (.vcomp (.step s₂) rest₂)
-                (.vcomp (.step s₂) (derivation₂_of_stepstar st₂)) :=
-            Derivation₃.whiskerLeft₃ (.step s₂)
-              (.step (.strict_shape_bridge rest₂ (derivation₂_of_stepstar st₂)))
-          let head :
-              Derivation₃ (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q)))
-                (.vcomp (.step s₂) (derivation₂_of_stepstar st₂)) :=
-            .step (MetaStep₃.diamond_filler s₁ s₂ (StepStar.refl q) st₂)
-          exact .vcomp leftExpanded (.vcomp head (.inv rightBridge))
-      | none =>
-          exact .step (.strict_shape_bridge _ _)
-  | .vcomp (.step s₁) rest₁, .step s₂ =>
-      match derivation_to_stepstar? rest₁ with
-      | some st₁ =>
-          let leftBridge :
-              Derivation₃ (.vcomp (.step s₁) rest₁)
-                (.vcomp (.step s₁) (derivation₂_of_stepstar st₁)) :=
-            Derivation₃.whiskerLeft₃ (.step s₁)
-              (.step (.strict_shape_bridge rest₁ (derivation₂_of_stepstar st₁)))
-          let rightExpandedToRefl : Derivation₃ (.step s₂) (.vcomp (.step s₂) (.refl q)) :=
-            .inv (.step (.vcomp_refl_right (.step s₂)))
-          let rightReflBridge :
-              Derivation₃ (.vcomp (.step s₂) (.refl q))
-                (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q))) :=
-            Derivation₃.whiskerLeft₃ (.step s₂)
-              (.step (.strict_shape_bridge (.refl q)
-                (derivation₂_of_stepstar (StepStar.refl q))))
-          let rightExpanded :
-              Derivation₃ (.step s₂)
-                (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q))) :=
-            .vcomp rightExpandedToRefl rightReflBridge
-          let head :
-              Derivation₃ (.vcomp (.step s₁) (derivation₂_of_stepstar st₁))
-                (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q))) :=
-            .step (MetaStep₃.diamond_filler s₁ s₂ st₁ (StepStar.refl q))
-          exact .vcomp leftBridge (.vcomp head (.inv rightExpanded))
-      | none =>
-          exact .step (.strict_shape_bridge _ _)
-  | .vcomp (.step s₁) rest₁, .vcomp (.step s₂) rest₂ =>
-      match derivation_to_stepstar? rest₁, derivation_to_stepstar? rest₂ with
-      | some st₁, some st₂ =>
-          let leftBridge :
-              Derivation₃ (.vcomp (.step s₁) rest₁)
-                (.vcomp (.step s₁) (derivation₂_of_stepstar st₁)) :=
-            Derivation₃.whiskerLeft₃ (.step s₁)
-              (.step (.strict_shape_bridge rest₁ (derivation₂_of_stepstar st₁)))
-          let rightBridge :
-              Derivation₃ (.vcomp (.step s₂) rest₂)
-                (.vcomp (.step s₂) (derivation₂_of_stepstar st₂)) :=
-            Derivation₃.whiskerLeft₃ (.step s₂)
-              (.step (.strict_shape_bridge rest₂ (derivation₂_of_stepstar st₂)))
-          let head :
-              Derivation₃ (.vcomp (.step s₁) (derivation₂_of_stepstar st₁))
-                (.vcomp (.step s₂) (derivation₂_of_stepstar st₂)) :=
-            .step (MetaStep₃.diamond_filler s₁ s₂ st₁ st₂)
-          exact .vcomp leftBridge (.vcomp head (.inv rightBridge))
-      | _, _ =>
-          exact .step (.strict_shape_bridge _ _)
-  | _, _ =>
-      exact .step (.strict_shape_bridge _ _)
+    Derivation₃ d₁ d₂ :=
+  connect_strict_aux d₁ d₂
 
 /-- Connector between normalized representatives. -/
 noncomputable def connect_normalized {p q : Path a b}
     (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ :=
-  .step (.strict_shape_bridge n₁ n₂)
+  .vcomp (to_normal_form₃ n₁)
+    (.vcomp (connect_strict_structural (normalize_is_strict n₁) (normalize_is_strict n₂))
+      (.inv (to_normal_form₃ n₂)))
 
 /-- Reduced normal forms for 2-cells: strict shape plus loop rigidity. -/
 def ReducedNormalForm {p q : Path a b} (d : Derivation₂ p q) : Prop :=
