@@ -225,12 +225,18 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   different "reasons" for the same rewrite step. -/
   | step_eq {a b : A} {p q : Path a b} (s₁ s₂ : Step p q) :
       MetaStep₃ (.step s₁) (.step s₂)
-  /-- Squier-style diamond filler for local peaks in the rewrite graph. -/
-  | diamond_filler {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      {p₀ q₀ r₀ m₀ : Path a b}
-      (s₁ : Step p₀ q₀) (s₂ : Step p₀ r₀)
-      (j₁ : StepStar q₀ m₀) (j₂ : StepStar r₀ m₀) :
+  /-- Proof-irrelevance coherence for arbitrary parallel 2-cells. -/
+  | proof_irrel {a b : A} {p q : Path a b}
+      (d₁ d₂ : Derivation₂ p q)
+      (h : rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq) :
       MetaStep₃ d₁ d₂
+  /-- Squier-style diamond filler for local peaks in the rewrite graph. -/
+  | diamond_filler {a b : A} {p q r m : Path a b}
+      (s₁ : Step p q) (s₂ : Step p r)
+      (j₁ : StepStar q m) (j₂ : StepStar r m) :
+      MetaStep₃
+        (.vcomp (.step s₁) (derivation₂_of_stepstar j₁))
+        (.vcomp (.step s₂) (derivation₂_of_stepstar j₂))
   -- Pentagon coherence
   | pentagon {a b c d e : A} (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
       MetaStep₃
@@ -318,8 +324,7 @@ variable {a b : A}
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell. -/
 noncomputable def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .step (.diamond_filler (Step.trans_refl_right p) (Step.trans_refl_right p)
-    (StepStar.refl p) (StepStar.refl p))
+  .step (.proof_irrel d₁ d₂ (Subsingleton.elim _ _))
 
 /-- **Loop contraction**: Any loop derivation `d : Derivation₂ p p` contracts to `refl p`.
 
@@ -372,10 +377,20 @@ inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivati
   | step_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       (s₁ s₂ : MetaStep₃ d₁ d₂) :
       MetaStep₄ (.step s₁) (.step s₂)
-  /-- Diamond filler connecting any two parallel 3-cells at level 4. -/
-  | diamond_filler {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      {m₁ m₂ : Derivation₃ d₁ d₂} :
+  /-- Proof-irrelevance coherence for arbitrary parallel 3-cells. -/
+  | proof_irrel {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      (m₁ m₂ : Derivation₃ d₁ d₂)
+      (h : Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
+        Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂) :
       MetaStep₄ m₁ m₂
+  /-- Squier-style diamond filler for local peaks in the level-3 rewrite graph. -/
+  | diamond_filler {a b : A} {p q : Path a b}
+      {d₀ d₁ d₂ d₃ : Derivation₂ p q}
+      (s₁ : MetaStep₃ d₀ d₁) (s₂ : MetaStep₃ d₀ d₂)
+      (j₁ : Derivation₃ d₁ d₃) (j₂ : Derivation₃ d₂ d₃) :
+      MetaStep₄
+        (.vcomp (.step s₁) j₁)
+        (.vcomp (.step s₂) j₂)
   -- Whiskering at level 4 (functoriality of vcomp)
   | whisker_left₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
       (c : Derivation₃ d₃ d₁) {m₁ m₂ : Derivation₃ d₁ d₂} (s : MetaStep₄ m₁ m₂) :
@@ -439,7 +454,7 @@ end Derivation₄
 /-- Contractibility at Level 4: any two parallel 3-cells are connected by a 4-cell. -/
 noncomputable def contractibility₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     (m₁ m₂ : Derivation₃ d₁ d₂) : Derivation₄ m₁ m₂ :=
-  .step .diamond_filler
+  .step (.proof_irrel m₁ m₂ (Subsingleton.elim _ _))
 
 /-- Loop contraction at level 4: Any loop m : Derivation₃ d d contracts to .refl d. -/
 noncomputable def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂ p q}
@@ -484,10 +499,21 @@ inductive MetaStepHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
   | step_eq {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ : Derivation₃ d₁ d₂} (s₁ s₂ : MetaStep₄ m₁ m₂) :
       MetaStepHigh n (.step s₁) (.step s₂)
-  /-- Diamond filler connecting any two parallel 4-cells at level 5+. -/
-  | diamond_filler {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      {m₁ m₂ : Derivation₃ d₁ d₂} {c₁ c₂ : Derivation₄ m₁ m₂} :
+  /-- Proof-irrelevance coherence for arbitrary parallel 4-cells. -/
+  | proof_irrel {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      {m₁ m₂ : Derivation₃ d₁ d₂}
+      (c₁ c₂ : Derivation₄ m₁ m₂)
+      (h : Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) c₁ =
+        Derivation₄.toRwEqEq (d₁ := d₁) (d₂ := d₂) c₂) :
       MetaStepHigh n c₁ c₂
+  /-- Squier-style diamond filler for local peaks in the level-4 rewrite graph. -/
+  | diamond_filler {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      {m₀ m₁ m₂ m₃ : Derivation₃ d₁ d₂}
+      (s₁ : MetaStep₄ m₀ m₁) (s₂ : MetaStep₄ m₀ m₂)
+      (j₁ : Derivation₄ m₁ m₃) (j₂ : Derivation₄ m₂ m₃) :
+      MetaStepHigh n
+        (.vcomp (.step s₁) j₁)
+        (.vcomp (.step s₂) j₂)
   -- Whiskering at level 5+ (functoriality of vcomp)
   | whisker_left {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ m₃ : Derivation₃ d₁ d₂} (c : Derivation₄ m₃ m₁)
@@ -546,7 +572,7 @@ end DerivationHigh
 noncomputable def contractibilityHigh {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (n : Nat)
     (c₁ c₂ : Derivation₄ m₁ m₂) : DerivationHigh n c₁ c₂ :=
-  .step .diamond_filler
+  .step (.proof_irrel c₁ c₂ (Subsingleton.elim _ _))
 
 /-- Loop contraction at level 5+: Any loop c : Derivation₄ m m contracts to .refl m. -/
 noncomputable def loop_contract_high {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
