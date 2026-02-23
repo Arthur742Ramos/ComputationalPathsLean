@@ -1061,6 +1061,36 @@ theorem Step.Joinable.symm {A : Type u} {a b : A} {p q : Path a b} :
   rcases h with ⟨r, hp, hq⟩
   exact ⟨r, hq, hp⟩
 
+/-- Type-level local-confluence payload carrying explicit `StepStar` witnesses. -/
+structure Step.JoinableData {A : Type u} {a b : A} (p q : Path a b) : Type (u + 1) where
+  meet : Path a b
+  left : StepStar p meet
+  right : StepStar q meet
+
+/-- Extract type-level join data from a Prop-level joinability proof. -/
+noncomputable def Step.Joinable.toData {A : Type u} {a b : A} {p q : Path a b} :
+    Step.Joinable p q → Step.JoinableData p q := by
+  classical
+  intro h
+  have hs : Nonempty (Step.JoinableData p q) := by
+    cases h with
+    | intro r hp hq =>
+        exact ⟨⟨r, hp, hq⟩⟩
+  exact Classical.choice hs
+
+/-- Forget type-level join data to recover Prop-level joinability. -/
+theorem Step.Joinable.ofData {A : Type u} {a b : A} {p q : Path a b} :
+    Step.JoinableData p q → Step.Joinable p q := by
+  intro h
+  exact ⟨h.meet, h.left, h.right⟩
+
+/-- Local-confluence oracle with explicit witness payload, given a joinability proof. -/
+noncomputable def Step.local_confluence_data
+    {A : Type u} {a b : A} {p q r : Path a b}
+    (_s₁ : Step p q) (_s₂ : Step p r)
+    (h : Step.Joinable q r) : Step.JoinableData q r :=
+  Step.Joinable.toData h
+
 /-- Determinism up to `toEq`: any two one-step reducts have equal semantic proof. -/
 theorem Step.deterministic {A : Type u} {a b : A} {p q r : Path a b}
     (hq : Step p q) (hr : Step p r) :

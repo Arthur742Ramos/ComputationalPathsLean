@@ -284,6 +284,30 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
       {d₁ d₂ : Derivation₂ p q} (s : MetaStep₃ d₁ d₂) :
       MetaStep₃ (.inv d₁) (.inv d₂)
 
+/-- Build a level-3 diamond filler from explicit local-confluence witness data. -/
+noncomputable def meta_diamond_from_data
+    {a b : A} {p q r : Path a b}
+    (s₁ : Step p q) (s₂ : Step p r)
+    (j : Step.JoinableData q r) :
+    MetaStep₃
+      (.vcomp (.step s₁) (derivation₂_of_stepstar j.left))
+      (.vcomp (.step s₂) (derivation₂_of_stepstar j.right)) :=
+  MetaStep₃.diamond_filler s₁ s₂ j.left j.right
+
+/-- Build a level-3 diamond filler from Prop-level joinability by extracting
+explicit `StepStar` witnesses. -/
+noncomputable def meta_diamond_from_joinable
+    {a b : A} {p q r : Path a b}
+    (s₁ : Step p q) (s₂ : Step p r)
+    (h : Step.Joinable q r) :
+    MetaStep₃
+      (.vcomp (.step s₁)
+        (derivation₂_of_stepstar (Step.local_confluence_data s₁ s₂ h).left))
+      (.vcomp (.step s₂)
+        (derivation₂_of_stepstar (Step.local_confluence_data s₁ s₂ h).right)) := by
+  let j := Step.local_confluence_data s₁ s₂ h
+  exact MetaStep₃.diamond_filler s₁ s₂ j.left j.right
+
 /-- 3-cells: Meta-derivations between 2-cells -/
 inductive Derivation₃ {a b : A} {p q : Path a b} :
     Derivation₂ p q → Derivation₂ p q → Type (u + 2) where

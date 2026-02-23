@@ -1,4 +1,5 @@
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.Step
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.Rw
 namespace ComputationalPaths.Path.Rewriting
@@ -823,5 +824,184 @@ theorem all_critical_pairs_joinable :
     ∀ c ∈ allCriticalPairs, c.Statement := by
   intro c _
   exact local_confluence_on_critical_pair c
+
+/-- Convert a Prop-level `Rw` chain into a type-level `StepStar` witness. -/
+noncomputable def stepstar_of_rw {A : Type u} {a b : A} {p q : Path a b}
+    (h : Rw p q) : StepStar p q := by
+  classical
+  have hs : Nonempty (StepStar p q) := by
+    induction h with
+    | refl =>
+        exact ⟨StepStar.refl p⟩
+    | tail _ step ih =>
+        rcases ih with ⟨hq⟩
+        exact ⟨StepStar.tail hq step⟩
+  exact Classical.choice hs
+
+/-- Convert `JoinableRw` into explicit type-level join witnesses. -/
+noncomputable def joinable_rw_to_data {A : Type u} {a b : A} {p q : Path a b}
+    (h : JoinableRw p q) : ComputationalPaths.Path.Step.JoinableData p q := by
+  classical
+  have hs : Nonempty (ComputationalPaths.Path.Step.JoinableData p q) := by
+    rcases h with ⟨r, hp, hq⟩
+    exact ⟨⟨r, stepstar_of_rw hp, stepstar_of_rw hq⟩⟩
+  exact Classical.choice hs
+
+noncomputable def critical_pair_trans_assoc_trans_refl_left_data
+    {A : Type u} {a b c : A} (p : Path a b) (r : Path b c) :=
+  joinable_rw_to_data (critical_pair_trans_assoc_trans_refl_left_joinable (A := A) p r)
+
+noncomputable def critical_pair_trans_assoc_trans_refl_right_data
+    {A : Type u} {a b c : A} (p : Path a b) (r : Path b c) :=
+  joinable_rw_to_data (critical_pair_trans_assoc_trans_refl_right_joinable (A := A) p r)
+
+noncomputable def critical_pair_trans_assoc_trans_symm_data
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path a c) :=
+  joinable_rw_to_data (critical_pair_trans_assoc_trans_symm_joinable (A := A) p q)
+
+noncomputable def critical_pair_trans_assoc_symm_trans_data
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :=
+  joinable_rw_to_data (critical_pair_trans_assoc_symm_trans_joinable (A := A) p q)
+
+noncomputable def critical_pair_trans_assoc_trans_assoc_data
+    {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :=
+  joinable_rw_to_data (critical_pair_trans_assoc_trans_assoc_joinable (A := A) p q r s)
+
+noncomputable def critical_pair_symm_congr_symm_symm_data
+    {A : Type u} {a b : A} {p p' : Path a b}
+    (hp : Step p p') :=
+  joinable_rw_to_data (critical_pair_symm_congr_symm_symm_joinable (A := A) hp)
+
+noncomputable def critical_pair_symm_congr_symm_trans_congr_left_data
+    {A : Type u} {a b c : A}
+    {p p' : Path a b} {q : Path b c}
+    (hp : Step p p') :=
+  joinable_rw_to_data
+    (critical_pair_symm_congr_symm_trans_congr_left_joinable (A := A) (q := q) hp)
+
+noncomputable def critical_pair_symm_congr_symm_trans_congr_right_data
+    {A : Type u} {a b c : A}
+    {p : Path a b} {q q' : Path b c}
+    (hq : Step q q') :=
+  joinable_rw_to_data
+    (critical_pair_symm_congr_symm_trans_congr_right_joinable (A := A) (p := p) hq)
+
+noncomputable def critical_pair_trans_congr_left_right_data
+    {A : Type u} {a b c : A}
+    {p p' : Path a b} {q q' : Path b c}
+    (hp : Step p p') (hq : Step q q') :=
+  joinable_rw_to_data (critical_pair_trans_congr_left_right_joinable (A := A) hp hq)
+
+noncomputable def critical_pair_trans_congr_left_trans_assoc_data
+    {A : Type u} {a b c d : A}
+    {p p' : Path a b} {q : Path b c} {r : Path c d}
+    (hp : Step p p') :=
+  joinable_rw_to_data
+    (critical_pair_trans_congr_left_trans_assoc_joinable (A := A) (q := q) (r := r) hp)
+
+noncomputable def critical_pair_trans_congr_right_trans_assoc_data
+    {A : Type u} {a b c d : A}
+    {p : Path a b} {q q' : Path b c} {r : Path c d}
+    (hq : Step q q') :=
+  joinable_rw_to_data
+    (critical_pair_trans_congr_right_trans_assoc_joinable (A := A) (p := p) (r := r) hq)
+
+noncomputable def critical_pair_trans_assoc_trans_refl_inner_right_data
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :=
+  joinable_rw_to_data (critical_pair_trans_assoc_trans_refl_inner_right_joinable (A := A) p q)
+
+noncomputable def critical_pair_symm_symm_symm_refl_data
+    {A : Type u} (a : A) :=
+  joinable_rw_to_data (critical_pair_symm_symm_symm_refl_joinable (A := A) a)
+
+noncomputable def critical_pair_symm_symm_symm_trans_congr_data
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :=
+  joinable_rw_to_data (critical_pair_symm_symm_symm_trans_congr_joinable (A := A) p q)
+
+noncomputable def critical_pair_symm_trans_congr_trans_refl_left_data
+    {A : Type u} {a b : A} (p : Path a b) :=
+  joinable_rw_to_data (critical_pair_symm_trans_congr_trans_refl_left_joinable (A := A) p)
+
+noncomputable def critical_pair_symm_trans_congr_trans_refl_right_data
+    {A : Type u} {a b : A} (p : Path a b) :=
+  joinable_rw_to_data (critical_pair_symm_trans_congr_trans_refl_right_joinable (A := A) p)
+
+noncomputable def critical_pair_trans_cancel_left_trans_refl_left_inner_data
+    {A : Type u} {a c : A} (q : Path a c) :=
+  joinable_rw_to_data (critical_pair_trans_cancel_left_trans_refl_left_inner_joinable (A := A) q)
+
+noncomputable def critical_pair_trans_cancel_right_symm_refl_data
+    {A : Type u} {a c : A} (q : Path a c) :=
+  joinable_rw_to_data (critical_pair_trans_cancel_right_symm_refl_joinable (A := A) q)
+
+noncomputable def critical_pair_trans_assoc_trans_cancel_left_data
+    {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path a c) (r : Path c d) :=
+  joinable_rw_to_data (critical_pair_trans_assoc_trans_cancel_left_joinable (A := A) p q r)
+
+noncomputable def critical_pair_trans_assoc_trans_cancel_right_data
+    {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :=
+  joinable_rw_to_data (critical_pair_trans_assoc_trans_cancel_right_joinable (A := A) p q r)
+
+noncomputable def critical_pair_symm_trans_congr_symm_symm_left_data
+    {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :=
+  joinable_rw_to_data (critical_pair_symm_trans_congr_symm_symm_left_joinable (A := A) p q)
+
+noncomputable def critical_pair_symm_trans_congr_symm_symm_right_data
+    {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :=
+  joinable_rw_to_data (critical_pair_symm_trans_congr_symm_symm_right_joinable (A := A) p q)
+
+noncomputable def critical_pair_trans_cancel_left_trans_refl_right_data
+    {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path a c) :=
+  joinable_rw_to_data (critical_pair_trans_cancel_left_trans_refl_right_joinable (A := A) p q)
+
+noncomputable def critical_pair_trans_cancel_right_trans_refl_right_data
+    {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :=
+  joinable_rw_to_data (critical_pair_trans_cancel_right_trans_refl_right_joinable (A := A) p q)
+
+noncomputable def critical_pair_trans_cancel_left_trans_refl_left_data
+    {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path a c) :=
+  joinable_rw_to_data (critical_pair_trans_cancel_left_trans_refl_left_joinable (A := A) p q)
+
+noncomputable def critical_pair_trans_cancel_right_trans_refl_left_data
+    {A : Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) :=
+  joinable_rw_to_data (critical_pair_trans_cancel_right_trans_refl_left_joinable (A := A) p q)
+
+noncomputable def critical_pair_trans_refl_left_trans_assoc_data
+    {A : Type u} {a b c : A} (p : Path a b) (r : Path b c) :=
+  joinable_rw_to_data (critical_pair_trans_refl_left_trans_assoc_joinable (A := A) p r)
+
+noncomputable def critical_pair_trans_refl_right_trans_assoc_data
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :=
+  joinable_rw_to_data (critical_pair_trans_refl_right_trans_assoc_joinable (A := A) p q)
+
+noncomputable def critical_pair_trans_symm_trans_assoc_data
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path a c) :=
+  joinable_rw_to_data (critical_pair_trans_symm_trans_assoc_joinable (A := A) p q)
+
+noncomputable def critical_pair_symm_trans_trans_assoc_data
+    {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :=
+  joinable_rw_to_data (critical_pair_symm_trans_trans_assoc_joinable (A := A) p q)
+
+noncomputable def critical_pair_symm_congr_trans_assoc_data
+    {A : Type u} {a b c d : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) :=
+  joinable_rw_to_data (critical_pair_symm_congr_trans_assoc_joinable (A := A) p q r)
+
+noncomputable def critical_pair_symm_congr_trans_symm_data
+    {A : Type u} {a b : A} (p : Path a b) :=
+  joinable_rw_to_data (critical_pair_symm_congr_trans_symm_joinable (A := A) p)
+
+noncomputable def critical_pair_symm_congr_symm_trans_data
+    {A : Type u} {a b : A} (p : Path a b) :=
+  joinable_rw_to_data (critical_pair_symm_congr_symm_trans_joinable (A := A) p)
 
 end ComputationalPaths.Path.Rewriting
