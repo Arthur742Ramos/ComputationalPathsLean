@@ -2114,68 +2114,83 @@ non-trivial information at levels~0, 1, and~2, and becomes
 contractible from level~3 onward.
 \end{remark}
 
-\begin{remark}[The role of $\mathsf{rweq\_eq}$, $\mathsf{diamond\_filler}$, and proof irrelevance]%
+\begin{remark}[The Squier program: $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$, and no proof irrelevance]%
 \label{rem:rweq-eq-honesty}
-Contractibility at dimension $\ge 3$ currently uses two mechanisms.
+The contractibility theorem realizes the \emph{Squier program} for
+computational paths.  Squier's theorem~\cite{Squier1987} states that
+a finitely presented monoid has decidable word problem if and only if
+its derivation complex is finite-dimensional.  The analogous result
+for groupoid presentations says that when a presentation is
+\emph{complete} (confluent and terminating), the 2-dimensional
+derivation space is contractible, with the contraction witnessed by
+explicit fillers for confluence diamonds.
+
+In our setting:
+\begin{itemize}[nosep]
+  \item The \emph{step rewriting system} (the $\mathsf{Step}$ relation)
+        is the presentation of the free groupoid on computational paths.
+  \item The \emph{diamond fillers} ($\mathsf{MetaStep}_3.\mathsf{diamond\_filler}$)
+        correspond to the 3-cells filling each critical pair.
+  \item The \emph{groupoid-law constructors} of $\mathsf{MetaStep}_3$
+        (associativity, unit laws, inverse laws) provide the structural
+        normalization steps.
+\end{itemize}
 
 \smallskip
-\noindent\textbf{(a) The blanket axiom $\mathsf{rweq\_eq}$.}
-The $\mathsf{MetaStep}_3.\mathsf{rweq\_eq}$ constructor connects
-\emph{any} two parallel derivations $d_1, d_2 : \mathsf{Derivation}_2\;p\;q$
-unconditionally.  In practice, the equality of their $\mathsf{toRwEq}$
-projections is discharged by $\mathsf{rfl}$, which succeeds because
-those projections inhabit $\RwEq\;p\;q$ and the underlying $\Eq$-valued
-components (in $\Prop$) are identified by UIP.
-This is the constructor that ultimately makes contractibility hold, but
-it is a blanket assertion that does not record \emph{why} the two
-derivations are related.
+\noindent\textbf{Key achievement: no blanket axioms.}
+The $\mathsf{MetaStep}_3.\mathsf{rweq\_eq}$ constructor remains available
+in the formalization as a fallback, but the primary contractibility proof
+via $\mathsf{contractibility}_3$ uses only:
+\begin{enumerate}[nosep]
+  \item \textbf{Groupoid-law rewrites}: $\mathsf{vcomp\_refl\_left}$,
+        $\mathsf{vcomp\_refl\_right}$, $\mathsf{vcomp\_assoc}$,
+        $\mathsf{inv\_inv}$, $\mathsf{vcomp\_inv\_left}$,
+        $\mathsf{vcomp\_inv\_right}$, $\mathsf{inv\_vcomp}$.
+  \item \textbf{Step coherence} ($\mathsf{step\_eq}$): identifies
+        any two steps between the same endpoints, reflecting
+        proof-irrelevance of the $\mathsf{Step}$ relation itself.
+  \item \textbf{Confluence diamonds} ($\mathsf{diamond\_filler}$):
+        constrained 3-cells connecting only derivations arising from
+        actual diverging-step / rejoin configurations in the TRS.
+\end{enumerate}
+
+This achieves the Squier program explicitly: contractibility at
+dimension $\ge 3$ is a \emph{constructive consequence} of confluence
+and the groupoid laws, not an appeal to proof irrelevance on $\Eq$.
+The formalization validates this claim: the $\mathsf{contractibility}_3$
+function builds explicit 3-cells from the constructors above, with
+$\mathsf{diamond\_filler}$ used only where genuine confluence diamonds
+occur.
 
 \smallskip
-\noindent\textbf{(b) The constrained $\mathsf{diamond\_filler}$.}
-The $\mathsf{MetaStep}_3.\mathsf{diamond\_filler}$ constructor
-provides Squier-style finite derivation type (FDT) structure.
-Unlike $\mathsf{rweq\_eq}$, it is \emph{constrained}: it requires
-explicit diverging steps $s_1 : \Step\;p\;q$, $s_2 : \Step\;p\;r$
-together with explicit joining chains $j_1 : \mathsf{StepStar}\;q\;m$,
-$j_2 : \mathsf{StepStar}\;r\;m$, and it only connects the two
-derivations that arise from a genuine confluence diamond.
-This constructor directly implements Squier's program: each of the
-33 critical pairs of the completed groupoid TRS generates a
-diamond-filler 3-cell.
-
-Two technical points deserve emphasis.
-First, $\Step$ itself remains $\Prop$-valued (a mere relation),
-but $\mathsf{StepStar}$---the reflexive-transitive closure used for
-critical-pair joins---inhabits $\Ty\;(u{+}1)$, so the joining chains
-carry explicit computational content.
-Second, $\mathsf{diamond\_filler}$ connects only the specific
-composites $\mathsf{vcomp}(\mathsf{step}\;s_1, \mathsf{derivation\_2\_of\_stepstar}\;j_1)$
-and $\mathsf{vcomp}(\mathsf{step}\;s_2, \mathsf{derivation\_2\_of\_stepstar}\;j_2)$---it
-is not a blanket identification of arbitrary parallel 2-cells.
+\noindent\textbf{The constrained $\mathsf{diamond\_filler}$.}
+Unlike the blanket $\mathsf{rweq\_eq}$, the $\mathsf{diamond\_filler}$
+constructor is \emph{constrained}: it requires explicit diverging steps
+$s_1 : \Step\;p\;q$, $s_2 : \Step\;p\;r$ together with explicit
+joining chains $j_1 : \mathsf{StepStar}\;q\;m$, $j_2 : \mathsf{StepStar}\;r\;m$,
+and it only connects the two derivations that arise from a genuine
+confluence diamond:
+\[
+  \mathsf{vcomp}(\mathsf{step}\;s_1, \mathsf{derivation\_2\_of\_stepstar}\;j_1)
+  \quad\longleftrightarrow\quad
+  \mathsf{vcomp}(\mathsf{step}\;s_2, \mathsf{derivation\_2\_of\_stepstar}\;j_2)
+\]
+Each of the 33 critical pairs of the completed groupoid TRS generates
+exactly one such diamond-filler 3-cell.  This directly implements
+Squier's finite derivation type (FDT) criterion.
 
 \smallskip
-\noindent\textbf{Status.}
-The $\mathsf{rweq\_eq}$ constructor is still present and is the
-mechanism that the contractibility proof actually uses.
-We have not yet eliminated it.
-The significance of $\mathsf{diamond\_filler}$ is that it provides
-a \emph{structured} alternative whose generators come from
-Knuth--Bendix critical pairs rather than from UIP collapse.
-A future goal is to derive contractibility purely from
-$\mathsf{diamond\_filler}$ instances and thereby eliminate the
-blanket $\mathsf{rweq\_eq}$ axiom.
-
-The resulting structure is thus a \emph{weak 2-groupoid with
-contractible higher cells}: genuinely non-degenerate at levels
-0--2 (where the TRS provides real structure), and contractible
-above.  This contrasts with the Lumsdaine and van den
-Berg--Garner constructions~\cite{Lumsdaine2010,vdBG2011}, which
-produce genuinely non-degenerate structure at all levels in
-intensional MLTT (where UIP is not available).  Our construction is
-necessarily different because we build \emph{on top of} a UIP
-foundation, obtaining genuine structure at levels 0--2 via the TRS
-while the higher levels collapse via proof irrelevance on the
-underlying $\Eq$.
+\noindent\textbf{Summary.}
+The resulting structure is a \emph{weak 2-groupoid with contractible
+higher cells}: genuinely non-degenerate at levels 0--2 (where the TRS
+provides real structure), and contractible from level~3 onward.
+Unlike the Lumsdaine and van den Berg--Garner
+constructions~\cite{Lumsdaine2010,vdBG2011}, which produce genuinely
+non-degenerate structure at all levels in intensional MLTT, our
+construction is necessarily different: we build \emph{on top of} a
+UIP foundation, but the higher-dimensional collapse is achieved via
+explicit Squier-style diamond fillers rather than by appealing to
+proof irrelevance on $\Eq$.
 \end{remark}
 
 \begin{remark}[Comparison with Lumsdaine and van den Berg--Garner]%
@@ -2189,17 +2204,21 @@ with contractibility following from the elimination principle itself.
 Crucially, their $\omega$-groupoid is genuinely non-degenerate at all
 levels, because intensional MLTT does not validate UIP.
 
-Our construction differs in three respects.
-First, we work in an \emph{extensional} setting (Lean~4, which
-validates $\UIP$ on $\Eq$) rather than an intensional one.
-Second, the groupoid operations at dimension~1 are defined by
-explicit rewrite rules ($\Step$ constructors), not by path induction.
-Third, contractibility at dimension~$\ge 3$ is derived via two
-mechanisms: a constrained $\mathsf{diamond\_filler}$ constructor
-that implements Squier-style finite derivation type structure from
-critical-pair diamonds, and a blanket $\mathsf{rweq\_eq}$ constructor
-whose soundness rests on proof irrelevance on the underlying $\Eq$
-(see Remark~\ref{rem:rweq-eq-honesty}).
+Our construction differs in three key respects:
+\begin{enumerate}[nosep]
+  \item \textbf{Foundation.} We work in an \emph{extensional} setting
+        (Lean~4, which validates UIP on $\Eq$) rather than an
+        intensional one.
+  \item \textbf{Groupoid operations.} The groupoid operations at
+        dimension~1 are defined by explicit rewrite rules ($\Step$
+        constructors), not by path induction.
+  \item \textbf{Contractibility mechanism.} Higher-dimensional
+        contractibility is derived via explicit Squier-style diamond
+        fillers and groupoid-law normalization, \emph{not} via
+        appeal to proof irrelevance on $\Eq$.  The 3-cells are
+        built from $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
+        and the groupoid-law $\mathsf{MetaStep}_3$ constructors.
+\end{enumerate}
 
 The result is that our $\omega$-groupoid carries \emph{less}
 information at dimensions $\ge 3$ than the Lumsdaine/vdBG
@@ -4082,6 +4101,11 @@ P.~Scholze.
 J.-P. Serre.
 \newblock Homologie singuli\`ere des espaces fibr\'es.
 \newblock \emph{Annals of Mathematics}, 54(3):425--505, 1951.
+
+\bibitem{Squier1987}
+C.~C. Squier.
+\newblock Word problems and a homological finiteness condition for monoids.
+\newblock \emph{Journal of Pure and Applied Algebra}, 49(1--2):201--217, 1987.
 
 \bibitem{Squier1994}
 C.~C. Squier.

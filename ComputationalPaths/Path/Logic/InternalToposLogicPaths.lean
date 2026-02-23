@@ -145,9 +145,7 @@ noncomputable def canonForall {A B : Type u} (proj : A → B) (P : A → Prop) :
 /-- 13. Path: canonical existential of True is surjective image. -/
 noncomputable def exist_true_path {A B : Type u} (proj : A → B) :
     Path (canonExist proj (fun _ => True)) (fun b => ∃ a, proj a = b) :=
-  Path.mk [] (by ext b; simp [canonExist]; constructor
-    · rintro ⟨a, h, _⟩; exact ⟨a, h⟩
-    · rintro ⟨a, h⟩; exact ⟨a, h, trivial⟩)
+  Path.mk [] (by ext b; simp [canonExist])
 
 /-- 14. Path: canonical universal of True is constant True. -/
 noncomputable def forall_true_path {A B : Type u} (proj : A → B) :
@@ -248,44 +246,44 @@ noncomputable def mbEval_or {Var : Type u} (env : Var → Bool) (a b : MBTerm Va
 /-- 24. Path: eval(¬¬a) = eval(a) for Bool. -/
 noncomputable def mbEval_dne {Var : Type u} (env : Var → Bool) (a : MBTerm Var) :
     Path (mbEval env (.not_ (.not_ a))) (mbEval env a) :=
-  Path.mk [] (by simp [mbEval]; exact Bool.not_not (mbEval env a))
+  Path.mk [] (by simp [mbEval])
 
 /-- 25. Path: eval(a ∧ true) = eval(a). -/
 noncomputable def mbEval_and_true {Var : Type u} (env : Var → Bool) (a : MBTerm Var) :
     Path (mbEval env (.and_ a .true_)) (mbEval env a) :=
-  Path.mk [] (by simp [mbEval]; exact Bool.and_true (mbEval env a))
+  Path.mk [] (by simp [mbEval])
 
 /-- 26. Path: eval(a ∨ false) = eval(a). -/
 noncomputable def mbEval_or_false {Var : Type u} (env : Var → Bool) (a : MBTerm Var) :
     Path (mbEval env (.or_ a .false_)) (mbEval env a) :=
-  Path.mk [] (by simp [mbEval]; exact Bool.or_false (mbEval env a))
+  Path.mk [] (by simp [mbEval])
 
 /-- 27. Path: eval(a → a) = true (tautology). -/
 noncomputable def mbEval_impl_refl {Var : Type u} (env : Var → Bool) (a : MBTerm Var) :
     Path (mbEval env (.impl_ a a)) true :=
-  Path.mk [] (by simp [mbEval]; cases mbEval env a <;> rfl)
+  Path.mk [] (by simp [mbEval])
 
 /-- 28. 2-step chain: eval(a ∧ a) = eval(a) via idempotency. -/
 noncomputable def mbEval_and_idem {Var : Type u} (env : Var → Bool) (a : MBTerm Var) :
     Path (mbEval env (.and_ a a)) (mbEval env a) :=
-  Path.mk [] (by simp [mbEval]; exact Bool.and_self (mbEval env a))
+  Path.mk [] (by simp [mbEval])
 
 /-- 29. 2-step chain: eval(a ∨ a) = eval(a) via idempotency. -/
 noncomputable def mbEval_or_idem {Var : Type u} (env : Var → Bool) (a : MBTerm Var) :
     Path (mbEval env (.or_ a a)) (mbEval env a) :=
-  Path.mk [] (by simp [mbEval]; exact Bool.or_self (mbEval env a))
+  Path.mk [] (by simp [mbEval])
 
 /-- 30. Path: De Morgan for eval. -/
 noncomputable def mbEval_deMorgan_and {Var : Type u} (env : Var → Bool) (a b : MBTerm Var) :
     Path (mbEval env (.not_ (.and_ a b)))
          (mbEval env (.or_ (.not_ a) (.not_ b))) :=
-  Path.mk [] (by simp [mbEval]; cases mbEval env a <;> cases mbEval env b <;> rfl)
+  Path.mk [] (by simp [mbEval])
 
 /-- 31. Path: De Morgan for eval (or). -/
 noncomputable def mbEval_deMorgan_or {Var : Type u} (env : Var → Bool) (a b : MBTerm Var) :
     Path (mbEval env (.not_ (.or_ a b)))
          (mbEval env (.and_ (.not_ a) (.not_ b))) :=
-  Path.mk [] (by simp [mbEval]; cases mbEval env a <;> cases mbEval env b <;> rfl)
+  Path.mk [] (by simp [mbEval])
 
 /-! ## §5 Internal Hom and Exponential -/
 
