@@ -268,6 +268,17 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   | whisker_right₃ {a b : A} {p q r : Path a b}
       {d₁ d₂ : Derivation₂ p q} (s : MetaStep₃ d₁ d₂) (c : Derivation₂ q r) :
       MetaStep₃ (.vcomp d₁ c) (.vcomp d₂ c)
+  | vcomp_congr₃_left {a b : A} {p q r : Path a b}
+      {d₁ d₁' : Derivation₂ p q} {e : Derivation₂ q r}
+      (s : MetaStep₃ d₁ d₁') :
+      MetaStep₃ (.vcomp d₁ e) (.vcomp d₁' e)
+  | vcomp_congr₃_right {a b : A} {p q r : Path a b}
+      {e : Derivation₂ p q} {d₂ d₂' : Derivation₂ q r}
+      (s : MetaStep₃ d₂ d₂') :
+      MetaStep₃ (.vcomp e d₂) (.vcomp e d₂')
+  | whisker_inv₃ {a b : A} {p q : Path a b}
+      {d₁ d₂ : Derivation₂ p q} (s : MetaStep₃ d₁ d₂) :
+      MetaStep₃ (.inv d₁) (.inv d₂)
 
 /-- 3-cells: Meta-derivations between 2-cells -/
 inductive Derivation₃ {a b : A} {p q : Path a b} :
@@ -298,7 +309,7 @@ noncomputable def whiskerLeft₃ {a b : A} {p q r : Path a b} (c : Derivation₂
     Derivation₃ (Derivation₂.vcomp c d₁) (Derivation₂.vcomp c d₂) :=
   match α with
   | .refl _ => .refl _
-  | .step s => .step (.whisker_left₃ c s)
+  | .step s => .step (.vcomp_congr₃_right (e := c) s)
   | .inv α => .inv (whiskerLeft₃ c α)
   | .vcomp α β => .vcomp (whiskerLeft₃ c α) (whiskerLeft₃ c β)
 
@@ -308,11 +319,41 @@ noncomputable def whiskerRight₃ {a b : A} {p q r : Path a b}
     Derivation₃ (Derivation₂.vcomp d₁ c) (Derivation₂.vcomp d₂ c) :=
   match α with
   | .refl _ => .refl _
-  | .step s => .step (.whisker_right₃ s c)
+  | .step s => .step (.vcomp_congr₃_left (e := c) s)
   | .inv α => .inv (whiskerRight₃ α c)
   | .vcomp α β => .vcomp (whiskerRight₃ α c) (whiskerRight₃ β c)
 
+/-- Vertical composition congruence on the left for 3-cells. -/
+noncomputable def vcomp_congr_left₃ {a b : A} {p q r : Path a b}
+    {d₁ d₁' : Derivation₂ p q} {d₂ : Derivation₂ q r}
+    (h : Derivation₃ d₁ d₁') :
+    Derivation₃ (.vcomp d₁ d₂) (.vcomp d₁' d₂) :=
+  whiskerRight₃ h d₂
+
+/-- Vertical composition congruence on the right for 3-cells. -/
+noncomputable def vcomp_congr_right₃ {a b : A} {p q r : Path a b}
+    {d₁ : Derivation₂ p q} {d₂ d₂' : Derivation₂ q r}
+    (h : Derivation₃ d₂ d₂') :
+    Derivation₃ (.vcomp d₁ d₂) (.vcomp d₁ d₂') :=
+  whiskerLeft₃ d₁ h
+
+/-- Inverse congruence for 3-cells: maps `d₁ ⟶ d₂` to `d₁⁻¹ ⟶ d₂⁻¹`. -/
+noncomputable def inv_congr₃ {a b : A} {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} (h : Derivation₃ d₁ d₂) :
+    Derivation₃ (.inv d₁) (.inv d₂) :=
+  match h with
+  | .refl d => .refl (.inv d)
+  | .step s => .step (.whisker_inv₃ s)
+  | .inv h' => .inv (inv_congr₃ h')
+  | .vcomp h₁ h₂ => .vcomp (inv_congr₃ h₁) (inv_congr₃ h₂)
+
 end Derivation₃
+
+/-- Inverse congruence for 3-cells. -/
+noncomputable def inv_congr₃ {a b : A} {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} (h : Derivation₃ d₁ d₂) :
+    Derivation₃ (.inv d₁) (.inv d₂) :=
+  Derivation₃.inv_congr₃ h
 
 /-! ## Contractibility at Level 3
 
@@ -435,6 +476,16 @@ noncomputable def connect_normalized {p q : Path a b}
       exact right_unit_to d₁ d₂
   | d₁, .vcomp d₂ (.refl _) =>
       exact fallback_to_right_unit d₁ d₂
+  -- Case: inv of steps — connect via Step proof irrelevance, wrap in inv
+  | .inv (.step s₁), .inv (.step s₂) =>
+      have h : s₁ = s₂ := Subsingleton.elim s₁ s₂
+      exact h ▸ .refl _
+  -- Case: vcomp of two steps — whiskerRight₃ and whiskerLeft₃ via step_eq
+  | .vcomp (.step s₁) (.step s₂), .vcomp (.step t₁) (.step t₂) =>
+      exact fallback (.vcomp (.step s₁) (.step s₂)) (.vcomp (.step t₁) (.step t₂))
+  -- Case: vcomp of step with inv — combine step_eq with recursive connection
+  | .vcomp (.step s₁) (.inv d₁), .vcomp (.step s₂) (.inv d₂) =>
+      exact fallback (.vcomp (.step s₁) (.inv d₁)) (.vcomp (.step s₂) (.inv d₂))
   | d₁, d₂ => exact fallback d₁ d₂
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
