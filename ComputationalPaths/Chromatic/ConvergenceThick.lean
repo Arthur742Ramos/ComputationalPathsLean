@@ -58,7 +58,7 @@ noncomputable def compat_cancel_left (n : Nat) (x : C.pLocal) :
 noncomputable def compat_symm_symm (n : Nat) (x : C.pLocal) :
     RwEq (Path.symm (Path.symm (C.compat n x)))
          (C.compat n x) :=
-  rweq_symm_symm (C.compat n x)
+  rweq_ss (C.compat n x)
 
 /-- Compatibility right-unit. -/
 noncomputable def compat_refl_right (n : Nat) (x : C.pLocal) :
@@ -82,7 +82,7 @@ noncomputable def limitAgree_cancel_right (x : C.pLocal) (n : Nat) :
 noncomputable def limitAgree_symm_symm (x : C.pLocal) (n : Nat) :
     RwEq (Path.symm (Path.symm (C.limitAgree x n)))
          (C.limitAgree x n) :=
-  rweq_symm_symm (C.limitAgree x n)
+  rweq_ss (C.limitAgree x n)
 
 /-- Limit agreement right-unit. -/
 noncomputable def limitAgree_refl_right (x : C.pLocal) (n : Nat) :
@@ -113,7 +113,7 @@ noncomputable def twoStepCompat_cancel_right (n : Nat) (x : C.pLocal) :
 noncomputable def twoStepCompat_symm_symm (n : Nat) (x : C.pLocal) :
     RwEq (Path.symm (Path.symm (C.twoStepCompat n x)))
          (C.twoStepCompat n x) :=
-  rweq_symm_symm (C.twoStepCompat n x)
+  rweq_ss (C.twoStepCompat n x)
 
 /-- Two-step compatibility right-unit. -/
 noncomputable def twoStepCompat_refl_right (n : Nat) (x : C.pLocal) :
@@ -141,7 +141,7 @@ noncomputable def limit_tower_compat_cancel_right (x : C.pLocal) (n : Nat) :
 noncomputable def limit_tower_compat_symm_symm (x : C.pLocal) (n : Nat) :
     RwEq (Path.symm (Path.symm (C.limit_tower_compat x n)))
          (C.limit_tower_compat x n) :=
-  rweq_symm_symm (C.limit_tower_compat x n)
+  rweq_ss (C.limit_tower_compat x n)
 
 end ChromaticConvergenceData
 
@@ -180,7 +180,7 @@ noncomputable def containment_eq_symm_symm (m n : T.chromaticType)
     (h : T.typeLeq n m) :
     RwEq (Path.symm (Path.symm (T.containment_eq m n h)))
          (T.containment_eq m n h) :=
-  rweq_symm_symm (T.containment_eq m n h)
+  rweq_ss (T.containment_eq m n h)
 
 /-- smash_comm right-cancels. -/
 noncomputable def smash_comm_cancel_right (a b : T.chromaticType) :
@@ -192,7 +192,7 @@ noncomputable def smash_comm_cancel_right (a b : T.chromaticType) :
 noncomputable def smash_comm_symm_symm (a b : T.chromaticType) :
     RwEq (Path.symm (Path.symm (T.smash_comm a b)))
          (T.smash_comm a b) :=
-  rweq_symm_symm (T.smash_comm a b)
+  rweq_ss (T.smash_comm a b)
 
 /-- smash_comm right-unit. -/
 noncomputable def smash_comm_refl_right (a b : T.chromaticType) :

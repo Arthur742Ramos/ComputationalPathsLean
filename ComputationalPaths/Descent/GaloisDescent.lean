@@ -80,19 +80,19 @@ noncomputable def mul_one_refl_right (g : G) :
 noncomputable def act_one_symm_symm (x : X) :
     RwEq (Path.symm (Path.symm (A.act_one x)))
          (A.act_one x) :=
-  rweq_symm_symm (A.act_one x)
+  rweq_ss (A.act_one x)
 
 /-- act_mul symm-symm. -/
 noncomputable def act_mul_symm_symm (g h : G) (x : X) :
     RwEq (Path.symm (Path.symm (A.act_mul g h x)))
          (A.act_mul g h x) :=
-  rweq_symm_symm (A.act_mul g h x)
+  rweq_ss (A.act_mul g h x)
 
 /-- mul_assoc symm-symm. -/
 noncomputable def mul_assoc_symm_symm (g h k : G) :
     RwEq (Path.symm (Path.symm (A.mul_assoc g h k)))
          (A.mul_assoc g h k) :=
-  rweq_symm_symm (A.mul_assoc g h k)
+  rweq_ss (A.mul_assoc g h k)
 
 /-- one_mul left-unit. -/
 noncomputable def one_mul_refl_left (g : G) :
@@ -165,19 +165,19 @@ noncomputable def phi_act_cancel_right (g : G) (x : Fiber) :
 noncomputable def cocycle_symm_symm (g h : G) (x : Fiber) :
     RwEq (Path.symm (Path.symm (D.cocycle g h x)))
          (D.cocycle g h x) :=
-  rweq_symm_symm (D.cocycle g h x)
+  rweq_ss (D.cocycle g h x)
 
 /-- Unit symm-symm. -/
 noncomputable def unit_symm_symm (x : Fiber) :
     RwEq (Path.symm (Path.symm (D.unit x)))
          (D.unit x) :=
-  rweq_symm_symm (D.unit x)
+  rweq_ss (D.unit x)
 
 /-- phi_act symm-symm. -/
 noncomputable def phi_act_symm_symm (g : G) (x : Fiber) :
     RwEq (Path.symm (Path.symm (D.phi_act g x)))
          (D.phi_act g x) :=
-  rweq_symm_symm (D.phi_act g x)
+  rweq_ss (D.phi_act g x)
 
 /-- Cocycle right-unit. -/
 noncomputable def cocycle_refl_right (g h : G) (x : Fiber) :
@@ -248,7 +248,7 @@ noncomputable def transitive_cancel_left (x y : P) :
 noncomputable def transitive_symm_symm (x y : P) :
     RwEq (Path.symm (Path.symm (T.transitive_path x y)))
          (T.transitive_path x y) :=
-  rweq_symm_symm (T.transitive_path x y)
+  rweq_ss (T.transitive_path x y)
 
 /-- Transitive path right-unit. -/
 noncomputable def transitive_refl_right (x y : P) :

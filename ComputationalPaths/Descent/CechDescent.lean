@@ -76,7 +76,7 @@ noncomputable def overlapSymm_symm_refl_left {i j : Idx} (x : C.overlap i j) :
 noncomputable def overlapSymm_symm_involution {i j : Idx} (x : C.overlap i j) :
     RwEq (Path.symm (Path.symm (C.overlapSymm_symm x)))
          (C.overlapSymm_symm x) :=
-  rweq_of_step (Path.Step.symm_symm (C.overlapSymm_symm x))
+  rweq_ss (C.overlapSymm_symm x)
 
 end CoveringData
 
@@ -88,11 +88,12 @@ structure CechDescentDatum (X : Type u) (Idx : Type v)
   /-- Gluing condition: sections agree on overlaps. -/
   gluing : {i j : Idx} → (x : C.overlap i j) →
     Path (section_ i (C.pr₁ x)) (section_ j (C.pr₂ x))
-  /-- Symmetry coherence: gluing on (i,j) reverses on (j,i). -/
-  gluing_symm : {i j : Idx} → (x : C.overlap i j) →
+  /-- Symmetry coherence: gluing is coherent with overlap symmetry. -/
+  gluing_symm_coherent : {i j : Idx} → (x : C.overlap i j) →
     RwEq (Path.symm (gluing x))
-         (Path.trans (Path.congrArg (section_ j) (Path.refl (C.pr₂ x)))
-                     (Path.symm (gluing (C.overlapSymm x))))
+         (Path.trans (Path.congrArg (section_ j) (Path.symm (C.pr_symm₁ x)))
+                     (Path.trans (gluing (C.overlapSymm x))
+                                 (Path.congrArg (section_ i) (C.pr_symm₂ x))))
 
 namespace CechDescentDatum
 
@@ -127,7 +128,7 @@ noncomputable def gluing_refl_left {i j : Idx} (x : C.overlap i j) :
 noncomputable def gluing_symm_symm {i j : Idx} (x : C.overlap i j) :
     RwEq (Path.symm (Path.symm (D.gluing x)))
          (D.gluing x) :=
-  rweq_of_step (Path.Step.symm_symm (D.gluing x))
+  rweq_ss (D.gluing x)
 
 end CechDescentDatum
 
@@ -140,14 +141,27 @@ structure TripleOverlapData (X : Type u) (Idx : Type v)
   pr₁₂ : {i j k : Idx} → triple i j k → C.overlap i j
   pr₂₃ : {i j k : Idx} → triple i j k → C.overlap j k
   pr₁₃ : {i j k : Idx} → triple i j k → C.overlap i k
+  /-- Coherence: pr₂ of pr₁₂ equals pr₁ of pr₂₃ (middle index). -/
+  pr_coherence_mid : {i j k : Idx} → (x : triple i j k) →
+    Path (C.pr₂ (pr₁₂ x)) (C.pr₁ (pr₂₃ x))
+  /-- Coherence: pr₁ of pr₁₂ equals pr₁ of pr₁₃. -/
+  pr_coherence_start : {i j k : Idx} → (x : triple i j k) →
+    Path (C.pr₁ (pr₁₂ x)) (C.pr₁ (pr₁₃ x))
+  /-- Coherence: pr₂ of pr₂₃ equals pr₂ of pr₁₃. -/
+  pr_coherence_end : {i j k : Idx} → (x : triple i j k) →
+    Path (C.pr₂ (pr₂₃ x)) (C.pr₂ (pr₁₃ x))
 
 /-- Čech 2-cocycle condition with path-level coherence. -/
 structure CechCocycleCondition (X : Type u) (Idx : Type v)
     (C : CoveringData X Idx) (T : TripleOverlapData X Idx C)
     (F : Type u) (D : CechDescentDatum X Idx C F) where
-  /-- Cocycle: g_{ij} g_{jk} = g_{ik} on triple overlaps. -/
+  /-- Cocycle: transport of (g_{ij} ∘ coherence ∘ g_{jk}) equals g_{ik}. -/
   cocycle : {i j k : Idx} → (x : T.triple i j k) →
-    RwEq (Path.trans (D.gluing (T.pr₁₂ x)) (D.gluing (T.pr₂₃ x)))
+    RwEq (Path.trans (Path.congrArg (D.section_ i) (Path.symm (T.pr_coherence_start x)))
+           (Path.trans (D.gluing (T.pr₁₂ x))
+             (Path.trans (Path.congrArg (D.section_ j) (T.pr_coherence_mid x))
+               (Path.trans (D.gluing (T.pr₂₃ x))
+                 (Path.congrArg (D.section_ k) (T.pr_coherence_end x))))))
          (D.gluing (T.pr₁₃ x))
 
 namespace CechCocycleCondition
@@ -157,8 +171,7 @@ variable {X : Type u} {Idx : Type v} {C : CoveringData X Idx}
          {D : CechDescentDatum X Idx C F}
 
 /-- Cocycle composed with unit is still cocycle. -/
-noncomputable def cocycle_refl_right (CC : CechCocycleCondition X Idx C T F D)
-    {i j k : Idx} (x : T.triple i j k) :
+noncomputable def cocycle_refl_right {i j k : Idx} (x : T.triple i j k) :
     RwEq (Path.trans (D.gluing (T.pr₁₃ x)) (Path.refl _))
          (D.gluing (T.pr₁₃ x)) :=
   rweq_cmpA_refl_right (D.gluing (T.pr₁₃ x))
@@ -198,7 +211,7 @@ noncomputable def coface_comm_symm_symm (n : Nat) (i j : Fin (n + 2))
     (x : H.level n) (h : i.val ≤ j.val) :
     RwEq (Path.symm (Path.symm (H.coface_comm n i j x h)))
          (H.coface_comm n i j x h) :=
-  rweq_of_step (Path.Step.symm_symm (H.coface_comm n i j x h))
+  rweq_ss (H.coface_comm n i j x h)
 
 /-- Coface commutation right-unit. -/
 noncomputable def coface_comm_refl_right (n : Nat) (i j : Fin (n + 2))

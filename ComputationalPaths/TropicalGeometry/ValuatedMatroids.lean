@@ -130,7 +130,7 @@ theorem ValuatedMatroid.exists_regularSubdivision
   exact regularSubdivisionOfValuation_isRegular M.valuation M.support_nonempty
 
 /-- Path witness for reflexivity of a valuated matroid valuation. -/
-theorem ValuatedMatroid.valuation_path
+noncomputable def ValuatedMatroid.valuation_path
     {ι : Type u} [DecidableEq ι] {r : ℕ}
     (M : ValuatedMatroid ι r) :
     ComputationalPaths.Path M.valuation M.valuation :=

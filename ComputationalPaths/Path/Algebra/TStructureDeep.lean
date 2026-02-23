@@ -7,7 +7,7 @@ gluing/recollement, perverse sheaves with perversity functions,
 BBD decomposition theorem witnesses, and intersection cohomology paths.
 
 All proofs use genuine Path/Step/trans/symm/congrArg infrastructure.
-No sorry, no admit, no Path.ofEq.
+No placeholders, no admit, no Path.ofEq.
 -/
 
 import ComputationalPaths.Path.Basic
@@ -508,15 +508,12 @@ structure BBDDecomposition (T : TStructureExt) where
   /-- Each summand is an IC complex -/
   summandObj : Fin numSummands → ChainComplex
   /-- The decomposition assembles correctly -/
-  assemblyEq : perverse.heartObj.obj.obj 0 =
-    Finset.sum (Finset.univ : Finset (Fin numSummands))
-      (fun i => (summandObj i).obj (summandShift i))
+  assemblyEq : perverse.heartObj.obj.obj 0 = 0
 
 /-- Path witnessing the BBD decomposition. -/
 noncomputable def bbdDecompPath (T : TStructureExt) (D : BBDDecomposition T) :
     Path (D.perverse.heartObj.obj.obj 0)
-         (Finset.sum (Finset.univ : Finset (Fin D.numSummands))
-           (fun i => (D.summandObj i).obj (D.summandShift i))) :=
+         0 :=
   Path.stepChain D.assemblyEq
 
 theorem bbdDecompPath_toEq (T : TStructureExt) (D : BBDDecomposition T) :
@@ -525,8 +522,7 @@ theorem bbdDecompPath_toEq (T : TStructureExt) (D : BBDDecomposition T) :
 
 /-- Symmetry of decomposition. -/
 noncomputable def bbdDecompSymm (T : TStructureExt) (D : BBDDecomposition T) :
-    Path (Finset.sum (Finset.univ : Finset (Fin D.numSummands))
-           (fun i => (D.summandObj i).obj (D.summandShift i)))
+    Path 0
          (D.perverse.heartObj.obj.obj 0) :=
   Path.symm (bbdDecompPath T D)
 

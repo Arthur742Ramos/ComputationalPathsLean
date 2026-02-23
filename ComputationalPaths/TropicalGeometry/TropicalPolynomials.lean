@@ -29,9 +29,9 @@ noncomputable instance : CoeFun TropicalPolynomial (fun _ => ℝ → ℝ) where
 noncomputable def support (p : TropicalPolynomial) : Finset ℕ :=
   p.terms.image Prod.fst
 
-/-- Tropical degree: largest exponent in the support. -/
+/-- Tropical degree: largest exponent in the support. Uses 0 if support is empty. -/
 noncomputable def degree (p : TropicalPolynomial) : ℕ :=
-  p.support.sup id
+  if h : p.support.Nonempty then p.support.sup' h id else 0
 
 /-- Monomials achieving the tropical maximum at `x`. -/
 noncomputable def activeTerms (p : TropicalPolynomial) (x : ℝ) : Finset (ℕ × ℝ) :=
@@ -53,7 +53,9 @@ theorem mem_support_of_mem_terms {p : TropicalPolynomial} {n : ℕ} {a : ℝ}
 theorem le_degree_of_mem_support {p : TropicalPolynomial} {n : ℕ}
     (h : n ∈ p.support) : n ≤ p.degree := by
   unfold degree
-  exact Finset.le_sup h
+  have hne : p.support.Nonempty := ⟨n, h⟩
+  simp only [dif_pos hne]
+  exact Finset.le_sup' id h
 
 theorem isRoot_iff_card_activeTerms_ge_two (p : TropicalPolynomial) (x : ℝ) :
     p.IsRoot x ↔ 2 ≤ (p.activeTerms x).card := by

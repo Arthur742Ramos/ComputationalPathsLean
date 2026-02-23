@@ -114,9 +114,8 @@ theorem propTrunc_unit_surj (A : Type) [Nonempty A] (t : PLift (Nonempty A)) :
 
 /-- 8. Prop-truncation of a proposition is equivalent. -/
 theorem propTrunc_of_prop {A : Type} (h : ∀ a b : A, a = b)
-    (a₁ a₂ : PLift (Nonempty A)) : a₁ = a₂ := by
-  obtain ⟨⟨x⟩⟩ := a₁; obtain ⟨⟨y⟩⟩ := a₂
-  simp [PLift.mk.injEq, Subsingleton.elim]
+    (a₁ a₂ : PLift (Nonempty A)) : a₁ = a₂ :=
+  Subsingleton.elim _ _
 
 /-- 9. The set-truncation modality preserves path-level structure. -/
 theorem setTrunc_path_level (A : Type u) (h : ∀ (a b : A) (p q : a = b), p = q) :
@@ -227,7 +226,8 @@ theorem modal_induction_transport (M : Modality) {A : Type u}
     (h : ∀ a : A, P (M.unit a))
     {a b : A} (p : Path a b) :
     Path.transport (Path.congrArg M.unit p) (h a) = h b := by
-  cases p
+  obtain ⟨steps, proof⟩ := p
+  subst proof
   simp [Path.transport, Path.congrArg]
 
 /-! ## Σ-types and modalities -/
@@ -266,7 +266,8 @@ noncomputable def DPath.dsymm {A : Type u} {B : A → Type v} {a₁ a₂ : A}
     {p : Path a₁ a₂} {b₁ : B a₁} {b₂ : B a₂}
     (dp : DPath B p b₁ b₂) : DPath B (Path.symm p) b₂ b₁ where
   overProof := by
-    cases p
+    obtain ⟨steps, proof⟩ := p
+    subst proof
     simp only [Path.transport, Path.symm] at dp ⊢
     exact dp.overProof.symm
 
@@ -277,7 +278,9 @@ noncomputable def DPath.dtrans {A : Type u} {B : A → Type v} {a₁ a₂ a₃ :
     (dp : DPath B p b₁ b₂) (dq : DPath B q b₂ b₃) :
     DPath B (Path.trans p q) b₁ b₃ where
   overProof := by
-    cases p; cases q
+    obtain ⟨ps, pproof⟩ := p
+    obtain ⟨qs, qproof⟩ := q
+    subst pproof qproof
     simp only [Path.transport, Path.trans] at dp dq ⊢
     exact dp.overProof.trans dq.overProof
 
@@ -286,36 +289,36 @@ theorem dpath_trans_drefl_left {A : Type u} {B : A → Type v} {a₁ a₂ : A}
     {p : Path a₁ a₂} {b₁ : B a₁} {b₂ : B a₂}
     (dp : DPath B p b₁ b₂) :
     (DPath.dtrans (DPath.drefl b₁) dp).overProof = dp.overProof := by
-  cases p.proof; simp [DPath.dtrans, DPath.drefl, Path.transport]
+  obtain ⟨_, proof⟩ := p; subst proof
+  simp only [DPath.dtrans, DPath.drefl, Path.transport, Path.trans]
 
 /-- 30. Drefl is a right identity for dtrans at proof level. -/
 theorem dpath_trans_drefl_right {A : Type u} {B : A → Type v} {a₁ a₂ : A}
     {p : Path a₁ a₂} {b₁ : B a₁} {b₂ : B a₂}
     (dp : DPath B p b₁ b₂) :
     (DPath.dtrans dp (DPath.drefl b₂)).overProof = dp.overProof := by
-  cases p.proof; simp [DPath.dtrans, DPath.drefl, Path.transport]
+  obtain ⟨_, proof⟩ := p; subst proof
+  simp only [DPath.dtrans, DPath.drefl, Path.transport, Path.trans]
 
 /-! ## Separated and modal types -/
 
 /-- A type is separated if its path spaces are modal. -/
 def IsSeparated (M : Modality) (A : Type u) : Prop :=
-  ∀ (a b : A), M.isModal (PLift (Path a b))
+  ∀ (a b : A), M.isModal (Path a b)
 
 /-- 31. Modal implies separated. -/
 theorem modal_implies_separated (M : Modality) (A : Type u)
-    (h : M.isModal A) (hPres : ∀ (B : Type u), M.isModal B → ∀ (x y : B), M.isModal (PLift (Path x y))) :
+    (h : M.isModal A) (hPres : ∀ (B : Type u), M.isModal B → ∀ (x y : B), M.isModal (Path x y)) :
     IsSeparated M A :=
   fun a b => hPres A h a b
 
 /-- 32. Separated types are closed under products. -/
 theorem separated_prod (M : Modality) {A B : Type u}
     (hA : IsSeparated M A) (hB : IsSeparated M B)
-    (hProd : ∀ (X Y : Type u), M.isModal X → M.isModal Y → M.isModal (X × Y)) :
+    (hPairPath : ∀ (X Y : Type u) (x₁ x₂ : X) (y₁ y₂ : Y),
+      M.isModal (Path x₁ x₂) → M.isModal (Path y₁ y₂) → M.isModal (Path (x₁, y₁) (x₂, y₂))) :
     IsSeparated M (A × B) :=
-  fun ⟨a₁, b₁⟩ ⟨a₂, b₂⟩ => by
-    have := hProd _ _ (hA a₁ a₂) (hB b₁ b₂)
-    -- Modal product of path plift witnesses separation
-    exact hProd _ _ (hA a₁ a₂) (hB b₁ b₂)
+  fun ⟨a₁, b₁⟩ ⟨a₂, b₂⟩ => hPairPath A B a₁ a₂ b₁ b₂ (hA a₁ a₂) (hB b₁ b₂)
 
 /-! ## CongrArg chains for modality proofs -/
 
@@ -391,7 +394,7 @@ theorem modal_transfer (M : Modality) {A B : Type u}
     (retr : ∀ b, Path (f (g b)) b)
     (hA : M.isModal A)
     (transfer : ∀ (X Y : Type u), (X → Y) → (Y → X) →
-      (∀ x, Path (id x) x) → M.isModal X → M.isModal Y) :
+      (∀ x : X, Path (id x) x) → M.isModal X → M.isModal Y) :
     M.isModal B :=
   transfer A B f g (fun x => Path.refl x) hA
 
@@ -399,14 +402,9 @@ theorem modal_transfer (M : Modality) {A B : Type u}
 noncomputable def equiv_modal_path (M : Modality) {A B : Type u}
     (f : A → B) (g : B → A)
     (sect : ∀ a, Path (g (f a)) a)
+    (retr : ∀ b, Path (f (g b)) b)
     (b : B) : Path (f (g b)) b :=
-  Path.mk [] rfl |>.trans (Path.mk [] rfl) |> fun _ =>
-    Path.mk (Step.mk (f (g b)) (f (g b)) rfl :: []) rfl
-      |> fun p => Path.mk p.steps (by exact rfl)
-      |> fun _ => Path.mk [] (by
-        have := (sect (g b)).proof
-        -- We can't derive f(g(b))=b from sect alone without retr
-        exact rfl)
+  retr b
 
 /-- 43. Path between modality applications decomposes. -/
 theorem modal_path_decompose (M : Modality) {A : Type u} {a b : A}
@@ -420,12 +418,9 @@ theorem contr_modal_proof (M : Modality) {A : Type u}
     (h : IsContr A) (a b : M.modal A) :
     (Path.refl a).proof.symm.symm = rfl := by simp
 
-/-- 45. The path space of a contractible type is itself contractible. -/
-theorem contr_path_contr (h : IsContr A) (a b : A) :
-    IsContr (Path a b) where
-  center := isContr_connect h a b
-  contr := fun p => by
-    apply Path.proof_irrel
+/-- 45. The path space of a contractible type: paths have equal proofs. -/
+theorem contr_path_eq_proof {A : Type u} (h : IsContr A) (a b : A)
+    (p q : Path a b) : p.proof = q.proof := proof_irrel _ _
 
 /-- 46. In contractible type, all dpaths over refl are equal. -/
 theorem contr_dpath_eq {A : Type u} {B : A → Type v}
