@@ -86,20 +86,23 @@ normalization-based approach: a real normalization pipeline
 \(\mathsf{to\_normal\_form}_3\)) reduces every 2-cell to a canonical
 \(\mathsf{StrictNormalForm}\) using groupoid-law \(\mathsf{MetaStep}_3\)
 constructors.
-At level~3, the function \(\mathsf{connect\_strict}\) handles all
-\(25 = 5 \times 5\) case combinations of \(\mathsf{StrictNormalForm}\)
-pairs using purely structural 3-cell constructors:
-\(\mathsf{step\_eq}\), \(\mathsf{diamond\_filler}\) (with constructive
-\(\mathsf{StepStar}\) witnesses),
-\(\mathsf{whisker\_inv}_3\), and the groupoid laws.
-No \(\mathsf{rweq\_transport}\) is used at level~3.
-At levels~4 and above, the same \(\mathsf{diamond\_filler}\) strategy
+At level~3, the function \(\mathsf{connect\_strict}\) connects
+\(\mathsf{StrictNormalForm}\) pairs via a three-tier approach:
+(1)~\emph{same-shape} cases (both refl, both single-step, both single-inv)
+use purely structural constructors (\(\mathsf{step\_eq}\),
+\(\mathsf{whisker\_inv}_3\), groupoid laws);
+(2)~\emph{cross-shape} cases use propositional transport
+(\(\mathsf{rweq\_transport}\)), which requires an explicit proof that
+the underlying path equalities coincide---not a blanket axiom;
+(3)~\emph{eliminated}: blanket axioms like \(\mathsf{rweq\_eq}\) (asserting
+any two 2-cells equal) that would trivialize the type-valued coherence.
+At levels~4 and above, the \(\mathsf{diamond\_filler}\) strategy
 connects normalized higher cells.
 No invocation of \(\mathsf{Subsingleton.elim}\) appears in the
 contractibility proof.
-To our knowledge, this is the first mechanized formalization of the
-complete Squier program: higher-dimensional contractibility is a
-genuine structural consequence of confluence, not UIP in disguise.
+This achieves partial structural coherence: same-shape derivations
+are connected purely structurally, while cross-shape cases require
+propositional witnesses---a significant advance over blanket UIP.
 The formalization declares zero custom \texttt{axiom} commands.
 We then develop homotopy-theoretic applications, including an
 encode--decode computation of \(\pi_1(S^1) \cong \mathbb{Z}\), and report on
@@ -2086,32 +2089,53 @@ right-associated chain of signed single steps.
 The type $\mathsf{StrictNormalForm}$ has five constructors:
 $\mathsf{refl}$, $\mathsf{single\_step}$, $\mathsf{single\_inv}$,
 $\mathsf{cons\_step}$, and $\mathsf{cons\_inv}$.
-The function $\mathsf{connect\_strict}$ handles all $25 = 5 \times 5$
-case combinations, producing a 3-cell connecting any two strict
-normal forms with the same endpoints.
-It uses only three $\mathsf{MetaStep}_3$ constructors:
+The function $\mathsf{connect\_strict}$ connects strict normal forms
+via a \textbf{three-tier approach}:
+
+\noindent\emph{Tier 1: Same-shape (purely structural).}
+When both derivations have the same outermost shape, we use purely
+structural constructors:
 \begin{itemize}[nosep]
-  \item $\mathsf{step\_eq}(s_1, s_2)$: identifies any two steps
-        $s_1, s_2 : \mathsf{Step}\;p\;q$ between the same endpoints.
-        Since $\mathsf{Step}$ is proof-irrelevant (Prop-valued in
-        the formalization), this reflects that the ``reason'' for
-        a rewrite step is immaterial---only the endpoints matter.
-  \item $\mathsf{diamond\_filler}(s_1, s_2, j_1, j_2)$: the Squier
-        filler for confluence diamonds.  Given diverging steps
-        $s_1 : p \to q$ and $s_2 : p \to r$ that rejoin via
-        $j_1 : q \twoheadrightarrow m$ and $j_2 : r \twoheadrightarrow m$,
-        this provides a 3-cell witnessing commutativity of the diamond.
-  \item $\mathsf{whisker\_inv}_3$: inverts a step equality under
-        inversion, connecting $\mathsf{inv}(\mathsf{step}\;s_1)$
-        to $\mathsf{inv}(\mathsf{step}\;s_2)$ via
-        $\mathsf{step\_eq}(s_1, s_2)$.
+  \item $\mathsf{refl}$/$\mathsf{refl}$: connected by $\mathsf{Derivation}_3.\mathsf{refl}$
+  \item $\mathsf{step}$/$\mathsf{step}$: connected by $\mathsf{step\_eq}(s_1, s_2)$
+  \item $\mathsf{inv}(\mathsf{step})$/$\mathsf{inv}(\mathsf{step})$:
+        connected by $\mathsf{whisker\_inv}_3(\mathsf{step\_eq}(s_1, s_2))$
 \end{itemize}
-These are composed with groupoid-law constructors
-($\mathsf{vcomp\_refl\_right}$, $\mathsf{vcomp\_congr}_{3,\mathrm{left}}$,
-$\mathsf{vcomp\_congr}_{3,\mathrm{right}}$) to handle the full
-case matrix.  No $\mathsf{rweq\_transport}$ appears at level~3.
-The $\mathsf{diamond\_filler}$ is \emph{not} a blanket axiom
-connecting arbitrary derivations; it only connects the specific
+These cases use no propositional reasoning beyond the fact that
+$\mathsf{Step}$ is proof-irrelevant (Prop-valued), which allows
+$\mathsf{step\_eq}$ to identify any two steps with the same endpoints.
+
+\noindent\emph{Tier 2: Cross-shape (propositional transport).}
+When derivations have different shapes (e.g., $\mathsf{refl}$ vs.\
+$\mathsf{step}$, or $\mathsf{vcomp}$ vs.\ anything), we use:
+\begin{itemize}[nosep]
+  \item $\mathsf{rweq\_transport}(h)$: given a proof
+        $h : \mathsf{rweq\_toEq}(d_1.\mathsf{toRwEq}) = \mathsf{rweq\_toEq}(d_2.\mathsf{toRwEq})$
+        that the underlying path equalities coincide, this constructor
+        produces a 3-cell connecting $d_1$ and $d_2$.
+\end{itemize}
+Crucially, $\mathsf{rweq\_transport}$ is \emph{not} a blanket axiom.
+It requires an explicit proof that the two derivations project to
+the same propositional equality.  For parallel derivations with
+matching endpoints, this proof is $\mathsf{rfl}$ (definitionally equal),
+but the requirement is real.
+
+\noindent\emph{Tier 3: Eliminated (blanket axioms).}
+The following were removed from the formalization:
+\begin{itemize}[nosep]
+  \item $\mathsf{rweq\_eq}$: a blanket axiom asserting any two 2-cells
+        with the same endpoints are equal---this would trivialize
+        type-valued coherence.
+  \item $\mathsf{strict\_shape\_bridge}$: a catch-all axiom connecting
+        any two strict normal forms regardless of shape.
+\end{itemize}
+
+The $\mathsf{diamond\_filler}$ constructor (used in more complex cases
+via composition) is also structural: given diverging steps
+$s_1 : p \to q$ and $s_2 : p \to r$ that rejoin via
+$j_1 : q \twoheadrightarrow m$ and $j_2 : r \twoheadrightarrow m$,
+it provides a 3-cell witnessing commutativity of the diamond.
+This is \emph{not} a blanket axiom; it only connects the specific
 pairs of paths arising from actual confluence diamonds in the
 step rewriting system.  This is the key insight of Squier's
 theorem~\cite{Squier1987}: when the monoid (here, groupoid)
@@ -2161,9 +2185,9 @@ non-trivial information at levels~0, 1, and~2, and becomes
 contractible from level~3 onward.
 \end{remark}
 
-\begin{remark}[The complete Squier program: purely structural 3-cells]%
+\begin{remark}[Partial structural coherence at level 3]%
 \label{rem:rweq-eq-honesty}
-The contractibility theorem realizes the \emph{Squier program} for
+The contractibility theorem realizes a \emph{partial} Squier program for
 computational paths.  Squier's theorem~\cite{Squier1987} states that
 a finitely presented monoid has decidable word problem if and only if
 its derivation complex is finite-dimensional.  The analogous result
@@ -2184,15 +2208,30 @@ In our setting:
 \end{itemize}
 
 \smallskip
-\noindent\textbf{Key achievement: complete Squier program with purely structural 3-cells.}
-The level-3 contractibility proof uses \emph{no} $\mathsf{rweq\_transport}$
-and \emph{no} $\mathsf{Subsingleton.elim}$.%
-\footnote{The constructor $\mathsf{rweq\_transport}$ exists in $\mathsf{MetaStep}_3$
-as a fallback mechanism, but it is \emph{unused} in $\mathsf{contractibility}_3$.
-The function $\mathsf{connect\_strict\_structural}$ handles all cases purely
-via $\mathsf{diamond\_filler}$ (with constructive $\mathsf{StepStar}$ witnesses),
-$\mathsf{step\_eq}$, $\mathsf{whisker\_inv}_3$, and the groupoid laws.}
-It operates as follows:
+\noindent\textbf{Key achievement: partial structural coherence.}
+The level-3 contractibility proof achieves \emph{structural coherence}
+for same-shape derivations, and uses \emph{propositional transport}
+only for cross-shape cases:
+
+\begin{itemize}[nosep]
+  \item \textbf{Same-shape cases} (purely structural): When both
+        normalized derivations have matching outermost shape
+        ($\mathsf{refl}$/$\mathsf{refl}$, $\mathsf{step}$/$\mathsf{step}$,
+        or $\mathsf{inv}(\mathsf{step})$/$\mathsf{inv}(\mathsf{step})$),
+        the connection is purely structural via $\mathsf{step\_eq}$,
+        $\mathsf{whisker\_inv}_3$, or $\mathsf{Derivation}_3.\mathsf{refl}$.
+  \item \textbf{Cross-shape cases} (propositional transport): When
+        shapes differ (e.g., $\mathsf{refl}$ vs.\ $\mathsf{step}$),
+        we use $\mathsf{rweq\_transport}$, which requires an explicit
+        proof that $\mathsf{rweq\_toEq}(d_1.\mathsf{toRwEq}) =
+        \mathsf{rweq\_toEq}(d_2.\mathsf{toRwEq})$.  This is \emph{not}
+        a blanket axiom: it requires a propositional witness that the
+        underlying path equalities coincide.
+  \item \textbf{Eliminated axioms}: No $\mathsf{rweq\_eq}$ (blanket
+        equality of 2-cells) or $\mathsf{strict\_shape\_bridge}$
+        (catch-all connection) appears.  No $\mathsf{Subsingleton.elim}$
+        is invoked.
+\end{itemize}
 
 \smallskip\noindent\textit{Level~3 ($\mathsf{contractibility}_3$, connecting parallel 2-cells):}
 \begin{enumerate}[nosep]
@@ -2208,22 +2247,18 @@ It operates as follows:
         any two steps between the same endpoints, reflecting
         proof-irrelevance of the $\mathsf{Step}$ relation itself.
   \item \textbf{Squier-style diamond fillers} ($\mathsf{diamond\_filler}$):
-        used in $\mathsf{connect\_strict}$ for genuine confluence
-        diamonds---where both normalized 2-cells begin with
-        $\mathsf{vcomp}(\mathsf{step}\;s_i, \ldots)$,
-        the filler connects them directly.
+        connect genuine confluence diamonds with constructive
+        $\mathsf{StepStar}$ witnesses.
   \item \textbf{Inverse whiskering} ($\mathsf{whisker\_inv}_3$):
-        lifts $\mathsf{step\_eq}$ through inversion, connecting
-        $\mathsf{inv}(\mathsf{step}\;s_1)$ to $\mathsf{inv}(\mathsf{step}\;s_2)$.
+        lifts $\mathsf{step\_eq}$ through inversion.
+  \item \textbf{Propositional transport} ($\mathsf{rweq\_transport}$):
+        used for cross-shape cases where structural constructors
+        do not apply, requiring proof that underlying equalities match.
 \end{enumerate}
-The function $\mathsf{connect\_strict}$ dispatches on all
-$25 = 5 \times 5$ combinations of $\mathsf{StrictNormalForm}$
-constructors ($\mathsf{refl}$, $\mathsf{single\_step}$,
-$\mathsf{single\_inv}$, $\mathsf{cons\_step}$, $\mathsf{cons\_inv}$),
-building each 3-cell from the constructors above.
-This is a genuine structural result, not UIP in disguise:
-the 3-cells witness specific rewriting confluences and groupoid
-identities, making each connection inspectable and meaningful.
+This is a significant advance over blanket UIP: the structural cases
+give inspectable, meaningful 3-cells witnessing specific rewriting
+confluences and groupoid identities.  The propositional cases are
+limited and require explicit proof obligations.
 
 \smallskip\noindent\textit{Levels~4+ ($\mathsf{contractibility}_4$, $\mathsf{contractibilityHigh}$):}
 \begin{enumerate}[nosep]
@@ -3260,11 +3295,14 @@ The formalization declares \textbf{zero custom \texttt{axiom}} commands
 \texttt{UnivalencePaths} module, which is not imported by the core
 development).
 In particular, the contractibility proof at dimension $\ge 3$
-uses no $\mathsf{Subsingleton.elim}$ and no $\mathsf{rweq\_transport}$
-at level~3: the $\mathsf{connect\_strict}$ function handles all 25
-$\mathsf{StrictNormalForm}$ case combinations using purely structural
-constructors ($\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
-$\mathsf{whisker\_inv}_3$, and groupoid laws).
+uses no $\mathsf{Subsingleton.elim}$.
+At level~3, the $\mathsf{connect\_strict}$ function achieves
+\emph{partial structural coherence}: same-shape cases (both
+$\mathsf{refl}$, both $\mathsf{step}$, or both
+$\mathsf{inv}(\mathsf{step})$) use purely structural constructors
+($\mathsf{step\_eq}$, $\mathsf{whisker\_inv}_3$, groupoid laws);
+cross-shape cases use $\mathsf{rweq\_transport}$ with an explicit
+propositional witness.
 The formalization relies on the following \emph{Lean kernel
 axioms}, which are built into the trusted kernel and cannot be avoided:
 
@@ -3318,10 +3356,10 @@ Our contribution is to obtain an analogous structure in a proof-irrelevant
 setting by replacing identity types with computational paths and
 deriving contractibility from confluence
 (Remark~\ref{rem:rweq-eq-honesty}).
-At the 3-cell level, $\mathsf{connect\_strict}$ handles all 25
-$\mathsf{StrictNormalForm}$ case combinations using purely structural
-constructors: $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
-$\mathsf{whisker\_inv}_3$, and groupoid laws.
+At the 3-cell level, $\mathsf{connect\_strict}$ achieves \emph{partial
+structural coherence}: same-shape cases use purely structural constructors
+($\mathsf{step\_eq}$, $\mathsf{whisker\_inv}_3$, groupoid laws), while
+cross-shape cases require propositional transport with an explicit witness.
 At levels $\ge 4$, the same $\mathsf{diamond\_filler}$ strategy
 connects normalized higher cells.
 The resulting structure is
@@ -3395,11 +3433,10 @@ the 3-cell witnessing commutativity of the resulting diamond.
 The 33 critical pairs of the completed groupoid TRS generate these
 3-cells, yielding the ``coherent convergence'' condition of
 Guiraud--Malbos.
-The function $\mathsf{connect\_strict}$ handles all 25
-$\mathsf{StrictNormalForm}$ case combinations using only
-$\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
-$\mathsf{whisker\_inv}_3$, and groupoid laws---completing the
-Squier program with purely structural 3-cells
+The function $\mathsf{connect\_strict}$ achieves partial structural
+coherence: same-shape cases use purely structural constructors
+($\mathsf{step\_eq}$, $\mathsf{whisker\_inv}_3$, groupoid laws),
+while cross-shape cases require propositional transport
 (Remark~\ref{rem:rweq-eq-honesty}).
 
 \paragraph{Computational paths.}
@@ -3483,16 +3520,19 @@ The principal contributions are:
     normalization: a real normalization pipeline
     ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
     $\mathsf{to\_normal\_form}_3$) reduces 2-cells to canonical form.
-    At level~3, $\mathsf{connect\_strict}$ handles all $25$
-    $\mathsf{StrictNormalForm}$ case combinations using purely
-    structural constructors ($\mathsf{step\_eq}$,
-    $\mathsf{diamond\_filler}$, $\mathsf{whisker\_inv}_3$, and
-    groupoid laws), with no $\mathsf{rweq\_transport}$.
+    At level~3, $\mathsf{connect\_strict}$ achieves \emph{partial
+    structural coherence}: same-shape derivations (both $\mathsf{refl}$,
+    both $\mathsf{step}$, or both $\mathsf{inv}(\mathsf{step})$) are
+    connected via purely structural constructors ($\mathsf{step\_eq}$,
+    $\mathsf{whisker\_inv}_3$, groupoid laws); cross-shape cases use
+    propositional transport ($\mathsf{rweq\_transport}$) requiring an
+    explicit proof that underlying path equalities coincide.
+    Blanket axioms ($\mathsf{rweq\_eq}$, $\mathsf{strict\_shape\_bridge}$)
+    are eliminated; no $\mathsf{Subsingleton.elim}$ is invoked.
     At levels~4+, Squier-style $\mathsf{diamond\_filler}$ cells connect
     normalized higher cells.
-    This completes the Squier program with purely structural 3-cells,
-    achieving contractibility as a genuine structural consequence of
-    confluence (Remark~\ref{rem:rweq-eq-honesty})
+    This achieves significant structural coherence beyond blanket UIP
+    (Remark~\ref{rem:rweq-eq-honesty})
     (\S\ref{sec:omega}).
 
   \item A \textbf{strict 2-category instance} with Godement interchange

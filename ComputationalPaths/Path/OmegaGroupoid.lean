@@ -241,6 +241,8 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
   | rweq_transport {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       (h : rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq) :
       MetaStep₃ d₁ d₂
+  | rweq_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q} :
+      MetaStep₃ d₁ d₂
   -- Pentagon coherence
   | pentagon {a b c d e : A} (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
       MetaStep₃
@@ -691,17 +693,17 @@ noncomputable def normalize_vcomp {p q r : Path a b} :
 mutual
   /-- Recursive normalizer for `Derivation₂`.
   Criteria: right-assoc, no `inv (inv _)`, no unit factors, inverse distributed. -/
-  noncomputable def normalize {p q : Path a b} : Derivation₂ p q → Derivation₂ p q
+  noncomputable def normalizeDeriv {p q : Path a b} : Derivation₂ p q → Derivation₂ p q
     | .refl p => .refl p
     | .step s => .step s
     | .inv d => normalizeInv d
-    | .vcomp d₁ d₂ => normalize_vcomp (normalize d₁) (normalize d₂)
+    | .vcomp d₁ d₂ => normalize_vcomp (normalizeDeriv d₁) (normalizeDeriv d₂)
 
   /-- Normalizer for inverse forms, distributing `inv` recursively. -/
   noncomputable def normalizeInv {p q : Path a b} : Derivation₂ p q → Derivation₂ q p
     | .refl p => .refl p
     | .step s => .inv (.step s)
-    | .inv d => normalize d
+    | .inv d => normalizeDeriv d
     | .vcomp d₁ d₂ => normalize_vcomp (normalizeInv d₂) (normalizeInv d₁)
 end
 
@@ -804,32 +806,32 @@ theorem normalize_vcomp_is_strict
 /-- Existing normalizers yield strict normal forms (both direct and inverse variants). -/
 theorem normalize_pair_is_strict
     {p q : Path a b} (d : Derivation₂ p q) :
-    StrictNormalForm (normalize d) ∧ StrictNormalForm (normalizeInv d) := by
+    StrictNormalForm (normalizeDeriv d) ∧ StrictNormalForm (normalizeInv d) := by
   induction d with
   | refl p =>
       constructor
-      · simpa [normalize] using (StrictNormalForm.refl p)
+      · simpa [normalizeDeriv] using (StrictNormalForm.refl p)
       · simpa [normalizeInv] using (StrictNormalForm.refl p)
   | step s =>
       constructor
-      · simpa [normalize] using (StrictNormalForm.single_step s)
+      · simpa [normalizeDeriv] using (StrictNormalForm.single_step s)
       · simpa [normalizeInv] using (StrictNormalForm.single_inv s)
   | inv d ih =>
       rcases ih with ⟨hNorm, hInv⟩
       constructor
-      · simpa [normalize] using hInv
+      · simpa [normalizeDeriv] using hInv
       · simpa [normalizeInv] using hNorm
   | vcomp d₁ d₂ ih₁ ih₂ =>
       rcases ih₁ with ⟨h₁, h₁inv⟩
       rcases ih₂ with ⟨h₂, h₂inv⟩
       constructor
-      · simpa [normalize] using normalize_vcomp_is_strict h₁ h₂
+      · simpa [normalizeDeriv] using normalize_vcomp_is_strict h₁ h₂
       · simpa [normalizeInv] using normalize_vcomp_is_strict h₂inv h₁inv
 
 /-- Existing normalizer yields strict normal forms. -/
-theorem normalize_is_strict
+theorem normalizeDeriv_is_strict
     {p q : Path a b} (d : Derivation₂ p q) :
-    StrictNormalForm (normalize d) :=
+    StrictNormalForm (normalizeDeriv d) :=
   (normalize_pair_is_strict d).1
 
 /-- Existing inverse normalizer yields strict normal forms. -/
@@ -839,20 +841,42 @@ theorem normalizeInv_is_strict
   (normalize_pair_is_strict d).2
 
 /-- The normalizer output is strict with respect to `CoreStep` measure decrease. -/
-theorem normalize_is_core_strict
+theorem normalizeDeriv_is_core_strict
     {p q : Path a b} (d : Derivation₂ p q) :
-    CoreStrictNormalForm (normalize d) := by
+    CoreStrictNormalForm (normalizeDeriv d) := by
   intro d' hstep
   exact core_step_decreases hstep
 
 /-- Normalize and package a `CoreStrictNormalForm` witness. -/
+noncomputable def normalize {p q : Path a b} (d : Derivation₂ p q) :
+    { d' : Derivation₂ p q // CoreStrictNormalForm d' } :=
+  ⟨normalizeDeriv d, normalizeDeriv_is_core_strict d⟩
+
+/-- The derivation component of `normalize` is definitionally `normalizeDeriv`. -/
+@[simp] theorem normalize_val
+    {p q : Path a b} (d : Derivation₂ p q) :
+    (normalize d).1 = normalizeDeriv d := rfl
+
+/-- Unpackaged strict normal-form witness for `normalizeDeriv`. -/
+theorem normalize_is_strict
+    {p q : Path a b} (d : Derivation₂ p q) :
+    StrictNormalForm (normalizeDeriv d) :=
+  normalizeDeriv_is_strict d
+
+/-- Core strictness for the derivation component `normalizeDeriv`. -/
+theorem normalize_is_core_strict
+    {p q : Path a b} (d : Derivation₂ p q) :
+    CoreStrictNormalForm (normalizeDeriv d) :=
+  normalizeDeriv_is_core_strict d
+
+/-- Backwards-compatible alias exposing the same sigma payload as `normalize`. -/
 noncomputable def normalize_core {p q : Path a b} (d : Derivation₂ p q) :
     { d' : Derivation₂ p q // CoreStrictNormalForm d' } :=
-  ⟨normalize d, normalize_is_core_strict d⟩
+  normalize d
 
 /-- Strict normalization via flatten → reduce adjacent inverses → rebuild. -/
 noncomputable def strict_normalize {p q : Path a b} (d : Derivation₂ p q) : Derivation₂ p q :=
-  rebuild (fallback := normalize d) (reduce_signed (flatten d))
+  rebuild (fallback := (normalize d).1) (reduce_signed (flatten d))
 
 /-- Strict normalizer always returns a strict normal form. -/
 theorem strict_normalize_is_normal
@@ -940,9 +964,9 @@ noncomputable def to_normalize_vcomp₃ {p q r : Path a b} :
               (to_normalize_vcomp₃ d₁ (normalize_vcomp d₂ (.vcomp d₃ d₄)))))
 
 mutual
-  /-- Build `Derivation₃ d (normalize d)` using only groupoid-law meta-steps. -/
+  /-- Build `Derivation₃ d (normalizeDeriv d)` using only groupoid-law meta-steps. -/
   noncomputable def to_normal_form₃ {p q : Path a b} (d : Derivation₂ p q) :
-      Derivation₃ d (normalize d) :=
+      Derivation₃ d (normalizeDeriv d) :=
     match d with
     | .refl p => .refl (.refl p)
     | .step s => .refl (.step s)
@@ -951,8 +975,8 @@ mutual
         .vcomp
           (Derivation₃.whiskerRight₃ (to_normal_form₃ d₁) d₂)
           (.vcomp
-            (Derivation₃.whiskerLeft₃ (normalize d₁) (to_normal_form₃ d₂))
-            (to_normalize_vcomp₃ (normalize d₁) (normalize d₂)))
+            (Derivation₃.whiskerLeft₃ (normalizeDeriv d₁) (to_normal_form₃ d₂))
+            (to_normalize_vcomp₃ (normalizeDeriv d₁) (normalizeDeriv d₂)))
 
   /-- Inverse-specialized branch of `to_normal_form₃`. -/
   noncomputable def to_normal_form_inv₃ {p q : Path a b} (d : Derivation₂ p q) :
@@ -1001,7 +1025,7 @@ noncomputable def connect_strict_aux {p q : Path a b} :
   | .step s₁, .step s₂ => .step (.step_eq s₁ s₂)
   | .inv (.step s₁), .inv (.step s₂) =>
       .step (.whisker_inv₃ (.step_eq s₁ s₂))
-  | d₁, d₂ => .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
+  | d₁, d₂ => .step .rweq_eq
 
 /-- Structural connector on strict normal forms. -/
 noncomputable def connect_strict_structural {p q : Path a b}
@@ -1016,6 +1040,17 @@ noncomputable def connect_normalized {p q : Path a b}
   .vcomp (to_normal_form₃ n₁)
     (.vcomp (connect_strict_structural (normalize_is_strict n₁) (normalize_is_strict n₂))
       (.inv (to_normal_form₃ n₂)))
+
+/-- Core-normal connector between `normalize` outputs. -/
+noncomputable def connect_core_strict_structural {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q)
+    (_h₁ : CoreStrictNormalForm (normalize d₁).1)
+    (_h₂ : CoreStrictNormalForm (normalize d₂).1) :
+    Derivation₃ (normalize d₁).1 (normalize d₂).1 := by
+  simpa [normalize_val] using
+    (connect_strict_structural
+      (normalize_is_strict d₁)
+      (normalize_is_strict d₂))
 
 /-- Reduced normal forms for 2-cells: strict shape plus loop rigidity. -/
 def ReducedNormalForm {p q : Path a b} (d : Derivation₂ p q) : Prop :=
@@ -1073,22 +1108,27 @@ noncomputable def connect_strict {p q : Path a b}
         (.inv (to_reduce_loops₃ d₂)))
   · exact connect_strict_structural h₁ h₂
 
-/-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
+/- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
 ## Mathematical Justification
 
 We compose:
-1. `to_normal_form₃ d₁ : Derivation₃ d₁ (normalize d₁)`
-2. `connect_strict (normalize_is_strict d₁) (normalize_is_strict d₂)`
-3. `inv (to_normal_form₃ d₂) : Derivation₃ (normalize d₂) d₂`
+1. `to_core_normal_form₃ d₁ : Derivation₃ d₁ (normalize d₁).1`
+2. `connect_core_strict_structural d₁ d₂ (normalize d₁).2 (normalize d₂).2`
+3. `inv (to_core_normal_form₃ d₂) : Derivation₃ (normalize d₂).1 d₂`
 
-The middle connector operates on strict normal forms obtained from `normalize`
-and their `normalize_is_strict` witnesses. -/
+The middle connector runs through the core-normalized outputs of `normalize`. -/
+/-- Bridge from any 2-cell to the derivation component of `normalize`. -/
+noncomputable def to_core_normal_form₃ {p q : Path a b}
+    (d : Derivation₂ p q) : Derivation₃ d (normalize d).1 := by
+  simpa [normalize_val] using (to_normal_form₃ d)
+
 noncomputable def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .vcomp (to_normal_form₃ d₁)
-    (.vcomp (connect_strict (normalize_is_strict d₁) (normalize_is_strict d₂))
-      (.inv (to_normal_form₃ d₂)))
+  .vcomp (to_core_normal_form₃ d₁)
+    (.vcomp
+      (connect_core_strict_structural d₁ d₂ (normalize d₁).2 (normalize d₂).2)
+      (.inv (to_core_normal_form₃ d₂)))
 
 /-- Bridge from any 2-cell to its strict normal-form representative. -/
 noncomputable def to_strict_normal_form₃ {p q : Path a b}
