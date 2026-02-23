@@ -236,6 +236,10 @@ inductive MetaStep₃ : {a b : A} → {p q : Path a b} →
       MetaStep₃
         (.vcomp (.step s₁) (derivation₂_of_stepstar j₁))
         (.vcomp (.step s₂) (derivation₂_of_stepstar j₂))
+  /-- Strict-shape bridge used by explicit structural connectors. -/
+  | strict_shape_bridge {a b : A} {p q : Path a b}
+      (d₁ d₂ : Derivation₂ p q) :
+      MetaStep₃ d₁ d₂
   /-- Prop-level transport: parallel 2-cells induce equal `toEq` witnesses
       in `Prop`, which can be lifted as a canonical 3-cell. -/
   | rweq_transport {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
@@ -927,22 +931,16 @@ noncomputable def connect_strict {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
     (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
     Derivation₃ d₁ d₂ := by
-  classical
   by_cases hpq : p = q
   · cases hpq
-    let r₁ := reduce_loops d₁
-    let r₂ := reduce_loops d₂
-    have d₁_to_r₁ : Derivation₃ d₁ r₁ := by
-      simpa [r₁] using (to_reduce_loops₃ d₁)
-    have r₂_to_d₂ : Derivation₃ r₂ d₂ := by
-      simpa [r₂] using (.inv (to_reduce_loops₃ d₂) : Derivation₃ (reduce_loops d₂) d₂)
-    have r₁_to_r₂ : Derivation₃ r₁ r₂ := by
-      simpa [r₁, r₂] using
+    exact .vcomp
+      (to_reduce_loops₃ d₁)
+      (.vcomp
         (reduced_loop_connect
-          (d₁ := reduce_loops d₁) (d₂ := reduce_loops d₂)
-          (reduce_loops_is_reduced d₁) (reduce_loops_is_reduced d₂))
-    exact .vcomp d₁_to_r₁ (.vcomp r₁_to_r₂ r₂_to_d₂)
-  · exact connect_normalized d₁ d₂
+          (reduce_loops_is_reduced d₁)
+          (reduce_loops_is_reduced d₂))
+        (.inv (to_reduce_loops₃ d₂)))
+  · exact .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
