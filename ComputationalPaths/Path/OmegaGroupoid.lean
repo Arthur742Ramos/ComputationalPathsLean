@@ -376,6 +376,14 @@ noncomputable def connect_normalized {p q : Path a b}
   | .vcomp (.step s₁) (.refl _), .step s₂ =>
       exact .vcomp (.step (.vcomp_refl_right (.step s₁)))
         (.step (.step_eq s₁ s₂))
+  | .vcomp (.refl _) (.step s₁), .vcomp (.refl _) (.step s₂) =>
+      exact Derivation₃.whiskerLeft₃ (.refl _) (.step (.step_eq s₁ s₂))
+  | .step s₁, .vcomp (.refl _) (.step s₂) =>
+      exact .vcomp (.step (.step_eq s₁ s₂))
+        (.inv (.step (.vcomp_refl_left (.step s₂))))
+  | .vcomp (.refl _) (.step s₁), .step s₂ =>
+      exact .vcomp (.step (.vcomp_refl_left (.step s₁)))
+        (.step (.step_eq s₁ s₂))
   | .step s₁, .step s₂ => exact .step (.step_eq s₁ s₂)
   | _, _ => exact .step .rweq_eq
 
