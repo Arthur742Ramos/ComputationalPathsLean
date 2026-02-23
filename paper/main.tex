@@ -80,18 +80,20 @@ From these rewriting principles we construct explicit coherence witnesses
 genuine non-degeneracy at levels~0--2 and contractible higher cells
 (an \emph{adapted} Batanin--Leinster structure, not the genuinely
 non-degenerate one of Lumsdaine or van den Berg--Garner).
-Contractibility at dimension~\(\ge 3\) is achieved via the full
-Squier program: a real normalization pipeline
+Contractibility at dimension~\(\ge 3\) is achieved via a
+normalization-based approach: a real normalization pipeline
 (\(\mathsf{IsReduced}\), \(\mathsf{normalize}\),
 \(\mathsf{to\_normal\_form}_3\)) reduces every 2-cell to a canonical
-reduced flat chain using only groupoid-law \(\mathsf{MetaStep}_3\)
-constructors, and Squier-style \(\mathsf{diamond\_filler}\) 3-cells
-connect the canonical forms across confluence diamonds.
-The \(\mathsf{rweq\_transport}\) constructor participates in connecting
-normalized forms, but its proof obligation
-\(\mathsf{derivation_2\_toEq\_eq}\) is discharged by \(\mathsf{rfl}\)
-(definitional equality); no invocation of
-\(\mathsf{Subsingleton.elim}\) appears in the contractibility proof.
+reduced flat chain using groupoid-law \(\mathsf{MetaStep}_3\)
+constructors.
+At level~3 (connecting parallel 2-cells), the normalized forms are
+joined via the \(\mathsf{rweq\_transport}\) constructor, whose proof
+obligation \(\mathsf{derivation_2\_toEq\_eq}\) is discharged by
+\(\mathsf{rfl}\) (definitional equality on normalized forms).
+At levels~4 and above, Squier-style \(\mathsf{diamond\_filler}\)
+3-cells connect normalized higher cells across confluence diamonds.
+No invocation of \(\mathsf{Subsingleton.elim}\) appears in the
+contractibility proof.
 The formalization declares zero custom \texttt{axiom} commands.
 We then develop homotopy-theoretic applications, including an
 encode--decode computation of \(\pi_1(S^1) \cong \mathbb{Z}\), and report on
@@ -2166,7 +2168,9 @@ In our setting:
 
 \smallskip
 \noindent\textbf{Key achievement: $\mathsf{Subsingleton.elim}$-free structured contractibility.}
-The contractibility proof via $\mathsf{contractibility}_3$ uses:
+The contractibility proof operates at two levels:
+
+\smallskip\noindent\textit{Level~3 ($\mathsf{contractibility}_3$, connecting parallel 2-cells):}
 \begin{enumerate}[nosep]
   \item \textbf{Groupoid-law rewrites}: $\mathsf{vcomp\_refl\_left}$,
         $\mathsf{vcomp\_refl\_right}$, $\mathsf{vcomp\_assoc}$,
@@ -2178,19 +2182,24 @@ The contractibility proof via $\mathsf{contractibility}_3$ uses:
   \item \textbf{Step coherence} ($\mathsf{step\_eq}$): identifies
         any two steps between the same endpoints, reflecting
         proof-irrelevance of the $\mathsf{Step}$ relation itself.
-  \item \textbf{Confluence diamonds} ($\mathsf{diamond\_filler}$):
-        constrained 3-cells connecting only derivations arising from
-        actual diverging-step / rejoin configurations in the TRS.
   \item \textbf{Definitional transport} ($\mathsf{rweq\_transport}$):
         connects normalized forms whose $\mathsf{toEq}$ projections agree.
-        Crucially, the proof obligation $\mathsf{derivation_2\_toEq\_eq}$
+        The proof obligation $\mathsf{derivation_2\_toEq\_eq}$
         is discharged by $\mathsf{rfl}$ (definitional equality in Lean's kernel),
         \emph{not} by $\mathsf{Subsingleton.elim}$.
 \end{enumerate}
 
-This achieves the Squier program explicitly: contractibility at
-dimension $\ge 3$ is a \emph{structured consequence} of confluence
-and the groupoid laws.  The $\mathsf{step\_eq}$ constructor
+\smallskip\noindent\textit{Levels~4+ ($\mathsf{contractibility}_4$, $\mathsf{contractibilityHigh}$):}
+\begin{enumerate}[nosep]
+  \item \textbf{Normalization}: higher cells are normalized via
+        $\mathsf{normalize}_3$, $\mathsf{normalize}_4$.
+  \item \textbf{Squier-style diamond fillers} ($\mathsf{diamond\_filler}$):
+        connect normalized higher cells across confluence diamonds.
+\end{enumerate}
+
+\smallskip
+This achieves contractibility at dimension~$\ge 3$ as a
+\emph{structured consequence} of normalization and the groupoid laws.  The $\mathsf{step\_eq}$ constructor
 relies on $\mathsf{Step}$ being $\Prop$-valued (hence proof-irrelevant),
 and the $\mathsf{rweq\_transport}$ constructor's proof obligation
 reduces to $\mathsf{rfl}$ because all $\mathsf{Derivation}_2$ inhabitants
@@ -2229,10 +2238,11 @@ constructions~\cite{Lumsdaine2010,vdBG2011}, which produce genuinely
 non-degenerate structure at all levels in intensional MLTT, our
 construction is necessarily different: we build \emph{on top of} a
 UIP foundation, and the higher-dimensional collapse is achieved via
-Squier-style diamond fillers, groupoid-law normalization
+groupoid-law normalization
 ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
-$\mathsf{to\_normal\_form}_3$), and the $\mathsf{rweq\_transport}$
-constructor whose proof obligation is definitional ($\mathsf{rfl}$).
+$\mathsf{to\_normal\_form}_3$), the $\mathsf{rweq\_transport}$
+constructor at level~3 whose proof obligation is definitional ($\mathsf{rfl}$),
+and Squier-style $\mathsf{diamond\_filler}$ cells at levels~4 and above.
 No use of $\mathsf{Subsingleton.elim}$ is required.
 \end{remark}
 
@@ -2258,13 +2268,14 @@ Our construction differs in three key respects:
   \item \textbf{Contractibility mechanism.} Higher-dimensional
         contractibility is derived via a real normalization pipeline
         ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
-        $\mathsf{to\_normal\_form}_3$), Squier-style
-        $\mathsf{diamond\_filler}$ constructors for confluence diamonds,
-        and the $\mathsf{rweq\_transport}$ constructor whose proof
-        obligation is definitional ($\mathsf{rfl}$).
+        $\mathsf{to\_normal\_form}_3$), the $\mathsf{rweq\_transport}$
+        constructor for connecting normalized 2-cells, and
+        Squier-style $\mathsf{diamond\_filler}$ constructors at levels~4+.
+        At level~3, the proof obligation for $\mathsf{rweq\_transport}$
+        is discharged by $\mathsf{rfl}$ (definitional equality on
+        normalized forms).
         The 3-cells are
-        built from $\mathsf{step\_eq}$, $\mathsf{diamond\_filler}$,
-        $\mathsf{rweq\_transport}$,
+        built from $\mathsf{step\_eq}$, $\mathsf{rweq\_transport}$,
         and the groupoid-law $\mathsf{MetaStep}_3$ constructors
         (including $\mathsf{whisker\_inv}_3$,
         $\mathsf{vcomp\_congr}_{3,\mathrm{left}}$,
@@ -3266,11 +3277,10 @@ Our contribution is to obtain an analogous structure in a proof-irrelevant
 setting by replacing identity types with computational paths and
 deriving contractibility from confluence combined with UIP
 (Remark~\ref{rem:rweq-eq-honesty}).
-At the 3-cell level, a constrained $\mathsf{diamond\_filler}$
-constructor provides Squier-style structure from critical-pair joins,
-while the $\mathsf{rweq\_transport}$ constructor (at level~3) and
-blanket $\mathsf{diamond\_filler}$ constructors (at levels $\ge 4$) complete
-contractibility, ultimately relying on proof irrelevance of $\Eq$.
+At the 3-cell level, the $\mathsf{rweq\_transport}$ constructor
+connects normalized forms via definitionally-equal proofs ($\mathsf{rfl}$),
+while Squier-style $\mathsf{diamond\_filler}$ constructors at levels $\ge 4$
+connect normalized higher cells across confluence diamonds.
 The resulting structure is
 genuinely non-degenerate at levels 0--2 but contractible above,
 in contrast to the Lumsdaine/vdBG construction which is
@@ -3423,14 +3433,15 @@ The principal contributions are:
   \item A \textbf{weak $\omega$-groupoid structure} adapted from the
     Batanin--Leinster framework~\cite{Batanin1998,Leinster2004}, with
     genuine non-degeneracy at levels 0--2 and contractible higher
-    cells.  Contractibility at dimensions $\ge 3$ is achieved via the
-    full Squier program: a real normalization pipeline
+    cells.  Contractibility at dimensions $\ge 3$ is achieved via
+    normalization: a real normalization pipeline
     ($\mathsf{IsReduced}$, $\mathsf{normalize}$,
-    $\mathsf{to\_normal\_form}_3$) reduces 2-cells to canonical form,
-    Squier-style $\mathsf{diamond\_filler}$ 3-cells connect across
-    confluence diamonds, and the $\mathsf{rweq\_transport}$ constructor's
-    proof obligation is discharged by $\mathsf{rfl}$ (definitional equality),
-    eliminating all uses of $\mathsf{Subsingleton.elim}$ from the
+    $\mathsf{to\_normal\_form}_3$) reduces 2-cells to canonical form.
+    At level~3, normalized forms are connected via $\mathsf{rweq\_transport}$
+    with proof obligations discharged by $\mathsf{rfl}$ (definitional equality).
+    At levels~4+, Squier-style $\mathsf{diamond\_filler}$ cells connect
+    normalized higher cells.
+    This eliminates all uses of $\mathsf{Subsingleton.elim}$ from the
     contractibility proof (Remark~\ref{rem:rweq-eq-honesty})
     (\S\ref{sec:omega}).
 
