@@ -530,6 +530,22 @@ noncomputable def connect_normalized {p q : Path a b}
   match n₁, n₂ with
   | .refl _, .refl _ => exact .refl _
   | .step s₁, .step s₂ => exact .step (.step_eq s₁ s₂)
+  | .vcomp (.step s₁) d₁, .vcomp (.step s₂) d₂ =>
+      by
+        classical
+        by_cases h₁ : ∃ j₁ : StepStar _ q, d₁ = derivation₂_of_stepstar j₁
+        · rcases h₁ with ⟨j₁, rfl⟩
+          by_cases h₂ : ∃ j₂ : StepStar _ q, d₂ = derivation₂_of_stepstar j₂
+          · rcases h₂ with ⟨j₂, rfl⟩
+            exact .step (.diamond_filler s₁ s₂ j₁ j₂)
+          · exact .step (.rweq_transport
+              (derivation₂_toEq_eq
+                (.vcomp (.step s₁) (derivation₂_of_stepstar j₁))
+                (.vcomp (.step s₂) d₂)))
+        · exact .step (.rweq_transport
+            (derivation₂_toEq_eq
+              (.vcomp (.step s₁) d₁)
+              (.vcomp (.step s₂) d₂)))
   | .vcomp (.refl _) d, n =>
       exact .vcomp (.step (.vcomp_refl_left d))
         (.step (.rweq_transport (derivation₂_toEq_eq d n)))
