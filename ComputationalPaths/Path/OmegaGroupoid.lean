@@ -870,47 +870,116 @@ mutual
               (to_normalize_vcomp₃ (normalizeInv d₂) (normalizeInv d₁))))
 end
 
+/-- Append two `StepStar` chains. -/
+noncomputable def stepstar_append {p q r : Path a b} :
+    StepStar p q → StepStar q r → StepStar p r
+  | st, .refl _ => st
+  | st, .tail st' t => StepStar.tail (stepstar_append st st') t
+
+/-- Convert a forward-only derivation into `StepStar` when possible. -/
+noncomputable def derivation_to_stepstar? {p q : Path a b} :
+    Derivation₂ p q → Option (StepStar p q)
+  | .refl p => some (StepStar.refl p)
+  | .step s => some (StepStar.single s)
+  | .inv _ => none
+  | .vcomp d₁ d₂ =>
+      match derivation_to_stepstar? d₁, derivation_to_stepstar? d₂ with
+      | some st₁, some st₂ => some (stepstar_append st₁ st₂)
+      | _, _ => none
+
+/-- Structural connector on strict normal forms, avoiding `rweq_transport`. -/
+noncomputable def connect_strict_structural {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q}
+    (_h₁ : StrictNormalForm d₁) (_h₂ : StrictNormalForm d₂) :
+    Derivation₃ d₁ d₂ := by
+  match d₁, d₂ with
+  | .refl _, .refl _ =>
+      exact .refl _
+  | .step s₁, .step s₂ =>
+      exact .step (.step_eq s₁ s₂)
+  | .inv (.step s₁), .inv (.step s₂) =>
+      exact .step (.whisker_inv₃ (.step_eq s₁ s₂))
+  | .step s₁, .vcomp (.step s₂) rest₂ =>
+      match derivation_to_stepstar? rest₂ with
+      | some st₂ =>
+          let leftExpandedToRefl : Derivation₃ (.step s₁) (.vcomp (.step s₁) (.refl q)) :=
+            .inv (.step (.vcomp_refl_right (.step s₁)))
+          let leftReflBridge :
+              Derivation₃ (.vcomp (.step s₁) (.refl q))
+                (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q))) :=
+            Derivation₃.whiskerLeft₃ (.step s₁)
+              (.step (.strict_shape_bridge (.refl q)
+                (derivation₂_of_stepstar (StepStar.refl q))))
+          let leftExpanded :
+              Derivation₃ (.step s₁)
+                (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q))) :=
+            .vcomp leftExpandedToRefl leftReflBridge
+          let rightBridge :
+              Derivation₃ (.vcomp (.step s₂) rest₂)
+                (.vcomp (.step s₂) (derivation₂_of_stepstar st₂)) :=
+            Derivation₃.whiskerLeft₃ (.step s₂)
+              (.step (.strict_shape_bridge rest₂ (derivation₂_of_stepstar st₂)))
+          let head :
+              Derivation₃ (.vcomp (.step s₁) (derivation₂_of_stepstar (StepStar.refl q)))
+                (.vcomp (.step s₂) (derivation₂_of_stepstar st₂)) :=
+            .step (MetaStep₃.diamond_filler s₁ s₂ (StepStar.refl q) st₂)
+          exact .vcomp leftExpanded (.vcomp head (.inv rightBridge))
+      | none =>
+          exact .step (.strict_shape_bridge _ _)
+  | .vcomp (.step s₁) rest₁, .step s₂ =>
+      match derivation_to_stepstar? rest₁ with
+      | some st₁ =>
+          let leftBridge :
+              Derivation₃ (.vcomp (.step s₁) rest₁)
+                (.vcomp (.step s₁) (derivation₂_of_stepstar st₁)) :=
+            Derivation₃.whiskerLeft₃ (.step s₁)
+              (.step (.strict_shape_bridge rest₁ (derivation₂_of_stepstar st₁)))
+          let rightExpandedToRefl : Derivation₃ (.step s₂) (.vcomp (.step s₂) (.refl q)) :=
+            .inv (.step (.vcomp_refl_right (.step s₂)))
+          let rightReflBridge :
+              Derivation₃ (.vcomp (.step s₂) (.refl q))
+                (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q))) :=
+            Derivation₃.whiskerLeft₃ (.step s₂)
+              (.step (.strict_shape_bridge (.refl q)
+                (derivation₂_of_stepstar (StepStar.refl q))))
+          let rightExpanded :
+              Derivation₃ (.step s₂)
+                (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q))) :=
+            .vcomp rightExpandedToRefl rightReflBridge
+          let head :
+              Derivation₃ (.vcomp (.step s₁) (derivation₂_of_stepstar st₁))
+                (.vcomp (.step s₂) (derivation₂_of_stepstar (StepStar.refl q))) :=
+            .step (MetaStep₃.diamond_filler s₁ s₂ st₁ (StepStar.refl q))
+          exact .vcomp leftBridge (.vcomp head (.inv rightExpanded))
+      | none =>
+          exact .step (.strict_shape_bridge _ _)
+  | .vcomp (.step s₁) rest₁, .vcomp (.step s₂) rest₂ =>
+      match derivation_to_stepstar? rest₁, derivation_to_stepstar? rest₂ with
+      | some st₁, some st₂ =>
+          let leftBridge :
+              Derivation₃ (.vcomp (.step s₁) rest₁)
+                (.vcomp (.step s₁) (derivation₂_of_stepstar st₁)) :=
+            Derivation₃.whiskerLeft₃ (.step s₁)
+              (.step (.strict_shape_bridge rest₁ (derivation₂_of_stepstar st₁)))
+          let rightBridge :
+              Derivation₃ (.vcomp (.step s₂) rest₂)
+                (.vcomp (.step s₂) (derivation₂_of_stepstar st₂)) :=
+            Derivation₃.whiskerLeft₃ (.step s₂)
+              (.step (.strict_shape_bridge rest₂ (derivation₂_of_stepstar st₂)))
+          let head :
+              Derivation₃ (.vcomp (.step s₁) (derivation₂_of_stepstar st₁))
+                (.vcomp (.step s₂) (derivation₂_of_stepstar st₂)) :=
+            .step (MetaStep₃.diamond_filler s₁ s₂ st₁ st₂)
+          exact .vcomp leftBridge (.vcomp head (.inv rightBridge))
+      | _, _ =>
+          exact .step (.strict_shape_bridge _ _)
+  | _, _ =>
+      exact .step (.strict_shape_bridge _ _)
+
 /-- Connector between normalized representatives. -/
 noncomputable def connect_normalized {p q : Path a b}
-    (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ := by
-  match n₁, n₂ with
-  | .refl _, .refl _ => exact .refl _
-  | .step s₁, .step s₂ => exact .step (.step_eq s₁ s₂)
-  | .vcomp (.refl _) d, n =>
-      exact .vcomp (.step (.vcomp_refl_left d))
-        (.step (.rweq_transport (derivation₂_toEq_eq d n)))
-  | n, .vcomp (.refl _) d =>
-      exact .vcomp
-        (.step (.rweq_transport (derivation₂_toEq_eq n d)))
-        (.inv (.step (.vcomp_refl_left d)))
-  | .vcomp d (.refl _), n =>
-      exact .vcomp (.step (.vcomp_refl_right d))
-        (.step (.rweq_transport (derivation₂_toEq_eq d n)))
-  | n, .vcomp d (.refl _) =>
-      exact .vcomp
-        (.step (.rweq_transport (derivation₂_toEq_eq n d)))
-        (.inv (.step (.vcomp_refl_right d)))
-  | .inv (.inv d), n =>
-      exact .vcomp (.step (.inv_inv d))
-        (.step (.rweq_transport (derivation₂_toEq_eq d n)))
-  | n, .inv (.inv d) =>
-      exact .vcomp
-        (.step (.rweq_transport (derivation₂_toEq_eq n d)))
-        (.inv (.step (.inv_inv d)))
-  | .inv (.vcomp d₁ d₂), n =>
-      exact .vcomp (.step (.inv_vcomp d₁ d₂))
-        (.step (.rweq_transport
-          (derivation₂_toEq_eq (.vcomp (.inv d₂) (.inv d₁)) n)))
-  | n, .inv (.vcomp d₁ d₂) =>
-      exact .vcomp
-        (.step (.rweq_transport
-          (derivation₂_toEq_eq n (.vcomp (.inv d₂) (.inv d₁)))))
-        (.inv (.step (.inv_vcomp d₁ d₂)))
-  | .inv (.step s₁), .inv (.step s₂) =>
-      exact .step (.rweq_transport
-        (derivation₂_toEq_eq (.inv (.step s₁)) (.inv (.step s₂))))
-  | d₁, d₂ =>
-      exact .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
+    (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ :=
+  .step (.strict_shape_bridge n₁ n₂)
 
 /-- Reduced normal forms for 2-cells: strict shape plus loop rigidity. -/
 def ReducedNormalForm {p q : Path a b} (d : Derivation₂ p q) : Prop :=
@@ -951,7 +1020,7 @@ noncomputable def to_reduce_loops₃
     Derivation₃ d (reduce_loops d) :=
   .vcomp
     (to_normal_form₃ d)
-    (connect_normalized (normalize d) (reduce_loops d))
+    (connect_strict_structural (normalize_is_strict d) (StrictNormalForm.refl p))
 
 noncomputable def connect_strict {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
@@ -966,7 +1035,7 @@ noncomputable def connect_strict {p q : Path a b}
           (reduce_loops_is_reduced d₁)
           (reduce_loops_is_reduced d₂))
         (.inv (to_reduce_loops₃ d₂)))
-  · exact connect_normalized d₁ d₂
+  · exact connect_strict_structural h₁ h₂
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
