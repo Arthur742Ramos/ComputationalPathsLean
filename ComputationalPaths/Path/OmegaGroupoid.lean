@@ -884,7 +884,26 @@ noncomputable def connect_normalized {p q : Path a b}
   | d₁, d₂ =>
       exact .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
 
-/-- Structural connector between strict normal-form representatives. -/
+/-- Reduced normal forms for 2-cells: strict shape plus loop rigidity. -/
+def ReducedNormalForm {p q : Path a b} (d : Derivation₂ p q) : Prop :=
+  StrictNormalForm d ∧ (p = q → HEq d (.refl p))
+
+/-- Reduced loops are structurally the reflexive derivation. -/
+theorem reduced_loop_is_refl
+    {p : Path a b} {d : Derivation₂ p p}
+    (h : ReducedNormalForm d) :
+    d = .refl p :=
+  eq_of_heq (h.2 rfl)
+
+/-- Structural connector between reduced loops. -/
+noncomputable def reduced_loop_connect
+    {p : Path a b} {d₁ d₂ : Derivation₂ p p}
+    (h₁ : ReducedNormalForm d₁) (h₂ : ReducedNormalForm d₂) :
+    Derivation₃ d₁ d₂ := by
+  rw [reduced_loop_is_refl h₁, reduced_loop_is_refl h₂]
+  exact .refl (.refl p)
+
+/-- Default connector used for residual strict-connector branches. -/
 private noncomputable def connect_strict_fallback {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
   .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
