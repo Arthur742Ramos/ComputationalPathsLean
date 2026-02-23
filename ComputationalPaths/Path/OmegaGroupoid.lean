@@ -886,7 +886,7 @@ noncomputable def connect_normalized {p q : Path a b}
 
 /-- Reduced normal forms for 2-cells: strict shape plus loop rigidity. -/
 def ReducedNormalForm {p q : Path a b} (d : Derivation₂ p q) : Prop :=
-  StrictNormalForm d ∧ (p = q → HEq d (.refl p))
+  StrictNormalForm d ∧ (p = q → HEq d (Derivation₂.refl p))
 
 /-- Reduced loops are structurally the reflexive derivation. -/
 theorem reduced_loop_is_refl
@@ -903,106 +903,46 @@ noncomputable def reduced_loop_connect
   rw [reduced_loop_is_refl h₁, reduced_loop_is_refl h₂]
   exact .refl (.refl p)
 
-/-- Default connector used for residual strict-connector branches. -/
-private noncomputable def connect_strict_fallback {p q : Path a b}
-    (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
+/-- Loop-only reduction used by `connect_strict` in the `p = q` branch. -/
+noncomputable def reduce_loops {p : Path a b} (_d : Derivation₂ p p) : Derivation₂ p p :=
+  .refl p
+
+/-- `reduce_loops` always lands in reduced normal form. -/
+theorem reduce_loops_is_reduced
+    {p : Path a b} (d : Derivation₂ p p) :
+    ReducedNormalForm (reduce_loops d) := by
+  constructor
+  · simpa [reduce_loops] using (StrictNormalForm.refl p)
+  · intro hp
+    cases hp
+    rfl
+
+/-- Bridge from any loop derivation to its `reduce_loops` representative. -/
+noncomputable def to_reduce_loops₃
+    {p : Path a b} (d : Derivation₂ p p) :
+    Derivation₃ d (reduce_loops d) :=
+  .step (.rweq_transport (derivation₂_toEq_eq d (reduce_loops d)))
 
 noncomputable def connect_strict {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
     (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
     Derivation₃ d₁ d₂ := by
   classical
-  have aux : Nonempty (Derivation₃ d₁ d₂) := by
-    induction h₁ with
-    | refl p =>
-        cases h₂ with
-        | refl _ => exact ⟨.refl (.refl p)⟩
-        | _ => exact ⟨connect_strict_fallback _ _⟩
-    | single_step s =>
-        cases h₂ with
-        | single_step t =>
-            exact ⟨.step (.step_eq s t)⟩
-        | cons_step t hrest₂ =>
-            cases hrest₂ with
-            | refl _ =>
-                have _hdiamond :
-                    Derivation₃
-                      (.vcomp (.step s) (derivation₂_of_stepstar (StepStar.refl _)))
-                      (.vcomp (.step t) (derivation₂_of_stepstar (StepStar.refl _))) :=
-                  .step (.diamond_filler s t (StepStar.refl _) (StepStar.refl _))
-                exact ⟨.vcomp
-                  (.step (.step_eq s t))
-                  (.inv (.step (.vcomp_refl_right (.step t))))⟩
-            | _ =>
-                exact ⟨connect_strict_fallback _ _⟩
-        | _ => exact ⟨connect_strict_fallback _ _⟩
-    | single_inv s =>
-        cases h₂ with
-        | single_inv t =>
-            exact ⟨.step (.whisker_inv₃ (.step_eq s t))⟩
-        | cons_inv t hrest₂ =>
-            cases hrest₂ with
-            | refl _ =>
-                exact ⟨.vcomp
-                  (.step (.whisker_inv₃ (.step_eq s t)))
-                  (.inv (.step (.vcomp_refl_right (.inv (.step t)))))⟩
-            | _ =>
-                exact ⟨connect_strict_fallback _ _⟩
-        | _ => exact ⟨connect_strict_fallback _ _⟩
-    | cons_step s hrest₁ ih =>
-        cases h₂ with
-        | cons_step t hrest₂ =>
-            cases hrest₁ with
-            | refl _ =>
-                cases hrest₂ with
-                | refl _ =>
-                    have hrecN : Nonempty (Derivation₃ (.refl _) (.refl _)) :=
-                      ih (StrictNormalForm.refl _)
-                    let _hrec := hrecN
-                    have _hdiamond :
-                        Derivation₃
-                          (.vcomp (.step s) (derivation₂_of_stepstar (StepStar.refl _)))
-                          (.vcomp (.step t) (derivation₂_of_stepstar (StepStar.refl _))) :=
-                      .step (.diamond_filler s t (StepStar.refl _) (StepStar.refl _))
-                    exact ⟨.vcomp
-                      (.step (.vcomp_refl_right (.step s)))
-                      (.vcomp
-                        (.step (.step_eq s t))
-                        (.inv (.step (.vcomp_refl_right (.step t)))))⟩
-                | _ =>
-                    exact ⟨connect_strict_fallback _ _⟩
-            | _ =>
-                exact ⟨connect_strict_fallback _ _⟩
-        | _ =>
-            exact ⟨connect_strict_fallback _ _⟩
-    | cons_inv s hrest₁ ih =>
-        cases h₂ with
-        | single_inv t =>
-            cases hrest₁ with
-            | refl _ =>
-                exact ⟨.vcomp
-                  (.step (.vcomp_refl_right (.inv (.step s))))
-                  (.step (.whisker_inv₃ (.step_eq s t)))⟩
-            | _ =>
-                exact ⟨connect_strict_fallback _ _⟩
-        | cons_inv t hrest₂ =>
-            cases hrest₁ with
-            | refl _ =>
-                cases hrest₂ with
-                | refl _ =>
-                    exact ⟨.vcomp
-                      (.step (.vcomp_refl_right (.inv (.step s))))
-                      (.vcomp
-                        (.step (.whisker_inv₃ (.step_eq s t)))
-                        (.inv (.step (.vcomp_refl_right (.inv (.step t))))))⟩
-                | _ =>
-                    exact ⟨connect_strict_fallback _ _⟩
-            | _ =>
-                exact ⟨connect_strict_fallback _ _⟩
-        | _ =>
-            exact ⟨connect_strict_fallback _ _⟩
-  exact Classical.choice aux
+  by_cases hpq : p = q
+  · cases hpq
+    let r₁ := reduce_loops d₁
+    let r₂ := reduce_loops d₂
+    have d₁_to_r₁ : Derivation₃ d₁ r₁ := by
+      simpa [r₁] using (to_reduce_loops₃ d₁)
+    have r₂_to_d₂ : Derivation₃ r₂ d₂ := by
+      simpa [r₂] using (.inv (to_reduce_loops₃ d₂) : Derivation₃ (reduce_loops d₂) d₂)
+    have r₁_to_r₂ : Derivation₃ r₁ r₂ := by
+      simpa [r₁, r₂] using
+        (reduced_loop_connect
+          (d₁ := reduce_loops d₁) (d₂ := reduce_loops d₂)
+          (reduce_loops_is_reduced d₁) (reduce_loops_is_reduced d₂))
+    exact .vcomp d₁_to_r₁ (.vcomp r₁_to_r₂ r₂_to_d₂)
+  · exact connect_normalized d₁ d₂
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
