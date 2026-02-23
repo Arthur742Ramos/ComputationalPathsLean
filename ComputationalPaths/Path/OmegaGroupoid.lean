@@ -925,7 +925,9 @@ theorem reduce_loops_is_reduced
 noncomputable def to_reduce_loops₃
     {p : Path a b} (d : Derivation₂ p p) :
     Derivation₃ d (reduce_loops d) :=
-  .step (.strict_shape_bridge d (reduce_loops d))
+  .vcomp
+    (to_normal_form₃ d)
+    (connect_normalized (normalize d) (reduce_loops d))
 
 noncomputable def connect_strict {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
@@ -940,7 +942,7 @@ noncomputable def connect_strict {p q : Path a b}
           (reduce_loops_is_reduced d₁)
           (reduce_loops_is_reduced d₂))
         (.inv (to_reduce_loops₃ d₂)))
-  · exact .step (.strict_shape_bridge d₁ d₂)
+  · exact connect_normalized d₁ d₂
 
 /-- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
