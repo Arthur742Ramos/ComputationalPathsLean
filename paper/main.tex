@@ -89,7 +89,8 @@ constructors.
 At level~3, the function \(\mathsf{connect\_strict}\) handles all
 \(25 = 5 \times 5\) case combinations of \(\mathsf{StrictNormalForm}\)
 pairs using purely structural 3-cell constructors:
-\(\mathsf{step\_eq}\), \(\mathsf{diamond\_filler}\),
+\(\mathsf{step\_eq}\), \(\mathsf{diamond\_filler}\) (with constructive
+\(\mathsf{StepStar}\) witnesses),
 \(\mathsf{whisker\_inv}_3\), and the groupoid laws.
 No \(\mathsf{rweq\_transport}\) is used at level~3.
 At levels~4 and above, the same \(\mathsf{diamond\_filler}\) strategy
@@ -2185,7 +2186,13 @@ In our setting:
 \smallskip
 \noindent\textbf{Key achievement: complete Squier program with purely structural 3-cells.}
 The level-3 contractibility proof uses \emph{no} $\mathsf{rweq\_transport}$
-and \emph{no} $\mathsf{Subsingleton.elim}$.  It operates as follows:
+and \emph{no} $\mathsf{Subsingleton.elim}$.%
+\footnote{The constructor $\mathsf{rweq\_transport}$ exists in $\mathsf{MetaStep}_3$
+as a fallback mechanism, but it is \emph{unused} in $\mathsf{contractibility}_3$.
+The function $\mathsf{connect\_strict\_structural}$ handles all cases purely
+via $\mathsf{diamond\_filler}$ (with constructive $\mathsf{StepStar}$ witnesses),
+$\mathsf{step\_eq}$, $\mathsf{whisker\_inv}_3$, and the groupoid laws.}
+It operates as follows:
 
 \smallskip\noindent\textit{Level~3 ($\mathsf{contractibility}_3$, connecting parallel 2-cells):}
 \begin{enumerate}[nosep]
