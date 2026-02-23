@@ -33,12 +33,12 @@ variable {A : Type u}
 /-! ## Cell tower and coherence -/
 
 /-- The cell tower for the infinity-groupoid approximation. -/
-abbrev cellType (A : Type u) : Nat → Type u :=
+abbrev cellType (A : Type u) : Nat → Type (u + 2) :=
   OmegaGroupoid.CellType A
 
 /-- Coherence at level `n`: any two parallel `n`-cells are connected by an
     `(n+1)`-cell in the tower. -/
-noncomputable def CoherenceAt (A : Type u) : Nat → Type u
+noncomputable def CoherenceAt (A : Type u) : Nat → Type (u + 2)
   | 0 => PUnit
   | 1 => PUnit
   | 2 =>
@@ -62,7 +62,7 @@ noncomputable def coherenceAt (A : Type u) : (n : Nat) → CoherenceAt (A := A) 
 /-- An infinity-groupoid approximation on a type `A`. -/
 structure InfinityGroupoid (A : Type u) where
   /-- Cells in each dimension. -/
-  cells : Nat → Type u := cellType A
+  cells : Nat → Type (u + 2) := cellType A
   /-- Coherence witnesses at each level. -/
   coherence : (n : Nat) → CoherenceAt (A := A) n
 
@@ -74,13 +74,13 @@ noncomputable def compPathInfinityGroupoid (A : Type u) : InfinityGroupoid A whe
 /-! ## n-groupoid truncations -/
 
 /-- Cell tower truncated at level `n` (higher cells are collapsed to `PUnit`). -/
-noncomputable def truncCell (A : Type u) (n : Nat) : Nat → Type u
+noncomputable def truncCell (A : Type u) (n : Nat) : Nat → Type (u + 2)
   | k => if k ≤ n then cellType A k else PUnit
 
 /-- The `n`-groupoid truncation of the infinity-groupoid tower. -/
 structure NGroupoidTruncation (A : Type u) (n : Nat) where
   /-- Cells in each dimension for the truncation. -/
-  cells : Nat → Type u := truncCell A n
+  cells : Nat → Type (u + 2) := truncCell A n
   /-- Coherence witness at the top level. -/
   coherence : CoherenceAt (A := A) n
 

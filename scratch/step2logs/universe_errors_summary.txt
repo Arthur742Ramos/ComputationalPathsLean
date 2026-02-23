@@ -1,0 +1,6 @@
+ComputationalPaths/Path/Algebra/TStructureDeep.lean:72 | tripleTruncLE_toEq (line 70) | Application type mismatch: The argument
+ComputationalPaths/Path/Algebra/TriangulatedDeep.lean:512 | doubleShiftRoundtrip_toEq (line 510) | Application type mismatch: The argument
+ComputationalPaths/Path/Algebra/DerivedAdjunctionDeep.lean:355 | verdierDoubleLoop_toEq (line 352) | Application type mismatch: The argument
+ComputationalPaths/Path/Algebra/DerivedAdjunctionDeep.lean:367 | verdierTripleToSingle_toEq (line 364) | Application type mismatch: The argument
+ComputationalPaths/Path/Algebra/DerivedAdjunctionDeep.lean:380 | verdierQuadToId_toEq (line 377) | Application type mismatch: The argument
+ComputationalPaths/Path/Algebra/DerivedAdjunctionDeep.lean:487 | moritaDoubleApply_toEq (line 484) | Application type mismatch: The argument

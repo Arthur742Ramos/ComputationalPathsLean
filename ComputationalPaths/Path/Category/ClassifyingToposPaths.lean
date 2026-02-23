@@ -246,22 +246,30 @@ noncomputable def ipOr_comm {A : Type u} (p q : InternalProp A) :
 /-- 22. Path: conjunction with True is identity. -/
 noncomputable def ipAnd_true {A : Type u} (p : InternalProp A) :
     Path (ipAnd p (ipTrue A)).holds p.holds :=
-  Path.mk [] (by ext a; simp [ipAnd, ipTrue]; exact ⟨fun ⟨h, _⟩ => h, fun h => ⟨h, trivial⟩⟩)
+  Path.mk [] (by
+    funext a
+    simp [ipAnd, ipTrue])
 
 /-- 23. Path: conjunction with False is False. -/
 noncomputable def ipAnd_false {A : Type u} (p : InternalProp A) :
     Path (ipAnd p (ipFalse A)).holds (ipFalse A).holds :=
-  Path.mk [] (by ext a; simp [ipAnd, ipFalse]; exact ⟨fun ⟨_, h⟩ => h, False.elim⟩)
+  Path.mk [] (by
+    funext a
+    simp [ipAnd, ipFalse])
 
 /-- 24. Path: disjunction with False is identity. -/
 noncomputable def ipOr_false {A : Type u} (p : InternalProp A) :
     Path (ipOr p (ipFalse A)).holds p.holds :=
-  Path.mk [] (by ext a; simp [ipOr, ipFalse]; exact or_false_iff _)
+  Path.mk [] (by
+    funext a
+    simp [ipOr, ipFalse])
 
 /-- 25. Path: disjunction with True is True. -/
 noncomputable def ipOr_true {A : Type u} (p : InternalProp A) :
     Path (ipOr p (ipTrue A)).holds (ipTrue A).holds :=
-  Path.mk [] (by ext a; simp [ipOr, ipTrue]; exact ⟨fun _ => trivial, fun _ => Or.inr trivial⟩)
+  Path.mk [] (by
+    funext a
+    simp [ipOr, ipTrue])
 
 /-- 26. Path: conjunction distributes over disjunction. -/
 noncomputable def ipAnd_distrib_or {A : Type u} (p q r : InternalProp A) :
@@ -292,7 +300,9 @@ noncomputable def ipOr_distrib_and {A : Type u} (p q r : InternalProp A) :
 /-- 28. Path: implication reflexivity p → p is True. -/
 noncomputable def ipImpl_refl {A : Type u} (p : InternalProp A) :
     Path (ipImpl p p).holds (ipTrue A).holds :=
-  Path.mk [] (by ext a; simp [ipImpl, ipTrue]; exact ⟨fun _ => trivial, fun _ h => h⟩)
+  Path.mk [] (by
+    funext a
+    simp [ipImpl, ipTrue])
 
 /-- 29. 2-step chain: (p ∧ q) ∧ r = p ∧ (q ∧ r) via associativity path. -/
 noncomputable def ipAnd_assoc {A : Type u} (p q r : InternalProp A) :
@@ -328,9 +338,17 @@ structure SubobjClassifier (Ω : Type u) where
 /-- The Bool subobject classifier. -/
 noncomputable def boolClassifier : SubobjClassifier Bool where
   true_ := true
-  char := fun P a => if P a then true else false
-  char_true := fun P a hp => by simp [hp]
-  char_false := fun P a hp => by simp [hp]
+  char := fun P a => by
+    classical
+    exact if P a then true else false
+  char_true := by
+    intro A P a hp
+    classical
+    simp [hp]
+  char_false := by
+    intro A P a hp
+    classical
+    simp [hp]
 
 /-- 31. Path: characteristic of True is constant true. -/
 noncomputable def char_true_const (a : Nat) :
@@ -373,54 +391,58 @@ noncomputable def unionSet {A : Type u} (S T : PowerObj A) : PowerObj A :=
 /-- 34. Path: intersection commutativity. -/
 noncomputable def interSet_comm {A : Type u} (S T : PowerObj A) :
     Path (interSet S T) (interSet T S) :=
-  Path.mk [] (by ext a; simp [interSet]; exact And.comm)
+  Path.mk [] (by
+    funext a
+    simp [interSet, And.comm])
 
 /-- 35. Path: union commutativity. -/
 noncomputable def unionSet_comm {A : Type u} (S T : PowerObj A) :
     Path (unionSet S T) (unionSet T S) :=
-  Path.mk [] (by ext a; simp [unionSet]; exact Or.comm)
+  Path.mk [] (by
+    funext a
+    simp [unionSet, Or.comm])
 
 /-- 36. Path: intersection with full is identity. -/
 noncomputable def interSet_full {A : Type u} (S : PowerObj A) :
     Path (interSet S (fullSet A)) S :=
-  Path.mk [] (by ext a; simp [interSet, fullSet]; exact ⟨fun ⟨h, _⟩ => h, fun h => ⟨h, trivial⟩⟩)
+  Path.mk [] (by
+    funext a
+    simp [interSet, fullSet])
 
 /-- 37. Path: union with empty is identity. -/
 noncomputable def unionSet_empty {A : Type u} (S : PowerObj A) :
     Path (unionSet S (emptySet A)) S :=
-  Path.mk [] (by ext a; simp [unionSet, emptySet]; exact or_false_iff _)
+  Path.mk [] (by
+    funext a
+    simp [unionSet, emptySet])
 
 /-- 38. Path: intersection with empty is empty. -/
 noncomputable def interSet_empty {A : Type u} (S : PowerObj A) :
     Path (interSet S (emptySet A)) (emptySet A) :=
-  Path.mk [] (by ext a; simp [interSet, emptySet]; exact ⟨fun ⟨_, h⟩ => h, False.elim⟩)
+  Path.mk [] (by
+    funext a
+    simp [interSet, emptySet])
 
 /-- 39. Path: union with full is full. -/
 noncomputable def unionSet_full {A : Type u} (S : PowerObj A) :
     Path (unionSet S (fullSet A)) (fullSet A) :=
-  Path.mk [] (by ext a; simp [unionSet, fullSet]; exact ⟨fun _ => trivial, fun _ => Or.inr trivial⟩)
+  Path.mk [] (by
+    funext a
+    simp [unionSet, fullSet])
 
 /-- 40. Path: intersection associativity. -/
 noncomputable def interSet_assoc {A : Type u} (S T U : PowerObj A) :
     Path (interSet (interSet S T) U) (interSet S (interSet T U)) :=
   Path.mk [] (by
-    ext a; simp [interSet]; constructor
-    · rintro ⟨⟨hs, ht⟩, hu⟩; exact ⟨hs, ht, hu⟩
-    · rintro ⟨hs, ht, hu⟩; exact ⟨⟨hs, ht⟩, hu⟩)
+    funext a
+    simp [interSet, and_assoc])
 
 /-- 41. Path: union associativity. -/
 noncomputable def unionSet_assoc {A : Type u} (S T U : PowerObj A) :
     Path (unionSet (unionSet S T) U) (unionSet S (unionSet T U)) :=
   Path.mk [] (by
-    ext a; simp [unionSet]; constructor
-    · rintro ((hs | ht) | hu)
-      · exact Or.inl hs
-      · exact Or.inr (Or.inl ht)
-      · exact Or.inr (Or.inr hu)
-    · rintro (hs | ht | hu)
-      · exact Or.inl (Or.inl hs)
-      · exact Or.inl (Or.inr ht)
-      · exact Or.inr hu)
+    funext a
+    simp [unionSet, or_assoc])
 
 /-- 42. Path: De Morgan for intersection/union. -/
 noncomputable def deMorgan_inter {A : Type u} [DecidableEq A] (S T : A → Bool) :

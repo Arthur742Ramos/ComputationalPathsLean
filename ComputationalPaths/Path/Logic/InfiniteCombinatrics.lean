@@ -73,7 +73,8 @@ noncomputable def pigeonhole_path (n : Nat) (f : Fin (n + 1) → Fin n) (_ : 0 <
         have hinj : Function.Injective f := by
           intro i j hij
           exact Classical.byContradiction fun hne => h ⟨i, j, hne, hij⟩
-        exact absurd (Fintype.card_le_of_injective f hinj) (by omega)⟩)
+        exact absurd (Fintype.card_le_of_injective f hinj)
+          (by simp [Nat.not_succ_le_self])⟩)
 
 /-! ## Infinite Ramsey -/
 

@@ -140,11 +140,11 @@ theorem compPathsStrengths_trace_is_explicit {A : Type u} {a b : A}
 
 /-! ## (6) `PathRwQuot` as the 1-truncation (via level-3 contractibility) -/
 
-abbrev Derivation2 {A : Type u} {a b : A} (p q : Path a b) : Type u :=
+abbrev Derivation2 {A : Type u} {a b : A} (p q : Path a b) : Type (u+2) :=
   OmegaGroupoid.Derivation₂ p q
 
 abbrev Derivation3 {A : Type u} {a b : A} {p q : Path a b}
-    (d₁ d₂ : OmegaGroupoid.Derivation₂ p q) : Type u :=
+    (d₁ d₂ : OmegaGroupoid.Derivation₂ p q) : Type (u+2) :=
   OmegaGroupoid.Derivation₃ d₁ d₂
 
 structure IsOneTruncation (A : Type u) (a b : A) where

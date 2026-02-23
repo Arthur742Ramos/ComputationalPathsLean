@@ -124,7 +124,7 @@ For 3-cells, we additionally require the two closing paths to be 3-equivalent.
     When two single steps diverge, they can close to a common point,
     and the two derivations are 3-equivalent. -/
 structure TDiamond {a b : A} (r : Path a b → Path a b → Type v) :
-    Type (max (u + 1) v) where
+    Type (max (u + 2) v) where
   /-- Embed an `r`-witness as a `Step` so we can form 2-cells (`Derivation₂`)
   and state 3-cell coherences. -/
   step_of : ∀ {p q : Path a b}, r p q → Step p q

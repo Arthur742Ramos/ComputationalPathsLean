@@ -65,16 +65,16 @@ abbrev Loop1Space (A : Type u) (a : A) : Type u :=
 
 /-- The 2-loop space: 2-cells from refl to refl.
     An element of Loop2Space is a derivation between the reflexivity path. -/
-noncomputable def Loop2Space (A : Type u) (a : A) : Type u :=
+noncomputable def Loop2Space (A : Type u) (a : A) : Type (u + 2) :=
   Derivation₂ (Path.refl a) (Path.refl a)
 
 /-- The 3-loop space: 3-cells from refl₂ to refl₂.
     An element of Loop3Space is a meta-derivation between reflexivity derivations. -/
-noncomputable def Loop3Space (A : Type u) (a : A) : Type u :=
+noncomputable def Loop3Space (A : Type u) (a : A) : Type (u + 2) :=
   Derivation₃ (Derivation₂.refl (Path.refl a)) (Derivation₂.refl (Path.refl a))
 
 /-- The 4-loop space: 4-cells from refl₃ to refl₃. -/
-noncomputable def Loop4Space (A : Type u) (a : A) : Type u :=
+noncomputable def Loop4Space (A : Type u) (a : A) : Type (u + 2) :=
   Derivation₄ (Derivation₃.refl (Derivation₂.refl (Path.refl a)))
               (Derivation₃.refl (Derivation₂.refl (Path.refl a)))
 
@@ -145,7 +145,7 @@ noncomputable instance Loop2Setoid (A : Type u) (a : A) : Setoid (Loop2Space A a
   }
 
 /-- The second homotopy group π₂(A, a). -/
-noncomputable def PiTwo (A : Type u) (a : A) : Type u :=
+noncomputable def PiTwo (A : Type u) (a : A) : Type (u + 2) :=
   Quotient (Loop2Setoid A a)
 
 notation "π₂(" A ", " a ")" => PiTwo A a
@@ -273,17 +273,17 @@ For a uniform treatment, we define π_n using the cell types from the ω-groupoi
 /-- The n-th homotopy group for n ≥ 1.
     π₁ = fundamental group (loops / RwEq)
     πₙ for n ≥ 2 uses the ω-groupoid tower -/
-noncomputable def PiN (n : Nat) (A : Type u) (a : A) : Type u :=
+noncomputable def PiN (n : Nat) (A : Type u) (a : A) : Type (u + 2) :=
   match n with
-  | 0 => PUnit  -- π₀ would be path components, but we return Unit here
-  | 1 => π₁(A, a)
+  | 0 => ULift.{u + 2, 0} PUnit  -- π₀ would be path components, but we return Unit here
+  | 1 => ULift.{u + 2, u} (π₁(A, a))
   | 2 => π₂(A, a)
   | _ + 3 =>
       -- For n ≥ 3, we use contractibility to show π_n collapses
       -- By contractibility₃, all 2-cells are equivalent
       -- By contractibility₄, all 3-cells are equivalent
       -- Thus π₃, π₄, ... become trivial quotients
-      PUnit  -- Placeholder: proper definition requires more infrastructure
+      ULift.{u + 2, 0} PUnit  -- Placeholder: proper definition requires more infrastructure
 
 notation "πₙ(" n ", " A ", " a ")" => PiN n A a
 
@@ -299,7 +299,7 @@ dimensions, all cells are equivalent.
 -/
 
 /-- For any pointed type, π₂ is abelian. -/
-theorem piN_two_comm (A : Type u) (a : A) (x y : πₙ(2, A, a)) :
+theorem piN_two_comm (A : Type u) (a : A) (x y : π₂(A, a)) :
     PiTwo.mul x y = PiTwo.mul y x := piTwo_comm x y
 
 /-! ## Path Connectivity

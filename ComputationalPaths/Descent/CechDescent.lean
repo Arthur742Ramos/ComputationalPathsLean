@@ -34,6 +34,12 @@ structure CoveringData (X : Type u) (Idx : Type v) where
   pr₂ : {i j : Idx} → overlap i j → patch j
   /-- Symmetry of overlaps. -/
   overlapSymm : {i j : Idx} → overlap i j → overlap j i
+  /-- Symmetry swaps projections (first direction). -/
+  pr_symm₁ : {i j : Idx} → (x : overlap i j) →
+    Path (pr₁ (overlapSymm x)) (pr₂ x)
+  /-- Symmetry swaps projections (second direction). -/
+  pr_symm₂ : {i j : Idx} → (x : overlap i j) →
+    Path (pr₂ (overlapSymm x)) (pr₁ x)
   /-- Symmetry-symmetry is identity. -/
   overlapSymm_symm : {i j : Idx} → (x : overlap i j) →
     Path (overlapSymm (overlapSymm x)) x
@@ -70,7 +76,7 @@ noncomputable def overlapSymm_symm_refl_left {i j : Idx} (x : C.overlap i j) :
 noncomputable def overlapSymm_symm_involution {i j : Idx} (x : C.overlap i j) :
     RwEq (Path.symm (Path.symm (C.overlapSymm_symm x)))
          (C.overlapSymm_symm x) :=
-  rweq_of_step (Step.symm_symm (C.overlapSymm_symm x))
+  rweq_of_step (Path.Step.symm_symm (C.overlapSymm_symm x))
 
 end CoveringData
 
@@ -121,7 +127,7 @@ noncomputable def gluing_refl_left {i j : Idx} (x : C.overlap i j) :
 noncomputable def gluing_symm_symm {i j : Idx} (x : C.overlap i j) :
     RwEq (Path.symm (Path.symm (D.gluing x)))
          (D.gluing x) :=
-  rweq_of_step (Step.symm_symm (D.gluing x))
+  rweq_of_step (Path.Step.symm_symm (D.gluing x))
 
 end CechDescentDatum
 
@@ -192,7 +198,7 @@ noncomputable def coface_comm_symm_symm (n : Nat) (i j : Fin (n + 2))
     (x : H.level n) (h : i.val ≤ j.val) :
     RwEq (Path.symm (Path.symm (H.coface_comm n i j x h)))
          (H.coface_comm n i j x h) :=
-  rweq_of_step (Step.symm_symm (H.coface_comm n i j x h))
+  rweq_of_step (Path.Step.symm_symm (H.coface_comm n i j x h))
 
 /-- Coface commutation right-unit. -/
 noncomputable def coface_comm_refl_right (n : Nat) (i j : Fin (n + 2))

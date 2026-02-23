@@ -287,33 +287,32 @@ section EckmannHiltonProof
 
 variable {a : A}
 
-/-- Right whiskering by `refl` is connected to the identity by a 3-cell.
+/-- Transport a 2-loop to the whiskered type using unit laws.
+    This conjugates `α` by the unit law `trans (refl a) (refl a) → refl a`. -/
+noncomputable def transportToWhiskerType (α : OmegaTwo A a) :
+    Derivation₂ (Path.trans (Path.refl a) (Path.refl a)) (Path.trans (Path.refl a) (Path.refl a)) :=
+  .vcomp (.vcomp (.step (Step.trans_refl_right (Path.refl a))) α)
+         (.inv (.step (Step.trans_refl_right (Path.refl a))))
 
-    Both `OmegaGroupoid.whiskerRight α (refl a)` and `α` are derivations between the
-    reflexivity path and itself, producing identical `RwEq` proofs. -/
-noncomputable def whiskerRight_refl_id (α : OmegaTwo A a) :
-    Derivation₃ (OmegaGroupoid.whiskerRight α (Path.refl a)) α :=
-  .step (.diamond_filler (Step.trans_refl_right (Path.refl a)) (Step.trans_refl_right (Path.refl a))
-    (StepStar.refl (Path.refl a)) (StepStar.refl (Path.refl a)))
+/-- Right whiskering by `refl` is connected to the transported identity by a 3-cell.
+    We connect `whiskerRight α refl` to `transportToWhiskerType α` using contractibility₃. -/
+noncomputable def whiskerRight_refl_transport (α : OmegaTwo A a) :
+    Derivation₃ (OmegaGroupoid.whiskerRight α (Path.refl a)) (transportToWhiskerType α) :=
+  contractibility₃ _ _
 
-/-- Left whiskering by `refl` is connected to the identity by a 3-cell. -/
-noncomputable def whiskerLeft_refl_id (β : OmegaTwo A a) :
-    Derivation₃ (OmegaGroupoid.whiskerLeft (Path.refl a) β) β :=
-  .step (.diamond_filler (Step.trans_refl_right (Path.refl a)) (Step.trans_refl_right (Path.refl a))
-    (StepStar.refl (Path.refl a)) (StepStar.refl (Path.refl a)))
+/-- Left whiskering by `refl` is connected to the transported identity by a 3-cell. -/
+noncomputable def whiskerLeft_refl_transport (β : OmegaTwo A a) :
+    Derivation₃ (OmegaGroupoid.whiskerLeft (Path.refl a) β) (transportToWhiskerType β) :=
+  contractibility₃ _ _
 
-/-- **Key lemma**: Horizontal composition reduces to vertical composition on Ω².
+/-- **Key lemma**: Horizontal composition reduces to vertical composition on Ω² up to transport.
 
-    `hcomp α β ≡₃ vcomp α β`
-
-    Since `hcomp α β` unfolds to `vcomp (OmegaGroupoid.whiskerRight α refl) (OmegaGroupoid.whiskerLeft refl β)`,
-    and whiskering by `refl` is the identity up to 3-cells, we conclude by
-    congruence of `vcomp` at level 3. -/
+    Since both `hcomp α β` and `vcomp α β` (after transport) are parallel 2-cells
+    living in the same type, they are connected by contractibility₃. -/
 noncomputable def hcomp_eq_vcomp (α β : OmegaTwo A a) :
     Derivation₃ (OmegaTwo.hcomp α β) (OmegaTwo.vcomp α β) :=
-  .vcomp
-    (Derivation₃.whiskerRight₃ (whiskerRight_refl_id α) (OmegaGroupoid.whiskerLeft (Path.refl a) β))
-    (Derivation₃.whiskerLeft₃ α (whiskerLeft_refl_id β))
+  -- Both sides are parallel 2-cells from refl to refl
+  contractibility₃ _ _
 
 /-- Alternative horizontal composition: left-whisker first, then right-whisker.
     This is the other diagonal of the interchange square. -/
@@ -324,9 +323,8 @@ noncomputable def hcomp_eq_vcomp (α β : OmegaTwo A a) :
     `hcomp' α β ≡₃ vcomp β α`. -/
 noncomputable def hcomp'_eq_vcomp (α β : OmegaTwo A a) :
     Derivation₃ (hcomp' α β) (OmegaTwo.vcomp β α) :=
-  .vcomp
-    (Derivation₃.whiskerRight₃ (whiskerLeft_refl_id β) (OmegaGroupoid.whiskerRight α (Path.refl a)))
-    (Derivation₃.whiskerLeft₃ β (whiskerRight_refl_id α))
+  -- Both sides are parallel 2-cells from refl to refl
+  contractibility₃ _ _
 
 /-- Interchange law specialized to Ω²: the two horizontal compositions
     are connected by a 3-cell. `hcomp α β ≡₃ hcomp' α β`. -/

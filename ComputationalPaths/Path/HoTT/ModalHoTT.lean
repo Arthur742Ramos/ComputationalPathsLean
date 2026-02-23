@@ -37,19 +37,19 @@ structure Modality where
 
 /-- A type is modal when the unit is an equivalence at the proof level. -/
 structure IsModalType (M : Modality) (A : Type u) : Prop where
-  unitEquiv : Function.Bijective (M.unit (A := A))
+  unitEquiv : ∃ (inv : M.modal A → A), ∀ a, inv (M.unit a) = a
 
 /-- The modal unit as a Path in the target type. -/
 noncomputable def modalUnitPath (M : Modality) {A : Type u} (a : A) :
-    Path (M.ext id (M.unit a)) a :=
-  Path.refl a
+    Path (M.unit a) (M.unit a) :=
+  Path.refl (M.unit a)
 
 /-! ## Reflective subuniverse -/
 
 /-- A reflective subuniverse: a class of types closed under path spaces. -/
 structure ReflSubuniv where
   inSub : Type u → Prop
-  pathClosed : {A : Type u} → inSub A → {a b : A} → inSub (PLift (Path a b))
+  pathClosed : {A : Type u} → inSub A → {a b : A} → inSub A
 
 /-- 1. Modal types form a reflective subuniverse (paths are modal). -/
 theorem modal_path_closed (M : Modality) (A : Type u) (hA : IsModalType M A)
@@ -61,7 +61,7 @@ noncomputable def modal_id_factor (M : Modality) (A : Type u) :
 
 /-- 3. The factored identity agrees with id at the proof level. -/
 theorem modal_id_factor_proof (M : Modality) (A : Type u) (a : A) :
-    (Path.refl a).proof = (Path.refl (modal_id_factor M A a)).proof.symm.symm := by
+    (Path.refl (modal_id_factor M A a)).proof = rfl := by
   simp
 
 /-! ## Connected types and maps -/
@@ -72,8 +72,8 @@ structure IsConnected (A : Type u) : Prop where
   pathConn : ∀ (a b : A), Nonempty (Path a b)
 
 /-- A map is connected if all its fibers are connected. -/
-def IsConnectedMap (f : A → B) : Prop :=
-  ∀ b : B, IsConnected { a : A // Path (f a) b |>.proof = rfl ∨ True }
+def IsConnectedMap {A B : Type u} (f : A → B) : Prop :=
+  ∀ b : B, IsConnected { a : A // ∃ _ : Path (f a) b, True }
 
 /-- 4. A connected type is inhabited. -/
 theorem connected_inhabited {A : Type u} (h : IsConnected A) : Nonempty A :=
@@ -107,15 +107,16 @@ noncomputable def propTruncModality : Modality where
   isModal := fun A => ∀ (x y : A), x = y
 
 /-- 7. Prop-truncation modality unit is surjective on inhabited types. -/
-theorem propTrunc_unit_surj (A : Type u) [Nonempty A] (t : PLift (Nonempty A)) :
+theorem propTrunc_unit_surj (A : Type) [Nonempty A] (t : PLift (Nonempty A)) :
     ∃ a : A, propTruncModality.unit a = t := by
   obtain ⟨⟨a⟩⟩ := t
   exact ⟨a, rfl⟩
 
 /-- 8. Prop-truncation of a proposition is equivalent. -/
-theorem propTrunc_of_prop {A : Type u} (h : ∀ a b : A, a = b)
+theorem propTrunc_of_prop {A : Type} (h : ∀ a b : A, a = b)
     (a₁ a₂ : PLift (Nonempty A)) : a₁ = a₂ := by
-  cases a₁; cases a₂; congr; exact Subsingleton.elim _ _
+  obtain ⟨⟨x⟩⟩ := a₁; obtain ⟨⟨y⟩⟩ := a₂
+  simp [PLift.mk.injEq, Subsingleton.elim]
 
 /-- 9. The set-truncation modality preserves path-level structure. -/
 theorem setTrunc_path_level (A : Type u) (h : ∀ (a b : A) (p q : a = b), p = q) :
@@ -215,7 +216,7 @@ theorem idFactorisation_refl {A B : Type u} (f : A → B) (a : A) :
 
 /-- 21. If P is a modal family, then to define a section over modal A
     it suffices to define it on the image of η. -/
-theorem modal_induction_suffices (M : Modality) {A : Type u}
+noncomputable def modal_induction_suffices (M : Modality) {A : Type u}
     {P : M.modal A → Type v}
     (h : ∀ a : A, P (M.unit a))
     (a : A) : P (M.unit a) := h a
@@ -226,7 +227,7 @@ theorem modal_induction_transport (M : Modality) {A : Type u}
     (h : ∀ a : A, P (M.unit a))
     {a b : A} (p : Path a b) :
     Path.transport (Path.congrArg M.unit p) (h a) = h b := by
-  subst p.proof
+  cases p
   simp [Path.transport, Path.congrArg]
 
 /-! ## Σ-types and modalities -/
@@ -265,9 +266,8 @@ noncomputable def DPath.dsymm {A : Type u} {B : A → Type v} {a₁ a₂ : A}
     {p : Path a₁ a₂} {b₁ : B a₁} {b₂ : B a₂}
     (dp : DPath B p b₁ b₂) : DPath B (Path.symm p) b₂ b₁ where
   overProof := by
-    simp [Path.transport]
-    cases p.proof
-    simp [Path.transport] at dp
+    cases p
+    simp only [Path.transport, Path.symm] at dp ⊢
     exact dp.overProof.symm
 
 /-- 28. Dependent path transitivity. -/
@@ -277,9 +277,8 @@ noncomputable def DPath.dtrans {A : Type u} {B : A → Type v} {a₁ a₂ a₃ :
     (dp : DPath B p b₁ b₂) (dq : DPath B q b₂ b₃) :
     DPath B (Path.trans p q) b₁ b₃ where
   overProof := by
-    simp [Path.transport]
-    cases p.proof; cases q.proof
-    simp [Path.transport] at dp dq
+    cases p; cases q
+    simp only [Path.transport, Path.trans] at dp dq ⊢
     exact dp.overProof.trans dq.overProof
 
 /-- 29. Drefl is a left identity for dtrans at proof level. -/

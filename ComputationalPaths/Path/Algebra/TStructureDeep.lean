@@ -69,7 +69,7 @@ noncomputable def tripleTruncLE (T : TStructureExt) (C : ChainComplex) :
 
 theorem tripleTruncLE_toEq (T : TStructureExt) (C : ChainComplex) :
     (tripleTruncLE T C).toEq =
-      ((congrArg T.truncLE (T.truncLE_idem C).toEq).trans (T.truncLE_idem C).toEq) := by
+      (((congrArg T.truncLE (T.truncLE_idem C)).toEq).trans (T.truncLE_idem C).toEq) := by
   simp [tripleTruncLE]
 
 noncomputable def tripleTruncGE (T : TStructureExt) (C : ChainComplex) :
@@ -373,7 +373,6 @@ theorem IC_zero_perversity_simplified (T : TStructureExt) (C : ChainComplex) (n 
     intersectionCohomology T zeroPerversity C n =
       (T.truncLE (T.truncGE C)).obj (Int.ofNat n) := by
   simp [intersectionCohomology, zeroPerversity]
-  omega
 
 /-- Path from IC with zero perversity to underlying truncation. -/
 noncomputable def IC_zero_path (T : TStructureExt) (C : ChainComplex) (n : Nat) :

@@ -56,7 +56,7 @@ noncomputable def unitPath_cancel_left (X : Sp) :
 noncomputable def unitPath_symm_symm (X : Sp) :
     RwEq (Path.symm (Path.symm (B.unitPath X)))
          (B.unitPath X) :=
-  rweq_of_step (Step.symm_symm (B.unitPath X))
+  rweq_symm_symm (B.unitPath X)
 
 /-- unitPath right-unit. -/
 noncomputable def unitPath_refl_right (X : Sp) :
@@ -80,7 +80,7 @@ noncomputable def localIsLocal_cancel_right (X : Sp) :
 noncomputable def localIsLocal_symm_symm (X : Sp) :
     RwEq (Path.symm (Path.symm (B.localIsLocal X)))
          (B.localIsLocal X) :=
-  rweq_of_step (Step.symm_symm (B.localIsLocal X))
+  rweq_symm_symm (B.localIsLocal X)
 
 /-- idempotent right-cancels. -/
 noncomputable def idempotent_cancel_right (X : Sp) :
@@ -92,7 +92,7 @@ noncomputable def idempotent_cancel_right (X : Sp) :
 noncomputable def idempotent_symm_symm (X : Sp) :
     RwEq (Path.symm (Path.symm (B.idempotent X)))
          (B.idempotent X) :=
-  rweq_of_step (Step.symm_symm (B.idempotent X))
+  rweq_symm_symm (B.idempotent X)
 
 /-- idempotent right-unit. -/
 noncomputable def idempotent_refl_right (X : Sp) :
@@ -137,7 +137,7 @@ noncomputable def nilpotentPath_cancel_right (X : Sp) (n : Nat) :
 noncomputable def nilpotentPath_symm_symm (X : Sp) (n : Nat) :
     RwEq (Path.symm (Path.symm (N.nilpotentPath X n)))
          (N.nilpotentPath X n) :=
-  rweq_of_step (Step.symm_symm (N.nilpotentPath X n))
+  rweq_symm_symm (N.nilpotentPath X n)
 
 /-- nilpotentPath right-unit. -/
 noncomputable def nilpotentPath_refl_right (X : Sp) (n : Nat) :
@@ -161,7 +161,7 @@ noncomputable def smash_comm_cancel_right (X Y : Sp) :
 noncomputable def smash_comm_symm_symm (X Y : Sp) :
     RwEq (Path.symm (Path.symm (N.smash_comm X Y)))
          (N.smash_comm X Y) :=
-  rweq_of_step (Step.symm_symm (N.smash_comm X Y))
+  rweq_symm_symm (N.smash_comm X Y)
 
 /-- smash_assoc right-cancels. -/
 noncomputable def smash_assoc_cancel_right (X Y Z : Sp) :
@@ -174,7 +174,7 @@ noncomputable def smash_assoc_cancel_right (X Y Z : Sp) :
 noncomputable def smash_assoc_symm_symm (X Y Z : Sp) :
     RwEq (Path.symm (Path.symm (N.smash_assoc X Y Z)))
          (N.smash_assoc X Y Z) :=
-  rweq_of_step (Step.symm_symm (N.smash_assoc X Y Z))
+  rweq_symm_symm (N.smash_assoc X Y Z)
 
 /-- smash_assoc right-unit. -/
 noncomputable def smash_assoc_refl_right (X Y Z : Sp) :
@@ -224,7 +224,7 @@ noncomputable def periodicPath_cancel_right (X : Sp) (k : Nat) :
 noncomputable def periodicPath_symm_symm (X : Sp) (k : Nat) :
     RwEq (Path.symm (Path.symm (P.periodicPath X k)))
          (P.periodicPath X k) :=
-  rweq_of_step (Step.symm_symm (P.periodicPath X k))
+  rweq_symm_symm (P.periodicPath X k)
 
 /-- periodicPath right-unit. -/
 noncomputable def periodicPath_refl_right (X : Sp) (k : Nat) :
