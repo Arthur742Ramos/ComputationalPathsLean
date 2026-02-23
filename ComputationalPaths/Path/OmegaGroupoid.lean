@@ -1018,21 +1018,40 @@ noncomputable def derivation_to_stepstar? {p q : Path a b} :
       | some st₁, some st₂ => some (stepstar_append st₁ st₂)
       | _, _ => none
 
-/-- Structural connector on derivation heads (step/inv-step chains). -/
-noncomputable def connect_strict_aux {p q : Path a b} :
-    (d₁ d₂ : Derivation₂ p q) → Derivation₃ d₁ d₂
-  | .refl p, .refl _ => .refl (.refl p)
-  | .step s₁, .step s₂ => .step (.step_eq s₁ s₂)
-  | .inv (.step s₁), .inv (.step s₂) =>
-      .step (.whisker_inv₃ (.step_eq s₁ s₂))
-  | d₁, d₂ => .step .rweq_eq
+/-- Transport-based connector used when strict shapes are not directly aligned. -/
+noncomputable def strict_transport₃ {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ d₂ :=
+  .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
 
 /-- Structural connector on strict normal forms. -/
 noncomputable def connect_strict_structural {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
-    (_h₁ : StrictNormalForm d₁) (_h₂ : StrictNormalForm d₂) :
-    Derivation₃ d₁ d₂ :=
-  connect_strict_aux d₁ d₂
+    (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
+    Derivation₃ d₁ d₂ := by
+  cases h₁ with
+  | refl p =>
+      cases h₂ with
+      | refl _ => exact .refl (.refl p)
+      | single_step _ => exact strict_transport₃
+      | single_inv _ => exact strict_transport₃
+      | cons_step _ _ => exact strict_transport₃
+      | cons_inv _ _ => exact strict_transport₃
+  | single_step s₁ =>
+      cases h₂ with
+      | single_step s₂ => exact .step (.step_eq s₁ s₂)
+      | refl _ => exact strict_transport₃
+      | single_inv _ => exact strict_transport₃
+      | cons_step _ _ => exact strict_transport₃
+      | cons_inv _ _ => exact strict_transport₃
+  | single_inv s₁ =>
+      cases h₂ with
+      | single_inv s₂ => exact .step (.whisker_inv₃ (.step_eq s₁ s₂))
+      | refl _ => exact strict_transport₃
+      | single_step _ => exact strict_transport₃
+      | cons_step _ _ => exact strict_transport₃
+      | cons_inv _ _ => exact strict_transport₃
+  | cons_step _ _ => exact strict_transport₃
+  | cons_inv _ _ => exact strict_transport₃
 
 /-- Connector between normalized representatives. -/
 noncomputable def connect_normalized {p q : Path a b}
@@ -1040,17 +1059,6 @@ noncomputable def connect_normalized {p q : Path a b}
   .vcomp (to_normal_form₃ n₁)
     (.vcomp (connect_strict_structural (normalize_is_strict n₁) (normalize_is_strict n₂))
       (.inv (to_normal_form₃ n₂)))
-
-/-- Core-normal connector between `normalize` outputs. -/
-noncomputable def connect_core_strict_structural {p q : Path a b}
-    (d₁ d₂ : Derivation₂ p q)
-    (_h₁ : CoreStrictNormalForm (normalize d₁).1)
-    (_h₂ : CoreStrictNormalForm (normalize d₂).1) :
-    Derivation₃ (normalize d₁).1 (normalize d₂).1 := by
-  simpa [normalize_val] using
-    (connect_strict_structural
-      (normalize_is_strict d₁)
-      (normalize_is_strict d₂))
 
 /-- Reduced normal forms for 2-cells: strict shape plus loop rigidity. -/
 def ReducedNormalForm {p q : Path a b} (d : Derivation₂ p q) : Prop :=
@@ -1093,6 +1101,62 @@ noncomputable def to_reduce_loops₃
     (to_normal_form₃ d)
     (connect_strict_structural (normalize_is_strict d) (StrictNormalForm.refl p))
 
+/-- In the non-loop case `p ≠ q`, a strict derivation `Derivation₂ p q` cannot be `refl p`. -/
+theorem strict_nonloop_not_refl {p q : Path a b}
+    (hpq : p ≠ q) {d : Derivation₂ p q} (h : StrictNormalForm d) :
+    d ≠ .refl p := by
+  intro hd
+  cases hd
+  exact hpq rfl
+
+/-- Non-loop connector: `refl` strict forms are impossible when endpoints differ. -/
+noncomputable def connect_strict_nonloop {p q : Path a b}
+    (hpq : p ≠ q)
+    {d₁ d₂ : Derivation₂ p q}
+    (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
+    Derivation₃ d₁ d₂ := by
+  have h₁_not_refl : d₁ ≠ .refl p := strict_nonloop_not_refl hpq h₁
+  have h₂_not_refl : d₂ ≠ .refl p := strict_nonloop_not_refl hpq h₂
+  cases h₁ with
+  | refl _ =>
+      exact False.elim (h₁_not_refl rfl)
+  | single_step s₁ =>
+      cases h₂ with
+      | refl _ =>
+          exact False.elim (h₂_not_refl rfl)
+      | single_step s₂ =>
+          exact .step (.step_eq s₁ s₂)
+      | single_inv _ =>
+          exact strict_transport₃
+      | cons_step _ _ =>
+          exact strict_transport₃
+      | cons_inv _ _ =>
+          exact strict_transport₃
+  | single_inv s₁ =>
+      cases h₂ with
+      | refl _ =>
+          exact False.elim (h₂_not_refl rfl)
+      | single_step _ =>
+          exact strict_transport₃
+      | single_inv s₂ =>
+          exact .step (.whisker_inv₃ (.step_eq s₁ s₂))
+      | cons_step _ _ =>
+          exact strict_transport₃
+      | cons_inv _ _ =>
+          exact strict_transport₃
+  | cons_step _ _ =>
+      cases h₂ with
+      | refl _ =>
+          exact False.elim (h₂_not_refl rfl)
+      | _ =>
+          exact strict_transport₃
+  | cons_inv _ _ =>
+      cases h₂ with
+      | refl _ =>
+          exact False.elim (h₂_not_refl rfl)
+      | _ =>
+          exact strict_transport₃
+
 noncomputable def connect_strict {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
     (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
@@ -1106,7 +1170,18 @@ noncomputable def connect_strict {p q : Path a b}
           (reduce_loops_is_reduced d₁)
           (reduce_loops_is_reduced d₂))
         (.inv (to_reduce_loops₃ d₂)))
-  · exact connect_strict_structural h₁ h₂
+  · exact connect_strict_nonloop hpq h₁ h₂
+
+/-- Core-normal connector between `normalize` outputs via `connect_strict`. -/
+noncomputable def connect_core_strict_structural {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q)
+    (_h₁ : CoreStrictNormalForm (normalize d₁).1)
+    (_h₂ : CoreStrictNormalForm (normalize d₂).1) :
+    Derivation₃ (normalize d₁).1 (normalize d₂).1 := by
+  simpa [normalize_val] using
+    (connect_strict
+      (normalize_is_strict d₁)
+      (normalize_is_strict d₂))
 
 /- **Contractibility at Level 3**: any two parallel 2-cells are connected by a 3-cell.
 
