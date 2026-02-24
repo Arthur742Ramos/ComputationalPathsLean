@@ -810,6 +810,7 @@ import ComputationalPaths.Path.Graph.FlowPaths
 import ComputationalPaths.Path.Graph.GraphPaths
 import ComputationalPaths.Path.Graph.TreePaths
 import ComputationalPaths.Path.Groupoid.ActionGroupoidPaths
+import ComputationalPaths.Path.Groupoid.BasepointChange
 import ComputationalPaths.Path.Groupoid.CoveringPaths
 import ComputationalPaths.Path.Groupoid.FundGroupoidPaths
 import ComputationalPaths.Path.Groupoid.FundamentalGroupoidDeep

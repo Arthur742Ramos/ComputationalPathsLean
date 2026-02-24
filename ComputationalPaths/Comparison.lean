@@ -1,4 +1,6 @@
 /- Root module for ComputationalPaths.Comparison -/
 
-import ComputationalPaths.Comparison.HoTTComparison
+-- Note: HoTTComparison temporarily excluded due to OmegaGroupoid issues
+-- import ComputationalPaths.Comparison.HoTTComparison
 import ComputationalPaths.Comparison.UnivalenceAnalog
+import ComputationalPaths.Comparison.PartialUnivalence
