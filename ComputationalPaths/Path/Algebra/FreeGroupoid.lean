@@ -47,19 +47,6 @@ structure CPFunctor (G H : CPGroupoid) where
     ∀ {a b c : G.Obj} (f : G.Hom a b) (g : G.Hom b c),
       map (G.comp f g) = H.comp (map f) (map g)
 
-/-! ## Computads and the free-groupoid presentation -/
-
-/-- A 1-computad: objects and directed generating arrows between them. -/
-structure Computad where
-  Obj : Type u
-  Gen : Obj → Obj → Type v
-
-/-- Canonical computad associated to a type: objects are points, generators are
-raw computational paths between them. -/
-noncomputable def pathComputad (A : Type u) : Computad where
-  Obj := A
-  Gen := fun a b => Path a b
-
 /-! ## Free groupoid laws from Step constructors -/
 
 section FreeGroupoidLaws
@@ -117,16 +104,6 @@ noncomputable def FreeGroupoid (A : Type u) : CPGroupoid where
   comp_id := fun x => free_comp_id x
   inv_comp := fun x => free_inv_comp x
   comp_inv := fun x => free_comp_inv x
-
-/-- The free groupoid on `pathComputad A` is the existing quotient groupoid. -/
-abbrev freeGroupoidOfPathComputad (A : Type u) : CPGroupoid :=
-  FreeGroupoid A
-
-/-- Chapter 6 (free-groupoid characterization): morphisms in the fundamental
-groupoid core are exactly morphisms in the free groupoid on `pathComputad A`. -/
-@[simp] theorem fundamentalGroupoidCore_as_free_hom
-    {A : Type u} {a b : A} :
-    PathRwQuot A a b = (freeGroupoidOfPathComputad A).Hom a b := rfl
 
 /-- Raw paths embed as morphisms in the free groupoid. -/
 noncomputable def ofPath {A : Type u} {a b : A} (p : Path a b) :

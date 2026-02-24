@@ -944,66 +944,6 @@ noncomputable def weakBicategory (A : Type u) :
   triangle := fun {a b c} (f : Path a b) (g : Path b c) =>
     TwoCell.triangle (A := A) (a := a) (b := b) (c := c) f g
 
-/-- Explicit bicategory interface with invertible associator and unitors. -/
-class Bicategory (Obj : Type u') extends WeakBicategory (Obj := Obj) where
-  assocInv :
-    ∀ {a b c d : Obj},
-      (f : Hom a b) → (g : Hom b c) → (h : Hom c d) →
-      TwoCell (comp f (comp g h)) (comp (comp f g) h)
-  leftUnitorInv :
-    ∀ {a b : Obj} (f : Hom a b),
-      TwoCell f (comp (id₁ a) f)
-  rightUnitorInv :
-    ∀ {a b : Obj} (f : Hom a b),
-      TwoCell f (comp f (id₁ b))
-  assoc_left_inverse :
-    ∀ {a b c d : Obj} (f : Hom a b) (g : Hom b c) (h : Hom c d),
-      vcomp (assoc f g h) (assocInv f g h) = id₂ (comp (comp f g) h)
-  assoc_right_inverse :
-    ∀ {a b c d : Obj} (f : Hom a b) (g : Hom b c) (h : Hom c d),
-      vcomp (assocInv f g h) (assoc f g h) = id₂ (comp f (comp g h))
-  leftUnitor_left_inverse :
-    ∀ {a b : Obj} (f : Hom a b),
-      vcomp (leftUnitor f) (leftUnitorInv f) = id₂ (comp (id₁ a) f)
-  leftUnitor_right_inverse :
-    ∀ {a b : Obj} (f : Hom a b),
-      vcomp (leftUnitorInv f) (leftUnitor f) = id₂ f
-  rightUnitor_left_inverse :
-    ∀ {a b : Obj} (f : Hom a b),
-      vcomp (rightUnitor f) (rightUnitorInv f) = id₂ (comp f (id₁ b))
-  rightUnitor_right_inverse :
-    ∀ {a b : Obj} (f : Hom a b),
-      vcomp (rightUnitorInv f) (rightUnitor f) = id₂ f
-
-/-- The bicategory of computational paths `𝔅_A` (Chapter 7): objects are points
-of `A`, 1-cells are computational paths, and 2-cells are rewrite equivalences. -/
-noncomputable instance pathBicategory (A : Type u) : Bicategory A where
-  toWeakBicategory := weakBicategory A
-  assocInv := fun {a b c d} f g h =>
-    TwoCell.assoc_inv (A := A) (a := a) (b := b) (c := c) (d := d) f g h
-  leftUnitorInv := fun {a b} f =>
-    TwoCell.leftUnitor_inv (A := A) (a := a) (b := b) f
-  rightUnitorInv := fun {a b} f =>
-    TwoCell.rightUnitor_inv (A := A) (a := a) (b := b) f
-  assoc_left_inverse := by
-    intro a b c d f g h
-    apply Subsingleton.elim
-  assoc_right_inverse := by
-    intro a b c d f g h
-    apply Subsingleton.elim
-  leftUnitor_left_inverse := by
-    intro a b f
-    apply Subsingleton.elim
-  leftUnitor_right_inverse := by
-    intro a b f
-    apply Subsingleton.elim
-  rightUnitor_left_inverse := by
-    intro a b f
-    apply Subsingleton.elim
-  rightUnitor_right_inverse := by
-    intro a b f
-    apply Subsingleton.elim
-
 /-- Computational paths organise into a weak 2-groupoid: every path has an
 inverse up to rewrite equality. -/
 noncomputable def weakTwoGroupoid (A : Type u) :
