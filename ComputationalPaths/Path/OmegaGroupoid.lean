@@ -87,7 +87,14 @@ This module derives the following contractibility results from structural filler
 3. **Level 5+**: `contractibilityHigh` for parallel `Derivation₄`
 
 The groupoid laws (unit, associativity, inverses), pentagon, triangle, and interchange
-coherences are all *proved* as constructors of `MetaStep₃`/`MetaStep₄`/`MetaStepHigh`.
+coherences are represented as constructors of `MetaStep₃`. The pentagon and triangle
+constructors correspond to critical pairs in the rewrite system:
+- **Pentagon**: Critical pair when two `trans_assoc` rules overlap on `((f·g)·h)·k`
+- **Triangle**: Critical pair when `trans_assoc` and `trans_refl_right` overlap on `(f·refl)·g`
+
+These could alternatively be derived via `contractibility₃` (which uses normalization
+and diamond fillers), but having them as explicit generators makes the categorical
+structure clearer and mirrors the classical bicategorical axioms.
 
 ### Why This Is Consistent
 
@@ -1625,7 +1632,17 @@ noncomputable def pentagonRight (f : Path a b) (g : Path b c) (h : Path c d) (k 
          (whiskerLeft f (associator g h k))
 
 /-- **Pentagon coherence** (Mac Lane): The two ways of re-associating four paths
-    `((f·g)·h)·k ⟹ f·(g·(h·k))` are equal as 2-cells, witnessed by a 3-cell. -/
+    `((f·g)·h)·k ⟹ f·(g·(h·k))` are equal as 2-cells, witnessed by a 3-cell.
+
+    This coherence arises from the critical pair when two `trans_assoc` rules overlap
+    on `((f·g)·h)·k`. One application gives `(f·g)·(h·k)`, the other gives `(f·(g·h))·k`.
+    Both paths lead to the normal form `f·(g·(h·k))`. The `MetaStep₃.pentagon` constructor
+    encapsulates this critical pair resolution as a primitive 3-cell generator.
+
+    **Alternative derivation**: One could derive this using `contractibility₃` which
+    constructs 3-cells between any parallel 2-cells via normalization and diamond fillers.
+    However, having pentagon as a primitive generator makes the categorical structure
+    more explicit and mirrors the classical bicategorical axioms. -/
 noncomputable def pentagonCoherence (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e) :
     Derivation₃ (pentagonLeft f g h k) (pentagonRight f g h k) :=
   .step (.pentagon f g h k)
@@ -1641,7 +1658,14 @@ noncomputable def triangleRight (f : Path a b) (g : Path b c) :
   whiskerRight (rightUnitor f) g
 
 /-- **Triangle coherence**: The two ways of simplifying `(f·refl)·g ⟹ f·g`
-    (via associator+left-unitor vs. via right-unitor) are equal, witnessed by a 3-cell. -/
+    (via associator+left-unitor vs. via right-unitor) are equal, witnessed by a 3-cell.
+
+    This coherence arises from the critical pair when `trans_assoc` and `trans_refl_right`
+    overlap on `(f·refl)·g`. The `MetaStep₃.triangle` constructor encapsulates this
+    critical pair resolution as a primitive 3-cell generator.
+
+    Like the pentagon, this could alternatively be derived via `contractibility₃`,
+    but having it as a primitive makes the monoidal coherence structure explicit. -/
 noncomputable def triangleCoherence (f : Path a b) (g : Path b c) :
     Derivation₃ (triangleLeft f g) (triangleRight f g) :=
   .step (.triangle f g)
