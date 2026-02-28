@@ -189,43 +189,45 @@ end QuillenAdjunction
 
 /-! ## Basic path theorem layer -/
 
-theorem path_refl_1 {A : Type _} (a : A) :
-    Path.refl a = Path.refl a := by
-  rfl
+noncomputable def path_refl_left_rweq {A : Type _} (a : A) :
+    RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+  rweq_of_step (Step.trans_refl_left (A := A) (p := Path.refl a))
 
-theorem path_refl_2 {A : Type _} (a : A) :
-    Path.trans (Path.refl a) (Path.refl a) =
-      Path.trans (Path.refl a) (Path.refl a) := by
-  rfl
+noncomputable def path_refl_right_rweq {A : Type _} (a : A) :
+    RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) :=
+  rweq_of_step (Step.trans_refl_right (A := A) (p := Path.refl a))
 
-theorem path_symm_refl {A : Type _} (a : A) :
-    Path.symm (Path.refl a) = Path.symm (Path.refl a) := by
-  rfl
+noncomputable def path_symm_trans_rweq {A : Type _} (a : A) :
+    RwEq (Path.trans (Path.symm (Path.refl a)) (Path.refl a)) (Path.refl a) :=
+  rweq_of_step (Step.symm_trans (A := A) (p := Path.refl a))
 
-theorem path_trans_refl {A : Type _} (a : A) :
-    Path.trans (Path.refl a) (Path.symm (Path.refl a)) =
-      Path.trans (Path.refl a) (Path.symm (Path.refl a)) := by
-  rfl
+noncomputable def path_trans_symm_rweq {A : Type _} (a : A) :
+    RwEq (Path.trans (Path.refl a) (Path.symm (Path.refl a))) (Path.refl a) :=
+  rweq_of_step (Step.trans_symm (A := A) (p := Path.refl a))
 
-theorem path_trans_assoc_shape {A : Type _} (a : A) :
-    Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) =
-      Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) := by
-  rfl
+theorem path_symm_trans_toEq {A : Type _} (a : A) :
+    (Path.trans (Path.symm (Path.refl a)) (Path.refl a)).toEq = rfl := by
+  simpa using
+    (rwEq_iff_toEq
+      (p := Path.trans (Path.symm (Path.refl a)) (Path.refl a))
+      (q := Path.refl a)).1
+      (path_symm_trans_rweq a)
 
-theorem path_symm_trans_shape {A : Type _} (a : A) :
-    Path.symm (Path.trans (Path.refl a) (Path.refl a)) =
-      Path.symm (Path.trans (Path.refl a) (Path.refl a)) := by
-  rfl
-
-theorem path_trans_symm_shape {A : Type _} (a : A) :
-    Path.trans (Path.symm (Path.refl a)) (Path.refl a) =
-      Path.trans (Path.symm (Path.refl a)) (Path.refl a) := by
-  rfl
+theorem path_trans_symm_toEq {A : Type _} (a : A) :
+    (Path.trans (Path.refl a) (Path.symm (Path.refl a))).toEq = rfl := by
+  simpa using
+    (rwEq_iff_toEq
+      (p := Path.trans (Path.refl a) (Path.symm (Path.refl a)))
+      (q := Path.refl a)).1
+      (path_trans_symm_rweq a)
 
 theorem path_double_symm_refl {A : Type _} (a : A) :
-    Path.symm (Path.symm (Path.refl a)) =
-      Path.symm (Path.symm (Path.refl a)) := by
-  rfl
+    Path.symm (Path.symm (Path.refl a)) = Path.refl a := by
+  simpa using
+    (rwEq_iff_toEq
+      (p := Path.symm (Path.symm (Path.refl a)))
+      (q := Path.refl a)).1
+      (rweq_of_step (Step.symm_symm (A := A) (p := Path.refl a)))
 
 end QuillenAdjunction
 end Homotopy

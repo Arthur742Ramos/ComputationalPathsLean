@@ -20,6 +20,7 @@ inverse laws and naturality.
 -/
 
 import ComputationalPaths.Path.BrownRepresentability
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -44,6 +45,32 @@ noncomputable def equiv_rightInvPath {A : Type u} {F : PathContraFunctor A}
     ComputationalPaths.Path
       ((R.equiv b).toFun ((R.equiv b).invFun y)) y :=
   ComputationalPaths.Path.stepChain ((R.equiv b).right_inv y)
+
+noncomputable def equiv_leftInv_cancel_rweq {A : Type u} {F : PathContraFunctor A}
+    (R : ContraRepresentable A F) (b : A) (x : F.obj b) :
+    RwEq
+      (Path.trans
+        (Path.symm (equiv_leftInvPath (R := R) (b := b) (x := x)))
+        (equiv_leftInvPath (R := R) (b := b) (x := x)))
+      (Path.refl x) :=
+  rweq_of_step
+    (Step.symm_trans
+      (A := F.obj b)
+      (p := equiv_leftInvPath (R := R) (b := b) (x := x)))
+
+noncomputable def equiv_rightInv_cancel_rweq {A : Type u} {F : PathContraFunctor A}
+    (R : ContraRepresentable A F) (b : A)
+    (y : FundamentalGroupoid.Hom A b R.obj) :
+    RwEq
+      (Path.trans
+        (equiv_rightInvPath (R := R) (b := b) (y := y))
+        (Path.symm (equiv_rightInvPath (R := R) (b := b) (y := y))))
+      (Path.refl (((R.equiv b).toFun ((R.equiv b).invFun y)))) :=
+  rweq_of_step
+    (Step.trans_symm
+      (A := FundamentalGroupoid.Hom A b R.obj)
+      (p := equiv_rightInvPath (R := R) (b := b) (y := y))
+    )
 
 /-- Path-typed naturality of a representability equivalence. -/
 noncomputable def equiv_naturalityPath {A : Type u} {F : PathContraFunctor A}

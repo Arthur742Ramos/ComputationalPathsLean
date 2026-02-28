@@ -181,7 +181,7 @@ noncomputable def conjugateByPath {a b : A} (p : FundamentalGroupoid.Hom A a b) 
     (FundamentalGroupoid.comp' A α p)
 
 /-- Alternative notation: transport along a path. -/
-abbrev transportPiOne {a b : A} (p : FundamentalGroupoid.Hom A a b) :
+noncomputable abbrev transportPiOne {a b : A} (p : FundamentalGroupoid.Hom A a b) :
     π₁(A, a) → π₁(A, b) :=
   conjugateByPath p
 

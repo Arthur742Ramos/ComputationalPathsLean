@@ -38,7 +38,7 @@ variable (A : Type u)
 /-- The fundamental groupoid category on A.
 
 Objects are points of A and morphisms are path equivalence classes. -/
-abbrev FundamentalGroupoidCategory : StrictGroupoid A := FundamentalGroupoid A
+noncomputable abbrev FundamentalGroupoidCategory : StrictGroupoid A := FundamentalGroupoid A
 
 /-- The fundamental groupoid category is a groupoid in the categorical sense. -/
 theorem fundamentalGroupoid_isGroupoid :

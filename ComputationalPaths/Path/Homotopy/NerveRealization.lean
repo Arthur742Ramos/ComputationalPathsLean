@@ -43,6 +43,7 @@ The nerve and realization form an adjoint pair:
 
 import ComputationalPaths.Path.Homotopy.KanComplex
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -92,6 +93,30 @@ noncomputable def comp_assoc_path {a b c d : C.Obj}
     (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) :
     Path (C.comp (C.comp f g) h) (C.comp f (C.comp g h)) :=
   Path.stepChain (C.comp_assoc f g h)
+
+noncomputable def id_comp_cancel_rweq {a b : C.Obj} (f : C.Hom a b) :
+    RwEq
+      (Path.trans (Path.symm (id_comp_path (C := C) f)) (id_comp_path (C := C) f))
+      (Path.refl f) :=
+  rweq_of_step
+    (Step.symm_trans (A := C.Hom a b) (p := id_comp_path (C := C) f))
+
+noncomputable def comp_id_cancel_rweq {a b : C.Obj} (f : C.Hom a b) :
+    RwEq
+      (Path.trans (comp_id_path (C := C) f) (Path.symm (comp_id_path (C := C) f)))
+      (Path.refl (C.comp f (C.id b))) :=
+  rweq_of_step
+    (Step.trans_symm (A := C.Hom a b) (p := comp_id_path (C := C) f))
+
+noncomputable def comp_assoc_cancel_rweq {a b c d : C.Obj}
+    (f : C.Hom a b) (g : C.Hom b c) (h : C.Hom c d) :
+    RwEq
+      (Path.trans
+        (comp_assoc_path (C := C) f g h)
+        (Path.symm (comp_assoc_path (C := C) f g h)))
+      (Path.refl (C.comp (C.comp f g) h)) :=
+  rweq_of_step
+    (Step.trans_symm (A := C.Hom a d) (p := comp_assoc_path (C := C) f g h))
 
 end SmallCatData
 
@@ -226,6 +251,20 @@ noncomputable def inv_comp_path {a b : G.Obj} (f : G.Hom a b) :
 noncomputable def comp_inv_path {a b : G.Obj} (f : G.Hom a b) :
     Path (G.comp f (G.inv f)) (G.id a) :=
   Path.stepChain (G.comp_inv f)
+
+noncomputable def inv_comp_cancel_rweq {a b : G.Obj} (f : G.Hom a b) :
+    RwEq
+      (Path.trans (Path.symm (inv_comp_path (G := G) f)) (inv_comp_path (G := G) f))
+      (Path.refl (G.id b)) :=
+  rweq_of_step
+    (Step.symm_trans (A := G.Hom b b) (p := inv_comp_path (G := G) f))
+
+noncomputable def comp_inv_cancel_rweq {a b : G.Obj} (f : G.Hom a b) :
+    RwEq
+      (Path.trans (comp_inv_path (G := G) f) (Path.symm (comp_inv_path (G := G) f)))
+      (Path.refl (G.comp f (G.inv f))) :=
+  rweq_of_step
+    (Step.trans_symm (A := G.Hom a a) (p := comp_inv_path (G := G) f))
 
 /-- Inverse of identity is identity. -/
 theorem inv_id (a : G.Obj) : G.inv (G.id a) = G.id a := by

@@ -44,6 +44,31 @@ structure PreFunctor (A : Type u) (B : Type u) (f : A -> B) where
   respects_rweq :
     forall {a b : A} {p q : Path a b}, RwEq p q -> Path (map p) (map q)
 
+namespace PreFunctor
+
+variable {A B : Type u} {f : A -> B}
+
+noncomputable def map_refl_cancel_rweq (F : PreFunctor A B f) (a : A) :
+    RwEq
+      (Path.trans (Path.symm (F.map_refl a)) (F.map_refl a))
+      (Path.refl (FundamentalGroupoid.id' B (f a))) :=
+  rweq_of_step
+    (Step.symm_trans
+      (A := FundamentalGroupoid.Hom B (f a) (f a))
+      (p := F.map_refl a))
+
+noncomputable def map_trans_cancel_rweq (F : PreFunctor A B f)
+    {a b c : A} (p : Path a b) (q : Path b c) :
+    RwEq
+      (Path.trans (F.map_trans p q) (Path.symm (F.map_trans p q)))
+      (Path.refl (F.map (Path.trans p q))) :=
+  rweq_of_step
+    (Step.trans_symm
+      (A := FundamentalGroupoid.Hom B (f a) (f c))
+      (p := F.map_trans p q))
+
+end PreFunctor
+
 /-! ## Fixed-object functors -/
 
 /-- A fundamental groupoid functor with object map fixed to `f`. -/
@@ -175,8 +200,7 @@ noncomputable def rightDerivedFunctor {A B : Type u} {f : A -> B}
 @[simp] theorem leftDerivedFunctorOn_map_localize {A B : Type u} {f : A -> B}
     (F : PreFunctor A B f) {a b : A} (p : Path a b) :
     (leftDerivedFunctorOn F).map (localize p) = F.map p := by
-  simpa [PreFunctor.localizationMap, localize] using
-    (PathLocalizationMap.lift_mk (F := PreFunctor.localizationMap F) (p := p))
+  rfl
 
 /-- The right derived functor factors the path map through localization. -/
 @[simp] theorem rightDerivedFunctorOn_map_localize {A B : Type u} {f : A -> B}
