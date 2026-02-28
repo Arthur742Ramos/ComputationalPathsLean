@@ -127,11 +127,50 @@ noncomputable def suspensionCircleMeridInv (x : CircleCompPath) :
     Path (suspensionCircleSouth : SuspensionCircleCompPath) suspensionCircleNorth :=
   Path.symm (suspensionCircleMerid x)
 
+/-- RwEq-first cancellation: `merid(x) ⬝ merid(x)⁻¹` rewrites to `refl`. -/
+noncomputable def suspensionCircleMerid_cancel_rweq (x : CircleCompPath) :
+    RwEq (suspensionCircleMeridLoop x x)
+      (Path.refl (suspensionCircleNorth : SuspensionCircleCompPath)) := by
+  simpa [suspensionCircleMeridLoop] using
+    (rweq_cmpA_inv_right (suspensionCircleMerid x))
+
+/-- RwEq-first cancellation: `merid(x)⁻¹ ⬝ merid(x)` rewrites to `refl`. -/
+noncomputable def suspensionCircleMeridInv_cancel_rweq (x : CircleCompPath) :
+    RwEq (Path.trans (suspensionCircleMeridInv x) (suspensionCircleMerid x))
+      (Path.refl (suspensionCircleSouth : SuspensionCircleCompPath)) := by
+  simpa [suspensionCircleMeridInv] using
+    (rweq_cmpA_inv_left (suspensionCircleMerid x))
+
+/-- RwEq-first simplification: `(merid x ⬝ merid y⁻¹) ⬝ merid y` rewrites to `merid x`. -/
+noncomputable def suspensionCircleMeridLoop_simplify_right_rweq (x y : CircleCompPath) :
+    RwEq (Path.trans (suspensionCircleMeridLoop x y) (suspensionCircleMerid y))
+      (suspensionCircleMerid x) := by
+  have hAssoc :
+      RwEq (Path.trans (suspensionCircleMeridLoop x y) (suspensionCircleMerid y))
+        (Path.trans (suspensionCircleMerid x)
+          (Path.trans (Path.symm (suspensionCircleMerid y)) (suspensionCircleMerid y))) := by
+    simpa [suspensionCircleMeridLoop] using
+      (rweq_tt (suspensionCircleMerid x) (Path.symm (suspensionCircleMerid y))
+        (suspensionCircleMerid y))
+  have hCancel :
+      RwEq (Path.trans (suspensionCircleMerid x)
+          (Path.trans (Path.symm (suspensionCircleMerid y)) (suspensionCircleMerid y)))
+        (Path.trans (suspensionCircleMerid x)
+          (Path.refl (suspensionCircleSouth : SuspensionCircleCompPath))) :=
+    rweq_trans_congr_right (suspensionCircleMerid x)
+      (rweq_cmpA_inv_left (suspensionCircleMerid y))
+  have hUnit :
+      RwEq (Path.trans (suspensionCircleMerid x)
+          (Path.refl (suspensionCircleSouth : SuspensionCircleCompPath)))
+        (suspensionCircleMerid x) :=
+    rweq_cmpA_refl_right (suspensionCircleMerid x)
+  exact rweq_trans (rweq_trans hAssoc hCancel) hUnit
+
 /-- Round-trip cancellation: merid(x) ⬝ merid(x)⁻¹ has trivial toEq. -/
 theorem suspensionCircleMerid_cancel_toEq (x : CircleCompPath) :
     (suspensionCircleMeridLoop x x).toEq =
     (rfl : (suspensionCircleNorth : SuspensionCircleCompPath) = suspensionCircleNorth) := by
-  simp
+  exact rweq_toEq (suspensionCircleMerid_cancel_rweq x)
 
 /-- All meridian loops have the same toEq (by proof irrelevance). -/
 theorem suspensionCircleMeridLoop_toEq_eq (x y x' y' : CircleCompPath) :
@@ -143,7 +182,7 @@ theorem suspensionCircleMeridLoop_toEq_eq (x y x' y' : CircleCompPath) :
 theorem suspensionCircleMeridLoop_self_proof (x : CircleCompPath) :
     (suspensionCircleMeridLoop x x).proof =
     (Path.refl (suspensionCircleNorth : SuspensionCircleCompPath)).proof := by
-  simp
+  exact rweq_toEq (suspensionCircleMerid_cancel_rweq x)
 
 /-- Composition of two meridian paths through south. -/
 noncomputable def suspensionCircleMeridCompose (x y z : CircleCompPath) :

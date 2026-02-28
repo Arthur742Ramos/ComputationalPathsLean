@@ -305,11 +305,12 @@ noncomputable def inducedPiNMap (n : Nat) (f : A → B) (a : A) :
   cases n with
   | zero =>
       intro _
-      exact PUnit.unit
+      exact ULift.up PUnit.unit
   | succ n =>
       cases n with
       | zero =>
-          exact inducedPi1Map f a
+          intro α
+          exact ULift.up (inducedPi1Map f a α.down)
       | succ n =>
           cases n with
           | zero =>
@@ -317,7 +318,7 @@ noncomputable def inducedPiNMap (n : Nat) (f : A → B) (a : A) :
               exact PiTwo.id (A := B) (a := f a)
           | succ n =>
               intro _
-              exact PUnit.unit
+              exact ULift.up PUnit.unit
 
 /-- The long exact sequence at the π₁ level for a type family fibration.
     We have: π₁(F) →i* π₁(E) →p* π₁(B) →∂ π₀(F) -/

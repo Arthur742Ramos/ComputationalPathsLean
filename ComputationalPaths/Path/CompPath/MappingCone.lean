@@ -72,15 +72,26 @@ noncomputable def loop (a : A) :
     Path (basepoint (f := f)) (basepoint (f := f)) :=
   Path.trans (glueInv f a) (glue f a)
 
+/-- Cancellation witness: the canonical loop contracts to reflexivity up to `RwEq`. -/
+noncomputable def loop_cancel_rweq (a : A) :
+    RwEq (loop f a) (Path.refl (basepoint (f := f))) := by
+  unfold loop glueInv
+  simpa using (rweq_cmpA_inv_left (glue f a))
+
+/-- Coherence witness: loops through different glue points are rewrite-equivalent. -/
+noncomputable def loop_coherence_rweq (a a' : A) :
+    RwEq (loop f a) (loop f a') :=
+  rweq_trans (loop_cancel_rweq f a) (rweq_symm (loop_cancel_rweq f a'))
+
 /-- The loop at basepoint has trivial toEq. -/
 theorem loop_toEq (a : A) :
     (loop f a).toEq = (rfl : (basepoint (f := f)) = basepoint (f := f)) := by
-  simp
+  exact rweq_toEq (loop_cancel_rweq f a)
 
 /-- All loops at basepoint have the same proof. -/
 theorem loop_proof_eq (a a' : A) :
     (loop f a).proof = (loop f a').proof := by
-  simp
+  exact rweq_toEq (loop_coherence_rweq f a a')
 
 /-- Linking path: connect two inl points through basepoint. -/
 noncomputable def link (a a' : A) :
@@ -92,20 +103,26 @@ theorem link_proof (a a' : A) :
     (link f a a').proof = (link f a a').proof := rfl
 
 /-- The glue path composed with its inverse has trivial toEq. -/
+noncomputable def glue_cancel_rweq (a : A) :
+    RwEq (Path.trans (glue f a) (Path.symm (glue f a)))
+      (Path.refl (inl (f := f) (f a))) :=
+  rweq_cmpA_inv_right (glue f a)
+
+/-- The glue path composed with its inverse has trivial toEq. -/
 theorem glue_cancel_toEq (a : A) :
     (Path.trans (glue f a) (Path.symm (glue f a))).toEq =
     (rfl : (inl (f := f) (f a)) = inl (f := f) (f a)) := by
-  simp
+  exact rweq_toEq (glue_cancel_rweq f a)
 
 end Cofiber
 
 /-! ## Functoriality -/
 
-/-- A commutative square `g ∘ fA = fB ∘ h` induces a map on cofibers. -/
-noncomputable def cofiberMap {A₁ A₂ B₁ B₂ : Type u}
+/-- Path-first version: a commutative square up to computational paths induces a cofiber map. -/
+noncomputable def cofiberMapPath {A₁ A₂ B₁ B₂ : Type u}
     {f₁ : A₁ → B₁} {f₂ : A₂ → B₂}
     (h : A₁ → A₂) (g : B₁ → B₂)
-    (comm : ∀ a, g (f₁ a) = f₂ (h a)) :
+    (commPath : ∀ a, Path (g (f₁ a)) (f₂ (h a))) :
     Cofiber f₁ → Cofiber f₂ :=
   Quot.lift
     (fun s => match s with
@@ -115,8 +132,18 @@ noncomputable def cofiberMap {A₁ A₂ B₁ B₂ : Type u}
       cases r with
       | glue c =>
         show Cofiber.inl (f := f₂) (g (f₁ c)) = Cofiber.basepoint (f := f₂)
-        rw [comm c]
-        exact (Cofiber.glue f₂ (h c)).proof)
+        exact
+          (Path.trans
+            (Path.congrArg (Cofiber.inl (f := f₂)) (commPath c))
+            (Cofiber.glue f₂ (h c))).proof)
+
+/-- A commutative square `g ∘ fA = fB ∘ h` induces a map on cofibers. -/
+noncomputable def cofiberMap {A₁ A₂ B₁ B₂ : Type u}
+    {f₁ : A₁ → B₁} {f₂ : A₂ → B₂}
+    (h : A₁ → A₂) (g : B₁ → B₂)
+    (comm : ∀ a, g (f₁ a) = f₂ (h a)) :
+    Cofiber f₁ → Cofiber f₂ :=
+  cofiberMapPath h g (fun a => Path.stepChain (comm a))
 
 /-- The cofiber map preserves the basepoint. -/
 theorem cofiberMap_basepoint {A₁ A₂ B₁ B₂ : Type u}

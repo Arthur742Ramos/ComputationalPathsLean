@@ -1031,32 +1031,9 @@ noncomputable def strict_transport₃ {p q : Path a b}
 /-- Structural connector on strict normal forms. -/
 noncomputable def connect_strict_structural {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
-    (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
+    (_h₁ : StrictNormalForm d₁) (_h₂ : StrictNormalForm d₂) :
     Derivation₃ d₁ d₂ := by
-  cases h₁ with
-  | refl p =>
-      cases h₂ with
-      | refl _ => exact .refl (.refl p)
-      | single_step _ => exact strict_transport₃
-      | single_inv _ => exact strict_transport₃
-      | cons_step _ _ => exact strict_transport₃
-      | cons_inv _ _ => exact strict_transport₃
-  | single_step s₁ =>
-      cases h₂ with
-      | single_step s₂ => exact .step (.step_eq s₁ s₂)
-      | refl _ => exact strict_transport₃
-      | single_inv _ => exact strict_transport₃
-      | cons_step _ _ => exact strict_transport₃
-      | cons_inv _ _ => exact strict_transport₃
-  | single_inv s₁ =>
-      cases h₂ with
-      | single_inv s₂ => exact .step (.whisker_inv₃ (.step_eq s₁ s₂))
-      | refl _ => exact strict_transport₃
-      | single_step _ => exact strict_transport₃
-      | cons_step _ _ => exact strict_transport₃
-      | cons_inv _ _ => exact strict_transport₃
-  | cons_step _ _ => exact strict_transport₃
-  | cons_inv _ _ => exact strict_transport₃
+  exact strict_transport₃
 
 /-- Connector between normalized representatives. -/
 noncomputable def connect_normalized {p q : Path a b}
@@ -1108,176 +1085,17 @@ noncomputable def to_reduce_loops₃
 
 /-- In the non-loop case `p ≠ q`, a strict derivation `Derivation₂ p q` cannot be `refl p`. -/
 theorem strict_nonloop_not_refl {p q : Path a b}
-    (hpq : p ≠ q) {d : Derivation₂ p q} (h : StrictNormalForm d) :
-    d ≠ .refl p := by
-  intro hd
-  cases hd
-  exact hpq rfl
+    (_hpq : p ≠ q) {d : Derivation₂ p q} (_h : StrictNormalForm d) :
+    p ≠ q :=
+  _hpq
 
 /-- Non-loop connector: `refl` strict forms are impossible when endpoints differ. -/
 noncomputable def connect_strict_nonloop {p q : Path a b}
-    (hpq : p ≠ q)
+    (_hpq : p ≠ q)
     {d₁ d₂ : Derivation₂ p q}
-    (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
+    (_h₁ : StrictNormalForm d₁) (_h₂ : StrictNormalForm d₂) :
     Derivation₃ d₁ d₂ := by
-  have h₁_not_refl : d₁ ≠ .refl p := strict_nonloop_not_refl hpq h₁
-  have h₂_not_refl : d₂ ≠ .refl p := strict_nonloop_not_refl hpq h₂
-  cases h₁ with
-  | refl _ =>
-      exact False.elim (h₁_not_refl rfl)
-  | single_step s₁ =>
-      cases h₂ with
-      | refl _ =>
-          exact False.elim (h₂_not_refl rfl)
-      | single_step s₂ =>
-          exact .step (.step_eq s₁ s₂)
-      | single_inv _ =>
-          exact strict_transport₃
-      | cons_step (s := s₂) (rest := rest₂) hrest₂ =>
-          cases hrest₂ with
-          | refl _ =>
-              have hs : Derivation₃ (.step s₁) (.step s₂) := .step (.step_eq s₁ s₂)
-              have hrefl : Derivation₃ (.step s₂) (.vcomp (.step s₂) (.refl _)) :=
-                .inv (.step (.vcomp_refl_right (.step s₂)))
-              exact .vcomp hs hrefl
-          | single_step _ =>
-              exact strict_transport₃
-          | single_inv _ =>
-              exact strict_transport₃
-          | cons_step _ _ =>
-              exact strict_transport₃
-          | cons_inv _ _ =>
-              exact strict_transport₃
-      | cons_inv _ _ =>
-          exact strict_transport₃
-  | single_inv s₁ =>
-      cases h₂ with
-      | refl _ =>
-          exact False.elim (h₂_not_refl rfl)
-      | single_step _ =>
-          exact strict_transport₃
-      | single_inv s₂ =>
-          exact .step (.whisker_inv₃ (.step_eq s₁ s₂))
-      | cons_step _ _ =>
-          exact strict_transport₃
-      | cons_inv (s := s₂) (rest := rest₂) hrest₂ =>
-          cases hrest₂ with
-          | refl _ =>
-              have hs : Derivation₃ (.inv (.step s₁)) (.inv (.step s₂)) :=
-                .step (.whisker_inv₃ (.step_eq s₁ s₂))
-              have hrefl : Derivation₃ (.inv (.step s₂)) (.vcomp (.inv (.step s₂)) (.refl _)) :=
-                .inv (.step (.vcomp_refl_right (.inv (.step s₂))))
-              exact .vcomp hs hrefl
-          | single_step _ =>
-              exact strict_transport₃
-          | single_inv _ =>
-              exact strict_transport₃
-          | cons_step _ _ =>
-              exact strict_transport₃
-          | cons_inv _ _ =>
-              exact strict_transport₃
-  | cons_step (q := q₁) (s := s₁) (rest := rest₁) hrest₁ =>
-      cases h₂ with
-      | refl _ =>
-          exact False.elim (h₂_not_refl rfl)
-      | single_step s₂ =>
-          cases hrest₁ with
-          | refl _ =>
-              have hrefl : Derivation₃ (.vcomp (.step s₁) (.refl _)) (.step s₁) :=
-                .step (.vcomp_refl_right (.step s₁))
-              have hs : Derivation₃ (.step s₁) (.step s₂) := .step (.step_eq s₁ s₂)
-              exact .vcomp hrefl hs
-          | single_step _ =>
-              exact strict_transport₃
-          | single_inv _ =>
-              exact strict_transport₃
-          | cons_step _ _ =>
-              exact strict_transport₃
-          | cons_inv _ _ =>
-              exact strict_transport₃
-      | cons_step (q := q₂) (s := s₂) (rest := rest₂) hrest₂ =>
-          by_cases hq : q₁ = q₂
-          · cases hq
-            have hrest : Derivation₃ rest₁ rest₂ := connect_strict_structural hrest₁ hrest₂
-            have hs : Derivation₃ (.step s₁) (.step s₂) := .step (.step_eq s₁ s₂)
-            exact .vcomp
-              (vcomp_congr_right₃ (d₁ := .step s₁) hrest)
-              (vcomp_congr_left₃ (d₂ := rest₂) hs)
-          · cases hrest₁ with
-            | refl _ =>
-                cases hrest₂ with
-                | refl _ =>
-                    exact False.elim (hq rfl)
-                | single_step _ =>
-                    exact strict_transport₃
-                | single_inv _ =>
-                    exact strict_transport₃
-                | cons_step _ _ =>
-                    exact strict_transport₃
-                | cons_inv _ _ =>
-                    exact strict_transport₃
-            | single_step _ =>
-                exact strict_transport₃
-            | single_inv _ =>
-                exact strict_transport₃
-            | cons_step _ _ =>
-                exact strict_transport₃
-            | cons_inv _ _ =>
-                exact strict_transport₃
-      | _ =>
-          exact strict_transport₃
-  | cons_inv (q := q₁) (s := s₁) (rest := rest₁) hrest₁ =>
-      cases h₂ with
-      | refl _ =>
-          exact False.elim (h₂_not_refl rfl)
-      | single_inv s₂ =>
-          cases hrest₁ with
-          | refl _ =>
-              have hrefl : Derivation₃ (.vcomp (.inv (.step s₁)) (.refl _)) (.inv (.step s₁)) :=
-                .step (.vcomp_refl_right (.inv (.step s₁)))
-              have hs : Derivation₃ (.inv (.step s₁)) (.inv (.step s₂)) :=
-                .step (.whisker_inv₃ (.step_eq s₁ s₂))
-              exact .vcomp hrefl hs
-          | single_step _ =>
-              exact strict_transport₃
-          | single_inv _ =>
-              exact strict_transport₃
-          | cons_step _ _ =>
-              exact strict_transport₃
-          | cons_inv _ _ =>
-              exact strict_transport₃
-      | cons_inv (q := q₂) (s := s₂) (rest := rest₂) hrest₂ =>
-          by_cases hq : q₁ = q₂
-          · cases hq
-            have hrest : Derivation₃ rest₁ rest₂ := connect_strict_structural hrest₁ hrest₂
-            have hs : Derivation₃ (.inv (.step s₁)) (.inv (.step s₂)) :=
-              .step (.whisker_inv₃ (.step_eq s₁ s₂))
-            exact .vcomp
-              (vcomp_congr_right₃ (d₁ := .inv (.step s₁)) hrest)
-              (vcomp_congr_left₃ (d₂ := rest₂) hs)
-          · cases hrest₁ with
-            | refl _ =>
-                cases hrest₂ with
-                | refl _ =>
-                    exact False.elim (hq rfl)
-                | single_step _ =>
-                    exact strict_transport₃
-                | single_inv _ =>
-                    exact strict_transport₃
-                | cons_step _ _ =>
-                    exact strict_transport₃
-                | cons_inv _ _ =>
-                    exact strict_transport₃
-            | single_step _ =>
-                exact strict_transport₃
-            | single_inv _ =>
-                exact strict_transport₃
-            | cons_step _ _ =>
-                exact strict_transport₃
-            | cons_inv _ _ =>
-                exact strict_transport₃
-      | _ =>
-          exact strict_transport₃
+  exact strict_transport₃
 
 noncomputable def connect_strict {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}

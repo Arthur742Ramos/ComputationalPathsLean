@@ -90,10 +90,16 @@ noncomputable def suspMeridLoop {X : Type u} (x y : X) :
 noncomputable def suspNorthRefl (X : Type u) : Path (suspNorth X) (suspNorth X) :=
   Path.refl (suspNorth X)
 
+/-- RwEq-first cancellation: `merid(x) ⬝ merid(x)⁻¹` rewrites to `refl`. -/
+noncomputable def suspMeridLoop_self_rweq {X : Type u} (x : X) :
+    RwEq (suspMeridLoop x x) (Path.refl (suspNorth X)) := by
+  simpa [suspMeridLoop] using
+    (rweq_cmpA_inv_right (suspMerid x))
+
 /-- The loop `merid(x) ⬝ merid(x)⁻¹` has trivial `toEq`. -/
 theorem suspMeridLoop_self_toEq {X : Type u} (x : X) :
     (suspMeridLoop x x).toEq = (rfl : suspNorth X = suspNorth X) := by
-  simp [suspMeridLoop, Path.trans, Path.symm]
+  exact rweq_toEq (suspMeridLoop_self_rweq (X := X) x)
 
 /-- Two meridian loops have the same `toEq` by proof irrelevance. -/
 theorem suspMeridLoop_toEq_eq {X : Type u} (x y x' y' : X) :
@@ -105,15 +111,42 @@ noncomputable def suspMeridInv {X : Type u} (x : X) :
     Path (suspSouth X) (suspNorth X) :=
   Path.symm (suspMerid x)
 
+/-- RwEq-first cancellation: `merid(x)⁻¹ ⬝ merid(x)` rewrites to `refl`. -/
+noncomputable def suspMeridInv_cancel_rweq {X : Type u} (x : X) :
+    RwEq (Path.trans (suspMeridInv x) (suspMerid x)) (Path.refl (suspSouth X)) := by
+  simpa [suspMeridInv] using
+    (rweq_cmpA_inv_left (suspMerid x))
+
+/-- RwEq-first simplification: `(merid x ⬝ merid y⁻¹) ⬝ merid y` rewrites to `merid x`. -/
+noncomputable def suspMeridLoop_simplify_right_rweq {X : Type u} (x y : X) :
+    RwEq (Path.trans (suspMeridLoop x y) (suspMerid y)) (suspMerid x) := by
+  have hAssoc :
+      RwEq (Path.trans (suspMeridLoop x y) (suspMerid y))
+        (Path.trans (suspMerid x)
+          (Path.trans (Path.symm (suspMerid y)) (suspMerid y))) := by
+    simpa [suspMeridLoop] using
+      (rweq_tt (suspMerid x) (Path.symm (suspMerid y)) (suspMerid y))
+  have hCancel :
+      RwEq (Path.trans (suspMerid x)
+          (Path.trans (Path.symm (suspMerid y)) (suspMerid y)))
+        (Path.trans (suspMerid x) (Path.refl (suspSouth X))) :=
+    rweq_trans_congr_right (suspMerid x) (rweq_cmpA_inv_left (suspMerid y))
+  have hUnit :
+      RwEq (Path.trans (suspMerid x) (Path.refl (suspSouth X))) (suspMerid x) :=
+    rweq_cmpA_refl_right (suspMerid x)
+  exact rweq_trans (rweq_trans hAssoc hCancel) hUnit
+
 /-- Round-trip: `merid(x) ⬝ merid(x)⁻¹` has trivial proof. -/
 theorem suspMerid_cancel {X : Type u} (x : X) :
     (Path.trans (suspMerid x) (suspMeridInv x)).proof =
-    (rfl : suspNorth X = suspNorth X) := rfl
+    (rfl : suspNorth X = suspNorth X) := by
+  exact rweq_toEq (suspMeridLoop_self_rweq (X := X) x)
 
 /-- Round-trip: `merid(x)⁻¹ ⬝ merid(x)` has trivial proof. -/
 theorem suspMeridInv_cancel {X : Type u} (x : X) :
     (Path.trans (suspMeridInv x) (suspMerid x)).proof =
-    (rfl : suspSouth X = suspSouth X) := rfl
+    (rfl : suspSouth X = suspSouth X) := by
+  exact rweq_toEq (suspMeridInv_cancel_rweq (X := X) x)
 
 /-! ## Functoriality of Suspension -/
 
@@ -244,7 +277,8 @@ noncomputable def suspMerid_eq (x : X) :
 /-- The meridian symm-trans cancellation at the proof level. -/
 theorem suspMerid_symm_trans_proof (x : X) :
     (Path.trans (Path.symm (suspMerid x)) (suspMerid x)).proof =
-    (rfl : suspSouth X = suspSouth X) := rfl
+    (rfl : suspSouth X = suspSouth X) := by
+  exact rweq_toEq (suspMeridInv_cancel_rweq (X := X) x)
 
 /-! ## Smash Product Connection -/
 

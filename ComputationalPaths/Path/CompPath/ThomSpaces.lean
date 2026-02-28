@@ -20,6 +20,7 @@ isomorphisms, and basic orientation data in the computational-path framework.
 import ComputationalPaths.Path.Homotopy.ThomSpectra
 import ComputationalPaths.Path.Homotopy.VectorBundle
 import ComputationalPaths.Path.Homotopy.GeneralizedCohomology
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -76,6 +77,34 @@ noncomputable def degreePath (O : BundleOrientation H bundle) :
     Path O.thomClass.degree bundle.rank :=
   Path.stepChain O.degree_eq_rank
 
+/-- Path-level coherence: degree path followed by its inverse contracts. -/
+noncomputable def degreePath_cancel_right (O : BundleOrientation H bundle) :
+    RwEq (Path.trans (degreePath O) (Path.symm (degreePath O)))
+      (Path.refl O.thomClass.degree) :=
+  rweq_cmpA_inv_right (degreePath O)
+
+/-- Path-level coherence: inverse degree path followed by degree path contracts. -/
+noncomputable def degreePath_cancel_left (O : BundleOrientation H bundle) :
+    RwEq (Path.trans (Path.symm (degreePath O)) (degreePath O))
+      (Path.refl bundle.rank) :=
+  rweq_cmpA_inv_left (degreePath O)
+
+/-- Reassociate-and-cancel coherence for orientation degree data. -/
+noncomputable def degreePath_reassoc_cancel (O : BundleOrientation H bundle) :
+    RwEq
+      (Path.trans (Path.trans (Path.refl O.thomClass.degree) (degreePath O))
+        (Path.symm (degreePath O)))
+      (Path.refl O.thomClass.degree) := by
+  apply rweq_trans
+    (rweq_tt (Path.refl O.thomClass.degree) (degreePath O) (Path.symm (degreePath O)))
+  apply rweq_trans
+    (rweq_trans_congr_right (Path.refl O.thomClass.degree) (degreePath_cancel_right O))
+  exact rweq_cmpA_refl_left (Path.refl O.thomClass.degree)
+
+/-- Legacy wrapper preserving the placeholder compatibility flag. -/
+theorem compatible_true (O : BundleOrientation H bundle) : True :=
+  O.compatible
+
 end BundleOrientation
 
 /-- An oriented vector bundle. -/
@@ -107,6 +136,24 @@ variable {K B Total V : Type u} {bundle : VectorBundleData K B Total V} {b0 : B}
 noncomputable def degreePath (T : OrientedThomIsomorphism H bundle b0) :
     Path T.isomorphism.degree bundle.rank :=
   Path.stepChain T.degree_eq_rank
+
+/-- Degree path followed by its inverse contracts to reflexivity. -/
+noncomputable def degreePath_cancel_right (T : OrientedThomIsomorphism H bundle b0) :
+    RwEq (Path.trans (degreePath T) (Path.symm (degreePath T)))
+      (Path.refl T.isomorphism.degree) :=
+  rweq_cmpA_inv_right (degreePath T)
+
+/-- Reassociate-and-cancel coherence for Thom-isomorphism degree data. -/
+noncomputable def degreePath_reassoc_cancel (T : OrientedThomIsomorphism H bundle b0) :
+    RwEq
+      (Path.trans (Path.trans (Path.refl T.isomorphism.degree) (degreePath T))
+        (Path.symm (degreePath T)))
+      (Path.refl T.isomorphism.degree) := by
+  apply rweq_trans
+    (rweq_tt (Path.refl T.isomorphism.degree) (degreePath T) (Path.symm (degreePath T)))
+  apply rweq_trans
+    (rweq_trans_congr_right (Path.refl T.isomorphism.degree) (degreePath_cancel_right T))
+  exact rweq_cmpA_refl_left (Path.refl T.isomorphism.degree)
 
 /-- Heterogeneous witness that the Thom class matches the orientation class. -/
 noncomputable def classPath (T : OrientedThomIsomorphism H bundle b0) :
@@ -155,6 +202,19 @@ theorem degree_eq_rank_from_path (O : BundleOrientation H bundle) :
     O.thomClass.degree = bundle.rank :=
   O.degree_eq_rank
 
+theorem degreePath_cancel_right_def (O : BundleOrientation H bundle) :
+    degreePath_cancel_right O = rweq_cmpA_inv_right (degreePath O) := by
+  rfl
+
+theorem degreePath_cancel_left_def (O : BundleOrientation H bundle) :
+    degreePath_cancel_left O = rweq_cmpA_inv_left (degreePath O) := by
+  rfl
+
+theorem compatible_true_iff (O : BundleOrientation H bundle) :
+    compatible_true O = True.intro := by
+  cases O.compatible
+  rfl
+
 end BundleOrientation
 
 variable {H : ReducedCohomologyTheory}
@@ -185,6 +245,10 @@ theorem degreePath_toEq (T : OrientedThomIsomorphism H bundle b0) :
 
 theorem classPath_def (T : OrientedThomIsomorphism H bundle b0) :
     classPath T = T.class_eq := by
+  rfl
+
+theorem degreePath_cancel_right_def (T : OrientedThomIsomorphism H bundle b0) :
+    degreePath_cancel_right T = rweq_cmpA_inv_right (degreePath T) := by
   rfl
 
 theorem degree_eq_orientation_degree (T : OrientedThomIsomorphism H bundle b0) :
