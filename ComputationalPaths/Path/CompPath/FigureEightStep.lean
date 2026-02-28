@@ -375,10 +375,16 @@ noncomputable def commutator_assoc_rweq :
     (rweq_tt (Path.trans loopA loopB) loopAInv loopBInv)
     (rweq_tt loopA loopB (Path.trans loopAInv loopBInv))
 
+/-- Quotient-level equality between the two commutator classes. -/
+theorem commutator_class_eq :
+    commutatorClass = (Quot.mk _ commutator' : FigureEightPiOne) :=
+  Quot.sound commutator_assoc_rweq
+
 /-- The two commutator definitions have the same toEq. -/
 theorem commutator_toEq_eq :
     commutator.toEq = commutator'.toEq := by
-  exact rweq_toEq commutator_assoc_rweq
+  simpa [commutatorClass] using
+    congrArg (PathRwQuot.toEq (A := FigureEight)) commutator_class_eq
 
 /-! ## Summary
 

@@ -129,6 +129,12 @@ noncomputable def z2_comm_path (a b : Z2) :
     Path (z2_add a b) (z2_add b a) :=
   Path.stepChain (z2_add_comm a b)
 
+/-- Commutativity witness is symmetric up to `RwEq`. -/
+noncomputable def z2_comm_symm_rweq (a b : Z2) :
+    RwEq (z2_comm_path a b) (Path.symm (z2_comm_path b a)) := by
+  unfold z2_comm_path
+  exact rweq_of_eq (by simp [Path.stepChain])
+
 /-- Path coherence: associativity of Z/2 addition. -/
 noncomputable def z2_assoc_path (a b c : Z2) :
     Path (z2_add (z2_add a b) c) (z2_add a (z2_add b c)) :=
@@ -211,6 +217,13 @@ theorem z2_inverse_paths_agree_quot (a : Z2) :
     Quot.mk _ (z2_add_neg_path a) := by
   exact Quot.sound (rweqProp_of_rweq (z2_inverse_paths_agree_rweq a))
 
+/-- Quotient coherence: commutativity path agrees with the opposite-direction witness by symmetry. -/
+theorem z2_comm_symm_quot (a b : Z2) :
+    ((Quot.mk _ (z2_comm_path a b)) :
+      PathRwQuot Z2 (z2_add a b) (z2_add b a)) =
+    Quot.mk _ (Path.symm (z2_comm_path b a)) := by
+  exact Quot.sound (rweqProp_of_rweq (z2_comm_symm_rweq a b))
+
 /-- Quotient coherence: left-unit witness agrees with its commutativity/right-unit factorization. -/
 theorem z2_zero_add_coherence_quot (a : Z2) :
     ((Quot.mk _ (z2_zero_add_path a)) :
@@ -235,22 +248,26 @@ theorem rp2GeneratorOrder2_quot_comm :
 /-- Coherence at `toEq`: left and right inverse paths agree. -/
 theorem z2_inverse_paths_agree_toEq (a : Z2) :
     (z2_neg_add_path a).toEq = (z2_add_neg_path a).toEq := by
-  exact rweq_toEq (z2_inverse_paths_agree_rweq a)
+  simpa [PathRwQuot.toEq_mk] using
+    congrArg (PathRwQuot.toEq (A := Z2)) (z2_inverse_paths_agree_quot a)
 
 /-- Coherence at `toEq`: left-unit witness agrees with commutativity/right-unit factorization. -/
 theorem z2_zero_add_coherence_toEq (a : Z2) :
     (z2_zero_add_path a).toEq = (z2_zero_add_via_comm_path a).toEq := by
-  exact rweq_toEq (z2_zero_add_coherence_rweq a)
+  simpa [PathRwQuot.toEq_mk] using
+    congrArg (PathRwQuot.toEq (A := Z2)) (z2_zero_add_coherence_quot a)
 
 /-- Coherence at `toEq`: the RP² generator witness matches involutive addition at `1`. -/
 theorem rp2GeneratorOrder2_toEq_involutive :
     rp2GeneratorOrder2.toEq = (z2_add_involutive z2_one).toEq := by
-  exact rweq_toEq rp2GeneratorOrder2_rweq
+  simpa [PathRwQuot.toEq_mk] using
+    congrArg (PathRwQuot.toEq (A := Z2)) rp2GeneratorOrder2_quot_involutive
 
 /-- Coherence at `toEq`: direct and commutativity-factored generator witnesses agree. -/
 theorem rp2GeneratorOrder2_toEq_comm :
     rp2GeneratorOrder2.toEq = rp2GeneratorOrder2_comm_path.toEq := by
-  exact rweq_toEq rp2GeneratorOrder2_comm_rweq
+  simpa [PathRwQuot.toEq_mk] using
+    congrArg (PathRwQuot.toEq (A := Z2)) rp2GeneratorOrder2_quot_comm
 
 /-! ## Z/2 Multiplication -/
 

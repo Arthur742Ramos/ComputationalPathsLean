@@ -22,6 +22,7 @@ cylinder at the left endpoint of the interval.
 -/
 
 import ComputationalPaths.Path.CompPath.PushoutCompPath
+import ComputationalPaths.Path.Rewrite.Quot
 
 namespace ComputationalPaths
 namespace Path
@@ -169,6 +170,30 @@ noncomputable def glue_assoc_rweq {a : A} {x y : MappingCylinder f}
       (Path.trans (glue (f := f) a) (Path.trans q r)) :=
   rweq_tt (glue (f := f) a) q r
 
+/-- Quotient class of the gluing path. -/
+noncomputable def glueClass (a : A) :
+    PathRwQuot (MappingCylinder f) (bottom (f := f) a) (inTarget (f := f) (f a)) :=
+  Quot.mk _ (glue (f := f) a)
+
+/-- Quotient-level associativity for glue composition. -/
+theorem glueClass_assoc {a : A} {x y : MappingCylinder f}
+    (q : Path (inTarget (f := f) (f a)) x) (r : Path x y) :
+    PathRwQuot.trans (PathRwQuot.trans (glueClass (f := f) a) (Quot.mk _ q)) (Quot.mk _ r) =
+      PathRwQuot.trans (glueClass (f := f) a) (PathRwQuot.trans (Quot.mk _ q) (Quot.mk _ r)) :=
+  Quot.sound (glue_assoc_rweq (f := f) q r)
+
+/-- Quotient-level left unit for glue composition. -/
+theorem glueClass_trans_refl_left (a : A) :
+    PathRwQuot.trans (PathRwQuot.refl (bottom (f := f) a)) (glueClass (f := f) a) =
+      glueClass (f := f) a :=
+  Quot.sound (glue_rweq_refl_left (f := f) a)
+
+/-- Quotient-level right unit for glue composition. -/
+theorem glueClass_trans_refl_right (a : A) :
+    PathRwQuot.trans (glueClass (f := f) a) (PathRwQuot.refl (inTarget (f := f) (f a))) =
+      glueClass (f := f) a :=
+  Quot.sound (glue_rweq_refl_right (f := f) a)
+
 theorem glue_comp_assoc {a : A} {x y : MappingCylinder f}
     (q : Path (inTarget (f := f) (f a)) x) (r : Path x y) :
     Path.trans (Path.trans (glue (f := f) a) q) r =
@@ -179,7 +204,9 @@ theorem glue_comp_assoc_toEq {a : A} {x y : MappingCylinder f}
     (q : Path (inTarget (f := f) (f a)) x) (r : Path x y) :
     (Path.trans (Path.trans (glue (f := f) a) q) r).toEq =
       (Path.trans (glue (f := f) a) (Path.trans q r)).toEq := by
-  exact rweq_toEq (glue_assoc_rweq (f := f) q r)
+  simpa [glueClass] using
+    congrArg (PathRwQuot.toEq (A := MappingCylinder f))
+      (glueClass_assoc (f := f) (a := a) q r)
 
 theorem glue_trans_refl_left (a : A) :
     Path.trans (Path.refl (bottom (f := f) a)) (glue (f := f) a) = glue (f := f) a :=
@@ -188,7 +215,9 @@ theorem glue_trans_refl_left (a : A) :
 theorem glue_trans_refl_left_toEq (a : A) :
     (Path.trans (Path.refl (bottom (f := f) a)) (glue (f := f) a)).toEq =
       (glue (f := f) a).toEq := by
-  exact rweq_toEq (glue_rweq_refl_left (f := f) a)
+  simpa [glueClass] using
+    congrArg (PathRwQuot.toEq (A := MappingCylinder f))
+      (glueClass_trans_refl_left (f := f) a)
 
 theorem glue_trans_refl_right (a : A) :
     Path.trans (glue (f := f) a) (Path.refl (inTarget (f := f) (f a))) = glue (f := f) a :=
@@ -197,7 +226,9 @@ theorem glue_trans_refl_right (a : A) :
 theorem glue_trans_refl_right_toEq (a : A) :
     (Path.trans (glue (f := f) a) (Path.refl (inTarget (f := f) (f a)))).toEq =
       (glue (f := f) a).toEq := by
-  exact rweq_toEq (glue_rweq_refl_right (f := f) a)
+  simpa [glueClass] using
+    congrArg (PathRwQuot.toEq (A := MappingCylinder f))
+      (glueClass_trans_refl_right (f := f) a)
 
 -- Note: glue_trans_symm and glue_symm_trans claim
 -- `Path.trans p (Path.symm p) = Path.refl _` which requires the steps list

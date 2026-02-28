@@ -29,6 +29,7 @@ The π₁ computation is packaged in `TorusStep.lean`.
 import ComputationalPaths.Path.CompPath.CircleCompPath
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
+import ComputationalPaths.Path.Rewrite.Quot
 
 set_option linter.unusedSimpArgs false
 
@@ -88,12 +89,25 @@ noncomputable def torusPiOneEquiv :
 
 /-! ## Commutativity of Torus Loops -/
 
+/-- The two generating loops of the torus commute at the `RwEq` level. -/
+noncomputable def torusLoopsCommute_rweq :
+    RwEq (Path.trans torusLoop1 torusLoop2) (Path.trans torusLoop2 torusLoop1) := by
+  exact rweq_of_eq (by simp [torusLoop1, torusLoop2, Path.trans, Path.prodMk])
+
+/-- Quotient-facing commutativity of the two generating torus loops. -/
+theorem torusLoopsCommute_quot :
+    ((Quot.mk _ (Path.trans torusLoop1 torusLoop2)) :
+      PathRwQuot Torus.{u} torusBase torusBase) =
+    Quot.mk _ (Path.trans torusLoop2 torusLoop1) := by
+  exact Quot.sound (rweqProp_of_rweq torusLoopsCommute_rweq)
+
 /-- The two generating loops of the torus commute at the `toEq` level.
 This is immediate because `toEq` is proof-irrelevant. -/
 theorem torusLoopsCommute_toEq :
     (Path.trans torusLoop1 torusLoop2).toEq =
     (Path.trans torusLoop2 torusLoop1).toEq := by
-  simp [torusLoop1, torusLoop2, Path.trans, Path.prodMk]
+  simpa [PathRwQuot.toEq_mk] using
+    congrArg (PathRwQuot.toEq (A := Torus.{u})) torusLoopsCommute_quot
 
 /-- Product of two loops on the torus, composed in either order, have the
 same underlying equality witness. -/
@@ -351,16 +365,32 @@ theorem torusLoop2_symm_toEq :
     _ = torusLoop2.toEq.symm := (_root_.congrArg Eq.symm hDouble).symm
 
 /-- Cancellation: `torusLoop1 ⬝ torusLoop1⁻¹` has trivial `toEq`. -/
+theorem torusLoop1_cancel_quot :
+    ((Quot.mk _ (Path.trans (A := Torus.{u}) torusLoop1 (Path.symm torusLoop1))) :
+      PathRwQuot Torus.{u} torusBase torusBase) =
+    Quot.mk _ (Path.refl torusBase) := by
+  exact Quot.sound (rweqProp_of_rweq torusLoop1_cancel_rweq)
+
+/-- Cancellation: `torusLoop2 ⬝ torusLoop2⁻¹` in quotient form. -/
+theorem torusLoop2_cancel_quot :
+    ((Quot.mk _ (Path.trans (A := Torus.{u}) torusLoop2 (Path.symm torusLoop2))) :
+      PathRwQuot Torus.{u} torusBase torusBase) =
+    Quot.mk _ (Path.refl torusBase) := by
+  exact Quot.sound (rweqProp_of_rweq torusLoop2_cancel_rweq)
+
+/-- Cancellation: `torusLoop1 ⬝ torusLoop1⁻¹` has trivial `toEq`. -/
 theorem torusLoop1_cancel_toEq :
     (Path.trans (A := Torus.{u}) torusLoop1 (Path.symm torusLoop1)).toEq =
     (rfl : torusBase = torusBase) := by
-  exact rweq_toEq torusLoop1_cancel_rweq
+  simpa [PathRwQuot.toEq_mk] using
+    congrArg (PathRwQuot.toEq (A := Torus.{u})) torusLoop1_cancel_quot
 
 /-- Cancellation: `torusLoop2 ⬝ torusLoop2⁻¹` has trivial `toEq`. -/
 theorem torusLoop2_cancel_toEq :
     (Path.trans (A := Torus.{u}) torusLoop2 (Path.symm torusLoop2)).toEq =
     (rfl : torusBase = torusBase) := by
-  exact rweq_toEq torusLoop2_cancel_rweq
+  simpa [PathRwQuot.toEq_mk] using
+    congrArg (PathRwQuot.toEq (A := Torus.{u})) torusLoop2_cancel_quot
 
 /-! ## Congruence on the Torus -/
 
