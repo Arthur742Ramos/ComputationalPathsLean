@@ -94,12 +94,33 @@ noncomputable def lensLoopPow_one_rweq (p q : Nat) :
     RwEq (lensLoopNPow p q 1) (lensLoop p q) :=
   rweq_of_step (Step.trans_refl_left (lensLoop p q))
 
+/-- `loop^2` contracts the leading `refl` by congruence and left unit. -/
+noncomputable def lensLoopPow_two_rweq (p q : Nat) :
+    RwEq (lensLoopNPow p q 2)
+      (Path.trans (lensLoop p q) (lensLoop p q)) := by
+  simpa [lensLoopNPow] using
+    (rweq_trans_congr_left (lensLoop p q) (rweq_cmpA_refl_left (lensLoop p q)))
+
 /-! ## The p-fold relation -/
 
 /-- The fundamental relation: `loop^p = refl` (as a LensStep). -/
 theorem lensRelation (p q : Nat) :
     LensStep p q (lensLoopNPow p q p) (Path.refl (lensSpaceBase p q)) :=
   LensStep.relation
+
+/-- Prefixing the relation by `loop^n` preserves LensStep rewriting. -/
+theorem lensRelation_congr_prefix (p q n : Nat) :
+    LensStep p q
+      (Path.trans (lensLoopNPow p q n) (lensLoopNPow p q p))
+      (Path.trans (lensLoopNPow p q n) (Path.refl (lensSpaceBase p q))) :=
+  LensStep.congr_right (lensLoopNPow p q n) (lensRelation p q)
+
+/-- Suffixing the relation by `loop^n` preserves LensStep rewriting. -/
+theorem lensRelation_congr_suffix (p q n : Nat) :
+    LensStep p q
+      (Path.trans (lensLoopNPow p q p) (lensLoopNPow p q n))
+      (Path.trans (Path.refl (lensSpaceBase p q)) (lensLoopNPow p q n)) :=
+  LensStep.congr_left (lensLoopNPow p q n) (lensRelation p q)
 
 /-! ## Explicit cancellation sequences -/
 
@@ -144,12 +165,33 @@ theorem lensNorm2 (p q : Nat) :
       (Step.trans_refl_left (lensLoop p q)))
   · exact Step.trans_refl_right _
 
+/-- First normalization path as RwEq. -/
+noncomputable def lensNorm1_rweq (p q : Nat) :
+    RwEq (Path.trans (Path.trans (Path.refl (lensSpaceBase p q)) (lensLoop p q))
+            (Path.refl (lensSpaceBase p q)))
+         (lensLoop p q) :=
+  rweq_of_rw (lensNorm1 p q)
+
+/-- Second normalization path as RwEq. -/
+noncomputable def lensNorm2_rweq (p q : Nat) :
+    RwEq (Path.trans (Path.trans (Path.refl (lensSpaceBase p q)) (lensLoop p q))
+            (Path.refl (lensSpaceBase p q)))
+         (lensLoop p q) :=
+  rweq_of_rw (lensNorm2 p q)
+
+/-- Coherence of the two one-step normal forms in the normalization peak. -/
+noncomputable def lensNormalization_peak_coherence (p q : Nat) :
+    RwEq (Path.trans (Path.refl (lensSpaceBase p q)) (lensLoop p q))
+         (Path.trans (lensLoop p q) (Path.refl (lensSpaceBase p q))) := by
+  apply rweq_trans (rweq_cmpA_refl_left (lensLoop p q))
+  exact rweq_symm (rweq_cmpA_refl_right (lensLoop p q))
+
 /-- Two normalizations agree via RwEq. -/
 noncomputable def lensNormalization_rweq (p q : Nat) :
     RwEq (Path.trans (Path.trans (Path.refl (lensSpaceBase p q)) (lensLoop p q))
             (Path.refl (lensSpaceBase p q)))
          (lensLoop p q) :=
-  rweq_of_rw (lensNorm1 p q)
+  lensNorm1_rweq p q
 
 /-! ## ℤ/p structure -/
 

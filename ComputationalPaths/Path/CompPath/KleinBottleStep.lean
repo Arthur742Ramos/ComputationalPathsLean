@@ -145,6 +145,24 @@ noncomputable def kleinNormalization_rweq :
          kleinBottleLoopA :=
   rweq_of_rw kleinNormalize1
 
+/-- Associativity-first normalization coherence for `((refl ⬝ a) ⬝ refl)`. -/
+noncomputable def kleinNormalization_assoc_rweq :
+    RwEq (Path.trans (Path.trans (Path.refl kleinBottleBase) kleinBottleLoopA)
+            (Path.refl kleinBottleBase))
+         (Path.trans (Path.refl kleinBottleBase)
+            (Path.trans kleinBottleLoopA (Path.refl kleinBottleBase))) :=
+  rweq_tt (Path.refl kleinBottleBase) kleinBottleLoopA (Path.refl kleinBottleBase)
+
+/-- The associativity-first normalization still contracts to `a`. -/
+noncomputable def kleinNormalization_assoc_to_loop_rweq :
+    RwEq (Path.trans (Path.refl kleinBottleBase)
+            (Path.trans kleinBottleLoopA (Path.refl kleinBottleBase)))
+         kleinBottleLoopA := by
+  refine RwEq.trans
+    (rweq_trans_congr_right (Path.refl kleinBottleBase)
+      (rweq_cmpA_refl_right kleinBottleLoopA)) ?_
+  exact rweq_cmpA_refl_left kleinBottleLoopA
+
 /-! ## Relator word -/
 
 /-- The relator word. -/
@@ -195,6 +213,38 @@ noncomputable def kleinRelatorNorm_rweq :
             (Path.refl kleinBottleBase))
          kleinRelatorWord :=
   rweq_of_rw kleinRelatorNorm
+
+/-- Unit/associativity coherence from right-associated relator-with-units
+    to the canonical relator word. -/
+noncomputable def kleinRelator_unit_assoc_rweq :
+    RwEq
+      (Path.trans
+        (Path.trans (Path.refl kleinBottleBase)
+          (Path.trans kleinBottleLoopA
+            (Path.trans kleinBottleLoopB
+              (Path.trans (Path.symm kleinBottleLoopA) kleinBottleLoopB))))
+        (Path.refl kleinBottleBase))
+      kleinRelatorWord := by
+  refine RwEq.trans
+    (rweq_tt
+      (Path.refl kleinBottleBase)
+      (Path.trans kleinBottleLoopA
+        (Path.trans kleinBottleLoopB
+          (Path.trans (Path.symm kleinBottleLoopA) kleinBottleLoopB)))
+      (Path.refl kleinBottleBase)) ?_
+  refine RwEq.trans
+    (rweq_trans_congr_right
+      (Path.refl kleinBottleBase)
+      (rweq_cmpA_refl_right
+        (Path.trans kleinBottleLoopA
+          (Path.trans kleinBottleLoopB
+            (Path.trans (Path.symm kleinBottleLoopA) kleinBottleLoopB))))) ?_
+  refine RwEq.trans
+    (rweq_cmpA_refl_left
+      (Path.trans kleinBottleLoopA
+        (Path.trans kleinBottleLoopB
+          (Path.trans (Path.symm kleinBottleLoopA) kleinBottleLoopB)))) ?_
+  exact rweq_symm kleinAssocChain_rweq
 
 /-! ## Symmetry distribution on Klein loops -/
 

@@ -105,6 +105,28 @@ noncomputable def right_inv_refl_cancel_rweq (e : PathSimpleEquiv α β) (y : β
     (rweq_trans_congr_right (Path.refl (e.toFun (e.invFun y))) (right_inv_cancel_rweq e y)) ?_
   exact rweq_cmpA_refl_left (Path.refl (e.toFun (e.invFun y)))
 
+/-- Left-unit coherence transported through left-cancellation. -/
+noncomputable def left_inv_refl_cancel_rweq (e : PathSimpleEquiv α β) (x : α) :
+    RwEq
+      (Path.trans (Path.refl (e.invFun (e.toFun x)))
+        (Path.trans (e.left_inv x) (Path.symm (e.left_inv x))))
+      (Path.refl (e.invFun (e.toFun x))) := by
+  refine RwEq.trans
+    (rweq_trans_congr_right (Path.refl (e.invFun (e.toFun x)))
+      (rweq_cmpA_inv_right (e.left_inv x))) ?_
+  exact rweq_cmpA_refl_left (Path.refl (e.invFun (e.toFun x)))
+
+/-- Associativity + unit + inverse coherence on the right inverse witness. -/
+noncomputable def right_inv_assoc_cancel_rweq (e : PathSimpleEquiv α β) (y : β) :
+    RwEq
+      (Path.trans (Path.trans (Path.symm (e.right_inv y)) (e.right_inv y)) (Path.refl y))
+      (Path.refl y) := by
+  refine RwEq.trans (rweq_tt (Path.symm (e.right_inv y)) (e.right_inv y) (Path.refl y)) ?_
+  refine RwEq.trans
+    (rweq_trans_congr_right (Path.symm (e.right_inv y))
+      (rweq_cmpA_refl_right (e.right_inv y))) ?_
+  exact rweq_cmpA_inv_left (e.right_inv y)
+
 end PathSimpleEquiv
 
 /-- Identity `PathSimpleEquiv`. -/
@@ -261,12 +283,45 @@ noncomputable def simpleEquivToPathSimpleEquiv_right_inv_refl_cancel_rweq {α : 
       (Path.refl ((simpleEquivToPathSimpleEquiv e).toFun ((simpleEquivToPathSimpleEquiv e).invFun y))) := by
   exact PathSimpleEquiv.right_inv_refl_cancel_rweq (simpleEquivToPathSimpleEquiv e) y
 
+noncomputable def simpleEquivToPathSimpleEquiv_left_inv_refl_cancel_rweq {α : Type u} {β : Type v}
+    (e : SimpleEquiv α β) (x : α) :
+    RwEq
+      (Path.trans
+        (Path.refl ((simpleEquivToPathSimpleEquiv e).invFun ((simpleEquivToPathSimpleEquiv e).toFun x)))
+        (Path.trans
+          ((simpleEquivToPathSimpleEquiv e).left_inv x)
+          (Path.symm ((simpleEquivToPathSimpleEquiv e).left_inv x))))
+      (Path.refl ((simpleEquivToPathSimpleEquiv e).invFun ((simpleEquivToPathSimpleEquiv e).toFun x))) := by
+  exact PathSimpleEquiv.left_inv_refl_cancel_rweq (simpleEquivToPathSimpleEquiv e) x
+
+noncomputable def simpleEquivToPathSimpleEquiv_right_inv_assoc_cancel_rweq {α : Type u} {β : Type v}
+    (e : SimpleEquiv α β) (y : β) :
+    RwEq
+      (Path.trans
+        (Path.trans
+          (Path.symm ((simpleEquivToPathSimpleEquiv e).right_inv y))
+          ((simpleEquivToPathSimpleEquiv e).right_inv y))
+        (Path.refl y))
+      (Path.refl y) := by
+  exact PathSimpleEquiv.right_inv_assoc_cancel_rweq (simpleEquivToPathSimpleEquiv e) y
+
 noncomputable def recognizeLoopSpaceOfSimpleEquiv_left_inv_double_symm_rweq {L : Type u} {A : Type u}
     (a : A) (e : SimpleEquiv L (LoopSpace A a)) (x : L) :
     RwEq
       (Path.symm (Path.symm ((recognizeLoopSpaceOfSimpleEquiv a e).equiv.left_inv x)))
       ((recognizeLoopSpaceOfSimpleEquiv a e).equiv.left_inv x) := by
   exact PathSimpleEquiv.left_inv_double_symm_rweq (recognizeLoopSpaceOfSimpleEquiv a e).equiv x
+
+noncomputable def recognizeLoopSpaceOfSimpleEquiv_right_inv_assoc_cancel_rweq
+    {L : Type u} {A : Type u} (a : A) (e : SimpleEquiv L (LoopSpace A a)) (p : LoopSpace A a) :
+    RwEq
+      (Path.trans
+        (Path.trans
+          (Path.symm ((recognizeLoopSpaceOfSimpleEquiv a e).equiv.right_inv p))
+          ((recognizeLoopSpaceOfSimpleEquiv a e).equiv.right_inv p))
+        (Path.refl p))
+      (Path.refl p) := by
+  exact PathSimpleEquiv.right_inv_assoc_cancel_rweq (recognizeLoopSpaceOfSimpleEquiv a e).equiv p
 
 /-! ## Summary -/
 

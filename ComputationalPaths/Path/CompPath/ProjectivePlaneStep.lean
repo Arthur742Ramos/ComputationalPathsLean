@@ -95,12 +95,30 @@ theorem rp2LoopLeftUnit :
        rp2Loop :=
   rw_of_step (Step.trans_refl_left rp2Loop)
 
+/-- `loop^2` contracts the leading `refl` by congruence and left unit. -/
+noncomputable def rp2LoopPow_two_rweq :
+    RwEq (rp2LoopPow 2) rp2LoopSquared := by
+  simpa [rp2LoopPow, rp2LoopSquared] using
+    (rweq_trans_congr_left rp2Loop (rweq_cmpA_refl_left rp2Loop))
+
 /-! ## The 2-fold relation -/
 
 /-- `loop² = refl` as an RP2Step. -/
 theorem rp2Relation :
     RP2Step (Path.trans rp2Loop rp2Loop) (Path.refl rp2Base) :=
   RP2Step.relation
+
+/-- Prefixing `loop² → refl` by any RP² loop preserves RP2Step rewriting. -/
+theorem rp2Relation_congr_prefix (r : rp2LoopSpace) :
+    RP2Step (Path.trans r (Path.trans rp2Loop rp2Loop))
+      (Path.trans r (Path.refl rp2Base)) :=
+  RP2Step.congr_right r rp2Relation
+
+/-- Suffixing `loop² → refl` by any RP² loop preserves RP2Step rewriting. -/
+theorem rp2Relation_congr_suffix (r : rp2LoopSpace) :
+    RP2Step (Path.trans (Path.trans rp2Loop rp2Loop) r)
+      (Path.trans (Path.refl rp2Base) r) :=
+  RP2Step.congr_left r rp2Relation
 
 /-- `loop² ⬝ refl → loop²` via Step.  -/
 theorem rp2SquaredRightUnit :
@@ -134,11 +152,30 @@ theorem rp2Norm2 :
   · exact rw_of_step (Step.trans_congr_left (Path.refl rp2Base) (Step.trans_refl_left _))
   · exact Step.trans_refl_right _
 
+/-- First normalization path as RwEq. -/
+noncomputable def rp2Norm1_rweq :
+    RwEq (Path.trans (Path.trans (Path.refl rp2Base) rp2Loop) (Path.refl rp2Base))
+      rp2Loop :=
+  rweq_of_rw rp2Norm1
+
+/-- Second normalization path as RwEq. -/
+noncomputable def rp2Norm2_rweq :
+    RwEq (Path.trans (Path.trans (Path.refl rp2Base) rp2Loop) (Path.refl rp2Base))
+      rp2Loop :=
+  rweq_of_rw rp2Norm2
+
+/-- Coherence of the two one-step normal forms in the normalization peak. -/
+noncomputable def rp2Normalization_peak_coherence :
+    RwEq (Path.trans (Path.refl rp2Base) rp2Loop)
+      (Path.trans rp2Loop (Path.refl rp2Base)) := by
+  apply rweq_trans (rweq_cmpA_refl_left rp2Loop)
+  exact rweq_symm (rweq_cmpA_refl_right rp2Loop)
+
 /-- Two normalizations agree via RwEq. -/
 noncomputable def rp2Normalization_rweq :
     RwEq (Path.trans (Path.trans (Path.refl rp2Base) rp2Loop) (Path.refl rp2Base))
          rp2Loop :=
-  rweq_of_rw rp2Norm1
+  rp2Norm1_rweq
 
 /-! ## ℤ/2 structure -/
 
