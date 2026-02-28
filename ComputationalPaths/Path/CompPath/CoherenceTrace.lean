@@ -133,6 +133,28 @@ noncomputable def pentagon_coherence {a b c d e : A}
          (trans p (trans q (trans r s))) :=
   rweq_of_rw (pentagon_left_path p q r s)
 
+/-- Pentagon coherence using the right route explicitly. -/
+noncomputable def pentagon_coherence_right {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans p (trans q (trans r s))) :=
+  rweq_of_rw (pentagon_right_path p q r s)
+
+/-- Left and right pentagon routes compose to a coherent loop. -/
+noncomputable def pentagon_left_right_coherence {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans (trans (trans p q) r) s) :=
+  rweq_trans (pentagon_coherence p q r s)
+    (rweq_symm (pentagon_coherence_right p q r s))
+
+/-- The explicit pentagon trace is sound at the `RwEq` level. -/
+noncomputable def pentagonTrace_soundness {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans p (trans q (trans r s))) :=
+  pentagon_coherence p q r s
+
 /-- Pentagon coherence via the existing library theorem. -/
 noncomputable def pentagon_coherence' {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
@@ -193,6 +215,35 @@ noncomputable def triangle_coherence {a b c : A}
     RwEq (trans (trans p (refl b)) q)
          (trans p q) :=
   rweq_of_rw (triangle_top_right p q)
+
+/-- Triangle coherence via the left route explicitly. -/
+noncomputable def triangle_coherence_left {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans p (refl b)) q)
+         (trans p q) :=
+  rweq_of_rw (triangle_left p q)
+
+/-- Triangle coherence via the right route explicitly. -/
+noncomputable def triangle_coherence_right {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans p (refl b)) q)
+         (trans p q) :=
+  rweq_of_rw (triangle_top_right p q)
+
+/-- Left and right triangle routes compose to a coherent loop. -/
+noncomputable def triangle_left_right_coherence {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans p (refl b)) q)
+         (trans (trans p (refl b)) q) :=
+  rweq_trans (triangle_coherence_right p q)
+    (rweq_symm (triangle_coherence_left p q))
+
+/-- The explicit triangle trace is sound at the `RwEq` level. -/
+noncomputable def triangleTrace_soundness {a b c : A}
+    (p : Path a b) (q : Path b c) :
+    RwEq (trans (trans p (refl b)) q)
+         (trans p q) :=
+  triangle_coherence_right p q
 
 /-- Triangle coherence via the existing library theorem. -/
 noncomputable def triangle_coherence' {a b c : A}

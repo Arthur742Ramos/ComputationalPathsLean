@@ -117,6 +117,21 @@ noncomputable def suspMeridInv_cancel_rweq {X : Type u} (x : X) :
   simpa [suspMeridInv] using
     (rweq_cmpA_inv_left (suspMerid x))
 
+/-- RwEq-first symmetry: reversing a meridian loop swaps its endpoints. -/
+noncomputable def suspMeridLoop_symm_rweq {X : Type u} (x y : X) :
+    RwEq (Path.symm (suspMeridLoop x y)) (suspMeridLoop y x) := by
+  have hSymmTrans :
+      RwEq (Path.symm (suspMeridLoop x y))
+        (Path.trans (Path.symm (Path.symm (suspMerid y))) (Path.symm (suspMerid x))) := by
+    simpa [suspMeridLoop] using
+      (rweq_symm_trans_congr (p := suspMerid x) (q := Path.symm (suspMerid y)))
+  have hCancelSymm :
+      RwEq (Path.trans (Path.symm (Path.symm (suspMerid y))) (Path.symm (suspMerid x)))
+        (Path.trans (suspMerid y) (Path.symm (suspMerid x))) := by
+    simpa using
+      (rweq_trans_congr_left (Path.symm (suspMerid x)) (rweq_ss (suspMerid y)))
+  exact rweq_trans hSymmTrans hCancelSymm
+
 /-- RwEq-first simplification: `(merid x ⬝ merid y⁻¹) ⬝ merid y` rewrites to `merid x`. -/
 noncomputable def suspMeridLoop_simplify_right_rweq {X : Type u} (x y : X) :
     RwEq (Path.trans (suspMeridLoop x y) (suspMerid y)) (suspMerid x) := by
@@ -135,6 +150,35 @@ noncomputable def suspMeridLoop_simplify_right_rweq {X : Type u} (x y : X) :
       RwEq (Path.trans (suspMerid x) (Path.refl (suspSouth X))) (suspMerid x) :=
     rweq_cmpA_refl_right (suspMerid x)
   exact rweq_trans (rweq_trans hAssoc hCancel) hUnit
+
+/-- Eq wrapper derived from `suspMeridLoop_simplify_right_rweq`. -/
+theorem suspMeridLoop_simplify_right_toEq {X : Type u} (x y : X) :
+    (Path.trans (suspMeridLoop x y) (suspMerid y)).toEq = (suspMerid x).toEq := by
+  exact rweq_toEq (suspMeridLoop_simplify_right_rweq (X := X) x y)
+
+/-- RwEq-first simplification: `merid x⁻¹ ⬝ (merid x ⬝ merid y⁻¹)` rewrites to `merid y⁻¹`. -/
+noncomputable def suspMeridLoop_simplify_left_rweq {X : Type u} (x y : X) :
+    RwEq (Path.trans (suspMeridInv x) (suspMeridLoop x y)) (Path.symm (suspMerid y)) := by
+  have hAssoc :
+      RwEq (Path.trans (suspMeridInv x) (suspMeridLoop x y))
+        (Path.trans (Path.trans (suspMeridInv x) (suspMerid x)) (Path.symm (suspMerid y))) := by
+    simpa [suspMeridInv, suspMeridLoop] using
+      (rweq_symm (rweq_tt (Path.symm (suspMerid x)) (suspMerid x) (Path.symm (suspMerid y))))
+  have hCancel :
+      RwEq (Path.trans (Path.trans (suspMeridInv x) (suspMerid x)) (Path.symm (suspMerid y)))
+        (Path.trans (Path.refl (suspSouth X)) (Path.symm (suspMerid y))) := by
+    simpa [suspMeridInv] using
+      (rweq_trans_congr_left (Path.symm (suspMerid y)) (suspMeridInv_cancel_rweq (X := X) x))
+  have hUnit :
+      RwEq (Path.trans (Path.refl (suspSouth X)) (Path.symm (suspMerid y)))
+        (Path.symm (suspMerid y)) :=
+    rweq_cmpA_refl_left (Path.symm (suspMerid y))
+  exact rweq_trans (rweq_trans hAssoc hCancel) hUnit
+
+/-- Eq wrapper derived from `suspMeridLoop_simplify_left_rweq`. -/
+theorem suspMeridLoop_simplify_left_toEq {X : Type u} (x y : X) :
+    (Path.trans (suspMeridInv x) (suspMeridLoop x y)).toEq = (Path.symm (suspMerid y)).toEq := by
+  exact rweq_toEq (suspMeridLoop_simplify_left_rweq (X := X) x y)
 
 /-- Round-trip: `merid(x) ⬝ merid(x)⁻¹` has trivial proof. -/
 theorem suspMerid_cancel {X : Type u} (x : X) :
@@ -279,6 +323,11 @@ theorem suspMerid_symm_trans_proof (x : X) :
     (Path.trans (Path.symm (suspMerid x)) (suspMerid x)).proof =
     (rfl : suspSouth X = suspSouth X) := by
   exact rweq_toEq (suspMeridInv_cancel_rweq (X := X) x)
+
+/-- Eq wrapper derived from `suspMeridLoop_symm_rweq`. -/
+theorem suspMeridLoop_symm_toEq (x y : X) :
+    (Path.symm (suspMeridLoop x y)).toEq = (suspMeridLoop y x).toEq := by
+  exact rweq_toEq (suspMeridLoop_symm_rweq (X := X) x y)
 
 /-! ## Smash Product Connection -/
 

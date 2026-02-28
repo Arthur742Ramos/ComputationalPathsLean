@@ -160,11 +160,35 @@ theorem triangle_rw (p : Path a b) (q : Path b c) :
   · exact rw_of_step (Step.trans_assoc p (Path.refl b) q)
   · exact Step.trans_congr_right p (Step.trans_refl_left q)
 
+/-- The alternate (left) route for the triangle identity. -/
+theorem triangle_left_rw (p : Path a b) (q : Path b c) :
+    Rw (Path.trans (Path.trans p (Path.refl b)) q)
+       (Path.trans p q) :=
+  rw_of_step (Step.trans_congr_left q (Step.trans_refl_right p))
+
 /-- Triangle identity as RwEq. -/
 noncomputable def triangle_rweq (p : Path a b) (q : Path b c) :
     RwEq (Path.trans (Path.trans p (Path.refl b)) q)
          (Path.trans p q) :=
   rweq_of_rw (triangle_rw p q)
+
+/-- Triangle identity as RwEq via the left route. -/
+noncomputable def triangle_left_rweq (p : Path a b) (q : Path b c) :
+    RwEq (Path.trans (Path.trans p (Path.refl b)) q)
+         (Path.trans p q) :=
+  rweq_of_rw (triangle_left_rw p q)
+
+/-- Left and right triangle routes compose to a coherent loop. -/
+noncomputable def triangle_left_right_coherence (p : Path a b) (q : Path b c) :
+    RwEq (Path.trans (Path.trans p (Path.refl b)) q)
+         (Path.trans (Path.trans p (Path.refl b)) q) :=
+  rweq_trans (triangle_rweq p q) (rweq_symm (triangle_left_rweq p q))
+
+/-- `triangleTrace` is sound as an `RwEq` witness. -/
+noncomputable def triangleTrace_soundness (p : Path a b) (q : Path b c) :
+    RwEq (Path.trans (Path.trans p (Path.refl b)) q)
+         (Path.trans p q) :=
+  triangle_rweq p q
 
 end TriangleTrace
 
@@ -231,6 +255,31 @@ noncomputable def pentagon_coherence (p : Path a b) (q : Path b c) (r : Path c d
     RwEq (trans (trans (trans p q) r) s)
          (trans p (trans q (trans r s))) :=
   rweq_of_rw (pentagon_left_rw p q r s)
+
+/-- Pentagon coherence via the right route explicitly. -/
+noncomputable def pentagon_right_coherence (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans p (trans q (trans r s))) :=
+  rweq_of_rw (pentagon_right_rw p q r s)
+
+/-- Left and right pentagon routes compose to a coherent loop. -/
+noncomputable def pentagon_left_right_coherence (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans (trans (trans p q) r) s) :=
+  rweq_trans (pentagon_coherence p q r s)
+    (rweq_symm (pentagon_right_coherence p q r s))
+
+/-- `pentagonLeftTrace` is sound as an `RwEq` witness. -/
+noncomputable def pentagonLeftTrace_soundness (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans p (trans q (trans r s))) :=
+  pentagon_coherence p q r s
+
+/-- `pentagonRightTrace` is sound as an `RwEq` witness. -/
+noncomputable def pentagonRightTrace_soundness (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (trans (trans (trans p q) r) s)
+         (trans p (trans q (trans r s))) :=
+  pentagon_right_coherence p q r s
 
 end PentagonTrace
 

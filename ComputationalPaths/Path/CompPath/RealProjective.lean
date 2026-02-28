@@ -210,6 +210,12 @@ noncomputable def rp2GeneratorOrder2_comm_rweq :
     (_root_.congrArg Path.stepChain
       (Subsingleton.elim rfl ((z2_add_comm z2_one z2_one).trans (z2_add_self z2_one))))
 
+/-- Path coherence: applying the order-2 generator relation and adding once more
+returns the generator. -/
+noncomputable def rp2GeneratorOrder2_stability_path :
+    Path (z2_add (z2_add z2_one z2_one) z2_one) z2_one :=
+  Path.stepChain (by simp)
+
 /-- Quotient coherence: left and right inverse witnesses represent the same class. -/
 theorem z2_inverse_paths_agree_quot (a : Z2) :
     ((Quot.mk _ (z2_neg_add_path a)) :
@@ -248,26 +254,22 @@ theorem rp2GeneratorOrder2_quot_comm :
 /-- Coherence at `toEq`: left and right inverse paths agree. -/
 theorem z2_inverse_paths_agree_toEq (a : Z2) :
     (z2_neg_add_path a).toEq = (z2_add_neg_path a).toEq := by
-  simpa [PathRwQuot.toEq_mk] using
-    congrArg (PathRwQuot.toEq (A := Z2)) (z2_inverse_paths_agree_quot a)
+  exact rweq_toEq (z2_inverse_paths_agree_rweq a)
 
 /-- Coherence at `toEq`: left-unit witness agrees with commutativity/right-unit factorization. -/
 theorem z2_zero_add_coherence_toEq (a : Z2) :
     (z2_zero_add_path a).toEq = (z2_zero_add_via_comm_path a).toEq := by
-  simpa [PathRwQuot.toEq_mk] using
-    congrArg (PathRwQuot.toEq (A := Z2)) (z2_zero_add_coherence_quot a)
+  exact rweq_toEq (z2_zero_add_coherence_rweq a)
 
 /-- Coherence at `toEq`: the RP² generator witness matches involutive addition at `1`. -/
 theorem rp2GeneratorOrder2_toEq_involutive :
     rp2GeneratorOrder2.toEq = (z2_add_involutive z2_one).toEq := by
-  simpa [PathRwQuot.toEq_mk] using
-    congrArg (PathRwQuot.toEq (A := Z2)) rp2GeneratorOrder2_quot_involutive
+  exact rweq_toEq rp2GeneratorOrder2_rweq
 
 /-- Coherence at `toEq`: direct and commutativity-factored generator witnesses agree. -/
 theorem rp2GeneratorOrder2_toEq_comm :
     rp2GeneratorOrder2.toEq = rp2GeneratorOrder2_comm_path.toEq := by
-  simpa [PathRwQuot.toEq_mk] using
-    congrArg (PathRwQuot.toEq (A := Z2)) rp2GeneratorOrder2_quot_comm
+  exact rweq_toEq rp2GeneratorOrder2_comm_rweq
 
 /-! ## Z/2 Multiplication -/
 
