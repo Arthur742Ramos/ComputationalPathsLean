@@ -71,6 +71,15 @@ noncomputable def braidNaturality_rweq {X1 X2 Y1 Y2 : Obj}
       (B.braidNaturality p q) :=
   rweq_of_step (B.braidNaturality_step p q)
 
+noncomputable def braidNaturality_cancel_left {X1 X2 Y1 Y2 : Obj}
+    (p : Path X1 X2) (q : Path Y1 Y2) :
+    RwEq
+      (Path.trans
+        (Path.symm (B.braidNaturality p q))
+        (B.braidNaturality p q))
+      (Path.refl (Path.trans (B.braid X1 Y1) (B.tensorMap q p))) :=
+  rweq_cmpA_inv_left (B.braidNaturality p q)
+
 noncomputable def braid_cancel_left (X Y : Obj) :
     RwEq
       (Path.trans (Path.symm (B.braid X Y)) (B.braid X Y))
@@ -99,6 +108,12 @@ noncomputable def hexagon_rweq (X Y Z : Obj) :
         (Path.refl (B.tensor (B.tensor Y Z) X)))
       (B.hexagonPath X Y Z) :=
   rweq_of_step (B.hexagon_step X Y Z)
+
+noncomputable def hexagon_cancel_right (X Y Z : Obj) :
+    RwEq
+      (Path.trans (B.hexagonPath X Y Z) (Path.symm (B.hexagonPath X Y Z)))
+      (Path.refl (B.tensor (B.tensor X Y) Z)) :=
+  rweq_cmpA_inv_right (B.hexagonPath X Y Z)
 
 end BraidedCategoryPathData
 end BraidedCategoryPaths

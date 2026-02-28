@@ -63,6 +63,18 @@ noncomputable def add_val_cancel_rweq (x y : K) :
       (Path.refl (V.tropAdd (V.val x) (V.val y))) :=
   rweq_cmpA_inv_left (V.addValPath x y)
 
+noncomputable def mul_val_cancel_left_rweq (x y : K) :
+    RwEq
+      (Path.trans (Path.symm (V.mulValPath x y)) (V.mulValPath x y))
+      (Path.refl (V.tropMul (V.val x) (V.val y))) :=
+  rweq_cmpA_inv_left (V.mulValPath x y)
+
+noncomputable def mul_val_cancel_right_rweq (x y : K) :
+    RwEq
+      (Path.trans (V.mulValPath x y) (Path.symm (V.mulValPath x y)))
+      (Path.refl (V.val (V.mulK x y))) :=
+  rweq_cmpA_inv_right (V.mulValPath x y)
+
 end ValuationPathData
 
 /-- Tropicalization data linking curve edges with valuation values. -/
@@ -97,6 +109,12 @@ noncomputable def tropical_length_cancel_rweq (e : Edge) :
       (Path.trans (Path.symm (T.tropicalLengthPath e)) (T.tropicalLengthPath e))
       (Path.refl (T.tropicalLength e)) :=
   rweq_cmpA_inv_left (T.tropicalLengthPath e)
+
+noncomputable def tropical_length_roundtrip_rweq (e : Edge) :
+    RwEq
+      (Path.trans (T.tropicalLengthPath e) (Path.symm (T.tropicalLengthPath e)))
+      (Path.refl (V.val (T.edgeLabel e))) :=
+  rweq_cmpA_inv_right (T.tropicalLengthPath e)
 
 end TropicalizationPathData
 

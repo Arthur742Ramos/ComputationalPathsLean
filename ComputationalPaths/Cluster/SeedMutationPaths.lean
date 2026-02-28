@@ -46,6 +46,18 @@ noncomputable def skew_rweq (i j : ι) :
       (S.skewPath i j) :=
   rweq_of_step (S.skew_step i j)
 
+noncomputable def skew_cancel_left (i j : ι) :
+    RwEq
+      (Path.trans (Path.symm (S.skewPath i j)) (S.skewPath i j))
+      (Path.refl (-(S.exchangeMatrix j i))) :=
+  rweq_cmpA_inv_left (S.skewPath i j)
+
+noncomputable def skew_cancel_right (i j : ι) :
+    RwEq
+      (Path.trans (S.skewPath i j) (Path.symm (S.skewPath i j)))
+      (Path.refl (S.exchangeMatrix i j)) :=
+  rweq_cmpA_inv_right (S.skewPath i j)
+
 end SeedPathData
 
 /-- Mutation data over a fixed seed, including exchange and involution paths. -/
@@ -103,6 +115,14 @@ noncomputable def exchange_cancel_rweq :
       (Path.trans (Path.symm (M.exchangePath)) (M.exchangePath))
       (Path.refl (M.add M.posMonomial M.negMonomial)) :=
   rweq_cmpA_inv_left (M.exchangePath)
+
+noncomputable def mutation_involutive_cancel_rweq :
+    RwEq
+      (Path.trans
+        (M.mutationInvolutivePath)
+        (Path.symm (M.mutationInvolutivePath)))
+      (Path.refl (M.mutateAt M.direction (M.mutateAt M.direction (S.vars M.direction)))) :=
+  rweq_cmpA_inv_right (M.mutationInvolutivePath)
 
 end MutationPathData
 

@@ -110,6 +110,20 @@ noncomputable def weight_roundtrip_rweq (i j : Int) (x : H) :
   exact rweq_of_mixed_hodge_step
     (MixedHodgeStep.polarization_cancel (M.weightComposePath i j x))
 
+/-- Hodge-filtration round-trip path and its cancellation witness. -/
+noncomputable def hodgeRoundTrip (p q : Nat) (x : H) :
+    Path
+      (M.hodgeFiltration p (M.hodgeFiltration q x))
+      (M.hodgeFiltration p (M.hodgeFiltration q x)) :=
+  Path.trans (M.hodgeComposePath p q x) (Path.symm (M.hodgeComposePath p q x))
+
+noncomputable def hodge_roundtrip_rweq (p q : Nat) (x : H) :
+    RwEq (M.hodgeRoundTrip p q x)
+      (Path.refl (M.hodgeFiltration p (M.hodgeFiltration q x))) := by
+  unfold hodgeRoundTrip
+  exact rweq_of_mixed_hodge_step
+    (MixedHodgeStep.polarization_cancel (M.hodgeComposePath p q x))
+
 /-- Weight filtration transport induced by a path in the base. -/
 noncomputable def transportWeight
     {X : Type v} (fiber : X → H) {x y : X} (p : Path x y) (i : Int) :
