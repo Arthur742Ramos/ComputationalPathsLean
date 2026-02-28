@@ -154,27 +154,75 @@ noncomputable def torusSndBase :
     Path (A := Circle.{u}) (Prod.snd torusBase) circleBase :=
   Path.refl circleBase
 
+/-- RwEq-first associativity coherence for loop composition on the torus. -/
+noncomputable def torusTrans_assoc_rweq
+    (p q r : Path (A := Torus.{u}) torusBase torusBase) :
+    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
+  rweq_tt p q r
+
+/-- RwEq-first left-unit coherence for loop composition on the torus. -/
+noncomputable def torusTrans_refl_left_rweq
+    (p : Path (A := Torus.{u}) torusBase torusBase) :
+    RwEq (Path.trans (Path.refl torusBase) p) p :=
+  rweq_cmpA_refl_left p
+
+/-- RwEq-first right-unit coherence for loop composition on the torus. -/
+noncomputable def torusTrans_refl_right_rweq
+    (p : Path (A := Torus.{u}) torusBase torusBase) :
+    RwEq (Path.trans p (Path.refl torusBase)) p :=
+  rweq_cmpA_refl_right p
+
+/-- First projection coherence for `torusLoop1` at the `RwEq` level. -/
+noncomputable def torusLoop1_fst_rweq :
+    RwEq (Path.fst (a1 := circleBase.{u}) (b1 := circleBase.{u}) torusLoop1) circleLoop.{u} := by
+  simpa [torusLoop1] using
+    (rweq_fst_prodMk (α := Circle.{u}) (β := Circle.{u})
+      (p := circleLoop.{u}) (q := Path.refl (circleBase.{u})))
+
+/-- Second projection coherence for `torusLoop1` at the `RwEq` level. -/
+noncomputable def torusLoop1_snd_rweq :
+    RwEq (Path.snd (a1 := circleBase.{u}) (b1 := circleBase.{u}) torusLoop1)
+      (Path.refl (circleBase.{u})) := by
+  simpa [torusLoop1] using
+    (rweq_snd_prodMk (α := Circle.{u}) (β := Circle.{u})
+      (p := circleLoop.{u}) (q := Path.refl (circleBase.{u})))
+
+/-- First projection coherence for `torusLoop2` at the `RwEq` level. -/
+noncomputable def torusLoop2_fst_rweq :
+    RwEq (Path.fst (a1 := circleBase.{u}) (b1 := circleBase.{u}) torusLoop2)
+      (Path.refl (circleBase.{u})) := by
+  simpa [torusLoop2] using
+    (rweq_fst_prodMk (α := Circle.{u}) (β := Circle.{u})
+      (p := Path.refl (circleBase.{u})) (q := circleLoop.{u}))
+
+/-- Second projection coherence for `torusLoop2` at the `RwEq` level. -/
+noncomputable def torusLoop2_snd_rweq :
+    RwEq (Path.snd (a1 := circleBase.{u}) (b1 := circleBase.{u}) torusLoop2) circleLoop.{u} := by
+  simpa [torusLoop2] using
+    (rweq_snd_prodMk (α := Circle.{u}) (β := Circle.{u})
+      (p := Path.refl (circleBase.{u})) (q := circleLoop.{u}))
+
 /-- Projecting `torusLoop1` to the first factor yields `circleLoop` at the `toEq` level. -/
 theorem torusLoop1_fst_toEq :
     (Path.fst (a1 := circleBase.{u}) (b1 := circleBase.{u}) torusLoop1).toEq = circleLoop.{u}.toEq := by
-  simp [torusLoop1, Path.fst, Path.prodMk]
+  exact rweq_toEq torusLoop1_fst_rweq
 
 /-- Projecting `torusLoop1` to the second factor yields `refl` at the `toEq` level. -/
 theorem torusLoop1_snd_toEq :
     (Path.snd (a1 := circleBase.{u}) (b1 := circleBase.{u}) torusLoop1).toEq =
     (Path.refl circleBase.{u}).toEq := by
-  simp [torusLoop1, Path.snd, Path.prodMk]
+  exact rweq_toEq torusLoop1_snd_rweq
 
 /-- Projecting `torusLoop2` to the first factor yields `refl` at the `toEq` level. -/
 theorem torusLoop2_fst_toEq :
     (Path.fst (a1 := circleBase.{u}) (b1 := circleBase.{u}) torusLoop2).toEq =
     (Path.refl circleBase.{u}).toEq := by
-  simp [torusLoop2, Path.fst, Path.prodMk]
+  exact rweq_toEq torusLoop2_fst_rweq
 
 /-- Projecting `torusLoop2` to the second factor yields `circleLoop` at the `toEq` level. -/
 theorem torusLoop2_snd_toEq :
     (Path.snd (a1 := circleBase.{u}) (b1 := circleBase.{u}) torusLoop2).toEq = circleLoop.{u}.toEq := by
-  simp [torusLoop2, Path.snd, Path.prodMk]
+  exact rweq_toEq torusLoop2_snd_rweq
 
 /-! ## Euler Characteristic -/
 

@@ -15,6 +15,7 @@ model π₁(L(p,q)) ≅ ℤ/p from the LensSpace module and add:
 
 import ComputationalPaths.Path.CompPath.LensSpace
 import ComputationalPaths.Path.Homotopy.Reflexivity
+import ComputationalPaths.Path.Rewrite.Quot
 
 namespace ComputationalPaths
 namespace Path
@@ -146,6 +147,18 @@ theorem loopMul_id_right (p q : Nat) (α : lensSpaceLoopSpace p q) :
     loopMul p q α (loopId p q) = α := by
   unfold loopMul loopId; exact Path.trans_refl_right α
 
+/-- Left identity for loop multiplication at rewrite-equivalence level. -/
+noncomputable def loopMul_id_left_rweq (p q : Nat) (α : lensSpaceLoopSpace p q) :
+    RwEq (loopMul p q (loopId p q) α) α := by
+  unfold loopMul loopId
+  exact rweq_cmpA_refl_left (p := α)
+
+/-- Right identity for loop multiplication at rewrite-equivalence level. -/
+noncomputable def loopMul_id_right_rweq (p q : Nat) (α : lensSpaceLoopSpace p q) :
+    RwEq (loopMul p q α (loopId p q)) α := by
+  unfold loopMul loopId
+  exact rweq_cmpA_refl_right (p := α)
+
 /-- Path witness for left identity. -/
 def loopMul_id_left_path (p q : Nat) (α : lensSpaceLoopSpace p q) :
     Path (loopMul p q (loopId p q) α) α :=
@@ -161,11 +174,54 @@ theorem loopMul_assoc (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
     loopMul p q (loopMul p q α β) γ = loopMul p q α (loopMul p q β γ) := by
   unfold loopMul; exact Path.trans_assoc α β γ
 
+/-- Associativity of loop multiplication at rewrite-equivalence level. -/
+noncomputable def loopMul_assoc_rweq (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
+    RwEq (loopMul p q (loopMul p q α β) γ) (loopMul p q α (loopMul p q β γ)) := by
+  unfold loopMul
+  exact rweq_tt (p := α) (q := β) (r := γ)
+
 /-- Path witness for loop associativity. -/
 def loopMul_assoc_path (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
     Path (loopMul p q (loopMul p q α β) γ)
          (loopMul p q α (loopMul p q β γ)) :=
   Path.stepChain (loopMul_assoc p q α β γ)
+
+/-- Quotient coherence for left identity. -/
+theorem loopMul_id_left_quot (p q : Nat) (α : lensSpaceLoopSpace p q) :
+    ((Quot.mk _ (loopMul p q (loopId p q) α)) :
+      PathRwQuot (LensSpace p q) (lensSpaceBase p q) (lensSpaceBase p q)) =
+    Quot.mk _ α := by
+  exact Quot.sound (rweqProp_of_rweq (loopMul_id_left_rweq p q α))
+
+/-- Quotient coherence for right identity. -/
+theorem loopMul_id_right_quot (p q : Nat) (α : lensSpaceLoopSpace p q) :
+    ((Quot.mk _ (loopMul p q α (loopId p q))) :
+      PathRwQuot (LensSpace p q) (lensSpaceBase p q) (lensSpaceBase p q)) =
+    Quot.mk _ α := by
+  exact Quot.sound (rweqProp_of_rweq (loopMul_id_right_rweq p q α))
+
+/-- Quotient coherence for associativity. -/
+theorem loopMul_assoc_quot (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
+    ((Quot.mk _ (loopMul p q (loopMul p q α β) γ)) :
+      PathRwQuot (LensSpace p q) (lensSpaceBase p q) (lensSpaceBase p q)) =
+    Quot.mk _ (loopMul p q α (loopMul p q β γ)) := by
+  exact Quot.sound (rweqProp_of_rweq (loopMul_assoc_rweq p q α β γ))
+
+/-- Left identity coherence at the `toEq` level, derived from `RwEq`. -/
+theorem loopMul_id_left_toEq (p q : Nat) (α : lensSpaceLoopSpace p q) :
+    (loopMul p q (loopId p q) α).toEq = α.toEq := by
+  exact rweq_toEq (loopMul_id_left_rweq p q α)
+
+/-- Right identity coherence at the `toEq` level, derived from `RwEq`. -/
+theorem loopMul_id_right_toEq (p q : Nat) (α : lensSpaceLoopSpace p q) :
+    (loopMul p q α (loopId p q)).toEq = α.toEq := by
+  exact rweq_toEq (loopMul_id_right_rweq p q α)
+
+/-- Associativity coherence at the `toEq` level, derived from `RwEq`. -/
+theorem loopMul_assoc_toEq (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
+    (loopMul p q (loopMul p q α β) γ).toEq =
+      (loopMul p q α (loopMul p q β γ)).toEq := by
+  exact rweq_toEq (loopMul_assoc_rweq p q α β γ)
 
 /-- Left inverse for loops at rewrite-equivalence level. -/
 noncomputable def loopMul_inv_left_rweq (p q : Nat) (α : lensSpaceLoopSpace p q) :
@@ -182,12 +238,12 @@ noncomputable def loopMul_inv_right_rweq (p q : Nat) (α : lensSpaceLoopSpace p 
 /-- Left inverse for loops (at the toEq level). -/
 theorem loopMul_inv_left_toEq (p q : Nat) (α : lensSpaceLoopSpace p q) :
     (loopMul p q (loopInv p q α) α).toEq = (loopId p q).toEq := by
-  simpa using rweq_toEq (loopMul_inv_left_rweq p q α)
+  exact rweq_toEq (loopMul_inv_left_rweq p q α)
 
 /-- Right inverse for loops (at the toEq level). -/
 theorem loopMul_inv_right_toEq (p q : Nat) (α : lensSpaceLoopSpace p q) :
     (loopMul p q α (loopInv p q α)).toEq = (loopId p q).toEq := by
-  simpa using rweq_toEq (loopMul_inv_right_rweq p q α)
+  exact rweq_toEq (loopMul_inv_right_rweq p q α)
 
 /-- Inverse distributes over composition. -/
 theorem loopInv_mul (p q : Nat) (α β : lensSpaceLoopSpace p q) :

@@ -25,6 +25,7 @@ fundamental group is Z/2. We encode Z/2 as Bool with xor.
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Rewrite.Quot
 
 namespace ComputationalPaths
 namespace Path
@@ -202,6 +203,34 @@ noncomputable def rp2GeneratorOrder2_comm_rweq :
   exact rweq_of_eq
     (_root_.congrArg Path.stepChain
       (Subsingleton.elim rfl ((z2_add_comm z2_one z2_one).trans (z2_add_self z2_one))))
+
+/-- Quotient coherence: left and right inverse witnesses represent the same class. -/
+theorem z2_inverse_paths_agree_quot (a : Z2) :
+    ((Quot.mk _ (z2_neg_add_path a)) :
+      PathRwQuot Z2 (z2_add (z2_neg a) a) z2_zero) =
+    Quot.mk _ (z2_add_neg_path a) := by
+  exact Quot.sound (rweqProp_of_rweq (z2_inverse_paths_agree_rweq a))
+
+/-- Quotient coherence: left-unit witness agrees with its commutativity/right-unit factorization. -/
+theorem z2_zero_add_coherence_quot (a : Z2) :
+    ((Quot.mk _ (z2_zero_add_path a)) :
+      PathRwQuot Z2 (z2_add z2_zero a) a) =
+    Quot.mk _ (z2_zero_add_via_comm_path a) := by
+  exact Quot.sound (rweqProp_of_rweq (z2_zero_add_coherence_rweq a))
+
+/-- Quotient coherence: the RP² generator witness matches involutive addition at `1`. -/
+theorem rp2GeneratorOrder2_quot_involutive :
+    ((Quot.mk _ rp2GeneratorOrder2) :
+      PathRwQuot Z2 (z2_add z2_one z2_one) z2_zero) =
+    Quot.mk _ (z2_add_involutive z2_one) := by
+  exact Quot.sound (rweqProp_of_rweq rp2GeneratorOrder2_rweq)
+
+/-- Quotient coherence: direct and commutativity-factored generator witnesses agree. -/
+theorem rp2GeneratorOrder2_quot_comm :
+    ((Quot.mk _ rp2GeneratorOrder2) :
+      PathRwQuot Z2 (z2_add z2_one z2_one) z2_zero) =
+    Quot.mk _ rp2GeneratorOrder2_comm_path := by
+  exact Quot.sound (rweqProp_of_rweq rp2GeneratorOrder2_comm_rweq)
 
 /-- Coherence at `toEq`: left and right inverse paths agree. -/
 theorem z2_inverse_paths_agree_toEq (a : Z2) :

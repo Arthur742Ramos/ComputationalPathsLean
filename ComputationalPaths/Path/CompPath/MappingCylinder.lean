@@ -99,6 +99,28 @@ noncomputable def glue (a : A) :
     top (f := f) a = inCylinder (f := f) (a, Interval.right) := by
   rfl
 
+/-! ## Endpoint projection coherences (Path-first) -/
+
+/-- Path-first coherence: first projection at the bottom endpoint. -/
+noncomputable def bottom_fst_path (a : A) :
+    Path (Prod.fst (a, Interval.left)) a :=
+  Path.refl a
+
+/-- Path-first coherence: second projection at the bottom endpoint. -/
+noncomputable def bottom_snd_path (a : A) :
+    Path (Prod.snd (a, Interval.left)) Interval.left :=
+  Path.refl Interval.left
+
+/-- Path-first coherence: first projection at the top endpoint. -/
+noncomputable def top_fst_path (a : A) :
+    Path (Prod.fst (a, Interval.right)) a :=
+  Path.refl a
+
+/-- Path-first coherence: second projection at the top endpoint. -/
+noncomputable def top_snd_path (a : A) :
+    Path (Prod.snd (a, Interval.right)) Interval.right :=
+  Path.refl Interval.right
+
 @[simp] theorem glue_def (a : A) :
     glue (f := f) a =
       Pushout.glue (A := Cylinder A) (B := B) (C := A)
