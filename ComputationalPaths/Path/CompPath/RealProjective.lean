@@ -113,6 +113,11 @@ noncomputable def rp2GeneratorOrder2 :
     Path (z2_add z2_one z2_one) z2_zero :=
   Path.stepChain rfl
 
+/-- Generator coherence path factored via commutativity and involutivity. -/
+noncomputable def rp2GeneratorOrder2_comm_path :
+    Path (z2_add z2_one z2_one) z2_zero :=
+  Path.stepChain ((z2_add_comm z2_one z2_one).trans (z2_add_self z2_one))
+
 /-- Path coherence: addition in Z/2 is involutive. -/
 noncomputable def z2_add_involutive (a : Z2) :
     Path (z2_add a a) z2_zero :=
@@ -137,6 +142,11 @@ noncomputable def z2_zero_add_path (a : Z2) :
 noncomputable def z2_add_zero_path (a : Z2) :
     Path (z2_add a z2_zero) a :=
   Path.stepChain (z2_add_zero a)
+
+/-- Path coherence: left identity factored through commutativity and right identity. -/
+noncomputable def z2_zero_add_via_comm_path (a : Z2) :
+    Path (z2_add z2_zero a) a :=
+  Path.stepChain ((z2_add_comm z2_zero a).trans (z2_add_zero a))
 
 /-- Path coherence: left inverse law. -/
 noncomputable def z2_neg_add_path (a : Z2) :
@@ -168,6 +178,16 @@ noncomputable def z2_inverse_paths_agree_rweq (a : Z2) :
   rweq_trans (z2_neg_add_involutive_rweq a)
     (rweq_symm (z2_add_neg_involutive_rweq a))
 
+/-- Group-law coherence: left-unit witness agrees with commutativity/right-unit factorization. -/
+noncomputable def z2_zero_add_coherence_rweq (a : Z2) :
+    RwEq (z2_zero_add_path a) (z2_zero_add_via_comm_path a) := by
+  unfold z2_zero_add_path z2_zero_add_via_comm_path
+  exact rweq_of_eq
+    (_root_.congrArg Path.stepChain
+      (Subsingleton.elim
+        (z2_zero_add a)
+        ((z2_add_comm z2_zero a).trans (z2_add_zero a))))
+
 /-- Generator order-2 coherence in `RwEq` form. -/
 noncomputable def rp2GeneratorOrder2_rweq :
     RwEq rp2GeneratorOrder2 (z2_add_involutive z2_one) := by
@@ -175,15 +195,33 @@ noncomputable def rp2GeneratorOrder2_rweq :
   exact rweq_of_eq
     (_root_.congrArg Path.stepChain (Subsingleton.elim rfl (z2_add_self z2_one)))
 
+/-- Generator coherence: direct and commutativity-factored order-2 witnesses agree. -/
+noncomputable def rp2GeneratorOrder2_comm_rweq :
+    RwEq rp2GeneratorOrder2 rp2GeneratorOrder2_comm_path := by
+  unfold rp2GeneratorOrder2 rp2GeneratorOrder2_comm_path
+  exact rweq_of_eq
+    (_root_.congrArg Path.stepChain
+      (Subsingleton.elim rfl ((z2_add_comm z2_one z2_one).trans (z2_add_self z2_one))))
+
 /-- Coherence at `toEq`: left and right inverse paths agree. -/
 theorem z2_inverse_paths_agree_toEq (a : Z2) :
     (z2_neg_add_path a).toEq = (z2_add_neg_path a).toEq := by
   exact rweq_toEq (z2_inverse_paths_agree_rweq a)
 
+/-- Coherence at `toEq`: left-unit witness agrees with commutativity/right-unit factorization. -/
+theorem z2_zero_add_coherence_toEq (a : Z2) :
+    (z2_zero_add_path a).toEq = (z2_zero_add_via_comm_path a).toEq := by
+  exact rweq_toEq (z2_zero_add_coherence_rweq a)
+
 /-- Coherence at `toEq`: the RP² generator witness matches involutive addition at `1`. -/
 theorem rp2GeneratorOrder2_toEq_involutive :
     rp2GeneratorOrder2.toEq = (z2_add_involutive z2_one).toEq := by
   exact rweq_toEq rp2GeneratorOrder2_rweq
+
+/-- Coherence at `toEq`: direct and commutativity-factored generator witnesses agree. -/
+theorem rp2GeneratorOrder2_toEq_comm :
+    rp2GeneratorOrder2.toEq = rp2GeneratorOrder2_comm_path.toEq := by
+  exact rweq_toEq rp2GeneratorOrder2_comm_rweq
 
 /-! ## Z/2 Multiplication -/
 

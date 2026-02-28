@@ -8,6 +8,7 @@ All constructions use the core Path/Step/trans/symm/congrArg/transport API.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -152,11 +153,21 @@ noncomputable def northLoopComp (A : Type u) (p q : Path (north A) (north A)) :
 theorem northLoop_id (A : Type u) : northLoop A = Path.refl (north A) := rfl
 
 /-- Loop composition is associative. -/
+noncomputable def northLoopComp_assoc_path (A : Type u)
+    (p q r : Path (north A) (north A)) :
+    Path
+      (northLoopComp A (northLoopComp A p q) r)
+      (northLoopComp A p (northLoopComp A q r)) :=
+  Path.stepChain (by
+    unfold northLoopComp
+    exact Path.trans_assoc p q r)
+
+/-- Loop composition associativity as an Eq corollary. -/
 theorem northLoopComp_assoc (A : Type u)
     (p q r : Path (north A) (north A)) :
     northLoopComp A (northLoopComp A p q) r =
       northLoopComp A p (northLoopComp A q r) := by
-  unfold northLoopComp; exact Path.trans_assoc p q r
+  exact (northLoopComp_assoc_path A p q r).toEq
 
 /-- Loop inverse at north. -/
 noncomputable def northLoopInv (A : Type u) (p : Path (north A) (north A)) :
@@ -164,19 +175,84 @@ noncomputable def northLoopInv (A : Type u) (p : Path (north A) (north A)) :
   Path.symm p
 
 /-- Double inverse of north loop. -/
+noncomputable def northLoopInv_inv_path (A : Type u) (p : Path (north A) (north A)) :
+    Path (northLoopInv A (northLoopInv A p)) p :=
+  Path.stepChain (by
+    unfold northLoopInv
+    exact Path.symm_symm p)
+
+/-- Double inverse of north loop as an Eq corollary. -/
 theorem northLoopInv_inv (A : Type u) (p : Path (north A) (north A)) :
     northLoopInv A (northLoopInv A p) = p := by
-  unfold northLoopInv; exact Path.symm_symm p
+  exact (northLoopInv_inv_path A p).toEq
 
 /-- Left identity for north loops. -/
+noncomputable def northLoopComp_refl_left_path (A : Type u) (p : Path (north A) (north A)) :
+    Path (northLoopComp A (Path.refl (north A)) p) p :=
+  Path.stepChain (by
+    unfold northLoopComp
+    simp)
+
+/-- Left identity for north loops as an Eq corollary. -/
 theorem northLoopComp_refl_left (A : Type u) (p : Path (north A) (north A)) :
     northLoopComp A (Path.refl (north A)) p = p := by
-  unfold northLoopComp; simp
+  exact (northLoopComp_refl_left_path A p).toEq
 
 /-- Right identity for north loops. -/
+noncomputable def northLoopComp_refl_right_path (A : Type u) (p : Path (north A) (north A)) :
+    Path (northLoopComp A p (Path.refl (north A))) p :=
+  Path.stepChain (by
+    unfold northLoopComp
+    simp)
+
+/-- Right identity for north loops as an Eq corollary. -/
 theorem northLoopComp_refl_right (A : Type u) (p : Path (north A) (north A)) :
     northLoopComp A p (Path.refl (north A)) = p := by
-  unfold northLoopComp; simp
+  exact (northLoopComp_refl_right_path A p).toEq
+
+/-- Associativity witness at the rewrite-equivalence level. -/
+noncomputable def northLoopComp_assoc_rweq (A : Type u)
+    (p q r : Path (north A) (north A)) :
+    RwEq
+      (northLoopComp A (northLoopComp A p q) r)
+      (northLoopComp A p (northLoopComp A q r)) := by
+  unfold northLoopComp
+  simpa using rweq_tt p q r
+
+/-- Left unit witness at the rewrite-equivalence level. -/
+noncomputable def northLoopComp_refl_left_rweq (A : Type u)
+    (p : Path (north A) (north A)) :
+    RwEq (northLoopComp A (Path.refl (north A)) p) p := by
+  unfold northLoopComp
+  simpa using rweq_cmpA_refl_left p
+
+/-- Right unit witness at the rewrite-equivalence level. -/
+noncomputable def northLoopComp_refl_right_rweq (A : Type u)
+    (p : Path (north A) (north A)) :
+    RwEq (northLoopComp A p (Path.refl (north A))) p := by
+  unfold northLoopComp
+  simpa using rweq_cmpA_refl_right p
+
+/-- Left inverse cancellation for north loops via rewrite equivalence. -/
+noncomputable def northLoopComp_inv_left_rweq (A : Type u)
+    (p : Path (north A) (north A)) :
+    RwEq (northLoopComp A (northLoopInv A p) p) (Path.refl (north A)) := by
+  unfold northLoopComp northLoopInv
+  simpa using rweq_cmpA_inv_left p
+
+/-- Right inverse cancellation for north loops via rewrite equivalence. -/
+noncomputable def northLoopComp_inv_right_rweq (A : Type u)
+    (p : Path (north A) (north A)) :
+    RwEq (northLoopComp A p (northLoopInv A p)) (Path.refl (north A)) := by
+  unfold northLoopComp northLoopInv
+  simpa using rweq_cmpA_inv_right p
+
+/-- Double symmetry for north loops via rewrite equivalence. -/
+noncomputable def northLoopInv_inv_rweq (A : Type u)
+    (p : Path (north A) (north A)) :
+    RwEq (northLoopInv A (northLoopInv A p)) p := by
+  unfold northLoopInv
+  simpa using rweq_ss p
 
 /-! ## Double suspension -/
 

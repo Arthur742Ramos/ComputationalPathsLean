@@ -126,6 +126,40 @@ theorem loopBPowClass_zero :
     loopBPowClass 0 = PathRwQuot.refl base :=
   rfl
 
+/-- Additivity coherence for powers of loop A in `RwEq` form. -/
+noncomputable def loopAPow_add_rweq (m n : Nat) :
+    RwEq (Path.trans (loopAPow m) (loopAPow n)) (loopAPow (m + n)) := by
+  induction m with
+  | zero =>
+      simpa [loopAPow] using (rweq_cmpA_refl_left (p := loopAPow n))
+  | succ m ih =>
+      have hAssoc :
+          RwEq (Path.trans (Path.trans loopA (loopAPow m)) (loopAPow n))
+            (Path.trans loopA (Path.trans (loopAPow m) (loopAPow n))) :=
+        rweq_tt loopA (loopAPow m) (loopAPow n)
+      have hCongr :
+          RwEq (Path.trans loopA (Path.trans (loopAPow m) (loopAPow n)))
+            (Path.trans loopA (loopAPow (m + n))) :=
+        rweq_trans_congr_right loopA ih
+      simpa [loopAPow, Nat.succ_add] using rweq_trans hAssoc hCongr
+
+/-- Additivity coherence for powers of loop B in `RwEq` form. -/
+noncomputable def loopBPow_add_rweq (m n : Nat) :
+    RwEq (Path.trans (loopBPow m) (loopBPow n)) (loopBPow (m + n)) := by
+  induction m with
+  | zero =>
+      simpa [loopBPow] using (rweq_cmpA_refl_left (p := loopBPow n))
+  | succ m ih =>
+      have hAssoc :
+          RwEq (Path.trans (Path.trans loopB (loopBPow m)) (loopBPow n))
+            (Path.trans loopB (Path.trans (loopBPow m) (loopBPow n))) :=
+        rweq_tt loopB (loopBPow m) (loopBPow n)
+      have hCongr :
+          RwEq (Path.trans loopB (Path.trans (loopBPow m) (loopBPow n)))
+            (Path.trans loopB (loopBPow (m + n))) :=
+        rweq_trans_congr_right loopB ih
+      simpa [loopBPow, Nat.succ_add] using rweq_trans hAssoc hCongr
+
 /-! ## Inverse loops -/
 
 /-- Inverse of loop A. -/
@@ -318,15 +352,33 @@ theorem loopBPowClass_succ (n : Nat) :
     loopBPowClass (n + 1) = PathRwQuot.trans loopBClass (loopBPowClass n) := by
   simp [loopBPowClass, loopBPow, loopBClass, PathRwQuot.trans]
 
+/-- Additivity coherence for powers of loop A at the quotient level. -/
+theorem loopAPowClass_add (m n : Nat) :
+    PathRwQuot.trans (loopAPowClass m) (loopAPowClass n) = loopAPowClass (m + n) :=
+  Quot.sound (loopAPow_add_rweq m n)
+
+/-- Additivity coherence for powers of loop B at the quotient level. -/
+theorem loopBPowClass_add (m n : Nat) :
+    PathRwQuot.trans (loopBPowClass m) (loopBPowClass n) = loopBPowClass (m + n) :=
+  Quot.sound (loopBPow_add_rweq m n)
+
 /-! ## Commutator alternative form -/
 
 /-- Alternative definition: commutator as four-fold composition. -/
 noncomputable def commutator' : FigureEightLoopSpace :=
   Path.trans loopA (Path.trans loopB (Path.trans loopAInv loopBInv))
 
+/-- Reassociation coherence between the two commutator presentations. -/
+noncomputable def commutator_assoc_rweq :
+    RwEq commutator commutator' :=
+  rweq_trans
+    (rweq_tt (Path.trans loopA loopB) loopAInv loopBInv)
+    (rweq_tt loopA loopB (Path.trans loopAInv loopBInv))
+
 /-- The two commutator definitions have the same toEq. -/
 theorem commutator_toEq_eq :
-    commutator.toEq = commutator'.toEq := rfl
+    commutator.toEq = commutator'.toEq := by
+  exact rweq_toEq commutator_assoc_rweq
 
 /-! ## Summary
 

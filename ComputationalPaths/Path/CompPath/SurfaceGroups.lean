@@ -23,6 +23,7 @@ structural hooks for later computational-path constructions.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.CompPath.SphereCompPath
@@ -191,33 +192,64 @@ namespace ComputationalPaths
 namespace Path
 namespace CompPath
 
+noncomputable def surfaceGroups_boundary_orientable_path (genus boundary : Nat) :
+    Path (SurfaceClass.boundary (SurfaceClass.orientable genus boundary)) boundary :=
+  Path.refl boundary
+
 theorem surfaceGroups_boundary_orientable (genus boundary : Nat) :
     SurfaceClass.boundary (SurfaceClass.orientable genus boundary) = boundary := by
-  rfl
+  exact (surfaceGroups_boundary_orientable_path genus boundary).toEq
+
+noncomputable def surfaceGroups_boundary_nonorientable_path (crosscaps boundary : Nat) :
+    Path (SurfaceClass.boundary (SurfaceClass.nonorientable crosscaps boundary)) boundary :=
+  Path.refl boundary
 
 theorem surfaceGroups_boundary_nonorientable (crosscaps boundary : Nat) :
     SurfaceClass.boundary (SurfaceClass.nonorientable crosscaps boundary) = boundary := by
-  rfl
+  exact (surfaceGroups_boundary_nonorientable_path crosscaps boundary).toEq
+
+noncomputable def surfaceGroups_isOrientable_orientable_path (genus boundary : Nat) :
+    Path (SurfaceClass.isOrientable (SurfaceClass.orientable genus boundary)) true :=
+  Path.refl true
 
 theorem surfaceGroups_isOrientable_orientable (genus boundary : Nat) :
     SurfaceClass.isOrientable (SurfaceClass.orientable genus boundary) = true := by
-  rfl
+  exact (surfaceGroups_isOrientable_orientable_path genus boundary).toEq
+
+noncomputable def surfaceGroups_isOrientable_nonorientable_path (crosscaps boundary : Nat) :
+    Path (SurfaceClass.isOrientable (SurfaceClass.nonorientable crosscaps boundary)) false :=
+  Path.refl false
 
 theorem surfaceGroups_isOrientable_nonorientable (crosscaps boundary : Nat) :
     SurfaceClass.isOrientable (SurfaceClass.nonorientable crosscaps boundary) = false := by
-  rfl
+  exact (surfaceGroups_isOrientable_nonorientable_path crosscaps boundary).toEq
+
+noncomputable def surfaceGroups_mappingClassComp_id_left_path (S : SurfaceData) (f : MappingClass S) :
+    Path (mappingClassComp (mappingClassId S) f) f :=
+  Path.stepChain (by
+    simpa [mappingClassComp, mappingClassId] using SimpleEquiv.refl_comp f)
 
 theorem surfaceGroups_mappingClassComp_id_left (S : SurfaceData) (f : MappingClass S) :
     mappingClassComp (mappingClassId S) f = f := by
-  simp [mappingClassComp, mappingClassId, SimpleEquiv.refl_comp]
+  exact (surfaceGroups_mappingClassComp_id_left_path S f).toEq
+
+noncomputable def surfaceGroups_mappingClassComp_id_right_path (S : SurfaceData) (f : MappingClass S) :
+    Path (mappingClassComp f (mappingClassId S)) f :=
+  Path.stepChain (by
+    simpa [mappingClassComp, mappingClassId] using SimpleEquiv.comp_refl f)
 
 theorem surfaceGroups_mappingClassComp_id_right (S : SurfaceData) (f : MappingClass S) :
     mappingClassComp f (mappingClassId S) = f := by
-  simp [mappingClassComp, mappingClassId, SimpleEquiv.comp_refl]
+  exact (surfaceGroups_mappingClassComp_id_right_path S f).toEq
+
+noncomputable def surfaceGroups_mappingClassInv_involutive_path (S : SurfaceData) (f : MappingClass S) :
+    Path (mappingClassInv (mappingClassInv f)) f :=
+  Path.stepChain (by
+    simpa [mappingClassInv] using SimpleEquiv.symm_symm f)
 
 theorem surfaceGroups_mappingClassInv_involutive (S : SurfaceData) (f : MappingClass S) :
     mappingClassInv (mappingClassInv f) = f := by
-  simp [mappingClassInv, SimpleEquiv.symm_symm]
+  exact (surfaceGroups_mappingClassInv_involutive_path S f).toEq
 
 theorem surfaceGroups_dehnTwistPow_zero (S : SurfaceData) (D : DehnTwistData S)
     (c : SurfaceCurve S) :
@@ -236,17 +268,56 @@ theorem surfaceGroups_eulerChar_genus_g (g : Nat) :
     surfaceEulerChar (SurfaceClass.orientable g 0) = 2 - 2 * Int.ofNat g := by
   simp [surfaceEulerChar]
 
+noncomputable def surfaceGroups_mappingClassComp_assoc_path
+    (S : SurfaceData) (f g h : MappingClass S) :
+    Path
+      (mappingClassComp (mappingClassComp f g) h)
+      (mappingClassComp f (mappingClassComp g h)) :=
+  Path.stepChain (by
+    simpa [mappingClassComp] using (SimpleEquiv.comp_assoc f g h))
+
 theorem surfaceGroups_mappingClassComp_assoc (S : SurfaceData) (f g h : MappingClass S) :
     mappingClassComp (mappingClassComp f g) h =
     mappingClassComp f (mappingClassComp g h) := by
-  simp [mappingClassComp, SimpleEquiv.comp_assoc]
+  exact (surfaceGroups_mappingClassComp_assoc_path S f g h).toEq
+
+noncomputable def surfaceGroups_mappingClassInv_left_path (S : SurfaceData) (f : MappingClass S) :
+    Path (mappingClassComp (mappingClassInv f) f) (mappingClassId S) :=
+  Path.stepChain (by
+    simpa [mappingClassComp, mappingClassInv, mappingClassId] using
+      (SimpleEquiv.symm_comp f))
 
 theorem surfaceGroups_mappingClassInv_left (S : SurfaceData) (f : MappingClass S) :
     mappingClassComp (mappingClassInv f) f = mappingClassId S := by
-  simp only [mappingClassComp, mappingClassInv, mappingClassId]
-  have h := SimpleEquiv.symm_comp f
-  simp only [SimpleEquiv.comp, SimpleEquiv.symm, SimpleEquiv.refl] at h ⊢
-  exact h
+  exact (surfaceGroups_mappingClassInv_left_path S f).toEq
+
+noncomputable def surfaceGroups_mappingClassInv_right_path (S : SurfaceData) (f : MappingClass S) :
+    Path (mappingClassComp f (mappingClassInv f)) (mappingClassId S) :=
+  Path.stepChain (by
+    simpa [mappingClassComp, mappingClassInv, mappingClassId] using
+      (SimpleEquiv.comp_symm f))
+
+theorem surfaceGroups_mappingClassInv_right (S : SurfaceData) (f : MappingClass S) :
+    mappingClassComp f (mappingClassInv f) = mappingClassId S := by
+  exact (surfaceGroups_mappingClassInv_right_path S f).toEq
+
+noncomputable def surfaceGroups_mappingClassComp_coherence_assoc_rweq
+    (S : SurfaceData) (f g h : MappingClass S) :
+    RwEq
+      (Path.trans
+        (Path.trans
+          (surfaceGroups_mappingClassComp_assoc_path S f g h)
+          (surfaceGroups_mappingClassComp_id_right_path S (mappingClassComp f (mappingClassComp g h))))
+        (Path.refl (mappingClassComp f (mappingClassComp g h))))
+      (Path.trans
+        (surfaceGroups_mappingClassComp_assoc_path S f g h)
+        (Path.trans
+          (surfaceGroups_mappingClassComp_id_right_path S (mappingClassComp f (mappingClassComp g h)))
+          (Path.refl (mappingClassComp f (mappingClassComp g h))))) := by
+  exact rweq_tt
+    (surfaceGroups_mappingClassComp_assoc_path S f g h)
+    (surfaceGroups_mappingClassComp_id_right_path S (mappingClassComp f (mappingClassComp g h)))
+    (Path.refl (mappingClassComp f (mappingClassComp g h)))
 
 theorem surfaceGroups_dehnTwistPow_succ (S : SurfaceData) (D : DehnTwistData S)
     (c : SurfaceCurve S) (n : Nat) :
