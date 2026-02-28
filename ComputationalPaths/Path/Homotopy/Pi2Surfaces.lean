@@ -16,6 +16,8 @@ computational-path structure.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Homotopy.Reflexivity
 
 namespace ComputationalPaths
 namespace Path
@@ -139,16 +141,30 @@ noncomputable def pi2Comp_assoc_path {A : Type} {a : A}
   Path.stepChain (pi2Comp_assoc α β γ)
 
 /-- Left inverse at toEq level. -/
+noncomputable def pi2Comp_inv_left_rweq {A : Type} {a : A}
+    (α : Pi2 A a) :
+    RwEq (pi2Comp (pi2Inv α) α) (Path.refl (Path.refl a)) := by
+  unfold pi2Comp pi2Inv
+  exact rweq_cmpA_inv_left α
+
+/-- Left inverse at toEq level. -/
 theorem pi2Comp_inv_left_toEq {A : Type} {a : A}
     (α : Pi2 A a) :
     (pi2Comp (pi2Inv α) α).toEq = (Path.refl (Path.refl a)).toEq := by
-  unfold pi2Comp pi2Inv; simp
+  exact rweq_toEq (pi2Comp_inv_left_rweq α)
+
+/-- Right inverse at toEq level. -/
+noncomputable def pi2Comp_inv_right_rweq {A : Type} {a : A}
+    (α : Pi2 A a) :
+    RwEq (pi2Comp α (pi2Inv α)) (Path.refl (Path.refl a)) := by
+  unfold pi2Comp pi2Inv
+  exact rweq_cmpA_inv_right α
 
 /-- Right inverse at toEq level. -/
 theorem pi2Comp_inv_right_toEq {A : Type} {a : A}
     (α : Pi2 A a) :
     (pi2Comp α (pi2Inv α)).toEq = (Path.refl (Path.refl a)).toEq := by
-  unfold pi2Comp pi2Inv; simp
+  exact rweq_toEq (pi2Comp_inv_right_rweq α)
 
 /-! ## Inverse properties -/
 
@@ -156,6 +172,11 @@ theorem pi2Comp_inv_right_toEq {A : Type} {a : A}
 theorem pi2Inv_id {A : Type} {a : A} :
     pi2Inv (pi2Id (A := A) (a := a)) = pi2Id := by
   unfold pi2Inv pi2Id; exact symm_refl (Path.refl a)
+
+/-- Inverse of identity in rewrite form. -/
+noncomputable def pi2Inv_id_rweq {A : Type} {a : A} :
+    RwEq (pi2Inv (pi2Id (A := A) (a := a))) (pi2Id (A := A) (a := a)) :=
+  rweq_of_eq pi2Inv_id
 
 /-- Path for inverse of identity. -/
 noncomputable def pi2Inv_id_path {A : Type} {a : A} :
@@ -168,6 +189,12 @@ theorem pi2Inv_comp {A : Type} {a : A}
     pi2Inv (pi2Comp α β) = pi2Comp (pi2Inv β) (pi2Inv α) := by
   unfold pi2Inv pi2Comp; exact symm_trans α β
 
+/-- Inverse distributes over composition in rewrite form. -/
+noncomputable def pi2Inv_comp_rweq {A : Type} {a : A}
+    (α β : Pi2 A a) :
+    RwEq (pi2Inv (pi2Comp α β)) (pi2Comp (pi2Inv β) (pi2Inv α)) :=
+  rweq_of_eq (pi2Inv_comp α β)
+
 /-- Path for inverse distributing over composition. -/
 noncomputable def pi2Inv_comp_path {A : Type} {a : A}
     (α β : Pi2 A a) :
@@ -179,6 +206,12 @@ theorem pi2Inv_inv {A : Type} {a : A}
     (α : Pi2 A a) :
     pi2Inv (pi2Inv α) = α := by
   unfold pi2Inv; exact symm_symm α
+
+/-- Double inverse in rewrite form. -/
+noncomputable def pi2Inv_inv_rweq {A : Type} {a : A}
+    (α : Pi2 A a) :
+    RwEq (pi2Inv (pi2Inv α)) α :=
+  rweq_of_eq (pi2Inv_inv α)
 
 /-- Path for double inverse. -/
 noncomputable def pi2Inv_inv_path {A : Type} {a : A}
@@ -341,11 +374,20 @@ theorem pi2ProdSnd_inv {A B : Type} {a : A} {b : B}
 
 /-! ## Abelianness of π₂ -/
 
+/-- π₂ commutativity in rewrite form after canonical `stepChain` projection. -/
+noncomputable def pi2_abelian_rweq {A : Type} {a : A}
+    (α β : Pi2 A a) :
+    RwEq (Path.stepChain (pi2Comp α β).toEq)
+         (Path.stepChain (pi2Comp β α).toEq) := by
+  have h : (pi2Comp α β).toEq = (pi2Comp β α).toEq := by
+    simp [pi2Comp]
+  exact rweq_of_eq (by simpa using congrArg (fun e => Path.stepChain e) h)
+
 /-- π₂ is abelian at the toEq level. -/
 theorem pi2_abelian_toEq {A : Type} {a : A}
     (α β : Pi2 A a) :
     (pi2Comp α β).toEq = (pi2Comp β α).toEq := by
-  unfold pi2Comp; simp
+  simpa using rweq_toEq (pi2_abelian_rweq α β)
 
 /-! ## Hopf action -/
 
@@ -469,23 +511,47 @@ theorem wedgeInclRight_comp' {A B : Type} {b : B}
 
 /-! ## Surface-specific π₂ results -/
 
+/-- For PUnit-based spaces, canonical representatives are rewrite-equivalent. -/
+noncomputable def pi2_punit_rweq
+    (α : Pi2 PUnit PUnit.unit) :
+    RwEq (Path.stepChain α.toEq) (Path.refl (Path.refl PUnit.unit)) := by
+  have h : α.toEq = rfl := by simp
+  cases h
+  simpa using
+    (rweq_ofEq_rfl_refl (A := Path PUnit.unit PUnit.unit)
+      (a := Path.refl PUnit.unit))
+
 /-- For PUnit-based spaces, π₂ toEq is always trivial. -/
 theorem pi2_punit_toEq
     (α : Pi2 PUnit PUnit.unit) :
     α.toEq = (Path.refl (Path.refl PUnit.unit)).toEq := by
-  simp
+  simpa using rweq_toEq (pi2_punit_rweq α)
+
+/-- Genus-g surface: canonical representatives are rewrite-equivalent. -/
+noncomputable def pi2Surface_rweq (g : Nat)
+    (α : Pi2 (Surface g) (surfaceBase g)) :
+    RwEq (Path.stepChain α.toEq) (Path.refl (Path.refl (surfaceBase g))) := by
+  simpa [Surface, surfaceBase] using pi2_punit_rweq (α := α)
 
 /-- Genus-g surface: π₂ toEq is trivial. -/
 theorem pi2Surface_toEq (g : Nat)
     (α : Pi2 (Surface g) (surfaceBase g)) :
     α.toEq = (Path.refl (Path.refl (surfaceBase g))).toEq := by
-  simp
+  simpa using rweq_toEq (pi2Surface_rweq g α)
+
+/-- Two π₂ elements of a surface are rewrite-equivalent after canonical projection. -/
+noncomputable def pi2Surface_all_rweq (g : Nat)
+    (α β : Pi2 (Surface g) (surfaceBase g)) :
+    RwEq (Path.stepChain α.toEq) (Path.stepChain β.toEq) := by
+  have h : α.toEq = β.toEq := by
+    simp [Surface, surfaceBase]
+  exact rweq_of_eq (by simpa using congrArg (fun e => Path.stepChain e) h)
 
 /-- Two π₂ elements of a surface agree at toEq. -/
 theorem pi2Surface_all_eq_toEq (g : Nat)
     (α β : Pi2 (Surface g) (surfaceBase g)) :
     α.toEq = β.toEq := by
-  simp
+  simpa using rweq_toEq (pi2Surface_all_rweq g α β)
 
 /-- Torus: π₂(T²) has trivial toEq. -/
 theorem pi2Torus_trivial_toEq
@@ -553,11 +619,22 @@ noncomputable def pi2Iterate_two_path {A : Type} {a : A}
 
 /-! ## Constant map on π₂ -/
 
+/-- A constant map induces the zero map on canonical representatives up to rewrite. -/
+noncomputable def pi2_const_map_rweq {A B : Type} {a : A} {b : B}
+    (α : Pi2 A a) :
+    RwEq (Path.stepChain (pi2Map (fun _ : A => b) α).toEq) (pi2Id (A := B) (a := b)) := by
+  have h : (pi2Map (fun _ : A => b) α).toEq = rfl := by
+    unfold pi2Map
+    simp
+  cases h
+  simpa [pi2Id] using
+    (rweq_ofEq_rfl_refl (A := Path b b) (a := Path.refl b))
+
 /-- A constant map induces the zero map on π₂ (at toEq level). -/
 theorem pi2_const_map_toEq {A B : Type} {a : A} {b : B}
     (α : Pi2 A a) :
     (pi2Map (fun _ : A => b) α).toEq = (pi2Id (A := B) (a := b)).toEq := by
-  unfold pi2Map pi2Id; simp
+  simpa using rweq_toEq (pi2_const_map_rweq (A := A) (B := B) (a := a) (b := b) α)
 
 end Pi2Surfaces
 end Homotopy

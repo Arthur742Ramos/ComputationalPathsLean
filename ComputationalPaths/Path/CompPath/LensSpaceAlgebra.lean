@@ -14,6 +14,7 @@ model π₁(L(p,q)) ≅ ℤ/p from the LensSpace module and add:
 -/
 
 import ComputationalPaths.Path.CompPath.LensSpace
+import ComputationalPaths.Path.Homotopy.Reflexivity
 
 namespace ComputationalPaths
 namespace Path
@@ -166,15 +167,27 @@ def loopMul_assoc_path (p q : Nat) (α β γ : lensSpaceLoopSpace p q) :
          (loopMul p q α (loopMul p q β γ)) :=
   Path.stepChain (loopMul_assoc p q α β γ)
 
+/-- Left inverse for loops at rewrite-equivalence level. -/
+noncomputable def loopMul_inv_left_rweq (p q : Nat) (α : lensSpaceLoopSpace p q) :
+    RwEq (loopMul p q (loopInv p q α) α) (loopId p q) := by
+  unfold loopMul loopInv loopId
+  simpa using rweq_cmpA_inv_left (p := α)
+
+/-- Right inverse for loops at rewrite-equivalence level. -/
+noncomputable def loopMul_inv_right_rweq (p q : Nat) (α : lensSpaceLoopSpace p q) :
+    RwEq (loopMul p q α (loopInv p q α)) (loopId p q) := by
+  unfold loopMul loopInv loopId
+  simpa using rweq_cmpA_inv_right (p := α)
+
 /-- Left inverse for loops (at the toEq level). -/
 theorem loopMul_inv_left_toEq (p q : Nat) (α : lensSpaceLoopSpace p q) :
     (loopMul p q (loopInv p q α) α).toEq = (loopId p q).toEq := by
-  unfold loopMul loopInv loopId; simp
+  simpa using rweq_toEq (loopMul_inv_left_rweq p q α)
 
 /-- Right inverse for loops (at the toEq level). -/
 theorem loopMul_inv_right_toEq (p q : Nat) (α : lensSpaceLoopSpace p q) :
     (loopMul p q α (loopInv p q α)).toEq = (loopId p q).toEq := by
-  unfold loopMul loopInv loopId; simp
+  simpa using rweq_toEq (loopMul_inv_right_rweq p q α)
 
 /-- Inverse distributes over composition. -/
 theorem loopInv_mul (p q : Nat) (α β : lensSpaceLoopSpace p q) :
@@ -365,16 +378,35 @@ def lensSpaceLoopPow_one_path (p q : Nat) :
          (Path.trans (lensSpaceLoop p q) (Path.refl (lensSpaceBase p q))) :=
   Path.refl _
 
+/-- The fundamental loop normalizes to reflexivity up to rewrite equivalence. -/
+noncomputable def lensSpaceLoop_rweq_refl (p q : Nat) :
+    RwEq (lensSpaceLoop p q) (Path.refl (lensSpaceBase p q)) := by
+  simpa [lensSpaceLoop] using
+    (rweq_ofEq_rfl_refl (A := LensSpace p q) (a := lensSpaceBase p q))
+
+/-- Every loop power normalizes to reflexivity up to rewrite equivalence. -/
+noncomputable def lensSpaceLoopPow_rweq_refl (p q n : Nat) :
+    RwEq (lensSpaceLoopPow p q n) (Path.refl (lensSpaceBase p q)) := by
+  induction n with
+  | zero =>
+      simpa [lensSpaceLoopPow] using (rweq_refl (Path.refl (lensSpaceBase p q)))
+  | succ n ih =>
+      simpa [lensSpaceLoopPow] using
+        (rweq_trans
+          (rweq_trans
+            (rweq_trans_congr_right (p := lensSpaceLoop p q) ih)
+            (rweq_cmpA_refl_right (p := lensSpaceLoop p q)))
+          (lensSpaceLoop_rweq_refl p q))
+
 /-- toEq of loop power is always rfl (PUnit). -/
 theorem lensSpaceLoopPow_toEq (p q n : Nat) :
     (lensSpaceLoopPow p q n).toEq = rfl := by
-  induction n with
-  | zero => simp
-  | succ _ _ => simp
+  simpa using rweq_toEq (lensSpaceLoopPow_rweq_refl p q n)
 
 /-- The fundamental loop has trivial toEq (PUnit). -/
 theorem lensSpaceLoop_toEq (p q : Nat) :
-    (lensSpaceLoop p q).toEq = rfl := by simp
+    (lensSpaceLoop p q).toEq = rfl := by
+  simpa using rweq_toEq (lensSpaceLoop_rweq_refl p q)
 
 end
 

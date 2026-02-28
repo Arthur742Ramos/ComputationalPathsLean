@@ -23,6 +23,7 @@ they can be used without additional analytic or algebraic machinery.
 
 import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 namespace ComputationalPaths
@@ -79,14 +80,23 @@ theorem point_mk (a : E) (h : Path (mf.map a) mf.regularValue) :
     point mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h) = a := by
   rfl
 
-/-- Constructor/projection identity for Milnor fiber path witnesses.
-Note: basePath returns `Fiber.prop`, which wraps the stored `Eq` proof
-back into a `Path.stepChain`. This equals the original path at the
-equality level (`toEq`) but not structurally (different step lists).
-We provide the `toEq`-level version instead. -/
+/-- Constructor/projection identity for Milnor fiber path witnesses
+to the canonical `stepChain` representative. -/
+theorem basePath_mk_stepChain (a : E) (h : Path (mf.map a) mf.regularValue) :
+    basePath mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h) =
+      Path.stepChain h.toEq := by
+  rfl
+
+/-- Rewrite-equivalence form of `basePath_mk_stepChain`. -/
+noncomputable def basePath_mk_rweq (a : E) (h : Path (mf.map a) mf.regularValue) :
+    RwEq (basePath mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h))
+      (Path.stepChain h.toEq) := by
+  exact rweq_of_eq (basePath_mk_stepChain (mf := mf) a h)
+
+/-- Constructor/projection identity for Milnor fiber path witnesses at `toEq`. -/
 theorem basePath_mk_toEq (a : E) (h : Path (mf.map a) mf.regularValue) :
     (basePath mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h)).toEq = h.toEq := by
-  rfl
+  simpa using rweq_toEq (basePath_mk_rweq (mf := mf) a h)
 
 /-- Eta law for Milnor fiber elements. -/
 theorem mk_eta (x : MilnorFiber mf) :
@@ -225,10 +235,16 @@ theorem formula_eq_reflection_spec (d : PicardLefschetzData mf)
     d.formula x = d.reflection_spec x := by
   rfl
 
+/-- Rewrite-equivalence form of `formula_eq_reflection_spec`. -/
+noncomputable def formula_rweq_reflection_spec (d : PicardLefschetzData mf)
+    (x : MilnorFiber mf) :
+    RwEq (d.formula x) (d.reflection_spec x) := by
+  exact rweq_of_eq (formula_eq_reflection_spec d x)
+
 /-- Equality-level compatibility of `formula` with `reflection_spec`. -/
 theorem formula_toEq (d : PicardLefschetzData mf) (x : MilnorFiber mf) :
     (d.formula x).toEq = (d.reflection_spec x).toEq := by
-  rfl
+  simpa using rweq_toEq (formula_rweq_reflection_spec d x)
 
 end PicardLefschetzData
 

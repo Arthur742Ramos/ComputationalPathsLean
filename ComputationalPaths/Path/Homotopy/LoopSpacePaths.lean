@@ -7,6 +7,7 @@ All constructions use the core Path/Step/trans/symm/congrArg/transport API.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -52,16 +53,26 @@ theorem omega_comp_assoc {a : A} (p q r : Omega A a) :
   unfold omega_comp; exact Path.trans_assoc p q r
 
 /-- Left inverse for loop composition (propositional). -/
+noncomputable def omega_inv_comp_rweq {a : A} (p : Omega A a) :
+    RwEq (omega_comp (omega_inv p) p) (omega_id a) := by
+  unfold omega_comp omega_inv omega_id
+  exact rweq_cmpA_inv_left p
+
+/-- Left inverse for loop composition (propositional). -/
 theorem omega_inv_comp_toEq {a : A} (p : Omega A a) :
     (omega_comp (omega_inv p) p).toEq = (Path.refl a).toEq := by
-  unfold omega_comp omega_inv
-  cases p with | mk s h => cases h; simp
+  exact rweq_toEq (omega_inv_comp_rweq p)
+
+/-- Right inverse for loop composition (propositional). -/
+noncomputable def omega_comp_inv_rweq {a : A} (p : Omega A a) :
+    RwEq (omega_comp p (omega_inv p)) (omega_id a) := by
+  unfold omega_comp omega_inv omega_id
+  exact rweq_cmpA_inv_right p
 
 /-- Right inverse for loop composition (propositional). -/
 theorem omega_comp_inv_toEq {a : A} (p : Omega A a) :
     (omega_comp p (omega_inv p)).toEq = (Path.refl a).toEq := by
-  unfold omega_comp omega_inv
-  cases p with | mk s h => cases h; simp
+  exact rweq_toEq (omega_comp_inv_rweq p)
 
 /-- Double inverse is identity. -/
 theorem omega_inv_inv {a : A} (p : Omega A a) :
@@ -94,6 +105,30 @@ noncomputable def twoLoop_comp {a : A} {p q r : Omega A a} (α : TwoLoop p q) (�
 /-- 2-loop inverse via Eq.symm. -/
 noncomputable def twoLoop_inv {a : A} {p q : Omega A a} (α : TwoLoop p q) : TwoLoop q p :=
   Eq.symm α
+
+/-- Path-first 2-loop witness. -/
+abbrev TwoLoopPath {a : A} (p q : Omega A a) : Type u := Path p q
+
+/-- RwEq-first 2-loop witness. -/
+abbrev TwoLoopRwEq {a : A} (p q : Omega A a) : Type u := RwEq p q
+
+/-- Promote Eq-based 2-loops to path witnesses. -/
+noncomputable def twoLoop_toPath {a : A} {p q : Omega A a} (α : TwoLoop p q) : TwoLoopPath p q :=
+  Path.stepChain α
+
+/-- Promote Eq-based 2-loops to rewrite-equivalence witnesses. -/
+noncomputable def twoLoop_toRwEq {a : A} {p q : Omega A a} (α : TwoLoop p q) : TwoLoopRwEq p q :=
+  rweq_of_eq α
+
+/-- Path composition of path-first 2-loops. -/
+noncomputable def twoLoopPath_comp {a : A} {p q r : Omega A a}
+    (α : TwoLoopPath p q) (β : TwoLoopPath q r) : TwoLoopPath p r :=
+  Path.trans α β
+
+/-- Path inverse of a path-first 2-loop. -/
+noncomputable def twoLoopPath_inv {a : A} {p q : Omega A a}
+    (α : TwoLoopPath p q) : TwoLoopPath q p :=
+  Path.symm α
 
 /-- All 2-loops between the same endpoints are equal (proof irrelevance). -/
 theorem twoLoop_subsingleton {a : A} {p q : Omega A a} (α β : TwoLoop p q) :
@@ -149,8 +184,9 @@ theorem omega_map_comp (f : A → B) {a : A} (p q : Omega A a) :
   unfold omega_map omega_comp; simp
 
 /-- Step.map f commutes with Step.symm. -/
-private theorem step_map_symm_comm (f : A → B) (s : Step A) :
-    Step.map f (Step.symm s) = Step.symm (Step.map f s) := by
+private theorem step_map_symm_comm (f : A → B) (s : ComputationalPaths.Step A) :
+    ComputationalPaths.Step.map f (ComputationalPaths.Step.symm s) =
+      ComputationalPaths.Step.symm (ComputationalPaths.Step.map f s) := by
   cases s; rfl
 
 /-- The loop space functor preserves loop inverse. -/
@@ -159,8 +195,9 @@ theorem omega_map_inv (f : A → B) {a : A} (p : Omega A a) :
   exact Path.congrArg_symm f p
 
 /-- Step.map distributes over composition. -/
-private theorem step_map_comp (f : B → C) (g : A → B) (s : Step A) :
-    Step.map (fun x => f (g x)) s = Step.map f (Step.map g s) := by
+private theorem step_map_comp (f : B → C) (g : A → B) (s : ComputationalPaths.Step A) :
+    ComputationalPaths.Step.map (fun x => f (g x)) s =
+      ComputationalPaths.Step.map f (ComputationalPaths.Step.map g s) := by
   cases s; rfl
 
 /-- Functoriality: composition of maps. -/
@@ -169,8 +206,8 @@ theorem omega_map_comp_fun (f : B → C) (g : A → B) {a : A} (p : Omega A a) :
   exact Path.congrArg_comp f g p
 
 /-- Step.map id is identity. -/
-private theorem step_map_id_eq (s : Step A) :
-    Step.map (fun x : A => x) s = s := by
+private theorem step_map_id_eq (s : ComputationalPaths.Step A) :
+    ComputationalPaths.Step.map (fun x : A => x) s = s := by
   cases s; simp
 
 /-- Identity function acts trivially on loops. -/
@@ -185,10 +222,17 @@ noncomputable def omega_transport {a b : A} (p : Path a b) (l : Omega A a) : Ome
   Path.trans (Path.symm p) (Path.trans l p)
 
 /-- Transport preserves the identity loop (propositionally). -/
+noncomputable def omega_transport_id_rweq {a b : A} (p : Path a b) :
+    RwEq (omega_transport p (omega_id a)) (omega_id b) := by
+  unfold omega_transport omega_id
+  exact rweq_trans
+    (rweq_trans_congr_right (Path.symm p) (rweq_cmpA_refl_left p))
+    (rweq_cmpA_inv_left p)
+
+/-- Transport preserves the identity loop (propositionally). -/
 theorem omega_transport_id_toEq {a b : A} (p : Path a b) :
     (omega_transport p (omega_id a)).toEq = (omega_id b).toEq := by
-  unfold omega_transport omega_id
-  cases p with | mk s h => cases h; simp
+  exact rweq_toEq (omega_transport_id_rweq p)
 
 /-- Transport along refl is identity. -/
 theorem omega_transport_refl_path {a : A} (l : Omega A a) :
@@ -209,10 +253,17 @@ theorem omega_conj_id {a : A} (l : Omega A a) :
   cases l; simp
 
 /-- Conjugation preserves the identity loop (propositionally). -/
+noncomputable def omega_conj_id_loop_rweq {a : A} (g : Omega A a) :
+    RwEq (omega_conj g (omega_id a)) (omega_id a) := by
+  unfold omega_conj omega_comp omega_inv omega_id
+  exact rweq_trans
+    (rweq_trans_congr_right (Path.symm g) (rweq_cmpA_refl_left g))
+    (rweq_cmpA_inv_left g)
+
+/-- Conjugation preserves the identity loop (propositionally). -/
 theorem omega_conj_id_loop_toEq {a : A} (g : Omega A a) :
     (omega_conj g (omega_id a)).toEq = (omega_id a).toEq := by
-  unfold omega_conj omega_comp omega_inv omega_id
-  cases g with | mk s h => cases h; simp
+  exact rweq_toEq (omega_conj_id_loop_rweq g)
 
 /-! ## Power operations -/
 
