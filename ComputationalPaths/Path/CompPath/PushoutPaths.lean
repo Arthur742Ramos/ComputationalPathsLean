@@ -2169,7 +2169,7 @@ theorem pushoutDecode_respects_amalg
       apply rweq_cmpA_refl_left
 
     apply Quot.sound
-    exact h_final
+    exact rweqProp_of_rweq h_final
 
 /-- Encode map for general pushouts (at the quotient level). -/
 class HasPushoutSVKEncodeQuot (A : Type u) (B : Type u) (C : Type u)
@@ -2394,6 +2394,7 @@ theorem pushoutPiOneInl_mul (α β : π₁(A, f c₀)) :
         Quot.mk _ (Path.trans (Pushout.inlPath p) (Pushout.inlPath q))
       apply Quot.sound
       simp [Pushout.inlPath]
+      exact rweqProp_of_rweq (RwEq.refl _)
 
 theorem pushoutPiOneInl_zero :
     pushoutPiOneInl (A := A) (B := B) (C := C) (f := f) (g := g) c₀ (0 : π₁(A, f c₀)) =
@@ -2401,7 +2402,7 @@ theorem pushoutPiOneInl_zero :
   change Quot.mk _ (Pushout.inlPath (Path.refl (f c₀))) =
     Quot.mk _ (Path.refl (Pushout.inl (f c₀)))
   apply Quot.sound
-  simp [Pushout.inlPath]
+  exact rweqProp_of_rweq (RwEq.refl _)
 
 theorem pushoutPiOneInr_mul (β₁ β₂ : π₁(B, g c₀)) :
     pushoutPiOneInr (A := A) (B := B) (C := C) (f := f) (g := g) c₀ (piOneMul β₁ β₂) =
@@ -2438,6 +2439,7 @@ theorem pushoutPiOneInr_mul (β₁ β₂ : π₁(B, g c₀)) :
               (Pushout.inrPath (A := A) (B := B) (C := C) (f := f) (g := g) p)
               (Pushout.inrPath (A := A) (B := B) (C := C) (f := f) (g := g) q)) := by
         simp [Pushout.inrPath]
+        exact RwEq.refl _
 
       -- Now compare the two conjugation composites up to RwEq.
       -- Right side is:
@@ -2662,6 +2664,7 @@ theorem pushoutPiOneInr_zero :
         (Pushout.inrPath (A := A) (B := B) (C := C) (f := f) (g := g) (Path.refl (g c₀)))
         (Path.refl (Pushout.inr (A := A) (B := B) (C := C) (f := f) (g := g) (g c₀))) := by
     simp [Pushout.inrPath]
+    exact RwEq.refl _
   -- Reduce glue ⋅ refl ⋅ glue⁻¹ to refl.
   have hstep :
       RwEq
@@ -3469,9 +3472,11 @@ theorem wedgeFreeProductDecode_eq_pushoutDecode (a₀ : A) (b₀ : B) :
   induction w with
   | nil => rfl
   | consLeft α rest ih =>
-      simp only [wedgeFreeProductDecode, pushoutDecode_consLeft, pushoutPiOneInl, ih]
+      simp [wedgeFreeProductDecode, pushoutDecode_consLeft, pushoutPiOneInl, ih,
+        Wedge.inl, Wedge.basepoint, Wedge.wedgeBasepoint]
   | consRight β rest ih =>
-      simp only [wedgeFreeProductDecode, pushoutDecode_consRight, pushoutPiOneInr, ih, Wedge.glue]
+      simp [wedgeFreeProductDecode, pushoutDecode_consRight, pushoutPiOneInr, ih,
+        Wedge.inl, Wedge.inr, Wedge.glue, Wedge.basepoint, Wedge.wedgeBasepoint]
 
 /-! Decode after encode gives back the original loop (at π₁ level).
 
