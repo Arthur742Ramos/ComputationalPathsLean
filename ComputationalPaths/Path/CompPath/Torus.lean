@@ -256,27 +256,63 @@ theorem transport_torusLoopMN_const (D : Type u) (m n : Int) (x : D) :
 
 /-! ## Symmetry of Torus Loops -/
 
+/-- RwEq-first double symmetry for `torusLoop1`. -/
+noncomputable def torusLoop1_double_symm_rweq :
+    RwEq (Path.symm (A := Torus.{u}) (Path.symm torusLoop1)) torusLoop1 :=
+  rweq_ss torusLoop1
+
+/-- RwEq-first double symmetry for `torusLoop2`. -/
+noncomputable def torusLoop2_double_symm_rweq :
+    RwEq (Path.symm (A := Torus.{u}) (Path.symm torusLoop2)) torusLoop2 :=
+  rweq_ss torusLoop2
+
+/-- RwEq-first cancellation for `torusLoop1`. -/
+noncomputable def torusLoop1_cancel_rweq :
+    RwEq (Path.trans (A := Torus.{u}) torusLoop1 (Path.symm torusLoop1))
+      (Path.refl torusBase) :=
+  rweq_cmpA_inv_right torusLoop1
+
+/-- RwEq-first cancellation for `torusLoop2`. -/
+noncomputable def torusLoop2_cancel_rweq :
+    RwEq (Path.trans (A := Torus.{u}) torusLoop2 (Path.symm torusLoop2))
+      (Path.refl torusBase) :=
+  rweq_cmpA_inv_right torusLoop2
+
 /-- The inverse of `torusLoop1` at the `toEq` level. -/
 theorem torusLoop1_symm_toEq :
     (Path.symm (A := Torus.{u}) torusLoop1).toEq = torusLoop1.toEq.symm := by
-  simp
+  have hDouble :
+      (Path.symm (A := Torus.{u}) (Path.symm torusLoop1)).toEq = torusLoop1.toEq :=
+    rweq_toEq torusLoop1_double_symm_rweq
+  calc
+    (Path.symm (A := Torus.{u}) torusLoop1).toEq
+        = ((Path.symm (A := Torus.{u}) (Path.symm torusLoop1)).toEq).symm := by
+            simp
+    _ = torusLoop1.toEq.symm := (_root_.congrArg Eq.symm hDouble).symm
 
 /-- The inverse of `torusLoop2` at the `toEq` level. -/
 theorem torusLoop2_symm_toEq :
     (Path.symm (A := Torus.{u}) torusLoop2).toEq = torusLoop2.toEq.symm := by
-  simp
+  have hDouble :
+      (Path.symm (A := Torus.{u}) (Path.symm torusLoop2)).toEq = torusLoop2.toEq :=
+    rweq_toEq torusLoop2_double_symm_rweq
+  calc
+    (Path.symm (A := Torus.{u}) torusLoop2).toEq
+        = ((Path.symm (A := Torus.{u}) (Path.symm torusLoop2)).toEq).symm := by
+            simp
+    _ = torusLoop2.toEq.symm := (_root_.congrArg Eq.symm hDouble).symm
 
 /-- Cancellation: `torusLoop1 ⬝ torusLoop1⁻¹` has trivial `toEq`. -/
 theorem torusLoop1_cancel_toEq :
     (Path.trans (A := Torus.{u}) torusLoop1 (Path.symm torusLoop1)).toEq =
     (rfl : torusBase = torusBase) := by
-  simp
+  exact rweq_toEq torusLoop1_cancel_rweq
 
 /-- Cancellation: `torusLoop2 ⬝ torusLoop2⁻¹` has trivial `toEq`. -/
 theorem torusLoop2_cancel_toEq :
     (Path.trans (A := Torus.{u}) torusLoop2 (Path.symm torusLoop2)).toEq =
     (rfl : torusBase = torusBase) := by
-  simp
+  exact rweq_toEq torusLoop2_cancel_rweq
 
 /-! ## Congruence on the Torus -/
 

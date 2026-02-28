@@ -138,6 +138,53 @@ noncomputable def z2_add_zero_path (a : Z2) :
     Path (z2_add a z2_zero) a :=
   Path.stepChain (z2_add_zero a)
 
+/-- Path coherence: left inverse law. -/
+noncomputable def z2_neg_add_path (a : Z2) :
+    Path (z2_add (z2_neg a) a) z2_zero :=
+  Path.stepChain (z2_neg_add a)
+
+/-- Path coherence: right inverse law. -/
+noncomputable def z2_add_neg_path (a : Z2) :
+    Path (z2_add a (z2_neg a)) z2_zero :=
+  Path.stepChain (z2_add_neg a)
+
+/-- RwEq coherence: left inverse and involutive addition witnesses agree. -/
+noncomputable def z2_neg_add_involutive_rweq (a : Z2) :
+    RwEq (z2_neg_add_path a) (z2_add_involutive a) := by
+  unfold z2_neg_add_path z2_add_involutive
+  exact rweq_of_eq
+    (_root_.congrArg Path.stepChain (Subsingleton.elim (z2_neg_add a) (z2_add_self a)))
+
+/-- RwEq coherence: right inverse and involutive addition witnesses agree. -/
+noncomputable def z2_add_neg_involutive_rweq (a : Z2) :
+    RwEq (z2_add_neg_path a) (z2_add_involutive a) := by
+  unfold z2_add_neg_path z2_add_involutive
+  exact rweq_of_eq
+    (_root_.congrArg Path.stepChain (Subsingleton.elim (z2_add_neg a) (z2_add_self a)))
+
+/-- Left and right inverse path witnesses are rewrite-equivalent. -/
+noncomputable def z2_inverse_paths_agree_rweq (a : Z2) :
+    RwEq (z2_neg_add_path a) (z2_add_neg_path a) :=
+  rweq_trans (z2_neg_add_involutive_rweq a)
+    (rweq_symm (z2_add_neg_involutive_rweq a))
+
+/-- Generator order-2 coherence in `RwEq` form. -/
+noncomputable def rp2GeneratorOrder2_rweq :
+    RwEq rp2GeneratorOrder2 (z2_add_involutive z2_one) := by
+  unfold rp2GeneratorOrder2 z2_add_involutive
+  exact rweq_of_eq
+    (_root_.congrArg Path.stepChain (Subsingleton.elim rfl (z2_add_self z2_one)))
+
+/-- Coherence at `toEq`: left and right inverse paths agree. -/
+theorem z2_inverse_paths_agree_toEq (a : Z2) :
+    (z2_neg_add_path a).toEq = (z2_add_neg_path a).toEq := by
+  exact rweq_toEq (z2_inverse_paths_agree_rweq a)
+
+/-- Coherence at `toEq`: the RP² generator witness matches involutive addition at `1`. -/
+theorem rp2GeneratorOrder2_toEq_involutive :
+    rp2GeneratorOrder2.toEq = (z2_add_involutive z2_one).toEq := by
+  exact rweq_toEq rp2GeneratorOrder2_rweq
+
 /-! ## Z/2 Multiplication -/
 
 /-- Multiplication in Z/2 is AND. -/

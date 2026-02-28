@@ -18,6 +18,7 @@ Zero `sorry`, zero `admit`, zero `Path.ofEq`.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -248,13 +249,17 @@ noncomputable def vb_cancel_rank (v : VirtualBundle) :
   stepPath (vb_cancel_rank_thm v)
 
 -- 18. Double negation
+noncomputable def vb_neg_neg_path (v : VirtualBundle) :
+    Path (VirtualBundle.negation (VirtualBundle.negation v)) v :=
+  stepPath (by ext <;> simp)
+
 theorem vb_neg_neg_thm (v : VirtualBundle) :
-    VirtualBundle.negation (VirtualBundle.negation v) = v := by
-  ext <;> simp
+    VirtualBundle.negation (VirtualBundle.negation v) = v :=
+  (vb_neg_neg_path v).toEq
 
 noncomputable def vb_neg_neg (v : VirtualBundle) :
     Path (VirtualBundle.negation (VirtualBundle.negation v)) v :=
-  stepPath (vb_neg_neg_thm v)
+  vb_neg_neg_path v
 
 -- 19. **Multi-step** Four-fold sum associativity via trans
 noncomputable def vb_add_assoc4 (a b c d : VirtualBundle) :
@@ -283,7 +288,7 @@ noncomputable def vb_add_assoc4 (a b c d : VirtualBundle) :
 
 -- 20. Bott periodicity: kIndex is 2-periodic
 theorem bott_periodic_thm (n : Nat) : kIndex (n + 2) = kIndex n := by
-  simp [Nat.add_mod]
+  simp
 
 noncomputable def bott_periodic (n : Nat) : Path (kIndex (n + 2)) (kIndex n) :=
   stepPath (bott_periodic_thm n)
@@ -455,6 +460,19 @@ noncomputable def adams_comm (j k : Nat) (v : VirtualBundle) :
   Path.trans (adams_compose j k v)
              (Path.trans (stepPath (by ext <;> simp [Nat.mul_comm j k]))
                          (Path.symm (adams_compose k j v)))
+
+theorem adams_comm_thm (j k : Nat) (v : VirtualBundle) :
+    adamsOp j (adamsOp k v) = adamsOp k (adamsOp j v) :=
+  (adams_comm j k v).toEq
+
+noncomputable def adams_comm_roundtrip_rweq (j k : Nat) (v : VirtualBundle) :
+    RwEq (Path.trans (adams_comm j k v) (Path.symm (adams_comm j k v)))
+      (Path.refl (adamsOp j (adamsOp k v))) :=
+  rweq_cmpA_inv_right (p := adams_comm j k v)
+
+theorem adams_comm_roundtrip_eq (j k : Nat) (v : VirtualBundle) :
+    (Path.trans (adams_comm j k v) (Path.symm (adams_comm j k v))).toEq = rfl :=
+  rweq_toEq (adams_comm_roundtrip_rweq j k v)
 
 -- 40. **Multi-step** ψ^1 ∘ ψ^k = ψ^k via trans
 noncomputable def adams_one_compose (k : Nat) (v : VirtualBundle) :
@@ -648,6 +666,19 @@ noncomputable def vb_add_zero_right_via_comm (v : VirtualBundle) :
 noncomputable def vb_neg_neg_roundtrip (v : VirtualBundle) :
     Path v (VirtualBundle.negation (VirtualBundle.negation v)) :=
   Path.symm (vb_neg_neg v)
+
+noncomputable def vb_neg_neg_roundtrip_cancel_left_rweq (v : VirtualBundle) :
+    RwEq (Path.trans (vb_neg_neg_roundtrip v) (vb_neg_neg v)) (Path.refl v) :=
+  rweq_cmpA_inv_left (p := vb_neg_neg v)
+
+noncomputable def vb_neg_neg_roundtrip_cancel_right_rweq (v : VirtualBundle) :
+    RwEq (Path.trans (vb_neg_neg v) (vb_neg_neg_roundtrip v))
+      (Path.refl (VirtualBundle.negation (VirtualBundle.negation v))) :=
+  rweq_cmpA_inv_right (p := vb_neg_neg v)
+
+theorem vb_neg_neg_roundtrip_cancel_left_eq (v : VirtualBundle) :
+    (Path.trans (vb_neg_neg_roundtrip v) (vb_neg_neg v)).toEq = rfl :=
+  rweq_toEq (vb_neg_neg_roundtrip_cancel_left_rweq v)
 
 -- 59. **Multi-step** ch(a + b) = ch(b + a) via trans chain
 noncomputable def chern_comm (a b : VirtualBundle) :
