@@ -227,7 +227,7 @@ variable {A : Type u} {B : Type v}
   right_inv := fun _ => Eq.refl _
   map_refl := fun a => by simp
   inv_refl := fun a => by simp
-  adj := fun a => by simp [Path.congrArg, Path.mk, Step.mk]
+  adj := fun a => by simp [Path.congrArg]
 
 /-- Every `PathEquiv` can be promoted to a `HalfAdjEquiv` because
 the coherence condition holds: `congrArg f (ofEq h)` and `ofEq (congrArg f h)`
@@ -242,7 +242,7 @@ noncomputable def ofPathEquiv (e : PathEquiv A B) : HalfAdjEquiv A B where
   map_refl := e.map_refl
   inv_refl := e.inv_refl
   adj := fun a => by
-    simp only [Path.congrArg, Path.mk, Step.mk]
+    simp only [Path.congrArg]
     constructor
 
 /-- A half-adjoint equivalence is symmetric. -/

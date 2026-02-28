@@ -1,3 +1,6 @@
 /- Root module for ComputationalPaths.SheafCohomology -/
 
 import ComputationalPaths.SheafCohomology.PathInfrastructure
+import ComputationalPaths.SheafCohomology.CechPaths
+import ComputationalPaths.SheafCohomology.CechDeRhamPaths
+import ComputationalPaths.SheafCohomology.SpectralSequencePaths

@@ -1839,13 +1839,23 @@ theorem Step.complexity_symm_trans_symm_decreases
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity (Path.symm (Path.refl a)) ≤
       Step.complexity (Path.symm (Path.trans p (Path.symm p))) := by
-  simpa [Step.complexity_symm] using Step.complexity_trans_symm_decreases p
+  calc
+    Step.complexity (Path.symm (Path.refl a))
+        = Step.complexity (Path.refl a) := Step.complexity_symm (Path.refl a)
+    _ ≤ Step.complexity (Path.trans p (Path.symm p)) := Step.complexity_trans_symm_decreases p
+    _ = Step.complexity (Path.symm (Path.trans p (Path.symm p))) :=
+      (Step.complexity_symm (Path.trans p (Path.symm p))).symm
 
 theorem Step.complexity_symm_symm_trans_decreases
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity (Path.symm (Path.refl b)) ≤
       Step.complexity (Path.symm (Path.trans (Path.symm p) p)) := by
-  simpa [Step.complexity_symm] using Step.complexity_symm_trans_decreases p
+  calc
+    Step.complexity (Path.symm (Path.refl b))
+        = Step.complexity (Path.refl b) := Step.complexity_symm (Path.refl b)
+    _ ≤ Step.complexity (Path.trans (Path.symm p) p) := Step.complexity_symm_trans_decreases p
+    _ = Step.complexity (Path.symm (Path.trans (Path.symm p) p)) :=
+      (Step.complexity_symm (Path.trans (Path.symm p) p)).symm
 
 theorem Step.complexity_symm_trans_symm_strict_decreases
     {A : Type u} {a b : A} (p : Path a b)
