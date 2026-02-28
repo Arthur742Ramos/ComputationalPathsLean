@@ -18,6 +18,7 @@ than a higher inductive axiom.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
@@ -67,6 +68,25 @@ inductive CircleCompPathExpr : CircleCompPath → CircleCompPath → Type u
   | Int.ofNat n => circleCompPathLoopExprPow n
   | Int.negSucc n =>
       CircleCompPathExpr.symm (circleCompPathLoopExprPow (Nat.succ n))
+
+/-- Canonical path-level loop generator (path-first presentation). -/
+@[simp] noncomputable def circleLoopPath :
+    Path circleCompPathBase circleCompPathBase :=
+  Path.refl circleCompPathBase
+
+/-- Interpret loop expressions as computational paths. -/
+@[simp] noncomputable def circleLoopExpr_toPath :
+    CircleCompPathExpr circleCompPathBase circleCompPathBase →
+      Path circleCompPathBase circleCompPathBase := by
+  intro p
+  refine CircleCompPathExpr.rec (motive := fun {a b} _ => Path a b) ?loop ?refl ?symm ?trans p
+  · exact circleLoopPath
+  · intro a
+    exact Path.refl a
+  · intro _ _ _ ih
+    exact Path.symm ih
+  · intro _ _ _ _ _ ihp ihq
+    exact Path.trans ihp ihq
 
 /-! ## Encode by loop count -/
 
@@ -218,25 +238,61 @@ abbrev circlePiOne : Type u := circleCompPathPiOne
 
 /-- Chosen equality proof used to seed the loop generator. -/
 noncomputable def circleLoopEq : circleBase = circleBase :=
-  Classical.choice (by
-    exact (⟨rfl⟩ : Nonempty (circleBase = circleBase)))
+  circleLoopPath.toEq
 
 /-- Alias for the fundamental loop path. -/
 @[simp] noncomputable def circleLoop : Path circleBase circleBase :=
   Path.stepChain circleLoopEq
 
 /-- Alias for the loop z-power at the path level. -/
-@[simp] noncomputable def circleLoopPathZPow : Int → Path circleBase circleBase := by
-  let rec loopPow : Nat → Path circleBase circleBase
-    | 0 => Path.refl circleBase
-    | Nat.succ n => Path.trans circleLoop (loopPow n)
-  exact fun
-    | Int.ofNat n => loopPow n
-    | Int.negSucc n => Path.symm (loopPow (Nat.succ n))
+@[simp] noncomputable def circleLoopPathPow :
+    Nat → Path circleBase circleBase
+  | 0 => Path.refl circleBase
+  | Nat.succ n => Path.trans (circleLoopPathPow n) circleLoopPath
+
+/-- Alias for the loop z-power at the path level. -/
+@[simp] noncomputable def circleLoopPathZPow : Int → Path circleBase circleBase
+  | Int.ofNat n => circleLoopPathPow n
+  | Int.negSucc n => Path.symm (circleLoopPathPow (Nat.succ n))
 
 /-- Alias for decoding integers into raw loops. -/
 @[simp] noncomputable def circleDecodePath : Int → Path circleBase circleBase :=
-  circleLoopPathZPow
+  fun z => circleLoopExpr_toPath (circleCompPathLoopExprZPow z)
+
+@[simp] theorem circleLoopExpr_toPath_zpow_eq_decodePath (z : Int) :
+    circleLoopExpr_toPath (circleCompPathLoopExprZPow z) = circleDecodePath z := rfl
+
+/-- Path-level encode/decode coherence between expression and loop-path presentations. -/
+noncomputable def circleLoopPath_encode_decode_rweq (z : Int) :
+    RwEq (circleLoopExpr_toPath (circleCompPathLoopExprZPow z)) (circleDecodePath z) :=
+  rweq_of_eq (circleLoopExpr_toPath_zpow_eq_decodePath z)
+
+/-- Additivity of natural loop powers at the path level (rewrite-equivalence form). -/
+noncomputable def circleLoopZPow_add_rweq (m n : Nat) :
+    RwEq (Path.trans (circleLoopPathPow m) (circleLoopPathPow n))
+      (circleLoopPathPow (m + n)) := by
+  induction n with
+  | zero =>
+      simpa [circleLoopPathPow] using
+        (rweq_cmpA_refl_right (p := circleLoopPathPow m))
+  | succ n ih =>
+      have hAssoc :
+          RwEq
+            (Path.trans (circleLoopPathPow m)
+              (Path.trans (circleLoopPathPow n) circleLoopPath))
+            (Path.trans
+              (Path.trans (circleLoopPathPow m) (circleLoopPathPow n))
+              circleLoopPath) :=
+        rweq_symm (rweq_tt (circleLoopPathPow m) (circleLoopPathPow n) circleLoopPath)
+      have hCongr :
+          RwEq
+            (Path.trans
+              (Path.trans (circleLoopPathPow m) (circleLoopPathPow n))
+              circleLoopPath)
+            (Path.trans (circleLoopPathPow (m + n)) circleLoopPath) :=
+        rweq_trans_congr_left circleLoopPath ih
+      have hTotal := rweq_trans hAssoc hCongr
+      simpa [circleLoopPathPow, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hTotal
 
 /-- Alias for the fundamental loop in π₁. -/
 @[simp] noncomputable def circlePiOneLoop : circlePiOne :=

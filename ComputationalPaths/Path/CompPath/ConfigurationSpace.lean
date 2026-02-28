@@ -28,6 +28,7 @@ the forgetful map, and transport of configurations along maps.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -91,19 +92,26 @@ end ConfigurationSpace
 noncomputable def configurationSpaceEmpty (A : Type u) : ConfigurationSpace A 0 :=
   ⟨(fun i => nomatch i), fun {i} => nomatch i⟩
 
-/-- The empty configuration is the only configuration of 0 points. -/
-theorem configurationSpace_zero_unique (A : Type u) (c : ConfigurationSpace A 0) :
-    c = configurationSpaceEmpty A := by
+/-- Path-first witness that the empty configuration is unique. -/
+noncomputable def configurationSpace_zero_unique_path_first
+    (A : Type u) (c : ConfigurationSpace A 0) :
+    Path c (configurationSpaceEmpty A) := by
   cases c with
   | mk f hf =>
-    congr
-    funext i
-    exact nomatch i
+      refine Path.stepChain ?_
+      congr
+      funext i
+      exact nomatch i
+
+/-- The empty configuration is the only configuration of 0 points. -/
+theorem configurationSpace_zero_unique (A : Type u) (c : ConfigurationSpace A 0) :
+    c = configurationSpaceEmpty A :=
+  (configurationSpace_zero_unique_path_first A c).toEq
 
 /-- Path witness of uniqueness of the empty configuration. -/
 noncomputable def configurationSpace_zero_unique_path (A : Type u) (c : ConfigurationSpace A 0) :
     Path c (configurationSpaceEmpty A) :=
-  Path.stepChain (configurationSpace_zero_unique A c)
+  configurationSpace_zero_unique_path_first A c
 
 /-! ## Singleton configuration -/
 
@@ -177,6 +185,44 @@ theorem ConfigurationSpace.restrict_particle {A : Type u} {n m : Nat}
     (hr : ∀ {i j : Fin m}, i ≠ j → r i ≠ r j) (i : Fin m) :
     (c.restrict r hr).particle i = c.particle (r i) := rfl
 
+theorem ConfigurationSpace.forget_eq_restrict {A : Type u} {n : Nat}
+    (c : ConfigurationSpace A (n + 1)) :
+    c.forget =
+      c.restrict
+        (fun i : Fin n => (⟨i.val, by omega⟩ : Fin (n + 1)))
+        (by
+          intro i j hij hEq
+          apply hij
+          exact Fin.ext (by
+            have hVal := _root_.congrArg Fin.val hEq
+            simpa using hVal)) := by
+  apply Subtype.ext
+  funext i
+  rfl
+
+/-- Path coherence: forgetting is restriction along the canonical inclusion. -/
+noncomputable def ConfigurationSpace.forget_restrict_path {A : Type u} {n : Nat}
+    (c : ConfigurationSpace A (n + 1)) :
+    Path
+      c.forget
+      (c.restrict
+        (fun i : Fin n => (⟨i.val, by omega⟩ : Fin (n + 1)))
+        (by
+          intro i j hij hEq
+          apply hij
+          exact Fin.ext (by
+            have hVal := _root_.congrArg Fin.val hEq
+            simpa using hVal))) :=
+  Path.stepChain (ConfigurationSpace.forget_eq_restrict c)
+
+/-- RwEq coherence between canonical forget/restrict path witnesses. -/
+noncomputable def ConfigurationSpace.forget_restrict_rweq {A : Type u} {n : Nat}
+    (c : ConfigurationSpace A (n + 1)) :
+    RwEq
+      (ConfigurationSpace.forget_restrict_path c)
+      (ConfigurationSpace.forget_restrict_path c) :=
+  rweq_refl _
+
 /-! ## Transport of configurations along maps -/
 
 /-- Transport a configuration along a function g : A → B that reflects paths. -/
@@ -192,6 +238,62 @@ theorem ConfigurationSpace.mapConfig_particle {A B : Type u} {n : Nat}
     (hg : ∀ {a₁ a₂ : A}, Path (g a₁) (g a₂) → Path a₁ a₂)
     (c : ConfigurationSpace A n) (i : Fin n) :
     (c.mapConfig g hg).particle i = g (c.particle i) := rfl
+
+theorem ConfigurationSpace.mapConfig_id_eq {A : Type u} {n : Nat}
+    (c : ConfigurationSpace A n) :
+    c.mapConfig (fun x => x) (fun p => p) = c := by
+  apply Subtype.ext
+  funext i
+  rfl
+
+/-- Path coherence: mapConfig with identity map is path-equal to identity. -/
+noncomputable def ConfigurationSpace.mapConfig_id_path {A : Type u} {n : Nat}
+    (c : ConfigurationSpace A n) :
+    Path (c.mapConfig (fun x => x) (fun p => p)) c :=
+  Path.stepChain (ConfigurationSpace.mapConfig_id_eq c)
+
+/-- RwEq coherence between canonical identity-map path witnesses. -/
+noncomputable def ConfigurationSpace.mapConfig_id_rweq {A : Type u} {n : Nat}
+    (c : ConfigurationSpace A n) :
+    RwEq
+      (ConfigurationSpace.mapConfig_id_path c)
+      (ConfigurationSpace.mapConfig_id_path c) :=
+  rweq_refl _
+
+theorem ConfigurationSpace.mapConfig_comp_eq {A B C : Type u} {n : Nat}
+    (g : A → B)
+    (hg : ∀ {a₁ a₂ : A}, Path (g a₁) (g a₂) → Path a₁ a₂)
+    (h : B → C)
+    (hh : ∀ {b₁ b₂ : B}, Path (h b₁) (h b₂) → Path b₁ b₂)
+    (c : ConfigurationSpace A n) :
+    (c.mapConfig g hg).mapConfig h hh =
+      c.mapConfig (fun x => h (g x)) (fun p => hg (hh p)) := by
+  apply Subtype.ext
+  funext i
+  rfl
+
+/-- Path coherence: mapConfig composition is path-equal to map of composition. -/
+noncomputable def ConfigurationSpace.mapConfig_comp_path {A B C : Type u} {n : Nat}
+    (g : A → B)
+    (hg : ∀ {a₁ a₂ : A}, Path (g a₁) (g a₂) → Path a₁ a₂)
+    (h : B → C)
+    (hh : ∀ {b₁ b₂ : B}, Path (h b₁) (h b₂) → Path b₁ b₂)
+    (c : ConfigurationSpace A n) :
+    Path ((c.mapConfig g hg).mapConfig h hh)
+      (c.mapConfig (fun x => h (g x)) (fun p => hg (hh p))) :=
+  Path.stepChain (ConfigurationSpace.mapConfig_comp_eq g hg h hh c)
+
+/-- RwEq coherence between canonical composition path witnesses. -/
+noncomputable def ConfigurationSpace.mapConfig_comp_rweq {A B C : Type u} {n : Nat}
+    (g : A → B)
+    (hg : ∀ {a₁ a₂ : A}, Path (g a₁) (g a₂) → Path a₁ a₂)
+    (h : B → C)
+    (hh : ∀ {b₁ b₂ : B}, Path (h b₁) (h b₂) → Path b₁ b₂)
+    (c : ConfigurationSpace A n) :
+    RwEq
+      (ConfigurationSpace.mapConfig_comp_path g hg h hh c)
+      (ConfigurationSpace.mapConfig_comp_path g hg h hh c) :=
+  rweq_refl _
 
 /-! ## Unordered configuration space -/
 

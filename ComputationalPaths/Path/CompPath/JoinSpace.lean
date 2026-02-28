@@ -73,16 +73,31 @@ noncomputable def glueTriR (x : X) (y y' : Y) :
     Path (inr (X := X) (Y := Y) y) (inr (X := X) (Y := Y) y') :=
   Path.trans (glueInv x y) (glue x y')
 
+/-- The glue path cancels with its inverse up to rewrite equivalence. -/
+noncomputable def glue_cancel_rweq (x : X) (y : Y) :
+    RwEq (Path.trans (glue x y) (Path.symm (glue x y)))
+      (Path.refl (inl (X := X) (Y := Y) x)) :=
+  rweq_cmpA_inv_right (glue x y)
+
 /-- Path from glue(x,y) to glue(x,y) is refl. -/
 theorem glue_self_toEq (x : X) (y : Y) :
     (Path.trans (glue x y) (Path.symm (glue x y))).toEq =
     (rfl : (inl x : JoinSpace X Y) = inl x) := by
-  simp
+  exact rweq_toEq (glue_cancel_rweq (X := X) (Y := Y) x y)
+
+/-- `glueTri` is independent of the `Y` parameter at the `RwEq` level after step-chain wrapping. -/
+noncomputable def glueTri_param_indep_rweq (x x' : X) (y y' : Y) :
+    RwEq (Path.stepChain ((glueTri x x' y).toEq))
+      (Path.stepChain ((glueTri x x' y').toEq)) := by
+  apply rweq_of_eq
+  exact _root_.congrArg Path.stepChain
+    (Subsingleton.elim (glueTri x x' y).proof (glueTri x x' y').proof)
 
 /-- All paths inl x → inl x' have the same proof (proof irrelevance). -/
 theorem glueTri_proof_unique (x x' : X) (y y' : Y) :
     (glueTri x x' y).proof = (glueTri x x' y').proof := by
-  simp
+  simpa using
+    (rweq_toEq (glueTri_param_indep_rweq (X := X) (Y := Y) x x' y y'))
 
 end JoinSpace
 
@@ -114,6 +129,47 @@ theorem joinMap_inl {X₁ X₂ Y₁ Y₂ : Type u}
 theorem joinMap_inr {X₁ X₂ Y₁ Y₂ : Type u}
     (f : X₁ → X₂) (g : Y₁ → Y₂) (y : Y₁) :
     joinMap f g (JoinSpace.inr y) = JoinSpace.inr (g y) := rfl
+
+/-- Join map composition law. -/
+theorem joinMap_comp {X₁ X₂ X₃ Y₁ Y₂ Y₃ : Type u}
+    (f₁ : X₁ → X₂) (g₁ : Y₁ → Y₂)
+    (f₂ : X₂ → X₃) (g₂ : Y₂ → Y₃)
+    (z : JoinSpace X₁ Y₁) :
+    joinMap f₂ g₂ (joinMap f₁ g₁ z) =
+      joinMap (f₂ ∘ f₁) (g₂ ∘ g₁) z := by
+  refine Quot.inductionOn z ?_
+  intro s
+  cases s <;> rfl
+
+/-- Path-level compatibility of `joinMap` composition on glue generators. -/
+noncomputable def joinMap_comp_rweq {X₁ X₂ X₃ Y₁ Y₂ Y₃ : Type u}
+    (f₁ : X₁ → X₂) (g₁ : Y₁ → Y₂)
+    (f₂ : X₂ → X₃) (g₂ : Y₂ → Y₃)
+    (x : X₁) (y : Y₁) :
+    RwEq
+      (Path.congrArg (joinMap f₂ g₂)
+        (Path.congrArg (joinMap f₁ g₁) (JoinSpace.glue (X := X₁) (Y := Y₁) x y)))
+      (Path.congrArg (joinMap (f₂ ∘ f₁) (g₂ ∘ g₁))
+        (JoinSpace.glue (X := X₁) (Y := Y₁) x y)) := by
+  apply rweq_of_eq
+  have hcomp :
+      (fun z => joinMap f₂ g₂ (joinMap f₁ g₁ z)) =
+        joinMap (f₂ ∘ f₁) (g₂ ∘ g₁) := by
+    funext z
+    exact joinMap_comp f₁ g₁ f₂ g₂ z
+  calc
+    Path.congrArg (joinMap f₂ g₂)
+      (Path.congrArg (joinMap f₁ g₁) (JoinSpace.glue (X := X₁) (Y := Y₁) x y))
+        =
+      Path.congrArg (fun z => joinMap f₂ g₂ (joinMap f₁ g₁ z))
+        (JoinSpace.glue (X := X₁) (Y := Y₁) x y) := by
+          simpa using
+            (Path.congrArg_comp (joinMap f₂ g₂) (joinMap f₁ g₁)
+              (JoinSpace.glue (X := X₁) (Y := Y₁) x y)).symm
+    _ =
+      Path.congrArg (joinMap (f₂ ∘ f₁) (g₂ ∘ g₁))
+        (JoinSpace.glue (X := X₁) (Y := Y₁) x y) := by
+          simpa [hcomp]
 
 /-- The identity join map is the identity function. -/
 theorem joinMap_id {X Y : Type u} (z : JoinSpace X Y) :
@@ -155,6 +211,51 @@ theorem joinSymmMap_involutive {X Y : Type u} (z : JoinSpace X Y) :
   refine Quot.inductionOn z ?_
   intro s
   cases s <;> rfl
+
+/-- Naturality of join symmetry with respect to join maps. -/
+theorem joinSymmMap_nat {X₁ X₂ Y₁ Y₂ : Type u}
+    (f : X₁ → X₂) (g : Y₁ → Y₂) (z : JoinSpace X₁ Y₁) :
+    joinSymmMap (X := X₂) (Y := Y₂) (joinMap f g z) =
+      joinMap g f (joinSymmMap (X := X₁) (Y := Y₁) z) := by
+  refine Quot.inductionOn z ?_
+  intro s
+  cases s <;> rfl
+
+/-- Path-level naturality of symmetry on glue generators. -/
+noncomputable def joinSymmMap_nat_rweq {X₁ X₂ Y₁ Y₂ : Type u}
+    (f : X₁ → X₂) (g : Y₁ → Y₂) (x : X₁) (y : Y₁) :
+    RwEq
+      (Path.congrArg (joinSymmMap (X := X₂) (Y := Y₂))
+        (Path.congrArg (joinMap f g) (JoinSpace.glue (X := X₁) (Y := Y₁) x y)))
+      (Path.congrArg (joinMap g f)
+        (Path.congrArg (joinSymmMap (X := X₁) (Y := Y₁))
+          (JoinSpace.glue (X := X₁) (Y := Y₁) x y))) := by
+  apply rweq_of_eq
+  have hnat :
+      (fun z => joinSymmMap (X := X₂) (Y := Y₂) (joinMap f g z)) =
+        (fun z => joinMap g f (joinSymmMap (X := X₁) (Y := Y₁) z)) := by
+    funext z
+    exact joinSymmMap_nat f g z
+  calc
+    Path.congrArg (joinSymmMap (X := X₂) (Y := Y₂))
+      (Path.congrArg (joinMap f g) (JoinSpace.glue (X := X₁) (Y := Y₁) x y))
+        =
+      Path.congrArg (fun z => joinSymmMap (X := X₂) (Y := Y₂) (joinMap f g z))
+        (JoinSpace.glue (X := X₁) (Y := Y₁) x y) := by
+          simpa using
+            (Path.congrArg_comp (joinSymmMap (X := X₂) (Y := Y₂)) (joinMap f g)
+              (JoinSpace.glue (X := X₁) (Y := Y₁) x y)).symm
+    _ =
+      Path.congrArg (fun z => joinMap g f (joinSymmMap (X := X₁) (Y := Y₁) z))
+        (JoinSpace.glue (X := X₁) (Y := Y₁) x y) := by
+          simpa [hnat]
+    _ =
+      Path.congrArg (joinMap g f)
+        (Path.congrArg (joinSymmMap (X := X₁) (Y := Y₁))
+          (JoinSpace.glue (X := X₁) (Y := Y₁) x y)) := by
+          simpa using
+            (Path.congrArg_comp (joinMap g f) (joinSymmMap (X := X₁) (Y := Y₁))
+              (JoinSpace.glue (X := X₁) (Y := Y₁) x y))
 
 /-- Path witness of the double symmetry involution. -/
 noncomputable def joinSymmMap_involutive_path {X Y : Type u} (z : JoinSpace X Y) :

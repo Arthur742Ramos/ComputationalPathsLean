@@ -131,19 +131,51 @@ theorem top_congr {a a' : A} (p : Path a a') :
         (Path.congrArg (fun x => (x, Interval.right)) p) := by
   exact Path.congrArg_comp (inCylinder (f := f)) (fun x => (x, Interval.right)) p
 
+noncomputable def glue_rweq_refl_left (a : A) :
+    RwEq (Path.trans (Path.refl (bottom (f := f) a)) (glue (f := f) a))
+      (glue (f := f) a) :=
+  rweq_cmpA_refl_left (glue (f := f) a)
+
+noncomputable def glue_rweq_refl_right (a : A) :
+    RwEq (Path.trans (glue (f := f) a) (Path.refl (inTarget (f := f) (f a))))
+      (glue (f := f) a) :=
+  rweq_cmpA_refl_right (glue (f := f) a)
+
+noncomputable def glue_assoc_rweq {a : A} {x y : MappingCylinder f}
+    (q : Path (inTarget (f := f) (f a)) x) (r : Path x y) :
+    RwEq (Path.trans (Path.trans (glue (f := f) a) q) r)
+      (Path.trans (glue (f := f) a) (Path.trans q r)) :=
+  rweq_tt (glue (f := f) a) q r
+
 theorem glue_comp_assoc {a : A} {x y : MappingCylinder f}
     (q : Path (inTarget (f := f) (f a)) x) (r : Path x y) :
     Path.trans (Path.trans (glue (f := f) a) q) r =
       Path.trans (glue (f := f) a) (Path.trans q r) :=
   Path.trans_assoc _ q r
 
+theorem glue_comp_assoc_toEq {a : A} {x y : MappingCylinder f}
+    (q : Path (inTarget (f := f) (f a)) x) (r : Path x y) :
+    (Path.trans (Path.trans (glue (f := f) a) q) r).toEq =
+      (Path.trans (glue (f := f) a) (Path.trans q r)).toEq := by
+  exact rweq_toEq (glue_assoc_rweq (f := f) q r)
+
 theorem glue_trans_refl_left (a : A) :
     Path.trans (Path.refl (bottom (f := f) a)) (glue (f := f) a) = glue (f := f) a :=
   Path.trans_refl_left _
 
+theorem glue_trans_refl_left_toEq (a : A) :
+    (Path.trans (Path.refl (bottom (f := f) a)) (glue (f := f) a)).toEq =
+      (glue (f := f) a).toEq := by
+  exact rweq_toEq (glue_rweq_refl_left (f := f) a)
+
 theorem glue_trans_refl_right (a : A) :
     Path.trans (glue (f := f) a) (Path.refl (inTarget (f := f) (f a))) = glue (f := f) a :=
   Path.trans_refl_right _
+
+theorem glue_trans_refl_right_toEq (a : A) :
+    (Path.trans (glue (f := f) a) (Path.refl (inTarget (f := f) (f a)))).toEq =
+      (glue (f := f) a).toEq := by
+  exact rweq_toEq (glue_rweq_refl_right (f := f) a)
 
 -- Note: glue_trans_symm and glue_symm_trans claim
 -- `Path.trans p (Path.symm p) = Path.refl _` which requires the steps list
