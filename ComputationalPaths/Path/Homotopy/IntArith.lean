@@ -17,6 +17,9 @@ about Int.ofNat and Int.negSucc that omega doesn't handle directly.
 Import this module when proving properties about integer powers of loops.
 -/
 
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+
 namespace ComputationalPaths
 namespace Path
 
@@ -50,6 +53,26 @@ theorem int_ofNat_succ_add_negSucc_self (m : Nat) :
     Int.ofNat (m + 1) + Int.negSucc m = 0 := by
   simp only [Int.ofNat_eq_coe, Int.negSucc_eq]
   omega
+
+noncomputable def int_ofNat_succ_add_negSucc_self_path (m : Nat) :
+    Path (Int.ofNat (m + 1) + Int.negSucc m) 0 :=
+  Path.stepChain (int_ofNat_succ_add_negSucc_self m)
+
+noncomputable def int_ofNat_succ_add_negSucc_self_cancel_left (m : Nat) :
+    RwEq
+      (Path.trans
+        (Path.symm (int_ofNat_succ_add_negSucc_self_path m))
+        (int_ofNat_succ_add_negSucc_self_path m))
+      (Path.refl 0) :=
+  rweq_of_step (Step.symm_trans (A := Int) (p := int_ofNat_succ_add_negSucc_self_path m))
+
+noncomputable def int_ofNat_succ_add_negSucc_self_cancel_right (m : Nat) :
+    RwEq
+      (Path.trans
+        (int_ofNat_succ_add_negSucc_self_path m)
+        (Path.symm (int_ofNat_succ_add_negSucc_self_path m)))
+      (Path.refl (Int.ofNat (m + 1) + Int.negSucc m)) :=
+  rweq_of_step (Step.trans_symm (A := Int) (p := int_ofNat_succ_add_negSucc_self_path m))
 
 /-- Symmetric: (-(m+1)) + (m+1) = 0 -/
 theorem int_negSucc_add_ofNat_succ_self (m : Nat) :

@@ -45,13 +45,26 @@ variable {A : Type u} {a : A}
 
 @[simp] theorem comp_assoc (p q r : LoopSpace A a) :
     comp (comp p q) r = comp p (comp q r) :=
-  Path.trans_assoc _ _ _
+  by
+    have h :
+        RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
+      rweq_of_step (Step.trans_assoc (A := A) (p := p) (q := q) (r := r))
+    simpa [comp] using
+      (rwEq_iff_toEq
+        (p := Path.trans (Path.trans p q) r)
+        (q := Path.trans p (Path.trans q r))).1 h
 
 @[simp] theorem id_comp (p : LoopSpace A a) : comp id p = p := by
-  simp [id, comp]
+  have h : RwEq (Path.trans (Path.refl a) p) p :=
+    rweq_of_step (Step.trans_refl_left (A := A) (p := p))
+  simpa [id, comp] using
+    (rwEq_iff_toEq (p := Path.trans (Path.refl a) p) (q := p)).1 h
 
 @[simp] theorem comp_id (p : LoopSpace A a) : comp p id = p := by
-  simp [id, comp]
+  have h : RwEq (Path.trans p (Path.refl a)) p :=
+    rweq_of_step (Step.trans_refl_right (A := A) (p := p))
+  simpa [id, comp] using
+    (rwEq_iff_toEq (p := Path.trans p (Path.refl a)) (q := p)).1 h
 
 /-! ## RwEq examples -/
 

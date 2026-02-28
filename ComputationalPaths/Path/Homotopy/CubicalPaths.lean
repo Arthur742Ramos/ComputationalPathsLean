@@ -12,6 +12,7 @@ identity types, and transport along cubical paths.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -256,16 +257,38 @@ theorem twoPathTransport_refl {A : Type u} {a b : A} (p : Path a b)
     twoPathTransport (TwoPath.refl p) x = x := rfl
 
 /-- Symm-trans is identity at the eq level. -/
+noncomputable def TwoPath.symm_trans_rweq {A : Type u} {a b : A} {p q : Path a b}
+    (α : TwoPath p q) :
+    RwEq (TwoPath.trans (TwoPath.symm α) α) (Path.refl q) :=
+  rweq_of_step (Step.symm_trans (A := Path a b) (p := α))
+
 theorem TwoPath.symm_trans_toEq {A : Type u} {a b : A} {p q : Path a b}
     (α : TwoPath p q) :
     (TwoPath.trans (TwoPath.symm α) α).toEq = rfl := by
-  simp [TwoPath.trans, TwoPath.symm]
+  have h :
+      RwEq (TwoPath.trans (TwoPath.symm α) α) (Path.refl q) :=
+    TwoPath.symm_trans_rweq α
+  simpa using
+    (rwEq_iff_toEq
+      (p := TwoPath.trans (TwoPath.symm α) α)
+      (q := Path.refl q)).1 h
 
 /-- Trans-symm is identity at the eq level. -/
+noncomputable def TwoPath.trans_symm_rweq {A : Type u} {a b : A} {p q : Path a b}
+    (α : TwoPath p q) :
+    RwEq (TwoPath.trans α (TwoPath.symm α)) (Path.refl p) :=
+  rweq_of_step (Step.trans_symm (A := Path a b) (p := α))
+
 theorem TwoPath.trans_symm_toEq {A : Type u} {a b : A} {p q : Path a b}
     (α : TwoPath p q) :
     (TwoPath.trans α (TwoPath.symm α)).toEq = rfl := by
-  simp [TwoPath.trans, TwoPath.symm]
+  have h :
+      RwEq (TwoPath.trans α (TwoPath.symm α)) (Path.refl p) :=
+    TwoPath.trans_symm_rweq α
+  simpa using
+    (rwEq_iff_toEq
+      (p := TwoPath.trans α (TwoPath.symm α))
+      (q := Path.refl p)).1 h
 
 end CubicalPaths
 end Homotopy
