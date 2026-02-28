@@ -18,6 +18,7 @@ homogeneous actions as those that supply orbit paths between any two points.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Algebra.GroupActionOps
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -75,6 +76,36 @@ noncomputable def orbitPath_trans (A : GroupAction G S X) {x y z : X} :
       _ = A.act (S.mul h g) x := (A.act_mul _ _ _).symm
   refine ⟨S.mul h g, ?_⟩
   exact Path.trans (Path.stepChain hmul.symm) q
+
+/-- Orbit-path symmetry is stable at the `toEq`/`stepChain` level up to `RwEq`. -/
+noncomputable def orbitPath_symm_toEq_rweq (A : GroupAction G S X) {x y : X}
+    (h : OrbitPath A x y) :
+    RwEq (Path.stepChain ((Path.symm (Path.symm (orbitPath_symm A h).2)).toEq))
+         (Path.stepChain ((orbitPath_symm A h).2.toEq)) := by
+  apply rweq_of_eq
+  simp
+
+/-- Associativity coherence for transitivity witnesses with reflexive whiskers. -/
+noncomputable def orbitPath_trans_assoc_rweq (A : GroupAction G S X) {x y z : X}
+    (hxy : OrbitPath A x y) (hyz : OrbitPath A y z) :
+    RwEq
+      (Path.trans (Path.trans (Path.refl _) (orbitPath_trans A hxy hyz).2) (Path.refl _))
+      (Path.trans (Path.refl _) (Path.trans (orbitPath_trans A hxy hyz).2 (Path.refl _))) :=
+  RwEq.step (Step.trans_assoc _ _ _)
+
+/-- Left unit coherence for transitivity witnesses. -/
+noncomputable def orbitPath_refl_trans_rweq (A : GroupAction G S X) {x y z : X}
+    (hxy : OrbitPath A x y) (hyz : OrbitPath A y z) :
+    RwEq (Path.trans (Path.refl _) (orbitPath_trans A hxy hyz).2)
+         (orbitPath_trans A hxy hyz).2 :=
+  RwEq.step (Step.trans_refl_left _)
+
+/-- Right unit coherence for transitivity witnesses. -/
+noncomputable def orbitPath_trans_refl_rweq (A : GroupAction G S X) {x y z : X}
+    (hxy : OrbitPath A x y) (hyz : OrbitPath A y z) :
+    RwEq (Path.trans (orbitPath_trans A hxy hyz).2 (Path.refl _))
+         (orbitPath_trans A hxy hyz).2 :=
+  RwEq.step (Step.trans_refl_right _)
 
 /-- Every orbit path carries an explicit group/path witness pair. -/
 theorem orbitPath_exists_witness (A : GroupAction G S X) {x y : X}

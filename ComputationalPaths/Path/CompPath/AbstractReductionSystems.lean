@@ -11,6 +11,7 @@ confluence, Church-Rosser, termination, Newman's lemma, parallel reduction.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 set_option maxHeartbeats 800000
 
@@ -317,18 +318,46 @@ noncomputable def Commute (s1 s2 : A → A → Prop) :=
 /-- Lift an equality to a single-step computational path. -/
 noncomputable def toPath {a b : A} (h : a = b) : Path a b := Path.mk [Step.mk _ _ h] h
 
+/-- Path-first transitivity bridge for `toPath`. -/
+noncomputable def toPath_trans_rweq {a b c : A} (h1 : a = b) (h2 : b = c) :
+    RwEq
+      (Path.stepChain ((Path.trans (toPath h1) (toPath h2)).toEq))
+      (Path.stepChain ((toPath (h1.trans h2)).toEq)) := by
+  exact rweq_of_eq (by subst h1; subst h2; rfl)
+
 /-- The underlying equality of composed paths is the composition of equalities. -/
 theorem toPath_toEq_trans {a b c : A} (h1 : a = b) (h2 : b = c) :
     (Path.trans (toPath h1) (toPath h2)).toEq = (toPath (h1.trans h2)).toEq := by
-  subst h1; subst h2; rfl
+  simpa using rweq_toEq (toPath_trans_rweq h1 h2)
+
+/-- Path-first symmetry bridge for `toPath`. -/
+noncomputable def toPath_symm_rweq {a b : A} (h : a = b) :
+    RwEq
+      (Path.stepChain ((Path.symm (toPath h)).toEq))
+      (Path.stepChain ((toPath h.symm).toEq)) := by
+  exact rweq_of_eq (by subst h; rfl)
 
 /-- Symmetry of path equalities. -/
 theorem toPath_toEq_symm {a b : A} (h : a = b) :
     (Path.symm (toPath h)).toEq = (toPath h.symm).toEq := by
-  subst h; rfl
+  simpa using rweq_toEq (toPath_symm_rweq h)
 
 /-- Reflexive path from `rfl`. -/
 theorem toPath_refl (a : A) : toPath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl
+
+/-- RwEq form of transport along `toPath`. -/
+noncomputable def transport_via_toPath_rweq {a b : A} {D : A → Type u} (h : a = b) (x : D a) :
+    RwEq
+      (Path.stepChain (A := D b)
+        (a := Path.transport (toPath h) x)
+        (b := h ▸ x)
+        (by
+          subst h
+          simpa using (Path.transport_refl (A := A) (D := D) (a := a) x)))
+      (Path.refl (h ▸ x)) := by
+  subst h
+  simpa [toPath] using
+    (rweq_of_step (Step.transport_refl_beta (A := A) (B := D) (a := a) x))
 
 /-- Transport along a toPath is the same as Eq-substitution. -/
 theorem transport_via_path {a b : A} {D : A → Type u} (h : a = b) (x : D a) :

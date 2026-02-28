@@ -4,6 +4,7 @@ import ComputationalPaths.Path.CompPath.SuspensionSpace
 import ComputationalPaths.Path.CompPath.PushoutCompPath
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Homotopy.Sets
+import ComputationalPaths.Path.Rewrite.RwEq
 
 /-
 # The 2-sphere via computational path pushouts
@@ -129,18 +130,36 @@ theorem sphere2CompPath_path_trans {x y z : Sphere2CompPath}
     (p : Path x y) (q : Path y z) : Nonempty (Path x z) :=
   ⟨Path.trans p q⟩
 
+noncomputable def sphere2CompPath_path_trans_assoc_rweq {w x y z : Sphere2CompPath}
+    (p : Path w x) (q : Path x y) (r : Path y z) :
+    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
+  rweq_tt p q r
+
 theorem sphere2CompPath_path_trans_assoc {w x y z : Sphere2CompPath}
     (p : Path w x) (q : Path x y) (r : Path y z) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) :=
   Path.trans_assoc p q r
 
+noncomputable def sphere2CompPath_path_trans_refl_left_rweq {x y : Sphere2CompPath}
+    (p : Path x y) : RwEq (Path.trans (Path.refl x) p) p :=
+  rweq_cmpA_refl_left p
+
 theorem sphere2CompPath_path_trans_refl_left {x y : Sphere2CompPath}
     (p : Path x y) : Path.trans (Path.refl x) p = p :=
   Path.trans_refl_left p
 
+noncomputable def sphere2CompPath_path_trans_refl_right_rweq {x y : Sphere2CompPath}
+    (p : Path x y) : RwEq (Path.trans p (Path.refl y)) p :=
+  rweq_cmpA_refl_right p
+
 theorem sphere2CompPath_path_trans_refl_right {x y : Sphere2CompPath}
     (p : Path x y) : Path.trans p (Path.refl y) = p :=
   Path.trans_refl_right p
+
+noncomputable def sphere2CompPath_path_cancel_right_rweq {x y z : Sphere2CompPath}
+    (p : Path x y) (q : Path y z) :
+    RwEq (Path.trans (Path.symm p) (Path.trans p q)) q :=
+  rweq_of_step (Step.trans_cancel_right p q)
 
 -- Note: Path.trans p (Path.symm p) = Path.refl x is not provable in general
 -- because the steps lists differ (non-empty vs empty). The underlying

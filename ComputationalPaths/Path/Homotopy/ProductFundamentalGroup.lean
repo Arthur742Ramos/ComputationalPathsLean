@@ -64,6 +64,23 @@ noncomputable def Path.prod_fst_snd_rweq {a a' : A} {b b' : B}
     RwEq (Path.prod (Path.fst p) (Path.snd p)) p :=
   by simpa [Path.prod] using (rweq_prod_eta (α := A) (β := B) (p := p))
 
+/-- Product of reflexive paths is rewrite-equivalent to reflexive product path. -/
+@[simp] noncomputable def Path.prod_refl_rweq (a : A) (b : B) :
+    RwEq (Path.prod (Path.refl a) (Path.refl b)) (Path.refl (a, b)) :=
+  rweq_of_eq (by simp [Path.prod])
+
+/-- First projection of a product path recovers the first component up to `RwEq`. -/
+@[simp] noncomputable def Path.fst_prod_rweq {a a' : A} {b b' : B}
+    (p : Path a a') (q : Path b b') :
+    RwEq (Path.fst (Path.prod p q)) p := by
+  simpa [Path.prod] using (rweq_fst_prodMk (α := A) (β := B) (p := p) (q := q))
+
+/-- Second projection of a product path recovers the second component up to `RwEq`. -/
+@[simp] noncomputable def Path.snd_prod_rweq {a a' : A} {b b' : B}
+    (p : Path a a') (q : Path b b') :
+    RwEq (Path.snd (Path.prod p q)) q := by
+  simpa [Path.prod] using (rweq_snd_prodMk (α := A) (β := B) (p := p) (q := q))
+
 end ProductPaths
 
 /-! ## Product Fundamental Group -/
@@ -137,10 +154,10 @@ theorem prodPiOne_encode_decode (x : π₁(A, a) × π₁(B, b)) :
       refine Prod.ext ?_ ?_
       · apply Quot.sound
         exact rweqProp_of_rweq
-          (by simpa [Path.prod] using (rweq_fst_prodMk (α := A) (β := B) (p := p) (q := q)))
+          (Path.fst_prod_rweq (A := A) (B := B) p q)
       · apply Quot.sound
         exact rweqProp_of_rweq
-          (by simpa [Path.prod] using (rweq_snd_prodMk (α := A) (β := B) (p := p) (q := q)))
+          (Path.snd_prod_rweq (A := A) (B := B) p q)
 
 /-- Round-trip: decode ∘ encode = id. -/
 theorem prodPiOne_decode_encode (γ : π₁(A × B, (a, b))) :
@@ -167,9 +184,13 @@ end ProductFundamentalGroup
 
 section NTorusFundamentalGroup
 
-/-- Skeleton placeholder: the inductive product structure for π₁ of tori. -/
-theorem nTorus_piOne_structure :
-    ∀ _ : Nat, True := fun _ => trivial
+variable {A : Type u} {B : Type u}
+
+/-- Product decomposition coherence used as the base step for torus-style π₁ products. -/
+theorem nTorus_piOne_structure (a : A) (b : B) :
+    prodPiOneDecode (A := A) (B := B) a b ∘ prodPiOneEncode (A := A) (B := B) a b = id := by
+  funext γ
+  exact prodPiOne_decode_encode (A := A) (B := B) a b γ
 
 end NTorusFundamentalGroup
 
