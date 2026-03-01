@@ -12,7 +12,7 @@ and detailed balance.
 - Levin, Peres & Wilmer, "Markov Chains and Mixing Times"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

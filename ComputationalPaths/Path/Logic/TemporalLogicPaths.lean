@@ -11,7 +11,7 @@ model checking aspects, and fairness properties.
 - Pnueli, "The Temporal Logic of Programs"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -101,13 +101,18 @@ theorem always_conj {S : Type u} (φ ψ : StateProp S)
 theorem not_always_iff_eventually_not {S : Type u} (φ : StateProp S)
     (σ : Trace S) (i : Nat) :
     ¬ alwaysOp φ σ i ↔ eventuallyOp (fun s => ¬ φ s) σ i := by
+  classical
   constructor
   · intro h
-    by_contra hne
-    apply h
-    intro j hj
-    by_contra hnφ
-    exact hne ⟨j, hj, hnφ⟩
+    by_cases hne : eventuallyOp (fun s => ¬ φ s) σ i
+    · exact hne
+    · exfalso
+      apply h
+      intro j hj
+      have hnn : ¬ ¬ φ (σ j) := by
+        intro hnφ
+        exact hne ⟨j, hj, hnφ⟩
+      exact Classical.not_not.mp hnn
   · intro ⟨j, hj, hnφ⟩ hall
     exact hnφ (hall j hj)
 

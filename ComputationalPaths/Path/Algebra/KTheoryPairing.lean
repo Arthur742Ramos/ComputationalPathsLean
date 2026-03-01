@@ -256,7 +256,10 @@ noncomputable def index_add_zero_rweq (x : IP.k0.carrier)
     RwEq
       (pathOfEqStepChain (_root_.congrArg IP.index h))
       (IP.index_add_zero_path x h) :=
-  rweq_refl _
+  by
+    let t := pathOfEqStepChain (_root_.congrArg IP.index h)
+    change RwEq t t
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
 
 end IndexPairing
 
@@ -368,7 +371,10 @@ noncomputable def bott_zero_rweq (n : Nat) :
     RwEq
       (BP.bott_left_inv_path n (BP.kZero n))
       (BP.bott_zero_roundtrip n) :=
-  rweq_refl _
+  by
+    let t := BP.bott_left_inv_path n (BP.kZero n)
+    change RwEq t t
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
 
 end BottPeriodicity
 
@@ -461,7 +467,10 @@ noncomputable def exact_rweq :
     RwEq
       (pathOfEqStepChain S.exact_ji_zero)
       (S.half_sequence_zero) :=
-  rweq_refl _
+  by
+    let t := pathOfEqStepChain S.exact_ji_zero
+    change RwEq t t
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
 
 end SixTermExact
 

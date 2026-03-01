@@ -11,7 +11,7 @@ Curry-Howard correspondence aspects, proof terms, and detour reduction.
 - Troelstra & Schwichtenberg, "Basic Proof Theory"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

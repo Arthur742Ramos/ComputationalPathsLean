@@ -236,11 +236,16 @@ noncomputable def torusCommutator_reduction_equiv :
   have h_left : RwEq torusCommutatorReduceFst
       (Path.prodMk (Path.refl circleBase) (Path.refl circleBase)) :=
     rweq_map2_of_rweq (f := Prod.mk)
-      (rweq_refl (Path.refl circleBase)) torusCommutator_snd_refl
+      (rweq_trans
+        (rweq_symm (rweq_cmpA_refl_right (Path.refl circleBase)))
+        (rweq_cmpA_refl_right (Path.refl circleBase))) torusCommutator_snd_refl
   have h_right : RwEq torusCommutatorReduceSnd
       (Path.prodMk (Path.refl circleBase) (Path.refl circleBase)) :=
     rweq_map2_of_rweq (f := Prod.mk)
-      torusCommutator_fst_refl (rweq_refl (Path.refl circleBase))
+      torusCommutator_fst_refl
+      (rweq_trans
+        (rweq_symm (rweq_cmpA_refl_right (Path.refl circleBase)))
+        (rweq_cmpA_refl_right (Path.refl circleBase)))
   exact rweq_trans h_left (rweq_symm h_right)
 
 /-! ### Step-level commutator reduction sequence

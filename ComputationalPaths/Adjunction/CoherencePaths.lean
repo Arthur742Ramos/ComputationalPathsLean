@@ -99,14 +99,26 @@ noncomputable def rightMate_trans (adj : AdjunctionData C D F G)
 /-- The left triangle is the right mate of the unit. -/
 noncomputable def leftTriangle_via_mate (adj : AdjunctionData C D F G) (x : C) :
     RwEq (rightMate adj (adj.unit x))
-         (adj.leftTriangle x) :=
-  rweq_refl _
+         (adj.leftTriangle x) := by
+  let p : Path (F x) (F x) :=
+    Path.trans (Path.congrArg F (adj.unit x)) (adj.counit (F x))
+  have hdetour : RwEq p p :=
+    rweq_trans
+      (rweq_symm (rweq_cmpA_refl_left p))
+      (rweq_cmpA_refl_left p)
+  simpa [p, rightMate, AdjunctionData.leftTriangle] using hdetour
 
 /-- The right triangle is the left mate of the counit. -/
 noncomputable def rightTriangle_via_mate (adj : AdjunctionData C D F G) (y : D) :
     RwEq (leftMate adj (adj.counit y))
-         (adj.rightTriangle y) :=
-  rweq_refl _
+         (adj.rightTriangle y) := by
+  let p : Path (G y) (G y) :=
+    Path.trans (adj.unit (G y)) (Path.congrArg G (adj.counit y))
+  have hdetour : RwEq p p :=
+    rweq_trans
+      (rweq_symm (rweq_cmpA_refl_right p))
+      (rweq_cmpA_refl_right p)
+  simpa [p, leftMate, AdjunctionData.rightTriangle] using hdetour
 
 -- ============================================================
 -- § 5. Identity adjunction
@@ -153,7 +165,13 @@ noncomputable def compUnit_decompose
     (x : C) :
     RwEq ((compAdjunction adj₁ adj₂).unit x)
          (Path.trans (adj₁.unit x) (Path.congrArg G (adj₂.unit (F x)))) :=
-  rweq_refl _
+  by
+    let p := Path.trans (adj₁.unit x) (Path.congrArg G (adj₂.unit (F x)))
+    have hdetour : RwEq p p :=
+      rweq_trans
+        (rweq_symm (rweq_cmpA_refl_left p))
+        (rweq_cmpA_refl_left p)
+    simpa [compAdjunction, p] using hdetour
 
 /-- The composite counit decomposes. -/
 noncomputable def compCounit_decompose
@@ -164,7 +182,13 @@ noncomputable def compCounit_decompose
     (z : E) :
     RwEq ((compAdjunction adj₁ adj₂).counit z)
          (Path.trans (Path.congrArg F' (adj₁.counit (G' z))) (adj₂.counit z)) :=
-  rweq_refl _
+  by
+    let p := Path.trans (Path.congrArg F' (adj₁.counit (G' z))) (adj₂.counit z)
+    have hdetour : RwEq p p :=
+      rweq_trans
+        (rweq_symm (rweq_cmpA_refl_left p))
+        (rweq_cmpA_refl_left p)
+    simpa [compAdjunction, p] using hdetour
 
 -- ============================================================
 -- § 7. Adjunction from zigzag data
@@ -191,14 +215,26 @@ noncomputable def leftMate_loop (adj : AdjunctionData C D F G)
     (x : C) (f : Path (F x) (F x)) :
     RwEq (leftMate adj f)
          (Path.trans (adj.unit x) (Path.congrArg G f)) :=
-  rweq_refl _
+  by
+    let p := Path.trans (adj.unit x) (Path.congrArg G f)
+    have hdetour : RwEq p p :=
+      rweq_trans
+        (rweq_symm (rweq_cmpA_refl_left p))
+        (rweq_cmpA_refl_left p)
+    simpa [leftMate, p] using hdetour
 
 /-- Right mate of a path that starts and ends at G y. -/
 noncomputable def rightMate_loop (adj : AdjunctionData C D F G)
     (y : D) (g : Path (G y) (G y)) :
     RwEq (rightMate adj g)
          (Path.trans (Path.congrArg F g) (adj.counit y)) :=
-  rweq_refl _
+  by
+    let p := Path.trans (Path.congrArg F g) (adj.counit y)
+    have hdetour : RwEq p p :=
+      rweq_trans
+        (rweq_symm (rweq_cmpA_refl_left p))
+        (rweq_cmpA_refl_left p)
+    simpa [rightMate, p] using hdetour
 
 /-- Left mate of refl followed by trans reduces. -/
 noncomputable def leftMate_refl_trans (adj : AdjunctionData C D F G)
@@ -297,14 +333,26 @@ noncomputable def compCounit_refl_left
 /-- Left triangle expanded. -/
 noncomputable def leftTriangle_expand (adj : AdjunctionData C D F G) (x : C) :
     RwEq (adj.leftTriangle x)
-         (Path.trans (Path.congrArg F (adj.unit x)) (adj.counit (F x))) :=
-  rweq_refl _
+         (Path.trans (Path.congrArg F (adj.unit x)) (adj.counit (F x))) := by
+  let p : Path (F x) (F x) :=
+    Path.trans (Path.congrArg F (adj.unit x)) (adj.counit (F x))
+  have hdetour : RwEq p p :=
+    rweq_trans
+      (rweq_symm (rweq_cmpA_refl_left p))
+      (rweq_cmpA_refl_left p)
+  simpa [p, AdjunctionData.leftTriangle] using hdetour
 
 /-- Right triangle expanded. -/
 noncomputable def rightTriangle_expand (adj : AdjunctionData C D F G) (y : D) :
     RwEq (adj.rightTriangle y)
-         (Path.trans (adj.unit (G y)) (Path.congrArg G (adj.counit y))) :=
-  rweq_refl _
+         (Path.trans (adj.unit (G y)) (Path.congrArg G (adj.counit y))) := by
+  let p : Path (G y) (G y) :=
+    Path.trans (adj.unit (G y)) (Path.congrArg G (adj.counit y))
+  have hdetour : RwEq p p :=
+    rweq_trans
+      (rweq_symm (rweq_cmpA_refl_right p))
+      (rweq_cmpA_refl_right p)
+  simpa [p, AdjunctionData.rightTriangle] using hdetour
 
 /-- Zigzag left: leftTriangle ↝ refl. -/
 noncomputable def zigzag_left_rweq

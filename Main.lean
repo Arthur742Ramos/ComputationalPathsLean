@@ -1,4 +1,4 @@
-import ComputationalPaths.Basic
+import ComputationalPaths
 
 open ComputationalPaths
 

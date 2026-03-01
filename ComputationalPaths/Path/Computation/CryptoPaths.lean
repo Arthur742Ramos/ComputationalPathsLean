@@ -11,7 +11,7 @@ aspects. All coherence conditions witnessed by `Path` values.
 - Katz & Lindell, "Introduction to Modern Cryptography"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

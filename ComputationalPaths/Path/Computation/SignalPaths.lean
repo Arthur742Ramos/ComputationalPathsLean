@@ -11,7 +11,7 @@ through computational paths.
 - Haykin, "Communication Systems"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

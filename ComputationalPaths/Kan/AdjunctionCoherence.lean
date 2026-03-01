@@ -187,7 +187,10 @@ noncomputable def rightKanDoubleTransport {b c d : B}
     RwEq
       (Path.trans q (Path.trans r p))
       (Path.trans q (Path.trans r p)) :=
-  rweq_refl _
+  by
+    exact rweq_trans
+      (rweq_symm (rweq_cmpA_refl_right (Path.trans q (Path.trans r p))))
+      (rweq_cmpA_refl_right (Path.trans q (Path.trans r p)))
 
 /-- Theorem 18: Symmetry in right Kan transport. -/
 noncomputable def rightKanSymmTransport {b c : B}
@@ -322,7 +325,10 @@ noncomputable def densityMult {b : B} (a a' : A)
     RwEq
       (Path.trans q p)
       (Path.trans q p) :=
-  rweq_refl _
+  by
+    exact rweq_trans
+      (rweq_symm (rweq_cmpA_refl_right (Path.trans q p)))
+      (rweq_cmpA_refl_right (Path.trans q p))
 
 /-- Theorem 28: Left unit law for density monad. -/
 noncomputable def densityLeftUnit {b : B} (a : A) (p : Path (J.obj a) b) :
@@ -527,7 +533,11 @@ noncomputable def leftKanSymmCongr {b : B}
     (h : RwEq p p') :
     RwEq (Path.symm p) (Path.symm p') := by
   induction h with
-  | refl => exact rweq_refl _
+  | refl =>
+      rename_i p0
+      exact rweq_trans
+        (rweq_symm (rweq_cmpA_refl_right (Path.symm p0)))
+        (rweq_cmpA_refl_right (Path.symm p0))
   | step h => exact rweq_of_step (Step.symm_congr h)
   | symm _ ih => exact rweq_symm ih
   | trans _ _ ih1 ih2 => exact rweq_trans ih1 ih2

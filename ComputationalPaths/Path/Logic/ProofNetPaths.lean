@@ -12,7 +12,7 @@ reduction, and multiplicative fragment theorems.
 - Danos & Regnier, "The Structure of Multiplicative Proof Nets"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -75,7 +75,17 @@ theorem MFormula.size_neg {n : Nat} (A : MFormula n) : A.neg.size = A.size := by
 
 /-- Theorem 3: Formula size is always positive. -/
 theorem MFormula.size_pos {n : Nat} (A : MFormula n) : 0 < A.size := by
-  cases A <;> simp [MFormula.size]
+  cases A with
+  | atom _ => simp [MFormula.size]
+  | negAtom _ => simp [MFormula.size]
+  | tensor A B =>
+      have h : 0 < Nat.succ (MFormula.size A + MFormula.size B) := Nat.succ_pos _
+      simpa [MFormula.size, Nat.succ_eq_add_one, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using h
+  | par A B =>
+      have h : 0 < Nat.succ (MFormula.size A + MFormula.size B) := Nat.succ_pos _
+      simpa [MFormula.size, Nat.succ_eq_add_one, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using h
+  | one => simp [MFormula.size]
+  | bot => simp [MFormula.size]
 
 /-! ## Proof Net Links -/
 
@@ -122,7 +132,7 @@ noncomputable def correctnessPath {A : Type u} (a b : A) (h : a = b) : Path a b 
 
 /-- Theorem 5: Correctness path is reflexive at identity. -/
 theorem correctnessPath_refl {A : Type u} (a : A) :
-    correctnessPath a a rfl = Path.mk [Step.mk _ _ rfl] rfl := by
+    correctnessPath a a rfl = Path.mk [Step.mk a a rfl] rfl := by
   rfl
 
 /-! ## Cut Elimination as Path Reduction -/
@@ -172,7 +182,17 @@ noncomputable def SequentProof.size {n : Nat} : SequentProof n → Nat
 
 /-- Theorem 8: Proof size is positive. -/
 theorem SequentProof.size_pos {n : Nat} (p : SequentProof n) : 0 < p.size := by
-  cases p <;> simp [SequentProof.size]
+  cases p with
+  | axiom_ _ => simp [SequentProof.size]
+  | tensor_ l r =>
+      have h : 0 < Nat.succ (SequentProof.size l + SequentProof.size r) := Nat.succ_pos _
+      simpa [SequentProof.size, Nat.succ_eq_add_one, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using h
+  | par_ l r =>
+      have h : 0 < Nat.succ (SequentProof.size l + SequentProof.size r) := Nat.succ_pos _
+      simpa [SequentProof.size, Nat.succ_eq_add_one, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using h
+  | cut_ l r =>
+      have h : 0 < Nat.succ (SequentProof.size l + SequentProof.size r) := Nat.succ_pos _
+      simpa [SequentProof.size, Nat.succ_eq_add_one, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using h
 
 /-- Number of cuts in a proof. -/
 noncomputable def SequentProof.numCuts {n : Nat} : SequentProof n → Nat

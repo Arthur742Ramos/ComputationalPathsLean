@@ -173,14 +173,16 @@ noncomputable def jMap (M : CoverData) : H1Sum M → H1 M.A M.baseA :=
             intro q q' hqq'
             rcases hqq' with ⟨hqq'⟩
             exact Quot.sound ⟨M.mergeLoops_respects
-              (hp := rweq_refl (p := p)) (hq := hqq')⟩))
+              (hp := rweq_trans (rweq_symm (rweq_cmpA_refl_right p)) (rweq_cmpA_refl_right p))
+              (hq := hqq')⟩))
       (by
         intro p p' hpp'
         rcases hpp' with ⟨hpp'⟩
         refine Quot.inductionOn x.2 ?_
         intro q
         exact Quot.sound ⟨M.mergeLoops_respects
-          (hp := hpp') (hq := rweq_refl (p := q))⟩)
+          (hp := hpp')
+          (hq := rweq_trans (rweq_symm (rweq_cmpA_refl_right q)) (rweq_cmpA_refl_right q))⟩)
 
 /-- Connecting morphism `δ : H₁(A) → H₀(U∩V)` from decomposition overlap points. -/
 noncomputable def delta (M : CoverData) (decomp : ∀ p : Path M.baseA M.baseA, LoopDecomposition M p) :

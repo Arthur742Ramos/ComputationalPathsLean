@@ -12,7 +12,7 @@ properties, and game morphisms.
 - Hyland & Ong, "On Full Abstraction for PCF"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

@@ -75,6 +75,13 @@ noncomputable def ganeaProj : (n : Nat) → (X : PtdType.{u}) → GaneaSpace n X
       Total.proj (P := fun _ : X.carrier =>
         CompPath.Join (GaneaSpace (n + 1) X) (Omega X))
 
+/-- Projection of the Ganea basepoint is the ambient basepoint. -/
+noncomputable def ganeaProjBasePath : (n : Nat) → (X : PtdType.{u}) →
+    Path (ganeaProj n X (ganeaBase n X)) X.pt
+  | 0, X => Path.refl X.pt
+  | 1, X => Path.refl X.pt
+  | _ + 2, X => Path.refl X.pt
+
 /-- The n-th Ganea fibration G_n(X) -> X packaged as a fiber sequence. -/
 noncomputable def ganeaFibration : (n : Nat) → (X : PtdType.{u}) →
     FiberSeq (GaneaFiber n X) (GaneaSpace n X) X.carrier
@@ -106,13 +113,13 @@ noncomputable def ganeaFibration : (n : Nat) → (X : PtdType.{u}) →
 structure GaneaSection (n : Nat) (X : PtdType.{u}) where
   /-- The section map. -/
   toFun : X.carrier → GaneaSpace n X
-  /-- Section property (placeholder). -/
-  section_proj : True
+  /-- The section sends the basepoint to a point over the basepoint. -/
+  section_proj : Path (ganeaProj n X (toFun X.pt)) X.pt
 
 /-- A trivial section picking the basepoint in every fiber. -/
 noncomputable def ganeaTrivialSection (n : Nat) (X : PtdType.{u}) : GaneaSection n X where
   toFun := fun _ => ganeaBase n X
-  section_proj := trivial
+  section_proj := ganeaProjBasePath n X
 
 /-- The n-th Ganea fibration admits a section (scaffold). -/
 noncomputable def ganeaHasSection (n : Nat) (X : PtdType.{u}) : Prop :=
@@ -137,8 +144,10 @@ theorem cat_le_iff_section (X : PtdType.{u}) (n : Nat) :
 structure GaneaWhiteheadData (n : Nat) (X : PtdType.{u}) where
   /-- A section of the n-th Ganea fibration. -/
   ganeaSection : GaneaSection n X
-  /-- Whitehead-type condition (placeholder). -/
-  whitehead : True
+  /-- Right-unit coherence for the section witness. -/
+  whitehead :
+    RwEq (Path.trans ganeaSection.section_proj (Path.refl X.pt))
+      ganeaSection.section_proj
 
 /-- Ganea-Whitehead characterization: sections correspond to Whitehead data. -/
 theorem ganea_whitehead_characterization (n : Nat) (X : PtdType.{u}) :
@@ -146,7 +155,7 @@ theorem ganea_whitehead_characterization (n : Nat) (X : PtdType.{u}) :
   constructor
   · intro h
     rcases h with ⟨s⟩
-    exact ⟨{ ganeaSection := s, whitehead := trivial }⟩
+    exact ⟨{ ganeaSection := s, whitehead := rweq_cmpA_refl_right s.section_proj }⟩
   · intro h
     rcases h with ⟨data⟩
     exact ⟨data.ganeaSection⟩

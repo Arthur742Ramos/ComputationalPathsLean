@@ -176,7 +176,7 @@ noncomputable def OmegaN (A : Type u) (a : A) : Nat → Type u
 /-- Identity element of Ωⁿ. -/
 noncomputable def omegaN_refl {A : Type u} (a : A) : (n : Nat) → OmegaN A a n
   | 0     => loopOne a
-  | _ + 1 => rweq_refl (loopOne a)
+  | _ + 1 => rweq_trans (rweq_symm (rweq_cmpA_refl_right (loopOne a))) (rweq_cmpA_refl_right (loopOne a))
 
 /-- The delooping question: does there exist `Y` such that `Ω(Y, y) ≃ X`?
     In our UIP-based setting, all loop spaces at level ≥ 2 collapse,

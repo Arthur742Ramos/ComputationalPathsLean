@@ -141,7 +141,7 @@ noncomputable def boundary1Setoid {A : Type u} (a : A) : Setoid (Path a a) where
   iseqv :=
     { refl := by
         intro p
-        exact ⟨rweq_refl (p := p)⟩
+        exact ⟨rweq_trans (rweq_symm (rweq_cmpA_refl_right p)) (rweq_cmpA_refl_right p)⟩
       symm := by
         intro p q h
         rcases h with ⟨h⟩

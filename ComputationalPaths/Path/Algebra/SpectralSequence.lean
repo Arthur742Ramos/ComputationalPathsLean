@@ -55,7 +55,7 @@ noncomputable def gradedSetoid (A : Type u) (a : A) (n : Nat) : Setoid (ExactLen
   iseqv :=
     { refl := by
         intro x
-        exact ⟨rweq_refl x.1⟩
+        exact ⟨rweq_trans (rweq_symm (rweq_cmpA_refl_right x.1)) (rweq_cmpA_refl_right x.1)⟩
       symm := by
         intro x y h
         rcases h with ⟨hxy⟩

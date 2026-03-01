@@ -216,7 +216,11 @@ noncomputable def exprRel {x y : PushoutCompPath A B C f g}
 
 @[simp] theorem exprRel_refl {x y : PushoutCompPath A B C f g}
     (p : PushoutCompPathExpr A B C f g x y) : exprRel (A := A) (B := B) (C := C) (f := f) (g := g) p p :=
-  ⟨rweq_refl _⟩
+  by
+    let t := exprToPath (A := A) (B := B) (C := C) (f := f) (g := g) p
+    refine ⟨?_⟩
+    change RwEq t t
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
 
 @[simp] theorem exprRel_symm {x y : PushoutCompPath A B C f g}
     {p q : PushoutCompPathExpr A B C f g x y}
@@ -367,13 +371,19 @@ noncomputable instance instHasGlueNaturalLoopRwEq_Wedge {A : Type u} {B : Type u
                         (congrArg f' p))
                      (Path.refl (inl' a₀)) := by
       apply rweq_trans (rweq_congrArg_of_rweq inl' h1)
-      exact rweq_refl _
+      refine rweq_trans (rweq_congrArg_refl inl' a₀) ?_
+      let t := Path.refl (inl' a₀)
+      change RwEq t t
+      exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
     -- inrPath (congrArg g' p) ≈ inrPath (refl b₀) = refl (inr' b₀)
     have hinr : RwEq (Pushout.inrPath (A := A) (B := B) (C := PUnit') (f := f') (g := g')
                         (congrArg g' p))
                      (Path.refl (inr' b₀)) := by
       apply rweq_trans (rweq_congrArg_of_rweq inr' h2)
-      exact rweq_refl _
+      refine rweq_trans (rweq_congrArg_refl inr' b₀) ?_
+      let t := Path.refl (inr' b₀)
+      change RwEq t t
+      exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
     -- symm (inlPath ...) ≈ symm refl ≈ refl
     have hsymm : RwEq (Path.symm (Pushout.inlPath (A := A) (B := B) (C := PUnit') (f := f') (g := g')
                           (congrArg f' p)))

@@ -30,7 +30,7 @@ noncomputable def compose {A : Type u} {a b : A} {p q : Path a b}
     (σ : RwEqSequence p q) : RwEq p q := by
   induction σ with
   | nil p =>
-      exact rweq_refl p
+      exact rweq_trans (rweq_symm (rweq_cmpA_refl_right p)) (rweq_cmpA_refl_right p)
   | cons h tail ih =>
       exact rweq_trans h ih
 
@@ -102,7 +102,7 @@ noncomputable def toRwEq {A : Type u} {a b : A} {p q : Path a b}
     (σ : StepSequence p q) : RwEq p q := by
   induction σ with
   | nil p =>
-      exact rweq_refl p
+      exact rweq_trans (rweq_symm (rweq_cmpA_refl_right p)) (rweq_cmpA_refl_right p)
   | cons hs tail ih =>
       exact rweq_trans (rweq_of_step hs) ih
 
@@ -200,7 +200,7 @@ namespace GaugeEquivalence
 
 noncomputable def refl {A : Type u} {a b : A} {p₀ : Path a b}
     (D : PathDeformation p₀) : GaugeEquivalence D D where
-  higher := rweq_refl D.terminal
+  higher := rweq_trans (rweq_symm (rweq_cmpA_refl_right D.terminal)) (rweq_cmpA_refl_right D.terminal)
 
 noncomputable def symm {A : Type u} {a b : A} {p₀ : Path a b}
     {D₁ D₂ : PathDeformation p₀} (g : GaugeEquivalence D₁ D₂) :

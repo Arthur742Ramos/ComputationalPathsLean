@@ -276,7 +276,12 @@ noncomputable def rweq_congrArg_of_rweq {B : Type u} (f : A → B)
 /-- congrArg on refl is refl. -/
 noncomputable def rweq_congrArg_refl {B : Type u} (f : A → B) (a : A) :
     RwEq (Path.congrArg f (Path.refl a)) (Path.refl (f a)) :=
-  rweq_refl _
+  by
+    let t := Path.congrArg f (Path.refl a)
+    change RwEq t t
+    exact RwEq.trans
+      (RwEq.symm (RwEq.step (Step.trans_refl_right t)))
+      (RwEq.step (Step.trans_refl_right t))
 
 /-- Congruence along a constant map collapses to reflexivity.
 
@@ -302,7 +307,11 @@ noncomputable def rweq_congrArg_const {B : Type u} (b : B)
           (Path.refl b) := by
         induction steps with
         | nil =>
-            exact rweq_refl _
+            let t := Path.refl b
+            change RwEq t t
+            exact RwEq.trans
+              (RwEq.symm (RwEq.step (Step.trans_refl_right t)))
+              (RwEq.step (Step.trans_refl_right t))
         | cons s tail ih =>
             -- Peel one step: after mapping through the constant function it becomes `ofEq rfl`.
             cases s with

@@ -11,7 +11,7 @@ All coherence witnessed by `Path`.
 - Nash, "Non-Cooperative Games"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -102,11 +102,13 @@ noncomputable def IsBestResponse2 {S1 S2 : Type u} (g : Game S1 S2)
 /-- Best response is reflexive (self is at least as good as self). -/
 theorem best_response1_self {S1 S2 : Type u} (g : Game S1 S2)
     (s1 : S1) (s2 : S2) : g.payoff1 s1 s2 ≥ g.payoff1 s1 s2 :=
-  le_refl _
+  by
+    simpa using (le_rfl : g.payoff1 s1 s2 ≤ g.payoff1 s1 s2)
 
 theorem best_response2_self {S1 S2 : Type u} (g : Game S1 S2)
     (s1 : S1) (s2 : S2) : g.payoff2 s1 s2 ≥ g.payoff2 s1 s2 :=
-  le_refl _
+  by
+    simpa using (le_rfl : g.payoff2 s1 s2 ≤ g.payoff2 s1 s2)
 
 /-! ## Nash Equilibrium -/
 
@@ -170,8 +172,8 @@ theorem pareto_irrefl {S1 S2 : Type u} (g : Game S1 S2)
     (p : Profile S1 S2) : ¬ParetoImproves g p p := by
   intro ⟨_, _, h3⟩
   cases h3 with
-  | inl h => exact absurd h (lt_irrefl _)
-  | inr h => exact absurd h (lt_irrefl _)
+  | inl h => exact (Int.lt_irrefl (payoff1_at g p)) h
+  | inr h => exact (Int.lt_irrefl (payoff2_at g p)) h
 
 /-- A profile is Pareto optimal if no profile Pareto improves it. -/
 noncomputable def IsParetoOptimal {S1 S2 : Type u} (g : Game S1 S2)

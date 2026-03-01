@@ -12,7 +12,7 @@ fixed-point theorems (Kleene chain) as path limits.
 - Amadio & Curien, "Domains and Lambda-Calculi"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

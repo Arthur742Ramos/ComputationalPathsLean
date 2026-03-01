@@ -12,7 +12,7 @@ Bekic's lemma.
 - Lassez, Nguyen, Sonenberg, "Fixed Point Theorems and Semantics"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -176,7 +176,10 @@ theorem param_iterate_succ {P A : Type u} (f : ParamMonotone P A)
 noncomputable def param_change_path {P A : Type u} (f : ParamMonotone P A)
     {p1 p2 : P} (hp : p1 = p2) (n : Nat) (x : A) :
     Path (f.iterate p1 n x) (f.iterate p2 n x) :=
-  Path.mk [Step.mk _ _ (by subst hp; rfl)] (by subst hp; rfl)
+  by
+    cases hp
+    let t := f.iterate p1 n x
+    exact Path.mk [Step.mk t t rfl] rfl
 
 /-! ## Bekic's Lemma Aspects -/
 

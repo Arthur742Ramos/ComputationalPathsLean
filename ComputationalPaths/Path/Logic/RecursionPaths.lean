@@ -12,7 +12,7 @@ aspects — all mediated by Path/Step infrastructure.
 - Rogers, "Theory of Recursive Functions and Effective Computability"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

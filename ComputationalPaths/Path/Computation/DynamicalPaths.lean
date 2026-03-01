@@ -12,7 +12,7 @@ invariant measures, omega-limit sets, bifurcation cascades, and ergodic paths.
 - Katok & Hasselblatt, "Introduction to the Modern Theory of Dynamical Systems"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -72,7 +72,7 @@ theorem fixedPoint_trans_refl {S : Type u} (d : FixedPointData S) :
 /-- RwEq: fixed point trans refl. -/
 noncomputable def fixedPoint_rweq_trans_refl {S : Type u} (d : FixedPointData S) :
     RwEq (Path.trans d.fixedPath (Path.refl d.point)) d.fixedPath :=
-  rweq_of_step (Step.trans_refl_right d.fixedPath)
+  rweq_of_step (Path.Step.trans_refl_right d.fixedPath)
 
 /-- RwEq: fixed point inv cancel right. -/
 noncomputable def fixedPoint_rweq_inv_right {S : Type u} (d : FixedPointData S) :
@@ -84,7 +84,7 @@ noncomputable def fixedPoint_rweq_inv_right {S : Type u} (d : FixedPointData S) 
 /-- RwEq: fixed point symm_symm. -/
 noncomputable def fixedPoint_rweq_symm_symm {S : Type u} (d : FixedPointData S) :
     RwEq (Path.symm (Path.symm d.fixedPath)) d.fixedPath :=
-  rweq_of_step (Step.symm_symm d.fixedPath)
+  rweq_of_step (Path.Step.symm_symm d.fixedPath)
 
 /-- RwEq: fixed point inv cancel left. -/
 noncomputable def fixedPoint_rweq_inv_left {S : Type u} (d : FixedPointData S) :
@@ -117,7 +117,7 @@ noncomputable def periodic_rweq_inv_right {S : Type u} (d : PeriodicOrbitData S)
 /-- RwEq: periodic symm_symm. -/
 noncomputable def periodic_rweq_symm_symm {S : Type u} (d : PeriodicOrbitData S) :
     RwEq (Path.symm (Path.symm d.periodicPath)) d.periodicPath :=
-  rweq_of_step (Step.symm_symm d.periodicPath)
+  rweq_of_step (Path.Step.symm_symm d.periodicPath)
 
 /-- RwEq: periodic inv cancel left. -/
 noncomputable def periodic_rweq_inv_left {S : Type u} (d : PeriodicOrbitData S) :
@@ -151,7 +151,7 @@ noncomputable def lyapunov_rweq_trans_refl (d : LyapunovData) :
     RwEq
       (Path.trans d.lyapunovPath (Path.refl d.vAtState))
       d.lyapunovPath :=
-  rweq_of_step (Step.trans_refl_right d.lyapunovPath)
+  rweq_of_step (Path.Step.trans_refl_right d.lyapunovPath)
 
 /-! ## Conjugacy -/
 
@@ -176,7 +176,7 @@ noncomputable def conjugacy_rweq_inv_right {A B : Type u} (d : ConjugacyData A B
 /-- RwEq: conjugacy symm_symm. -/
 noncomputable def conjugacy_rweq_symm_symm {A B : Type u} (d : ConjugacyData A B) :
     RwEq (Path.symm (Path.symm d.conjugacyPath)) d.conjugacyPath :=
-  rweq_of_step (Step.symm_symm d.conjugacyPath)
+  rweq_of_step (Path.Step.symm_symm d.conjugacyPath)
 
 /-! ## Semiconjugacy -/
 
@@ -198,7 +198,7 @@ noncomputable def semiconj_rweq_refl_trans {A B : Type u} (d : SemiconjugacyData
     RwEq
       (Path.trans (Path.refl d.hfVal) d.semiconjPath)
       d.semiconjPath :=
-  rweq_of_step (Step.trans_refl_left d.semiconjPath)
+  rweq_of_step (Path.Step.trans_refl_left d.semiconjPath)
 
 /-! ## Attractors -/
 
@@ -225,7 +225,7 @@ noncomputable def attractor_rweq_refl_trans {S : Type u} (d : AttractorData S) :
     RwEq
       (Path.trans (Path.refl d.orbitVal) d.convergePath)
       d.convergePath :=
-  rweq_of_step (Step.trans_refl_left d.convergePath)
+  rweq_of_step (Path.Step.trans_refl_left d.convergePath)
 
 /-! ## Repellers -/
 
@@ -249,7 +249,7 @@ noncomputable def repeller_rweq_diverge_return {S : Type u} (d : RepellerData S)
 /-- RwEq: repeller symm_symm. -/
 noncomputable def repeller_rweq_symm_symm {S : Type u} (d : RepellerData S) :
     RwEq (Path.symm (Path.symm d.divergePath)) d.divergePath :=
-  rweq_of_step (Step.symm_symm d.divergePath)
+  rweq_of_step (Path.Step.symm_symm d.divergePath)
 
 /-! ## Omega-Limit Sets -/
 
@@ -271,7 +271,7 @@ noncomputable def omegaLimit_rweq_refl_trans {S : Type u} (d : OmegaLimitData S)
     RwEq
       (Path.trans (Path.refl d.orbitVal) d.approachPath)
       d.approachPath :=
-  rweq_of_step (Step.trans_refl_left d.approachPath)
+  rweq_of_step (Path.Step.trans_refl_left d.approachPath)
 
 /-! ## Bifurcation Cascades -/
 
@@ -289,7 +289,7 @@ noncomputable def bifurcationCascade (d1 : BifurcationData) (d2 : BifurcationDat
 /-- Bifurcation symm_symm. -/
 noncomputable def bifurcation_rweq_symm_symm (d : BifurcationData) :
     RwEq (Path.symm (Path.symm d.bifurcPath)) d.bifurcPath :=
-  rweq_of_step (Step.symm_symm d.bifurcPath)
+  rweq_of_step (Path.Step.symm_symm d.bifurcPath)
 
 /-- Bifurcation trans refl. -/
 theorem bifurcation_trans_refl (d : BifurcationData) :
@@ -361,14 +361,15 @@ noncomputable def ergodic_rweq_inv_right (d : ErgodicData) :
 /-- RwEq: ergodic symm_symm. -/
 noncomputable def ergodic_rweq_symm_symm (d : ErgodicData) :
     RwEq (Path.symm (Path.symm d.ergodicPath)) d.ergodicPath :=
-  rweq_of_step (Step.symm_symm d.ergodicPath)
+  rweq_of_step (Path.Step.symm_symm d.ergodicPath)
 
 /-! ## Orbit Equivalence -/
 
 /-- Two orbit paths that agree propositionally are RwEq. -/
 noncomputable def orbit_rweq_of_eq {S : Type u} {a b : S}
     (p q : Path a b) (h : p = q) : RwEq p q := by
-  subst h; exact rweq_refl p
+  subst h
+  exact rweq_trans (rweq_symm (rweq_cmpA_refl_right p)) (rweq_cmpA_refl_right p)
 
 /-- Orbit symm trans cancel. -/
 noncomputable def orbit_rweq_symm_trans {S : Type u} {a b : S} (p : Path a b) :
@@ -398,7 +399,7 @@ theorem iteratedOrbit_one {S : Type u} {a : S} (p : Path a a) :
 /-- RwEq: iterated orbit 1 simplifies. -/
 noncomputable def iteratedOrbit_one_rweq {S : Type u} {a : S} (p : Path a a) :
     RwEq (iteratedOrbit p 1) p :=
-  rweq_of_step (Step.trans_refl_left p)
+  rweq_of_step (Path.Step.trans_refl_left p)
 
 /-- Mapping a dynamical path through a function preserves orbit structure. -/
 theorem congrArg_iterated_zero {S T : Type u} (f : S → T) {a : S} (p : Path a a) :

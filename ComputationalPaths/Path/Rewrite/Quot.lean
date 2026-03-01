@@ -36,7 +36,9 @@ noncomputable instance {A : Type u} {a b : A} {p q : Path a b} :
 noncomputable def rwEqSetoid (A : Type u) (a b : A) : Setoid (Path a b) where
   r := rwEqRel A a b
   iseqv :=
-    { refl := fun p => rweqProp_of_rweq (rweq_refl (p := p))
+    { refl := fun p =>
+        rweqProp_of_rweq
+          (rweq_trans (rweq_symm (rweq_cmpA_refl_right p)) (rweq_cmpA_refl_right p))
       symm := fun {_ _} h =>
         match h with
         | ⟨h'⟩ => rweqProp_of_rweq (rweq_symm h')

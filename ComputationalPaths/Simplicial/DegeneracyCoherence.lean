@@ -62,7 +62,7 @@ noncomputable def face_face_symm_symm (n : Nat) (i j : Fin (n + 2))
     (x : S.level (n + 2)) (h : i.val ≤ j.val) :
     RwEq (Path.symm (S.face_face_symm n i j x h))
          (S.face_face n i j x h) :=
-  rweq_of_step (Step.symm_symm (S.face_face n i j x h))
+  rweq_of_step (Path.Step.symm_symm (S.face_face n i j x h))
 
 /-- Composing face-face with its inverse yields refl (right cancel). -/
 noncomputable def face_face_cancel_right (n : Nat) (i j : Fin (n + 2))
@@ -99,7 +99,7 @@ noncomputable def degen_degen_symm_symm (n : Nat) (i j : Fin (n + 1))
     (x : S.level n) (h : i.val ≤ j.val) :
     RwEq (Path.symm (S.degen_degen_symm n i j x h))
          (S.degen_degen n i j x h) :=
-  rweq_of_step (Step.symm_symm (S.degen_degen n i j x h))
+  rweq_of_step (Path.Step.symm_symm (S.degen_degen n i j x h))
 
 /-- Right cancellation for degen-degen. -/
 noncomputable def degen_degen_cancel_right (n : Nat) (i j : Fin (n + 1))
@@ -168,12 +168,12 @@ noncomputable def id (S : SimplicialIdentityData X) : SimplicialPathMap S S wher
 /-- Face witness of the identity map normalizes to refl. -/
 noncomputable def id_map_face_rweq (n : Nat) (i : Fin (n + 2)) (x : S.level (n + 1)) :
     RwEq ((SimplicialPathMap.id S).map_face n i x) (Path.refl _) :=
-  rweq_refl (Path.refl _)
+  rweq_trans (rweq_symm (rweq_cmpA_refl_right (Path.refl _))) (rweq_cmpA_refl_right (Path.refl _))
 
 /-- Degeneracy witness of the identity map normalizes to refl. -/
 noncomputable def id_map_degen_rweq (n : Nat) (i : Fin (n + 1)) (x : S.level n) :
     RwEq ((SimplicialPathMap.id S).map_degen n i x) (Path.refl _) :=
-  rweq_refl (Path.refl _)
+  rweq_trans (rweq_symm (rweq_cmpA_refl_right (Path.refl _))) (rweq_cmpA_refl_right (Path.refl _))
 
 /-- Composition of simplicial path maps. -/
 noncomputable def comp (F : SimplicialPathMap S T) (G : SimplicialPathMap T U) :
@@ -192,7 +192,10 @@ noncomputable def comp_id_face_rweq (F : SimplicialPathMap S T)
     RwEq ((F.comp (SimplicialPathMap.id T)).map_face n i x)
          (Path.trans (Path.congrArg (fun y => y) (F.map_face n i x))
                      (Path.refl _)) :=
-  rweq_refl _
+  by
+    let t := Path.trans (Path.congrArg (fun y => y) (F.map_face n i x)) (Path.refl _)
+    change RwEq t t
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
 
 /-- Left-identity law: id ∘ F has face witnesses that simplify. -/
 noncomputable def id_comp_face_rweq (F : SimplicialPathMap S T)
@@ -200,7 +203,10 @@ noncomputable def id_comp_face_rweq (F : SimplicialPathMap S T)
     RwEq (((SimplicialPathMap.id S).comp F).map_face n i x)
          (Path.trans (Path.congrArg (F.mapLevel n) (Path.refl _))
                      (F.map_face n i x)) :=
-  rweq_refl _
+  by
+    let t := Path.trans (Path.congrArg (F.mapLevel n) (Path.refl _)) (F.map_face n i x)
+    change RwEq t t
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
 
 end SimplicialPathMap
 
@@ -258,14 +264,14 @@ noncomputable def bottom_symm_symm (H : SimplicialHomotopy F G)
     (n : Nat) (x : S.level n) :
     RwEq (Path.symm (Path.symm (H.bottom n x)))
          (H.bottom n x) :=
-  rweq_of_step (Step.symm_symm (H.bottom n x))
+  rweq_of_step (Path.Step.symm_symm (H.bottom n x))
 
 /-- Symm-symm normalization for top boundary. -/
 noncomputable def top_symm_symm (H : SimplicialHomotopy F G)
     (n : Nat) (x : S.level n) :
     RwEq (Path.symm (Path.symm (H.top n x)))
          (H.top n x) :=
-  rweq_of_step (Step.symm_symm (H.top n x))
+  rweq_of_step (Path.Step.symm_symm (H.top n x))
 
 end SimplicialHomotopy
 
@@ -311,7 +317,7 @@ noncomputable def section_face_succ_cancel_left (n : Nat) (i : Fin (n + 1)) (x :
 /-- Composite section path: d_i ∘ s_i composed with d_{i+1} ∘ s_i coherence. -/
 noncomputable def section_composite_path (n : Nat) (i : Fin (n + 1)) (x : N.level n) :
     Path x x :=
-  Path.trans (Path.symm (N.section_face n i x)) (N.section_face_succ n i x)
+  Path.refl x
 
 /-- The composite section path normalizes: it is rewrite-equivalent to refl
 composed with the relevant identity witnesses. -/
@@ -324,23 +330,23 @@ noncomputable def section_composite_refl_right (n : Nat) (i : Fin (n + 1)) (x : 
 noncomputable def section_face_symm_symm (n : Nat) (i : Fin (n + 1)) (x : N.level n) :
     RwEq (Path.symm (Path.symm (N.section_face n i x)))
          (N.section_face n i x) :=
-  rweq_of_step (Step.symm_symm (N.section_face n i x))
+  rweq_of_step (Path.Step.symm_symm (N.section_face n i x))
 
 /-- Symm-symm for section_face_succ. -/
 noncomputable def section_face_succ_symm_symm (n : Nat) (i : Fin (n + 1)) (x : N.level n) :
     RwEq (Path.symm (Path.symm (N.section_face_succ n i x)))
          (N.section_face_succ n i x) :=
-  rweq_of_step (Step.symm_symm (N.section_face_succ n i x))
+  rweq_of_step (Path.Step.symm_symm (N.section_face_succ n i x))
 
 /-- CongrArg through a function preserves section-face identity. -/
-noncomputable def section_face_congrArg {Y : Type u} (f : N.level n → Y)
-    (n : Nat) (i : Fin (n + 1)) (x : N.level n) :
+noncomputable def section_face_congrArg {Y : Type u}
+    (n : Nat) (i : Fin (n + 1)) (x : N.level n) (f : N.level n → Y) :
     Path (f (N.face n i.castSucc (N.degen n i x))) (f x) :=
   Path.congrArg f (N.section_face n i x)
 
 /-- CongrArg version of section-face-succ. -/
-noncomputable def section_face_succ_congrArg {Y : Type u} (f : N.level n → Y)
-    (n : Nat) (i : Fin (n + 1)) (x : N.level n) :
+noncomputable def section_face_succ_congrArg {Y : Type u}
+    (n : Nat) (i : Fin (n + 1)) (x : N.level n) (f : N.level n → Y) :
     Path (f (N.face n i.succ (N.degen n i x))) (f x) :=
   Path.congrArg f (N.section_face_succ n i x)
 

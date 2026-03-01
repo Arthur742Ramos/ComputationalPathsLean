@@ -12,7 +12,7 @@ comparisons — all mediated by Path/Step infrastructure.
 - Jech, "Set Theory"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

@@ -11,7 +11,7 @@ and network reliability—all modeled through computational paths.
 - Bertsekas & Gallager, "Data Networks"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

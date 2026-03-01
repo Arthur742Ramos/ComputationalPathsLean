@@ -13,7 +13,7 @@ algebraic and continuous domains, all modeled through computational paths.
 - Algebraic/continuous domains
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.Path.Computation.DomainTheoryPaths
 
@@ -229,7 +229,7 @@ noncomputable def liftedBot {α : Type u} [DecidableEq α] (x : Lifted α) (h : 
 /-- Flat domain: paths between equal lifted elements. -/
 noncomputable def flat_domain_paths {α : Type u} [DecidableEq α] (a b : α) (h : a = b) :
     Path (Lifted.up a) (Lifted.up b) :=
-  Path.mk [Step.mk _ _ (h ▸ rfl)] (h ▸ rfl)
+  Path.mk [Step.mk _ _ (_root_.congrArg Lifted.up h)] (_root_.congrArg Lifted.up h)
 
 /-- Flat domain identity path proof is rfl. -/
 theorem flat_domain_refl_proof {α : Type u} [DecidableEq α] (a : α) :

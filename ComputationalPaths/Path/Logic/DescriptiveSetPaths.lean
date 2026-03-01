@@ -11,7 +11,7 @@ and Baire category theorem aspects.
 - Moschovakis, "Descriptive Set Theory"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -152,9 +152,17 @@ theorem perfect_no_isolated {X : Type u} (τ : Topology X) (S : X → Prop)
     (hperf : isPerfect τ S) (x : X) (hx : S x) (U : X → Prop)
     (hU : τ.isOpen U) (hUx : U x) :
     ∃ y, S y ∧ U y ∧ y ≠ x := by
-  by_contra h
-  push_neg at h
-  exact hperf.2 x hx ⟨U, hU, hUx, fun y hy hSy => h y hSy hy⟩
+  classical
+  by_cases h : ∃ y, S y ∧ U y ∧ y ≠ x
+  · exact h
+  · exfalso
+    apply hperf.2 x hx
+    refine ⟨U, hU, hUx, ?_⟩
+    intro y hy hSy
+    have : ¬ (y ≠ x) := by
+      intro hne
+      exact h ⟨y, hSy, hy, hne⟩
+    exact Classical.not_not.mp this
 
 /-- Perfect and nonempty implies at least two points exist. -/
 theorem perfect_two_points {X : Type u} (τ : Topology X) (S : X → Prop)

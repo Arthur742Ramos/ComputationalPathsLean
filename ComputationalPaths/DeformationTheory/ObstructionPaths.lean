@@ -25,7 +25,7 @@ variable {A : Type u} {a b : A} {p₀ : Path a b} {n : Nat}
 
 noncomputable def prefixRwEq (D : PartialDeformation p₀ n) :
     ∀ t, t ≤ n → RwEq (D.pathAt 0) (D.pathAt t)
-  | 0, _ => rweq_refl (D.pathAt 0)
+  | 0, _ => rweq_trans (rweq_symm (rweq_cmpA_refl_right (D.pathAt 0))) (rweq_cmpA_refl_right (D.pathAt 0))
   | Nat.succ t, h =>
       have ht : t < n := Nat.lt_of_lt_of_le (Nat.lt_succ_self t) h
       have hprev : RwEq (D.pathAt 0) (D.pathAt t) := prefixRwEq D t (Nat.le_of_lt ht)

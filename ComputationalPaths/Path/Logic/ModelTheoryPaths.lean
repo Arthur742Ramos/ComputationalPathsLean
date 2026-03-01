@@ -11,7 +11,7 @@ elementary embeddings, diagrams, types, and Löwenheim-Skolem aspects.
 - Marker, "Model Theory: An Introduction"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path

@@ -68,7 +68,10 @@ noncomputable def mapRwEq (EF : EnrichedFunctorData A B)
     (h : RwEq p q) :
     RwEq (EF.mapHom p) (EF.mapHom q) := by
   induction h with
-  | refl _ => exact rweq_refl _
+  | refl p =>
+      let t := EF.mapHom p
+      change RwEq t t
+      exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
   | step s => exact EF.mapStep s
   | symm _ ih => exact rweq_symm ih
   | trans _ _ ih1 ih2 => exact rweq_trans ih1 ih2
@@ -81,8 +84,16 @@ noncomputable def mapRwEq (EF : EnrichedFunctorData A B)
 noncomputable def idFunctor (A : Type u) : EnrichedFunctorData A A where
   obj := id
   mapHom := id
-  mapId := fun _ => rweq_refl _
-  mapComp := fun _ _ => rweq_refl _
+  mapId := by
+    intro a
+    let t := homId a
+    change RwEq t t
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
+  mapComp := by
+    intro a b c p q
+    let t := homComp p q
+    change RwEq t t
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right t)) (rweq_cmpA_refl_right t)
   mapStep := fun s => rweq_of_step s
 
 -- ============================================================

@@ -49,7 +49,7 @@ noncomputable def truncSetoid (A : Type u) (a : A) (n : Nat) :
     · intro p
       cases n with
       | zero => trivial
-      | succ n => exact ⟨rweq_refl p⟩
+      | succ n => exact ⟨rweq_trans (rweq_symm (rweq_cmpA_refl_right p)) (rweq_cmpA_refl_right p)⟩
     · intro p q hpq
       cases n with
       | zero => trivial

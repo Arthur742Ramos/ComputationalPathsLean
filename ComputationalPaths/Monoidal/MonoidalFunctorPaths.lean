@@ -162,12 +162,12 @@ noncomputable def idMonoidalFunctor (A : Type u) : MonoidalFunctorData A A where
   F := id
   preserveTensor := by
     intro a b c p q
-    simp [tensorPath, unitPath]
-    exact rweq_refl _
+    simp [tensorPath]
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right _)) (rweq_cmpA_refl_right _)
   preserveUnit := by
     intro a
     simp [unitPath]
-    exact rweq_refl _
+    exact rweq_trans (rweq_symm (rweq_cmpA_refl_right _)) (rweq_cmpA_refl_right _)
 
 -- ============================================================
 -- § 8. Composition of monoidal functors

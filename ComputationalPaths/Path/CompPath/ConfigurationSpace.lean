@@ -221,7 +221,10 @@ noncomputable def ConfigurationSpace.forget_restrict_rweq {A : Type u} {n : Nat}
     RwEq
       (ConfigurationSpace.forget_restrict_path c)
       (ConfigurationSpace.forget_restrict_path c) :=
-  rweq_refl _
+  by
+    exact rweq_trans
+      (rweq_symm (rweq_cmpA_refl_right (ConfigurationSpace.forget_restrict_path c)))
+      (rweq_cmpA_refl_right (ConfigurationSpace.forget_restrict_path c))
 
 /-! ## Transport of configurations along maps -/
 
@@ -258,7 +261,10 @@ noncomputable def ConfigurationSpace.mapConfig_id_rweq {A : Type u} {n : Nat}
     RwEq
       (ConfigurationSpace.mapConfig_id_path c)
       (ConfigurationSpace.mapConfig_id_path c) :=
-  rweq_refl _
+  by
+    exact rweq_trans
+      (rweq_symm (rweq_cmpA_refl_right (ConfigurationSpace.mapConfig_id_path c)))
+      (rweq_cmpA_refl_right (ConfigurationSpace.mapConfig_id_path c))
 
 theorem ConfigurationSpace.mapConfig_comp_eq {A B C : Type u} {n : Nat}
     (g : A → B)
@@ -293,7 +299,10 @@ noncomputable def ConfigurationSpace.mapConfig_comp_rweq {A B C : Type u} {n : N
     RwEq
       (ConfigurationSpace.mapConfig_comp_path g hg h hh c)
       (ConfigurationSpace.mapConfig_comp_path g hg h hh c) :=
-  rweq_refl _
+  by
+    exact rweq_trans
+      (rweq_symm (rweq_cmpA_refl_right (ConfigurationSpace.mapConfig_comp_path g hg h hh c)))
+      (rweq_cmpA_refl_right (ConfigurationSpace.mapConfig_comp_path g hg h hh c))
 
 /-! ## Unordered configuration space -/
 

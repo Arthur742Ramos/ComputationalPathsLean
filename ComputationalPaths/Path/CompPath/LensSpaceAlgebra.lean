@@ -445,7 +445,10 @@ noncomputable def lensSpaceLoopPow_rweq_refl (p q n : Nat) :
     RwEq (lensSpaceLoopPow p q n) (Path.refl (lensSpaceBase p q)) := by
   induction n with
   | zero =>
-      simpa [lensSpaceLoopPow] using (rweq_refl (Path.refl (lensSpaceBase p q)))
+      simpa [lensSpaceLoopPow] using
+        (rweq_trans
+          (rweq_symm (rweq_cmpA_refl_right (Path.refl (lensSpaceBase p q))))
+          (rweq_cmpA_refl_right (Path.refl (lensSpaceBase p q))))
   | succ n ih =>
       simpa [lensSpaceLoopPow] using
         (rweq_trans

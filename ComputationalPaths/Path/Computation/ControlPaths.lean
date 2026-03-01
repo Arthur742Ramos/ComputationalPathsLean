@@ -11,7 +11,7 @@ optimal control, Kalman decomposition, stabilization, and tracking.
 - Khalil, "Nonlinear Systems"
 -/
 
-import ComputationalPaths
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
