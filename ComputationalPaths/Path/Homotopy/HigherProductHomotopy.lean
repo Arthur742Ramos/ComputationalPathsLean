@@ -60,23 +60,23 @@ standard rewrite congruence lemmas already available for:
 -/
 
 /-- Type representing π_n(A, a) for the higher product theorem. -/
-abbrev HigherPiN (A : Type u) (a : A) (n : Nat) : Type u :=
+abbrev HigherPiN (A : Type u) (a : A) (n : Nat) : Type (u + 2) :=
   HigherHomotopy.PiN n A a
 
 /-- The trivial element in π_n. -/
 noncomputable def higherPiN_refl (A : Type u) (a : A) (n : Nat) : HigherPiN A a n :=
   match n with
-  | 0 => PUnit.unit
-  | 1 => LoopQuot.id (A := A) (a := a)
+  | 0 => ULift.up PUnit.unit
+  | 1 => ULift.up (LoopQuot.id (A := A) (a := a))
   | 2 => PiTwo.id (A := A) (a := a)
-  | _ + 3 => PUnit.unit
+  | _ + 3 => ULift.up PUnit.unit
 
 /-- Type representing π_n(A × B, (a, b)). -/
-noncomputable def ProdHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
+noncomputable def ProdHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) : Type (u + 2) :=
   HigherPiN (A × B) (a, b) n
 
 /-- Type representing π_n(A, a) × π_n(B, b). -/
-noncomputable def ProdOfHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) :=
+noncomputable def ProdOfHigherPiN (A B : Type u) (a : A) (b : B) (n : Nat) : Type (u + 2) :=
   HigherPiN A a n × HigherPiN B b n
 
 /-- Helper: `π₂` is always a subsingleton in the current computational-paths model. -/
@@ -91,9 +91,10 @@ private theorem piTwo_subsingleton (A : Type u) (a : A) :
       apply Quotient.sound
       exact ⟨OmegaGroupoid.contractibility₃ α β⟩
 
-private noncomputable def unit_equiv_unit_prod : SimpleEquiv PUnit (PUnit × PUnit) where
-  toFun := fun _ => (PUnit.unit, PUnit.unit)
-  invFun := fun _ => PUnit.unit
+private noncomputable def unit_equiv_unit_prod : 
+    SimpleEquiv (ULift.{u + 2, 0} PUnit) (ULift.{u + 2, 0} PUnit × ULift.{u + 2, 0} PUnit) where
+  toFun := fun _ => (ULift.up PUnit.unit, ULift.up PUnit.unit)
+  invFun := fun _ => ULift.up PUnit.unit
   left_inv := fun x => by cases x; rfl
   right_inv := fun y => by
     cases y with
@@ -118,6 +119,23 @@ private noncomputable def piTwo_equiv_prod {A B : Type u} (a : A) (b : B)
     letI : Subsingleton (π₂(B, b)) := piTwo_subsingleton (A := B) (a := b)
     exact Subsingleton.elim _ _
 
+private noncomputable def ulift_prod_equiv {A B : Type u} (a : A) (b : B) :
+    SimpleEquiv 
+      (ULift.{u + 2, u} (π₁(A × B, (a, b))))
+      (ULift.{u + 2, u} (π₁(A, a)) × ULift.{u + 2, u} (π₁(B, b))) where
+  toFun := fun ⟨x⟩ => 
+    let e := prodPiOneEquiv a b
+    (ULift.up (e.toFun x).1, ULift.up (e.toFun x).2)
+  invFun := fun ⟨⟨x₁⟩, ⟨x₂⟩⟩ =>
+    let e := prodPiOneEquiv a b
+    ULift.up (e.invFun (x₁, x₂))
+  left_inv := fun ⟨x⟩ => by
+    simp
+    rw [(prodPiOneEquiv a b).left_inv]
+  right_inv := fun ⟨⟨x₁⟩, ⟨x₂⟩⟩ => by
+    simp
+    rw [(prodPiOneEquiv a b).right_inv]
+
 /-- **Main Theorem**: π_n(A × B, (a, b)) ≃ π_n(A, a) × π_n(B, b).
 
 Higher homotopy groups preserve products. This generalizes the fundamental
@@ -126,7 +144,7 @@ noncomputable def prodHigherPiNEquiv {A B : Type u} (a : A) (b : B) (n : Nat) :
     SimpleEquiv (ProdHigherPiN A B a b n) (ProdOfHigherPiN A B a b n) :=
   match n with
   | 0 => unit_equiv_unit_prod
-  | 1 => prodPiOneEquiv (A := A) (B := B) a b
+  | 1 => ulift_prod_equiv (A := A) (B := B) a b
   | 2 => piTwo_equiv_prod (A := A) (B := B) a b
   | _ + 3 => unit_equiv_unit_prod
 
@@ -166,8 +184,9 @@ theorem prodHigherPiN_encode_refl {A B : Type u} (a : A) (b : B) (n : Nat) :
       cases n with
       | zero =>
           -- n = 1
-          simp [prodHigherPiN_encode, prodHigherPiNEquiv, higherPiN_refl, prodPiOneEquiv,
-            prodPiOneEncode, LoopQuot.id, PathRwQuot.refl]
+          simp [prodHigherPiN_encode, prodHigherPiNEquiv, higherPiN_refl, 
+                ulift_prod_equiv, prodPiOneEquiv, prodPiOneEncode, 
+                LoopQuot.id, PathRwQuot.refl]
       | succ n =>
           cases n with
           | zero => rfl
@@ -183,8 +202,9 @@ theorem prodHigherPiN_decode_refl {A B : Type u} (a : A) (b : B) (n : Nat) :
       cases n with
       | zero =>
           -- n = 1
-          simp [prodHigherPiN_decode, prodHigherPiNEquiv, higherPiN_refl, prodPiOneEquiv,
-            prodPiOneDecode, LoopQuot.id, PathRwQuot.refl, Path.prod]
+          simp [prodHigherPiN_decode, prodHigherPiNEquiv, higherPiN_refl, 
+                ulift_prod_equiv, prodPiOneEquiv, prodPiOneDecode, 
+                LoopQuot.id, PathRwQuot.refl, Path.prod]
       | succ n =>
           cases n with
           | zero => rfl
@@ -195,10 +215,10 @@ noncomputable def higherPiN_comp {X : Type u} (x : X) (n : Nat)
     :
     HigherPiN X x n → HigherPiN X x n → HigherPiN X x n :=
   match n with
-  | 0 => fun _ _ => PUnit.unit
-  | 1 => LoopQuot.comp (A := X) (a := x)
+  | 0 => fun _ _ => ULift.up PUnit.unit
+  | 1 => fun ⟨a⟩ ⟨b⟩ => ULift.up (LoopQuot.comp (A := X) (a := x) a b)
   | 2 => PiTwo.mul (A := X) (a := x)
-  | _ + 3 => fun _ _ => PUnit.unit
+  | _ + 3 => fun _ _ => ULift.up PUnit.unit
 
 /-- Group inverse on π_n. -/
 noncomputable def higherPiN_inv {X : Type u} (x : X) (n : Nat)

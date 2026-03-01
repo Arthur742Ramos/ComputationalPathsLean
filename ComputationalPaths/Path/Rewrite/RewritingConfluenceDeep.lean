@@ -21,7 +21,7 @@ namespace ComputationalPaths
 namespace Rewriting
 namespace ConfluenceDeep
 
-open ComputationalPaths.Path.Confluence
+open ComputationalPaths.Confluence
 open ComputationalPaths.Path
 
 universe u

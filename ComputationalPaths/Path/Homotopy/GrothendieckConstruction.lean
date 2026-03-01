@@ -64,7 +64,7 @@ abbrev GrothendieckTotal {A : Type u} (F : FundamentalGroupoidTypeFunctor A) : T
   Fibration.Total (P := F.obj)
 
 /-- The Grothendieck construction as the fundamental groupoid of the total space. -/
-abbrev GrothendieckConstruction {A : Type u} (F : FundamentalGroupoidTypeFunctor A) :
+noncomputable abbrev GrothendieckConstruction {A : Type u} (F : FundamentalGroupoidTypeFunctor A) :
     StrictGroupoid (GrothendieckTotal F) :=
   FundamentalGroupoid (GrothendieckTotal F)
 

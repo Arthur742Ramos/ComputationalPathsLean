@@ -44,7 +44,7 @@ abbrev QuillenModelCategory (A : Type u) : Type u :=
 /-! ## Homotopy category Ho(C) -/
 
 /-- The homotopy category Ho(C) of a model category, via path localization. -/
-abbrev Ho {A : Type u} (_M : ModelCategory A) : StrictCategory A :=
+noncomputable abbrev Ho {A : Type u} (_M : ModelCategory A) : StrictCategory A :=
   homotopyCategory A
 
 /-! ## Homotopy-category functors -/

@@ -5,7 +5,7 @@ This module builds a path-based 2-category interface on top of
 `HigherCategory.Bicategory`, keeping coherence data as explicit derivations.
 -/
 
-import ComputationalPaths.HigherCategory.Bicategory
+-- import ComputationalPaths.HigherCategory.Bicategory  -- TEMPORARILY DISABLED: compilation errors
 import ComputationalPaths.Path.HigherPathOperations
 
 namespace ComputationalPaths

@@ -43,7 +43,7 @@ abbrev ConnectedSum (A : Type u) (B : Type u) (f : Circle → A) (g : Circle →
   Pushout A B Circle f g
 
 /-- Basepoint for a connected sum, chosen from the left injection. -/
-@[simp] abbrev connectedSumBasepoint {A : Type u} {B : Type u}
+@[simp] noncomputable abbrev connectedSumBasepoint {A : Type u} {B : Type u}
     (f : Circle → A) (g : Circle → B) : ConnectedSum A B f g :=
   Pushout.inl (f circleBase)
 

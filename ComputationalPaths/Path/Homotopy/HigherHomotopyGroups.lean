@@ -34,7 +34,7 @@ private lemma atLeastTwo_false_one [Nat.AtLeastTwo 1] : False :=
   (Nat.not_succ_le_self 1 (Nat.AtLeastTwo.prop (n := 1)))
 
 /-- The n-th homotopy group `πₙ(X, x)` from `HigherHomotopy`. -/
-abbrev PiN (n : Nat) (X : Type u) (x : X) : Type u :=
+abbrev PiN (n : Nat) (X : Type u) (x : X) : Type (u + 2) :=
   HigherHomotopy.PiN n X x
 
 /-- Multiplication on πₙ in the computational-path model. -/

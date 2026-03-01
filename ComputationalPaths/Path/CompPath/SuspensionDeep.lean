@@ -28,13 +28,13 @@ universe u
 
 abbrev Susp (A : Type u) : Type u := SuspensionCompPath A
 
-abbrev north (A : Type u) : Susp A :=
+noncomputable abbrev north (A : Type u) : Susp A :=
   SuspensionCompPath.north (X := A)
 
-abbrev south (A : Type u) : Susp A :=
+noncomputable abbrev south (A : Type u) : Susp A :=
   SuspensionCompPath.south (X := A)
 
-abbrev merid {A : Type u} (a : A) : Path (north A) (south A) :=
+noncomputable abbrev merid {A : Type u} (a : A) : Path (north A) (south A) :=
   SuspensionCompPath.merid (X := A) a
 
 /-- A suspension loop written as an explicit `Path.trans` chain. -/
@@ -104,11 +104,11 @@ theorem sigmaPowS0_eq_sphereN (n : Nat) :
   | succ n ih =>
       simpa [iterSusp, SphereN, ih]
 
-abbrev sphereNorth (n : Nat) : SphereN (Nat.succ n) := north (SphereN n)
+noncomputable abbrev sphereNorth (n : Nat) : SphereN (Nat.succ n) := north (SphereN n)
 
-abbrev sphereSouth (n : Nat) : SphereN (Nat.succ n) := south (SphereN n)
+noncomputable abbrev sphereSouth (n : Nat) : SphereN (Nat.succ n) := south (SphereN n)
 
-abbrev sphereMerid (n : Nat) (x : SphereN n) :
+noncomputable abbrev sphereMerid (n : Nat) (x : SphereN n) :
     Path (sphereNorth n) (sphereSouth n) :=
   merid (A := SphereN n) x
 

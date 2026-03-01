@@ -81,7 +81,7 @@ noncomputable def freeLoopFiberSeq_exact (X : Type u) (x0 : X) :
 /-! ## Conjugacy classes in PiOne -/
 
 /-- Conjugation action of PiOne on itself. -/
-abbrev piOneConjAction (X : Type u) (x0 : X) :
+noncomputable abbrev piOneConjAction (X : Type u) (x0 : X) :
     Algebra.GroupAction (PiOne X x0)
       (Homotopy.LoopGroupAlgebra.loopGroupStructure X x0) (PiOne X x0) :=
   Algebra.GroupAction.conjugationAction

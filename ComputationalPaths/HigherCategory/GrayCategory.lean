@@ -5,7 +5,7 @@ This module packages Gray-style coherence data by treating 3-cells as primitive
 computational witnesses and 4-cells as higher contractions between them.
 -/
 
-import ComputationalPaths.HigherCategory.TwoCategory
+-- import ComputationalPaths.HigherCategory.TwoCategory  -- TEMPORARILY DISABLED: depends on broken Bicategory module
 
 namespace ComputationalPaths
 namespace HigherCategory

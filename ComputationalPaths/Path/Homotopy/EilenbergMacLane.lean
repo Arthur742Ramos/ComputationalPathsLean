@@ -29,7 +29,7 @@ universe u
 /-! ## Definition -/
 
 /-- An Eilenberg-MacLane space K(G,n): a type with basepoint and πₙ ≃ G. -/
-structure KSpace (G : Type u) (n : Nat) where
+structure KSpace (G : Type u) (n : Nat) : Type (u + 3) where
   /-- Underlying space. -/
   carrier : Type u
   /-- Chosen basepoint. -/
@@ -38,18 +38,18 @@ structure KSpace (G : Type u) (n : Nat) where
   piNEquiv : SimpleEquiv (HigherHomotopy.PiN n carrier base) G
 
 /-- K(G,1) as a specialization of K(G,n). -/
-abbrev KOneSpace (G : Type u) : Type (u + 1) :=
+abbrev KOneSpace (G : Type u) : Type (u + 3) :=
   KSpace G 1
 
 /-- The π₁ equivalence for a K(G,1) space. -/
-abbrev KOneSpace.piOneEquiv {G : Type u} (X : KOneSpace G) :
-    SimpleEquiv (PiOne X.carrier X.base) G :=
+noncomputable abbrev KOneSpace.piOneEquiv {G : Type u} (X : KOneSpace G) :
+    SimpleEquiv (HigherHomotopy.PiN 1 X.carrier X.base) G :=
   X.piNEquiv
 
 /-! ## Uniqueness up to homotopy -/
 
 /-- Homotopy equivalence between K(G,n) spaces, recorded on πₙ. -/
-abbrev KSpaceHomotopy {G : Type u} {n : Nat} (X Y : KSpace G n) : Type u :=
+abbrev KSpaceHomotopy {G : Type u} {n : Nat} (X Y : KSpace G n) : Type (max 0 (u + 2)) :=
   SimpleEquiv
     (HigherHomotopy.PiN n X.carrier X.base)
     (HigherHomotopy.PiN n Y.carrier Y.base)
@@ -57,10 +57,10 @@ abbrev KSpaceHomotopy {G : Type u} {n : Nat} (X Y : KSpace G n) : Type u :=
 /-- Any two K(G,n) spaces are equivalent at the level of πₙ. -/
 noncomputable def kSpaceUniqueUpToHomotopy {G : Type u} {n : Nat} (X Y : KSpace G n) :
     KSpaceHomotopy X Y :=
-  SimpleEquiv.comp X.piNEquiv (SimpleEquiv.symm Y.piNEquiv)
+  X.piNEquiv.comp Y.piNEquiv.symm
 
 /-- Homotopy equivalence between K(G,1) spaces, recorded on π₁. -/
-abbrev KOneHomotopy {G : Type u} (X Y : KOneSpace G) : Type u :=
+abbrev KOneHomotopy {G : Type u} (X Y : KOneSpace G) : Type (max 0 (u + 2)) :=
   KSpaceHomotopy X Y
 
 /-- Any two K(G,1) spaces are equivalent at the level of π₁. -/
@@ -99,23 +99,24 @@ theorem kSpace_piN_right_inv {G : Type u} {n : Nat} (X : KSpace G n)
 theorem kSpace_unique_self {G : Type u} {n : Nat} (X : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
     (kSpaceUniqueUpToHomotopy X X).toFun x = x := by
-  simp [kSpaceUniqueUpToHomotopy, X.piNEquiv.left_inv]
+  simp [kSpaceUniqueUpToHomotopy, SimpleEquiv.comp, SimpleEquiv.symm]
+  exact X.piNEquiv.left_inv x
 
 /-- The uniqueness equivalence composes piN equivalences. -/
 theorem kSpace_unique_comp {G : Type u} {n : Nat} (X Y : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
     (kSpaceUniqueUpToHomotopy X Y).toFun x =
       Y.piNEquiv.invFun (X.piNEquiv.toFun x) := by
-  simp [kSpaceUniqueUpToHomotopy]
+  simp [kSpaceUniqueUpToHomotopy, SimpleEquiv.comp, SimpleEquiv.symm]
 
 /-- K(G,1) specialization: the piOne equivalence agrees with the piN equiv. -/
 theorem kOne_piOne_eq_piN {G : Type u} (X : KOneSpace G) :
-    X.piOneEquiv = X.piNEquiv := by
+    X.piOneEquiv = X.piNEquiv := 
   rfl
 
 /-- Uniqueness at K(G,1) level is a special case of general uniqueness. -/
 theorem kOne_unique_eq_general {G : Type u} (X Y : KOneSpace G) :
-    kOneUniqueUpToHomotopy X Y = kSpaceUniqueUpToHomotopy X Y := by
+    kOneUniqueUpToHomotopy X Y = kSpaceUniqueUpToHomotopy X Y := 
   rfl
 
 /-- The homotopy equivalence between KSpaces has a left inverse. -/
@@ -123,7 +124,8 @@ theorem kSpace_homotopy_left_inv {G : Type u} {n : Nat} (X Y : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
     (kSpaceUniqueUpToHomotopy Y X).toFun
       ((kSpaceUniqueUpToHomotopy X Y).toFun x) = x := by
-  simp [kSpaceUniqueUpToHomotopy]
+  simp only [kSpaceUniqueUpToHomotopy, SimpleEquiv.comp, SimpleEquiv.symm]
+  rw [show Y.piNEquiv.invFun (X.piNEquiv.toFun x) = Y.piNEquiv.invFun (X.piNEquiv.toFun x) from rfl]
   rw [Y.piNEquiv.right_inv, X.piNEquiv.left_inv]
 
 /-- The homotopy equivalence between KSpaces has a right inverse. -/

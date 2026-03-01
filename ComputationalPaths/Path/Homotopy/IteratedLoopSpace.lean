@@ -80,35 +80,23 @@ noncomputable def omegaN_comp_id_rweq (n : Nat) {X : Pointed}
 /-! ## Associativity and unit laws -/
 
 /-- Associativity of composition in Ω^{n+1}(X). -/
-theorem omegaN_comp_assoc (n : Nat) {X : Pointed}
+noncomputable def omegaN_comp_assoc (n : Nat) {X : Pointed}
     (p q r : (OmegaN (n + 1) X).carrier) :
-    omegaNComp n (omegaNComp n p q) r =
-      omegaNComp n p (omegaNComp n q r) := by
-  exact
-    (rwEq_iff_toEq
-      (p := omegaNComp n (omegaNComp n p q) r)
-      (q := omegaNComp n p (omegaNComp n q r))).1
-      (omegaN_comp_assoc_rweq n p q r)
+    RwEq (omegaNComp n (omegaNComp n p q) r)
+      (omegaNComp n p (omegaNComp n q r)) :=
+  omegaN_comp_assoc_rweq n p q r
 
 /-- Left unit law in Ω^{n+1}(X). -/
-theorem omegaN_id_comp (n : Nat) {X : Pointed}
+noncomputable def omegaN_id_comp (n : Nat) {X : Pointed}
     (p : (OmegaN (n + 1) X).carrier) :
-    omegaNComp n (omegaNId n X) p = p := by
-  exact
-    (rwEq_iff_toEq
-      (p := omegaNComp n (omegaNId n X) p)
-      (q := p)).1
-      (omegaN_id_comp_rweq n p)
+    RwEq (omegaNComp n (omegaNId n X) p) p :=
+  omegaN_id_comp_rweq n p
 
 /-- Right unit law in Ω^{n+1}(X). -/
-theorem omegaN_comp_id (n : Nat) {X : Pointed}
+noncomputable def omegaN_comp_id (n : Nat) {X : Pointed}
     (p : (OmegaN (n + 1) X).carrier) :
-    omegaNComp n p (omegaNId n X) = p := by
-  exact
-    (rwEq_iff_toEq
-      (p := omegaNComp n p (omegaNId n X))
-      (q := p)).1
-      (omegaN_comp_id_rweq n p)
+    RwEq (omegaNComp n p (omegaNId n X)) p :=
+  omegaN_comp_id_rweq n p
 
 /-! ## Iterated delooping -/
 

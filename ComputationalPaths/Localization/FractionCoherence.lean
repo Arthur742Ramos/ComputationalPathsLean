@@ -16,14 +16,16 @@ This module deepens the localization infrastructure with:
 -/
 
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Localization.PathInfrastructure
 
 namespace ComputationalPaths
 namespace Localization
 
 open Path
-open Path.Step
 
 universe u
+
+noncomputable section
 
 /-! ## 1. Morphism class and saturation -/
 
@@ -116,10 +118,10 @@ structure LocalizationData (A : Type u) (B : Type u)
     Path (obj b) (obj a)
   /-- Right inverse law witnessed by Step. -/
   right_inv_step : ∀ {a b : A} (p : Path a b) (h : W.mem p),
-    Step (Path.trans (mapPath p) (inverts p h)) (Path.refl (obj a))
+    Path.Step (Path.trans (mapPath p) (inverts p h)) (Path.refl (obj a))
   /-- Left inverse law witnessed by Step. -/
   left_inv_step : ∀ {a b : A} (p : Path a b) (h : W.mem p),
-    Step (Path.trans (inverts p h) (mapPath p)) (Path.refl (obj b))
+    Path.Step (Path.trans (inverts p h) (mapPath p)) (Path.refl (obj b))
 
 variable {W : WeakEquivClass A} (L : LocalizationData A B W)
 
@@ -138,7 +140,7 @@ noncomputable def locMapReflRwEq (a : A) :
     RwEq
       (Path.trans (L.mapPath (Path.refl a)) (Path.refl (L.obj a)))
       (L.mapPath (Path.refl a)) :=
-  rweq_of_step (Step.trans_refl_right (L.mapPath (Path.refl a)))
+  rweq_of_step (Path.Step.trans_refl_right (L.mapPath (Path.refl a)))
 
 /-- Theorem 12: Double inversion roundtrip produces an identity path. -/
 noncomputable def locDoubleInvRwEq {a b : A} (p : Path a b) (h : W.mem p) :
@@ -153,7 +155,7 @@ noncomputable def locDoubleInvSimplRwEq {a b : A} (p : Path a b) (h : W.mem p) :
     RwEq
       (Path.trans (L.mapPath p) (Path.refl (L.obj b)))
       (L.mapPath p) :=
-  rweq_of_step (Step.trans_refl_right (L.mapPath p))
+  rweq_of_step (Path.Step.trans_refl_right (L.mapPath p))
 
 /-- Theorem 14: Full roundtrip equivalence. -/
 noncomputable def locRoundtripRwEq {a b : A} (p : Path a b) (h : W.mem p) :
@@ -244,7 +246,7 @@ noncomputable def leftFractionId_backward_rweq (a : A) :
     RwEq
       (Path.trans (leftFractionId a).backward (Path.refl a))
       (leftFractionId a).backward :=
-  rweq_of_step (Step.trans_refl_right (Path.refl a))
+  rweq_of_step (Path.Step.trans_refl_right (Path.refl a))
 
 /-- Theorem 24: Composing two left fractions via an intermediate path. -/
 def leftFractionComp (f : LeftFraction a b) (g : LeftFraction b c)
@@ -286,15 +288,14 @@ def hammockOfBackward {a b : A} (p : Path b a) : Hammock a b 1 :=
   Hammock.backward p (Hammock.nil b)
 
 /-- Theorem 28: Concatenation of hammocks. -/
-def hammockConcat {a b c : A} {m n : Nat} :
-    Hammock a b m → Hammock b c n → Hammock a c (m + n) := by
-  intro h1 h2
-  induction h1 with
-  | nil => exact h2
-  | forward p rest ih =>
-    exact Hammock.forward p (ih h2)
-  | backward p rest ih =>
-    exact Hammock.backward p (ih h2)
+def hammockConcat {a b c : A} :
+    ∀ {m n : Nat}, Hammock a b m → Hammock b c n → Hammock a c (m + n)
+  | 0, _, Hammock.nil _, h2 => by
+      simpa using h2
+  | _ + 1, _, Hammock.forward p rest, h2 => by
+      simpa [Nat.succ_add] using Hammock.forward p (hammockConcat rest h2)
+  | _ + 1, _, Hammock.backward p rest, h2 => by
+      simpa [Nat.succ_add] using Hammock.backward p (hammockConcat rest h2)
 
 /-- Theorem 29: Collapsing a width-0 hammock. -/
 def hammockCollapse {a : A} : Hammock a a 0 → Path a a :=
@@ -302,15 +303,15 @@ def hammockCollapse {a : A} : Hammock a a 0 → Path a a :=
 
 /-- Theorem 30: Extracting the underlying path from a width-1 forward hammock. -/
 def hammockExtract {a b : A} : Hammock a b 1 → Path a b
-  | Hammock.forward p _ => p
-  | Hammock.backward p _ => Path.symm p
+  | Hammock.forward p (Hammock.nil _) => p
+  | Hammock.backward p (Hammock.nil _) => Path.symm p
 
 /-- Theorem 31: A width-2 hammock (forward-backward) yields a composed path. -/
 def hammockW2Extract {a b : A} : Hammock a b 2 → (c : A) × Path a c × Path b c
-  | Hammock.forward p (Hammock.backward q _) => ⟨_, p, q⟩
-  | Hammock.forward p (Hammock.forward q _) => ⟨_, p, Path.symm q⟩
-  | Hammock.backward p (Hammock.forward q _) => ⟨_, Path.symm p, Path.symm q⟩
-  | Hammock.backward p (Hammock.backward q _) => ⟨_, Path.symm p, q⟩
+  | Hammock.forward p (Hammock.backward q (Hammock.nil _)) => ⟨_, p, q⟩
+  | Hammock.forward p (Hammock.forward q (Hammock.nil _)) => ⟨_, p, Path.symm q⟩
+  | Hammock.backward p (Hammock.forward q (Hammock.nil _)) => ⟨_, Path.symm p, Path.symm q⟩
+  | Hammock.backward p (Hammock.backward q (Hammock.nil _)) => ⟨_, Path.symm p, q⟩
 
 end Hammock
 
@@ -325,37 +326,37 @@ noncomputable def localized_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq
       (Path.trans (Path.trans p q) r)
       (Path.trans p (Path.trans q r)) :=
-  rweq_of_step (Step.trans_assoc p q r)
+  rweq_of_step (Path.Step.trans_assoc p q r)
 
 /-- Theorem 33: Left unit in localized composition. -/
 noncomputable def localized_left_unit (p : Path a b) :
     RwEq (Path.trans (Path.refl a) p) p :=
-  rweq_of_step (Step.trans_refl_left p)
+  rweq_of_step (Path.Step.trans_refl_left p)
 
 /-- Theorem 34: Right unit in localized composition. -/
 noncomputable def localized_right_unit (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p :=
-  rweq_of_step (Step.trans_refl_right p)
+  rweq_of_step (Path.Step.trans_refl_right p)
 
 /-- Theorem 35: Left inverse in localized category. -/
 noncomputable def localized_left_inv (p : Path a b) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl b) :=
-  rweq_of_step (Step.symm_trans p)
+  rweq_of_step (Path.Step.symm_trans p)
 
 /-- Theorem 36: Right inverse in localized category. -/
 noncomputable def localized_right_inv (p : Path a b) :
     RwEq (Path.trans p (Path.symm p)) (Path.refl a) :=
-  rweq_of_step (Step.trans_symm p)
+  rweq_of_step (Path.Step.trans_symm p)
 
 /-- Theorem 37: Involution of inversion in localized category. -/
 noncomputable def localized_inv_inv (p : Path a b) :
     RwEq (Path.symm (Path.symm p)) p :=
-  rweq_of_step (Step.symm_symm p)
+  rweq_of_step (Path.Step.symm_symm p)
 
 /-- Theorem 38: Contravariance of inversion. -/
 noncomputable def localized_inv_comp (p : Path a b) (q : Path b c) :
     RwEq (Path.symm (Path.trans p q)) (Path.trans (Path.symm q) (Path.symm p)) :=
-  rweq_of_step (Step.symm_trans_congr p q)
+  rweq_of_step (Path.Step.symm_trans_congr p q)
 
 /-- Theorem 39: Zigzag reduction in localized category. -/
 noncomputable def localized_zigzag (p : Path a b) :
@@ -363,8 +364,8 @@ noncomputable def localized_zigzag (p : Path a b) :
       (Path.trans (Path.trans p (Path.symm p)) p)
       p := by
   apply rweq_trans
-  · exact rweq_trans_congr_left p (rweq_of_step (Step.trans_symm p))
-  · exact rweq_of_step (Step.trans_refl_left p)
+  · exact rweq_trans_congr_left p (rweq_of_step (Path.Step.trans_symm p))
+  · exact rweq_of_step (Path.Step.trans_refl_left p)
 
 /-- Theorem 40: Reverse zigzag reduction. -/
 noncomputable def localized_reverse_zigzag (p : Path a b) :
@@ -372,8 +373,8 @@ noncomputable def localized_reverse_zigzag (p : Path a b) :
       (Path.trans (Path.trans (Path.symm p) p) (Path.symm p))
       (Path.symm p) := by
   apply rweq_trans
-  · exact rweq_trans_congr_left (Path.symm p) (rweq_of_step (Step.symm_trans p))
-  · exact rweq_of_step (Step.trans_refl_left (Path.symm p))
+  · exact rweq_trans_congr_left (Path.symm p) (rweq_of_step (Path.Step.symm_trans p))
+  · exact rweq_of_step (Path.Step.trans_refl_left (Path.symm p))
 
 end LocalizedCoherence
 
@@ -418,20 +419,11 @@ theorem saturated_middle {a b c d : A}
 theorem saturated_triple {a b c d : A}
     {p : Path a b} {q : Path b c} {r : Path c d}
     (hpq : S.mem (Path.trans p q)) (hqr : S.mem (Path.trans q r)) :
-    S.mem (Path.trans (Path.trans p q) r) :=
-  S.mem_trans hpq (by
-    have hq := S.two_of_six_middle hpq hqr
-    -- from q ∈ W and q·r ∈ W, get r
-    exact S.mem_trans (S.mem_symm hq) hqr
-    |> fun h => S.mem_trans (S.mem_symm (S.mem_trans (S.mem_symm hq) hqr))
-        (S.mem_trans (S.mem_symm hq) hqr)
-    |> fun _ => S.mem_trans (S.mem_symm hq) hqr
-    |> fun h2 => by
-        -- h2 : mem (trans (symm q) (trans q r))
-        -- need: mem r
-        -- use: trans (symm q) (trans q r) as a proxy
-        exact S.mem_trans (S.mem_symm hpq) (S.mem_trans hpq (S.mem_trans (S.mem_symm hq) hqr)
-          |> fun _ => by exact S.two_of_six_middle hqr (S.mem_trans (S.mem_symm hqr) hqr)))
+    S.mem (Path.trans (Path.trans p q) (Path.trans (Path.symm q) (Path.trans q r))) := by
+  have hq : S.mem q := S.two_of_six_middle hpq hqr
+  have htail : S.mem (Path.trans (Path.symm q) (Path.trans q r)) :=
+    S.mem_trans (S.mem_symm hq) hqr
+  exact S.mem_trans hpq htail
 
 end Saturation
 
@@ -459,7 +451,7 @@ noncomputable def locFunctor_comp_reduce (L : LocalizationFunctor A)
       (Path.trans (L.mapPath p) (Path.refl (L.obj b)))
       (Path.congrArg L.obj p) := by
   apply rweq_trans
-  · exact rweq_of_step (Step.trans_refl_right (L.mapPath p))
+  · exact rweq_of_step (Path.Step.trans_refl_right (L.mapPath p))
   · exact L.mapPath_preserves_rweq p
 
 /-- Theorem 48: Double map reduces via reflection. -/
@@ -468,12 +460,12 @@ noncomputable def locFunctor_double_map (L : LocalizationFunctor A)
     RwEq
       (Path.trans (L.mapPath p) (Path.refl (L.obj b)))
       (L.mapPath p) :=
-  rweq_of_step (Step.trans_refl_right (L.mapPath p))
+  rweq_of_step (Path.Step.trans_refl_right (L.mapPath p))
 
 /-- Theorem 49: Reflection and map compose to produce a step. -/
 theorem locFunctor_reflect_step (L : LocalizationFunctor A)
     {a b : A} (q : Path (L.obj a) (L.obj b)) :
-    Step (Path.congrArg L.obj (L.reflectPath q)) q :=
+    Path.Step (Path.congrArg L.obj (L.reflectPath q)) q :=
   L.reflect_step q
 
 /-- Theorem 50: Reflection-map roundtrip as RwEq. -/
@@ -484,6 +476,8 @@ noncomputable def locFunctor_reflect_roundtrip (L : LocalizationFunctor A)
     (rweq_of_step (L.reflect_step q))
 
 end FunctorCoherence
+
+end
 
 end Localization
 end ComputationalPaths

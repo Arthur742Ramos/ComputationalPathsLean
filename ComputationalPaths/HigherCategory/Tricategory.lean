@@ -5,7 +5,7 @@ This module lifts bicategorical pentagon/triangle coherence to tricategorical
 data: 3-cells for the identities and 4-cells/5-cells as higher modifications.
 -/
 
-import ComputationalPaths.HigherCategory.GrayCategory
+-- import ComputationalPaths.HigherCategory.GrayCategory  -- TEMPORARILY DISABLED: depends on broken TwoCategory
 
 namespace ComputationalPaths
 namespace HigherCategory

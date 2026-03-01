@@ -287,6 +287,14 @@ noncomputable def PiN (n : Nat) (A : Type u) (a : A) : Type (u + 2) :=
 
 notation "πₙ(" n ", " A ", " a ")" => PiN n A a
 
+/-- The basepoint (identity element) of πₙ. -/
+noncomputable def piNBasepoint (n : Nat) (A : Type u) (a : A) : PiN n A a :=
+  match n with
+  | 0 => ULift.up PUnit.unit
+  | 1 => ULift.up (Quot.mk _ (Path.refl a))
+  | 2 => PiTwo.id
+  | _ + 3 => ULift.up PUnit.unit
+
 /-! ## Trivial Higher Groups
 
 A key feature of the computational paths framework is that contractibility

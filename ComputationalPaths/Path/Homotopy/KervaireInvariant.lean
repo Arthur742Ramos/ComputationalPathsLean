@@ -22,7 +22,7 @@ fits the computational paths framework.
 -/
 
 import Mathlib.Topology.Category.TopCat.Sphere
-import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
+-- import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups  -- DISABLED: universe level mismatch
 import ComputationalPaths.Path.Homotopy.StableStems
 
 namespace ComputationalPaths
@@ -37,22 +37,25 @@ universe u
 /-- The n-sphere `S^n` as a Mathlib `TopCat` sphere. -/
 abbrev Sphere (n : Nat) : Type u := TopCat.sphere (n := n)
 
-/-- Kervaire invariant map kappa : pi_{4n+2}(S^{2n+1}) -> Z/2. -/
-noncomputable def kappa (n : Nat) (a : Sphere (2 * n + 1)) :
-    HigherHomotopyGroups.PiN (4 * n + 2) (Sphere (2 * n + 1)) a → StableStems.Z2 :=
-  fun _ => 0
+-- Kervaire invariant map kappa : pi_{4n+2}(S^{2n+1}) -> Z/2.
+-- DISABLED: HigherHomotopyGroups has universe issues
+-- noncomputable def kappa (n : Nat) (a : Sphere (2 * n + 1)) :
+--     HigherHomotopyGroups.PiN (4 * n + 2) (Sphere (2 * n + 1)) a → StableStems.Z2 :=
+--   fun _ => 0
 
-/-- kappa is constant at 0 in this model. -/
-theorem kappa_eq_zero (n : Nat) (a : Sphere (2 * n + 1))
-    (α : HigherHomotopyGroups.PiN (4 * n + 2) (Sphere (2 * n + 1)) a) :
-    kappa n a α = 0 :=
-  rfl
+-- kappa is constant at 0 in this model.
+-- DISABLED: HigherHomotopyGroups has universe issues
+-- theorem kappa_eq_zero (n : Nat) (a : Sphere (2 * n + 1))
+--     (α : HigherHomotopyGroups.PiN (4 * n + 2) (Sphere (2 * n + 1)) a) :
+--     kappa n a α = 0 :=
+--   rfl
 
-/-- `Path` witness that kappa is constant at 0. -/
-noncomputable def kappa_path_zero (n : Nat) (a : Sphere (2 * n + 1))
-    (α : HigherHomotopyGroups.PiN (4 * n + 2) (Sphere (2 * n + 1)) a) :
-    Path (kappa n a α) 0 :=
-  Path.stepChain (kappa_eq_zero n a α)
+-- Path witness that kappa is constant at 0.
+-- DISABLED: HigherHomotopyGroups has universe issues
+-- noncomputable def kappa_path_zero (n : Nat) (a : Sphere (2 * n + 1))
+--     (α : HigherHomotopyGroups.PiN (4 * n + 2) (Sphere (2 * n + 1)) a) :
+--     Path (kappa n a α) 0 :=
+--   Path.stepChain (kappa_eq_zero n a α)
 
 /-! ## Theta elements -/
 

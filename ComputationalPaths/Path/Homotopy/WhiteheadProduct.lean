@@ -4,7 +4,7 @@
 This module defines the Whitehead product on homotopy groups in the
 computational-paths setting. The bracket [x, y] lands in π_{m+n-1} and is
 implemented by the loop commutator in the (m,n) = (1,1) case, while other
-degrees use the canonical base element provided by `piN_one`.
+degrees use the canonical base element provided by `HigherHomotopy.piNBasepoint`.
 
 ## Key Results
 
@@ -22,15 +22,17 @@ degrees use the canonical base element provided by `piN_one`.
 - Hatcher, *Algebraic Topology*, Section 4.2
 -/
 
-import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
+-- import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups  -- DISABLED: universe level mismatch
 import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
+import ComputationalPaths.Path.Homotopy.HigherHomotopy
 
 namespace ComputationalPaths
 namespace Path
 namespace Homotopy
 namespace WhiteheadProduct
 
-open HigherHomotopyGroups
+-- open HigherHomotopyGroups  -- DISABLED: universe level mismatch
+open HigherHomotopy
 
 universe u
 
@@ -38,10 +40,10 @@ universe u
 
 /-- Whitehead product on computational-path homotopy groups. -/
 noncomputable def whiteheadProduct {m n : Nat} {A : Type u} {a : A} :
-    PiN m A a → PiN n A a → PiN (m + n - 1) A a :=
+    HigherHomotopy.PiN m A a → HigherHomotopy.PiN n A a → HigherHomotopy.PiN (m + n - 1) A a :=
   match m, n with
   | 1, 1 => fun x y => LoopGroupAlgebra.commutator (A := A) (a := a) x y
-  | m, n => fun _ _ => piN_one (n := m + n - 1) (x := a)
+  | m, n => fun _ _ => HigherHomotopy.piNBasepoint (m + n - 1) A a
 
 /-- Bracket notation for the Whitehead product. -/
 notation "[" x ", " y "]" => whiteheadProduct x y
@@ -50,43 +52,43 @@ notation "[" x ", " y "]" => whiteheadProduct x y
 
 /-- The Whitehead product with the identity on the left (in π₁) is trivial. -/
 theorem whitehead_identity_left_pi1 {A : Type u} {a : A}
-    (y : PiN 1 A a) :
-    whiteheadProduct (m := 1) (n := 1) (piN_one 1 a) y = piN_one 1 a :=
+    (y : HigherHomotopy.PiN 1 A a) :
+    whiteheadProduct (m := 1) (n := 1) (HigherHomotopy.piNBasepoint 1 A a a) y = HigherHomotopy.piNBasepoint 1 A a a :=
   LoopGroupAlgebra.commutator_id_left (A := A) (a := a) y
 
 /-- The Whitehead product with the identity on the right (in π₁) is trivial. -/
 theorem whitehead_identity_right_pi1 {A : Type u} {a : A}
-    (x : PiN 1 A a) :
-    whiteheadProduct (m := 1) (n := 1) x (piN_one 1 a) = piN_one 1 a :=
+    (x : HigherHomotopy.PiN 1 A a) :
+    whiteheadProduct (m := 1) (n := 1) x (HigherHomotopy.piNBasepoint 1 A a a) = HigherHomotopy.piNBasepoint 1 A a a :=
   LoopGroupAlgebra.commutator_id_right (A := A) (a := a) x
 
 /-- Whitehead product is trivial when the first index is 0. -/
 theorem whitehead_zero_left {n : Nat} {A : Type u} {a : A}
-    (x : PiN 0 A a) (y : PiN n A a) :
-    whiteheadProduct (m := 0) (n := n) x y = piN_one (0 + n - 1) a := rfl
+    (x : HigherHomotopy.PiN 0 A a) (y : HigherHomotopy.PiN n A a) :
+    whiteheadProduct (m := 0) (n := n) x y = HigherHomotopy.piNBasepoint (0 + n - 1) a := rfl
 
 /-- Whitehead product is trivial when the first index is ≥ 2. -/
 theorem whitehead_high_left {m n : Nat} {A : Type u} {a : A}
-    (x : PiN (m + 2) A a) (y : PiN n A a) :
-    whiteheadProduct (m := m + 2) (n := n) x y = piN_one (m + 2 + n - 1) a := rfl
+    (x : HigherHomotopy.PiN (m + 2) A a) (y : HigherHomotopy.PiN n A a) :
+    whiteheadProduct (m := m + 2) (n := n) x y = HigherHomotopy.piNBasepoint (m + 2 + n - 1) a := rfl
 
 /-- Whitehead product is trivial when the second index is 0 and first is 1. -/
 theorem whitehead_one_zero {A : Type u} {a : A}
-    (x : PiN 1 A a) (y : PiN 0 A a) :
-    whiteheadProduct (m := 1) (n := 0) x y = piN_one 0 a := rfl
+    (x : HigherHomotopy.PiN 1 A a) (y : HigherHomotopy.PiN 0 A a) :
+    whiteheadProduct (m := 1) (n := 0) x y = HigherHomotopy.piNBasepoint 0 A a := rfl
 
 /-- Whitehead product is trivial when the second index is ≥ 2 and first is 1. -/
 theorem whitehead_one_high {n : Nat} {A : Type u} {a : A}
-    (x : PiN 1 A a) (y : PiN (n + 2) A a) :
+    (x : HigherHomotopy.PiN 1 A a) (y : HigherHomotopy.PiN (n + 2) A a) :
     whiteheadProduct (m := 1) (n := n + 2) x y =
-      piN_one (1 + (n + 2) - 1) a := rfl
+      HigherHomotopy.piNBasepoint (1 + (n + 2) - 1) a := rfl
 
 /-! ## Self-Product -/
 
 /-- The Whitehead product of an element with itself in π₁ is trivial. -/
 theorem whitehead_self_pi1 {A : Type u} {a : A}
-    (x : PiN 1 A a) :
-    whiteheadProduct (m := 1) (n := 1) x x = piN_one 1 a :=
+    (x : HigherHomotopy.PiN 1 A a) :
+    whiteheadProduct (m := 1) (n := 1) x x = HigherHomotopy.piNBasepoint 1 A a :=
   LoopGroupAlgebra.commutator_self (A := A) (a := a) x
 
 /-! ## Antisymmetry -/
@@ -124,7 +126,7 @@ theorem gradedSign_zero_right (n : Nat) : gradedSign n 0 = 1 := by
 
 /-- In the fundamental group (m=n=1), the Whitehead product is the commutator. -/
 theorem whitehead_eq_commutator {A : Type u} {a : A}
-    (x y : PiN 1 A a) :
+    (x y : HigherHomotopy.PiN 1 A a) :
     whiteheadProduct (m := 1) (n := 1) x y =
       LoopGroupAlgebra.commutator (A := A) (a := a) x y := rfl
 
@@ -132,7 +134,7 @@ theorem whitehead_eq_commutator {A : Type u} {a : A}
 
 /-- Conjugation preserves Whitehead products in the fundamental group. -/
 theorem whitehead_conj_invariant {A : Type u} {a : A}
-    (g x y : PiN 1 A a) :
+    (g x y : HigherHomotopy.PiN 1 A a) :
     LoopGroupAlgebra.conj (A := A) (a := a) g
       (whiteheadProduct (m := 1) (n := 1) x y) =
     whiteheadProduct (m := 1) (n := 1)
@@ -144,26 +146,26 @@ theorem whitehead_conj_invariant {A : Type u} {a : A}
 
 /-- Iterated Whitehead product (left-associated) on π₁. -/
 noncomputable def iteratedWhitehead {A : Type u} {a : A} :
-    (n : Nat) → PiN 1 A a → PiN 1 A a → PiN 1 A a
-  | 0 => fun _ _ => piN_one 1 a
+    (n : Nat) → HigherHomotopy.PiN 1 A a → HigherHomotopy.PiN 1 A a → HigherHomotopy.PiN 1 A a
+  | 0 => fun _ _ => HigherHomotopy.piNBasepoint 1 A a
   | 1 => fun x y => whiteheadProduct (m := 1) (n := 1) x y
   | n + 2 => fun x y => whiteheadProduct (m := 1) (n := 1) x
       (iteratedWhitehead (n + 1) x y)
 
 /-- The zeroth iterated product is the identity. -/
 theorem iteratedWhitehead_zero {A : Type u} {a : A}
-    (x y : PiN 1 A a) :
-    iteratedWhitehead 0 x y = piN_one 1 a := rfl
+    (x y : HigherHomotopy.PiN 1 A a) :
+    iteratedWhitehead 0 x y = HigherHomotopy.piNBasepoint 1 A a := rfl
 
 /-- The first iterated product is the regular Whitehead product. -/
 theorem iteratedWhitehead_one {A : Type u} {a : A}
-    (x y : PiN 1 A a) :
+    (x y : HigherHomotopy.PiN 1 A a) :
     iteratedWhitehead 1 x y = whiteheadProduct (m := 1) (n := 1) x y := rfl
 
 /-- The iterated product of identity is identity. -/
 theorem iteratedWhitehead_id {A : Type u} {a : A}
-    (n : Nat) (y : PiN 1 A a) :
-    iteratedWhitehead n (piN_one 1 a) y = piN_one 1 a := by
+    (n : Nat) (y : HigherHomotopy.PiN 1 A a) :
+    iteratedWhitehead n (HigherHomotopy.piNBasepoint 1 A a) y = HigherHomotopy.piNBasepoint 1 A a := by
   induction n with
   | zero => rfl
   | succ n ih =>
@@ -172,22 +174,22 @@ theorem iteratedWhitehead_id {A : Type u} {a : A}
       | n + 1 =>
           simp [iteratedWhitehead]
           rw [ih]
-          exact whitehead_identity_right_pi1 (piN_one 1 a)
+          exact whitehead_identity_right_pi1 (HigherHomotopy.piNBasepoint 1 A a)
 
 /-! ## Whitehead Algebra Structure -/
 
 /-- The Whitehead algebra structure packaging the product and its properties. -/
 structure WhiteheadAlgebra (A : Type u) (a : A) where
   /-- The underlying product on π₁. -/
-  product : PiN 1 A a → PiN 1 A a → PiN 1 A a
+  product : HigherHomotopy.PiN 1 A a → HigherHomotopy.PiN 1 A a → HigherHomotopy.PiN 1 A a
   /-- Product is the commutator. -/
   product_eq : ∀ x y, product x y = LoopGroupAlgebra.commutator (A := A) (a := a) x y
   /-- Identity annihilates from the left. -/
-  id_left : ∀ y, product (piN_one 1 a) y = piN_one 1 a
+  id_left : ∀ y, product (HigherHomotopy.piNBasepoint 1 A a) y = HigherHomotopy.piNBasepoint 1 A a
   /-- Identity annihilates from the right. -/
-  id_right : ∀ x, product x (piN_one 1 a) = piN_one 1 a
+  id_right : ∀ x, product x (HigherHomotopy.piNBasepoint 1 A a) = HigherHomotopy.piNBasepoint 1 A a
   /-- Self-product is trivial. -/
-  self_trivial : ∀ x, product x x = piN_one 1 a
+  self_trivial : ∀ x, product x x = HigherHomotopy.piNBasepoint 1 A a
 
 /-- The canonical Whitehead algebra structure on any type. -/
 noncomputable def canonicalWhiteheadAlgebra (A : Type u) (a : A) : WhiteheadAlgebra A a where
@@ -202,13 +204,13 @@ noncomputable def canonicalWhiteheadAlgebra (A : Type u) (a : A) : WhiteheadAlge
 /-- Path witness that the Whitehead product of identities is the identity. -/
 noncomputable def whitehead_id_id_path {A : Type u} {a : A} :
     Path
-      (whiteheadProduct (m := 1) (n := 1) (A := A) (a := a) (piN_one 1 a) (piN_one 1 a))
-      (piN_one 1 a) :=
-  Path.stepChain (whitehead_self_pi1 (piN_one 1 a))
+      (whiteheadProduct (m := 1) (n := 1) (A := A) (a := a) (HigherHomotopy.piNBasepoint 1 A a) (HigherHomotopy.piNBasepoint 1 A a))
+      (HigherHomotopy.piNBasepoint 1 A a) :=
+  Path.stepChain (whitehead_self_pi1 (HigherHomotopy.piNBasepoint 1 A a))
 
 /-- Path witness that the Whitehead product equals the commutator. -/
 noncomputable def whitehead_commutator_path {A : Type u} {a : A}
-    (x y : PiN 1 A a) :
+    (x y : HigherHomotopy.PiN 1 A a) :
     Path
       (whiteheadProduct (m := 1) (n := 1) x y)
       (LoopGroupAlgebra.commutator (A := A) (a := a) x y) :=
@@ -216,7 +218,7 @@ noncomputable def whitehead_commutator_path {A : Type u} {a : A}
 
 /-- Path witness that conjugation is compatible with the Whitehead product. -/
 noncomputable def whitehead_conj_path {A : Type u} {a : A}
-    (g x y : PiN 1 A a) :
+    (g x y : HigherHomotopy.PiN 1 A a) :
     Path
       (LoopGroupAlgebra.conj (A := A) (a := a) g
         (whiteheadProduct (m := 1) (n := 1) x y))
@@ -229,7 +231,7 @@ noncomputable def whitehead_conj_path {A : Type u} {a : A}
 
 /-- Whitehead product with a power element. -/
 theorem whitehead_pow_left {A : Type u} {a : A}
-    (x y : PiN 1 A a) (n : Nat) :
+    (x y : HigherHomotopy.PiN 1 A a) (n : Nat) :
     whiteheadProduct (m := 1) (n := 1)
       (LoopGroupAlgebra.pow (A := A) (a := a) x n) y =
     LoopGroupAlgebra.commutator (A := A) (a := a)
@@ -237,10 +239,10 @@ theorem whitehead_pow_left {A : Type u} {a : A}
 
 /-- Whitehead product of identity power (n=0) is trivial. -/
 theorem whitehead_pow_zero {A : Type u} {a : A}
-    (x y : PiN 1 A a) :
+    (x y : HigherHomotopy.PiN 1 A a) :
     whiteheadProduct (m := 1) (n := 1)
       (LoopGroupAlgebra.pow (A := A) (a := a) x 0) y =
-    piN_one 1 a := by
+    HigherHomotopy.piNBasepoint 1 A a := by
   show LoopGroupAlgebra.commutator (A := A) (a := a)
     (LoopGroupAlgebra.pow (A := A) (a := a) x 0) y = _
   rw [LoopGroupAlgebra.pow_zero]
@@ -266,9 +268,9 @@ theorem whitehead_one_n_degree (n : Nat) (hn : n ≥ 1) :
     f_*(wp(x,y)) = wp(f_*(x), f_*(y)) in the (1,1) case,
     where f_* is the induced map on π₁. -/
 structure WhiteheadNatural {A : Type u} {B : Type u} {a : A} {b : B}
-    (f_star : PiN 1 A a → PiN 1 B b) where
+    (f_star : HigherHomotopy.PiN 1 A a → HigherHomotopy.PiN 1 B b) where
   /-- Naturality of the Whitehead product. -/
-  natural : ∀ x y : PiN 1 A a,
+  natural : ∀ x y : HigherHomotopy.PiN 1 A a,
     f_star (whiteheadProduct (m := 1) (n := 1) x y) =
     whiteheadProduct (m := 1) (n := 1) (f_star x) (f_star y)
 
@@ -277,7 +279,7 @@ structure WhiteheadNatural {A : Type u} {B : Type u} {a : A} {b : B}
 /-- The n-th term of the lower central series of π₁, defined via iterated
     Whitehead products. -/
 noncomputable def lowerCentralTerm {A : Type u} {a : A}
-    (n : Nat) (S : List (PiN 1 A a)) : List (PiN 1 A a) :=
+    (n : Nat) (S : List (HigherHomotopy.PiN 1 A a)) : List (HigherHomotopy.PiN 1 A a) :=
   match n with
   | 0 => S
   | n + 1 =>
@@ -287,7 +289,7 @@ noncomputable def lowerCentralTerm {A : Type u} {a : A}
 
 /-- The zeroth term of the lower central series is the original set. -/
 theorem lowerCentral_zero {A : Type u} {a : A}
-    (S : List (PiN 1 A a)) :
+    (S : List (HigherHomotopy.PiN 1 A a)) :
     lowerCentralTerm 0 S = S := rfl
 
 /-! ## Abelianization -/
@@ -296,10 +298,10 @@ theorem lowerCentral_zero {A : Type u} {a : A}
     This is because commutators are trivial in abelian groups. -/
 structure AbelianWhitehead (A : Type u) (a : A) where
   /-- The abelianization map. -/
-  abel : PiN 1 A a → PiN 1 A a
+  abel : HigherHomotopy.PiN 1 A a → HigherHomotopy.PiN 1 A a
   /-- The abelianization kills all Whitehead products. -/
-  kills_whitehead : ∀ x y : PiN 1 A a,
-    abel (whiteheadProduct (m := 1) (n := 1) x y) = piN_one 1 a
+  kills_whitehead : ∀ x y : HigherHomotopy.PiN 1 A a,
+    abel (whiteheadProduct (m := 1) (n := 1) x y) = HigherHomotopy.piNBasepoint 1 A a
 
 /-! ## Summary
 

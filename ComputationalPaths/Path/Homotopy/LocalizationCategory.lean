@@ -33,15 +33,15 @@ universe u v
 /-! ## Homotopy localization -/
 
 /-- The homotopy category on a type `A`, obtained by localizing paths at `RwEq`. -/
-abbrev homotopyCategory (A : Type u) : StrictCategory A :=
+noncomputable abbrev homotopyCategory (A : Type u) : StrictCategory A :=
   pathLocalization A
 
 /-- The homotopy groupoid on a type `A`, obtained by localizing paths at `RwEq`. -/
-abbrev homotopyGroupoid (A : Type u) : StrictGroupoid A :=
+noncomputable abbrev homotopyGroupoid (A : Type u) : StrictGroupoid A :=
   pathLocalizationGroupoid A
 
 /-- The localization map on paths used in the homotopy category. -/
-abbrev homotopyLocalize {A : Type u} {a b : A} (p : Path a b) :
+noncomputable abbrev homotopyLocalize {A : Type u} {a b : A} (p : Path a b) :
     PathRwQuot A a b :=
   localize p
 

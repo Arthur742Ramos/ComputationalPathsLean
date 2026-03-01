@@ -19,7 +19,7 @@ image of the J-homomorphism.
 - Quillen, "Higher algebraic K-theory: I"
 -/
 
-import ComputationalPaths.Path.Homotopy.BottPeriodicity
+-- import ComputationalPaths.Path.Homotopy.BottPeriodicity  -- TEMPORARILY DISABLED: universe mismatch with PiTwo
 import ComputationalPaths.Path.Algebra.KTheory
 import ComputationalPaths.Path.Algebra.DerivedAlgebraicGeometry
 import ComputationalPaths.Path.Homotopy.StableHomotopyGroups

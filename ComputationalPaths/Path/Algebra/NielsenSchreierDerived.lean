@@ -21,7 +21,7 @@ to the integers.
 - de Queiroz et al., SAJL 2016
 -/
 
-import ComputationalPaths.Path.Algebra.NielsenSchreier
+-- import ComputationalPaths.Path.Algebra.NielsenSchreier  -- TEMPORARILY DISABLED: depends on broken FreeGroupProperties
 import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths

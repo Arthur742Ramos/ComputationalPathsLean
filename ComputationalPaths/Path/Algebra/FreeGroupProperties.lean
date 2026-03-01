@@ -13,11 +13,11 @@ The proofs reuse the explicit word normalization in `BouquetN` and the
 π₁(S¹) ≃ ℤ equivalence from `CircleStep`.
 -/
 
-import ComputationalPaths.Path.CompPath.BouquetN
+-- import ComputationalPaths.Path.CompPath.BouquetN  -- TEMPORARILY DISABLED: tactic errors in encode proofs
 import ComputationalPaths.Path.CompPath.CircleStep
 import ComputationalPaths.Path.CompPath.FigureEightStep
 import ComputationalPaths.Path.CompPath.PushoutPaths
-import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
+-- import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps  -- TEMPORARILY DISABLED: depends on broken BouquetN
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 namespace ComputationalPaths

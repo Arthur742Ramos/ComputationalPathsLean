@@ -14,7 +14,7 @@ power operations and inversion identities.
 - Inversion as an anti-automorphism on the monoid
 -/
 
-import ComputationalPaths.Path.CompPath.BouquetN
+-- import ComputationalPaths.Path.CompPath.BouquetN  -- TEMPORARILY DISABLED: tactic errors in encode proofs
 import ComputationalPaths.Path.Algebra.GroupStructures
 
 namespace ComputationalPaths

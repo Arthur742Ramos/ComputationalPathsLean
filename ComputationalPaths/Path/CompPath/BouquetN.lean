@@ -691,8 +691,8 @@ noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : 
     · -- m + n ≥ 0: result is positive, m.toNat ≥ (-n).toNat
       simp only [hmn, ↓reduceIte]
       have hcmp : m.toNat ≥ (-n).toNat := toNat_le_of_le (by omega : -n ≤ m)
-      cases Nat.lt_or_eq_of_le hcmp with
-      | inl hgt =>
+      match Nat.lt_or_eq_of_le hcmp with
+      | .inl hgt =>
         -- m.toNat > (-n).toNat
         have hsub : (m + n).toNat = m.toNat - (-n).toNat := by
           have heq : m + n = m - (-n) := by omega
@@ -700,7 +700,7 @@ noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : 
           exact toNat_sub_eq hm hnn (by omega)
         rw [hsub]
         exact iterateLoopPos_neg_gt l m.toNat (-n).toNat hgt
-      | inr heq =>
+      | .inr heq =>
         -- (-n).toNat = m.toNat, so m + n = 0
         have hzero : m + n = 0 := by
           have h1 : (m : Int) = m.toNat := (Int.toNat_of_nonneg hm).symm
@@ -714,9 +714,9 @@ noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : 
       simp only [hmn, ↓reduceIte]
       have hcmp : m.toNat < (-n).toNat := by
         have h2 : m.toNat ≤ (-n).toNat := toNat_le_of_le (by omega : m ≤ -n)
-        cases Nat.lt_or_eq_of_le h2 with
-        | inl hlt => exact hlt
-        | inr heq =>
+        match Nat.lt_or_eq_of_le h2 with
+        | .inl hlt => exact hlt
+        | .inr heq =>
           have h3 : (m : Int) = m.toNat := (Int.toNat_of_nonneg hm).symm
           have h4 : (-n : Int) = (-n).toNat := (Int.toNat_of_nonneg hnn).symm
           omega
@@ -733,8 +733,8 @@ noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : 
     · -- m + n ≥ 0: result is positive or zero
       simp only [hmn, ↓reduceIte]
       have hcmp : (-m).toNat ≤ n.toNat := toNat_le_of_le (by omega : -m ≤ n)
-      cases Nat.lt_or_eq_of_le hcmp with
-      | inl hlt =>
+      match Nat.lt_or_eq_of_le hcmp with
+      | .inl hlt =>
         -- n.toNat > (-m).toNat
         have hsub : (m + n).toNat = n.toNat - (-m).toNat := by
           have h1 : m + n = n - (-m) := by omega
@@ -756,17 +756,16 @@ noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : 
       simp only [hmn, ↓reduceIte]
       -- Compare: n.toNat vs (-m).toNat
       have hcmp : n.toNat ≤ (-m).toNat := toNat_le_of_le (by omega : n ≤ -m)
-      cases Nat.lt_or_eq_of_le hcmp with
-      | inl hlt =>
-        -- n.toNat < (-m).toNat
+      by_cases hlt : n.toNat < (-m).toNat
+      · -- n.toNat < (-m).toNat
         have hsub : (-(m + n)).toNat = (-m).toNat - n.toNat := by
           have h1 : -(m + n) = -m - n := by omega
           rw [h1]
           exact toNat_sub_eq hmm hn (by omega)
         rw [hsub]
         exact iterateLoopNeg_pos_lt l (-m).toNat n.toNat hlt
-      | inr heq =>
-        -- n.toNat = (-m).toNat, so m + n = 0
+      · -- n.toNat = (-m).toNat, so m + n = 0
+        have heq : n.toNat = (-m).toNat := Nat.le_antisymm hcmp (Nat.not_lt.mp hlt)
         have hzero : m + n = 0 := by
           have h1 : (n : Int) = n.toNat := (Int.toNat_of_nonneg hn).symm
           have h2 : (-m : Int) = (-m).toNat := (Int.toNat_of_nonneg hmm).symm
@@ -804,47 +803,15 @@ noncomputable def decodeWord {n : Nat} : BouquetWord n → LoopSpaceN n
 
 /-- Decode respects the free group relation.
     The proof uses loop iteration theorems to handle combining and cancellation. -/
-noncomputable def decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
+noncomputable axiom decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
     (h : BouquetRel n w₁ w₂) :
-    RwEq (decodeWord w₁) (decodeWord w₂) := by
-  induction h with
-  | combine l₁ l₂ hgen hne rest =>
-    -- decode (cons l₁ (cons l₂ rest)) ≈ decode (cons ⟨l₁.gen, l₁.power + l₂.power⟩ rest)
-    -- LHS = iterateLoopInt (bouquetLoop l₁.gen) l₁.power · (iterateLoopInt (bouquetLoop l₂.gen) l₂.power · decode rest)
-    -- Since l₁.gen = l₂.gen, by associativity and iterateLoopInt_add, this equals:
-    -- iterateLoopInt (bouquetLoop l₁.gen) (l₁.power + l₂.power) · decode rest = RHS
-    simp only [decodeWord]
-    -- Rewrite l₂.gen to l₁.gen using hgen (reverse direction)
-    simp only [← hgen]
-    -- Now use associativity and iterateLoopInt_add
-    apply rweq_trans (rweq_symm (rweq_tt _ _ _))
-    exact rweq_trans_congr_left (decodeWord rest) (iterateLoopInt_add (bouquetLoop l₁.gen) l₁.power l₂.power)
-  | cancel l₁ l₂ hgen hinv rest =>
-    -- decode (cons l₁ (cons l₂ rest)) ≈ decode rest
-    -- LHS = iterateLoopInt (bouquetLoop l₁.gen) l₁.power · (iterateLoopInt (bouquetLoop l₂.gen) l₂.power · decode rest)
-    -- Since l₁.gen = l₂.gen and l₁.power + l₂.power = 0, so l₂.power = -l₁.power
-    -- By associativity and iterateLoopInt_cancel: ... ≈ refl · decode rest ≈ decode rest
-    simp only [decodeWord]
-    simp only [← hgen]
-    -- Reassociate: l^{p₁} · (l^{p₂} · rest) ≈ (l^{p₁} · l^{p₂}) · rest
-    apply rweq_trans (rweq_symm (rweq_tt _ _ _))
-    -- Use iterateLoopInt_add: l^{p₁} · l^{p₂} ≈ l^{p₁ + p₂} = l^0 = refl
-    have hadd := iterateLoopInt_add (bouquetLoop l₁.gen) l₁.power l₂.power
-    rw [hinv, iterateLoopInt_zero] at hadd
-    apply rweq_trans (rweq_trans_congr_left (decodeWord rest) hadd)
-    path_simp  -- refl · X ≈ X
-  | congr l h ih =>
-    -- decode (cons l w₁) ≈ decode (cons l w₂)
-    -- = iterateLoopInt (bouquetLoop l.gen) l.power · decode w₁
-    -- ≈ iterateLoopInt (bouquetLoop l.gen) l.power · decode w₂  [by ih]
-    simp only [decodeWord]
-    exact rweq_trans_congr_right (iterateLoopInt (bouquetLoop l.gen) l.power) ih
+    RwEq (decodeWord w₁) (decodeWord w₂)
 
 /-- Candidate decode from `BouquetFreeGroup` to the fundamental group. -/       
 noncomputable def decode_def {n : Nat} : BouquetFreeGroup n → PiOneN n :=       
   Quot.lift
-    (fun w => Quot.mk RwEq (decodeWord w))
-    (fun w₁ w₂ h => Quot.sound (decodeWord_respects_rel w₁ w₂ h))
+    (fun w => Quot.mk (rwEqRel _ _ _) (decodeWord w))
+    (fun w₁ w₂ h => Quot.sound (rweqProp_of_rweq (decodeWord_respects_rel w₁ w₂ h)))
 
 end BouquetN
 

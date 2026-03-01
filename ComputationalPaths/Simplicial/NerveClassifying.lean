@@ -56,20 +56,20 @@ noncomputable def assoc_refl_right {x y z w : C}
 noncomputable def id_comp_symm_symm {x y : C} (f : D.hom x y) :
     RwEq (Path.symm (Path.symm (D.id_comp f)))
          (D.id_comp f) :=
-  rweq_of_step (Step.symm_symm (D.id_comp f))
+  rweq_of_step (Path.Step.symm_symm (D.id_comp f))
 
 /-- Symm-symm for right identity. -/
 noncomputable def comp_id_symm_symm {x y : C} (f : D.hom x y) :
     RwEq (Path.symm (Path.symm (D.comp_id f)))
          (D.comp_id f) :=
-  rweq_of_step (Step.symm_symm (D.comp_id f))
+  rweq_of_step (Path.Step.symm_symm (D.comp_id f))
 
 /-- Symm-symm for associativity. -/
 noncomputable def assoc_symm_symm {x y z w : C}
     (f : D.hom x y) (g : D.hom y z) (h : D.hom z w) :
     RwEq (Path.symm (Path.symm (D.assoc f g h)))
          (D.assoc f g h) :=
-  rweq_of_step (Step.symm_symm (D.assoc f g h))
+  rweq_of_step (Path.Step.symm_symm (D.assoc f g h))
 
 /-- Left identity right-cancels. -/
 noncomputable def id_comp_cancel_right {x y : C} (f : D.hom x y) :
@@ -164,14 +164,14 @@ noncomputable def map_comp_cancel_right (F : PathFunctor D₁ D₂)
 noncomputable def map_id_symm_symm (F : PathFunctor D₁ D₂) (x : C) :
     RwEq (Path.symm (Path.symm (F.map_id x)))
          (F.map_id x) :=
-  rweq_of_step (Step.symm_symm (F.map_id x))
+  rweq_of_step (Path.Step.symm_symm (F.map_id x))
 
 /-- Map-comp symm-symm. -/
 noncomputable def map_comp_symm_symm (F : PathFunctor D₁ D₂)
     {x y z : C} (f : D₁.hom x y) (g : D₁.hom y z) :
     RwEq (Path.symm (Path.symm (F.map_comp f g)))
          (F.map_comp f g) :=
-  rweq_of_step (Step.symm_symm (F.map_comp f g))
+  rweq_of_step (Path.Step.symm_symm (F.map_comp f g))
 
 /-- Map-id right unit. -/
 noncomputable def map_id_refl_right (F : PathFunctor D₁ D₂) (x : C) :
@@ -226,7 +226,7 @@ noncomputable def naturality_symm_symm (α : PathNatTrans F G)
     {x y : C} (f : D₁.hom x y) :
     RwEq (Path.symm (Path.symm (α.naturality f)))
          (α.naturality f) :=
-  rweq_of_step (Step.symm_symm (α.naturality f))
+  rweq_of_step (Path.Step.symm_symm (α.naturality f))
 
 /-- Naturality right-unit. -/
 noncomputable def naturality_refl_right (α : PathNatTrans F G)

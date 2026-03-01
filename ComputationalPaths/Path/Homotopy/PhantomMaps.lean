@@ -27,7 +27,7 @@ All proofs are complete — no placeholders, no axioms.
 -/
 
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
-import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
+-- import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups  -- DISABLED: universe level mismatch
 
 namespace ComputationalPaths
 namespace Path

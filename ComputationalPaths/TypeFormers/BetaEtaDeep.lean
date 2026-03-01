@@ -14,9 +14,8 @@ variable {f g : A → B}
 
 @[simp] noncomputable def piBetaStep
     (p : ∀ x : A, Path (f x) (g x)) (a : A) :
-    Step (Path.app (Path.lamCongr p) a) (p a) := by
-  simpa [Path.app] using
-    (Step.fun_app_beta (A := B) (α := A) (p := p) (a := a))
+    Step (Path.congrArg (fun h : A → B => h a) (Path.lamCongr p)) (p a) :=
+  Step.fun_app_beta (A := B) (α := A) (p := p) (a := a)
 
 @[simp] noncomputable def piEtaStep (p : Path f g) :
     Step (Path.lamCongr (fun x => Path.app p x)) p :=
@@ -24,7 +23,7 @@ variable {f g : A → B}
 
 @[simp] noncomputable def piBetaRwEq
     (p : ∀ x : A, Path (f x) (g x)) (a : A) :
-    RwEq (Path.app (Path.lamCongr p) a) (p a) :=
+    RwEq (Path.congrArg (fun h : A → B => h a) (Path.lamCongr p)) (p a) :=
   RwEq.step (piBetaStep p a)
 
 @[simp] noncomputable def piEtaRwEq (p : Path f g) :

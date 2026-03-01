@@ -9,7 +9,7 @@ namespace Rewriting
 
 open ComputationalPaths
 open ComputationalPaths.Path
-open ComputationalPaths.Path.Confluence
+open ComputationalPaths.Confluence
 
 universe u
 

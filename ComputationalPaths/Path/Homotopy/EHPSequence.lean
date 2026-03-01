@@ -24,7 +24,7 @@ invariant one witness via the Hopf-invariant data package.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
-import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
+-- import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups  -- DISABLED: universe level mismatch
 import ComputationalPaths.Path.Homotopy.FreudenthalSuspension
 import ComputationalPaths.Path.Homotopy.HopfInvariant
 
@@ -33,7 +33,7 @@ namespace Path
 namespace Homotopy
 namespace EHPSequence
 
-open HigherHomotopy HigherHomotopyGroups
+open HigherHomotopy -- HigherHomotopyGroups DISABLED: universe issues
 open HopfInvariant
 open HopfFibration
 
@@ -46,26 +46,23 @@ abbrev Sphere (n : Nat) : Type u := TopCat.sphere (n := n)
 
 /-! ## EHP maps -/
 
-/-- The suspension homomorphism E on higher homotopy groups. -/
+-- The suspension homomorphism E on higher homotopy groups (stub).
 noncomputable def eMap (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1)) :
     HigherHomotopy.PiN n (Sphere k) a →
       HigherHomotopy.PiN (n + 1) (Sphere (k + 1)) a1 :=
-  fun _ =>
-    HigherHomotopyGroups.piN_one (X := Sphere (k + 1)) (n := n + 1) a1
+  fun _ => HigherHomotopy.piNBasepoint (n + 1) (Sphere (k + 1)) a1
 
-/-- The James-Hopf map H on higher homotopy groups. -/
+-- The James-Hopf map H on higher homotopy groups (stub).
 noncomputable def hMap (n k : Nat) (a1 : Sphere (k + 1)) (a2 : Sphere (2 * k + 1)) :
     HigherHomotopy.PiN (n + 1) (Sphere (k + 1)) a1 →
       HigherHomotopy.PiN (n + 1) (Sphere (2 * k + 1)) a2 :=
-  fun _ =>
-    HigherHomotopyGroups.piN_one (X := Sphere (2 * k + 1)) (n := n + 1) a2
+  fun _ => HigherHomotopy.piNBasepoint (n + 1) (Sphere (2 * k + 1)) a2
 
-/-- The connecting map P on higher homotopy groups. -/
+-- The connecting map P on higher homotopy groups (stub).
 noncomputable def pMap (n k : Nat) (a2 : Sphere (2 * k - 1)) (a : Sphere k) :
     HigherHomotopy.PiN n (Sphere (2 * k - 1)) a2 →
       HigherHomotopy.PiN (n - 1) (Sphere k) a :=
-  fun _ =>
-    HigherHomotopyGroups.piN_one (X := Sphere k) (n := n - 1) a
+  fun _ => HigherHomotopy.piNBasepoint (n - 1) (Sphere k) a
 
 /-! ## Sequence packaging -/
 
@@ -99,11 +96,11 @@ structure EHPExact (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
   /-- The composite H ∘ E is trivial. -/
   exact_EH :
     ∀ α, Path (seq.H (seq.E α))
-      (HigherHomotopyGroups.piN_one (X := Sphere (2 * k + 1)) (n := n + 1) a2)
+      (HigherHomotopy.piNBasepoint (n + 1) (Sphere (2 * k + 1)) a2)
   /-- The connecting map P is constant at the basepoint. -/
   exact_P :
     ∀ β, Path (seq.P β)
-      (HigherHomotopyGroups.piN_one (X := Sphere k) (n := n - 1) a)
+      (HigherHomotopy.piNBasepoint (n - 1) (Sphere k) a)
 
 /-- Exactness witnesses for the canonical EHP sequence. -/
 noncomputable def ehpExact (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))

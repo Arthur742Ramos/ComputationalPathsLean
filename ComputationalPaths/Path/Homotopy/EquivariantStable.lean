@@ -47,7 +47,7 @@ abbrev SpectralMackeyFunctor (G : Type u) (S : StrictGroup G) :=
   Algebra.SpectralMackey.SpectralMackeyFunctor G S
 
 /-- The Burnside Mackey functor (constant Nat). -/
-abbrev burnsideMackeyFunctor (G : Type u) (S : StrictGroup G) : MackeyFunctor G S :=
+noncomputable abbrev burnsideMackeyFunctor (G : Type u) (S : StrictGroup G) : MackeyFunctor G S :=
   Algebra.SpectralMackey.burnsideMackeyFunctor G S
 
 /-! ## Genuine G-spectra -/

@@ -10,7 +10,7 @@ universe u
 abbrev CPath {A : Type u} (a b : A) : Type u := ComputationalPaths.Path a b
 abbrev CStep {A : Type u} {a b : A} (p q : CPath a b) : Prop :=
   ComputationalPaths.Path.Step p q
-abbrev CRwEq {A : Type u} {a b : A} (p q : CPath a b) : Prop :=
+abbrev CRwEq {A : Type u} {a b : A} (p q : CPath a b) : Type u :=
   ComputationalPaths.Path.RwEq p q
 
 section HigherCells

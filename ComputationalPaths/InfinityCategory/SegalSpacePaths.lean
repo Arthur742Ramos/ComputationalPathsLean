@@ -80,12 +80,12 @@ noncomputable def fromQuasi (Obj : Type u) :
     simpa using (QuasiCategoryPaths.canonical Obj).assoc_step f g h
 
 /-- Canonical Segal composition on computational paths. -/
-abbrev canonical (Obj : Type u) :
+noncomputable abbrev canonical (Obj : Type u) :
     SegalComposition (SegalPathSpace.pathSpace Obj) :=
   fromQuasi Obj
 
 /-- Right-associated triple Segal composition in path form. -/
-abbrev compose3 {S : SegalPathSpace.{u}} (C : SegalComposition S)
+noncomputable abbrev compose3 {S : SegalPathSpace.{u}} (C : SegalComposition S)
     {w x y z : S.Obj}
     (f : S.OneSimplex w x) (g : S.OneSimplex x y) (h : S.OneSimplex y z) :
     Path w z :=

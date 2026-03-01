@@ -1,6 +1,6 @@
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
-import ComputationalPaths.TypeFormers.BetaEtaDeep
+-- import ComputationalPaths.TypeFormers.BetaEtaDeep  -- TEMPORARILY DISABLED: compilation errors
 namespace ComputationalPaths.TypeFormers
 
 open ComputationalPaths

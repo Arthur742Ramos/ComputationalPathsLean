@@ -483,12 +483,12 @@ noncomputable def kanSymmDistrib {b c : B}
 noncomputable def kanSymmSymm {b : B}
     (a : A) (p : Path (J.obj a) b) :
     RwEq (Path.symm (Path.symm p)) p :=
-  rweq_of_step (Step.symm_symm p)
+  rweq_of_step (Path.Step.symm_symm p)
 
 /-- Theorem 43: Symmetry of reflexivity in Kan context. -/
 noncomputable def kanSymmRefl (b : B) :
     RwEq (Path.symm (Path.refl b)) (Path.refl b) :=
-  rweq_of_step (Step.symm_refl b)
+  rweq_of_step (Path.Step.symm_refl b)
 
 /-- Theorem 44: Kan transport along composed-then-inverted path. -/
 noncomputable def kanTransportCompInv {b c d : B}
