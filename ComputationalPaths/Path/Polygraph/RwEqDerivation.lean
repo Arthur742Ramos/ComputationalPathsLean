@@ -92,7 +92,7 @@ theorem deriv_refl_left_ne_right : deriv_refl_left ≠ deriv_refl_right := by
         RwEqDeriv (eTrans eRefl eRefl) eRefl) =
       (RwEqDeriv.trans_refl_right eRefl :
         RwEqDeriv (eTrans eRefl eRefl) eRefl) := by
-    simpa [deriv_refl_left, deriv_refl_right] using h
+    simp [deriv_refl_left, deriv_refl_right] at h
   cases h'
 
 theorem distinct_derivations_exist :

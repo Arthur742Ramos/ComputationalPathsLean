@@ -111,8 +111,7 @@ theorem localization_universal {A : Type u} {Hom : A → A → Type v}
   refine ⟨PathLocalizationMap.lift F, ?_⟩
   constructor
   · intro a b p
-    simpa [localize] using
-      (PathLocalizationMap.lift_mk (F := F) (a := a) (b := b) p)
+    simp [localize]
   · intro g' hg' a b x
     refine Quot.inductionOn x (fun p => ?_)
     simpa [localize, PathLocalizationMap.lift_mk] using

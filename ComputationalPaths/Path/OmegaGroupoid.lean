@@ -1551,9 +1551,9 @@ theorem cell_tower_functor_whiskerLeft (f : Path a b) {p q : Path b c}
   | refl _ => rfl
   | step _ => rfl
   | inv _ ih =>
-      simpa [whiskerLeft, Derivation₂.toRwEq, rweq_trans_congr_right, ih]
+      simp [whiskerLeft, Derivation₂.toRwEq, rweq_trans_congr_right, ih]
   | vcomp _ _ ih₁ ih₂ =>
-      simpa [whiskerLeft, Derivation₂.toRwEq, rweq_trans_congr_right, ih₁, ih₂]
+      simp [whiskerLeft, Derivation₂.toRwEq, rweq_trans_congr_right, ih₁, ih₂]
 
 theorem cell_tower_functor_whiskerRight {p q : Path a b}
     (α : Derivation₂ p q) (g : Path b c) :
@@ -1563,9 +1563,9 @@ theorem cell_tower_functor_whiskerRight {p q : Path a b}
   | refl _ => rfl
   | step _ => rfl
   | inv _ ih =>
-      simpa [whiskerRight, Derivation₂.toRwEq, rweq_trans_congr_left, ih]
+      simp [whiskerRight, Derivation₂.toRwEq, rweq_trans_congr_left, ih]
   | vcomp _ _ ih₁ ih₂ =>
-      simpa [whiskerRight, Derivation₂.toRwEq, rweq_trans_congr_left, ih₁, ih₂]
+      simp [whiskerRight, Derivation₂.toRwEq, rweq_trans_congr_left, ih₁, ih₂]
 
 noncomputable def cell_tower_functor_hcomp {p p' : Path a b} {q q' : Path b c}
     (α : Derivation₂ p p') (β : Derivation₂ q q') :

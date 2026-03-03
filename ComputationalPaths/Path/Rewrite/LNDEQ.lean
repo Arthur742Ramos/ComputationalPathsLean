@@ -169,7 +169,7 @@ noncomputable def sound_complete_rweq_bundle (i : Instantiation) :
 
 @[simp] theorem normalize_toEq_agree (i : Instantiation) :
     (normalize i.p).toEq = (normalize i.q).toEq := by
-  simpa [normalize_toEq] using i.rweq_sound
+  simp
 
 @[simp] theorem complete_sound_rw_pair (i : Instantiation) :
     Rw (A := _) i.p i.q ∧ i.p.toEq = i.q.toEq :=
@@ -672,7 +672,7 @@ end Builder
   have hnorm : normalize r = normalize q :=
     (peak_normalize_eq_of_steps hq hr).symm
   refine ⟨normalize_isNormal q, ?_⟩
-  simpa [hnorm] using (normalize_isNormal q)
+  simp
 
 noncomputable def critical_pair_tt_rrr_via_peak {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
@@ -846,15 +846,13 @@ theorem confluence_bridge_tt_lrr_join_exists {A : Type u} {a b c : A}
 @[simp] theorem confluence_bridge_tt_rrr_toEq {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     (Path.trans p (Path.trans q (Path.refl c))).toEq = (Path.trans p q).toEq := by
-  simpa [Builder.instTt, Builder.instRrr] using
-    (critical_pair_tt_rrr_toEq (A := A) (p := p) (q := q))
+  simp
 
 /-- Soundness bridge for the `tt/lrr` critical pair in direct path form. -/
 @[simp] theorem confluence_bridge_tt_lrr_toEq {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
     (Path.trans (Path.refl a) (Path.trans q r)).toEq = (Path.trans q r).toEq := by
-  simpa [Builder.instTt, Builder.instLrr] using
-    (critical_pair_tt_lrr_toEq (A := A) (q := q) (r := r))
+  simp
 
 /-! ## Soundness/completeness/termination refinements for confluence bridges -/
 
@@ -938,31 +936,27 @@ noncomputable def confluence_bridge_tt_lrr_sound_complete {A : Type u} {a b c : 
 @[simp] theorem confluence_bridge_tt_rrr_normalize {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     normalize (Path.trans p (Path.trans q (Path.refl c))) = normalize (Path.trans p q) := by
-  simpa [Builder.instTt, Builder.instRrr] using
-    (critical_pair_tt_rrr_normalize (A := A) (p := p) (q := q))
+  simp
 
 /-- Termination bridge in direct path form (`tt/lrr`). -/
 @[simp] theorem confluence_bridge_tt_lrr_normalize {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
     normalize (Path.trans (Path.refl a) (Path.trans q r)) = normalize (Path.trans q r) := by
-  simpa [Builder.instTt, Builder.instLrr] using
-    (critical_pair_tt_lrr_normalize (A := A) (q := q) (r := r))
+  simp
 
 /-- Normality payload in direct path form (`tt/rrr`). -/
 @[simp] theorem confluence_bridge_tt_rrr_normal_targets {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     IsNormal (normalize (Path.trans p (Path.trans q (Path.refl c)))) ∧
       IsNormal (normalize (Path.trans p q)) := by
-  simpa [Builder.instTt, Builder.instRrr] using
-    (critical_pair_tt_rrr_normal_targets (A := A) (p := p) (q := q))
+  simp
 
 /-- Normality payload in direct path form (`tt/lrr`). -/
 @[simp] theorem confluence_bridge_tt_lrr_normal_targets {A : Type u} {a b c : A}
     (q : Path a b) (r : Path b c) :
     IsNormal (normalize (Path.trans (Path.refl a) (Path.trans q r))) ∧
       IsNormal (normalize (Path.trans q r)) := by
-  simpa [Builder.instTt, Builder.instLrr] using
-    (critical_pair_tt_lrr_normal_targets (A := A) (q := q) (r := r))
+  simp
 
 end LNDEQ
 end Rewrite

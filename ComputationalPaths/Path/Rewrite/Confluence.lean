@@ -372,6 +372,8 @@ end Sigma
 
 end CriticalPairs
 
+end
+
 /-! ## Structural properties of Join -/
 
 /-- Join is symmetric: if p and q join, then q and p join. -/
@@ -396,7 +398,8 @@ theorem Join.refl_quot {A : Type u} {a b : A}
 theorem Join.trans_join {A : Type u} {a b : A}
     {p q r : Path a b}
     (J₁ : Join (A := A) (a := a) (b := b) p q)
-    (J₂ : Join (A := A) (a := a) (b := b) q r) :
+    (J₂ : Join (A := A) (a := a) (b := b) q r)
+    [HasJoinOfRw.{u}] :
     ∃ (s : Path a b), Rw (A := A) (a := a) (b := b) p s ∧ Rw (A := A) (a := a) (b := b) r s := by
   -- Join the two intermediate meets via confluence on q
   let J₃ := join_of_rw J₁.right J₂.left
@@ -437,6 +440,7 @@ theorem Join.rweq_sound {A : Type u} {a b : A}
 /-- Two joins from the same source have equivalent meets up to Rw. -/
 noncomputable def Join.meets_rweq {A : Type u} {a b : A}
     {p q r : Path a b}
+    [HasJoinOfRw.{u}]
     (J₁ : Join (A := A) (a := a) (b := b) p q)
     (J₂ : Join (A := A) (a := a) (b := b) p r) :
     RwEq (A := A) (a := a) (b := b) J₁.meet J₂.meet := by
@@ -444,8 +448,6 @@ noncomputable def Join.meets_rweq {A : Type u} {a b : A}
   -- Use confluence on p to join J₁.meet and J₂.meet
   let J₃ := join_of_rw J₁.left J₂.left
   exact J₃.rweq
-
-end
 
 end Confluence
 end Rewrite
