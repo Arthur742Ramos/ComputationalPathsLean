@@ -139,7 +139,7 @@ noncomputable def star_star_path (a : A.alg) : Path (A.star (A.star a)) a :=
 
 /-- Multi-step path: π(1·a)v = π(a)v via π(1)(π(a)v) = π(a)v. -/
 noncomputable def repr_one_mul_path (a : A.alg) (v : H.carrier)
-    (h : A.mul A.one a = a) :
+    (_h : A.mul A.one a = a) :
     Path (A.repr (A.mul A.one a) v) (A.repr a v) :=
   Path.trans
     (A.repr_mul_path A.one a v)

@@ -677,11 +677,11 @@ theorem atomicPath_trans_assoc {A : Type u} {a b c d : A}
     (h₁ : a = b) (h₂ : b = c) (h₃ : c = d) :
     Path.trans (Path.trans (atomicPath h₁) (atomicPath h₂)) (atomicPath h₃) =
       Path.trans (atomicPath h₁) (Path.trans (atomicPath h₂) (atomicPath h₃)) := by
-  simpa using Path.trans_assoc (atomicPath h₁) (atomicPath h₂) (atomicPath h₃)
+  simp
 
 theorem atomicPath_trans_refl {A : Type u} {a b : A} (h : a = b) :
     Path.trans (atomicPath h) (Path.refl b) = atomicPath h := by
-  simp [Path.trans_refl_right]
+  simp
 
 /-! ### Fundamental groupoid -/
 

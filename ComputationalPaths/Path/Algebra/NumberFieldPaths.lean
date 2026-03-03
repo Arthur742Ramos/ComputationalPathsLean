@@ -114,7 +114,7 @@ noncomputable def trace_zero_path (NF : NumberField A) (NT : NormTrace A NF) :
 theorem transport_norm_mul {D : A → Sort u} (NF : NumberField A) (NT : NormTrace A NF)
     (a b : A) (x : D (NT.norm (NF.mul a b))) :
     transport (norm_mul_path NF NT a b) x = (NT.norm_mul a b) ▸ x := by
-  simp [norm_mul_path, transport]
+  simp [transport]
 
 -- 14. congrArg of norm through add commutativity
 theorem congrArg_norm_add_comm (NF : NumberField A) (NT : NormTrace A NF) (a b : A) :
@@ -210,7 +210,7 @@ noncomputable def disc_path (NF : NumberField A) (NT : NormTrace A NF) (D : Disc
 theorem transport_disc {C : A → Sort u} (NF : NumberField A) (NT : NormTrace A NF)
     (D : Discriminant A NF NT) (x : C D.disc) :
     transport (disc_path NF NT D) x = D.disc_formula ▸ x := by
-  simp [disc_path, transport]
+  simp [transport]
 
 /-! ## Path coherence for field operations -/
 
@@ -218,13 +218,13 @@ theorem transport_disc {C : A → Sort u} (NF : NumberField A) (NT : NormTrace A
 theorem mul_comm_roundtrip_toEq (NF : NumberField A) (a b : A) :
     (trans (mul_comm_path NF a b) (symm (mul_comm_path NF a b))).toEq =
       (refl (NF.mul a b)).toEq := by
-  simp [mul_comm_path]
+  simp
 
 -- 25. Add comm roundtrip
 theorem add_comm_roundtrip_toEq (NF : NumberField A) (a b : A) :
     (trans (add_comm_path NF a b) (symm (add_comm_path NF a b))).toEq =
       (refl (NF.add a b)).toEq := by
-  simp [add_comm_path]
+  simp
 
 -- 26. symm commutes with congrArg for norm
 theorem symm_congrArg_norm (NF : NumberField A) (NT : NormTrace A NF)

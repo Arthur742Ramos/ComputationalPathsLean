@@ -289,7 +289,7 @@ structure SchemeMorphismPathData (X Y Ox Oy : Type u) where
   identityPath : ∀ (s : Oy),
     Path (sheafMap s) (sheafMap s)
   sheafMapTransPath : ∀ (s t : Oy)
-    (p : Path s t),
+    (_p : Path s t),
     Path (sheafMap s) (sheafMap t)
 
 namespace SchemeMorphismPathData
@@ -394,7 +394,7 @@ structure SeparatedMorphismPathData (X S : Type u) where
     Path (diagEmbed x y) (morphism x = morphism y → x = y)
   separatedSquarePath : ∀ (x : X),
     Path (diagEmbed x x) True
-  diagTransPath : ∀ (x y z : X),
+  diagTransPath : ∀ (x _y z : X),
     Path (diagEmbed x z)
          (diagEmbed x z)
 

@@ -179,12 +179,12 @@ noncomputable def bdry_squared_symm_path (p : A) : Path M.base (M.bdry (M.bdry p
 
 -- 8. Boundary of base is base
 
-noncomputable def bdry_base_path (p : A) : Path (M.bdry M.base) M.base :=
+noncomputable def bdry_base_path (_p : A) : Path (M.bdry M.base) M.base :=
   ⟦MorseStep.bdry_base (M := M)⟧
 
 -- 9. A 2-step witness: bdry(bdry base) -> base
 
-noncomputable def bdry_bdry_base (p : A) : Path (M.bdry (M.bdry M.base)) M.base :=
+noncomputable def bdry_bdry_base (_p : A) : Path (M.bdry (M.bdry M.base)) M.base :=
   Path.trans (⟦MorseStep.bdry_sq (M := M) M.base⟧) (Path.refl _)
 
 -- 10. Handle/attachment associativity

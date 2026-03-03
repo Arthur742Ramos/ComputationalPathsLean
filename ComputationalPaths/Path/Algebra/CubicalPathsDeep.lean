@@ -234,14 +234,14 @@ noncomputable def CPathType.symm (p : CPathType α a b) : CPathType α b a :=
 -- ============================================================
 
 /-- Coercion along a line of types (modeled for a single type). -/
-noncomputable def coe_line (l : CLine α) (i j : Iv) : α :=
+noncomputable def coe_line (l : CLine α) (_i j : Iv) : α :=
   l.eval j
 
 /-- Theorem 28 – coe at same endpoint is identity. -/
 theorem coe_refl (l : CLine α) (i : Iv) : coe_line l i i = l.eval i := rfl
 
 /-- Homogeneous composition: compose two lines sharing a midpoint. -/
-noncomputable def hcomp (l₁ : CLine α) (l₂ : CLine α) (h : l₁.atI1 = l₂.atI0) : CLine α :=
+noncomputable def hcomp (l₁ : CLine α) (l₂ : CLine α) (_h : l₁.atI1 = l₂.atI0) : CLine α :=
   ⟨l₁.atI0, l₂.atI1, l₁.atI1⟩
 
 /-- Theorem 29 – hcomp preserves left endpoint. -/
@@ -266,8 +266,8 @@ structure CSquare (α : Type) where
 
 /-- Kan filler: given three sides of a square, produce the fourth. -/
 noncomputable def kanFill (top : CLine α) (left : CLine α) (right : CLine α)
-    (htl : top.atI0 = left.atI1)
-    (htr : top.atI1 = right.atI1) : CSquare α :=
+    (_htl : top.atI0 = left.atI1)
+    (_htr : top.atI1 = right.atI1) : CSquare α :=
   ⟨left.atI0, left.atI1, right.atI0, right.atI1, top.atMid⟩
 
 /-- Theorem 31 – Kan filler corner consistency. -/
@@ -327,7 +327,7 @@ noncomputable def GlueData.id (A : Type) : GlueData A A :=
   ⟨fun a => a, fun a => a, fun _ => rfl, fun _ => rfl⟩
 
 /-- Glue type at a given interval point. -/
-noncomputable def GlueType (g : GlueData A B) : Iv → Type :=
+noncomputable def GlueType (_g : GlueData A B) : Iv → Type :=
   fun i => match i with
   | .i0   => A
   | .i1   => B
@@ -378,7 +378,7 @@ theorem cequiv_right_inv (e : CEquiv A B) (b : B) :
 -- ============================================================
 
 /-- The "ua" map: an equivalence gives a cubical path type. -/
-noncomputable def ua (e : CEquiv A B) : CPathType (Type _) A B :=
+noncomputable def ua (_e : CEquiv A B) : CPathType (Type _) A B :=
   ⟨⟨A, B, A⟩, rfl, rfl⟩
 
 /-- Theorem 46 – ua of identity is refl. -/
@@ -538,7 +538,7 @@ theorem transport_nil {P : CPoint → Prop} (a : CPoint) (pa : P a)
     transportPath (.nil a) pa h = pa := rfl
 
 /-- Theorem 68 – constant transport. -/
-noncomputable def transport_const {a b : CPoint} (p : Path a b) (x : α) : α := x
+noncomputable def transport_const {a b : CPoint} (_p : Path a b) (x : α) : α := x
 
 theorem transport_const_eq {a b : CPoint} (p : Path a b) (x : α) :
     transport_const p x = x := rfl

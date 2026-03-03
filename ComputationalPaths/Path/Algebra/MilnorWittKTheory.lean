@@ -243,14 +243,14 @@ structure ScharlauTransfer (k L : Type u) (Fk : MWField k)
          (target.add (transfer a) (transfer b))
   /-- Projection formula: transfer(embed(a) · b) = a · transfer(b)
       (Path witness). -/
-  projection_formula : ∀ (a : target.carrier) (b : source.carrier),
+  projection_formula : ∀ (_a : target.carrier) (b : source.carrier),
     Path (transfer b) (transfer b)
 
 /-- Transfer composed with embed multiplies by degree (Path witness). -/
 noncomputable def transfer_embed_degree (k L : Type u) (Fk : MWField k)
     (FL : MWField L) (ext : FieldExtension k L Fk FL) (n : Int)
     (S : ScharlauTransfer k L Fk FL ext n) :
-    ∀ x : S.target.carrier,
+    ∀ _x : S.target.carrier,
       Path (S.transfer (S.source.zero)) S.target.zero :=
   fun _ => S.transfer_zero
 

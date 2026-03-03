@@ -173,7 +173,7 @@ noncomputable def tripleRotateX (S : ShiftData) (T : DistTriangle S) :
 
 theorem tripleRotateX_toEq (S : ShiftData) (T : DistTriangle S) :
     (tripleRotateX S T).toEq = rfl := by
-  simp [tripleRotateX]
+  simp
 
 /-- The double rotation source is T.Z. -/
 noncomputable def doubleRotateXPath (S : ShiftData) (T : DistTriangle S) :
@@ -182,7 +182,7 @@ noncomputable def doubleRotateXPath (S : ShiftData) (T : DistTriangle S) :
 
 theorem doubleRotateXPath_toEq (S : ShiftData) (T : DistTriangle S) :
     (doubleRotateXPath S T).toEq = rfl := by
-  simp [doubleRotateXPath]
+  simp
 
 /-! ## §3. Octahedral axiom -/
 
@@ -231,17 +231,17 @@ noncomputable def octCompositePath (S : ShiftData) (O : OctahedralData S) :
 theorem octSourcePath_symm_trans (S : ShiftData) (O : OctahedralData S) :
     (Path.trans (Path.symm (octSourcePath S O)) (octSourcePath S O)).toEq =
       (Path.refl O.T_gf.X).toEq := by
-  simp [octSourcePath]
+  simp
 
 theorem octMidPath_symm_trans (S : ShiftData) (O : OctahedralData S) :
     (Path.trans (Path.symm (octMidPath S O)) (octMidPath S O)).toEq =
       (Path.refl O.T_g.X).toEq := by
-  simp [octMidPath]
+  simp
 
 theorem octTargetPath_symm_trans (S : ShiftData) (O : OctahedralData S) :
     (Path.trans (Path.symm (octTargetPath S O)) (octTargetPath S O)).toEq =
       (Path.refl O.T_gf.Y).toEq := by
-  simp [octTargetPath]
+  simp
 
 /-- The octahedral loop: traversing all four faces returns to start. -/
 noncomputable def octahedralLoop (S : ShiftData) (O : OctahedralData S) :
@@ -250,11 +250,11 @@ noncomputable def octahedralLoop (S : ShiftData) (O : OctahedralData S) :
 
 theorem octahedralLoop_toEq (S : ShiftData) (O : OctahedralData S) :
     (octahedralLoop S O).toEq = rfl := by
-  simp [octahedralLoop, octSourcePath]
+  simp
 
 theorem octahedralLoop_symm (S : ShiftData) (O : OctahedralData S) :
     (Path.symm (octahedralLoop S O)).toEq = rfl := by
-  simp [octahedralLoop, octSourcePath]
+  simp
 
 /-! ## §4. Verdier quotient localization -/
 
@@ -268,7 +268,7 @@ structure ThickSubcategory where
 structure VerdierQuotient (S : ShiftData) where
   thick : ThickSubcategory
   /-- Quotient functor preserves distinguished triangles -/
-  preservesDist : ∀ (T : DistTriangle S), True
+  preservesDist : ∀ (_T : DistTriangle S), True
 
 theorem thick_zero_mem (N : ThickSubcategory) : N.mem zeroComplex :=
   N.zero_mem
@@ -300,7 +300,7 @@ noncomputable def shiftZeroPath (S : ShiftData) :
 
 theorem shiftZeroPath_toEq (S : ShiftData) :
     (shiftZeroPath S).toEq = rfl := by
-  simp [shiftZeroPath]
+  simp
 
 /-! ## §5. Long exact sequences via paths -/
 
@@ -318,7 +318,7 @@ noncomputable def exactnessPath {S : ShiftData} {T : DistTriangle S}
 theorem exactnessPath_toEq {S : ShiftData} {T : DistTriangle S}
     (L : LongExactData S T) (n : Nat) :
     (exactnessPath L n).toEq = L.exactAt n := by
-  simp [exactnessPath]
+  simp
 
 /-- Symmetry of exactness path. -/
 noncomputable def exactnessPathSymm {S : ShiftData} {T : DistTriangle S}
@@ -329,7 +329,7 @@ noncomputable def exactnessPathSymm {S : ShiftData} {T : DistTriangle S}
 theorem exactness_round_trip {S : ShiftData} {T : DistTriangle S}
     (L : LongExactData S T) (n : Nat) :
     (Path.trans (exactnessPath L n) (exactnessPathSymm L n)).toEq = rfl := by
-  simp [exactnessPath, exactnessPathSymm]
+  simp
 
 /-- Connecting two consecutive exactness paths. -/
 noncomputable def exactnessChain {S : ShiftData} {T : DistTriangle S}
@@ -343,7 +343,7 @@ theorem exactnessChain_toEq {S : ShiftData} {T : DistTriangle S}
     (L : LongExactData S T) (n : Nat)
     (hn : L.H n (T.Y.obj n) = L.H (n + 1) (T.X.obj (n + 1)) + L.H (n + 1) (T.Z.obj (n + 1))) :
     (exactnessChain L n hn).toEq = (L.exactAt n).trans hn := by
-  simp [exactnessChain, exactnessPath]
+  simp
 
 /-! ## §6. Cone and cofiber sequences -/
 
@@ -378,7 +378,7 @@ noncomputable def coneIdObjPath (C : ChainComplex) (n : Int) :
 
 theorem coneIdObjPath_toEq (C : ChainComplex) (n : Int) :
     (coneIdObjPath C n).toEq = rfl := by
-  simp [coneIdObjPath]
+  simp
 
 /-! ## §7. Triangulated natural transformations -/
 
@@ -449,7 +449,7 @@ noncomputable def exactTrianglePath {S : ShiftData} (E : ExactTriangle S) (n x :
 
 theorem exactTrianglePath_toEq {S : ShiftData} (E : ExactTriangle S) (n x : Int) :
     (exactTrianglePath E n x).toEq = E.gf_zero n x := by
-  simp [exactTrianglePath]
+  simp
 
 /-- Zero map yields an exact triangle. -/
 @[simp] noncomputable def zeroExactTriangle (S : ShiftData) (C : ChainComplex) :
@@ -462,7 +462,7 @@ theorem exactTrianglePath_toEq {S : ShiftData} (E : ExactTriangle S) (n x : Int)
   h := zeroMap zeroComplex (S.Sym C)
   gf_zero := by intro n x; simp
 
-theorem zeroExactTriangle_gf (S : ShiftData) (C : ChainComplex) (n x : Int) :
+theorem zeroExactTriangle_gf (_S : ShiftData) (C : ChainComplex) (n x : Int) :
     (compMap (idMap C) (zeroMap C zeroComplex)).component n x = 0 := by simp
 
 /-! ## §9. Shift compatibility paths -/
@@ -492,7 +492,7 @@ noncomputable def doubleShiftRoundtrip (S : ShiftData) (C : ChainComplex) :
 theorem doubleShiftRoundtrip_toEq (S : ShiftData) (C : ChainComplex) :
     (doubleShiftRoundtrip S C).toEq =
       (congrArg S.Sym (S.unsym_Sym (S.unsym C))).toEq := by
-  simp [doubleShiftRoundtrip]
+  simp
 
 /-- Shift of zero complex is path-equivalent to zero. -/
 noncomputable def shiftZero (S : ShiftData) :
@@ -501,7 +501,7 @@ noncomputable def shiftZero (S : ShiftData) :
 
 theorem shiftZero_toEq (S : ShiftData) :
     (shiftZero S).toEq = rfl := by
-  simp [shiftZero]
+  simp
 
 end TriangulatedDeep
 end Algebra

@@ -105,7 +105,7 @@ structure EulerFormula (P : ConvexPolytope.{u}) (fv : FVector P) where
   euler : Path alt_sum 0
 
 /-- Euler characteristic = 1 for contractible polytopes (Path). -/
-noncomputable def euler_char_one (P : ConvexPolytope.{u}) :
+noncomputable def euler_char_one (_P : ConvexPolytope.{u}) :
     Path (1 : Int) 1 :=
   Path.refl 1
 

@@ -147,7 +147,7 @@ the Grothendieck–Maltsiniotis conjecture. -/
 
 /-- The 3-groupoid axiom: every 2-cell has an inverse. -/
 theorem two_cell_inverse (d : RwEqDeriv e₁ e₂) :
-    ∃ d' : RwEqDeriv e₂ e₁, True := ⟨d.symm, trivial⟩
+    ∃ _d' : RwEqDeriv e₂ e₁, True := ⟨d.symm, trivial⟩
 
 /-- Vertical composition of 3-cells is well-defined on equivalence classes. -/
 theorem vcomp_respects_equiv {e₁ e₂ e₃ : Expr}

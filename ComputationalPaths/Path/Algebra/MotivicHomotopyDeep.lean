@@ -100,7 +100,7 @@ theorem a1Equiv_trans_assoc {k : Type u} {W X Y Z : Variety.{u,0} k}
     a1Equiv_trans (a1Equiv_trans e1 e2) e3 =
     a1Equiv_trans e1 (a1Equiv_trans e2 e3) := by
   unfold a1Equiv_trans
-  simp [Path.trans_assoc]
+  simp
 
 -- ============================================================
 -- Section 2: Nisnevich Topology
@@ -389,7 +389,7 @@ theorem norm_residue_comp_assoc (nr1 nr2 nr3 : NormResidue)
     Path.trans nr1.degreeMatch
       (Path.trans (Path.trans h12 nr2.degreeMatch) (Path.trans h23 nr3.degreeMatch)) := by
   unfold norm_residue_comp
-  simp [Path.trans_assoc]
+  simp
 
 /-- 39: Bloch-Kato conjecture: norm residue at degree 0 -/
 noncomputable def bloch_kato_deg0 :
@@ -576,14 +576,14 @@ theorem em_level_congrArg_trans (n m k : Nat) (p : Path n m) (q : Path m k) :
     em_level_congrArg n k (Path.trans p q) =
     Path.trans (em_level_congrArg n m p) (em_level_congrArg m k q) := by
   unfold em_level_congrArg
-  simp [Path.congrArg_trans]
+  simp
 
 /-- 63: EM spectrum level functoriality preserves symmetry -/
 theorem em_level_congrArg_symm (n m : Nat) (p : Path n m) :
     em_level_congrArg m n (Path.symm p) =
     Path.symm (em_level_congrArg n m p) := by
   unfold em_level_congrArg
-  simp [Path.congrArg_symm]
+  simp
 
 -- ============================================================
 -- Section 11: Motivic Weight Structure
@@ -667,14 +667,14 @@ theorem congrArg_symm_motivicSmash (s1 s2 t : MotivicSphere)
     (h : Path s1.topDeg s2.topDeg) :
     Path.congrArg (· + t.topDeg) (Path.symm h) =
     Path.symm (Path.congrArg (· + t.topDeg) h) := by
-  simp [Path.congrArg_symm]
+  simp
 
 /-- 74: congrArg composed with trans -/
 theorem congrArg_trans_motivicSmash (s1 s2 s3 t : MotivicSphere)
     (h1 : Path s1.topDeg s2.topDeg) (h2 : Path s2.topDeg s3.topDeg) :
     Path.congrArg (· + t.topDeg) (Path.trans h1 h2) =
     Path.trans (Path.congrArg (· + t.topDeg) h1) (Path.congrArg (· + t.topDeg) h2) := by
-  simp [Path.congrArg_trans]
+  simp
 
 /-- 75: Suspension is functorial via congrArg on level -/
 noncomputable def suspend_congrArg (sp1 sp2 : MotivicSpectrum) (h : Path sp1.level sp2.level) :
@@ -686,14 +686,14 @@ theorem suspend_congrArg_trans (sp1 sp2 sp3 : MotivicSpectrum)
     (h1 : Path sp1.level sp2.level) (h2 : Path sp2.level sp3.level) :
     suspend_congrArg sp1 sp3 (Path.trans h1 h2) =
     Path.trans (suspend_congrArg sp1 sp2 h1) (suspend_congrArg sp2 sp3 h2) := by
-  unfold suspend_congrArg; simp [Path.congrArg_trans]
+  unfold suspend_congrArg; simp
 
 /-- 77: Suspension functoriality respects symmetry -/
 theorem suspend_congrArg_symm (sp1 sp2 : MotivicSpectrum)
     (h : Path sp1.level sp2.level) :
     suspend_congrArg sp2 sp1 (Path.symm h) =
     Path.symm (suspend_congrArg sp1 sp2 h) := by
-  unfold suspend_congrArg; simp [Path.congrArg_symm]
+  unfold suspend_congrArg; simp
 
 -- ============================================================
 -- Section 14: Motivic Transfers and Gysin Maps

@@ -1966,8 +1966,7 @@ theorem wedgeProvenanceEncodeDecode
       have hα :
           HasWedgeProvenanceEncode.encodeInl (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
               (loopRepInl (A := A) (a₀ := a₀) α) = α := by
-        simpa [HasWedgeProvenanceEncode.encodeInl_loop]
-          using (loopRepInl_spec (A := A) (a₀ := a₀) α)
+        simp [HasWedgeProvenanceEncode.encodeInl_loop]
       simp [wedgeProvenanceDecodeQuot, wedgeProvenanceDecodeLoop,
         wedgeProvenanceEncodeQuot, wedgeProvenanceEncode, hα, hrest]
   | consRight β rest ih =>
@@ -1988,8 +1987,7 @@ theorem wedgeProvenanceEncodeDecode
       have hβ :
           HasWedgeProvenanceEncode.encodeInr (A := A) (B := B) (a₀ := a₀) (b₀ := b₀)
               (loopRepInr (B := B) (b₀ := b₀) β) = β := by
-        simpa [HasWedgeProvenanceEncode.encodeInr_loop]
-          using (loopRepInr_spec (B := B) (b₀ := b₀) β)
+        simp [HasWedgeProvenanceEncode.encodeInr_loop]
       simp [wedgeProvenanceDecodeQuot, wedgeProvenanceDecodeLoop,
         wedgeProvenanceEncodeQuot, wedgeProvenanceEncode, hβ, hrest]
 

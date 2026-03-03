@@ -379,15 +379,15 @@ noncomputable def pi2_abelian_rweq {A : Type} {a : A}
     (α β : Pi2 A a) :
     RwEq (Path.stepChain (pi2Comp α β).toEq)
          (Path.stepChain (pi2Comp β α).toEq) := by
-  have h : (pi2Comp α β).toEq = (pi2Comp β α).toEq := by
-    simp [pi2Comp]
-  exact rweq_of_eq (by simpa using congrArg (fun e => Path.stepChain e) h)
+  have _h : (pi2Comp α β).toEq = (pi2Comp β α).toEq := by
+    simp
+  exact rweq_of_eq (by simp)
 
 /-- π₂ is abelian at the toEq level. -/
 theorem pi2_abelian_toEq {A : Type} {a : A}
     (α β : Pi2 A a) :
     (pi2Comp α β).toEq = (pi2Comp β α).toEq := by
-  simpa using rweq_toEq (pi2_abelian_rweq α β)
+  simp
 
 /-! ## Hopf action -/
 
@@ -525,7 +525,7 @@ noncomputable def pi2_punit_rweq
 theorem pi2_punit_toEq
     (α : Pi2 PUnit PUnit.unit) :
     α.toEq = (Path.refl (Path.refl PUnit.unit)).toEq := by
-  simpa using rweq_toEq (pi2_punit_rweq α)
+  simp
 
 /-- Genus-g surface: canonical representatives are rewrite-equivalent. -/
 noncomputable def pi2Surface_rweq (g : Nat)
@@ -537,21 +537,21 @@ noncomputable def pi2Surface_rweq (g : Nat)
 theorem pi2Surface_toEq (g : Nat)
     (α : Pi2 (Surface g) (surfaceBase g)) :
     α.toEq = (Path.refl (Path.refl (surfaceBase g))).toEq := by
-  simpa using rweq_toEq (pi2Surface_rweq g α)
+  simp
 
 /-- Two π₂ elements of a surface are rewrite-equivalent after canonical projection. -/
 noncomputable def pi2Surface_all_rweq (g : Nat)
     (α β : Pi2 (Surface g) (surfaceBase g)) :
     RwEq (Path.stepChain α.toEq) (Path.stepChain β.toEq) := by
-  have h : α.toEq = β.toEq := by
+  have _h : α.toEq = β.toEq := by
     simp [Surface, surfaceBase]
-  exact rweq_of_eq (by simpa using congrArg (fun e => Path.stepChain e) h)
+  exact rweq_of_eq (by simp)
 
 /-- Two π₂ elements of a surface agree at toEq. -/
 theorem pi2Surface_all_eq_toEq (g : Nat)
     (α β : Pi2 (Surface g) (surfaceBase g)) :
     α.toEq = β.toEq := by
-  simpa using rweq_toEq (pi2Surface_all_rweq g α β)
+  simp
 
 /-- Torus: π₂(T²) has trivial toEq. -/
 theorem pi2Torus_trivial_toEq
@@ -634,7 +634,7 @@ noncomputable def pi2_const_map_rweq {A B : Type} {a : A} {b : B}
 theorem pi2_const_map_toEq {A B : Type} {a : A} {b : B}
     (α : Pi2 A a) :
     (pi2Map (fun _ : A => b) α).toEq = (pi2Id (A := B) (a := b)).toEq := by
-  simpa using rweq_toEq (pi2_const_map_rweq (A := A) (B := B) (a := a) (b := b) α)
+  simp
 
 end Pi2Surfaces
 end Homotopy

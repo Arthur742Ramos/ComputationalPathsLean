@@ -105,7 +105,7 @@ structure PointOfTopos (E : GrothendieckTopos) where
   isGeometric  : True
 
 /-- A topos has enough points if stalk functors are jointly conservative. -/
-noncomputable def HasEnoughPoints (E : GrothendieckTopos) : Prop :=
+noncomputable def HasEnoughPoints (_E : GrothendieckTopos) : Prop :=
   True  -- Points jointly detect isomorphisms
 
 -- ============================================================
@@ -171,11 +171,11 @@ theorem deligne_completeness (E : GrothendieckTopos) (_ : True) :
     HasEnoughPoints E := by trivial
 
 /-- Barr's theorem: surjection from sheaves on a Boolean algebra. -/
-theorem barr_theorem (E : GrothendieckTopos) :
+theorem barr_theorem (_E : GrothendieckTopos) :
     Exists (fun desc : String => desc = "Barr covering exists") := ⟨_, rfl⟩
 
 /-- Every Grothendieck topos is Sh(C, J) for some site. -/
-theorem topos_is_sheaf_category (E : GrothendieckTopos) :
+theorem topos_is_sheaf_category (_E : GrothendieckTopos) :
     Exists (fun desc : String => desc = "topos is Sh(C,J)") := ⟨_, rfl⟩
 
 /-- Diaconescu's theorem. -/
@@ -214,11 +214,11 @@ noncomputable def idGeometricMorphism (E : GrothendieckTopos) : GeometricMorphis
   leftExact := trivial
 
 /-- Every Grothendieck topos has a subobject classifier. -/
-theorem topos_has_subobject_classifier (T : GrothendieckTopos) :
+theorem topos_has_subobject_classifier (_T : GrothendieckTopos) :
     Exists (fun desc : String => desc = "SubobjectClassifier exists") := ⟨_, rfl⟩
 
 /-- Every Grothendieck topos is cartesian closed. -/
-theorem topos_is_cartesian_closed (T : GrothendieckTopos) :
+theorem topos_is_cartesian_closed (_T : GrothendieckTopos) :
     Exists (fun desc : String => desc = "InternalHomObj exists") := ⟨_, rfl⟩
 
 /-- Localic topoi are Sh(L) for a locale L. -/
@@ -311,29 +311,29 @@ structure AtomicConnectedTopos where
 noncomputable def isLocallyConnectedTopos (E : GrothendieckTopos) : Prop :=
   ∃ F : LocallyConnectedTopos, F.toGrothendieckTopos = E
 
-noncomputable def pointsDetectIsomorphisms (E : GrothendieckTopos) : Prop :=
+noncomputable def pointsDetectIsomorphisms (_E : GrothendieckTopos) : Prop :=
   True
 
 /-! ## Additional Theorems -/
 
-theorem deligne_completeness_data_exists (E : GrothendieckTopos) :
+theorem deligne_completeness_data_exists (_E : GrothendieckTopos) :
     Exists (fun desc : String => desc = "DeligneCompletenessData exists") :=
   ⟨_, rfl⟩
 
 theorem deligne_completeness_implies_enough_points (E : GrothendieckTopos)
-    (D : DeligneCompletenessData E) : HasEnoughPoints E := by
+    (_D : DeligneCompletenessData E) : HasEnoughPoints E := by
   trivial
 
-theorem barr_covering_data_exists (E : GrothendieckTopos) :
+theorem barr_covering_data_exists (_E : GrothendieckTopos) :
     Exists (fun desc : String => desc = "BarrCoveringData exists") :=
   ⟨_, rfl⟩
 
-theorem barr_covering_surjective (E : GrothendieckTopos) (B : BarrCoveringData E) :
+theorem barr_covering_surjective (E : GrothendieckTopos) (_B : BarrCoveringData E) :
     True := by
   trivial
 
 theorem atomic_topos_decomposition (E : GrothendieckTopos)
-    (A : AtomicToposData E) : True := by
+    (_A : AtomicToposData E) : True := by
   trivial
 
 theorem connected_geometric_morphism_stable_under_comp
@@ -356,7 +356,7 @@ theorem local_geometric_morphism_reflects_points
   trivial
 
 theorem hyperconnected_localic_factorization_data_exists
-    (E F : GrothendieckTopos) (f : GeometricMorphism E F) :
+    (E F : GrothendieckTopos) (_f : GeometricMorphism E F) :
     Exists (fun desc : String => desc = "HyperconnectedLocalicFactorizationData exists") :=
   ⟨_, rfl⟩
 
@@ -365,7 +365,7 @@ theorem hyperconnected_localic_factorization_unique
     (_ : HyperconnectedLocalicFactorizationData E F) : True := by
   trivial
 
-theorem classifying_topos_exists (T : GeometricTheory) :
+theorem classifying_topos_exists (_T : GeometricTheory) :
     Exists (fun desc : String => desc = "ClassifyingTopos exists") :=
   ⟨_, rfl⟩
 
@@ -373,15 +373,15 @@ theorem classifying_topos_points_correspond_models (T : GeometricTheory)
     (_ : ClassifyingTopos T) : True := by
   trivial
 
-theorem points_of_topos_form_category (E : GrothendieckTopos) :
+theorem points_of_topos_form_category (_E : GrothendieckTopos) :
     Exists (fun desc : String => desc = "PointCategory exists") :=
   ⟨_, rfl⟩
 
 theorem enough_points_from_point_category (E : GrothendieckTopos)
-    (W : EnoughPointsWitness E) : HasEnoughPoints E := by
+    (_W : EnoughPointsWitness E) : HasEnoughPoints E := by
   trivial
 
-theorem atomic_connected_topos_has_localic_groupoid (A : AtomicConnectedTopos) :
+theorem atomic_connected_topos_has_localic_groupoid (_A : AtomicConnectedTopos) :
     True := by
   trivial
 
@@ -397,11 +397,11 @@ theorem hyperconnected_part_of_factorization_is_hyperconnected
     IsHyperconnected E H.middle H.hyperPart := by
   trivial
 
-theorem connected_atomic_implies_points (A : AtomicConnectedTopos) : True := by
+theorem connected_atomic_implies_points (_A : AtomicConnectedTopos) : True := by
   trivial
 
 theorem geometric_theory_has_points_if_classifying_topos_has_enough_points
-    (T : GeometricTheory) (C : ClassifyingTopos T) : True := by
+    (T : GeometricTheory) (_C : ClassifyingTopos T) : True := by
   trivial
 
 theorem points_detect_isomorphisms_iff_enough_points (E : GrothendieckTopos) :
@@ -413,7 +413,7 @@ theorem local_geometric_morphism_factorization
     (_ : LocalGeometricMorphism E F f) : True := by
   trivial
 
-theorem deligne_and_barr_are_compatible (E : GrothendieckTopos) : True := by
+theorem deligne_and_barr_are_compatible (_E : GrothendieckTopos) : True := by
   trivial
 
 /-! ## Computational-path topos integration -/

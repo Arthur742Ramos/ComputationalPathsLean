@@ -43,7 +43,7 @@ noncomputable def idFrac (a : A) : Fraction a a a :=
 -- 1
 theorem idFrac_toPath_toEq (a : A) :
     (idFrac a).toPath.toEq = (refl a).toEq := by
-  simp [idFrac, toPath, toEq]
+  simp
 
 -- 2
 theorem toPath_steps (f : Fraction a b c) :
@@ -57,12 +57,12 @@ noncomputable def symmFrac (fr : Fraction a b c) : Fraction c b a :=
 -- 3
 theorem symmFrac_toPath_toEq (fr : Fraction a b c) :
     fr.symmFrac.toPath.toEq = (symm fr.toPath).toEq := by
-  simp [symmFrac, toPath, toEq]
+  simp
 
 -- 4
 theorem symmFrac_symmFrac_toEq (fr : Fraction a b c) :
     fr.symmFrac.symmFrac.toPath.toEq = fr.toPath.toEq := by
-  simp [symmFrac, toPath, toEq]
+  simp
 
 end Fraction
 
@@ -112,7 +112,7 @@ noncomputable def oreRefl {A : Type u} (a : A) : OreCondition a a a :=
   { apex := a
     compB := refl a
     compC := refl a
-    square := fun _ _ => by simp [toEq] }
+    square := fun _ _ => by simp }
 
 /-! ## Section 3: Left fractions and left Ore condition -/
 
@@ -133,7 +133,7 @@ noncomputable def idFrac (a : A) : LeftFraction a a a :=
 -- 9
 theorem idFrac_toPath_toEq (a : A) :
     (idFrac a).toPath.toEq = (refl a).toEq := by
-  simp [idFrac, toPath, toEq]
+  simp
 
 -- 10
 theorem toPath_steps (f : LeftFraction a b c) :
@@ -160,7 +160,7 @@ noncomputable def leftOreRefl {A : Type u} (a : A) : LeftOreCondition a a a :=
   { apex := a
     compB := refl a
     compC := refl a
-    square := fun _ _ => by simp [toEq] }
+    square := fun _ _ => by simp }
 
 /-! ## Section 4: Zigzag / Hammock localization -/
 
@@ -194,7 +194,7 @@ noncomputable def ofPath {a b : A} (p : Path a b) : @Zigzag A a b :=
 -- 13
 theorem collapse_ofPath_toEq {a b : A} (p : Path a b) :
     (ofPath p).collapse.toEq = p.toEq := by
-  simp [ofPath, collapse, toEq]
+  simp
 
 noncomputable def zigzag_trans {a b c : A} (z₁ : @Zigzag A a b) (z₂ : @Zigzag A b c) : @Zigzag A a c :=
   append z₁ z₂
@@ -206,9 +206,9 @@ noncomputable def zigzag_symm {a b : A} (z : @Zigzag A a b) : @Zigzag A b a :=
 theorem collapse_append_toEq {a b c : A} (z₁ : @Zigzag A a b) (z₂ : @Zigzag A b c) :
     (append z₁ z₂).collapse.toEq = (trans z₁.collapse z₂.collapse).toEq := by
   induction z₁ with
-  | nil _ => simp [toEq]
-  | forward p z₁ ih => simp only [append, collapse, toEq] at *
-  | backward p z₁ ih => simp only [append, collapse, toEq] at *
+  | nil _ => simp
+  | forward p z₁ ih => simp only at *
+  | backward p z₁ ih => simp only at *
 
 -- 15
 theorem collapse_zigzag_trans_toEq {a b c : A} (z₁ : @Zigzag A a b) (z₂ : @Zigzag A b c) :
@@ -249,7 +249,7 @@ variable {A : Type u} {B : Type v} {C : Type w}
 -- 19
 theorem map_symm_toEq (F : LocalizationFunctor A B) {a b : A} (p : Path a b) :
     (F.mapPath (symm p)).toEq = (symm (F.mapPath p)).toEq := by
-  simp [toEq]
+  simp
 
 -- 20
 theorem map_trans_toEq (F : LocalizationFunctor A B) {a b c : A}
@@ -306,7 +306,7 @@ structure InvertsWeqs (A : Type u) (B : Type v)
 -- 25: Universal property of localization: G.F factors through itself.
 theorem locFunctor_universal {A : Type u} {B : Type v}
     {W : {a b : A} → Path a b → Prop}
-    (L : InvertsWeqs A A W)
+    (_L : InvertsWeqs A A W)
     (G : InvertsWeqs A B W) :
     ∃ (H : LocalizationFunctor A B),
       H = G.F :=
@@ -370,12 +370,12 @@ variable {A : Type u} (R : BousfieldReflection A)
 theorem unit_natural_toEq {a b : A} (p : Path a b) :
     (trans (R.unit a) (R.mapPath p)).toEq =
       (trans p (R.unit b)).toEq := by
-  simp [toEq]
+  simp
 
 -- 30
 theorem mapPath_unit_toEq (a : A) :
     (R.mapPath (R.unit a)).toEq = (R.unit (R.L a)).toEq := by
-  simp [toEq]
+  simp
 
 -- 31
 theorem idempotent_toEq (a : A) :
@@ -401,7 +401,7 @@ theorem transport_fraction {A : Type u} {D : A → Sort v} {a b c : A}
 -- 33
 theorem transport_idFrac {A : Type u} {D : A → Sort v} (a : A) (x : D a) :
     transport (D := D) (Fraction.idFrac a).toPath x = x := by
-  simp [Fraction.idFrac, Fraction.toPath, transport]
+  simp [transport]
 
 -- 34
 theorem transport_zigzag_nil {A : Type u} {D : A → Sort v} (a : A) (x : D a) :

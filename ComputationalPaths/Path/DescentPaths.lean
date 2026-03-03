@@ -159,7 +159,7 @@ noncomputable def descent_unique_trans {A : Type u} {B : Type v}
 
 /-- Descent along identity paths yields reflexive paths. -/
 noncomputable def descent_unique_refl {A : Type u} {B : Type v}
-    {f : A → B} (edm : EffectiveDescentMorphism A B f) (a : A) :
+    {f : A → B} (_edm : EffectiveDescentMorphism A B f) (a : A) :
     Path (f a) (f a) :=
   Path.refl (f a)
 
@@ -445,7 +445,7 @@ theorem beck_chevalley_symm {A : Type u} {B : Type v}
 structure GrothendieckFibration (E : Type u) (B : Type v)
     (p : E → B) where
   /-- Lifting: given a path in the base and a point in the fiber, lift it -/
-  lift : ∀ {b1 b2 : B} (γ : Path b1 b2) (e : E) (h : p e = b1), E
+  lift : ∀ {b1 b2 : B} (_γ : Path b1 b2) (e : E) (_h : p e = b1), E
   /-- The lift projects correctly -/
   liftProj : ∀ {b1 b2 : B} (γ : Path b1 b2) (e : E) (h : p e = b1),
     Path (p (lift γ e h)) b2
@@ -494,8 +494,8 @@ noncomputable def fiberTransport_congrArg {E : Type u} {B : Type v} {C : Type w}
 /-- A descent morphism preserves path structure. -/
 structure DescentMorphism (A : Type u) (B : Type v) (f : A → B) where
   /-- Surjectivity on paths: any base path lifts -/
-  pathSurj : ∀ {b1 b2 : B} (p : Path b1 b2),
-    ∀ (a1 : A) (h : f a1 = b1), ∃ a2 : A, f a2 = b2
+  pathSurj : ∀ {b1 b2 : B} (_p : Path b1 b2),
+    ∀ (a1 : A) (_h : f a1 = b1), ∃ a2 : A, f a2 = b2
   /-- Path reflection: congruent images imply related sources -/
   pathRefl : ∀ (a : A), f a = f a
 
@@ -614,7 +614,7 @@ structure CartesianMorphism (E : Type u) (B : Type v)
   /-- Compatibility with projection -/
   projCompat : Path.congrArg p morph = basePath
   /-- Cartesian property: universal factorization -/
-  factor : ∀ (e : E) (q : Path e tgt) (hbase : Path (p e) (p src)),
+  factor : ∀ (e : E) (_q : Path e tgt) (_hbase : Path (p e) (p src)),
     Path e src
 
 /-- Identity cartesian morphism. -/

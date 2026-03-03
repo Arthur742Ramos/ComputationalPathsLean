@@ -73,7 +73,7 @@ structure AccessibleCategory (κ : RegularCardinal) where
   hasFilteredColimits : True
   compactGenerators : Obj → Prop
   generatorsAreCompact : ∀ g, compactGenerators g → True
-  generationProperty : ∀ (X : Obj), True
+  generationProperty : ∀ (_X : Obj), True
 
 structure LocallyPresentableCategory (κ : RegularCardinal)
     extends AccessibleCategory κ where
@@ -108,7 +108,7 @@ structure IndCategory (Obj : Type u) where
   indObj : Type u
   indHom : indObj → indObj → Type v
 
-theorem ind_is_accessible (κ : RegularCardinal) (_ : Type u) :
+theorem ind_is_accessible (_κ : RegularCardinal) (_ : Type u) :
     True := by trivial
 
 structure ProCategory (Obj : Type u) where
@@ -271,17 +271,17 @@ structure DoctrineMorphism (D₁ D₂ : SoundDoctrine) where
   mapSyntax : D₁.syntaxType → D₂.syntaxType
   preservesTruth : True
 
-noncomputable def isAccessibleSketchable (κ : RegularCardinal) (C : AccessibleCategory κ) : Prop :=
+noncomputable def isAccessibleSketchable (κ : RegularCardinal) (_C : AccessibleCategory κ) : Prop :=
   True
 
 noncomputable def hasReflectiveAccessibleSubcategory (κ : RegularCardinal)
-    (C : AccessibleCategory κ) : Prop :=
+    (_C : AccessibleCategory κ) : Prop :=
   True
 
 /-! ## Additional Theorems -/
 
 theorem makkai_pare_presentation_exists (κ : RegularCardinal)
-    (C : AccessibleCategory κ) :
+    (_C : AccessibleCategory κ) :
     Exists (fun desc : String => desc = "MakkaiParePresentation exists") :=
   ⟨_, rfl⟩
 
@@ -291,33 +291,33 @@ theorem lambda_orthogonality_stable_under_filtered_colimits
   trivial
 
 theorem lambda_orthogonality_characterizes_accessibility
-    (κ : RegularCardinal) (C : AccessibleCategory κ) : True := by
+    (κ : RegularCardinal) (_C : AccessibleCategory κ) : True := by
   trivial
 
-theorem ind_pro_bridge_exists (Obj : Type u) :
+theorem ind_pro_bridge_exists (_Obj : Type u) :
     Exists (fun desc : String => desc = "IndProBridge exists") :=
   ⟨_, rfl⟩
 
-theorem ind_pro_bridge_functorial (Obj : Type u) (B : IndProBridge Obj) :
+theorem ind_pro_bridge_functorial (Obj : Type u) (_B : IndProBridge Obj) :
     True := by
   trivial
 
 theorem accessible_localization_data_exists (κ : RegularCardinal)
-    (C : AccessibleCategory κ) :
+    (_C : AccessibleCategory κ) :
     Exists (fun desc : String => desc = "AccessibleLocalizationData exists") :=
   ⟨_, rfl⟩
 
 theorem accessible_localization_functor_exists (κ : RegularCardinal)
-    (C : AccessibleCategory κ) :
+    (_C : AccessibleCategory κ) :
     Exists (fun desc : String => desc = "AccessibleLocalizationFunctor exists") :=
   ⟨_, rfl⟩
 
 theorem accessible_localization_is_reflective_ext (κ : RegularCardinal)
-    (C : AccessibleCategory κ) : True := by
+    (_C : AccessibleCategory κ) : True := by
   trivial
 
 theorem sketch_theoretic_characterization_of_accessibility
-    (κ : RegularCardinal) (C : AccessibleCategory κ) : True := by
+    (κ : RegularCardinal) (_C : AccessibleCategory κ) : True := by
   trivial
 
 theorem reflective_accessible_subcategory_exists
@@ -327,36 +327,36 @@ theorem reflective_accessible_subcategory_exists
 
 theorem reflective_accessible_subcategory_closed_under_limits
     (κ : RegularCardinal) (C : AccessibleCategory κ)
-    (R : ReflectiveAccessibleSubcategory κ C) : True := by
+    (_R : ReflectiveAccessibleSubcategory κ C) : True := by
   trivial
 
 theorem reflective_accessible_subcategory_closed_under_filtered_colimits
     (κ : RegularCardinal) (C : AccessibleCategory κ)
-    (R : ReflectiveAccessibleSubcategory κ C) : True := by
+    (_R : ReflectiveAccessibleSubcategory κ C) : True := by
   trivial
 
-theorem sound_doctrine_reflects_validity (D : SoundDoctrine) : True := by
+theorem sound_doctrine_reflects_validity (_D : SoundDoctrine) : True := by
   trivial
 
-theorem sound_doctrine_is_complete_on_models (D : SoundDoctrine) : True := by
+theorem sound_doctrine_is_complete_on_models (_D : SoundDoctrine) : True := by
   trivial
 
 theorem doctrine_morphism_composition (D₁ D₂ D₃ : SoundDoctrine)
-    (f : DoctrineMorphism D₁ D₂) (g : DoctrineMorphism D₂ D₃) : True := by
+    (_f : DoctrineMorphism D₁ D₂) (_g : DoctrineMorphism D₂ D₃) : True := by
   trivial
 
 theorem accessible_from_sound_doctrine (κ : RegularCardinal)
-    (C : AccessibleCategory κ) (_ : SoundDoctrine) : True := by
+    (_C : AccessibleCategory κ) (_ : SoundDoctrine) : True := by
   trivial
 
 theorem reflective_subcategory_has_accessible_reflector
     (κ : RegularCardinal) (C : AccessibleCategory κ)
-    (R : ReflectiveAccessibleSubcategory κ C) : True := by
+    (_R : ReflectiveAccessibleSubcategory κ C) : True := by
   trivial
 
 theorem accessibility_preserved_by_reflection
     (κ : RegularCardinal) (C : AccessibleCategory κ)
-    (R : ReflectiveAccessibleSubcategory κ C) : True := by
+    (_R : ReflectiveAccessibleSubcategory κ C) : True := by
   trivial
 
 theorem ind_and_pro_bridge_respects_localizations
@@ -394,7 +394,7 @@ noncomputable def filteredColimitPathId {κ : RegularCardinal}
     (r : filteredColimitPathLimit C Y Z) :
     filteredColimitPathCompose (filteredColimitPathCompose p q) r =
       filteredColimitPathCompose p (filteredColimitPathCompose q r) := by
-  simpa [filteredColimitPathCompose] using Path.trans_assoc p q r
+  simp [filteredColimitPathCompose]
 
 noncomputable def indObjectPathCompletion (Obj : Type u) (I : IndCategory Obj) : Type _ :=
   (x : I.indObj) → Path x x

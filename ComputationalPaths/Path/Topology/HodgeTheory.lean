@@ -272,28 +272,28 @@ structure MixedHodgeOnVariety where
 /-! ## Additional Theorem Stubs -/
 
 theorem deRham_exact_sub_closed_theorem (Omega : DifferentialForms)
-    (H : DeRhamCohomology Omega) (p : Nat) (x : H.exact p) : True := trivial
+    (H : DeRhamCohomology Omega) (p : Nat) (_x : H.exact p) : True := trivial
 
 theorem hodgeStep_output_path (Omega : DifferentialForms) (p : Nat)
-    (h : HodgeStep Omega p) : True := trivial
+    (_h : HodgeStep Omega p) : True := trivial
 
 theorem codifferential_squared_true (Omega : DifferentialForms)
-    (C : Codifferential Omega) (p : Nat) (hp : p > 1) (hq : p > 0)
-    (omega : Omega.forms p) : True := trivial
+    (_C : Codifferential Omega) (p : Nat) (_hp : p > 1) (_hq : p > 0)
+    (_omega : Omega.forms p) : True := trivial
 
 theorem harmonicSpace_closed_true (Omega : DifferentialForms)
-    (L : HodgeLaplacian Omega) (H : HarmonicSpace Omega L) : True := trivial
+    (L : HodgeLaplacian Omega) (_H : HarmonicSpace Omega L) : True := trivial
 
 theorem hodgeDeRham_dimension_path (Omega : DifferentialForms)
-    (H : HodgeDeRham Omega) (p : Nat) : True := trivial
+    (_H : HodgeDeRham Omega) (_p : Nat) : True := trivial
 
-theorem kahler_real_dim_path (K : KahlerManifold) : True := trivial
+theorem kahler_real_dim_path (_K : KahlerManifold) : True := trivial
 
 theorem dolbeault_conjugation_path (K : KahlerManifold)
-    (D : DolbeaultDecomposition K) (r s : Nat) : True := trivial
+    (_D : DolbeaultDecomposition K) (_r _s : Nat) : True := trivial
 
 theorem hardLefschetz_holds (K : KahlerManifold)
-    (H : HardLefschetz K) (k : Nat) (hk : k ≤ K.complexDim) : True := trivial
+    (_H : HardLefschetz K) (k : Nat) (_hk : k ≤ K.complexDim) : True := trivial
 
 
 end HodgeTheory

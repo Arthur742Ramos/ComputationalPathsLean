@@ -243,7 +243,7 @@ theorem fp_congrArg {A : Type u} {B : Type v} {f : MonotoneMap A} {x : A}
 
 /-- An ascending chain from iteration. -/
 noncomputable def iterChain {A : Type u} (f : MonotoneMap A) (bot : A)
-    (bot_below : ∀ y : A, Path bot y) : Nat → A :=
+    (_bot_below : ∀ y : A, Path bot y) : Nat → A :=
   fun n => f.iterate n bot
 
 /-- The iteration chain starts at bot. -/

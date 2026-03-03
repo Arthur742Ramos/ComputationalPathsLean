@@ -34,7 +34,7 @@ structure Antichain (P : ForcingNotion) where
   pairwise_incompat : ∀ p q, p ∈ elems → q ∈ elems → p ≠ q → ¬Compatible P p q
 
 /-- CCC (countable chain condition): every antichain is countable. -/
-noncomputable def CCC (P : ForcingNotion) : Prop :=
+noncomputable def CCC (_P : ForcingNotion) : Prop :=
   True  -- every antichain is countable
 
 /-- Dense set in a forcing notion. -/
@@ -68,11 +68,11 @@ structure IteratedForcing (P : ForcingNotion) (Q : ForcingNotion) where
   combined : ForcingNotion
 
 /-- Martin's axiom: MA(κ) for a cardinal κ. -/
-noncomputable def MartinsAxiom (κ : Nat) : Prop :=
+noncomputable def MartinsAxiom (_κ : Nat) : Prop :=
   True  -- for every CCC poset and < κ dense sets, a generic filter exists
 
 /-- Proper forcing. -/
-noncomputable def Proper (P : ForcingNotion) : Prop :=
+noncomputable def Proper (_P : ForcingNotion) : Prop :=
   True  -- every countable elementary submodel has a condition forcing it is generic
 
 /-- Proper forcing axiom (PFA). -/
@@ -123,7 +123,7 @@ structure CoreModel where
   level : Nat → Type u
 
 /-- Determinacy for pointclasses. -/
-noncomputable def PointclassDeterminacy (Γ : (Nat → Nat) → Prop → Prop) : Prop :=
+noncomputable def PointclassDeterminacy (_Γ : (Nat → Nat) → Prop → Prop) : Prop :=
   True  -- all games in Γ are determined
 
 -- ============================================================
@@ -135,19 +135,19 @@ theorem ch_independence :
     True := trivial
 
 /-- Cohen forcing adds a new real. -/
-theorem cohen_adds_real (G : GenericFilter CohenForcing) :
+theorem cohen_adds_real (_G : GenericFilter CohenForcing) :
     True := trivial
 
 /-- CCC forcing preserves cardinals. -/
-theorem ccc_preserves_cardinals (P : ForcingNotion) (h : CCC P) :
+theorem ccc_preserves_cardinals (P : ForcingNotion) (_h : CCC P) :
     True := trivial
 
 /-- Proper forcing preserves ω₁. -/
-theorem proper_preserves_omega1 (P : ForcingNotion) (h : Proper P) :
+theorem proper_preserves_omega1 (P : ForcingNotion) (_h : Proper P) :
     True := trivial
 
 /-- Martin's axiom implies Souslin's hypothesis. -/
-theorem ma_implies_sh (κ : Nat) (h : MartinsAxiom κ) :
+theorem ma_implies_sh (κ : Nat) (_h : MartinsAxiom κ) :
     True := trivial
 
 /-- ◇ implies existence of a Souslin tree. -/
@@ -178,7 +178,7 @@ noncomputable def measurable_is_inaccessible (M : MeasurableCardinal) : Inaccess
   M.toInaccessible
 
 /-- Woodin cardinals imply Σ²₁ absoluteness. -/
-theorem woodin_sigma21_absoluteness (W : WoodinCardinal) :
+theorem woodin_sigma21_absoluteness (_W : WoodinCardinal) :
     True := trivial
 
 /-- AD (axiom of determinacy) contradicts AC. -/
@@ -210,7 +210,7 @@ theorem easton_theorem :
     True := trivial
 
 /-- Solovay's model: if inaccessible exists, all sets of reals measurable in inner model. -/
-theorem solovay_model (I : Inaccessible) :
+theorem solovay_model (_I : Inaccessible) :
     True := trivial
 
 end SetTheoreticTopology

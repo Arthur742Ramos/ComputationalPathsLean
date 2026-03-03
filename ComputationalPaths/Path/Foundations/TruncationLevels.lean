@@ -90,11 +90,11 @@ theorem pi {B : A → Type v} (h : ∀ x, IsProp (B x)) :
   fun f g => funext (fun x => h x (f x) (g x))
 
 /-- In a proposition, any two equalities are equal. -/
-theorem eq_eq (h : IsProp A) {x y : A} (p q : x = y) : p = q :=
+theorem eq_eq (_h : IsProp A) {x y : A} (p q : x = y) : p = q :=
   Subsingleton.elim p q
 
 /-- Two computational paths in a proposition have equal toEq. -/
-theorem path_toEq_eq (h : IsProp A) {x y : A} (p q : Path x y) :
+theorem path_toEq_eq (_h : IsProp A) {x y : A} (p q : Path x y) :
     p.toEq = q.toEq :=
   Subsingleton.elim p.toEq q.toEq
 
@@ -115,7 +115,7 @@ theorem uip (h : IsSet A) {x y : A} (p q : x = y) : p = q :=
   h x y p q
 
 /-- Every proposition is a set. -/
-theorem ofIsProp (h : IsProp A) : IsSet A :=
+theorem ofIsProp (_h : IsProp A) : IsSet A :=
   fun _ _ _ _ => Subsingleton.elim _ _
 
 /-- Nat is a set. -/
@@ -127,12 +127,12 @@ theorem boolIsSet : IsSet Bool :=
   fun _ _ _ _ => Subsingleton.elim _ _
 
 /-- Products of sets are sets. -/
-theorem prod {B : Type v} (ha : IsSet A) (hb : IsSet B) :
+theorem prod {B : Type v} (_ha : IsSet A) (_hb : IsSet B) :
     IsSet (A × B) :=
   fun _ _ _ _ => Subsingleton.elim _ _
 
 /-- Dependent function types into sets are sets. -/
-theorem pi {B : A → Type v} (h : ∀ x, IsSet (B x)) :
+theorem pi {B : A → Type v} (_h : ∀ x, IsSet (B x)) :
     IsSet (∀ x, B x) :=
   fun _ _ _ _ => Subsingleton.elim _ _
 
@@ -166,11 +166,11 @@ namespace IsGroupoid
 variable {A : Type u}
 
 /-- Every set is a groupoid. -/
-theorem ofIsSet (h : IsSet A) : IsGroupoid A :=
-  fun x y p q r s => Subsingleton.elim r s
+theorem ofIsSet (_h : IsSet A) : IsGroupoid A :=
+  fun _x _y _p _q r s => Subsingleton.elim r s
 
 /-- Products of groupoids are groupoids. -/
-theorem prod {B : Type v} (ha : IsGroupoid A) (hb : IsGroupoid B) :
+theorem prod {B : Type v} (_ha : IsGroupoid A) (_hb : IsGroupoid B) :
     IsGroupoid (A × B) :=
   fun _ _ _ _ r s => Subsingleton.elim r s
 
@@ -188,7 +188,7 @@ end IsGroupoid
 noncomputable def IsTruncLevel : Nat → Type u → Prop
   | 0 => IsProp
   | 1 => IsSet
-  | (n + 2) => IsGroupoid  -- For n ≥ 2, all collapse to groupoid in UIP
+  | (_n + 2) => IsGroupoid  -- For n ≥ 2, all collapse to groupoid in UIP
 
 namespace IsTruncLevel
 
@@ -207,11 +207,11 @@ theorem two_iff_groupoid : IsTruncLevel 2 A ↔ IsGroupoid A :=
   Iff.rfl
 
 /-- Truncation levels are cumulative: prop → set. -/
-theorem prop_to_set (h : IsTruncLevel 0 A) : IsTruncLevel 1 A :=
+theorem prop_to_set (_h : IsTruncLevel 0 A) : IsTruncLevel 1 A :=
   fun _ _ _ _ => Subsingleton.elim _ _
 
 /-- Truncation levels are cumulative: set → groupoid. -/
-theorem set_to_groupoid (h : IsTruncLevel 1 A) : IsTruncLevel 2 A :=
+theorem set_to_groupoid (_h : IsTruncLevel 1 A) : IsTruncLevel 2 A :=
   fun _ _ _ _ _ _ => Subsingleton.elim _ _
 
 /-- Propositions are sets (named corollary). -/
@@ -250,7 +250,7 @@ private theorem constPath_const (dec : DecidableEq A) (x y : A)
 private theorem factorization (dec : DecidableEq A) {x y : A}
     (p : x = y) :
     p = (constPath dec x x rfl).symm.trans (constPath dec x y p) := by
-  cases p; simp [Eq.trans]
+  cases p; simp
 
 /-- **Hedberg's theorem**: a type with decidable equality is a set. -/
 theorem hedberg (dec : DecidableEq A) : IsSet A := by
@@ -288,7 +288,7 @@ namespace TruncExtra
 variable {A : Type u} {B : Type v}
 
 /-- Propositions are trivially sets. -/
-theorem prop_isSet (h : IsProp A) : IsSet A :=
+theorem prop_isSet (_h : IsProp A) : IsSet A :=
   fun _ _ _ _ => Subsingleton.elim _ _
 
 /-- Retract of a set is a set. -/
@@ -303,8 +303,8 @@ theorem set_of_retract {f : A → B} {g : B → A}
   rw [hp, hq, this]
 
 /-- Embedding into a set gives a set. -/
-theorem set_of_injective {f : A → B} (hf : Function.Injective f)
-    (hB : IsSet B) : IsSet A :=
+theorem set_of_injective {f : A → B} (_hf : Function.Injective f)
+    (_hB : IsSet B) : IsSet A :=
   fun _ _ _ _ => Subsingleton.elim _ _
 
 /-- Sigma of propositions over a proposition is a proposition. -/

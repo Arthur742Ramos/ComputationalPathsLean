@@ -116,7 +116,7 @@ theorem assoc_refl_trans {A : Type u} (O : OpetopicType A) (x y z : A) :
 theorem assoc_symm_trans {A : Type u} (O : OpetopicType A) (x y z : A) :
     symm (trans (O.assoc x y z) (refl (O.Gam x (O.Gam y z)))) =
       trans (symm (refl (O.Gam x (O.Gam y z)))) (symm (O.assoc x y z)) := by
-  simpa using symm_trans (O.assoc x y z) (refl (O.Gam x (O.Gam y z)))
+  simp
 
 theorem assoc_chain_reassoc {A : Type u} (O : OpetopicType A) (x y z w : A) :
     trans (trans (O.assoc (O.Gam x y) z w) (O.assoc x y (O.Gam z w)))
@@ -171,7 +171,7 @@ noncomputable def whisker_assoc {A : Type u} (O : OpetopicType A) (f : A → A) 
 theorem whisker_assoc_trans {A : Type u} (O : OpetopicType A) (f : A → A) (x y z : A) :
     congrArg f (trans (O.assoc x y z) (refl (O.Gam x (O.Gam y z)))) =
       trans (congrArg f (O.assoc x y z)) (congrArg f (refl (O.Gam x (O.Gam y z)))) := by
-  simpa using congrArg_trans f (O.assoc x y z) (refl (O.Gam x (O.Gam y z)))
+  simp
 
 theorem whisker_assoc_symm {A : Type u} (O : OpetopicType A) (f : A → A) (x y z : A) :
     congrArg f (symm (O.assoc x y z)) = symm (congrArg f (O.assoc x y z)) :=
@@ -184,7 +184,7 @@ theorem id_left_whisker_symm {A : Type u} (O : OpetopicType A) (f : A → A) (x 
 theorem id_right_whisker_trans {A : Type u} (O : OpetopicType A) (f : A → A) (x : A) :
     congrArg f (trans (O.id_right x) (refl x)) =
       trans (congrArg f (O.id_right x)) (congrArg f (refl x)) := by
-  simpa using congrArg_trans f (O.id_right x) (refl x)
+  simp
 
 theorem coherence_routes_agree {A : Type u} (O : OpetopicType A) (x y z w : A) :
     coherenceRouteLeft O x y z w = coherenceRouteRight O x y z w :=
@@ -211,12 +211,12 @@ noncomputable def contractThree {A : Type u} (Z : ZoomComplex A) (n : Nat) (x : 
 theorem zoom_congr_trans {A : Type u} (Z : ZoomComplex A) (n : Nat)
     {x y z : A} (p : Path x y) (q : Path y z) :
     zoom_congr Z n (trans p q) = trans (zoom_congr Z n p) (zoom_congr Z n q) := by
-  simpa [zoom_congr] using congrArg_trans (fun t => Z.zoom n t) p q
+  simp [zoom_congr]
 
 theorem zoom_congr_symm {A : Type u} (Z : ZoomComplex A) (n : Nat)
     {x y : A} (p : Path x y) :
     zoom_congr Z n (symm p) = symm (zoom_congr Z n p) := by
-  simpa [zoom_congr] using congrArg_symm (fun t => Z.zoom n t) p
+  simp [zoom_congr]
 
 theorem contract_symm_symm {A : Type u} (Z : ZoomComplex A) (n : Nat) (x : A) :
     symm (symm (Z.contract n x)) = Z.contract n x :=
@@ -255,7 +255,7 @@ theorem contract_two_symm_trans {A : Type u} (Z : ZoomComplex A) (n : Nat) (x : 
 theorem contract_whisker_trans {A : Type u} (Z : ZoomComplex A) (f : A → A) (n : Nat) (x : A) :
     congrArg f (trans (Z.contract (n + 1) x) (Z.contract n x)) =
       trans (congrArg f (Z.contract (n + 1) x)) (congrArg f (Z.contract n x)) := by
-  simpa using congrArg_trans f (Z.contract (n + 1) x) (Z.contract n x)
+  simp
 
 theorem contract_whisker_symm {A : Type u} (Z : ZoomComplex A) (f : A → A) (n : Nat) (x : A) :
     congrArg f (symm (contractTwo Z n x)) = symm (congrArg f (contractTwo Z n x)) :=
@@ -320,7 +320,7 @@ theorem compose_via_universal_whisker_trans {A : Type u} (O : OpetopicType A)
     (U : UniversalCell O) (f : A → A) :
     congrArg f (trans U.leftFactor (symm U.rightFactor)) =
       trans (congrArg f U.leftFactor) (congrArg f (symm U.rightFactor)) := by
-  simpa using congrArg_trans f U.leftFactor (symm U.rightFactor)
+  simp
 
 theorem compose_via_universal_whisker_symm {A : Type u} (O : OpetopicType A)
     (U : UniversalCell O) (f : A → A) :
@@ -381,7 +381,7 @@ theorem cat_whisker_assoc_trans {Obj : Type u} {Mor : Type v}
     (C : OpetopicCategory Obj Mor) (m : Mor → Mor) (f g h : Mor) :
     congrArg m (trans (C.assoc f g h) (refl (C.Gam f (C.Gam g h)))) =
       trans (congrArg m (C.assoc f g h)) (congrArg m (refl (C.Gam f (C.Gam g h)))) := by
-  simpa using congrArg_trans m (C.assoc f g h) (refl (C.Gam f (C.Gam g h)))
+  simp
 
 theorem cat_whisker_assoc_symm {Obj : Type u} {Mor : Type v}
     (C : OpetopicCategory Obj Mor) (m : Mor → Mor) (f g h : Mor) :
@@ -392,7 +392,7 @@ theorem cat_assoc_symm_trans {Obj : Type u} {Mor : Type v}
     (C : OpetopicCategory Obj Mor) (f g h : Mor) :
     symm (trans (C.assoc f g h) (refl (C.Gam f (C.Gam g h)))) =
       trans (symm (refl (C.Gam f (C.Gam g h)))) (symm (C.assoc f g h)) := by
-  simpa using symm_trans (C.assoc f g h) (refl (C.Gam f (C.Gam g h)))
+  simp
 
 /-! ## Baez-Dolan hypothesis and multitopes -/
 
@@ -428,7 +428,7 @@ theorem universal_whisker_trans {A : Type u} (B : BaezDolanHypothesis A)
     (f : A → A) (m n : Nat) :
     congrArg f (trans (B.universal m n) (refl (B.Sym (m + n)))) =
       trans (congrArg f (B.universal m n)) (congrArg f (refl (B.Sym (m + n)))) := by
-  simpa using congrArg_trans f (B.universal m n) (refl (B.Sym (m + n)))
+  simp
 
 theorem universal_whisker_symm {A : Type u} (B : BaezDolanHypothesis A)
     (f : A → A) (m n : Nat) :
@@ -438,7 +438,7 @@ theorem universal_whisker_symm {A : Type u} (B : BaezDolanHypothesis A)
 theorem universal_symm_trans {A : Type u} (B : BaezDolanHypothesis A) (m n : Nat) :
     symm (trans (B.universal m n) (refl (B.Sym (m + n)))) =
       trans (symm (refl (B.Sym (m + n)))) (symm (B.universal m n)) := by
-  simpa using symm_trans (B.universal m n) (refl (B.Sym (m + n)))
+  simp
 
 inductive Multitope (A : Type u) where
   | atom : A → Multitope A

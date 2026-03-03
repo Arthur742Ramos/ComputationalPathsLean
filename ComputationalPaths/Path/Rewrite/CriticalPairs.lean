@@ -304,35 +304,35 @@ noncomputable def CriticalPairCase.Statement : CriticalPairCase → Prop
           (Path.trans (Path.trans p q) (Path.trans r s))
   | .symm_congr_symm_symm =>
       ∀ {A : Type u} {a b : A} {p p' : Path a b}
-        (hp : Step p p'),
+        (_hp : Step p p'),
         Step.Joinable (Path.symm (Path.symm p')) p
   | .symm_congr_symm_trans_congr_left =>
       ∀ {A : Type u} {a b c : A} {p p' : Path a b} {q : Path b c}
-        (hp : Step p p'),
+        (_hp : Step p p'),
         Step.Joinable
           (Path.symm (Path.trans p' q))
           (Path.trans (Path.symm q) (Path.symm p))
   | .symm_congr_symm_trans_congr_right =>
       ∀ {A : Type u} {a b c : A} {p : Path a b} {q q' : Path b c}
-        (hq : Step q q'),
+        (_hq : Step q q'),
         Step.Joinable
           (Path.symm (Path.trans p q'))
           (Path.trans (Path.symm q) (Path.symm p))
   | .trans_congr_left_right =>
       ∀ {A : Type u} {a b c : A} {p p' : Path a b} {q q' : Path b c}
-        (hp : Step p p') (hq : Step q q'),
+        (_hp : Step p p') (_hq : Step q q'),
         Step.Joinable (Path.trans p' q) (Path.trans p q')
   | .trans_congr_left_trans_assoc =>
       ∀ {A : Type u} {a b c d : A}
         {p p' : Path a b} {q : Path b c} {r : Path c d}
-        (hp : Step p p'),
+        (_hp : Step p p'),
         Step.Joinable
           (Path.trans (Path.trans p' q) r)
           (Path.trans p (Path.trans q r))
   | .trans_congr_right_trans_assoc =>
       ∀ {A : Type u} {a b c d : A}
         {p : Path a b} {q q' : Path b c} {r : Path c d}
-        (hq : Step q q'),
+        (_hq : Step q q'),
         Step.Joinable
           (Path.trans (Path.trans p q') r)
           (Path.trans p (Path.trans q r))

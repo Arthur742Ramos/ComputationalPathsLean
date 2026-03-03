@@ -26,7 +26,7 @@ noncomputable def transport {P : α → Type u} {a b : α} (p : Path a b) (x : P
 
 theorem transport_refl {P : α → Type u} {a : α} (x : P a) :
     transport (Path.refl a) x = x := by
-  simp [transport, Path.refl]
+  simp [transport]
 
 theorem transport_eq {P : α → Type u} {a b : α} (p : Path a b) (x : P a) :
     transport p x = p.toEq ▸ x := rfl

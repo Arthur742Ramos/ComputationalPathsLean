@@ -118,12 +118,12 @@ theorem loop_right_id {A : Type u} {a : A} (l : LoopSpace A a) :
 /-- Left inverse for loops. -/
 theorem loop_left_inv {A : Type u} {a : A} (l : LoopSpace A a) :
     (loop_comp (loop_inv l) l).proof = rfl := by
-  simp only [loop_comp, loop_inv, Path.trans, Path.symm]
+  simp only []
 
 /-- Right inverse for loops. -/
 theorem loop_right_inv {A : Type u} {a : A} (l : LoopSpace A a) :
     (loop_comp l (loop_inv l)).proof = rfl := by
-  simp only [loop_comp, loop_inv, Path.trans, Path.symm]
+  simp only []
 
 /-! ## Eckmann-Hilton argument -/
 
@@ -292,7 +292,7 @@ theorem piN_mul_id_right {A : Type u} {a : A}
 theorem piN_mul_inv_left {A : Type u} {a : A}
     (alpha : Path (Path.refl a) (Path.refl (A := A) a)) :
     (piN_mul (Path.symm alpha) alpha).proof = rfl := by
-  simp only [piN_mul, Path.trans, Path.symm]
+  simp only []
 
 /-- pi_n commutativity for n >= 2 (via UIP). -/
 theorem piN_comm {A : Type u} {a : A}
@@ -330,7 +330,7 @@ theorem monodromy_trans {B : Type u} (C : CoveringSpace B)
 theorem monodromy_symm {B : Type u} (C : CoveringSpace B)
     {b : B} (l : Path b b) (x : C.fiber b) :
     monodromy C (Path.symm l) (monodromy C l x) = x := by
-  simp only [monodromy, Path.transport, Path.symm]
+  simp only [monodromy, Path.transport]
 
 /-- Hopf fibration data. -/
 structure HopfData where
@@ -347,7 +347,7 @@ noncomputable def hopf_transport (H : HopfData) {b1 b2 : H.base}
 
 /-- Hopf transport proof. -/
 theorem hopf_transport_proof (H : HopfData) {b1 b2 : H.base}
-    (p : Path b1 b2) (x : H.fiberAt b1) :
+    (_p : Path b1 b2) (x : H.fiberAt b1) :
     (hopf_transport H (Path.refl b1) x : H.fiberAt b1) =
       (hopf_transport H (Path.refl b1) x : H.fiberAt b1) := rfl
 

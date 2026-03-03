@@ -265,7 +265,7 @@ theorem transport_box {W : Type u} (F : KripkeFrame W)
   cases p with
   | mk steps proof =>
     cases proof
-    simp [Path.transport]
+    simp
 
 /-- Box of conjunction distributes. -/
 theorem box_conj_distrib {W : Type u} (F : KripkeFrame W)

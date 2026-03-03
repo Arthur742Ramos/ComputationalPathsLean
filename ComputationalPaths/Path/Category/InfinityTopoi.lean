@@ -53,8 +53,8 @@ structure Presentable (C : InfinityCategory.{u,v}) where
   isCompact : generatingSet → Prop
 
 /-- κ-compact object: Hom(x, −) commutes with κ-filtered colimits. -/
-noncomputable def IsCompact (C : InfinityCategory.{u,v}) (x : C.Obj) (κ : Nat) : Prop :=
-  ∀ (I : Type u) (d : I → C.Obj) (c : C.Obj),
+noncomputable def IsCompact (C : InfinityCategory.{u,v}) (_x : C.Obj) (_κ : Nat) : Prop :=
+  ∀ (I : Type u) (_d : I → C.Obj) (_c : C.Obj),
     True -- placeholder for filtered colimit commutation
 
 /-- Accessible ∞-category: admits a set of κ-compact generators. -/
@@ -68,7 +68,7 @@ structure Accessible (C : InfinityCategory.{u,v}) where
 
 /-- Colimit-universality: pullback of a colimit diagram is a colimit. -/
 noncomputable def ColimitUniversality (C : InfinityCategory.{u,v}) : Prop :=
-  ∀ (I : Type u) (d : I → C.Obj) (c x : C.Obj)
+  ∀ (I : Type u) (_d : I → C.Obj) (c x : C.Obj)
     (_ : C.Hom x c), True -- placeholder
 
 /-- Descent: effective epimorphisms are stable under pullback. -/
@@ -76,11 +76,11 @@ noncomputable def EffectiveDescentCondition (C : InfinityCategory.{u,v}) : Prop 
   ∀ (x y : C.Obj) (_ : C.Hom x y), True -- placeholder for Čech nerve effectivity
 
 /-- Groupoid objects are effective (every groupoid object is a Čech nerve). -/
-noncomputable def GroupoidObjectsEffective (C : InfinityCategory.{u,v}) : Prop :=
+noncomputable def GroupoidObjectsEffective (_C : InfinityCategory.{u,v}) : Prop :=
   True -- placeholder
 
 /-- Coproducts are disjoint and universal. -/
-noncomputable def DisjointCoproducts (C : InfinityCategory.{u,v}) : Prop :=
+noncomputable def DisjointCoproducts (_C : InfinityCategory.{u,v}) : Prop :=
   True -- placeholder
 
 /-- The Giraud axioms for ∞-topoi. -/
@@ -106,21 +106,21 @@ inductive TruncLevel : Type where
   | succ : TruncLevel → TruncLevel
 
 /-- n-truncated object: all homotopy groups above n vanish. -/
-noncomputable def IsTruncated (T : InfinityTopos.{u,v}) (n : TruncLevel) (x : T.carrier.Obj) : Prop :=
+noncomputable def IsTruncated (T : InfinityTopos.{u,v}) (_n : TruncLevel) (_x : T.carrier.Obj) : Prop :=
   True -- placeholder
 
 /-- n-connected object: all homotopy groups up to n are trivial. -/
-noncomputable def IsConnected (T : InfinityTopos.{u,v}) (n : TruncLevel) (x : T.carrier.Obj) : Prop :=
+noncomputable def IsConnected (T : InfinityTopos.{u,v}) (_n : TruncLevel) (_x : T.carrier.Obj) : Prop :=
   True -- placeholder
 
 /-- The n-truncation functor τ≤n. -/
-noncomputable def truncationFunctor (T : InfinityTopos.{u,v}) (n : TruncLevel) :
+noncomputable def truncationFunctor (T : InfinityTopos.{u,v}) (_n : TruncLevel) :
     InfinityFunctor T.carrier T.carrier where
   obj := id
   map := fun f => f
 
 /-- The n-connected cover functor. -/
-noncomputable def connectedCover (T : InfinityTopos.{u,v}) (n : TruncLevel) :
+noncomputable def connectedCover (T : InfinityTopos.{u,v}) (_n : TruncLevel) :
     InfinityFunctor T.carrier T.carrier where
   obj := id
   map := fun f => f
@@ -129,8 +129,8 @@ noncomputable def connectedCover (T : InfinityTopos.{u,v}) (n : TruncLevel) :
 
 /-- An ∞-topos is hypercomplete if every ∞-connective morphism is an equivalence. -/
 noncomputable def IsHypercomplete (T : InfinityTopos.{u,v}) : Prop :=
-  ∀ (x y : T.carrier.Obj) (f : T.carrier.Hom x y),
-    (∀ n : TruncLevel, True) → True -- Whitehead-type condition
+  ∀ (x y : T.carrier.Obj) (_f : T.carrier.Hom x y),
+    (∀ _n : TruncLevel, True) → True -- Whitehead-type condition
 
 /-- Hypercompletion functor: the left-exact localization at ∞-connective maps. -/
 noncomputable def hypercompletion (T : InfinityTopos.{u,v}) : InfinityTopos.{u,v} := T
@@ -148,15 +148,15 @@ noncomputable def shape (T : InfinityTopos.{u,v}) : Type u := T.carrier.Obj
 
 /-- The constant sheaf functor Δ : Spaces → Sh(T).
     Placeholder implementation using the truncation functor. -/
-noncomputable def constantSheaf (T : InfinityTopos.{u,v}) (S : Type u) : T.carrier.Obj :=
+noncomputable def constantSheaf (T : InfinityTopos.{u,v}) (_S : Type u) : T.carrier.Obj :=
   (truncationFunctor T TruncLevel.negTwo).obj T.terminalObj
 
 /-- The global sections functor Γ : Sh(T) → Spaces. -/
-noncomputable def globalSections (T : InfinityTopos.{u,v}) (x : T.carrier.Obj) : Type u :=
+noncomputable def globalSections (T : InfinityTopos.{u,v}) (_x : T.carrier.Obj) : Type u :=
   PUnit
 
 /-- Locally constant sheaves on T with fiber F. -/
-noncomputable def LocallyConstant (T : InfinityTopos.{u,v}) (F : Type u) : Type u :=
+noncomputable def LocallyConstant (T : InfinityTopos.{u,v}) (_F : Type u) : Type u :=
   T.carrier.Obj
 
 /-- The étale homotopy type is the shape of the étale ∞-topos. -/
@@ -166,11 +166,11 @@ noncomputable def etaleHomotopyType (T : InfinityTopos.{u,v}) : Type u := shape 
 
 /-- Cohomology of an object X with coefficients in A:
     H^n(X, A) := π₀ Map(X, Bⁿ A). -/
-noncomputable def cohomology (T : InfinityTopos.{u,v}) (X A : T.carrier.Obj) (n : Nat) : Type v :=
+noncomputable def cohomology (T : InfinityTopos.{u,v}) (X A : T.carrier.Obj) (_n : Nat) : Type v :=
   T.carrier.Hom X A
 
 /-- The Eilenberg-MacLane object K(A, n) in an ∞-topos. -/
-noncomputable def eilenbergMacLane (T : InfinityTopos.{u,v}) (A : T.carrier.Obj) (n : Nat) :
+noncomputable def eilenbergMacLane (T : InfinityTopos.{u,v}) (A : T.carrier.Obj) (_n : Nat) :
     T.carrier.Obj := A
 
 /-- The classifying object BG for a group object G. -/
@@ -197,11 +197,11 @@ noncomputable def subobjectClassifier (T : InfinityTopos.{u,v}) : T.carrier.Obj 
 
 /-- Every ∞-topos has all small colimits. -/
 theorem topos_has_colimits (T : InfinityTopos.{u,v}) :
-    ∀ (I : Type u) (d : I → T.carrier.Obj), True := by
+    ∀ (I : Type u) (_d : I → T.carrier.Obj), True := by
   intros; trivial
 
 /-- The Giraud axioms characterize ∞-topoi among presentable ∞-categories. -/
-noncomputable def giraud_characterization (C : InfinityCategory.{u,v}) (P : Presentable C)
+noncomputable def giraud_characterization (C : InfinityCategory.{u,v}) (_P : Presentable C)
     (T : InfinityTopos.{u,v}) (hT : T.carrier = C) : GiraudAxioms C :=
   hT ▸ T.axioms
 
@@ -213,7 +213,7 @@ theorem truncation_adjunction (T : InfinityTopos.{u,v}) (n : TruncLevel) :
 
 /-- The Postnikov tower converges: X ≃ lim τ≤n X. -/
 theorem postnikov_convergence (T : InfinityTopos.{u,v})
-    (hT : IsHypercomplete T) (x : T.carrier.Obj) :
+    (_hT : IsHypercomplete T) (_x : T.carrier.Obj) :
     True := by trivial
 
 /-- Hypercompletion is idempotent. -/
@@ -222,17 +222,17 @@ theorem hypercompletion_idempotent (T : InfinityTopos.{u,v}) :
   rfl
 
 /-- The hypercompletion of a hypercomplete topos is itself. -/
-theorem hypercomplete_fixed (T : InfinityTopos.{u,v}) (h : IsHypercomplete T) :
+theorem hypercomplete_fixed (T : InfinityTopos.{u,v}) (_h : IsHypercomplete T) :
     hypercompletion T = T := by
   rfl
 
 /-- Čech descent: the Čech nerve of an effective epi is a colimit diagram. -/
 theorem cech_descent (T : InfinityTopos.{u,v})
-    (x y : T.carrier.Obj) (f : T.carrier.Hom x y) :
+    (x y : T.carrier.Obj) (_f : T.carrier.Hom x y) :
     True := by trivial
 
 /-- Disjoint coproducts: the pullback of two coproduct inclusions is initial. -/
-theorem disjoint_coproduct_pullback (T : InfinityTopos.{u,v}) :
+theorem disjoint_coproduct_pullback (_T : InfinityTopos.{u,v}) :
     True := by trivial
 
 /-- Shape is invariant under hypercompletion. -/
@@ -243,19 +243,19 @@ theorem shape_hypercompletion_invariant (T : InfinityTopos.{u,v}) :
 /-- Cohomology satisfies the Eilenberg-Steenrod axioms (homotopy invariance). -/
 theorem cohomology_homotopy_invariance (T : InfinityTopos.{u,v})
     (X A : T.carrier.Obj) (n : Nat) :
-    ∀ (f g : T.carrier.Hom X X), cohomology T X A n = cohomology T X A n := by
+    ∀ (_f _g : T.carrier.Hom X X), cohomology T X A n = cohomology T X A n := by
   intros; rfl
 
 /-- Mayer-Vietoris: for a pushout X = U ∪_W V, there is a long exact sequence. -/
 theorem mayer_vietoris (T : InfinityTopos.{u,v})
-    (U V W X A : T.carrier.Obj) (n : Nat)
+    (_U _V W X A : T.carrier.Obj) (n : Nat)
     (i : T.carrier.Hom X W) :
-    ∃ (connecting : cohomology T W A n → cohomology T X A (n + 1)), True :=
+    ∃ (_connecting : cohomology T W A n → cohomology T X A (n + 1)), True :=
   ⟨fun h => T.carrier.comp i h, trivial⟩
 
 /-- The object classifier exists in every ∞-topos. -/
 theorem object_classifier_exists (T : InfinityTopos.{u,v}) :
-    ∃ (oc : ObjectClassifier T), True :=
+    ∃ (_oc : ObjectClassifier T), True :=
   ⟨⟨T.terminalObj, T.terminalObj, T.carrier.id T.terminalObj⟩, trivial⟩
 
 /-- K(A, n+1) ≃ BK(A, n) in any ∞-topos. -/
@@ -266,43 +266,43 @@ theorem delooping_eilenberg_maclane (T : InfinityTopos.{u,v})
 
 /-- Constant sheaf is left adjoint to global sections. -/
 theorem constant_sheaf_adjunction (T : InfinityTopos.{u,v}) :
-    ∀ (S : Type u) (x : T.carrier.Obj),
+    ∀ (S : Type u) (_x : T.carrier.Obj),
       (constantSheaf T S = constantSheaf T S) := by
   intros; rfl
 
 /-- Locally constant sheaves are classified by maps to the shape. -/
 theorem locally_constant_classification (T : InfinityTopos.{u,v})
-    (F : Type u) :
-    ∃ (classifier : shape T → Type u), True :=
+    (_F : Type u) :
+    ∃ (_classifier : shape T → Type u), True :=
   ⟨fun _ => PUnit, trivial⟩
 
 /-- Cohomological dimension: if T has c.d. ≤ n then H^k(X,A) = 0 for k > n. -/
 theorem cohomological_dimension_bound (T : InfinityTopos.{u,v})
-    (n : Nat) (X A : T.carrier.Obj) (k : Nat) (hk : k > n) :
+    (n : Nat) (_X _A : T.carrier.Obj) (k : Nat) (_hk : k > n) :
     True := by -- placeholder for vanishing
   trivial
 
 /-- Truncated objects form a sub-∞-topos. -/
-theorem truncated_subtopos (T : InfinityTopos.{u,v}) (n : TruncLevel) :
-    ∃ (S : InfinityTopos.{u,v}), True :=
+theorem truncated_subtopos (T : InfinityTopos.{u,v}) (_n : TruncLevel) :
+    ∃ (_S : InfinityTopos.{u,v}), True :=
   ⟨T, trivial⟩
 
 /-- n-connected, n-truncated factorization system. -/
 theorem connected_truncated_factorization (T : InfinityTopos.{u,v})
-    (n : TruncLevel) (x y : T.carrier.Obj) (f : T.carrier.Hom x y) :
-    ∃ (z : T.carrier.Obj) (g : T.carrier.Hom x z) (h : T.carrier.Hom z y),
+    (_n : TruncLevel) (x y : T.carrier.Obj) (f : T.carrier.Hom x y) :
+    ∃ (z : T.carrier.Obj) (_g : T.carrier.Hom x z) (_h : T.carrier.Hom z y),
       True :=
   ⟨x, T.carrier.id x, f, trivial⟩
 
 /-- The ∞-topos of spaces is the initial ∞-topos. -/
 theorem spaces_initial_topos :
     ∀ (T : InfinityTopos.{u,v}),
-      ∃ (F : InfinityFunctor T.carrier T.carrier), True :=
-  fun T => ⟨⟨id, fun f => f⟩, trivial⟩
+      ∃ (_F : InfinityFunctor T.carrier T.carrier), True :=
+  fun _T => ⟨⟨id, fun f => f⟩, trivial⟩
 
 /-- Descent for sheaves: Sh(X) is the limit of Sh over the Čech nerve. -/
 theorem sheaf_descent (T : InfinityTopos.{u,v})
-    (x y : T.carrier.Obj) (f : T.carrier.Hom x y) :
+    (x y : T.carrier.Obj) (_f : T.carrier.Hom x y) :
     True := by
   trivial
 

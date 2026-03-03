@@ -99,7 +99,7 @@ theorem transport_linear_dioph {D : A → Sort u} (R : DRing A) (a b c : A)
     (S : LinearDiophSol R a b c)
     (x : D (R.add (R.mul a S.x) (R.mul b S.y))) :
     transport (linear_dioph_path R a b c S) x = S.sol ▸ x := by
-  simp [linear_dioph_path, transport]
+  simp [transport]
 
 /-! ## Pythagorean triples -/
 
@@ -131,7 +131,7 @@ theorem congrArg_pyth {B : Type u} (R : DRing A) (T : PythTriple R) (f : A → B
 theorem transport_pyth {D : A → Sort u} (R : DRing A) (T : PythTriple R)
     (x : D (R.add (R.mul T.a T.a) (R.mul T.b T.b))) :
     transport (pyth_path R T) x = T.pyth ▸ x := by
-  simp [pyth_path, transport]
+  simp [transport]
 
 /-! ## Sum of squares -/
 
@@ -190,7 +190,7 @@ theorem pell_roundtrip_toEq (R : DRing A) (D : A) (S : PellSol R D) :
 theorem transport_pell {E : A → Sort u} (R : DRing A) (D : A) (S : PellSol R D)
     (x : E (R.mul S.x S.x)) :
     transport (pell_path R D S) x = S.pell ▸ x := by
-  simp [pell_path, transport]
+  simp [transport]
 
 /-! ## Fermat descent -/
 
@@ -246,7 +246,7 @@ theorem bf_roundtrip_toEq (R : DRing A) (BF : BrahmaguptaFib R) (a b c d : A) :
 /-! ## Path coherence -/
 
 /-- symm commutes with congrArg for ring paths. -/
-theorem symm_congrArg_ring {B : Type u} (R : DRing A) (f : A → B)
+theorem symm_congrArg_ring {B : Type u} (_R : DRing A) (f : A → B)
     {x y : A} (p : Path x y) :
     symm (congrArg f p) = congrArg f (symm p) := by
   cases p with | mk sp pp =>
@@ -254,7 +254,7 @@ theorem symm_congrArg_ring {B : Type u} (R : DRing A) (f : A → B)
   simp [congrArg, symm]
 
 /-- trans commutes with congrArg for ring paths. -/
-theorem congrArg_trans_ring {B : Type u} (R : DRing A) (f : A → B)
+theorem congrArg_trans_ring {B : Type u} (_R : DRing A) (f : A → B)
     {x y z : A} (p : Path x y) (q : Path y z) :
     congrArg f (trans p q) = trans (congrArg f p) (congrArg f q) := by
   cases p with | mk sp pp =>

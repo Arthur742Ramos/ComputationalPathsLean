@@ -390,7 +390,7 @@ theorem baum_connes_implies_novikov (bc : BaumConnesConjecture)
     (_nc : NovikovConjecture) : True := bc.injective
 
 /-- Higher index is a homotopy invariant for aspherical manifolds. -/
-theorem higher_index_homotopy_invariant (hi : HigherIndex) (_aspherical : True) :
+theorem higher_index_homotopy_invariant (_hi : HigherIndex) (_aspherical : True) :
     True := trivial
 
 /-- Coarse Baum-Connes for spaces with finite asymptotic dimension. -/
@@ -400,7 +400,7 @@ theorem coarse_bc_finite_asdim (cbc : CoarseBaumConnes) (_fin_asdim : True) :
 -- spectral_flow_contractible: requires genuine contractibility data (deleted)
 
 /-- Eta invariant changes by integers under gauge transformations. -/
-theorem eta_gauge_integer (ei₁ ei₂ : EtaInvariant) (_gauge : True) :
+theorem eta_gauge_integer (_ei₁ _ei₂ : EtaInvariant) (_gauge : True) :
     True := trivial
 
 /-- The reduced eta invariant is well-defined mod integers. -/

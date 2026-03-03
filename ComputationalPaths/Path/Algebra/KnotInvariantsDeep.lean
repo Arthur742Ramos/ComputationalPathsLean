@@ -149,7 +149,7 @@ theorem knotEquiv_trans {d₁ d₂ d₃ : KnotDiagram}
 /-- An invariant is a function whose value is preserved along any path. -/
 structure KnotInvariant (R : Type v) where
   val : KnotDiagram → R
-  preserved : ∀ {d₁ d₂ : KnotDiagram} (p : Path d₁ d₂), val d₁ = val d₂
+  preserved : ∀ {d₁ d₂ : KnotDiagram} (_p : Path d₁ d₂), val d₁ = val d₂
 
 /-- Compose an invariant with a function. -/
 noncomputable def KnotInvariant.map {R S : Type v} (f : R → S) (inv : KnotInvariant R) :

@@ -87,7 +87,7 @@ theorem id_comp₁_path_cancel (M : MultiCat) {a b : M.Obj}
     (f : M.Hom [a] b) :
     (Path.trans (M.id_comp₁_path f)
       (Path.symm (M.id_comp₁_path f))).proof = rfl := by
-  simp [MultiCat.id_comp₁_path]
+  simp
 
 /-- 5. Symm of symm of left unit path. -/
 theorem id_comp₁_path_symm_symm (M : MultiCat) {a b : M.Obj}
@@ -137,7 +137,7 @@ theorem map₁_id_path_trans_refl (F : MultiFunctor M N) (a : M.Obj) :
 theorem map₁_id_path_cancel (F : MultiFunctor M N) (a : M.Obj) :
     (Path.trans (F.map₁_id_path a)
       (Path.symm (F.map₁_id_path a))).proof = rfl := by
-  simp [MultiFunctor.map₁_id_path]
+  simp
 
 /-- Identity multifunctor. -/
 noncomputable def MultiFunctor.idFunctor (M : MultiCat) : MultiFunctor M M where
@@ -200,7 +200,7 @@ theorem naturality_path_cancel {F G : MultiFunctor M N}
     (η : MultiNatTrans F G) {a b : M.Obj} (f : M.Hom [a] b) :
     (Path.trans (η.naturality_path f)
       (Path.symm (η.naturality_path f))).proof = rfl := by
-  simp [MultiNatTrans.naturality_path]
+  simp
 
 /-- Identity multinatural transformation. -/
 noncomputable def MultiNatTrans.idTrans (F : MultiFunctor M N) : MultiNatTrans F F where
@@ -282,7 +282,7 @@ theorem assoc₁_path_cancel (M : MultiCat) {a b c d : M.Obj}
     (f : M.Hom [a] b) (g : M.Hom [b] c) (h : M.Hom [c] d) :
     (Path.trans (M.assoc₁_path f g h)
       (Path.symm (M.assoc₁_path f g h))).proof = rfl := by
-  simp [MultiCat.assoc₁_path]
+  simp
 
 /-- 22. CongrArg comp₁ on a path. -/
 theorem congrArg_comp₁_left (M : MultiCat) {a b c : M.Obj}

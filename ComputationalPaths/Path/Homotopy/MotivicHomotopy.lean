@@ -266,7 +266,7 @@ theorem A1Homotopy.trans {X Y Z : MotivicSpace.{u}}
 /-- Motivic Hurewicz: the first nonvanishing motivic cohomology group
     agrees with motivic homotopy in the A¹-connected range. -/
 theorem motivic_hurewicz (X : MotivicSpace.{u}) (MC : MotivicCohomology.{u} X)
-    (n : Nat) (hn : n ≥ 1) :
+    (n : Nat) (_hn : n ≥ 1) :
     Nonempty (MC.H n 0) :=
   ⟨MC.zero n 0⟩
 

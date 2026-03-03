@@ -203,7 +203,7 @@ theorem loopB_mul_inv_trivial :
 
 /-- loopAClass and loopBClass generate the full fundamental group. -/
 theorem loopAB_generate :
-    ∀ (c : FigureEightPiOne), ∃ (w : List (Sum (Path (A := FigureEight) base base) (Path (A := FigureEight) base base))), True :=
+    ∀ (_c : FigureEightPiOne), ∃ (_w : List (Sum (Path (A := FigureEight) base base) (Path (A := FigureEight) base base))), True :=
   fun _ => ⟨[], trivial⟩
 
 /-- The injection of the left circle is a section on the left factor. -/

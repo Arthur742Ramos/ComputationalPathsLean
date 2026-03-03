@@ -38,7 +38,7 @@ noncomputable def truncLEIdempPath (T : TStructureExt) (C : ChainComplex) :
 
 theorem truncLEIdempPath_toEq (T : TStructureExt) (C : ChainComplex) :
     (truncLEIdempPath T C).toEq = (T.truncLE_idem C).toEq := by
-  simp [truncLEIdempPath]
+  simp
 
 /-- Path witnessing idempotency of τ≥0. -/
 noncomputable def truncGEIdempPath (T : TStructureExt) (C : ChainComplex) :
@@ -52,7 +52,7 @@ noncomputable def truncLEIdempLoop (T : TStructureExt) (C : ChainComplex) :
 
 theorem truncLEIdempLoop_toEq (T : TStructureExt) (C : ChainComplex) :
     (truncLEIdempLoop T C).toEq = rfl := by
-  simp [truncLEIdempLoop, truncLEIdempPath]
+  simp
 
 noncomputable def truncGEIdempLoop (T : TStructureExt) (C : ChainComplex) :
     Path (T.truncGE C) (T.truncGE C) :=
@@ -60,7 +60,7 @@ noncomputable def truncGEIdempLoop (T : TStructureExt) (C : ChainComplex) :
 
 theorem truncGEIdempLoop_toEq (T : TStructureExt) (C : ChainComplex) :
     (truncGEIdempLoop T C).toEq = rfl := by
-  simp [truncGEIdempLoop, truncGEIdempPath]
+  simp
 
 /-- Triple truncation reduces to single. -/
 noncomputable def tripleTruncLE (T : TStructureExt) (C : ChainComplex) :
@@ -70,7 +70,7 @@ noncomputable def tripleTruncLE (T : TStructureExt) (C : ChainComplex) :
 theorem tripleTruncLE_toEq (T : TStructureExt) (C : ChainComplex) :
     (tripleTruncLE T C).toEq =
       (((congrArg T.truncLE (T.truncLE_idem C)).toEq).trans (T.truncLE_idem C).toEq) := by
-  simp [tripleTruncLE]
+  simp
 
 noncomputable def tripleTruncGE (T : TStructureExt) (C : ChainComplex) :
     Path (T.truncGE (T.truncGE (T.truncGE C))) (T.truncGE C) :=
@@ -193,7 +193,7 @@ noncomputable def truncLESquaredPath (T : TStructureExt) (S : ShiftData) (C : Ch
 
 theorem truncLESquaredPath_toEq (T : TStructureExt) (S : ShiftData) (C : ChainComplex) :
     (truncLESquaredPath T S C).toEq = (T.truncLE_idem C).toEq := by
-  simp [truncLESquaredPath]
+  simp
 
 /-! ## §4. Adjacent t-structures -/
 
@@ -245,16 +245,16 @@ noncomputable def recollementIStarPath (S : ShiftData) (R : Recollement S) (C : 
 
 theorem recollementIStarPath_toEq (S : ShiftData) (R : Recollement S) (C : ChainComplex) :
     (recollementIStarPath S R C).toEq = rfl := by
-  simp [recollementIStarPath]
+  simp
 
 /-- The recollement unit-counit loop. -/
-noncomputable def recollementLoop (S : ShiftData) (R : Recollement S) (C : ChainComplex) :
+noncomputable def recollementLoop (S : ShiftData) (_R : Recollement S) (C : ChainComplex) :
     Path C C :=
   Path.trans (Path.refl C) (Path.refl C)
 
 theorem recollementLoop_toEq (S : ShiftData) (R : Recollement S) (C : ChainComplex) :
     (recollementLoop S R C).toEq = rfl := by
-  simp [recollementLoop]
+  simp
 
 theorem recollementLoop_symm (S : ShiftData) (R : Recollement S) (C : ChainComplex) :
     Path.symm (recollementLoop S R C) = recollementLoop S R C := by
@@ -295,7 +295,7 @@ noncomputable def dualDualPath (p : Perversity) (n : Nat) :
 
 theorem dualDualPath_toEq (p : Perversity) (n : Nat) :
     (dualDualPath p n).toEq = dual_dual_perversity p n := by
-  simp [dualDualPath]
+  simp
 
 /-- Round trip: dual-dual is identity path. -/
 noncomputable def dualDualLoop (p : Perversity) (n : Nat) :
@@ -304,7 +304,7 @@ noncomputable def dualDualLoop (p : Perversity) (n : Nat) :
 
 theorem dualDualLoop_toEq (p : Perversity) (n : Nat) :
     (dualDualLoop p n).toEq = rfl := by
-  simp [dualDualLoop, dualDualPath]
+  simp
 
 /-- Perverse sheaf with support conditions. -/
 structure PerverseSheafExt (T : TStructureExt) where
@@ -382,7 +382,7 @@ noncomputable def IC_zero_path (T : TStructureExt) (C : ChainComplex) (n : Nat) 
 
 theorem IC_zero_path_toEq (T : TStructureExt) (C : ChainComplex) (n : Nat) :
     (IC_zero_path T C n).toEq = IC_zero_perversity_simplified T C n := by
-  simp [IC_zero_path]
+  simp
 
 /-- Poincaré–Verdier duality path: IC with p and IC with dual p. -/
 noncomputable def PVDualityPath (T : TStructureExt) (p : Perversity) (C : ChainComplex) (n : Nat) :
@@ -433,7 +433,7 @@ noncomputable def weightHeartObjPath (W : WeightStructure) (H : WeightHeartObj W
 
 theorem weightHeartObjPath_toEq (W : WeightStructure) (H : WeightHeartObj W) :
     (weightHeartObjPath W H).toEq = rfl := by
-  simp [weightHeartObjPath]
+  simp
 
 /-! ## §9. Cohomological functors on t-structures -/
 
@@ -469,7 +469,7 @@ noncomputable def cohFunctorIdPath (T : TStructureExt) (F : CohomologicalFunctor
 theorem cohFunctorIdPath_toEq (T : TStructureExt) (F : CohomologicalFunctor T)
     (C : ChainComplex) (n x : Int) :
     (cohFunctorIdPath T F C n x).toEq = F.H0_id C n x := by
-  simp [cohFunctorIdPath]
+  simp
 
 /-- Path witnessing that H⁰ respects composition. -/
 noncomputable def cohFunctorCompPath (T : TStructureExt) (F : CohomologicalFunctor T)
@@ -483,7 +483,7 @@ theorem cohFunctorCompPath_toEq (T : TStructureExt) (F : CohomologicalFunctor T)
     {A B C : ChainComplex} (f : ChainMap A B) (g : ChainMap B C)
     (n x : Int) :
     (cohFunctorCompPath T F f g n x).toEq = F.H0_comp f g n x := by
-  simp [cohFunctorCompPath]
+  simp
 
 /-- Loop: H⁰(id) → id → H⁰(id). -/
 noncomputable def cohFunctorIdLoop (T : TStructureExt) (F : CohomologicalFunctor T)
@@ -494,7 +494,7 @@ noncomputable def cohFunctorIdLoop (T : TStructureExt) (F : CohomologicalFunctor
 theorem cohFunctorIdLoop_toEq (T : TStructureExt) (F : CohomologicalFunctor T)
     (C : ChainComplex) (n x : Int) :
     (cohFunctorIdLoop T F C n x).toEq = rfl := by
-  simp [cohFunctorIdLoop, cohFunctorIdPath]
+  simp
 
 /-! ## §10. BBD decomposition theorem data -/
 
@@ -518,7 +518,7 @@ noncomputable def bbdDecompPath (T : TStructureExt) (D : BBDDecomposition T) :
 
 theorem bbdDecompPath_toEq (T : TStructureExt) (D : BBDDecomposition T) :
     (bbdDecompPath T D).toEq = D.assemblyEq := by
-  simp [bbdDecompPath]
+  simp
 
 /-- Symmetry of decomposition. -/
 noncomputable def bbdDecompSymm (T : TStructureExt) (D : BBDDecomposition T) :
@@ -528,7 +528,7 @@ noncomputable def bbdDecompSymm (T : TStructureExt) (D : BBDDecomposition T) :
 
 theorem bbdDecomp_round_trip (T : TStructureExt) (D : BBDDecomposition T) :
     (Path.trans (bbdDecompPath T D) (bbdDecompSymm T D)).toEq = rfl := by
-  simp [bbdDecompPath, bbdDecompSymm]
+  simp
 
 end TStructureDeep
 end Algebra

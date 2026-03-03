@@ -64,7 +64,7 @@ noncomputable def LieGroup.adjoint (G : LieGroup) : G.carrier → G.lieAlgebra �
 structure LieBracket (G : LieGroup) where
   bracket        : G.lieAlgebra → G.lieAlgebra → G.lieAlgebra
   antisymmetry   : ∀ (x y : G.lieAlgebra), bracket x y = bracket x y  -- placeholder
-  jacobi         : ∀ (x y z : G.lieAlgebra), True                      -- placeholder
+  jacobi         : ∀ (_x _y _z : G.lieAlgebra), True                      -- placeholder
 
 /-- The Killing form ⟨−,−⟩ on g. -/
 structure KillingForm (G : LieGroup) where
@@ -121,7 +121,7 @@ structure Curvature (G : LieGroup) (P : PrincipalBundle G)
 /-- A flat connection: F_A = 0. -/
 structure FlatConnection (G : LieGroup) (P : PrincipalBundle G)
     extends Connection G P where
-  flat : ∀ x : P.base, True
+  flat : ∀ _x : P.base, True
 
 /-- Holonomy of a connection around a loop. -/
 structure Holonomy (G : LieGroup) (P : PrincipalBundle G)
@@ -153,8 +153,8 @@ noncomputable def gaugeAct {G : LieGroup} {P : PrincipalBundle G}
 
 /-- Curvature transforms by conjugation: F_{g·A} = g F_A g⁻¹. -/
 theorem curvature_gauge_conjugation (G : LieGroup) (P : PrincipalBundle G)
-    (A : Connection G P) (g : GaugeTransformation G P)
-    (F : Curvature G P A) : True := trivial
+    (A : Connection G P) (_g : GaugeTransformation G P)
+    (_F : Curvature G P A) : True := trivial
 
 /-! ## 5. Hodge Star and Self-Duality (dimension 4) -/
 
@@ -166,19 +166,19 @@ structure HodgeStar (G : LieGroup) (P : PrincipalBundle G) where
 
 /-- Self-dual component F⁺ = ½(F + *F). -/
 noncomputable def selfDualPart {G : LieGroup} {P : PrincipalBundle G}
-    (hs : HodgeStar G P) (F : P.base → G.lieAlgebra) :
+    (_hs : HodgeStar G P) (F : P.base → G.lieAlgebra) :
     P.base → G.lieAlgebra :=
   fun x => F x   -- placeholder
 
 /-- Anti-self-dual component F⁻ = ½(F − *F). -/
 noncomputable def antiSelfDualPart {G : LieGroup} {P : PrincipalBundle G}
-    (hs : HodgeStar G P) (F : P.base → G.lieAlgebra) :
+    (_hs : HodgeStar G P) (F : P.base → G.lieAlgebra) :
     P.base → G.lieAlgebra :=
   fun x => F x   -- placeholder
 
 /-- Splitting Ω²(g_P) = Ω⁺ ⊕ Ω⁻. -/
 theorem hodge_splitting (G : LieGroup) (P : PrincipalBundle G)
-    (hs : HodgeStar G P) : True := trivial
+    (_hs : HodgeStar G P) : True := trivial
 
 /-! ## 6. Yang-Mills Functional -/
 
@@ -243,12 +243,12 @@ structure MultiInstanton (G : LieGroup) where
 
 /-- Every instanton satisfies the Yang-Mills equation. -/
 theorem instanton_is_yang_mills (G : LieGroup) (P : PrincipalBundle G)
-    (I : Instanton G P) : True := trivial
+    (_I : Instanton G P) : True := trivial
 
 /-- An instanton minimises YM in its topological class. -/
 theorem instanton_minimises (G : LieGroup) (P : PrincipalBundle G)
-    (I : Instanton G P) (YM : YangMillsFunctional G P)
-    (A : Connection G P) : True := trivial
+    (_I : Instanton G P) (_YM : YangMillsFunctional G P)
+    (_A : Connection G P) : True := trivial
 
 /-! ## 8. Deformation Complex and Index -/
 
@@ -273,7 +273,7 @@ structure IndexFormula (G : LieGroup) (P : PrincipalBundle G) where
 
 /-- For a generic metric the obstruction H² vanishes. -/
 theorem generic_metric_unobstructed (G : LieGroup) (P : PrincipalBundle G)
-    (A : Connection G P) (D : DeformationComplex G P A) : True := trivial
+    (A : Connection G P) (_D : DeformationComplex G P A) : True := trivial
 
 /-! ## 9. Moduli Space of ASD Connections -/
 
@@ -294,12 +294,12 @@ structure ModuliOrientation (G : LieGroup) (P : PrincipalBundle G)
 
 /-- Smoothness of moduli for generic metrics (Freed-Uhlenbeck). -/
 theorem moduli_smooth_generic (G : LieGroup) (P : PrincipalBundle G)
-    (M : ASDModuli G P) : True := trivial
+    (_M : ASDModuli G P) : True := trivial
 
 /-- The moduli space is a smooth manifold of the expected dimension
     for generic metrics when b⁺ > 0. -/
 theorem moduli_expected_dim (G : LieGroup) (P : PrincipalBundle G)
-    (M : ASDModuli G P) (I : IndexFormula G P) : True := trivial
+    (_M : ASDModuli G P) (_I : IndexFormula G P) : True := trivial
 
 /-! ## 10. Uhlenbeck Compactness and Compactification -/
 
@@ -323,11 +323,11 @@ structure UhlenbeckCompactification (G : LieGroup) (P : PrincipalBundle G) where
 /-- Removable singularity theorem: ASD connections over a punctured ball
     with finite energy extend smoothly across the puncture. -/
 theorem removable_singularity (G : LieGroup) (P : PrincipalBundle G)
-    (A : Connection G P) : True := trivial
+    (_A : Connection G P) : True := trivial
 
 /-- Energy identity: total energy is preserved under convergence. -/
 theorem energy_identity (G : LieGroup) (P : PrincipalBundle G)
-    (U : UhlenbeckCompactness G P) : True := trivial
+    (_U : UhlenbeckCompactness G P) : True := trivial
 
 /-! ## 11. Donaldson Invariants -/
 
@@ -348,7 +348,7 @@ structure DonaldsonInvariants (G : LieGroup) (P : PrincipalBundle G) where
 
 /-- Donaldson invariants are diffeomorphism invariants of X. -/
 theorem donaldson_diffeo_invariance (G : LieGroup) (P : PrincipalBundle G)
-    (D : DonaldsonInvariants G P) : True := trivial
+    (_D : DonaldsonInvariants G P) : True := trivial
 
 /-- Donaldson's diagonalisation theorem: if the intersection form of a
     closed simply-connected smooth 4-manifold is definite, it is diagonal. -/
@@ -363,7 +363,7 @@ structure DonaldsonSimpleType (G : LieGroup) (P : PrincipalBundle G) where
 
 /-- Blowup formula: behaviour of Donaldson invariants under blowup. -/
 theorem donaldson_blowup_formula (G : LieGroup) (P : PrincipalBundle G)
-    (D : DonaldsonInvariants G P) : True := trivial
+    (_D : DonaldsonInvariants G P) : True := trivial
 
 /-! ## 12. ADHM Construction -/
 
@@ -378,10 +378,10 @@ structure ADHMData where
   stable     : True
 
 /-- ADHM → instanton correspondence is a bijection. -/
-theorem adhm_bijection (G : LieGroup) (d : ADHMData) : True := trivial
+theorem adhm_bijection (_G : LieGroup) (_d : ADHMData) : True := trivial
 
 /-- Dimension of the ADHM moduli: 8k − 3 for framed instantons. -/
-theorem adhm_moduli_dim (d : ADHMData) : True := trivial
+theorem adhm_moduli_dim (_d : ADHMData) : True := trivial
 
 /-! ## 13. Cobordism Maps -/
 
@@ -395,7 +395,7 @@ structure CobordismMap (G : LieGroup) where
 /-- Gluing theorem: moduli spaces on a cut manifold glue to the
     moduli on the closed manifold. -/
 theorem gluing_theorem (G : LieGroup) (P : PrincipalBundle G)
-    (M : ASDModuli G P) : True := trivial
+    (_M : ASDModuli G P) : True := trivial
 
 /-! ## 14. Reducible Connections -/
 
@@ -406,8 +406,8 @@ structure ReducibleConnection (G : LieGroup) (P : PrincipalBundle G)
   stabiliser_pos : stabiliser_dim > 0
 
 /-- For b⁺ > 0 and generic metric, the ASD moduli contains no reducibles. -/
-theorem no_reducibles_generic (G : LieGroup) (P : PrincipalBundle G)
-    (bPlus : Nat) (h : bPlus > 0) : True := trivial
+theorem no_reducibles_generic (G : LieGroup) (_P : PrincipalBundle G)
+    (bPlus : Nat) (_h : bPlus > 0) : True := trivial
 
 /-! ## 15. Additional Theorems -/
 
@@ -422,23 +422,23 @@ theorem ym_gauge_invariance (G : LieGroup) (P : PrincipalBundle G)
   YM.gauge_inv g A
 
 theorem flat_connection_trivial_holonomy (G : LieGroup)
-    (P : PrincipalBundle G) (A : FlatConnection G P) : True := trivial
+    (P : PrincipalBundle G) (_A : FlatConnection G P) : True := trivial
 
 theorem holonomy_gauge_conjugation (G : LieGroup) (P : PrincipalBundle G)
-    (A : Connection G P) (H : Holonomy G P A) : True := trivial
+    (A : Connection G P) (_H : Holonomy G P A) : True := trivial
 
 theorem killing_form_symmetric (G : LieGroup) (K : KillingForm G)
     (x y : G.lieAlgebra) : K.eval x y = K.eval y x :=
   K.symmetric x y
 
 theorem bianchi_identity (G : LieGroup) (P : PrincipalBundle G)
-    (A : Connection G P) (F : Curvature G P A) : True := trivial
+    (A : Connection G P) (_F : Curvature G P A) : True := trivial
 
 theorem uhlenbeck_bubble_energy (G : LieGroup) (P : PrincipalBundle G)
-    (U : UhlenbeckCompactness G P) : True := trivial
+    (_U : UhlenbeckCompactness G P) : True := trivial
 
 theorem deformation_complex_elliptic (G : LieGroup) (P : PrincipalBundle G)
-    (A : Connection G P) (D : DeformationComplex G P A) : True := trivial
+    (A : Connection G P) (_D : DeformationComplex G P A) : True := trivial
 
 
 
@@ -474,7 +474,7 @@ theorem gaugeRewrite_refl {x y : Connection G P} (p : Path x y) :
 theorem gaugeRewrite_coherence {x y z w : Connection G P}
     (p : Path x y) (q : Path y z) (r : Path z w) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simpa using Path.trans_assoc p q r
+  simp
 
 end GaugeRewrite
 

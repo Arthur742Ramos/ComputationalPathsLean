@@ -106,8 +106,7 @@ This is immediate because `toEq` is proof-irrelevant. -/
 theorem torusLoopsCommute_toEq :
     (Path.trans torusLoop1 torusLoop2).toEq =
     (Path.trans torusLoop2 torusLoop1).toEq := by
-  simpa [PathRwQuot.toEq_mk] using
-    congrArg (PathRwQuot.toEq (A := Torus.{u})) torusLoopsCommute_quot
+  simp [PathRwQuot.toEq_mk]
 
 /-- Product of two loops on the torus, composed in either order, have the
 same underlying equality witness. -/
@@ -382,15 +381,13 @@ theorem torusLoop2_cancel_quot :
 theorem torusLoop1_cancel_toEq :
     (Path.trans (A := Torus.{u}) torusLoop1 (Path.symm torusLoop1)).toEq =
     (rfl : torusBase = torusBase) := by
-  simpa [PathRwQuot.toEq_mk] using
-    congrArg (PathRwQuot.toEq (A := Torus.{u})) torusLoop1_cancel_quot
+  simp [PathRwQuot.toEq_mk]
 
 /-- Cancellation: `torusLoop2 ⬝ torusLoop2⁻¹` has trivial `toEq`. -/
 theorem torusLoop2_cancel_toEq :
     (Path.trans (A := Torus.{u}) torusLoop2 (Path.symm torusLoop2)).toEq =
     (rfl : torusBase = torusBase) := by
-  simpa [PathRwQuot.toEq_mk] using
-    congrArg (PathRwQuot.toEq (A := Torus.{u})) torusLoop2_cancel_quot
+  simp [PathRwQuot.toEq_mk]
 
 /-! ## Congruence on the Torus -/
 

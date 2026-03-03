@@ -324,7 +324,7 @@ theorem hitchin_component_contractible (sg : SurfaceGroup) (G : LieGroupData)
 
 /-- Character variety dimension for genus ≥ 2. -/
 theorem charvar_dimension (sg : SurfaceGroup) (G : LieGroupData)
-    (cv : CharacterVariety sg G) :
+    (_cv : CharacterVariety sg G) :
     True := trivial
 
 /-- Tangent space at irreducible ρ is H¹(Σ; Ad ρ). -/

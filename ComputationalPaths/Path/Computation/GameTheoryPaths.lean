@@ -103,12 +103,12 @@ noncomputable def IsBestResponse2 {S1 S2 : Type u} (g : Game S1 S2)
 theorem best_response1_self {S1 S2 : Type u} (g : Game S1 S2)
     (s1 : S1) (s2 : S2) : g.payoff1 s1 s2 ≥ g.payoff1 s1 s2 :=
   by
-    simpa using (le_rfl : g.payoff1 s1 s2 ≤ g.payoff1 s1 s2)
+    simp
 
 theorem best_response2_self {S1 S2 : Type u} (g : Game S1 S2)
     (s1 : S1) (s2 : S2) : g.payoff2 s1 s2 ≥ g.payoff2 s1 s2 :=
   by
-    simpa using (le_rfl : g.payoff2 s1 s2 ≤ g.payoff2 s1 s2)
+    simp
 
 /-! ## Nash Equilibrium -/
 

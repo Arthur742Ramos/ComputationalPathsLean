@@ -140,24 +140,24 @@ noncomputable def botElim (Γ : NDContext) (A : NDFormula) :
 /-- An intro-elim detour: conjunction intro followed by elim-left
     reduces to the first component. Modeled as path equality. -/
 theorem conj_intro_elim_left_reduces (Γ : NDContext) (A B : NDFormula)
-    (pA : Path (Judgment.mk Γ A) (Judgment.mk Γ A))
-    (pB : Path (Judgment.mk Γ B) (Judgment.mk Γ B)) :
+    (_pA : Path (Judgment.mk Γ A) (Judgment.mk Γ A))
+    (_pB : Path (Judgment.mk Γ B) (Judgment.mk Γ B)) :
     conjElimLeft Γ A B (conjIntro Γ A B) = Path.refl _ := by
-  simp [conjElimLeft, conjIntro]
+  simp [conjElimLeft]
 
 /-- Conjunction intro followed by elim-right reduces to second component. -/
 theorem conj_intro_elim_right_reduces (Γ : NDContext) (A B : NDFormula)
-    (pA : Path (Judgment.mk Γ A) (Judgment.mk Γ A))
-    (pB : Path (Judgment.mk Γ B) (Judgment.mk Γ B)) :
+    (_pA : Path (Judgment.mk Γ A) (Judgment.mk Γ A))
+    (_pB : Path (Judgment.mk Γ B) (Judgment.mk Γ B)) :
     conjElimRight Γ A B (conjIntro Γ A B) = Path.refl _ := by
-  simp [conjElimRight, conjIntro]
+  simp [conjElimRight]
 
 /-- Implication intro-elim detour reduces. -/
 theorem impl_intro_elim_reduces (Γ : NDContext) (A B : NDFormula)
     (pBody : Path (Judgment.mk (A :: Γ) B) (Judgment.mk (A :: Γ) B))
     (pArg : Path (Judgment.mk Γ A) (Judgment.mk Γ A)) :
     implElim Γ A B (implIntro Γ A B pBody) pArg = Path.refl _ := by
-  simp [implElim, implIntro]
+  simp [implElim]
 
 /-! ## Normalization as Confluence -/
 
@@ -188,7 +188,7 @@ inductive IsNormal : ProofTerm → Prop where
 
 /-- Normal forms are stable under path transport. -/
 theorem normal_transport_stable (t₁ t₂ : ProofTerm)
-    (p : Path t₁ t₂) (h : IsNormal t₁) :
+    (p : Path t₁ t₂) (_h : IsNormal t₁) :
     Path.transport (D := fun _ => Prop) p (IsNormal t₁) = IsNormal t₁ := by
   simp
 

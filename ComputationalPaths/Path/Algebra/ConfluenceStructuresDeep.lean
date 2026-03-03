@@ -603,7 +603,7 @@ structure CompletionState (α : Type) where
 /-- One completion step: orient a pending equation as a new rule. -/
 noncomputable def CompletionState.orientNext {α : Type}
     (st : CompletionState α) (eq : Equation α) (rest : List (Equation α))
-    (h : st.pending = eq :: rest) : CompletionState α :=
+    (_h : st.pending = eq :: rest) : CompletionState α :=
   ⟨st.rules ++ [eq.orientLR], rest⟩
 
 /-- Theorem 38: orientNext increases rule count by one. -/
@@ -743,7 +743,7 @@ noncomputable def Terminating (α : Type) (R : α → α → Prop) : Prop :=
     then for any single step divergence, the result is joinable.
     (Key step of Newman's lemma — structural path witness.) -/
 theorem newman_step_joinable {α : Type} {R : α → α → Prop}
-    (wf : Terminating α R)
+    (_wf : Terminating α R)
     (lc : ∀ (a b c : α), R a b → R a c →
       ∃ d, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True))
     (a b c : α) (hab : R a b) (hac : R a c) :
@@ -815,7 +815,7 @@ theorem normal_form_path_refl {α : Type} {R : α → α → Prop}
 
 /-- Theorem 55: a normal form is joinable with itself trivially. -/
 theorem normal_form_self_joinable {α : Type} {R : α → α → Prop}
-    (a : α) (nf : NormalForm α R a) :
+    (a : α) (_nf : NormalForm α R a) :
     ∃ d, (∃ _ : RPath α R a d, ∃ _ : RPath α R a d, True) :=
   ⟨a, ⟨.refl a, ⟨.refl a, trivial⟩⟩⟩
 
@@ -995,7 +995,7 @@ theorem transport_map_factor {α β : Type} {R : α → α → Prop} {S : β →
 
 /-- Theorem 70: transport preserves length-0 paths as id. -/
 theorem transport_length_zero {α : Type} {R : α → α → Prop}
-    (P : α → Type) (tr : ∀ {x y}, Step α R x y → P x → P y)
+    (P : α → Type) (_tr : ∀ {x y}, Step α R x y → P x → P y)
     {a b : α} (p : RPath α R a b) (h : p.length = 0) :
     a = b := by
   cases p with

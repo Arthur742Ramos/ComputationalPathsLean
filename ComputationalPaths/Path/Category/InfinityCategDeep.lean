@@ -63,7 +63,7 @@ noncomputable def SSet.tetrahedron (X : SSet.{u}) : Type u := X.obj 3
 /-- An inner horn: a partial simplex missing one inner face -/
 structure InnerHorn (X : SSet.{u}) (n : Nat) (k : Fin (n + 2)) where
   faces : (i : Fin (n + 2)) → i ≠ k → X.obj n
-  compat : ∀ (i j : Fin (n + 2)) (hi : i ≠ k) (hj : j ≠ k),
+  compat : ∀ (i j : Fin (n + 2)) (_hi : i ≠ k) (_hj : j ≠ k),
     i.val < j.val → True
 
 /-- Witness that an inner horn has a filler -/

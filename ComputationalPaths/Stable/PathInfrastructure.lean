@@ -251,7 +251,7 @@ theorem suspension_unit_stable_equivalence
 
 /-- Naturality of the Freudenthal unit under stable equivalence. -/
 theorem suspension_unit_natural
-    (unitStable : (E : Spectrum) → Nonempty (StableEquivalence E (Loop (Susp E))))
+    (_unitStable : (E : Spectrum) → Nonempty (StableEquivalence E (Loop (Susp E))))
     (loopSuspFunctorial :
       {E F : Spectrum} →
         StableEquivalence E F →

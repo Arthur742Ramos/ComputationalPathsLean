@@ -34,7 +34,7 @@ structure NonArchimedean (F : Type u) (Gam : Type v) where
 /-- Ultrametric inequality witness via paths with commutativity -/
 noncomputable def ultrametric_symm {F : Type u} {Gam : Type v}
     (na : NonArchimedean F Gam) (x y : F)
-    (comm_add : Path (na.add x y) (na.add y x))
+    (_comm_add : Path (na.add x y) (na.add y x))
     (max_comm : Path (na.max_op (na.v.val x) (na.v.val y))
                      (na.max_op (na.v.val y) (na.v.val x)))
     : Path (na.v.val (na.add x y)) (na.max_op (na.v.val y) (na.v.val x)) :=
@@ -545,12 +545,12 @@ structure CDVR (R : Type u) where
   dv : DiscreteValuation R
   mul : R → R → R
   add : R → R → R
-  complete : (seq : Nat → R) → (Σ' (lim : R),
+  complete : (seq : Nat → R) → (Σ' (_lim : R),
     (n : Nat) → (Σ' (k : Int), Path (dv.v (seq n)) k))
 
 -- Def 48: CDVR completion witness
 noncomputable def cdvr_complete {R : Type u} (c : CDVR R) (seq : Nat → R)
-    : (Σ' (lim : R), (n : Nat) → (Σ' (k : Int), Path (c.dv.v (seq n)) k)) :=
+    : (Σ' (_lim : R), (n : Nat) → (Σ' (k : Int), Path (c.dv.v (seq n)) k)) :=
   c.complete seq
 
 -- ============================================================================

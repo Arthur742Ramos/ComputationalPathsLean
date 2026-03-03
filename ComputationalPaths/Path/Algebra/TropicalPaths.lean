@@ -278,7 +278,7 @@ noncomputable def tropAdd_idem_roundtrip (a : Nat) :
 theorem transport_val_tropAdd {D : Nat → Sort _} (a b : Nat)
     (x : D (valuation (tropMul a b))) :
     transport (val_tropMul_path a b) x = (val_tropMul a b) ▸ x := by
-  simp [val_tropMul_path, transport]
+  simp [transport]
 
 -- 32. Commutativity roundtrip is semantically refl
 theorem tropAdd_comm_roundtrip_toEq (a b : Nat) :

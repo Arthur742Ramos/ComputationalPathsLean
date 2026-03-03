@@ -168,13 +168,13 @@ theorem transitionCongr_trans {M : Type u} {C : Type v}
     (h1 : Path c1 c2) (h2 : Path c2 c3) :
     transitionCongr S T (Path.trans h1 h2) =
       Path.trans (transitionCongr S T h1) (transitionCongr S T h2) := by
-  simp [transitionCongr, Path.congrArg_trans]
+  simp [transitionCongr]
 
 theorem transitionCongr_symm {M : Type u} {C : Type v}
     (S T : SmoothManifold M C) {c1 c2 : C}
     (h : Path c1 c2) :
     transitionCongr S T (Path.symm h) = Path.symm (transitionCongr S T h) := by
-  simp [transitionCongr, Path.congrArg_symm]
+  simp [transitionCongr]
 
 theorem transitionSelfPath_symm_symm {M : Type u} {C : Type v}
     (S : SmoothManifold M C) (c : C) :
@@ -184,12 +184,12 @@ theorem transitionSelfPath_symm_symm {M : Type u} {C : Type v}
 theorem transitionSelfPath_left_unit {M : Type u} {C : Type v}
     (S : SmoothManifold M C) (c : C) :
     Path.trans (Path.refl (transition S S c)) (transitionSelfPath S c) = transitionSelfPath S c := by
-  simpa using Path.trans_refl_left (transitionSelfPath S c)
+  simp
 
 theorem transitionSelfPath_right_unit {M : Type u} {C : Type v}
     (S : SmoothManifold M C) (c : C) :
     Path.trans (transitionSelfPath S c) (Path.refl c) = transitionSelfPath S c := by
-  simpa using Path.trans_refl_right (transitionSelfPath S c)
+  simp
 
 /-! ## Tangent vectors -/
 

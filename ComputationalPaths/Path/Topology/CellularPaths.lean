@@ -45,7 +45,7 @@ theorem transport_attach {D : X → Sort v} (c : Cell X)
   rfl
 
 /-- Two attachment paths for the same boundary point agree propositionally (UIP). -/
-theorem attach_unique (c : Cell X) (b : X) (hb : b ∈ c.boundary)
+theorem attach_unique (c : Cell X) (b : X) (_hb : b ∈ c.boundary)
     (p q : Path b c.interior) : p.proof = q.proof :=
   Subsingleton.elim _ _
 
@@ -55,12 +55,12 @@ noncomputable def detach (c : Cell X) (b : X) (hb : b ∈ c.boundary) : Path c.i
 
 theorem detach_attach_toEq (c : Cell X) (b : X) (hb : b ∈ c.boundary) :
     (Path.trans (c.detach b hb) (c.attach b hb)).toEq = rfl := by
-  simp [detach]
+  simp
 
 /-- Round-trip: attach then detach yields reflexivity proof. -/
 theorem attach_detach_toEq (c : Cell X) (b : X) (hb : b ∈ c.boundary) :
     (Path.trans (c.attach b hb) (c.detach b hb)).toEq = rfl := by
-  simp [detach]
+  simp
 
 /-- Attach then detach equals the full round-trip. -/
 theorem attach_detach_eq (c : Cell X) (b : X) (hb : b ∈ c.boundary) :
@@ -109,7 +109,7 @@ theorem comp_toFun (ψ : CellularMap Y Z) (φ : CellularMap X Y) :
   rfl
 
 /-- Identity cellular map. -/
-noncomputable def idMap (skel : CWSkeleton X) : CellularMap X X where
+noncomputable def idMap (_skel : CWSkeleton X) : CellularMap X X where
   toFun := id
   mapCell := id
   interior_compat := fun _ => rfl

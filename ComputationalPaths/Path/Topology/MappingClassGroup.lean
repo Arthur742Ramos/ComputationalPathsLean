@@ -134,7 +134,7 @@ theorem mcg_action_functoriality_assoc {surf : SurfaceData.{u}} {X : Type v}
     A.act (M.group.mul (M.group.mul g h) k) x
         = A.act (M.group.mul g h) (A.act k x) := A.act_mul (M.group.mul g h) k x
     _ = A.act g (A.act h (A.act k x)) := by
-          simpa using A.act_mul g h (A.act k x)
+          simp
 
 /-- Path-valued identity functoriality witness. -/
 noncomputable def mcg_action_functoriality_id_path {surf : SurfaceData.{u}} {X : Type v}
@@ -309,7 +309,7 @@ noncomputable def presentation_relations_are_rweq {surf : SurfaceData.{u}}
     (∀ R, R ∈ P.disjoint_relations → RwEqProp R.comm_path R.comm_path) ∧
       (∀ R, R ∈ P.braid_relations → RwEqProp R.braid_path R.braid_path) ∧
       (∀ R, R ∈ P.lantern_relations → RwEqProp R.lantern_path R.lantern_path) :=
-  ⟨fun R _ => ⟨RwEq.refl _⟩, fun R _ => ⟨RwEq.refl _⟩, fun R _ => ⟨RwEq.refl _⟩⟩
+  ⟨fun _R _ => ⟨RwEq.refl _⟩, fun _R _ => ⟨RwEq.refl _⟩, fun _R _ => ⟨RwEq.refl _⟩⟩
 
 /-! ## Birman Exact Sequence -/
 

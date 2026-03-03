@@ -34,7 +34,7 @@ noncomputable def HurewiczIso (G H : Type u) : Type u :=
   HurewiczData G H
 
 /-- Identity Hurewicz iso. -/
-noncomputable def hurewiczIdIso (G : Type u) (mul : G → G → G) (one : G) : HurewiczIso G G :=
+noncomputable def hurewiczIdIso (G : Type u) (_mul : G → G → G) (one : G) : HurewiczIso G G :=
   { toFun := id, oneH := one }
 
 end HurewiczTheorem
@@ -147,7 +147,7 @@ theorem modC_hurewicz {C : SerreClass} {G H : Type u} (data : ModCHurewiczData C
 structure ModCWhiteheadData (C : SerreClass) {A B : Type u} (f : A → B)
     extends WhiteheadTheorem.WeakEquivData f where
   /-- Each induced map on pi_n is a C-isomorphism (simplified placeholder). -/
-  cisom_piN : ∀ (n : Nat) (a : A), True
+  cisom_piN : ∀ (_n : Nat) (_a : A), True
 
 /-- Mod C Whitehead theorem: mod C data plus a bijection gives Whitehead data. -/
 noncomputable def modC_whitehead {C : SerreClass} {A B : Type u} {f : A → B}

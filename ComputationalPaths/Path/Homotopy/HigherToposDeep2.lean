@@ -45,7 +45,7 @@ structure InftyFunctor (C D : QuasiCategory) where
 
 /-- Identity ∞-functor. -/
 noncomputable def InftyFunctor.id (C : QuasiCategory) : InftyFunctor C C where
-  map := ⟨fun n x => x, fun n i x => rfl⟩
+  map := ⟨fun _n x => x, fun _ _i _x => rfl⟩
 
 /-- Composition of ∞-functors. -/
 noncomputable def InftyFunctor.comp {C D E : QuasiCategory}
@@ -81,8 +81,8 @@ theorem giraud_all_axioms (G : GiraudAxioms)
   ⟨h1, h2, h3, h4⟩
 
 noncomputable def giraud_all_axioms_path (G : GiraudAxioms)
-    (h1 : G.isPresentable) (h2 : G.universalColimits)
-    (h3 : G.disjointCoproducts) (h4 : G.effectiveGroupoids) :
+    (_h1 : G.isPresentable) (_h2 : G.universalColimits)
+    (_h3 : G.disjointCoproducts) (_h4 : G.effectiveGroupoids) :
     Path (G.isPresentable ∧ G.universalColimits ∧ G.disjointCoproducts ∧ G.effectiveGroupoids)
          (G.isPresentable ∧ G.universalColimits ∧ G.disjointCoproducts ∧ G.effectiveGroupoids) :=
   Path.refl _
@@ -118,7 +118,7 @@ theorem effective_epi_local_section (T : GiraudAxioms) (e : EffectiveEpi T)
   h
 
 noncomputable def effective_epi_local_section_path (T : GiraudAxioms) (e : EffectiveEpi T)
-    (h : e.cechNerveIsColimit) :
+    (_h : e.cechNerveIsColimit) :
     Path e.cechNerveIsColimit e.cechNerveIsColimit :=
   Path.refl _
 
@@ -132,7 +132,7 @@ structure ObjectClassifier (T : GiraudAxioms) where
   /-- The universal family over the classifier. -/
   universalFamily : T.cat.mor
   /-- Classification: maps to U correspond to objects of the slice. -/
-  classifies : ∀ (x : T.cat.obj) (f : T.cat.mor), Prop
+  classifies : ∀ (_x : T.cat.obj) (_f : T.cat.mor), Prop
 
 /-- A bounded object classifier for κ-compact objects. -/
 structure BoundedObjectClassifier (T : GiraudAxioms) where
@@ -141,7 +141,7 @@ structure BoundedObjectClassifier (T : GiraudAxioms) where
   /-- The bounded classifier. -/
   classifier : ObjectClassifier T
   /-- Only classifies κ-compact families. -/
-  compact : ∀ (x : T.cat.obj), Prop
+  compact : ∀ (_x : T.cat.obj), Prop
 
 theorem bounded_classifier_exists (T : GiraudAxioms)
     (B : BoundedObjectClassifier T) :
@@ -208,7 +208,7 @@ structure PostnikovTower (T : GiraudAxioms) where
   /-- Each stage is n-truncated. -/
   stageIsTruncated : ∀ (n : Nat), NTruncated T (Int.ofNat n)
   /-- Map from stage (n+1) to stage n. -/
-  bondingMap : ∀ (n : Nat), T.cat.mor
+  bondingMap : ∀ (_n : Nat), T.cat.mor
   /-- The object is the limit of its Postnikov tower. -/
   isLimit : Prop
 
@@ -237,7 +237,7 @@ structure TruncationModality (T : GiraudAxioms) (n : Int) where
   /-- The truncation functor. -/
   truncFunctor : InftyFunctor T.cat T.cat
   /-- Unit: X → τ≤n(X). -/
-  unit : ∀ (x : T.cat.sset.obj 0), T.cat.mor
+  unit : ∀ (_x : T.cat.sset.obj 0), T.cat.mor
   /-- Idempotency: τ≤n ∘ τ≤n ≃ τ≤n. -/
   idempotent : ∀ (k : Nat) (x : T.cat.sset.obj k),
     (InftyFunctor.comp truncFunctor truncFunctor).map.map k x =
@@ -280,7 +280,7 @@ noncomputable def slice_topos_base_path (T : GiraudAxioms) (S : SliceTopos T) :
     an equivalence. -/
 structure HypercompleteTopos extends GiraudAxioms where
   /-- Hypercompleteness condition. -/
-  hyperComplete : ∀ (f : cat.mor), Prop
+  hyperComplete : ∀ (_f : cat.mor), Prop
 
 theorem hypercomplete_is_topos (H : HypercompleteTopos) :
     H.cat = H.cat :=
@@ -351,12 +351,12 @@ structure WhiteheadInTopos (H : HypercompleteTopos) where
   target : H.cat.obj
   morphism : H.cat.mor
   /-- Induces iso on all homotopy sheaves. -/
-  piSheafIso : ∀ (n : Nat), Prop
+  piSheafIso : ∀ (_n : Nat), Prop
   /-- Therefore is an equivalence. -/
   isEquivalence : Prop
 
 theorem whitehead_in_topos_holds (H : HypercompleteTopos)
-    (W : WhiteheadInTopos H) (hpi : ∀ n, W.piSheafIso n)
+    (W : WhiteheadInTopos H) (_hpi : ∀ n, W.piSheafIso n)
     (heq : W.isEquivalence) : W.isEquivalence :=
   heq
 

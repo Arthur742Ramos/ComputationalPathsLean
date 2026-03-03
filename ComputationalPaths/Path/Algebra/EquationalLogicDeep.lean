@@ -416,14 +416,14 @@ noncomputable def theoryOf {Sig : Signature} {Var : Type}
 theorem model_of_theoryOf {Sig : Signature} {Var : Type}
     (K : SigAlgebra Sig → Prop) (Alg : SigAlgebra Sig)
     (hmem : K Alg) : isModel Alg (theoryOf (Var := Var) K) :=
-  fun eq heq => heq Alg hmem
+  fun _eq heq => heq Alg hmem
 
 /-- Galois connection: if `K₁ ⊆ K₂` then `theoryOf K₂ ⊆ theoryOf K₁`. -/
 -- Theorem 28
 theorem theoryOf_antitone {Sig : Signature} {Var : Type}
     (K1 K2 : SigAlgebra Sig → Prop) (hsub : ∀ Alg, K1 Alg → K2 Alg) :
     ∀ eq, theoryOf (Var := Var) K2 eq → theoryOf (Var := Var) K1 eq :=
-  fun eq heq Alg hk1 => heq Alg (hsub Alg hk1)
+  fun _eq heq Alg hk1 => heq Alg (hsub Alg hk1)
 
 /-! ## §15  Congruences -/
 
@@ -853,7 +853,7 @@ noncomputable def theoryInter {Sig : Signature} {Var : Type}
 -- Theorem 70
 theorem model_inter {Sig : Signature} {Var : Type}
     (T1 T2 : EqTheory Sig Var) (Alg : SigAlgebra Sig)
-    (hmod1 : isModel Alg T1) (hmod2 : isModel Alg T2) :
+    (hmod1 : isModel Alg T1) (_hmod2 : isModel Alg T2) :
     isModel Alg (theoryInter T1 T2) :=
   fun eq ⟨h1, _h2⟩ => hmod1 eq h1
 

@@ -205,15 +205,15 @@ theorem congrArg_symm_graph {V : Type u} {W : Type v}
 
 /-- The complement graph: edges where the original has none. -/
 noncomputable def complementGraph {V : Type u} [DecidableEq V] (G : Graph V)
-    (adj_dec : ∀ u v, Decidable (G.adj u v)) : Graph V :=
+    (_adj_dec : ∀ u v, Decidable (G.adj u v)) : Graph V :=
   { adj := fun u v => u ≠ v ∧ ¬ G.adj u v
     adj_symm := fun ⟨hne, hnadj⟩ => ⟨fun h => hne h.symm, fun h => hnadj (G.adj_symm h)⟩
-    adj_irrefl := fun v ⟨hne, _⟩ => hne rfl }
+    adj_irrefl := fun _v ⟨hne, _⟩ => hne rfl }
 
 /-- Complement of complement restores adjacency for connected vertices. -/
 theorem complement_adj_not_adj {V : Type u} [DecidableEq V] (G : Graph V)
     (adj_dec : ∀ u v, Decidable (G.adj u v))
-    {u v : V} (hne : u ≠ v) (h : G.adj u v) :
+    {u v : V} (_hne : u ≠ v) (h : G.adj u v) :
     ¬ (complementGraph G adj_dec).adj u v := by
   intro ⟨_, hnadj⟩
   exact hnadj h

@@ -286,14 +286,14 @@ theorem AmalgamatedPath.ofPath_trans {A B C : Type u} (vk : VKInclusion A B C)
     AmalgamatedPath.ofPath vk (Path.trans p q) =
       AmalgamatedPath.trans_amalg (AmalgamatedPath.ofPath vk p)
         (AmalgamatedPath.ofPath vk q) := by
-  simp [AmalgamatedPath.ofPath, AmalgamatedPath.trans_amalg, Path.congrArg_trans]
+  simp [AmalgamatedPath.ofPath, AmalgamatedPath.trans_amalg]
 
 /-- ofPath preserves symm. -/
 theorem AmalgamatedPath.ofPath_symm {A B C : Type u} (vk : VKInclusion A B C)
     {c₁ c₂ : C} (p : Path c₁ c₂) :
     AmalgamatedPath.ofPath vk (Path.symm p) =
       AmalgamatedPath.symm_amalg (AmalgamatedPath.ofPath vk p) := by
-  simp [AmalgamatedPath.ofPath, AmalgamatedPath.symm_amalg, Path.congrArg_symm]
+  simp [AmalgamatedPath.ofPath, AmalgamatedPath.symm_amalg]
 
 /-! ## CW Complex Cell Attachment -/
 
@@ -301,7 +301,7 @@ theorem AmalgamatedPath.ofPath_symm {A B C : Type u} (vk : VKInclusion A B C)
 structure CWStructure (X : Type u) where
   Skeleton : Nat → Type u
   incl : ∀ n, Skeleton n → Skeleton (n + 1)
-  inclPath : ∀ n {a b : Skeleton n} (p : Path a b),
+  inclPath : ∀ n {a b : Skeleton n} (_p : Path a b),
     Path (incl n a) (incl n b)
   inclPathRefl : ∀ n (a : Skeleton n),
     inclPath n (Path.refl a) = Path.refl (incl n a)
@@ -344,7 +344,7 @@ theorem CWStructure.iterLift_refl {X : Type u} (cw : CWStructure X)
   induction k with
   | zero => rfl
   | succ k _ =>
-      simp [CWStructure.iterLiftPath, CWStructure.iterIncl]
+      simp [CWStructure.iterIncl]
 
 /-! ## Mayer-Vietoris via Path Exact Sequences -/
 

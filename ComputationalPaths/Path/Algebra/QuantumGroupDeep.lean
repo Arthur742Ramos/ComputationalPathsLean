@@ -76,7 +76,7 @@ noncomputable def unit_right_path (alg : AlgStr A) (a : A)
   p
 
 /-- Theorem 4: Coassociativity of comultiplication as Path -/
-noncomputable def coassoc_path (co : CoalgStr A) (a : A)
+noncomputable def coassoc_path (_co : CoalgStr A) (_a : A)
     (lhs rhs : A × A × A)
     (p : Path lhs rhs)
     : Path lhs rhs :=
@@ -195,8 +195,8 @@ structure ComoduleStr (A : Type u) (M : Type v) where
   coaction : M → M × A
 
 /-- Theorem 17: Comodule coassociativity -/
-noncomputable def comodule_coassoc (co : CoalgStr A) (cm : ComoduleStr A M)
-    (m : M) (result1 result2 : M × A × A)
+noncomputable def comodule_coassoc (_co : CoalgStr A) (_cm : ComoduleStr A M)
+    (_m : M) (result1 result2 : M × A × A)
     (p : Path result1 result2)
     : Path result1 result2 :=
   p
@@ -209,7 +209,7 @@ noncomputable def comodule_counit (co : CoalgStr A) (cm : ComoduleStr A M)
   p
 
 /-- Theorem 19: Comodule map composition via trans -/
-noncomputable def comodule_map_trans (cm : ComoduleStr A M) (m : M)
+noncomputable def comodule_map_trans (_cm : ComoduleStr A M) (_m : M)
     (x y z : M × A)
     (p : Path x y) (q : Path y z)
     : Path x z :=
@@ -224,7 +224,7 @@ structure ModuleAlgStr (H : Type u) (A : Type v) where
   action : H → A → A
 
 /-- Theorem 20: Module algebra compatibility -/
-noncomputable def module_alg_compat (ha : AlgStr H) (aa : AlgStr A)
+noncomputable def module_alg_compat (_ha : AlgStr H) (aa : AlgStr A)
     (ma : ModuleAlgStr H A) (h : H) (a b : A)
     (p : Path (ma.action h (aa.mul a b))
               (aa.mul (ma.action h a) (ma.action h b)))
@@ -334,8 +334,8 @@ noncomputable def qdouble_unit (alg : AlgStr A)
   Path.refl (QuantumDouble.mk alg.unit alg.unit)
 
 /-- Theorem 31: Quantum double associativity via triple trans -/
-noncomputable def qdouble_assoc (alg : AlgStr A)
-    (d1 d2 d3 : QuantumDouble A)
+noncomputable def qdouble_assoc (_alg : AlgStr A)
+    (_d1 _d2 _d3 : QuantumDouble A)
     (x y z : QuantumDouble A)
     (p : Path x y) (q : Path y z) (r : Path z x)
     : Path x x :=
@@ -377,7 +377,7 @@ noncomputable def twisted_comul (bi : BialgebraStr A) (tw : DrinfeldTwist A)
   p
 
 /-- Theorem 35: Twist cocycle condition -/
-noncomputable def twist_cocycle (alg : AlgStr A) (tw : DrinfeldTwist A)
+noncomputable def twist_cocycle (_alg : AlgStr A) (_tw : DrinfeldTwist A)
     (lhs rhs : A × A × A)
     (p : Path lhs rhs)
     : Path lhs rhs :=
@@ -397,7 +397,7 @@ noncomputable def twisted_rmatrix (alg : AlgStr A)
 
 /-- Theorem 37: Twist preserves Yang-Baxter -/
 noncomputable def twist_preserves_yb (alg : AlgStr A) (yb : YBComponents A)
-    (tw : DrinfeldTwist A)
+    (_tw : DrinfeldTwist A)
     (lhs rhs : A)
     (p_twist : Path (alg.mul (alg.mul yb.R12 yb.R13) yb.R23) lhs)
     (q_twist : Path lhs rhs)
@@ -441,7 +441,7 @@ noncomputable def ribbon_twist (h : HopfStr A) (rib : RibbonElt A) (u : A)
 
 /-- Theorem 42: Ribbon element squared and R-matrix -/
 noncomputable def ribbon_squared (alg : AlgStr A) (rib : RibbonElt A)
-    (rm : RMatrix A) (target : A)
+    (_rm : RMatrix A) (target : A)
     (p : Path (alg.mul rib.v rib.v) target)
     : Path (alg.mul rib.v rib.v) target :=
   p
@@ -509,7 +509,7 @@ noncomputable def triple_trans {X : Type u} (a b c d : X)
   Path.trans (Path.trans p q) r
 
 /-- Theorem 52: Cyclic path in quantum double -/
-noncomputable def qdouble_cyclic (alg : AlgStr A)
+noncomputable def qdouble_cyclic (_alg : AlgStr A)
     (x y z : QuantumDouble A)
     (p : Path x y) (q : Path y z) (r : Path z x)
     : Path x x :=
@@ -621,7 +621,7 @@ noncomputable def transport_antipode (h : HopfStr A) (a b c : A)
   Path.trans (congrArg h.antipode p) q
 
 /-- Theorem 67: Naturality square for coalgebra morphism -/
-noncomputable def coalg_morph_natural (f : A → B) (coA : CoalgStr A) (coB : CoalgStr B)
+noncomputable def coalg_morph_natural (f : A → B) (_coA : CoalgStr A) (coB : CoalgStr B)
     (a : A)
     (lhs rhs : B × B)
     (p : Path lhs (coB.comul (f a)))

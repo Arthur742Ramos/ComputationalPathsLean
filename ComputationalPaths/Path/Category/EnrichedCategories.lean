@@ -421,51 +421,51 @@ theorem weighted_colimit_exists_of_has {C : VCategory} (h : HasWeightedColimits 
     (D : WeightedDiagram C) : Nonempty (WeightedColimit C D) :=
   h D
 
-theorem weighted_limit_unique_up_to_iso {C : VCategory} (D : WeightedDiagram C) :
+theorem weighted_limit_unique_up_to_iso {C : VCategory} (_D : WeightedDiagram C) :
     True := by
   trivial
 
-theorem weighted_colimit_unique_up_to_iso {C : VCategory} (D : WeightedDiagram C) :
+theorem weighted_colimit_unique_up_to_iso {C : VCategory} (_D : WeightedDiagram C) :
     True := by
   trivial
 
-theorem weighted_limits_stable_under_equiv {C : VCategory} : True := by
+theorem weighted_limits_stable_under_equiv {_C : VCategory} : True := by
   trivial
 
-theorem weighted_colimits_stable_under_equiv {C : VCategory} : True := by
+theorem weighted_colimits_stable_under_equiv {_C : VCategory} : True := by
   trivial
 
-theorem enriched_yoneda_embedding_fully_faithful {C : VCategory} : True := by
+theorem enriched_yoneda_embedding_fully_faithful {_C : VCategory} : True := by
   trivial
 
-theorem enriched_yoneda_naturality {C : VCategory} (Y : EnrichedYonedaIso C) : True := by
+theorem enriched_yoneda_naturality {C : VCategory} (_Y : EnrichedYonedaIso C) : True := by
   trivial
 
-theorem enriched_adjoint_triangle_left {C D : VCategory} (A : EnrichedAdjunction C D) :
+theorem enriched_adjoint_triangle_left {C D : VCategory} (_A : EnrichedAdjunction C D) :
     True := by
   trivial
 
-theorem enriched_adjoint_triangle_right {C D : VCategory} (A : EnrichedAdjunction C D) :
+theorem enriched_adjoint_triangle_right {C D : VCategory} (_A : EnrichedAdjunction C D) :
     True := by
   trivial
 
-theorem mates_for_enriched_adjunctions {C D : VCategory} (A : EnrichedAdjunction C D) :
+theorem mates_for_enriched_adjunctions {C D : VCategory} (_A : EnrichedAdjunction C D) :
     True := by
   trivial
 
 theorem change_of_base_preserves_weighted_limits {C : VCategory}
-    {B₁ B₂ : MonoidalBase} (F : ChangeOfBaseFunctor B₁ B₂ C) : True := by
+    {B₁ B₂ : MonoidalBase} (_F : ChangeOfBaseFunctor B₁ B₂ C) : True := by
   trivial
 
 theorem change_of_base_preserves_weighted_colimits {C : VCategory}
-    {B₁ B₂ : MonoidalBase} (F : ChangeOfBaseFunctor B₁ B₂ C) : True := by
+    {B₁ B₂ : MonoidalBase} (_F : ChangeOfBaseFunctor B₁ B₂ C) : True := by
   trivial
 
-theorem tensored_category_represents_action {C : VCategory} (T : TensoredCategory C) :
+theorem tensored_category_represents_action {C : VCategory} (_T : TensoredCategory C) :
     True := by
   trivial
 
-theorem cotensored_category_represents_action {C : VCategory} (T : CotensoredCategory C) :
+theorem cotensored_category_represents_action {C : VCategory} (_T : CotensoredCategory C) :
     True := by
   trivial
 
@@ -474,37 +474,37 @@ theorem tensored_and_cotensored_implies_enriched_limits {C : VCategory}
   trivial
 
 theorem enriched_end_exists_for_small_functor {C : VCategory}
-    (F : C.Obj → C.Obj → Type u) : True := by
+    (_F : C.Obj → C.Obj → Type u) : True := by
   trivial
 
 theorem enriched_coend_exists_for_small_functor {C : VCategory}
-    (F : C.Obj → C.Obj → Type u) : True := by
+    (_F : C.Obj → C.Obj → Type u) : True := by
   trivial
 
-theorem fubini_for_enriched_ends {C : VCategory} : True := by
+theorem fubini_for_enriched_ends {_C : VCategory} : True := by
   trivial
 
-theorem fubini_for_enriched_coends {C : VCategory} : True := by
+theorem fubini_for_enriched_coends {_C : VCategory} : True := by
   trivial
 
 theorem day_convolution_associative_enriched {C : VCategory}
-    (D : EnrichedDayConvolution C) : True := by
+    (_D : EnrichedDayConvolution C) : True := by
   trivial
 
 theorem day_convolution_unital_left_enriched {C : VCategory}
-    (D : EnrichedDayConvolution C) : True := by
+    (_D : EnrichedDayConvolution C) : True := by
   trivial
 
 theorem day_convolution_unital_right_enriched {C : VCategory}
-    (D : EnrichedDayConvolution C) : True := by
+    (_D : EnrichedDayConvolution C) : True := by
   trivial
 
 theorem day_convolution_closed_monoidal {C : VCategory}
-    (D : EnrichedDayConvolution C) : True := by
+    (_D : EnrichedDayConvolution C) : True := by
   trivial
 
 theorem ends_coends_interact_with_day_convolution {C : VCategory}
-    (D : EnrichedDayConvolution C) : True := by
+    (_D : EnrichedDayConvolution C) : True := by
   trivial
 
 /-! ## Computational-path enrichment integration -/
@@ -524,7 +524,7 @@ noncomputable def enrichedComposeAsPath {C : VCategory} {x y z : C.Obj}
     (r : enrichedHomPathSpace y z) :
     enrichedComposeAsPath (enrichedComposeAsPath p q) r =
       enrichedComposeAsPath p (enrichedComposeAsPath q r) := by
-  simpa [enrichedComposeAsPath] using Path.trans_assoc p q r
+  simp [enrichedComposeAsPath]
 
 @[simp] theorem enrichedComposeAsPath_id_left {C : VCategory}
     {x y : C.Obj} (p : enrichedHomPathSpace x y) :

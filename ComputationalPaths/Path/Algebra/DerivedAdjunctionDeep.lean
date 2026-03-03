@@ -54,12 +54,12 @@ noncomputable def triangleRPath {S T : ShiftData}
 theorem triangleLPath_toEq {S T : ShiftData}
     (A : DerivedAdjunction S T) (C : ChainComplex) (n x : Int) :
     (triangleLPath A C n x).toEq = A.triangleL C n x := by
-  simp [triangleLPath]
+  simp
 
 theorem triangleRPath_toEq {S T : ShiftData}
     (A : DerivedAdjunction S T) (C : ChainComplex) (n x : Int) :
     (triangleRPath A C n x).toEq = A.triangleR C n x := by
-  simp [triangleRPath]
+  simp
 
 /-- Loop from left triangle identity. -/
 noncomputable def triangleLLoop {S T : ShiftData}
@@ -70,7 +70,7 @@ noncomputable def triangleLLoop {S T : ShiftData}
 theorem triangleLLoop_toEq {S T : ShiftData}
     (A : DerivedAdjunction S T) (C : ChainComplex) (n x : Int) :
     (triangleLLoop A C n x).toEq = rfl := by
-  simp [triangleLLoop, triangleLPath]
+  simp
 
 /-- Loop from right triangle identity. -/
 noncomputable def triangleRLoop {S T : ShiftData}
@@ -81,7 +81,7 @@ noncomputable def triangleRLoop {S T : ShiftData}
 theorem triangleRLoop_toEq {S T : ShiftData}
     (A : DerivedAdjunction S T) (C : ChainComplex) (n x : Int) :
     (triangleRLoop A C n x).toEq = rfl := by
-  simp [triangleRLoop, triangleRPath]
+  simp
 
 /-! ## §2. Identity adjunction and composition -/
 
@@ -113,7 +113,7 @@ noncomputable def idAdjLRPath (S : ShiftData) (C : ChainComplex) :
 
 theorem idAdjLRPath_toEq (S : ShiftData) (C : ChainComplex) :
     (idAdjLRPath S C).toEq = rfl := by
-  simp [idAdjLRPath]
+  simp
 
 noncomputable def idAdjRLPath (S : ShiftData) (C : ChainComplex) :
     Path ((idAdjunction S).R.onObj ((idAdjunction S).L.onObj C)) C :=
@@ -121,7 +121,7 @@ noncomputable def idAdjRLPath (S : ShiftData) (C : ChainComplex) :
 
 theorem idAdjRLPath_toEq (S : ShiftData) (C : ChainComplex) :
     (idAdjRLPath S C).toEq = rfl := by
-  simp [idAdjRLPath]
+  simp
 
 /-! ## §3. Derived Hom and Tensor adjunction -/
 
@@ -145,7 +145,7 @@ noncomputable def tensorHomAdjPath (TH : TensorHomAdjunction) (A B C : ChainComp
 
 theorem tensorHomAdjPath_toEq (TH : TensorHomAdjunction) (A B C : ChainComplex) :
     (tensorHomAdjPath TH A B C).toEq = TH.adjIso A B C := by
-  simp [tensorHomAdjPath]
+  simp
 
 /-- Path witnessing tensor symmetry. -/
 noncomputable def tensorSymPath (TH : TensorHomAdjunction) (A B : ChainComplex) :
@@ -154,7 +154,7 @@ noncomputable def tensorSymPath (TH : TensorHomAdjunction) (A B : ChainComplex) 
 
 theorem tensorSymPath_toEq (TH : TensorHomAdjunction) (A B : ChainComplex) :
     (tensorSymPath TH A B).toEq = TH.tensorSym A B := by
-  simp [tensorSymPath]
+  simp
 
 /-- Double symmetry is identity. -/
 noncomputable def tensorSymSymPath (TH : TensorHomAdjunction) (A B : ChainComplex) :
@@ -163,7 +163,7 @@ noncomputable def tensorSymSymPath (TH : TensorHomAdjunction) (A B : ChainComple
 
 theorem tensorSymSymPath_toEq (TH : TensorHomAdjunction) (A B : ChainComplex) :
     (tensorSymSymPath TH A B).toEq = (TH.tensorSym A B).trans (TH.tensorSym B A) := by
-  simp [tensorSymSymPath, tensorSymPath]
+  simp
 
 /-- Path from tensor with zero. -/
 noncomputable def tensorZeroPath (TH : TensorHomAdjunction) (A : ChainComplex) :
@@ -172,12 +172,12 @@ noncomputable def tensorZeroPath (TH : TensorHomAdjunction) (A : ChainComplex) :
 
 theorem tensorZeroPath_toEq (TH : TensorHomAdjunction) (A : ChainComplex) :
     (tensorZeroPath TH A).toEq = TH.tensorZero A := by
-  simp [tensorZeroPath]
+  simp
 
 /-- Round trip: tensor zero and back. -/
 theorem tensorZero_round_trip (TH : TensorHomAdjunction) (A : ChainComplex) :
     (Path.trans (tensorZeroPath TH A) (Path.symm (tensorZeroPath TH A))).toEq = rfl := by
-  simp [tensorZeroPath]
+  simp
 
 /-! ## §4. Grothendieck spectral sequence data -/
 
@@ -202,7 +202,7 @@ noncomputable def spectralConvergencePath {S T U : ShiftData}
 theorem spectralConvergencePath_toEq {S T U : ShiftData}
     (SS : GrothendieckSpectralSeq S T U) (n : Int) :
     (spectralConvergencePath SS n).toEq = SS.convergence n := by
-  simp [spectralConvergencePath]
+  simp
 
 /-- Symmetry of convergence. -/
 noncomputable def spectralConvergenceSymm {S T U : ShiftData}
@@ -214,7 +214,7 @@ noncomputable def spectralConvergenceSymm {S T U : ShiftData}
 theorem spectral_round_trip {S T U : ShiftData}
     (SS : GrothendieckSpectralSeq S T U) (n : Int) :
     (Path.trans (spectralConvergencePath SS n) (spectralConvergenceSymm SS n)).toEq = rfl := by
-  simp [spectralConvergencePath, spectralConvergenceSymm]
+  simp
 
 /-! ## §5. Base change and projection formula -/
 
@@ -236,7 +236,7 @@ noncomputable def baseChangePath {S : ShiftData} (BC : BaseChangeData S) (C : Ch
 
 theorem baseChangePath_toEq {S : ShiftData} (BC : BaseChangeData S) (C : ChainComplex) :
     (baseChangePath BC C).toEq = BC.baseChangeIso C := by
-  simp [baseChangePath]
+  simp
 
 /-- Round trip of base change. -/
 noncomputable def baseChangeLoop {S : ShiftData} (BC : BaseChangeData S) (C : ChainComplex) :
@@ -246,7 +246,7 @@ noncomputable def baseChangeLoop {S : ShiftData} (BC : BaseChangeData S) (C : Ch
 
 theorem baseChangeLoop_toEq {S : ShiftData} (BC : BaseChangeData S) (C : ChainComplex) :
     (baseChangeLoop BC C).toEq = rfl := by
-  simp [baseChangeLoop, baseChangePath]
+  simp
 
 /-- Projection formula data. -/
 structure ProjectionFormula (S : ShiftData) where
@@ -268,13 +268,13 @@ noncomputable def projFormulaPath {S : ShiftData} (PF : ProjectionFormula S)
 theorem projFormulaPath_toEq {S : ShiftData} (PF : ProjectionFormula S)
     (A B : ChainComplex) :
     (projFormulaPath PF A B).toEq = PF.projIso A B := by
-  simp [projFormulaPath]
+  simp
 
 /-- Round trip. -/
 theorem projFormula_round_trip {S : ShiftData} (PF : ProjectionFormula S)
     (A B : ChainComplex) :
     (Path.trans (projFormulaPath PF A B) (Path.symm (projFormulaPath PF A B))).toEq = rfl := by
-  simp [projFormulaPath]
+  simp
 
 /-! ## §6. Serre duality -/
 
@@ -297,7 +297,7 @@ noncomputable def serreDualityPath (SD : SerreDuality) (F G : ChainComplex) :
 
 theorem serreDualityPath_toEq (SD : SerreDuality) (F G : ChainComplex) :
     (serreDualityPath SD F G).toEq = SD.serreIso F G := by
-  simp [serreDualityPath]
+  simp
 
 /-- Self-dual Serre path. -/
 noncomputable def serreSelfPath (SD : SerreDuality) (F : ChainComplex) :
@@ -306,7 +306,7 @@ noncomputable def serreSelfPath (SD : SerreDuality) (F : ChainComplex) :
 
 theorem serreSelfPath_toEq (SD : SerreDuality) (F : ChainComplex) :
     (serreSelfPath SD F).toEq = SD.serreSelf F := by
-  simp [serreSelfPath]
+  simp
 
 /-- Serre duality loop: compose duality with its inverse. -/
 noncomputable def serreDualityLoop (SD : SerreDuality) (F G : ChainComplex) :
@@ -315,7 +315,7 @@ noncomputable def serreDualityLoop (SD : SerreDuality) (F G : ChainComplex) :
 
 theorem serreDualityLoop_toEq (SD : SerreDuality) (F G : ChainComplex) :
     (serreDualityLoop SD F G).toEq = rfl := by
-  simp [serreDualityLoop, serreDualityPath]
+  simp
 
 /-! ## §7. Verdier duality -/
 
@@ -337,7 +337,7 @@ noncomputable def verdierInvolutionPath {S : ShiftData}
 theorem verdierInvolutionPath_toEq {S : ShiftData}
     (V : VerdierDuality S) (C : ChainComplex) :
     (verdierInvolutionPath V C).toEq = (V.involution C).toEq := by
-  simp [verdierInvolutionPath]
+  simp
 
 /-- Double involution loop. -/
 noncomputable def verdierDoubleLoop {S : ShiftData}
@@ -350,7 +350,7 @@ theorem verdierDoubleLoop_toEq {S : ShiftData}
     (V : VerdierDuality S) (C : ChainComplex) :
     (verdierDoubleLoop V C).toEq =
       (congrArg V.D.onObj (congrArg V.D.onObj (V.involution C))).toEq := by
-  simp [verdierDoubleLoop]
+  simp
 
 /-- Triple application reduces to single. -/
 noncomputable def verdierTripleToSingle {S : ShiftData}
@@ -362,7 +362,7 @@ theorem verdierTripleToSingle_toEq {S : ShiftData}
     (V : VerdierDuality S) (C : ChainComplex) :
     (verdierTripleToSingle V C).toEq =
       (congrArg V.D.onObj (V.involution C)).toEq := by
-  simp [verdierTripleToSingle]
+  simp
 
 /-- Quad application reduces to identity. -/
 noncomputable def verdierQuadToId {S : ShiftData}
@@ -376,7 +376,7 @@ theorem verdierQuadToId_toEq {S : ShiftData}
     (verdierQuadToId V C).toEq =
       ((congrArg V.D.onObj (congrArg V.D.onObj (V.involution C))).toEq).trans
         (V.involution C).toEq := by
-  simp [verdierQuadToId]
+  simp
 
 /-- Loop from quad involution. -/
 noncomputable def verdierQuadLoop {S : ShiftData}
@@ -387,7 +387,7 @@ noncomputable def verdierQuadLoop {S : ShiftData}
 theorem verdierQuadLoop_toEq {S : ShiftData}
     (V : VerdierDuality S) (C : ChainComplex) :
     (verdierQuadLoop V C).toEq = rfl := by
-  simp [verdierQuadLoop]
+  simp
 
 /-! ## §8. Sheaf cohomology via derived pushforward -/
 
@@ -410,7 +410,7 @@ noncomputable def sheafCohFormula {S : ShiftData} (SC : SheafCohomology S)
 theorem sheafCohFormula_toEq {S : ShiftData} (SC : SheafCohomology S)
     (n : Nat) (F : ChainComplex) :
     (sheafCohFormula SC n F).toEq = SC.Hn_formula n F := by
-  simp [sheafCohFormula]
+  simp
 
 /-- Path witnessing H^0(0) = 0. -/
 noncomputable def H0_zero_path {S : ShiftData} (SC : SheafCohomology S) :
@@ -419,7 +419,7 @@ noncomputable def H0_zero_path {S : ShiftData} (SC : SheafCohomology S) :
 
 theorem H0_zero_path_toEq {S : ShiftData} (SC : SheafCohomology S) :
     (H0_zero_path SC).toEq = SC.H0_zero := by
-  simp [H0_zero_path]
+  simp
 
 /-- Loop from cohomology vanishing. -/
 noncomputable def H0_zero_loop {S : ShiftData} (SC : SheafCohomology S) :
@@ -428,7 +428,7 @@ noncomputable def H0_zero_loop {S : ShiftData} (SC : SheafCohomology S) :
 
 theorem H0_zero_loop_toEq {S : ShiftData} (SC : SheafCohomology S) :
     (H0_zero_loop SC).toEq = rfl := by
-  simp [H0_zero_loop, H0_zero_path]
+  simp
 
 /-! ## §9. Derived Morita equivalence -/
 
@@ -467,7 +467,7 @@ noncomputable def moritaLoop' {S T : ShiftData}
 theorem moritaLoop_eq_loop' {S T : ShiftData}
     (M : DerivedMorita S T) (C : ChainComplex) :
     (moritaLoop M C).toEq = (moritaLoop' M C).toEq := by
-  simp [moritaLoop, moritaLoop']
+  simp
 
 /-- Double application of equivalence gives a path back. -/
 noncomputable def moritaDoubleApply {S T : ShiftData}
@@ -480,7 +480,7 @@ theorem moritaDoubleApply_toEq {S T : ShiftData}
     (M : DerivedMorita S T) (C : ChainComplex) :
     (moritaDoubleApply M C).toEq =
       ((congrArg M.G.onObj (congrArg M.F.onObj (M.unitIso C))).toEq).trans (M.unitIso C).toEq := by
-  simp [moritaDoubleApply]
+  simp
 
 /-- Self-Morita equivalence. -/
 @[simp] noncomputable def selfMorita (S : ShiftData) : DerivedMorita S S where
@@ -521,7 +521,7 @@ noncomputable def yonedaAssocPath (E : ExtAlgebra) (p q r : Nat) (x y z : Int) :
 
 theorem yonedaAssocPath_toEq (E : ExtAlgebra) (p q r : Nat) (x y z : Int) :
     (yonedaAssocPath E p q r x y z).toEq = E.assoc p q r x y z := by
-  simp [yonedaAssocPath]
+  simp
 
 /-- Path witnessing left unit. -/
 noncomputable def yonedaLeftUnitPath (E : ExtAlgebra) (n : Nat) (x : Int) :
@@ -530,7 +530,7 @@ noncomputable def yonedaLeftUnitPath (E : ExtAlgebra) (n : Nat) (x : Int) :
 
 theorem yonedaLeftUnitPath_toEq (E : ExtAlgebra) (n : Nat) (x : Int) :
     (yonedaLeftUnitPath E n x).toEq = E.leftUnit n x := by
-  simp [yonedaLeftUnitPath]
+  simp
 
 /-- Path witnessing right unit. -/
 noncomputable def yonedaRightUnitPath (E : ExtAlgebra) (n : Nat) (x : Int) :
@@ -539,10 +539,10 @@ noncomputable def yonedaRightUnitPath (E : ExtAlgebra) (n : Nat) (x : Int) :
 
 theorem yonedaRightUnitPath_toEq (E : ExtAlgebra) (n : Nat) (x : Int) :
     (yonedaRightUnitPath E n x).toEq = E.rightUnit n x := by
-  simp [yonedaRightUnitPath]
+  simp
 
 /-- Pentagon identity for Yoneda product (Mac Lane coherence). -/
-theorem yoneda_pentagon (E : ExtAlgebra) (p q r s : Nat) (a b c d : Int) :
+theorem yoneda_pentagon (_E : ExtAlgebra) (_p _q _r _s : Nat) (_a _b _c _d : Int) :
     True := by
   trivial
 
@@ -557,7 +557,7 @@ noncomputable def yonedaUnitConsistencyPath (E : ExtAlgebra) :
 
 theorem yonedaUnitConsistencyPath_toEq (E : ExtAlgebra) :
     (yonedaUnitConsistencyPath E).toEq = yoneda_unit_consistency E := by
-  simp [yonedaUnitConsistencyPath]
+  simp
 
 /-- Associativity loop. -/
 noncomputable def yonedaAssocLoop (E : ExtAlgebra) (p q r : Nat) (x y z : Int) :
@@ -567,7 +567,7 @@ noncomputable def yonedaAssocLoop (E : ExtAlgebra) (p q r : Nat) (x y z : Int) :
 
 theorem yonedaAssocLoop_toEq (E : ExtAlgebra) (p q r : Nat) (x y z : Int) :
     (yonedaAssocLoop E p q r x y z).toEq = rfl := by
-  simp [yonedaAssocLoop, yonedaAssocPath]
+  simp
 
 end DerivedAdjunctionDeep
 end Algebra

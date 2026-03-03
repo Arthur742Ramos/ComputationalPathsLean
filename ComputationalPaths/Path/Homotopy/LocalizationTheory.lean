@@ -255,16 +255,16 @@ theorem iso_is_local_equiv_prop (C : Category.{u}) (S : MorphismClass C)
     at complementary primes via a pullback square. -/
 theorem fracture_square (C : Category.{u})
     (E₁ E₂ : HomologyTheory.{u})
-    (B₁ : BousfieldLocalization C E₁)
-    (B₂ : BousfieldLocalization C E₂)
-    (X : C.Obj) :
+    (_B₁ : BousfieldLocalization C E₁)
+    (_B₂ : BousfieldLocalization C E₂)
+    (_X : C.Obj) :
     True := trivial
 
 /-- Chromatic convergence: a spectrum is the homotopy limit of its
     chromatic localizations. -/
 theorem chromatic_convergence (C : Category.{u})
-    (localizations : Nat → HomologyTheory.{u})
-    (X : C.Obj) :
+    (_localizations : Nat → HomologyTheory.{u})
+    (_X : C.Obj) :
     True := trivial
 
 
@@ -272,8 +272,8 @@ theorem chromatic_convergence (C : Category.{u})
 
 
 /-- Every object is local with respect to the empty class of maps. -/
-theorem every_object_local_empty (C : Category.{u}) (W : C.Obj) :
-    ∀ {X Y : C.Obj} (f : C.Hom X Y) (hf : False), False := by
+theorem every_object_local_empty (C : Category.{u}) (_W : C.Obj) :
+    ∀ {X Y : C.Obj} (_f : C.Hom X Y) (_hf : False), False := by
   intro _ _ _ hf; exact hf
 
 private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=

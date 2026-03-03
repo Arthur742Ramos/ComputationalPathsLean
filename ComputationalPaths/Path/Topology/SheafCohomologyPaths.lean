@@ -215,28 +215,28 @@ noncomputable def leray_converges_transport_comp {U : OpenCover.{u, v}} {S : She
 /-! ## Additional Theorem Stubs -/
 
 theorem presheaf_res_id_theorem {U : OpenCover} (F : Presheaf U)
-    (i : U.index) (s : F.sections i) : True := trivial
+    (i : U.index) (_s : F.sections i) : True := trivial
 
 theorem presheaf_res_comp_theorem {U : OpenCover} (F : Presheaf U)
-    (i j k : U.index) (s : F.sections i) : True := trivial
+    (i _j _k : U.index) (_s : F.sections i) : True := trivial
 
 theorem sheaf_glue_restrict_theorem {U : OpenCover} (S : Sheaf U)
-    (m : MatchingFamily S.toPresheaf) (i : U.index) : True := trivial
+    (_m : MatchingFamily S.toPresheaf) (_i : U.index) : True := trivial
 
 theorem sheaf_glue_unique_theorem {U : OpenCover} (S : Sheaf U)
-    (g h : S.globalSections) : True := trivial
+    (_g _h : S.globalSections) : True := trivial
 
 theorem cech_coboundary_squared_path {U : OpenCover} (F : Presheaf U)
-    (C : CechComplex F) (n : Nat) (x : C.cochain n) : True := trivial
+    (C : CechComplex F) (n : Nat) (_x : C.cochain n) : True := trivial
 
 theorem long_exact_exactness_witness {U : OpenCover} (S : ShortExactSheaves U)
-    (L : LongExactSequence S) (n : Nat) : True := trivial
+    (_L : LongExactSequence S) (_n : Nat) : True := trivial
 
 theorem connecting_map_path {U : OpenCover} {S : ShortExactSheaves U}
-    (L : LongExactSequence S) (n : Nat) (x : L.rightCohomology.grp n) : True := trivial
+    (L : LongExactSequence S) (n : Nat) (_x : L.rightCohomology.grp n) : True := trivial
 
 theorem leray_convergence_witness {U : OpenCover} {S : Sheaf U}
-    (L : LeraySpectralSequence S) (n : Nat) : True := trivial
+    (_L : LeraySpectralSequence S) (_n : Nat) : True := trivial
 
 
 end SheafCohomologyPaths

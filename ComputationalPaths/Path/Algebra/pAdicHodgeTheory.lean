@@ -82,7 +82,7 @@ structure PadicValuation (K : Type u) (F : PathField K) (V : Type v) where
   val_unit : V
   val_one : Path (val F.one) val_unit
   /-- Ultrametric inequality: val(a + b) ≥ min(val(a), val(b)). -/
-  ultrametric_witness : ∀ (a b : K), V  -- the minimum
+  ultrametric_witness : ∀ (_a _b : K), V  -- the minimum
   /-- Multiplicativity: val(ab) = val(a) + val(b). -/
   val_add_group : V → V → V
   val_mul : ∀ (a b : K), Path (val (F.mul a b)) (val_add_group (val a) (val b))
@@ -164,7 +164,7 @@ noncomputable def galois_compose (B : PeriodRingBdR K F) (g h : K) (x : B.carrie
 
 /-- The filtration is compatible with the ring multiplication. -/
 noncomputable def fil_mul_compat (B : PeriodRingBdR K F) (i j : Int) (x y : B.carrier)
-    (hx : B.filtration.level i x) (hy : B.filtration.level j y) :
+    (_hx : B.filtration.level i x) (_hy : B.filtration.level j y) :
     B.filtration.level (i + j) (B.ring.mul x y) → 
     Path (B.ring.mul x y) (B.ring.mul x y) :=
   fun _ => Path.refl _
@@ -419,7 +419,7 @@ structure CcrysComparison (K : Type u) (F : PathField K) where
   left_adj_dim : ∀ D : FilteredPhiModule K F,
     Path (dcrys (vcrys D)).dimension D.dimension
   /-- Right adjoint: V_crys(D_crys(V)) dimension. -/
-  right_adj_dim : ∀ V : PadicRepresentation K F, Nat
+  right_adj_dim : ∀ _V : PadicRepresentation K F, Nat
   right_adj : ∀ V : PadicRepresentation K F,
     Path (right_adj_dim V) (right_adj_dim V)
 
@@ -472,7 +472,7 @@ structure FontaineFunctor (K : Type u) (F : PathField K) where
   obj_eq : ∀ V : CrystallineRepresentation K F,
     Path (objMap V).dimension V.dcrys.dimension
   /-- Functoriality: morphism map (abstract). -/
-  morMap_dim : ∀ (V W : CrystallineRepresentation K F),
+  morMap_dim : ∀ (V _W : CrystallineRepresentation K F),
     Path (objMap V).dimension (objMap V).dimension
 
 /-! ## RwEq constructions -/

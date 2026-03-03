@@ -160,24 +160,15 @@ noncomputable def leftDerivedFunctorOn {A B : Type u} {f : A -> B}
         have h_left :
             PathLocalizationMap.lift (PreFunctor.localizationMap F)
               (Quot.mk _ (Path.trans p q)) = F.map (Path.trans p q) := by
-          simpa [PreFunctor.localizationMap] using
-            (PathLocalizationMap.lift_mk
-              (F := PreFunctor.localizationMap F)
-              (p := Path.trans p q))
+          simp [PreFunctor.localizationMap, PathLocalizationMap.lift_mk]
         have h_p :
             PathLocalizationMap.lift (PreFunctor.localizationMap F) (Quot.mk _ p) =
               F.map p := by
-          simpa [PreFunctor.localizationMap] using
-            (PathLocalizationMap.lift_mk
-              (F := PreFunctor.localizationMap F)
-              (p := p))
+          simp [PreFunctor.localizationMap, PathLocalizationMap.lift_mk]
         have h_q :
             PathLocalizationMap.lift (PreFunctor.localizationMap F) (Quot.mk _ q) =
               F.map q := by
-          simpa [PreFunctor.localizationMap] using
-            (PathLocalizationMap.lift_mk
-              (F := PreFunctor.localizationMap F)
-              (p := q))
+          simp [PreFunctor.localizationMap, PathLocalizationMap.lift_mk]
         rw [h_left, h_p, h_q]
         simpa [FundamentalGroupoid.comp'] using (F.map_trans p q).toEq
 

@@ -135,8 +135,8 @@ theorem sharpTriadConnectivityBound_eq (k l : Nat) :
 
 /-- Freudenthal corollary is natural in the pointed type. -/
 theorem freudenthalCorollary_natural {A B C : Type u} {f : C → A} {g : C → B}
-    (T : Triad A B C f g) (k l : Nat) (h : triadConnectivityStatement T k l)
-    (X Y : SuspensionLoop.Pointed) :
+    (T : Triad A B C f g) (k l : Nat) (_h : triadConnectivityStatement T k l)
+    (_X _Y : SuspensionLoop.Pointed) :
     Exists (fun desc : String =>
       desc = "FreudenthalPreview for X and Y") :=
   ⟨_, rfl⟩

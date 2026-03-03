@@ -346,7 +346,7 @@ theorem fundamentalGroupoidMap_inv (f : A → B) {a b : A}
     fundamentalGroupoidMap f (FundamentalGroupoid.inv' A p) =
       FundamentalGroupoid.inv' B (fundamentalGroupoidMap f p) := by
   unfold fundamentalGroupoidMap FundamentalGroupoid.inv'
-  simpa using (PathRwQuot.congrArg_symm A B f p)
+  simp
 
 /-- Composition of functions composes induced maps on groupoid morphisms. -/
 theorem fundamentalGroupoidMap_compFun {C : Type u}
@@ -355,7 +355,7 @@ theorem fundamentalGroupoidMap_compFun {C : Type u}
     fundamentalGroupoidMap g (fundamentalGroupoidMap f p) =
       fundamentalGroupoidMap (g ∘ f) p := by
   unfold fundamentalGroupoidMap
-  simpa using (PathRwQuot.congrArg_comp A B C f g p)
+  simp
 
 /-- The induced map on π₁ preserves loop composition. -/
 theorem inducedPiOneMap_comp (f : A → B) (a : A)
@@ -363,7 +363,7 @@ theorem inducedPiOneMap_comp (f : A → B) (a : A)
     inducedPiOneMap f a (LoopQuot.comp α β) =
       LoopQuot.comp (inducedPiOneMap f a α) (inducedPiOneMap f a β) := by
   unfold inducedPiOneMap fundamentalGroupoidMap LoopQuot.comp
-  simpa using (PathRwQuot.congrArg_trans A B f α β)
+  simp
 
 /-- The induced map on π₁ preserves loop inversion. -/
 theorem inducedPiOneMap_inv (f : A → B) (a : A)

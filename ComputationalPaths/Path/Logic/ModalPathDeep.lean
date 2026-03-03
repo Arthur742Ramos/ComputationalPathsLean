@@ -241,8 +241,8 @@ theorem bisim_preserves_diamond (R₁ R₂ : World → World → Prop)
 
 /-- Reflexive frames validate T -/
 theorem refl_validates_T (R : World → World → Prop) (hRefl : FrameReflexive R)
-    : ∀ φ : ModalProp, ∀ w, boxProp R φ w → φ w :=
-  fun φ w h => h w (hRefl w)
+    : ∀ _φ : ModalProp, ∀ w, boxProp R _φ w → _φ w :=
+  fun _φ w h => h w (hRefl w)
 
 /-- Transitive frames validate 4 -/
 theorem trans_validates_4 (R : World → World → Prop) (hTrans : FrameTransitive R)
@@ -356,7 +356,7 @@ theorem dynBox_choice (α β : Program) (φ : ModalProp) (w : World)
 theorem dynBox_test (φ ψ : ModalProp) (w : World)
     : dynBox (Program.test φ) ψ w ↔ (φ w → ψ w) :=
   ⟨fun h hφ => h w ⟨rfl, hφ⟩,
-   fun h v ⟨hEq, hφ⟩ => hEq ▸ h hφ⟩
+   fun h _v ⟨hEq, hφ⟩ => hEq ▸ h hφ⟩
 
 /-- ⟨α;β⟩φ ↔ ⟨α⟩⟨β⟩φ -/
 theorem dynDiamond_seq (α β : Program) (φ : ModalProp) (w : World)
@@ -378,7 +378,7 @@ theorem dynBox_star_step (α : Program) (φ : ModalProp) (w : World)
 /-- ⟨φ?⟩ψ ↔ φ ∧ ψ (at same world) -/
 theorem dynDiamond_test (φ ψ : ModalProp) (w : World)
     : dynDiamond (Program.test φ) ψ w ↔ (φ w ∧ ψ w) :=
-  ⟨fun ⟨v, ⟨hEq, hφ⟩, hψ⟩ => ⟨hEq ▸ hφ, hEq ▸ hψ⟩,
+  ⟨fun ⟨_v, ⟨hEq, hφ⟩, hψ⟩ => ⟨hEq ▸ hφ, hEq ▸ hψ⟩,
    fun ⟨hφ, hψ⟩ => ⟨w, ⟨rfl, hφ⟩, hψ⟩⟩
 
 /-- ⟨α∪β⟩φ ↔ ⟨α⟩φ ∨ ⟨β⟩φ -/
@@ -419,7 +419,7 @@ theorem common_implies_individual (R : Nat → World → World → Prop) (agents
 theorem common_box_idempotent (R : Nat → World → World → Prop) (agents : List Nat)
     (φ : ModalProp) (w : World)
     (h : commonBox R agents φ w) : commonBox R agents (commonBox R agents φ) w :=
-  fun v hReach u hReach2 => h u (CommonReach.trans' hReach hReach2)
+  fun _v hReach u hReach2 => h u (CommonReach.trans' hReach hReach2)
 
 -- ============================================================
 -- SECTION 12: Filtration and Finite Model Property

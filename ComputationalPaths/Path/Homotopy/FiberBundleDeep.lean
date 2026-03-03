@@ -184,8 +184,8 @@ noncomputable def proj_act_e (p : P) : Path (pb.proj (pb.action.act p pb.grp.e))
   Path.stepChain (by rw [pb.action.act_e])
 
 -- Theorem 9: free action implies unique transition element
-theorem transition_unique (p : P) (b : B) (hp : pb.proj p = b)
-    (q : P) (hq : pb.proj q = b) (g₁ g₂ : G)
+theorem transition_unique (p : P) (b : B) (_hp : pb.proj p = b)
+    (q : P) (_hq : pb.proj q = b) (g₁ g₂ : G)
     (h₁ : pb.action.act p g₁ = q) (h₂ : pb.action.act p g₂ = q) :
     g₁ = g₂ :=
   pb.fiberFree p g₁ g₂ (h₁.trans h₂.symm)

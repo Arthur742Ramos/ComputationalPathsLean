@@ -59,10 +59,10 @@ structure CEFFramework where
   generationDegree : Nat
   relationDegree : Nat
 
-noncomputable def FINoetherian (F : CEFFramework) : Prop := ∃ N : Nat, True
-noncomputable def EventuallyInjective (S : ConsistentSequence) : Prop := ∃ N : Nat, True
-noncomputable def EventuallySurjective (S : ConsistentSequence) : Prop := ∃ N : Nat, True
-noncomputable def RepresentationStable (R : SymRepSequence) : Prop := ∃ N : Nat, True
+noncomputable def FINoetherian (_F : CEFFramework) : Prop := ∃ _N : Nat, True
+noncomputable def EventuallyInjective (_S : ConsistentSequence) : Prop := ∃ _N : Nat, True
+noncomputable def EventuallySurjective (_S : ConsistentSequence) : Prop := ∃ _N : Nat, True
+noncomputable def RepresentationStable (_R : SymRepSequence) : Prop := ∃ _N : Nat, True
 
 /-! ## Character, central, and twisted stability data -/
 
@@ -84,7 +84,7 @@ structure TwistedStabilityDatum where
   boundary : Nat → chain → chain
   structureMap : Nat → chain → chain
 
-noncomputable def TwistedHomologicalStable (T : TwistedStabilityDatum) : Prop := ∃ N : Nat, True
+noncomputable def TwistedHomologicalStable (_T : TwistedStabilityDatum) : Prop := ∃ _N : Nat, True
 
 /-! ## FI theorems -/
 
@@ -646,7 +646,7 @@ noncomputable def twisted_to_representation_stable (T : TwistedStabilityDatum) (
     RepresentationStable R :=
   ⟨0, True.intro⟩
 
-noncomputable def twisted_character_bridge (T : TwistedStabilityDatum) (P : CharacterPolynomial)
+noncomputable def twisted_character_bridge (_T : TwistedStabilityDatum) (P : CharacterPolynomial)
     (n : Nat) :
     Path (P.eval n) (P.eval n) :=
   Path.refl _

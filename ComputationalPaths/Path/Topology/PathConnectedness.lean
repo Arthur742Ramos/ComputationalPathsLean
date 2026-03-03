@@ -147,7 +147,7 @@ theorem mapPath_preserves_related {A : Type u} {B : Type v} (f : A → B)
 /-- Functorial action on π₀. -/
 noncomputable def Pi0.map {A : Type u} {B : Type v} (f : A → B) : Pi0 A → Pi0 B :=
   Pi0.lift (fun a => Pi0.mk (f a))
-    (fun a b h => Pi0.mk_eq_iff.mpr (mapPath_preserves_related f h))
+    (fun _a _b h => Pi0.mk_eq_iff.mpr (mapPath_preserves_related f h))
 
 theorem Pi0.map_mk {A : Type u} {B : Type v} (f : A → B) (a : A) :
     Pi0.map f (Pi0.mk a) = Pi0.mk (f a) :=

@@ -96,7 +96,7 @@ noncomputable def basePath_mk_rweq (a : E) (h : Path (mf.map a) mf.regularValue)
 /-- Constructor/projection identity for Milnor fiber path witnesses at `toEq`. -/
 theorem basePath_mk_toEq (a : E) (h : Path (mf.map a) mf.regularValue) :
     (basePath mf (Fiber.mk (f := mf.map) (b := mf.regularValue) a h)).toEq = h.toEq := by
-  simpa using rweq_toEq (basePath_mk_rweq (mf := mf) a h)
+  simp
 
 /-- Eta law for Milnor fiber elements. -/
 theorem mk_eta (x : MilnorFiber mf) :
@@ -244,7 +244,7 @@ noncomputable def formula_rweq_reflection_spec (d : PicardLefschetzData mf)
 /-- Equality-level compatibility of `formula` with `reflection_spec`. -/
 theorem formula_toEq (d : PicardLefschetzData mf) (x : MilnorFiber mf) :
     (d.formula x).toEq = (d.reflection_spec x).toEq := by
-  simpa using rweq_toEq (formula_rweq_reflection_spec d x)
+  simp
 
 end PicardLefschetzData
 

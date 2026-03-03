@@ -230,21 +230,21 @@ structure MonochromaticLayer (p : Prime) (n : Nat) where
 
 /-! ## Deepening theorem stubs -/
 
-theorem prime_gt_one_witness (p : Prime) : True := trivial
+theorem prime_gt_one_witness (_p : Prime) : True := trivial
 
-theorem moravaKTheory_periodicity_witness (p : Prime) (n : Nat) (K : MoravaKTheory p n) : True := trivial
+theorem moravaKTheory_periodicity_witness (p : Prime) (n : Nat) (_K : MoravaKTheory p n) : True := trivial
 
-theorem chromaticHeight_data_exists (p : Prime) (h : ChromaticHeight p) : True := trivial
+theorem chromaticHeight_data_exists (p : Prime) (_h : ChromaticHeight p) : True := trivial
 
-theorem chromaticFiltration_inclusion_exists (p : Prime) (F : ChromaticFiltration p) (n : Nat) : True := trivial
+theorem chromaticFiltration_inclusion_exists (p : Prime) (_F : ChromaticFiltration p) (_n : Nat) : True := trivial
 
-theorem thickSubcategory_closure_witness (p : Prime) (C : ThickSubcategory p) : True := trivial
+theorem thickSubcategory_closure_witness (p : Prime) (_C : ThickSubcategory p) : True := trivial
 
-theorem nilpotence_detection_witness (N : NilpotenceData) : True := trivial
+theorem nilpotence_detection_witness (_N : NilpotenceData) : True := trivial
 
-theorem periodicity_vnMap_exists (p : Prime) (n : Nat) (P : PeriodicityData p n) : True := trivial
+theorem periodicity_vnMap_exists (p : Prime) (n : Nat) (_P : PeriodicityData p n) : True := trivial
 
-theorem chromaticConvergence_maps_exist (p : Prime) (C : ChromaticConvergence p) : True := trivial
+theorem chromaticConvergence_maps_exist (p : Prime) (_C : ChromaticConvergence p) : True := trivial
 
 end ChromaticHomotopy
 end Homotopy

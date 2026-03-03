@@ -166,10 +166,10 @@ structure LaurentPhenomenon (n : Nat) where
   /-- The Laurent polynomial ring. -/
   lp : LaurentPolynomial n
   /-- For any sequence of mutations, the result is a Laurent polynomial. -/
-  is_laurent : ∀ (mutations : List (Fin n)),
-    ∃ (f : LaurentPolynomial n), True
+  is_laurent : ∀ (_mutations : List (Fin n)),
+    ∃ (_f : LaurentPolynomial n), True
   /-- Laurent polynomials have non-negative denominators (structural). -/
-  positivity : ∀ (mutations : List (Fin n)),
+  positivity : ∀ (_mutations : List (Fin n)),
     Path lp.one lp.one
 
 /-- Trivial Laurent phenomenon witness. -/
@@ -371,7 +371,7 @@ theorem fzFiniteTypeWitness_of_ge (n : Nat) (fc : FiniteTypeClassification n)
 
 theorem calderoChapotonMap_pos (n : Nat) (cv : ClusterVariable n) :
     calderoChapotonMap n cv > 0 := by
-  simpa [calderoChapotonMap] using Nat.succ_pos cv.index.1
+  simp [calderoChapotonMap]
 
 theorem calderoChapotonTrace_refl (n : Nat) (cv : ClusterVariable n) :
     calderoChapotonTrace n cv = calderoChapotonTrace n cv := rfl

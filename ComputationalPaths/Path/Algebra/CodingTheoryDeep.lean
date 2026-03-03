@@ -371,7 +371,7 @@ noncomputable def detect_correct_path (d t : Nat) (hc : correctsErrors d t)
                 (propext ⟨fun _ => trivial, fun _ => hp⟩)
 
 /-- Theorem 36: Minimum distance determines detection -/
-noncomputable def min_dist_detection (d : Nat) (hd : d ≥ 1)
+noncomputable def min_dist_detection (d : Nat) (_hd : d ≥ 1)
     : Path (detectsErrors d (d - 1)) True := by
   unfold detectsErrors
   have hp : d - 1 ≤ d - 1 := Nat.le_refl _

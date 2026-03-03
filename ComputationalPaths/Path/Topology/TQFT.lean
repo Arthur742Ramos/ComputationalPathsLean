@@ -219,7 +219,7 @@ theorem foldTensor_cons {A : Type v} (T : MonoidalTarget A) (x : A) (xs : List A
 
 theorem point_evaluation_dualizable {Obj : Type u} {A : Type v}
     (Z : ExtendedTQFTData Obj A) (x : Obj)
-    (h : DualizableObject Z.target (evaluateOnPoint Z x)) :
+    (_h : DualizableObject Z.target (evaluateOnPoint Z x)) :
     evaluateOnPoint Z x = evaluateOnPoint Z x := rfl
 
 

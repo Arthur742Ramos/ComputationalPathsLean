@@ -105,11 +105,11 @@ structure DiracOperator (X : FourManifold) (𝔰 : SpinCStructure X)
 
 /-- The Dirac operator is Fredholm. -/
 theorem dirac_fredholm (X : FourManifold) (𝔰 : SpinCStructure X)
-    (A : SpinCConnection X 𝔰) (D : DiracOperator X 𝔰 A) : True := trivial
+    (A : SpinCConnection X 𝔰) (_D : DiracOperator X 𝔰 A) : True := trivial
 
 /-- The index of the Dirac operator via APS index theorem. -/
 theorem dirac_index_formula (X : FourManifold) (𝔰 : SpinCStructure X)
-    (A : SpinCConnection X 𝔰) (D : DiracOperator X 𝔰 A) : True := trivial
+    (A : SpinCConnection X 𝔰) (_D : DiracOperator X 𝔰 A) : True := trivial
 
 /-! ## 4. The Quadratic Map σ -/
 
@@ -159,15 +159,15 @@ noncomputable def swGaugeAct {X : FourManifold} {𝔰 : SpinCStructure X}
 /-- A priori bound (Witten): solutions to SW satisfy |φ|² ≤ max(0, −s/4)
     where s is the scalar curvature. -/
 theorem sw_a_priori_bound (X : FourManifold) (𝔰 : SpinCStructure X)
-    (sol : SWSolution X 𝔰) : True := trivial
+    (_sol : SWSolution X 𝔰) : True := trivial
 
 /-- The SW moduli space is compact (no Uhlenbeck bubbling for U(1)). -/
-theorem sw_moduli_compact (X : FourManifold) (𝔰 : SpinCStructure X) :
+theorem sw_moduli_compact (X : FourManifold) (_𝔰 : SpinCStructure X) :
     True := trivial
 
 /-- For generic perturbation the moduli space is a smooth manifold. -/
 theorem sw_moduli_smooth_generic (X : FourManifold)
-    (𝔰 : SpinCStructure X) : True := trivial
+    (_𝔰 : SpinCStructure X) : True := trivial
 
 /-! ## 7. The SW Moduli Space -/
 
@@ -189,8 +189,8 @@ structure SWReducible (X : FourManifold) (𝔰 : SpinCStructure X) where
   asd_eq      : True   -- F_A⁺ = 0
 
 /-- For b⁺ ≥ 1 and generic metric, the moduli contains no reducibles. -/
-theorem sw_no_reducibles (X : FourManifold) (𝔰 : SpinCStructure X)
-    (h : X.bPlus ≥ 1) : True := trivial
+theorem sw_no_reducibles (X : FourManifold) (_𝔰 : SpinCStructure X)
+    (_h : X.bPlus ≥ 1) : True := trivial
 
 /-! ## 8. The Seiberg-Witten Invariant -/
 
@@ -202,16 +202,16 @@ structure SWInvariant (X : FourManifold) where
   orientation    : True   -- depends on orientation of H¹ ⊕ H²₊
 
 /-- SW invariant vanishes when the virtual dimension is odd. -/
-theorem sw_vanishes_odd_dim (X : FourManifold) (SW : SWInvariant X)
-    (𝔰 : SpinCStructure X) (h : swExpectedDim X 𝔰 % 2 ≠ 0) : True := trivial
+theorem sw_vanishes_odd_dim (X : FourManifold) (_SW : SWInvariant X)
+    (𝔰 : SpinCStructure X) (_h : swExpectedDim X 𝔰 % 2 ≠ 0) : True := trivial
 
 /-- SW is a diffeomorphism invariant for b⁺ ≥ 2. -/
-theorem sw_diffeomorphism_invariant (X : FourManifold) (SW : SWInvariant X)
-    (h : X.bPlus ≥ 2) : True := trivial
+theorem sw_diffeomorphism_invariant (X : FourManifold) (_SW : SWInvariant X)
+    (_h : X.bPlus ≥ 2) : True := trivial
 
 /-- Positive scalar curvature ⟹ SW = 0. -/
-theorem sw_vanishes_positive_curvature (X : FourManifold) (SW : SWInvariant X)
-    (pos_curv : True) : True := trivial
+theorem sw_vanishes_positive_curvature (X : FourManifold) (_SW : SWInvariant X)
+    (_pos_curv : True) : True := trivial
 
 /-! ## 9. Basic Classes -/
 
@@ -226,12 +226,12 @@ structure SWSimpleType (X : FourManifold) (SW : SWInvariant X) where
   dim_zero       : ∀ K ∈ basicClasses, swExpectedDim X K.spinc = 0
 
 /-- The number of basic classes is finite. -/
-theorem basic_classes_finite (X : FourManifold) (SW : SWInvariant X) :
+theorem basic_classes_finite (X : FourManifold) (_SW : SWInvariant X) :
     True := trivial
 
 /-- Conjugation symmetry: SW(𝔰̄) = (−1)^{…} SW(𝔰). -/
-theorem sw_conjugation_symmetry (X : FourManifold) (SW : SWInvariant X)
-    (𝔰 : SpinCStructure X) : True := trivial
+theorem sw_conjugation_symmetry (X : FourManifold) (_SW : SWInvariant X)
+    (_𝔰 : SpinCStructure X) : True := trivial
 
 /-! ## 10. Wall Crossing -/
 
@@ -246,7 +246,7 @@ structure WallCrossing (X : FourManifold) where
 
 /-- Wall crossing is determined by the reducible locus. -/
 theorem wall_crossing_reducible (X : FourManifold)
-    (wc : WallCrossing X) : True := trivial
+    (_wc : WallCrossing X) : True := trivial
 
 /-! ## 11. The Witten Conjecture -/
 
@@ -261,7 +261,7 @@ structure WittenConjecture (X : FourManifold) where
   conjecture_eq      : True        -- D_X = exp(Q/2) Σ …
 
 /-- KM proved the conjecture for manifolds of simple type. -/
-theorem km_simple_type (X : FourManifold) (W : WittenConjecture X) :
+theorem km_simple_type (X : FourManifold) (_W : WittenConjecture X) :
     True := trivial
 
 /-! ## 12. Adjunction Inequality -/
@@ -304,15 +304,15 @@ structure KnotSurgery (X : FourManifold) where
   sw_change      : True     -- SW(X_K) = SW(X) · Δ_K(t)
 
 /-- Rational blowdown changes SW invariants predictably. -/
-theorem rational_blowdown_sw (X : FourManifold) (SW : SWInvariant X) :
+theorem rational_blowdown_sw (X : FourManifold) (_SW : SWInvariant X) :
     True := trivial
 
 /-! ## 14. SW and Symplectic Geometry -/
 
 /-- Taubes' theorem: for symplectic 4-manifolds, SW(K) = ±1 where
     K is the canonical class. -/
-theorem taubes_symplectic (X : FourManifold) (SW : SWInvariant X)
-    (symplectic : True) : True := trivial
+theorem taubes_symplectic (X : FourManifold) (_SW : SWInvariant X)
+    (_symplectic : True) : True := trivial
 
 /-- Taubes' SW = Gr: the SW invariant equals the Gromov invariant
     (counting pseudo-holomorphic curves). -/
@@ -325,11 +325,11 @@ structure TaubesSWGr (X : FourManifold) where
 
 /-- SW vanishes for connected sums X # Y with b⁺(X), b⁺(Y) > 0. -/
 theorem sw_connected_sum_vanishes (X Y : FourManifold)
-    (hx : X.bPlus > 0) (hy : Y.bPlus > 0) : True := trivial
+    (_hx : X.bPlus > 0) (_hy : Y.bPlus > 0) : True := trivial
 
 /-- Metric of positive scalar curvature implies SW = 0 for all Spinᶜ. -/
 theorem positive_scalar_implies_sw_zero (X : FourManifold)
-    (SW : SWInvariant X) (psc : True) : True := trivial
+    (_SW : SWInvariant X) (_psc : True) : True := trivial
 
 
 
@@ -365,7 +365,7 @@ theorem swRewrite_refl {x y : SWConfiguration X 𝔰} (p : Path x y) :
 theorem swRewrite_coherence {x y z w : SWConfiguration X 𝔰}
     (p : Path x y) (q : Path y z) (r : Path z w) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simpa using Path.trans_assoc p q r
+  simp
 
 end SWRewrite
 

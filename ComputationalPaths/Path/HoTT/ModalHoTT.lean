@@ -47,11 +47,11 @@ noncomputable def modalUnitPath (M : Modality) {A : Type u} (a : A) :
 /-- A reflective subuniverse: a class of types closed under path spaces. -/
 structure ReflSubuniv where
   inSub : Type u → Prop
-  pathClosed : {A : Type u} → inSub A → {a b : A} → inSub A
+  pathClosed : {A : Type u} → inSub A → {_a _b : A} → inSub A
 
 /-- 1. Modal types form a reflective subuniverse (paths are modal). -/
 theorem modal_path_closed (M : Modality) (A : Type u) (hA : IsModalType M A)
-    (a b : A) : IsModalType M A := hA
+    (_a _b : A) : IsModalType M A := hA
 
 /-- 2. If A is modal, the identity map on A factors through the modality. -/
 noncomputable def modal_id_factor (M : Modality) (A : Type u) :
@@ -111,12 +111,12 @@ theorem propTrunc_unit_surj (A : Type) [Nonempty A] (t : PLift (Nonempty A)) :
   exact ⟨a, rfl⟩
 
 /-- 8. Prop-truncation of a proposition is equivalent. -/
-theorem propTrunc_of_prop {A : Type} (h : ∀ a b : A, a = b)
+theorem propTrunc_of_prop {A : Type} (_h : ∀ a b : A, a = b)
     (a₁ a₂ : PLift (Nonempty A)) : a₁ = a₂ :=
   Subsingleton.elim _ _
 
 /-- 9. The set-truncation modality preserves path-level structure. -/
-theorem setTrunc_path_level (A : Type u) (h : ∀ (a b : A) (p q : a = b), p = q) :
+theorem setTrunc_path_level (A : Type u) (_h : ∀ (a b : A) (p q : a = b), p = q) :
     ∀ (a b : A) (p q : Path a b), p.proof = q.proof :=
   fun _ _ _ _ => Subsingleton.elim _ _
 
@@ -127,14 +127,14 @@ theorem modal_unit_trans_proof (M : Modality) {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     (Path.congrArg M.unit (Path.trans p q)).proof =
       (Path.trans (Path.congrArg M.unit p) (Path.congrArg M.unit q)).proof := by
-  simp [Path.trans, Path.congrArg]
+  simp
 
 /-- 11. Applying modality unit commutes with symm at proof level. -/
 theorem modal_unit_symm_proof (M : Modality) {A : Type u} {a b : A}
     (p : Path a b) :
     (Path.congrArg M.unit (Path.symm p)).proof =
       (Path.symm (Path.congrArg M.unit p)).proof := by
-  simp [Path.symm, Path.congrArg]
+  simp
 
 /-- 12. Unit preserves refl path. -/
 theorem modal_unit_refl (M : Modality) {A : Type u} (a : A) :
@@ -146,7 +146,7 @@ theorem modal_double_unit_proof (M : Modality) {A : Type u} {a b : A}
     (p : Path a b) :
     (Path.congrArg M.unit (Path.congrArg M.unit p)).proof =
       _root_.congrArg M.unit (_root_.congrArg M.unit p.proof) := by
-  simp [Path.congrArg]
+  simp
 
 /-- 14. Extension of id gives back original. -/
 theorem modal_ext_id_proof (M : Modality) {A : Type u} (a : A) :
@@ -174,14 +174,14 @@ structure LexModality extends Modality where
 theorem lex_path_factor (M : LexModality) {A : Type u} {a b : A}
     (p : Path a b) :
     (Path.congrArg M.unit p).proof = _root_.congrArg M.unit p.proof := by
-  simp [Path.congrArg]
+  simp
 
 /-- 17. Lex modality preserves path composition structure. -/
 theorem lex_trans_factor (M : LexModality) {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     (Path.congrArg M.unit (Path.trans p q)).proof =
       (Path.trans (Path.congrArg M.unit p) (Path.congrArg M.unit q)).proof := by
-  simp [Path.trans, Path.congrArg]
+  simp
 
 /-! ## Connected-truncated factorisation -/
 
@@ -226,7 +226,7 @@ theorem modal_induction_transport (M : Modality) {A : Type u}
     Path.transport (Path.congrArg M.unit p) (h a) = h b := by
   obtain ⟨steps, proof⟩ := p
   subst proof
-  simp [Path.transport, Path.congrArg]
+  simp [Path.transport]
 
 /-! ## Σ-types and modalities -/
 
@@ -238,7 +238,7 @@ theorem modal_sigma_unit (M : Modality) {A : Type u} {B : A → Type u}
 /-- 24. Path in Σ-type from component paths (fst projection). -/
 noncomputable def sigma_path_fst {A : Type u} {B : A → Type u}
     {x y : Σ a, B a} (p : Path x.1 y.1)
-    (q : Path (Path.transport p x.2) y.2) :
+    (_q : Path (Path.transport p x.2) y.2) :
     Path x.1 y.1 := p
 
 /-- 25. The fst-projection of a sigma path recovers the first component. -/
@@ -266,7 +266,7 @@ noncomputable def DPath.dsymm {A : Type u} {B : A → Type v} {a₁ a₂ : A}
   overProof := by
     obtain ⟨steps, proof⟩ := p
     subst proof
-    simp only [Path.transport, Path.symm] at dp ⊢
+    simp only [Path.transport] at dp ⊢
     exact dp.overProof.symm
 
 /-- 28. Dependent path transitivity. -/
@@ -279,7 +279,7 @@ noncomputable def DPath.dtrans {A : Type u} {B : A → Type v} {a₁ a₂ a₃ :
     obtain ⟨ps, pproof⟩ := p
     obtain ⟨qs, qproof⟩ := q
     subst pproof qproof
-    simp only [Path.transport, Path.trans] at dp dq ⊢
+    simp only [Path.transport] at dp dq ⊢
     exact dp.overProof.trans dq.overProof
 
 /-- 29. Drefl is a left identity for dtrans at proof level. -/
@@ -288,7 +288,7 @@ theorem dpath_trans_drefl_left {A : Type u} {B : A → Type v} {a₁ a₂ : A}
     (dp : DPath B p b₁ b₂) :
     (DPath.dtrans (DPath.drefl b₁) dp).overProof = dp.overProof := by
   obtain ⟨_, proof⟩ := p; subst proof
-  simp only [DPath.dtrans, DPath.drefl, Path.transport, Path.trans]
+  simp only [Path.transport]
 
 /-- 30. Drefl is a right identity for dtrans at proof level. -/
 theorem dpath_trans_drefl_right {A : Type u} {B : A → Type v} {a₁ a₂ : A}
@@ -296,7 +296,7 @@ theorem dpath_trans_drefl_right {A : Type u} {B : A → Type v} {a₁ a₂ : A}
     (dp : DPath B p b₁ b₂) :
     (DPath.dtrans dp (DPath.drefl b₂)).overProof = dp.overProof := by
   obtain ⟨_, proof⟩ := p; subst proof
-  simp only [DPath.dtrans, DPath.drefl, Path.transport, Path.trans]
+  simp only [Path.transport]
 
 /-! ## Separated and modal types -/
 
@@ -332,14 +332,14 @@ theorem congrArg_symm_trans_cancel (M : Modality) {A : Type u} {a b : A}
     (p : Path a b) :
     (Path.trans (Path.congrArg M.unit (Path.symm p))
                 (Path.congrArg M.unit p)).proof = rfl := by
-  simp [Path.trans, Path.congrArg, Path.symm]
+  simp
 
 /-- 35. CongrArg preserves trans-symm cancellation. -/
 theorem congrArg_trans_symm_cancel (M : Modality) {A : Type u} {a b : A}
     (p : Path a b) :
     (Path.trans (Path.congrArg M.unit p)
                 (Path.congrArg M.unit (Path.symm p))).proof = rfl := by
-  simp [Path.trans, Path.congrArg, Path.symm]
+  simp
 
 /-! ## Nullification and localisation -/
 
@@ -353,7 +353,7 @@ structure Localisation (S : Type u → Prop) (A : Type u) where
 theorem localisation_embed_path {S : Type u → Prop} {A : Type u}
     (L : Localisation S A) {a b : A} (p : Path a b) :
     (Path.congrArg L.embed p).proof = _root_.congrArg L.embed p.proof := by
-  simp [Path.congrArg]
+  simp
 
 /-- 37. Localisation embedding preserves trans. -/
 theorem localisation_embed_trans {S : Type u → Prop} {A : Type u}
@@ -381,15 +381,15 @@ theorem modal_fourfold_trans (M : Modality) {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     (Path.congrArg M.unit (Path.trans (Path.trans (Path.trans p q) r) s)).proof =
       (Path.congrArg M.unit (Path.trans p (Path.trans q (Path.trans r s)))).proof := by
-  simp [Path.trans, Path.congrArg, List.append_assoc]
+  simp
 
 /-! ## Modality and equivalences -/
 
 /-- 41. If f is an equivalence and A is modal, then B is modal (transfer). -/
 theorem modal_transfer (M : Modality) {A B : Type u}
     (f : A → B) (g : B → A)
-    (sect : ∀ a, Path (g (f a)) a)
-    (retr : ∀ b, Path (f (g b)) b)
+    (_sect : ∀ a, Path (g (f a)) a)
+    (_retr : ∀ b, Path (f (g b)) b)
     (hA : M.isModal A)
     (transfer : ∀ (X Y : Type u), (X → Y) → (Y → X) →
       (∀ x : X, Path (id x) x) → M.isModal X → M.isModal Y) :
@@ -397,9 +397,9 @@ theorem modal_transfer (M : Modality) {A B : Type u}
   transfer A B f g (fun x => Path.refl x) hA
 
 /-- 42. Equivalence-induced path in modal type. -/
-noncomputable def equiv_modal_path (M : Modality) {A B : Type u}
+noncomputable def equiv_modal_path (_M : Modality) {A B : Type u}
     (f : A → B) (g : B → A)
-    (sect : ∀ a, Path (g (f a)) a)
+    (_sect : ∀ a, Path (g (f a)) a)
     (retr : ∀ b, Path (f (g b)) b)
     (b : B) : Path (f (g b)) b :=
   retr b
@@ -413,16 +413,16 @@ theorem modal_path_decompose (M : Modality) {A : Type u} {a b : A}
 
 /-- 44. Contractible types are modal for any modality with stable units. -/
 theorem contr_modal_proof (M : Modality) {A : Type u}
-    (h : IsContr A) (a b : M.modal A) :
+    (_h : IsContr A) (a _b : M.modal A) :
     (Path.refl a).proof.symm.symm = rfl := by simp
 
 /-- 45. The path space of a contractible type: paths have equal proofs. -/
-theorem contr_path_eq_proof {A : Type u} (h : IsContr A) (a b : A)
+theorem contr_path_eq_proof {A : Type u} (_h : IsContr A) (a b : A)
     (p q : Path a b) : p.proof = q.proof := proof_irrel _ _
 
 /-- 46. In contractible type, all dpaths over refl are equal. -/
 theorem contr_dpath_eq {A : Type u} {B : A → Type v}
-    (hA : IsContr A) {a : A} (b₁ b₂ : B a)
+    (_hA : IsContr A) {a : A} (b₁ b₂ : B a)
     (dp₁ dp₂ : DPath B (Path.refl a) b₁ b₂) :
     dp₁.overProof = dp₂.overProof :=
   Subsingleton.elim _ _
@@ -430,7 +430,7 @@ theorem contr_dpath_eq {A : Type u} {B : A → Type v}
 /-! ## Pushforward modality -/
 
 /-- Pushing a modality through a function. -/
-noncomputable def pushforwardModal (M : Modality) (f : A → B) {a : A} :
+noncomputable def pushforwardModal (_M : Modality) (f : A → B) {a : A} :
     Path (f a) (f a) := Path.refl (f a)
 
 /-- 47. Pushforward refl has empty steps. -/
@@ -445,7 +445,7 @@ theorem pushforward_refl_proof (M : Modality) (f : A → B) {a : A} :
 
 /-- 49. Two modality units on the same element yield equal images if types match. -/
 theorem modal_unit_unique_image (M₁ M₂ : Modality)
-    (h : M₁.modal = M₂.modal)
+    (_h : M₁.modal = M₂.modal)
     {A : Type u} (a : A) :
     HEq (M₁.unit a) (M₂.unit a) → HEq (M₁.unit a) (M₂.unit a) := id
 

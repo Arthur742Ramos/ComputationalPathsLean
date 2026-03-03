@@ -60,24 +60,24 @@ structure AInfinityCategory where
     (∀ i : Fin n, (Hom (objs i.castSucc) (objs i.succ)).component 0) →
     (Hom (objs 0) (objs ⟨n, by omega⟩)).component (2 - n : Int)
   /-- The A-infinity relations: Σ_{r+s+t=n} ±m_{r+1+t}(1^r ⊗ mₛ ⊗ 1^t) = 0. -/
-  ainfty_relation : ∀ (n : Nat) (hn : n ≥ 1)
+  ainfty_relation : ∀ (n : Nat) (_hn : n ≥ 1)
     (objs : Fin (n + 1) → Obj)
-    (inputs : ∀ i : Fin n, (Hom (objs i.castSucc) (objs i.succ)).component 0),
+    (_inputs : ∀ i : Fin n, (Hom (objs i.castSucc) (objs i.succ)).component 0),
     True  -- The full stasheff identity; propositionally witnessed
 
 /-- m₁ is a differential (m₁² = 0). -/
 noncomputable def AInfinityCategory.m1_sq_zero (C : AInfinityCategory.{u}) : Prop :=
-  ∀ (X Y : C.Obj), True  -- m₁ ∘ m₁ = 0
+  ∀ (_X _Y : C.Obj), True  -- m₁ ∘ m₁ = 0
 
 /-- m₂ is a chain map with respect to m₁. -/
 noncomputable def AInfinityCategory.m2_chain_map (C : AInfinityCategory.{u}) : Prop :=
-  ∀ (X Y Z : C.Obj), True  -- m₁ ∘ m₂ = m₂ ∘ (m₁ ⊗ 1 + 1 ⊗ m₁)
+  ∀ (_X _Y _Z : C.Obj), True  -- m₁ ∘ m₂ = m₂ ∘ (m₁ ⊗ 1 + 1 ⊗ m₁)
 
 /-- Strict A-infinity category: mₙ = 0 for n ≥ 3 (i.e., a DG category). -/
 noncomputable def AInfinityCategory.isStrict (C : AInfinityCategory.{u}) : Prop :=
-  ∀ (n : Nat) (hn : n ≥ 3)
+  ∀ (n : Nat) (_hn : n ≥ 3)
     (objs : Fin (n + 1) → C.Obj)
-    (inputs : ∀ i : Fin n, (C.Hom (objs i.castSucc) (objs i.succ)).component 0),
+    (_inputs : ∀ i : Fin n, (C.Hom (objs i.castSucc) (objs i.succ)).component 0),
     True  -- mₙ = 0
 
 /-! ## A-infinity functors -/
@@ -93,15 +93,15 @@ structure AInfinityFunctor (C D : AInfinityCategory.{u}) where
     (∀ i : Fin n, (C.Hom (objs i.castSucc) (objs i.succ)).component 0) →
     (D.Hom (mapObj (objs 0)) (mapObj (objs ⟨n, by omega⟩))).component (1 - n : Int)
   /-- A-infinity functor relation. -/
-  functor_relation : ∀ (n : Nat) (hn : n ≥ 1)
+  functor_relation : ∀ (n : Nat) (_hn : n ≥ 1)
     (objs : Fin (n + 1) → C.Obj)
-    (inputs : ∀ i : Fin n, (C.Hom (objs i.castSucc) (objs i.succ)).component 0),
+    (_inputs : ∀ i : Fin n, (C.Hom (objs i.castSucc) (objs i.succ)).component 0),
     True
 
 /-- Strict A-infinity functor: fₙ = 0 for n ≥ 2. -/
 noncomputable def AInfinityFunctor.isStrict {C D : AInfinityCategory.{u}}
-    (F : AInfinityFunctor C D) : Prop :=
-  ∀ (n : Nat) (hn : n ≥ 2), True
+    (_F : AInfinityFunctor C D) : Prop :=
+  ∀ (n : Nat) (_hn : n ≥ 2), True
 
 
 
@@ -120,7 +120,7 @@ structure AInfinityNatTrans {C D : AInfinityCategory.{u}}
   /-- Natural transformation relation. -/
   nat_relation : ∀ (n : Nat)
     (objs : Fin (n + 1) → C.Obj)
-    (inputs : ∀ i : Fin n, (C.Hom (objs i.castSucc) (objs i.succ)).component 0),
+    (_inputs : ∀ i : Fin n, (C.Hom (objs i.castSucc) (objs i.succ)).component 0),
     True
 
 /-- A-infinity quasi-isomorphism: an A-infinity functor whose f₁ is a
@@ -128,7 +128,7 @@ structure AInfinityNatTrans {C D : AInfinityCategory.{u}}
 structure AInfinityQuasiIso (C D : AInfinityCategory.{u})
     extends AInfinityFunctor C D where
   /-- f₁ is a quasi-isomorphism. -/
-  f1_qi : ∀ (X Y : C.Obj), True
+  f1_qi : ∀ (_X _Y : C.Obj), True
 
 /-! ## A-infinity modules -/
 
@@ -143,7 +143,7 @@ structure AInfinityModule (C : AInfinityCategory.{u}) where
     (∀ i : Fin n, (C.Hom (objs i.castSucc) (objs i.succ)).component 0) →
     (value (objs ⟨n, by omega⟩)).component (1 - n : Int)
   /-- Module A-infinity relations. -/
-  module_relation : ∀ (n : Nat) (hn : n ≥ 1), True
+  module_relation : ∀ (n : Nat) (_hn : n ≥ 1), True
 
 
 
@@ -181,7 +181,7 @@ structure Perturbation (SDR : StrongDeformationRetract.{u}) where
 /-- The homological perturbation lemma: given an SDR and a perturbation,
     produce a new SDR. -/
 noncomputable def homologicalPerturbationLemma
-    (SDR : StrongDeformationRetract.{u}) (δ : Perturbation SDR) :
+    (SDR : StrongDeformationRetract.{u}) (_δ : Perturbation SDR) :
     StrongDeformationRetract.{u} where
   big := SDR.big
   small := SDR.small
@@ -205,7 +205,7 @@ noncomputable def transferredAInfinity (SDR : StrongDeformationRetract.{u})
 /-- A minimal A-infinity category: one with m₁ = 0. -/
 structure MinimalAInfinityCategory extends AInfinityCategory.{u} where
   /-- The differential m₁ is zero. -/
-  m1_zero : ∀ (X Y : Obj), True
+  m1_zero : ∀ (_X _Y : Obj), True
 
 /-- A minimal model of an A-infinity category. -/
 structure MinimalModel (C : AInfinityCategory.{u}) where
@@ -218,7 +218,7 @@ structure MinimalModel (C : AInfinityCategory.{u}) where
 /-- Kadeishvili's theorem, uniqueness: the minimal model is unique up to
     A-infinity quasi-isomorphism. -/
 theorem kadeishvili_uniqueness (C : AInfinityCategory.{u})
-    (M₁ M₂ : MinimalModel C) :
+    (_M₁ _M₂ : MinimalModel C) :
     Exists (fun desc : String =>
       desc = "AInfinityQuasiIso between minimal models") :=
   ⟨_, rfl⟩
@@ -233,11 +233,11 @@ structure AInfinityAlgebra where
   m : (n : Nat) → (n ≥ 1) →
     (Fin n → carrier.component 0) → carrier.component (2 - n : Int)
   /-- A-infinity relations. -/
-  relation : ∀ (n : Nat) (hn : n ≥ 1), True
+  relation : ∀ (n : Nat) (_hn : n ≥ 1), True
 
 /-- Formality: an A-infinity algebra is formal if it is quasi-isomorphic
     to its cohomology with trivial higher products. -/
-noncomputable def AInfinityAlgebra.isFormal (A : AInfinityAlgebra.{u}) : Prop :=
+noncomputable def AInfinityAlgebra.isFormal (_A : AInfinityAlgebra.{u}) : Prop :=
   True  -- H*(A) with m₂ only is quasi-isomorphic to A
 
 /-- An augmented A-infinity algebra. -/
@@ -298,7 +298,7 @@ structure FukayaCategory (M : SymplecticManifoldData.{u}) where
 
 /-- The Fukaya category is unobstructed if the mₙ satisfy convergence. -/
 noncomputable def FukayaCategory.isUnobstructed {M : SymplecticManifoldData.{u}}
-    (F : FukayaCategory M) : Prop :=
+    (_F : FukayaCategory M) : Prop :=
   True  -- Maurer-Cartan solutions exist
 
 /-! ## Hochschild cohomology of A-infinity categories -/
@@ -311,7 +311,7 @@ noncomputable def ainftyHochschild (C : AInfinityCategory.{u}) : GradedFamily.{u
     (C.Hom (objs 0) (objs ⟨k, by omega⟩)).component n
 
 /-- HH*(C) has a Gerstenhaber algebra structure. -/
-theorem ainfty_HH_gerstenhaber (C : AInfinityCategory.{u}) :
+theorem ainfty_HH_gerstenhaber (_C : AInfinityCategory.{u}) :
     True := trivial
 
 /-! ## Path witnesses -/
@@ -319,42 +319,42 @@ theorem ainfty_HH_gerstenhaber (C : AInfinityCategory.{u}) :
 /-- Path witness: A-infinity functor composition is homotopy-associative. -/
 theorem ainfty_functor_comp_assoc
     {A B C D : AInfinityCategory.{u}}
-    (F : AInfinityFunctor A B)
-    (G : AInfinityFunctor B C)
-    (H : AInfinityFunctor C D) :
+    (_F : AInfinityFunctor A B)
+    (_G : AInfinityFunctor B C)
+    (_H : AInfinityFunctor C D) :
     Exists (fun desc : String =>
       desc = "AInfinityNatTrans: (F∘G)∘H ≃ F∘(G∘H)") :=
   ⟨_, rfl⟩
 
 /-- Path witness: A-infinity identity is neutral up to homotopy. -/
 theorem ainfty_id_comp {C D : AInfinityCategory.{u}}
-    (F : AInfinityFunctor C D) :
+    (_F : AInfinityFunctor C D) :
     Exists (fun desc : String =>
       desc = "AInfinityNatTrans: id∘F ≃ F") :=
   ⟨_, rfl⟩
 
 /-- Path witness: Kadeishvili minimal model is functorial. -/
 theorem kadeishvili_functorial
-    {C D : AInfinityCategory.{u}} (F : AInfinityFunctor C D)
-    (MC : MinimalModel C) (MD : MinimalModel D) :
+    {C D : AInfinityCategory.{u}} (_F : AInfinityFunctor C D)
+    (_MC : MinimalModel C) (_MD : MinimalModel D) :
     ∃ (_ : String), True :=
   ⟨"AInfinityFunctor between minimal models", trivial⟩
 
 /-- Path witness: HPL is natural in the SDR data. -/
 theorem hpl_naturality
     (SDR₁ SDR₂ : StrongDeformationRetract.{u})
-    (δ₁ : Perturbation SDR₁) (δ₂ : Perturbation SDR₂) :
+    (_δ₁ : Perturbation SDR₁) (_δ₂ : Perturbation SDR₂) :
     True := trivial
 
 /-- Formality criterion: if all higher Massey products vanish then
     the A-infinity algebra is formal. -/
 theorem massey_vanishing_implies_formal (A : AInfinityAlgebra.{u})
-    (h : ∀ (n : Nat) (hn : n ≥ 3), True) :
+    (_h : ∀ (n : Nat) (_hn : n ≥ 3), True) :
     A.isFormal := trivial
 
 /-- Homological smoothness: an A-infinity category C is homologically
     smooth if the diagonal bimodule has a finite resolution. -/
-noncomputable def isHomologicallySmooth (C : AInfinityCategory.{u}) : Prop :=
+noncomputable def isHomologicallySmooth (_C : AInfinityCategory.{u}) : Prop :=
   True
 
 /-- Calabi-Yau structure on an A-infinity category. -/

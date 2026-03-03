@@ -54,7 +54,7 @@ structure SymMonInfCat extends InfCat.{u,v} where
   monoidal : MonoidalStructure toInfCat
   braid : Braiding toInfCat monoidal
   /-- The braiding is an involution: σ² = id. -/
-  braidSquareId : ∀ x y : Obj, True
+  braidSquareId : ∀ _x _y : Obj, True
 
 /-- Lax monoidal functor between symmetric monoidal ∞-categories. -/
 structure LaxMonoidalFunctor (C D : SymMonInfCat.{u,v}) where
@@ -65,7 +65,7 @@ structure LaxMonoidalFunctor (C D : SymMonInfCat.{u,v}) where
   unitMap : D.Hom D.monoidal.unit (obj C.monoidal.unit)
 
 /-- Strong (symmetric) monoidal functor: the monoidal maps are equivalences. -/
-noncomputable def IsStrongMonoidal (C D : SymMonInfCat.{u,v}) (F : LaxMonoidalFunctor C D) : Prop :=
+noncomputable def IsStrongMonoidal (C D : SymMonInfCat.{u,v}) (_F : LaxMonoidalFunctor C D) : Prop :=
   True -- placeholder for monoidalMap being an equivalence
 
 /-! ## Day Convolution -/
@@ -91,9 +91,9 @@ noncomputable def dayMonoidal (C : SymMonInfCat.{u,v}) :
     MonoidalStructure (Presheaf C.toInfCat) where
   tensor := fun F G x => F x × G x
   unit := dayUnit C
-  assocWitness := fun _ _ _ x => fun ⟨⟨a, b⟩, c⟩ => ⟨a, ⟨b, c⟩⟩
-  leftUnit := fun _ x => fun ⟨_, a⟩ => a
-  rightUnit := fun _ x => fun ⟨a, _⟩ => a
+  assocWitness := fun _ _ _ _x => fun ⟨⟨a, b⟩, c⟩ => ⟨a, ⟨b, c⟩⟩
+  leftUnit := fun _ _x => fun ⟨_, a⟩ => a
+  rightUnit := fun _ _x => fun ⟨a, _⟩ => a
 
 /-! ## ∞-Operads -/
 
@@ -102,7 +102,7 @@ structure InfinityOperad where
   Color : Type u
   MultiHom : List Color → Color → Type v
   identity : (c : Color) → MultiHom [c] c
-  composition : {cs : List Color} → {ds : List (List Color)} →
+  composition : {cs : List Color} → {_ds : List (List Color)} →
     {c : Color} → MultiHom cs c → True -- placeholder for full composition
 
 /-- The commutative operad Comm. -/
@@ -113,7 +113,7 @@ noncomputable def commOperad : InfinityOperad.{u,v} where
   composition := fun _ => trivial
 
 /-- The E_n operad (little n-cubes). -/
-noncomputable def enOperad (n : Nat) : InfinityOperad.{u,v} where
+noncomputable def enOperad (_n : Nat) : InfinityOperad.{u,v} where
   Color := PUnit.{u+1}
   MultiHom := fun _ _ => PUnit -- placeholder
   identity := fun _ => PUnit.unit
@@ -155,17 +155,17 @@ noncomputable def freeAlgebra (O : InfinityOperad.{u,v}) (C : SymMonInfCat.{u,v}
 
 /-- Day convolution is associative. -/
 theorem day_convolution_assoc (C : SymMonInfCat.{u,v})
-    (F G H : C.Obj → Type v) (z : C.Obj) :
+    (_F _G _H : C.Obj → Type v) (_z : C.Obj) :
     True := by trivial
 
 /-- Day convolution is symmetric. -/
 theorem day_convolution_symmetric (C : SymMonInfCat.{u,v})
-    (F G : C.Obj → Type v) (z : C.Obj) : True := by
+    (_F _G : C.Obj → Type v) (_z : C.Obj) : True := by
   trivial
 
 /-- Day unit is the identity for Day convolution. -/
 theorem day_unit_identity (C : SymMonInfCat.{u,v})
-    (F : C.Obj → Type v) (z : C.Obj) : True := by
+    (_F : C.Obj → Type v) (_z : C.Obj) : True := by
   trivial
 
 /-- E_∞ = Comm: E_∞-algebras are commutative algebras. -/
@@ -174,63 +174,63 @@ theorem e_infinity_is_comm (C : SymMonInfCat.{u,v}) :
   rfl
 
 /-- Dunn additivity: E_n ≃ E_1 ⊗ ··· ⊗ E_1 (n times). -/
-theorem dunn_additivity (m n : Nat) (C : SymMonInfCat.{u,v}) : True := by
+theorem dunn_additivity (_m _n : Nat) (_C : SymMonInfCat.{u,v}) : True := by
   trivial
 
 /-- E_1-algebras in C are monoid objects in C. -/
-theorem e1_algebras_are_monoids (C : SymMonInfCat.{u,v}) :
+theorem e1_algebras_are_monoids (_C : SymMonInfCat.{u,v}) :
     True := by -- AssocAlgebra C ≃ Mon(C)
   trivial
 
 /-- E_2-algebras are braided monoid objects. -/
-theorem e2_algebras_are_braided (C : SymMonInfCat.{u,v}) :
+theorem e2_algebras_are_braided (_C : SymMonInfCat.{u,v}) :
     True := by
   trivial
 
 /-- Free algebra is left adjoint to the forgetful functor. -/
 theorem free_algebra_adjunction (O : InfinityOperad.{u,v})
     (C : SymMonInfCat.{u,v}) :
-    ∀ (X : C.Obj) (A : AlgebraObject O C), True := by
+    ∀ (_X : C.Obj) (_A : AlgebraObject O C), True := by
   intro; intro; trivial
 
 /-- Strong monoidal functors preserve algebra objects. -/
 theorem strong_monoidal_preserves_algebras
     (C D : SymMonInfCat.{u,v}) (F : LaxMonoidalFunctor C D)
-    (hF : IsStrongMonoidal C D F) (O : InfinityOperad.{u,v})
-    (A : AlgebraObject O C) :
+    (_hF : IsStrongMonoidal C D F) (O : InfinityOperad.{u,v})
+    (_A : AlgebraObject O C) :
     True := by
   trivial
 
 /-- The ∞-category of E_n-algebras is itself E_{k}-monoidal for k+n = ∞. -/
-theorem en_algebras_monoidal (n : Nat) (C : SymMonInfCat.{u,v}) :
+theorem en_algebras_monoidal (_n : Nat) (_C : SymMonInfCat.{u,v}) :
     True := by
   trivial
 
 /-- Modules over a commutative algebra form a symmetric monoidal ∞-category. -/
 theorem modules_symmetric_monoidal (C : SymMonInfCat.{u,v})
-    (A : CommAlgebra C) :
+    (_A : CommAlgebra C) :
     True := by
   trivial
 
 /-- The tensor product of E_n-algebras is an E_n-algebra. -/
 theorem tensor_en_algebras (n : Nat) (C : SymMonInfCat.{u,v})
-    (A B : EnAlgebra n C) :
+    (_A _B : EnAlgebra n C) :
     True := by
   trivial
 
 /-- Bar construction: B(1, A, 1) computes the suspension of an E_1-algebra. -/
 theorem bar_construction (C : SymMonInfCat.{u,v})
-    (A : AssocAlgebra C) :
+    (_A : AssocAlgebra C) :
     True := by
   trivial
 
 /-- Koszul duality: there is a duality between E_n-algebras and E_n-coalgebras. -/
-theorem koszul_duality (n : Nat) (C : SymMonInfCat.{u,v}) :
+theorem koszul_duality (_n : Nat) (_C : SymMonInfCat.{u,v}) :
     True := by
   trivial
 
 /-- Stabilization: E_∞-groups in C ≃ connective spectra in C (group completion). -/
-theorem group_completion (C : SymMonInfCat.{u,v}) :
+theorem group_completion (_C : SymMonInfCat.{u,v}) :
     True := by
   trivial
 

@@ -165,7 +165,7 @@ noncomputable def duality_roundtrip (n : Nat) :
 /-- 20. Round-trip duality toEq is rfl. -/
 theorem duality_roundtrip_toEq (n : Nat) :
     (duality_roundtrip n).toEq = rfl := by
-  simp [duality_roundtrip, partition_duality_path, partition_duality_symm_path]
+  simp
 
 /-- 21. Double duality: symm of symm has same toEq. -/
 theorem duality_symm_symm_toEq (n : Nat) :

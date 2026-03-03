@@ -46,8 +46,8 @@ structure ChainHomotopy (C D : ChainComplex.{u}) (f g : ChainMap C D) where
 noncomputable def cohomologyAt (C : ChainComplex.{u}) (n : Int) : Type u := C.obj n
 
 /-- A quasi-isomorphism: a chain map inducing isomorphisms on all cohomology. -/
-noncomputable def IsQuasiIsomorphism (C D : ChainComplex.{u}) (f : ChainMap C D) : Prop :=
-  ∀ n : Int, True -- placeholder: H^n(f) is an isomorphism
+noncomputable def IsQuasiIsomorphism (C D : ChainComplex.{u}) (_f : ChainMap C D) : Prop :=
+  ∀ _n : Int, True -- placeholder: H^n(f) is an isomorphism
 
 /-! ## Derived Category -/
 
@@ -73,7 +73,7 @@ structure DerivedCategory where
 
 /-- The bounded derived category D^b(A). -/
 structure BoundedDerivedCategory extends DerivedCategory.{u,v} where
-  isBounded : ∀ x : Obj, ∃ (a b : Int), True -- H^n = 0 outside [a,b]
+  isBounded : ∀ _x : Obj, ∃ (_a _b : Int), True -- H^n = 0 outside [a,b]
 
 /-- The localization functor Q : K(A) → D(A). -/
 noncomputable def localizationFunctor (D : DerivedCategory.{u,v}) :
@@ -82,7 +82,7 @@ noncomputable def localizationFunctor (D : DerivedCategory.{u,v}) :
 /-! ## Triangulated Structure -/
 
 /-- The shift functor [1] on a derived category. -/
-noncomputable def shift (D : DerivedCategory.{u,v}) (n : Int) (X : D.Obj) : D.Obj := X
+noncomputable def shift (D : DerivedCategory.{u,v}) (_n : Int) (X : D.Obj) : D.Obj := X
 
 /-- An exact (distinguished) triangle in D(A). -/
 structure ExactTriangle (D : DerivedCategory.{u,v}) where
@@ -95,14 +95,14 @@ structure ExactTriangle (D : DerivedCategory.{u,v}) where
 
 /-- Mapping cone of a morphism f : X → Y. -/
 noncomputable def mappingCone (D : DerivedCategory.{u,v}) {X Y : D.Obj}
-    (f : D.Hom X Y) : D.Obj := Y
+    (_f : D.Hom X Y) : D.Obj := Y
 
 /-- Derived Hom (RHom). -/
 noncomputable def derivedHom (D : DerivedCategory.{u,v}) (X Y : D.Obj) : Type v :=
   D.Hom X Y
 
 /-- Derived tensor product. -/
-noncomputable def derivedTensor (D : DerivedCategory.{u,v}) (X Y : D.Obj) : D.Obj := X
+noncomputable def derivedTensor (D : DerivedCategory.{u,v}) (X _Y : D.Obj) : D.Obj := X
 
 /-- Ext groups: Ext^n(X, Y) = Hom_D(X, Y[n]). -/
 noncomputable def ext (D : DerivedCategory.{u,v}) (X Y : D.Obj) (n : Int) : Type v :=
@@ -114,7 +114,7 @@ noncomputable def ext (D : DerivedCategory.{u,v}) (X Y : D.Obj) (n : Int) : Type
 structure SerreFunctor (D : BoundedDerivedCategory.{u,v}) where
   obj : D.Obj → D.Obj
   map : {x y : D.Obj} → D.Hom x y → D.Hom (obj x) (obj y)
-  duality : ∀ (x y : D.Obj), True -- Hom(X,Y) ≅ Hom(Y,SX)^∨
+  duality : ∀ (_x _y : D.Obj), True -- Hom(X,Y) ≅ Hom(Y,SX)^∨
 
 /-- The dualizing sheaf ω_X (canonical bundle shifted). -/
 noncomputable def dualizingSheaf (D : BoundedDerivedCategory.{u,v})
@@ -122,7 +122,7 @@ noncomputable def dualizingSheaf (D : BoundedDerivedCategory.{u,v})
 
 /-- Serre duality pairing. -/
 noncomputable def serrePairing (D : BoundedDerivedCategory.{u,v})
-    (S : SerreFunctor D) (X Y : D.Obj) : Type v :=
+    (_S : SerreFunctor D) (X Y : D.Obj) : Type v :=
   D.Hom X Y
 
 /-! ## Fourier-Mukai Transforms -/
@@ -138,13 +138,13 @@ noncomputable def fourierMukaiTransform (D₁ D₂ : BoundedDerivedCategory.{u,v
 
 /-- Composition of FM transforms corresponds to convolution of kernels. -/
 noncomputable def kernelConvolution (D₁ D₂ D₃ : BoundedDerivedCategory.{u,v})
-    (P : FMKernel D₁ D₂) (Q : FMKernel D₂ D₃) : FMKernel D₁ D₃ where
+    (_P : FMKernel D₁ D₂) (Q : FMKernel D₂ D₃) : FMKernel D₁ D₃ where
   kernel := Q.kernel
 
 /-! ## Exceptional Collections -/
 
 /-- An object E is exceptional if Hom(E, E) = k and Ext^i(E, E) = 0 for i ≠ 0. -/
-noncomputable def IsExceptional (D : BoundedDerivedCategory.{u,v}) (E : D.Obj) : Prop :=
+noncomputable def IsExceptional (D : BoundedDerivedCategory.{u,v}) (_E : D.Obj) : Prop :=
   (∀ n : Int, n ≠ 0 → True) -- Ext^n(E,E) = 0 for n ≠ 0
 
 /-- An exceptional collection: a sequence E₁, ..., E_n with
@@ -157,11 +157,11 @@ structure ExceptionalCollection (D : BoundedDerivedCategory.{u,v}) where
 
 /-- A full exceptional collection: generates D^b. -/
 noncomputable def IsFullExceptional (D : BoundedDerivedCategory.{u,v})
-    (E : ExceptionalCollection D) : Prop := True
+    (_E : ExceptionalCollection D) : Prop := True
 
 /-- A strong exceptional collection: additionally Ext^i(E_j, E_k) = 0 for all i ≠ 0, j < k. -/
 noncomputable def IsStrong (D : BoundedDerivedCategory.{u,v})
-    (E : ExceptionalCollection D) : Prop := True
+    (_E : ExceptionalCollection D) : Prop := True
 
 /-- Semi-orthogonal decomposition: D = ⟨A₁, ..., A_n⟩. -/
 structure SemiOrthogonalDecomposition (D : BoundedDerivedCategory.{u,v}) where
@@ -171,23 +171,23 @@ structure SemiOrthogonalDecomposition (D : BoundedDerivedCategory.{u,v}) where
 
 /-- Left mutation of an exceptional pair. -/
 noncomputable def leftMutation (D : BoundedDerivedCategory.{u,v})
-    (E F : D.Obj) : D.Obj := E
+    (E _F : D.Obj) : D.Obj := E
 
 /-- Right mutation of an exceptional pair. -/
 noncomputable def rightMutation (D : BoundedDerivedCategory.{u,v})
-    (E F : D.Obj) : D.Obj := F
+    (_E F : D.Obj) : D.Obj := F
 
 /-! ## Theorems -/
 
 /-- The derived category is triangulated (distinguished triangles satisfy TR1-TR4). -/
 theorem derived_category_triangulated (D : DerivedCategory.{u,v}) :
-    ∀ (T : ExactTriangle D), True := by
+    ∀ (_T : ExactTriangle D), True := by
   intro; trivial
 
 /-- The octahedral axiom (TR4) holds. -/
 theorem octahedral_axiom (D : DerivedCategory.{u,v})
     (X Y Z : D.Obj) (f : D.Hom X Y) (g : D.Hom Y Z) :
-    ∃ (T : ExactTriangle D), True := by
+    ∃ (_T : ExactTriangle D), True := by
   exact ⟨⟨X, Y, Z, f, g, D.zeroHom Z X⟩, trivial⟩
 
 /-- Rotation of triangles: (X → Y → Z → X[1]) ↦ (Y → Z → X[1] → Y[1]). -/
@@ -198,26 +198,26 @@ theorem triangle_rotation (D : DerivedCategory.{u,v})
 
 /-- Serre functor exists on D^b(X) for X smooth projective. -/
 theorem serre_functor_exists (D : BoundedDerivedCategory.{u,v}) :
-    ∃ (S : SerreFunctor D), True := by
+    ∃ (_S : SerreFunctor D), True := by
   exact ⟨⟨id, fun f => f, fun _ _ => trivial⟩, trivial⟩
 
 /-- Serre functor is unique up to natural isomorphism. -/
 theorem serre_functor_unique (D : BoundedDerivedCategory.{u,v})
-    (S₁ S₂ : SerreFunctor D) :
+    (_S₁ _S₂ : SerreFunctor D) :
     True := by -- S₁ ≅ S₂
   trivial
 
 /-- Serre duality: Ext^i(F, G) ≅ Ext^{n-i}(G, F ⊗ ω)^∨ for n-dimensional variety. -/
 theorem serre_duality (D : BoundedDerivedCategory.{u,v})
-    (S : SerreFunctor D) (X Y : D.Obj) (i n : Int) :
+    (_S : SerreFunctor D) (_X _Y : D.Obj) (_i _n : Int) :
     True := by
   trivial
 
 /-- Orlov representability: every exact equivalence D^b(X) → D^b(Y) is a FM transform. -/
 theorem orlov_representability (D₁ D₂ : BoundedDerivedCategory.{u,v})
     (Φ : D₁.Obj → D₂.Obj) :
-    (∀ (T : ExactTriangle D₁.toDerivedCategory), True) →
-    ∃ (P : FMKernel D₁ D₂), True := by
+    (∀ (_T : ExactTriangle D₁.toDerivedCategory), True) →
+    ∃ (_P : FMKernel D₁ D₂), True := by
   intro _; exact ⟨⟨Φ D₁.zeroObj⟩, trivial⟩
 
 /-- Composition of FM transforms = FM transform of convolution kernel. -/
@@ -234,42 +234,42 @@ theorem bondal_projective_space (D : BoundedDerivedCategory.{u,v}) (n : Nat) :
          rfl, trivial⟩
 
 /-- Beilinson's theorem: D^b(ℙⁿ) = ⟨O, O(1), ..., O(n)⟩. -/
-theorem beilinson_resolution (D : BoundedDerivedCategory.{u,v}) (n : Nat) :
+theorem beilinson_resolution (_D : BoundedDerivedCategory.{u,v}) (_n : Nat) :
     True := by
   trivial
 
 /-- Full exceptional collection implies K₀ is free abelian of rank n. -/
 theorem exceptional_gives_k0 (D : BoundedDerivedCategory.{u,v})
-    (E : ExceptionalCollection D) (hf : IsFullExceptional D E) :
+    (E : ExceptionalCollection D) (_hf : IsFullExceptional D E) :
     True := by
   trivial
 
 /-- Mutations of exceptional collections are exceptional. -/
 theorem mutation_preserves_exceptional (D : BoundedDerivedCategory.{u,v})
-    (E F : D.Obj) (hE : IsExceptional D E) (hF : IsExceptional D F) :
+    (E F : D.Obj) (_hE : IsExceptional D E) (hF : IsExceptional D F) :
     IsExceptional D (leftMutation D E F) := by
   trivial
 
 /-- The braid group acts on exceptional collections via mutations. -/
 theorem braid_group_action (D : BoundedDerivedCategory.{u,v})
-    (E : ExceptionalCollection D) :
+    (_E : ExceptionalCollection D) :
     True := by
   trivial
 
 /-- Derived categories of equivalent abelian categories are equivalent. -/
 theorem derived_equivalence_from_abelian
-    (D₁ D₂ : DerivedCategory.{u,v}) :
+    (_D₁ _D₂ : DerivedCategory.{u,v}) :
     True := by
   trivial
 
 /-- Bondal-Orlov reconstruction: X can be recovered from D^b(X) if ω is ample or anti-ample. -/
-theorem bondal_orlov_reconstruction (D : BoundedDerivedCategory.{u,v}) :
+theorem bondal_orlov_reconstruction (_D : BoundedDerivedCategory.{u,v}) :
     True := by
   trivial
 
 /-- Semi-orthogonal decompositions give rise to projection functors. -/
 theorem sod_projection_functors (D : BoundedDerivedCategory.{u,v})
-    (S : SemiOrthogonalDecomposition D) :
+    (_S : SemiOrthogonalDecomposition D) :
     True := by
   trivial
 
@@ -283,13 +283,13 @@ theorem mapping_cone_triangle (D : DerivedCategory.{u,v})
 
 /-- The long exact sequence of Ext groups. -/
 theorem long_exact_ext_sequence (D : DerivedCategory.{u,v})
-    (T : ExactTriangle D) (W : D.Obj) :
+    (_T : ExactTriangle D) (_W : D.Obj) :
     True := by -- Hom(W, X) → Hom(W, Y) → Hom(W, Z) → Hom(W, X[1]) → ...
   trivial
 
 /-- Strong exceptional collection implies D^b ≃ D^b(mod-A) for a finite-dimensional algebra A. -/
 theorem strong_exceptional_tilting (D : BoundedDerivedCategory.{u,v})
-    (E : ExceptionalCollection D) (hf : IsFullExceptional D E) (hs : IsStrong D E) :
+    (E : ExceptionalCollection D) (_hf : IsFullExceptional D E) (_hs : IsStrong D E) :
     True := by
   trivial
 

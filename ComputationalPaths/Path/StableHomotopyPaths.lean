@@ -122,7 +122,7 @@ noncomputable def StablePath.symm' {E : CPathSpectrum} {x y : (E.level 0).carrie
 /-- Transitive stable path. -/
 noncomputable def StablePath.trans' {E : CPathSpectrum} {x y z : (E.level 0).carrier}
     (p : StablePath E x y) (q : StablePath E y z)
-    (heq : p.stage = q.stage)
+    (_heq : p.stage = q.stage)
     (ptrans : Path (iterStruct E p.stage x) (iterStruct E p.stage z)) :
     StablePath E x z where
   stage := p.stage
@@ -170,7 +170,7 @@ noncomputable def StableHomotopyGroup.inv {E : CPathSpectrum}
 
 /-- Multiplication via path composition. -/
 noncomputable def StableHomotopyGroup.mul {E : CPathSpectrum}
-    (g h : StableHomotopyGroup E) (heq : g.stage = h.stage)
+    (g h : StableHomotopyGroup E) (_heq : g.stage = h.stage)
     (hmul : Path (iterStruct E g.stage (E.level 0).pt) (iterStruct E g.stage (E.level 0).pt)) :
     StableHomotopyGroup E where
   stage := g.stage

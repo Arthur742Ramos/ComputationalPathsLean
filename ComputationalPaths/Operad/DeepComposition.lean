@@ -83,7 +83,7 @@ theorem compAt_unit_right_path_cancel (O : PartialOperad)
     {n : Nat} (i : Fin n) (f : O.Ops n) (h : n + 1 - 1 = n) :
     (Path.trans (O.compAt_unit_right_path i f h)
       (Path.symm (O.compAt_unit_right_path i f h))).proof = rfl := by
-  simp [PartialOperad.compAt_unit_right_path]
+  simp
 
 /-- 4. Seq assoc path trans refl. -/
 theorem compAt_seq_assoc_path_trans_refl (O : PartialOperad)
@@ -111,7 +111,7 @@ theorem compAt_seq_assoc_path_cancel (O : PartialOperad)
     (heq : n + m - 1 + k - 1 = n + (m + k - 1) - 1) :
     (Path.trans (O.compAt_seq_assoc_path i j f g h heq)
       (Path.symm (O.compAt_seq_assoc_path i j f g h heq))).proof = rfl := by
-  simp [PartialOperad.compAt_seq_assoc_path]
+  simp
 
 /-- 7. Refl trans partial comp unit path. -/
 theorem refl_trans_compAt_unit_right_path (O : PartialOperad)
@@ -181,7 +181,7 @@ theorem EndOp.comp_ids_path_cancel {X : Type v} {n : Nat}
     (f : EndOp X n) (xs : Fin n → X) :
     (Path.trans (EndOp.comp_ids_path f xs)
       (Path.symm (EndOp.comp_ids_path f xs))).proof = rfl := by
-  simp [EndOp.comp_ids_path]
+  simp
 
 /-- 13. CongrArg through EndOp.comp on refl. -/
 theorem congrArg_EndOp_comp_refl {X : Type v} {n : Nat}
@@ -288,21 +288,21 @@ theorem leftAct_unit_path_cancel (B : OperadicBimodule) {n : Nat}
     (m : B.MOps n) :
     (Path.trans (B.leftAct_unit_path m)
       (Path.symm (B.leftAct_unit_path m))).proof = rfl := by
-  simp [OperadicBimodule.leftAct_unit_path]
+  simp
 
 /-- 22. Right unit bimodule path cancellation. -/
 theorem rightAct_unit_path_cancel (B : OperadicBimodule) {n : Nat}
     (m : B.MOps n) :
     (Path.trans (B.rightAct_unit_path m)
       (Path.symm (B.rightAct_unit_path m))).proof = rfl := by
-  simp [OperadicBimodule.rightAct_unit_path]
+  simp
 
 /-- 23. Bimodule assoc path cancellation. -/
 theorem act_assoc_path_cancel (B : OperadicBimodule) {n : Nat}
     (l : B.LOps 1) (m : B.MOps n) (r : B.ROps 1) :
     (Path.trans (B.act_assoc_path l m r)
       (Path.symm (B.act_assoc_path l m r))).proof = rfl := by
-  simp [OperadicBimodule.act_assoc_path]
+  simp
 
 /-- 24. CongrArg through leftAct on refl. -/
 theorem congrArg_leftAct_refl (B : OperadicBimodule) {n : Nat}
@@ -384,7 +384,7 @@ theorem idMorph_map_unit_path_trans_refl (O : PartialOperad) :
 /-- 32. Morphism unit path cancellation. -/
 theorem map_unit_path_cancel (φ : PartialOperadMorphism O P) :
     (Path.trans φ.map_unit_path (Path.symm φ.map_unit_path)).proof = rfl := by
-  simp [PartialOperadMorphism.map_unit_path]
+  simp
 
 /-- 33. Double symm of morphism unit path. -/
 theorem map_unit_path_symm_symm (φ : PartialOperadMorphism O P) :

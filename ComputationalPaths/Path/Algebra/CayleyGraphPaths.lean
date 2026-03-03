@@ -215,7 +215,7 @@ theorem SignedGen.inv_inv {Gen : Type u} (g : SignedGen Gen) :
 /-- Word inversion is involutive. -/
 theorem Word.inv_inv {Gen : Type u} (w : Word Gen) :
     Word.inv (Word.inv w) = w := by
-  simp [Word.inv, List.map_reverse, List.reverse_reverse, List.map_map, Function.comp]
+  simp [Word.inv, List.map_reverse, List.reverse_reverse, List.map_map]
   induction w with
   | nil => rfl
   | cons g rest ih =>

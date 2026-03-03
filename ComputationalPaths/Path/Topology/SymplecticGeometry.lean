@@ -95,7 +95,7 @@ structure StandardSymplectic (n : Nat) where
   coords : Fin (2 * n) → Int
 
 /-- Standard symplectic form ω₀ on ℝ²ⁿ (abstract version). -/
-noncomputable def stdOmega (n : Nat) (v w : Fin (2 * n) → Int) : Int :=
+noncomputable def stdOmega (n : Nat) (_v _w : Fin (2 * n) → Int) : Int :=
   0  -- Abstract: represents Σᵢ (vᵢ wᵢ₊ₙ - vᵢ₊ₙ wᵢ)
 
 /-- ω₀ is skew-symmetric. -/
@@ -393,7 +393,7 @@ structure WeinsteinConjecture (M : SymplecticManifold) where
 theorem symplecto_id_left_fun (M₁ M₂ : SymplecticManifold)
     (f : Symplectomorphism M₁ M₂) (x : M₁.carrier) :
     (symplecto_comp M₁ M₁ M₂ (symplecto_id M₁) f).toFun x = f.toFun x := by
-  simp [symplecto_comp, symplecto_id, Function.comp]
+  simp [symplecto_comp, symplecto_id]
 
 /-- Inverse is an involution on the forward map. -/
 noncomputable def symplecto_inv_inv (M₁ M₂ : SymplecticManifold)

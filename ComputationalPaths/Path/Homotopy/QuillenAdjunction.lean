@@ -207,27 +207,15 @@ noncomputable def path_trans_symm_rweq {A : Type _} (a : A) :
 
 theorem path_symm_trans_toEq {A : Type _} (a : A) :
     (Path.trans (Path.symm (Path.refl a)) (Path.refl a)).toEq = rfl := by
-  simpa using
-    (rwEq_iff_toEq
-      (p := Path.trans (Path.symm (Path.refl a)) (Path.refl a))
-      (q := Path.refl a)).1
-      (path_symm_trans_rweq a)
+  simp
 
 theorem path_trans_symm_toEq {A : Type _} (a : A) :
     (Path.trans (Path.refl a) (Path.symm (Path.refl a))).toEq = rfl := by
-  simpa using
-    (rwEq_iff_toEq
-      (p := Path.trans (Path.refl a) (Path.symm (Path.refl a)))
-      (q := Path.refl a)).1
-      (path_trans_symm_rweq a)
+  simp
 
 theorem path_double_symm_refl {A : Type _} (a : A) :
     Path.symm (Path.symm (Path.refl a)) = Path.refl a := by
-  simpa using
-    (rwEq_iff_toEq
-      (p := Path.symm (Path.symm (Path.refl a)))
-      (q := Path.refl a)).1
-      (rweq_of_step (Step.symm_symm (A := A) (p := Path.refl a)))
+  simp
 
 end QuillenAdjunction
 end Homotopy

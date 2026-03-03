@@ -265,28 +265,28 @@ noncomputable def mapper_node_count (m : MapperGraph) :
 /-! ## Additional Theorem Stubs -/
 
 theorem mapper_node_count_consistency_theorem
-    (m : MapperGraph) : True := trivial
+    (_m : MapperGraph) : True := trivial
 
 theorem mapper_functoriality_refinement_theorem
-    (M : MapperFunctoriality) : True := trivial
+    (_M : MapperFunctoriality) : True := trivial
 
 theorem reeb_interleaving_symmetry_theorem
-    (R : ReebInterleavingDist) : True := trivial
+    (_R : ReebInterleavingDist) : True := trivial
 
 theorem merge_tree_root_fixed_theorem
-    (t : MergeTree) : True := trivial
+    (_t : MergeTree) : True := trivial
 
 theorem merge_tree_distance_nonnegative_theorem
-    (D : MergeTreeDist) : True := trivial
+    (_D : MergeTreeDist) : True := trivial
 
 theorem landscape_order_monotone_theorem
-    (L : PersistenceLandscape) : True := trivial
+    (_L : PersistenceLandscape) : True := trivial
 
 theorem wasserstein_triangle_theorem
-    (p : Nat) (W : WassersteinTriangle p) : True := trivial
+    (p : Nat) (_W : WassersteinTriangle p) : True := trivial
 
 theorem tda_step_validity_theorem
-    (s : TDAStep) : True := trivial
+    (_s : TDAStep) : True := trivial
 
 end TopologicalData
 end Topology

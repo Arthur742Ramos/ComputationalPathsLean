@@ -73,7 +73,7 @@ structure PathCompact (A : Type u) : Prop where
 
 /-- The empty type is compact. -/
 theorem empty_compact : PathCompact Empty :=
-  ⟨fun C => ⟨⟨[], fun a => Empty.elim a⟩⟩⟩
+  ⟨fun _C => ⟨⟨[], fun a => Empty.elim a⟩⟩⟩
 
 /-- A type with decidable equality and inhabited by a single element is compact. -/
 theorem unit_compact : PathCompact Unit :=
@@ -159,7 +159,7 @@ noncomputable def Terminating {A : Type u} (R : RewriteSystem A) : Prop :=
     eventually enters a finite set of normal forms. -/
 structure CompactRewriting {A : Type u} (R : RewriteSystem A) : Prop where
   /-- Normal forms. -/
-  has_nf : ∀ a : A, ∃ nf : A, ¬ ∃ b, R.step nf b
+  has_nf : ∀ _a : A, ∃ nf : A, ¬ ∃ b, R.step nf b
 
 /-- The empty rewriting system is terminating. -/
 theorem empty_terminating {A : Type u} :
@@ -237,7 +237,7 @@ noncomputable def koenig_prefix_path {A : Type u} {t : PathTree A} (k : KoenigPa
 /-- The prefix path at 0 connects root to root via the start equality. -/
 theorem koenig_prefix_zero {A : Type u} {t : PathTree A} (k : KoenigPath t) :
     (koenig_prefix_path k 0).toEq = (k.starts ▸ rfl : t.root = k.path_seq 0) := by
-  simp [koenig_prefix_path, koenig_start_path]
+  simp
 
 /-! ## Finite Path Covers from Reduction -/
 
@@ -275,7 +275,7 @@ theorem reduction_transport {A : Type u} (R : PathReduction A)
     Path.transport (R.reduce p) x = Path.transport p x := by
   have h : (R.reduce p).proof = p.proof := by
     rfl
-  simp [Path.transport, h]
+  simp [Path.transport]
 
 end CompactPaths
 end Topology

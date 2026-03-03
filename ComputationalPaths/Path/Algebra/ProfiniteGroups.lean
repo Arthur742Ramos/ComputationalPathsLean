@@ -122,7 +122,7 @@ structure ProPGroup extends ProfiniteGroup where
   /-- p is at least 2. -/
   p_ge_two : p ≥ 2
   /-- Size of each quotient is a power of p. -/
-  quotient_size : ∀ (n : Nat), ∃ k : Nat, ∀ (count : Nat),
+  quotient_size : ∀ (_n : Nat), ∃ k : Nat, ∀ (count : Nat),
     count = k → count = count
   /-- Index of open subgroups is a power of p (structural witness). -/
   index_p_power : ∀ (n : Nat),
@@ -239,7 +239,7 @@ structure ContinuousCohomology (G : ProfiniteGroup) where
 /-- The zeroth cohomology H^0 as fixed points. -/
 noncomputable def fixed_points (G : ProfiniteGroup) (M : Type u)
     (action : G.limit → M → M)
-    (action_one : ∀ m, Path (action G.lim_one m) m) :
+    (_action_one : ∀ m, Path (action G.lim_one m) m) :
     M → Prop :=
   fun m => ∀ g, action g m = m
 

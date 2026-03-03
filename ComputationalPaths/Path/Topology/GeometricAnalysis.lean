@@ -86,7 +86,7 @@ noncomputable def scalarCurvatureDefect (S : ScalarCurvaturePrescription) (n : N
 noncomputable def prescribedScalarResidual (S : ScalarCurvaturePrescription) (n : Nat) : Nat :=
   Int.natAbs (scalarCurvatureDefect S n)
 
-noncomputable def bubbleScale (B : BubbleTreeDatum) (k : Nat) : Nat :=
+noncomputable def bubbleScale (_B : BubbleTreeDatum) (k : Nat) : Nat :=
   k + 1
 
 noncomputable def bubbleEnergyLoss (B : BubbleTreeDatum) : Nat :=

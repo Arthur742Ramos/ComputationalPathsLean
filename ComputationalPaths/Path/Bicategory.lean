@@ -569,8 +569,7 @@ of vertical composites. -/
       hcomp (A := A) (a := a) (b := b) (c := c)
         (comp (A := A) (a := a) (b := b) η₁ η₂)
         (comp (A := A) (a := b) (b := c) θ₁ θ₂) := by
-  simpa [interchange] using
-    (interchange_law (A := A) (a := a) (b := b) (c := c) η₁ η₂ θ₁ θ₂)
+  simp
 
 /-- The alternative interchange composite equals the vertical composite of
 horizontal composites. -/
@@ -585,8 +584,7 @@ horizontal composites. -/
       comp
         (hcomp (A := A) (a := a) (b := b) (c := c) η₁ θ₁)
         (hcomp (A := A) (a := a) (b := b) (c := c) η₂ θ₂) := by
-  simpa [interchange'] using
-    (interchange_law (A := A) (a := a) (b := b) (c := c) η₁ η₂ θ₁ θ₂).symm
+  simp
 
 /-- Explicit pentagon coherence as a canonical 2-cell. -/
 @[simp] theorem pentagon_coherence_two_cell

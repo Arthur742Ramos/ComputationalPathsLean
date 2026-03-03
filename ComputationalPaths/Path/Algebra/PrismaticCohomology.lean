@@ -433,7 +433,7 @@ noncomputable def zero_from_div_frob (N : NygaardData A R C PA rR rC) :
 
 /-- Predicate expressing exhaustiveness of the Nygaard filtration. -/
 noncomputable def FiltrationExhaustive (N : NygaardData A R C PA rR rC) : Prop :=
-  ∀ c : C, ∃ n : Nat, N.mem c
+  ∀ c : C, ∃ _n : Nat, N.mem c
 
 /-- If every element is in Nygaard filtration, then the filtration is exhaustive. -/
 theorem nygaard_filtration_exhaustive (N : NygaardData A R C PA rR rC)
@@ -444,7 +444,7 @@ theorem nygaard_filtration_exhaustive (N : NygaardData A R C PA rR rC)
 
 /-- Zero lies in some Nygaard stage, giving a base exhaustive witness. -/
 theorem nygaard_filtration_exhaustive_zero (N : NygaardData A R C PA rR rC) :
-    ∃ n : Nat, N.mem rC.zero :=
+    ∃ _n : Nat, N.mem rC.zero :=
   ⟨N.degree, N.zero_mem⟩
 
 end NygaardData

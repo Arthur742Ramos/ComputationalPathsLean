@@ -328,7 +328,7 @@ noncomputable def toPath_trans_rweq {a b c : A} (h1 : a = b) (h2 : b = c) :
 /-- The underlying equality of composed paths is the composition of equalities. -/
 theorem toPath_toEq_trans {a b c : A} (h1 : a = b) (h2 : b = c) :
     (Path.trans (toPath h1) (toPath h2)).toEq = (toPath (h1.trans h2)).toEq := by
-  simpa using rweq_toEq (toPath_trans_rweq h1 h2)
+  simp
 
 /-- Path-first symmetry bridge for `toPath`. -/
 noncomputable def toPath_symm_rweq {a b : A} (h : a = b) :
@@ -340,7 +340,7 @@ noncomputable def toPath_symm_rweq {a b : A} (h : a = b) :
 /-- Symmetry of path equalities. -/
 theorem toPath_toEq_symm {a b : A} (h : a = b) :
     (Path.symm (toPath h)).toEq = (toPath h.symm).toEq := by
-  simpa using rweq_toEq (toPath_symm_rweq h)
+  simp
 
 /-- Reflexive path from `rfl`. -/
 theorem toPath_refl (a : A) : toPath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl

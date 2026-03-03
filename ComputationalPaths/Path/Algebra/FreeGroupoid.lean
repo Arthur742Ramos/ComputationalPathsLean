@@ -153,7 +153,7 @@ theorem onRwEq (F : StepGraphMorphism A G)
 /-- Canonical factorization through the quotient. -/
 noncomputable def factorHom (F : StepGraphMorphism A G) {a b : A} :
     PathRwQuot A a b → G.Hom (F.obj a) (F.obj b) :=
-  Quot.lift F.onPath (fun p q h => F.onRwEq (rweq_of_rweqProp h))
+  Quot.lift F.onPath (fun _p _q h => F.onRwEq (rweq_of_rweqProp h))
 
 @[simp] theorem factorHom_mk (F : StepGraphMorphism A G)
     {a b : A} (p : Path a b) :

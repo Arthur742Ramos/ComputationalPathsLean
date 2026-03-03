@@ -42,14 +42,14 @@ noncomputable def emptySieve (I : Type u) (t : I) : Sieve I where
   downClosed := fun _ _ h _ => h
 
 /-- Intersection of sieves. -/
-noncomputable def sieveInter {I : Type u} (s₁ s₂ : Sieve I) (h : s₁.target = s₂.target) :
+noncomputable def sieveInter {I : Type u} (s₁ s₂ : Sieve I) (_h : s₁.target = s₂.target) :
     Sieve I where
   target := s₁.target
   arrows := fun i => s₁.arrows i ∧ s₂.arrows i
   downClosed := fun i j ⟨h₁, h₂⟩ eq => ⟨s₁.downClosed i j h₁ eq, s₂.downClosed i j h₂ eq⟩
 
 /-- Union of sieves. -/
-noncomputable def sieveUnion {I : Type u} (s₁ s₂ : Sieve I) (h : s₁.target = s₂.target) :
+noncomputable def sieveUnion {I : Type u} (s₁ s₂ : Sieve I) (_h : s₁.target = s₂.target) :
     Sieve I where
   target := s₁.target
   arrows := fun i => s₁.arrows i ∨ s₂.arrows i
@@ -166,7 +166,7 @@ structure Amalgamation {I : Type u} (F : Presheaf I) (c : I) (S : I → Prop)
 /-- The sheaf condition: every matching family has a unique amalgamation. -/
 structure IsSheaf {I : Type u} (J : GrothendieckTopology I) (F : Presheaf I) where
   amalgamate : ∀ c S, J.covers c S → MatchingFamily F S → F.sections c
-  unique : ∀ c S (hc : J.covers c S) (mf : MatchingFamily F S)
+  unique : ∀ c S (_hc : J.covers c S) (mf : MatchingFamily F S)
     (a₁ a₂ : F.sections c),
     (∀ i (hi : S i) (h : c = i), F.restrict h.symm a₁ = mf.family i hi) →
     (∀ i (hi : S i) (h : c = i), F.restrict h.symm a₂ = mf.family i hi) →
@@ -186,7 +186,7 @@ structure IndexFunctor (I J : Type u) where
 noncomputable def directImage {I J : Type u} (f : IndexFunctor I J)
     (F : Presheaf I) : Presheaf J where
   sections := fun j => ∀ i, f.onObj i = j → F.sections i
-  restrict := fun {j₁ j₂} h s i hi => s i (hi.trans h)
+  restrict := fun {_j₁ _j₂} h s i hi => s i (hi.trans h)
 
 /-- A geometric morphism between sites. -/
 structure GeometricMorphism (I J : Type u) where
@@ -211,12 +211,12 @@ noncomputable def compGeometric {I J K : Type u}
   adjunction := fun _ _ _ h => h
 
 /-- 10. Identity geometric morphism: direct image is identity on sections. -/
-noncomputable def idGeometric_direct_id {I : Type u} (F : Presheaf I) (i : I) :
+noncomputable def idGeometric_direct_id {I : Type u} (F : Presheaf I) (_i : I) :
     Path ((idGeometric I).direct F).sections (F.sections) :=
   Path.refl F.sections
 
 /-- 11. Identity geometric morphism: inverse image is identity on sections. -/
-noncomputable def idGeometric_inverse_id {I : Type u} (F : Presheaf I) (i : I) :
+noncomputable def idGeometric_inverse_id {I : Type u} (F : Presheaf I) (_i : I) :
     Path ((idGeometric I).inverse F).sections (F.sections) :=
   Path.refl F.sections
 

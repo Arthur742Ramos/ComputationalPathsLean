@@ -341,7 +341,7 @@ noncomputable def groupAlg_embed_one (ga : GroupAlgebra G) :
 
 noncomputable def groupAlg_embed_inv_mul (ga : GroupAlgebra G) (g : G.carrier) :
     Path (ga.embed (G.mul g (G.inv g))) ga.algOne :=
-  let step1 : Path (ga.embed (G.mul g (G.inv g)))
+  let _step1 : Path (ga.embed (G.mul g (G.inv g)))
                    (ga.algMul (ga.embed g) (ga.embed (G.inv g))) :=
     ga.embed_mul g (G.inv g)
   let step2_inner : Path (G.mul g (G.inv g)) G.one := G.mul_inv g
@@ -416,8 +416,8 @@ noncomputable def weight_double_neg (wl : WeightLattice.{u}) (w : wl.weights) :
 noncomputable def weight_assoc_four (wl : WeightLattice.{u}) (a b c d : wl.weights) :
     Path (wl.add (wl.add (wl.add a b) c) d)
          (wl.add a (wl.add b (wl.add c d))) :=
-  let step1 := wl.add_assoc (wl.add a b) c d
-  let step2 := Path.congrArg (fun x => wl.add x (wl.add c d)) (wl.add_assoc a b c)
+  let _step1 := wl.add_assoc (wl.add a b) c d
+  let _step2 := Path.congrArg (fun x => wl.add x (wl.add c d)) (wl.add_assoc a b c)
   -- Hmm, step2 has wrong shape. Let me restructure:
   let s1 : Path (wl.add (wl.add (wl.add a b) c) d)
                 (wl.add (wl.add a b) (wl.add c d)) :=
@@ -500,7 +500,7 @@ noncomputable def rep_triple_action (ρ : Rep G) (g h k : G.carrier) (v : ρ.V) 
 
 noncomputable def rep_act_inv_cancel (ρ : Rep G) (g : G.carrier) (v : ρ.V) :
     Path (ρ.act (G.mul g (G.inv g)) v) v :=
-  let step1 : Path (ρ.act (G.mul g (G.inv g)) v)
+  let _step1 : Path (ρ.act (G.mul g (G.inv g)) v)
                    (ρ.act g (ρ.act (G.inv g) v)) :=
     ρ.act_mul g (G.inv g) v
   let step2_inner : Path (G.mul g (G.inv g)) G.one := G.mul_inv g

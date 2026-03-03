@@ -252,7 +252,7 @@ noncomputable def ZigZag.ofPath {A : Type u} {S : InvSet A} {a b : A}
   ZigZag.forward (Arrow.mk a b p) rfl rfl (ZigZag.id b)
 
 -- 29. Lift preserves proof
-theorem zigzag_ofPath_proof {A : Type u} {S : InvSet A} {a b : A}
+theorem zigzag_ofPath_proof {A : Type u} {_S : InvSet A} {a b : A}
     (p : Path a b) :
     (Arrow.mk a b p).mor.proof = p.proof := rfl
 
@@ -288,7 +288,7 @@ structure TwoOutOfThree (A : Type u) (S : InvSet A) : Prop where
 
 -- 34. Saturated implies two-out-of-three for proofs
 theorem saturated_two_of_three_proofs {A : Type u} {S : InvSet A}
-    (hS : Saturated A S) (f : Arrow A) (hf : S.contains f) :
+    (_hS : Saturated A S) (f : Arrow A) (_hf : S.contains f) :
     (Path.trans f.mor (Path.symm f.mor)).proof = rfl := by
   simp
 
@@ -325,7 +325,7 @@ theorem loc_maps_id_arrow {A : Type u} {B : Type v} {S : InvSet A}
 
 -- 39. Two zig-zags are equivalent if they have the same proof
 noncomputable def ZigZag.proofEq {A : Type u} {S : InvSet A} {a b : A}
-    (p q : ZigZag A S a b) : Prop :=
+    (_p _q : ZigZag A S a b) : Prop :=
   True  -- In the presence of UIP, all paths are proof-equal
 
 -- 40. proofEq is reflexive
@@ -334,13 +334,13 @@ theorem zigzag_proofEq_refl {A : Type u} {S : InvSet A} {a b : A}
 
 -- 41. proofEq is symmetric
 theorem zigzag_proofEq_symm {A : Type u} {S : InvSet A} {a b : A}
-    (p q : ZigZag A S a b) (h : ZigZag.proofEq p q) :
+    (p q : ZigZag A S a b) (_h : ZigZag.proofEq p q) :
     ZigZag.proofEq q p := trivial
 
 -- 42. proofEq is transitive
 theorem zigzag_proofEq_trans {A : Type u} {S : InvSet A} {a b : A}
     (p q r : ZigZag A S a b)
-    (h1 : ZigZag.proofEq p q) (h2 : ZigZag.proofEq q r) :
+    (_h1 : ZigZag.proofEq p q) (_h2 : ZigZag.proofEq q r) :
     ZigZag.proofEq p r := trivial
 
 /-! ## Calculus of fractions compatibility -/

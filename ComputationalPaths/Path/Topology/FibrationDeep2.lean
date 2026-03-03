@@ -87,7 +87,7 @@ structure PathLifting (fib : Fibration.{u}) {b₁ b₂ : fib.B}
 
 structure SerreFibration extends Fibration.{u} where
   homotopyLifting : ∀ {b₁ b₂ : toFibration.B} (γ : Path b₁ b₂)
-    (e₀ : toFibration.E) (over : Path (toFibration.proj e₀) b₁),
+    (e₀ : toFibration.E) (_over : Path (toFibration.proj e₀) b₁),
     PathLifting toFibration γ e₀
 
 /-! ## 5: Lifting the identity path -/
@@ -130,8 +130,8 @@ noncomputable def fibMorphism_id (fib : Fibration.{u}) : FibrationMorphism fib f
   baseMap := id
   totalMap := id
   fiberMap := id
-  proj_commutes := fun e => Path.refl _
-  section_commutes := fun b => Path.refl _
+  proj_commutes := fun _e => Path.refl _
+  section_commutes := fun _b => Path.refl _
 
 /-! ## 9: Composition of morphisms -/
 
@@ -197,7 +197,7 @@ noncomputable def pullback_transport_refl (fib : Fibration.{u}) (A : Type u)
     (pb : PullbackFibration fib A) (a : A) (f : fib.F) :
     Path (pullback_fiberTransport fib A pb (Path.refl a) f) f := by
   unfold pullback_fiberTransport fiberTransport
-  simp [Path.congrArg, Path.transport]
+  simp [Path.transport]
   exact Path.refl f
 
 /-! ## 15: Pullback transport over trans -/
@@ -438,8 +438,8 @@ noncomputable def covering_fiber_discrete (cov : CoveringSpace.{u}) (f₁ f₂ :
 /-! ## Hurewicz fibrations -/
 
 structure HurewiczFibration extends Fibration.{u} where
-  fullLifting : ∀ {b₁ b₂ : B} (γ : Path b₁ b₂) (e₀ : E)
-    (over : Path (proj e₀) b₁),
+  fullLifting : ∀ {b₁ b₂ : B} (_γ : Path b₁ b₂) (e₀ : E)
+    (_over : Path (proj e₀) b₁),
     Σ' (e₁ : E), (Path e₀ e₁) × (Path (proj e₁) b₂)
 
 /-! ## 36: Hurewicz lift endpoint -/

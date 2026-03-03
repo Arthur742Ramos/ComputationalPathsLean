@@ -91,7 +91,7 @@ theorem jElim_refl {A : Type u} {a : A}
 noncomputable def jElim_refl_via_step {A : Type u} {a : A}
     (C : (b : A) → (a = b) → Type u)
     (c : C a rfl) :
-    {h : RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) // jElim C c (Path.refl a) = c} := by
+    {_h : RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) // jElim C c (Path.refl a) = c} := by
   exact ⟨RwEq.step (Step.trans_refl_right (Path.refl a)), rfl⟩
 
 /-! ## Σ-types and Π-types with explicit β/η Steps -/
@@ -212,9 +212,9 @@ noncomputable def toSyntactic : CwFMorToSyntactic where
   onSub := fun _ _ σ => σ
   onTy := fun _ A => A
   onTm := fun _ _ t => t
-  sub_id := fun _ _ σ => rfl
-  ty_id := fun _ A => rfl
-  tm_id := fun _ _ t => rfl
+  sub_id := fun _ _ _σ => rfl
+  ty_id := fun _ _A => rfl
+  tm_id := fun _ _ _t => rfl
 
 noncomputable def toSyntactic_id_preserves_paths {Γ : Ctx} {A : Ty Γ}
     (a b : Tm Γ A) (γ : Γ) (p : IdTy a b γ) :

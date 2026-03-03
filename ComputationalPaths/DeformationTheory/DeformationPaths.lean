@@ -171,7 +171,7 @@ noncomputable def PathDeformation.extend_of_joinable
     {A : Type u} {a b : A} {p₀ : Path a b}
     (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal)
     (h : D.ExtendableAlong cp) :
-    Σ r : Path a b, PathDeformation p₀ :=
+    Σ _r : Path a b, PathDeformation p₀ :=
   ⟨h.1,
    D.extend (rweq_trans cp.left_rweq h.2.1)⟩
 

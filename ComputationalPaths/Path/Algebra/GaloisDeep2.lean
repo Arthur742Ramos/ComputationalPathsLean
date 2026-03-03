@@ -121,7 +121,7 @@ noncomputable def fixedFieldPath (G : List FieldAut) (a : FieldElem) (σ : Field
 -- ============================================================
 
 /-- A field extension is normal if it's closed under all embeddings -/
-noncomputable def IsNormal (base ext : List FieldElem) (auts : List FieldAut) : Prop :=
+noncomputable def IsNormal (_base ext : List FieldElem) (auts : List FieldAut) : Prop :=
   ∀ a, a ∈ ext → ∀ σ, σ ∈ auts → σ.apply a ∈ ext
 
 /-- Normal extensions are preserved under restriction -/
@@ -132,8 +132,8 @@ theorem normal_restrict (base ext : List FieldElem) (auts sub_auts : List FieldA
 
 /-- Path witnessing normality -/
 noncomputable def normalPath (ext : List FieldElem) (auts : List FieldAut)
-    (a : FieldElem) (hA : a ∈ ext) (σ : FieldAut) (hσ : σ ∈ auts)
-    (hNorm : IsNormal [] ext auts) : ExtPath a (σ.apply a) :=
+    (a : FieldElem) (_hA : a ∈ ext) (σ : FieldAut) (_hσ : σ ∈ auts)
+    (_hNorm : IsNormal [] ext auts) : ExtPath a (σ.apply a) :=
   ExtPath.cons (ExtStep.adjoin a (σ.apply a)) (ExtPath.nil _)
 
 -- ============================================================
@@ -170,7 +170,7 @@ structure GaloisCorrespondence where
 
 /-- Larger subgroup means smaller fixed field -/
 theorem galois_antitone_fixed (gc : GaloisCorrespondence) (H₁ H₂ : List FieldAut)
-    (hSub : ∀ σ, σ ∈ H₁ → σ ∈ H₂)
+    (_hSub : ∀ σ, σ ∈ H₁ → σ ∈ H₂)
     (a : FieldElem) (hA : a ∈ gc.fixedField H₂) : a ∈ gc.fixedField H₂ :=
   hA
 
@@ -225,12 +225,12 @@ structure RadicalTower where
   levelsNonempty : levels.length > 0
 
 /-- Path through a radical tower -/
-noncomputable def radicalTowerPath (rt : RadicalTower) (h : rt.levels.length ≥ 2) :
+noncomputable def radicalTowerPath (rt : RadicalTower) (_h : rt.levels.length ≥ 2) :
     ExtPath (FieldElem.mk 0) (FieldElem.mk 1) :=
   ExtPath.cons (ExtStep.adjoin (FieldElem.mk 0) (FieldElem.mk 1)) (ExtPath.nil _)
 
 /-- Galois implies solvable iff radical tower exists -/
-theorem solvable_iff_radical (auts : List FieldAut)
+theorem solvable_iff_radical (_auts : List FieldAut)
     (ss : SolvableSeries)
     (rt : RadicalTower) :
     ss.chain.length > 0 ∧ rt.levels.length > 0 :=
@@ -268,7 +268,7 @@ noncomputable def DedekindIndependent (chars : List FieldAut) : Prop :=
 
 /-- Single character is independent (vacuously, we show the structure) -/
 theorem dedekind_single (σ : FieldAut) (coeffs : List Nat)
-    (hLen : coeffs.length = [σ].length) (hAll : ∀ c, c ∈ coeffs → c = 0)
+    (_hLen : coeffs.length = [σ].length) (hAll : ∀ c, c ∈ coeffs → c = 0)
     : ∀ c, c ∈ coeffs → c = 0 :=
   hAll
 
@@ -329,7 +329,7 @@ theorem intersection_sub_left (E₁ E₂ : List FieldElem) (a : FieldElem)
 
 /-- Path through compositum -/
 noncomputable def compositumPath (E₁ E₂ : List FieldElem) (a b : FieldElem)
-    (ha : a ∈ E₁) (_hb : b ∈ E₂) : ExtPath a b :=
+    (_ha : a ∈ E₁) (_hb : b ∈ E₂) : ExtPath a b :=
   ExtPath.cons (ExtStep.adjoin a b) (ExtPath.nil b)
 
 -- ============================================================
@@ -344,14 +344,14 @@ structure GaloisGroupOrder where
 
 /-- Identity is always in the Galois group -/
 theorem galois_has_identity (G : List FieldAut) (e : FieldAut)
-    (hId : e.apply = id) (hMem : e ∈ G) : e ∈ G :=
+    (_hId : e.apply = id) (hMem : e ∈ G) : e ∈ G :=
   hMem
 
 /-- Galois group is closed under composition (given membership) -/
 theorem galois_closed_compose (G : List FieldAut) (σ τ result : FieldAut)
-    (hσ : σ ∈ G) (hτ : τ ∈ G)
+    (_hσ : σ ∈ G) (_hτ : τ ∈ G)
     (hResult : result ∈ G)
-    (hComp : result.apply = σ.apply ∘ τ.apply)
+    (_hComp : result.apply = σ.apply ∘ τ.apply)
     : result ∈ G :=
   hResult
 
@@ -445,8 +445,8 @@ noncomputable def complexGaloisPath (σ τ ρ : FieldAut) (f : FieldAut → Fiel
 -- ============================================================
 
 /-- Fixed field of trivial group is the whole field -/
-theorem trivial_group_fixed (ext : List FieldElem) (e : FieldAut)
-    (hId : e.apply = id) : isFixed [e] = fun a => e.apply a = a := by
+theorem trivial_group_fixed (_ext : List FieldElem) (e : FieldAut)
+    (_hId : e.apply = id) : isFixed [e] = fun a => e.apply a = a := by
   ext a
   simp [isFixed]
 

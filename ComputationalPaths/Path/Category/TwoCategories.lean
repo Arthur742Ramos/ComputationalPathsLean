@@ -146,17 +146,17 @@ structure RightUnitor (B : BicategoryData) {a b : B.Obj} (f : B.Hom a b) where
 
 /-- Pentagon axiom: the two ways of re-associating (f∘g)∘(h∘k) agree. -/
 noncomputable def PentagonAxiom (B : BicategoryData)
-    (assoc : {a b c d : B.Obj} → (f : B.Hom a b) → (g : B.Hom b c) → (h : B.Hom c d) →
+    (_assoc : {a b c d : B.Obj} → (f : B.Hom a b) → (g : B.Hom b c) → (h : B.Hom c d) →
              Associator B f g h) : Prop :=
-  ∀ {a b c d e : B.Obj} (f : B.Hom a b) (g : B.Hom b c) (h : B.Hom c d) (k : B.Hom d e),
+  ∀ {a b c d e : B.Obj} (_f : B.Hom a b) (_g : B.Hom b c) (_h : B.Hom c d) (_k : B.Hom d e),
     True -- Full coherence diagram (simplified for brevity)
 
 /-- Triangle axiom: associator and unitors are compatible. -/
 noncomputable def TriangleAxiom (B : BicategoryData)
-    (assoc : {a b c : B.Obj} → (f : B.Hom a b) → (g : B.Hom b c) → (h : B.Hom c c) →
+    (_assoc : {a b c : B.Obj} → (f : B.Hom a b) → (g : B.Hom b c) → (h : B.Hom c c) →
              Associator B f g h)
-    (runit : {a b : B.Obj} → (f : B.Hom a b) → RightUnitor B f) : Prop :=
-  ∀ {a b c : B.Obj} (f : B.Hom a b) (g : B.Hom b c),
+    (_runit : {a b : B.Obj} → (f : B.Hom a b) → RightUnitor B f) : Prop :=
+  ∀ {a b c : B.Obj} (_f : B.Hom a b) (_g : B.Hom b c),
     True -- Full coherence diagram (simplified)
 
 -- ============================================================
@@ -216,18 +216,18 @@ structure Adjunction₂ (C : StrictTwoCategory) {a b : C.Obj}
     there is a bijection between 2-cells f'h → kf and hu' → u k. -/
 noncomputable def MatesCorrespondence (C : StrictTwoCategory)
     {a b a' b' : C.Obj}
-    {f : C.Hom a b} {u : C.Hom b a} (adj₁ : Adjunction₂ C f u)
-    {f' : C.Hom a' b'} {u' : C.Hom b' a'} (adj₂ : Adjunction₂ C f' u')
-    (h : C.Hom a a') (k : C.Hom b b') :
+    {f : C.Hom a b} {u : C.Hom b a} (_adj₁ : Adjunction₂ C f u)
+    {f' : C.Hom a' b'} {u' : C.Hom b' a'} (_adj₂ : Adjunction₂ C f' u')
+    (_h : C.Hom a a') (_k : C.Hom b b') :
     -- 2-cells f'h → kf  correspond to  hu' → uk
     Prop := True
 
 /-- Mates correspondence preserves composition. -/
 theorem mates_preserves_composition (C : StrictTwoCategory)
     {a b a' b' : C.Obj}
-    {f : C.Hom a b} {u : C.Hom b a} (adj₁ : Adjunction₂ C f u)
-    {f' : C.Hom a' b'} {u' : C.Hom b' a'} (adj₂ : Adjunction₂ C f' u')
-    (h : C.Hom a a') (k : C.Hom b b') :
+    {f : C.Hom a b} {u : C.Hom b a} (_adj₁ : Adjunction₂ C f u)
+    {f' : C.Hom a' b'} {u' : C.Hom b' a'} (_adj₂ : Adjunction₂ C f' u')
+    (_h : C.Hom a a') (_k : C.Hom b b') :
     True := by  -- Composition preservation statement
   trivial
 
@@ -246,7 +246,7 @@ structure DoctrinalAdjunction (C : StrictTwoCategory)
 /-- Kelly's doctrinal adjunction lifting theorem. -/
 theorem doctrinal_lifting_theorem (C : StrictTwoCategory)
     {a b : C.Obj} (f : C.Hom a b) (u : C.Hom b a)
-    (adj : Adjunction₂ C f u) :
+    (_adj : Adjunction₂ C f u) :
     True := by  -- The adjunction lifts iff the mate is invertible
   trivial
 
@@ -292,7 +292,7 @@ structure LaxAlgebra (C : StrictTwoCategory) (M : TwoMonad C) where
 
 /-- A 2-monad is flexible if every pseudo-algebra can be strictified. -/
 noncomputable def IsFlexible (C : StrictTwoCategory) (M : TwoMonad C) : Prop :=
-  ∀ (A : PseudoAlgebra C M), ∃ (B : StrictAlgebra C M),
+  ∀ (_A : PseudoAlgebra C M), ∃ (_B : StrictAlgebra C M),
     True  -- B is pseudo-equivalent to A
 
 /-- Cofibrant replacement of a 2-monad: a flexible 2-monad with a map
@@ -305,11 +305,11 @@ structure CofibrantReplacement (C : StrictTwoCategory) (M : TwoMonad C) where
 /-- Every pseudo-algebra for a flexible 2-monad is equivalent to a strict one. -/
 theorem flexible_strictification (C : StrictTwoCategory) (M : TwoMonad C)
     (hflex : IsFlexible C M) (A : PseudoAlgebra C M) :
-    ∃ (B : StrictAlgebra C M), True := by
+    ∃ (_B : StrictAlgebra C M), True := by
   exact hflex A
 
 /-- Cofibrant replacement exists for any 2-monad. -/
-theorem cofibrant_replacement_exists (C : StrictTwoCategory) (M : TwoMonad C) :
+theorem cofibrant_replacement_exists (C : StrictTwoCategory) (_M : TwoMonad C) :
     Exists (fun d : String => d = "CofibrantReplacement exists") :=
   ⟨_, rfl⟩
 
@@ -319,7 +319,7 @@ theorem cofibrant_replacement_exists (C : StrictTwoCategory) (M : TwoMonad C) :
 
 /-- Mac Lane's coherence theorem for bicategories: every bicategory is
     biequivalent to a strict 2-category. -/
-theorem bicategory_coherence (B : BicategoryData) :
+theorem bicategory_coherence (_B : BicategoryData) :
     Exists (fun d : String => d = "StrictTwoCategory biequivalent to B exists") :=
   ⟨_, rfl⟩
 
@@ -329,12 +329,12 @@ theorem free_bicategory_coherence :
   trivial
 
 /-- The Yoneda embedding for 2-categories is locally fully faithful. -/
-theorem twoCat_yoneda_locally_ff (C : StrictTwoCategory) :
+theorem twoCat_yoneda_locally_ff (_C : StrictTwoCategory) :
     True := by
   trivial
 
 /-- Power's general coherence result for pseudo-algebras. -/
-theorem power_coherence (C : StrictTwoCategory) (M : TwoMonad C) :
+theorem power_coherence (C : StrictTwoCategory) (_M : TwoMonad C) :
     True := by
   trivial
 
@@ -367,13 +367,13 @@ theorem hcomp_functorial (C : StrictTwoCategory) [HasHcompFunctorial C]
 
 /-- Whisker-left by a 1-cell is a 2-functor. -/
 theorem whisker_left_functorial (C : StrictTwoCategory)
-    {a b c : C.Obj} (f : C.Hom a b) {g h : C.Hom b c} (α : C.TwoHom g h) :
+    {a b c : C.Obj} (_f : C.Hom a b) {g h : C.Hom b c} (_α : C.TwoHom g h) :
     True := by
   trivial
 
 /-- Whisker-right by a 1-cell is a 2-functor. -/
 theorem whisker_right_functorial (C : StrictTwoCategory)
-    {a b c : C.Obj} {f g : C.Hom a b} (α : C.TwoHom f g) (h : C.Hom b c) :
+    {a b c : C.Obj} {f g : C.Hom a b} (_α : C.TwoHom f g) (_h : C.Hom b c) :
     True := by
   trivial
 
@@ -398,18 +398,18 @@ noncomputable def compLaxFunctor {B₁ B₂ B₃ : BicategoryData}
 
 /-- Every adjunction in a 2-category gives rise to a monad. -/
 noncomputable def monadFromAdjunction₂ (C : StrictTwoCategory)
-    {a b : C.Obj} (l : C.Hom a b) (r : C.Hom b a) (adj : Adjunction₂ C l r) :
+    {a b : C.Obj} (l : C.Hom a b) (r : C.Hom b a) (_adj : Adjunction₂ C l r) :
     C.Hom a a :=
   C.comp₁ l r
 
 /-- Mates of identity 2-cells are unit/counit. -/
 theorem mates_of_identity (C : StrictTwoCategory)
-    {a b : C.Obj} (f : C.Hom a b) (u : C.Hom b a) (adj : Adjunction₂ C f u) :
+    {a b : C.Obj} (f : C.Hom a b) (u : C.Hom b a) (_adj : Adjunction₂ C f u) :
     True := by
   trivial
 
 /-- Every lax algebra morphism between strict algebras factors through a strict one. -/
-theorem lax_to_strict_factorization (C : StrictTwoCategory) (M : TwoMonad C) :
+theorem lax_to_strict_factorization (C : StrictTwoCategory) (_M : TwoMonad C) :
     True := by
   trivial
 
@@ -505,60 +505,60 @@ noncomputable def ModificationHorizontalComp (B₁ B₂ : BicategoryData)
 
 /-! ## Additional Theorems -/
 
-theorem bicategory_coherence_strictification_exists (B : BicategoryData) :
+theorem bicategory_coherence_strictification_exists (_B : BicategoryData) :
     Exists (fun d : String => d = "StrictificationWitness exists") :=
   ⟨_, rfl⟩
 
-theorem bicategory_coherence_unique_up_to_biequivalence (B : BicategoryData) :
+theorem bicategory_coherence_unique_up_to_biequivalence (_B : BicategoryData) :
     True := by
   trivial
 
 theorem mates_correspondence_is_bijective (C : StrictTwoCategory)
-    (M : MatesBijection C) : True := by
+    (_M : MatesBijection C) : True := by
   trivial
 
 theorem mates_correspondence_respects_vertical (C : StrictTwoCategory)
-    (M : MatesBijection C) : True := by
+    (_M : MatesBijection C) : True := by
   trivial
 
 theorem mates_correspondence_respects_horizontal (C : StrictTwoCategory)
-    (M : MatesBijection C) : True := by
+    (_M : MatesBijection C) : True := by
   trivial
 
 theorem doctrinal_adjunction_characterization (C : StrictTwoCategory)
-    (D : DoctrinalAdjunctionData C) : True := by
+    (_D : DoctrinalAdjunctionData C) : True := by
   trivial
 
 theorem doctrinal_adjunction_lifts_left_adjoint (C : StrictTwoCategory)
-    (D : DoctrinalAdjunctionData C) : True := by
+    (_D : DoctrinalAdjunctionData C) : True := by
   trivial
 
 theorem doctrinal_adjunction_lifts_right_adjoint (C : StrictTwoCategory)
-    (D : DoctrinalAdjunctionData C) : True := by
+    (_D : DoctrinalAdjunctionData C) : True := by
   trivial
 
-theorem two_monad_algebra_2category_exists (C : StrictTwoCategory) (M : TwoMonad C) :
+theorem two_monad_algebra_2category_exists (C : StrictTwoCategory) (_M : TwoMonad C) :
     True := by
   trivial
 
-theorem eilenberg_moore_for_twomonad_exists (C : StrictTwoCategory) (M : TwoMonad C) :
+theorem eilenberg_moore_for_twomonad_exists (C : StrictTwoCategory) (_M : TwoMonad C) :
     Exists (fun d : String => d = "EilenbergMooreTwoCategory exists") :=
   ⟨_, rfl⟩
 
 theorem eilenberg_moore_universal_property (C : StrictTwoCategory) (M : TwoMonad C)
-    (E : EilenbergMooreTwoCategory C M) : True := by
+    (_E : EilenbergMooreTwoCategory C M) : True := by
   trivial
 
 theorem lax_transformation_whiskering_law (B₁ B₂ : BicategoryData)
-    {F G : LaxFunctor B₁ B₂} (η : LaxTransformation₂ B₁ B₂ F G) : True := by
+    {F G : LaxFunctor B₁ B₂} (_η : LaxTransformation₂ B₁ B₂ F G) : True := by
   trivial
 
 theorem oplax_transformation_whiskering_law (B₁ B₂ : BicategoryData)
-    {F G : LaxFunctor B₁ B₂} (η : OplaxTransformation₂ B₁ B₂ F G) : True := by
+    {F G : LaxFunctor B₁ B₂} (_η : OplaxTransformation₂ B₁ B₂ F G) : True := by
   trivial
 
 theorem pseudo_transformation_gives_lax_and_oplax (B₁ B₂ : BicategoryData)
-    {F G : LaxFunctor B₁ B₂} (η : PseudoTransformation₂ B₁ B₂ F G) : True := by
+    {F G : LaxFunctor B₁ B₂} (_η : PseudoTransformation₂ B₁ B₂ F G) : True := by
   trivial
 
 theorem icons_form_category (B₁ B₂ : BicategoryData)
@@ -576,35 +576,35 @@ theorem icon_identity_law (B₁ B₂ : BicategoryData)
 theorem modification_vertical_associative (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ δ : LaxTransformation₂ B₁ B₂ F G}
-    (m₁ : ModificationData B₁ B₂ α β)
-    (m₂ : ModificationData B₁ B₂ β γ)
-    (m₃ : ModificationData B₁ B₂ γ δ) : True := by
+    (_m₁ : ModificationData B₁ B₂ α β)
+    (_m₂ : ModificationData B₁ B₂ β γ)
+    (_m₃ : ModificationData B₁ B₂ γ δ) : True := by
   trivial
 
 theorem modification_horizontal_associative (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ δ : LaxTransformation₂ B₁ B₂ F G}
-    (m₁ : ModificationData B₁ B₂ α β)
-    (m₂ : ModificationData B₁ B₂ β γ)
-    (m₃ : ModificationData B₁ B₂ γ δ) : True := by
+    (_m₁ : ModificationData B₁ B₂ α β)
+    (_m₂ : ModificationData B₁ B₂ β γ)
+    (_m₃ : ModificationData B₁ B₂ γ δ) : True := by
   trivial
 
 theorem modification_interchange_law (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ : LaxTransformation₂ B₁ B₂ F G}
-    (m₁ : ModificationData B₁ B₂ α β)
-    (m₂ : ModificationData B₁ B₂ β γ) : True := by
+    (_m₁ : ModificationData B₁ B₂ α β)
+    (_m₂ : ModificationData B₁ B₂ β γ) : True := by
   trivial
 
 theorem twomonad_morphism_preserves_unit (C : StrictTwoCategory)
-    {M N : TwoMonad C} (φ : TwoMonadMorphism C M N) : True := by
+    {M N : TwoMonad C} (_φ : TwoMonadMorphism C M N) : True := by
   trivial
 
 theorem twomonad_morphism_preserves_multiplication (C : StrictTwoCategory)
-    {M N : TwoMonad C} (φ : TwoMonadMorphism C M N) : True := by
+    {M N : TwoMonad C} (_φ : TwoMonadMorphism C M N) : True := by
   trivial
 
-theorem em_comparison_2functor_exists (C : StrictTwoCategory) (M : TwoMonad C) :
+theorem em_comparison_2functor_exists (C : StrictTwoCategory) (_M : TwoMonad C) :
     True := by
   trivial
 
@@ -635,7 +635,7 @@ noncomputable def twoCellMatesTransposition {C : StrictTwoCategory} {a b : C.Obj
     (α : twoCellAsPath f g) (β : twoCellAsPath g h) (γ : twoCellAsPath h k) :
     twoCellVerticalPath (twoCellVerticalPath α β) γ =
       twoCellVerticalPath α (twoCellVerticalPath β γ) := by
-  simpa [twoCellVerticalPath] using Path.trans_assoc α β γ
+  simp [twoCellVerticalPath]
 
 noncomputable def twoCategoryRewrite {C : StrictTwoCategory} {a b : C.Obj}
     {f g : C.Hom a b} (α β : twoCellAsPath f g) : Prop :=

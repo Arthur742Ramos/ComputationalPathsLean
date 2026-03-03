@@ -226,7 +226,7 @@ theorem hopf_symm (HA : PathHopfAlg A) {a : A}
 
 /-- Transport along mul equality is trivial for constants. -/
 theorem transport_mul_const (HA : PathHopfAlg A) {a : A}
-    (p q : Path a a) (x : Nat) :
+    (p _q : Path a a) (x : Nat) :
     transport (D := fun _ => Nat) (ofEq (HA.mul_unit_left p)) x = x :=
   transport_const (ofEq (HA.mul_unit_left p)) x
 

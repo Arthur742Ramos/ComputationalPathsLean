@@ -55,7 +55,7 @@ noncomputable def universalEntourage (A : Type u) : PathEntourage A where
   symm_mem := fun _ _ _ => trivial
 
 /-- Path witnessing entourage reflexivity. -/
-noncomputable def entourage_refl_path {A : Type u} (E : PathEntourage A) (a : A) :
+noncomputable def entourage_refl_path {A : Type u} (_E : PathEntourage A) (a : A) :
     Path a a :=
   Path.refl a
 
@@ -91,7 +91,7 @@ noncomputable def indiscreteUniform (A : Type u) : UniformPathSpace A where
   mono := fun _ _ _ _ _ _ => trivial
 
 /-- Path between discrete entourage relations. -/
-noncomputable def discrete_entourage_path (A : Type u) (n : Nat) (a : A) :
+noncomputable def discrete_entourage_path (A : Type u) (n : Nat) (_a : A) :
     Path ((discreteUniform A).entourage n).rel
          ((discreteUniform A).entourage n).rel :=
   Path.refl _
@@ -145,7 +145,7 @@ structure TotallyBounded {A : Type u} (U : UniformPathSpace A) (S : A → Prop) 
 /-- The empty set is totally bounded. -/
 theorem empty_totally_bounded {A : Type u} (U : UniformPathSpace A) :
     TotallyBounded U (fun _ => False) :=
-  ⟨fun _ => ⟨[], fun a h => absurd h id⟩⟩
+  ⟨fun _ => ⟨[], fun _a h => absurd h id⟩⟩
 
 /-- A singleton is totally bounded. -/
 theorem singleton_totally_bounded {A : Type u} (U : UniformPathSpace A) (a : A) :
@@ -229,7 +229,7 @@ noncomputable def entourageSelfComp {A : Type u} (E : PathEntourage A) :
     PathEntourage A where
   rel := fun a c => ∃ b, E.rel a b ∧ E.rel b c
   refl_mem := fun a => ⟨a, E.refl_mem a, E.refl_mem a⟩
-  symm_mem := fun a c ⟨b, h1, h2⟩ =>
+  symm_mem := fun _a _c ⟨b, h1, h2⟩ =>
     ⟨b, E.symm_mem _ _ h2, E.symm_mem _ _ h1⟩
 
 /-- An entourage is contained in its self-composition. -/
@@ -280,13 +280,13 @@ theorem uniform_equiv_transport {A : Type u} {B : Type v}
     (e : UniformEquiv UA UB) (a : A) (P : A → Type v)
     (x : P (e.invFun (e.toFun a))) :
     Path.transport (uniform_equiv_loop e a) x = (e.left_inv a ▸ x : P a) := by
-  simp [uniform_equiv_loop, Path.transport]
+  simp [Path.transport]
 
 /-! ## Entourage-Based Distance -/
 
 /-- The entourage index of a pair: the smallest n such that
     (a,b) ∈ entourage(n). We use a decision procedure. -/
-noncomputable def entourageIndex {A : Type u} (U : UniformPathSpace A) [DecidableEq A]
+noncomputable def entourageIndex {A : Type u} (_U : UniformPathSpace A) [DecidableEq A]
     (a b : A) : Nat :=
   if a = b then 0 else 1
 

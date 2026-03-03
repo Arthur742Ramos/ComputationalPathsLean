@@ -127,21 +127,21 @@ theorem mk_refl_toEq {A : Type u} (a : A) :
 
 theorem trans_refl_left_generic {A : Type u} {a b : A} (p : Path a b) :
     Path.trans (Path.refl a) p = p := by
-  simpa using Path.trans_refl_left p
+  simp
 
 theorem trans_refl_right_generic {A : Type u} {a b : A} (p : Path a b) :
     Path.trans p (Path.refl b) = p := by
-  simpa using Path.trans_refl_right p
+  simp
 
 theorem trans_assoc_generic {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simpa using Path.trans_assoc p q r
+  simp
 
 theorem symm_trans_generic {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Path.symm (Path.trans p q) = Path.trans (Path.symm q) (Path.symm p) := by
-  simpa using Path.symm_trans p q
+  simp
 
 theorem symm_symm_generic {A : Type u} {a b : A} (p : Path a b) :
     Path.symm (Path.symm p) = p := by
@@ -151,21 +151,21 @@ theorem congrArg_trans_generic {A : Type u} {B : Type v}
     (f : A → B) {a b c : A} (p : Path a b) (q : Path b c) :
     Path.congrArg f (Path.trans p q) =
       Path.trans (Path.congrArg f p) (Path.congrArg f q) := by
-  simpa using Path.congrArg_trans f p q
+  simp
 
 theorem congrArg_symm_generic {A : Type u} {B : Type v}
     (f : A → B) {a b : A} (p : Path a b) :
     Path.congrArg f (Path.symm p) = Path.symm (Path.congrArg f p) := by
-  simpa using Path.congrArg_symm f p
+  simp
 
 theorem toEq_trans_generic {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Path.toEq (Path.trans p q) = (Path.toEq p).trans (Path.toEq q) := by
-  simpa using Path.toEq_trans p q
+  simp
 
 theorem toEq_symm_generic {A : Type u} {a b : A} (p : Path a b) :
     Path.toEq (Path.symm p) = (Path.toEq p).symm := by
-  simpa using Path.toEq_symm p
+  simp
 
 theorem singleStepPath_symm {A : Type u} {a b : A} (h : a = b) :
     Path.symm (singleStepPath h) = singleStepPath h.symm := by
@@ -203,16 +203,16 @@ theorem indep_empty_toEq {E : Type u} (M : Matroid E) :
 
 theorem indep_empty_refl_left {E : Type u} (M : Matroid E) :
     Path.trans (Path.refl (M.indep M.ops.empty)) M.indep_empty = M.indep_empty := by
-  simpa using Path.trans_refl_left M.indep_empty
+  simp
 
 theorem indep_empty_refl_right {E : Type u} (M : Matroid E) :
     Path.trans M.indep_empty (Path.refl True) = M.indep_empty := by
-  simpa using Path.trans_refl_right M.indep_empty
+  simp
 
 theorem indep_empty_symm_trans {E : Type u} (M : Matroid E) :
     Path.symm (Path.trans M.indep_empty (Path.refl True)) =
       Path.trans (Path.symm (Path.refl True)) (Path.symm M.indep_empty) := by
-  simpa using Path.symm_trans M.indep_empty (Path.refl True)
+  simp
 
 theorem indep_hereditary_path {E : Type u} (M : Matroid E)
     (I J : E → Prop) (hI : M.indep I) (hJI : M.ops.subset J I) :
@@ -234,14 +234,14 @@ theorem exchange_trans_left {E : Type u} (M : Matroid E)
     (hlt : M.ops.card I < M.ops.card J) :
     Path.trans (Path.refl (M.indep (M.ops.union I J))) (M.exchange I J hI hJ hlt) =
       M.exchange I J hI hJ hlt := by
-  simpa using Path.trans_refl_left (M.exchange I J hI hJ hlt)
+  simp
 
 theorem exchange_trans_right {E : Type u} (M : Matroid E)
     (I J : E → Prop) (hI : M.indep I) (hJ : M.indep J)
     (hlt : M.ops.card I < M.ops.card J) :
     Path.trans (M.exchange I J hI hJ hlt) (Path.refl (M.indep (M.ops.union I J))) =
       M.exchange I J hI hJ hlt := by
-  simpa using Path.trans_refl_right (M.exchange I J hI hJ hlt)
+  simp
 
 theorem exchange_assoc {E : Type u} (M : Matroid E)
     (I J : E → Prop) (hI : M.indep I) (hJ : M.indep J)
@@ -250,10 +250,7 @@ theorem exchange_assoc {E : Type u} (M : Matroid E)
       (M.exchange I J hI hJ hlt) =
     Path.trans (M.exchange I J hI hJ hlt)
       (Path.trans (M.exchange I J hI hJ hlt) (M.exchange I J hI hJ hlt)) := by
-  simpa using Path.trans_assoc
-    (M.exchange I J hI hJ hlt)
-    (M.exchange I J hI hJ hlt)
-    (M.exchange I J hI hJ hlt)
+  simp
 
 /-! ## Bases -/
 
@@ -289,14 +286,14 @@ theorem base_exchange_refl_left {E : Type u} {M : Matroid E}
     (h1 : B.isBase B1) (h2 : B.isBase B2) :
     Path.trans (Path.refl (B.isBase B1)) (B.base_exchange B1 B2 h1 h2) =
       B.base_exchange B1 B2 h1 h2 := by
-  simpa using Path.trans_refl_left (B.base_exchange B1 B2 h1 h2)
+  simp
 
 theorem base_exchange_refl_right {E : Type u} {M : Matroid E}
     (B : BaseData E M) (B1 B2 : E → Prop)
     (h1 : B.isBase B1) (h2 : B.isBase B2) :
     Path.trans (B.base_exchange B1 B2 h1 h2) (Path.refl (B.isBase B1)) =
       B.base_exchange B1 B2 h1 h2 := by
-  simpa using Path.trans_refl_right (B.base_exchange B1 B2 h1 h2)
+  simp
 
 theorem base_exchange_symm_symm {E : Type u} {M : Matroid E}
     (B : BaseData E M) (B1 B2 : E → Prop)
@@ -333,7 +330,7 @@ theorem circuit_dep_symm_symm {E : Type u} {M : Matroid E}
 theorem circuit_dep_trans_refl_right {E : Type u} {M : Matroid E}
     (C : CircuitData E M) (X : E → Prop) (hX : C.isCircuit X) :
     Path.trans (C.circuit_dep X hX) (Path.refl False) = C.circuit_dep X hX := by
-  simpa using Path.trans_refl_right (C.circuit_dep X hX)
+  simp
 
 theorem circuit_elim_refl_left {E : Type u} {M : Matroid E}
     (C : CircuitData E M) (C1 C2 : E → Prop) (e : E)
@@ -344,14 +341,14 @@ theorem circuit_elim_refl_left {E : Type u} {M : Matroid E}
         (M.ops.diff (M.ops.union C1 C2) (M.ops.singleton e))))
       (C.circuit_elim C1 C2 e h1 h2 he1 he2) =
     C.circuit_elim C1 C2 e h1 h2 he1 he2 := by
-  simpa using Path.trans_refl_left (C.circuit_elim C1 C2 e h1 h2 he1 he2)
+  simp
 
 theorem circuit_elim_refl_right {E : Type u} {M : Matroid E}
     (C : CircuitData E M) (C1 C2 : E → Prop) (e : E)
     (h1 : C.isCircuit C1) (h2 : C.isCircuit C2) (he1 : C1 e) (he2 : C2 e) :
     Path.trans (C.circuit_elim C1 C2 e h1 h2 he1 he2) (Path.refl True) =
       C.circuit_elim C1 C2 e h1 h2 he1 he2 := by
-  simpa using Path.trans_refl_right (C.circuit_elim C1 C2 e h1 h2 he1 he2)
+  simp
 
 /-! ## Rank function -/
 
@@ -373,16 +370,16 @@ theorem rank_submod_path {E : Type u} {M : Matroid E}
 
 theorem rank_empty_refl_left {E : Type u} {M : Matroid E} (r : RankData E M) :
     Path.trans (Path.refl (r.rank M.ops.empty)) r.rank_empty = r.rank_empty := by
-  simpa using Path.trans_refl_left r.rank_empty
+  simp
 
 theorem rank_empty_refl_right {E : Type u} {M : Matroid E} (r : RankData E M) :
     Path.trans r.rank_empty (Path.refl 0) = r.rank_empty := by
-  simpa using Path.trans_refl_right r.rank_empty
+  simp
 
 theorem rank_empty_symm_trans {E : Type u} {M : Matroid E} (r : RankData E M) :
     Path.symm (Path.trans r.rank_empty (Path.refl 0)) =
       Path.trans (Path.symm (Path.refl 0)) (Path.symm r.rank_empty) := by
-  simpa using Path.symm_trans r.rank_empty (Path.refl 0)
+  simp
 
 theorem rank_submod_symm_symm {E : Type u} {M : Matroid E}
     (r : RankData E M) (S T : E → Prop) :
@@ -406,7 +403,7 @@ theorem rank_congrArg_trans {E : Type u} {M : Matroid E}
     Path.congrArg Nat.succ (Path.trans r.rank_empty (Path.refl 0)) =
       Path.trans (Path.congrArg Nat.succ r.rank_empty)
         (Path.congrArg Nat.succ (Path.refl 0)) := by
-  simpa using Path.congrArg_trans Nat.succ r.rank_empty (Path.refl 0)
+  simp
 
 /-! ## Duality -/
 
@@ -425,12 +422,12 @@ theorem double_dual_symm {E : Type u} {M : Matroid E}
 theorem dual_indep_refl_left {E : Type u} {M : Matroid E}
     (D : DualData E M) (I : E → Prop) :
     Path.trans (Path.refl (D.dualMatroid.indep I)) (D.dual_indep I) = D.dual_indep I := by
-  simpa using Path.trans_refl_left (D.dual_indep I)
+  simp
 
 theorem dual_indep_refl_right {E : Type u} {M : Matroid E}
     (D : DualData E M) (I : E → Prop) :
     Path.trans (D.dual_indep I) (Path.refl (D.dualMatroid.indep I)) = D.dual_indep I := by
-  simpa using Path.trans_refl_right (D.dual_indep I)
+  simp
 
 /-! ## Minors -/
 
@@ -450,7 +447,7 @@ theorem delete_indep_symm_trans {E : Type u} {M : Matroid E}
     (N : MinorData E M) (I : E → Prop) :
     Path.symm (Path.trans (N.delete_indep I) (Path.refl (N.deleteMatroid.indep I))) =
       Path.trans (Path.symm (Path.refl (N.deleteMatroid.indep I))) (Path.symm (N.delete_indep I)) := by
-  simpa using Path.symm_trans (N.delete_indep I) (Path.refl (N.deleteMatroid.indep I))
+  simp
 
 theorem minor_rank_symm_symm {E : Type u} {M : Matroid E}
     (N : MinorData E M) (r : RankData E M) (S : E → Prop) :
@@ -475,12 +472,12 @@ theorem greedy_weight_path {E : Type u} {M : Matroid E}
 theorem greedy_weight_refl_left {E : Type u} {M : Matroid E}
     (G : GreedyData E M) (I : E → Prop) (hI : M.indep I) :
     Path.trans (Path.refl (M.ops.card I)) (G.optimal_weight I hI) = G.optimal_weight I hI := by
-  simpa using Path.trans_refl_left (G.optimal_weight I hI)
+  simp
 
 theorem greedy_weight_refl_right {E : Type u} {M : Matroid E}
     (G : GreedyData E M) (I : E → Prop) (hI : M.indep I) :
     Path.trans (G.optimal_weight I hI) (Path.refl (M.ops.card I)) = G.optimal_weight I hI := by
-  simpa using Path.trans_refl_right (G.optimal_weight I hI)
+  simp
 
 /-! ## Matroid union -/
 
@@ -503,7 +500,7 @@ theorem union_indep_assoc {E : Type u} {M1 M2 : Matroid E}
     (U : UnionData E M1 M2) (I : E → Prop) :
     Path.trans (Path.trans (U.union_indep I) (U.union_indep I)) (U.union_indep I) =
       Path.trans (U.union_indep I) (Path.trans (U.union_indep I) (U.union_indep I)) := by
-  simpa using Path.trans_assoc (U.union_indep I) (U.union_indep I) (U.union_indep I)
+  simp
 
 /-! ## Representability -/
 
@@ -531,6 +528,6 @@ theorem repr_rank_symm_trans {E : Type u} {Gam : Type v} {M : Matroid E}
     (R : RepresentableData E Gam M) (r : RankData E M) (S : E → Prop) :
     Path.symm (Path.trans (R.rank_span r S) (Path.refl (r.rank S))) =
       Path.trans (Path.symm (Path.refl (r.rank S))) (Path.symm (R.rank_span r S)) := by
-  simpa using Path.symm_trans (R.rank_span r S) (Path.refl (r.rank S))
+  simp
 
 end ComputationalPaths.Path.Algebra.MatroidTheoryDeep

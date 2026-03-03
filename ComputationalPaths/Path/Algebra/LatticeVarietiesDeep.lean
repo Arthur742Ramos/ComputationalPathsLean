@@ -153,14 +153,14 @@ noncomputable def meet_bimap_congr (p : Path a b) (q : Path c d) :
   have hp : a = b := p.toEq
   have hq : c = d := q.toEq
   refine ⟨pathOfEq ?_⟩
-  simpa [hp, hq]
+  simp [hp, hq]
 
 noncomputable def join_bimap_congr (p : Path a b) (q : Path c d) :
     Nonempty (Path (L.join a c) (L.join b d)) := by
   have hp : a = b := p.toEq
   have hq : c = d := q.toEq
   refine ⟨pathOfEq ?_⟩
-  simpa [hp, hq]
+  simp [hp, hq]
 
 noncomputable def absorb_meet_join_swapped (a b : L.Carrier) :
     Nonempty (Path (L.meet (L.join a b) a) a) := by
@@ -561,7 +561,7 @@ noncomputable def map (Sym : Gam → Del) : LatticePolynomial L Gam → LatticeP
 @[simp] theorem map_comp (Sym : Gam → Del) (Tau : Del → L.Carrier)
     (p : LatticePolynomial L Gam) :
     eval Tau (map Sym p) = eval (fun g => Tau (Sym g)) p := by
-  simpa using eval_map (L := L) Tau Sym p
+  simp
 
 noncomputable def subst (Sym : Gam → LatticePolynomial L Del) :
     LatticePolynomial L Gam → LatticePolynomial L Del
@@ -665,7 +665,7 @@ theorem polyRel_meet (h1 : PolyRel (L := L) p1 q1) (h2 : PolyRel (L := L) p2 q2)
   have hEq1 : LatticePolynomial.eval Sym p1 = LatticePolynomial.eval Sym q1 := pq1.toEq
   have hEq2 : LatticePolynomial.eval Sym p2 = LatticePolynomial.eval Sym q2 := pq2.toEq
   refine ⟨pathOfEq ?_⟩
-  simpa [LatticePolynomial.eval, hEq1, hEq2]
+  simp [LatticePolynomial.eval, hEq1, hEq2]
 
 theorem polyRel_join (h1 : PolyRel (L := L) p1 q1) (h2 : PolyRel (L := L) p2 q2) :
     PolyRel (L := L) (.join p1 p2) (.join q1 q2) := by
@@ -675,7 +675,7 @@ theorem polyRel_join (h1 : PolyRel (L := L) p1 q1) (h2 : PolyRel (L := L) p2 q2)
   have hEq1 : LatticePolynomial.eval Sym p1 = LatticePolynomial.eval Sym q1 := pq1.toEq
   have hEq2 : LatticePolynomial.eval Sym p2 = LatticePolynomial.eval Sym q2 := pq2.toEq
   refine ⟨pathOfEq ?_⟩
-  simpa [LatticePolynomial.eval, hEq1, hEq2]
+  simp [LatticePolynomial.eval, hEq1, hEq2]
 
 theorem polyRel_subst
     (h : PolyRel (L := L) p q)

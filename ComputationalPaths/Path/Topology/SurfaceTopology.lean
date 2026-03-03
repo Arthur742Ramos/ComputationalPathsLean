@@ -312,27 +312,27 @@ noncomputable def sphere_gauss_bonnet :
 
 /-! ## Additional Theorem Stubs -/
 
-theorem surface_classification_exists (S : ClosedSurface.{u}) : True := trivial
+theorem surface_classification_exists (_S : ClosedSurface.{u}) : True := trivial
 
 theorem surface_classification_unique (S : ClosedSurface.{u})
-    (C : SurfaceClassification S) : True := trivial
+    (_C : SurfaceClassification S) : True := trivial
 
 theorem euler_characteristic_orientable_formula (S : ClosedSurface.{u})
-    (E : EulerCharacteristic S) : True := trivial
+    (_E : EulerCharacteristic S) : True := trivial
 
 theorem connected_sum_euler_formula_theorem
-    (C : ConnectedSumEuler.{u}) : True := trivial
+    (_C : ConnectedSumEuler.{u}) : True := trivial
 
 theorem polygon_surface_well_formed_theorem
-    (P : PolygonSurface.{u}) : True := trivial
+    (_P : PolygonSurface.{u}) : True := trivial
 
 theorem torus_word_commutator_relation_theorem : True := trivial
 
 theorem genus_invariant_consistency_theorem (S : ClosedSurface.{u})
-    (g : Genus S) : True := trivial
+    (_g : Genus S) : True := trivial
 
 theorem gauss_bonnet_identity_theorem (S : ClosedSurface.{u})
-    (G : GaussBonnet S) : True := trivial
+    (_G : GaussBonnet S) : True := trivial
 
 end SurfaceTopology
 end Topology

@@ -82,7 +82,7 @@ theorem hammingWeight_zero (n : Nat) : hammingWeight n (zeroWord n) = 0 := by
   | zero => rfl
   | succ n ih =>
     simp [hammingWeight, zeroWord]
-    simp [List.ofFn, List.foldl]
+    simp [List.ofFn]
     exact ih
 
 /-! ## Path constructions from XOR algebra -/

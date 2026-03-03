@@ -201,7 +201,7 @@ noncomputable def mateProp {L R L' R' : AdjPEF A} (adj₁ : PathAdj L R) (adj₂
     (_root_.congrArg R.obj (((σ (R'.obj a)).trans (adj₂.ε.cmp a).toEq)))
 
 theorem mateProp_id {L R : AdjPEF A} (adj : PathAdj L R) (a : A) :
-    mateProp adj adj (fun x => rfl) a =
+    mateProp adj adj (fun _x => rfl) a =
       ((adj.η.cmp (R.obj a)).toEq).trans (_root_.congrArg R.obj (adj.ε.cmp a).toEq) := rfl
 
 /-! ### Adjoint uniqueness -/

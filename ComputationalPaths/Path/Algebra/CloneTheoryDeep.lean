@@ -130,7 +130,7 @@ noncomputable def InvSet {A : Type u} (ops : (n : Nat) → NaryOp A n → Prop)
 /-- Theorem 9: Projections preserve all relations -/
 theorem proj_preserves {A : Type u} {n m : Nat} (i : Fin n) (R : NaryRel A m) :
     Preserves (proj n i) R :=
-  fun tuples hR => hR i
+  fun _tuples hR => hR i
 
 /-- Theorem 10: Superposition preserves preserved relations -/
 theorem superpose_preserves {A : Type u} {k n m : Nat}
@@ -156,13 +156,13 @@ theorem pol_has_proj {A : Type u} (rels : (m : Nat) → NaryRel A m → Prop)
 theorem ops_subset_pol_inv {A : Type u} (ops : (n : Nat) → NaryOp A n → Prop)
     (n : Nat) (f : NaryOp A n) (hf : ops n f) :
     PolSet (InvSet ops) n f :=
-  fun m R hR => hR n f hf
+  fun _m _R hR => hR n f hf
 
 /-- Theorem 13: R ⊆ Inv(Pol(R)) -/
 theorem rels_subset_inv_pol {A : Type u} (rels : (m : Nat) → NaryRel A m → Prop)
     (m : Nat) (R : NaryRel A m) (hR : rels m R) :
     InvSet (PolSet rels) m R :=
-  fun n f hf => hf m R hR
+  fun _ _f hf => hf m R hR
 
 /-- Theorem 14: Monotonicity: more relations means fewer polymorphisms -/
 theorem pol_antitone {A : Type u}
@@ -182,13 +182,13 @@ theorem inv_antitone {A : Type u}
 theorem pol_inv_pol {A : Type u} (rels : (m : Nat) → NaryRel A m → Prop)
     (n : Nat) (f : NaryOp A n) (hf : PolSet rels n f) :
     PolSet (InvSet (PolSet rels)) n f :=
-  fun m R hR => hR n f hf
+  fun _ _R hR => hR n f hf
 
 /-- Theorem 17: Inv(Pol(Inv(F))) = Inv(F) -/
 theorem inv_pol_inv {A : Type u} (ops : (n : Nat) → NaryOp A n → Prop)
     (m : Nat) (R : NaryRel A m) (hR : InvSet ops m R) :
     InvSet (PolSet (InvSet ops)) m R :=
-  fun n f hf => hf m R hR
+  fun _ _f hf => hf m R hR
 
 -- ============================================================================
 -- SECTION 6: Constant and Unary Operations
@@ -246,7 +246,7 @@ noncomputable def comm_assoc_medial {A : Type u} (f : A → A → A)
 /-- Theorem 22: Idempotent + commutative gives absorption-like path -/
 noncomputable def idem_comm_path {A : Type u} (f : A → A → A)
     (hi : ∀ x : A, Path (f x x) x)
-    (hc : ∀ x y : A, Path (f x y) (f y x))
+    (_hc : ∀ x y : A, Path (f x y) (f y x))
     (x : A) : Path (f x x) x :=
   hi x
 

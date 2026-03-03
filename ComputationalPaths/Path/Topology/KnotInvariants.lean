@@ -196,30 +196,30 @@ structure FiniteTypeInvariant where
 
 theorem reidemeister_equivalence_transitive_theorem
     {d1 d2 d3 : KnotDiagram}
-    (h12 : ReidemeisterEquiv d1 d2) (h23 : ReidemeisterEquiv d2 d3) : True := trivial
+    (_h12 : ReidemeisterEquiv d1 d2) (_h23 : ReidemeisterEquiv d2 d3) : True := trivial
 
 theorem knot_step_preserves_invariant_theorem {α : Type u}
-    (I : KnotInvariant α) {d1 d2 : KnotDiagram} (s : KnotStep d1 d2) : True := trivial
+    (_I : KnotInvariant α) {d1 d2 : KnotDiagram} (_s : KnotStep d1 d2) : True := trivial
 
 theorem jones_skein_relation_theorem
-    (J : JonesPolynomial) (s : SkeinTriple) : True := trivial
+    (_J : JonesPolynomial) (_s : SkeinTriple) : True := trivial
 
 theorem homflypt_skein_relation_theorem
-    (H : HOMFLYPTPolynomial) (s : SkeinTriple) : True := trivial
+    (_H : HOMFLYPTPolynomial) (_s : SkeinTriple) : True := trivial
 
 theorem vassiliev_finite_type_condition_theorem
-    (V : VassilievInvariant) : True := trivial
+    (_V : VassilievInvariant) : True := trivial
 
 theorem finite_type_reidemeister_invariance_theorem
-    (F : FiniteTypeInvariant) {d1 d2 : KnotDiagram}
-    (h : ReidemeisterEquiv d1 d2) : True := trivial
+    (_F : FiniteTypeInvariant) {d1 d2 : KnotDiagram}
+    (_h : ReidemeisterEquiv d1 d2) : True := trivial
 
 theorem reidemeister_step_path_symmetry_theorem
-    {d1 d2 : KnotDiagram} (s : KnotStep d1 d2) : True := trivial
+    {d1 d2 : KnotDiagram} (_s : KnotStep d1 d2) : True := trivial
 
 theorem knot_steps_compose_associative_theorem
     {d1 d2 d3 d4 : KnotDiagram}
-    (s1 : KnotStep d1 d2) (s2 : KnotStep d2 d3) (s3 : KnotStep d3 d4) : True := trivial
+    (_s1 : KnotStep d1 d2) (_s2 : KnotStep d2 d3) (_s3 : KnotStep d3 d4) : True := trivial
 
 end KnotInvariants
 end Topology

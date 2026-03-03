@@ -117,13 +117,13 @@ noncomputable def mappingClassGroup (S : SurfaceData) :
   inv := mappingClassInv
   mul_assoc := by
     intro x y z
-    simpa [mappingClassComp] using SimpleEquiv.comp_assoc x y z
+    simp [mappingClassComp]
   one_mul := by
     intro x
-    simpa [mappingClassComp, mappingClassId] using SimpleEquiv.refl_comp x
+    simp [mappingClassComp, mappingClassId]
   mul_one := by
     intro x
-    simpa [mappingClassComp, mappingClassId] using SimpleEquiv.comp_refl x
+    simp [mappingClassComp, mappingClassId]
   mul_left_inv := by
     intro x
     simpa [mappingClassComp, mappingClassId, mappingClassInv]
@@ -227,7 +227,7 @@ theorem surfaceGroups_isOrientable_nonorientable (crosscaps boundary : Nat) :
 noncomputable def surfaceGroups_mappingClassComp_id_left_path (S : SurfaceData) (f : MappingClass S) :
     Path (mappingClassComp (mappingClassId S) f) f :=
   Path.stepChain (by
-    simpa [mappingClassComp, mappingClassId] using SimpleEquiv.refl_comp f)
+    simp [mappingClassComp, mappingClassId])
 
 theorem surfaceGroups_mappingClassComp_id_left (S : SurfaceData) (f : MappingClass S) :
     mappingClassComp (mappingClassId S) f = f := by
@@ -236,7 +236,7 @@ theorem surfaceGroups_mappingClassComp_id_left (S : SurfaceData) (f : MappingCla
 noncomputable def surfaceGroups_mappingClassComp_id_right_path (S : SurfaceData) (f : MappingClass S) :
     Path (mappingClassComp f (mappingClassId S)) f :=
   Path.stepChain (by
-    simpa [mappingClassComp, mappingClassId] using SimpleEquiv.comp_refl f)
+    simp [mappingClassComp, mappingClassId])
 
 theorem surfaceGroups_mappingClassComp_id_right (S : SurfaceData) (f : MappingClass S) :
     mappingClassComp f (mappingClassId S) = f := by
@@ -245,7 +245,7 @@ theorem surfaceGroups_mappingClassComp_id_right (S : SurfaceData) (f : MappingCl
 noncomputable def surfaceGroups_mappingClassInv_involutive_path (S : SurfaceData) (f : MappingClass S) :
     Path (mappingClassInv (mappingClassInv f)) f :=
   Path.stepChain (by
-    simpa [mappingClassInv] using SimpleEquiv.symm_symm f)
+    simp [mappingClassInv])
 
 theorem surfaceGroups_mappingClassInv_involutive (S : SurfaceData) (f : MappingClass S) :
     mappingClassInv (mappingClassInv f) = f := by
@@ -274,7 +274,7 @@ noncomputable def surfaceGroups_mappingClassComp_assoc_path
       (mappingClassComp (mappingClassComp f g) h)
       (mappingClassComp f (mappingClassComp g h)) :=
   Path.stepChain (by
-    simpa [mappingClassComp] using (SimpleEquiv.comp_assoc f g h))
+    simp [mappingClassComp])
 
 theorem surfaceGroups_mappingClassComp_assoc (S : SurfaceData) (f g h : MappingClass S) :
     mappingClassComp (mappingClassComp f g) h =

@@ -460,12 +460,12 @@ noncomputable def lensSpaceLoopPow_rweq_refl (p q n : Nat) :
 /-- toEq of loop power is always rfl (PUnit). -/
 theorem lensSpaceLoopPow_toEq (p q n : Nat) :
     (lensSpaceLoopPow p q n).toEq = rfl := by
-  simpa using rweq_toEq (lensSpaceLoopPow_rweq_refl p q n)
+  simp
 
 /-- The fundamental loop has trivial toEq (PUnit). -/
 theorem lensSpaceLoop_toEq (p q : Nat) :
     (lensSpaceLoop p q).toEq = rfl := by
-  simpa using rweq_toEq (lensSpaceLoop_rweq_refl p q)
+  simp
 
 end
 

@@ -175,7 +175,7 @@ theorem run_path_refl (cfg : AutoConfig) :
     autoConfigTrans (autoConfigRefl cfg) (autoConfigRefl cfg) =
     autoConfigRefl cfg := by
   unfold autoConfigTrans autoConfigRefl
-  simp [Path.trans_refl_left]
+  simp
 
 /-- Theorem 2: Associativity of run path composition. -/
 theorem run_path_assoc {a b c d : AutoConfig}
@@ -183,7 +183,7 @@ theorem run_path_assoc {a b c d : AutoConfig}
     autoConfigTrans (autoConfigTrans p q) r =
     autoConfigTrans p (autoConfigTrans q r) := by
   unfold autoConfigTrans
-  simp [Path.trans_assoc]
+  simp
 
 /-- Theorem 3: Symm distributes over trans for run paths. -/
 theorem run_path_symm_trans {a b c : AutoConfig}
@@ -191,7 +191,7 @@ theorem run_path_symm_trans {a b c : AutoConfig}
     autoConfigSymm (autoConfigTrans p q) =
     autoConfigTrans (autoConfigSymm q) (autoConfigSymm p) := by
   unfold autoConfigSymm autoConfigTrans
-  simp [Path.symm_trans]
+  simp
 
 /-! ## Product Construction for Intersection -/
 
@@ -284,7 +284,7 @@ theorem lift_state_trans (f : TAState → TAState) {a b c : TAState}
     liftStateFun f (Path.trans p q) =
     Path.trans (liftStateFun f p) (liftStateFun f q) := by
   unfold liftStateFun
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 5: Lifting preserves symmetry. -/
 theorem lift_state_symm (f : TAState → TAState) {a b : TAState}
@@ -292,7 +292,7 @@ theorem lift_state_symm (f : TAState → TAState) {a b : TAState}
     liftStateFun f (Path.symm p) =
     Path.symm (liftStateFun f p) := by
   unfold liftStateFun
-  simp [Path.congrArg_symm]
+  simp
 
 /-- Theorem 6: Lifting refl is refl. -/
 theorem lift_state_refl (f : TAState → TAState) (a : TAState) :
@@ -425,13 +425,13 @@ structure TransConfig where
 theorem trans_config_compose {a b c : TransConfig}
     (p : Path a b) (q : Path b c) :
     Path.trans (Path.trans p q) (Path.refl c) = Path.trans p q := by
-  simp [Path.trans_refl_right]
+  simp
 
 /-- Theorem 14: Transducer path symm distributes over trans. -/
 theorem trans_config_symm_dist {a b c : TransConfig}
     (p : Path a b) (q : Path b c) :
     Path.symm (Path.trans p q) = Path.trans (Path.symm q) (Path.symm p) := by
-  simp [Path.symm_trans]
+  simp
 
 /-! ## Pumping for Tree Languages -/
 
@@ -466,25 +466,25 @@ theorem path_symm_symm_auto {a b : AutoConfig}
 /-- Theorem 16: refl is left identity of trans. -/
 theorem path_refl_trans_auto {a b : AutoConfig}
     (p : Path a b) : Path.trans (Path.refl a) p = p := by
-  simp [Path.trans_refl_left]
+  simp
 
 /-- Theorem 17: refl is right identity of trans. -/
 theorem path_trans_refl_auto {a b : AutoConfig}
     (p : Path a b) : Path.trans p (Path.refl b) = p := by
-  simp [Path.trans_refl_right]
+  simp
 
 /-- Theorem 18: congrArg distributes over trans on AutoConfig. -/
 theorem path_congrArg_trans_auto (f : AutoConfig → AutoConfig)
     {a b c : AutoConfig} (p : Path a b) (q : Path b c) :
     Path.congrArg f (Path.trans p q) =
     Path.trans (Path.congrArg f p) (Path.congrArg f q) := by
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 19: congrArg distributes over symm on AutoConfig. -/
 theorem path_congrArg_symm_auto (f : AutoConfig → AutoConfig)
     {a b : AutoConfig} (p : Path a b) :
     Path.congrArg f (Path.symm p) = Path.symm (Path.congrArg f p) := by
-  simp [Path.congrArg_symm]
+  simp
 
 /-! ## Closure Under Homomorphism -/
 
@@ -523,7 +523,7 @@ theorem liftHom_trans (h : TreeHom) {t1 t2 t3 : GTerm}
     liftHomPath h (Path.trans p q) =
     Path.trans (liftHomPath h p) (liftHomPath h q) := by
   unfold liftHomPath
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 22: Lifting hom preserves symm. -/
 theorem liftHom_symm (h : TreeHom) {t1 t2 : GTerm}
@@ -531,7 +531,7 @@ theorem liftHom_symm (h : TreeHom) {t1 t2 : GTerm}
     liftHomPath h (Path.symm p) =
     Path.symm (liftHomPath h p) := by
   unfold liftHomPath
-  simp [Path.congrArg_symm]
+  simp
 
 /-- Theorem 23: Lifting hom preserves refl. -/
 theorem liftHom_refl (h : TreeHom) (t : GTerm) :
@@ -569,7 +569,7 @@ theorem stateMap_trans (sm : StateMap) {q1 q2 q3 : TAState}
     stateMapPath sm (Path.trans p r) =
     Path.trans (stateMapPath sm p) (stateMapPath sm r) := by
   unfold stateMapPath
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 25: State map path preserves symm. -/
 theorem stateMap_symm (sm : StateMap) {q1 q2 : TAState}
@@ -577,7 +577,7 @@ theorem stateMap_symm (sm : StateMap) {q1 q2 : TAState}
     stateMapPath sm (Path.symm p) =
     Path.symm (stateMapPath sm p) := by
   unfold stateMapPath
-  simp [Path.congrArg_symm]
+  simp
 
 /-! ## Congruence Closure -/
 
@@ -601,13 +601,13 @@ theorem path_implies_cong (sc : StateCong) {q1 q2 : TAState}
 theorem runSeg_assoc {a b c d : RunSegment}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simp [Path.trans_assoc]
+  simp
 
 /-- Theorem 28: Symm distributes over trans for RunSegment. -/
 theorem runSeg_symm_trans {a b c : RunSegment}
     (p : Path a b) (q : Path b c) :
     Path.symm (Path.trans p q) = Path.trans (Path.symm q) (Path.symm p) := by
-  simp [Path.symm_trans]
+  simp
 
 /-- Theorem 29: Double symm for RunSegment. -/
 theorem runSeg_symm_symm {a b : RunSegment}
@@ -717,7 +717,7 @@ theorem substRoot_trans (f : RankedSym) {t1 t2 t3 : GTerm}
     substRootPath f (Path.trans p q) =
     Path.trans (substRootPath f p) (substRootPath f q) := by
   unfold substRootPath
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 41: substRoot path preserves symm. -/
 theorem substRoot_symm (f : RankedSym) {t1 t2 : GTerm}
@@ -725,7 +725,7 @@ theorem substRoot_symm (f : RankedSym) {t1 t2 : GTerm}
     substRootPath f (Path.symm p) =
     Path.symm (substRootPath f p) := by
   unfold substRootPath
-  simp [Path.congrArg_symm]
+  simp
 
 /-! ## Embedding and Simulation -/
 
@@ -746,7 +746,7 @@ theorem sim_lift_trans {a1 a2 : BUTA} (sim : Simulation a1 a2)
     sim.liftPath (Path.trans p r) =
     Path.trans (sim.liftPath p) (sim.liftPath r) := by
   unfold Simulation.liftPath
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 43: Simulation lift preserves symm. -/
 theorem sim_lift_symm {a1 a2 : BUTA} (sim : Simulation a1 a2)
@@ -754,7 +754,7 @@ theorem sim_lift_symm {a1 a2 : BUTA} (sim : Simulation a1 a2)
     sim.liftPath (Path.symm p) =
     Path.symm (sim.liftPath p) := by
   unfold Simulation.liftPath
-  simp [Path.congrArg_symm]
+  simp
 
 /-! ## Projection Paths -/
 
@@ -769,14 +769,14 @@ theorem proj_fst_trans {q1 q2 q3 : TAState}
     (p : Path q1 q2) (r : Path q2 q3) :
     Path.congrArg projFst (Path.trans p r) =
     Path.trans (Path.congrArg projFst p) (Path.congrArg projFst r) := by
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 45: Projection paths compose with symm. -/
 theorem proj_snd_symm {q1 q2 : TAState}
     (p : Path q1 q2) :
     Path.congrArg projSnd (Path.symm p) =
     Path.symm (Path.congrArg projSnd p) := by
-  simp [Path.congrArg_symm]
+  simp
 
 /-! ## Recognizable Step Algebra -/
 
@@ -798,7 +798,7 @@ theorem extTrans_trans {e1 e2 e3 : ExtTransition}
     extTransPath (Path.trans p q) =
     Path.trans (extTransPath p) (extTransPath q) := by
   unfold extTransPath
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 47: Extended transition path preserves symm. -/
 theorem extTrans_symm {e1 e2 : ExtTransition}
@@ -806,7 +806,7 @@ theorem extTrans_symm {e1 e2 : ExtTransition}
     extTransPath (Path.symm p) =
     Path.symm (extTransPath p) := by
   unfold extTransPath
-  simp [Path.congrArg_symm]
+  simp
 
 /-! ## Determinization Path -/
 
@@ -833,7 +833,7 @@ theorem det_path_trans {ps1 ps2 ps3 : PowerState}
     detPath (Path.trans p q) =
     Path.trans (detPath p) (detPath q) := by
   unfold detPath
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 49: Determinization path preserves symm. -/
 theorem det_path_symm {ps1 ps2 : PowerState}
@@ -841,7 +841,7 @@ theorem det_path_symm {ps1 ps2 : PowerState}
     detPath (Path.symm p) =
     Path.symm (detPath p) := by
   unfold detPath
-  simp [Path.congrArg_symm]
+  simp
 
 /-! ## Grand Coherence Theorems -/
 
@@ -850,19 +850,19 @@ theorem functorial_comp (f g : TAState → TAState)
     {a b : TAState} (p : Path a b) :
     Path.congrArg g (Path.congrArg f p) =
     Path.congrArg (fun x => g (f x)) p := by
-  simp [Path.congrArg_comp]
+  simp
 
 /-- Theorem 51: Path algebra coherence for four-fold composition. -/
 theorem four_fold_assoc {a b c d e : TAState}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Path.trans (Path.trans (Path.trans p q) r) s =
     Path.trans p (Path.trans q (Path.trans r s)) := by
-  simp [Path.trans_assoc]
+  simp
 
 /-- Theorem 52: Triple symm. -/
 theorem triple_symm {a b : TAState}
     (p : Path a b) : Path.symm (Path.symm (Path.symm p)) = Path.symm p := by
-  simp [Path.symm_symm]
+  simp
 
 /-- Theorem 53: CongrArg of refl is refl. -/
 theorem congrArg_refl_state (f : TAState → TAState) (a : TAState) :
@@ -880,7 +880,7 @@ theorem contextPlug_trans (c : Context) {t1 t2 t3 : GTerm}
     contextPlugPath c (Path.trans p q) =
     Path.trans (contextPlugPath c p) (contextPlugPath c q) := by
   unfold contextPlugPath
-  simp [Path.congrArg_trans]
+  simp
 
 /-- Theorem 56: Context plug path preserves symm. -/
 theorem contextPlug_symm (c : Context) {t1 t2 : GTerm}
@@ -888,7 +888,7 @@ theorem contextPlug_symm (c : Context) {t1 t2 : GTerm}
     contextPlugPath c (Path.symm p) =
     Path.symm (contextPlugPath c p) := by
   unfold contextPlugPath
-  simp [Path.congrArg_symm]
+  simp
 
 /-- Theorem 57: Union of tree languages is associative. -/
 theorem treeLang_union_assoc (L1 L2 L3 : TreeLang) (t : GTerm) :

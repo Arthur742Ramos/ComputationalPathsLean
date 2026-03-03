@@ -180,7 +180,7 @@ theorem inLowerCentralN_zero (LA : PathLieAlg A) {a : A} (p : Path a a) :
 theorem nilpotent_implies_solvable_step (LA : PathLieAlg A) {a : A}
     (n : Nat) (p : Path a a)
     (h : inLowerCentralN LA n p → p = LA.zero a)
-    (hp : inDerivedN LA n p) :
+    (_hp : inDerivedN LA n p) :
     inLowerCentralN LA n p → p = LA.zero a := h
 
 /-! ## Representations -/

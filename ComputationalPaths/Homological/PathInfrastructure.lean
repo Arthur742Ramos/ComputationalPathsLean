@@ -86,10 +86,10 @@ noncomputable def hom_symm_distrib (p : Path a b) (q : Path b c) :
 noncomputable def hom_symm_symm (p : Path a b) :
     Path.symm (Path.symm p) = p := by
   cases p with
-  | mk steps proof => cases proof; simp [Path.symm, List.map_map, Function.comp]
+  | mk steps proof => cases proof; simp [Path.symm, List.map_map]
                       induction steps with
                       | nil => rfl
-                      | cons s t ih => simp [List.map, Step.symm_symm, ih]
+                      | cons s t ih => simp [List.map, ih]
 
 noncomputable def hom_congrArg_trans {B : Type u} (f : A → B)
     (p : Path a b) (q : Path b c) :

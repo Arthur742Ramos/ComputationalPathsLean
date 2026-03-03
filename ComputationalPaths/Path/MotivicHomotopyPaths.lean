@@ -177,8 +177,8 @@ structure GmSphere (G : Type u) where
 /-- Functorial action on Gm-sphere: mapping right-inverse through f. -/
 noncomputable def GmSphere.mapRightInv {G H : Type u} (f : G → H)
     (gm : GmSphere G) (hm : GmSphere H)
-    (fMul : ∀ x y, Path (f (gm.mul x y)) (hm.mul (f x) (f y)))
-    (fUnit : Path (f gm.unit) hm.unit)
+    (_fMul : ∀ x y, Path (f (gm.mul x y)) (hm.mul (f x) (f y)))
+    (_fUnit : Path (f gm.unit) hm.unit)
     (x : G) :
     Path (hm.mul (f x) (hm.inv (f x))) hm.unit :=
   hm.rightInvPath (f x)
@@ -500,8 +500,8 @@ theorem MotivicStabilization.triangle_toEq {C : Type u}
 /-- Stabilization is functorial: mapping via congrArg. -/
 noncomputable def MotivicStabilization.mapUnit {C D : Type u}
     (ms : MotivicStabilization C) (f : C → D)
-    (fSusp : ∀ x, Path (f (ms.susp x)) (f (ms.susp x)))
-    (fLoops : ∀ x, Path (f (ms.loops x)) (f (ms.loops x)))
+    (_fSusp : ∀ x, Path (f (ms.susp x)) (f (ms.susp x)))
+    (_fLoops : ∀ x, Path (f (ms.loops x)) (f (ms.loops x)))
     (x : C) :
     Path (f x) (f (ms.loops (ms.susp x))) :=
   Path.congrArg f (ms.unitPath x)

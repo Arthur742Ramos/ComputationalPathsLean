@@ -47,7 +47,7 @@ structure PathExteriorAlg (A : Type u) where
 /-! ## Basic wedge product theorems -/
 
 /-- Wedge of refl with anything is refl (from alternating + unit). -/
-theorem wedge_refl_left (EA : PathExteriorAlg A) (a : A) (p : Path a a) :
+theorem wedge_refl_left (EA : PathExteriorAlg A) (a : A) (_p : Path a a) :
     EA.wedge (refl a) (refl a) = refl a :=
   EA.wedge_self (refl a)
 
@@ -96,7 +96,7 @@ structure HasGrade (EA : PathExteriorAlg A) {a : A}
 /-- Wedge product of grade-k and grade-l element has grade k+l. -/
 theorem grade_add (EA : PathExteriorAlg A) {a : A}
     (p q : Path a a) (k l : Nat)
-    (hk : HasGrade EA p k) (hl : HasGrade EA q l) :
+    (_hk : HasGrade EA p k) (_hl : HasGrade EA q l) :
     HasGrade EA (EA.wedge p q) (k + l) :=
   ⟨trivial⟩
 

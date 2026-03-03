@@ -98,19 +98,19 @@ theorem mkTraceStepPath_symm_eq {u v : TraceWord Sym} (h : u = v) :
 
 theorem trace_trans_assoc (p : Path w x) (q : Path x y) (r : Path y z) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simpa using Path.trans_assoc p q r
+  simp
 
 theorem trace_trans_refl_left (p : Path w x) :
     Path.trans (Path.refl w) p = p := by
-  simpa using Path.trans_refl_left p
+  simp
 
 theorem trace_trans_refl_right (p : Path w x) :
     Path.trans p (Path.refl x) = p := by
-  simpa using Path.trans_refl_right p
+  simp
 
 theorem trace_symm_trans (p : Path w x) (q : Path x y) :
     Path.symm (Path.trans p q) = Path.trans (Path.symm q) (Path.symm p) := by
-  simpa using Path.symm_trans p q
+  simp
 
 theorem trace_symm_symm (p : Path w x) :
     Path.symm (Path.symm p) = p := by
@@ -120,36 +120,36 @@ theorem trace_congrArg_trans (f : TraceWord Sym → TraceWord Sym)
     (p : Path w x) (q : Path x y) :
     Path.congrArg f (Path.trans p q) =
       Path.trans (Path.congrArg f p) (Path.congrArg f q) := by
-  simpa using Path.congrArg_trans f p q
+  simp
 
 theorem trace_congrArg_symm (f : TraceWord Sym → TraceWord Sym)
     (p : Path w x) :
     Path.congrArg f (Path.symm p) = Path.symm (Path.congrArg f p) := by
-  simpa using Path.congrArg_symm f p
+  simp
 
 theorem trace_toEq_trans (p : Path w x) (q : Path x y) :
     (Path.trans p q).toEq = p.toEq.trans q.toEq := by
-  simpa using Path.toEq_trans p q
+  simp
 
 theorem trace_toEq_symm (p : Path w x) :
     (Path.symm p).toEq = p.toEq.symm := by
-  simpa using Path.toEq_symm p
+  simp
 
 theorem trace_congrArg_id (p : Path w x) :
     Path.congrArg (fun t : TraceWord Sym => t) p = p := by
-  simpa using Path.congrArg_id p
+  simp
 
 theorem trace_symm_refl (u : TraceWord Sym) :
     Path.symm (Path.refl u) = Path.refl u := by
-  simpa using Path.symm_refl u
+  simp
 
 theorem trace_toEq_symm_trans (p : Path w x) :
     (Path.trans (Path.symm p) p).toEq = rfl := by
-  simpa using Path.toEq_symm_trans p
+  simp
 
 theorem trace_toEq_trans_symm (p : Path w x) :
     (Path.trans p (Path.symm p)).toEq = rfl := by
-  simpa using Path.toEq_trans_symm p
+  simp
 
 end PathCore
 
@@ -175,13 +175,13 @@ theorem traceOne_left (u : TraceWord Sym) : traceMul traceOne u = u :=
   rfl
 
 theorem traceOne_right (u : TraceWord Sym) : traceMul u traceOne = u := by
-  simpa [traceMul, traceOne] using List.append_nil u
+  simp [traceMul, traceOne]
 
 theorem traceMul_nil_left (u : TraceWord Sym) : traceMul [] u = u :=
   rfl
 
 theorem traceMul_nil_right (u : TraceWord Sym) : traceMul u [] = u := by
-  simpa [traceMul] using List.append_nil u
+  simp [traceMul]
 
 theorem traceMul_cons (a : Sym) (u v : TraceWord Sym) :
     traceMul (a :: u) v = a :: traceMul u v :=
@@ -589,12 +589,12 @@ noncomputable def emptyDFA : DFA Gam (ULift.{u} Unit) where
 theorem fullDFA_recognizes_full :
     Recognizes fullDFA (langFull (Gam := Gam)) := by
   intro w
-  simp [Recognizes, DFA.accepts, DFA.run, langFull, fullDFA]
+  simp [DFA.accepts, langFull, fullDFA]
 
 theorem emptyDFA_recognizes_empty :
     Recognizes emptyDFA (langEmpty (Gam := Gam)) := by
   intro w
-  simp [Recognizes, DFA.accepts, DFA.run, langEmpty, emptyDFA]
+  simp [DFA.accepts, langEmpty, emptyDFA]
 
 theorem recognizable_full : TraceRecognizable (langFull (Gam := Gam)) := by
   refine ⟨ULift.{u} Unit, fullDFA, fullDFA_recognizes_full (Gam := Gam)⟩
@@ -663,11 +663,11 @@ theorem recognizable_implies_async {L : TraceLanguage Gam}
   intro w
   exact (dfaToAsync_accepts M w).trans (hM w)
 
-noncomputable def ZielonkaStatement (A : IndependenceAlphabet Gam) (L : TraceLanguage Gam) : Prop :=
+noncomputable def ZielonkaStatement (_A : IndependenceAlphabet Gam) (L : TraceLanguage Gam) : Prop :=
   TraceRecognizable (Gam := Gam) L →
     ∃ (State : Type u), ∃ M : AsyncAutomaton Gam State, AsyncRecognizes M L
 
-theorem zielonka_theorem (A : IndependenceAlphabet Gam) (L : TraceLanguage Gam)
+theorem zielonka_theorem (_A : IndependenceAlphabet Gam) (L : TraceLanguage Gam)
     (h : TraceRecognizable (Gam := Gam) L) :
     ∃ (State : Type u), ∃ M : AsyncAutomaton Gam State, AsyncRecognizes M L :=
   recognizable_implies_async (Gam := Gam) h
@@ -754,8 +754,8 @@ theorem traceRewrite_normalForm_all (w : TraceWord Gam) :
   exact hb.symm
 
 theorem traceRewrite_normal_form_unique {u v : TraceWord Gam}
-    (hu : NormalForm (TraceRewrite (Gam := Gam)) u)
-    (hv : NormalForm (TraceRewrite (Gam := Gam)) v)
+    (_hu : NormalForm (TraceRewrite (Gam := Gam)) u)
+    (_hv : NormalForm (TraceRewrite (Gam := Gam)) v)
     (h : TraceRewrite (Gam := Gam) u v) :
     u = v := by
   exact h

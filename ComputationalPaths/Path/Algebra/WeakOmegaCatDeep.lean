@@ -323,7 +323,7 @@ noncomputable def associator {α R} {a b c d : α}
 /-- Theorem 20: The associator is refl after normalization. -/
 theorem associator_eq_refl {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
-    ∃ h : Cell2 α R (comp0 (comp0 p q) r) (comp0 p (comp0 q r)), True := by
+    ∃ _h : Cell2 α R (comp0 (comp0 p q) r) (comp0 p (comp0 q r)), True := by
   exact ⟨associator p q r, trivial⟩
 
 /-- The associator inverse. -/
@@ -335,7 +335,7 @@ noncomputable def associatorInv {α R} {a b c d : α}
 /-- Theorem 21: Associator composed with its inverse yields identity-type cell. -/
 theorem associator_inv_comp {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
-    ∃ w : Cell2 α R (comp0 (comp0 p q) r) (comp0 (comp0 p q) r),
+    ∃ _w : Cell2 α R (comp0 (comp0 p q) r) (comp0 (comp0 p q) r),
       True := by
   exact ⟨comp1 (associator p q r) (associatorInv p q r), trivial⟩
 
@@ -357,12 +357,12 @@ noncomputable def rightUnitor {α R} {a b : α} (p : SPath α R a b) :
 
 /-- Theorem 22: Left unitor exists. -/
 theorem leftUnitor_exists {α R} {a b : α} (p : SPath α R a b) :
-    ∃ h : Cell2 α R (comp0 (id1 a) p) p, True := by
+    ∃ _h : Cell2 α R (comp0 (id1 a) p) p, True := by
   exact ⟨leftUnitor p, trivial⟩
 
 /-- Theorem 23: Right unitor exists. -/
 theorem rightUnitor_exists {α R} {a b : α} (p : SPath α R a b) :
-    ∃ h : Cell2 α R (comp0 p (id1 b)) p, True := by
+    ∃ _h : Cell2 α R (comp0 p (id1 b)) p, True := by
   exact ⟨rightUnitor p, trivial⟩
 
 /-- Left unitor inverse. -/
@@ -377,7 +377,7 @@ noncomputable def rightUnitorInv {α R} {a b : α} (p : SPath α R a b) :
 
 /-- Theorem 24: Left unitor round-trip. -/
 theorem leftUnitor_roundtrip {α R} {a b : α} (p : SPath α R a b) :
-    ∃ w : Cell2 α R (comp0 (id1 a) p) (comp0 (id1 a) p), True := by
+    ∃ _w : Cell2 α R (comp0 (id1 a) p) (comp0 (id1 a) p), True := by
   exact ⟨comp1 (leftUnitor p) (leftUnitorInv p), trivial⟩
 
 -- ============================================================
@@ -439,7 +439,7 @@ theorem pentagon_level0 {α R} {a b c d e : α}
 theorem pentagon_level1 {α R} {a b c d e : α}
     (p : SPath α R a b) (q : SPath α R b c)
     (r : SPath α R c d) (s : SPath α R d e) :
-    ∃ w : Cell2 α R
+    ∃ _w : Cell2 α R
       (comp0 (comp0 (comp0 p q) r) s)
       (comp0 p (comp0 q (comp0 r s))),
     True := by
@@ -450,7 +450,7 @@ theorem pentagon_level1 {α R} {a b c d e : α}
 theorem pentagon_level2 {α R} {a b c d e : α}
     (p : SPath α R a b) (q : SPath α R b c)
     (r : SPath α R c d) (s : SPath α R d e) :
-    ∃ w : Cell2 α R
+    ∃ _w : Cell2 α R
       (comp0 (comp0 (comp0 p q) r) s)
       (comp0 (comp0 (comp0 p q) r) s),
     True := by
@@ -466,7 +466,7 @@ theorem interchange_witness {α R} {a b c : α}
     {p₂ q₂ r₂ : SPath α R b c}
     (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R q₁ r₁)
     (k₁ : Cell2 α R p₂ q₂) (k₂ : Cell2 α R q₂ r₂) :
-    ∃ w : Cell2 α R (p₁.trans p₂) (r₁.trans r₂), True := by
+    ∃ _w : Cell2 α R (p₁.trans p₂) (r₁.trans r₂), True := by
   exact ⟨Cell2.hcomp (h₁.trans2 h₂) (k₁.trans2 k₂), trivial⟩
 
 /-- Theorem 32: Interchange with identities. -/
@@ -592,19 +592,19 @@ structure Contractible (α : Type) (R : α → α → Prop) where
 
 /-- Theorem 41: Contractible implies any two objects are connected. -/
 theorem contractible_connected {α R} (hc : Contractible α R) (x y : α) :
-    ∃ p : SPath α R x y, True := by
+    ∃ _p : SPath α R x y, True := by
   exact ⟨(hc.contract0 x).symm.trans (hc.contract0 y), trivial⟩
 
 /-- Theorem 42: Contractible implies all 1-cells are equal up to 2-cell. -/
 theorem contractible_1cell_eq {α R} (hc : Contractible α R) {a b : α}
     (p q : SPath α R a b) :
-    ∃ h : Cell2 α R p q, True := by
+    ∃ _h : Cell2 α R p q, True := by
   exact ⟨hc.contract1 p q, trivial⟩
 
 /-- Theorem 43: Contractible implies all 2-cells are equal up to 3-cell. -/
 theorem contractible_2cell_eq {α R} (hc : Contractible α R) {a b : α}
     {p q : SPath α R a b} (h₁ h₂ : Cell2 α R p q) :
-    ∃ m : Cell3 α R h₁ h₂, True := by
+    ∃ _m : Cell3 α R h₁ h₂, True := by
   exact ⟨hc.contract2 h₁ h₂, trivial⟩
 
 -- ============================================================

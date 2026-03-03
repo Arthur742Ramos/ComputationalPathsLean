@@ -408,7 +408,7 @@ structure HidaFamily (R : Type u) (ring : PathRing R) where
   /-- Eigenform at each weight. -/
   specialization : R → HeckeEigenform R ring
   /-- q-expansion is p-adically interpolated. -/
-  interpolation : ∀ n, R → R
+  interpolation : ∀ _n, R → R
   /-- Interpolation at integer weights gives classical coefficients. -/
   classical_compat : ∀ (k : R) (n : Nat),
     Path (interpolation n k) (interpolation n k)

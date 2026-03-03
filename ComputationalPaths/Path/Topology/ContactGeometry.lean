@@ -178,7 +178,7 @@ structure TBInequality (cs : ContactStructure) (L : LegendrianKnot cs) where
   inequality  : L.tb + Int.natAbs L.rot ≤ 2 * genus - 1
 
 /-- Bennequin bound for Legendrian knots. -/
-theorem bennequin_bound (cs : ContactStructure) (L : LegendrianKnot cs) :
+theorem bennequin_bound (cs : ContactStructure) (_L : LegendrianKnot cs) :
     True := trivial
 
 /-- Legendrian isotopy: two Legendrian knots related by a contact isotopy. -/
@@ -225,7 +225,7 @@ structure GrayStability where
   isotopy_zero : ∀ x, (isotopy 0).toFun x = x
 
 /-- Moser's method for contact forms: yields the diffeomorphisms. -/
-theorem gray_moser_method (gs : GrayStability) : True := trivial
+theorem gray_moser_method (_gs : GrayStability) : True := trivial
 
 /-! ## 7. Tight vs Overtwisted -/
 
@@ -334,7 +334,7 @@ structure ContactSurgery (cs : ContactStructure) where
 
 /-- (−1)-surgery preserves tightness (if the original is Stein fillable). -/
 theorem minus_one_surgery_tight (cs : ContactStructure)
-    (S : ContactSurgery cs) (h : S.coefficient = -1) : True := trivial
+    (S : ContactSurgery cs) (_h : S.coefficient = -1) : True := trivial
 
 /-- (+1)-surgery can create overtwisted structures. -/
 theorem plus_one_surgery_may_ot : True := trivial
@@ -372,7 +372,7 @@ structure WeinsteinConjecture (cs : ContactStructure) where
 
 /-- Taubes' proof of the Weinstein conjecture in dimension 3 via
     ECH = Seiberg-Witten Floer. -/
-theorem taubes_weinstein_dim3 (cs : ContactStructure) (h : cs.dim = 3) :
+theorem taubes_weinstein_dim3 (cs : ContactStructure) (_h : cs.dim = 3) :
     True := trivial
 
 /-! ## 14. Additional Theorems -/
@@ -402,14 +402,14 @@ theorem distribution_iff_zero (cs : ContactStructure) (p : cs.carrier)
   cs.distribution_eq p v
 
 theorem overtwisted_implies_not_fillable (cs : ContactStructure)
-    (ot : OvertwistedStructure cs) : True := trivial
+    (_ot : OvertwistedStructure cs) : True := trivial
 
 theorem reeb_flow_identity (cs : ContactStructure) (R : ReebFlow cs)
     (x : cs.carrier) : R.flow 0 x = x :=
   R.flow_zero x
 
 theorem conley_zehnder_parity (cs : ContactStructure)
-    (cz : ConleyZehnderIndex cs) : True := trivial
+    (_cz : ConleyZehnderIndex cs) : True := trivial
 
 theorem stabilisation_decreases_tb (cs : ContactStructure)
     (S : LegendrianStabilisation cs) :
@@ -453,7 +453,7 @@ theorem legendrianRewrite_refl {x y : LegendrianKnot cs} (p : Path x y) :
 theorem legendrianRewrite_coherence {x y z w : LegendrianKnot cs}
     (p : Path x y) (q : Path y z) (r : Path z w) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simpa using Path.trans_assoc p q r
+  simp
 
 end LegendrianRewrite
 

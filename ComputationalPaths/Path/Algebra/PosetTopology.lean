@@ -272,11 +272,11 @@ noncomputable def rwEq_cm_pure (P : PathPoset) (cm : CohenMacaulayPoset P)
 /-! ## Zeta Polynomials and Quillen-Type Fiber Data -/
 
 /-- Interval length proxy in a ranked poset. -/
-noncomputable def intervalLength (P : PathPoset) (_x y : P.P) : Nat :=
+noncomputable def intervalLength (P : PathPoset) (_x _y : P.P) : Nat :=
   0
 
 /-- Coefficient of the zeta polynomial at degree k (simplified). -/
-noncomputable def zetaPolynomialCoeff (P : PathPoset) (_k : Nat) : Int :=
+noncomputable def zetaPolynomialCoeff (_P : PathPoset) (_k : Nat) : Int :=
   0
 
 /-- Evaluation of the zeta polynomial at m (simplified). -/

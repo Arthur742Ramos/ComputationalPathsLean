@@ -39,7 +39,7 @@ abbrev Ctx := List Ty
 
 @[simp] noncomputable def Ctx.empty : Ctx := []
 @[simp] noncomputable def Ctx.extend (Γ : Ctx) (τ : Ty) : Ctx := τ :: Γ
-@[reducible] noncomputable def Ctx.lookup (Γ : Ctx) (n : Nat) : Option Ty := List.get? Γ n
+@[reducible] noncomputable def Ctx.lookup (Γ : Ctx) (n : Nat) : Option Ty := Γ[n]?
 
 -- 1
 theorem empty_lookup (n : Nat) : Ctx.lookup Ctx.empty n = none := rfl

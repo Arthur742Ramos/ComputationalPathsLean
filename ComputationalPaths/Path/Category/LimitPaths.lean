@@ -69,8 +69,8 @@ variable {A : Type u}
 
 theorem pair_unique_toEq {a b prod : A} (P : PathProduct a b prod)
     {x : A} (f : Path x a) (g : Path x b) (h : Path x prod)
-    (hf : (Path.trans h P.fst).toEq = f.toEq)
-    (hg : (Path.trans h P.snd).toEq = g.toEq) :
+    (_hf : (Path.trans h P.fst).toEq = f.toEq)
+    (_hg : (Path.trans h P.snd).toEq = g.toEq) :
     h.toEq = (P.pair x f g).toEq := Subsingleton.elim _ _
 
 /-- Product of an object with itself has a diagonal. -/
@@ -104,7 +104,7 @@ end PathProduct
 structure PathEqualizer {A : Type u} (f g : A → A) (a eq_obj : A) where
   incl : Path eq_obj a
   cond : f eq_obj = g eq_obj
-  factor : ∀ (x : A) (h : Path x a), f x = g x → Path x eq_obj
+  factor : ∀ (x : A) (_h : Path x a), f x = g x → Path x eq_obj
   factor_incl_toEq : ∀ (x : A) (h : Path x a) (hc : f x = g x),
     (Path.trans (factor x h hc) incl).toEq = h.toEq
 
@@ -113,7 +113,7 @@ variable {A : Type u}
 
 theorem factor_unique_toEq {f g : A → A} {a eq_obj : A}
     (E : PathEqualizer f g a eq_obj) {x : A} (h : Path x a)
-    (hc : f x = g x) (k : Path x eq_obj) (hk : (Path.trans k E.incl).toEq = h.toEq) :
+    (hc : f x = g x) (k : Path x eq_obj) (_hk : (Path.trans k E.incl).toEq = h.toEq) :
     k.toEq = (E.factor x h hc).toEq := Subsingleton.elim _ _
 
 end PathEqualizer
@@ -125,7 +125,7 @@ structure PathPullback {A : Type u} (f : A → A) (g : A → A) (a b pb : A) whe
   pbFst : Path pb a
   pbSnd : Path pb b
   square : f (pb) = g (pb)
-  pbPair : ∀ (x : A) (ha : Path x a) (hb : Path x b), f x = g x → Path x pb
+  pbPair : ∀ (x : A) (_ha : Path x a) (_hb : Path x b), f x = g x → Path x pb
   pbPair_fst_toEq : ∀ (x : A) (ha : Path x a) (hb : Path x b) (hc : f x = g x),
     (Path.trans (pbPair x ha hb hc) pbFst).toEq = ha.toEq
   pbPair_snd_toEq : ∀ (x : A) (ha : Path x a) (hb : Path x b) (hc : f x = g x),
@@ -137,8 +137,8 @@ variable {A : Type u}
 theorem pbPair_unique_toEq {f : A → A} {g : A → A} {a b pb : A}
     (P : PathPullback f g a b pb) {x : A}
     (ha : Path x a) (hb : Path x b) (hc : f x = g x)
-    (k : Path x pb) (kf : (Path.trans k P.pbFst).toEq = ha.toEq)
-    (kg : (Path.trans k P.pbSnd).toEq = hb.toEq) :
+    (k : Path x pb) (_kf : (Path.trans k P.pbFst).toEq = ha.toEq)
+    (_kg : (Path.trans k P.pbSnd).toEq = hb.toEq) :
     k.toEq = (P.pbPair x ha hb hc).toEq := Subsingleton.elim _ _
 
 end PathPullback
@@ -171,8 +171,8 @@ variable {A : Type u}
 
 theorem copair_unique_toEq {a b coprod : A} (C : PathCoproduct a b coprod)
     {x : A} (f : Path a x) (g : Path b x) (h : Path coprod x)
-    (hf : (Path.trans C.inl h).toEq = f.toEq)
-    (hg : (Path.trans C.inr h).toEq = g.toEq) :
+    (_hf : (Path.trans C.inl h).toEq = f.toEq)
+    (_hg : (Path.trans C.inr h).toEq = g.toEq) :
     h.toEq = (C.copair x f g).toEq := Subsingleton.elim _ _
 
 /-- Codiagonal (fold map). -/
@@ -205,7 +205,7 @@ end PathCoproduct
 structure PathCoequalizer {A : Type u} (f g : A → A) (a coeq : A) where
   proj : Path a coeq
   cond : f a = g a
-  cofactor : ∀ (x : A) (h : Path a x), f a = g a → Path coeq x
+  cofactor : ∀ (x : A) (_h : Path a x), f a = g a → Path coeq x
   cofactor_proj_toEq : ∀ (x : A) (h : Path a x) (hc : f a = g a),
     (Path.trans proj (cofactor x h hc)).toEq = h.toEq
 
@@ -214,7 +214,7 @@ variable {A : Type u}
 
 theorem cofactor_unique_toEq {f g : A → A} {a coeq : A}
     (E : PathCoequalizer f g a coeq) {x : A} (h : Path a x) (hc : f a = g a)
-    (k : Path coeq x) (hk : (Path.trans E.proj k).toEq = h.toEq) :
+    (k : Path coeq x) (_hk : (Path.trans E.proj k).toEq = h.toEq) :
     k.toEq = (E.cofactor x h hc).toEq := Subsingleton.elim _ _
 
 end PathCoequalizer
@@ -225,7 +225,7 @@ structure PathPushout {A : Type u} (f : A → A) (g : A → A) (a b po : A) wher
   poInl : Path a po
   poInr : Path b po
   square : f a = g a
-  poCopair : ∀ (x : A) (ha : Path a x) (hb : Path b x), f a = g a → Path po x
+  poCopair : ∀ (x : A) (_ha : Path a x) (_hb : Path b x), f a = g a → Path po x
   poCopair_inl_toEq : ∀ (x : A) (ha : Path a x) (hb : Path b x) (hc : f a = g a),
     (Path.trans poInl (poCopair x ha hb hc)).toEq = ha.toEq
   poCopair_inr_toEq : ∀ (x : A) (ha : Path a x) (hb : Path b x) (hc : f a = g a),
@@ -237,8 +237,8 @@ variable {A : Type u}
 theorem poCopair_unique_toEq {f g : A → A} {a b po : A}
     (P : PathPushout f g a b po) {x : A}
     (ha : Path a x) (hb : Path b x) (hc : f a = g a)
-    (k : Path po x) (kf : (Path.trans P.poInl k).toEq = ha.toEq)
-    (kg : (Path.trans P.poInr k).toEq = hb.toEq) :
+    (k : Path po x) (_kf : (Path.trans P.poInl k).toEq = ha.toEq)
+    (_kg : (Path.trans P.poInr k).toEq = hb.toEq) :
     k.toEq = (P.poCopair x ha hb hc).toEq := Subsingleton.elim _ _
 
 end PathPushout
@@ -315,7 +315,7 @@ noncomputable def coneMorphComp {A : Type u} {D : LimPEF A} {c c' c'' : A}
     (f : PathConeMorphism K K') (g : PathConeMorphism K' K'') :
     PathConeMorphism K K'' where
   morph := Path.trans f.morph g.morph
-  compat_toEq a := Subsingleton.elim _ _
+  compat_toEq _a := Subsingleton.elim _ _
 
 theorem coneMorphComp_morph {A : Type u} {D : LimPEF A} {c c' c'' : A}
     {K : PathCone D c} {K' : PathCone D c'} {K'' : PathCone D c''}
@@ -328,7 +328,7 @@ noncomputable def coconeMorphComp {A : Type u} {D : LimPEF A} {c c' c'' : A}
     (f : PathCoconeMorphism K K') (g : PathCoconeMorphism K' K'') :
     PathCoconeMorphism K K'' where
   morph := Path.trans f.morph g.morph
-  compat_toEq a := Subsingleton.elim _ _
+  compat_toEq _a := Subsingleton.elim _ _
 
 theorem coconeMorphComp_morph {A : Type u} {D : LimPEF A} {c c' c'' : A}
     {K : PathCocone D c} {K' : PathCocone D c'} {K'' : PathCocone D c''}

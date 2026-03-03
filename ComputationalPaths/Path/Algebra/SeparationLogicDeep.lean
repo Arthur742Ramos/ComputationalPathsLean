@@ -222,22 +222,22 @@ theorem heapPath_trans_assoc_toEq {h1 h2 h3 h4 : Heap}
     (p : HeapPath h1 h2) (q : HeapPath h2 h3) (r : HeapPath h3 h4) :
     (HeapPath.trans' (HeapPath.trans' p q) r).path.toEq =
     (HeapPath.trans' p (HeapPath.trans' q r)).path.toEq := by
-  simp [HeapPath.trans']
+  simp
 
 -- Theorem 15: Heap path left identity (via toEq)
 theorem heapPath_trans_refl_left_toEq {h1 h2 : Heap} (p : HeapPath h1 h2) :
     (HeapPath.trans' (HeapPath.rfl' h1) p).path.toEq = p.path.toEq := by
-  simp [HeapPath.trans', HeapPath.rfl']
+  simp
 
 -- Theorem 16: Heap path right identity (via toEq)
 theorem heapPath_trans_refl_right_toEq {h1 h2 : Heap} (p : HeapPath h1 h2) :
     (HeapPath.trans' p (HeapPath.rfl' h2)).path.toEq = p.path.toEq := by
-  simp [HeapPath.trans', HeapPath.rfl']
+  simp
 
 -- Theorem 17: Heap path symm involution (via toEq)
 theorem heapPath_symm_symm_toEq {h1 h2 : Heap} (p : HeapPath h1 h2) :
     (HeapPath.symm' (HeapPath.symm' p)).path.toEq = p.path.toEq := by
-  simp [HeapPath.symm']
+  simp
 
 -- =====================================================================
 -- Section 8: Command Path Algebra
@@ -358,13 +358,13 @@ theorem emp_star_right_bwd (P : Assertion) (h : Heap) :
 -- Theorem 32: Star monotonicity left
 noncomputable def star_mono_left {P P' Q : Assertion}
     (e : AssertionPath P P') : AssertionPath (P ⋆ Q) (P' ⋆ Q) :=
-  ⟨fun h ⟨h1, h2, hdisj, heq, hp, hq⟩ =>
+  ⟨fun _h ⟨h1, h2, hdisj, heq, hp, hq⟩ =>
     ⟨h1, h2, hdisj, heq, e.witness h1 hp, hq⟩⟩
 
 -- Theorem 33: Star monotonicity right
 noncomputable def star_mono_right {P Q Q' : Assertion}
     (e : AssertionPath Q Q') : AssertionPath (P ⋆ Q) (P ⋆ Q') :=
-  ⟨fun h ⟨h1, h2, hdisj, heq, hp, hq⟩ =>
+  ⟨fun _h ⟨h1, h2, hdisj, heq, hp, hq⟩ =>
     ⟨h1, h2, hdisj, heq, hp, e.witness h2 hq⟩⟩
 
 -- Theorem 34: Wand monotonicity

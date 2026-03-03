@@ -17,7 +17,7 @@ noncomputable def pentagon_identity {A : Type u} {a b c d e : A}
           (ComputationalPaths.Path.trans_assoc p (ComputationalPaths.Path.trans q r) s)
           (_root_.congrArg (fun t => ComputationalPaths.Path.trans p t)
             (ComputationalPaths.Path.trans_assoc q r s))) := by
-  simpa using ComputationalPaths.Path.trans_assoc_pentagon (p := p) (q := q) (r := r) (s := s)
+  simp
 
 noncomputable def triangle_identity {A : Type u} {a b c : A}
     (p : ComputationalPaths.Path a b) (q : ComputationalPaths.Path b c) :

@@ -49,23 +49,23 @@ def HasRLP {a b c d : A} (p : Path c d) (i : Path a b) : Prop :=
 
 /-- The left orthogonal complement: all paths having LLP w.r.t. every element of S. -/
 def leftPerp (S : {x y : A} → Path x y → Prop) : {x y : A} → Path x y → Prop :=
-  fun {a b} i => ∀ {c d : A} (p : Path c d), S p → HasLLP i p
+  fun {_a _b} i => ∀ {c d : A} (p : Path c d), S p → HasLLP i p
 
 /-- The right orthogonal complement: all paths having RLP w.r.t. every element of S. -/
 def rightPerp (S : {x y : A} → Path x y → Prop) : {x y : A} → Path x y → Prop :=
-  fun {c d} p => ∀ {a b : A} (i : Path a b), S i → HasRLP p i
+  fun {_c _d} p => ∀ {a b : A} (i : Path a b), S i → HasRLP p i
 
 /-- Double right perp contains the original class. -/
 theorem rightPerp_rightPerp_contains
     (S : {x y : A} → Path x y → Prop) {a b : A} (f : Path a b)
     (hf : S f) : rightPerp (leftPerp S) f :=
-  fun i hi => hi f hf
+  fun _i hi => hi f hf
 
 /-- Double left perp contains the original class. -/
 theorem leftPerp_leftPerp_contains
     (S : {x y : A} → Path x y → Prop) {a b : A} (f : Path a b)
     (hf : S f) : leftPerp (rightPerp S) f :=
-  fun p hp => hp f hf
+  fun _p hp => hp f hf
 
 /-! ## Closure properties of lifting classes -/
 

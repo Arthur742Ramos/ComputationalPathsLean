@@ -204,9 +204,7 @@ theorem glue_comp_assoc_toEq {a : A} {x y : MappingCylinder f}
     (q : Path (inTarget (f := f) (f a)) x) (r : Path x y) :
     (Path.trans (Path.trans (glue (f := f) a) q) r).toEq =
       (Path.trans (glue (f := f) a) (Path.trans q r)).toEq := by
-  simpa [glueClass] using
-    congrArg (PathRwQuot.toEq (A := MappingCylinder f))
-      (glueClass_assoc (f := f) (a := a) q r)
+  simp
 
 theorem glue_trans_refl_left (a : A) :
     Path.trans (Path.refl (bottom (f := f) a)) (glue (f := f) a) = glue (f := f) a :=
@@ -215,9 +213,7 @@ theorem glue_trans_refl_left (a : A) :
 theorem glue_trans_refl_left_toEq (a : A) :
     (Path.trans (Path.refl (bottom (f := f) a)) (glue (f := f) a)).toEq =
       (glue (f := f) a).toEq := by
-  simpa [glueClass] using
-    congrArg (PathRwQuot.toEq (A := MappingCylinder f))
-      (glueClass_trans_refl_left (f := f) a)
+  simp
 
 theorem glue_trans_refl_right (a : A) :
     Path.trans (glue (f := f) a) (Path.refl (inTarget (f := f) (f a))) = glue (f := f) a :=
@@ -226,9 +222,7 @@ theorem glue_trans_refl_right (a : A) :
 theorem glue_trans_refl_right_toEq (a : A) :
     (Path.trans (glue (f := f) a) (Path.refl (inTarget (f := f) (f a)))).toEq =
       (glue (f := f) a).toEq := by
-  simpa [glueClass] using
-    congrArg (PathRwQuot.toEq (A := MappingCylinder f))
-      (glueClass_trans_refl_right (f := f) a)
+  simp
 
 -- Note: glue_trans_symm and glue_symm_trans claim
 -- `Path.trans p (Path.symm p) = Path.refl _` which requires the steps list

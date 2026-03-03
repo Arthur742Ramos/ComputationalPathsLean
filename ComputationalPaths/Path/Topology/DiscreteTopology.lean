@@ -225,22 +225,22 @@ noncomputable def optimal_eq (K : CellComplex) (O : OptimalDiscreteMorse K) (k :
 
 /-! ## Additional Theorem Stubs -/
 
-theorem cellsOfDim_subset (K : CellComplex) (d : Nat) (c : Cell) : True := trivial
+theorem cellsOfDim_subset (_K : CellComplex) (_d : Nat) (_c : Cell) : True := trivial
 
-theorem numCells_eq_length (K : CellComplex) (k : Nat) : True := trivial
+theorem numCells_eq_length (_K : CellComplex) (_k : Nat) : True := trivial
 
-theorem unmatchedCells_subset (K : CellComplex) (V : GradientVectorField K) (c : Cell) : True := trivial
+theorem unmatchedCells_subset (K : CellComplex) (_V : GradientVectorField K) (_c : Cell) : True := trivial
 
-theorem matchingCriticalCells_subset (K : CellComplex) (M : AcyclicMatching K) (c : Cell) : True := trivial
+theorem matchingCriticalCells_subset (K : CellComplex) (_M : AcyclicMatching K) (_c : Cell) : True := trivial
 
-theorem collapse_homotopy_path_symm (K : CellComplex) (e : ElementaryCollapse K) : True := trivial
+theorem collapse_homotopy_path_symm (K : CellComplex) (_e : ElementaryCollapse K) : True := trivial
 
-theorem weak_discrete_morse_bound (K : CellComplex) (I : DiscreteMorseInequalities K) (k : Nat) : True := trivial
+theorem weak_discrete_morse_bound (K : CellComplex) (_I : DiscreteMorseInequalities K) (_k : Nat) : True := trivial
 
-theorem optimal_eq_symmetric (K : CellComplex) (O : OptimalDiscreteMorse K) (k : Nat) : True := trivial
+theorem optimal_eq_symmetric (K : CellComplex) (_O : OptimalDiscreteMorse K) (_k : Nat) : True := trivial
 
 theorem critical_count_formula (K : CellComplex) (f : DiscreteMorseFunction K)
-    (C : CriticalCells K f) (k : Nat) : True := trivial
+    (_C : CriticalCells K f) (_k : Nat) : True := trivial
 
 
 end DiscreteMorse

@@ -102,7 +102,7 @@ theorem sigmaPowS0_eq_sphereN (n : Nat) :
   | zero =>
       rfl
   | succ n ih =>
-      simpa [iterSusp, SphereN, ih]
+      simp [iterSusp, SphereN, ih]
 
 noncomputable abbrev sphereNorth (n : Nat) : SphereN (Nat.succ n) := north (SphereN n)
 

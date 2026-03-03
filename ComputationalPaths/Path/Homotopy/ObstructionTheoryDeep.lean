@@ -264,7 +264,7 @@ structure PostnikovStage (X : Type u) (base : X) (n : Nat) where
   piPreserved : ∀ k, k ≤ n →
     (πX : HomotopyGroupData X base k) →
     (πS : HomotopyGroupData stage stageBase k) →
-    ∀ x : πX.carrier, ∃ y : πS.carrier, True
+    ∀ _x : πX.carrier, ∃ _y : πS.carrier, True
   /-- πₖ for k > n is trivial. -/
   piTrivial : ∀ k, n < k →
     (πS : HomotopyGroupData stage stageBase k) →
@@ -316,7 +316,7 @@ noncomputable def compat_path (pm : PostnikovMap X base n) (x : X) :
 noncomputable def tower_compose {m : Nat} (pm1 : PostnikovMap X base n)
     (pm2 : PostnikovMap X base m)
     (h : pm2.lower.stage = pm1.upper.stage)
-    (hBase : h ▸ pm2.lower.stageBase = pm1.upper.stageBase) :
+    (_hBase : h ▸ pm2.lower.stageBase = pm1.upper.stageBase) :
     ∀ x : X, pm1.connect (pm1.upper.truncMap x) = pm1.lower.truncMap x :=
   pm1.compat
 

@@ -38,7 +38,7 @@ noncomputable def fiber_id (b : A) : Fiber (fun x : A => x) b where
 theorem fiber_id_point (b : A) : (fiber_id b).point = b := rfl
 
 noncomputable def fiber_const_of_path {b₀ b : B}
-    (p : Path b₀ b) : Fiber (fun _ : A => b₀) b₀ → Fiber (fun _ : A => b₀) b₀ :=
+    (_p : Path b₀ b) : Fiber (fun _ : A => b₀) b₀ → Fiber (fun _ : A => b₀) b₀ :=
   fun fib => fib
 
 /-! ## Sections and retractions -/

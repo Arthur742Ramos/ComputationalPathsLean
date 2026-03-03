@@ -52,12 +52,12 @@ structure BorelSet (X : Type u) (τ : Topology X) where
   level : BorelLevel
 
 /-- Open Borel set. -/
-noncomputable def mkOpenBorel {X : Type u} (τ : Topology X) (U : X → Prop) (h : τ.isOpen U) :
+noncomputable def mkOpenBorel {X : Type u} (τ : Topology X) (U : X → Prop) (_h : τ.isOpen U) :
     BorelSet X τ :=
   ⟨U, BorelLevel.open_⟩
 
 /-- Closed Borel set. -/
-noncomputable def mkClosedBorel {X : Type u} (τ : Topology X) (C : X → Prop) (h : isClosed τ C) :
+noncomputable def mkClosedBorel {X : Type u} (τ : Topology X) (C : X → Prop) (_h : isClosed τ C) :
     BorelSet X τ :=
   ⟨C, BorelLevel.closed_⟩
 
@@ -104,7 +104,7 @@ theorem dense_univ {X : Type u} (τ : Topology X) :
 
 /-- Dense sets are nonempty in nonempty spaces. -/
 theorem dense_nonempty {X : Type u} (τ : Topology X) (D : X → Prop)
-    (hD : isDense τ D) (hne : ∃ x : X, True) :
+    (hD : isDense τ D) (hne : ∃ _x : X, True) :
     ∃ x, D x := by
   obtain ⟨x, _⟩ := hne
   obtain ⟨y, _, hy⟩ := hD _ τ.open_univ ⟨x, trivial⟩
@@ -198,7 +198,7 @@ theorem transport_membership {X : Type u} (S : X → Prop)
     Path.transport (D := fun x => S x → S x) p id = id := by
   cases p with
   | mk steps proof =>
-    cases proof; simp [Path.transport]
+    cases proof; simp
 
 /-- Trans path for topology. -/
 noncomputable def topology_trans_path {X : Type u} (x₁ x₂ x₃ : X)
@@ -242,7 +242,7 @@ theorem transport_open {X : Type u} (τ : Topology X)
     Path.transport (D := fun U => τ.isOpen U → τ.isOpen U) p id = id := by
   cases p with
   | mk steps proof =>
-    cases proof; simp [Path.transport]
+    cases proof; simp
 
 /-- CongrArg on derived set. -/
 noncomputable def derived_congrArg {X : Type u} (τ : Topology X) (S₁ S₂ : X → Prop)

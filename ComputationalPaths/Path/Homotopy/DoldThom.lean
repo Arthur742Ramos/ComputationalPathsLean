@@ -100,7 +100,7 @@ abbrev ReducedHomology (_X : Type u) : Type (u + 1) :=
 
 /-- The n-th homotopy group of the infinite symmetric product of `X`.
     Stub implementation since HigherHomotopyGroups has universe issues. -/
-abbrev symmProdInfPi (n : ℕ) (X : Type u) : Type u :=
+abbrev symmProdInfPi (_n : ℕ) (_X : Type u) : Type u :=
   PUnit  -- Placeholder: proper definition requires HigherHomotopyGroups
 
 /-- Data of the Dold-Thom theorem: homotopy of `SP^infty(X)` matches homology. -/

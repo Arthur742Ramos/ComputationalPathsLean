@@ -302,21 +302,21 @@ structure HandleRearrangement (n : Nat) where
 
 /-! ## Additional Theorem Stubs -/
 
-theorem handle_attachment_boundary_reflexive (n : Nat) (A : HandleAttachment n) : True := trivial
+theorem handle_attachment_boundary_reflexive (n : Nat) (_A : HandleAttachment n) : True := trivial
 
-theorem handle_slide_index_symmetric (n : Nat) (s : HandleSlideData n) : True := trivial
+theorem handle_slide_index_symmetric (n : Nat) (_s : HandleSlideData n) : True := trivial
 
-theorem handle_slide_roundtrip_rweq (n : Nat) (s : HandleSlideData n) : True := trivial
+theorem handle_slide_roundtrip_rweq (n : Nat) (_s : HandleSlideData n) : True := trivial
 
-theorem cancellation_consecutive_symmetric (n : Nat) (c : HandleCancellation n) : True := trivial
+theorem cancellation_consecutive_symmetric (n : Nat) (_c : HandleCancellation n) : True := trivial
 
-theorem cancellation_roundtrip_rweq (n : Nat) (c : HandleCancellation n) : True := trivial
+theorem cancellation_roundtrip_rweq (n : Nat) (_c : HandleCancellation n) : True := trivial
 
-theorem cw_cell_count_path (n : Nat) (C : CWFromHandles n) (k : Nat) : True := trivial
+theorem cw_cell_count_path (n : Nat) (_C : CWFromHandles n) (_k : Nat) : True := trivial
 
-theorem kirby_component_count_path (K : KirbyDiagram) : True := trivial
+theorem kirby_component_count_path (_K : KirbyDiagram) : True := trivial
 
-theorem rearrangement_count_symmetric (n : Nat) (R : HandleRearrangement n) : True := trivial
+theorem rearrangement_count_symmetric (n : Nat) (_R : HandleRearrangement n) : True := trivial
 
 
 end HandleBody

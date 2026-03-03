@@ -53,7 +53,7 @@ structure GaloisCategory where
   coproductDecomp : Prop := True
 
 /-- An object is connected if it cannot be decomposed as a nontrivial coproduct. -/
-noncomputable def IsConnected (C : GaloisCategory.{u,v}) (x : C.carrier.Obj) : Prop :=
+noncomputable def IsConnected (C : GaloisCategory.{u,v}) (_x : C.carrier.Obj) : Prop :=
   True -- placeholder
 
 /-- A Galois object: connected X such that Aut(X) acts transitively on F(X). -/
@@ -78,7 +78,7 @@ structure ProfiniteGroup where
 noncomputable def fundamentalGroup (C : GaloisCategory.{u,v}) : ProfiniteGroup.{u,v} where
   Index := C.carrier.Obj
   quotient := fun x => Aut C.carrier x
-  transition := fun f => C.carrier.id _  -- placeholder transition
+  transition := fun _f => C.carrier.id _  -- placeholder transition
 
 /-- A covering of an object X: an object over X with finite fibers. -/
 structure Covering (C : GaloisCategory.{u,v}) (X : C.carrier.Obj) where
@@ -121,7 +121,7 @@ noncomputable def etaleHomotopyType (C : GaloisCategory.{u,v}) : ProSpace.{u} wh
   transition := fun _ => PUnit.unit
 
 /-- Higher étale fundamental group π_n^ét. -/
-noncomputable def etaleHomotopyGroup (C : GaloisCategory.{u,v}) (n : Nat)
+noncomputable def etaleHomotopyGroup (C : GaloisCategory.{u,v}) (_n : Nat)
     (x₀ : C.carrier.Obj) : Type u :=
   (etaleHomotopyType C).space x₀
 
@@ -132,7 +132,7 @@ noncomputable def classifyingSpace (C : GaloisCategory.{u,v}) : ProSpace.{u} :=
 /-- Galois closure of an object: the smallest Galois object through which
     a given covering factors. -/
 noncomputable def galoisClosure (C : GaloisCategory.{u,v}) (x : C.carrier.Obj)
-    (hx : IsConnected C x) : C.carrier.Obj := x
+    (_hx : IsConnected C x) : C.carrier.Obj := x
 
 /-- Fixed points of a group action: objects invariant under π₁-action. -/
 noncomputable def fixedPoints (C : GaloisCategory.{u,v}) (x : C.carrier.Obj) : Type u :=
@@ -142,7 +142,7 @@ noncomputable def fixedPoints (C : GaloisCategory.{u,v}) (x : C.carrier.Obj) : T
 
 /-- Grothendieck's main theorem: equivalence between the Galois category
     and π₁-FinSet. -/
-theorem grothendieck_galois_correspondence (C : GaloisCategory.{u,v}) :
+theorem grothendieck_galois_correspondence (_C : GaloisCategory.{u,v}) :
     True := by -- C ≃ π₁(C)-FinSet
   trivial
 
@@ -153,31 +153,31 @@ theorem galois_closure_exists (C : GaloisCategory.{u,v})
   exact ⟨x, hx, trivial⟩
 
 /-- The fundamental group is profinite. -/
-theorem fundamental_group_profinite (C : GaloisCategory.{u,v}) :
+theorem fundamental_group_profinite (_C : GaloisCategory.{u,v}) :
     True := by -- π₁(C) is a profinite group
   trivial
 
 /-- Coverings of X correspond to π₁(X)-sets. -/
 theorem coverings_classification (C : GaloisCategory.{u,v})
-    (X : C.carrier.Obj) :
+    (_X : C.carrier.Obj) :
     True := by -- Cov(X) ≃ π₁(X, x)-Set
   trivial
 
 /-- Connected coverings correspond to conjugacy classes of subgroups of π₁. -/
 theorem connected_coverings_subgroups (C : GaloisCategory.{u,v})
-    (X : C.carrier.Obj) :
+    (_X : C.carrier.Obj) :
     True := by
   trivial
 
 /-- The fiber functor is exact (preserves finite limits and colimits). -/
-theorem fiber_functor_exact (C : GaloisCategory.{u,v}) :
+theorem fiber_functor_exact (_C : GaloisCategory.{u,v}) :
     True := by
   trivial
 
 /-- The fundamental group is functorial in pointed Galois categories. -/
 theorem fundamental_group_functorial
     (C D : GaloisCategory.{u,v})
-    (F : C.carrier.Obj → D.carrier.Obj) :
+    (_F : C.carrier.Obj → D.carrier.Obj) :
     True := by
   trivial
 
@@ -187,38 +187,38 @@ theorem profinite_completion_adjunction :
   trivial
 
 /-- The étale homotopy type recovers π₁ in dimension 1. -/
-theorem etale_homotopy_recovers_pi1 (C : GaloisCategory.{u,v}) :
+theorem etale_homotopy_recovers_pi1 (_C : GaloisCategory.{u,v}) :
     True := by
   trivial
 
 /-- Galois objects form a filtered system. -/
-theorem galois_objects_filtered (C : GaloisCategory.{u,v}) :
+theorem galois_objects_filtered (_C : GaloisCategory.{u,v}) :
     True := by
   trivial
 
 /-- The fundamental group of a product is the product of fundamental groups. -/
-theorem pi1_product (C D : GaloisCategory.{u,v}) :
+theorem pi1_product (_C _D : GaloisCategory.{u,v}) :
     True := by
   trivial
 
 /-- Van Kampen theorem for Galois categories: π₁ of pushout is amalgam. -/
-theorem van_kampen (C : GaloisCategory.{u,v}) :
+theorem van_kampen (_C : GaloisCategory.{u,v}) :
     True := by
   trivial
 
 /-- Short exact sequence: 1 → π₁(X̄) → π₁(X) → Gal(k̄/k) → 1 for varieties. -/
-theorem galois_exact_sequence (C : GaloisCategory.{u,v}) :
+theorem galois_exact_sequence (_C : GaloisCategory.{u,v}) :
     True := by
   trivial
 
 /-- Comparison: for a nice topological space, π₁^ét ≅ profinite completion of π₁^top. -/
-theorem etale_topological_comparison (C : GaloisCategory.{u,v}) :
+theorem etale_topological_comparison (_C : GaloisCategory.{u,v}) :
     True := by
   trivial
 
 /-- The exodromy equivalence: locally constant sheaves ≃ functors from the
     étale homotopy type. -/
-theorem exodromy_equivalence (C : GaloisCategory.{u,v}) :
+theorem exodromy_equivalence (_C : GaloisCategory.{u,v}) :
     True := by
   trivial
 

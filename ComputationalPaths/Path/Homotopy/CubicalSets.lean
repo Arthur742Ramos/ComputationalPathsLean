@@ -145,7 +145,7 @@ structure OpenBox (C : Type u) (csd : CubicalSetData C) (n : Nat)
   /-- The faces of the box (all except (i, ε)). -/
   faces : (j : Fin (n + 1)) → (δ_dir : FaceDir) → csd.graded.cells n
   /-- Compatibility: adjacent faces agree on their shared boundary. -/
-  compat : ∀ (j k : Fin (n + 1)) (δ₁ δ₂ : FaceDir),
+  compat : ∀ (_j k : Fin (n + 1)) (_δ₁ _δ₂ : FaceDir),
     Path (faces k δ₂) (faces k δ₂)
 
 /-- A box filler: an (n+1)-cube whose faces match the open box. -/
@@ -170,7 +170,7 @@ structure CubicalSphere (C : Type u) (csd : CubicalSetData C) (n : Nat)
     (basepoint : csd.graded.cells 0) where
   cell : csd.graded.cells n
   /-- All faces are degenerate from the basepoint. -/
-  boundary_trivial : ∀ (i : Fin (n + 1)) (ε : FaceDir),
+  boundary_trivial : ∀ (_i : Fin (n + 1)) (_ε : FaceDir),
     Path cell cell
 
 /-- Homotopy between cubical spheres: an (n+1)-cube interpolating. -/

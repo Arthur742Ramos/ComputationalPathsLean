@@ -43,19 +43,19 @@ theorem mkStepPath_symm_toEq {A : Type u} {a b : A} (h : a = b) :
 
 theorem mkStepPath_trans_symm_toEq {A : Type u} {a b : A} (h : a = b) :
     Path.toEq (Path.trans (mkStepPath h) (Path.symm (mkStepPath h))) = rfl := by
-  simpa using (Path.toEq_trans_symm (p := mkStepPath h))
+  simp
 
 theorem mkStepPath_symm_trans_toEq {A : Type u} {a b : A} (h : a = b) :
     Path.toEq (Path.trans (Path.symm (mkStepPath h)) (mkStepPath h)) = rfl := by
-  simpa using (Path.toEq_symm_trans (p := mkStepPath h))
+  simp
 
 theorem mkStepPath_refl_left {A : Type u} {a b : A} (h : a = b) :
     Path.trans (Path.refl a) (mkStepPath h) = mkStepPath h := by
-  simpa using (Path.trans_refl_left (p := mkStepPath h))
+  simp
 
 theorem mkStepPath_refl_right {A : Type u} {a b : A} (h : a = b) :
     Path.trans (mkStepPath h) (Path.refl b) = mkStepPath h := by
-  simpa using (Path.trans_refl_right (p := mkStepPath h))
+  simp
 
 structure CommRing where
   ident : Nat
@@ -282,15 +282,15 @@ theorem inter_comm_path_toEq (I J : CommIdeal) :
 
 theorem add_comm_roundtrip_toEq (I J : CommIdeal) :
     Path.toEq (Path.trans (add_comm_path I J) (Path.symm (add_comm_path I J))) = rfl := by
-  simpa using (Path.toEq_trans_symm (p := add_comm_path I J))
+  simp
 
 theorem mul_comm_roundtrip_toEq (I J : CommIdeal) :
     Path.toEq (Path.trans (mul_comm_path I J) (Path.symm (mul_comm_path I J))) = rfl := by
-  simpa using (Path.toEq_trans_symm (p := mul_comm_path I J))
+  simp
 
 theorem inter_comm_roundtrip_toEq (I J : CommIdeal) :
     Path.toEq (Path.trans (inter_comm_path I J) (Path.symm (inter_comm_path I J))) = rfl := by
-  simpa using (Path.toEq_trans_symm (p := inter_comm_path I J))
+  simp
 
 noncomputable def add_comm_congr_mul_left (I J K : CommIdeal) :
     Path (CommIdeal.mul (CommIdeal.add I J) K) (CommIdeal.mul (CommIdeal.add J I) K) :=
@@ -450,7 +450,7 @@ theorem primary_radical_eq (I : CommIdeal) :
 
 theorem primary_component_isPrimary (I : CommIdeal) :
     CommIdeal.isPrimary (recombinePrimary (primaryDecomposition I)) := by
-  simp [primaryDecomposition, recombinePrimary, CommIdeal.isPrimary]
+  simp [CommIdeal.isPrimary]
 
 structure Fraction where
   num : Nat
@@ -494,7 +494,7 @@ theorem fraction_mul_comm_path_toEq (x y : Fraction) :
 theorem fraction_mul_roundtrip_toEq (x y : Fraction) :
     Path.toEq (Path.trans (mkStepPath (fraction_mul_comm_eq x y))
       (Path.symm (mkStepPath (fraction_mul_comm_eq x y)))) = rfl := by
-  simpa using (Path.toEq_trans_symm (p := mkStepPath (fraction_mul_comm_eq x y)))
+  simp
 
 theorem fraction_num_congr_toEq (x y : Fraction) :
     Path.toEq (Path.congrArg Fraction.num (mkStepPath (fraction_mul_comm_eq x y))) =
@@ -539,7 +539,7 @@ theorem tensor_comm_path_toEq (M N : ModObj) :
 theorem tensor_roundtrip_toEq (M N : ModObj) :
     Path.toEq (Path.trans (mkStepPath (tensor_comm_eq M N))
       (Path.symm (mkStepPath (tensor_comm_eq M N)))) = rfl := by
-  simpa using (Path.toEq_trans_symm (p := mkStepPath (tensor_comm_eq M N)))
+  simp
 
 theorem directSum_comm_eq (M N : ModObj) :
     ModObj.directSum M N = ModObj.directSum N M := by
@@ -555,7 +555,7 @@ theorem directSum_comm_path_toEq (M N : ModObj) :
 theorem directSum_roundtrip_toEq (M N : ModObj) :
     Path.toEq (Path.trans (mkStepPath (directSum_comm_eq M N))
       (Path.symm (mkStepPath (directSum_comm_eq M N)))) = rfl := by
-  simpa using (Path.toEq_trans_symm (p := mkStepPath (directSum_comm_eq M N)))
+  simp
 
 theorem tor_zero_formula (M N : ModObj) :
     Tor 0 M N = (ModObj.tensor M N).rank := by

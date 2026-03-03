@@ -108,7 +108,7 @@ noncomputable def msgDepth : Message → Nat
 
 theorem msgSize_pair_comm (m n : Message) :
     msgSize (Message.pair m n) = msgSize (Message.pair n m) := by
-  simp [msgSize, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+  simp [msgSize, Nat.add_comm]
 
 theorem msgDepth_pair_comm (m n : Message) :
     msgDepth (Message.pair m n) = msgDepth (Message.pair n m) := by
@@ -158,7 +158,7 @@ theorem msgSize_pairSwap (m : Message) : msgSize (pairSwap m) = msgSize m := by
   | atom n => rfl
   | nonce n a => rfl
   | pair x y =>
-      simp [pairSwap, msgSize, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm]
+      simp [pairSwap, msgSize, Nat.add_comm]
   | enc k x => rfl
   | hash x => rfl
   | tag a => rfl
@@ -445,13 +445,12 @@ noncomputable def nsAttack_as_path : Path nsAttackTrace nsAttackTrace :=
 
 theorem nsAttack_refl_symm :
     Path.symm (Path.refl nsAttackTrace) = Path.refl nsAttackTrace := by
-  simpa using Path.symm_refl nsAttackTrace
+  simp
 
 theorem nsAttack_assoc_path :
     Path.trans nsAttack_as_path (Path.refl nsAttackTrace) =
       Path.trans (Path.refl nsAttackTrace) nsAttack_as_path := by
-  simpa [nsAttack_as_path] using
-    (Path.trans_assoc (Path.refl nsAttackTrace) (Path.refl nsAttackTrace) (Path.refl nsAttackTrace))
+  simp [nsAttack_as_path]
 
 /-! ## Protocol equivalence and symbolic models -/
 

@@ -93,7 +93,7 @@ theorem rotate_period_path_cancel (O : CyclicOperad) {n : Nat}
     (f : O.Ops (n + 1)) :
     (Path.trans (O.rotate_period_path f)
       (Path.symm (O.rotate_period_path f))).proof = rfl := by
-  simp [CyclicOperad.rotate_period_path]
+  simp
 
 /-- 4. γ_rotate path trans refl. -/
 theorem γ_rotate_path_trans_refl (O : CyclicOperad) {n m : Nat}
@@ -114,7 +114,7 @@ theorem γ_rotate_path_cancel (O : CyclicOperad) {n m : Nat}
     (f : O.Ops (n + 1)) (g : O.Ops (m + 1)) :
     (Path.trans (O.γ_rotate_path f g)
       (Path.symm (O.γ_rotate_path f g))).proof = rfl := by
-  simp [CyclicOperad.γ_rotate_path]
+  simp
 
 /-- 7. Refl trans rotation period path. -/
 theorem refl_trans_rotate_period_path (O : CyclicOperad) {n : Nat}
@@ -158,7 +158,7 @@ theorem symm_trans_rotate_period_path (O : CyclicOperad) {n : Nat}
     (f : O.Ops (n + 1)) :
     (Path.trans (Path.symm (O.rotate_period_path f))
       (O.rotate_period_path f)).proof = rfl := by
-  simp [CyclicOperad.rotate_period_path]
+  simp
 
 /-- 14. Refl trans γ_rotate path. -/
 theorem refl_trans_γ_rotate_path (O : CyclicOperad) {n m : Nat}
@@ -347,7 +347,7 @@ theorem cyc_map_unit_path_trans_refl (φ : CyclicOperadMorphism O P) :
 /-- 32. Cyclic morphism unit path cancellation. -/
 theorem cyc_map_unit_path_cancel (φ : CyclicOperadMorphism O P) :
     (Path.trans φ.map_unit_path (Path.symm φ.map_unit_path)).proof = rfl := by
-  simp [CyclicOperadMorphism.map_unit_path]
+  simp
 
 /-- 33. Double symm of cyclic morphism unit path. -/
 theorem cyc_map_unit_path_symm_symm (φ : CyclicOperadMorphism O P) :

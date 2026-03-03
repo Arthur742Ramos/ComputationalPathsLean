@@ -67,13 +67,13 @@ theorem γ_unit_right_path_trans_refl (O : Operad) {n : Nat} (f : O.Ops n) :
 theorem γ_unit_left_path_cancel (O : Operad) (f : O.Ops 1) :
     (Path.trans (O.γ_unit_left_path f)
       (Path.symm (O.γ_unit_left_path f))).proof = rfl := by
-  simp [Operad.γ_unit_left_path]
+  simp
 
 /-- 4. Right unit path followed by its inverse has trivial proof. -/
 theorem γ_unit_right_path_cancel (O : Operad) {n : Nat} (f : O.Ops n) :
     (Path.trans (O.γ_unit_right_path f)
       (Path.symm (O.γ_unit_right_path f))).proof = rfl := by
-  simp [Operad.γ_unit_right_path]
+  simp
 
 /-- 5. Symm of symm of unit path is the original. -/
 theorem γ_unit_right_path_symm_symm (O : Operad) {n : Nat} (f : O.Ops n) :
@@ -114,7 +114,7 @@ noncomputable def Perm.inv {n : Nat} (σ : Perm n) : Perm n where
 /-- 6. Composition with identity on the right is identity. -/
 theorem Perm.comp_id_right {n : Nat} (σ : Perm n) :
     Perm.comp σ (Perm.id n) = σ := by
-  cases σ; simp [Perm.comp, Perm.id, Function.comp]
+  cases σ; simp [Perm.comp, Perm.id]
 
 /-- Symmetric operad: an operad with a right Σ_n-action on Ops n. -/
 structure SymOperad extends Operad where
@@ -145,7 +145,7 @@ theorem act_id_path_trans_refl (O : SymOperad) {n : Nat} (f : O.Ops n) :
 /-- 8. Symmetry of act_id_path cancels. -/
 theorem act_id_path_cancel (O : SymOperad) {n : Nat} (f : O.Ops n) :
     (Path.trans (Path.symm (O.act_id_path f)) (O.act_id_path f)).proof = rfl := by
-  simp [SymOperad.act_id_path]
+  simp
 
 /-- 9. Action composition path with refl. -/
 theorem act_comp_path_trans_refl (O : SymOperad) {n : Nat}
@@ -263,7 +263,7 @@ theorem act₁_unit_path_cancel {O : Operad} {X : Type v}
     (A : SimpleAlgebra O X) (x : X) :
     (Path.trans (A.act₁_unit_path x)
       (Path.symm (A.act₁_unit_path x))).proof = rfl := by
-  simp [SimpleAlgebra.act₁_unit_path]
+  simp
 
 /-! ## Transport across operadic paths -/
 

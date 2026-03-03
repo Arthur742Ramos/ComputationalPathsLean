@@ -192,7 +192,7 @@ noncomputable def lt_idempotent_path {A : Type u} (lt : LTTopology A) (a : A) :
 theorem lt_idempotent_symm {A : Type u} (lt : LTTopology A) (a : A) :
     Path.symm (lt_idempotent_path lt a) =
     Path.mk [Step.mk _ _ (lt.idempotent a).symm] (lt.idempotent a).symm := by
-  simp [lt_idempotent_path, Path.symm, Path.mk]
+  simp [lt_idempotent_path, Path.symm]
 
 /-- Functoriality of j via congrArg. -/
 theorem lt_functorial {A : Type u} (lt : LTTopology A) {a b : A}

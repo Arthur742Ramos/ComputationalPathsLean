@@ -471,7 +471,7 @@ structure FiniteDerivationType where
 noncomputable def squierWitness : FiniteDerivationType where
   generators := orientedStepRules78
   criticalBranchings := superposeRules orientedStepRules78
-  covers := fun cp hcp => hcp
+  covers := fun _cp hcp => hcp
   coherence :=
     rweq_tt (Path.refl orientedStepRules78)
       (Path.refl orientedStepRules78)

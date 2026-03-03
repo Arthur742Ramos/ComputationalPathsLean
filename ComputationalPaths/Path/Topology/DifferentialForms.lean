@@ -145,11 +145,11 @@ structure FormWedge (Ω : DiffFormAlgebra) where
   /-- Wedge product operation. -/
   wedge : (p q : Nat) → Ω.forms p → Ω.forms q → Ω.forms (p + q)
   /-- Graded commutativity: α ∧ β = (-1)^{pq} β ∧ α. -/
-  graded_comm : ∀ p q (α : Ω.forms p) (β : Ω.forms q), True
+  graded_comm : ∀ _p _q (_α : Ω.forms _p) (_β : Ω.forms _q), True
   /-- Associativity. -/
-  assoc : ∀ p q r (α : Ω.forms p) (β : Ω.forms q) (γ : Ω.forms r), True
+  assoc : ∀ _p _q _r (_α : Ω.forms _p) (_β : Ω.forms _q) (_γ : Ω.forms _r), True
   /-- Unit: 1 ∧ α = α for the constant function 1. -/
-  unit : ∀ p (α : Ω.forms p), True
+  unit : ∀ _p (_α : Ω.forms _p), True
   /-- Bilinearity. -/
   bilinear : True
 
@@ -269,7 +269,7 @@ structure Codifferential (Ω : DiffFormAlgebra) where
   /-- The codifferential. -/
   codiff : (p : Nat) → p > 0 → Ω.forms p → Ω.forms (p - 1)
   /-- δ² = 0. -/
-  codiff_squared : ∀ (p : Nat) (hp : p > 1) (hq : p > 0) (ω : Ω.forms p),
+  codiff_squared : ∀ (p : Nat) (_hp : p > 1) (_hq : p > 0) (_ω : Ω.forms p),
     True  -- δ(δω) = 0
 
 /-- The Hodge Laplacian Δ = dδ + δd. -/

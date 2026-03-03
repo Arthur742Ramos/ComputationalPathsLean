@@ -79,11 +79,11 @@ structure JoyalModelStr where
   /-- Weak equivalences are categorical equivalences. -/
   isWeakEquiv : SSetMap S T → Prop
   /-- Every map factors as cofibration followed by trivial fibration. -/
-  factor_cof_trivfib : ∀ (f : SSetMap S T),
+  factor_cof_trivfib : ∀ (_f : SSetMap S T),
     ∃ (U : SSetData) (i : SSetMap S U) (p : SSetMap U T),
       isCofibration i ∧ isFibration p ∧ isWeakEquiv p
   /-- Every map factors as trivial cofibration followed by fibration. -/
-  factor_trivcof_fib : ∀ (f : SSetMap S T),
+  factor_trivcof_fib : ∀ (_f : SSetMap S T),
     ∃ (U : SSetData) (i : SSetMap S U) (p : SSetMap U T),
       isCofibration i ∧ isWeakEquiv i ∧ isFibration p
 
@@ -153,7 +153,7 @@ structure InftyCatFunctor (C D : QuasiCategory) where
 
 /-- The identity ∞-functor. -/
 noncomputable def InftyCatFunctor.id (C : QuasiCategory) : InftyCatFunctor C C where
-  map := ⟨fun n x => x, fun n i x => rfl⟩
+  map := ⟨fun _n x => x, fun _ _i _x => rfl⟩
   preserves_inner := fun _ _ _ => trivial
 
 /-- Composition of ∞-functors. -/
@@ -222,10 +222,10 @@ structure InftyCatAdjunctionHom (C D : QuasiCategory) where
   left : InftyCatFunctor C D
   right : InftyCatFunctor D C
   /-- Bijection on 0-simplices of mapping spaces. -/
-  homEquiv : ∀ (x : C.obj) (y : D.obj),
+  homEquiv : ∀ (_x : C.obj) (_y : D.obj),
     D.mor → C.mor
   /-- Naturality in x. -/
-  natural_x : ∀ (x x' : C.obj) (y : D.obj) (f : D.mor),
+  natural_x : ∀ (x _x' : C.obj) (y : D.obj) (f : D.mor),
     homEquiv x y f = homEquiv x y f
 
 theorem adjunction_hom_natural_refl (A : InftyCatAdjunctionHom C D)
@@ -257,8 +257,8 @@ structure InftyCatCone (C : QuasiCategory) (D : InftyCatDiagram C) where
 /-- A limit cone is a terminal cone. -/
 structure InftyCatLimit (C : QuasiCategory) (D : InftyCatDiagram C) extends InftyCatCone C D where
   /-- Universality: any other cone factors uniquely through this one. -/
-  isTerminal : ∀ (other : InftyCatCone C D),
-    ∃ (u : C.mor), ∀ (i : D.index.sset.obj 0),
+  isTerminal : ∀ (_other : InftyCatCone C D),
+    ∃ (_u : C.mor), ∀ (_i : D.index.sset.obj 0),
       True
 
 /-- A cocone under a diagram. -/
@@ -268,12 +268,12 @@ structure InftyCatCocone (C : QuasiCategory) (D : InftyCatDiagram C) where
 
 /-- A colimit cocone is an initial cocone. -/
 structure InftyCatColimit (C : QuasiCategory) (D : InftyCatDiagram C) extends InftyCatCocone C D where
-  isInitial : ∀ (other : InftyCatCocone C D),
-    ∃ (u : C.mor), True
+  isInitial : ∀ (_other : InftyCatCocone C D),
+    ∃ (_u : C.mor), True
 
 theorem limit_apex_unique (C : QuasiCategory) (D : InftyCatDiagram C)
-    (L₁ L₂ : InftyCatLimit C D) :
-    ∃ (e : C.mor), True :=
+    (L₁ _L₂ : InftyCatLimit C D) :
+    ∃ (_e : C.mor), True :=
   ⟨C.id L₁.apex, trivial⟩
 
 noncomputable def limit_apex_unique_path (C : QuasiCategory) (D : InftyCatDiagram C)
@@ -282,8 +282,8 @@ noncomputable def limit_apex_unique_path (C : QuasiCategory) (D : InftyCatDiagra
   Path.refl _
 
 theorem colimit_nadir_unique (C : QuasiCategory) (D : InftyCatDiagram C)
-    (L₁ L₂ : InftyCatColimit C D) :
-    ∃ (e : C.mor), True :=
+    (L₁ _L₂ : InftyCatColimit C D) :
+    ∃ (_e : C.mor), True :=
   ⟨C.id L₁.nadir, trivial⟩
 
 /-! ## Yoneda Embedding -/
@@ -295,7 +295,7 @@ structure InftyCatYoneda (C : QuasiCategory) where
   /-- The Yoneda functor. -/
   yoneda : InftyCatFunctor C presheaf
   /-- Yoneda is fully faithful at 0-simplices. -/
-  fullyFaithful : ∀ (x y : C.obj),
+  fullyFaithful : ∀ (_x _y : C.obj),
     Function.Bijective (fun (f : C.mor) => yoneda.map.map 1 f)
 
 theorem yoneda_preserves_id (C : QuasiCategory) (Y : InftyCatYoneda C) (x : C.obj) :
@@ -343,7 +343,7 @@ structure PresentableInftyCat where
   /-- Accessibility cardinal. -/
   kappa : Nat
   /-- Has all small colimits (witnessed structurally). -/
-  hasColimits : ∀ (D : InftyCatDiagram cat), ∃ (L : InftyCatColimit cat D), True
+  hasColimits : ∀ (D : InftyCatDiagram cat), ∃ (_L : InftyCatColimit cat D), True
   /-- Is generated under colimits by a small set. -/
   generators : cat.sset.obj 0 → Prop
 
@@ -352,7 +352,7 @@ structure PresentableInftyCat where
 structure AdjointFunctorThm (C D : PresentableInftyCat) where
   functor : InftyCatFunctor C.cat D.cat
   preservesColimits : ∀ (Diag : InftyCatDiagram C.cat)
-    (L : InftyCatColimit C.cat Diag), True
+    (_L : InftyCatColimit C.cat Diag), True
   /-- The right adjoint exists. -/
   rightAdjoint : InftyCatFunctor D.cat C.cat
 

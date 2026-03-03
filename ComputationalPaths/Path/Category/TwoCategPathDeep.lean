@@ -103,21 +103,21 @@ theorem vinv_id2 (f : A → B) : vinv (id2 f) = id2 f := by
 
 /-- Theorem 7: Left cancellation at toEq level. -/
 theorem vinv_vcomp_toEq {f g : A → B} (α : Cell2 f g) (a : A) :
-    (vcomp (vinv α) α a).toEq = rfl := by simp [vcomp, vinv]
+    (vcomp (vinv α) α a).toEq = rfl := by simp
 
 /-- Theorem 8: Right cancellation at toEq level. -/
 theorem vcomp_vinv_toEq {f g : A → B} (α : Cell2 f g) (a : A) :
-    (vcomp α (vinv α) a).toEq = rfl := by simp [vcomp, vinv]
+    (vcomp α (vinv α) a).toEq = rfl := by simp
 
 /-- Theorem 9: toEq is functorial. -/
 theorem toEq_vcomp {f g h : A → B}
     (α : Cell2 f g) (β : Cell2 g h) (a : A) :
     (vcomp α β a).toEq = ((α a).toEq).trans ((β a).toEq) := by
-  simp [vcomp]
+  simp
 
 /-- Theorem 10: toEq of identity is rfl. -/
 theorem toEq_id2 (f : A → B) (a : A) :
-    (id2 f a).toEq = rfl := by simp [id2]
+    (id2 f a).toEq = rfl := by simp
 
 -- ============================================================================
 -- Section 4: Whiskering Properties
@@ -194,7 +194,7 @@ noncomputable def hcomp' {f g : A → B} {h k : B → C}
 theorem hcomp_eq_hcomp'_toEq {f g : A → B} {h k : B → C}
     (α : Cell2 f g) (β : Cell2 h k) (a : A) :
     (hcomp α β a).toEq = (hcomp' α β a).toEq := by
-  simp [hcomp, hcomp']
+  simp
 
 -- ============================================================================
 -- Section 6: The Interchange Law
@@ -206,14 +206,14 @@ theorem interchange_toEq {f g h₁ : A → B} {j k l : B → C}
     (γ : Cell2 j k) (δ : Cell2 k l) (a : A) :
     (hcomp (vcomp α β) (vcomp γ δ) a).toEq =
     (vcomp (hcomp α γ) (hcomp β δ) a).toEq := by
-  simp [hcomp, vcomp]
+  simp
 
 /-- Theorem 23: Interchange specialized to identity cells. -/
 theorem interchange_id_toEq {f : A → B} {h : B → C}
     (α : Cell2 f f) (γ : Cell2 h h) (a : A) :
     (hcomp (vcomp (id2 f) α) (vcomp (id2 h) γ) a).toEq =
     (vcomp (hcomp (id2 f) (id2 h)) (hcomp α γ) a).toEq := by
-  simp [hcomp, vcomp, id2]
+  simp
 
 -- ============================================================================
 -- Section 7: Adjunction Structure
@@ -237,12 +237,12 @@ noncomputable def triangleR {f : A → B} {g : B → A}
 /-- Theorem 26: Triangle identity (left) holds at toEq level. -/
 theorem triangleL_toEq {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) (a : A) :
-    (triangleL adj a).toEq = rfl := by simp [triangleL]
+    (triangleL adj a).toEq = rfl := by simp
 
 /-- Theorem 27: Triangle identity (right) holds at toEq level. -/
 theorem triangleR_toEq {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) (b : B) :
-    (triangleR adj b).toEq = rfl := by simp [triangleR]
+    (triangleR adj b).toEq = rfl := by simp
 
 /-- Adjunction with triangle identities at toEq level. -/
 structure AdjTriangle (f : A → B) (g : B → A) extends Adjunction2 f g where
@@ -257,12 +257,12 @@ noncomputable def idAdjunction : Adjunction2 (fun a : A => a) (fun a : A => a) w
 /-- Theorem 29: Identity adjunction satisfies triangle L at toEq. -/
 theorem idAdj_triangleL_toEq (a : A) :
     (triangleL (idAdjunction (A := A)) a).toEq = rfl := by
-  simp [triangleL, idAdjunction, id2]
+  simp
 
 /-- Theorem 30: Identity adjunction satisfies triangle R at toEq. -/
 theorem idAdj_triangleR_toEq (a : A) :
     (triangleR (idAdjunction (A := A)) a).toEq = rfl := by
-  simp [triangleR, idAdjunction, id2]
+  simp
 
 /-- Theorem 31: Full identity adjunction with triangles. -/
 noncomputable def idAdjTriangle : AdjTriangle (fun a : A => a) (fun a : A => a) where
@@ -277,7 +277,7 @@ noncomputable def idAdjTriangle : AdjTriangle (fun a : A => a) (fun a : A => a) 
 
 /-- Theorem 32: Forward mates: given f ⊣ g and σ : k → l ∘ f, produce mate at toEq. -/
 noncomputable def mate_forward_eq {f : A → B} {g : B → A}
-    (adj : Adjunction2 f g) {k l : A → C}
+    (_adj : Adjunction2 f g) {k l : A → C}
     (σ : Cell2 k l) (b : B) : k (g b) = l (g b) :=
   (σ (g b)).toEq
 
@@ -297,7 +297,7 @@ theorem mate_roundtrip_toEq {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) {k l : A → C}
     (σ : Cell2 k l) (a : A) :
     (mate_backward adj (mate_forward_eq adj σ) a).toEq = (σ a).toEq := by
-  simp [mate_backward, mate_forward_eq]
+  simp
 
 -- ============================================================================
 -- Section 9: Composing Adjunctions
@@ -316,13 +316,13 @@ noncomputable def compAdjunction {f : A → B} {g : B → A} {h : B → C} {k : 
 theorem compAdj_triangleL_toEq {f : A → B} {g : B → A} {h : B → C} {k : C → B}
     (adj₁ : Adjunction2 f g) (adj₂ : Adjunction2 h k) (a : A) :
     (triangleL (compAdjunction adj₁ adj₂) a).toEq = rfl := by
-  simp [triangleL, compAdjunction]
+  simp
 
 /-- Theorem 37: Composed adjunction triangle R at toEq. -/
 theorem compAdj_triangleR_toEq {f : A → B} {g : B → A} {h : B → C} {k : C → B}
     (adj₁ : Adjunction2 f g) (adj₂ : Adjunction2 h k) (c : C) :
     (triangleR (compAdjunction adj₁ adj₂) c).toEq = rfl := by
-  simp [triangleR, compAdjunction]
+  simp
 
 -- ============================================================================
 -- Section 10: 2-Functors
@@ -342,7 +342,7 @@ theorem twoFunctor_preserves_vinv_toEq {F₀ : Type u → Type v}
     (F : TwoFunctor F₀) {X Y : Type u} {f g : X → Y}
     (α : Cell2 f g) (x : F₀ X) :
     (F.map₂ (vinv α) x).toEq = (vinv (F.map₂ α) x).toEq := by
-  simp [vinv]
+  simp
 
 /-- Theorem 39: Identity 2-functor. -/
 noncomputable def idTwoFunctor : TwoFunctor (id : Type u → Type u) where
@@ -372,7 +372,7 @@ noncomputable def idTwoNatTrans {F₀ : Type u → Type v} (F : TwoFunctor F₀)
 theorem idNatTrans_naturality_toEq {F₀ : Type u → Type v}
     (F : TwoFunctor F₀) {X Y : Type u} (f : X → Y) (x : F₀ X) :
     ((idTwoNatTrans F).naturality f x).toEq = rfl := by
-  simp [idTwoNatTrans, id2]
+  simp [idTwoNatTrans]
 
 -- ============================================================================
 -- Section 12: Monad from Adjunction
@@ -393,13 +393,13 @@ noncomputable def monadFromAdj {f : A → B} {g : B → A}
 theorem monad_unit_left_toEq {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) (a : A) :
     (vcomp (whiskerR (monadFromAdj adj).η (g ∘ f)) (monadFromAdj adj).μ a).toEq =
-    rfl := by simp [vcomp, whiskerR, monadFromAdj]
+    rfl := by simp
 
 /-- Theorem 44: Monad unit law (right) at toEq level. -/
 theorem monad_unit_right_toEq {f : A → B} {g : B → A}
     (adj : Adjunction2 f g) (a : A) :
     (vcomp (whiskerL (g ∘ f) (monadFromAdj adj).η) (monadFromAdj adj).μ a).toEq =
-    rfl := by simp [vcomp, whiskerL, monadFromAdj]
+    rfl := by simp
 
 -- ============================================================================
 -- Section 13: Coherence Results (proof irrelevance for Eq)

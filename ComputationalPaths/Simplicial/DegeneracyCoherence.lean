@@ -315,7 +315,7 @@ noncomputable def section_face_succ_cancel_left (n : Nat) (i : Fin (n + 1)) (x :
   rweq_cmpA_inv_left (N.section_face_succ n i x)
 
 /-- Composite section path: d_i ∘ s_i composed with d_{i+1} ∘ s_i coherence. -/
-noncomputable def section_composite_path (n : Nat) (i : Fin (n + 1)) (x : N.level n) :
+noncomputable def section_composite_path (n : Nat) (_i : Fin (n + 1)) (x : N.level n) :
     Path x x :=
   Path.refl x
 

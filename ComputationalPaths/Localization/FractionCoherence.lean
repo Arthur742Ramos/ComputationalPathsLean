@@ -151,7 +151,7 @@ noncomputable def locDoubleInvRwEq {a b : A} (p : Path a b) (h : W.mem p) :
   exact rweq_trans_congr_right (L.mapPath p) (locLeftInvRwEq L p h)
 
 /-- Theorem 13: Simplifying the roundtrip to the map itself. -/
-noncomputable def locDoubleInvSimplRwEq {a b : A} (p : Path a b) (h : W.mem p) :
+noncomputable def locDoubleInvSimplRwEq {a b : A} (p : Path a b) (_h : W.mem p) :
     RwEq
       (Path.trans (L.mapPath p) (Path.refl (L.obj b)))
       (L.mapPath p) :=
@@ -397,14 +397,14 @@ variable (S : SaturatedClass A)
 /-- Theorem 41: From 2-out-of-6, derive `p ∈ W`. -/
 theorem saturated_left {a b c d : A}
     {p : Path a b} {q : Path b c} {r : Path c d}
-    (hpq : S.mem (Path.trans p q)) (hqr : S.mem (Path.trans q r)) :
+    (hpq : S.mem (Path.trans p q)) (_hqr : S.mem (Path.trans q r)) :
     S.mem (Path.trans (Path.symm (Path.trans p q)) (Path.trans p q)) := by
   exact S.mem_trans (S.mem_symm hpq) hpq
 
 /-- Theorem 42: From 2-out-of-6, derive `r ∈ W`. -/
 theorem saturated_right {a b c d : A}
     {p : Path a b} {q : Path b c} {r : Path c d}
-    (hpq : S.mem (Path.trans p q)) (hqr : S.mem (Path.trans q r)) :
+    (_hpq : S.mem (Path.trans p q)) (hqr : S.mem (Path.trans q r)) :
     S.mem (Path.trans (Path.trans q r) (Path.symm (Path.trans q r))) := by
   exact S.mem_trans hqr (S.mem_symm hqr)
 

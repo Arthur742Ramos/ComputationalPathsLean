@@ -265,7 +265,7 @@ private theorem foldl_add_shift (f : Nat → Int) (xs : List Nat) (a : Int) :
   | cons x xs ih =>
     simp only [List.foldl]
     rw [ih (a + f x), ih (0 + f x)]
-    simp [Int.add_assoc, Int.zero_add]
+    simp [Int.add_assoc]
 
 theorem lambdaSum_append (S : SelbergSieve) (xs ys : List Nat) :
     SelbergSieve.lambdaSum S (xs ++ ys) =

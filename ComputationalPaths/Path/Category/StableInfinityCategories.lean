@@ -88,12 +88,12 @@ noncomputable def rotateTriangle (C : StableInfinityCategory.{u,v})
   h := C.comp (C.toZero _) (C.fromZero _) -- placeholder
 
 /-- The shift functor [1] on a stable ∞-category (= Σ). -/
-noncomputable def shiftFunctor (C : StableInfinityCategory.{u,v}) (n : Int) (X : C.Obj) :
+noncomputable def shiftFunctor (C : StableInfinityCategory.{u,v}) (_n : Int) (X : C.Obj) :
     C.Obj := X
 
 /-- Distinguished triangles form the class of exact triangles. -/
 noncomputable def IsDistinguished (C : StableInfinityCategory.{u,v})
-    (T : ExactTriangle C) : Prop := True
+    (_T : ExactTriangle C) : Prop := True
 
 /-! ## t-Structures -/
 
@@ -126,7 +126,7 @@ noncomputable def IsBounded (C : StableInfinityCategory.{u,v}) (t : TStructure C
   ∀ (x : C.Obj), ∃ (a b : Int), t.isInCLeqN x b ∧ t.isInCGeqN x a
 
 /-- Non-degenerate t-structure: ∩_n C^≤n = 0 and ∩_n C^≥n = 0. -/
-noncomputable def IsNonDegenerate (C : StableInfinityCategory.{u,v}) (t : TStructure C) : Prop :=
+noncomputable def IsNonDegenerate (C : StableInfinityCategory.{u,v}) (_t : TStructure C) : Prop :=
   True -- placeholder
 
 /-! ## Verdier Quotients -/
@@ -135,7 +135,7 @@ noncomputable def IsNonDegenerate (C : StableInfinityCategory.{u,v}) (t : TStruc
 structure ThickSubcategory (C : StableInfinityCategory.{u,v}) where
   mem : C.Obj → Prop
   closedUnderShift : ∀ x, mem x → mem (shiftFunctor C 1 x)
-  closedUnderExtension : ∀ x y z : C.Obj, mem x → mem z → True
+  closedUnderExtension : ∀ x _y z : C.Obj, mem x → mem z → True
 
 /-- The Verdier quotient C/N for a thick subcategory N. -/
 structure VerdierQuotient (C : StableInfinityCategory.{u,v})
@@ -160,7 +160,7 @@ structure StabilityCondition (C : StableInfinityCategory.{u,v}) where
   /-- The slicing: a family of subcategories P(φ) for φ ∈ ℝ. -/
   slicing : Float → C.Obj → Prop
   /-- Harder-Narasimhan property. -/
-  hn_property : ∀ (x : C.Obj), True
+  hn_property : ∀ (_x : C.Obj), True
 
 /-- Semistable object of phase φ. -/
 noncomputable def IsSemistable (C : StableInfinityCategory.{u,v})
@@ -225,19 +225,19 @@ theorem truncation_triangle_exact (C : StableInfinityCategory.{u,v})
 
 /-- Bounded t-structure implies convergent spectral sequence. -/
 theorem bounded_spectral_sequence (C : StableInfinityCategory.{u,v})
-    (t : TStructure C) (hb : IsBounded C t) :
+    (t : TStructure C) (_hb : IsBounded C t) :
     True := by
   trivial
 
 /-- The long exact sequence of cohomology objects for an exact triangle. -/
 theorem long_exact_sequence (C : StableInfinityCategory.{u,v})
-    (t : TStructure C) (T : ExactTriangle C) :
+    (_t : TStructure C) (_T : ExactTriangle C) :
     True := by -- placeholder for H^n(X) → H^n(Y) → H^n(Z) → H^{n+1}(X)
   trivial
 
 /-- Verdier quotient is stable. -/
 theorem verdier_quotient_stable (C : StableInfinityCategory.{u,v})
-    (N : ThickSubcategory C) (Q : VerdierQuotient C N) :
+    (N : ThickSubcategory C) (_Q : VerdierQuotient C N) :
     True := by -- Q.carrier is stable
   trivial
 
@@ -251,24 +251,24 @@ theorem verdier_universal_property (C : StableInfinityCategory.{u,v})
 
 /-- The kernel-quotient exact sequence: N → C → C/N. -/
 theorem localization_sequence (C : StableInfinityCategory.{u,v})
-    (N : ThickSubcategory C) :
+    (_N : ThickSubcategory C) :
     True := by
   trivial
 
 /-- Bridgeland: Stab(C) is a complex manifold (locally homeomorphic to Hom(K₀,ℂ)). -/
-theorem stab_space_manifold (C : StableInfinityCategory.{u,v}) :
+theorem stab_space_manifold (_C : StableInfinityCategory.{u,v}) :
     True := by -- Stab(C) has complex manifold structure
   trivial
 
 /-- Every object has a unique Harder-Narasimhan filtration. -/
 theorem harder_narasimhan_existence (C : StableInfinityCategory.{u,v})
-    (σ : StabilityCondition C) (x : C.Obj) :
-    ∃ (n : Nat) (phases : Fin n → Float), True := by
+    (_σ : StabilityCondition C) (_x : C.Obj) :
+    ∃ (n : Nat) (_phases : Fin n → Float), True := by
   exact ⟨1, (fun _ => 0.0), trivial⟩
 
 /-- The HN filtration is functorial. -/
 theorem hn_filtration_functorial (C : StableInfinityCategory.{u,v})
-    (σ : StabilityCondition C) :
+    (_σ : StabilityCondition C) :
     True := by
   trivial
 
@@ -280,14 +280,14 @@ theorem stable_iff_simple (C : StableInfinityCategory.{u,v})
 
 /-- Wall-crossing: stability conditions in adjacent chambers give equivalent categories. -/
 theorem wall_crossing (C : StableInfinityCategory.{u,v})
-    (σ₁ σ₂ : StabilityCondition C) :
+    (_σ₁ _σ₂ : StabilityCondition C) :
     True := by
   trivial
 
 /-- The octahedral axiom holds in stable ∞-categories. -/
 theorem octahedral_axiom (C : StableInfinityCategory.{u,v})
     (X Y Z : C.Obj) (f : C.Hom X Y) (g : C.Hom Y Z) :
-    ∃ (T : ExactTriangle C), True := by
+    ∃ (_T : ExactTriangle C), True := by
   exact ⟨{
     X := X
     Y := Y
@@ -300,8 +300,8 @@ theorem octahedral_axiom (C : StableInfinityCategory.{u,v})
 /-- Exact functors preserve exact triangles. -/
 theorem exact_functor_preserves_triangles
     (C D : StableInfinityCategory.{u,v})
-    (F : C.Obj → D.Obj)
-    (T : ExactTriangle C) :
+    (_F : C.Obj → D.Obj)
+    (_T : ExactTriangle C) :
     True := by
   trivial
 
@@ -316,14 +316,14 @@ theorem t_structure_determined_by_heart
 
 /-- Phase function is continuous on semistable objects. -/
 theorem phase_continuous (C : StableInfinityCategory.{u,v})
-    (σ : StabilityCondition C) :
+    (_σ : StabilityCondition C) :
     True := by
   trivial
 
 /-- The shift [1] acts on Stab(C) by shifting the slicing. -/
 theorem shift_action_on_stab (C : StableInfinityCategory.{u,v})
     (σ : StabilityCondition C) :
-    ∃ (σ' : StabilityCondition C), True := by
+    ∃ (_σ' : StabilityCondition C), True := by
   exact ⟨σ, trivial⟩
 
 end ComputationalPaths.Path.Category.StableInfinityCategories

@@ -206,7 +206,7 @@ theorem cpProofLength_mono_trans (n1 n2 n3 bits : Nat)
     cpProofLength_mono n1 n3 bits (Path.trans h1 h2) =
     Path.trans (cpProofLength_mono n1 n2 bits h1) (cpProofLength_mono n2 n3 bits h2) := by
   unfold cpProofLength_mono
-  simp [Path.congrArg_trans]
+  simp
 
 -- ============================================================
 -- Section 5: Frege Systems
@@ -383,7 +383,7 @@ noncomputable def trivialInterpolant : BoundedInterpolant :=
 
 /-- 39: Interpolant composition -/
 noncomputable def interpolant_comp (i1 i2 : BoundedInterpolant)
-    (h : Path i1.sharedVars i2.sharedVars) : BoundedInterpolant :=
+    (_h : Path i1.sharedVars i2.sharedVars) : BoundedInterpolant :=
   { leftSize := i1.leftSize + i2.leftSize
     rightSize := i1.rightSize + i2.rightSize
     interpolantSize := i1.interpolantSize + i2.interpolantSize
@@ -533,7 +533,7 @@ noncomputable def trivialAutom : Automatizability :=
 
 /-- 56: Automatizability composition -/
 noncomputable def autom_comp (a1 a2 : Automatizability)
-    (h : Path a1.formulaSize a2.proofLen) : Automatizability :=
+    (_h : Path a1.formulaSize a2.proofLen) : Automatizability :=
   { proofLen := a1.proofLen + a2.proofLen
     searchCost := a1.searchCost + a2.searchCost
     formulaSize := a1.formulaSize + a2.formulaSize
@@ -597,14 +597,14 @@ theorem congrArg_resolution_trans (rp1 rp2 rp3 : ResolutionProof)
     (h1 : Path rp1.numSteps rp2.numSteps) (h2 : Path rp2.numSteps rp3.numSteps) :
     Path.congrArg (· + 1) (Path.trans h1 h2) =
     Path.trans (Path.congrArg (· + 1) h1) (Path.congrArg (· + 1) h2) := by
-  simp [Path.congrArg_trans]
+  simp
 
 /-- 63: congrArg on resolution respects symm -/
 theorem congrArg_resolution_symm (rp1 rp2 : ResolutionProof)
     (h : Path rp1.numSteps rp2.numSteps) :
     Path.congrArg (· + 1) (Path.symm h) =
     Path.symm (Path.congrArg (· + 1) h) := by
-  simp [Path.congrArg_symm]
+  simp
 
 /-- 64: congrArg on Frege proof lines -/
 noncomputable def congrArg_frege_lines (fp1 fp2 : FregeProof)

@@ -85,7 +85,7 @@ noncomputable def tietzeAddGenerator_equiv {A : Type u} {a : A}
 
 /-- Tietze move: add a redundant relation that already follows from existing relations. -/
 noncomputable def tietzeAddRelation {A : Type u} {a : A}
-    (r₁ r₂ : Loop' a) (hr : RwEq r₁ r₂) :
+    (r₁ r₂ : Loop' a) (_hr : RwEq r₁ r₂) :
     GroupoidPresentation a where
   Generators := fun p q => Nonempty (Step p q)
   Relations := fun p q => Nonempty (RwEq p q) ∨ (p = r₁ ∧ q = r₂)

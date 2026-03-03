@@ -225,25 +225,25 @@ noncomputable def iso_roundtrip (K L : SimplicialComplex) (I : SimplicialIso K L
 /-! ## Additional Theorem Stubs -/
 
 theorem simplicialMapComp_eval (K L M : SimplicialComplex)
-    (f : SimplicialMap K L) (g : SimplicialMap L M) (v : Nat) : True := trivial
+    (_f : SimplicialMap K L) (_g : SimplicialMap L M) (_v : Nat) : True := trivial
 
 theorem simplicialIso_left_roundtrip (K L : SimplicialComplex)
-    (I : SimplicialIso K L) (v : Nat) : True := trivial
+    (_I : SimplicialIso K L) (_v : Nat) : True := trivial
 
 theorem simplicialIso_right_roundtrip (K L : SimplicialComplex)
-    (I : SimplicialIso K L) (v : Nat) : True := trivial
+    (_I : SimplicialIso K L) (_v : Nat) : True := trivial
 
 theorem chainRank_matches_numSimplices (K : SimplicialComplex)
-    (C : SimplicialChainComplex K) (k : Nat) : True := trivial
+    (_C : SimplicialChainComplex K) (_k : Nat) : True := trivial
 
 theorem barycentricSubdivision_preserves_euler (K : SimplicialComplex)
-    (B : BarycentricSubdivision K) (d : Nat) : True := trivial
+    (_B : BarycentricSubdivision K) (_d : Nat) : True := trivial
 
-theorem cechComplex_epsilon_nonnegative (C : CechComplex) : True := trivial
+theorem cechComplex_epsilon_nonnegative (_C : CechComplex) : True := trivial
 
-theorem nerveTheorem_homotopy_equiv_true (N : NerveTheorem) : True := trivial
+theorem nerveTheorem_homotopy_equiv_true (_N : NerveTheorem) : True := trivial
 
-theorem simplicialStep_valid_true (s : SimplicialStep) : True := trivial
+theorem simplicialStep_valid_true (_s : SimplicialStep) : True := trivial
 
 
 end SimplicialComplexes

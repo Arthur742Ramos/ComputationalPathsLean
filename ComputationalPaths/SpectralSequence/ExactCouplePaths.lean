@@ -419,8 +419,8 @@ noncomputable def toDifferentials : Differentials C.toPages where
   dSquaredPath := fun _r p q => C.dSquaredPath p q
   dSquaredStep := fun _r p q =>
     Path.Step.trans_refl_right (C.dSquaredPath p q)
-  commutePath := fun _r p q => Path.refl _
-  commuteStep := fun _r p q =>
+  commutePath := fun _r _p _q => Path.refl _
+  commuteStep := fun _r _p _q =>
     Path.Step.trans_refl_left (Path.refl _)
 
 /-! ### Boundary operator paths -/

@@ -82,7 +82,7 @@ noncomputable def whitney_sum_formula {A : Sort u} (op : A → A → A) (a b : A
 
 -- 4. Whitney sum naturality chain
 noncomputable def whitney_sum_nat_chain {A : Sort u} (op : A → A → A) (f : A → A) (a b : A)
-    (p : CharClassPath a b) :
+    (_p : CharClassPath a b) :
     CharClassPath (f (op a b)) (f (op a b)) :=
   .cons (.congrArg f (.sw_whitney_sum op a b)) (.nil _)
 
@@ -106,7 +106,7 @@ noncomputable def chern_splitting_path {A : Sort u} (split : A → A) (a : A) :
 
 -- 9. Chern splitting + normalization chain
 noncomputable def chern_split_norm_chain {A : Sort u} (split : A → A) (a : A)
-    (h : split a = a) : CharClassPath (split a) (split a) :=
+    (_h : split a = a) : CharClassPath (split a) (split a) :=
   CharClassPath.trans
     (chern_splitting_path split a)
     (CharClassPath.symm (chern_splitting_path split a))
@@ -168,7 +168,7 @@ noncomputable def chern_char_naturality {A : Sort u} (ch : A → A) (f : A → A
 
 -- 21. Chern character composition chain
 noncomputable def chern_char_compose_chain {A : Sort u} (ch : A → A) (op : A → A → A) (a b c : A)
-    (p : CharClassPath a b) :
+    (_p : CharClassPath a b) :
     CharClassPath (ch (op a c)) (op (ch a) (ch c)) :=
   chern_char_hom_path ch op a c
 
@@ -183,7 +183,7 @@ noncomputable def todd_naturality {A : Sort u} (td : A → A) (f : A → A) (a b
   CharClassPath.congrArg td (CharClassPath.congrArg f p)
 
 -- 24. Todd + Chern character chain
-noncomputable def todd_chern_char_chain {A : Sort u} (td ch : A → A) (op : A → A → A) (a b : A) :
+noncomputable def todd_chern_char_chain {A : Sort u} (td _ch : A → A) (op : A → A → A) (a b : A) :
     CharClassPath (td (op a b)) (op (td a) (td b)) :=
   todd_mult_path td op a b
 
@@ -194,7 +194,7 @@ noncomputable def grr_structure {A : Sort u} (ch td : A → A) (f : A → A) (co
   h ▸ .nil _
 
 -- 26. GRR via explicit path construction
-noncomputable def grr_path_construction {A : Sort u} (ch td : A → A) (op : A → A → A) (a b : A)
+noncomputable def grr_path_construction {A : Sort u} (ch td : A → A) (_op : A → A → A) (a b : A)
     (p : CharClassPath (ch a) (ch b)) :
     CharClassPath (td (ch a)) (td (ch b)) :=
   CharClassPath.congrArg td p
@@ -272,7 +272,7 @@ theorem trans_length_sum {A : Sort u} {a b c : A}
   | cons s p ih => simp [CharClassPath.trans, CharClassPath.length, ih, Nat.add_assoc]
 
 -- 39. Chern character + Todd + GRR grand chain
-noncomputable def grr_grand_chain {A : Sort u} (ch td : A → A) (op : A → A → A) (a b : A) :
+noncomputable def grr_grand_chain {A : Sort u} (ch _td : A → A) (op : A → A → A) (a b : A) :
     CharClassPath (ch (op a b)) (op (ch a) (ch b)) :=
   CharClassPath.trans
     (chern_char_hom_path ch op a b)

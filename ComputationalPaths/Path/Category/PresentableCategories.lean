@@ -8,15 +8,15 @@ structure PresentableInfinityCategory where
   Obj : Type u
   colimitSeed : Obj
 
-noncomputable def isAccessible (C : PresentableInfinityCategory) : Prop := True
+noncomputable def isAccessible (_C : PresentableInfinityCategory) : Prop := True
 
-noncomputable def isCocomplete (C : PresentableInfinityCategory) : Prop := True
+noncomputable def isCocomplete (_C : PresentableInfinityCategory) : Prop := True
 
 noncomputable def isPresentable (C : PresentableInfinityCategory) : Prop :=
   isAccessible C ∧ isCocomplete C
 
 noncomputable def adjointFunctorTheoremHypothesis
-    (C D : PresentableInfinityCategory) : Prop := True
+    (_C _D : PresentableInfinityCategory) : Prop := True
 
 noncomputable def leftAdjointType (C D : PresentableInfinityCategory) : Type _ := C.Obj → D.Obj
 
@@ -26,15 +26,15 @@ noncomputable def indCompletion (C : PresentableInfinityCategory) : Type u := Li
 
 noncomputable def compactObject (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
 
-noncomputable def compactlyGenerated (C : PresentableInfinityCategory) : Prop := True
+noncomputable def compactlyGenerated (_C : PresentableInfinityCategory) : Prop := True
 
-noncomputable def brownRepresentable (C : PresentableInfinityCategory) : Prop := True
+noncomputable def brownRepresentable (_C : PresentableInfinityCategory) : Prop := True
 
 noncomputable def localizationData (C : PresentableInfinityCategory) : Type u := C.Obj → Prop
 
 noncomputable def localizationFunctor (C : PresentableInfinityCategory) : C.Obj → C.Obj := fun x => x
 
-noncomputable def smashingLocalization (C : PresentableInfinityCategory) : Prop := True
+noncomputable def smashingLocalization (_C : PresentableInfinityCategory) : Prop := True
 
 noncomputable def reflectiveSubcategory (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
 
@@ -42,12 +42,12 @@ noncomputable def coreflectiveSubcategory (C : PresentableInfinityCategory) : C.
 
 noncomputable def generatedUnderColimits (C : PresentableInfinityCategory) : C.Obj → Prop := fun _ => True
 
-noncomputable def accessibleLocalization (C : PresentableInfinityCategory) : Prop := True
+noncomputable def accessibleLocalization (_C : PresentableInfinityCategory) : Prop := True
 
 noncomputable def presentableTensorProduct
     (C D : PresentableInfinityCategory) : Type _ := C.Obj × D.Obj
 
-noncomputable def compactGenerationRank (C : PresentableInfinityCategory) : Nat := 0
+noncomputable def compactGenerationRank (_C : PresentableInfinityCategory) : Nat := 0
 
 noncomputable def brownRepresentableFunctor (C : PresentableInfinityCategory) : C.Obj → Type _ :=
   fun _ => C.Obj

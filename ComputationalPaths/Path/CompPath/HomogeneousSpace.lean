@@ -181,8 +181,10 @@ theorem orbit_eq_orbitPath_to_orbit (x y : X) :
       orbitPath_to_orbit (A := A) (orbitPath (A := A) x y) := by
   rfl
 
+end IsHomogeneous
+
 /-- Homogeneous actions are closed under orbit-path symmetry. -/
-theorem orbitPath_symm_closed (x y : X) :
+theorem orbitPath_symm_closed {A : GroupAction G S X} (x y : X) :
     A.Orbit x y → A.Orbit y x := by
   intro ⟨g, hg⟩
   exact ⟨S.inv g, by
@@ -191,15 +193,13 @@ theorem orbitPath_symm_closed (x y : X) :
       _ = x := by rw [S.mul_left_inv]; exact A.act_one x⟩
 
 /-- Homogeneous actions are closed under orbit-path transitivity. -/
-theorem orbitPath_trans_closed (x y z : X) :
+theorem orbitPath_trans_closed {A : GroupAction G S X} (x y z : X) :
     A.Orbit x y → A.Orbit y z → A.Orbit x z := by
   intro ⟨g, hg⟩ ⟨h, hh⟩
   exact ⟨S.mul h g, by
     calc A.act (S.mul h g) x = A.act h (A.act g x) := A.act_mul h g x
       _ = A.act h y := by rw [hg]
       _ = z := hh⟩
-
-end IsHomogeneous
 
 end Homogeneous
 

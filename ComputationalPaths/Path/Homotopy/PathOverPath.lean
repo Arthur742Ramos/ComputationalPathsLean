@@ -98,12 +98,12 @@ noncomputable def trans₃ (po₁ : PathOver B p x y)
 theorem trans_refl_left_witness (po : PathOver B p x y) :
     (PathOver.refl x).trans (p := Path.refl a) (q := p) po =
       ofTransportEq po.witness := by
-  simp [trans, refl, ofTransportEq]
+  simp
 
 /-- symm then trans cancels: witness is rfl. -/
 theorem symm_trans_cancel (po : PathOver B p x y) :
     ((po.symm).trans po).witness = rfl := by
-  simp [trans, symm]
+  simp
 
 end PathOver
 

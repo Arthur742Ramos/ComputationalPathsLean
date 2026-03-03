@@ -231,7 +231,7 @@ theorem minimalFillerPath_symm_eq {S : SimpSet} (mk : MinimalKan S)
     (hk : S.face n k f1.filler = S.face n k f2.filler) :
     (Path.symm (minimalFillerPath mk f1 f2 hk)).toEq =
       (minimalFillerPath mk f2 f1 hk.symm).toEq := by
-  simp [minimalFillerPath, Path.symm, Path.stepChain, Path.toEq]
+  simp
 
 /-- Theorem 14: Filler face paths compose via trans to give boundary data. -/
 theorem filler_face_trans_toEq {S : SimpSet}
@@ -240,7 +240,7 @@ theorem filler_face_trans_toEq {S : SimpSet}
     (i : Fin (n + 2)) (hi : i ≠ k) :
     (Path.trans (f.match_face i hi) (Path.symm (f.match_face i hi))).toEq =
       (Path.refl (S.face n i f.filler)).toEq := by
-  simp [Path.toEq, Path.trans, Path.symm]
+  simp
 
 /-! ## Section 5: Nerve Construction via Path Functoriality -/
 
@@ -342,7 +342,7 @@ theorem doldkan_roundtrip_inv {S : SimpSet} (dk : DoldKanData S)
     (n : Nat) (x : S.obj n) :
     (Path.trans (dk.roundtrip n x) (doldkan_inverse dk n x)).toEq =
       (Path.refl _).toEq := by
-  simp [doldkan_inverse, Path.toEq, Path.trans, Path.symm]
+  simp
 
 /-- Theorem 24: congrArg applied through Dold-Kan denormalize. -/
 theorem doldkan_congrArg {S : SimpSet} (dk : DoldKanData S)
@@ -436,8 +436,7 @@ theorem SimpLoop.map_trivial_eq {S T : PointedSimpSet}
     (hbase : F.map n (S.base n) = T.base n) :
     (SimpLoop.mapLoop F hbase (SimpLoop.trivial S n)).loop.toEq =
       (SimpLoop.trivial T n).loop.toEq := by
-  simp [SimpLoop.mapLoop, SimpLoop.trivial, Path.toEq, Path.stepChain,
-        Path.trans, Path.symm, Path.congrArg]
+  simp
 
 /-- Theorem 32: Map preserves loop composition. -/
 theorem SimpLoop.map_comp_eq {S T : PointedSimpSet}
@@ -447,8 +446,7 @@ theorem SimpLoop.map_comp_eq {S T : PointedSimpSet}
     (SimpLoop.mapLoop F hbase (SimpLoop.comp α β)).loop.toEq =
       (SimpLoop.comp (SimpLoop.mapLoop F hbase α)
                      (SimpLoop.mapLoop F hbase β)).loop.toEq := by
-  simp [SimpLoop.mapLoop, SimpLoop.comp, Path.toEq, Path.stepChain,
-        Path.trans, Path.symm, Path.congrArg]
+  simp
 
 /-! ## Section 10: Transport along Simplicial Paths -/
 

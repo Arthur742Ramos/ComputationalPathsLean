@@ -52,19 +52,19 @@ noncomputable def atomicPath (h : a = b) : Path a b :=
 
 theorem trans_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simpa using Path.trans_assoc p q r
+  simp
 
 theorem trans_refl_left (p : Path a b) :
     Path.trans (Path.refl a) p = p := by
-  simpa using Path.trans_refl_left p
+  simp
 
 theorem trans_refl_right (p : Path a b) :
     Path.trans p (Path.refl b) = p := by
-  simpa using Path.trans_refl_right p
+  simp
 
 theorem symm_trans (p : Path a b) (q : Path b c) :
     Path.symm (Path.trans p q) = Path.trans (Path.symm q) (Path.symm p) := by
-  simpa using Path.symm_trans p q
+  simp
 
 theorem symm_symm (p : Path a b) :
     Path.symm (Path.symm p) = p := by
@@ -73,12 +73,12 @@ theorem symm_symm (p : Path a b) :
 theorem congrArg_trans {B : Type v} (f : A → B) (p : Path a b) (q : Path b c) :
     Path.congrArg f (Path.trans p q) =
       Path.trans (Path.congrArg f p) (Path.congrArg f q) := by
-  simpa using Path.congrArg_trans f p q
+  simp
 
 theorem congrArg_symm {B : Type v} (f : A → B) (p : Path a b) :
     Path.congrArg f (Path.symm p) =
       Path.symm (Path.congrArg f p) := by
-  simpa using Path.congrArg_symm f p
+  simp
 
 @[simp] theorem path_mk_refl (x : A) :
     Path.mk ([] : List (Step A)) (rfl : x = x) = Path.refl x := rfl
@@ -92,12 +92,12 @@ theorem congrArg_symm {B : Type v} (f : A → B) (p : Path a b) :
 @[simp] theorem atomicPath_trans_symm_toEq (h : a = b) :
     Path.toEq (Path.trans (atomicPath (a := a) (b := b) h)
       (Path.symm (atomicPath (a := a) (b := b) h))) = rfl := by
-  simpa using Path.toEq_trans_symm (atomicPath (a := a) (b := b) h)
+  simp
 
 @[simp] theorem atomicPath_symm_trans_toEq (h : a = b) :
     Path.toEq (Path.trans (Path.symm (atomicPath (a := a) (b := b) h))
       (atomicPath (a := a) (b := b) h)) = rfl := by
-  simpa using Path.toEq_symm_trans (atomicPath (a := a) (b := b) h)
+  simp
 
 @[simp] theorem atomicPath_congr_toEq (f : A → A) (h : a = b) :
     Path.toEq (Path.congrArg f (atomicPath (a := a) (b := b) h)) =
@@ -180,10 +180,7 @@ theorem conditionPath_trans_assoc {Cond : Type u}
     Path.trans (conditionPath (p := p) (q := q) h₁)
       (Path.trans (conditionPath (p := q) (q := r) h₂)
         (conditionPath (p := r) (q := s) h₃)) := by
-  simpa using Path.trans_assoc
-    (conditionPath (p := p) (q := q) h₁)
-    (conditionPath (p := q) (q := r) h₂)
-    (conditionPath (p := r) (q := s) h₃)
+  simp
 
 /-! ## Filters, dense sets, and generic filters -/
 
@@ -512,13 +509,13 @@ noncomputable def evalPath {Obj : Type u} (M : BooleanValuedModel Obj) {x y : Ob
     (p : Path x y) (q : Path y z) :
     evalPath M (Path.trans p q) =
       Path.trans (evalPath M p) (evalPath M q) := by
-  simpa [evalPath] using Path.congrArg_trans M.eval p q
+  simp [evalPath]
 
 @[simp] theorem evalPath_symm {Obj : Type u}
     (M : BooleanValuedModel Obj) {x y : Obj}
     (p : Path x y) :
     evalPath M (Path.symm p) = Path.symm (evalPath M p) := by
-  simpa [evalPath] using Path.congrArg_symm M.eval p
+  simp [evalPath]
 
 @[simp] theorem evalPath_toEq {Obj : Type u}
     (M : BooleanValuedModel Obj) {x y : Obj}
@@ -690,7 +687,7 @@ theorem independenceResult_congr_sym (R S : IndependenceResult)
     (p : Path R S) :
     Path.congrArg IndependenceResult.Sym (Path.symm p) =
       Path.symm (Path.congrArg IndependenceResult.Sym p) := by
-  simpa using Path.congrArg_symm IndependenceResult.Sym p
+  simp
 
 theorem independenceResult_congr_trans (R S T : IndependenceResult)
     (p : Path R S) (q : Path S T) :
@@ -698,7 +695,7 @@ theorem independenceResult_congr_trans (R S T : IndependenceResult)
       Path.trans
         (Path.congrArg IndependenceResult.Sym p)
         (Path.congrArg IndependenceResult.Sym q) := by
-  simpa using Path.congrArg_trans IndependenceResult.Sym p q
+  simp
 
 end MetadataPaths
 

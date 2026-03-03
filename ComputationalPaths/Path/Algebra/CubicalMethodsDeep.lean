@@ -138,7 +138,7 @@ noncomputable def Square.vcomp {A : Type u} {a b : A} {p q r : Path a b}
 /-- Horizontal composition of squares. -/
 noncomputable def Square.hcomp {A : Type u} {a b c : A}
     {p₁ p₂ : Path a b} {q₁ q₂ : Path b c}
-    (s₁ : Square p₁ p₂) (s₂ : Square q₁ q₂) :
+    (_s₁ : Square p₁ p₂) (_s₂ : Square q₁ q₂) :
     Square (Path.trans p₁ q₁) (Path.trans p₂ q₂) :=
   ⟨by apply Subsingleton.elim⟩
 
@@ -314,7 +314,7 @@ theorem congrArg_line_symm {A B : Type u} (f : A → B) {a b : A}
 
 /-- congrArg maps squares to squares. -/
 noncomputable def congrArg_square {A B : Type u} (f : A → B) {a b : A} {p q : Path a b}
-    (s : Square p q) :
+    (_s : Square p q) :
     Square (Path.congrArg f p) (Path.congrArg f q) :=
   ⟨by apply Subsingleton.elim⟩
 

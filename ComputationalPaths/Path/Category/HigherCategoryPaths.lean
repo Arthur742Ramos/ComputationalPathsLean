@@ -92,14 +92,14 @@ theorem assoc₁_path_trans_refl (C : TwoCat) {a b c d : C.Obj}
 theorem id₁_comp_path_cancel (C : TwoCat) {a b : C.Obj} (f : C.Mor₁ a b) :
     (Path.trans (C.id₁_comp_path f)
       (Path.symm (C.id₁_comp_path f))).proof = rfl := by
-  simp [TwoCat.id₁_comp_path]
+  simp
 
 /-- 5. Associativity path cancels with inverse. -/
 theorem assoc₁_path_cancel (C : TwoCat) {a b c d : C.Obj}
     (f : C.Mor₁ a b) (g : C.Mor₁ b c) (h : C.Mor₁ c d) :
     (Path.trans (C.assoc₁_path f g h)
       (Path.symm (C.assoc₁_path f g h))).proof = rfl := by
-  simp [TwoCat.assoc₁_path]
+  simp
 
 /-- 6. Symm of symm of assoc₁ path. -/
 theorem assoc₁_path_symm_symm (C : TwoCat) {a b c d : C.Obj}
@@ -169,7 +169,7 @@ theorem whiskerLeft_id_path_cancel (W : HasWhiskering C)
     {a b c : C.Obj} (h : C.Mor₁ a b) (f : C.Mor₁ b c) :
     (Path.trans (W.whiskerLeft_id_path h f)
       (Path.symm (W.whiskerLeft_id_path h f))).proof = rfl := by
-  simp [HasWhiskering.whiskerLeft_id_path]
+  simp
 
 /-! ## Interchange law -/
 
@@ -216,7 +216,7 @@ theorem interchange_path_cancel (I : HasInterchange C)
     (γ : C.Mor₂ g₁ g₂) (δ : C.Mor₂ g₂ g₃) :
     (Path.trans (I.interchange_path α β γ δ)
       (Path.symm (I.interchange_path α β γ δ))).proof = rfl := by
-  simp [HasInterchange.interchange_path]
+  simp
 
 /-! ## Eckmann-Hilton argument -/
 
@@ -246,7 +246,7 @@ theorem eh_single_is_id_trans_refl (E : EckmannHiltonData C) :
 theorem eh_single_is_id_cancel (E : EckmannHiltonData C) :
     (Path.trans (E.single_is_id_path)
       (Path.symm (E.single_is_id_path))).proof = rfl := by
-  simp [EckmannHiltonData.single_is_id_path]
+  simp
 
 /-! ## Strictification -/
 
@@ -286,7 +286,7 @@ theorem morMap_comp_path_cancel (S : StrictificationData C)
     {a b c : C.Obj} (f : C.Mor₁ a b) (g : C.Mor₁ b c) :
     (Path.trans (S.morMap_comp_path f g)
       (Path.symm (S.morMap_comp_path f g))).proof = rfl := by
-  simp [StrictificationData.morMap_comp_path]
+  simp
 
 /-! ## Transport and congruence -/
 

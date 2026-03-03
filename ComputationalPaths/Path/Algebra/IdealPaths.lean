@@ -188,7 +188,7 @@ noncomputable def crt_coprime_sum_path (I J : Ideal) (h : Nat.gcd I.gen J.gen = 
   Path.stepChain (by simp [Ideal.sum, h])
 
 /-- 27. CRT followed by product comm: composing two paths. -/
-noncomputable def crt_prod_chain (I J : Ideal) (h : Nat.gcd I.gen J.gen = 1) :
+noncomputable def crt_prod_chain (I J : Ideal) (_h : Nat.gcd I.gen J.gen = 1) :
     Path (Ideal.prod I J) (Ideal.prod J I) :=
   ideal_prod_comm_path I J
 
@@ -202,7 +202,7 @@ noncomputable def sum_zero_roundtrip (I : Ideal) :
 /-- 29. Symmetry of sum commutativity roundtrip gives refl on toEq. -/
 theorem sum_comm_roundtrip_toEq (I J : Ideal) :
     (Path.trans (ideal_sum_comm_path I J) (ideal_sum_comm_inv I J)).toEq = rfl := by
-  simp [ideal_sum_comm_inv]
+  simp
 
 /-- 30. Symmetry of prod commutativity roundtrip gives refl on toEq. -/
 theorem prod_comm_roundtrip_toEq (I J : Ideal) :

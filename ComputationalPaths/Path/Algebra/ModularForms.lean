@@ -70,7 +70,7 @@ structure ModularAction (H : Type u) where
   act_mul : ∀ w1 w2 z,
     Path (act (ModularWord.mul w1 w2) z) (act w1 (act w2 z))
   /-- Step witness for primitive modular relations. -/
-  act_step : ∀ {w w'} (h : ModularStep w w') (z : H),
+  act_step : ∀ {w w'} (_h : ModularStep w w') (z : H),
     Path (act w z) (act w' z)
 
 /-- Data for modular forms: action plus weight scaling. -/
@@ -80,7 +80,7 @@ structure ModularData (H : Type u) (R : Type v) where
   /-- Weight scaling action on values. -/
   weight : Nat → ModularWord → H → R → R
   /-- Weight action respects modular steps. -/
-  weight_step : ∀ {k w w'} (h : ModularStep w w') (z : H) (r : R),
+  weight_step : ∀ {k w w'} (_h : ModularStep w w') (z : H) (r : R),
     Path (weight k w z r) (weight k w' z r)
 
 /-- A modular form of weight `k` with a Path-valued transformation law. -/

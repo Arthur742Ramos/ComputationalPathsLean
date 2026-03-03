@@ -206,22 +206,22 @@ theorem inner_horn_filling (C : QuasiCategory) (n : Nat) (k : Fin (n + 2))
   ⟨InnerKanProperty.fill C.innerKan n k hk horn⟩
 
 /-- The identity morphism is a left unit for composition. -/
-theorem QuasiCategory.id_comp' (C : QuasiCategory) (f : C.mor) :
+theorem QuasiCategory.id_comp' (C : QuasiCategory) (_f : C.mor) :
     True := by trivial
 
 /-- The identity morphism is a right unit for composition. -/
-theorem QuasiCategory.comp_id' (C : QuasiCategory) (f : C.mor) :
+theorem QuasiCategory.comp_id' (C : QuasiCategory) (_f : C.mor) :
     True := by trivial
 
 /-- Composition is associative up to a 3-simplex witness. -/
-theorem QuasiCategory.comp_assoc (C : QuasiCategory) (f g h : C.mor) :
+theorem QuasiCategory.comp_assoc (C : QuasiCategory) (_f _g _h : C.mor) :
     Exists (fun desc : String => desc = "3-simplex associativity witness") :=
   ⟨_, rfl⟩
 
 /-- Mapping space adjunction: given mapping space data, the component types are
     non-trivially related (placeholder for the full adjunction). -/
-theorem mapping_space_adjunction (C : QuasiCategory) (M : MappingSpaceData C)
-    (x y z : C.obj) : True :=
+theorem mapping_space_adjunction (C : QuasiCategory) (_M : MappingSpaceData C)
+    (_x _y _z : C.obj) : True :=
   trivial
 
 /-- The homotopy category of a quasi-category satisfies left identity. -/
@@ -236,12 +236,12 @@ theorem nerve_is_quasiCategory_prop (Cat : SmallCatData) (N : NerveQuasiCategory
 
 /-- Left fibrations are stable under pullback. -/
 theorem left_fibration_pullback {S T U : SSetData}
-    (p : LeftFibrationData S T) (f : SSetMap U T) :
+    (_p : LeftFibrationData S T) (_f : SSetMap U T) :
     True := by trivial
 
 /-- Right fibrations are stable under pullback. -/
 theorem right_fibration_pullback {S T U : SSetData}
-    (p : RightFibrationData S T) (f : SSetMap U T) :
+    (_p : RightFibrationData S T) (_f : SSetMap U T) :
     True := by trivial
 
 /-- Every left horn is either the 0-horn or an inner horn. -/

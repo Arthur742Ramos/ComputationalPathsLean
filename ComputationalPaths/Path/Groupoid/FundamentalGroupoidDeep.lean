@@ -144,7 +144,7 @@ theorem GNatTrans.vcomp_naturality_toEq {F G H : GFunctor A B}
     {x y : A} (f : GMor A x y) :
     (GMor.comp (F.mor f) (GMor.comp (η.component y) (θ.component y))).path.toEq =
       (GMor.comp (GMor.comp (η.component x) (θ.component x)) (H.mor f)).path.toEq := by
-  simp [GMor.comp]
+  simp
 
 /-- 16. Identity natural transformation. -/
 noncomputable def GNatTrans.identity (F : GFunctor A B) : GNatTrans F F where
@@ -172,19 +172,19 @@ theorem GNatTrans.naturality_toEq {F G : GFunctor A B}
 /-- 18. Conjugation by identity is identity (via trans/symm reduction). -/
 theorem conjugate_by_id {x : A} (f : GMor A x x) :
     (conjugate f (GMor.id x)).path.toEq = f.path.toEq := by
-  simp [GMor.comp, GMor.inv, GMor.id]
+  simp
 
 /-- 19. Commutator with self is trivial. -/
 theorem commutator_self {x : A} (f : GMor A x x) :
     (commutator f f).path.toEq = rfl := by
-  simp [commutator, GMor.comp, GMor.inv]
+  simp
 
 /-- 20. Double conjugation associates: conj(conj(f,g),h) = conj(f, g∘h). -/
 theorem double_conjugation_toEq {x y z : A}
     (f : GMor A x x) (g : GMor A x y) (h : GMor A y z) :
     (conjugate (conjugate f g) h).path.toEq =
       (conjugate f (GMor.comp g h)).path.toEq := by
-  simp [conjugate, GMor.comp, GMor.inv]
+  simp
 
 /-! ## Transport functoriality -/
 

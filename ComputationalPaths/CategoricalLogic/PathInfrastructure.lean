@@ -391,7 +391,7 @@ structure QuantifiedHyperdoctrine (C : Cat.{u,v}) where
   forall_ : {A B : C.Obj} → C.Hom A B → Pred A → Pred B
   beck_chevalley_exists : ∀ {A B D E : C.Obj}
     (f : C.Hom A B) (g : C.Hom D E) (h : C.Hom A D) (k : C.Hom B E)
-    (sq : C.comp f k = C.comp h g) (φ : Pred D),
+    (_sq : C.comp f k = C.comp h g) (φ : Pred D),
     substQ k (exists_ g φ) = exists_ f (substQ h φ)
   frobenius : ∀ {A B : C.Obj} (f : C.Hom A B) (φ : Pred A) (ψ : Pred B),
     exists_ f (meetQ φ (substQ f ψ)) = meetQ (exists_ f φ) ψ
@@ -431,7 +431,7 @@ end QHPaths
 /-- Kripke-Joyal forcing model for a topos. -/
 structure KripkeJoyal (C : Cat.{u,v}) (T : Terminal C) (Ω : SubobjectClassifier C T) where
   forces : C.Obj → C.Hom T.one Ω.Ω → Prop
-  monotone : ∀ {U V : C.Obj} (f : C.Hom U V) (φ : C.Hom T.one Ω.Ω),
+  monotone : ∀ {U V : C.Obj} (_f : C.Hom U V) (φ : C.Hom T.one Ω.Ω),
     forces V φ → forces U φ
   forces_true : ∀ (U : C.Obj), forces U Ω.true_arrow
   forces_and : ∀ {U : C.Obj} (L : InternalLogic C T Ω) (φ : C.Hom T.one Ω.Ω),

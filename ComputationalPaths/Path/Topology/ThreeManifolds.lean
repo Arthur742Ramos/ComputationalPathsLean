@@ -367,26 +367,26 @@ structure GeometrizationPrime (M : ThreeManifold.{u}) where
 
 /-! ## Additional Theorem Stubs -/
 
-theorem heegaard_decomposition_exists (M : ThreeManifold.{u}) : True := trivial
+theorem heegaard_decomposition_exists (_M : ThreeManifold.{u}) : True := trivial
 
 theorem heegaard_genus_well_defined (M : ThreeManifold.{u})
-    (g : HeegaardGenus M) : True := trivial
+    (_g : HeegaardGenus M) : True := trivial
 
-theorem prime_decomposition_exists (M : ThreeManifold.{u}) : True := trivial
+theorem prime_decomposition_exists (_M : ThreeManifold.{u}) : True := trivial
 
 theorem prime_decomposition_unique (M : ThreeManifold.{u})
-    (P : PrimeDecomposition M) : True := trivial
+    (_P : PrimeDecomposition M) : True := trivial
 
-theorem jsj_decomposition_exists (M : ThreeManifold.{u}) : True := trivial
+theorem jsj_decomposition_exists (_M : ThreeManifold.{u}) : True := trivial
 
 theorem geometrization_piecewise (M : ThreeManifold.{u})
-    (G : Geometrization M) : True := trivial
+    (_G : Geometrization M) : True := trivial
 
 theorem dehn_surgery_realization (M : ThreeManifold.{u})
-    (L : LickorishWallace M) : True := trivial
+    (_L : LickorishWallace M) : True := trivial
 
 theorem incompressible_surface_haken (M : ThreeManifold.{u})
-    (H : HakenManifold M) : True := trivial
+    (_H : HakenManifold M) : True := trivial
 
 end ThreeManifolds
 end Topology

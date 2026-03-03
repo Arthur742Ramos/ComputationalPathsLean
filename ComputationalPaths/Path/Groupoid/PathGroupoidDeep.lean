@@ -117,7 +117,7 @@ theorem inducedFunctor_inv (f : A → B) {x y : A} (p : Hom A x y) :
 theorem inducedFunctor_comp_map (f : A → B) (g : B → C) {x y : A} (p : Hom A x y) :
     (inducedFunctor (g ∘ f)).map p =
     (compFunctor (inducedFunctor f) (inducedFunctor g)).map p := by
-  simp [inducedFunctor, compFunctor, congrArg_comp]
+  simp [inducedFunctor, compFunctor]
 
 /-! ## Natural transformations -/
 
@@ -240,7 +240,7 @@ theorem triangle {x y z : A}
 
 /-- 31. Inverse is unique at toEq level. -/
 theorem inv_unique {x y : A} (f : Hom A x y) (g : Hom A y x)
-    (hl : (Hom.comp g f).toEq = rfl) (hr : (Hom.comp f g).toEq = rfl) :
+    (_hl : (Hom.comp g f).toEq = rfl) (_hr : (Hom.comp f g).toEq = rfl) :
     g.toEq = (Hom.inv f).toEq := rfl
 
 /-- 32. Conjugation by identity is identity. -/

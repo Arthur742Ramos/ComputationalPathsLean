@@ -261,7 +261,7 @@ structure KoszulDuality (C : DeformationContext.{u}) where
   /-- From formal moduli problem to DG Lie algebra. -/
   moduliToLie : FormalModuli.{u} → DGLie.{u}
   /-- Round-trip: Lie → Moduli → Lie recovers the original via Path. -/
-  lie_roundtrip : ∀ (L : DGLie.{u}) (x : L.Carrier),
+  lie_roundtrip : ∀ (L : DGLie.{u}) (_x : L.Carrier),
     Path ((moduliToLie (lieToModuli L)).Carrier)
          ((moduliToLie (lieToModuli L)).Carrier)
   /-- Round-trip: Moduli → Lie → Moduli recovers the original. -/

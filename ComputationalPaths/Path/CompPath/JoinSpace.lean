@@ -96,8 +96,7 @@ noncomputable def glueTri_param_indep_rweq (x x' : X) (y y' : Y) :
 /-- All paths inl x → inl x' have the same proof (proof irrelevance). -/
 theorem glueTri_proof_unique (x x' : X) (y y' : Y) :
     (glueTri x x' y).proof = (glueTri x x' y').proof := by
-  simpa using
-    (rweq_toEq (glueTri_param_indep_rweq (X := X) (Y := Y) x x' y y'))
+  simp
 
 end JoinSpace
 
@@ -163,13 +162,11 @@ noncomputable def joinMap_comp_rweq {X₁ X₂ X₃ Y₁ Y₂ Y₃ : Type u}
         =
       Path.congrArg (fun z => joinMap f₂ g₂ (joinMap f₁ g₁ z))
         (JoinSpace.glue (X := X₁) (Y := Y₁) x y) := by
-          simpa using
-            (Path.congrArg_comp (joinMap f₂ g₂) (joinMap f₁ g₁)
-              (JoinSpace.glue (X := X₁) (Y := Y₁) x y)).symm
+          simp
     _ =
       Path.congrArg (joinMap (f₂ ∘ f₁) (g₂ ∘ g₁))
         (JoinSpace.glue (X := X₁) (Y := Y₁) x y) := by
-          simpa [hcomp]
+          simp [hcomp]
 
 /-- The identity join map is the identity function. -/
 theorem joinMap_id {X Y : Type u} (z : JoinSpace X Y) :
@@ -242,20 +239,16 @@ noncomputable def joinSymmMap_nat_rweq {X₁ X₂ Y₁ Y₂ : Type u}
         =
       Path.congrArg (fun z => joinSymmMap (X := X₂) (Y := Y₂) (joinMap f g z))
         (JoinSpace.glue (X := X₁) (Y := Y₁) x y) := by
-          simpa using
-            (Path.congrArg_comp (joinSymmMap (X := X₂) (Y := Y₂)) (joinMap f g)
-              (JoinSpace.glue (X := X₁) (Y := Y₁) x y)).symm
+          simp
     _ =
       Path.congrArg (fun z => joinMap g f (joinSymmMap (X := X₁) (Y := Y₁) z))
         (JoinSpace.glue (X := X₁) (Y := Y₁) x y) := by
-          simpa [hnat]
+          simp [hnat]
     _ =
       Path.congrArg (joinMap g f)
         (Path.congrArg (joinSymmMap (X := X₁) (Y := Y₁))
           (JoinSpace.glue (X := X₁) (Y := Y₁) x y)) := by
-          simpa using
-            (Path.congrArg_comp (joinMap g f) (joinSymmMap (X := X₁) (Y := Y₁))
-              (JoinSpace.glue (X := X₁) (Y := Y₁) x y))
+          simp
 
 /-- Path witness of the double symmetry involution. -/
 noncomputable def joinSymmMap_involutive_path {X Y : Type u} (z : JoinSpace X Y) :

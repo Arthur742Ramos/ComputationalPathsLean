@@ -181,30 +181,30 @@ noncomputable def happly {f g : A → B} (p : Path f g) (x : A) :
 /-- Round-trip: happly ∘ funext is pointwise identity at toEq level. -/
 theorem happly_funext_toEq {f g : A → B} (h : ∀ x, Path (f x) (g x)) (x : A) :
     (happly (funext h) x).toEq = (h x).toEq := by
-  simp [happly, funext]
+  simp
 
 /-- Round-trip: funext ∘ happly = id at toEq level. -/
 theorem funext_happly_toEq {f g : A → B} (p : Path f g) :
     (funext (happly p)).toEq = p.toEq := by
-  cases p with | mk s h => cases h; simp [funext, happly]
+  cases p with | mk s h => cases h; simp
 
 /-- `funext` on reflexive paths yields a path with `toEq = rfl`. -/
 @[simp] theorem funext_refl (f : A → B) :
     (funext (fun x => Path.refl (f x))).toEq = rfl := by
-  simp [funext]
+  simp
 
 /-- `funext` respects symmetry at toEq level. -/
 theorem funext_symm {f g : A → B} (h : ∀ x, Path (f x) (g x)) :
     (funext (fun x => Path.symm (h x))).toEq =
       (funext h).toEq.symm := by
-  simp [funext]
+  simp
 
 /-- `funext` respects transitivity at toEq level. -/
 theorem funext_trans {f g k : A → B}
     (h₁ : ∀ x, Path (f x) (g x)) (h₂ : ∀ x, Path (g x) (k x)) :
     (funext (fun x => Path.trans (h₁ x) (h₂ x))).toEq =
       ((funext h₁).toEq.trans (funext h₂).toEq) := by
-  simp [funext]
+  simp
 
 /-- Dependent function extensionality. -/
 noncomputable def dfunext {C : A → Type v} {f g : ∀ x, C x}
@@ -219,7 +219,7 @@ noncomputable def dhapply {C : A → Type v} {f g : ∀ x, C x}
 
 @[simp] theorem dfunext_refl {C : A → Type v} (f : ∀ x, C x) :
     (dfunext (fun x => Path.refl (f x))).toEq = rfl := by
-  simp [dfunext]
+  simp
 
 end FunExtPath
 

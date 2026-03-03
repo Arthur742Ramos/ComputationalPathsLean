@@ -225,7 +225,7 @@ noncomputable def mulConjugatePath (h g x : X) :
 theorem congrArg_symm_conjugate (g x : X) :
     Path.congrArg G.loopInv (Path.symm (G.conjugatePath g x)) =
     Path.symm (G.invConjugatePath g x) := by
-  simp [invConjugatePath, Path.congrArg_symm]
+  simp [invConjugatePath]
 
 -- ============================================================
 -- §5  Basepoint-change coherence  (10 theorems)
@@ -282,7 +282,7 @@ noncomputable def bpChangeAssocPath (a b c : X) :
 theorem congrArg_symm_bpChangeAssoc (a b c : X) :
     Path.congrArg G.basepointChange (Path.symm (G.mulAssocPath a b c)) =
     Path.symm (G.bpChangeAssocPath a b c) := by
-  simp [bpChangeAssocPath, Path.congrArg_symm]
+  simp [bpChangeAssocPath]
 
 -- ============================================================
 -- §6  Higher composites & pentagon-like identities  (16 theorems)

@@ -264,12 +264,12 @@ structure MinimalGroupoidAxioms (A : Type u) where
   symm_symm : ∀ {a b : A} (p : Path a b), RwEq (Path.symm (Path.symm p)) p
 
 /-- Derive trans_refl_right from the minimal set. -/
-noncomputable def deriveTransReflRight (M : MinimalGroupoidAxioms A) {a b : A} (p : Path a b) :
+noncomputable def deriveTransReflRight (_M : MinimalGroupoidAxioms A) {a b : A} (p : Path a b) :
     RwEq (Path.trans p (Path.refl b)) p :=
   derive_trans_refl_right p
 
 /-- Derive symm_trans from the minimal set. -/
-noncomputable def deriveSymmTrans (M : MinimalGroupoidAxioms A) {a b : A} (p : Path a b) :
+noncomputable def deriveSymmTrans (_M : MinimalGroupoidAxioms A) {a b : A} (p : Path a b) :
     RwEq (Path.trans (Path.symm p) p) (Path.refl b) :=
   derive_symm_trans p
 

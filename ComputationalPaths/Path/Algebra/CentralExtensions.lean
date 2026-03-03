@@ -118,7 +118,7 @@ noncomputable def TwoCocycle.trivial (G : Type u) (A : Type v) (gd : GroupData G
   normalized_right := fun _ => Path.refl _
   cocycle_cond := fun _ _ _ => by
     apply Path.stepChain
-    simp [ad.one_mul, ad.mul_one]
+    simp [ad.one_mul]
 
 /-! ## 2-Coboundaries -/
 
@@ -212,7 +212,7 @@ structure UniversalCentralExtension (G : Type u) where
   ext : CentralExtension A U G
   /-- Universality: for any central extension, there is a factoring map. -/
   factor : ∀ (E : Type v) (B : Type v)
-    (ext' : CentralExtension B E G), U → E
+    (_ext' : CentralExtension B E G), U → E
   /-- The factor map preserves projection. -/
   factor_proj : ∀ (E : Type v) (B : Type v)
     (ext' : CentralExtension B E G) (u : U),

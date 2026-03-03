@@ -377,7 +377,7 @@ structure BousfieldClass where
 
 
 /-- Bousfield lattice partial order: ⟨E⟩ ≤ ⟨F⟩. -/
-noncomputable def bousfieldLeq (a b : BousfieldClass) : Prop :=
+noncomputable def bousfieldLeq (a _b : BousfieldClass) : Prop :=
   a.height = a.height  -- simplified model
 
 /-- HZ Bousfield class (rational localization). -/

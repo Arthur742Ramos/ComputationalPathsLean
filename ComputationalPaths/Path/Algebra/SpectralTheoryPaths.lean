@@ -346,7 +346,7 @@ theorem nmat_add_step_map_trace (m1 m2 : NMat2) :
 theorem transport_ntrace_add {D : Nat → Sort _} (m1 m2 : NMat2)
     (x : D (NMat2.add m1 m2).trace) :
     transport (ntrace_add_path m1 m2) x = (ntrace_add m1 m2) ▸ x := by
-  simp [ntrace_add_path, transport]
+  simp [transport]
 
 -- 35. Smul distributivity then commutativity chain
 noncomputable def nsmul_add_comm_path (c : Nat) (m1 m2 : NMat2) :

@@ -233,7 +233,7 @@ structure QuillenEquivalence {A : Type u} {B : Type v}
 
 /-- Quillen equivalences are symmetric. -/
 theorem quillen_equiv_symm {A : Type u} {B : Type v}
-    {M : MCat A} {N : MCat B} (Q : QuillenEquivalence M N) :
+    {M : MCat A} {N : MCat B} (_Q : QuillenEquivalence M N) :
     Exists (fun desc : String => desc = "QuillenEquivalence N M") :=
   ⟨_, rfl⟩
 
@@ -280,8 +280,8 @@ structure ReedyModelStructure (R : ReedyCategory.{u}) (A : Type v) where
 
 /-- Reedy model structures exist for any Reedy category and cofibrantly
     generated model category. -/
-theorem reedy_model_structure_exists (R : ReedyCategory.{u}) (A : Type v)
-    (M : MCat A) : Exists (fun desc : String => desc = "ReedyModelStructure exists") :=
+theorem reedy_model_structure_exists (_R : ReedyCategory.{u}) (A : Type v)
+    (_M : MCat A) : Exists (fun desc : String => desc = "ReedyModelStructure exists") :=
   ⟨_, rfl⟩
 
 /-! ## Combinatorial model categories -/
@@ -302,9 +302,9 @@ structure CombinatorialModelCategory (A : Type u) extends MCat A where
 /-- Smith's recognition theorem: a combinatorial model structure is
     determined by the weak equivalences and one set of generating
     cofibrations satisfying the solution set condition. -/
-theorem smith_recognition (A : Type u) (weq : ∀ {a b : A}, Path a b → Prop)
-    (I : (Σ (a : A) (b : A), Path a b) → Prop)
-    (h_acc : True) (h_sol : True) :
+theorem smith_recognition (A : Type u) (_weq : ∀ {a b : A}, Path a b → Prop)
+    (_I : (Σ (a : A) (b : A), Path a b) → Prop)
+    (_h_acc : True) (_h_sol : True) :
     Exists (fun desc : String => desc = "Smith recognition: CombinatorialModelCategory exists") :=
   ⟨_, rfl⟩
 
@@ -327,7 +327,7 @@ structure BousfieldLocalization (A : Type u) where
 
 /-- An S-local object: one seeing all S-local equivalences as
     homotopy equivalences. -/
-noncomputable def isLocalObject {A : Type u} (L : BousfieldLocalization A) (X : A) : Prop :=
+noncomputable def isLocalObject {A : Type u} (L : BousfieldLocalization A) (_X : A) : Prop :=
   ∀ {a b : A} (f : Path a b), L.localWeq f → True
 
 /-- An S-local fibration: a map with RLP against S-local trivial
@@ -406,13 +406,13 @@ noncomputable def isRightProper (A : Type u) (M : MCat A) : Prop :=
 /-- Every model category in which all objects are cofibrant is left
     proper. -/
 theorem all_cofibrant_left_proper (A : Type u) (M : MCat A)
-    (h : ∀ a : A, True) : isLeftProper A M :=
+    (_h : ∀ _a : A, True) : isLeftProper A M :=
   fun _ _ _ _ => trivial
 
 /-- Every model category in which all objects are fibrant is right
     proper. -/
 theorem all_fibrant_right_proper (A : Type u) (M : MCat A)
-    (h : ∀ a : A, True) : isRightProper A M :=
+    (_h : ∀ _a : A, True) : isRightProper A M :=
   fun _ _ _ _ => trivial
 
 /-! ## Simplicial model categories -/
@@ -432,7 +432,7 @@ structure SimplicialModelCategory (A : Type u) extends MCat A where
 /-- The SM7 axiom: cofibrations tensored with cofibrations of simplicial
     sets yield cofibrations. -/
 theorem sm7_axiom {A : Type u} (SM : SimplicialModelCategory A)
-    {a b : A} (i : Path a b) (hi : SM.cof i) :
+    {a b : A} (i : Path a b) (_hi : SM.cof i) :
     True := trivial
 
 /-! ## Path witnesses -/

@@ -244,13 +244,13 @@ structure RingHom (R S : CRing.{u}) where
   preserves_mul : (a b : R.carrier) → Path (map (R.mul a b)) (S.mul (map a) (map b))
 
 /-- Theorem 14: Ring hom induces map on Spec -/
-noncomputable def ring_hom_induces_spec_map (R S : CRing.{u}) (phi : RingHom R S)
+noncomputable def ring_hom_induces_spec_map (R S : CRing.{u}) (_phi : RingHom R S)
     (pullback : Spec S → Spec R)
     (p : Spec S) : Path (pullback p) (pullback p) :=
   Path.refl (pullback p)
 
 /-- Theorem 15: Composition of ring homs on Spec is contravariant -/
-noncomputable def spec_contravariant (R S T : CRing.{u}) (f : RingHom R S) (g : RingHom S T)
+noncomputable def spec_contravariant (R S T : CRing.{u}) (_f : RingHom R S) (_g : RingHom S T)
     (specF : Spec S → Spec R) (specG : Spec T → Spec S)
     (specGF : Spec T → Spec R)
     (comp_compat : (p : Spec T) → Path (specF (specG p)) (specGF p))
@@ -380,7 +380,7 @@ noncomputable def qcoh_restrict_compat (X : AffineScheme.{u}) (F : QCohSheaf X)
 /-- Theorem 26: Module localization compatibility -/
 noncomputable def module_localization_compat (R : CRing.{u}) (M : Module R)
     (f : R.carrier)
-    (Rf : LocalizationAt R f) (Mf : Module R)
+    (_Rf : LocalizationAt R f) (Mf : Module R)
     (tensor : R.carrier → M.carrier → Mf.carrier)
     (compat : (r s : R.carrier) → (m : M.carrier) →
       Path (tensor (R.mul r s) m) (tensor r (M.smul s m)))
@@ -479,8 +479,8 @@ structure Cech1Cocycle (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R) wher
 
 /-- Theorem 34: Čech cocycle condition via Path -/
 noncomputable def cech_cocycle_condition (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
-    (g : Cech1Cocycle R F cov)
-    (i j k : cov.indexSet)
+    (_g : Cech1Cocycle R F cov)
+    (i _j k : cov.indexSet)
     (gij : F.sections (cov.opens i))
     (gik : F.sections (cov.opens k))
     (cocycle : Path (F.restrict (cov.opens i) (cov.opens k) gij) gik)
@@ -512,15 +512,15 @@ noncomputable def cech_refinement (R : CRing.{u}) (F : Presheaf R)
   compat j
 
 /-- Theorem 37: Čech-to-derived functor comparison -/
-noncomputable def cech_to_derived (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
+noncomputable def cech_to_derived (R : CRing.{u}) (_F : Presheaf R) (_cov : OpenCover R)
     (H0_cech H0_derived : Type u)
     (comparison : H0_cech → H0_derived)
     (c : H0_cech) : Path (comparison c) (comparison c) :=
   Path.refl (comparison c)
 
 /-- Theorem 38: Refinement functoriality via congrArg -/
-noncomputable def cech_refinement_functorial (R : CRing.{u}) (F : Presheaf R)
-    (cov : OpenCover R)
+noncomputable def cech_refinement_functorial (R : CRing.{u}) (_F : Presheaf R)
+    (_cov : OpenCover R)
     (H0 : Type u) (ref1 ref2 : H0 → H0)
     (comp : H0 → H0)
     (factor : (c : H0) → Path (comp c) (ref1 (ref2 c)))
@@ -554,7 +554,7 @@ noncomputable def proj_structure_sheaf (S : GradedRing.{u})
   Path.refl s
 
 /-- Theorem 40: D+(f) is affine for Proj -/
-noncomputable def dplus_is_affine (S : GradedRing.{u}) (f : S.ring.carrier)
+noncomputable def dplus_is_affine (S : GradedRing.{u}) (_f : S.ring.carrier)
     (affineChart : AffineScheme.{u})
     (iso : Proj S → Spec affineChart.ring)
     (p : Proj S) : Path (iso p) (iso p) :=
@@ -562,7 +562,7 @@ noncomputable def dplus_is_affine (S : GradedRing.{u}) (f : S.ring.carrier)
 
 /-- Theorem 41: Proj inclusion via graded maps -/
 noncomputable def proj_graded_map (S T : GradedRing.{u})
-    (phi : RingHom S.ring T.ring)
+    (_phi : RingHom S.ring T.ring)
     (induced : Proj T → Proj S)
     (p q : Proj T) (h : Path p q)
     : Path (induced p) (induced q) :=
@@ -600,7 +600,7 @@ noncomputable def gluing_unique (X Y : Scheme.{u})
 noncomputable def sheaf_gluing_locality (R : CRing.{u}) (F : Presheaf R) (cov : OpenCover R)
     (U : BasicOpen R)
     (s t : F.sections U)
-    (local_eq : (i : cov.indexSet) →
+    (_local_eq : (i : cov.indexSet) →
       Path (F.restrict U (cov.opens i) s)
            (F.restrict U (cov.opens i) t))
     (global_eq : Path s t)
@@ -619,7 +619,7 @@ structure DVR where
   inclusion : ring.carrier → fractionField.carrier
 
 /-- Theorem 45: Valuative criterion of separatedness -/
-noncomputable def valuative_separatedness (X S : Scheme.{u})
+noncomputable def valuative_separatedness (X _S : Scheme.{u})
     (R : DVR.{u})
     (lift1 lift2 : Spec R.ring → X.points)
     (agree : (p : Spec R.ring) → Path (lift1 p) (lift2 p))
@@ -627,16 +627,16 @@ noncomputable def valuative_separatedness (X S : Scheme.{u})
   agree p
 
 /-- Theorem 46: Valuative criterion of properness -/
-noncomputable def valuative_properness (X S : Scheme.{u}) (prop : Proper X S)
+noncomputable def valuative_properness (X S : Scheme.{u}) (_prop : Proper X S)
     (R : DVR.{u})
-    (generic_pt : Spec R.fractionField → X.points)
+    (_generic_pt : Spec R.fractionField → X.points)
     (lift : Spec R.ring → X.points)
     (extends_generic : (q : Spec R.ring) → Path (lift q) (lift q))
     (q : Spec R.ring) : Path (lift q) (lift q) :=
   extends_generic q
 
 /-- Theorem 47: Uniqueness of valuative lift via Path.symm -/
-noncomputable def valuative_lift_unique (X S : Scheme.{u})
+noncomputable def valuative_lift_unique (X _S : Scheme.{u})
     (R : DVR.{u}) (lift1 lift2 : Spec R.ring → X.points)
     (agree : (p : Spec R.ring) → Path (lift1 p) (lift2 p))
     (p : Spec R.ring) : Path (lift2 p) (lift1 p) :=
@@ -662,8 +662,8 @@ noncomputable def tensor_symmetric (R : CRing.{u}) (M N : Module R)
 
 /-- Theorem 49: Base change of a quasi-coherent sheaf -/
 noncomputable def base_change_qcoh (X Y : AffineScheme.{u})
-    (phi : RingHom X.ring Y.ring)
-    (F : QCohSheaf X)
+    (_phi : RingHom X.ring Y.ring)
+    (_F : QCohSheaf X)
     (pullbackF : QCohSheaf Y)
     (U : BasicOpen Y.ring) (s : (pullbackF.localization U).carrier)
     : Path s s :=
@@ -700,7 +700,7 @@ theorem congrArg_symm_restrict (R : CRing.{u}) (F : Presheaf R) (U V : BasicOpen
   congrArg_symm (F.restrict U V) p
 
 /-- Theorem 53: symm_symm involution for scheme morphisms -/
-theorem scheme_symm_symm (X Y : Scheme.{u}) (a b : X.points)
+theorem scheme_symm_symm (X _Y : Scheme.{u}) (a b : X.points)
     (p : Path a b)
     : Path.symm (Path.symm p) = p :=
   symm_symm p

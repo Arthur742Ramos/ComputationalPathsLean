@@ -244,7 +244,7 @@ structure HyperbolicMap (R : Type u) (Ri : RingWithInvolution R) where
 /-- The composition Forget ∘ Hyp doubles the class (Path witness). -/
 noncomputable def forget_hyp_double (R : Type u) (Ri : RingWithInvolution R)
     (F : ForgetfulMap R Ri) (H : HyperbolicMap R Ri)
-    (h_gw : F.gw = H.gw) :
+    (_h_gw : F.gw = H.gw) :
     Path (F.forget F.gw.zero) F.k0_zero :=
   F.forget_zero
 

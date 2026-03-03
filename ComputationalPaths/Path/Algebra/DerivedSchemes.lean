@@ -197,8 +197,8 @@ structure DerivedSchemeMor (X Y : DerivedScheme.{u}) where
   /-- Underlying map on spaces. -/
   toFun : X.Space → Y.Space
   /-- Local affine maps exist (simplified). -/
-  localAffine : ∀ (x : X.Space), ∃ (i : Fin X.charts.length) (j : Fin Y.charts.length),
-    ∃ (g : DerivedAffineMor (X.charts.get i).affine (Y.charts.get j).affine),
+  localAffine : ∀ (_x : X.Space), ∃ (i : Fin X.charts.length) (j : Fin Y.charts.length),
+    ∃ (_g : DerivedAffineMor (X.charts.get i).affine (Y.charts.get j).affine),
     True
 
 /-! ## Cotangent Complex -/

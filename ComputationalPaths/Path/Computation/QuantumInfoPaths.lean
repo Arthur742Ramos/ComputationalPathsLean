@@ -171,7 +171,7 @@ theorem channel_compose_apply (c1 c2 : QChannel) (ρ : DensityMatrix) :
 -- 31
 theorem channel_compose_nil_left (c : QChannel) (ρ : DensityMatrix) :
     QChannel.apply (QChannel.compose [] c) ρ = QChannel.apply c ρ := by
-  simp [QChannel.compose, QChannel.apply]
+  simp [QChannel.compose]
 -- 32
 theorem channel_compose_nil_right (c : QChannel) (ρ : DensityMatrix) :
     QChannel.apply (QChannel.compose c []) ρ = QChannel.apply c ρ := by

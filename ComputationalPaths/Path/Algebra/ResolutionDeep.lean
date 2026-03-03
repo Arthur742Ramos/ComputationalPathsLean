@@ -524,7 +524,7 @@ theorem transport_along_path {P : α → Prop} (hinv : PathInvariant P)
 noncomputable def liftPath (f : F) : Path (FOTerm F V) t₁ t₂ →
     Path (FOTerm F V) (FOTerm.app f [t₁]) (FOTerm.app f [t₂])
   | Path.nil _ => Path.nil _
-  | Path.cons s rest =>
+  | Path.cons _s rest =>
       Path.cons (Step.rule "cong" _ _) (liftPath f rest)
 
 -- 54

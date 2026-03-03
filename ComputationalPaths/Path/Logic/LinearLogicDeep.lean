@@ -165,7 +165,7 @@ structure Fact (M : PhaseSpace.{u}) where
   closed : ∀ x, set x → set (M.mul M.e x)
 
 /-- 16. Phase space identity fact path. -/
-noncomputable def phase_id_fact (M : PhaseSpace.{u}) (f : Fact M) (x : M.carrier) (h : f.set x) :
+noncomputable def phase_id_fact (M : PhaseSpace.{u}) (f : Fact M) (x : M.carrier) (_h : f.set x) :
     Path (M.mul M.e x) x :=
   Path.mk [] (M.left_id x)
 
@@ -203,14 +203,14 @@ noncomputable def empty_clique (C : CoherenceSpace.{u}) : Clique C :=
 /-- 20. Singleton clique. -/
 noncomputable def singleton_clique (C : CoherenceSpace.{u}) (a : C.token) : Clique C :=
   ⟨[a], fun x y hx hy => by
-    simp [List.mem_singleton] at hx hy
+    simp at hx hy
     rw [hx, hy]; exact C.coh_refl a⟩
 
 /-- 21. Web (dual) of a coherence space: incoherence becomes coherence. -/
 noncomputable def CoherenceSpace.dual (C : CoherenceSpace.{u}) : CoherenceSpace.{u} :=
   { token := C.token,
     coh := fun a b => a = b ∨ ¬ C.coh a b,
-    coh_refl := fun a => Or.inl rfl,
+    coh_refl := fun _a => Or.inl rfl,
     coh_symm := fun a b h => h.elim (fun e => Or.inl e.symm)
       (fun h => Or.inr (fun hc => h (C.coh_symm b a hc))) }
 

@@ -41,7 +41,7 @@ variable {a b c d e : A}
 theorem hcomp_id_id (f : Path a b) (g : Path b c) :
     TwoCell.hcomp (TwoCell.id f) (TwoCell.id g) =
       TwoCell.id (Path.trans f g) := by
-  simp [TwoCell.hcomp, TwoCell.id]
+  simp [TwoCell.id]
 
 /-- The RwEq-level pentagon yields a bicategory 2-cell. -/
 theorem pentagon_twoCell (p : Path a b) (q : Path b c)

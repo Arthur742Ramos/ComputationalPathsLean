@@ -123,13 +123,13 @@ theorem vId_comp_path_trans_refl (D : DblCat) {a b : D.Obj} (f : D.VMor a b) :
 theorem hId_comp_path_cancel (D : DblCat) {a b : D.Obj} (f : D.HMor a b) :
     (Path.trans (D.hId_comp_path f)
       (Path.symm (D.hId_comp_path f))).proof = rfl := by
-  simp [DblCat.hId_comp_path]
+  simp
 
 /-- 6. Vertical left unit path cancels with inverse. -/
 theorem vId_comp_path_cancel (D : DblCat) {a b : D.Obj} (f : D.VMor a b) :
     (Path.trans (D.vId_comp_path f)
       (Path.symm (D.vId_comp_path f))).proof = rfl := by
-  simp [DblCat.vId_comp_path]
+  simp
 
 /-- 7. Symm of symm of hAssoc path. -/
 theorem hAssoc_path_symm_symm (D : DblCat) {a b c d : D.Obj}
@@ -208,13 +208,13 @@ theorem idFunctor_vMap_id (D : DblCat) (a : D.Obj) :
 theorem hMap_id_path_cancel (F : DblFunctor D E) (a : D.Obj) :
     (Path.trans (F.hMap_id_path a)
       (Path.symm (F.hMap_id_path a))).proof = rfl := by
-  simp [DblFunctor.hMap_id_path]
+  simp
 
 /-- 14. vMap_id path cancels with inverse. -/
 theorem vMap_id_path_cancel (F : DblFunctor D E) (a : D.Obj) :
     (Path.trans (F.vMap_id_path a)
       (Path.symm (F.vMap_id_path a))).proof = rfl := by
-  simp [DblFunctor.vMap_id_path]
+  simp
 
 /-! ## Companion and conjoint pairs -/
 
@@ -249,7 +249,7 @@ structure ConjointData (D : DblCat) {a b : D.Obj}
 /-- 16. Every identity has a trivial companion with itself. -/
 theorem id_companion (D : DblCat) (a : D.Obj) :
     CompanionData D (D.hId a) (D.vId a) where
-  isCompanion := by simp [D.hComp_id, D.hId_comp]
+  isCompanion := by simp
 
 /-! ## Transport -/
 
@@ -303,6 +303,6 @@ theorem hAssoc_path_cancel (D : DblCat) {a b c d : D.Obj}
     (f : D.HMor a b) (g : D.HMor b c) (h : D.HMor c d) :
     (Path.trans (D.hAssoc_path f g h)
       (Path.symm (D.hAssoc_path f g h))).proof = rfl := by
-  simp [DblCat.hAssoc_path]
+  simp
 
 end ComputationalPaths.Path.Category.DoubleCategoryPaths

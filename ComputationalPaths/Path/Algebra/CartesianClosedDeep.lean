@@ -624,7 +624,7 @@ theorem thm_symm_nil (a : Mor) :
 
 theorem thm_symm_single (s : Step Mor a b) :
     (Path.single s).symm = Path.single s.symm := by
-  simp [Path.single, Path.symm, Path.trans, path_trans_nil_right]
+  simp [Path.single, Path.symm, Path.trans]
 
 theorem thm_symm_length_gen (p : Path α a b) :
     p.symm.length = p.length := by
@@ -633,7 +633,7 @@ theorem thm_symm_length_gen (p : Path α a b) :
   | cons s _ ih =>
     simp [Path.symm, Path.length]
     rw [path_length_trans]
-    simp [Path.single, Path.length, ih]
+    simp [Path.length, ih]
     omega
 
 theorem thm_symm_length (p : CCPath a b) :

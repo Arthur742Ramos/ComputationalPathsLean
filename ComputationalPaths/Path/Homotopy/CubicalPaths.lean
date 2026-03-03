@@ -268,10 +268,7 @@ theorem TwoPath.symm_trans_toEq {A : Type u} {a b : A} {p q : Path a b}
   have h :
       RwEq (TwoPath.trans (TwoPath.symm α) α) (Path.refl q) :=
     TwoPath.symm_trans_rweq α
-  simpa using
-    (rwEq_iff_toEq
-      (p := TwoPath.trans (TwoPath.symm α) α)
-      (q := Path.refl q)).1 h
+  simp
 
 /-- Trans-symm is identity at the eq level. -/
 noncomputable def TwoPath.trans_symm_rweq {A : Type u} {a b : A} {p q : Path a b}
@@ -285,10 +282,7 @@ theorem TwoPath.trans_symm_toEq {A : Type u} {a b : A} {p q : Path a b}
   have h :
       RwEq (TwoPath.trans α (TwoPath.symm α)) (Path.refl p) :=
     TwoPath.trans_symm_rweq α
-  simpa using
-    (rwEq_iff_toEq
-      (p := TwoPath.trans α (TwoPath.symm α))
-      (q := Path.refl p)).1 h
+  simp
 
 end CubicalPaths
 end Homotopy

@@ -533,7 +533,7 @@ theorem chain_congrArg_symm {B : Type u} (f : A → B) {a b : A}
   congrArg_symm f p
 
 -- Theorem 45: Pentagon chain — left . right⁻¹ = left . right⁻¹
-theorem pentagon_chain_cancel (M : MonoidalData A) (P : PentagonAxiom M)
+theorem pentagon_chain_cancel (M : MonoidalData A) (_P : PentagonAxiom M)
     (a b c d : A) :
     pentagonLeft M a b c d = pentagonLeft M a b c d :=
   rfl
@@ -563,7 +563,7 @@ theorem braid_inv_via_sym (M : MonoidalData A) (B : BraidingData M) (S : Symmetr
 
 -- Theorem 49: tensorPath preserves trans in first argument
 theorem tensorPath_trans_left (M : MonoidalData A) {a b c d : A}
-    (p : Path a b) (q : Path b c) (r : Path d d) (hr : r = Path.refl d) :
+    (p : Path a b) (q : Path b c) (r : Path d d) (_hr : r = Path.refl d) :
     tensorPath M (Path.trans p q) r =
     Path.trans (Path.congrArg (M.tensor · d) (Path.trans p q))
       (Path.congrArg (M.tensor c ·) r) := by

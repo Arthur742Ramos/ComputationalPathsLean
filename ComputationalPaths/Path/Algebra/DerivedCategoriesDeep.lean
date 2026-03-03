@@ -116,19 +116,19 @@ namespace DerivedStep
 
 theorem toEq {a b : Int} (s : DerivedStep a b) : a = b := by
   cases s with
-  | add_zero x => simpa using Int.add_zero x
-  | zero_add x => simpa using Int.zero_add x
+  | add_zero x => simp
+  | zero_add x => simp
   | add_comm x y => simpa using Int.add_comm x y
   | add_assoc x y z => simpa using Int.add_assoc x y z
   | neg_cancel x => simpa using Int.add_right_neg x
-  | neg_neg x => simpa using Int.neg_neg x
+  | neg_neg x => simp
 
 noncomputable def toPath {a b : Int} (s : DerivedStep a b) : Path a b :=
   Path.stepChain (toEq s)
 
 theorem toPath_toEq {a b : Int} (s : DerivedStep a b) :
     (toPath s).toEq = toEq s := by
-  simp [toPath]
+  simp
 
 end DerivedStep
 
@@ -181,7 +181,7 @@ noncomputable def localizationRoofLoop {C D : ChainComplex} (L : LocalizationWit
 theorem localizationRoofLoop_toEq {C D : ChainComplex}
     (L : LocalizationWitness C D) :
     (localizationRoofLoop L).toEq = rfl := by
-  simp [localizationRoofLoop]
+  simp
 
 theorem localizationRoofLoop_symm {C D : ChainComplex}
     (L : LocalizationWitness C D) :
@@ -200,7 +200,7 @@ structure ShiftData where
 @[simp] noncomputable def idShiftData : ShiftData where
   Sym := fun C => C
   unsym := fun C => C
-  mapSym := fun {C D} f => f
+  mapSym := fun {_C _D} f => f
   Sym_unsym := fun C => Path.refl C
   unsym_Sym := fun C => Path.refl C
 
@@ -222,7 +222,7 @@ noncomputable def symUnsymLoop (S : ShiftData) (C : ChainComplex) :
 
 theorem symUnsymLoop_toEq (S : ShiftData) (C : ChainComplex) :
     (symUnsymLoop S C).toEq = rfl := by
-  simp [symUnsymLoop]
+  simp
 
 structure DistTriangle (S : ShiftData) where
   X : ChainComplex
@@ -268,7 +268,7 @@ noncomputable def rotateSourceLoop (S : ShiftData) (T : DistTriangle S) :
 
 theorem rotateSourceLoop_toEq (S : ShiftData) (T : DistTriangle S) :
     (rotateSourceLoop S T).toEq = rfl := by
-  simp [rotateSourceLoop, rotateSourcePath]
+  simp
 
 theorem rotateSourcePath_symm (S : ShiftData) (T : DistTriangle S) :
     Path.symm (rotateSourcePath S T) = rotateSourcePath S T := by
@@ -437,7 +437,7 @@ noncomputable def dualityLoop (G : GrothendieckDuality) (C : ChainComplex) :
 
 theorem dualityLoop_toEq (G : GrothendieckDuality) (C : ChainComplex) :
     (dualityLoop G C).toEq = rfl := by
-  simp [dualityLoop]
+  simp
 
 theorem dualityLoop_symm (G : GrothendieckDuality) (C : ChainComplex) :
     Path.symm (dualityLoop G C) = dualityLoop G C := by
@@ -480,7 +480,7 @@ noncomputable def heartObjLoop (T : TStructure) (H : HeartObj T) : Path H.obj H.
 
 theorem heartObjLoop_toEq (T : TStructure) (H : HeartObj T) :
     (heartObjLoop T H).toEq = rfl := by
-  simp [heartObjLoop]
+  simp
 
 abbrev Perversity := Nat → Int
 
@@ -541,7 +541,7 @@ noncomputable def dmoduleActionLoop (M : DModule) (x : Int) : Path (M.action 0 x
 
 theorem dmoduleActionLoop_toEq (M : DModule) (x : Int) :
     (dmoduleActionLoop M x).toEq = M.action_zero x := by
-  simp [dmoduleActionLoop]
+  simp
 
 /-! ## Additional bridges -/
 

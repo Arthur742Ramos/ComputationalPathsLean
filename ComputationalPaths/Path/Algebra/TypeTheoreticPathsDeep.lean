@@ -127,7 +127,7 @@ theorem ap_comp {A B C : Type u} (f : B → C) (g : A → B) {a b : A}
 /-- ap of identity proof. -/
 theorem ap_id {A : Type u} {a b : A} (p : Path a b) :
     (ap id p).proof = p.proof := by
-  simp [ap]
+  simp
 
 /-- ap not on Bool refl. -/
 theorem ap_not_bool_refl :

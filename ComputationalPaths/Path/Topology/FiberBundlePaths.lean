@@ -200,7 +200,7 @@ noncomputable def parallelTransport_proj_congrArg {E : FiberBundle} (conn : Conn
 /-- A flat connection: parallel transport along symm then forward is identity. -/
 structure FlatConnection (E : FiberBundle) extends Connection E where
   flat : ∀ {b₁ b₂ : E.base} (γ : Path b₁ b₂) (e : E.total)
-    (h : Path (E.proj e) b₁),
+    (_h : Path (E.proj e) b₁),
     Path (lift (Path.symm γ) (lift γ e)) e
 
 /-- Flat connection: reverse transport recovers original element. -/
@@ -255,8 +255,8 @@ noncomputable def productBundle_triv (B F : Type u) (f₀ : F) :
 noncomputable def productBundle_conn (B F : Type u) (f₀ : F) :
     Connection (productBundle B F f₀) where
   lift := fun {_ _} _ e => e
-  lift_proj := fun {b₁ b₂} γ e h =>
-    Path.trans h (Path.trans (Path.symm (Path.refl b₁)) γ)
+  lift_proj := fun {_b₁ _b₂} γ _e h =>
+    Path.trans h (Path.trans (Path.symm (Path.refl _b₁)) γ)
   lift_refl := fun _ _ _ => Path.refl _
 
 /-- Product bundle connection is flat. -/

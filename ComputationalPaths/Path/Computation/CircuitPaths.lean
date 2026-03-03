@@ -121,7 +121,7 @@ theorem circId_apply (n : Nat) (inp : Fin n → Bool) :
 -- 2. Left identity for composition
 theorem circComp_id_left {n m : Nat} (f : Circuit n m) :
     circComp (circId n) f = f := by
-  funext inp; simp [Function.comp]
+  funext inp; simp
 
 noncomputable def circComp_id_left_path {n m : Nat} (f : Circuit n m) :
     Path (circComp (circId n) f) f :=
@@ -130,7 +130,7 @@ noncomputable def circComp_id_left_path {n m : Nat} (f : Circuit n m) :
 -- 3. Right identity for composition
 theorem circComp_id_right {n m : Nat} (f : Circuit n m) :
     circComp f (circId m) = f := by
-  funext inp; simp [Function.comp]
+  funext inp; simp
 
 noncomputable def circComp_id_right_path {n m : Nat} (f : Circuit n m) :
     Path (circComp f (circId m)) f :=
@@ -140,7 +140,7 @@ noncomputable def circComp_id_right_path {n m : Nat} (f : Circuit n m) :
 theorem circComp_assoc {a b c d : Nat}
     (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) :
     circComp (circComp f g) h = circComp f (circComp g h) := by
-  funext inp; simp [Function.comp]
+  funext inp; simp
 
 noncomputable def circComp_assoc_path {a b c d : Nat}
     (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) :
@@ -150,7 +150,7 @@ noncomputable def circComp_assoc_path {a b c d : Nat}
 -- 5. NOT is an involution
 theorem circNot_involution (n : Nat) :
     circComp (circNot n) (circNot n) = circId n := by
-  funext inp i; simp [Function.comp, Bool.not_not]
+  funext inp i; simp [Bool.not_not]
 
 noncomputable def circNot_involution_path (n : Nat) :
     Path (circComp (circNot n) (circNot n)) (circId n) :=
@@ -212,13 +212,13 @@ noncomputable def circEquiv_path {n m : Nat} {f g : Circuit n m}
 theorem circComp_equiv_left {a b c : Nat}
     {f₁ f₂ : Circuit a b} (g : Circuit b c)
     (h : CircEquiv f₁ f₂) : CircEquiv (circComp f₁ g) (circComp f₂ g) :=
-  fun inp => by simp [circComp, Function.comp, h inp]
+  fun inp => by simp [circComp, h inp]
 
 -- 16. Composition preserves equivalence (right)
 theorem circComp_equiv_right {a b c : Nat}
     (f : Circuit a b) {g₁ g₂ : Circuit b c}
     (h : CircEquiv g₁ g₂) : CircEquiv (circComp f g₁) (circComp f g₂) :=
-  fun inp => by simp [circComp, Function.comp]; exact h (f inp)
+  fun inp => by simp [circComp]; exact h (f inp)
 
 /-! ## Boolean identities as circuit paths -/
 
@@ -311,7 +311,7 @@ theorem four_circuit_coherence {a b c d e : Nat}
     (f : Circuit a b) (g : Circuit b c) (h : Circuit c d) (k : Circuit d e) :
     circComp (circComp (circComp f g) h) k =
     circComp f (circComp g (circComp h k)) := by
-  funext inp; simp [Function.comp]
+  funext inp; simp
 
 -- 34. Step-level construction
 noncomputable def circuit_step {n m : Nat} (f : Circuit n m) : Step (Circuit n m) :=

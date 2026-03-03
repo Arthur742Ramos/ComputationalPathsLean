@@ -101,14 +101,14 @@ theorem comp₁_id_left_path_symm_cancel (M : Multicategory)
     {Γ : List M.Obj} {a : M.Obj} (f : M.Hom Γ a) :
     (Path.trans (M.comp₁_id_left_path f)
       (Path.symm (M.comp₁_id_left_path f))).proof = rfl := by
-  simp [Multicategory.comp₁_id_left_path]
+  simp
 
 /-- 5. Symm of right unit path. -/
 theorem comp₁_id_right_path_symm_cancel (M : Multicategory)
     {a b : M.Obj} (f : M.Hom [a] b) :
     (Path.trans (M.comp₁_id_right_path f)
       (Path.symm (M.comp₁_id_right_path f))).proof = rfl := by
-  simp [Multicategory.comp₁_id_right_path]
+  simp
 
 /-- 6. Symm of assoc path cancels. -/
 theorem comp₁_assoc_path_symm_cancel (M : Multicategory)
@@ -116,7 +116,7 @@ theorem comp₁_assoc_path_symm_cancel (M : Multicategory)
     (f : M.Hom [b] c) (g : M.Hom [a] b) (h : M.Hom Γ a) :
     (Path.trans (M.comp₁_assoc_path f g h)
       (Path.symm (M.comp₁_assoc_path f g h))).proof = rfl := by
-  simp [Multicategory.comp₁_assoc_path]
+  simp
 
 /-- 7. Double symm of left unit path. -/
 theorem comp₁_id_left_path_symm_symm (M : Multicategory)
@@ -210,7 +210,7 @@ theorem map_comp₁_path_trans_refl (F : MultiFunctor M N)
 /-- 15. Symm of map_id_path cancels via trans. -/
 theorem map_id_path_cancel (F : MultiFunctor M N) (a : M.Obj) :
     (Path.trans (F.map_id_path a) (Path.symm (F.map_id_path a))).proof = rfl := by
-  simp [MultiFunctor.map_id_path]
+  simp
 
 /-- 16. Double symm of map_id_path. -/
 theorem map_id_path_symm_symm (F : MultiFunctor M N) (a : M.Obj) :
@@ -231,7 +231,7 @@ theorem map_comp₁_path_symm_trans (F : MultiFunctor M N)
     (f : M.Hom [a] b) (g : M.Hom Γ a) :
     (Path.trans (Path.symm (F.map_comp₁_path f g))
       (F.map_comp₁_path f g)).proof = rfl := by
-  simp [MultiFunctor.map_comp₁_path]
+  simp
 
 /-- 19. CongrArg through homMap on refl. -/
 theorem congrArg_homMap_refl (F : MultiFunctor M N)
@@ -430,7 +430,7 @@ theorem naturality_path_cancel (α : MultiNatTrans F G)
     {a b : M.Obj} (f : M.Hom [a] b) :
     (Path.trans (α.naturality_path f)
       (Path.symm (α.naturality_path f))).proof = rfl := by
-  simp [MultiNatTrans.naturality_path]
+  simp
 
 /-- 37. Refl trans naturality path. -/
 theorem refl_trans_naturality_path (α : MultiNatTrans F G)
@@ -444,7 +444,7 @@ theorem naturality_path_symm_trans_proof (α : MultiNatTrans F G)
     {a b : M.Obj} (f : M.Hom [a] b) :
     (Path.trans (Path.symm (α.naturality_path f))
       (α.naturality_path f)).proof = rfl := by
-  simp [MultiNatTrans.naturality_path]
+  simp
 
 /-- 39. CongrArg through component on refl. -/
 theorem congrArg_component_refl (α : MultiNatTrans F G)

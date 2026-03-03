@@ -60,7 +60,7 @@ theorem derivedSymplecticRewrite_refl {x y : ShiftedSymplecticData}
 theorem derivedSymplectic_coherence {x y z w : ShiftedSymplecticData}
     (p : Path x y) (q : Path y z) (r : Path z w) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simpa using Path.trans_assoc p q r
+  simp
 
 end DerivedSymplectic
 end Topology

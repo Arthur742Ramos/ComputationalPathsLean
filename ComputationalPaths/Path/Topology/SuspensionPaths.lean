@@ -97,7 +97,7 @@ noncomputable def meridianLoop (a b : A) : Path (@north A) (@north A) :=
 
 theorem meridianLoop_toEq (a b : A) :
     (meridianLoop a b).toEq = rfl := by
-  simp [meridianLoop, fullMeridian, fullMeridianRev]
+  simp
 
 /-- A loop at south. -/
 noncomputable def southLoop (a b : A) : Path (@south A) (@south A) :=
@@ -105,7 +105,7 @@ noncomputable def southLoop (a b : A) : Path (@south A) (@south A) :=
 
 theorem southLoop_toEq (a b : A) :
     (southLoop a b).toEq = rfl := by
-  simp [southLoop, fullMeridian, fullMeridianRev]
+  simp
 
 /-- All loops at north are proof-irrelevant. -/
 theorem loop_north_eq (p q : Path (@north A) (@north A)) :
@@ -228,7 +228,7 @@ theorem symm_fullMeridian (a : A) :
 /-- Trans of meridian and its reverse is proof-trivial. -/
 theorem trans_fullMeridian_rev (a : A) :
     (Path.trans (fullMeridian a) (fullMeridianRev a)).toEq = rfl := by
-  simp [fullMeridian, fullMeridianRev]
+  simp
 
 end Susp
 

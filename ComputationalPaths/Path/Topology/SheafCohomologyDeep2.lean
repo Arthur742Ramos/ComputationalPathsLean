@@ -164,7 +164,7 @@ noncomputable def projection_formula_symm {A : Type u} (lhs rhs : A → A) (FG :
 
 -- 16. Čech then Serre duality
 noncomputable def cech_serre_chain {A : Type u} (cech derived Hi Hdual : A → A) (F : A)
-    (hcd : ∀ x, derived x = Hi x) :
+    (_hcd : ∀ x, derived x = Hi x) :
     SheafPath (cech F) (Hdual F) :=
   SheafPath.trans
     (cech_derived_path cech Hi F)
@@ -233,7 +233,7 @@ noncomputable def base_change_projection {A : Type u} (bc_l bc_r pf_r : A → A)
     (projection_formula_path (fun x => x) pf_r (bc_r F))
 
 -- 27. Coherent adjunction then base change
-noncomputable def coherent_base_change {A : Type u} (fStar fLower lhs rhs : A → A) (F : A) :
+noncomputable def coherent_base_change {A : Type u} (fStar fLower _lhs rhs : A → A) (F : A) :
     SheafPath (fStar (fLower F)) (rhs F) :=
   SheafPath.trans
     (coherent_adjunction_path fStar fLower F)
@@ -330,7 +330,7 @@ noncomputable def long_exact_mayer_vietoris {A : Type u} (δ Hn HnPlus : A → A
 
 -- 40. Grand sheaf cohomology theorem: Čech → derived → Leray → Serre → vanishing
 noncomputable def grand_sheaf_theorem {A : Type u}
-    (cech derived : A → A) (E₂ : A → A → A) (Htotal Hdual zero : A → A)
+    (cech derived : A → A) (E₂ : A → A → A) (Htotal _Hdual zero : A → A)
     (F : A) (p q : A)
     (h₁ : SheafStep (derived F) (E₂ p q)) :
     SheafPath (cech F) (zero p) :=

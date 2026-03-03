@@ -175,7 +175,7 @@ structure Subcomplex (A : Type u) (cw : CWData A) where
 
 /-- Path within a subcomplex: both endpoints satisfy the predicate. -/
 noncomputable def Subcomplex.pathIn {A : Type u} {cw : CWData A} (sub : Subcomplex A cw)
-    {x y : A} (p : Path x y) (hx : sub.pred x) : sub.pred x :=
+    {x y : A} (_p : Path x y) (hx : sub.pred x) : sub.pred x :=
   hx
 
 /-- The full complex is a subcomplex. -/

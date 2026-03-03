@@ -100,7 +100,7 @@ structure TwistedKGroup (T : Twist) where
   add_comm : ∀ x y, Path (add x y) (add y x)
 
 /-- Untwisted K-theory: K⁰(X) corresponds to τ = 0. -/
-noncomputable def untwistedK (T : Twist) (K : TwistedKGroup T) (h : Path K.twist T.zero) :
+noncomputable def untwistedK (T : Twist) (K : TwistedKGroup T) (_h : Path K.twist T.zero) :
     TwistedKGroup T :=
   K
 

@@ -104,7 +104,7 @@ theorem interchange_law
           (p := f0) (q := f1) (r := f2) eta1 eta2)
         (TwoCell.comp (A := A) (a := b) (b := c)
           (p := g0) (q := g1) (r := g2) theta1 theta2) := by
-  simp [TwoCell.comp, TwoCell.hcomp]
+  simp
 
 /-- Godement interchange: the two whiskering composites agree. -/
 @[simp] theorem godement_interchange

@@ -47,7 +47,7 @@ structure A1Contractible (X : Type u) (A1 : Type v) where
 
 /-- The projection from an A¹-contractible pair is a path equivalence. -/
 noncomputable def a1_contract_proj_path {X : Type u} {A1 : Type v}
-    (C : A1Contractible X A1) (x : X) (t : A1) :
+    (_C : A1Contractible X A1) (x : X) (t : A1) :
     Path (x, t).1 x :=
   Path.refl x
 
@@ -57,7 +57,7 @@ theorem a1_contract_compose {X : Type u} {A1 : Type v}
     Path.trans (Path.congrArg Prod.fst (C.contract x C.zero))
                (Path.refl x) =
     Path.congrArg Prod.fst (C.contract x C.zero) := by
-  simp [Path.trans_refl_right]
+  simp
 
 /-- A¹-homotopy between two maps: f and g are A¹-homotopic if there
 exists a computational path connecting them through the A¹-interval. -/

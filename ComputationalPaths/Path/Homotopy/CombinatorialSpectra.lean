@@ -215,7 +215,7 @@ structure LevelwiseEquivalence (S : Type u) (src tgt : LevelData S) extends
 structure StableEquivalenceData (S : Type u) (src tgt : LevelData S) extends
     SpectrumMap S src tgt where
   /-- Path certificate that each π_n^s is isomorphic. -/
-  stable_iso : ∀ (n : Int) (πs : HomotopyGroupData S src n)
+  stable_iso : ∀ (n : Int) (_πs : HomotopyGroupData S src n)
     (πt : HomotopyGroupData S tgt n),
     Path πt.zero πt.zero
 
@@ -297,7 +297,7 @@ structure LevelwiseFibration (S : Type u) (src tgt : LevelData S) extends
 structure StableFibration (S : Type u) (src tgt : LevelData S) extends
     SpectrumMap S src tgt where
   /-- Ω-spectrum condition on fibers. -/
-  fiber_omega : ∀ (n : Nat) (y : tgt.space n)
+  fiber_omega : ∀ (n : Nat) (_y : tgt.space n)
     (x : src.space n),
     Path
       (src.structure_map n x)

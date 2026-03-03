@@ -154,7 +154,7 @@ noncomputable def dComp_assoc_path {A B C D : DObj}
 noncomputable def dComp_id_fg {A B C : DObj} (f : DMor A B) (g : DMor B C) :
     Path (dComp (dComp (dId A) f) g) (dComp f g) :=
   Path.trans (dComp_assoc_path (dId A) f g)
-             (stepPath (by simp [dComp_id_left]))
+             (stepPath (by simp))
 
 -- 10. **Multi-step**: id ∘ (f ∘ id) = f  via  two simplifications
 noncomputable def dComp_id_full {A B : DObj} (f : DMor A B) :

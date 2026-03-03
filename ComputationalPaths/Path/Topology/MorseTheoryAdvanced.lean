@@ -158,7 +158,7 @@ structure MorseChainComplex (f : MorseFunctionExt) where
   /-- Boundary matrix entry. -/
   boundary : Nat → Nat → Nat → Int
   /-- ∂² = 0 with signs. -/
-  boundary_sq_zero : ∀ (k : Nat), True
+  boundary_sq_zero : ∀ (_k : Nat), True
 
 /-- Morse homology: the homology of the Morse chain complex. -/
 structure MorseHomologyGroup (f : MorseFunctionExt) where
@@ -249,7 +249,7 @@ structure WittenDeformation where
   /-- Deformed Laplacian eigenvalues (small eigenvalues). -/
   smallEigenvalues : Nat → Nat → Int
   /-- Number of small eigenvalues at degree k equals c_k. -/
-  small_count : ∀ (k : Nat), True
+  small_count : ∀ (_k : Nat), True
 
 /-- Witten instanton: a gradient flow line contributing to the deformed
     differential in the semiclassical limit t → ∞. -/
@@ -406,7 +406,7 @@ theorem morse_smale_cw (f : MorseFunctionExt) (msc : MorseSmaleComplex f) :
     True := msc.cw_structure
 
 /-- Handle decomposition exists for every smooth manifold. -/
-theorem handle_decomposition_exists (dim : Nat) : True := trivial
+theorem handle_decomposition_exists (_dim : Nat) : True := trivial
 
 /-- Handle cancellation reduces handle count. -/
 theorem handle_cancellation_reduces (hc : HandleCancellation) :

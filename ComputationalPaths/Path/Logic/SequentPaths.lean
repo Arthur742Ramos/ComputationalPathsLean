@@ -172,7 +172,7 @@ theorem weaken_symm (extra : Nat) (s₁ s₂ : DerivState)
 /-- Weakening by zero preserves the proof. -/
 theorem weaken_zero_toEq (s₁ s₂ : DerivState) (p : DerivPath s₁ s₂) :
     (weakenPath 0 s₁ s₂ p).toEq = _root_.congrArg (· + 0) p.toEq := by
-  simp [weakenPath, Path.congrArg]
+  simp
 
 /-- Contraction: collapsing duplicate derivation states. -/
 noncomputable def contractPath (f : DerivState → DerivState) (s₁ s₂ : DerivState)

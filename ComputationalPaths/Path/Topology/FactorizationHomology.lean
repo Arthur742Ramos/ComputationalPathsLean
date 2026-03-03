@@ -59,7 +59,7 @@ theorem factorizationRewrite_refl {x y : FactorizationCell}
 theorem factorization_coherence {x y z w : FactorizationCell}
     (p : Path x y) (q : Path y z) (r : Path z w) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
-  simpa using Path.trans_assoc p q r
+  simp
 
 end FactorizationHomology
 end Topology

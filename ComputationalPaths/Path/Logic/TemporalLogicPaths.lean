@@ -147,7 +147,7 @@ theorem eventually_monotone {S : Type u} (φ ψ : StateProp S)
 /-- Eventually of eventually simplifies: ◇◇φ ↔ ◇φ. -/
 theorem eventually_idempotent {S : Type u} (φ : StateProp S)
     (σ : Trace S) (i : Nat) :
-    eventuallyOp (fun s => eventuallyOp φ σ i) σ i →
+    eventuallyOp (fun _s => eventuallyOp φ σ i) σ i →
     eventuallyOp φ σ i := by
   intro ⟨_, _, h⟩; exact h
 
@@ -226,7 +226,7 @@ theorem transport_stateProp {S : Type u} (φ : StateProp S)
     Path.transport (D := fun s => φ s → φ s) p id = id := by
   cases p with
   | mk steps proof =>
-    cases proof; simp [Path.transport]
+    cases proof; simp
 
 /-- Trans path for temporal composition. -/
 noncomputable def temporal_trans_path {S : Type u} (s₁ s₂ s₃ : S)

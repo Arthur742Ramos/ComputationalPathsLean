@@ -81,14 +81,14 @@ structure PolyRewriteSystem (A : Type u) where
   rules : List (A × A)
 
 /-- Local confluence: all critical pairs are resolvable. -/
-noncomputable def PolyRewriteSystem.isLocallyConfluent (rs : PolyRewriteSystem A) : Prop :=
+noncomputable def PolyRewriteSystem.isLocallyConfluent (_rs : PolyRewriteSystem A) : Prop :=
   ∀ (cp : CriticalPair A),
-    ∃ (t : A) (pl : Path cp.left t) (pr : Path cp.right t), True
+    ∃ (t : A) (_pl : Path cp.left t) (_pr : Path cp.right t), True
 
 /-- Global confluence: all divergent paths can be joined. -/
-noncomputable def PolyRewriteSystem.isGloballyConfluent (rs : PolyRewriteSystem A) : Prop :=
+noncomputable def PolyRewriteSystem.isGloballyConfluent (_rs : PolyRewriteSystem A) : Prop :=
   ∀ (a b c : A), Path a b → Path a c →
-    ∃ (d : A) (p : Path b d) (q : Path c d), True
+    ∃ (d : A) (_p : Path b d) (_q : Path c d), True
 
 /-- Termination via a well-founded measure. -/
 noncomputable def PolyRewriteSystem.isTerminating (rs : PolyRewriteSystem A) : Prop :=
@@ -125,7 +125,7 @@ theorem resolved_pair_diamonds_eq {A : Type u}
     (rcp : ResolvedCriticalPair A) :
     (resolved_critical_pair_diamond rcp).toEq =
       (resolved_critical_pair_diamond_right rcp).toEq := by
-  simp [resolved_critical_pair_diamond, resolved_critical_pair_diamond_right]
+  simp
 
 /-! ## Reduction to Normal Form = Path to Irreducible -/
 
@@ -185,7 +185,7 @@ theorem reduction_compose_toEq {A : Type u} (N : PolyNormalForm A)
 theorem reduction_symm_toEq {A : Type u} (N : PolyNormalForm A)
     {a b : A} (p : Path a b) :
     (reduction_symm N p).toEq = (N.sound a b p).toEq.symm := by
-  simp [reduction_symm]
+  simp
 
 /-! ## Ideal Membership = Path Existence -/
 

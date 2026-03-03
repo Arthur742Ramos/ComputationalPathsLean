@@ -11,7 +11,7 @@ structure HigherMonoidalCategory where
 
 noncomputable def infinityOperadShape (n : Nat) : Type := Fin (n + 1)
 
-noncomputable def infinityOperadAxiom (C : HigherMonoidalCategory) : Prop := True
+noncomputable def infinityOperadAxiom (_C : HigherMonoidalCategory) : Prop := True
 
 noncomputable def algebraObject (C : HigherMonoidalCategory) : Type _ := C.Obj
 
@@ -26,7 +26,7 @@ noncomputable def dayConvolutionTensor (C D : HigherMonoidalCategory) :
 noncomputable def dayConvolutionUnit (C D : HigherMonoidalCategory) : dayConvolutionObj C D :=
   (C.unit, D.unit)
 
-noncomputable def dayConvolutionMonoidal (C D : HigherMonoidalCategory) : Prop := True
+noncomputable def dayConvolutionMonoidal (_C _D : HigherMonoidalCategory) : Prop := True
 
 noncomputable def operadicLeftKanExtension (C : HigherMonoidalCategory) : C.Obj → C.Obj := fun x => x
 

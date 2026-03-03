@@ -459,7 +459,7 @@ theorem tropicalHyperplane_dim_path (n : Nat) (hn : n > 0)
       (tropicalHyperplane n hn vm).dim_eq_rank := rfl
 
 theorem orientedMatroidTropicalBridge_true (n r : Nat)
-    (tls : TropicalLinearSpace n r) :
+    (_tls : TropicalLinearSpace n r) :
     True := by
   trivial
 

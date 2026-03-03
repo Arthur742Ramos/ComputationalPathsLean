@@ -99,7 +99,7 @@ theorem separated_from_refl {Obj : Type u} {F : SitePresheaf.{u, v} Obj}
 
 /-- Separated presheaves detect equality via restriction to self. -/
 theorem separated_refl_suffices {Obj : Type u} {F : SitePresheaf.{u, v} Obj}
-    (sep : Separated F) (c : Obj) (g h : F.sections c)
+    (_sep : Separated F) (c : Obj) (g h : F.sections c)
     (heq : g = h) : F.restrict (Eq.refl c) g = F.restrict (Eq.refl c) h := by
   rw [heq]
 
@@ -108,7 +108,7 @@ theorem separated_refl_suffices {Obj : Type u} {F : SitePresheaf.{u, v} Obj}
 /-- Full sheaf condition: existence + uniqueness of gluing. -/
 structure SheafCondition {Obj : Type u} (F : SitePresheaf.{u, v} Obj) where
   /-- Gluing: every matching family has a global section. -/
-  glue : ∀ (I : Type u) (m : MatchingFamily F I) (c : Obj),
+  glue : ∀ (I : Type u) (_m : MatchingFamily F I) (c : Obj),
     F.sections c
   /-- Glued section restricts to the local data. -/
   glue_compat : ∀ (I : Type u) (m : MatchingFamily F I) (c : Obj) (i : I),
@@ -169,7 +169,7 @@ structure DescentDatum {Obj : Type u} (F : SitePresheaf.{u, v} Obj) (I : Type u)
   /-- Local objects over each index. -/
   localObj : I → (c : Obj) → F.sections c
   /-- Transition maps on overlaps. -/
-  transition : ∀ (i j : I) (c : Obj), F.sections c → F.sections c
+  transition : ∀ (_i _j : I) (c : Obj), F.sections c → F.sections c
   /-- Cocycle condition: transition i→j→k = transition i→k. -/
   cocycle : ∀ (i j k : I) (c : Obj) (x : F.sections c),
     transition j k c (transition i j c x) = transition i k c x

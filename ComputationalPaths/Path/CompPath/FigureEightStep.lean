@@ -383,8 +383,7 @@ theorem commutator_class_eq :
 /-- The two commutator definitions have the same toEq. -/
 theorem commutator_toEq_eq :
     commutator.toEq = commutator'.toEq := by
-  simpa [commutatorClass] using
-    congrArg (PathRwQuot.toEq (A := FigureEight)) commutator_class_eq
+  simp
 
 /-! ## Summary
 

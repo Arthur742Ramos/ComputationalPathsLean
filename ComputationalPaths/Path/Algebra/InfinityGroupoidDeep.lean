@@ -268,7 +268,7 @@ theorem Path2.interchange_witness {α R} {a b c : α}
     {p₂ q₂ r₂ : SPath α R b c}
     (h₁ : Path2 α R p₁ q₁) (h₂ : Path2 α R q₁ r₁)
     (k₁ : Path2 α R p₂ q₂) (k₂ : Path2 α R q₂ r₂) :
-    ∃ w : Path2 α R (p₁.trans p₂) (r₁.trans r₂),
+    ∃ _w : Path2 α R (p₁.trans p₂) (r₁.trans r₂),
       True := by
   exact ⟨Path2.hcomp (h₁.trans2 h₂) (k₁.trans2 k₂), trivial⟩
 
@@ -315,7 +315,7 @@ theorem Path3.symm3_nil3 {α R} {a b : α} {p q : SPath α R a b}
 theorem macLane_pentagon_witness {α R} {a b c d e : α}
     (p : SPath α R a b) (q : SPath α R b c)
     (r : SPath α R c d) (s : SPath α R d e) :
-    ∃ w : Path2 α R
+    ∃ _w : Path2 α R
       ((p.trans q).trans (r.trans s))
       ((p.trans q).trans (r.trans s)),
     True := by
@@ -331,7 +331,7 @@ theorem triangle_coherence {α R} {a b c : α}
 theorem whisker_3path_exists {α R} {a b c : α}
     (r : SPath α R a b) {p q : SPath α R b c}
     (h : Path2 α R p q) :
-    ∃ w : Path3 α R (Path2.whiskerL r h) (Path2.whiskerL r h),
+    ∃ _w : Path3 α R (Path2.whiskerL r h) (Path2.whiskerL r h),
       True := by
   exact ⟨Path3.nil3 _, trivial⟩
 
