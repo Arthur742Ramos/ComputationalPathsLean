@@ -95,7 +95,7 @@ if one can be obtained from the other by applying a single rewrite rule.
 
 See the module documentation for a complete list of rule categories. -/
 inductive Step :
-  {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+  {A : Type u} → {a b : A} → Path a b → Path a b → Type (u + 1)
   /-- Rule 1: Symmetry of reflexivity is reflexivity. `symm(refl) ▷ refl` -/
   | symm_refl {A : Type u} (a : A) :
       Step (A := A) (symm (Path.refl a)) (Path.refl a)

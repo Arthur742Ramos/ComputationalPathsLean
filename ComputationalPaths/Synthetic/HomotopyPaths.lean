@@ -32,28 +32,28 @@ variable {A : Type u}
     (p : Path x y) : Path (f x) (f y) :=
   Path.congrArg f p
 
-theorem concat_left_unit_step {a b : A} (p : Path a b) :
+noncomputable def concat_left_unit_step {a b : A} (p : Path a b) :
     Path.Step (concat (Path.refl a) p) p := by
   simpa [concat] using (Path.Step.trans_refl_left p)
 
-theorem concat_right_unit_step {a b : A} (p : Path a b) :
+noncomputable def concat_right_unit_step {a b : A} (p : Path a b) :
     Path.Step (concat p (Path.refl b)) p := by
   simpa [concat] using (Path.Step.trans_refl_right p)
 
-theorem concat_assoc_step {a b c d : A}
+noncomputable def concat_assoc_step {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Path.Step (concat (concat p q) r) (concat p (concat q r)) := by
   simpa [concat] using (Path.Step.trans_assoc p q r)
 
-theorem concat_inverse_right_step {a b : A} (p : Path a b) :
+noncomputable def concat_inverse_right_step {a b : A} (p : Path a b) :
     Path.Step (concat p (inverse p)) (Path.refl a) := by
   simpa [concat, inverse] using (Path.Step.trans_symm p)
 
-theorem concat_inverse_left_step {a b : A} (p : Path a b) :
+noncomputable def concat_inverse_left_step {a b : A} (p : Path a b) :
     Path.Step (concat (inverse p) p) (Path.refl b) := by
   simpa [concat, inverse] using (Path.Step.symm_trans p)
 
-theorem inverse_concat_step {a b c : A}
+noncomputable def inverse_concat_step {a b c : A}
     (p : Path a b) (q : Path b c) :
     Path.Step (inverse (concat p q)) (concat (inverse q) (inverse p)) := by
   simpa [concat, inverse] using (Path.Step.symm_trans_congr p q)
@@ -98,11 +98,11 @@ noncomputable def transportReflPath {a : A} (u : P a) :
     (b := u)
     (Path.transport_refl (A := A) (D := P) (a := a) (x := u))
 
-theorem apd_refl_step (f : (x : A) → P x) (a : A) :
+noncomputable def apd_refl_step (f : (x : A) → P x) (a : A) :
     Path.Step (apd (A := A) (P := P) f (Path.refl a)) (Path.refl (f a)) := by
   simpa [apd] using (Path.Step.apd_refl (A := A) (B := P) f a)
 
-theorem transport_refl_step {a : A} (u : P a) :
+noncomputable def transport_refl_step {a : A} (u : P a) :
     Path.Step (transportReflPath (A := A) (P := P) u) (Path.refl u) := by
   simpa [transportReflPath] using
     (Path.Step.transport_refl_beta (A := A) (B := P) (a := a) u)
@@ -143,20 +143,20 @@ abbrev Homotopy {X : Type u} {Y : Type u} (f g : X → Y) : Type u :=
     (H : Homotopy f g) : Homotopy (fun x => f (h x)) (fun x => g (h x)) :=
   fun x => H (h x)
 
-theorem hTrans_left_unit_step {f g : A → B} (H : Homotopy f g) (x : A) :
+noncomputable def hTrans_left_unit_step {f g : A → B} (H : Homotopy f g) (x : A) :
     Path.Step (hTrans (hRefl f) H x) (H x) := by
   simpa [hTrans, hRefl, concat] using (Path.Step.trans_refl_left (H x))
 
-theorem hTrans_right_unit_step {f g : A → B} (H : Homotopy f g) (x : A) :
+noncomputable def hTrans_right_unit_step {f g : A → B} (H : Homotopy f g) (x : A) :
     Path.Step (hTrans H (hRefl g) x) (H x) := by
   simpa [hTrans, hRefl, concat] using (Path.Step.trans_refl_right (H x))
 
-theorem hTrans_assoc_step {f g h k : A → B}
+noncomputable def hTrans_assoc_step {f g h k : A → B}
     (H₁ : Homotopy f g) (H₂ : Homotopy g h) (H₃ : Homotopy h k) (x : A) :
     Path.Step (hTrans (hTrans H₁ H₂) H₃ x) (hTrans H₁ (hTrans H₂ H₃) x) := by
   simpa [hTrans, concat] using (Path.Step.trans_assoc (H₁ x) (H₂ x) (H₃ x))
 
-theorem homotopy_app_step {f g : A → B} (H : Homotopy f g) (x : A) :
+noncomputable def homotopy_app_step {f g : A → B} (H : Homotopy f g) (x : A) :
     Path.Step
       (Path.congrArg (fun k : A → B => k x)
         (Path.lamCongr (f := f) (g := g) H))

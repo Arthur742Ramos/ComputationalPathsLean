@@ -47,7 +47,7 @@ noncomputable def assocWithUnitsRight (a b c : V.State) (m n : Int) :
   Path.trans (O.assoc a b c m n) (Path.trans (Path.refl _) (Path.refl _))
 
 /-- Reassociating the unit-extended associator is a primitive rewrite step. -/
-theorem assocWithUnitsStep (a b c : V.State) (m n : Int) :
+noncomputable def assocWithUnitsStep (a b c : V.State) (m n : Int) :
     Path.Step (O.assocWithUnitsLeft a b c m n) (O.assocWithUnitsRight a b c m n) := by
   simpa [assocWithUnitsLeft, assocWithUnitsRight] using
     (Path.Step.trans_assoc
