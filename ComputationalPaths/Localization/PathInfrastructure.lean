@@ -38,7 +38,7 @@ noncomputable def mapPath {a b : A} (p : Path a b) : Path (L.obj a) (L.obj b) :=
   Path.trans (Path.congrArg L.obj p) (Path.refl (L.obj b))
 
 /-- Localization preserves paths with a direct `Step` witness. -/
-def mapPath_preserves_step {a b : A} (p : Path a b) :
+noncomputable def mapPath_preserves_step {a b : A} (p : Path a b) :
     Path.Step (L.mapPath p) (Path.congrArg L.obj p) := by
   simpa [mapPath] using
     (Path.Step.trans_refl_right (Path.congrArg L.obj p))
