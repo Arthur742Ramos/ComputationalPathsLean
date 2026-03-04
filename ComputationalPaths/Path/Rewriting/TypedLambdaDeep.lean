@@ -304,7 +304,7 @@ theorem normalForm_multi_eq {t nf : Term}
     (hn : NormalForm nf) (hm : BetaMulti nf t) : nf = t := by
   cases hm with
   | refl => rfl
-  | step hs _ => exact absurd hs (hn _)
+  | step hs _ => exact absurd ⟨hs⟩ (hn _)
 
 -- ═══════════════════════════════════════════════════════════════
 -- Section 6: Path algebra on Types
@@ -490,7 +490,7 @@ inductive SN : Term -> Prop where
 
 /-- Theorem 48: normal forms are SN -/
 theorem normalForm_SN (t : Term) (h : NormalForm t) : SN t :=
-  SN.intro (fun t' hs => absurd hs (h t'))
+  SN.intro (fun t' hs => absurd ⟨hs⟩ (h t'))
 
 /-- Theorem 49: variables are SN -/
 theorem var_SN (n : Nat) : SN (Term.var n) :=

@@ -1051,7 +1051,7 @@ noncomputable def two {A : Type u} {a b : A} {p q r : Path a b}
 end StepStar
 
 /-- Two reducts are joinable when they have a common `StepStar` descendant. -/
-inductive Step.Joinable {A : Type u} {a b : A} (p q : Path a b) : Type where
+inductive Step.Joinable {A : Type u} {a b : A} (p q : Path a b) : Type (u + 1) where
   | intro (r : Path a b) (hp : StepStar p r) (hq : StepStar q r) : Step.Joinable p q
 
 /-- Joinability is symmetric. -/
@@ -1242,6 +1242,10 @@ theorem Step.deterministic_mapRight_ofEq
       (Path.stepChain (A := A) (a := f a b1) (b := f a b2)
         (_root_.congrArg (f a) h)).toEq := by
   exact Step.deterministic (hq := hr) (hr := Step.mapRight_ofEq f a h)
+
+noncomputable section
+
+noncomputable section
 
 def critical_pair_trans_assoc_trans_refl_left_joinable
     {A : Type u} {a b c : A} (p : Path a b) (r : Path b c) :
@@ -1592,6 +1596,11 @@ def critical_pair_symm_congr_symm_trans_joinable
   refine ⟨Path.refl b, ?_, ?_⟩
   · exact StepStar.single (Step.symm_refl b)
   · exact StepStar.single (Step.trans_symm (Path.symm p))
+
+
+end
+
+end
 
 /-! ## Lexicographic termination measure scaffold -/
 
