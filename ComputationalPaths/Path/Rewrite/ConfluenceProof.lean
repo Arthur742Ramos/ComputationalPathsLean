@@ -555,7 +555,7 @@ making `RwPlus` reflexive and hence non-well-founded as a relation on
 `Terminating` records that the abstract TRS terminates: specifically, that
 `GroupoidTRS.Expr.Step` is well-founded. -/
 noncomputable def Terminating : Prop :=
-  WellFounded (fun q p : GroupoidTRS.Expr => GroupoidTRS.Expr.Step p q)
+  WellFounded (fun q p : GroupoidTRS.Expr => GroupoidTRS.Expr.StepProp p q)
 
 class HasTerminationProp : Prop where
   termination_prop : Terminating
@@ -700,9 +700,9 @@ If two expressions in normal form are both reachable from the same source,
 they are identical.  This is the strongest form of the confluence property. -/
 def expr_unique_normal_forms (e₁ e₂ : GroupoidTRS.Expr)
     (h : GroupoidConfluence.CRTC e₁ e₂)
-    (hnf : ∀ e', ¬GroupoidConfluence.CStep e₂ e') :
+    (hnf : ∀ e', ¬ GroupoidConfluence.CStepProp e₂ e') :
     ∀ e₃, GroupoidConfluence.CRTC e₁ e₃ →
-      (∀ e', ¬GroupoidConfluence.CStep e₃ e') → e₂ = e₃ :=
+      (∀ e', ¬ GroupoidConfluence.CStepProp e₃ e') → e₂ = e₃ :=
   GroupoidConfluence.normal_form_unique e₁ e₂ h hnf
 
 end ConfluenceProof
