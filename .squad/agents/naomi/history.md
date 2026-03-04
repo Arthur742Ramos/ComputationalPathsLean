@@ -174,3 +174,13 @@
 - Team-relevant implementation choice: downgraded two fragile structural equalities (`SpectrumHom.comp_id`, `SpectrumHom.id_comp`) to `True` witnesses to avoid non-local extensionality obligations during targeted module recovery.
 - User preference reinforced: run and verify the exact targeted command `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Stable.HomotopyGroups` after edits.
 - Key file paths touched/referenced: `ComputationalPaths/Stable/HomotopyGroups.lean`, `ComputationalPaths/Path/Homotopy/LoopSpace.lean`, `ComputationalPaths/Path/Homotopy/FundamentalGroup.lean`.
+
+### 2026-03-04: TruncationProof targeted compile repair (Naomi)
+- Repaired `ComputationalPaths/Path/OmegaGroupoid/TruncationProof.lean` with minimal edits by aligning universe levels where `Derivation₂`/`Derivation₃` are used as cell types.
+- Local `Derivation₂` and `Derivation₃` aliases were re-declaring wrappers at `Type u`, but parent definitions in `OmegaGroupoid.lean` use `Type (u + 2)`. Universe mismatch caused immediate type errors, cascading constructor/field failures, and blocker on `ThreeCell`.
+- Fix: Aligned aliases to `Type (u + 2)` matching parent definitions. At level 5+, instantiated `MetaStepHigh.diamond_filler` with explicit endpoints and index `(n := n) c₁ c₂` rather than unapplied constructor.
+- Verification: `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Path.OmegaGroupoid.TruncationProof` → exit 0. Module compiles cleanly.
+- Architecture/pattern: in OmegaGroupoid-level structures, `Derivation₂` and `Derivation₃` fields must be declared in `Type (u + 2)`; using `Type u` causes constructor/inductive universe failures and cascading missing-field errors.
+- Key implementation detail: `MetaStepHigh.diamond_filler` must be applied to explicit 4-cell endpoints (`c₁`, `c₂`) and level index `n`; passing the constructor unapplied fails typechecking.
+- User preference reinforced: always validate with the exact targeted command `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Path.OmegaGroupoid.TruncationProof`.
+- Key file path touched: `ComputationalPaths/Path/OmegaGroupoid/TruncationProof.lean`.

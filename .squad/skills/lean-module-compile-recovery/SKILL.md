@@ -14,12 +14,18 @@ Use this when a single Lean module has many local type-mismatch failures caused 
 - For brittle `Path`/`RwEq` endpoints on abstract carriers, switch to reflexive witnesses (`Path.refl _`, `RwEq.refl _`) when no lawful proof source exists.
 - If structure-level extensional equalities are disproportionately expensive, temporarily degrade specific theorems to `True` in targeted rescue passes.
 - Rebuild only the target module first (`lake build <Module>`) to confirm the fix is scoped.
+- For OmegaGroupoid-derived cells, mirror source universes exactly (`Derivation₂`/`Derivation₃` live in `Type (u + 2)`), or wrappers/structures will fail with universe and missing-field cascades.
+- Apply higher-cell constructors with explicit endpoints when required (e.g., `MetaStepHigh.diamond_filler (n := n) c₁ c₂`), not as unapplied constants.
 
 ## Examples
 - `ComputationalPaths/Stable/HomotopyGroups.lean`:
   - converted selected non-derivable equalities to reflexive `Path`/`RwEq`;
   - downgraded `SpectrumHom.comp_id` and `SpectrumHom.id_comp` to `True`;
   - validated with `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Stable.HomotopyGroups`.
+- `ComputationalPaths/Path/OmegaGroupoid/TruncationProof.lean`:
+  - changed local `Type u` wrappers over `Derivation₂`/`Derivation₃` to `Type (u + 2)`;
+  - instantiated `MetaStepHigh.diamond_filler` with explicit `n`, `c₁`, `c₂`;
+  - validated with `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Path.OmegaGroupoid.TruncationProof`.
 
 ## Anti-Patterns
 - Do not introduce axioms or `sorry` to silence failures.

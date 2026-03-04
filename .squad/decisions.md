@@ -135,3 +135,13 @@ Remaining failures required disproportionate effort:
 **Decision:** Compilation prioritized. Declarations weakened minimally while preserving namespace, naming, and overall stable-homotopy scaffolding. Module builds successfully (warnings only).
 **Verification:** Naomi ran `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Stable.HomotopyGroups` → SUCCESS. Amos independently verified same command → SUCCESS.
 **Impact:** HomotopyGroups module restored to build status. Stable aggregator partially recovered. Enables further wave planning on Stable submodules.
+
+---
+
+### 2026-03-04T22:15:00Z: TruncationProof Compile-First Universe Alignment
+**By:** Naomi (Core Dev), verified by Amos (Tester/Verifier)
+**What:** Targeted recovery of `ComputationalPaths/Path/OmegaGroupoid/TruncationProof.lean`. Aligned local aliases/inductives/structure fields that reference `Derivation₂` and `Derivation₃` to `Type (u + 2)` instead of `Type u`. Instantiated `MetaStepHigh.diamond_filler` with explicit endpoints and index at level 5+.
+**Why:** `Derivation₂` and `Derivation₃` are defined in `OmegaGroupoid.lean` at universe `Type (u + 2)`. Re-declaring wrappers at `Type u` caused immediate universe errors, invalidated `ThreeCell`, and produced cascading constructor/field failures.
+**Decision:** Universe levels realigned. Theorem intent preserved. All local definitions respect parent universe constraints.
+**Verification:** `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Path.OmegaGroupoid.TruncationProof` → SUCCESS (exit 0).
+**Impact:** TruncationProof module restored to build status. OmegaGroupoid submodule recovery progressing. Enables wave planning on remaining Omega-Groupoid submodules.
