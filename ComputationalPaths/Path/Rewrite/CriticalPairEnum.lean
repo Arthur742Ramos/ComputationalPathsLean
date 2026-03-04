@@ -229,7 +229,7 @@ but this module provides the "critical pair" proof path as well. -/
 /-- Local confluence follows from joinability of all critical pairs
     (here verified by direct construction for each family). -/
 def local_confluence_from_critical_pairs :
-    ∀ a b c : Expr, CStep a b → CStep a c →
+    ∀ a b c : Expr, GroupoidConfluence.CStepProp a b → GroupoidConfluence.CStepProp a c →
       ∃ d, CRTC b d ∧ CRTC c d :=
   local_confluence
 
@@ -267,7 +267,7 @@ and combined with termination, globally confluent (by Newman's Lemma). -/
 /-- The critical pairs witness that the system is the output of
     Knuth-Bendix completion: all overlaps are resolved. -/
 def knuth_bendix_complete :
-    (∀ a b c : Expr, CStep a b → CStep a c → ∃ d, CRTC b d ∧ CRTC c d) :=
+    (∀ a b c : Expr, GroupoidConfluence.CStepProp a b → GroupoidConfluence.CStepProp a c → ∃ d, CRTC b d ∧ CRTC c d) :=
   local_confluence
 
 /-! ## Critical Pair Symmetry

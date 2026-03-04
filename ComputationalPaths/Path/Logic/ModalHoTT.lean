@@ -135,7 +135,7 @@ structure ConnTruncFactorization {A B : Type u} (f : A → B) (n : Nat) where
 /-! ## Modal Step -/
 
 /-- Rewrite steps for modal operations. -/
-inductive ModalStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
+inductive ModalStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type (u+1)
   /-- Idempotence: mu(eta(x)) ≡ x. -/
   | idempotent (M : ModalityFull) {A : Type u} (x : M.op A) :
       ModalStep (M.mu_eta A x) (M.mu_eta A x)
