@@ -47,14 +47,14 @@ structure MotivicCohomRing where
     Path (add p q (add p q x y) z) (add p q x (add p q y z))
 
 /-- Addition with zero on the right is the identity. -/
-theorem cohom_add_zero_refl (R : MotivicCohomRing) (p q : Int) (x : R.H p q) :
-    Path.trans (R.add_zero p q x) (Path.refl x) = R.add_zero p q x := by
-  simp
+noncomputable def cohom_add_zero_refl (R : MotivicCohomRing) (p q : Int) (x : R.H p q) :
+    RwEq (Path.trans (R.add_zero p q x) (Path.refl x)) (R.add_zero p q x) :=
+  rweq_of_step (Path.Step.trans_refl_right (R.add_zero p q x))
 
 /-- Commutativity path is self-inverse via double symm. -/
-theorem cohom_comm_symm_symm (R : MotivicCohomRing) (p q : Int) (x y : R.H p q) :
-    Path.symm (Path.symm (R.add_comm p q x y)) = R.add_comm p q x y :=
-  Path.symm_symm (R.add_comm p q x y)
+noncomputable def cohom_comm_symm_symm (R : MotivicCohomRing) (p q : Int) (x y : R.H p q) :
+    RwEq (Path.symm (Path.symm (R.add_comm p q x y))) (R.add_comm p q x y) :=
+  rweq_of_step (Path.Step.symm_symm (R.add_comm p q x y))
 
 /-- Double zero addition is identity. -/
 noncomputable def cohom_zero_zero (R : MotivicCohomRing) (p q : Int) :
@@ -62,20 +62,20 @@ noncomputable def cohom_zero_zero (R : MotivicCohomRing) (p q : Int) :
   R.zero_add p q (R.zero p q)
 
 /-- Associativity composes with refl trivially. -/
-theorem cohom_assoc_refl (R : MotivicCohomRing) (p q : Int) (x y z : R.H p q) :
-    Path.trans (R.add_assoc p q x y z) (Path.refl _) =
-    R.add_assoc p q x y z := by
-  simp
+noncomputable def cohom_assoc_refl (R : MotivicCohomRing) (p q : Int) (x y z : R.H p q) :
+    RwEq (Path.trans (R.add_assoc p q x y z) (Path.refl (R.add p q x (R.add p q y z))))
+      (R.add_assoc p q x y z) :=
+  rweq_of_step (Path.Step.trans_refl_right (R.add_assoc p q x y z))
 
 /-- Associativity double symmetry. -/
-theorem cohom_assoc_symm_symm (R : MotivicCohomRing) (p q : Int) (x y z : R.H p q) :
-    Path.symm (Path.symm (R.add_assoc p q x y z)) = R.add_assoc p q x y z :=
-  Path.symm_symm (R.add_assoc p q x y z)
+noncomputable def cohom_assoc_symm_symm (R : MotivicCohomRing) (p q : Int) (x y z : R.H p q) :
+    RwEq (Path.symm (Path.symm (R.add_assoc p q x y z))) (R.add_assoc p q x y z) :=
+  rweq_of_step (Path.Step.symm_symm (R.add_assoc p q x y z))
 
 /-- zero_add composes with refl trivially. -/
-theorem cohom_zero_add_refl (R : MotivicCohomRing) (p q : Int) (x : R.H p q) :
-    Path.trans (R.zero_add p q x) (Path.refl x) = R.zero_add p q x := by
-  simp
+noncomputable def cohom_zero_add_refl (R : MotivicCohomRing) (p q : Int) (x : R.H p q) :
+    RwEq (Path.trans (R.zero_add p q x) (Path.refl x)) (R.zero_add p q x) :=
+  rweq_of_step (Path.Step.trans_refl_right (R.zero_add p q x))
 
 -- ============================================================
 -- § 2. Chow Groups and Cycle Class Map
@@ -93,24 +93,24 @@ structure ChowGroup (n : Nat) where
     Path (add (add c1 c2) c3) (add c1 (add c2 c3))
 
 /-- Chow addition with zero on right, refl stability. -/
-theorem chow_add_zero_refl {n : Nat} (G : ChowGroup n) (c : G.cycles) :
-    Path.trans (G.add_zero c) (Path.refl c) = G.add_zero c := by
-  simp
+noncomputable def chow_add_zero_refl {n : Nat} (G : ChowGroup n) (c : G.cycles) :
+    RwEq (Path.trans (G.add_zero c) (Path.refl c)) (G.add_zero c) :=
+  rweq_of_step (Path.Step.trans_refl_right (G.add_zero c))
 
 /-- Chow commutativity double symmetry. -/
-theorem chow_comm_symm_symm {n : Nat} (G : ChowGroup n) (c1 c2 : G.cycles) :
-    Path.symm (Path.symm (G.add_comm c1 c2)) = G.add_comm c1 c2 :=
-  Path.symm_symm (G.add_comm c1 c2)
+noncomputable def chow_comm_symm_symm {n : Nat} (G : ChowGroup n) (c1 c2 : G.cycles) :
+    RwEq (Path.symm (Path.symm (G.add_comm c1 c2))) (G.add_comm c1 c2) :=
+  rweq_of_step (Path.Step.symm_symm (G.add_comm c1 c2))
 
 /-- Chow associativity double symmetry. -/
-theorem chow_assoc_symm_symm {n : Nat} (G : ChowGroup n) (c1 c2 c3 : G.cycles) :
-    Path.symm (Path.symm (G.add_assoc c1 c2 c3)) = G.add_assoc c1 c2 c3 :=
-  Path.symm_symm (G.add_assoc c1 c2 c3)
+noncomputable def chow_assoc_symm_symm {n : Nat} (G : ChowGroup n) (c1 c2 c3 : G.cycles) :
+    RwEq (Path.symm (Path.symm (G.add_assoc c1 c2 c3))) (G.add_assoc c1 c2 c3) :=
+  rweq_of_step (Path.Step.symm_symm (G.add_assoc c1 c2 c3))
 
 /-- Chow zero_add refl stability. -/
-theorem chow_zero_add_refl {n : Nat} (G : ChowGroup n) (c : G.cycles) :
-    Path.trans (G.zero_add c) (Path.refl c) = G.zero_add c := by
-  simp
+noncomputable def chow_zero_add_refl {n : Nat} (G : ChowGroup n) (c : G.cycles) :
+    RwEq (Path.trans (G.zero_add c) (Path.refl c)) (G.zero_add c) :=
+  rweq_of_step (Path.Step.trans_refl_right (G.zero_add c))
 
 /-- Cycle class map into a target type. -/
 structure CycleClassMap (n : Nat) (T : Type u) where
@@ -120,10 +120,10 @@ structure CycleClassMap (n : Nat) (T : Type u) where
     Path (cl (chow.add c1 c2)) (cl (chow.add c1 c2))
 
 /-- Cycle class map applied to refl gives refl. -/
-theorem cycle_class_refl {n : Nat} {T : Type u}
+noncomputable def cycle_class_refl {n : Nat} {T : Type u}
     (C : CycleClassMap n T) (c : C.chow.cycles) :
-    Path.congrArg C.cl (Path.refl c) = Path.refl (C.cl c) := by
-  simp
+    RwEq (Path.congrArg C.cl (Path.refl c)) (Path.refl (C.cl c)) :=
+  rweq_congrArg_refl (A := C.chow.cycles) (f := C.cl) c
 
 -- ============================================================
 -- § 3. Milnor K-Theory Paths
@@ -139,11 +139,10 @@ structure MilnorKTheory (k : Type u) where
          (by rw [Nat.add_assoc]; exact product n (m + l) x (product m l y z))
 
 /-- Milnor product associativity double symmetry. -/
-theorem milnor_assoc_symm_symm {k : Type u} (M : MilnorKTheory k)
+noncomputable def milnor_assoc_symm_symm {k : Type u} (M : MilnorKTheory k)
     (n m l : Nat) (x : M.KM n) (y : M.KM m) (z : M.KM l) :
-    Path.symm (Path.symm (M.product_assoc n m l x y z)) =
-    M.product_assoc n m l x y z :=
-  Path.symm_symm (M.product_assoc n m l x y z)
+    RwEq (Path.symm (Path.symm (M.product_assoc n m l x y z))) (M.product_assoc n m l x y z) :=
+  rweq_of_step (Path.Step.symm_symm (M.product_assoc n m l x y z))
 
 -- ============================================================
 -- § 4. Bloch–Kato Norm Residue Paths
@@ -153,12 +152,12 @@ theorem milnor_assoc_symm_symm {k : Type u} (M : MilnorKTheory k)
 structure BlochKato (Source Target : Type u) where
   norm_residue : Source → Target
   nr_functorial : ∀ (s : Source),
-    Path.congrArg norm_residue (Path.refl s) = Path.refl (norm_residue s)
+    RwEq (Path.congrArg norm_residue (Path.refl s)) (Path.refl (norm_residue s))
 
 /-- Norm residue applied to congrArg of refl is refl. -/
-theorem bloch_kato_refl {S T : Type u} (BK : BlochKato S T) (s : S) :
-    Path.congrArg BK.norm_residue (Path.refl s) = Path.refl (BK.norm_residue s) := by
-  simp
+noncomputable def bloch_kato_refl {S T : Type u} (BK : BlochKato S T) (s : S) :
+    RwEq (Path.congrArg BK.norm_residue (Path.refl s)) (Path.refl (BK.norm_residue s)) :=
+  rweq_congrArg_refl (A := S) (f := BK.norm_residue) s
 
 -- ============================================================
 -- § 5. Motivic Eilenberg–MacLane Spaces
@@ -174,14 +173,14 @@ structure MotivicEM (A : Type u) where
   fund_bp_path : Path (fundamental basepoint) (fundamental basepoint)
 
 /-- The basepoint class is refl-stable. -/
-theorem em_basepoint_stable {A : Type u} (K : MotivicEM A) :
-    Path.trans K.fund_bp_path (Path.refl _) = K.fund_bp_path := by
-  simp
+noncomputable def em_basepoint_stable {A : Type u} (K : MotivicEM A) :
+    RwEq (Path.trans K.fund_bp_path (Path.refl (K.fundamental K.basepoint))) K.fund_bp_path :=
+  rweq_of_step (Path.Step.trans_refl_right K.fund_bp_path)
 
 /-- Fundamental class applied to refl gives refl. -/
-theorem em_fund_refl {A : Type u} (K : MotivicEM A) (x : K.space) :
-    Path.congrArg K.fundamental (Path.refl x) = Path.refl (K.fundamental x) := by
-  simp
+noncomputable def em_fund_refl {A : Type u} (K : MotivicEM A) (x : K.space) :
+    RwEq (Path.congrArg K.fundamental (Path.refl x)) (Path.refl (K.fundamental x)) :=
+  rweq_congrArg_refl (A := K.space) (f := K.fundamental) x
 
 /-- A map between motivic EM spaces. -/
 structure MotivicEMMap (A B : Type u) (K : MotivicEM A) (L : MotivicEM B) where
@@ -189,16 +188,16 @@ structure MotivicEMMap (A B : Type u) (K : MotivicEM A) (L : MotivicEM B) where
   map_bp : Path (map_space K.basepoint) L.basepoint
 
 /-- EM map preserves basepoint modulo refl. -/
-theorem em_map_bp_refl {A B : Type u} {K : MotivicEM A} {L : MotivicEM B}
+noncomputable def em_map_bp_refl {A B : Type u} {K : MotivicEM A} {L : MotivicEM B}
     (f : MotivicEMMap A B K L) :
-    Path.trans f.map_bp (Path.refl _) = f.map_bp := by
-  simp
+    RwEq (Path.trans f.map_bp (Path.refl L.basepoint)) f.map_bp :=
+  rweq_of_step (Path.Step.trans_refl_right f.map_bp)
 
 /-- EM map basepoint double symmetry. -/
-theorem em_map_bp_symm_symm {A B : Type u} {K : MotivicEM A} {L : MotivicEM B}
+noncomputable def em_map_bp_symm_symm {A B : Type u} {K : MotivicEM A} {L : MotivicEM B}
     (f : MotivicEMMap A B K L) :
-    Path.symm (Path.symm f.map_bp) = f.map_bp :=
-  Path.symm_symm f.map_bp
+    RwEq (Path.symm (Path.symm f.map_bp)) f.map_bp :=
+  rweq_of_step (Path.Step.symm_symm f.map_bp)
 
 -- ============================================================
 -- § 6. Hermitian K-Theory (Grothendieck–Witt) Paths
@@ -218,19 +217,19 @@ structure GrothendieckWitt where
   one_mul : ∀ x : GW, Path (mul one x) x
 
 /-- GW addition with zero refl stability. -/
-theorem gw_add_zero_path (G : GrothendieckWitt) (x : G.GW) :
-    Path.trans (G.add_zero x) (Path.refl x) = G.add_zero x := by
-  simp
+noncomputable def gw_add_zero_path (G : GrothendieckWitt) (x : G.GW) :
+    RwEq (Path.trans (G.add_zero x) (Path.refl x)) (G.add_zero x) :=
+  rweq_of_step (Path.Step.trans_refl_right (G.add_zero x))
 
 /-- GW multiplication by one refl stability. -/
-theorem gw_mul_one_path (G : GrothendieckWitt) (x : G.GW) :
-    Path.trans (G.mul_one x) (Path.refl x) = G.mul_one x := by
-  simp
+noncomputable def gw_mul_one_path (G : GrothendieckWitt) (x : G.GW) :
+    RwEq (Path.trans (G.mul_one x) (Path.refl x)) (G.mul_one x) :=
+  rweq_of_step (Path.Step.trans_refl_right (G.mul_one x))
 
 /-- GW commutativity double symmetry. -/
-theorem gw_comm_symm_symm (G : GrothendieckWitt) (x y : G.GW) :
-    Path.symm (Path.symm (G.add_comm x y)) = G.add_comm x y :=
-  Path.symm_symm (G.add_comm x y)
+noncomputable def gw_comm_symm_symm (G : GrothendieckWitt) (x y : G.GW) :
+    RwEq (Path.symm (Path.symm (G.add_comm x y))) (G.add_comm x y) :=
+  rweq_of_step (Path.Step.symm_symm (G.add_comm x y))
 
 /-- GW zero is both-sided identity. -/
 noncomputable def gw_zero_both (G : GrothendieckWitt) :
@@ -238,14 +237,14 @@ noncomputable def gw_zero_both (G : GrothendieckWitt) :
   G.zero_add G.zero
 
 /-- GW mul_one double symmetry. -/
-theorem gw_mul_one_symm_symm (G : GrothendieckWitt) (x : G.GW) :
-    Path.symm (Path.symm (G.mul_one x)) = G.mul_one x :=
-  Path.symm_symm (G.mul_one x)
+noncomputable def gw_mul_one_symm_symm (G : GrothendieckWitt) (x : G.GW) :
+    RwEq (Path.symm (Path.symm (G.mul_one x))) (G.mul_one x) :=
+  rweq_of_step (Path.Step.symm_symm (G.mul_one x))
 
 /-- GW one_mul refl stability. -/
-theorem gw_one_mul_refl (G : GrothendieckWitt) (x : G.GW) :
-    Path.trans (G.one_mul x) (Path.refl x) = G.one_mul x := by
-  simp
+noncomputable def gw_one_mul_refl (G : GrothendieckWitt) (x : G.GW) :
+    RwEq (Path.trans (G.one_mul x) (Path.refl x)) (G.one_mul x) :=
+  rweq_of_step (Path.Step.trans_refl_right (G.one_mul x))
 
 -- ============================================================
 -- § 7. Motivic Γ-Space / Infinite Loop Space Machine
@@ -265,21 +264,20 @@ structure MotivicGammaSpace where
          (by rw [Nat.add_assoc]; exact gamma n (m + k) x (gamma m k y z))
 
 /-- Γ-space unit law on left, double symmetry. -/
-theorem gamma_unit_left_symm_symm (G : MotivicGammaSpace) (m : Nat) (y : G.space m) :
-    Path.symm (Path.symm (G.gamma_zero_left m y)) = G.gamma_zero_left m y :=
-  Path.symm_symm (G.gamma_zero_left m y)
+noncomputable def gamma_unit_left_symm_symm (G : MotivicGammaSpace) (m : Nat) (y : G.space m) :
+    RwEq (Path.symm (Path.symm (G.gamma_zero_left m y))) (G.gamma_zero_left m y) :=
+  rweq_of_step (Path.Step.symm_symm (G.gamma_zero_left m y))
 
 /-- Γ-space unit law on right, double symmetry. -/
-theorem gamma_unit_right_symm_symm (G : MotivicGammaSpace) (n : Nat) (x : G.space n) :
-    Path.symm (Path.symm (G.gamma_zero_right n x)) = G.gamma_zero_right n x :=
-  Path.symm_symm (G.gamma_zero_right n x)
+noncomputable def gamma_unit_right_symm_symm (G : MotivicGammaSpace) (n : Nat) (x : G.space n) :
+    RwEq (Path.symm (Path.symm (G.gamma_zero_right n x))) (G.gamma_zero_right n x) :=
+  rweq_of_step (Path.Step.symm_symm (G.gamma_zero_right n x))
 
 /-- Γ-space assoc double symmetry. -/
-theorem gamma_assoc_symm_symm (G : MotivicGammaSpace) (n m k : Nat)
+noncomputable def gamma_assoc_symm_symm (G : MotivicGammaSpace) (n m k : Nat)
     (x : G.space n) (y : G.space m) (z : G.space k) :
-    Path.symm (Path.symm (G.gamma_assoc n m k x y z)) =
-    G.gamma_assoc n m k x y z :=
-  Path.symm_symm (G.gamma_assoc n m k x y z)
+    RwEq (Path.symm (Path.symm (G.gamma_assoc n m k x y z))) (G.gamma_assoc n m k x y z) :=
+  rweq_of_step (Path.Step.symm_symm (G.gamma_assoc n m k x y z))
 
 -- ============================================================
 -- § 8. η-Periodic Motivic Phenomena
@@ -293,16 +291,16 @@ structure EtaPeriodic (π : Int → Int → Type u) where
     Path (eta_mul p q x) (eta_mul p q x)
 
 /-- η-multiplication is refl-stable. -/
-theorem eta_mul_stable {π : Int → Int → Type u}
+noncomputable def eta_mul_stable {π : Int → Int → Type u}
     (E : EtaPeriodic π) (p q : Int) (x : π p q) :
-    Path.trans (E.eta_unit p q x) (Path.refl _) = E.eta_unit p q x := by
-  simp
+    RwEq (Path.trans (E.eta_unit p q x) (Path.refl (E.eta_mul p q x))) (E.eta_unit p q x) :=
+  rweq_of_step (Path.Step.trans_refl_right (E.eta_unit p q x))
 
 /-- η-periodicity double symmetry. -/
-theorem eta_symm_symm {π : Int → Int → Type u}
+noncomputable def eta_symm_symm {π : Int → Int → Type u}
     (E : EtaPeriodic π) (p q : Int) (x : π p q) :
-    Path.symm (Path.symm (E.eta_unit p q x)) = E.eta_unit p q x :=
-  Path.symm_symm (E.eta_unit p q x)
+    RwEq (Path.symm (Path.symm (E.eta_unit p q x))) (E.eta_unit p q x) :=
+  rweq_of_step (Path.Step.symm_symm (E.eta_unit p q x))
 
 -- ============================================================
 -- § 9. ρ-Torsion Paths
@@ -315,16 +313,16 @@ structure RhoTorsion (π : Int → Int → Type u) where
   rho_zero_path : ∀ (x : π 0 0), Path (rho_mul 0 0 x) (rho_mul 0 0 x)
 
 /-- ρ-torsion refl stability. -/
-theorem rho_path_stable {π : Int → Int → Type u}
+noncomputable def rho_path_stable {π : Int → Int → Type u}
     (R : RhoTorsion π) (x : π 0 0) :
-    Path.trans (R.rho_zero_path x) (Path.refl _) = R.rho_zero_path x := by
-  simp
+    RwEq (Path.trans (R.rho_zero_path x) (Path.refl (R.rho_mul 0 0 x))) (R.rho_zero_path x) :=
+  rweq_of_step (Path.Step.trans_refl_right (R.rho_zero_path x))
 
 /-- ρ-zero double symmetry. -/
-theorem rho_zero_symm_symm {π : Int → Int → Type u}
+noncomputable def rho_zero_symm_symm {π : Int → Int → Type u}
     (R : RhoTorsion π) (x : π 0 0) :
-    Path.symm (Path.symm (R.rho_zero_path x)) = R.rho_zero_path x :=
-  Path.symm_symm (R.rho_zero_path x)
+    RwEq (Path.symm (Path.symm (R.rho_zero_path x))) (R.rho_zero_path x) :=
+  rweq_of_step (Path.Step.symm_symm (R.rho_zero_path x))
 
 -- ============================================================
 -- § 10. Motivic Atiyah–Hirzebruch Spectral Sequence
@@ -338,14 +336,14 @@ structure MotivicAHSS where
     Path (d r p q x) (d r p q x)
 
 /-- AHSS differential refl stability. -/
-theorem ahss_d_refl {M : MotivicAHSS} (r : Nat) (p q : Int) (x : M.E r p q) :
-    Path.trans (M.d_path r p q x) (Path.refl _) = M.d_path r p q x := by
-  simp
+noncomputable def ahss_d_refl {M : MotivicAHSS} (r : Nat) (p q : Int) (x : M.E r p q) :
+    RwEq (Path.trans (M.d_path r p q x) (Path.refl (M.d r p q x))) (M.d_path r p q x) :=
+  rweq_of_step (Path.Step.trans_refl_right (M.d_path r p q x))
 
 /-- AHSS differential double symmetry. -/
-theorem ahss_d_symm_symm {M : MotivicAHSS} (r : Nat) (p q : Int) (x : M.E r p q) :
-    Path.symm (Path.symm (M.d_path r p q x)) = M.d_path r p q x :=
-  Path.symm_symm (M.d_path r p q x)
+noncomputable def ahss_d_symm_symm {M : MotivicAHSS} (r : Nat) (p q : Int) (x : M.E r p q) :
+    RwEq (Path.symm (Path.symm (M.d_path r p q x))) (M.d_path r p q x) :=
+  rweq_of_step (Path.Step.symm_symm (M.d_path r p q x))
 
 -- ============================================================
 -- § 11. Voevodsky's Slice Tower
@@ -361,19 +359,19 @@ structure VoevodskySlice where
     Path (cofiber q (inc q x)) x
 
 /-- Slice-cofiber roundtrip refl stability. -/
-theorem slice_cofiber_refl (V : VoevodskySlice) (q : Int) (x : V.sq q) :
-    Path.trans (V.slice_path q x) (Path.refl x) = V.slice_path q x := by
-  simp
+noncomputable def slice_cofiber_refl (V : VoevodskySlice) (q : Int) (x : V.sq q) :
+    RwEq (Path.trans (V.slice_path q x) (Path.refl x)) (V.slice_path q x) :=
+  rweq_of_step (Path.Step.trans_refl_right (V.slice_path q x))
 
 /-- Slice path double symmetry. -/
-theorem slice_path_symm_symm (V : VoevodskySlice) (q : Int) (x : V.sq q) :
-    Path.symm (Path.symm (V.slice_path q x)) = V.slice_path q x :=
-  Path.symm_symm (V.slice_path q x)
+noncomputable def slice_path_symm_symm (V : VoevodskySlice) (q : Int) (x : V.sq q) :
+    RwEq (Path.symm (Path.symm (V.slice_path q x))) (V.slice_path q x) :=
+  rweq_of_step (Path.Step.symm_symm (V.slice_path q x))
 
 /-- Slice path applied to congrArg of inc on refl. -/
-theorem slice_congrArg_inc (V : VoevodskySlice) (q : Int) (x : V.sq q) :
-    Path.congrArg (V.inc q) (Path.refl x) = Path.refl (V.inc q x) := by
-  simp
+noncomputable def slice_congrArg_inc (V : VoevodskySlice) (q : Int) (x : V.sq q) :
+    RwEq (Path.congrArg (V.inc q) (Path.refl x)) (Path.refl (V.inc q x)) :=
+  rweq_congrArg_refl (A := V.sq q) (f := V.inc q) x
 
 -- ============================================================
 -- § 12. Algebraic Cobordism Paths (MGL)
@@ -393,21 +391,20 @@ structure AlgebraicCobordism where
          (by rw [Nat.add_assoc]; exact mul n (m + k) x (mul m k y z))
 
 /-- MGL unit left double symmetry. -/
-theorem mgl_unit_left_symm_symm (C : AlgebraicCobordism) (n : Nat) (x : C.MGL n) :
-    Path.symm (Path.symm (C.mul_unit_left n x)) = C.mul_unit_left n x :=
-  Path.symm_symm (C.mul_unit_left n x)
+noncomputable def mgl_unit_left_symm_symm (C : AlgebraicCobordism) (n : Nat) (x : C.MGL n) :
+    RwEq (Path.symm (Path.symm (C.mul_unit_left n x))) (C.mul_unit_left n x) :=
+  rweq_of_step (Path.Step.symm_symm (C.mul_unit_left n x))
 
 /-- MGL unit right double symmetry. -/
-theorem mgl_unit_right_symm_symm (C : AlgebraicCobordism) (n : Nat) (x : C.MGL n) :
-    Path.symm (Path.symm (C.mul_unit_right n x)) = C.mul_unit_right n x :=
-  Path.symm_symm (C.mul_unit_right n x)
+noncomputable def mgl_unit_right_symm_symm (C : AlgebraicCobordism) (n : Nat) (x : C.MGL n) :
+    RwEq (Path.symm (Path.symm (C.mul_unit_right n x))) (C.mul_unit_right n x) :=
+  rweq_of_step (Path.Step.symm_symm (C.mul_unit_right n x))
 
 /-- MGL assoc double symmetry. -/
-theorem mgl_assoc_symm_symm (C : AlgebraicCobordism) (n m k : Nat)
+noncomputable def mgl_assoc_symm_symm (C : AlgebraicCobordism) (n m k : Nat)
     (x : C.MGL n) (y : C.MGL m) (z : C.MGL k) :
-    Path.symm (Path.symm (C.mul_assoc n m k x y z)) =
-    C.mul_assoc n m k x y z :=
-  Path.symm_symm (C.mul_assoc n m k x y z)
+    RwEq (Path.symm (Path.symm (C.mul_assoc n m k x y z))) (C.mul_assoc n m k x y z) :=
+  rweq_of_step (Path.Step.symm_symm (C.mul_assoc n m k x y z))
 
 -- ============================================================
 -- § 13. Motivic Transfers and Norms
@@ -421,24 +418,24 @@ structure MotivicTransfer (F : Type u) where
   norm_id : ∀ (x : F), Path (norm x) (norm x)
 
 /-- Transfer refl stability. -/
-theorem transfer_id_stable (T : MotivicTransfer F) (x : F) :
-    Path.trans (T.transfer_id x) (Path.refl _) = T.transfer_id x := by
-  simp
+noncomputable def transfer_id_stable (T : MotivicTransfer F) (x : F) :
+    RwEq (Path.trans (T.transfer_id x) (Path.refl (T.transfer x))) (T.transfer_id x) :=
+  rweq_of_step (Path.Step.trans_refl_right (T.transfer_id x))
 
 /-- Norm refl stability. -/
-theorem norm_id_stable (T : MotivicTransfer F) (x : F) :
-    Path.trans (T.norm_id x) (Path.refl _) = T.norm_id x := by
-  simp
+noncomputable def norm_id_stable (T : MotivicTransfer F) (x : F) :
+    RwEq (Path.trans (T.norm_id x) (Path.refl (T.norm x))) (T.norm_id x) :=
+  rweq_of_step (Path.Step.trans_refl_right (T.norm_id x))
 
 /-- Transfer double symmetry. -/
-theorem transfer_symm_symm (T : MotivicTransfer F) (x : F) :
-    Path.symm (Path.symm (T.transfer_id x)) = T.transfer_id x :=
-  Path.symm_symm (T.transfer_id x)
+noncomputable def transfer_symm_symm (T : MotivicTransfer F) (x : F) :
+    RwEq (Path.symm (Path.symm (T.transfer_id x))) (T.transfer_id x) :=
+  rweq_of_step (Path.Step.symm_symm (T.transfer_id x))
 
 /-- Norm double symmetry. -/
-theorem norm_symm_symm (T : MotivicTransfer F) (x : F) :
-    Path.symm (Path.symm (T.norm_id x)) = T.norm_id x :=
-  Path.symm_symm (T.norm_id x)
+noncomputable def norm_symm_symm (T : MotivicTransfer F) (x : F) :
+    RwEq (Path.symm (Path.symm (T.norm_id x))) (T.norm_id x) :=
+  rweq_of_step (Path.Step.symm_symm (T.norm_id x))
 
 -- ============================================================
 -- § 14. Motivic t-Structure
@@ -453,19 +450,19 @@ structure MotivicTStructure where
   adj_path : ∀ (x : obj), Path (trunc_le x) (trunc_le x)
 
 /-- t-structure truncation refl stability. -/
-theorem tstr_trunc_refl (T : MotivicTStructure) (x : T.obj) :
-    Path.trans (T.trunc_path x) (Path.refl _) = T.trunc_path x := by
-  simp
+noncomputable def tstr_trunc_refl (T : MotivicTStructure) (x : T.obj) :
+    RwEq (Path.trans (T.trunc_path x) (Path.refl (T.trunc_ge x))) (T.trunc_path x) :=
+  rweq_of_step (Path.Step.trans_refl_right (T.trunc_path x))
 
 /-- t-structure adjunction refl stability. -/
-theorem tstr_adj_refl (T : MotivicTStructure) (x : T.obj) :
-    Path.trans (T.adj_path x) (Path.refl _) = T.adj_path x := by
-  simp
+noncomputable def tstr_adj_refl (T : MotivicTStructure) (x : T.obj) :
+    RwEq (Path.trans (T.adj_path x) (Path.refl (T.trunc_le x))) (T.adj_path x) :=
+  rweq_of_step (Path.Step.trans_refl_right (T.adj_path x))
 
 /-- t-structure truncation double symmetry. -/
-theorem tstr_trunc_symm_symm (T : MotivicTStructure) (x : T.obj) :
-    Path.symm (Path.symm (T.trunc_path x)) = T.trunc_path x :=
-  Path.symm_symm (T.trunc_path x)
+noncomputable def tstr_trunc_symm_symm (T : MotivicTStructure) (x : T.obj) :
+    RwEq (Path.symm (Path.symm (T.trunc_path x))) (T.trunc_path x) :=
+  rweq_of_step (Path.Step.symm_symm (T.trunc_path x))
 
 -- ============================================================
 -- § 15. Motivic Orientations and Chern Classes
@@ -479,19 +476,19 @@ structure MotivicOrientation where
     Path (chern_class n x) (chern_class n x)
 
 /-- Chern class refl stability. -/
-theorem chern_stable (O : MotivicOrientation) (n : Nat) (x : O.spectrum n) :
-    Path.trans (O.chern_path n x) (Path.refl _) = O.chern_path n x := by
-  simp
+noncomputable def chern_stable (O : MotivicOrientation) (n : Nat) (x : O.spectrum n) :
+    RwEq (Path.trans (O.chern_path n x) (Path.refl (O.chern_class n x))) (O.chern_path n x) :=
+  rweq_of_step (Path.Step.trans_refl_right (O.chern_path n x))
 
 /-- Chern class double symmetry. -/
-theorem chern_symm_symm (O : MotivicOrientation) (n : Nat) (x : O.spectrum n) :
-    Path.symm (Path.symm (O.chern_path n x)) = O.chern_path n x :=
-  Path.symm_symm (O.chern_path n x)
+noncomputable def chern_symm_symm (O : MotivicOrientation) (n : Nat) (x : O.spectrum n) :
+    RwEq (Path.symm (Path.symm (O.chern_path n x))) (O.chern_path n x) :=
+  rweq_of_step (Path.Step.symm_symm (O.chern_path n x))
 
 /-- Chern class applied to congrArg of refl. -/
-theorem chern_congrArg_refl (O : MotivicOrientation) (n : Nat) (x : O.spectrum n) :
-    Path.congrArg (O.chern_class n) (Path.refl x) = Path.refl (O.chern_class n x) := by
-  simp
+noncomputable def chern_congrArg_refl (O : MotivicOrientation) (n : Nat) (x : O.spectrum n) :
+    RwEq (Path.congrArg (O.chern_class n) (Path.refl x)) (Path.refl (O.chern_class n x)) :=
+  rweq_congrArg_refl (A := O.spectrum n) (f := O.chern_class n) x
 
 -- ============================================================
 -- § 16. Motivic Formal Group Law
@@ -509,24 +506,24 @@ structure MotivicFGL where
     Path (add (add x y) z) (add x (add y z))
 
 /-- FGL add_zero refl stability. -/
-theorem fgl_add_zero_refl (F : MotivicFGL) (x : F.R) :
-    Path.trans (F.add_zero x) (Path.refl x) = F.add_zero x := by
-  simp
+noncomputable def fgl_add_zero_refl (F : MotivicFGL) (x : F.R) :
+    RwEq (Path.trans (F.add_zero x) (Path.refl x)) (F.add_zero x) :=
+  rweq_of_step (Path.Step.trans_refl_right (F.add_zero x))
 
 /-- FGL commutativity double symmetry. -/
-theorem fgl_comm_symm_symm (F : MotivicFGL) (x y : F.R) :
-    Path.symm (Path.symm (F.add_comm x y)) = F.add_comm x y :=
-  Path.symm_symm (F.add_comm x y)
+noncomputable def fgl_comm_symm_symm (F : MotivicFGL) (x y : F.R) :
+    RwEq (Path.symm (Path.symm (F.add_comm x y))) (F.add_comm x y) :=
+  rweq_of_step (Path.Step.symm_symm (F.add_comm x y))
 
 /-- FGL associativity double symmetry. -/
-theorem fgl_assoc_symm_symm (F : MotivicFGL) (x y z : F.R) :
-    Path.symm (Path.symm (F.add_assoc x y z)) = F.add_assoc x y z :=
-  Path.symm_symm (F.add_assoc x y z)
+noncomputable def fgl_assoc_symm_symm (F : MotivicFGL) (x y z : F.R) :
+    RwEq (Path.symm (Path.symm (F.add_assoc x y z))) (F.add_assoc x y z) :=
+  rweq_of_step (Path.Step.symm_symm (F.add_assoc x y z))
 
 /-- FGL zero_add refl stability. -/
-theorem fgl_zero_add_refl (F : MotivicFGL) (x : F.R) :
-    Path.trans (F.zero_add x) (Path.refl x) = F.zero_add x := by
-  simp
+noncomputable def fgl_zero_add_refl (F : MotivicFGL) (x : F.R) :
+    RwEq (Path.trans (F.zero_add x) (Path.refl x)) (F.zero_add x) :=
+  rweq_of_step (Path.Step.trans_refl_right (F.zero_add x))
 
 /-- FGL zero is both-sided identity. -/
 noncomputable def fgl_zero_both (F : MotivicFGL) :

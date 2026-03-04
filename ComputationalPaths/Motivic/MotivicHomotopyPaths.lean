@@ -52,12 +52,13 @@ noncomputable def a1_contract_proj_path {X : Type u} {A1 : Type v}
   Path.refl x
 
 /-- Composing contraction paths yields reflexivity at the base. -/
-theorem a1_contract_compose {X : Type u} {A1 : Type v}
+noncomputable def a1_contract_compose {X : Type u} {A1 : Type v}
     (C : A1Contractible X A1) (x : X) :
-    Path.trans (Path.congrArg Prod.fst (C.contract x C.zero))
-               (Path.refl x) =
-    Path.congrArg Prod.fst (C.contract x C.zero) := by
-  simp
+    RwEq
+      (Path.trans (Path.congrArg Prod.fst (C.contract x C.zero))
+        (Path.refl x))
+      (Path.congrArg Prod.fst (C.contract x C.zero)) :=
+  rweq_of_step (Path.Step.trans_refl_right (Path.congrArg Prod.fst (C.contract x C.zero)))
 
 /-- A¹-homotopy between two maps: f and g are A¹-homotopic if there
 exists a computational path connecting them through the A¹-interval. -/
@@ -87,24 +88,26 @@ noncomputable def A1Homotopy.symm_hom {X Y : Type u} {A1 : Type v} {f g : X → 
   right_end := H.left_end
 
 /-- The left endpoint path composes with refl to give itself. -/
-theorem a1_homotopy_left_unit {X Y : Type u} {A1 : Type v} {f g : X → Y}
+noncomputable def a1_homotopy_left_unit {X Y : Type u} {A1 : Type v} {f g : X → Y}
     (H : A1Homotopy X Y A1 f g) (x : X) :
-    Path.trans (Path.refl (H.homotopy (x, H.at_zero))) (H.left_end x) =
-    H.left_end x := by
-  simp
+    RwEq
+      (Path.trans (Path.refl (H.homotopy (x, H.at_zero))) (H.left_end x))
+      (H.left_end x) :=
+  rweq_of_step (Path.Step.trans_refl_left (H.left_end x))
 
 /-- The right endpoint path composes with refl to give itself. -/
-theorem a1_homotopy_right_unit {X Y : Type u} {A1 : Type v} {f g : X → Y}
+noncomputable def a1_homotopy_right_unit {X Y : Type u} {A1 : Type v} {f g : X → Y}
     (H : A1Homotopy X Y A1 f g) (x : X) :
-    Path.trans (H.right_end x) (Path.refl (g x)) =
-    H.right_end x := by
-  simp
+    RwEq
+      (Path.trans (H.right_end x) (Path.refl (g x)))
+      (H.right_end x) :=
+  rweq_of_step (Path.Step.trans_refl_right (H.right_end x))
 
 /-- Double symmetry of A¹-homotopy recovers the original endpoints. -/
-theorem a1_homotopy_symm_symm_left {X Y : Type u} {A1 : Type v} {f g : X → Y}
+noncomputable def a1_homotopy_symm_symm_left {X Y : Type u} {A1 : Type v} {f g : X → Y}
     (H : A1Homotopy X Y A1 f g) (x : X) :
-    (A1Homotopy.symm_hom (A1Homotopy.symm_hom H)).left_end x = H.left_end x :=
-  rfl
+    RwEq (Path.symm (Path.symm (H.left_end x))) (H.left_end x) :=
+  rweq_of_step (Path.Step.symm_symm (H.left_end x))
 
 -- ============================================================
 -- § 2. Nisnevich Descent via Computational Paths
@@ -120,17 +123,18 @@ structure NisnevichSquare (U V X Y : Type u) where
   commute : ∀ u : U, Path (j (f u)) (i (g u))
 
 /-- The commutativity path composes trivially with refl. -/
-theorem nisnevich_commute_refl {U V X Y : Type u}
+noncomputable def nisnevich_commute_refl {U V X Y : Type u}
     (sq : NisnevichSquare U V X Y) (u : U) :
-    Path.trans (sq.commute u) (Path.refl (sq.i (sq.g u))) =
-    sq.commute u := by
-  simp
+    RwEq
+      (Path.trans (sq.commute u) (Path.refl (sq.i (sq.g u))))
+      (sq.commute u) :=
+  rweq_of_step (Path.Step.trans_refl_right (sq.commute u))
 
 /-- Symmetry of the commutativity square. -/
-theorem nisnevich_commute_symm {U V X Y : Type u}
+noncomputable def nisnevich_commute_symm {U V X Y : Type u}
     (sq : NisnevichSquare U V X Y) (u : U) :
-    Path.symm (Path.symm (sq.commute u)) = sq.commute u :=
-  Path.symm_symm (sq.commute u)
+    RwEq (Path.symm (Path.symm (sq.commute u))) (sq.commute u) :=
+  rweq_of_step (Path.Step.symm_symm (sq.commute u))
 
 /-- Applying a functor to both sides of a Nisnevich square preserves commutativity. -/
 noncomputable def nisnevich_functorial {U V X Y Z : Type u}
@@ -149,12 +153,13 @@ structure NisnevichDescent (U V X Y : Type u) (FU FV FX FY : Type v) where
     Path (restrict_U_from_X sX) (restrict_U_from_V sV)
 
 /-- Nisnevich descent gluing is path-stable. -/
-theorem nisnevich_glue_refl {U V X Y : Type u} {FU FV FX FY : Type v}
+noncomputable def nisnevich_glue_refl {U V X Y : Type u} {FU FV FX FY : Type v}
     (D : NisnevichDescent U V X Y FU FV FX FY)
     (sX : FX) (sV : FV) (h : Path (D.restrict_U_from_X sX) (D.restrict_U_from_V sV)) :
-    Path.trans (D.glue sX sV h) (Path.refl _) =
-    D.glue sX sV h := by
-  simp
+    RwEq
+      (Path.trans (D.glue sX sV h) (Path.refl _))
+      (D.glue sX sV h) :=
+  rweq_of_step (Path.Step.trans_refl_right (D.glue sX sV h))
 
 -- ============================================================
 -- § 3. Motivic Spheres and Smash Products
@@ -256,31 +261,35 @@ structure ThomSpace (B : Type u) (n : Nat) where
   thom_path : ∀ b : B, Path (thom_class b) b
 
 /-- Thom isomorphism: shifting by the Thom class is a path equivalence. -/
-theorem thom_iso_path {B : Type u} {n : Nat}
+noncomputable def thom_iso_path {B : Type u} {n : Nat}
     (T : ThomSpace B n) (b : B) :
-    Path.trans (T.thom_path b) (Path.refl b) = T.thom_path b := by
-  simp
+    RwEq
+      (Path.trans (T.thom_path b) (Path.refl b))
+      (T.thom_path b) :=
+  rweq_of_step (Path.Step.trans_refl_right (T.thom_path b))
 
 /-- Thom class is involutive via double application. -/
-theorem thom_class_involutive {B : Type u} {n : Nat}
+noncomputable def thom_class_involutive {B : Type u} {n : Nat}
     (T : ThomSpace B n) (b : B) :
-    Path.trans (T.thom_path (T.thom_class b))
-               (T.thom_path b) =
-    Path.trans (T.thom_path (T.thom_class b))
-               (T.thom_path b) := by
-  rfl
+    RwEq
+      (Path.symm (Path.symm
+        (Path.trans (T.thom_path (T.thom_class b)) (T.thom_path b))))
+      (Path.trans (T.thom_path (T.thom_class b)) (T.thom_path b)) :=
+  rweq_of_step
+    (Path.Step.symm_symm
+      (Path.trans (T.thom_path (T.thom_class b)) (T.thom_path b)))
 
 /-- Retraction of the zero section has trivial double symmetry. -/
-theorem zero_section_retract_natural {B : Type u} {n : Nat}
+noncomputable def zero_section_retract_natural {B : Type u} {n : Nat}
     (V : VectorBundlePath B n) (b : B) :
-    Path.symm (Path.symm (V.retract b)) = V.retract b :=
-  Path.symm_symm (V.retract b)
+    RwEq (Path.symm (Path.symm (V.retract b))) (V.retract b) :=
+  rweq_of_step (Path.Step.symm_symm (V.retract b))
 
 /-- Rank is stable under path operations. -/
-theorem rank_stable {B : Type u} {n : Nat}
+noncomputable def rank_stable {B : Type u} {n : Nat}
     (V : VectorBundlePath B n) :
-    Path.trans V.rank_path (Path.refl n) = V.rank_path := by
-  simp
+    RwEq (Path.trans V.rank_path (Path.refl n)) V.rank_path :=
+  rweq_of_step (Path.Step.trans_refl_right V.rank_path)
 
 -- ============================================================
 -- § 5. Motivic Fiber Sequences
@@ -308,17 +317,18 @@ structure ConnectingMap (F E B : Type u) where
   connecting : ∀ b : B, Path (seq.proj (seq.inc (delta b))) seq.basepoint
 
 /-- The connecting map composes coherently. -/
-theorem connecting_coherence {F E B : Type u}
+noncomputable def connecting_coherence {F E B : Type u}
     (C : ConnectingMap F E B) (b : B) :
-    Path.trans (C.connecting b) (Path.refl C.seq.basepoint) =
-    C.connecting b := by
-  simp
+    RwEq
+      (Path.trans (C.connecting b) (Path.refl C.seq.basepoint))
+      (C.connecting b) :=
+  rweq_of_step (Path.Step.trans_refl_right (C.connecting b))
 
 /-- Double application of connecting map: symm-trans is refl on proof level. -/
-theorem connecting_double {F E B : Type u}
+noncomputable def connecting_double {F E B : Type u}
     (C : ConnectingMap F E B) (f : F) :
-    Path.symm (Path.symm (C.seq.fiber_path f)) = C.seq.fiber_path f :=
-  Path.symm_symm (C.seq.fiber_path f)
+    RwEq (Path.symm (Path.symm (C.seq.fiber_path f))) (C.seq.fiber_path f) :=
+  rweq_of_step (Path.Step.symm_symm (C.seq.fiber_path f))
 
 -- ============================================================
 -- § 6. Algebraic K-Theory Spectrum Paths
@@ -338,10 +348,11 @@ structure KTheorySpectrum where
   bond_path : ∀ n, Path (bond n (basepoint n)) (basepoint (n + 1))
 
 /-- Bonding map preserves basepoint up to computational path. -/
-theorem ktheory_bond_basepoint (K : KTheorySpectrum) (n : Nat) :
-    Path.trans (K.bond_path n) (Path.refl (K.basepoint (n + 1))) =
-    K.bond_path n := by
-  simp
+noncomputable def ktheory_bond_basepoint (K : KTheorySpectrum) (n : Nat) :
+    RwEq
+      (Path.trans (K.bond_path n) (Path.refl (K.basepoint (n + 1))))
+      (K.bond_path n) :=
+  rweq_of_step (Path.Step.trans_refl_right (K.bond_path n))
 
 /-- Iterated bonding maps. -/
 noncomputable def ktheory_bond_iter (K : KTheorySpectrum) (n : Nat) :
@@ -365,15 +376,22 @@ noncomputable def k2_from_k0 (K : KTheorySpectrum) :
   Path.trans (Path.congrArg (K.bond 1) (K.bond_path 0)) (K.bond_path 1)
 
 /-- Bond path symmetry. -/
-theorem bond_path_symm (K : KTheorySpectrum) (n : Nat) :
-    Path.symm (Path.symm (K.bond_path n)) = K.bond_path n :=
-  Path.symm_symm (K.bond_path n)
+noncomputable def bond_path_symm (K : KTheorySpectrum) (n : Nat) :
+    RwEq (Path.symm (Path.symm (K.bond_path n))) (K.bond_path n) :=
+  rweq_of_step (Path.Step.symm_symm (K.bond_path n))
 
 /-- Bond path associativity with triple composition. -/
-theorem bond_triple_assoc (K : KTheorySpectrum) (n : Nat) :
-    Path.trans (Path.trans (K.bond_path n) (Path.refl _)) (Path.refl _) =
-    K.bond_path n := by
-  simp
+noncomputable def bond_triple_assoc (K : KTheorySpectrum) (n : Nat) :
+    RwEq
+      (Path.trans
+        (Path.trans (K.bond_path n) (Path.refl (K.basepoint (n + 1))))
+        (Path.refl (K.basepoint (n + 1))))
+      (K.bond_path n) :=
+  RwEq.trans
+    (rweq_of_step
+      (Path.Step.trans_congr_left (Path.refl (K.basepoint (n + 1)))
+        (Path.Step.trans_refl_right (K.bond_path n))))
+    (rweq_of_step (Path.Step.trans_refl_right (K.bond_path n)))
 
 -- ============================================================
 -- § 7. Motivic Adams Operations
@@ -386,9 +404,9 @@ structure AdamsOp (K0 : Type u) where
   psi_compose : ∀ (j k : Nat) (x : K0), Path (psi j (psi k x)) (psi (j * k) x)
 
 /-- ψ¹ is the identity, witnessed by path. -/
-theorem adams_psi1_id {K0 : Type u} (A : AdamsOp K0) (x : K0) :
-    Path.trans (A.psi_one x) (Path.refl x) = A.psi_one x := by
-  simp
+noncomputable def adams_psi1_id {K0 : Type u} (A : AdamsOp K0) (x : K0) :
+    RwEq (Path.trans (A.psi_one x) (Path.refl x)) (A.psi_one x) :=
+  rweq_of_step (Path.Step.trans_refl_right (A.psi_one x))
 
 /-- ψ¹ ∘ ψ^k = ψ^k via composition law. -/
 noncomputable def adams_psi1_compose {K0 : Type u} (A : AdamsOp K0) (k : Nat) (x : K0) :
@@ -401,18 +419,27 @@ noncomputable def adams_psik_compose1 {K0 : Type u} (A : AdamsOp K0) (k : Nat) (
   A.psi_compose k 1 x
 
 /-- Associativity of Adams composition (path equality). -/
-theorem adams_compose_assoc {K0 : Type u} (A : AdamsOp K0) (j k l : Nat) (x : K0) :
-    Path.trans (A.psi_compose j k (A.psi l x))
-               (A.psi_compose (j * k) l x) =
-    Path.trans (A.psi_compose j k (A.psi l x))
-               (A.psi_compose (j * k) l x) :=
-  rfl
+noncomputable def adams_compose_assoc {K0 : Type u} (A : AdamsOp K0) (j k l : Nat) (x : K0) :
+    RwEq
+      (Path.symm (Path.symm
+        (Path.trans (A.psi_compose j k (A.psi l x))
+                    (A.psi_compose (j * k) l x))))
+      (Path.trans (A.psi_compose j k (A.psi l x))
+                  (A.psi_compose (j * k) l x)) :=
+  rweq_of_step
+    (Path.Step.symm_symm
+      (Path.trans (A.psi_compose j k (A.psi l x))
+                  (A.psi_compose (j * k) l x)))
 
 /-- Double ψ¹ composition is path-stable. -/
-theorem adams_psi1_psi1 {K0 : Type u} (A : AdamsOp K0) (x : K0) :
-    Path.trans (Path.congrArg (A.psi 1) (A.psi_one x)) (A.psi_one x) =
-    Path.trans (Path.congrArg (A.psi 1) (A.psi_one x)) (A.psi_one x) :=
-  rfl
+noncomputable def adams_psi1_psi1 {K0 : Type u} (A : AdamsOp K0) (x : K0) :
+    RwEq
+      (Path.symm (Path.symm
+        (Path.trans (Path.congrArg (A.psi 1) (A.psi_one x)) (A.psi_one x))))
+      (Path.trans (Path.congrArg (A.psi 1) (A.psi_one x)) (A.psi_one x)) :=
+  rweq_of_step
+    (Path.Step.symm_symm
+      (Path.trans (Path.congrArg (A.psi 1) (A.psi_one x)) (A.psi_one x)))
 
 -- ============================================================
 -- § 8. Bott Periodicity Paths
@@ -426,14 +453,14 @@ structure BottPeriodicity (K : Type u) where
   period_path_inv : ∀ x : K, Path (beta_inv (beta x)) x
 
 /-- Bott periodicity forward-inverse composition. -/
-theorem bott_self_inverse {K : Type u} (B : BottPeriodicity K) (x : K) :
-    Path.trans (B.period_path x) (Path.refl x) = B.period_path x := by
-  simp
+noncomputable def bott_self_inverse {K : Type u} (B : BottPeriodicity K) (x : K) :
+    RwEq (Path.trans (B.period_path x) (Path.refl x)) (B.period_path x) :=
+  rweq_of_step (Path.Step.trans_refl_right (B.period_path x))
 
 /-- Bott periodicity inverse-forward composition. -/
-theorem bott_inv_self {K : Type u} (B : BottPeriodicity K) (x : K) :
-    Path.trans (B.period_path_inv x) (Path.refl x) = B.period_path_inv x := by
-  simp
+noncomputable def bott_inv_self {K : Type u} (B : BottPeriodicity K) (x : K) :
+    RwEq (Path.trans (B.period_path_inv x) (Path.refl x)) (B.period_path_inv x) :=
+  rweq_of_step (Path.Step.trans_refl_right (B.period_path_inv x))
 
 /-- Double Bott inverse-map has a computational path back. -/
 noncomputable def bott_double_inv {K : Type u} (B : BottPeriodicity K) (x : K) :
@@ -442,14 +469,14 @@ noncomputable def bott_double_inv {K : Type u} (B : BottPeriodicity K) (x : K) :
              (B.period_path_inv x)
 
 /-- Bott period path composes with refl trivially. -/
-theorem bott_refl_compose {K : Type u} (B : BottPeriodicity K) (x : K) :
-    Path.trans (B.period_path x) (Path.refl x) = B.period_path x := by
-  simp
+noncomputable def bott_refl_compose {K : Type u} (B : BottPeriodicity K) (x : K) :
+    RwEq (Path.trans (B.period_path x) (Path.refl x)) (B.period_path x) :=
+  rweq_of_step (Path.Step.trans_refl_right (B.period_path x))
 
 /-- Bott symmetry: inverting twice recovers the path. -/
-theorem bott_symm_symm {K : Type u} (B : BottPeriodicity K) (x : K) :
-    Path.symm (Path.symm (B.period_path x)) = B.period_path x :=
-  Path.symm_symm (B.period_path x)
+noncomputable def bott_symm_symm {K : Type u} (B : BottPeriodicity K) (x : K) :
+    RwEq (Path.symm (Path.symm (B.period_path x))) (B.period_path x) :=
+  rweq_of_step (Path.Step.symm_symm (B.period_path x))
 
 -- ============================================================
 -- § 9. Motivic Weight Structure
@@ -464,15 +491,16 @@ structure WeightStructure (M : Type u) where
     Path (weight (weight_add m1 m2)) (weight m1 + weight m2)
 
 /-- Weight of sum is sum of weights, witnessed by path. -/
-theorem weight_sum_path {M : Type u} (W : WeightStructure M) (m1 m2 : M) :
-    Path.trans (W.weight_additive m1 m2) (Path.refl _) =
-    W.weight_additive m1 m2 := by
-  simp
+noncomputable def weight_sum_path {M : Type u} (W : WeightStructure M) (m1 m2 : M) :
+    RwEq
+      (Path.trans (W.weight_additive m1 m2) (Path.refl _))
+      (W.weight_additive m1 m2) :=
+  rweq_of_step (Path.Step.trans_refl_right (W.weight_additive m1 m2))
 
 /-- Weight paths are reflexive under double symmetry. -/
-theorem weight_symm_symm {M : Type u} (W : WeightStructure M) (m : M) :
-    Path.symm (Path.symm (W.weight_path m)) = W.weight_path m := by
-  exact Path.symm_symm (W.weight_path m)
+noncomputable def weight_symm_symm {M : Type u} (W : WeightStructure M) (m : M) :
+    RwEq (Path.symm (Path.symm (W.weight_path m))) (W.weight_path m) :=
+  rweq_of_step (Path.Step.symm_symm (W.weight_path m))
 
 -- ============================================================
 -- § 10. Motivic Cohomology Operations (Steenrod, Power)
@@ -486,23 +514,27 @@ structure MotivicSteenrod (H : Nat → Nat → Type u) where
     Path (sq i p q (f x)) (sq i p q (f x))
 
 /-- Sq⁰ = id, stabilized by refl composition. -/
-theorem steenrod_sq0_stable {H : Nat → Nat → Type u}
+noncomputable def steenrod_sq0_stable {H : Nat → Nat → Type u}
     (S : MotivicSteenrod H) (p q : Nat) (x : H p q) :
-    Path.trans (S.sq_zero p q x) (Path.refl x) = S.sq_zero p q x := by
-  simp
+    RwEq (Path.trans (S.sq_zero p q x) (Path.refl x)) (S.sq_zero p q x) :=
+  rweq_of_step (Path.Step.trans_refl_right (S.sq_zero p q x))
 
 /-- Double Sq⁰ is identity path. -/
-theorem steenrod_sq0_sq0 {H : Nat → Nat → Type u}
+noncomputable def steenrod_sq0_sq0 {H : Nat → Nat → Type u}
     (S : MotivicSteenrod H) (p q : Nat) (x : H p q) :
-    Path.trans (S.sq_zero p q (S.sq 0 p q x)) (S.sq_zero p q x) =
-    Path.trans (S.sq_zero p q (S.sq 0 p q x)) (S.sq_zero p q x) :=
-  rfl
+    RwEq
+      (Path.symm (Path.symm
+        (Path.trans (S.sq_zero p q (S.sq 0 p q x)) (S.sq_zero p q x))))
+      (Path.trans (S.sq_zero p q (S.sq 0 p q x)) (S.sq_zero p q x)) :=
+  rweq_of_step
+    (Path.Step.symm_symm
+      (Path.trans (S.sq_zero p q (S.sq 0 p q x)) (S.sq_zero p q x)))
 
 /-- Steenrod symmetry coherence. -/
-theorem steenrod_symm_coherence {H : Nat → Nat → Type u}
+noncomputable def steenrod_symm_coherence {H : Nat → Nat → Type u}
     (S : MotivicSteenrod H) (p q : Nat) (x : H p q) :
-    Path.symm (Path.symm (S.sq_zero p q x)) = S.sq_zero p q x :=
-  Path.symm_symm (S.sq_zero p q x)
+    RwEq (Path.symm (Path.symm (S.sq_zero p q x))) (S.sq_zero p q x) :=
+  rweq_of_step (Path.Step.symm_symm (S.sq_zero p q x))
 
 /-- Motivic power operations. -/
 structure MotivicPowerOp (H : Nat → Type u) where
@@ -512,10 +544,10 @@ structure MotivicPowerOp (H : Nat → Type u) where
     Path (power j (k * n) (power k n x)) (by rw [← Nat.mul_assoc]; exact power (j * k) n x)
 
 /-- Power one is the identity modulo path. -/
-theorem power_one_id {H : Nat → Type u}
+noncomputable def power_one_id {H : Nat → Type u}
     (P : MotivicPowerOp H) (n : Nat) (x : H n) :
-    Path.trans (P.power_one n x) (Path.refl _) = P.power_one n x := by
-  exact Path.trans_refl_right (P.power_one n x)
+    RwEq (Path.trans (P.power_one n x) (Path.refl _)) (P.power_one n x) :=
+  rweq_of_step (Path.Step.trans_refl_right (P.power_one n x))
 
 -- ============================================================
 -- § 11. Motivic Stable Homotopy Category Paths
@@ -531,23 +563,23 @@ structure MotivicSpectrum where
   bond_t_path : ∀ p q, Path (bond_t p q (basepoint p q)) (basepoint p (q + 1))
 
 /-- Simplicial bonding preserves basepoint. -/
-theorem spectrum_bond_s_bp (E : MotivicSpectrum) (p q : Nat) :
-    Path.trans (E.bond_s_path p q) (Path.refl _) = E.bond_s_path p q := by
-  simp
+noncomputable def spectrum_bond_s_bp (E : MotivicSpectrum) (p q : Nat) :
+    RwEq (Path.trans (E.bond_s_path p q) (Path.refl _)) (E.bond_s_path p q) :=
+  rweq_of_step (Path.Step.trans_refl_right (E.bond_s_path p q))
 
 /-- Tate bonding preserves basepoint. -/
-theorem spectrum_bond_t_bp (E : MotivicSpectrum) (p q : Nat) :
-    Path.trans (E.bond_t_path p q) (Path.refl _) = E.bond_t_path p q := by
-  simp
+noncomputable def spectrum_bond_t_bp (E : MotivicSpectrum) (p q : Nat) :
+    RwEq (Path.trans (E.bond_t_path p q) (Path.refl _)) (E.bond_t_path p q) :=
+  rweq_of_step (Path.Step.trans_refl_right (E.bond_t_path p q))
 
 /-- Bond paths have trivial double symmetry. -/
-theorem spectrum_bond_s_symm_symm (E : MotivicSpectrum) (p q : Nat) :
-    Path.symm (Path.symm (E.bond_s_path p q)) = E.bond_s_path p q :=
-  Path.symm_symm (E.bond_s_path p q)
+noncomputable def spectrum_bond_s_symm_symm (E : MotivicSpectrum) (p q : Nat) :
+    RwEq (Path.symm (Path.symm (E.bond_s_path p q))) (E.bond_s_path p q) :=
+  rweq_of_step (Path.Step.symm_symm (E.bond_s_path p q))
 
-theorem spectrum_bond_t_symm_symm (E : MotivicSpectrum) (p q : Nat) :
-    Path.symm (Path.symm (E.bond_t_path p q)) = E.bond_t_path p q :=
-  Path.symm_symm (E.bond_t_path p q)
+noncomputable def spectrum_bond_t_symm_symm (E : MotivicSpectrum) (p q : Nat) :
+    RwEq (Path.symm (Path.symm (E.bond_t_path p q))) (E.bond_t_path p q) :=
+  rweq_of_step (Path.Step.symm_symm (E.bond_t_path p q))
 
 /-- A map of motivic spectra with path-level compatibility. -/
 structure MotivicSpectrumMap (E F : MotivicSpectrum) where
@@ -559,13 +591,18 @@ structure MotivicSpectrumMap (E F : MotivicSpectrum) where
     Path (F.bond_t p q (map p q x)) (map p (q + 1) (E.bond_t p q x))
 
 /-- Spectrum map commutes with bonding on basepoints. -/
-theorem spectrum_map_bond_bp {E F : MotivicSpectrum}
+noncomputable def spectrum_map_bond_bp {E F : MotivicSpectrum}
     (φ : MotivicSpectrumMap E F) (p q : Nat) :
-    Path.trans (φ.map_bond_s p q (E.basepoint p q))
-               (Path.congrArg (φ.map (p + 1) q) (E.bond_s_path p q)) =
-    Path.trans (φ.map_bond_s p q (E.basepoint p q))
-               (Path.congrArg (φ.map (p + 1) q) (E.bond_s_path p q)) :=
-  rfl
+    RwEq
+      (Path.symm (Path.symm
+        (Path.trans (φ.map_bond_s p q (E.basepoint p q))
+                    (Path.congrArg (φ.map (p + 1) q) (E.bond_s_path p q)))))
+      (Path.trans (φ.map_bond_s p q (E.basepoint p q))
+                  (Path.congrArg (φ.map (p + 1) q) (E.bond_s_path p q))) :=
+  rweq_of_step
+    (Path.Step.symm_symm
+      (Path.trans (φ.map_bond_s p q (E.basepoint p q))
+                  (Path.congrArg (φ.map (p + 1) q) (E.bond_s_path p q))))
 
 -- ============================================================
 -- § 12. Motivic Euler Characteristic
@@ -581,15 +618,16 @@ structure MotivicEuler (GW : Type u) where
     Path (rank (add g1 g2)) (rank g1 + rank g2)
 
 /-- Euler characteristic rank is additive. -/
-theorem euler_rank_add {GW : Type u} (E : MotivicEuler GW) (g1 g2 : GW) :
-    Path.trans (E.chi_additive g1 g2) (Path.refl _) =
-    E.chi_additive g1 g2 := by
-  simp
+noncomputable def euler_rank_add {GW : Type u} (E : MotivicEuler GW) (g1 g2 : GW) :
+    RwEq
+      (Path.trans (E.chi_additive g1 g2) (Path.refl _))
+      (E.chi_additive g1 g2) :=
+  rweq_of_step (Path.Step.trans_refl_right (E.chi_additive g1 g2))
 
 /-- Rank path symmetry. -/
-theorem euler_rank_symm_symm {GW : Type u} (E : MotivicEuler GW) (g : GW) :
-    Path.symm (Path.symm (E.rank_path g)) = E.rank_path g :=
-  Path.symm_symm (E.rank_path g)
+noncomputable def euler_rank_symm_symm {GW : Type u} (E : MotivicEuler GW) (g : GW) :
+    RwEq (Path.symm (Path.symm (E.rank_path g))) (E.rank_path g) :=
+  rweq_of_step (Path.Step.symm_symm (E.rank_path g))
 
 -- ============================================================
 -- § 13. Slice Filtration
@@ -603,9 +641,9 @@ structure SliceTower where
   bond_path : ∀ n : Int, Path (bond n (slice n)) (slice (n + 1))
 
 /-- Slice tower bonding is well-behaved. -/
-theorem slice_bond_refl (T : SliceTower) (n : Int) :
-    Path.trans (T.bond_path n) (Path.refl _) = T.bond_path n := by
-  simp
+noncomputable def slice_bond_refl (T : SliceTower) (n : Int) :
+    RwEq (Path.trans (T.bond_path n) (Path.refl _)) (T.bond_path n) :=
+  rweq_of_step (Path.Step.trans_refl_right (T.bond_path n))
 
 /-- Double slice bonding. -/
 noncomputable def slice_double_bond (T : SliceTower) (n : Int) :
@@ -613,9 +651,9 @@ noncomputable def slice_double_bond (T : SliceTower) (n : Int) :
   Path.congrArg (T.bond (n + 1)) (T.bond_path n)
 
 /-- Slice bond path symmetry. -/
-theorem slice_bond_symm_symm (T : SliceTower) (n : Int) :
-    Path.symm (Path.symm (T.bond_path n)) = T.bond_path n :=
-  Path.symm_symm (T.bond_path n)
+noncomputable def slice_bond_symm_symm (T : SliceTower) (n : Int) :
+    RwEq (Path.symm (Path.symm (T.bond_path n))) (T.bond_path n) :=
+  rweq_of_step (Path.Step.symm_symm (T.bond_path n))
 
 end Motivic
 end ComputationalPaths
