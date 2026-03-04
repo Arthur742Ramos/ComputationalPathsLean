@@ -364,13 +364,13 @@ theorem braid_involution (a b : MObj) :
 -- ============================================================
 
 /-- A monoidal functor on generators. -/
-noncomputable def MObj.mapGen (f : Nat → Nat) : MObj → MObj
+def MObj.mapGen (f : Nat → Nat) : MObj → MObj
   | .gen n => .gen (f n)
   | .unit => .unit
   | .tensor a b => .tensor (a.mapGen f) (b.mapGen f)
 
 /-- Theorem 39: mapGen preserves MonStep. -/
-def MonStep.mapGen {a b : MObj} (f : Nat → Nat)
+noncomputable def MonStep.mapGen {a b : MObj} (f : Nat → Nat)
     (s : MonStep a b) : MonStep (a.mapGen f) (b.mapGen f) := by
   induction s with
   | assocR a b c => exact MonStep.assocR (a.mapGen f) (b.mapGen f) (c.mapGen f)
@@ -415,8 +415,10 @@ noncomputable def assoc5Path (a b c d e : MObj) :
       (MonPath.single (MonStep.assocR a b (c ⊗ₘ (d ⊗ₘ e)))))
 
 /-- Theorem 45: No step from a generator to unit. -/
-def unit_no_gen_step (n : Nat) : ¬ MonStep (.gen n) .unit := by
-  intro h; cases h
+def unit_no_gen_step (n : Nat) : ¬ Nonempty (MonStep (.gen n) .unit) := by
+  intro h
+  rcases h with ⟨h⟩
+  cases h
 
 /-- Theorem 46: Flatten preserved under assocR. -/
 theorem flatten_assocR (a b c : MObj) :
