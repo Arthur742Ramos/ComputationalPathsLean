@@ -128,7 +128,7 @@ end MonExpr
 /-! ## Monoidal Steps: Elementary Structural Isomorphisms -/
 
 /-- Elementary structural rewrite steps between monoidal expressions. -/
-inductive MonStep (α : Type u) : MonExpr α → MonExpr α → Type where
+inductive MonStep (α : Type u) : MonExpr α → MonExpr α → Type (u + 1) where
   | assoc_fwd (a b c : MonExpr α) :
       MonStep α (MonExpr.tensor a (MonExpr.tensor b c))
                (MonExpr.tensor (MonExpr.tensor a b) c)
@@ -461,7 +461,7 @@ end StructuralPaths
 /-! ## Braided Monoidal Structure -/
 
 /-- Steps for the braided monoidal case. -/
-inductive BraidStep (α : Type u) : MonExpr α → MonExpr α → Type where
+inductive BraidStep (α : Type u) : MonExpr α → MonExpr α → Type (u + 1) where
   | ofMon {e₁ e₂ : MonExpr α} : MonStep α e₁ e₂ → BraidStep α e₁ e₂
   | braid (a b : MonExpr α) :
       BraidStep α (MonExpr.tensor a b) (MonExpr.tensor b a)
