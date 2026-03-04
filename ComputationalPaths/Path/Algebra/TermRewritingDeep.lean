@@ -375,18 +375,16 @@ inductive TRMStep (R : TRTRS) : TRTm → TRTm → Type where
   | cons : TRStep R a b → TRMStep R b c → TRMStep R a c
 
 /-- Theorem 43: MStep is transitive. -/
-def TRMStep.append {R : TRTRS} {a b c : TRTm}
-    (m₁ : TRMStep R a b) (m₂ : TRMStep R b c) : TRMStep R a c := by
-  induction m₁ with
-  | refl _ => exact m₂
-  | cons s _ ih => exact TRMStep.cons s (ih m₂)
+def TRMStep.append {R : TRTRS} {a b c : TRTm} :
+    TRMStep R a b → TRMStep R b c → TRMStep R a c
+  | .refl _, m₂ => m₂
+  | .cons s m₁, m₂ => .cons s (TRMStep.append m₁ m₂)
 
 /-- Theorem 44: MStep embeds into Path. -/
-theorem TRMStep.toPath {R : TRTRS} {a b : TRTm}
-    (m : TRMStep R a b) : TRPath R a b := by
-  induction m with
-  | refl t => exact TRPath.refl t
-  | cons s _ ih => exact TRPath.trans (TRPath.step s) ih
+def TRMStep.toPath {R : TRTRS} {a b : TRTm} :
+    TRMStep R a b → TRPath R a b
+  | .refl t => .refl t
+  | .cons s m => TRPath.trans (TRPath.step s) (TRMStep.toPath m)
 
 /-- Theorem 45: Single step → MStep. -/
 def TRStep.toMStep {R : TRTRS} (s : TRStep R a b) :
@@ -394,45 +392,43 @@ def TRStep.toMStep {R : TRTRS} (s : TRStep R a b) :
   TRMStep.cons s (TRMStep.refl b)
 
 /-- Theorem 46: MStep lifts through congrL. -/
-theorem TRMStep.liftCongrL {R : TRTRS}
-    (m : TRMStep R l l') (r : TRTm) :
-    TRPath R (.app l r) (.app l' r) := by
-  induction m with
-  | refl _ => exact TRPath.refl _
-  | cons s _ ih => exact TRPath.trans (TRPath.congrL (TRPath.step s) r) ih
+def TRMStep.liftCongrL {R : TRTRS} {l l' : TRTm} (r : TRTm) :
+    TRMStep R l l' → TRPath R (.app l r) (.app l' r)
+  | .refl _ => TRPath.refl _
+  | .cons s m =>
+      TRPath.trans (TRPath.congrL (TRPath.step s) r) (TRMStep.liftCongrL r m)
 
 /-- Theorem 47: MStep lifts through congrR. -/
-theorem TRMStep.liftCongrR {R : TRTRS} (l : TRTm)
-    (m : TRMStep R r r') :
-    TRPath R (.app l r) (.app l r') := by
-  induction m with
-  | refl _ => exact TRPath.refl _
-  | cons s _ ih => exact TRPath.trans (TRPath.congrR l (TRPath.step s)) ih
+def TRMStep.liftCongrR {R : TRTRS} {r r' : TRTm} (l : TRTm) :
+    TRMStep R r r' → TRPath R (.app l r) (.app l r')
+  | .refl _ => TRPath.refl _
+  | .cons s m =>
+      TRPath.trans (TRPath.congrR l (TRPath.step s)) (TRMStep.liftCongrR l m)
 
 -- ============================================================
 -- §14  Joinability & Confluence
 -- ============================================================
 
-noncomputable def TRJoinable (R : TRTRS) (a b : TRTm) : Prop :=
-  ∃ c, TRMStep R a c ∧ TRMStep R b c
+noncomputable def TRJoinable (R : TRTRS) (a b : TRTm) : Type :=
+  Σ c, TRMStep R a c × TRMStep R b c
 
-noncomputable def TRConfluent (R : TRTRS) : Prop :=
+noncomputable def TRConfluent (R : TRTRS) : Type :=
   ∀ a b c, TRMStep R a b → TRMStep R a c → TRJoinable R b c
 
-noncomputable def TRLocallyConfluent (R : TRTRS) : Prop :=
+noncomputable def TRLocallyConfluent (R : TRTRS) : Type :=
   ∀ a b c, TRStep R a b → TRStep R a c → TRJoinable R b c
 
 /-- Theorem 48: Joinability is reflexive. -/
-theorem TRJoinable.refl (R : TRTRS) (t : TRTm) : TRJoinable R t t :=
+def TRJoinable.refl (R : TRTRS) (t : TRTm) : TRJoinable R t t :=
   ⟨t, TRMStep.refl t, TRMStep.refl t⟩
 
 /-- Theorem 49: Joinability is symmetric. -/
-theorem TRJoinable.symm' {R : TRTRS} (h : TRJoinable R a b) :
+def TRJoinable.symm' {R : TRTRS} (h : TRJoinable R a b) :
     TRJoinable R b a :=
   let ⟨c, ha, hb⟩ := h; ⟨c, hb, ha⟩
 
 /-- Theorem 50: Joinable terms connect via path. -/
-theorem TRJoinable.toPath {R : TRTRS} (h : TRJoinable R a b) :
+def TRJoinable.toPath {R : TRTRS} (h : TRJoinable R a b) :
     TRPath R a b :=
   let ⟨c, ha, hb⟩ := h
   TRPath.trans ha.toPath (TRPath.symm hb.toPath)
@@ -441,10 +437,10 @@ theorem TRJoinable.toPath {R : TRTRS} (h : TRJoinable R a b) :
 -- §15  Normal Forms
 -- ============================================================
 
-noncomputable def TRNF (R : TRTRS) (t : TRTm) : Prop := ∀ t', ¬ TRStep R t t'
+noncomputable def TRNF (R : TRTRS) (t : TRTm) : Prop := ∀ t', ¬ Nonempty (TRStep R t t')
 
 /-- Theorem 51: NF has only trivial self-path. -/
-theorem TRNF.self_path {R : TRTRS} (hnf : TRNF R t) :
+def TRNF.self_path {R : TRTRS} (hnf : TRNF R t) :
     TRPath R t t :=
   TRPath.refl t
 
@@ -453,10 +449,10 @@ theorem TRNF.self_path {R : TRTRS} (hnf : TRNF R t) :
 -- ============================================================
 
 noncomputable def TRTerminating (R : TRTRS) : Prop :=
-  WellFounded (fun b a => TRStep R a b)
+  WellFounded (fun b a => Nonempty (TRStep R a b))
 
 /-- Theorem 52: Newman's lemma. -/
-theorem tr_newman {R : TRTRS} (hWF : TRTerminating R)
+def tr_newman {R : TRTRS} (hWF : TRTerminating R)
     (hLC : TRLocallyConfluent R) : TRConfluent R := by
   intro a
   apply hWF.induction (C := fun a => ∀ b c,
@@ -467,8 +463,8 @@ theorem tr_newman {R : TRTRS} (hWF : TRTerminating R)
   | hab, .refl _ => exact ⟨b, .refl b, hab⟩
   | .cons s₁ m₁, .cons s₂ m₂ =>
     obtain ⟨d, hbd, hcd⟩ := hLC a _ _ s₁ s₂
-    obtain ⟨e, hbe, hde⟩ := ihA _ s₁ b d m₁ hbd
-    obtain ⟨f, hcf, hef⟩ := ihA _ s₂ c e m₂ (TRMStep.append hcd hde)
+    obtain ⟨e, hbe, hde⟩ := ihA _ ⟨s₁⟩ b d m₁ hbd
+    obtain ⟨f, hcf, hef⟩ := ihA _ ⟨s₂⟩ c e m₂ (TRMStep.append hcd hde)
     exact ⟨f, TRMStep.append hbe hef, hcf⟩
 
 -- ============================================================
@@ -490,21 +486,21 @@ structure TRCPWitness (R : TRTRS) where
   cp      : TRCriticalPair
 
 /-- Theorem 53: Trivial CP is joinable. -/
-theorem tr_trivial_cp_joinable (R : TRTRS) (t : TRTm) :
+def tr_trivial_cp_joinable (R : TRTRS) (t : TRTm) :
     TRJoinable R t t :=
   TRJoinable.refl R t
 
 /-- Theorem 54: Joinable CP gives a path. -/
-theorem tr_cp_joinable_path {R : TRTRS} {cp : TRCriticalPair}
+def tr_cp_joinable_path {R : TRTRS} {cp : TRCriticalPair}
     (h : TRJoinable R cp.left cp.right) : TRPath R cp.left cp.right :=
   h.toPath
 
 /-- All critical pairs joinable. -/
-noncomputable def TRAllCPJoinable (R : TRTRS) (cps : List TRCriticalPair) : Prop :=
+noncomputable def TRAllCPJoinable (R : TRTRS) (cps : List TRCriticalPair) : Type :=
   ∀ cp, cp ∈ cps → TRJoinable R cp.left cp.right
 
 /-- Theorem 55: Empty CP list trivially joinable. -/
-theorem tr_all_cp_joinable_empty (R : TRTRS) : TRAllCPJoinable R [] :=
+def tr_all_cp_joinable_empty (R : TRTRS) : TRAllCPJoinable R [] :=
   fun _ h => by cases h
 
 -- ============================================================
