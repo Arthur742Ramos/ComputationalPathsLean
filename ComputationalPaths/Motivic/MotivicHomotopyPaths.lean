@@ -14,7 +14,7 @@ We formalize:
 * Motivic Adams operations
 * Bott periodicity paths for algebraic K-theory
 
-All constructions use explicit Step/Path witnesses with zero sorry/admit.
+All constructions use explicit Step/Path witnesses with no placeholders.
 
 ## References
 

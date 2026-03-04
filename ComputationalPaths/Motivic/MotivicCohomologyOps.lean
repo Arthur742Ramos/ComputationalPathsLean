@@ -12,7 +12,7 @@ This module develops advanced motivic homotopy structures via computational path
 * Motivic infinite loop space machine
 * η-periodic phenomena and ρ-torsion paths
 
-All constructions are pure Step/Path/trans/symm/congrArg — zero sorry/admit.
+All constructions are pure Step/Path/trans/symm/congrArg — no placeholders.
 
 ## References
 
