@@ -291,14 +291,15 @@ theorem sub_diamond_cr {step : A → A → Prop} (hSD : SubDiamond step) :
     cases hac with
     | refl => exact ⟨b, ⟨(ParStep.refl : ParStep step b b)⟩, ⟨ParStep.lift sab⟩⟩
     | lift sac =>
-      obtain ⟨d, hbd, hcd⟩ := hSD sab sac
-      refine ⟨d, ?_, ?_⟩
-      · cases hbd with
-        | inl h => exact h ▸ ⟨(ParStep.refl : ParStep step b b)⟩
-        | inr s => exact ⟨ParStep.lift s⟩
-      · cases hcd with
-        | inl h => exact h ▸ ⟨(ParStep.refl : ParStep step c c)⟩
-        | inr s => exact ⟨ParStep.lift s⟩
+      classical
+      have hd : ∃ d, (b = d ∨ step b d) ∧ (c = d ∨ step c d) := hSD sab sac
+      refine ⟨Classical.choose hd, ?_, ?_⟩
+      · exact (Classical.choose_spec hd).1.elim
+          (fun h => h ▸ ⟨(ParStep.refl : ParStep step b b)⟩)
+          (fun s => ⟨ParStep.lift s⟩)
+      · exact (Classical.choose_spec hd).2.elim
+          (fun h => h ▸ ⟨(ParStep.refl : ParStep step c c)⟩)
+          (fun s => ⟨ParStep.lift s⟩)
 
 theorem diamond_sub {step : A → A → Prop} (hD : Diamond step) :
     SubDiamond step := by
