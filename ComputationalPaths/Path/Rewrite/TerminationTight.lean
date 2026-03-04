@@ -252,7 +252,7 @@ def step_weight_le {p q : Expr} (h : Step p q) : q.weight ≤ p.weight := by
     This is just a re-export of `termination` with a complexity annotation:
     the depth of the well-founded tree rooted at `e` is at most
     `O(weight(e)² + leftWeight(e))` = `O(size(e)⁴)`. -/
-def acc_with_bound (e : Expr) : Acc (fun q p => Step p q) e :=
+def acc_with_bound (e : Expr) : Acc (fun q p => StepProp p q) e :=
   acc_step e
 
 end ComputationalPaths.Path.Rewrite.GroupoidTRS
