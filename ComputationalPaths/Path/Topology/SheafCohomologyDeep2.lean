@@ -11,7 +11,7 @@ universe u
 -- ============================================================================
 
 -- Sheaf cohomology step constructors
-inductive SheafStep : {A : Type u} → A → A → Type u (u + 1) where
+inductive SheafStep : {A : Type u} → A → A → Type (u + 1) where
   | refl  : {A : Type u} → (a : A) → SheafStep a a
   | symm  : {A : Type u} → {a b : A} → SheafStep a b → SheafStep b a
   | trans : {A : Type u} → {a b c : A} → SheafStep a b → SheafStep b c → SheafStep a c
@@ -53,7 +53,7 @@ inductive SheafStep : {A : Type u} → A → A → Type u (u + 1) where
       → SheafStep x (δ x)
 
 -- Path type for sheaf cohomology
-inductive SheafPath : {A : Type u} → A → A → Type u (u + 1) where
+inductive SheafPath : {A : Type u} → A → A → Type (u + 1) where
   | nil  : {A : Type u} → (a : A) → SheafPath a a
   | cons : {A : Type u} → {a b c : A} → SheafStep a b → SheafPath b c → SheafPath a c
 
