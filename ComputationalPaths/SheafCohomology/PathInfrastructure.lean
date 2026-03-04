@@ -24,7 +24,7 @@ universe u v w
 /-! ## Sheaf Cohomology Rewrite Steps -/
 
 inductive ShStep {A : Type u} :
-    {a b : A} → Path a b → Path a b → Type where
+    {a b : A} → Path a b → Path a b → Type (u + 1) where
   | right_unit {a b : A} (p : Path a b) :
       ShStep (Path.trans p (Path.refl b)) p
   | left_unit {a b : A} (p : Path a b) :
