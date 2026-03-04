@@ -662,28 +662,31 @@ theorem resolution_path_to_contradiction
 -- Multi-step rewriting
 -- ============================================================================
 
-inductive MultiStepN (R : α → α → Type) : Nat → α → α → Type where
-  | zero : MultiStepN R 0 a a
-  | succ : R a b → MultiStepN R n b c → MultiStepN R (n + 1) a c
+inductive MultiStepN {α : Type u} (R : α → α → Sort v) :
+    Nat → α → α → Type (max u v) where
+  | zero {a : α} : MultiStepN R 0 a a
+  | succ {n : Nat} {a b c : α} : R a b → MultiStepN R n b c → MultiStepN R (n + 1) a c
 
-noncomputable def MultiStep (R : α → α → Prop) : α → α → Prop :=
-  fun a b => ∃ n : Nat, MultiStepN R n a b
+noncomputable def MultiStep {α : Type u} (R : α → α → Sort v) :
+    α → α → Type (max u v) :=
+  fun a b => Sigma fun n : Nat => MultiStepN R n a b
 
 -- 71
-theorem multiStepN_zero_eq (R : α → α → Prop) {a b : α} :
+theorem multiStepN_zero_eq {α : Type u} (R : α → α → Sort v) {a b : α} :
     MultiStepN R 0 a b → a = b := by
   intro h; cases h; rfl
 
 -- 72
-theorem multiStepN_refl (R : α → α → Prop) (a : α) : MultiStepN R 0 a a :=
+def multiStepN_refl {α : Type u} (R : α → α → Sort v) (a : α) : MultiStepN R 0 a a :=
   MultiStepN.zero
 
 -- 73
-def multiStep_refl (R : α → α → Prop) (a : α) : MultiStep R a a :=
+def multiStep_refl {α : Type u} (R : α → α → Sort v) (a : α) : MultiStep R a a :=
   ⟨0, MultiStepN.zero⟩
 
 -- 74
-theorem multiStep_single (R : α → α → Prop) (hab : R a b) : MultiStep R a b :=
+def multiStep_single {α : Type u} (R : α → α → Sort v) {a b : α} (hab : R a b) :
+    MultiStep R a b :=
   ⟨1, MultiStepN.succ hab MultiStepN.zero⟩
 
 -- ============================================================================

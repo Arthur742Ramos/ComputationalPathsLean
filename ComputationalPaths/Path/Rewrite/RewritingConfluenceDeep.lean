@@ -118,7 +118,7 @@ variable {A : Type u} {a b : A}
 structure PathNormFn (a b : A) where
   nf : ComputationalPaths.Path a b → ComputationalPaths.Path a b
   reduces : ∀ p : ComputationalPaths.Path a b, ComputationalPaths.Path.Rw p (nf p)
-  is_nf : ∀ (p q : ComputationalPaths.Path a b), ¬ ComputationalPaths.Path.Step (nf p) q
+  is_nf : ∀ (p q : ComputationalPaths.Path a b), ¬ Nonempty (ComputationalPaths.Path.Step (nf p) q)
 
 /-- **Path Word Problem (toEq version)**: normalisation preserves toEq,
     so two paths have equal toEq iff their normal forms do. -/

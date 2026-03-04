@@ -41,7 +41,7 @@ import ComputationalPaths.Path.Polygraph.CoherentPresentation
 namespace ComputationalPaths.Path.Polygraph.HomotopyBasis
 
 open Rewrite.GroupoidTRS (Expr RTC)
-open Rewrite.GroupoidConfluence (CStep CRTC ExprRwEq canon toRW confluence
+open Rewrite.GroupoidConfluence (CStep CStepProp CRTC ExprRwEq canon toRW confluence
   cstep_termination reach_canon toRW_invariant toRW_invariant_rtc
   local_confluence exprRwEq_of_crtc rwAppend)
 open Polygraph (RwEqDeriv DerivEquiv)
@@ -61,10 +61,10 @@ structure HomotopyBasis where
   /-- The generating 3-cell families -/
   generators : List (Σ (n : Nat), (Fin n → Expr) → Generating3Cell)
   /-- Every local fork is resolved by a generator -/
-  local_resolution : ∀ a b c : Expr, CStep a b → CStep a c →
+  local_resolution : ∀ a b c : Expr, CStepProp a b → CStepProp a c →
     ∃ d, CRTC b d ∧ CRTC c d
   /-- The TRS terminates -/
-  termination : WellFounded (fun q p : Expr => CStep p q)
+  termination : WellFounded (fun q p : Expr => CStepProp p q)
 
 /-- The groupoid TRS homotopy basis: 9 generating 3-cell families. -/
 noncomputable def groupoidHomotopyBasis : HomotopyBasis where
@@ -206,9 +206,9 @@ def acyclic_above_3 :
     -- Confluence: any fork joins
     (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
     -- Termination: no infinite reduction sequences
-    WellFounded (fun q p : Expr => CStep p q) ∧
+    WellFounded (fun q p : Expr => CStepProp p q) ∧
     -- All critical pairs are joinable (9 families suffice)
-    (∀ a b c : Expr, CStep a b → CStep a c → ∃ d, CRTC b d ∧ CRTC c d) :=
+    (∀ a b c : Expr, CStepProp a b → CStepProp a c → ∃ d, CRTC b d ∧ CRTC c d) :=
   ⟨confluence, cstep_termination, local_confluence⟩
 
 /-! ## The 3-Dimensional Coherent Presentation -/
@@ -226,9 +226,9 @@ structure CoherentPresentation3D where
   num3cells : Nat
   /-- Convergence of 2-cells -/
   convergent : (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
-               WellFounded (fun q p : Expr => CStep p q)
+               WellFounded (fun q p : Expr => CStepProp p q)
   /-- 3-cells form a homotopy basis -/
-  basis : ∀ a b c : Expr, CStep a b → CStep a c → ∃ d, CRTC b d ∧ CRTC c d
+  basis : ∀ a b c : Expr, CStepProp a b → CStepProp a c → ∃ d, CRTC b d ∧ CRTC c d
 
 /-- The completed groupoid TRS is a 3-dimensional coherent presentation. -/
 noncomputable def coherentPresentation3d : CoherentPresentation3D where

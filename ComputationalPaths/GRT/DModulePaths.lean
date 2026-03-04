@@ -54,7 +54,7 @@ noncomputable def riemannHilbert_rweq (M : Obj) :
       (D.riemannHilbertPath M) :=
   rweq_of_step (D.riemannHilbertStep M)
 
-@[simp] theorem riemannHilbert_left_unit_step (M : Obj) :
+def riemannHilbert_left_unit_step (M : Obj) :
     Path.Step
       (Path.trans (Path.refl (D.solution (D.deRham M))) (D.riemannHilbertPath M))
       (D.riemannHilbertPath M) :=
@@ -74,7 +74,7 @@ noncomputable def convolution_assoc_rweq (M N K : Obj) :
       (D.convolutionAssocPath M N K) :=
   rweq_of_step (D.convolutionAssocStep M N K)
 
-@[simp] theorem convolution_assoc_left_unit_step (M N K : Obj) :
+def convolution_assoc_left_unit_step (M N K : Obj) :
     Path.Step
       (Path.trans
         (Path.refl (D.tensor (D.tensor M N) K))
@@ -90,7 +90,7 @@ noncomputable def convolution_assoc_left_unit_rweq (M N K : Obj) :
       (D.convolutionAssocPath M N K) :=
   rweq_of_step (D.convolution_assoc_left_unit_step M N K)
 
-@[simp] theorem riemannHilbert_cancel_step (M : Obj) :
+def riemannHilbert_cancel_step (M : Obj) :
     Path.Step
       (Path.trans (D.riemannHilbertPath M) (Path.symm (D.riemannHilbertPath M)))
       (Path.refl (D.solution (D.deRham M))) :=

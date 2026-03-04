@@ -446,7 +446,7 @@ theorem nf_unique_path {α : Type} {R : α → α → Prop} {a b : α}
 -- ════════════════════════════════════════════════════════════
 
 /-- Parallel step: reduce zero or more redexes simultaneously. -/
-inductive ParStep (α : Type) (R : α → α → Type) : α → α → Type where
+inductive ParStep (α : Type) (R : α → α → Prop) : α → α → Type where
   | refl : (a : α) → ParStep α R a a
   | step : {a b : α} → R a b → ParStep α R a b
 
@@ -551,7 +551,7 @@ theorem toParPath_trans {α : Type} {R : α → α → Prop} {a b c : α}
 -- ════════════════════════════════════════════════════════════
 
 /-- A labelled step carries a tag for residual tracking. -/
-inductive LStep (α : Type) (R : α → α → Type) (L : Type) : α → α → Type where
+inductive LStep (α : Type) (R : α → α → Prop) (L : Type) : α → α → Type where
   | mk : {a b : α} → L → R a b → LStep α R L a b
 
 /-- A labelled path: sequence of labelled steps (Lévy labels). -/

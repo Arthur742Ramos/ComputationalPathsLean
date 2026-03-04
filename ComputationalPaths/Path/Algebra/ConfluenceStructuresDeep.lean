@@ -509,7 +509,7 @@ theorem toExt_source {α : Type} {R : α → α → Prop}
 
 /-- Parallel step: simultaneous reduction at multiple positions.
     Modeled as a relation that extends R. -/
-inductive ParStep (α : Type) (R : α → α → Type) : α → α → Type where
+inductive ParStep (α : Type) (R : α → α → Prop) : α → α → Prop where
   | refl : (a : α) → ParStep α R a a
   | step : {a b : α} → R a b → ParStep α R a b
 
@@ -586,8 +586,9 @@ inductive RWStep (α : Type) [DecidableEq α] (sys : RWSystem α) : α → α �
 
 /-- Theorem 37: a system with no rules has no steps. -/
 theorem empty_system_no_steps {α : Type} [DecidableEq α] (a b : α) :
-    ¬ RWStep α (⟨[]⟩ : RWSystem α) a b := by
+    ¬ Nonempty (RWStep α (⟨[]⟩ : RWSystem α) a b) := by
   intro h
+  rcases h with ⟨h⟩
   cases h with
   | apply hmem _ _ => exact absurd hmem (List.not_mem_nil)
 

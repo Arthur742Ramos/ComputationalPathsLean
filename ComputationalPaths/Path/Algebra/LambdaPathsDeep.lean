@@ -285,12 +285,11 @@ theorem BetaPath.congrAppR {f a a' : LTerm}
   | step s _ ih => exact BetaPath.step (BetaStep.congAppR s) ih
 
 /-- Theorem 26: Beta step embeds into full step. -/
-def BetaStep.toStep {a b : LTerm} (s : BetaStep a b) : Step a b := by
-  induction s with
-  | beta body arg => exact Step.beta body arg
-  | congLam _ ih => exact Step.congLam ih
-  | congAppL _ ih => exact Step.congAppL ih
-  | congAppR _ ih => exact Step.congAppR ih
+def BetaStep.toStep {a b : LTerm} : BetaStep a b → Step a b
+  | .beta body arg => Step.beta body arg
+  | .congLam s => Step.congLam (BetaStep.toStep s)
+  | .congAppL s => Step.congAppL (BetaStep.toStep s)
+  | .congAppR s => Step.congAppR (BetaStep.toStep s)
 
 /-- Theorem 27: Beta path embeds into full path. -/
 theorem BetaPath.toPath {a b : LTerm} (p : BetaPath a b) : Path a b := by
@@ -322,10 +321,9 @@ theorem HeadPath.trans {a b c : LTerm}
   | step s _ ih => exact HeadPath.step s (ih q)
 
 /-- Theorem 29: Head step is a beta step. -/
-def HeadStep.toBetaStep {a b : LTerm} (s : HeadStep a b) : BetaStep a b := by
-  induction s with
-  | headBeta body arg => exact BetaStep.beta body arg
-  | headAppL _ ih => exact BetaStep.congAppL ih
+def HeadStep.toBetaStep {a b : LTerm} : HeadStep a b → BetaStep a b
+  | .headBeta body arg => BetaStep.beta body arg
+  | .headAppL s => BetaStep.congAppL (HeadStep.toBetaStep s)
 
 /-- Theorem 30: Head path embeds into beta path. -/
 theorem HeadPath.toBetaPath {a b : LTerm} (p : HeadPath a b) : BetaPath a b := by
@@ -360,11 +358,10 @@ theorem IntPath.trans {a b c : LTerm}
   | step s _ ih => exact IntPath.step s (ih q)
 
 /-- Theorem 33: Internal step is a beta step. -/
-def IntStep.toBetaStep {a b : LTerm} (s : IntStep a b) : BetaStep a b := by
-  induction s with
-  | congLam s => exact BetaStep.congLam s
-  | congAppR s => exact BetaStep.congAppR s
-  | congAppL _ ih => exact BetaStep.congAppL ih
+def IntStep.toBetaStep {a b : LTerm} : IntStep a b → BetaStep a b
+  | .congLam s => BetaStep.congLam s
+  | .congAppR s => BetaStep.congAppR s
+  | .congAppL s => BetaStep.congAppL (IntStep.toBetaStep s)
 
 /-- Theorem 34: Internal path embeds into beta path. -/
 theorem IntPath.toBetaPath {a b : LTerm} (p : IntPath a b) : BetaPath a b := by
@@ -468,17 +465,21 @@ noncomputable def Confluent : Prop :=
 theorem unique_nf_of_confluent
     (hCR : Confluent) {a nf1 nf2 : LTerm}
     (p1 : Path a nf1) (p2 : Path a nf2)
-    (hnf1 : ∀ x, ¬ Step nf1 x) (hnf2 : ∀ x, ¬ Step nf2 x) :
+    (hnf1 : ∀ x, ¬ Nonempty (Step nf1 x)) (hnf2 : ∀ x, ¬ Nonempty (Step nf2 x)) :
     nf1 = nf2 := by
   obtain ⟨d, pd1, pd2⟩ := hCR a nf1 nf2 p1 p2
   have h1 : nf1 = d := by
     cases pd1 with
     | refl _ => rfl
-    | step s _ => exact absurd s (hnf1 _)
+    | step s _ =>
+        exfalso
+        exact hnf1 _ ⟨s⟩
   have h2 : nf2 = d := by
     cases pd2 with
     | refl _ => rfl
-    | step s _ => exact absurd s (hnf2 _)
+    | step s _ =>
+        exfalso
+        exact hnf2 _ ⟨s⟩
   rw [h1, h2]
 
 /-- Theorem 47: Confluence implies SymPath gives common reduct. -/
@@ -509,7 +510,7 @@ inductive ParStep : LTerm → LTerm → Type where
       ParStep (app (lam body) arg) (subst 0 arg' body')
 
 /-- Theorem 48: Identity parallel step (reflexivity). -/
-theorem ParStep.refl : (t : LTerm) → ParStep t t
+def ParStep.refl : (t : LTerm) → ParStep t t
   | var n    => ParStep.pvar n
   | lam body => ParStep.plam (ParStep.refl body)
   | app f a  => ParStep.papp (ParStep.refl f) (ParStep.refl a)
@@ -527,12 +528,11 @@ theorem ParPath.trans {a b c : LTerm}
   | step s _ ih => exact ParPath.step s (ih q)
 
 /-- Theorem 50: Single beta step embeds into parallel step. -/
-def BetaStep.toParStep {a b : LTerm} (s : BetaStep a b) : ParStep a b := by
-  induction s with
-  | beta body arg => exact ParStep.pbeta (ParStep.refl body) (ParStep.refl arg)
-  | congLam _ ih => exact ParStep.plam ih
-  | congAppL _ ih => exact ParStep.papp ih (ParStep.refl _)
-  | congAppR _ ih => exact ParStep.papp (ParStep.refl _) ih
+def BetaStep.toParStep {a b : LTerm} : BetaStep a b → ParStep a b
+  | .beta body arg => ParStep.pbeta (ParStep.refl body) (ParStep.refl arg)
+  | .congLam s => ParStep.plam (BetaStep.toParStep s)
+  | .congAppL s => ParStep.papp (BetaStep.toParStep s) (ParStep.refl _)
+  | .congAppR s => ParStep.papp (ParStep.refl _) (BetaStep.toParStep s)
 
 -- ============================================================
 -- §15  Reduction strategies as path selectors
@@ -591,7 +591,7 @@ theorem church_zero_closed : isClosed (lam (lam (var 0))) := by
 -- ============================================================
 
 /-- Beta expansion: the reverse of beta reduction. -/
-noncomputable def BetaExpansion (a b : LTerm) : Prop := BetaStep b a
+abbrev BetaExpansion (a b : LTerm) : Type := BetaStep b a
 
 /-- Theorem 56: A beta expansion composes with reduction into a SymPath via symm+trans. -/
 theorem expansion_then_reduction {a b c : LTerm}

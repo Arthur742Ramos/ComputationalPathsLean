@@ -226,43 +226,51 @@ theorem newman {step : A → A → Prop} (hT : SN step) (hLC : WCR step) :
 
 /-! ## Parallel Reduction -/
 
-inductive ParStep (step : A → A → Type) : A → A → Type where
+inductive ParStep (step : A → A → Prop) : A → A → Type (u + 1) where
   | refl : ParStep step a a
   | lift : step a b → ParStep step a b
 
 namespace ParStep
 variable {step : A → A → Prop}
 
+abbrev ParStepProp (a b : A) : Prop := Nonempty (ParStep step a b)
+
 theorem toStar {a b : A} (h : ParStep step a b) : Star step a b := by
   cases h with | refl => exact .refl | lift s => exact Star.single s
 
+theorem toStarProp {a b : A} (h : ParStepProp (step := step) a b) : Star step a b := by
+  rcases h with ⟨h⟩
+  exact toStar h
+
 theorem par_strip
-    (hPD : ∀ {a b c : A}, ParStep step a b → ParStep step a c →
-      ∃ d, ParStep step b d ∧ ParStep step c d)
-    {a b c : A} (hab : Star step a b) (hac : ParStep step a c) :
+    (hPD : ∀ {a b c : A}, ParStepProp (step := step) a b → ParStepProp (step := step) a c →
+      ∃ d, ParStepProp (step := step) b d ∧ ParStepProp (step := step) c d)
+    {a b c : A} (hab : Star step a b) (hac : ParStepProp (step := step) a c) :
     ∃ d, Star step b d ∧ Star step c d := by
   revert c
   induction hab with
-  | refl => intro c hac; exact ⟨c, hac.toStar, .refl⟩
+  | refl => intro c hac; exact ⟨c, toStarProp hac, .refl⟩
   | cons sab' _hbc ih =>
     intro c hac
-    obtain ⟨d1, hbd1, hcd1⟩ := hPD (.lift sab') hac
+    obtain ⟨d1, hbd1, hcd1⟩ := hPD ⟨.lift sab'⟩ hac
     obtain ⟨d2, hbd2, hd1d2⟩ := ih hbd1
-    exact ⟨d2, hbd2, Star.append hcd1.toStar hd1d2⟩
+    exact ⟨d2, hbd2, Star.append (toStarProp hcd1) hd1d2⟩
 
 theorem par_diamond_cr
-    (hPD : ∀ {a b c : A}, ParStep step a b → ParStep step a c →
-      ∃ d, ParStep step b d ∧ ParStep step c d) :
+    (hPD : ∀ {a b c : A}, ParStepProp (step := step) a b → ParStepProp (step := step) a c →
+      ∃ d, ParStepProp (step := step) b d ∧ ParStepProp (step := step) c d) :
     CR step := by
   intro a b c hab hac
   revert b
   induction hac with
-  | refl => intro b hab; exact ⟨b, .refl, hab⟩
+  | refl =>
+      intro b hab
+      exact ⟨b, .refl, hab⟩
   | cons sac' _hcc ih =>
-    intro b hab
-    obtain ⟨d1, hbd1, hcd1⟩ := par_strip hPD hab (.lift sac')
-    obtain ⟨d2, hd1d2, hcd2⟩ := ih hcd1
-    exact ⟨d2, Star.append hbd1 hd1d2, hcd2⟩
+      intro b hab
+      obtain ⟨d1, hbd1, hcd1⟩ := par_strip hPD hab ⟨.lift sac'⟩
+      obtain ⟨d2, hd1d2, hcd2⟩ := ih hcd1
+      exact ⟨d2, Star.append hbd1 hd1d2, hcd2⟩
 end ParStep
 
 /-! ## Subcommutative Diamond -/
@@ -275,14 +283,22 @@ theorem sub_diamond_cr {step : A → A → Prop} (hSD : SubDiamond step) :
     CR step := by
   apply ParStep.par_diamond_cr
   intro a b c hab hac
+  rcases hab with ⟨hab⟩
+  rcases hac with ⟨hac⟩
   cases hab with
-  | refl => exact ⟨c, hac, .refl⟩
+  | refl => exact ⟨c, ⟨hac⟩, ⟨(ParStep.refl : ParStep step c c)⟩⟩
   | lift sab =>
     cases hac with
-    | refl => exact ⟨b, .refl, .lift sab⟩
+    | refl => exact ⟨b, ⟨(ParStep.refl : ParStep step b b)⟩, ⟨ParStep.lift sab⟩⟩
     | lift sac =>
       obtain ⟨d, hbd, hcd⟩ := hSD sab sac
-      exact ⟨d, hbd.elim (· ▸ .refl) .lift, hcd.elim (· ▸ .refl) .lift⟩
+      refine ⟨d, ?_, ?_⟩
+      · cases hbd with
+        | inl h => exact h ▸ ⟨(ParStep.refl : ParStep step b b)⟩
+        | inr s => exact ⟨ParStep.lift s⟩
+      · cases hcd with
+        | inl h => exact h ▸ ⟨(ParStep.refl : ParStep step c c)⟩
+        | inr s => exact ⟨ParStep.lift s⟩
 
 theorem diamond_sub {step : A → A → Prop} (hD : Diamond step) :
     SubDiamond step := by

@@ -256,7 +256,7 @@ inductive PBPath : List PBStep → List PBStep → Type where
   | extend (h : PBStep) : PBPath xs ys → PBPath (h :: xs) (h :: ys)
 
 /-- The standard verification path for a pullback. -/
-noncomputable def pbVerifyPath : List PBStep := [.checkLeft, .checkRight, .unify]
+def pbVerifyPath : List PBStep := [.checkLeft, .checkRight, .unify]
 
 /-- Theorem 22: Pullback cone from equal functions yields identity apex. -/
 noncomputable def pb_cone_identity (f : PBObj → Nat) (p : PBObj) :
@@ -264,7 +264,7 @@ noncomputable def pb_cone_identity (f : PBObj → Nat) (p : PBObj) :
   ⟨p, p, p, rfl⟩
 
 /-- Theorem 23: Pullback path is reflexive. -/
-theorem pb_path_refl : PBPath pbVerifyPath pbVerifyPath :=
+def pb_path_refl : PBPath pbVerifyPath pbVerifyPath :=
   PBPath.refl _
 
 -- ============================================================
