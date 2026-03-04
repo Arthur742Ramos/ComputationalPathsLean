@@ -41,7 +41,7 @@ structure MaurerCartanElement {A : Type u} (L : DGLiePathData A) where
   equation : Path (curvature L element) L.zero
 
 /-- Atomic rewrite steps for Maurer-Cartan path normalization. -/
-inductive MaurerCartanStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive MaurerCartanStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | contract_right {A : Type u} {a b : A} (p : Path a b) :
       MaurerCartanStep (Path.trans p (Path.refl b)) p
 

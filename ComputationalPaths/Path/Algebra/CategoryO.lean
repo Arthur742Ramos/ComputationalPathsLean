@@ -247,7 +247,7 @@ noncomputable def kl_identity_mult {O : CategoryOData.{u}} (kl : KLData O) :
 /-! ## CatOStep Inductive -/
 
 /-- Rewrite steps for category O computations. -/
-inductive CatOStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive CatOStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Weight decomposition idempotence. -/
   | weight_idem {A : Type u} {a : A} (p : Path a a) :
       CatOStep p (Path.refl a)

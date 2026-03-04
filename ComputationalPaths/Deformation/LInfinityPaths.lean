@@ -42,7 +42,7 @@ structure MaurerCartanElement {A : Type u} (L : LInfinityPathData A) where
   equation : Path (curvature L element) L.zero
 
 /-- Atomic rewrite steps for L-infinity Maurer-Cartan path normalization. -/
-inductive LInfinityStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive LInfinityStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   | contract_right {A : Type u} {a b : A} (p : Path a b) :
       LInfinityStep (Path.trans p (Path.refl b)) p
 

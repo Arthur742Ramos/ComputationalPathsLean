@@ -193,7 +193,7 @@ structure EhrhartReciprocity (P : ConvexPolytope.{u}) (ep : EhrhartPoly P) where
 /-! ## PolytopeStep Inductive -/
 
 /-- Rewrite steps for polytope computations. -/
-inductive PolytopeStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive PolytopeStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Euler formula reduction. -/
   | euler_reduce {A : Type u} {a : A} (p : Path a a) :
       PolytopeStep p (Path.refl a)

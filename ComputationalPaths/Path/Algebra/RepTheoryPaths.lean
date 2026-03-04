@@ -214,7 +214,7 @@ noncomputable def regular_rep_compose {G V : Type u} (R : RegularRep G V) (g h :
 /-! ## RepStep Inductive -/
 
 /-- Rewrite steps for representation-theoretic character computations. -/
-inductive RepStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive RepStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Character of identity is dimension. -/
   | char_identity {A : Type u} {a : A} (p : Path a a) :
       RepStep p (Path.refl a)

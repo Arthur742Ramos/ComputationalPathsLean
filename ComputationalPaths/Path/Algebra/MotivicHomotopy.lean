@@ -170,7 +170,7 @@ structure MotivicSpace where
 /-! ## MotivicStep Inductive -/
 
 /-- Rewrite steps for motivic homotopy computations. -/
-inductive MotivicStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive MotivicStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- A¹-contraction: contracting A¹ factor. -/
   | a1_contract {A : Type u} {a : A} (p : Path a a) :
       MotivicStep p (Path.refl a)

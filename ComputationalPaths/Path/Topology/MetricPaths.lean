@@ -37,7 +37,7 @@ structure PathMetric (A : Type u) where
 /-! ## MetricStep: domain-specific rewrites (Prop, for indexing) -/
 
 /-- Elementary metric rewrites. -/
-inductive MetricStep {A : Type u} (M : PathMetric A) : Nat → Nat → Type where
+inductive MetricStep {A : Type u} (M : PathMetric A) : Nat → Nat → Type u where
   | selfZero  : (a : A) → MetricStep M (M.dist a a) 0
   | symmDist  : (a b : A) → MetricStep M (M.dist a b) (M.dist b a)
   | addComm   : (n m : Nat) → MetricStep M (n + m) (m + n)

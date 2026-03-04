@@ -397,7 +397,7 @@ noncomputable def lr_symm_invol (SR : SymRing) (sf : SchurFunction SR) (lr : LRR
 /-! ## SymFuncStep Inductive -/
 
 /-- Rewrite steps for symmetric function computations. -/
-inductive SymFuncStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive SymFuncStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Cauchy identity reduction. -/
   | cauchy_reduce {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : SymFuncStep p q

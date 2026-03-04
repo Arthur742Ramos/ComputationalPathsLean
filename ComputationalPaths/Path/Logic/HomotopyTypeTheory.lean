@@ -179,7 +179,7 @@ noncomputable def suspensionHIT (A : Type u) : HITData where
 /-! ## HTT Step -/
 
 /-- Rewrite steps for HoTT operations. -/
-inductive HTTStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive HTTStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Transport along refl is identity. -/
   | transport_refl {A : Type u} {B : A → Type u} {a : A} (x : B a) :
       HTTStep

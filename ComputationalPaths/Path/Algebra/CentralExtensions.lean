@@ -281,7 +281,7 @@ noncomputable def H2Group.trivialUnit (G : Type u) (gd : GroupData G) : H2Group 
 /-! ## Rewrite Steps -/
 
 /-- Rewrite steps for central extension reasoning. -/
-inductive CentralExtStep : {A : Type u} → A → A → Type (u + 1)
+inductive CentralExtStep : {A : Type u} → A → A → Type u (u + 1)
   | cocycle_normalize {G A : Type u} {gd : GroupData G} {ad : AbelianGroupData A}
       {f : TwoCocycle G A gd ad} {g : G} :
       CentralExtStep (f.toFun gd.one g) ad.one

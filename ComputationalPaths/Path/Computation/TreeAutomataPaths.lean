@@ -230,7 +230,7 @@ theorem treeLang_inter_union_distrib {Sigma : Type u}
 /-! ## TreeAutomataStep Rewrite Rules -/
 
 /-- Rewrite steps for tree automata computations. -/
-inductive TreeAutoStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive TreeAutoStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Bottom-up run reduction. -/
   | bu_reduce {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : TreeAutoStep p q

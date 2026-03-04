@@ -190,7 +190,7 @@ noncomputable def trans_marking {P : Type u} {m₁ m₂ m₃ : Marking P}
 /-! ## PetriStep Rewrite Rules -/
 
 /-- Rewrite steps for Petri net computations. -/
-inductive PetriStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive PetriStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Firing step simplification. -/
   | fire_simplify {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : PetriStep p q

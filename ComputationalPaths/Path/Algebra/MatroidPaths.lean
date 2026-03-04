@@ -213,7 +213,7 @@ noncomputable def intersection_left {E : Type u} {M₁ M₂ : PathMatroid E}
 /-! ## MatroidStep Inductive -/
 
 /-- Rewrite steps for matroid computations. -/
-inductive MatroidStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive MatroidStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Exchange property reduction. -/
   | exchange_reduce {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : MatroidStep p q

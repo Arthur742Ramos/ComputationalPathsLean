@@ -228,7 +228,7 @@ structure LocalDualityData {R : Type u} (ring : CommRingData R)
 /-! ## LocalCohStep -/
 
 /-- Rewrite steps for local cohomology computations. -/
-inductive LocalCohStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive LocalCohStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Vanishing step: zero cohomology element stays zero. -/
   | vanishing {A : Type u} {a : A} (p : Path a a) :
       LocalCohStep p (Path.refl a)

@@ -355,7 +355,7 @@ structure FreudenthalSuspension (X : PtScheme.{u}) where
 /-! ## MotivicSphereStep: Rewrite Steps -/
 
 /-- Rewrite steps for motivic sphere computations. -/
-inductive MotivicSphereStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
+inductive MotivicSphereStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- A¹-contraction: paths in A¹ contract to refl. -/
   | a1_contract {A : Type u} {a : A} (p : Path a a) :
       MotivicSphereStep p (Path.refl a)
