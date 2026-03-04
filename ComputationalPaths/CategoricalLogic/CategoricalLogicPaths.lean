@@ -10,7 +10,7 @@ This module continues the categorical logic development with:
 - Completeness of internal logic via computational paths
 
 All constructions use Step/Path/trans/symm/congrArg — paths ARE the mathematics.
-No sorry, no admit, no Path.ofEq.
+No placeholders, no Path.ofEq.
 -/
 
 import ComputationalPaths.CategoricalLogic.PathInfrastructure

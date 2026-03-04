@@ -7,7 +7,7 @@ Lawvere hyperdoctrines, categorical models of intuitionistic logic, Kripke-Joyal
 semantics, classifying topoi, geometric morphisms, and logical functors.
 
 All constructions use Step/Path/trans/symm/congrArg — paths ARE the mathematics.
-No sorry, no admit, no Path.ofEq.
+No placeholders, no Path.ofEq.
 -/
 
 import ComputationalPaths.Path.Basic.Core
