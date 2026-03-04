@@ -67,15 +67,20 @@ end TruncLevel
 
 /-! ## n-truncated types -/
 
-/-- Type-level wrapper for `IsSet`, keeping truncation levels in `Type`. -/
-structure IsSetType (A : Type u) : Type u where
+/-- Type-level wrapper for `IsProp`, used when truncation evidence must live in `Type (u+1)`. -/
+structure IsPropType (A : Type u) : Type (u + 1) where
+  /-- Evidence that `A` is a proposition. -/
+  isProp : IsProp A
+
+/-- Type-level wrapper for `IsSet`, used when truncation evidence must live in `Type (u+1)`. -/
+structure IsSetType (A : Type u) : Type (u + 1) where
   /-- Evidence that `A` is a set. -/
   isSet : IsSet A
 
 /-- `IsTrunc n A` means that `A` is n-truncated in the computational-paths sense. -/
-abbrev IsTrunc (n : TruncLevel) (A : Type u) : Type u :=
+abbrev IsTrunc (n : TruncLevel) (A : Type u) : Type (u + 1) :=
   match n with
-  | TruncLevel.negOne => IsProp A
+  | TruncLevel.negOne => IsPropType A
   | TruncLevel.nonneg 0 => IsSetType A
   | TruncLevel.nonneg (Nat.succ n) =>
       ∀ a b : A, IsTrunc (TruncLevel.nonneg n) (Path a b)
@@ -84,7 +89,7 @@ abbrev IsTrunc (n : TruncLevel) (A : Type u) : Type u :=
 
 /-- Propositions are (-1)-truncated. -/
 abbrev prop_is_trunc_minus_one (h : IsProp A) :
-    IsTrunc TruncLevel.negOne A := h
+    IsTrunc TruncLevel.negOne A := ⟨h⟩
 
 /-- Sets are 0-truncated. -/
 abbrev set_is_trunc_zero (h : IsSet A) :

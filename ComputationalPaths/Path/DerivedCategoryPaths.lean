@@ -25,7 +25,7 @@ universe u v w
 
 /-- Domain-specific rewrite steps for derived category coherence. -/
 inductive DerivedStep {A : Type u} :
-    {a b : A} → Path a b → Path a b → Prop where
+    {a b : A} → Path a b → Path a b → Type (u + 1) where
   | right_unit {a b : A} (p : Path a b) :
       DerivedStep (Path.trans p (Path.refl b)) p
   | left_unit {a b : A} (p : Path a b) :

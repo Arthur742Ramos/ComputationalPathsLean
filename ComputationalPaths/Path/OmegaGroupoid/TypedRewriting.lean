@@ -425,7 +425,7 @@ open Path Rewrite
 /-- Lift the Prop-valued `Step` relation into `Type` via `PLift`.
     Note: `Step` lives at `Type 0` (Prop), so `StepT` lives at `Type 0`.
     We fix the universe to 0 for this section. -/
-abbrev StepT {A : Type} {a b : A} (p q : Path a b) : Type := PLift (Step p q)
+abbrev StepT {A : Type u} {a b : A} (p q : Path a b) : Type (u + 1) := Step p q
 
 variable {A₀ : Type} {a₀ b₀ : A₀}
 
@@ -433,7 +433,7 @@ private noncomputable def TStar.of_rw_prop {p q : Path a₀ b₀} (h : Rw p q) :
     Nonempty (TStar StepT p q) := by
   induction h with
   | refl => exact ⟨.refl _⟩
-  | tail _ step ih => exact ih.elim fun d => ⟨.tail d ⟨step⟩⟩
+  | tail _ step ih => exact ih.elim fun d => ⟨.tail d step⟩
 
 noncomputable def TStar.of_rw {p q : Path a₀ b₀} (h : Rw p q) :
     TStar StepT p q :=
@@ -446,7 +446,7 @@ noncomputable def localConfluent_step
   close := fun {_p _q₁ _q₂} h₁ h₂ =>
     have hjoin :=
       (ConfluenceConstructive.local_confluence_prop
-        (A := A₀) (a := a₀) (b := b₀) h₁.down h₂.down)
+        (A := A₀) (a := a₀) (b := b₀) h₁ h₂)
     Classical.choice (hjoin.elim fun s hs =>
       hs.elim fun hq₁s hq₂s =>
         ⟨⟨s, TStar.of_rw hq₁s, TStar.of_rw hq₂s⟩⟩)

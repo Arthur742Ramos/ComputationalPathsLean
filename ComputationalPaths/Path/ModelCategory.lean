@@ -104,12 +104,12 @@ noncomputable def pathModelCategory (A : Type u) : ModelCategory A where
     · exact rw_of_step (Step.trans_refl_left p)
 
 /-- Step witness for the cofibration-trivial-fibration factorization rewrite. -/
-theorem factorization_cof_triv_fib_step_witness {a b : A} (p : Path a b) :
+def factorization_cof_triv_fib_step_witness {a b : A} (p : Path a b) :
     Step ((pathModelCategory A).comp p (Path.refl b)) p := by
   exact Step.trans_refl_right p
 
 /-- Step witness for the trivial-cofibration-fibration factorization rewrite. -/
-theorem factorization_triv_cof_fib_step_witness {a b : A} (p : Path a b) :
+def factorization_triv_cof_fib_step_witness {a b : A} (p : Path a b) :
     Step ((pathModelCategory A).comp (Path.refl a) p) p := by
   exact Step.trans_refl_left p
 
@@ -119,10 +119,10 @@ theorem factorization_cof_triv_fib_step_factorization {a b : A} (p : Path a b) :
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).fib q ∧
       (pathModelCategory A).weq q ∧
-      Step ((pathModelCategory A).comp i q) p := by
+      Nonempty (Step ((pathModelCategory A).comp i q) p) := by
   refine ⟨b, p, Path.refl b, True.intro, True.intro, ?_, ?_⟩
   · exact path_is_weak_equivalence (A := A) (p := Path.refl b)
-  · exact factorization_cof_triv_fib_step_witness (A := A) p
+  · exact ⟨factorization_cof_triv_fib_step_witness (A := A) p⟩
 
 /-- Step-level data for trivial-cofibration-fibration factorization. -/
 theorem factorization_triv_cof_fib_step_factorization {a b : A} (p : Path a b) :
@@ -130,10 +130,10 @@ theorem factorization_triv_cof_fib_step_factorization {a b : A} (p : Path a b) :
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).weq i ∧
       (pathModelCategory A).fib q ∧
-      Step ((pathModelCategory A).comp i q) p := by
+      Nonempty (Step ((pathModelCategory A).comp i q) p) := by
   refine ⟨a, Path.refl a, p, True.intro, ?_, True.intro, ?_⟩
   · exact path_is_weak_equivalence (A := A) (p := Path.refl a)
-  · exact factorization_triv_cof_fib_step_witness (A := A) p
+  · exact ⟨factorization_triv_cof_fib_step_witness (A := A) p⟩
 
 /-- The cofibration-trivial-fibration factorization uses a trivial fibration. -/
 theorem factorization_cof_triv_fib_trivial_fibration {a b : A} (p : Path a b) :
@@ -180,20 +180,20 @@ theorem factorization_cof_triv_fib_step_trivial_fibration {a b : A} (p : Path a 
     ∃ (c : A) (i : Path a c) (q : Path c b),
       (pathModelCategory A).cof i ∧
       ModelCategory.trivialFibration (pathModelCategory A) q ∧
-      Step ((pathModelCategory A).comp i q) p := by
+      Nonempty (Step ((pathModelCategory A).comp i q) p) := by
   refine ⟨b, p, Path.refl b, True.intro, ?_, ?_⟩
   · exact ⟨True.intro, path_is_weak_equivalence (A := A) (p := Path.refl b)⟩
-  · exact factorization_cof_triv_fib_step_witness (A := A) p
+  · exact ⟨factorization_cof_triv_fib_step_witness (A := A) p⟩
 
 /-- Step-level factorization can be packaged with a trivial cofibration witness. -/
 theorem factorization_triv_cof_fib_step_trivial_cofibration {a b : A} (p : Path a b) :
     ∃ (c : A) (i : Path a c) (q : Path c b),
       ModelCategory.trivialCofibration (pathModelCategory A) i ∧
       (pathModelCategory A).fib q ∧
-      Step ((pathModelCategory A).comp i q) p := by
+      Nonempty (Step ((pathModelCategory A).comp i q) p) := by
   refine ⟨a, Path.refl a, p, ?_, True.intro, ?_⟩
   · exact ⟨True.intro, path_is_weak_equivalence (A := A) (p := Path.refl a)⟩
-  · exact factorization_triv_cof_fib_step_witness (A := A) p
+  · exact ⟨factorization_triv_cof_fib_step_witness (A := A) p⟩
 
 /-- Weak equivalences satisfy two-of-three in the path model structure. -/
 theorem weq_two_of_three {a b c : A} (f : Path a b) (g : Path b c) :

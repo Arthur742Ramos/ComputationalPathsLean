@@ -142,7 +142,7 @@ noncomputable def mappedFacePath (F : PathPreservingSSetMap S T)
   Path.stepChain ((F.fillMappedHorn kan n k horn).face_match i hi)
 
 /-- A direct `Step` witness for normalization of transported face paths. -/
-theorem mappedFacePath_step (F : PathPreservingSSetMap S T)
+noncomputable def mappedFacePath_step (F : PathPreservingSSetMap S T)
     (kan : KanFillerProperty S)
     {n : Nat} {k : Fin (n + 2)} (horn : HornData S n k)
     (i : Fin (n + 2)) (hi : i ≠ k) :

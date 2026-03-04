@@ -179,7 +179,7 @@ noncomputable def rweq_ofEq_rfl_eq_refl (h : a = a) :
 
 /-- If `Step p q` then `Step (congrArg f p) (congrArg f q)` via context
     congruence. -/
-theorem step_congrArg_of_step {B : Type u} (f : A → B) {p q : Path a b}
+def step_congrArg_of_step {B : Type u} (f : A → B) {p q : Path a b}
     (h : Step p q) :
     Step (Path.congrArg f p) (Path.congrArg f q) :=
   Step.context_congr ⟨f⟩ h
@@ -215,7 +215,7 @@ theorem transport_ofEq_trans {D : A → Sort v}
 /-! ## Rw interaction with symmetry congruence -/
 
 /-- If `Step p q` then `Step (symm p) (symm q)`. -/
-theorem step_symm_of_step {p q : Path a b}
+def step_symm_of_step {p q : Path a b}
     (h : Step p q) : Step (Path.symm p) (Path.symm q) :=
   Step.symm_congr h
 
@@ -227,12 +227,12 @@ theorem rw_symm_of_rw {p q : Path a b}
   | tail _ step ih => exact Rw.tail ih (Step.symm_congr step)
 
 /-- If `Step p q` then `Step (trans p r) (trans q r)` (left congruence). -/
-theorem step_trans_left_of_step {p q : Path a b} (r : Path b c)
+def step_trans_left_of_step {p q : Path a b} (r : Path b c)
     (h : Step p q) : Step (Path.trans p r) (Path.trans q r) :=
   Step.trans_congr_left r h
 
 /-- If `Step p q` then `Step (trans r p) (trans r q)` (right congruence). -/
-theorem step_trans_right_of_step (r : Path a b) {p q : Path b c}
+def step_trans_right_of_step (r : Path a b) {p q : Path b c}
     (h : Step p q) : Step (Path.trans r p) (Path.trans r q) :=
   Step.trans_congr_right r h
 

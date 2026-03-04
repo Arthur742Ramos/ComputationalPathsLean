@@ -368,11 +368,11 @@ noncomputable def IsSimplyConnected (A : Type u) (a : A) : Prop :=
   ∀ (p : Path a a), Nonempty (RwEq p (Path.refl a))
 
 /-- The second homotopy group π₂(A,a): 2-cells from refl to refl. -/
-noncomputable def Pi2 (A : Type u) (a : A) : Type u :=
+noncomputable def Pi2 (A : Type u) (a : A) : Type (u + 1) :=
   RwEq (Path.refl (A := A) a) (Path.refl a)
 
 /-- The second homology group H₂(A). -/
-noncomputable def H₂ (A : Type u) : Type u := Algebra.H2 A
+noncomputable def H₂ (A : Type u) : Type (u + 1) := Algebra.H2 A
 
 /-- The second Hurewicz map h₂: sends a 2-cell to its H₂ representative. -/
 noncomputable def hurewiczMap2 {A : Type u} {a : A} :

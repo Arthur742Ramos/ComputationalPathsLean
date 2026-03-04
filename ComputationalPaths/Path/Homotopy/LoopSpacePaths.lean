@@ -110,7 +110,7 @@ noncomputable def twoLoop_inv {a : A} {p q : Omega A a} (α : TwoLoop p q) : Two
 abbrev TwoLoopPath {a : A} (p q : Omega A a) : Type u := Path p q
 
 /-- RwEq-first 2-loop witness. -/
-abbrev TwoLoopRwEq {a : A} (p q : Omega A a) : Type u := RwEq p q
+abbrev TwoLoopRwEq {a : A} (p q : Omega A a) : Type (u + 1) := RwEq p q
 
 /-- Promote Eq-based 2-loops to path witnesses. -/
 noncomputable def twoLoop_toPath {a : A} {p q : Omega A a} (α : TwoLoop p q) : TwoLoopPath p q :=

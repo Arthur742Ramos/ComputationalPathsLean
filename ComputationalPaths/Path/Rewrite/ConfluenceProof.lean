@@ -521,7 +521,7 @@ theorem rw_plus_trans {a b : A} {p q r : Path a b}
   | tail _ step ih => exact RwPlus.tail ih step
 
 theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
-    Nonempty (Path p q) ∨ ∃ r, Step p r ∧ Rw r q := by
+    Nonempty (Path p q) ∨ ∃ r, Nonempty (Step p r) ∧ Rw r q := by
   induction h with
   | refl => exact Or.inl ⟨Path.refl _⟩
   | tail h step ih =>
@@ -529,7 +529,7 @@ theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
     | inl hpeq =>
         rcases hpeq with ⟨hpath⟩
         refine Or.inr ?_
-        refine ⟨_, ?_, Rw.refl _⟩
+        refine ⟨_, ⟨?_⟩, Rw.refl _⟩
         cases hpath.toEq
         exact step
     | inr hdata =>

@@ -56,7 +56,7 @@ noncomputable def MotivicFiber.identity (A : Type u) (a : A) : MotivicFiber A A 
   trivial   := fun _ => Path.refl a
 
 /-- The trivial fiber's triviality path composes with refl via Step. -/
-theorem motivicFiber_id_step {A : Type u} (a f : A) :
+noncomputable def motivicFiber_id_step {A : Type u} (a f : A) :
     Step
       (Path.trans ((MotivicFiber.identity A a).trivial f) (Path.refl a))
       ((MotivicFiber.identity A a).trivial f) :=
@@ -70,7 +70,7 @@ theorem motivicFiber_congrArg {F E B C : Type u} (g : B → C)
   rfl
 
 /-- Double symm of triviality path is a Step. -/
-theorem motivicFiber_symm_symm {F E B : Type u} (mf : MotivicFiber F E B) (f : F) :
+def motivicFiber_symm_symm {F E B : Type u} (mf : MotivicFiber F E B) (f : F) :
     Step (Path.symm (Path.symm (mf.trivial f))) (mf.trivial f) :=
   Step.symm_symm _
 
@@ -103,21 +103,21 @@ noncomputable def A1LocalEquiv.comp {X Y Z : Type u}
                                     (e₁.section_ x)
 
 /-- Left-unit for A¹-local equivalence retract (Step). -/
-theorem a1local_retract_left_unit {X : Type u} (x : X) :
+noncomputable def a1local_retract_left_unit {X : Type u} (x : X) :
     Step
       (Path.trans (Path.refl x) ((A1LocalEquiv.idEquiv X).retract x))
       ((A1LocalEquiv.idEquiv X).retract x) :=
   Step.trans_refl_left _
 
 /-- Right-unit for A¹-local equivalence retract (Step). -/
-theorem a1local_retract_right_unit {X : Type u} (x : X) :
+noncomputable def a1local_retract_right_unit {X : Type u} (x : X) :
     Step
       (Path.trans ((A1LocalEquiv.idEquiv X).retract x) (Path.refl x))
       ((A1LocalEquiv.idEquiv X).retract x) :=
   Step.trans_refl_right _
 
 /-- The retract path followed by its inverse is refl (Step). -/
-theorem a1local_retract_inv {X Y : Type u} (e : A1LocalEquiv X Y) (y : Y) :
+def a1local_retract_inv {X Y : Type u} (e : A1LocalEquiv X Y) (y : Y) :
     Step
       (Path.trans (e.retract y) (Path.symm (e.retract y)))
       (Path.refl (e.forward (e.backward y))) :=
@@ -151,19 +151,19 @@ noncomputable def WeightPath.composeThreeEdges {A : Type u} (w : WeightPath A) (
   Path.trans (w.composeTwoEdges n) (w.edge (n + 2))
 
 /-- Associativity of weight-edge composition (Step). -/
-theorem weight_edge_assoc {A : Type u} (w : WeightPath A) (n : Nat) :
+def weight_edge_assoc {A : Type u} (w : WeightPath A) (n : Nat) :
     Step
       (Path.trans (Path.trans (w.edge n) (w.edge (n + 1))) (w.edge (n + 2)))
       (Path.trans (w.edge n) (Path.trans (w.edge (n + 1)) (w.edge (n + 2)))) :=
   Step.trans_assoc _ _ _
 
 /-- Left unit for weight edge (Step). -/
-theorem weight_edge_left_unit {A : Type u} (w : WeightPath A) (n : Nat) :
+def weight_edge_left_unit {A : Type u} (w : WeightPath A) (n : Nat) :
     Step (Path.trans (Path.refl (w.obj n)) (w.edge n)) (w.edge n) :=
   Step.trans_refl_left _
 
 /-- Symmetry distributes over consecutive edges (Step). -/
-theorem weight_edge_symm_trans {A : Type u} (w : WeightPath A) (n : Nat) :
+def weight_edge_symm_trans {A : Type u} (w : WeightPath A) (n : Nat) :
     Step
       (Path.symm (w.composeTwoEdges n))
       (Path.trans (Path.symm (w.edge (n + 1))) (Path.symm (w.edge n))) :=
@@ -196,7 +196,7 @@ noncomputable def MotivicAdams.comp {A : Type u} {a : A}
   psi_base := Path.trans (Path.congrArg ψ₁.psi ψ₂.psi_base) ψ₁.psi_base
 
 /-- Left unit for Adams composition (Step). -/
-theorem adams_left_unit {A : Type u} {a : A} (ψ : MotivicAdams A a) :
+def adams_left_unit {A : Type u} {a : A} (ψ : MotivicAdams A a) :
     Step
       (Path.trans (Path.refl (ψ.psi a)) ψ.psi_base)
       ψ.psi_base :=
@@ -208,12 +208,12 @@ theorem adams_identity_base {A : Type u} (a : A) :
   rfl
 
 /-- Double symmetry of Adams base path (Step). -/
-theorem adams_symm_symm {A : Type u} {a : A} (ψ : MotivicAdams A a) :
+def adams_symm_symm {A : Type u} {a : A} (ψ : MotivicAdams A a) :
     Step (Path.symm (Path.symm ψ.psi_base)) ψ.psi_base :=
   Step.symm_symm _
 
 /-- Right inverse for Adams base path (Step). -/
-theorem adams_right_inv {A : Type u} {a : A} (ψ : MotivicAdams A a) :
+def adams_right_inv {A : Type u} {a : A} (ψ : MotivicAdams A a) :
     Step
       (Path.trans ψ.psi_base (Path.symm ψ.psi_base))
       (Path.refl (ψ.psi a)) :=
@@ -239,7 +239,7 @@ theorem slice_descend_zero {A : Type u} (t : SliceTower A) (n : Nat) :
   rfl
 
 /-- Descending 1 level is the connection map. -/
-theorem slice_descend_one_step {A : Type u} (t : SliceTower A) (n : Nat) :
+def slice_descend_one_step {A : Type u} (t : SliceTower A) (n : Nat) :
     Step
       (Path.trans (t.conn n) (Path.refl (t.slice n)))
       (t.conn n) :=
@@ -251,7 +251,7 @@ noncomputable def slice_descend_one_rweq {A : Type u} (t : SliceTower A) (n : Na
   rweq_of_step (Step.trans_refl_right _)
 
 /-- Symmetry of the connection map followed by itself is refl (Step). -/
-theorem slice_conn_inv {A : Type u} (t : SliceTower A) (n : Nat) :
+def slice_conn_inv {A : Type u} (t : SliceTower A) (n : Nat) :
     Step
       (Path.trans (Path.symm (t.conn n)) (t.conn n))
       (Path.refl (t.slice n)) :=
@@ -275,7 +275,7 @@ noncomputable def MotivicHopf.trivial (A : Type u) (a : A) : MotivicHopf A A A w
   collapse := fun _ => Path.refl a
 
 /-- The trivial Hopf collapse composes with refl (Step). -/
-theorem hopf_trivial_step {A : Type u} (a : A) :
+noncomputable def hopf_trivial_step {A : Type u} (a : A) :
     Step
       (Path.trans ((MotivicHopf.trivial A a).collapse a) (Path.refl a))
       ((MotivicHopf.trivial A a).collapse a) :=
@@ -289,7 +289,7 @@ theorem hopf_congrArg {E B F C : Type u} (g : B → C)
   rfl
 
 /-- Symmetry of Hopf collapse is a Step back. -/
-theorem hopf_symm_refl {A : Type u} (a : A) :
+def hopf_symm_refl {A : Type u} (a : A) :
     Step
       (Path.symm (Path.refl a))
       (Path.refl a) :=
@@ -313,14 +313,14 @@ noncomputable def MotivicPurity.identity (A : Type u) : MotivicPurity A A where
   section_ := fun a => Path.refl a
 
 /-- Purity retract followed by its inverse (Step). -/
-theorem purity_retract_inv {Th Susp : Type u} (mp : MotivicPurity Th Susp) (s : Susp) :
+def purity_retract_inv {Th Susp : Type u} (mp : MotivicPurity Th Susp) (s : Susp) :
     Step
       (Path.trans (mp.retract s) (Path.symm (mp.retract s)))
       (Path.refl (mp.forward (mp.backward s))) :=
   Step.trans_symm _
 
 /-- Purity section path's double symm (Step). -/
-theorem purity_section_symm_symm {Th Susp : Type u} (mp : MotivicPurity Th Susp) (t : Th) :
+def purity_section_symm_symm {Th Susp : Type u} (mp : MotivicPurity Th Susp) (t : Th) :
     Step (Path.symm (Path.symm (mp.section_ t))) (mp.section_ t) :=
   Step.symm_symm _
 
@@ -355,18 +355,18 @@ theorem motivic_congrArg_refl {A B : Type u} (f : A → B) (a : A) :
 /-! ## §9  Further Step / RwEq witnesses -/
 
 /-- Associativity for three arbitrary paths (Step). -/
-theorem motivic_assoc {A : Type u} {a b c d : A}
+def motivic_assoc {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Step (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   Step.trans_assoc p q r
 
 /-- Left inverse (Step). -/
-theorem motivic_left_inv {A : Type u} {a b : A} (p : Path a b) :
+def motivic_left_inv {A : Type u} {a b : A} (p : Path a b) :
     Step (Path.trans (Path.symm p) p) (Path.refl b) :=
   Step.symm_trans _
 
 /-- Right inverse (Step). -/
-theorem motivic_right_inv {A : Type u} {a b : A} (p : Path a b) :
+def motivic_right_inv {A : Type u} {a b : A} (p : Path a b) :
     Step (Path.trans p (Path.symm p)) (Path.refl a) :=
   Step.trans_symm _
 

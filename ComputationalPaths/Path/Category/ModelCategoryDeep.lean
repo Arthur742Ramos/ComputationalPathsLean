@@ -44,10 +44,10 @@ structure PathObj (a : A) where
   sec0 : RwEq (Path.trans s ev0) (Path.refl a)
   sec1 : RwEq (Path.trans s ev1) (Path.refl a)
 
-noncomputable def LeftHtpy {a b : A} (f g : Path a b) : Type u :=
+noncomputable def LeftHtpy {a b : A} (f g : Path a b) : Type (u + 1) :=
   RwEq f g
 
-noncomputable def RightHtpy {a b : A} (f g : Path a b) : Type u :=
+noncomputable def RightHtpy {a b : A} (f g : Path a b) : Type (u + 1) :=
   RwEq f g
 
 noncomputable def left_htpy_refl {a b : A} (f : Path a b) : LeftHtpy f f :=
@@ -56,7 +56,7 @@ noncomputable def left_htpy_refl {a b : A} (f : Path a b) : LeftHtpy f f :=
 noncomputable def right_htpy_refl {a b : A} (f : Path a b) : RightHtpy f f :=
   RwEq.refl f
 
-noncomputable def HasLift {a b c d : A} (i : Path a b) (p : Path c d) : Type u :=
+noncomputable def HasLift {a b c d : A} (i : Path a b) (p : Path c d) : Type (u + 1) :=
   ∀ (f : Path a c) (g : Path b d),
     RwEq (Path.trans f p) (Path.trans i g) →
     Σ h : Path b c, RwEq (Path.trans i h) f × RwEq (Path.trans h p) g

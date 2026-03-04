@@ -72,7 +72,7 @@ a "cellular decomposition" of the derivation. -/
 
 /-- A directed cell chain: a sequence of step derivations. -/
 inductive CellChain₂ {A : Type u} {a b : A} :
-    Path a b → Path a b → Type u where
+    Path a b → Path a b → Type (u + 1) where
   | nil (p : Path a b) : CellChain₂ p p
   | cons {p q r : Path a b} :
       Step p q → CellChain₂ q r → CellChain₂ p r
