@@ -177,7 +177,7 @@ noncomputable def godement_step_right {a b c : A}
     (RwEq.step (Step.trans_congr_left g' sf))
 
 /-- Godement for individual steps: both orders give the same `toEq`. -/
-theorem godement_step_coherence {a b c : A}
+def godement_step_coherence {a b c : A}
     {f f' : Path a b} {g g' : Path b c}
     (sf : RwStep (A := A) f f') (sg : RwStep (A := A) g g') :
     rweq_toEq (godement_step_left sf sg) =

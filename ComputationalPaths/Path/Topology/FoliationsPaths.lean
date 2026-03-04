@@ -72,7 +72,7 @@ structure CompactLeaf (F : FoliationData.{u}) extends Leaf F where
 /-! ## FoliationStep -/
 
 /-- Rewrite steps for foliation operations. -/
-inductive FoliationStep : FoliationData.{u} → FoliationData.{u} → Prop
+inductive FoliationStep : FoliationData.{u} → FoliationData.{u} → Type
   | holonomy_compute (F : FoliationData.{u}) : FoliationStep F F
   | reeb_identify (F : FoliationData.{u}) : FoliationStep F F
   | novikov_apply (F : FoliationData.{u}) : FoliationStep F F

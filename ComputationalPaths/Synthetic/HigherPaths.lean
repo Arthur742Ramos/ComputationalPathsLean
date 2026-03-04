@@ -36,31 +36,31 @@ noncomputable def loopRefl (a : A) : Ω a := Path.refl a
 
 /-! ## Loop space group laws via Step -/
 
-theorem loopConcat_assoc {a : A} (p q r : Ω a) :
+def loopConcat_assoc {a : A} (p q r : Ω a) :
     Path.Step (loopConcat (loopConcat p q) r) (loopConcat p (loopConcat q r)) :=
   Path.Step.trans_assoc p q r
 
-theorem loopConcat_left_unit {a : A} (p : Ω a) :
+def loopConcat_left_unit {a : A} (p : Ω a) :
     Path.Step (loopConcat (loopRefl a) p) p :=
   Path.Step.trans_refl_left p
 
-theorem loopConcat_right_unit {a : A} (p : Ω a) :
+def loopConcat_right_unit {a : A} (p : Ω a) :
     Path.Step (loopConcat p (loopRefl a)) p :=
   Path.Step.trans_refl_right p
 
-theorem loopConcat_right_inv {a : A} (p : Ω a) :
+def loopConcat_right_inv {a : A} (p : Ω a) :
     Path.Step (loopConcat p (loopInv p)) (loopRefl a) :=
   Path.Step.trans_symm p
 
-theorem loopConcat_left_inv {a : A} (p : Ω a) :
+def loopConcat_left_inv {a : A} (p : Ω a) :
     Path.Step (loopConcat (loopInv p) p) (loopRefl a) :=
   Path.Step.symm_trans p
 
-theorem loopInv_involutive {a : A} (p : Ω a) :
+def loopInv_involutive {a : A} (p : Ω a) :
     Path.Step (loopInv (loopInv p)) p :=
   Path.Step.symm_symm p
 
-theorem loopInv_concat {a : A} (p q : Ω a) :
+def loopInv_concat {a : A} (p q : Ω a) :
     Path.Step (loopInv (loopConcat p q)) (loopConcat (loopInv q) (loopInv p)) :=
   Path.Step.symm_trans_congr p q
 

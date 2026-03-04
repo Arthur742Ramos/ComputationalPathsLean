@@ -220,7 +220,7 @@ noncomputable def inv_right_coherence (p : Path a b)
 /-! ## Depth Analysis -/
 
 /-- A step-composed derivation has bounded depth. -/
-theorem step_derivation₂_depth_eq {p q : Path a b} (h : Step p q) :
+def step_derivation₂_depth_eq {p q : Path a b} (h : Step p q) :
     (step_to_derivation₂ h).depth = 1 := rfl
 
 /-- Composing two derivations: depth is additive + 1. -/

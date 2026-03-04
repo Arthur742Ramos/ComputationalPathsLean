@@ -58,7 +58,7 @@ structure ClosedSurface extends CompactSurface.{u} where
 /-! ## Surface Steps -/
 
 /-- Rewrite steps for surface topology operations. -/
-inductive SurfaceStep : ClosedSurface.{u} → ClosedSurface.{u} → Prop
+inductive SurfaceStep : ClosedSurface.{u} → ClosedSurface.{u} → Type
   | classify (S : ClosedSurface.{u}) : SurfaceStep S S
   | euler_compute (S : ClosedSurface.{u}) : SurfaceStep S S
   | polygon_identify (S : ClosedSurface.{u}) : SurfaceStep S S

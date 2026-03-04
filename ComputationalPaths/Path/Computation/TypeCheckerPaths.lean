@@ -144,15 +144,15 @@ theorem reduces_irrel {t t' : Term} (h1 h2 : Reduces t t') : h1 = h2 :=
 
 /-! ## Multi-step reduction -/
 
-inductive MultiStep : Term → Term → Prop where
+inductive MultiStep : Term → Term → Type where
   | refl : ∀ t, MultiStep t t
   | step : ∀ {t t' t''}, Reduces t t' → MultiStep t' t'' → MultiStep t t''
 
 -- 9
-theorem multistep_refl (t : Term) : MultiStep t t := MultiStep.refl t
+def multistep_refl (t : Term) : MultiStep t t := MultiStep.refl t
 
 -- 10
-theorem multistep_trans {t1 t2 t3 : Term}
+def multistep_trans {t1 t2 t3 : Term}
     (h1 : MultiStep t1 t2) (h2 : MultiStep t2 t3) : MultiStep t1 t3 := by
   induction h1 with
   | refl _ => exact h2

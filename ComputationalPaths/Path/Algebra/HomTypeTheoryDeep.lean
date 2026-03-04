@@ -87,7 +87,7 @@ theorem length_trans : (p : Path a b) → (q : Path b c) →
     simp [Path.trans, Path.length]; rw [length_trans p q]; omega
 
 /-- Theorem 9 – Double inversion of step. -/
-theorem step_symm_symm : (s : Step a b) → s.symm.symm = s
+def step_symm_symm : (s : Step a b) → s.symm.symm = s
   | .refl _   => rfl
   | .edge _ _ => rfl
 
@@ -412,7 +412,7 @@ theorem Pi1.mul_e_left {a : HTTPoint} (x : Pi1 a) :
 -- ============================================================
 
 /-- Theorem 54 – congrArg for Path.cons. -/
-theorem congrArg_cons_tail (s : Step a b) (p q : Path b c) (h : p = q) :
+def congrArg_cons_tail (s : Step a b) (p q : Path b c) (h : p = q) :
     Path.cons s p = Path.cons s q :=
   congrArg (Path.cons s) h
 

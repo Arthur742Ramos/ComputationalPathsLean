@@ -18,7 +18,7 @@ universe u
 
 /-- Domain-specific rewrite steps for t-structure coherence paths. -/
 inductive TStructureStep {Obj : Type u} :
-    {a b : Obj} → Path a b → Path a b → Prop where
+    {a b : Obj} → Path a b → Path a b → Type where
   | trunc_ge_right_unit {a b : Obj} (p : Path a b) :
       TStructureStep (Path.trans p (Path.refl b)) p
   | trunc_ge_left_unit {a b : Obj} (p : Path a b) :

@@ -173,7 +173,7 @@ This normalization strategy is:
 3. **Efficient**: it runs in linear time -/
 
 /-- NbE output is always a fixed point (normal form). -/
-theorem nbe_is_normal_form (e : Expr) :
+def nbe_is_normal_form (e : Expr) :
     ∀ e', ¬ CStep (nbe e) e' ∨ nbe (nbe e) = nbe e := by
   intro _
   exact Or.inr (nbe_idempotent e)
@@ -232,7 +232,7 @@ iterated CStep rewriting may require Θ(n²) steps on worst-case inputs
 (see `TerminationTight.lean`). -/
 
 /-- NbE produces the same result as iterated rewriting to normal form. -/
-theorem nbe_agrees_with_normalization (e : Expr) :
+def nbe_agrees_with_normalization (e : Expr) :
     ∀ nf, (∀ e', ¬ CStep nf e') → CRTC e nf → nbe e = nf := by
   intro nf hnf hred
   -- Key: if nf has no CStep reducts, and CRTC nf x, then x = nf

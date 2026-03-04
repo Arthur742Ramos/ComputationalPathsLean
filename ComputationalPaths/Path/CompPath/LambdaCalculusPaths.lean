@@ -86,7 +86,7 @@ end LTerm
 /-! ## Beta Reduction -/
 
 /-- One-step beta reduction. -/
-inductive BetaStep : LTerm → LTerm → Prop where
+inductive BetaStep : LTerm → LTerm → Type where
   | beta (body arg : LTerm) :
       BetaStep (.app (.lam body) arg) (LTerm.betaBody body arg)
   | appL {t t' s : LTerm} : BetaStep t t' → BetaStep (.app t s) (.app t' s)
@@ -167,7 +167,7 @@ inductive ParBeta : LTerm → LTerm → Prop where
 namespace ParBeta
 
 /-- Parallel beta is reflexive. -/
-theorem refl : ∀ t, ParBeta t t
+def refl : ∀ t, ParBeta t t
   | .var n => .var n
   | .app t s => .app (refl t) (refl s)
   | .lam t => .lam (refl t)
@@ -200,34 +200,40 @@ end ParBeta
 /-! ## Normal Forms -/
 
 /-- A term is in beta normal form if no beta step is possible. -/
-noncomputable def BetaNF (t : LTerm) : Prop := ∀ s, ¬BetaStep t s
+noncomputable def BetaNF (t : LTerm) : Prop := ∀ s, ¬Nonempty (BetaStep t s)
 
 /-- Variables are in normal form. -/
 theorem var_nf (n : Nat) : BetaNF (.var n) := by
-  intro s h; cases h
+  intro s hs
+  cases hs with
+  | intro h => cases h
 
 /-- If the body is in NF, lambda is in NF. -/
 theorem lam_nf {t : LTerm} (h : BetaNF t) : BetaNF (.lam t) := by
-  intro s h'
-  cases h' with
-  | lam step => exact h _ step
+  intro s hs
+  cases hs with
+  | intro hs =>
+    cases hs with
+    | lam step => exact h _ ⟨step⟩
 
 /-- An application is in NF iff both parts are NF and it's not a beta-redex. -/
 theorem app_nf_of_not_lam {t s : LTerm} (ht : BetaNF t) (hs : BetaNF s)
     (hnotlam : ∀ body, t ≠ .lam body) :
     BetaNF (.app t s) := by
-  intro u h
-  cases h with
-  | beta body arg => exact hnotlam body rfl
-  | appL step => exact ht _ step
-  | appR step => exact hs _ step
+  intro u hu
+  cases hu with
+  | intro hu =>
+    cases hu with
+    | beta body arg => exact hnotlam body rfl
+    | appL step => exact ht _ ⟨step⟩
+    | appR step => exact hs _ ⟨step⟩
 
 /-- NF terms don't reduce. -/
-theorem nf_no_step {t : LTerm} (h : BetaNF t) : ∀ s, ¬BetaStep t s := h
+def nf_no_step {t : LTerm} (h : BetaNF t) : ∀ s, ¬Nonempty (BetaStep t s) := h
 
 /-- If a term beta-reduces and is in NF, contradiction. -/
 theorem nf_irreducible {t s : LTerm} (hnf : BetaNF t) (hstep : BetaStep t s) :
-    False := hnf s hstep
+    False := hnf s ⟨hstep⟩
 
 /-- NF is preserved by the identity "reduction" (reflexivity). -/
 theorem nf_refl_star (t : LTerm) :
@@ -238,7 +244,7 @@ theorem nf_star_eq {t s : LTerm} (hnf : BetaNF t) (h : BetaStar t s) :
     t = s := by
   cases h with
   | refl => rfl
-  | cons step _ => exact absurd step (hnf _)
+  | cons step _ => exact absurd ⟨step⟩ (hnf _)
 
 /-! ## Eta Reduction -/
 
@@ -249,19 +255,19 @@ noncomputable def freeIn (n : Nat) : LTerm → Bool
   | .lam t => freeIn (n + 1) t
 
 /-- Eta reduction: λ(t 0) → shift(-1,0,t) when 0 ∉ FV(t). -/
-inductive EtaStep : LTerm → LTerm → Prop where
+inductive EtaStep : LTerm → LTerm → Type where
   | eta (t : LTerm) (h : freeIn 0 t = false) :
       EtaStep (.lam (.app t (.var 0))) (LTerm.shift (-1) 0 t)
 
 /-- Beta-eta step: union of beta and eta steps. -/
-inductive BetaEtaStep : LTerm → LTerm → Prop where
+inductive BetaEtaStep : LTerm → LTerm → Type where
   | beta : BetaStep t s → BetaEtaStep t s
   | eta : EtaStep t s → BetaEtaStep t s
 
 /-! ## Standardization (Head Reduction) -/
 
 /-- Head reduction: only reduce the head redex. -/
-inductive HeadStep : LTerm → LTerm → Prop where
+inductive HeadStep : LTerm → LTerm → Type where
   | beta (body arg : LTerm) :
       HeadStep (.app (.lam body) arg) (LTerm.betaBody body arg)
   | appHead {t t' s : LTerm} :
@@ -273,11 +279,9 @@ inductive HeadStar : LTerm → LTerm → Prop where
   | cons : HeadStep t s → HeadStar s u → HeadStar t u
 
 /-- Head step is a beta step. -/
-theorem head_is_beta : HeadStep t s → BetaStep t s := by
-  intro h
-  induction h with
-  | beta body arg => exact .beta body arg
-  | appHead _ ih => exact .appL ih
+def head_is_beta : HeadStep t s → BetaStep t s
+  | .beta body arg => .beta body arg
+  | .appHead h => .appL (head_is_beta h)
 
 /-- Multi-step head reduction implies multi-step beta. -/
 theorem head_star_is_beta_star : HeadStar t s → BetaStar t s := by
@@ -287,20 +291,26 @@ theorem head_star_is_beta_star : HeadStar t s → BetaStar t s := by
   | cons step _ ih => exact .cons (head_is_beta step) ih
 
 /-- Head normal form: no head redex. -/
-noncomputable def HeadNF (t : LTerm) : Prop := ∀ s, ¬HeadStep t s
+noncomputable def HeadNF (t : LTerm) : Prop := ∀ s, ¬Nonempty (HeadStep t s)
 
 /-- Variables are head normal forms. -/
 theorem var_head_nf (n : Nat) : HeadNF (.var n) := by
-  intro s h; cases h
+  intro s hs
+  cases hs with
+  | intro h => cases h
 
 /-- Lambdas are head normal forms (head reduction doesn't go under binders). -/
 theorem lam_head_nf (t : LTerm) : HeadNF (.lam t) := by
-  intro s h; cases h
+  intro s hs
+  cases hs with
+  | intro h => cases h
 
 /-- Beta NF implies Head NF. -/
 theorem beta_nf_head_nf {t : LTerm} (h : BetaNF t) : HeadNF t := by
   intro s hs
-  exact h s (head_is_beta hs)
+  cases hs with
+  | intro hs =>
+    exact h s ⟨head_is_beta hs⟩
 
 /-! ## Church-Rosser via conversion join -/
 

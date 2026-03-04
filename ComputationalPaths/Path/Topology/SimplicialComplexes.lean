@@ -196,7 +196,7 @@ structure BarycentricSubdivision (K : SimplicialComplex) where
 /-! ## SimplicialStep -/
 
 /-- Rewrite steps for simplicial complex operations. -/
-inductive SimplicialStep : Prop
+inductive SimplicialStep : Type
   | face_inclusion : SimplicialStep
   | boundary_apply : SimplicialStep
   | nerve_construct : SimplicialStep

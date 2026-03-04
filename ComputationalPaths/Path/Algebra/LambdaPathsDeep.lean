@@ -49,7 +49,7 @@ noncomputable def subst (j : Nat) (s : LTerm) : LTerm → LTerm
 -- ============================================================
 
 /-- One‑step reduction. -/
-inductive Step : LTerm → LTerm → Prop where
+inductive Step : LTerm → LTerm → Type where
   | beta  (body arg : LTerm) :
       Step (app (lam body) arg) (subst 0 arg body)
   | eta   (body : LTerm) :
@@ -78,7 +78,7 @@ theorem Path.trans {a b c : LTerm}
   | step s _ ih => exact Path.step s (ih q)
 
 /-- Theorem 2: Single step lifts to path. -/
-theorem Path.single {a b : LTerm} (s : Step a b) : Path a b :=
+def Path.single {a b : LTerm} (s : Step a b) : Path a b :=
   Path.step s (Path.refl b)
 
 /-- Beta‑eta equivalence (symmetric closure). -/
@@ -192,7 +192,7 @@ theorem PathBound.toPath {a b : LTerm} {n : Nat}
   | step s _ ih => exact Path.step s ih
 
 /-- Theorem 16: Single step has bound 1. -/
-theorem PathBound.single {a b : LTerm} (s : Step a b) :
+def PathBound.single {a b : LTerm} (s : Step a b) :
     PathBound a b 1 :=
   PathBound.step s (PathBound.refl b)
 
@@ -237,7 +237,7 @@ theorem var_isHNF (n : Nat) : isHNF (var n) := isHNF.var n
 -- ============================================================
 
 /-- Beta‑only steps. -/
-inductive BetaStep : LTerm → LTerm → Prop where
+inductive BetaStep : LTerm → LTerm → Type where
   | beta  (body arg : LTerm) :
       BetaStep (app (lam body) arg) (subst 0 arg body)
   | congLam  {t t' : LTerm} (s : BetaStep t t') :
@@ -285,7 +285,7 @@ theorem BetaPath.congrAppR {f a a' : LTerm}
   | step s _ ih => exact BetaPath.step (BetaStep.congAppR s) ih
 
 /-- Theorem 26: Beta step embeds into full step. -/
-theorem BetaStep.toStep {a b : LTerm} (s : BetaStep a b) : Step a b := by
+def BetaStep.toStep {a b : LTerm} (s : BetaStep a b) : Step a b := by
   induction s with
   | beta body arg => exact Step.beta body arg
   | congLam _ ih => exact Step.congLam ih
@@ -303,7 +303,7 @@ theorem BetaPath.toPath {a b : LTerm} (p : BetaPath a b) : Path a b := by
 -- ============================================================
 
 /-- Head reduction step: reduce only the head redex. -/
-inductive HeadStep : LTerm → LTerm → Prop where
+inductive HeadStep : LTerm → LTerm → Type where
   | headBeta (body arg : LTerm) :
       HeadStep (app (lam body) arg) (subst 0 arg body)
   | headAppL {f f' a : LTerm} (s : HeadStep f f') :
@@ -322,7 +322,7 @@ theorem HeadPath.trans {a b c : LTerm}
   | step s _ ih => exact HeadPath.step s (ih q)
 
 /-- Theorem 29: Head step is a beta step. -/
-theorem HeadStep.toBetaStep {a b : LTerm} (s : HeadStep a b) : BetaStep a b := by
+def HeadStep.toBetaStep {a b : LTerm} (s : HeadStep a b) : BetaStep a b := by
   induction s with
   | headBeta body arg => exact BetaStep.beta body arg
   | headAppL _ ih => exact BetaStep.congAppL ih
@@ -342,7 +342,7 @@ theorem HeadPath.toPath {a b : LTerm} (p : HeadPath a b) : Path a b :=
 -- ============================================================
 
 /-- Internal step: reduce inside, never the head position. -/
-inductive IntStep : LTerm → LTerm → Prop where
+inductive IntStep : LTerm → LTerm → Type where
   | congLam   {t t' : LTerm} (s : BetaStep t t') : IntStep (lam t) (lam t')
   | congAppR  {f a a' : LTerm} (s : BetaStep a a') : IntStep (app f a) (app f a')
   | congAppL  {f f' a : LTerm} (s : IntStep f f') : IntStep (app f a) (app f' a)
@@ -360,7 +360,7 @@ theorem IntPath.trans {a b c : LTerm}
   | step s _ ih => exact IntPath.step s (ih q)
 
 /-- Theorem 33: Internal step is a beta step. -/
-theorem IntStep.toBetaStep {a b : LTerm} (s : IntStep a b) : BetaStep a b := by
+def IntStep.toBetaStep {a b : LTerm} (s : IntStep a b) : BetaStep a b := by
   induction s with
   | congLam s => exact BetaStep.congLam s
   | congAppR s => exact BetaStep.congAppR s
@@ -499,7 +499,7 @@ theorem confluent_sympath_common (hCR : Confluent) {x y : LTerm}
 -- ============================================================
 
 /-- Parallel reduction: reduce many redexes simultaneously. -/
-inductive ParStep : LTerm → LTerm → Prop where
+inductive ParStep : LTerm → LTerm → Type where
   | pvar  (n : Nat) : ParStep (var n) (var n)
   | plam  {t t' : LTerm} (s : ParStep t t') : ParStep (lam t) (lam t')
   | papp  {f f' a a' : LTerm} (sf : ParStep f f') (sa : ParStep a a') :
@@ -527,7 +527,7 @@ theorem ParPath.trans {a b c : LTerm}
   | step s _ ih => exact ParPath.step s (ih q)
 
 /-- Theorem 50: Single beta step embeds into parallel step. -/
-theorem BetaStep.toParStep {a b : LTerm} (s : BetaStep a b) : ParStep a b := by
+def BetaStep.toParStep {a b : LTerm} (s : BetaStep a b) : ParStep a b := by
   induction s with
   | beta body arg => exact ParStep.pbeta (ParStep.refl body) (ParStep.refl arg)
   | congLam _ ih => exact ParStep.plam ih
@@ -558,7 +558,7 @@ theorem leftmostStep_none_of_var (n : Nat) : leftmostStep (var n) = none := by
   simp [leftmostStep]
 
 /-- Theorem 52: Leftmost step on a beta redex does beta. -/
-theorem leftmostStep_beta (body arg : LTerm) :
+def leftmostStep_beta (body arg : LTerm) :
     leftmostStep (app (lam body) arg) = some (subst 0 arg body) := by
   simp [leftmostStep]
 
@@ -660,7 +660,7 @@ theorem dpath_category_laws :
 noncomputable def termI : LTerm := lam (var 0)
 
 /-- Theorem 63: I x →β x  (single beta step path). -/
-theorem I_reduces (x : LTerm) :
+def I_reduces (x : LTerm) :
     Step (app termI x) (subst 0 x (var 0)) :=
   Step.beta (var 0) x
 

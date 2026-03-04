@@ -42,7 +42,7 @@ def size {A : Type u} {a b : A} : PathExpr A a b → Nat
 abbrev complexity {A : Type u} {a b : A} (e : PathExpr A a b) : Nat := size e
 
 /-- Single rewrite step on `PathExpr` (trivial: only reflexivity). -/
-inductive Step {A : Type u} {a b : A} : PathExpr A a b → PathExpr A a b → Prop where
+inductive Step {A : Type u} {a b : A} : PathExpr A a b → PathExpr A a b → Type where
 
 /-- Multi-step rewriting (reflexive-transitive closure). -/
 inductive Rw {A : Type u} {a b : A} : PathExpr A a b → PathExpr A a b → Prop where

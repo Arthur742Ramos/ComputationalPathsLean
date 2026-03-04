@@ -43,7 +43,7 @@ universe u v w
 /-! ## Model category step relation -/
 
 /-- Atomic rewrite steps for model category identities. -/
-inductive ModelCatStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive ModelCatStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   | weq_refl {A : Type u} (a : A) :
       ModelCatStep (Path.refl a) (Path.refl a)
   | weq_comp {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :

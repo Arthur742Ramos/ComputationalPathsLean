@@ -17,7 +17,7 @@ universe u
 
 /-- Domain-specific rewrite steps for triangulated coherence paths. -/
 inductive TriangulatedStep {Obj : Type u} :
-    {a b : Obj} → Path a b → Path a b → Prop where
+    {a b : Obj} → Path a b → Path a b → Type u where
   | shift_right_unit {a b : Obj} (p : Path a b) :
       TriangulatedStep (Path.trans p (Path.refl b)) p
   | connect_left_unit {a b : Obj} (p : Path a b) :

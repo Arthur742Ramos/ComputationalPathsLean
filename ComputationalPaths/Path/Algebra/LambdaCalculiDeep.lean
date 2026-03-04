@@ -189,7 +189,7 @@ theorem USymPath.symm {a b : UTerm}
 -- ============================================================
 
 /-- Parallel beta step: simultaneously reduce many redexes. -/
-inductive UParStep : UTerm → UTerm → Prop where
+inductive UParStep : UTerm → UTerm → Type where
   | pvar (n : Nat) : UParStep (.var n) (.var n)
   | plam {t t' : UTerm} : UParStep t t' → UParStep (.lam t) (.lam t')
   | papp {f f' a a' : UTerm} :
@@ -199,7 +199,7 @@ inductive UParStep : UTerm → UTerm → Prop where
       UParStep (.app (.lam body) arg) (body'.subst 0 arg')
 
 /-- Theorem 13: Parallel step reflexivity. -/
-theorem UParStep.refl : (t : UTerm) → UParStep t t
+def UParStep.refl : (t : UTerm) → UParStep t t
   | .var n => .pvar n
   | .lam t => .plam (UParStep.refl t)
   | .app f a => .papp (UParStep.refl f) (UParStep.refl a)
@@ -650,7 +650,7 @@ theorem FSN.lam {τ : FType} {t : FTerm} (h : FSN t) : FSN (.lam τ t) := by
 -- ============================================================
 
 /-- Call-by-name: reduce head position only. -/
-inductive CBNStep : UTerm → UTerm → Prop where
+inductive CBNStep : UTerm → UTerm → Type where
   | headBeta (body arg : UTerm) :
       CBNStep (.app (.lam body) arg) (body.subst 0 arg)
   | congAppL {f f' a : UTerm} : CBNStep f f' →
@@ -674,7 +674,7 @@ theorem CBNPath.toUPath {a b : UTerm} (p : CBNPath a b) : UPath a b := by
   | step s _ ih => exact .step s.toUBeta ih
 
 /-- Call-by-value: reduce argument first. -/
-inductive CBVStep : UTerm → UTerm → Prop where
+inductive CBVStep : UTerm → UTerm → Type where
   | valBeta (body : UTerm) (v : UTerm) :
       CBVStep (.app (.lam body) v) (body.subst 0 v)
   | congAppR {f a a' : UTerm} : CBVStep a a' →

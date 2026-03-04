@@ -66,7 +66,7 @@ Rules 1–8: `symm_refl`, `symm_symm`, `trans_refl_left`, `trans_refl_right`,
 Rules 9–10: `trans_cancel_left`, `trans_cancel_right`
 Rules 11–13: congruence closure (`symm_congr`, `trans_congr_left/right`) -/
 
-inductive CStep : Expr → Expr → Prop where
+inductive CStep : Expr → Expr → Type where
   | symm_refl : CStep (.symm .refl) .refl
   | symm_symm (p : Expr) : CStep (.symm (.symm p)) p
   | trans_refl_left (p : Expr) : CStep (.trans .refl p) p
@@ -215,7 +215,7 @@ private theorem natLex_wf : WellFounded (fun (a b : Nat × Nat) =>
         · exact ihw w' hw l'
         · cases heq; exact ihl l' hl⟩
 
-theorem cstep_termination : WellFounded (fun q p : Expr => CStep p q) :=
+def cstep_termination : WellFounded (fun q p : Expr => CStep p q) :=
   Subrelation.wf (fun h => cstep_lex_decrease h)
     (InvImage.wf (fun (e : Expr) => (e.weight, e.leftWeight)) natLex_wf)
 
@@ -765,7 +765,7 @@ The confluence theorem gives unique normal forms: if `e` is in normal form
 any two normal forms reachable from the same source must be identical. -/
 
 /-- If a normal form is reachable from `e`, it equals `canon e`. -/
-theorem normal_form_unique (e₁ e₂ : Expr)
+def normal_form_unique (e₁ e₂ : Expr)
     (h : CRTC e₁ e₂)
     (hnf : ∀ e', ¬CStep e₂ e') :
     ∀ e₃, CRTC e₁ e₃ → (∀ e', ¬CStep e₃ e') → e₂ = e₃ := by

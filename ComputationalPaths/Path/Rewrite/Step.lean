@@ -1051,11 +1051,11 @@ noncomputable def two {A : Type u} {a b : A} {p q r : Path a b}
 end StepStar
 
 /-- Two reducts are joinable when they have a common `StepStar` descendant. -/
-inductive Step.Joinable {A : Type u} {a b : A} (p q : Path a b) : Prop where
+inductive Step.Joinable {A : Type u} {a b : A} (p q : Path a b) : Type where
   | intro (r : Path a b) (hp : StepStar p r) (hq : StepStar q r) : Step.Joinable p q
 
 /-- Joinability is symmetric. -/
-theorem Step.Joinable.symm {A : Type u} {a b : A} {p q : Path a b} :
+def Step.Joinable.symm {A : Type u} {a b : A} {p q : Path a b} :
     Step.Joinable p q → Step.Joinable q p := by
   intro h
   rcases h with ⟨r, hp, hq⟩
@@ -1079,7 +1079,7 @@ noncomputable def Step.Joinable.toData {A : Type u} {a b : A} {p q : Path a b} :
   exact Classical.choice hs
 
 /-- Forget type-level join data to recover Prop-level joinability. -/
-theorem Step.Joinable.ofData {A : Type u} {a b : A} {p q : Path a b} :
+def Step.Joinable.ofData {A : Type u} {a b : A} {p q : Path a b} :
     Step.JoinableData p q → Step.Joinable p q := by
   intro h
   exact ⟨h.meet, h.left, h.right⟩
@@ -1210,7 +1210,7 @@ theorem Step.deterministic_prod_eta
   exact Step.deterministic (hq := hr) (hr := Step.prod_eta p)
 
 /-- Non-overlapping base case: function η has a unique semantic reduct. -/
-theorem Step.deterministic_fun_eta
+def Step.deterministic_fun_eta
     {α β : Type u} {f g : α → β}
     (p : Path f g) {r : Path f g}
     (hr : Step (A := α → β) (Path.lamCongr (fun x => Path.app p x)) r) :
@@ -1243,7 +1243,7 @@ theorem Step.deterministic_mapRight_ofEq
         (_root_.congrArg (f a) h)).toEq := by
   exact Step.deterministic (hq := hr) (hr := Step.mapRight_ofEq f a h)
 
-theorem critical_pair_trans_assoc_trans_refl_left_joinable
+def critical_pair_trans_assoc_trans_refl_left_joinable
     {A : Type u} {a b c : A} (p : Path a b) (r : Path b c) :
     Step.Joinable
       (Path.trans (Path.refl a) (Path.trans p r))
@@ -1252,7 +1252,7 @@ theorem critical_pair_trans_assoc_trans_refl_left_joinable
   · exact StepStar.single (Step.trans_refl_left (Path.trans p r))
   · exact StepStar.refl (Path.trans p r)
 
-theorem critical_pair_trans_assoc_trans_refl_right_joinable
+def critical_pair_trans_assoc_trans_refl_right_joinable
     {A : Type u} {a b c : A} (p : Path a b) (r : Path b c) :
     Step.Joinable
       (Path.trans p (Path.trans (Path.refl b) r))
@@ -1262,7 +1262,7 @@ theorem critical_pair_trans_assoc_trans_refl_right_joinable
       (Step.trans_congr_right p (Step.trans_refl_left r))
   · exact StepStar.refl (Path.trans p r)
 
-theorem critical_pair_trans_assoc_trans_symm_joinable
+def critical_pair_trans_assoc_trans_symm_joinable
     {A : Type u} {a b c : A} (p : Path a b) (q : Path a c) :
     Step.Joinable
       (Path.trans p (Path.trans (Path.symm p) q))
@@ -1271,7 +1271,7 @@ theorem critical_pair_trans_assoc_trans_symm_joinable
   · exact StepStar.single (Step.trans_cancel_left p q)
   · exact StepStar.single (Step.trans_refl_left q)
 
-theorem critical_pair_trans_assoc_symm_trans_joinable
+def critical_pair_trans_assoc_symm_trans_joinable
     {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
     Step.Joinable
       (Path.trans (Path.symm p) (Path.trans p q))
@@ -1280,7 +1280,7 @@ theorem critical_pair_trans_assoc_symm_trans_joinable
   · exact StepStar.single (Step.trans_cancel_right p q)
   · exact StepStar.single (Step.trans_refl_left q)
 
-theorem critical_pair_trans_assoc_trans_assoc_joinable
+def critical_pair_trans_assoc_trans_assoc_joinable
     {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     Step.Joinable
@@ -1292,7 +1292,7 @@ theorem critical_pair_trans_assoc_trans_assoc_joinable
       (Step.trans_congr_right p (Step.trans_assoc q r s))
   · exact StepStar.single (Step.trans_assoc p q (Path.trans r s))
 
-theorem critical_pair_symm_congr_symm_symm_joinable
+def critical_pair_symm_congr_symm_symm_joinable
     {A : Type u} {a b : A} {p p' : Path a b}
     (hp : Step p p') :
     Step.Joinable
@@ -1302,7 +1302,7 @@ theorem critical_pair_symm_congr_symm_symm_joinable
   · exact StepStar.single (Step.symm_symm p')
   · exact StepStar.single hp
 
-theorem critical_pair_symm_congr_symm_trans_congr_left_joinable
+def critical_pair_symm_congr_symm_trans_congr_left_joinable
     {A : Type u} {a b c : A}
     {p p' : Path a b} {q : Path b c}
     (hp : Step p p') :
@@ -1314,7 +1314,7 @@ theorem critical_pair_symm_congr_symm_trans_congr_left_joinable
   · exact StepStar.single
       (Step.trans_congr_right (Path.symm q) (Step.symm_congr hp))
 
-theorem critical_pair_symm_congr_symm_trans_congr_right_joinable
+def critical_pair_symm_congr_symm_trans_congr_right_joinable
     {A : Type u} {a b c : A}
     {p : Path a b} {q q' : Path b c}
     (hq : Step q q') :
@@ -1326,7 +1326,7 @@ theorem critical_pair_symm_congr_symm_trans_congr_right_joinable
   · exact StepStar.single
       (Step.trans_congr_left (Path.symm p) (Step.symm_congr hq))
 
-theorem critical_pair_trans_congr_left_right_joinable
+def critical_pair_trans_congr_left_right_joinable
     {A : Type u} {a b c : A}
     {p p' : Path a b} {q q' : Path b c}
     (hp : Step p p') (hq : Step q q') :
@@ -1337,7 +1337,7 @@ theorem critical_pair_trans_congr_left_right_joinable
   · exact StepStar.single (Step.trans_congr_right p' hq)
   · exact StepStar.single (Step.trans_congr_left q' hp)
 
-theorem critical_pair_trans_congr_left_trans_assoc_joinable
+def critical_pair_trans_congr_left_trans_assoc_joinable
     {A : Type u} {a b c d : A}
     {p p' : Path a b} {q : Path b c} {r : Path c d}
     (hp : Step p p') :
@@ -1348,7 +1348,7 @@ theorem critical_pair_trans_congr_left_trans_assoc_joinable
   · exact StepStar.single (Step.trans_assoc p' q r)
   · exact StepStar.single (Step.trans_congr_left (Path.trans q r) hp)
 
-theorem critical_pair_trans_congr_right_trans_assoc_joinable
+def critical_pair_trans_congr_right_trans_assoc_joinable
     {A : Type u} {a b c d : A}
     {p : Path a b} {q q' : Path b c} {r : Path c d}
     (hq : Step q q') :
@@ -1360,7 +1360,7 @@ theorem critical_pair_trans_congr_right_trans_assoc_joinable
   · exact StepStar.single
       (Step.trans_congr_right p (Step.trans_congr_left r hq))
 
-theorem critical_pair_trans_assoc_trans_refl_inner_right_joinable
+def critical_pair_trans_assoc_trans_refl_inner_right_joinable
     {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
     Step.Joinable
       (Path.trans p (Path.trans q (Path.refl c)))
@@ -1370,14 +1370,14 @@ theorem critical_pair_trans_assoc_trans_refl_inner_right_joinable
       (Step.trans_congr_right p (Step.trans_refl_right q))
   · exact StepStar.refl (Path.trans p q)
 
-theorem critical_pair_symm_symm_symm_refl_joinable
+def critical_pair_symm_symm_symm_refl_joinable
     {A : Type u} (a : A) :
     Step.Joinable (Path.refl a) (Path.symm (Path.refl a)) := by
   refine ⟨Path.refl a, ?_, ?_⟩
   · exact StepStar.refl (Path.refl a)
   · exact StepStar.single (Step.symm_refl a)
 
-theorem critical_pair_symm_symm_symm_trans_congr_joinable
+def critical_pair_symm_symm_symm_trans_congr_joinable
     {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Step.Joinable
@@ -1392,7 +1392,7 @@ theorem critical_pair_symm_symm_symm_trans_congr_joinable
           (Step.symm_symm p)))
       (Step.trans_congr_right p (Step.symm_symm q))
 
-theorem critical_pair_symm_trans_congr_trans_refl_left_joinable
+def critical_pair_symm_trans_congr_trans_refl_left_joinable
     {A : Type u} {a b : A} (p : Path a b) :
     Step.Joinable
       (Path.symm p)
@@ -1403,7 +1403,7 @@ theorem critical_pair_symm_trans_congr_trans_refl_left_joinable
       (Step.trans_congr_right (Path.symm p) (Step.symm_refl a))
       (Step.trans_refl_right (Path.symm p))
 
-theorem critical_pair_symm_trans_congr_trans_refl_right_joinable
+def critical_pair_symm_trans_congr_trans_refl_right_joinable
     {A : Type u} {a b : A} (p : Path a b) :
     Step.Joinable
       (Path.symm p)
@@ -1414,7 +1414,7 @@ theorem critical_pair_symm_trans_congr_trans_refl_right_joinable
       (Step.trans_congr_left (Path.symm p) (Step.symm_refl b))
       (Step.trans_refl_left (Path.symm p))
 
-theorem critical_pair_trans_cancel_left_trans_refl_left_inner_joinable
+def critical_pair_trans_cancel_left_trans_refl_left_inner_joinable
     {A : Type u} {a c : A} (q : Path a c) :
     Step.Joinable
       q
@@ -1425,7 +1425,7 @@ theorem critical_pair_trans_cancel_left_trans_refl_left_inner_joinable
       (Step.trans_congr_left q (Step.symm_refl a))
       (Step.trans_refl_left q)
 
-theorem critical_pair_trans_cancel_right_symm_refl_joinable
+def critical_pair_trans_cancel_right_symm_refl_joinable
     {A : Type u} {a c : A} (q : Path a c) :
     Step.Joinable
       q
@@ -1436,7 +1436,7 @@ theorem critical_pair_trans_cancel_right_symm_refl_joinable
       (StepStar.single (Step.trans_refl_left (Path.trans (Path.refl a) q)))
       (Step.trans_refl_left q)
 
-theorem critical_pair_trans_assoc_trans_cancel_left_joinable
+def critical_pair_trans_assoc_trans_cancel_left_joinable
     {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path a c) (r : Path c d) :
     Step.Joinable
@@ -1449,7 +1449,7 @@ theorem critical_pair_trans_assoc_trans_cancel_left_joinable
         (Step.trans_congr_right p (Step.trans_assoc (Path.symm p) q r)))
       (Step.trans_cancel_left p (Path.trans q r))
 
-theorem critical_pair_trans_assoc_trans_cancel_right_joinable
+def critical_pair_trans_assoc_trans_cancel_right_joinable
     {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Step.Joinable
@@ -1462,7 +1462,7 @@ theorem critical_pair_trans_assoc_trans_cancel_right_joinable
         (Step.trans_congr_right (Path.symm p) (Step.trans_assoc p q r)))
       (Step.trans_cancel_right p (Path.trans q r))
 
-theorem critical_pair_symm_trans_congr_symm_symm_left_joinable
+def critical_pair_symm_trans_congr_symm_symm_left_joinable
     {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Step.Joinable
@@ -1473,7 +1473,7 @@ theorem critical_pair_symm_trans_congr_symm_symm_left_joinable
   · exact StepStar.single
       (Step.trans_congr_right (Path.symm q) (Step.symm_symm (Path.symm p)))
 
-theorem critical_pair_symm_trans_congr_symm_symm_right_joinable
+def critical_pair_symm_trans_congr_symm_symm_right_joinable
     {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Step.Joinable
@@ -1484,7 +1484,7 @@ theorem critical_pair_symm_trans_congr_symm_symm_right_joinable
   · exact StepStar.single
       (Step.trans_congr_left (Path.symm p) (Step.symm_symm (Path.symm q)))
 
-theorem critical_pair_trans_cancel_left_trans_refl_right_joinable
+def critical_pair_trans_cancel_left_trans_refl_right_joinable
     {A : Type u} {a b c : A}
     (p : Path a b) (q : Path a c) :
     Step.Joinable
@@ -1494,7 +1494,7 @@ theorem critical_pair_trans_cancel_left_trans_refl_right_joinable
   · exact StepStar.single (Step.trans_refl_right q)
   · exact StepStar.single (Step.trans_cancel_left p q)
 
-theorem critical_pair_trans_cancel_right_trans_refl_right_joinable
+def critical_pair_trans_cancel_right_trans_refl_right_joinable
     {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Step.Joinable
@@ -1504,7 +1504,7 @@ theorem critical_pair_trans_cancel_right_trans_refl_right_joinable
   · exact StepStar.single (Step.trans_refl_right q)
   · exact StepStar.single (Step.trans_cancel_right p q)
 
-theorem critical_pair_trans_cancel_left_trans_refl_left_joinable
+def critical_pair_trans_cancel_left_trans_refl_left_joinable
     {A : Type u} {a b c : A}
     (p : Path a b) (q : Path a c) :
     Step.Joinable
@@ -1514,7 +1514,7 @@ theorem critical_pair_trans_cancel_left_trans_refl_left_joinable
   · exact StepStar.single (Step.trans_refl_left q)
   · exact StepStar.single (Step.trans_cancel_left p q)
 
-theorem critical_pair_trans_cancel_right_trans_refl_left_joinable
+def critical_pair_trans_cancel_right_trans_refl_left_joinable
     {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     Step.Joinable
@@ -1524,7 +1524,7 @@ theorem critical_pair_trans_cancel_right_trans_refl_left_joinable
   · exact StepStar.single (Step.trans_refl_left q)
   · exact StepStar.single (Step.trans_cancel_right p q)
 
-theorem critical_pair_trans_refl_left_trans_assoc_joinable
+def critical_pair_trans_refl_left_trans_assoc_joinable
     {A : Type u} {a b c : A} (p : Path a b) (r : Path b c) :
     Step.Joinable
       (Path.trans p r)
@@ -1532,7 +1532,7 @@ theorem critical_pair_trans_refl_left_trans_assoc_joinable
   exact Step.Joinable.symm
     (critical_pair_trans_assoc_trans_refl_left_joinable p r)
 
-theorem critical_pair_trans_refl_right_trans_assoc_joinable
+def critical_pair_trans_refl_right_trans_assoc_joinable
     {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
     Step.Joinable
       (Path.trans p q)
@@ -1540,7 +1540,7 @@ theorem critical_pair_trans_refl_right_trans_assoc_joinable
   exact Step.Joinable.symm
     (critical_pair_trans_assoc_trans_refl_inner_right_joinable p q)
 
-theorem critical_pair_trans_symm_trans_assoc_joinable
+def critical_pair_trans_symm_trans_assoc_joinable
     {A : Type u} {a b c : A} (p : Path a b) (q : Path a c) :
     Step.Joinable
       (Path.trans (Path.refl a) q)
@@ -1548,7 +1548,7 @@ theorem critical_pair_trans_symm_trans_assoc_joinable
   exact Step.Joinable.symm
     (critical_pair_trans_assoc_trans_symm_joinable p q)
 
-theorem critical_pair_symm_trans_trans_assoc_joinable
+def critical_pair_symm_trans_trans_assoc_joinable
     {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
     Step.Joinable
       (Path.trans (Path.refl b) q)
@@ -1556,7 +1556,7 @@ theorem critical_pair_symm_trans_trans_assoc_joinable
   exact Step.Joinable.symm
     (critical_pair_trans_assoc_symm_trans_joinable p q)
 
-theorem critical_pair_symm_congr_trans_assoc_joinable
+def critical_pair_symm_congr_trans_assoc_joinable
     {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Step.Joinable
@@ -1571,7 +1571,7 @@ theorem critical_pair_symm_congr_trans_assoc_joinable
         (Step.trans_congr_left (Path.symm p) (Step.symm_trans_congr q r)))
       (Step.trans_assoc (Path.symm r) (Path.symm q) (Path.symm p))
 
-theorem critical_pair_symm_congr_trans_symm_joinable
+def critical_pair_symm_congr_trans_symm_joinable
     {A : Type u} {a b : A}
     (p : Path a b) :
     Step.Joinable
@@ -1583,7 +1583,7 @@ theorem critical_pair_symm_congr_trans_symm_joinable
       (Step.trans_congr_left (Path.symm p) (Step.symm_symm p))
       (Step.trans_symm p)
 
-theorem critical_pair_symm_congr_symm_trans_joinable
+def critical_pair_symm_congr_symm_trans_joinable
     {A : Type u} {a b : A}
     (p : Path a b) :
     Step.Joinable
@@ -1726,74 +1726,74 @@ theorem leftWeight_lt_under_trans_right
     Step.complexity (Path.trans p q) = Step.complexity p + Step.complexity q := by
   simp [Step.complexity]
 
-theorem Step.complexity_trans_refl_left_decreases
+def Step.complexity_trans_refl_left_decreases
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity p ≤ Step.complexity (Path.trans (Path.refl a) p) := by
   simp [Step.complexity]
 
-theorem Step.complexity_trans_refl_right_decreases
+def Step.complexity_trans_refl_right_decreases
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity p ≤ Step.complexity (Path.trans p (Path.refl b)) := by
   simp [Step.complexity]
 
-theorem Step.complexity_trans_assoc_preserved
+def Step.complexity_trans_assoc_preserved
     {A : Type u} {a b c d : A}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Step.complexity (Path.trans (Path.trans p q) r) =
       Step.complexity (Path.trans p (Path.trans q r)) := by
   simp [Step.complexity]
 
-theorem Step.complexity_trans_cancel_left_decreases
+def Step.complexity_trans_cancel_left_decreases
     {A : Type u} {a b c : A} (p : Path a b) (q : Path a c) :
     Step.complexity q ≤
       Step.complexity (Path.trans p (Path.trans (Path.symm p) q)) := by
   simpa [Step.complexity, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using
     (Nat.le_add_right q.steps.length (p.steps.length + p.steps.length))
 
-theorem Step.complexity_trans_cancel_right_decreases
+def Step.complexity_trans_cancel_right_decreases
     {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
     Step.complexity q ≤
       Step.complexity (Path.trans (Path.symm p) (Path.trans p q)) := by
   simpa [Step.complexity, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using
     (Nat.le_add_right q.steps.length (p.steps.length + p.steps.length))
 
-theorem Step.complexity_trans_symm_gap
+def Step.complexity_trans_symm_gap
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity (Path.trans p (Path.symm p)) =
       Step.complexity p + Step.complexity p := by
   simp [Step.complexity]
 
-theorem Step.complexity_symm_trans_gap
+def Step.complexity_symm_trans_gap
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity (Path.trans (Path.symm p) p) =
       Step.complexity p + Step.complexity p := by
   simp [Step.complexity]
 
-theorem Step.complexity_trans_cancel_left_gap
+def Step.complexity_trans_cancel_left_gap
     {A : Type u} {a b c : A} (p : Path a b) (q : Path a c) :
     Step.complexity (Path.trans p (Path.trans (Path.symm p) q)) =
       Step.complexity q + (Step.complexity p + Step.complexity p) := by
   simp [Step.complexity, Nat.add_assoc, Nat.add_comm]
 
-theorem Step.complexity_trans_cancel_right_gap
+def Step.complexity_trans_cancel_right_gap
     {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :
     Step.complexity (Path.trans (Path.symm p) (Path.trans p q)) =
       Step.complexity q + (Step.complexity p + Step.complexity p) := by
   simp [Step.complexity, Nat.add_assoc, Nat.add_comm]
 
-theorem Step.complexity_trans_symm_decreases
+def Step.complexity_trans_symm_decreases
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity (Path.refl a) ≤
       Step.complexity (Path.trans p (Path.symm p)) := by
   simp [Step.complexity]
 
-theorem Step.complexity_symm_trans_decreases
+def Step.complexity_symm_trans_decreases
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity (Path.refl b) ≤
       Step.complexity (Path.trans (Path.symm p) p) := by
   simp [Step.complexity]
 
-theorem Step.complexity_trans_symm_strict
+def Step.complexity_trans_symm_strict
     {A : Type u} {a b : A} (p : Path a b)
     (hp : 0 < Step.complexity p) :
     Step.complexity (Path.refl a) <
@@ -1802,7 +1802,7 @@ theorem Step.complexity_trans_symm_strict
     exact Nat.lt_of_lt_of_le hp (Nat.le_add_right (Step.complexity p) (Step.complexity p))
   simpa [Step.complexity] using hpp
 
-theorem Step.complexity_symm_trans_strict
+def Step.complexity_symm_trans_strict
     {A : Type u} {a b : A} (p : Path a b)
     (hp : 0 < Step.complexity p) :
     Step.complexity (Path.refl b) <
@@ -1811,7 +1811,7 @@ theorem Step.complexity_symm_trans_strict
     exact Nat.lt_of_lt_of_le hp (Nat.le_add_right (Step.complexity p) (Step.complexity p))
   simpa [Step.complexity] using hpp
 
-theorem Step.complexity_trans_cancel_left_strict
+def Step.complexity_trans_cancel_left_strict
     {A : Type u} {a b c : A} (p : Path a b) (q : Path a c)
     (hp : 0 < Step.complexity p) :
     Step.complexity q <
@@ -1823,7 +1823,7 @@ theorem Step.complexity_trans_cancel_left_strict
     Nat.lt_add_of_pos_right hpp
   simpa [Step.complexity, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hlt
 
-theorem Step.complexity_trans_cancel_right_strict
+def Step.complexity_trans_cancel_right_strict
     {A : Type u} {a b c : A} (p : Path a b) (q : Path b c)
     (hp : 0 < Step.complexity p) :
     Step.complexity q <
@@ -1835,7 +1835,7 @@ theorem Step.complexity_trans_cancel_right_strict
     Nat.lt_add_of_pos_right hpp
   simpa [Step.complexity, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hlt
 
-theorem Step.complexity_symm_trans_symm_decreases
+def Step.complexity_symm_trans_symm_decreases
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity (Path.symm (Path.refl a)) ≤
       Step.complexity (Path.symm (Path.trans p (Path.symm p))) := by
@@ -1846,7 +1846,7 @@ theorem Step.complexity_symm_trans_symm_decreases
     _ = Step.complexity (Path.symm (Path.trans p (Path.symm p))) :=
       (Step.complexity_symm (Path.trans p (Path.symm p))).symm
 
-theorem Step.complexity_symm_symm_trans_decreases
+def Step.complexity_symm_symm_trans_decreases
     {A : Type u} {a b : A} (p : Path a b) :
     Step.complexity (Path.symm (Path.refl b)) ≤
       Step.complexity (Path.symm (Path.trans (Path.symm p) p)) := by
@@ -1857,21 +1857,21 @@ theorem Step.complexity_symm_symm_trans_decreases
     _ = Step.complexity (Path.symm (Path.trans (Path.symm p) p)) :=
       (Step.complexity_symm (Path.trans (Path.symm p) p)).symm
 
-theorem Step.complexity_symm_trans_symm_strict_decreases
+def Step.complexity_symm_trans_symm_strict_decreases
     {A : Type u} {a b : A} (p : Path a b)
     (hp : 0 < Step.complexity p) :
     Step.complexity (Path.symm (Path.refl a)) <
       Step.complexity (Path.symm (Path.trans p (Path.symm p))) := by
   simpa using Step.complexity_trans_symm_strict p hp
 
-theorem Step.complexity_symm_symm_trans_strict_decreases
+def Step.complexity_symm_symm_trans_strict_decreases
     {A : Type u} {a b : A} (p : Path a b)
     (hp : 0 < Step.complexity p) :
     Step.complexity (Path.symm (Path.refl b)) <
       Step.complexity (Path.symm (Path.trans (Path.symm p) p)) := by
   simpa using Step.complexity_symm_trans_strict p hp
 
-theorem Step.complexity_symm_trans_cancel_left_strict
+def Step.complexity_symm_trans_cancel_left_strict
     {A : Type u} {a b c : A} (p : Path a b) (q : Path a c)
     (hp : 0 < Step.complexity p) :
     Step.complexity (Path.symm q) <
@@ -1879,7 +1879,7 @@ theorem Step.complexity_symm_trans_cancel_left_strict
   simp only [Step.complexity_symm]
   exact Step.complexity_trans_cancel_left_strict p q hp
 
-theorem Step.complexity_symm_trans_cancel_right_strict
+def Step.complexity_symm_trans_cancel_right_strict
     {A : Type u} {a b c : A} (p : Path a b) (q : Path b c)
     (hp : 0 < Step.complexity p) :
     Step.complexity (Path.symm q) <

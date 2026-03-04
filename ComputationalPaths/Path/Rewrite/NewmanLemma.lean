@@ -123,11 +123,11 @@ noncomputable def critical_pair_witness : Expr :=
   .trans (.trans (.atom 0) (.atom 1)) (.symm (.trans (.atom 0) (.atom 1)))
 
 /-- Via trans_symm, the witness reduces to refl. -/
-theorem critical_pair_left : Step critical_pair_witness .refl :=
+def critical_pair_left : Step critical_pair_witness .refl :=
   Step.trans_symm _
 
 /-- Via trans_assoc, the witness reduces to a different term. -/
-theorem critical_pair_right :
+def critical_pair_right :
     Step critical_pair_witness
       (.trans (.atom 0) (.trans (.atom 1) (.symm (.trans (.atom 0) (.atom 1))))) :=
   Step.trans_assoc _ _ _

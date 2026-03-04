@@ -86,7 +86,7 @@ theorem length_trans : (p : Path a b) → (q : Path b c) →
 theorem length_refl (a : HPoint) : (Path.refl a).length = 0 := rfl
 
 /-- Theorem 9 – step_symm_symm. -/
-theorem step_symm_symm : (s : Step a b) → s.symm.symm = s
+def step_symm_symm : (s : Step a b) → s.symm.symm = s
   | .edge _ _ => rfl
   | .refl _   => rfl
 
@@ -547,7 +547,7 @@ theorem encode_add (p q : S1Loop) :
 -- ============================================================
 
 /-- Theorem 68 – cons length decomposition. -/
-theorem path_cons_length (s : Step a b) (p : Path b c) :
+def path_cons_length (s : Step a b) (p : Path b c) :
     (Path.cons s p).length = 1 + p.length := rfl
 
 /-- Theorem 69 – trans preserves left length. -/
@@ -571,7 +571,7 @@ theorem susp_roundtrip_len :
   simp [SuspPath.trans, meridian_path, SuspPath.length]
 
 /-- Theorem 74 – step refl symm. -/
-theorem step_refl_symm (a : HPoint) : (Step.refl a).symm = Step.refl a := rfl
+def step_refl_symm (a : HPoint) : (Step.refl a).symm = Step.refl a := rfl
 
 /-- Theorem 75 – ap_id preserves symm. -/
 theorem ap_id_symm : (p : Path a b) → ap_id_path p.symm = (ap_id_path p).symm

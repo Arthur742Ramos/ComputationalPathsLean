@@ -334,23 +334,23 @@ theorem trunc_idem_roundtrip_toEq (Ops : InfinityToposOps X)
     (Path.trans (Ax.truncIdem n x) (Path.symm (Ax.truncIdem n x))).toEq = rfl := by
   simp
 
-theorem postnikov_step_double_symm (Ops : InfinityToposOps X)
+def postnikov_step_double_symm (Ops : InfinityToposOps X)
     (Ax : GiraudInfinityAxioms X Ops) (n : Nat) (x : X) :
     Path.symm (Path.symm (Ax.postnikovStep n x)) = Ax.postnikovStep n x :=
   Path.symm_symm _
 
-theorem postnikov_step_refl_left (Ops : InfinityToposOps X)
+def postnikov_step_refl_left (Ops : InfinityToposOps X)
     (Ax : GiraudInfinityAxioms X Ops) (n : Nat) (x : X) :
     Path.trans (Path.refl (Ops.postnikov (Nat.succ n) x)) (Ax.postnikovStep n x) =
       Ax.postnikovStep n x :=
   Path.trans_refl_left _
 
-theorem postnikov_step_refl_right (Ops : InfinityToposOps X)
+def postnikov_step_refl_right (Ops : InfinityToposOps X)
     (Ax : GiraudInfinityAxioms X Ops) (n : Nat) (x : X) :
     Path.trans (Ax.postnikovStep n x) (Path.refl (Ops.truncate n x)) = Ax.postnikovStep n x :=
   Path.trans_refl_right _
 
-theorem postnikov_step_symm_trans (Ops : InfinityToposOps X)
+def postnikov_step_symm_trans (Ops : InfinityToposOps X)
     (Ax : GiraudInfinityAxioms X Ops) (n : Nat) (x : X) :
     Path.symm (Path.trans (Ax.postnikovStep n x) (Path.symm (Ax.postnikovStep n x))) =
       Path.trans
@@ -358,13 +358,13 @@ theorem postnikov_step_symm_trans (Ops : InfinityToposOps X)
         (Path.symm (Ax.postnikovStep n x)) :=
   Path.symm_trans _ _
 
-theorem postnikov_step_congrArg_shape (Ops : InfinityToposOps X)
+def postnikov_step_congrArg_shape (Ops : InfinityToposOps X)
     (Ax : GiraudInfinityAxioms X Ops) (n : Nat) (x : X) :
     Path.congrArg Ops.shape (Path.symm (Ax.postnikovStep n x)) =
       Path.symm (Path.congrArg Ops.shape (Ax.postnikovStep n x)) :=
   Path.congrArg_symm Ops.shape (Ax.postnikovStep n x)
 
-theorem postnikov_step_roundtrip_toEq (Ops : InfinityToposOps X)
+def postnikov_step_roundtrip_toEq (Ops : InfinityToposOps X)
     (Ax : GiraudInfinityAxioms X Ops) (n : Nat) (x : X) :
     (Path.trans (Ax.postnikovStep n x) (Path.symm (Ax.postnikovStep n x))).toEq = rfl := by
   simp

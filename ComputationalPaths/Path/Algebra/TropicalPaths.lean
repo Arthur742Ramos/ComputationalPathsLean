@@ -317,7 +317,7 @@ theorem tropAdd_assoc_roundtrip_toEq (a b c : Nat) :
   simp
 
 -- 37. Step map through valuation
-theorem tropAdd_step_map_val (a b : Nat) :
+def tropAdd_step_map_val (a b : Nat) :
     Step.map valuation (tropAdd_comm_step a b) =
       Step.mk (valuation (tropAdd a b)) (valuation (tropAdd b a))
         (_root_.congrArg valuation (tropAdd_comm a b)) := by

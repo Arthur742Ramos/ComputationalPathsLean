@@ -131,7 +131,7 @@ structure TRule where
   rhs : Term
 
 /-- One-step rewriting: apply a rule with a matching substitution. -/
-inductive TStep (rules : List TRule) : Term → Term → Prop where
+inductive TStep (rules : List TRule) : Term → Term → Type where
   | root (r : TRule) (σ : Subst) :
       r ∈ rules →
       TStep rules (applySubst σ r.lhs) (applySubst σ r.rhs)

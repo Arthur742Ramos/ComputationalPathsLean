@@ -39,7 +39,7 @@ structure SRule (α : Type u) where
 /-- One-step string rewriting: replace an occurrence of `r.lhs` with `r.rhs`
 in context `u ++ r.lhs ++ v`. -/
 inductive SStep {α : Type u} (rules : List (SRule α)) :
-    Word α → Word α → Prop where
+    Word α → Word α → Type where
   | apply (r : SRule α) (u v : Word α) :
       r ∈ rules →
       SStep rules (u ++ r.lhs ++ v) (u ++ r.rhs ++ v)
@@ -220,7 +220,7 @@ theorem length_reducing_rtc {α : Type u} {rules : List (SRule α)}
     omega
 
 /-- In a length-reducing system, SStep is well-founded. -/
-theorem length_reducing_wf {α : Type u} {rules : List (SRule α)}
+def length_reducing_wf {α : Type u} {rules : List (SRule α)}
     (hlr : isLengthReducing rules) :
     WellFounded (fun a b => SStep rules b a) :=
   Subrelation.wf
@@ -287,7 +287,7 @@ theorem single_rule_step {α : Type u} (l r : Word α)
     exact ⟨u, v, rfl, rfl⟩
 
 /-- In a single-rule system, if the rule is length-reducing, the system terminates. -/
-theorem single_rule_terminates {α : Type u} (l r : Word α)
+def single_rule_terminates {α : Type u} (l r : Word α)
     (hlr : r.length < l.length) :
     WellFounded (fun a b => SStep [SRule.mk l r] b a) :=
   length_reducing_wf (fun rule hmem => by simp at hmem; subst hmem; exact hlr)

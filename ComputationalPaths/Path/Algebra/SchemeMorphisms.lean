@@ -213,7 +213,7 @@ structure ChevalleyTheorem {X Y : SchemeData.{u}}
 /-! ## SchemeStep -/
 
 /-- Rewrite steps for scheme morphism computations. -/
-inductive SchemeStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive SchemeStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   /-- Base change compatibility step. -/
   | base_change {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : SchemeStep p q

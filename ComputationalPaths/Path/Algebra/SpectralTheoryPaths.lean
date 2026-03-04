@@ -336,7 +336,7 @@ theorem congrArg_mulVec_trans (v : NVec2) {m1 m2 m3 : NMat2}
   simp [Path.congrArg, Path.trans]
 
 -- 33. Step map through trace
-theorem nmat_add_step_map_trace (m1 m2 : NMat2) :
+def nmat_add_step_map_trace (m1 m2 : NMat2) :
     Step.map NMat2.trace (nmat_add_comm_step m1 m2) =
       Step.mk (NMat2.add m1 m2).trace (NMat2.add m2 m1).trace
         (_root_.congrArg NMat2.trace (nmat_add_comm m1 m2)) := by

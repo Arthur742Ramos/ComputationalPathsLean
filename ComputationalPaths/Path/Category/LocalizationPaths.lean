@@ -90,7 +90,7 @@ structure LocalizedCategory (C : Type u) (W : MorphismClass C) where
 /-! ## Localization Step -/
 
 /-- Rewrite steps for localization operations. -/
-inductive LocStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive LocStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   /-- Localizing refl yields refl. -/
   | localize_refl {C : Type u} {W : MorphismClass C}
       (L : LocalizedCategory C W) (a : C) :

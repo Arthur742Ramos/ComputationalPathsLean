@@ -377,7 +377,7 @@ theorem topos_path_coherence {a b : Bool}
   Subsingleton.elim _ _
 
 /-- Path uniqueness for meet-comm round trip. -/
-theorem meetComm_roundtrip (a b : Bool) :
+def meetComm_roundtrip (a b : Bool) :
     (Path.trans
       (Path.mk [Step.mk _ _ (tvMeet_comm a b)] (tvMeet_comm a b))
       (Path.mk [Step.mk _ _ (tvMeet_comm b a)] (tvMeet_comm b a))).proof
@@ -385,7 +385,7 @@ theorem meetComm_roundtrip (a b : Bool) :
   Subsingleton.elim _ _
 
 /-- Path uniqueness for join-comm round trip. -/
-theorem joinComm_roundtrip (a b : Bool) :
+def joinComm_roundtrip (a b : Bool) :
     (Path.trans
       (Path.mk [Step.mk _ _ (tvJoin_comm a b)] (tvJoin_comm a b))
       (Path.mk [Step.mk _ _ (tvJoin_comm b a)] (tvJoin_comm b a))).proof
@@ -393,7 +393,7 @@ theorem joinComm_roundtrip (a b : Bool) :
   Subsingleton.elim _ _
 
 /-- Symm of named step is inverse path. -/
-theorem symmMeetComm (a b : Bool) :
+def symmMeetComm (a b : Bool) :
     (Path.symm (Path.mk [Step.mk _ _ (tvMeet_comm a b)] (tvMeet_comm a b))).proof
     = (Path.mk [Step.mk _ _ (tvMeet_comm b a)] (tvMeet_comm b a)).proof :=
   Subsingleton.elim _ _

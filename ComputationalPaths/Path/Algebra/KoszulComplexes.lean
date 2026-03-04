@@ -41,7 +41,7 @@ universe u v
 /-! ## Koszul step relation -/
 
 /-- Atomic rewrite steps for Koszul complex identities. -/
-inductive KoszulStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive KoszulStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   | diff_sq {A : Type u} (a : A) :
       KoszulStep (Path.refl a) (Path.refl a)
   | exact_seq {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :

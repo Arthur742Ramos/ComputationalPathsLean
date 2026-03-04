@@ -147,7 +147,7 @@ structure ElementaryCollapse (K : CellComplex) where
   coface_in : coface ∈ K.cells
 
 /-- DiscMorseStep: rewrite steps modelling discrete Morse operations. -/
-inductive DiscMorseStep : Prop
+inductive DiscMorseStep : Type
   | collapse : DiscMorseStep
   | uncollapse : DiscMorseStep
   | gradient_pair : DiscMorseStep

@@ -185,7 +185,7 @@ theorem length_trans (p : Path α a b) (q : Path α b c) :
 theorem nil_length : (Path.nil a : Path α a a).length = 0 := rfl
 
 /-- Theorem 6: single step has length one. -/
-theorem single_length (s : Step α a b) : (Path.single s).length = 1 := rfl
+def single_length (s : Step α a b) : (Path.single s).length = 1 := rfl
 
 -- ============================================================
 -- §7  Reduction Sequences as Paths
@@ -199,7 +199,7 @@ noncomputable def redStep (t₁ t₂ : Term) (r : Redex) : Step Term t₁ t₂ :
   Step.rule r.name t₁ t₂
 
 /-- Theorem 7: A single reduction step gives a path of length 1. -/
-theorem single_red_length (t₁ t₂ : Term) (r : Redex) :
+def single_red_length (t₁ t₂ : Term) (r : Redex) :
     (Path.single (redStep t₁ t₂ r)).length = 1 := rfl
 
 /-- Theorem 8: Composing two reduction sequences gives combined length. -/
@@ -322,12 +322,12 @@ inductive IsVal : Term → Prop where
   | var : (n : Nat) → IsVal (.var n)
 
 /-- CBN: reduce function position first, never reduce under lambda. -/
-inductive CBNStep : Term → Term → Prop where
+inductive CBNStep : Term → Term → Type where
   | beta : (body arg : Term) → CBNStep (.app (.lam body) arg) body
   | appL : CBNStep f f' → CBNStep (.app f x) (.app f' x)
 
 /-- CBV: reduce argument to value first, then beta. -/
-inductive CBVStep : Term → Term → Prop where
+inductive CBVStep : Term → Term → Type where
   | beta : (body arg : Term) → IsVal arg → CBVStep (.app (.lam body) arg) body
   | appL : CBVStep f f' → CBVStep (.app f x) (.app f' x)
   | appR : IsVal f → CBVStep x x' → CBVStep (.app f x) (.app f x')
@@ -355,7 +355,7 @@ noncomputable def cbvToStep (t₁ t₂ : Term) (_ : CBVStep t₁ t₂) : Step Te
   .rule "cbv" t₁ t₂
 
 /-- Theorem 20: CBN and CBV steps for same redex give same-length paths. -/
-theorem cbn_cbv_single_length (t₁ t₂ : Term)
+def cbn_cbv_single_length (t₁ t₂ : Term)
     (hcbn : CBNStep t₁ t₂) (hcbv : CBVStep t₁ t₂) :
     (Path.single (cbnToStep t₁ t₂ hcbn)).length =
     (Path.single (cbvToStep t₁ t₂ hcbv)).length := rfl
@@ -621,7 +621,7 @@ theorem trans_congrArg_right (p₁ p₂ : Path α a b) (q : Path α b c)
 theorem symm_nil : (Path.nil a : Path α a a).symm = .nil a := rfl
 
 /-- Theorem 50: symm of single step gives single inverted step. -/
-theorem symm_single (s : Step α a b) :
+def symm_single (s : Step α a b) :
     (Path.single s).symm = Path.single s.symm := by
   simp [Path.single, Path.symm, Path.trans]
 

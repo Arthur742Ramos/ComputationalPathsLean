@@ -77,7 +77,7 @@ theorem trans_nil_right (p : Path α a b) : p.trans (.nil b) = p := by
   | cons s _ ih => simp [Path.trans, ih]
 
 -- Theorem 9: Step.inv is involutive
-theorem step_inv_inv (s : Step α a b) : s.inv.inv = s := by
+def step_inv_inv (s : Step α a b) : s.inv.inv = s := by
   cases s <;> rfl
 
 -- Theorem 10: inv distributes over trans (anti-homomorphism)
@@ -110,7 +110,7 @@ theorem length_trans (p : Path α a b) (q : Path α b c) :
 theorem length_nil (a : α) : (Path.nil a : Path α a a).length = 0 := rfl
 
 -- Theorem 15: length of single is 1
-theorem length_single (s : Step α a b) : (Path.single s).length = 1 := rfl
+def length_single (s : Step α a b) : (Path.single s).length = 1 := rfl
 
 -- Theorem 16: length preserved by inv
 theorem length_inv (p : Path α a b) : p.inv.length = p.length := by
@@ -189,7 +189,7 @@ theorem map_trans (f : α → β) (p : Path α a b) (q : Path α b c) :
   | cons s _ ih => simp [Path.trans, Path.map, ih]
 
 -- Theorem 27: map preserves step inversion
-theorem map_step_inv (f : α → β) (s : Step α a b) :
+def map_step_inv (f : α → β) (s : Step α a b) :
     (s.inv).map f = (s.map f).inv := by
   cases s <;> rfl
 
@@ -396,7 +396,7 @@ noncomputable def loopMonoid (a : α) : LoopMonoidData α a where
 -- ============================================================
 
 -- Theorem 51: inv of single
-theorem inv_single (s : Step α a b) :
+def inv_single (s : Step α a b) :
     (Path.single s).inv = Path.single s.inv := by
   simp [Path.single, Path.inv, Path.trans]
 
@@ -571,7 +571,7 @@ theorem map_inv_trans_law (f : α → β) (p : Path α a b) (q : Path α b c) :
   rw [inv_trans, map_trans, map_inv, map_inv]
 
 -- Theorem 73: cons decomposition with trans
-theorem cons_as_trans (s : Step α a b) (p : Path α b c) :
+def cons_as_trans (s : Step α a b) (p : Path α b c) :
     Path.cons s p = (Path.single s).trans p := rfl
 
 -- Theorem 74: length of composed isos
@@ -580,7 +580,7 @@ theorem iso_compose_length (i : PathIso α a b) (j : PathIso α b c) :
   simp [PathIso.compose, length_trans]
 
 -- Theorem 75: map commutes with single
-theorem map_single (f : α → β) (s : Step α a b) :
+def map_single (f : α → β) (s : Step α a b) :
     Path.map f (Path.single s) = Path.single (s.map f) := rfl
 
 end CompPaths.GrandUnification

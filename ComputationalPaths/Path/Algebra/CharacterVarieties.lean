@@ -40,7 +40,7 @@ universe u v
 /-! ## Character variety step relation -/
 
 /-- Atomic rewrite steps for character variety identities. -/
-inductive CharVarStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive CharVarStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   | char_refl {A : Type u} (a : A) :
       CharVarStep (Path.refl a) (Path.refl a)
   | char_mul {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :

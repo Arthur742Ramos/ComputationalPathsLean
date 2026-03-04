@@ -107,7 +107,7 @@ inductive CharPhase where
   deriving DecidableEq, Repr
 
 /-- Steps for characteristic map evaluation. -/
-inductive CharStep : CharPhase × Omega → CharPhase × Omega → Prop where
+inductive CharStep : CharPhase × Omega → CharPhase × Omega → Type where
   | classify (v : Omega) : CharStep (.input, v) (.classified, v)
   | verify   (v : Omega) : CharStep (.classified, v) (.verified, v)
 
@@ -217,12 +217,12 @@ theorem charFullPath_exists (v : Omega) :
   ⟨charFullPath v, trivial⟩
 
 /-- Theorem 20: Classify step preserves truth value. -/
-theorem classify_preserves (v : Omega) :
+def classify_preserves (v : Omega) :
     CharStep (.input, v) (.classified, v) :=
   CharStep.classify v
 
 /-- Theorem 21: Verify step preserves truth value. -/
-theorem verify_preserves (v : Omega) :
+def verify_preserves (v : Omega) :
     CharStep (.classified, v) (.verified, v) :=
   CharStep.verify v
 
@@ -251,7 +251,7 @@ inductive PBStep where
   deriving DecidableEq, Repr
 
 /-- Pullback verification path. -/
-inductive PBPath : List PBStep → List PBStep → Prop where
+inductive PBPath : List PBStep → List PBStep → Type where
   | refl (s : List PBStep) : PBPath s s
   | extend (h : PBStep) : PBPath xs ys → PBPath (h :: xs) (h :: ys)
 

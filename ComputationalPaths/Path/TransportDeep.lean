@@ -274,23 +274,23 @@ noncomputable def fourStep {e : α} (p : Path a b) (q : Path b c) (r : Path c d)
     (s : Path d e) : Path a e :=
   Path.trans p (Path.trans q (Path.trans r s))
 
-theorem threeStep_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
+def threeStep_assoc (p : Path a b) (q : Path b c) (r : Path c d) :
     Path.trans (Path.trans p q) r = threeStep p q r :=
   Path.trans_assoc p q r
 
 /-! ## 52-54. Four-step associativity -/
 
-theorem fourStep_assoc1 {e : α} (p : Path a b) (q : Path b c)
+def fourStep_assoc1 {e : α} (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) :
     Path.trans (Path.trans (Path.trans p q) r) s = fourStep p q r s := by
   simp [fourStep]
 
-theorem fourStep_assoc2 {e : α} (p : Path a b) (q : Path b c)
+def fourStep_assoc2 {e : α} (p : Path a b) (q : Path b c)
     (r : Path c d) (s : Path d e) :
     Path.trans p (Path.trans (Path.trans q r) s) = fourStep p q r s := by
   simp [fourStep]
 
-theorem fourStep_congrArg_toEq {β : Type u} {e : α} (f : α → β) (p : Path a b)
+def fourStep_congrArg_toEq {β : Type u} {e : α} (f : α → β) (p : Path a b)
     (q : Path b c) (r : Path c d) (s : Path d e) :
     (ap f (fourStep p q r s)).toEq =
     (fourStep (ap f p) (ap f q) (ap f r) (ap f s)).toEq :=
@@ -318,7 +318,7 @@ theorem hcomp_toEq {a b c : α} (p : Path a b) (q : Path b c) :
     (hcomp p q).toEq = p.toEq.trans q.toEq :=
   Subsingleton.elim _ _
 
-theorem threeStep_toEq (p : Path a b) (q : Path b c) (r : Path c d) :
+def threeStep_toEq (p : Path a b) (q : Path b c) (r : Path c d) :
     (threeStep p q r).toEq = (Path.trans (Path.trans p q) r).toEq :=
   Subsingleton.elim _ _
 

@@ -603,7 +603,7 @@ theorem ext_sq_zero_length (n : Nat) : (ext_connecting_sq_zero n).length = 2 := 
 theorem nil_path_length (a : Mor) : (Path.nil a : MP a a).length = 0 := rfl
 
 -- 77
-theorem single_step_length (s : Step Mor a b) : (Path.single s).length = 1 := rfl
+def single_step_length (s : Step Mor a b) : (Path.single s).length = 1 := rfl
 
 -- 78
 theorem add_zero_twice_length (f : Mor) : (add_zero_twice_path f).length = 2 := rfl

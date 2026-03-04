@@ -45,7 +45,7 @@ noncomputable def segLoop0 : Path i0 i0 :=
 noncomputable def segLoop1 : Path i1 i1 :=
   Path.trans segSym seg
 
-theorem interval_thm01_seg_steps :
+def interval_thm01_seg_steps :
     seg.steps = [Step.mk i0 i1 rfl] := rfl
 
 theorem interval_thm02_seg_toEq :
@@ -269,7 +269,7 @@ theorem kan_thm39_compPath_congrArg_symm (B : KanBox) :
 theorem kan_thm40_fillPath_def (B : KanBox) :
     fillPath B = Path.symm (compPath B) := rfl
 
-theorem kan_thm41_compPath_steps (B : KanBox) :
+def kan_thm41_compPath_steps (B : KanBox) :
     (compPath B).steps = [Step.mk (composition B) (filling B) rfl] := rfl
 
 theorem kan_thm42_comp_fill_toEq (B : KanBox) :

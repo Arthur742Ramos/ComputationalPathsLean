@@ -113,11 +113,11 @@ theorem dj_constant (v : Bool) : deutschJozsa1 (constOracle 1 v) = false := by
 theorem grover_init_iter : groverInit.iteration = 0 := rfl
 
 -- 4. Grover step increments iteration
-theorem grover_step_iter (gs : GroverState) (s : Bool) :
+def grover_step_iter (gs : GroverState) (s : Bool) :
     (groverStep gs s).iteration = gs.iteration + 1 := rfl
 
 -- 5. Grover found is monotone
-theorem grover_found_monotone (gs : GroverState) (s : Bool) :
+def grover_found_monotone (gs : GroverState) (s : Bool) :
     gs.found = true → (groverStep gs s).found = true := by
   intro h; simp [h]
 
@@ -126,7 +126,7 @@ noncomputable def grover_found_path (gs : GroverState) (s : Bool) (h : gs.found 
   Path.mk [Step.mk _ _ (grover_found_monotone gs s h)] (grover_found_monotone gs s h)
 
 -- 6. Grover with success finds
-theorem grover_success (gs : GroverState) :
+def grover_success (gs : GroverState) :
     (groverStep gs true).found = true := by simp
 
 -- 7. QFT followed by inverse is identity
@@ -235,7 +235,7 @@ theorem qalg_path_coherence {a b : Bool} (p q : Path a b) :
   Subsingleton.elim _ _
 
 -- 23. Symm of QFT path
-theorem qft_path_symm (n : Nat) (k : Fin (2^n)) :
+def qft_path_symm (n : Nat) (k : Fin (2^n)) :
     Path.symm (qft_iqft_path n k) =
       Path.mk [Step.mk _ _ (qft_iqft n k).symm] (qft_iqft n k).symm := rfl
 

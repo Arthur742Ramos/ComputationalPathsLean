@@ -258,7 +258,7 @@ theorem polygraph_dimension_three :
     coherentPresentation_groupoid.numGenerators = 9 := rfl
 
 /-- Convergence of the groupoid polygraph: confluence + termination. -/
-theorem convergence :
+def convergence :
     (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
     WellFounded (fun q p : Expr => CStep p q) :=
   ⟨confluence, cstep_termination⟩
@@ -281,7 +281,7 @@ theorem gen3_join_correct (p q : Expr) :
   simp [gen3_refl_left_assoc, toRW]
 
 /-- The coherent presentation is complete: 9 families suffice for all forks. -/
-theorem coherent_presentation_complete :
+def coherent_presentation_complete :
     ∀ a b c : Expr, CStep a b → CStep a c →
     ∃ d, CRTC b d ∧ CRTC c d :=
   local_confluence

@@ -68,14 +68,14 @@ theorem path_length_trans (p : Path α a b) (q : Path α b c) :
   | nil _ => simp [Path.trans, Path.length]
   | cons s _ ih => simp [Path.trans, Path.length, ih, Nat.add_assoc]
 
-theorem single_length (s : Step α a b) : (Path.single s).length = 1 := by
+def single_length (s : Step α a b) : (Path.single s).length = 1 := by
   simp [Path.single, Path.length]
 
-theorem two_step_length (s1 : Step α a b) (s2 : Step α b c) :
+def two_step_length (s1 : Step α a b) (s2 : Step α b c) :
     (Path.cons s1 (Path.single s2)).length = 2 := by
   simp [Path.single, Path.length]
 
-theorem three_step_length (s1 : Step α a b) (s2 : Step α b c) (s3 : Step α c d) :
+def three_step_length (s1 : Step α a b) (s2 : Step α b c) (s3 : Step α c d) :
     (Path.cons s1 (Path.cons s2 (Path.single s3))).length = 3 := by
   simp [Path.single, Path.length]
 
@@ -654,12 +654,12 @@ theorem map_path_trans (f : α → β) (p : Path α a b) (q : Path α b c) :
     | rule _ _ _ => simp [Path.trans, mapPath, ih]
 
 -- Theorem 49: Trans of single steps gives length 2
-theorem single_trans_length (s1 : Step α a b) (s2 : Step α b c) :
+def single_trans_length (s1 : Step α a b) (s2 : Step α b c) :
     (Path.trans (Path.single s1) (Path.single s2)).length = 2 := by
   simp [Path.single, Path.trans, Path.length]
 
 -- Theorem 50: Symm of single preserves length
-theorem symm_single_length (s : Step α a b) :
+def symm_single_length (s : Step α a b) :
     (Path.single s).symm.length = 1 := by
   simp [Path.single, Path.symm, Path.trans, Path.length]
 

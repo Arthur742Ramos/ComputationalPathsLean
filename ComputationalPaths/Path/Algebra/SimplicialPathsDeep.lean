@@ -117,7 +117,7 @@ theorem length_trans : (p : Path s t) → (q : Path t u) →
     omega
 
 /-- Theorem 9 — single has length 1. -/
-theorem single_length (st : Step s t) : (Path.single st).length = 1 := rfl
+def single_length (st : Step s t) : (Path.single st).length = 1 := rfl
 
 /-- Theorem 10 — refl has length 0. -/
 theorem refl_length (s : Simplex) : (Path.refl s).length = 0 := rfl
@@ -572,7 +572,7 @@ noncomputable def Path.congrArg (f : Simplex → Simplex)
   | Path.cons st p => Path.cons (fStep _ _ st) (Path.congrArg f fStep p)
 
 /-- Theorem 44 — congrArg preserves length. -/
-theorem congrArg_length (f : Simplex → Simplex)
+def congrArg_length (f : Simplex → Simplex)
     (fStep : (s t : Simplex) → Step s t → Step (f s) (f t))
     (p : Path s t) :
     (Path.congrArg f fStep p).length = p.length := by
@@ -581,7 +581,7 @@ theorem congrArg_length (f : Simplex → Simplex)
   | cons st p ih => simp [Path.congrArg, Path.length, ih]
 
 /-- Theorem 45 — congrArg preserves trans. -/
-theorem congrArg_trans (f : Simplex → Simplex)
+def congrArg_trans (f : Simplex → Simplex)
     (fStep : (s t : Simplex) → Step s t → Step (f s) (f t))
     (p : Path s t) (q : Path t u) :
     Path.congrArg f fStep (Path.trans p q) =

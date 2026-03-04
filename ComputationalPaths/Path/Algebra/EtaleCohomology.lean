@@ -207,7 +207,7 @@ noncomputable def dualDegree (n i : Nat) : Nat := 2 * n - i
 -- ============================================================================
 
 /-- Rewrite steps for étale cohomology -/
-inductive EtaleStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive EtaleStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   /-- Restriction step -/
   | restrict {A : Type u} {a : A} (p : Path a a) :
       EtaleStep p (Path.refl a)

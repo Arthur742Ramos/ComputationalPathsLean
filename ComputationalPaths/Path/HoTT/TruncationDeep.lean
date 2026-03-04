@@ -85,7 +85,7 @@ theorem isProp_triple_assoc (h : IsProp A) (a b c d : A) :
 /-! ## Deeper set theory -/
 
 /-- 11. In a set, the proof of any ofEq path equals the proof of any other. -/
-theorem isSet_ofEq_proofs (h : IsSet A) {a b : A} (p q : a = b) :
+def isSet_ofEq_proofs (h : IsSet A) {a b : A} (p q : a = b) :
     (Path.mk [Step.mk _ _ p] p).toEq = (Path.mk [Step.mk _ _ q] q).toEq :=
   h.proofEq (Path.mk [Step.mk _ _ p] p) (Path.mk [Step.mk _ _ q] q)
 

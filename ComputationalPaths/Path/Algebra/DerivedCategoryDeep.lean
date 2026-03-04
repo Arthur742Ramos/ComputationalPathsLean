@@ -748,12 +748,12 @@ noncomputable def verdierStep (C : ChainComplex) (sub : ChainComplex) :
   (Path.single s1).trans (Path.single s2)
 
 /-- Theorem 42: Verdier quotient step has length 2. -/
-theorem verdier_step_length (C sub : ChainComplex) :
+def verdier_step_length (C sub : ChainComplex) :
     (verdierStep C sub).length = 2 := by
   simp [verdierStep, Path.trans, Path.single, Path.length]
 
 /-- Theorem 43: Verdier step reversed has length 2. -/
-theorem verdier_step_symm_length (C sub : ChainComplex) :
+def verdier_step_symm_length (C sub : ChainComplex) :
     (verdierStep C sub).symm.length = 2 := by
   simp [verdierStep, Path.symm, Path.trans, Path.single, Path.length, Step.symm]
 

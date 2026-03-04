@@ -114,7 +114,7 @@ def factorization_triv_cof_fib_step_witness {a b : A} (p : Path a b) :
   exact Step.trans_refl_left p
 
 /-- Step-level data for cofibration-trivial-fibration factorization. -/
-theorem factorization_cof_triv_fib_step_factorization {a b : A} (p : Path a b) :
+def factorization_cof_triv_fib_step_factorization {a b : A} (p : Path a b) :
     ∃ (c : A) (i : Path a c) (q : Path c b),
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).fib q ∧
@@ -125,7 +125,7 @@ theorem factorization_cof_triv_fib_step_factorization {a b : A} (p : Path a b) :
   · exact ⟨factorization_cof_triv_fib_step_witness (A := A) p⟩
 
 /-- Step-level data for trivial-cofibration-fibration factorization. -/
-theorem factorization_triv_cof_fib_step_factorization {a b : A} (p : Path a b) :
+def factorization_triv_cof_fib_step_factorization {a b : A} (p : Path a b) :
     ∃ (c : A) (i : Path a c) (q : Path c b),
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).weq i ∧
@@ -176,7 +176,7 @@ noncomputable def factorization_triv_cof_fib_rweq_from_step {a b : A} (p : Path 
   exact rweq_of_step (factorization_triv_cof_fib_step_witness (A := A) p)
 
 /-- Step-level factorization can be packaged with a trivial fibration witness. -/
-theorem factorization_cof_triv_fib_step_trivial_fibration {a b : A} (p : Path a b) :
+def factorization_cof_triv_fib_step_trivial_fibration {a b : A} (p : Path a b) :
     ∃ (c : A) (i : Path a c) (q : Path c b),
       (pathModelCategory A).cof i ∧
       ModelCategory.trivialFibration (pathModelCategory A) q ∧
@@ -186,7 +186,7 @@ theorem factorization_cof_triv_fib_step_trivial_fibration {a b : A} (p : Path a 
   · exact ⟨factorization_cof_triv_fib_step_witness (A := A) p⟩
 
 /-- Step-level factorization can be packaged with a trivial cofibration witness. -/
-theorem factorization_triv_cof_fib_step_trivial_cofibration {a b : A} (p : Path a b) :
+def factorization_triv_cof_fib_step_trivial_cofibration {a b : A} (p : Path a b) :
     ∃ (c : A) (i : Path a c) (q : Path c b),
       ModelCategory.trivialCofibration (pathModelCategory A) i ∧
       (pathModelCategory A).fib q ∧

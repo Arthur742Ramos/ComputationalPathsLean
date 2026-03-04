@@ -226,7 +226,7 @@ theorem newman {step : A → A → Prop} (hT : SN step) (hLC : WCR step) :
 
 /-! ## Parallel Reduction -/
 
-inductive ParStep (step : A → A → Prop) : A → A → Prop where
+inductive ParStep (step : A → A → Type) : A → A → Type where
   | refl : ParStep step a a
   | lift : step a b → ParStep step a b
 
@@ -343,7 +343,7 @@ theorem toPath_toEq_symm {a b : A} (h : a = b) :
   simp
 
 /-- Reflexive path from `rfl`. -/
-theorem toPath_refl (a : A) : toPath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl
+def toPath_refl (a : A) : toPath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl
 
 /-- RwEq form of transport along `toPath`. -/
 noncomputable def transport_via_toPath_rweq {a b : A} {D : A → Type u} (h : a = b) (x : D a) :

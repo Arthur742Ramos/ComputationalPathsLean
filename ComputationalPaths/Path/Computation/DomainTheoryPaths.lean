@@ -248,7 +248,7 @@ noncomputable def deflation_fixedPoint (f : CPOElem → CPOElem) (d : Deflation 
   fixedPointOfEq f (f x) (d.idempotent x)
 
 /-- Deflation composed with itself yields path to same target. -/
-theorem deflation_double_below_proof (f : CPOElem → CPOElem) (d : Deflation f) (x : CPOElem) :
+def deflation_double_below_proof (f : CPOElem → CPOElem) (d : Deflation f) (x : CPOElem) :
     (d.below (f x)).proof.symm =
       (Path.mk [Step.mk _ _ (d.idempotent x).symm] (d.idempotent x).symm).proof := by
   simp

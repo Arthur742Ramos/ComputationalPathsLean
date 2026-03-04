@@ -720,12 +720,12 @@ theorem exact_tri_len (s t cone : N) :
 -- ============================================================
 
 -- Theorem 80: single step length
-theorem single_step_len (s : Step N a b) :
+def single_step_len (s : Step N a b) :
     (Path.single s).length = 1 := by
   simp [Path.single, Path.length]
 
 -- Theorem 81: symm of single
-theorem symm_single_len (s : Step N a b) :
+def symm_single_len (s : Step N a b) :
     (Path.single s).symm.length = 1 := by
   simp [Path.single, Path.symm, Path.trans, Path.length, Step.symm]
 

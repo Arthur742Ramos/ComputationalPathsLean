@@ -125,7 +125,7 @@ noncomputable def fiber_trans {A : Type u} {a b c : A}
 /-! ## StackStep Inductive -/
 
 /-- Rewrite steps for stack-related computational paths. -/
-inductive StackStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive StackStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   /-- Cartesian lift uniqueness step: two lifts of the same morphism are related. -/
   | lift_unique {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : StackStep p q

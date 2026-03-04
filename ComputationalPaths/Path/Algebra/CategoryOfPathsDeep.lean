@@ -78,7 +78,7 @@ theorem length_trans (p : Path α a b) (q : Path α b c) :
   | cons s _ ih => simp [Path.trans, Path.length, ih, Nat.add_assoc]
 
 /-- Theorem 5 -/
-theorem single_length (s : Step α a b) :
+def single_length (s : Step α a b) :
     (Path.single s).length = 1 := by
   simp [Path.single, Path.length]
 
@@ -87,11 +87,11 @@ theorem single_length (s : Step α a b) :
 -- ============================================================
 
 /-- Theorem 6 -/
-theorem step_refl_symm (a : α) :
+def step_refl_symm (a : α) :
     Step.symm (Step.refl a) = Step.refl a := rfl
 
 /-- Theorem 7 -/
-theorem step_rule_symm (n : String) (a b : α) :
+def step_rule_symm (n : String) (a b : α) :
     Step.symm (Step.rule n a b) = Step.rule (n ++ "⁻¹") b a := rfl
 
 /-- Theorem 8 -/
@@ -172,7 +172,7 @@ theorem functor_preserves_length (F : PathFunctor α β) (p : Path α a b) :
   | cons s _ ih => simp [PathFunctor.mapPath, Path.length, ih]
 
 /-- Theorem 17 -/
-theorem functor_preserves_single (F : PathFunctor α β) (s : Step α a b) :
+def functor_preserves_single (F : PathFunctor α β) (s : Step α a b) :
     F.mapPath (Path.single s) = Path.single (F.mapStep s) := by
   simp [Path.single, PathFunctor.mapPath]
 
@@ -335,7 +335,7 @@ theorem yonedaMap_trans (a : α) (p : Path α x y) (q : Path α y z)
   simp [yonedaMap, trans_assoc]
 
 /-- Theorem 31 -/
-theorem yonedaMap_single (a : α) (s : Step α x y) (r : yonedaObj a x) :
+def yonedaMap_single (a : α) (s : Step α x y) (r : yonedaObj a x) :
     yonedaMap a (Path.single s) r =
     Path.trans r (Path.single s) := rfl
 

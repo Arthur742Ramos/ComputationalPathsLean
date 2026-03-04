@@ -386,7 +386,7 @@ theorem sym_comm_roundtrip (a b : Int) :
   simp
 
 -- 49
-theorem neg_neg_roundtrip (e : KExpr) :
+def neg_neg_roundtrip (e : KExpr) :
     eval_eq (step (KStep.neg_neg e)) = Int.neg_neg (e.eval) := by
   simp
 
@@ -408,7 +408,7 @@ theorem toPath_eval {a b : KExpr} (p : KPath a b) :
     (toPath p).toEq = eval_eq p := rfl
 
 -- 52
-theorem toPath_step {a b : KExpr} (s : KStep a b) :
+def toPath_step {a b : KExpr} (s : KStep a b) :
     (toPath (step s)).toEq = KStep.eval_eq s := by
   have hId :
       ComputationalPaths.Path.congrArg (fun x : Int => x) (toPath (step s)) =

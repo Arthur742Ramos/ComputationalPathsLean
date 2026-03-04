@@ -296,7 +296,7 @@ noncomputable def motivicAdemPath {α : Type u} (s : MotivicSteenrodData α) :
 -- ============================================================================
 
 /-- Rewrite steps for motivic cohomology -/
-inductive MotivicCohStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive MotivicCohStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   /-- Cycle class step -/
   | cycle_class {A : Type u} {a : A} (p : Path a a) :
       MotivicCohStep p (Path.refl a)

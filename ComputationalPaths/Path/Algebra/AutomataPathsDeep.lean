@@ -112,7 +112,7 @@ theorem DFA.deltaStar_singleton (M : DFA) (q : AState) (a : ASym) :
 -- ============================================================
 
 /-- One-step DFA transition. -/
-inductive DFAStep (M : DFA) : AState → AState → Prop where
+inductive DFAStep (M : DFA) : AState → AState → Type where
   | read (q : AState) (a : ASym) : DFAStep M q (M.delta q a)
   | readAt {q q' : AState} (a : ASym) (heq : q' = M.delta q a) : DFAStep M q q'
 
@@ -177,7 +177,7 @@ theorem NFA.deltaSetStar_nil (N : NFA) (qs : List AState) :
     N.deltaSetStar qs [] = qs := rfl
 
 /-- Theorem 11: NFA deltaSetStar on cons. -/
-theorem NFA.deltaSetStar_cons (N : NFA) (qs : List AState) (a : ASym) (w : List ASym) :
+def NFA.deltaSetStar_cons (N : NFA) (qs : List AState) (a : ASym) (w : List ASym) :
     N.deltaSetStar qs (a :: w) = N.deltaSetStar (N.deltaSetStep qs a) w := rfl
 
 /-- Theorem 12: NFA deltaSetStar on append (path trans). -/
@@ -544,7 +544,7 @@ theorem DFA.product_deltaStar_decompose (M₁ M₂ : DFA)
 -- ============================================================
 
 /-- Closure step: one closure operation on a language class. -/
-inductive ClosureStep : String → String → Prop where
+inductive ClosureStep : String → String → Type where
   | union         : ClosureStep "L₁" "L₁ ∪ L₂"
   | intersection  : ClosureStep "L₁" "L₁ ∩ L₂"
   | complementOp  : ClosureStep "L" "L̄"

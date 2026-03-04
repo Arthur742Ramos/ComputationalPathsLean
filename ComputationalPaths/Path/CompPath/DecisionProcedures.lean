@@ -301,7 +301,7 @@ theorem pathTrace_trans {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) :
     pathTrace (Path.trans p q) = pathTrace p ++ pathTrace q := rfl
 
-theorem pathTrace_symm {A : Type u} {a b : A} (p : Path a b) :
+def pathTrace_symm {A : Type u} {a b : A} (p : Path a b) :
     pathTrace (Path.symm p) = (pathTrace p).reverse.map Step.symm := rfl
 
 noncomputable def pathTraceLen {A : Type u} {a b : A} (p : Path a b) : Nat :=

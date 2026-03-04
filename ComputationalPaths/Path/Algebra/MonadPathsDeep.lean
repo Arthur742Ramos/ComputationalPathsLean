@@ -34,7 +34,7 @@ infixl:70 " ∘ₘ " => MExpr.comp
 -- ============================================================
 
 /-- One-step rewrites capturing monad axioms and Kleisli laws. -/
-inductive MStep : MExpr → MExpr → Prop where
+inductive MStep : MExpr → MExpr → Type where
   -- Category laws
   | idL  (f : MExpr) : MStep (.id ∘ₘ f) f
   | idL' (f : MExpr) : MStep f (.id ∘ₘ f)
@@ -216,7 +216,7 @@ structure MonadMorph where
 deriving DecidableEq, Repr
 
 /-- Rewrite steps for monad morphisms. -/
-inductive MMStep : MExpr → MExpr → Prop where
+inductive MMStep : MExpr → MExpr → Type where
   | base : MStep a b → MMStep a b
   | morph_eta (σ : MonadMorph) :
       MMStep (.eta σ.src) (.eta σ.tgt)  -- σ ∘ η_s = η_t
@@ -263,7 +263,7 @@ inductive FreeExpr where
 deriving DecidableEq, Repr
 
 /-- Rewriting steps for free monad. -/
-inductive FStep : FreeExpr → FreeExpr → Prop where
+inductive FStep : FreeExpr → FreeExpr → Type where
   | bindPure (n : Nat) (k : FreeExpr) :
       FStep (.bind (.pure n) k) k
   | bindPure' (n : Nat) (k : FreeExpr) :
@@ -341,7 +341,7 @@ inductive EffExpr where
 deriving DecidableEq, Repr
 
 /-- Effect rewriting steps. -/
-inductive EStep : EffExpr → EffExpr → Prop where
+inductive EStep : EffExpr → EffExpr → Type where
   | handleRet (n : Nat) (h : Nat) :
       EStep (.handle (.ret n) h) (.ret n)
   | handleRet' (n : Nat) (h : Nat) :
@@ -405,7 +405,7 @@ deriving DecidableEq, Repr
 infixl:70 " ∘ₑₘ " => EMExpr.comp
 
 /-- EM algebra rewriting steps. -/
-inductive EMStep : EMExpr → EMExpr → Prop where
+inductive EMStep : EMExpr → EMExpr → Type where
   | unitLaw (n a : Nat) : EMStep (.struct n a ∘ₑₘ .idEM) (.struct n a)
   | unitLaw' (n a : Nat) : EMStep (.struct n a) (.struct n a ∘ₑₘ .idEM)
   | assocLaw (n a : Nat) :
@@ -477,7 +477,7 @@ deriving DecidableEq, Repr
 infixl:70 " ∘ₐ " => AdjExpr.comp
 
 /-- Adjunction rewriting steps (triangle identities). -/
-inductive AdjStep : AdjExpr → AdjExpr → Prop where
+inductive AdjStep : AdjExpr → AdjExpr → Type where
   | triL (n : Nat) : AdjStep (.counit n ∘ₐ .free n ∘ₐ .unit n) (.free n)
   | triL' (n : Nat) : AdjStep (.free n) (.counit n ∘ₐ .free n ∘ₐ .unit n)
   | triR (n : Nat) : AdjStep (.forget n ∘ₐ .counit n ∘ₐ .unit n) (.forget n)
@@ -519,7 +519,7 @@ theorem adj_triangle_right (n : Nat) :
 -- ============================================================
 
 /-- Distributive law: λ : S∘T → T∘S satisfying compatibility. -/
-inductive DLStep : MExpr → MExpr → Prop where
+inductive DLStep : MExpr → MExpr → Type where
   | base : MStep a b → DLStep a b
   | distLaw (s t : Nat) :
       DLStep (.T s ∘ₘ .T t) (.T t ∘ₘ .T s)
@@ -573,7 +573,7 @@ deriving DecidableEq, Repr
 infixl:70 " ∘ₜ " => TrExpr.comp
 
 /-- Transformer rewriting steps. -/
-inductive TrStep : TrExpr → TrExpr → Prop where
+inductive TrStep : TrExpr → TrExpr → Type where
   | liftComp (n : Nat) (a b : TrExpr) :
       TrStep (.lift n (a ∘ₜ b)) (.lift n a ∘ₜ .lift n b)
   | liftComp' (n : Nat) (a b : TrExpr) :

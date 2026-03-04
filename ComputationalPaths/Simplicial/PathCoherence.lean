@@ -68,7 +68,7 @@ noncomputable def mapPath (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj
   Path.trans (Path.congrArg (F.map n) p) (Path.refl (F.map n y))
 
 /-- `mapPath` reduces to plain `congrArg` in one rewrite step. -/
-theorem mapPath_step (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj n}
+noncomputable def mapPath_step (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj n}
     (p : Path x y) :
     Path.Step (F.mapPath p) (Path.congrArg (F.map n) p) := by
   simpa [mapPath] using Path.Step.trans_refl_right (Path.congrArg (F.map n) p)

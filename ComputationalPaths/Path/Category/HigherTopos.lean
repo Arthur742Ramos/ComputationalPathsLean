@@ -87,7 +87,7 @@ structure DescentDatum (Idx : Type u) (Fiber : Idx → Type u) where
 
 /-- Rewrite steps for topos-theoretic operations. Each constructor captures
     an atomic reduction rule for descent, truncation, or base change. -/
-inductive ToposStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive ToposStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   /-- Descent transition along refl reduces to identity. -/
   | descent_refl_beta {Idx : Type u} {F : Idx → Type u}
       (D : DescentDatum Idx F) (i : Idx) (x : F i) :

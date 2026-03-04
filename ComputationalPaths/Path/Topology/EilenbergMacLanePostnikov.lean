@@ -40,7 +40,7 @@ universe u v
 /-! ## EM space step relation -/
 
 /-- Atomic rewrite steps for Eilenberg-MacLane and Postnikov identities. -/
-inductive EMStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive EMStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   | loop_refl {A : Type u} (a : A) :
       EMStep (Path.refl a) (Path.refl a)
   | loop_comp {A : Type u} {a b c : A} (p : Path a b) (q : Path b c) :

@@ -184,7 +184,7 @@ theorem omega_map_comp (f : A → B) {a : A} (p q : Omega A a) :
   unfold omega_map omega_comp; simp
 
 /-- Step.map f commutes with Step.symm. -/
-private theorem step_map_symm_comm (f : A → B) (s : ComputationalPaths.Step A) :
+private def step_map_symm_comm (f : A → B) (s : ComputationalPaths.Step A) :
     ComputationalPaths.Step.map f (ComputationalPaths.Step.symm s) =
       ComputationalPaths.Step.symm (ComputationalPaths.Step.map f s) := by
   cases s; rfl
@@ -195,7 +195,7 @@ theorem omega_map_inv (f : A → B) {a : A} (p : Omega A a) :
   exact Path.congrArg_symm f p
 
 /-- Step.map distributes over composition. -/
-private theorem step_map_comp (f : B → C) (g : A → B) (s : ComputationalPaths.Step A) :
+private def step_map_comp (f : B → C) (g : A → B) (s : ComputationalPaths.Step A) :
     ComputationalPaths.Step.map (fun x => f (g x)) s =
       ComputationalPaths.Step.map f (ComputationalPaths.Step.map g s) := by
   cases s; rfl
@@ -206,7 +206,7 @@ theorem omega_map_comp_fun (f : B → C) (g : A → B) {a : A} (p : Omega A a) :
   exact Path.congrArg_comp f g p
 
 /-- Step.map id is identity. -/
-private theorem step_map_id_eq (s : ComputationalPaths.Step A) :
+private def step_map_id_eq (s : ComputationalPaths.Step A) :
     ComputationalPaths.Step.map (fun x : A => x) s = s := by
   cases s; simp
 

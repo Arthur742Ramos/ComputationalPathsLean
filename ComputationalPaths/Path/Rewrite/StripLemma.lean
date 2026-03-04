@@ -119,14 +119,14 @@ noncomputable def StripWitness.comp {A : Type u} {a b : A}
 /-! ## Preservation Theorems -/
 
 /-- The strip join preserves propositional equality. -/
-theorem strip_preserves_toEq {p q r : Path a b}
+def strip_preserves_toEq {p q r : Path a b}
     (hstep : Step (A := A) p q)
     (hrw : Rw (A := A) (a := a) (b := b) p r) :
     q.toEq = r.toEq :=
   (step_toEq hstep).symm.trans (rw_toEq hrw)
 
 /-- A single-step rewrite preserves toEq. -/
-theorem single_step_toEq_eq {p q : Path a b}
+def single_step_toEq_eq {p q : Path a b}
     (h : Step (A := A) p q) : p.toEq = q.toEq :=
   step_toEq h
 
@@ -165,7 +165,7 @@ theorem join_symm_prop {p q : Path a b}
   exact ⟨s, hqs, hps⟩
 
 /-- If p → q by a step, then p and q are joinable. -/
-theorem joinable_of_step {p q : Path a b}
+def joinable_of_step {p q : Path a b}
     (h : Step (A := A) p q) : Joinable p q :=
   ⟨q, rw_of_step h, Rw.refl q⟩
 

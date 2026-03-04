@@ -221,7 +221,7 @@ noncomputable def exprMeasure4 (e : Expr) : Nat × Nat × Nat × Nat :=
   (0, Expr.weight e, 0, Expr.leftWeight e)
 
 /-- Every Expr.Step strictly decreases the 4-component measure. -/
-theorem exprStep_measure4_decrease {p q : Expr} (h : Expr.Step p q) :
+def exprStep_measure4_decrease {p q : Expr} (h : Expr.Step p q) :
     NatLex4 (exprMeasure4 q) (exprMeasure4 p) := by
   have hlex := Expr.step_lex_decrease h
   unfold exprMeasure4 NatLex4
@@ -234,7 +234,7 @@ theorem exprStep_measure4_decrease {p q : Expr} (h : Expr.Step p q) :
     exact ⟨rfl, hw, rfl, hl⟩
 
 /-- The Expr.Step relation is well-founded (alternative proof via 4-component measure). -/
-theorem exprStep_wf_via_multi : WellFounded (fun q p : Expr => Expr.Step p q) :=
+def exprStep_wf_via_multi : WellFounded (fun q p : Expr => Expr.Step p q) :=
   Subrelation.wf
     (fun h => exprStep_measure4_decrease h)
     (InvImage.wf exprMeasure4 natLex4_wf)

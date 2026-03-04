@@ -17,7 +17,7 @@ universe u v
 
 /-- Domain-specific rewrite steps for mixed-Hodge filtration computations. -/
 inductive MixedHodgeStep {H : Type u} :
-    {a b : H} → Path a b → Path a b → Prop where
+    {a b : H} → Path a b → Path a b → Type u where
   | weight_right_unit {a b : H} (p : Path a b) :
       MixedHodgeStep (Path.trans p (Path.refl b)) p
   | hodge_left_unit {a b : H} (p : Path a b) :

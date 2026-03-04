@@ -677,7 +677,7 @@ inductive LTS : CProc → Action → CProc → Prop where
 notation P " —[" a "]→ " Q => LTS P a Q
 
 /-- Multi-step transition (trace execution) -/
-inductive MultiStep : CProc → List Action → CProc → Prop where
+inductive MultiStep : CProc → List Action → CProc → Type where
   | empty : MultiStep P [] P
   | step : LTS P a Q → MultiStep Q t R → MultiStep P (a :: t) R
 
@@ -942,7 +942,7 @@ theorem empty_trace_refl {P Q : CProc} (h : MultiStep P [] Q) : P = Q := by
 -- Theorem 77: Single step trace
 -- ============================================================
 
-theorem single_step_trace {P Q : CProc} {a : Action}
+def single_step_trace {P Q : CProc} {a : Action}
     (h : P —[a]→ Q) : MultiStep P [a] Q :=
   MultiStep.step h MultiStep.empty
 
@@ -950,7 +950,7 @@ theorem single_step_trace {P Q : CProc} {a : Action}
 -- Theorem 78: Trace concatenation
 -- ============================================================
 
-theorem trace_concat {P Q R : CProc} {t1 t2 : List Action}
+def trace_concat {P Q R : CProc} {t1 t2 : List Action}
     (h1 : MultiStep P t1 Q) (h2 : MultiStep Q t2 R) :
     MultiStep P (t1 ++ t2) R := by
   induction h1 with

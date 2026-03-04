@@ -463,7 +463,7 @@ noncomputable def locFunctor_double_map (L : LocalizationFunctor A)
   rweq_of_step (Path.Step.trans_refl_right (L.mapPath p))
 
 /-- Theorem 49: Reflection and map compose to produce a step. -/
-theorem locFunctor_reflect_step (L : LocalizationFunctor A)
+def locFunctor_reflect_step (L : LocalizationFunctor A)
     {a b : A} (q : Path (L.obj a) (L.obj b)) :
     Path.Step (Path.congrArg L.obj (L.reflectPath q)) q :=
   L.reflect_step q

@@ -78,7 +78,7 @@ theorem Path.length_nil {α : Type} (a : α) :
     (Path.nil a).length = 0 := rfl
 
 /-- Theorem 5: length of single. -/
-theorem Path.length_single {α : Type} {a b : α} (s : Step α a b) :
+def Path.length_single {α : Type} {a b : α} (s : Step α a b) :
     (Path.single s).length = 1 := rfl
 
 /-- Theorem 6: length distributes over trans. -/
@@ -297,7 +297,7 @@ theorem UEq.id_unifies_refl (t : Tm) :
 -- §12  Martelli-Montanari steps
 -- ============================================================
 
-inductive MMStep : UProblem → UProblem → Prop where
+inductive MMStep : UProblem → UProblem → Type where
   | delete (t : Tm) (rest : UProblem) :
       MMStep (⟨t, t⟩ :: rest) rest
   | decompose (l₁ l₂ r₁ r₂ : Tm) (rest : UProblem) :
@@ -583,7 +583,7 @@ theorem Joinable.symm' {R : Tm → Tm → Prop} {s t : Tm}
 -- §22  Narrowing
 -- ============================================================
 
-inductive NarrowStep (rules : List RRule) : Tm → Tm → Prop where
+inductive NarrowStep (rules : List RRule) : Tm → Tm → Type where
   | atRoot (r : RRule) (σ : Subst) (t : Tm)
       (hr : r ∈ rules) (hUnif : applyS σ r.lhs = applyS σ t) :
       NarrowStep rules t (applyS σ r.rhs)

@@ -159,7 +159,7 @@ theorem seven_nil {α : Type u} (a : α) :
       (pTrans (CPath.nil a) (pTrans (CPath.nil a)
         (pTrans (CPath.nil a) (pTrans (CPath.nil a) (CPath.nil a)))))) = CPath.nil a := rfl
 -- 113
-theorem single_refl_len {α : Type u} (a : α) :
+def single_refl_len {α : Type u} (a : α) :
     pathLen (CPath.cons (CStep.refl a) (CPath.nil a)) = 1 := rfl
 -- 114
 theorem pTrans_len_exact {α : Type u} {a b c : α}
@@ -200,7 +200,7 @@ theorem inner_horn_exact (n : Nat) (h : n ≥ 2) :
   refine ⟨⟨1, by omega⟩, ?_, rfl⟩
   simp [isInnerHorn]; omega
 -- 122
-theorem pSymm_step_type {α : Type u} {a b : α} (s : CStep α a b) :
+def pSymm_step_type {α : Type u} {a b : α} (s : CStep α a b) :
     ∀ (_ : CStep α b a), True := fun _ => trivial
 -- 123
 theorem cons_nil_len {α : Type u} {a b : α} (s : CStep α a b) :

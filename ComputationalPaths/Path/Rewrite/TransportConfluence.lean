@@ -58,7 +58,7 @@ inductive RuleCategory where
     `atom`, `refl`, `symm`, `trans`. Transport rules operate on
     `Path.stepChain` / `Path.transport` terms in the polymorphic `Path A a b`.
     These are syntactically disjoint — the head constructors don't overlap. -/
-theorem transport_groupoid_disjoint :
+def transport_groupoid_disjoint :
     -- The groupoid TRS (CStep) is self-contained on Expr
     -- Transport rules operate on Path.stepChain which is not an Expr constructor
     -- Therefore no critical pair exists between a CStep rule and a transport rule
@@ -272,7 +272,7 @@ Path values. This means:
 /-- Without proof irrelevance, the transport system is confluent
     on the *semantic* level (via toEq), even when syntactically
     the stepChain terms may differ. -/
-theorem semantic_confluence :
+def semantic_confluence :
     -- Every Step preserves toEq (proven in Step.lean as step_toEq)
     -- Therefore any two reducts have the same propositional content
     -- This is "confluence up to propositional equality"

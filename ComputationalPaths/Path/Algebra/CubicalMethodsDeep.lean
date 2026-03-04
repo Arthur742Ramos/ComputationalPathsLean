@@ -365,7 +365,7 @@ theorem pathBoolTT_trans :
   simp [pathBoolTT, Path.trans]
 
 /-- Symmetry of Bool path. -/
-theorem pathBoolTT_symm :
+def pathBoolTT_symm :
     Path.symm pathBoolTT = Path.mk [Step.symm stepBoolTT] rfl := by
   simp [pathBoolTT, Path.symm, stepBoolTT]
 
@@ -396,7 +396,7 @@ theorem pathNat00_trans :
   simp [pathNat00, Path.trans]
 
 /-- Symmetry of Nat path. -/
-theorem pathNat00_symm :
+def pathNat00_symm :
     Path.symm pathNat00 = Path.mk [Step.symm stepNat00] rfl := by
   simp [pathNat00, Path.symm, stepNat00]
 

@@ -147,7 +147,7 @@ noncomputable def VNatTrans.vcomp {C D : VCategory} {F G H : VFunctor C D}
 /-! ## Enriched Step -/
 
 /-- Rewrite steps for enriched category operations. -/
-inductive EnrichedStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive EnrichedStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   /-- Enriched composition with identity on left reduces. -/
   | comp_id_left {C : VCategory} {a b : C.Obj} (f : C.Hom a b) :
       EnrichedStep

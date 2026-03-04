@@ -71,7 +71,7 @@ theorem path_length_trans (p : Path α a b) (q : Path α b c) :
   | nil _ => simp [Path.trans, Path.length]
   | cons s _ ih => simp [Path.trans, Path.length, ih, Nat.add_assoc]
 
-theorem path_length_single (s : Step α a b) :
+def path_length_single (s : Step α a b) :
     (Path.single s).length = 1 := by
   simp [Path.single, Path.length]
 
@@ -695,7 +695,7 @@ theorem path_assoc_sheaf (p : Path Sect a b) (q : Path Sect b c) (r : Path Sect 
     (p.trans q).trans r = p.trans (q.trans r) :=
   path_trans_assoc p q r
 
-theorem single_step_length_sheaf (s : Step Sect a b) :
+def single_step_length_sheaf (s : Step Sect a b) :
     (Path.single s).length = 1 := by
   simp [Path.single, Path.length]
 

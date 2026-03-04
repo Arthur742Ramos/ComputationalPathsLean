@@ -60,7 +60,7 @@ noncomputable def confluenceData (A : Type u) (a b : A) : ConfluenceData A a b w
 /-! ## Soundness: Step/Rw/RwEq all preserve toEq -/
 
 /-- Step is sound. -/
-theorem step_sound {p q : Path a b} (h : Step p q) : p.toEq = q.toEq :=
+def step_sound {p q : Path a b} (h : Step p q) : p.toEq = q.toEq :=
   step_toEq h
 
 /-- Rw is sound. -/
@@ -135,7 +135,7 @@ theorem rw_trans' {p q r : Path a b} (h₁ : Rw p q) (h₂ : Rw q r) :
     Rw p r := rw_trans h₁ h₂
 
 /-- A step lifts to Rw. -/
-theorem rw_of_step' {p q : Path a b} (h : Step p q) : Rw p q :=
+def rw_of_step' {p q : Path a b} (h : Step p q) : Rw p q :=
   rw_of_step h
 
 /-! ## Coherence: RwEq Paths Share Normal Forms -/

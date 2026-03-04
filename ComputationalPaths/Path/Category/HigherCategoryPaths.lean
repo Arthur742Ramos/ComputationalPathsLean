@@ -320,7 +320,7 @@ theorem transport_mor₁_src_symm (C : TwoCat) {a₁ a₂ b : C.Obj}
   | mk sp pp => cases pp; rfl
 
 /-- 20. CongrArg through comp₁ in first argument. -/
-theorem congrArg_comp₁_left (C : TwoCat) {a b c : C.Obj}
+def congrArg_comp₁_left (C : TwoCat) {a b c : C.Obj}
     {f₁ f₂ : C.Mor₁ a b} (h : f₁ = f₂) (g : C.Mor₁ b c) :
     Path.congrArg (fun f => C.comp₁ f g) (Path.mk [Step.mk _ _ h] h) =
       Path.mk [Step.mk _ _ (_root_.congrArg (fun f => C.comp₁ f g) h)]
@@ -328,7 +328,7 @@ theorem congrArg_comp₁_left (C : TwoCat) {a b c : C.Obj}
   subst h; simp
 
 /-- 21. CongrArg through comp₁ in second argument. -/
-theorem congrArg_comp₁_right (C : TwoCat) {a b c : C.Obj}
+def congrArg_comp₁_right (C : TwoCat) {a b c : C.Obj}
     (f : C.Mor₁ a b) {g₁ g₂ : C.Mor₁ b c} (h : g₁ = g₂) :
     Path.congrArg (fun g => C.comp₁ f g) (Path.mk [Step.mk _ _ h] h) =
       Path.mk [Step.mk _ _ (_root_.congrArg (fun g => C.comp₁ f g) h)]

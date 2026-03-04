@@ -233,27 +233,27 @@ theorem removeMultiples_idempotent_mem (p : Nat) (S : Sieve) (n : Nat) :
     Sieve.removeMultiples p (Sieve.removeMultiples p S) n ↔ Sieve.removeMultiples p S n :=
   ⟨fun ⟨⟨hs, hm⟩, _⟩ => ⟨hs, hm⟩, fun h => ⟨h, h.2⟩⟩
 
-theorem eval_union_mem (s t : SieveStep) (n : Nat) :
+def eval_union_mem (s t : SieveStep) (n : Nat) :
     SieveStep.eval (SieveStep.union s t) n ↔ (SieveStep.eval s n ∨ SieveStep.eval t n) :=
   Iff.rfl
 
-theorem eval_inter_mem (s t : SieveStep) (n : Nat) :
+def eval_inter_mem (s t : SieveStep) (n : Nat) :
     SieveStep.eval (SieveStep.inter s t) n ↔ (SieveStep.eval s n ∧ SieveStep.eval t n) :=
   Iff.rfl
 
-theorem eval_compl_mem (s : SieveStep) (n : Nat) :
+def eval_compl_mem (s : SieveStep) (n : Nat) :
     SieveStep.eval (SieveStep.compl s) n ↔ ¬ SieveStep.eval s n :=
   Iff.rfl
 
-theorem stepWeight_removeMultiples_eq (w : SieveWeight) (p : Nat) (s : SieveStep) :
+def stepWeight_removeMultiples_eq (w : SieveWeight) (p : Nat) (s : SieveStep) :
     stepWeight w (SieveStep.removeMultiples p s) = stepWeight w s :=
   rfl
 
-theorem stepWeight_compl_eq (w : SieveWeight) (s : SieveStep) :
+def stepWeight_compl_eq (w : SieveWeight) (s : SieveStep) :
     stepWeight w (SieveStep.compl s) = -stepWeight w s :=
   rfl
 
-theorem stepWeight_union_formula (w : SieveWeight) (s t : SieveStep) :
+def stepWeight_union_formula (w : SieveWeight) (s t : SieveStep) :
     stepWeight w (SieveStep.union s t) =
       stepWeight w s + stepWeight w t - w.weight (SieveStep.eval (SieveStep.inter s t)) :=
   rfl

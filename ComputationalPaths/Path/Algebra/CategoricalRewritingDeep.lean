@@ -195,7 +195,7 @@ theorem length_trans (p : Path α a b) (q : Path α b c) :
 theorem length_nil : (Path.nil a : Path α a a).length = 0 := rfl
 
 /-- Theorem 6: length of single is one. -/
-theorem length_single (s : Step α a b) : (Path.single s).length = 1 := rfl
+def length_single (s : Step α a b) : (Path.single s).length = 1 := rfl
 
 -- ============================================================
 -- §8  2-Cell vertical composition algebra

@@ -164,7 +164,7 @@ theorem trans_nil_right (p : Path a b) : Path.trans p (Path.nil b) = p := by
 theorem len_nil : (Path.nil a).len = 0 := rfl
 
 /-- Theorem 15 – len of step is 1. -/
-theorem len_step (s : Step a b) : (Path.step s).len = 1 := rfl
+def len_step (s : Step a b) : (Path.step s).len = 1 := rfl
 
 /-- Theorem 16 – len distributes over trans. -/
 theorem len_trans (p : Path a b) (q : Path b c) :
@@ -295,23 +295,23 @@ noncomputable def join_chain (a b c : E) : Path (.join a (.join b c)) (.join c (
 noncomputable def EProp := E → Prop
 
 /-- Theorem 36 – Transport along a path: if P respects steps, paths preserve P. -/
-theorem transport_path (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
+def transport_path (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
     {a b : E} (p : Path a b) (ha : P a) : P b := by
   induction p with
   | nil _ => exact ha
   | cons s _ ih => exact ih (hstep _ _ s ha)
 
 /-- Theorem 37 – Transport is functorial: transporting along nil is identity. -/
-theorem transport_nil (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
+def transport_nil (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
     (a : E) (ha : P a) : transport_path P hstep (Path.nil a) ha = ha := rfl
 
 /-- Theorem 38 – Transport along single step = step transport. -/
-theorem transport_single (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
+def transport_single (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
     (s : Step a b) (ha : P a) :
     transport_path P hstep (Path.step s) ha = hstep a b s ha := rfl
 
 /-- Theorem 39 – Transport along trans = sequential transport. -/
-theorem transport_trans (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
+def transport_trans (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
     (p : Path a b) (q : Path b c) (ha : P a) :
     transport_path P hstep (Path.trans p q) ha =
     transport_path P hstep q (transport_path P hstep p ha) := by
@@ -565,14 +565,14 @@ theorem all_gen_div_delta : ∀ i : Nat, LDiv (.gen i) .delta :=
 -- ============================================================
 
 /-- Theorem 79 – If P(a) and a | b, transport P. -/
-theorem transport_along_div (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
+def transport_along_div (P : EProp) (hstep : ∀ a b, Step a b → P a → P b)
     {a b : E} (hdiv : LDiv a b) (hPmul : ∀ x y, P x → P (.mul x y)) (ha : P a) :
     P b := by
   obtain ⟨c, ⟨p⟩⟩ := hdiv
   exact transport_path P hstep p (hPmul a c ha)
 
 /-- Theorem 80 – Transport along reflexive divisibility. -/
-theorem transport_div_refl (P : EProp) (_hstep : ∀ a b, Step a b → P a → P b)
+def transport_div_refl (P : EProp) (_hstep : ∀ a b, Step a b → P a → P b)
     (_hPmul : ∀ x y, P x → P (.mul x y)) (a : E) (ha : P a) :
     P a :=
   ha

@@ -96,7 +96,7 @@ theorem size_eq_erase_size (e : TExpr a b) : e.size = e.erase.size := by
 The typed version of CStep: same rules, but type-indexed. -/
 
 /-- Typed rewrite step, mirroring `CStep` but preserving type indices. -/
-inductive TCStep : TExpr a b → TExpr a b → Prop where
+inductive TCStep : TExpr a b → TExpr a b → Type where
   | symm_refl (x : Obj) : TCStep (.symm (.refl x)) (.refl x)
   | symm_symm {a b : Obj} (p : TExpr a b) : TCStep (.symm (.symm p)) p
   | trans_refl_left {a b : Obj} (p : TExpr a b) :
@@ -125,7 +125,7 @@ inductive TCStep : TExpr a b → TExpr a b → Prop where
 /-! ## Erasure Preserves Steps -/
 
 /-- Erasing a typed step gives an untyped step. -/
-theorem erase_tcstep {e₁ e₂ : TExpr a b} (h : TCStep e₁ e₂) :
+def erase_tcstep {e₁ e₂ : TExpr a b} (h : TCStep e₁ e₂) :
     CStep e₁.erase e₂.erase := by
   induction h with
   | symm_refl _ => exact .symm_refl

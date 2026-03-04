@@ -424,7 +424,7 @@ theorem pTrans_assoc {α : Type u} {a b c d : α}
 theorem stepToPath_def {α : Type u} {a b : α} (s : CStep α a b) :
     stepToPath s = CPath.cons s (CPath.nil _) := rfl
 -- 16
-theorem refl_step_len (α : Type u) (a : α) :
+def refl_step_len (α : Type u) (a : α) :
     pathLen (stepToPath (CStep.refl a)) = 1 := rfl
 -- 17
 theorem pathLen_nonneg {α : Type u} {a b : α} (p : CPath α a b) :
@@ -451,7 +451,7 @@ theorem double_pTrans {α : Type u} {a b c d e : α}
     pTrans (pTrans (pTrans p q) r) s = pTrans p (pTrans q (pTrans r s)) := by
   rw [pTrans_assoc, pTrans_assoc]
 -- 25
-theorem pSymm_step_len {α : Type u} {a b : α} (s : CStep α a b) :
+def pSymm_step_len {α : Type u} {a b : α} (s : CStep α a b) :
     pathLen (stepToPath (pSymmStep s)) = 1 := rfl
 -- 26
 theorem qcat_obj_type (C : QCat) : C.Obj = C.under.cells 0 := rfl
@@ -575,7 +575,7 @@ theorem straighten_fiber (C E : QCat) (p : LeftFib E C) (x : C.Obj) :
 theorem smap_id_cells (X : SSet) (n : Nat) (σ : X.cells n) :
     (SMap.id X).mapCells σ = σ := rfl
 -- 64
-theorem pSymm_refl {α : Type u} (a : α) :
+def pSymm_refl {α : Type u} (a : α) :
     pSymmStep (CStep.refl a) = CStep.refl a := rfl
 -- 65
 theorem en_positive (n : Nat) (C : SymMonCat) (A : EnAlg n C) : n > 0 := A.level
@@ -641,10 +641,10 @@ theorem six_nil {α : Type u} (a : α) :
     pTrans (CPath.nil a) (pTrans (CPath.nil a) (pTrans (CPath.nil a)
       (pTrans (CPath.nil a) (pTrans (CPath.nil a) (CPath.nil a))))) = CPath.nil a := rfl
 -- 83
-theorem cons_refl_len {α : Type u} {a b : α} (p : CPath α a b) :
+def cons_refl_len {α : Type u} {a b : α} (p : CPath α a b) :
     pathLen (CPath.cons (CStep.refl a) p) = 1 + pathLen p := rfl
 -- 84
-theorem stepToPath_refl {α : Type u} (a : α) :
+def stepToPath_refl {α : Type u} (a : α) :
     stepToPath (CStep.refl a) = CPath.cons (CStep.refl a) (CPath.nil a) := rfl
 -- 85
 theorem step_step_pTrans {α : Type u} {a b c : α} (s1 : CStep α a b) (s2 : CStep α b c) :

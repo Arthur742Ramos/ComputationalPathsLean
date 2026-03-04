@@ -248,7 +248,7 @@ noncomputable def norm_mul_step (NF : NumberField A) (NT : NormTrace A NF) (a b 
   Step.mk (NT.norm (NF.mul a b)) (NF.mul (NT.norm a) (NT.norm b)) (NT.norm_mul a b)
 
 -- 29. Step map through norm
-theorem norm_mul_step_map (NF : NumberField A) (NT : NormTrace A NF) (f : A → B) (a b : A) :
+def norm_mul_step_map (NF : NumberField A) (NT : NormTrace A NF) (f : A → B) (a b : A) :
     Step.map f (norm_mul_step NF NT a b) =
       Step.mk (f (NT.norm (NF.mul a b))) (f (NF.mul (NT.norm a) (NT.norm b)))
         (_root_.congrArg f (NT.norm_mul a b)) := by

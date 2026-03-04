@@ -270,7 +270,7 @@ theorem contact_structures_path_trans_assoc {α : Type u} {x y z w : α}
     Path.trans (Path.trans h₁ h₂) h₃ = Path.trans h₁ (Path.trans h₂ h₃) :=
   Path.trans_assoc h₁ h₂ h₃
 
-theorem contact_structures_path_toEq_ofEq {α : Type u} {x y : α} (h : x = y) :
+def contact_structures_path_toEq_ofEq {α : Type u} {x y : α} (h : x = y) :
     Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
   rfl
 

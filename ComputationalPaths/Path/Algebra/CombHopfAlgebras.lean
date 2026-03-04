@@ -267,7 +267,7 @@ noncomputable def dendri_2_symm (DA : DendriformAlgebra) (x y z : DA.D) :
 /-! ## HopfStep Inductive -/
 
 /-- Rewrite steps for combinatorial Hopf algebra computations. -/
-inductive HopfStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive HopfStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type
   /-- Antipode cancellation. -/
   | antipode_cancel {A : Type u} {a : A} (p : Path a a) :
       HopfStep p (Path.refl a)

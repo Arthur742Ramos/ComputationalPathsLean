@@ -478,25 +478,25 @@ noncomputable def natPath (n : Nat) : Path n n :=
   Path.mk [Step.mk n n rfl] rfl
 
 /-- trans of Bool paths. -/
-theorem boolPath_trans (b : Bool) :
+def boolPath_trans (b : Bool) :
     Path.trans (boolPath b) (boolPath b) =
     Path.mk [Step.mk b b rfl, Step.mk b b rfl] rfl := by
   simp [boolPath, Path.trans]
 
 /-- symm of Bool path. -/
-theorem boolPath_symm (b : Bool) :
+def boolPath_symm (b : Bool) :
     Path.symm (boolPath b) =
     Path.mk [Step.symm (Step.mk b b rfl)] rfl := by
   simp [boolPath, Path.symm]
 
 /-- trans of Nat paths. -/
-theorem natPath_trans (n : Nat) :
+def natPath_trans (n : Nat) :
     Path.trans (natPath n) (natPath n) =
     Path.mk [Step.mk n n rfl, Step.mk n n rfl] rfl := by
   simp [natPath, Path.trans]
 
 /-- symm of Nat path. -/
-theorem natPath_symm (n : Nat) :
+def natPath_symm (n : Nat) :
     Path.symm (natPath n) =
     Path.mk [Step.symm (Step.mk n n rfl)] rfl := by
   simp [natPath, Path.symm]

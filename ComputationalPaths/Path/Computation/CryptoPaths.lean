@@ -307,7 +307,7 @@ noncomputable def merkle_root_congr_path {D : Type u} (t1 t2 : MerkleTree D) (h 
 /-! ## Path symmetry as cryptographic duality -/
 
 /-- Encryption path and decryption path are symmetric. -/
-theorem enc_dec_symm {P C K : Type u} (s : SymEncScheme P C K)
+def enc_dec_symm {P C K : Type u} (s : SymEncScheme P C K)
     (h : SymEncCorrect s) (k : K) (m : P) :
     Path.symm (encDecPath s h k m) =
       Path.mk [Step.mk _ _ (h.correct k m).symm] (h.correct k m).symm := by

@@ -108,7 +108,7 @@ theorem kleinLoopA_double_symm :
 /-! ## The relation as a Step -/
 
 /-- The Klein bottle relation `aba⁻¹b` reduces to `refl` via the KleinStep. -/
-theorem kleinRelation_holds :
+def kleinRelation_holds :
     KleinStep
       (Path.trans (Path.trans (Path.trans kleinBottleLoopA kleinBottleLoopB)
         (Path.symm kleinBottleLoopA)) kleinBottleLoopB)

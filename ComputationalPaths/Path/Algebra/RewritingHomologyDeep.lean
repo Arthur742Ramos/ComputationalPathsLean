@@ -112,7 +112,7 @@ theorem length_trans (p : Path α a b) (q : Path α b c) :
 
 theorem length_nil : (Path.nil a : Path α a a).length = 0 := rfl
 
-theorem length_single (s : Step α a b) : (Path.single s).length = 1 := rfl
+def length_single (s : Step α a b) : (Path.single s).length = 1 := rfl
 
 -- ============================================================
 -- §3  2-Cell Algebra
@@ -414,11 +414,11 @@ noncomputable def PathSpace.extend (ps : PathSpace α a) (s : Step α ps.endpoin
 theorem pathspace_base_nil : (PathSpace.base a : PathSpace α a).path = Path.nil a := rfl
 
 /-- Theorem 39: extending base by a step gives a single-step path. -/
-theorem pathspace_extend_base (s : Step α a b) :
+def pathspace_extend_base (s : Step α a b) :
     (PathSpace.base a |>.extend s).path = Path.single s := rfl
 
 /-- Theorem 40: extending by refl step preserves the path (up to trans_nil). -/
-theorem pathspace_extend_refl (ps : PathSpace α a) :
+def pathspace_extend_refl (ps : PathSpace α a) :
     (ps.extend (Step.refl ps.endpoint)).path = ps.path.trans (Path.single (Step.refl ps.endpoint)) :=
   rfl
 
@@ -457,11 +457,11 @@ theorem anick_dim0_nil (a : α) :
     (AnickChain.point a).toPath = Path.nil a := rfl
 
 /-- Theorem 44: dimension-1 chain yields single-step path. -/
-theorem anick_dim1_single (s : Step α a b) :
+def anick_dim1_single (s : Step α a b) :
     (AnickChain.cell1 s).toPath = Path.single s := rfl
 
 /-- Theorem 45: lifting preserves path via trans. -/
-theorem anick_cellN_path (ch : AnickChain α (n + 1) a b) (s : Step α b c) :
+def anick_cellN_path (ch : AnickChain α (n + 1) a b) (s : Step α b c) :
     (AnickChain.cellN ch s).toPath = ch.toPath.trans (Path.single s) := rfl
 
 /-- Theorem 46: toPath of a doubly-lifted chain unfolds correctly. -/
@@ -495,7 +495,7 @@ noncomputable def Path.map (f : α → β) : Path α a b → Path β (f a) (f b)
 theorem map_nil (f : α → β) : Path.map f (Path.nil a) = Path.nil (f a) := rfl
 
 /-- Theorem 49: map preserves single. -/
-theorem map_single_rule (f : α → β) (n : String) (a b : α) :
+def map_single_rule (f : α → β) (n : String) (a b : α) :
     Path.map f (Path.single (Step.rule n a b)) = Path.single (Step.rule n (f a) (f b)) := rfl
 
 /-- Theorem 50: map preserves trans. -/
@@ -794,15 +794,15 @@ theorem hcomp_assoc_witness {a b c d : α}
 -- ============================================================
 
 /-- Theorem 85: single-step path has length 1. -/
-theorem single_length (s : Step α a b) :
+def single_length (s : Step α a b) :
     (Path.single s).length = 1 := rfl
 
 /-- Theorem 86: cons decomposes as trans of single and rest. -/
-theorem cons_eq_single_trans (s : Step α a b) (p : Path α b c) :
+def cons_eq_single_trans (s : Step α a b) (p : Path α b c) :
     Path.cons s p = (Path.single s).trans p := rfl
 
 /-- Theorem 87: length of symm of single is 1. -/
-theorem symm_single_length (s : Step α a b) :
+def symm_single_length (s : Step α a b) :
     (Path.single s).symm.length = 1 := by
   simp [Path.single, Path.symm, Path.trans, Path.length]
 

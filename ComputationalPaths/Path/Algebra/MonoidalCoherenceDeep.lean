@@ -36,7 +36,7 @@ noncomputable def MObj.flatten : MObj → List Nat
 -- ============================================================
 
 /-- One-step structural isomorphism (generating paths). -/
-inductive MonStep : MObj → MObj → Prop where
+inductive MonStep : MObj → MObj → Type where
   | assocR (a b c : MObj) : MonStep ((a ⊗ₘ b) ⊗ₘ c) (a ⊗ₘ (b ⊗ₘ c))
   | assocL (a b c : MObj) : MonStep (a ⊗ₘ (b ⊗ₘ c)) ((a ⊗ₘ b) ⊗ₘ c)
   | unitL  (a : MObj) : MonStep (.unit ⊗ₘ a) a
@@ -265,7 +265,7 @@ theorem unitR_naturality (a a' : MObj) (p : MonPath a a') :
 -- ============================================================
 
 /-- Braiding step: adds σ_{A,B} : A⊗B → B⊗A to the monoidal steps. -/
-inductive BraidMonStep : MObj → MObj → Prop where
+inductive BraidMonStep : MObj → MObj → Type where
   | mon  : MonStep a b → BraidMonStep a b
   | braid (a b : MObj) : BraidMonStep (a ⊗ₘ b) (b ⊗ₘ a)
   | braidInv (a b : MObj) : BraidMonStep (b ⊗ₘ a) (a ⊗ₘ b)
@@ -370,7 +370,7 @@ noncomputable def MObj.mapGen (f : Nat → Nat) : MObj → MObj
   | .tensor a b => .tensor (a.mapGen f) (b.mapGen f)
 
 /-- Theorem 39: mapGen preserves MonStep. -/
-theorem MonStep.mapGen {a b : MObj} (f : Nat → Nat)
+def MonStep.mapGen {a b : MObj} (f : Nat → Nat)
     (s : MonStep a b) : MonStep (a.mapGen f) (b.mapGen f) := by
   induction s with
   | assocR a b c => exact MonStep.assocR (a.mapGen f) (b.mapGen f) (c.mapGen f)
@@ -415,7 +415,7 @@ noncomputable def assoc5Path (a b c d e : MObj) :
       (MonPath.single (MonStep.assocR a b (c ⊗ₘ (d ⊗ₘ e)))))
 
 /-- Theorem 45: No step from a generator to unit. -/
-theorem unit_no_gen_step (n : Nat) : ¬ MonStep (.gen n) .unit := by
+def unit_no_gen_step (n : Nat) : ¬ MonStep (.gen n) .unit := by
   intro h; cases h
 
 /-- Theorem 46: Flatten preserved under assocR. -/

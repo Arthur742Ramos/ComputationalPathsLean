@@ -520,7 +520,7 @@ theorem rw_plus_trans {a b : A} {p q r : Path a b}
   | refl => exact h1
   | tail _ step ih => exact RwPlus.tail ih step
 
-theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
+def rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
     Nonempty (Path p q) ∨ ∃ r, Nonempty (Step p r) ∧ Rw r q := by
   induction h with
   | refl => exact Or.inl ⟨Path.refl _⟩
@@ -698,7 +698,7 @@ theorem expr_church_rosser (e₁ e₂ : GroupoidTRS.Expr) :
 
 If two expressions in normal form are both reachable from the same source,
 they are identical.  This is the strongest form of the confluence property. -/
-theorem expr_unique_normal_forms (e₁ e₂ : GroupoidTRS.Expr)
+def expr_unique_normal_forms (e₁ e₂ : GroupoidTRS.Expr)
     (h : GroupoidConfluence.CRTC e₁ e₂)
     (hnf : ∀ e', ¬GroupoidConfluence.CStep e₂ e') :
     ∀ e₃, GroupoidConfluence.CRTC e₁ e₃ →

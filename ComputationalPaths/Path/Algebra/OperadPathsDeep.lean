@@ -117,18 +117,18 @@ theorem length_trans (p : Path a b) (q : Path b c) :
 theorem length_refl (a : ArityProfile) : (Path.refl a).length = 0 := rfl
 
 /-- Theorem 10 — single has length 1. -/
-theorem length_single (s : Step a b) : (Path.single s).length = 1 := rfl
+def length_single (s : Step a b) : (Path.single s).length = 1 := rfl
 
 /-- Theorem 11 — symm of refl is refl. -/
 theorem symm_refl (a : ArityProfile) : Path.symm (Path.refl a) = Path.refl a := rfl
 
 /-- Theorem 12 — symm of single. -/
-theorem symm_single (s : Step a b) :
+def symm_single (s : Step a b) :
     Path.symm (Path.single s) = Path.single (Step.symm s) := by
   simp [Path.single, Path.symm, Path.trans]
 
 /-- Theorem 13 — double step inversion. -/
-theorem step_symm_symm (s : Step a b) : Step.symm (Step.symm s) = s := by
+def step_symm_symm (s : Step a b) : Step.symm (Step.symm s) = s := by
   cases s <;> rfl
 
 -- ============================================================
@@ -797,14 +797,14 @@ noncomputable def congrArgChain3 (f : ArityMap) (s1 : Step a b) (s2 : Step b c) 
     (Path.trans (congrArgStep f s2) (congrArgStep f s3))
 
 /-- Theorem 94 — congrArg chain has length 3. -/
-theorem congrArgChain3_length (f : ArityMap) (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) :
+def congrArgChain3_length (f : ArityMap) (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) :
     (congrArgChain3 f s1 s2 s3).length = 3 := by
   simp [congrArgChain3]
   rw [length_trans]; simp [congrArgStep, Path.single, Path.length]
   rw [length_trans]; simp [congrArgStep, Path.single, Path.length]
 
 /-- Theorem 95 — symm of congrArg single. -/
-theorem symm_congrArg_single (f : ArityMap) (s : Step a b) :
+def symm_congrArg_single (f : ArityMap) (s : Step a b) :
     Path.symm (congrArgStep f s) = Path.single (Step.compose (f b) (f a)) := by
   simp [congrArgStep, Path.symm, Path.single, Path.trans, Step.symm]
 
@@ -861,7 +861,7 @@ noncomputable def threeLevelCompose (s1 : Step a b) (s2 : Step b c) (s3 : Step c
   Path.trans (Path.single s1) (Path.trans (Path.single s2) (Path.single s3))
 
 /-- Theorem 105 — three level has length 3. -/
-theorem threeLevelCompose_length (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) :
+def threeLevelCompose_length (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) :
     (threeLevelCompose s1 s2 s3).length = 3 := by
   simp [threeLevelCompose]; rw [length_trans]; simp [Path.single, Path.length]
   rw [length_trans]; rfl
@@ -872,7 +872,7 @@ noncomputable def fourLevelCompose (s1 : Step a b) (s2 : Step b c) (s3 : Step c 
   Path.trans (Path.single s1) (threeLevelCompose s2 s3 s4)
 
 /-- Theorem 107 — four level has length 4. -/
-theorem fourLevelCompose_length (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) (s4 : Step d e) :
+def fourLevelCompose_length (s1 : Step a b) (s2 : Step b c) (s3 : Step c d) (s4 : Step d e) :
     (fourLevelCompose s1 s2 s3 s4).length = 4 := by
   simp [fourLevelCompose, threeLevelCompose]
   rw [length_trans, length_trans, length_trans]
@@ -895,7 +895,7 @@ noncomputable def congrArgChain2 (f : ArityMap) (s1 : Step a b) (s2 : Step b c) 
   Path.trans (congrArgStep f s1) (congrArgStep f s2)
 
 /-- Theorem 111 — congrArg chain 2 has length 2. -/
-theorem congrArgChain2_length (f : ArityMap) (s1 : Step a b) (s2 : Step b c) :
+def congrArgChain2_length (f : ArityMap) (s1 : Step a b) (s2 : Step b c) :
     (congrArgChain2 f s1 s2).length = 2 := by
   simp [congrArgChain2]; rw [length_trans]; rfl
 

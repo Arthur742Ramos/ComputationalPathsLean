@@ -122,7 +122,7 @@ theorem pyth_roundtrip_toEq (R : DRing A) (T : PythTriple R) :
   simp
 
 /-- congrArg of a function through a Pythagorean path. -/
-theorem congrArg_pyth {B : Type u} (R : DRing A) (T : PythTriple R) (f : A → B) :
+def congrArg_pyth {B : Type u} (R : DRing A) (T : PythTriple R) (f : A → B) :
     congrArg f (pyth_path R T) =
       Path.mk [Step.mk _ _ (_root_.congrArg f T.pyth)] (_root_.congrArg f T.pyth) := by
   simp [pyth_path, congrArg]
@@ -267,13 +267,13 @@ noncomputable def pyth_step (R : DRing A) (T : PythTriple R) : Step A :=
   Step.mk (R.add (R.mul T.a T.a) (R.mul T.b T.b)) (R.mul T.c T.c) T.pyth
 
 /-- Symm of Pythagorean step. -/
-theorem pyth_step_symm (R : DRing A) (T : PythTriple R) :
+def pyth_step_symm (R : DRing A) (T : PythTriple R) :
     (pyth_step R T).symm =
       Step.mk (R.mul T.c T.c) (R.add (R.mul T.a T.a) (R.mul T.b T.b)) T.pyth.symm := by
   simp [pyth_step, Step.symm]
 
 /-- Mapping a function through a Pythagorean step. -/
-theorem pyth_step_map {B : Type u} (R : DRing A) (T : PythTriple R) (f : A → B) :
+def pyth_step_map {B : Type u} (R : DRing A) (T : PythTriple R) (f : A → B) :
     Step.map f (pyth_step R T) =
       Step.mk (f (R.add (R.mul T.a T.a) (R.mul T.b T.b))) (f (R.mul T.c T.c))
         (_root_.congrArg f T.pyth) := by

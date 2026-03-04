@@ -123,7 +123,7 @@ The completed groupoid TRS satisfies all hypotheses of Squier's theorem:
 -/
 
 /-- **Convergence**: The completed groupoid TRS is confluent and terminating. -/
-theorem convergent :
+def convergent :
     (∀ e₁ e₂ e₃ : Expr, CRTC e₁ e₂ → CRTC e₁ e₃ →
       ∃ e₄, CRTC e₂ e₄ ∧ CRTC e₃ e₄) ∧
     WellFounded (fun q p : Expr => Expr.Step p q) := by

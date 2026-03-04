@@ -93,7 +93,7 @@ noncomputable def gluingChainRight {W X Y Z : C.Obj}
     (Path.trans (S.gluingMiddle f g h) (S.gluingLast f g h))
 
 /-- Associativity of gluing as a primitive Step witness. -/
-theorem gluing_assoc_step {W X Y Z : C.Obj}
+def gluing_assoc_step {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path.Step (S.gluingChainLeft f g h) (S.gluingChainRight f g h) := by
   simpa [gluingChainLeft, gluingChainRight] using

@@ -59,15 +59,15 @@ theorem mkStepPath_symm {A : Type u} {a b : A} (h : a = b) :
   cases h
   rfl
 
-theorem path_mk_toEq {A : Type u} {a b : A} (steps : List (Step A)) (h : a = b) :
+def path_mk_toEq {A : Type u} {a b : A} (steps : List (Step A)) (h : a = b) :
     Path.toEq (Path.mk steps h) = h :=
   rfl
 
-theorem step_mk_src {A : Type u} (a b : A) (h : a = b) :
+def step_mk_src {A : Type u} (a b : A) (h : a = b) :
     (Step.mk a b h).src = a :=
   rfl
 
-theorem step_mk_tgt {A : Type u} (a b : A) (h : a = b) :
+def step_mk_tgt {A : Type u} (a b : A) (h : a = b) :
     (Step.mk a b h).tgt = b :=
   rfl
 

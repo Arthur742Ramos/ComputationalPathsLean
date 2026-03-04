@@ -509,7 +509,7 @@ theorem toExt_source {α : Type} {R : α → α → Prop}
 
 /-- Parallel step: simultaneous reduction at multiple positions.
     Modeled as a relation that extends R. -/
-inductive ParStep (α : Type) (R : α → α → Prop) : α → α → Prop where
+inductive ParStep (α : Type) (R : α → α → Type) : α → α → Type where
   | refl : (a : α) → ParStep α R a a
   | step : {a b : α} → R a b → ParStep α R a b
 
@@ -581,7 +581,7 @@ structure RWSystem (α : Type) where
   rules : List (Rule α)
 
 /-- The one-step reduction relation from a rule set. -/
-inductive RWStep (α : Type) [DecidableEq α] (sys : RWSystem α) : α → α → Prop where
+inductive RWStep (α : Type) [DecidableEq α] (sys : RWSystem α) : α → α → Type where
   | apply : {r : Rule α} → r ∈ sys.rules → (a : α) → a = r.lhs → RWStep α sys a r.rhs
 
 /-- Theorem 37: a system with no rules has no steps. -/
@@ -830,7 +830,7 @@ theorem eqpath_symm_single_length {α : Type} {R : α → α → Prop} {a b : α
   simp [EqPath.symm, EqPath.trans, EqPath.length]
 
 /-- Theorem 57: embedding then symm gives backward path. -/
-theorem toEqPath_single_symm {α : Type} {R : α → α → Prop} {a b : α}
+def toEqPath_single_symm {α : Type} {R : α → α → Prop} {a b : α}
     (s : Step α R a b) :
     (RPath.single s).toEqPath.symm =
     EqPath.cons (SymStep.bwd s) (EqPath.refl a) := by
@@ -916,23 +916,23 @@ theorem reverse_length {α : Type} {R : α → α → Prop}
 -- ============================================================
 
 /-- Parallel step is reflexive. -/
-theorem parStep_refl {α : Type} {R : α → α → Prop} (a : α) :
+def parStep_refl {α : Type} {R : α → α → Prop} (a : α) :
     ParStep α R a a :=
   .refl a
 
 /-- Theorem 64: A ParStep refl gives a trivial parallel path. -/
-theorem parpath_from_refl {α : Type} {R : α → α → Prop} (a : α) :
+def parpath_from_refl {α : Type} {R : α → α → Prop} (a : α) :
     ∃ _ : RPath α (ParStep α R) a a, True :=
   ⟨.refl a, trivial⟩
 
 /-- Theorem 65: sequential path embeds into parallel path. -/
-theorem sequential_to_parallel {α : Type} {R : α → α → Prop} {a b : α}
+def sequential_to_parallel {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) :
     ∃ _ : RPath α (ParStep α R) a b, True :=
   ⟨p.toParPath, trivial⟩
 
 /-- Theorem 66: toParPath of single is single par step. -/
-theorem toParPath_single {α : Type} {R : α → α → Prop} {a b : α}
+def toParPath_single {α : Type} {R : α → α → Prop} {a b : α}
     (s : Step α R a b) :
     (RPath.single s).toParPath = RPath.single s.toParStep := by
   rfl

@@ -399,7 +399,7 @@ theorem weightTruncation_upper (W : WeightFiltrationData α) (a b : Int) :
 theorem mixedTateLoop_eq_refl (T : MixedTateData α) :
     mixedTateLoop T = Path.refl T := rfl
 
-theorem mixedTateTwoStep_eq_refl (T : MixedTateData α) :
+def mixedTateTwoStep_eq_refl (T : MixedTateData α) :
     mixedTateTwoStep T = Path.refl T := by
   simp [mixedTateTwoStep]
 
@@ -508,7 +508,7 @@ theorem regulatorCompose_target (f g : RegulatorMapData α) :
 theorem regulatorLoop_eq_refl (f : RegulatorMapData α) :
     regulatorLoop f = Path.refl f := rfl
 
-theorem regulatorTwoStep_eq_refl (f : RegulatorMapData α) :
+def regulatorTwoStep_eq_refl (f : RegulatorMapData α) :
     regulatorTwoStep f = Path.refl f := by
   simp [regulatorTwoStep]
 
@@ -694,7 +694,7 @@ theorem etaleComparison_identity_holds (M : MotivicComplexData α) (E : EtaleCoh
 theorem etaleComparison_loop_refl (C : EtaleComparisonData α) :
     etaleComparisonLoop C = Path.refl C := rfl
 
-theorem etaleComparison_twoStep_eq_refl (C : EtaleComparisonData α) :
+def etaleComparison_twoStep_eq_refl (C : EtaleComparisonData α) :
     etaleComparisonTwoStep C = Path.refl C := by
   simp [etaleComparisonTwoStep]
 

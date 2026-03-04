@@ -119,7 +119,7 @@ abbrev TRTRS := List TRRule
 -- §6  Step & Path — Prop-valued rewriting groupoid
 -- ============================================================
 
-inductive TRStep (R : TRTRS) : TRTm → TRTm → Prop where
+inductive TRStep (R : TRTRS) : TRTm → TRTm → Type where
   | ruleAt (r : TRRule) (σ : TRSubst) (p : TRPos)
       (t : TRTm) (hmem : r ∈ R)
       (hat : t.atPos p = some (r.lhs.applyS σ))
@@ -370,12 +370,12 @@ theorem tr_depth_app (l r : TRTm) : 0 < (TRTm.app l r).depth := by
 -- §13  Multi-Step Reduction (Prop)
 -- ============================================================
 
-inductive TRMStep (R : TRTRS) : TRTm → TRTm → Prop where
+inductive TRMStep (R : TRTRS) : TRTm → TRTm → Type where
   | refl : (t : TRTm) → TRMStep R t t
   | cons : TRStep R a b → TRMStep R b c → TRMStep R a c
 
 /-- Theorem 43: MStep is transitive. -/
-theorem TRMStep.append {R : TRTRS} {a b c : TRTm}
+def TRMStep.append {R : TRTRS} {a b c : TRTm}
     (m₁ : TRMStep R a b) (m₂ : TRMStep R b c) : TRMStep R a c := by
   induction m₁ with
   | refl _ => exact m₂
@@ -389,7 +389,7 @@ theorem TRMStep.toPath {R : TRTRS} {a b : TRTm}
   | cons s _ ih => exact TRPath.trans (TRPath.step s) ih
 
 /-- Theorem 45: Single step → MStep. -/
-theorem TRStep.toMStep {R : TRTRS} (s : TRStep R a b) :
+def TRStep.toMStep {R : TRTRS} (s : TRStep R a b) :
     TRMStep R a b :=
   TRMStep.cons s (TRMStep.refl b)
 
@@ -547,7 +547,7 @@ noncomputable def trCompletionStep (st : TRCompState) : TRCompState :=
     | none   => ⟨st.rules, rest ++ [eq]⟩
 
 /-- Theorem 57: Completion on empty equations is idempotent. -/
-theorem tr_completion_empty (rs : TRTRS) :
+def tr_completion_empty (rs : TRTRS) :
     trCompletionStep ⟨rs, []⟩ = ⟨rs, []⟩ := by
   simp [trCompletionStep]
 
@@ -602,7 +602,7 @@ private noncomputable def exTRS : TRTRS := [ruleF]
 private noncomputable def σA : TRSubst := fun n => if n == 0 then cA else .var n
 
 /-- Theorem 61: f(a) rewrites to a. -/
-theorem tr_ex_fA_to_a : TRStep exTRS (.app cF cA) cA :=
+def tr_ex_fA_to_a : TRStep exTRS (.app cF cA) cA :=
   TRStep.ruleAt ruleF σA [] (.app cF cA)
     (List.Mem.head _)
     (by simp [TRTm.atPos, TRTm.applyS, σA, ruleF, cF, cA, v0])
@@ -990,7 +990,7 @@ theorem tr_confluent_implies_lc {R : TRTRS} (hConf : TRConfluent R) :
 -- ============================================================
 
 /-- Theorem 106: NF has no outgoing step. -/
-theorem TRNF.no_step {R : TRTRS} {t t' : TRTm}
+def TRNF.no_step {R : TRTRS} {t t' : TRTm}
     (hnf : TRNF R t) : ¬ TRStep R t t' :=
   hnf t'
 

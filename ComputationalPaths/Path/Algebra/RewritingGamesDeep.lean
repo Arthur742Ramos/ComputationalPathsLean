@@ -95,7 +95,7 @@ theorem trans_assoc (p : Path α a b) (q : Path α b c) (r : Path α c d) :
   | cons s p ih => simp [Path.trans, ih]
 
 theorem len_nil (a : α) : (Path.nil a).len = 0 := rfl
-theorem len_single (s : Step α a b) : (Path.single s).len = 1 := rfl
+def len_single (s : Step α a b) : (Path.single s).len = 1 := rfl
 
 theorem len_trans (p : Path α a b) (q : Path α b c) :
     (p.trans q).len = p.len + q.len := by
@@ -103,7 +103,7 @@ theorem len_trans (p : Path α a b) (q : Path α b c) :
   | nil _ => simp [Path.trans, Path.len]
   | cons s p ih => simp [Path.trans, Path.len, ih]; omega
 
-theorem len_cons (s : Step α a b) (p : Path α b c) :
+def len_cons (s : Step α a b) (p : Path α b c) :
     (Path.cons s p).len = 1 + p.len := rfl
 
 -- ============================================================
@@ -277,7 +277,7 @@ noncomputable def diamondToJoinable (D : Diamond α) (s₁ : Step α a b) (s₂ 
   { target := d, left := Path.single l, right := Path.single r }
 
 -- Theorem 17
-theorem diamond_join_single (D : Diamond α) (s₁ : Step α a b) (s₂ : Step α a c) :
+def diamond_join_single (D : Diamond α) (s₁ : Step α a b) (s₂ : Step α a c) :
     (diamondToJoinable D s₁ s₂).left.len ≤ 1 := by
   simp [diamondToJoinable, Path.single, Path.len]
 
@@ -300,15 +300,15 @@ theorem swap_target (j : Joinable α b c) : j.swap.target = j.target := rfl
 -- ============================================================
 
 -- Theorem 21
-theorem backward_forward_len (s : Step α a b) :
+def backward_forward_len (s : Step α a b) :
     ((Path.single s.inv).trans (Path.single s)).len = 2 := rfl
 
 -- Theorem 22
-theorem forward_backward_len (s : Step α a b) :
+def forward_backward_len (s : Step α a b) :
     ((Path.single s).trans (Path.single s.inv)).len = 2 := rfl
 
 -- Theorem 23
-theorem roundtrip_cell (s : Step α a b) :
+def roundtrip_cell (s : Step α a b) :
     Cell2 ((Path.single s).trans (Path.single s.inv))
           ((Path.single s).trans (Path.single s.inv)) :=
   Cell2.id _
@@ -476,7 +476,7 @@ theorem maxPriority_nil (pg : ParityGame α) (a : α) :
     maxPriority pg (Path.nil a) = pg.priority a := rfl
 
 -- Theorem 34
-theorem maxPriority_cons (pg : ParityGame α) (s : Step α a b) (p : Path α b c) :
+def maxPriority_cons (pg : ParityGame α) (s : Step α a b) (p : Path α b c) :
     maxPriority pg (Path.cons s p) = max (pg.priority a) (maxPriority pg p) := rfl
 
 -- Theorem 35
@@ -487,7 +487,7 @@ theorem maxPriority_ge_source (pg : ParityGame α) (p : Path α a b) :
   | cons s q => simp [maxPriority]; exact Nat.le_max_left _ _
 
 -- Theorem 36
-theorem maxPriority_single (pg : ParityGame α) (s : Step α a b) :
+def maxPriority_single (pg : ParityGame α) (s : Step α a b) :
     maxPriority pg (Path.single s) = max (pg.priority a) (pg.priority b) := rfl
 
 -- ============================================================
@@ -605,7 +605,7 @@ structure LocalConfl (α : Type) where
        Σ d : α, Path α b d × Path α c d
 
 -- Theorem 52
-theorem lcJoinLen (lc : LocalConfl α) (s₁ : Step α a b) (s₂ : Step α a c)
+def lcJoinLen (lc : LocalConfl α) (s₁ : Step α a b) (s₂ : Step α a c)
     (ext : Path α (lc.lc s₁ s₂).1 d) :
     ((lc.lc s₁ s₂).2.1.trans ext).len =
       (lc.lc s₁ s₂).2.1.len + ext.len :=
@@ -657,17 +657,17 @@ theorem span_via_trans (sp : Span α a) (ext : Path α sp.left_end d) :
 theorem inv_nil (a : α) : (Path.nil a).inv = Path.nil a := rfl
 
 -- Theorem 56
-theorem step_inv_refl (a : α) : (Step.refl a).inv = Step.refl a := rfl
+def step_inv_refl (a : α) : (Step.refl a).inv = Step.refl a := rfl
 
 -- Theorem 57
-theorem step_inv_rule (n : String) (a b : α) :
+def step_inv_rule (n : String) (a b : α) :
     (Step.rule n a b).inv = Step.rule (n ++ "⁻¹") b a := rfl
 
 -- Theorem 58
-theorem step_inv_inv_refl (a : α) : (Step.refl a).inv.inv = Step.refl a := rfl
+def step_inv_inv_refl (a : α) : (Step.refl a).inv.inv = Step.refl a := rfl
 
 -- Theorem 59
-theorem step_inv_inv_rule (n : String) (a b : α) :
+def step_inv_inv_rule (n : String) (a b : α) :
     (Step.rule n a b).inv.inv = Step.rule ((n ++ "⁻¹") ++ "⁻¹") a b := rfl
 
 -- ============================================================
@@ -748,12 +748,12 @@ theorem len_ge_zero (p : Path α a b) : 0 ≤ p.len :=
   Nat.zero_le _
 
 -- Theorem 70
-theorem len_cons_pos (s : Step α a b) (p : Path α b c) :
+def len_cons_pos (s : Step α a b) (p : Path α b c) :
     0 < (Path.cons s p).len := by
   simp [Path.len]; omega
 
 -- Theorem 71
-theorem len_single_pos (s : Step α a b) : 0 < (Path.single s).len := by
+def len_single_pos (s : Step α a b) : 0 < (Path.single s).len := by
   simp [Path.single, Path.len]
 
 -- Theorem 72
@@ -812,17 +812,17 @@ theorem mapFn_vcomp (f : Path α a b → Path α a b)
   cases σ; cases τ; rfl
 
 -- Theorem 79
-theorem single_step_eq (s t : Step α a b) (h : s = t) :
+def single_step_eq (s t : Step α a b) (h : s = t) :
     Path.single s = Path.single t :=
   congrArg Path.single h
 
 -- Theorem 80
-theorem trans_single_len (p : Path α a b) (s : Step α b c) :
+def trans_single_len (p : Path α a b) (s : Step α b c) :
     (p.trans (Path.single s)).len = p.len + 1 := by
   rw [len_trans]; rfl
 
 -- Theorem 81
-theorem single_trans_len (s : Step α a b) (p : Path α b c) :
+def single_trans_len (s : Step α a b) (p : Path α b c) :
     (Path.single s |>.trans p).len = 1 + p.len := by
   rw [len_trans]; rfl
 

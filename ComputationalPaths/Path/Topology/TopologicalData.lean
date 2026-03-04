@@ -237,7 +237,7 @@ structure WassersteinTriangle (p : Nat) where
 /-! ## TDAStep -/
 
 /-- Rewrite steps for TDA computations. -/
-inductive TDAStep : Prop
+inductive TDAStep : Type
   | mapper_refine : TDAStep
   | reeb_quotient : TDAStep
   | merge_event : TDAStep

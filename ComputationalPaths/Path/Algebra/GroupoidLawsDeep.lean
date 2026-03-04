@@ -100,18 +100,18 @@ theorem length_trans (p : Path a b) (q : Path b c) :
 theorem length_refl (a : Pt) : (Path.refl a).length = 0 := rfl
 
 /-- Theorem 12 – length_single: single step has length 1. -/
-theorem length_single (s : Step a b) : (Path.single s).length = 1 := rfl
+def length_single (s : Step a b) : (Path.single s).length = 1 := rfl
 
 /-- Theorem 13 – symm_refl: inverse of refl is refl. -/
 theorem symm_refl (a : Pt) : Path.symm (Path.refl a) = Path.refl a := rfl
 
 /-- Theorem 14 – symm_single: inverse of a single step. -/
-theorem symm_single (s : Step a b) :
+def symm_single (s : Step a b) :
     Path.symm (Path.single s) = Path.single (Step.symm s) := by
   simp [Path.single, Path.symm, Path.trans]
 
 /-- Theorem 15 – step_symm_symm: double inversion on Step is identity. -/
-theorem step_symm_symm (s : Step a b) : Step.symm (Step.symm s) = s := by
+def step_symm_symm (s : Step a b) : Step.symm (Step.symm s) = s := by
   cases s with
   | edge n m => rfl
   | refl a => rfl
@@ -323,7 +323,7 @@ theorem lift_refl (cov : Covering) (x : cov.fibre a) :
 -- ============================================================
 
 /-- Theorem 39 – length of symm (single step). -/
-theorem length_symm_single (s : Step a b) :
+def length_symm_single (s : Step a b) :
     (Path.symm (Path.single s)).length = 1 := by
   simp [Path.single, Path.symm, Path.trans, Path.length]
 
@@ -335,12 +335,12 @@ theorem cons_of_nonzero_length (p : Path a b) (h : p.length > 0) :
   | cons s q => exact ⟨_, s, q, rfl⟩
 
 /-- Theorem 41 – trans with single. -/
-theorem trans_single_cons (s : Step a b) (p : Path b c) :
+def trans_single_cons (s : Step a b) (p : Path b c) :
     Path.trans (Path.single s) p = Path.cons s p := by
   simp [Path.single, Path.trans]
 
 /-- Theorem 42 – length_single_plus: length after appending a step. -/
-theorem length_single_plus (s : Step a b) (p : Path b c) :
+def length_single_plus (s : Step a b) (p : Path b c) :
     (Path.cons s p).length = 1 + p.length := rfl
 
 -- ============================================================
@@ -348,7 +348,7 @@ theorem length_single_plus (s : Step a b) (p : Path b c) :
 -- ============================================================
 
 /-- Helper: trans snoc lemma. -/
-theorem trans_cons_single (p : Path a b) (s : Step b c) :
+def trans_cons_single (p : Path a b) (s : Step b c) :
     Path.trans p (Path.single s) = Path.trans p (Path.cons s (Path.nil _)) := rfl
 
 /-- Theorem 43 – symm distributes over trans (anti-homomorphism). -/
@@ -463,7 +463,7 @@ theorem refl_loop_exists (a : Pt) : ∃ p : Loop a, p.length = 0 :=
   ⟨Path.refl a, rfl⟩
 
 /-- Theorem 53 – nonempty path has positive length. -/
-theorem cons_length_pos (s : Step a b) (p : Path b c) :
+def cons_length_pos (s : Step a b) (p : Path b c) :
     (Path.cons s p).length > 0 := by
   simp [Path.length]; omega
 
@@ -515,7 +515,7 @@ theorem loopEquiv_trans {l₁ l₂ l₃ : Loop a}
 -- ============================================================
 
 /-- Auxiliary: map commutes with step symm. -/
-theorem step_map_symm (f : PtMap) (s : Step a b) :
+def step_map_symm (f : PtMap) (s : Step a b) :
     Step.map f (Step.symm s) = Step.symm (Step.map f s) := by
   cases s with
   | edge n m => rfl

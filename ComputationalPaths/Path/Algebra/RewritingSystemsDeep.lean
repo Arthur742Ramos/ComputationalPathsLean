@@ -446,7 +446,7 @@ theorem nf_unique_path {α : Type} {R : α → α → Prop} {a b : α}
 -- ════════════════════════════════════════════════════════════
 
 /-- Parallel step: reduce zero or more redexes simultaneously. -/
-inductive ParStep (α : Type) (R : α → α → Prop) : α → α → Type where
+inductive ParStep (α : Type) (R : α → α → Type) : α → α → Type where
   | refl : (a : α) → ParStep α R a a
   | step : {a b : α} → R a b → ParStep α R a b
 
@@ -551,7 +551,7 @@ theorem toParPath_trans {α : Type} {R : α → α → Prop} {a b c : α}
 -- ════════════════════════════════════════════════════════════
 
 /-- A labelled step carries a tag for residual tracking. -/
-inductive LStep (α : Type) (R : α → α → Prop) (L : Type) : α → α → Type where
+inductive LStep (α : Type) (R : α → α → Type) (L : Type) : α → α → Type where
   | mk : {a b : α} → L → R a b → LStep α R L a b
 
 /-- A labelled path: sequence of labelled steps (Lévy labels). -/
@@ -943,11 +943,11 @@ theorem conv_symm_refl {α : Type} {R : α → α → Prop} (a : α) :
     (ConvPath.refl a : ConvPath α R a a).symm = ConvPath.refl a := rfl
 
 /-- Theorem 68: toRPath of par refl step is refl. -/
-theorem parStep_refl_toRPath {α : Type} {R : α → α → Prop} (a : α) :
+def parStep_refl_toRPath {α : Type} {R : α → α → Prop} (a : α) :
     (ParStep.refl a : ParStep α R a a).toRPath = RPath.refl a := rfl
 
 /-- Theorem 69: toRPath of par step is single. -/
-theorem parStep_step_toRPath {α : Type} {R : α → α → Prop} {a b : α}
+def parStep_step_toRPath {α : Type} {R : α → α → Prop} {a b : α}
     (r : R a b) :
     (ParStep.step r : ParStep α R a b).toRPath = RPath.single (.mk r) := rfl
 

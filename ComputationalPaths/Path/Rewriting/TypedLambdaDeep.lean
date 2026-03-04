@@ -202,7 +202,7 @@ theorem HasType.weakening_cons {Gam : Ctx} {A S : Ty} {Gam' : Ctx}
 -- ═══════════════════════════════════════════════════════════════
 
 /-- Single-step beta reduction -/
-inductive BetaStep : Term -> Term -> Prop where
+inductive BetaStep : Term -> Term -> Type where
   | beta : forall (ty : Ty) (body arg : Term),
       BetaStep (Term.app (Term.lam ty body) arg) (Term.betaReduce body arg)
   | appLeft : forall {t1 t1' : Term} (t2 : Term),
@@ -213,12 +213,12 @@ inductive BetaStep : Term -> Term -> Prop where
       BetaStep body body' -> BetaStep (Term.lam ty body) (Term.lam ty body')
 
 /-- Eta reduction -/
-inductive EtaStep : Term -> Term -> Prop where
+inductive EtaStep : Term -> Term -> Type where
   | eta : forall (ty : Ty) (t : Term),
       EtaStep (Term.lam ty (Term.app (Term.shift 1 0 t) (Term.var 0))) t
 
 /-- Combined beta-eta step -/
-inductive BetaEtaStep : Term -> Term -> Prop where
+inductive BetaEtaStep : Term -> Term -> Type where
   | ofBeta : BetaStep a b -> BetaEtaStep a b
   | ofEta : EtaStep a b -> BetaEtaStep a b
 
@@ -265,7 +265,7 @@ theorem BetaMulti.lamBody (ty : Ty) {body body' : Term}
 
 /-- A term is in normal form if no beta step is possible -/
 noncomputable def NormalForm (t : Term) : Prop :=
-  forall t', ¬ BetaStep t t'
+  forall t', ¬ Nonempty (BetaStep t t')
 
 /-- A term is in weak head normal form -/
 noncomputable def WeakHeadNF (t : Term) : Prop :=
@@ -277,7 +277,9 @@ noncomputable def WeakHeadNF (t : Term) : Prop :=
 
 /-- Theorem 21: variables are in normal form -/
 theorem var_normalForm (n : Nat) : NormalForm (Term.var n) := by
-  intro t' h; cases h
+  intro t' hs
+  cases hs with
+  | intro h => cases h
 
 /-- Theorem 22: normal form implies WHNF -/
 theorem normalForm_imp_whnf (t : Term) (h : NormalForm t) : WeakHeadNF t := by
@@ -289,7 +291,7 @@ theorem normalForm_imp_whnf (t : Term) (h : NormalForm t) : WeakHeadNF t := by
     cases t1 with
     | var _ => exact True.intro
     | app _ _ => exact True.intro
-    | lam ty body => exact absurd (BetaStep.beta ty body t2) (h _)
+    | lam ty body => exact absurd ⟨BetaStep.beta ty body t2⟩ (h _)
 
 /-- Theorem 23: variables are WHNF -/
 theorem var_whnf (n : Nat) : WeakHeadNF (Term.var n) := True.intro
@@ -707,7 +709,7 @@ theorem kCombinator_typed (Gam : Ctx) (A B : Ty) :
   HasType.tlam (HasType.tlam (HasType.tvar rfl))
 
 /-- Theorem 72: identity applied reduces -/
-theorem id_app_reduces (A : Ty) (t : Term) :
+def id_app_reduces (A : Ty) (t : Term) :
     BetaStep (Term.app (idCombinator A) t) (Term.betaReduce (Term.var 0) t) :=
   BetaStep.beta A (Term.var 0) t
 

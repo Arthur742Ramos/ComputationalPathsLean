@@ -113,7 +113,7 @@ theorem length_trans (p : Path a b) (q : Path b c) :
   | cons s p ih => simp [Path.trans, Path.length, ih, Nat.add_assoc]
 
 /-- Theorem 9 — length_single. -/
-theorem length_single (s : Step a b) : (Path.single s).length = 1 := rfl
+def length_single (s : Step a b) : (Path.single s).length = 1 := rfl
 
 /-- Theorem 10 — length_refl. -/
 theorem length_refl (gs : GameState n) : (Path.refl gs).length = 0 := rfl
@@ -513,7 +513,7 @@ theorem normalized_empty (f : Coalition → Int) (h0 : f [] = 0) :
 -- ============================================================
 
 /-- Theorem 50 — game diamond property. -/
-theorem game_diamond (gs a b : GameState n) (s1 : Step gs a) (s2 : Step gs b) :
+def game_diamond (gs a b : GameState n) (s1 : Step gs a) (s2 : Step gs b) :
     ∃ c : GameState n, Nonempty (Path a c) ∧ Nonempty (Path b c) :=
   ⟨a, ⟨Path.nil a⟩, ⟨Path.cons (Step.rewrite b a) (Path.nil a)⟩⟩
 
@@ -532,7 +532,7 @@ theorem choose_first_length (p : Player) (b : GameTree) (bs : List GameTree) :
       (TreePath.nil b)).length = 1 := rfl
 
 /-- Theorem 53 — prune + rebuild: length 2. -/
-theorem prune_rebuild_length (a b : GameTree) :
+def prune_rebuild_length (a b : GameTree) :
     (TreePath.cons (TreeStep.prune a b)
       (TreePath.cons (TreeStep.prune b a) (TreePath.nil a))).length = 2 := rfl
 

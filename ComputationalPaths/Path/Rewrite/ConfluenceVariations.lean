@@ -237,7 +237,7 @@ theorem det_functional {step : α → Option α} {a b c : α}
   simp [DetStep] at hb hc; rw [hb] at hc; exact Option.some.inj hc
 
 /-- A deterministic relation is confluent. -/
-theorem det_confluent (step : α → Option α) : Confluent (DetStep step) := by
+def det_confluent (step : α → Option α) : Confluent (DetStep step) := by
   intro a b c hab hac
   induction hab with
   | refl => exact ⟨c, hac, .refl c⟩
@@ -249,13 +249,13 @@ theorem det_confluent (step : α → Option α) : Confluent (DetStep step) := by
       exact ih hyc
 
 /-- A deterministic relation is locally confluent. -/
-theorem det_locally_confluent (step : α → Option α) : LocallyConfluent (DetStep step) := by
+def det_locally_confluent (step : α → Option α) : LocallyConfluent (DetStep step) := by
   intro a b c hb hc
   have := det_functional hb hc; subst this
   exact ⟨b, .refl b, .refl b⟩
 
 /-- Non-overlapping rules give deterministic steps → confluence. -/
-theorem orthogonal_confluent (step : α → Option α) : Confluent (DetStep step) :=
+def orthogonal_confluent (step : α → Option α) : Confluent (DetStep step) :=
   det_confluent step
 
 end Deterministic

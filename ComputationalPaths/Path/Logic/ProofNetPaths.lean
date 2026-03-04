@@ -131,7 +131,7 @@ noncomputable def correctnessPath {A : Type u} (a b : A) (h : a = b) : Path a b 
   Path.mk [Step.mk _ _ h] h
 
 /-- Theorem 5: Correctness path is reflexive at identity. -/
-theorem correctnessPath_refl {A : Type u} (a : A) :
+def correctnessPath_refl {A : Type u} (a : A) :
     correctnessPath a a rfl = Path.mk [Step.mk a a rfl] rfl := by
   rfl
 

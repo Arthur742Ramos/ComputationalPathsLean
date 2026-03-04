@@ -76,7 +76,7 @@ theorem path_length_trans (p : Path α a b) (q : Path α b c) :
   | nil _ => simp [Path.trans, Path.length]
   | cons s _ ih => simp [Path.trans, Path.length, ih, Nat.add_assoc]
 
-theorem path_single_length (s : Step α a b) :
+def path_single_length (s : Step α a b) :
     (Path.single s).length = 1 := by
   simp [Path.single, Path.length]
 

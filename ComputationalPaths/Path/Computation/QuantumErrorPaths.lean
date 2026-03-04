@@ -236,7 +236,7 @@ noncomputable def error_correct_compose (q : QBit) :
     (bitFlip_involution_path q)
 
 -- 19. Symm of error path
-theorem error_path_symm (q : QBit) :
+def error_path_symm (q : QBit) :
     Path.symm (bitFlip_involution_path q) =
     Path.mk [Step.mk _ _ (bitFlip_involution q).symm] (bitFlip_involution q).symm := by
   rfl
