@@ -677,7 +677,7 @@ inductive LTS : CProc → Action → CProc → Prop where
 notation P " —[" a "]→ " Q => LTS P a Q
 
 /-- Multi-step transition (trace execution) -/
-inductive MultiStep : CProc → List Action → CProc → Type where
+inductive MultiStep : CProc → List Action → CProc → Prop where
   | empty : MultiStep P [] P
   | step : LTS P a Q → MultiStep Q t R → MultiStep P (a :: t) R
 
