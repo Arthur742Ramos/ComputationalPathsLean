@@ -246,7 +246,7 @@ noncomputable def fixed_points (G : ProfiniteGroup) (M : Type u)
 /-! ## Rewrite Steps -/
 
 /-- Rewrite steps for profinite group reasoning. -/
-inductive ProfiniteStep : {A : Type u} → A → A → Type u (u + 1)
+inductive ProfiniteStep : {A : Type u} → A → A → Type (u + 1)
   | transition_compose {S : InverseSystem} {n : Nat} {x : S.obj (n + 2)} :
       ProfiniteStep (S.transition n (S.transition (n + 1) x))
                     (S.transition n (S.transition (n + 1) x))

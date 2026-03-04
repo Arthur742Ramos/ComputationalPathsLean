@@ -78,7 +78,7 @@ Since `Step` is Prop-valued, the sign and endpoints are the only data. -/
 
 /-- A signed atomic step: either a forward `Step p q` or a backward `Step q p`.
     This represents a generator of the free groupoid on `Step`. -/
-inductive SignedStep {A : Type u} {a b : A} : Path a b → Path a b → Type u (u + 1) where
+inductive SignedStep {A : Type u} {a b : A} : Path a b → Path a b → Type (u + 1) where
   | fwd {p q : Path a b} : Step p q → SignedStep p q
   | bwd {p q : Path a b} : Step q p → SignedStep p q
 
@@ -182,7 +182,7 @@ composing from `p` to `q`. This is the "word" in the free groupoid. -/
 
 /-- A flat chain of signed steps from `p` to `q`.
     This represents a word in the free groupoid. -/
-inductive FlatChain {A : Type u} {a b : A} : Path a b → Path a b → Type u (u + 1) where
+inductive FlatChain {A : Type u} {a b : A} : Path a b → Path a b → Type (u + 1) where
   | nil  : (p : Path a b) → FlatChain p p
   | cons : {p q r : Path a b} → SignedStep p q → FlatChain q r → FlatChain p r
 
