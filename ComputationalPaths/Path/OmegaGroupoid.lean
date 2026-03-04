@@ -1201,9 +1201,12 @@ inductive MetaStep₄ : {a b : A} → {p q : Path a b} → {d₁ d₂ : Derivati
   | step_eq {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       (s₁ s₂ : MetaStep₃ d₁ d₂) :
       MetaStep₄ (.step s₁) (.step s₂)
-  /-- Squier-style diamond filler connecting any parallel 3-cells. -/
-  | diamond_filler {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      (m₁ m₂ : Derivation₃ d₁ d₂) :
+  /-- Prop-level transport: parallel 3-cells induce equal `toRwEqEq` witnesses
+      in `Prop`, which can be lifted as a canonical 4-cell. -/
+  | rweq_transport {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      {m₁ m₂ : Derivation₃ d₁ d₂}
+      (h : Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₁ =
+            Derivation₃.toRwEqEq (d₁ := d₁) (d₂ := d₂) m₂) :
       MetaStep₄ m₁ m₂
   -- Whiskering at level 4 (functoriality of vcomp)
   | whisker_left₄ {a b : A} {p q : Path a b} {d₁ d₂ d₃ : Derivation₂ p q}
@@ -1277,10 +1280,13 @@ noncomputable def normalize₃_bridge {a b : A} {p q : Path a b} {d₁ d₂ : De
 
 /-- Contractibility at Level 4: any two parallel 3-cells are connected by a 4-cell. -/
 noncomputable def contractibility₄ {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-    (m₁ m₂ : Derivation₃ d₁ d₂) : Derivation₄ m₁ m₂ :=
-  .vcomp (normalize₃_bridge m₁)
-    (.vcomp (.step (.diamond_filler (normalize₃ m₁) (normalize₃ m₂)))
-      (.inv (normalize₃_bridge m₂)))
+    (m₁ m₂ : Derivation₃ d₁ d₂) : Derivation₄ m₁ m₂ := by
+  -- `Derivation₃.toRwEqEq` lands in `Prop`, so any two such proofs are equal.
+  refine .step ?_
+  exact
+    MetaStep₄.rweq_transport (m₁ := m₁) (m₂ := m₂)
+      (by
+        apply Subsingleton.elim)
 
 /-- Loop contraction at level 4: Any loop m : Derivation₃ d d contracts to .refl d. -/
 noncomputable def loop_contract₄ {a b : A} {p q : Path a b} {d : Derivation₂ p q}
@@ -1325,10 +1331,11 @@ inductive MetaStepHigh : (n : Nat) → {a b : A} → {p q : Path a b} →
   | step_eq {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
       {m₁ m₂ : Derivation₃ d₁ d₂} (s₁ s₂ : MetaStep₄ m₁ m₂) :
       MetaStepHigh n (.step s₁) (.step s₂)
-  /-- Squier-style diamond filler connecting any parallel 4-cells. -/
-  | diamond_filler {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
-      {m₁ m₂ : Derivation₃ d₁ d₂}
-      (c₁ c₂ : Derivation₄ m₁ m₂) :
+  /-- Prop-level transport: parallel 4-cells induce equal `toRwEqEq` witnesses
+      in `Prop`, which can be lifted as a canonical higher cell. -/
+  | rweq_transport {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
+      {m₁ m₂ : Derivation₃ d₁ d₂} {c₁ c₂ : Derivation₄ m₁ m₂}
+      (h : Derivation₄.toRwEqEq c₁ = Derivation₄.toRwEqEq c₂) :
       MetaStepHigh n c₁ c₂
   -- Whiskering at level 5+ (functoriality of vcomp)
   | whisker_left {n : Nat} {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
@@ -1398,10 +1405,11 @@ noncomputable def normalize₄_bridge {a b : A} {p q : Path a b} {d₁ d₂ : De
 /-- Contractibility at Level 5+: any two parallel cells are connected. -/
 noncomputable def contractibilityHigh {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}
     {m₁ m₂ : Derivation₃ d₁ d₂} (n : Nat)
-    (c₁ c₂ : Derivation₄ m₁ m₂) : DerivationHigh n c₁ c₂ :=
-  .vcomp (normalize₄_bridge (n := n) c₁)
-    (.vcomp (.step (.diamond_filler (n := n) (normalize₄ c₁) (normalize₄ c₂)))
-      (.inv (normalize₄_bridge (n := n) c₂)))
+    (c₁ c₂ : Derivation₄ m₁ m₂) : DerivationHigh n c₁ c₂ := by
+  -- `Derivation₄.toRwEqEq` lands in `Prop`, so any two such proofs are equal.
+  refine .step ?_
+  exact MetaStepHigh.rweq_transport (n := n) (c₁ := c₁) (c₂ := c₂) (by
+    apply Subsingleton.elim)
 
 /-- Loop contraction at level 5+: Any loop c : Derivation₄ m m contracts to .refl m. -/
 noncomputable def loop_contract_high {a b : A} {p q : Path a b} {d₁ d₂ : Derivation₂ p q}

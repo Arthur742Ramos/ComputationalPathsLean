@@ -579,7 +579,7 @@ theorem omega_structure_contractible_above_2 :
       Nonempty (DerivationHigh n c₁ c₂)) :=
   ⟨fun d₁ d₂ => ⟨Normalizer.contractibility₃_genuine d₁ d₂⟩,
    fun m₁ m₂ => ⟨OmegaGroupoid.contractibility₄ m₁ m₂⟩,
-   fun n c₁ c₂ => ⟨DerivationHigh.step (MetaStepHigh.diamond_filler (n := n) c₁ c₂)⟩⟩
+   fun n c₁ c₂ => ⟨OmegaGroupoid.contractibilityHigh n c₁ c₂⟩⟩
 
 /-- The coherence conditions at level n+1 witness the equations at level n.
     Level 3+ is contractible because the TRS is confluent. -/

@@ -287,7 +287,7 @@ Prop-valued, we only need to check the direction and endpoints. -/
     `ss₁ : SignedStep p q` and `ss₂ : SignedStep q p` cancel when
     one is the flip of the other (same underlying step, opposite sign). -/
 inductive Cancels {A : Type u} {a b : A} :
-    {p q : Path a b} → SignedStep p q → {r : Path a b} → SignedStep q r → Type u where
+    {p q : Path a b} → SignedStep p q → {r : Path a b} → SignedStep q r → Type (u + 2) where
   | fwd_bwd {p q : Path a b} (s₁ : Step p q) (s₂ : Step p q) :
       Cancels (.fwd s₁) (.bwd s₂)
   | bwd_fwd {p q : Path a b} (s₁ : Step q p) (s₂ : Step q p) :
@@ -308,21 +308,39 @@ noncomputable def cancel_witness {p q : Path a b}
     Derivation₃ (.vcomp ss₁.toDerivation₂ ss₂.toDerivation₂) (.refl p) := by
   cases hc with
   | fwd_bwd s₁ s₂ =>
-    -- Since Step is Prop, s₁ = s₂ definitionally
-    exact .step (.vcomp_inv_right (.step s₁))
+    -- step s₁ · inv(step s₂)  ↝  step s₁ · inv(step s₁)  ↝  refl
+    have hInv : Derivation₃ (.inv (.step s₂)) (.inv (.step s₁)) :=
+      .step (.whisker_inv₃ (s := MetaStep₃.step_eq s₂ s₁))
+    have hCongr :
+        Derivation₃
+          (.vcomp (.step s₁) (.inv (.step s₂)))
+          (.vcomp (.step s₁) (.inv (.step s₁))) :=
+      Derivation₃.whiskerLeft₃ (c := .step s₁) (α := hInv)
+    exact
+      .vcomp hCongr
+        (.step (.vcomp_inv_right (.step s₁)))
   | bwd_fwd s₁ s₂ =>
-    -- Since Step is Prop, s₁ = s₂ definitionally
-    exact .step (.vcomp_inv_left (.step s₁))
+    -- inv(step s₁) · step s₂  ↝  inv(step s₁) · step s₁  ↝  refl
+    have hStep : Derivation₃ (.step s₂) (.step s₁) :=
+      .step (MetaStep₃.step_eq s₂ s₁)
+    have hCongr :
+        Derivation₃
+          (.vcomp (.inv (.step s₁)) (.step s₂))
+          (.vcomp (.inv (.step s₁)) (.step s₁)) :=
+      Derivation₃.whiskerLeft₃ (c := .inv (.step s₁)) (α := hStep)
+    exact
+      .vcomp hCongr
+        (.step (.vcomp_inv_left (.step s₁)))
 
 /-- A chain is **reduced** if it contains no adjacent canceling pairs. -/
 inductive IsReduced {A : Type u} {a b : A} : {p q : Path a b} → FlatChain p q → Prop where
-  | nil : (p : Path a b) → IsReduced (.nil p)
-  | singleton : (ss : SignedStep p q) → IsReduced (.cons ss (.nil q))
-  | cons_cons : {p q r s : Path a b} →
-      (ss₁ : SignedStep p q) → (ss₂ : SignedStep q r) →
-      (rest : FlatChain r s) →
-      (Cancels ss₁ ss₂ → False) →
-      IsReduced (.cons ss₂ rest) →
+  | nil (p : Path a b) : IsReduced (.nil p)
+  | singleton {p q : Path a b} (ss : SignedStep p q) : IsReduced (.cons ss (.nil q))
+  | cons_cons {p q r s : Path a b}
+      (ss₁ : SignedStep p q) (ss₂ : SignedStep q r)
+      (rest : FlatChain r s)
+      (hnc : Cancels ss₁ ss₂ → False)
+      (hrest : IsReduced (.cons ss₂ rest)) :
       IsReduced (.cons ss₁ (.cons ss₂ rest))
 
 /-! ## §4  One-Step Reduction
@@ -330,12 +348,14 @@ inductive IsReduced {A : Type u} {a b : A} : {p q : Path a b} → FlatChain p q 
 Perform a single cancellation in a chain, producing a shorter chain
 and a `Derivation₃` witness. -/
 
-/-- Result of attempting to reduce the head of a chain. -/
+/-- Result of attempting to reduce the head of a chain.
+
+We keep this as a lightweight datatype (used only for documentation / future work).
+Current development returns `unchanged` everywhere, since we avoid computational
+cancellation detection and rely on `contractibility₃` for global coherence. -/
 inductive ReduceHeadResult {A : Type u} {a b : A} (p r : Path a b) where
   | unchanged : (c : FlatChain p r) → ReduceHeadResult p r
-  | reduced   : (c : FlatChain p r) →
-                 (witness : Derivation₃ (FlatChain.toDerivation₂ orig) c.toDerivation₂) →
-                 ReduceHeadResult p r
+  | reduced   : (c : FlatChain p r) → ReduceHeadResult p r
 
 /-- Try to cancel the first two elements of a chain.
     If they cancel, return the tail with a `Derivation₃` witness. -/
