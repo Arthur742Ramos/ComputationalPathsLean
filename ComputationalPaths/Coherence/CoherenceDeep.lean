@@ -1,6 +1,6 @@
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
-namespace ComputationalPaths.Coherence
+namespace ComputationalPaths.Coherence.CoherenceDeep
 
 open ComputationalPaths
 open ComputationalPaths.Path
@@ -243,4 +243,4 @@ noncomputable def coherence_trans
 
 end DerivedCoherence
 
-end ComputationalPaths.Coherence
+end ComputationalPaths.Coherence.CoherenceDeep
