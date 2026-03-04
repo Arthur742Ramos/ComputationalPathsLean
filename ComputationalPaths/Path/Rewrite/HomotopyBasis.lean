@@ -148,7 +148,7 @@ noncomputable def criticalPairHomotopyBasis : HomotopyBasis where
 /-- A 3-cell between two decompositions is a path between interpreted 2-cells. -/
 abbrev Decomposition3Cell
     {A : Type u} {a b : A} {p q : Path a b}
-    (d₁ d₂ : Generated2Cells CriticalPairBasisCell p q) : Type u :=
+    (d₁ d₂ : Generated2Cells CriticalPairBasisCell p q) : Type (u + 1) :=
   Path
     (Generated2Cells.toRwEq
       (B := CriticalPairBasisCell) (toRwEqB := CriticalPairBasisCell.toRwEqProp) d₁)
