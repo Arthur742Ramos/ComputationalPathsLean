@@ -118,7 +118,7 @@ noncomputable def StepConfluent : Prop :=
   ∀ p q r : Path a b, Rw p q → Rw p r → ∃ m, Rw q m ∧ Rw r m
 
 theorem step_newman_lemma
-    (wf : WellFounded (fun y x : Path a b => StepRel (A := A) (a := a) (b := b) x y))
+    (wf : WellFounded (fun y x : Path a b => Nonempty (Path.Step x y)))
     (hLocal : StepLocallyConfluent (A := A) (a := a) (b := b)) :
     StepConfluent (A := A) (a := a) (b := b) := by
   have hLocalRTC : LocallyConfluent (StepRel (A := A) (a := a) (b := b)) := by
