@@ -1029,7 +1029,7 @@ inductive Step :
 /-! ## Local joinability for critical overlaps -/
 
 /-- Compatibility helper used by deep modules: append `refl` and contract. -/
-theorem Step.exact_compose {A : Type u} {a b : A} (p : Path a b) :
+noncomputable def Step.exact_compose {A : Type u} {a b : A} (p : Path a b) :
     Step (Path.trans p (Path.refl b)) p :=
   Step.trans_refl_right (A := A) p
 
