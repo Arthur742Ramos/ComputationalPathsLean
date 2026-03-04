@@ -39,7 +39,7 @@ noncomputable def cancellation_contracts_two_cell {A : Type u} {a : A}
   refine RwEq.trans ?_ (rweq_cmpA_refl_right p)
   exact rweq_trans_congr_right p (LoopSpace.loop_cancel_left (A := A) (a := a) p)
 
-/-- Higher homotopy multiplication is path-associative (`n ≥ 2`). -/
+/- Higher homotopy multiplication is path-associative (`n ≥ 2`). -/
 -- DISABLED: HigherHomotopyGroups has universe issues
 -- noncomputable def piN_mul_assoc_path {X : Type u} (n : Nat) [Nat.AtLeastTwo n] (x : X)
 --     (α β γ : HigherHomotopyGroups.PiN n X x) :

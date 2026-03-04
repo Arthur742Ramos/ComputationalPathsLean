@@ -21,7 +21,7 @@ to the integers.
 - de Queiroz et al., SAJL 2016
 -/
 
--- import ComputationalPaths.Path.Algebra.NielsenSchreier  -- TEMPORARILY DISABLED: depends on broken FreeGroupProperties
+import ComputationalPaths.Path.Algebra.NielsenSchreier
 import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
@@ -221,11 +221,9 @@ noncomputable def genPow_roundtrip (k : Int) :
 
 /-! ## Deeper structural properties -/
 
-noncomputable section
+-- Commutativity of F₁ multiplication via the ℤ encoding.
 
-/-- Commutativity of F₁ multiplication via the ℤ encoding. -/
-
-/-- Encoding of negation corresponds to integer negation. -/
+-- Encoding of negation corresponds to integer negation.
 
 /-- The equivalence preserves the group structure: encoding is a homomorphism. -/
 noncomputable def equiv_homomorphism (x y : BouquetFreeGroup 1) :
@@ -233,19 +231,19 @@ noncomputable def equiv_homomorphism (x y : BouquetFreeGroup 1) :
       (freeGroupOneToInt x + freeGroupOneToInt y) :=
   mul_encoding_path x y
 
-/-- Double negation via the encoding. -/
+-- Double negation via the encoding.
 
-/-- Encoding of zero is zero. -/
+-- Encoding of zero is zero.
 
-/-- Power of 2 law: pow x 2 = mul x x. -/
+-- Power of 2 law: pow x 2 = mul x x.
 
-/-- Encoding of generator power via integer multiplication. -/
+-- Encoding of generator power via integer multiplication.
 
-/-- Multiplication by inverse on the left cancels. -/
+-- Multiplication by inverse on the left cancels.
 
-/-- Multiplication by inverse on the right cancels. -/
+-- Multiplication by inverse on the right cancels.
 
-/-- Generator power of zero is the identity. -/
+-- Generator power of zero is the identity.
 
 /-- The roundtrip F₁ → ℤ → F₁ is the identity. -/
 noncomputable def f1_roundtrip (x : BouquetFreeGroup 1) :

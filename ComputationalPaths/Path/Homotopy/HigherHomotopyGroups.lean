@@ -40,26 +40,26 @@ abbrev PiN (n : Nat) (X : Type u) (x : X) : Type (u + 2) :=
 /-- Multiplication on πₙ in the computational-path model. -/
 noncomputable def piN_mul (n : Nat) (x : X) : PiN n X x → PiN n X x → PiN n X x :=
   match n with
-  | 0 => fun _ _ => PUnit.unit
-  | 1 => PiOne.mul (A := X) (a := x)
+  | 0 => fun _ _ => ULift.up PUnit.unit
+  | 1 => fun a b => ULift.up (PiOne.mul (A := X) (a := x) a.down b.down)
   | 2 => HigherHomotopy.PiTwo.mul (A := X) (a := x)
-  | _ + 3 => fun _ _ => PUnit.unit
+  | _ + 3 => fun _ _ => ULift.up PUnit.unit
 
 /-- Identity in πₙ in the computational-path model. -/
 noncomputable def piN_one (n : Nat) (x : X) : PiN n X x :=
   match n with
-  | 0 => PUnit.unit
-  | 1 => PiOne.id (A := X) (a := x)
+  | 0 => ULift.up PUnit.unit
+  | 1 => ULift.up (PiOne.id (A := X) (a := x))
   | 2 => HigherHomotopy.PiTwo.id (A := X) (a := x)
-  | _ + 3 => PUnit.unit
+  | _ + 3 => ULift.up PUnit.unit
 
 /-- Inverse in πₙ in the computational-path model. -/
 noncomputable def piN_inv (n : Nat) (x : X) : PiN n X x → PiN n X x :=
   match n with
-  | 0 => fun _ => PUnit.unit
-  | 1 => PiOne.inv (A := X) (a := x)
+  | 0 => fun _ => ULift.up PUnit.unit
+  | 1 => fun a => ULift.up (PiOne.inv (A := X) (a := x) a.down)
   | 2 => HigherHomotopy.PiTwo.inv (A := X) (a := x)
-  | _ + 3 => fun _ => PUnit.unit
+  | _ + 3 => fun _ => ULift.up PUnit.unit
 
 noncomputable def piN_mul_assoc (n : Nat) [Nat.AtLeastTwo n] {x : X}
     (a b c : PiN n X x) :

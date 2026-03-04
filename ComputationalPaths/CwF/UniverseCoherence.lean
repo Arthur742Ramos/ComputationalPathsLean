@@ -12,6 +12,8 @@ import ComputationalPaths.CwF.CwFDeep
 
 namespace ComputationalPaths.CwF
 
+namespace UniverseCoherence
+
 open ComputationalPaths
 open ComputationalPaths.Path
 
@@ -218,5 +220,7 @@ noncomputable def congrArg_refl_path {Γ : Ctx} {A B : Ty Γ}
     (f : (γ : Γ) → A γ → B γ) (a : Tm Γ A) (γ : Γ) :
     Path (Path.congrArg (f γ) (Path.refl (a γ))) (Path.refl (f γ (a γ))) := by
   simp [Path.congrArg, Path.refl]; exact Path.refl _
+
+end UniverseCoherence
 
 end ComputationalPaths.CwF

@@ -406,12 +406,12 @@ noncomputable def iterateLoopNeg_add {A : Type u} {a : A} (l : Path a a) (m n : 
 /-- l · l⁻¹ ≈ refl -/
 noncomputable def loop_cancel {A : Type u} {a : A} (l : Path a a) :
     RwEq (Path.trans l (Path.symm l)) (Path.refl a) := by
-  path_simp
+  exact rweq_cmpA_inv_right l
 
 /-- l⁻¹ · l ≈ refl -/
 noncomputable def loop_cancel' {A : Type u} {a : A} (l : Path a a) :
     RwEq (Path.trans (Path.symm l) l) (Path.refl a) := by
-  path_simp
+  exact rweq_cmpA_inv_left l
 
 /-- l · (l⁻¹)^{n+1} ≈ (l⁻¹)^n
     This is: l · (l⁻¹ · (l⁻¹)^n) ≈ (l · l⁻¹) · (l⁻¹)^n ≈ refl · (l⁻¹)^n ≈ (l⁻¹)^n -/
@@ -504,25 +504,24 @@ noncomputable def iterateLoopPos_neg_gt {A : Type u} {a : A} (l : Path a a) (m n
   induction n generalizing m with
   | zero =>
     simp only [iterateLoopNeg, Nat.sub_zero]
-    path_simp  -- X · refl ≈ X
+    exact rweq_cmpA_refl_right (iterateLoopPos l m)
   | succ n ih =>
     -- m > n + 1
-    have hm : m ≥ 2 := by omega
-    obtain ⟨m', hm'⟩ : ∃ m', m = m' + 1 := ⟨m - 1, by omega⟩
-    have hm'_gt : m' > n := by omega
+    have hm' : m = (m - 1) + 1 := by omega
+    have hm'_gt : m - 1 > n := by omega
     rw [hm']
     simp only [iterateLoopNeg]
     -- LHS: trans (iterateLoopPos l (m'+1)) (trans (symm l) (iterateLoopNeg l n))
     -- Use iterateLoopNeg_cancel_one in reverse on inner part
     -- First reassociate: trans (trans (iterateLoopPos l (m'+1)) (symm l)) (iterateLoopNeg l n)
-    apply rweq_trans (rweq_symm (rweq_tt (iterateLoopPos l (m' + 1)) (Path.symm l) (iterateLoopNeg l n)))
+    apply rweq_trans (rweq_symm (rweq_tt (iterateLoopPos l ((m - 1) + 1)) (Path.symm l) (iterateLoopNeg l n)))
     -- Now use a cancellation lemma on (iterateLoopPos l (m'+1)) (symm l)
     -- This should give l^{m'}
-    apply rweq_trans (rweq_trans_congr_left (iterateLoopNeg l n) (iterateLoopPos_cancel_right l m'))
+    apply rweq_trans (rweq_trans_congr_left (iterateLoopNeg l n) (iterateLoopPos_cancel_right l (m - 1)))
     -- Now: trans (iterateLoopPos l m') (iterateLoopNeg l n) ≈ iterateLoopPos l (m' - n)
-    have hsub : m' + 1 - (n + 1) = m' - n := by omega
+    have hsub : (m - 1) + 1 - (n + 1) = (m - 1) - n := by omega
     rw [hsub]
-    exact ih m' hm'_gt
+    exact ih (m - 1) hm'_gt
 
 /-- Positive < Negative: l^m · (l⁻¹)^n ≈ (l⁻¹)^{n-m} when m < n
     Induct on n. For succ n with m < n+1:
@@ -632,14 +631,16 @@ noncomputable def iterateLoopNeg_pos_lt {A : Type u} {a : A} (l : Path a a) (m n
     simp only [iterateLoopNeg]
     -- LHS: (l⁻¹ · (l⁻¹)^m) · l^n ≈ l⁻¹ · ((l⁻¹)^m · l^n)  [by tt]
     apply rweq_trans (rweq_tt (Path.symm l) (iterateLoopNeg l m) (iterateLoopPos l n))
-    cases Nat.lt_or_eq_of_le (Nat.lt_succ_iff.mp h) with
-    | inl hlt =>
+    have hle : n ≤ m := Nat.lt_succ_iff.mp h
+    by_cases hlt : n < m
+    ·
       -- n < m: by IH, (l⁻¹)^m · l^n ≈ (l⁻¹)^{m-n}
       apply rweq_trans (rweq_trans_congr_right (Path.symm l) (ih n hlt))
       have hsub : m + 1 - n = (m - n) + 1 := by omega
       rw [hsub]
       exact RwEq.refl _
-    | inr heq =>
+    ·
+      have heq : n = m := Nat.le_antisymm hle (Nat.not_lt.mp hlt)
       -- n = m: (l⁻¹)^{m+1} · l^m when n = m
       -- Goal: l⁻¹ · ((l⁻¹)^m · l^m) ≈ (l⁻¹)^{m+1-m} = (l⁻¹)^1 = l⁻¹
       rw [heq]
@@ -691,8 +692,8 @@ noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : 
     · -- m + n ≥ 0: result is positive, m.toNat ≥ (-n).toNat
       simp only [hmn, ↓reduceIte]
       have hcmp : m.toNat ≥ (-n).toNat := toNat_le_of_le (by omega : -n ≤ m)
-      match Nat.lt_or_eq_of_le hcmp with
-      | .inl hgt =>
+      by_cases hgt : (-n).toNat < m.toNat
+      ·
         -- m.toNat > (-n).toNat
         have hsub : (m + n).toNat = m.toNat - (-n).toNat := by
           have heq : m + n = m - (-n) := by omega
@@ -700,7 +701,8 @@ noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : 
           exact toNat_sub_eq hm hnn (by omega)
         rw [hsub]
         exact iterateLoopPos_neg_gt l m.toNat (-n).toNat hgt
-      | .inr heq =>
+      ·
+        have heq : (-n).toNat = m.toNat := Nat.le_antisymm hcmp (Nat.not_lt.mp hgt)
         -- (-n).toNat = m.toNat, so m + n = 0
         have hzero : m + n = 0 := by
           have h1 : (m : Int) = m.toNat := (Int.toNat_of_nonneg hm).symm
@@ -733,8 +735,8 @@ noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : 
     · -- m + n ≥ 0: result is positive or zero
       simp only [hmn, ↓reduceIte]
       have hcmp : (-m).toNat ≤ n.toNat := toNat_le_of_le (by omega : -m ≤ n)
-      match Nat.lt_or_eq_of_le hcmp with
-      | .inl hlt =>
+      by_cases hlt : (-m).toNat < n.toNat
+      ·
         -- n.toNat > (-m).toNat
         have hsub : (m + n).toNat = n.toNat - (-m).toNat := by
           have h1 : m + n = n - (-m) := by omega
@@ -742,7 +744,8 @@ noncomputable def iterateLoopInt_add {A : Type u} {a : A} (l : Path a a) (m n : 
           exact toNat_sub_eq hn hmm (by omega)
         rw [hsub]
         exact iterateLoopNeg_pos_gt l (-m).toNat n.toNat hlt
-      | inr heq =>
+      ·
+        have heq : (-m).toNat = n.toNat := Nat.le_antisymm hcmp (Nat.not_lt.mp hlt)
         -- (-m).toNat = n.toNat, so m + n = 0
         have hzero : m + n = 0 := by
           have h3 : (n : Int) = n.toNat := (Int.toNat_of_nonneg hn).symm

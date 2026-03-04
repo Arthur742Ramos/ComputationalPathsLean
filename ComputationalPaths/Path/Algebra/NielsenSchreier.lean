@@ -19,7 +19,7 @@ and FreeGroupProperties.
 -/
 
 import ComputationalPaths.Path.Basic.Core
--- import ComputationalPaths.Path.Algebra.FreeGroupProperties  -- TEMPORARILY DISABLED: depends on broken BouquetN
+import ComputationalPaths.Path.Algebra.FreeGroupProperties
 
 namespace ComputationalPaths
 namespace Path

@@ -77,6 +77,15 @@ noncomputable def gromovProduct_comm_loop (e x y : X) :
   Path.trans (gromovProduct_comm (M:=M) e x y)
     (Path.symm (gromovProduct_comm (M:=M) e x y))
 
+/-- The commutativity loop contracts to reflexivity up to rewrite equivalence. -/
+noncomputable def gromov_delta_path_lemma (e x y : X) :
+    RwEq (Path.trans (gromovProduct_comm_loop (M := M) e x y)
+      (Path.refl (M.gromovProduct e x y)))
+      (Path.refl (M.gromovProduct e x y)) := by
+  apply rweq_trans (rweq_cmpA_refl_right (gromovProduct_comm_loop (M := M) e x y))
+  simpa [gromovProduct_comm_loop] using
+    (rweq_cmpA_inv_right (gromovProduct_comm (M := M) e x y))
+
 end MetricData
 
 /-! ## Delta-hyperbolicity -/

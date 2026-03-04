@@ -12,6 +12,8 @@ import ComputationalPaths.Path.Rewrite.RwEq
 namespace ComputationalPaths
 namespace Equivalence
 
+namespace PathInfrastructure
+
 open Path
 
 universe u v
@@ -212,6 +214,8 @@ noncomputable def inducedPathEquiv (E : CategoricalEquivalence C D F G) (x y : C
   right_inv := map_unmap_rweq (E := E)
 
 end InducedPathEquivalence
+
+end PathInfrastructure
 
 end Equivalence
 end ComputationalPaths

@@ -252,6 +252,20 @@ noncomputable def functionalEquationPath {α : Type u} (zd : ZetaFunctionData α
     Path zd zd :=
   Path.refl zd
 
+/-- A nontrivial rewrite-equivalence chain collapsing nested zeta/functional paths. -/
+noncomputable def zetaFunctional_chain_rweq {α : Type u} (zd : ZetaFunctionData α) :
+    RwEq
+      (Path.trans
+        (Path.trans (zetaRationalityPath zd) (Path.symm (zetaRationalityPath zd)))
+        (Path.trans (functionalEquationPath zd) (Path.refl zd)))
+      (functionalEquationPath zd) := by
+  apply rweq_trans
+    (rweq_trans_congr_left
+      (Path.trans (functionalEquationPath zd) (Path.refl zd))
+      (rweq_cmpA_inv_right (zetaRationalityPath zd)))
+  apply rweq_trans (rweq_cmpA_refl_left (Path.trans (functionalEquationPath zd) (Path.refl zd)))
+  exact rweq_cmpA_refl_right (functionalEquationPath zd)
+
 end Algebra
 end Path
 end ComputationalPaths

@@ -78,8 +78,8 @@ import ComputationalPaths.Path.Homotopy.IntArith
 import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
 import ComputationalPaths.Path.Homotopy.SamelsonProduct
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
--- import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups  -- TEMPORARILY DISABLED: compilation errors
--- import ComputationalPaths.Path.Homotopy.HomotopyGroup  -- TEMPORARILY DISABLED: universe issues with HigherHomotopyGroups dependency
+import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups
+import ComputationalPaths.Path.Homotopy.HomotopyGroup
 import ComputationalPaths.Path.Homotopy.EckmannHilton
 import ComputationalPaths.Path.Homotopy.AbelianFundamentalGroup
 import ComputationalPaths.Path.Homotopy.OmegaTwoCoherence
@@ -199,7 +199,7 @@ import ComputationalPaths.Path.CompPath.WedgeFreeProductDerived
 import ComputationalPaths.Path.CompPath.WedgeFreeProductUniversal
 import ComputationalPaths.Path.CompPath.FigureEight
 import ComputationalPaths.Path.CompPath.FigureEightStep
--- import ComputationalPaths.Path.CompPath.BouquetN  -- TEMPORARILY DISABLED: compilation errors
+import ComputationalPaths.Path.CompPath.BouquetN
 import ComputationalPaths.Path.CompPath.SuspensionSpace
 import ComputationalPaths.Path.CompPath.SphereCompPath
 import ComputationalPaths.Path.CompPath.SuspensionCircle
@@ -220,7 +220,7 @@ import ComputationalPaths.Path.InfinityGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.Algebra.GroupStructures
--- import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps  -- TEMPORARILY DISABLED: depends on broken BouquetN
+import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
 import ComputationalPaths.Path.Algebra.SpectralMackey
 import ComputationalPaths.Path.Algebra.AInfinityAlgebra
@@ -228,11 +228,11 @@ import ComputationalPaths.Path.Algebra.StringTopology
 import ComputationalPaths.Path.Algebra.ExtFunctor
 import ComputationalPaths.Path.Algebra.HomotopicalAlgebra
 import ComputationalPaths.Path.Algebra.BarComplex
--- import ComputationalPaths.Path.Algebra.Abelianization  -- TEMPORARILY DISABLED: depends on broken BouquetN
+import ComputationalPaths.Path.Algebra.Abelianization
 import ComputationalPaths.Path.Algebra.KTheory
 import ComputationalPaths.Path.Algebra.WaldhausenKTheory
 import ComputationalPaths.Path.Algebra.GaloisRepresentations
--- import ComputationalPaths.Path.Algebra.FreeGroupProperties  -- TEMPORARILY DISABLED: depends on broken BouquetN
+import ComputationalPaths.Path.Algebra.FreeGroupProperties
 import ComputationalPaths.Path.Homotopy.HurewiczTheorem
 import ComputationalPaths.Path.Homotopy.SerreModC
 import ComputationalPaths.Path.Homotopy.BlakersMasseyImproved
@@ -609,8 +609,8 @@ import ComputationalPaths.Path.Algebra.MotivicHomotopyDeep
 import ComputationalPaths.Path.Algebra.MotivicPathDeep
 import ComputationalPaths.Path.Algebra.MotivicPaths
 import ComputationalPaths.Path.Algebra.MotivicSpheres
--- import ComputationalPaths.Path.Algebra.NielsenSchreier  -- TEMPORARILY DISABLED: depends on broken FreeGroupProperties
--- import ComputationalPaths.Path.Algebra.NielsenSchreierDerived  -- TEMPORARILY DISABLED: depends on broken NielsenSchreier
+import ComputationalPaths.Path.Algebra.NielsenSchreier
+import ComputationalPaths.Path.Algebra.NielsenSchreierDerived
 import ComputationalPaths.Path.Algebra.NoncommutativeGeomDeep
 import ComputationalPaths.Path.Algebra.NoncommutativeGeometryDeep
 import ComputationalPaths.Path.Algebra.NormalizationStrategiesDeep

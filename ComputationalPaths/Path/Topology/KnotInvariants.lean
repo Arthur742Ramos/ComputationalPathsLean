@@ -22,6 +22,7 @@ invariants as structures that respect those paths.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -144,6 +145,18 @@ noncomputable def knot_invariant_two_steps {α : Type u} (I : KnotInvariant α)
     {d1 d2 d3 : KnotDiagram} (s1 : KnotStep d1 d2) (s2 : KnotStep d2 d3) :
     Path (I.value d1) (I.value d3) :=
   Path.trans (knot_invariant_step I s1) (knot_invariant_step I s2)
+
+/-- A step composed with its reverse and a trailing unit contracts up to `RwEq`. -/
+noncomputable def knot_invariant_step_cancel_with_tail_rweq {α : Type u} (I : KnotInvariant α)
+    {d1 d2 : KnotDiagram} (s : KnotStep d1 d2) :
+    RwEq
+      (Path.trans
+        (Path.trans (knot_invariant_step I s) (knot_invariant_step_symm I s))
+        (Path.refl (I.value d1)))
+      (Path.refl (I.value d1)) := by
+  refine rweq_trans ?_ (rweq_cmpA_inv_right (knot_invariant_step I s))
+  exact rweq_cmpA_refl_right
+    (Path.trans (knot_invariant_step I s) (knot_invariant_step_symm I s))
 
 /-- Jones polynomial data with an abstract skein relation. -/
 structure JonesPolynomial extends KnotInvariant LaurentPolynomial where
