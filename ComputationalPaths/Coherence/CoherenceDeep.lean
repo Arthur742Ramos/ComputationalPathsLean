@@ -1,6 +1,6 @@
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
-namespace ComputationalPaths.Coherence.CoherenceDeep
+namespace ComputationalPaths.Coherence
 
 namespace Deep
 
@@ -247,4 +247,4 @@ end DerivedCoherence
 
 end Deep
 
-end ComputationalPaths.Coherence.CoherenceDeep
+end ComputationalPaths.Coherence
