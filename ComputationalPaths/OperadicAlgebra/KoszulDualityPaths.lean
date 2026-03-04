@@ -17,7 +17,7 @@ universe u v w
 
 /-- Domain-specific rewrite steps for Koszul duality path witnesses. -/
 inductive KoszulStep {A : Type u} :
-    {a b : A} → Path a b → Path a b → Type where
+    {a b : A} → Path a b → Path a b → Type (u + 1) where
   | right_unit {a b : A} (p : Path a b) :
       KoszulStep (Path.trans p (Path.refl b)) p
   | left_unit {a b : A} (p : Path a b) :
