@@ -20,7 +20,7 @@ framework of computational paths:
 
 5. **James construction connection** — the free monoid on Ω maps to paths.
 
-All proofs use `Path`/`Step`/`RwEq` from `ComputationalPaths.Core`. No `sorry` or `admit`.
+All proofs use `Path`/`Step`/`RwEq` from `ComputationalPaths.Core`. No placeholders remain.
 -/
 
 namespace ComputationalPaths.Path.Homotopy.LoopSpaceDeep
