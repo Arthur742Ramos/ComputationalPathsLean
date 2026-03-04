@@ -18,7 +18,7 @@ universe u
 
 /-- Domain-specific rewrite steps for prism computations. -/
 inductive PrismStep {A : Type u} :
-    {a b : A} → Path a b → Path a b → Type where
+    {a b : A} → Path a b → Path a b → Type (u + 1) where
   | delta_right_unit {a b : A} (p : Path a b) :
       PrismStep (Path.trans p (Path.refl b)) p
   | frobenius_left_unit {a b : A} (p : Path a b) :
