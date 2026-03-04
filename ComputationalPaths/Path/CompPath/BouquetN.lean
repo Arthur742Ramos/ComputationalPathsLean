@@ -814,7 +814,7 @@ noncomputable axiom decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n
 noncomputable def decode_def {n : Nat} : BouquetFreeGroup n → PiOneN n :=       
   Quot.lift
     (fun w => Quot.mk (rwEqRel _ _ _) (decodeWord w))
-    (fun w₁ w₂ h => Quot.sound (rweqProp_of_rweq (decodeWord_respects_rel w₁ w₂ h)))
+    (fun w₁ w₂ h => Quot.sound (decodeWord_respects_rel w₁ w₂ h))
 
 end BouquetN
 
