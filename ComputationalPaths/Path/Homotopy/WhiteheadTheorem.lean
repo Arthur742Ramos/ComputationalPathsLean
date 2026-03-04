@@ -71,7 +71,7 @@ noncomputable def piOneInverse {A B : Type u} {f : A → B}
 /-! ## 1-types and path lifting data -/
 
 /-- A 1-type is a type where `RwEq` gives an equivalence relation on path terms. -/
-structure IsOneType (A : Type u) : Type u where
+structure IsOneType (A : Type u) : Type (u + 1) where
   rweq_refl : ∀ {a b : A} (p : Path a b), RwEq p p
   rweq_symm : ∀ {a b : A} {p q : Path a b}, RwEq p q → RwEq q p
   rweq_trans : ∀ {a b : A} {p q r : Path a b}, RwEq p q → RwEq q r → RwEq p r
