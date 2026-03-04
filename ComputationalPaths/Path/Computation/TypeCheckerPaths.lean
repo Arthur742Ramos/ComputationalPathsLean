@@ -152,11 +152,10 @@ inductive MultiStep : Term → Term → Type where
 def multistep_refl (t : Term) : MultiStep t t := MultiStep.refl t
 
 -- 10
-def multistep_trans {t1 t2 t3 : Term}
-    (h1 : MultiStep t1 t2) (h2 : MultiStep t2 t3) : MultiStep t1 t3 := by
-  induction h1 with
-  | refl _ => exact h2
-  | step s _ ih => exact MultiStep.step s (ih h2)
+def multistep_trans {t1 t2 t3 : Term} :
+    MultiStep t1 t2 → MultiStep t2 t3 → MultiStep t1 t3
+  | .refl _, h2 => h2
+  | .step s h1, h2 => .step s (multistep_trans h1 h2)
 
 /-! ## Type uniqueness and paths -/
 
