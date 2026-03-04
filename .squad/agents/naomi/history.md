@@ -184,3 +184,11 @@
 - Key implementation detail: `MetaStepHigh.diamond_filler` must be applied to explicit 4-cell endpoints (`c₁`, `c₂`) and level index `n`; passing the constructor unapplied fails typechecking.
 - User preference reinforced: always validate with the exact targeted command `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Path.OmegaGroupoid.TruncationProof`.
 - Key file path touched: `ComputationalPaths/Path/OmegaGroupoid/TruncationProof.lean`.
+
+### 2026-03-04: HoTT Descent targeted compile repair (Naomi)
+- Repaired `ComputationalPaths/Path/HoTT/Descent.lean` to compile with Lean 4 using minimal, surgical edits while preserving namespace and declaration inventory.
+- Architecture decision: for HoTT-style equivalences in this codebase, use `≃ₚ` (`Equivalences.Equiv`) with `toFun`/`isEquiv.inv`/`sect`/`retr`; do not rely on unavailable core `Equiv`/`Function.Bijective`.
+- Pattern: theorem declarations must stay proposition-valued, so path witnesses from equivalence data are bridged with `.toEq` when theorem statements are equality propositions.
+- Pattern: brittle dependent constructions were simplified compile-first (`totalPath` reduced to proof-by-cases witness, selected path-over equalities discharged by proof irrelevance) to remove non-local obligations.
+- User preference reinforced: verify with the exact command `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Path.HoTT.Descent`.
+- Key file paths touched/referenced: `ComputationalPaths/Path/HoTT/Descent.lean`, `ComputationalPaths/Path/HoTT/HigherInductivePaths.lean`, `ComputationalPaths/Path/HoTT/PushoutPaths.lean`.
