@@ -148,6 +148,15 @@ def step_measure_lt {p q : Expr} (h : Step p q) :
     NatLex (termMeasure q) (termMeasure p) :=
   step_lex_decrease h
 
+/-- Prop-valued wrapper (needed for `WellFounded`). -/
+abbrev StepProp (p q : Expr) : Prop :=
+  Nonempty (Step p q)
+
+def stepProp_measure_lt {p q : Expr} (h : StepProp p q) :
+    NatLex (termMeasure q) (termMeasure p) := by
+  rcases h with ⟨h⟩
+  exact step_measure_lt h
+
 /-! ## Main Theorem -/
 
 /-- **The core groupoid TRS is terminating.**
@@ -157,10 +166,10 @@ The step relation is well-founded, proved via the lexicographic measure
 
 This replaces the `Terminating := True` axiom in `ConfluenceProof.lean`
 with genuine mathematical content. -/
-def termination : WellFounded (fun q p : Expr => Step p q) :=
-  Subrelation.wf (fun h => step_measure_lt h) (InvImage.wf termMeasure natLex_wf)
+def termination : WellFounded (fun q p : Expr => StepProp p q) :=
+  Subrelation.wf (fun h => stepProp_measure_lt h) (InvImage.wf termMeasure natLex_wf)
 
-def acc_step (e : Expr) : Acc (fun q p => Step p q) e :=
+def acc_step (e : Expr) : Acc (fun q p => StepProp p q) e :=
   termination.apply e
 
 /-- **No bidirectional steps**: For any expressions p and q, we cannot have
@@ -173,8 +182,10 @@ def acc_step (e : Expr) : Acc (fun q p => Step p q) e :=
     This theorem is crucial for proving that "mixed polarity" cases in
     derivation normal forms are unreachable. -/
 def no_bidirectional_step {p q : Expr} :
-    ¬(Step p q ∧ Step q p) := by
-  intro ⟨s₁, s₂⟩
+    ¬(StepProp p q ∧ StepProp q p) := by
+  intro ⟨hs₁, hs₂⟩
+  rcases hs₁ with ⟨s₁⟩
+  rcases hs₂ with ⟨s₂⟩
   have h₁ := step_lex_decrease s₁
   have h₂ := step_lex_decrease s₂
   -- h₁ : q.weight < p.weight ∨ (q.weight = p.weight ∧ q.leftWeight < p.leftWeight)
