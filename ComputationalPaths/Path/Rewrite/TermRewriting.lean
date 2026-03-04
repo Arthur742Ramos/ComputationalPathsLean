@@ -194,19 +194,22 @@ noncomputable def IsConfluent (rules : List TRule) : Prop :=
 
 /-- Local confluence (weak Church-Rosser). -/
 noncomputable def IsLocallyConfluent (rules : List TRule) : Prop :=
-  ∀ a b c, TStep rules a b → TStep rules a c →
+  ∀ a b c, Nonempty (TStep rules a b) → Nonempty (TStep rules a c) →
     ∃ d, TRtc rules b d ∧ TRtc rules c d
 
 /-- Confluence implies local confluence. -/
 theorem confluent_implies_lc {rules : List TRule}
-    (hc : IsConfluent rules) : IsLocallyConfluent rules :=
-  fun a b c h₁ h₂ => hc a b c (.single h₁) (.single h₂)
+    (hc : IsConfluent rules) : IsLocallyConfluent rules := by
+  intro a b c h₁ h₂
+  rcases h₁ with ⟨h₁⟩
+  rcases h₂ with ⟨h₂⟩
+  exact hc a b c (.single h₁) (.single h₂)
 
 /-! ## Normal Forms -/
 
 /-- A term is in normal form. -/
 noncomputable def IsNF (rules : List TRule) (t : Term) : Prop :=
-  ∀ t', ¬ TStep rules t t'
+  ∀ t', ¬ Nonempty (TStep rules t t')
 
 /-- Normal forms are unique in confluent systems. -/
 theorem unique_nf {rules : List TRule} (hc : IsConfluent rules)
@@ -218,16 +221,18 @@ theorem unique_nf {rules : List TRule} (hc : IsConfluent rules)
   cases hd₁ with
   | refl => cases hd₂ with
     | refl => rfl
-    | head step _ => exact absurd step (hnf₂ _)
-  | head step _ => exact absurd step (hnf₁ _)
+    | head step _ => exact absurd ⟨step⟩ (hnf₂ _)
+  | head step _ => exact absurd ⟨step⟩ (hnf₁ _)
 
 /-- Variables are normal forms if no rule has a variable as a matched LHS instance. -/
 theorem var_nf {rules : List TRule} (n : Nat)
     (h : ∀ r ∈ rules, ∀ σ, applySubst σ r.lhs ≠ .var n) :
     IsNF rules (.var n) := by
   intro t' ht
-  have : ∃ s, .var n = s ∧ TStep rules s t' := ⟨_, rfl, ht⟩
+  rcases ht with ⟨ht⟩
+  have : ∃ s, .var n = s ∧ Nonempty (TStep rules s t') := ⟨_, rfl, ⟨ht⟩⟩
   obtain ⟨s, hs, hstep⟩ := this
+  rcases hstep with ⟨hstep⟩
   induction hstep with
   | root r σ hmem => exact h r hmem σ hs.symm
   | appL _ _ => cases hs
@@ -238,8 +243,10 @@ theorem const_nf {rules : List TRule} (c : Nat)
     (h : ∀ r ∈ rules, ∀ σ, applySubst σ r.lhs ≠ .const c) :
     IsNF rules (.const c) := by
   intro t' ht
-  have : ∃ s, .const c = s ∧ TStep rules s t' := ⟨_, rfl, ht⟩
+  rcases ht with ⟨ht⟩
+  have : ∃ s, .const c = s ∧ Nonempty (TStep rules s t') := ⟨_, rfl, ⟨ht⟩⟩
   obtain ⟨s, hs, hstep⟩ := this
+  rcases hstep with ⟨hstep⟩
   induction hstep with
   | root r σ hmem => exact h r hmem σ hs.symm
   | appL _ _ => cases hs
@@ -249,7 +256,7 @@ theorem const_nf {rules : List TRule} (c : Nat)
 
 /-- Terminating (strongly normalizing). -/
 noncomputable def IsTerminating (rules : List TRule) : Prop :=
-  WellFounded (fun a b => TStep rules b a)
+  WellFounded (fun a b => Nonempty (TStep rules b a))
 
 /-- Newman's Lemma: WF + WCR → CR. -/
 theorem newman {rules : List TRule}
@@ -268,12 +275,12 @@ theorem newman {rules : List TRule}
       | head step_ac rest_ac =>
         -- a →₁ ab_tgt, a →₁ ac_tgt
         -- Local confluence gives d₁ with ab_tgt →* d₁, ac_tgt →* d₁
-        obtain ⟨d₁, hbd₁, hcd₁⟩ := hlc a _ _ step_ab step_ac
+        obtain ⟨d₁, hbd₁, hcd₁⟩ := hlc a _ _ ⟨step_ab⟩ ⟨step_ac⟩
         -- IH at ab_tgt: join (rest_ab target = b) and d₁
-        have ihab := ih _ step_ab
+        have ihab := ih _ ⟨step_ab⟩
         obtain ⟨d₂, hbd₂, hd₁d₂⟩ := ihab b d₁ rest_ab hbd₁
         -- IH at ac_tgt: join d₁ and (rest_ac target = c)
-        have ihac := ih _ step_ac
+        have ihac := ih _ ⟨step_ac⟩
         obtain ⟨d₃, hd₁d₃, hcd₃⟩ := ihac d₁ c hcd₁ rest_ac
         -- Now d₁ →* d₂ and d₁ →* d₃, join them using IH at ab_tgt
         -- ab_tgt →* d₁ →* d₂ and ab_tgt →* d₁ →* d₃
@@ -355,8 +362,9 @@ theorem TRtc.toConv {rules : List TRule} {s t : Term}
 
 /-! ## Empty System -/
 
-theorem no_step_empty {a b : Term} : ¬ TStep ([] : List TRule) a b := by
+theorem no_step_empty {a b : Term} : ¬ Nonempty (TStep ([] : List TRule) a b) := by
   intro h
+  rcases h with ⟨h⟩
   induction h with
   | root r _ hmem => simp at hmem
   | appL _ ih => exact ih
@@ -366,15 +374,15 @@ theorem empty_confluent : IsConfluent ([] : List TRule) := by
   intro a b c hab hac
   cases hab with
   | refl => exact ⟨c, hac, .refl c⟩
-  | head step _ => exact absurd step no_step_empty
+  | head step _ => exact absurd ⟨step⟩ no_step_empty
 
 /-- In the empty system, conversion is equality. -/
 theorem conv_empty_eq {a b : Term} (h : TConv ([] : List TRule) a b) :
     a = b := by
   induction h with
   | refl => rfl
-  | fwd h => exact absurd h no_step_empty
-  | bwd h => exact absurd h no_step_empty
+  | fwd h => exact absurd ⟨h⟩ no_step_empty
+  | bwd h => exact absurd ⟨h⟩ no_step_empty
   | trans _ _ ih1 ih2 => exact ih1.trans ih2
 
 /-! ## Ground Terms -/
