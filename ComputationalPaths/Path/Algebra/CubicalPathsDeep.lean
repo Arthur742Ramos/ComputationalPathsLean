@@ -97,7 +97,7 @@ theorem length_trans : (p : Path a b) → (q : Path b c) →
 theorem length_refl (a : CPoint) : (Path.refl a).length = 0 := rfl
 
 /-- Theorem 9 – step_symm_symm. -/
-theorem step_symm_symm : (s : Step a b) → s.symm.symm = s
+def step_symm_symm : (s : Step a b) → s.symm.symm = s
   | .edge _ _  => rfl
   | .refl _    => rfl
   | .coe _ _   => rfl

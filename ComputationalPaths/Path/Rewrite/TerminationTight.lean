@@ -191,7 +191,7 @@ theorem assocSteps_formula : ∀ n, 2 * assocSteps n + n = n * n := by
 /-- The leftWeight drops by at least 1 with each trans_assoc step applied
     at the outermost position. Combined with leftWeight being quadratic in n,
     this proves the normalization takes Ω(n²) steps. -/
-theorem leftWeight_step_decrease {p q : Expr} (h : Step p q)
+def leftWeight_step_decrease {p q : Expr} (h : Step p q)
     (hw : q.weight = p.weight) : q.leftWeight < p.leftWeight := by
   have := step_lex_decrease h
   rcases this with hlt | ⟨heq, hlt⟩
@@ -238,13 +238,13 @@ theorem lex_measure_bounded (e : Expr) :
     Since `WellFounded NatLex` holds (proved in GroupoidTRS), this gives
     termination. The pair is bounded by `(6s, s²)` where `s = size`,
     so any reduction sequence has length O(s³). -/
-theorem step_lex_decrease' {p q : Expr} (h : Step p q) :
+def step_lex_decrease' {p q : Expr} (h : Step p q) :
     q.weight < p.weight ∨ (q.weight = p.weight ∧ q.leftWeight < p.leftWeight) :=
   step_lex_decrease h
 
 /-- Weight is monotonically non-increasing along reduction sequences,
     and strictly decreasing for all rules except `trans_assoc`. -/
-theorem step_weight_le {p q : Expr} (h : Step p q) : q.weight ≤ p.weight := by
+def step_weight_le {p q : Expr} (h : Step p q) : q.weight ≤ p.weight := by
   have := step_lex_decrease h
   rcases this with hw | ⟨heq, _⟩ <;> omega
 
@@ -252,7 +252,7 @@ theorem step_weight_le {p q : Expr} (h : Step p q) : q.weight ≤ p.weight := by
     This is just a re-export of `termination` with a complexity annotation:
     the depth of the well-founded tree rooted at `e` is at most
     `O(weight(e)² + leftWeight(e))` = `O(size(e)⁴)`. -/
-theorem acc_with_bound (e : Expr) : Acc (fun q p => Step p q) e :=
+def acc_with_bound (e : Expr) : Acc (fun q p => StepProp p q) e :=
   acc_step e
 
 end ComputationalPaths.Path.Rewrite.GroupoidTRS

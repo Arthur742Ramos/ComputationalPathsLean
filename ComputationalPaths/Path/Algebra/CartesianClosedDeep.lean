@@ -75,7 +75,7 @@ theorem path_length_trans (p : Path α a b) (q : Path α b c) :
   | nil _ => simp [Path.trans, Path.length]
   | cons s _ ih => simp [Path.trans, Path.length, ih, Nat.add_assoc]
 
-theorem path_length_single (s : Step α a b) :
+def path_length_single (s : Step α a b) :
     (Path.single s).length = 1 := by
   simp [Path.single, Path.length]
 
@@ -177,15 +177,15 @@ noncomputable def prodAssocL (A B C : Obj) : Mor :=
 noncomputable def prodSwap (A B : Obj) : Mor :=
   .pair (.snd A B) (.fst A B)
 
-theorem thm_pairFst_exists (f g : Mor) (A B : Obj) :
+def thm_pairFst_exists (f g : Mor) (A B : Obj) :
     ∃ (_ : CCStep (.comp (.fst A B) (.pair f g)) f), True :=
   ⟨CCStep.pairFst f g A B, trivial⟩
 
-theorem thm_pairSnd_exists (f g : Mor) (A B : Obj) :
+def thm_pairSnd_exists (f g : Mor) (A B : Obj) :
     ∃ (_ : CCStep (.comp (.snd A B) (.pair f g)) g), True :=
   ⟨CCStep.pairSnd f g A B, trivial⟩
 
-theorem thm_prod_eta_exists (A B : Obj) :
+def thm_prod_eta_exists (A B : Obj) :
     ∃ (_ : CCStep (.pair (.fst A B) (.snd A B)) (.id (.prod A B))), True :=
   ⟨CCStep.pairEta A B, trivial⟩
 
@@ -204,15 +204,15 @@ theorem thm_swap_involutive (A B : Obj) :
 -- §6  Exponentials: Curry, Uncurry, Beta, Eta
 -- ============================================================
 
-theorem thm_beta_exists (f : Mor) (A B C : Obj) :
+def thm_beta_exists (f : Mor) (A B C : Obj) :
     ∃ (_ : CCStep (.comp (.eval_ A B) (.pair (.comp (.curry f) (.fst C A)) (.snd C A))) f), True :=
   ⟨CCStep.beta f A B C, trivial⟩
 
-theorem thm_eta_exists (g : Mor) (A B C : Obj) :
+def thm_eta_exists (g : Mor) (A B C : Obj) :
     ∃ (_ : CCStep (.curry (.comp (.eval_ A B) (.pair (.comp g (.fst C A)) (.snd C A)))) g), True :=
   ⟨CCStep.eta g A B C, trivial⟩
 
-theorem thm_curryComp_exists (f h : Mor) (A B : Obj) :
+def thm_curryComp_exists (f h : Mor) (A B : Obj) :
     ∃ (_ : CCStep (.curry (.comp f (.pair (.comp h (.fst A B)) (.snd A B)))) (.comp (.curry f) h)), True :=
   ⟨CCStep.curryComp f h A B, trivial⟩
 
@@ -288,27 +288,27 @@ inductive BetaStep : STLCTerm → STLCTerm → Type where
 
 abbrev BetaPath := Path STLCTerm
 
-theorem thm_beta_reduces :
+def thm_beta_reduces :
     ∃ (_ : BetaStep (.app (.lam (.base "A") (.var 0)) .star) (.var 0)), True :=
   ⟨BetaStep.betaReduce (.base "A") (.var 0) .star, trivial⟩
 
-theorem thm_fst_reduces :
+def thm_fst_reduces :
     ∃ (_ : BetaStep (.fst_ (.mkpair .star (.var 1))) .star), True :=
   ⟨BetaStep.fstReduce .star (.var 1), trivial⟩
 
-theorem thm_snd_reduces :
+def thm_snd_reduces :
     ∃ (_ : BetaStep (.snd_ (.mkpair (.var 1) .star)) .star), True :=
   ⟨BetaStep.sndReduce (.var 1) .star, trivial⟩
 
-theorem thm_curry_howard_beta (ty : STLCType) (body arg : STLCTerm) :
+def thm_curry_howard_beta (ty : STLCType) (body arg : STLCTerm) :
     ∃ (_ : BetaStep (.app (.lam ty body) arg) body), True :=
   ⟨BetaStep.betaReduce ty body arg, trivial⟩
 
-theorem thm_curry_howard_pair_eta (p : STLCTerm) :
+def thm_curry_howard_pair_eta (p : STLCTerm) :
     ∃ (_ : BetaStep (.mkpair (.fst_ p) (.snd_ p)) p), True :=
   ⟨BetaStep.etaPair p, trivial⟩
 
-theorem thm_curry_howard_eta_lam (A : STLCType) (f : STLCTerm) :
+def thm_curry_howard_eta_lam (A : STLCType) (f : STLCTerm) :
     ∃ (_ : BetaStep (.lam A (.app f (.var 0))) f), True :=
   ⟨BetaStep.etaLam A f, trivial⟩
 
@@ -316,11 +316,11 @@ theorem thm_curry_howard_eta_lam (A : STLCType) (f : STLCTerm) :
 -- §8  Natural Numbers Object
 -- ============================================================
 
-theorem thm_nno_zero_step (q f : Mor) (A : Obj) :
+def thm_nno_zero_step (q f : Mor) (A : Obj) :
     ∃ (_ : CCStep (.comp (.rec_ q f) (.comp .zero_ (.terminal A))) q), True :=
   ⟨CCStep.recZero q f A, trivial⟩
 
-theorem thm_nno_succ_step (q f : Mor) :
+def thm_nno_succ_step (q f : Mor) :
     ∃ (_ : CCStep (.comp (.rec_ q f) .succ_) (.comp f (.rec_ q f))), True :=
   ⟨CCStep.recSucc q f, trivial⟩
 
@@ -481,7 +481,7 @@ theorem thm_eval_nat_len (A B : Obj) (f : Mor) :
 -- §13  Subobject Classifier (Topos sketch)
 -- ============================================================
 
-theorem thm_char_map_property (m : Mor) (A : Obj) :
+def thm_char_map_property (m : Mor) (A : Obj) :
     ∃ (_ : CCStep (.comp (.char_ m) m) (.comp .true_ (.terminal A))), True :=
   ⟨CCStep.charTrue m A, trivial⟩
 
@@ -622,7 +622,7 @@ theorem thm_symm_nil (a : Mor) :
     (Path.nil a : CCPath a a).symm = .nil a := by
   simp [Path.symm]
 
-theorem thm_symm_single (s : Step Mor a b) :
+def thm_symm_single (s : Step Mor a b) :
     (Path.single s).symm = Path.single s.symm := by
   simp [Path.single, Path.symm, Path.trans]
 
@@ -644,15 +644,15 @@ theorem thm_symm_length (p : CCPath a b) :
 -- §20  Coproduct Properties
 -- ============================================================
 
-theorem thm_copair_inl (f g : Mor) (A B : Obj) :
+def thm_copair_inl (f g : Mor) (A B : Obj) :
     ∃ (_ : CCStep (.comp (.copair f g) (.inl A B)) f), True :=
   ⟨CCStep.copairInl f g A B, trivial⟩
 
-theorem thm_copair_inr (f g : Mor) (A B : Obj) :
+def thm_copair_inr (f g : Mor) (A B : Obj) :
     ∃ (_ : CCStep (.comp (.copair f g) (.inr A B)) g), True :=
   ⟨CCStep.copairInr f g A B, trivial⟩
 
-theorem thm_copair_eta (A B : Obj) :
+def thm_copair_eta (A B : Obj) :
     ∃ (_ : CCStep (.copair (.inl A B) (.inr A B)) (.id (.coprod A B))), True :=
   ⟨CCStep.copairEta A B, trivial⟩
 
@@ -660,19 +660,19 @@ theorem thm_copair_eta (A B : Obj) :
 -- §21  Congruence in CCC Steps
 -- ============================================================
 
-theorem thm_congComp_left (s : CCStep f f') (g : Mor) :
+def thm_congComp_left (s : CCStep f f') (g : Mor) :
     ∃ (_ : CCStep (.comp f g) (.comp f' g)), True :=
   ⟨CCStep.congComp₁ s, trivial⟩
 
-theorem thm_congComp_right (f : Mor) (s : CCStep g g') :
+def thm_congComp_right (f : Mor) (s : CCStep g g') :
     ∃ (_ : CCStep (.comp f g) (.comp f g')), True :=
   ⟨CCStep.congComp₂ s, trivial⟩
 
-theorem thm_congPair_left (s : CCStep f f') (g : Mor) :
+def thm_congPair_left (s : CCStep f f') (g : Mor) :
     ∃ (_ : CCStep (.pair f g) (.pair f' g)), True :=
   ⟨CCStep.congPair₁ s, trivial⟩
 
-theorem thm_congCurry (s : CCStep f f') :
+def thm_congCurry (s : CCStep f f') :
     ∃ (_ : CCStep (.curry f) (.curry f')), True :=
   ⟨CCStep.congCurry s, trivial⟩
 
@@ -680,15 +680,15 @@ theorem thm_congCurry (s : CCStep f f') :
 -- §22  Category Axioms as Paths
 -- ============================================================
 
-theorem thm_idL_step (f : Mor) (A : Obj) :
+def thm_idL_step (f : Mor) (A : Obj) :
     ∃ (_ : CCStep (.comp f (.id A)) f), True :=
   ⟨CCStep.idL f A, trivial⟩
 
-theorem thm_idR_step (f : Mor) (A : Obj) :
+def thm_idR_step (f : Mor) (A : Obj) :
     ∃ (_ : CCStep (.comp (.id A) f) f), True :=
   ⟨CCStep.idR f A, trivial⟩
 
-theorem thm_assoc_step (f g h : Mor) :
+def thm_assoc_step (f g h : Mor) :
     ∃ (_ : CCStep (.comp (.comp f g) h) (.comp f (.comp g h))), True :=
   ⟨CCStep.assoc f g h, trivial⟩
 
@@ -706,7 +706,7 @@ theorem thm_idBoth_length (f : Mor) (A B : Obj) :
 -- §23  Terminal Uniqueness
 -- ============================================================
 
-theorem thm_terminal_uniq (f : Mor) (A : Obj) :
+def thm_terminal_uniq (f : Mor) (A : Obj) :
     ∃ (_ : CCStep f (.terminal A)), True :=
   ⟨CCStep.termUniq f A, trivial⟩
 
@@ -729,7 +729,7 @@ theorem thm_nil_is_identity (a : α) :
     (Path.nil a).length = 0 := by
   simp [Path.length]
 
-theorem thm_single_is_one (s : Step α a b) :
+def thm_single_is_one (s : Step α a b) :
     (Path.single s).length = 1 := by
   simp [Path.single, Path.length]
 
@@ -737,11 +737,11 @@ theorem thm_single_is_one (s : Step α a b) :
 -- §25  Symmetry of CCStep
 -- ============================================================
 
-theorem thm_ccstep_symm (s : CCStep a b) :
+def thm_ccstep_symm (s : CCStep a b) :
     ∃ (_ : CCStep b a), True :=
   ⟨CCStep.symm s, trivial⟩
 
-theorem thm_ccstep_symm_symm (s : CCStep a b) :
+def thm_ccstep_symm_symm (s : CCStep a b) :
     ∃ (_ : CCStep a b), True :=
   ⟨CCStep.symm (CCStep.symm s), trivial⟩
 
@@ -749,7 +749,7 @@ theorem thm_ccstep_symm_symm (s : CCStep a b) :
 -- §26  Pair composition
 -- ============================================================
 
-theorem thm_pair_comp (f g h : Mor) :
+def thm_pair_comp (f g h : Mor) :
     ∃ (_ : CCStep (.comp (.pair f g) h) (.pair (.comp f h) (.comp g h))), True :=
   ⟨CCStep.pairComp f g h, trivial⟩
 

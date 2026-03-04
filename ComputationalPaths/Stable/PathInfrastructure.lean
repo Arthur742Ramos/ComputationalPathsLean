@@ -55,19 +55,19 @@ noncomputable def comp (g : SpectrumMap F G) (f : SpectrumMap E F) : SpectrumMap
       (g.commBase n)
 
 /-- Right unit rewrite witness for levelwise basepoint paths. -/
-theorem map_pt_refl_right_step (f : SpectrumMap E F) (n : Nat) :
+noncomputable def map_pt_refl_right_step (f : SpectrumMap E F) (n : Nat) :
     Path.Step (Path.trans (f.mapLevel n).map_pt (Path.refl (F.level n).pt))
       (f.mapLevel n).map_pt :=
   Path.Step.trans_refl_right ((f.mapLevel n).map_pt)
 
 /-- Left unit rewrite witness for levelwise basepoint paths. -/
-theorem map_pt_refl_left_step (f : SpectrumMap E F) (n : Nat) :
+noncomputable def map_pt_refl_left_step (f : SpectrumMap E F) (n : Nat) :
     Path.Step (Path.trans (Path.refl ((f.mapLevel n).toFun (E.level n).pt)) (f.mapLevel n).map_pt)
       (f.mapLevel n).map_pt :=
   Path.Step.trans_refl_left ((f.mapLevel n).map_pt)
 
 /-- Associativity witness used when composing pointed basepoint paths. -/
-theorem comp_map_pt_assoc_step (g : SpectrumMap F G) (f : SpectrumMap E F) (n : Nat) :
+noncomputable def comp_map_pt_assoc_step (g : SpectrumMap F G) (f : SpectrumMap E F) (n : Nat) :
     Path.Step
       (Path.trans
         (Path.trans
@@ -83,7 +83,7 @@ theorem comp_map_pt_assoc_step (g : SpectrumMap F G) (f : SpectrumMap E F) (n : 
     (Path.refl (G.level n).pt)
 
 /-- Associativity witness for the structure-map compatibility path. -/
-theorem commBase_assoc_step (f : SpectrumMap E F) (n : Nat) :
+noncomputable def commBase_assoc_step (f : SpectrumMap E F) (n : Nat) :
     Path.Step
       (Path.trans
         (Path.trans (f.commBase n) ((F.structureMap n).map_pt))
@@ -94,7 +94,7 @@ theorem commBase_assoc_step (f : SpectrumMap E F) (n : Nat) :
   Path.Step.trans_assoc (f.commBase n) ((F.structureMap n).map_pt) (Path.symm ((F.structureMap n).map_pt))
 
 /-- Cancellation witness for `p · p⁻¹` on structure-map basepoint paths. -/
-theorem structure_cancel_step (F : Spectrum) (n : Nat) :
+noncomputable def structure_cancel_step (F : Spectrum) (n : Nat) :
     Path.Step
       (Path.trans ((F.structureMap n).map_pt) (Path.symm ((F.structureMap n).map_pt)))
       (Path.refl ((F.structureMap n).toFun (sigmaPointed (F.level n)).pt)) :=

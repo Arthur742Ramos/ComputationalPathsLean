@@ -214,7 +214,7 @@ theorem foldRaw_idem (x : SuspRaw A) : foldRaw (foldRaw x) = foldRaw x := by
 /-! ## CongrArg for suspension paths -/
 
 /-- Mapping a path in the suspension through `map f`. -/
-theorem congrArg_map (f : A → B) (a : A) :
+def congrArg_map (f : A → B) (a : A) :
     Path.congrArg (map f) (fullMeridian a) =
       Path.mk ((fullMeridian a).steps.map (Step.map (map f)))
               (_root_.congrArg (map f) (fullMeridian a).proof) :=

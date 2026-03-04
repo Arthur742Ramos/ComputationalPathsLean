@@ -29,12 +29,12 @@ noncomputable abbrev leftMap {b b' : B} (q : Path b b') :
     LeftKanObj (J := J) (X := X) b → LeftKanObj (J := J) (X := X) b' :=
   pointwiseLeftKanMap (F := J) (G := X) (b := b) (b' := b') q
 
-theorem leftMap_id_step {b : B}
+def leftMap_id_step {b : B}
     (a : A) (p : Path (J.obj a) b) (x : X.obj a) :
     Path.Step ((leftMap (J := J) (X := X) (q := Path.refl b) ⟨a, ⟨p, x⟩⟩).2.1) p := by
   simpa [leftMap, pointwiseLeftKanMap] using (Path.Step.trans_refl_right p)
 
-theorem leftMap_comp_step {b c d : B}
+def leftMap_comp_step {b c d : B}
     (q : Path b c) (r : Path c d)
     (a : A) (p : Path (J.obj a) b) (x : X.obj a) :
     Path.Step
@@ -109,12 +109,12 @@ noncomputable abbrev rightMap {b b' : B} (q : Path b b') :
     RightKanObj (J := J) (X := X) b → RightKanObj (J := J) (X := X) b' :=
   pointwiseRightKanMap (F := J) (G := X) (b := b) (b' := b') q
 
-theorem rightMap_id_arg_step {b : B} {a : A}
+def rightMap_id_arg_step {b : B} {a : A}
     (p : Path b (J.obj a)) :
     Path.Step (Path.trans (Path.refl b) p) p :=
   Path.Step.trans_refl_left p
 
-theorem rightMap_comp_arg_step {b c d : B}
+def rightMap_comp_arg_step {b c d : B}
     (q : Path b c) (r : Path c d) {a : A}
     (p : Path d (J.obj a)) :
     Path.Step (Path.trans (Path.trans q r) p) (Path.trans q (Path.trans r p)) :=

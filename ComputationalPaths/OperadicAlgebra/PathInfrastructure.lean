@@ -18,7 +18,7 @@ universe u
 
 /-- Shared domain-specific rewrite steps for operadic algebra path modules. -/
 inductive OperadicPathStep {A : Type u} :
-    {a b : A} → Path a b → Path a b → Prop where
+    {a b : A} → Path a b → Path a b → Type (u + 1) where
   | right_unit {a b : A} (p : Path a b) :
       OperadicPathStep (Path.trans p (Path.refl b)) p
   | left_unit {a b : A} (p : Path a b) :

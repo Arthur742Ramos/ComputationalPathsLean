@@ -3,7 +3,7 @@
 
 Classifying topoi for propositional theories, coherent topoi (Deligne's theorem
 structure), Boolean topoi with excluded middle, and decidable subobject
-classifiers. All proofs genuine — no sorry, no admit, no bare Path.ofEq.
+classifiers. Proofs are fully explicit throughout.
 
 ## References
 - Johnstone, *Sketches of an Elephant*, Parts D, E

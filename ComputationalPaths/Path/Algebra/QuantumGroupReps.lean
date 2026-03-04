@@ -260,7 +260,7 @@ noncomputable def yang_baxter_reverse {U : QUEAlgebra.{u}} {ρ : QRep U} {rm : R
 /-! ## QuantumRepStep Inductive -/
 
 /-- Rewrite steps for quantum group representation computations. -/
-inductive QuantumRepStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive QuantumRepStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- q-commutation reduction. -/
   | q_commute {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : QuantumRepStep p q

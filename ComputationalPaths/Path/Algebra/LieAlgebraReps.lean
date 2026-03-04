@@ -243,7 +243,7 @@ noncomputable def bgg_diff_compose {𝔤 : Type u} (bgg : BGGResolution 𝔤) (n
 /-! ## LieRepStep Inductive -/
 
 /-- Rewrite steps for Lie algebra representation computations. -/
-inductive LieRepStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive LieRepStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Bracket antisymmetry reduction. -/
   | bracket_antisymm {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : LieRepStep p q

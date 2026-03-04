@@ -72,7 +72,7 @@ a "cellular decomposition" of the derivation. -/
 
 /-- A directed cell chain: a sequence of step derivations. -/
 inductive CellChain₂ {A : Type u} {a b : A} :
-    Path a b → Path a b → Type u where
+    Path a b → Path a b → Type (u + 1) where
   | nil (p : Path a b) : CellChain₂ p p
   | cons {p q r : Path a b} :
       Step p q → CellChain₂ q r → CellChain₂ p r
@@ -131,7 +131,7 @@ theorem toEq_preserved {p q : Path a b} (c : CellChain₂ p q) :
     (cons s (nil q)).length = 1 := rfl
 
 /-- A single-step chain converts to a step derivation. -/
-theorem toDeriv_single {p q : Path a b} (s : Step p q) :
+def toDeriv_single {p q : Path a b} (s : Step p q) :
     (cons s (nil q)).toDeriv =
       Derivation₂.vcomp (Derivation₂.step s) (Derivation₂.refl q) := rfl
 

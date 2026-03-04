@@ -654,7 +654,7 @@ theorem SPath.map_length {α β : Type} {R : α → α → Prop} {S : β → β 
   | cons _ r ih => simp [SPath.map, SPath.length, ih]
 
 /-- Theorem 49: Single-step path has length 1. -/
-theorem Path.single_length {α R} {a b : α} (s : Step α R a b) :
+def Path.single_length {α R} {a b : α} (s : Step α R a b) :
     (Path.single s).length = 1 := by rfl
 
 /-- Theorem 50: SPath.single has length 1. -/
@@ -841,7 +841,7 @@ theorem SStep.symm_symm {α R} {a b : α} (s : SStep α R a b) :
   | bwd _ => rfl
 
 /-- Theorem 70: Embedding single step preserves structure. -/
-theorem Path.toSPath_single {α R} {a b : α} (s : Step α R a b) :
+def Path.toSPath_single {α R} {a b : α} (s : Step α R a b) :
     (Path.single s).toSPath = SPath.single (.fwd s) := by rfl
 
 /-- Theorem 71: map on embedding commutes. -/

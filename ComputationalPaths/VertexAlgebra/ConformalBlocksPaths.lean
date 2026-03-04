@@ -84,7 +84,7 @@ noncomputable def transportCompWithUnitsRight {i j k : Fin B.curve.nPoints}
   Path.trans (B.transport_comp p q ψ) (Path.trans (Path.refl _) (Path.refl _))
 
 /-- Reassociation for the unit-extended transport coherence is a primitive step. -/
-theorem transportCompWithUnitsStep {i j k : Fin B.curve.nPoints}
+noncomputable def transportCompWithUnitsStep {i j k : Fin B.curve.nPoints}
     (p : Path (B.curve.mark i) (B.curve.mark j))
     (q : Path (B.curve.mark j) (B.curve.mark k))
     (ψ : B.Block) :

@@ -76,7 +76,7 @@ noncomputable def inr (b : B) : Pushout A B C f g :=
 /-- The gluing path: for each c : C, we have a path from inl (f c) to inr (g c).
 This is the computational path witnessing the pushout square. -/
 noncomputable def glue (c : C) : Path (inl (f c) : Pushout A B C f g) (inr (g c)) :=
-  Path.ofEq <|
+  Path.stepChain <|
     Quot.sound (PushoutRel.glue (A := A) (B := B) (C := C) (f := f) (g := g) c)
 
 /-- Inverse of the gluing path. -/

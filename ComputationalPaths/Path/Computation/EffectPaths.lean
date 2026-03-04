@@ -146,7 +146,7 @@ noncomputable def effectPath {A : Type u} {a b : A} (h : a = b) : Path a b :=
   Path.mk [Step.mk _ _ h] h
 
 /-- Theorem 14: Effect path at refl is ofEq rfl. -/
-theorem effectPath_rfl {A : Type u} {a : A} :
+def effectPath_rfl {A : Type u} {a : A} :
     effectPath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl
 
 /-- Path for handler application on values. -/
@@ -155,7 +155,7 @@ noncomputable def handlerPath (h : Handler Nat Nat) (a b : Nat) (heq : h.handleP
   Path.mk [Step.mk _ _ heq] heq
 
 /-- Theorem 15: Handler path at identity. -/
-theorem handlerPath_id (a : Nat) :
+def handlerPath_id (a : Nat) :
     handlerPath (Handler.id Nat) a a rfl = Path.mk [Step.mk a a rfl] rfl := rfl
 
 /-! ## Effect State Transformer -/

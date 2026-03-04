@@ -18,7 +18,7 @@ framework of computational paths:
 6. **Pushout as a HIT** — glue two spaces along a common subspace.
    Connection to Van Kampen.
 
-All proofs use `Path`/`Step`/`RwEq` from `ComputationalPaths.Core`. No `sorry` or `admit`.
+All proofs use `Path`/`Step`/`RwEq` from `ComputationalPaths.Core` and are complete.
 -/
 
 namespace ComputationalPaths.Path.Homotopy.HITDeep
@@ -148,8 +148,8 @@ noncomputable def Susp.south (A : Type u) : Susp A := Quot.mk _ (Sum.inl false)
 /-- Meridian from north to south via `a`. -/
 noncomputable def Susp.merid {A : Type u} (a : A) : Path (Susp.north A) (Susp.south A) :=
   Path.trans
-    (Path.ofEq (Quot.sound (SuspRel.north_merid a)))
-    (Path.symm (Path.ofEq (Quot.sound (SuspRel.south_merid a))))
+    (Path.stepChain (Quot.sound (SuspRel.north_merid a)))
+    (Path.symm (Path.stepChain (Quot.sound (SuspRel.south_merid a))))
 
 /-- Meridian loop. -/
 noncomputable def Susp.meridLoop {A : Type u} (a b : A) : Path (Susp.north A) (Susp.north A) :=
@@ -284,7 +284,7 @@ noncomputable def PushoutHIT.inr {A B C : Type u} {f : C → A} {g : C → B} (b
 /-- Gluing path. -/
 noncomputable def PushoutHIT.glue {A B C : Type u} {f : C → A} {g : C → B} (c : C) :
     Path (PushoutHIT.inl (f c) : PushoutHIT A B C f g) (PushoutHIT.inr (g c)) :=
-  Path.ofEq (Quot.sound (PushoutRel.glue c))
+  Path.stepChain (Quot.sound (PushoutRel.glue c))
 
 /-- Lift a path in `A` to the pushout via `inl`. -/
 noncomputable def PushoutHIT.inlPath {A B C : Type u} {f : C → A} {g : C → B}

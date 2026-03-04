@@ -79,7 +79,7 @@ structure TwoCell (A : Type u) where
 
 abbrev C0 (A : Type u) : Type u := A
 abbrev C1 (A : Type u) : Type u := OneCell A
-abbrev C2 (A : Type u) : Type u := TwoCell A
+abbrev C2 (A : Type u) : Type (u + 1) := TwoCell A
 
 /-- `∂₁(path) = target - source`. -/
 noncomputable def boundary1 {A : Type u} (x : C1 A) : FormalDiff (C0 A) :=
@@ -230,7 +230,7 @@ noncomputable def boundary2Setoid (A : Type u) : Setoid (C2 A) where
       trans := by intro x y z hxy hyz; exact hxy.trans hyz }
 
 /-- Second homology: 2-cells modulo boundaries of 3-cells. -/
-abbrev H2 (A : Type u) : Type u :=
+abbrev H2 (A : Type u) : Type (u + 1) :=
   Quot (boundary2Setoid (A := A)).r
 
 /-- A 3-cell identifies its two boundary 2-cells in `H₂`. -/

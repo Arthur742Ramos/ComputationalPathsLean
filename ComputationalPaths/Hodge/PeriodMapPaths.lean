@@ -18,7 +18,7 @@ universe u v w
 
 /-- Domain-specific rewrite steps for period-map calculations. -/
 inductive PeriodMapStep {D : Type u} :
-    {a b : D} → Path a b → Path a b → Prop where
+    {a b : D} → Path a b → Path a b → Type (u + 1) where
   | horizontality_right_unit {a b : D} (p : Path a b) :
       PeriodMapStep (Path.trans p (Path.refl b)) p
   | functorial_left_unit {a b : D} (p : Path a b) :

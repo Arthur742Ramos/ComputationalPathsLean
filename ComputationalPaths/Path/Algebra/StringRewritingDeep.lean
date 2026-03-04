@@ -37,12 +37,12 @@ abbrev SRS := List Rule
 -- ============================================================
 
 /-- One‑step rewrite: apply rule `r` at position `pre` inside a word. -/
-inductive Step (R : SRS) : Word → Word → Prop where
+inductive Step (R : SRS) : Word → Word → Type where
   | apply (pre suf : Word) (r : Rule) (hmem : r ∈ R) :
       Step R (pre ++ r.lhs ++ suf) (pre ++ r.rhs ++ suf)
 
 /-- Theorem 1: A step decomposes into prefix ++ rhs ++ suffix. -/
-theorem Step.decompose {R : SRS} {u v : Word} (s : Step R u v) :
+def Step.decompose {R : SRS} {u v : Word} (s : Step R u v) :
     ∃ pre suf r, r ∈ R ∧ u = pre ++ r.lhs ++ suf ∧ v = pre ++ r.rhs ++ suf := by
   cases s with
   | apply pre suf r hmem => exact ⟨pre, suf, r, hmem, rfl, rfl⟩
@@ -68,7 +68,7 @@ theorem RPath.trans {R : SRS} {a b c : Word}
   | step s _ ih => exact RPath.step s (ih q)
 
 /-- Theorem 3: Single step lifts to a path. -/
-theorem RPath.single {R : SRS} {a b : Word} (s : Step R a b) : RPath R a b :=
+def RPath.single {R : SRS} {a b : Word} (s : Step R a b) : RPath R a b :=
   RPath.step s (RPath.refl b)
 
 /-- Inverse of a Rule. -/
@@ -115,7 +115,7 @@ theorem RPath.toSymPath {R : SRS} {a b : Word}
   | step s _ ih => exact SymPath.fwd s ih
 
 /-- Theorem 9: congrArg — prepending a common prefix preserves steps. -/
-theorem Step.congrArg_prepend {R : SRS} (pfx : Word) {u v : Word}
+def Step.congrArg_prepend {R : SRS} (pfx : Word) {u v : Word}
     (s : Step R u v) : Step R (pfx ++ u) (pfx ++ v) := by
   cases s with
   | apply pre suf r hmem =>
@@ -127,7 +127,7 @@ theorem Step.congrArg_prepend {R : SRS} (pfx : Word) {u v : Word}
     exact Step.apply (pfx ++ pre) suf r hmem
 
 /-- Theorem 10: congrArg — appending a common suffix preserves steps. -/
-theorem Step.congrArg_append {R : SRS} (sfx : Word) {u v : Word}
+def Step.congrArg_append {R : SRS} (sfx : Word) {u v : Word}
     (s : Step R u v) : Step R (u ++ sfx) (v ++ sfx) := by
   cases s with
   | apply pre suf r hmem =>
@@ -184,7 +184,7 @@ theorem PathBound.toPath {R : SRS} {a b : Word} {n : Nat}
   | step s _ ih => exact RPath.step s ih
 
 /-- Theorem 16: single step has bound 1. -/
-theorem PathBound.single {R : SRS} {a b : Word} (s : Step R a b) :
+def PathBound.single {R : SRS} {a b : Word} (s : Step R a b) :
     PathBound R a b 1 :=
   PathBound.step s (PathBound.refl b)
 
@@ -271,7 +271,7 @@ noncomputable def NormalForm (R : SRS) (w : Word) : Prop :=
   ∀ v, ¬ Step R w v
 
 /-- Theorem 24: A normal form has no outgoing steps. -/
-theorem NormalForm.no_step {R : SRS} {w : Word} (hnf : NormalForm R w) :
+def NormalForm.no_step {R : SRS} {w : Word} (hnf : NormalForm R w) :
     ∀ v, ¬ Step R w v := hnf
 
 /-- Theorem 25: If w is a normal form, the only path from w reaches w itself. -/
@@ -351,7 +351,7 @@ theorem word_problem_via_confluence {R : SRS} (hc : Confluent R)
 -- ============================================================
 
 /-- Theorem 35: A step in a subsystem is a step in the full system. -/
-theorem Step.mono {R S : SRS} (hsub : ∀ r, r ∈ R → r ∈ S)
+def Step.mono {R S : SRS} (hsub : ∀ r, r ∈ R → r ∈ S)
     {u v : Word} (s : Step R u v) : Step S u v := by
   cases s with
   | apply pre suf r hmem => exact Step.apply pre suf r (hsub r hmem)
@@ -398,12 +398,12 @@ theorem PathEq.trans' {R : SRS} {a b : Word} {p q r : RPath R a b}
 -- ============================================================
 
 /-- Theorem 41: Rewriting the left factor of a concatenation. -/
-theorem Step.left_concat {R : SRS} {u u' : Word} (v : Word)
+def Step.left_concat {R : SRS} {u u' : Word} (v : Word)
     (s : Step R u u') : Step R (u ++ v) (u' ++ v) :=
   Step.congrArg_append v s
 
 /-- Theorem 42: Rewriting the right factor of a concatenation. -/
-theorem Step.right_concat {R : SRS} (u : Word) {v v' : Word}
+def Step.right_concat {R : SRS} (u : Word) {v v' : Word}
     (s : Step R v v') : Step R (u ++ v) (u ++ v') :=
   Step.congrArg_prepend u s
 
@@ -555,7 +555,7 @@ theorem Joinable.mono {R S : SRS} (hsub : ∀ r, r ∈ R → r ∈ S)
   exact ⟨d, RPath.mono hsub ha, RPath.mono hsub hb⟩
 
 /-- Theorem 61: Empty SRS has no steps. -/
-theorem no_step_empty_srs (u v : Word) : ¬ Step ([] : SRS) u v := by
+def no_step_empty_srs (u v : Word) : ¬ Step ([] : SRS) u v := by
   intro h; cases h with
   | apply _ _ r hmem => simp at hmem
 /-- Theorem 62: Every word is a normal form in the empty SRS. -/
@@ -582,14 +582,14 @@ noncomputable def commRule : Rule := ⟨[symA, symB], [symB, symA]⟩
 noncomputable def commSRS : SRS := [commRule]
 
 /-- Theorem 64: We can swap ab to ba. -/
-theorem swap_ab : Step commSRS [symA, symB] [symB, symA] := by
+def swap_ab : Step commSRS [symA, symB] [symB, symA] := by
   have h1 : [symA, symB] = [] ++ commRule.lhs ++ [] := by simp [commRule]
   have h2 : [symB, symA] = [] ++ commRule.rhs ++ [] := by simp [commRule]
   rw [h1, h2]
   exact Step.apply [] [] commRule (List.Mem.head _)
 
 /-- Theorem 65: aab → aba via the rule in context. -/
-theorem swap_aab_aba : Step commSRS [symA, symA, symB] [symA, symB, symA] := by
+def swap_aab_aba : Step commSRS [symA, symA, symB] [symA, symB, symA] := by
   have h1 : [symA, symA, symB] = [symA] ++ commRule.lhs ++ [] := by simp [commRule]
   have h2 : [symA, symB, symA] = [symA] ++ commRule.rhs ++ [] := by simp [commRule]
   rw [h1, h2]

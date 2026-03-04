@@ -39,7 +39,7 @@ structure SRule (α : Type u) where
 /-- One-step string rewriting: replace an occurrence of `r.lhs` with `r.rhs`
 in context `u ++ r.lhs ++ v`. -/
 inductive SStep {α : Type u} (rules : List (SRule α)) :
-    Word α → Word α → Prop where
+    Word α → Word α → Type u where
   | apply (r : SRule α) (u v : Word α) :
       r ∈ rules →
       SStep rules (u ++ r.lhs ++ v) (u ++ r.rhs ++ v)
@@ -220,19 +220,23 @@ theorem length_reducing_rtc {α : Type u} {rules : List (SRule α)}
     omega
 
 /-- In a length-reducing system, SStep is well-founded. -/
-theorem length_reducing_wf {α : Type u} {rules : List (SRule α)}
+abbrev SStepProp {α : Type u} (rules : List (SRule α)) (a b : Word α) : Prop :=
+  Nonempty (SStep (α := α) rules a b)
+
+def length_reducing_wf {α : Type u} {rules : List (SRule α)}
     (hlr : isLengthReducing rules) :
-    WellFounded (fun a b => SStep rules b a) :=
+    WellFounded (fun a b => SStepProp rules b a) :=
   Subrelation.wf
-    (fun {a b} (h : SStep rules b a) =>
-      length_reducing_step hlr h)
+    (fun {a b} (h : SStepProp rules b a) => by
+      rcases h with ⟨h⟩
+      exact length_reducing_step hlr h)
     (InvImage.wf (fun (w : Word α) => w.length) Nat.lt_wfRel.wf)
 
 /-! ## Normal Forms -/
 
 /-- A word is in normal form if no rule applies to it. -/
 noncomputable def IsNF {α : Type u} (rules : List (SRule α)) (w : Word α) : Prop :=
-  ∀ w', ¬ SStep rules w w'
+  ∀ w', ¬ Nonempty (SStep rules w w')
 
 /-- In a confluent system, two NFs reachable from the same source are equal. -/
 theorem unique_normal_form {α : Type u} {rules : List (SRule α)}
@@ -245,15 +249,19 @@ theorem unique_normal_form {α : Type u} {rules : List (SRule α)}
   cases hd₁ with
   | refl => cases hd₂ with
     | refl => rfl
-    | head step _ => exact absurd step (hnf₂ _)
-  | head step _ => exact absurd step (hnf₁ _)
+    | head step _ => exact absurd ⟨step⟩ (hnf₂ _)
+  | head step _ => exact absurd ⟨step⟩ (hnf₁ _)
 
 /-! ## Empty System Properties -/
 
 /-- No steps exist in the empty system. -/
 theorem no_step_empty {α : Type u} {a b : Word α} :
-    ¬ SStep ([] : List (SRule α)) a b := by
-  intro h; cases h; rename_i hmem; simp at hmem
+    ¬ Nonempty (SStep ([] : List (SRule α)) a b) := by
+  intro h
+  rcases h with ⟨h⟩
+  cases h
+  rename_i hmem
+  simp at hmem
 
 /-- The empty system is confluent. -/
 theorem empty_confluent {α : Type u} :
@@ -261,7 +269,7 @@ theorem empty_confluent {α : Type u} :
   intro a b c h₁ h₂
   cases h₁ with
   | refl => exact ⟨c, h₂, .refl c⟩
-  | head step _ => exact absurd step no_step_empty
+  | head step _ => exact absurd ⟨step⟩ no_step_empty
 
 /-- In the empty system, ThueEq is just equality. -/
 theorem thueEq_empty_iff_eq {α : Type u} {a b : Word α} :
@@ -287,9 +295,9 @@ theorem single_rule_step {α : Type u} (l r : Word α)
     exact ⟨u, v, rfl, rfl⟩
 
 /-- In a single-rule system, if the rule is length-reducing, the system terminates. -/
-theorem single_rule_terminates {α : Type u} (l r : Word α)
+def single_rule_terminates {α : Type u} (l r : Word α)
     (hlr : r.length < l.length) :
-    WellFounded (fun a b => SStep [SRule.mk l r] b a) :=
+    WellFounded (fun a b => SStepProp [SRule.mk l r] b a) :=
   length_reducing_wf (fun rule hmem => by simp at hmem; subst hmem; exact hlr)
 
 /-! ## Rewriting Preserves Thue Classes -/

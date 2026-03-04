@@ -122,7 +122,7 @@ end Cell2Expr
 /-- Elementary rewrite steps on 2-cell expressions. Each preserves
 `atomCount`. The interchange law — the critical bicategorical axiom —
 permutes atom *order* but not atom *count*. -/
-inductive Cell2Step (γ : Type u) : Cell2Expr γ → Cell2Expr γ → Prop where
+inductive Cell2Step (γ : Type u) : Cell2Expr γ → Cell2Expr γ → Type (u + 1) where
   /-- Interchange law forward: (f∘g)*(h∘k) → (f*h)∘(g*k) -/
   | interchange_fwd (f g h k : Cell2Expr γ) :
       Cell2Step γ

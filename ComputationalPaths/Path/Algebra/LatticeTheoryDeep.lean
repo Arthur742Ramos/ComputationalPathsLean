@@ -809,7 +809,7 @@ theorem confluence_same_target (L : Lattice α) (a b : α) :
 -- ============================================================================
 
 -- Theorem 86: Path trans preserves single-step structure
-theorem single_length_one (s : Step α a b) :
+def single_length_one (s : Step α a b) :
     (Path.single s).length = 1 := by
   simp [Path.single, Path.length]
 
@@ -827,7 +827,7 @@ theorem congrArg_length (f : α → β) (p : Path α a b) :
 noncomputable def symm_witness (p : Path α a b) : Path α b a := Path.symm p
 
 -- Theorem 89: trans of singles = length 2
-theorem trans_singles_length (s₁ : Step α a b) (s₂ : Step α b c) :
+def trans_singles_length (s₁ : Step α a b) (s₂ : Step α b c) :
     (Path.trans (Path.single s₁) (Path.single s₂)).length = 2 := by
   simp [Path.single, Path.trans, Path.length]
 

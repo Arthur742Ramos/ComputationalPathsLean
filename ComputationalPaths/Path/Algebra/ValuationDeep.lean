@@ -54,7 +54,7 @@ noncomputable def ValVal.min : ValVal → ValVal → ValVal
 /-! ## Step constructors: genuine rewrite rules -/
 
 /-- One-step rewrites for valued ring expressions. -/
-inductive VRStep : VRExpr → VRExpr → Prop where
+inductive VRStep : VRExpr → VRExpr → Type where
   -- Ring axioms
   | add_comm (a b : VRExpr) : VRStep (add a b) (add b a)
   | add_assoc (a b c : VRExpr) : VRStep (add (add a b) c) (add a (add b c))
@@ -107,7 +107,7 @@ inductive VRPath : VRExpr → VRExpr → Prop where
 /-! ## Valuation step constructors -/
 
 /-- One-step rewrites for valuation computations. -/
-inductive ValStep : ValVal → ValVal → Prop where
+inductive ValStep : ValVal → ValVal → Type where
   | v_zero : ValStep infty infty                           -- v(0) = ∞
   | v_one : ValStep (fin 0) (fin 0)                        -- v(1) = 0
   | v_uniformizer : ValStep (fin 1) (fin 1)                -- v(π) = 1

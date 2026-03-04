@@ -17,7 +17,7 @@ open SuspensionLoop
 universe u
 
 /-- A 2-cell between parallel computational paths. -/
-abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Type u := RwEq p q
+abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Type (u + 1) := RwEq p q
 
 /-- The adjunction basepoint loop contracts to reflexivity through a 2-cell. -/
 noncomputable def adjMap_basepoint_two_cell {X : Type u} (x₀ : X) {Y : Pointed}

@@ -448,7 +448,7 @@ noncomputable def congruence_path {Sig : Signature}
 
 /-- Congruence paths compose via trans. -/
 -- Theorem 30
-theorem congruence_path_trans {C : Type}
+def congruence_path_trans {C : Type}
     {a b c : C} (hab : a = b) (hbc : b = c) :
     Path.trans (Path.mk [Step.mk a b hab] hab) (Path.mk [Step.mk b c hbc] hbc) =
     Path.mk ([Step.mk a b hab] ++ [Step.mk b c hbc]) (hab.trans hbc) := by

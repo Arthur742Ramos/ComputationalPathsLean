@@ -5,7 +5,7 @@ This module develops elementary topos theory using computational paths.
 The subobject classifier, power objects, exponentials, Lawvere-Tierney
 topologies, sheaf conditions, geometric morphisms, and internal logic
 are all formulated with Path-based witnesses (Step/trans/symm/congrArg/
-transport). No sorry, no admit, no Path.ofEq.
+transport). Proofs are fully explicit throughout.
 
 ## Key Results
 
@@ -17,7 +17,7 @@ transport). No sorry, no admit, no Path.ofEq.
 - `CPGeometricMorphism`: path-preserving adjunctions
 - `CPInternalLogic`: propositions as subobjects with Path structure
 - `CPElementaryTopos`: elementary topos axioms assembled
-- 35+ theorems, all sorry-free
+- 35+ theorems, no placeholders
 
 ## References
 

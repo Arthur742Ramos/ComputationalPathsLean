@@ -160,7 +160,7 @@ theorem encode_decode_roundtrip {A : Type u} [DecidableEq A] {a b : A}
     (c : Code a b) : encode (decode c) = c := rfl
 
 /-- 21. Decode-encode gives ofEq of the proof. -/
-theorem decode_encode {A : Type u} [DecidableEq A] {a b : A}
+def decode_encode {A : Type u} [DecidableEq A] {a b : A}
     (p : Path a b) : decode (encode p) = Path.mk [Step.mk _ _ p.proof] p.proof := rfl
 
 /-- 22. Encode at refl gives rfl. -/

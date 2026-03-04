@@ -846,7 +846,7 @@ noncomputable def knotStep (d₁ d₂ : KnotDiagram) (h : d₁ = d₂) : Step Kn
   Step.mk d₁ d₂ h
 
 /-- Symmetry of knot step. -/
-theorem knotStep_symm (d₁ d₂ : KnotDiagram) (h : d₁ = d₂) :
+def knotStep_symm (d₁ d₂ : KnotDiagram) (h : d₁ = d₂) :
     (knotStep d₁ d₂ h).symm = knotStep d₂ d₁ h.symm := rfl
 
 /-- Path from a single knot step. -/

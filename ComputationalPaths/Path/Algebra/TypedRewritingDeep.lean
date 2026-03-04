@@ -162,7 +162,7 @@ theorem Path.length_trans (p : Path α a b) (q : Path α b c) :
 theorem Path.length_nil (a : α) : (Path.nil a).length = 0 := rfl
 
 /-- Theorem 10 – length of single is 1. -/
-theorem Path.length_single (s : Step α a b) : (Path.single s).length = 1 := rfl
+def Path.length_single (s : Step α a b) : (Path.single s).length = 1 := rfl
 
 -- ============================================================
 -- §6  Typed steps and typed paths

@@ -50,7 +50,7 @@ noncomputable def solutionPath (C : CSP A) (s₁ s₂ : CSPSolution C)
   Path.mk [Step.mk _ _ h] h
 
 /-- Solution path steps -/
-theorem solutionPath_steps (C : CSP A) (s₁ s₂ : CSPSolution C)
+def solutionPath_steps (C : CSP A) (s₁ s₂ : CSPSolution C)
     (h : s₁.point = s₂.point) :
     (solutionPath C s₁ s₂ h).steps =
     [Step.mk s₁.point s₂.point h] := by
@@ -84,7 +84,7 @@ noncomputable def fixedWitnessPath (C : CSP A) (AC : ArcConsistent C)
   Path.mk [Step.mk _ _ FW.isFixed] FW.isFixed
 
 /-- CongrArg applied to fixed witness path -/
-theorem congrArg_fixedWitness (C : CSP A) (AC : ArcConsistent C)
+def congrArg_fixedWitness (C : CSP A) (AC : ArcConsistent C)
     (FW : FixedWitness C AC) (f : A → B) :
     congrArg f (fixedWitnessPath C AC FW) =
     Path.mk [Step.mk _ _ (_root_.congrArg f FW.isFixed)] (_root_.congrArg f FW.isFixed) := by
@@ -172,7 +172,7 @@ theorem transport_domain (C : CSP A) {a b : A} (p : Path a b)
   | mk steps proof => cases proof; rfl
 
 /-- CongrArg distributes over solution paths -/
-theorem congrArg_solution (C : CSP A) (f : A → B)
+def congrArg_solution (C : CSP A) (f : A → B)
     (s₁ s₂ : CSPSolution C) (h : s₁.point = s₂.point) :
     congrArg f (solutionPath C s₁ s₂ h) =
     Path.mk [Step.mk _ _ (_root_.congrArg f h)] (_root_.congrArg f h) := by
@@ -187,7 +187,7 @@ theorem solution_transport_roundtrip {P : A → Type v}
   transport_symm_left (solutionPath C s₁ s₂ h) x
 
 /-- Step map preserves solution path structure -/
-theorem step_map_solution (C : CSP A) (f : A → B)
+def step_map_solution (C : CSP A) (f : A → B)
     (s₁ s₂ : CSPSolution C) (h : s₁.point = s₂.point) :
     (congrArg f (solutionPath C s₁ s₂ h)).steps =
     [Step.mk (f s₁.point) (f s₂.point) (_root_.congrArg f h)] := by

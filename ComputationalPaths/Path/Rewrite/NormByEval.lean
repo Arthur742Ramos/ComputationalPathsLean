@@ -173,8 +173,8 @@ This normalization strategy is:
 3. **Efficient**: it runs in linear time -/
 
 /-- NbE output is always a fixed point (normal form). -/
-theorem nbe_is_normal_form (e : Expr) :
-    ∀ e', ¬ CStep (nbe e) e' ∨ nbe (nbe e) = nbe e := by
+def nbe_is_normal_form (e : Expr) :
+    ∀ e', ¬ Nonempty (CStep (nbe e) e') ∨ nbe (nbe e) = nbe e := by
   intro _
   exact Or.inr (nbe_idempotent e)
 
@@ -232,15 +232,17 @@ iterated CStep rewriting may require Θ(n²) steps on worst-case inputs
 (see `TerminationTight.lean`). -/
 
 /-- NbE produces the same result as iterated rewriting to normal form. -/
-theorem nbe_agrees_with_normalization (e : Expr) :
-    ∀ nf, (∀ e', ¬ CStep nf e') → CRTC e nf → nbe e = nf := by
+def nbe_agrees_with_normalization (e : Expr) :
+    ∀ nf, (∀ e', ¬ Nonempty (CStep nf e')) → CRTC e nf → nbe e = nf := by
   intro nf hnf hred
   -- Key: if nf has no CStep reducts, and CRTC nf x, then x = nf
   have nf_stuck : ∀ x, CRTC nf x → x = nf := by
     intro x hx
     induction hx with
     | refl _ => rfl
-    | head s _ _ => exact absurd s (hnf _)
+    | head s _ _ => exact False.elim (by
+      rcases s with ⟨s⟩
+      exact (hnf _ ⟨s⟩))
   have h_inv : toRW nf = toRW e := (toRW_invariant_rtc hred).symm
   have h_canon_eq : canon e = canon nf := by
     show rwToExpr (toRW e) = rwToExpr (toRW nf); rw [h_inv]

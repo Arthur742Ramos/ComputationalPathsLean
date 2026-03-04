@@ -42,7 +42,7 @@ def size {A : Type u} {a b : A} : PathExpr A a b → Nat
 abbrev complexity {A : Type u} {a b : A} (e : PathExpr A a b) : Nat := size e
 
 /-- Single rewrite step on `PathExpr` (trivial: only reflexivity). -/
-inductive Step {A : Type u} {a b : A} : PathExpr A a b → PathExpr A a b → Prop where
+inductive Step {A : Type u} {a b : A} : PathExpr A a b → PathExpr A a b → Type u where
 
 /-- Multi-step rewriting (reflexive-transitive closure). -/
 inductive Rw {A : Type u} {a b : A} : PathExpr A a b → PathExpr A a b → Prop where
@@ -103,13 +103,19 @@ theorem rwPlus_complexity_lt {A : Type u} {a b : A}
   | single hs => exact nomatch hs
   | cons hs _ _ => exact nomatch hs
 
+/-- Prop-valued wrapper for `Step` (needed for `Acc`). -/
+abbrev StepProp {A : Type u} {a b : A} (p q : PathExpr A a b) : Prop :=
+  Nonempty (Step p q)
+
 /-- The rewrite system is terminating: no infinite `Step` chains. -/
 noncomputable def Terminating (A : Type u) (a b : A) : Prop :=
-  ∀ e : PathExpr A a b, Acc (fun q p => Step p q) e
+  ∀ e : PathExpr A a b, Acc (fun q p => StepProp p q) e
 
 /-- The trivial rewrite system is terminating. -/
 theorem terminating (A : Type u) (a b : A) : Terminating A a b :=
-  fun e => Acc.intro e (fun _ h => nomatch h)
+  fun e => Acc.intro e (fun _ h => by
+    rcases h with ⟨h⟩
+    nomatch h)
 
 /-- Evaluation respects `Rw`. -/
 theorem eval_rw {A : Type u} {a b : A} {p q : PathExpr A a b}

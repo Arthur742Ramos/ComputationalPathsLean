@@ -343,7 +343,7 @@ theorem pathJoinable_symm {p q : Path a b} (h : PathJoinable p q) : PathJoinable
 theorem pathJoinable_of_rw {p q : Path a b} (h : Rw p q) : PathJoinable p q :=
   ⟨q, h, Rw.refl q⟩
 
-theorem pathJoinable_of_step {p q : Path a b} (h : Step (A := A) p q) : PathJoinable p q :=
+def pathJoinable_of_step {p q : Path a b} (h : Step (A := A) p q) : PathJoinable p q :=
   pathJoinable_of_rw (rw_of_step h)
 
 theorem pathJoinable_of_eq {p q : Path a b} (h : p = q) : PathJoinable p q := by
@@ -408,25 +408,28 @@ section Connection
 
 variable {A : Type u} {a b : A}
 
-/-- The abstract RTC of `Step` embeds into `Rw`. -/
-theorem rtc_step_to_rw {p q : Path a b} (h : RTC' (Step (A := A) (a := a) (b := b)) p q) :
+/-- The abstract RTC of `Step` (viewed propositionally via `Nonempty`) embeds into `Rw`. -/
+def rtc_step_to_rw {p q : Path a b}
+    (h : RTC' (fun p q => Nonempty (Step (A := A) (a := a) (b := b) p q)) p q) :
     Rw p q := by
   induction h with
   | refl' => exact Rw.refl _
-  | @step _ x _ hpx _ ih => exact rw_trans (rw_of_step hpx) ih
+  | @step _ x _ hpx _ ih =>
+      rcases hpx with ⟨hpx⟩
+      exact rw_trans (rw_of_step hpx) ih
 
-/-- Conversely, `Rw` is an RTC of `Step`. -/
-theorem rw_to_rtc_step {p q : Path a b} (h : Rw p q) :
-    RTC' (Step (A := A) (a := a) (b := b)) p q := by
+/-- Conversely, `Rw` is an RTC of `Step` (again using `Nonempty`). -/
+def rw_to_rtc_step {p q : Path a b} (h : Rw p q) :
+    RTC' (fun p q => Nonempty (Step (A := A) (a := a) (b := b) p q)) p q := by
   induction h with
   | refl => exact .refl' _
-  | tail _ s ih => exact RTC'.tail' ih s
+  | tail _ s ih => exact RTC'.tail' ih ⟨s⟩
 
 /-- `PathJoinable` is a path-level instantiation of the abstract `Confluent`
-applied to `Step`. -/
-theorem pathJoinable_iff_confluent_instance {p q r : Path a b}
+applied to `Step` viewed propositionally via `Nonempty`. -/
+def pathJoinable_iff_confluent_instance {p q r : Path a b}
     (hpq : Rw p q) (hpr : Rw p r)
-    (hConfl : Confluent (Step (A := A) (a := a) (b := b))) :
+    (hConfl : Confluent (fun p q => Nonempty (Step (A := A) (a := a) (b := b) p q))) :
     PathJoinable q r := by
   obtain ⟨d, hqd, hrd⟩ := hConfl p q r (rw_to_rtc_step hpq) (rw_to_rtc_step hpr)
   exact ⟨d, rtc_step_to_rw hqd, rtc_step_to_rw hrd⟩

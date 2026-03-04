@@ -29,7 +29,7 @@ abbrev BraidWord (n : Nat) := List (BraidGen n)
     `comm`  :  σ_i σ_j  →  σ_j σ_i       (|i - j| ≥ 2)
     `braid` :  σ_i σ_j σ_i → σ_j σ_i σ_j (|i - j| = 1)
 -/
-inductive BraidStep (n : Nat) : BraidWord n → BraidWord n → Prop where
+inductive BraidStep (n : Nat) : BraidWord n → BraidWord n → Type where
   | comm (pre suf : BraidWord n) (g h : BraidGen n)
       (hfar : (g.idx : Nat) + 2 ≤ (h.idx : Nat) ∨ (h.idx : Nat) + 2 ≤ (g.idx : Nat)) :
       BraidStep n (pre ++ [g, h] ++ suf) (pre ++ [h, g] ++ suf)
@@ -107,7 +107,7 @@ theorem BraidPath.congrArg_append {n : Nat} (sfx : BraidWord n)
 -- ============================================================
 
 /-- One step in either direction. -/
-inductive BraidStepSym (n : Nat) : BraidWord n → BraidWord n → Prop where
+inductive BraidStepSym (n : Nat) : BraidWord n → BraidWord n → Type where
   | fwd {a b} : BraidStep n a b → BraidStepSym n a b
   | bwd {a b} : BraidStep n a b → BraidStepSym n b a
 

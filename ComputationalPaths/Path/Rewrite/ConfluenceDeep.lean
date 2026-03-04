@@ -89,7 +89,8 @@ section PathLayer
 
 variable {A : Type u} {a b : A}
 
-abbrev StepRel : Path a b → Path a b → Prop := fun p q => Path.Step p q
+abbrev StepRel : Path a b → Path a b → Prop :=
+  fun p q => Nonempty (Path.Step p q)
 
 noncomputable def rtc_of_rw {p q : Path a b} (h : Rw p q) :
     RTC (StepRel (A := A) (a := a) (b := b)) p q := by
@@ -97,7 +98,7 @@ noncomputable def rtc_of_rw {p q : Path a b} (h : Rw p q) :
   | refl =>
       exact RTC.refl _
   | tail _ h₂ ih =>
-      exact RTC.snoc ih h₂
+      exact RTC.snoc ih ⟨h₂⟩
 
 noncomputable def rw_of_rtc {p q : Path a b}
     (h : RTC (StepRel (A := A) (a := a) (b := b)) p q) :
@@ -106,16 +107,18 @@ noncomputable def rw_of_rtc {p q : Path a b}
   | refl =>
       exact Rw.refl _
   | step hpq _ ih =>
+      rcases hpq with ⟨hpq⟩
       exact rw_trans (Rw.tail (Rw.refl _) hpq) ih
 
 noncomputable def StepLocallyConfluent : Prop :=
-  ∀ p q r : Path a b, Path.Step p q → Path.Step p r → ∃ m, Rw q m ∧ Rw r m
+  ∀ p q r : Path a b, StepRel (A := A) (a := a) (b := b) p q →
+    StepRel (A := A) (a := a) (b := b) p r → ∃ m, Rw q m ∧ Rw r m
 
 noncomputable def StepConfluent : Prop :=
   ∀ p q r : Path a b, Rw p q → Rw p r → ∃ m, Rw q m ∧ Rw r m
 
 theorem step_newman_lemma
-    (wf : WellFounded (fun y x : Path a b => Path.Step x y))
+    (wf : WellFounded (fun y x : Path a b => Nonempty (Path.Step x y)))
     (hLocal : StepLocallyConfluent (A := A) (a := a) (b := b)) :
     StepConfluent (A := A) (a := a) (b := b) := by
   have hLocalRTC : LocallyConfluent (StepRel (A := A) (a := a) (b := b)) := by

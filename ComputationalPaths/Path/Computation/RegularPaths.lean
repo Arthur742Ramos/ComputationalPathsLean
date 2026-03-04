@@ -262,7 +262,7 @@ theorem starFreeSize_pos {Alpha : Type u} (r : StarFree Alpha) : 0 < starFreeSiz
 /-! ## RegularStep Rewrite Rules -/
 
 /-- Rewrite steps for regular expression computations. -/
-inductive RegularStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive RegularStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Union idempotency reduction. -/
   | union_idem {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : RegularStep p q

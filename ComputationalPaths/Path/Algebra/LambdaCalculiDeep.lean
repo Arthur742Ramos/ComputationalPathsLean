@@ -189,7 +189,7 @@ theorem USymPath.symm {a b : UTerm}
 -- ============================================================
 
 /-- Parallel beta step: simultaneously reduce many redexes. -/
-inductive UParStep : UTerm → UTerm → Prop where
+inductive UParStep : UTerm → UTerm → Type where
   | pvar (n : Nat) : UParStep (.var n) (.var n)
   | plam {t t' : UTerm} : UParStep t t' → UParStep (.lam t) (.lam t')
   | papp {f f' a a' : UTerm} :
@@ -199,23 +199,34 @@ inductive UParStep : UTerm → UTerm → Prop where
       UParStep (.app (.lam body) arg) (body'.subst 0 arg')
 
 /-- Theorem 13: Parallel step reflexivity. -/
-theorem UParStep.refl : (t : UTerm) → UParStep t t
+def UParStep.refl : (t : UTerm) → UParStep t t
   | .var n => .pvar n
   | .lam t => .plam (UParStep.refl t)
   | .app f a => .papp (UParStep.refl f) (UParStep.refl a)
 
-/-- Theorem 14: Beta step embeds into parallel step. -/
-theorem UBeta.toParStep {a b : UTerm} (s : UBeta a b) : UParStep a b := by
+/-- Prop-valued wrapper for `UParStep` (for `Diamond` etc.). -/
+abbrev UParStepProp (a b : UTerm) : Prop :=
+  Nonempty (UParStep a b)
+
+/-- Theorem 14: Beta step embeds into parallel step (Prop wrapper). -/
+noncomputable def UBeta.toParStep {a b : UTerm} (s : UBeta a b) : UParStepProp a b := by
   induction s with
-  | redex body arg => exact .pbeta (.refl body) (.refl arg)
-  | congLam _ ih => exact .plam ih
-  | congAppL _ ih => exact .papp ih (.refl _)
-  | congAppR _ ih => exact .papp (.refl _) ih
+  | redex body arg =>
+      exact ⟨.pbeta (.refl body) (.refl arg)⟩
+  | congLam _ ih =>
+      rcases ih with ⟨ih⟩
+      exact ⟨.plam ih⟩
+  | congAppL _ ih =>
+      rcases ih with ⟨ih⟩
+      exact ⟨.papp ih (.refl _)⟩
+  | congAppR _ ih =>
+      rcases ih with ⟨ih⟩
+      exact ⟨.papp (.refl _) ih⟩
 
 /-- Parallel path. -/
 inductive UParPath : UTerm → UTerm → Prop where
   | refl (t : UTerm) : UParPath t t
-  | step {a b c : UTerm} : UParStep a b → UParPath b c → UParPath a c
+  | step {a b c : UTerm} : UParStepProp a b → UParPath b c → UParPath a c
 
 /-- Theorem 15: UParPath transitivity. -/
 theorem UParPath.trans {a b c : UTerm}
@@ -650,7 +661,7 @@ theorem FSN.lam {τ : FType} {t : FTerm} (h : FSN t) : FSN (.lam τ t) := by
 -- ============================================================
 
 /-- Call-by-name: reduce head position only. -/
-inductive CBNStep : UTerm → UTerm → Prop where
+inductive CBNStep : UTerm → UTerm → Type where
   | headBeta (body arg : UTerm) :
       CBNStep (.app (.lam body) arg) (body.subst 0 arg)
   | congAppL {f f' a : UTerm} : CBNStep f f' →
@@ -674,7 +685,7 @@ theorem CBNPath.toUPath {a b : UTerm} (p : CBNPath a b) : UPath a b := by
   | step s _ ih => exact .step s.toUBeta ih
 
 /-- Call-by-value: reduce argument first. -/
-inductive CBVStep : UTerm → UTerm → Prop where
+inductive CBVStep : UTerm → UTerm → Type where
   | valBeta (body : UTerm) (v : UTerm) :
       CBVStep (.app (.lam body) v) (body.subst 0 v)
   | congAppR {f a a' : UTerm} : CBVStep a a' →
@@ -852,8 +863,8 @@ noncomputable def Diamond (R : UTerm → UTerm → Prop) : Prop :=
 
 /-- Theorem 56b: Diamond implies semi-confluence (single step vs path). -/
 theorem semi_confluence_of_diamond
-    (hD : Diamond UParStep)
-    {x y : UTerm} (s : UParStep x y)
+    (hD : Diamond UParStepProp)
+    {x y : UTerm} (s : UParStepProp x y)
     {z : UTerm} (q : UParPath x z) :
     ∃ d, UParPath y d ∧ UParPath z d := by
   induction q generalizing y with
@@ -869,7 +880,7 @@ theorem semi_confluence_of_diamond
 
 /-- Theorem 56c: Diamond implies full confluence for parallel paths. -/
 theorem confluence_of_diamond
-    (hDiamond : Diamond UParStep)
+    (hDiamond : Diamond UParStepProp)
     {t b c : UTerm} (p : UParPath t b) (q : UParPath t c) :
     ∃ d, UParPath b d ∧ UParPath c d := by
   induction p generalizing c with

@@ -10,11 +10,11 @@ and the skeletal filtration properties.
 ## Key Results
 
 - `CWApproximationData`: CW approximation data for a map between CW complexes.
-- `cwApproximation_of_cellular`: cellular maps admit trivial CW approximations.
-- `cwApproximation_id`: the identity map on a CW complex admits a CW approximation.
+- `cwApproximation_of_cellular`: cellular maps have trivial CW approximations.
+- `cwApproximation_id`: the identity map on a CW complex has a CW approximation.
 - `cwApproximation_path`: extract the Path-valued homotopy from a CW approximation.
 - `cwApproximation_comp`: composition of CW approximations.
-- `cwApproximation_constant`: constant maps admit CW approximations.
+- `cwApproximation_constant`: constant maps have CW approximations.
 - `skeletal_restriction`: restricting a cellular map to a skeleton.
 - `cellular_homotopy_extension`: homotopy extension for cellular maps.
 
@@ -257,7 +257,7 @@ We packaged CW approximation data for maps between CW complexes:
 
 1. **Core**: `CWApproximationData`, trivial approximations for cellular maps
 2. **Composition**: `cwApproximation_comp` composes approximations
-3. **Constants**: constant maps admit cellular approximations
+3. **Constants**: constant maps have cellular approximations
 4. **Skeletal**: `SkeletalRestriction` for level-by-level analysis
 5. **Uniqueness**: two approximations are homotopic
 6. **Relative**: approximations that agree on subcomplexes

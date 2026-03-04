@@ -87,7 +87,7 @@ theorem mkTraceStepPath_toEq {u v : TraceWord Sym} (h : u = v) :
     (mkTraceStepPath h).toEq = h :=
   rfl
 
-theorem mkTraceStepPath_steps {u v : TraceWord Sym} (h : u = v) :
+def mkTraceStepPath_steps {u v : TraceWord Sym} (h : u = v) :
     (mkTraceStepPath h).steps = [Step.mk u v h] :=
   rfl
 
@@ -622,7 +622,7 @@ theorem run_nil (M : AsyncAutomaton Gam State) (s : State) :
     run M s [] = s :=
   rfl
 
-theorem run_cons (M : AsyncAutomaton Gam State) (s : State)
+def run_cons (M : AsyncAutomaton Gam State) (s : State)
     (a : Gam) (w : TraceWord Gam) :
     run M s (a :: w) = run M (M.localStep s a) w :=
   rfl

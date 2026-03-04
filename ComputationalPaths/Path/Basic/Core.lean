@@ -244,7 +244,7 @@ theorem mac_lane_coherence_fourfold_steps {e : A}
   simp [trans, List.append_assoc]
 
 /-- Step-trace companion: reversing and symmetrizing a trace twice is identity. -/
-theorem trace_symm_involutive (steps : List (Step A)) :
+def trace_symm_involutive (steps : List (Step A)) :
     (steps.reverse.map Step.symm).reverse.map Step.symm = steps := by
   have hmap : List.map (Step.symm ∘ Step.symm) steps = steps := by
     induction steps with

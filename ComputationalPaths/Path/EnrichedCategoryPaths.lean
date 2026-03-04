@@ -43,7 +43,7 @@ noncomputable section
 
 /-- Domain-specific rewrite steps for enriched category coherence. -/
 inductive EnrichedStep {A : Type u} :
-    {a b : A} → Path a b → Path a b → Prop where
+    {a b : A} → Path a b → Path a b → Type (u + 1) where
   | right_unit {a b : A} (p : Path a b) :
       EnrichedStep (Path.trans p (Path.refl b)) p
   | left_unit {a b : A} (p : Path a b) :

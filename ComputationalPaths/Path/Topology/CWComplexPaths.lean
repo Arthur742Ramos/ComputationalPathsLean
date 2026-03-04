@@ -219,7 +219,7 @@ structure CellularChainMap (X Y : CWComplex) where
 /-! ## CWStep: Rewrite Steps -/
 
 /-- Rewrite steps for CW complex operations. -/
-inductive CWStep : Prop
+inductive CWStep : Type
   | attach_cell : CWStep
   | collapse_cell : CWStep
   | cellular_approx : CWStep

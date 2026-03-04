@@ -163,7 +163,7 @@ theorem polygraph_summary :
     -- All critical pairs joinable (→ confluence)
     (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
     -- Termination
-    WellFounded (fun q p : Expr => CStep p q) ∧
+    WellFounded (fun q p : Expr => GroupoidConfluence.CStepProp p q) ∧
     -- Decidable word problem
     (∀ e₁ e₂ : Expr, ExprRwEq e₁ e₂ ∨ ¬ ExprRwEq e₁ e₂) := by
   exact ⟨rfl, rfl, rfl, confluence, cstep_termination,

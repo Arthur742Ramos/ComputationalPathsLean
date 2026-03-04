@@ -102,7 +102,7 @@ noncomputable def TyF.deriv2 (f : TyF) : TyF := f.deriv.deriv
 -- §4  Rewrite steps with full congruence
 -- ============================================================
 
-inductive DStep : TyF → TyF → Prop where
+inductive DStep : TyF → TyF → Type where
   | sumZeroL (f : TyF) : DStep (.sum .zero f) f
   | sumZeroR (f : TyF) : DStep (.sum f .zero) f
   | prodZeroL (f : TyF) : DStep (.prod .zero f) .zero
@@ -313,7 +313,7 @@ noncomputable def Zipper.goUp : Zipper → Option Zipper
 -- §9  Zipper navigation as computational paths
 -- ============================================================
 
-inductive NavStep : Zipper → Zipper → Prop where
+inductive NavStep : Zipper → Zipper → Type where
   | goLeft (z z' : Zipper) : z.goLeft = some z' → NavStep z z'
   | goRight (z z' : Zipper) : z.goRight = some z' → NavStep z z'
   | goUp (z z' : Zipper) : z.goUp = some z' → NavStep z z'

@@ -292,7 +292,7 @@ noncomputable def trans_extend {Q Alpha : Type u} (M : DFAPath Q Alpha) (q : Q)
 /-! ## AutomataStep Rewrite Rules -/
 
 /-- Rewrite steps for automata computations. -/
-inductive AutomataStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive AutomataStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Deterministic transition collapse. -/
   | det_collapse {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : AutomataStep p q

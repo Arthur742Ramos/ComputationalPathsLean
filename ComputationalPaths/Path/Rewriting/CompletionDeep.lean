@@ -635,19 +635,19 @@ theorem congrArg_refl {B : Type u} (f : A → B) (a : A) :
 
 /-! ### 37. Step-level: single step produces correct path -/
 
-theorem step_path_toEq (s : Step A) :
+def step_path_toEq (s : Step A) :
     (Path.mk [s] s.proof : Path s.src s.tgt).toEq = s.proof := rfl
 
 /-! ### 38. symm of single step path -/
 
-theorem symm_single_step (s : Step A) :
+def symm_single_step (s : Step A) :
     Path.symm (Path.mk [s] s.proof : Path s.src s.tgt) =
     Path.mk [s.symm] s.proof.symm := by
   simp [Path.symm]
 
 /-! ### 39. congrArg of single step path -/
 
-theorem congrArg_single_step {B : Type u} (f : A → B) (s : Step A) :
+def congrArg_single_step {B : Type u} (f : A → B) (s : Step A) :
     Path.congrArg f (Path.mk [s] s.proof : Path s.src s.tgt) =
     Path.mk [s.map f] (_root_.congrArg f s.proof) := by
   simp [Path.congrArg]

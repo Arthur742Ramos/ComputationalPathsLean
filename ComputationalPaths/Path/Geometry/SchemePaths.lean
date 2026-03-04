@@ -82,7 +82,7 @@ inductive SchObj where
   | empty : SchObj
   | terminal : SchObj
 
-inductive SchStep : SchObj → SchObj → Prop where
+inductive SchStep : SchObj → SchObj → Type where
   | locIncl (f : R) : SchStep .ring (.loc f)
   | locRefl : SchStep (.loc 1) .ring
   | locTrans (f g : R) : SchStep (.loc f) (.loc (rmul f g))
@@ -106,7 +106,7 @@ inductive SchPath : SchObj → SchObj → Type where
 
 /-! ## Ring rewrite steps -/
 
-inductive RStep : R → R → Prop where
+inductive RStep : R → R → Type where
   | addComm (a b : R) : RStep (radd a b) (radd b a)
   | mulComm (a b : R) : RStep (rmul a b) (rmul b a)
   | addAssoc (a b c : R) : RStep (radd (radd a b) c) (radd a (radd b c))

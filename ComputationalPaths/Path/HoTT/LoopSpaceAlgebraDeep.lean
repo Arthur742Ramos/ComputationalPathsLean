@@ -105,7 +105,7 @@ end LoopExpr
 /-! ## 2. LoopStep — Elementary Rewrite Steps -/
 
 /-- Elementary rewrite steps between loop expressions. -/
-inductive LoopStep : LoopExpr → LoopExpr → Prop where
+inductive LoopStep : LoopExpr → LoopExpr → Type where
   | left_unit (α : LoopExpr) :
       LoopStep (LoopExpr.concat LoopExpr.id_loop α) α
   | right_unit (α : LoopExpr) :
@@ -722,7 +722,7 @@ theorem normalFormToExpr_singleton (g : SignedGen) :
     normalFormToExpr [g] = signedGenToExpr g := rfl
 
 /-- CancelStep preserves empty. -/
-theorem cancelStep_nil : cancelStep [] = [] := rfl
+def cancelStep_nil : cancelStep [] = [] := rfl
 
 /-- CancelStep singleton. -/
 theorem cancelStep_singleton (g : SignedGen) : cancelStep [g] = [g] := by

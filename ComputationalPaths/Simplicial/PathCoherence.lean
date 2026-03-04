@@ -68,7 +68,7 @@ noncomputable def mapPath (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj
   Path.trans (Path.congrArg (F.map n) p) (Path.refl (F.map n y))
 
 /-- `mapPath` reduces to plain `congrArg` in one rewrite step. -/
-theorem mapPath_step (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj n}
+noncomputable def mapPath_step (F : PathPreservingSSetMap S T) {n : Nat} {x y : S.obj n}
     (p : Path x y) :
     Path.Step (F.mapPath p) (Path.congrArg (F.map n) p) := by
   simpa [mapPath] using Path.Step.trans_refl_right (Path.congrArg (F.map n) p)
@@ -142,7 +142,7 @@ noncomputable def mappedFacePath (F : PathPreservingSSetMap S T)
   Path.stepChain ((F.fillMappedHorn kan n k horn).face_match i hi)
 
 /-- A direct `Step` witness for normalization of transported face paths. -/
-theorem mappedFacePath_step (F : PathPreservingSSetMap S T)
+noncomputable def mappedFacePath_step (F : PathPreservingSSetMap S T)
     (kan : KanFillerProperty S)
     {n : Nat} {k : Fin (n + 2)} (horn : HornData S n k)
     (i : Fin (n + 2)) (hi : i ≠ k) :

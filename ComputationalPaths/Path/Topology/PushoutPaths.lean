@@ -127,7 +127,7 @@ theorem Cocone.desc_unique (cc : Cocone f g D)
 
 /-- The cocone map respects gluing paths: the image of a glue path
 through `desc` produces a path in `D`. -/
-theorem Cocone.desc_gluePath (cc : Cocone f g D) (c : C) :
+def Cocone.desc_gluePath (cc : Cocone f g D) (c : C) :
     Path.congrArg cc.desc (gluePath c) =
       Path.mk ((gluePath c).steps.map (Step.map cc.desc))
               (_root_.congrArg cc.desc (gluePath c).proof) :=

@@ -217,7 +217,7 @@ noncomputable def quadratic_double {M : CoxeterMatrix} {G : CoxeterGroup M}
 /-! ## CoxeterStep Inductive -/
 
 /-- Rewrite steps for Coxeter group computations. -/
-inductive CoxeterStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive CoxeterStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Braid relation reduction. -/
   | braid_reduce {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : CoxeterStep p q

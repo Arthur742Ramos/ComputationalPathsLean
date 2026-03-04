@@ -169,7 +169,7 @@ noncomputable def tqftPath : CobPath a b → LinMap (stateSpace a) (stateSpace b
 -- ============================================================
 
 -- Theorem 1: Identity axiom — cylinder maps to identity
-theorem tqft_identity (m : Manifold) :
+def tqft_identity (m : Manifold) :
     tqftStep (Step.refl m) = LinMap.id (stateSpace m) := by
   simp [tqftStep]
 
@@ -179,7 +179,7 @@ theorem tqft_nil (m : Manifold) :
   simp [tqftPath]
 
 -- Theorem 3: TQFT on single step matches step map
-theorem tqft_single (s : Cob a b) :
+def tqft_single (s : Cob a b) :
     tqftPath (Path.single s) = LinMap.comp (tqftStep s) (LinMap.id (stateSpace b)) := by
   simp [Path.single, tqftPath]
 
@@ -213,13 +213,13 @@ theorem tensor_comm_dim (V W : VSpace) :
 -- ============================================================
 
 -- Theorem 9: TQFT preserves path composition (label-level)
-theorem tqft_comp_label (s : Cob a b) (p : CobPath b c) :
+def tqft_comp_label (s : Cob a b) (p : CobPath b c) :
     (tqftPath (.cons s p)).label =
     (LinMap.comp (tqftStep s) (tqftPath p)).label := by
   rfl
 
 -- Theorem 10: TQFT path single cons
-theorem tqft_cons (s : Cob a b) (p : CobPath b c) :
+def tqft_cons (s : Cob a b) (p : CobPath b c) :
     tqftPath (.cons s p) = LinMap.comp (tqftStep s) (tqftPath p) := by
   rfl
 
@@ -395,7 +395,7 @@ theorem rev_partition (m : Manifold) :
   simp [partitionFn, rev_stateSpace_dim]
 
 -- Theorem 35: Path between reversed manifolds (via symm of step)
-theorem cob_rev_step (n : String) (a b : Manifold) :
+def cob_rev_step (n : String) (a b : Manifold) :
     (Step.rule n a b |>.symm) = Step.rule (n ++ "⁻¹") b a := by
   rfl
 

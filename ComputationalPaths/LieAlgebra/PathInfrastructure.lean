@@ -26,7 +26,7 @@ noncomputable section
 /-! ## Lie Algebra Rewrite Steps -/
 
 inductive LieStep {A : Type u} :
-    {a b : A} → Path a b → Path a b → Prop where
+    {a b : A} → Path a b → Path a b → Type (u + 1) where
   | right_unit {a b : A} (p : Path a b) :
       LieStep (Path.trans p (Path.refl b)) p
   | left_unit {a b : A} (p : Path a b) :

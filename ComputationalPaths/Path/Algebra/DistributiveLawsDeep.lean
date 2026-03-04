@@ -36,7 +36,7 @@ noncomputable def EF.flatten : EF → List Nat
 -- ============================================================
 
 /-- One-step rewrite capturing distributive-law axioms. -/
-inductive DStep : EF → EF → Prop where
+inductive DStep : EF → EF → Type where
   | idL  (f : EF) : DStep (.id ∘ₑ f) f
   | idL' (f : EF) : DStep f (.id ∘ₑ f)
   | idR  (f : EF) : DStep (f ∘ₑ .id) f

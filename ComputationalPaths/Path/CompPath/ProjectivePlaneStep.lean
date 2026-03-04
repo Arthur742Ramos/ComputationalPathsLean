@@ -104,18 +104,18 @@ noncomputable def rp2LoopPow_two_rweq :
 /-! ## The 2-fold relation -/
 
 /-- `loop² = refl` as an RP2Step. -/
-theorem rp2Relation :
+def rp2Relation :
     RP2Step (Path.trans rp2Loop rp2Loop) (Path.refl rp2Base) :=
   RP2Step.relation
 
 /-- Prefixing `loop² → refl` by any RP² loop preserves RP2Step rewriting. -/
-theorem rp2Relation_congr_prefix (r : rp2LoopSpace) :
+def rp2Relation_congr_prefix (r : rp2LoopSpace) :
     RP2Step (Path.trans r (Path.trans rp2Loop rp2Loop))
       (Path.trans r (Path.refl rp2Base)) :=
   RP2Step.congr_right r rp2Relation
 
 /-- Suffixing `loop² → refl` by any RP² loop preserves RP2Step rewriting. -/
-theorem rp2Relation_congr_suffix (r : rp2LoopSpace) :
+def rp2Relation_congr_suffix (r : rp2LoopSpace) :
     RP2Step (Path.trans (Path.trans rp2Loop rp2Loop) r)
       (Path.trans (Path.refl rp2Base) r) :=
   RP2Step.congr_left r rp2Relation

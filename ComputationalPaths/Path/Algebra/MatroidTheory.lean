@@ -99,7 +99,7 @@ theorem rankBoundedByN (n : Nat) (_M : RankMatroid n) :
 /-! ## Domain-Specific Rewrite Steps -/
 
 /-- Domain-specific rewrite steps for matroid theory. -/
-inductive MatroidStep : {A : Type} → A → A → Prop
+inductive MatroidStep : {A : Type} → A → A → Type
   | rank_empty {n : Nat} {M : RankMatroid n} :
       MatroidStep (M.rank (fun _ => false)) 0
   | submodular_ineq {n : Nat} {M : RankMatroid n}

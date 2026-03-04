@@ -441,7 +441,7 @@ noncomputable def SqPath.congrArg (f : Square → Square) (mkStep : (a b : Squar
   | SqPath.cons _ p => SqPath.cons (mkStep _ _) (SqPath.congrArg f mkStep p)
 
 /-- Theorem 42 — congrArg preserves horizontal path length. -/
-theorem hpath_congrArg_length (f : HEdge → HEdge) (mkStep : (a b : HEdge) → HStep (f a) (f b))
+def hpath_congrArg_length (f : HEdge → HEdge) (mkStep : (a b : HEdge) → HStep (f a) (f b))
     (p : HPath a b) :
     HPath.length (HPath.congrArg f mkStep p) = HPath.length p := by
   induction p with
@@ -449,7 +449,7 @@ theorem hpath_congrArg_length (f : HEdge → HEdge) (mkStep : (a b : HEdge) → 
   | cons s p ih => simp [HPath.congrArg, HPath.length, ih]
 
 /-- Theorem 43 — congrArg preserves vertical path length. -/
-theorem vpath_congrArg_length (f : VEdge → VEdge) (mkStep : (a b : VEdge) → VStep (f a) (f b))
+def vpath_congrArg_length (f : VEdge → VEdge) (mkStep : (a b : VEdge) → VStep (f a) (f b))
     (p : VPath a b) :
     VPath.length (VPath.congrArg f mkStep p) = VPath.length p := by
   induction p with
@@ -457,7 +457,7 @@ theorem vpath_congrArg_length (f : VEdge → VEdge) (mkStep : (a b : VEdge) → 
   | cons s p ih => simp [VPath.congrArg, VPath.length, ih]
 
 /-- Theorem 44 — congrArg preserves square path length. -/
-theorem sqpath_congrArg_length (f : Square → Square) (mkStep : (a b : Square) → SqStep (f a) (f b))
+def sqpath_congrArg_length (f : Square → Square) (mkStep : (a b : Square) → SqStep (f a) (f b))
     (p : SqPath a b) :
     SqPath.length (SqPath.congrArg f mkStep p) = SqPath.length p := by
   induction p with
@@ -465,19 +465,19 @@ theorem sqpath_congrArg_length (f : Square → Square) (mkStep : (a b : Square) 
   | cons s p ih => simp [SqPath.congrArg, SqPath.length, ih]
 
 /-- Theorem 45 — congrArg refl = refl (horizontal). -/
-theorem hpath_congrArg_refl (f : HEdge → HEdge) (mkStep : (a b : HEdge) → HStep (f a) (f b))
+def hpath_congrArg_refl (f : HEdge → HEdge) (mkStep : (a b : HEdge) → HStep (f a) (f b))
     (a : HEdge) :
     HPath.congrArg f mkStep (HPath.refl a) = HPath.refl (f a) := by
   simp [HPath.refl, HPath.congrArg]
 
 /-- Theorem 46 — congrArg refl = refl (vertical). -/
-theorem vpath_congrArg_refl (f : VEdge → VEdge) (mkStep : (a b : VEdge) → VStep (f a) (f b))
+def vpath_congrArg_refl (f : VEdge → VEdge) (mkStep : (a b : VEdge) → VStep (f a) (f b))
     (a : VEdge) :
     VPath.congrArg f mkStep (VPath.refl a) = VPath.refl (f a) := by
   simp [VPath.refl, VPath.congrArg]
 
 /-- Theorem 47 — congrArg refl = refl (square). -/
-theorem sqpath_congrArg_refl (f : Square → Square) (mkStep : (a b : Square) → SqStep (f a) (f b))
+def sqpath_congrArg_refl (f : Square → Square) (mkStep : (a b : Square) → SqStep (f a) (f b))
     (a : Square) :
     SqPath.congrArg f mkStep (SqPath.refl a) = SqPath.refl (f a) := by
   simp [SqPath.refl, SqPath.congrArg]
@@ -832,7 +832,7 @@ theorem sqpath_symm_symm_length (p : SqPath a b) :
 -- ============================================================
 
 /-- Theorem 89 — congrArg distributes over horizontal trans (length). -/
-theorem hpath_congrArg_trans_length (f : HEdge → HEdge)
+def hpath_congrArg_trans_length (f : HEdge → HEdge)
     (mkStep : (a b : HEdge) → HStep (f a) (f b))
     (p : HPath a b) (q : HPath b c) :
     HPath.length (HPath.congrArg f mkStep (HPath.trans p q)) =
@@ -843,7 +843,7 @@ theorem hpath_congrArg_trans_length (f : HEdge → HEdge)
                           hpath_congrArg_length]
 
 /-- Theorem 90 — congrArg distributes over vertical trans (length). -/
-theorem vpath_congrArg_trans_length (f : VEdge → VEdge)
+def vpath_congrArg_trans_length (f : VEdge → VEdge)
     (mkStep : (a b : VEdge) → VStep (f a) (f b))
     (p : VPath a b) (q : VPath b c) :
     VPath.length (VPath.congrArg f mkStep (VPath.trans p q)) =
@@ -905,7 +905,7 @@ theorem sq_interchange_chain_zero (s : Square) :
   simp [sq_interchange_chain, SqPath.refl]
 
 /-- Theorem 99 — congrArg single = single (horizontal). -/
-theorem hpath_congrArg_single (f : HEdge → HEdge) (mkStep : (a b : HEdge) → HStep (f a) (f b))
+def hpath_congrArg_single (f : HEdge → HEdge) (mkStep : (a b : HEdge) → HStep (f a) (f b))
     (s : HStep a b) :
     HPath.length (HPath.congrArg f mkStep (HPath.single s)) = 1 := by
   simp [HPath.single, HPath.congrArg, HPath.length]

@@ -311,7 +311,7 @@ noncomputable def devissage_coherence (R k : Type u) (Ri : RingWithInvolution R)
 /-! ## HermitianStep: Rewrite Steps -/
 
 /-- Rewrite steps for Hermitian K-theory computations. -/
-inductive HermitianStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive HermitianStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Metabolic vanishing: metabolic forms are zero in GW. -/
   | metabolic_vanish {A : Type u} {a : A} (p : Path a a) :
       HermitianStep p (Path.refl a)

@@ -169,7 +169,7 @@ theorem satoBoundaryValue_def (H : HyperfunctionModel) (n : Nat) :
 theorem propagationCone_nonneg (P : PropagationDatum) (ξ : CotangentPoint) :
     0 ≤ propagationCone P ξ := Nat.zero_le _
 
-theorem bicharacteristicFlowStep_def (P : PropagationDatum) (ξ : CotangentPoint) :
+def bicharacteristicFlowStep_def (P : PropagationDatum) (ξ : CotangentPoint) :
     bicharacteristicFlowStep P ξ = P.flow ξ := rfl
 
 theorem nonCharacteristicPullbackCondition_self (K : KashiwaraSchapiraDatum) :

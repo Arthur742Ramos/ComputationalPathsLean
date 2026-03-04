@@ -69,9 +69,13 @@ theorem expr_step_complexity_lt
 
 /-- The core PathExpr rewrite system is terminating (well-founded).
     (Immediate: `PathExpr.Step` is empty.) -/
-theorem expr_terminating :
-    WellFounded (fun q p : PathExpr A a b => PathExpr.Step p q) :=
-  ⟨fun x => ⟨x, fun _ h => nomatch h⟩⟩
+def expr_terminating :
+    WellFounded (fun q p : PathExpr A a b => Nonempty (PathExpr.Step p q)) := by
+  refine ⟨fun x => ?_⟩
+  refine Acc.intro x ?_
+  intro y hy
+  rcases hy with ⟨h⟩
+  nomatch h
 
 /-! ## Word problems and rewrite equality -/
 

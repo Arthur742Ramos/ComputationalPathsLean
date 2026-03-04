@@ -58,7 +58,7 @@ end FieldExpr
 /-! ## Single-step field rewrites -/
 
 /-- A single rewrite step justified by a field axiom. -/
-inductive FieldStep (V : Type u) : FieldExpr V → FieldExpr V → Prop where
+inductive FieldStep (V : Type u) : FieldExpr V → FieldExpr V → Type u where
   | add_assoc (a b c) : FieldStep V (.add (.add a b) c) (.add a (.add b c))
   | add_comm (a b) : FieldStep V (.add a b) (.add b a)
   | zero_add (a) : FieldStep V (.add .zero a) a

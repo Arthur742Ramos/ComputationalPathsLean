@@ -40,7 +40,7 @@ noncomputable def objectivePath (P : OptProblem A) (s₁ s₂ : FeasibleSol P)
   Path.mk [Step.mk _ _ h] h
 
 /-- Objective path steps are a singleton -/
-theorem objectivePath_steps (P : OptProblem A) (s₁ s₂ : FeasibleSol P)
+def objectivePath_steps (P : OptProblem A) (s₁ s₂ : FeasibleSol P)
     (h : P.objective s₁.point = P.objective s₂.point) :
     (objectivePath P s₁ s₂ h).steps =
     [Step.mk (P.objective s₁.point) (P.objective s₂.point) h] := by
@@ -100,15 +100,15 @@ noncomputable def iterStep (D : DescentIter A) : Nat → A → A
   | n+1, a => D.step (iterStep D n a)
 
 /-- Iteration at 0 is the identity -/
-theorem iterStep_zero (D : DescentIter A) (a : A) :
+def iterStep_zero (D : DescentIter A) (a : A) :
     iterStep D 0 a = a := rfl
 
 /-- Iteration at 1 is a single step -/
-theorem iterStep_one (D : DescentIter A) (a : A) :
+def iterStep_one (D : DescentIter A) (a : A) :
     iterStep D 1 a = D.step a := rfl
 
 /-- Fixed point is preserved by iteration -/
-theorem iterStep_fixedPt (D : DescentIter A) (n : Nat) :
+def iterStep_fixedPt (D : DescentIter A) (n : Nat) :
     iterStep D n D.fixedPt = D.fixedPt := by
   induction n with
   | zero => rfl
@@ -120,7 +120,7 @@ noncomputable def iterFixedPath (D : DescentIter A) (n : Nat) :
   Path.mk [Step.mk _ _ (iterStep_fixedPt D n)] (iterStep_fixedPt D n)
 
 /-- CongrArg applied to fixed path -/
-theorem congrArg_fixedPath (D : DescentIter A) (f : A → B) :
+def congrArg_fixedPath (D : DescentIter A) (f : A → B) :
     Path.congrArg f (fixedPath D) =
     Path.mk [Step.mk _ _ (_root_.congrArg f D.isFixed)] (_root_.congrArg f D.isFixed) := by
   simp [fixedPath, Path.congrArg, Step.map]
@@ -209,14 +209,14 @@ theorem pareto_symm (f : A → A)
   simp [paretoObjectivePath]
 
 /-- Step structure of a Pareto path -/
-theorem pareto_steps (f : A → A)
+def pareto_steps (f : A → A)
     (a b : A) (h : f a = f b) :
     (paretoObjectivePath f a b h).steps =
     [Step.mk (f a) (f b) h] := by
   simp [paretoObjectivePath]
 
 /-- CongrArg applied to Pareto path -/
-theorem pareto_congrArg (f : A → A) (g : A → B)
+def pareto_congrArg (f : A → A) (g : A → B)
     (a b : A) (h : f a = f b) :
     Path.congrArg g (paretoObjectivePath f a b h) =
     Path.mk [Step.mk _ _ (_root_.congrArg g h)] (_root_.congrArg g h) := by

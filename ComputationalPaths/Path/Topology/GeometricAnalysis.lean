@@ -137,7 +137,7 @@ theorem harmonicMapEnergy_def (H : HarmonicMapDatum) (n : Nat) :
 theorem minimalSurfaceArea_nonneg (M : MinimalSurfaceDatum) (n : Nat) :
     0 ≤ minimalSurfaceArea M n := Nat.zero_le _
 
-theorem meanCurvatureStep_def (F : MeanCurvatureFlowDatum) (n : Nat) :
+def meanCurvatureStep_def (F : MeanCurvatureFlowDatum) (n : Nat) :
     meanCurvatureStep F n = meanCurvature F (n + 1) - meanCurvature F n := rfl
 
 theorem willmoreEnergy_nonneg (W : WillmoreDatum) (n : Nat) :
@@ -172,7 +172,7 @@ theorem epsilonRegularityThreshold_pos (H : HarmonicMapDatum) :
 theorem concentrationMeasure_nonneg (B : BubbleTreeDatum) (N : Nat) :
     0 ≤ concentrationMeasure B N := Nat.zero_le _
 
-theorem flowTimeStep_succ (n : Nat) :
+def flowTimeStep_succ (n : Nat) :
     flowTimeStep n = n + 1 := rfl
 
 theorem renormalizedArea_nonneg (M : MinimalSurfaceDatum) (n : Nat) :

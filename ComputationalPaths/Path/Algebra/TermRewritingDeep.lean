@@ -119,7 +119,7 @@ abbrev TRTRS := List TRRule
 -- §6  Step & Path — Prop-valued rewriting groupoid
 -- ============================================================
 
-inductive TRStep (R : TRTRS) : TRTm → TRTm → Prop where
+inductive TRStep (R : TRTRS) : TRTm → TRTm → Type where
   | ruleAt (r : TRRule) (σ : TRSubst) (p : TRPos)
       (t : TRTm) (hmem : r ∈ R)
       (hat : t.atPos p = some (r.lhs.applyS σ))
@@ -140,51 +140,51 @@ inductive TRPath (R : TRTRS) : TRTm → TRTm → Prop where
 -- ============================================================
 
 /-- Theorem 1: refl is left identity for trans. -/
-theorem trpath_refl_trans {R : TRTRS} (p : TRPath R a b) :
+def trpath_refl_trans {R : TRTRS} (p : TRPath R a b) :
     TRPath R a b :=
   TRPath.trans (TRPath.refl a) p
 
 /-- Theorem 2: refl is right identity for trans. -/
-theorem trpath_trans_refl {R : TRTRS} (p : TRPath R a b) :
+def trpath_trans_refl {R : TRTRS} (p : TRPath R a b) :
     TRPath R a b :=
   TRPath.trans p (TRPath.refl b)
 
 /-- Theorem 3: double symm round-trips. -/
-theorem trpath_symm_symm {R : TRTRS} (p : TRPath R a b) :
+def trpath_symm_symm {R : TRTRS} (p : TRPath R a b) :
     TRPath R a b :=
   TRPath.symm (TRPath.symm p)
 
 /-- Theorem 4: path ∘ path⁻¹ is a loop at source. -/
-theorem trpath_loop {R : TRTRS} (p : TRPath R a b) : TRPath R a a :=
+def trpath_loop {R : TRTRS} (p : TRPath R a b) : TRPath R a a :=
   TRPath.trans p (TRPath.symm p)
 
 /-- Theorem 5: path⁻¹ ∘ path is a loop at target. -/
-theorem trpath_loop_target {R : TRTRS} (p : TRPath R a b) : TRPath R b b :=
+def trpath_loop_target {R : TRTRS} (p : TRPath R a b) : TRPath R b b :=
   TRPath.trans (TRPath.symm p) p
 
 /-- Theorem 6: three-fold trans. -/
-theorem trpath_trans₃ {R : TRTRS} (p : TRPath R a b)
+def trpath_trans₃ {R : TRTRS} (p : TRPath R a b)
     (q : TRPath R b c) (r : TRPath R c d) : TRPath R a d :=
   TRPath.trans p (TRPath.trans q r)
 
 /-- Theorem 7: four-fold trans. -/
-theorem trpath_trans₄ {R : TRTRS} (p : TRPath R a b) (q : TRPath R b c)
+def trpath_trans₄ {R : TRTRS} (p : TRPath R a b) (q : TRPath R b c)
     (r : TRPath R c d) (s : TRPath R d e) : TRPath R a e :=
   TRPath.trans (TRPath.trans p q) (TRPath.trans r s)
 
 /-- Theorem 8: five-fold trans chain. -/
-theorem trpath_trans₅ {R : TRTRS} (p₁ : TRPath R a b)
+def trpath_trans₅ {R : TRTRS} (p₁ : TRPath R a b)
     (p₂ : TRPath R b c) (p₃ : TRPath R c d)
     (p₄ : TRPath R d e) (p₅ : TRPath R e f) : TRPath R a f :=
   TRPath.trans p₁ (TRPath.trans (TRPath.trans p₂ p₃) (TRPath.trans p₄ p₅))
 
 /-- Theorem 9: symm distributes over trans (reverses order). -/
-theorem trpath_symm_trans {R : TRTRS} (p : TRPath R a b)
+def trpath_symm_trans {R : TRTRS} (p : TRPath R a b)
     (q : TRPath R b c) : TRPath R c a :=
   TRPath.trans (TRPath.symm q) (TRPath.symm p)
 
 /-- Theorem 10: symm of three-fold trans. -/
-theorem trpath_symm_trans₃ {R : TRTRS} (p : TRPath R a b)
+def trpath_symm_trans₃ {R : TRTRS} (p : TRPath R a b)
     (q : TRPath R b c) (r : TRPath R c d) : TRPath R d a :=
   TRPath.trans (TRPath.symm r) (TRPath.trans (TRPath.symm q) (TRPath.symm p))
 
@@ -193,56 +193,56 @@ theorem trpath_symm_trans₃ {R : TRTRS} (p : TRPath R a b)
 -- ============================================================
 
 /-- Theorem 11: congrL preserves refl. -/
-theorem tr_congrL_refl {R : TRTRS} (l r : TRTm) :
+def tr_congrL_refl {R : TRTRS} (l r : TRTm) :
     TRPath R (.app l r) (.app l r) :=
   TRPath.congrL (TRPath.refl l) r
 
 /-- Theorem 12: congrR preserves refl. -/
-theorem tr_congrR_refl {R : TRTRS} (l r : TRTm) :
+def tr_congrR_refl {R : TRTRS} (l r : TRTm) :
     TRPath R (.app l r) (.app l r) :=
   TRPath.congrR l (TRPath.refl r)
 
 /-- Theorem 13: congrL distributes over trans. -/
-theorem tr_congrL_trans {R : TRTRS} (r : TRTm)
+def tr_congrL_trans {R : TRTRS} (r : TRTm)
     (p : TRPath R l₁ l₂) (q : TRPath R l₂ l₃) :
     TRPath R (.app l₁ r) (.app l₃ r) :=
   TRPath.trans (TRPath.congrL p r) (TRPath.congrL q r)
 
 /-- Theorem 14: congrR distributes over trans. -/
-theorem tr_congrR_trans {R : TRTRS} (l : TRTm)
+def tr_congrR_trans {R : TRTRS} (l : TRTm)
     (p : TRPath R r₁ r₂) (q : TRPath R r₂ r₃) :
     TRPath R (.app l r₁) (.app l r₃) :=
   TRPath.trans (TRPath.congrR l p) (TRPath.congrR l q)
 
 /-- Theorem 15: congrL distributes over symm. -/
-theorem tr_congrL_symm {R : TRTRS} (r : TRTm) (p : TRPath R l l') :
+def tr_congrL_symm {R : TRTRS} (r : TRTm) (p : TRPath R l l') :
     TRPath R (.app l' r) (.app l r) :=
   TRPath.congrL (TRPath.symm p) r
 
 /-- Theorem 16: congrR distributes over symm. -/
-theorem tr_congrR_symm {R : TRTRS} (l : TRTm) (p : TRPath R r r') :
+def tr_congrR_symm {R : TRTRS} (l : TRTm) (p : TRPath R r r') :
     TRPath R (.app l r') (.app l r) :=
   TRPath.congrR l (TRPath.symm p)
 
 /-- Theorem 17: Interchange — independent rewrites on L and R. -/
-theorem tr_interchange {R : TRTRS}
+def tr_interchange {R : TRTRS}
     (pl : TRPath R l l') (pr : TRPath R r r') :
     TRPath R (.app l r) (.app l' r') :=
   TRPath.trans (TRPath.congrL pl r) (TRPath.congrR l' pr)
 
 /-- Theorem 18: Interchange alternative order. -/
-theorem tr_interchange' {R : TRTRS}
+def tr_interchange' {R : TRTRS}
     (pl : TRPath R l l') (pr : TRPath R r r') :
     TRPath R (.app l r) (.app l' r') :=
   TRPath.trans (TRPath.congrR l pr) (TRPath.congrL pl r')
 
 /-- Theorem 19: Nested congrL three deep. -/
-theorem tr_congrL_nested₃ {R : TRTRS} (p : TRPath R a b) (r₁ r₂ : TRTm) :
+def tr_congrL_nested₃ {R : TRTRS} (p : TRPath R a b) (r₁ r₂ : TRTm) :
     TRPath R (.app (.app a r₁) r₂) (.app (.app b r₁) r₂) :=
   TRPath.congrL (TRPath.congrL p r₁) r₂
 
 /-- Theorem 20: Nested congrR three deep. -/
-theorem tr_congrR_nested₃ {R : TRTRS} (l₁ l₂ : TRTm) (p : TRPath R a b) :
+def tr_congrR_nested₃ {R : TRTRS} (l₁ l₂ : TRTm) (p : TRPath R a b) :
     TRPath R (.app l₁ (.app l₂ a)) (.app l₁ (.app l₂ b)) :=
   TRPath.congrR l₁ (TRPath.congrR l₂ p)
 
@@ -251,27 +251,27 @@ theorem tr_congrR_nested₃ {R : TRTRS} (l₁ l₂ : TRTm) (p : TRPath R a b) :
 -- ============================================================
 
 /-- Theorem 21: Left whiskering — prepend a step. -/
-theorem tr_whisker_left {R : TRTRS} (s : TRStep R a b) (p : TRPath R b c) :
+def tr_whisker_left {R : TRTRS} (s : TRStep R a b) (p : TRPath R b c) :
     TRPath R a c :=
   TRPath.trans (TRPath.step s) p
 
 /-- Theorem 22: Right whiskering — append a step. -/
-theorem tr_whisker_right {R : TRTRS} (p : TRPath R a b) (s : TRStep R b c) :
+def tr_whisker_right {R : TRTRS} (p : TRPath R a b) (s : TRStep R b c) :
     TRPath R a c :=
   TRPath.trans p (TRPath.step s)
 
 /-- Theorem 23: Zigzag  a ← b → c  gives path a → c. -/
-theorem tr_zigzag {R : TRTRS} (p₁ : TRPath R b a) (p₂ : TRPath R b c) :
+def tr_zigzag {R : TRTRS} (p₁ : TRPath R b a) (p₂ : TRPath R b c) :
     TRPath R a c :=
   TRPath.trans (TRPath.symm p₁) p₂
 
 /-- Theorem 24: Co-zigzag  a → b ← c  gives path c → a. -/
-theorem tr_co_zigzag {R : TRTRS} (p₁ : TRPath R a b) (p₂ : TRPath R c b) :
+def tr_co_zigzag {R : TRTRS} (p₁ : TRPath R a b) (p₂ : TRPath R c b) :
     TRPath R c a :=
   TRPath.trans p₂ (TRPath.symm p₁)
 
 /-- Theorem 25: Diamond from four paths meeting at center. -/
-theorem tr_diamond {R : TRTRS}
+def tr_diamond {R : TRTRS}
     (p₁ : TRPath R a b) (p₂ : TRPath R a c)
     (p₃ : TRPath R b d) (p₄ : TRPath R c d) :
     TRPath R a d :=
@@ -370,81 +370,84 @@ theorem tr_depth_app (l r : TRTm) : 0 < (TRTm.app l r).depth := by
 -- §13  Multi-Step Reduction (Prop)
 -- ============================================================
 
-inductive TRMStep (R : TRTRS) : TRTm → TRTm → Prop where
+inductive TRMStep (R : TRTRS) : TRTm → TRTm → Type where
   | refl : (t : TRTm) → TRMStep R t t
   | cons : TRStep R a b → TRMStep R b c → TRMStep R a c
 
 /-- Theorem 43: MStep is transitive. -/
-theorem TRMStep.append {R : TRTRS} {a b c : TRTm}
-    (m₁ : TRMStep R a b) (m₂ : TRMStep R b c) : TRMStep R a c := by
-  induction m₁ with
-  | refl _ => exact m₂
-  | cons s _ ih => exact TRMStep.cons s (ih m₂)
+def TRMStep.append {R : TRTRS} {a b c : TRTm} :
+    TRMStep R a b → TRMStep R b c → TRMStep R a c
+  | .refl _, m₂ => m₂
+  | .cons s m₁, m₂ => .cons s (TRMStep.append m₁ m₂)
 
 /-- Theorem 44: MStep embeds into Path. -/
-theorem TRMStep.toPath {R : TRTRS} {a b : TRTm}
-    (m : TRMStep R a b) : TRPath R a b := by
-  induction m with
-  | refl t => exact TRPath.refl t
-  | cons s _ ih => exact TRPath.trans (TRPath.step s) ih
+def TRMStep.toPath {R : TRTRS} {a b : TRTm} :
+    TRMStep R a b → TRPath R a b
+  | .refl t => .refl t
+  | .cons s m => TRPath.trans (TRPath.step s) (TRMStep.toPath m)
 
 /-- Theorem 45: Single step → MStep. -/
-theorem TRStep.toMStep {R : TRTRS} (s : TRStep R a b) :
+def TRStep.toMStep {R : TRTRS} (s : TRStep R a b) :
     TRMStep R a b :=
   TRMStep.cons s (TRMStep.refl b)
 
 /-- Theorem 46: MStep lifts through congrL. -/
-theorem TRMStep.liftCongrL {R : TRTRS}
-    (m : TRMStep R l l') (r : TRTm) :
-    TRPath R (.app l r) (.app l' r) := by
-  induction m with
-  | refl _ => exact TRPath.refl _
-  | cons s _ ih => exact TRPath.trans (TRPath.congrL (TRPath.step s) r) ih
+def TRMStep.liftCongrL {R : TRTRS} {l l' : TRTm} (r : TRTm) :
+    TRMStep R l l' → TRPath R (.app l r) (.app l' r)
+  | .refl _ => TRPath.refl _
+  | .cons s m =>
+      TRPath.trans (TRPath.congrL (TRPath.step s) r) (TRMStep.liftCongrL r m)
 
 /-- Theorem 47: MStep lifts through congrR. -/
-theorem TRMStep.liftCongrR {R : TRTRS} (l : TRTm)
-    (m : TRMStep R r r') :
-    TRPath R (.app l r) (.app l r') := by
-  induction m with
-  | refl _ => exact TRPath.refl _
-  | cons s _ ih => exact TRPath.trans (TRPath.congrR l (TRPath.step s)) ih
+def TRMStep.liftCongrR {R : TRTRS} {r r' : TRTm} (l : TRTm) :
+    TRMStep R r r' → TRPath R (.app l r) (.app l r')
+  | .refl _ => TRPath.refl _
+  | .cons s m =>
+      TRPath.trans (TRPath.congrR l (TRPath.step s)) (TRMStep.liftCongrR l m)
 
 -- ============================================================
 -- §14  Joinability & Confluence
 -- ============================================================
 
 noncomputable def TRJoinable (R : TRTRS) (a b : TRTm) : Prop :=
-  ∃ c, TRMStep R a c ∧ TRMStep R b c
+  Nonempty (Σ c, TRMStep R a c × TRMStep R b c)
 
 noncomputable def TRConfluent (R : TRTRS) : Prop :=
-  ∀ a b c, TRMStep R a b → TRMStep R a c → TRJoinable R b c
+  ∀ a b c,
+    Nonempty (TRMStep R a b) →
+    Nonempty (TRMStep R a c) →
+    TRJoinable R b c
 
 noncomputable def TRLocallyConfluent (R : TRTRS) : Prop :=
-  ∀ a b c, TRStep R a b → TRStep R a c → TRJoinable R b c
+  ∀ a b c,
+    Nonempty (TRStep R a b) →
+    Nonempty (TRStep R a c) →
+    TRJoinable R b c
 
 /-- Theorem 48: Joinability is reflexive. -/
-theorem TRJoinable.refl (R : TRTRS) (t : TRTm) : TRJoinable R t t :=
-  ⟨t, TRMStep.refl t, TRMStep.refl t⟩
+def TRJoinable.refl (R : TRTRS) (t : TRTm) : TRJoinable R t t :=
+  ⟨⟨t, TRMStep.refl t, TRMStep.refl t⟩⟩
 
 /-- Theorem 49: Joinability is symmetric. -/
-theorem TRJoinable.symm' {R : TRTRS} (h : TRJoinable R a b) :
-    TRJoinable R b a :=
-  let ⟨c, ha, hb⟩ := h; ⟨c, hb, ha⟩
+def TRJoinable.symm' {R : TRTRS} (h : TRJoinable R a b) :
+    TRJoinable R b a := by
+  rcases h with ⟨⟨c, ha, hb⟩⟩
+  exact ⟨⟨c, hb, ha⟩⟩
 
 /-- Theorem 50: Joinable terms connect via path. -/
-theorem TRJoinable.toPath {R : TRTRS} (h : TRJoinable R a b) :
-    TRPath R a b :=
-  let ⟨c, ha, hb⟩ := h
-  TRPath.trans ha.toPath (TRPath.symm hb.toPath)
+noncomputable def TRJoinable.toPath {R : TRTRS} (h : TRJoinable R a b) :
+    TRPath R a b := by
+  rcases h with ⟨⟨c, ha, hb⟩⟩
+  exact TRPath.trans ha.toPath (TRPath.symm hb.toPath)
 
 -- ============================================================
 -- §15  Normal Forms
 -- ============================================================
 
-noncomputable def TRNF (R : TRTRS) (t : TRTm) : Prop := ∀ t', ¬ TRStep R t t'
+noncomputable def TRNF (R : TRTRS) (t : TRTm) : Prop := ∀ t', ¬ Nonempty (TRStep R t t')
 
 /-- Theorem 51: NF has only trivial self-path. -/
-theorem TRNF.self_path {R : TRTRS} (hnf : TRNF R t) :
+def TRNF.self_path {R : TRTRS} (hnf : TRNF R t) :
     TRPath R t t :=
   TRPath.refl t
 
@@ -453,23 +456,33 @@ theorem TRNF.self_path {R : TRTRS} (hnf : TRNF R t) :
 -- ============================================================
 
 noncomputable def TRTerminating (R : TRTRS) : Prop :=
-  WellFounded (fun b a => TRStep R a b)
+  WellFounded (fun b a => Nonempty (TRStep R a b))
 
 /-- Theorem 52: Newman's lemma. -/
-theorem tr_newman {R : TRTRS} (hWF : TRTerminating R)
+def tr_newman {R : TRTRS} (hWF : TRTerminating R)
     (hLC : TRLocallyConfluent R) : TRConfluent R := by
-  intro a
-  apply hWF.induction (C := fun a => ∀ b c,
-    TRMStep R a b → TRMStep R a c → TRJoinable R b c)
-  intro a ihA b c hab hac
-  match hab, hac with
-  | .refl _, hac => exact ⟨c, hac, .refl c⟩
-  | hab, .refl _ => exact ⟨b, .refl b, hab⟩
-  | .cons s₁ m₁, .cons s₂ m₂ =>
-    obtain ⟨d, hbd, hcd⟩ := hLC a _ _ s₁ s₂
-    obtain ⟨e, hbe, hde⟩ := ihA _ s₁ b d m₁ hbd
-    obtain ⟨f, hcf, hef⟩ := ihA _ s₂ c e m₂ (TRMStep.append hcd hde)
-    exact ⟨f, TRMStep.append hbe hef, hcf⟩
+  intro a b c hab hac
+  rcases hab with ⟨hab⟩
+  rcases hac with ⟨hac⟩
+  
+  -- Well-founded induction on the source term `a`.
+  have hInd : (∀ b c, TRMStep R a b → TRMStep R a c → TRJoinable R b c) := by
+    refine hWF.induction
+      (C := fun a => ∀ b c, TRMStep R a b → TRMStep R a c → TRJoinable R b c)
+      a ?_
+    intro a ihA b c hab hac
+    match hab, hac with
+    | .refl _, hac =>
+        exact ⟨⟨c, hac, .refl c⟩⟩
+    | hab, .refl _ =>
+        exact ⟨⟨b, .refl b, hab⟩⟩
+    | .cons s₁ m₁, .cons s₂ m₂ =>
+        rcases (hLC a _ _ ⟨s₁⟩ ⟨s₂⟩) with ⟨⟨d, hbd, hcd⟩⟩
+        rcases (ihA _ ⟨s₁⟩ b d m₁ hbd) with ⟨⟨e, hbe, hde⟩⟩
+        rcases (ihA _ ⟨s₂⟩ c e m₂ (TRMStep.append hcd hde)) with ⟨⟨f, hcf, hef⟩⟩
+        exact ⟨⟨f, TRMStep.append hbe hef, hcf⟩⟩
+
+  exact hInd b c hab hac
 
 -- ============================================================
 -- §17  Critical Pairs
@@ -490,21 +503,21 @@ structure TRCPWitness (R : TRTRS) where
   cp      : TRCriticalPair
 
 /-- Theorem 53: Trivial CP is joinable. -/
-theorem tr_trivial_cp_joinable (R : TRTRS) (t : TRTm) :
+def tr_trivial_cp_joinable (R : TRTRS) (t : TRTm) :
     TRJoinable R t t :=
   TRJoinable.refl R t
 
 /-- Theorem 54: Joinable CP gives a path. -/
-theorem tr_cp_joinable_path {R : TRTRS} {cp : TRCriticalPair}
+def tr_cp_joinable_path {R : TRTRS} {cp : TRCriticalPair}
     (h : TRJoinable R cp.left cp.right) : TRPath R cp.left cp.right :=
   h.toPath
 
 /-- All critical pairs joinable. -/
-noncomputable def TRAllCPJoinable (R : TRTRS) (cps : List TRCriticalPair) : Prop :=
+def TRAllCPJoinable (R : TRTRS) (cps : List TRCriticalPair) : Prop :=
   ∀ cp, cp ∈ cps → TRJoinable R cp.left cp.right
 
 /-- Theorem 55: Empty CP list trivially joinable. -/
-theorem tr_all_cp_joinable_empty (R : TRTRS) : TRAllCPJoinable R [] :=
+def tr_all_cp_joinable_empty (R : TRTRS) : TRAllCPJoinable R [] :=
   fun _ h => by cases h
 
 -- ============================================================
@@ -547,7 +560,7 @@ noncomputable def trCompletionStep (st : TRCompState) : TRCompState :=
     | none   => ⟨st.rules, rest ++ [eq]⟩
 
 /-- Theorem 57: Completion on empty equations is idempotent. -/
-theorem tr_completion_empty (rs : TRTRS) :
+def tr_completion_empty (rs : TRTRS) :
     trCompletionStep ⟨rs, []⟩ = ⟨rs, []⟩ := by
   simp [trCompletionStep]
 
@@ -556,7 +569,7 @@ theorem tr_completion_empty (rs : TRTRS) :
 -- ============================================================
 
 /-- Theorem 58: Pointwise-connected substitutions yield connected results. -/
-theorem tr_transport_subst {R : TRTRS} (σ σ' : TRSubst)
+def tr_transport_subst {R : TRTRS} (σ σ' : TRSubst)
     (hσ : ∀ n, TRPath R (σ n) (σ' n))
     (t : TRTm) : TRPath R (t.applyS σ) (t.applyS σ') := by
   induction t with
@@ -567,7 +580,7 @@ theorem tr_transport_subst {R : TRTRS} (σ σ' : TRSubst)
     exact tr_interchange ihl ihr
 
 /-- Theorem 59: subst id is path-equivalent to original. -/
-theorem tr_transport_id {R : TRTRS} (t : TRTm) :
+def tr_transport_id {R : TRTRS} (t : TRTm) :
     TRPath R (t.applyS TRSubst.id) t := by
   rw [tr_applyS_id]; exact TRPath.refl t
 
@@ -584,25 +597,25 @@ structure TRNarrowStep (R : TRTRS) (t t' : TRTm) where
   result : t' = (t.applyS unif).replaceAt pos (rule.rhs.applyS unif)
 
 /-- Theorem 60: Narrow step refl gives a self-path. -/
-theorem tr_narrow_refl {R : TRTRS} (t : TRTm) : TRPath R t t :=
+def tr_narrow_refl {R : TRTRS} (t : TRTm) : TRPath R t t :=
   TRPath.refl t
 
 -- ============================================================
 -- §22  Concrete Example: {f(x) → x}
 -- ============================================================
 
-private noncomputable def v0 : TRTm := .var 0
-private noncomputable def cA : TRTm := .const "a"
-private noncomputable def cB : TRTm := .const "b"
-private noncomputable def cF : TRTm := .const "f"
+private def v0 : TRTm := .var 0
+private def cA : TRTm := .const "a"
+private def cB : TRTm := .const "b"
+private def cF : TRTm := .const "f"
 
-private noncomputable def ruleF : TRRule := ⟨.app cF v0, v0⟩
-private noncomputable def exTRS : TRTRS := [ruleF]
+private def ruleF : TRRule := ⟨.app cF v0, v0⟩
+private def exTRS : TRTRS := [ruleF]
 
-private noncomputable def σA : TRSubst := fun n => if n == 0 then cA else .var n
+private def σA : TRSubst := fun n => if n == 0 then cA else .var n
 
 /-- Theorem 61: f(a) rewrites to a. -/
-theorem tr_ex_fA_to_a : TRStep exTRS (.app cF cA) cA :=
+def tr_ex_fA_to_a : TRStep exTRS (.app cF cA) cA :=
   TRStep.ruleAt ruleF σA [] (.app cF cA)
     (List.Mem.head _)
     (by simp [TRTm.atPos, TRTm.applyS, σA, ruleF, cF, cA, v0])
@@ -610,38 +623,38 @@ theorem tr_ex_fA_to_a : TRStep exTRS (.app cF cA) cA :=
     (by simp [TRTm.replaceAt, TRTm.applyS, σA, ruleF, cA, v0])
 
 /-- Theorem 62: Path from f(a) to a. -/
-theorem tr_ex_path_fA : TRPath exTRS (.app cF cA) cA :=
+def tr_ex_path_fA : TRPath exTRS (.app cF cA) cA :=
   TRPath.step tr_ex_fA_to_a
 
 /-- Theorem 63: Path from f(f(a)) to a — two-step trans chain. -/
-theorem tr_ex_path_ffA : TRPath exTRS (.app cF (.app cF cA)) cA :=
+def tr_ex_path_ffA : TRPath exTRS (.app cF (.app cF cA)) cA :=
   TRPath.trans
     (TRPath.congrR cF tr_ex_path_fA)
     tr_ex_path_fA
 
 /-- Theorem 64: Path from f(f(f(a))) to a — three-step trans chain. -/
-theorem tr_ex_path_fffA :
+def tr_ex_path_fffA :
     TRPath exTRS (.app cF (.app cF (.app cF cA))) cA :=
   TRPath.trans
     (TRPath.congrR cF (TRPath.congrR cF tr_ex_path_fA))
     (TRPath.trans (TRPath.congrR cF tr_ex_path_fA) tr_ex_path_fA)
 
 /-- Theorem 65: Loop f(a) → a → f(a) via symm. -/
-theorem tr_ex_loop_fA : TRPath exTRS (.app cF cA) (.app cF cA) :=
+def tr_ex_loop_fA : TRPath exTRS (.app cF cA) (.app cF cA) :=
   TRPath.trans tr_ex_path_fA (TRPath.symm tr_ex_path_fA)
 
 /-- Theorem 66: congrL lifts f(a)→a into app(·,b) context. -/
-theorem tr_ex_congrL_lift :
+def tr_ex_congrL_lift :
     TRPath exTRS (.app (.app cF cA) cB) (.app cA cB) :=
   TRPath.congrL tr_ex_path_fA cB
 
 /-- Theorem 67: Interchange — f(a)→a on both sides of app. -/
-theorem tr_ex_interchange :
+def tr_ex_interchange :
     TRPath exTRS (.app (.app cF cA) (.app cF cA)) (.app cA cA) :=
   tr_interchange tr_ex_path_fA tr_ex_path_fA
 
 /-- Theorem 68: Deep round trip — f(f(f(a))) → a → f(f(f(a))). -/
-theorem tr_ex_deep_round_trip :
+def tr_ex_deep_round_trip :
     TRPath exTRS
       (.app cF (.app cF (.app cF cA)))
       (.app cF (.app cF (.app cF cA))) :=
@@ -683,15 +696,15 @@ theorem tr_subterm_app_right (l r : TRTm) : TRSubterm r (.app l r) :=
 theorem tr_nf_unique {R : TRTRS} (hConf : TRConfluent R)
     {a b c : TRTm} (hab : TRMStep R a b) (hac : TRMStep R a c)
     (hnfb : TRNF R b) (hnfc : TRNF R c) : b = c := by
-  obtain ⟨d, hbd, hcd⟩ := hConf a b c hab hac
+  rcases (hConf a b c ⟨hab⟩ ⟨hac⟩) with ⟨⟨d, hbd, hcd⟩⟩
   have hbeq : b = d := by
     cases hbd with
     | refl _ => rfl
-    | cons s _ => exact absurd s (hnfb _)
+    | cons s _ => cases (hnfb _ ⟨s⟩)
   have hceq : c = d := by
     cases hcd with
     | refl _ => rfl
-    | cons s _ => exact absurd s (hnfc _)
+    | cons s _ => cases (hnfc _ ⟨s⟩)
   rw [hbeq, hceq]
 
 -- ============================================================
@@ -704,12 +717,12 @@ noncomputable def TRChurchRosser (R : TRTRS) : Prop :=
 /-- Theorem 74: Confluence implies CR for steps. -/
 theorem tr_confluent_cr_step {R : TRTRS} (hConf : TRConfluent R)
     (s : TRStep R a b) : TRJoinable R a b :=
-  ⟨b, s.toMStep, TRMStep.refl b⟩
+  ⟨⟨b, s.toMStep, TRMStep.refl b⟩⟩
 
 /-- Theorem 75: Confluence implies joinability for multi-steps. -/
 theorem tr_confluent_join {R : TRTRS} (hConf : TRConfluent R)
     (m₁ : TRMStep R a b) (m₂ : TRMStep R a c) : TRJoinable R b c :=
-  hConf a b c m₁ m₂
+  hConf a b c ⟨m₁⟩ ⟨m₂⟩
 
 -- ============================================================
 -- §26  Convergent TRS
@@ -725,7 +738,7 @@ theorem tr_convergent_unique_nf {R : TRTRS} (hConv : TRConvergent R)
   tr_nf_unique hConv.2 hab hac hnfb hnfc
 
 /-- Theorem 77: Terminating + locally confluent ⟹ convergent. -/
-theorem tr_convergent_from_local {R : TRTRS}
+def tr_convergent_from_local {R : TRTRS}
     (hT : TRTerminating R) (hLC : TRLocallyConfluent R) :
     TRConvergent R :=
   ⟨hT, tr_newman hT hLC⟩
@@ -779,7 +792,7 @@ theorem tr_invariant_extend {R : TRTRS}
   | tail _ h => exact hInv e h
 
 /-- Theorem 84: Empty equation list is trivially invariant. -/
-theorem tr_invariant_empty (R : TRTRS) : TRCompInvariant R [] :=
+def tr_invariant_empty (R : TRTRS) : TRCompInvariant R [] :=
   fun _ h => by cases h
 
 -- ============================================================
@@ -787,14 +800,14 @@ theorem tr_invariant_empty (R : TRTRS) : TRCompInvariant R [] :=
 -- ============================================================
 
 /-- Theorem 85: Five-level nested congruence. -/
-theorem tr_congr_chain₅ {R : TRTRS}
+def tr_congr_chain₅ {R : TRTRS}
     (p : TRPath R a b) (c₁ c₂ c₃ c₄ : TRTm) :
     TRPath R (.app c₁ (.app c₂ (.app c₃ (.app c₄ a))))
            (.app c₁ (.app c₂ (.app c₃ (.app c₄ b)))) :=
   TRPath.congrR c₁ (TRPath.congrR c₂ (TRPath.congrR c₃ (TRPath.congrR c₄ p)))
 
 /-- Theorem 86: Mixed congruence — left at top, right nested. -/
-theorem tr_congr_mixed {R : TRTRS}
+def tr_congr_mixed {R : TRTRS}
     (p₁ : TRPath R a₁ b₁) (p₂ : TRPath R a₂ b₂) (c : TRTm) :
     TRPath R (.app (.app a₁ c) a₂) (.app (.app b₁ c) b₂) :=
   TRPath.trans
@@ -802,13 +815,13 @@ theorem tr_congr_mixed {R : TRTRS}
     (TRPath.congrR (.app b₁ c) p₂)
 
 /-- Theorem 87: Symmetric mixed congruence. -/
-theorem tr_congr_mixed_symm {R : TRTRS}
+def tr_congr_mixed_symm {R : TRTRS}
     (p₁ : TRPath R a₁ b₁) (p₂ : TRPath R a₂ b₂) (c : TRTm) :
     TRPath R (.app (.app b₁ c) b₂) (.app (.app a₁ c) a₂) :=
   TRPath.symm (tr_congr_mixed p₁ p₂ c)
 
 /-- Theorem 88: Loop via nested interchange + symm. -/
-theorem tr_congr_loop {R : TRTRS}
+def tr_congr_loop {R : TRTRS}
     (p₁ : TRPath R a b) (p₂ : TRPath R c d) (e : TRTm) :
     TRPath R (.app (.app a e) c) (.app (.app a e) c) :=
   TRPath.trans
@@ -816,7 +829,7 @@ theorem tr_congr_loop {R : TRTRS}
     (TRPath.symm (tr_congr_mixed p₁ p₂ e))
 
 /-- Theorem 89: Double interchange in nested context. -/
-theorem tr_double_interchange {R : TRTRS}
+def tr_double_interchange {R : TRTRS}
     (p₁ : TRPath R a₁ b₁) (p₂ : TRPath R a₂ b₂)
     (p₃ : TRPath R a₃ b₃) :
     TRPath R (.app (.app a₁ a₂) a₃) (.app (.app b₁ b₂) b₃) :=
@@ -829,7 +842,7 @@ theorem tr_double_interchange {R : TRTRS}
 -- ============================================================
 
 /-- Theorem 90: Six-fold trans. -/
-theorem trpath_trans₆ {R : TRTRS}
+def trpath_trans₆ {R : TRTRS}
     (p₁ : TRPath R t₁ t₂) (p₂ : TRPath R t₂ t₃)
     (p₃ : TRPath R t₃ t₄) (p₄ : TRPath R t₄ t₅)
     (p₅ : TRPath R t₅ t₆) (p₆ : TRPath R t₆ t₇) :
@@ -841,7 +854,7 @@ theorem trpath_trans₆ {R : TRTRS}
           (TRPath.trans p₅ p₆))))
 
 /-- Theorem 91: Seven-fold trans. -/
-theorem trpath_trans₇ {R : TRTRS}
+def trpath_trans₇ {R : TRTRS}
     (p₁ : TRPath R t₁ t₂) (p₂ : TRPath R t₂ t₃)
     (p₃ : TRPath R t₃ t₄) (p₄ : TRPath R t₄ t₅)
     (p₅ : TRPath R t₅ t₆) (p₆ : TRPath R t₆ t₇)
@@ -854,7 +867,7 @@ theorem trpath_trans₇ {R : TRTRS}
             (TRPath.trans p₆ p₇)))))
 
 /-- Theorem 92: Zigzag-interchange. -/
-theorem tr_zigzag_interchange {R : TRTRS}
+def tr_zigzag_interchange {R : TRTRS}
     (p₁ : TRPath R b a) (p₂ : TRPath R b c)
     (q₁ : TRPath R e d) (q₂ : TRPath R e f) :
     TRPath R (.app a d) (.app c f) :=
@@ -874,14 +887,14 @@ noncomputable def TRRedex.disjoint (r₁ r₂ : TRRedex R) : Prop :=
   ¬ r₁.pos.isPrefixOf r₂.pos ∧ ¬ r₂.pos.isPrefixOf r₁.pos
 
 /-- Theorem 93: Disjoint redex diamond — two independent steps close. -/
-theorem tr_disjoint_diamond {R : TRTRS}
+def tr_disjoint_diamond {R : TRTRS}
     (s₁ : TRStep R a b) (s₂ : TRStep R a c)
     (p₁ : TRPath R b d) (p₂ : TRPath R c d) :
     TRPath R a d :=
   TRPath.trans (TRPath.step s₁) p₁
 
 /-- Theorem 94: Development embeds as path. -/
-theorem tr_development_path {R : TRTRS} (ms : TRMStep R a b) :
+def tr_development_path {R : TRTRS} (ms : TRMStep R a b) :
     TRPath R a b := ms.toPath
 
 -- ============================================================
@@ -889,13 +902,13 @@ theorem tr_development_path {R : TRTRS} (ms : TRMStep R a b) :
 -- ============================================================
 
 /-- Theorem 95: Parallel app rewrite. -/
-theorem tr_parallel_app {R : TRTRS}
+def tr_parallel_app {R : TRTRS}
     (p : TRPath R l l') (q : TRPath R r r') :
     TRPath R (.app l r) (.app l' r') :=
   tr_interchange p q
 
 /-- Theorem 96: Three-argument parallel rewrite. -/
-theorem tr_parallel_app₃ {R : TRTRS}
+def tr_parallel_app₃ {R : TRTRS}
     (p₁ : TRPath R a₁ b₁) (p₂ : TRPath R a₂ b₂)
     (p₃ : TRPath R a₃ b₃) :
     TRPath R (.app (.app a₁ a₂) a₃) (.app (.app b₁ b₂) b₃) :=
@@ -912,7 +925,7 @@ structure TRModStep (R : TRTRS) (E : TREqTheory) (a b : TRTm) where
   rwStep : TRStep R a mid
 
 /-- Theorem 97: Mod-step yields a path to mid. -/
-theorem tr_modstep_path {R : TRTRS} {E : TREqTheory}
+def tr_modstep_path {R : TRTRS} {E : TREqTheory}
     (ms : TRModStep R E a b) : TRPath R a ms.mid :=
   TRPath.step ms.rwStep
 
@@ -921,19 +934,19 @@ theorem tr_modstep_path {R : TRTRS} {E : TREqTheory}
 -- ============================================================
 
 /-- Theorem 98: Two steps compose into a path. -/
-theorem tr_rule_compose {R : TRTRS}
+def tr_rule_compose {R : TRTRS}
     (s₁ : TRStep R a b) (s₂ : TRStep R b c) : TRPath R a c :=
   TRPath.trans (TRPath.step s₁) (TRPath.step s₂)
 
 /-- Theorem 99: Three steps compose. -/
-theorem tr_rule_compose₃ {R : TRTRS}
+def tr_rule_compose₃ {R : TRTRS}
     (s₁ : TRStep R a b) (s₂ : TRStep R b c) (s₃ : TRStep R c d) :
     TRPath R a d :=
   TRPath.trans (TRPath.step s₁)
     (TRPath.trans (TRPath.step s₂) (TRPath.step s₃))
 
 /-- Theorem 100: Conjugation — s₂⁻¹ ∘ s₁ ∘ p. -/
-theorem tr_conjugate {R : TRTRS}
+def tr_conjugate {R : TRTRS}
     (s₁ : TRStep R a b) (p : TRPath R b c) (s₂ : TRStep R a d) :
     TRPath R d c :=
   TRPath.trans (TRPath.symm (TRPath.step s₂))
@@ -958,7 +971,7 @@ theorem tr_replaceAt_twice_root (t s₁ s₂ : TRTm) :
 -- ============================================================
 
 /-- Theorem 103: Four nested applications f(f(f(f(a)))) → a. -/
-theorem tr_ex_path_f4A :
+def tr_ex_path_f4A :
     TRPath exTRS
       (.app cF (.app cF (.app cF (.app cF cA)))) cA :=
   TRPath.trans
@@ -970,7 +983,7 @@ theorem tr_ex_path_f4A :
         tr_ex_path_fA))
 
 /-- Theorem 104: Parallel in nested app: both branches reduce. -/
-theorem tr_ex_nested_parallel :
+def tr_ex_nested_parallel :
     TRPath exTRS
       (.app (.app cF cA) (.app cF (.app cF cA)))
       (.app cA cA) :=
@@ -982,8 +995,11 @@ theorem tr_ex_nested_parallel :
 
 /-- Theorem 105: Confluent ⟹ locally confluent. -/
 theorem tr_confluent_implies_lc {R : TRTRS} (hConf : TRConfluent R) :
-    TRLocallyConfluent R :=
-  fun a b c sb sc => hConf a b c sb.toMStep sc.toMStep
+    TRLocallyConfluent R := by
+  intro a b c sb sc
+  rcases sb with ⟨sb⟩
+  rcases sc with ⟨sc⟩
+  exact hConf a b c ⟨sb.toMStep⟩ ⟨sc.toMStep⟩
 
 -- ============================================================
 -- §39  NF step contradiction
@@ -991,7 +1007,7 @@ theorem tr_confluent_implies_lc {R : TRTRS} (hConf : TRConfluent R) :
 
 /-- Theorem 106: NF has no outgoing step. -/
 theorem TRNF.no_step {R : TRTRS} {t t' : TRTm}
-    (hnf : TRNF R t) : ¬ TRStep R t t' :=
+    (hnf : TRNF R t) : ¬ Nonempty (TRStep R t t') :=
   hnf t'
 
 -- ============================================================
@@ -999,7 +1015,7 @@ theorem TRNF.no_step {R : TRTRS} {t t' : TRTm}
 -- ============================================================
 
 /-- Theorem 107: congrL over three-fold trans. -/
-theorem tr_congrL_trans₃ {R : TRTRS} (r : TRTm)
+def tr_congrL_trans₃ {R : TRTRS} (r : TRTm)
     (p₁ : TRPath R l₁ l₂) (p₂ : TRPath R l₂ l₃)
     (p₃ : TRPath R l₃ l₄) :
     TRPath R (.app l₁ r) (.app l₄ r) :=
@@ -1007,7 +1023,7 @@ theorem tr_congrL_trans₃ {R : TRTRS} (r : TRTm)
     (TRPath.trans (TRPath.congrL p₂ r) (TRPath.congrL p₃ r))
 
 /-- Theorem 108: congrR over three-fold trans. -/
-theorem tr_congrR_trans₃ {R : TRTRS} (l : TRTm)
+def tr_congrR_trans₃ {R : TRTRS} (l : TRTm)
     (p₁ : TRPath R r₁ r₂) (p₂ : TRPath R r₂ r₃)
     (p₃ : TRPath R r₃ r₄) :
     TRPath R (.app l r₁) (.app l r₄) :=

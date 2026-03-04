@@ -53,7 +53,7 @@ noncomputable def HeytingAlg.neg {α : Type u} (H : HeytingAlg α) (a : α) : α
 /-! ## HeytingStep: domain-specific rewrites -/
 
 /-- Elementary rewrites in a Heyting algebra. -/
-inductive HeytingStep {α : Type u} (H : HeytingAlg α) : α → α → Prop where
+inductive HeytingStep {α : Type u} (H : HeytingAlg α) : α → α → Type u where
   | meetComm    : (a b : α) → HeytingStep H (H.meet a b) (H.meet b a)
   | joinComm    : (a b : α) → HeytingStep H (H.join a b) (H.join b a)
   | meetIdem    : (a : α) → HeytingStep H (H.meet a a) a

@@ -11,7 +11,7 @@ open scoped Quot
 universe u
 
 /-- A set of explicit `RwEq` witnesses available as closure seeds. -/
-abbrev RwEqWitnessSet (A : Type u) : Type u :=
+abbrev RwEqWitnessSet (A : Type u) : Type (u + 1) :=
   ∀ {a b : A} {p q : Path a b}, RwEq p q → Prop
 
 /-- Seed relation induced by a witness set. -/

@@ -63,7 +63,7 @@ structure EmbeddedSurface (M : ThreeManifold.{u}) where
 /-! ## Rewrite Steps for 3-Manifold Operations -/
 
 /-- Rewrite steps for 3-manifold decompositions and transformations. -/
-inductive ThreeManStep : ThreeManifold.{u} → ThreeManifold.{u} → Prop
+inductive ThreeManStep : ThreeManifold.{u} → ThreeManifold.{u} → Type (u + 1)
   | heegaard_split (M : ThreeManifold.{u}) (g : Nat) :
       ThreeManStep M M
   | prime_factor (M P Q : ThreeManifold.{u}) :

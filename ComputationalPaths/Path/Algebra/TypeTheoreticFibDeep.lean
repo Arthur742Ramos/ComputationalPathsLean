@@ -72,14 +72,14 @@ theorem trans_nil_right : (p : Path a b) → p.trans (.nil b) = p
 theorem trans_nil_left (p : Path a b) : (Path.nil a).trans p = p := rfl
 
 /-- Theorem 6 – length distributes over trans. -/
-theorem length_trans : (p : Path a b) → (q : Path b c) →
+def length_trans : (p : Path a b) → (q : Path b c) →
     (p.trans q).length = p.length + q.length
   | .nil _, q => by simp [Path.trans, Path.length]
   | .cons _ p, q => by
     simp [Path.trans, Path.length]; rw [length_trans p q]; omega
 
 /-- Theorem 7 – step_symm involution. -/
-theorem step_symm_symm : (s : Step a b) → s.symm.symm = s
+def step_symm_symm : (s : Step a b) → s.symm.symm = s
   | .edge _ _ => rfl
   | .refl _   => rfl
 
@@ -216,7 +216,7 @@ noncomputable def pathMeasure : Path a b → Nat
 theorem J_nil_zero (a : Pt) : pathMeasure (Path.nil a) = 0 := rfl
 
 /-- Theorem 19 – J computation on single step is 1. -/
-theorem J_single_one (s : Step a b) : pathMeasure (.cons s (.nil b)) = 1 := rfl
+def J_single_one (s : Step a b) : pathMeasure (.cons s (.nil b)) = 1 := rfl
 
 /-- Theorem 20 – J distributes over trans. -/
 theorem pathMeasure_trans : (p : Path a b) → (q : Path b c) →
@@ -446,16 +446,16 @@ noncomputable def transportAlongPath (tStep : (x y : Pt) → Step x y → Nat �
   | .cons s p, n => transportAlongPath tStep p (tStep _ _ s n)
 
 /-- Theorem 48 – transport along nil is identity. -/
-theorem transport_nil_id (tStep : (x y : Pt) → Step x y → Nat → Nat) (n : Nat) :
+def transport_nil_id (tStep : (x y : Pt) → Step x y → Nat → Nat) (n : Nat) :
     transportAlongPath tStep (.nil x) n = n := rfl
 
 /-- Theorem 49 – transport along single step. -/
-theorem transport_single (tStep : (x y : Pt) → Step x y → Nat → Nat)
+def transport_single (tStep : (x y : Pt) → Step x y → Nat → Nat)
     (s : Step x y) (n : Nat) :
     transportAlongPath tStep (.cons s (.nil y)) n = tStep x y s n := rfl
 
 /-- Theorem 50 – transport along concatenation. -/
-theorem transport_trans (tStep : (x y : Pt) → Step x y → Nat → Nat) :
+def transport_trans (tStep : (x y : Pt) → Step x y → Nat → Nat) :
     (p : Path a b) → (q : Path b c) → (n : Nat) →
     transportAlongPath tStep (p.trans q) n =
       transportAlongPath tStep q (transportAlongPath tStep p n)

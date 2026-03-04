@@ -150,13 +150,13 @@ theorem PathOperadAlgebra.inverse_right {A : Type u} {a : A} {X : Type v}
 /-! ## (4) A∞ Structure from Contractible Higher Coherences -/
 
 /-- A 2-derivation between paths is an RwEq witness. -/
-abbrev Deriv2 {A : Type u} {a b : A} (p q : Path a b) : Type u := RwEq p q
+abbrev Deriv2 {A : Type u} {a b : A} (p q : Path a b) : Type (u + 1) := RwEq p q
 
 /-- A 3-derivation witnesses that two 2-derivations are connected.
     At the truncated/quotient level, any two RwEq witnesses are identified
     by confluence of the rewriting system. -/
 structure Deriv3 {A : Type u} {a b : A} {p q : Path a b}
-    (_ : Deriv2 p q) (_ : Deriv2 p q) : Type u where
+    (_ : Deriv2 p q) (_ : Deriv2 p q) : Type (u + 1) where
   mk ::
 
 /-- The path operad is an A∞ operad: all operad axioms hold up to

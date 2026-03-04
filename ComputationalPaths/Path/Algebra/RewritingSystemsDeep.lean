@@ -943,11 +943,11 @@ theorem conv_symm_refl {α : Type} {R : α → α → Prop} (a : α) :
     (ConvPath.refl a : ConvPath α R a a).symm = ConvPath.refl a := rfl
 
 /-- Theorem 68: toRPath of par refl step is refl. -/
-theorem parStep_refl_toRPath {α : Type} {R : α → α → Prop} (a : α) :
+def parStep_refl_toRPath {α : Type} {R : α → α → Prop} (a : α) :
     (ParStep.refl a : ParStep α R a a).toRPath = RPath.refl a := rfl
 
 /-- Theorem 69: toRPath of par step is single. -/
-theorem parStep_step_toRPath {α : Type} {R : α → α → Prop} {a b : α}
+def parStep_step_toRPath {α : Type} {R : α → α → Prop} {a b : α}
     (r : R a b) :
     (ParStep.step r : ParStep α R a b).toRPath = RPath.single (.mk r) := rfl
 

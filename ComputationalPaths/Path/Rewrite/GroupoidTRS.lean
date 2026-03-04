@@ -57,7 +57,7 @@ theorem weight_ge_four (e : Expr) : 4 ≤ e.weight := by
 
 /-! ## Rewrite relation -/
 
-inductive Step : Expr → Expr → Prop where
+inductive Step : Expr → Expr → Type where
   | symm_refl : Step (.symm .refl) .refl
   | symm_symm (p) : Step (.symm (.symm p)) p
   | trans_refl_left (p) : Step (.trans .refl p) p
@@ -72,7 +72,7 @@ inductive Step : Expr → Expr → Prop where
 
 /-! ## Weight-preservation implies size-preservation -/
 
-theorem step_weight_eq_imp_size_eq {p q : Expr} (h : Step p q)
+def step_weight_eq_imp_size_eq {p q : Expr} (h : Step p q)
     (hw : q.weight = p.weight) : q.size = p.size := by
   induction h with
   | symm_refl => simp at hw
@@ -92,7 +92,7 @@ theorem step_weight_eq_imp_size_eq {p q : Expr} (h : Step p q)
 
 /-! ## Main lemma: lexicographic decrease -/
 
-theorem step_lex_decrease {p q : Expr} (h : Step p q) :
+def step_lex_decrease {p q : Expr} (h : Step p q) :
     q.weight < p.weight ∨ (q.weight = p.weight ∧ q.leftWeight < p.leftWeight) := by
   induction h with
   | symm_refl => left; simp
@@ -144,9 +144,18 @@ private theorem natLex_wf : WellFounded NatLex :=
 
 noncomputable def termMeasure (e : Expr) : Nat × Nat := (e.weight, e.leftWeight)
 
-theorem step_measure_lt {p q : Expr} (h : Step p q) :
+def step_measure_lt {p q : Expr} (h : Step p q) :
     NatLex (termMeasure q) (termMeasure p) :=
   step_lex_decrease h
+
+/-- Prop-valued wrapper (needed for `WellFounded`). -/
+abbrev StepProp (p q : Expr) : Prop :=
+  Nonempty (Step p q)
+
+def stepProp_measure_lt {p q : Expr} (h : StepProp p q) :
+    NatLex (termMeasure q) (termMeasure p) := by
+  rcases h with ⟨h⟩
+  exact step_measure_lt h
 
 /-! ## Main Theorem -/
 
@@ -157,10 +166,10 @@ The step relation is well-founded, proved via the lexicographic measure
 
 This replaces the `Terminating := True` axiom in `ConfluenceProof.lean`
 with genuine mathematical content. -/
-theorem termination : WellFounded (fun q p : Expr => Step p q) :=
-  Subrelation.wf (fun h => step_measure_lt h) (InvImage.wf termMeasure natLex_wf)
+def termination : WellFounded (fun q p : Expr => StepProp p q) :=
+  Subrelation.wf (fun h => stepProp_measure_lt h) (InvImage.wf termMeasure natLex_wf)
 
-theorem acc_step (e : Expr) : Acc (fun q p => Step p q) e :=
+def acc_step (e : Expr) : Acc (fun q p => StepProp p q) e :=
   termination.apply e
 
 /-- **No bidirectional steps**: For any expressions p and q, we cannot have
@@ -172,9 +181,11 @@ theorem acc_step (e : Expr) : Acc (fun q p => Step p q) e :=
 
     This theorem is crucial for proving that "mixed polarity" cases in
     derivation normal forms are unreachable. -/
-theorem no_bidirectional_step {p q : Expr} :
-    ¬(Step p q ∧ Step q p) := by
-  intro ⟨s₁, s₂⟩
+def no_bidirectional_step {p q : Expr} :
+    ¬(StepProp p q ∧ StepProp q p) := by
+  intro ⟨hs₁, hs₂⟩
+  rcases hs₁ with ⟨s₁⟩
+  rcases hs₂ with ⟨s₂⟩
   have h₁ := step_lex_decrease s₁
   have h₂ := step_lex_decrease s₂
   -- h₁ : q.weight < p.weight ∨ (q.weight = p.weight ∧ q.leftWeight < p.leftWeight)

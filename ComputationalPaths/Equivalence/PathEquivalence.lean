@@ -36,24 +36,24 @@ structure CategoricalEquivalence (C : Type u) (D : Type v) where
 namespace CategoricalEquivalence
 
 /-- Primitive computational step witnessing right-cancellation of the unit. -/
-theorem unit_hom_inv_step (E : CategoricalEquivalence C D) (x : C) :
+def unit_hom_inv_step (E : CategoricalEquivalence C D) (x : C) :
     Path.Step (Path.trans (E.unit x) (Path.symm (E.unit x))) (Path.refl x) :=
   Path.Step.trans_symm (E.unit x)
 
 /-- Primitive computational step witnessing left-cancellation of the unit. -/
-theorem unit_inv_hom_step (E : CategoricalEquivalence C D) (x : C) :
+def unit_inv_hom_step (E : CategoricalEquivalence C D) (x : C) :
     Path.Step (Path.trans (Path.symm (E.unit x)) (E.unit x))
       (Path.refl (E.invFun (E.toFun x))) :=
   Path.Step.symm_trans (E.unit x)
 
 /-- Primitive computational step witnessing right-cancellation of the counit. -/
-theorem counit_hom_inv_step (E : CategoricalEquivalence C D) (y : D) :
+def counit_hom_inv_step (E : CategoricalEquivalence C D) (y : D) :
     Path.Step (Path.trans (E.counit y) (Path.symm (E.counit y)))
       (Path.refl (E.toFun (E.invFun y))) :=
   Path.Step.trans_symm (E.counit y)
 
 /-- Primitive computational step witnessing left-cancellation of the counit. -/
-theorem counit_inv_hom_step (E : CategoricalEquivalence C D) (y : D) :
+def counit_inv_hom_step (E : CategoricalEquivalence C D) (y : D) :
     Path.Step (Path.trans (Path.symm (E.counit y)) (E.counit y)) (Path.refl y) :=
   Path.Step.symm_trans (E.counit y)
 

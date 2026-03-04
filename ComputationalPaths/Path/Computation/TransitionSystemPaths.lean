@@ -247,7 +247,7 @@ theorem pairPath_transport {S₁ S₂ : Type u} (D : LTSPair S₁ S₂ → Type 
   cases ep; cases eq1; rfl
 
 /-- 24. Congruence: LTSPair from both paths at once. -/
-theorem pairPath_congrArg {S₁ S₂ : Type u}
+def pairPath_congrArg {S₁ S₂ : Type u}
     {a₁ a₂ : S₁} {b₁ b₂ : S₂}
     (ha : a₁ = a₂) (hb : b₁ = b₂) :
     (pairPath (Path.mk [Step.mk _ _ ha] ha) (Path.mk [Step.mk _ _ hb] hb)).toEq =

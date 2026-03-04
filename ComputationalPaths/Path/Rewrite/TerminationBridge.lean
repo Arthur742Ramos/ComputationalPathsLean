@@ -93,7 +93,7 @@ structure NewmanData (A : Type u) (a b : A) where
     ∃ s, Rw q s ∧ Rw r s
   /-- Termination: the step relation is well-founded (no infinite chains). -/
   termination : ∀ (p : Path a b),
-    ¬ ∃ (f : Nat → Path a b), f 0 = p ∧ ∀ n, Step (f n) (f (n + 1))
+    ¬ ∃ (f : Nat → Path a b), f 0 = p ∧ ∀ n, Nonempty (Step (f n) (f (n + 1)))
 
 /-- From Newman data, we extract the propositional-level confluence guarantee:
 any two Rw chains from the same source yield paths with the same `toEq`. -/

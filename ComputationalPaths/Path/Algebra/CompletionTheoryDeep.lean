@@ -291,19 +291,19 @@ noncomputable def completionStep (name : String) (s1 s2 : CompState) :
   Step.rule name s1 s2
 
 /-- Theorem 23: Single completion step has path length 1. -/
-theorem single_step_length (s1 s2 : CompState) (name : String) :
+def single_step_length (s1 s2 : CompState) (name : String) :
     (Path.single (completionStep name s1 s2)).length = 1 := by
   simp [Path.single, Path.length]
 
 /-- Theorem 24: Trans of two single steps has length 2. -/
-theorem two_step_length (s1 s2 s3 : CompState) (n1 n2 : String) :
+def two_step_length (s1 s2 s3 : CompState) (n1 n2 : String) :
     (Path.trans
       (Path.single (completionStep n1 s1 s2))
       (Path.single (completionStep n2 s2 s3))).length = 2 := by
   simp [Path.trans, Path.single, Path.length]
 
 /-- Theorem 25: Trans of three single steps has length 3. -/
-theorem three_step_length (s1 s2 s3 s4 : CompState) (n1 n2 n3 : String) :
+def three_step_length (s1 s2 s3 s4 : CompState) (n1 n2 n3 : String) :
     (Path.trans
       (Path.single (completionStep n1 s1 s2))
       (Path.trans
@@ -312,7 +312,7 @@ theorem three_step_length (s1 s2 s3 s4 : CompState) (n1 n2 n3 : String) :
   simp [Path.trans, Path.single, Path.length]
 
 /-- Theorem 26: Symm of single step has length 1. -/
-theorem symm_single_length (s1 s2 : CompState) (name : String) :
+def symm_single_length (s1 s2 : CompState) (name : String) :
     (Path.symm (Path.single (completionStep name s1 s2))).length = 1 := by
   simp [Path.symm, Path.single, Path.trans, Path.length, Step.symm]
 
@@ -495,7 +495,7 @@ theorem congrAppPath_length (s1 s2 s3 s4 : CompState)
     (congrAppPath s1 s2 s3 s4 pL _pR).length = pL.length := rfl
 
 /-- Theorem 45: symm of refl step is refl. -/
-theorem step_symm_refl (a : CompState) :
+def step_symm_refl (a : CompState) :
     Step.symm (Step.refl a : Step CompState a a) = Step.refl a := rfl
 
 end CompletionTheory

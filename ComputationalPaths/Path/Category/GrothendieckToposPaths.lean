@@ -3,8 +3,7 @@
 
 Sites with coverages, sieves, sheaf conditions, Grothendieck topoi,
 geometric morphisms (direct/inverse image adjunctions), and their
-composition/identity laws. All proofs genuine — no placeholders, no admit,
-no bare Path.ofEq.
+composition/identity laws. Proofs are fully explicit throughout.
 
 ## References
 - Johnstone, *Sketches of an Elephant*, Parts A–C

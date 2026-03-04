@@ -457,9 +457,9 @@ theorem APath.trans_assoc (p : APath a b) (q : APath b c) (r : APath c d) :
 theorem APath.symm_refl (a : MorE) : (APath.refl a).symm = APath.refl a := rfl
 
 /-- Theorem 43: symm involution for basic steps. -/
-theorem AStep.symm_symm_tri1 (n : Nat) : (AStep.tri1 n).symm.symm = AStep.tri1 n := rfl
+def AStep.symm_symm_tri1 (n : Nat) : (AStep.tri1 n).symm.symm = AStep.tri1 n := rfl
 theorem AStep.symm_symm_tri2 (n : Nat) : (AStep.tri2 n).symm.symm = AStep.tri2 n := rfl
-theorem AStep.symm_symm_fmapFId (n : Nat) : (AStep.fmapFId n).symm.symm = AStep.fmapFId n := rfl
+def AStep.symm_symm_fmapFId (n : Nat) : (AStep.fmapFId n).symm.symm = AStep.fmapFId n := rfl
 theorem AStep.symm_symm_assoc (f g h : MorE) : (AStep.assoc f g h).symm.symm = AStep.assoc f g h := rfl
 
 -- ============================================================

@@ -19,7 +19,7 @@ whose consecutive entries are linked by `RwEq`.
 
 /-- A finite family `p₀, p₁, ..., pₙ` with `RwEq pᵢ pᵢ₊₁` witnesses. -/
 inductive RwEqSequence {A : Type u} {a b : A} :
-    Path a b → Path a b → Type u where
+    Path a b → Path a b → Type (u + 1) where
   | nil (p : Path a b) : RwEqSequence p p
   | cons {p q r : Path a b} :
       RwEq p q → RwEqSequence q r → RwEqSequence p r
@@ -91,7 +91,7 @@ end InfinitesimalDeformation
 
 /-- A sequence of primitive `Step`s along a deformation trajectory. -/
 inductive StepSequence {A : Type u} {a b : A} :
-    Path a b → Path a b → Type u where
+    Path a b → Path a b → Type (u + 1) where
   | nil (p : Path a b) : StepSequence p p
   | cons {p q r : Path a b} :
       Path.Step p q → StepSequence q r → StepSequence p r
@@ -149,7 +149,7 @@ structure CriticalPairAt {A : Type u} {a b : A} (p : Path a b) where
 namespace CriticalPairAt
 
 noncomputable def Joinable {A : Type u} {a b : A} {p : Path a b}
-    (cp : CriticalPairAt p) : Type u :=
+    (cp : CriticalPairAt p) : Type (u + 1) :=
   Σ r : Path a b, RwEq cp.left r × RwEq cp.right r
 
 noncomputable def left_rweq {A : Type u} {a b : A} {p : Path a b}
@@ -164,7 +164,7 @@ end CriticalPairAt
 
 noncomputable def PathDeformation.ExtendableAlong
     {A : Type u} {a b : A} {p₀ : Path a b}
-    (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal) : Type u :=
+    (D : PathDeformation p₀) (cp : CriticalPairAt D.terminal) : Type (u + 1) :=
   cp.Joinable
 
 noncomputable def PathDeformation.extend_of_joinable

@@ -57,7 +57,7 @@ noncomputable def kleinRelatorDecomposition :
   Path.trans (Path.trans (Path.trans kleinBottleLoopA kleinBottleLoopB)
     (Path.symm kleinBottleLoopA)) kleinBottleLoopB
 
-theorem kleinRelatorDecomposition_eq :
+def kleinRelatorDecomposition_eq :
     kleinRelatorDecomposition = KleinBottleStep.kleinRelatorWord :=
   rfl
 
@@ -90,7 +90,7 @@ noncomputable def rp2LoopSquaredDecomposition :
     Path (A := RealProjective2) rp2Basepoint rp2Basepoint :=
   Path.trans ProjectivePlaneStep.rp2Loop ProjectivePlaneStep.rp2Loop
 
-theorem rp2LoopSquaredDecomposition_eq :
+def rp2LoopSquaredDecomposition_eq :
     rp2LoopSquaredDecomposition = ProjectivePlaneStep.rp2LoopSquared :=
   rfl
 

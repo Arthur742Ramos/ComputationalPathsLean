@@ -71,7 +71,7 @@ structure SimpleCurve (surf : SurfaceData.{u}) where
 /-! ## MCG Steps -/
 
 /-- Rewrite steps for mapping class group operations. -/
-inductive MCGStep : SurfaceData.{u} → SurfaceData.{u} → Prop
+inductive MCGStep : SurfaceData.{u} → SurfaceData.{u} → Type
   | dehn_twist (surf : SurfaceData.{u}) : MCGStep surf surf
   | lantern (surf : SurfaceData.{u}) : MCGStep surf surf
   | birman_push (surf : SurfaceData.{u}) : MCGStep surf surf

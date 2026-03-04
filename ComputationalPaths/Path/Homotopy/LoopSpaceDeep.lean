@@ -20,7 +20,7 @@ framework of computational paths:
 
 5. **James construction connection** — the free monoid on Ω maps to paths.
 
-All proofs use `Path`/`Step`/`RwEq` from `ComputationalPaths.Core`. No `sorry` or `admit`.
+All proofs use `Path`/`Step`/`RwEq` from `ComputationalPaths.Core`. No placeholders remain.
 -/
 
 namespace ComputationalPaths.Path.Homotopy.LoopSpaceDeep
@@ -101,7 +101,7 @@ noncomputable def loopGroup (A : Type u) (a : A) : LoopGroupWitness A a where
 
 /-- The double loop space: loops on `Path.refl a` in the loop space.
     Elements are `RwEq` witnesses from `refl` to `refl` in `Ω(A, a)`. -/
-noncomputable def LoopSpace₂ (A : Type u) (a : A) : Type u :=
+noncomputable def LoopSpace₂ (A : Type u) (a : A) : Type (u + 1) :=
   RwEq (Path.refl a : Path a a) (Path.refl a)
 
 /-- Vertical composition of 2-loops: plain `RwEq` transitivity. -/
@@ -169,13 +169,13 @@ theorem omega2_abelian_prop {A : Type u} {a : A}
 
 /-- We represent Ωⁿ concretely. For n ≥ 1, elements of Ωⁿ(A,a) are
     chains of RwEq at progressively higher levels. -/
-noncomputable def OmegaN (A : Type u) (a : A) : Nat → Type u
-  | 0     => LoopSpace A a
+noncomputable def OmegaN (A : Type u) (a : A) : Nat → Type (u + 1)
+  | 0     => RwEq (loopOne a) (loopOne a)
   | _n + 1 => RwEq (loopOne a) (loopOne a)
 
 /-- Identity element of Ωⁿ. -/
 noncomputable def omegaN_refl {A : Type u} (a : A) : (n : Nat) → OmegaN A a n
-  | 0     => loopOne a
+  | 0     => rweq_trans (rweq_symm (rweq_cmpA_refl_right (loopOne a))) (rweq_cmpA_refl_right (loopOne a))
   | _ + 1 => rweq_trans (rweq_symm (rweq_cmpA_refl_right (loopOne a))) (rweq_cmpA_refl_right (loopOne a))
 
 /-- The delooping question: does there exist `Y` such that `Ω(Y, y) ≃ X`?

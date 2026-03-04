@@ -104,19 +104,19 @@ noncomputable def lensLoopPow_two_rweq (p q : Nat) :
 /-! ## The p-fold relation -/
 
 /-- The fundamental relation: `loop^p = refl` (as a LensStep). -/
-theorem lensRelation (p q : Nat) :
+def lensRelation (p q : Nat) :
     LensStep p q (lensLoopNPow p q p) (Path.refl (lensSpaceBase p q)) :=
   LensStep.relation
 
 /-- Prefixing the relation by `loop^n` preserves LensStep rewriting. -/
-theorem lensRelation_congr_prefix (p q n : Nat) :
+def lensRelation_congr_prefix (p q n : Nat) :
     LensStep p q
       (Path.trans (lensLoopNPow p q n) (lensLoopNPow p q p))
       (Path.trans (lensLoopNPow p q n) (Path.refl (lensSpaceBase p q))) :=
   LensStep.congr_right (lensLoopNPow p q n) (lensRelation p q)
 
 /-- Suffixing the relation by `loop^n` preserves LensStep rewriting. -/
-theorem lensRelation_congr_suffix (p q n : Nat) :
+def lensRelation_congr_suffix (p q n : Nat) :
     LensStep p q
       (Path.trans (lensLoopNPow p q p) (lensLoopNPow p q n))
       (Path.trans (Path.refl (lensSpaceBase p q)) (lensLoopNPow p q n)) :=

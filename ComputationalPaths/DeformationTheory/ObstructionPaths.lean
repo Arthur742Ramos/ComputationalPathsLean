@@ -76,7 +76,7 @@ noncomputable def obstructionClass (oc : ObstructionCocycle D) :
   rweqClassOf oc.obstructionLoop
 
 /-- Joinability phrased at the `RwEq` level. -/
-noncomputable def Joinable (oc : ObstructionCocycle D) : Type u :=
+noncomputable def Joinable (oc : ObstructionCocycle D) : Type (u + 1) :=
   Σ r : Path a b, RwEq oc.left r × RwEq oc.right r
 
 /-- Joinability in the `Rw` sense, as used in `CriticalPairs.lean`. -/
@@ -139,7 +139,7 @@ noncomputable def secondaryClass (τ : TodaRepresentative oc) :
     RwEqClass (A := A) (x := b) (y := b) :=
   rweqClassOf τ.secondary
 
-noncomputable def GaugeEquivalent (τ₁ τ₂ : TodaRepresentative oc) : Type u :=
+noncomputable def GaugeEquivalent (τ₁ τ₂ : TodaRepresentative oc) : Type (u + 1) :=
   RwEq τ₁.secondary τ₂.secondary
 
 theorem secondaryClass_eq_of_gauge

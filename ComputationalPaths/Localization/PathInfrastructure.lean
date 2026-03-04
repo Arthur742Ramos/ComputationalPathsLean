@@ -38,7 +38,7 @@ noncomputable def mapPath {a b : A} (p : Path a b) : Path (L.obj a) (L.obj b) :=
   Path.trans (Path.congrArg L.obj p) (Path.refl (L.obj b))
 
 /-- Localization preserves paths with a direct `Step` witness. -/
-theorem mapPath_preserves_step {a b : A} (p : Path a b) :
+noncomputable def mapPath_preserves_step {a b : A} (p : Path a b) :
     Path.Step (L.mapPath p) (Path.congrArg L.obj p) := by
   simpa [mapPath] using
     (Path.Step.trans_refl_right (Path.congrArg L.obj p))
@@ -67,7 +67,7 @@ noncomputable def map_reflect_rweq {a b : A} (q : Path (L.obj a) (L.obj b)) :
   rweq_of_rw (L.map_reflect_rw q)
 
 /-- Raw reflection witness exposed directly in `Step` form. -/
-theorem reflects_path_step {a b : A} (q : Path (L.obj a) (L.obj b)) :
+def reflects_path_step {a b : A} (q : Path (L.obj a) (L.obj b)) :
     Path.Step (Path.congrArg L.obj (L.reflectPath q)) q :=
   L.reflect_step q
 

@@ -119,7 +119,7 @@ noncomputable def qDoubleSwap (d : QuantumDouble) : QuantumDouble :=
 
 /-! ## Core path API and rewrite lemmas -/
 
-theorem thm01_step_symm_symm {A : Type u} (s : Step A) :
+def thm01_step_symm_symm {A : Type u} (s : Step A) :
     Step.symm (Step.symm s) = s := by
   simp
 

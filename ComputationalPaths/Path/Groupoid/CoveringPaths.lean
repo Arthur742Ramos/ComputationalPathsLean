@@ -230,7 +230,7 @@ theorem DeckTransformation.comp_id_right {C : CoveringProj E A}
   cases σ; simp [DeckTransformation.comp, DeckTransformation.idDeck]
 
 /-- Projection is functorial with a section. -/
-theorem projPath_section (C : CoveringProj E A) (f : A → E)
+def projPath_section (C : CoveringProj E A) (f : A → E)
     (hf : ∀ a, C.proj (f a) = a) {a b : A} (p : Path a b) :
     (projPath C (Path.congrArg f p)).toEq =
       ((Path.mk [Step.mk _ _ (hf a)] (hf a))
@@ -238,7 +238,7 @@ theorem projPath_section (C : CoveringProj E A) (f : A → E)
   cases p with | mk s h => cases h; simp
 
 /-- Deck transformations commute with projection paths (at toEq level). -/
-theorem deck_projPath_toEq {C : CoveringProj E A}
+def deck_projPath_toEq {C : CoveringProj E A}
     (σ : DeckTransformation C) {e₁ e₂ : E} (p : Path e₁ e₂) :
     (projPath C (σ.mapPath p)).toEq =
       ((Path.mk [Step.mk _ _ (σ.proj_comm e₁)] (σ.proj_comm e₁)).trans

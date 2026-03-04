@@ -714,12 +714,12 @@ theorem addNeg_len (x : HElem) :
 -- ============================================================
 
 /-- Theorem 21: Composing two single-step paths gives length 2. -/
-theorem compose_single_len (s₁ : Step HElem a b) (s₂ : Step HElem b c) :
+def compose_single_len (s₁ : Step HElem a b) (s₂ : Step HElem b c) :
     ((Path.single s₁).trans (Path.single s₂)).length = 2 := by
   simp [Path.single, Path.trans, Path.length]
 
 /-- Theorem 22: Composing three single-step paths gives length 3. -/
-theorem compose_triple_len (s₁ : Step HElem a b) (s₂ : Step HElem b c) (s₃ : Step HElem c d) :
+def compose_triple_len (s₁ : Step HElem a b) (s₂ : Step HElem b c) (s₃ : Step HElem c d) :
     ((Path.single s₁).trans ((Path.single s₂).trans (Path.single s₃))).length = 3 := by
   simp [Path.single, Path.trans, Path.length]
 
@@ -739,7 +739,7 @@ noncomputable def counitApplyStep (x y : HElem) :
     Step HElem (comulMulRHS x y) (counit (mul x y)) :=
   .rule "apply-counit" _ _
 
-theorem bialg_compose_len (x y : HElem) :
+def bialg_compose_len (x y : HElem) :
     ((comulMul_path x y).trans (Path.single (counitApplyStep x y))).length = 2 := by
   simp [comulMul_path, counitApplyStep, Path.single, Path.trans, Path.length]
 
@@ -939,7 +939,7 @@ noncomputable def antipodeTensorStep (x y : HElem) :
     Step HElem (comulMulRHS x y) (tensor (antipode (sw1 x)) (antipode (sw2 y))) :=
   .rule "apply-antipode-tensor" _ _
 
-theorem bialg_antipode_compose (x y : HElem) :
+def bialg_antipode_compose (x y : HElem) :
     ((comulMul_path x y).trans (Path.single (antipodeTensorStep x y))).length = 2 := by
   simp [comulMul_path, antipodeTensorStep, Path.single, Path.trans, Path.length]
 
@@ -964,12 +964,12 @@ theorem fullHopfChain_len (x : HElem) :
   simp [fullHopfChain, mulUnitLeft_path, Path.single, Path.length]
 
 /-- Theorem 41: Length of symm of a single-step path is 1. -/
-theorem symm_single_len (s : Step HElem a b) :
+def symm_single_len (s : Step HElem a b) :
     (Path.single s).symm.length = 1 := by
   simp [Path.single, Path.symm, Path.trans, Path.length, Step.symm]
 
 /-- Theorem 42: Length is preserved by symm for single step. -/
-theorem symm_preserves_single (s : Step HElem a b) :
+def symm_preserves_single (s : Step HElem a b) :
     (Path.single s).symm.length = (Path.single s).length := by
   simp [Path.single, Path.symm, Path.trans, Path.length, Step.symm]
 

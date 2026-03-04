@@ -47,14 +47,14 @@ noncomputable def comp (g : ThomSpectrumMap F G) (f : ThomSpectrumMap E F) : Tho
     Path.trans (Path.congrArg (g.mapLevel n) (f.map_base n)) (g.map_base n)
 
 /-- Left unit insertion on a basepoint coherence path is a primitive rewrite. -/
-theorem map_base_refl_left_step (f : ThomSpectrumMap E F) (n : Nat) :
+noncomputable def map_base_refl_left_step (f : ThomSpectrumMap E F) (n : Nat) :
     Path.Step
       (Path.trans (Path.refl (f.mapLevel n (thomBase E n))) (f.map_base n))
       (f.map_base n) :=
   Path.Step.trans_refl_left (f.map_base n)
 
 /-- Right unit insertion on a basepoint coherence path is a primitive rewrite. -/
-theorem map_base_refl_right_step (f : ThomSpectrumMap E F) (n : Nat) :
+noncomputable def map_base_refl_right_step (f : ThomSpectrumMap E F) (n : Nat) :
     Path.Step
       (Path.trans (f.map_base n) (Path.refl (thomBase F n)))
       (f.map_base n) :=
@@ -81,7 +81,7 @@ noncomputable def compBaseRight (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F
       (h.map_base n))
 
 /-- Associativity on threefold basepoint coherence composites is a primitive rewrite. -/
-theorem comp_base_assoc_step (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
+noncomputable def comp_base_assoc_step (h : ThomSpectrumMap G H) (g : ThomSpectrumMap F G)
     (f : ThomSpectrumMap E F) (n : Nat) :
     Path.Step
       (compBaseLeft h g f n)

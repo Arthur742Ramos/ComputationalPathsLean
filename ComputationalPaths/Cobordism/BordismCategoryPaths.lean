@@ -42,26 +42,26 @@ noncomputable def bordismComp {n : Nat} {X Y Z : BordismObj n}
   Path.trans p q
 
 /-- Left unit as a primitive rewrite step. -/
-theorem bordism_id_left_step {n : Nat} {X Y : BordismObj n}
+def bordism_id_left_step {n : Nat} {X Y : BordismObj n}
     (p : Path X Y) :
     Path.Step (bordismComp (bordismId X) p) p := by
   simpa [bordismComp, bordismId] using Path.Step.trans_refl_left p
 
 /-- Right unit as a primitive rewrite step. -/
-theorem bordism_id_right_step {n : Nat} {X Y : BordismObj n}
+def bordism_id_right_step {n : Nat} {X Y : BordismObj n}
     (p : Path X Y) :
     Path.Step (bordismComp p (bordismId Y)) p := by
   simpa [bordismComp, bordismId] using Path.Step.trans_refl_right p
 
 /-- Associativity as a primitive rewrite step. -/
-theorem bordism_assoc_step {n : Nat}
+def bordism_assoc_step {n : Nat}
     {W X Y Z : BordismObj n}
     (f : Path W X) (g : Path X Y) (h : Path Y Z) :
     Path.Step (bordismComp (bordismComp f g) h) (bordismComp f (bordismComp g h)) := by
   simpa [bordismComp] using Path.Step.trans_assoc f g h
 
 /-- Cancellation `p⁻¹ · p` as a primitive rewrite step. -/
-theorem bordism_cancel_step {n : Nat} {X Y : BordismObj n}
+def bordism_cancel_step {n : Nat} {X Y : BordismObj n}
     (p : Path X Y) :
     Path.Step (bordismComp (Path.symm p) p) (bordismId Y) := by
   simpa [bordismComp, bordismId] using Path.Step.symm_trans p

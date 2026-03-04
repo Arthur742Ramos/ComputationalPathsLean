@@ -328,7 +328,7 @@ noncomputable def gersten_exact (k : Type u) (F : MWField k) (n : Int)
 /-! ## MWStep: Rewrite Steps -/
 
 /-- Rewrite steps for KMW computations. -/
-inductive MWStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive MWStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Steinberg reduction: [u, 1-u] → 0. -/
   | steinberg_reduce {A : Type u} {a : A} (p : Path a a) :
       MWStep p (Path.refl a)

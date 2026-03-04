@@ -201,7 +201,7 @@ structure AdditionDeletion (A : Arrangement.{u}) (fa : FreeArrangement A) where
 /-! ## ArrangeStep Inductive -/
 
 /-- Rewrite steps for hyperplane arrangement computations. -/
-inductive ArrangeStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive ArrangeStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Möbius function recursion. -/
   | moebius_reduce {A : Type u} {a : A} (p : Path a a) :
       ArrangeStep p (Path.refl a)

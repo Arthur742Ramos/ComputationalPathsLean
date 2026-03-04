@@ -99,7 +99,7 @@ theorem path_nil_trans (p : Path α a b) :
     Path.trans (Path.nil a) p = p := rfl
 
 -- 7
-theorem path_single_trans (s : Step α a b) (p : Path α b c) :
+def path_single_trans (s : Step α a b) (p : Path α b c) :
     Path.trans (Path.single s) p = Path.cons s p := by
   simp [Path.single, Path.trans]
 
@@ -107,7 +107,7 @@ theorem path_single_trans (s : Step α a b) (p : Path α b c) :
 theorem path_nil_length : (Path.nil a : Path α a a).length = 0 := rfl
 
 -- 9
-theorem path_single_length (s : Step α a b) : (Path.single s).length = 1 := rfl
+def path_single_length (s : Step α a b) : (Path.single s).length = 1 := rfl
 
 -- 10
 theorem path_trans_length (p : Path α a b) (q : Path α b c) :
@@ -125,7 +125,7 @@ theorem path_length_nonneg (p : Path α a b) : 0 ≤ p.length :=
 -- ============================================================================
 
 -- 12
-theorem step_refl_symm (a : α) : (Step.refl a).symm = Step.refl a := rfl
+def step_refl_symm (a : α) : (Step.refl a).symm = Step.refl a := rfl
 
 -- ============================================================================
 -- Literal and Clause
@@ -605,11 +605,11 @@ theorem pathConnected_equiv_refl :
   fun t => pathConnected_refl t
 
 -- 65
-theorem path_trans_single_right (p : Path α a b) (s : Step α b c) :
+def path_trans_single_right (p : Path α a b) (s : Step α b c) :
     Path.trans p (Path.single s) = Path.trans p (Path.cons s (Path.nil c)) := rfl
 
 -- 66
-theorem path_cons_length (s : Step α a b) (p : Path α b c) :
+def path_cons_length (s : Step α a b) (p : Path α b c) :
     (Path.cons s p).length = 1 + p.length := rfl
 
 -- ============================================================================
@@ -662,28 +662,31 @@ theorem resolution_path_to_contradiction
 -- Multi-step rewriting
 -- ============================================================================
 
-inductive MultiStepN (R : α → α → Prop) : Nat → α → α → Prop where
-  | zero : MultiStepN R 0 a a
-  | succ : R a b → MultiStepN R n b c → MultiStepN R (n + 1) a c
+inductive MultiStepN {α : Type u} (R : α → α → Sort v) :
+    Nat → α → α → Type (max u v) where
+  | zero {a : α} : MultiStepN R 0 a a
+  | succ {n : Nat} {a b c : α} : R a b → MultiStepN R n b c → MultiStepN R (n + 1) a c
 
-noncomputable def MultiStep (R : α → α → Prop) : α → α → Prop :=
-  fun a b => ∃ n : Nat, MultiStepN R n a b
+noncomputable def MultiStep {α : Type u} (R : α → α → Sort v) :
+    α → α → Type (max u v) :=
+  fun a b => Sigma fun n : Nat => MultiStepN R n a b
 
 -- 71
-theorem multiStepN_zero_eq (R : α → α → Prop) {a b : α} :
+theorem multiStepN_zero_eq {α : Type u} (R : α → α → Sort v) {a b : α} :
     MultiStepN R 0 a b → a = b := by
   intro h; cases h; rfl
 
 -- 72
-theorem multiStepN_refl (R : α → α → Prop) (a : α) : MultiStepN R 0 a a :=
+def multiStepN_refl {α : Type u} (R : α → α → Sort v) (a : α) : MultiStepN R 0 a a :=
   MultiStepN.zero
 
 -- 73
-theorem multiStep_refl (R : α → α → Prop) (a : α) : MultiStep R a a :=
+def multiStep_refl {α : Type u} (R : α → α → Sort v) (a : α) : MultiStep R a a :=
   ⟨0, MultiStepN.zero⟩
 
 -- 74
-theorem multiStep_single (R : α → α → Prop) (hab : R a b) : MultiStep R a b :=
+def multiStep_single {α : Type u} (R : α → α → Sort v) {a b : α} (hab : R a b) :
+    MultiStep R a b :=
   ⟨1, MultiStepN.succ hab MultiStepN.zero⟩
 
 -- ============================================================================

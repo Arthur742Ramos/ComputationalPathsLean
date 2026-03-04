@@ -70,11 +70,11 @@ variable {A : Type u} (W : WeakFactorizationSystemPaths A)
 noncomputable def factorComposite {a b : A} (f : Path a b) : Path a b :=
   (W.factor f).composite
 
-theorem factor_right_unit_step {a b : A} (f : Path a b) :
+noncomputable def factor_right_unit_step {a b : A} (f : Path a b) :
     Path.Step (Path.trans (W.factorComposite f) (Path.refl b)) (W.factorComposite f) :=
   (W.factor f).rightUnitStep
 
-theorem factor_left_unit_step {a b : A} (f : Path a b) :
+noncomputable def factor_left_unit_step {a b : A} (f : Path a b) :
     Path.Step (Path.trans (Path.refl a) (W.factorComposite f)) (W.factorComposite f) :=
   (W.factor f).leftUnitStep
 

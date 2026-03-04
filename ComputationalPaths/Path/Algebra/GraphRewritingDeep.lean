@@ -196,7 +196,7 @@ theorem morphism_comp_assoc (f : GraphMorphism g1 g2) (h : GraphMorphism g2 g3) 
   rfl
 
 /-- Theorem 7: Morphism identity path has length 1. -/
-theorem morphism_identity_path :
+def morphism_identity_path :
     ∀ g : Graph, Path.length (Path.single (Step.mk "id" g g)) = 1 := by
   intro g; rfl
 
@@ -224,12 +224,12 @@ theorem dpo_empty_rhs (rule : DPORule) (host : Graph)
   simp [applyDPO, h, Nat.sub_self]
 
 /-- Theorem 11: DPO step records rule index. -/
-theorem dpo_step_records_rule (rule : DPORule) (idx : Nat) (host : GState) :
+def dpo_step_records_rule (rule : DPORule) (idx : Nat) (host : GState) :
     (dpStep rule idx host).ruleHist = host.ruleHist ++ [idx] := by
   rfl
 
 /-- Theorem 12: DPO chain accumulates history. -/
-theorem dpo_step_chain_history (r1 r2 : DPORule) (i1 i2 : Nat) (host : GState) :
+def dpo_step_chain_history (r1 r2 : DPORule) (i1 i2 : Nat) (host : GState) :
     (dpStep r2 i2 (dpStep r1 i1 host)).ruleHist = host.ruleHist ++ [i1] ++ [i2] := by
   simp [dpStep, List.append_assoc]
 
@@ -251,7 +251,7 @@ theorem spo_identity_rule (rule : SPORule) (host : Graph)
   simp [applySPO, h]; omega
 
 /-- Theorem 15: SPO step records rule index. -/
-theorem spo_step_records_rule (rule : SPORule) (idx : Nat) (host : GState) :
+def spo_step_records_rule (rule : SPORule) (idx : Nat) (host : GState) :
     (spoStep rule idx host).ruleHist = host.ruleHist ++ [idx] := by
   rfl
 
@@ -260,7 +260,7 @@ theorem spo_step_records_rule (rule : SPORule) (idx : Nat) (host : GState) :
 -- ============================================================
 
 /-- Theorem 16: Single DPO step path has length 1. -/
-theorem dpo_single_path_len (rule : DPORule) (idx : Nat) (host : GState) :
+def dpo_single_path_len (rule : DPORule) (idx : Nat) (host : GState) :
     (Path.single (gStep "DPO" host (dpStep rule idx host))).length = 1 := by
   rfl
 
@@ -314,7 +314,7 @@ structure LocalConfluence (α : Type) where
     (d : α) × (Path α b d × Path α c d)
 
 /-- Theorem 21: Local confluence with same target. -/
-theorem local_confluence_same_target (s1 s2 : Step GState a b) :
+def local_confluence_same_target (s1 s2 : Step GState a b) :
     ∃ d : GState, Nonempty (Path GState b d × Path GState b d) :=
   ⟨b, ⟨Path.nil b, Path.nil b⟩⟩
 
@@ -520,7 +520,7 @@ structure ParallelIndependence (r1 r2 : DPORule) (host : Graph) where
     host.numNodes + r1.interface.numNodes + r2.interface.numNodes
 
 /-- Theorem 44: Parallel independent rules history length agrees. -/
-theorem parallel_independence_commutes
+def parallel_independence_commutes
     (r1 r2 : DPORule) (host : GState)
     (pi : ParallelIndependence r1 r2 host.graph) :
     (dpStep r2 1 (dpStep r1 0 host)).ruleHist.length =
@@ -583,7 +583,7 @@ theorem collapse_length (p : Path α a b) : p.collapse.length = p.length := by
 -- ============================================================
 
 /-- Theorem 51: symm of single step has length 1. -/
-theorem symm_single_length (s : Step α a b) : (Path.single s).symm.length = 1 := by
+def symm_single_length (s : Step α a b) : (Path.single s).symm.length = 1 := by
   rfl
 
 /-- Auxiliary: symm of trans distributes over length. -/
@@ -596,7 +596,7 @@ theorem symm_trans_length (p : Path α a b) (q : Path α b c) :
     rw [Path.length_trans, Path.length_trans, ih]; omega
 
 /-- Theorem 52: DPO step history grows by one. -/
-theorem dpo_apply_history_length (rule : DPORule) (idx : Nat) (host : GState) :
+def dpo_apply_history_length (rule : DPORule) (idx : Nat) (host : GState) :
     (dpStep rule idx host).ruleHist.length = host.ruleHist.length + 1 := by
   simp [dpStep]
 

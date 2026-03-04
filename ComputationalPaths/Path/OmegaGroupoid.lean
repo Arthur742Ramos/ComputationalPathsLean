@@ -612,14 +612,14 @@ def reduced (xs : List (SignedStep (A := A) (a := a) (b := b))) : Prop :=
   | _ => True
 
 /-- Rebuilding from a signed-step word always yields a strict normal form. -/
-theorem rebuild_from_is_strict
+def rebuild_from_is_strict
     (start : Path a b)
     (xs : List (SignedStep (A := A) (a := a) (b := b))) :
     StrictNormalForm (rebuild_from (start := start) xs).2.1 :=
   (rebuild_from (start := start) xs).2.2
 
 /-- If fallback is strict, rebuilding at fixed endpoints is strict. -/
-theorem rebuild_reduced_is_strict
+def rebuild_reduced_is_strict
     {p q : Path a b}
     (fallback : Derivation₂ p q)
     (hfb : StrictNormalForm fallback)

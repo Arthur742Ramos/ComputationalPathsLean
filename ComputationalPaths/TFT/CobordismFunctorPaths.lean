@@ -91,7 +91,7 @@ noncomputable def mapCompChainRight {W X Y Z : C.Obj}
     (Path.trans (F.mapCompMiddle f g h) (F.mapCompLast f g h))
 
 /-- Associativity of the coherence chain as a primitive Step witness. -/
-theorem mapComp_assoc_step {W X Y Z : C.Obj}
+noncomputable def mapComp_assoc_step {W X Y Z : C.Obj}
     (f : C.Hom W X) (g : C.Hom X Y) (h : C.Hom Y Z) :
     Path.Step (F.mapCompChainLeft f g h) (F.mapCompChainRight f g h) := by
   simpa [mapCompChainLeft, mapCompChainRight] using

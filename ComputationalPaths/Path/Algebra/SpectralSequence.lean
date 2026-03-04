@@ -109,7 +109,7 @@ noncomputable def d1Rep {A : Type u} {a : A} {n : Nat}
       simpa using x.2⟩
 
 /-- `d₁` is induced by a primitive `Step` composition rule. -/
-theorem d1Rep_step {A : Type u} {a : A} {n : Nat}
+def d1Rep_step {A : Type u} {a : A} {n : Nat}
     (x : ExactLengthLoop A a n) :
     Step (d1Rep x).1 x.1 := by
   simpa [d1Rep] using (Step.trans_refl_left x.1)

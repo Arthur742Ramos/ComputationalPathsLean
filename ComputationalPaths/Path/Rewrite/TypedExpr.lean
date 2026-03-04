@@ -96,7 +96,7 @@ theorem size_eq_erase_size (e : TExpr a b) : e.size = e.erase.size := by
 The typed version of CStep: same rules, but type-indexed. -/
 
 /-- Typed rewrite step, mirroring `CStep` but preserving type indices. -/
-inductive TCStep : TExpr a b → TExpr a b → Prop where
+inductive TCStep : TExpr a b → TExpr a b → Type where
   | symm_refl (x : Obj) : TCStep (.symm (.refl x)) (.refl x)
   | symm_symm {a b : Obj} (p : TExpr a b) : TCStep (.symm (.symm p)) p
   | trans_refl_left {a b : Obj} (p : TExpr a b) :
@@ -125,7 +125,7 @@ inductive TCStep : TExpr a b → TExpr a b → Prop where
 /-! ## Erasure Preserves Steps -/
 
 /-- Erasing a typed step gives an untyped step. -/
-theorem erase_tcstep {e₁ e₂ : TExpr a b} (h : TCStep e₁ e₂) :
+noncomputable def erase_tcstep {e₁ e₂ : TExpr a b} (h : TCStep e₁ e₂) :
     CStep e₁.erase e₂.erase := by
   induction h with
   | symm_refl _ => exact .symm_refl
@@ -167,7 +167,9 @@ theorem erase_tcrtc {e₁ e₂ : TExpr a b} (h : TCRTC e₁ e₂) :
     CRTC e₁.erase e₂.erase := by
   induction h with
   | refl _ => exact .refl _
-  | head s _ ih => exact .head (erase_tcstep s) ih
+  | head s _ ih =>
+      -- `CRTC` is the RTC of the Prop-wrapper `CStepProp := Nonempty (CStep ..)`
+      exact .head ⟨erase_tcstep s⟩ ih
 
 /-! ## Typed Equivalence and Word Problem -/
 
@@ -199,14 +201,15 @@ Since the untyped system has unique normal forms and erasure preserves
 steps, we can define typed normal forms via the untyped system. -/
 
 /-- Typed normal form: the expression has no typed rewrite steps. -/
-noncomputable def IsTypedNF (e : TExpr a b) : Prop := ∀ e' : TExpr a b, ¬ TCStep e e'
+noncomputable def IsTypedNF (e : TExpr a b) : Prop := ∀ e' : TExpr a b, ¬ Nonempty (TCStep e e')
 
 /-- If the erasure of a typed expression is in untyped normal form,
     then the typed expression is in typed normal form. -/
 theorem typed_nf_of_erased_nf (e : TExpr a b)
-    (h : ∀ e' : Expr, ¬ CStep e.erase e') : IsTypedNF e := by
+    (h : ∀ e' : Expr, ¬ Nonempty (CStep e.erase e')) : IsTypedNF e := by
   intro e' hs
-  exact h e'.erase (erase_tcstep hs)
+  rcases hs with ⟨hs⟩
+  exact h e'.erase ⟨erase_tcstep hs⟩
 
 /-- Typed expressions of the same type with equivalent erasures
     have the same toRW interpretation. -/

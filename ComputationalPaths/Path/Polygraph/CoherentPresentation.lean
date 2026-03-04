@@ -43,7 +43,7 @@ import ComputationalPaths.Path.Rewrite.Squier
 namespace ComputationalPaths.Path.Polygraph.CoherentPresentation
 
 open Rewrite.GroupoidTRS (Expr RTC)
-open Rewrite.GroupoidConfluence (CStep CRTC ExprRwEq canon toRW confluence
+open Rewrite.GroupoidConfluence (CStep CStepProp CRTC ExprRwEq canon toRW confluence
   cstep_termination reach_canon toRW_invariant toRW_invariant_rtc
   local_confluence exprRwEq_of_crtc rwAppend)
 open Rewrite.Squier (CriticalPair)
@@ -63,7 +63,7 @@ structure Convergent2Polygraph where
 
 /-- The completed groupoid TRS is a convergent 2-polygraph. -/
 noncomputable def groupoidPolygraph : Convergent2Polygraph where
-  step := CStep
+  step := CStepProp
   terminating := cstep_termination
   confluent := confluence
 
@@ -258,9 +258,9 @@ theorem polygraph_dimension_three :
     coherentPresentation_groupoid.numGenerators = 9 := rfl
 
 /-- Convergence of the groupoid polygraph: confluence + termination. -/
-theorem convergence :
+def convergence :
     (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
-    WellFounded (fun q p : Expr => CStep p q) :=
+    WellFounded (fun q p : Expr => CStepProp p q) :=
   ⟨confluence, cstep_termination⟩
 
 /-! ## Coherent Presentation implies all 3-cells are generated
@@ -281,9 +281,9 @@ theorem gen3_join_correct (p q : Expr) :
   simp [gen3_refl_left_assoc, toRW]
 
 /-- The coherent presentation is complete: 9 families suffice for all forks. -/
-theorem coherent_presentation_complete :
-    ∀ a b c : Expr, CStep a b → CStep a c →
-    ∃ d, CRTC b d ∧ CRTC c d :=
+def coherent_presentation_complete :
+    ∀ a b c : Expr, CStepProp a b → CStepProp a c →
+      ∃ d, CRTC b d ∧ CRTC c d :=
   local_confluence
 
 /-- Alternative characterization: coherent presentation via the quotient.

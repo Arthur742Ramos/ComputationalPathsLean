@@ -152,7 +152,7 @@ structure GCDState where
   deriving DecidableEq, Repr
 
 /-- One step of the Euclidean algorithm. -/
-inductive EuclidStep : GCDState → GCDState → Prop where
+inductive EuclidStep : GCDState → GCDState → Type where
   | reduce (a b : Nat) (hb : b > 0) :
       EuclidStep ⟨a, b⟩ ⟨b, a % b⟩
 
@@ -399,7 +399,7 @@ structure PadicState where
   deriving DecidableEq, Repr
 
 /-- p-adic valuation step: divide by p, increment valuation. -/
-inductive PadicStep : PadicState → PadicState → Prop where
+inductive PadicStep : PadicState → PadicState → Type where
   | divide (p n v : Nat) (hp : p > 1) (hdiv : n % p = 0) (hn : n > 0) :
       PadicStep ⟨p, n, v⟩ ⟨p, n / p, v + 1⟩
 

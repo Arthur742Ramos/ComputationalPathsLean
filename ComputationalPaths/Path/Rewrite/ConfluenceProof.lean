@@ -520,8 +520,8 @@ theorem rw_plus_trans {a b : A} {p q r : Path a b}
   | refl => exact h1
   | tail _ step ih => exact RwPlus.tail ih step
 
-theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
-    Nonempty (Path p q) ∨ ∃ r, Step p r ∧ Rw r q := by
+def rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
+    Nonempty (Path p q) ∨ ∃ r, Nonempty (Step p r) ∧ Rw r q := by
   induction h with
   | refl => exact Or.inl ⟨Path.refl _⟩
   | tail h step ih =>
@@ -529,7 +529,7 @@ theorem rw_uncons {a b : A} {p q : Path a b} (h : Rw p q) :
     | inl hpeq =>
         rcases hpeq with ⟨hpath⟩
         refine Or.inr ?_
-        refine ⟨_, ?_, Rw.refl _⟩
+        refine ⟨_, ⟨?_⟩, Rw.refl _⟩
         cases hpath.toEq
         exact step
     | inr hdata =>
@@ -555,7 +555,7 @@ making `RwPlus` reflexive and hence non-well-founded as a relation on
 `Terminating` records that the abstract TRS terminates: specifically, that
 `GroupoidTRS.Expr.Step` is well-founded. -/
 noncomputable def Terminating : Prop :=
-  WellFounded (fun q p : GroupoidTRS.Expr => GroupoidTRS.Expr.Step p q)
+  WellFounded (fun q p : GroupoidTRS.Expr => GroupoidTRS.Expr.StepProp p q)
 
 class HasTerminationProp : Prop where
   termination_prop : Terminating
@@ -698,11 +698,11 @@ theorem expr_church_rosser (e₁ e₂ : GroupoidTRS.Expr) :
 
 If two expressions in normal form are both reachable from the same source,
 they are identical.  This is the strongest form of the confluence property. -/
-theorem expr_unique_normal_forms (e₁ e₂ : GroupoidTRS.Expr)
+def expr_unique_normal_forms (e₁ e₂ : GroupoidTRS.Expr)
     (h : GroupoidConfluence.CRTC e₁ e₂)
-    (hnf : ∀ e', ¬GroupoidConfluence.CStep e₂ e') :
+    (hnf : ∀ e', ¬ GroupoidConfluence.CStepProp e₂ e') :
     ∀ e₃, GroupoidConfluence.CRTC e₁ e₃ →
-      (∀ e', ¬GroupoidConfluence.CStep e₃ e') → e₂ = e₃ :=
+      (∀ e', ¬ GroupoidConfluence.CStepProp e₃ e') → e₂ = e₃ :=
   GroupoidConfluence.normal_form_unique e₁ e₂ h hnf
 
 end ConfluenceProof

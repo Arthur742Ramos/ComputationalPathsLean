@@ -218,7 +218,7 @@ noncomputable def el_shellable_cm {P : PathPoset} (el : ELLabeling P)
 /-! ## PosetStep Inductive -/
 
 /-- Rewrite steps for poset topology computations. -/
-inductive PosetStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive PosetStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Möbius diagonal reduction. -/
   | mobius_diag {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : PosetStep p q

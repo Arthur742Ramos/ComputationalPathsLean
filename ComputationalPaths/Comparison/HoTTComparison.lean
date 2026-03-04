@@ -44,8 +44,9 @@ noncomputable def hottApd {A : Type u} {B : A → Sort v}
 
 abbrev CompPathId {A : Type u} (a b : A) : Type u := Path a b
 abbrev CompPathStep {A : Type u} {a b : A} (p q : Path a b) : Prop :=
-  ComputationalPaths.Path.Step p q
-abbrev CompPathRwEq {A : Type u} {a b : A} (p q : Path a b) : Type u := RwEq p q
+  Nonempty (ComputationalPaths.Path.Step p q)
+
+abbrev CompPathRwEq {A : Type u} {a b : A} (p q : Path a b) : Type (u + 1) := RwEq p q
 
 @[simp] noncomputable def compPathTrans {A : Type u} {a b c : A}
     (p : Path a b) (q : Path b c) : Path a c :=

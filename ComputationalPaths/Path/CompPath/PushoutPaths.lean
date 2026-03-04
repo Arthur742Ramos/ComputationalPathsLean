@@ -306,7 +306,7 @@ This allows proving that `w * inverse(w) = nil` (the group cancellation law). -/
 /-- Single-step reduction in a free product word.
 This captures both adjacent element combination and identity removal. -/
 inductive FreeGroupStep [Add G₁] [Add G₂] [Zero G₁] [Zero G₂] :
-    FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂ → Prop where
+    FreeProductWord G₁ G₂ → FreeProductWord G₁ G₂ → Type (u+1) where
   /-- Combine adjacent left elements: consLeft x (consLeft y rest) → consLeft (x + y) rest -/
   | combineLeft (x y : G₁) (rest : FreeProductWord G₁ G₂) :
       FreeGroupStep (consLeft x (consLeft y rest)) (consLeft (x + y) rest)

@@ -66,7 +66,7 @@ Rules 1–8: `symm_refl`, `symm_symm`, `trans_refl_left`, `trans_refl_right`,
 Rules 9–10: `trans_cancel_left`, `trans_cancel_right`
 Rules 11–13: congruence closure (`symm_congr`, `trans_congr_left/right`) -/
 
-inductive CStep : Expr → Expr → Prop where
+inductive CStep : Expr → Expr → Type where
   | symm_refl : CStep (.symm .refl) .refl
   | symm_symm (p : Expr) : CStep (.symm (.symm p)) p
   | trans_refl_left (p : Expr) : CStep (.trans .refl p) p
@@ -89,27 +89,39 @@ inductive CStep : Expr → Expr → Prop where
 
 /-! ## CRTC: Reflexive-Transitive Closure of CStep -/
 
-abbrev CRTC := GroupoidTRS.RTC CStep
+/-- Prop-valued wrapper for `CStep` (needed for `RTC`/`WellFounded`). -/
+abbrev CStepProp (a b : Expr) : Prop :=
+  Nonempty (CStep a b)
+
+/-- Reflexive-transitive closure of the completed system. -/
+abbrev CRTC := GroupoidTRS.RTC CStepProp
 
 namespace CRTC
-noncomputable def single {a b : Expr} (h : CStep a b) : CRTC a b := RTC.single h
+noncomputable def single {a b : Expr} (h : CStep a b) : CRTC a b :=
+  RTC.single ⟨h⟩
 
 noncomputable def symm_congr {p q : Expr} (h : CRTC p q) : CRTC (.symm p) (.symm q) := by
   induction h with
   | refl => exact .refl _
-  | head s _ ih => exact .head (.symm_congr s) ih
+  | head s _ ih =>
+      rcases s with ⟨s⟩
+      exact .head ⟨CStep.symm_congr s⟩ ih
 
 noncomputable def trans_congr_left (r : Expr) {p q : Expr} (h : CRTC p q) :
     CRTC (.trans p r) (.trans q r) := by
   induction h with
   | refl => exact .refl _
-  | head s _ ih => exact .head (.trans_congr_left r s) ih
+  | head s _ ih =>
+      rcases s with ⟨s⟩
+      exact .head ⟨CStep.trans_congr_left r s⟩ ih
 
 noncomputable def trans_congr_right (p : Expr) {q r : Expr} (h : CRTC q r) :
     CRTC (.trans p q) (.trans p r) := by
   induction h with
   | refl => exact .refl _
-  | head s _ ih => exact .head (.trans_congr_right p s) ih
+  | head s _ ih =>
+      rcases s with ⟨s⟩
+      exact .head ⟨CStep.trans_congr_right p s⟩ ih
 
 noncomputable def trans_congr {p p' q q' : Expr} (h₁ : CRTC p p') (h₂ : CRTC q q') :
     CRTC (.trans p q) (.trans p' q') :=
@@ -131,7 +143,7 @@ theorem single {a b : Expr} (h : CStep a b) : CRTCN 1 a b := by
 theorem toCRTC {n : Nat} {a b : Expr} (h : CRTCN n a b) : CRTC a b := by
   induction h with
   | refl a => exact .refl a
-  | head s _ ih => exact .head s ih
+  | head s _ ih => exact .head ⟨s⟩ ih
 
 theorem trans {m n : Nat} {a b c : Expr}
     (h₁ : CRTCN m a b) (h₂ : CRTCN n b c) : CRTCN (m + n) a c := by
@@ -146,6 +158,7 @@ theorem ofCRTC {a b : Expr} (h : CRTC a b) : ∃ n, CRTCN n a b := by
   induction h with
   | refl a => exact ⟨0, .refl a⟩
   | head s _ ih =>
+      rcases s with ⟨s⟩
       rcases ih with ⟨n, hn⟩
       exact ⟨n + 1, .head s hn⟩
 
@@ -215,8 +228,8 @@ private theorem natLex_wf : WellFounded (fun (a b : Nat × Nat) =>
         · exact ihw w' hw l'
         · cases heq; exact ihl l' hl⟩
 
-theorem cstep_termination : WellFounded (fun q p : Expr => CStep p q) :=
-  Subrelation.wf (fun h => cstep_lex_decrease h)
+def cstep_termination : WellFounded (fun q p : Expr => CStepProp p q) :=
+  Subrelation.wf (fun h => by rcases h with ⟨h⟩; exact cstep_lex_decrease h)
     (InvImage.wf (fun (e : Expr) => (e.weight, e.leftWeight)) natLex_wf)
 
 /-! ## Free Group Word Algebra
@@ -514,7 +527,9 @@ theorem toRW_invariant_rtc {e₁ e₂ : Expr} (h : CRTC e₁ e₂) :
     toRW e₁ = toRW e₂ := by
   induction h with
   | refl => rfl
-  | head s _ ih => rw [toRW_invariant s, ih]
+  | head s _ ih =>
+      rcases s with ⟨s⟩
+      rw [toRW_invariant s, ih]
 
 /-! ## Reachability: Every Expr Reduces to its Canonical Form
 
@@ -587,13 +602,13 @@ theorem reach_cancel (g : Gen) (rest : List Gen) (_hr : Reduced rest) :
   | nil =>
     -- trans g.toExpr (g.inv.toExpr) → refl
     cases g with
-    | pos n => exact RTC.single (.trans_symm _)
-    | neg n => exact RTC.single (.symm_trans _)
+    | pos n => exact RTC.single ⟨CStep.trans_symm (.atom n)⟩
+    | neg n => exact RTC.single ⟨CStep.symm_trans (.atom n)⟩
   | cons h rest' =>
     -- trans g.toExpr (trans g.inv.toExpr (rwToExpr ...))
     cases g with
-    | pos n => exact RTC.single (.trans_cancel_left (.atom n) _)
-    | neg n => exact RTC.single (.trans_cancel_right (.atom n) _)
+    | pos n => exact RTC.single ⟨CStep.trans_cancel_left (.atom n) _⟩
+    | neg n => exact RTC.single ⟨CStep.trans_cancel_right (.atom n) _⟩
 
 /-- Prepend a generator to a canonical form. -/
 theorem reach_prepend (g : Gen) (w : List Gen) (hw : Reduced w) :
@@ -601,7 +616,7 @@ theorem reach_prepend (g : Gen) (w : List Gen) (hw : Reduced w) :
   cases w with
   | nil =>
     -- trans g.toExpr refl → g.toExpr = rwToExpr [g]
-    exact RTC.single (.trans_refl_right _)
+    exact RTC.single ⟨CStep.trans_refl_right _⟩
   | cons h rest =>
     by_cases heq : g.inv = h
     · subst heq
@@ -616,7 +631,7 @@ theorem reach_prepend (g : Gen) (w : List Gen) (hw : Reduced w) :
 theorem reach_append (w₁ w₂ : List Gen) (hw₁ : Reduced w₁) (hw₂ : Reduced w₂) :
     CRTC (.trans (rwToExpr w₁) (rwToExpr w₂)) (rwToExpr (rwAppend w₁ w₂)) := by
   induction w₁ with
-  | nil => exact RTC.single (.trans_refl_left _)
+  | nil => exact RTC.single ⟨CStep.trans_refl_left _⟩
   | cons g rest ih =>
     cases rest with
     | nil =>
@@ -636,20 +651,20 @@ theorem reach_append (w₁ w₂ : List Gen) (hw₁ : Reduced w₁) (hw₂ : Redu
       have s2 := CRTC.trans_congr_right g.toExpr (ih hw₁')
       have s3 := reach_prepend g (rwAppend (h :: rest') w₂)
                    (rwAppend_reduced _ _ hw₁' hw₂)
-      exact (RTC.single s1).trans (s2.trans s3)
+      exact (RTC.single ⟨s1⟩).trans (s2.trans s3)
 
 /-- symm of a canonical form reduces to the canonical form of the inverse. -/
 theorem reach_symm (w : List Gen) (hw : Reduced w) :
     CRTC (.symm (rwToExpr w)) (rwToExpr (rwInv w)) := by
   induction w with
-  | nil => exact RTC.single .symm_refl
+  | nil => exact RTC.single ⟨CStep.symm_refl⟩
   | cons g rest ih =>
     cases rest with
     | nil =>
       -- symm g.toExpr: need to reach rwToExpr [g.inv]
       cases g with
       | pos _ => exact .refl _  -- symm (atom n) is already the expr for neg n
-      | neg n => exact RTC.single (.symm_symm _)  -- symm (symm (atom n)) → atom n
+      | neg n => exact RTC.single ⟨CStep.symm_symm (.atom n)⟩  -- symm (symm (atom n)) → atom n
     | cons h rest' =>
       -- w = g :: h :: rest', so rwToExpr w = trans g.toExpr (rwToExpr (h :: rest'))
       -- rwInv w = rwAppend (rwInv (h :: rest')) [g.inv]
@@ -667,11 +682,11 @@ theorem reach_symm (w : List Gen) (hw : Reduced w) :
       have ih_g : CRTC (.symm g.toExpr) (rwToExpr [g.inv]) := by
         cases g with
         | pos _ => exact .refl _
-        | neg n => exact RTC.single (.symm_symm _)
+        | neg n => exact RTC.single ⟨CStep.symm_symm (.atom n)⟩
       have s2 := CRTC.trans_congr ih_rest ih_g
       have s3 := reach_append (rwInv (h :: rest')) [g.inv]
                    (rwInv_reduced _ hw') trivial
-      exact (RTC.single s1).trans (s2.trans s3)
+      exact (RTC.single ⟨s1⟩).trans (s2.trans s3)
 
 /-- Every expression CStep-reduces to its canonical form. -/
 theorem reach_canon (e : Expr) : CRTC e (canon e) := by
@@ -754,7 +769,7 @@ theorem confluence_with_step_bounds (a b c : Expr)
 
 /-- Local confluence as a corollary. -/
 theorem local_confluence (a b c : Expr)
-    (hab : CStep a b) (hac : CStep a c) :
+    (hab : CStepProp a b) (hac : CStepProp a c) :
     ∃ d, CRTC b d ∧ CRTC c d :=
   confluence a b c (RTC.single hab) (RTC.single hac)
 
@@ -765,10 +780,10 @@ The confluence theorem gives unique normal forms: if `e` is in normal form
 any two normal forms reachable from the same source must be identical. -/
 
 /-- If a normal form is reachable from `e`, it equals `canon e`. -/
-theorem normal_form_unique (e₁ e₂ : Expr)
+def normal_form_unique (e₁ e₂ : Expr)
     (h : CRTC e₁ e₂)
-    (hnf : ∀ e', ¬CStep e₂ e') :
-    ∀ e₃, CRTC e₁ e₃ → (∀ e', ¬CStep e₃ e') → e₂ = e₃ := by
+    (hnf : ∀ e', ¬ CStepProp e₂ e') :
+    ∀ e₃, CRTC e₁ e₃ → (∀ e', ¬ CStepProp e₃ e') → e₂ = e₃ := by
   intro e₃ h₃ hnf₃
   obtain ⟨d, hd₂, hd₃⟩ := confluence e₁ e₂ e₃ h h₃
   -- e₂ →* d and e₃ →* d, but e₂ and e₃ are normal forms
@@ -841,7 +856,9 @@ theorem exprRwEq_of_crtc {e₁ e₂ : Expr} (h : CRTC e₁ e₂) :
     ExprRwEq e₁ e₂ := by
   induction h with
   | refl => exact ExprRwEq.refl _
-  | head s _ ih => exact ExprRwEq.trans (ExprRwEq.step s) ih
+  | head s _ ih =>
+      rcases s with ⟨s⟩
+      exact ExprRwEq.trans (ExprRwEq.step s) ih
 
 theorem toRW_eq_iff_exprRwEq (e₁ e₂ : Expr) :
     toRW e₁ = toRW e₂ ↔ ExprRwEq e₁ e₂ := by
@@ -936,7 +953,7 @@ theorem diamond_implies_confluence_of_termination {α : Type _} {R : α → α �
     ∀ a b c, RTC R a b → RTC R a c → ∃ d, RTC R b d ∧ RTC R c d :=
   GroupoidTRS.newman_lemma wf (diamond_implies_local_confluence hdiamond)
 
-theorem cstep_diamond_implies_confluence (hdiamond : Diamond CStep) :
+theorem cstep_diamond_implies_confluence (hdiamond : Diamond CStepProp) :
     ∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d :=
   diamond_implies_confluence_of_termination cstep_termination hdiamond
 
@@ -986,7 +1003,7 @@ theorem cstep_confluent : ∀ a b c : Expr,
   confluence
 
 /-- CStep termination: the completed groupoid TRS is well-founded. -/
-theorem cstep_wf : WellFounded (fun q p : Expr => CStep p q) :=
+theorem cstep_wf : WellFounded (fun q p : Expr => CStepProp p q) :=
   cstep_termination
 
 end ComputationalPaths.Path.Rewrite.GroupoidConfluence

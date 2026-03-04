@@ -356,7 +356,7 @@ structure ConnerFloyd where
 /-! ## CobordismStep: Rewrite Steps -/
 
 /-- Rewrite steps for algebraic cobordism computations. -/
-inductive CobordismStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive CobordismStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- FGL unit: F(x, 0) = x. -/
   | fgl_unit {A : Type u} {a b : A} (p q : Path a b)
       (h : p.proof = q.proof) : CobordismStep p q

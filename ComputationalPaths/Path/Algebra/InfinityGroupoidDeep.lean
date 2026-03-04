@@ -798,7 +798,7 @@ theorem SPath.map_length {α β : Type} {R : α → α → Prop} {S : β → β 
     simp [SPath.map, SPath.length, ih]
 
 /-- Theorem 66: Single-step path has length 1. -/
-theorem Path.single_length {α R} {a b : α} (s : Step α R a b) :
+def Path.single_length {α R} {a b : α} (s : Step α R a b) :
     (Path.single s).length = 1 := by rfl
 
 /-- Theorem 67: Path.map preserves embedding to SPath. -/

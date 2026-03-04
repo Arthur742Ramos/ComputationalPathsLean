@@ -228,7 +228,7 @@ structure LocalDualityData {R : Type u} (ring : CommRingData R)
 /-! ## LocalCohStep -/
 
 /-- Rewrite steps for local cohomology computations. -/
-inductive LocalCohStep : {A : Type u} → {a b : A} → Path a b → Path a b → Prop
+inductive LocalCohStep : {A : Type u} → {a b : A} → Path a b → Path a b → Type u
   /-- Vanishing step: zero cohomology element stays zero. -/
   | vanishing {A : Type u} {a : A} (p : Path a a) :
       LocalCohStep p (Path.refl a)
@@ -249,7 +249,7 @@ theorem localCohStep_sound {A : Type u} {a b : A} {p q : Path a b}
 
 /-- RwEq closure of LocalCohStep. -/
 noncomputable def LocalCohRwEq {A : Type u} {a b : A} (p q : Path a b) : Prop :=
-  ∃ r : Path a b, LocalCohStep p r ∧ LocalCohStep q r
+  ∃ r : Path a b, Nonempty (LocalCohStep p r) ∧ Nonempty (LocalCohStep q r)
 
 private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 

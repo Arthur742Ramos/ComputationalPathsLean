@@ -27,7 +27,7 @@ structure FlipFlopPathData (X : Type u) where
   flopPath : ∀ x : X, Path (canonical (flop x)) (canonical x)
 
 /-- Atomic rewrite step for normalized birational path concatenations. -/
-inductive FlipFlopStep : {X : Type u} → {a b : X} → Path a b → Path a b → Prop
+inductive FlipFlopStep : {X : Type u} → {a b : X} → Path a b → Path a b → Type u
   | contract_right {X : Type u} {a b : X} (p : Path a b) :
       FlipFlopStep (Path.trans p (Path.refl b)) p
 

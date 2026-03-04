@@ -195,7 +195,7 @@ noncomputable def tropicalSemiringTropVal : TropicalSemiring where
 /-! ## Domain-Specific Rewrite Steps -/
 
 /-- Domain-specific rewrite steps for tropical geometry. -/
-inductive TropicalStep : {A : Type u} → A → A → Prop
+inductive TropicalStep : {A : Type u} → A → A → Type (u+1)
   | distrib_trop {T : TropicalSemiring} {a b c : T.carrier} :
       TropicalStep (T.mul a (T.add b c)) (T.add (T.mul a b) (T.mul a c))
   | idem_trop {T : TropicalSemiring} {a : T.carrier} :

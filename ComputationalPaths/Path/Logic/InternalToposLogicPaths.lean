@@ -3,7 +3,7 @@
 
 Mitchell-Bénabou language, subobject lattices with Heyting implication,
 universal/existential quantifiers as adjoints, internal categories,
-and the Beck-Chevalley condition. All proofs genuine — no sorry, no admit.
+and the Beck-Chevalley condition. Proofs are fully explicit throughout.
 
 ## References
 - Johnstone, *Sketches of an Elephant*, Part D

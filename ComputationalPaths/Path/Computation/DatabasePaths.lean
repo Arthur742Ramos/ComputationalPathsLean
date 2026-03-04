@@ -61,7 +61,7 @@ noncomputable def equiJoin {T S : Type u} (r1 : Relation T) (r2 : Relation S) (p
 /-! ## Domain-specific rewrite steps (indexing only — Prop) -/
 
 /-- Elementary rewrites in relational algebra. -/
-inductive DbStep (T : Type u) : Relation T → Relation T → Prop where
+inductive DbStep (T : Type u) : Relation T → Relation T → Type u where
   | selTrue   : (r : Relation T) → DbStep T (selection r (fun _ => true)) r
   | selFalse  : (r : Relation T) → DbStep T (selection r (fun _ => false)) (Relation.empty T)
   | selCompose : (r : Relation T) → (p q : T → Bool) →

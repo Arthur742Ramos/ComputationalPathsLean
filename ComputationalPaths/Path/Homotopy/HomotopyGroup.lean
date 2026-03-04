@@ -16,7 +16,7 @@ namespace HomotopyGroup
 universe u
 
 /-- A 2-cell between parallel computational paths. -/
-abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Type u := RwEq p q
+abbrev TwoCell {A : Type u} {x y : A} (p q : Path x y) : Type (u + 1) := RwEq p q
 
 /-- Associative rerouting of loop composition gives a canonical 2-cell. -/
 noncomputable def loop_assoc_two_cell {A : Type u} {a : A}

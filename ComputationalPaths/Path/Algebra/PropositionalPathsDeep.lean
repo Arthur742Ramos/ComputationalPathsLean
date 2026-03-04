@@ -71,7 +71,7 @@ theorem path_trans_assoc {α : Type} {a b c d : α}
   | cons _ _ ih => simp [Path.trans, ih]
 
 /-- Theorem 4: Single step has length 1. -/
-theorem single_length {α : Type} {a b : α} (s : Step α a b) :
+def single_length {α : Type} {a b : α} (s : Step α a b) :
     (Path.single s).length = 1 := rfl
 
 /-- Theorem 5: Nil path has length 0. -/

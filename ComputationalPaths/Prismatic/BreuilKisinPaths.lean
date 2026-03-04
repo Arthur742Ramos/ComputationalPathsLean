@@ -18,7 +18,7 @@ universe u v
 
 /-- Domain-specific rewrite steps for Breuil-Kisin computations. -/
 inductive BreuilKisinStep {M : Type v} :
-    {x y : M} → Path x y → Path x y → Prop where
+    {x y : M} → Path x y → Path x y → Type (v + 1) where
   | linearity_right_unit {x y : M} (p : Path x y) :
       BreuilKisinStep (Path.trans p (Path.refl y)) p
   | twist_left_unit {x y : M} (p : Path x y) :

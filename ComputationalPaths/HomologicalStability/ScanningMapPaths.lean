@@ -17,7 +17,7 @@ universe u v
 
 /-- Domain-specific rewrite steps for scanning-map coherence moves. -/
 inductive ScanningStep {Y : Type v} :
-    {a b : Y} → Path a b → Path a b → Prop where
+    {a b : Y} → Path a b → Path a b → Type v where
   | right_unit {a b : Y} (p : Path a b) :
       ScanningStep (Path.trans p (Path.refl b)) p
   | left_unit {a b : Y} (p : Path a b) :

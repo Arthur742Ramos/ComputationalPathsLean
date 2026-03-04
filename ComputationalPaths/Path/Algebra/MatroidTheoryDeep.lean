@@ -116,7 +116,7 @@ noncomputable def singleStepPath {A : Type u} {a b : A} (h : a = b) : Path a b :
 theorem singleStepPath_toEq {A : Type u} {a b : A} (h : a = b) :
     Path.toEq (singleStepPath h) = h := rfl
 
-theorem singleStepPath_mk_eq {A : Type u} {a b : A} (h : a = b) :
+def singleStepPath_mk_eq {A : Type u} {a b : A} (h : a = b) :
     singleStepPath h = Path.mk [Step.mk a b h] h := rfl
 
 theorem mk_refl_eq_refl {A : Type u} (a : A) :
