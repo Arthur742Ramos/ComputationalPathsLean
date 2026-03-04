@@ -20,7 +20,7 @@ universe u v
 
 /-- Domain-specific rewrite steps for Quillen-homology coherence moves. -/
 inductive QuillenHomologyStep {A : Type u} :
-    {a b : A} → Path a b → Path a b → Type where
+    {a b : A} → Path a b → Path a b → Type (u + 1) where
   | right_unit {a b : A} (p : Path a b) :
       QuillenHomologyStep (Path.trans p (Path.refl b)) p
   | left_unit {a b : A} (p : Path a b) :
