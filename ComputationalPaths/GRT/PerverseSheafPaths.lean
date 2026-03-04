@@ -51,7 +51,7 @@ noncomputable def tExact_rweq (F : Obj) :
       (P.tExactPath F) :=
   rweq_of_step (P.tExactStep F)
 
-@[simp] theorem tExact_left_unit_step (F : Obj) :
+@[simp] noncomputable def tExact_left_unit_step (F : Obj) :
     Path.Step
       (Path.trans (Path.refl (P.shift (P.nearbyCycles F) 0)) (P.tExactPath F))
       (P.tExactPath F) :=
@@ -69,7 +69,7 @@ noncomputable def gluing_rweq (F : Obj) :
       (P.gluingPath F) :=
   rweq_of_step (P.gluingStep F)
 
-@[simp] theorem gluing_right_unit_step (F : Obj) :
+@[simp] noncomputable def gluing_right_unit_step (F : Obj) :
     Path.Step
       (Path.trans (P.gluingPath F) (Path.refl (P.nearbyCycles F)))
       (P.gluingPath F) :=
@@ -81,7 +81,7 @@ noncomputable def gluing_right_unit_rweq (F : Obj) :
       (P.gluingPath F) :=
   rweq_of_step (P.gluing_right_unit_step F)
 
-@[simp] theorem gluing_cancel_left_step (F : Obj) :
+@[simp] noncomputable def gluing_cancel_left_step (F : Obj) :
     Path.Step
       (Path.trans (Path.symm (P.gluingPath F)) (P.gluingPath F))
       (Path.refl (P.nearbyCycles F)) :=
@@ -93,7 +93,7 @@ noncomputable def gluing_cancel_left_rweq (F : Obj) :
       (Path.refl (P.nearbyCycles F)) :=
   rweq_of_step (P.gluing_cancel_left_step F)
 
-@[simp] theorem gluing_cancel_right_step (F : Obj) :
+@[simp] noncomputable def gluing_cancel_right_step (F : Obj) :
     Path.Step
       (Path.trans (P.gluingPath F) (Path.symm (P.gluingPath F)))
       (Path.refl (P.vanishingCycles F)) :=
