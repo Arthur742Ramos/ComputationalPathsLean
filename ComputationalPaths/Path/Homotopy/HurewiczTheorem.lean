@@ -11,7 +11,7 @@ framework:
    subgroup), constructed using `Path.trans` and Step chains.
 4. **Simply connected case**: `h₂ : π₂ → H₂` is an isomorphism.
 
-All proofs use Path/Step/RwEq. No `sorry` or `admit`.
+All proofs use Path/Step/RwEq and are complete.
 -/
 
 import ComputationalPaths.Path.Basic

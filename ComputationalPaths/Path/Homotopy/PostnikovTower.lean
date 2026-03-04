@@ -13,7 +13,7 @@ This module develops the Postnikov tower for computational paths:
 4. **k-invariants** – `RwEq`-invariant loop data descends to coherent maps on
    truncation stages.
 
-All proofs use `Path`/`Step`/`RwEq`. No `sorry`/`admit`.
+All proofs use `Path`/`Step`/`RwEq` and are complete.
 -/
 
 import ComputationalPaths.Path.Basic
