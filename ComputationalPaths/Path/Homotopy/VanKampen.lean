@@ -79,18 +79,18 @@ theorem decodeAlternating_hasDecomposition (i0 : I) :
       HasAlternatingDecomposition (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0
         (decodeAlternating (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0 w)
   | _, .nil _ => by
-      simpa [decodeAlternating] using
-        (HasAlternatingDecomposition.refl (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0)
+    simpa [decodeAlternating] using
+        (HasAlternatingDecomposition.refl (i0 := i0))
   | _, .consLeft p rest => by
       simpa [decodeAlternating] using
         (HasAlternatingDecomposition.transLeft
-          (U := U) (V := V) (I := I) (iU := iU) (iV := iV) (i0 := i0) (p := p)
-          (decodeAlternating_hasDecomposition (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0 rest))
+          (i0 := i0) (p := p)
+          (decodeAlternating_hasDecomposition (i0 := i0) rest))
   | _, .consRight q rest => by
       simpa [decodeAlternating] using
         (HasAlternatingDecomposition.transRight
-          (U := U) (V := V) (I := I) (iU := iU) (iV := iV) (i0 := i0) (q := q)
-          (decodeAlternating_hasDecomposition (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0 rest))
+          (i0 := i0) (q := q)
+          (decodeAlternating_hasDecomposition (i0 := i0) rest))
 
 /-- Explicit `Step` witness: appending a reflexive segment on the right is removable. -/
 noncomputable def decodeSingleLeft_rwEq (i0 : I) (p : Path (iU i0) (iU i0)) :
@@ -112,26 +112,35 @@ noncomputable def decodeSingleRight_rwEq (i0 : I) (q : Path (iV i0) (iV i0)) :
     (Step.trans_refl_right
       (inVSegment (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0 q))
 
-/-- Overlap amalgamation: loops from `I = U ∩ V` are identified in the pushout via `RwEq`. -/
-theorem overlapAmalgamation_rwEq (i0 : I)
-    [Pushout.HasGlueNaturalLoopRwEq (A := U) (B := V) (C := I) (f := iU) (g := iV) i0]
+/-- Overlap amalgamation witness from the pushout loop-naturality interface. -/
+noncomputable def overlapAmalgamation_rwEq (i0 : I)
+    [CompPath.Pushout.HasGlueNaturalLoopRwEq
+      (A := U) (B := V) (C := I) (f := iU) (g := iV) i0]
     (p : Path i0 i0) :
-    RwEq
-      (Pushout.inlPath (A := U) (B := V) (C := I) (f := iU) (g := iV) (Path.congrArg iU p) :
-        Path (Pushout.inl (iU i0) : Pushout U V I iU iV) (Pushout.inl (iU i0)))
-      (inVSegment (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0 (Path.congrArg iV p)) := by
-  simpa [inVSegment] using
-    (Pushout.glue_natural_loop_rweq (A := U) (B := V) (C := I) (f := iU) (g := iV) i0 p)
+    RwEqProp
+      (Path.trans
+        (Path.symm
+          (CompPath.Pushout.inlPath (A := U) (B := V) (C := I) (f := iU) (g := iV) (Path.congrArg iU p)))
+        (Path.trans
+          (CompPath.Pushout.glue (A := U) (B := V) (C := I) (f := iU) (g := iV) i0)
+          (CompPath.Pushout.inrPath (A := U) (B := V) (C := I) (f := iU) (g := iV) (Path.congrArg iV p))))
+      (CompPath.Pushout.glue (A := U) (B := V) (C := I) (f := iU) (g := iV) i0) :=
+  CompPath.Pushout.HasGlueNaturalLoopRwEq.eq
+    (A := U) (B := V) (C := I) (f := iU) (g := iV) (c₀ := i0) i0 p
 
 /-- Seifert-van Kampen for computational paths, stated on automorphisms in the fundamental
 groupoid of the pushout. -/
 noncomputable def seifertVanKampenFundamentalGroupoidPushout (i0 : I)
-    [Pushout.HasGlueNaturalLoopRwEq (A := U) (B := V) (C := I) (f := iU) (g := iV) i0]
+    [CompPath.Pushout.HasGlueNaturalLoopRwEq
+      (A := U) (B := V) (C := I) (f := iU) (g := iV) i0]
     [HasPushoutSVKEncodeQuot U V I iU iV i0]
     [HasPushoutSVKDecodeEncode U V I iU iV i0]
     [HasPushoutSVKEncodeDecode U V I iU iV i0] :
     SimpleEquiv
-      (FundamentalGroupoid.Hom (Pushout U V I iU iV) (Pushout.inl (iU i0)) (Pushout.inl (iU i0)))
+      (FundamentalGroupoid.Hom
+        (CompPath.Pushout U V I iU iV)
+        (CompPath.Pushout.inl (A := U) (B := V) (C := I) (f := iU) (g := iV) (iU i0))
+        (CompPath.Pushout.inl (A := U) (B := V) (C := I) (f := iU) (g := iV) (iU i0)))
       (AmalgamatedFreeProduct
         (PiOne U (iU i0))
         (PiOne V (iV i0))
@@ -182,8 +191,8 @@ noncomputable def wedgeCirclePiOneEquivFreeGroupTwo
     [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase] :
     SimpleEquiv
       (PiOne
-        (Wedge Circle Circle circleBase circleBase)
-        (Wedge.basepoint (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase)))
+        (CompPath.Wedge Circle Circle circleBase circleBase)
+        (CompPath.Wedge.basepoint (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase)))
       FreeGroupTwoCode :=
   wedgeFundamentalGroupEquiv_of_decode_bijective
     (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase)

@@ -37,12 +37,12 @@ variable (X : PathFunctor.{u, v} (A := A))
 /-- Theorem 1: Left Kan map identity law — the action on refl
     reduces to refl on the forward component, witnessed by Step. -/
 noncomputable def leftMap_id_full {b : B}
-    (elem : LeftKanObj (J := J) (X := X) b) :
+    (elem : pointwiseLeftKanObj J X b) :
     RwEq
       (Path.trans
-        ((leftMap (J := J) (X := X) (q := Path.refl b) elem).2.1)
+        ((pointwiseLeftKanMap (F := J) (G := X) (b := b) (b' := b) (Path.refl b) elem).2.1)
         (Path.refl b))
-      ((leftMap (J := J) (X := X) (q := Path.refl b) elem).2.1) :=
+      ((pointwiseLeftKanMap (F := J) (G := X) (b := b) (b' := b) (Path.refl b) elem).2.1) :=
   rweq_of_step (Step.trans_refl_right _)
 
 /-- Theorem 2: Composition law for left Kan maps — associativity
@@ -58,7 +58,7 @@ noncomputable def leftMap_comp_full {b c d : B}
 /-- Theorem 3: Left Kan extension unit — embedding the source
     value at `J.obj a` into the left Kan extension. -/
 noncomputable def leftKanUnit (a : A) (x : X.obj a) :
-    LeftKanObj (J := J) (X := X) (J.obj a) :=
+    pointwiseLeftKanObj J X (J.obj a) :=
   ⟨a, ⟨Path.refl (J.obj a), x⟩⟩
 
 /-- Theorem 4: Unit naturality — transporting along `J.map p`
@@ -101,7 +101,7 @@ noncomputable def leftKanTripleTransport {b c d e : B}
 /-- Theorem 8: Left Kan unit followed by transport along `q : J.obj a → b`. -/
 noncomputable def leftKanUnitTransport (a : A) (x : X.obj a)
     {b : B} (q : Path (J.obj a) b) :
-    LeftKanObj (J := J) (X := X) b :=
+    pointwiseLeftKanObj J X b :=
   ⟨a, ⟨q, x⟩⟩
 
 /-- Theorem 9: Backward transport (via symm) and forward transport cancel. -/
@@ -135,10 +135,10 @@ noncomputable def leftKanRoundtrip {b c : B}
       (Path.trans (Path.trans p q) (Path.symm q))
       p := by
   apply rweq_trans
-  · exact leftKanTransportCancel (J := J) (X := X) q a p
+  · exact leftKanTransportCancel (J := J) q a p
   apply rweq_trans
-  · exact leftKanTransportCancelFull (J := J) (X := X) q a p
-  · exact leftKanTransportCancelToP (J := J) (X := X) q a p
+  · exact leftKanTransportCancelFull (J := J) q a p
+  · exact leftKanTransportCancelToP (J := J) q a p
 
 end LeftCoherence
 
@@ -168,8 +168,8 @@ noncomputable def rightMap_comp_coherence {b c d : B}
 /-- Theorem 15: Right Kan counit — extracting from the right Kan extension
     at `J.obj a`. -/
 noncomputable def rightKanCounit (a : A) :
-    RightKanObj (J := J) (X := X) (J.obj a) → X.obj a :=
-  fun f => f ⟨a, Path.refl (J.obj a)⟩
+    pointwiseRightKanObj J X (J.obj a) → X.obj a :=
+  fun f => f a (Path.refl (J.obj a))
 
 /-- Theorem 16: Right Kan counit naturality path — transporting
     the function along symm and evaluating is coherent. -/
@@ -371,9 +371,9 @@ noncomputable def whiskerLeftKan {b c : B}
 noncomputable def whiskerRightKan {b c : B}
     (q : Path b c) (a : A) (p : Path (J.obj a) c) :
     RwEq
-      (Path.trans (Path.refl (J.obj a)) (Path.trans (Path.symm q) p))
-      (Path.trans (Path.symm q) p) :=
-  rweq_of_step (Step.trans_refl_left (Path.trans (Path.symm q) p))
+      (Path.trans (Path.refl (J.obj a)) (Path.trans p (Path.symm q)))
+      (Path.trans p (Path.symm q)) :=
+  rweq_of_step (Step.trans_refl_left (Path.trans p (Path.symm q)))
 
 /-- Theorem 33: Left-right whiskering composition. -/
 noncomputable def whiskerBothKan {b c d : B}

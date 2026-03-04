@@ -27,7 +27,7 @@ namespace Path
 
 universe u
 
-abbrev MoorePiN (_n : Nat) (_A : Type u) (_base : _A) : Type u := Unit
+abbrev MoorePiN (_n : Nat) (_A : Type u) (_base : _A) : Type u := ULift Unit
 
 /-! ## Definition -/
 
@@ -121,7 +121,7 @@ theorem moore_unique_self (X : MooreSpace G n) (x : PiN X) :
     (uniqueUpToHomotopy X X).toFun x = x := by
   exact X.piNEquiv.left_inv x
 
-/-- The PiN abbreviation unfolds correctly. -/
+-- The PiN abbreviation unfolds correctly.
 -- DISABLED: HigherHomotopyGroups has universe issues
 -- theorem moore_piN_unfold (X : MooreSpace G n) :
 --     PiN X = HigherHomotopyGroups.PiN n X.carrier X.base := by

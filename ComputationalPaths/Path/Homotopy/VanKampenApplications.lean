@@ -36,7 +36,7 @@ noncomputable def figureEightPiOneEquivF2_vanKampen
 
 /-- Explicit loop decomposition `ab` in the figure-eight. -/
 noncomputable def figureEightLoopABDecomposition :
-    Path (A := FigureEight.FigureEight) FigureEight.base FigureEight.base :=
+    Path FigureEight.base FigureEight.base :=
   Path.trans FigureEight.loopA FigureEight.loopB
 
 theorem figureEightLoopABDecomposition_eq :

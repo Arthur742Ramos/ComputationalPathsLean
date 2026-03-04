@@ -70,8 +70,8 @@ end PointedEquiv
 /-! ## Bott periodicity data -/
 
 /-- The second homotopy group of a pointed type (universe-adjusted). -/
-abbrev pi2 (X : Pointed) : Type u :=
-  ULift.{0, u + 2} (HigherHomotopy.PiTwo X.carrier X.pt)
+abbrev pi2 (X : Pointed) : Type (u + 2) :=
+  HigherHomotopy.PiTwo X.carrier X.pt
 
 /-- Two-fold loop space Omega^2 as a pointed type. -/
 noncomputable abbrev omega2 (X : Pointed) : Pointed :=

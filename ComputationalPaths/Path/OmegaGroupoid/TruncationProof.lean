@@ -61,7 +61,7 @@ variable {A : Type u} {a b : A}
 /-- A Type-valued rewrite-equivalence trace is simply a `Derivation₂`.
     This carries the full derivation structure (which steps were applied
     and in what order), unlike the Prop-valued `RwEqProp`. -/
-abbrev RwEqT (p q : Path a b) : Type u := Derivation₂ p q
+abbrev RwEqT (p q : Path a b) : Type (u + 2) := Derivation₂ p q
 
 /-- The identity trace. -/
 @[inline] noncomputable def RwEqT.rfl (p : Path a b) : RwEqT p p := Derivation₂.refl p
@@ -103,7 +103,7 @@ sequence of "rewrite moves on derivations".  We give three constructors:
 3. `by_groupoid_law`: a meta-step (from `MetaStep₃`) provides the connection.
 4. `inv` / `vcomp`: groupoid closure. -/
 inductive ThreeCell {p q : Path a b} :
-    Derivation₂ p q → Derivation₂ p q → Type u where
+    Derivation₂ p q → Derivation₂ p q → Type (u + 2) where
   | refl (d : Derivation₂ p q) : ThreeCell d d
   | by_canonical
       {d₁ d₂ : Derivation₂ p q}
@@ -409,10 +409,10 @@ structure OmegaGroupoidExplicit (A : Type u) where
   /-- Level 1: 1-cells (paths) -/
   cell₁ : A → A → Type u := Path
   /-- Level 2: 2-cells (derivations) -/
-  cell₂ : {a b : A} → Path a b → Path a b → Type u := fun p q => Derivation₂ p q
+  cell₂ : {a b : A} → Path a b → Path a b → Type (u + 2) := fun p q => Derivation₂ p q
   /-- Level 3: 3-cells (derivation equivalences) -/
   cell₃ : {a b : A} → {p q : Path a b} →
-    Derivation₂ p q → Derivation₂ p q → Type u := fun d₁ d₂ => Derivation₃ d₁ d₂
+    Derivation₂ p q → Derivation₂ p q → Type (u + 2) := fun d₁ d₂ => Derivation₃ d₁ d₂
   /-- Composition at level 1 -/
   comp₁ : {a b c : A} → Path a b → Path b c → Path a c := Path.trans
   /-- Identity at level 1 -/
@@ -579,7 +579,7 @@ theorem omega_structure_contractible_above_2 :
       Nonempty (DerivationHigh n c₁ c₂)) :=
   ⟨fun d₁ d₂ => ⟨Normalizer.contractibility₃_genuine d₁ d₂⟩,
    fun m₁ m₂ => ⟨OmegaGroupoid.contractibility₄ m₁ m₂⟩,
-   fun _n _c₁ _c₂ => ⟨DerivationHigh.step MetaStepHigh.diamond_filler⟩⟩
+   fun n c₁ c₂ => ⟨DerivationHigh.step (MetaStepHigh.diamond_filler (n := n) c₁ c₂)⟩⟩
 
 /-- The coherence conditions at level n+1 witness the equations at level n.
     Level 3+ is contractible because the TRS is confluent. -/

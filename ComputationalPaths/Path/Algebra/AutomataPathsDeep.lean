@@ -15,6 +15,8 @@
 -- §1  Alphabet, States, Computational Paths
 -- ============================================================
 
+namespace ComputationalPaths.Path.Algebra.AutomataPathsDeep
+
 structure ASym where
   id : Nat
 deriving DecidableEq, Repr
@@ -578,3 +580,5 @@ theorem APath.symm_nil {α : Type} (a : α) : (APath.nil a).symm = APath.nil a :
 /-- Theorem 50: deltaStar on two appended singletons. -/
 theorem DFA.deltaStar_two (M : DFA) (q : AState) (a b : ASym) :
     M.deltaStar q [a, b] = M.delta (M.delta q a) b := rfl
+
+end ComputationalPaths.Path.Algebra.AutomataPathsDeep

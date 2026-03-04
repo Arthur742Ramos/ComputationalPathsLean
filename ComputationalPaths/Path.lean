@@ -61,8 +61,8 @@ import ComputationalPaths.Path.SimplicialHomotopy
 import ComputationalPaths.Path.DoubleGroupoid
 import ComputationalPaths.Path.DoubleCategoryPaths
 import ComputationalPaths.Path.TwoCategory
--- import ComputationalPaths.Path.GrayCategory  -- TEMPORARILY DISABLED: depends on broken higher category modules
--- import ComputationalPaths.Path.Tricategory  -- TEMPORARILY DISABLED: depends on broken higher category modules
+import ComputationalPaths.Path.GrayCategory
+import ComputationalPaths.Path.Tricategory
 import ComputationalPaths.Path.HigherCoherenceDerived
 import ComputationalPaths.Path.WhiskerOperations
 import ComputationalPaths.Path.HigherPathOperations
@@ -93,7 +93,7 @@ import ComputationalPaths.Path.Homotopy.PointedMapCategory
 import ComputationalPaths.Path.Homotopy.UniversalCover
 import ComputationalPaths.Path.Homotopy.HomotopyPullback
 import ComputationalPaths.Path.Homotopy.HomotopyLimitColimit
--- import ComputationalPaths.Path.Homotopy.WhiteheadProduct  -- TEMPORARILY DISABLED: type errors with piNBasepoint
+import ComputationalPaths.Path.Homotopy.WhiteheadProduct
 import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 import ComputationalPaths.Path.Homotopy.BrownRepresentability
 import ComputationalPaths.Path.Homotopy.PathAlgebraQuotient
@@ -142,8 +142,8 @@ import ComputationalPaths.Path.Homotopy.EHPSequence
 import ComputationalPaths.Path.Homotopy.StableHomotopy
 import ComputationalPaths.Path.Homotopy.StableHomotopyGroups
 import ComputationalPaths.Path.Homotopy.GeneralizedCohomology
--- import ComputationalPaths.Path.Homotopy.BottPeriodicity  -- TEMPORARILY DISABLED: compilation errors
--- import ComputationalPaths.Path.Homotopy.AdamsOperations  -- TEMPORARILY DISABLED: depends on broken BottPeriodicity
+import ComputationalPaths.Path.Homotopy.BottPeriodicity
+import ComputationalPaths.Path.Homotopy.AdamsOperations
 import ComputationalPaths.Path.Homotopy.SpectrumTheory
 import ComputationalPaths.Path.Homotopy.ThomSpectra
 import ComputationalPaths.Path.Homotopy.StableSplitting
@@ -155,7 +155,7 @@ import ComputationalPaths.Path.Homotopy.DerivedFunctorHomotopy
 import ComputationalPaths.Path.Homotopy.GrothendieckConstruction
 import ComputationalPaths.Path.Homotopy.ProductFundamentalGroup
 import ComputationalPaths.Path.Homotopy.PiOneDerived
--- import ComputationalPaths.Path.Homotopy.HigherProductHomotopy  -- TEMPORARILY DISABLED: compilation errors
+-- import ComputationalPaths.Path.Homotopy.HigherProductHomotopy  -- TEMPORARILY DISABLED: unsolved goals + PiN/ULift mismatches (lines 135, 228-231, 249, 288)
 import ComputationalPaths.Path.Homotopy.LieGroups
 import ComputationalPaths.Path.Homotopy.Hurewicz
 import ComputationalPaths.Path.Homotopy.LSCategory
@@ -167,7 +167,7 @@ import ComputationalPaths.Path.Homotopy.Sets
 import ComputationalPaths.Path.Homotopy.Reflexivity
 import ComputationalPaths.Path.Homotopy.IdentityType
 import ComputationalPaths.Path.Homotopy.EilenbergMacLane
--- import ComputationalPaths.Path.Homotopy.MooreSpace  -- TEMPORARILY DISABLED: unsolved goals in uniqueness proofs
+import ComputationalPaths.Path.Homotopy.MooreSpace
 import ComputationalPaths.Path.Homotopy.Coproduct
 import ComputationalPaths.Path.Homotopy.CoproductPaths
 import ComputationalPaths.Path.CompPath.CircleCompPath
@@ -191,9 +191,9 @@ import ComputationalPaths.Path.CompPath.PushoutPaths
 import ComputationalPaths.Path.CompPath.PushoutSVKInstances
 import ComputationalPaths.Path.CompPath.WedgeSVKCircleInstances
 import ComputationalPaths.Path.CompPath.PullbackPaths
--- import ComputationalPaths.Path.CompPath.VanKampenGeneralized  -- TEMPORARILY DISABLED: see SeifertVanKampen
--- import ComputationalPaths.Path.SeifertVanKampen  -- TEMPORARILY DISABLED: compilation errors
--- import ComputationalPaths.Path.CompPath.SeifertVanKampenDerived  -- TEMPORARILY DISABLED: compilation errors
+import ComputationalPaths.Path.CompPath.VanKampenGeneralized
+import ComputationalPaths.Path.SeifertVanKampen
+import ComputationalPaths.Path.CompPath.SeifertVanKampenDerived
 import ComputationalPaths.Path.CompPath.FreeProductUniversal
 import ComputationalPaths.Path.CompPath.WedgeFreeProductDerived
 import ComputationalPaths.Path.CompPath.WedgeFreeProductUniversal
@@ -388,7 +388,7 @@ import ComputationalPaths.Path.Category.EnrichedCategories
 import ComputationalPaths.Path.Category.TwoCategories
 import ComputationalPaths.Path.Category.ToposTheoryAdv
 import ComputationalPaths.Path.Category.AccessibleCategories
--- import ComputationalPaths.Path.Category.ProfiniteCategories  -- DISABLED: FiberFunctor conflict with Path.Homotopy.PathLifting
+import ComputationalPaths.Path.Category.ProfiniteCategories
 import ComputationalPaths.Path.Logic.HomotopyTypeTheory
 import ComputationalPaths.Path.Logic.ModalHoTT
 import ComputationalPaths.Path.Logic.SequentPaths
@@ -598,7 +598,7 @@ import ComputationalPaths.Path.Algebra.ModularDeep
 import ComputationalPaths.Path.Algebra.ModularForms
 import ComputationalPaths.Path.Algebra.ModularLatticeDeep
 import ComputationalPaths.Path.Algebra.MonadDeep
--- import ComputationalPaths.Path.Algebra.MonadPathsDeep  -- DISABLED: monad_left_unit conflict with AdjunctionCoherenceDeep
+-- import ComputationalPaths.Path.Algebra.MonadPathsDeep  -- DISABLED: FPath.recOn conflict with PetriNetRewritingDeep
 import ComputationalPaths.Path.Algebra.MonoidPathPaths
 import ComputationalPaths.Path.Algebra.MonoidalCategoryDeep
 import ComputationalPaths.Path.Algebra.MonoidalCoherenceDeep
@@ -715,7 +715,7 @@ import ComputationalPaths.Path.Category.CategoricalLogicDeep
 import ComputationalPaths.Path.Category.CategoryOfElementsDeep
 -- import ComputationalPaths.Path.Category.ClosedPaths  -- circular: imports ComputationalPaths
 import ComputationalPaths.Path.Category.CoalgebraPathDeep
--- import ComputationalPaths.Path.Category.CoherenceTheorems  -- DISABLED: pentagon_coherence conflict with CoherentPresentationDeep
+import ComputationalPaths.Path.Category.CoherenceTheorems
 import ComputationalPaths.Path.Category.CoveringSpaceDeep
 import ComputationalPaths.Path.Category.DerivedCategories
 import ComputationalPaths.Path.Category.DerivedCategoryDeep
@@ -757,7 +757,7 @@ import ComputationalPaths.Path.ChromaticHomotopyPaths
 import ComputationalPaths.Path.CompPath.AbstractReductionSystems
 import ComputationalPaths.Path.CompPath.ConfigurationSpace
 import ComputationalPaths.Path.CompPath.DecisionProcedures
--- import ComputationalPaths.Path.CompPath.EilenbergMacLaneSpaces  -- TEMPORARILY DISABLED: compilation errors
+import ComputationalPaths.Path.CompPath.EilenbergMacLaneSpaces
 import ComputationalPaths.Path.CompPath.LambdaCalculusPaths
 import ComputationalPaths.Path.CompPath.SmashProduct
 import ComputationalPaths.Path.CompPath.SurfaceGroups
@@ -799,7 +799,7 @@ import ComputationalPaths.Path.Computation.TypedEffectsDeep
 import ComputationalPaths.Path.DerivedCategoryPaths
 import ComputationalPaths.Path.DescentPaths
 import ComputationalPaths.Path.EnrichedCategoryPaths
--- import ComputationalPaths.Path.Foundations.PathOverTypes  -- DISABLED: transport_Subsingleton.elim conflict with PathInduction
+import ComputationalPaths.Path.Foundations.PathOverTypes
 import ComputationalPaths.Path.Foundations.SetTheoreticTopology
 import ComputationalPaths.Path.Foundations.TruncationLevels
 import ComputationalPaths.Path.Foundations.UniversalProperties
@@ -834,7 +834,7 @@ import ComputationalPaths.Path.HoTT.TruncationDeep
 import ComputationalPaths.Path.HoTT.TruncationPaths
 import ComputationalPaths.Path.HoTT.ModalHoTT
 import ComputationalPaths.Path.HoTT.SyntheticHomotopy
--- import ComputationalPaths.Path.HoTT.Descent  -- TEMPORARILY DISABLED: compilation errors
+import ComputationalPaths.Path.HoTT.Descent
 import ComputationalPaths.Path.Homotopy.AdamsSpectralSequence
 import ComputationalPaths.Path.Homotopy.BlakersMassey
 import ComputationalPaths.Path.Homotopy.CellularApproximation
@@ -851,7 +851,7 @@ import ComputationalPaths.Path.Homotopy.FibrationPaths
 import ComputationalPaths.Path.Homotopy.FreeLoopSpace
 import ComputationalPaths.Path.Homotopy.FreudenthalSuspension
 import ComputationalPaths.Path.Homotopy.HigherToposDeep2
--- import ComputationalPaths.Path.Homotopy.HomotopyGroupPaths  -- TEMPORARILY DISABLED: compilation errors
+import ComputationalPaths.Path.Homotopy.HomotopyGroupPaths
 import ComputationalPaths.Path.Homotopy.HomotopyLimitDeep
 import ComputationalPaths.Path.Homotopy.InfinityCatDeep2
 import ComputationalPaths.Path.Homotopy.KTheoryPaths

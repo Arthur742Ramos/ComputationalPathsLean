@@ -5,7 +5,7 @@ This module builds a path-based 2-category interface on top of
 `HigherCategory.Bicategory`, keeping coherence data as explicit derivations.
 -/
 
--- import ComputationalPaths.HigherCategory.Bicategory  -- TEMPORARILY DISABLED: compilation errors
+import ComputationalPaths.HigherCategory.Bicategory
 import ComputationalPaths.Path.HigherPathOperations
 
 namespace ComputationalPaths
@@ -25,10 +25,10 @@ variable {a b c d e : A}
 abbrev Hom (x y : A) : Type u := Path x y
 
 /-- 2-cells in the path 2-category. -/
-abbrev TwoCell {x y : A} (f g : Hom x y) : Type u := Derivation₂ f g
+abbrev TwoCell {x y : A} (f g : Hom x y) : Type (u + 2) := Derivation₂ f g
 
 /-- 3-cells in the path 2-category. -/
-abbrev ThreeCell {x y : A} {f g : Hom x y} (α β : TwoCell f g) : Type u := Derivation₃ α β
+abbrev ThreeCell {x y : A} {f g : Hom x y} (α β : TwoCell f g) : Type (u + 2) := Derivation₃ α β
 
 /-- Identity 2-cell. -/
 noncomputable def id₂ (f : Hom a b) : TwoCell f f := Derivation₂.refl f

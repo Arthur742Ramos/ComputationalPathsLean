@@ -15,6 +15,8 @@
 -- §1  Alphabet, words, rewrite rules
 -- ============================================================
 
+namespace ComputationalPaths.Path.Algebra.StringRewritingDeep
+
 /-- An alphabet symbol. -/
 structure Sym where
   id : Nat
@@ -663,3 +665,5 @@ theorem diamond_implies_lc {R : SRS} (hd : Diamond R) : LocallyConfluent R := by
     obtain ⟨hbc, hbd⟩ := h
     subst hbc; subst hbd
     exact ⟨b, RPath.refl b, RPath.refl b⟩
+
+end ComputationalPaths.Path.Algebra.StringRewritingDeep

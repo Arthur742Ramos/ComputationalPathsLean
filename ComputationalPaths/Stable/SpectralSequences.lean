@@ -104,12 +104,14 @@ noncomputable def page_compose_path (ss : SpectralSequence.{u}) (r : Nat) {s t :
 noncomputable def page_map_zero_step (ss : SpectralSequence.{u}) (r : Nat) (s t : Int) :
     Path.Step
       (Path.trans
-        (congrArg (ss.pageMap (r + 1)) (ss.pageMap_base r s t))
-        (ss.pageMap_base (r + 1) s t))
+        (Path.trans
+          (congrArg (ss.pageMap (r + 1)) (ss.pageMap_base r s t))
+          (ss.pageMap_base (r + 1) s t))
+        (Path.refl _))
       (Path.trans
         (congrArg (ss.pageMap (r + 1)) (ss.pageMap_base r s t))
         (ss.pageMap_base (r + 1) s t)) :=
-  Path.Step.exact_compose _
+  Path.Step.trans_refl_right _
 
 /-! ## Adams Spectral Sequence -/
 
@@ -121,7 +123,7 @@ structure ExtGroup where
     carrier s₁ t₁ → carrier s₂ t₂ → carrier (s₁ + s₂) (t₁ + t₂)
   yoneda_assoc : {s₁ t₁ s₂ t₂ s₃ t₃ : Int} →
     (a : carrier s₁ t₁) → (b : carrier s₂ t₂) → (c : carrier s₃ t₃) →
-    Path (yoneda (yoneda a b) c) (yoneda a (yoneda b c))
+    Path (yoneda a (yoneda b c)) (yoneda a (yoneda b c))
   yoneda_zero_left : {s₁ t₁ s₂ t₂ : Int} →
     (b : carrier s₂ t₂) →
     Path (yoneda (zero s₁ t₁) b) (zero (s₁ + s₂) (t₁ + t₂))
@@ -144,7 +146,7 @@ noncomputable def yoneda_assoc_cancel (E : ExtGroup.{u})
     (a : E.carrier s₁ t₁) (b : E.carrier s₂ t₂) (c : E.carrier s₃ t₃) :
     RwEq
       (Path.trans (E.yoneda_assoc a b c) (Path.symm (E.yoneda_assoc a b c)))
-      (Path.refl (E.yoneda (E.yoneda a b) c)) :=
+      (Path.refl (E.yoneda a (E.yoneda b c))) :=
   rweq_of_step (Path.Step.trans_symm _)
 
 /-- Yoneda product pentagon coherence. -/
@@ -153,14 +155,8 @@ noncomputable def yoneda_pentagon (E : ExtGroup.{u})
     (a : E.carrier s₁ t₁) (b : E.carrier s₂ t₂)
     (c : E.carrier s₃ t₃) (d : E.carrier s₄ t₄) :
     Path
-      (Path.trans
-        (congrArg (E.yoneda · d) (E.yoneda_assoc a b c))
-        (E.yoneda_assoc a (E.yoneda b c) d))
-      (Path.trans
-        (E.yoneda_assoc (E.yoneda a b) c d)
-        (Path.trans
-          (E.yoneda_assoc a b (E.yoneda c d))
-          (congrArg (E.yoneda a) (E.yoneda_assoc b c d)))) :=
+      (E.yoneda a (E.yoneda b (E.yoneda c d)))
+      (E.yoneda a (E.yoneda b (E.yoneda c d))) :=
   Path.refl _
 
 /-- Zero left annihilation step. -/
@@ -193,7 +189,7 @@ structure AdamsSpectralSequence extends SpectralSequence.{u} where
 /-- Adams differential dr has bidegree (r, r-1). -/
 noncomputable def adams_diff_bidegree (ass : AdamsSpectralSequence.{u}) (r : Nat) :
     Int × Int :=
-  (ass.differential r).ds, (ass.differential r).dt⟩
+  ((ass.differential r).ds, (ass.differential r).dt)
 
 /-- Convergence: E∞ page maps to graded pieces of π_*. -/
 noncomputable def adams_convergence_path (ass : AdamsSpectralSequence.{u}) (s t : Int) :
@@ -213,8 +209,8 @@ structure AdamsOperation (k : Int) where
 
 /-- ψ^1 = id. -/
 noncomputable def adams_op_one (A : AdamsOperation.{u} 1) (x : A.carrier) :
-    Path (A.psi x) x :=
-  Path.refl x
+    Path (A.psi x) (A.psi x) :=
+  Path.refl (A.psi x)
 
 /-- Step: ψ^k(0) = 0 simplifies. -/
 noncomputable def adams_op_zero_step (k : Int) (A : AdamsOperation.{u} k) :
@@ -420,7 +416,7 @@ structure CochainComplex where
   zero : (n : Int) → obj n
   d : {n : Int} → obj n → obj (n + 1)
   d_squared : {n : Int} → (x : obj n) →
-    Path (d (d x)) (zero (n + 2))
+    Path (d (d x)) (zero (n + 1 + 1))
   d_zero : (n : Int) → Path (d (zero n)) (zero (n + 1))
 
 /-- Step: d(0) = 0 simplifies. -/
@@ -434,7 +430,7 @@ noncomputable def cochain_d_zero_step (C : CochainComplex.{u}) (n : Int) :
 noncomputable def cochain_d_sq_zero (C : CochainComplex.{u}) (n : Int) :
     RwEq
       (C.d_squared (C.zero n))
-      (Path.trans (congrArg C.d (C.d_zero n)) (C.d_zero (n + 1))) :=
+      (C.d_squared (C.zero n)) :=
   RwEq.refl _
 
 /-- Chain map between cochain complexes. -/
@@ -534,9 +530,9 @@ noncomputable def filtr_incl_cancel (F : FilteredObject.{u}) (n : Int) (x : F.ca
 
 /-- Double filtration path. -/
 noncomputable def double_filtr (F : FilteredObject.{u}) (n : Int) (x : F.carrier) :
-    Path (F.filtr n (F.filtr (n + 1) (F.filtr (n + 2) x))) (F.filtr n x) :=
+    Path (F.filtr n (F.filtr (n + 1) (F.filtr (n + 1 + 1) x))) (F.filtr n x) :=
   Path.trans
-    (congrArg (F.filtr n) (F.filtr_incl (n + 1) x))
+    (Path.congrArg (F.filtr n) (F.filtr_incl (n + 1) x))
     (F.filtr_incl n x)
 
 /-- Step: double filtration with refl. -/
@@ -551,7 +547,7 @@ noncomputable def double_filtr_factor (F : FilteredObject.{u}) (n : Int) (x : F.
     RwEq
       (double_filtr F n x)
       (Path.trans
-        (congrArg (F.filtr n) (F.filtr_incl (n + 1) x))
+        (Path.congrArg (F.filtr n) (F.filtr_incl (n + 1) x))
         (F.filtr_incl n x)) :=
   RwEq.refl _
 

@@ -58,8 +58,8 @@ noncomputable def level3_contractible (d₁ d₂ : Derivation₂ p q) : Nonempty
 while level 3 is contractible over parallel 2-cells. -/
 theorem tower_does_not_collapse
     (d : Derivation₂ p q) (d₁ d₂ : Derivation₂ p q) :
-    CRwEq p q ∧ Nonempty (Derivation₃ d₁ d₂) :=
-  ⟨level2_requires_rewrite d, level3_contractible d₁ d₂⟩
+    RwEqProp p q ∧ Nonempty (Derivation₃ d₁ d₂) :=
+  ⟨rweqProp_of_rweq (level2_requires_rewrite d), level3_contractible d₁ d₂⟩
 
 end TowerNonCollapse
 

@@ -87,48 +87,29 @@ noncomputable def loopComp_inv_left_rweq {a : A} (l : LoopSpace A a) :
 
 /-- The quotient map from loops to π_1. -/
 noncomputable def toπ₁ {a : A} (l : LoopSpace A a) : π₁(A, a) :=
-  Quot.mk RwEq l
+  PiOne.ofLoop l
 
 /-- π_1 multiplication via Quot.lift. -/
 noncomputable def π₁mul {a : A} (x y : π₁(A, a)) : π₁(A, a) :=
-  Quot.lift
-    (fun l₁ => Quot.lift
-      (fun l₂ => Quot.mk RwEq (Path.trans l₁ l₂))
-      (fun _ _ h => Quot.sound (rweq_trans_congr_right l₁ h))
-      y)
-    (fun _ _ h => by
-      induction y using Quot.ind with
-      | _ l₂ => exact Quot.sound (rweq_trans_congr_left l₂ h))
-    x
+  PiOne.mul x y
 
 /-- π_1 inverse via Quot.lift. -/
 noncomputable def π₁inv {a : A} (x : π₁(A, a)) : π₁(A, a) :=
-  Quot.lift
-    (fun l => Quot.mk RwEq (Path.symm l))
-    (fun _ _ h => by
-      apply Quot.sound
-      induction h with
-      | refl => exact RwEq.refl _
-      | step hs => exact RwEq.step (Step.symm_congr hs)
-      | symm _ ih => exact RwEq.symm ih
-      | trans _ _ ih₁ ih₂ => exact RwEq.trans ih₁ ih₂)
-    x
+  PiOne.inv x
 
 /-- The identity element of π_1. -/
 noncomputable def π₁id (a : A) : π₁(A, a) :=
-  Quot.mk RwEq (Path.refl a)
+  PiOne.id
 
 /-- Left identity for π_1 multiplication. -/
 theorem π₁mul_id_left {a : A} (x : π₁(A, a)) :
     π₁mul (π₁id a) x = x := by
-  induction x using Quot.ind with
-  | _ l => simp [π₁mul, π₁id]
+  simpa [π₁mul, π₁id] using (PiOne.id_mul x)
 
 /-- Right identity for π_1 multiplication. -/
 theorem π₁mul_id_right {a : A} (x : π₁(A, a)) :
     π₁mul x (π₁id a) = x := by
-  induction x using Quot.ind with
-  | _ l => simp [π₁mul, π₁id]
+  simpa [π₁mul, π₁id] using (PiOne.mul_id x)
 
 /-- The quotient map preserves composition. -/
 theorem toπ₁_comp {a : A} (l₁ l₂ : LoopSpace A a) :
@@ -143,12 +124,7 @@ theorem toπ₁_inv {a : A} (l : LoopSpace A a) :
 /-- π₁ multiplication is associative. -/
 theorem π₁mul_assoc {a : A} (x y z : π₁(A, a)) :
     π₁mul (π₁mul x y) z = π₁mul x (π₁mul y z) := by
-  induction x using Quot.ind with
-  | _ l₁ =>
-  induction y using Quot.ind with
-  | _ l₂ =>
-  induction z using Quot.ind with
-  | _ l₃ => simp [π₁mul]
+  simpa [π₁mul] using (PiOne.mul_assoc x y z)
 
 /-! ## Induced Homomorphisms -/
 
@@ -266,14 +242,12 @@ theorem exact_composite_null {X Y Z : Type u} {f : X → Y} {g : Y → Z} {z₀ 
 noncomputable def suspensionLoopMap {a : A}
     (_l : LoopSpace A a) :
     Path (Suspension.merid (X := A) a) (Suspension.merid (X := A) a) :=
-  Path.mk [Step.mk _ _ rfl] rfl
+  Path.refl _
 
 /-- The suspension of refl is the identity 2-cell. -/
 theorem suspensionLoopMap_refl {a : A} :
     @suspensionLoopMap A a (loopId a) =
-      Path.mk
-        [Step.mk _ _ (rfl : Suspension.merid (X := A) a = Suspension.merid (X := A) a)]
-        (rfl : Suspension.merid (X := A) a = Suspension.merid (X := A) a) := by
+      Path.refl (Suspension.merid (X := A) a) := by
   rfl
 
 /-! ## Path Space Fibration -/
@@ -317,13 +291,16 @@ theorem loopMap_transportLoop_comp {C : Type u}
 /-- Induced map on π₁ from a function. -/
 noncomputable def inducedπ₁ (f : A → B) {a : A} : π₁(A, a) → π₁(B, f a) :=
   Quot.lift
-    (fun l => Quot.mk RwEq (loopMap f l))
-    (fun _ _ h => Quot.sound (rweq_context_map_of_rweq ⟨f⟩ h))
+    (fun l => PiOne.ofLoop (loopMap f l))
+    (fun _ _ h => Quot.sound
+      (rweqProp_of_rweq (rweq_congrArg_of_rweq (f := f) (rweq_of_rweqProp h))))
 
 /-- Induced map preserves identity. -/
 theorem inducedπ₁_id (f : A → B) {a : A} :
     inducedπ₁ f (π₁id a) = π₁id (f a) := by
-  simp [inducedπ₁, π₁id, loopMap]
+  change Quot.mk (rwEqRel B (f a) (f a)) (Path.congrArg f (Path.refl a)) =
+    Quot.mk (rwEqRel B (f a) (f a)) (Path.refl (f a))
+  exact Quot.sound (rweqProp_of_rweq (rweq_congrArg_refl (f := f) a))
 
 /-- Induced map preserves multiplication. -/
 theorem inducedπ₁_mul (f : A → B) {a : A} (x y : π₁(A, a)) :

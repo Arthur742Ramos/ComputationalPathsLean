@@ -144,7 +144,7 @@ theorem two_of_three_right {A B C : Type u} {f : A → B} {g : B → C}
   have hF := hf.bijOn a₁ a₂
   exact ⟨fun y₁ y₂ h => by
            obtain ⟨x₁, rfl⟩ := hF.2 y₁; obtain ⟨x₂, rfl⟩ := hF.2 y₂
-           exact congrArg (pathRwMap f) (hGF.1 h),
+           exact _root_.congrArg (pathRwMap f) (hGF.1 h),
          fun z => let ⟨x, hx⟩ := hGF.2 z; ⟨pathRwMap f x, hx⟩⟩
 
 theorem two_of_three_left {A B C : Type u} {f : A → B} {g : B → C}
@@ -153,7 +153,7 @@ theorem two_of_three_left {A B C : Type u} {f : A → B} {g : B → C}
   bijOn a₁ a₂ := by
     have hGF := hgf.bijOn a₁ a₂; rw [pathRwMap_eq_comp] at hGF
     have hG := hg.bijOn (f a₁) (f a₂)
-    exact ⟨fun x₁ x₂ h => hGF.1 (congrArg (pathRwMap g) h),
+    exact ⟨fun x₁ x₂ h => hGF.1 (_root_.congrArg (pathRwMap g) h),
            fun y => let ⟨x, hx⟩ := hGF.2 (pathRwMap g y); ⟨x, hG.1 hx⟩⟩
 
 theorem two_out_of_three {A B C : Type u} (f : A → B) (g : B → C) :
@@ -202,7 +202,7 @@ theorem bijective_of_retract {α β : Type u} {F G : α → β}
   constructor
   · intro x₁ x₂ hF
     have h1 : G (s x₁) = G (s x₂) := by rw [hgs, hgs, hF]
-    have h2 := congrArg r (hG.1 h1)
+    have h2 := _root_.congrArg r (hG.1 h1)
     rwa [hrs, hrs] at h2
   · intro y
     obtain ⟨w, hw⟩ := hG.2 (t y)

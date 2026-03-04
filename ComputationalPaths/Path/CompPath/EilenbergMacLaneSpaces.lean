@@ -40,11 +40,11 @@ universe u
 /-! ## K(G,n) spaces -/
 
 /-- Eilenberg-MacLane space data in the CompPath namespace. -/
-abbrev KSpace (G : Type u) (n : Nat) : Type (u + 1) :=
+abbrev KSpace (G : Type u) (n : Nat) : Type (u + 3) :=
   EilenbergMacLane.KSpace G n
 
 /-- K(G,1) alias in the CompPath namespace. -/
-abbrev KOneSpace (G : Type u) : Type (u + 1) :=
+abbrev KOneSpace (G : Type u) : Type (u + 3) :=
   EilenbergMacLane.KOneSpace G
 
 /-- View a K(G,n) space as a pointed type. -/

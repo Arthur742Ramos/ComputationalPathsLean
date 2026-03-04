@@ -28,7 +28,8 @@ import ComputationalPaths.Path.Rewrite.GroupoidTRS
 namespace ComputationalPaths.Path.Rewrite.TerminationProofs
 
 open ComputationalPaths.Path.Rewrite.GroupoidTRS (Expr)
-open ComputationalPaths.Path.Rewriting (StepRule RuleShape shapeExprPair)
+open ComputationalPaths.Path.Rewriting (StepRule)
+open ComputationalPaths.Rewriting (RuleShape shapeExprPair)
 
 /-! ## Step Categories -/
 

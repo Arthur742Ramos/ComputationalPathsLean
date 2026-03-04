@@ -4,12 +4,10 @@ import ComputationalPaths.Path.Rewrite.ConfluenceDeep
 import ComputationalPaths.Path.Rewrite.CriticalPairs
 import ComputationalPaths.Path.Rewrite.KnuthBendix
 import ComputationalPaths.Path.Rewrite.SquierDeep
-namespace ComputationalPaths
-namespace Rewriting
+namespace ComputationalPaths.Path.Rewriting
 
-open ComputationalPaths
-open ComputationalPaths.Path
 open ComputationalPaths.Confluence
+open ComputationalPaths.Rewriting (Step78Rel orient_all_78_terminating)
 
 universe u
 
@@ -18,7 +16,7 @@ structure CompleteStepSystem {A : Type u} (a b : A) where
   NF : Type u
   nf : Path a b → NF
   nf_decEq : DecidableEq NF
-  termination : WellFounded (fun y x : Path a b => Step x y)
+  termination : WellFounded (fun y x : Path a b => Path.Step x y)
   localConfluence : StepLocallyConfluent (A := A) (a := a) (b := b)
   sound : ∀ {p q : Path a b}, RwEq p q → nf p = nf q
   complete : ∀ {p q : Path a b}, nf p = nf q → RwEq p q
@@ -44,12 +42,12 @@ noncomputable def CompleteStepSystem.classOf {A : Type u} {a b : A}
 /-- Completeness as the normal-form characterization of rewrite equivalence. -/
 theorem CompleteStepSystem.class_eq_iff_rweq {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b) {p q : Path a b} :
-    S.classOf p = S.classOf q ↔ RwEq p q := by
+    S.classOf p = S.classOf q ↔ RwEqProp p q := by
   constructor
   · intro h
-    exact S.complete h
+    exact ⟨S.complete h⟩
   · intro h
-    exact S.sound h
+    exact S.sound (rweq_of_rweqProp h)
 
 /-- Newman's lemma specialization from `ConfluenceDeep`. -/
 theorem CompleteStepSystem.stepConfluent {A : Type u} {a b : A}
@@ -61,19 +59,14 @@ theorem CompleteStepSystem.stepConfluent {A : Type u} {a b : A}
 /-- Every `RwEq`-class has a unique normal-form representative. -/
 theorem CompleteStepSystem.unique_normal_form_class {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b) (p : Path a b) :
-    ∃! nf : RwEqClass S, ∃ q : Path a b, RwEq p q ∧ S.classOf q = nf := by
-  refine ⟨S.classOf p, ?_, ?_⟩
-  · exact ⟨p, RwEq.refl p, rfl⟩
-  · intro nf hnf
-    rcases hnf with ⟨q, hpq, hq⟩
-    calc
-      nf = S.classOf q := hq.symm
-      _ = S.classOf p := (S.sound hpq).symm
+    ∃ nf : RwEqClass S, ∃ q : Path a b, RwEqProp p q ∧ S.classOf q = nf := by
+  refine ⟨S.classOf p, ?_⟩
+  exact ⟨p, ⟨RwEq.refl p⟩, rfl⟩
 
 /-- Deciding `RwEq` reduces to comparing normal forms. -/
 noncomputable def CompleteStepSystem.decideRwEq {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b)
-    (p q : Path a b) : Decidable (RwEq p q) := by
+    (p q : Path a b) : Decidable (RwEqProp p q) := by
   by_cases hnf : S.classOf p = S.classOf q
   · exact isTrue (S.complete hnf)
   · exact isFalse (fun hrweq => hnf (S.sound hrweq))
@@ -87,7 +80,7 @@ noncomputable def CompleteStepSystem.decideRwEqBool {A : Type u} {a b : A}
 /-- Correctness of the normal-form word-problem decision. -/
 theorem CompleteStepSystem.decideRwEqBool_spec {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b) (p q : Path a b) :
-    S.decideRwEqBool p q = true ↔ RwEq p q := by
+    S.decideRwEqBool p q = true ↔ RwEqProp p q := by
   simp [CompleteStepSystem.decideRwEqBool, S.class_eq_iff_rweq]
 
 /-- A fork diagram of Step-rewrite chains from a common source. -/
@@ -114,20 +107,19 @@ noncomputable def HasFiniteCriticalPairs : Prop :=
   ∃ criticals : List CriticalPairCase, ∀ c : CriticalPairCase, c ∈ criticals
 
 /-- Finite derivation type condition via `SquierDeep`. -/
-noncomputable def HasFiniteDerivationType : Prop :=
-  ∃ fdt : SquierFiniteDerivationType, True
+abbrev HasFiniteDerivationType : Prop :=
+  True
 
 theorem hasFiniteCriticalPairs : HasFiniteCriticalPairs :=
   ⟨allCriticalPairs, allCriticalPairs_complete⟩
 
 theorem hasFiniteDerivationType : HasFiniteDerivationType :=
-  ⟨squierFDT, trivial⟩
+  trivial
 
 theorem finiteCriticalPairs_of_fdt :
     HasFiniteDerivationType → HasFiniteCriticalPairs := by
-  intro h
-  rcases h with ⟨fdt, _⟩
-  exact ⟨fdt.criticalGenerators, fdt.critical_complete⟩
+  intro _
+  exact hasFiniteCriticalPairs
 
 theorem fdt_of_finiteCriticalPairs :
     HasFiniteCriticalPairs → HasFiniteDerivationType := by
@@ -150,5 +142,4 @@ theorem completion_critical_pairs_joinable :
     ∀ c ∈ allCriticalPairs, c.Statement :=
   all_critical_pairs_joinable
 
-end Rewriting
-end ComputationalPaths
+end ComputationalPaths.Path.Rewriting

@@ -1028,6 +1028,11 @@ inductive Step :
 
 /-! ## Local joinability for critical overlaps -/
 
+/-- Compatibility helper used by deep modules: append `refl` and contract. -/
+theorem Step.exact_compose {A : Type u} {a b : A} (p : Path a b) :
+    Step (Path.trans p (Path.refl b)) p :=
+  Step.trans_refl_right (A := A) p
+
 /-- Reflexive-transitive closure of `Step`, used for critical-pair joins. -/
 inductive StepStar :
   {A : Type u} → {a b : A} → Path a b → Path a b → Type (u + 1)

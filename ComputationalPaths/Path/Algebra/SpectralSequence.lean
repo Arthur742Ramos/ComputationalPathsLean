@@ -17,7 +17,7 @@ import ComputationalPaths.Path.Algebra.HomologicalAlgebra
 import ComputationalPaths.Path.Rewrite.ConfluenceDeep
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
-namespace ComputationalPaths.Path.Algebra
+namespace ComputationalPaths.Path.Algebra.SpectralSequence
 
 open ComputationalPaths
 open ComputationalPaths.Path
@@ -163,4 +163,4 @@ theorem collapses_at_E2_of_complete {A : Type u} {a : A}
 
 end
 
-end ComputationalPaths.Path.Algebra
+end ComputationalPaths.Path.Algebra.SpectralSequence

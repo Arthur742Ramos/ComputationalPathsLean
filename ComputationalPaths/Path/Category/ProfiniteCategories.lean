@@ -13,7 +13,7 @@ Galois categories, Noohi fundamental group, condensed perspective.
 
 import ComputationalPaths.Path.Basic.Core
 
-namespace ComputationalPaths
+namespace ComputationalPaths.Path.Category.ProfiniteCategories
 
 open List
 
@@ -240,9 +240,9 @@ theorem pontryagin_profinite_discrete : True := by trivial
 /-- The absolute Galois group is profinite. -/
 theorem absolute_galois_is_profinite : True := by trivial
 
-end ComputationalPaths
+end ComputationalPaths.Path.Category.ProfiniteCategories
 
-namespace ComputationalPaths
+namespace ComputationalPaths.Path.Category.ProfiniteCategories
 
 open List
 
@@ -448,4 +448,4 @@ theorem profinitePathRewrite_confluent {Obj : Type u} {x y : Obj}
   refine ⟨q, rfl, ?_⟩
   exact Eq.trans hpr.symm hpq
 
-end ComputationalPaths
+end ComputationalPaths.Path.Category.ProfiniteCategories

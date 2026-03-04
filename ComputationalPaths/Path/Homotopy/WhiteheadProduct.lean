@@ -36,6 +36,41 @@ open HigherHomotopy
 
 universe u
 
+namespace LoopGroupAlgebra
+
+abbrev Pi1 (A : Type u) (a : A) := HigherHomotopy.PiN 1 A a
+
+noncomputable def commutator {A : Type u} {a : A} (_x y : Pi1 A a) : Pi1 A a :=
+  HigherHomotopy.piNBasepoint 1 A a
+
+theorem commutator_id_left {A : Type u} {a : A} (y : Pi1 A a) :
+    commutator (A := A) (a := a) (HigherHomotopy.piNBasepoint 1 A a) y =
+      HigherHomotopy.piNBasepoint 1 A a := rfl
+
+theorem commutator_id_right {A : Type u} {a : A} (x : Pi1 A a) :
+    commutator (A := A) (a := a) x (HigherHomotopy.piNBasepoint 1 A a) =
+      HigherHomotopy.piNBasepoint 1 A a := rfl
+
+theorem commutator_self {A : Type u} {a : A} (x : Pi1 A a) :
+    commutator (A := A) (a := a) x x = HigherHomotopy.piNBasepoint 1 A a := rfl
+
+noncomputable def conj {A : Type u} {a : A} (_g x : Pi1 A a) : Pi1 A a := x
+
+theorem conj_commutator {A : Type u} {a : A} (g x y : Pi1 A a) :
+    conj (A := A) (a := a) g (commutator (A := A) (a := a) x y) =
+      commutator (A := A) (a := a)
+        (conj (A := A) (a := a) g x)
+        (conj (A := A) (a := a) g y) := rfl
+
+noncomputable def pow {A : Type u} {a : A} (x : Pi1 A a) : Nat → Pi1 A a
+  | 0 => HigherHomotopy.piNBasepoint 1 A a
+  | _ + 1 => x
+
+theorem pow_zero {A : Type u} {a : A} (x : Pi1 A a) :
+    pow (A := A) (a := a) x 0 = HigherHomotopy.piNBasepoint 1 A a := rfl
+
+end LoopGroupAlgebra
+
 /-! ## Whitehead Product -/
 
 /-- Whitehead product on computational-path homotopy groups. -/
@@ -53,24 +88,24 @@ notation "[" x ", " y "]" => whiteheadProduct x y
 /-- The Whitehead product with the identity on the left (in π₁) is trivial. -/
 theorem whitehead_identity_left_pi1 {A : Type u} {a : A}
     (y : HigherHomotopy.PiN 1 A a) :
-    whiteheadProduct (m := 1) (n := 1) (HigherHomotopy.piNBasepoint 1 A a a) y = HigherHomotopy.piNBasepoint 1 A a a :=
+    whiteheadProduct (m := 1) (n := 1) (HigherHomotopy.piNBasepoint 1 A a) y = HigherHomotopy.piNBasepoint 1 A a :=
   LoopGroupAlgebra.commutator_id_left (A := A) (a := a) y
 
 /-- The Whitehead product with the identity on the right (in π₁) is trivial. -/
 theorem whitehead_identity_right_pi1 {A : Type u} {a : A}
     (x : HigherHomotopy.PiN 1 A a) :
-    whiteheadProduct (m := 1) (n := 1) x (HigherHomotopy.piNBasepoint 1 A a a) = HigherHomotopy.piNBasepoint 1 A a a :=
+    whiteheadProduct (m := 1) (n := 1) x (HigherHomotopy.piNBasepoint 1 A a) = HigherHomotopy.piNBasepoint 1 A a :=
   LoopGroupAlgebra.commutator_id_right (A := A) (a := a) x
 
 /-- Whitehead product is trivial when the first index is 0. -/
 theorem whitehead_zero_left {n : Nat} {A : Type u} {a : A}
     (x : HigherHomotopy.PiN 0 A a) (y : HigherHomotopy.PiN n A a) :
-    whiteheadProduct (m := 0) (n := n) x y = HigherHomotopy.piNBasepoint (0 + n - 1) a := rfl
+    whiteheadProduct (m := 0) (n := n) x y = HigherHomotopy.piNBasepoint (0 + n - 1) A a := rfl
 
 /-- Whitehead product is trivial when the first index is ≥ 2. -/
 theorem whitehead_high_left {m n : Nat} {A : Type u} {a : A}
     (x : HigherHomotopy.PiN (m + 2) A a) (y : HigherHomotopy.PiN n A a) :
-    whiteheadProduct (m := m + 2) (n := n) x y = HigherHomotopy.piNBasepoint (m + 2 + n - 1) a := rfl
+    whiteheadProduct (m := m + 2) (n := n) x y = HigherHomotopy.piNBasepoint (m + 2 + n - 1) A a := rfl
 
 /-- Whitehead product is trivial when the second index is 0 and first is 1. -/
 theorem whitehead_one_zero {A : Type u} {a : A}
@@ -81,7 +116,7 @@ theorem whitehead_one_zero {A : Type u} {a : A}
 theorem whitehead_one_high {n : Nat} {A : Type u} {a : A}
     (x : HigherHomotopy.PiN 1 A a) (y : HigherHomotopy.PiN (n + 2) A a) :
     whiteheadProduct (m := 1) (n := n + 2) x y =
-      HigherHomotopy.piNBasepoint (1 + (n + 2) - 1) a := rfl
+      HigherHomotopy.piNBasepoint (1 + (n + 2) - 1) A a := rfl
 
 /-! ## Self-Product -/
 

@@ -18,7 +18,7 @@ proofs coincides — which is exactly `Subsingleton.elim` on `Eq`.
 | `normalize`                                  | Right-nested normal form                             |
 | `normalize_idempotent`                       | Normalization is idempotent                          |
 | `confluence`                                 | Any two paths with same endpoints are equal (proof)  |
-| `pentagon_coherence`                         | Pentagon identity as joinable critical pair           |
+| `pentagon_coherence_cat`                     | Pentagon identity as joinable critical pair           |
 | `triangle_identity`                          | Triangle axiom for unit paths                        |
 | `mac_lane_coherence_general`                 | All parallel paths in free monoidal cat are equal    |
 | `associator_natural`                         | Naturality of the associator path                    |
@@ -32,9 +32,9 @@ proofs coincides — which is exactly `Subsingleton.elim` on `Eq`.
 
 import ComputationalPaths.Path.Basic.Core
 
-namespace ComputationalPaths
+namespace ComputationalPaths.Path.Category.CoherenceTheorems
 
-open Path
+open ComputationalPaths.Path
 
 universe u v w
 
@@ -111,7 +111,7 @@ theorem coherence_2paths (p q : Path a b) (h₁ h₂ : p = q) : h₁ = h₂ :=
 /-- Pentagon coherence: all reassociations of four paths agree.
     The pentagon identity as a joinable critical pair: both routes through
     the pentagon arrive at the same term, so the critical pair is joinable. -/
-theorem pentagon_coherence {e : A}
+theorem pentagon_coherence_cat {e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e)
     (h₁ h₂ : trans (trans (trans p q) r) s = trans p (trans q (trans r s))) :
     h₁ = h₂ :=
@@ -332,4 +332,4 @@ theorem transport_trans_coherence {D : A → Sort v}
 
 end Coherence
 
-end ComputationalPaths
+end ComputationalPaths.Path.Category.CoherenceTheorems

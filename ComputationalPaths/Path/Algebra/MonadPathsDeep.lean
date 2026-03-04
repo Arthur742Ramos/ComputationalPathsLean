@@ -13,6 +13,8 @@
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
 
+namespace ComputationalPaths.Path.Algebra.MonadPathsDeep
+
 -- ============================================================
 -- §1  Monad expressions (abstract endofunctor algebra)
 -- ============================================================
@@ -682,3 +684,5 @@ theorem tr_lift_comp_roundtrip (n : Nat) (a b : TrExpr) :
     TrPath (.lift n a ∘ₜ .lift n b) (.lift n (a ∘ₜ b)) :=
   ⟨tr_lift_comp n a b,
    TrPath.step (TrStep.liftComp' n a b) (TrPath.refl _)⟩
+
+end ComputationalPaths.Path.Algebra.MonadPathsDeep

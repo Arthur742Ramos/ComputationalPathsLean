@@ -16,6 +16,8 @@
 -- §1  Sorts and many‑sorted signatures
 -- ============================================================
 
+namespace ComputationalPaths.Path.Algebra.TypedRewritingDeep
+
 /-- A sort in the many‑sorted algebra. -/
 structure Sort' where
   id : Nat
@@ -640,3 +642,5 @@ theorem true_has_sort_bool : HasSort exSig exEnv (.const "true") sBool :=
 noncomputable def zero_typed_path :
     TypedPath exSig exEnv (.const "zero") (.const "zero") sNat :=
   .nil _ sNat zero_has_sort_nat
+
+end ComputationalPaths.Path.Algebra.TypedRewritingDeep

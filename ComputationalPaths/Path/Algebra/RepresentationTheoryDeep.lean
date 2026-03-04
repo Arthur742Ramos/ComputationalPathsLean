@@ -4,7 +4,7 @@
 
 import ComputationalPaths.Path.Basic
 
-namespace ComputationalPaths
+namespace ComputationalPaths.Path.Algebra.RepresentationTheoryDeep
 
 open Path
 
@@ -779,4 +779,4 @@ noncomputable def grand_coherence {G : Type u} {V : Type v}
   let lifted := Path.congrArg (rho.action g) combined
   Path.trans lifted (Path.refl _)
 
-end ComputationalPaths
+end ComputationalPaths.Path.Algebra.RepresentationTheoryDeep

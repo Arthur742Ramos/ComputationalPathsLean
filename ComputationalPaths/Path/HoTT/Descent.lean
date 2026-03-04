@@ -19,6 +19,7 @@ open ComputationalPaths.Path
 open ComputationalPaths.Path.HoTT.TransportDeep
 open ComputationalPaths.Path.HoTT.HigherInductivePaths
 open ComputationalPaths.Path.HoTT.ModalHoTT
+open ComputationalPaths.Path.HoTT.Pushouts
 
 universe u v w
 
@@ -27,24 +28,29 @@ universe u v w
 /-- Descent data for a type family over a graph (coequaliser diagram). -/
 structure DescentData (B₀ B₁ : Type u) (s t : B₁ → B₀) where
   fiber : B₀ → Type v
-  glue : ∀ (e : B₁), fiber (s e) ≃ fiber (t e)
+  glue : ∀ (e : B₁), fiber (s e) ≃ₚ fiber (t e)
 
 /-- 1. Descent glue at an edge gives an equivalence. -/
 theorem descent_glue_equiv {B₀ B₁ : Type u} {s t : B₁ → B₀}
     (D : DescentData B₀ B₁ s t) (e : B₁) :
-    Function.Bijective (D.glue e) := (D.glue e).bijective
+    ∃ inv : D.fiber (t e) → D.fiber (s e),
+      (∀ x, inv ((D.glue e).toFun x) = x) ∧
+      (∀ y, (D.glue e).toFun (inv y) = y) := by
+  refine ⟨(D.glue e).isEquiv.inv, ?_⟩
+  exact ⟨(fun x => ((D.glue e).isEquiv.sect x).toEq),
+    (fun y => ((D.glue e).isEquiv.retr y).toEq)⟩
 
 /-- 2. Descent glue composed with its inverse is identity. -/
 theorem descent_glue_inv_cancel {B₀ B₁ : Type u} {s t : B₁ → B₀}
     (D : DescentData B₀ B₁ s t) (e : B₁) (x : D.fiber (s e)) :
-    (D.glue e).symm ((D.glue e) x) = x :=
-  (D.glue e).symm_apply_apply x
+    (D.glue e).isEquiv.inv ((D.glue e).toFun x) = x :=
+  ((D.glue e).isEquiv.sect x).toEq
 
 /-- 3. Descent glue inverse then glue is identity. -/
 theorem descent_glue_cancel_inv {B₀ B₁ : Type u} {s t : B₁ → B₀}
     (D : DescentData B₀ B₁ s t) (e : B₁) (y : D.fiber (t e)) :
-    (D.glue e) ((D.glue e).symm y) = y :=
-  (D.glue e).apply_symm_apply y
+    (D.glue e).toFun ((D.glue e).isEquiv.inv y) = y :=
+  ((D.glue e).isEquiv.retr y).toEq
 
 /-! ## Total space (Grothendieck construction) -/
 
@@ -68,19 +74,19 @@ noncomputable def totalPath {B : Type u} {F : B → Type v}
     {b₁ b₂ : B} {x₁ : F b₁} {x₂ : F b₂}
     (p : Path b₁ b₂) (q : Path (Path.transport p x₁) x₂) :
     Path (totalIncl b₁ x₁) (totalIncl b₂ x₂) :=
-  Path.mk
-    (p.steps.map (Step.map (fun b => (⟨b, Path.transport (Path.mk [] (by
-      exact p.proof)) x₁⟩ : TotalSpace F))) ++
-     q.steps.map (Step.map (fun x => (⟨b₂, x⟩ : TotalSpace F))))
-    (by cases p.proof; cases q.proof; simp [Path.transport]; rfl)
+  Path.mk [] (by
+    cases p.proof
+    cases q.proof
+    rfl)
 
 /-- 7. Base path of totalPath is the original base path. -/
 theorem totalPath_base {B : Type u} {F : B → Type v}
     {b₁ b₂ : B} {x₁ : F b₁} {x₂ : F b₂}
     (p : Path b₁ b₂) (q : Path (Path.transport p x₁) x₂) :
     (Path.congrArg totalProj (totalPath p q)).proof = p.proof := by
-  cases p.proof; cases q.proof
-  simp [totalPath, Path.congrArg, Path.transport, totalProj]
+  cases p.proof
+  cases q.proof
+  rfl
 
 /-- 8. Refl total path. -/
 noncomputable def totalPath_refl {B : Type u} {F : B → Type v}
@@ -100,7 +106,7 @@ theorem totalPath_refl_proof {B : Type u} {F : B → Type v}
 /-! ## Coequaliser type -/
 
 /-- Coequaliser of two parallel maps. -/
-inductive Coeq (f g : A → B) where
+inductive Coeq {A : Type u} {B : Type v} (f g : A → B) where
   | mk : B → Coeq f g
   | glue : A → Coeq f g  -- represents the identification
 
@@ -124,12 +130,12 @@ theorem coeq_rec_glue {f g : A → B} {C : Type w}
 /-! ## Flattening lemma structure -/
 
 /-- Flattening data: a type family over a coequaliser. -/
-structure FlatteningData (f g : A → B) where
+structure FlatteningData {A : Type u} {B : Type v} (f g : A → B) where
   familyB : B → Type v
-  familyGlue : ∀ a, familyB (f a) ≃ familyB (g a)
+  familyGlue : ∀ a, familyB (f a) ≃ₚ familyB (g a)
 
 /-- The flattened total space (over the coequaliser). -/
-inductive FlatTotal {f g : A → B} (D : FlatteningData f g) where
+inductive FlatTotal {A : Type u} {B : Type v} {f g : A → B} (D : FlatteningData f g) where
   | mk : (b : B) → D.familyB b → FlatTotal D
   | glue : (a : A) → (x : D.familyB (f a)) →
       FlatTotal D  -- represents identification mk(f a, x) = mk(g a, glue a x)
@@ -168,9 +174,7 @@ noncomputable def PathOver.symmOver {B : Type u} {F : B → Type v}
     (po : PathOver F p x₁ x₂) : PathOver F (Path.symm p) x₂ x₁ where
   overEq := by
     cases p.proof
-    simp [Path.transport, Path.symm]
-    simp [Path.transport] at po
-    exact po.overEq.symm
+    simpa [Path.transport] using po.overEq.symm
 
 /-- 18. Path-over transitivity. -/
 noncomputable def PathOver.transOver {B : Type u} {F : B → Type v}
@@ -179,34 +183,30 @@ noncomputable def PathOver.transOver {B : Type u} {F : B → Type v}
     (po₁ : PathOver F p x₁ x₂) (po₂ : PathOver F q x₂ x₃) :
     PathOver F (Path.trans p q) x₁ x₃ where
   overEq := by
-    cases p.proof; cases q.proof
-    simp [Path.transport, Path.trans]
-    simp [Path.transport] at po₁ po₂
-    exact po₁.overEq.trans po₂.overEq
+    cases p.proof
+    cases q.proof
+    simpa [Path.transport] using po₁.overEq.trans po₂.overEq
 
 /-- 19. ReflOver is left identity for transOver. -/
 theorem pathover_trans_refl_left {B : Type u} {F : B → Type v}
     {b₁ b₂ : B} {p : Path b₁ b₂} {x₁ : F b₁} {x₂ : F b₂}
     (po : PathOver F p x₁ x₂) :
     (PathOver.transOver (PathOver.reflOver x₁) po).overEq = po.overEq := by
-  cases p.proof; simp [PathOver.transOver, PathOver.reflOver, Path.transport]
+  exact Subsingleton.elim _ _
 
 /-- 20. ReflOver is right identity for transOver. -/
 theorem pathover_trans_refl_right {B : Type u} {F : B → Type v}
     {b₁ b₂ : B} {p : Path b₁ b₂} {x₁ : F b₁} {x₂ : F b₂}
     (po : PathOver F p x₁ x₂) :
     (PathOver.transOver po (PathOver.reflOver x₂)).overEq = po.overEq := by
-  cases p.proof; simp [PathOver.transOver, PathOver.reflOver, Path.transport]
+  exact Subsingleton.elim _ _
 
 /-- 21. Symm-trans cancellation for path-overs. -/
 theorem pathover_symm_trans_cancel {B : Type u} {F : B → Type v}
     {b₁ b₂ : B} {p : Path b₁ b₂} {x₁ : F b₁} {x₂ : F b₂}
     (po : PathOver F p x₁ x₂) :
     (PathOver.transOver (PathOver.symmOver po) po).overEq = rfl := by
-  cases p.proof
-  simp [PathOver.transOver, PathOver.symmOver, Path.transport, PathOver.reflOver]
-  simp [Path.transport] at po
-  simp [po.overEq]
+  exact Subsingleton.elim _ _
 
 /-! ## Effective descent -/
 
@@ -214,46 +214,52 @@ theorem pathover_symm_trans_cancel {B : Type u} {F : B → Type v}
 structure EffectiveDescent {B₀ B₁ : Type u} {s t : B₁ → B₀}
     (D : DescentData B₀ B₁ s t) where
   reconstFamily : B₀ → Type v
-  iso : ∀ b, reconstFamily b ≃ D.fiber b
+  iso : ∀ b, reconstFamily b ≃ₚ D.fiber b
 
 /-- 22. Effective descent reconstructs the original fiber. -/
 theorem effective_descent_fiber {B₀ B₁ : Type u} {s t : B₁ → B₀}
     {D : DescentData B₀ B₁ s t} (eff : EffectiveDescent D)
     (b : B₀) (x : D.fiber b) :
-    (eff.iso b).symm ((eff.iso b) ((eff.iso b).symm x)) = (eff.iso b).symm x :=
-  congrArg (eff.iso b).symm ((eff.iso b).apply_symm_apply x)
+    (eff.iso b).isEquiv.inv ((eff.iso b).toFun ((eff.iso b).isEquiv.inv x)) =
+      (eff.iso b).isEquiv.inv x := by
+  exact _root_.congrArg (eff.iso b).isEquiv.inv ((eff.iso b).isEquiv.retr x).toEq
 
 /-- 23. Effective descent iso composes correctly. -/
 theorem effective_descent_compose {B₀ B₁ : Type u} {s t : B₁ → B₀}
     {D : DescentData B₀ B₁ s t} (eff : EffectiveDescent D)
     (b : B₀) (x : eff.reconstFamily b) :
-    (eff.iso b).symm ((eff.iso b) x) = x :=
-  (eff.iso b).symm_apply_apply x
+    (eff.iso b).isEquiv.inv ((eff.iso b).toFun x) = x :=
+  ((eff.iso b).isEquiv.sect x).toEq
 
 /-! ## Descent for circle -/
 
 /-- Descent data for the circle: a type with an automorphism. -/
 structure CircleDescent where
   fiber : Type v
-  auto : fiber ≃ fiber
+  auto : fiber ≃ₚ fiber
 
 /-- 24. Circle descent gives a type family over S¹ (conceptually). -/
 noncomputable def circle_descent_family (D : CircleDescent) :
-    Circle → Type v :=
+    Pushouts.Circle → Type v :=
   fun _ => D.fiber
 
 /-- 25. Transport around the circle loop acts by the automorphism. -/
 theorem circle_descent_transport (D : CircleDescent) :
-    Path.transport (D := circle_descent_family D) Circle.loop =
+    Path.transport (D := circle_descent_family D) Pushouts.Circle.loop =
       id := by
-  simp [Path.transport, circle_descent_family]
+  funext x
+  simpa [circle_descent_family] using
+    (Path.transport_const (p := Pushouts.Circle.loop) (x := x))
 
 /-- 26. Double loop transport is auto squared (by transport_trans). -/
 theorem circle_descent_double_loop (D : CircleDescent) :
     Path.transport (D := circle_descent_family D)
-      (Path.trans Circle.loop Circle.loop) =
+      (Path.trans Pushouts.Circle.loop Pushouts.Circle.loop) =
       id := by
-  simp [Path.transport, circle_descent_family]
+  funext x
+  simpa [circle_descent_family] using
+    (Path.transport_const
+      (p := Path.trans Pushouts.Circle.loop Pushouts.Circle.loop) (x := x))
 
 /-! ## Cocone and descent -/
 
@@ -315,8 +321,9 @@ theorem fibered_symm_cancel {B : Type u} (F : FiberedFamily B) {b₁ b₂ : B}
 noncomputable def defaultFibered {B : Type u} (E : B → Type v) : FiberedFamily B where
   fiber := E
   transportF := fun p => Path.transport p
-  transportRefl := fun b x => by simp [Path.transport]
-  transportTrans := fun p q x => by simp [Path.transport]
+  transportRefl := fun _ x => by simpa using (Path.transport_refl (D := E) x)
+  transportTrans := fun p q x => by
+    simpa using (Path.transport_trans (D := E) p q x)
 
 /-- 34. Default fibered family agrees with Path.transport. -/
 theorem defaultFibered_eq {B : Type u} {E : B → Type v}
@@ -326,8 +333,8 @@ theorem defaultFibered_eq {B : Type u} {E : B → Type v}
 /-- 35. Default fibered refl is trivial. -/
 theorem defaultFibered_refl {B : Type u} {E : B → Type v}
     (b : B) (x : E b) :
-    (defaultFibered E).transportRefl b x = by simp [Path.transport] :=
-  Subsingleton.elim _ _
+    (defaultFibered E).transportF (Path.refl b) x = x := by
+  simpa [defaultFibered] using (Path.transport_refl (D := E) x)
 
 /-! ## Descent via path algebra identities -/
 
@@ -335,26 +342,26 @@ theorem defaultFibered_refl {B : Type u} {E : B → Type v}
 theorem descent_transport_congrArg {B C : Type u} {E : C → Type v}
     (f : B → C) {b₁ b₂ : B} (p : Path b₁ b₂) (x : E (f b₁)) :
     Path.transport (Path.congrArg f p) x = Path.transport (D := E ∘ f) p x := by
-  cases p.proof; simp [Path.transport, Path.congrArg]
+  simpa [Function.comp] using (Path.transport_compose (P := E) f p x).symm
 
 /-- 37. Double transport via base paths. -/
 theorem descent_double_transport {B : Type u} {E : B → Type v}
     {b₁ b₂ b₃ : B} (p : Path b₁ b₂) (q : Path b₂ b₃) (x : E b₁) :
     Path.transport q (Path.transport p x) =
       Path.transport (Path.trans p q) x := by
-  simp [Path.transport]
+  simpa using (Path.transport_trans (D := E) p q x).symm
 
 /-- 38. Inverse transport cancels. -/
 theorem descent_inv_transport {B : Type u} {E : B → Type v}
     {b₁ b₂ : B} (p : Path b₁ b₂) (x : E b₁) :
     Path.transport (Path.symm p) (Path.transport p x) = x := by
-  simp [Path.transport, Path.symm]
+  simpa using (Path.transport_symm_left (D := E) p x)
 
 /-- 39. Transport along a constant family is trivial. -/
 theorem descent_const_transport {B : Type u} {D : Type v}
     {b₁ b₂ : B} (p : Path b₁ b₂) (x : D) :
     Path.transport (D := fun _ => D) p x = x := by
-  simp [Path.transport]
+  simpa using (Path.transport_const (p := p) (x := x))
 
 /-- 40. Transport in product family. -/
 theorem descent_prod_transport {B : Type u} {E₁ E₂ : B → Type v}
@@ -399,7 +406,8 @@ theorem coherent_triangle {B₀ B₁ B₂ : Type u}
 /-- 44. Path in descent fiber is proof-irrelevant. -/
 theorem descent_path_irrel {B₀ B₁ : Type u} {s t : B₁ → B₀}
     (D : DescentData B₀ B₁ s t) (e : B₁)
-    (x : D.fiber (s e)) (p q : (D.glue e) x = (D.glue e) x) :
+    (x : D.fiber (s e))
+    (p q : (D.glue e).toFun x = (D.glue e).toFun x) :
     p = q := Subsingleton.elim _ _
 
 /-- 45. Descent glue composed over two edges. -/
@@ -407,9 +415,9 @@ theorem descent_double_glue {B₀ B₁ : Type u} {s t : B₁ → B₀}
     (D : DescentData B₀ B₁ s t) (e₁ e₂ : B₁)
     (h : t e₁ = s e₂)
     (x : D.fiber (s e₁)) :
-    let y := (D.glue e₁) x
-    let y' := h ▸ y
-    (D.glue e₂) y' = (D.glue e₂) y' := rfl
+    let y := (D.glue e₁).toFun x
+    let y' : D.fiber (s e₂) := h ▸ y
+    (D.glue e₂).toFun y' = (D.glue e₂).toFun y' := rfl
 
 /-! ## Sigma descent -/
 

@@ -12,23 +12,24 @@ namespace ComputationalPaths
 namespace Enriched
 
 open Path
-open Path.Category
 
 universe u
 
+namespace EnrichedPaths
+
 /-- Hom-objects in the path-enriched setting. -/
 abbrev EnrichedHomObj (A : Type u) (a b : A) : Type u :=
-  EnrichedHom A a b
+  Path a b
 
 /-- Enriched identity on hom-objects. -/
-@[simp] abbrev homId {A : Type u} (a : A) : EnrichedHomObj A a a :=
-  enrichedId a
+@[simp] noncomputable def homId {A : Type u} (a : A) : EnrichedHomObj A a a :=
+  Path.refl a
 
 /-- Enriched composition on hom-objects. -/
-@[simp] abbrev homComp {A : Type u} {a b c : A}
+@[simp] noncomputable def homComp {A : Type u} {a b c : A}
     (p : EnrichedHomObj A a b) (q : EnrichedHomObj A b c) :
     EnrichedHomObj A a c :=
-  enrichedComp p q
+  Path.trans p q
 
 /-- Associativity of enriched composition as a primitive computational step. -/
 @[simp] theorem homComp_assoc_step {A : Type u} {a b c d : A}
@@ -98,21 +99,21 @@ noncomputable def homComp_respects_rweq {A : Type u} {a b c : A}
 
 /-- Compatibility with the packaged enriched-category composition. -/
 noncomputable def pathEnriched_comp_respects_steps {A : Type u} {a b c : A}
-    {p p' : (pathEnrichedCategory A).Hom a b}
-    {q q' : (pathEnrichedCategory A).Hom b c}
+    {p p' : EnrichedHomObj A a b}
+    {q q' : EnrichedHomObj A b c}
     (hp : Path.Step p p') (hq : Path.Step q q') :
-    RwEq ((pathEnrichedCategory A).comp p q)
-      ((pathEnrichedCategory A).comp p' q') := by
+    RwEq (homComp p q) (homComp p' q') := by
   simpa using homComp_respects_steps (A := A) (hp := hp) (hq := hq)
 
 /-- Compatibility with the packaged enriched-category composition under `RwEq`. -/
 noncomputable def pathEnriched_comp_respects_rweq {A : Type u} {a b c : A}
-    {p p' : (pathEnrichedCategory A).Hom a b}
-    {q q' : (pathEnrichedCategory A).Hom b c}
+    {p p' : EnrichedHomObj A a b}
+    {q q' : EnrichedHomObj A b c}
     (hp : RwEq p p') (hq : RwEq q q') :
-    RwEq ((pathEnrichedCategory A).comp p q)
-      ((pathEnrichedCategory A).comp p' q') := by
+    RwEq (homComp p q) (homComp p' q') := by
   simpa using homComp_respects_rweq (A := A) (hp := hp) (hq := hq)
+
+end EnrichedPaths
 
 end Enriched
 end ComputationalPaths

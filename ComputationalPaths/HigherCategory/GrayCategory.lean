@@ -5,7 +5,7 @@ This module packages Gray-style coherence data by treating 3-cells as primitive
 computational witnesses and 4-cells as higher contractions between them.
 -/
 
--- import ComputationalPaths.HigherCategory.TwoCategory  -- TEMPORARILY DISABLED: depends on broken Bicategory module
+import ComputationalPaths.HigherCategory.TwoCategory
 
 namespace ComputationalPaths
 namespace HigherCategory
@@ -23,14 +23,14 @@ variable {a b c d e : A}
 abbrev Hom (x y : A) : Type u := Path x y
 
 /-- 2-cells in the Gray-category scaffold. -/
-abbrev TwoCell {x y : A} (f g : Hom x y) : Type u := Derivation₂ f g
+abbrev TwoCell {x y : A} (f g : Hom x y) : Type (u + 2) := Derivation₂ f g
 
 /-- 3-cells in the Gray-category scaffold. -/
-abbrev ThreeCell {x y : A} {f g : Hom x y} (α β : TwoCell f g) : Type u := Derivation₃ α β
+abbrev ThreeCell {x y : A} {f g : Hom x y} (α β : TwoCell f g) : Type (u + 2) := Derivation₃ α β
 
 /-- 4-cells in the Gray-category scaffold. -/
 abbrev FourCell {x y : A} {f g : Hom x y} {α β : TwoCell f g}
-    (m₁ m₂ : ThreeCell α β) : Type u := Derivation₄ m₁ m₂
+    (m₁ m₂ : ThreeCell α β) : Type (u + 2) := Derivation₄ m₁ m₂
 
 /-- Pentagon 3-cell from the underlying bicategorical coherence. -/
 noncomputable def pentagon3 (f : Hom a b) (g : Hom b c) (h : Hom c d) (k : Hom d e) :
