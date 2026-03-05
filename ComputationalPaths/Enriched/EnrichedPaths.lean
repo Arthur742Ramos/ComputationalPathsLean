@@ -32,50 +32,50 @@ abbrev EnrichedHomObj (A : Type u) (a b : A) : Type u :=
   Path.trans p q
 
 /-- Associativity of enriched composition as a primitive computational step. -/
-@[simp] theorem homComp_assoc_step {A : Type u} {a b c d : A}
+@[simp] def homComp_assoc_step {A : Type u} {a b c d : A}
     (p : EnrichedHomObj A a b) (q : EnrichedHomObj A b c) (r : EnrichedHomObj A c d) :
     Path.Step (homComp (homComp p q) r) (homComp p (homComp q r)) :=
   Path.Step.trans_assoc p q r
 
 /-- Left unit for enriched composition as a primitive computational step. -/
-@[simp] theorem homComp_left_unit_step {A : Type u} {a b : A}
+@[simp] def homComp_left_unit_step {A : Type u} {a b : A}
     (p : EnrichedHomObj A a b) :
     Path.Step (homComp (homId a) p) p :=
   Path.Step.trans_refl_left p
 
 /-- Right unit for enriched composition as a primitive computational step. -/
-@[simp] theorem homComp_right_unit_step {A : Type u} {a b : A}
+@[simp] def homComp_right_unit_step {A : Type u} {a b : A}
     (p : EnrichedHomObj A a b) :
     Path.Step (homComp p (homId b)) p :=
   Path.Step.trans_refl_right p
 
 /-- Left inverse cancellation for enriched composition as a primitive step. -/
-@[simp] theorem homComp_inv_left_step {A : Type u} {a b : A}
+@[simp] def homComp_inv_left_step {A : Type u} {a b : A}
     (p : EnrichedHomObj A a b) :
     Path.Step (homComp (Path.symm p) p) (homId b) :=
   Path.Step.symm_trans p
 
 /-- Right inverse cancellation for enriched composition as a primitive step. -/
-@[simp] theorem homComp_inv_right_step {A : Type u} {a b : A}
+@[simp] def homComp_inv_right_step {A : Type u} {a b : A}
     (p : EnrichedHomObj A a b) :
     Path.Step (homComp p (Path.symm p)) (homId a) :=
   Path.Step.trans_symm p
 
 /-- Symmetry of enriched composition as a primitive computational step. -/
-@[simp] theorem homComp_symm_step {A : Type u} {a b c : A}
+@[simp] def homComp_symm_step {A : Type u} {a b c : A}
     (p : EnrichedHomObj A a b) (q : EnrichedHomObj A b c) :
     Path.Step (Path.symm (homComp p q)) (homComp (Path.symm q) (Path.symm p)) :=
   Path.Step.symm_trans_congr p q
 
 /-- A primitive left hom-object step is preserved by enriched composition. -/
-@[simp] theorem homComp_respects_step_left {A : Type u} {a b c : A}
+@[simp] def homComp_respects_step_left {A : Type u} {a b c : A}
     {p p' : EnrichedHomObj A a b} (q : EnrichedHomObj A b c)
     (h : Path.Step p p') :
     Path.Step (homComp p q) (homComp p' q) :=
   Path.Step.trans_congr_left q h
 
 /-- A primitive right hom-object step is preserved by enriched composition. -/
-@[simp] theorem homComp_respects_step_right {A : Type u} {a b c : A}
+@[simp] def homComp_respects_step_right {A : Type u} {a b c : A}
     (p : EnrichedHomObj A a b) {q q' : EnrichedHomObj A b c}
     (h : Path.Step q q') :
     Path.Step (homComp p q) (homComp p q') :=

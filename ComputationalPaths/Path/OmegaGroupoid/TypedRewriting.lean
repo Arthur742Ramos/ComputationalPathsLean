@@ -415,15 +415,13 @@ end Newman
 
 /-! ## Typed Instances for `Step`
 
-We lift `Step : Path a b → Path a b → Prop` into the Type-valued framework
-via `PLift`. -/
+We instantiate the Type-valued framework with the native `Step` relation. -/
 
 section StepInstances
 
 open Path Rewrite
 
-/-- Lift the Prop-valued `Step` relation into `Type` via `PLift`.
-    Note: `Step` lives at `Type 0` (Prop), so `StepT` lives at `Type 0`.
+/-- `Step` is already Type-valued, so `StepT` is just a universe-polymorphic alias.
     We fix the universe to 0 for this section. -/
 abbrev StepT {A : Type u} {a b : A} (p q : Path a b) : Type (u + 1) := Step p q
 
@@ -439,7 +437,7 @@ noncomputable def TStar.of_rw {p q : Path a₀ b₀} (h : Rw p q) :
     TStar StepT p q :=
   Classical.choice (TStar.of_rw_prop h)
 
-/-- `Step` is type-level locally confluent using the Prop-level proof. -/
+/-- `Step` is type-level locally confluent, via the existing `Nonempty` bridge. -/
 noncomputable def localConfluent_step
     [Rewrite.ConfluenceConstructive.HasLocalConfluenceProp.{0}] :
     TLocalConfluent (a := a₀) (b := b₀) StepT where

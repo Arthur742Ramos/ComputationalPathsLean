@@ -153,7 +153,7 @@ theorem collapses_at_E2_of_confluent {A : Type u} {a : A}
 
 /-- Complete rewriting (termination + local confluence) collapses at `E₂`. -/
 theorem collapses_at_E2_of_complete {A : Type u} {a : A}
-    (wf : WellFounded (fun y x : Loop A a => Step x y))
+    (wf : WellFounded (fun y x : Loop A a => Nonempty (Step x y)))
     (hLocal : ComputationalPaths.Confluence.StepLocallyConfluent (A := A) (a := a) (b := a)) :
     CollapsesAtE2 A a := by
   have hConf : ComputationalPaths.Confluence.StepConfluent (A := A) (a := a) (b := a) :=

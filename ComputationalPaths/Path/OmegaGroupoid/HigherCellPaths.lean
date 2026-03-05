@@ -8,9 +8,9 @@ open ComputationalPaths.Path.OmegaGroupoid
 universe u
 
 abbrev CPath {A : Type u} (a b : A) : Type u := ComputationalPaths.Path a b
-abbrev CStep {A : Type u} {a b : A} (p q : CPath a b) : Prop :=
+abbrev CStep {A : Type u} {a b : A} (p q : CPath a b) : Type (u + 1) :=
   ComputationalPaths.Path.Step p q
-abbrev CRwEq {A : Type u} {a b : A} (p q : CPath a b) : Type u :=
+abbrev CRwEq {A : Type u} {a b : A} (p q : CPath a b) : Type (u + 1) :=
   ComputationalPaths.Path.RwEq p q
 
 section HigherCells

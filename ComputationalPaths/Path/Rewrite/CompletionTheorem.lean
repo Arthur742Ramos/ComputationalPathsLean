@@ -16,7 +16,7 @@ structure CompleteStepSystem {A : Type u} (a b : A) where
   NF : Type u
   nf : Path a b → NF
   nf_decEq : DecidableEq NF
-  termination : WellFounded (fun y x : Path a b => Path.Step x y)
+  termination : WellFounded (fun y x : Path a b => Nonempty (Path.Step x y))
   localConfluence : StepLocallyConfluent (A := A) (a := a) (b := b)
   sound : ∀ {p q : Path a b}, RwEq p q → nf p = nf q
   complete : ∀ {p q : Path a b}, nf p = nf q → RwEq p q
