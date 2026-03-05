@@ -984,4 +984,5 @@ import ComputationalPaths.Path.Rewrite.ConfluenceDeepType
 import ComputationalPaths.Path.Rewrite.RewritingDeep
 import ComputationalPaths.Path.OmegaGroupoid.EckmannHiltonProof
 import ComputationalPaths.Path.OmegaGroupoid.PentagonProof
+import ComputationalPaths.Path.OmegaGroupoid.OmegaWeakGroupoid
 import ComputationalPaths.Path.Algebra.DeformationDeep
