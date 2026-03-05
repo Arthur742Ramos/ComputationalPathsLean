@@ -982,3 +982,4 @@ import ComputationalPaths.Path.TransportDeep
 import ComputationalPaths.Path.Homotopy.KillerExamples
 import ComputationalPaths.Path.Rewrite.ConfluenceDeepType
 import ComputationalPaths.Path.Rewrite.RewritingDeep
+import ComputationalPaths.Path.OmegaGroupoid.EckmannHiltonProof
