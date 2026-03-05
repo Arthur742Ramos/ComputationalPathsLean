@@ -235,9 +235,11 @@ def exprStep_measure4_decrease {p q : Expr} (h : Expr.Step p q) :
     exact ⟨rfl, hw, rfl, hl⟩
 
 /-- The Expr.Step relation is well-founded (alternative proof via 4-component measure). -/
-def exprStep_wf_via_multi : WellFounded (fun q p : Expr => Expr.Step p q) :=
+def exprStep_wf_via_multi : WellFounded (fun q p : Expr => Expr.StepProp p q) :=
   Subrelation.wf
-    (fun h => exprStep_measure4_decrease h)
+    (fun h => by
+      rcases h with ⟨h⟩
+      exact exprStep_measure4_decrease h)
     (InvImage.wf exprMeasure4 natLex4_wf)
 
 /-! ## Size-change analysis per rule shape -/

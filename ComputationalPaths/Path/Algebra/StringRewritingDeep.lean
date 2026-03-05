@@ -49,6 +49,9 @@ def Step.decompose {R : SRS} {u v : Word} (s : Step R u v) :
   cases s with
   | apply pre suf r hmem => exact ⟨pre, suf, r, hmem, rfl, rfl⟩
 
+/-- Prop-level witness that a one-step rewrite exists. -/
+def StepStar (R : SRS) (u v : Word) : Prop := Nonempty (Step R u v)
+
 -- ============================================================
 -- §3  Multi‑step paths (Path)
 -- ============================================================
@@ -270,24 +273,25 @@ theorem RPath.length_nonincreasing {R : SRS} (hR : SRS.lengthReducing R)
 
 /-- A word is in normal form if no rule applies. -/
 noncomputable def NormalForm (R : SRS) (w : Word) : Prop :=
-  ∀ v, ¬ Step R w v
+  ∀ v, ¬ StepStar R w v
 
 /-- Theorem 24: A normal form has no outgoing steps. -/
 def NormalForm.no_step {R : SRS} {w : Word} (hnf : NormalForm R w) :
-    ∀ v, ¬ Step R w v := hnf
+    ∀ v, ¬ StepStar R w v := hnf
 
 /-- Theorem 25: If w is a normal form, the only path from w reaches w itself. -/
 theorem NormalForm.path_eq_refl {R : SRS} {w v : Word}
     (hnf : NormalForm R w) (p : RPath R w v) : w = v := by
   cases p with
   | refl _ => rfl
-  | step s _ => exact absurd s (hnf _)
+  | step s _ => exact absurd ⟨s⟩ (hnf _)
 
 /-- Theorem 26: In a length‑reducing system, the empty word is normal form
     if no rule has empty lhs. -/
 theorem empty_nf_of_nonempty_lhs {R : SRS}
     (hne : ∀ r ∈ R, r.lhs.length > 0) : NormalForm R [] := by
   intro v hstep
+  rcases hstep with ⟨hstep⟩
   obtain ⟨pre, suf, r, hmem, heq, _⟩ := Step.decompose hstep
   have : (pre ++ r.lhs ++ suf).length > 0 := by
     simp [List.length_append]; have := hne r hmem; omega
@@ -557,8 +561,10 @@ theorem Joinable.mono {R S : SRS} (hsub : ∀ r, r ∈ R → r ∈ S)
   exact ⟨d, RPath.mono hsub ha, RPath.mono hsub hb⟩
 
 /-- Theorem 61: Empty SRS has no steps. -/
-def no_step_empty_srs (u v : Word) : ¬ Step ([] : SRS) u v := by
-  intro h; cases h with
+def no_step_empty_srs (u v : Word) : ¬ StepStar ([] : SRS) u v := by
+  intro h
+  rcases h with ⟨h⟩
+  cases h with
   | apply _ _ r hmem => simp at hmem
 /-- Theorem 62: Every word is a normal form in the empty SRS. -/
 theorem nf_empty_srs (w : Word) : NormalForm ([] : SRS) w := by
@@ -584,14 +590,14 @@ noncomputable def commRule : Rule := ⟨[symA, symB], [symB, symA]⟩
 noncomputable def commSRS : SRS := [commRule]
 
 /-- Theorem 64: We can swap ab to ba. -/
-def swap_ab : Step commSRS [symA, symB] [symB, symA] := by
+noncomputable def swap_ab : Step commSRS [symA, symB] [symB, symA] := by
   have h1 : [symA, symB] = [] ++ commRule.lhs ++ [] := by simp [commRule]
   have h2 : [symB, symA] = [] ++ commRule.rhs ++ [] := by simp [commRule]
   rw [h1, h2]
   exact Step.apply [] [] commRule (List.Mem.head _)
 
 /-- Theorem 65: aab → aba via the rule in context. -/
-def swap_aab_aba : Step commSRS [symA, symA, symB] [symA, symB, symA] := by
+noncomputable def swap_aab_aba : Step commSRS [symA, symA, symB] [symA, symB, symA] := by
   have h1 : [symA, symA, symB] = [symA] ++ commRule.lhs ++ [] := by simp [commRule]
   have h2 : [symA, symB, symA] = [symA] ++ commRule.rhs ++ [] := by simp [commRule]
   rw [h1, h2]
@@ -651,7 +657,7 @@ theorem Rule.map_rhs (f : Sym → Word) (r : Rule) :
 /-- The diamond property (strong confluence). -/
 noncomputable def Diamond (R : SRS) : Prop :=
   ∀ a b c : Word, Step R a b → Step R a c →
-    ∃ d, Step R b d ∧ Step R c d ∨ (b = c ∧ b = d)
+    ∃ d, StepStar R b d ∧ StepStar R c d ∨ (b = c ∧ b = d)
 
 /-- Theorem 72: Diamond implies local confluence. -/
 theorem diamond_implies_lc {R : SRS} (hd : Diamond R) : LocallyConfluent R := by
@@ -660,6 +666,8 @@ theorem diamond_implies_lc {R : SRS} (hd : Diamond R) : LocallyConfluent R := by
   cases h with
   | inl h =>
     obtain ⟨hbd, hcd⟩ := h
+    rcases hbd with ⟨hbd⟩
+    rcases hcd with ⟨hcd⟩
     exact ⟨d, RPath.single hbd, RPath.single hcd⟩
   | inr h =>
     obtain ⟨hbc, hbd⟩ := h
