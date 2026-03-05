@@ -67,13 +67,15 @@
 \begin{abstract}
 We present a fully mechanized Lean~4 development of the theory of \emph{computational paths}, a proof-relevant account of equality in which
 an equality witness carries an explicit trace of elementary rewrite steps.
-The central technical choice is to place rewrite equivalence \(\RwEq\) in
-\(\Ty\) rather than \(\Prop\), preventing higher coherences from collapsing
-under proof irrelevance.
-We define steps, paths, and rewrite equivalence over a 77-constructor step
-relation; prove soundness and congruence properties; and establish
-Church--Rosser confluence for the completed groupoid fragment via a
-free-group interpretation.
+The central technical choice is to place the primitive step relation
+\(\Step\) and rewrite equivalence \(\RwEq\) in \(\Ty\,(u{+}1)\) rather than
+\(\Prop\), preventing higher coherences from collapsing under proof
+irrelevance.  When a \(\Prop\)-valued relation is required, we use
+\(\RwEqProp\;p\;q := \mathsf{Nonempty}(\RwEq\;p\;q)\).
+We define steps, paths, and rewrite equivalence over the step relation in
+\texttt{Path/Rewrite/Step.lean}; prove soundness and congruence properties; and
+establish type-valued Church--Rosser confluence for the completed groupoid
+fragment (\texttt{Path/Rewrite/ConfluenceDeepType.lean}).
 From these rewriting principles we construct explicit coherence witnesses
 (pentagon, triangle, interchange, Eckmann--Hilton) and assemble a weak
 \(\omega\)-groupoid structure inspired by Batanin--Leinster, with
@@ -166,9 +168,9 @@ comprises a term rewriting system (TRS) on the algebra of paths, with each
 rewrite rule corresponding to an algebraic identity of the groupoid structure.
 
 The present paper reports on a comprehensive formalization of this theory in the
-Lean~4 proof assistant~\cite{Moura2021}.  The formalization encompasses approximately
-1,300 source files, over 46,000 formally verified theorems, and contains no uses
-of \texttt{sorry} or \texttt{admit}---every theorem is fully proved.
+Lean~4 proof assistant~\cite{Moura2021}.  The formalization encompasses 1,297
+Lean source files and contains no uses of \texttt{sorry} or \texttt{admit}---every
+theorem is fully proved.
 The source code is publicly available~\cite{repo}.  The scale
 of the formalization is substantial---comparable, in focused depth on a
 single framework, to major efforts such as the Liquid Tensor
@@ -187,9 +189,11 @@ the same relational statement are definitionally equal.  A
 $\mathsf{Type}$-valued relation does \emph{not}: its inhabitants are genuine
 data that can be distinguished, case-split upon, and counted.
 
-Our rewrite equivalence $\mathsf{RwEq}$ is defined as:
+Our primitive step relation and rewrite equivalence are defined as:
 \[
-\mathsf{RwEq} : \mathsf{Path}\,a\,b \to \mathsf{Path}\,a\,b \to \mathsf{Type}\,u
+\mathsf{Step} : \mathsf{Path}\,a\,b \to \mathsf{Path}\,a\,b \to \mathsf{Type}(u{+}1),
+\qquad
+\mathsf{RwEq} : \mathsf{Path}\,a\,b \to \mathsf{Path}\,a\,b \to \mathsf{Type}(u{+}1)
 \]
 This choice is \emph{not} accidental.  It is the sine qua non for a
 proof-relevant theory of paths-between-paths.  If $\mathsf{RwEq}$ lived in
@@ -201,8 +205,11 @@ $\mathsf{Type}$, we ensure that distinct rewrite derivations are genuinely
 distinct inhabitants, and the higher groupoid structure is \emph{non-degenerate}.
 
 When classical or decidability reasoning requires a $\mathsf{Prop}$-valued
-wrapper, we provide $\mathsf{RwEqProp}$ as a $\mathsf{Nonempty}$ wrapper around
-$\mathsf{RwEq}$.  This two-tier design---$\mathsf{Type}$-valued for structure,
+wrapper, we provide
+\[
+\mathsf{RwEqProp}\;p\;q := \mathsf{Nonempty}(\mathsf{RwEq}\;p\;q).
+\]
+This two-tier design---$\mathsf{Type}$-valued for structure,
 $\mathsf{Prop}$-valued for logic---pervades the entire formalization and is
 essential for maintaining the separation between intensional and extensional
 equality.
@@ -217,25 +224,36 @@ following:
   lists of elementary rewrite steps, equip them with groupoid operations
   (composition, inversion, identity, congruence), and define the rewrite
   equivalence $\mathsf{RwEq}$ as the symmetric reflexive-transitive closure of
-  a 77-constructor step relation, targeting $\mathsf{Type}$ rather than
-  $\mathsf{Prop}$.
+  the step relation in \texttt{Path/Rewrite/Step.lean}, targeting
+  $\mathsf{Type}(u{+}1)$ rather than $\mathsf{Prop}$.
 
-\item \textbf{The weak $\omega$-groupoid theorem.}  We prove that for every type
-  $A$ and elements $a, b : A$, the space of paths $\mathsf{Path}\,a\,b$ modulo
-  $\mathsf{RwEq}$ carries the structure of a weak $\omega$-groupoid.  The
-  groupoid laws, their coherences, and the coherences of the coherences, all
-  arise from the rewrite rules---not from axiomatic postulates.
+\item \textbf{Type-valued rewriting combinators.}
+  \texttt{Path/Rewrite/RewritingDeep.lean} provides type-valued rewriting
+  combinators, conversions, and normal-form witnesses.
 
-\item \textbf{Confluence via Church--Rosser.}  We prove that the completed
-  groupoid fragment of the TRS is confluent by interpreting path expressions into
-  the free group and showing that every expression reduces to a unique canonical
-  form determined by its free-group image.
+\item \textbf{Type-valued confluence.}
+  \texttt{Path/Rewrite/ConfluenceDeepType.lean} establishes Church--Rosser
+  confluence with $\Sigma$-witnesses of joinability.
 
-\item \textbf{Explicit pentagon and Eckmann--Hilton.}  The pentagon coherence for
-  the monoidal structure on path composition, the triangle identity, and the
-  Eckmann--Hilton argument for $\pi_2$ are all constructed as explicit
-  $\mathsf{Step}$ chains in $\mathsf{RwEq}$, giving concrete rewrite-trace
-  witnesses for these standard coherences.
+\item \textbf{A lightweight weak 2-groupoid interface (towards a weak $\omega$-groupoid).}
+  The module \texttt{Path/OmegaGroupoid/OmegaWeakGroupoid.lean} packages the
+  0/1/2-cell structure carried by computational paths, taking 2-cells to be the
+  type-valued rewrite equivalences $\RwEq$.  It records the standard operations
+  (vertical composition, whiskering, horizontal composition) together with
+  pentagon/triangle/interchange/Eckmann--Hilton coherence statements after
+  truncation via \texttt{rweq\_toEq}.  The higher-dimensional development and the
+  contractibility-based Batanin--Leinster conditions are treated in the
+  \texttt{Path/OmegaGroupoid} development (see in particular
+  \texttt{Path/OmegaGroupoid/TruncationProof.lean}).
+
+\item \textbf{Explicit pentagon and Eckmann--Hilton.}  Genuine 2-cell coherence
+  proofs for the pentagon and Eckmann--Hilton arguments are constructed in
+  \texttt{Path/OmegaGroupoid/PentagonProof.lean} and
+  \texttt{Path/OmegaGroupoid/EckmannHiltonProof.lean}.
+
+\item \textbf{Deformation theory over $\RwEq$.}  The module
+  \texttt{Path/Algebra/DeformationDeep.lean} develops deformation theory built on
+  type-valued rewrite equivalence.
 
 \item \textbf{$\pi_1(S^1) \cong \mathbb{Z}$.}  The fundamental group of the
   circle is computed within the computational paths framework, using a
@@ -637,7 +655,7 @@ steps.
 The \emph{rewrite equivalence} $\mathsf{RwEq}$ is defined as the inductive
 type family
 \[
-\mathsf{RwEq} : \mathsf{Path}(a, b) \to \mathsf{Path}(a, b) \to \mathsf{Type}\,u
+\mathsf{RwEq} : \mathsf{Path}(a, b) \to \mathsf{Path}(a, b) \to \mathsf{Type}(u{+}1)
 \]
 with four constructors:
 \begin{enumerate}
@@ -653,7 +671,7 @@ with four constructors:
 If $\mathsf{RwEq}$ targeted $\mathsf{Prop}$, proof irrelevance would
 identify all inhabitants, collapsing the iterated construction to a
 set and trivializing all higher-dimensional structure.
-By targeting $\mathsf{Type}\,u$, each level of the tower carries
+By targeting $\mathsf{Type}(u{+}1)$, each level of the tower carries
 genuine information: a rewrite derivation
 $e : \mathsf{RwEq}(p, q)$ is a structured tree recording the specific sequence
 of rules applied, and two derivations $e_1, e_2 : \mathsf{RwEq}(p, q)$
@@ -664,9 +682,9 @@ See \S\ref{ssec:type-vs-prop-main} for the full discussion.
 \begin{definition}[$\mathsf{RwEqProp}$]\label{def:rweqprop}
 For classical and decidability applications, we define
 \[
-\mathsf{RwEqProp}(p, q) := \exists\, (e : \mathsf{RwEq}(p, q)),\; \top
+\mathsf{RwEqProp}(p, q) := \mathsf{Nonempty}(\mathsf{RwEq}(p, q))
 \]
-(implemented as $\mathsf{Nonempty}(\mathsf{RwEq}(p, q))$ in Lean).
+In Lean this is just \texttt{Nonempty} (\texttt{RwEq p q}).
 This is a $\mathsf{Prop}$-valued wrapper: it records \emph{that} a rewrite
 equivalence exists without preserving \emph{which} one.
 \end{definition}
@@ -679,7 +697,7 @@ That is, rewrite-equivalent paths witness the same propositional equality.
 \begin{proof}
 By induction on the derivation $e : \mathsf{RwEq}(p, q)$.  The base case
 $\mathsf{step}(h)$ follows from the fact that each step constructor preserves
-the semantic equality (proved by case analysis on all 77 constructors).  The
+the semantic equality (proved by case analysis on all Step constructors).  The
 $\mathsf{refl}$, $\mathsf{symm}$, and $\mathsf{trans}$ cases are immediate
 from reflexivity, symmetry, and transitivity of propositional equality.
 \end{proof}
@@ -776,6 +794,14 @@ both $u$ and $v$ (in any number of steps), there exists a common reduct $w$
 to which both $u$ and $v$ reduce~\cite{BaaderNipkow1998}.  Confluence is the central property ensuring
 that the rewriting system defines a well-behaved equivalence: it guarantees
 that distinct reduction strategies cannot lead to irreconcilable normal forms.
+
+In the Lean development, the type-valued closure is made explicit in
+\texttt{Path/Rewrite/ConfluenceDeepType.lean}, where the type-valued multi-step
+closure \texttt{RwT} and the abstract closure \texttt{ARTC} support confluence
+and Church--Rosser statements producing $\Sigma$-witnesses of joinability.
+Complementing this, \texttt{Path/Rewrite/RewritingDeep.lean} supplies
+combinators on multi-step reductions, conversion (zigzag) paths, and the
+\texttt{NormalFormWitness} package for normal forms.
 
 In this section we establish the confluence of the \emph{completed groupoid
 TRS}---the fragment of the step relation consisting of Rules 1--8 (the basic
@@ -1176,8 +1202,18 @@ as explicit $\RwEq$ witnesses constructed from $\Step$ chains.
 By ``explicit'' we mean that each coherence witness is a concrete term
 whose structure records which rewrite rules were applied and in what order;
 no coherence proof in the formalization invokes
-$\mathsf{Subsingleton.elim}$ at the $\RwEq$ level (though the underlying
-$\mathsf{Step}$ relation is $\Prop$-valued and therefore proof-irrelevant).
+$\mathsf{Subsingleton.elim}$ at the $\RwEq$ level.  Since $\Step$ and $\RwEq$
+are type-valued, these coherence witnesses are genuine data; when a
+propositional coherence statement is desired we apply the truncation
+map $\mathsf{rweq\_toEq}$.
+
+These constructions are realized in
+\texttt{Path/OmegaGroupoid/PentagonProof.lean} and
+\texttt{Path/OmegaGroupoid/EckmannHiltonProof.lean}.  The lightweight
+\texttt{Path/OmegaGroupoid/OmegaWeakGroupoid.lean} interface packages a weak
+2-groupoid/$\omega$-groupoid structure whose pentagon, triangle, interchange,
+and Eckmann--Hilton coherences are stated after truncation via
+\texttt{rweq\_toEq}.
 
 \subsection{Pentagon coherence}\label{subsec:pentagon}
 
@@ -2514,6 +2550,12 @@ machinery enables.
 The central result of this section is the computation of the
 fundamental group $\pi_1(S^1) \cong \mathbb{Z}$ via an encode--decode
 argument carried out entirely within the computational-path framework.
+
+Beyond the homotopy computations, \texttt{Path/Algebra/DeformationDeep.lean}
+develops deformation theory for computational paths: formal deformations and
+their equivalences, obstruction and unobstructedness criteria for extensions,
+and rigidity/formal rigidity results.  All equalities in this development are
+tracked by Type-valued $\RwEq$ witnesses.
 
 \subsection{The fundamental group of the circle}\label{subsec:pi1-circle}
 
