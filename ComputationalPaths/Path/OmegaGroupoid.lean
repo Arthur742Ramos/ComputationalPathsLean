@@ -146,6 +146,25 @@ noncomputable def toRwEq {p q : Path a b} : Derivation₂ p q → RwEq p q
   | .inv d => RwEq.symm (toRwEq d)
   | .vcomp d₁ d₂ => RwEq.trans (toRwEq d₁) (toRwEq d₂)
 
+/-- Reify an `RwEq` witness as an explicit level-2 derivation. -/
+noncomputable def ofRwEq {p q : Path a b} : RwEq p q → Derivation₂ p q
+  | .refl p => .refl p
+  | .step s => .step s
+  | .symm h => .inv (ofRwEq h)
+  | .trans h₁ h₂ => .vcomp (ofRwEq h₁) (ofRwEq h₂)
+
+@[simp] theorem ofRwEq_toRwEq {p q : Path a b} (d : Derivation₂ p q) :
+    ofRwEq d.toRwEq = d := by
+  induction d with
+  | refl p =>
+      rfl
+  | step s =>
+      rfl
+  | inv d ih =>
+      simp [Derivation₂.toRwEq, ofRwEq, ih]
+  | vcomp d₁ d₂ ih₁ ih₂ =>
+      simp [Derivation₂.toRwEq, ofRwEq, ih₁, ih₂]
+
 end Derivation₂
 
 /-! ## Bridging Lemma: Derivation₂ → RwEq
@@ -374,6 +393,15 @@ noncomputable def inv_congr₃ {a b : A} {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q} (h : Derivation₃ d₁ d₂) :
     Derivation₃ (.inv d₁) (.inv d₂) :=
   Derivation₃.inv_congr₃ h
+
+/-- Reify an `RwEq` witness as an explicit level-2 derivation. -/
+noncomputable abbrev derivation₂_of_rweq {a b : A} {p q : Path a b} (h : RwEq p q) :
+    Derivation₂ p q :=
+  Derivation₂.ofRwEq h
+
+/-- Proof-relevant 3-cells between parallel `RwEq` witnesses. -/
+abbrev RwEq₃ {a b : A} {p q : Path a b} (α β : RwEq p q) : Type (u + 2) :=
+  Derivation₃ (derivation₂_of_rweq α) (derivation₂_of_rweq β)
 
 /-! ## Contractibility at Level 3
 

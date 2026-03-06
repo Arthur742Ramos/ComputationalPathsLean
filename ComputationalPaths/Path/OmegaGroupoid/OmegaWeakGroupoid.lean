@@ -17,8 +17,8 @@ We take:
 - 2-cells: Type-valued rewrite equivalences `RwEq p q`
 
 and package the usual bicategorical coherence data:
-associator, left/right unitors, inverse laws, pentagon+triangle (at the `toEq` level),
-interchange and Eckmann–Hilton witnesses.
+associator, left/right unitors, inverse laws, and proof-relevant pentagon,
+triangle, interchange, and Eckmann–Hilton witnesses.
 
 No `sorry`/`admit`/new axioms and no `Path.ofEq`.
 -/
@@ -38,8 +38,8 @@ noncomputable section
 
 This structure is intentionally *lightweight*: it does not construct the full tower of
 higher cells (see `ComputationalPaths.Path.OmegaGroupoid` for the derivation tower).
-Instead it records the standard 2-dimensional operations and the canonical 3-dimensional
-coherence statements *after truncation* via `rweq_toEq`.
+Instead it records the standard 2-dimensional operations and the canonical proof-relevant
+3-dimensional coherences between parallel `RwEq` routes.
 -/
 structure OmegaWeakGroupoid (A : Type u) where
   /- 1-cell operations -/
@@ -74,7 +74,7 @@ structure OmegaWeakGroupoid (A : Type u) where
   cancelRight₂ : {a b c : A} → (p : Path a b) → (q : Path b c) →
       RwEq (comp₁ (inv₁ p) (comp₁ p q)) q
 
-  /- Pentagon and triangle routes + their truncated coherence -/
+  /- Pentagon and triangle routes + their proof-relevant coherence -/
 
   pentagonRight₂ : {a b c d e : A} →
       (p : Path a b) → (q : Path b c) → (r : Path c d) → (s : Path d e) →
@@ -90,10 +90,10 @@ structure OmegaWeakGroupoid (A : Type u) where
       RwEq (comp₁ (comp₁ (comp₁ p q) r) s) (comp₁ p (comp₁ q (comp₁ r s))) ×
       RwEq (comp₁ (comp₁ (comp₁ p q) r) s) (comp₁ p (comp₁ q (comp₁ r s)))
 
-  /-- Pentagon coherence after truncation. -/
-  pentagon_toEq : {a b c d e : A} →
+  /-- Pentagon coherence as a proof-relevant 3-cell between the two routes. -/
+  pentagon₃ : {a b c d e : A} →
       (p : Path a b) → (q : Path b c) → (r : Path c d) → (s : Path d e) →
-      rweq_toEq (pentagonRight₂ p q r s) = rweq_toEq (pentagonLeft₂ p q r s)
+      RwEq₃ (pentagonRight₂ p q r s) (pentagonLeft₂ p q r s)
 
   triangleLeft₂ : {a b c : A} → (p : Path a b) → (q : Path b c) →
       RwEq (comp₁ (comp₁ p (id₁ b)) q) (comp₁ p q)
@@ -101,27 +101,27 @@ structure OmegaWeakGroupoid (A : Type u) where
   triangleRight₂ : {a b c : A} → (p : Path a b) → (q : Path b c) →
       RwEq (comp₁ (comp₁ p (id₁ b)) q) (comp₁ p q)
 
-  /-- Triangle coherence after truncation. -/
-  triangle_toEq : {a b c : A} → (p : Path a b) → (q : Path b c) →
-      rweq_toEq (triangleLeft₂ p q) = rweq_toEq (triangleRight₂ p q)
+  /-- Triangle coherence as a proof-relevant 3-cell between the two routes. -/
+  triangle₃ : {a b c : A} → (p : Path a b) → (q : Path b c) →
+      RwEq₃ (triangleLeft₂ p q) (triangleRight₂ p q)
 
-  /- Interchange and Eckmann–Hilton (after truncation). -/
+  /- Interchange and Eckmann–Hilton (proof-relevant). -/
 
-  interchange_toEq : {a b c : A} →
+  interchange₃ : {a b c : A} →
       {p p' p'' : Path a b} → {q q' q'' : Path b c} →
       (α : RwEq p p') → (β : RwEq p' p'') → (γ : RwEq q q') → (δ : RwEq q' q'') →
-      rweq_toEq (hcomp₂ (vcomp₂ α β) (vcomp₂ γ δ)) =
-        rweq_toEq (vcomp₂ (hcomp₂ α γ) (hcomp₂ β δ))
+      RwEq₃ (hcomp₂ (vcomp₂ α β) (vcomp₂ γ δ))
+        (vcomp₂ (hcomp₂ α γ) (hcomp₂ β δ))
 
-  eckmann_hilton_toEq : {a : A} →
+  eckmann_hilton₃ : {a : A} →
       (α β : RwEq (id₁ a) (id₁ a)) →
-      rweq_toEq (vcomp₂ α β) = rweq_toEq (vcomp₂ β α)
+      RwEq₃ (vcomp₂ α β) (vcomp₂ β α)
 
 /-- The canonical `OmegaWeakGroupoid` on computational paths.
 
 Instantiated directly from:
 - `RwEq`/`Step` (associativity/unit/inverses and cancellation)
-- `GroupoidProofs` (pentagon/triangle `toEq` coherence)
+- `GroupoidProofs` (pentagon/triangle proof-relevant coherence)
 - `PentagonProof` (alternate pentagon route presentation)
 - `EckmannHiltonProof` (horizontal composition, interchange, Eckmann–Hilton)
 
@@ -156,20 +156,20 @@ noncomputable def compPathOmegaWeakGroupoid (A : Type u) : OmegaWeakGroupoid A w
   pentagonLeft₂ := fun p q r s =>
     ComputationalPaths.Path.OmegaGroupoidCompPaths.pentagon_left_route p q r s
   pentagonPair₂ := fun p q r s =>
-    ComputationalPaths.Path.pentagon_coherence p q r s
-  pentagon_toEq := fun p q r s =>
+    ComputationalPaths.Path.pentagon_routes p q r s
+  pentagon₃ := fun p q r s =>
     ComputationalPaths.Path.OmegaGroupoidCompPaths.pentagon_coherence p q r s
 
   triangleLeft₂ := fun p q =>
     ComputationalPaths.Path.OmegaGroupoidCompPaths.triangle_left_route p q
   triangleRight₂ := fun p q =>
     ComputationalPaths.Path.OmegaGroupoidCompPaths.triangle_right_route p q
-  triangle_toEq := fun p q =>
+  triangle₃ := fun p q =>
     ComputationalPaths.Path.OmegaGroupoidCompPaths.triangle_coherence p q
 
-  interchange_toEq := fun α β γ δ =>
+  interchange₃ := fun α β γ δ =>
     ComputationalPaths.EckmannHilton.interchange α β γ δ
-  eckmann_hilton_toEq := fun α β =>
+  eckmann_hilton₃ := fun α β =>
     ComputationalPaths.EckmannHilton.eckmann_hilton α β
 
 end

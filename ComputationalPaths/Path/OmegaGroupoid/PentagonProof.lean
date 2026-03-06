@@ -1,4 +1,6 @@
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.OmegaGroupoid
+import ComputationalPaths.Path.OmegaGroupoid.GroupoidProofs
 
 /-!
 # Pentagon Coherence — Genuine Proof
@@ -36,9 +38,7 @@ noncomputable def pentagon_right
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (Path.trans (Path.trans (Path.trans p q) r) s)
          (Path.trans p (Path.trans q (Path.trans r s))) :=
-  RwEq.trans
-    (rweq_of_step (Step.trans_assoc (Path.trans p q) r s))
-    (rweq_of_step (Step.trans_assoc p q (Path.trans r s)))
+  ComputationalPaths.Path.OmegaGroupoidCompPaths.pentagon_right_route p q r s
 
 /-- Path 2 (left route): three associativity steps.
     ((p∘q)∘r)∘s → (p∘(q∘r))∘s → p∘((q∘r)∘s) → p∘(q∘(r∘s)) -/
@@ -47,31 +47,10 @@ noncomputable def pentagon_left
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (Path.trans (Path.trans (Path.trans p q) r) s)
          (Path.trans p (Path.trans q (Path.trans r s))) :=
-  -- Step 1: ((p∘q)∘r)∘s → (p∘(q∘r))∘s  [assoc on left factor, s fixed]
-  let step1 : RwEq (Path.trans (Path.trans (Path.trans p q) r) s)
-                    (Path.trans (Path.trans p (Path.trans q r)) s) :=
-    rweq_trans_congr_left s (rweq_of_step (Step.trans_assoc p q r))
-  -- Step 2: (p∘(q∘r))∘s → p∘((q∘r)∘s)  [assoc on outer]
-  let step2 : RwEq (Path.trans (Path.trans p (Path.trans q r)) s)
-                    (Path.trans p (Path.trans (Path.trans q r) s)) :=
-    rweq_of_step (Step.trans_assoc p (Path.trans q r) s)
-  -- Step 3: p∘((q∘r)∘s) → p∘(q∘(r∘s))  [assoc on inner, p fixed]
-  let step3 : RwEq (Path.trans p (Path.trans (Path.trans q r) s))
-                    (Path.trans p (Path.trans q (Path.trans r s))) :=
-    rweq_trans_congr_right p (rweq_of_step (Step.trans_assoc q r s))
-  RwEq.trans step1 (RwEq.trans step2 step3)
+  ComputationalPaths.Path.OmegaGroupoidCompPaths.pentagon_left_route p q r s
 
-/-- **The Pentagon Identity**: both routes through the pentagon produce
-    RwEq witnesses with the same source and target.
-
-    Since RwEq is Type-valued (not Prop), these are genuine data —
-    the two routes are distinct 2-cells (rewrite sequences) connecting
-    the same pair of 1-cells. The fact that both exist demonstrates
-    the pentagon coherence condition.
-
-    A deeper coherence statement (that these two 2-cells are themselves
-    connected by a 3-cell) would be part of the full ω-groupoid structure. -/
-noncomputable def pentagon_coherence
+/-- The two explicit pentagon routes, packaged as a pair. -/
+noncomputable def pentagon_routes
     {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     (RwEq (Path.trans (Path.trans (Path.trans p q) r) s)
@@ -79,6 +58,14 @@ noncomputable def pentagon_coherence
     (RwEq (Path.trans (Path.trans (Path.trans p q) r) s)
           (Path.trans p (Path.trans q (Path.trans r s)))) :=
   (pentagon_right p q r s, pentagon_left p q r s)
+
+/-- Pentagon coherence as a genuine proof-relevant 3-cell between the two routes. -/
+noncomputable def pentagon_coherence
+    {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    OmegaGroupoid.RwEq₃ (pentagon_right p q r s) (pentagon_left p q r s) := by
+  simpa [pentagon_right, pentagon_left] using
+    (ComputationalPaths.Path.OmegaGroupoidCompPaths.pentagon_coherence p q r s)
 
 end
 

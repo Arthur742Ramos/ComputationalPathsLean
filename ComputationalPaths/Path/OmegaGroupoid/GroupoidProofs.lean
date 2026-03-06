@@ -33,6 +33,7 @@ explicitly named rewrite step.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.OmegaGroupoid
 namespace ComputationalPaths.Path.OmegaGroupoidCompPaths
 
 open ComputationalPaths
@@ -101,24 +102,20 @@ noncomputable def pentagon_left_route
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     RwEq (Path.trans (Path.trans (Path.trans p q) r) s)
       (Path.trans p (Path.trans q (Path.trans r s))) :=
-  RwEq.trans (pentagon_edge3 p q r s)
-    (RwEq.trans (pentagon_edge4 p q r s) (pentagon_edge5 p q r s))
+  RwEq.trans
+    (RwEq.trans (pentagon_edge3 p q r s) (pentagon_edge4 p q r s))
+    (pentagon_edge5 p q r s)
 
-/-- Pentagon coherence: both explicit routes induce the same underlying equality.
-    This is the computational content of Mac Lane's coherence theorem. -/
-theorem pentagon_coherence
+/-- Pentagon coherence as a genuine proof-relevant 3-cell between the two routes. -/
+noncomputable def pentagon_coherence
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
-    rweq_toEq (pentagon_right_route p q r s) =
-      rweq_toEq (pentagon_left_route p q r s) := by
-  rfl
-
-/-- Both pentagon routes, being `RwEq` witnesses between the same endpoints,
-    produce equal `toEq` proofs — this is the computational coherence. -/
-theorem pentagon_coherence_prop
-    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
-    (⟨pentagon_right_route p q r s⟩ : RwEqProp _ _) =
-      ⟨pentagon_left_route p q r s⟩ := by
-  rfl
+    OmegaGroupoid.RwEq₃ (pentagon_right_route p q r s) (pentagon_left_route p q r s) := by
+  simpa [OmegaGroupoid.RwEq₃, OmegaGroupoid.derivation₂_of_rweq,
+      OmegaGroupoid.Derivation₂.ofRwEq, pentagon_right_route, pentagon_left_route,
+      pentagon_edge1, pentagon_edge2, pentagon_edge3, pentagon_edge4, pentagon_edge5,
+      OmegaGroupoid.pentagonLeft, OmegaGroupoid.pentagonRight,
+      OmegaGroupoid.associator, OmegaGroupoid.whiskerLeft, OmegaGroupoid.whiskerRight]
+    using (OmegaGroupoid.pentagonCoherence p q r s)
 
 end Pentagon
 
@@ -168,12 +165,17 @@ noncomputable def triangle_right_route
       (Path.trans p q) :=
   triangle_edge3 p q
 
-/-- Triangle coherence: both routes produce the same underlying equality. -/
-theorem triangle_coherence
+/-- Triangle coherence as a genuine proof-relevant 3-cell between the two routes. -/
+noncomputable def triangle_coherence
     (p : Path a b) (q : Path b c) :
-    rweq_toEq (triangle_left_route p q) =
-      rweq_toEq (triangle_right_route p q) := by
-  rfl
+    OmegaGroupoid.RwEq₃ (triangle_left_route p q) (triangle_right_route p q) := by
+  simpa [OmegaGroupoid.RwEq₃, OmegaGroupoid.derivation₂_of_rweq,
+      OmegaGroupoid.Derivation₂.ofRwEq, triangle_left_route, triangle_right_route,
+      triangle_edge1, triangle_edge2, triangle_edge3,
+      OmegaGroupoid.triangleLeft, OmegaGroupoid.triangleRight,
+      OmegaGroupoid.associator, OmegaGroupoid.leftUnitor,
+      OmegaGroupoid.rightUnitor, OmegaGroupoid.whiskerLeft, OmegaGroupoid.whiskerRight]
+    using (OmegaGroupoid.triangleCoherence p q)
 
 /-- Extended triangle: also show `refl · (p · q)` reduces to `p · q`.
     Uses **Rule 3** (trans_refl_left). -/
@@ -191,13 +193,11 @@ noncomputable def triangle_extended_right
       (Path.trans p q) :=
   RwEq.step (Step.trans_refl_right (Path.trans p q))
 
-/-- Full triangle square: two routes from `(p · refl) · q` to `p · q`.
-    The square commutes at the `toEq` level. -/
-theorem triangle_square_coherence
+/-- Full triangle square: the same proof-relevant witness as `triangle_coherence`. -/
+noncomputable def triangle_square_coherence
     (p : Path a b) (q : Path b c) :
-    rweq_toEq (triangle_left_route p q) =
-      rweq_toEq (triangle_right_route p q) := by
-  rfl
+    OmegaGroupoid.RwEq₃ (triangle_left_route p q) (triangle_right_route p q) :=
+  triangle_coherence p q
 
 end Triangle
 
