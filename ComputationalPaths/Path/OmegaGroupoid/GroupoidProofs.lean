@@ -38,6 +38,7 @@ namespace ComputationalPaths.Path.OmegaGroupoidCompPaths
 
 open ComputationalPaths
 open ComputationalPaths.Path
+open ComputationalPaths.Path.OmegaGroupoid
 
 universe u
 
@@ -245,13 +246,14 @@ noncomputable def inverse_edge5_refl_left
     RwEq (Path.trans (Path.refl a) p) p :=
   RwEq.step (Step.trans_refl_left p)
 
-/-- Inverse route A: assoc → left-cancel → right-unit.
-    Step chain: **Rule 8** ⟶ (**Rule 76** ∘ **Rule 6**) ⟶ **Rule 4**. -/
+/-- Inverse route A: assoc → completion-cancel.
+    Step chain: **Rule 8** ⟶ **Rule 77**. -/
 noncomputable def inverse_route_assoc_then_cancel
     (p : Path a b) :
     RwEq (Path.trans (Path.trans p (Path.symm p)) p) p :=
-  RwEq.trans (inverse_edge1_assoc p)
-    (RwEq.trans (inverse_edge2_symm_trans p) (inverse_edge3_refl_right p))
+  RwEq.trans
+    (inverse_edge1_assoc p)
+    (RwEq.step (Step.trans_cancel_left p p))
 
 /-- Inverse route B: right-cancel → left-unit.
     Step chain: (**Rule 75** ∘ **Rule 5**) ⟶ **Rule 3**. -/
@@ -260,12 +262,39 @@ noncomputable def inverse_route_cancel_then_unit
     RwEq (Path.trans (Path.trans p (Path.symm p)) p) p :=
   RwEq.trans (inverse_edge4_trans_symm p) (inverse_edge5_refl_left p)
 
-/-- Inverse coherence: both cancellation routes produce the same `toEq`. -/
-theorem inverse_coherence
+/-- Inverse coherence as a genuine 3-cell between the two cancellation routes. -/
+noncomputable def inverse_coherence
+    (p : Path a b) :
+    OmegaGroupoid.RwEq₃ (inverse_route_assoc_then_cancel p)
+      (inverse_route_cancel_then_unit p) := by
+  change Derivation₃
+    (.vcomp (.step (Step.trans_assoc p (Path.symm p) p))
+      (.step (Step.trans_cancel_left p p)))
+    (.vcomp (.step (Step.trans_congr_left p (Step.trans_symm p)))
+      (.step (Step.trans_refl_left p)))
+  exact
+    Derivation₃.vcomp
+      (Derivation₃.inv
+        (Derivation₃.whiskerLeft₃
+          (.step (Step.trans_assoc p (Path.symm p) p))
+          (OmegaGroupoid.derivation₂_of_stepstar_single₃ (Step.trans_cancel_left p p))))
+      (Derivation₃.vcomp
+        (Derivation₃.step
+          (MetaStep₃.diamond_filler
+            (Step.trans_assoc p (Path.symm p) p)
+            (Step.trans_congr_left p (Step.trans_symm p))
+            (StepStar.single (Step.trans_cancel_left p p))
+            (StepStar.single (Step.trans_refl_left p))))
+        (Derivation₃.whiskerLeft₃
+          (.step (Step.trans_congr_left p (Step.trans_symm p)))
+          (OmegaGroupoid.derivation₂_of_stepstar_single₃ (Step.trans_refl_left p))))
+
+/-- Prop-level compatibility wrapper for `inverse_coherence`. -/
+theorem inverse_coherence_toEq
     (p : Path a b) :
     rweq_toEq (inverse_route_assoc_then_cancel p) =
-      rweq_toEq (inverse_route_cancel_then_unit p) := by
-  rfl
+      rweq_toEq (inverse_route_cancel_then_unit p) :=
+  OmegaGroupoid.trunc₃ (inverse_coherence p)
 
 end Inverse
 
@@ -297,11 +326,35 @@ noncomputable def double_inv_route2 (p : Path a b) :
     RwEq (Path.trans (Path.symm (Path.symm p)) (Path.symm p)) (Path.refl a) :=
   RwEq.step (Step.symm_trans (Path.symm p))
 
-/-- Double inverse coherence: both routes agree. -/
-theorem double_inverse_coherence (p : Path a b) :
+/-- Double inverse coherence as a genuine 3-cell between the two routes. -/
+noncomputable def double_inverse_coherence (p : Path a b) :
+    OmegaGroupoid.RwEq₃ (double_inv_route1 p) (double_inv_route2 p) := by
+  change Derivation₃
+    (.vcomp (.step (Step.trans_congr_left (Path.symm p) (Step.symm_symm p)))
+      (.step (Step.trans_symm p)))
+    (.step (Step.symm_trans (Path.symm p)))
+  exact
+    Derivation₃.vcomp
+      (Derivation₃.inv
+        (Derivation₃.whiskerLeft₃
+          (.step (Step.trans_congr_left (Path.symm p) (Step.symm_symm p)))
+          (OmegaGroupoid.derivation₂_of_stepstar_single₃ (Step.trans_symm p))))
+      (Derivation₃.vcomp
+        (Derivation₃.step
+          (MetaStep₃.diamond_filler
+            (Step.trans_congr_left (Path.symm p) (Step.symm_symm p))
+            (Step.symm_trans (Path.symm p))
+            (StepStar.single (Step.trans_symm p))
+            (StepStar.refl (Path.refl a))))
+        (Derivation₃.step
+          (MetaStep₃.vcomp_refl_right
+            (.step (Step.symm_trans (Path.symm p))))))
+
+/-- Prop-level compatibility wrapper for `double_inverse_coherence`. -/
+theorem double_inverse_coherence_toEq (p : Path a b) :
     rweq_toEq (double_inv_route1 p) =
-      rweq_toEq (double_inv_route2 p) := by
-  rfl
+      rweq_toEq (double_inv_route2 p) :=
+  OmegaGroupoid.trunc₃ (double_inverse_coherence p)
 
 end DoubleInverse
 
@@ -347,24 +400,57 @@ noncomputable def contravariance_route1
     (RwEq.step (Step.symm_trans_congr p (Path.trans q r)))
     (RwEq.step (Step.trans_congr_left (Path.symm p) (Step.symm_trans_congr q r)))
 
-/-- Route 2: apply contravariance to get `(q · r)⁻¹ · p⁻¹`, then decompose
-    `(q · r)⁻¹` into `r⁻¹ · q⁻¹`, yielding `(r⁻¹ · q⁻¹) · p⁻¹`.
-    Step chain: **Rule 7** (symm_trans_congr) ⟶ (**Rule 75** ∘ **Rule 7**).
-    This is the same as route 1 but stated separately for verification. -/
+/-- Route 2: decompose as in route 1, then travel through an associator round-trip.
+    Step chain: route 1 ⟶ **Rule 8** ⟶ **(sym Rule 8)**. -/
 noncomputable def contravariance_route2
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (Path.symm (Path.trans p (Path.trans q r)))
       (Path.trans (Path.trans (Path.symm r) (Path.symm q)) (Path.symm p)) :=
   RwEq.trans
-    (RwEq.step (Step.symm_trans_congr p (Path.trans q r)))
-    (RwEq.step (Step.trans_congr_left (Path.symm p) (Step.symm_trans_congr q r)))
+    (contravariance_route1 p q r)
+    (RwEq.trans
+      (RwEq.step (Step.trans_assoc (Path.symm r) (Path.symm q) (Path.symm p)))
+      (RwEq.symm
+        (RwEq.step (Step.trans_assoc (Path.symm r) (Path.symm q) (Path.symm p)))))
 
-/-- Contravariance coherence: both decompositions yield the same equality. -/
-theorem contravariance_coherence
+/-- Contravariance coherence as a genuine 3-cell between the two routes. -/
+noncomputable def contravariance_coherence
+    (p : Path a b) (q : Path b c) (r : Path c d) :
+    OmegaGroupoid.RwEq₃ (contravariance_route1 p q r)
+      (contravariance_route2 p q r) := by
+  change Derivation₃
+    (.vcomp
+      (.step (Step.symm_trans_congr p (Path.trans q r)))
+      (.step (Step.trans_congr_left (Path.symm p) (Step.symm_trans_congr q r))))
+    (.vcomp
+      (.vcomp
+        (.step (Step.symm_trans_congr p (Path.trans q r)))
+        (.step (Step.trans_congr_left (Path.symm p) (Step.symm_trans_congr q r))))
+      (.vcomp
+        (.step (Step.trans_assoc (Path.symm r) (Path.symm q) (Path.symm p)))
+        (.inv (.step (Step.trans_assoc (Path.symm r) (Path.symm q) (Path.symm p))))))
+  exact
+    Derivation₃.inv
+      (Derivation₃.vcomp
+        (Derivation₃.whiskerLeft₃
+          (.vcomp
+            (.step (Step.symm_trans_congr p (Path.trans q r)))
+            (.step (Step.trans_congr_left (Path.symm p) (Step.symm_trans_congr q r))))
+          (Derivation₃.step
+            (MetaStep₃.vcomp_inv_right
+              (.step (Step.trans_assoc (Path.symm r) (Path.symm q) (Path.symm p))))))
+        (Derivation₃.step
+          (MetaStep₃.vcomp_refl_right
+            (.vcomp
+              (.step (Step.symm_trans_congr p (Path.trans q r)))
+              (.step (Step.trans_congr_left (Path.symm p) (Step.symm_trans_congr q r)))))))
+
+/-- Prop-level compatibility wrapper for `contravariance_coherence`. -/
+theorem contravariance_coherence_toEq
     (p : Path a b) (q : Path b c) (r : Path c d) :
     rweq_toEq (contravariance_route1 p q r) =
-      rweq_toEq (contravariance_route2 p q r) := by
-  rfl
+      rweq_toEq (contravariance_route2 p q r) :=
+  OmegaGroupoid.trunc₃ (contravariance_coherence p q r)
 
 end Contravariance
 
@@ -384,7 +470,7 @@ Each proof above explicitly names the `Step` constructors it employs:
 - `Step.symm_symm` (Rule 2) — used in double inverse cancellation
 - `Step.symm_refl` (Rule 1) — used in unit inverse
 - `Step.symm_trans_congr` (Rule 7) — used in contravariance
-- `Step.symm_congr` (Rule 74) — used in contravariance route 2
+- `Step.trans_cancel_left` (Rule 77) — used in inverse route A
 -/
 
 end ComputationalPaths.Path.OmegaGroupoidCompPaths
