@@ -2,6 +2,7 @@ import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.OmegaGroupoid.GroupoidProofs
 import ComputationalPaths.Path.OmegaGroupoid.PentagonProof
 import ComputationalPaths.Path.OmegaGroupoid.EckmannHiltonProof
+import ComputationalPaths.Path.OmegaGroupoid.Stabilization
 import ComputationalPaths.Path.Rewrite.ConfluenceDeepType
 import ComputationalPaths.Path.Rewrite.RewritingDeep
 
@@ -19,6 +20,11 @@ We take:
 and package the usual bicategorical coherence data:
 associator, left/right unitors, inverse laws, and proof-relevant pentagon,
 triangle, interchange, and Eckmann–Hilton witnesses.
+
+The genuine ω-extension is packaged in
+`ComputationalPaths.Path.OmegaGroupoid.Stabilization`; this file records the
+low-dimensional skeleton whose higher tail is shown there to stabilize above
+dimension 3.
 
 No `sorry`/`admit`/new axioms and no `Path.ofEq`.
 -/
@@ -171,6 +177,19 @@ noncomputable def compPathOmegaWeakGroupoid (A : Type u) : OmegaWeakGroupoid A w
     ComputationalPaths.EckmannHilton.interchange α β γ δ
   eckmann_hilton₃ := fun α β =>
     ComputationalPaths.EckmannHilton.eckmann_hilton α β
+
+/-- Bundled stabilization data for the ω-groupoid.
+    Justifies the "Omega" in the name: the cell tower stabilizes at dimension 3,
+    with levels 4+ contractible (Batanin–Leinster conditions). -/
+noncomputable def compPathOmegaWeakGroupoid_stabilization (A : Type u) :
+    OmegaGroupoid.StabilizationData A :=
+  OmegaGroupoid.stabilization_theorem A
+
+/-- The `OmegaWeakGroupoid` is genuinely a stabilized ω-groupoid:
+    the cell tower is 3-truncated (contractible at levels 4+). -/
+noncomputable def compPathOmegaWeakGroupoid_omega (A : Type u) :
+    OmegaGroupoid.StabilizedOmegaGroupoid A :=
+  OmegaGroupoid.compPathStabilizedOmegaGroupoid A
 
 end
 
