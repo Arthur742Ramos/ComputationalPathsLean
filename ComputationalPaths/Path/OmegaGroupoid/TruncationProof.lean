@@ -1,9 +1,12 @@
 /-
 # Truncation Proof: Contractibility from Confluence
 
-This module proves that the ω-groupoid of computational paths is
-contractible at level 3 and above **from the rewriting system's confluence**,
-rather than from Lean's proof irrelevance (`Subsingleton.elim`).
+This module packages confluence-facing interfaces for the ω-groupoid of
+computational paths.  Confluence supplies canonical derivations and explicit
+Step-based ingredients, while the current imported level-3 contractibility
+witness still retains a residual Prop-level transport boundary in
+`OmegaGroupoid.strict_transport₃`, now only as a final zero-fuel safety fallback
+after the structural and normalized-inverse routes are tried first.
 
 ## Key idea
 
@@ -24,13 +27,23 @@ argument is:
 - `RwEqT`: A Type-valued rewrite-equivalence carrying the derivation trace.
 - `ThreeCell`: The 3-cell type — evidence that two `Derivation₂` witnesses
   are connected through confluence-based normalization.
-- `confluence_contractibility₃`: The key theorem — contractibility at level 3
-  derived from Step-confluence, not from `Subsingleton.elim`.
+- `confluence_contractibility₃`: contractibility at level 3 routed through
+  confluence-chosen canonical derivations and the current core connector.
 - `OmegaGroupoidExplicit`: The full ω-groupoid structure with explicit Step chains.
+- `explicitPolygraphCoherentPresentation`: a proof-relevant 3-dimensional
+  coherent presentation on the explicit expression/polygraph side.
+- `OmegaGroupoidWithProofRelevantShadow`: honest frontier bundle combining the
+  Path-level explicit ω-groupoid with the proof-relevant explicit-syntax shadow.
 - `omega_groupoid_explicit_is_weak_omega`: The main theorem establishing
   the Batanin/Leinster contractibility conditions.
 
-## NO `Subsingleton.elim` anywhere in this file.
+## No direct `Subsingleton.elim` in this file
+
+The remaining proof-irrelevance boundary is imported from
+`OmegaGroupoid.strict_transport₃`; this file itself only packages that witness
+with confluence data.  Separately, the imported polygraph development provides
+explicit Type-valued 3-cell generators and a proof-relevant coherent
+presentation on the expression syntax side.
 -/
 
 import ComputationalPaths.Path.Basic
@@ -39,6 +52,7 @@ import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.GroupoidProofs
 import ComputationalPaths.Path.OmegaGroupoid.Normalizer
 import ComputationalPaths.Path.Rewrite.ConfluenceDeep
+import ComputationalPaths.Path.Polygraph.HomotopyBasis
 namespace ComputationalPaths.Path.OmegaGroupoid.TruncationProof
 
 open ComputationalPaths
@@ -197,17 +211,39 @@ noncomputable def canonical_via_confluence
   let ⟨_, d_pm, d_qm⟩ := canonical_derivation hConf d
   Derivation₂.vcomp d_pm (Derivation₂.inv d_qm)
 
-/-- **Key lemma**: Any `Derivation₂` is connected to its canonical form
-    by a `Derivation₃` (3-cell).
-    
-    We use the explicit normalizer witness
-    `Normalizer.contractibility₃_genuine`, which is built from groupoid-law
-    `MetaStep₃` constructors plus `diamond_filler` for local peaks. -/
+/-- Compare parallel 2-cells by isolating the loop `d₁ · d₂⁻¹`.
+
+This keeps the surrounding route explicit:
+1. expand `d₁` by a right unit,
+2. expand that unit into the inverse loop `d₂⁻¹ · d₂`,
+3. reassociate to isolate the loop `d₁ · d₂⁻¹`,
+4. contract that loop with the exported normalizer witness,
+5. absorb the remaining left unit on `d₂`. -/
+noncomputable def contract₃_via_loop_normalizer
+    {p q : Path a b} (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ := by
+  let loop : Derivation₂ p p := Derivation₂.vcomp d₁ (Derivation₂.inv d₂)
+  exact Derivation₃.vcomp
+    (Derivation₃.inv (Derivation₃.step (MetaStep₃.vcomp_refl_right d₁)))
+    (Derivation₃.vcomp
+      (Derivation₃.whiskerLeft₃ d₁
+        (Derivation₃.inv (Derivation₃.step (MetaStep₃.vcomp_inv_left d₂))))
+      (Derivation₃.vcomp
+        (Derivation₃.inv (Derivation₃.step (MetaStep₃.vcomp_assoc d₁ (Derivation₂.inv d₂) d₂)))
+        (Derivation₃.vcomp
+          (Derivation₃.whiskerRight₃ (Normalizer.loop_contraction_genuine loop) d₂)
+          (Derivation₃.step (MetaStep₃.vcomp_refl_left d₂)))))
+
+/-- Connect any `Derivation₂` to its confluence-chosen canonical form.
+
+    Rather than immediately invoking the full global connector, we first isolate
+    the loop `d · canon⁻¹` and then import the normalizer only for that loop
+    contraction.  This keeps the packaging layer closer to the explicit groupoid
+    algebra on derivations. -/
 noncomputable def connect_to_canonical
     (hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ d (canonical_via_confluence hConf d) := by
-  exact Normalizer.contractibility₃_genuine d (canonical_via_confluence hConf d)
+  exact contract₃_via_loop_normalizer d (canonical_via_confluence hConf d)
 
 /-- **Contractibility at level 3 from confluence**.
 
@@ -220,7 +256,7 @@ The argument:
 2. Both canonical derivations go through common reducts of `p` and `q`.
 3. By confluence, these common reducts themselves have a common reduct.
 4. Therefore both `d₁` and `d₂` factor through a shared canonical form.
-5. The groupoid laws provide explicit 3-cells connecting each `dᵢ` to
+5. The current core contractibility witness then connects each `dᵢ` to
    this shared form. -/
 noncomputable def confluence_contractibility₃
     (hConf : StepConfluent (A := A) (a := a) (b := b))
@@ -232,8 +268,8 @@ noncomputable def confluence_contractibility₃
   let canon := canonical_via_confluence hConf d₁
   -- Connect d₁ to canon
   have link₁ : Derivation₃ d₁ canon := connect_to_canonical hConf d₁
-  -- Connect d₂ to canon — both are Derivation₂ p q, so we get a 3-cell
-  have link₂ : Derivation₃ d₂ canon := Normalizer.contractibility₃_genuine d₂ canon
+  -- Connect d₂ to canon through the same isolated-loop route.
+  have link₂ : Derivation₃ d₂ canon := contract₃_via_loop_normalizer d₂ canon
   exact ThreeCell.by_canonical canon link₁ link₂
 
 /-- Alternative: directly build a `Derivation₃` from confluence,
@@ -388,7 +424,8 @@ end OmegaStructure
 /-! ## §5  The `OmegaGroupoidExplicit` structure
 
 This packages all levels together with the key property: contractibility
-at level 3+ comes from confluence. -/
+at level 3+ comes from confluence.  The connector used below is the
+loop-isolation route `contract₃_via_loop_normalizer` defined above. -/
 
 section ExplicitStructure
 
@@ -479,9 +516,9 @@ structure OmegaGroupoidExplicit (A : Type u) where
 
 /-- Construct the explicit ω-groupoid.
 
-Every field is filled with an explicit constructor — no `Subsingleton.elim`.
-For 3-cells we use `Normalizer.contractibility₃_genuine` (groupoid laws +
-local `diamond_filler` peaks), and for 4-cells we reuse
+This file contains no direct `Subsingleton.elim`.  For 3-cells we expose an
+explicit loop-contraction route and use the normalizer only for the single
+loop-contraction subproblem.  For 4-cells we reuse
 `OmegaGroupoid.contractibility₄`. -/
 noncomputable def mkOmegaGroupoidExplicit (A : Type u) : OmegaGroupoidExplicit A where
   assoc := fun p q r => Derivation₂.step (Step.trans_assoc p q r)
@@ -496,7 +533,7 @@ noncomputable def mkOmegaGroupoidExplicit (A : Type u) : OmegaGroupoidExplicit A
   rinv₂ := fun d => Derivation₃.step (MetaStep₃.vcomp_inv_right d)
   pentagon := fun f g h k => pentagonCoherence f g h k
   triangle := fun f g => triangleCoherence f g
-  contract₃ := fun d₁ d₂ => Normalizer.contractibility₃_genuine d₁ d₂
+  contract₃ := fun d₁ d₂ => contract₃_via_loop_normalizer d₁ d₂
   contract₄ := fun m₁ m₂ => OmegaGroupoid.contractibility₄ m₁ m₂
 
 end ExplicitStructure
@@ -510,12 +547,14 @@ for a weak ω-groupoid:
 2. The coherence conditions at level n+1 witness the equations at level n.
 3. Level 3+ is contractible.
 
-The contractibility at level 3 comes from the fact that the Step TRS
-is confluent: any two `RwEq` derivations between the same paths can
-be connected through their common Church–Rosser normal form.
+At level 3, confluence supplies canonical comparison targets, while the
+packaging layer now factors every comparison through an explicit inverse-loop
+contraction route.  The only imported nontrivial step in that route is the
+normalizer-based contraction of the isolated loop `d₁ · d₂⁻¹`, whose remaining
+hard boundary is still the residual strict-connector transport fallback.
 
-The contractibility at level 4+ follows because level 3 cells are
-themselves derivations in a confluent system (the `MetaStep₃` system). -/
+The contractibility at level 4+ is then inherited from the existing
+`OmegaGroupoid` higher-cell infrastructure. -/
 
 section MainTheorem
 
@@ -554,7 +593,7 @@ structure BataninLeinsterData (A : Type u) where
     (pentagon, triangle, interchange) use explicit `MetaStep₃` constructors
     which encode the Step chains from `GroupoidProofs.lean`. -/
 noncomputable def bataninLeinsterData : BataninLeinsterData A where
-  contract₃ := fun d₁ d₂ => Normalizer.contractibility₃_genuine d₁ d₂
+  contract₃ := fun d₁ d₂ => contract₃_via_loop_normalizer d₁ d₂
   contract₄ := fun m₁ m₂ => OmegaGroupoid.contractibility₄ m₁ m₂
   pentagon := pentagonCoherence
   triangle := triangleCoherence
@@ -577,7 +616,7 @@ theorem omega_structure_contractible_above_2 :
       {m₁ m₂ : Derivation₃ d₁ d₂} (n : Nat)
       (c₁ c₂ : Derivation₄ m₁ m₂),
       Nonempty (DerivationHigh n c₁ c₂)) :=
-  ⟨fun d₁ d₂ => ⟨Normalizer.contractibility₃_genuine d₁ d₂⟩,
+  ⟨fun d₁ d₂ => ⟨contract₃_via_loop_normalizer d₁ d₂⟩,
    fun m₁ m₂ => ⟨OmegaGroupoid.contractibility₄ m₁ m₂⟩,
    fun n c₁ c₂ => ⟨DerivationHigh.step (MetaStepHigh.diamond_filler (n := n) c₁ c₂)⟩⟩
 
@@ -605,34 +644,60 @@ theorem omega_groupoid_explicit_is_weak_omega :
   ⟨fun f g h k => ⟨pentagonCoherence f g h k⟩,
    fun f g => ⟨triangleCoherence f g⟩,
    fun α β => ⟨Derivation₃.step (MetaStep₃.interchange α β)⟩,
-   fun d₁ d₂ => ⟨Normalizer.contractibility₃_genuine d₁ d₂⟩,
-   fun m₁ m₂ => ⟨OmegaGroupoid.contractibility₄ m₁ m₂⟩⟩
+    fun d₁ d₂ => ⟨contract₃_via_loop_normalizer d₁ d₂⟩,
+    fun m₁ m₂ => ⟨OmegaGroupoid.contractibility₄ m₁ m₂⟩⟩
 
 /-- **Key observation**: the explicit `OmegaGroupoidExplicit` uses the
     normalizer-based 3-cell contractibility witness. -/
 theorem omega_explicit_uses_same_mechanism :
     ∀ {a b : A} {p q : Path a b} (d₁ d₂ : Derivation₂ p q),
       (mkOmegaGroupoidExplicit A).contract₃ d₁ d₂ =
-        Normalizer.contractibility₃_genuine d₁ d₂ :=
+        contract₃_via_loop_normalizer d₁ d₂ :=
   fun _ _ => rfl
+
+/-- Proof-relevant 3-dimensional coherent presentation on the explicit
+    expression/polygraph side.  This is the honest proof-relevant replacement
+    currently available while the Path-level `contract₃` witness still retains
+    the residual zero-fuel transport fallback. -/
+noncomputable def explicitPolygraphCoherentPresentation :
+    ComputationalPaths.Path.Polygraph.HomotopyBasis.ProofRelevantCoherentPresentation3D :=
+  ComputationalPaths.Path.Polygraph.HomotopyBasis.proofRelevantCoherentPresentation3d
+
+/-- The explicit polygraph shadow has the expected nine generating 3-cell
+    families. -/
+theorem explicitPolygraph_num3cells :
+    explicitPolygraphCoherentPresentation.num3cells = 9 := rfl
+
+/-- Current honest frontier package: the Path-level explicit ω-groupoid together
+    with the proof-relevant explicit-syntax 3-dimensional coherent shadow. -/
+structure OmegaGroupoidWithProofRelevantShadow (A : Type u) where
+  omega : OmegaGroupoidExplicit A
+  shadow3d :
+    ComputationalPaths.Path.Polygraph.HomotopyBasis.ProofRelevantCoherentPresentation3D
+
+/-- Bundle the current Path-level ω-groupoid witness with its proof-relevant
+    explicit polygraph shadow. -/
+noncomputable def mkOmegaGroupoidWithProofRelevantShadow (A : Type u) :
+    OmegaGroupoidWithProofRelevantShadow A where
+  omega := mkOmegaGroupoidExplicit A
+  shadow3d := explicitPolygraphCoherentPresentation
+
+/-- The bundled proof-relevant shadow still carries the nine explicit
+    critical-pair generator families. -/
+theorem omega_shadow_num3cells (A : Type u) :
+    (mkOmegaGroupoidWithProofRelevantShadow A).shadow3d.num3cells = 9 := rfl
 
 end MainTheorem
 
-/-! ## §7  Confluence-based contractibility without `Subsingleton.elim`
+/-! ## §7  Confluence-facing contractibility interface
 
-We now prove the key technical result: when we have an explicit proof
-of Step-confluence, the contractibility₃ can be constructed without
-any appeal to `Subsingleton.elim`.
-
-The existing `contractibility₃` ultimately leans on the blanket MetaStep
-constructor that collapses parallel derivations via proof irrelevance of
-the `Prop`-level projection `rweq_toEq`. Note that `RwEq` itself is `Type u`-valued,
-not `Prop`-valued; equality of `RwEq` witnesses is obtained only at the `Prop`
-level via `rweq_toEq` (the `RwEqProp` wrapper approach).
-
-The following construction avoids even that indirect use, by building
-the 3-cell entirely from the groupoid-law `MetaStep₃` constructors
-(which are explicit Step chains). -/
+This section packages the current level-3 contractibility witness together with
+confluence data.  The imported normalizer witness now explicitly factors through
+flat-chain normalization and then the core strict connector, and even the
+remaining unmatched strict cases are first retried through normalized inverses
+before any Prop-level transport is used.  So the constructions below should be
+read as an interface around the current proof, not yet as a fully
+transport-free normal-form uniqueness argument. -/
 
 section PureConfluenceContractibility
 
@@ -646,11 +711,11 @@ variable {A : Type u} {a b : A}
     - `vcomp_inv_left`: cancel left inverse
     - `vcomp_inv_right`: cancel right inverse
     
-    Each step is an explicit `MetaStep₃`. -/
+     Each step is an explicit `MetaStep₃`. -/
 noncomputable def normalize_deriv₂ {p q : Path a b}
     (d : Derivation₂ p q) :
     Σ (d' : Derivation₂ p q), Derivation₃ d d' := by
-  exact ⟨d, Derivation₃.refl d⟩
+  exact ⟨(Normalizer.normalizeStrict d).1, Normalizer.to_normalizeStrict₃ d⟩
 
 /-- Two `Derivation₂.step` witnesses with the same endpoints are connected
     by `MetaStep₃.step_eq`. This is the base case of confluence-based
@@ -690,7 +755,13 @@ noncomputable def inv_distrib {p q r : Path a b}
                 (Derivation₂.vcomp (Derivation₂.inv d₂) (Derivation₂.inv d₁)) :=
   Derivation₃.step (MetaStep₃.inv_vcomp d₁ d₂)
 
-/-- The full contractibility argument from the groupoid laws alone.
+/-- Expand `refl` into the inverse loop `d⁻¹ · d`. -/
+noncomputable def inverse_loop_expand {p q : Path a b}
+    (d : Derivation₂ p q) :
+    Derivation₃ (Derivation₂.refl q) (Derivation₂.vcomp (Derivation₂.inv d) d) :=
+  Derivation₃.inv (Derivation₃.step (MetaStep₃.vcomp_inv_left d))
+
+/-- Export the current contractibility witness through the confluence wrapper.
 
 Given `d₁ d₂ : Derivation₂ p q`, we build `Derivation₃ d₁ d₂` by:
 
@@ -701,17 +772,12 @@ Given `d₁ d₂ : Derivation₂ p q`, we build `Derivation₃ d₁ d₂` by:
    which contracts to `refl` by loop contraction
 5. `refl · d₂` is connected to `d₂` (left unit)
 
-Each step uses an explicit `MetaStep₃` constructor, which is an
-explicit Step chain. The loop contraction at step 4 uses
-`contractibility₃`, which for loop derivations is trivially
-the identity on the canonical loop form.
-
-**Note**: This is the mathematically correct argument. The existing
-`contractibility₃` uses this same strategy internally (via `diamond_filler`),
-but expressed at the Prop level. Here we make each step explicit. -/
+The surrounding confluence data is explicit, and the final 3-cell is the
+same explicit loop-isolation route used by the packaged ω-groupoid; the
+normalizer is used only at the single loop-contraction step. -/
 noncomputable def explicit_contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ := by
-  exact Normalizer.contractibility₃_genuine d₁ d₂
+  exact contract₃_via_loop_normalizer d₁ d₂
 
 end PureConfluenceContractibility
 

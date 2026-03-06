@@ -12,10 +12,11 @@ beginning of a genuine ω-groupoid structure:
 
 ## Main Results
 
-1. `DerivEquiv` is an inductive type relating `RwEqDeriv` terms
-2. `DerivEquiv` is an equivalence relation (reflexive, symmetric, transitive)
-3. Naturality squares: composing 3-cells horizontally
-4. Non-trivial 3-cells exist: two genuinely different 3-cell witnesses
+1. `DerivEquiv` is an inductive Prop relating `RwEqDeriv` terms
+2. `Generator3CellT` / `DerivEquivT` provide explicit Type-valued 3-cell data
+3. `DerivEquiv` is an equivalence relation (reflexive, symmetric, transitive)
+4. Naturality squares: composing 3-cells horizontally
+5. Non-trivial 3-cells exist: two genuinely different 3-cell witnesses
 
 ## References
 
@@ -28,6 +29,10 @@ import ComputationalPaths.Path.Polygraph.RwEqDerivation
 namespace ComputationalPaths.Path.Polygraph
 
 open Rewrite.GroupoidTRS (Expr)
+
+local notation "eRefl" => Rewrite.GroupoidTRS.Expr.refl
+local notation "eSymm" => Rewrite.GroupoidTRS.Expr.symm
+local notation "eTrans" => Rewrite.GroupoidTRS.Expr.trans
 
 /-! ## DerivEquiv: 3-cells of the polygraph
 
@@ -67,6 +72,169 @@ inductive DerivEquiv : {e₁ e₂ : Expr} → RwEqDeriv e₁ e₂ → RwEqDeriv 
       DerivEquiv
         ((d₁.vcomp d₂).hcomp (d₃.vcomp d₄))
         ((d₁.hcomp d₃).vcomp (d₂.hcomp d₄))
+
+/-! ## Explicit type-valued 3-cells
+
+The Prop-valued relation above captures only the structural fragment of
+derivation equivalence.  For genuinely proof-relevant 3-dimensional data on the
+explicit syntax side, we package the nine critical-pair fillers as Type-valued
+generators and close them under the same structural operations. -/
+
+@[simp] def cp_refl_left_assoc_left (p q : Expr) :
+    RwEqDeriv (eTrans (eTrans eRefl p) q) (eTrans p q) :=
+  .trans_congr_left q (.trans_refl_left p)
+
+@[simp] def cp_refl_left_assoc_right (p q : Expr) :
+    RwEqDeriv (eTrans (eTrans eRefl p) q) (eTrans p q) :=
+  .trans (.trans_assoc eRefl p q) (.trans_refl_left (eTrans p q))
+
+@[simp] def cp_symm_assoc_left (p q : Expr) :
+    RwEqDeriv (eTrans (eTrans p (eSymm p)) q) q :=
+  .trans (.trans_congr_left q (.trans_symm p)) (.trans_refl_left q)
+
+@[simp] def cp_symm_assoc_right (p q : Expr) :
+    RwEqDeriv (eTrans (eTrans p (eSymm p)) q) q :=
+  .trans (.trans_assoc p (eSymm p) q) (.trans_cancel_left p q)
+
+@[simp] def cp_symm_trans_assoc_left (p q : Expr) :
+    RwEqDeriv (eTrans (eTrans (eSymm p) p) q) q :=
+  .trans (.trans_congr_left q (.symm_trans p)) (.trans_refl_left q)
+
+@[simp] def cp_symm_trans_assoc_right (p q : Expr) :
+    RwEqDeriv (eTrans (eTrans (eSymm p) p) q) q :=
+  .trans (.trans_assoc (eSymm p) p q) (.trans_cancel_right p q)
+
+@[simp] def cp_refl_right_assoc_left (p q : Expr) :
+    RwEqDeriv (eTrans (eTrans p eRefl) q) (eTrans p q) :=
+  .trans_congr_left q (.trans_refl_right p)
+
+@[simp] def cp_refl_right_assoc_right (p q : Expr) :
+    RwEqDeriv (eTrans (eTrans p eRefl) q) (eTrans p q) :=
+  .trans (.trans_assoc p eRefl q) (.trans_congr_right p (.trans_refl_left q))
+
+@[simp] def cp_assoc_assoc_left (p q r s : Expr) :
+    RwEqDeriv (eTrans (eTrans (eTrans p q) r) s) (eTrans p (eTrans q (eTrans r s))) :=
+  .trans (.trans_assoc (eTrans p q) r s) (.trans_assoc p q (eTrans r s))
+
+@[simp] def cp_assoc_assoc_right (p q r s : Expr) :
+    RwEqDeriv (eTrans (eTrans (eTrans p q) r) s) (eTrans p (eTrans q (eTrans r s))) :=
+  .trans
+    (.trans_congr_left s (.trans_assoc p q r))
+    (.trans
+      (.trans_assoc p (eTrans q r) s)
+      (.trans_congr_right p (.trans_assoc q r s)))
+
+@[simp] def cp_symm_congr_refl_left_left (p : Expr) :
+    RwEqDeriv (eSymm (eTrans eRefl p)) (eSymm p) :=
+  .trans
+    (.symm_trans_congr eRefl p)
+    (.trans
+      (.trans_congr_right (eSymm p) .symm_refl)
+      (.trans_refl_right (eSymm p)))
+
+@[simp] def cp_symm_congr_refl_left_right (p : Expr) :
+    RwEqDeriv (eSymm (eTrans eRefl p)) (eSymm p) :=
+  .symm_congr (.trans_refl_left p)
+
+@[simp] def cp_symm_congr_refl_right_left (p : Expr) :
+    RwEqDeriv (eSymm (eTrans p eRefl)) (eSymm p) :=
+  .trans
+    (.symm_trans_congr p eRefl)
+    (.trans
+      (.trans_congr_left (eSymm p) .symm_refl)
+      (.trans_refl_left (eSymm p)))
+
+@[simp] def cp_symm_congr_refl_right_right (p : Expr) :
+    RwEqDeriv (eSymm (eTrans p eRefl)) (eSymm p) :=
+  .symm_congr (.trans_refl_right p)
+
+@[simp] def cp_cancel_left_assoc_left (p q r : Expr) :
+    RwEqDeriv (eTrans (eTrans p (eTrans (eSymm p) q)) r) (eTrans q r) :=
+  .trans_congr_left r (.trans_cancel_left p q)
+
+@[simp] def cp_cancel_left_assoc_right (p q r : Expr) :
+    RwEqDeriv (eTrans (eTrans p (eTrans (eSymm p) q)) r) (eTrans q r) :=
+  .trans
+    (.trans_assoc p (eTrans (eSymm p) q) r)
+    (.trans
+      (.trans_congr_right p (.trans_assoc (eSymm p) q r))
+      (.trans_cancel_left p (eTrans q r)))
+
+@[simp] def cp_cancel_right_assoc_left (p q r : Expr) :
+    RwEqDeriv (eTrans (eTrans (eSymm p) (eTrans p q)) r) (eTrans q r) :=
+  .trans_congr_left r (.trans_cancel_right p q)
+
+@[simp] def cp_cancel_right_assoc_right (p q r : Expr) :
+    RwEqDeriv (eTrans (eTrans (eSymm p) (eTrans p q)) r) (eTrans q r) :=
+  .trans
+    (.trans_assoc (eSymm p) (eTrans p q) r)
+    (.trans
+      (.trans_congr_right (eSymm p) (.trans_assoc p q r))
+      (.trans_cancel_right p (eTrans q r)))
+
+/-- Explicit critical-pair 3-cell generators for the completed groupoid TRS. -/
+inductive Generator3CellT : {e₁ e₂ : Expr} → RwEqDeriv e₁ e₂ → RwEqDeriv e₁ e₂ → Type where
+  | refl_left_assoc (p q : Expr) :
+      Generator3CellT (cp_refl_left_assoc_left p q) (cp_refl_left_assoc_right p q)
+  | symm_assoc (p q : Expr) :
+      Generator3CellT (cp_symm_assoc_left p q) (cp_symm_assoc_right p q)
+  | symm_trans_assoc (p q : Expr) :
+      Generator3CellT (cp_symm_trans_assoc_left p q) (cp_symm_trans_assoc_right p q)
+  | refl_right_assoc (p q : Expr) :
+      Generator3CellT (cp_refl_right_assoc_left p q) (cp_refl_right_assoc_right p q)
+  | assoc_assoc (p q r s : Expr) :
+      Generator3CellT (cp_assoc_assoc_left p q r s) (cp_assoc_assoc_right p q r s)
+  | symm_congr_refl_left (p : Expr) :
+      Generator3CellT (cp_symm_congr_refl_left_left p) (cp_symm_congr_refl_left_right p)
+  | symm_congr_refl_right (p : Expr) :
+      Generator3CellT (cp_symm_congr_refl_right_left p) (cp_symm_congr_refl_right_right p)
+  | cancel_left_assoc (p q r : Expr) :
+      Generator3CellT (cp_cancel_left_assoc_left p q r) (cp_cancel_left_assoc_right p q r)
+  | cancel_right_assoc (p q r : Expr) :
+      Generator3CellT (cp_cancel_right_assoc_left p q r) (cp_cancel_right_assoc_right p q r)
+
+/-- Type-valued 3-cells: structural operations plus explicit critical-pair
+    fillers.  This is the proof-relevant 3-dimensional syntax missing from the
+    current Prop-valued packaging. -/
+inductive DerivEquivT : {e₁ e₂ : Expr} → RwEqDeriv e₁ e₂ → RwEqDeriv e₁ e₂ → Type where
+  | refl {e₁ e₂ : Expr} (d : RwEqDeriv e₁ e₂) : DerivEquivT d d
+  | symm {e₁ e₂ : Expr} {d₁ d₂ : RwEqDeriv e₁ e₂} :
+      DerivEquivT d₁ d₂ → DerivEquivT d₂ d₁
+  | dtrans {e₁ e₂ : Expr} {d₁ d₂ d₃ : RwEqDeriv e₁ e₂} :
+      DerivEquivT d₁ d₂ → DerivEquivT d₂ d₃ → DerivEquivT d₁ d₃
+  | vcomp_congr_left {e₁ e₂ e₃ : Expr}
+      {d₁ d₁' : RwEqDeriv e₁ e₂} {d₂ : RwEqDeriv e₂ e₃}
+      (h : DerivEquivT d₁ d₁') :
+      DerivEquivT (d₁.vcomp d₂) (d₁'.vcomp d₂)
+  | vcomp_congr_right {e₁ e₂ e₃ : Expr}
+      {d₁ : RwEqDeriv e₁ e₂} {d₂ d₂' : RwEqDeriv e₂ e₃}
+      (h : DerivEquivT d₂ d₂') :
+      DerivEquivT (d₁.vcomp d₂) (d₁.vcomp d₂')
+  | hcomp_congr {e₁ e₁' e₂ e₂' : Expr}
+      {dp dp' : RwEqDeriv e₁ e₁'} {dq dq' : RwEqDeriv e₂ e₂'}
+      (hp : DerivEquivT dp dp') (hq : DerivEquivT dq dq') :
+      DerivEquivT (dp.hcomp dq) (dp'.hcomp dq')
+  | interchange {p p' p'' q q' q'' : Expr}
+      (d₁ : RwEqDeriv p p') (d₂ : RwEqDeriv p' p'')
+      (d₃ : RwEqDeriv q q') (d₄ : RwEqDeriv q' q'') :
+      DerivEquivT
+        ((d₁.vcomp d₂).hcomp (d₃.vcomp d₄))
+        ((d₁.hcomp d₃).vcomp (d₂.hcomp d₄))
+  | generator {e₁ e₂ : Expr} {d₁ d₂ : RwEqDeriv e₁ e₂} :
+      Generator3CellT d₁ d₂ → DerivEquivT d₁ d₂
+
+namespace DerivEquivT
+
+abbrev refl' {e₁ e₂ : Expr} (d : RwEqDeriv e₁ e₂) : DerivEquivT d d := .refl d
+
+abbrev symm' {e₁ e₂ : Expr} {d₁ d₂ : RwEqDeriv e₁ e₂}
+    (h : DerivEquivT d₁ d₂) : DerivEquivT d₂ d₁ := .symm h
+
+abbrev trans' {e₁ e₂ : Expr} {d₁ d₂ d₃ : RwEqDeriv e₁ e₂}
+    (h₁ : DerivEquivT d₁ d₂) (h₂ : DerivEquivT d₂ d₃) : DerivEquivT d₁ d₃ :=
+  .dtrans h₁ h₂
+
+end DerivEquivT
 
 /-! ## DerivEquiv is an equivalence relation -/
 

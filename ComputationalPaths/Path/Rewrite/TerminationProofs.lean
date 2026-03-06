@@ -235,7 +235,7 @@ def exprStep_measure4_decrease {p q : Expr} (h : Expr.Step p q) :
     exact ⟨rfl, hw, rfl, hl⟩
 
 /-- The Expr.Step relation is well-founded (alternative proof via 4-component measure). -/
-def exprStep_wf_via_multi : WellFounded (fun q p : Expr => Expr.StepProp p q) :=
+def exprStep_wf_via_multi : WellFounded (fun q p : Expr => Nonempty (Expr.Step p q)) :=
   Subrelation.wf
     (fun h => by
       rcases h with ⟨h⟩

@@ -73,15 +73,23 @@ noncomputable def refl_derivation₂ (p : Path a b) : Derivation₂ p p :=
     (d₁ : Derivation₂ p q) (d₂ : Derivation₂ q r) :
     (Derivation₂.vcomp d₁ d₂).depth = d₁.depth + d₂.depth + 1 := rfl
 
-/-- Any derivation from p to itself has the same toRwEq (at Prop level). -/
+/-- Prop-level boundary for loops.
+
+This is one of the places where we deliberately forget the Type-valued
+derivation structure and compare only the projected `Eq` proof carried by
+`rweq_toEq`. -/
 noncomputable def derivation₂_self_toRwEq (p : Path a b)
     (d : Derivation₂ p p) : rweq_toEq d.toRwEq = rweq_toEq (RwEq.refl p) := by
-  exact Subsingleton.elim _ _
+  rfl
 
-/-- Two derivations between the same paths have the same toRwEq (at Prop level). -/
+/-- Prop-level boundary for parallel derivations.
+
+After projecting through `rweq_toEq`, Lean's proof irrelevance identifies the
+resulting `Eq` proofs.  This keeps the proof-irrelevance step localized to the
+projection boundary rather than the Type-valued derivations themselves. -/
 theorem derivation₂_toRwEq_unique {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq := by
-  exact Subsingleton.elim _ _
+  rfl
 
 /-! ## Soundness of the Embedding -/
 

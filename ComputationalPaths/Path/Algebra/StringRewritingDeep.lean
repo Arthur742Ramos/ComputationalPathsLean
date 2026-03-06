@@ -271,20 +271,23 @@ theorem RPath.length_nonincreasing {R : SRS} (hR : SRS.lengthReducing R)
     have := Step.length_decreasing hR s
     omega
 
+/-- Prop wrapper for the Type-valued one-step rewrite relation. -/
+abbrev StepProp (R : SRS) (u v : Word) : Prop := Nonempty (Step R u v)
+
 /-- A word is in normal form if no rule applies. -/
 noncomputable def NormalForm (R : SRS) (w : Word) : Prop :=
-  ∀ v, ¬ StepStar R w v
+  ∀ v, ¬ StepProp R w v
 
 /-- Theorem 24: A normal form has no outgoing steps. -/
 def NormalForm.no_step {R : SRS} {w : Word} (hnf : NormalForm R w) :
-    ∀ v, ¬ StepStar R w v := hnf
+    ∀ v, ¬ StepProp R w v := hnf
 
 /-- Theorem 25: If w is a normal form, the only path from w reaches w itself. -/
 theorem NormalForm.path_eq_refl {R : SRS} {w v : Word}
     (hnf : NormalForm R w) (p : RPath R w v) : w = v := by
   cases p with
   | refl _ => rfl
-  | step s _ => exact absurd ⟨s⟩ (hnf _)
+  | step s _ => exact False.elim ((hnf _) ⟨s⟩)
 
 /-- Theorem 26: In a length‑reducing system, the empty word is normal form
     if no rule has empty lhs. -/
@@ -561,7 +564,7 @@ theorem Joinable.mono {R S : SRS} (hsub : ∀ r, r ∈ R → r ∈ S)
   exact ⟨d, RPath.mono hsub ha, RPath.mono hsub hb⟩
 
 /-- Theorem 61: Empty SRS has no steps. -/
-def no_step_empty_srs (u v : Word) : ¬ StepStar ([] : SRS) u v := by
+def no_step_empty_srs (u v : Word) : ¬ StepProp ([] : SRS) u v := by
   intro h
   rcases h with ⟨h⟩
   cases h with
@@ -657,7 +660,7 @@ theorem Rule.map_rhs (f : Sym → Word) (r : Rule) :
 /-- The diamond property (strong confluence). -/
 noncomputable def Diamond (R : SRS) : Prop :=
   ∀ a b c : Word, Step R a b → Step R a c →
-    ∃ d, StepStar R b d ∧ StepStar R c d ∨ (b = c ∧ b = d)
+    ∃ d, StepProp R b d ∧ StepProp R c d ∨ (b = c ∧ b = d)
 
 /-- Theorem 72: Diamond implies local confluence. -/
 theorem diamond_implies_lc {R : SRS} (hd : Diamond R) : LocallyConfluent R := by

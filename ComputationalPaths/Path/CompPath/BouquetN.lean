@@ -806,62 +806,50 @@ noncomputable def decodeWord {n : Nat} : BouquetWord n → LoopSpaceN n
 
 /-- Decode respects the free group relation.
     The proof uses loop iteration theorems to handle combining and cancellation. -/
-noncomputable def decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
+private theorem decodeWord_respects_rel_prop {n : Nat} (w₁ w₂ : BouquetWord n)
     (h : BouquetRel n w₁ w₂) :
-    RwEq (decodeWord w₁) (decodeWord w₂) := by
-  refine (rweq_of_rweqProp ?_)
+    rwEqRel _ _ _ (decodeWord w₁) (decodeWord w₂) := by
   induction h with
   | combine l₁ l₂ hgen _hne rest =>
-      refine rweqProp_of_rweq ?_
-      cases l₁ with
-      | mk gen₁ pow₁ _pow₁_ne0 =>
-        cases l₂ with
-        | mk gen₂ pow₂ _pow₂_ne0 =>
-          cases hgen
-          simp [decodeWord]
-          apply
-            rweq_trans
-              (rweq_symm
-                (rweq_tt
-                  (iterateLoopInt (bouquetLoop gen₁) pow₁)
-                  (iterateLoopInt (bouquetLoop gen₁) pow₂)
-                  (decodeWord rest)))
-          exact
-            rweq_trans_congr_left (decodeWord rest)
-              (iterateLoopInt_add (bouquetLoop gen₁) pow₁ pow₂)
+      simp only [decodeWord]
+      rw [← hgen]
+      exact ⟨rweq_trans
+        (rweq_symm
+          (rweq_tt
+            (iterateLoopInt (bouquetLoop l₁.gen) l₁.power)
+            (iterateLoopInt (bouquetLoop l₁.gen) l₂.power)
+            (decodeWord rest)))
+        (rweq_trans_congr_left
+          (decodeWord rest)
+          (iterateLoopInt_add (bouquetLoop l₁.gen) l₁.power l₂.power))⟩
   | cancel l₁ l₂ hgen hinv rest =>
-      refine rweqProp_of_rweq ?_
-      cases l₁ with
-      | mk gen₁ pow₁ _pow₁_ne0 =>
-        cases l₂ with
-        | mk gen₂ pow₂ _pow₂_ne0 =>
-          cases hgen
-          simp [decodeWord]
-          apply
-            rweq_trans
-              (rweq_symm
-                (rweq_tt
-                  (iterateLoopInt (bouquetLoop gen₁) pow₁)
-                  (iterateLoopInt (bouquetLoop gen₁) pow₂)
-                  (decodeWord rest)))
-          apply
-            rweq_trans
-              (rweq_trans_congr_left (decodeWord rest)
-                (iterateLoopInt_add (bouquetLoop gen₁) pow₁ pow₂))
-          have hzero :
-              RwEq
-                (Path.trans (iterateLoopInt (bouquetLoop gen₁) (pow₁ + pow₂)) (decodeWord rest))
-                (Path.trans (Path.refl (bouquetBase (n := n))) (decodeWord rest)) := by
-            apply rweq_of_eq
-            simp [hinv]
-          apply rweq_trans hzero
-          path_simp
-  | congr l h ih =>
-      refine rweqProp_of_rweq ?_
-      simp [decodeWord]
-      exact
-        rweq_trans_congr_right (iterateLoopInt (bouquetLoop l.gen) l.power)
-          (rweq_of_rweqProp ih)
+      have hpow : l₂.power = -l₁.power := by omega
+      simp only [decodeWord]
+      rw [← hgen]
+      rw [hpow]
+      exact ⟨rweq_trans
+        (rweq_symm
+          (rweq_tt
+            (iterateLoopInt (bouquetLoop l₁.gen) l₁.power)
+            (iterateLoopInt (bouquetLoop l₁.gen) (-l₁.power))
+            (decodeWord rest)))
+        (rweq_trans
+          (rweq_trans_congr_left
+            (decodeWord rest)
+            (iterateLoopInt_cancel (bouquetLoop l₁.gen) l₁.power))
+          (rweq_cmpA_refl_left (decodeWord rest)))⟩
+  | congr l hrel ih =>
+      simp only [decodeWord]
+      exact ⟨rweq_trans_congr_right
+        (iterateLoopInt (bouquetLoop l.gen) l.power)
+        (rweq_of_rweqProp ih)⟩
+
+/-- Decode respects the free group relation.
+    The proof uses loop iteration theorems to handle combining and cancellation. -/
+noncomputable def decodeWord_respects_rel {n : Nat} (w₁ w₂ : BouquetWord n)
+    (h : BouquetRel n w₁ w₂) :
+    RwEq (decodeWord w₁) (decodeWord w₂) :=
+  rweq_of_rweqProp (decodeWord_respects_rel_prop w₁ w₂ h)
 
 /-- Candidate decode from `BouquetFreeGroup` to the fundamental group. -/       
 noncomputable def decode_def {n : Nat} : BouquetFreeGroup n → PiOneN n :=       

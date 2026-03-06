@@ -45,6 +45,55 @@ inductive RwEqDeriv : Expr → Expr → Type where
 
 namespace RwEqDeriv
 
+open Rewrite.GroupoidConfluence (ExprRwEq toRW toRW_eq_of_exprRwEq)
+
+/-- Rewrite-equivalence on expressions is closed under `symm`. -/
+noncomputable def exprRwEq_symmCongr {p q : Expr} :
+    ExprRwEq p q → ExprRwEq (eSymm p) (eSymm q)
+  | .refl _ => .refl _
+  | .step h => .step (.symm_congr h)
+  | .symm h => .symm (exprRwEq_symmCongr h)
+  | .trans h₁ h₂ => .trans (exprRwEq_symmCongr h₁) (exprRwEq_symmCongr h₂)
+
+/-- Rewrite-equivalence on expressions is closed under right composition. -/
+noncomputable def exprRwEq_transCongrLeft (r : Expr) {p q : Expr} :
+    ExprRwEq p q → ExprRwEq (eTrans p r) (eTrans q r)
+  | .refl _ => .refl _
+  | .step h => .step (.trans_congr_left r h)
+  | .symm h => .symm (exprRwEq_transCongrLeft r h)
+  | .trans h₁ h₂ => .trans (exprRwEq_transCongrLeft r h₁) (exprRwEq_transCongrLeft r h₂)
+
+/-- Rewrite-equivalence on expressions is closed under left composition. -/
+noncomputable def exprRwEq_transCongrRight (p : Expr) {q r : Expr} :
+    ExprRwEq q r → ExprRwEq (eTrans p q) (eTrans p r)
+  | .refl _ => .refl _
+  | .step h => .step (.trans_congr_right p h)
+  | .symm h => .symm (exprRwEq_transCongrRight p h)
+  | .trans h₁ h₂ => .trans (exprRwEq_transCongrRight p h₁) (exprRwEq_transCongrRight p h₂)
+
+/-- Forget a proof-relevant derivation tree to the Prop-valued expression-level
+    rewrite equivalence it witnesses. -/
+noncomputable def toExprRwEq {p q : Expr} : RwEqDeriv p q → ExprRwEq p q
+  | .symm_refl => .step .symm_refl
+  | .symm_symm p => .step (.symm_symm p)
+  | .trans_refl_left p => .step (.trans_refl_left p)
+  | .trans_refl_right p => .step (.trans_refl_right p)
+  | .trans_symm p => .step (.trans_symm p)
+  | .symm_trans p => .step (.symm_trans p)
+  | .symm_trans_congr p q => .step (.symm_trans_congr p q)
+  | .trans_assoc p q r => .step (.trans_assoc p q r)
+  | .trans_cancel_left p q => .step (.trans_cancel_left p q)
+  | .trans_cancel_right p q => .step (.trans_cancel_right p q)
+  | .symm_congr d => exprRwEq_symmCongr (toExprRwEq d)
+  | .trans_congr_left r d => exprRwEq_transCongrLeft r (toExprRwEq d)
+  | .trans_congr_right p d => exprRwEq_transCongrRight p (toExprRwEq d)
+  | .symm d => .symm (toExprRwEq d)
+  | .trans d₁ d₂ => .trans (toExprRwEq d₁) (toExprRwEq d₂)
+
+/-- Every derivation tree preserves the reduced-word semantics. -/
+theorem toRW_eq {p q : Expr} (d : RwEqDeriv p q) : toRW p = toRW q :=
+  toRW_eq_of_exprRwEq (toExprRwEq d)
+
 /-- Vertical composition of derivations. -/
 @[simp] noncomputable def vcomp {p q r : Expr}
     (d₁ : RwEqDeriv p q) (d₂ : RwEqDeriv q r) : RwEqDeriv p r :=
