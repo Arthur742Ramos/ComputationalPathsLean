@@ -1,0 +1,17 @@
+[squad]
+lead = "Lead"
+
+[[squad.agents]]
+name = "Developer"
+role = "Writes implementation code"
+phase = 2
+
+[[squad.agents]]
+name = "Docs"
+role = "Updates documentation"
+phase = 4
+
+[[squad.agents]]
+name = "Devops"
+role = "Maintains CI/CD and infrastructure"
+phase = 2

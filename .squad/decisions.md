@@ -156,3 +156,16 @@ Remaining failures required disproportionate effort:
 **Decision:** Compilation restored. Module now compiles successfully (warnings only). Established reusable pattern for HoTT module recovery: use `≃ₚ` APIs and keep theorem outputs proposition-valued by bridging `Path` to equality with `.toEq`.
 **Verification:** `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Path.HoTT.Descent` → SUCCESS (exit 0).
 **Impact:** HoTT.Descent module restored to build status. Pattern transferable to other HoTT submodules (HigherInductivePaths, PushoutPaths). Enables Wave-5 HoTT aggregator recovery planning.
+## 2026-03-06T13:12:14+00:00
+- **Preferred design**: use explicit 3-cells between `RwEq` witnesses, not Lean `Eq` on proof objects.
+- **Trade-off**: this is more invasive than a local wrapper edit, but it matches the existing ω-groupoid architecture and avoids brittle proof-object equality.
+- **Biggest risk**: Eckmann-Hilton may force changes in `Path/OmegaGroupoid.lean` itself if `contractibility₃` still reaches `strict_transport₃`.
+- **API trade-off**: keeping old `_toEq` theorems for compatibility may be possible as derived lemmas, but they should not remain part of the core coherence construction.
+- **Refactor strategy**: consolidate around `ComputationalPaths/Path/OmegaGroupoid.lean` as the single source of truth rather than maintaining separate truncated and proof-relevant implementations.
+
+## 2026-03-06T14:07:32+00:00
+- Prioritize eliminating named-coherence reliance on `strict_transport₃` over rewriting `Derivation₂.ofRwEq`.
+- Preserve public theorem names where feasible, but move the core construction to `Derivation₃`/`RwEq₃`.
+- Treat `OmegaWeakGroupoid.lean` as packaging only; keep real proofs centralized in `OmegaGroupoid.lean` and focused wrapper modules.
+- Use `Homotopy/EckmannHilton.lean` as a conceptual decomposition reference, not as proof infrastructure, until its `contractibility₃` shortcuts are removed.
+
