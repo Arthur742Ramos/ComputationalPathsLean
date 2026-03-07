@@ -48,54 +48,73 @@ structure IPLModel where
 
 variable {M : IPLModel.{u}}
 
+private noncomputable def eq_chain {A : Type _} {a b : A} (h : a = b) : Path a b := by
+  cases h
+  exact Path.trans
+    (Path.congrArg (fun x : A => x) (Path.refl a))
+    (Path.refl a)
+
+@[simp] private theorem eq_chain_toEq {A : Type _} {a b : A} (h : a = b) :
+    (eq_chain h).toEq = h := by
+  cases h
+  rfl
+
 noncomputable def ipl_and_comm_path (p q : M.Prop_) :
     Path (M.and_ p q) (M.and_ q p) :=
-  Path.mk [Step.mk _ _ (M.and_comm p q)] (M.and_comm p q)
+  eq_chain (M.and_comm p q)
 
 noncomputable def ipl_or_comm_path (p q : M.Prop_) :
     Path (M.or_ p q) (M.or_ q p) :=
-  Path.mk [Step.mk _ _ (M.or_comm p q)] (M.or_comm p q)
+  eq_chain (M.or_comm p q)
 
 noncomputable def ipl_and_assoc_path (p q r : M.Prop_) :
     Path (M.and_ (M.and_ p q) r) (M.and_ p (M.and_ q r)) :=
-  Path.mk [Step.mk _ _ (M.and_assoc p q r)] (M.and_assoc p q r)
+  eq_chain (M.and_assoc p q r)
 
 noncomputable def ipl_or_assoc_path (p q r : M.Prop_) :
     Path (M.or_ (M.or_ p q) r) (M.or_ p (M.or_ q r)) :=
-  Path.mk [Step.mk _ _ (M.or_assoc p q r)] (M.or_assoc p q r)
+  eq_chain (M.or_assoc p q r)
 
 noncomputable def ipl_and_top_path (p : M.Prop_) :
     Path (M.and_ p M.top_) p :=
-  Path.mk [Step.mk _ _ (M.and_top p)] (M.and_top p)
+  eq_chain (M.and_top p)
 
 noncomputable def ipl_or_bot_path (p : M.Prop_) :
     Path (M.or_ p M.bot_) p :=
-  Path.mk [Step.mk _ _ (M.or_bot p)] (M.or_bot p)
+  eq_chain (M.or_bot p)
 
 noncomputable def ipl_and_idem_path (p : M.Prop_) :
     Path (M.and_ p p) p :=
-  Path.mk [Step.mk _ _ (M.and_idem p)] (M.and_idem p)
+  eq_chain (M.and_idem p)
 
 noncomputable def ipl_or_idem_path (p : M.Prop_) :
     Path (M.or_ p p) p :=
-  Path.mk [Step.mk _ _ (M.or_idem p)] (M.or_idem p)
+  eq_chain (M.or_idem p)
 
 theorem ipl_and_comm_path_toEq (p q : M.Prop_) :
-    (ipl_and_comm_path (M := M) p q).toEq = M.and_comm p q := rfl
+    (ipl_and_comm_path (M := M) p q).toEq = M.and_comm p q := by
+  simp
 theorem ipl_or_comm_path_toEq (p q : M.Prop_) :
-    (ipl_or_comm_path (M := M) p q).toEq = M.or_comm p q := rfl
+    (ipl_or_comm_path (M := M) p q).toEq = M.or_comm p q := by
+  simp
 theorem ipl_and_assoc_path_toEq (p q r : M.Prop_) :
-    (ipl_and_assoc_path (M := M) p q r).toEq = M.and_assoc p q r := rfl
+    (ipl_and_assoc_path (M := M) p q r).toEq = M.and_assoc p q r := by
+  simp
 theorem ipl_or_assoc_path_toEq (p q r : M.Prop_) :
-    (ipl_or_assoc_path (M := M) p q r).toEq = M.or_assoc p q r := rfl
+    (ipl_or_assoc_path (M := M) p q r).toEq = M.or_assoc p q r := by
+  simp
 theorem ipl_and_top_path_toEq (p : M.Prop_) :
-    (ipl_and_top_path (M := M) p).toEq = M.and_top p := rfl
+    (ipl_and_top_path (M := M) p).toEq = M.and_top p := by
+  simp
 theorem ipl_or_bot_path_toEq (p : M.Prop_) :
-    (ipl_or_bot_path (M := M) p).toEq = M.or_bot p := rfl
+    (ipl_or_bot_path (M := M) p).toEq = M.or_bot p := by
+  simp
 theorem ipl_and_idem_path_toEq (p : M.Prop_) :
-    (ipl_and_idem_path (M := M) p).toEq = M.and_idem p := rfl
+    (ipl_and_idem_path (M := M) p).toEq = M.and_idem p := by
+  simp
 theorem ipl_or_idem_path_toEq (p : M.Prop_) :
-    (ipl_or_idem_path (M := M) p).toEq = M.or_idem p := rfl
+    (ipl_or_idem_path (M := M) p).toEq = M.or_idem p := by
+  simp
 
 /-- Double commutativity for and: and(and(p,q), and(q,p)) via path composition. -/
 noncomputable def ipl_and_double_comm (p q : M.Prop_) :
@@ -165,26 +184,29 @@ variable {J : Coverage C}
 
 noncomputable def coverage_maximal_stable_path {A B : C.Obj} (f : C.Hom A B) :
     Path (J.pullback f (J.maximal B)) (J.maximal A) :=
-  Path.mk [Step.mk _ _ (J.maximal_stable f)] (J.maximal_stable f)
+  eq_chain (J.maximal_stable f)
 
 noncomputable def coverage_pullback_id_path {A : C.Obj} (S : J.Sieve A) :
     Path (J.pullback (C.id A) S) S :=
-  Path.mk [Step.mk _ _ (J.pullback_id S)] (J.pullback_id S)
+  eq_chain (J.pullback_id S)
 
 noncomputable def coverage_pullback_comp_path {A B D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (S : J.Sieve D) :
     Path (J.pullback (C.comp f g) S) (J.pullback f (J.pullback g S)) :=
-  Path.mk [Step.mk _ _ (J.pullback_comp f g S)] (J.pullback_comp f g S)
+  eq_chain (J.pullback_comp f g S)
 
 theorem coverage_maximal_stable_path_toEq {A B : C.Obj} (f : C.Hom A B) :
-    (coverage_maximal_stable_path (J := J) f).toEq = J.maximal_stable f := rfl
+    (coverage_maximal_stable_path (J := J) f).toEq = J.maximal_stable f := by
+  simp
 
 theorem coverage_pullback_id_path_toEq {A : C.Obj} (S : J.Sieve A) :
-    (coverage_pullback_id_path (J := J) S).toEq = J.pullback_id S := rfl
+    (coverage_pullback_id_path (J := J) S).toEq = J.pullback_id S := by
+  simp
 
 theorem coverage_pullback_comp_path_toEq {A B D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (S : J.Sieve D) :
-    (coverage_pullback_comp_path (J := J) f g S).toEq = J.pullback_comp f g S := rfl
+    (coverage_pullback_comp_path (J := J) f g S).toEq = J.pullback_comp f g S := by
+  simp
 
 /-- Triple pullback coherence. -/
 noncomputable def coverage_triple_pullback {A B D E : C.Obj}
@@ -215,17 +237,19 @@ variable {LO : LocalOperator C T Ω}
 
 noncomputable def lt_j_true_path :
     Path (C.comp Ω.true_arrow LO.j) Ω.true_arrow :=
-  Path.mk [Step.mk _ _ LO.j_true] LO.j_true
+  eq_chain LO.j_true
 
 noncomputable def lt_j_idem_path :
     Path (C.comp LO.j LO.j) LO.j :=
-  Path.mk [Step.mk _ _ LO.j_idem] LO.j_idem
+  eq_chain LO.j_idem
 
 theorem lt_j_true_path_toEq :
-    (lt_j_true_path (LO := LO)).toEq = LO.j_true := rfl
+    (lt_j_true_path (LO := LO)).toEq = LO.j_true := by
+  simp
 
 theorem lt_j_idem_path_toEq :
-    (lt_j_idem_path (LO := LO)).toEq = LO.j_idem := rfl
+    (lt_j_idem_path (LO := LO)).toEq = LO.j_idem := by
+  simp
 
 /-- Triple application of j reduces to j. -/
 noncomputable def lt_j_triple_path :
@@ -262,19 +286,21 @@ variable {SC : SheafCondition C J}
 
 noncomputable def sheaf_restrict_id_path {A : C.Obj} (s : SC.F A) :
     Path (SC.restrict (C.id A) s) s :=
-  Path.mk [Step.mk _ _ (SC.restrict_id s)] (SC.restrict_id s)
+  eq_chain (SC.restrict_id s)
 
 noncomputable def sheaf_restrict_comp_path {A B D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (s : SC.F D) :
     Path (SC.restrict (C.comp f g) s) (SC.restrict f (SC.restrict g s)) :=
-  Path.mk [Step.mk _ _ (SC.restrict_comp f g s)] (SC.restrict_comp f g s)
+  eq_chain (SC.restrict_comp f g s)
 
 theorem sheaf_restrict_id_path_toEq {A : C.Obj} (s : SC.F A) :
-    (sheaf_restrict_id_path (SC := SC) s).toEq = SC.restrict_id s := rfl
+    (sheaf_restrict_id_path (SC := SC) s).toEq = SC.restrict_id s := by
+  simp
 
 theorem sheaf_restrict_comp_path_toEq {A B D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (s : SC.F D) :
-    (sheaf_restrict_comp_path (SC := SC) f g s).toEq = SC.restrict_comp f g s := rfl
+    (sheaf_restrict_comp_path (SC := SC) f g s).toEq = SC.restrict_comp f g s := by
+  simp
 
 /-- Triple restriction coherence for sheaves. -/
 noncomputable def sheaf_triple_restrict {A B D E : C.Obj}
@@ -318,34 +344,39 @@ variable {H₁ H₂ : Hyperdoctrine C} {HM : HyperdoctrineMorphism C H₁ H₂}
 
 noncomputable def hm_preserves_meet_path {A : C.Obj} (φ ψ : H₁.Pred A) :
     Path (HM.mapPred (H₁.meet φ ψ)) (H₂.meet (HM.mapPred φ) (HM.mapPred ψ)) :=
-  Path.mk [Step.mk _ _ (HM.preserves_meet φ ψ)] (HM.preserves_meet φ ψ)
+  eq_chain (HM.preserves_meet φ ψ)
 
 noncomputable def hm_preserves_join_path {A : C.Obj} (φ ψ : H₁.Pred A) :
     Path (HM.mapPred (H₁.join φ ψ)) (H₂.join (HM.mapPred φ) (HM.mapPred ψ)) :=
-  Path.mk [Step.mk _ _ (HM.preserves_join φ ψ)] (HM.preserves_join φ ψ)
+  eq_chain (HM.preserves_join φ ψ)
 
 noncomputable def hm_preserves_top_path {A : C.Obj} :
     Path (HM.mapPred (H₁.top A)) (H₂.top A) :=
-  Path.mk [Step.mk _ _ HM.preserves_top] HM.preserves_top
+  eq_chain HM.preserves_top
 
 noncomputable def hm_preserves_bot_path {A : C.Obj} :
     Path (HM.mapPred (H₁.bot A)) (H₂.bot A) :=
-  Path.mk [Step.mk _ _ HM.preserves_bot] HM.preserves_bot
+  eq_chain HM.preserves_bot
 
 noncomputable def hm_preserves_subst_path {A B : C.Obj} (f : C.Hom A B) (φ : H₁.Pred B) :
     Path (HM.mapPred (H₁.subst f φ)) (H₂.subst f (HM.mapPred φ)) :=
-  Path.mk [Step.mk _ _ (HM.preserves_subst f φ)] (HM.preserves_subst f φ)
+  eq_chain (HM.preserves_subst f φ)
 
 theorem hm_preserves_meet_path_toEq {A : C.Obj} (φ ψ : H₁.Pred A) :
-    (hm_preserves_meet_path (HM := HM) φ ψ).toEq = HM.preserves_meet φ ψ := rfl
+    (hm_preserves_meet_path (HM := HM) φ ψ).toEq = HM.preserves_meet φ ψ := by
+  simp
 theorem hm_preserves_join_path_toEq {A : C.Obj} (φ ψ : H₁.Pred A) :
-    (hm_preserves_join_path (HM := HM) φ ψ).toEq = HM.preserves_join φ ψ := rfl
+    (hm_preserves_join_path (HM := HM) φ ψ).toEq = HM.preserves_join φ ψ := by
+  simp
 theorem hm_preserves_top_path_toEq {A : C.Obj} :
-    (hm_preserves_top_path (HM := HM) (A := A)).toEq = HM.preserves_top := rfl
+    (hm_preserves_top_path (HM := HM) (A := A)).toEq = HM.preserves_top := by
+  simp
 theorem hm_preserves_bot_path_toEq {A : C.Obj} :
-    (hm_preserves_bot_path (HM := HM) (A := A)).toEq = HM.preserves_bot := rfl
+    (hm_preserves_bot_path (HM := HM) (A := A)).toEq = HM.preserves_bot := by
+  simp
 theorem hm_preserves_subst_path_toEq {A B : C.Obj} (f : C.Hom A B) (φ : H₁.Pred B) :
-    (hm_preserves_subst_path (HM := HM) f φ).toEq = HM.preserves_subst f φ := rfl
+    (hm_preserves_subst_path (HM := HM) f φ).toEq = HM.preserves_subst f φ := by
+  simp
 
 /-- Morphism preserves meet-substitution interaction. -/
 noncomputable def hm_meet_subst_coherence {A B : C.Obj}
@@ -427,42 +458,47 @@ variable {DL : DistLattice.{u}}
 
 noncomputable def dl_distribute_path (a b c : DL.carrier) :
     Path (DL.meet_ a (DL.join_ b c)) (DL.join_ (DL.meet_ a b) (DL.meet_ a c)) :=
-  Path.mk [Step.mk _ _ (DL.distribute a b c)] (DL.distribute a b c)
+  eq_chain (DL.distribute a b c)
 
 noncomputable def dl_meet_comm_path (a b : DL.carrier) :
     Path (DL.meet_ a b) (DL.meet_ b a) :=
-  Path.mk [Step.mk _ _ (DL.meet_comm a b)] (DL.meet_comm a b)
+  eq_chain (DL.meet_comm a b)
 
 noncomputable def dl_join_comm_path (a b : DL.carrier) :
     Path (DL.join_ a b) (DL.join_ b a) :=
-  Path.mk [Step.mk _ _ (DL.join_comm a b)] (DL.join_comm a b)
+  eq_chain (DL.join_comm a b)
 
 noncomputable def dl_meet_assoc_path (a b c : DL.carrier) :
     Path (DL.meet_ (DL.meet_ a b) c) (DL.meet_ a (DL.meet_ b c)) :=
-  Path.mk [Step.mk _ _ (DL.meet_assoc a b c)] (DL.meet_assoc a b c)
+  eq_chain (DL.meet_assoc a b c)
 
 noncomputable def dl_join_assoc_path (a b c : DL.carrier) :
     Path (DL.join_ (DL.join_ a b) c) (DL.join_ a (DL.join_ b c)) :=
-  Path.mk [Step.mk _ _ (DL.join_assoc a b c)] (DL.join_assoc a b c)
+  eq_chain (DL.join_assoc a b c)
 
 noncomputable def dl_meet_top_path (a : DL.carrier) :
     Path (DL.meet_ a DL.top_) a :=
-  Path.mk [Step.mk _ _ (DL.meet_top a)] (DL.meet_top a)
+  eq_chain (DL.meet_top a)
 
 noncomputable def dl_join_bot_path (a : DL.carrier) :
     Path (DL.join_ a DL.bot_) a :=
-  Path.mk [Step.mk _ _ (DL.join_bot a)] (DL.join_bot a)
+  eq_chain (DL.join_bot a)
 
 theorem dl_distribute_path_toEq (a b c : DL.carrier) :
-    (dl_distribute_path (DL := DL) a b c).toEq = DL.distribute a b c := rfl
+    (dl_distribute_path (DL := DL) a b c).toEq = DL.distribute a b c := by
+  simp
 theorem dl_meet_comm_path_toEq (a b : DL.carrier) :
-    (dl_meet_comm_path (DL := DL) a b).toEq = DL.meet_comm a b := rfl
+    (dl_meet_comm_path (DL := DL) a b).toEq = DL.meet_comm a b := by
+  simp
 theorem dl_join_comm_path_toEq (a b : DL.carrier) :
-    (dl_join_comm_path (DL := DL) a b).toEq = DL.join_comm a b := rfl
+    (dl_join_comm_path (DL := DL) a b).toEq = DL.join_comm a b := by
+  simp
 theorem dl_meet_assoc_path_toEq (a b c : DL.carrier) :
-    (dl_meet_assoc_path (DL := DL) a b c).toEq = DL.meet_assoc a b c := rfl
+    (dl_meet_assoc_path (DL := DL) a b c).toEq = DL.meet_assoc a b c := by
+  simp
 theorem dl_join_assoc_path_toEq (a b c : DL.carrier) :
-    (dl_join_assoc_path (DL := DL) a b c).toEq = DL.join_assoc a b c := rfl
+    (dl_join_assoc_path (DL := DL) a b c).toEq = DL.join_assoc a b c := by
+  simp
 
 /-- Distribution coherence: meet over join and then commutativity. -/
 noncomputable def dl_distribute_comm_path (a b c : DL.carrier) :
@@ -504,7 +540,7 @@ noncomputable def derivation_path {S : Sequent C T Ω} {L : InternalLogic C T Ω
     (D : Derivation C T Ω S L)
     (h : C.comp S.antecedent L.impOp = S.consequent) :
     Path (C.comp S.antecedent L.impOp) S.consequent :=
-  Path.mk [Step.mk _ _ (D.witness h)] (D.witness h)
+  eq_chain (D.witness h)
 
 /-- Identity derivation: if antecedent equals consequent. -/
 noncomputable def identity_sequent_path {Γ : C.Obj} (φ : C.Hom Γ Ω.Ω) :
@@ -533,19 +569,21 @@ variable {PS : Presheaf C}
 
 noncomputable def presheaf_map_id_path {A : C.Obj} (x : PS.obj A) :
     Path (PS.map (C.id A) x) x :=
-  Path.mk [Step.mk _ _ (PS.map_id x)] (PS.map_id x)
+  eq_chain (PS.map_id x)
 
 noncomputable def presheaf_map_comp_path {A B D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (x : PS.obj D) :
     Path (PS.map (C.comp f g) x) (PS.map f (PS.map g x)) :=
-  Path.mk [Step.mk _ _ (PS.map_comp f g x)] (PS.map_comp f g x)
+  eq_chain (PS.map_comp f g x)
 
 theorem presheaf_map_id_path_toEq {A : C.Obj} (x : PS.obj A) :
-    (presheaf_map_id_path (PS := PS) x).toEq = PS.map_id x := rfl
+    (presheaf_map_id_path (PS := PS) x).toEq = PS.map_id x := by
+  simp
 
 theorem presheaf_map_comp_path_toEq {A B D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (x : PS.obj D) :
-    (presheaf_map_comp_path (PS := PS) f g x).toEq = PS.map_comp f g x := rfl
+    (presheaf_map_comp_path (PS := PS) f g x).toEq = PS.map_comp f g x := by
+  simp
 
 /-- Triple functoriality for presheaves. -/
 noncomputable def presheaf_triple_map {A B D E : C.Obj}
@@ -581,11 +619,12 @@ variable {F G : Presheaf C}
 noncomputable def nt_naturality_path (η : PresheafNT C F G) {A B : C.Obj}
     (f : C.Hom A B) (x : F.obj B) :
     Path (η.component A (F.map f x)) (G.map f (η.component B x)) :=
-  Path.mk [Step.mk _ _ (η.naturality f x)] (η.naturality f x)
+  eq_chain (η.naturality f x)
 
 theorem nt_naturality_path_toEq (η : PresheafNT C F G) {A B : C.Obj}
     (f : C.Hom A B) (x : F.obj B) :
-    (nt_naturality_path η f x).toEq = η.naturality f x := rfl
+    (nt_naturality_path η f x).toEq = η.naturality f x := by
+  simp
 
 /-- Identity natural transformation. -/
 noncomputable def nt_id_naturality {A B : C.Obj} (f : C.Hom A B) (x : F.obj B) :
@@ -603,13 +642,14 @@ noncomputable def cha_distribute_chain (HA : HeytingAlgebra)
       HA.meet_ a (HA.join_ b c) = HA.join_ (HA.meet_ a b) (HA.meet_ a c))
     (a b c : HA.carrier) :
     Path (HA.meet_ a (HA.join_ b c)) (HA.join_ (HA.meet_ a b) (HA.meet_ a c)) :=
-  Path.mk [Step.mk _ _ (hd a b c)] (hd a b c)
+  eq_chain (hd a b c)
 
 theorem cha_distribute_chain_toEq (HA : HeytingAlgebra)
     (hd : ∀ (a b c : HA.carrier),
       HA.meet_ a (HA.join_ b c) = HA.join_ (HA.meet_ a b) (HA.meet_ a c))
     (a b c : HA.carrier) :
-    (cha_distribute_chain HA hd a b c).toEq = hd a b c := rfl
+    (cha_distribute_chain HA hd a b c).toEq = hd a b c := by
+  simp
 
 /-- Categorical logic summary: composing subobject classifier with internal logic. -/
 noncomputable def categorical_logic_chain (L : InternalLogic C T Ω) :
