@@ -62,16 +62,16 @@ noncomputable def comp_assoc_path {A B D E : C.Obj}
 
 theorem comp_id_left_path_toEq {A B : C.Obj} (f : C.Hom A B) :
     (comp_id_left_path f).toEq = C.comp_id_left f := by
-  simpa [comp_id_left_path]
+  simp
 
 theorem comp_id_right_path_toEq {A B : C.Obj} (f : C.Hom A B) :
     (comp_id_right_path f).toEq = C.comp_id_right f := by
-  simpa [comp_id_right_path]
+  simp
 
 theorem comp_assoc_path_toEq {A B D E : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (h : C.Hom D E) :
     (comp_assoc_path f g h).toEq = C.comp_assoc f g h := by
-  simpa [comp_assoc_path]
+  simp
 
 /-! ## Terminal object -/
 
@@ -87,7 +87,7 @@ noncomputable def terminal_unique_path (T : Terminal C) {A : C.Obj} (f : C.Hom A
 
 theorem terminal_unique_path_toEq (T : Terminal C) {A : C.Obj} (f : C.Hom A T.one) :
     (terminal_unique_path T f).toEq = T.unique f := by
-  simpa [terminal_unique_path]
+  simp
 
 noncomputable def terminal_morphisms_equal (T : Terminal C) {A : C.Obj}
     (f g : C.Hom A T.one) : Path f g :=
@@ -117,7 +117,7 @@ noncomputable def subobj_pullback_path (Ω : SubobjectClassifier C T)
 theorem subobj_pullback_path_toEq (Ω : SubobjectClassifier C T)
     {A B : C.Obj} (m : C.Hom A B) :
     (subobj_pullback_path Ω m).toEq = Ω.pullback_condition m := by
-  simpa [subobj_pullback_path]
+  simp
 
 /-- The truth morphism viewed as a subobject characteristic map. -/
 noncomputable def truth_char_path (Ω : SubobjectClassifier C T) :
@@ -155,15 +155,15 @@ noncomputable def imp_true_true_path (L : InternalLogic C T Ω) :
 
 theorem and_idempotent_path_toEq (L : InternalLogic C T Ω) :
     (and_idempotent_path L).toEq = L.and_idempotent := by
-  simpa [and_idempotent_path]
+  simp
 
 theorem or_absorb_true_path_toEq (L : InternalLogic C T Ω) :
     (or_absorb_true_path L).toEq = L.or_absorb_true := by
-  simpa [or_absorb_true_path]
+  simp
 
 theorem imp_true_true_path_toEq (L : InternalLogic C T Ω) :
     (imp_true_true_path L).toEq = L.imp_true_true := by
-  simpa [imp_true_true_path]
+  simp
 
 /-- Conjunction of two truth arrows equals truth. -/
 noncomputable def and_truth_chain (L : InternalLogic C T Ω) :
@@ -199,7 +199,7 @@ noncomputable def eval_transpose_path {A : C.Obj} (φ : C.Hom A Ω.Ω) :
 
 theorem eval_transpose_path_toEq {A : C.Obj} (φ : C.Hom A Ω.Ω) :
     (eval_transpose_path (P := P) φ).toEq = P.eval_transpose φ := by
-  simpa [eval_transpose_path]
+  simp
 
 /-- Power object membership is self-classifying. -/
 noncomputable def pow_self_classify (A : C.Obj) :
@@ -241,7 +241,7 @@ noncomputable def mb_true_interp_path :
 
 theorem mb_true_interp_path_toEq :
     (mb_true_interp_path (MB := MB)).toEq = MB.true_interp := by
-  simpa [mb_true_interp_path]
+  simp
 
 /-- Congruence: and-formula interpretation under path transport. -/
 noncomputable def mb_and_congruence (φ ψ : MB.Formula) :
@@ -338,30 +338,30 @@ noncomputable def subst_bot_path {A B : C.Obj} (f : C.Hom A B) :
 
 theorem subst_id_path_toEq {A : C.Obj} (φ : H.Pred A) :
     (subst_id_path (H := H) φ).toEq = H.subst_id φ := by
-  simpa [subst_id_path]
+  simp
 
 theorem subst_comp_path_toEq {A B D : C.Obj}
     (f : C.Hom A B) (g : C.Hom B D) (φ : H.Pred D) :
     (subst_comp_path (H := H) f g φ).toEq = H.subst_comp f g φ := by
-  simpa [subst_comp_path]
+  simp
 
 theorem subst_meet_path_toEq {A B : C.Obj}
     (f : C.Hom A B) (φ ψ : H.Pred B) :
     (subst_meet_path (H := H) f φ ψ).toEq = H.subst_meet f φ ψ := by
-  simpa [subst_meet_path]
+  simp
 
 theorem subst_join_path_toEq {A B : C.Obj}
     (f : C.Hom A B) (φ ψ : H.Pred B) :
     (subst_join_path (H := H) f φ ψ).toEq = H.subst_join f φ ψ := by
-  simpa [subst_join_path]
+  simp
 
 theorem subst_top_path_toEq {A B : C.Obj} (f : C.Hom A B) :
     (subst_top_path (H := H) f).toEq = H.subst_top f := by
-  simpa [subst_top_path]
+  simp
 
 theorem subst_bot_path_toEq {A B : C.Obj} (f : C.Hom A B) :
     (subst_bot_path (H := H) f).toEq = H.subst_bot f := by
-  simpa [subst_bot_path]
+  simp
 
 /-- Triple substitution coherence: f ∘ g ∘ h. -/
 noncomputable def subst_triple_coherence {A B D E : C.Obj}
@@ -377,7 +377,7 @@ theorem subst_triple_coherence_consistent {A B D E : C.Obj}
     (subst_triple_coherence (H := H) f g h φ).toEq =
       Eq.trans (H.subst_comp (C.comp f g) h φ)
                (H.subst_comp f g (H.subst h φ)) := by
-  simp [subst_triple_coherence]
+  simp
 
 /-- Substitution along associativity path. -/
 noncomputable def subst_assoc_path {A B D E : C.Obj}
@@ -444,12 +444,12 @@ theorem beck_chevalley_path_toEq {A B D E : C.Obj}
     (sq : C.comp f k = C.comp h g) (φ : QH.Pred D) :
     (beck_chevalley_path f g h k sq φ).toEq =
       QH.beck_chevalley_exists f g h k sq φ := by
-  simpa [beck_chevalley_path]
+  simp
 
 theorem frobenius_path_toEq {A B : C.Obj}
     (f : C.Hom A B) (φ : QH.Pred A) (ψ : QH.Pred B) :
     (frobenius_path (QH := QH) f φ ψ).toEq = QH.frobenius f φ ψ := by
-  simpa [frobenius_path]
+  simp
 
 end QHPaths
 
@@ -549,20 +549,20 @@ noncomputable def logical_preserves_omega_path (LF : LogicalFunctor E F TE TF Ω
 theorem logical_preserves_id_path_toEq (LF : LogicalFunctor E F TE TF ΩE ΩF)
     (A : E.Obj) :
     (logical_preserves_id_path LF A).toEq = LF.preserves_id A := by
-  simpa [logical_preserves_id_path]
+  simp
 
 theorem logical_preserves_comp_path_toEq (LF : LogicalFunctor E F TE TF ΩE ΩF)
     {A B D : E.Obj} (f : E.Hom A B) (g : E.Hom B D) :
     (logical_preserves_comp_path LF f g).toEq = LF.preserves_comp f g := by
-  simpa [logical_preserves_comp_path]
+  simp
 
 theorem logical_preserves_terminal_path_toEq (LF : LogicalFunctor E F TE TF ΩE ΩF) :
     (logical_preserves_terminal_path LF).toEq = LF.preserves_terminal := by
-  simpa [logical_preserves_terminal_path]
+  simp
 
 theorem logical_preserves_omega_path_toEq (LF : LogicalFunctor E F TE TF ΩE ΩF) :
     (logical_preserves_omega_path LF).toEq = LF.preserves_omega := by
-  simpa [logical_preserves_omega_path]
+  simp
 
 /-- Logical functor preserves triple composition. -/
 noncomputable def logical_preserves_triple_comp (LF : LogicalFunctor E F TE TF ΩE ΩF)
@@ -653,19 +653,19 @@ noncomputable def heyting_join_bot_path (HA : HeytingAlgebra) (a : HA.carrier) :
 
 theorem heyting_meet_comm_path_toEq (HA : HeytingAlgebra) (a b : HA.carrier) :
     (heyting_meet_comm_path HA a b).toEq = HA.meet_comm a b := by
-  simpa [heyting_meet_comm_path]
+  simp
 
 theorem heyting_join_comm_path_toEq (HA : HeytingAlgebra) (a b : HA.carrier) :
     (heyting_join_comm_path HA a b).toEq = HA.join_comm a b := by
-  simpa [heyting_join_comm_path]
+  simp
 
 theorem heyting_meet_top_path_toEq (HA : HeytingAlgebra) (a : HA.carrier) :
     (heyting_meet_top_path HA a).toEq = HA.meet_top a := by
-  simpa [heyting_meet_top_path]
+  simp
 
 theorem heyting_join_bot_path_toEq (HA : HeytingAlgebra) (a : HA.carrier) :
     (heyting_join_bot_path HA a).toEq = HA.join_bot a := by
-  simpa [heyting_join_bot_path]
+  simp
 
 /-- Meet double commutativity: swapping twice returns to start. -/
 noncomputable def heyting_meet_double_comm (HA : HeytingAlgebra) (a b : HA.carrier) :
