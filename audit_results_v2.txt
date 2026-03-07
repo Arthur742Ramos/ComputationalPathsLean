@@ -1,0 +1,857 @@
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:39:  Path.mk [Step.mk _ _ (C.comp_id_left f)] (C.comp_id_left f)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:44:  Path.mk [Step.mk _ _ (C.comp_id_right f)] (C.comp_id_right f)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:50:  Path.mk [Step.mk _ _ (C.comp_assoc f g h)] (C.comp_assoc f g h)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:72:  Path.mk [Step.mk _ _ (T.unique f)] (T.unique f)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:100:  Path.mk [Step.mk _ _ (Ω.pullback_condition m)] (Ω.pullback_condition m)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:130:  Path.mk [Step.mk _ _ L.and_idempotent] L.and_idempotent
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:134:  Path.mk [Step.mk _ _ L.or_absorb_true] L.or_absorb_true
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:138:  Path.mk [Step.mk _ _ L.imp_true_true] L.imp_true_true
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:179:  Path.mk [Step.mk _ _ (P.eval_transpose φ)] (P.eval_transpose φ)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:220:  Path.mk [Step.mk _ _ MB.true_interp] MB.true_interp
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:288:  Path.mk [Step.mk _ _ (H.subst_id φ)] (H.subst_id φ)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:294:  Path.mk [Step.mk _ _ (H.subst_comp f g φ)] (H.subst_comp f g φ)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:300:  Path.mk [Step.mk _ _ (H.subst_meet f φ ψ)] (H.subst_meet f φ ψ)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:306:  Path.mk [Step.mk _ _ (H.subst_join f φ ψ)] (H.subst_join f φ ψ)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:311:  Path.mk [Step.mk _ _ (H.subst_top f)] (H.subst_top f)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:316:  Path.mk [Step.mk _ _ (H.subst_bot f)] (H.subst_bot f)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:345:    (Path.mk [Step.mk _ _ (H.subst_comp (C.comp f g) h φ)]
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:347:    (Path.mk [Step.mk _ _ (H.subst_comp f g (H.subst h φ))]
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:372:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:378:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:407:  Path.mk [Step.mk _ _ (QH.beck_chevalley_exists f g h k sq φ)]
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:415:  Path.mk [Step.mk _ _ (QH.frobenius f φ ψ)] (QH.frobenius f φ ψ)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:507:  Path.mk [Step.mk _ _ (LF.preserves_id A)] (LF.preserves_id A)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:512:  Path.mk [Step.mk _ _ (LF.preserves_comp f g)] (LF.preserves_comp f g)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:516:  Path.mk [Step.mk _ _ LF.preserves_terminal] LF.preserves_terminal
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:520:  Path.mk [Step.mk _ _ LF.preserves_omega] LF.preserves_omega
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:609:  Path.mk [Step.mk _ _ (HA.meet_comm a b)] (HA.meet_comm a b)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:613:  Path.mk [Step.mk _ _ (HA.join_comm a b)] (HA.join_comm a b)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:617:  Path.mk [Step.mk _ _ (HA.meet_top a)] (HA.meet_top a)
+ComputationalPaths/CategoricalLogic/PathInfrastructure.lean:621:  Path.mk [Step.mk _ _ (HA.join_bot a)] (HA.join_bot a)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:53:  Path.mk [Step.mk _ _ (M.and_comm p q)] (M.and_comm p q)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:57:  Path.mk [Step.mk _ _ (M.or_comm p q)] (M.or_comm p q)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:61:  Path.mk [Step.mk _ _ (M.and_assoc p q r)] (M.and_assoc p q r)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:65:  Path.mk [Step.mk _ _ (M.or_assoc p q r)] (M.or_assoc p q r)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:69:  Path.mk [Step.mk _ _ (M.and_top p)] (M.and_top p)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:73:  Path.mk [Step.mk _ _ (M.or_bot p)] (M.or_bot p)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:77:  Path.mk [Step.mk _ _ (M.and_idem p)] (M.and_idem p)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:81:  Path.mk [Step.mk _ _ (M.or_idem p)] (M.or_idem p)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:168:  Path.mk [Step.mk _ _ (J.maximal_stable f)] (J.maximal_stable f)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:172:  Path.mk [Step.mk _ _ (J.pullback_id S)] (J.pullback_id S)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:177:  Path.mk [Step.mk _ _ (J.pullback_comp f g S)] (J.pullback_comp f g S)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:218:  Path.mk [Step.mk _ _ LO.j_true] LO.j_true
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:222:  Path.mk [Step.mk _ _ LO.j_idem] LO.j_idem
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:265:  Path.mk [Step.mk _ _ (SC.restrict_id s)] (SC.restrict_id s)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:270:  Path.mk [Step.mk _ _ (SC.restrict_comp f g s)] (SC.restrict_comp f g s)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:321:  Path.mk [Step.mk _ _ (HM.preserves_meet φ ψ)] (HM.preserves_meet φ ψ)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:325:  Path.mk [Step.mk _ _ (HM.preserves_join φ ψ)] (HM.preserves_join φ ψ)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:329:  Path.mk [Step.mk _ _ HM.preserves_top] HM.preserves_top
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:333:  Path.mk [Step.mk _ _ HM.preserves_bot] HM.preserves_bot
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:337:  Path.mk [Step.mk _ _ (HM.preserves_subst f φ)] (HM.preserves_subst f φ)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:430:  Path.mk [Step.mk _ _ (DL.distribute a b c)] (DL.distribute a b c)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:434:  Path.mk [Step.mk _ _ (DL.meet_comm a b)] (DL.meet_comm a b)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:438:  Path.mk [Step.mk _ _ (DL.join_comm a b)] (DL.join_comm a b)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:442:  Path.mk [Step.mk _ _ (DL.meet_assoc a b c)] (DL.meet_assoc a b c)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:446:  Path.mk [Step.mk _ _ (DL.join_assoc a b c)] (DL.join_assoc a b c)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:450:  Path.mk [Step.mk _ _ (DL.meet_top a)] (DL.meet_top a)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:454:  Path.mk [Step.mk _ _ (DL.join_bot a)] (DL.join_bot a)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:507:  Path.mk [Step.mk _ _ (D.witness h)] (D.witness h)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:536:  Path.mk [Step.mk _ _ (PS.map_id x)] (PS.map_id x)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:541:  Path.mk [Step.mk _ _ (PS.map_comp f g x)] (PS.map_comp f g x)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:584:  Path.mk [Step.mk _ _ (η.naturality f x)] (η.naturality f x)
+ComputationalPaths/CategoricalLogic/CategoricalLogicPaths.lean:606:  Path.mk [Step.mk _ _ (hd a b c)] (hd a b c)
+ComputationalPaths/Path/Groupoid/ActionGroupoidPaths.lean:95:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Groupoid/CoveringPaths.lean:50:  Path.mk [Step.mk _ _ (liftEndpoint_refl C e he)] (liftEndpoint_refl C e he)
+ComputationalPaths/Path/Groupoid/CoveringPaths.lean:153:  Path.mk [Step.mk _ _ (σ.proj_comm e)] (σ.proj_comm e)
+ComputationalPaths/Path/Groupoid/CoveringPaths.lean:192:    ⟨(Path.transport (D := fun _ => A) ((Path.mk [Step.mk _ _ ha] ha) |>.trans p) a₀ : A), f⟩
+ComputationalPaths/Path/Groupoid/CoveringPaths.lean:236:      ((Path.mk [Step.mk _ _ (hf a)] (hf a))
+ComputationalPaths/Path/Groupoid/CoveringPaths.lean:237:        |>.trans (Path.trans p (Path.mk [Step.mk _ _ (hf b).symm] (hf b).symm))).toEq := by
+ComputationalPaths/Path/Groupoid/CoveringPaths.lean:244:      ((Path.mk [Step.mk _ _ (σ.proj_comm e₁)] (σ.proj_comm e₁)).trans
+ComputationalPaths/Path/Groupoid/CoveringPaths.lean:246:          (Path.mk [Step.mk _ _ (σ.proj_comm e₂).symm] (σ.proj_comm e₂).symm))).toEq := by
+ComputationalPaths/Path/Groupoid/OmegaGroupoidDeep.lean:203:  Path.mk [Step.mk _ _ (Path.trans_assoc p q r)] (Path.trans_assoc p q r)
+ComputationalPaths/Path/Groupoid/OmegaGroupoidDeep.lean:208:  Path.mk [Step.mk _ _ (Path.trans_refl_left p)] (Path.trans_refl_left p)
+ComputationalPaths/Path/Groupoid/OmegaGroupoidDeep.lean:213:  Path.mk [Step.mk _ _ (Path.trans_refl_right p)] (Path.trans_refl_right p)
+ComputationalPaths/Path/Groupoid/SymmetryGroupoidPaths.lean:134:  Path.mk [Step.mk _ _ (swap_involution s)] (swap_involution s)
+ComputationalPaths/Path/Groupoid/SymmetryGroupoidPaths.lean:141:  Path.mk [Step.mk _ _ (doubleSwap_is_id s)] (doubleSwap_is_id s)
+ComputationalPaths/Path/Groupoid/SymmetryGroupoidPaths.lean:149:  Path.mk [Step.mk _ _ (projectCharge_idem s)] (projectCharge_idem s)
+ComputationalPaths/Path/Groupoid/SymmetryGroupoidPaths.lean:157:  Path.mk [Step.mk _ _ (project_kills_shift s)] (project_kills_shift s)
+ComputationalPaths/Path/Groupoid/SymmetryGroupoidPaths.lean:166:  Path.mk [Step.mk _ _ (totalCharge_swap_conserved s)] (totalCharge_swap_conserved s)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:54:  Path.mk [Step.mk _ _ (M.assoc a b c)] (M.assoc a b c)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:58:  Path.mk [Step.mk _ _ (M.leftUnit a)] (M.leftUnit a)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:62:  Path.mk [Step.mk _ _ (M.rightUnit a)] (M.rightUnit a)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:122:  Path.mk [Step.mk _ _ (C.assocCoherence a b c d)] (C.assocCoherence a b c d)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:133:  Path.mk [Step.mk _ _ (C.leftUnitCoherence a b)] (C.leftUnitCoherence a b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:143:  Path.mk [Step.mk _ _ (C.rightUnitCoherence a b)] (C.rightUnitCoherence a b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:194:  Path.mk [Step.mk _ _ (F.compCoherence a b c)] (F.compCoherence a b c)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:205:  Path.mk [Step.mk _ _ (F.idCoherence a)] (F.idCoherence a)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:241:  Path.mk [Step.mk _ _ (alpha.naturality a b)] (alpha.naturality a b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:277:  Path.mk [Step.mk _ _ (L.tensorCoherence a b)] (L.tensorCoherence a b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:287:  Path.mk [Step.mk _ _ L.unitCoherence] L.unitCoherence
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:315:  Path.mk [Step.mk _ _ (cbd.homTransported a b)] (cbd.homTransported a b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:335:  Path.mk [Step.mk _ _ (adj.homIso a b)] (adj.homIso a b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:376:  Path.mk [Step.mk _ _ (lim.universality x j)] (lim.universality x j)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:404:  Path.mk [Step.mk _ _ (colim.universality x j)] (colim.universality x j)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:432:  Path.mk [Step.mk _ _ (e.dinaturality a b)] (e.dinaturality a b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:460:  Path.mk [Step.mk _ _ (ce.dinaturality a b)] (ce.dinaturality a b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:505:  Path.mk [Step.mk _ _ Y.leftInverse] Y.leftInverse
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:519:  Path.mk [Step.mk _ _ Y.rightInverse] Y.rightInverse
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:553:  Path.mk [Step.mk _ _ (D.coendWitness c a b)] (D.coendWitness c a b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:580:  Path.mk [Step.mk _ _ (P.coherence a b c)] (P.coherence a b c)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:605:  Path.mk [Step.mk _ _ (pw.iso x)] (pw.iso x)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:625:  Path.mk [Step.mk _ _ (cp.iso x)] (cp.iso x)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:651:  Path.mk [Step.mk _ _ (lan.counit c)] (lan.counit c)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:673:  Path.mk [Step.mk _ _ (ran.unit c)] (ran.unit c)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:702:  Path.mk [Step.mk _ _ (E.unitIso a)] (E.unitIso a)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:718:  Path.mk [Step.mk _ _ (E.counitIso b)] (E.counitIso b)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:740:  Path.mk [Step.mk _ _ (monad.leftUnitLaw a)] (monad.leftUnitLaw a)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:754:  Path.mk [Step.mk _ _ (monad.rightUnitLaw a)] (monad.rightUnitLaw a)
+ComputationalPaths/Path/Category/EnrichedCategoryDeep.lean:788:  Path.mk [Step.mk _ _ (comonad.leftCounitLaw a)] (comonad.leftCounitLaw a)
+ComputationalPaths/Path/Rewrite/StringRewriting.lean:113:  ComputationalPaths.Path.mk [Step.mk _ _ (word_append_assoc u v w)]
+ComputationalPaths/Path/Rewrite/StringRewriting.lean:119:  ComputationalPaths.Path.mk [Step.mk _ _ (word_nil_append w)]
+ComputationalPaths/Path/Rewrite/StringRewriting.lean:125:  ComputationalPaths.Path.mk [Step.mk _ _ (word_append_nil w)]
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:283:  Path.mk [Step.mk _ _ (FreeWord.mul_assoc u v w)] (FreeWord.mul_assoc u v w)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:288:  Path.mk [Step.mk _ _ (FreeWord.ε_mul w)] (FreeWord.ε_mul w)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:293:  Path.mk [Step.mk _ _ (FreeWord.mul_ε w)] (FreeWord.mul_ε w)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:300:  Path.mk [Step.mk _ _ (FreeWord.inv_mul u v)] (FreeWord.inv_mul u v)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:305:  Path.mk [Step.mk _ _ (FreeWord.inv_inv w)] (FreeWord.inv_inv w)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:311:  Path.mk [Step.mk _ _ (FreeWord.len_mul u v)] (FreeWord.len_mul u v)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:316:  Path.mk [Step.mk _ _ (FreeWord.len_inv w)] (FreeWord.len_inv w)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:474:  Path.mk [Step.mk _ _ (WTerm.mul_assoc_eq a b c)] (WTerm.mul_assoc_eq a b c)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:478:  Path.mk [Step.mk _ _ (WTerm.one_mul_eq a)] (WTerm.one_mul_eq a)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:482:  Path.mk [Step.mk _ _ (WTerm.mul_one_eq a)] (WTerm.mul_one_eq a)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:486:  Path.mk [Step.mk _ _ (WTerm.inv_inv_eq a)] (WTerm.inv_inv_eq a)
+ComputationalPaths/Path/Algebra/CoherentPresentationDeep.lean:946:  Path.mk [Step.mk e.src.word e.tgt.word e.conn] e.conn
+ComputationalPaths/Path/Category/TwoCategPathDeep.lean:292:        (Path.mk [Step.mk (k (g (f a))) (l (g (f a))) (τ (f a))] (τ (f a)))
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:75:    (Path.mk [Step.mk (tvMeet a (tvJoin a b)) a (tvMeet_absorb_join a b)]
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:83:    (Path.mk [Step.mk (tvJoin a (tvMeet a b)) a (tvJoin_absorb_meet a b)]
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:88:  Path.mk [Step.mk (tvNeg (tvNeg a)) a (tvNeg_invol a)] (tvNeg_invol a)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:93:  Path.mk [Step.mk _ _ (tvDeMorgan_meet a b)] (tvDeMorgan_meet a b)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:98:  Path.mk [Step.mk _ _ (tvDeMorgan_join a b)] (tvDeMorgan_join a b)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:104:    (Path.mk [Step.mk _ _ (tvMeet_comm a b)] (tvMeet_comm a b))
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:109:  Path.symm (Path.mk [Step.mk _ _ (tvMeet_assoc a b c)] (tvMeet_assoc a b c))
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:117:      (Path.mk [Step.mk _ _ (tvMeet_comm a b)] (tvMeet_comm a b)))
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:126:  Path.mk [Step.mk _ _ (tvImpl_refl a)] (tvImpl_refl a)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:153:  Path.mk [Step.mk _ _ (top.j_idem a)] (top.j_idem a)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:165:  Path.mk [Step.mk _ _ (top.j_meet a b)] (top.j_meet a b)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:171:    (Path.mk [Step.mk _ _ (tvMeet_comm a b)] (tvMeet_comm a b))
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:176:  Path.mk [Step.mk _ _ (tvMeet_comm (top.j a) (top.j b))]
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:192:  Path.mk [Step.mk _ _ top.j_true] top.j_true
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:224:  Path.mk [Step.mk _ _ (gm.unit x)] (gm.unit x)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:229:  Path.mk [Step.mk _ _ (gm.counit x)] (gm.counit x)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:297:  Path.mk [Step.mk _ _ (s.idem x)] (s.idem x)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:329:  Path.mk [Step.mk b true (modusPonens a b himp ha)] (modusPonens a b himp ha)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:339:  Path.mk [Step.mk _ _ (contrapositive a b h)] (contrapositive a b h)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:347:  Path.mk [Step.mk _ _ (excludedMiddle a)] (excludedMiddle a)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:358:  Path.mk [Step.mk _ _ (cm.idem x)] (cm.idem x)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:382:      (Path.mk [Step.mk _ _ (tvMeet_comm a b)] (tvMeet_comm a b))
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:383:      (Path.mk [Step.mk _ _ (tvMeet_comm b a)] (tvMeet_comm b a))).proof
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:390:      (Path.mk [Step.mk _ _ (tvJoin_comm a b)] (tvJoin_comm a b))
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:391:      (Path.mk [Step.mk _ _ (tvJoin_comm b a)] (tvJoin_comm b a))).proof
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:397:    (Path.symm (Path.mk [Step.mk _ _ (tvMeet_comm a b)] (tvMeet_comm a b))).proof
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:398:    = (Path.mk [Step.mk _ _ (tvMeet_comm b a)] (tvMeet_comm b a)).proof :=
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:431:  Path.mk [Step.mk _ _ (p.restrict_id i)] (p.restrict_id i)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:436:  Path.mk [Step.mk _ _ (p.restrict_comp i j k)] (p.restrict_comp i j k)
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:442:    (Path.congrArg (· + p.restrict i i) (Path.mk [Step.mk _ _ (p.restrict_id i)] (p.restrict_id i)))
+ComputationalPaths/Path/Category/ToposDeepPaths.lean:443:    (Path.congrArg (0 + ·) (Path.mk [Step.mk _ _ (p.restrict_id i)] (p.restrict_id i)))
+ComputationalPaths/Path/Category/DoubleCategoryPaths.lean:288:    Path.congrArg (fun f => D.hComp f g) (Path.mk [Step.mk _ _ h] h) =
+ComputationalPaths/Path/Category/DoubleCategoryPaths.lean:289:      Path.mk [Step.mk _ _ (_root_.congrArg (fun f => D.hComp f g) h)]
+ComputationalPaths/Path/Category/DoubleCategoryPaths.lean:296:    Path.congrArg (fun g => D.hComp f g) (Path.mk [Step.mk _ _ h] h) =
+ComputationalPaths/Path/Category/DoubleCategoryPaths.lean:297:      Path.mk [Step.mk _ _ (_root_.congrArg (fun g => D.hComp f g) h)]
+ComputationalPaths/Path/Category/LocalePaths.lean:6:All paths use genuine multi-step trans/symm/congrArg chains. Zero Path.mk [Step.mk _ _ h] h.
+ComputationalPaths/Path/Category/LocalePaths.lean:47:  Path.mk [Step.mk _ _ (fMeet_comm a b)] (fMeet_comm a b)
+ComputationalPaths/Path/Category/LocalePaths.lean:51:  Path.mk [Step.mk _ _ (fJoin_comm a b)] (fJoin_comm a b)
+ComputationalPaths/Path/Category/LocalePaths.lean:55:  Path.mk [Step.mk _ _ (fMeet_assoc a b c)] (fMeet_assoc a b c)
+ComputationalPaths/Path/Category/LocalePaths.lean:59:  Path.mk [Step.mk _ _ (fJoin_assoc a b c)] (fJoin_assoc a b c)
+ComputationalPaths/Path/Category/LocalePaths.lean:63:  Path.mk [Step.mk _ _ (fMeet_idem a)] (fMeet_idem a)
+ComputationalPaths/Path/Category/LocalePaths.lean:67:  Path.mk [Step.mk _ _ (fJoin_idem a)] (fJoin_idem a)
+ComputationalPaths/Path/Category/LocalePaths.lean:71:  Path.mk [Step.mk _ _ (fMeet_zero a)] (fMeet_zero a)
+ComputationalPaths/Path/Category/LocalePaths.lean:75:  Path.mk [Step.mk _ _ (fJoin_zero a)] (fJoin_zero a)
+ComputationalPaths/Path/Category/LocalePaths.lean:79:  Path.mk [Step.mk _ _ (fMeet_absorb_join a b)] (fMeet_absorb_join a b)
+ComputationalPaths/Path/Category/LocalePaths.lean:83:  Path.mk [Step.mk _ _ (fJoin_absorb_meet a b)] (fJoin_absorb_meet a b)
+ComputationalPaths/Path/Category/LocalePaths.lean:148:  Path.mk [Step.mk _ _ (f.pres_meet a b)] (f.pres_meet a b)
+ComputationalPaths/Path/Category/LocalePaths.lean:153:  Path.mk [Step.mk _ _ (f.pres_join a b)] (f.pres_join a b)
+ComputationalPaths/Path/Category/LocalePaths.lean:197:  Path.mk [Step.mk _ _ (n.idem a)] (n.idem a)
+ComputationalPaths/Path/Category/LocalePaths.lean:216:  Path.mk [Step.mk _ _ (n.pres_meet a b)] (n.pres_meet a b)
+ComputationalPaths/Path/Category/LocalePaths.lean:249:  Path.mk [Step.mk _ _ (openNuc_idem a x)] (openNuc_idem a x)
+ComputationalPaths/Path/Category/LocalePaths.lean:253:  Path.mk [Step.mk _ _ (closedNuc_idem a x)] (closedNuc_idem a x)
+ComputationalPaths/Path/Category/LocalePaths.lean:319:  Path.mk [Step.mk _ _ (pt.pres_meet a b)] (pt.pres_meet a b)
+ComputationalPaths/Path/Category/LocalePaths.lean:324:  Path.mk [Step.mk _ _ (pt.pres_join a b)] (pt.pres_join a b)
+ComputationalPaths/Path/Category/MonadicPathDeep.lean:7:  65 theorems, zero sorry, zero Path.mk [Step.mk _ _ h] h.
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:59:  Path.mk [Step.mk _ _ cs.attachFixesBase] cs.attachFixesBase
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:65:  Path.mk [Step.mk _ _ hfg] hfg
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:72:  Path.trans (Path.mk [Step.mk _ _ p1] p1) (Path.mk [Step.mk _ _ p2] p2)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:77:  Path.symm (Path.mk [Step.mk _ _ p] p)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:82:  Path.symm (Path.symm (Path.mk [Step.mk _ _ p] p))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:91:  Path.mk [Step.mk _ _ (sk.preservesBase base)] (sk.preservesBase base)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:98:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:104:  Path.congrArg f (Path.mk [Step.mk _ _ (sk.preservesBase base)] (sk.preservesBase base))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:110:  Path.congrArg sk2.incl (Path.mk [Step.mk _ _ (sk1.preservesBase base)] (sk1.preservesBase base))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:117:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:126:    (Path.congrArg sk3.incl (Path.mk [Step.mk _ _ h12] h12))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:127:    (Path.mk [Step.mk _ _ h23] h23)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:140:  Path.congrArg cm.map (Path.mk [Step.mk _ _ p] p)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:147:  Path.congrArg g.map (Path.congrArg f.map (Path.mk [Step.mk _ _ p] p))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:153:    (Path.congrArg id (Path.mk [Step.mk _ _ (rfl : x = x)] (rfl : x = x)))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:154:    (Path.mk [Step.mk _ _ (rfl : id x = x)] (rfl : id x = x))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:160:  Path.congrArg f (Path.trans (Path.mk [Step.mk _ _ p] p) (Path.mk [Step.mk _ _ q] q))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:166:  Path.congrArg f (Path.symm (Path.mk [Step.mk _ _ p] p))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:172:    (Path.congrArg f (Path.mk [Step.mk _ _ (rfl : x = x)] (rfl : x = x)))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:173:    (Path.symm (Path.congrArg f (Path.mk [Step.mk _ _ (rfl : x = x)] (rfl : x = x))))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:188:  Path.mk [Step.mk _ _ (ca.homotopy x)] (ca.homotopy x)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:195:    (Path.mk [Step.mk _ _ (ca.homotopy x)] (ca.homotopy x))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:196:    (Path.congrArg ca.cellular (Path.mk [Step.mk _ _ p] p))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:203:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:210:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:223:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:239:  Path.mk [Step.mk _ _ (po.coherence x)] (po.coherence x)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:245:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:257:    (Path.trans (pushout_coherence_path po1 x) (Path.mk [Step.mk _ _ h] h))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:271:  Path.congrArg g (Path.mk [Step.mk _ _ hf] hf)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:300:  Path.mk [Step.mk _ _ ee.sameChar] ee.sameChar
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:317:    (Path.trans (Path.mk [Step.mk _ _ h] h) (euler_invariance ee2))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:325:  Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.mk [Step.mk _ _ h2] h2)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:332:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:353:  Path.mk [Step.mk _ _ (cc.boundarySquared x)] (cc.boundarySquared x)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:366:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:372:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:379:  Path.mk [Step.mk _ _ im_eq_ker] im_eq_ker
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:386:  Path.mk [Step.mk _ _ hom] hom
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:400:    (Path.congrArg cc.boundary (Path.mk [Step.mk _ _ hx] hx))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:401:    (Path.mk [Step.mk _ _ hy] hy)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:408:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:424:  Path.mk [Step.mk _ _ (we.rightInv b)] (we.rightInv b)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:429:  Path.mk [Step.mk _ _ (we.leftInv a)] (we.leftInv a)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:435:    (Path.congrArg we.backward (Path.congrArg we.forward (Path.mk [Step.mk _ _ (we.leftInv a)] (we.leftInv a))))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:436:    (Path.mk [Step.mk _ _ (we.leftInv a)] (we.leftInv a))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:442:  Path.congrArg we.forward (Path.mk [Step.mk _ _ p] p)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:448:  Path.congrArg we.backward (Path.mk [Step.mk _ _ p] p)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:454:  Path.congrArg (fun b => we.forward (we.backward b)) (Path.mk [Step.mk _ _ p] p)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:460:  Path.congrArg (fun a => we.backward (we.forward a)) (Path.mk [Step.mk _ _ p] p)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:466:  Path.mk [Step.mk _ _ (we2.leftInv (we1.forward a))] (we2.leftInv (we1.forward a))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:476:  Path.mk [Step.mk _ _ (we.rightInv (we.forward a))] (we.rightInv (we.forward a))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:488:  Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.mk [Step.mk _ _ h2] h2)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:494:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:500:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:506:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:512:  Path.mk [Step.mk _ _ hg] hg
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:519:  Path.trans (Path.mk [Step.mk _ _ p] p) (Path.mk [Step.mk _ _ q] q)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:526:  Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.mk [Step.mk _ _ h2] h2)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:532:  Path.congrArg approx (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:540:  Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.mk [Step.mk _ _ h2] h2)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:547:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:553:  Path.mk [Step.mk _ _ (H x)] (H x)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:560:  Path.congrArg g (Path.mk [Step.mk _ _ hf] hf)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:566:  Path.mk [Step.mk _ _ ha] ha
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:572:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:578:  Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.symm (Path.mk [Step.mk _ _ h2] h2))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:585:    (Path.congrArg f (Path.mk [Step.mk _ _ hg] hg))
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:586:    (Path.mk [Step.mk _ _ hf] hf)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:592:  Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.mk [Step.mk _ _ h2] h2)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:599:  Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.mk [Step.mk _ _ h2] h2)
+ComputationalPaths/Path/Algebra/CWComplexPathDeep.lean:605:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Category/TwoCategDeep.lean:221:  Path.mk [Step.mk _ _ (C.assoc_strict f g h)] (C.assoc_strict f g h)
+ComputationalPaths/Path/Category/TwoCategDeep.lean:227:  Path.mk [Step.mk _ _ (C.id_left_strict f)] (C.id_left_strict f)
+ComputationalPaths/Path/Category/TwoCategDeep.lean:233:  Path.mk [Step.mk _ _ (C.id_right_strict f)] (C.id_right_strict f)
+ComputationalPaths/Path/Category/TwoCategDeep.lean:770:  Path.mk [Step.mk _ _ (Path.trans_assoc p q r)] (Path.trans_assoc p q r)
+ComputationalPaths/Path/Category/TwoCategDeep.lean:775:  Path.mk [Step.mk _ _ (Path.trans_refl_left p)] (Path.trans_refl_left p)
+ComputationalPaths/Path/Category/TwoCategDeep.lean:780:  Path.mk [Step.mk _ _ (Path.trans_refl_right p)] (Path.trans_refl_right p)
+ComputationalPaths/Path/Category/TwoCategDeep.lean:785:  Path.mk [Step.mk _ _ (Path.symm_symm p)] (Path.symm_symm p)
+ComputationalPaths/Path/Category/TwoCategDeep.lean:793:  Path.mk [Step.mk _ _ (quad_trans_assoc p q r s)] (quad_trans_assoc p q r s)
+ComputationalPaths/Path/Category/ToposPaths.lean:189:  Path.mk [Step.mk _ _ (lt.idempotent a)] (lt.idempotent a)
+ComputationalPaths/Path/Category/ToposPaths.lean:194:    Path.mk [Step.mk _ _ (lt.idempotent a).symm] (lt.idempotent a).symm := by
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:88:  Path.mk [Step.mk _ _ sq.commutes] sq.commutes
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:130:  Path.mk [Step.mk _ _ (adj.leftTriangle x)] (adj.leftTriangle x)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:135:  Path.mk [Step.mk _ _ (adj.rightTriangle y)] (adj.rightTriangle y)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:161:  Path.mk [Step.mk _ _ (F.frobenius phi psi)] (F.frobenius phi psi)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:193:  Path.mk [Step.mk _ _ I.factorizes] I.factorizes
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:203:  Path.mk [Step.mk _ _ P.stable] P.stable
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:258:  Path.mk [Step.mk _ _ (L.meetComm a b)] (L.meetComm a b)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:263:  Path.mk [Step.mk _ _ (L.joinComm a b)] (L.joinComm a b)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:293:  Path.mk [Step.mk _ _ (C.projIsA A p)] (C.projIsA A p)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:421:  Path.mk [Step.mk _ _ (H.topMeet a)] (H.topMeet a)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:426:  Path.mk [Step.mk _ _ (H.botJoin a)] (H.botJoin a)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:431:  Path.mk [Step.mk _ _ (H.meetComm a b)] (H.meetComm a b)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:436:  Path.mk [Step.mk _ _ (H.joinComm a b)] (H.joinComm a b)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:481:  Path.mk [Step.mk _ _ (LT.quotientResp a b h)] (LT.quotientResp a b h)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:507:  Path.mk [Step.mk _ _ (Q.substExists a)] (Q.substExists a)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:512:  Path.mk [Step.mk _ _ (Q.substForall a)] (Q.substForall a)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:556:  Path.mk [Step.mk _ _ (F.projCoherent x)] (F.projCoherent x)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:583:  Path.mk [Step.mk _ _ (I.idLaw a)] (I.idLaw a)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:588:  Path.mk [Step.mk _ _ (I.compLaw a)] (I.compLaw a)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:593:  Path.mk [Step.mk _ _ (I.assocLaw a)] (I.assocLaw a)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:619:  Path.mk [Step.mk _ _ (I.interpNat x)] (I.interpNat x)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:648:  Path.mk [Step.mk _ _ (PA.leftUnit a)] (PA.leftUnit a)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:653:  Path.mk [Step.mk _ _ (PA.rightUnit a)] (PA.rightUnit a)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:658:  Path.mk [Step.mk _ _ (PA.opAssoc a b c)] (PA.opAssoc a b c)
+ComputationalPaths/Path/Category/CategoricalLogicDeep.lean:691:  Path.mk [Step.mk _ _ (CE.weakenEq gam A)] (CE.weakenEq gam A)
+ComputationalPaths/Path/Category/MultiCategoryPaths.lean:275:    Path.congrArg (fun g => M.comp₁ f g) (Path.mk [Step.mk _ _ h] h) =
+ComputationalPaths/Path/Category/MultiCategoryPaths.lean:276:      Path.mk [Step.mk _ _ (_root_.congrArg (fun g => M.comp₁ f g) h)]
+ComputationalPaths/Path/Category/MultiCategoryPaths.lean:290:    Path.congrArg (fun f => M.comp₁ f g) (Path.mk [Step.mk _ _ h] h) =
+ComputationalPaths/Path/Category/MultiCategoryPaths.lean:291:      Path.mk [Step.mk _ _ (_root_.congrArg (fun f => M.comp₁ f g) h)]
+ComputationalPaths/Path/TransportDeep.lean:7:90+ theorems/defs. ZERO sorry, ZERO Path.mk [Step.mk _ _ h] h.
+ComputationalPaths/Path/Topology/ChernSimons.lean:189:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Category/HigherCategoryPaths.lean:325:    Path.congrArg (fun f => C.comp₁ f g) (Path.mk [Step.mk _ _ h] h) =
+ComputationalPaths/Path/Category/HigherCategoryPaths.lean:326:      Path.mk [Step.mk _ _ (_root_.congrArg (fun f => C.comp₁ f g) h)]
+ComputationalPaths/Path/Category/HigherCategoryPaths.lean:333:    Path.congrArg (fun g => C.comp₁ f g) (Path.mk [Step.mk _ _ h] h) =
+ComputationalPaths/Path/Category/HigherCategoryPaths.lean:334:      Path.mk [Step.mk _ _ (_root_.congrArg (fun g => C.comp₁ f g) h)]
+ComputationalPaths/Path/Algebra/MatroidTheoryDeep.lean:114:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Algebra/MatroidTheoryDeep.lean:120:    singleStepPath h = Path.mk [Step.mk a b h] h := rfl
+ComputationalPaths/Path/Geometry/DerivedAlgGeomDeep.lean:6:inductives. Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:73:  Path.mk [Step.mk _ _ (applySubst_id t)] (applySubst_id t)
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:125:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:265:  Path.mk [Step.mk _ _ (hom_eval h env t)] (hom_eval h env t)
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:375:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:447:  Path.mk [Step.mk a b heq] heq
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:453:    Path.trans (Path.mk [Step.mk a b hab] hab) (Path.mk [Step.mk b c hbc] hbc) =
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:482:  Path.mk [Step.mk _ _ (eval_termAlgebra_var t)] (eval_termAlgebra_var t)
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:503:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:526:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:542:  Path.mk [Step.mk _ _ hunif] hunif
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:599:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:729:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/EquationalLogicDeep.lean:746:    Path.trans (Path.mk [Step.mk _ _ heq] heq)
+ComputationalPaths/Path/Geometry/SchemePaths.lean:7:All paths built from SchemeStep/RStep inductives — zero Path.mk [Step.mk _ _ h] h.
+ComputationalPaths/Path/Algebra/SpectralTheoryPaths.lean:6:`symm`, `congrArg`, `transport`. Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Algebra/InformationPaths.lean:54:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/InformationPaths.lean:278:  Path.mk [Step.mk _ _ (_root_.congrArg (fun l => l.foldl (· + ·) 0) h)]
+ComputationalPaths/Path/Algebra/InformationPaths.lean:284:  Path.transport (Path.mk [Step.mk _ _ h] h) x
+ComputationalPaths/Path/Foundations/UniversalProperties.lean:173:  Path.mk [Step.mk _ _ (_root_.funext (fun x => (h x).toEq))]
+ComputationalPaths/Path/Foundations/UniversalProperties.lean:212:  Path.mk [Step.mk _ _ (_root_.funext (fun x => (h x).toEq))]
+ComputationalPaths/Path/Foundations/UniversalProperties.lean:236:noncomputable def eqToPath : (a = b) → Path a b := fun h => Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Foundations/UniversalProperties.lean:258:  exact h (Path.mk [Step.mk _ _ e] e)
+ComputationalPaths/Path/Foundations/UniversalProperties.lean:271:    Path.transport (D := C) (Path.mk [Step.mk _ _ h] h) x = h ▸ x := by
+ComputationalPaths/Path/Algebra/CompletionDeep.lean:226:  Path.mk [Step.mk _ _ (InvLimitElem.ext S x y h)] (InvLimitElem.ext S x y h)
+ComputationalPaths/Path/CompPath/LambdaCalculusPaths.lean:354:noncomputable def termPath {t s : LTerm} (h : t = s) : Path t s := Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Topology/ContactStructures.lean:274:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/HoTT/HigherInductivePaths.lean:333:  Path.mk [Step.mk _ _ (Quot.sound (SmashRel.left a))]
+ComputationalPaths/Path/HoTT/HigherInductivePaths.lean:340:  Path.mk [Step.mk _ _ (Quot.sound (SmashRel.right b))]
+ComputationalPaths/Path/CompPath/AbstractReductionSystems.lean:336:noncomputable def toPath {a b : A} (h : a = b) : Path a b := Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/CompPath/AbstractReductionSystems.lean:363:def toPath_refl (a : A) : toPath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl
+ComputationalPaths/Path/HoTT/JForPath.lean:132:noncomputable def witness_step (a : A) : Path a a := Path.mk [Step.mk a a rfl] rfl
+ComputationalPaths/Path/Algebra/HomCommAlgDeep.lean:7:Zero `Path.mk [Step.mk _ _ h] h` — every path built from `step`, `trans`, `symm`, `congrDS/Ten`.
+ComputationalPaths/Path/HoTT/EquivalencePaths.lean:31:  ⟨a, Path.mk [Step.mk _ _ h] h⟩
+ComputationalPaths/Path/HoTT/EquivalencePaths.lean:222:        Path.mk [Step.mk _ _ (Path.transport_symm_left p x)] (Path.transport_symm_left p x)
+ComputationalPaths/Path/HoTT/EquivalencePaths.lean:224:        Path.mk [Step.mk _ _ (Path.transport_symm_right p y)] (Path.transport_symm_right p y) }
+ComputationalPaths/Path/TypeTheory/IdentityTypePaths.lean:158:  Path.mk [Step.mk _ _ (funext fun x => (h x).toEq)] (funext fun x => (h x).toEq)
+ComputationalPaths/Path/TypeTheory/IdentityTypePaths.lean:204:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/TypeTheory/IdentityTypePaths.lean:247:  Path.mk [Step.mk _ _ (singleton_contractible a b p)] (singleton_contractible a b p)
+ComputationalPaths/Path/HoTT/TruncationPaths.lean:187:    Path.mk [Step.mk _ _ (funext fun a => (hB.allPaths (f a) (g a)).proof)]
+ComputationalPaths/Path/Algebra/OpetopicSetsDeep.lean:21:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Algebra/OpetopicSetsDeep.lean:30:    edgePath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:6:trans/symm/congrArg chains. Zero Path.mk [Step.mk _ _ h] h.
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:55:  Path.mk [Step.mk _ _ (padicVal_zero p)] (padicVal_zero p)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:59:  Path.mk [Step.mk _ _ (padicVal_one p hp)] (padicVal_one p hp)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:64:  Path.mk [Step.mk _ _ (padicVal_trivial p hp n)] (padicVal_trivial p hp n)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:85:  Path.mk [Step.mk _ _ (um.dist_self a)] (um.dist_self a)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:90:  Path.mk [Step.mk _ _ (um.dist_symm a b)] (um.dist_symm a b)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:117:  Path.mk [Step.mk _ _ (dist_max_comm um a b c)] (dist_max_comm um a b c)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:159:  Path.mk [Step.mk _ _ vf.val_zero] vf.val_zero
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:163:  Path.mk [Step.mk _ _ vf.val_one] vf.val_one
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:168:  Path.mk [Step.mk _ _ (vf.val_mul a b)] (vf.val_mul a b)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:174:    (Path.mk [Step.mk _ _ (vf.mul_comm a b)] (vf.mul_comm a b))
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:180:    (Path.mk [Step.mk _ _ (vf_mul_one vf a)] (vf_mul_one vf a))
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:185:  Path.mk [Step.mk _ _ (vf_mul_zero_val vf a)] (vf_mul_zero_val vf a)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:198:    (Path.mk [Step.mk _ _ (vf.mul_assoc a b c)] (vf.mul_assoc a b c))
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:217:  Path.mk [Step.mk _ _ (vf.add_comm a b)] (vf.add_comm a b)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:222:  Path.mk [Step.mk _ _ (vf.add_assoc a b c)] (vf.add_assoc a b c)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:227:  Path.mk [Step.mk _ _ (vf.zero_add a)] (vf.zero_add a)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:239:  Path.mk [Step.mk _ _ (vf.add_neg a)] (vf.add_neg a)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:244:  Path.mk [Step.mk _ _ (vf.one_mul a)] (vf.one_mul a)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:250:    (Path.mk [Step.mk _ _ (vf.mul_comm a vf.one)] (vf.mul_comm a vf.one))
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:256:  Path.mk [Step.mk _ _ (vf.mul_assoc a b c)] (vf.mul_assoc a b c)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:261:  Path.mk [Step.mk _ _ (vf.mul_comm a b)] (vf.mul_comm a b)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:301:  Path.mk [Step.mk _ _ (abs_max_comm nav a b)] (abs_max_comm nav a b)
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:334:  Path.transport (Path.mk [Step.mk _ _ h] h) x
+ComputationalPaths/Path/Algebra/ValuationPaths.lean:355:    (Path.mk [Step.mk _ _ (vf.mul_comm b a)] (vf.mul_comm b a))
+ComputationalPaths/Path/HoTT/TransportDeep.lean:368:    Path.transport (D := D) (Path.symm (Path.mk [Step.mk _ _ h] h))
+ComputationalPaths/Path/HoTT/TransportDeep.lean:369:      (Path.transport (D := D) (Path.mk [Step.mk _ _ h] h) x) = x := by
+ComputationalPaths/Path/HoTT/TransportDeep.lean:370:  calc Path.transport (D := D) (Path.symm (Path.mk [Step.mk _ _ h] h))
+ComputationalPaths/Path/HoTT/TransportDeep.lean:371:        (Path.transport (D := D) (Path.mk [Step.mk _ _ h] h) x)
+ComputationalPaths/Path/HoTT/TransportDeep.lean:373:          (Path.trans (Path.mk [Step.mk _ _ h] h) (Path.symm (Path.mk [Step.mk _ _ h] h))) x :=
+ComputationalPaths/Path/HoTT/TransportDeep.lean:374:          (Path.transport_trans (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/HoTT/TransportDeep.lean:375:            (Path.symm (Path.mk [Step.mk _ _ h] h)) x).symm
+ComputationalPaths/Path/Algebra/CombinatorPaths.lean:83:  Path.mk [Step.mk _ _ (SKK_reduces x)] (SKK_reduces x)
+ComputationalPaths/Path/Algebra/GaloisPaths.lean:6:inductives. Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Topology/CohomologyPaths.lean:6:genuine `Path` operations (`refl`, `trans`, `symm`, `congrArg`). Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/HoTT/LoopSpaceAlgebraDeep.lean:22:ZERO `sorry`, ZERO `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Algebra/DifferentialGeomDeep.lean:47:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/TypeTheory/InductiveTypePaths.lean:80:  | 0 => Path.mk [Step.mk _ _ h.map_zero] h.map_zero
+ComputationalPaths/Path/TypeTheory/InductiveTypePaths.lean:82:      (Path.mk [Step.mk _ _ (h.map_succ n)] (h.map_succ n))
+ComputationalPaths/Path/TypeTheory/InductiveTypePaths.lean:193:  Path.mk [Step.mk _ _ heq] heq
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:6:Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:192:  Path.mk [Step.mk _ _ (frac_add_num_comm f g)] (frac_add_num_comm f g)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:197:  Path.mk [Step.mk _ _ (frac_add_den_comm f g)] (frac_add_den_comm f g)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:202:  Path.mk [Step.mk _ _ (frac_mul_num_comm f g)] (frac_mul_num_comm f g)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:207:  Path.mk [Step.mk _ _ (frac_mul_den_comm f g)] (frac_mul_den_comm f g)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:212:  Path.mk [Step.mk _ _ (frac_neg_neg_num f)] (frac_neg_neg_num f)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:217:  Path.mk [Step.mk _ _ (frac_mul_den_assoc f g h)] (frac_mul_den_assoc f g h)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:222:  Path.mk [Step.mk _ _ (frac_mul_num_assoc f g h)] (frac_mul_num_assoc f g h)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:231:  Path.mk [Step.mk _ _ (crossProd_swap f g)] (crossProd_swap f g)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:240:  Path.mk [Step.mk _ _ (frac_mul_one_self_num f)] (frac_mul_one_self_num f)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:245:  Path.mk [Step.mk _ _ (frac_mul_one_self_den f)] (frac_mul_one_self_den f)
+ComputationalPaths/Path/Algebra/LocalizationPaths.lean:250:  Path.mk [Step.mk _ _ (frac_mul_zero_num f)] (frac_mul_zero_num f)
+ComputationalPaths/Path/CompPath/DecisionProcedures.lean:275:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/RepresentationPaths.lean:8:Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Algebra/RepresentationPaths.lean:63:  Path.mk [Step.mk a b s.sound] s.sound
+ComputationalPaths/Path/Algebra/RepresentationPaths.lean:90:  Path.mk [Step.mk a b s.sound] s.sound
+ComputationalPaths/Path/Algebra/RepresentationPaths.lean:298:  Path.mk [Step.mk _ _ eq] eq
+ComputationalPaths/Path/Algebra/RepresentationPaths.lean:307:  Path.mk [Step.mk _ _ eq] eq
+ComputationalPaths/Path/Algebra/RepresentationPaths.lean:349:  Path.mk [Step.mk a b s.sound] s.sound
+ComputationalPaths/Path/Algebra/RepresentationPaths.lean:412:  Path.mk [Step.mk _ _ eq] eq
+ComputationalPaths/Path/Algebra/RepresentationPaths.lean:462:  Path.mk [Step.mk _ _ eq] eq
+ComputationalPaths/Path/Algebra/RepresentationPaths.lean:497:  Path.mk [Step.mk _ _ eq] eq
+ComputationalPaths/Path/Topology/ManifoldPaths.lean:112:  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => A.nonempty⟩)]
+ComputationalPaths/Path/Topology/ManifoldPaths.lean:216:  Path.mk [Step.mk _ _ (pushforward_id M v)] (pushforward_id M v)
+ComputationalPaths/Path/Topology/ManifoldPaths.lean:227:  Path.mk [Step.mk _ _ (pushforward_comp g f v)] (pushforward_comp g f v)
+ComputationalPaths/Path/TypeTheory/IdentityTypeDeep.lean:156:    (c : Code a b) : Path a b := Path.mk [Step.mk _ _ c] c
+ComputationalPaths/Path/TypeTheory/IdentityTypeDeep.lean:164:    (p : Path a b) : decode (encode p) = Path.mk [Step.mk _ _ p.proof] p.proof := rfl
+ComputationalPaths/Path/TypeTheory/IdentityTypeDeep.lean:175:  Path.mk [Step.mk _ _ (funext (fun a => (h a).proof))]
+ComputationalPaths/Path/TypeTheory/IdentityTypeDeep.lean:233:  rightInv := fun y => Path.mk [Step.mk _ _ (transport_symm_right p y)]
+ComputationalPaths/Path/TypeTheory/IdentityTypeDeep.lean:235:  leftInv := fun x => Path.mk [Step.mk _ _ (transport_symm_left p x)]
+ComputationalPaths/Path/HoTT/HITDeep.lean:38:  Path.mk [Step.mk _ _ Interval.seg_eq] Interval.seg_eq
+ComputationalPaths/Path/HoTT/HITDeep.lean:158:  Path.mk [Step.mk _ _ (Quot.sound r)] (Quot.sound r)
+ComputationalPaths/Path/HoTT/HITDeep.lean:194:  Path.mk [Step.mk _ _ (Quot.sound (TruncRel.trunc a b))] (Quot.sound (TruncRel.trunc a b))
+ComputationalPaths/Path/Algebra/SheafDeep.lean:334:    Path.transport (D := F.sections) (Path.mk [Step.mk _ _ h] h) s = h ▸ s := by
+ComputationalPaths/Path/Topology/PersistentHomologyPaths.lean:10:Instead of wrapping `simp` / `rfl` results with `Path.mk [Step.mk _ _ h] h`, we define
+ComputationalPaths/Path/TypeTheory/UnivalencePaths.lean:7:`Path.congrArg`, `Path.transport`. **Zero** `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Algebra/OptimizationPaths.lean:40:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/OptimizationPaths.lean:95:  Path.mk [Step.mk _ _ D.isFixed] D.isFixed
+ComputationalPaths/Path/Algebra/OptimizationPaths.lean:120:  Path.mk [Step.mk _ _ (iterStep_fixedPt D n)] (iterStep_fixedPt D n)
+ComputationalPaths/Path/Algebra/OptimizationPaths.lean:125:    Path.mk [Step.mk _ _ (_root_.congrArg f D.isFixed)] (_root_.congrArg f D.isFixed) := by
+ComputationalPaths/Path/Algebra/OptimizationPaths.lean:202:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/OptimizationPaths.lean:222:    Path.mk [Step.mk _ _ (_root_.congrArg g h)] (_root_.congrArg g h) := by
+ComputationalPaths/Path/HoTT/TruncationDeep.lean:89:    (Path.mk [Step.mk _ _ p] p).toEq = (Path.mk [Step.mk _ _ q] q).toEq :=
+ComputationalPaths/Path/HoTT/TruncationDeep.lean:90:  h.proofEq (Path.mk [Step.mk _ _ p] p) (Path.mk [Step.mk _ _ q] q)
+ComputationalPaths/Path/HoTT/TruncationDeep.lean:200:  Path.mk [Step.mk _ _ (Quot.sound (PTruncRel.identify a b))]
+ComputationalPaths/Path/HoTT/TruncationDeep.lean:240:  Path.mk [Step.mk _ _ (Quot.sound (STruncRel.identify a b))]
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:98:      Path.mk [Step.mk _ _ q.toEq] q.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:101:      Path.mk [Step.mk _ _ q.toEq] q.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:104:      Path.mk [Step.mk _ _ q.toEq] q.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:107:      Path.mk [Step.mk _ _ q.toEq] q.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:110:      Path.mk [Step.mk _ _ q.toEq] q.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:113:      Path.mk [Step.mk _ _ t.toEq] t.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:116:      Path.mk [Step.mk _ _ t.toEq] t.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:119:      Path.mk [Step.mk _ _ t.toEq] t.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:122:      Path.mk [Step.mk _ _ t.toEq] t.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:125:      Path.mk [Step.mk _ _ t.toEq] t.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:128:      Path.mk [Step.mk _ _ t.toEq] t.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:131:      Path.mk [Step.mk _ _ t.toEq] t.toEq
+ComputationalPaths/Path/Topology/MorseTheoryDeep.lean:134:      Path.mk [Step.mk _ _ t.toEq] t.toEq
+ComputationalPaths/Path/HoTT/PushoutPaths.lean:57:  Path.mk [Step.mk _ _ (Pushout.glue c)] (Pushout.glue c)
+ComputationalPaths/Path/HoTT/PushoutPaths.lean:101:  Path.mk [Step.mk _ _ (Coequalizer.coeq x)] (Coequalizer.coeq x)
+ComputationalPaths/Path/HoTT/PushoutPaths.lean:195:  Path.mk [Step.mk _ _ Wedge.glue] Wedge.glue
+ComputationalPaths/Path/Topology/Gerbes.lean:405:  exact ⟨G, ⟨Path.mk [Step.mk _ _ hGc] hGc⟩⟩
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:121:  Path.mk [Step.mk _ _ (Nat.add_assoc f.weight g.weight h.weight)] (Nat.add_assoc f.weight g.weight h.weight)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:133:  Path.mk [Step.mk _ _ (Nat.add_assoc f.weight g.weight h.weight).symm]
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:201:    (Path.mk [Step.mk _ _ (Nat.add_zero (semSize s))] (Nat.add_zero (semSize s)))
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:354:  Path.mk [Step.mk _ _ (Nat.zero_add b)] (Nat.zero_add b)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:369:  Path.mk [Step.mk _ _ (Nat.add_comm a b)] (Nat.add_comm a b)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:374:  Path.mk [Step.mk _ _ (Nat.add_assoc a b c)] (Nat.add_assoc a b c)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:379:  Path.mk [Step.mk _ _ (Nat.zero_add a)] (Nat.zero_add a)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:384:  Path.mk [Step.mk _ _ (Nat.add_zero a)] (Nat.add_zero a)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:391:  Path.mk [Step.mk _ _ (congrArg (· + b) (Nat.add_zero a))]
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:397:  Path.mk [Step.mk _ _ (congrArg (a + ·) (Nat.zero_add b))]
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:474:  Path.mk [Step.mk _ _ (Nat.zero_add n)] (Nat.zero_add n)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:481:  Path.congrArg MorphRepr.weight (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:491:  Path.congrArg interactCount (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:526:  Path.mk [Step.mk _ _ (congrArg (· + b) p)] (congrArg (· + b) p)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:531:  Path.mk [Step.mk _ _ (congrArg (a + ·) p)] (congrArg (a + ·) p)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:550:  Path.mk [Step.mk _ _ (Nat.zero_add n)] (Nat.zero_add n)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:559:  Path.mk [Step.mk _ _ (Nat.sub_self n)] (Nat.sub_self n)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:580:    (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:602:    (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Algebra/GameSemanticsDeep.lean:609:    (Path.mk [Step.mk _ _ (Nat.zero_add (semSize s))] (Nat.zero_add (semSize s)))
+ComputationalPaths/Path/Topology/DistributionPaths.lean:109:    exact trans (congrArg (n * ·) d.eval_zero) (Path.mk [Step.mk _ _ (Int.mul_zero n)] (Int.mul_zero n))
+ComputationalPaths/Path/Topology/DistributionPaths.lean:116:  Path.mk [Step.mk _ _ (Int.zero_mul (d.eval f))] (Int.zero_mul (d.eval f))
+ComputationalPaths/Path/Topology/DistributionPaths.lean:122:  Path.mk [Step.mk _ _ (Int.one_mul (d.eval f))] (Int.one_mul (d.eval f))
+ComputationalPaths/Path/Topology/DistributionPaths.lean:138:               (Path.mk [Step.mk _ _ (Int.neg_zero)] Int.neg_zero)
+ComputationalPaths/Path/Topology/DistributionPaths.lean:146:              (Path.mk [Step.mk _ _ (Int.neg_zero)] Int.neg_zero)
+ComputationalPaths/Path/NumberTheory/DiophantinePaths.lean:8:Every path is built from explicit `Step` witnesses — zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/NumberTheory/DiophantinePaths.lean:59:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Algebra/MazurkiewiczTracesDeep.lean:84:  Path.mk [Step.mk u v h] h
+ComputationalPaths/Path/Topology/SheafificationPaths.lean:229:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Computation/ControlPaths.lean:66:  Path.trans r1.reachPath (Path.trans (Path.mk [Step.mk _ _ h] h) r2.reachPath)
+ComputationalPaths/Path/Basic/Core.lean:110:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Basic/Core.lean:114:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:59:  Path.mk [Step.mk _ _ (code.roundtrip w)] (code.roundtrip w)
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:147:  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:157:  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:167:  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:178:  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hp⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:209:  Path.mk [Step.mk _ _ prf] prf
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:295:  Path.mk [Step.mk _ _ (Nat.sub_sub_self hk)] (Nat.sub_sub_self hk)
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:307:  Path.mk [Step.mk _ _ prf] prf
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:338:  Path.mk [Step.mk _ _ prf] prf
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:370:  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hp⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:378:  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hp⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:384:  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hc⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:393:  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hp⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:415:  Path.mk [Step.mk _ _ prf] prf
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:443:  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => bp.hBound⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:450:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:457:  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hk⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:477:  Path.mk [Step.mk _ _ prf] prf
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:489:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:518:  Path.mk [Step.mk _ _ prf] prf
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:553:  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:567:  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:639:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:644:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:649:  Path.mk [Step.mk _ _ (Nat.mul_comm d1 d2)] (Nat.mul_comm d1 d2)
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:673:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CodingTheoryDeep.lean:678:  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
+ComputationalPaths/Path/Topology/EtaleFundamentalGroup.lean:213:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Algebra/PolynomialPaths.lean:57:  Path.mk [Step.mk _ _ (polyAdd_nil_right p)] (polyAdd_nil_right p)
+ComputationalPaths/Path/Algebra/PolynomialPaths.lean:70:  Path.mk [Step.mk _ _ (polyAdd_comm p q)] (polyAdd_comm p q)
+ComputationalPaths/Path/Algebra/PolynomialPaths.lean:88:  Path.mk [Step.mk _ _ (polyAdd_assoc p q r)] (polyAdd_assoc p q r)
+ComputationalPaths/Path/Algebra/PolynomialPaths.lean:98:  Path.mk [Step.mk _ _ (polyNeg_neg p)] (polyNeg_neg p)
+ComputationalPaths/Path/Algebra/PolynomialPaths.lean:108:  Path.mk [Step.mk _ _ (polyScale_one p)] (polyScale_one p)
+ComputationalPaths/Path/Algebra/PolynomialPaths.lean:120:  Path.mk [Step.mk _ _ (polyEval_nil x)] (polyEval_nil x)
+ComputationalPaths/Path/Algebra/PolynomialPaths.lean:126:  Path.mk [Step.mk _ _ (polyEval_const c x)] (polyEval_const c x)
+ComputationalPaths/Path/Algebra/PolynomialPaths.lean:137:  Path.mk [Step.mk _ _ polyDeg_nil] polyDeg_nil
+ComputationalPaths/Path/Algebra/PolynomialPaths.lean:142:  Path.mk [Step.mk _ _ (polyDeg_const c)] (polyDeg_const c)
+ComputationalPaths/Path/Algebra/MeasurePaths.lean:305:  Path.mk [Step.mk _ _ (_root_.congrArg m.meas h)] (_root_.congrArg m.meas h)
+ComputationalPaths/Path/Algebra/MeasurePaths.lean:310:  Path.transport (Path.mk [Step.mk _ _ h] h) x
+ComputationalPaths/Path/Computation/QuantumInfoPaths.lean:6:All paths use `refl`, `trans`, `symm`, `congrArg`, `transport` — zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Topology/StringTopology.lean:274:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Logic/DependentTypeDeep.lean:243:  Path.mk [Step.mk fib.point a fib.over] fib.over
+ComputationalPaths/Path/Algebra/MotivicPaths.lean:78:  Path.mk [Step.mk _ _ (add_zero_components c)] (add_zero_components c)
+ComputationalPaths/Path/Algebra/MotivicPaths.lean:125:  Path.mk [Step.mk _ _ (chow_product_codim_comm c₁ c₂)] (chow_product_codim_comm c₁ c₂)
+ComputationalPaths/Path/Algebra/MotivicPaths.lean:146:  Path.mk [Step.mk _ _ ccm.degree_formula] ccm.degree_formula
+ComputationalPaths/Path/Algebra/MotivicPaths.lean:195:  Path.mk [Step.mk _ _ (double_twist_weight mw)] (double_twist_weight mw)
+ComputationalPaths/Path/Algebra/MotivicPaths.lean:251:  Path.mk [Step.mk _ _ bk.iso] bk.iso
+ComputationalPaths/Path/Algebra/MotivicPaths.lean:312:  Path.mk [Step.mk _ _ (directSum_dim_comm m₁ m₂)] (directSum_dim_comm m₁ m₂)
+ComputationalPaths/Path/Algebra/MotivicPaths.lean:322:  Path.mk [Step.mk _ _ (tensor_weight_comm m₁ m₂)] (tensor_weight_comm m₁ m₂)
+ComputationalPaths/Path/Algebra/FibrationDeep.lean:147:      fiber_pt := F.lift (e.compat.toEq) (congrArg f (Path.mk [Step.mk e.index n₂ idx_eq] idx_eq))
+ComputationalPaths/Path/Algebra/FibrationDeep.lean:148:      compat := F.lift_over e.compat.toEq (congrArg f (Path.mk [Step.mk e.index n₂ idx_eq] idx_eq)) }
+ComputationalPaths/Path/Algebra/FibrationDeep.lean:210:    lft e b₂ (Path.mk [Step.mk (p e) b₂ (h ▸ q.toEq)] (h ▸ q.toEq))
+ComputationalPaths/Path/Algebra/FibrationDeep.lean:212:    lft_over e b₂ (Path.mk [Step.mk (p e) b₂ (h ▸ q.toEq)] (h ▸ q.toEq))
+ComputationalPaths/Path/Algebra/FibrationDeep.lean:370:    over := Path.mk [Step.mk (n % 2) 0 h] h }
+ComputationalPaths/Path/Algebra/FibrationDeep.lean:376:    over := Path.mk [Step.mk (n % 2) 1 h] h }
+ComputationalPaths/Path/Algebra/FibrationDeep.lean:455:    over := Path.mk [Step.mk c b h] h }
+ComputationalPaths/Path/Algebra/FibrationDeep.lean:461:    over := Path.mk [Step.mk c b h] h }
+ComputationalPaths/Path/Algebra/FibrationDeep.lean:606:    Path.mk [Step.mk b₂ b₂ rfl] rfl
+ComputationalPaths/Path/Topology/FibrationDeep2.lean:58:  exact Path.mk [Step.mk _ _ (Path.transport_trans (D := fun _ => fib.F) p q f)]
+ComputationalPaths/Path/Topology/FibrationDeep2.lean:67:  exact Path.mk [Step.mk _ _ (Path.transport_symm_left (D := fun _ => fib.F) p f)]
+ComputationalPaths/Path/Topology/FibrationDeep2.lean:76:  exact Path.mk [Step.mk _ _ (Path.transport_symm_right (D := fun _ => fib.F) p g)]
+ComputationalPaths/Path/Algebra/CubicalTypeTheoryDeep.lean:37:  Path.mk [Step.mk i0 i1 rfl] rfl
+ComputationalPaths/Path/Algebra/CubicalTypeTheoryDeep.lean:224:  Path.mk [Step.mk (composition B) (filling B) rfl] rfl
+ComputationalPaths/Path/Algebra/CubicalTypeTheoryDeep.lean:413:  Path.mk [Step.mk circleBase circleBase rfl] rfl
+ComputationalPaths/Path/Algebra/CubicalTypeTheoryDeep.lean:465:  Path.mk [Step.mk torusBase torusBase rfl] rfl
+ComputationalPaths/Path/Algebra/CubicalTypeTheoryDeep.lean:472:  Path.mk [Step.mk (Path.trans torusMerid torusLong) (Path.trans torusLong torusMerid) rfl] rfl
+ComputationalPaths/Path/Algebra/CubicalTypeTheoryDeep.lean:529:  Path.mk [Step.mk (north (A := A)) (south (A := A)) rfl] rfl
+ComputationalPaths/Path/Topology/MetricPaths.lean:7:**Zero** `Path.mk [Step.mk _ _ _] _`.
+ComputationalPaths/Path/Topology/MetricPaths.lean:82:/-! ## Path witnesses — zero Path.mk [Step.mk _ _ _] _ -/
+ComputationalPaths/Path/Algebra/SheafPaths.lean:6:`refl`, `trans`, `symm`, `congrArg` — zero `Path.mk [Step.mk _ _ h] h`, zero `sorry`.
+ComputationalPaths/Path/Topology/ArithmeticTopology.lean:203:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Topology/DerivedSheaves.lean:200:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Homotopy/HomotopyLimitDeep.lean:148:  Path.mk [Step.mk _ _ (SeqColimit.ι_comm D n x)]
+ComputationalPaths/Path/Homotopy/HomotopyLimitDeep.lean:203:  Path.mk [Step.mk _ _ (h.compat n)] (h.compat n)
+ComputationalPaths/Path/Homotopy/HomotopyLimitDeep.lean:287:    HoPullback f g := ⟨a, b, Path.mk [Step.mk _ _ h] h⟩
+ComputationalPaths/Path/Homotopy/HomotopyLimitDeep.lean:362:  Path.mk [Step.mk _ _ (T.section_inv n x)] (T.section_inv n x)
+ComputationalPaths/Path/Topology/CompactPaths.lean:177:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Topology/CompactPaths.lean:182:  Path.trans (Path.mk [Step.mk _ _ h1] h1) (Path.mk [Step.mk _ _ h2] h2)
+ComputationalPaths/Path/Topology/CompactPaths.lean:219:  Path.mk [Step.mk _ _ k.starts] k.starts
+ComputationalPaths/Path/Algebra/QuantumGroupsDeep.lean:106:  Path.mk [Step.mk a a rfl] rfl
+ComputationalPaths/Path/Logic/LinearLogicPaths.lean:102:  | .neg_neg A          => Path.mk [Step.mk _ _ (LProp.neg_neg A)] (LProp.neg_neg A)
+ComputationalPaths/Path/Logic/LinearLogicPaths.lean:254:  | .comm a b       => Path.mk [Step.mk _ _ (P.mul_comm a b)] (P.mul_comm a b)
+ComputationalPaths/Path/Logic/LinearLogicPaths.lean:255:  | .assoc a b c    => Path.mk [Step.mk _ _ (P.mul_assoc a b c)] (P.mul_assoc a b c)
+ComputationalPaths/Path/Logic/LinearLogicPaths.lean:256:  | .unit_right a   => Path.mk [Step.mk _ _ (P.mul_e a)] (P.mul_e a)
+ComputationalPaths/Path/Logic/LinearLogicPaths.lean:261:      Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/NumberFieldPaths.lean:7:## Main results (35+ theorems/defs, zero Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Computation/QuantumErrorPaths.lean:115:  Path.mk [Step.mk _ _ (noError_identity q)] (noError_identity q)
+ComputationalPaths/Path/Computation/QuantumErrorPaths.lean:124:  Path.mk [Step.mk _ _ (bitFlip_involution q)] (bitFlip_involution q)
+ComputationalPaths/Path/Computation/QuantumErrorPaths.lean:133:  Path.mk [Step.mk _ _ (correction_undoes_bitFlip q)] (correction_undoes_bitFlip q)
+ComputationalPaths/Path/Computation/QuantumErrorPaths.lean:144:  Path.mk [Step.mk _ _ (encode_decode q)] (encode_decode q)
+ComputationalPaths/Path/Computation/QuantumErrorPaths.lean:164:  Path.mk [Step.mk _ _ (correct_single_flip_0 q)] (correct_single_flip_0 q)
+ComputationalPaths/Path/Computation/QuantumErrorPaths.lean:169:  Path.mk [Step.mk _ _ (correct_single_flip_1 q)] (correct_single_flip_1 q)
+ComputationalPaths/Path/Computation/QuantumErrorPaths.lean:174:  Path.mk [Step.mk _ _ (correct_single_flip_2 q)] (correct_single_flip_2 q)
+ComputationalPaths/Path/Computation/QuantumErrorPaths.lean:183:  Path.mk [Step.mk _ _ (noError_channel_id r)] (noError_channel_id r)
+ComputationalPaths/Path/Computation/QuantumErrorPaths.lean:241:    Path.mk [Step.mk _ _ (bitFlip_involution q).symm] (bitFlip_involution q).symm := by
+ComputationalPaths/Path/Algebra/ProbabilityPaths.lean:88:  Path.mk [Step.mk _ _ (_root_.congrArg m.prob h)] (_root_.congrArg m.prob h)
+ComputationalPaths/Path/Algebra/ProbabilityPaths.lean:93:  Path.transport (Path.mk [Step.mk _ _ h] h) x
+ComputationalPaths/Path/Computation/QuantumGroupoidPaths.lean:139:  Path.mk [Step.mk _ _ (pauliX_involution q)] (pauliX_involution q)
+ComputationalPaths/Path/Computation/QuantumGroupoidPaths.lean:154:  Path.mk [Step.mk _ _ (measure_idempotent q)] (measure_idempotent q)
+ComputationalPaths/Path/Computation/QuantumGroupoidPaths.lean:162:  Path.mk [Step.mk _ _ (measure_kills_phase q)] (measure_kills_phase q)
+ComputationalPaths/Path/Computation/QuantumGroupoidPaths.lean:197:  Path.mk [Step.mk _ _ pauliX_comp_id] pauliX_comp_id
+ComputationalPaths/Path/Algebra/KnotInvariantsDeep.lean:1103:  Path.mk [Step.mk d .unknot (zero_crossings_is_unknot d h)]
+ComputationalPaths/Path/Algebra/MonoidPathPaths.lean:6:word problem as path existence — **zero** `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Computation/TransitionSystemPaths.lean:172:  Path.mk [Step.mk _ _ (List.append_nil t)] (List.append_nil t)
+ComputationalPaths/Path/Computation/TransitionSystemPaths.lean:177:  Path.mk [Step.mk _ _ (List.append_assoc t₁ t₂ t₃)] (List.append_assoc t₁ t₂ t₃)
+ComputationalPaths/Path/Computation/TransitionSystemPaths.lean:253:    (pairPath (Path.mk [Step.mk _ _ ha] ha) (Path.mk [Step.mk _ _ hb] hb)).toEq =
+ComputationalPaths/Path/Topology/SuspensionPaths.lean:77:  Path.mk [Step.mk _ _ (north_eq_south a)] (north_eq_south a)
+ComputationalPaths/Path/Topology/SuspensionPaths.lean:170:  Path.mk [Step.mk _ _ ((eq_north x).trans (eq_north y).symm)]
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:238:      · exact Path.mk [Step.mk true true rfl] rfl
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:239:      · exact Path.mk [Step.mk false false rfl] rfl
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:242:      · exact Path.mk [Step.mk true true rfl] rfl
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:243:      · exact Path.mk [Step.mk false false rfl] rfl
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:385:  Fiber.mk true (Path.mk [Step.mk false false rfl] rfl)
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:389:  Fiber.mk false (Path.mk [Step.mk true true rfl] rfl)
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:393:  Fiber.mk 0 (Path.mk [Step.mk 1 1 rfl] rfl)
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:474:  Path.mk [Step.mk b b rfl] rfl
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:478:  Path.mk [Step.mk n n rfl] rfl
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:483:    Path.mk [Step.mk b b rfl, Step.mk b b rfl] rfl := by
+ComputationalPaths/Path/Algebra/TypeTheoreticPathsDeep.lean:495:    Path.mk [Step.mk n n rfl, Step.mk n n rfl] rfl := by
+ComputationalPaths/Path/Algebra/CommutativeAlgebraDeep.lean:36:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Algebra/CommutativeAlgebraDeep.lean:231:  Path.mk [Step.mk I J s.sound] s.sound
+ComputationalPaths/Path/Logic/IntuitionisticPaths.lean:6:**Zero** `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Computation/GameTheoryPaths.lean:59:  Path.congrArg (payoff1_at g) (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Computation/GameTheoryPaths.lean:65:  Path.congrArg (payoff2_at g) (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Computation/GameTheoryPaths.lean:82:  Path.mk [Step.mk _ _ (zerosum_neg g s1 s2)] (zerosum_neg g s1 s2)
+ComputationalPaths/Path/Computation/GameTheoryPaths.lean:130:  Path.transport (D := fun pr => IsNashEquilibrium g pr) (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Computation/GameTheoryPaths.lean:235:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/GameTheoryPaths.lean:241:  Path.transport (Path.mk [Step.mk _ _ h] h) x
+ComputationalPaths/Path/Computation/GameTheoryPaths.lean:279:  Path.congrArg pureToMixed (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Computation/GameTheoryPaths.lean:295:  Path.mk [Step.mk _ _ (utility_congrArg u h s2)] (utility_congrArg u h s2)
+ComputationalPaths/Path/Computation/GameTheoryPaths.lean:314:  Path.mk [Step.mk _ _ (hsym s1 s2)] (hsym s1 s2)
+ComputationalPaths/Path/Algebra/DifferentialAlgebraPaths.lean:48:  Path.mk [Step.mk _ _ (DR.leibniz x y)] (DR.leibniz x y)
+ComputationalPaths/Path/Algebra/DifferentialAlgebraPaths.lean:53:  Path.mk [Step.mk _ _ (DR.deriv_add x y)] (DR.deriv_add x y)
+ComputationalPaths/Path/Algebra/DifferentialAlgebraPaths.lean:130:  Path.mk [Step.mk _ _ (φ.f_deriv x)] (φ.f_deriv x)
+ComputationalPaths/Path/Algebra/DifferentialAlgebraPaths.lean:176:  Path.mk [Step.mk _ _ (DR.deriv_add x y)] (DR.deriv_add x y)
+ComputationalPaths/Path/Algebra/DifferentialAlgebraPaths.lean:182:  Path.mk [Step.mk _ _ (constants_add DR x y hx hy)]
+ComputationalPaths/Path/Algebra/DifferentialAlgebraPaths.lean:197:  Path.mk [Step.mk _ _ (ext.embed_deriv x)] (ext.embed_deriv x)
+ComputationalPaths/Path/Algebra/DifferentialAlgebraPaths.lean:339:  Path.mk [Step.mk _ _ (iter_leibniz_2 DR x y)] (iter_leibniz_2 DR x y)
+ComputationalPaths/Path/Algebra/DifferentialAlgebraPaths.lean:346:    (Path.mk [Step.mk _ _ (_root_.congrArg DR.deriv hxy.symm)]
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:4:This file eliminates `Path.mk [Step.mk _ _ h] h` scaffolding.  We provide a small
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:230:  | _, _, s => Path.mk [Step.mk _ _ (eval_eq s)] (eval_eq s)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:260:  Path.mk [Step.mk _ _ (matAdd_comm A B)] (matAdd_comm A B)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:264:  Path.mk [Step.mk _ _ (matAdd_assoc A B C)] (matAdd_assoc A B C)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:267:  Path.mk [Step.mk _ _ (matAdd_zero_right A)] (matAdd_zero_right A)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:270:  Path.mk [Step.mk _ _ (matAdd_zero_left A)] (matAdd_zero_left A)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:273:  Path.mk [Step.mk _ _ (matAdd_neg_right A)] (matAdd_neg_right A)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:276:  Path.mk [Step.mk _ _ (matScale_one A)] (matScale_one A)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:279:  Path.mk [Step.mk _ _ (matScale_zero A)] (matScale_zero A)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:283:  Path.mk [Step.mk _ _ (matScale_add c A B)] (matScale_add c A B)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:286:  Path.mk [Step.mk _ _ (matTrans_trans A)] (matTrans_trans A)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:290:  Path.mk [Step.mk _ _ (matTrans_add A B)] (matTrans_add A B)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:293:  Path.mk [Step.mk _ _ (matTrans_zero (n := n) (m := m))] (matTrans_zero (n := n) (m := m))
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:296:  Path.mk [Step.mk _ _ (matNeg_neg A)] (matNeg_neg A)
+ComputationalPaths/Path/Algebra/MatrixPaths.lean:299:  Path.mk [Step.mk _ _ (idMat_trans n)] (idMat_trans n)
+ComputationalPaths/Path/Computation/ConstraintPaths.lean:50:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/ConstraintPaths.lean:84:  Path.mk [Step.mk _ _ FW.isFixed] FW.isFixed
+ComputationalPaths/Path/Computation/ConstraintPaths.lean:90:    Path.mk [Step.mk _ _ (_root_.congrArg f FW.isFixed)] (_root_.congrArg f FW.isFixed) := by
+ComputationalPaths/Path/Computation/ConstraintPaths.lean:125:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/ConstraintPaths.lean:178:    Path.mk [Step.mk _ _ (_root_.congrArg f h)] (_root_.congrArg f h) := by
+ComputationalPaths/Path/Topology/GeodeticPaths.lean:10:All `Path.mk [Step.mk _ _ h] h` wrappers have been replaced with either:
+ComputationalPaths/Path/Computation/CompilerPaths.lean:7:`Path.transport`. **Zero** `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Algebra/LatticeDeepPaths.lean:193:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Algebra/LatticeDeepPaths.lean:392:  Path.mk [Step.mk x y h] h
+ComputationalPaths/Path/Algebra/LatticeDeepPaths.lean:444:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Logic/ProofNetPaths.lean:131:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Logic/ProofNetPaths.lean:135:    correctnessPath a a rfl = Path.mk [Step.mk a a rfl] rfl := by
+ComputationalPaths/Path/Logic/ProofNetPaths.lean:154:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CircuitComplexityDeep.lean:728:  exact Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CircuitComplexityDeep.lean:749:  exact Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CircuitComplexityDeep.lean:769:  exact Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/CircuitComplexityDeep.lean:778:  exact Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:53:  Path.mk [Step.mk _ _ r.rank_empty] r.rank_empty
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:74:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:89:  Path.mk [Step.mk _ _ (c.idempotent S)] (c.idempotent S)
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:125:  Path.mk [Step.mk _ _ (funext (fun S => c.idempotent S))] (funext (fun S => c.idempotent S))
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:134:  Path.mk [Step.mk _ _ hF] hF
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:160:  Path.mk [Step.mk _ _ (d.compl_invol S)] (d.compl_invol S)
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:173:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:196:  Path.mk [Step.mk _ _ (ds.additivity S T)] (ds.additivity S T)
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:209:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:239:  Path.mk [Step.mk _ _ (d.rank_agree S h)] (d.rank_agree S h)
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:244:  Path.mk [Step.mk _ _ (c.rank_shift S)] (c.rank_shift S)
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:249:  Path.mk [Step.mk _ _ d.restricted.rank_empty] d.restricted.rank_empty
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:254:  Path.mk [Step.mk _ _ d.original.rank_empty] d.original.rank_empty
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:268:  Path.mk [Step.mk _ _ hx] hx
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:274:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:295:  Path.mk [Step.mk _ _ g.optimality] g.optimality
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:307:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:324:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:345:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:361:  Path.mk [Step.mk _ _ g.rank_empty] g.rank_empty
+ComputationalPaths/Path/Algebra/MatroidPathDeep.lean:461:  Path.trans (biduality_rank n d S h1) (Path.mk [Step.mk _ _ h2] h2)
+ComputationalPaths/Path/Algebra/GradedAlgebraDeep.lean:60:  Path.mk [Step.mk (p + q) (q + p) h] h
+ComputationalPaths/Path/Algebra/GradedAlgebraDeep.lean:65:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Topology/LagrangianPaths.lean:295:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:45:  Path.mk [Step.mk _ _ (R.add_comm a b)] (R.add_comm a b)
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:50:  Path.mk [Step.mk _ _ (R.mul_comm a b)] (R.mul_comm a b)
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:55:  Path.mk [Step.mk _ _ (R.add_assoc a b c)] (R.add_assoc a b c)
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:60:  Path.mk [Step.mk _ _ (R.mul_assoc a b c)] (R.mul_assoc a b c)
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:65:  Path.mk [Step.mk _ _ (R.distrib a b c)] (R.distrib a b c)
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:70:  Path.mk [Step.mk _ _ (R.mul_zero a)] (R.mul_zero a)
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:75:  Path.mk [Step.mk _ _ (R.add_neg a)] (R.add_neg a)
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:88:  Path.mk [Step.mk _ _ S.sol] S.sol
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:116:  Path.mk [Step.mk _ _ T.pyth] T.pyth
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:127:      Path.mk [Step.mk _ _ (_root_.congrArg f T.pyth)] (_root_.congrArg f T.pyth) := by
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:147:  Path.mk [Step.mk _ _ S.repr] S.repr
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:168:  Path.mk [Step.mk _ _ S.repr] S.repr
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:181:  Path.mk [Step.mk _ _ S.pell] S.pell
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:209:  Path.mk [Step.mk _ _ (FD.descend_measure n h)] (FD.descend_measure n h)
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:216:    (Path.mk [Step.mk _ _ (R.mul_zero (FD.measure n))] (R.mul_zero (FD.measure n)))
+ComputationalPaths/Path/Algebra/DiophantinePaths.lean:238:  Path.mk [Step.mk _ _ (BF.identity a b c d)] (BF.identity a b c d)
+ComputationalPaths/Path/Computation/ProcessPaths.lean:120:  exact Path.mk [Step.mk _ _ (List.append_nil t)] (List.append_nil t)
+ComputationalPaths/Path/Computation/ProcessPaths.lean:125:  Path.mk [Step.mk _ _ (List.append_assoc t₁ t₂ t₃)] (List.append_assoc t₁ t₂ t₃)
+ComputationalPaths/Path/Algebra/AlgebraicTopologyDeep.lean:655:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Algebra/FieldPaths.lean:6:`trans`/`symm` chains.  Zero `Path.mk [Step.mk _ _ h] h` in the rewrite system.
+ComputationalPaths/Path/Algebra/FieldPaths.lean:592:  Path.mk [Step.mk _ _ (path_sound fi p)] (path_sound fi p)
+ComputationalPaths/Path/Computation/EffectPaths.lean:146:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/EffectPaths.lean:150:    effectPath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl
+ComputationalPaths/Path/Computation/EffectPaths.lean:155:  Path.mk [Step.mk _ _ heq] heq
+ComputationalPaths/Path/Computation/EffectPaths.lean:159:    handlerPath (Handler.id Nat) a a rfl = Path.mk [Step.mk a a rfl] rfl := rfl
+ComputationalPaths/Path/Algebra/RingSpectrumPaths.lean:149:  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => fracEquiv_refl x⟩)]
+ComputationalPaths/Path/Topology/ChromaticHomotopy.lean:245:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Algebra/DescriptiveComplexityDeep.lean:350:  Path.mk [Step.mk _ _ (Nat.pow_one n).symm] (Nat.pow_one n).symm
+ComputationalPaths/Path/Computation/TreeAutomataPaths.lean:146:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Topology/SurgeryTheory.lean:243:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Topology/TQFTPaths.lean:219:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Logic/SetTheoryPaths.lean:57:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/DynamicalPaths.lean:287:  Path.trans d1.bifurcPath (Path.trans (Path.mk [Step.mk _ _ h] h) d2.bifurcPath)
+ComputationalPaths/Path/Algebra/MonadDeep.lean:196:  Path.mk [Step.mk _ _ (_root_.congrArg (fun g => pbind m g) h)]
+ComputationalPaths/Path/Algebra/MonadDeep.lean:203:  Path.mk [Step.mk _ _ (_root_.congrArg (fun x => pbind x f) h)]
+ComputationalPaths/Path/Topology/PushoutPaths.lean:67:  Path.mk [Step.mk _ _ (glue_eq c)] (glue_eq c)
+ComputationalPaths/Path/Topology/PushoutPaths.lean:114:  Path.mk [Step.mk _ _ (cc.commute c)] (cc.commute c)
+ComputationalPaths/Path/Topology/PushoutPaths.lean:182:  ⟨Path.mk [Step.mk _ _ h] h, rfl⟩
+ComputationalPaths/Path/Topology/PushoutPaths.lean:186:  ⟨Path.mk [Step.mk _ _ h] h, rfl⟩
+ComputationalPaths/Path/Topology/PushoutPaths.lean:218:  · intro h; exact ⟨Path.mk [Step.mk _ _ h] h⟩
+ComputationalPaths/Path/Topology/PushoutPaths.lean:225:    (Path.trans (Path.mk [Step.mk _ _ h] h) (gluePathRev c₂))
+ComputationalPaths/Path/Algebra/MonoidalCategoryDeep.lean:40:  Path.mk [Step.mk (a + 0) a (Nat.add_zero a)] (Nat.add_zero a)
+ComputationalPaths/Path/Algebra/MonoidalCategoryDeep.lean:44:  Path.mk [Step.mk (0 + a) a (Nat.zero_add a)] (Nat.zero_add a)
+ComputationalPaths/Path/Algebra/MonoidalCategoryDeep.lean:49:  Path.mk [Step.mk ((a + b) + c) (a + (b + c)) (Nat.add_assoc a b c)]
+ComputationalPaths/Path/Algebra/MonoidalCategoryDeep.lean:54:  Path.mk [Step.mk (a + b) (b + a) (Nat.add_comm a b)]
+ComputationalPaths/Path/Algebra/MonoidalCategoryDeep.lean:266:  Path.mk [Step.mk (tensor a (tensor b c)) (tensor b (tensor a c))
+ComputationalPaths/Path/Algebra/MonoidalCategoryDeep.lean:311:    path := trans d1.path (Path.mk [Step.mk d1.target d2.source h] h |> fun p =>
+ComputationalPaths/Path/Algebra/MonoidalCategoryDeep.lean:544:  Path.mk [Step.mk (tensor (tensor (tensor (tensor a b) c) d) e)
+ComputationalPaths/Path/Algebra/MonoidalCategoryDeep.lean:555:      (Path.mk [Step.mk (tensor (tensor a b) (tensor c (tensor d e)))
+ComputationalPaths/Path/Topology/CellularPaths.lean:34:  Path.mk [Step.mk _ _ (c.bdry_eq b hb)] (c.bdry_eq b hb)
+ComputationalPaths/Path/Computation/CryptoPaths.lean:34:  Path.mk [Step.mk _ _ heq] heq
+ComputationalPaths/Path/Computation/CryptoPaths.lean:147:  Path.mk [Step.mk _ _ (h.correct k m)] (h.correct k m)
+ComputationalPaths/Path/Computation/CryptoPaths.lean:196:  Path.mk [Step.mk _ _ (h.correct sk m)] (h.correct sk m)
+ComputationalPaths/Path/Computation/CryptoPaths.lean:224:  Path.mk [Step.mk _ _ (h.correct k m)] (h.correct k m)
+ComputationalPaths/Path/Computation/CryptoPaths.lean:305:  Path.congrArg merkleRoot (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Computation/CryptoPaths.lean:313:      Path.mk [Step.mk _ _ (h.correct k m).symm] (h.correct k m).symm := by
+ComputationalPaths/Path/Algebra/DerivedCategoryPaths.lean:6:inductives, rewrite steps, and multi-step paths. Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Topology/UniformPaths.lean:275:  Path.mk [Step.mk _ _ (e.left_inv a)] (e.left_inv a)
+ComputationalPaths/Path/Topology/UniformPaths.lean:303:  Path.mk [Step.mk _ _ (entourageIndex_self U a)] (entourageIndex_self U a)
+ComputationalPaths/Path/Algebra/SeparationLogicDeep.lean:389:  Path.mk [Step.mk _ _ pf] pf
+ComputationalPaths/Path/Algebra/SeparationLogicDeep.lean:466:  Path.mk [Step.mk (sa.compose sa.unit a) a (sa.unit_left a)] (sa.unit_left a)
+ComputationalPaths/Path/Algebra/SeparationLogicDeep.lean:471:  Path.mk [Step.mk _ _ (sa.assoc a b c)] (sa.assoc a b c)
+ComputationalPaths/Path/Algebra/HomologicalDeepPaths.lean:9:Zero `Path.mk [Step.mk _ _ _] _`.  Every path is built from `refl`, `trans`, `symm`,
+ComputationalPaths/Path/Algebra/HomologicalDeepPaths.lean:355:/-! ### Verification: zero Path.mk [Step.mk _ _ _] _ in this file -/
+ComputationalPaths/Path/Algebra/HomologicalDeepPaths.lean:358:-- Zero occurrences of Path.mk [Step.mk _ _ _] _
+ComputationalPaths/Path/Algebra/LocalizationDeep.lean:38:    (Path.trans f.mor (Path.trans (Path.mk [Step.mk _ _ h] h) g.mor))
+ComputationalPaths/Path/Algebra/LocalizationDeep.lean:166:      (Path.trans f.mor (Path.trans (Path.mk [Step.mk _ _ h] h) g.mor)))
+ComputationalPaths/Path/Topology/FlowCategory.lean:259:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:160:  Path.mk [Step.mk _ _ (FreeMonoid.mul_one m)] (FreeMonoid.mul_one m)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:165:  Path.mk [Step.mk _ _ (FreeMonoid.one_mul m)] (FreeMonoid.one_mul m)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:170:  Path.mk [Step.mk _ _ (FreeMonoid.mul_assoc a b c)] (FreeMonoid.mul_assoc a b c)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:251:  Path.mk [Step.mk _ _ (reduction_decreases_length h).symm]
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:354:  Path.mk [Step.mk _ _ heq] heq
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:464:  Path.mk [Step.mk _ _ (mul_assoc a b c)] (mul_assoc a b c)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:468:  Path.mk [Step.mk _ _ (mul_one g)] (mul_one g)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:472:  Path.mk [Step.mk _ _ (one_mul g)] (one_mul g)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:562:  Path.mk [Step.mk _ _ (concat_length w₁ w₂)] (concat_length w₁ w₂)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:570:  Path.mk [Step.mk _ _ (inv_length w)] (inv_length w)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:639:  Path.mk [Step.mk _ _ (norm.isIdempotent t)] (norm.isIdempotent t)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:737:  Path.mk [Step.mk _ _ (Word.concat_assoc u v w)] (Word.concat_assoc u v w)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:742:  Path.mk [Step.mk _ _ (Word.concat_empty w)] (Word.concat_empty w)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:747:  Path.mk [Step.mk _ _ (Word.inv_inv w)] (Word.inv_inv w)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:752:  Path.mk [Step.mk _ _ (Word.inv_concat u v)] (Word.inv_concat u v)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:766:  Path.mk [Step.mk _ _ this] this
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:810:  Path.mk [Step.mk _ _ (wordMap_concat f w₁ w₂)] (wordMap_concat f w₁ w₂)
+ComputationalPaths/Path/Algebra/WordProblemDeep.lean:828:  Path.mk [Step.mk _ _ (wordMap_comp f g w)] (wordMap_comp f g w)
+ComputationalPaths/Path/Computation/TypeCheckerPaths.lean:5:progress, type soundness, all via computational paths. Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Topology/HandleDecomposition.lean:237:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Computation/FixedPointPaths.lean:182:    exact Path.mk [Step.mk t t rfl] rfl
+ComputationalPaths/Path/Algebra/CommAlgDeep.lean:7:path reasoning (trans/symm/congrArg). Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Algebra/CommAlgDeep.lean:70:  Path.mk [Step.mk I J s.sound] s.sound
+ComputationalPaths/Path/Algebra/CommAlgDeep.lean:259:  Path.mk [Step.mk M N s.sound] s.sound
+ComputationalPaths/Path/Algebra/CommAlgDeep.lean:332:  Path.mk [Step.mk _ _ sum_6_10_eq] sum_6_10_eq
+ComputationalPaths/Path/Algebra/CommAlgDeep.lean:338:  Path.mk [Step.mk _ _ inter_6_10_eq] inter_6_10_eq
+ComputationalPaths/Path/Algebra/CommAlgDeep.lean:344:  Path.mk [Step.mk _ _ prod_6_10_eq] prod_6_10_eq
+ComputationalPaths/Path/Algebra/CommAlgDeep.lean:351:    (Path.symm (Path.mk [Step.mk _ _ sum_10_6_eq] sum_10_6_eq))
+ComputationalPaths/Path/Algebra/CommAlgDeep.lean:357:  Path.mk [Step.mk _ _ eq] eq
+ComputationalPaths/Path/Topology/StacksAndGerbes.lean:221:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Algebra/OrderedRewriting.lean:41:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Algebra/OrderedRewriting.lean:156:  Path.mk [Step.mk _ _ (R.sub_lt a b h)] (R.sub_lt a b h)
+ComputationalPaths/Path/Algebra/OrderedRewriting.lean:174:  Path.mk [Step.mk _ _ (K.wt_lt a b h)] (K.wt_lt a b h)
+ComputationalPaths/Path/Computation/QuantumAlgPaths.lean:48:  Path.mk [Step.mk _ _ (dj1_constant_false v)] (dj1_constant_false v)
+ComputationalPaths/Path/Computation/QuantumAlgPaths.lean:105:  Path.mk [Step.mk _ _ (constOracle_isConstant n v x y)]
+ComputationalPaths/Path/Computation/QuantumAlgPaths.lean:126:  Path.mk [Step.mk _ _ (grover_found_monotone gs s h)] (grover_found_monotone gs s h)
+ComputationalPaths/Path/Computation/QuantumAlgPaths.lean:138:  Path.mk [Step.mk _ _ (qft_iqft n k)] (qft_iqft n k)
+ComputationalPaths/Path/Computation/QuantumAlgPaths.lean:146:  Path.mk [Step.mk _ _ (qft_iqft_comp n)] (qft_iqft_comp n)
+ComputationalPaths/Path/Computation/QuantumAlgPaths.lean:175:  Path.mk [Step.mk _ _ (groverNSteps_iter n successes)]
+ComputationalPaths/Path/Computation/QuantumAlgPaths.lean:213:  Path.mk [Step.mk _ _ dj_constant_both] dj_constant_both
+ComputationalPaths/Path/Computation/QuantumAlgPaths.lean:218:  Path.mk [Step.mk _ _ (dj_constant v)] (dj_constant v)
+ComputationalPaths/Path/Computation/QuantumAlgPaths.lean:240:      Path.mk [Step.mk _ _ (qft_iqft n k).symm] (qft_iqft n k).symm := rfl
+ComputationalPaths/Path/Graph/ColoringPaths.lean:65:    Path.transport (D := fun _ => C) (Path.mk [Step.mk _ _ h] h) (col.color v) = col.color v := by
+ComputationalPaths/Path/Graph/ColoringPaths.lean:133:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/DenotationalPaths.lean:6:Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Computation/DenotationalPaths.lean:117:  Path.mk [Step.mk (evalExpr env e1) (evalExpr env e2) (h env)] (h env)
+ComputationalPaths/Path/Computation/DenotationalPaths.lean:215:  Path.mk [Step.mk _ _ (h env)] (h env)
+ComputationalPaths/Path/Computation/DenotationalPaths.lean:292:  Path.mk [Step.mk _ _ (h env)] (h env)
+ComputationalPaths/Path/Topology/IntersectionForm.lean:248:    Path.toEq (Path.mk [Step.mk _ _ h] h) = h :=
+ComputationalPaths/Path/Computation/DomainTheoryPaths.lean:36:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/DomainTheoryPaths.lean:136:  forward := Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/DomainTheoryPaths.lean:137:  backward := Path.symm (Path.mk [Step.mk _ _ h] h)
+ComputationalPaths/Path/Computation/DomainTheoryPaths.lean:227:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/DomainTheoryPaths.lean:232:  Path.mk [Step.mk _ _ (_root_.congrArg Lifted.up h)] (_root_.congrArg Lifted.up h)
+ComputationalPaths/Path/Computation/DomainTheoryPaths.lean:253:      (Path.mk [Step.mk _ _ (d.idempotent x).symm] (d.idempotent x).symm).proof := by
+ComputationalPaths/Path/Algebra/DescriptiveSetTheoryDeep.lean:32:  Path.mk [Step.mk m n h] h
+ComputationalPaths/Path/Computation/CircuitPaths.lean:128:  Path.mk [Step.mk _ _ (circComp_id_left f)] (circComp_id_left f)
+ComputationalPaths/Path/Computation/CircuitPaths.lean:137:  Path.mk [Step.mk _ _ (circComp_id_right f)] (circComp_id_right f)
+ComputationalPaths/Path/Computation/CircuitPaths.lean:148:  Path.mk [Step.mk _ _ (circComp_assoc f g h)] (circComp_assoc f g h)
+ComputationalPaths/Path/Computation/CircuitPaths.lean:157:  Path.mk [Step.mk _ _ (circNot_involution n)] (circNot_involution n)
+ComputationalPaths/Path/Computation/CircuitPaths.lean:209:  Path.mk [Step.mk _ _ (circEquiv_to_eq h)] (circEquiv_to_eq h)
+ComputationalPaths/Path/Computation/CircuitPaths.lean:351:  Path.mk [Step.mk _ _ (circComp_id_right (circNot n))] (circComp_id_right (circNot n))
+ComputationalPaths/Path/Topology/DifferentialPaths.lean:158:  Path.mk [Step.mk _ _ (differential_id M v)] (differential_id M v)
+ComputationalPaths/Path/Topology/DifferentialPaths.lean:168:  Path.mk [Step.mk _ _ (chain_rule g f v)] (chain_rule g f v)
+ComputationalPaths/Path/Topology/DifferentialPaths.lean:322:  Path.mk [Step.mk _ _ (exteriorD_squared_degree M ω)] (exteriorD_squared_degree M ω)
+ComputationalPaths/Path/Rewriting/TypedLambdaDeep.lean:627:    (Path.trans (Path.mk [Step.mk _ _ h] h) r2.typePreservedPath)
+ComputationalPaths/Path/Algebra/LatticeVarietiesDeep.lean:55:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Graph/GraphPaths.lean:79:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Homotopy/CWComplexPaths.lean:117:  Path.trans att1.attachPath (Path.trans (Path.mk [Step.mk _ _ h] h) att2.attachPath)
+ComputationalPaths/Path/Homotopy/CWComplexPaths.lean:153:  Path.mk [Step.mk _ _ (cd.d_sq n x)] (cd.d_sq n x)
+ComputationalPaths/Path/Computation/GamePaths.lean:98:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/GamePaths.lean:237:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Computation/GamePaths.lean:243:  Path.transport (Path.mk [Step.mk _ _ h] h) x
+ComputationalPaths/Path/Homotopy/FibrationPaths.lean:104:  Path.mk [Step.mk _ _ (fs.fiberOver x)] (fs.fiberOver x)
+ComputationalPaths/Path/Computation/CodingPaths.lean:6:`congrArg`, `transport` — zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:86:  Path.mk [Step.mk (faceMap 0 (x :: xs)) xs (faceMap_zero_cons x xs)] (faceMap_zero_cons x xs)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:97:  Path.mk [Step.mk _ _ (faceMap_large xs i h)] (faceMap_large xs i h)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:182:  Path.mk [Step.mk _ _ (f.comm_face n i x)] (f.comm_face n i x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:191:  Path.mk [Step.mk _ _ (f.comm_degen n j x)] (f.comm_degen n j x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:264:  Path.mk [Step.mk _ _ (kf.face_match i h)] (kf.face_match i h)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:308:  Path.mk [Step.mk _ _ (C.boundary_sq n x)] (C.boundary_sq n x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:344:  Path.mk [Step.mk _ _ (M.boundary_sq n x)] (M.boundary_sq n x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:380:  Path.mk [Step.mk _ _ (H.bottom n x)] (H.bottom n x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:390:  Path.mk [Step.mk _ _ (H.top n x)] (H.top n x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:404:      (Path.mk [Step.mk _ _ connect] connect)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:440:  Path.mk [Step.mk _ _ (G.face_compat n i x t)] (G.face_compat n i x t)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:471:  Path.mk [Step.mk _ _ eq] eq
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:488:  Path.mk [Step.mk _ _ hx] hx
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:517:      (Path.mk [Step.mk _ _ face_zero] face_zero))
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:540:  Path.mk [Step.mk _ _ decomp_trivial] decomp_trivial
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:598:  Path.mk [Step.mk _ _ (C.id_comp f)] (C.id_comp f)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:603:  Path.mk [Step.mk _ _ (C.comp_id f)] (C.comp_id f)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:609:  Path.mk [Step.mk _ _ (C.comp_assoc f g h)] (C.comp_assoc f g h)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:650:  Path.mk [Step.mk _ _ (DK.roundtrip_NGam n x)] (DK.roundtrip_NGam n x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:656:  Path.mk [Step.mk _ _ (DK.roundtrip_GamN n x)] (DK.roundtrip_GamN n x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:693:  Path.mk [Step.mk _ _ (BS.face_base n i)] (BS.face_base n i)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:699:  Path.mk [Step.mk _ _ (BS.degen_base n j)] (BS.degen_base n j)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:733:  Path.mk [Step.mk _ _ (Aug.aug_compat x)] (Aug.aug_compat x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:761:  Path.mk [Step.mk _ _ (ED.aug_extra x)] (ED.aug_extra x)
+ComputationalPaths/Path/Algebra/SimplicialDeep.lean:768:  Path.mk [Step.mk _ _ (ED.face_extra x)] (ED.face_extra x)
+ComputationalPaths/Path/Rewriting/CompletionDeep.lean:20:ZERO `Path.mk [Step.mk _ _ h] h`, ZERO `sorry`.
+ComputationalPaths/Path/Rewriting/CompletionDeep.lean:267:  Path.mk [Step.mk _ _ h] h
+ComputationalPaths/Path/Rewriting/CompletionDeep.lean:1214:ZERO `Path.mk [Step.mk _ _ h] h`. ZERO `sorry`.
+ComputationalPaths/Path/Homotopy/HigherToposDeep2.lean:256:  Path.mk [Step.mk _ _ (τ.idempotent k x)] (τ.idempotent k x)
+ComputationalPaths/Path/Homotopy/HigherToposDeep2.lean:319:  Path.mk [Step.mk _ _ (f.adjunction k x)] (f.adjunction k x)
+ComputationalPaths/Path/Algebra/ForcingSetTheoryDeep.lean:34:  Path.mk [Step.mk a b h] h
+ComputationalPaths/Path/Algebra/ForcingSetTheoryDeep.lean:325:  Path.mk [Step.mk tau sig h] h
+ComputationalPaths/Path/Computation/SignalPaths.lean:110:  Path.trans d1.filterPath (Path.trans (Path.mk [Step.mk _ _ h] h) d2.filterPath)
+ComputationalPaths/Path/Computation/MarkovPaths.lean:267:  Path.mk [Step.mk _ _ (_root_.congrArg (m.trans i) h)] (_root_.congrArg (m.trans i) h)
+ComputationalPaths/Path/Computation/MarkovPaths.lean:272:  Path.transport (Path.mk [Step.mk _ _ h] h) x
+ComputationalPaths/Path/Homotopy/StableHomotopyPaths.lean:6:operations (`refl`, `trans`, `symm`, `congrArg`). Zero `Path.mk [Step.mk _ _ h] h`.
+ComputationalPaths/Path/Homotopy/StableHomotopyPaths.lean:106:  exact Path.mk [Step.mk _ _ (Nat.succ_pred_eq_of_pos h)] (Nat.succ_pred_eq_of_pos h)
+ComputationalPaths/Path/Homotopy/StableHomotopyPaths.lean:129:  Path.mk [Step.mk _ _ (OS.omega_cond n)] (OS.omega_cond n)
+ComputationalPaths/Path/Homotopy/StableHomotopyPaths.lean:229:    (Path.mk [Step.mk _ _ (smash_comm_dim E F n)] (smash_comm_dim E F n))
+ComputationalPaths/Path/Homotopy/StableHomotopyPaths.lean:251:  Path.mk [Step.mk _ _ (cs.cofiber_dim n)] (cs.cofiber_dim n)
+ComputationalPaths/Path/Homotopy/StableHomotopyPaths.lean:306:  Path.mk [Step.mk _ _ (h n)] (h n)
+ComputationalPaths/Path/Homotopy/ChainComplexPaths.lean:194:  Path.mk [Step.mk _ _ (cc.d_sq n x)] (cc.d_sq n x)
+ComputationalPaths/Path/Homotopy/ChainComplexPaths.lean:235:  Path.mk [Step.mk _ _ (ses.gf_zero a)] (ses.gf_zero a)
+ComputationalPaths/Path/Homotopy/ChainComplexPaths.lean:255:  Path.mk [Step.mk _ _ (mv.comm x)] (mv.comm x)
