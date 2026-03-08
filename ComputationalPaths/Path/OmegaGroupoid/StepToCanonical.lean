@@ -21,13 +21,15 @@ where `deriv₂_to_normal p := .step (Step.canon p)` used a canonicalization ste
 
 Without `Step.canon`, the `canonical` function requires a different construction.
 The current formalization no longer needs `to_canonical`: contractibility at level 3
-is derived from proof irrelevance of `RwEq`.
+now routes through the inverse loop `d₁ · d₂⁻¹` and contracts that loop via the
+normalizer-based loop connector.
 
 ## The Semantic Argument (Still Valid)
 
-At the level of `RwEq` (Prop-valued), everything works: any two derivations
-between the same paths have equal `toRwEq`. This equality now yields a 3-cell
-via `MetaStep₃.diamond_filler`.
+At the level of `RwEq` (Prop-valued), everything still works: any two derivations
+between the same paths have equal `toRwEq`. This explains the residual
+projection boundary that remains only behind the loop-specialized raw-`Path`
+connector.
 
 ## The Structural Gap
 
@@ -36,15 +38,16 @@ The fundamental issue is the gap between `Prop` and `Type`:
 - `Derivation₂ p q` is in `Type` — preserves structure of the derivation
 
 All `Derivation₂ p q` values have the same `toRwEq` (by proof irrelevance of `RwEq`).
-We now use this equality directly to produce a Type-valued 3-cell via
-`MetaStep₃.diamond_filler`.
+The exported `contractibility₃` witness, however, no longer compares arbitrary
+parallel derivations directly through that projection; it first isolates an
+inverse loop and then contracts that loop constructively.
 
 ## Analysis Summary
 
 | Level | Current Axioms | Notes |
 |-------|----------------|-------|
 | 1 | Step constructors (~76) | Term rewriting rules |
-| 3 | None | Contractibility from proof irrelevance |
+| 3 | None | Contractibility via inverse-loop normalization |
 | 4 | `contractibility₄` (1) | Contractibility |
 | 5+ | `contractibilityHigh` (1) | Higher contractibility |
 
@@ -67,8 +70,9 @@ variable {A : Type u}
 /-! ## Part 1: The Semantic Argument
 
 At the level of `RwEq` (Prop-valued), everything works: any two derivations
-between the same paths have equal `toRwEq`. This equality now yields a 3-cell
-via `MetaStep₃.diamond_filler`, so no assumption is needed.
+between the same paths have equal `toRwEq`. This still explains why no new
+assumption is needed, even though the exported 3-cell now factors through the
+loop-normalizer route instead of using a direct global transport.
 -/
 
 section SemanticArgument
@@ -139,13 +143,18 @@ No assumptions needed — `Derivation₂` is a free structure.
 
 ### Level 3: Meta-derivations (Derivation₃)
 
-No assumption is needed: `contractibility₃` follows from proof irrelevance of `RwEq`.
+No assumption is needed: `contractibility₃` is now implemented by explicit
+inverse-loop isolation together with the loop normalizer and the local
+`strict_loop_contract_go` recursion, with only a residual raw-`Path`
+projection boundary left inside that loop connector.
 All groupoid laws, coherences, and step equality are derivable from
 `contractibility₃`.
 
 ### Level 4+: Higher cells
 
-No higher contractibility assumptions: levels 4+ are derived from proof irrelevance.
+No higher contractibility assumptions: levels 4+ are obtained from the explicit
+level-3 tower plus the higher diamond fillers already present in the core
+development.
 
 ### Total Minimal Axioms
 

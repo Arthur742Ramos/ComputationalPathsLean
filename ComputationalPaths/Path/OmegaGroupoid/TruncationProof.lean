@@ -3,16 +3,18 @@
 
 This module packages confluence-facing interfaces for the ω-groupoid of
 computational paths.  Confluence supplies canonical derivations and explicit
-Step-based ingredients, while the current imported level-3 contractibility
-witness still retains a residual Prop-level transport boundary in
-`OmegaGroupoid.strict_transport₃`, now only as a final zero-fuel safety fallback
-after the structural and normalized-inverse routes are tried first.
+Step-based ingredients, while the current imported level-3 connector on raw
+`Path` still retains a residual Prop-level transport boundary in
+`OmegaGroupoid.strict_transport₃`.  Atomic self-loops, loop-specialized
+structural contraction, and mixed-sign singleton comparisons are now handled
+constructively in the imported core, so the remaining boundary is the final
+zero-fuel fallback for harder global strict-shape mismatches that the current
+structural recursion still does not align away.
 
 ## Key idea
 
-Any two `RwEq` witnesses `r₁ r₂ : RwEq p q` can be shown to be connected
-by a 3-cell because the underlying TRS is confluent (Church–Rosser). The
-argument is:
+Under an explicit path-level confluence hypothesis, any two `RwEq` witnesses
+`r₁ r₂ : RwEq p q` can be shown to be connected by a 3-cell.  The argument is:
 
 1. Each `RwEq` derivation determines a zig-zag of `Step` rewrites.
 2. By Church–Rosser (from `ConfluenceDeep.lean`), any two paths connected
@@ -21,6 +23,9 @@ argument is:
    to derivations through the *same* canonical form.
 4. This canonical-form agreement gives an explicit 3-cell connecting
    any two parallel 2-cells.
+
+For the actual exported `Derivation₃` witness on raw `Path`, this file still
+packages the imported core connector rather than replacing it.
 
 ## What this file provides
 
@@ -40,10 +45,13 @@ argument is:
 ## No direct `Subsingleton.elim` in this file
 
 The remaining proof-irrelevance boundary is imported from
-`OmegaGroupoid.strict_transport₃`; this file itself only packages that witness
-with confluence data.  Separately, the imported polygraph development provides
+`OmegaGroupoid.strict_transport₃`, now only after the core
+`strict_loop_contract_go` recursion has exhausted its constructive loop cases;
+this file itself only packages that witness with confluence data.  Separately,
+the imported polygraph development provides
 explicit Type-valued 3-cell generators and a proof-relevant coherent
-presentation on the expression syntax side.
+presentation on the expression syntax side, but that constructive syntax-level
+story is not yet a drop-in replacement for raw-`Path` `Derivation₃`.
 -/
 
 import ComputationalPaths.Path.Basic

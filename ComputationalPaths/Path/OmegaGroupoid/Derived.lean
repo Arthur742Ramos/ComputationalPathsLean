@@ -24,7 +24,8 @@ All these derivations follow from a single observation:
 > Any two `Derivation₂ p q` values (for the same `p, q`) are connected by
 > a `Derivation₃` via the canonical derivation.
 
-This is exactly `contractibility₃`, derived from proof irrelevance of `RwEq`.
+This is exactly `contractibility₃`, now routed through explicit inverse-loop
+isolation and constructive loop contraction.
 
 Once we have contractibility, all the individual coherence laws become
 special cases: they're just saying that two specific derivations are equal,

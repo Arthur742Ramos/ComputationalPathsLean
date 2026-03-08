@@ -6,9 +6,12 @@
 \usepackage{tikz-cd}
 \usepackage{enumitem}
 \usepackage{booktabs,longtable}
+\usepackage{adjustbox}
+\usepackage[all]{nowidow}
 \usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
 \usepackage[nameinlink,noabbrev]{cleveref}
 \usepackage{fancyhdr}
+\allowdisplaybreaks
 
 % BSL-style header
 \pagestyle{fancy}
@@ -277,6 +280,35 @@ following:
 
 \subsection{Related work and comparison with HoTT}
 
+\begin{figure}[htbp]
+\centering
+\begin{tikzcd}[column sep=2.5em, row sep=2.8em]
+  \text{Step (77 rules)}
+    \ar[r, "\text{closure}"]
+    \ar[d, "\text{lift}"']
+  & \text{RwEq} \;:\; \Ty\;u
+    \ar[r, "\text{iterate}"]
+    \ar[d, "\text{project}"]
+  & \text{Derivation}_n
+    \ar[d, "\text{contract}"] \\
+  \text{Path}
+    \ar[r, "\text{toEq}"']
+  & \text{Eq} \;:\; \Prop
+    \ar[r, "\text{UIP}"']
+  & \text{trivial above } n \ge 3
+\end{tikzcd}
+\caption{Architecture of the computational paths framework.
+  The top row carries proof-relevant structure: elementary
+  $\Step$ rules lift to $\RwEq$ witnesses in $\Ty$, which
+  iterate into the cell tower.
+  The bottom row is the proof-irrelevant shadow: paths project
+  to propositional equality in $\Prop$, which is trivial by UIP.
+  The key insight is that genuine higher structure lives in the
+  top row at levels 0--2, while contractibility at level $\ge 3$
+  is mediated by the projection to the bottom row.}
+\label{fig:architecture}
+\end{figure}
+
 The relationship between computational paths and homotopy type theory deserves
 careful delineation.  Both theories assign non-trivial structure to identity
 types, and both arrive at weak $\omega$-groupoid structures.  The differences
@@ -319,7 +351,6 @@ discusses the Church--Rosser property and its consequences.
 Sections~\ref{sec:omega}--\ref{sec:applications} (Parts~2 and~3) develop the
 weak $\omega$-groupoid structure, the homotopy-theoretic applications, and the
 breadth of the formalization across mathematical domains.
-
 
 % ==========================================================================
 \section{The Path/Step/RwEq Framework}\label{sec:framework}
@@ -415,7 +446,7 @@ $(p \cdot q) \cdot r$ and $p \cdot (q \cdot r)$ have different step lists
 $\sigma_1 \mathbin{+\!\!+} (\sigma_2 \mathbin{+\!\!+} \sigma_3)$) but are identified by
 the associativity rewrite rule.
 
-\begin{theorem}[Definitional groupoid laws]\label{thm:def-groupoid}\label{thm:weak-groupoid-laws}
+\begin{theorem}[Definitional groupoid laws]\label{thm:weak-groupoid-laws}
 The following hold as definitional equalities of $\mathsf{Path}$ terms:
 \begin{enumerate}
 \item $\mathsf{refl}(a) \cdot p = p$ \quad (left unit)
@@ -439,7 +470,6 @@ Each identity reduces to a corresponding identity on list operations:
 All five are proved by structural induction on lists.
 \end{proof}
 
-
 \subsection{The 77 step constructors}\label{ssec:constructors}
 
 The rewriting system on computational paths is defined by an inductive relation
@@ -453,14 +483,12 @@ is defined by 77 constructors, organized into the following categories.
 \noindent\textbf{Category 1: Basic Path Algebra (Rules 1--8).}\quad
 These are the core groupoid rewrite rules.
 
-\begin{table}[ht]
-\caption{Selected step constructors (Rules 1--8).}
+\begin{table}[htbp]
+\centering
+\caption{Basic path algebra step constructors (Rules 1--8).}
 \label{tab:step-rules}
-\end{table}
-
-
-\begin{center}
 \renewcommand{\arraystretch}{1.2}
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{@{}clll@{}}
 \toprule
 \# & Name & Rule & Type \\
@@ -482,8 +510,9 @@ These are the core groupoid rewrite rules.
 8 & \textsc{trans-assoc} & $(p \cdot q) \cdot r \triangleright p \cdot (q \cdot r)$ &
   $\forall p\,q\,r.\; \mathsf{Step}\bigl(\ldots\bigr)$ \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}%
+}
+\end{table}
 
 \medskip
 
@@ -492,9 +521,13 @@ These rules govern the interaction of paths with product types, including
 $\beta$-rules for projections, the $\eta$-expansion, and the decomposition of
 binary maps.
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Product type step constructors (Rules 9--16).}
+\label{tab:product-rules}
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{@{}clp{7.5cm}@{}}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}clp{9cm}@{}}
 \toprule
 \# & Name & Rule \\
 \midrule
@@ -511,8 +544,9 @@ binary maps.
 16 & \textsc{sigma-fst-$\beta$} & $\mathsf{fst}(\sigma\mathsf{Mk}(p, q)) \triangleright
   \mathsf{ofEq}(p.\mathsf{toEq})$ \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}%
+}
+\end{table}
 
 \medskip
 
@@ -615,9 +649,13 @@ propositional equalities through binary maps.  Twelve rules in total.
 Closure rules ensuring that the step relation is stable under the groupoid
 operations and that certain critical pairs are closed:
 
-\begin{center}
+\begin{table}[htbp]
+\centering
+\caption{Structural closure and Knuth--Bendix completion rules (Rules 73--77).}
+\label{tab:closure-rules}
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{@{}clp{8cm}@{}}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}clp{9cm}@{}}
 \toprule
 \# & Name & Rule \\
 \midrule
@@ -627,10 +665,11 @@ operations and that certain critical pairs are closed:
 76 & \textsc{trans-cancel-left} & $p \cdot (p^{-1} \cdot q) \triangleright q$ \\
 77 & \textsc{trans-cancel-right} & $p^{-1} \cdot (p \cdot q) \triangleright q$ \\
 \bottomrule
-\end{tabular}
-\end{center}
+\end{tabular}%
+}
+\end{table}
 
-\begin{remark}[The cancellation rules]\label{rem:cancellation}\label{ex:critical-pair}
+\begin{remark}[The cancellation rules]\label{rem:cancellation}
 Rules 76 and 77 are \emph{completion rules} in the sense of
 Knuth--Bendix~\cite{KnuthBendix1970}: they do not follow from the
 basic groupoid axioms (Rules 1--8) as single rewrite steps, though they are
@@ -644,8 +683,7 @@ reduction paths must join, and the direct cancellation rule ensures that they do
 so in a single step.
 \end{remark}
 
-
-\subsection{Rewrite equivalence \texorpdfstring{$\mathsf{RwEq}$}{RwEq}}\label{ssec:rweq}\label{subsec:rweq}
+\subsection{Rewrite equivalence \texorpdfstring{$\mathsf{RwEq}$}{RwEq}}\label{ssec:rweq}
 
 With the step relation in hand, we define the equivalence relation on paths
 that identifies paths connected by any finite sequence of forward and backward
@@ -702,14 +740,13 @@ $\mathsf{refl}$, $\mathsf{symm}$, and $\mathsf{trans}$ cases are immediate
 from reflexivity, symmetry, and transitivity of propositional equality.
 \end{proof}
 
-
 \subsection{Congruence and functoriality}\label{ssec:congruence}
 
 The rewrite equivalence is compatible with all path operations, making $\mathsf{ap}_f$
 a functor and $\mathsf{trans}$ a bifunctor on the category of paths modulo
 $\mathsf{RwEq}$.
 
-\begin{theorem}[Congruence of composition]\label{thm:trans-congr}\label{prop:congr}
+\begin{theorem}[Congruence of composition]\label{thm:trans-congr}
 If $\mathsf{RwEq}(p, p')$ and $\mathsf{RwEq}(q, q')$, then
 $\mathsf{RwEq}(p \cdot q,\; p' \cdot q')$.
 \end{theorem}
@@ -783,8 +820,6 @@ $\mathsf{RewriteLift}$ transport applied to the context $a \mapsto f(a, b)$
 (respectively $b \mapsto f(a, b)$).
 \end{proof}
 
-
-
 % ==========================================================================
 \section{Confluence and Church--Rosser}\label{sec:confluence}
 % ==========================================================================
@@ -855,7 +890,6 @@ We write $\mathsf{CRTC}$ for the reflexive-transitive closure of $\mathsf{CStep}
 and $e \to^* e'$ for $\mathsf{CRTC}(e, e')$.
 \end{definition}
 
-
 \subsection{Termination}\label{ssec:termination}
 
 Before establishing confluence, we verify that $\mathsf{CStep}$ is terminating:
@@ -897,7 +931,6 @@ contains only $w(q)$, so the net weight drops by at least $2 \cdot w(p) + 2$.
 The congruence rules (Rules 11--13) preserve the lexicographic decrease from
 the inner step by a straightforward structural argument.
 \end{proof}
-
 
 \subsection{The free-group interpretation}\label{ssec:free-group}
 
@@ -983,7 +1016,6 @@ For every expression $e$, the word $\llbracket e \rrbracket$ is reduced.
 By structural induction on $e$, using the reducedness-preservation properties
 of $\mathsf{rwAppend}$ and $\mathsf{rwInv}$ (Theorem~\ref{thm:fg-algebra}(1)).
 \end{proof}
-
 
 \subsection{Invariance, reachability, and the confluence theorem}\label{ssec:confluence-proof}
 
@@ -1092,6 +1124,24 @@ $c \to^* \mathsf{canon}(c) = \mathsf{canon}(b)$.  Take
 $d := \mathsf{canon}(b)$.
 \end{proof}
 
+\begin{figure}[htbp]
+\centering
+\begin{tikzcd}[column sep=3em, row sep=2.5em]
+  & a \ar[dl, twoheadrightarrow] \ar[dr, twoheadrightarrow] & \\
+  b \ar[dr, twoheadrightarrow]
+    \ar[rr, dashed, "\llbracket b \rrbracket = \llbracket c \rrbracket"
+      description]
+  & & c \ar[dl, twoheadrightarrow] \\
+  & d = \mathsf{canon}(b) &
+\end{tikzcd}
+\caption{Confluence via the free-group interpretation.
+  Any two reducts $b$, $c$ of a common ancestor $a$ share the
+  same free-group image (Theorem~\ref{thm:invariance}), hence
+  reduce to the same canonical form $d$
+  (Theorem~\ref{thm:reachability}).}
+\label{fig:confluence}
+\end{figure}
+
 \begin{corollary}[Local confluence]
 If $a \triangleright b$ and $a \triangleright c$, then $b$ and $c$ are joinable.
 \end{corollary}
@@ -1100,7 +1150,6 @@ If $a \triangleright b$ and $a \triangleright c$, then $b$ and $c$ are joinable.
 If $e_1$ and $e_2$ are both normal forms (no $\mathsf{CStep}$ applies) reachable
 from $e$, then $e_1 = e_2$.
 \end{corollary}
-
 
 \subsection{The Church--Rosser property}\label{ssec:church-rosser}
 
@@ -1132,7 +1181,6 @@ As an immediate consequence, the word problem for the completed groupoid TRS is
 $\llbracket e_1 \rrbracket$ and $\llbracket e_2 \rrbracket$ (which are concrete
 lists of signed generators, with decidable equality) and compare.
 \end{remark}
-
 
 \subsection{What is proved vs.\ what is assumed}\label{ssec:honest}
 
@@ -1246,24 +1294,29 @@ The five edges of the Mac~Lane pentagon are:
 \begin{align}
   e_1 &: \RwEq\;\big(((p \cmpA q) \cmpA r) \cmpA s\big)
                 \;\big((p \cmpA q) \cmpA (r \cmpA s)\big)
-    && \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_assoc}\;
+    \notag \\
+    &\quad \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_assoc}\;
        (p \cmpA q)\; r\; s) \label{eq:pent-e1} \\
   e_2 &: \RwEq\;\big((p \cmpA q) \cmpA (r \cmpA s)\big)
                 \;\big(p \cmpA (q \cmpA (r \cmpA s))\big)
-    && \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_assoc}\;
+    \notag \\
+    &\quad \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_assoc}\;
        p\; q\; (r \cmpA s)) \label{eq:pent-e2} \\
   e_3 &: \RwEq\;\big(((p \cmpA q) \cmpA r) \cmpA s\big)
                 \;\big((p \cmpA (q \cmpA r)) \cmpA s\big)
-    && \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_congr\_left}\;
+    \notag \\
+    &\quad \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_congr\_left}\;
        s\; (\Step.\mathsf{trans\_assoc}\; p\; q\; r))
        \label{eq:pent-e3} \\
   e_4 &: \RwEq\;\big((p \cmpA (q \cmpA r)) \cmpA s\big)
                 \;\big(p \cmpA ((q \cmpA r) \cmpA s)\big)
-    && \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_assoc}\;
+    \notag \\
+    &\quad \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_assoc}\;
        p\; (q \cmpA r)\; s) \label{eq:pent-e4} \\
   e_5 &: \RwEq\;\big(p \cmpA ((q \cmpA r) \cmpA s)\big)
                 \;\big(p \cmpA (q \cmpA (r \cmpA s))\big)
-    && \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_congr\_right}\;
+    \notag \\
+    &\quad \triangleq\; \RwEq.\mathsf{step}(\Step.\mathsf{trans\_congr\_right}\;
        p\; (\Step.\mathsf{trans\_assoc}\; q\; r\; s))
        \label{eq:pent-e5}
 \end{align}
@@ -1275,6 +1328,27 @@ to the right factor while holding~$p$ fixed.
 
 The two canonical routes through the pentagon are now composed from
 these edges.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzcd}[column sep=1.2em, row sep=3.5em]
+  & (p \cmpA q) \cmpA (r \cmpA s)
+    \ar[dr, "{e_2}"] & \\
+  ((p \cmpA q) \cmpA r) \cmpA s
+    \ar[ur, "{e_1}"]
+    \ar[d, "{e_3}"'] & &
+  p \cmpA (q \cmpA (r \cmpA s)) \\
+  (p \cmpA (q \cmpA r)) \cmpA s
+    \ar[rr, "{e_4}"'] & &
+  p \cmpA ((q \cmpA r) \cmpA s)
+    \ar[u, "{e_5}"']
+\end{tikzcd}
+\caption{The Mac\,Lane pentagon for path composition.
+  The right route $R = e_1 \vcomp e_2$ (top) and the left route
+  $L = e_3 \vcomp e_4 \vcomp e_5$ (bottom) yield the same
+  underlying equality.}
+\label{fig:pentagon}
+\end{figure}
 
 \begin{definition}[Pentagon routes]\label{def:pentagon-routes}
 The \emph{right route} (outer association first):
@@ -1422,6 +1496,23 @@ agree:
   \;=_{\mathsf{toEq}}\;
   (\alpha_1 \hcomp \beta_1) \vcomp (\alpha_2 \hcomp \beta_2).
 \]
+\begin{figure}[htbp]
+\centering
+\begin{tikzcd}[column sep=4em, row sep=2.5em]
+  p_1 \cmpA q_1
+    \ar[r, Rightarrow, "{\alpha_1 \hcomp \beta_1}"]
+    \ar[d, Rightarrow, "{\alpha_1 \vcomp \alpha_2}"']
+  & p_2 \cmpA q_2
+    \ar[d, Rightarrow, "{\alpha_2 \hcomp \beta_2}"] \\
+  p_3 \cmpA q_1
+    \ar[r, Rightarrow]
+  & p_3 \cmpA q_3
+\end{tikzcd}
+\caption{The interchange law: horizontal-then-vertical equals
+  vertical-then-horizontal composition of a $2 \times 2$ grid
+  of 2-cells.}
+\label{fig:interchange}
+\end{figure}
 \end{theorem}
 
 \begin{proof}
@@ -1455,7 +1546,7 @@ $\mathsf{map2}\;(\trs)\;\alpha\;\beta$, decomposed by Rule~9
 For all $\alpha, \beta : \Omega^2(A, a)$,
 the vertical composite $\alpha \vcomp \beta$ equals $\beta \vcomp \alpha$
 after projection through $\mathsf{toEq}$.
-The proof proceeds in three explicit steps:
+The proof proceeds in three explicit steps (see Figure~\ref{fig:eckmann-hilton}):
 \begin{enumerate}
   \item \textbf{Vertical to horizontal.}
     The ``vertical composite''
@@ -1502,6 +1593,27 @@ $v(\beta, \alpha)$, which projects to
 $v(\alpha, \beta).\mathsf{toEq} = v(\beta, \alpha).\mathsf{toEq}$.
 \end{theorem}
 
+\begin{figure}[htbp]
+\centering
+\begin{gather*}
+  v(\alpha, \beta)
+  \xrightarrow[\text{R9}]{\mathsf{map2\_subst}}
+  h(\alpha, \beta)
+  \xrightarrow[\text{R3, R4}]{\text{unit laws}}
+  \alpha \cmpA \beta \\
+  \xrightarrow[\text{swap}]{\text{interchange}}
+  \beta \cmpA \alpha
+  \xrightarrow[\text{R3, R4}]{\text{unit laws}}
+  h(\beta, \alpha)
+  \xrightarrow[\text{R9}^{-1}]{\mathsf{map2\_subst}}
+  v(\beta, \alpha)
+\end{gather*}
+\caption{The Eckmann--Hilton argument as a chain of $\Step$/$\RwEq$
+  applications.  Each arrow is a concrete rewrite step (or its inverse)
+  from the 77-constructor step relation.}
+\label{fig:eckmann-hilton}
+\end{figure}
+
 \begin{proof}
 The first step is the $\RwEq$ witness
 $\RwEq.\mathsf{step}(\Step.\mathsf{map2\_subst}\;(\trs)\;\alpha\;\beta)$.
@@ -1545,6 +1657,23 @@ For composable $p : \Path\;a\;b$ and $q : \Path\;b\;c$, the two
 canonical routes from
 $(p \cmpA \refl_b) \cmpA q$ to $p \cmpA q$ yield the same
 underlying equality.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzcd}[column sep=4em, row sep=3em]
+  (p \cmpA \refl_b) \cmpA q
+    \ar[rr, "{\alpha_{p,\,\refl_b,\,q}}"]
+    \ar[dr, "{\rho_p \wr q}"'] & &
+  p \cmpA (\refl_b \cmpA q)
+    \ar[dl, "{p \wl \lambda_q}"] \\
+  & p \cmpA q &
+\end{tikzcd}
+\caption{The triangle identity.
+  Route $T_1$ (top, then right leg) uses associativity followed
+  by the left unitor; route $T_2$ (left leg) uses the right unitor
+  under congruence.}
+\label{fig:triangle}
+\end{figure}
 Explicitly, defining:
 \begin{align*}
   T_1 &\;\triangleq\; \RwEq.\trs\big(
@@ -1733,7 +1862,6 @@ That is, $\mathsf{congrArg}\;f$ is a groupoid functor from the
 path groupoid of $A$ to the path groupoid of $B$.
 \end{proposition}
 
-
 % ======================================================================
 \section{Two-Categorical Structure}\label{sec:twocat}
 % ======================================================================
@@ -1850,7 +1978,7 @@ $\mathsf{PathRwQuot}\;A\;a\;b \triangleq \mathsf{Quot}(\RwEqProp)$,
 where $\RwEqProp\;p\;q \triangleq \mathsf{Nonempty}(\RwEq\;p\;q) : \Prop$.
 Composition $\trs$ and inversion $\sym$ descend to the quotient because
 $\RwEq$ is a congruence for both operations
-(Proposition~\ref{prop:congr}).
+(Proposition~\ref{thm:trans-congr}).
 \end{definition}
 
 \begin{proposition}[Groupoid enrichment]\label{prop:enrichment}
@@ -1878,7 +2006,6 @@ invertible---in other words, an $\infty$-groupoid.
 This connection is made precise by the weak $\omega$-groupoid theorem
 of the next section.
 \end{remark}
-
 
 % ======================================================================
 \section{The Weak $\omega$-Groupoid Theorem}\label{sec:omega}
@@ -1912,6 +2039,33 @@ $(n{-}1)$-cells, giving the data a \emph{globular} shape: the source
 and target maps $s, t : \mathsf{Cell}_n \to \mathsf{Cell}_{n-1}$
 satisfy $s \circ s = s \circ t$ and $t \circ s = t \circ t$.
 \end{definition}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzcd}[column sep=3.5em, row sep=0.8em]
+  A
+    \ar[r, shift left=0.7ex, "p"{name=U1}]
+    \ar[r, shift right=0.7ex, "q"'{name=D1}]
+  & A
+  \ar[from=U1, to=D1, Rightarrow, "\alpha"{description}]
+\end{tikzcd}
+
+\smallskip
+$\underbrace{%
+  \mathsf{Cell}_0 = A,\;
+  \mathsf{Cell}_1 = \Path,\;
+  \mathsf{Cell}_2 = \mathsf{Deriv}_2,\;
+  \mathsf{Cell}_3 = \mathsf{Deriv}_3,\;
+  \ldots
+}_{\text{globular tower: genuine at levels 0--2, contractible at level } \ge 3}$%
+\caption{The cell tower.
+  0-cells are elements of $A$; 1-cells are paths $p, q : \Path\;a\;b$;
+  2-cells are derivations $\alpha : \mathsf{Derivation}_2\;p\;q$;
+  higher cells witness coherences between lower cells.
+  From level 3 onward the tower is contractible
+  (Theorem~\ref{thm:contract}).}
+\label{fig:cell-tower}
+\end{figure}
 
 \begin{definition}[Derivation$_2$]\label{def:derivation2}
 The type $\mathsf{Derivation}_2\;p\;q$ is a $\Ty\;u$-valued type of
@@ -2510,13 +2664,13 @@ $\mathsf{PathRwQuot}\;A\;a\;b \triangleq
  \mathsf{Quot}(\RwEqProp)$
 is the 1-truncated hom-space of the $\omega$-groupoid:
 composition, units, and inverses descend to the quotient via
-Proposition~\ref{prop:congr}, yielding a strict groupoid
+Proposition~\ref{thm:trans-congr}, yielding a strict groupoid
 $\Pi_1^{\mathrm{cp}}(A)$.
 \end{theorem}
 
 \begin{proof}
 The $\RwEqProp$ relation is a congruence for $\trs$, $\sym$, and
-$\refl$ by the congruence lemmas of \S\ref{subsec:rweq}.
+$\refl$ by the congruence lemmas of \S\ref{ssec:rweq}.
 The quotient operations are defined by $\mathsf{Quot.lift}$ and
 $\mathsf{Quot.liftOn}_2$; the associativity, unit, and inverse laws
 become strict equalities on the quotient because the $\RwEq$
@@ -2538,7 +2692,7 @@ with Lumsdaine and van den Berg--Garner.
 % ======================================================================
 
 % ======================================================================
-\section{Homotopy-Theoretic Applications}\label{sec:homotopy}\label{sec:applications}
+\section{Homotopy-Theoretic Applications}\label{sec:applications}
 % ======================================================================
 
 The preceding sections developed the algebraic machinery of
@@ -2711,7 +2865,7 @@ $\mathsf{decode}(1 + \mathsf{wind}(p')) =
 \trs(\mathsf{loop}, \mathsf{decode}(\mathsf{wind}(p')))$.
 By the inductive hypothesis,
 $\RwEq\;(\mathsf{decode}(\mathsf{wind}(p')))\;p'$,
-and by Proposition~\ref{prop:congr} (bifunctoriality of composition),
+and by Proposition~\ref{thm:trans-congr} (bifunctoriality of composition),
 $\RwEq\;(\trs(\mathsf{loop},
 \mathsf{decode}(\mathsf{wind}(p'))))\;(\trs(\mathsf{loop}, p'))$.
 The result follows since
@@ -2738,6 +2892,23 @@ maps on the quotient:
   \mathsf{PathRwQuot}\;S^1\;\mathsf{base}\;\mathsf{base}
   \;\cong\; \mathbb{Z}.
 \]
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzcd}[column sep=5em, row sep=2.5em]
+  \pi_1(S^1, \mathsf{base})
+    \ar[r, shift left=1ex, "\overline{\mathsf{wind}}"]
+  & \mathbb{Z}
+    \ar[l, shift left=1ex, "\overline{\mathsf{decode}}"]
+\end{tikzcd}
+\caption{The encode--decode isomorphism
+  $\pi_1(S^1) \cong \mathbb{Z}$.
+  The winding number $\overline{\mathsf{wind}}$ counts
+  loop traversals; $\overline{\mathsf{decode}}$ constructs
+  the $n$-fold loop $\mathsf{loop}^n$.
+  Both directions are verified as $\RwEq$-compatible.}
+\label{fig:pi1-circle}
+\end{figure}
 \end{theorem}
 
 \begin{proof}
@@ -2887,7 +3058,7 @@ $X \xleftarrow{x_0} \mathbf{1} \xrightarrow{y_0} Y$.
 The mapping cylinder and cofiber are similarly pushout instances.
 \end{remark}
 
-\subsection{Seifert--van Kampen theorem}\label{subsec:svk-full}\label{sec:svk}
+\subsection{Seifert--van Kampen theorem}\label{sec:svk}
 
 \begin{theorem}[Seifert--van Kampen for pushouts]\label{thm:svk-full}
 Let $A$, $B$, $C$ be types with $f : C \to A$ and $g : C \to B$,
@@ -2988,7 +3159,7 @@ Since $\pi_1(\mathbf{1}) = \{e\}$, the amalgamation is trivial,
 yielding the free product.
 \end{proof}
 
-\subsection{Partial univalence}\label{subsec:partial-ua}\label{sec:univalence}
+\subsection{Partial univalence}\label{sec:univalence}
 
 Voevodsky's \emph{univalence axiom}~\cite{UFP2013} states that
 the canonical map
@@ -3011,7 +3182,7 @@ is defined by transport along the underlying equality of $p$.
 The inverse is given by transport along $\sym(p)$.
 \end{definition}
 
-\begin{theorem}[Well-definedness]\label{thm:idtoequiv-wd-full}\label{thm:idtoequiv-wd}
+\begin{theorem}[Well-definedness]\label{thm:idtoequiv-wd}
 If $\RwEq\;p\;q$ for $p, q : \Path\;A\;B$, then
 $\mathsf{idToEquiv}(p)$ and $\mathsf{idToEquiv}(q)$ agree
 extensionally:
@@ -3058,7 +3229,7 @@ yet $p$ and $q$ are not $\RwEq$-equivalent (their step lists
 do not reduce to a common form under the TRS).
 \end{proof}
 
-\begin{theorem}[Partial univalence for 1-types]\label{thm:partial-ua-full}
+\begin{theorem}[Partial univalence for 1-types]\label{thm:partial-ua}
 When $A$ and $B$ are 1-truncated (i.e., their path types are
 sets), $\mathsf{idToEquiv}$ descends to an injection on the quotient:
 \[
@@ -3246,11 +3417,12 @@ of the formalization depth across all 1{,}294 source files.
     No \texttt{sorry} or \texttt{admit} is used.
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Formalization status by component.}
 \label{tab:status-full}
 \small
+\resizebox{\textwidth}{!}{%
 \begin{tabular}{p{5.8cm}ccr}
 \toprule
 \textbf{Component} & \textbf{Status} & \textbf{Files} & \textbf{Key results} \\
@@ -3258,7 +3430,7 @@ of the formalization depth across all 1{,}294 source files.
 \multicolumn{4}{l}{\emph{Core framework}} \\
 \quad Path/Step/RwEq definitions & $\FF$ & 150+ & Defs.~\ref{def:rweq}, \ref{def:cell-tower} \\
 \quad Confluence (completed TRS) & $\FF$ & 15+ & Thms.~\ref{thm:confluence}, \ref{thm:church-rosser} \\
-\quad Critical pair witnesses & $\FF$ & 3 & Ex.~\ref{ex:critical-pair} \\
+\quad Critical pair witnesses & $\FF$ & 3 & Rem.~\ref{rem:cancellation} \\
 \quad Pentagon, triangle coherence & $\FF$ & 8+ & Thms.~\ref{thm:pentagon}, \ref{thm:triangle} \\
 \quad Interchange, Eckmann--Hilton & $\FF$ & 5+ & Thms.~\ref{thm:interchange}, \ref{thm:eckmann-hilton} \\
 \quad Mac Lane fivefold coherence & $\FF$ & 2 & Thm.~\ref{thm:mac-lane} \\
@@ -3271,7 +3443,7 @@ of the formalization depth across all 1{,}294 source files.
 \quad $\pi_1(S^1) \cong \mathbb{Z}$ & $\FF$ & 6 & Thm.~\ref{thm:pi1-circle} \\
 \quad HIT definitions (circle, susp.) & $\FF$ & 4 & Defs.~\ref{def:circle}--\ref{def:pushout} \\
 \quad Seifert--van Kampen & $\PS$ & 8+ & Thm.~\ref{thm:svk-full} \\
-\quad Partial univalence & $\PS$ & 3 & Thms.~\ref{thm:partial-ua-full}, \ref{thm:no-ua-full} \\
+\quad Partial univalence & $\PS$ & 3 & Thms.~\ref{thm:partial-ua}, \ref{thm:no-ua-full} \\
 \quad Suspension map, Freudenthal & PS/SO & 4 & Def.~\ref{def:susp-map}, Thm.~\ref{thm:freudenthal} \\
 \midrule
 \multicolumn{4}{l}{\emph{Higher categorical structure}} \\
@@ -3287,12 +3459,13 @@ of the formalization depth across all 1{,}294 source files.
 \quad Langlands / automorphic forms & SO & 4+ & Functoriality \\
 \quad Remaining 30+ modules & SO & 80+ & Infrastructure \\
 \bottomrule
-\end{tabular}
+\end{tabular}%
+}
 \end{table}
 
 \subsection{Quantitative summary}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Aggregate formalization statistics (February 2026).}
 \label{tab:aggregate}
@@ -3416,7 +3589,7 @@ categorical framework within which our cell tower
 \paragraph{Univalent foundations.}
 Voevodsky's univalent foundations program, codified in the HoTT
 book~\cite{UFP2013}, takes the univalence axiom as foundational.
-Our partial univalence result (Theorem~\ref{thm:partial-ua-full})
+Our partial univalence result (Theorem~\ref{thm:partial-ua})
 recovers a fragment of this principle without assuming univalence as
 an axiom.
 The Cubical Type Theory of Cohen, Coquand, Huber, and
@@ -3590,7 +3763,7 @@ The principal contributions are:
     computational-path setting (\S\ref{sec:univalence}).
 
   \item \textbf{Extensions to 72 mathematical modules}
-    (\S\ref{sec:extensions}), of which ${\sim}26$ are FF or PS level,
+    (\S\ref{app:modules}), of which ${\sim}26$ are FF or PS level,
     with honest formalization status reporting
     distinguishing $\FF$, $\PS$, and SO levels (\S\ref{sec:status}).
 \end{enumerate}
@@ -3626,7 +3799,7 @@ constructor that witnesses type equivalences, analogous to the
 \texttt{ua} axiom of HoTT~\cite{Voevodsky2010,UFP2013}.
 
 \paragraph{Synthetic homotopy theory via paths.}
-The HoTT modules (\S\ref{sec:extensions}) include higher inductive
+The HoTT modules (\S\ref{app:modules}) include higher inductive
 types, Postnikov towers, and loop space constructions at the
 $\PS$ level.
 Deepening these to $\FF$ status would yield a synthetic homotopy theory
@@ -3661,7 +3834,7 @@ required to have inverses.
 
 \paragraph{Machine-verified mathematical physics.}
 The TFT, cobordism, and Floer homology modules
-(\S\ref{sec:extensions}) formalize structures from mathematical
+(\S\ref{sec:higher-cat}) formalize structures from mathematical
 physics at the SO level.
 Deepening these to include verified Atiyah--Segal axioms for
 topological quantum field theories~\cite{Atiyah1988}, path-level
@@ -4149,7 +4322,7 @@ and $\trs$ constructors.
 \end{remark}
 
 % ======================================================================
-\section{Module Index}\label{app:modules}\label{sec:extensions}
+\section{Module Index}\label{app:modules}
 
 The formalization comprises 1,294 source files organized into 72
 top-level modules.

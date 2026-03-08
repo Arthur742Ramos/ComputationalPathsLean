@@ -439,6 +439,18 @@ theorem strict_tail_of_cons_inv {p q r : Path a b} {s : Step p q}
   cases h with
   | cons_inv _ hrest => exact hrest
 
+/-- Prepending a positive atomic step preserves strict normal form. -/
+theorem strict_prepend_step {p q r : Path a b} (s : Step p q)
+    {d : Derivation₂ q r} (hd : StrictNormalForm d) :
+    StrictNormalForm (.vcomp (.step s) d) :=
+  StrictNormalForm.cons_step s hd
+
+/-- Prepending a negative atomic step preserves strict normal form. -/
+theorem strict_prepend_inv {p q r : Path a b} (s : Step p q)
+    {d : Derivation₂ p r} (hd : StrictNormalForm d) :
+    StrictNormalForm (.vcomp (.inv (.step s)) d) :=
+  StrictNormalForm.cons_inv s hd
+
 /-- Core normalization steps (groupoid fragment only). -/
 inductive CoreStep : {p q : Path a b} → Derivation₂ p q → Derivation₂ p q → Type (u + 2) where
   | vcomp_refl_left {p q : Path a b} (d : Derivation₂ p q) :
@@ -1177,24 +1189,359 @@ noncomputable def connect_cons_step_stepstar_to_step {p m q : Path a b}
     Derivation₃ (.vcomp (.step s₁) rest) (.step s₂) :=
   .inv (connect_step_to_cons_step_stepstar s₂ s₁ hst)
 
+/-- If `step s₂ · d₁` connects to a forward tail `rest₂`, then `d₁` connects to
+    `inv(step s₂) · rest₂` by explicit associativity and inverse cancellation. -/
+noncomputable def connect_forward_to_cons_inv_forward_strict {p q m : Path a b}
+    {d₁ : Derivation₂ p q} (s₂ : Step m p) {rest₂ : Derivation₂ m q}
+    (hmid : Derivation₃ (.vcomp (.step s₂) d₁) rest₂) :
+    Derivation₃ d₁ (.vcomp (.inv (.step s₂)) rest₂) :=
+  .inv <|
+    .vcomp
+      (Derivation₃.whiskerLeft₃ (.inv (.step s₂)) (.inv hmid))
+      (.vcomp
+        (.inv (.step (.vcomp_assoc (.inv (.step s₂)) (.step s₂) d₁)))
+        (.vcomp
+          (Derivation₃.whiskerRight₃ (.step (.vcomp_inv_left (.step s₂))) d₁)
+          (.step (.vcomp_refl_left d₁))))
+
+/-- Symmetric form of `connect_forward_to_cons_inv_forward_strict`. -/
+noncomputable def connect_cons_inv_forward_to_forward_strict {p q m : Path a b}
+    (s₁ : Step m p) {rest₁ : Derivation₂ m q} {d₂ : Derivation₂ p q}
+    (hmid : Derivation₃ (.vcomp (.step s₁) d₂) rest₁) :
+    Derivation₃ (.vcomp (.inv (.step s₁)) rest₁) d₂ :=
+  .inv (connect_forward_to_cons_inv_forward_strict (d₁ := d₂) s₁ hmid)
+
+/-- Every raw path carries a definitional left-unit self-step.
+
+On expression syntax the source of `trans_refl_left` is genuinely different from
+its target, but on raw `Path` values `Path.trans (Path.refl _) p` simplifies
+back to `p`.  This produces singleton strict loops already at the atomic level.
+Those loops are now handled constructively by `unit_self_step_contract`, but
+they remain the simplest manifestation of the raw-`Path` collapse that the
+strict connector has to account for. -/
+noncomputable def unit_self_step {p : Path a b} : Step p p := by
+  simpa using (Step.trans_refl_left p)
+
+/-- The singleton loop induced by `unit_self_step` is a strict normal form. -/
+theorem unit_self_step_is_strict {p : Path a b} :
+    StrictNormalForm (.step (unit_self_step (p := p))) := by
+  simpa [unit_self_step] using
+    (StrictNormalForm.single_step (Step.trans_refl_left p))
+
+/-- Cancel a common right factor from a level-3 comparison. -/
+noncomputable def cancel_common_right₃ {p q r : Path a b}
+    {d₁ d₂ : Derivation₂ p q} (c : Derivation₂ q r)
+    (h : Derivation₃ (.vcomp d₁ c) (.vcomp d₂ c)) :
+    Derivation₃ d₁ d₂ :=
+  .vcomp
+    (.inv (.step (.vcomp_refl_right d₁)))
+    (.vcomp
+      (Derivation₃.whiskerLeft₃ d₁
+        (.inv (.step (.vcomp_inv_right c))))
+      (.vcomp
+        (.inv (.step (.vcomp_assoc d₁ c (.inv c))))
+        (.vcomp
+          (Derivation₃.whiskerRight₃ h (.inv c))
+          (.vcomp
+            (.step (.vcomp_assoc d₂ c (.inv c)))
+            (.vcomp
+              (Derivation₃.whiskerLeft₃ d₂
+                (.step (.vcomp_inv_right c)))
+              (.step (.vcomp_refl_right d₂)))))))
+
+/-- Any loop 2-cell that is idempotent up to a 3-cell contracts to `refl`. -/
+noncomputable def idempotent_loop_contract {p : Path a b}
+    (d : Derivation₂ p p)
+    (hidem : Derivation₃ d (.vcomp d d)) :
+    Derivation₃ d (.refl p) :=
+  .inv <|
+    .vcomp
+      (.inv (.step (.vcomp_inv_left d)))
+      (.vcomp
+        (Derivation₃.whiskerLeft₃ (.inv d) hidem)
+        (.vcomp
+          (.inv (.step (.vcomp_assoc (.inv d) d d)))
+          (.vcomp
+            (Derivation₃.whiskerRight₃ (.step (.vcomp_inv_left d)) d)
+            (.step (.vcomp_refl_left d)))))
+
+/-- The canonical raw self-loop `unit_self_step` is idempotent up to a 3-cell. -/
+noncomputable def unit_self_step_idempotent {p : Path a b} :
+    Derivation₃
+      (.step (unit_self_step (p := p)))
+      (.vcomp
+        (.step (unit_self_step (p := p)))
+        (.step (unit_self_step (p := p)))) := by
+  let s₁ : Step p p := by
+    simpa using
+      (Step.trans_congr_left (Path.refl b) (Step.trans_refl_left p))
+  let s₂ : Step p p := by
+    simpa using
+      (Step.trans_assoc (Path.refl a) p (Path.refl b))
+  let s₃ : Step p p := by
+    simpa using
+      (Step.trans_refl_left (Path.trans p (Path.refl b)))
+  have hDiamond :
+      Derivation₃ (.step s₁) (.vcomp (.step s₂) (.step s₃)) :=
+    connect_step_to_cons_step_stepstar s₁ s₂
+      (rest := .step s₃) (st := StepStar.single s₃) rfl
+  have hHead :
+      Derivation₃ (.step (unit_self_step (p := p))) (.step s₁) :=
+    connect_single_step_strict (unit_self_step (p := p)) s₁
+  have hTail :
+      Derivation₃ (.vcomp (.step s₂) (.step s₃))
+        (.vcomp
+          (.step (unit_self_step (p := p)))
+          (.step (unit_self_step (p := p)))) :=
+    connect_cons_step_strict s₂ (unit_self_step (p := p))
+      (rest₁ := .step s₃)
+      (rest₂ := .step (unit_self_step (p := p)))
+      (connect_single_step_strict s₃ (unit_self_step (p := p)))
+  exact .vcomp hHead (.vcomp hDiamond hTail)
+
+/-- The canonical raw self-loop contracts to `refl` constructively. -/
+noncomputable def unit_self_step_contract {p : Path a b} :
+    Derivation₃ (.step (unit_self_step (p := p))) (.refl p) :=
+  idempotent_loop_contract (.step (unit_self_step (p := p)))
+    (unit_self_step_idempotent (p := p))
+
+/-- Any atomic strict loop contracts by first comparing it with `unit_self_step`. -/
+noncomputable def atomic_loop_contract {p : Path a b} (s : Step p p) :
+    Derivation₃ (.step s) (.refl p) :=
+  .vcomp
+    (connect_single_step_strict s (unit_self_step (p := p)))
+    (unit_self_step_contract (p := p))
+
+/-- Inverse atomic strict loops contract via `atomic_loop_contract`. -/
+noncomputable def atomic_inv_loop_contract {p : Path a b} (s : Step p p) :
+    Derivation₃ (.inv (.step s)) (.refl p) :=
+  .vcomp
+    (inv_congr₃ (atomic_loop_contract s))
+    (to_normal_form_inv₃ (.refl p))
+
+/-- Any adjacent forward/inverse atomic pair with the same endpoints cancels. -/
+noncomputable def cancel_step_inv_pair {p q : Path a b} (s₁ s₂ : Step p q) :
+    Derivation₃ (.vcomp (.step s₁) (.inv (.step s₂))) (.refl p) :=
+  .vcomp
+    (Derivation₃.vcomp_congr_right₃ (d₁ := .step s₁)
+      (inv_congr₃ (connect_single_step_strict s₂ s₁)))
+    (.step (.vcomp_inv_right (.step s₁)))
+
+/-- Any adjacent inverse/forward atomic pair with the same endpoints cancels. -/
+noncomputable def cancel_inv_step_pair {p q : Path a b} (s₁ s₂ : Step q p) :
+    Derivation₃ (.vcomp (.inv (.step s₁)) (.step s₂)) (.refl p) :=
+  .vcomp
+    (Derivation₃.vcomp_congr_right₃ (d₁ := .inv (.step s₁))
+      (connect_single_step_strict s₂ s₁))
+    (.step (.vcomp_inv_left (.step s₁)))
+
+/-- Contract a strict loop whose first two atomic fragments cancel immediately. -/
+noncomputable def step_inv_head_loop_contract {p q : Path a b}
+    (s₁ s₂ : Step p q) {rest : Derivation₂ p p}
+    (hrest : Derivation₃ rest (.refl p)) :
+    Derivation₃ (.vcomp (.step s₁) (.vcomp (.inv (.step s₂)) rest)) (.refl p) :=
+  .vcomp
+    (.inv (.step (.vcomp_assoc (.step s₁) (.inv (.step s₂)) rest)))
+    (.vcomp
+      (Derivation₃.whiskerRight₃ (cancel_step_inv_pair s₁ s₂) rest)
+      (.vcomp
+        (.step (.vcomp_refl_left rest))
+        hrest))
+
+/-- Contract a strict loop whose first two atomic fragments cancel immediately. -/
+noncomputable def inv_step_head_loop_contract {p q : Path a b}
+    (s₁ s₂ : Step q p) {rest : Derivation₂ p p}
+    (hrest : Derivation₃ rest (.refl p)) :
+    Derivation₃ (.vcomp (.inv (.step s₁)) (.vcomp (.step s₂) rest)) (.refl p) :=
+  .vcomp
+    (.inv (.step (.vcomp_assoc (.inv (.step s₁)) (.step s₂) rest)))
+    (.vcomp
+      (Derivation₃.whiskerRight₃ (cancel_inv_step_pair s₁ s₂) rest)
+      (.vcomp
+        (.step (.vcomp_refl_left rest))
+        hrest))
+
+/-- A two-step forward loop contracts by joining it to `unit_self_step`. -/
+noncomputable def forward_loop_contract {p q : Path a b}
+    (s₁ : Step p q) (s₂ : Step q p) :
+    Derivation₃ (.vcomp (.step s₂) (.step s₁)) (.refl q) :=
+  .vcomp
+    (connect_cons_step_stepstar_to_step s₂ (unit_self_step (p := q))
+      (rest := .step s₁) (st := StepStar.single s₁) rfl)
+    (unit_self_step_contract (p := q))
+
+/-- Structural connector between singleton strict forms with opposite signs. -/
+noncomputable def connect_single_step_to_single_inv_strict {p q : Path a b}
+    (s₁ : Step p q) (s₂ : Step q p) :
+    Derivation₃ (.step s₁) (.inv (.step s₂)) :=
+  .vcomp
+    (connect_forward_to_cons_inv_forward_strict (d₁ := .step s₁) s₂
+      (rest₂ := .refl q) (forward_loop_contract s₁ s₂))
+    (.step (.vcomp_refl_right (.inv (.step s₂))))
+
+/-- Symmetric form of `connect_single_step_to_single_inv_strict`. -/
+noncomputable def connect_single_inv_to_single_step_strict {p q : Path a b}
+    (s₁ : Step q p) (s₂ : Step p q) :
+    Derivation₃ (.inv (.step s₁)) (.step s₂) :=
+  .inv (connect_single_step_to_single_inv_strict s₂ s₁)
+
+/-- Structural connector from a singleton forward step to a forward strict chain. -/
+noncomputable def connect_single_step_to_forward_stepstar_strict {p q : Path a b}
+    (s : Step p q) {d : Derivation₂ p q} (hd : StrictNormalForm d)
+    {st : StepStar p q} (hst : derivation_to_stepstar? d = some st) :
+    Derivation₃ (.step s) d := by
+  cases d with
+  | refl p =>
+      exact atomic_loop_contract s
+  | step t =>
+      simpa using connect_single_step_strict s t
+  | inv e =>
+      simp [derivation_to_stepstar?] at hst
+  | vcomp dL dR =>
+      cases dL with
+      | refl r =>
+          have hfalse : False := by
+            cases hd
+          exact False.elim hfalse
+      | step t =>
+          cases hstR : derivation_to_stepstar? dR with
+          | none =>
+              simp [derivation_to_stepstar?, hstR] at hst
+          | some stR =>
+              simpa using
+                (connect_step_to_cons_step_stepstar s t
+                  (rest := dR) (st := stR) hstR)
+      | inv dInner =>
+          cases dInner with
+          | refl r =>
+              have hfalse : False := by
+                cases hd
+              exact False.elim hfalse
+          | step t =>
+              simp [derivation_to_stepstar?] at hst
+          | inv dInner' =>
+              have hfalse : False := by
+                cases hd
+              exact False.elim hfalse
+          | vcomp dLL dLR =>
+              have hfalse : False := by
+                cases hd
+              exact False.elim hfalse
+      | vcomp dLL dLR =>
+          have hfalse : False := by
+            cases hd
+          exact False.elim hfalse
+
+/-- Any forward strict loop whose tail is a `StepStar` contracts constructively. -/
+noncomputable def forward_stepstar_loop_contract {p q : Path a b}
+    (s : Step p q) {rest : Derivation₂ q p} {st : StepStar q p}
+    (hst : derivation_to_stepstar? rest = some st) :
+    Derivation₃ (.vcomp (.step s) rest) (.refl p) :=
+  .vcomp
+    (connect_cons_step_stepstar_to_step s (unit_self_step (p := p))
+      (rest := rest) (st := st) hst)
+    (unit_self_step_contract (p := p))
+
+/-- Any strict loop whose whole derivation is forward-only contracts constructively. -/
+noncomputable def forward_strict_loop_contract {p : Path a b}
+    (d : Derivation₂ p p) (hd : StrictNormalForm d)
+    {st : StepStar p p} (hst : derivation_to_stepstar? d = some st) :
+    Derivation₃ d (.refl p) := by
+  cases d with
+  | refl p =>
+      exact .refl (.refl p)
+  | step s =>
+      exact atomic_loop_contract s
+  | inv dInner =>
+      simp [derivation_to_stepstar?] at hst
+  | vcomp dL dR =>
+      cases dL with
+      | refl r =>
+          have hfalse : False := by
+            cases hd
+          exact False.elim hfalse
+      | step s =>
+          cases hstR : derivation_to_stepstar? dR with
+          | none =>
+              simp [derivation_to_stepstar?, hstR] at hst
+          | some stR =>
+              simpa using
+                (forward_stepstar_loop_contract s
+                  (rest := dR) (st := stR) hstR)
+      | inv dInner =>
+          cases dInner with
+          | step t =>
+              simp [derivation_to_stepstar?] at hst
+          | refl r =>
+              have hfalse : False := by
+                cases hd
+              exact False.elim hfalse
+          | inv dInner' =>
+              have hfalse : False := by
+                cases hd
+              exact False.elim hfalse
+          | vcomp dLL dLR =>
+              have hfalse : False := by
+                cases hd
+              exact False.elim hfalse
+      | vcomp dLL dLR =>
+          have hfalse : False := by
+            cases hd
+          exact False.elim hfalse
+
+/-- A strict loop with negative head and forward tail contracts constructively. -/
+noncomputable def inv_forward_stepstar_loop_contract {p q : Path a b}
+    (s : Step q p) {rest : Derivation₂ q p} (hrest : StrictNormalForm rest)
+    {st : StepStar q p} (hst : derivation_to_stepstar? rest = some st) :
+    Derivation₃ (.vcomp (.inv (.step s)) rest) (.refl p) :=
+  let hstep : Derivation₃ (.step s) rest :=
+    connect_single_step_to_forward_stepstar_strict s hrest hst
+  let hmid : Derivation₃ (.vcomp (.step s) (.refl p)) rest :=
+    .vcomp
+      (.step (.vcomp_refl_right (.step s)))
+      hstep
+  connect_cons_inv_forward_to_forward_strict (d₂ := .refl p) s hmid
+
+/-- Structural connector from a forward `StepStar` chain to a singleton inverse step. -/
+noncomputable def connect_forward_stepstar_to_single_inv_strict {p q : Path a b}
+    {d : Derivation₂ p q} {st : StepStar p q}
+    (hst : derivation_to_stepstar? d = some st) (s : Step q p) :
+    Derivation₃ d (.inv (.step s)) :=
+  .vcomp
+    (connect_forward_to_cons_inv_forward_strict (d₁ := d) s
+      (rest₂ := .refl q)
+      (forward_stepstar_loop_contract (s := s) (rest := d) (st := st) hst))
+    (.step (.vcomp_refl_right (.inv (.step s))))
+
+/-- Symmetric form of `connect_forward_stepstar_to_single_inv_strict`. -/
+noncomputable def connect_single_inv_to_forward_stepstar_strict {p q : Path a b}
+    (s : Step q p) {d : Derivation₂ p q} {st : StepStar p q}
+    (hst : derivation_to_stepstar? d = some st) :
+    Derivation₃ (.inv (.step s)) d :=
+  .inv (connect_forward_stepstar_to_single_inv_strict hst s)
+
 /-- Residual Prop-level connector used when strict shapes are not structurally alignable.
 
-Singleton strict forms, single-step/forward-chain comparisons, and recursively
-aligned positive-head strict chains are handled structurally.  When a strict
-comparison still fails to align, `connect_strict_structural_go` first retries
-through normalized inverses; `strict_transport₃` is therefore only the final
-zero-fuel safety fallback after those structural routes have been exhausted. -/
+Atomic loops, mixed-sign singletons, single-step/forward-chain comparisons, and
+recursively aligned positive-head strict chains are handled constructively.
+When a strict comparison still fails to align, `connect_strict_structural_go`
+first retries through normalized inverses.  `strict_transport₃` is now only the
+final safety fallback for the remaining longer global strict-shape mismatches
+where the current structural recursion still fails to reach a head-aligned or
+forward-stepstar comparison before fuel runs out. -/
 noncomputable def strict_transport₃ {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ d₂ :=
   .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
 
 /-- Fuel-based recursive structural connector on strict normal forms.
 
-This eliminates the direct transport fallback for single forward steps, aligned
-`cons_step` / `cons_inv` chains, and positive-head comparisons whose tails can
-be interpreted as forward `StepStar`s.  Remaining unmatched strict shapes are
-first rerouted through normalized inverses; only the zero-fuel safety case still
-falls back to `strict_transport₃`. -/
+This eliminates the direct transport fallback for atomic loops, mixed-sign
+singletons, aligned `cons_step` / `cons_inv` chains, and loop/comparison cases
+whose forward tails can be interpreted as `StepStar`s.  Remaining unmatched
+strict shapes are first rerouted through normalized inverses.  The
+residual zero-fuel call to `strict_transport₃` is therefore now just the
+catch-all safety case for the hardest global strict-shape comparisons under the
+current recursion scheme. -/
 noncomputable def connect_strict_structural_go {p q : Path a b} :
     Nat → (d₁ d₂ : Derivation₂ p q) →
     StrictNormalForm d₁ → StrictNormalForm d₂ → Derivation₃ d₁ d₂
@@ -1220,8 +1567,50 @@ noncomputable def connect_strict_structural_go {p q : Path a b} :
       match d₁, d₂ with
       | .refl p, .refl _ =>
           .refl (.refl p)
+      | .step s, .refl _ =>
+          atomic_loop_contract s
+      | .refl _, .step s =>
+          .inv (atomic_loop_contract s)
+      | .vcomp (.step s) rest, .refl _ =>
+          by
+            cases hst : derivation_to_stepstar? rest with
+            | none =>
+                exact viaInverse _ _
+            | some st =>
+                exact forward_stepstar_loop_contract s (st := st) hst
+      | .refl _, .vcomp (.step s) rest =>
+          by
+            cases hst : derivation_to_stepstar? rest with
+            | none =>
+                exact viaInverse _ _
+            | some st =>
+                exact .inv (forward_stepstar_loop_contract s (st := st) hst)
+      | .vcomp (.inv (.step s)) rest, .refl _ =>
+          by
+            cases hst : derivation_to_stepstar? rest with
+            | none =>
+                exact viaInverse _ _
+            | some st =>
+                exact inv_forward_stepstar_loop_contract s
+                  (strict_tail_of_cons_inv h₁) (st := st) hst
+      | .refl _, .vcomp (.inv (.step s)) rest =>
+          by
+            cases hst : derivation_to_stepstar? rest with
+            | none =>
+                exact viaInverse _ _
+            | some st =>
+                exact .inv (inv_forward_stepstar_loop_contract s
+                  (strict_tail_of_cons_inv h₂) (st := st) hst)
       | .step s₁, .step s₂ =>
           by simpa using connect_single_step_strict s₁ s₂
+      | .step s₁, .inv (.step s₂) =>
+          connect_single_step_to_single_inv_strict s₁ s₂
+      | .inv (.step s), .refl _ =>
+          atomic_inv_loop_contract s
+      | .refl _, .inv (.step s) =>
+          .inv (atomic_inv_loop_contract s)
+      | .inv (.step s₁), .step s₂ =>
+          connect_single_inv_to_single_step_strict s₁ s₂
       | .inv (.step s₁), .inv (.step s₂) =>
           by simpa using connect_single_inv_strict s₁ s₂
       | .step s₁, .vcomp (.step s₂) rest₂ =>
@@ -1259,10 +1648,22 @@ noncomputable def connect_strict_structural_go {p q : Path a b} :
                   | some st₂ =>
                       exact connect_cons_step_stepstar_strict s₁ s₂
                         (st₁ := st₁) (st₂ := st₂) hst₁ hst₂
-      | .inv (.step _), .vcomp (.inv (.step _)) _ =>
-          viaInverse _ _
-      | .vcomp (.inv (.step _)) _, .inv (.step _) =>
-          viaInverse _ _
+      | .inv (.step s₁), .vcomp (.inv (.step s₂)) rest₂ =>
+          by
+            let hmid :=
+              connect_strict_structural_go _fuel
+                (.vcomp (.step s₂) (.inv (.step s₁))) rest₂
+                (strict_prepend_step s₂ h₁)
+                (strict_tail_of_cons_inv h₂)
+            exact connect_forward_to_cons_inv_forward_strict s₂ hmid
+      | .vcomp (.inv (.step s₁)) rest₁, .inv (.step s₂) =>
+          by
+            let hmid :=
+              connect_strict_structural_go _fuel
+                (.vcomp (.step s₁) (.inv (.step s₂))) rest₁
+                (strict_prepend_step s₁ h₂)
+                (strict_tail_of_cons_inv h₁)
+            exact connect_cons_inv_forward_to_forward_strict s₁ hmid
       | .vcomp (q := m₁) (.inv (.step s₁)) rest₁, .vcomp (q := m₂) (.inv (.step s₂)) rest₂ =>
           by
             by_cases hm : m₁ = m₂
@@ -1272,7 +1673,42 @@ noncomputable def connect_strict_structural_go {p q : Path a b} :
                   (strict_tail_of_cons_inv h₁)
                   (strict_tail_of_cons_inv h₂))
             ·
-              exact viaInverse _ _
+                let hmid :=
+                  connect_strict_structural_go _fuel
+                    (.vcomp (.step s₂) (.vcomp (.inv (.step s₁)) rest₁)) rest₂
+                    (strict_prepend_step s₂ h₁)
+                    (strict_tail_of_cons_inv h₂)
+                exact connect_forward_to_cons_inv_forward_strict s₂ hmid
+      | d₁, .vcomp (.inv (.step s₂)) rest₂ =>
+          by
+            let hmid :=
+              connect_strict_structural_go _fuel
+                (.vcomp (.step s₂) d₁) rest₂
+                (strict_prepend_step s₂ h₁)
+                (strict_tail_of_cons_inv h₂)
+            exact connect_forward_to_cons_inv_forward_strict s₂ hmid
+      | .vcomp (.inv (.step s₁)) rest₁, d₂ =>
+          by
+            let hmid :=
+              connect_strict_structural_go _fuel
+                (.vcomp (.step s₁) d₂) rest₁
+                (strict_prepend_step s₁ h₂)
+                (strict_tail_of_cons_inv h₁)
+            exact connect_cons_inv_forward_to_forward_strict s₁ hmid
+      | d₁, .inv (.step s₂) =>
+          by
+            cases hst₁ : derivation_to_stepstar? d₁ with
+            | none =>
+                exact viaInverse _ _
+            | some st₁ =>
+                exact connect_forward_stepstar_to_single_inv_strict hst₁ s₂
+      | .inv (.step s₁), d₂ =>
+          by
+            cases hst₂ : derivation_to_stepstar? d₂ with
+            | none =>
+                exact viaInverse _ _
+            | some st₂ =>
+                exact connect_single_inv_to_forward_stepstar_strict s₁ hst₂
       | _, _ =>
           viaInverse _ _
 
@@ -1294,6 +1730,124 @@ noncomputable def connect_normalized {p q : Path a b}
     (.vcomp (connect_strict_structural (normalizeDeriv n₁) (normalizeDeriv n₂)
         (normalize_is_strict n₁) (normalize_is_strict n₂))
       (.inv (to_normal_form₃ n₂)))
+
+/-- Loop-specialized structural contraction on strict normal forms.
+
+This local recursion handles atomic loops, inverse atomic loops, forward
+`StepStar` tails, inverse-headed loops with forward tails, and head-cancellable
+mixed-sign loops in both orientations.  Before falling back to
+`strict_transport₃`, it also checks whether inverse-normalization exposes a
+forward-only loop that can be contracted directly. -/
+noncomputable def strict_loop_via_inverse {p : Path a b}
+    (e : Derivation₂ p p)
+    (hInvNorm : Derivation₃ (normalizeInv e) (.refl p)) :
+    Derivation₃ e (.refl p) :=
+  let hInv : Derivation₃ (.inv e) (.refl p) :=
+    .vcomp
+      (to_normal_form_inv₃ e)
+      hInvNorm
+  .vcomp
+    (.inv (.step (.inv_inv e)))
+    (.vcomp
+      (inv_congr₃ hInv)
+      (to_normal_form_inv₃ (.refl p)))
+
+noncomputable def strict_loop_contract_go {p : Path a b} :
+    Nat → (d : Derivation₂ p p) → StrictNormalForm d → Derivation₃ d (.refl p)
+  | 0, d, _ => strict_transport₃ (d₁ := d) (d₂ := .refl p)
+  | _fuel + 1, d, hd =>
+      match d with
+      | .refl _ =>
+          .refl (.refl p)
+      | .step s =>
+          atomic_loop_contract s
+      | .inv (.step s) =>
+          atomic_inv_loop_contract s
+      | .vcomp (.step s) rest =>
+          by
+            let fallback : Derivation₃ (.vcomp (.step s) rest) (.refl p) := by
+              cases hst : derivation_to_stepstar? rest with
+              | none =>
+                  let loop : Derivation₂ p p := .vcomp (.step s) rest
+                  let invLoop : Derivation₂ p p := normalizeInv loop
+                  let hInvStrict : StrictNormalForm invLoop := normalizeInv_is_strict loop
+                  cases hstInv : derivation_to_stepstar? invLoop with
+                  | some stInv =>
+                      exact strict_loop_via_inverse loop
+                        (forward_strict_loop_contract invLoop hInvStrict
+                          (st := stInv) hstInv)
+                  | none =>
+                      exact strict_loop_via_inverse loop
+                        (strict_loop_contract_go _fuel invLoop hInvStrict)
+              | some st =>
+                  exact forward_stepstar_loop_contract s (st := st) hst
+            cases rest with
+            | inv dInner =>
+                cases dInner with
+                | step s₂ =>
+                    exact cancel_step_inv_pair s s₂
+                | _ =>
+                    exact fallback
+            | @vcomp _ r _ dL dR =>
+                cases dL with
+                | @inv _ _ dInner =>
+                    cases dInner with
+                    | step s₂ =>
+                        by_cases hr : r = p
+                        · subst r
+                          let htail : StrictNormalForm (.vcomp (.inv (.step s₂)) dR) :=
+                            strict_tail_of_cons_step hd
+                          let hrest : Derivation₃ dR (.refl p) :=
+                            strict_loop_contract_go _fuel dR (strict_tail_of_cons_inv htail)
+                          exact step_inv_head_loop_contract s s₂ hrest
+                        · exact fallback
+                    | _ =>
+                        exact fallback
+                | _ =>
+                    exact fallback
+            | _ =>
+                exact fallback
+      | .vcomp (.inv (.step s)) rest =>
+          by
+            cases hst : derivation_to_stepstar? rest with
+            | some st =>
+                exact inv_forward_stepstar_loop_contract s
+                  (strict_tail_of_cons_inv hd) (st := st) hst
+            | none =>
+                let fallback : Derivation₃ (.vcomp (.inv (.step s)) rest) (.refl p) := by
+                  let loop : Derivation₂ p p := .vcomp (.inv (.step s)) rest
+                  let invLoop : Derivation₂ p p := normalizeInv loop
+                  let hInvStrict : StrictNormalForm invLoop := normalizeInv_is_strict loop
+                  cases hstInv : derivation_to_stepstar? invLoop with
+                  | some stInv =>
+                      exact strict_loop_via_inverse loop
+                        (forward_strict_loop_contract invLoop hInvStrict
+                          (st := stInv) hstInv)
+                  | none =>
+                      exact strict_loop_via_inverse loop
+                        (strict_loop_contract_go _fuel invLoop hInvStrict)
+                cases rest with
+                | @vcomp _ r _ dL dR =>
+                    cases dL with
+                    | step s₂ =>
+                        by_cases hr : r = p
+                        · subst r
+                          let htail : StrictNormalForm (.vcomp (.step s₂) dR) :=
+                            strict_tail_of_cons_inv hd
+                          let hrest : Derivation₃ dR (.refl p) :=
+                            strict_loop_contract_go _fuel dR (strict_tail_of_cons_step htail)
+                          exact inv_step_head_loop_contract s s₂ hrest
+                        · exact fallback
+                    | _ =>
+                        exact fallback
+                | _ =>
+                    exact fallback
+
+/-- Wrapper for the loop-specialized structural contraction. -/
+noncomputable def strict_loop_contract {p : Path a b}
+    (d : Derivation₂ p p) (h : StrictNormalForm d) :
+    Derivation₃ d (.refl p) :=
+  strict_loop_contract_go (d.depth + 1) d h
 
 /-- Reduced normal forms for 2-cells: strict shape plus loop rigidity. -/
 def ReducedNormalForm {p q : Path a b} (d : Derivation₂ p q) : Prop :=
@@ -1334,8 +1888,17 @@ noncomputable def to_reduce_loops₃
     Derivation₃ d (reduce_loops d) :=
   .vcomp
     (to_normal_form₃ d)
-    (connect_strict_structural (normalizeDeriv d) (.refl p)
-      (normalize_is_strict d) (StrictNormalForm.refl p))
+    (strict_loop_contract (normalizeDeriv d) (normalize_is_strict d))
+
+/-- Genuine loop contraction packaged from the loop-only normalizer branch.
+
+This is the remaining constructive core used by `contractibility₃`: once two
+parallel derivations are rewritten as the inverse loop `d₁ · d₂⁻¹`, the global
+comparison reduces to contracting that loop back to `refl`. -/
+noncomputable def loop_contract_genuine
+    {p : Path a b} (d : Derivation₂ p p) :
+    Derivation₃ d (.refl p) := by
+  simpa [reduce_loops] using (to_reduce_loops₃ d)
 
 /-- In the non-loop case `p ≠ q`, a strict derivation `Derivation₂ p q` cannot be `refl p`. -/
 theorem strict_nonloop_not_refl {p q : Path a b}
@@ -1381,23 +1944,37 @@ noncomputable def connect_core_strict_structural {p q : Path a b}
 
 ## Mathematical Justification
 
-We compose:
-1. `to_core_normal_form₃ d₁ : Derivation₃ d₁ (normalize d₁).1`
-2. `connect_core_strict_structural d₁ d₂ (normalize d₁).2 (normalize d₂).2`
-3. `inv (to_core_normal_form₃ d₂) : Derivation₃ (normalize d₂).1 d₂`
+We now make the comparison route explicit by isolating the inverse loop
+`d₁ · d₂⁻¹`:
 
-The middle connector runs through the core-normalized outputs of `normalize`. -/
+1. Expand `d₁` by a right unit.
+2. Expand that unit into the inverse pair `d₂⁻¹ · d₂`.
+3. Reassociate to expose the loop `(d₁ · d₂⁻¹) · d₂`.
+4. Contract the loop `d₁ · d₂⁻¹` with `loop_contract_genuine`.
+5. Absorb the remaining left unit on `d₂`.
+
+This pushes the remaining hard constructivity boundary into the loop
+contraction subproblem instead of comparing arbitrary non-loop strict forms
+directly in the exported `contractibility₃`. -/
 /-- Bridge from any 2-cell to the derivation component of `normalize`. -/
 noncomputable def to_core_normal_form₃ {p q : Path a b}
     (d : Derivation₂ p q) : Derivation₃ d (normalize d).1 := by
   simpa [normalize_val] using (to_normal_form₃ d)
 
 noncomputable def contractibility₃ {p q : Path a b}
-    (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ :=
-  .vcomp (to_core_normal_form₃ d₁)
-    (.vcomp
-      (connect_core_strict_structural d₁ d₂ (normalize d₁).2 (normalize d₂).2)
-      (.inv (to_core_normal_form₃ d₂)))
+    (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ := by
+  let loop : Derivation₂ p p := .vcomp d₁ (.inv d₂)
+  exact
+    .vcomp
+      (.inv (.step (.vcomp_refl_right d₁)))
+      (.vcomp
+        (Derivation₃.whiskerLeft₃ d₁
+          (.inv (.step (.vcomp_inv_left d₂))))
+        (.vcomp
+          (.inv (.step (.vcomp_assoc d₁ (.inv d₂) d₂)))
+          (.vcomp
+            (Derivation₃.whiskerRight₃ (loop_contract_genuine loop) d₂)
+            (.step (.vcomp_refl_left d₂)))))
 
 /-- Bridge from any 2-cell to its strict normal-form representative. -/
 noncomputable def to_strict_normal_form₃ {p q : Path a b}
@@ -1406,14 +1983,13 @@ noncomputable def to_strict_normal_form₃ {p q : Path a b}
 
 /-- **Loop contraction**: Any loop derivation `d : Derivation₂ p p` contracts to `refl p`.
 
-This follows from contractibility₃: both `d` and `refl p` are derivations from `p` to `p`,
-so they are connected by a 3-cell.
+This is the dedicated loop-only branch underlying `contractibility₃`.
 
 Loop contraction is the key property that makes the fundamental group well-defined:
 it ensures that different derivations representing the "same" loop are identified. -/
 noncomputable def loop_contract {p : Path a b} (d : Derivation₂ p p) :
     Derivation₃ d (.refl p) :=
-  contractibility₃ d (.refl p)
+  loop_contract_genuine d
 
 end Contractibility
 

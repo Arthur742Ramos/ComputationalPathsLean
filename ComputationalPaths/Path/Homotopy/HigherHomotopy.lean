@@ -298,7 +298,8 @@ noncomputable def piNBasepoint (n : Nat) (A : Type u) (a : A) : PiN n A a :=
 /-! ## Trivial Higher Groups
 
 A key feature of the computational paths framework is that contractibility
-at level 3 (via proof irrelevance of `RwEq`) implies that π_n is trivial for n ≥ 3
+at level 3 (via the explicit inverse-loop contraction route for `contractibility₃`)
+implies that π_n is trivial for n ≥ 3
 when working over contractible loop spaces.
 
 More precisely, for a general space, we need to analyze when higher loops

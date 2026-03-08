@@ -13,7 +13,8 @@ computational paths framework:
 
 A type A is an n-type if π_k(A, a) is trivial for all k > n.
 
-In the computational paths framework with contractibility₃ derived from proof irrelevance:
+In the computational paths framework with contractibility₃ routed through
+explicit inverse-loop contraction:
 - All types are at most 1-types (by contractibility₃)
 - This reflects the "truncated" nature of our model
 

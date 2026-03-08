@@ -8,8 +8,11 @@ in Type rather than collapsing to Prop.
 ## Purpose
 
 This module developed a type-valued confluence pipeline, once aimed at
-eliminating `to_canonical`. Contractibility₃ is now derived directly from proof
-irrelevance of `RwEq`, but the typed framework remains useful for future work.
+eliminating `to_canonical`. Contractibility₃ now routes through explicit
+inverse-loop isolation plus loop normalization on raw `Path`, with the loop
+branch first passing through `strict_loop_contract_go`; the typed framework
+remains useful for future work on removing the residual transport boundary
+entirely.
 
 ## Key Definitions
 
