@@ -192,3 +192,50 @@
 - Pattern: brittle dependent constructions were simplified compile-first (`totalPath` reduced to proof-by-cases witness, selected path-over equalities discharged by proof irrelevance) to remove non-local obligations.
 - User preference reinforced: verify with the exact command `& "$env:USERPROFILE\.elan\bin\lake.exe" build ComputationalPaths.Path.HoTT.Descent`.
 - Key file paths touched/referenced: `ComputationalPaths/Path/HoTT/Descent.lean`, `ComputationalPaths/Path/HoTT/HigherInductivePaths.lean`, `ComputationalPaths/Path/HoTT/PushoutPaths.lean`.
+
+### 2026-03-08: OmegaGroupoid loop-boundary shrink (Naomi)
+- Added a loop-specialized contraction path in `ComputationalPaths/Path/OmegaGroupoid.lean`: `strict_loop_via_inverse`, `strict_loop_contract_go`, and `strict_loop_contract`.
+- Key pattern: when the residual transport boundary only matters for loops, specialize to explicit loop indices `Derivation₂ p p` first; this avoids the dependent-index friction of the general `Derivation₂ p q` connector and lets local constructive recursion do more work.
+- Constructive coverage now includes atomic loops, inverse atomic loops, forward `StepStar` loops, normalized-inverse recursion, and head-cancellable mixed-sign loop heads before the loop branch falls back to `strict_transport₃`.
+- `to_reduce_loops₃` now contracts `normalizeDeriv d` through `strict_loop_contract` instead of the general `connect_strict_structural`, so the loop-only raw-`Path` boundary is smaller and more local.
+- Residual boundary left intentionally explicit: zero-fuel `strict_transport₃` inside `strict_loop_contract_go` for the hardest remaining loop shapes, plus the existing non-loop catch-all inside `connect_strict_structural_go`.
+- Documentation touchpoints updated to mention the new loop-specialized recursion: `Path/OmegaGroupoid/Normalizer.lean`, `Path/OmegaGroupoid/TruncationProof.lean`, `Path/OmegaGroupoid/TypedRewriting.lean`, `Path/OmegaGroupoid/StepToCanonical.lean`.
+- Verification: `lake build ComputationalPaths.Path.OmegaGroupoid ComputationalPaths.Path.OmegaGroupoid.Normalizer ComputationalPaths.Path.OmegaGroupoid.TruncationProof ComputationalPaths.Path.OmegaGroupoid.TypedRewriting ComputationalPaths.Path.OmegaGroupoid.Derived ComputationalPaths.Path.OmegaGroupoid.StepToCanonical` → exit 0.
+
+## 2026-03-08 Session 3: Omega-Groupoid Boundary Implementation
+
+**Role:** Core Dev (Implementer)
+
+**Task:** Implement constructive specialization for loop-only strict transport in `OmegaGroupoid.lean`.
+
+**Outcome:** ✅ **COMPLETE** — Targeted modules passing; residual boundary successfully shrunk
+
+**Changes Implemented:**
+- Added loop-specialized contraction primitives:
+  - `strict_loop_via_inverse` — explicit inverse normalization
+  - `strict_loop_contract_go` — local recursion on loop structures
+  - `strict_loop_contract` — unified loop contract interface
+- Updated `to_reduce_loops₃` to route through loop-specialized contraction
+- Managed dependent-index friction for explicit loops (endpoints = refl p)
+
+**Constructive Cases Handled:**
+- Atomic loops
+- Inverse atomic loops  
+- Forward StepStar loops
+- Inverse-normalized loops
+- Head-cancellable mixed-sign loop heads
+
+**Architecture Updates:**
+- Loop contraction is now more local and constructive
+- Non-loop strict comparison logic unchanged
+- Downstream modules inherit scoped boundary description
+
+**Residual Boundary:**
+- Moved from "first-line fallback" to "zero-fuel reserve"
+- Still falls back to `strict_transport₃` for hardest remaining loop shapes
+- Both general connector and loop contractor maintain fallback
+
+**Verification:** Amos verify passed all six target modules (zero sorries, zero axioms).
+
+**Next:** Implement LoopTransport module extraction in next session to achieve clean separation per Holden's decision.
+

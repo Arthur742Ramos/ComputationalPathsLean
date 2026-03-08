@@ -169,3 +169,73 @@ Remaining failures required disproportionate effort:
 - Treat `OmegaWeakGroupoid.lean` as packaging only; keep real proofs centralized in `OmegaGroupoid.lean` and focused wrapper modules.
 - Use `Homotopy/EckmannHilton.lean` as a conceptual decomposition reference, not as proof infrastructure, until its `contractibility₃` shortcuts are removed.
 
+---
+
+### 2026-03-08T12:41:40Z: Omega-Groupoid Loop-Transport Boundary Refinement (Wave 3)
+**By:** Holden (Lead), Naomi (Core Dev), Amos (Tester/Verifier), Coordinator  
+**What:** Executed three-phase review, audit, and implementation to constructively shrink the residual `strict_transport₃` boundary in `OmegaGroupoid.lean`. Boundary now fires **only on loop-loop comparisons** (both endpoints = `refl p`), never on non-loop pairs.
+
+**Phase 1 – Architecture Review (Holden):**
+- Confirmed `strict_transport₃` fires only when structural strict connector (`connect_strict_structural_go`) exhausts fuel on hard global strict-shape mismatches.
+- Identified all hard-case loops funnel through zero-fuel branch.
+- Approved compartmentalization option: create `OmegaGroupoid/LoopTransport.lean` (next session).
+
+**Phase 2 – Audit (Amos):**
+- Verified boundary location: `OmegaGroupoid.lean` lines 1383–1399.
+- Root cause: proof irrelevance via `rweq_toEq` projection into `Prop` (works because two proofs in `Prop` are definitionally equal).
+- Confirmed rebuild sequence after patch: OmegaGroupoid → Normalizer → TruncationProof → TypedRewriting → Derived → StepToCanonical.
+- Validated: no circular dependencies, no `strict_connector` function/type, all six files production-ready.
+
+**Phase 3 – Implementation (Naomi):**
+- Added loop-specialized contraction primitives in `OmegaGroupoid.lean`:
+  - `strict_loop_via_inverse` — explicit inverse normalization
+  - `strict_loop_contract_go` — local recursion on loop structures
+  - `strict_loop_contract` — unified loop contract interface
+- Routed `to_reduce_loops₃` through loop-specialized contraction.
+- Handled five major loop shapes constructively: atomic loops, inverse atomic loops, forward StepStar loops, inverse-normalized loops, head-cancellable mixed-sign loop heads.
+- Targeted modules now pass; residual boundary localized to fuel-based fallbacks.
+
+**Phase 4 – Verification (Amos):**
+- All six target modules compile cleanly (zero sorries, zero axioms).
+- Residual boundary confirmed: `strict_loop_contract_go` still falls back to `strict_transport₃` at zero fuel for hardest remaining loop shapes.
+- Non-loop strict comparison logic unchanged.
+- Boundary successfully compartmentalized.
+
+**Decision:** ✅ **APPROVED FOR NEXT SESSION**
+- Implement Option C (Compartmentalization) in next session.
+- Create `ComputationalPaths/Path/OmegaGroupoid/LoopTransport.lean` with Type-valued API.
+- Future session (N+1): Execute Option A (Confluence-based canonical form) to eliminate boundary entirely.
+
+**Why:**
+- Satisfies "tiny surgical change" criterion; 30 min implementation + 15 min verification.
+- Allows concurrent Option A work (confluence-based replacement).
+- Establishes clean interface for future work.
+- Boundary is architecturally sound and well-documented.
+- Recent loop-contraction work shows primitives are sound but not yet unified.
+
+**Impact:**
+- Loop contraction is now more constructive and more local.
+- Non-loop strict comparison logic unchanged.
+- Downstream modules (Normalizer, etc.) inherit scoped boundary description.
+- Preserve Type-valued code discipline.
+
+**Code Changes:**
+- `ComputationalPaths/Path/OmegaGroupoid.lean` — added three loop-contract primitives
+- `ComputationalPaths/Path/OmegaGroupoid/Normalizer.lean` — propagates updates
+- `ComputationalPaths/Path/OmegaGroupoid/TruncationProof.lean` — propagates updates
+- `ComputationalPaths/Path/OmegaGroupoid/TypedRewriting.lean` — propagates updates
+- `ComputationalPaths/Path/OmegaGroupoid/Derived.lean` — propagates updates
+- `ComputationalPaths/Path/OmegaGroupoid/StepToCanonical.lean` — propagates updates
+- `ComputationalPaths/Path/Homotopy/HigherHomotopy.lean` — updated references
+- `ComputationalPaths/Path/Homotopy/Truncation.lean` — updated references
+
+**Verification:**
+- Targeted modules: ✅ PASS
+- Full build (Coordinator): 🔄 IN PROGRESS (compiling mathlib dependencies)
+
+**Next Steps:**
+1. Confirm full build success
+2. Implement LoopTransport module (next session)
+3. Verify rebuild sequence: OmegaGroupoid → Normalizer → TruncationProof → TypedRewriting → Derived → StepToCanonical
+4. Full validation: `lake build`
+

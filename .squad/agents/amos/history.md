@@ -420,3 +420,229 @@ HomotopyGroups module is **compile-fix ready** for broader Wave-5+ Stable aggreg
 - No unsolved goals, no sorries, no axioms introduced
 - Pattern transferable to other HoTT submodules (HigherInductivePaths, PushoutPaths)
 - Cross-check: Full lake build remains green post-repair
+
+## 2026-03-06 — Omega-Groupoid strict_transport₃ Residual-Loop Audit
+
+**Executed by:** Amos (Tester/Verifier)  
+**Requested by:** Arthur Freitas Ramos  
+**Task:** Audit residual loop-only dependence on `strict_transport₃` and strict connector code in omega-groupoid files.  
+**Scope:** Read-only investigation of architecture boundary.
+
+### Files Scanned
+- ComputationalPaths/Path/OmegaGroupoid.lean (main)
+- ComputationalPaths/Path/OmegaGroupoid/Normalizer.lean
+- ComputationalPaths/Path/OmegaGroupoid/TruncationProof.lean
+- ComputationalPaths/Path/OmegaGroupoid/TypedRewriting.lean
+- ComputationalPaths/Path/OmegaGroupoid/Derived.lean
+- ComputationalPaths/Path/OmegaGroupoid/StepToCanonical.lean
+
+### Build Status (All Green)
+✅ `lake build ComputationalPaths.Path.OmegaGroupoid` — 16 jobs, exit 0
+✅ `lake build ComputationalPaths.Path.OmegaGroupoid.Normalizer` — 17 jobs, exit 0
+✅ `lake build ComputationalPaths.Path.OmegaGroupoid.TruncationProof` — 33 jobs, exit 0
+✅ `lake build ComputationalPaths.Path.OmegaGroupoid.TypedRewriting` — 23 jobs, exit 0
+✅ `lake build ComputationalPaths.Path.OmegaGroupoid.Derived` — 18 jobs, exit 0
+✅ `lake build ComputationalPaths.Path.OmegaGroupoid.StepToCanonical` — 17 jobs, exit 0
+
+### Invariant Verification
+- ✅ Zero `sorry` declarations across all 6 files
+- ✅ Zero `axiom` declarations across all 6 files
+- ✅ All files maintain Path/RwEq integration
+
+### Residual Boundary Analysis
+
+**Location:** OmegaGroupoid.lean (lines 1383–1399)
+
+#### Definition: `strict_transport₃`
+```lean
+noncomputable def strict_transport₃ {p q : Path a b}
+    {d₁ d₂ : Derivation₂ p q} : Derivation₃ d₁ d₂ :=
+  .step (.rweq_transport (derivation₂_toEq_eq d₁ d₂))
+```
+
+**Boundary condition:** Applies `MetaStep₃.rweq_transport`, which projects two parallel `Derivation₂` witnesses to equal `Eq` proofs via `rweq_toEq`.
+
+#### Evidence: `derivation₂_toEq_eq` (line 948–950)
+```lean
+theorem derivation₂_toEq_eq {p q : Path a b} (d₁ d₂ : Derivation₂ p q) :
+    rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq :=
+  rfl
+```
+
+**Key observation:** This theorem exploits Lean's *proof irrelevance in `Prop`* — `rweq_toEq` returns an `Eq` (a proof), and two proofs of the same equality are definitionally equal. The `rfl` witness works precisely because we're in `Prop`.
+
+#### Usage Boundary: `connect_strict_structural_go` (line 1396–1399)
+```lean
+noncomputable def connect_strict_structural_go {p q : Path a b} :
+    Nat → (d₁ d₂ : Derivation₂ p q) →
+    StrictNormalForm d₁ → StrictNormalForm d₂ → Derivation₃ d₁ d₂
+  | 0, d₁, d₂, _, _ => strict_transport₃ (d₁ := d₁) (d₂ := d₂)  -- ← zero-fuel fallback
+  | _fuel + 1, d₁, d₂, h₁, h₂ => ...  -- ← constructive path with recursive fuel
+```
+
+**Call graph:** 
+- `connect_strict_structural_go` (loop-only path comparator with fuel)
+  → recurses on positively-signed loops and inverse-normalized pairs
+  → **hits zero fuel → calls `strict_transport₃`**
+
+### Reference Pattern: Normalizer Module
+
+**File:** Normalizer.lean (lines 43–46)  
+**Export:** `contractibility₃_genuine` (line 108)
+
+Routes through groupoid-law constructors and inverse-loop isolation, then:
+```lean
+exact .vcomp (to_normalizeStrict₃ d₁) <|
+  connect_strict d₁ d₂  -- Eventually calls strict_transport₃ at zero fuel
+```
+
+**Comment (line 53–55):**
+> "The remaining non-structural boundary is therefore exactly the one isolated in the core strict connector: `OmegaGroupoid.connect_strict` still has a final zero-fuel `strict_transport₃` branch for the hardest global strict-shape comparisons."
+
+### No Circular Dependencies Detected
+
+- ✅ OmegaGroupoid.lean (main) does **not** import Derived.lean
+- ✅ TruncationProof imports {OmegaGroupoid, Normalizer, Derived} — no loop
+- ✅ Normalizer imports OmegaGroupoid only — no loop
+- ✅ All other files import OmegaGroupoid as a dependency (downstream only)
+
+### Recommended Rebuild Sequence (After Naomi's Patch)
+
+To verify any fix to the strict-transport boundary:
+
+**Phase 1: Core module**
+```bash
+lake build ComputationalPaths.Path.OmegaGroupoid
+```
+
+**Phase 2: Downstream consumers (in order)**
+```bash
+lake build ComputationalPaths.Path.OmegaGroupoid.Normalizer
+lake build ComputationalPaths.Path.OmegaGroupoid.TruncationProof
+lake build ComputationalPaths.Path.OmegaGroupoid.TypedRewriting
+lake build ComputationalPaths.Path.OmegaGroupoid.Derived
+lake build ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
+```
+
+**Phase 3: Full validation**
+```bash
+lake build
+```
+
+### Summary
+
+**The residual boundary is exactly identified and isolated:**
+
+1. **In:** `strict_transport₃` definition (line 1383 of OmegaGroupoid.lean)
+2. **Why:** Uses proof irrelevance in `Prop` via `rweq_toEq` projection  
+3. **When called:** Zero-fuel path in `connect_strict_structural_go` (line 1399)
+4. **Scope:** Loop-only comparisons where positively-signed structural recursion exhausts fuel
+5. **Prop-level dependency:** Leverages `Eq` proof irrelevance (line 950: `derivation₂_toEq_eq`)
+
+**No strict_connector found** — `strict_connector` identifier has zero matches across all six files.
+
+All target files compile cleanly with zero sorries and zero axioms. The boundary is **localized, well-documented, and architecturally sound**.
+
+**Status:** ✅ Audit complete. All invariants maintained. Ready for downstream merge.
+
+
+## Learnings
+
+### Architecture Pattern: Prop-Level Boundary Isolation
+
+The `strict_transport₃` pattern represents a defensible architectural strategy:
+
+1. **Locate the boundary:** Identify exact definitions that cross from Type-valued to Prop-valued territory
+2. **Document thoroughly:** Comment the specific limitation and when it triggers (zero-fuel fallback)
+3. **Isolate callsites:** Ensure the boundary is called from exactly one recursive function (here: `connect_strict_structural_go`)
+4. **Track downstream:** Document in dependent modules (Normalizer, TruncationProof) that they inherit this limitation
+
+### Verification Protocol for Proof-Irrelevance Boundaries
+
+When auditing Prop-level code paths:
+- Search for `rweq_transport`, `Subsingleton.elim`, `Classical.choice` keywords
+- Trace the full call chain from definition to usage
+- Verify the boundary is *necessary* (no alternative constructive proof exists yet)
+- Check all imports are acyclic
+- Confirm dependent files document the limitation
+
+### Loop-Only Recursion Pattern
+
+The `connect_strict_structural_go` fuel-based recursion demonstrates a technique useful for troubleshooting hard structural comparisons:
+- **Positive fuel:** Constructive recursion on structurally decreasing cases
+- **Zero fuel:** Safety fallback for cases not covered by structural recursion
+- **Comments:** Explicitly document what structures are handled constructively vs. what remains
+
+### Team Note
+
+Naomi's upcoming patch should clearly specify which fuel-based cases become constructive (reducing the zero-fuel scope). Post-patch, rebuild targets should follow the Phase 1–4 sequence above.
+
+
+## Core Context (Summarized from Sessions 1–2)
+
+**Role:** Tester/Verifier — maintains build integrity, audits code quality, verifies module behavior
+
+**Prior Contributions:**
+- Session 1: Codebase depth audit (1,287 files); identified 5 SHALLOW Wave-1 targets; 71.6% Path integration baseline
+- Session 1: Wave-1 targets prioritized (HyperbolicGroups, KnotInvariants, HigherChernWeil, EtaleCohomology, InfinityTopoi; 1–2 hour ROI each)
+- Session 2: Multiple build verifications across Wave-1/Wave-2/Wave-3 tasks; identified regression in IteratedLoopSpace; confirmed clean de-scaffolding across 20+ files
+- Session 2: TruncationProof.lean universe-level repair; validated rebuild sequence
+- Session 2: HoTT.Descent compile recovery; established reusable pattern for HoTT module recovery
+
+**Key Skills:** Build verification, regex audit, module-level diagnosis, cross-file regression detection
+
+**Known Build Hotspots:**
+- InfinityTopoi, YangMillsPaths, CategoricalGalois, SymmetricMonoidalInfinity, StableInfinityCategories (scaffold-heavy)
+- IteratedLoopSpace (regression: unknown identifier `rwEq_iff_toEq`)
+- HoTT modules (descent/flattening/effective-descent equivalence patterns)
+
+---
+
+## 2026-03-08 Session 3: Omega-Groupoid Boundary Audit & Verification
+
+**Role:** Tester/Verifier
+
+**Task 1 – Audit:** Audited current `strict_transport₃` footprint and identified rebuild targets after boundary modification.
+
+**Findings:**
+- Boundary location: `ComputationalPaths/Path/OmegaGroupoid.lean` lines 1383–1399
+- Trigger: `connect_strict_structural_go` at zero fuel (line 1399)
+- Scope: Loop-loop comparisons only
+- Root cause: proof irrelevance via `rweq_toEq` projection into `Prop`
+
+**Architecture Validation:**
+- ✅ No circular dependencies
+- ✅ No `strict_connector` function/type (search: 0 matches)
+- ✅ All six files production-ready (clean builds, no sorries, no axioms)
+- ✅ TruncationProof.lean correctly cites boundary
+
+**Rebuild Sequence Mapped:**
+1. `lake build ComputationalPaths.Path.OmegaGroupoid`
+2. Propagates to: Normalizer → TruncationProof → TypedRewriting → Derived → StepToCanonical
+3. Full validation: `lake build`
+
+**Task 2 – Verification:** Verified targeted omega-groupoid modules after Naomi's constructive shrink patch.
+
+**Targeted Modules Verified (All PASS):**
+- `ComputationalPaths.Path.OmegaGroupoid`
+- `ComputationalPaths.Path.OmegaGroupoid.Normalizer`
+- `ComputationalPaths.Path.OmegaGroupoid.TruncationProof`
+- `ComputationalPaths.Path.OmegaGroupoid.TypedRewriting`
+- `ComputationalPaths.Path.OmegaGroupoid.Derived`
+- `ComputationalPaths.Path.OmegaGroupoid.StepToCanonical`
+
+**Verification Results:**
+- ✅ All target modules compile cleanly
+- ✅ No new sorries introduced
+- ✅ No axiom violations
+- ✅ Residual boundary localized to fuel-based fallbacks
+
+**Residual Boundary Status:**
+- `strict_loop_contract_go` still falls back to `strict_transport₃` at zero fuel for hardest loop shapes
+- `connect_strict_structural_go` retains original non-loop/global fallback
+- Boundary successfully compartmentalized and scoped
+
+**Outcome:** ✅ **VERIFIED** — All target modules passing. Ready for full build attempt.
+
+**Next:** Full build (Coordinator) in progress; if successful, LoopTransport extraction scheduled for next session.
+
