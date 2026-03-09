@@ -1072,16 +1072,10 @@ structure Step.JoinableData {A : Type u} {a b : A} (p q : Path a b) : Type (u + 
   left : StepStar p meet
   right : StepStar q meet
 
-/-- Extract type-level join data from a Prop-level joinability proof. -/
-noncomputable def Step.Joinable.toData {A : Type u} {a b : A} {p q : Path a b} :
-    Step.Joinable p q → Step.JoinableData p q := by
-  classical
-  intro h
-  have hs : Nonempty (Step.JoinableData p q) := by
-    cases h with
-    | intro r hp hq =>
-        exact ⟨⟨r, hp, hq⟩⟩
-  exact Classical.choice hs
+/-- Extract the explicit `StepStar` witnesses already carried by `Joinable`. -/
+def Step.Joinable.toData {A : Type u} {a b : A} {p q : Path a b} :
+    Step.Joinable p q → Step.JoinableData p q
+  | .intro r hp hq => ⟨r, hp, hq⟩
 
 /-- Forget type-level join data to recover Prop-level joinability. -/
 def Step.Joinable.ofData {A : Type u} {a b : A} {p q : Path a b} :
@@ -1090,7 +1084,7 @@ def Step.Joinable.ofData {A : Type u} {a b : A} {p q : Path a b} :
   exact ⟨h.meet, h.left, h.right⟩
 
 /-- Local-confluence oracle with explicit witness payload, given a joinability proof. -/
-noncomputable def Step.local_confluence_data
+def Step.local_confluence_data
     {A : Type u} {a b : A} {p q r : Path a b}
     (_s₁ : Step p q) (_s₂ : Step p r)
     (h : Step.Joinable q r) : Step.JoinableData q r :=

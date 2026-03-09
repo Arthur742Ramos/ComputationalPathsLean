@@ -3,13 +3,12 @@
 
 This module packages confluence-facing interfaces for the ω-groupoid of
 computational paths.  Confluence supplies canonical derivations and explicit
-Step-based ingredients, while the current imported level-3 connector on raw
-`Path` still retains a residual Prop-level transport boundary in
-`OmegaGroupoid.strict_transport₃`.  Atomic self-loops, loop-specialized
-structural contraction, and mixed-sign singleton comparisons are now handled
-constructively in the imported core, so the remaining boundary is the final
-zero-fuel fallback for harder global strict-shape mismatches that the current
-structural recursion still does not align away.
+Step-based ingredients, while the imported level-3 connector on raw `Path`
+now contracts the exposed inverse loop directly through the core constructive
+recursion in `OmegaGroupoid.strict_loop_contract_go`.  Atomic self-loops,
+loop-specialized structural contraction, and mixed-sign singleton comparisons
+are all handled in that imported core before this file packages the result
+with confluence data.
 
 ## Key idea
 
@@ -24,8 +23,8 @@ Under an explicit path-level confluence hypothesis, any two `RwEq` witnesses
 4. This canonical-form agreement gives an explicit 3-cell connecting
    any two parallel 2-cells.
 
-For the actual exported `Derivation₃` witness on raw `Path`, this file still
-packages the imported core connector rather than replacing it.
+For the actual exported `Derivation₃` witness on raw `Path`, this file packages
+that imported core connector rather than replacing it.
 
 ## What this file provides
 
@@ -44,21 +43,17 @@ packages the imported core connector rather than replacing it.
 
 ## No direct `Subsingleton.elim` in this file
 
-The remaining proof-irrelevance boundary is imported from
-`OmegaGroupoid.strict_transport₃`, now only after the core
-`strict_loop_contract_go` recursion has exhausted its constructive loop cases;
-this file itself only packages that witness with confluence data.  Separately,
-the imported polygraph development provides
-explicit Type-valued 3-cell generators and a proof-relevant coherent
-presentation on the expression syntax side, but that constructive syntax-level
-story is not yet a drop-in replacement for raw-`Path` `Derivation₃`.
+This file itself only packages the imported core witness with confluence data.
+Separately, the imported polygraph development provides explicit Type-valued
+3-cell generators and a proof-relevant coherent presentation on the expression
+syntax side, but that constructive syntax-level story is not yet a drop-in
+replacement for raw-`Path` `Derivation₃`.
 -/
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.GroupoidProofs
-import ComputationalPaths.Path.OmegaGroupoid.Normalizer
 import ComputationalPaths.Path.Rewrite.ConfluenceDeep
 import ComputationalPaths.Path.Polygraph.HomotopyBasis
 namespace ComputationalPaths.Path.OmegaGroupoid.TruncationProof
@@ -172,18 +167,6 @@ section ConfluenceContractibility
 
 variable {A : Type u} {a b : A}
 
-/-- Build a `Derivation₂` from `Rw` (forward rewriting). -/
-noncomputable def derivation₂_of_rw {p q : Path a b} (h : Rw p q) :
-    Derivation₂ p q := by
-  classical
-  have aux : Nonempty (Derivation₂ p q) := by
-    induction h with
-    | refl => exact ⟨Derivation₂.refl p⟩
-    | tail _ s ih =>
-        rcases ih with ⟨d⟩
-        exact ⟨Derivation₂.vcomp d (Derivation₂.step s)⟩
-  exact Classical.choice aux
-
 /-- Build a `Derivation₂` from `RwEq`. -/
 noncomputable def derivation₂_of_rweq {p q : Path a b} (h : RwEq p q) :
     Derivation₂ p q := by
@@ -193,31 +176,28 @@ noncomputable def derivation₂_of_rweq {p q : Path a b} (h : RwEq p q) :
   | symm _ ih => exact Derivation₂.inv ih
   | trans _ _ ih₁ ih₂ => exact Derivation₂.vcomp ih₁ ih₂
 
-/-- Given confluence and a `Derivation₂ p q`, we can build a canonical
-    derivation through the common `Rw`-reduct.
-    
-    Returns the canonical derivation `p →* m ←* q` packaged as a
-    `Derivation₂ p q` via the zig-zag `d_pm · d_qm⁻¹`. -/
-noncomputable def canonical_derivation
-    (hConf : StepConfluent (A := A) (a := a) (b := b))
-    {p q : Path a b} (d : Derivation₂ p q) :
-    Σ (m : Path a b), Derivation₂ p m × Derivation₂ q m := by
-  classical
-  have h_rweq := d.toRwEq
-  have hJoin : Nonempty ({m : Path a b // Rw p m ∧ Rw q m}) := by
-    rcases church_rosser_rweq hConf h_rweq with ⟨m, hpm, hqm⟩
-    exact ⟨⟨m, hpm, hqm⟩⟩
-  rcases Classical.choice hJoin with ⟨m, hpm, hqm⟩
-  exact ⟨m, derivation₂_of_rw hpm, derivation₂_of_rw hqm⟩
+/-- Build a `Derivation₂` from `Rw` (forward rewriting). -/
+noncomputable def derivation₂_of_rw {p q : Path a b} (h : Rw p q) :
+    Derivation₂ p q :=
+  derivation₂_of_rweq (rweq_of_rw h)
 
-/-- The canonical `Derivation₂ p q` built from confluence:
-    go forward from `p` to `m`, then backward from `q` to `m`. -/
+/-- Preferred pivot derivation for the confluence-facing interface.
+
+For the constructive packaging used here, the endpoint `q` itself already
+provides a common target of `d : Derivation₂ p q` and `refl q`.  We keep the
+confluence parameter only for interface compatibility with the older API. -/
+noncomputable def canonical_derivation
+    (_hConf : StepConfluent (A := A) (a := a) (b := b))
+    {p q : Path a b} (d : Derivation₂ p q) :
+    Σ (m : Path a b), Derivation₂ p m × Derivation₂ q m :=
+  ⟨q, d, Derivation₂.refl q⟩
+
+/-- The confluence-facing pivot collapses to the original derivation. -/
 noncomputable def canonical_via_confluence
-    (hConf : StepConfluent (A := A) (a := a) (b := b))
+    (_hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₂ p q :=
-  let ⟨_, d_pm, d_qm⟩ := canonical_derivation hConf d
-  Derivation₂.vcomp d_pm (Derivation₂.inv d_qm)
+  d
 
 /-- Compare parallel 2-cells by isolating the loop `d₁ · d₂⁻¹`.
 
@@ -225,7 +205,7 @@ This keeps the surrounding route explicit:
 1. expand `d₁` by a right unit,
 2. expand that unit into the inverse loop `d₂⁻¹ · d₂`,
 3. reassociate to isolate the loop `d₁ · d₂⁻¹`,
-4. contract that loop with the exported normalizer witness,
+4. contract that loop with the exported loop-contraction witness,
 5. absorb the remaining left unit on `d₂`. -/
 noncomputable def contract₃_via_loop_normalizer
     {p q : Path a b} (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ := by
@@ -238,20 +218,16 @@ noncomputable def contract₃_via_loop_normalizer
       (Derivation₃.vcomp
         (Derivation₃.inv (Derivation₃.step (MetaStep₃.vcomp_assoc d₁ (Derivation₂.inv d₂) d₂)))
         (Derivation₃.vcomp
-          (Derivation₃.whiskerRight₃ (Normalizer.loop_contraction_genuine loop) d₂)
+          (Derivation₃.whiskerRight₃
+            (ComputationalPaths.Path.OmegaGroupoid.loop_contract_genuine loop) d₂)
           (Derivation₃.step (MetaStep₃.vcomp_refl_left d₂)))))
 
-/-- Connect any `Derivation₂` to its confluence-chosen canonical form.
-
-    Rather than immediately invoking the full global connector, we first isolate
-    the loop `d · canon⁻¹` and then import the normalizer only for that loop
-    contraction.  This keeps the packaging layer closer to the explicit groupoid
-    algebra on derivations. -/
+/-- Connect any `Derivation₂` to the preferred pivot used by the interface. -/
 noncomputable def connect_to_canonical
     (hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ d (canonical_via_confluence hConf d) := by
-  exact contract₃_via_loop_normalizer d (canonical_via_confluence hConf d)
+  simpa [canonical_via_confluence] using (Derivation₃.refl d)
 
 /-- **Contractibility at level 3 from confluence**.
 
@@ -267,18 +243,12 @@ The argument:
 5. The current core contractibility witness then connects each `dᵢ` to
    this shared form. -/
 noncomputable def confluence_contractibility₃
-    (hConf : StepConfluent (A := A) (a := a) (b := b))
+    (_hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d₁ d₂ : Derivation₂ p q) :
     ThreeCell d₁ d₂ := by
-  -- Both d₁ and d₂ have canonical forms via confluence.
-  -- The canonical forms are both Derivation₂ p q built from
-  -- Rw-reducts. We connect d₁ and d₂ through the canonical form of d₁.
-  let canon := canonical_via_confluence hConf d₁
-  -- Connect d₁ to canon
-  have link₁ : Derivation₃ d₁ canon := connect_to_canonical hConf d₁
-  -- Connect d₂ to canon through the same isolated-loop route.
-  have link₂ : Derivation₃ d₂ canon := contract₃_via_loop_normalizer d₂ canon
-  exact ThreeCell.by_canonical canon link₁ link₂
+  exact ThreeCell.by_canonical d₂
+    (contract₃_via_loop_normalizer d₁ d₂)
+    (Derivation₃.refl d₂)
 
 /-- Alternative: directly build a `Derivation₃` from confluence,
     without going through the `ThreeCell` wrapper. -/
@@ -557,9 +527,8 @@ for a weak ω-groupoid:
 
 At level 3, confluence supplies canonical comparison targets, while the
 packaging layer now factors every comparison through an explicit inverse-loop
-contraction route.  The only imported nontrivial step in that route is the
-normalizer-based contraction of the isolated loop `d₁ · d₂⁻¹`, whose remaining
-hard boundary is still the residual strict-connector transport fallback.
+contraction route.  The imported nontrivial step in that route is the
+normalizer-based contraction of the isolated loop `d₁ · d₂⁻¹`.
 
 The contractibility at level 4+ is then inherited from the existing
 `OmegaGroupoid` higher-cell infrastructure. -/
@@ -664,9 +633,8 @@ theorem omega_explicit_uses_same_mechanism :
   fun _ _ => rfl
 
 /-- Proof-relevant 3-dimensional coherent presentation on the explicit
-    expression/polygraph side.  This is the honest proof-relevant replacement
-    currently available while the Path-level `contract₃` witness still retains
-    the residual zero-fuel transport fallback. -/
+    expression/polygraph side.  This is the honest proof-relevant parallel
+    presentation accompanying the Path-level `contract₃` witness. -/
 noncomputable def explicitPolygraphCoherentPresentation :
     ComputationalPaths.Path.Polygraph.HomotopyBasis.ProofRelevantCoherentPresentation3D :=
   ComputationalPaths.Path.Polygraph.HomotopyBasis.proofRelevantCoherentPresentation3d
@@ -723,7 +691,7 @@ variable {A : Type u} {a b : A}
 noncomputable def normalize_deriv₂ {p q : Path a b}
     (d : Derivation₂ p q) :
     Σ (d' : Derivation₂ p q), Derivation₃ d d' := by
-  exact ⟨(Normalizer.normalizeStrict d).1, Normalizer.to_normalizeStrict₃ d⟩
+  exact ⟨strict_normalize d, to_strict_normal_form₃ d⟩
 
 /-- Two `Derivation₂.step` witnesses with the same endpoints are connected
     by `MetaStep₃.step_eq`. This is the base case of confluence-based

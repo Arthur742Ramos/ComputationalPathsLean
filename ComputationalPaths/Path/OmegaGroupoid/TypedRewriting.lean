@@ -30,6 +30,7 @@ entirely.
 
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
+import ComputationalPaths.Path.Rewrite.ConfluenceDeepType
 import ComputationalPaths.Path.Rewrite.PathExpr
 
 namespace ComputationalPaths
@@ -430,34 +431,31 @@ abbrev StepT {A : Type u} {a b : A} (p q : Path a b) : Type (u + 1) := Step p q
 
 variable {A₀ : Type} {a₀ b₀ : A₀}
 
-private noncomputable def TStar.of_rw_prop {p q : Path a₀ b₀} (h : Rw p q) :
-    Nonempty (TStar StepT p q) := by
-  induction h with
-  | refl => exact ⟨.refl _⟩
-  | tail _ step ih => exact ih.elim fun d => ⟨.tail d step⟩
+private noncomputable def TStar.ofARTC {p q : Path a₀ b₀} :
+    Rewrite.ConfluenceDeepType.ARTC StepT p q → TStar StepT p q
+  | .refl p => .refl p
+  | .step h rest => TStar.head h (TStar.ofARTC rest)
 
-noncomputable def TStar.of_rw {p q : Path a₀ b₀} (h : Rw p q) :
-    TStar StepT p q :=
-  Classical.choice (TStar.of_rw_prop h)
-
-/-- `Step` is type-level locally confluent, via the existing `Nonempty` bridge. -/
+/-- `Step` is type-level locally confluent once we are given an explicit
+    Type-valued local confluence witness for the `Step` relation. -/
 noncomputable def localConfluent_step
-    [Rewrite.ConfluenceConstructive.HasLocalConfluenceProp.{0}] :
+    (hLocal :
+      Rewrite.ConfluenceDeepType.LocallyConfluentT
+        (fun p q : Path a₀ b₀ => StepT p q)) :
     TLocalConfluent (a := a₀) (b := b₀) StepT where
   close := fun {_p _q₁ _q₂} h₁ h₂ =>
-    have hjoin :=
-      (ConfluenceConstructive.local_confluence_prop
-        (A := A₀) (a := a₀) (b := b₀) h₁ h₂)
-    Classical.choice (hjoin.elim fun s hs =>
-      hs.elim fun hq₁s hq₂s =>
-        ⟨⟨s, TStar.of_rw hq₁s, TStar.of_rw hq₂s⟩⟩)
+    let ⟨s, hq₁s, hq₂s⟩ := hLocal h₁ h₂
+    ⟨s, TStar.ofARTC hq₁s, TStar.ofARTC hq₂s⟩
 
-/-- `Step` is type-level confluent, using termination + local confluence. -/
+/-- `Step` is type-level confluent, using termination plus a Type-valued local
+    confluence witness. -/
 noncomputable def confluent_step
-    [Rewrite.ConfluenceConstructive.HasLocalConfluenceProp.{0}]
+    (hLocal :
+      Rewrite.ConfluenceDeepType.LocallyConfluentT
+        (fun p q : Path a₀ b₀ => StepT p q))
     (hterm : Terminating (a := a₀) (b := b₀) StepT) :
     TConfluent (a := a₀) (b := b₀) StepT :=
-  newman hterm (localConfluent_step (a₀ := a₀) (b₀ := b₀))
+  newman hterm (localConfluent_step (a₀ := a₀) (b₀ := b₀) hLocal)
 
 end StepInstances
 

@@ -1,14 +1,13 @@
 /-
 # Word-Like Normalizer for Derivation₂
 
-This module develops a signed-word normalizer for `Derivation₂` using the
-groupoid-law constructors of `MetaStep₃`.  It removes many ad hoc comparisons
-by flattening derivations into explicit chains and performing local
-cancellations, but it does **not** eliminate the residual transport boundary in
-the core `OmegaGroupoid` strict connector.  The exported witness still hands the
-resulting strict forms to `OmegaGroupoid.connect_strict`, whose loop branch now
-passes through `strict_loop_contract_go` before the last-resort raw-`Path`
-fallback.
+This module develops a signed-word presentation for `Derivation₂` using the
+groupoid-law constructors of `MetaStep₃`.  The public normalization route is
+now fully constructive: it first uses the core `OmegaGroupoid.strict_normalize`
+procedure and then flattens the resulting strict derivation into an explicit
+chain.  The exported witness hands those strict forms to
+`OmegaGroupoid.connect_strict`, whose public comparison route now contracts the
+isolated inverse loop through the core `strict_loop_contract_go` recursion.
 
 ## The Idea
 
@@ -18,16 +17,15 @@ fallback.
 
 The normalizer therefore tries to solve as much of the comparison problem as is
 visible from the derivation syntax:
-1. **Flatten** a `Derivation₂` tree into a right-associated chain of signed steps
-2. **Reduce** the chain by canceling adjacent `s · s⁻¹` pairs
-3. Rebuild a strict derivation from the reduced chain
+1. **Normalize** a `Derivation₂` with the constructive core strict normalizer
+2. **Flatten** the resulting strict derivation into a right-associated chain
+3. **Compare** the strict representatives via `OmegaGroupoid.connect_strict`
 
 This strategy works constructively for large structural fragments.  The point
-where it still stops is specific to raw `Path`: the core connector now handles
-atomic self-loops, local loop recursion, and mixed-sign singleton comparisons
-constructively, but the current recursion still leaves a residual fallback for
-harder global strict-shape mismatches that do not reduce to head-aligned or
-forward-stepstar cases.
+where the core connector takes over is specific to raw `Path`: atomic
+self-loops, local loop recursion, and mixed-sign singleton comparisons are all
+handled by explicit `MetaStep₃`-based derivations, and the remaining global
+comparison work is packaged by `OmegaGroupoid.connect_strict`.
 
 The MetaStep₃ constructors provide Derivation₃ witnesses for each rewrite:
 - `vcomp_assoc` — re-associate
@@ -42,21 +40,18 @@ The MetaStep₃ constructors provide Derivation₃ witnesses for each rewrite:
 
 `contractibility₃_genuine` : exported level-3 connector routed through the
 normalizer API.  Singleton strict forms, single-step/forward-chain comparisons,
-and recursively aligned positive-head strict chains are now connected by
-explicit groupoid-law 3-cells.  Loop contraction itself first goes through the
-core `strict_loop_contract_go` recursion; remaining hard strict-shape
-comparisons are then rerouted through normalized inverses, so
-`OmegaGroupoid.strict_transport₃` still appears as the final raw-`Path`
-fallback.
+and recursively aligned positive-head strict chains are connected by explicit
+groupoid-law 3-cells.  Loop contraction itself goes through the core
+`strict_loop_contract_go` recursion, which now feeds exposed blocked loops back
+into the same constructive loop-normalization route.
 
 ## Critical constraint
 
 The groupoid-law constructors handle most normalization steps (flatten,
-reassociate, cancel inverse pairs).  The remaining limitation is global
-strict-form comparison on raw `Path`: mixed-polarity and uniqueness-style cases
-still funnel through the core `OmegaGroupoid.connect_strict` machinery, whose
-last-resort zero-fuel branch is now reserved for the longest remaining global
-strict-shape mismatches.
+reassociate, cancel inverse pairs).  The remaining limitation is simply that
+the final comparison is performed in the raw-`Path` strict connector:
+mixed-polarity and uniqueness-style cases still funnel through the core
+`OmegaGroupoid.connect_strict` machinery.
 
 ## Step constructors from MetaStep₃ used
 
@@ -125,8 +120,8 @@ theorem toDerivation₂_is_strict {p q : Path a b} (ss : SignedStep p q) :
     up to a `Derivation₃` witness.
 
     Rather than case-splitting on polarity, we hand both singleton strict forms
-    to the core strict connector.  This keeps the remaining transport boundary
-    isolated in `OmegaGroupoid.connect_strict`. -/
+    to the core strict connector.  This keeps the singleton case aligned with
+    the same strict/loop-normalization route used throughout the module. -/
 noncomputable def coherence {p q : Path a b} (ss₁ ss₂ : SignedStep p q) :
     Derivation₃ ss₁.toDerivation₂ ss₂.toDerivation₂ :=
   connect_strict
@@ -355,99 +350,7 @@ inductive IsReduced {A : Type u} {a b : A} : {p q : Path a b} → FlatChain p q 
       IsReduced (.cons ss₂ rest) →
       IsReduced (.cons ss₁ (.cons ss₂ rest))
 
-/-! ## §4  One-Step Reduction
-
-Perform a single cancellation in a chain, producing a shorter chain
-and a `Derivation₃` witness. -/
-
-/-- Result of attempting to reduce the head of a chain. -/
-inductive ReduceHeadResult {A : Type u} {a b : A} {p q : Path a b}
-    (orig : FlatChain p q) where
-  | unchanged : ReduceHeadResult orig
-  | reduced   : (c : FlatChain p q) →
-                 (witness : Derivation₃ orig.toDerivation₂ c.toDerivation₂) →
-                 ReduceHeadResult orig
-
-/-- Try to cancel the first two elements of a chain.
-
-    Cancellation is structural: opposite signs cancel when the second step
-    returns to the starting endpoint of the first.  The witness is built from
-    `cancel_witness`, which uses only `step_eq` and the groupoid laws. -/
-noncomputable def reduceHead {p q r s : Path a b}
-    (ss₁ : SignedStep p q) (ss₂ : SignedStep q r) (rest : FlatChain r s) :
-    ReduceHeadResult (FlatChain.cons ss₁ (.cons ss₂ rest)) := by
-  classical
-  match ss₁, ss₂ with
-  | .fwd s₁, .bwd s₂ =>
-      by_cases h : r = p
-      · cases h
-        let cancel : Derivation₃
-            (.vcomp (SignedStep.toDerivation₂ (SignedStep.fwd s₁))
-              (SignedStep.toDerivation₂ (SignedStep.bwd s₂)))
-            (.refl p) :=
-          cancel_witness (SignedStep.fwd s₁) (SignedStep.bwd s₂) (Cancels.fwd_bwd s₁ s₂)
-        exact .reduced rest <|
-          .vcomp
-            (.inv (.step (.vcomp_assoc (SignedStep.toDerivation₂ (SignedStep.fwd s₁))
-              (SignedStep.toDerivation₂ (SignedStep.bwd s₂))
-              rest.toDerivation₂)))
-            (.vcomp
-              (Derivation₃.whiskerRight₃ cancel rest.toDerivation₂)
-              (.step (.vcomp_refl_left rest.toDerivation₂)))
-      · exact .unchanged
-  | .bwd s₁, .fwd s₂ =>
-      by_cases h : r = p
-      · cases h
-        let cancel : Derivation₃
-            (.vcomp (SignedStep.toDerivation₂ (SignedStep.bwd s₁))
-              (SignedStep.toDerivation₂ (SignedStep.fwd s₂)))
-            (.refl p) :=
-          cancel_witness (SignedStep.bwd s₁) (SignedStep.fwd s₂) (Cancels.bwd_fwd s₁ s₂)
-        exact .reduced rest <|
-          .vcomp
-            (.inv (.step (.vcomp_assoc (SignedStep.toDerivation₂ (SignedStep.bwd s₁))
-              (SignedStep.toDerivation₂ (SignedStep.fwd s₂))
-              rest.toDerivation₂)))
-            (.vcomp
-              (Derivation₃.whiskerRight₃ cancel rest.toDerivation₂)
-              (.step (.vcomp_refl_left rest.toDerivation₂)))
-      · exact .unchanged
-  | .fwd _, .fwd _ => exact .unchanged
-  | .bwd _, .bwd _ => exact .unchanged
-
-/-! ## §5  Full Reduction (Iterated Cancellation)
-
-Repeatedly scan the chain and cancel adjacent pairs until no more
-cancellations are possible. The result is a reduced chain.
-
-We use a fuel-based approach (bounded by chain length) to ensure termination. -/
-
-/-- Perform one pass of reduction over the entire chain.
-    Returns the reduced chain and a `Derivation₃` witness. -/
-noncomputable def reducePass {p q : Path a b} (c : FlatChain p q) :
-    Σ (c' : FlatChain p q), Derivation₃ c.toDerivation₂ c'.toDerivation₂ :=
-  match c with
-  | .nil p => ⟨.nil p, .refl _⟩
-  | .cons ss (.nil _) => ⟨.cons ss (.nil _), .refl _⟩
-  | .cons ss₁ (.cons ss₂ rest) =>
-    match reduceHead ss₁ ss₂ rest with
-    | .reduced c' w' => ⟨c', w'⟩
-    | .unchanged =>
-        let ⟨c', w'⟩ := reducePass (.cons ss₂ rest)
-        ⟨.cons ss₁ c', Derivation₃.whiskerLeft₃ ss₁.toDerivation₂ w'⟩
-
-/-- Fully reduce a chain by iterating `reducePass` up to `fuel` times.
-    Returns the reduced chain and a `Derivation₃` witness. -/
-noncomputable def reduce (fuel : Nat) {p q : Path a b} (c : FlatChain p q) :
-    Σ (c' : FlatChain p q), Derivation₃ c.toDerivation₂ c'.toDerivation₂ :=
-  match fuel with
-  | 0 => ⟨c, .refl _⟩
-  | n + 1 =>
-    let ⟨c', w'⟩ := reducePass c
-    let ⟨c'', w''⟩ := reduce n c'
-    ⟨c'', .vcomp w' w''⟩
-
-/-! ## §6  Flattening: Derivation₂ → FlatChain
+/-! ## §4  Flattening: Derivation₂ → FlatChain
 
 Convert a `Derivation₂` tree into a right-associated `FlatChain`,
 producing a `Derivation₃` witness for the conversion. -/
@@ -490,16 +393,18 @@ noncomputable def flatten {p q : Path a b} (d : Derivation₂ p q) :
     let step2 := c₁.append_vcomp_witness c₂
     exact ⟨c₁.append c₂, .vcomp step1 step2⟩
 
-/-! ## §7  Normalization: Flatten then Reduce
+/-! ## §5  Normalization: Core Strict Normalization Then Flatten
 
-The full normalization pipeline: flatten to a chain, then reduce. -/
+The public normalization route uses the constructive core strict normalizer and
+then flattens the resulting strict derivation into an explicit chain. -/
 
-/-- Normalize a `Derivation₂` to a reduced `FlatChain` with `Derivation₃` witness. -/
+/-- Normalize a `Derivation₂` to a flat-chain strict representative with a
+    `Derivation₃` witness. -/
 noncomputable def normalize {p q : Path a b} (d : Derivation₂ p q) :
-    Σ (c : FlatChain p q), Derivation₃ d c.toDerivation₂ :=
-  let ⟨c, w⟩ := flatten d
-  let ⟨c', w'⟩ := reduce c.length c
-  ⟨c', .vcomp w w'⟩
+    Σ (c : FlatChain p q), Derivation₃ d c.toDerivation₂ := by
+  let d' := strict_normalize d
+  let ⟨c, w⟩ := flatten d'
+  exact ⟨c, .vcomp (to_strict_normal_form₃ d) w⟩
 
 /-- Canonical normal-form derivation extracted from `normalize`. -/
 noncomputable def canonical_normal_form {p q : Path a b} (d : Derivation₂ p q) :
@@ -552,10 +457,10 @@ the same endpoints that traverse "the same vertices in the same order"
 are connected by a sequence of `step_eq` applications.
 
 This free-groupoid uniqueness discussion explains the strongest structural
-statement one would need in order to remove the residual boundary in the core
-strict connector entirely.  The present implementation instead routes reduced
-chains through `connect_strict`, which isolates that remaining boundary in
-`OmegaGroupoid.strict_transport₃`. -/
+statement one would need in order to replace the core strict connector
+completely.  The present implementation instead routes reduced chains through
+`connect_strict`, i.e. through the same strict/loop-normalization API used by
+the public level-3 connector. -/
 
 /-- **Flat-chain uniqueness**: any two flat chains between the same endpoints
     are connected once viewed as strict derivations.
@@ -595,9 +500,8 @@ Wire the normalizer into contractibility₃. -/
     2. Observe that every flat chain denotes a strict normal-form derivation.
     3. Connect the resulting strict derivations with `OmegaGroupoid.connect_strict`.
 
-    The only remaining non-structural boundary is therefore the zero-fuel
-    safety branch already isolated inside the core strict connector
-    (`strict_transport₃`). -/
+    This packages the same core strict/loop-normalization route that underlies
+    the exported `OmegaGroupoid.contractibility₃`. -/
 noncomputable def contractibility₃_genuine {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ := by
   exact .vcomp (to_normalizeStrict₃ d₁) <|
@@ -613,7 +517,7 @@ noncomputable def loop_contraction_genuine {p : Path a b}
     (d : Derivation₂ p p) : Derivation₃ d (.refl p) :=
   contractibility₃_genuine d (.refl p)
 
-/-! ## §10  Alternative: Direct Structural Induction
+/-! ## §8  Alternative: Direct Structural Induction
 
 An alternative approach that avoids the chain representation entirely.
 Instead, we normalize `Derivation₂` by structural induction,
@@ -708,46 +612,7 @@ noncomputable def absorbUnits {p q : Path a b} (d : Derivation₂ p q) :
            .vcomp (Derivation₃.whiskerRight₃ w₁ d₂)
                   (Derivation₃.whiskerLeft₃ d₁' w₂)⟩
 
-/-- Cancel adjacent inverse pairs at the head of a right-associated derivation.
-    
-    Looks for patterns like `vcomp (step s) (vcomp (inv (step s')) rest)` and
-    cancels them using `step_eq` + `vcomp_inv_right`, then `vcomp_refl_left`. -/
-noncomputable def cancelHead {p q : Path a b} (d : Derivation₂ p q) :
-    Σ (d' : Derivation₂ p q), Derivation₃ d d' := by
-  match d with
-  | .vcomp (.step (p := p₀) s₁) d₂ =>
-      match d₂ with
-      | .vcomp (.inv (.step (p := r) s₂)) rest =>
-          by_cases h : r = p₀
-          · cases h
-            let cancel : Derivation₃ (.vcomp (.step s₁) (.inv (.step s₂))) (.refl p₀) :=
-              cancel_witness (SignedStep.fwd s₁) (SignedStep.bwd s₂) (Cancels.fwd_bwd s₁ s₂)
-            exact ⟨rest,
-              .vcomp
-                (.inv (.step (.vcomp_assoc (.step s₁) (.inv (.step s₂)) rest)))
-                (.vcomp
-                  (Derivation₃.whiskerRight₃ cancel rest)
-                  (.step (.vcomp_refl_left rest)))⟩
-          · exact ⟨.vcomp (.step s₁) (.vcomp (.inv (.step s₂)) rest), .refl _⟩
-      | d₂' => exact ⟨.vcomp (.step s₁) d₂', .refl _⟩
-  | .vcomp (.inv (.step (q := p₀) s₁)) d₂ =>
-      match d₂ with
-      | .vcomp (.step (q := r) s₂) rest =>
-          by_cases h : r = p₀
-          · cases h
-            let cancel : Derivation₃ (.vcomp (.inv (.step s₁)) (.step s₂)) (.refl p₀) :=
-              cancel_witness (SignedStep.bwd s₁) (SignedStep.fwd s₂) (Cancels.bwd_fwd s₁ s₂)
-            exact ⟨rest,
-              .vcomp
-                (.inv (.step (.vcomp_assoc (.inv (.step s₁)) (.step s₂) rest)))
-                (.vcomp
-                  (Derivation₃.whiskerRight₃ cancel rest)
-                  (.step (.vcomp_refl_left rest)))⟩
-          · exact ⟨.vcomp (.inv (.step s₁)) (.vcomp (.step s₂) rest), .refl _⟩
-      | d₂' => exact ⟨.vcomp (.inv (.step s₁)) d₂', .refl _⟩
-  | d' => exact ⟨d', .refl _⟩
-
-/-! ## §11  Summary and Remaining Gaps
+/-! ## §9  Summary and Remaining Gaps
 
 ### What was built
 
@@ -760,29 +625,22 @@ noncomputable def cancelHead {p q : Path a b} (d : Derivation₂ p q) :
 4. **Cancellation**:
    - `Cancels` — predicate for adjacent canceling pairs
    - `cancel_witness` — `Derivation₃` for cancellation via `step_eq` + `vcomp_inv_*`
-   - `reduceHead` — cancel head pair with witness
-   - `reducePass` — one pass of reduction
-   - `reduce` — iterated reduction
 5. **Flattening**: `flatten : Derivation₂ → FlatChain` with `Derivation₃` witness
-6. **Normalization**: `normalize = flatten ∘ reduce`
+6. **Normalization**: `normalize` first uses `strict_normalize`, then `flatten`
 7. **Direct normalization**: `pushInvToLeaves`, `rightAssociate`, `absorbUnits`
 8. **Main theorem**: `contractibility₃_genuine`
 
 ### Structural progress
 
-The flat-chain route now performs real local cancellation:
-
+The flat-chain route now keeps the cancellation data explicit without relying on
+any decision procedure for equality of intermediate raw `Path`s:
 - `cancel_witness` identifies opposite-sign adjacent generators using `step_eq`
   and `vcomp_inv_left/right`.
-- `reduceHead` removes cancellable head pairs structurally and rewires the
-  remaining tail with associativity plus whiskering.
-- `reducePass` now recurses into the tail when the head does not cancel, so a
-  single pass scans the whole chain rather than leaving non-head redexes in
-  place.
-- `cancelHead` mirrors the same local cancellation on direct right-associated
-  `Derivation₂` syntax.
+- `normalize` now delegates endpoint-sensitive global comparison to the
+  constructive core strict normalizer and only uses `flatten` to expose the
+  resulting strict derivation as a flat chain.
 
-### Remaining structural boundary
+### Structural route
 
 The normalizer no longer falls back to `OmegaGroupoid.contractibility₃` locally:
 
@@ -792,25 +650,20 @@ The normalizer no longer falls back to `OmegaGroupoid.contractibility₃` locall
 - `contractibility₃_genuine` now explicitly normalizes both sides and connects
   the resulting strict derivations.
 
-The remaining non-structural boundary is therefore exactly the one isolated in
-the core strict connector: `OmegaGroupoid.connect_strict` still has a final
-zero-fuel `strict_transport₃` branch for the hardest global strict-shape
-comparisons.
-
 ### MetaStep₃ constructors used
 
 | Constructor | Where used |
 |-------------|------------|
-| `vcomp_refl_left` | `append_vcomp_witness`, `reduceHead`, `absorbUnits` |
+| `vcomp_refl_left` | `append_vcomp_witness`, `absorbUnits` |
 | `vcomp_refl_right` | `flatten` (step case), `absorbUnits`, `pushInvToLeaves` |
-| `vcomp_assoc` | `append_vcomp_witness`, `reduceHead`, `rightAssociate` |
-| `vcomp_inv_left` | `cancel_witness`, `reduceHead`, `pushInvToLeaves` |
-| `vcomp_inv_right` | `cancel_witness`, `reduceHead` |
+| `vcomp_assoc` | `append_vcomp_witness`, `rightAssociate` |
+| `vcomp_inv_left` | `cancel_witness`, `pushInvToLeaves` |
+| `vcomp_inv_right` | `cancel_witness` |
 | `inv_inv` | `pushInvToLeaves` |
 | `inv_vcomp` | `pushInvToLeaves` |
-| `step_eq` | `cancel_witness`, `cancelHead` |
+| `step_eq` | `cancel_witness` |
 | `whisker_left₃` | `append_vcomp_witness`, `flatten`, various |
-| `whisker_right₃` | `reduceHead`, `flatten`, various |
+| `whisker_right₃` | `flatten`, various |
 -/
 
 end ComputationalPaths.Path.OmegaGroupoid.Normalizer
