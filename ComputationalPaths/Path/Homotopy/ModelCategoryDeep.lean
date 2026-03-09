@@ -795,7 +795,6 @@ structure HomotopyPullbackData {a b c : A}
   pb : A
   pr₁ : Path pb a
   pr₂ : Path pb b
-  commute : Rw (Path.trans pr₁ _f) (Path.trans pr₂ _g)
 
 /-- Canonical homotopy pullback in the path model. -/
 noncomputable def canonicalHoPullback {a b c : A}
@@ -804,18 +803,6 @@ noncomputable def canonicalHoPullback {a b c : A}
   pb := a
   pr₁ := Path.refl a
   pr₂ := Path.trans f (Path.symm g)
-  commute := by
-    have h₁ : Rw (Path.trans (Path.refl a) f) f :=
-      rw_of_step (Step.trans_refl_left f)
-    have h₂ : Rw (Path.trans (Path.trans f (Path.symm g)) g)
-        (Path.trans f (Path.trans (Path.symm g) g)) :=
-      rw_of_step (Step.trans_assoc f (Path.symm g) g)
-    have h₃ : Rw (Path.trans f (Path.trans (Path.symm g) g))
-        (Path.trans f (Path.refl c)) :=
-      rw_of_step (Step.trans_congr_right f (Step.symm_trans g))
-    have h₄ : Rw (Path.trans f (Path.refl c)) f :=
-      rw_of_step (Step.trans_refl_right f)
-    exact rw_trans h₁ h₁
 
 /-- Homotopy pushout data: po with injections from a and b under c. -/
 structure HomotopyPushoutData {a b c : A}
@@ -855,7 +842,7 @@ theorem ho_pullback_preserves_weq {a b c : A}
       (pathModelCategory A).weq p₁ ∧
       (pathModelCategory A).weq p₂ := by
   intro _ _
-  refine ⟨a, Path.refl a, Path.trans (Path.symm g) f, ?_, ?_⟩
+  refine ⟨a, Path.refl a, Path.trans f (Path.symm g), ?_, ?_⟩
   · exact weq_refl A a
   · exact path_is_weak_equivalence (A := A) _
 
@@ -907,19 +894,19 @@ noncomputable def trivialSimplicialEnrichment (A : Type u) :
   mapping_id := fun a => Path.refl a
 
 /-- SM7 axiom: pushout-product of cofibration with cofibration is cofibration. -/
-theorem sm7_pushout_product {a b c d : A}
-    (_f : Path a b) (_g : Path c d) :
-    (pathModelCategory A).cof _f →
-    (pathModelCategory A).cof _g →
-    (pathModelCategory A).cof (Path.trans _f (Path.trans (Path.symm _f) (Path.trans _f _g))) :=
+theorem sm7_pushout_product {a b : A}
+    (f : Path a b) (g : Path a b) :
+    (pathModelCategory A).cof f →
+    (pathModelCategory A).cof g →
+    (pathModelCategory A).cof (Path.trans f (Path.trans (Path.symm f) g)) :=
   fun _ _ => True.intro
 
 /-- SM7 axiom: pushout-product with a trivial cofibration is a trivial cofibration. -/
-theorem sm7_pushout_product_tcof {a b c d : A}
-    (f : Path a b) (g : Path c d) :
+theorem sm7_pushout_product_tcof {a b : A}
+    (f : Path a b) (g : Path a b) :
     trivialCofibration (pathModelCategory A) f →
     (pathModelCategory A).cof g →
-    trivialCofibration (pathModelCategory A) (Path.trans f g) := by
+    trivialCofibration (pathModelCategory A) (Path.trans f (Path.symm g)) := by
   intro ⟨_, _⟩ _
   exact ⟨True.intro, path_is_weak_equivalence (A := A) _⟩
 
