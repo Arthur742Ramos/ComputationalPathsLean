@@ -1062,6 +1062,30 @@ noncomputable def stepstar_append {p q r : Path a b} :
   | st, .refl _ => st
   | st, .tail st' t => StepStar.tail (stepstar_append st st') t
 
+@[simp] theorem stepstar_append_refl_left {p q : Path a b}
+    (st : StepStar p q) :
+    stepstar_append (StepStar.refl p) st = st := by
+  induction st with
+  | refl =>
+      rfl
+  | tail st s ih =>
+      simp [stepstar_append, ih]
+
+@[simp] theorem stepstar_append_refl_right {p q : Path a b}
+    (st : StepStar p q) :
+    stepstar_append st (StepStar.refl q) = st :=
+  rfl
+
+theorem stepstar_append_assoc {p q r s : Path a b}
+    (st₁ : StepStar p q) (st₂ : StepStar q r) (st₃ : StepStar r s) :
+    stepstar_append (stepstar_append st₁ st₂) st₃ =
+      stepstar_append st₁ (stepstar_append st₂ st₃) := by
+  induction st₃ with
+  | refl =>
+      rfl
+  | tail st₃ t ih =>
+      simp [stepstar_append, ih]
+
 /-- Convert a forward-only derivation into `StepStar` when possible. -/
 noncomputable def derivation_to_stepstar? {p q : Path a b} :
     Derivation₂ p q → Option (StepStar p q)
@@ -1123,6 +1147,748 @@ noncomputable def derivation_to_stepstar_sound₃ {p q : Path a b}
                 (.vcomp
                   (Derivation₃.whiskerRight₃ (ih₁ h₁) (derivation₂_of_stepstar st₂))
                   (Derivation₃.whiskerLeft₃ d₁ (ih₂ h₂)))
+
+/-- Forward `StepStar` extraction is stable under `normalize_vcomp`. -/
+theorem normalize_vcomp_stepstar_some
+    {p q r : Path a b}
+    {d₁ : Derivation₂ p q} {d₂ : Derivation₂ q r}
+    {st₁ : StepStar p q} {st₂ : StepStar q r}
+    (hst₁ : derivation_to_stepstar? d₁ = some st₁)
+    (hst₂ : derivation_to_stepstar? d₂ = some st₂) :
+    derivation_to_stepstar? (normalize_vcomp d₁ d₂) =
+      some (stepstar_append st₁ st₂) := by
+  induction d₁ generalizing r with
+  | refl p =>
+      cases hst₁
+      simpa [normalize_vcomp] using hst₂
+  | step s =>
+      cases hst₁
+      cases d₂ with
+      | refl q =>
+          cases hst₂
+          rfl
+      | step t =>
+          cases hst₂
+          rfl
+      | inv d =>
+          simp [derivation_to_stepstar?] at hst₂
+      | vcomp dL dR =>
+          cases hL : derivation_to_stepstar? dL with
+          | none =>
+              simp [derivation_to_stepstar?, hL] at hst₂
+          | some stL =>
+              cases hR : derivation_to_stepstar? dR with
+              | none =>
+                  simp [derivation_to_stepstar?, hL, hR] at hst₂
+              | some stR =>
+                  simp [derivation_to_stepstar?, normalize_vcomp, hL, hR] at hst₂ ⊢
+                  cases hst₂
+                  rfl
+  | inv d ih =>
+      simp [derivation_to_stepstar?] at hst₁
+  | vcomp dL dR ihL ihR =>
+      cases hL : derivation_to_stepstar? dL with
+      | none =>
+          simp [derivation_to_stepstar?, hL] at hst₁
+      | some stL =>
+          cases hR : derivation_to_stepstar? dR with
+          | none =>
+              simp [derivation_to_stepstar?, hL, hR] at hst₁
+          | some stR =>
+              simp [derivation_to_stepstar?, hL, hR] at hst₁
+              cases hst₁
+              cases d₂ with
+              | refl r =>
+                  cases hst₂
+                  simp [normalize_vcomp, derivation_to_stepstar?, hL, hR]
+              | step t =>
+                  cases hst₂
+                  have hmid :
+                      derivation_to_stepstar? (normalize_vcomp dR (.step t)) =
+                        some (stepstar_append stR (StepStar.single t)) :=
+                    ihR hR rfl
+                  have hleft :
+                      derivation_to_stepstar? (normalize_vcomp dL (normalize_vcomp dR (.step t))) =
+                        some (stepstar_append stL (stepstar_append stR (StepStar.single t))) :=
+                    ihL hL hmid
+                  simpa [normalize_vcomp, stepstar_append_assoc] using hleft
+              | inv d =>
+                  simp [derivation_to_stepstar?] at hst₂
+              | vcomp d₂L d₂R =>
+                  have hmid :
+                      derivation_to_stepstar? (normalize_vcomp dR (.vcomp d₂L d₂R)) =
+                        some (stepstar_append stR st₂) :=
+                    ihR hR hst₂
+                  have hleft :
+                      derivation_to_stepstar? (normalize_vcomp dL (normalize_vcomp dR (.vcomp d₂L d₂R))) =
+                        some (stepstar_append stL (stepstar_append stR st₂)) :=
+                    ihL hL hmid
+                  simpa [normalize_vcomp, stepstar_append_assoc] using hleft
+
+/-- Every `StepStar` admits a strict forward representative whose extractor
+returns the original chain. -/
+noncomputable def strict_of_stepstar {p q : Path a b} (st : StepStar p q) :
+    { d : Derivation₂ p q // StrictNormalForm d ∧ derivation_to_stepstar? d = some st } := by
+  refine ⟨normalizeDeriv (derivation₂_of_stepstar st), normalizeDeriv_is_strict _, ?_⟩
+  induction st with
+  | refl =>
+      simp [derivation₂_of_stepstar, normalizeDeriv, derivation_to_stepstar?]
+  | tail st s ih =>
+      simpa [derivation₂_of_stepstar, normalizeDeriv] using
+        (normalize_vcomp_stepstar_some
+          (d₁ := normalizeDeriv (derivation₂_of_stepstar st))
+          (d₂ := .step s)
+          (st₁ := st)
+          (st₂ := StepStar.single s)
+          ih
+          rfl)
+
+/-- Split a strict derivation at its first negative atomic fragment.
+
+The positive prefix is recorded as an explicit `StepStar`; the remaining tail is
+still strict and starts immediately with an inverse atomic step.  The witness is
+packaged only propositionally, because the `StepStar.single`/append
+representatives differ from the raw strict chain by unit and associativity
+3-cells. -/
+def FirstNegativeSplit {p q : Path a b} (d : Derivation₂ p q) : Prop :=
+  ∃ (r m : Path a b) (forwardPrefix : StepStar p r) (negStep : Step m r)
+    (tail : Derivation₂ m q),
+    StrictNormalForm tail ∧
+      Nonempty (Derivation₃ d
+        (.vcomp (derivation₂_of_stepstar forwardPrefix)
+          (.vcomp (.inv (.step negStep)) tail)))
+
+/-- Any strict derivation whose forward extractor fails admits a first-negative
+decomposition: a maximal forward prefix followed by an inverse head. -/
+theorem strict_split_first_negative
+    {p q : Path a b} {d : Derivation₂ p q}
+    (hd : StrictNormalForm d) (hnone : derivation_to_stepstar? d = none) :
+    FirstNegativeSplit d := by
+  induction hd with
+  | refl p =>
+      simp [derivation_to_stepstar?] at hnone
+  | single_step s =>
+      simp [derivation_to_stepstar?] at hnone
+  | @single_inv p q s =>
+      refine ⟨q, p, StepStar.refl q, s, .refl p, StrictNormalForm.refl p, ?_⟩
+      exact ⟨
+        .vcomp
+          (.inv (.step (.vcomp_refl_right (.inv (.step s)))))
+          (.inv (.step (.vcomp_refl_left (.vcomp (.inv (.step s)) (.refl p)))))⟩
+  | @cons_inv p q r s rest hrest ih =>
+      refine ⟨q, p, StepStar.refl q, s, rest, hrest, ?_⟩
+      exact ⟨.inv (.step (.vcomp_refl_left (.vcomp (.inv (.step s)) rest)))⟩
+  | @cons_step p q r s rest hrest ih =>
+      cases hstRest : derivation_to_stepstar? rest with
+      | some stRest =>
+          simp [derivation_to_stepstar?, hstRest] at hnone
+      | none =>
+          rcases ih hstRest with ⟨r', m', prefix', negStep', tail', htail', hsplit'⟩
+          let prefix'' : StepStar p r' :=
+            stepstar_append (StepStar.single s) prefix'
+          let tailExpr : Derivation₂ r' r :=
+            .vcomp (.inv (.step negStep')) tail'
+          have hprefix :
+              Derivation₃ (derivation₂_of_stepstar prefix'')
+                (.vcomp (.step s) (derivation₂_of_stepstar prefix')) := by
+            exact
+              .vcomp
+                (derivation₂_of_stepstar_append₃ (StepStar.single s) prefix')
+                (Derivation₃.whiskerRight₃
+                  (derivation₂_of_stepstar_single₃ s)
+                  (derivation₂_of_stepstar prefix'))
+          refine ⟨r', m', prefix'', negStep', tail', htail', ?_⟩
+          exact ⟨
+            .vcomp
+              (Derivation₃.whiskerLeft₃ (.step s) (Classical.choice hsplit'))
+              (.vcomp
+                (.inv (.step (.vcomp_assoc (.step s)
+                  (derivation₂_of_stepstar prefix') tailExpr)))
+                (Derivation₃.whiskerRight₃ (.inv hprefix) tailExpr))⟩
+
+/-- Quantitative version of `strict_split_first_negative`: the residual tail is
+strictly smaller in derivation depth than the original strict derivation. -/
+theorem strict_split_first_negative_depth
+    {p q : Path a b} {d : Derivation₂ p q}
+    (hd : StrictNormalForm d) (hnone : derivation_to_stepstar? d = none) :
+    ∃ (r m : Path a b) (forwardPrefix : StepStar p r) (negStep : Step m r)
+      (tail : Derivation₂ m q),
+      StrictNormalForm tail ∧ tail.depth < d.depth ∧
+        Nonempty (Derivation₃ d
+          (.vcomp (derivation₂_of_stepstar forwardPrefix)
+            (.vcomp (.inv (.step negStep)) tail))) := by
+  induction hd with
+  | refl p =>
+      simp [derivation_to_stepstar?] at hnone
+  | single_step s =>
+      simp [derivation_to_stepstar?] at hnone
+  | @single_inv p q s =>
+      refine ⟨q, p, StepStar.refl q, s, .refl p, StrictNormalForm.refl p, ?_, ?_⟩
+      · simp [Derivation₂.depth]
+      · exact ⟨
+          .vcomp
+            (.inv (.step (.vcomp_refl_right (.inv (.step s)))))
+            (.inv (.step (.vcomp_refl_left (.vcomp (.inv (.step s)) (.refl p)))))⟩
+  | @cons_inv p q r s rest hrest ih =>
+      refine ⟨q, p, StepStar.refl q, s, rest, hrest, ?_, ?_⟩
+      · simp [Derivation₂.depth]
+        omega
+      · exact ⟨.inv (.step (.vcomp_refl_left (.vcomp (.inv (.step s)) rest)))⟩
+  | @cons_step p q r s rest hrest ih =>
+      cases hstRest : derivation_to_stepstar? rest with
+      | some stRest =>
+          simp [derivation_to_stepstar?, hstRest] at hnone
+      | none =>
+          rcases ih hstRest with
+            ⟨r', m', prefix', negStep', tail', htail', htailDepth', hsplit'⟩
+          let prefix'' : StepStar p r' :=
+            stepstar_append (StepStar.single s) prefix'
+          let tailExpr : Derivation₂ r' r :=
+            .vcomp (.inv (.step negStep')) tail'
+          have hprefix :
+              Derivation₃ (derivation₂_of_stepstar prefix'')
+                (.vcomp (.step s) (derivation₂_of_stepstar prefix')) := by
+            exact
+              .vcomp
+                (derivation₂_of_stepstar_append₃ (StepStar.single s) prefix')
+                (Derivation₃.whiskerRight₃
+                  (derivation₂_of_stepstar_single₃ s)
+                  (derivation₂_of_stepstar prefix'))
+          refine ⟨r', m', prefix'', negStep', tail', htail', ?_, ?_⟩
+          ·
+            have hrestDepth :
+                rest.depth < (Derivation₂.vcomp (Derivation₂.step s) rest).depth := by
+              simp [Derivation₂.depth]
+              omega
+            exact Nat.lt_trans htailDepth' hrestDepth
+          · exact ⟨
+              .vcomp
+                (Derivation₃.whiskerLeft₃ (.step s) (Classical.choice hsplit'))
+                (.vcomp
+                  (.inv (.step (.vcomp_assoc (.step s)
+                    (derivation₂_of_stepstar prefix') tailExpr)))
+                  (Derivation₃.whiskerRight₃ (.inv hprefix) tailExpr))⟩
+
+/-- Type-level packaging of `strict_split_first_negative`. -/
+structure FirstNegativeData {p q : Path a b} (d : Derivation₂ p q) : Type (u + 3) where
+  r : Path a b
+  m : Path a b
+  forwardPrefix : StepStar p r
+  negStep : Step m r
+  tail : Derivation₂ m q
+  tail_strict : StrictNormalForm tail
+  split :
+    Derivation₃ d
+      (.vcomp (derivation₂_of_stepstar forwardPrefix)
+        (.vcomp (.inv (.step negStep)) tail))
+
+/-- Choose the first-negative split data from the Prop-level existence theorem. -/
+noncomputable def choose_first_negative_split
+    {p q : Path a b} {d : Derivation₂ p q}
+    (hd : StrictNormalForm d) (hnone : derivation_to_stepstar? d = none) :
+    FirstNegativeData (d := d) := by
+  classical
+  let hsplit := strict_split_first_negative_depth hd hnone
+  let r := Classical.choose hsplit
+  let hr := Classical.choose_spec hsplit
+  let m := Classical.choose hr
+  let hm := Classical.choose_spec hr
+  let forwardPrefix := Classical.choose hm
+  let hprefix := Classical.choose_spec hm
+  let negStep := Classical.choose hprefix
+  let hneg := Classical.choose_spec hprefix
+  let tail := Classical.choose hneg
+  let htail := Classical.choose_spec hneg
+  exact
+    { r := r
+      m := m
+      forwardPrefix := forwardPrefix
+      negStep := negStep
+      tail := tail
+      tail_strict := htail.1
+      split := Classical.choice htail.2.2 }
+
+/-- The residual tail returned by `choose_first_negative_split` is strictly
+smaller in derivation depth than the original strict derivation. -/
+theorem choose_first_negative_split_tail_depth_lt
+    {p q : Path a b} {d : Derivation₂ p q}
+    (hd : StrictNormalForm d) (hnone : derivation_to_stepstar? d = none) :
+    (choose_first_negative_split hd hnone).tail.depth < d.depth := by
+  classical
+  let hsplit := strict_split_first_negative_depth hd hnone
+  let r := Classical.choose hsplit
+  let hr := Classical.choose_spec hsplit
+  let m := Classical.choose hr
+  let hm := Classical.choose_spec hr
+  let forwardPrefix := Classical.choose hm
+  let hprefix := Classical.choose_spec hm
+  let negStep := Classical.choose hprefix
+  let hneg := Classical.choose_spec hprefix
+  let tail := Classical.choose hneg
+  let htail := Classical.choose_spec hneg
+  simpa [choose_first_negative_split, hsplit, r, hr, m, hm, forwardPrefix, hprefix,
+    negStep, hneg, tail] using htail.2.1
+
+/-- Split a strict derivation at its first positive atomic fragment.
+
+The initial negative prefix is recorded as an explicit forward `StepStar`
+whose inverse reconstructs the original negative segment.  The remaining tail
+is still strict and starts immediately with a positive atomic step. -/
+def FirstPositiveSplit {p q : Path a b} (d : Derivation₂ p q) : Prop :=
+  ∃ (r m : Path a b) (negativePrefix : StepStar r p) (posStep : Step r m)
+    (tail : Derivation₂ m q),
+    StrictNormalForm tail ∧
+      Nonempty (Derivation₃ d
+        (.vcomp (.inv (derivation₂_of_stepstar negativePrefix))
+          (.vcomp (.step posStep) tail)))
+
+/-- Any strict derivation whose inverse normal form is not forward-only admits
+    a first-positive decomposition: a maximal negative prefix followed by a
+    positive head. -/
+theorem strict_split_first_positive
+    {p q : Path a b} {d : Derivation₂ p q}
+    (hd : StrictNormalForm d)
+    (hnone : derivation_to_stepstar? (normalizeInv d) = none) :
+    FirstPositiveSplit d := by
+  induction hd with
+  | refl p =>
+      simp [normalizeInv, derivation_to_stepstar?] at hnone
+  | @single_step p q s =>
+      refine ⟨p, q, StepStar.refl p, s, .refl q, StrictNormalForm.refl q, ?_⟩
+      let mid : Derivation₂ p q := .vcomp (.step s) (.refl q)
+      have hmid : Derivation₃ (.step s) mid :=
+        .inv (.step (.vcomp_refl_right (.step s)))
+      have hleft : Derivation₃ (.vcomp (.inv (.refl p)) mid) mid :=
+        .vcomp
+          (Derivation₃.whiskerRight₃ (to_normal_form_inv₃ (.refl p)) mid)
+          (.step (.vcomp_refl_left mid))
+      exact ⟨.vcomp hmid (.inv hleft)⟩
+  | @single_inv p q s =>
+      simp [normalizeInv, normalizeDeriv, derivation_to_stepstar?] at hnone
+  | @cons_step p q r s rest hrest ih =>
+      refine ⟨p, q, StepStar.refl p, s, rest, hrest, ?_⟩
+      let mid : Derivation₂ p r := .vcomp (.step s) rest
+      have hleft : Derivation₃ (.vcomp (.inv (.refl p)) mid) mid :=
+        .vcomp
+          (Derivation₃.whiskerRight₃ (to_normal_form_inv₃ (.refl p)) mid)
+          (.step (.vcomp_refl_left mid))
+      exact ⟨.inv hleft⟩
+  | @cons_inv p q r s rest hrest ih =>
+      have hnoneRest : derivation_to_stepstar? (normalizeInv rest) = none := by
+        cases hstRest : derivation_to_stepstar? (normalizeInv rest) with
+        | some stRest =>
+            have hsome :
+                derivation_to_stepstar?
+                  (normalizeInv (.vcomp (.inv (.step s)) rest)) =
+                    some (stepstar_append stRest (StepStar.single s)) := by
+              simpa [normalizeInv] using
+              normalize_vcomp_stepstar_some
+                (d₁ := normalizeInv rest)
+                (d₂ := .step s)
+                (st₁ := stRest)
+                (st₂ := StepStar.single s)
+                hstRest
+                rfl
+            rw [hsome] at hnone
+            cases hnone
+        | none =>
+            simp
+      rcases ih hnoneRest with
+        ⟨r', m', negPrefix', posStep', tail', htail', hsplit'⟩
+      let negPrefix'' : StepStar r' q :=
+        stepstar_append negPrefix' (StepStar.single s)
+      have hprefixForward :
+          Derivation₃ (derivation₂_of_stepstar negPrefix'')
+            (.vcomp (derivation₂_of_stepstar negPrefix') (.step s)) := by
+        exact
+          .vcomp
+            (derivation₂_of_stepstar_append₃ negPrefix' (StepStar.single s))
+            (Derivation₃.whiskerLeft₃ (derivation₂_of_stepstar negPrefix')
+              (derivation₂_of_stepstar_single₃ s))
+      have hprefixInv :
+          Derivation₃ (.inv (derivation₂_of_stepstar negPrefix''))
+            (.vcomp (.inv (.step s)) (.inv (derivation₂_of_stepstar negPrefix'))) := by
+        exact
+          .vcomp
+            (inv_congr₃ hprefixForward)
+            (.step (.inv_vcomp (derivation₂_of_stepstar negPrefix') (.step s)))
+      refine ⟨r', m', negPrefix'', posStep', tail', htail', ?_⟩
+      exact ⟨
+        .vcomp
+          (Derivation₃.whiskerLeft₃ (.inv (.step s)) (Classical.choice hsplit'))
+          (.vcomp
+            (.inv (.step (.vcomp_assoc (.inv (.step s))
+              (.inv (derivation₂_of_stepstar negPrefix'))
+              (.vcomp (.step posStep') tail'))))
+            (Derivation₃.whiskerRight₃ (.inv hprefixInv)
+              (.vcomp (.step posStep') tail')))⟩
+
+/-- Quantitative version of `strict_split_first_positive`: the residual tail is
+strictly smaller in derivation depth than the original strict derivation. -/
+theorem strict_split_first_positive_depth
+    {p q : Path a b} {d : Derivation₂ p q}
+    (hd : StrictNormalForm d)
+    (hnone : derivation_to_stepstar? (normalizeInv d) = none) :
+    ∃ (r m : Path a b) (negativePrefix : StepStar r p) (posStep : Step r m)
+      (tail : Derivation₂ m q),
+      StrictNormalForm tail ∧ tail.depth < d.depth ∧
+        Nonempty (Derivation₃ d
+          (.vcomp (.inv (derivation₂_of_stepstar negativePrefix))
+            (.vcomp (.step posStep) tail))) := by
+  induction hd with
+  | refl p =>
+      simp [normalizeInv, derivation_to_stepstar?] at hnone
+  | @single_step p q s =>
+      refine ⟨p, q, StepStar.refl p, s, .refl q, StrictNormalForm.refl q, ?_, ?_⟩
+      · simp [Derivation₂.depth]
+      ·
+        let mid : Derivation₂ p q := .vcomp (.step s) (.refl q)
+        have hmid : Derivation₃ (.step s) mid :=
+          .inv (.step (.vcomp_refl_right (.step s)))
+        have hleft : Derivation₃ (.vcomp (.inv (.refl p)) mid) mid :=
+          .vcomp
+            (Derivation₃.whiskerRight₃ (to_normal_form_inv₃ (.refl p)) mid)
+            (.step (.vcomp_refl_left mid))
+        exact ⟨.vcomp hmid (.inv hleft)⟩
+  | @single_inv p q s =>
+      simp [normalizeInv, normalizeDeriv, derivation_to_stepstar?] at hnone
+  | @cons_step p q r s rest hrest ih =>
+      refine ⟨p, q, StepStar.refl p, s, rest, hrest, ?_, ?_⟩
+      · simp [Derivation₂.depth]
+        omega
+      ·
+        let mid : Derivation₂ p r := .vcomp (.step s) rest
+        have hleft : Derivation₃ (.vcomp (.inv (.refl p)) mid) mid :=
+          .vcomp
+            (Derivation₃.whiskerRight₃ (to_normal_form_inv₃ (.refl p)) mid)
+            (.step (.vcomp_refl_left mid))
+        exact ⟨.inv hleft⟩
+  | @cons_inv p q r s rest hrest ih =>
+      have hnoneRest : derivation_to_stepstar? (normalizeInv rest) = none := by
+        cases hstRest : derivation_to_stepstar? (normalizeInv rest) with
+        | some stRest =>
+            have hsome :
+                derivation_to_stepstar?
+                  (normalizeInv (.vcomp (.inv (.step s)) rest)) =
+                    some (stepstar_append stRest (StepStar.single s)) := by
+              simpa [normalizeInv] using
+                normalize_vcomp_stepstar_some
+                  (d₁ := normalizeInv rest)
+                  (d₂ := .step s)
+                  (st₁ := stRest)
+                  (st₂ := StepStar.single s)
+                  hstRest
+                  rfl
+            rw [hsome] at hnone
+            cases hnone
+        | none =>
+            simp
+      rcases ih hnoneRest with
+        ⟨r', m', negPrefix', posStep', tail', htail', htailDepth', hsplit'⟩
+      let negPrefix'' : StepStar r' q :=
+        stepstar_append negPrefix' (StepStar.single s)
+      have hprefixForward :
+          Derivation₃ (derivation₂_of_stepstar negPrefix'')
+            (.vcomp (derivation₂_of_stepstar negPrefix') (.step s)) := by
+        exact
+          .vcomp
+            (derivation₂_of_stepstar_append₃ negPrefix' (StepStar.single s))
+            (Derivation₃.whiskerLeft₃ (derivation₂_of_stepstar negPrefix')
+              (derivation₂_of_stepstar_single₃ s))
+      have hprefixInv :
+          Derivation₃ (.inv (derivation₂_of_stepstar negPrefix''))
+            (.vcomp (.inv (.step s)) (.inv (derivation₂_of_stepstar negPrefix'))) := by
+        exact
+          .vcomp
+            (inv_congr₃ hprefixForward)
+            (.step (.inv_vcomp (derivation₂_of_stepstar negPrefix') (.step s)))
+      refine ⟨r', m', negPrefix'', posStep', tail', htail', ?_, ?_⟩
+      ·
+        have hrestDepth :
+            rest.depth < (Derivation₂.vcomp (.inv (.step s)) rest).depth := by
+          simp [Derivation₂.depth]
+          omega
+        exact Nat.lt_trans htailDepth' hrestDepth
+      · exact ⟨
+          .vcomp
+            (Derivation₃.whiskerLeft₃ (.inv (.step s)) (Classical.choice hsplit'))
+            (.vcomp
+              (.inv (.step (.vcomp_assoc (.inv (.step s))
+                (.inv (derivation₂_of_stepstar negPrefix'))
+                (.vcomp (.step posStep') tail'))))
+              (Derivation₃.whiskerRight₃ (.inv hprefixInv)
+                (.vcomp (.step posStep') tail')))⟩
+
+/-- Type-level packaging of `strict_split_first_positive`. -/
+structure FirstPositiveData {p q : Path a b} (d : Derivation₂ p q) : Type (u + 3) where
+  r : Path a b
+  m : Path a b
+  negativePrefix : StepStar r p
+  posStep : Step r m
+  tail : Derivation₂ m q
+  tail_strict : StrictNormalForm tail
+  split :
+    Derivation₃ d
+      (.vcomp (.inv (derivation₂_of_stepstar negativePrefix))
+        (.vcomp (.step posStep) tail))
+
+/-- Choose the first-positive split data from the Prop-level existence theorem. -/
+noncomputable def choose_first_positive_split
+    {p q : Path a b} {d : Derivation₂ p q}
+    (hd : StrictNormalForm d)
+    (hnone : derivation_to_stepstar? (normalizeInv d) = none) :
+    FirstPositiveData (d := d) := by
+  classical
+  let hsplit := strict_split_first_positive_depth hd hnone
+  let r := Classical.choose hsplit
+  let hr := Classical.choose_spec hsplit
+  let m := Classical.choose hr
+  let hm := Classical.choose_spec hr
+  let negativePrefix := Classical.choose hm
+  let hprefix := Classical.choose_spec hm
+  let posStep := Classical.choose hprefix
+  let hpos := Classical.choose_spec hprefix
+  let tail := Classical.choose hpos
+  let htail := Classical.choose_spec hpos
+  exact
+    { r := r
+      m := m
+      negativePrefix := negativePrefix
+      posStep := posStep
+      tail := tail
+      tail_strict := htail.1
+      split := Classical.choice htail.2.2 }
+
+/-- The residual tail returned by `choose_first_positive_split` is strictly
+smaller in derivation depth than the original strict derivation. -/
+theorem choose_first_positive_split_tail_depth_lt
+    {p q : Path a b} {d : Derivation₂ p q}
+    (hd : StrictNormalForm d)
+    (hnone : derivation_to_stepstar? (normalizeInv d) = none) :
+    (choose_first_positive_split hd hnone).tail.depth < d.depth := by
+  classical
+  let hsplit := strict_split_first_positive_depth hd hnone
+  let r := Classical.choose hsplit
+  let hr := Classical.choose_spec hsplit
+  let m := Classical.choose hr
+  let hm := Classical.choose_spec hr
+  let negativePrefix := Classical.choose hm
+  let hprefix := Classical.choose_spec hm
+  let posStep := Classical.choose hprefix
+  let hpos := Classical.choose_spec hprefix
+  let tail := Classical.choose hpos
+  let htail := Classical.choose_spec hpos
+  simpa [choose_first_positive_split, hsplit, r, hr, m, hm, negativePrefix, hprefix,
+    posStep, hpos, tail] using htail.2.1
+
+/-- Split a positive-headed strict tail at its first negative fragment, keeping
+track of the full residual negative-headed loop and its depth decrease. -/
+theorem split_from_pos_head
+    {p x y : Path a b} (sPos : Step x y) {tail : Derivation₂ y p}
+    (htail : StrictNormalForm tail)
+    (hnone : derivation_to_stepstar? (.vcomp (.step sPos) tail) = none) :
+    ∃ (r m : Path a b) (posPrefix : StepStar x r) (negStep : Step m r)
+      (negTail : Derivation₂ m p),
+      StrictNormalForm negTail ∧
+        (Derivation₂.vcomp (.inv (.step negStep)) negTail).depth <
+          (Derivation₂.vcomp (.step sPos) tail).depth ∧
+        Nonempty (Derivation₃ (.vcomp (.step sPos) tail)
+          (.vcomp (derivation₂_of_stepstar posPrefix)
+            (.vcomp (.inv (.step negStep)) negTail))) := by
+  match tail, htail with
+  | .refl _, .refl _ =>
+      simp [derivation_to_stepstar?] at hnone
+  | .step t, .single_step _ =>
+      simp [derivation_to_stepstar?] at hnone
+  | .inv (.step t), .single_inv _ =>
+      let tailExpr : Derivation₂ y p := .vcomp (.inv (.step t)) (.refl p)
+      refine ⟨y, p, StepStar.single sPos, t, .refl p, StrictNormalForm.refl p, ?_, ?_⟩
+      · simp [Derivation₂.depth]
+      · exact ⟨
+          .vcomp
+            (.inv (.step (.vcomp_refl_right (.vcomp (.step sPos) (.inv (.step t))))))
+            (.vcomp
+              (.step (.vcomp_assoc (.step sPos) (.inv (.step t)) (.refl p)))
+              (Derivation₃.whiskerRight₃
+                (.inv (derivation₂_of_stepstar_single₃ sPos))
+                tailExpr))⟩
+  | .vcomp (.inv (.step t)) rest, .cons_inv _ hrest =>
+      refine ⟨y, _, StepStar.single sPos, t, rest, hrest, ?_, ?_⟩
+      · simp [Derivation₂.depth]
+        omega
+      · exact ⟨
+          Derivation₃.whiskerRight₃
+            (.inv (derivation₂_of_stepstar_single₃ sPos))
+            (.vcomp (.inv (.step t)) rest)⟩
+  | .vcomp (.step t) rest, .cons_step _ hrest =>
+      have hnoneTail : derivation_to_stepstar? (.vcomp (.step t) rest) = none := by
+        cases hstTail : derivation_to_stepstar? (.vcomp (.step t) rest) with
+        | some stTail =>
+            cases hstRest : derivation_to_stepstar? rest with
+            | some stRest =>
+                have hsome :
+                    derivation_to_stepstar? (.vcomp (.step sPos) (.vcomp (.step t) rest)) =
+                      some (stepstar_append (StepStar.single sPos)
+                        (stepstar_append (StepStar.single t) stRest)) := by
+                  simp [derivation_to_stepstar?, hstRest]
+                rw [hsome] at hnone
+                cases hnone
+            | none =>
+                simp [derivation_to_stepstar?, hstRest] at hstTail
+        | none =>
+            simp
+      rcases split_from_pos_head t hrest hnoneTail with
+        ⟨r', m', posPrefix', negStep', negTail', hnegTail', hdepth', hsplit'⟩
+      let posPrefix'' : StepStar x r' :=
+        stepstar_append (StepStar.single sPos) posPrefix'
+      let negExpr : Derivation₂ r' p :=
+        .vcomp (.inv (.step negStep')) negTail'
+      have hprefix :
+          Derivation₃ (derivation₂_of_stepstar posPrefix'')
+            (.vcomp (.step sPos) (derivation₂_of_stepstar posPrefix')) := by
+        exact
+          .vcomp
+            (derivation₂_of_stepstar_append₃ (StepStar.single sPos) posPrefix')
+            (Derivation₃.whiskerRight₃
+              (derivation₂_of_stepstar_single₃ sPos)
+              (derivation₂_of_stepstar posPrefix'))
+      refine ⟨r', m', posPrefix'', negStep', negTail', hnegTail', ?_, ?_⟩
+      ·
+        have htailDepth :
+            (Derivation₂.vcomp (.step t) rest).depth <
+              (Derivation₂.vcomp (.step sPos) (.vcomp (.step t) rest)).depth := by
+          simp [Derivation₂.depth]
+          omega
+        exact Nat.lt_trans hdepth' htailDepth
+      · exact ⟨
+          .vcomp
+            (Derivation₃.whiskerLeft₃ (.step sPos) (Classical.choice hsplit'))
+            (.vcomp
+              (.inv (.step (.vcomp_assoc (.step sPos)
+                (derivation₂_of_stepstar posPrefix') negExpr)))
+              (Derivation₃.whiskerRight₃ (.inv hprefix) negExpr))⟩
+termination_by tail.depth
+decreasing_by
+  simp_wf
+  simp [Derivation₂.depth]
+  omega
+
+/-- Split a negative-headed strict tail at its first positive fragment, keeping
+track of the full residual positive-headed loop and its depth decrease. -/
+theorem split_from_neg_head
+    {p x y : Path a b} (sNeg : Step y x) {tail : Derivation₂ y p}
+    (htail : StrictNormalForm tail)
+    (hnone : derivation_to_stepstar? (normalizeInv (.vcomp (.inv (.step sNeg)) tail)) = none) :
+    ∃ (r m : Path a b) (negPrefix : StepStar r x) (posStep : Step r m)
+      (posTail : Derivation₂ m p),
+      StrictNormalForm posTail ∧
+        (Derivation₂.vcomp (.step posStep) posTail).depth <
+          (Derivation₂.vcomp (.inv (.step sNeg)) tail).depth ∧
+        Nonempty (Derivation₃ (.vcomp (.inv (.step sNeg)) tail)
+          (.vcomp (.inv (derivation₂_of_stepstar negPrefix))
+            (.vcomp (.step posStep) posTail))) := by
+  match tail, htail with
+  | .refl _, .refl _ =>
+      simp [normalizeInv, normalizeDeriv, normalize_vcomp, derivation_to_stepstar?] at hnone
+  | .step t, .single_step _ =>
+      let tailExpr : Derivation₂ y p := .vcomp (.step t) (.refl p)
+      refine ⟨y, p, StepStar.single sNeg, t, .refl p, StrictNormalForm.refl p, ?_, ?_⟩
+      · simp [Derivation₂.depth]
+      · exact ⟨
+          .vcomp
+            (.inv (.step (.vcomp_refl_right (.vcomp (.inv (.step sNeg)) (.step t)))))
+            (.vcomp
+              (.step (.vcomp_assoc (.inv (.step sNeg)) (.step t) (.refl p)))
+              (Derivation₃.whiskerRight₃
+                (inv_congr₃ (.inv (derivation₂_of_stepstar_single₃ sNeg)))
+                tailExpr))⟩
+  | .inv (.step t), .single_inv _ =>
+      simp [normalizeInv, normalizeDeriv, normalize_vcomp, derivation_to_stepstar?] at hnone
+  | .vcomp (.step t) rest, .cons_step _ hrest =>
+      refine ⟨y, _, StepStar.single sNeg, t, rest, hrest, ?_, ?_⟩
+      · simp [Derivation₂.depth]
+        omega
+      · exact ⟨
+          Derivation₃.whiskerRight₃
+            (inv_congr₃ (.inv (derivation₂_of_stepstar_single₃ sNeg)))
+            (.vcomp (.step t) rest)⟩
+  | .vcomp (.inv (.step t)) rest, .cons_inv _ hrest =>
+      have hnoneTail :
+          derivation_to_stepstar? (normalizeInv (.vcomp (.inv (.step t)) rest)) = none := by
+        cases hstTail : derivation_to_stepstar? (normalizeInv (.vcomp (.inv (.step t)) rest)) with
+        | some stTail =>
+            have hsome :
+                derivation_to_stepstar?
+                  (normalizeInv (.vcomp (.inv (.step sNeg)) (.vcomp (.inv (.step t)) rest))) =
+                    some (stepstar_append stTail (StepStar.single sNeg)) := by
+              simpa [normalizeInv] using
+                normalize_vcomp_stepstar_some
+                  (d₁ := normalizeInv (.vcomp (.inv (.step t)) rest))
+                  (d₂ := .step sNeg)
+                  (st₁ := stTail)
+                  (st₂ := StepStar.single sNeg)
+                  hstTail
+                  rfl
+            rw [hsome] at hnone
+            cases hnone
+        | none =>
+            simp
+      rcases split_from_neg_head t hrest hnoneTail with
+        ⟨r', m', negPrefix', posStep', posTail', hposTail', hdepth', hsplit'⟩
+      let negPrefix'' : StepStar r' x :=
+        stepstar_append negPrefix' (StepStar.single sNeg)
+      have hprefixForward :
+          Derivation₃ (derivation₂_of_stepstar negPrefix'')
+            (.vcomp (derivation₂_of_stepstar negPrefix') (.step sNeg)) := by
+        exact
+          .vcomp
+            (derivation₂_of_stepstar_append₃ negPrefix' (StepStar.single sNeg))
+            (Derivation₃.whiskerLeft₃ (derivation₂_of_stepstar negPrefix')
+              (derivation₂_of_stepstar_single₃ sNeg))
+      have hprefixInv :
+          Derivation₃ (.inv (derivation₂_of_stepstar negPrefix''))
+            (.vcomp (.inv (.step sNeg)) (.inv (derivation₂_of_stepstar negPrefix'))) := by
+        exact
+          .vcomp
+            (inv_congr₃ hprefixForward)
+            (.step (.inv_vcomp (derivation₂_of_stepstar negPrefix') (.step sNeg)))
+      refine ⟨r', m', negPrefix'', posStep', posTail', hposTail', ?_, ?_⟩
+      ·
+        have htailDepth :
+            (Derivation₂.vcomp (.inv (.step t)) rest).depth <
+              (Derivation₂.vcomp (.inv (.step sNeg)) (.vcomp (.inv (.step t)) rest)).depth := by
+          simp [Derivation₂.depth]
+          omega
+        exact Nat.lt_trans hdepth' htailDepth
+      · exact ⟨
+          .vcomp
+            (Derivation₃.whiskerLeft₃ (.inv (.step sNeg)) (Classical.choice hsplit'))
+            (.vcomp
+              (.inv (.step (.vcomp_assoc (.inv (.step sNeg))
+                (.inv (derivation₂_of_stepstar negPrefix'))
+                (.vcomp (.step posStep') posTail'))))
+              (Derivation₃.whiskerRight₃ (.inv hprefixInv)
+                (.vcomp (.step posStep') posTail')))⟩
+termination_by tail.depth
+decreasing_by
+  simp_wf
+  simp [Derivation₂.depth]
+  omega
+
+/-- If inverse-normalization of a derivation is a forward `StepStar`, then the
+    original derivation is connected to the inverse of that `StepStar`. -/
+noncomputable def of_inv_normalized_stepstar {p q : Path a b}
+    {d : Derivation₂ p q} {st : StepStar q p}
+    (hst : derivation_to_stepstar? (normalizeInv d) = some st) :
+    Derivation₃ (.inv (derivation₂_of_stepstar st)) d := by
+  let hstep : Derivation₃ (derivation₂_of_stepstar st) (normalizeInv d) :=
+    derivation_to_stepstar_sound₃ (normalizeInv d) hst
+  let htoInv : Derivation₃ (derivation₂_of_stepstar st) (.inv d) :=
+    .vcomp hstep (.inv (to_normal_form_inv₃ d))
+  exact
+    .vcomp
+      (inv_congr₃ htoInv)
+      (.step (.inv_inv d))
 
 /-- Explicit singleton connector for strict one-step normal forms. -/
 noncomputable def connect_single_step_strict {p q : Path a b}
@@ -1210,6 +1976,39 @@ noncomputable def connect_cons_inv_forward_to_forward_strict {p q m : Path a b}
     (hmid : Derivation₃ (.vcomp (.step s₁) d₂) rest₁) :
     Derivation₃ (.vcomp (.inv (.step s₁)) rest₁) d₂ :=
   .inv (connect_forward_to_cons_inv_forward_strict (d₁ := d₂) s₁ hmid)
+
+/-- Resolve a local inverse/forward segment through an explicit step-level
+diamond, producing a purely forward chain. -/
+noncomputable def reduce_inv_step_forward_via_diamond
+    {q r m : Path a b}
+    (sNeg : Step r q) (sTail : Step r m)
+    (j : Step.JoinableData q m) :
+    Derivation₃
+      (.vcomp (.inv (.step sNeg))
+        (.vcomp (.step sTail) (derivation₂_of_stepstar j.right)))
+      (derivation₂_of_stepstar j.left) := by
+  let hdiamond :
+      Derivation₃
+        (.vcomp (.step sNeg) (derivation₂_of_stepstar j.left))
+        (.vcomp (.step sTail) (derivation₂_of_stepstar j.right)) :=
+    .step (meta_diamond_from_data sNeg sTail j)
+  exact .inv <|
+    connect_forward_to_cons_inv_forward_strict
+      (d₁ := derivation₂_of_stepstar j.left) sNeg hdiamond
+
+/-- Whiskered form of `reduce_inv_step_forward_via_diamond` for a positive head
+preceding the local `+ - +` segment. -/
+noncomputable def reduce_step_inv_step_forward_via_diamond
+    {p q r m : Path a b}
+    (sHead : Step p q) (sNeg : Step r q) (sTail : Step r m)
+    (j : Step.JoinableData q m) :
+    Derivation₃
+      (.vcomp (.step sHead)
+        (.vcomp (.inv (.step sNeg))
+          (.vcomp (.step sTail) (derivation₂_of_stepstar j.right))))
+      (.vcomp (.step sHead) (derivation₂_of_stepstar j.left)) :=
+  Derivation₃.whiskerLeft₃ (.step sHead)
+    (reduce_inv_step_forward_via_diamond sNeg sTail j)
 
 /-- Every raw path carries a definitional left-unit self-step.
 
@@ -1489,6 +2288,445 @@ noncomputable def forward_strict_loop_contract {p : Path a b}
             cases hd
           exact False.elim hfalse
 
+/-- Structural connector between strict forward-only chains. -/
+noncomputable def connect_forward_stepstar_strict {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q)
+    (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂)
+    {st₁ : StepStar p q} {st₂ : StepStar p q}
+    (hst₁ : derivation_to_stepstar? d₁ = some st₁)
+    (hst₂ : derivation_to_stepstar? d₂ = some st₂) :
+    Derivation₃ d₁ d₂ := by
+  cases d₁ with
+  | refl p =>
+      exact .inv (forward_strict_loop_contract d₂ h₂ (st := st₂) hst₂)
+  | step s₁ =>
+      exact connect_single_step_to_forward_stepstar_strict s₁ h₂ hst₂
+  | inv dInner =>
+      simp [derivation_to_stepstar?] at hst₁
+  | vcomp dL₁ dR₁ =>
+      cases dL₁ with
+      | refl r =>
+          have hfalse : False := by
+            cases h₁
+          exact False.elim hfalse
+      | step s₁ =>
+          cases hst₁R : derivation_to_stepstar? dR₁ with
+          | none =>
+              simp [derivation_to_stepstar?, hst₁R] at hst₁
+          | some st₁R =>
+              cases d₂ with
+              | refl _ =>
+                  exact forward_strict_loop_contract _ h₁ (st := st₁) hst₁
+              | step s₂ =>
+                  exact connect_cons_step_stepstar_to_step s₁ s₂
+                    (rest := dR₁) (st := st₁R) hst₁R
+              | inv dInner₂ =>
+                  simp [derivation_to_stepstar?] at hst₂
+              | vcomp dL₂ dR₂ =>
+                  cases dL₂ with
+                  | refl r =>
+                      have hfalse : False := by
+                        cases h₂
+                      exact False.elim hfalse
+                  | step s₂ =>
+                      cases hst₂R : derivation_to_stepstar? dR₂ with
+                      | none =>
+                          simp [derivation_to_stepstar?, hst₂R] at hst₂
+                      | some st₂R =>
+                          exact connect_cons_step_stepstar_strict s₁ s₂
+                            (rest₁ := dR₁) (rest₂ := dR₂)
+                            (st₁ := st₁R) (st₂ := st₂R)
+                            hst₁R hst₂R
+                  | inv dInner₂ =>
+                      simp [derivation_to_stepstar?] at hst₂
+                  | vcomp dLL₂ dLR₂ =>
+                      have hfalse : False := by
+                        cases h₂
+                      exact False.elim hfalse
+      | inv dInner =>
+          simp [derivation_to_stepstar?] at hst₁
+      | vcomp dLL₁ dLR₁ =>
+          have hfalse : False := by
+            cases h₁
+          exact False.elim hfalse
+
+/-- Compare two explicit forward `StepStar` chains by routing through their
+strict representatives. -/
+noncomputable def connect_stepstar_stepstar {p q : Path a b}
+    (st₁ st₂ : StepStar p q) :
+    Derivation₃ (derivation₂_of_stepstar st₁) (derivation₂_of_stepstar st₂) := by
+  let d₁ : Derivation₂ p q := (strict_of_stepstar st₁).1
+  let d₂ : Derivation₂ p q := (strict_of_stepstar st₂).1
+  have hd₁ : StrictNormalForm d₁ := (strict_of_stepstar st₁).2.1
+  have hd₂ : StrictNormalForm d₂ := (strict_of_stepstar st₂).2.1
+  have hst₁ : derivation_to_stepstar? d₁ = some st₁ := (strict_of_stepstar st₁).2.2
+  have hst₂ : derivation_to_stepstar? d₂ = some st₂ := (strict_of_stepstar st₂).2.2
+  have hleft : Derivation₃ (derivation₂_of_stepstar st₁) d₁ :=
+    derivation_to_stepstar_sound₃ d₁ hst₁
+  have hright : Derivation₃ (derivation₂_of_stepstar st₂) d₂ :=
+    derivation_to_stepstar_sound₃ d₂ hst₂
+  exact
+    .vcomp hleft
+      (.vcomp
+        (connect_forward_stepstar_strict d₁ d₂ hd₁ hd₂ hst₁ hst₂)
+        (.inv hright))
+
+/-- A forward `StepStar` followed by the inverse of another forward `StepStar`
+with the same endpoints contracts constructively. -/
+noncomputable def stepstar_inv_stepstar_loop_contract {p r : Path a b}
+    (st₁ st₂ : StepStar p r) :
+    Derivation₃
+      (.vcomp (derivation₂_of_stepstar st₁) (.inv (derivation₂_of_stepstar st₂)))
+      (.refl p) := by
+  let d₁ : Derivation₂ p r := (strict_of_stepstar st₁).1
+  let d₂ : Derivation₂ p r := (strict_of_stepstar st₂).1
+  have hd₁ : StrictNormalForm d₁ := (strict_of_stepstar st₁).2.1
+  have hd₂ : StrictNormalForm d₂ := (strict_of_stepstar st₂).2.1
+  have hst₁ : derivation_to_stepstar? d₁ = some st₁ := (strict_of_stepstar st₁).2.2
+  have hst₂ : derivation_to_stepstar? d₂ = some st₂ := (strict_of_stepstar st₂).2.2
+  have hleft : Derivation₃ (derivation₂_of_stepstar st₁) d₁ :=
+    derivation_to_stepstar_sound₃ d₁ hst₁
+  have hright : Derivation₃ (derivation₂_of_stepstar st₂) d₂ :=
+    derivation_to_stepstar_sound₃ d₂ hst₂
+  have hconn : Derivation₃ d₁ d₂ :=
+    connect_forward_stepstar_strict d₁ d₂ hd₁ hd₂ hst₁ hst₂
+  exact
+    .vcomp
+      (Derivation₃.whiskerRight₃ hleft (.inv (derivation₂_of_stepstar st₂)))
+      (.vcomp
+        (Derivation₃.whiskerLeft₃ d₁ (inv_congr₃ hright))
+        (.vcomp
+          (Derivation₃.whiskerRight₃ hconn (.inv d₂))
+          (.step (.vcomp_inv_right d₂))))
+
+/-- The symmetric inverse/forward `StepStar` block also contracts
+constructively. -/
+noncomputable def inv_stepstar_stepstar_loop_contract {p r : Path a b}
+    (st₁ st₂ : StepStar r p) :
+    Derivation₃
+      (.vcomp (.inv (derivation₂_of_stepstar st₁)) (derivation₂_of_stepstar st₂))
+      (.refl p) := by
+  let d₁ : Derivation₂ r p := (strict_of_stepstar st₁).1
+  let d₂ : Derivation₂ r p := (strict_of_stepstar st₂).1
+  have hd₁ : StrictNormalForm d₁ := (strict_of_stepstar st₁).2.1
+  have hd₂ : StrictNormalForm d₂ := (strict_of_stepstar st₂).2.1
+  have hst₁ : derivation_to_stepstar? d₁ = some st₁ := (strict_of_stepstar st₁).2.2
+  have hst₂ : derivation_to_stepstar? d₂ = some st₂ := (strict_of_stepstar st₂).2.2
+  have hleft : Derivation₃ (derivation₂_of_stepstar st₁) d₁ :=
+    derivation_to_stepstar_sound₃ d₁ hst₁
+  have hright : Derivation₃ (derivation₂_of_stepstar st₂) d₂ :=
+    derivation_to_stepstar_sound₃ d₂ hst₂
+  have hconn : Derivation₃ d₂ d₁ :=
+    .inv (connect_forward_stepstar_strict d₁ d₂ hd₁ hd₂ hst₁ hst₂)
+  exact
+    .vcomp
+      (Derivation₃.whiskerRight₃ (inv_congr₃ hleft) (derivation₂_of_stepstar st₂))
+      (.vcomp
+        (Derivation₃.whiskerLeft₃ (.inv d₁) hright)
+        (.vcomp
+        (Derivation₃.whiskerLeft₃ (.inv d₁) hconn)
+        (.step (.vcomp_inv_left d₁))))
+
+/-- Swap an adjacent inverse/forward atomic pair through an explicit local
+diamond, turning it into a forward `StepStar` followed by an inverse
+`StepStar`. -/
+noncomputable def swap_inv_step_forward {q r m : Path a b}
+    (sNeg : Step r q) (sPos : Step r m)
+    (j : Step.JoinableData q m) :
+    Derivation₃
+      (.vcomp (.inv (.step sNeg)) (.step sPos))
+      (.vcomp (derivation₂_of_stepstar j.left)
+        (.inv (derivation₂_of_stepstar j.right))) := by
+  let hdiamond :
+      Derivation₃
+        (.vcomp (.step sNeg) (derivation₂_of_stepstar j.left))
+        (.vcomp (.step sPos) (derivation₂_of_stepstar j.right)) :=
+    .step (meta_diamond_from_data sNeg sPos j)
+  let hto :
+      Derivation₃
+        (derivation₂_of_stepstar j.left)
+        (.vcomp (.inv (.step sNeg))
+          (.vcomp (.step sPos) (derivation₂_of_stepstar j.right))) :=
+    connect_forward_to_cons_inv_forward_strict
+      (d₁ := derivation₂_of_stepstar j.left) sNeg hdiamond
+  let hwhisk :
+      Derivation₃
+        (.vcomp (derivation₂_of_stepstar j.left)
+          (.inv (derivation₂_of_stepstar j.right)))
+        (.vcomp
+          (.vcomp (.inv (.step sNeg))
+            (.vcomp (.step sPos) (derivation₂_of_stepstar j.right)))
+          (.inv (derivation₂_of_stepstar j.right))) :=
+    Derivation₃.whiskerRight₃ hto (.inv (derivation₂_of_stepstar j.right))
+  let hassoc₁ :
+      Derivation₃
+        (.vcomp
+          (.vcomp (.inv (.step sNeg))
+            (.vcomp (.step sPos) (derivation₂_of_stepstar j.right)))
+          (.inv (derivation₂_of_stepstar j.right)))
+        (.vcomp (.inv (.step sNeg))
+          (.vcomp
+            (.vcomp (.step sPos) (derivation₂_of_stepstar j.right))
+            (.inv (derivation₂_of_stepstar j.right)))) :=
+    .step (.vcomp_assoc
+      (.inv (.step sNeg))
+      (.vcomp (.step sPos) (derivation₂_of_stepstar j.right))
+      (.inv (derivation₂_of_stepstar j.right)))
+  let hassoc₂ :
+      Derivation₃
+        (.vcomp (.inv (.step sNeg))
+          (.vcomp
+            (.vcomp (.step sPos) (derivation₂_of_stepstar j.right))
+            (.inv (derivation₂_of_stepstar j.right))))
+        (.vcomp (.inv (.step sNeg))
+          (.vcomp (.step sPos)
+            (.vcomp (derivation₂_of_stepstar j.right)
+              (.inv (derivation₂_of_stepstar j.right))))) :=
+    Derivation₃.whiskerLeft₃ (.inv (.step sNeg))
+      (.step (.vcomp_assoc
+        (.step sPos)
+        (derivation₂_of_stepstar j.right)
+        (.inv (derivation₂_of_stepstar j.right))))
+  let hcancel :
+      Derivation₃
+        (.vcomp (.inv (.step sNeg))
+          (.vcomp (.step sPos)
+            (.vcomp (derivation₂_of_stepstar j.right)
+              (.inv (derivation₂_of_stepstar j.right)))))
+        (.vcomp (.inv (.step sNeg))
+          (.vcomp (.step sPos) (.refl m))) :=
+    Derivation₃.whiskerLeft₃ (.inv (.step sNeg))
+      (Derivation₃.whiskerLeft₃ (.step sPos)
+        (stepstar_inv_stepstar_loop_contract j.right j.right))
+  let hrefl :
+      Derivation₃
+        (.vcomp (.inv (.step sNeg))
+          (.vcomp (.step sPos) (.refl m)))
+        (.vcomp (.inv (.step sNeg)) (.step sPos)) :=
+    Derivation₃.whiskerLeft₃ (.inv (.step sNeg))
+      (.step (.vcomp_refl_right (.step sPos)))
+  exact
+    .inv <|
+      .vcomp hwhisk
+        (.vcomp hassoc₁
+          (.vcomp hassoc₂
+            (.vcomp hcancel hrefl)))
+
+/-- Contextual version of `swap_inv_step_forward` with an arbitrary right tail. -/
+noncomputable def swap_inv_step_forward_tail {q r m s : Path a b}
+    (sNeg : Step r q) (sPos : Step r m)
+    (j : Step.JoinableData q m)
+    (tail : Derivation₂ m s) :
+    Derivation₃
+      (.vcomp (.inv (.step sNeg)) (.vcomp (.step sPos) tail))
+      (.vcomp (derivation₂_of_stepstar j.left)
+        (.vcomp (.inv (derivation₂_of_stepstar j.right)) tail)) := by
+  exact
+    .vcomp
+      (.inv (.step (.vcomp_assoc (.inv (.step sNeg)) (.step sPos) tail)))
+      (.vcomp
+        (Derivation₃.whiskerRight₃ (swap_inv_step_forward sNeg sPos j) tail)
+        (.step (.vcomp_assoc
+          (derivation₂_of_stepstar j.left)
+          (.inv (derivation₂_of_stepstar j.right))
+          tail)))
+
+/-- Whiskered form of `swap_inv_step_forward_tail` for a forward prefix. -/
+noncomputable def swap_step_inv_step_forward_tail {p q r m s : Path a b}
+    (sHead : Step p q) (sNeg : Step r q) (sPos : Step r m)
+    (j : Step.JoinableData q m)
+    (tail : Derivation₂ m s) :
+    Derivation₃
+      (.vcomp (.step sHead)
+        (.vcomp (.inv (.step sNeg)) (.vcomp (.step sPos) tail)))
+      (.vcomp (.step sHead)
+        (.vcomp (derivation₂_of_stepstar j.left)
+          (.vcomp (.inv (derivation₂_of_stepstar j.right)) tail))) :=
+  Derivation₃.whiskerLeft₃ (.step sHead)
+    (swap_inv_step_forward_tail sNeg sPos j tail)
+
+/-- Symmetry for explicit local-confluence payloads. -/
+noncomputable def joinData_symm {p q : Path a b}
+    (j : Step.JoinableData p q) : Step.JoinableData q p :=
+  Step.Joinable.toData (Step.Joinable.symm (Step.Joinable.ofData j))
+
+/-- Expose the leftmost forward step of a `StepStar` as the rightmost inverse
+step of its inverse derivation. -/
+noncomputable def inv_stepstar_cons_expose
+    {x q r : Path a b}
+    (sNeg : Step x q) (negSuffix : StepStar q r) :
+    Derivation₃
+      (.inv (derivation₂_of_stepstar
+        (stepstar_append (StepStar.single sNeg) negSuffix)))
+      (.vcomp (.inv (derivation₂_of_stepstar negSuffix))
+        (.inv (.step sNeg))) := by
+  have happ :
+      Derivation₃
+        (derivation₂_of_stepstar
+          (stepstar_append (StepStar.single sNeg) negSuffix))
+        (.vcomp (derivation₂_of_stepstar (StepStar.single sNeg))
+          (derivation₂_of_stepstar negSuffix)) :=
+    derivation₂_of_stepstar_append₃ (StepStar.single sNeg) negSuffix
+  have hsingle :
+      Derivation₃
+        (derivation₂_of_stepstar (StepStar.single sNeg))
+        (.step sNeg) :=
+    derivation₂_of_stepstar_single₃ sNeg
+  exact
+    .vcomp
+      (inv_congr₃ happ)
+      (.vcomp
+        (.step (.inv_vcomp
+          (derivation₂_of_stepstar (StepStar.single sNeg))
+          (derivation₂_of_stepstar negSuffix)))
+        (Derivation₃.whiskerLeft₃ (.inv (derivation₂_of_stepstar negSuffix))
+          (inv_congr₃ hsingle)))
+
+/-- Expose the leftmost forward step of a positive prefix. -/
+noncomputable def stepstar_cons_expose
+    {x y r : Path a b}
+    (sPos : Step x y) (posTail : StepStar y r) :
+    Derivation₃
+      (derivation₂_of_stepstar
+        (stepstar_append (StepStar.single sPos) posTail))
+      (.vcomp (.step sPos) (derivation₂_of_stepstar posTail)) := by
+  exact
+    .vcomp
+      (derivation₂_of_stepstar_append₃ (StepStar.single sPos) posTail)
+      (Derivation₃.whiskerRight₃
+        (derivation₂_of_stepstar_single₃ sPos)
+        (derivation₂_of_stepstar posTail))
+
+/-- Commute one exposed inverse-step head past one exposed positive-step head,
+preserving the remaining inverse/positive tails. -/
+noncomputable def blocked_commute_one
+    {x q r y z : Path a b}
+    (sNeg : Step x q) (negSuffix : StepStar q r)
+    (sPos : Step x y) (posTail : StepStar y z)
+    (j : Step.JoinableData q y) :
+    Derivation₃
+      (.vcomp
+        (.inv (derivation₂_of_stepstar
+          (stepstar_append (StepStar.single sNeg) negSuffix)))
+        (derivation₂_of_stepstar
+          (stepstar_append (StepStar.single sPos) posTail)))
+      (.vcomp
+        (.inv (derivation₂_of_stepstar negSuffix))
+        (.vcomp
+          (derivation₂_of_stepstar j.left)
+          (.vcomp
+            (.inv (derivation₂_of_stepstar j.right))
+            (derivation₂_of_stepstar posTail)))) := by
+  have hexposeNeg :
+      Derivation₃
+        (.inv (derivation₂_of_stepstar
+          (stepstar_append (StepStar.single sNeg) negSuffix)))
+        (.vcomp (.inv (derivation₂_of_stepstar negSuffix))
+          (.inv (.step sNeg))) :=
+    inv_stepstar_cons_expose sNeg negSuffix
+  have hexposePos :
+      Derivation₃
+        (derivation₂_of_stepstar
+          (stepstar_append (StepStar.single sPos) posTail))
+        (.vcomp (.step sPos) (derivation₂_of_stepstar posTail)) :=
+    stepstar_cons_expose sPos posTail
+  have h₁ :
+      Derivation₃
+        (.vcomp
+          (.inv (derivation₂_of_stepstar
+            (stepstar_append (StepStar.single sNeg) negSuffix)))
+          (derivation₂_of_stepstar
+            (stepstar_append (StepStar.single sPos) posTail)))
+        (.vcomp
+          (.vcomp (.inv (derivation₂_of_stepstar negSuffix))
+            (.inv (.step sNeg)))
+          (derivation₂_of_stepstar
+            (stepstar_append (StepStar.single sPos) posTail))) :=
+    Derivation₃.whiskerRight₃ hexposeNeg
+      (derivation₂_of_stepstar
+        (stepstar_append (StepStar.single sPos) posTail))
+  have h₂ :
+      Derivation₃
+        (.vcomp
+          (.vcomp (.inv (derivation₂_of_stepstar negSuffix))
+            (.inv (.step sNeg)))
+          (derivation₂_of_stepstar
+            (stepstar_append (StepStar.single sPos) posTail)))
+        (.vcomp
+          (.vcomp (.inv (derivation₂_of_stepstar negSuffix))
+            (.inv (.step sNeg)))
+          (.vcomp (.step sPos) (derivation₂_of_stepstar posTail))) :=
+    Derivation₃.whiskerLeft₃
+      (.vcomp (.inv (derivation₂_of_stepstar negSuffix))
+        (.inv (.step sNeg)))
+      hexposePos
+  have h₃ :
+      Derivation₃
+        (.vcomp
+          (.vcomp (.inv (derivation₂_of_stepstar negSuffix))
+            (.inv (.step sNeg)))
+          (.vcomp (.step sPos) (derivation₂_of_stepstar posTail)))
+        (.vcomp
+          (.inv (derivation₂_of_stepstar negSuffix))
+          (.vcomp (.inv (.step sNeg))
+            (.vcomp (.step sPos) (derivation₂_of_stepstar posTail)))) :=
+    .step (.vcomp_assoc
+      (.inv (derivation₂_of_stepstar negSuffix))
+      (.inv (.step sNeg))
+      (.vcomp (.step sPos) (derivation₂_of_stepstar posTail)))
+  have h₄ :
+      Derivation₃
+        (.vcomp
+          (.inv (derivation₂_of_stepstar negSuffix))
+          (.vcomp (.inv (.step sNeg))
+            (.vcomp (.step sPos) (derivation₂_of_stepstar posTail))))
+        (.vcomp
+          (.inv (derivation₂_of_stepstar negSuffix))
+          (.vcomp
+            (derivation₂_of_stepstar j.left)
+            (.vcomp
+              (.inv (derivation₂_of_stepstar j.right))
+              (derivation₂_of_stepstar posTail)))) :=
+    Derivation₃.whiskerLeft₃
+      (.inv (derivation₂_of_stepstar negSuffix))
+      (swap_inv_step_forward_tail sNeg sPos j
+        (derivation₂_of_stepstar posTail))
+  exact
+    .vcomp h₁ (.vcomp h₂ (.vcomp h₃ h₄))
+
+/-- Cancel a middle `StepStar · StepStar⁻¹` block while preserving a right
+context. -/
+noncomputable def stepstar_inv_stepstar_cancel_in_context
+    {p r s : Path a b}
+    (st : StepStar p r) (tail : Derivation₂ p s) :
+    Derivation₃
+      (.vcomp (derivation₂_of_stepstar st)
+        (.vcomp (.inv (derivation₂_of_stepstar st)) tail))
+      tail :=
+  .vcomp
+    (.inv (.step (.vcomp_assoc (derivation₂_of_stepstar st)
+      (.inv (derivation₂_of_stepstar st)) tail)))
+    (.vcomp
+      (Derivation₃.whiskerRight₃
+        (stepstar_inv_stepstar_loop_contract st st) tail)
+      (.step (.vcomp_refl_left tail)))
+
+/-- Symmetric contextual cancellation for `StepStar⁻¹ · StepStar`. -/
+noncomputable def inv_stepstar_stepstar_cancel_in_context
+    {p r s : Path a b}
+    (st : StepStar r p) (tail : Derivation₂ p s) :
+    Derivation₃
+      (.vcomp (.inv (derivation₂_of_stepstar st))
+        (.vcomp (derivation₂_of_stepstar st) tail))
+      tail :=
+  .vcomp
+    (.inv (.step (.vcomp_assoc (.inv (derivation₂_of_stepstar st))
+      (derivation₂_of_stepstar st) tail)))
+    (.vcomp
+      (Derivation₃.whiskerRight₃
+        (inv_stepstar_stepstar_loop_contract st st) tail)
+      (.step (.vcomp_refl_left tail)))
+
 /-- A strict loop with negative head and forward tail contracts constructively. -/
 noncomputable def inv_forward_stepstar_loop_contract {p q : Path a b}
     (s : Step q p) {rest : Derivation₂ q p} (hrest : StrictNormalForm rest)
@@ -1723,13 +2961,351 @@ noncomputable def connect_strict_structural {p q : Path a b}
     Derivation₃ d₁ d₂ :=
   connect_strict_structural_go (d₁.depth + d₂.depth + 1) d₁ d₂ h₁ h₂
 
-/-- Connector between normalized representatives. -/
-noncomputable def connect_normalized {p q : Path a b}
-    (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ :=
-  .vcomp (to_normal_form₃ n₁)
-    (.vcomp (connect_strict_structural (normalizeDeriv n₁) (normalizeDeriv n₂)
-        (normalize_is_strict n₁) (normalize_is_strict n₂))
-      (.inv (to_normal_form₃ n₂)))
+/-- Contract a loop whose positive prefix is a forward `StepStar`, followed by
+an inverse atomic step returning to the basepoint. -/
+noncomputable def stepstar_inv_head_loop_contract {p r : Path a b}
+    (st : StepStar p r) (s : Step p r)
+    {tail : Derivation₂ p p}
+    (htail : Derivation₃ tail (.refl p)) :
+    Derivation₃
+      (.vcomp (derivation₂_of_stepstar st) (.vcomp (.inv (.step s)) tail))
+      (.refl p) := by
+  let d : Derivation₂ p r := (strict_of_stepstar st).1
+  have hd : StrictNormalForm d := (strict_of_stepstar st).2.1
+  have hst : derivation_to_stepstar? d = some st := (strict_of_stepstar st).2.2
+  have hprefix : Derivation₃ (derivation₂_of_stepstar st) d :=
+    derivation_to_stepstar_sound₃ d hst
+  have hhead : Derivation₃ d (.step s) :=
+    .inv (connect_single_step_to_forward_stepstar_strict s hd hst)
+  exact
+    .vcomp
+      (Derivation₃.whiskerRight₃ hprefix (.vcomp (.inv (.step s)) tail))
+      (.vcomp
+      (Derivation₃.whiskerRight₃ hhead (.vcomp (.inv (.step s)) tail))
+        (step_inv_head_loop_contract s s htail))
+
+/-- Any raw forward `StepStar` loop ending in one atomic step contracts
+    constructively. -/
+noncomputable def raw_forward_stepstar_loop_contract {p q : Path a b}
+    (st : StepStar p q) (s : Step q p) :
+    Derivation₃ (.vcomp (derivation₂_of_stepstar st) (.step s)) (.refl p) := by
+  let stAll : StepStar p p := stepstar_append st (StepStar.single s)
+  let d : Derivation₂ p p := (strict_of_stepstar stAll).1
+  have hd : StrictNormalForm d := (strict_of_stepstar stAll).2.1
+  have hst : derivation_to_stepstar? d = some stAll := (strict_of_stepstar stAll).2.2
+  have hprefix : Derivation₃ (derivation₂_of_stepstar stAll) d :=
+    derivation_to_stepstar_sound₃ d hst
+  have hcontract : Derivation₃ d (.refl p) :=
+    forward_strict_loop_contract d hd (st := stAll) hst
+  simpa [stAll, stepstar_append] using .vcomp hprefix hcontract
+
+/-- A loop of the form `inv(step) · inv(stepstar)` contracts by viewing it as
+    the inverse of a forward `StepStar` loop. -/
+noncomputable def inv_step_inv_stepstar_contract {p q : Path a b}
+    (s : Step q p) (st : StepStar p q) :
+    Derivation₃
+      (.vcomp (.inv (.step s)) (.inv (derivation₂_of_stepstar st)))
+      (.refl p) := by
+  let hforward : Derivation₃
+      (.vcomp (derivation₂_of_stepstar st) (.step s))
+      (.refl p) :=
+    raw_forward_stepstar_loop_contract st s
+  let hInv :
+      Derivation₃
+        (.inv (.vcomp (derivation₂_of_stepstar st) (.step s)))
+        (.refl p) :=
+    .vcomp
+      (inv_congr₃ hforward)
+      (to_normal_form_inv₃ (.refl p))
+  exact
+    .vcomp
+      (.inv (.step (.inv_vcomp (derivation₂_of_stepstar st) (.step s))))
+      hInv
+
+/-- Contract a loop whose first fragment is `inv(step)` and whose tail starts
+    with the inverse of a forward `StepStar` matching that head. -/
+noncomputable def inv_step_inv_stepstar_head_loop_contract {p q : Path a b}
+    (s : Step q p) (st : StepStar p q)
+    {tail : Derivation₂ p p}
+    (htail : Derivation₃ tail (.refl p)) :
+    Derivation₃
+      (.vcomp (.inv (.step s))
+        (.vcomp (.inv (derivation₂_of_stepstar st)) tail))
+      (.refl p) :=
+  .vcomp
+    (.inv (.step (.vcomp_assoc (.inv (.step s))
+      (.inv (derivation₂_of_stepstar st)) tail)))
+    (.vcomp
+      (Derivation₃.whiskerRight₃ (inv_step_inv_stepstar_contract s st) tail)
+      (.vcomp
+        (.step (.vcomp_refl_left tail))
+        htail))
+
+/-- Contract a loop whose initial forward block matches the inverse of a whole
+forward `StepStar` block before the remaining tail. -/
+noncomputable def stepstar_inv_stepstar_head_loop_contract {p r : Path a b}
+    (st₁ st₂ : StepStar p r)
+    {tail : Derivation₂ p p}
+    (htail : Derivation₃ tail (.refl p)) :
+    Derivation₃
+      (.vcomp (derivation₂_of_stepstar st₁)
+        (.vcomp (.inv (derivation₂_of_stepstar st₂)) tail))
+      (.refl p) :=
+  .vcomp
+    (.inv (.step (.vcomp_assoc (derivation₂_of_stepstar st₁)
+      (.inv (derivation₂_of_stepstar st₂)) tail)))
+    (.vcomp
+      (Derivation₃.whiskerRight₃ (stepstar_inv_stepstar_loop_contract st₁ st₂) tail)
+      (.vcomp
+        (.step (.vcomp_refl_left tail))
+        htail))
+
+/-- Contract a blocked loop `prefix · inv(middle) · tail` when the return segment
+    `tail` is itself a forward `StepStar` to the basepoint. -/
+noncomputable def stepstar_inv_forward_tail_loop_contract {p r x : Path a b}
+    (stPrefix : StepStar p r) (stNeg : StepStar x r) (stTail : StepStar x p) :
+    Derivation₃
+      (.vcomp (derivation₂_of_stepstar stPrefix)
+        (.vcomp (.inv (derivation₂_of_stepstar stNeg))
+          (derivation₂_of_stepstar stTail)))
+      (.refl p) := by
+  let fullNeg : StepStar x r := stepstar_append stTail stPrefix
+  have hnegToFull :
+      Derivation₃ (derivation₂_of_stepstar stNeg)
+        (derivation₂_of_stepstar fullNeg) :=
+    connect_stepstar_stepstar stNeg fullNeg
+  have hfullExpand :
+      Derivation₃ (derivation₂_of_stepstar fullNeg)
+        (.vcomp (derivation₂_of_stepstar stTail)
+          (derivation₂_of_stepstar stPrefix)) := by
+    exact derivation₂_of_stepstar_append₃ stTail stPrefix
+  have hfullInv :
+      Derivation₃ (.inv (derivation₂_of_stepstar fullNeg))
+        (.vcomp (.inv (derivation₂_of_stepstar stPrefix))
+          (.inv (derivation₂_of_stepstar stTail))) := by
+    exact
+      .vcomp
+        (inv_congr₃ hfullExpand)
+        (.step (.inv_vcomp
+          (derivation₂_of_stepstar stTail)
+          (derivation₂_of_stepstar stPrefix)))
+  have hloopToMid :
+      Derivation₃
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp (.inv (derivation₂_of_stepstar stNeg))
+            (derivation₂_of_stepstar stTail)))
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp (.inv (derivation₂_of_stepstar fullNeg))
+            (derivation₂_of_stepstar stTail))) := by
+    exact
+      Derivation₃.whiskerLeft₃
+        (derivation₂_of_stepstar stPrefix)
+        (Derivation₃.whiskerRight₃
+          (inv_congr₃ hnegToFull)
+          (derivation₂_of_stepstar stTail))
+  have hmidExpand :
+      Derivation₃
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp (.inv (derivation₂_of_stepstar fullNeg))
+            (derivation₂_of_stepstar stTail)))
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp
+            (.vcomp (.inv (derivation₂_of_stepstar stPrefix))
+              (.inv (derivation₂_of_stepstar stTail)))
+            (derivation₂_of_stepstar stTail))) := by
+    exact
+      Derivation₃.whiskerLeft₃
+        (derivation₂_of_stepstar stPrefix)
+        (Derivation₃.whiskerRight₃ hfullInv
+          (derivation₂_of_stepstar stTail))
+  have hmidAssoc :
+      Derivation₃
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp
+            (.vcomp (.inv (derivation₂_of_stepstar stPrefix))
+              (.inv (derivation₂_of_stepstar stTail)))
+            (derivation₂_of_stepstar stTail)))
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp (.inv (derivation₂_of_stepstar stPrefix))
+            (.vcomp (.inv (derivation₂_of_stepstar stTail))
+              (derivation₂_of_stepstar stTail)))) := by
+    exact
+      Derivation₃.whiskerLeft₃
+        (derivation₂_of_stepstar stPrefix)
+        (.step (.vcomp_assoc
+          (.inv (derivation₂_of_stepstar stPrefix))
+          (.inv (derivation₂_of_stepstar stTail))
+          (derivation₂_of_stepstar stTail)))
+  exact
+    .vcomp hloopToMid
+      (.vcomp hmidExpand
+        (.vcomp hmidAssoc
+          (.vcomp
+            (stepstar_inv_stepstar_cancel_in_context stPrefix
+              (.vcomp (.inv (derivation₂_of_stepstar stTail))
+                (derivation₂_of_stepstar stTail)))
+            (inv_stepstar_stepstar_loop_contract stTail stTail))))
+
+/-- Contextual version of `stepstar_inv_forward_tail_loop_contract` with a
+    residual loop tail at the basepoint. -/
+noncomputable def stepstar_inv_forward_tail_head_loop_contract {p r x : Path a b}
+    (stPrefix : StepStar p r) (stNeg : StepStar x r) (stTail : StepStar x p)
+    {tail : Derivation₂ p p}
+    (htail : Derivation₃ tail (.refl p)) :
+    Derivation₃
+      (.vcomp (derivation₂_of_stepstar stPrefix)
+        (.vcomp (.inv (derivation₂_of_stepstar stNeg))
+          (.vcomp (derivation₂_of_stepstar stTail) tail)))
+      (.refl p) := by
+  let fullNeg : StepStar x r := stepstar_append stTail stPrefix
+  have hnegToFull :
+      Derivation₃ (derivation₂_of_stepstar stNeg)
+        (derivation₂_of_stepstar fullNeg) :=
+    connect_stepstar_stepstar stNeg fullNeg
+  have hfullExpand :
+      Derivation₃ (derivation₂_of_stepstar fullNeg)
+        (.vcomp (derivation₂_of_stepstar stTail)
+          (derivation₂_of_stepstar stPrefix)) := by
+    exact derivation₂_of_stepstar_append₃ stTail stPrefix
+  have hfullInv :
+      Derivation₃ (.inv (derivation₂_of_stepstar fullNeg))
+        (.vcomp (.inv (derivation₂_of_stepstar stPrefix))
+          (.inv (derivation₂_of_stepstar stTail))) := by
+    exact
+      .vcomp
+        (inv_congr₃ hfullExpand)
+        (.step (.inv_vcomp
+          (derivation₂_of_stepstar stTail)
+          (derivation₂_of_stepstar stPrefix)))
+  have hloopToMid :
+      Derivation₃
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp (.inv (derivation₂_of_stepstar stNeg))
+            (.vcomp (derivation₂_of_stepstar stTail) tail)))
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp (.inv (derivation₂_of_stepstar fullNeg))
+            (.vcomp (derivation₂_of_stepstar stTail) tail))) := by
+    exact
+      Derivation₃.whiskerLeft₃
+        (derivation₂_of_stepstar stPrefix)
+        (Derivation₃.whiskerRight₃
+          (inv_congr₃ hnegToFull)
+          (.vcomp (derivation₂_of_stepstar stTail) tail))
+  have hmidExpand :
+      Derivation₃
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp (.inv (derivation₂_of_stepstar fullNeg))
+            (.vcomp (derivation₂_of_stepstar stTail) tail)))
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp
+            (.vcomp (.inv (derivation₂_of_stepstar stPrefix))
+              (.inv (derivation₂_of_stepstar stTail)))
+            (.vcomp (derivation₂_of_stepstar stTail) tail))) := by
+    exact
+      Derivation₃.whiskerLeft₃
+        (derivation₂_of_stepstar stPrefix)
+        (Derivation₃.whiskerRight₃ hfullInv
+          (.vcomp (derivation₂_of_stepstar stTail) tail))
+  have hmidAssoc :
+      Derivation₃
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp
+            (.vcomp (.inv (derivation₂_of_stepstar stPrefix))
+              (.inv (derivation₂_of_stepstar stTail)))
+            (.vcomp (derivation₂_of_stepstar stTail) tail)))
+        (.vcomp (derivation₂_of_stepstar stPrefix)
+          (.vcomp (.inv (derivation₂_of_stepstar stPrefix))
+            (.vcomp (.inv (derivation₂_of_stepstar stTail))
+              (.vcomp (derivation₂_of_stepstar stTail) tail)))) := by
+    exact
+      Derivation₃.whiskerLeft₃
+        (derivation₂_of_stepstar stPrefix)
+        (.step (.vcomp_assoc
+          (.inv (derivation₂_of_stepstar stPrefix))
+          (.inv (derivation₂_of_stepstar stTail))
+          (.vcomp (derivation₂_of_stepstar stTail) tail)))
+  exact
+    .vcomp hloopToMid
+      (.vcomp hmidExpand
+        (.vcomp hmidAssoc
+          (.vcomp
+            (stepstar_inv_stepstar_cancel_in_context stPrefix
+              (.vcomp (.inv (derivation₂_of_stepstar stTail))
+                (.vcomp (derivation₂_of_stepstar stTail) tail)))
+            (.vcomp
+              (inv_stepstar_stepstar_cancel_in_context stTail tail)
+              htail))))
+
+/-- Symmetric whole-block version of
+`inv_step_inv_stepstar_head_loop_contract`. -/
+noncomputable def inv_stepstar_stepstar_head_loop_contract {p r : Path a b}
+    (st₁ st₂ : StepStar r p)
+    {tail : Derivation₂ p p}
+    (htail : Derivation₃ tail (.refl p)) :
+    Derivation₃
+      (.vcomp (.inv (derivation₂_of_stepstar st₁))
+        (.vcomp (derivation₂_of_stepstar st₂) tail))
+      (.refl p) :=
+  .vcomp
+    (.inv (.step (.vcomp_assoc (.inv (derivation₂_of_stepstar st₁))
+      (derivation₂_of_stepstar st₂) tail)))
+    (.vcomp
+      (Derivation₃.whiskerRight₃ (inv_stepstar_stepstar_loop_contract st₁ st₂) tail)
+      (.vcomp
+        (.step (.vcomp_refl_left tail))
+        htail))
+
+/-- Wrapper of `stepstar_inv_forward_tail_loop_contract` for the special case
+    with no initial forward prefix. -/
+noncomputable def inv_stepstar_forward_tail_loop_contract {p r : Path a b}
+    (stNeg stTail : StepStar r p) :
+    Derivation₃
+      (.vcomp (.inv (derivation₂_of_stepstar stNeg))
+        (derivation₂_of_stepstar stTail))
+      (.refl p) := by
+  exact
+    .vcomp
+      (.inv (.step (.vcomp_refl_left
+        (.vcomp (.inv (derivation₂_of_stepstar stNeg))
+          (derivation₂_of_stepstar stTail)))))
+      (stepstar_inv_forward_tail_loop_contract (StepStar.refl p) stNeg stTail)
+
+/-- Wrapper of `stepstar_inv_forward_tail_head_loop_contract` for the special
+    case with no initial forward prefix. -/
+noncomputable def inv_stepstar_forward_tail_head_loop_contract {p r : Path a b}
+    (stNeg stTail : StepStar r p) {tail : Derivation₂ p p}
+    (htail : Derivation₃ tail (.refl p)) :
+    Derivation₃
+      (.vcomp (.inv (derivation₂_of_stepstar stNeg))
+        (.vcomp (derivation₂_of_stepstar stTail) tail))
+      (.refl p) := by
+  exact
+    .vcomp
+      (.inv (.step (.vcomp_refl_left
+        (.vcomp (.inv (derivation₂_of_stepstar stNeg))
+          (.vcomp (derivation₂_of_stepstar stTail) tail)))))
+      (stepstar_inv_forward_tail_head_loop_contract
+        (StepStar.refl p) stNeg stTail htail)
+
+/-- If two forward derivations with the same endpoints are connected, then the
+loop formed by the inverse of the first followed by the second contracts
+immediately. -/
+noncomputable def contract_inv_forward_compare {p r : Path a b}
+    (d₁ d₂ : Derivation₂ r p)
+    (h : Derivation₃ d₁ d₂) :
+    Derivation₃ (.vcomp (.inv d₁) d₂) (.refl p) :=
+  .vcomp
+    (Derivation₃.whiskerLeft₃ (.inv d₁) (.inv h))
+    (.step (.vcomp_inv_left d₁))
+
+/-- Symmetric companion of `contract_inv_forward_compare`. -/
+noncomputable def contract_forward_inv_compare {p r : Path a b}
+    (d₁ d₂ : Derivation₂ p r)
+    (h : Derivation₃ d₁ d₂) :
+    Derivation₃ (.vcomp d₁ (.inv d₂)) (.refl p) :=
+  .vcomp
+    (Derivation₃.whiskerRight₃ h (.inv d₂))
+    (.step (.vcomp_inv_right d₂))
 
 /-- Loop-specialized structural contraction on strict normal forms.
 
@@ -1814,18 +3390,9 @@ noncomputable def strict_loop_contract_go {p : Path a b} :
                 exact inv_forward_stepstar_loop_contract s
                   (strict_tail_of_cons_inv hd) (st := st) hst
             | none =>
-                let fallback : Derivation₃ (.vcomp (.inv (.step s)) rest) (.refl p) := by
-                  let loop : Derivation₂ p p := .vcomp (.inv (.step s)) rest
-                  let invLoop : Derivation₂ p p := normalizeInv loop
-                  let hInvStrict : StrictNormalForm invLoop := normalizeInv_is_strict loop
-                  cases hstInv : derivation_to_stepstar? invLoop with
-                  | some stInv =>
-                      exact strict_loop_via_inverse loop
-                        (forward_strict_loop_contract invLoop hInvStrict
-                          (st := stInv) hstInv)
-                  | none =>
-                      exact strict_loop_via_inverse loop
-                        (strict_loop_contract_go _fuel invLoop hInvStrict)
+                let loop : Derivation₂ p p := .vcomp (.inv (.step s)) rest
+                let invLoop : Derivation₂ p p := normalizeInv loop
+                let hInvStrict : StrictNormalForm invLoop := normalizeInv_is_strict loop
                 cases rest with
                 | @vcomp _ r _ dL dR =>
                     cases dL with
@@ -1837,11 +3404,135 @@ noncomputable def strict_loop_contract_go {p : Path a b} :
                           let hrest : Derivation₃ dR (.refl p) :=
                             strict_loop_contract_go _fuel dR (strict_tail_of_cons_step htail)
                           exact inv_step_head_loop_contract s s₂ hrest
-                        · exact fallback
+                        ·
+                            cases hstInv : derivation_to_stepstar? invLoop with
+                            | some stInv =>
+                                exact strict_loop_via_inverse loop
+                                  (forward_strict_loop_contract invLoop hInvStrict
+                                    (st := stInv) hstInv)
+                            | none =>
+                                let splitData :=
+                                  choose_first_positive_split
+                                    (d := loop) hd hstInv
+                                let strictNeg :=
+                                  strict_of_stepstar splitData.negativePrefix
+                                let dNeg : Derivation₂ splitData.r p :=
+                                  strictNeg.1
+                                let dPos : Derivation₂ splitData.r p :=
+                                  .vcomp (.step splitData.posStep) splitData.tail
+                                have hdNeg : StrictNormalForm dNeg :=
+                                  strictNeg.2.1
+                                have hdPos : StrictNormalForm dPos :=
+                                  StrictNormalForm.cons_step splitData.posStep
+                                    splitData.tail_strict
+                                have hnegSound :
+                                    Derivation₃
+                                      (derivation₂_of_stepstar
+                                        splitData.negativePrefix)
+                                      dNeg :=
+                                  derivation_to_stepstar_sound₃ dNeg strictNeg.2.2
+                                have hloop :
+                                    Derivation₃
+                                      (.vcomp
+                                        (.inv (derivation₂_of_stepstar
+                                          splitData.negativePrefix))
+                                        dPos)
+                                      (.vcomp (.inv dNeg) dPos) :=
+                                  Derivation₃.whiskerRight₃
+                                    (inv_congr₃ hnegSound) dPos
+                                have hconn : Derivation₃ dNeg dPos :=
+                                  connect_strict_structural dNeg dPos hdNeg hdPos
+                                exact
+                                  .vcomp
+                                    splitData.split
+                                    (.vcomp hloop
+                                      (contract_inv_forward_compare dNeg dPos hconn))
                     | _ =>
-                        exact fallback
+                        cases hstInv : derivation_to_stepstar? invLoop with
+                        | some stInv =>
+                            exact strict_loop_via_inverse loop
+                              (forward_strict_loop_contract invLoop hInvStrict
+                                (st := stInv) hstInv)
+                        | none =>
+                            let splitData :=
+                              choose_first_positive_split
+                                (d := loop) hd hstInv
+                            let strictNeg :=
+                              strict_of_stepstar splitData.negativePrefix
+                            let dNeg : Derivation₂ splitData.r p :=
+                              strictNeg.1
+                            let dPos : Derivation₂ splitData.r p :=
+                              .vcomp (.step splitData.posStep) splitData.tail
+                            have hdNeg : StrictNormalForm dNeg :=
+                              strictNeg.2.1
+                            have hdPos : StrictNormalForm dPos :=
+                              StrictNormalForm.cons_step splitData.posStep
+                                splitData.tail_strict
+                            have hnegSound :
+                                Derivation₃
+                                  (derivation₂_of_stepstar
+                                    splitData.negativePrefix)
+                                  dNeg :=
+                              derivation_to_stepstar_sound₃ dNeg strictNeg.2.2
+                            have hloop :
+                                Derivation₃
+                                  (.vcomp
+                                    (.inv (derivation₂_of_stepstar
+                                      splitData.negativePrefix))
+                                    dPos)
+                                  (.vcomp (.inv dNeg) dPos) :=
+                              Derivation₃.whiskerRight₃
+                                (inv_congr₃ hnegSound) dPos
+                            have hconn : Derivation₃ dNeg dPos :=
+                              connect_strict_structural dNeg dPos hdNeg hdPos
+                            exact
+                              .vcomp
+                                splitData.split
+                                (.vcomp hloop
+                                  (contract_inv_forward_compare dNeg dPos hconn))
                 | _ =>
-                    exact fallback
+                    cases hstInv : derivation_to_stepstar? invLoop with
+                    | some stInv =>
+                        exact strict_loop_via_inverse loop
+                          (forward_strict_loop_contract invLoop hInvStrict
+                            (st := stInv) hstInv)
+                    | none =>
+                        let splitData :=
+                          choose_first_positive_split
+                            (d := loop) hd hstInv
+                        let strictNeg :=
+                          strict_of_stepstar splitData.negativePrefix
+                        let dNeg : Derivation₂ splitData.r p :=
+                          strictNeg.1
+                        let dPos : Derivation₂ splitData.r p :=
+                          .vcomp (.step splitData.posStep) splitData.tail
+                        have hdNeg : StrictNormalForm dNeg :=
+                          strictNeg.2.1
+                        have hdPos : StrictNormalForm dPos :=
+                          StrictNormalForm.cons_step splitData.posStep
+                            splitData.tail_strict
+                        have hnegSound :
+                            Derivation₃
+                              (derivation₂_of_stepstar
+                                splitData.negativePrefix)
+                              dNeg :=
+                          derivation_to_stepstar_sound₃ dNeg strictNeg.2.2
+                        have hloop :
+                            Derivation₃
+                              (.vcomp
+                                (.inv (derivation₂_of_stepstar
+                                  splitData.negativePrefix))
+                                dPos)
+                              (.vcomp (.inv dNeg) dPos) :=
+                          Derivation₃.whiskerRight₃
+                            (inv_congr₃ hnegSound) dPos
+                        have hconn : Derivation₃ dNeg dPos :=
+                          connect_strict_structural dNeg dPos hdNeg hdPos
+                        exact
+                          .vcomp
+                            splitData.split
+                            (.vcomp hloop
+                              (contract_inv_forward_compare dNeg dPos hconn))
 
 /-- Wrapper for the loop-specialized structural contraction. -/
 noncomputable def strict_loop_contract {p : Path a b}
@@ -1900,6 +3591,24 @@ noncomputable def loop_contract_genuine
     Derivation₃ d (.refl p) := by
   simpa [reduce_loops] using (to_reduce_loops₃ d)
 
+/-- Parallel 2-cells connect by exposing the loop `d₁ · d₂⁻¹` and contracting
+that loop back to `refl`. This is the transport-free comparison route used by
+the public strict connector. -/
+noncomputable def connect_parallel_via_loop {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ := by
+  let loop : Derivation₂ p p := .vcomp d₁ (.inv d₂)
+  exact
+    .vcomp
+      (.inv (.step (.vcomp_refl_right d₁)))
+      (.vcomp
+        (Derivation₃.whiskerLeft₃ d₁
+          (.inv (.step (.vcomp_inv_left d₂))))
+        (.vcomp
+          (.inv (.step (.vcomp_assoc d₁ (.inv d₂) d₂)))
+          (.vcomp
+            (Derivation₃.whiskerRight₃ (loop_contract_genuine loop) d₂)
+            (.step (.vcomp_refl_left d₂)))))
+
 /-- In the non-loop case `p ≠ q`, a strict derivation `Derivation₂ p q` cannot be `refl p`. -/
 theorem strict_nonloop_not_refl {p q : Path a b}
     (_hpq : p ≠ q) {d : Derivation₂ p q} (_h : StrictNormalForm d) :
@@ -1910,24 +3619,24 @@ theorem strict_nonloop_not_refl {p q : Path a b}
 noncomputable def connect_strict_nonloop {p q : Path a b}
     (_hpq : p ≠ q)
     {d₁ d₂ : Derivation₂ p q}
-    (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
+    (_h₁ : StrictNormalForm d₁) (_h₂ : StrictNormalForm d₂) :
     Derivation₃ d₁ d₂ := by
-  exact connect_strict_structural d₁ d₂ h₁ h₂
+  exact connect_parallel_via_loop d₁ d₂
 
 noncomputable def connect_strict {p q : Path a b}
     {d₁ d₂ : Derivation₂ p q}
-    (h₁ : StrictNormalForm d₁) (h₂ : StrictNormalForm d₂) :
+    (_h₁ : StrictNormalForm d₁) (_h₂ : StrictNormalForm d₂) :
     Derivation₃ d₁ d₂ := by
-  by_cases hpq : p = q
-  · cases hpq
-    exact .vcomp
-      (to_reduce_loops₃ d₁)
-      (.vcomp
-        (reduced_loop_connect
-          (reduce_loops_is_reduced d₁)
-          (reduce_loops_is_reduced d₂))
-        (.inv (to_reduce_loops₃ d₂)))
-  · exact connect_strict_nonloop hpq h₁ h₂
+  exact connect_parallel_via_loop d₁ d₂
+
+/-- Connector between normalized representatives. -/
+noncomputable def connect_normalized {p q : Path a b}
+    (n₁ n₂ : Derivation₂ p q) : Derivation₃ n₁ n₂ :=
+  .vcomp (to_normal_form₃ n₁)
+    (.vcomp (connect_strict
+        (d₁ := normalizeDeriv n₁) (d₂ := normalizeDeriv n₂)
+        (normalize_is_strict n₁) (normalize_is_strict n₂))
+      (.inv (to_normal_form₃ n₂)))
 
 /-- Core-normal connector between `normalize` outputs via `connect_strict`. -/
 noncomputable def connect_core_strict_structural {p q : Path a b}
@@ -1963,18 +3672,7 @@ noncomputable def to_core_normal_form₃ {p q : Path a b}
 
 noncomputable def contractibility₃ {p q : Path a b}
     (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ := by
-  let loop : Derivation₂ p p := .vcomp d₁ (.inv d₂)
-  exact
-    .vcomp
-      (.inv (.step (.vcomp_refl_right d₁)))
-      (.vcomp
-        (Derivation₃.whiskerLeft₃ d₁
-          (.inv (.step (.vcomp_inv_left d₂))))
-        (.vcomp
-          (.inv (.step (.vcomp_assoc d₁ (.inv d₂) d₂)))
-          (.vcomp
-            (Derivation₃.whiskerRight₃ (loop_contract_genuine loop) d₂)
-            (.step (.vcomp_refl_left d₂)))))
+  exact connect_parallel_via_loop d₁ d₂
 
 /-- Bridge from any 2-cell to its strict normal-form representative. -/
 noncomputable def to_strict_normal_form₃ {p q : Path a b}
