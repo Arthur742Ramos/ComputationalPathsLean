@@ -77,6 +77,37 @@ noncomputable def degree_homotopy_path (D : BrouwerDegreeData X) {f g : C(X, X)}
     ComputationalPaths.Path (D.degree f) (D.degree g) :=
   ComputationalPaths.Path.stepChain (D.homotopy_invariant h)
 
+/-- A homotopy to a constant map forces degree 0. -/
+noncomputable def degree_homotopic_const_path (D : BrouwerDegreeData X)
+    (f : C(X, X)) {x : X} (h : ContinuousMap.Homotopic f (ContinuousMap.const X x)) :
+    ComputationalPaths.Path (D.degree f) 0 :=
+  ComputationalPaths.Path.trans (degree_homotopy_path D h) (degree_const_path D x)
+
+/-- Chosen constant point supplied by the no-fixed-point hypothesis. -/
+noncomputable def noFixedPointConstPoint (D : BrouwerDegreeData X) (f : C(X, X))
+    (h : ∀ x, f x ≠ x) : X :=
+  Classical.choose (D.homotopy_const_of_no_fixed_point f h)
+
+/-- Chosen homotopy to a constant map supplied by the no-fixed-point hypothesis. -/
+noncomputable def noFixedPointConstHomotopy (D : BrouwerDegreeData X) (f : C(X, X))
+    (h : ∀ x, f x ≠ x) :
+    ContinuousMap.Homotopic f (ContinuousMap.const X (noFixedPointConstPoint D f h)) :=
+  Classical.choose_spec (D.homotopy_const_of_no_fixed_point f h)
+
+/-- Degree of a no-fixed-point map agrees with the degree of its chosen constant witness. -/
+theorem degree_of_no_fixed_point_eq_const (D : BrouwerDegreeData X) (f : C(X, X))
+    (h : ∀ x, f x ≠ x) :
+    D.degree f = D.degree (ContinuousMap.const X (noFixedPointConstPoint D f h)) :=
+  D.homotopy_invariant (noFixedPointConstHomotopy D f h)
+
+/-- `Path` witnessing agreement with the chosen constant-map degree. -/
+noncomputable def degree_of_no_fixed_point_eq_const_path (D : BrouwerDegreeData X) (f : C(X, X))
+    (h : ∀ x, f x ≠ x) :
+    ComputationalPaths.Path
+      (D.degree f)
+      (D.degree (ContinuousMap.const X (noFixedPointConstPoint D f h))) :=
+  ComputationalPaths.Path.stepChain (degree_of_no_fixed_point_eq_const D f h)
+
 /-- Maps without fixed points have degree zero. -/
 theorem degree_of_no_fixed_point (D : BrouwerDegreeData X) (f : C(X, X))
     (h : ∀ x, f x ≠ x) : D.degree f = 0 := by
@@ -91,6 +122,12 @@ noncomputable def degree_of_no_fp_path (D : BrouwerDegreeData X) (f : C(X, X))
     (h : ∀ x, f x ≠ x) :
     ComputationalPaths.Path (D.degree f) 0 :=
   ComputationalPaths.Path.stepChain (degree_of_no_fixed_point D f h)
+
+/-- `Path` witnessing that a map homotopic to the identity has the same degree as the identity. -/
+noncomputable def degree_of_homotopic_id_eq_id_path (D : BrouwerDegreeData X) (f : C(X, X))
+    (h : ContinuousMap.Homotopic f (ContinuousMap.id X)) :
+    ComputationalPaths.Path (D.degree f) (D.degree (ContinuousMap.id X)) :=
+  degree_homotopy_path D h
 
 /-- A nonzero degree forces a fixed point. -/
 theorem fixed_point_of_degree_ne_zero (D : BrouwerDegreeData X) (f : C(X, X))
