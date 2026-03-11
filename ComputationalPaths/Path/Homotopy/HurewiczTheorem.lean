@@ -154,9 +154,21 @@ theorem hurewiczMap_mul {A : Type u} {a : A}
   intro q
   rfl
 
+/-- Path witness for multiplicativity of the Hurewicz map. -/
+noncomputable def hurewiczMap_mul_path {A : Type u} {a : A}
+    (x y : π₁(A, a)) :
+    Path (hurewiczMap A a (LoopQuot.comp x y))
+      (h1Mul (hurewiczMap A a x) (hurewiczMap A a y)) :=
+  Path.stepChain (hurewiczMap_mul x y)
+
 /-- `h(id) = 1`. -/
 theorem hurewiczMap_one {A : Type u} (a : A) :
     hurewiczMap A a LoopQuot.id = h1One a := rfl
+
+/-- Path witness for the unit law of the Hurewicz map. -/
+noncomputable def hurewiczMap_one_path {A : Type u} (a : A) :
+    Path (hurewiczMap A a LoopQuot.id) (h1One a) :=
+  Path.stepChain (hurewiczMap_one a)
 
 /-- `h(x⁻¹) = h(x)⁻¹`. -/
 theorem hurewiczMap_inv {A : Type u} {a : A}
@@ -166,6 +178,12 @@ theorem hurewiczMap_inv {A : Type u} {a : A}
   intro p
   simp only [hurewiczMap, LoopQuot.inv, PathRwQuot.symm, h1Inv]
   rfl
+
+/-- Path witness for inversion compatibility of the Hurewicz map. -/
+noncomputable def hurewiczMap_inv_path {A : Type u} {a : A}
+    (x : π₁(A, a)) :
+    Path (hurewiczMap A a (LoopQuot.inv x)) (h1Inv (hurewiczMap A a x)) :=
+  Path.stepChain (hurewiczMap_inv x)
 
 /-- H₁ is associative, witnessed by `Step.trans_assoc`. -/
 theorem h1Mul_assoc {A : Type u} {a : A}
@@ -180,6 +198,12 @@ theorem h1Mul_assoc {A : Type u} {a : A}
   apply Quotient.sound
   exact AbelRel.rweq ⟨rweq_of_step (Step.trans_assoc p q r)⟩
 
+/-- Path witness for associativity on `H₁`. -/
+noncomputable def h1Mul_assoc_path {A : Type u} {a : A}
+    (x y z : H₁ A a) :
+    Path (h1Mul (h1Mul x y) z) (h1Mul x (h1Mul y z)) :=
+  Path.stepChain (h1Mul_assoc x y z)
+
 /-- H₁ left identity via `Step.trans_refl_left`. -/
 theorem h1One_mul {A : Type u} {a : A}
     (x : H₁ A a) : h1Mul (h1One a) x = x := by
@@ -187,6 +211,12 @@ theorem h1One_mul {A : Type u} {a : A}
   intro p
   apply Quotient.sound
   exact AbelRel.rweq ⟨rweq_of_step (Step.trans_refl_left p)⟩
+
+/-- Path witness for left identity on `H₁`. -/
+noncomputable def h1One_mul_path {A : Type u} {a : A}
+    (x : H₁ A a) :
+    Path (h1Mul (h1One a) x) x :=
+  Path.stepChain (h1One_mul x)
 
 /-- H₁ right identity via `Step.trans_refl_right`. -/
 theorem h1Mul_one {A : Type u} {a : A}
@@ -196,6 +226,12 @@ theorem h1Mul_one {A : Type u} {a : A}
   apply Quotient.sound
   exact AbelRel.rweq ⟨rweq_of_step (Step.trans_refl_right p)⟩
 
+/-- Path witness for right identity on `H₁`. -/
+noncomputable def h1Mul_one_path {A : Type u} {a : A}
+    (x : H₁ A a) :
+    Path (h1Mul x (h1One a)) x :=
+  Path.stepChain (h1Mul_one x)
+
 /-- H₁ left inverse via `Step.symm_trans`. -/
 theorem h1Inv_mul {A : Type u} {a : A}
     (x : H₁ A a) : h1Mul (h1Inv x) x = h1One a := by
@@ -203,6 +239,12 @@ theorem h1Inv_mul {A : Type u} {a : A}
   intro p
   apply Quotient.sound
   exact AbelRel.rweq ⟨rweq_of_step (Step.symm_trans p)⟩
+
+/-- Path witness for left inverses on `H₁`. -/
+noncomputable def h1Inv_mul_path {A : Type u} {a : A}
+    (x : H₁ A a) :
+    Path (h1Mul (h1Inv x) x) (h1One a) :=
+  Path.stepChain (h1Inv_mul x)
 
 /-- H₁ right inverse via `Step.trans_symm`. -/
 theorem h1Mul_inv {A : Type u} {a : A}
@@ -212,6 +254,12 @@ theorem h1Mul_inv {A : Type u} {a : A}
   apply Quotient.sound
   exact AbelRel.rweq ⟨rweq_of_step (Step.trans_symm p)⟩
 
+/-- Path witness for right inverses on `H₁`. -/
+noncomputable def h1Mul_inv_path {A : Type u} {a : A}
+    (x : H₁ A a) :
+    Path (h1Mul x (h1Inv x)) (h1One a) :=
+  Path.stepChain (h1Mul_inv x)
+
 /-- H₁ is abelian: `p · q = q · p`, by `AbelRel.comm`. -/
 theorem h1Mul_comm {A : Type u} {a : A}
     (x y : H₁ A a) : h1Mul x y = h1Mul y x := by
@@ -220,6 +268,12 @@ theorem h1Mul_comm {A : Type u} {a : A}
   refine Quotient.inductionOn y ?_
   intro q
   exact Quotient.sound (AbelRel.comm p q)
+
+/-- Path witness for commutativity on `H₁`. -/
+noncomputable def h1Mul_comm_path {A : Type u} {a : A}
+    (x y : H₁ A a) :
+    Path (h1Mul x y) (h1Mul y x) :=
+  Path.stepChain (h1Mul_comm x y)
 
 /-- Bundle: H₁ is an abelian group under h1Mul. -/
 structure H1GroupWitness (A : Type u) (a : A) where
@@ -336,6 +390,12 @@ theorem commutator_in_kernel {A : Type u} {a : A}
       rw [hurewiczMap_mul, hurewiczMap_mul, hurewiczMap_inv]
       rw [ih, h1Mul_one]
       exact h1Mul_inv (hurewiczMap A a β)
+
+/-- Path witness that commutator-subgroup elements map to the identity in `H₁`. -/
+noncomputable def commutator_in_kernel_path {A : Type u} {a : A}
+    {α : π₁(A, a)} (h : InCommutatorSubgroup α) :
+    Path (hurewiczMap A a α) (h1One a) :=
+  Path.stepChain (commutator_in_kernel h)
 
 /-- Backward: kernel elements factor through the commutator subgroup. -/
 theorem kernel_in_commutator {A : Type u} {a : A}
