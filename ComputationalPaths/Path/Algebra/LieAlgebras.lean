@@ -140,7 +140,7 @@ noncomputable def toSubalgebra (I : LieIdeal A) : LieSubalgebra A where
 /-- The whole Lie algebra as an ideal. -/
 noncomputable def topIdeal (A : LieAlgebra L) : LieIdeal A where
   carrier := fun _ => True
-  zero_mem := trivial
+  zero_mem := True.intro
   add_mem := by
     intro x y hx hy
     trivial

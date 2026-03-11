@@ -133,7 +133,7 @@ noncomputable def etaleId (R : Type u) (RR : CRingData R) : EtaleMap where
   map := { toFun := id, map_one := rfl, map_add := fun _ _ => rfl, map_mul := fun _ _ => rfl }
   flat := ⟨trivial⟩
   unramified := ⟨trivial⟩
-  finitelyPresented := trivial
+  finitelyPresented := True.intro
 
 /-- Composition of étale maps is étale (when target of f = source of g).
     The proof witnesses existence of a composite étale map. -/
@@ -227,8 +227,8 @@ noncomputable def constantSheaf (X : SchemeData) (A : Type u) (AG : AbelianGroup
   groupStr := fun _ => AG
   restrict := fun _ x => x
   restrict_zero := fun _ => rfl
-  locality := trivial
-  gluing := trivial
+  locality := True.intro
+  gluing := True.intro
 
 /-! ## Étale Cohomology Groups -/
 

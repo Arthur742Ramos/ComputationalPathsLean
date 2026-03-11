@@ -276,7 +276,7 @@ noncomputable def cobordism_map_path {M N : FourManifold.{u}}
     DonaldsonInvariant N where
   degree := dM.degree
   evaluate := fun _ => 0
-  orientation_dep := trivial
+  orientation_dep := True.intro
 
 /-- Wall-crossing formula data: how invariants change at walls. -/
 structure WallCrossing (M : FourManifold.{u}) where

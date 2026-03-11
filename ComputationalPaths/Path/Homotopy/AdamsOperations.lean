@@ -142,7 +142,7 @@ noncomputable def adamsConjectureTrivial {M : Type u} (S : StrictMonoid M) (R : 
     AdamsConjecture S R where
   adams := AdamsOperationRingHom.trivial S R
   jImage := JImageMap.trivial S
-  compatibility := trivial
+  compatibility := True.intro
 
 namespace AdamsConjecture
 

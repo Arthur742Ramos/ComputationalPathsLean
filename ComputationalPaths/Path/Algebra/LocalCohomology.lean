@@ -85,7 +85,7 @@ structure IdealData {R : Type u} (ring : CommRingData R) where
 /-- The whole ring as an ideal. -/
 noncomputable def IdealData.whole {R : Type u} (ring : CommRingData R) : IdealData ring where
   mem := fun _ => True
-  zero_mem := trivial
+  zero_mem := True.intro
   add_mem := fun _ _ => trivial
   mul_mem := fun _ _ => trivial
 

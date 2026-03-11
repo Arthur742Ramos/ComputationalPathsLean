@@ -101,7 +101,7 @@ noncomputable def trivialSliceFiltration : SliceFiltration.{u} where
   spectrum := PUnit
   slice := fun _ => PUnit
   structureMap := fun _ _ => PUnit.unit
-  converges := trivial
+  converges := True.intro
 
 /-- Data for the gap theorem in the slice filtration. -/
 structure GapTheorem (F : SliceFiltration.{u}) where
@@ -116,7 +116,7 @@ structure GapTheorem (F : SliceFiltration.{u}) where
 noncomputable def trivialGapTheorem : GapTheorem trivialSliceFiltration where
   gapStart := 0
   gapEnd := 0
-  gapHolds := trivial
+  gapHolds := True.intro
 
 /-! ## Norm maps -/
 
@@ -136,7 +136,7 @@ noncomputable def trivialNormMap : NormMap.{u} where
   source := PUnit
   target := PUnit
   map := fun _ => PUnit.unit
-  multiplicative := trivial
+  multiplicative := True.intro
 
 /-! ## Summary
 

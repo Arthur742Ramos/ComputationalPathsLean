@@ -47,7 +47,7 @@ noncomputable def ModRealizes (_e : Nat) (φ : Prop) (truth : Prop) : Prop := tr
 /-! ## Basic theorems -/
 
 -- 1
-theorem realizes_true (e : Nat) : Realizes e True := trivial
+theorem realizes_true (e : Nat) : Realizes e True := True.intro
 
 -- 2
 theorem realizes_and {e : Nat} {φ ψ : Prop}

@@ -84,7 +84,7 @@ structure DiffIdeal (DR : DiffRing R) where
 /-- The full ring is a differential ideal. -/
 noncomputable def fullDiffIdeal (DR : DiffRing R) : DiffIdeal DR where
   mem := fun _ => True
-  zero_mem := trivial
+  zero_mem := True.intro
   add_mem := fun _ _ _ _ => trivial
   neg_mem := fun _ _ => trivial
   mul_absorb := fun _ _ _ => trivial

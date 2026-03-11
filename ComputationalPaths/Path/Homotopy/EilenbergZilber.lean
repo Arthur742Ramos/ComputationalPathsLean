@@ -54,11 +54,11 @@ noncomputable def awDecomp (n : Nat) : AWDecomp n where
   total := fun _ _ _ => trivial
 
 /-- Degree 0: the only splitting is (0, 0). -/
-theorem aw_decomp_zero : (awDecomp 0).decomp 0 0 rfl := trivial
+theorem aw_decomp_zero : (awDecomp 0).decomp 0 0 rfl := True.intro
 
 /-- Degree 1: two splittings (0,1) and (1,0). -/
-theorem aw_decomp_one_left : (awDecomp 1).decomp 0 1 rfl := trivial
-theorem aw_decomp_one_right : (awDecomp 1).decomp 1 0 rfl := trivial
+theorem aw_decomp_one_left : (awDecomp 1).decomp 0 1 rfl := True.intro
+theorem aw_decomp_one_right : (awDecomp 1).decomp 1 0 rfl := True.intro
 
 /-! ## Shuffle Signs
 

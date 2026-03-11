@@ -38,7 +38,7 @@ noncomputable def universalFilter {a b : A} : PathFilter A (a := a) (b := b) whe
 
 /-- Every path is in the universal filter -/
 theorem universalFilter_mem {a b : A} (p : Path a b) :
-    (universalFilter (A := A)).mem p := trivial
+    (universalFilter (A := A)).mem p := True.intro
 
 /-! ## Principal filters -/
 

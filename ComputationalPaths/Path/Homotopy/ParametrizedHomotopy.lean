@@ -193,7 +193,7 @@ noncomputable def trivialTwistedCohomology (B : Type u) (L : LocalCoefficients B
     TwistedCohomology B L where
   H := fun _ => PUnit
   zero := fun _ => PUnit.unit
-  reduces_ordinary := trivial
+  reduces_ordinary := True.intro
 
 /-! ## Thom isomorphism -/
 

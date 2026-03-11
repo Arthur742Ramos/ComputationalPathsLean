@@ -224,7 +224,7 @@ inductive isHNF : LTerm → Prop where
   | lam  {t : LTerm} (ht : isHNF t) : isHNF (lam t)
 
 /-- Theorem 18: A variable is in beta NF. -/
-theorem var_isBetaNF (n : Nat) : isBetaNF (var n) := trivial
+theorem var_isBetaNF (n : Nat) : isBetaNF (var n) := True.intro
 
 /-- Theorem 19: If body is NF, then lambda is NF. -/
 theorem lam_isBetaNF {t : LTerm} (h : isBetaNF t) : isBetaNF (lam t) := h

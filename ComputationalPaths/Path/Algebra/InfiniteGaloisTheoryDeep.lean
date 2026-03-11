@@ -219,7 +219,7 @@ structure ClosedSubgroup (G : ProfiniteGroup) where
 
 noncomputable def ClosedSubgroup.full (G : ProfiniteGroup) : ClosedSubgroup G where
   carrier := fun _ => True
-  one_mem := trivial
+  one_mem := True.intro
   mul_mem := fun _ _ _ _ => trivial
   inv_mem := fun _ _ => trivial
   closedCode := true

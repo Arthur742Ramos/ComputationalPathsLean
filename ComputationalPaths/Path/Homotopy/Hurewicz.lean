@@ -697,7 +697,7 @@ For n ≥ 2 and (n-1)-connected spaces, there's a higher version.
 
 /-- The higher Hurewicz homomorphism h_n : π_n(X) → H_n(X). -/
 theorem higherHurewiczMap (A : Type u) (_a : A) (_n : Nat) (_hn : _n ≥ 2) :
-    True := trivial
+    True := True.intro
 
 /-- **Higher Hurewicz Theorem**: For (n-1)-connected X and n ≥ 2,
     h_n : π_n(X) → H_n(X) is an isomorphism.
@@ -708,14 +708,14 @@ In particular:
 theorem higher_hurewicz_theorem (A : Type u) (_a : A) (n : Nat) (_hn : n ≥ 2)
     (_hconn : True) :  -- X is (n-1)-connected
     -- h_n : π_n(X) ≃ H_n(X)
-    True := trivial
+    True := True.intro
 
 /-- **Example**: H_n(Sⁿ) ≃ ℤ.
 
 For spheres, H_n(Sⁿ) ≃ π_n(Sⁿ) ≃ ℤ by the higher Hurewicz theorem. -/
 theorem sphere_Hn_equiv_int (_n : Nat) (_hn : _n ≥ 1) :
     -- H_n(Sⁿ) ≃ ℤ
-    True := trivial
+    True := True.intro
 
 /-! ## Applications
 

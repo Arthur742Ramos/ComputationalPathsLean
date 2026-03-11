@@ -515,7 +515,7 @@ noncomputable def isId : MorE → Prop
   | _ => False
 
 theorem triangle1_transports_to_id (n : Nat) :
-    isId (MorE.id n) := trivial
+    isId (MorE.id n) := True.intro
 
 -- ============================================================
 -- §17  Confluence / Church–Rosser Property

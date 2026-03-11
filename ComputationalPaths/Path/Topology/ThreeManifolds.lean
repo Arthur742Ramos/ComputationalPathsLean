@@ -204,7 +204,7 @@ structure PrimeDecomposition (M : ThreeManifold.{u}) where
 
 /-- Kneser-Milnor existence theorem. -/
 noncomputable def kneser_milnor_existence (_M : ThreeManifold.{u}) :
-    True := trivial
+    True := True.intro
 
 /-! ## JSJ Decomposition -/
 

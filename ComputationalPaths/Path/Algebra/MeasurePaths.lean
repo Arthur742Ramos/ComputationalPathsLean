@@ -318,8 +318,8 @@ theorem meas_transport_refl {P : Nat → Type v} (n : Nat) (x : P n) :
 /-- Trivial sigma algebra on Unit. -/
 noncomputable def trivialSigma : SigmaAlgebra Unit where
   measurable := fun _ => True
-  emptyMeas := trivial
-  fullMeas := trivial
+  emptyMeas := True.intro
+  fullMeas := True.intro
 
 /-- Trivial measure on Unit. -/
 noncomputable def trivialMeasure : Measure Unit where

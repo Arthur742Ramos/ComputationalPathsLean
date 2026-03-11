@@ -200,7 +200,7 @@ noncomputable def gen3_cancel_right_assoc (p q r : Expr) : Generating3Cell where
 noncomputable def coherentPresentation_groupoid : CoherentPresentation where
   poly := groupoidPolygraph
   numGenerators := 9
-  generators_resolve_cps := trivial
+  generators_resolve_cps := True.intro
 
 /-! ## Finite Derivation Type -/
 

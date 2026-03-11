@@ -125,7 +125,7 @@ noncomputable def symplecto_id (M : SymplecticManifold) : Symplectomorphism M M 
   invFun := id
   left_inv := fun x => Path.refl x
   right_inv := fun y => Path.refl y
-  preserves_omega := trivial
+  preserves_omega := True.intro
 
 /-- Composition of symplectomorphisms. -/
 noncomputable def symplecto_comp (M₁ M₂ M₃ : SymplecticManifold)
@@ -143,7 +143,7 @@ noncomputable def symplecto_comp (M₁ M₂ M₃ : SymplecticManifold)
     have h1 := (f.right_inv (g.invFun z)).proof
     have h2 := (g.right_inv z).proof
     exact ⟨[], by rw [h1, h2]⟩
-  preserves_omega := trivial
+  preserves_omega := True.intro
 
 /-- Inverse of a symplectomorphism. -/
 noncomputable def symplecto_inv (M₁ M₂ : SymplecticManifold)
@@ -152,7 +152,7 @@ noncomputable def symplecto_inv (M₁ M₂ : SymplecticManifold)
   invFun := f.toFun
   left_inv := f.right_inv
   right_inv := f.left_inv
-  preserves_omega := trivial
+  preserves_omega := True.intro
 
 /-! ## Hamiltonian Vector Fields -/
 

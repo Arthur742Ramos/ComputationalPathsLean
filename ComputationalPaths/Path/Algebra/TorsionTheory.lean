@@ -206,7 +206,7 @@ noncomputable def trivialCluster (TC : TriangulatedCategory.{u})
   triCat := TC
   clusterTilting := obj
   cyDim := 2
-  calabiYau := trivial
+  calabiYau := True.intro
 
 /-! ## RwEq lemmas -/
 

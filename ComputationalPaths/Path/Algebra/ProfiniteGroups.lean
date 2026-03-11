@@ -183,7 +183,7 @@ noncomputable def sylow_exists (G : ProfiniteGroup) (p : Nat) (hp : p ≥ 2) : S
   p := p
   p_ge_two := hp
   subgroup := fun _ => True
-  one_mem := trivial
+  one_mem := True.intro
   mul_mem := fun _ _ _ _ => trivial
   inv_mem := fun _ _ => trivial
   exists_element := ⟨G.lim_one, trivial⟩

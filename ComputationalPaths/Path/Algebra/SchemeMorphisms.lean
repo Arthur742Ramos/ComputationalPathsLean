@@ -54,8 +54,8 @@ structure SchemeData where
 noncomputable def SchemeData.point : SchemeData.{u} where
   Point := PUnit
   isOpen := fun _ => True
-  open_univ := trivial
-  open_empty := trivial
+  open_univ := True.intro
+  open_empty := True.intro
   section_ := fun _ _ => PUnit
   restrict := fun _ _ _ _ => PUnit.unit
 

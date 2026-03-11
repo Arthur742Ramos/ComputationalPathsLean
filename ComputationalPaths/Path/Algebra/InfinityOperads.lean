@@ -138,7 +138,7 @@ noncomputable def TreeMorphism.root_path {S T : PlanarTree} (f : TreeMorphism S 
 noncomputable def TreeMorphism.id (T : PlanarTree) : TreeMorphism T T where
   edgeMap := fun e => e
   root_pres := rfl
-  edge_compat := trivial
+  edge_compat := True.intro
 
 /-- Composition of tree morphisms. -/
 noncomputable def TreeMorphism.comp {S T U : PlanarTree}
@@ -146,7 +146,7 @@ noncomputable def TreeMorphism.comp {S T U : PlanarTree}
     TreeMorphism S U where
   edgeMap := fun e => g.edgeMap (f.edgeMap e)
   root_pres := by rw [f.root_pres, g.root_pres]
-  edge_compat := trivial
+  edge_compat := True.intro
 
 /-- Path witness for composition root preservation. -/
 noncomputable def TreeMorphism.comp_root_path {S T U : PlanarTree}

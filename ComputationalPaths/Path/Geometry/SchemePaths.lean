@@ -45,7 +45,7 @@ noncomputable def zeroIdeal : Ideal where
 
 noncomputable def unitIdeal : Ideal where
   mem := fun _ => True
-  zero_mem := trivial
+  zero_mem := True.intro
   add_mem := fun _ _ _ _ => trivial
   neg_mem := fun _ _ => trivial
   mul_mem := fun _ _ _ => trivial

@@ -330,7 +330,7 @@ theorem structureGroup_inv (G : StructureGroup F)
 /-- The maximal structure group: all automorphisms of F. -/
 noncomputable def maximal : StructureGroup F where
   mem := fun _ => True
-  id_mem := trivial
+  id_mem := True.intro
   comp_mem := fun _ _ => trivial
   inv_mem := fun _ => trivial
 

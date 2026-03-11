@@ -258,14 +258,14 @@ theorem fracture_square (C : Category.{u})
     (_B₁ : BousfieldLocalization C E₁)
     (_B₂ : BousfieldLocalization C E₂)
     (_X : C.Obj) :
-    True := trivial
+    True := True.intro
 
 /-- Chromatic convergence: a spectrum is the homotopy limit of its
     chromatic localizations. -/
 theorem chromatic_convergence (C : Category.{u})
     (_localizations : Nat → HomologyTheory.{u})
     (_X : C.Obj) :
-    True := trivial
+    True := True.intro
 
 
 
