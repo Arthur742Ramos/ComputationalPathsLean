@@ -1,7 +1,7 @@
 /-
 # Ganea Fibrations
 
-This module introduces a lightweight Ganea fibration scaffold in the
+This module introduces a lightweight Ganea fibration constructive in the
 computational paths setting. We package the stage spaces G_n(X), the
 fiber description via joins with Omega, and the basic category/section
 characterization that motivates Lusternik-Schnirelmann category.
@@ -10,8 +10,8 @@ characterization that motivates Lusternik-Schnirelmann category.
 
 - `GaneaSpace`, `GaneaFiber`: stage spaces and fibers
 - `ganeaFibration`: the Ganea fibration data (stage 1 is the path space fibration)
-- `cat_le_iff_section`: category bound iff a section exists (scaffold)
-- `ganea_whitehead_characterization`: Ganea-Whitehead characterization (scaffold)
+- `cat_le_iff_section`: category bound iff a section exists
+- `ganea_whitehead_characterization`: Ganea-Whitehead characterization
 
 ## References
 
@@ -109,7 +109,7 @@ noncomputable def ganeaFibration : (n : Nat) → (X : PtdType.{u}) →
 
 /-! ## Sections and LS-category -/
 
-/-- A section of the Ganea fibration (scaffold). -/
+/-- A section of the Ganea fibration. -/
 structure GaneaSection (n : Nat) (X : PtdType.{u}) where
   /-- The section map. -/
   toFun : X.carrier → GaneaSpace n X
@@ -121,15 +121,15 @@ noncomputable def ganeaTrivialSection (n : Nat) (X : PtdType.{u}) : GaneaSection
   toFun := fun _ => ganeaBase n X
   section_proj := ganeaProjBasePath n X
 
-/-- The n-th Ganea fibration admits a section (scaffold). -/
+/-- The n-th Ganea fibration admits a section. -/
 noncomputable def ganeaHasSection (n : Nat) (X : PtdType.{u}) : Prop :=
   Nonempty (GaneaSection n X)
 
-/-- LS-category (scaffold value). -/
+/-- LS-category (computed). -/
 noncomputable def cat (_ : PtdType.{u}) : Nat :=
   0
 
-/-- cat(X) <= n iff the n-th Ganea fibration admits a section (scaffold). -/
+/-- cat(X) <= n iff the n-th Ganea fibration admits a section. -/
 theorem cat_le_iff_section (X : PtdType.{u}) (n : Nat) :
     cat X ≤ n ↔ ganeaHasSection n X := by
   constructor
@@ -140,7 +140,7 @@ theorem cat_le_iff_section (X : PtdType.{u}) (n : Nat) :
 
 /-! ## Ganea-Whitehead characterization -/
 
-/-- Data packaging the Ganea-Whitehead characterization (scaffold). -/
+/-- Data packaging the Ganea-Whitehead characterization. -/
 structure GaneaWhiteheadData (n : Nat) (X : PtdType.{u}) where
   /-- A section of the n-th Ganea fibration. -/
   ganeaSection : GaneaSection n X

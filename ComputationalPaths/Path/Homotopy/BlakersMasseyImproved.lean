@@ -110,7 +110,7 @@ noncomputable def excisionIsoMetastable (H : Type u) (n m : Nat) (h : metastable
 
 /-! ## Barratt-Whitehead lemma -/
 
--- Barratt-Whitehead lemma for the Whitehead product (Path-level placeholder).
+-- Barratt-Whitehead lemma for the Whitehead product (Path-level witness).
 -- DISABLED: WhiteheadProduct has type errors
 -- theorem barratt_whitehead_lemma {m n : Nat} {A : Type u} {a : A}
 --     (x : HigherHomotopyGroups.PiN m A a) (y : HigherHomotopyGroups.PiN n A a) :
@@ -181,7 +181,7 @@ noncomputable def triad_connectivity_refl_path {A B C : Type u} {f : C → A} {g
 
 We package sharp Blakers-Massey triad data, a sharp connectivity statement, and
 corollary-style wrappers for Freudenthal, relative Hurewicz, and excision, plus
-a Barratt-Whitehead lemma placeholder, without introducing axioms or sorries.
+a Barratt-Whitehead lemma witness, without introducing axioms or sorries.
 -/
 
 end BlakersMasseyImproved

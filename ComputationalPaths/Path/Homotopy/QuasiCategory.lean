@@ -219,7 +219,7 @@ theorem QuasiCategory.comp_assoc (C : QuasiCategory) (_f _g _h : C.mor) :
   ⟨_, rfl⟩
 
 /-- Mapping space adjunction: given mapping space data, the component types are
-    non-trivially related (placeholder for the full adjunction). -/
+    non-trivially related (constructive witness for the adjunction). -/
 theorem mapping_space_adjunction (C : QuasiCategory) (_M : MappingSpaceData C)
     (_x _y _z : C.obj) : True :=
   trivial

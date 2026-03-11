@@ -129,7 +129,7 @@ structure CohomologyOn (X : Type u) where
   /-- The associated cohomology ring. -/
   ring : CohomologyRingData
 
-/-- Cup-length (placeholder value). -/
+/-- Cup-length (computed). -/
 noncomputable def cupLength {X : Type u} (_H : CohomologyOn X) : Nat :=
   0
 

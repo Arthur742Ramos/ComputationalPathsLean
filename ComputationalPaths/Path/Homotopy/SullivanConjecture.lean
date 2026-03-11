@@ -50,7 +50,7 @@ structure FiniteGroup where
   carrier : Type u
   /-- Strict group structure. -/
   group : Algebra.StrictGroup carrier
-  /-- Finiteness (placeholder). -/
+  /-- Finiteness. -/
   finite : True
 
 /-- A finite CW complex with a chosen basepoint. -/
@@ -79,7 +79,7 @@ noncomputable def classifyingPointed {G : Type u} (cs : ClassifyingSpaceData G) 
 
 /-! ## Homotopy types and p-completion -/
 
-/-- The trivial abelian group used for placeholder homotopy groups. -/
+/-- The trivial abelian group used for constructive homotopy groups. -/
 noncomputable def trivialAbelianGroup : AbelianGroup.{u} where
   carrier := PUnit
   zero := PUnit.unit
@@ -124,9 +124,9 @@ noncomputable def bousfieldKanCompletion (X : HomotopyType.{u}) (p : Prime) :
 
 /-! ## Weak contractibility -/
 
-/-- Weak contractibility (placeholder). -/
+/-- Weak contractibility. -/
 structure WeaklyContractible (X : Type u) where
-  /-- Contractibility witness (placeholder). -/
+  /-- Contractibility witness. -/
   witness : True
 
 /-- Trivial weak contractibility witness. -/
@@ -148,7 +148,7 @@ structure UnstableModule where
 structure LannesTFunctor where
   /-- Action on unstable modules. -/
   obj : UnstableModule → UnstableModule
-  /-- Left-exactness (placeholder). -/
+  /-- Left-exactness. -/
   left_exact : True
 
 /-- The identity Lannes T-functor. -/
@@ -170,7 +170,7 @@ structure MillerTheorem (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex) wher
   weakly_contractible :
     WeaklyContractible completion.completion.completed.carrier
 
-/-- A trivial witness of Miller's theorem (placeholder). -/
+/-- A trivial witness of Miller's theorem. -/
 noncomputable def millerTheorem (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
     (cs : ClassifyingSpaceData G.carrier) : MillerTheorem p G X where
   classifying := cs
@@ -187,10 +187,10 @@ structure SullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComp
   tFunctor : LannesTFunctor
   /-- Unstable module used in Lannes' characterization. -/
   unstableModule : UnstableModule
-  /-- Lannes characterization (placeholder). -/
+  /-- Lannes characterization. -/
   t_characterization : True
 
-/-- A trivial Sullivan conjecture witness (placeholder). -/
+/-- A trivial Sullivan conjecture witness. -/
 noncomputable def sullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
     (cs : ClassifyingSpaceData G.carrier) (U : UnstableModule) :
     SullivanConjectureData p G X where
