@@ -85,11 +85,23 @@ theorem truncClass_right_unit {A : Type u} {a : A}
     truncClass (n + 1) (Path.trans p (Path.refl a)) = truncClass (n + 1) p :=
   truncClass_sound (rweq_of_step (Step.trans_refl_right p))
 
+/-- Path witness for the right-unit law in positive truncation stages. -/
+noncomputable def truncClass_right_unit_path {A : Type u} {a : A}
+    (n : Nat) (p : Loop A a) :
+    Path (truncClass (n + 1) (Path.trans p (Path.refl a))) (truncClass (n + 1) p) :=
+  Path.stepChain (truncClass_right_unit n p)
+
 /-- Symmetrically, `refl · p = p` in every positive stage. -/
 theorem truncClass_left_unit {A : Type u} {a : A}
     (n : Nat) (p : Loop A a) :
     truncClass (n + 1) (Path.trans (Path.refl a) p) = truncClass (n + 1) p :=
   truncClass_sound (rweq_of_step (Step.trans_refl_left p))
+
+/-- Path witness for the left-unit law in positive truncation stages. -/
+noncomputable def truncClass_left_unit_path {A : Type u} {a : A}
+    (n : Nat) (p : Loop A a) :
+    Path (truncClass (n + 1) (Path.trans (Path.refl a) p)) (truncClass (n + 1) p) :=
+  Path.stepChain (truncClass_left_unit n p)
 
 /-! ## Section 2 – Postnikov tower -/
 
@@ -128,6 +140,14 @@ theorem projection_right_unit {A : Type u} {a : A}
   simp only [postnikovProjection]
   exact truncClass_right_unit (n + 1) p
 
+/-- Path witness for projection compatibility with right-unit rewrites. -/
+noncomputable def projection_right_unit_path {A : Type u} {a : A}
+    (n : Nat) (p : Loop A a) :
+    Path
+      (postnikovProjection A a (n + 1) (truncClass (n + 2) (Path.trans p (Path.refl a))))
+      (postnikovProjection A a (n + 1) (truncClass (n + 2) p)) :=
+  Path.stepChain (projection_right_unit n p)
+
 /-! ## Section 3 – τ₁(A) recovers π₁ -/
 
 /-- First truncation stage. -/
@@ -153,10 +173,20 @@ theorem tau1_pi1_left_inv {A : Type u} (a : A) (x : τ₁ A a) :
     piOneToTau1 A a (tau1ToPiOne A a x) = x := by
   exact Quot.inductionOn x (fun _ => rfl)
 
+/-- Path witness for the left round-trip `τ₁(A,a) → π₁(A,a) → τ₁(A,a)`. -/
+noncomputable def tau1_pi1_left_inv_path {A : Type u} (a : A) (x : τ₁ A a) :
+    Path (piOneToTau1 A a (tau1ToPiOne A a x)) x :=
+  Path.stepChain (tau1_pi1_left_inv a x)
+
 /-- Right inverse witness. -/
 theorem tau1_pi1_right_inv {A : Type u} (a : A) (x : PiOne A a) :
     tau1ToPiOne A a (piOneToTau1 A a x) = x := by
   exact Quot.inductionOn x (fun _ => rfl)
+
+/-- Path witness for the right round-trip `π₁(A,a) → τ₁(A,a) → π₁(A,a)`. -/
+noncomputable def tau1_pi1_right_inv_path {A : Type u} (a : A) (x : PiOne A a) :
+    Path (tau1ToPiOne A a (piOneToTau1 A a x)) x :=
+  Path.stepChain (tau1_pi1_right_inv a x)
 
 /-- `τ₁(A,a) ≃ π₁(A,a)` as a `SimpleEquiv`. -/
 noncomputable def tau1RecoversPiOne (A : Type u) (a : A) :
@@ -170,6 +200,22 @@ noncomputable def tau1RecoversPiOne (A : Type u) (a : A) :
 noncomputable def postnikovStageOneEquivPiOne (A : Type u) (a : A) :
     SimpleEquiv ((postnikovTower A a).stage 1) (PiOne A a) :=
   tau1RecoversPiOne A a
+
+/-- Path witness for the backward-forward round-trip of stage 1 vs. `π₁`. -/
+noncomputable def postnikovStageOneEquivPiOne_left_inv_path {A : Type u}
+    (a : A) (x : (postnikovTower A a).stage 1) :
+    Path
+      ((postnikovStageOneEquivPiOne A a).invFun ((postnikovStageOneEquivPiOne A a).toFun x))
+      x :=
+  tau1_pi1_left_inv_path a x
+
+/-- Path witness for the forward-backward round-trip of stage 1 vs. `π₁`. -/
+noncomputable def postnikovStageOneEquivPiOne_right_inv_path {A : Type u}
+    (a : A) (x : PiOne A a) :
+    Path
+      ((postnikovStageOneEquivPiOne A a).toFun ((postnikovStageOneEquivPiOne A a).invFun x))
+      x :=
+  tau1_pi1_right_inv_path a x
 
 /-! ## Section 4 – k-invariants -/
 

@@ -45,6 +45,29 @@ noncomputable def shift (M : PersistenceModule) (e : Nat) : PersistenceModule wh
   carrier := fun i => M.carrier (i + e)
   map := fun {_i _j} h => M.map (Nat.add_le_add_right h e)
 
+/-- Shifting by zero does not change a persistence module. -/
+theorem shift_zero (M : PersistenceModule) :
+    shift M 0 = M := by
+  cases M
+  rfl
+
+/-- Path witness for zero shift. -/
+noncomputable def shift_zero_path (M : PersistenceModule) :
+    Path (shift M 0) M :=
+  Path.stepChain (shift_zero M)
+
+/-- Two successive shifts have the same carrier family as a single shift by `f + e`. -/
+theorem shift_shift_carrier (M : PersistenceModule) (e f : Nat) :
+    (shift (shift M e) f).carrier = (shift M (f + e)).carrier := by
+  funext i
+  cases M
+  simp [shift, Nat.add_assoc]
+
+/-- Path witness for carrier-level shift composition. -/
+noncomputable def shift_shift_carrier_path (M : PersistenceModule) (e f : Nat) :
+    Path (shift (shift M e) f).carrier (shift M (f + e)).carrier :=
+  Path.stepChain (shift_shift_carrier M e f)
+
 /-- An epsilon-interleaving between persistence modules. -/
 structure Interleaving (M N : PersistenceModule) (eps : Nat) where
   /-- Forward maps M_i -> N_{i+eps}. -/
@@ -53,6 +76,24 @@ structure Interleaving (M N : PersistenceModule) (eps : Nat) where
   backward : (i : Nat) -> N.carrier i -> M.carrier (i + eps)
   /-- Compatibility conditions (kept as a Prop field). -/
   compat : True
+
+/-- The canonical zero-interleaving of a module with itself. -/
+noncomputable def identityInterleaving (M : PersistenceModule) : Interleaving M M 0 where
+  forward := fun _ x => x
+  backward := fun _ x => x
+  compat := True.intro
+
+/-- Path witness for the forward map of the identity interleaving. -/
+noncomputable def identityInterleaving_forward_path (M : PersistenceModule)
+    (i : Nat) (x : M.carrier i) :
+    Path ((identityInterleaving M).forward i x) x :=
+  Path.refl x
+
+/-- Path witness for the backward map of the identity interleaving. -/
+noncomputable def identityInterleaving_backward_path (M : PersistenceModule)
+    (i : Nat) (x : M.carrier i) :
+    Path ((identityInterleaving M).backward i x) x :=
+  Path.refl x
 
 /-- Interleaving distance d_I as a Nat-valued placeholder. -/
 noncomputable def interleavingDistance (_M _N : PersistenceModule) : Nat := 0
@@ -63,6 +104,11 @@ noncomputable abbrev dI (M N : PersistenceModule) : Nat := interleavingDistance 
 /-- The interleaving distance of a module with itself. -/
 theorem interleavingDistance_self (M : PersistenceModule) :
     interleavingDistance M M = 0 := rfl
+
+/-- Path witness for the self-distance of a persistence module. -/
+noncomputable def interleavingDistance_self_path (M : PersistenceModule) :
+    Path (interleavingDistance M M) 0 :=
+  Path.stepChain (interleavingDistance_self M)
 
 /-! ## Persistence diagrams and bottleneck distance -/
 
@@ -94,6 +140,11 @@ noncomputable abbrev dB (D1 D2 : PersistenceDiagram) : Nat := bottleneckDistance
 theorem bottleneckDistance_self (D : PersistenceDiagram) :
     bottleneckDistance D D = 0 := rfl
 
+/-- Path witness for the self-bottleneck distance of a persistence diagram. -/
+noncomputable def bottleneckDistance_self_path (D : PersistenceDiagram) :
+    Path (bottleneckDistance D D) 0 :=
+  Path.stepChain (bottleneckDistance_self D)
+
 /-! ## q-tame modules and structure theorem -/
 
 /-- q-tameness for persistence modules. -/
@@ -117,6 +168,15 @@ structure QTameStructure (M : PersistenceModule) where
 /-- Build a trivial structure theorem for a q-tame module. -/
 noncomputable def qTame_structure (M : PersistenceModule) (h : QTame M) : QTameStructure M :=
   { qTame := h, diagram := trivialDiagram, realizes := True.intro }
+
+/-- The q-tame structure package uses the trivial persistence diagram in this scaffold. -/
+theorem qTame_structure_diagram (M : PersistenceModule) (h : QTame M) :
+    (qTame_structure M h).diagram = trivialDiagram := rfl
+
+/-- Path witness for the diagram field of the q-tame structure package. -/
+noncomputable def qTame_structure_diagram_path (M : PersistenceModule) (h : QTame M) :
+    Path (qTame_structure M h).diagram trivialDiagram :=
+  Path.stepChain (qTame_structure_diagram M h)
 
 /-- Algebraic stability: d_B <= d_I for q-tame modules. -/
 theorem algebraic_stability {M N : PersistenceModule}

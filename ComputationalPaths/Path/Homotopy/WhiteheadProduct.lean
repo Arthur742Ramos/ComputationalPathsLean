@@ -47,12 +47,28 @@ theorem commutator_id_left {A : Type u} {a : A} (y : Pi1 A a) :
     commutator (A := A) (a := a) (HigherHomotopy.piNBasepoint 1 A a) y =
       HigherHomotopy.piNBasepoint 1 A a := rfl
 
+noncomputable def commutator_id_left_path {A : Type u} {a : A} (y : Pi1 A a) :
+    Path
+      (commutator (A := A) (a := a) (HigherHomotopy.piNBasepoint 1 A a) y)
+      (HigherHomotopy.piNBasepoint 1 A a) :=
+  Path.stepChain (commutator_id_left y)
+
 theorem commutator_id_right {A : Type u} {a : A} (x : Pi1 A a) :
     commutator (A := A) (a := a) x (HigherHomotopy.piNBasepoint 1 A a) =
       HigherHomotopy.piNBasepoint 1 A a := rfl
 
+noncomputable def commutator_id_right_path {A : Type u} {a : A} (x : Pi1 A a) :
+    Path
+      (commutator (A := A) (a := a) x (HigherHomotopy.piNBasepoint 1 A a))
+      (HigherHomotopy.piNBasepoint 1 A a) :=
+  Path.stepChain (commutator_id_right x)
+
 theorem commutator_self {A : Type u} {a : A} (x : Pi1 A a) :
     commutator (A := A) (a := a) x x = HigherHomotopy.piNBasepoint 1 A a := rfl
+
+noncomputable def commutator_self_path {A : Type u} {a : A} (x : Pi1 A a) :
+    Path (commutator (A := A) (a := a) x x) (HigherHomotopy.piNBasepoint 1 A a) :=
+  Path.stepChain (commutator_self x)
 
 noncomputable def conj {A : Type u} {a : A} (_g x : Pi1 A a) : Pi1 A a := x
 
@@ -62,12 +78,24 @@ theorem conj_commutator {A : Type u} {a : A} (g x y : Pi1 A a) :
         (conj (A := A) (a := a) g x)
         (conj (A := A) (a := a) g y) := rfl
 
+noncomputable def conj_commutator_path {A : Type u} {a : A} (g x y : Pi1 A a) :
+    Path
+      (conj (A := A) (a := a) g (commutator (A := A) (a := a) x y))
+      (commutator (A := A) (a := a)
+        (conj (A := A) (a := a) g x)
+        (conj (A := A) (a := a) g y)) :=
+  Path.stepChain (conj_commutator g x y)
+
 noncomputable def pow {A : Type u} {a : A} (x : Pi1 A a) : Nat → Pi1 A a
   | 0 => HigherHomotopy.piNBasepoint 1 A a
   | _ + 1 => x
 
 theorem pow_zero {A : Type u} {a : A} (x : Pi1 A a) :
     pow (A := A) (a := a) x 0 = HigherHomotopy.piNBasepoint 1 A a := rfl
+
+noncomputable def pow_zero_path {A : Type u} {a : A} (x : Pi1 A a) :
+    Path (pow (A := A) (a := a) x 0) (HigherHomotopy.piNBasepoint 1 A a) :=
+  Path.stepChain (pow_zero x)
 
 end LoopGroupAlgebra
 
@@ -91,32 +119,70 @@ theorem whitehead_identity_left_pi1 {A : Type u} {a : A}
     whiteheadProduct (m := 1) (n := 1) (HigherHomotopy.piNBasepoint 1 A a) y = HigherHomotopy.piNBasepoint 1 A a :=
   LoopGroupAlgebra.commutator_id_left (A := A) (a := a) y
 
+noncomputable def whitehead_identity_left_pi1_path {A : Type u} {a : A}
+    (y : HigherHomotopy.PiN 1 A a) :
+    Path
+      (whiteheadProduct (m := 1) (n := 1) (HigherHomotopy.piNBasepoint 1 A a) y)
+      (HigherHomotopy.piNBasepoint 1 A a) :=
+  Path.stepChain (whitehead_identity_left_pi1 y)
+
 /-- The Whitehead product with the identity on the right (in π₁) is trivial. -/
 theorem whitehead_identity_right_pi1 {A : Type u} {a : A}
     (x : HigherHomotopy.PiN 1 A a) :
     whiteheadProduct (m := 1) (n := 1) x (HigherHomotopy.piNBasepoint 1 A a) = HigherHomotopy.piNBasepoint 1 A a :=
   LoopGroupAlgebra.commutator_id_right (A := A) (a := a) x
 
+noncomputable def whitehead_identity_right_pi1_path {A : Type u} {a : A}
+    (x : HigherHomotopy.PiN 1 A a) :
+    Path
+      (whiteheadProduct (m := 1) (n := 1) x (HigherHomotopy.piNBasepoint 1 A a))
+      (HigherHomotopy.piNBasepoint 1 A a) :=
+  Path.stepChain (whitehead_identity_right_pi1 x)
+
 /-- Whitehead product is trivial when the first index is 0. -/
 theorem whitehead_zero_left {n : Nat} {A : Type u} {a : A}
     (x : HigherHomotopy.PiN 0 A a) (y : HigherHomotopy.PiN n A a) :
     whiteheadProduct (m := 0) (n := n) x y = HigherHomotopy.piNBasepoint (0 + n - 1) A a := rfl
+
+noncomputable def whitehead_zero_left_path {n : Nat} {A : Type u} {a : A}
+    (x : HigherHomotopy.PiN 0 A a) (y : HigherHomotopy.PiN n A a) :
+    Path (whiteheadProduct (m := 0) (n := n) x y) (HigherHomotopy.piNBasepoint (0 + n - 1) A a) :=
+  Path.stepChain (whitehead_zero_left x y)
 
 /-- Whitehead product is trivial when the first index is ≥ 2. -/
 theorem whitehead_high_left {m n : Nat} {A : Type u} {a : A}
     (x : HigherHomotopy.PiN (m + 2) A a) (y : HigherHomotopy.PiN n A a) :
     whiteheadProduct (m := m + 2) (n := n) x y = HigherHomotopy.piNBasepoint (m + 2 + n - 1) A a := rfl
 
+noncomputable def whitehead_high_left_path {m n : Nat} {A : Type u} {a : A}
+    (x : HigherHomotopy.PiN (m + 2) A a) (y : HigherHomotopy.PiN n A a) :
+    Path
+      (whiteheadProduct (m := m + 2) (n := n) x y)
+      (HigherHomotopy.piNBasepoint (m + 2 + n - 1) A a) :=
+  Path.stepChain (whitehead_high_left x y)
+
 /-- Whitehead product is trivial when the second index is 0 and first is 1. -/
 theorem whitehead_one_zero {A : Type u} {a : A}
     (x : HigherHomotopy.PiN 1 A a) (y : HigherHomotopy.PiN 0 A a) :
     whiteheadProduct (m := 1) (n := 0) x y = HigherHomotopy.piNBasepoint 0 A a := rfl
+
+noncomputable def whitehead_one_zero_path {A : Type u} {a : A}
+    (x : HigherHomotopy.PiN 1 A a) (y : HigherHomotopy.PiN 0 A a) :
+    Path (whiteheadProduct (m := 1) (n := 0) x y) (HigherHomotopy.piNBasepoint 0 A a) :=
+  Path.stepChain (whitehead_one_zero x y)
 
 /-- Whitehead product is trivial when the second index is ≥ 2 and first is 1. -/
 theorem whitehead_one_high {n : Nat} {A : Type u} {a : A}
     (x : HigherHomotopy.PiN 1 A a) (y : HigherHomotopy.PiN (n + 2) A a) :
     whiteheadProduct (m := 1) (n := n + 2) x y =
       HigherHomotopy.piNBasepoint (1 + (n + 2) - 1) A a := rfl
+
+noncomputable def whitehead_one_high_path {n : Nat} {A : Type u} {a : A}
+    (x : HigherHomotopy.PiN 1 A a) (y : HigherHomotopy.PiN (n + 2) A a) :
+    Path
+      (whiteheadProduct (m := 1) (n := n + 2) x y)
+      (HigherHomotopy.piNBasepoint (1 + (n + 2) - 1) A a) :=
+  Path.stepChain (whitehead_one_high x y)
 
 /-! ## Self-Product -/
 
@@ -136,6 +202,10 @@ noncomputable def gradedSign (m n : Nat) : Int :=
 /-- The graded sign for (1,1) is -1. -/
 theorem gradedSign_one_one : gradedSign 1 1 = -1 := rfl
 
+noncomputable def gradedSign_one_one_path :
+    Path (gradedSign 1 1) (-1 : Int) :=
+  Path.stepChain gradedSign_one_one
+
 /-- The graded sign for (2,1) is 1. -/
 theorem gradedSign_two_one : gradedSign 2 1 = 1 := rfl
 
@@ -148,6 +218,10 @@ theorem gradedSign_one_two : gradedSign 1 2 = 1 := rfl
 /-- The graded sign is symmetric: sign(m,n) = sign(n,m). -/
 theorem gradedSign_comm (m n : Nat) : gradedSign m n = gradedSign n m := by
   simp [gradedSign, Nat.mul_comm]
+
+noncomputable def gradedSign_comm_path (m n : Nat) :
+    Path (gradedSign m n) (gradedSign n m) :=
+  Path.stepChain (gradedSign_comm m n)
 
 /-- The graded sign for (0, n) is 1. -/
 theorem gradedSign_zero_left (n : Nat) : gradedSign 0 n = 1 := by
@@ -192,10 +266,20 @@ theorem iteratedWhitehead_zero {A : Type u} {a : A}
     (x y : HigherHomotopy.PiN 1 A a) :
     iteratedWhitehead 0 x y = HigherHomotopy.piNBasepoint 1 A a := rfl
 
+noncomputable def iteratedWhitehead_zero_path {A : Type u} {a : A}
+    (x y : HigherHomotopy.PiN 1 A a) :
+    Path (iteratedWhitehead 0 x y) (HigherHomotopy.piNBasepoint 1 A a) :=
+  Path.stepChain (iteratedWhitehead_zero x y)
+
 /-- The first iterated product is the regular Whitehead product. -/
 theorem iteratedWhitehead_one {A : Type u} {a : A}
     (x y : HigherHomotopy.PiN 1 A a) :
     iteratedWhitehead 1 x y = whiteheadProduct (m := 1) (n := 1) x y := rfl
+
+noncomputable def iteratedWhitehead_one_path {A : Type u} {a : A}
+    (x y : HigherHomotopy.PiN 1 A a) :
+    Path (iteratedWhitehead 1 x y) (whiteheadProduct (m := 1) (n := 1) x y) :=
+  Path.stepChain (iteratedWhitehead_one x y)
 
 /-- The iterated product of identity is identity. -/
 theorem iteratedWhitehead_id {A : Type u} {a : A}
@@ -210,6 +294,13 @@ theorem iteratedWhitehead_id {A : Type u} {a : A}
           simp [iteratedWhitehead]
           rw [ih]
           exact whitehead_identity_right_pi1 (HigherHomotopy.piNBasepoint 1 A a)
+
+noncomputable def iteratedWhitehead_id_path {A : Type u} {a : A}
+    (n : Nat) (y : HigherHomotopy.PiN 1 A a) :
+    Path
+      (iteratedWhitehead n (HigherHomotopy.piNBasepoint 1 A a) y)
+      (HigherHomotopy.piNBasepoint 1 A a) :=
+  Path.stepChain (iteratedWhitehead_id n y)
 
 /-! ## Whitehead Algebra Structure -/
 

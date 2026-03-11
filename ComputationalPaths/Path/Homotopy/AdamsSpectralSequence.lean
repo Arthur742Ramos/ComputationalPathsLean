@@ -185,6 +185,41 @@ noncomputable def trivialPage (r : Nat) : SpectralSequencePage r where
 noncomputable instance (r : Nat) : HasDifferentialSquaredZero (trivialPage r) where
   d_squared_zero := fun _ _ _ => Path.stepChain rfl
 
+/-! ## Trivial convergence package -/
+
+/-- A canonical convergence package built from the trivial Adams page. -/
+noncomputable def trivialConvergence (stem : Nat) : AdamsConvergence where
+  E2 := trivialPage 2
+  d_squared := inferInstance
+  stem := stem
+  converges_to_stem := Unit
+
+/-- The trivial convergence package remembers its stem parameter. -/
+theorem trivialConvergence_stem (stem : Nat) :
+    (trivialConvergence stem).stem = stem := rfl
+
+/-- The trivial convergence package uses the trivial `E₂` page. -/
+theorem trivialConvergence_page (stem : Nat) :
+    (trivialConvergence stem).E2 = trivialPage 2 := rfl
+
+/-- A chosen basepoint in the trivial convergence target. -/
+noncomputable def trivialConvergence_targetBase (stem : Nat) :
+    (trivialConvergence stem).converges_to_stem :=
+  ()
+
+/-- The basepoint of the trivial convergence target is definitionally the unit point. -/
+theorem trivialConvergence_targetBase_eq (stem : Nat) :
+    trivialConvergence_targetBase stem = () := rfl
+
+/-- Path witness that the trivial convergence differential squares to zero. -/
+noncomputable def trivialConvergence_d_squared_path (stem s t : Nat) :
+    Path
+      (((trivialConvergence stem).E2).d (s + 2) (t + 1)
+        (((trivialConvergence stem).E2).d s t ()))
+      (((trivialConvergence stem).E2).groups.zero (s + 4) (t + 2)) := by
+  letI := (trivialConvergence stem).d_squared
+  simpa using differential_squared_zero ((trivialConvergence stem).E2) s t ()
+
 end AdamsSpectralSequence
 end Path
 end ComputationalPaths

@@ -137,6 +137,53 @@ theorem adamsEInvariant_value (n : Nat) (x : StableStem n) :
     (adamsEInvariant n x).value = 0 := by
   rfl
 
+/-- Path witness for the stable-stem element underlying the image of J. -/
+noncomputable def imageOfJMap_elem_path (n : Nat) (x : JSource n) :
+    Path (imageOfJMap n x).elem (stableStemBase n) :=
+  Path.stepChain rfl
+
+/-- Path witness that the canonical image-of-J class matches `imageOfJBase`. -/
+noncomputable def imageOfJBase_path (n : Nat) :
+    Path (imageOfJMap n ()).elem (imageOfJBase n).elem :=
+  Path.stepChain rfl
+
+/-- Path witness for the value of the Adams e-invariant. -/
+noncomputable def adamsEInvariant_value_path (n : Nat) (x : StableStem n) :
+    Path (adamsEInvariant n x).value 0 :=
+  Path.stepChain rfl
+
+/-- Path witness for the underlying stable stem of the alpha family. -/
+noncomputable def alphaFamily_elem_path (k : Nat) :
+    Path (alphaFamily k).elem (stableStemBase (alphaStem k)) :=
+  Path.stepChain rfl
+
+/-- Path witness for the underlying stable stem of the beta family. -/
+noncomputable def betaFamily_elem_path (k : Nat) :
+    Path (betaFamily k).elem (stableStemBase (betaStem k)) :=
+  Path.stepChain rfl
+
+/-- Path witness that the trivial height-1 chromatic page is the trivial Adams page. -/
+noncomputable def trivialHeightOneSS_page_path (p : ChromaticHomotopy.Prime) :
+    Path (trivialHeightOneSS p).E2 (AdamsSpectralSequence.trivialPage 1) :=
+  Path.stepChain rfl
+
+/-- A chosen basepoint in the trivial convergence target. -/
+noncomputable def trivialHeightOneSS_targetBase (p : ChromaticHomotopy.Prime) :
+    (trivialHeightOneSS p).converges_to_stem :=
+  ()
+
+/-- Path witness that the trivial height-1 differential squares to zero. -/
+noncomputable def trivialHeightOneSS_d_squared_path
+    (p : ChromaticHomotopy.Prime) (s t : Nat) :
+    Path
+      (((trivialHeightOneSS p).E2).d (s + 1) t (((trivialHeightOneSS p).E2).d s t ()))
+      (((trivialHeightOneSS p).E2).groups.zero (s + 2) t) := by
+  letI := (trivialHeightOneSS p).d_squared
+  simpa using AdamsSpectralSequence.differential_squared_zero ((trivialHeightOneSS p).E2) s t ()
+
+/-- The chosen prime-two example really has underlying value 2. -/
+theorem primeTwo_val : primeTwo.val = 2 := rfl
+
 
 
 

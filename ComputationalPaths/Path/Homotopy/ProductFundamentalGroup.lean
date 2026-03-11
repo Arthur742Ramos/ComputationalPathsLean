@@ -159,6 +159,12 @@ theorem prodPiOne_encode_decode (x : π₁(A, a) × π₁(B, b)) :
         exact rweqProp_of_rweq
           (Path.snd_prod_rweq (A := A) (B := B) p q)
 
+/-- `Path` witness for the quotient-level round-trip `encode ∘ decode = id`. -/
+noncomputable def prodPiOne_encode_decode_path
+    (x : π₁(A, a) × π₁(B, b)) :
+    Path (prodPiOneEncode a b (prodPiOneDecode a b x)) x :=
+  Path.stepChain (prodPiOne_encode_decode (A := A) (B := B) a b x)
+
 /-- Round-trip: decode ∘ encode = id. -/
 theorem prodPiOne_decode_encode (γ : π₁(A × B, (a, b))) :
     prodPiOneDecode a b (prodPiOneEncode a b γ) = γ := by
@@ -166,6 +172,12 @@ theorem prodPiOne_decode_encode (γ : π₁(A × B, (a, b))) :
   | _ p =>
     simp only [prodPiOneEncode, prodPiOneDecode]
     exact Quot.sound (rweqProp_of_rweq (Path.prod_fst_snd_rweq (A := A) (B := B) (p := p)))
+
+/-- `Path` witness for the quotient-level round-trip `decode ∘ encode = id`. -/
+noncomputable def prodPiOne_decode_encode_path
+    (γ : π₁(A × B, (a, b))) :
+    Path (prodPiOneDecode a b (prodPiOneEncode a b γ)) γ :=
+  Path.stepChain (prodPiOne_decode_encode (A := A) (B := B) a b γ)
 
 /-! ## Main Theorem -/
 
@@ -177,6 +189,18 @@ noncomputable def prodPiOneEquiv :
   invFun := prodPiOneDecode a b
   left_inv := prodPiOne_decode_encode a b
   right_inv := prodPiOne_encode_decode a b
+
+/-- `Path` witness for the backward round-trip of `prodPiOneEquiv`. -/
+noncomputable def prodPiOneEquiv_roundtrip_path
+    (γ : π₁(A × B, (a, b))) :
+    Path (((prodPiOneEquiv a b).invFun ((prodPiOneEquiv a b).toFun γ))) γ :=
+  Path.stepChain ((prodPiOneEquiv a b).left_inv γ)
+
+/-- `Path` witness for the forward round-trip of `prodPiOneEquiv`. -/
+noncomputable def prodPiOneEquiv_fwdRoundtrip_path
+    (x : π₁(A, a) × π₁(B, b)) :
+    Path (((prodPiOneEquiv a b).toFun ((prodPiOneEquiv a b).invFun x))) x :=
+  Path.stepChain ((prodPiOneEquiv a b).right_inv x)
 
 end ProductFundamentalGroup
 
@@ -191,6 +215,19 @@ theorem nTorus_piOne_structure (a : A) (b : B) :
     prodPiOneDecode (A := A) (B := B) a b ∘ prodPiOneEncode (A := A) (B := B) a b = id := by
   funext γ
   exact prodPiOne_decode_encode (A := A) (B := B) a b γ
+
+/-- `Path` witness for the torus-style product decomposition coherence. -/
+noncomputable def nTorus_piOne_structure_path (a : A) (b : B) :
+    Path
+      (prodPiOneDecode (A := A) (B := B) a b ∘ prodPiOneEncode (A := A) (B := B) a b)
+      id :=
+  Path.stepChain (nTorus_piOne_structure (A := A) (B := B) a b)
+
+/-- Pointwise `Path` form of the torus product decomposition coherence. -/
+noncomputable def nTorus_piOne_structure_apply_path
+    (a : A) (b : B) (γ : π₁(A × B, (a, b))) :
+    Path (prodPiOneDecode (A := A) (B := B) a b (prodPiOneEncode (A := A) (B := B) a b γ)) γ :=
+  Path.stepChain (prodPiOne_decode_encode (A := A) (B := B) a b γ)
 
 end NTorusFundamentalGroup
 

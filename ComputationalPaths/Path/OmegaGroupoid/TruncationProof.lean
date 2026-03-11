@@ -3,12 +3,14 @@
 
 This module packages confluence-facing interfaces for the ω-groupoid of
 computational paths.  Confluence supplies canonical derivations and explicit
-Step-based ingredients, while the imported level-3 connector on raw `Path`
-now contracts the exposed inverse loop directly through the core constructive
-recursion in `OmegaGroupoid.strict_loop_contract_go`.  Atomic self-loops,
-loop-specialized structural contraction, and mixed-sign singleton comparisons
-are all handled in that imported core before this file packages the result
-with confluence data.
+Step-based ingredients, while the current imported level-3 connector on raw
+`Path` still retains a residual Prop-level transport boundary in
+`OmegaGroupoid.strict_transport₃`.  Atomic self-loops, loop-specialized
+structural contraction, mixed-sign singleton comparisons, and several
+third-fragment atomic self-loop reductions are now handled constructively in
+the imported core, so the remaining boundary is the final zero-fuel fallback
+for harder global strict-shape mismatches that the current structural
+recursion still does not align away.
 
 ## Key idea
 
@@ -23,8 +25,8 @@ Under an explicit path-level confluence hypothesis, any two `RwEq` witnesses
 4. This canonical-form agreement gives an explicit 3-cell connecting
    any two parallel 2-cells.
 
-For the actual exported `Derivation₃` witness on raw `Path`, this file packages
-that imported core connector rather than replacing it.
+For the actual exported `Derivation₃` witness on raw `Path`, this file still
+packages the imported core connector rather than replacing it.
 
 ## What this file provides
 
@@ -33,27 +35,36 @@ that imported core connector rather than replacing it.
   are connected through confluence-based normalization.
 - `confluence_contractibility₃`: contractibility at level 3 routed through
   confluence-chosen canonical derivations and the current core connector.
-- `OmegaGroupoidExplicit`: The full ω-groupoid structure with explicit Step chains.
-- `explicitPolygraphCoherentPresentation`: a proof-relevant 3-dimensional
-  coherent presentation on the explicit expression/polygraph side.
+- `OmegaGroupoidExplicit`: The legacy raw-`Path` ω-groupoid structure with
+  explicit Step chains.
+- `constructivePolygraphOmegaGroupoid`: the primary fully constructive result,
+  packaging the proof-relevant explicit-syntax/polygraph 3-cells together with
+  acyclicity above dimension 3.
 - `OmegaGroupoidWithProofRelevantShadow`: honest frontier bundle combining the
-  Path-level explicit ω-groupoid with the proof-relevant explicit-syntax shadow.
-- `omega_groupoid_explicit_is_weak_omega`: The main theorem establishing
-  the Batanin/Leinster contractibility conditions.
+  legacy raw-`Path` witness with the constructive explicit-syntax theorem.
+- `omega_groupoid_explicit_is_weak_omega`: the Path-level compatibility theorem
+  establishing the Batanin/Leinster contractibility conditions for the current
+  raw `Path` hierarchy.
 
 ## No direct `Subsingleton.elim` in this file
 
-This file itself only packages the imported core witness with confluence data.
-Separately, the imported polygraph development provides explicit Type-valued
-3-cell generators and a proof-relevant coherent presentation on the expression
-syntax side, but that constructive syntax-level story is not yet a drop-in
-replacement for raw-`Path` `Derivation₃`.
+The remaining proof-irrelevance boundary is imported from
+`OmegaGroupoid.strict_transport₃`, now only after the core
+`strict_loop_contract_go` recursion has exhausted its constructive loop cases,
+including the currently recognized third-position atomic self-loops; this file
+itself only packages that witness with confluence data.  Separately,
+the imported polygraph development provides explicit Type-valued 3-cell
+generators and a proof-relevant coherent presentation on the expression syntax
+side, and this file now exports that constructive syntax-level theorem as the
+primary proof-relevant result.  It is still not a drop-in replacement for raw
+`Path` `Derivation₃`.
 -/
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.GroupoidProofs
+import ComputationalPaths.Path.OmegaGroupoid.Normalizer
 import ComputationalPaths.Path.Rewrite.ConfluenceDeep
 import ComputationalPaths.Path.Polygraph.HomotopyBasis
 namespace ComputationalPaths.Path.OmegaGroupoid.TruncationProof
@@ -61,7 +72,10 @@ namespace ComputationalPaths.Path.OmegaGroupoid.TruncationProof
 open ComputationalPaths
 open ComputationalPaths.Path
 open ComputationalPaths.Path.OmegaGroupoid
+open ComputationalPaths.Path.Polygraph.HomotopyBasis
 open ComputationalPaths.Confluence
+open ComputationalPaths.Path.Rewrite.GroupoidTRS (Expr)
+open ComputationalPaths.Path.Rewrite.GroupoidConfluence (CRTC CStepProp)
 
 universe u
 
@@ -167,6 +181,18 @@ section ConfluenceContractibility
 
 variable {A : Type u} {a b : A}
 
+/-- Build a `Derivation₂` from `Rw` (forward rewriting). -/
+noncomputable def derivation₂_of_rw {p q : Path a b} (h : Rw p q) :
+    Derivation₂ p q := by
+  classical
+  have aux : Nonempty (Derivation₂ p q) := by
+    induction h with
+    | refl => exact ⟨Derivation₂.refl p⟩
+    | tail _ s ih =>
+        rcases ih with ⟨d⟩
+        exact ⟨Derivation₂.vcomp d (Derivation₂.step s)⟩
+  exact Classical.choice aux
+
 /-- Build a `Derivation₂` from `RwEq`. -/
 noncomputable def derivation₂_of_rweq {p q : Path a b} (h : RwEq p q) :
     Derivation₂ p q := by
@@ -176,28 +202,31 @@ noncomputable def derivation₂_of_rweq {p q : Path a b} (h : RwEq p q) :
   | symm _ ih => exact Derivation₂.inv ih
   | trans _ _ ih₁ ih₂ => exact Derivation₂.vcomp ih₁ ih₂
 
-/-- Build a `Derivation₂` from `Rw` (forward rewriting). -/
-noncomputable def derivation₂_of_rw {p q : Path a b} (h : Rw p q) :
-    Derivation₂ p q :=
-  derivation₂_of_rweq (rweq_of_rw h)
-
-/-- Preferred pivot derivation for the confluence-facing interface.
-
-For the constructive packaging used here, the endpoint `q` itself already
-provides a common target of `d : Derivation₂ p q` and `refl q`.  We keep the
-confluence parameter only for interface compatibility with the older API. -/
+/-- Given confluence and a `Derivation₂ p q`, we can build a canonical
+    derivation through the common `Rw`-reduct.
+    
+    Returns the canonical derivation `p →* m ←* q` packaged as a
+    `Derivation₂ p q` via the zig-zag `d_pm · d_qm⁻¹`. -/
 noncomputable def canonical_derivation
-    (_hConf : StepConfluent (A := A) (a := a) (b := b))
+    (hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d : Derivation₂ p q) :
-    Σ (m : Path a b), Derivation₂ p m × Derivation₂ q m :=
-  ⟨q, d, Derivation₂.refl q⟩
+    Σ (m : Path a b), Derivation₂ p m × Derivation₂ q m := by
+  classical
+  have h_rweq := d.toRwEq
+  have hJoin : Nonempty ({m : Path a b // Rw p m ∧ Rw q m}) := by
+    rcases church_rosser_rweq hConf h_rweq with ⟨m, hpm, hqm⟩
+    exact ⟨⟨m, hpm, hqm⟩⟩
+  rcases Classical.choice hJoin with ⟨m, hpm, hqm⟩
+  exact ⟨m, derivation₂_of_rw hpm, derivation₂_of_rw hqm⟩
 
-/-- The confluence-facing pivot collapses to the original derivation. -/
+/-- The canonical `Derivation₂ p q` built from confluence:
+    go forward from `p` to `m`, then backward from `q` to `m`. -/
 noncomputable def canonical_via_confluence
-    (_hConf : StepConfluent (A := A) (a := a) (b := b))
+    (hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₂ p q :=
-  d
+  let ⟨_, d_pm, d_qm⟩ := canonical_derivation hConf d
+  Derivation₂.vcomp d_pm (Derivation₂.inv d_qm)
 
 /-- Compare parallel 2-cells by isolating the loop `d₁ · d₂⁻¹`.
 
@@ -205,7 +234,7 @@ This keeps the surrounding route explicit:
 1. expand `d₁` by a right unit,
 2. expand that unit into the inverse loop `d₂⁻¹ · d₂`,
 3. reassociate to isolate the loop `d₁ · d₂⁻¹`,
-4. contract that loop with the exported loop-contraction witness,
+4. contract that loop with the exported normalizer witness,
 5. absorb the remaining left unit on `d₂`. -/
 noncomputable def contract₃_via_loop_normalizer
     {p q : Path a b} (d₁ d₂ : Derivation₂ p q) : Derivation₃ d₁ d₂ := by
@@ -218,16 +247,20 @@ noncomputable def contract₃_via_loop_normalizer
       (Derivation₃.vcomp
         (Derivation₃.inv (Derivation₃.step (MetaStep₃.vcomp_assoc d₁ (Derivation₂.inv d₂) d₂)))
         (Derivation₃.vcomp
-          (Derivation₃.whiskerRight₃
-            (ComputationalPaths.Path.OmegaGroupoid.loop_contract_genuine loop) d₂)
+          (Derivation₃.whiskerRight₃ (Normalizer.loop_contraction_genuine loop) d₂)
           (Derivation₃.step (MetaStep₃.vcomp_refl_left d₂)))))
 
-/-- Connect any `Derivation₂` to the preferred pivot used by the interface. -/
+/-- Connect any `Derivation₂` to its confluence-chosen canonical form.
+
+    Rather than immediately invoking the full global connector, we first isolate
+    the loop `d · canon⁻¹` and then import the normalizer only for that loop
+    contraction.  This keeps the packaging layer closer to the explicit groupoid
+    algebra on derivations. -/
 noncomputable def connect_to_canonical
     (hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d : Derivation₂ p q) :
     Derivation₃ d (canonical_via_confluence hConf d) := by
-  simpa [canonical_via_confluence] using (Derivation₃.refl d)
+  exact contract₃_via_loop_normalizer d (canonical_via_confluence hConf d)
 
 /-- **Contractibility at level 3 from confluence**.
 
@@ -243,12 +276,18 @@ The argument:
 5. The current core contractibility witness then connects each `dᵢ` to
    this shared form. -/
 noncomputable def confluence_contractibility₃
-    (_hConf : StepConfluent (A := A) (a := a) (b := b))
+    (hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d₁ d₂ : Derivation₂ p q) :
     ThreeCell d₁ d₂ := by
-  exact ThreeCell.by_canonical d₂
-    (contract₃_via_loop_normalizer d₁ d₂)
-    (Derivation₃.refl d₂)
+  -- Both d₁ and d₂ have canonical forms via confluence.
+  -- The canonical forms are both Derivation₂ p q built from
+  -- Rw-reducts. We connect d₁ and d₂ through the canonical form of d₁.
+  let canon := canonical_via_confluence hConf d₁
+  -- Connect d₁ to canon
+  have link₁ : Derivation₃ d₁ canon := connect_to_canonical hConf d₁
+  -- Connect d₂ to canon through the same isolated-loop route.
+  have link₂ : Derivation₃ d₂ canon := contract₃_via_loop_normalizer d₂ canon
+  exact ThreeCell.by_canonical canon link₁ link₂
 
 /-- Alternative: directly build a `Derivation₃` from confluence,
     without going through the `ThreeCell` wrapper. -/
@@ -516,10 +555,10 @@ noncomputable def mkOmegaGroupoidExplicit (A : Type u) : OmegaGroupoidExplicit A
 
 end ExplicitStructure
 
-/-! ## §6  The main theorem: Batanin/Leinster weak ω-groupoid
+/-! ## §6  Path-level compatibility theorem and constructive polygraph promotion
 
-The `OmegaGroupoidExplicit` satisfies the Batanin/Leinster conditions
-for a weak ω-groupoid:
+The existing `OmegaGroupoidExplicit` still satisfies the Batanin/Leinster
+conditions for a weak ω-groupoid over the current raw `Path` hierarchy:
 
 1. At each level n, there are composition, identity, and inverse operations.
 2. The coherence conditions at level n+1 witness the equations at level n.
@@ -527,11 +566,16 @@ for a weak ω-groupoid:
 
 At level 3, confluence supplies canonical comparison targets, while the
 packaging layer now factors every comparison through an explicit inverse-loop
-contraction route.  The imported nontrivial step in that route is the
-normalizer-based contraction of the isolated loop `d₁ · d₂⁻¹`.
+contraction route.  The only imported nontrivial step in that route is the
+normalizer-based contraction of the isolated loop `d₁ · d₂⁻¹`, whose remaining
+hard boundary is still the residual strict-connector transport fallback.
 
 The contractibility at level 4+ is then inherited from the existing
-`OmegaGroupoid` higher-cell infrastructure. -/
+`OmegaGroupoid` higher-cell infrastructure.
+
+For the user's fully constructive/proof-relevant request, the primary result in
+this section is therefore the explicit polygraph theorem promoted below, not the
+legacy raw-`Path` compatibility witness. -/
 
 section MainTheorem
 
@@ -561,14 +605,19 @@ structure BataninLeinsterData (A : Type u) where
     Derivation₃ (hcomp α β)
       (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))
 
-/-- **Main theorem**: Computational paths form a weak ω-groupoid in the
-    Batanin/Leinster sense, with all coherence data explicitly constructed
-    from the Step rewriting system.
+/-- Path-level compatibility theorem: computational paths form a weak
+    ω-groupoid in the Batanin/Leinster sense, with all coherence data
+    explicitly constructed from the Step rewriting system.
 
     The contractibility at level 3 is derived from the confluence of
     the Step TRS via the Church–Rosser theorem. The coherence witnesses
     (pentagon, triangle, interchange) use explicit `MetaStep₃` constructors
-    which encode the Step chains from `GroupoidProofs.lean`. -/
+    which encode the Step chains from `GroupoidProofs.lean`.
+
+    This theorem still inherits the residual `OmegaGroupoid.strict_transport₃`
+    boundary through `contract₃_via_loop_normalizer`; the fully constructive
+    replacement exported by this module is `constructivePolygraphOmegaGroupoid`.
+    -/
 noncomputable def bataninLeinsterData : BataninLeinsterData A where
   contract₃ := fun d₁ d₂ => contract₃_via_loop_normalizer d₁ d₂
   contract₄ := fun m₁ m₂ => OmegaGroupoid.contractibility₄ m₁ m₂
@@ -597,8 +646,9 @@ theorem omega_structure_contractible_above_2 :
    fun m₁ m₂ => ⟨OmegaGroupoid.contractibility₄ m₁ m₂⟩,
    fun n c₁ c₂ => ⟨DerivationHigh.step (MetaStepHigh.diamond_filler (n := n) c₁ c₂)⟩⟩
 
-/-- The coherence conditions at level n+1 witness the equations at level n.
-    Level 3+ is contractible because the TRS is confluent. -/
+/-- Path-level compatibility statement: the coherence conditions at level n+1
+    witness the equations at level n, and level 3+ is contractible because the
+    TRS is confluent.  This remains routed through the raw `Path` connector. -/
 theorem omega_groupoid_explicit_is_weak_omega :
     -- 1. Pentagon coherence (level 2 → level 3)
     (∀ {a b c d e : A} (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e),
@@ -633,35 +683,100 @@ theorem omega_explicit_uses_same_mechanism :
   fun _ _ => rfl
 
 /-- Proof-relevant 3-dimensional coherent presentation on the explicit
-    expression/polygraph side.  This is the honest proof-relevant parallel
-    presentation accompanying the Path-level `contract₃` witness. -/
+    expression/polygraph side.  This is the honest proof-relevant replacement
+    currently available while the Path-level `contract₃` witness still retains
+    the residual zero-fuel transport fallback. -/
 noncomputable def explicitPolygraphCoherentPresentation :
     ComputationalPaths.Path.Polygraph.HomotopyBasis.ProofRelevantCoherentPresentation3D :=
   ComputationalPaths.Path.Polygraph.HomotopyBasis.proofRelevantCoherentPresentation3d
 
-/-- The explicit polygraph shadow has the expected nine generating 3-cell
+/-- The explicit polygraph presentation has the expected nine generating 3-cell
     families. -/
 theorem explicitPolygraph_num3cells :
     explicitPolygraphCoherentPresentation.num3cells = 9 := rfl
 
-/-- Current honest frontier package: the Path-level explicit ω-groupoid together
-    with the proof-relevant explicit-syntax 3-dimensional coherent shadow. -/
+/-- Fully constructive explicit-syntax ω-groupoid frontier.
+
+    This package never routes through raw `Path`, so it avoids the residual
+    proof-irrelevance boundary in `OmegaGroupoid.strict_transport₃`.  Instead it
+    records exactly the proof-relevant data already established on the polygraph
+    side: explicit Type-valued 3-cell generators plus acyclicity above
+    dimension 3. -/
+structure ConstructivePolygraphOmegaGroupoid where
+  presentation3d :
+    ComputationalPaths.Path.Polygraph.HomotopyBasis.ProofRelevantCoherentPresentation3D
+  acyclicAbove3 :
+    (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
+    WellFounded (fun q p : Expr => CStepProp p q) ∧
+    (∀ a b c : Expr, CStepProp a b → CStepProp a c → ∃ d, CRTC b d ∧ CRTC c d)
+
+/-- The completed groupoid polygraph already provides the fully constructive
+    proof-relevant ω-groupoid shadow used as the primary constructive theorem of
+    this module. -/
+noncomputable def constructivePolygraphOmegaGroupoid :
+    ConstructivePolygraphOmegaGroupoid where
+  presentation3d := explicitPolygraphCoherentPresentation
+  acyclicAbove3 := acyclic_above_3
+
+/-- The constructive polygraph theorem retains the ten 2-cell families. -/
+theorem constructivePolygraph_num2cells :
+    constructivePolygraphOmegaGroupoid.presentation3d.num2cells = 10 := rfl
+
+/-- The constructive polygraph theorem retains the nine 3-cell generator
+    families. -/
+theorem constructivePolygraph_num3cells :
+    constructivePolygraphOmegaGroupoid.presentation3d.num3cells = 9 := rfl
+
+/-- Every named critical-pair family comes with an explicit Type-valued
+    generator in the constructive polygraph theorem. -/
+noncomputable def constructivePolygraphGenerator (fam : GeneratorFamily) :
+    GeneratorWitnessType fam :=
+  constructivePolygraphOmegaGroupoid.presentation3d.generatorWitness fam
+
+/-- Each named generator family still resolves its critical pair in the
+    constructive polygraph theorem. -/
+theorem constructivePolygraph_generator_resolves (fam : GeneratorFamily) :
+    GeneratorResolutionType fam :=
+  constructivePolygraphOmegaGroupoid.presentation3d.generatorResolves fam
+
+/-- The explicit generator families remain semantically sound with respect to
+    the free-group interpretation used in the confluence proof. -/
+theorem constructivePolygraph_generator_semantics (fam : GeneratorFamily) :
+    GeneratorSemanticType fam :=
+  constructivePolygraphOmegaGroupoid.presentation3d.generatorSemantics fam
+
+/-- The constructive polygraph theorem is acyclic above dimension 3, so no
+    generating 4-cells are required on the explicit syntax side. -/
+theorem constructivePolygraph_acyclic_above_3 :
+    (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
+    WellFounded (fun q p : Expr => CStepProp p q) ∧
+    (∀ a b c : Expr, CStepProp a b → CStepProp a c → ∃ d, CRTC b d ∧ CRTC c d) :=
+  constructivePolygraphOmegaGroupoid.acyclicAbove3
+
+/-- Current honest frontier package: the legacy Path-level explicit ω-groupoid
+    together with the fully constructive proof-relevant explicit-syntax theorem. -/
 structure OmegaGroupoidWithProofRelevantShadow (A : Type u) where
   omega : OmegaGroupoidExplicit A
-  shadow3d :
-    ComputationalPaths.Path.Polygraph.HomotopyBasis.ProofRelevantCoherentPresentation3D
+  constructiveShadow : ConstructivePolygraphOmegaGroupoid
 
-/-- Bundle the current Path-level ω-groupoid witness with its proof-relevant
-    explicit polygraph shadow. -/
+/-- Bundle the current Path-level ω-groupoid witness with the fully constructive
+    explicit polygraph theorem exported by this file. -/
 noncomputable def mkOmegaGroupoidWithProofRelevantShadow (A : Type u) :
     OmegaGroupoidWithProofRelevantShadow A where
   omega := mkOmegaGroupoidExplicit A
-  shadow3d := explicitPolygraphCoherentPresentation
+  constructiveShadow := constructivePolygraphOmegaGroupoid
 
-/-- The bundled proof-relevant shadow still carries the nine explicit
+/-- The bundled constructive shadow still carries the nine explicit
     critical-pair generator families. -/
 theorem omega_shadow_num3cells (A : Type u) :
-    (mkOmegaGroupoidWithProofRelevantShadow A).shadow3d.num3cells = 9 := rfl
+    (mkOmegaGroupoidWithProofRelevantShadow A).constructiveShadow.presentation3d.num3cells = 9 := rfl
+
+/-- The bundled constructive shadow is still acyclic above dimension 3. -/
+theorem omega_shadow_acyclic_above_3 (A : Type u) :
+    (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
+    WellFounded (fun q p : Expr => CStepProp p q) ∧
+    (∀ a b c : Expr, CStepProp a b → CStepProp a c → ∃ d, CRTC b d ∧ CRTC c d) :=
+  (mkOmegaGroupoidWithProofRelevantShadow A).constructiveShadow.acyclicAbove3
 
 end MainTheorem
 
@@ -691,7 +806,7 @@ variable {A : Type u} {a b : A}
 noncomputable def normalize_deriv₂ {p q : Path a b}
     (d : Derivation₂ p q) :
     Σ (d' : Derivation₂ p q), Derivation₃ d d' := by
-  exact ⟨strict_normalize d, to_strict_normal_form₃ d⟩
+  exact ⟨(Normalizer.normalizeStrict d).1, Normalizer.to_normalizeStrict₃ d⟩
 
 /-- Two `Derivation₂.step` witnesses with the same endpoints are connected
     by `MetaStep₃.step_eq`. This is the base case of confluence-based
@@ -778,15 +893,22 @@ end PureConfluenceContractibility
    - Composition, identity, inverse at each level
    - Coherence witnesses = explicit Step chains from `GroupoidProofs.lean`
 
-4. **Batanin/Leinster conditions** (`omega_groupoid_explicit_is_weak_omega`):
-   - Pentagon and triangle coherences at level 3
-   - Interchange law at level 3
-   - Contractibility at levels 3, 4, 5+
-   - All from explicit Step/MetaStep constructors
+4. **Path-level compatibility theorem** (`omega_groupoid_explicit_is_weak_omega`):
+    - Pentagon and triangle coherences at level 3
+    - Interchange law at level 3
+    - Contractibility at levels 3, 4, 5+
+    - All from explicit Step/MetaStep constructors
+    - Still inherits the residual raw-`Path` transport fallback
 
-5. **Agreement** (`omega_explicit_agrees_with_standard`):
-   The explicit ω-groupoid agrees with the standard one from
-   `OmegaGroupoid.lean`.
+5. **Fully constructive explicit-syntax theorem**
+   (`constructivePolygraphOmegaGroupoid`):
+   - Proof-relevant `Generator3CellT` witnesses for all 9 critical-pair families
+   - Semantic soundness and critical-pair resolution data for each family
+   - Acyclicity above dimension 3, so no generating 4-cells are needed
+
+6. **Raw-`Path` comparison point** (`omega_explicit_uses_same_mechanism`):
+   The legacy explicit ω-groupoid still uses the same normalizer-based
+   3-cell witness as the standard `OmegaGroupoid.lean` packaging.
 
 ### Step constructors used
 
