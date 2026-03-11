@@ -94,7 +94,7 @@ noncomputable def matroidFullRank (n : Nat) (M : RankMatroid n) : Nat :=
 
 /-- Rank is bounded by n. -/
 theorem rankBoundedByN (n : Nat) (_M : RankMatroid n) :
-    True := True.intro
+    True := trivial
 
 /-! ## Domain-Specific Rewrite Steps -/
 

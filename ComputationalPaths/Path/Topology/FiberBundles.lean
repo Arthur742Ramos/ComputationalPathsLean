@@ -90,7 +90,7 @@ noncomputable def vectorBundleMorphism_id (E : VectorBundle) : VectorBundleMorph
   baseMap := id
   totalMap := id
   commutes := fun e => Path.refl (E.proj e)
-  fiberwise_linear := True.intro
+  fiberwise_linear := trivial
 
 /-! ## Operations on Vector Bundles -/
 

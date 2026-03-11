@@ -317,10 +317,10 @@ noncomputable def admissible : AdemWord → Prop
   | a :: b :: rest => a ≥ 2 * b ∧ admissible (b :: rest)
 
 /-- The empty word is admissible. -/
-theorem admissible_nil : admissible [] := True.intro
+theorem admissible_nil : admissible [] := trivial
 
 /-- A singleton word is admissible. -/
-theorem admissible_singleton (i : Nat) : admissible [i] := True.intro
+theorem admissible_singleton (i : Nat) : admissible [i] := trivial
 
 /-- The degree (excess) of an Adem word: sum of all indices. -/
 noncomputable def ademDegree : AdemWord → Nat

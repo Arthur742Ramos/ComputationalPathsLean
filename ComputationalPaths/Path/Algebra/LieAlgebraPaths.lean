@@ -136,7 +136,7 @@ noncomputable def zeroIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) w
 /-- The whole algebra as an ideal. -/
 noncomputable def wholeIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) where
   mem := fun _ => True
-  zero_mem := True.intro
+  zero_mem := trivial
   add_mem := fun _ _ _ _ => trivial
   bracket_mem := fun _ _ _ => trivial
 
@@ -170,11 +170,11 @@ noncomputable def isNilpotent (LA : PathLieAlg A) {a : A} : Prop :=
 
 /-- Zero-step derived series is trivially satisfied. -/
 theorem inDerivedN_zero (LA : PathLieAlg A) {a : A} (p : Path a a) :
-    inDerivedN LA 0 p := True.intro
+    inDerivedN LA 0 p := trivial
 
 /-- Zero-step lower central series is trivially satisfied. -/
 theorem inLowerCentralN_zero (LA : PathLieAlg A) {a : A} (p : Path a a) :
-    inLowerCentralN LA 0 p := True.intro
+    inLowerCentralN LA 0 p := trivial
 
 /-- Nilpotent implies solvable. -/
 theorem nilpotent_implies_solvable_step (LA : PathLieAlg A) {a : A}

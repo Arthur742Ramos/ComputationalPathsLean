@@ -379,7 +379,7 @@ theorem bordgCavalleri_connection :
     -- Both approaches yield π₁(S¹) ≃ ℤ
     -- Both should yield π₁(T^n) ≃ ℤⁿ
     -- The computational paths approach doesn't need smooth structure
-    True := True.intro
+    True := trivial
 
 end ProductPiOne
 

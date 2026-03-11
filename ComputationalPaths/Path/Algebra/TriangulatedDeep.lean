@@ -280,13 +280,13 @@ theorem thick_shift_closed (N : ThickSubcategory) (S : ShiftData) (C : ChainComp
 /-- The trivial thick subcategory contains only zero. -/
 @[simp] noncomputable def trivialThick : ThickSubcategory where
   mem := fun _ => True
-  zero_mem := True.intro
+  zero_mem := trivial
   shift_closed := by intro _ _ _; trivial
 
 /-- The maximal thick subcategory contains everything. -/
 @[simp] noncomputable def maximalThick : ThickSubcategory where
   mem := fun _ => True
-  zero_mem := True.intro
+  zero_mem := trivial
   shift_closed := by intro _ _ _; trivial
 
 theorem trivialThick_zero : trivialThick.mem zeroComplex := by simp

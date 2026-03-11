@@ -107,7 +107,7 @@ noncomputable def Symplectomorphism.id (M : SymplecticManifold.{u}) : Symplectom
   invFun := _root_.id
   left_inv := fun x => Path.refl x
   right_inv := fun x => Path.refl x
-  preserves_form := True.intro
+  preserves_form := trivial
 
 /-- Composition of symplectomorphisms. -/
 noncomputable def Symplectomorphism.comp {M N P : SymplecticManifold.{u}}
@@ -117,7 +117,7 @@ noncomputable def Symplectomorphism.comp {M N P : SymplecticManifold.{u}}
   invFun := f.invFun ∘ g.invFun
   left_inv := fun x => Path.trans (Path.congrArg f.invFun (g.left_inv (f.toFun x))) (f.left_inv x)
   right_inv := fun y => Path.trans (Path.congrArg g.toFun (f.right_inv (g.invFun y))) (g.right_inv y)
-  preserves_form := True.intro
+  preserves_form := trivial
 
 /-- Inverse of a symplectomorphism. -/
 noncomputable def Symplectomorphism.symm {M N : SymplecticManifold.{u}}
@@ -126,7 +126,7 @@ noncomputable def Symplectomorphism.symm {M N : SymplecticManifold.{u}}
   invFun := f.toFun
   left_inv := f.right_inv
   right_inv := f.left_inv
-  preserves_form := True.intro
+  preserves_form := trivial
 
 /-! ## Hamiltonian Vector Fields -/
 

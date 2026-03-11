@@ -106,7 +106,7 @@ noncomputable def representable (X : Scheme.{u}) : MotivicSpace.{u} where
     sections := fun Y => SchemeMorphism Y X
     restrict := fun f g => SchemeMorphism.comp g f
   }
-  nisnevich_descent := True.intro
+  nisnevich_descent := trivial
 
 /-! ## A¹-homotopy -/
 
@@ -123,7 +123,7 @@ structure A1Homotopy (X Y : MotivicSpace.{u}) where
 noncomputable def A1Homotopy.refl (X : MotivicSpace.{u}) : A1Homotopy X X where
   forward := fun _ x => x
   backward := fun _ x => x
-  homotopy := True.intro
+  homotopy := trivial
 
 /-- An A¹-invariant presheaf: F(X) ≅ F(X × A¹). -/
 structure A1Invariant (F : Presheaf.{u}) where

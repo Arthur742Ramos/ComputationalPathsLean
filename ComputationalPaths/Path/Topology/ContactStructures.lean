@@ -120,7 +120,7 @@ noncomputable def Contactomorphism.id (M : ContactStructure.{u}) : Contactomorph
   invFun := _root_.id
   left_inv := fun x => Path.refl x
   right_inv := fun x => Path.refl x
-  preserves_contact := True.intro
+  preserves_contact := trivial
 
 /-- Composition of contactomorphisms. -/
 noncomputable def Contactomorphism.comp {M N P : ContactStructure.{u}}
@@ -132,7 +132,7 @@ noncomputable def Contactomorphism.comp {M N P : ContactStructure.{u}}
     Path.trans (Path.congrArg f.invFun (g.left_inv (f.toFun x))) (f.left_inv x)
   right_inv := fun y =>
     Path.trans (Path.congrArg g.toFun (f.right_inv (g.invFun y))) (g.right_inv y)
-  preserves_contact := True.intro
+  preserves_contact := trivial
 
 /-! ## Gray Stability -/
 

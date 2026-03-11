@@ -63,7 +63,7 @@ def transport_groupoid_disjoint :
     -- Transport rules operate on Path.stepChain which is not an Expr constructor
     -- Therefore no critical pair exists between a CStep rule and a transport rule
     -- at the top level (they operate on different type universes)
-    True := True.intro
+    True := trivial
 
 /-! ## Transport Rules: Self-Confluence Analysis
 
@@ -104,7 +104,7 @@ theorem transport_self_locally_confluent :
     -- the propositional equality witness (transport_refl vs transport_trans etc.)
     -- Two transport rules can only overlap if applied at different positions
     -- (nested in congruence contexts), which is handled by congruence closure.
-    True := True.intro
+    True := trivial
 
 /-! ## Critical Pairs: Groupoid Rules ↔ Transport Rules
 
@@ -276,6 +276,6 @@ def semantic_confluence :
     -- Every Step preserves toEq (proven in Step.lean as step_toEq)
     -- Therefore any two reducts have the same propositional content
     -- This is "confluence up to propositional equality"
-    True := True.intro
+    True := trivial
 
 end ComputationalPaths.Path.Rewrite.TransportConfluence

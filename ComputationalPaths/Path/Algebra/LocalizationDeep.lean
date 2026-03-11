@@ -330,18 +330,18 @@ noncomputable def ZigZag.proofEq {A : Type u} {S : InvSet A} {a b : A}
 
 -- 40. proofEq is reflexive
 theorem zigzag_proofEq_refl {A : Type u} {S : InvSet A} {a b : A}
-    (p : ZigZag A S a b) : ZigZag.proofEq p p := True.intro
+    (p : ZigZag A S a b) : ZigZag.proofEq p p := trivial
 
 -- 41. proofEq is symmetric
 theorem zigzag_proofEq_symm {A : Type u} {S : InvSet A} {a b : A}
     (p q : ZigZag A S a b) (_h : ZigZag.proofEq p q) :
-    ZigZag.proofEq q p := True.intro
+    ZigZag.proofEq q p := trivial
 
 -- 42. proofEq is transitive
 theorem zigzag_proofEq_trans {A : Type u} {S : InvSet A} {a b : A}
     (p q r : ZigZag A S a b)
     (_h1 : ZigZag.proofEq p q) (_h2 : ZigZag.proofEq q r) :
-    ZigZag.proofEq p r := True.intro
+    ZigZag.proofEq p r := trivial
 
 /-! ## Calculus of fractions compatibility -/
 

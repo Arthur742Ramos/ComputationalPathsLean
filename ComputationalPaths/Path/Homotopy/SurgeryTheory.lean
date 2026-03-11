@@ -146,7 +146,7 @@ theorem surgery_identity_normal (n : Nat) (M : ManifoldWithStructure.{u} n)
     target := X
     map := f
     bundleData := PUnit
-    degree_one := True.intro
+    degree_one := trivial
   }, rfl, rfl⟩
 
 /-! ## Surgery Below the Middle Dimension -/

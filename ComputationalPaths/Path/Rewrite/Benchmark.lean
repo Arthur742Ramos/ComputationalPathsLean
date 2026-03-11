@@ -193,7 +193,7 @@ suitable for a paper. -/
 -/
 theorem formalization_scale :
     -- All Wave 4 modules are completely sorry-free.
-    True := True.intro
+    True := trivial
 
 /-! ## NbE Benchmarks -/
 

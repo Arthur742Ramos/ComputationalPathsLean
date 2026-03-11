@@ -592,7 +592,7 @@ theorem dmoduleActionLoop_exists (M : DModule) (x : Int) :
     S.baseComplex = S.baseComplex := rfl
 
 theorem perverse_dmodule_bridge (T : TStructure)
-    (_P : PerverseSheaf T) (_M : DModule) : True := True.intro
+    (_P : PerverseSheaf T) (_M : DModule) : True := trivial
 
 theorem localization_has_loop {C D : ChainComplex}
     (L : LocalizationWitness C D) : Nonempty (Path L.roof L.roof) :=

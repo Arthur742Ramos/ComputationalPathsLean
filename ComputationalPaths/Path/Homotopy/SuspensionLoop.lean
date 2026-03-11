@@ -327,7 +327,7 @@ noncomputable def susp_north_connected {X : Type u} :
     The π₁(ΣX) = 1 result for general X follows the same pattern. -/
 theorem susp_pi1_trivial_for_sphere :
     -- π₁(S²) = 1 is proven in CompPath/SphereCompPath.lean
-    True := True.intro
+    True := trivial
 
 /-! ## Summary
 

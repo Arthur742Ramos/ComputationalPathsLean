@@ -47,14 +47,14 @@ structure SmashPentagon where
 
 /-- A trivial pentagon witness. -/
 noncomputable def trivialPentagon : SmashPentagon where
-  pentagon_comm := True.intro
+  pentagon_comm := trivial
 
 /-- The triangle data for smash unitality. -/
 structure SmashTriangleCoherence where
   triangle_comm : True
 
 noncomputable def trivialTriangleCoherence : SmashTriangleCoherence where
-  triangle_comm := True.intro
+  triangle_comm := trivial
 
 /-! ## Ring spectra -/
 

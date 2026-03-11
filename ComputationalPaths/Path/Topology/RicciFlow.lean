@@ -127,7 +127,7 @@ noncomputable def RicciStep.comp {g₀ g₁ g₂ : RiemannianMetric}
     RicciStep g₀ g₂ where
   curv₀ := s₁.curv₀
   step_eq := Path.trans s₂.step_eq s₁.step_eq
-  energy_decrease := True.intro
+  energy_decrease := trivial
 
 /-- The identity Ricci step. -/
 noncomputable def RicciStep.identity (g : RiemannianMetric) : RicciStep g g where
@@ -135,7 +135,7 @@ noncomputable def RicciStep.identity (g : RiemannianMetric) : RicciStep g g wher
              riemannTensor := fun _ _ _ _ => 0, sectionalCurv := fun _ _ => 0,
              ricci_trace := trivial, scalar_trace := trivial }
   step_eq := Path.refl g.manifold
-  energy_decrease := True.intro
+  energy_decrease := trivial
 
 /-! ## Short-Time Existence and Uniqueness -/
 

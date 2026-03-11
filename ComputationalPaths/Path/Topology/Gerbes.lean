@@ -204,12 +204,12 @@ noncomputable def GerbeMorphism.comp {G₁ G₂ G₃ : BundleGerbe}
     (φ : GerbeMorphism G₁ G₂) (ψ : GerbeMorphism G₂ G₃) :
     GerbeMorphism G₁ G₃ where
   intertwiner := φ.intertwiner × ψ.intertwiner
-  compatible := True.intro
+  compatible := trivial
 
 /-- Identity gerbe morphism. -/
 noncomputable def GerbeMorphism.id (G : BundleGerbe) : GerbeMorphism G G where
   intertwiner := Unit
-  compatible := True.intro
+  compatible := trivial
 
 /-! ## Gerbe Modules -/
 

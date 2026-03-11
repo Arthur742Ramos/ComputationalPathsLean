@@ -114,7 +114,7 @@ structure QuillenEquivalence {A : Type u} {B : Type v}
 noncomputable def identityQuillenEquivalence {A : Type u} (M : ModelCategory A) :
     QuillenEquivalence M M where
   adjunction := identityQuillenAdjunction (M := M)
-  derived_equivalence := True.intro
+  derived_equivalence := trivial
 
 /-! ## Transferred model structures -/
 
