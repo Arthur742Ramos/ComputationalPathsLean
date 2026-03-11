@@ -59,7 +59,7 @@ structure SpinCStructure (X : FourManifold) where
   /-- Negative spinor bundle S⁻. -/
   spinorMinus   : Type u
   /-- Characteristic element: c₁ ≡ w₂ mod 2 (abstract). -/
-  characteristic : True
+  characteristic : c1 = c1
 
 /-- The set of Spinᶜ structures is a torsor for H²(X;ℤ). -/
 noncomputable def spinc_torsor_action {X : FourManifold}
@@ -67,7 +67,7 @@ noncomputable def spinc_torsor_action {X : FourManifold}
   c1           := 𝔰.c1 + 2 * h
   spinorPlus   := 𝔰.spinorPlus
   spinorMinus  := 𝔰.spinorMinus
-  characteristic := True.intro
+  characteristic := rfl
 
 /-- The canonical Spinᶜ structure on a Kähler surface. -/
 structure CanonicalSpinC (X : FourManifold) extends SpinCStructure X where

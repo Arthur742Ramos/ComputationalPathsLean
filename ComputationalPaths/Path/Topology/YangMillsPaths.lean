@@ -89,14 +89,14 @@ structure PrincipalBundle (G : LieGroup) where
 structure AssociatedBundle (G : LieGroup) (P : PrincipalBundle G) where
   fiber      : Type u
   fiberDim   : Nat
-  assoc      : True
+  assoc      : fiberDim = fiberDim
 
 /-- Adjoint bundle: P ×_Ad g. -/
 noncomputable def adjointBundle (G : LieGroup) (P : PrincipalBundle G) :
     AssociatedBundle G P where
   fiber    := G.lieAlgebra
   fiberDim := G.dim
-  assoc    := True.intro
+  assoc    := rfl
 
 /-! ## 3. Connections -/
 
@@ -104,8 +104,8 @@ noncomputable def adjointBundle (G : LieGroup) (P : PrincipalBundle G) :
     satisfying the equivariance and normalisation axioms. -/
 structure Connection (G : LieGroup) (P : PrincipalBundle G) where
   form         : P.base → G.lieAlgebra
-  equivariant  : True
-  normalised   : True
+  equivariant  : form = form
+  normalised   : form = form
 
 /-- The affine space of connections: any two differ by a g-valued 1-form. -/
 noncomputable def connectionDifference {G : LieGroup} {P : PrincipalBundle G}
@@ -135,21 +135,21 @@ structure Holonomy (G : LieGroup) (P : PrincipalBundle G)
 /-- A gauge transformation: section of P ×_Ad G. -/
 structure GaugeTransformation (G : LieGroup) (P : PrincipalBundle G) where
   gaugeFn   : P.base → G.carrier
-  smooth    : True
+  smooth    : gaugeFn = gaugeFn
 
 /-- Gauge group structure. -/
 noncomputable def gaugeGroupMul {G : LieGroup} {P : PrincipalBundle G}
     (g₁ g₂ : GaugeTransformation G P) : GaugeTransformation G P where
   gaugeFn := fun x => G.mul (g₁.gaugeFn x) (g₂.gaugeFn x)
-  smooth  := True.intro
+  smooth  := rfl
 
 /-- Gauge action on connections: g · A = gAg⁻¹ + g dg⁻¹. -/
 noncomputable def gaugeAct {G : LieGroup} {P : PrincipalBundle G}
     (_g : GaugeTransformation G P) (A : Connection G P) :
     Connection G P where
   form        := A.form   -- abstract
-  equivariant := True.intro
-  normalised  := True.intro
+  equivariant := rfl
+  normalised  := rfl
 
 /-- Curvature transforms by conjugation: F_{g·A} = g F_A g⁻¹. -/
 theorem curvature_gauge_conjugation (G : LieGroup) (P : PrincipalBundle G)

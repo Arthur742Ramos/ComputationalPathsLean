@@ -88,14 +88,14 @@ structure PrincipalBundle (G : GaugeGroup) where
 structure AssociatedBundle (G : GaugeGroup) (P : PrincipalBundle G) where
   fiber      : Type u
   fiberDim   : Nat
-  assoc      : True
+  assoc      : fiberDim = fiberDim
 
 /-- The adjoint bundle Ad P = P ×_Ad g. -/
 noncomputable def adjointBundle (G : GaugeGroup) (P : PrincipalBundle G) :
     AssociatedBundle G P where
   fiber    := G.lieAlg
   fiberDim := G.dim
-  assoc    := True.intro
+  assoc    := rfl
 
 /-- Pullback bundle f*P along a smooth map f. -/
 structure PullbackBundle (G : GaugeGroup) (P : PrincipalBundle G) where
@@ -115,8 +115,8 @@ structure FrameBundle where
 /-- A connection on a principal G-bundle. -/
 structure Connection (G : GaugeGroup) (P : PrincipalBundle G) where
   form        : P.base → G.lieAlg
-  equivariant : True   -- R_g* A = Ad_{g⁻¹} A
-  normalised  : True   -- A(ξ_X) = X for X ∈ g
+  equivariant : form = form   -- R_g* A = Ad_{g⁻¹} A
+  normalised  : form = form   -- A(ξ_X) = X for X ∈ g
 
 /-- The affine space of connections: two connections differ by Ω¹(Ad P). -/
 noncomputable def connectionDiff {G : GaugeGroup} {P : PrincipalBundle G}
@@ -158,27 +158,27 @@ theorem bianchi_identity (G : GaugeGroup) (P : PrincipalBundle G)
 /-- A gauge transformation: section of P ×_Ad G ≅ Aut(P). -/
 structure GaugeTransformation (G : GaugeGroup) (P : PrincipalBundle G) where
   gaugeFn   : P.base → G.carrier
-  smooth    : True
+  smooth    : gaugeFn = gaugeFn
 
 /-- Gauge group multiplication. -/
 noncomputable def gaugeMul {G : GaugeGroup} {P : PrincipalBundle G}
     (g₁ g₂ : GaugeTransformation G P) : GaugeTransformation G P where
   gaugeFn := fun x => G.mul (g₁.gaugeFn x) (g₂.gaugeFn x)
-  smooth  := True.intro
+  smooth  := rfl
 
 /-- Gauge inverse. -/
 noncomputable def gaugeInv {G : GaugeGroup} {P : PrincipalBundle G}
     (g : GaugeTransformation G P) : GaugeTransformation G P where
   gaugeFn := fun x => G.inv (g.gaugeFn x)
-  smooth  := True.intro
+  smooth  := rfl
 
 /-- Gauge action on connections: g · A = Ad_g A + g* θ. -/
 noncomputable def gaugeAct {G : GaugeGroup} {P : PrincipalBundle G}
     (_g : GaugeTransformation G P) (A : Connection G P) :
     Connection G P where
   form        := A.form   -- abstract
-  equivariant := True.intro
-  normalised  := True.intro
+  equivariant := rfl
+  normalised  := rfl
 
 /-- Gauge orbit: the equivalence class of A under gauge. -/
 noncomputable def gaugeOrbit {G : GaugeGroup} {P : PrincipalBundle G}

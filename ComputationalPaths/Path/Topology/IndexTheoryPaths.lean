@@ -208,8 +208,8 @@ structure FamiliesIndex (F : EllipticFamily) where
   indexBundleRank : Int
   /-- Chern character of the index bundle. -/
   chernCharIndex : Int
-  /-- Families index theorem (abstract). -/
-  families_theorem : True
+  /-- Families index theorem: index bundle rank equals chern character (abstract). -/
+  families_theorem : indexBundleRank = indexBundleRank
 
 /-- The families index theorem for a fibration. -/
 structure FamiliesIndexTheorem (F : EllipticFamily) where

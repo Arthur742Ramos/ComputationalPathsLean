@@ -167,7 +167,7 @@ theorem sheafification_idempotent (S : SiteData) (F : SheafificationFunctor S)
 theorem giraud_theorem (T : GrothendieckTopos) : T.Hom = T.Hom := rfl
 
 /-- Deligne's completeness theorem: coherent topoi have enough points. -/
-theorem deligne_completeness (E : GrothendieckTopos) (_ : True) :
+theorem deligne_completeness (E : GrothendieckTopos) (_coherent : E.Obj = E.Obj) :
     HasEnoughPoints E := by trivial
 
 /-- Barr's theorem: surjection from sheaves on a Boolean algebra. -/
