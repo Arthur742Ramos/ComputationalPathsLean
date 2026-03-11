@@ -594,7 +594,7 @@ import ComputationalPaths.Path.Algebra.MazurkiewiczTracesDeep
 import ComputationalPaths.Path.Algebra.MilnorWittKTheory
 import ComputationalPaths.Path.Algebra.ModFormsAdvanced
 import ComputationalPaths.Path.Algebra.ModalLogicDeep
-import ComputationalPaths.Path.Algebra.ModelCategoryDeep
+import ComputationalPaths.Path.Algebra.ModelCategory
 import ComputationalPaths.Path.Algebra.ModularDeep
 import ComputationalPaths.Path.Algebra.ModularForms
 import ComputationalPaths.Path.Algebra.ModularLatticeDeep
@@ -657,7 +657,7 @@ import ComputationalPaths.Path.Algebra.SeparationLogicDeep
 import ComputationalPaths.Path.Algebra.SheafDeep
 import ComputationalPaths.Path.Algebra.SheafPaths
 import ComputationalPaths.Path.Algebra.SheafPathsDeep
-import ComputationalPaths.Path.Algebra.SimplicialDeep
+import ComputationalPaths.Path.Algebra.Simplicial
 import ComputationalPaths.Path.Algebra.SimplicialPathsDeep
 import ComputationalPaths.Path.Algebra.SpectraPathDeep
 import ComputationalPaths.Path.Algebra.SpectraPathsDeep
