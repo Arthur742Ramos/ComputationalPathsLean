@@ -162,6 +162,26 @@ noncomputable def piOneGenerator : circlePiOne :=
 noncomputable def windingNumber : circlePiOne → Int :=
   piOneEquivInt
 
+/-- `Path` witness for the left inverse of `π₁(SO(2)) ≃ ℤ`. -/
+noncomputable def piOneEquivInt_left_inv_path (α : circlePiOne) :
+    Path (piOneEquivInt.invFun (piOneEquivInt.toFun α)) α :=
+  Path.stepChain (piOneEquivInt.left_inv α)
+
+/-- `Path` witness for the right inverse of `π₁(SO(2)) ≃ ℤ`. -/
+noncomputable def piOneEquivInt_right_inv_path (z : Int) :
+    Path (piOneEquivInt.toFun (piOneEquivInt.invFun z)) z :=
+  Path.stepChain (piOneEquivInt.right_inv z)
+
+/-- The fundamental loop in `SO(2)` has winding number `1`. -/
+theorem windingNumber_piOneGenerator :
+    windingNumber piOneGenerator = 1 :=
+  piOneEquivInt.right_inv 1
+
+/-- `Path`-typed winding-number calculation for the fundamental loop. -/
+noncomputable def windingNumber_piOneGenerator_path :
+    Path (windingNumber piOneGenerator) (1 : Int) :=
+  Path.stepChain windingNumber_piOneGenerator
+
 end SO2
 
 /-- U(1), the group of complex numbers of unit modulus.
@@ -175,6 +195,16 @@ noncomputable def e : U1 := circleBase
 noncomputable def piOneEquivInt :
     SimpleEquiv circlePiOne Int :=
   circlePiOneEquivInt
+
+/-- `Path` witness for the left inverse of `π₁(U(1)) ≃ ℤ`. -/
+noncomputable def piOneEquivInt_left_inv_path (α : circlePiOne) :
+    Path (piOneEquivInt.invFun (piOneEquivInt.toFun α)) α :=
+  Path.stepChain (piOneEquivInt.left_inv α)
+
+/-- `Path` witness for the right inverse of `π₁(U(1)) ≃ ℤ`. -/
+noncomputable def piOneEquivInt_right_inv_path (z : Int) :
+    Path (piOneEquivInt.toFun (piOneEquivInt.invFun z)) z :=
+  Path.stepChain (piOneEquivInt.right_inv z)
 
 end U1
 
@@ -233,12 +263,37 @@ theorem torusN_zero_trivial (α : π₁(TorusN.{u} 0, TorusN.base.{u} 0)) :
       exact Quot.sound
         (torusN_zero_pathEq p (Path.refl (TorusN.base.{u} 0)))
 
+/-- `Path`-typed triviality witness for `π₁(T⁰)`. -/
+noncomputable def torusN_zero_trivial_path
+    (α : π₁(TorusN.{u} 0, TorusN.base.{u} 0)) :
+    Path α (Quot.mk _ (Path.refl (TorusN.base.{u} 0))) :=
+  Path.stepChain (torusN_zero_trivial α)
+
 /-- T¹ ≃ S¹ -/
 noncomputable def torusOneEquivCircle : SimpleEquiv (TorusN 1) Circle where
   toFun := fun (_, c) => c
   invFun := fun c => (PUnit'.unit, c)
   left_inv := by intro (u, c); cases u; rfl
   right_inv := by intro c; rfl
+
+/-- `Path` witness for the left inverse of `T¹ ≃ S¹`. -/
+noncomputable def torusOneEquivCircle_left_inv_path (x : TorusN 1) :
+    Path (torusOneEquivCircle.invFun (torusOneEquivCircle.toFun x)) x :=
+  Path.stepChain (torusOneEquivCircle.left_inv x)
+
+/-- `Path` witness for the right inverse of `T¹ ≃ S¹`. -/
+noncomputable def torusOneEquivCircle_right_inv_path (c : Circle) :
+    Path (torusOneEquivCircle.toFun (torusOneEquivCircle.invFun c)) c :=
+  Path.stepChain (torusOneEquivCircle.right_inv c)
+
+/-- The torus identity in rank one projects to the circle basepoint. -/
+theorem torusOneEquivCircle_base :
+    torusOneEquivCircle.toFun (base 1) = circleBase := rfl
+
+/-- `Path`-typed projection of the rank-one torus basepoint. -/
+noncomputable def torusOneEquivCircle_base_path :
+    Path (torusOneEquivCircle.toFun (base 1)) circleBase :=
+  Path.stepChain torusOneEquivCircle_base
 
 /-- The type of n-tuples of integers, representing π₁(T^n). -/
 noncomputable def IntTuple : Nat → Type
@@ -257,6 +312,18 @@ This is already proved in Torus.lean. The torus is the simplest
 noncomputable def torus2PiOneEquiv { _ : HasTorusPiOneEncode } :
     SimpleEquiv torusPiOne (Int × Int) :=
   torusPiOneEquivIntProdSimple
+
+/-- `Path` witness for the left inverse of `π₁(T²) ≃ ℤ × ℤ`. -/
+noncomputable def torus2PiOneEquiv_left_inv_path [inst : HasTorusPiOneEncode]
+    (α : torusPiOne) :
+    Path ((@torus2PiOneEquiv inst).invFun ((@torus2PiOneEquiv inst).toFun α)) α :=
+  Path.stepChain ((@torus2PiOneEquiv inst).left_inv α)
+
+/-- `Path` witness for the right inverse of `π₁(T²) ≃ ℤ × ℤ`. -/
+noncomputable def torus2PiOneEquiv_right_inv_path [inst : HasTorusPiOneEncode]
+    (z : Int × Int) :
+    Path ((@torus2PiOneEquiv inst).toFun ((@torus2PiOneEquiv inst).invFun z)) z :=
+  Path.stepChain ((@torus2PiOneEquiv inst).right_inv z)
 
 end TorusN
 
@@ -331,6 +398,18 @@ theorem simplyConnected_unique_path {A : Type u} (h : IsSimplyConnected A)
   have hq := h a q
   rw [hp, hq]
 
+/-- `Path`-typed triviality witness for loops in `S²`. -/
+noncomputable def sphere2_simplyConnected_at_base_path
+    (α : π₁(CompPath.Sphere2CompPath,
+      (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath))) :
+    Path α (Quot.mk _ (Path.refl (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath))) :=
+  Path.stepChain (sphere2_simplyConnected_at_base α)
+
+/-- `Path`-typed uniqueness witness for loops in a simply connected type. -/
+noncomputable def simplyConnected_unique_path_path {A : Type u} (h : IsSimplyConnected A)
+    {a : A} (p q : PathRwQuot A a a) : Path p q :=
+  Path.stepChain (simplyConnected_unique_path (h := h) (p := p) (q := q))
+
 end SimplyConnected
 
 /-! ## Product Fundamental Group and n-Torus
@@ -354,10 +433,36 @@ noncomputable def torusN_product_step (n : Nat) :
       (π₁(TorusN n, TorusN.base n) × π₁(Circle, circleBase)) :=
   prodPiOneEquiv (TorusN.base n) circleBase
 
+/-- `Path` witness for the left inverse of the torus product step. -/
+noncomputable def torusN_product_step_left_inv_path (n : Nat)
+    (α : π₁(TorusN (n + 1), TorusN.base (n + 1))) :
+    Path
+      ((torusN_product_step n).invFun ((torusN_product_step n).toFun α))
+      α :=
+  Path.stepChain ((torusN_product_step n).left_inv α)
+
+/-- `Path` witness for the right inverse of the torus product step. -/
+noncomputable def torusN_product_step_right_inv_path (n : Nat)
+    (β : π₁(TorusN n, TorusN.base n) × π₁(Circle, circleBase)) :
+    Path
+      ((torusN_product_step n).toFun ((torusN_product_step n).invFun β))
+      β :=
+  Path.stepChain ((torusN_product_step n).right_inv β)
+
 /-- π₁(S¹) ≃ ℤ, packaged for the n-torus induction base. -/
 noncomputable def torusN1_piOne_equiv_int :
     SimpleEquiv circlePiOne Int :=
   circlePiOneEquivInt
+
+/-- `Path` witness for the left inverse of the torus base equivalence `π₁(S¹) ≃ ℤ`. -/
+noncomputable def torusN1_piOne_equiv_int_left_inv_path (α : circlePiOne) :
+    Path (torusN1_piOne_equiv_int.invFun (torusN1_piOne_equiv_int.toFun α)) α :=
+  Path.stepChain (torusN1_piOne_equiv_int.left_inv α)
+
+/-- `Path` witness for the right inverse of the torus base equivalence `π₁(S¹) ≃ ℤ`. -/
+noncomputable def torusN1_piOne_equiv_int_right_inv_path (z : Int) :
+    Path (torusN1_piOne_equiv_int.toFun (torusN1_piOne_equiv_int.invFun z)) z :=
+  Path.stepChain (torusN1_piOne_equiv_int.right_inv z)
 
 /-- **Connection to Bordg-Cavalleri**:
 
