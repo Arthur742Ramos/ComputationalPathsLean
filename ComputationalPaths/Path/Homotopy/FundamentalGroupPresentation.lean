@@ -79,6 +79,11 @@ noncomputable def circlePresentation :
   dsimp [circlePiOneEquivInt, circlePiOneLoop]
   exact circlePiOneEncode_circleDecode.{u₁} (z := (1 : Int))
 
+/-- `Path` witness for the circle generator value. -/
+@[simp] noncomputable def circlePresentation_generator_value_path.{u₁} :
+    Path (circlePresentation.{u₁}.generator CircleGenerator.loop) (1 : Int) :=
+  Path.stepChain circlePresentation_generator_value.{u₁}
+
 /-! ## Torus presentation -/
 
 /-- Generators for the torus presentation. -/
@@ -125,12 +130,22 @@ noncomputable def torusPresentation :
   dsimp [torusPiOneEquivIntProdSimple]
   exact torusPiOneEncode_torusDecode_eq (z := (1, 0))
 
+/-- `Path` witness for the first torus generator value. -/
+@[simp] noncomputable def torusPresentation_generator_loop1_path :
+    Path (torusPresentation.generator TorusGenerator.loop1) (1, 0) :=
+  Path.stepChain torusPresentation_generator_loop1
+
 /-- The second torus generator maps to `(0, 1)`. -/
 @[simp] theorem torusPresentation_generator_loop2 :
     torusPresentation.generator TorusGenerator.loop2 = (0, 1) := by
   change torusPiOneEquivIntProdSimple.toFun (torusDecode (0, 1)) = (0, 1)
   dsimp [torusPiOneEquivIntProdSimple]
   exact torusPiOneEncode_torusDecode_eq (z := (0, 1))
+
+/-- `Path` witness for the second torus generator value. -/
+@[simp] noncomputable def torusPresentation_generator_loop2_path :
+    Path (torusPresentation.generator TorusGenerator.loop2) (0, 1) :=
+  Path.stepChain torusPresentation_generator_loop2
 
 /-! ## Figure-eight presentation -/
 
@@ -186,41 +201,96 @@ theorem presentation_left_inv {G : Type u} (P : FundamentalGroupPresentation G)
     P.equiv.invFun (P.equiv.toFun x) = x :=
   P.equiv.left_inv x
 
+/-- `Path` witness for the left round-trip of a presentation equivalence. -/
+noncomputable def presentation_left_inv_path {G : Type u}
+    (P : FundamentalGroupPresentation G) (x : G) :
+    Path (P.equiv.invFun (P.equiv.toFun x)) x :=
+  Path.stepChain (presentation_left_inv P x)
+
 /-- A presentation's equivalence round-trips on the right. -/
 theorem presentation_right_inv {G : Type u} (P : FundamentalGroupPresentation G)
     (y : P.presentationGroup) :
     P.equiv.toFun (P.equiv.invFun y) = y :=
   P.equiv.right_inv y
 
+/-- `Path` witness for the right round-trip of a presentation equivalence. -/
+noncomputable def presentation_right_inv_path {G : Type u}
+    (P : FundamentalGroupPresentation G) (y : P.presentationGroup) :
+    Path (P.equiv.toFun (P.equiv.invFun y)) y :=
+  Path.stepChain (presentation_right_inv P y)
+
+/-- `Path` witness for a named relation in a presentation. -/
+noncomputable def presentation_relation_path {G : Type u}
+    (P : FundamentalGroupPresentation G) (r : P.relations) :
+    Path (P.relationLhs r) (P.relationRhs r) :=
+  Path.stepChain (P.relationEq r)
+
 /-- The circle presentation has exactly one generator type. -/
 theorem circlePresentation_one_generator :
     (circlePresentation.generators) = CircleGenerator := by
   rfl
+
+/-- `Path` witness for the circle generator type alias. -/
+noncomputable def circlePresentation_one_generator_path :
+    Path (circlePresentation.generators) CircleGenerator :=
+  Path.stepChain circlePresentation_one_generator
 
 /-- The circle presentation has no relations. -/
 theorem circlePresentation_no_relations :
     (circlePresentation.relations) = PEmpty := by
   rfl
 
+/-- `Path` witness for the absence of circle relations. -/
+noncomputable def circlePresentation_no_relations_path :
+    Path (circlePresentation.relations) PEmpty :=
+  Path.stepChain circlePresentation_no_relations
+
 /-- The torus presentation has two generators. -/
 theorem torusPresentation_two_generators :
     (torusPresentation.generators) = TorusGenerator := by
   rfl
+
+/-- `Path` witness for the torus generator type alias. -/
+noncomputable def torusPresentation_two_generators_path :
+    Path (torusPresentation.generators) TorusGenerator :=
+  Path.stepChain torusPresentation_two_generators
 
 /-- The torus presentation has one relation (commutativity). -/
 theorem torusPresentation_one_relation :
     (torusPresentation.relations) = TorusRelation := by
   rfl
 
+/-- `Path` witness for the torus relation type alias. -/
+noncomputable def torusPresentation_one_relation_path :
+    Path (torusPresentation.relations) TorusRelation :=
+  Path.stepChain torusPresentation_one_relation
+
+/-- `Path` witness for the torus commutativity relation. -/
+noncomputable def torusPresentation_relation_comm_path :
+    Path
+      (torusPresentation.relationLhs TorusRelation.comm)
+      (torusPresentation.relationRhs TorusRelation.comm) :=
+  presentation_relation_path torusPresentation TorusRelation.comm
+
 /-- The sphere presentation has no generators. -/
 theorem spherePresentation_no_generators :
     (spherePresentation.generators) = PEmpty := by
   rfl
 
+/-- `Path` witness for the absence of sphere generators. -/
+noncomputable def spherePresentation_no_generators_path :
+    Path (spherePresentation.generators) PEmpty :=
+  Path.stepChain spherePresentation_no_generators
+
 /-- The sphere presentation has no relations. -/
 theorem spherePresentation_no_relations :
     (spherePresentation.relations) = PEmpty := by
   rfl
+
+/-- `Path` witness for the absence of sphere relations. -/
+noncomputable def spherePresentation_no_relations_path :
+    Path (spherePresentation.relations) PEmpty :=
+  Path.stepChain spherePresentation_no_relations
 
 /-- The figure-eight presentation has no relations (free group). -/
 theorem figureEightPresentation_no_relations
@@ -228,10 +298,21 @@ theorem figureEightPresentation_no_relations
     (figureEightPresentation.relations) = PEmpty := by
   rfl
 
+/-- `Path` witness for the absence of figure-eight relations. -/
+noncomputable def figureEightPresentation_no_relations_path
+    [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase] :
+    Path (figureEightPresentation.relations) PEmpty :=
+  Path.stepChain figureEightPresentation_no_relations
+
 /-- intProdAdd is commutative. -/
 theorem intProdAdd_comm (x y : Int × Int) :
     intProdAdd x y = intProdAdd y x := by
   simp [intProdAdd, Int.add_comm]
+
+/-- `Path` witness for commutativity of `intProdAdd`. -/
+noncomputable def intProdAdd_comm_path (x y : Int × Int) :
+    Path (intProdAdd x y) (intProdAdd y x) :=
+  Path.stepChain (intProdAdd_comm x y)
 
 end Path
 end ComputationalPaths
