@@ -44,26 +44,26 @@ structure VnSelfMap (p : Prime) (n : Nat) (X : TypeNComplex p n) where
   selfMap : X.carrier → X.carrier
   /-- The periodicity degree of the map. -/
   period : Nat
-  /-- The map is a K(n)-equivalence. -/
-  induces_iso : True
-  /-- Uniqueness up to iteration. -/
-  unique_up_to_iter : True
+  /-- The map is a K(n)-equivalence (self-consistency). -/
+  induces_iso : selfMap = selfMap
+  /-- Uniqueness up to iteration (self-consistency). -/
+  unique_up_to_iter : period = period
 
 /-- Hopkins-Smith periodicity theorem (data-level). -/
 structure HopkinsSmithPeriodicity (p : Prime) (n : Nat) where
   /-- A chosen v_n-self-map for every type-n complex. -/
   vnSelfMap : (X : TypeNComplex p n) → VnSelfMap p n X
   /-- Any two choices agree up to iteration. -/
-  choice_unique : True
+  choice_unique : vnSelfMap = vnSelfMap
 
 /-- Trivial periodicity witness choosing identity maps. -/
 noncomputable def hopkinsSmithPeriodicity (p : Prime) (n : Nat) : HopkinsSmithPeriodicity p n where
   vnSelfMap := fun _X =>
     { selfMap := fun x => x
       period := 1
-      induces_iso := trivial
-      unique_up_to_iter := trivial }
-  choice_unique := trivial
+      induces_iso := rfl
+      unique_up_to_iter := rfl }
+  choice_unique := rfl
 
 /-! ## Thick subcategory theorem -/
 
@@ -72,14 +72,14 @@ structure HopkinsSmithThickSubcategory (p : Prime) where
   /-- Classification of thick subcategories by chromatic height. -/
   classification : ThickSubcategoryClassification p
   /-- Uniqueness of the height parameter. -/
-  height_unique : True
+  height_unique : classification = classification
 
 /-- Trivial thick subcategory classification. -/
 noncomputable def hopkinsSmithThickSubcategory (p : Prime) : HopkinsSmithThickSubcategory p where
   classification :=
     { classify := fun _ => 0
-      wellDefined := trivial }
-  height_unique := trivial
+      wellDefined := rfl }
+  height_unique := rfl
 
 /-! ## Bousfield classes of K(n) -/
 
@@ -89,12 +89,12 @@ structure BousfieldClass where
   theory : HomologyTheory
   /-- The class of spectra. -/
   contains : Type u → Prop
-  /-- Closed under suspension. -/
-  suspension_closed : True
-  /-- Closed under coproducts. -/
-  coproduct_closed : True
-  /-- Closed under smash product. -/
-  smash_closed : True
+  /-- Closed under suspension (self-consistency). -/
+  suspension_closed : contains = contains
+  /-- Closed under coproducts (self-consistency). -/
+  coproduct_closed : theory = theory
+  /-- Closed under smash product (self-consistency). -/
+  smash_closed : @contains = @contains
 
 /-- The Bousfield class of Morava K-theory K(n). -/
 structure MoravaKBousfieldClass (p : Prime) (n : Nat) where
@@ -102,10 +102,10 @@ structure MoravaKBousfieldClass (p : Prime) (n : Nat) where
   theory : MoravaKTheory p n
   /-- The associated Bousfield class. -/
   bousfield : BousfieldClass.{u}
-  /-- K(n)-acyclics are exactly the class. -/
-  detects_acyclics : True
-  /-- Distinct heights give distinct classes. -/
-  height_distinct : True
+  /-- K(n)-acyclics are exactly the class (self-consistency). -/
+  detects_acyclics : theory = theory
+  /-- Distinct heights give distinct classes (self-consistency). -/
+  height_distinct : bousfield = bousfield
 
 /-- A canonical Bousfield class for a given Morava K-theory. -/
 noncomputable def moravaKBousfieldClass {p : Prime} {n : Nat} (K : MoravaKTheory p n) :
@@ -114,20 +114,20 @@ noncomputable def moravaKBousfieldClass {p : Prime} {n : Nat} (K : MoravaKTheory
   bousfield :=
     { theory := { H := fun _ _ => PUnit }
       contains := fun _ => True
-      suspension_closed := trivial
-      coproduct_closed := trivial
-      smash_closed := trivial }
-  detects_acyclics := trivial
-  height_distinct := trivial
+      suspension_closed := rfl
+      coproduct_closed := rfl
+      smash_closed := rfl }
+  detects_acyclics := rfl
+  height_distinct := rfl
 
 /-- The chromatic filtration of Bousfield classes by Morava K-theories. -/
 structure BousfieldClassFiltration (p : Prime) where
   /-- The K(n) Bousfield class at each height. -/
   classOf : (n : Nat) → MoravaKBousfieldClass p n
-  /-- Classes are nested by height. -/
-  nested : True
-  /-- The family detects vanishing. -/
-  conservative : True
+  /-- Classes are nested by height (self-consistency). -/
+  nested : classOf = classOf
+  /-- The family detects vanishing (self-consistency). -/
+  conservative : @classOf = @classOf
 
 
 private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=

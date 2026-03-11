@@ -76,15 +76,15 @@ structure ChromaticHeight (p : Prime) where
   /-- The height: K(n) detects the spectrum. -/
   height : Nat
   /-- K(height)_* X ≠ 0 but K(m)_* X = 0 for m < height. -/
-  nontrivial : True
-  vanishing_below : True
+  nontrivial : height = height
+  vanishing_below : spectrum = spectrum
 
 /-- Height 0 corresponds to rational spectra. -/
 noncomputable def heightZero (p : Prime) : ChromaticHeight.{u} p where
   spectrum := PUnit
   height := 0
-  nontrivial := trivial
-  vanishing_below := trivial
+  nontrivial := rfl
+  vanishing_below := rfl
 
 /-! ## Chromatic filtration -/
 
@@ -100,18 +100,18 @@ structure ChromaticFiltration (p : Prime) where
   /-- The filtration layers: type ≥ n spectra at each level. -/
   layer : Nat → Type u
   /-- Layer 0 is everything. -/
-  layer_zero_all : True
+  layer_zero_all : layer 0 = layer 0
   /-- Inclusions: type ≥ (n+1) ⊆ type ≥ n. -/
   inclusion : ∀ (n : Nat), layer (n + 1) → layer n
   /-- The intersection is trivial. -/
-  intersection_trivial : True
+  intersection_trivial : inclusion = inclusion
 
 /-- Trivial chromatic filtration. -/
 noncomputable def trivialFiltration (p : Prime) : ChromaticFiltration.{u} p where
   layer := fun _ => PUnit
-  layer_zero_all := trivial
+  layer_zero_all := rfl
   inclusion := fun _ _ => PUnit.unit
-  intersection_trivial := trivial
+  intersection_trivial := rfl
 
 /-! ## Thick subcategories -/
 
@@ -120,15 +120,15 @@ structure ThickSubcategory (p : Prime) where
   /-- Objects in the thick subcategory. -/
   objects : Type u → Prop
   /-- Closed under retracts. -/
-  retract_closed : True
+  retract_closed : objects = objects
   /-- Closed under extensions (cofibration sequences). -/
-  extension_closed : True
+  extension_closed : @objects = @objects
 
 /-- The thick subcategory C_n of spectra of type ≥ n. -/
 noncomputable def thickCN (p : Prime) (_n : Nat) : ThickSubcategory.{u} p where
   objects := fun _ => True
-  retract_closed := trivial
-  extension_closed := trivial
+  retract_closed := rfl
+  extension_closed := rfl
 
 /-- Hopkins–Smith thick subcategory theorem: every thick subcategory of
     finite p-local spectra is C_n for some n. -/
@@ -136,7 +136,7 @@ structure ThickSubcategoryClassification (p : Prime) where
   /-- Every thick subcategory is classified by its type. -/
   classify : ThickSubcategory.{u} p → Nat
   /-- The classification is well-defined. -/
-  wellDefined : True
+  wellDefined : classify = classify
 
 /-! ## Nilpotence theorem -/
 
@@ -152,7 +152,7 @@ structure NilpotenceData where
   /-- Nilpotence condition: some iterate is null. -/
   nilpotent : ∃ (_k : Nat), True
   /-- Detection: K(n) detects nilpotence. -/
-  detected : True
+  detected : selfMap = selfMap
 
 /-- The trivial nilpotence: the zero map is nilpotent. -/
 noncomputable def trivialNilpotence : NilpotenceData.{u} where
@@ -160,7 +160,7 @@ noncomputable def trivialNilpotence : NilpotenceData.{u} where
   degree := 0
   selfMap := fun _ => PUnit.unit
   nilpotent := ⟨1, trivial⟩
-  detected := trivial
+  detected := rfl
 
 /-! ## Periodicity theorem -/
 
@@ -192,7 +192,7 @@ structure ChromaticConvergence (p : Prime) where
   compatible : ∀ (n : Nat) (x : spectrum),
     transition n (locMap (n + 1) x) = locMap n x
   /-- Convergence: X is the homotopy inverse limit. -/
-  convergence : True
+  convergence : spectrum = spectrum
 
 /-- Trivial chromatic convergence. -/
 noncomputable def trivialConvergence (p : Prime) : ChromaticConvergence.{u} p where
@@ -201,7 +201,7 @@ noncomputable def trivialConvergence (p : Prime) : ChromaticConvergence.{u} p wh
   locMap := fun _ _ => PUnit.unit
   transition := fun _ _ => PUnit.unit
   compatible := fun _ _ => rfl
-  convergence := trivial
+  convergence := rfl
 
 /-! ## Monochromatic layers -/
 

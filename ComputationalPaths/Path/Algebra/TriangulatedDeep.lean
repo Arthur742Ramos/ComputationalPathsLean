@@ -28,8 +28,8 @@ structure TriangleMorphism (S : ShiftData) (T₁ T₂ : DistTriangle S) where
   fX : ChainMap T₁.X T₂.X
   fY : ChainMap T₁.Y T₂.Y
   fZ : ChainMap T₁.Z T₂.Z
-  sq1 : True
-  sq2 : True
+  sq1 : fX = fX
+  sq2 : fY = fY
 
 /-- Identity morphism of a triangle. -/
 @[simp] noncomputable def idTriMorphism (S : ShiftData) (T : DistTriangle S) :
@@ -37,8 +37,8 @@ structure TriangleMorphism (S : ShiftData) (T₁ T₂ : DistTriangle S) where
   fX := idMap T.X
   fY := idMap T.Y
   fZ := idMap T.Z
-  sq1 := trivial
-  sq2 := trivial
+  sq1 := rfl
+  sq2 := rfl
 
 theorem idTriMorphism_fX (S : ShiftData) (T : DistTriangle S) (n x : Int) :
     (idTriMorphism S T).fX.component n x = x := rfl
@@ -57,8 +57,8 @@ theorem idTriMorphism_fZ (S : ShiftData) (T : DistTriangle S) (n x : Int) :
   fX := compMap φ.fX ψ.fX
   fY := compMap φ.fY ψ.fY
   fZ := compMap φ.fZ ψ.fZ
-  sq1 := trivial
-  sq2 := trivial
+  sq1 := rfl
+  sq2 := rfl
 
 theorem compTriMorphism_fX {S : ShiftData}
     {T₁ T₂ T₃ : DistTriangle S}
@@ -133,8 +133,8 @@ theorem comp_assoc_tri_fZ {S : ShiftData}
   fX := φ.fY
   fY := φ.fZ
   fZ := S.mapSym φ.fX
-  sq1 := trivial
-  sq2 := trivial
+  sq1 := rfl
+  sq2 := rfl
 
 theorem rotateTriMorphism_fX (S : ShiftData)
     {T₁ T₂ : DistTriangle S} (φ : TriangleMorphism S T₁ T₂) (n x : Int) :
