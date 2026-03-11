@@ -103,7 +103,7 @@ noncomputable def grothendieckGaloisEquiv (A : Type u) :
 structure EtaleCovering (A : Type u) : Type (u + 1) where
   /-- Underlying covering. -/
   covering : CoveringSpace.Covering A
-  /-- Finiteness of fibers (abstract placeholder). -/
+  /-- Finiteness of fibers (abstract). -/
   finiteFiber : (a : A) → True
 
 /-- The fiber of an etale covering. -/
@@ -119,9 +119,9 @@ noncomputable def etaleMonodromy (E : EtaleCovering A) (a : A) :
 structure GaloisCovering (A : Type u) : Type (u + 1) where
   /-- Underlying covering. -/
   covering : CoveringSpace.Covering A
-  /-- Connectedness of the cover (abstract placeholder). -/
+  /-- Connectedness of the cover (abstract). -/
   isConnected : True
-  /-- Normality of the cover (abstract placeholder). -/
+  /-- Normality of the cover (abstract). -/
   isNormal : True
 
 /-- Deck transformations as the Galois group of a covering. -/

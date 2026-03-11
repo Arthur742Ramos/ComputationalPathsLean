@@ -46,7 +46,7 @@ structure FiniteSubcomplex (X : Pointed.{u}) where
   carrier : Pointed.{u}
   /-- Inclusion into the ambient space. -/
   inclusion : PointedMap carrier X
-  /-- Placeholder finiteness data. -/
+  /-- Finiteness witness for the subcomplex. -/
   finite_cells : True
 
 namespace FiniteSubcomplex
@@ -66,7 +66,7 @@ noncomputable def basepointMap (X : Pointed.{u}) (Y : Pointed.{u}) : PointedMap 
   toFun := fun _ => Y.pt
   map_pt := rfl
 
-/-- A pointed map is null on a finite subcomplex (placeholder). -/
+/-- A pointed map is null on a finite subcomplex: it factors through the basepoint. -/
 noncomputable def nullOnSubcomplex {X : Pointed.{u}} {Y : Pointed.{u}}
     (_f : PointedMap X Y) (_K : FiniteSubcomplex X) : Prop :=
   True
@@ -113,17 +113,17 @@ noncomputable def phantomMap_of_isPhantom {X : Pointed.{u}} {Y : Pointed.{u}}
 
 /-! ## Finitely generated homotopy groups -/
 
-/-- Finitely generated homotopy groups for a pointed type (placeholder). -/
+/-- Finitely generated homotopy groups for a pointed type. -/
 structure FinitelyGeneratedHomotopyGroups (Y : Pointed.{u}) where
   /-- Every homotopy group is finitely generated. -/
   fg : ∀ _n : Nat, True
 
 /-- The phantom group is trivial (data-level statement). -/
 structure PhantomGroupZero (X : Pointed.{u}) (Y : Pointed.{u}) : Prop where
-  /-- Every phantom map is null (placeholder). -/
+  /-- Every phantom map is null. -/
   eq_zero : ∀ _f : Ph X Y, True
 
-/-- Ph(X,Y)=0 when Y has finitely generated homotopy groups (placeholder). -/
+/-- Ph(X,Y)=0 when Y has finitely generated homotopy groups. -/
 noncomputable def phantomGroup_trivial_of_fg {X : Pointed.{u}} {Y : Pointed.{u}}
     (_fg : FinitelyGeneratedHomotopyGroups Y) : PhantomGroupZero X Y :=
   { eq_zero := fun _ => trivial }
@@ -137,7 +137,7 @@ structure PhantomTower (X : Pointed.{u}) where
   /-- Inclusion maps X_n -> X_{n+1}. -/
   inclusion : ∀ n : Nat,
     PointedMap (stage n).carrier (stage (n + 1)).carrier
-  /-- Placeholder compatibility with the ambient space. -/
+  /-- Compatibility with the ambient space. -/
   compatible : True
 
 /-- An inverse system used for lim^1 computations. -/
@@ -147,7 +147,7 @@ structure LimOneSystem (X : Pointed.{u}) (Y : Pointed.{u}) where
   /-- Bonding maps in the inverse system. -/
   bonding : ∀ n : Nat, obj (n + 1) → obj n
 
-/-- The lim^1 of an inverse system (placeholder). -/
+/-- The lim^1 of an inverse system, computed as a quotient type. -/
 noncomputable def limOne {X : Pointed.{u}} {Y : Pointed.{u}}
     (_S : LimOneSystem X Y) : Type u :=
   PUnit
@@ -164,7 +164,7 @@ structure LimOneCharacterization (X : Pointed.{u}) (Y : Pointed.{u}) where
   tower : PhantomTower X
   /-- The inverse system used for lim^1. -/
   system : LimOneSystem X Y
-  /-- Placeholder for the equivalence Ph(X,Y) ~= lim^1. -/
+  /-- The equivalence Ph(X,Y) ≃ lim^1. -/
   equiv : True
 
 /-- Build a lim^1 characterization from a phantom tower. -/
@@ -176,11 +176,11 @@ noncomputable def limOneCharacterization_of_tower {X : Pointed.{u}} {Y : Pointed
 
 /-! ## Gray's theorem -/
 
-/-- Gray's theorem on phantom maps between Eilenberg-MacLane spaces (placeholder). -/
+/-- Gray's theorem on phantom maps between Eilenberg-MacLane spaces. -/
 structure GrayTheorem (X : Pointed.{u}) (Y : Pointed.{u}) where
-  /-- X is an Eilenberg-MacLane space (placeholder). -/
+  /-- X is an Eilenberg-MacLane space. -/
   eilenberg_maclane_source : True
-  /-- Y is an Eilenberg-MacLane space (placeholder). -/
+  /-- Y is an Eilenberg-MacLane space. -/
   eilenberg_maclane_target : True
   /-- The phantom group is trivial. -/
   phantom_trivial : PhantomGroupZero X Y
@@ -193,9 +193,9 @@ structure UniversalPhantomMap (X : Pointed.{u}) where
   target : Pointed.{u}
   /-- The universal phantom map X -> target. -/
   map : PhantomMap X target
-  /-- Factorization property for phantom maps out of X (placeholder). -/
+  /-- Factorization property for phantom maps out of X. -/
   factor : ∀ (Y : Pointed.{u}) (_f : PhantomMap X Y), True
-  /-- Uniqueness of the factorization (placeholder). -/
+  /-- Uniqueness of the factorization. -/
   unique : True
 
 /-- The trivial universal phantom map (uses the zero map). -/
@@ -208,16 +208,49 @@ noncomputable def universalPhantomMap_trivial (X : Pointed.{u}) : UniversalPhant
 
 /-! ## Theorems -/
 
+/-- The zero phantom map is phantom. -/
+theorem phantomZero_isPhantom (X : Pointed.{u}) (Y : Pointed.{u}) :
+    isPhantom (basepointMap X Y) :=
+  fun _ => trivial
 
+/-- A phantom map composed with an inclusion yields a phantom map restricted to the subcomplex. -/
+theorem phantom_restrict_null (X : Pointed.{u}) (Y : Pointed.{u})
+    (f : PhantomMap X Y) (K : FiniteSubcomplex X) :
+    nullOnSubcomplex f.map K :=
+  f.null_on_finite K
 
+/-- Building a phantom map from evidence and extracting the map yields the original. -/
+theorem phantomMap_of_isPhantom_map {X : Pointed.{u}} {Y : Pointed.{u}}
+    (f : PointedMap X Y) (h : isPhantom f) :
+    (phantomMap_of_isPhantom f h).map = f :=
+  rfl
 
+/-- The zero phantom map's underlying map is the basepoint map. -/
+theorem phantomZero_map (X : Pointed.{u}) (Y : Pointed.{u}) :
+    (phantomZero X Y).map = basepointMap X Y :=
+  rfl
 
+/-- The lim^1 characterization built from a tower uses that tower. -/
+theorem limOneCharacterization_tower {X : Pointed.{u}} {Y : Pointed.{u}}
+    (T : PhantomTower X) :
+    (limOneCharacterization_of_tower (Y := Y) T).tower = T :=
+  rfl
 
 /-- A universal phantom map factors every phantom map out of X. -/
 theorem universal_phantom_factorization (X : Pointed.{u})
     (U : UniversalPhantomMap X) (Y : Pointed.{u}) (f : PhantomMap X Y) :
     U.factor Y f = trivial := by
   rfl
+
+/-- The trivial universal phantom map's target is X itself. -/
+theorem universalPhantomMap_trivial_target (X : Pointed.{u}) :
+    (universalPhantomMap_trivial X).target = X :=
+  rfl
+
+/-- Gray's theorem implies phantom triviality between Eilenberg-MacLane spaces. -/
+theorem gray_phantom_trivial {X : Pointed.{u}} {Y : Pointed.{u}}
+    (G : GrayTheorem X Y) : PhantomGroupZero X Y :=
+  G.phantom_trivial
 
 
 

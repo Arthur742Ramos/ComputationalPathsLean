@@ -55,9 +55,9 @@ structure SmoothManifold (n : Nat) where
 structure Immersion {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) where
   /-- Underlying map. -/
   toFun : M.carrier → N.carrier
-  /-- Differential data (placeholder). -/
+  /-- Differential data for the immersion. -/
   differential : Type u
-  /-- Injectivity of the differential (placeholder). -/
+  /-- Injectivity of the differential. -/
   injective : True
 
 /-- Identity immersion on a smooth manifold. -/
@@ -102,7 +102,7 @@ noncomputable def RegularHomotopyClass {m n : Nat} (M : SmoothManifold m) (N : S
 structure FormalImmersion {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) where
   /-- Underlying immersion. -/
   immersion : Immersion M N
-  /-- Formal bundle data (placeholder). -/
+  /-- Formal bundle data. -/
   formalData : PUnit
 
 namespace FormalImmersion

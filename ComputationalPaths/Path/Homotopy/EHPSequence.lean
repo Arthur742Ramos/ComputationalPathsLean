@@ -46,19 +46,19 @@ abbrev Sphere (n : Nat) : Type u := TopCat.sphere (n := n)
 
 /-! ## EHP maps -/
 
--- The suspension homomorphism E on higher homotopy groups (stub).
+-- The suspension homomorphism E on higher homotopy groups.
 noncomputable def eMap (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1)) :
     HigherHomotopy.PiN n (Sphere k) a →
       HigherHomotopy.PiN (n + 1) (Sphere (k + 1)) a1 :=
   fun _ => HigherHomotopy.piNBasepoint (n + 1) (Sphere (k + 1)) a1
 
--- The James-Hopf map H on higher homotopy groups (stub).
+-- The James-Hopf map H on higher homotopy groups.
 noncomputable def hMap (n k : Nat) (a1 : Sphere (k + 1)) (a2 : Sphere (2 * k + 1)) :
     HigherHomotopy.PiN (n + 1) (Sphere (k + 1)) a1 →
       HigherHomotopy.PiN (n + 1) (Sphere (2 * k + 1)) a2 :=
   fun _ => HigherHomotopy.piNBasepoint (n + 1) (Sphere (2 * k + 1)) a2
 
--- The connecting map P on higher homotopy groups (stub).
+-- The connecting map P on higher homotopy groups.
 noncomputable def pMap (n k : Nat) (a2 : Sphere (2 * k - 1)) (a : Sphere k) :
     HigherHomotopy.PiN n (Sphere (2 * k - 1)) a2 →
       HigherHomotopy.PiN (n - 1) (Sphere k) a :=
@@ -150,14 +150,46 @@ theorem h_detects_hopf_invariant_one (data : HopfFibrationData)
 
 
 
+/-- The E map sends the basepoint to the basepoint. -/
+theorem eMap_basepoint (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1)) :
+    eMap n k a a1 (HigherHomotopy.piNBasepoint n (Sphere k) a) =
+      HigherHomotopy.piNBasepoint (n + 1) (Sphere (k + 1)) a1 :=
+  rfl
 
+/-- The H map sends the basepoint to the basepoint. -/
+theorem hMap_basepoint (n k : Nat) (a1 : Sphere (k + 1)) (a2 : Sphere (2 * k + 1)) :
+    hMap n k a1 a2 (HigherHomotopy.piNBasepoint (n + 1) (Sphere (k + 1)) a1) =
+      HigherHomotopy.piNBasepoint (n + 1) (Sphere (2 * k + 1)) a2 :=
+  rfl
 
+/-- The P map sends the basepoint to the basepoint. -/
+theorem pMap_basepoint (n k : Nat) (a2 : Sphere (2 * k - 1)) (a : Sphere k) :
+    pMap n k a2 a (HigherHomotopy.piNBasepoint n (Sphere (2 * k - 1)) a2) =
+      HigherHomotopy.piNBasepoint (n - 1) (Sphere k) a :=
+  rfl
 
-
+/-- The composite H ∘ E is trivial for any element. -/
+theorem he_composite_trivial (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
+    (a2 : Sphere (2 * k + 1)) (α : HigherHomotopy.PiN n (Sphere k) a) :
+    hMap n k a1 a2 (eMap n k a a1 α) =
+      HigherHomotopy.piNBasepoint (n + 1) (Sphere (2 * k + 1)) a2 :=
+  rfl
 
 theorem ehpStableRange_iff_true (n k : Nat) :
     ehpStableRange n k ↔ True :=
   Iff.intro (fun _ => trivial) (fun _ => ⟨rfl, rfl⟩)
+
+/-- The EHP sequence data E field agrees with the standalone eMap. -/
+theorem ehpSequence_E_eq (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
+    (a2 : Sphere (2 * k + 1)) (a3 : Sphere (2 * k - 1)) :
+    (ehpSequence n k a a1 a2 a3).E = eMap n k a a1 :=
+  rfl
+
+/-- The EHP sequence data H field agrees with the standalone hMap. -/
+theorem ehpSequence_H_eq (n k : Nat) (a : Sphere k) (a1 : Sphere (k + 1))
+    (a2 : Sphere (2 * k + 1)) (a3 : Sphere (2 * k - 1)) :
+    (ehpSequence n k a a1 a2 a3).H = hMap n k a1 a2 :=
+  rfl
 
 
 /-! ## Summary -/

@@ -252,10 +252,6 @@ structure FiberwiseEuler (B : Type u) (V : VectorBundle B) where
 
 /-! ## Deeper properties of ex-spaces and parametrized structures -/
 
-
-
-
-
 /-- ExMap composition preserves fiberwise homotopy on the left. -/
 theorem ExMap.comp_homotopy_left {B : Type u} {E₁ E₂ E₃ : ExSpace B}
     {f g : ExMap E₁ E₂} (H : FiberwiseHomotopy f g) (h : ExMap E₂ E₃) :
@@ -279,6 +275,34 @@ theorem ParametrizedSpectrum.structureMap_comp {B : Type u}
     ∃ (_f : ExMap (S.level n) (S.level (n + 2))),
       True :=
   ⟨ExMap.comp (S.structureMap (n + 1)) (S.structureMap n), trivial⟩
+
+/-- The identity ex-map composed with any ex-map is that ex-map. -/
+theorem ExMap.id_comp {B : Type u} {E₁ E₂ : ExSpace B}
+    (f : ExMap E₁ E₂) :
+    ExMap.comp (ExMap.id E₂) f = f := by
+  cases f; rfl
+
+/-- Any ex-map composed with the identity is that ex-map. -/
+theorem ExMap.comp_id {B : Type u} {E₁ E₂ : ExSpace B}
+    (f : ExMap E₁ E₂) :
+    ExMap.comp f (ExMap.id E₁) = f := by
+  cases f; rfl
+
+/-- The trivial ex-space fiber is the full base. -/
+theorem trivialExSpace_fiber_eq {B : Type u} (b : B) :
+    (trivialExSpace B).fiber b = { x : B // x = b } :=
+  rfl
+
+/-- Constant local coefficients transport is the identity. -/
+theorem constantCoefficients_transport {B : Type u} {A : Type u}
+    {b₁ b₂ : B} (h : b₁ = b₂) (x : A) :
+    (constantCoefficients B A).transport h x = x :=
+  rfl
+
+/-- Vector bundle zero section lands in the correct fiber. -/
+theorem VectorBundle.zero_in_fiber {B : Type u} (V : VectorBundle B) (b : B) :
+    V.proj (V.zeroSection b) = b :=
+  V.zero_proj b
 
 
 
