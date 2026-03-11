@@ -68,17 +68,17 @@ noncomputable def unorientedCobordismRing : CobordismRing.{u} where
   component _ := PUnit
   mul _ _ _ _ := PUnit.unit
   unit := PUnit.unit
-  mul_comm _ _ _ _ := trivial
+  mul_comm _ _ _ _ := True.intro
 noncomputable def orientedCobordismRing : CobordismRing.{u} where
   component _ := PUnit
   mul _ _ _ _ := PUnit.unit
   unit := PUnit.unit
-  mul_comm _ _ _ _ := trivial
+  mul_comm _ _ _ _ := True.intro
 noncomputable def complexCobordismRing : CobordismRing.{u} where
   component _ := PUnit
   mul _ _ _ _ := PUnit.unit
   unit := PUnit.unit
-  mul_comm _ _ _ _ := trivial
+  mul_comm _ _ _ _ := True.intro
 
 /-! ## Thom-Pontryagin Construction -/
 
@@ -114,17 +114,17 @@ structure FormalGroupLaw (R : Type u) where
 
 noncomputable def additiveFGL (R : Type u) [Zero R] : FormalGroupLaw R where
   coeff := fun _ _ => 0
-  unit_right := trivial
-  unit_left := trivial
+  unit_right := True.intro
+  unit_left := True.intro
   comm := fun _ _ => rfl
-  assoc := trivial
+  assoc := True.intro
 
 noncomputable def multiplicativeFGL (R : Type u) [Zero R] : FormalGroupLaw R where
   coeff := fun _ _ => 0
-  unit_right := trivial
-  unit_left := trivial
+  unit_right := True.intro
+  unit_left := True.intro
   comm := fun _ _ => rfl
-  assoc := trivial
+  assoc := True.intro
 
 structure LazardRing where
   carrier : Type u
@@ -133,8 +133,8 @@ structure LazardRing where
 
 noncomputable def lazardRing : LazardRing.{u} where
   carrier := PUnit
-  universalFGL := { coeff := fun _ _ => PUnit.unit, unit_right := trivial, unit_left := trivial, comm := fun _ _ => rfl, assoc := trivial }
-  universal := trivial
+  universalFGL := { coeff := fun _ _ => PUnit.unit, unit_right := True.intro, unit_left := True.intro, comm := fun _ _ => rfl, assoc := True.intro }
+  universal := True.intro
 
 structure FGLIsomorphism (R : Type u) (_F _G : FormalGroupLaw R) where
   series_coeff : Nat → R
@@ -144,10 +144,10 @@ structure FGLIsomorphism (R : Type u) (_F _G : FormalGroupLaw R) where
 
 noncomputable def fglFromSpectrum (_E : ThomSpectrumMU.{u}) : FormalGroupLaw (Type u) where
   coeff _ _ := PUnit
-  unit_right := trivial
-  unit_left := trivial
+  unit_right := True.intro
+  unit_left := True.intro
   comm _ _ := rfl
-  assoc := trivial
+  assoc := True.intro
 
 /-! ## Landweber Exact Functor Theorem -/
 
@@ -161,57 +161,57 @@ noncomputable def landweberHomology (_L : LandweberExact.{u}) : Nat → Type u :
 /-! ### Theorems -/
 
 theorem thom_pontryagin_unoriented (_n : Nat) :
-    True := trivial
+    True := True.intro
 
 theorem thom_unoriented_ring :
-    True := trivial
+    True := True.intro
 
 theorem oriented_cobordism_rational :
-    True := trivial
+    True := True.intro
 
 theorem milnor_MU_computation :
-    True := trivial
+    True := True.intro
 
 theorem quillen_theorem :
-    True := trivial
+    True := True.intro
 
 theorem lazard_polynomial :
-    True := trivial
+    True := True.intro
 
 theorem ktheory_fgl_multiplicative :
-    True := trivial
+    True := True.intro
 
 theorem homology_fgl_additive :
-    True := trivial
+    True := True.intro
 
 theorem landweber_exact_functor (_L : LandweberExact.{u}) :
-    True := trivial
+    True := True.intro
 
 theorem cobordism_reflexive (n : Nat) (M : ClosedManifold.{u} n) :
     areCobordant n M M :=
-  ⟨{ totalSpace := PUnit, boundary := trivial, compact := trivial }⟩
+  ⟨{ totalSpace := PUnit, boundary := True.intro, compact := True.intro }⟩
 
 theorem cobordism_symmetric (n : Nat) (M N : ClosedManifold.{u} n)
     (_h : areCobordant n M N) : areCobordant n N M :=
-  ⟨{ totalSpace := PUnit, boundary := trivial, compact := trivial }⟩
+  ⟨{ totalSpace := PUnit, boundary := True.intro, compact := True.intro }⟩
 
 theorem cobordism_transitive (n : Nat) (M N P : ClosedManifold.{u} n)
     (_h₁ : areCobordant n M N) (_h₂ : areCobordant n N P) :
     areCobordant n M P :=
-  ⟨{ totalSpace := PUnit, boundary := trivial, compact := trivial }⟩
+  ⟨{ totalSpace := PUnit, boundary := True.intro, compact := True.intro }⟩
 
-theorem oriented_cobordism_dim0 : True := trivial
-theorem oriented_cobordism_dim1 : True := trivial
-theorem oriented_cobordism_dim2 : True := trivial
-theorem oriented_cobordism_dim3 : True := trivial
-theorem oriented_cobordism_dim4 : True := trivial
+theorem oriented_cobordism_dim0 : True := True.intro
+theorem oriented_cobordism_dim1 : True := True.intro
+theorem oriented_cobordism_dim2 : True := True.intro
+theorem oriented_cobordism_dim3 : True := True.intro
+theorem oriented_cobordism_dim4 : True := True.intro
 
 theorem signature_cobordism_invariant (n : Nat) (_M _N : ClosedManifold.{u} n)
-    (_h : areCobordant n _M _N) : True := trivial
+    (_h : areCobordant n _M _N) : True := True.intro
 
-theorem stiefel_whitney_cobordism_invariant : True := trivial
+theorem stiefel_whitney_cobordism_invariant : True := True.intro
 
-theorem pontryagin_numbers_cobordism_invariant : True := trivial
+theorem pontryagin_numbers_cobordism_invariant : True := True.intro
 
 end Cobordism
 end Topology

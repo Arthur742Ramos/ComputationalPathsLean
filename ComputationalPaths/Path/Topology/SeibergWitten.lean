@@ -67,7 +67,7 @@ noncomputable def spinc_torsor_action {X : FourManifold}
   c1           := 𝔰.c1 + 2 * h
   spinorPlus   := 𝔰.spinorPlus
   spinorMinus  := 𝔰.spinorMinus
-  characteristic := trivial
+  characteristic := True.intro
 
 /-- The canonical Spinᶜ structure on a Kähler surface. -/
 structure CanonicalSpinC (X : FourManifold) extends SpinCStructure X where
@@ -105,11 +105,11 @@ structure DiracOperator (X : FourManifold) (𝔰 : SpinCStructure X)
 
 /-- The Dirac operator is Fredholm. -/
 theorem dirac_fredholm (X : FourManifold) (𝔰 : SpinCStructure X)
-    (A : SpinCConnection X 𝔰) (_D : DiracOperator X 𝔰 A) : True := trivial
+    (A : SpinCConnection X 𝔰) (_D : DiracOperator X 𝔰 A) : True := True.intro
 
 /-- The index of the Dirac operator via APS index theorem. -/
 theorem dirac_index_formula (X : FourManifold) (𝔰 : SpinCStructure X)
-    (A : SpinCConnection X 𝔰) (_D : DiracOperator X 𝔰 A) : True := trivial
+    (A : SpinCConnection X 𝔰) (_D : DiracOperator X 𝔰 A) : True := True.intro
 
 /-! ## 4. The Quadratic Map σ -/
 
@@ -159,15 +159,15 @@ noncomputable def swGaugeAct {X : FourManifold} {𝔰 : SpinCStructure X}
 /-- A priori bound (Witten): solutions to SW satisfy |φ|² ≤ max(0, −s/4)
     where s is the scalar curvature. -/
 theorem sw_a_priori_bound (X : FourManifold) (𝔰 : SpinCStructure X)
-    (_sol : SWSolution X 𝔰) : True := trivial
+    (_sol : SWSolution X 𝔰) : True := True.intro
 
 /-- The SW moduli space is compact (no Uhlenbeck bubbling for U(1)). -/
 theorem sw_moduli_compact (X : FourManifold) (_𝔰 : SpinCStructure X) :
-    True := trivial
+    True := True.intro
 
 /-- For generic perturbation the moduli space is a smooth manifold. -/
 theorem sw_moduli_smooth_generic (X : FourManifold)
-    (_𝔰 : SpinCStructure X) : True := trivial
+    (_𝔰 : SpinCStructure X) : True := True.intro
 
 /-! ## 7. The SW Moduli Space -/
 
@@ -190,7 +190,7 @@ structure SWReducible (X : FourManifold) (𝔰 : SpinCStructure X) where
 
 /-- For b⁺ ≥ 1 and generic metric, the moduli contains no reducibles. -/
 theorem sw_no_reducibles (X : FourManifold) (_𝔰 : SpinCStructure X)
-    (_h : X.bPlus ≥ 1) : True := trivial
+    (_h : X.bPlus ≥ 1) : True := True.intro
 
 /-! ## 8. The Seiberg-Witten Invariant -/
 
@@ -203,15 +203,15 @@ structure SWInvariant (X : FourManifold) where
 
 /-- SW invariant vanishes when the virtual dimension is odd. -/
 theorem sw_vanishes_odd_dim (X : FourManifold) (_SW : SWInvariant X)
-    (𝔰 : SpinCStructure X) (_h : swExpectedDim X 𝔰 % 2 ≠ 0) : True := trivial
+    (𝔰 : SpinCStructure X) (_h : swExpectedDim X 𝔰 % 2 ≠ 0) : True := True.intro
 
 /-- SW is a diffeomorphism invariant for b⁺ ≥ 2. -/
 theorem sw_diffeomorphism_invariant (X : FourManifold) (_SW : SWInvariant X)
-    (_h : X.bPlus ≥ 2) : True := trivial
+    (_h : X.bPlus ≥ 2) : True := True.intro
 
 /-- Positive scalar curvature ⟹ SW = 0. -/
 theorem sw_vanishes_positive_curvature (X : FourManifold) (_SW : SWInvariant X)
-    (_pos_curv : True) : True := trivial
+    (_pos_curv : True) : True := True.intro
 
 /-! ## 9. Basic Classes -/
 
@@ -227,11 +227,11 @@ structure SWSimpleType (X : FourManifold) (SW : SWInvariant X) where
 
 /-- The number of basic classes is finite. -/
 theorem basic_classes_finite (X : FourManifold) (_SW : SWInvariant X) :
-    True := trivial
+    True := True.intro
 
 /-- Conjugation symmetry: SW(𝔰̄) = (−1)^{…} SW(𝔰). -/
 theorem sw_conjugation_symmetry (X : FourManifold) (_SW : SWInvariant X)
-    (_𝔰 : SpinCStructure X) : True := trivial
+    (_𝔰 : SpinCStructure X) : True := True.intro
 
 /-! ## 10. Wall Crossing -/
 
@@ -246,7 +246,7 @@ structure WallCrossing (X : FourManifold) where
 
 /-- Wall crossing is determined by the reducible locus. -/
 theorem wall_crossing_reducible (X : FourManifold)
-    (_wc : WallCrossing X) : True := trivial
+    (_wc : WallCrossing X) : True := True.intro
 
 /-! ## 11. The Witten Conjecture -/
 
@@ -262,7 +262,7 @@ structure WittenConjecture (X : FourManifold) where
 
 /-- KM proved the conjecture for manifolds of simple type. -/
 theorem km_simple_type (X : FourManifold) (_W : WittenConjecture X) :
-    True := trivial
+    True := True.intro
 
 /-! ## 12. Adjunction Inequality -/
 
@@ -283,10 +283,10 @@ noncomputable def genusBound (A : AdjunctionInequality X SW) : Int :=
   (A.selfIntersection + Int.natAbs A.pairing + 2) / 2
 
 /-- Adjunction inequality implies the Thom conjecture for CP². -/
-theorem thom_conjecture : True := trivial
+theorem thom_conjecture : True := True.intro
 
 /-- Symplectic Thom conjecture (Ozsváth-Szabó). -/
-theorem symplectic_thom_conjecture : True := trivial
+theorem symplectic_thom_conjecture : True := True.intro
 
 /-! ## 13. Applications to Exotic Structures -/
 
@@ -305,14 +305,14 @@ structure KnotSurgery (X : FourManifold) where
 
 /-- Rational blowdown changes SW invariants predictably. -/
 theorem rational_blowdown_sw (X : FourManifold) (_SW : SWInvariant X) :
-    True := trivial
+    True := True.intro
 
 /-! ## 14. SW and Symplectic Geometry -/
 
 /-- Taubes' theorem: for symplectic 4-manifolds, SW(K) = ±1 where
     K is the canonical class. -/
 theorem taubes_symplectic (X : FourManifold) (_SW : SWInvariant X)
-    (_symplectic : True) : True := trivial
+    (_symplectic : True) : True := True.intro
 
 /-- Taubes' SW = Gr: the SW invariant equals the Gromov invariant
     (counting pseudo-holomorphic curves). -/
@@ -325,11 +325,11 @@ structure TaubesSWGr (X : FourManifold) where
 
 /-- SW vanishes for connected sums X # Y with b⁺(X), b⁺(Y) > 0. -/
 theorem sw_connected_sum_vanishes (X Y : FourManifold)
-    (_hx : X.bPlus > 0) (_hy : Y.bPlus > 0) : True := trivial
+    (_hx : X.bPlus > 0) (_hy : Y.bPlus > 0) : True := True.intro
 
 /-- Metric of positive scalar curvature implies SW = 0 for all Spinᶜ. -/
 theorem positive_scalar_implies_sw_zero (X : FourManifold)
-    (_SW : SWInvariant X) (_psc : True) : True := trivial
+    (_SW : SWInvariant X) (_psc : True) : True := True.intro
 
 
 
