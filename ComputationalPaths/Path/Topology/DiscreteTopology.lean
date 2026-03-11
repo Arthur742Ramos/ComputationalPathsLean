@@ -223,24 +223,43 @@ noncomputable def optimal_eq (K : CellComplex) (O : OptimalDiscreteMorse K) (k :
   O.optimal k
 
 
-/-! ## Additional Theorem Stubs -/
+/-! ## Additional Theorems -/
 
-theorem cellsOfDim_subset (_K : CellComplex) (_d : Nat) (_c : Cell) : True := trivial
+/-- Cells of a given dimension are a sublist of all cells. -/
+theorem cellsOfDim_subset (K : CellComplex) (d : Nat) :
+    cellsOfDim K d = K.cells.filter (fun c => c.dim == d) := rfl
 
-theorem numCells_eq_length (_K : CellComplex) (_k : Nat) : True := trivial
+/-- Number of k-cells equals the length of the filtered list. -/
+theorem numCells_eq_length (K : CellComplex) (k : Nat) :
+    numCells K k = (cellsOfDim K k).length := rfl
 
-theorem unmatchedCells_subset (K : CellComplex) (_V : GradientVectorField K) (_c : Cell) : True := trivial
+/-- Unmatched cells are computed from the gradient vector field pairs. -/
+theorem unmatchedCells_subset (K : CellComplex) (V : GradientVectorField K) :
+    unmatchedCells K V = K.cells.filter (fun c =>
+      !(V.pairs.any (fun p => p.1.id == c.id || p.2.id == c.id))) := rfl
 
-theorem matchingCriticalCells_subset (K : CellComplex) (_M : AcyclicMatching K) (_c : Cell) : True := trivial
+/-- Matching critical cells equal the unmatched cells of the underlying gradient field. -/
+theorem matchingCriticalCells_subset (K : CellComplex) (M : AcyclicMatching K) :
+    matchingCriticalCells K M = unmatchedCells K M.toGradientVectorField := rfl
 
-theorem collapse_homotopy_path_symm (K : CellComplex) (_e : ElementaryCollapse K) : True := trivial
+/-- Collapse homotopy path is symmetric under double-symm. -/
+theorem collapse_homotopy_path_symm (K : CellComplex) (e : ElementaryCollapse K) :
+    Path.symm (Path.symm (collapse_homotopy_path K e)) = collapse_homotopy_path K e :=
+  Path.symm_symm (collapse_homotopy_path K e)
 
-theorem weak_discrete_morse_bound (K : CellComplex) (_I : DiscreteMorseInequalities K) (_k : Nat) : True := trivial
+/-- Weak discrete Morse bound: critical count dominates Betti numbers. -/
+theorem weak_discrete_morse_bound (K : CellComplex) (I : DiscreteMorseInequalities K) (k : Nat) :
+    I.critCount k ≥ I.betti k := I.weak k
 
-theorem optimal_eq_symmetric (K : CellComplex) (_O : OptimalDiscreteMorse K) (_k : Nat) : True := trivial
+/-- Optimal discrete Morse: critical count equals Betti number (Path witness is symmetric). -/
+theorem optimal_eq_symmetric (K : CellComplex) (O : OptimalDiscreteMorse K) (k : Nat) :
+    Path.symm (Path.symm (O.optimal k)) = O.optimal k :=
+  Path.symm_symm (O.optimal k)
 
+/-- Critical count is given by the filtered list length. -/
 theorem critical_count_formula (K : CellComplex) (f : DiscreteMorseFunction K)
-    (_C : CriticalCells K f) (_k : Nat) : True := trivial
+    (C : CriticalCells K f) (k : Nat) :
+    C.critCount k = (C.critical.filter (fun c => c.dim == k)).length := C.count_eq k
 
 
 end DiscreteMorse

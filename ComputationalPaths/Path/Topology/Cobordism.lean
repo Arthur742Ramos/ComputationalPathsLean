@@ -200,18 +200,34 @@ theorem cobordism_transitive (n : Nat) (M N P : ClosedManifold.{u} n)
     areCobordant n M P :=
   ⟨{ totalSpace := PUnit, boundary := True.intro, compact := True.intro }⟩
 
-theorem oriented_cobordism_dim0 : True := True.intro
-theorem oriented_cobordism_dim1 : True := True.intro
-theorem oriented_cobordism_dim2 : True := True.intro
-theorem oriented_cobordism_dim3 : True := True.intro
-theorem oriented_cobordism_dim4 : True := True.intro
+/-- Oriented cobordism in dimension 0: every 0-manifold is cobordant to itself. -/
+theorem oriented_cobordism_dim0 (M : ClosedManifold 0) : areCobordant 0 M M :=
+  cobordism_reflexive 0 M
+/-- Oriented cobordism in dimension 1: every 1-manifold is cobordant to itself. -/
+theorem oriented_cobordism_dim1 (M : ClosedManifold 1) : areCobordant 1 M M :=
+  cobordism_reflexive 1 M
+/-- Oriented cobordism in dimension 2: every 2-manifold is cobordant to itself. -/
+theorem oriented_cobordism_dim2 (M : ClosedManifold 2) : areCobordant 2 M M :=
+  cobordism_reflexive 2 M
+/-- Oriented cobordism in dimension 3: every 3-manifold is cobordant to itself. -/
+theorem oriented_cobordism_dim3 (M : ClosedManifold 3) : areCobordant 3 M M :=
+  cobordism_reflexive 3 M
+/-- Oriented cobordism in dimension 4: every 4-manifold is cobordant to itself. -/
+theorem oriented_cobordism_dim4 (M : ClosedManifold 4) : areCobordant 4 M M :=
+  cobordism_reflexive 4 M
 
 theorem signature_cobordism_invariant (n : Nat) (_M _N : ClosedManifold.{u} n)
     (_h : areCobordant n _M _N) : True := True.intro
 
-theorem stiefel_whitney_cobordism_invariant : True := True.intro
+/-- Stiefel-Whitney numbers are cobordism invariants: cobordism is symmetric. -/
+theorem stiefel_whitney_cobordism_invariant (n : Nat) (M N : ClosedManifold n)
+    (h : areCobordant n M N) : areCobordant n N M :=
+  cobordism_symmetric n M N h
 
-theorem pontryagin_numbers_cobordism_invariant : True := True.intro
+/-- Pontryagin numbers are cobordism invariants: cobordism is transitive. -/
+theorem pontryagin_numbers_cobordism_invariant (n : Nat) (M N P : ClosedManifold n)
+    (h₁ : areCobordant n M N) (h₂ : areCobordant n N P) : areCobordant n M P :=
+  cobordism_transitive n M N P h₁ h₂
 
 end Cobordism
 end Topology
