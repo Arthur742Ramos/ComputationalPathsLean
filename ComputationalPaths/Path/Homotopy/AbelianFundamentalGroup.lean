@@ -81,6 +81,12 @@ theorem piOne_comm_of_interchange {G : Type u} {ops : PiOneOps G}
     _ = ops.mul y x := by
           simp [H.hmul_one_left, H.hmul_one_right]
 
+/-- `Path` witness for the Eckmann-Hilton commutativity conclusion. -/
+noncomputable def piOne_comm_of_interchange_path {G : Type u} {ops : PiOneOps G}
+    (H : PiOneInterchange G ops) (x y : G) :
+    Path (ops.mul x y) (ops.mul y x) :=
+  Path.stepChain (piOne_comm_of_interchange (H := H) x y)
+
 /-! ## Torus pi_1 (Z x Z) -/
 
 /-- Componentwise addition on integer pairs. -/
@@ -96,10 +102,20 @@ noncomputable def intProdZero : Int × Int :=
   cases x
   simp [intProdAdd, intProdZero]
 
+/-- `Path` witness for the left unit law on `Int × Int`. -/
+noncomputable def intProdAdd_zero_left_path (x : Int × Int) :
+    Path (intProdAdd intProdZero x) x :=
+  Path.stepChain (intProdAdd_zero_left x)
+
 @[simp] theorem intProdAdd_zero_right (x : Int × Int) :
     intProdAdd x intProdZero = x := by
   cases x
   simp [intProdAdd, intProdZero]
+
+/-- `Path` witness for the right unit law on `Int × Int`. -/
+noncomputable def intProdAdd_zero_right_path (x : Int × Int) :
+    Path (intProdAdd x intProdZero) x :=
+  Path.stepChain (intProdAdd_zero_right x)
 
 theorem intProdAdd_interchange (x1 x2 y1 y2 : Int × Int) :
     intProdAdd (intProdAdd x1 x2) (intProdAdd y1 y2) =
@@ -110,6 +126,13 @@ theorem intProdAdd_interchange (x1 x2 y1 y2 : Int × Int) :
   cases y2
   simp [intProdAdd, Int.add_comm, Int.add_left_comm]
 
+/-- `Path` witness for the interchange law on `Int × Int`. -/
+noncomputable def intProdAdd_interchange_path (x1 x2 y1 y2 : Int × Int) :
+    Path
+      (intProdAdd (intProdAdd x1 x2) (intProdAdd y1 y2))
+      (intProdAdd (intProdAdd x1 y1) (intProdAdd x2 y2)) :=
+  Path.stepChain (intProdAdd_interchange x1 x2 y1 y2)
+
 section TorusPiOne
 
 variable [HasTorusPiOneEncode]
@@ -118,6 +141,11 @@ local notation "encode" => HasTorusPiOneEncode.encode
 
 @[simp] theorem encode_torusDecode (z : Int × Int) : encode (torusDecode z) = z :=
   (HasTorusPiOneEncode.encode_torusDecode z).toEq
+
+/-- `Path` witness for `encode ∘ torusDecode`. -/
+noncomputable def encode_torusDecode_path (z : Int × Int) :
+    Path (encode (torusDecode z)) z :=
+  Path.stepChain (encode_torusDecode z)
 
 /-- Torus pi_1 multiplication induced by Z x Z addition. -/
 noncomputable def torusPiOneMul (x y : torusPiOne) : torusPiOne :=
@@ -132,10 +160,20 @@ noncomputable def torusPiOneOne : torusPiOne :=
   unfold torusPiOneMul
   simp [intProdAdd]
 
+/-- `Path` witness for torus `π₁` multiplication under encoding. -/
+noncomputable def torusPiOneEncode_mul_path (x y : torusPiOne) :
+    Path (encode (torusPiOneMul x y)) (intProdAdd (encode x) (encode y)) :=
+  Path.stepChain (torusPiOneEncode_mul x y)
+
 @[simp] theorem torusPiOneEncode_one :
     encode torusPiOneOne = intProdZero := by
   unfold torusPiOneOne
   simp
+
+/-- `Path` witness for the identity element under encoding. -/
+noncomputable def torusPiOneEncode_one_path :
+    Path (encode torusPiOneOne) intProdZero :=
+  Path.stepChain torusPiOneEncode_one
 
 theorem torusPiOneEncode_injective {x y : torusPiOne}
     (h : encode x = encode y) : x = y := by
@@ -157,6 +195,11 @@ theorem torusPiOneMul_one_left (x : torusPiOne) :
     _ = encode x := by
           simp [intProdAdd_zero_left]
 
+/-- `Path` witness for the left unit law on torus `π₁`. -/
+noncomputable def torusPiOneMul_one_left_path (x : torusPiOne) :
+    Path (torusPiOneMul torusPiOneOne x) x :=
+  Path.stepChain (torusPiOneMul_one_left x)
+
 theorem torusPiOneMul_one_right (x : torusPiOne) :
     torusPiOneMul x torusPiOneOne = x := by
   apply torusPiOneEncode_injective
@@ -169,12 +212,24 @@ theorem torusPiOneMul_one_right (x : torusPiOne) :
     _ = encode x := by
           simp [intProdAdd_zero_right]
 
+/-- `Path` witness for the right unit law on torus `π₁`. -/
+noncomputable def torusPiOneMul_one_right_path (x : torusPiOne) :
+    Path (torusPiOneMul x torusPiOneOne) x :=
+  Path.stepChain (torusPiOneMul_one_right x)
+
 theorem torusPiOne_interchange (x1 x2 y1 y2 : torusPiOne) :
     torusPiOneMul (torusPiOneMul x1 x2) (torusPiOneMul y1 y2) =
       torusPiOneMul (torusPiOneMul x1 y1) (torusPiOneMul x2 y2) := by
   apply torusPiOneEncode_injective
   apply Prod.ext <;>
     simp [torusPiOneMul, intProdAdd, Int.add_assoc, Int.add_left_comm]
+
+/-- `Path` witness for the interchange law on torus `π₁`. -/
+noncomputable def torusPiOne_interchange_path (x1 x2 y1 y2 : torusPiOne) :
+    Path
+      (torusPiOneMul (torusPiOneMul x1 x2) (torusPiOneMul y1 y2))
+      (torusPiOneMul (torusPiOneMul x1 y1) (torusPiOneMul x2 y2)) :=
+  Path.stepChain (torusPiOne_interchange x1 x2 y1 y2)
 
 /-- Operations package for torus pi_1. -/
 noncomputable def torusPiOneOps : PiOneOps torusPiOne where
@@ -193,6 +248,11 @@ noncomputable def torusPiOneInterchange : PiOneInterchange torusPiOne torusPiOne
 /-- Torus pi_1 is abelian (Eckmann-Hilton). -/
 theorem torusPiOne_abelian : PiOneAbelian torusPiOne torusPiOneOps :=
   piOne_comm_of_interchange (H := torusPiOneInterchange)
+
+/-- `Path` witness for the commutativity of torus `π₁`. -/
+noncomputable def torusPiOne_abelian_path (x y : torusPiOne) :
+    Path (torusPiOneOps.mul x y) (torusPiOneOps.mul y x) :=
+  Path.stepChain (torusPiOne_abelian x y)
 
 end TorusPiOne
 
