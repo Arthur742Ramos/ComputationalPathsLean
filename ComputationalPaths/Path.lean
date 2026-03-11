@@ -612,8 +612,8 @@ import ComputationalPaths.Path.Algebra.MotivicPaths
 import ComputationalPaths.Path.Algebra.MotivicSpheres
 import ComputationalPaths.Path.Algebra.NielsenSchreier
 import ComputationalPaths.Path.Algebra.NielsenSchreierDerived
-import ComputationalPaths.Path.Algebra.NoncommutativeGeomDeep
-import ComputationalPaths.Path.Algebra.NoncommutativeGeometryDeep
+import ComputationalPaths.Path.Algebra.NoncommutativeGeom
+import ComputationalPaths.Path.Algebra.NoncommutativeGeometry
 import ComputationalPaths.Path.Algebra.NormalizationStrategiesDeep
 import ComputationalPaths.Path.Algebra.NumberFieldPaths
 import ComputationalPaths.Path.Algebra.NumberTheoryDeep
