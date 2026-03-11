@@ -111,6 +111,18 @@ theorem proj_pathLift_ofEq {P : A → Type u} {a b : A}
     Path.congrArg proj (pathLift (P := P) p x) = Path.stepChain p.toEq := by
   simpa [singleStepPath_eq_stepChain] using proj_pathLift_step (P := P) p x
 
+/-- Path witness for the projection of a lifted path to the canonical single-step base path. -/
+noncomputable def proj_pathLift_step_path {P : A → Type u} {a b : A}
+    (p : Path a b) (x : P a) :
+    Path (Path.congrArg proj (pathLift (P := P) p x)) (singleStepPath (A := A) p.toEq) :=
+  Path.stepChain (proj_pathLift_step (P := P) p x)
+
+/-- Path witness for the `Path.stepChain` formulation of lift projection. -/
+noncomputable def proj_pathLift_ofEq_path {P : A → Type u} {a b : A}
+    (p : Path a b) (x : P a) :
+    Path (Path.congrArg proj (pathLift (P := P) p x)) (Path.stepChain p.toEq) :=
+  Path.stepChain (proj_pathLift_ofEq (P := P) p x)
+
 /-- The projection of the canonical lift has the expected base equality. -/
 @[simp] theorem proj_pathLift_toEq {P : A → Type u} {a b : A}
     (p : Path a b) (x : P a) :
@@ -127,6 +139,17 @@ theorem pathLift_refl_ofEq {P : A → Type u} {a : A} (x : P a) :
     pathLift (P := P) (Path.refl a) x = Path.stepChain (by rfl) := by
   simpa [singleStepPath_eq_stepChain] using pathLift_refl_step (P := P) x
 
+/-- Path witness for the reflexive lift formula. -/
+noncomputable def pathLift_refl_step_path {P : A → Type u} {a : A} (x : P a) :
+    Path (pathLift (P := P) (Path.refl a) x)
+      (singleStepPath (A := TotalSpace P) (by rfl)) :=
+  Path.stepChain (pathLift_refl_step (P := P) x)
+
+/-- Path witness for the `Path.stepChain` formulation of reflexive lifting. -/
+noncomputable def pathLift_refl_ofEq_path {P : A → Type u} {a : A} (x : P a) :
+    Path (pathLift (P := P) (Path.refl a) x) (Path.stepChain (by rfl)) :=
+  Path.stepChain (pathLift_refl_ofEq (P := P) x)
+
 /-- Unique path lifting: a lift with the same projected base path has
 the transported endpoint. -/
 theorem unique_path_lifting {P : A → Type u} {a b : A}
@@ -140,9 +163,17 @@ theorem unique_path_lifting {P : A → Type u} {a b : A}
       (sigmaSnd (B := fun a => P a) q).toEq
   have htransport :
       fiberTransport (P := P) (Path.congrArg proj q) x =
-        fiberTransport (P := P) p x := by
+      fiberTransport (P := P) p x := by
     exact Path.transport_of_toEq_eq hproj x
   exact hq.symm.trans htransport
+
+/-- Path witness for the endpoint identified by unique path lifting. -/
+noncomputable def unique_path_lifting_path {P : A → Type u} {a b : A}
+    (p : Path a b) (x : P a) {y : P b}
+    (q : Path (TotalPoint a x) (TotalPoint b y))
+    (hproj : (Path.congrArg proj q).toEq = p.toEq) :
+    Path y (fiberTransport (P := P) p x) :=
+  Path.stepChain (unique_path_lifting (P := P) (p := p) (x := x) (q := q) hproj)
 
 /-- Endpoint uniqueness for two lifts of the same base path with the same start. -/
 theorem unique_path_lifting_endpoint {P : A → Type u} {a b : A}
@@ -159,6 +190,18 @@ theorem unique_path_lifting_endpoint {P : A → Type u} {a b : A}
     unique_path_lifting (P := P) (p := p) (x := x) (q := q₂) hproj₂
   exact hy₁.trans hy₂.symm
 
+/-- Path witness for endpoint uniqueness of two lifts of the same base path. -/
+noncomputable def unique_path_lifting_endpoint_path {P : A → Type u} {a b : A}
+    (p : Path a b) (x : P a)
+    {y₁ y₂ : P b}
+    (q₁ : Path (TotalPoint a x) (TotalPoint b y₁))
+    (q₂ : Path (TotalPoint a x) (TotalPoint b y₂))
+    (hproj₁ : (Path.congrArg proj q₁).toEq = p.toEq)
+    (hproj₂ : (Path.congrArg proj q₂).toEq = p.toEq) :
+    Path y₁ y₂ :=
+  Path.stepChain
+    (unique_path_lifting_endpoint (P := P) (p := p) (x := x) (q₁ := q₁) (q₂ := q₂) hproj₁ hproj₂)
+
 /-! ## Transport Composition in Fibers -/
 
 /-- Transport along a composite base path equals successive transports. -/
@@ -172,6 +215,12 @@ theorem fiberTransport_trans {P : A → Type u} {a b c : A}
       cases proof₁
       cases proof₂
       rfl
+
+/-- Path witness for the composition law of fiber transport. -/
+noncomputable def fiberTransport_trans_path {P : A → Type u} {a b c : A}
+    (p : Path a b) (q : Path b c) (x : P a) :
+    Path (fiberTransport (Path.trans p q) x) (fiberTransport q (fiberTransport p x)) :=
+  Path.stepChain (fiberTransport_trans (P := P) p q x)
 
 /-! ## Covering Space Structure
 
@@ -228,11 +277,23 @@ theorem loopAction_respects_step {P : A → Type u} {a : A}
   unfold loopAction fiberTransport
   exact Path.transport_of_toEq_eq (step_toEq h) x
 
+/-- Path witness that a single rewrite preserves the loop action. -/
+noncomputable def loopAction_respects_step_path {P : A → Type u} {a : A}
+    {l₁ l₂ : LoopSpace A a} (h : Path.Step l₁ l₂) (x : P a) :
+    Path (loopAction l₁ x) (loopAction l₂ x) :=
+  Path.stepChain (loopAction_respects_step (P := P) h x)
+
 /-- Monodromy is well-defined at the `Step` level. -/
 theorem monodromy_step_well_defined {P : A → Type u} {a : A}
     {l₁ l₂ : LoopSpace A a} (h : Path.Step l₁ l₂) (x : P a) :
     loopAction l₁ x = loopAction l₂ x :=
   loopAction_respects_step (P := P) h x
+
+/-- Path witness for monodromy well-definedness at the `Step` level. -/
+noncomputable def monodromy_step_well_defined_path {P : A → Type u} {a : A}
+    {l₁ l₂ : LoopSpace A a} (h : Path.Step l₁ l₂) (x : P a) :
+    Path (loopAction l₁ x) (loopAction l₂ x) :=
+  Path.stepChain (monodromy_step_well_defined (P := P) h x)
 
 noncomputable def loopAction_respects_rweq {P : A → Type u} {a : A}
     {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) (x : P a) :
@@ -252,6 +313,12 @@ noncomputable def monodromy_rweq_well_defined {P : A → Type u} {a : A}
     {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) (x : P a) :
     loopAction l₁ x = loopAction l₂ x :=
   loopAction_respects_rweq (P := P) h x
+
+/-- Path witness for monodromy well-definedness on rewrite-equivalent loops. -/
+noncomputable def monodromy_rweq_well_defined_path {P : A → Type u} {a : A}
+    {l₁ l₂ : LoopSpace A a} (h : RwEq l₁ l₂) (x : P a) :
+    Path (loopAction l₁ x) (loopAction l₂ x) :=
+  Path.stepChain (monodromy_rweq_well_defined (P := P) h x)
 
 /-- The fiber action descends to the quotient π₁(A, a). -/
 noncomputable def fiberAction {P : A → Type u} {a : A} :
@@ -273,11 +340,22 @@ theorem fiberAction_comp {P : A → Type u} {a : A}
       unfold fiberTransport
       rfl
 
+/-- Path witness for the composition law of the fiber action. -/
+noncomputable def fiberAction_comp_path {P : A → Type u} {a : A}
+    (α β : π₁(A, a)) (x : P a) :
+    Path (fiberAction α (fiberAction β x)) (fiberAction (LoopQuot.comp α β) x) :=
+  Path.stepChain (fiberAction_comp (P := P) α β x)
+
 /-- The fiber action of identity is identity. -/
 theorem fiberAction_id {P : A → Type u} {a : A} (x : P a) :
     fiberAction (Quot.mk _ (Path.refl a)) x = x := by
   unfold fiberAction loopAction fiberTransport
   rfl
+
+/-- Path witness for the identity law of the fiber action. -/
+noncomputable def fiberAction_id_path {P : A → Type u} {a : A} (x : P a) :
+    Path (fiberAction (Quot.mk _ (Path.refl a)) x) x :=
+  Path.stepChain (fiberAction_id (P := P) x)
 
 /-! ## Fiber Paths and π₁-Action
 
@@ -296,11 +374,23 @@ theorem proj_fiberLoopPath_step {P : A → Type u} {a : A}
     Path.congrArg proj (fiberLoopPath (P := P) l x) = singleStepPath (A := A) l.toEq := by
   simpa [fiberLoopPath] using proj_pathLift_step (P := P) l x
 
+/-- Path witness for the projection of a fiber loop path to the base loop. -/
+noncomputable def proj_fiberLoopPath_step_path {P : A → Type u} {a : A}
+    (l : LoopSpace A a) (x : P a) :
+    Path (Path.congrArg proj (fiberLoopPath (P := P) l x)) (singleStepPath (A := A) l.toEq) :=
+  Path.stepChain (proj_fiberLoopPath_step (P := P) l x)
+
 /-- Backward-compatible statement in terms of `Path.stepChain`. -/
 theorem proj_fiberLoopPath_ofEq {P : A → Type u} {a : A}
     (l : LoopSpace A a) (x : P a) :
     Path.congrArg proj (fiberLoopPath (P := P) l x) = Path.stepChain l.toEq := by
   simpa [singleStepPath_eq_stepChain] using proj_fiberLoopPath_step (P := P) l x
+
+/-- Path witness for the `Path.stepChain` formulation of fiber-loop projection. -/
+noncomputable def proj_fiberLoopPath_ofEq_path {P : A → Type u} {a : A}
+    (l : LoopSpace A a) (x : P a) :
+    Path (Path.congrArg proj (fiberLoopPath (P := P) l x)) (Path.stepChain l.toEq) :=
+  Path.stepChain (proj_fiberLoopPath_ofEq (P := P) l x)
 
 /-! ## Deck Transformations
 
@@ -342,14 +432,37 @@ noncomputable def comp (f g : DeckTransformation P) : DeckTransformation P where
   left_inv := fun x => by simp [f.left_inv, g.left_inv]
   right_inv := fun x => by simp [f.right_inv, g.right_inv]
 
+/-- Path witness that a deck transformation preserves the base projection. -/
+noncomputable def proj_eq_path (f : DeckTransformation P) (x : TotalSpace P) :
+    Path (proj (f.toFun x)) (proj x) :=
+  Path.stepChain (f.proj_eq x)
+
+/-- Path witness for the left inverse law of a deck transformation. -/
+noncomputable def left_inv_path (f : DeckTransformation P) (x : TotalSpace P) :
+    Path (f.inv (f.toFun x)) x :=
+  Path.stepChain (f.left_inv x)
+
+/-- Path witness for the right inverse law of a deck transformation. -/
+noncomputable def right_inv_path (f : DeckTransformation P) (x : TotalSpace P) :
+    Path (f.toFun (f.inv x)) x :=
+  Path.stepChain (f.right_inv x)
+
 /-- Deck transformations form an identity element under composition. -/
 @[simp] theorem comp_id (f : DeckTransformation P) : comp f id = f := by
   cases f
   rfl
 
+/-- Path witness for the right identity law of deck transformations. -/
+noncomputable def comp_id_path (f : DeckTransformation P) : Path (comp f id) f :=
+  Path.stepChain (comp_id f)
+
 @[simp] theorem id_comp (f : DeckTransformation P) : comp id f = f := by
   cases f
   rfl
+
+/-- Path witness for the left identity law of deck transformations. -/
+noncomputable def id_comp_path (f : DeckTransformation P) : Path (comp id f) f :=
+  Path.stepChain (id_comp f)
 
 @[simp] theorem comp_assoc (f g h : DeckTransformation P) :
     comp (comp f g) h = comp f (comp g h) := by
@@ -357,6 +470,11 @@ noncomputable def comp (f g : DeckTransformation P) : DeckTransformation P where
   cases g
   cases h
   rfl
+
+/-- Path witness for associativity of deck transformation composition. -/
+noncomputable def comp_assoc_path (f g h : DeckTransformation P) :
+    Path (comp (comp f g) h) (comp f (comp g h)) :=
+  Path.stepChain (comp_assoc f g h)
 
 end DeckTransformation
 
