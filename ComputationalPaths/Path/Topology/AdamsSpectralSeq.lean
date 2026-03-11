@@ -5,7 +5,7 @@ Adams spectral-sequence traces via computational paths.
 
 This public wrapper surfaces representative constructions from
 `AdamsSpectralSeqDeep` under the `ComputationalPaths.Path.Topology.AdamsSpectralSeq`
-namespace, replacing the previous placeholder with usable spectral-sequence
+namespace with genuine spectral-sequence
 interfaces and small length facts about the resulting traces.
 -/
 

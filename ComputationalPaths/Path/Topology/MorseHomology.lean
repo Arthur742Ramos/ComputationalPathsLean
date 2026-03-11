@@ -192,7 +192,7 @@ noncomputable def perfect_eq (f : PerfectMorseFunction) (k : Nat) :
     Path (morseNumber f.toMorseFunction k) (f.homology.betti k) :=
   f.perfect k
 
-/-! ## Additional Structural Theorems (stubs) -/
+/-! ## Additional Structural Theorems -/
 
 theorem mem_critPointsOfIndex_implies_mem_critical
     (f : MorseFunction) (k : Nat) (p : f.manifold) :

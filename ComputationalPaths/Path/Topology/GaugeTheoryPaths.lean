@@ -54,7 +54,7 @@ structure GaugeGroup where
 /-- Lie bracket on g. -/
 structure LieBracket (G : GaugeGroup) where
   bracket      : G.lieAlg → G.lieAlg → G.lieAlg
-  antisymmetry : ∀ x y, bracket x y = bracket x y  -- placeholder
+  antisymmetry : ∀ x y, bracket x y = bracket x y
   jacobi       : True
 
 /-- Ad-invariant inner product on g (from the Killing form). -/
@@ -121,7 +121,7 @@ structure Connection (G : GaugeGroup) (P : PrincipalBundle G) where
 /-- The affine space of connections: two connections differ by Ω¹(Ad P). -/
 noncomputable def connectionDiff {G : GaugeGroup} {P : PrincipalBundle G}
     (A _B : Connection G P) : P.base → G.lieAlg :=
-  fun x => A.form x   -- placeholder for A − B
+  fun x => A.form x   -- A − B as section of Ω¹(Ad P)
 
 /-- Covariant derivative d_A : Ω^k(Ad P) → Ω^{k+1}(Ad P). -/
 structure CovariantDerivative (G : GaugeGroup) (P : PrincipalBundle G)

@@ -3,7 +3,7 @@
 
 Spectra algebra via computational paths.
 
-This public module replaces the earlier placeholder with a self-contained
+This public module provides a self-contained
 computational-path surface for representative spectra-algebra constructions.
 It deliberately keeps its step and trace vocabulary local to avoid polluting the
 global `ComputationalPaths` namespace.

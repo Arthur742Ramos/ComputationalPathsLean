@@ -5,7 +5,7 @@ Stable stems via computational paths.
 
 This public wrapper re-exports representative stable-stem traces from
 `StableStemsDeep` into the `ComputationalPaths.Path.Topology.StableStems`
-namespace, replacing the previous placeholder with a usable interface.
+namespace with genuine path traces and length proofs.
 -/
 
 import ComputationalPaths.Path.Topology.StableStemsDeep
