@@ -67,6 +67,10 @@ theorem inv_pt : G.inv X.pt = X.pt := by
   rw [G.mul_pt_right] at h
   exact h
 
+/-- `Path` witness that inversion fixes the basepoint. -/
+noncomputable def inv_pt_path : Path (G.inv X.pt) X.pt :=
+  Path.stepChain (G.inv_pt)
+
 /-- `Path` witness that unit laws hold. -/
 noncomputable def mul_pt_left_path (x : X.carrier) : Path (G.mul X.pt x) x :=
   Path.stepChain (G.mul_pt_left x)
@@ -149,6 +153,26 @@ noncomputable def trivial (X : Pointed) : DeloopingData (loopPointed X) where
   toLoop_pt := Path.refl _
   fromLoop_pt := Path.refl _
 
+/-- Public left-inverse witness for the trivial delooping. -/
+noncomputable def trivial_left_inv_path (X : Pointed) (l : LoopSpace X.carrier X.pt) :
+    Path ((trivial X).fromLoop ((trivial X).toLoop l)) l :=
+  (trivial X).left_inv l
+
+/-- Public right-inverse witness for the trivial delooping. -/
+noncomputable def trivial_right_inv_path (X : Pointed) (l : LoopSpace X.carrier X.pt) :
+    Path ((trivial X).toLoop ((trivial X).fromLoop l)) l :=
+  (trivial X).right_inv l
+
+/-- Public basepoint-preservation witness for the forward map of the trivial delooping. -/
+noncomputable def trivial_toLoop_pt_path (X : Pointed) :
+    Path ((trivial X).toLoop (loopPointed X).pt) (Path.refl X.pt) :=
+  (trivial X).toLoop_pt
+
+/-- Public basepoint-preservation witness for the backward map of the trivial delooping. -/
+noncomputable def trivial_fromLoop_pt_path (X : Pointed) :
+    Path ((trivial X).fromLoop (Path.refl X.pt)) (loopPointed X).pt :=
+  (trivial X).fromLoop_pt
+
 end DeloopingData
 
 /-! ## May recognition theorem -/
@@ -177,6 +201,72 @@ noncomputable def recognitionFromDelooping {X : Pointed}
         (e1.mul x y)) :
     MayRecognition X :=
   { e1 := e1, delooping := d, compat := h }
+
+/-- The `e1` field of `recognitionFromDelooping` is judgmentally the supplied one. -/
+theorem recognitionFromDelooping_e1_eq {X : Pointed}
+    (e1 : GroupLikeE1Space X) (d : DeloopingData X)
+    (h : ∀ x y : X.carrier,
+      Path (d.fromLoop (LoopSpace.comp (d.toLoop x) (d.toLoop y)))
+        (e1.mul x y)) :
+    (recognitionFromDelooping e1 d h).e1 = e1 := rfl
+
+/-- `Path` witness exposing the `e1` field of `recognitionFromDelooping`. -/
+noncomputable def recognitionFromDelooping_e1_path {X : Pointed}
+    (e1 : GroupLikeE1Space X) (d : DeloopingData X)
+    (h : ∀ x y : X.carrier,
+      Path (d.fromLoop (LoopSpace.comp (d.toLoop x) (d.toLoop y)))
+        (e1.mul x y)) :
+    Path (recognitionFromDelooping e1 d h).e1 e1 :=
+  Path.stepChain (recognitionFromDelooping_e1_eq e1 d h)
+
+/-- The `delooping` field of `recognitionFromDelooping` is judgmentally the supplied one. -/
+theorem recognitionFromDelooping_delooping_eq {X : Pointed}
+    (e1 : GroupLikeE1Space X) (d : DeloopingData X)
+    (h : ∀ x y : X.carrier,
+      Path (d.fromLoop (LoopSpace.comp (d.toLoop x) (d.toLoop y)))
+        (e1.mul x y)) :
+    (recognitionFromDelooping e1 d h).delooping = d := rfl
+
+/-- `Path` witness exposing the `delooping` field of `recognitionFromDelooping`. -/
+noncomputable def recognitionFromDelooping_delooping_path {X : Pointed}
+    (e1 : GroupLikeE1Space X) (d : DeloopingData X)
+    (h : ∀ x y : X.carrier,
+      Path (d.fromLoop (LoopSpace.comp (d.toLoop x) (d.toLoop y)))
+        (e1.mul x y)) :
+    Path (recognitionFromDelooping e1 d h).delooping d :=
+  Path.stepChain (recognitionFromDelooping_delooping_eq e1 d h)
+
+namespace MayRecognition
+
+variable {X : Pointed} (R : MayRecognition X)
+
+/-- Public left-inverse witness from the delooping packaged by May recognition. -/
+noncomputable def left_inv_path (x : X.carrier) :
+    Path (R.delooping.fromLoop (R.delooping.toLoop x)) x :=
+  R.delooping.left_inv x
+
+/-- Public right-inverse witness from the delooping packaged by May recognition. -/
+noncomputable def right_inv_path (l : LoopSpace R.delooping.deloop.carrier R.delooping.deloop.pt) :
+    Path (R.delooping.toLoop (R.delooping.fromLoop l)) l :=
+  R.delooping.right_inv l
+
+/-- Public forward basepoint-preservation witness from the packaged delooping. -/
+noncomputable def toLoop_pt_path :
+    Path (R.delooping.toLoop X.pt) (Path.refl R.delooping.deloop.pt) :=
+  R.delooping.toLoop_pt
+
+/-- Public backward basepoint-preservation witness from the packaged delooping. -/
+noncomputable def fromLoop_pt_path :
+    Path (R.delooping.fromLoop (Path.refl R.delooping.deloop.pt)) X.pt :=
+  R.delooping.fromLoop_pt
+
+/-- Public compatibility witness between loop composition and E1 multiplication. -/
+noncomputable def compat_path (x y : X.carrier) :
+    Path (R.delooping.fromLoop (LoopSpace.comp (R.delooping.toLoop x) (R.delooping.toLoop y)))
+      (R.e1.mul x y) :=
+  R.compat x y
+
+end MayRecognition
 
 /-! ## Summary -/
 
