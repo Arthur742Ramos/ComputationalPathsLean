@@ -215,6 +215,11 @@ theorem comp_id (t : TransitionFunction F) :
     ∀ f, (comp t id).toFun f = t.toFun f :=
   fun _ => rfl
 
+/-- Transition functions compose associatively on values. -/
+theorem comp_assoc (g h k : TransitionFunction F) :
+    ∀ f, (comp (comp g h) k).toFun f = (comp g (comp h k)).toFun f :=
+  fun _ => rfl
+
 /-- Composition with inverse gives identity. -/
 theorem comp_inv (t : TransitionFunction F) :
     ∀ f, (comp t (inv t)).toFun f = f := by
@@ -234,10 +239,35 @@ noncomputable def id_comp_path (t : TransitionFunction F) (f : F) :
     Path ((comp id t).toFun f) (t.toFun f) :=
   Path.stepChain (id_comp t f)
 
+/-- `Path`-typed comp_id. -/
+noncomputable def comp_id_path (t : TransitionFunction F) (f : F) :
+    Path ((comp t id).toFun f) (t.toFun f) :=
+  Path.stepChain (comp_id t f)
+
 /-- `Path`-typed comp_inv. -/
 noncomputable def comp_inv_path (t : TransitionFunction F) (f : F) :
     Path ((comp t (inv t)).toFun f) f :=
   Path.stepChain (comp_inv t f)
+
+/-- `Path`-typed inv_comp. -/
+noncomputable def inv_comp_path (t : TransitionFunction F) (f : F) :
+    Path ((comp (inv t) t).toFun f) f :=
+  Path.stepChain (inv_comp t f)
+
+/-- `Path`-typed left inverse. -/
+noncomputable def left_inv_path (t : TransitionFunction F) (f : F) :
+    Path (t.invFun (t.toFun f)) f :=
+  Path.stepChain (t.left_inv f)
+
+/-- `Path`-typed right inverse. -/
+noncomputable def right_inv_path (t : TransitionFunction F) (f : F) :
+    Path (t.toFun (t.invFun f)) f :=
+  Path.stepChain (t.right_inv f)
+
+/-- `Path`-typed associativity of transition-function composition on values. -/
+noncomputable def comp_assoc_path (g h k : TransitionFunction F) (f : F) :
+    Path ((comp (comp g h) k).toFun f) ((comp g (comp h k)).toFun f) :=
+  Path.stepChain (comp_assoc g h k f)
 
 end TransitionFunction
 
@@ -257,6 +287,44 @@ noncomputable def transitionSimple {B : Type u} {E : Type u} {F : Type u}
   invFun := fun f => triv1 b (untriv2 b f)
   left_inv := fun f => by rw [left2, right1]
   right_inv := fun f => by rw [left1, right2]
+
+/-- `Path`-typed left inverse for `transitionSimple`. -/
+noncomputable def transitionSimple_left_inv_path {B : Type u} {E : Type u} {F : Type u}
+    (proj : E → B)
+    (triv1 : (b : B) → Fiber proj b → F)
+    (untriv1 : (b : B) → F → Fiber proj b)
+    (triv2 : (b : B) → Fiber proj b → F)
+    (untriv2 : (b : B) → F → Fiber proj b)
+    (left1 : ∀ b x, untriv1 b (triv1 b x) = x)
+    (right1 : ∀ b f, triv1 b (untriv1 b f) = f)
+    (left2 : ∀ b x, untriv2 b (triv2 b x) = x)
+    (right2 : ∀ b f, triv2 b (untriv2 b f) = f)
+    (b : B) (f : F) :
+    Path
+      ((transitionSimple proj triv1 untriv1 triv2 untriv2 left1 right1 left2 right2 b).invFun
+        ((transitionSimple proj triv1 untriv1 triv2 untriv2 left1 right1 left2 right2 b).toFun f))
+      f :=
+  Path.stepChain
+    ((transitionSimple proj triv1 untriv1 triv2 untriv2 left1 right1 left2 right2 b).left_inv f)
+
+/-- `Path`-typed right inverse for `transitionSimple`. -/
+noncomputable def transitionSimple_right_inv_path {B : Type u} {E : Type u} {F : Type u}
+    (proj : E → B)
+    (triv1 : (b : B) → Fiber proj b → F)
+    (untriv1 : (b : B) → F → Fiber proj b)
+    (triv2 : (b : B) → Fiber proj b → F)
+    (untriv2 : (b : B) → F → Fiber proj b)
+    (left1 : ∀ b x, untriv1 b (triv1 b x) = x)
+    (right1 : ∀ b f, triv1 b (untriv1 b f) = f)
+    (left2 : ∀ b x, untriv2 b (triv2 b x) = x)
+    (right2 : ∀ b f, triv2 b (untriv2 b f) = f)
+    (b : B) (f : F) :
+    Path
+      ((transitionSimple proj triv1 untriv1 triv2 untriv2 left1 right1 left2 right2 b).toFun
+        ((transitionSimple proj triv1 untriv1 triv2 untriv2 left1 right1 left2 right2 b).invFun f))
+      f :=
+  Path.stepChain
+    ((transitionSimple proj triv1 untriv1 triv2 untriv2 left1 right1 left2 right2 b).right_inv f)
 
 /-! ## Cocycle Condition
 
@@ -287,6 +355,13 @@ noncomputable def trivialCocycle (F : Type u) : CocycleData F where
   g23 := TransitionFunction.id
   g13 := TransitionFunction.id
   cocycle := fun _ => rfl
+
+/-- `Path`-typed cocycle witness for the trivial cocycle. -/
+noncomputable def trivialCocycle_path (F : Type u) (f : F) :
+    Path
+      ((trivialCocycle F).g13.toFun f)
+      ((TransitionFunction.comp (trivialCocycle F).g12 (trivialCocycle F).g23).toFun f) :=
+  transition_cocycle (trivialCocycle F) f
 
 /-! ## Structure Group
 
