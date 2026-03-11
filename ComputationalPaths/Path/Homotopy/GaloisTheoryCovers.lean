@@ -173,21 +173,50 @@ theorem etalePiOne_eq_piOne (a : A) :
     EtalePiOne A a = PiOne A a := by
   rfl
 
+/-- `Path` witness for the etale `π₁` alias. -/
+noncomputable def etalePiOne_eq_piOne_path (a : A) :
+    Path (EtalePiOne A a) (PiOne A a) :=
+  Path.stepChain (etalePiOne_eq_piOne (A := A) a)
+
 /-- Monodromy of the identity loop is the identity (already @[simp]). -/
 theorem monodromy_identity_action (C : CoveringSpace.Covering A) (a : A)
     (x : C.fiber a) :
     monodromy (A := A) C a (PiOne.id (A := A) (a := a)) x = x :=
   monodromy_id x
 
+/-- `Path` witness for identity monodromy on a covering fiber. -/
+noncomputable def monodromy_identity_action_path (C : CoveringSpace.Covering A) (a : A)
+    (x : C.fiber a) :
+    Path (monodromy (A := A) C a (PiOne.id (A := A) (a := a)) x) x :=
+  Path.stepChain (monodromy_identity_action (A := A) C a x)
+
+/-- `Path` witness for multiplicative compatibility of monodromy. -/
+noncomputable def monodromy_mul_path {C : CoveringSpace.Covering A} {a : A}
+    (g h : EtalePiOne A a) (x : C.fiber a) :
+    Path
+      (monodromy (A := A) C a g (monodromy (A := A) C a h x))
+      (monodromy (A := A) C a (PiOne.mul g h) x) :=
+  Path.stepChain (monodromy_mul (A := A) (C := C) (a := a) g h x)
+
 /-- The fiber functor carrier is the covering fiber. -/
 theorem fiberFunctorObj_carrier (C : CoveringSpace.Covering A) (a : A) :
     (fiberFunctorObj (A := A) C a).carrier = C.fiber a := by
   rfl
 
+/-- `Path` witness for the carrier of the fiber functor object. -/
+noncomputable def fiberFunctorObj_carrier_path (C : CoveringSpace.Covering A) (a : A) :
+    Path ((fiberFunctorObj (A := A) C a).carrier) (C.fiber a) :=
+  Path.stepChain (fiberFunctorObj_carrier (A := A) C a)
+
 /-- The fiber functor abbreviation unfolds correctly. -/
 theorem fiberFunctor_unfold (a : A) (C : CoveringSpace.Covering A) :
     fiberFunctor (A := A) a C = C.fiber a := by
   rfl
+
+/-- `Path` witness for unfolding the fiber functor abbreviation. -/
+noncomputable def fiberFunctor_unfold_path (a : A) (C : CoveringSpace.Covering A) :
+    Path (fiberFunctor (A := A) a C) (C.fiber a) :=
+  Path.stepChain (fiberFunctor_unfold (A := A) a C)
 
 /-- The Grothendieck correspondence has a forward map. -/
 theorem grothendieck_forward_exists :
@@ -199,16 +228,38 @@ theorem grothendieck_left_inv (C : CoveringSpace.Covering A) :
     (grothendieckGaloisEquiv A).invFun ((grothendieckGaloisEquiv A).toFun C) = C :=
   (grothendieckGaloisEquiv A).left_inv C
 
+/-- `Path` witness for the left round-trip of the Grothendieck correspondence. -/
+noncomputable def grothendieck_left_inv_path (C : CoveringSpace.Covering A) :
+    Path ((grothendieckGaloisEquiv A).invFun ((grothendieckGaloisEquiv A).toFun C)) C :=
+  Path.stepChain (grothendieck_left_inv (A := A) C)
+
 /-- The Grothendieck correspondence round-trips on the right. -/
 theorem grothendieck_right_inv (G : CoveringSpace.GroupoidAction A) :
     (grothendieckGaloisEquiv A).toFun ((grothendieckGaloisEquiv A).invFun G) = G :=
   (grothendieckGaloisEquiv A).right_inv G
+
+/-- `Path` witness for the right round-trip of the Grothendieck correspondence. -/
+noncomputable def grothendieck_right_inv_path (G : CoveringSpace.GroupoidAction A) :
+    Path ((grothendieckGaloisEquiv A).toFun ((grothendieckGaloisEquiv A).invFun G)) G :=
+  Path.stepChain (grothendieck_right_inv (A := A) G)
 
 /-- Galois identity composed with any deck transformation is that transformation. -/
 theorem galoisId_left_identity (C : CoveringSpace.Covering A)
     (f : GaloisGroup (A := A) C) :
     galoisComp (A := A) C (galoisId (A := A) C) f = f :=
   galoisId_comp C f
+
+/-- `Path` witness for left identity in the Galois group. -/
+noncomputable def galoisId_left_identity_path (C : CoveringSpace.Covering A)
+    (f : GaloisGroup (A := A) C) :
+    Path (galoisComp (A := A) C (galoisId (A := A) C) f) f :=
+  Path.stepChain (galoisId_left_identity (A := A) C f)
+
+/-- `Path` witness for right identity in the Galois group. -/
+noncomputable def galoisComp_id_path (C : CoveringSpace.Covering A)
+    (f : GaloisGroup (A := A) C) :
+    Path (galoisComp (A := A) C f (galoisId (A := A) C)) f :=
+  Path.stepChain (galoisComp_id (A := A) C f)
 
 /-- Galois composition is associative. -/
 theorem galoisComp_associativity (C : CoveringSpace.Covering A)
@@ -217,15 +268,33 @@ theorem galoisComp_associativity (C : CoveringSpace.Covering A)
       galoisComp (A := A) C f (galoisComp (A := A) C g h) :=
   galoisComp_assoc C f g h
 
+/-- `Path` witness for associativity in the Galois group. -/
+noncomputable def galoisComp_associativity_path (C : CoveringSpace.Covering A)
+    (f g h : GaloisGroup (A := A) C) :
+    Path
+      (galoisComp (A := A) C (galoisComp (A := A) C f g) h)
+      (galoisComp (A := A) C f (galoisComp (A := A) C g h)) :=
+  Path.stepChain (galoisComp_associativity (A := A) C f g h)
+
 /-- An etale covering is a covering with finiteness data. -/
 theorem etaleCovering_fiber_eq (E : EtaleCovering A) (a : A) :
     E.fiber a = E.covering.fiber a := by
   rfl
 
+/-- `Path` witness for the fiber alias of an etale covering. -/
+noncomputable def etaleCovering_fiber_eq_path (E : EtaleCovering A) (a : A) :
+    Path (E.fiber a) (E.covering.fiber a) :=
+  Path.stepChain (etaleCovering_fiber_eq (A := A) E a)
+
 /-- Etale monodromy delegates to the underlying monodromy. -/
 theorem etaleMonodromy_eq (E : EtaleCovering A) (a : A) :
     etaleMonodromy (A := A) E a = monodromy (A := A) E.covering a := by
   rfl
+
+/-- `Path` witness for etale monodromy unfolding to the underlying covering monodromy. -/
+noncomputable def etaleMonodromy_eq_path (E : EtaleCovering A) (a : A) :
+    Path (etaleMonodromy (A := A) E a) (monodromy (A := A) E.covering a) :=
+  Path.stepChain (etaleMonodromy_eq (A := A) E a)
 
 end GaloisTheoryCovers
 end Homotopy
