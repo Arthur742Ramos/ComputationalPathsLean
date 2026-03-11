@@ -53,6 +53,15 @@ noncomputable def symmProdInfBase (X : Type u) : SymmetricProductInfinity X :=
 noncomputable def symmProdInfSingleton {X : Type u} (x : X) : SymmetricProductInfinity X :=
   ⟨1, Sym.cons x Sym.nil⟩
 
+/-- The singleton inclusion has degree one. -/
+theorem symmProdInfSingleton_fst {X : Type u} (x : X) :
+    (symmProdInfSingleton x).1 = 1 := rfl
+
+/-- `Path` witnessing that singleton inclusion lands in degree one. -/
+noncomputable def symmProdInfSingleton_fst_path {X : Type u} (x : X) :
+    ComputationalPaths.Path (symmProdInfSingleton x).1 1 :=
+  ComputationalPaths.Path.stepChain (symmProdInfSingleton_fst x)
+
 /-- Addition on the infinite symmetric product by multiset sum. -/
 noncomputable def symmProdInfAdd {X : Type u} :
     SymmetricProductInfinity X → SymmetricProductInfinity X → SymmetricProductInfinity X
@@ -92,6 +101,45 @@ noncomputable def symmProdInfAdd_fst_assoc_path {X : Type u}
       (symmProdInfAdd a (symmProdInfAdd b c)).1 :=
   ComputationalPaths.Path.stepChain (symmProdInfAdd_fst_assoc a b c)
 
+/-- Adding the basepoint on the left does not change the degree. -/
+theorem symmProdInfAdd_base_left_fst {X : Type u}
+    (a : SymmetricProductInfinity X) :
+    (symmProdInfAdd (symmProdInfBase X) a).1 = a.1 := by
+  simpa [symmProdInfBase] using
+    (symmProdInfAdd_fst (X := X) (a := symmProdInfBase X) (b := a))
+
+/-- `Path` witnessing left basepoint degree neutrality. -/
+noncomputable def symmProdInfAdd_base_left_fst_path {X : Type u}
+    (a : SymmetricProductInfinity X) :
+    ComputationalPaths.Path (symmProdInfAdd (symmProdInfBase X) a).1 a.1 :=
+  ComputationalPaths.Path.stepChain (symmProdInfAdd_base_left_fst a)
+
+/-- Adding the basepoint on the right does not change the degree. -/
+theorem symmProdInfAdd_base_right_fst {X : Type u}
+    (a : SymmetricProductInfinity X) :
+    (symmProdInfAdd a (symmProdInfBase X)).1 = a.1 := by
+  simpa [symmProdInfBase, Nat.add_zero] using
+    (symmProdInfAdd_fst (X := X) (a := a) (b := symmProdInfBase X))
+
+/-- `Path` witnessing right basepoint degree neutrality. -/
+noncomputable def symmProdInfAdd_base_right_fst_path {X : Type u}
+    (a : SymmetricProductInfinity X) :
+    ComputationalPaths.Path (symmProdInfAdd a (symmProdInfBase X)).1 a.1 :=
+  ComputationalPaths.Path.stepChain (symmProdInfAdd_base_right_fst a)
+
+/-- Adding a singleton shifts the degree by one. -/
+theorem symmProdInfAdd_singleton_fst {X : Type u}
+    (x : X) (a : SymmetricProductInfinity X) :
+    (symmProdInfAdd (symmProdInfSingleton x) a).1 = 1 + a.1 := by
+  simpa [symmProdInfSingleton] using
+    (symmProdInfAdd_fst (X := X) (a := symmProdInfSingleton x) (b := a))
+
+/-- `Path` witnessing the singleton degree shift. -/
+noncomputable def symmProdInfAdd_singleton_fst_path {X : Type u}
+    (x : X) (a : SymmetricProductInfinity X) :
+    ComputationalPaths.Path (symmProdInfAdd (symmProdInfSingleton x) a).1 (1 + a.1) :=
+  ComputationalPaths.Path.stepChain (symmProdInfAdd_singleton_fst x a)
+
 /-! ## Dold-Thom data -/
 
 /-- Reduced homology groups of a space, recorded as a family of types. -/
@@ -129,6 +177,20 @@ noncomputable def doldThomFwdRoundtrip_path {X : Type u}
     ComputationalPaths.Path
       ((D.equivalence n).toFun ((D.equivalence n).invFun y)) y :=
   ComputationalPaths.Path.stepChain ((D.equivalence n).right_inv y)
+
+/-- `Path` witnessing the backward round-trip of the induced homology equivalence. -/
+noncomputable def doldThomHomologyEquivRoundtrip_path {X : Type u}
+    (A B : DoldThomSpace X) (n : ℕ) (x : A.homology n) :
+    ComputationalPaths.Path
+      (((doldThomHomologyEquiv A B n).invFun ((doldThomHomologyEquiv A B n).toFun x))) x :=
+  ComputationalPaths.Path.stepChain ((doldThomHomologyEquiv A B n).left_inv x)
+
+/-- `Path` witnessing the forward round-trip of the induced homology equivalence. -/
+noncomputable def doldThomHomologyEquivFwdRoundtrip_path {X : Type u}
+    (A B : DoldThomSpace X) (n : ℕ) (y : B.homology n) :
+    ComputationalPaths.Path
+      (((doldThomHomologyEquiv A B n).toFun ((doldThomHomologyEquiv A B n).invFun y))) y :=
+  ComputationalPaths.Path.stepChain ((doldThomHomologyEquiv A B n).right_inv y)
 
 /-! ## Summary
 

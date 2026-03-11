@@ -39,6 +39,16 @@ noncomputable def lensSpacePiOneEquivZp (p : Nat) :
   left_inv := fun _ => rfl
   right_inv := fun _ => rfl
 
+/-- `Path` witnessing the backward round-trip for the `π₁(L(p,q)) ≃ Z/p` model. -/
+noncomputable def lensSpacePiOneRoundtrip_path (p : Nat) (x : lensSpacePiOne p) :
+    Path (((lensSpacePiOneEquivZp p).invFun ((lensSpacePiOneEquivZp p).toFun x))) x :=
+  Path.stepChain ((lensSpacePiOneEquivZp p).left_inv x)
+
+/-- `Path` witnessing the forward round-trip for the `π₁(L(p,q)) ≃ Z/p` model. -/
+noncomputable def lensSpacePiOneFwdRoundtrip_path (p : Nat) (y : Zp p) :
+    Path (((lensSpacePiOneEquivZp p).toFun ((lensSpacePiOneEquivZp p).invFun y))) y :=
+  Path.stepChain ((lensSpacePiOneEquivZp p).right_inv y)
+
 /-! ## Compatibility aliases -/
 
 /-- Placeholder lens space type. -/
@@ -57,15 +67,35 @@ abbrev lensSpaceLoopSpace (p q : Nat) : Type u :=
 @[simp] noncomputable def lensSpaceLoop (p q : Nat) : lensSpaceLoopSpace p q :=
   Path.stepChain rfl
 
+/-- The fundamental lens-space loop has trivial underlying equality proof. -/
+@[simp] theorem lensSpaceLoop_toEq (p q : Nat) :
+    (lensSpaceLoop p q).toEq = rfl := by
+  simp [lensSpaceLoop]
+
 /-- Iterate the fundamental loop `n` times. -/
 @[simp] noncomputable def lensSpaceLoopPow (p q : Nat) : Nat → lensSpaceLoopSpace p q
   | 0 => Path.refl (lensSpaceBase p q)
   | Nat.succ n => Path.trans (lensSpaceLoop p q) (lensSpaceLoopPow p q n)
 
+/-- Zero iterations of the fundamental loop give the reflexivity path. -/
+@[simp] theorem lensSpaceLoopPow_zero (p q : Nat) :
+    lensSpaceLoopPow p q 0 = Path.refl (lensSpaceBase p q) := rfl
+
+/-- Successor iteration unfolds to path composition with the generator. -/
+noncomputable def lensSpaceLoopPow_succ_path (p q n : Nat) :
+    Path (lensSpaceLoopPow p q (Nat.succ n))
+      (Path.trans (lensSpaceLoop p q) (lensSpaceLoopPow p q n)) :=
+  Path.stepChain rfl
+
 /-- Interpret an element of `Z/p` as a loop path. -/
 @[simp] noncomputable def lensSpaceDecodePath (p q : Nat) :
     Zp p → lensSpaceLoopSpace p q :=
   fun x => lensSpaceLoopPow p q x.val
+
+/-- Decoding a residue class computes by its underlying natural representative. -/
+noncomputable def lensSpaceDecodePath_val_path (p q : Nat) (x : Zp p) :
+    Path (lensSpaceDecodePath p q x) (lensSpaceLoopPow p q x.val) :=
+  Path.stepChain rfl
 
 end CompPath
 end Path
