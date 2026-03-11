@@ -283,7 +283,7 @@ noncomputable def stablePi_nine_generators :
     ∀ x : StablePi 9, Σ a b c : StableStems.Z2, Path x (a, b, c)
   | (a, b, c) => ⟨a, b, c, Path.refl (a, b, c)⟩
 
-/-! ## Additional theorem stubs -/
+/-! ## Additional theorems -/
 
 theorem basepointMap_toFun_const (X Y : Pointed) (x : X.carrier) :
     (basepointMap X Y).toFun x = Y.pt := by

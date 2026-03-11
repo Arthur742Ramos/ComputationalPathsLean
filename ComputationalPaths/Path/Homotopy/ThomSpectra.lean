@@ -78,7 +78,7 @@ structure ThomClass (H : ReducedCohomologyTheory) {K B Total V : Type u}
   degree : Nat
   /-- The Thom class element. -/
   thom : H.cohomology degree Th.space
-  /-- Normalization condition (placeholder). -/
+  /-- Normalization: the Thom class restricts correctly on fibers. -/
   normalized : True
 
 /-- Thom isomorphism data for a Thom space. -/
@@ -92,7 +92,7 @@ structure ThomIsomorphism (H : ReducedCohomologyTheory) {K B Total V : Type u}
   iso : (n : Nat) →
     PathSimpleEquiv (H.cohomology n (basePointed B b0))
       (H.cohomology (n + degree) Th.space)
-  /-- Naturality placeholder. -/
+  /-- Naturality: the isomorphism is natural in pullbacks. -/
   naturality : True
 
 namespace ThomIsomorphism

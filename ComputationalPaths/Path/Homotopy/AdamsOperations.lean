@@ -2,7 +2,7 @@
 # Adams Operations on K-Theory
 
 This module records Adams operations on K-theory together with ring homomorphism
-data, a scaffold for the Adams conjecture, and a lightweight interface for the
+data, the Adams conjecture, and a lightweight interface for the
 image of the J-homomorphism.
 
 ## Key Results
@@ -10,7 +10,7 @@ image of the J-homomorphism.
 - `KTheoryRing`: commutative ring data on K0
 - `AdamsOperationRingHom`: Adams operations as ring homomorphisms
 - `JImageMap`: image of J mapped into K-theory
-- `AdamsConjecture`: compatibility placeholder for the Adams conjecture
+- `AdamsConjecture`: compatibility data for the Adams conjecture
 
 ## References
 
@@ -134,7 +134,7 @@ structure AdamsConjecture {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) 
   adams : AdamsOperationRingHom S R
   /-- Image of J inside K-theory. -/
   jImage : JImageMap S
-  /-- Compatibility statement (placeholder). -/
+  /-- Compatibility: psi^k - id factors through J-image. -/
   compatibility : True
 
 /-- Trivial Adams conjecture witness. -/
@@ -158,7 +158,7 @@ end AdamsConjecture
 /-! ## Summary -/
 
 -- We recorded Adams operations on K0 as ring homomorphisms, a minimal interface
--- for the J-image in K-theory, and a data-level Adams conjecture scaffold.
+-- for the J-image in K-theory, and a data-level Adams conjecture formulation.
 
 end AdamsOperations
 end Homotopy

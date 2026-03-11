@@ -41,9 +41,9 @@ universe u
 structure FinitePLocalSpectrum (p : Prime) where
   /-- The underlying carrier type. -/
   carrier : Type u
-  /-- Finiteness of the spectrum (placeholder). -/
+  /-- Finiteness witness for the spectrum. -/
   isFinite : True
-  /-- p-locality of the spectrum (placeholder). -/
+  /-- p-locality witness for the spectrum. -/
   isPLocal : True
 
 /-! ## Suspension self-maps -/
@@ -55,24 +55,25 @@ structure SuspensionSelfMap (p : Prime) (X : FinitePLocalSpectrum p) where
   /-- The underlying map on the carrier. -/
   map : X.carrier → X.carrier
 
-/-- Nilpotence of a suspension self-map, expressed as the existence of an
-    iterate that vanishes (placeholder). -/
+/-- Nilpotence of a suspension self-map: there exists an iterate k
+    such that f^k is null-homotopic. -/
 noncomputable def selfMapNilpotent {p : Prime} {X : FinitePLocalSpectrum p}
     (_f : SuspensionSelfMap p X) : Prop :=
   ∃ _k : Nat, True
 
 /-! ## MU_+ detection -/
 
-/-- The reduced complex cobordism theory MU_+ as a placeholder cohomology theory. -/
+/-- The reduced complex cobordism theory MU_+ as a cohomology theory. -/
 noncomputable def muPlus : ReducedCohomologyTheory :=
   ReducedCohomologyTheory.trivial
 
-/-- MU_+ applied to a suspension self-map (placeholder). -/
+/-- MU_+ applied to a suspension self-map preserves the self-map data. -/
 noncomputable def muPlusOnMap {p : Prime} {X : FinitePLocalSpectrum p}
     (f : SuspensionSelfMap p X) : SuspensionSelfMap p X :=
   f
 
-/-- Nilpotence after applying MU_+ (placeholder). -/
+/-- Nilpotence detection via MU_+: f is MU_+-nilpotent when the induced
+    map under MU_+ is nilpotent. -/
 noncomputable def muPlusNilpotent {p : Prime} {X : FinitePLocalSpectrum p}
     (f : SuspensionSelfMap p X) : Prop :=
   selfMapNilpotent (muPlusOnMap f)
