@@ -98,6 +98,10 @@ noncomputable def pi2Comp {A : Type} {a : A}
 noncomputable def pi2Id {A : Type} {a : A} : Pi2 A a :=
   Path.refl (Path.refl a)
 
+/-- Canonical `stepChain` representative of the identity element of π₂. -/
+noncomputable def pi2IdCanonical {A : Type} {a : A} : Pi2 A a :=
+  Path.stepChain (pi2Id (A := A) (a := a)).toEq
+
 /-- The inverse of a π₂ element. -/
 noncomputable def pi2Inv {A : Type} {a : A}
     (α : Pi2 A a) : Pi2 A a :=
@@ -372,6 +376,18 @@ theorem pi2ProdSnd_inv {A B : Type} {a : A} {b : B}
   unfold pi2ProdSnd pi2Inv
   exact congrArg_symm (fun x => Path.congrArg Prod.snd x) α
 
+/-- Coherence for fst projection commuting with inversion. -/
+noncomputable def pi2ProdFst_inv_path {A B : Type} {a : A} {b : B}
+    (α : Pi2 (A × B) (a, b)) :
+    Path (pi2ProdFst (pi2Inv α)) (pi2Inv (pi2ProdFst α)) :=
+  Path.stepChain (pi2ProdFst_inv α)
+
+/-- Coherence for snd projection commuting with inversion. -/
+noncomputable def pi2ProdSnd_inv_path {A B : Type} {a : A} {b : B}
+    (α : Pi2 (A × B) (a, b)) :
+    Path (pi2ProdSnd (pi2Inv α)) (pi2Inv (pi2ProdSnd α)) :=
+  Path.stepChain (pi2ProdSnd_inv α)
+
 /-! ## Abelianness of π₂ -/
 
 /-- π₂ commutativity in rewrite form after canonical `stepChain` projection. -/
@@ -388,6 +404,20 @@ theorem pi2_abelian_toEq {A : Type} {a : A}
     (α β : Pi2 A a) :
     (pi2Comp α β).toEq = (pi2Comp β α).toEq := by
   simp
+
+/-- Canonical `stepChain` representatives for π₂ composition agree by commutativity. -/
+theorem pi2_abelian_stepChain_eq {A : Type} {a : A}
+    (α β : Pi2 A a) :
+    Path.stepChain (pi2Comp α β).toEq =
+      Path.stepChain (pi2Comp β α).toEq := by
+  exact _root_.congrArg Path.stepChain (pi2_abelian_toEq α β)
+
+/-- Path-level commutativity witness for canonical π₂ representatives. -/
+noncomputable def pi2_abelian_path {A : Type} {a : A}
+    (α β : Pi2 A a) :
+    Path (Path.stepChain (pi2Comp α β).toEq)
+         (Path.stepChain (pi2Comp β α).toEq) :=
+  Path.stepChain (pi2_abelian_stepChain_eq α β)
 
 /-! ## Hopf action -/
 
@@ -527,6 +557,13 @@ theorem pi2_punit_toEq
     α.toEq = (Path.refl (Path.refl PUnit.unit)).toEq := by
   simp
 
+/-- Path witness for the trivial canonical representative in the PUnit case. -/
+noncomputable def pi2_punit_path
+    (α : Pi2 PUnit PUnit.unit) :
+    Path (Path.stepChain α.toEq) (pi2IdCanonical (A := PUnit) (a := PUnit.unit)) := by
+  simpa [pi2IdCanonical, pi2Id] using
+    (Path.stepChain (_root_.congrArg Path.stepChain (pi2_punit_toEq α)))
+
 /-- Genus-g surface: canonical representatives are rewrite-equivalent. -/
 noncomputable def pi2Surface_rweq (g : Nat)
     (α : Pi2 (Surface g) (surfaceBase g)) :
@@ -538,6 +575,13 @@ theorem pi2Surface_toEq (g : Nat)
     (α : Pi2 (Surface g) (surfaceBase g)) :
     α.toEq = (Path.refl (Path.refl (surfaceBase g))).toEq := by
   simp
+
+/-- Path witness for the canonical trivial representative on a genus-g surface. -/
+noncomputable def pi2Surface_path (g : Nat)
+    (α : Pi2 (Surface g) (surfaceBase g)) :
+    Path (Path.stepChain α.toEq) (pi2IdCanonical (A := Surface g) (a := surfaceBase g)) := by
+  simpa [pi2IdCanonical, pi2Id] using
+    (Path.stepChain (_root_.congrArg Path.stepChain (pi2Surface_toEq g α)))
 
 /-- Two π₂ elements of a surface are rewrite-equivalent after canonical projection. -/
 noncomputable def pi2Surface_all_rweq (g : Nat)
@@ -553,30 +597,96 @@ theorem pi2Surface_all_eq_toEq (g : Nat)
     α.toEq = β.toEq := by
   simp
 
+/-- Path witness that any two canonical π₂ representatives on a surface agree. -/
+noncomputable def pi2Surface_all_path (g : Nat)
+    (α β : Pi2 (Surface g) (surfaceBase g)) :
+    Path (Path.stepChain α.toEq) (Path.stepChain β.toEq) :=
+  Path.stepChain (_root_.congrArg Path.stepChain (pi2Surface_all_eq_toEq g α β))
+
 /-- Torus: π₂(T²) has trivial toEq. -/
 theorem pi2Torus_trivial_toEq
     (α : Pi2 (Surface 1) (surfaceBase 1)) :
     α.toEq = rfl := by simp
+
+/-- Torus: canonical representatives collapse to the trivial 2-loop by rewrite. -/
+noncomputable def pi2Torus_trivial_rweq
+    (α : Pi2 (Surface 1) (surfaceBase 1)) :
+    RwEq (Path.stepChain α.toEq) (Path.refl (Path.refl (surfaceBase 1))) :=
+  pi2Surface_rweq 1 α
+
+/-- Torus: path witness for the trivial canonical representative. -/
+noncomputable def pi2Torus_trivial_path
+    (α : Pi2 (Surface 1) (surfaceBase 1)) :
+    Path (Path.stepChain α.toEq) (pi2IdCanonical (A := Surface 1) (a := surfaceBase 1)) :=
+  pi2Surface_path 1 α
 
 /-- RP²: π₂ has trivial toEq in our model. -/
 theorem pi2RP2_trivial_toEq
     (α : Pi2 RP2 rp2Base) :
     α.toEq = rfl := by simp
 
+/-- RP²: canonical representatives collapse to the trivial 2-loop by rewrite. -/
+noncomputable def pi2RP2_trivial_rweq
+    (α : Pi2 RP2 rp2Base) :
+    RwEq (Path.stepChain α.toEq) (Path.refl (Path.refl rp2Base)) := by
+  simpa [RP2, rp2Base] using pi2_punit_rweq (α := α)
+
+/-- RP²: path witness for the trivial canonical representative. -/
+noncomputable def pi2RP2_trivial_path
+    (α : Pi2 RP2 rp2Base) :
+    Path (Path.stepChain α.toEq) (pi2IdCanonical (A := RP2) (a := rp2Base)) := by
+  simpa [RP2, rp2Base, pi2IdCanonical, pi2Id] using pi2_punit_path (α := α)
+
 /-- Klein bottle: π₂ has trivial toEq. -/
 theorem pi2Klein_trivial_toEq
     (α : Pi2 KleinBottle kleinBase) :
     α.toEq = rfl := by simp
+
+/-- Klein bottle: canonical representatives collapse to the trivial 2-loop by rewrite. -/
+noncomputable def pi2Klein_trivial_rweq
+    (α : Pi2 KleinBottle kleinBase) :
+    RwEq (Path.stepChain α.toEq) (Path.refl (Path.refl kleinBase)) := by
+  simpa [KleinBottle, kleinBase] using pi2_punit_rweq (α := α)
+
+/-- Klein bottle: path witness for the trivial canonical representative. -/
+noncomputable def pi2Klein_trivial_path
+    (α : Pi2 KleinBottle kleinBase) :
+    Path (Path.stepChain α.toEq) (pi2IdCanonical (A := KleinBottle) (a := kleinBase)) := by
+  simpa [KleinBottle, kleinBase, pi2IdCanonical, pi2Id] using pi2_punit_path (α := α)
 
 /-- Genus-3 surface: π₂ toEq is trivial. -/
 theorem pi2_genus3_trivial (α : Pi2 (Surface 3) (surfaceBase 3)) :
     α.toEq = (Path.refl (Path.refl (surfaceBase 3))).toEq :=
   pi2Surface_toEq 3 α
 
+/-- Genus-3 surface: rewrite witness for the trivial canonical representative. -/
+noncomputable def pi2_genus3_trivial_rweq
+    (α : Pi2 (Surface 3) (surfaceBase 3)) :
+    RwEq (Path.stepChain α.toEq) (Path.refl (Path.refl (surfaceBase 3))) :=
+  pi2Surface_rweq 3 α
+
+/-- Genus-3 surface: path witness for the trivial canonical representative. -/
+noncomputable def pi2_genus3_trivial_path
+    (α : Pi2 (Surface 3) (surfaceBase 3)) :
+    Path (Path.stepChain α.toEq) (pi2IdCanonical (A := Surface 3) (a := surfaceBase 3)) :=
+  pi2Surface_path 3 α
+
 /-- Genus-4 surface: π₂ toEq is trivial. -/
 theorem pi2_genus4_trivial (α : Pi2 (Surface 4) (surfaceBase 4)) :
     α.toEq = (Path.refl (Path.refl (surfaceBase 4))).toEq :=
   pi2Surface_toEq 4 α
+
+/-- Genus-4 surface: rewrite witness for the trivial canonical representative. -/
+noncomputable def pi2_genus4_trivial_rweq
+    (α : Pi2 (Surface 4) (surfaceBase 4)) :
+    RwEq (Path.stepChain α.toEq) (Path.refl (Path.refl (surfaceBase 4))) :=
+  pi2Surface_rweq 4 α
+
+/-- Genus-4 surface: path witness for the trivial canonical representative. -/
+noncomputable def pi2_genus4_trivial_path
+    (α : Pi2 (Surface 4) (surfaceBase 4)) :
+    Path (Path.stepChain α.toEq) (pi2IdCanonical (A := Surface 4) (a := surfaceBase 4)) :=
+  pi2Surface_path 4 α
 
 /-! ## Iterated π₂ composition -/
 
@@ -635,6 +745,13 @@ theorem pi2_const_map_toEq {A B : Type} {a : A} {b : B}
     (α : Pi2 A a) :
     (pi2Map (fun _ : A => b) α).toEq = (pi2Id (A := B) (a := b)).toEq := by
   simp
+
+/-- Path witness that a constant map sends canonical π₂ representatives to zero. -/
+noncomputable def pi2_const_map_path {A B : Type} {a : A} {b : B}
+    (α : Pi2 A a) :
+    Path (Path.stepChain (pi2Map (fun _ : A => b) α).toEq) (pi2IdCanonical (A := B) (a := b)) := by
+  simpa [pi2IdCanonical, pi2Id] using
+    (Path.stepChain (_root_.congrArg Path.stepChain (pi2_const_map_toEq (A := A) (B := B) (a := a) (b := b) α)))
 
 end Pi2Surfaces
 end Homotopy
