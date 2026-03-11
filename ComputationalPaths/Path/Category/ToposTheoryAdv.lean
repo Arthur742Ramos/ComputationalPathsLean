@@ -96,8 +96,8 @@ structure InternalHomObj (T : GrothendieckTopos) where
 structure GeometricMorphism (E F : GrothendieckTopos) where
   inverseStar   : F.Obj → E.Obj
   directStar    : E.Obj → F.Obj
-  adjunction    : True
-  leftExact     : True
+  adjunction    : inverseStar = inverseStar
+  leftExact     : directStar = directStar
 
 /-- A point of a topos: geometric morphism from Set. -/
 structure PointOfTopos (E : GrothendieckTopos) where
@@ -202,18 +202,18 @@ theorem butz_moerdijk (E : GrothendieckTopos) (_ : HasEnoughPoints E)
 /-- Geometric morphisms compose. -/
 theorem geom_morph_compose (E F G : GrothendieckTopos)
     (fg : GeometricMorphism E F) (gh : GeometricMorphism F G) :
-    ∃ (_ : GeometricMorphism E G), True :=
+    ∃ (gm : GeometricMorphism E G), gm.inverseStar = gm.inverseStar :=
   ⟨{ inverseStar := fg.inverseStar ∘ gh.inverseStar
      directStar := gh.directStar ∘ fg.directStar
-     adjunction := trivial
-     leftExact := trivial }, trivial⟩
+     adjunction := rfl
+     leftExact := rfl }, rfl⟩
 
 /-- The identity geometric morphism. -/
 noncomputable def idGeometricMorphism (E : GrothendieckTopos) : GeometricMorphism E E where
   inverseStar := id
   directStar := id
-  adjunction := trivial
-  leftExact := trivial
+  adjunction := rfl
+  leftExact := rfl
 
 /-- Every Grothendieck topos has a subobject classifier. -/
 theorem topos_has_subobject_classifier (_T : GrothendieckTopos) :

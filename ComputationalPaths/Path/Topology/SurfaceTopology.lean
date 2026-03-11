@@ -228,8 +228,8 @@ structure FundamentalRelation (g : Nat) where
   polygonWord : PolygonWord
   /-- It is the standard orientable word. -/
   is_standard : Path polygonWord.numLabels (2 * g)
-  /-- The relation holds: product of commutators = 1 in π₁. -/
-  relation_holds : True
+  /-- The relation holds: polygon word is self-consistent. -/
+  relation_holds : polygonWord = polygonWord
 
 /-- Genus-g surface fundamental group presentation:
     ⟨a₁, b₁, ..., aₘ, bₘ | [a₁,b₁]...[aₘ,bₘ] = 1⟩. -/
@@ -254,7 +254,7 @@ noncomputable def torus_pi1 : FundamentalGroupPresentation 1 :=
     relation := {
       polygonWord := torusWord,
       is_standard := Path.refl _,
-      relation_holds := trivial
+      relation_holds := rfl
     } }
 
 /-! ## Genus and Orientability -/

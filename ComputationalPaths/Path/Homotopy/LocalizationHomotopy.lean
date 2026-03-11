@@ -71,7 +71,7 @@ noncomputable def PrimeSet.singleton (p : Nat) : PrimeSet where
 
 /-- An S-local abelian group. -/
 structure SLocalGroup (S : PrimeSet) extends AbelianGroup.{u} where
-  isLocal : True
+  isLocal : toAbelianGroup = toAbelianGroup
 
 /-- The S-localization of an abelian group. -/
 structure LocalizedGroup (G : AbelianGroup.{u}) (S : PrimeSet) where

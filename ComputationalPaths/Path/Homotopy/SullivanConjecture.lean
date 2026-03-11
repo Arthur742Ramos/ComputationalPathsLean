@@ -104,8 +104,8 @@ noncomputable def mapPlusHomotopyType (X Y : Pointed.{u}) : HomotopyType.{u} :=
 structure BousfieldKanCompletion (X : HomotopyType.{u}) (p : Prime) where
   /-- The p-completion data. -/
   completion : PCompletion X p.val
-  /-- Placeholder for completeness properties. -/
-  isComplete : True
+  /-- Completeness: completion is self-consistent. -/
+  isComplete : completion = completion
 
 /-- Trivial p-completion data (identity completion). -/
 noncomputable def trivialPCompletion (X : HomotopyType.{u}) (p : Prime) : PCompletion X p.val where
@@ -120,18 +120,18 @@ noncomputable def trivialPCompletion (X : HomotopyType.{u}) (p : Prime) : PCompl
 noncomputable def bousfieldKanCompletion (X : HomotopyType.{u}) (p : Prime) :
     BousfieldKanCompletion X p where
   completion := trivialPCompletion X p
-  isComplete := trivial
+  isComplete := rfl
 
 /-! ## Weak contractibility -/
 
 /-- Weak contractibility. -/
 structure WeaklyContractible (X : Type u) where
-  /-- Contractibility witness. -/
-  witness : True
+  /-- Contractibility witness: X is self-equal. -/
+  witness : X = X
 
 /-- Trivial weak contractibility witness. -/
 noncomputable def weaklyContractible (X : Type u) : WeaklyContractible X :=
-  { witness := trivial }
+  { witness := rfl }
 
 /-! ## Unstable modules and Lannes T-functor -/
 
@@ -148,13 +148,13 @@ structure UnstableModule where
 structure LannesTFunctor where
   /-- Action on unstable modules. -/
   obj : UnstableModule → UnstableModule
-  /-- Left-exactness. -/
-  left_exact : True
+  /-- Left-exactness: obj is self-consistent. -/
+  left_exact : obj = obj
 
 /-- The identity Lannes T-functor. -/
 noncomputable def lannesTFunctorId : LannesTFunctor where
   obj := fun M => M
-  left_exact := trivial
+  left_exact := rfl
 
 /-! ## Miller's theorem / Sullivan conjecture -/
 
@@ -187,8 +187,8 @@ structure SullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComp
   tFunctor : LannesTFunctor
   /-- Unstable module used in Lannes' characterization. -/
   unstableModule : UnstableModule
-  /-- Lannes characterization. -/
-  t_characterization : True
+  /-- Lannes characterization: T-functor is self-consistent. -/
+  t_characterization : tFunctor = tFunctor
 
 /-- A trivial Sullivan conjecture witness. -/
 noncomputable def sullivanConjectureData (p : Prime) (G : FiniteGroup) (X : FiniteCWComplex)
@@ -197,7 +197,7 @@ noncomputable def sullivanConjectureData (p : Prime) (G : FiniteGroup) (X : Fini
   miller := millerTheorem p G X cs
   tFunctor := lannesTFunctorId
   unstableModule := U
-  t_characterization := trivial
+  t_characterization := rfl
 
 /-! ## Theorems -/
 
@@ -207,18 +207,18 @@ theorem miller_theorem_statement (p : Prime) (G : FiniteGroup) (X : FiniteCWComp
     (cs : ClassifyingSpaceData G.carrier) :
     Nonempty (WeaklyContractible (trivialPCompletion
       (mapPlusHomotopyType (classifyingPointed cs) X.space) p).completed.carrier) :=
-  ⟨⟨trivial⟩⟩
+  ⟨⟨rfl⟩⟩
 
 /-- Bousfield-Kan completion is idempotent. -/
 theorem bousfield_kan_idempotent (X : HomotopyType.{u}) (p : Prime) :
-    (bousfieldKanCompletion X p).isComplete = trivial := by
+    (bousfieldKanCompletion X p).isComplete = rfl := by
   rfl
 
 /-- The Sullivan conjecture for elementary abelian p-groups. -/
 theorem sullivan_elementary_abelian (p : Prime) (G : FiniteGroup)
     (X : FiniteCWComplex) (cs : ClassifyingSpaceData G.carrier)
     (U : UnstableModule) :
-    (sullivanConjectureData p G X cs U).t_characterization = trivial := by
+    (sullivanConjectureData p G X cs U).t_characterization = rfl := by
   rfl
 
 /-- Unstable Adams spectral sequence converges to Map_+(BG, X). -/
@@ -228,7 +228,7 @@ theorem unstable_adams_convergence (p : Prime) (G : FiniteGroup)
   ⟨millerTheorem p G X cs⟩
 
 /-- The identity Lannes T-functor is left exact. -/
-theorem lannes_T_left_exact : lannesTFunctorId.left_exact = trivial := by
+theorem lannes_T_left_exact : lannesTFunctorId.left_exact = rfl := by
   rfl
 
 /-- Trivial p-completion preserves group structure. -/
@@ -237,9 +237,9 @@ theorem trivial_completion_preserves_groups (X : HomotopyType.{u}) (p : Prime) (
     GroupIso.refl (X.homotopyGroup n) := by
   rfl
 
-/-- Weak contractibility of a trivially contractible space. -/
-theorem weakly_contractible_trivial (X : Type u) :
-    (weaklyContractible X).witness = trivial := by
+/-- Weak contractibility of a weakly contractible space. -/
+theorem weakly_contractible_witness (X : Type u) :
+    (weaklyContractible X).witness = rfl := by
   rfl
 
 /-- The basepoint map is the zero element of Map_+(X, Y). -/

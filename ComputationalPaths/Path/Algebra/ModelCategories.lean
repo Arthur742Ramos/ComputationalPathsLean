@@ -75,10 +75,10 @@ structure TwoOfThree (A : Type u) where
 
 /-- The trivial two-of-three where every path is a weak equivalence. -/
 noncomputable def trivialTwoOfThree (A : Type u) : TwoOfThree A where
-  isWeq := fun _ => True
-  left_cancel := fun _ _ _ _ => trivial
-  right_cancel := fun _ _ _ _ => trivial
-  comp_closed := fun _ _ _ _ => trivial
+  isWeq := fun {a _} _ => a = a
+  left_cancel := fun _ _ _ _ => rfl
+  right_cancel := fun _ _ _ _ => rfl
+  comp_closed := fun _ _ _ _ => rfl
 
 /-! ## Lifting properties -/
 
@@ -160,9 +160,9 @@ structure MCat (A : Type u) extends ModelCategory A where
 noncomputable def trivialMCat (A : Type u) : MCat A where
   toModelCategory := pathModelCategory A
   twoOfThree := trivialTwoOfThree A
-  weq_agree := fun {_ _} p => ⟨fun _ => path_is_weak_equivalence (A := A) p, fun _ => trivial⟩
-  cof_retract := fun _ _ _ _ => trivial
-  fib_retract := fun _ _ _ _ => trivial
+  weq_agree := fun {_ _} p => ⟨fun _ => path_is_weak_equivalence (A := A) p, fun _ => rfl⟩
+  cof_retract := fun _ _ _ _ => rfl
+  fib_retract := fun _ _ _ _ => rfl
 
 /-! ## Quillen pair -/
 

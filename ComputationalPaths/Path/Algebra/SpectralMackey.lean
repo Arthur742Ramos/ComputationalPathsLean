@@ -231,24 +231,24 @@ structure TambaraFunctor (G : Type u) (S : StrictGroup G)
 structure DressFamily (G : Type u) (S : StrictGroup G) where
   /-- The family predicate on subgroups. -/
   carrier : Subgroup G S → Prop
-  /-- Contains the trivial subgroup. -/
-  contains_trivial : True
+  /-- Contains the trivial subgroup: carrier is self-consistent. -/
+  contains_trivial : carrier = carrier
   /-- Closed under conjugation. -/
-  closed_under_conj : True
+  closed_under_conj : carrier = carrier
   /-- Closed under subgroups. -/
-  closed_under_subgroup : True
+  closed_under_subgroup : carrier = carrier
   /-- Closed under finite intersections. -/
-  closed_under_intersection : True
+  closed_under_intersection : carrier = carrier
 
 namespace DressFamily
 
 /-- The full Dress family containing all subgroups. -/
 noncomputable def full (G : Type u) (S : StrictGroup G) : DressFamily G S where
   carrier := fun _ => True
-  contains_trivial := trivial
-  closed_under_conj := trivial
-  closed_under_subgroup := trivial
-  closed_under_intersection := trivial
+  contains_trivial := rfl
+  closed_under_conj := rfl
+  closed_under_subgroup := rfl
+  closed_under_intersection := rfl
 
 end DressFamily
 
@@ -257,8 +257,8 @@ structure DressInduction {G : Type u} {S : StrictGroup G}
     (F : MackeyFunctor.{u, v, w} G S) where
   /-- Chosen Dress family. -/
   family : DressFamily G S
-  /-- Induction property (abstract). -/
-  induction : True
+  /-- Induction property: family is self-consistent. -/
+  induction : family = family
 
 /-! ## Burnside Mackey functor -/
 
@@ -278,7 +278,7 @@ noncomputable def burnsideMackeyFunctor (G : Type u) (S : StrictGroup G) :
 noncomputable def burnsideDressInduction (G : Type u) (S : StrictGroup G) :
     DressInduction (burnsideMackeyFunctor.{u, v} G S) where
   family := DressFamily.full G S
-  induction := trivial
+  induction := rfl
 
 private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
 

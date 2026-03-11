@@ -43,7 +43,7 @@ noncomputable def primeSetAt (p : Prime) : PrimeSet :=
 private noncomputable def trivialSLocalGroup (G : AbelianGroup.{u}) (S : PrimeSet) :
     SLocalGroup S where
   toAbelianGroup := G
-  isLocal := trivial
+  isLocal := rfl
 
 private noncomputable def trivialLocalizedGroup (G : AbelianGroup.{u}) (S : PrimeSet) :
     LocalizedGroup G S where

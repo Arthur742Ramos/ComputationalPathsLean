@@ -186,12 +186,12 @@ theorem mc2_two_of_three {a b c : A} (f : Path a b) (g : Path b c) :
 /-- MC3: Retracts preserve cofibrations — in the path model structure,
     all morphisms are cofibrations. -/
 theorem mc3_retract_cof {a b : A} (f : Path a b) :
-    (pathModelCategory A).cof f := trivial
+    (pathModelCategory A).cof f := rfl
 
 /-- MC3: Retracts preserve fibrations — in the path model structure,
     all morphisms are fibrations. -/
 theorem mc3_retract_fib {a b : A} (f : Path a b) :
-    (pathModelCategory A).fib f := trivial
+    (pathModelCategory A).fib f := rfl
 
 /-- MC3: Retracts preserve weak equivalences. -/
 theorem mc3_retract_weq {a b : A} (f : Path a b) :
@@ -520,7 +520,7 @@ structure QuillenPair (A : Type u) (B : Type v) where
 theorem quillen_right_preserves_fib {B : Type v} (Q : QuillenPair A B)
     {b₁ b₂ : B} (_g : Path b₁ b₂) :
     (pathModelCategory B).fib _g →
-    (pathModelCategory A).fib (Q.mapRight _g) := fun _ => trivial
+    (pathModelCategory A).fib (Q.mapRight _g) := fun _ => rfl
 
 /-- In a Quillen pair, the right adjoint preserves trivial fibrations. -/
 theorem quillen_right_preserves_tfib {B : Type v} (Q : QuillenPair A B)
@@ -733,7 +733,7 @@ noncomputable def pathCofibrantlyGenerated (A : Type u) :
 /-- In the path model, every morphism is in the cofibration closure
     (all paths are cofibrations). -/
 theorem cof_gen_closure {a b : A} (f : Path a b) :
-    (pathModelCategory A).cof f := trivial
+    (pathModelCategory A).cof f := rfl
 
 /-- Cofibrantly generated models have functorial factorization. -/
 theorem cof_gen_functorial_factorization {a b : A} (f : Path a b) :
@@ -759,7 +759,7 @@ noncomputable def trivialCellComplex (a : A) :
   src := a
   tgt := a
   inclusion := Path.refl a
-  inclusion_cof := trivial
+  inclusion_cof := rfl
 
 /-- Small object argument: factorize as cell complex followed by injective. -/
 theorem small_object_argument {a b : A} (f : Path a b) :

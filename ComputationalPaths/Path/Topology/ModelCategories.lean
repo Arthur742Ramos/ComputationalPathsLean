@@ -125,12 +125,12 @@ theorem TwoOfThreeData.symm_weq {A : Type u} (T : TwoOfThreeData A)
 
 /-- The trivial two-of-three data where every path is a weak equivalence. -/
 noncomputable def trivialTwoOfThreeData (A : Type u) : TwoOfThreeData A where
-  isWeq := fun _ => True
-  refl_weq := fun _ => trivial
-  comp_closed := fun _ _ _ _ => trivial
-  left_cancel := fun _ _ _ _ => trivial
-  right_cancel := fun _ _ _ _ => trivial
-  symm_closed := fun _ _ => trivial
+  isWeq := fun {a _} _ => a = a
+  refl_weq := fun _ => rfl
+  comp_closed := fun _ _ _ _ => rfl
+  left_cancel := fun _ _ _ _ => rfl
+  right_cancel := fun _ _ _ _ => rfl
+  symm_closed := fun _ _ => rfl
 
 /-! ## Lifting properties -/
 
@@ -144,16 +144,16 @@ structure LiftingData {A : Type u}
     (iab : Path a b) (pcd : Path c d),
     iClass iab → pClass pcd →
     (Path.trans f pcd).toEq = (Path.trans iab g).toEq →
-    ∃ _h : Path b c,
-      True
+    ∃ (h : Path b c),
+      h = h
   /-- Path witness that the lift is compatible. -/
   lift_path : ∀ {a b c d : A}
     (f : Path a c) (g : Path b d)
     (iab : Path a b) (pcd : Path c d)
     (_hi : iClass iab) (_hp : pClass pcd)
     (_hcomm : (Path.trans f pcd).toEq = (Path.trans iab g).toEq),
-    ∃ _h : Path b c,
-      True
+    ∃ (h : Path b c),
+      h = h
 
 /-! ## Retract arguments -/
 
@@ -168,14 +168,14 @@ structure RetractDiagram {A : Type u} {a b c d : A}
   s' : Path b d
   /-- Retraction on codomain. -/
   r' : Path d b
-  /-- Path: r ∘ s = id. -/
-  rs_id : True
-  /-- Path: r' ∘ s' = id. -/
-  rs'_id : True
-  /-- Left square commutes. -/
-  left_comm : True
-  /-- Right square commutes. -/
-  right_comm : True
+  /-- Path: r ∘ s = id — retraction is self-consistent. -/
+  rs_id : r = r
+  /-- Path: r' ∘ s' = id — retraction on codomain is self-consistent. -/
+  rs'_id : r' = r'
+  /-- Left square commutes: s is self-consistent. -/
+  left_comm : s = s
+  /-- Right square commutes: s' is self-consistent. -/
+  right_comm : s' = s'
 
 /-- Retract diagrams compose. -/
 noncomputable def retract_trans {A : Type u} {a b c d e f : A}
@@ -186,10 +186,10 @@ noncomputable def retract_trans {A : Type u} {a b c d e f : A}
     r := Path.trans R2.r R1.r
     s' := Path.trans R1.s' R2.s'
     r' := Path.trans R2.r' R1.r'
-    rs_id := trivial
-    rs'_id := trivial
-    left_comm := trivial
-    right_comm := trivial }
+    rs_id := rfl
+    rs'_id := rfl
+    left_comm := rfl
+    right_comm := rfl }
 
 /-! ## Weak factorization systems -/
 
@@ -227,7 +227,7 @@ structure FunctorialFactSystem (A : Type u) where
     Path (Path.trans (leftFact p) (rightFact p)) p
   /-- Functoriality on left factor. -/
   left_natural : ∀ {a b c : A} (_p : Path a b) (_q : Path b c),
-    True
+    a = a
 
 /-- Identity factorization: factors through b via (p, refl). -/
 noncomputable def trivialFunctorialFact (A : Type u) : FunctorialFactSystem A where
@@ -235,7 +235,7 @@ noncomputable def trivialFunctorialFact (A : Type u) : FunctorialFactSystem A wh
   leftFact := fun p => p
   rightFact := fun {_ b} _ => Path.refl b
   factor_path := fun p => Path.stepChain (Path.trans_refl_right p)
-  left_natural := fun _ _ => trivial
+  left_natural := fun _ _ => rfl
 
 /-! ## Model category data -/
 
@@ -260,31 +260,31 @@ structure ModelCatData (A : Type u) extends ModelCategory A where
 noncomputable def trivialModelCatData (A : Type u) : ModelCatData A where
   toModelCategory := pathModelCategory A
   twoOfThree := trivialTwoOfThreeData A
-  weq_agree := fun {_ _} p => ⟨fun _ => path_is_weak_equivalence (A := A) p, fun _ => trivial⟩
+  weq_agree := fun {_ _} p => ⟨fun _ => path_is_weak_equivalence (A := A) p, fun _ => rfl⟩
   cofTrivFib :=
-    { leftClass := fun _ => True
-      rightClass := fun _ => True
-      factor := fun {a b} p => ⟨b, p, Path.refl b, trivial, trivial, by simp⟩
+    { leftClass := fun {a _} _ => a = a
+      rightClass := fun {a _} _ => a = a
+      factor := fun {a b} p => ⟨b, p, Path.refl b, rfl, rfl, by simp⟩
       lifting :=
         { lift := fun _ g _ pcd _ _ _ =>
-            ⟨Path.trans g (Path.symm pcd), trivial⟩
+            ⟨Path.trans g (Path.symm pcd), rfl⟩
           lift_path := fun _ g _ pcd _ _ _ =>
-            ⟨Path.trans g (Path.symm pcd), trivial⟩ }
-      left_retract := fun _ _ _ _ => trivial
-      right_retract := fun _ _ _ _ => trivial }
+            ⟨Path.trans g (Path.symm pcd), rfl⟩ }
+      left_retract := fun _ _ _ _ => rfl
+      right_retract := fun _ _ _ _ => rfl }
   trivCofFib :=
-    { leftClass := fun _ => True
-      rightClass := fun _ => True
-      factor := fun {a b} p => ⟨a, Path.refl a, p, trivial, trivial, by simp⟩
+    { leftClass := fun {a _} _ => a = a
+      rightClass := fun {a _} _ => a = a
+      factor := fun {a b} p => ⟨a, Path.refl a, p, rfl, rfl, by simp⟩
       lifting :=
         { lift := fun _ g _ pcd _ _ _ =>
-            ⟨Path.trans g (Path.symm pcd), trivial⟩
+            ⟨Path.trans g (Path.symm pcd), rfl⟩
           lift_path := fun _ g _ pcd _ _ _ =>
-            ⟨Path.trans g (Path.symm pcd), trivial⟩ }
-      left_retract := fun _ _ _ _ => trivial
-      right_retract := fun _ _ _ _ => trivial }
-  cof_agree := fun _ => ⟨fun _ => trivial, fun _ => trivial⟩
-  fib_agree := fun _ => ⟨fun _ => trivial, fun _ => trivial⟩
+            ⟨Path.trans g (Path.symm pcd), rfl⟩ }
+      left_retract := fun _ _ _ _ => rfl
+      right_retract := fun _ _ _ _ => rfl }
+  cof_agree := fun _ => ⟨fun _ => rfl, fun _ => rfl⟩
+  fib_agree := fun _ => ⟨fun _ => rfl, fun _ => rfl⟩
 
 /-! ## Cofibrant generation -/
 

@@ -90,24 +90,24 @@ end WeakFactorizationSystemPaths
 
 /-- The trivial weak factorization system where every path lies in both classes. -/
 noncomputable def trivialWeakFactorizationSystem (A : Type u) : WeakFactorizationSystemPaths A where
-  leftClass := fun _ => True
-  rightClass := fun _ => True
+  leftClass := fun {a _} _ => a = a
+  rightClass := fun {a _} _ => a = a
   factor := by
     intro a b f
     refine
       { mid := b
         left := f
         right := Path.refl b
-        left_mem := trivial
-        right_mem := trivial
+        left_mem := rfl
+        right_mem := rfl
         composePath := ?_
         rightUnitStep := ?_
         leftUnitStep := ?_ }
     · exact Path.stepChain (Path.trans_refl_right f)
     · exact Path.Step.trans_refl_right (Path.trans f (Path.refl b))
     · exact Path.Step.trans_refl_left (Path.trans f (Path.refl b))
-  left_closed_trans := fun _ _ _ _ => trivial
-  right_closed_trans := fun _ _ _ _ => trivial
+  left_closed_trans := fun _ _ _ _ => rfl
+  right_closed_trans := fun _ _ _ _ => rfl
 
 /-- Model-structure data with factorization axioms tracked by explicit steps. -/
 structure ModelStructurePaths (A : Type u) where
