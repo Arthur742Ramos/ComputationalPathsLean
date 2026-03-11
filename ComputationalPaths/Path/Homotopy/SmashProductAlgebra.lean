@@ -4,7 +4,7 @@
 Formalization of smash product algebra including smash product associativity,
 commutativity, unit, ring spectra, and module spectra.
 
-All proofs are complete — no placeholders or new assumptions.
+All proofs are complete — no placeholders, stubs, or new assumptions.
 
 ## References
 
@@ -140,6 +140,30 @@ structure SpectrumSmash (E F : SpectrumTheory.Spectrum) where
 
 private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a
+
+/-- The self-module's action is the ring's multiplication. -/
+theorem selfModule_act_eq (R : RingSpectrum) :
+    (R.selfModule).act = R.mul := rfl
+
+/-- Path witness for the self-module action equaling multiplication. -/
+noncomputable def selfModule_act_path (R : RingSpectrum) (n m : Nat)
+    (x : (R.spectrum.level n).carrier) (y : (R.spectrum.level m).carrier) :
+    Path ((R.selfModule).act n m x y) (R.mul n m x y) :=
+  Path.refl _
+
+/-- The structure map of an algebra spectrum preserves the unit. -/
+theorem algebraSpectrum_unit_preserved (R : CommRingSpectrum) (A : AlgebraSpectrum R) :
+    A.structureMap 0 R.unit = A.unit :=
+  A.structureMap_unit
+
+/-- Path witness for algebra spectrum unit preservation. -/
+noncomputable def algebraSpectrum_unit_path (R : CommRingSpectrum) (A : AlgebraSpectrum R) :
+    Path (A.structureMap 0 R.unit) A.unit :=
+  Path.stepChain A.structureMap_unit
+
+/-- S⁰ base and top are distinct. -/
+theorem s0_base_ne_top : S0.base ≠ S0.top := by
+  intro h; cases h
 
 /-! ## Summary -/
 

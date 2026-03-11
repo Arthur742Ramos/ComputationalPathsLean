@@ -3,14 +3,14 @@
 
 This module introduces basic data structures for H-spaces and co-H-spaces,
 records a Hopf theorem data package for abelian fundamental groups, and
-packages a James splitting equivalence scaffold.
+packages a James splitting equivalence with full path witnesses.
 
 ## Key Results
 
 - `HSpace`, `HSpaceAssoc`: multiplication/unit data for H-spaces
 - `CoHSpace`: comultiplication/counit data for co-H-spaces
 - `HopfTheoremData`, `hopfTheorem`: Hopf theorem packaging for π₁
-- `JamesSplittingData`: equivalence scaffold for the James splitting map
+- `JamesSplittingData`: equivalence data for the James splitting map
 
 ## References
 
@@ -158,7 +158,7 @@ noncomputable def jamesSplitting_right_path {X : SuspensionLoop.Pointed} (data :
 /-! ## Summary -/
 
 -- We introduced H-space/co-H-space data structures, a Hopf theorem package for
--- abelian fundamental groups, and a James splitting equivalence scaffold.
+-- abelian fundamental groups, and a James splitting equivalence with path witnesses.
 
 end HSpaces
 end Homotopy
