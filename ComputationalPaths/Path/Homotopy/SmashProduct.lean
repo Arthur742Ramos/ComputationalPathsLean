@@ -62,15 +62,30 @@ noncomputable def smashMk (X Y : PtdType.{u}) (x : X.carrier) (y : Y.carrier) :
 theorem smash_pt (X Y : PtdType.{u}) :
     (Smash X Y).pt = smashMk X Y X.pt Y.pt := rfl
 
+/-- `Path` witness for the smash-product basepoint. -/
+noncomputable def smash_pt_path (X Y : PtdType.{u}) :
+    Path (Smash X Y).pt (smashMk X Y X.pt Y.pt) :=
+  Path.stepChain (smash_pt X Y)
+
 /-- Left base relation: (x, y₀) ~ (x₀, y₀). -/
 theorem smash_baseL (X Y : PtdType.{u}) (x : X.carrier) :
     smashMk X Y x Y.pt = (Smash X Y).pt :=
   Quot.sound (SmashRel.baseL x)
 
+/-- `Path` witness for the left base relation. -/
+noncomputable def smash_baseL_path (X Y : PtdType.{u}) (x : X.carrier) :
+    Path (smashMk X Y x Y.pt) (Smash X Y).pt :=
+  Path.stepChain (smash_baseL X Y x)
+
 /-- Right base relation: (x₀, y) ~ (x₀, y₀). -/
 theorem smash_baseR (X Y : PtdType.{u}) (y : Y.carrier) :
     smashMk X Y X.pt y = (Smash X Y).pt :=
   Quot.sound (SmashRel.baseR y)
+
+/-- `Path` witness for the right base relation. -/
+noncomputable def smash_baseR_path (X Y : PtdType.{u}) (y : Y.carrier) :
+    Path (smashMk X Y X.pt y) (Smash X Y).pt :=
+  Path.stepChain (smash_baseR X Y y)
 
 /-! ## Universal Property
 
@@ -110,6 +125,12 @@ theorem smash_universal_mk {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z)
     (x : X.carrier) (y : Y.carrier) :
     (smash_universal f).toFun (smashMk X Y x y) = f.toFun x y := rfl
 
+/-- `Path` witness for the universal map on smash generators. -/
+noncomputable def smash_universal_mk_path {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z)
+    (x : X.carrier) (y : Y.carrier) :
+    Path ((smash_universal f).toFun (smashMk X Y x y)) (f.toFun x y) :=
+  Path.stepChain (smash_universal_mk f x y)
+
 /-- Uniqueness: any pointed map agreeing with f on smashMk equals the universal map. -/
 theorem smash_universal_unique {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z)
     (g : PtdMap (Smash X Y) Z)
@@ -140,6 +161,12 @@ theorem smashSwap_smashSwap (X Y : PtdType.{u})
   induction z using Quot.ind with
   | _ p => rfl
 
+/-- `Path` witness that swapping twice is the identity. -/
+noncomputable def smashSwap_smashSwap_path (X Y : PtdType.{u})
+    (z : (Smash X Y).carrier) :
+    Path ((smashSwap Y X).toFun ((smashSwap X Y).toFun z)) z :=
+  Path.stepChain (smashSwap_smashSwap X Y z)
+
 /-- Commutativity equivalence: X ∧ Y ≃ Y ∧ X. -/
 noncomputable def smash_comm_equiv (X Y : PtdType.{u}) :
     SimpleEquiv (Smash X Y).carrier (Smash Y X).carrier where
@@ -147,6 +174,18 @@ noncomputable def smash_comm_equiv (X Y : PtdType.{u}) :
   invFun := (smashSwap Y X).toFun
   left_inv := smashSwap_smashSwap X Y
   right_inv := smashSwap_smashSwap Y X
+
+/-- `Path` witness for the left inverse of smash commutativity. -/
+noncomputable def smash_comm_equiv_left_inv_path (X Y : PtdType.{u})
+    (z : (Smash X Y).carrier) :
+    Path ((smash_comm_equiv X Y).invFun ((smash_comm_equiv X Y).toFun z)) z :=
+  Path.stepChain ((smash_comm_equiv X Y).left_inv z)
+
+/-- `Path` witness for the right inverse of smash commutativity. -/
+noncomputable def smash_comm_equiv_right_inv_path (X Y : PtdType.{u})
+    (z : (Smash Y X).carrier) :
+    Path ((smash_comm_equiv X Y).toFun ((smash_comm_equiv X Y).invFun z)) z :=
+  Path.stepChain ((smash_comm_equiv X Y).right_inv z)
 
 /-! ## Associativity: (X ∧ Y) ∧ Z ≃ X ∧ (Y ∧ Z) -/
 
@@ -278,6 +317,12 @@ theorem smashAssocInv_smashAssoc (X Y Z : PtdType.{u})
           induction a using Quot.ind with
           | _ q => rfl
 
+/-- `Path` witness for the left-to-right associativity identity. -/
+noncomputable def smashAssocInv_smashAssoc_path (X Y Z : PtdType.{u})
+    (w : (Smash (Smash X Y) Z).carrier) :
+    Path ((smashAssocInv X Y Z).toFun ((smashAssoc X Y Z).toFun w)) w :=
+  Path.stepChain (smashAssocInv_smashAssoc X Y Z w)
+
 /-- Associativity composition (right to left) is the identity. -/
 theorem smashAssoc_smashAssocInv (X Y Z : PtdType.{u})
     (w : (Smash X (Smash Y Z)).carrier) :
@@ -289,6 +334,12 @@ theorem smashAssoc_smashAssocInv (X Y Z : PtdType.{u})
           induction yz using Quot.ind with
           | _ q => rfl
 
+/-- `Path` witness for the right-to-left associativity identity. -/
+noncomputable def smashAssoc_smashAssocInv_path (X Y Z : PtdType.{u})
+    (w : (Smash X (Smash Y Z)).carrier) :
+    Path ((smashAssoc X Y Z).toFun ((smashAssocInv X Y Z).toFun w)) w :=
+  Path.stepChain (smashAssoc_smashAssocInv X Y Z w)
+
 /-- Associativity equivalence: (X ∧ Y) ∧ Z ≃ X ∧ (Y ∧ Z). -/
 noncomputable def smash_assoc_equiv (X Y Z : PtdType.{u}) :
     SimpleEquiv (Smash (Smash X Y) Z).carrier (Smash X (Smash Y Z)).carrier where
@@ -296,6 +347,18 @@ noncomputable def smash_assoc_equiv (X Y Z : PtdType.{u}) :
   invFun := (smashAssocInv X Y Z).toFun
   left_inv := smashAssocInv_smashAssoc X Y Z
   right_inv := smashAssoc_smashAssocInv X Y Z
+
+/-- `Path` witness for the left inverse of smash associativity. -/
+noncomputable def smash_assoc_equiv_left_inv_path (X Y Z : PtdType.{u})
+    (w : (Smash (Smash X Y) Z).carrier) :
+    Path ((smash_assoc_equiv X Y Z).invFun ((smash_assoc_equiv X Y Z).toFun w)) w :=
+  Path.stepChain ((smash_assoc_equiv X Y Z).left_inv w)
+
+/-- `Path` witness for the right inverse of smash associativity. -/
+noncomputable def smash_assoc_equiv_right_inv_path (X Y Z : PtdType.{u})
+    (w : (Smash X (Smash Y Z)).carrier) :
+    Path ((smash_assoc_equiv X Y Z).toFun ((smash_assoc_equiv X Y Z).invFun w)) w :=
+  Path.stepChain ((smash_assoc_equiv X Y Z).right_inv w)
 
 /-! ## Wedge Inclusion
 
@@ -307,10 +370,20 @@ theorem smash_left_trivial (X Y : PtdType.{u}) (x : X.carrier) :
     smashMk X Y x Y.pt = (Smash X Y).pt :=
   smash_baseL X Y x
 
+/-- `Path` witness for the trivial left inclusion into the smash product. -/
+noncomputable def smash_left_trivial_path (X Y : PtdType.{u}) (x : X.carrier) :
+    Path (smashMk X Y x Y.pt) (Smash X Y).pt :=
+  Path.stepChain (smash_left_trivial X Y x)
+
 /-- Right inclusion of Y into the smash product: y ↦ (x₀, y) ~ *. -/
 theorem smash_right_trivial (X Y : PtdType.{u}) (y : Y.carrier) :
     smashMk X Y X.pt y = (Smash X Y).pt :=
   smash_baseR X Y y
+
+/-- `Path` witness for the trivial right inclusion into the smash product. -/
+noncomputable def smash_right_trivial_path (X Y : PtdType.{u}) (y : Y.carrier) :
+    Path (smashMk X Y X.pt y) (Smash X Y).pt :=
+  Path.stepChain (smash_right_trivial X Y y)
 
 /-! ## Smash Product as a Universal Construction -/
 
@@ -334,6 +407,12 @@ noncomputable def BiPtdMap.swap {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z) :
 theorem smash_universal_swap {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z)
     (x : X.carrier) (y : Y.carrier) :
     (smash_universal f.swap).toFun (smashMk Y X y x) = f.toFun x y := rfl
+
+/-- `Path` witness for the swapped universal map on smash generators. -/
+noncomputable def smash_universal_swap_path {X Y Z : PtdType.{u}} (f : BiPtdMap X Y Z)
+    (x : X.carrier) (y : Y.carrier) :
+    Path ((smash_universal f.swap).toFun (smashMk Y X y x)) (f.toFun x y) :=
+  Path.stepChain (smash_universal_swap f x y)
 
 end SmashProduct
 end Path
