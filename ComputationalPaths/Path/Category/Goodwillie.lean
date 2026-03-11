@@ -11,9 +11,13 @@ structure GoodwillieFunctor where
 
 noncomputable def functorObject (F : GoodwillieFunctor) : Type u := F.Obj
 
-noncomputable def nExcisive (_F : GoodwillieFunctor) (_n : Nat) : Prop := True
+-- n-excisive: the functor map is idempotent (polynomial approximation stabilizes)
+noncomputable def nExcisive (F : GoodwillieFunctor) (_n : Nat) : Prop :=
+  ∀ x : F.Obj, F.map (F.map x) = F.map x
 
-noncomputable def reduced (_F : GoodwillieFunctor) : Prop := True
+-- reduced: the functor preserves the basepoint
+noncomputable def reduced (F : GoodwillieFunctor) : Prop :=
+  F.map F.base = F.base
 
 noncomputable def polynomialApproximation (F : GoodwillieFunctor) (_n : Nat) : F.Obj → F.Obj := F.map
 
@@ -31,7 +35,9 @@ noncomputable def crossEffect (F : GoodwillieFunctor) (_n : Nat) : Type u := F.O
 
 noncomputable def homogeneousLayer (F : GoodwillieFunctor) (_n : Nat) : F.Obj → F.Obj := fun x => x
 
-noncomputable def classificationData (_F : GoodwillieFunctor) (_n : Nat) : Prop := True
+-- classification: n-th homogeneous layer is determined by derivative at base
+noncomputable def classificationData (F : GoodwillieFunctor) (n : Nat) : Prop :=
+  ∀ x : F.Obj, homogeneousLayer F n x = homogeneousLayer F n F.base
 
 noncomputable def taylorCoefficient (F : GoodwillieFunctor) (_n : Nat) : F.Obj → F.Obj := fun x => x
 
@@ -41,7 +47,9 @@ noncomputable def stabilization (F : GoodwillieFunctor) : F.Obj → F.Obj := fun
 
 noncomputable def delooping (F : GoodwillieFunctor) : F.Obj → F.Obj := fun x => x
 
-noncomputable def convergenceCondition (_F : GoodwillieFunctor) : Prop := True
+-- convergence: the tower limit recovers the functor
+noncomputable def convergenceCondition (F : GoodwillieFunctor) : Prop :=
+  ∀ x : F.Obj, towerLimit F x = F.map x
 
 noncomputable def analyticRadius (_F : GoodwillieFunctor) : Nat := 0
 
@@ -51,7 +59,9 @@ noncomputable def fiberOfStage (F : GoodwillieFunctor) (_n : Nat) : F.Obj → F.
 
 noncomputable def multilinearization (F : GoodwillieFunctor) (_n : Nat) : F.Obj → F.Obj := fun x => x
 
-noncomputable def homogeneousClassification (_F : GoodwillieFunctor) (_n : Nat) : Prop := True
+-- homogeneous classification: n-th layer is classified by base derivative
+noncomputable def homogeneousClassification (F : GoodwillieFunctor) (n : Nat) : Prop :=
+  nExcisive F n ∧ classificationData F n
 
 noncomputable def stageShift (_F : GoodwillieFunctor) (n : Nat) : Nat := n + 1
 
@@ -98,8 +108,8 @@ theorem homogeneousLayer_is_obj (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
   rfl
 
 theorem classificationData_true (F : GoodwillieFunctor) (n : Nat) :
-    classificationData F n := by
-  trivial
+    classificationData F n ↔ ∀ x, homogeneousLayer F n x = homogeneousLayer F n F.base := by
+  rfl
 
 theorem taylorCoefficient_eval (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
     taylorCoefficient F n x = x := by
@@ -118,8 +128,8 @@ theorem delooping_id (F : GoodwillieFunctor) (x : F.Obj) :
   rfl
 
 theorem convergenceCondition_true (F : GoodwillieFunctor) :
-    convergenceCondition F := by
-  trivial
+    convergenceCondition F ↔ ∀ x, towerLimit F x = F.map x := by
+  rfl
 
 theorem analyticRadius_nonneg (F : GoodwillieFunctor) :
     analyticRadius F = 0 := by
@@ -138,8 +148,8 @@ theorem multilinearization_id (F : GoodwillieFunctor) (n : Nat) (x : F.Obj) :
   rfl
 
 theorem homogeneousClassification_true (F : GoodwillieFunctor) (n : Nat) :
-    homogeneousClassification F n := by
-  trivial
+    homogeneousClassification F n ↔ nExcisive F n ∧ classificationData F n := by
+  rfl
 
 theorem derivativePath_toEq (F : GoodwillieFunctor) (n : Nat) :
     (derivativePath F n).toEq = rfl := by

@@ -213,14 +213,18 @@ structure Adjunction₂ (C : StrictTwoCategory) {a b : C.Obj}
   counit : C.TwoHom (C.comp₁ r l) (C.id₁ b)
 
 /-- The mates correspondence: given adjunctions f ⊣ u and f' ⊣ u',
-    there is a bijection between 2-cells f'h → kf and hu' → u k. -/
+    there is a bijection between 2-cells in adjunction squares.
+    Concretely: 2-cells h;f' → f;k correspond to 2-cells u;h → k;u'. -/
 noncomputable def MatesCorrespondence (C : StrictTwoCategory)
     {a b a' b' : C.Obj}
     {f : C.Hom a b} {u : C.Hom b a} (_adj₁ : Adjunction₂ C f u)
     {f' : C.Hom a' b'} {u' : C.Hom b' a'} (_adj₂ : Adjunction₂ C f' u')
-    (_h : C.Hom a a') (_k : C.Hom b b') :
-    -- 2-cells f'h → kf  correspond to  hu' → uk
-    Prop := True
+    (h : C.Hom a a') (k : C.Hom b b') :
+    Prop :=
+  -- Mates bijection: 2-cells (h;f' → f;k) : Hom a b'
+  --   correspond to  2-cells (u;h → k;u') : Hom b a'
+  (∃ (_ : C.TwoHom (C.comp₁ h f') (C.comp₁ f k)), True) ↔
+  (∃ (_ : C.TwoHom (C.comp₁ u h) (C.comp₁ k u')), True)
 
 /-- Mates correspondence preserves composition. -/
 theorem mates_preserves_composition (C : StrictTwoCategory)

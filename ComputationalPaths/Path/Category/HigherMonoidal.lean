@@ -11,7 +11,11 @@ structure HigherMonoidalCategory where
 
 noncomputable def infinityOperadShape (n : Nat) : Type := Fin (n + 1)
 
-noncomputable def infinityOperadAxiom (_C : HigherMonoidalCategory) : Prop := True
+-- ∞-operad axiom: tensor is associative and unital
+noncomputable def infinityOperadAxiom (C : HigherMonoidalCategory) : Prop :=
+  (∀ x y z : C.Obj, C.tensor (C.tensor x y) z = C.tensor x (C.tensor y z)) ∧
+  (∀ x : C.Obj, C.tensor C.unit x = x) ∧
+  (∀ x : C.Obj, C.tensor x C.unit = x)
 
 noncomputable def algebraObject (C : HigherMonoidalCategory) : Type _ := C.Obj
 
@@ -26,7 +30,11 @@ noncomputable def dayConvolutionTensor (C D : HigherMonoidalCategory) :
 noncomputable def dayConvolutionUnit (C D : HigherMonoidalCategory) : dayConvolutionObj C D :=
   (C.unit, D.unit)
 
-noncomputable def dayConvolutionMonoidal (_C _D : HigherMonoidalCategory) : Prop := True
+-- Day convolution is monoidal: tensor distributes over the convolution product
+noncomputable def dayConvolutionMonoidal (C D : HigherMonoidalCategory) : Prop :=
+  ∀ x y : dayConvolutionObj C D,
+    dayConvolutionTensor C D x (dayConvolutionUnit C D) = x ∧
+    dayConvolutionTensor C D (dayConvolutionUnit C D) y = y
 
 noncomputable def operadicLeftKanExtension (C : HigherMonoidalCategory) : C.Obj → C.Obj := fun x => x
 
@@ -95,9 +103,12 @@ theorem dayConvolutionUnit_fst (C D : HigherMonoidalCategory) :
     (dayConvolutionUnit C D).1 = C.unit := by
   rfl
 
-theorem dayConvolutionMonoidal_true (C D : HigherMonoidalCategory) :
-    dayConvolutionMonoidal C D := by
-  trivial
+theorem dayConvolutionMonoidal_iff (C D : HigherMonoidalCategory) :
+    dayConvolutionMonoidal C D ↔
+      ∀ x y : dayConvolutionObj C D,
+        dayConvolutionTensor C D x (dayConvolutionUnit C D) = x ∧
+        dayConvolutionTensor C D (dayConvolutionUnit C D) y = y := by
+  rfl
 
 theorem cotangentComplex_is_type (C : HigherMonoidalCategory) (a : algebraObject C) :
     cotangentComplex C a = C.Obj := by
