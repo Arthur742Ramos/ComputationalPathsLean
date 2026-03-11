@@ -804,6 +804,30 @@ noncomputable def decodeWord {n : Nat} : BouquetWord n → LoopSpaceN n
   | .cons l rest =>
       Path.trans (iterateLoopInt (bouquetLoop l.gen) l.power) (decodeWord rest)
 
+/-- Decoding a singleton generator word yields the corresponding bouquet loop class
+    up to rewrite equivalence. -/
+noncomputable def decodeWord_singleton_rweq {n : Nat} (i : Fin'B n) :
+    RwEq (decodeWord (BouquetWord.singleton i)) (bouquetLoop i) := by
+  simp only [BouquetWord.singleton, decodeWord, iterateLoopInt, ge_iff_le, iterateLoopPos]
+  apply rweq_trans
+    (rweq_trans_congr_left (Path.refl bouquetBase) (rweq_cmpA_refl_right (bouquetLoop i)))
+  exact rweq_cmpA_refl_right (bouquetLoop i)
+
+/-- Decoding concatenation agrees with path composition in the quotient model. -/
+noncomputable def decodeWord_wordConcat_rweq {n : Nat}
+    (w₁ w₂ : BouquetWord n) :
+    RwEq (decodeWord (BouquetWord.wordConcat w₁ w₂))
+         (Path.trans (decodeWord w₁) (decodeWord w₂)) := by
+  induction w₁ with
+  | nil =>
+      simp only [BouquetWord.wordConcat, decodeWord]
+      exact rweq_symm (rweq_cmpA_refl_left (decodeWord w₂))
+  | cons l rest ih =>
+      simp only [BouquetWord.wordConcat, decodeWord]
+      apply rweq_trans (rweq_trans_congr_right (iterateLoopInt (bouquetLoop l.gen) l.power) ih)
+      exact rweq_symm
+        (rweq_tt (iterateLoopInt (bouquetLoop l.gen) l.power) (decodeWord rest) (decodeWord w₂))
+
 /-- Decode respects the free group relation.
     The proof uses loop iteration theorems to handle combining and cancellation. -/
 private theorem decodeWord_respects_rel_prop {n : Nat} (w₁ w₂ : BouquetWord n)
@@ -856,6 +880,30 @@ noncomputable def decode_def {n : Nat} : BouquetFreeGroup n → PiOneN n :=
   Quot.lift
     (fun w => Quot.mk (rwEqRel _ _ _) (decodeWord w))
     (fun w₁ w₂ h => Quot.sound (decodeWord_respects_rel w₁ w₂ h))
+
+/-- The decode map sends a generator to the corresponding bouquet loop class. -/
+theorem decode_def_gen_eq_loopClass {n : Nat} (i : Fin'B n) :
+    decode_def (BouquetFreeGroup.gen i) = loopClass i := by
+  unfold decode_def BouquetFreeGroup.gen loopClass
+  exact Quot.sound (rweqProp_of_rweq (decodeWord_singleton_rweq i))
+
+/-- `Path` witness for decoding a generator to the corresponding loop class. -/
+noncomputable def decode_def_gen_path {n : Nat} (i : Fin'B n) :
+    Path (decode_def (BouquetFreeGroup.gen i)) (loopClass i) :=
+  Path.stepChain (decode_def_gen_eq_loopClass i)
+
+/-- Quotient-level coherence: decoding concatenation is composition of decoded words. -/
+theorem decodeWord_wordConcat_class_eq {n : Nat} (w₁ w₂ : BouquetWord n) :
+    Quot.mk (rwEqRel _ _ _) (decodeWord (BouquetWord.wordConcat w₁ w₂)) =
+      Quot.mk (rwEqRel _ _ _) (Path.trans (decodeWord w₁) (decodeWord w₂)) := by
+  exact Quot.sound (rweqProp_of_rweq (decodeWord_wordConcat_rweq w₁ w₂))
+
+/-- `Path` witness for quotient-level decode/concatenation coherence. -/
+noncomputable def decodeWord_wordConcat_class_path {n : Nat} (w₁ w₂ : BouquetWord n) :
+    Path
+      (Quot.mk (rwEqRel _ _ _) (decodeWord (BouquetWord.wordConcat w₁ w₂)))
+      (Quot.mk (rwEqRel _ _ _) (Path.trans (decodeWord w₁) (decodeWord w₂))) :=
+  Path.stepChain (decodeWord_wordConcat_class_eq w₁ w₂)
 
 end BouquetN
 
@@ -965,6 +1013,11 @@ theorem freeGroupOneToInt_intToFreeGroupOne (k : Int) :
     simp only [bouquetWordOnePower]
     omega
 
+/-- `Path` witness for the `Int → F₁ → Int` round-trip. -/
+noncomputable def freeGroupOneToInt_intToFreeGroupOne_path (k : Int) :
+    Path (freeGroupOneToInt (intToFreeGroupOne k)) k :=
+  Path.stepChain (freeGroupOneToInt_intToFreeGroupOne k)
+
 /-- In F₁, all letters have the same generator (fzero), so words reduce by combining powers.
 
 This lemma requires showing that the combine and cancel rules of BouquetRel reduce
@@ -1041,6 +1094,11 @@ theorem bouquetWord_one_equiv_single (w : BouquetWord 1) :
           simpa [hpow] using hw.trans ihCombined
   exact main w.length w rfl
 
+/-- `Path` witness for the canonical one-generator normal form in `F₁`. -/
+noncomputable def bouquetWord_one_equiv_single_path (w : BouquetWord 1) :
+    Path (Quot.mk (BouquetRel 1) w) (intToFreeGroupOne (bouquetWordOnePower w)) :=
+  Path.stepChain (bouquetWord_one_equiv_single w)
+
 /-- F₁ ≃ ℤ (the free group on one generator is isomorphic to the integers). -/
 noncomputable def freeGroupOneEquivInt : SimpleEquiv (BouquetFreeGroup 1) Int where
   toFun := freeGroupOneToInt
@@ -1052,6 +1110,18 @@ noncomputable def freeGroupOneEquivInt : SimpleEquiv (BouquetFreeGroup 1) Int wh
     simp only [freeGroupOneToInt]
     exact (bouquetWord_one_equiv_single w).symm
   right_inv := freeGroupOneToInt_intToFreeGroupOne
+
+/-- `Path` witness for the backward round-trip of `freeGroupOneEquivInt`. -/
+noncomputable def freeGroupOneEquivInt_roundtrip_path
+    (x : BouquetFreeGroup 1) :
+    Path (((freeGroupOneEquivInt).invFun ((freeGroupOneEquivInt).toFun x))) x :=
+  Path.stepChain ((freeGroupOneEquivInt).left_inv x)
+
+/-- `Path` witness for the forward round-trip of `freeGroupOneEquivInt`. -/
+noncomputable def freeGroupOneEquivInt_fwdRoundtrip_path
+    (k : Int) :
+    Path (((freeGroupOneEquivInt).toFun ((freeGroupOneEquivInt).invFun k))) k :=
+  Path.stepChain ((freeGroupOneEquivInt).right_inv k)
 
 /-! ### Part 2: Iterated Free Product -/
 
