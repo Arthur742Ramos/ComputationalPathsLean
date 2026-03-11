@@ -399,6 +399,12 @@ theorem abelianizationRel_int_eq {x y : Int} :
   | inv_left x => simpa using (Int.add_left_neg x)
   | inv_right x => simpa using (Int.add_right_neg x)
 
+/-- Path witness that the integer abelianization relation identifies equal integers. -/
+noncomputable def abelianizationRel_int_eq_path {x y : Int}
+    (h : AbelianizationRel Int Int.add Int.neg 0 x y) :
+    Path x y :=
+  Path.stepChain (abelianizationRel_int_eq (x := x) (y := y) h)
+
 noncomputable def abelianization_int_proj : Abelianization Int Int.add Int.neg 0 → Int :=
   Quotient.lift (fun x : Int => x) (by
     intro x y h
@@ -407,6 +413,15 @@ noncomputable def abelianization_int_proj : Abelianization Int Int.add Int.neg 0
 /-- Injection from ℤ into its abelianization. -/
 noncomputable def abelianization_int_inj : Int → Abelianization Int Int.add Int.neg 0 :=
   abelianization_mk Int.add Int.neg 0
+
+/-- Projection after injection is judgmentally the identity on ℤ. -/
+theorem abelianization_int_proj_inj (x : Int) :
+    abelianization_int_proj (abelianization_int_inj x) = x := rfl
+
+/-- Path witness for projection after injection on ℤ. -/
+noncomputable def abelianization_int_proj_inj_path (x : Int) :
+    Path (abelianization_int_proj (abelianization_int_inj x)) x :=
+  Path.stepChain (abelianization_int_proj_inj x)
 
 /-- ℤ^ab ≃ ℤ (integers are already abelian). -/
 noncomputable def int_abelianization_equiv : SimpleEquiv (Abelianization Int Int.add Int.neg 0) Int where
@@ -419,6 +434,17 @@ noncomputable def int_abelianization_equiv : SimpleEquiv (Abelianization Int Int
   right_inv := by
     intro x
     rfl
+
+/-- Left round-trip witness for `int_abelianization_equiv`. -/
+noncomputable def int_abelianization_equiv_left_inv_path
+    (q : Abelianization Int Int.add Int.neg 0) :
+    Path (int_abelianization_equiv.invFun (int_abelianization_equiv.toFun q)) q :=
+  Path.stepChain (int_abelianization_equiv.left_inv q)
+
+/-- Right round-trip witness for `int_abelianization_equiv`. -/
+noncomputable def int_abelianization_equiv_right_inv_path (x : Int) :
+    Path (int_abelianization_equiv.toFun (int_abelianization_equiv.invFun x)) x :=
+  Path.stepChain (int_abelianization_equiv.right_inv x)
 
 /-! ## H₁ of Known Spaces -/
 
