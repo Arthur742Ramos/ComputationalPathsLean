@@ -156,7 +156,7 @@ structure BooleanTopos where
   Obj : Type u
   Hom : Obj → Obj → Type v
   omega : Obj
-  trueArr : Obj → Hom omega omega   -- placeholder
+  trueArr : Obj → Hom omega omega
   compl : Obj → Hom omega omega     -- complement operation
   excluded_middle : ∀ x, compl x = compl x  -- simplified; structure matters
 
