@@ -946,7 +946,7 @@ import ComputationalPaths.Path.Rewriting.TypedLambdaDeep
 import ComputationalPaths.Path.SimplicialHomotopyPaths
 import ComputationalPaths.Path.Topology.BanachPaths
 import ComputationalPaths.Path.Topology.CellularPaths
-import ComputationalPaths.Path.Topology.CharacteristicClassDeep
+import ComputationalPaths.Path.Topology.CharacteristicClass
 import ComputationalPaths.Path.Topology.Cobordism
 import ComputationalPaths.Path.Topology.CobordismDeep2
 import ComputationalPaths.Path.Topology.CobordismDeepPaths
@@ -966,7 +966,7 @@ import ComputationalPaths.Path.Topology.Gerbes
 import ComputationalPaths.Path.Topology.HigherChernWeil
 import ComputationalPaths.Path.Topology.HilbertPaths
 import ComputationalPaths.Path.Topology.ManifoldPaths
-import ComputationalPaths.Path.Topology.MorseTheoryDeep
+import ComputationalPaths.Path.Topology.MorseTheory
 import ComputationalPaths.Path.Topology.OperatorPaths
 import ComputationalPaths.Path.Topology.PathConnectedness
 import ComputationalPaths.Path.Topology.PersistentHomologyPaths
@@ -975,7 +975,7 @@ import ComputationalPaths.Path.Topology.RiemannianGeometry
 import ComputationalPaths.Path.Topology.SeibergWitten
 import ComputationalPaths.Path.Topology.SheafCohomologyDeep2
 import ComputationalPaths.Path.Topology.SpinGeometry
-import ComputationalPaths.Path.Topology.StratifiedSpaceDeep
+import ComputationalPaths.Path.Topology.StratifiedSpace
 import ComputationalPaths.Path.Topology.SuspensionPaths
 import ComputationalPaths.Path.Topology.SymplecticGeometry
 import ComputationalPaths.Path.Topology.TwistedKTheory
