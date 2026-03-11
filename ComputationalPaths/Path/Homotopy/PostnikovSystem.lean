@@ -105,25 +105,51 @@ with canonical points coming from sections.
     (postnikovSystem A).stage n = A := by
   rfl
 
+/-- Path witness for the canonical stage identification. -/
+noncomputable def postnikovSystem_stage_path (A : Type u) (n : Nat) :
+    Path ((postnikovSystem A).stage n) A :=
+  Path.stepChain (postnikovSystem_stage A n)
+
 /-- The bond of the canonical system is the identity. -/
 theorem postnikovSystem_bond_id (A : Type u) (n : Nat) (a : A) :
     (postnikovSystem A).bond n a = a := by
   rfl
+
+/-- Path witness that the canonical bond map is the identity. -/
+noncomputable def postnikovSystem_bond_id_path (A : Type u) (n : Nat) (a : A) :
+    Path ((postnikovSystem A).bond n a) a :=
+  Path.stepChain (postnikovSystem_bond_id A n a)
 
 /-- Bond compatibility in the canonical system is witnessed by refl. -/
 theorem postnikovSystem_bond_comm_is_refl (A : Type u) (n : Nat) (a : A) :
     (postnikovSystem A).bond_comm n a = Path.refl a := by
   rfl
 
+/-- Path witness for canonical bond compatibility. -/
+noncomputable def postnikovSystem_bond_comm_is_refl_path (A : Type u) (n : Nat) (a : A) :
+    Path ((postnikovSystem A).bond_comm n a) (Path.refl a) :=
+  Path.stepChain (postnikovSystem_bond_comm_is_refl A n a)
+
 /-- The canonical decomposition section is the identity. -/
 theorem postnikovDecomposition_section_id (A : Type u) (n : Nat) (a : A) :
     (postnikovDecomposition A).sectionMap n a = a := by
   rfl
 
+/-- Path witness that the canonical section is the identity. -/
+noncomputable def postnikovDecomposition_section_id_path (A : Type u) (n : Nat) (a : A) :
+    Path ((postnikovDecomposition A).sectionMap n a) a :=
+  Path.stepChain (postnikovDecomposition_section_id A n a)
+
 /-- Section left-inverse in the canonical decomposition is refl. -/
 theorem postnikovDecomposition_section_left_is_refl (A : Type u) (n : Nat) (x : A) :
     (postnikovDecomposition A).section_left n x = Path.refl x := by
   rfl
+
+/-- Path witness for the canonical section left-inverse. -/
+noncomputable def postnikovDecomposition_section_left_is_refl_path
+    (A : Type u) (n : Nat) (x : A) :
+    Path ((postnikovDecomposition A).section_left n x) (Path.refl x) :=
+  Path.stepChain (postnikovDecomposition_section_left_is_refl A n x)
 
 /-- The bond fiber at a canonical system projection is `Sigma` over a refl path. -/
 theorem bondFiber_canonical_type (A : Type u) (n : Nat) (a : A) :
@@ -131,20 +157,41 @@ theorem bondFiber_canonical_type (A : Type u) (n : Nat) (a : A) :
       Sigma (fun y : A => Path y a) := by
   rfl
 
+/-- Path witness for the canonical bond-fiber type. -/
+noncomputable def bondFiber_canonical_type_path (A : Type u) (n : Nat) (a : A) :
+    Path (bondFiber (postnikovSystem A) n a) (Sigma (fun y : A => Path y a)) :=
+  Path.stepChain (bondFiber_canonical_type A n a)
+
 /-- The fiber section of the canonical decomposition yields the identity point. -/
 theorem bondFiberSection_canonical_fst (A : Type u) (n : Nat) (x : A) :
     (bondFiberSection (postnikovDecomposition A) n x).1 = x := by
   rfl
+
+/-- Path witness for the first component of the canonical fiber section. -/
+noncomputable def bondFiberSection_canonical_fst_path (A : Type u) (n : Nat) (x : A) :
+    Path ((bondFiberSection (postnikovDecomposition A) n x).1) x :=
+  Path.stepChain (bondFiberSection_canonical_fst A n x)
 
 /-- The bondFiberAt unfolds to bondFiber at the projected point. -/
 theorem bondFiberAt_unfold {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) :
     bondFiberAt P n a = bondFiber P n (P.proj n a) := by
   rfl
 
+/-- Path witness for unfolding `bondFiberAt`. -/
+noncomputable def bondFiberAt_unfold_path {A : Type u} (P : PostnikovSystem A) (n : Nat) (a : A) :
+    Path (bondFiberAt P n a) (bondFiber P n (P.proj n a)) :=
+  Path.stepChain (bondFiberAt_unfold P n a)
+
 /-- A decomposition extends a system: the underlying stages agree. -/
 theorem decomposition_extends_system {A : Type u} (D : PostnikovDecomposition A) (n : Nat) :
     D.toPostnikovSystem.stage n = D.stage n := by
   rfl
+
+/-- Path witness that a decomposition extends its underlying system. -/
+noncomputable def decomposition_extends_system_path {A : Type u}
+    (D : PostnikovDecomposition A) (n : Nat) :
+    Path (D.toPostnikovSystem.stage n) (D.stage n) :=
+  Path.stepChain (decomposition_extends_system D n)
 
 end PostnikovSystem
 end Path
