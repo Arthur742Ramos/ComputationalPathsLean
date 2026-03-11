@@ -81,6 +81,18 @@ noncomputable def fiberEquivFamily {P : B → Type u} (b : B) :
   left_inv := fun ⟨⟨_, _⟩, h⟩ => by subst h; rfl
   right_inv := fun _ => rfl
 
+/-- Path witness for the left round-trip of `fiberEquivFamily`. -/
+noncomputable def fiberEquivFamily_left_inv_path {P : B → Type u} (b : B)
+    (x : Fiber (@Total.proj B P) b) :
+    Path ((fiberEquivFamily b).invFun ((fiberEquivFamily b).toFun x)) x :=
+  Path.stepChain ((fiberEquivFamily b).left_inv x)
+
+/-- Path witness for the right round-trip of `fiberEquivFamily`. -/
+noncomputable def fiberEquivFamily_right_inv_path {P : B → Type u} (b : B)
+    (x : P b) :
+    Path ((fiberEquivFamily b).toFun ((fiberEquivFamily b).invFun x)) x :=
+  Path.stepChain ((fiberEquivFamily b).right_inv x)
+
 /-! ## Fiber Sequences
 
 A fiber sequence is a sequence F → E → B where F is the fiber of the map E → B.
@@ -168,6 +180,11 @@ noncomputable def connectingMapPi1 {P : B → Type u} (b : B) (x₀ : P b) :
 theorem connectingMap₁_refl {P : B → Type u} (b : B) (x₀ : P b) :
     connectingMap₁ b x₀ (Path.refl b) = x₀ := rfl
 
+/-- Path witness for the refl law of the connecting map. -/
+noncomputable def connectingMap₁_refl_path {P : B → Type u} (b : B) (x₀ : P b) :
+    Path (connectingMap₁ b x₀ (Path.refl b)) x₀ :=
+  Path.stepChain (connectingMap₁_refl b x₀)
+
 /-- Connecting map of composition. -/
 theorem connectingMap₁_trans {P : B → Type u} (b : B) (x₀ : P b)
     (l₁ l₂ : LoopSpace B b) :
@@ -175,6 +192,13 @@ theorem connectingMap₁_trans {P : B → Type u} (b : B) (x₀ : P b)
     connectingMap₁ b (connectingMap₁ b x₀ l₁) l₂ := by
   unfold connectingMap₁
   exact Path.transport_trans l₁ l₂ x₀
+
+/-- Path witness for the composition law of the connecting map. -/
+noncomputable def connectingMap₁_trans_path {P : B → Type u} (b : B) (x₀ : P b)
+    (l₁ l₂ : LoopSpace B b) :
+    Path (connectingMap₁ b x₀ (Path.trans l₁ l₂))
+      (connectingMap₁ b (connectingMap₁ b x₀ l₁) l₂) :=
+  Path.stepChain (connectingMap₁_trans b x₀ l₁ l₂)
 
 /-! ## Exactness
 
@@ -214,6 +238,18 @@ noncomputable def canonicalFiberSeq_exact {P : B → Type u} (b : B) (x₀ : P b
     cases h.toEq
     exact ⟨p, Path.refl _⟩
 
+/-- Path witness for the left inverse of the canonical fiber sequence. -/
+noncomputable def canonicalFiberSeq_left_inv_path {P : B → Type u} (b : B) (x₀ : P b)
+    (x : P b) :
+    Path ((canonicalFiberSeq b x₀).fromFiber ((canonicalFiberSeq b x₀).toFiber x)) x :=
+  Path.stepChain ((canonicalFiberSeq b x₀).left_inv x)
+
+/-- Path witness for the right inverse of the canonical fiber sequence. -/
+noncomputable def canonicalFiberSeq_right_inv_path {P : B → Type u} (b : B) (x₀ : P b)
+    (x : Fiber (@Total.proj B P) b) :
+    Path ((canonicalFiberSeq b x₀).toFiber ((canonicalFiberSeq b x₀).fromFiber x)) x :=
+  Path.stepChain ((canonicalFiberSeq b x₀).right_inv x)
+
 /-! ## Induced Maps on Homotopy Groups
 
 A map f : A → B induces maps f_* : π_n(A, a) → π_n(B, f(a)).
@@ -248,6 +284,11 @@ theorem inducedPi1Map_id (a : A) :
     -- congrArg id l ≈ l
     exact rweqProp_of_rweq (rweq_of_eq (Path.congrArg_id l))
 
+/-- Path witness that the induced π₁ map preserves identities. -/
+noncomputable def inducedPi1Map_id_path (a : A) :
+    Path (inducedPi1Map (id : A → A) a) id :=
+  Path.stepChain (inducedPi1Map_id a)
+
 /-- Induced map respects composition. -/
 theorem inducedPi1Map_comp (f : A → B) (g : B → E) (a : A) :
     inducedPi1Map (g ∘ f) a = inducedPi1Map g (f a) ∘ inducedPi1Map f a := by
@@ -258,6 +299,11 @@ theorem inducedPi1Map_comp (f : A → B) (g : B → E) (a : A) :
     apply Quot.sound
     -- congrArg (g ∘ f) l ≈ congrArg g (congrArg f l)
     exact rweqProp_of_rweq (rweq_of_eq (Path.congrArg_comp g f l))
+
+/-- Path witness that the induced π₁ map respects composition. -/
+noncomputable def inducedPi1Map_comp_path (f : A → B) (g : B → E) (a : A) :
+    Path (inducedPi1Map (g ∘ f) a) (inducedPi1Map g (f a) ∘ inducedPi1Map f a) :=
+  Path.stepChain (inducedPi1Map_comp f g a)
 
 /-! ## Long Exact Sequence Preview
 
