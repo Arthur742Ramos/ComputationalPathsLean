@@ -55,6 +55,11 @@ theorem reduceList_append {A : Type u} (a0 : A) :
       · simp [reduceList, h, ih]
       · simp [reduceList, h, ih]
 
+/-- `Path` witness for reduction over list append. -/
+noncomputable def reduceList_append_path {A : Type u} (a0 : A) (l1 l2 : List A) :
+    Path (reduceList a0 (l1 ++ l2)) (reduceList a0 l1 ++ reduceList a0 l2) :=
+  Path.stepChain (reduceList_append a0 l1 l2)
+
 
 
 
@@ -102,6 +107,50 @@ noncomputable def jamesMul (X : SuspensionLoop.Pointed) :
       simpa [reduceList_append] using
         _root_.congrArg (fun t => t ++ reduceList X.pt l2) h1)
 
+/-- Left identity for `jamesMul`. -/
+theorem jamesMul_base_left (X : SuspensionLoop.Pointed) (a : JamesConstruction X) :
+    jamesMul X (jamesBase X) a = a := by
+  refine Quot.inductionOn a ?_
+  intro l
+  rfl
+
+/-- `Path` witness for the left identity of `jamesMul`. -/
+noncomputable def jamesMul_base_left_path (X : SuspensionLoop.Pointed) (a : JamesConstruction X) :
+    Path (jamesMul X (jamesBase X) a) a :=
+  Path.stepChain (jamesMul_base_left X a)
+
+/-- Right identity for `jamesMul`. -/
+theorem jamesMul_base_right (X : SuspensionLoop.Pointed) (a : JamesConstruction X) :
+    jamesMul X a (jamesBase X) = a := by
+  refine Quot.inductionOn a ?_
+  intro l
+  apply Quot.sound
+  simp [JamesRel, reduceList_append]
+
+/-- `Path` witness for the right identity of `jamesMul`. -/
+noncomputable def jamesMul_base_right_path (X : SuspensionLoop.Pointed) (a : JamesConstruction X) :
+    Path (jamesMul X a (jamesBase X)) a :=
+  Path.stepChain (jamesMul_base_right X a)
+
+/-- Associativity of `jamesMul`. -/
+theorem jamesMul_assoc (X : SuspensionLoop.Pointed)
+    (a b c : JamesConstruction X) :
+    jamesMul X (jamesMul X a b) c = jamesMul X a (jamesMul X b c) := by
+  refine Quot.inductionOn a ?_
+  intro l1
+  refine Quot.inductionOn b ?_
+  intro l2
+  refine Quot.inductionOn c ?_
+  intro l3
+  apply Quot.sound
+  simp [JamesRel, reduceList_append, List.append_assoc]
+
+/-- `Path` witness for associativity of `jamesMul`. -/
+noncomputable def jamesMul_assoc_path (X : SuspensionLoop.Pointed)
+    (a b c : JamesConstruction X) :
+    Path (jamesMul X (jamesMul X a b) c) (jamesMul X a (jamesMul X b c)) :=
+  Path.stepChain (jamesMul_assoc X a b c)
+
 
 
 
@@ -138,6 +187,13 @@ theorem loopOfList_append (X : SuspensionLoop.Pointed) :
   | cons x xs ih =>
       simp [loopOfList, ih, LoopSpace.comp]
 
+/-- `Path` witness for folding append into loop composition. -/
+noncomputable def loopOfList_append_path (X : SuspensionLoop.Pointed)
+    (l1 l2 : List X.carrier) :
+    Path (loopOfList X (l1 ++ l2))
+      (LoopSpace.comp (loopOfList X l1) (loopOfList X l2)) :=
+  Path.stepChain (loopOfList_append X l1 l2)
+
 
 
 /-- Map from the James construction to the loop space of the suspension. -/
@@ -172,6 +228,16 @@ noncomputable def jamesToLoop_mul (X : SuspensionLoop.Pointed) (a b : JamesConst
   refine Quot.inductionOn b ?_
   intro l2
   simp [jamesMul, jamesToLoop, loopOfList_append, reduceList_append, LoopSpace.comp]
+
+/-- `jamesToLoop` sends left multiplication by the basepoint to the same loop. -/
+noncomputable def jamesToLoop_base_left_path (X : SuspensionLoop.Pointed) (a : JamesConstruction X) :
+    Path (jamesToLoop X (jamesMul X (jamesBase X) a)) (jamesToLoop X a) :=
+  Path.congrArg (jamesToLoop X) (jamesMul_base_left_path X a)
+
+/-- `jamesToLoop` sends right multiplication by the basepoint to the same loop. -/
+noncomputable def jamesToLoop_base_right_path (X : SuspensionLoop.Pointed) (a : JamesConstruction X) :
+    Path (jamesToLoop X (jamesMul X a (jamesBase X))) (jamesToLoop X a) :=
+  Path.congrArg (jamesToLoop X) (jamesMul_base_right_path X a)
 
 /-! ## Summary -/
 
