@@ -141,10 +141,43 @@ theorem freePathSpace_reverse_refl (a : A) :
     freePathSpaceReverse (freePathSpaceRefl a) = freePathSpaceRefl a := by
   simp [freePathSpaceReverse, freePathSpaceRefl]
 
+/-- Reversing a free path swaps its source with its target. -/
+theorem freePathSpace_reverse_source_eq {A : Type u} (p : FreePathSpace A) :
+    freePathSpaceSource (freePathSpaceReverse p) = freePathSpaceTarget p := by
+  obtain ⟨x, y, path⟩ := p
+  rfl
+
+/-- Reversing a free path swaps its target with its source. -/
+theorem freePathSpace_reverse_target_eq {A : Type u} (p : FreePathSpace A) :
+    freePathSpaceTarget (freePathSpaceReverse p) = freePathSpaceSource p := by
+  obtain ⟨x, y, path⟩ := p
+  rfl
+
+/-- Path witness: reversing a free path swaps its source with its target. -/
+noncomputable def freePathSpace_reverse_source_swap_path {A : Type u} (p : FreePathSpace A) :
+    Path
+      (freePathSpaceSource (freePathSpaceReverse p))
+      (freePathSpaceTarget p) :=
+  Path.stepChain (freePathSpace_reverse_source_eq p)
+
+/-- Path witness: reversing a free path swaps its target with its source. -/
+noncomputable def freePathSpace_reverse_target_swap_path {A : Type u} (p : FreePathSpace A) :
+    Path
+      (freePathSpaceTarget (freePathSpaceReverse p))
+      (freePathSpaceSource p) :=
+  Path.stepChain (freePathSpace_reverse_target_eq p)
+
 /-- Reversing twice is the identity at the propositional level. -/
 theorem freePathSpace_reverse_reverse_eq {A : Type u} (p : FreePathSpace A) :
     freePathSpaceSource (freePathSpaceReverse (freePathSpaceReverse p)) =
     freePathSpaceSource p := by
+  obtain ⟨x, y, path⟩ := p
+  rfl
+
+/-- Reversing twice preserves the target as well. -/
+theorem freePathSpace_reverse_reverse_target_eq {A : Type u} (p : FreePathSpace A) :
+    freePathSpaceTarget (freePathSpaceReverse (freePathSpaceReverse p)) =
+    freePathSpaceTarget p := by
   obtain ⟨x, y, path⟩ := p
   rfl
 
@@ -154,6 +187,13 @@ noncomputable def freePathSpace_reverse_source_path {A : Type u} (p : FreePathSp
       (freePathSpaceSource (freePathSpaceReverse (freePathSpaceReverse p)))
       (freePathSpaceSource p) :=
   Path.stepChain (freePathSpace_reverse_reverse_eq p)
+
+/-- Path witness: reverse-reverse preserves target. -/
+noncomputable def freePathSpace_reverse_target_path {A : Type u} (p : FreePathSpace A) :
+    Path
+      (freePathSpaceTarget (freePathSpaceReverse (freePathSpaceReverse p)))
+      (freePathSpaceTarget p) :=
+  Path.stepChain (freePathSpace_reverse_reverse_target_eq p)
 
 /-! ## Based Path Space as a Fiber -/
 
@@ -170,6 +210,18 @@ noncomputable def basedPathSpace_fiber_source (A : Type u) (a : A) :
       a :=
   Path.refl a
 
+/-- Path witness: the based path space embedding preserves the chosen source. -/
+noncomputable def basedPathSpace_fiber_source_path (A : Type u) (a : A)
+    (x : PathSpace A a) :
+    Path (freePathSpaceSource (basedPathSpace_as_fiber A a x).val) a :=
+  Path.refl a
+
+/-- Path witness: the based path space embedding preserves the target endpoint. -/
+noncomputable def basedPathSpace_fiber_target_path (A : Type u) (a : A)
+    (x : PathSpace A a) :
+    Path (freePathSpaceTarget (basedPathSpace_as_fiber A a x).val) x.1 :=
+  Path.refl x.1
+
 /-! ## Concatenation on Path Spaces -/
 
 /-- Concatenate two based paths: since the space is contractible,
@@ -177,6 +229,28 @@ noncomputable def basedPathSpace_fiber_source (A : Type u) (a : A) :
 noncomputable def pathSpaceConcat {A : Type u} {a : A}
     (_p : PathSpace A a) (q : PathSpace A a) :
     PathSpace A a := q
+
+/-- Concatenation on path spaces returns the second argument. -/
+theorem pathSpaceConcat_eq_right {A : Type u} {a : A}
+    (p q : PathSpace A a) :
+    pathSpaceConcat p q = q := rfl
+
+/-- Path witness: concatenation on path spaces returns the second argument. -/
+noncomputable def pathSpaceConcat_eq_right_path {A : Type u} {a : A}
+    (p q : PathSpace A a) :
+    Path (pathSpaceConcat p q) q :=
+  Path.stepChain (pathSpaceConcat_eq_right p q)
+
+/-- Concatenation on path spaces is associative. -/
+theorem pathSpaceConcat_assoc {A : Type u} {a : A}
+    (p q r : PathSpace A a) :
+    pathSpaceConcat (pathSpaceConcat p q) r = pathSpaceConcat p (pathSpaceConcat q r) := rfl
+
+/-- Path witness: concatenation on path spaces is associative. -/
+noncomputable def pathSpaceConcat_assoc_path {A : Type u} {a : A}
+    (p q r : PathSpace A a) :
+    Path (pathSpaceConcat (pathSpaceConcat p q) r) (pathSpaceConcat p (pathSpaceConcat q r)) :=
+  Path.stepChain (pathSpaceConcat_assoc p q r)
 
 /-- Path witness: concatenation with the basepoint is identity. -/
 noncomputable def pathSpaceConcat_base_right {A : Type u} {a : A}
@@ -210,6 +284,12 @@ noncomputable def loopSpaceEmbed_refl {A : Type u} {a : A} :
       (⟨pathSpaceBase A a, rfl⟩ : loopSpaceFromPathSpace A a) :=
   Path.refl _
 
+/-- Path witness: the loop embedding evaluates to the basepoint. -/
+noncomputable def loopSpaceEmbed_eval_path {A : Type u} {a : A}
+    (p : LoopSpaceEq A a) :
+    Path (pathSpaceEval (loopSpaceEmbed p).1) a :=
+  Path.refl a
+
 /-! ## Path Space Monad Structure -/
 
 /-- The unit of the path space monad: embed a point as a constant path. -/
@@ -222,6 +302,23 @@ noncomputable def pathSpaceJoin {A : Type u} {a : A}
     (_pp : PathSpace (PathSpace A a) (pathSpaceBase A a)) :
     PathSpace A a :=
   pathSpaceBase A a
+
+/-- The path space monad multiplication returns the basepoint path. -/
+theorem pathSpaceJoin_eq_base {A : Type u} {a : A}
+    (pp : PathSpace (PathSpace A a) (pathSpaceBase A a)) :
+    pathSpaceJoin pp = pathSpaceBase A a := rfl
+
+/-- Path witness: the path space monad multiplication returns the basepoint path. -/
+noncomputable def pathSpaceJoin_base_path {A : Type u} {a : A}
+    (pp : PathSpace (PathSpace A a) (pathSpaceBase A a)) :
+    Path (pathSpaceJoin pp) (pathSpaceBase A a) :=
+  Path.stepChain (pathSpaceJoin_eq_base pp)
+
+/-- Path witness: evaluating the monad multiplication gives the basepoint. -/
+noncomputable def pathSpaceJoin_eval_path {A : Type u} {a : A}
+    (pp : PathSpace (PathSpace A a) (pathSpaceBase A a)) :
+    Path (pathSpaceEval (pathSpaceJoin pp)) a :=
+  Path.refl a
 
 /-- Path witness: the monad unit law (unit followed by join is identity). -/
 noncomputable def pathSpace_unit_join_path {A : Type u} {a : A}
