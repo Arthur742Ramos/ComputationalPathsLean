@@ -108,6 +108,16 @@ structure Perm (n : Nat) where
 
 namespace Perm
 
+/-- `Path`-typed left inverse law for a permutation. -/
+noncomputable def left_inv_path {n : Nat} (σ : Perm n) (i : Fin n) :
+    Path (σ.invFun (σ.toFun i)) i :=
+  Path.stepChain (σ.left_inv i)
+
+/-- `Path`-typed right inverse law for a permutation. -/
+noncomputable def right_inv_path {n : Nat} (σ : Perm n) (i : Fin n) :
+    Path (σ.toFun (σ.invFun i)) i :=
+  Path.stepChain (σ.right_inv i)
+
 /-- Identity permutation. -/
 noncomputable def id (n : Nat) : Perm n where
   toFun := _root_.id
@@ -126,12 +136,55 @@ noncomputable def comp {n : Nat} (σ τ : Perm n) : Perm n where
     simp [Function.comp]
     rw [τ.right_inv, σ.right_inv]
 
+/-- Right identity for permutation composition. -/
+theorem comp_id {n : Nat} (σ : Perm n) : comp σ (id n) = σ := by
+  cases σ
+  rfl
+
+/-- `Path` witness for right identity of permutation composition. -/
+noncomputable def comp_id_path {n : Nat} (σ : Perm n) :
+    Path (comp σ (id n)) σ :=
+  Path.stepChain (comp_id σ)
+
+/-- Left identity for permutation composition. -/
+theorem id_comp {n : Nat} (σ : Perm n) : comp (id n) σ = σ := by
+  cases σ
+  rfl
+
+/-- `Path` witness for left identity of permutation composition. -/
+noncomputable def id_comp_path {n : Nat} (σ : Perm n) :
+    Path (comp (id n) σ) σ :=
+  Path.stepChain (id_comp σ)
+
 /-- Inverse permutation. -/
 noncomputable def inv {n : Nat} (σ : Perm n) : Perm n where
   toFun := σ.invFun
   invFun := σ.toFun
   left_inv := σ.right_inv
   right_inv := σ.left_inv
+
+/-- Associativity of permutation composition. -/
+theorem comp_assoc {n : Nat} (σ τ ρ : Perm n) :
+    comp (comp σ τ) ρ = comp σ (comp τ ρ) := by
+  cases σ
+  cases τ
+  cases ρ
+  rfl
+
+/-- `Path` witness for associativity of permutation composition. -/
+noncomputable def comp_assoc_path {n : Nat} (σ τ ρ : Perm n) :
+    Path (comp (comp σ τ) ρ) (comp σ (comp τ ρ)) :=
+  Path.stepChain (comp_assoc σ τ ρ)
+
+/-- Double inverse for permutations. -/
+theorem inv_inv {n : Nat} (σ : Perm n) : inv (inv σ) = σ := by
+  cases σ
+  rfl
+
+/-- `Path` witness for double inverse of permutations. -/
+noncomputable def inv_inv_path {n : Nat} (σ : Perm n) :
+    Path (inv (inv σ)) σ :=
+  Path.stepChain (inv_inv σ)
 
 /-- A permutation is injective. -/
 theorem injective {n : Nat} (σ : Perm n) : Function.Injective σ.toFun := by
@@ -166,6 +219,23 @@ noncomputable def config_action_id_path {A : Type u} {n : Nat}
     (c : OrderedConfig A n) :
     Path (config_permutation_action (Perm.id n) c) c :=
   Path.stepChain (config_action_id c)
+
+/-- Acting by a composite permutation equals iterated action. -/
+theorem config_action_comp {A : Type u} {n : Nat}
+    (σ τ : Perm n) (c : OrderedConfig A n) :
+    config_permutation_action (Perm.comp τ σ) c =
+      config_permutation_action σ (config_permutation_action τ c) := by
+  apply Subtype.ext
+  funext i
+  rfl
+
+/-- `Path` witness for compatibility of configuration action with permutation composition. -/
+noncomputable def config_action_comp_path {A : Type u} {n : Nat}
+    (σ τ : Perm n) (c : OrderedConfig A n) :
+    Path
+      (config_permutation_action (Perm.comp τ σ) c)
+      (config_permutation_action σ (config_permutation_action τ c)) :=
+  Path.stepChain (config_action_comp σ τ c)
 
 /-! ## Unordered Configuration Spaces -/
 
@@ -304,6 +374,26 @@ noncomputable def braid_rel_path (bg : BraidGroupData n) (br : BraidRelation bg)
 noncomputable def mul_assoc_path (bg : BraidGroupData n) (a b c : bg.Braid) :
     Path (bg.mul (bg.mul a b) c) (bg.mul a (bg.mul b c)) :=
   Path.stepChain (bg.mul_assoc a b c)
+
+/-- `Path`-typed left identity in the braid group. -/
+noncomputable def e_mul_path (bg : BraidGroupData n) (a : bg.Braid) :
+    Path (bg.mul bg.e a) a :=
+  Path.stepChain (bg.e_mul a)
+
+/-- `Path`-typed right identity in the braid group. -/
+noncomputable def mul_e_path (bg : BraidGroupData n) (a : bg.Braid) :
+    Path (bg.mul a bg.e) a :=
+  Path.stepChain (bg.mul_e a)
+
+/-- `Path`-typed left inverse in the braid group. -/
+noncomputable def inv_mul_path (bg : BraidGroupData n) (a : bg.Braid) :
+    Path (bg.mul (bg.inv a) a) bg.e :=
+  Path.stepChain (bg.inv_mul a)
+
+/-- `Path`-typed right inverse in the braid group. -/
+noncomputable def mul_inv_path (bg : BraidGroupData n) (a : bg.Braid) :
+    Path (bg.mul a (bg.inv a)) bg.e :=
+  Path.stepChain (bg.mul_inv a)
 
 end BraidGroupData
 
