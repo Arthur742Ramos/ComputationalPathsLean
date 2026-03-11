@@ -113,6 +113,17 @@ noncomputable def AInfinityFunctor.id (C : AInfinityCategory) : AInfinityFunctor
   mapHom := fun f => f
   map_unit := fun _ => trivial
   map_comp := fun _ => trivial
+
+/-- `Path` witness that the identity A-infinity functor preserves objects. -/
+noncomputable def AInfinityFunctor.id_mapObj_path (C : AInfinityCategory) (X : C.Obj) :
+    Path ((AInfinityFunctor.id C).mapObj X) X :=
+  Path.refl X
+
+/-- `Path` witness that the identity A-infinity functor preserves morphisms. -/
+noncomputable def AInfinityFunctor.id_mapHom_path (C : AInfinityCategory)
+    {X Y : C.Obj} (f : C.Hom X Y) :
+    Path ((AInfinityFunctor.id C).mapHom f) f :=
+  Path.refl f
  
 /-! ## Homotopy coherent diagrams -/
  
@@ -145,6 +156,17 @@ noncomputable def SmallFunctor.id (C : SmallCatData.{u}) : SmallFunctor C C wher
   mapHom := fun f => f
   map_id := fun _ => rfl
   map_comp := fun _ _ => rfl
+
+/-- `Path` witness that the identity small functor preserves objects. -/
+noncomputable def SmallFunctor.id_mapObj_path (C : SmallCatData.{u}) (X : C.Obj) :
+    Path ((SmallFunctor.id C).mapObj X) X :=
+  Path.refl X
+
+/-- `Path` witness that the identity small functor preserves morphisms. -/
+noncomputable def SmallFunctor.id_mapHom_path (C : SmallCatData.{u})
+    {X Y : C.Obj} (f : C.Hom X Y) :
+    Path ((SmallFunctor.id C).mapHom f) f :=
+  Path.refl f
  
 /-- Rectification data for a homotopy coherent diagram. -/
 structure Rectification (J : SmallCatData) (C : AInfinityCategory)
@@ -171,6 +193,18 @@ structure CoherentNerveData (C : AInfinityCategory) where
 noncomputable def CoherentNerveData.sSet {C : AInfinityCategory} (N : CoherentNerveData C) :
     SSetData :=
   N.sset
+
+/-- `Path` witness for the left inverse of the coherent-nerve object equivalence. -/
+noncomputable def CoherentNerveData.obj_equiv_left_inv_path {C : AInfinityCategory}
+    (N : CoherentNerveData C) (x : N.sset.obj 0) :
+    Path (N.obj_equiv.invFun (N.obj_equiv.toFun x)) x :=
+  Path.stepChain (N.obj_equiv.left_inv x)
+
+/-- `Path` witness for the right inverse of the coherent-nerve object equivalence. -/
+noncomputable def CoherentNerveData.obj_equiv_right_inv_path {C : AInfinityCategory}
+    (N : CoherentNerveData C) (x : C.Obj) :
+    Path (N.obj_equiv.toFun (N.obj_equiv.invFun x)) x :=
+  Path.stepChain (N.obj_equiv.right_inv x)
  
 /-! ## Boardman-Vogt W-construction -/
  
@@ -182,6 +216,18 @@ structure WConstructionData (C : SmallCatData) where
   obj_equiv : SimpleEquiv aInfinity.Obj C.Obj
   /-- Coherence of the W-construction (abstract). -/
   coherence : True
+
+/-- `Path` witness for the left inverse of the W-construction object equivalence. -/
+noncomputable def WConstructionData.obj_equiv_left_inv_path {C : SmallCatData}
+    (W : WConstructionData C) (x : W.aInfinity.Obj) :
+    Path (W.obj_equiv.invFun (W.obj_equiv.toFun x)) x :=
+  Path.stepChain (W.obj_equiv.left_inv x)
+
+/-- `Path` witness for the right inverse of the W-construction object equivalence. -/
+noncomputable def WConstructionData.obj_equiv_right_inv_path {C : SmallCatData}
+    (W : WConstructionData C) (x : C.Obj) :
+    Path (W.obj_equiv.toFun (W.obj_equiv.invFun x)) x :=
+  Path.stepChain (W.obj_equiv.right_inv x)
  
 
 /-! ## Theorems -/
@@ -228,6 +274,23 @@ theorem rectification_comparison (J : SmallCatData) (C : AInfinityCategory)
     (F : HomotopyCoherentDiagram J C) (R : Rectification J C F) :
     R.comparison = trivial := by
   rfl
+
+/-- `Path` witness exposing the strict diagram identity law in a rectification. -/
+noncomputable def Rectification.strictDiagram_map_id_path
+    (J : SmallCatData) (C : AInfinityCategory)
+    (F : HomotopyCoherentDiagram J C) (R : Rectification J C F)
+    (X : J.Obj) :
+    Path (R.strictDiagram.mapHom (J.id X)) (R.strictCat.id (R.strictDiagram.mapObj X)) :=
+  Path.stepChain (R.strictDiagram.map_id X)
+
+/-- `Path` witness exposing the strict diagram composition law in a rectification. -/
+noncomputable def Rectification.strictDiagram_map_comp_path
+    (J : SmallCatData) (C : AInfinityCategory)
+    (F : HomotopyCoherentDiagram J C) (R : Rectification J C F)
+    {X Y Z : J.Obj} (f : J.Hom X Y) (g : J.Hom Y Z) :
+    Path (R.strictDiagram.mapHom (J.comp f g))
+      (R.strictCat.comp (R.strictDiagram.mapHom f) (R.strictDiagram.mapHom g)) :=
+  Path.stepChain (R.strictDiagram.map_comp f g)
 
 /-- Higher associators: unit_left coherence holds abstractly. -/
 theorem unit_left_coherence (C : AInfinityCategory) :
