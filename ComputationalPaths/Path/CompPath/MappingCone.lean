@@ -152,6 +152,14 @@ theorem cofiberMap_basepoint {A₁ A₂ B₁ B₂ : Type u}
     (comm : ∀ a, g (f₁ a) = f₂ (h a)) :
     cofiberMap h g comm (Cofiber.basepoint (f := f₁)) = Cofiber.basepoint (f := f₂) := rfl
 
+/-- Path witness that the cofiber map preserves the basepoint. -/
+noncomputable def cofiberMap_basepoint_path {A₁ A₂ B₁ B₂ : Type u}
+    {f₁ : A₁ → B₁} {f₂ : A₂ → B₂}
+    (h : A₁ → A₂) (g : B₁ → B₂)
+    (comm : ∀ a, g (f₁ a) = f₂ (h a)) :
+    Path (cofiberMap h g comm (Cofiber.basepoint (f := f₁))) (Cofiber.basepoint (f := f₂)) :=
+  Path.stepChain (cofiberMap_basepoint h g comm)
+
 /-- The cofiber map preserves left inclusions. -/
 theorem cofiberMap_inl {A₁ A₂ B₁ B₂ : Type u}
     {f₁ : A₁ → B₁} {f₂ : A₂ → B₂}
@@ -159,6 +167,15 @@ theorem cofiberMap_inl {A₁ A₂ B₁ B₂ : Type u}
     (comm : ∀ a, g (f₁ a) = f₂ (h a))
     (b : B₁) :
     cofiberMap h g comm (Cofiber.inl (f := f₁) b) = Cofiber.inl (f := f₂) (g b) := rfl
+
+/-- Path witness that the cofiber map preserves left inclusions. -/
+noncomputable def cofiberMap_inl_path {A₁ A₂ B₁ B₂ : Type u}
+    {f₁ : A₁ → B₁} {f₂ : A₂ → B₂}
+    (h : A₁ → A₂) (g : B₁ → B₂)
+    (comm : ∀ a, g (f₁ a) = f₂ (h a))
+    (b : B₁) :
+    Path (cofiberMap h g comm (Cofiber.inl (f := f₁) b)) (Cofiber.inl (f := f₂) (g b)) :=
+  Path.stepChain (cofiberMap_inl h g comm b)
 
 /-! ## Cofiber of the identity -/
 
@@ -224,17 +241,35 @@ theorem cofiber_transport_glue_const
     Path.transport (D := fun _ : Cofiber f => D) (Cofiber.glue f a) d = d := by
   simp [Path.transport_const]
 
+/-- Path witness for constant-family transport along `glue`. -/
+noncomputable def cofiber_transport_glue_const_path
+    (f : A → B) (D : Type u) (a : A) (d : D) :
+    Path (Path.transport (D := fun _ : Cofiber f => D) (Cofiber.glue f a) d) d :=
+  Path.stepChain (cofiber_transport_glue_const f D a d)
+
 /-- Transport along a glueInv path in a constant family. -/
 theorem cofiber_transport_glueInv_const
     (f : A → B) (D : Type u) (a : A) (d : D) :
     Path.transport (D := fun _ : Cofiber f => D) (Cofiber.glueInv f a) d = d := by
   simp [Path.transport_const]
 
+/-- Path witness for constant-family transport along `glueInv`. -/
+noncomputable def cofiber_transport_glueInv_const_path
+    (f : A → B) (D : Type u) (a : A) (d : D) :
+    Path (Path.transport (D := fun _ : Cofiber f => D) (Cofiber.glueInv f a) d) d :=
+  Path.stepChain (cofiber_transport_glueInv_const f D a d)
+
 /-- Transport along a loop at basepoint in a constant family. -/
 theorem cofiber_transport_loop_const
     (f : A → B) (D : Type u) (a : A) (d : D) :
     Path.transport (D := fun _ : Cofiber f => D) (Cofiber.loop f a) d = d := by
   simp [Path.transport_const]
+
+/-- Path witness for constant-family transport along a cofiber loop. -/
+noncomputable def cofiber_transport_loop_const_path
+    (f : A → B) (D : Type u) (a : A) (d : D) :
+    Path (Path.transport (D := fun _ : Cofiber f => D) (Cofiber.loop f a) d) d :=
+  Path.stepChain (cofiber_transport_loop_const f D a d)
 
 /-! ## Cofiber inclusion map -/
 
