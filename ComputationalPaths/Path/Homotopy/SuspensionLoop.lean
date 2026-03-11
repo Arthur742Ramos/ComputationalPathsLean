@@ -83,6 +83,21 @@ noncomputable def id (X : Pointed) : PointedMap X X where
   toFun := _root_.id
   map_pt := rfl
 
+/-- Path witness for basepoint preservation of a pointed map. -/
+noncomputable def map_pt_path (f : PointedMap X Y) :
+    Path (f.toFun X.pt) Y.pt :=
+  Path.stepChain f.map_pt
+
+/-- Path witness that composition preserves the basepoint. -/
+noncomputable def comp_map_pt_path (g : PointedMap Y Z) (f : PointedMap X Y) :
+    Path ((comp g f).toFun X.pt) Z.pt :=
+  map_pt_path (comp g f)
+
+/-- Path witness that the identity pointed map preserves the basepoint. -/
+noncomputable def id_map_pt_path (X : Pointed) :
+    Path ((id X).toFun X.pt) X.pt :=
+  map_pt_path (id X)
+
 end PointedMap
 
 /-! ## Suspension as a Pointed Type
@@ -232,6 +247,46 @@ noncomputable def inducedPi1FromPointed {X Y : Pointed}
     -- β : π₁(Y.carrier, f.toFun X.pt)
     -- Need to transport along f.map_pt : f.toFun X.pt = Y.pt
     f.map_pt ▸ β
+
+/-- The pointed-free induced π₁ map preserves identity maps. -/
+theorem inducedPi1FromPointed'_id {A : Type u} (a : A) :
+    inducedPi1FromPointed' (A := A) (B := A) a (id : A → A) = id := by
+  simpa [inducedPi1FromPointed', Fibration.inducedPi1Map] using
+    (Fibration.inducedPi1Map_id (A := A) a)
+
+/-- Path witness that the pointed-free induced π₁ map preserves identities. -/
+noncomputable def inducedPi1FromPointed'_id_path {A : Type u} (a : A) :
+    Path (inducedPi1FromPointed' (A := A) (B := A) a (id : A → A)) id :=
+  Path.stepChain (inducedPi1FromPointed'_id a)
+
+/-- The pointed-free induced π₁ map respects composition. -/
+theorem inducedPi1FromPointed'_comp {A B C : Type u} (a : A) (f : A → B) (g : B → C) :
+    inducedPi1FromPointed' (A := A) (B := C) a (g ∘ f) =
+      inducedPi1FromPointed' (A := B) (B := C) (f a) g ∘
+        inducedPi1FromPointed' (A := A) (B := B) a f := by
+  simpa [inducedPi1FromPointed', Fibration.inducedPi1Map] using
+    (Fibration.inducedPi1Map_comp (A := A) (B := B) (E := C) f g a)
+
+/-- Path witness that the pointed-free induced π₁ map respects composition. -/
+noncomputable def inducedPi1FromPointed'_comp_path {A B C : Type u}
+    (a : A) (f : A → B) (g : B → C) :
+    Path
+      (inducedPi1FromPointed' (A := A) (B := C) a (g ∘ f))
+      (inducedPi1FromPointed' (A := B) (B := C) (f a) g ∘
+        inducedPi1FromPointed' (A := A) (B := B) a f) :=
+  Path.stepChain (inducedPi1FromPointed'_comp a f g)
+
+/-- The induced π₁ map of the identity pointed map is the identity. -/
+theorem inducedPi1FromPointed_id (X : Pointed) :
+    inducedPi1FromPointed (PointedMap.id X) = id := by
+  funext α
+  simpa [inducedPi1FromPointed, PointedMap.id] using
+    congrFun (inducedPi1FromPointed'_id (A := X.carrier) X.pt) α
+
+/-- Path witness that the identity pointed map induces the identity on π₁. -/
+noncomputable def inducedPi1FromPointed_id_path (X : Pointed) :
+    Path (inducedPi1FromPointed (PointedMap.id X)) id :=
+  Path.stepChain (inducedPi1FromPointed_id X)
 
 /-! ## Connectivity and Freudenthal Preview
 
