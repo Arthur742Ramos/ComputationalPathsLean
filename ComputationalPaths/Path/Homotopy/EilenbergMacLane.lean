@@ -83,17 +83,35 @@ theorem kSpace_piN_forward {G : Type u} {n : Nat} (X : KSpace G n)
     X.piNEquiv.toFun x = X.piNEquiv.toFun x := by
   rfl
 
+/-- Path witness for the forward map of the πₙ equivalence. -/
+noncomputable def kSpace_piN_forward_path {G : Type u} {n : Nat} (X : KSpace G n)
+    (x : HigherHomotopy.PiN n X.carrier X.base) :
+    Path (X.piNEquiv.toFun x) (X.piNEquiv.toFun x) :=
+  Path.stepChain (kSpace_piN_forward X x)
+
 /-- The piN equivalence round-trips on the left. -/
 theorem kSpace_piN_left_inv {G : Type u} {n : Nat} (X : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
     X.piNEquiv.invFun (X.piNEquiv.toFun x) = x :=
   X.piNEquiv.left_inv x
 
+/-- Path witness for the left round-trip of the πₙ equivalence. -/
+noncomputable def kSpace_piN_left_inv_path {G : Type u} {n : Nat} (X : KSpace G n)
+    (x : HigherHomotopy.PiN n X.carrier X.base) :
+    Path (X.piNEquiv.invFun (X.piNEquiv.toFun x)) x :=
+  Path.stepChain (kSpace_piN_left_inv X x)
+
 /-- The piN equivalence round-trips on the right. -/
 theorem kSpace_piN_right_inv {G : Type u} {n : Nat} (X : KSpace G n)
     (y : G) :
     X.piNEquiv.toFun (X.piNEquiv.invFun y) = y :=
   X.piNEquiv.right_inv y
+
+/-- Path witness for the right round-trip of the πₙ equivalence. -/
+noncomputable def kSpace_piN_right_inv_path {G : Type u} {n : Nat} (X : KSpace G n)
+    (y : G) :
+    Path (X.piNEquiv.toFun (X.piNEquiv.invFun y)) y :=
+  Path.stepChain (kSpace_piN_right_inv X y)
 
 /-- The uniqueness equivalence is reflexive when the spaces coincide. -/
 theorem kSpace_unique_self {G : Type u} {n : Nat} (X : KSpace G n)
@@ -102,6 +120,12 @@ theorem kSpace_unique_self {G : Type u} {n : Nat} (X : KSpace G n)
   simp [kSpaceUniqueUpToHomotopy, SimpleEquiv.comp, SimpleEquiv.symm]
   exact X.piNEquiv.left_inv x
 
+/-- Path witness for reflexivity of the uniqueness equivalence. -/
+noncomputable def kSpace_unique_self_path {G : Type u} {n : Nat} (X : KSpace G n)
+    (x : HigherHomotopy.PiN n X.carrier X.base) :
+    Path ((kSpaceUniqueUpToHomotopy X X).toFun x) x :=
+  Path.stepChain (kSpace_unique_self X x)
+
 /-- The uniqueness equivalence composes piN equivalences. -/
 theorem kSpace_unique_comp {G : Type u} {n : Nat} (X Y : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
@@ -109,15 +133,32 @@ theorem kSpace_unique_comp {G : Type u} {n : Nat} (X Y : KSpace G n)
       Y.piNEquiv.invFun (X.piNEquiv.toFun x) := by
   simp [kSpaceUniqueUpToHomotopy, SimpleEquiv.comp, SimpleEquiv.symm]
 
+/-- Path witness for the explicit formula of the uniqueness equivalence. -/
+noncomputable def kSpace_unique_comp_path {G : Type u} {n : Nat} (X Y : KSpace G n)
+    (x : HigherHomotopy.PiN n X.carrier X.base) :
+    Path ((kSpaceUniqueUpToHomotopy X Y).toFun x)
+      (Y.piNEquiv.invFun (X.piNEquiv.toFun x)) :=
+  Path.stepChain (kSpace_unique_comp X Y x)
+
 /-- K(G,1) specialization: the piOne equivalence agrees with the piN equiv. -/
 theorem kOne_piOne_eq_piN {G : Type u} (X : KOneSpace G) :
     X.piOneEquiv = X.piNEquiv := 
   rfl
 
+/-- Path witness for the `K(G,1)` specialization of the πₙ equivalence. -/
+noncomputable def kOne_piOne_eq_piN_path {G : Type u} (X : KOneSpace G) :
+    Path X.piOneEquiv X.piNEquiv :=
+  Path.stepChain (kOne_piOne_eq_piN X)
+
 /-- Uniqueness at K(G,1) level is a special case of general uniqueness. -/
 theorem kOne_unique_eq_general {G : Type u} (X Y : KOneSpace G) :
     kOneUniqueUpToHomotopy X Y = kSpaceUniqueUpToHomotopy X Y := 
   rfl
+
+/-- Path witness for the `K(G,1)` uniqueness specialization. -/
+noncomputable def kOne_unique_eq_general_path {G : Type u} (X Y : KOneSpace G) :
+    Path (kOneUniqueUpToHomotopy X Y) (kSpaceUniqueUpToHomotopy X Y) :=
+  Path.stepChain (kOne_unique_eq_general X Y)
 
 /-- The homotopy equivalence between KSpaces has a left inverse. -/
 theorem kSpace_homotopy_left_inv {G : Type u} {n : Nat} (X Y : KSpace G n)
@@ -128,6 +169,14 @@ theorem kSpace_homotopy_left_inv {G : Type u} {n : Nat} (X Y : KSpace G n)
   rw [show Y.piNEquiv.invFun (X.piNEquiv.toFun x) = Y.piNEquiv.invFun (X.piNEquiv.toFun x) from rfl]
   rw [Y.piNEquiv.right_inv, X.piNEquiv.left_inv]
 
+/-- Path witness for the left inverse of the K-space uniqueness equivalence. -/
+noncomputable def kSpace_homotopy_left_inv_path {G : Type u} {n : Nat} (X Y : KSpace G n)
+    (x : HigherHomotopy.PiN n X.carrier X.base) :
+    Path
+      ((kSpaceUniqueUpToHomotopy Y X).toFun ((kSpaceUniqueUpToHomotopy X Y).toFun x))
+      x :=
+  Path.stepChain (kSpace_homotopy_left_inv X Y x)
+
 /-- The homotopy equivalence between KSpaces has a right inverse. -/
 theorem kSpace_homotopy_right_inv {G : Type u} {n : Nat} (X Y : KSpace G n)
     (y : HigherHomotopy.PiN n Y.carrier Y.base) :
@@ -135,6 +184,14 @@ theorem kSpace_homotopy_right_inv {G : Type u} {n : Nat} (X Y : KSpace G n)
       ((kSpaceUniqueUpToHomotopy Y X).toFun y) = y := by
   simp [kSpaceUniqueUpToHomotopy]
   rw [X.piNEquiv.right_inv, Y.piNEquiv.left_inv]
+
+/-- Path witness for the right inverse of the K-space uniqueness equivalence. -/
+noncomputable def kSpace_homotopy_right_inv_path {G : Type u} {n : Nat} (X Y : KSpace G n)
+    (y : HigherHomotopy.PiN n Y.carrier Y.base) :
+    Path
+      ((kSpaceUniqueUpToHomotopy X Y).toFun ((kSpaceUniqueUpToHomotopy Y X).toFun y))
+      y :=
+  Path.stepChain (kSpace_homotopy_right_inv X Y y)
 
 end EilenbergMacLane
 end Path
