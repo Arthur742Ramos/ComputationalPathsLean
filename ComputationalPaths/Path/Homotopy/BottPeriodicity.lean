@@ -235,7 +235,7 @@ noncomputable def trivial {K B E V M : Type u} (S : StrictMonoid M)
 
 end CannibalisticClass
 
-/-! ## Basic theorem stubs -/
+/-! ## Structural theorems -/
 
 namespace PointedEquiv
 
@@ -249,7 +249,15 @@ theorem refl_toPointedMap_toFun (X : Pointed) :
     (toPointedMap (refl X)).toFun = id :=
   rfl
 
+/-- The identity pointed equivalence preserves the basepoint via refl. -/
+theorem refl_map_pt (X : Pointed) :
+    (refl X).map_pt = Path.refl X.pt :=
+  rfl
 
+/-- Composing the pointed-map conversion with identity gives the same function. -/
+theorem toPointedMap_refl_toFun_eq (X : Pointed) (x : X.carrier) :
+    (toPointedMap (refl X)).toFun x = x :=
+  rfl
 
 end PointedEquiv
 
@@ -260,24 +268,57 @@ theorem bottMap_map_pt {BU : Pointed} (B : BottPeriodicityData BU) :
     (B.bottMap).map_pt = B.bott_equiv.map_pt.toEq :=
   rfl
 
+/-- The pi2 equivalence function from Bott data agrees with the stored equiv. -/
+theorem pi2EquivInt_eq {BU : Pointed} (B : BottPeriodicityData BU) :
+    B.pi2EquivInt = B.pi2_equiv_int :=
+  rfl
 
+/-- The Bott map function agrees with the underlying equivalence. -/
+theorem bottMap_toFun {BU : Pointed} (B : BottPeriodicityData BU) :
+    (B.bottMap).toFun = B.bott_equiv.toEquiv.toFun :=
+  rfl
 
 end BottPeriodicityData
 
 namespace RealBottPeriodicityData
 
+/-- The real Bott map function agrees with the underlying equivalence. -/
+theorem bottMap_toFun {BO : Pointed} (B : RealBottPeriodicityData BO) :
+    (B.bottMap).toFun = B.bott_equiv.toEquiv.toFun :=
+  rfl
+
+/-- The real Bott map preserves basepoints by construction. -/
+theorem bottMap_map_pt {BO : Pointed} (B : RealBottPeriodicityData BO) :
+    (B.bottMap).map_pt = B.bott_equiv.map_pt.toEq :=
+  rfl
 
 end RealBottPeriodicityData
 
 namespace SphereData
 
+/-- The pointed type of a sphere-like type has the same basepoint. -/
+theorem toPointed_pt (S : SphereData) : S.toPointed.pt = S.base :=
+  rfl
 
+/-- The carrier of the pointed conversion agrees with the original. -/
+theorem toPointed_carrier (S : SphereData) : S.toPointed.carrier = S.carrier :=
+  rfl
 
 end SphereData
 
 namespace ClutchingConstruction
 
+/-- The clutching pointed map's function is the clutching map. -/
+theorem clutchingPointedMap_toFun {S : SphereData} {BU : Pointed}
+    (C : ClutchingConstruction S BU) :
+    C.clutchingPointedMap.toFun = C.clutchingMap :=
+  rfl
 
+/-- The clutching pointed map preserves basepoints via the stored path. -/
+theorem clutchingPointedMap_map_pt {S : SphereData} {BU : Pointed}
+    (C : ClutchingConstruction S BU) :
+    C.clutchingPointedMap.map_pt = C.clutching_base.toEq :=
+  rfl
 
 end ClutchingConstruction
 
@@ -293,12 +334,55 @@ theorem trivial_psi_one_path {M : Type u} (S : StrictMonoid M) (x : KTheory.K0 S
     AdamsOperation.psi_one_path (AdamsOperation.trivial S) x = Path.stepChain rfl :=
   rfl
 
+/-- psi^1 applied twice is the identity. -/
+theorem psi_one_twice {M : Type u} {S : StrictMonoid M} (A : AdamsOperation S)
+    (x : KTheory.K0 S) : A.psi 1 (A.psi 1 x) = x := by
+  rw [A.psi_one, A.psi_one]
 
+/-- Path witnessing psi^1 ∘ psi^1 = id. -/
+noncomputable def psi_one_twice_path {M : Type u} {S : StrictMonoid M}
+    (A : AdamsOperation S) (x : KTheory.K0 S) :
+    Path (A.psi 1 (A.psi 1 x)) x :=
+  Path.trans
+    (Path.stepChain (_root_.congrArg (A.psi 1) (A.psi_one x)))
+    (Path.stepChain (A.psi_one x))
+
+/-- The trivial Adams operation's psi_zero is reflexive. -/
+theorem trivial_psi_zero {M : Type u} (S : StrictMonoid M) :
+    (AdamsOperation.trivial S).psi_zero = rfl :=
+  rfl
 
 end AdamsOperation
 
 namespace CannibalisticClass
 
+/-- The trivial cannibalistic class has k=1. -/
+theorem trivial_k {K B E V M : Type u} (S : StrictMonoid M)
+    (bundle : VectorBundle.VectorBundleData K B E V) :
+    (CannibalisticClass.trivial S bundle).k = 1 :=
+  rfl
+
+/-- The trivial cannibalistic class has zero Thom class. -/
+theorem trivial_thomClass {K B E V M : Type u} (S : StrictMonoid M)
+    (bundle : VectorBundle.VectorBundleData K B E V) :
+    (CannibalisticClass.trivial S bundle).thomClass = KTheory.zero S :=
+  rfl
+
+/-- The trivial cannibalistic class equals the zero class. -/
+theorem trivial_cannibalistic {K B E V M : Type u} (S : StrictMonoid M)
+    (bundle : VectorBundle.VectorBundleData K B E V) :
+    (CannibalisticClass.trivial S bundle).cannibalistic = KTheory.zero S :=
+  rfl
+
+/-- Path from psi^k(thom) to the cannibalistic class for trivial data. -/
+noncomputable def trivial_psi_thom_path {K B E V M : Type u} (S : StrictMonoid M)
+    (bundle : VectorBundle.VectorBundleData K B E V) :
+    Path
+      ((CannibalisticClass.trivial S bundle).adams.psi
+        (CannibalisticClass.trivial S bundle).k
+        (CannibalisticClass.trivial S bundle).thomClass)
+      (CannibalisticClass.trivial S bundle).cannibalistic :=
+  Path.refl _
 
 end CannibalisticClass
 
