@@ -138,24 +138,52 @@ structure TransferredModelStructure (A : Type u) (B : Type v) where
 theorem quillenModelCategory_def (A : Type u) :
     QuillenModelCategory A = ModelCategory A := rfl
 
+/-- Path witness for the Quillen-model-category alias. -/
+noncomputable def quillenModelCategory_def_path (A : Type u) :
+    Path (QuillenModelCategory A) (ModelCategory A) :=
+  Path.stepChain (quillenModelCategory_def A)
+
 theorem ho_def {A : Type u} (M : ModelCategory A) :
     Ho (A := A) M = homotopyCategory A := rfl
+
+/-- Path witness for the homotopy-category alias. -/
+noncomputable def ho_def_path {A : Type u} (M : ModelCategory A) :
+    Path (Ho (A := A) M) (homotopyCategory A) :=
+  Path.stepChain (ho_def M)
 
 
 
 theorem hoFunctor_id_map {A : Type u} {a b : A} (p : PathRwQuot A a b) :
     (HoFunctor.id A).map p = p := rfl
 
+/-- Explicit path witness for the identity homotopy functor on morphisms. -/
+noncomputable def hoFunctor_id_map_path {A : Type u} {a b : A} (p : PathRwQuot A a b) :
+    Path ((HoFunctor.id A).map p) p :=
+  Path.stepChain (hoFunctor_id_map p)
+
 theorem hoFunctor_id_map_refl {A : Type u} (a : A) :
     Nonempty (Path ((HoFunctor.id A).map (PathRwQuot.refl (A := A) a))
       (PathRwQuot.refl (A := A) a)) :=
   ⟨Path.refl _⟩
+
+/-- Explicit path witness for the identity homotopy functor on identities. -/
+noncomputable def hoFunctor_id_map_refl_path {A : Type u} (a : A) :
+    Path ((HoFunctor.id A).map (PathRwQuot.refl (A := A) a))
+      (PathRwQuot.refl (A := A) a) :=
+  Path.refl _
 
 theorem hoFunctor_id_map_trans {A : Type u} {a b c : A}
     (p : PathRwQuot A a b) (q : PathRwQuot A b c) :
     Nonempty (Path ((HoFunctor.id A).map (PathRwQuot.trans p q))
       (PathRwQuot.trans ((HoFunctor.id A).map p) ((HoFunctor.id A).map q))) :=
   ⟨Path.refl _⟩
+
+/-- Explicit path witness for the identity homotopy functor on composition. -/
+noncomputable def hoFunctor_id_map_trans_path {A : Type u} {a b c : A}
+    (p : PathRwQuot A a b) (q : PathRwQuot A b c) :
+    Path ((HoFunctor.id A).map (PathRwQuot.trans p q))
+      (PathRwQuot.trans ((HoFunctor.id A).map p) ((HoFunctor.id A).map q)) :=
+  Path.refl _
 
 theorem leftDerivedFunctor_has_derived {A : Type u} {B : Type v}
     {M : ModelCategory A} {N : ModelCategory B} {F : ModelFunctor M N}
@@ -175,6 +203,11 @@ theorem derivedAdjunction_has_laws {A : Type u} {B : Type v}
 theorem identityQuillenEquivalence_adjunction {A : Type u} (M : ModelCategory A) :
     (identityQuillenEquivalence M).adjunction = identityQuillenAdjunction (M := M) := rfl
 
+/-- Path witness for the adjunction field of the identity Quillen equivalence. -/
+noncomputable def identityQuillenEquivalence_adjunction_path {A : Type u} (M : ModelCategory A) :
+    Path (identityQuillenEquivalence M).adjunction (identityQuillenAdjunction (M := M)) :=
+  Path.stepChain (identityQuillenEquivalence_adjunction M)
+
 theorem identityQuillenEquivalence_has_derived {A : Type u} (M : ModelCategory A) :
     (identityQuillenEquivalence M).derived_equivalence = trivial := rfl
 
@@ -186,6 +219,12 @@ theorem transferredModelStructure_has_adjunction {A : Type u} {B : Type v}
     (T : TransferredModelStructure A B) :
     Nonempty (ModelAdjunction T.source T.target T.left T.right) :=
   ⟨T.adjunction⟩
+
+/-- Explicit adjunction data carried by a transferred model structure. -/
+noncomputable def transferredModelStructure_adjunction_data {A : Type u} {B : Type v}
+    (T : TransferredModelStructure A B) :
+    ModelAdjunction T.source T.target T.left T.right :=
+  T.adjunction
 
 /-! ## Summary -/
 
