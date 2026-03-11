@@ -54,6 +54,16 @@ noncomputable def contract_path (U : ContractibleIn X) (x : U.carrier) :
     Path (U.incl x) U.center :=
   U.contract x
 
+/-- The center connects back to any point in a contractible-in-X set. -/
+noncomputable def center_to_point_path (U : ContractibleIn X) (x : U.carrier) :
+    Path U.center (U.incl x) :=
+  Path.symm (contract_path U x)
+
+/-- Any two points in a contractible-in-X set are connected inside `X`. -/
+noncomputable def points_path (U : ContractibleIn X) (x y : U.carrier) :
+    Path (U.incl x) (U.incl y) :=
+  Path.trans (contract_path U x) (center_to_point_path U y)
+
 /-- Build a contractible-in-X set from a contractible carrier. -/
 noncomputable def ofIsContr {U : Type u} (h : Truncation.IsContr U) (incl : U -> X) :
     ContractibleIn X where
@@ -85,6 +95,16 @@ noncomputable def cover_path (C : LSCover X n) (x : X) :
     Path ((C.sets (C.cover x).1).incl (C.cover x).2) x :=
   Path.stepChain (C.cover_eq x)
 
+/-- The chosen covering point contracts to the center of its covering set. -/
+noncomputable def cover_center_path (C : LSCover X n) (x : X) :
+    Path ((C.sets (C.cover x).1).incl (C.cover x).2) ((C.sets (C.cover x).1).center) :=
+  ContractibleIn.contract_path (C.sets (C.cover x).1) (C.cover x).2
+
+/-- Every point of `X` is connected to the center of its chosen covering set. -/
+noncomputable def point_to_cover_center_path (C : LSCover X n) (x : X) :
+    Path x ((C.sets (C.cover x).1).center) :=
+  Path.trans (Path.symm (cover_path C x)) (cover_center_path C x)
+
 end LSCover
 
 /-! ## LS-category data -/
@@ -106,10 +126,20 @@ variable {X : Type u}
 noncomputable def catValue (data : LSCategoryData X) : Nat :=
   data.cat
 
+/-- `Path`-typed accessor for the LS-category value. -/
+noncomputable def catValue_path (data : LSCategoryData X) :
+    Path (catValue data) data.cat :=
+  Path.stepChain rfl
+
 /-- Minimality witness for cat(X). -/
 theorem cat_minimal (data : LSCategoryData X) (m : Nat) (h : LSCover X m) :
     data.cat <= m :=
   data.minimal m h
+
+/-- Every point is connected to the center of its chosen covering set. -/
+noncomputable def point_to_cover_center_path (data : LSCategoryData X) (x : X) :
+    Path x ((data.cover.sets (data.cover.cover x).1).center) :=
+  LSCover.point_to_cover_center_path data.cover x
 
 end LSCategoryData
 
@@ -180,6 +210,11 @@ variable {X : Type u} {n : Nat}
 noncomputable def section_path (g : GaneaFibration X n) (x : X) :
     Path (g.proj (g.sectionMap x)) x :=
   Path.stepChain (g.sectionMap_eq x)
+
+/-- Symmetric path witness for the section equation. -/
+noncomputable def point_to_section_path (g : GaneaFibration X n) (x : X) :
+    Path x (g.proj (g.sectionMap x)) :=
+  Path.symm (section_path g x)
 
 end GaneaFibration
 
