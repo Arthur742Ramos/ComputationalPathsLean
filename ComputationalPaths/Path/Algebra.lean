@@ -16,3 +16,8 @@ import ComputationalPaths.Path.Algebra.RepresentationPaths
 import ComputationalPaths.Path.Algebra.RepresentationTheoryDeep
 import ComputationalPaths.Path.Algebra.StringRewritingDeep
 import ComputationalPaths.Path.Algebra.TypedRewritingDeep
+import ComputationalPaths.Path.Algebra.PerfectoidPaths
+import ComputationalPaths.Path.Algebra.FloerHomologyPaths
+import ComputationalPaths.Path.Algebra.GeometricLanglandsPaths
+import ComputationalPaths.Path.Algebra.TropicalGeometryPaths
+import ComputationalPaths.Path.Algebra.QuantumTopologyPaths
