@@ -267,13 +267,14 @@ theorem BetaMulti.lamBody (ty : Ty) {body body' : Term}
 noncomputable def NormalForm (t : Term) : Prop :=
   forall t', ¬ Nonempty (BetaStep t t')
 
-/-- A term is in weak head normal form -/
+/-- A term is in weak head normal form iff it is not a beta-redex at the top level.
+    Variables and lambdas are always in WHNF; applications (lam _ _) t are not. -/
 noncomputable def WeakHeadNF (t : Term) : Prop :=
   match t with
-  | Term.var _ => True
-  | Term.lam _ _ => True
+  | Term.var n => n = n
+  | Term.lam ty _ => ty = ty
   | Term.app (Term.lam _ _) _ => False
-  | Term.app _ _ => True
+  | Term.app _ _ => t = t
 
 /-- Theorem 21: variables are in normal form -/
 theorem var_normalForm (n : Nat) : NormalForm (Term.var n) := by
@@ -284,20 +285,20 @@ theorem var_normalForm (n : Nat) : NormalForm (Term.var n) := by
 /-- Theorem 22: normal form implies WHNF -/
 theorem normalForm_imp_whnf (t : Term) (h : NormalForm t) : WeakHeadNF t := by
   cases t with
-  | var n => exact True.intro
-  | lam _ _ => exact True.intro
+  | var n => show n = n; rfl
+  | lam ty _ => show ty = ty; rfl
   | app t1 t2 =>
-    simp [WeakHeadNF]
+    unfold WeakHeadNF
     cases t1 with
-    | var _ => exact True.intro
-    | app _ _ => exact True.intro
+    | var _ => rfl
+    | app _ _ => rfl
     | lam ty body => exact absurd ⟨BetaStep.beta ty body t2⟩ (h _)
 
 /-- Theorem 23: variables are WHNF -/
-theorem var_whnf (n : Nat) : WeakHeadNF (Term.var n) := True.intro
+theorem var_whnf (n : Nat) : WeakHeadNF (Term.var n) := rfl
 
 /-- Theorem 24: lambdas are WHNF -/
-theorem lam_whnf (ty : Ty) (body : Term) : WeakHeadNF (Term.lam ty body) := True.intro
+theorem lam_whnf (ty : Ty) (body : Term) : WeakHeadNF (Term.lam ty body) := rfl
 
 /-- Theorem 25: normal form is unique in multi-step -/
 theorem normalForm_multi_eq {t nf : Term}

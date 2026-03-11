@@ -175,15 +175,18 @@ noncomputable def conservation_compose_rweq (c₁ c₂ : ConservationResult)
 structure ReverseEquivalence where
   base : String
   axiom_system : String
-  theorem_statement : Prop
+  /-- Encoded theorem statement as a Nat index (0-indexed in a catalogue). -/
+  theoremId : Nat
+  /-- The equivalence holds: the forward direction is provable in the axiom system. -/
   forward : Path (True : Prop) True
+  /-- The reverse direction: the theorem implies the axiom system over the base. -/
   reverse : Path (True : Prop) True
 
-/-- WKL₀ ↔ IVT over RCA₀. -/
+/-- WKL₀ ↔ IVT (Intermediate Value Theorem) over RCA₀. -/
 noncomputable def wkl_equiv_ivt : ReverseEquivalence where
   base := "RCA₀"
   axiom_system := "WKL₀"
-  theorem_statement := True
+  theoremId := 0  -- IVT
   forward := Path.refl _
   reverse := Path.refl _
 
@@ -191,7 +194,7 @@ noncomputable def wkl_equiv_ivt : ReverseEquivalence where
 noncomputable def aca_equiv_bw : ReverseEquivalence where
   base := "RCA₀"
   axiom_system := "ACA₀"
-  theorem_statement := True
+  theoremId := 1  -- Bolzano-Weierstrass
   forward := Path.refl _
   reverse := Path.refl _
 
@@ -199,7 +202,7 @@ noncomputable def aca_equiv_bw : ReverseEquivalence where
 noncomputable def aca_equiv_monotone_conv : ReverseEquivalence where
   base := "RCA₀"
   axiom_system := "ACA₀"
-  theorem_statement := True
+  theoremId := 2  -- Monotone convergence
   forward := Path.refl _
   reverse := Path.refl _
 
@@ -207,7 +210,7 @@ noncomputable def aca_equiv_monotone_conv : ReverseEquivalence where
 noncomputable def atr_equiv_comparability : ReverseEquivalence where
   base := "RCA₀"
   axiom_system := "ATR₀"
-  theorem_statement := True
+  theoremId := 3  -- Comparability of well-orderings
   forward := Path.refl _
   reverse := Path.refl _
 

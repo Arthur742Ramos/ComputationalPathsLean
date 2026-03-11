@@ -69,14 +69,14 @@ structure SimplicialComplex (V : Type u) where
   hasEmpty : hasFace ⟨[]⟩
 
 noncomputable def totalComplex (V : Type u) : SimplicialComplex V where
-  hasFace := fun _ => True
-  hasEmpty := True.intro
+  hasFace := fun s => s.verts = s.verts
+  hasEmpty := rfl
 
 theorem totalComplex_face {V : Type u} (s : Simplex V) :
-    (totalComplex V).hasFace s := True.intro
+    (totalComplex V).hasFace s := rfl
 
 @[simp] theorem totalComplex_empty {V : Type u} :
-    (totalComplex V).hasFace ⟨([] : List V)⟩ := True.intro
+    (totalComplex V).hasFace ⟨([] : List V)⟩ := rfl
 
 noncomputable def complex_refl_path {V : Type u} (K : SimplicialComplex V) : Path K K :=
   Path.refl K
@@ -85,19 +85,20 @@ noncomputable def complex_refl_path {V : Type u} (K : SimplicialComplex V) : Pat
 
 structure Filtration (V : Type u) where
   level : Nat → SimplicialComplex V
-  monotone : True
+  monotone : ∀ (i j : Nat), i ≤ j → ∀ s, (level i).hasFace s → (level j).hasFace s
 
 noncomputable def constantFiltration {V : Type u} (K : SimplicialComplex V) : Filtration V where
   level := fun _ => K
-  monotone := True.intro
+  monotone := fun _ _ _ _ h => h
 
 @[simp] theorem constantFiltration_level {V : Type u}
     (K : SimplicialComplex V) (n : Nat) :
     (constantFiltration K).level n = K := rfl
 
 @[simp] theorem constantFiltration_monotone {V : Type u}
-    (K : SimplicialComplex V) :
-    (constantFiltration K).monotone = True.intro := rfl
+    (K : SimplicialComplex V) (i j : Nat) (h : i ≤ j) (s : Simplex V)
+    (hf : (constantFiltration K).level i |>.hasFace s) :
+    (constantFiltration K).level j |>.hasFace s := hf
 
 @[simp] theorem filtration_level_zero {V : Type u}
     (F : Filtration V) : F.level 0 = F.level 0 := rfl
@@ -126,14 +127,15 @@ noncomputable def filtration_succ_level_path {V : Type u}
 structure PersistenceModule where
   carrier : Nat → Type u
   map : {i j : Nat} → i ≤ j → carrier i → carrier j
-  mapId : True
-  mapComp : True
+  mapId : ∀ (i : Nat) (x : carrier i), map (Nat.le_refl i) x = x
+  mapComp : ∀ {i j k : Nat} (hij : i ≤ j) (hjk : j ≤ k) (x : carrier i),
+    map (Nat.le_trans hij hjk) x = map hjk (map hij x)
 
 noncomputable def shift (M : PersistenceModule) (eps : Nat) : PersistenceModule where
   carrier := fun i => M.carrier (i + eps)
   map := fun {_i _j} h => M.map (Nat.add_le_add_right h eps)
-  mapId := True.intro
-  mapComp := True.intro
+  mapId := fun i x => M.mapId (i + eps) x
+  mapComp := fun {i j k} hij hjk x => M.mapComp (Nat.add_le_add_right hij eps) (Nat.add_le_add_right hjk eps) x
 
 @[simp] theorem shift_carrier (M : PersistenceModule) (eps i : Nat) :
     (shift M eps).carrier i = M.carrier (i + eps) := rfl
@@ -142,17 +144,20 @@ noncomputable def shift (M : PersistenceModule) (eps : Nat) : PersistenceModule 
     {i j : Nat} (h : i ≤ j) :
     (shift M eps).map h = M.map (Nat.add_le_add_right h eps) := rfl
 
-@[simp] theorem shift_mapId (M : PersistenceModule) (eps : Nat) :
-    (shift M eps).mapId = True.intro := rfl
+@[simp] theorem shift_mapId (M : PersistenceModule) (eps i : Nat) (x : (shift M eps).carrier i) :
+    (shift M eps).map (Nat.le_refl i) x = x :=
+  (shift M eps).mapId i x
 
-@[simp] theorem shift_mapComp (M : PersistenceModule) (eps : Nat) :
-    (shift M eps).mapComp = True.intro := rfl
+@[simp] theorem shift_mapComp (M : PersistenceModule) (eps : Nat)
+    {i j k : Nat} (hij : i ≤ j) (hjk : j ≤ k) (x : (shift M eps).carrier i) :
+    (shift M eps).map (Nat.le_trans hij hjk) x = (shift M eps).map hjk ((shift M eps).map hij x) :=
+  (shift M eps).mapComp hij hjk x
 
 noncomputable def identityModule (A : Type u) : PersistenceModule where
   carrier := fun _ => A
   map := fun {_i _j} _ x => x
-  mapId := True.intro
-  mapComp := True.intro
+  mapId := fun _ _ => rfl
+  mapComp := fun _ _ _ => rfl
 
 @[simp] theorem identityModule_carrier (A : Type u) (n : Nat) :
     (identityModule A).carrier n = A := rfl
@@ -161,21 +166,24 @@ noncomputable def identityModule (A : Type u) : PersistenceModule where
     (h : i ≤ j) (x : (identityModule A).carrier i) :
     (identityModule A).map h x = x := rfl
 
-@[simp] theorem identityModule_mapId (A : Type u) :
-    (identityModule A).mapId = True.intro := rfl
+@[simp] theorem identityModule_mapId (A : Type u) (i : Nat) (x : (identityModule A).carrier i) :
+    (identityModule A).map (Nat.le_refl i) x = x := rfl
 
-@[simp] theorem identityModule_mapComp (A : Type u) :
-    (identityModule A).mapComp = True.intro := rfl
+@[simp] theorem identityModule_mapComp (A : Type u)
+    {i j k : Nat} (hij : i ≤ j) (hjk : j ≤ k) (x : (identityModule A).carrier i) :
+    (identityModule A).map (Nat.le_trans hij hjk) x =
+      (identityModule A).map hjk ((identityModule A).map hij x) := rfl
 
 structure Interleaving (M N : PersistenceModule) (eps : Nat) where
   forward : (i : Nat) → M.carrier i → N.carrier (i + eps)
   backward : (i : Nat) → N.carrier i → M.carrier (i + eps)
-  coherence : True
+  coherence : ∀ (i : Nat) (x : M.carrier i),
+    backward (i + eps) (forward i x) = M.map (by omega) x
 
 noncomputable def trivialInterleaving (M : PersistenceModule) : Interleaving M M 0 where
   forward := fun _ x => by simpa using x
   backward := fun _ x => by simpa using x
-  coherence := True.intro
+  coherence := fun i x => by simp; exact (M.mapId i x).symm
 
 @[simp] theorem trivialInterleaving_forward (M : PersistenceModule)
     (i : Nat) (x : M.carrier i) :
@@ -187,8 +195,11 @@ noncomputable def trivialInterleaving (M : PersistenceModule) : Interleaving M M
     (trivialInterleaving M).backward i x = x := by
   simp [trivialInterleaving]
 
-@[simp] theorem trivialInterleaving_coherence (M : PersistenceModule) :
-    (trivialInterleaving M).coherence = True.intro := rfl
+@[simp] theorem trivialInterleaving_coherence (M : PersistenceModule) (i : Nat)
+    (x : M.carrier i) :
+    (trivialInterleaving M).backward (i + 0) ((trivialInterleaving M).forward i x) =
+      M.map (by omega) x :=
+  (trivialInterleaving M).coherence i x
 
 noncomputable def interleavingDistance (_M _N : PersistenceModule) : Nat := 0
 
@@ -339,16 +350,16 @@ noncomputable def CechComplex (X : FiniteMetricSpace) (_eps : Nat) :
   totalComplex X.Point
 
 theorem vietorisFace (X : FiniteMetricSpace) (eps : Nat) (s : Simplex X.Point) :
-    (VietorisRipsComplex X eps).hasFace s := True.intro
+    (VietorisRipsComplex X eps).hasFace s := rfl
 
 theorem vietorisEmpty (X : FiniteMetricSpace) (eps : Nat) :
-    (VietorisRipsComplex X eps).hasFace ⟨([] : List X.Point)⟩ := True.intro
+    (VietorisRipsComplex X eps).hasFace ⟨([] : List X.Point)⟩ := rfl
 
 theorem cechFace (X : FiniteMetricSpace) (eps : Nat) (s : Simplex X.Point) :
-    (CechComplex X eps).hasFace s := True.intro
+    (CechComplex X eps).hasFace s := rfl
 
 theorem cechEmpty (X : FiniteMetricSpace) (eps : Nat) :
-    (CechComplex X eps).hasFace ⟨([] : List X.Point)⟩ := True.intro
+    (CechComplex X eps).hasFace ⟨([] : List X.Point)⟩ := rfl
 
 theorem vietoris_eq_cech (X : FiniteMetricSpace) (eps : Nat) :
     VietorisRipsComplex X eps = CechComplex X eps := rfl
@@ -363,11 +374,11 @@ noncomputable def cech_path_refl (X : FiniteMetricSpace) (eps : Nat) :
 
 noncomputable def ripsFiltration (X : FiniteMetricSpace) : Filtration X.Point where
   level := fun eps => VietorisRipsComplex X eps
-  monotone := True.intro
+  monotone := fun _ _ _ _ h => h
 
 noncomputable def cechFiltration (X : FiniteMetricSpace) : Filtration X.Point where
   level := fun eps => CechComplex X eps
-  monotone := True.intro
+  monotone := fun _ _ _ _ h => h
 
 @[simp] theorem ripsFiltration_level (X : FiniteMetricSpace) (n : Nat) :
     (ripsFiltration X).level n = VietorisRipsComplex X n := rfl
@@ -375,11 +386,13 @@ noncomputable def cechFiltration (X : FiniteMetricSpace) : Filtration X.Point wh
 @[simp] theorem cechFiltration_level (X : FiniteMetricSpace) (n : Nat) :
     (cechFiltration X).level n = CechComplex X n := rfl
 
-@[simp] theorem ripsFiltration_monotone (X : FiniteMetricSpace) :
-    (ripsFiltration X).monotone = True.intro := rfl
+@[simp] theorem ripsFiltration_monotone (X : FiniteMetricSpace) (i j : Nat) (h : i ≤ j)
+    (s : Simplex X.Point) (hf : (ripsFiltration X).level i |>.hasFace s) :
+    (ripsFiltration X).level j |>.hasFace s := hf
 
-@[simp] theorem cechFiltration_monotone (X : FiniteMetricSpace) :
-    (cechFiltration X).monotone = True.intro := rfl
+@[simp] theorem cechFiltration_monotone (X : FiniteMetricSpace) (i j : Nat) (h : i ≤ j)
+    (s : Simplex X.Point) (hf : (cechFiltration X).level i |>.hasFace s) :
+    (cechFiltration X).level j |>.hasFace s := hf
 
 theorem rips_cech_level_eq (X : FiniteMetricSpace) (n : Nat) :
     (ripsFiltration X).level n = (cechFiltration X).level n := rfl
@@ -410,14 +423,15 @@ structure ZigzagModule where
   arrow : Nat → ZigzagArrow
   mapFwd : (i : Nat) → obj i → obj (i + 1)
   mapBwd : (i : Nat) → obj (i + 1) → obj i
-  coherence : True
+  coherence : ∀ (i : Nat) (x : obj i),
+    mapBwd i (mapFwd i x) = x
 
 noncomputable def constantZigzag (A : Type u) : ZigzagModule where
   obj := fun _ => A
   arrow := fun _ => ZigzagArrow.fwd
   mapFwd := fun _ x => x
   mapBwd := fun _ x => x
-  coherence := True.intro
+  coherence := fun _ _ => rfl
 
 @[simp] theorem constantZigzag_arrow (A : Type u) (i : Nat) :
     (constantZigzag A).arrow i = ZigzagArrow.fwd := rfl
@@ -430,8 +444,8 @@ noncomputable def constantZigzag (A : Type u) : ZigzagModule where
     (x : (constantZigzag A).obj (i + 1)) :
     (constantZigzag A).mapBwd i x = x := rfl
 
-@[simp] theorem constantZigzag_coherence (A : Type u) :
-    (constantZigzag A).coherence = True.intro := rfl
+@[simp] theorem constantZigzag_coherence (A : Type u) (i : Nat) (x : (constantZigzag A).obj i) :
+    (constantZigzag A).mapBwd i ((constantZigzag A).mapFwd i x) = x := rfl
 
 noncomputable def zigzag_arrow_path (A : Type u) (i : Nat) :
     Path ((constantZigzag A).arrow i) ((constantZigzag A).arrow i) :=
@@ -531,12 +545,12 @@ noncomputable def elderRule_path_refl (cs : List PersistenceClass) :
 structure StabilityWitness (M N : PersistenceModule) where
   Sym : Sym
   Gam : Gam
-  cert : True
+  cert : interleavingDistance M N ≤ Sym + Gam
 
 noncomputable def trivialStability (M N : PersistenceModule) : StabilityWitness M N where
   Sym := 0
   Gam := 0
-  cert := True.intro
+  cert := by simp [interleavingDistance]
 
 @[simp] theorem trivialStability_Sym (M N : PersistenceModule) :
     (trivialStability M N).Sym = 0 := rfl
@@ -544,8 +558,9 @@ noncomputable def trivialStability (M N : PersistenceModule) : StabilityWitness 
 @[simp] theorem trivialStability_Gam (M N : PersistenceModule) :
     (trivialStability M N).Gam = 0 := rfl
 
-@[simp] theorem trivialStability_cert (M N : PersistenceModule) :
-    (trivialStability M N).cert = True.intro := rfl
+theorem trivialStability_cert_le (M N : PersistenceModule) :
+    interleavingDistance M N ≤ (trivialStability M N).Sym + (trivialStability M N).Gam :=
+  (trivialStability M N).cert
 
 theorem algebraic_stability_shape (M N : PersistenceModule) :
     bottleneckDistance emptyDiagram emptyDiagram ≤ interleavingDistance M N := by

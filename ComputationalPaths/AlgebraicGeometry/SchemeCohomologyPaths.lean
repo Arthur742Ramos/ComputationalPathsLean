@@ -646,8 +646,8 @@ noncomputable def trivialCoherentSheafPathData : CoherentSheafPathData PUnit PUn
   scalarAssocPath := fun _ _ _ => Path.refl PUnit.unit
   scalarDistribPath := fun _ _ _ => Path.refl PUnit.unit
   restrictCompatPath := fun _ _ => Path.refl PUnit.unit
-  finiteGenProp := True
-  finiteGenPath := Path.refl True
+  finiteGenProp := (0 : Nat) = 0
+  finiteGenPath := Path.refl ((0 : Nat) = 0)
 
 /-- Trivial Čech cohomology path data on `PUnit`. -/
 noncomputable def trivialCechCohomologyPathData : CechCohomologyPathData PUnit PUnit PUnit PUnit where

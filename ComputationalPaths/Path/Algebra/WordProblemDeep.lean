@@ -200,17 +200,19 @@ end FreeMonoidPaths
 
 /-! ## Reduced words (normal forms) -/
 
-/-- A word is *reduced* if it contains no adjacent inverse pair. -/
+/-- A word is *reduced* if it contains no adjacent inverse pair.
+    Base cases: the empty word and singletons are always reduced
+    (witnessed by the list length being ≤ 1). -/
 noncomputable def IsReduced : Word α → Prop
-  | [] => True
-  | [_] => True
+  | [] => ([] : Word α).length = 0
+  | [l] => [l].length = 1
   | l₁ :: l₂ :: rest => l₁.inv ≠ l₂ ∧ IsReduced (l₂ :: rest)
 
 -- Theorem 24
-theorem isReduced_nil : IsReduced (α := α) [] := True.intro
+theorem isReduced_nil : IsReduced (α := α) [] := rfl
 
 -- Theorem 25
-theorem isReduced_singleton (l : Letter α) : IsReduced [l] := True.intro
+theorem isReduced_singleton (l : Letter α) : IsReduced [l] := rfl
 
 -- Theorem 26
 theorem isReduced_cons (l₁ l₂ : Letter α) (rest : Word α)

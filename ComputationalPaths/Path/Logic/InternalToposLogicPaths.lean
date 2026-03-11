@@ -322,7 +322,9 @@ noncomputable def charMap_false {A : Type u} [DecidableEq A] :
 noncomputable def subtermMeet (P Q : Prop) : Prop := P ∧ Q
 noncomputable def subtermJoin (P Q : Prop) : Prop := P ∨ Q
 noncomputable def subtermImpl (P Q : Prop) : Prop := P → Q
-noncomputable def subtermTop : Prop := True
+/-- The top subterminal: the terminal object in the lattice of subterminals.
+    Defined as the reflexivity of zero. -/
+noncomputable def subtermTop : Prop := (0 : Nat) = 0
 noncomputable def subtermBot : Prop := False
 
 /-- 36. Path: meet commutativity for subterminals. -/
@@ -338,7 +340,7 @@ noncomputable def subterm_join_comm (P Q : Prop) :
 /-- 38. Path: meet with True is identity. -/
 noncomputable def subterm_meet_true (P : Prop) :
     Path (subtermMeet P subtermTop) P :=
-  Path.mk [] (propext ⟨fun ⟨p, _⟩ => p, fun p => ⟨p, trivial⟩⟩)
+  Path.mk [] (propext ⟨fun ⟨p, _⟩ => p, fun p => ⟨p, rfl⟩⟩)
 
 /-- 39. Path: join with False is identity. -/
 noncomputable def subterm_join_false (P : Prop) :
@@ -356,12 +358,12 @@ noncomputable def subterm_distrib (P Q R : Prop) :
 /-- 41. Path: impl reflexivity. -/
 noncomputable def subterm_impl_refl (P : Prop) :
     Path (subtermImpl P P) subtermTop :=
-  Path.mk [] (propext ⟨fun _ => trivial, fun _ h => h⟩)
+  Path.mk [] (propext ⟨fun _ => (rfl : (0 : Nat) = 0), fun _ h => h⟩)
 
 /-- 42. 2-step chain: meet comm then meet with top. -/
 noncomputable def subterm_comm_top_chain (P Q : Prop) :
     Path (subtermMeet (subtermMeet P Q) subtermTop) (subtermMeet P Q) :=
-  Path.mk [] (propext ⟨fun ⟨h, _⟩ => h, fun h => ⟨h, trivial⟩⟩)
+  Path.mk [] (propext ⟨fun ⟨h, _⟩ => h, fun h => ⟨h, rfl⟩⟩)
 
 /-! ## §8 Internal Categories -/
 

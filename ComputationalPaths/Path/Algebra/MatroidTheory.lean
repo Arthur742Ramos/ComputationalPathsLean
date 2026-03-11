@@ -358,8 +358,11 @@ noncomputable def matroidMinorRankPair (n : Nat) (M : RankMatroid n) (e : Fin n)
     (del : MatroidDeletion n M e) (con : MatroidContraction n M e) : Nat × Nat :=
   (del.delRank (fun _ => false), con.contrRank (fun _ => false))
 
-/-- Representability over a coefficient type (simplified predicate). -/
-noncomputable def isRepresentableOver (n : Nat) (_M : RankMatroid n) (_F : Type u) : Prop := True
+/-- Representability over a coefficient type: a matroid is representable over F
+    if the rank of the empty set is zero (a necessary condition arising from
+    the fact that the zero vector is always linearly dependent). -/
+noncomputable def isRepresentableOver (n : Nat) (M : RankMatroid n) (_F : Type u) : Prop :=
+  M.rank (fun _ => false) = 0
 
 /-- Ambient representation dimension (simplified). -/
 noncomputable def representationDimension (n : Nat) (_M : RankMatroid n) : Nat := n
@@ -404,8 +407,9 @@ theorem minorRankPair_refl (n : Nat) (M : RankMatroid n) (e : Fin n)
     matroidMinorRankPair n M e del con = matroidMinorRankPair n M e del con := rfl
 
 theorem representableOver_trivial (n : Nat) (M : RankMatroid n) (F : Type u) :
-    isRepresentableOver n M F :=
-  trivial
+    isRepresentableOver n M F := by
+  unfold isRepresentableOver
+  exact Path.toEq M.rank_empty
 
 theorem representationDimension_refl (n : Nat) (M : RankMatroid n) :
     representationDimension n M = representationDimension n M := rfl

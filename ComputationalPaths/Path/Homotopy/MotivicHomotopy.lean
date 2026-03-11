@@ -41,18 +41,18 @@ universe u
 structure Scheme where
   /-- The underlying set of points. -/
   points : Type u
-  /-- The affine line A¹ (abstract representation). -/
-  isAffine : Prop
+  /-- Whether this scheme is affine (i.e., Spec of a ring). -/
+  isAffine : Bool
 
 /-- The affine line A¹. -/
 noncomputable def affineLine : Scheme.{u} where
   points := PUnit
-  isAffine := True
+  isAffine := true
 
 /-- The point Spec(k). -/
 noncomputable def specPoint : Scheme.{u} where
   points := PUnit
-  isAffine := True
+  isAffine := true
 
 /-- A morphism of schemes. -/
 structure SchemeMorphism (X Y : Scheme.{u}) where
@@ -145,7 +145,7 @@ structure MotivicSphere where
 /-- The algebraic circle G_m. -/
 noncomputable def Gm : Scheme.{u} where
   points := PUnit
-  isAffine := True
+  isAffine := true
 
 /-- S^{1,0}: the simplicial circle. -/
 noncomputable def simplicialCircle : MotivicSphere.{u} where

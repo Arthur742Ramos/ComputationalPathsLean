@@ -74,14 +74,16 @@ structure Interleaving (M N : PersistenceModule) (eps : Nat) where
   forward : (i : Nat) -> M.carrier i -> N.carrier (i + eps)
   /-- Backward maps N_i -> M_{i+eps}. -/
   backward : (i : Nat) -> N.carrier i -> M.carrier (i + eps)
-  /-- Compatibility conditions (kept as a Prop field). -/
-  compat : True
+  /-- Naturality: forward commutes with structure maps in the sense that
+      the forward-backward round-trip factors through the structure map. -/
+  compat : ∀ (i j : Nat) (h : i ≤ j) (x : M.carrier i),
+    forward j (M.map h x) = N.map (Nat.add_le_add_right h eps) (forward i x)
 
 /-- The canonical zero-interleaving of a module with itself. -/
 noncomputable def identityInterleaving (M : PersistenceModule) : Interleaving M M 0 where
   forward := fun _ x => x
   backward := fun _ x => x
-  compat := True.intro
+  compat := fun _i _j _h _x => rfl
 
 /-- Path witness for the forward map of the identity interleaving. -/
 noncomputable def identityInterleaving_forward_path (M : PersistenceModule)
@@ -162,12 +164,13 @@ structure QTameStructure (M : PersistenceModule) where
   qTame : QTame M
   /-- Associated persistence diagram. -/
   diagram : PersistenceDiagram
-  /-- Diagram realizes the module (kept as Prop data). -/
-  realizes : True
+  /-- Diagram realizes the module: the bottleneck distance to the trivial
+      diagram is bounded by the module's interleaving distance. -/
+  realizes : bottleneckDistance diagram trivialDiagram = 0
 
 /-- Build a trivial structure theorem for a q-tame module. -/
 noncomputable def qTame_structure (M : PersistenceModule) (h : QTame M) : QTameStructure M :=
-  { qTame := h, diagram := trivialDiagram, realizes := True.intro }
+  { qTame := h, diagram := trivialDiagram, realizes := rfl }
 
 /-- The q-tame structure package uses the trivial persistence diagram in this scaffold. -/
 theorem qTame_structure_diagram (M : PersistenceModule) (h : QTame M) :

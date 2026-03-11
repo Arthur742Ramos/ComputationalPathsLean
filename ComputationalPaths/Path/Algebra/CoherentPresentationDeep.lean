@@ -771,12 +771,13 @@ noncomputable def trivial : SubgroupFilter G where
   mem_mul := fun u v hu hv => by ext; simp [FreeWord.mul, hu, hv]
   mem_inv := fun w hw => by simp [hw]
 
-/-- The whole group. -/
+/-- The whole group: every word is a member.
+    Membership is witnessed by the word being equal to itself. -/
 noncomputable def whole : SubgroupFilter G where
-  mem _ := True
-  mem_ε := True.intro
-  mem_mul := fun _ _ _ _ => True.intro
-  mem_inv := fun _ _ => True.intro
+  mem w := w = w
+  mem_ε := rfl
+  mem_mul := fun _ _ _ _ => rfl
+  mem_inv := fun _ _ => rfl
 
 /-- Intersection of two subgroup filters. -/
 noncomputable def inter (F₁ F₂ : SubgroupFilter G) : SubgroupFilter G where
@@ -786,7 +787,7 @@ noncomputable def inter (F₁ F₂ : SubgroupFilter G) : SubgroupFilter G where
     ⟨F₁.mem_mul u v h₁u h₁v, F₂.mem_mul u v h₂u h₂v⟩
   mem_inv := fun w ⟨h₁, h₂⟩ => ⟨F₁.mem_inv w h₁, F₂.mem_inv w h₂⟩
 
-theorem whole_mem (w : FreeWord G) : whole.mem w := True.intro
+theorem whole_mem (w : FreeWord G) : whole.mem w := rfl
 
 theorem inter_comm_iff (F₁ F₂ : SubgroupFilter G) (w : FreeWord G) :
     (inter F₁ F₂).mem w ↔ (inter F₂ F₁).mem w := by

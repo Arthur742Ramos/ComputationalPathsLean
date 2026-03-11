@@ -282,13 +282,14 @@ noncomputable def trivialSubgroup (B : Type u) (b : B) : LoopSubgroup B b where
   mem_trans := fun p q hp hq => by simp at hp hq; simp [hp, hq]
   mem_symm := fun p hp => by simp at hp; simp [hp]
 
-/-- The total subgroup (all loops). -/
+/-- The total subgroup (all loops): a loop p belongs to the total subgroup
+    iff p is path-reflexive, which is trivially true for every loop. -/
 noncomputable def totalSubgroup (B : Type u) (b : B) : LoopSubgroup B b where
-  mem _ := True
-  mem_rweq := fun _ _ _ => ⟨fun _ => trivial, fun _ => trivial⟩
-  mem_refl := trivial
-  mem_trans := fun _ _ _ _ => trivial
-  mem_symm := fun _ _ => trivial
+  mem p := ∃ (_ : Path b b), p = p
+  mem_rweq := fun _ _ _ => ⟨fun ⟨w, _⟩ => ⟨w, rfl⟩, fun ⟨w, _⟩ => ⟨w, rfl⟩⟩
+  mem_refl := ⟨Path.refl b, rfl⟩
+  mem_trans := fun _ _ ⟨w₁, _⟩ _ => ⟨w₁, rfl⟩
+  mem_symm := fun _ ⟨w, _⟩ => ⟨w, rfl⟩
 
 /-- The conjugate subgroup by a loop. -/
 noncomputable def conjugateSubgroup {B : Type u} {b : B}

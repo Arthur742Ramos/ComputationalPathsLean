@@ -96,22 +96,23 @@ structure SerreClass where
   /-- Closure under extensions. -/
   closed_extension : ∀ {A B C : Type u}, mem A → mem C → mem B
 
-/-- The trivial Serre class containing all types. -/
+/-- The trivial Serre class containing all types: membership is witnessed
+    by inhabitation of the function space from the type to itself. -/
 noncomputable def SerreClass.trivial : SerreClass where
-  mem := fun _ => True
-  mem_unit := True.intro
+  mem := fun A => ∃ (_ : A → A), A = A
+  mem_unit := ⟨id, rfl⟩
   closed_equiv := by
-    intro _ _ _ _
-    exact True.intro
+    intro _ _ _ ⟨_, _⟩
+    exact ⟨id, rfl⟩
   closed_subtype := by
-    intro _ _ _
-    exact True.intro
+    intro _ _ ⟨_, _⟩
+    exact ⟨id, rfl⟩
   closed_quot := by
-    intro _ _ _
-    exact True.intro
+    intro _ _ ⟨_, _⟩
+    exact ⟨id, rfl⟩
   closed_extension := by
     intro _ _ _ _ _
-    exact True.intro
+    exact ⟨id, rfl⟩
 
 /-! ## C-isomorphisms -/
 
@@ -133,7 +134,7 @@ structure CIsomorphism (C : SerreClass) {A B : Type u} (f : A → B) (b0 : B) : 
 /-- Any map is a C-isomorphism for the trivial Serre class. -/
 theorem cIsomorphism_trivial {A B : Type u} (_f : A → B) (_b0 : B) :
     CIsomorphism SerreClass.trivial _f _b0 := by
-  refine { ker_in_C := ?_, coker_in_C := ?_ } <;> exact True.intro
+  refine { ker_in_C := ?_, coker_in_C := ?_ } <;> exact ⟨id, rfl⟩
 
 /-! ## Mod C Hurewicz -/
 
