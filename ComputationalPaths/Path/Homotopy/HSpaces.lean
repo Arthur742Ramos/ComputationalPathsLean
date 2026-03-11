@@ -81,6 +81,26 @@ noncomputable def HSpaceAssoc.mul_assoc_path (h : HSpaceAssoc X) (x y z : X.carr
       (h.mul.toFun (x, h.mul.toFun (y, z))) :=
   Path.stepChain (h.mul_assoc x y z)
 
+/-- Derived left-unit simplification after one multiplication step. -/
+theorem HSpaceAssoc.mul_assoc_base_left (h : HSpaceAssoc X) (y z : X.carrier) :
+    h.mul.toFun (h.mul.toFun (X.pt, y), z) = h.mul.toFun (y, z) := by
+  rw [h.mul_left_unit]
+
+/-- `Path` witness for the derived left-unit simplification. -/
+noncomputable def HSpaceAssoc.mul_assoc_base_left_path (h : HSpaceAssoc X) (y z : X.carrier) :
+    Path (h.mul.toFun (h.mul.toFun (X.pt, y), z)) (h.mul.toFun (y, z)) :=
+  Path.stepChain (HSpaceAssoc.mul_assoc_base_left h y z)
+
+/-- Derived right-unit simplification after one multiplication step. -/
+theorem HSpaceAssoc.mul_assoc_base_right (h : HSpaceAssoc X) (x y : X.carrier) :
+    h.mul.toFun (h.mul.toFun (x, y), X.pt) = h.mul.toFun (x, y) := by
+  rw [h.mul_right_unit]
+
+/-- `Path` witness for the derived right-unit simplification. -/
+noncomputable def HSpaceAssoc.mul_assoc_base_right_path (h : HSpaceAssoc X) (x y : X.carrier) :
+    Path (h.mul.toFun (h.mul.toFun (x, y), X.pt)) (h.mul.toFun (x, y)) :=
+  Path.stepChain (HSpaceAssoc.mul_assoc_base_right h x y)
+
 /-! ## Co-H-spaces -/
 
 /-- A co-H-space structure on a pointed type. -/
@@ -101,10 +121,20 @@ noncomputable def CoHSpace.left_inv_path (h : CoHSpace X) :
     Path (PtdMap.comp h.counit_left h.comul) (PtdMap.id X) :=
   Path.stepChain h.left_inv
 
+/-- Pointwise `Path` witness for the left counit law. -/
+noncomputable def CoHSpace.left_inv_apply_path (h : CoHSpace X) (x : X.carrier) :
+    Path ((PtdMap.comp h.counit_left h.comul).toFun x) ((PtdMap.id X).toFun x) :=
+  Path.congrArg (fun k => k.toFun x) (CoHSpace.left_inv_path h)
+
 /-- Path witness for the right counit law. -/
 noncomputable def CoHSpace.right_inv_path (h : CoHSpace X) :
     Path (PtdMap.comp h.counit_right h.comul) (PtdMap.id X) :=
   Path.stepChain h.right_inv
+
+/-- Pointwise `Path` witness for the right counit law. -/
+noncomputable def CoHSpace.right_inv_apply_path (h : CoHSpace X) (x : X.carrier) :
+    Path ((PtdMap.comp h.counit_right h.comul).toFun x) ((PtdMap.id X).toFun x) :=
+  Path.congrArg (fun k => k.toFun x) (CoHSpace.right_inv_path h)
 
 /-! ## Hopf theorem data -/
 
@@ -121,6 +151,12 @@ structure HopfTheoremData (X : PtdType.{u}) where
 theorem hopfTheorem {X : PtdType.{u}} (data : HopfTheoremData X) :
     PiOneAbelian (π₁(X.carrier, X.pt)) data.piOneOps :=
   data.piOneAbelian
+
+/-- `Path` witness for the Hopf theorem conclusion on `π₁`. -/
+noncomputable def hopfTheorem_path {X : PtdType.{u}} (data : HopfTheoremData X)
+    (α β : π₁(X.carrier, X.pt)) :
+    Path (data.piOneOps.mul α β) (data.piOneOps.mul β α) :=
+  Path.stepChain (hopfTheorem data α β)
 
 /-! ## James splitting -/
 
@@ -142,6 +178,12 @@ structure JamesSplittingData (X : SuspensionLoop.Pointed) where
 theorem jamesSplitting_toLoop {X : SuspensionLoop.Pointed} (data : JamesSplittingData X) :
     data.splitEquiv.toFun = JamesConstruction.jamesToLoop X :=
   data.splitEquiv_toFun
+
+/-- Pointwise `Path` witness that the James splitting uses the canonical forward map. -/
+noncomputable def jamesSplitting_toLoop_apply_path {X : SuspensionLoop.Pointed}
+    (data : JamesSplittingData X) (j : JamesConstruction.JamesConstruction X) :
+    Path (data.splitEquiv.toFun j) (JamesConstruction.jamesToLoop X j) :=
+  Path.stepChain (_root_.congrArg (fun k => k j) (jamesSplitting_toLoop data))
 
 /-- Path witness for the left inverse in the James splitting. -/
 noncomputable def jamesSplitting_left_path {X : SuspensionLoop.Pointed} (data : JamesSplittingData X)
