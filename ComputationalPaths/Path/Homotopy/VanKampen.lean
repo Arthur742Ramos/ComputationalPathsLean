@@ -128,6 +128,21 @@ noncomputable def overlapAmalgamation_rwEq (i0 : I)
   CompPath.Pushout.HasGlueNaturalLoopRwEq.eq
     (A := U) (B := V) (C := I) (f := iU) (g := iV) (c₀ := i0) i0 p
 
+/-- Type-valued overlap amalgamation witness. -/
+noncomputable def overlapAmalgamation_rweq (i0 : I)
+    [CompPath.Pushout.HasGlueNaturalLoopRwEq
+      (A := U) (B := V) (C := I) (f := iU) (g := iV) i0]
+    (p : Path i0 i0) :
+    RwEq
+      (Path.trans
+        (Path.symm
+          (CompPath.Pushout.inlPath (A := U) (B := V) (C := I) (f := iU) (g := iV) (Path.congrArg iU p)))
+        (Path.trans
+          (CompPath.Pushout.glue (A := U) (B := V) (C := I) (f := iU) (g := iV) i0)
+          (CompPath.Pushout.inrPath (A := U) (B := V) (C := I) (f := iU) (g := iV) (Path.congrArg iV p))))
+      (CompPath.Pushout.glue (A := U) (B := V) (C := I) (f := iU) (g := iV) i0) :=
+  rweq_of_rweqProp (overlapAmalgamation_rwEq (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0 p)
+
 /-- Seifert-van Kampen for computational paths, stated on automorphisms in the fundamental
 groupoid of the pushout. -/
 noncomputable def seifertVanKampenFundamentalGroupoidPushout (i0 : I)
@@ -148,6 +163,42 @@ noncomputable def seifertVanKampenFundamentalGroupoidPushout (i0 : I)
         (piOneFmap (A := U) (C := I) (f := iU) (c₀ := i0))
         (piOneGmap (B := V) (C := I) (g := iV) (c₀ := i0))) :=
   vanKampenPathLevelEquiv (A := U) (B := V) (C := I) (f := iU) (g := iV) i0
+
+/-- `Path` witness for the left inverse of the Seifert-van Kampen equivalence. -/
+noncomputable def seifertVanKampenFundamentalGroupoidPushout_left_inv_path (i0 : I)
+    [CompPath.Pushout.HasGlueNaturalLoopRwEq
+      (A := U) (B := V) (C := I) (f := iU) (g := iV) i0]
+    [HasPushoutSVKEncodeQuot U V I iU iV i0]
+    [HasPushoutSVKDecodeEncode U V I iU iV i0]
+    [HasPushoutSVKEncodeDecode U V I iU iV i0]
+    (α :
+      FundamentalGroupoid.Hom
+        (CompPath.Pushout U V I iU iV)
+        (CompPath.Pushout.inl (A := U) (B := V) (C := I) (f := iU) (g := iV) (iU i0))
+        (CompPath.Pushout.inl (A := U) (B := V) (C := I) (f := iU) (g := iV) (iU i0))) :=
+  let e := seifertVanKampenFundamentalGroupoidPushout
+    (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0
+  show Path (e.invFun (e.toFun α)) α from
+    Path.stepChain (e.left_inv α)
+
+/-- `Path` witness for the right inverse of the Seifert-van Kampen equivalence. -/
+noncomputable def seifertVanKampenFundamentalGroupoidPushout_right_inv_path (i0 : I)
+    [CompPath.Pushout.HasGlueNaturalLoopRwEq
+      (A := U) (B := V) (C := I) (f := iU) (g := iV) i0]
+    [HasPushoutSVKEncodeQuot U V I iU iV i0]
+    [HasPushoutSVKDecodeEncode U V I iU iV i0]
+    [HasPushoutSVKEncodeDecode U V I iU iV i0]
+    (w :
+      AmalgamatedFreeProduct
+        (PiOne U (iU i0))
+        (PiOne V (iV i0))
+        (PiOne I i0)
+        (piOneFmap (A := U) (C := I) (f := iU) (c₀ := i0))
+        (piOneGmap (B := V) (C := I) (g := iV) (c₀ := i0))) :=
+  let e := seifertVanKampenFundamentalGroupoidPushout
+    (U := U) (V := V) (I := I) (iU := iU) (iV := iV) i0
+  show Path (e.toFun (e.invFun w)) w from
+    Path.stepChain (e.right_inv w)
 
 end PushoutDecomposition
 
@@ -196,6 +247,25 @@ noncomputable def wedgeCirclePiOneEquivFreeGroupTwo
       FreeGroupTwoCode :=
   wedgeFundamentalGroupEquiv_of_decode_bijective
     (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase)
+
+/-- `Path` witness for the left inverse of the wedge-circle equivalence. -/
+noncomputable def wedgeCirclePiOneEquivFreeGroupTwo_left_inv_path
+    [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase]
+    (α :
+      PiOne
+        (CompPath.Wedge Circle Circle circleBase circleBase)
+        (CompPath.Wedge.basepoint (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))) :=
+  let e := wedgeCirclePiOneEquivFreeGroupTwo
+  show Path (e.invFun (e.toFun α)) α from
+    Path.stepChain (e.left_inv α)
+
+/-- `Path` witness for the right inverse of the wedge-circle equivalence. -/
+noncomputable def wedgeCirclePiOneEquivFreeGroupTwo_right_inv_path
+    [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase]
+    (w : FreeGroupTwoCode) :=
+  let e := wedgeCirclePiOneEquivFreeGroupTwo
+  show Path (e.toFun (e.invFun w)) w from
+    Path.stepChain (e.right_inv w)
 
 end WedgeOfCircles
 
