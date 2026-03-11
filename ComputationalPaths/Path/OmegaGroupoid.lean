@@ -1124,6 +1124,138 @@ noncomputable def derivation_to_stepstar_sound₃ {p q : Path a b}
                   (Derivation₃.whiskerRight₃ (ih₁ h₁) (derivation₂_of_stepstar st₂))
                   (Derivation₃.whiskerLeft₃ d₁ (ih₂ h₂)))
 
+/-- Prepending a forward step to any derivation with a `StepStar` witness preserves
+    the extracted forward chain. -/
+theorem derivation_to_stepstar_prepend_step {p q r : Path a b}
+    (t : Step p q) {d : Derivation₂ q r} {st : StepStar q r}
+    (hst : derivation_to_stepstar? d = some st) :
+    derivation_to_stepstar? (normalize_vcomp (.step t) d) =
+      some (stepstar_append (StepStar.single t) st) := by
+  cases d with
+  | refl _ =>
+      cases hst
+      simp [normalize_vcomp, derivation_to_stepstar?, stepstar_append, StepStar.single]
+  | step s =>
+      cases hst
+      simp [normalize_vcomp, derivation_to_stepstar?, stepstar_append, StepStar.single]
+  | inv d =>
+      simp [derivation_to_stepstar?] at hst
+  | vcomp d₁ d₂ =>
+      cases h₁ : derivation_to_stepstar? d₁ with
+      | none =>
+          simp [derivation_to_stepstar?, h₁] at hst
+      | some st₁ =>
+          cases h₂ : derivation_to_stepstar? d₂ with
+          | none =>
+              simp [derivation_to_stepstar?, h₁, h₂] at hst
+          | some st₂ =>
+              simp [derivation_to_stepstar?, h₁, h₂] at hst
+              cases hst
+              simp [normalize_vcomp, derivation_to_stepstar?, h₁, h₂, StepStar.single]
+
+/-- Reverse a forward `StepStar` chain into a strict inverse-headed derivation. -/
+noncomputable def inverse_derivation_of_stepstar {p q : Path a b} :
+    StepStar p q → Derivation₂ q p
+  | .refl _ => .refl _
+  | .tail st s => .vcomp (.inv (.step s)) (inverse_derivation_of_stepstar st)
+
+/-- Inverting a `StepStar` derivation yields the explicit inverse chain. -/
+noncomputable def inv_derivation₂_of_stepstar_to_inverse {p q : Path a b}
+    (st : StepStar p q) :
+    Derivation₃ (.inv (derivation₂_of_stepstar st)) (inverse_derivation_of_stepstar st) := by
+  induction st with
+  | refl =>
+      simpa [derivation₂_of_stepstar, inverse_derivation_of_stepstar] using
+        (to_normal_form_inv₃ (.refl p))
+  | tail st s ih =>
+      simpa [derivation₂_of_stepstar, inverse_derivation_of_stepstar] using
+        (.vcomp
+          (.step (.inv_vcomp (derivation₂_of_stepstar st) (.step s)))
+          (Derivation₃.whiskerLeft₃ (.inv (.step s)) ih))
+
+/-- A forward `StepStar` followed by its explicit inverse chain contracts. -/
+noncomputable def inverse_stepstar_loop_contract {p q : Path a b}
+    (st : StepStar p q) :
+    Derivation₃
+      (.vcomp (inverse_derivation_of_stepstar st) (derivation₂_of_stepstar st))
+      (.refl q) := by
+  induction st with
+  | refl =>
+      simpa [derivation₂_of_stepstar, inverse_derivation_of_stepstar] using
+        (.step (.vcomp_refl_left (.refl p)) : Derivation₃ (.vcomp (.refl p) (.refl p)) (.refl p))
+  | tail st s ih =>
+      let invTail := inverse_derivation_of_stepstar st
+      let fwdTail := derivation₂_of_stepstar st
+      exact
+        .vcomp
+          (.step (.vcomp_assoc (.inv (.step s)) invTail (.vcomp fwdTail (.step s))))
+          (.vcomp
+            (Derivation₃.whiskerLeft₃ (.inv (.step s))
+              (.inv (.step (.vcomp_assoc invTail fwdTail (.step s)))))
+            (.vcomp
+              (Derivation₃.whiskerLeft₃ (.inv (.step s))
+                (Derivation₃.whiskerRight₃ ih (.step s)))
+              (.vcomp
+                (Derivation₃.whiskerLeft₃ (.inv (.step s))
+                  (.step (.vcomp_refl_left (.step s))))
+                (.step (.vcomp_inv_left (.step s))))))
+
+/-- Appending one forward step to a strict forward chain preserves its extracted
+    `StepStar` witness. -/
+theorem derivation_to_stepstar_normalize_vcomp_step {p q r : Path a b}
+    {d : Derivation₂ p q} (hd : StrictNormalForm d)
+    {st : StepStar p q} (hst : derivation_to_stepstar? d = some st)
+    (s : Step q r) :
+    derivation_to_stepstar? (normalize_vcomp d (.step s)) =
+      some (stepstar_append st (StepStar.single s)) := by
+  induction d with
+  | refl p =>
+      cases hd with
+      | refl =>
+          cases hst
+          simp [normalize_vcomp, derivation_to_stepstar?, stepstar_append, StepStar.single]
+  | step t =>
+      cases hd with
+      | single_step =>
+          cases hst
+          simp [normalize_vcomp, derivation_to_stepstar?, stepstar_append, StepStar.single]
+  | inv d ih =>
+      cases hd with
+      | single_inv =>
+          simp [derivation_to_stepstar?] at hst
+  | vcomp d₁ d₂ ih₁ ih₂ =>
+      cases hd with
+      | cons_step t hrest =>
+          cases hstR : derivation_to_stepstar? d₂ with
+          | none =>
+              simp [derivation_to_stepstar?, hstR] at hst
+          | some stR =>
+              simp [derivation_to_stepstar?, hstR] at hst
+              cases hst
+              have htail := ih₂ hrest hstR s
+              simpa [stepstar_append, StepStar.single] using
+                (derivation_to_stepstar_prepend_step t htail)
+      | cons_inv t hrest =>
+          simp [derivation_to_stepstar?] at hst
+
+/-- Any strict forward chain cancels against its inverse constructively. -/
+noncomputable def inverse_forward_chain_cancel {p q : Path a b}
+    (d : Derivation₂ p q) {st : StepStar p q}
+    (hst : derivation_to_stepstar? d = some st) :
+    Derivation₃ (.vcomp (.inv d) d) (.refl q) := by
+  let hForward : Derivation₃ (derivation₂_of_stepstar st) d :=
+    derivation_to_stepstar_sound₃ d hst
+  let hInv : Derivation₃ (.inv d) (inverse_derivation_of_stepstar st) :=
+    .vcomp
+      (inv_congr₃ (.inv hForward))
+      (inv_derivation₂_of_stepstar_to_inverse st)
+  exact
+    .vcomp
+      (Derivation₃.whiskerRight₃ hInv d)
+      (.vcomp
+        (Derivation₃.whiskerLeft₃ (inverse_derivation_of_stepstar st) (.inv hForward))
+        (inverse_stepstar_loop_contract st))
+
 /-- Explicit singleton connector for strict one-step normal forms. -/
 noncomputable def connect_single_step_strict {p q : Path a b}
     (s₁ s₂ : Step p q) : Derivation₃ (.step s₁) (.step s₂) :=
@@ -1319,6 +1451,22 @@ noncomputable def atomic_inv_loop_contract {p : Path a b} (s : Step p p) :
     (inv_congr₃ (atomic_loop_contract s))
     (to_normal_form_inv₃ (.refl p))
 
+/-- Contract a forward atomic self-loop sitting at the head of a strict tail. -/
+noncomputable def absorb_atomic_loop_head {p q : Path a b}
+    (s : Step p p) (rest : Derivation₂ p q) :
+    Derivation₃ (.vcomp (.step s) rest) rest :=
+  .vcomp
+    (Derivation₃.whiskerRight₃ (atomic_loop_contract s) rest)
+    (.step (.vcomp_refl_left rest))
+
+/-- Contract an inverse atomic self-loop sitting at the head of a strict tail. -/
+noncomputable def absorb_atomic_inv_loop_head {p q : Path a b}
+    (s : Step p p) (rest : Derivation₂ p q) :
+    Derivation₃ (.vcomp (.inv (.step s)) rest) rest :=
+  .vcomp
+    (Derivation₃.whiskerRight₃ (atomic_inv_loop_contract s) rest)
+    (.step (.vcomp_refl_left rest))
+
 /-- Any adjacent forward/inverse atomic pair with the same endpoints cancels. -/
 noncomputable def cancel_step_inv_pair {p q : Path a b} (s₁ s₂ : Step p q) :
     Derivation₃ (.vcomp (.step s₁) (.inv (.step s₂))) (.refl p) :=
@@ -1360,6 +1508,105 @@ noncomputable def inv_step_head_loop_contract {p q : Path a b}
       (.vcomp
         (.step (.vcomp_refl_left rest))
         hrest))
+
+/-- Contract a strict loop whose first three atomic fragments form a
+    forward/inverse/forward triangle returning to the base path. -/
+noncomputable def step_inv_step_triangle_loop_contract {p q r : Path a b}
+    (s : Step p q) (t : Step r q) (u : Step r p)
+    {rest : Derivation₂ p p}
+    (hrest : Derivation₃ rest (.refl p)) :
+    Derivation₃ (.vcomp (.step s) (.vcomp (.inv (.step t)) (.vcomp (.step u) rest))) (.refl p) :=
+  let htriangle : Derivation₃ (.step t) (.vcomp (.step u) (.step s)) :=
+    connect_step_to_cons_step_stepstar t u
+      (rest := .step s) (st := StepStar.single s) rfl
+  let hhead : Derivation₃ (.step s) (.vcomp (.inv (.step u)) (.step t)) :=
+    connect_forward_to_cons_inv_forward_strict
+      (d₁ := .step s) u (.inv htriangle)
+  .vcomp
+    (Derivation₃.whiskerRight₃ hhead
+      (.vcomp (.inv (.step t)) (.vcomp (.step u) rest)))
+    (.vcomp
+      (.step (.vcomp_assoc (.inv (.step u)) (.step t)
+        (.vcomp (.inv (.step t)) (.vcomp (.step u) rest))))
+      (.vcomp
+        (Derivation₃.whiskerLeft₃ (.inv (.step u))
+          (.inv (.step (.vcomp_assoc (.step t) (.inv (.step t))
+            (.vcomp (.step u) rest)))))
+        (.vcomp
+          (Derivation₃.whiskerLeft₃ (.inv (.step u))
+            (Derivation₃.whiskerRight₃ (cancel_step_inv_pair t t)
+              (.vcomp (.step u) rest)))
+          (.vcomp
+            (Derivation₃.whiskerLeft₃ (.inv (.step u))
+              (.step (.vcomp_refl_left (.vcomp (.step u) rest))))
+            (.vcomp
+              (.inv (.step (.vcomp_assoc (.inv (.step u)) (.step u) rest)))
+              (.vcomp
+                (Derivation₃.whiskerRight₃ (cancel_inv_step_pair u u) rest)
+                (.vcomp
+                  (.step (.vcomp_refl_left rest))
+                  hrest)))))))
+
+/-- Special case of `step_inv_step_triangle_loop_contract` with no residual tail. -/
+noncomputable def step_inv_step_triangle_contract {p q r : Path a b}
+    (s : Step p q) (t : Step r q) (u : Step r p) :
+    Derivation₃ (.vcomp (.step s) (.vcomp (.inv (.step t)) (.step u))) (.refl p) :=
+  .vcomp
+    (Derivation₃.whiskerLeft₃ (.step s)
+      (Derivation₃.whiskerLeft₃ (.inv (.step t))
+        (.inv (.step (.vcomp_refl_right (.step u))))))
+    (step_inv_step_triangle_loop_contract s t u (.refl (.refl p)))
+
+/-- Contract a strict loop whose first three atomic fragments form an
+    inverse/inverse/forward triangle returning to the base path. -/
+noncomputable def inv_inv_step_triangle_loop_contract {p q r : Path a b}
+    (s : Step q p) (t : Step r q) (u : Step r p)
+    {rest : Derivation₂ p p}
+    (hrest : Derivation₃ rest (.refl p)) :
+    Derivation₃ (.vcomp (.inv (.step s)) (.vcomp (.inv (.step t)) (.vcomp (.step u) rest))) (.refl p) :=
+  let htriangle : Derivation₃ (.step u) (.vcomp (.step t) (.step s)) :=
+    .inv (connect_cons_step_stepstar_to_step t u
+      (rest := .step s) (st := StepStar.single s) rfl)
+  .vcomp
+    (.inv (.step (.vcomp_assoc (.inv (.step s)) (.inv (.step t))
+      (.vcomp (.step u) rest))))
+    (.vcomp
+      (Derivation₃.whiskerLeft₃ (.vcomp (.inv (.step s)) (.inv (.step t)))
+        (Derivation₃.whiskerRight₃ htriangle rest))
+      (.vcomp
+        (Derivation₃.whiskerLeft₃ (.vcomp (.inv (.step s)) (.inv (.step t)))
+          (.step (.vcomp_assoc (.step t) (.step s) rest)))
+        (.vcomp
+          (.step (.vcomp_assoc (.inv (.step s)) (.inv (.step t))
+            (.vcomp (.step t) (.vcomp (.step s) rest))))
+          (.vcomp
+            (Derivation₃.whiskerLeft₃ (.inv (.step s))
+              (.inv (.step (.vcomp_assoc (.inv (.step t)) (.step t)
+                (.vcomp (.step s) rest)))))
+            (.vcomp
+              (Derivation₃.whiskerLeft₃ (.inv (.step s))
+                (Derivation₃.whiskerRight₃ (cancel_inv_step_pair t t)
+                  (.vcomp (.step s) rest)))
+              (.vcomp
+                (Derivation₃.whiskerLeft₃ (.inv (.step s))
+                  (.step (.vcomp_refl_left (.vcomp (.step s) rest))))
+                (.vcomp
+                  (.inv (.step (.vcomp_assoc (.inv (.step s)) (.step s) rest)))
+                  (.vcomp
+                    (Derivation₃.whiskerRight₃ (cancel_inv_step_pair s s) rest)
+                    (.vcomp
+                      (.step (.vcomp_refl_left rest))
+                      hrest)))))))))
+
+/-- Special case of `inv_inv_step_triangle_loop_contract` with no residual tail. -/
+noncomputable def inv_inv_step_triangle_contract {p q r : Path a b}
+    (s : Step q p) (t : Step r q) (u : Step r p) :
+    Derivation₃ (.vcomp (.inv (.step s)) (.vcomp (.inv (.step t)) (.step u))) (.refl p) :=
+  .vcomp
+    (Derivation₃.whiskerLeft₃ (.inv (.step s))
+      (Derivation₃.whiskerLeft₃ (.inv (.step t))
+        (.inv (.step (.vcomp_refl_right (.step u))))))
+    (inv_inv_step_triangle_loop_contract s t u (.refl (.refl p)))
 
 /-- A two-step forward loop contracts by joining it to `unit_self_step`. -/
 noncomputable def forward_loop_contract {p q : Path a b}
@@ -1734,10 +1981,13 @@ noncomputable def connect_normalized {p q : Path a b}
 /-- Loop-specialized structural contraction on strict normal forms.
 
 This local recursion handles atomic loops, inverse atomic loops, forward
-`StepStar` tails, inverse-headed loops with forward tails, and head-cancellable
-mixed-sign loops in both orientations.  Before falling back to
-`strict_transport₃`, it also checks whether inverse-normalization exposes a
-forward-only loop that can be contracted directly. -/
+`StepStar` tails, inverse-headed loops with forward tails, head-cancellable
+mixed-sign loops in both orientations, and now also loops whose third atomic
+fragment is an isolated forward or inverse self-loop that can be peeled away
+constructively before recursing.  Before falling back to `strict_transport₃`,
+both the recursive branch and the zero-fuel base case first retry the whole
+loop itself and its inverse-normal form as forward `StepStar` chains,
+contracting those constructively whenever possible. -/
 noncomputable def strict_loop_via_inverse {p : Path a b}
     (e : Derivation₂ p p)
     (hInvNorm : Derivation₃ (normalizeInv e) (.refl p)) :
@@ -1754,7 +2004,19 @@ noncomputable def strict_loop_via_inverse {p : Path a b}
 
 noncomputable def strict_loop_contract_go {p : Path a b} :
     Nat → (d : Derivation₂ p p) → StrictNormalForm d → Derivation₃ d (.refl p)
-  | 0, d, _ => strict_transport₃ (d₁ := d) (d₂ := .refl p)
+  | 0, d, hd =>
+      match hst : derivation_to_stepstar? d with
+      | some st =>
+          forward_strict_loop_contract d hd (st := st) hst
+      | none =>
+          let invLoop : Derivation₂ p p := normalizeInv d
+          let hInvStrict : StrictNormalForm invLoop := normalizeInv_is_strict d
+          match hstInv : derivation_to_stepstar? invLoop with
+          | some stInv =>
+              strict_loop_via_inverse d
+                (forward_strict_loop_contract invLoop hInvStrict (st := stInv) hstInv)
+          | none =>
+              strict_transport₃ (d₁ := d) (d₂ := .refl p)
   | _fuel + 1, d, hd =>
       match d with
       | .refl _ =>
@@ -1763,7 +2025,7 @@ noncomputable def strict_loop_contract_go {p : Path a b} :
           atomic_loop_contract s
       | .inv (.step s) =>
           atomic_inv_loop_contract s
-      | .vcomp (.step s) rest =>
+      | .vcomp (q := q) (.step s) rest =>
           by
             let fallback : Derivation₃ (.vcomp (.step s) rest) (.refl p) := by
               cases hst : derivation_to_stepstar? rest with
@@ -1800,14 +2062,186 @@ noncomputable def strict_loop_contract_go {p : Path a b} :
                           let hrest : Derivation₃ dR (.refl p) :=
                             strict_loop_contract_go _fuel dR (strict_tail_of_cons_inv htail)
                           exact step_inv_head_loop_contract s s₂ hrest
-                        · exact fallback
+                        ·
+                          by_cases hself : r = q
+                          · subst hself
+                            let h_inner : Derivation₃ (.vcomp (.inv (.step s₂)) dR) dR :=
+                              absorb_atomic_inv_loop_head s₂ dR
+                            let htail : StrictNormalForm (.vcomp (.inv (.step s₂)) dR) :=
+                              strict_tail_of_cons_step hd
+                            let hD_R : StrictNormalForm dR :=
+                              strict_tail_of_cons_inv htail
+                            let h_rec : Derivation₃ (.vcomp (.step s) dR) (.refl p) :=
+                              strict_loop_contract_go _fuel (.vcomp (.step s) dR)
+                                (StrictNormalForm.cons_step s hD_R)
+                            exact .vcomp (Derivation₃.whiskerLeft₃ (.step s) h_inner) h_rec
+                          ·
+                            cases dR with
+                            | step s₃ =>
+                                exact step_inv_step_triangle_contract s s₂ s₃
+                            | @vcomp _ m _ dHead dTail =>
+                                cases dHead with
+                                | step s₃ =>
+                                    by_cases hm : m = p
+                                    · subst m
+                                      let hD_R : StrictNormalForm (.vcomp (.step s₃) dTail) :=
+                                        strict_tail_of_cons_inv (strict_tail_of_cons_step hd)
+                                      let hrest : Derivation₃ dTail (.refl p) :=
+                                        strict_loop_contract_go _fuel dTail
+                                          (strict_tail_of_cons_step hD_R)
+                                      exact step_inv_step_triangle_loop_contract s s₂ s₃ hrest
+                                    · by_cases hself₃ : m = r
+                                      · subst hself₃
+                                        let h_inner : Derivation₃ (.vcomp (.step s₃) dTail) dTail :=
+                                          absorb_atomic_loop_head s₃ dTail
+                                        let hRest : StrictNormalForm
+                                            (.vcomp (.inv (.step s₂)) (.vcomp (.step s₃) dTail)) :=
+                                          strict_tail_of_cons_step hd
+                                        let hDR : StrictNormalForm (.vcomp (.step s₃) dTail) :=
+                                          strict_tail_of_cons_inv hRest
+                                        let hDTail : StrictNormalForm dTail :=
+                                          strict_tail_of_cons_step hDR
+                                        let loop' : Derivation₂ p p :=
+                                          .vcomp (.step s) (.vcomp (.inv (.step s₂)) dTail)
+                                        let hLoop : StrictNormalForm loop' :=
+                                          strict_prepend_step s (strict_prepend_inv s₂ hDTail)
+                                        let h_rec : Derivation₃ loop' (.refl p) :=
+                                          strict_loop_contract_go _fuel loop' hLoop
+                                        exact .vcomp
+                                          (Derivation₃.whiskerLeft₃ (.step s)
+                                            (Derivation₃.whiskerLeft₃ (.inv (.step s₂)) h_inner))
+                                          h_rec
+                                      · exact fallback
+                                | @inv _ _ dInner =>
+                                    cases dInner with
+                                    | step s₃ =>
+                                        by_cases hself₃ : m = r
+                                        · subst hself₃
+                                          let h_inner :
+                                              Derivation₃ (.vcomp (.inv (.step s₃)) dTail) dTail :=
+                                            absorb_atomic_inv_loop_head s₃ dTail
+                                          let hRest : StrictNormalForm
+                                              (.vcomp (.inv (.step s₂)) (.vcomp (.inv (.step s₃)) dTail)) :=
+                                            strict_tail_of_cons_step hd
+                                          let hDR : StrictNormalForm (.vcomp (.inv (.step s₃)) dTail) :=
+                                            strict_tail_of_cons_inv hRest
+                                          let hDTail : StrictNormalForm dTail :=
+                                            strict_tail_of_cons_inv hDR
+                                          let loop' : Derivation₂ p p :=
+                                            .vcomp (.step s) (.vcomp (.inv (.step s₂)) dTail)
+                                          let hLoop : StrictNormalForm loop' :=
+                                            strict_prepend_step s (strict_prepend_inv s₂ hDTail)
+                                          let h_rec : Derivation₃ loop' (.refl p) :=
+                                            strict_loop_contract_go _fuel loop' hLoop
+                                          exact .vcomp
+                                            (Derivation₃.whiskerLeft₃ (.step s)
+                                              (Derivation₃.whiskerLeft₃ (.inv (.step s₂)) h_inner))
+                                            h_rec
+                                        · exact fallback
+                                    | _ =>
+                                        exact fallback
+                                | _ =>
+                                    exact fallback
+                            | _ =>
+                                exact fallback
                     | _ =>
                         exact fallback
+                | step s₂ =>
+                    by_cases hr : r = p
+                    · subst r
+                      let htail : StrictNormalForm (.vcomp (.step s₂) dR) :=
+                        strict_tail_of_cons_step hd
+                      let hrest : Derivation₃ dR (.refl p) :=
+                        strict_loop_contract_go _fuel dR (strict_tail_of_cons_step htail)
+                      exact
+                        .vcomp
+                          (.inv (.step (.vcomp_assoc (.step s) (.step s₂) dR)))
+                          (.vcomp
+                            (Derivation₃.whiskerRight₃
+                              (forward_stepstar_loop_contract s (rest := .step s₂)
+                                (st := StepStar.single s₂) rfl)
+                              dR)
+                            (.vcomp
+                              (.step (.vcomp_refl_left dR))
+                              hrest))
+                    ·
+                      -- s₂ : Step q r (forward step in rest)
+                      -- When q = r (i.e., s₂ : Step q q is a forward self-loop),
+                      -- contract (step s₂) → refl, absorb unit, recurse on (step s) · dR.
+                      by_cases hself : q = r
+                      · subst hself
+                        let h_inner : Derivation₃ (.vcomp (.step s₂) dR) dR :=
+                          absorb_atomic_loop_head s₂ dR
+                        let htail : StrictNormalForm (.vcomp (.step s₂) dR) :=
+                          strict_tail_of_cons_step hd
+                        let hD_R : StrictNormalForm dR :=
+                          strict_tail_of_cons_step htail
+                        let h_rec : Derivation₃ (.vcomp (.step s) dR) (.refl p) :=
+                          strict_loop_contract_go _fuel (.vcomp (.step s) dR)
+                            (StrictNormalForm.cons_step s hD_R)
+                        exact .vcomp (Derivation₃.whiskerLeft₃ (.step s) h_inner) h_rec
+                      ·
+                        cases dR with
+                        | @vcomp _ m _ dHead dTail =>
+                            cases dHead with
+                            | step s₃ =>
+                                by_cases hself₃ : m = r
+                                · subst hself₃
+                                  let h_inner : Derivation₃ (.vcomp (.step s₃) dTail) dTail :=
+                                    absorb_atomic_loop_head s₃ dTail
+                                  let hRest : StrictNormalForm (.vcomp (.step s₂) (.vcomp (.step s₃) dTail)) :=
+                                    strict_tail_of_cons_step hd
+                                  let hDR : StrictNormalForm (.vcomp (.step s₃) dTail) :=
+                                    strict_tail_of_cons_step hRest
+                                  let hDTail : StrictNormalForm dTail :=
+                                    strict_tail_of_cons_step hDR
+                                  let loop' : Derivation₂ p p :=
+                                    .vcomp (.step s) (.vcomp (.step s₂) dTail)
+                                  let hLoop : StrictNormalForm loop' :=
+                                    strict_prepend_step s (strict_prepend_step s₂ hDTail)
+                                  let h_rec : Derivation₃ loop' (.refl p) :=
+                                    strict_loop_contract_go _fuel loop' hLoop
+                                  exact .vcomp
+                                    (Derivation₃.whiskerLeft₃ (.step s)
+                                      (Derivation₃.whiskerLeft₃ (.step s₂) h_inner))
+                                    h_rec
+                                · exact fallback
+                            | @inv _ _ dInner =>
+                                cases dInner with
+                                | step s₃ =>
+                                    by_cases hself₃ : m = r
+                                    · subst hself₃
+                                      let h_inner :
+                                          Derivation₃ (.vcomp (.inv (.step s₃)) dTail) dTail :=
+                                        absorb_atomic_inv_loop_head s₃ dTail
+                                      let hRest : StrictNormalForm (.vcomp (.step s₂) (.vcomp (.inv (.step s₃)) dTail)) :=
+                                        strict_tail_of_cons_step hd
+                                      let hDR : StrictNormalForm (.vcomp (.inv (.step s₃)) dTail) :=
+                                        strict_tail_of_cons_step hRest
+                                      let hDTail : StrictNormalForm dTail :=
+                                        strict_tail_of_cons_inv hDR
+                                      let loop' : Derivation₂ p p :=
+                                        .vcomp (.step s) (.vcomp (.step s₂) dTail)
+                                      let hLoop : StrictNormalForm loop' :=
+                                        strict_prepend_step s (strict_prepend_step s₂ hDTail)
+                                      let h_rec : Derivation₃ loop' (.refl p) :=
+                                        strict_loop_contract_go _fuel loop' hLoop
+                                      exact .vcomp
+                                        (Derivation₃.whiskerLeft₃ (.step s)
+                                          (Derivation₃.whiskerLeft₃ (.step s₂) h_inner))
+                                        h_rec
+                                    · exact fallback
+                                | _ =>
+                                    exact fallback
+                            | _ =>
+                                exact fallback
+                        | _ =>
+                            exact fallback
                 | _ =>
                     exact fallback
             | _ =>
                 exact fallback
-      | .vcomp (.inv (.step s)) rest =>
+      | .vcomp (q := q) (.inv (.step s)) rest =>
           by
             cases hst : derivation_to_stepstar? rest with
             | some st =>
@@ -1837,7 +2271,187 @@ noncomputable def strict_loop_contract_go {p : Path a b} :
                           let hrest : Derivation₃ dR (.refl p) :=
                             strict_loop_contract_go _fuel dR (strict_tail_of_cons_step htail)
                           exact inv_step_head_loop_contract s s₂ hrest
-                        · exact fallback
+                        ·
+                          by_cases hself : q = r
+                          · subst hself
+                            let h_inner : Derivation₃ (.vcomp (.step s₂) dR) dR :=
+                              absorb_atomic_loop_head s₂ dR
+                            let htail : StrictNormalForm (.vcomp (.step s₂) dR) :=
+                              strict_tail_of_cons_inv hd
+                            let hD_R : StrictNormalForm dR :=
+                              strict_tail_of_cons_step htail
+                            let h_rec : Derivation₃ (.vcomp (.inv (.step s)) dR) (.refl p) :=
+                              strict_loop_contract_go _fuel (.vcomp (.inv (.step s)) dR)
+                                (StrictNormalForm.cons_inv s hD_R)
+                            exact .vcomp
+                              (Derivation₃.whiskerLeft₃ (.inv (.step s)) h_inner)
+                              h_rec
+                          ·
+                            cases dR with
+                            | @vcomp _ m _ dHead dTail =>
+                                cases dHead with
+                                | step s₃ =>
+                                    by_cases hself₃ : m = r
+                                    · subst hself₃
+                                      let h_inner : Derivation₃ (.vcomp (.step s₃) dTail) dTail :=
+                                        absorb_atomic_loop_head s₃ dTail
+                                      let hRest : StrictNormalForm (.vcomp (.step s₂) (.vcomp (.step s₃) dTail)) :=
+                                        strict_tail_of_cons_inv hd
+                                      let hDR : StrictNormalForm (.vcomp (.step s₃) dTail) :=
+                                        strict_tail_of_cons_step hRest
+                                      let hDTail : StrictNormalForm dTail :=
+                                        strict_tail_of_cons_step hDR
+                                      let loop' : Derivation₂ p p :=
+                                        .vcomp (.inv (.step s)) (.vcomp (.step s₂) dTail)
+                                      let hLoop : StrictNormalForm loop' :=
+                                        strict_prepend_inv s (strict_prepend_step s₂ hDTail)
+                                      let h_rec : Derivation₃ loop' (.refl p) :=
+                                        strict_loop_contract_go _fuel loop' hLoop
+                                      exact .vcomp
+                                        (Derivation₃.whiskerLeft₃ (.inv (.step s))
+                                          (Derivation₃.whiskerLeft₃ (.step s₂) h_inner))
+                                        h_rec
+                                    · exact fallback
+                                | @inv _ _ dInner =>
+                                    cases dInner with
+                                    | step s₃ =>
+                                        by_cases hself₃ : m = r
+                                        · subst hself₃
+                                          let h_inner :
+                                              Derivation₃ (.vcomp (.inv (.step s₃)) dTail) dTail :=
+                                            absorb_atomic_inv_loop_head s₃ dTail
+                                          let hRest : StrictNormalForm (.vcomp (.step s₂) (.vcomp (.inv (.step s₃)) dTail)) :=
+                                            strict_tail_of_cons_inv hd
+                                          let hDR : StrictNormalForm (.vcomp (.inv (.step s₃)) dTail) :=
+                                            strict_tail_of_cons_step hRest
+                                          let hDTail : StrictNormalForm dTail :=
+                                            strict_tail_of_cons_inv hDR
+                                          let loop' : Derivation₂ p p :=
+                                            .vcomp (.inv (.step s)) (.vcomp (.step s₂) dTail)
+                                          let hLoop : StrictNormalForm loop' :=
+                                            strict_prepend_inv s (strict_prepend_step s₂ hDTail)
+                                          let h_rec : Derivation₃ loop' (.refl p) :=
+                                            strict_loop_contract_go _fuel loop' hLoop
+                                          exact .vcomp
+                                            (Derivation₃.whiskerLeft₃ (.inv (.step s))
+                                              (Derivation₃.whiskerLeft₃ (.step s₂) h_inner))
+                                            h_rec
+                                        · exact fallback
+                                    | _ =>
+                                        exact fallback
+                                | _ =>
+                                    exact fallback
+                            | _ =>
+                                exact fallback
+                    | @inv _ _ dInner =>
+                        cases dInner with
+                        | step s₂ =>
+                            by_cases hr : r = p
+                            · subst r
+                              let htail : StrictNormalForm (.vcomp (.inv (.step s₂)) dR) :=
+                                strict_tail_of_cons_inv hd
+                              let hrest : Derivation₃ dR (.refl p) :=
+                                strict_loop_contract_go _fuel dR (strict_tail_of_cons_inv htail)
+                              let hpair :
+                                  Derivation₃ (.vcomp (.inv (.step s)) (.inv (.step s₂))) (.refl p) :=
+                                strict_loop_via_inverse
+                                  (.vcomp (.inv (.step s)) (.inv (.step s₂)))
+                                  (forward_stepstar_loop_contract s₂ (rest := .step s)
+                                    (st := StepStar.single s) rfl)
+                              exact
+                                .vcomp
+                                  (.inv (.step (.vcomp_assoc (.inv (.step s)) (.inv (.step s₂)) dR)))
+                                  (.vcomp
+                                    (Derivation₃.whiskerRight₃ hpair dR)
+                                    (.vcomp
+                                      (.step (.vcomp_refl_left dR))
+                                      hrest))
+                            ·
+                              by_cases hself : q = r
+                              · subst hself
+                                let h_inner : Derivation₃ (.vcomp (.inv (.step s₂)) dR) dR :=
+                                  absorb_atomic_inv_loop_head s₂ dR
+                                let htail : StrictNormalForm (.vcomp (.inv (.step s₂)) dR) :=
+                                  strict_tail_of_cons_inv hd
+                                let hD_R : StrictNormalForm dR :=
+                                  strict_tail_of_cons_inv htail
+                                let h_rec : Derivation₃ (.vcomp (.inv (.step s)) dR) (.refl p) :=
+                                  strict_loop_contract_go _fuel (.vcomp (.inv (.step s)) dR)
+                                    (StrictNormalForm.cons_inv s hD_R)
+                                exact .vcomp
+                                  (Derivation₃.whiskerLeft₃ (.inv (.step s)) h_inner)
+                                  h_rec
+                              ·
+                                cases dR with
+                                | step s₃ =>
+                                    exact inv_inv_step_triangle_contract s s₂ s₃
+                                | @vcomp _ m _ dHead dTail =>
+                                    cases dHead with
+                                    | step s₃ =>
+                                        by_cases hm : m = p
+                                        · subst m
+                                          let hD_R : StrictNormalForm (.vcomp (.step s₃) dTail) :=
+                                            strict_tail_of_cons_inv (strict_tail_of_cons_inv hd)
+                                          let hrest : Derivation₃ dTail (.refl p) :=
+                                            strict_loop_contract_go _fuel dTail
+                                              (strict_tail_of_cons_step hD_R)
+                                          exact inv_inv_step_triangle_loop_contract s s₂ s₃ hrest
+                                        · by_cases hself₃ : m = r
+                                          · subst hself₃
+                                            let h_inner : Derivation₃ (.vcomp (.step s₃) dTail) dTail :=
+                                              absorb_atomic_loop_head s₃ dTail
+                                            let hRest : StrictNormalForm
+                                                (.vcomp (.inv (.step s₂)) (.vcomp (.step s₃) dTail)) :=
+                                              strict_tail_of_cons_inv hd
+                                            let hDR : StrictNormalForm (.vcomp (.step s₃) dTail) :=
+                                              strict_tail_of_cons_inv hRest
+                                            let hDTail : StrictNormalForm dTail :=
+                                              strict_tail_of_cons_step hDR
+                                            let loop' : Derivation₂ p p :=
+                                              .vcomp (.inv (.step s)) (.vcomp (.inv (.step s₂)) dTail)
+                                            let hLoop : StrictNormalForm loop' :=
+                                              strict_prepend_inv s (strict_prepend_inv s₂ hDTail)
+                                            let h_rec : Derivation₃ loop' (.refl p) :=
+                                              strict_loop_contract_go _fuel loop' hLoop
+                                            exact .vcomp
+                                              (Derivation₃.whiskerLeft₃ (.inv (.step s))
+                                                (Derivation₃.whiskerLeft₃ (.inv (.step s₂)) h_inner))
+                                              h_rec
+                                          · exact fallback
+                                    | @inv _ _ dInner' =>
+                                        cases dInner' with
+                                        | step s₃ =>
+                                            by_cases hself₃ : m = r
+                                            · subst hself₃
+                                              let h_inner :
+                                                  Derivation₃ (.vcomp (.inv (.step s₃)) dTail) dTail :=
+                                                absorb_atomic_inv_loop_head s₃ dTail
+                                              let hRest : StrictNormalForm
+                                                  (.vcomp (.inv (.step s₂)) (.vcomp (.inv (.step s₃)) dTail)) :=
+                                                strict_tail_of_cons_inv hd
+                                              let hDR : StrictNormalForm (.vcomp (.inv (.step s₃)) dTail) :=
+                                                strict_tail_of_cons_inv hRest
+                                              let hDTail : StrictNormalForm dTail :=
+                                                strict_tail_of_cons_inv hDR
+                                              let loop' : Derivation₂ p p :=
+                                                .vcomp (.inv (.step s)) (.vcomp (.inv (.step s₂)) dTail)
+                                              let hLoop : StrictNormalForm loop' :=
+                                                strict_prepend_inv s (strict_prepend_inv s₂ hDTail)
+                                              let h_rec : Derivation₃ loop' (.refl p) :=
+                                                strict_loop_contract_go _fuel loop' hLoop
+                                              exact .vcomp
+                                                (Derivation₃.whiskerLeft₃ (.inv (.step s))
+                                                  (Derivation₃.whiskerLeft₃ (.inv (.step s₂)) h_inner))
+                                                h_rec
+                                            · exact fallback
+                                        | _ =>
+                                            exact fallback
+                                    | _ =>
+                                        exact fallback
+                                | _ =>
+                                    exact fallback
+                        | _ =>
+                            exact fallback
                     | _ =>
                         exact fallback
                 | _ =>

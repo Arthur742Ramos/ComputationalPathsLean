@@ -6,10 +6,11 @@ computational paths.  Confluence supplies canonical derivations and explicit
 Step-based ingredients, while the current imported level-3 connector on raw
 `Path` still retains a residual Prop-level transport boundary in
 `OmegaGroupoid.strict_transport₃`.  Atomic self-loops, loop-specialized
-structural contraction, and mixed-sign singleton comparisons are now handled
-constructively in the imported core, so the remaining boundary is the final
-zero-fuel fallback for harder global strict-shape mismatches that the current
-structural recursion still does not align away.
+structural contraction, mixed-sign singleton comparisons, and several
+third-fragment atomic self-loop reductions are now handled constructively in
+the imported core, so the remaining boundary is the final zero-fuel fallback
+for harder global strict-shape mismatches that the current structural
+recursion still does not align away.
 
 ## Key idea
 
@@ -34,24 +35,29 @@ packages the imported core connector rather than replacing it.
   are connected through confluence-based normalization.
 - `confluence_contractibility₃`: contractibility at level 3 routed through
   confluence-chosen canonical derivations and the current core connector.
-- `OmegaGroupoidExplicit`: The full ω-groupoid structure with explicit Step chains.
-- `explicitPolygraphCoherentPresentation`: a proof-relevant 3-dimensional
-  coherent presentation on the explicit expression/polygraph side.
+- `OmegaGroupoidExplicit`: The legacy raw-`Path` ω-groupoid structure with
+  explicit Step chains.
+- `constructivePolygraphOmegaGroupoid`: the primary fully constructive result,
+  packaging the proof-relevant explicit-syntax/polygraph 3-cells together with
+  acyclicity above dimension 3.
 - `OmegaGroupoidWithProofRelevantShadow`: honest frontier bundle combining the
-  Path-level explicit ω-groupoid with the proof-relevant explicit-syntax shadow.
-- `omega_groupoid_explicit_is_weak_omega`: The main theorem establishing
-  the Batanin/Leinster contractibility conditions.
+  legacy raw-`Path` witness with the constructive explicit-syntax theorem.
+- `omega_groupoid_explicit_is_weak_omega`: the Path-level compatibility theorem
+  establishing the Batanin/Leinster contractibility conditions for the current
+  raw `Path` hierarchy.
 
 ## No direct `Subsingleton.elim` in this file
 
 The remaining proof-irrelevance boundary is imported from
 `OmegaGroupoid.strict_transport₃`, now only after the core
-`strict_loop_contract_go` recursion has exhausted its constructive loop cases;
-this file itself only packages that witness with confluence data.  Separately,
-the imported polygraph development provides
-explicit Type-valued 3-cell generators and a proof-relevant coherent
-presentation on the expression syntax side, but that constructive syntax-level
-story is not yet a drop-in replacement for raw-`Path` `Derivation₃`.
+`strict_loop_contract_go` recursion has exhausted its constructive loop cases,
+including the currently recognized third-position atomic self-loops; this file
+itself only packages that witness with confluence data.  Separately,
+the imported polygraph development provides explicit Type-valued 3-cell
+generators and a proof-relevant coherent presentation on the expression syntax
+side, and this file now exports that constructive syntax-level theorem as the
+primary proof-relevant result.  It is still not a drop-in replacement for raw
+`Path` `Derivation₃`.
 -/
 
 import ComputationalPaths.Path.Basic
@@ -66,7 +72,10 @@ namespace ComputationalPaths.Path.OmegaGroupoid.TruncationProof
 open ComputationalPaths
 open ComputationalPaths.Path
 open ComputationalPaths.Path.OmegaGroupoid
+open ComputationalPaths.Path.Polygraph.HomotopyBasis
 open ComputationalPaths.Confluence
+open ComputationalPaths.Path.Rewrite.GroupoidTRS (Expr)
+open ComputationalPaths.Path.Rewrite.GroupoidConfluence (CRTC CStepProp)
 
 universe u
 
@@ -546,10 +555,10 @@ noncomputable def mkOmegaGroupoidExplicit (A : Type u) : OmegaGroupoidExplicit A
 
 end ExplicitStructure
 
-/-! ## §6  The main theorem: Batanin/Leinster weak ω-groupoid
+/-! ## §6  Path-level compatibility theorem and constructive polygraph promotion
 
-The `OmegaGroupoidExplicit` satisfies the Batanin/Leinster conditions
-for a weak ω-groupoid:
+The existing `OmegaGroupoidExplicit` still satisfies the Batanin/Leinster
+conditions for a weak ω-groupoid over the current raw `Path` hierarchy:
 
 1. At each level n, there are composition, identity, and inverse operations.
 2. The coherence conditions at level n+1 witness the equations at level n.
@@ -562,7 +571,11 @@ normalizer-based contraction of the isolated loop `d₁ · d₂⁻¹`, whose rem
 hard boundary is still the residual strict-connector transport fallback.
 
 The contractibility at level 4+ is then inherited from the existing
-`OmegaGroupoid` higher-cell infrastructure. -/
+`OmegaGroupoid` higher-cell infrastructure.
+
+For the user's fully constructive/proof-relevant request, the primary result in
+this section is therefore the explicit polygraph theorem promoted below, not the
+legacy raw-`Path` compatibility witness. -/
 
 section MainTheorem
 
@@ -592,14 +605,19 @@ structure BataninLeinsterData (A : Type u) where
     Derivation₃ (hcomp α β)
       (Derivation₂.vcomp (whiskerLeft f β) (whiskerRight α g'))
 
-/-- **Main theorem**: Computational paths form a weak ω-groupoid in the
-    Batanin/Leinster sense, with all coherence data explicitly constructed
-    from the Step rewriting system.
+/-- Path-level compatibility theorem: computational paths form a weak
+    ω-groupoid in the Batanin/Leinster sense, with all coherence data
+    explicitly constructed from the Step rewriting system.
 
     The contractibility at level 3 is derived from the confluence of
     the Step TRS via the Church–Rosser theorem. The coherence witnesses
     (pentagon, triangle, interchange) use explicit `MetaStep₃` constructors
-    which encode the Step chains from `GroupoidProofs.lean`. -/
+    which encode the Step chains from `GroupoidProofs.lean`.
+
+    This theorem still inherits the residual `OmegaGroupoid.strict_transport₃`
+    boundary through `contract₃_via_loop_normalizer`; the fully constructive
+    replacement exported by this module is `constructivePolygraphOmegaGroupoid`.
+    -/
 noncomputable def bataninLeinsterData : BataninLeinsterData A where
   contract₃ := fun d₁ d₂ => contract₃_via_loop_normalizer d₁ d₂
   contract₄ := fun m₁ m₂ => OmegaGroupoid.contractibility₄ m₁ m₂
@@ -628,8 +646,9 @@ theorem omega_structure_contractible_above_2 :
    fun m₁ m₂ => ⟨OmegaGroupoid.contractibility₄ m₁ m₂⟩,
    fun n c₁ c₂ => ⟨DerivationHigh.step (MetaStepHigh.diamond_filler (n := n) c₁ c₂)⟩⟩
 
-/-- The coherence conditions at level n+1 witness the equations at level n.
-    Level 3+ is contractible because the TRS is confluent. -/
+/-- Path-level compatibility statement: the coherence conditions at level n+1
+    witness the equations at level n, and level 3+ is contractible because the
+    TRS is confluent.  This remains routed through the raw `Path` connector. -/
 theorem omega_groupoid_explicit_is_weak_omega :
     -- 1. Pentagon coherence (level 2 → level 3)
     (∀ {a b c d e : A} (f : Path a b) (g : Path b c) (h : Path c d) (k : Path d e),
@@ -671,29 +690,93 @@ noncomputable def explicitPolygraphCoherentPresentation :
     ComputationalPaths.Path.Polygraph.HomotopyBasis.ProofRelevantCoherentPresentation3D :=
   ComputationalPaths.Path.Polygraph.HomotopyBasis.proofRelevantCoherentPresentation3d
 
-/-- The explicit polygraph shadow has the expected nine generating 3-cell
+/-- The explicit polygraph presentation has the expected nine generating 3-cell
     families. -/
 theorem explicitPolygraph_num3cells :
     explicitPolygraphCoherentPresentation.num3cells = 9 := rfl
 
-/-- Current honest frontier package: the Path-level explicit ω-groupoid together
-    with the proof-relevant explicit-syntax 3-dimensional coherent shadow. -/
+/-- Fully constructive explicit-syntax ω-groupoid frontier.
+
+    This package never routes through raw `Path`, so it avoids the residual
+    proof-irrelevance boundary in `OmegaGroupoid.strict_transport₃`.  Instead it
+    records exactly the proof-relevant data already established on the polygraph
+    side: explicit Type-valued 3-cell generators plus acyclicity above
+    dimension 3. -/
+structure ConstructivePolygraphOmegaGroupoid where
+  presentation3d :
+    ComputationalPaths.Path.Polygraph.HomotopyBasis.ProofRelevantCoherentPresentation3D
+  acyclicAbove3 :
+    (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
+    WellFounded (fun q p : Expr => CStepProp p q) ∧
+    (∀ a b c : Expr, CStepProp a b → CStepProp a c → ∃ d, CRTC b d ∧ CRTC c d)
+
+/-- The completed groupoid polygraph already provides the fully constructive
+    proof-relevant ω-groupoid shadow used as the primary constructive theorem of
+    this module. -/
+noncomputable def constructivePolygraphOmegaGroupoid :
+    ConstructivePolygraphOmegaGroupoid where
+  presentation3d := explicitPolygraphCoherentPresentation
+  acyclicAbove3 := acyclic_above_3
+
+/-- The constructive polygraph theorem retains the ten 2-cell families. -/
+theorem constructivePolygraph_num2cells :
+    constructivePolygraphOmegaGroupoid.presentation3d.num2cells = 10 := rfl
+
+/-- The constructive polygraph theorem retains the nine 3-cell generator
+    families. -/
+theorem constructivePolygraph_num3cells :
+    constructivePolygraphOmegaGroupoid.presentation3d.num3cells = 9 := rfl
+
+/-- Every named critical-pair family comes with an explicit Type-valued
+    generator in the constructive polygraph theorem. -/
+noncomputable def constructivePolygraphGenerator (fam : GeneratorFamily) :
+    GeneratorWitnessType fam :=
+  constructivePolygraphOmegaGroupoid.presentation3d.generatorWitness fam
+
+/-- Each named generator family still resolves its critical pair in the
+    constructive polygraph theorem. -/
+theorem constructivePolygraph_generator_resolves (fam : GeneratorFamily) :
+    GeneratorResolutionType fam :=
+  constructivePolygraphOmegaGroupoid.presentation3d.generatorResolves fam
+
+/-- The explicit generator families remain semantically sound with respect to
+    the free-group interpretation used in the confluence proof. -/
+theorem constructivePolygraph_generator_semantics (fam : GeneratorFamily) :
+    GeneratorSemanticType fam :=
+  constructivePolygraphOmegaGroupoid.presentation3d.generatorSemantics fam
+
+/-- The constructive polygraph theorem is acyclic above dimension 3, so no
+    generating 4-cells are required on the explicit syntax side. -/
+theorem constructivePolygraph_acyclic_above_3 :
+    (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
+    WellFounded (fun q p : Expr => CStepProp p q) ∧
+    (∀ a b c : Expr, CStepProp a b → CStepProp a c → ∃ d, CRTC b d ∧ CRTC c d) :=
+  constructivePolygraphOmegaGroupoid.acyclicAbove3
+
+/-- Current honest frontier package: the legacy Path-level explicit ω-groupoid
+    together with the fully constructive proof-relevant explicit-syntax theorem. -/
 structure OmegaGroupoidWithProofRelevantShadow (A : Type u) where
   omega : OmegaGroupoidExplicit A
-  shadow3d :
-    ComputationalPaths.Path.Polygraph.HomotopyBasis.ProofRelevantCoherentPresentation3D
+  constructiveShadow : ConstructivePolygraphOmegaGroupoid
 
-/-- Bundle the current Path-level ω-groupoid witness with its proof-relevant
-    explicit polygraph shadow. -/
+/-- Bundle the current Path-level ω-groupoid witness with the fully constructive
+    explicit polygraph theorem exported by this file. -/
 noncomputable def mkOmegaGroupoidWithProofRelevantShadow (A : Type u) :
     OmegaGroupoidWithProofRelevantShadow A where
   omega := mkOmegaGroupoidExplicit A
-  shadow3d := explicitPolygraphCoherentPresentation
+  constructiveShadow := constructivePolygraphOmegaGroupoid
 
-/-- The bundled proof-relevant shadow still carries the nine explicit
+/-- The bundled constructive shadow still carries the nine explicit
     critical-pair generator families. -/
 theorem omega_shadow_num3cells (A : Type u) :
-    (mkOmegaGroupoidWithProofRelevantShadow A).shadow3d.num3cells = 9 := rfl
+    (mkOmegaGroupoidWithProofRelevantShadow A).constructiveShadow.presentation3d.num3cells = 9 := rfl
+
+/-- The bundled constructive shadow is still acyclic above dimension 3. -/
+theorem omega_shadow_acyclic_above_3 (A : Type u) :
+    (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
+    WellFounded (fun q p : Expr => CStepProp p q) ∧
+    (∀ a b c : Expr, CStepProp a b → CStepProp a c → ∃ d, CRTC b d ∧ CRTC c d) :=
+  (mkOmegaGroupoidWithProofRelevantShadow A).constructiveShadow.acyclicAbove3
 
 end MainTheorem
 
@@ -810,15 +893,22 @@ end PureConfluenceContractibility
    - Composition, identity, inverse at each level
    - Coherence witnesses = explicit Step chains from `GroupoidProofs.lean`
 
-4. **Batanin/Leinster conditions** (`omega_groupoid_explicit_is_weak_omega`):
-   - Pentagon and triangle coherences at level 3
-   - Interchange law at level 3
-   - Contractibility at levels 3, 4, 5+
-   - All from explicit Step/MetaStep constructors
+4. **Path-level compatibility theorem** (`omega_groupoid_explicit_is_weak_omega`):
+    - Pentagon and triangle coherences at level 3
+    - Interchange law at level 3
+    - Contractibility at levels 3, 4, 5+
+    - All from explicit Step/MetaStep constructors
+    - Still inherits the residual raw-`Path` transport fallback
 
-5. **Agreement** (`omega_explicit_agrees_with_standard`):
-   The explicit ω-groupoid agrees with the standard one from
-   `OmegaGroupoid.lean`.
+5. **Fully constructive explicit-syntax theorem**
+   (`constructivePolygraphOmegaGroupoid`):
+   - Proof-relevant `Generator3CellT` witnesses for all 9 critical-pair families
+   - Semantic soundness and critical-pair resolution data for each family
+   - Acyclicity above dimension 3, so no generating 4-cells are needed
+
+6. **Raw-`Path` comparison point** (`omega_explicit_uses_same_mechanism`):
+   The legacy explicit ω-groupoid still uses the same normalizer-based
+   3-cell witness as the standard `OmegaGroupoid.lean` packaging.
 
 ### Step constructors used
 

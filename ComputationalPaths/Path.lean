@@ -219,6 +219,7 @@ import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.InfinityGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
+import ComputationalPaths.Path.OmegaGroupoid.TruncationProof
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Algebra.BouquetFreeGroupOps
 import ComputationalPaths.Path.Algebra.GroupActionOps
