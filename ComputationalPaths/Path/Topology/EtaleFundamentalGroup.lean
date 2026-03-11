@@ -79,14 +79,18 @@ structure FiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) where
   onObj : FiniteEtaleCover X → Type u
   /-- Morphism part. -/
   onHom : {Y Z : FiniteEtaleCover X} → EtaleCoverHom Y Z → onObj Y → onObj Z
-  /-- Functoriality witness. -/
-  functorial : True
+  /-- Functoriality: identity morphisms map to identity. -/
+  map_id : ∀ (Y : FiniteEtaleCover X) (y : onObj Y), onHom (coverId Y) y = y
+  /-- Functoriality: composition is preserved. -/
+  map_comp : ∀ {Y Z W : FiniteEtaleCover X} (f : EtaleCoverHom Y Z) (g : EtaleCoverHom Z W)
+    (y : onObj Y), onHom (coverComp f g) y = onHom g (onHom f y)
 
 /-- The canonical fiber functor given by geometric fibers. -/
 noncomputable def geometricFiberFunctor (X : Scheme.{u}) (x : GeometricPoint X) : FiberFunctor X x :=
   { onObj := fiber x
-    onHom := fun {_ _} f y => ⟨f.toFun y.1, (f.comm y.1).proof.trans y.2⟩
-    functorial := True.intro }
+    onHom := fun {_ _} f y => ⟨f.toFun y.1, (f.comm y.1).toEq.trans y.2⟩
+    map_id := fun _ _ => rfl
+    map_comp := fun _ _ _ => rfl }
 
 /-! ## Profinite Completion and Grothendieck Pi1 -/
 

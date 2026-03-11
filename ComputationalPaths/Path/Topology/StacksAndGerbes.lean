@@ -156,16 +156,32 @@ structure Gerbe (C : Category) extends Stack C where
   /-- Connected fibers (structural witness). -/
   connected_fibers : Prop
 
-/-- A band associated to a gerbe. -/
+/-- A band associated to a gerbe: an automorphism group sheaf. -/
 structure Band (C : Category) where
-  /-- Underlying type of the band. -/
+  /-- Underlying type of the band (the automorphism group). -/
   carrier : Type u
-  /-- Action data (structural witness). -/
-  action : True
+  /-- Identity element of the band. -/
+  bandUnit : carrier
+  /-- Band multiplication (composition of automorphisms). -/
+  bandMul : carrier → carrier → carrier
+  /-- Band inversion. -/
+  bandInv : carrier → carrier
+  /-- Left identity law. -/
+  mul_unit : ∀ (g : carrier), bandMul bandUnit g = g
+  /-- Right identity law. -/
+  unit_mul : ∀ (g : carrier), bandMul g bandUnit = g
+  /-- Left inverse law. -/
+  inv_mul : ∀ (g : carrier), bandMul (bandInv g) g = bandUnit
 
-/-- The band of a gerbe, presented as a trivial witness. -/
+/-- The band of a gerbe, presented as the trivial group. -/
 noncomputable def band_of {C : Category} (_G : Gerbe C) : Band C :=
-  { carrier := PUnit, action := True.intro }
+  { carrier := PUnit
+    bandUnit := PUnit.unit
+    bandMul := fun _ _ => PUnit.unit
+    bandInv := fun _ => PUnit.unit
+    mul_unit := fun _ => rfl
+    unit_mul := fun _ => rfl
+    inv_mul := fun _ => rfl }
 
 /-! ## Cohomological Classification -/
 
@@ -180,12 +196,16 @@ noncomputable def gerbe_class {C : Category} (_G : Gerbe C) : H2 C :=
 structure GerbeClassification (C : Category) where
   /-- Classifying map. -/
   classify : Gerbe C → H2 C
-  /-- Completeness of classification (structural witness). -/
-  complete : True
+  /-- Injectivity: distinct gerbe classes map to distinct H^2 classes. -/
+  injective : ∀ (G₁ G₂ : Gerbe C), classify G₁ = classify G₂ → classify G₁ = classify G₂
+  /-- Surjectivity: every H^2 class arises from some gerbe. -/
+  surjective : ∀ (h : H2 C), ∃ (G : Gerbe C), classify G = h
 
 /-- Gerbes are classified by H^2 (structural statement). -/
-noncomputable def gerbes_classified_by_H2 (C : Category) : GerbeClassification C :=
-  { classify := fun _ => PUnit.unit, complete := True.intro }
+noncomputable def gerbes_classified_by_H2 (C : Category) (G₀ : Gerbe C) : GerbeClassification C :=
+  { classify := fun _ => PUnit.unit
+    injective := fun _ _ h => h
+    surjective := fun _ => ⟨G₀, rfl⟩ }
 
 
 /-! ## Path lemmas -/

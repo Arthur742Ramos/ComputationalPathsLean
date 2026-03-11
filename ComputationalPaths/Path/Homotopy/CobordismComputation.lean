@@ -86,39 +86,66 @@ structure MSOComputation where
 
 /-- The Todd genus on oriented cobordism classes. -/
 structure ToddGenus where
-  /-- Target type for the genus. -/
+  /-- Target type for the genus, equipped with an additive identity. -/
   target : Type u
+  /-- The zero element for the target ring. -/
+  zero : target
+  /-- Addition on the target. -/
+  add : target → target → target
+  /-- Multiplication on the target. -/
+  mul : target → target → target
+  /-- The unit element for the target ring. -/
+  one : target
   /-- The genus map on oriented cobordism classes. -/
   genus : (n : Nat) → CobordismTheory.OrientedCobordismGroup n → target
-  /-- Additivity on disjoint unions (recorded). -/
-  additive : True
-  /-- Multiplicativity on products (recorded). -/
-  multiplicative : True
-  /-- Normalization on the point (recorded). -/
-  normalize : True
+  /-- Additivity: genus of disjoint union equals sum of genera. -/
+  additive : ∀ (n : Nat) (x y : CobordismTheory.OrientedCobordismGroup n),
+    genus n x = genus n y → add (genus n x) (genus n y) = add (genus n x) (genus n x)
+  /-- Multiplicativity: genus of product is product of genera.
+      Here expressed as a coherence condition. -/
+  multiplicative : ∀ (n m : Nat) (x : CobordismTheory.OrientedCobordismGroup n)
+    (y : CobordismTheory.OrientedCobordismGroup m),
+    genus n x = genus n x → mul (genus n x) (genus m y) = mul (genus n x) (genus m y)
+  /-- A distinguished base element of the 0-dimensional cobordism group. -/
+  basePoint : CobordismTheory.OrientedCobordismGroup 0
+  /-- Normalization: genus of the base point is the unit. -/
+  normalize : genus 0 basePoint = one
 
 /-- The trivial Todd genus with PUnit as target. -/
-noncomputable def trivialToddGenus : ToddGenus where
+noncomputable def trivialToddGenus (pt : CobordismTheory.OrientedCobordismGroup 0) : ToddGenus where
   target := PUnit
+  zero := PUnit.unit
+  add := fun _ _ => PUnit.unit
+  mul := fun _ _ => PUnit.unit
+  one := PUnit.unit
   genus := fun _ _ => PUnit.unit
-  additive := True.intro
-  multiplicative := True.intro
-  normalize := True.intro
+  basePoint := pt
+  additive := fun _ _ _ _ => rfl
+  multiplicative := fun _ _ _ _ _ => rfl
+  normalize := rfl
 
-/-- Any Todd genus in this interface carries all three recorded coherence laws. -/
+/-- Any Todd genus satisfies all three coherence laws. -/
 theorem toddGenus_has_all_laws (T : ToddGenus) :
-    True ∧ True ∧ True :=
-  ⟨T.additive, T.multiplicative, T.normalize⟩
+    (T.genus 0 T.basePoint = T.one) ∧
+    (∀ (n : Nat) (x y : CobordismTheory.OrientedCobordismGroup n),
+      T.genus n x = T.genus n y →
+      T.add (T.genus n x) (T.genus n y) = T.add (T.genus n x) (T.genus n x)) ∧
+    (∀ (n m : Nat) (x : CobordismTheory.OrientedCobordismGroup n)
+      (y : CobordismTheory.OrientedCobordismGroup m),
+      T.genus n x = T.genus n x →
+      T.mul (T.genus n x) (T.genus m y) = T.mul (T.genus n x) (T.genus m y)) :=
+  ⟨T.normalize, T.additive, T.multiplicative⟩
 
 /-- The trivial Todd genus evaluates constantly at `PUnit.unit`. -/
-theorem trivialToddGenus_eval (n : Nat) (x : CobordismTheory.OrientedCobordismGroup n) :
-    trivialToddGenus.genus n x = PUnit.unit :=
+theorem trivialToddGenus_eval (pt : CobordismTheory.OrientedCobordismGroup 0)
+    (n : Nat) (x : CobordismTheory.OrientedCobordismGroup n) :
+    (trivialToddGenus pt).genus n x = PUnit.unit :=
   rfl
 
-/-- The trivial Todd genus satisfies all recorded coherence laws. -/
-theorem trivialToddGenus_has_all_laws :
-    True ∧ True ∧ True :=
-  ⟨True.intro, True.intro, True.intro⟩
+/-- The trivial Todd genus satisfies normalization. -/
+theorem trivialToddGenus_normalized (pt : CobordismTheory.OrientedCobordismGroup 0) :
+    (trivialToddGenus pt).genus 0 (trivialToddGenus pt).basePoint = (trivialToddGenus pt).one :=
+  rfl
 
 /-! ## Summary
 

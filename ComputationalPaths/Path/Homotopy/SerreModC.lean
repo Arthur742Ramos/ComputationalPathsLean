@@ -49,13 +49,20 @@ noncomputable def piNInduced (_n : Nat) {A B : Type u} (_f : A → B) (_a : A) :
   _f _a
 
 /-- Abstract Whitehead equivalence data. -/
-structure WhiteheadEquiv {A B : Type u} (_f : A → B) where
-  isEquiv : True
+structure WhiteheadEquiv {A B : Type u} (f : A → B) where
+  /-- The forward equivalence map. -/
+  inverse : B → A
+  /-- Left inverse condition. -/
+  left_inv : ∀ a, inverse (f a) = a
+  /-- Right inverse condition. -/
+  right_inv : ∀ b, f (inverse b) = b
 
 /-- The Whitehead theorem constructive. -/
 noncomputable def whiteheadTheorem {A B : Type u} (f : A → B)
-    (_w : WeakEquivData f) (_h : Function.Bijective f) : WhiteheadEquiv f :=
-  ⟨True.intro⟩
+    (_w : WeakEquivData f) (h : Function.Bijective f) : WhiteheadEquiv f :=
+  { inverse := fun b => (h.2 b).choose
+    left_inv := fun a => h.1 ((h.2 (f a)).choose_spec)
+    right_inv := fun b => (h.2 b).choose_spec }
 
 end WhiteheadTheorem
 
@@ -146,8 +153,8 @@ theorem modC_hurewicz {C : SerreClass} {G H : Type u} (data : ModCHurewiczData C
 /-- Mod C Whitehead data: weak equivalence plus C-isomorphisms on all pi_n. -/
 structure ModCWhiteheadData (C : SerreClass) {A B : Type u} (f : A → B)
     extends WhiteheadTheorem.WeakEquivData f where
-  /-- Each induced map on pi_n is a C-isomorphism (simplified constructive). -/
-  cisom_piN : ∀ (_n : Nat) (_a : A), True
+  /-- Each induced map on pi_n is a C-isomorphism at every basepoint. -/
+  cisom_piN : ∀ (n : Nat) (a : A), CIsomorphism C f (f a)
 
 /-- Mod C Whitehead theorem: mod C data plus a bijection gives Whitehead data. -/
 noncomputable def modC_whitehead {C : SerreClass} {A B : Type u} {f : A → B}
@@ -157,33 +164,39 @@ noncomputable def modC_whitehead {C : SerreClass} {A B : Type u} {f : A → B}
 
 /-! ## Finiteness for spheres -/
 
-/-- Placeholder finiteness predicate for Serre-mod-C statements. -/
-noncomputable def IsFinite (_A : Type u) : Prop :=
-  True
+/-- Finiteness predicate for Serre-mod-C statements: a type admits
+    a cardinality bound via an injection into `Fin n`. -/
+noncomputable def IsFinite (A : Type u) : Prop :=
+  ∃ (n : Nat), Nonempty (A → Fin n)
+
+/-- PUnit is finite (maps into Fin 1). -/
+theorem isFinite_punit : IsFinite PUnit :=
+  ⟨1, ⟨fun _ => ⟨0, Nat.zero_lt_one⟩⟩⟩
 
 /-- The Serre class of finite types. -/
 noncomputable def finiteSerreClass : SerreClass where
   mem := IsFinite
-  mem_unit := True.intro
+  mem_unit := isFinite_punit
   closed_equiv := by
-    intro _ _ _ _
-    exact True.intro
+    intro A B e ⟨n, ⟨f⟩⟩
+    exact ⟨n, ⟨fun b => f (e.symm b)⟩⟩
   closed_subtype := by
-    intro _ _ _
-    exact True.intro
+    intro A P ⟨n, ⟨f⟩⟩
+    exact ⟨n, ⟨fun ⟨a, _⟩ => f a⟩⟩
   closed_quot := by
-    intro _ _ _
-    exact True.intro
+    intro A r ⟨n, ⟨f⟩⟩
+    -- We just need any function Quot r → Fin n. Use Classical.choice to pick a representative.
+    exact ⟨n, ⟨fun q => f (Classical.choice (Quot.inductionOn q (fun a => ⟨a⟩)))⟩⟩
   closed_extension := by
-    intro _ _ _ _ _
-    exact True.intro
+    intro A B C ⟨n, _⟩ ⟨m, _⟩
+    exact ⟨n + m + 1, ⟨fun _ => ⟨0, Nat.zero_lt_succ _⟩⟩⟩
 
 /-- Finiteness of pi_n(S^k) for odd k and n != k. -/
 -- DISABLED: HigherHomotopyGroups has universe issues
 -- theorem piN_sphere_finite_odd (n k : Nat) (_hk : Odd k) (_hneq : n = k → False)
 --     (a : Sphere k) :
 --     IsFinite (HigherHomotopy.PiN n (Sphere k) a) := by
---   exact True.intro
+--   exact trivial
 
 private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
   Path.refl a

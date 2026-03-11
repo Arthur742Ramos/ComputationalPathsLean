@@ -53,12 +53,12 @@ noncomputable def wfs_cof_tfib (A : Type u) : WeakFactorizationSystem A where
   right_class := fun p => trivialFibration (pathModelCategory A) p
   factorize := by
     intro a b f
-    refine ⟨b, f, Path.refl b, True.intro, ⟨True.intro, ?_⟩, ?_⟩
+    refine ⟨b, f, Path.refl b, trivial, ⟨trivial, ?_⟩, ?_⟩
     · exact path_is_weak_equivalence (A := A) (Path.refl b)
     · exact rw_of_step (Step.trans_refl_right f)
   lift := by
     intro a b c d i p f _g _hi _hp
-    exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+    exact ⟨Path.trans (Path.symm i) f, trivial⟩
 
 /-- The (trivial cofibration, fibration) weak factorization system. -/
 noncomputable def wfs_tcof_fib (A : Type u) : WeakFactorizationSystem A where
@@ -66,46 +66,46 @@ noncomputable def wfs_tcof_fib (A : Type u) : WeakFactorizationSystem A where
   right_class := fun p => (pathModelCategory A).fib p
   factorize := by
     intro a b f
-    refine ⟨a, Path.refl a, f, ⟨True.intro, ?_⟩, True.intro, ?_⟩
+    refine ⟨a, Path.refl a, f, ⟨trivial, ?_⟩, trivial, ?_⟩
     · exact path_is_weak_equivalence (A := A) (Path.refl a)
     · exact rw_of_step (Step.trans_refl_left f)
   lift := by
     intro a b c d i p f _g _hi _hp
-    exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+    exact ⟨Path.trans (Path.symm i) f, trivial⟩
 
 /-- Left class of wfs_cof_tfib contains all identities. -/
 theorem wfs_cof_tfib_left_contains_id (a : A) :
     (wfs_cof_tfib A).left_class (Path.refl a) :=
-  True.intro
+  trivial
 
 /-- Right class of wfs_cof_tfib contains all identities. -/
 theorem wfs_cof_tfib_right_contains_id (a : A) :
     (wfs_cof_tfib A).right_class (Path.refl a) :=
-  ⟨True.intro, weq_refl A a⟩
+  ⟨trivial, weq_refl A a⟩
 
 /-- Left class of wfs_tcof_fib contains all identities. -/
 theorem wfs_tcof_fib_left_contains_id (a : A) :
     (wfs_tcof_fib A).left_class (Path.refl a) :=
-  ⟨True.intro, weq_refl A a⟩
+  ⟨trivial, weq_refl A a⟩
 
 /-- Right class of wfs_tcof_fib contains all identities. -/
 theorem wfs_tcof_fib_right_contains_id (a : A) :
     (wfs_tcof_fib A).right_class (Path.refl a) :=
-  True.intro
+  trivial
 
 /-- Left class is closed under composition for wfs_cof_tfib. -/
 theorem wfs_cof_tfib_left_comp {a b c : A} (f : Path a b) (g : Path b c) :
     (wfs_cof_tfib A).left_class f →
     (wfs_cof_tfib A).left_class g →
     (wfs_cof_tfib A).left_class (Path.trans f g) :=
-  fun _ _ => True.intro
+  fun _ _ => trivial
 
 /-- Right class is closed under composition for wfs_tcof_fib. -/
 theorem wfs_tcof_fib_right_comp {a b c : A} (f : Path a b) (g : Path b c) :
     (wfs_tcof_fib A).right_class f →
     (wfs_tcof_fib A).right_class g →
     (wfs_tcof_fib A).right_class (Path.trans f g) :=
-  fun _ _ => True.intro
+  fun _ _ => trivial
 
 /-! ## Section 2: Lifting Properties (LLP, RLP) -/
 
@@ -126,28 +126,28 @@ theorem trivial_cof_has_llp_fib {a b : A} (i : Path a b) :
     trivialCofibration (pathModelCategory A) i →
     HasLLP i (fun p => (pathModelCategory A).fib p) := by
   intro _hi c d p f _g _hp
-  exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+  exact ⟨Path.trans (Path.symm i) f, trivial⟩
 
 /-- Cofibrations have LLP against all trivial fibrations. -/
 theorem cof_has_llp_tfib {a b : A} (i : Path a b) :
     (pathModelCategory A).cof i →
     HasLLP i (fun p => trivialFibration (pathModelCategory A) p) := by
   intro _hi c d p f _g _hp
-  exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+  exact ⟨Path.trans (Path.symm i) f, trivial⟩
 
 /-- Fibrations have RLP against all trivial cofibrations. -/
 theorem fib_has_rlp_tcof {c d : A} (p : Path c d) :
     (pathModelCategory A).fib p →
     HasRLP p (fun i => trivialCofibration (pathModelCategory A) i) := by
   intro _hp a b i f _g _hi
-  exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+  exact ⟨Path.trans (Path.symm i) f, trivial⟩
 
 /-- Trivial fibrations have RLP against all cofibrations. -/
 theorem tfib_has_rlp_cof {c d : A} (p : Path c d) :
     trivialFibration (pathModelCategory A) p →
     HasRLP p (fun i => (pathModelCategory A).cof i) := by
   intro _hp a b i f _g _hi
-  exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+  exact ⟨Path.trans (Path.symm i) f, trivial⟩
 
 /-- LLP is closed under composition. -/
 theorem llp_comp {a b c : A} (f : Path a b) (g : Path b c)
@@ -156,7 +156,7 @@ theorem llp_comp {a b c : A} (f : Path a b) (g : Path b c)
     HasLLP g cls →
     HasLLP (Path.trans f g) cls := by
   intro _hf _hg x y p q h hp
-  exact ⟨Path.trans (Path.symm (Path.trans f g)) q, True.intro⟩
+  exact ⟨Path.trans (Path.symm (Path.trans f g)) q, trivial⟩
 
 /-- RLP is closed under composition. -/
 theorem rlp_comp {c d e : A} (f : Path c d) (g : Path d e)
@@ -166,7 +166,7 @@ theorem rlp_comp {c d e : A} (f : Path c d) (g : Path d e)
     HasRLP (Path.trans f g) cls := by
   intro hf _hg a b i q h hi
   rcases hf i q (Path.trans (Path.symm i) (Path.trans q f)) hi with ⟨h₁, _⟩
-  exact ⟨h₁, True.intro⟩
+  exact ⟨h₁, trivial⟩
 
 /-! ## Section 3: Quillen Model Structure Axioms -/
 
@@ -174,7 +174,7 @@ theorem rlp_comp {c d e : A} (f : Path c d) (g : Path d e)
 theorem mc1_finite_limits_colimits (a b c : A)
     (f : Path a b) (g : Path a c) :
     ∃ (d : A) (_p : Path b d) (_q : Path c d), True := by
-  exact ⟨b, Path.refl b, Path.trans (Path.symm g) f, True.intro⟩
+  exact ⟨b, Path.refl b, Path.trans (Path.symm g) f, trivial⟩
 
 /-- MC2: Two-of-three for weak equivalences. -/
 theorem mc2_two_of_three {a b c : A} (f : Path a b) (g : Path b c) :
@@ -183,13 +183,15 @@ theorem mc2_two_of_three {a b c : A} (f : Path a b) (g : Path b c) :
     (pathModelCategory A).weq (Path.trans f g) :=
   weq_two_of_three_comp A f g
 
-/-- MC3: Retracts preserve cofibrations. -/
+/-- MC3: Retracts preserve cofibrations — in the path model structure,
+    all morphisms are cofibrations. -/
 theorem mc3_retract_cof {a b : A} (f : Path a b) :
-    (pathModelCategory A).cof f := True.intro
+    (pathModelCategory A).cof f := trivial
 
-/-- MC3: Retracts preserve fibrations. -/
+/-- MC3: Retracts preserve fibrations — in the path model structure,
+    all morphisms are fibrations. -/
 theorem mc3_retract_fib {a b : A} (f : Path a b) :
-    (pathModelCategory A).fib f := True.intro
+    (pathModelCategory A).fib f := trivial
 
 /-- MC3: Retracts preserve weak equivalences. -/
 theorem mc3_retract_weq {a b : A} (f : Path a b) :
@@ -203,7 +205,7 @@ theorem mc4_lift_tcof_fib {a b c d : A}
     (pathModelCategory A).fib p →
     ∃ (_h : Path b c), True := by
   intro _hi _hp
-  exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+  exact ⟨Path.trans (Path.symm i) f, trivial⟩
 
 /-- MC4: Lifting axiom (cofibration vs trivial fibration). -/
 theorem mc4_lift_cof_tfib {a b c d : A}
@@ -212,7 +214,7 @@ theorem mc4_lift_cof_tfib {a b c d : A}
     trivialFibration (pathModelCategory A) p →
     ∃ (_h : Path b c), True := by
   intro _hi _hp
-  exact ⟨Path.trans (Path.symm i) f, True.intro⟩
+  exact ⟨Path.trans (Path.symm i) f, trivial⟩
 
 /-- MC5: Factorization axiom (cofibration, trivial fibration). -/
 theorem mc5_factor_cof_tfib {a b : A} (p : Path a b) :
@@ -220,7 +222,7 @@ theorem mc5_factor_cof_tfib {a b : A} (p : Path a b) :
       (pathModelCategory A).cof i ∧
       trivialFibration (pathModelCategory A) q ∧
       Rw (Path.trans i q) p := by
-  refine ⟨b, p, Path.refl b, True.intro, ⟨True.intro, ?_⟩, ?_⟩
+  refine ⟨b, p, Path.refl b, trivial, ⟨trivial, ?_⟩, ?_⟩
   · exact path_is_weak_equivalence (A := A) (Path.refl b)
   · exact rw_of_step (Step.trans_refl_right p)
 
@@ -230,7 +232,7 @@ theorem mc5_factor_tcof_fib {a b : A} (p : Path a b) :
       trivialCofibration (pathModelCategory A) i ∧
       (pathModelCategory A).fib q ∧
       Rw (Path.trans i q) p := by
-  refine ⟨a, Path.refl a, p, ⟨True.intro, ?_⟩, True.intro, ?_⟩
+  refine ⟨a, Path.refl a, p, ⟨trivial, ?_⟩, trivial, ?_⟩
   · exact path_is_weak_equivalence (A := A) (Path.refl a)
   · exact rw_of_step (Step.trans_refl_left p)
 
@@ -271,28 +273,28 @@ theorem all_classes_contain_id (a : A) :
     (pathModelCategory A).cof (Path.refl a) ∧
     (pathModelCategory A).fib (Path.refl a) ∧
     (pathModelCategory A).weq (Path.refl a) :=
-  ⟨True.intro, True.intro, weq_refl A a⟩
+  ⟨trivial, trivial, weq_refl A a⟩
 
 /-- A path is simultaneously a trivial cofibration and trivial fibration. -/
 theorem path_is_tcof_and_tfib {a b : A} (f : Path a b) :
     trivialCofibration (pathModelCategory A) f ∧
     trivialFibration (pathModelCategory A) f :=
-  ⟨⟨True.intro, path_is_weak_equivalence (A := A) f⟩,
-   ⟨True.intro, path_is_weak_equivalence (A := A) f⟩⟩
+  ⟨⟨trivial, path_is_weak_equivalence (A := A) f⟩,
+   ⟨trivial, path_is_weak_equivalence (A := A) f⟩⟩
 
 /-- Cofibrations are closed under retracts (trivially in path model). -/
 theorem cof_closed_under_retract {a b c d : A}
     (_f : Path a b) (_g : Path c d)
     (_s : Path a c) (_r : Path c a) (_s' : Path b d) (_r' : Path d b) :
     (pathModelCategory A).cof (Path.trans _s (Path.trans _g _r')) :=
-  True.intro
+  trivial
 
 /-- Fibrations are closed under retracts (trivially in path model). -/
 theorem fib_closed_under_retract {a b c d : A}
     (_f : Path a b) (_g : Path c d)
     (_s : Path a c) (_r : Path c a) (_s' : Path b d) (_r' : Path d b) :
     (pathModelCategory A).fib (Path.trans _s (Path.trans _g _r')) :=
-  True.intro
+  trivial
 
 /-! ## Section 5: Cylinder Objects and Path Objects -/
 
@@ -338,13 +340,13 @@ noncomputable def canonicalPathObject (b : A) :
 theorem cylinder_inclusions_are_cof (a : A) :
     (pathModelCategory A).cof (canonicalCylinder (A := A) a).i₀ ∧
     (pathModelCategory A).cof (canonicalCylinder (A := A) a).i₁ :=
-  ⟨True.intro, True.intro⟩
+  ⟨trivial, trivial⟩
 
 /-- Path object evaluations are fibrations. -/
 theorem pathobject_evals_are_fib (b : A) :
     (pathModelCategory A).fib (canonicalPathObject (A := A) b).ev₀ ∧
     (pathModelCategory A).fib (canonicalPathObject (A := A) b).ev₁ :=
-  ⟨True.intro, True.intro⟩
+  ⟨trivial, trivial⟩
 
 /-- Cylinder collapse is a weak equivalence. -/
 theorem cylinder_collapse_is_weq (a : A) :
@@ -361,14 +363,14 @@ theorem good_cylinder (a : A) :
     (pathModelCategory A).cof (canonicalCylinder (A := A) a).i₀ ∧
     (pathModelCategory A).cof (canonicalCylinder (A := A) a).i₁ ∧
     (pathModelCategory A).weq (canonicalCylinder (A := A) a).σ :=
-  ⟨True.intro, True.intro, path_is_weak_equivalence (A := A) _⟩
+  ⟨trivial, trivial, path_is_weak_equivalence (A := A) _⟩
 
 /-- Good path object: ev₀ and ev₁ are fibrations, δ is a weak equivalence. -/
 theorem good_path_object (b : A) :
     (pathModelCategory A).fib (canonicalPathObject (A := A) b).ev₀ ∧
     (pathModelCategory A).fib (canonicalPathObject (A := A) b).ev₁ ∧
     (pathModelCategory A).weq (canonicalPathObject (A := A) b).δ :=
-  ⟨True.intro, True.intro, path_is_weak_equivalence (A := A) _⟩
+  ⟨trivial, trivial, path_is_weak_equivalence (A := A) _⟩
 
 /-! ## Section 6: Left and Right Homotopy via Paths -/
 
@@ -518,7 +520,7 @@ structure QuillenPair (A : Type u) (B : Type v) where
 theorem quillen_right_preserves_fib {B : Type v} (Q : QuillenPair A B)
     {b₁ b₂ : B} (_g : Path b₁ b₂) :
     (pathModelCategory B).fib _g →
-    (pathModelCategory A).fib (Q.mapRight _g) := fun _ => True.intro
+    (pathModelCategory A).fib (Q.mapRight _g) := fun _ => trivial
 
 /-- In a Quillen pair, the right adjoint preserves trivial fibrations. -/
 theorem quillen_right_preserves_tfib {B : Type v} (Q : QuillenPair A B)
@@ -526,7 +528,7 @@ theorem quillen_right_preserves_tfib {B : Type v} (Q : QuillenPair A B)
     trivialFibration (pathModelCategory B) g →
     trivialFibration (pathModelCategory A) (Q.mapRight g) := by
   intro ⟨_, _⟩
-  exact ⟨True.intro, path_is_weak_equivalence (A := A) _⟩
+  exact ⟨trivial, path_is_weak_equivalence (A := A) _⟩
 
 /-- A Quillen equivalence is a Quillen pair where derived functors
     induce weak equivalences on the unit/counit. -/
@@ -659,7 +661,7 @@ noncomputable def trivialReedyCategory (A : Type u) : ReedyCategory A where
   inverse := fun _ => True
   reedy_factor := by
     intro a b f
-    exact ⟨a, Path.refl a, f, True.intro, True.intro⟩
+    exact ⟨a, Path.refl a, f, trivial, trivial⟩
 
 /-- Reedy factorization has an Rw-coherent version. -/
 theorem reedy_factor_rw (R : ReedyCategory A) {a b : A} (f : Path a b) :
@@ -684,24 +686,24 @@ def reedyWeakEquivalence (_R : ReedyCategory A) {a b : A} (f : Path a b) : Prop 
 /-- Every path is a Reedy cofibration in the trivial Reedy category. -/
 theorem trivial_reedy_all_cof {a b : A} (f : Path a b) :
     reedyCofibration (trivialReedyCategory A) f :=
-  ⟨True.intro, True.intro⟩
+  ⟨trivial, trivial⟩
 
 /-- Every path is a Reedy fibration in the trivial Reedy category. -/
 theorem trivial_reedy_all_fib {a b : A} (f : Path a b) :
     reedyFibration (trivialReedyCategory A) f :=
-  ⟨True.intro, True.intro⟩
+  ⟨trivial, trivial⟩
 
 /-- Identity is a Reedy cofibration. -/
 theorem reedy_cof_refl (R : ReedyCategory A) (a : A)
     (hd : R.direct (Path.refl a)) :
     reedyCofibration R (Path.refl a) :=
-  ⟨True.intro, hd⟩
+  ⟨trivial, hd⟩
 
 /-- Identity is a Reedy fibration. -/
 theorem reedy_fib_refl (R : ReedyCategory A) (a : A)
     (hi : R.inverse (Path.refl a)) :
     reedyFibration R (Path.refl a) :=
-  ⟨True.intro, hi⟩
+  ⟨trivial, hi⟩
 
 /-! ## Section 11: Cofibrantly Generated Model Categories -/
 
@@ -723,21 +725,22 @@ noncomputable def pathCofibrantlyGenerated (A : Type u) :
   genJ := fun _ => False
   genI_inj_is_tfib := by
     intro a b p _
-    exact ⟨True.intro, path_is_weak_equivalence (A := A) p⟩
+    exact ⟨trivial, path_is_weak_equivalence (A := A) p⟩
   genJ_inj_is_fib := by
     intro a b p _
-    exact True.intro
+    exact trivial
 
-/-- In the path model, every morphism is in the cofibration closure. -/
+/-- In the path model, every morphism is in the cofibration closure
+    (all paths are cofibrations). -/
 theorem cof_gen_closure {a b : A} (f : Path a b) :
-    (pathModelCategory A).cof f := True.intro
+    (pathModelCategory A).cof f := trivial
 
 /-- Cofibrantly generated models have functorial factorization. -/
 theorem cof_gen_functorial_factorization {a b : A} (f : Path a b) :
     ∃ (c : A) (i : Path a c) (p : Path c b),
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).fib p := by
-  exact ⟨a, Path.refl a, f, True.intro, True.intro⟩
+  exact ⟨a, Path.refl a, f, trivial, trivial⟩
 
 /-! ## Section 12: Small Object Argument -/
 
@@ -756,7 +759,7 @@ noncomputable def trivialCellComplex (a : A) :
   src := a
   tgt := a
   inclusion := Path.refl a
-  inclusion_cof := True.intro
+  inclusion_cof := trivial
 
 /-- Small object argument: factorize as cell complex followed by injective. -/
 theorem small_object_argument {a b : A} (f : Path a b) :
@@ -764,28 +767,28 @@ theorem small_object_argument {a b : A} (f : Path a b) :
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).fib p ∧
       Rw (Path.trans i p) (Path.trans i p) := by
-  exact ⟨a, Path.refl a, f, True.intro, True.intro, Rw.refl _⟩
+  exact ⟨a, Path.refl a, f, trivial, trivial, Rw.refl _⟩
 
 /-- Small object argument produces a weak factorization. -/
 theorem small_object_gives_wfs {a b : A} (f : Path a b) :
     ∃ (c : A) (i : Path a c) (p : Path c b),
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).fib p :=
-  ⟨a, Path.refl a, f, True.intro, True.intro⟩
+  ⟨a, Path.refl a, f, trivial, trivial⟩
 
 /-- Iterated pushout in the small object argument converges. -/
 theorem small_object_convergence (a : A) :
     ∃ (c : A) (i : Path a c),
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).weq i :=
-  ⟨a, Path.refl a, True.intro, weq_refl A a⟩
+  ⟨a, Path.refl a, trivial, weq_refl A a⟩
 
 /-- Cell attachment preserves cofibrations. -/
 theorem cell_attachment_preserves_cof {a b : A} (f : Path a b) :
     (pathModelCategory A).cof f →
     (pathModelCategory A).cof (Path.trans f (Path.refl b)) := by
   intro _
-  exact True.intro
+  exact trivial
 
 /-! ## Section 13: Homotopy Limits and Colimits -/
 
@@ -824,14 +827,14 @@ theorem ho_pullback_projections_fib {a b c : A}
     (f : Path a c) (g : Path b c) :
     (pathModelCategory A).fib (canonicalHoPullback f g).pr₁ ∧
     (pathModelCategory A).fib (canonicalHoPullback f g).pr₂ :=
-  ⟨True.intro, True.intro⟩
+  ⟨trivial, trivial⟩
 
 /-- Homotopy pushout injections are cofibrations. -/
 theorem ho_pushout_injections_cof {a b c : A}
     (f : Path c a) (g : Path c b) :
     (pathModelCategory A).cof (canonicalHoPushout f g).inj₁ ∧
     (pathModelCategory A).cof (canonicalHoPushout f g).inj₂ :=
-  ⟨True.intro, True.intro⟩
+  ⟨trivial, trivial⟩
 
 /-- Homotopy pullback preserves weak equivalences. -/
 theorem ho_pullback_preserves_weq {a b c : A}
@@ -899,7 +902,7 @@ theorem sm7_pushout_product {a b : A}
     (pathModelCategory A).cof f →
     (pathModelCategory A).cof g →
     (pathModelCategory A).cof (Path.trans f (Path.trans (Path.symm f) g)) :=
-  fun _ _ => True.intro
+  fun _ _ => trivial
 
 /-- SM7 axiom: pushout-product with a trivial cofibration is a trivial cofibration. -/
 theorem sm7_pushout_product_tcof {a b : A}
@@ -908,7 +911,7 @@ theorem sm7_pushout_product_tcof {a b : A}
     (pathModelCategory A).cof g →
     trivialCofibration (pathModelCategory A) (Path.trans f (Path.symm g)) := by
   intro ⟨_, _⟩ _
-  exact ⟨True.intro, path_is_weak_equivalence (A := A) _⟩
+  exact ⟨trivial, path_is_weak_equivalence (A := A) _⟩
 
 /-- Mapping space from a cofibrant to fibrant object is well-behaved. -/
 theorem mapping_space_weq (a b : A)
@@ -983,14 +986,14 @@ theorem cofibrant_replacement (a : A) :
     ∃ (qa : A) (q : Path qa a),
       (pathModelCategory A).weq q ∧
       (pathModelCategory A).cof (Path.refl qa) :=
-  ⟨a, Path.refl a, weq_refl A a, True.intro⟩
+  ⟨a, Path.refl a, weq_refl A a, trivial⟩
 
 /-- Fibrant replacement exists. -/
 theorem fibrant_replacement (a : A) :
     ∃ (ra : A) (r : Path a ra),
       (pathModelCategory A).weq r ∧
       (pathModelCategory A).fib (Path.refl ra) :=
-  ⟨a, Path.refl a, weq_refl A a, True.intro⟩
+  ⟨a, Path.refl a, weq_refl A a, trivial⟩
 
 /-- Cofibrant-fibrant replacement exists. -/
 theorem cofibrant_fibrant_replacement (a : A) :
@@ -998,7 +1001,7 @@ theorem cofibrant_fibrant_replacement (a : A) :
       (pathModelCategory A).weq q ∧
       (pathModelCategory A).cof (Path.refl ra) ∧
       (pathModelCategory A).fib (Path.refl ra) :=
-  ⟨a, Path.refl a, weq_refl A a, True.intro, True.intro⟩
+  ⟨a, Path.refl a, weq_refl A a, trivial, trivial⟩
 
 /-- Whitehead's theorem: weak equivalences between bifibrant objects
     are homotopy equivalences with explicit inverse. -/
@@ -1046,7 +1049,7 @@ theorem functorial_factorization_naturality {a b c : A}
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).fib p ∧
       Rw (Path.trans i p) (Path.trans i p) := by
-  refine ⟨a, Path.refl a, Path.trans f g, True.intro, True.intro, ?_⟩
+  refine ⟨a, Path.refl a, Path.trans f g, trivial, trivial, ?_⟩
   exact Rw.refl _
 
 /-- Mapping cylinder as a factorization tool. -/
@@ -1055,7 +1058,7 @@ theorem mapping_cylinder_factorization {a b : A} (f : Path a b) :
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).weq r ∧
       Rw (Path.trans i r) f := by
-  refine ⟨b, f, Path.refl b, True.intro, ?_, ?_⟩
+  refine ⟨b, f, Path.refl b, trivial, ?_, ?_⟩
   · exact weq_refl A b
   · exact rw_of_step (Step.trans_refl_right f)
 
@@ -1065,7 +1068,7 @@ theorem mapping_cocone_factorization {a b : A} (f : Path a b) :
       (pathModelCategory A).weq p ∧
       (pathModelCategory A).fib r ∧
       Rw (Path.trans p r) f := by
-  refine ⟨a, Path.refl a, f, ?_, True.intro, ?_⟩
+  refine ⟨a, Path.refl a, f, ?_, trivial, ?_⟩
   · exact weq_refl A a
   · exact rw_of_step (Step.trans_refl_left f)
 
@@ -1075,7 +1078,7 @@ theorem telescope_construction {a b c : A}
     ∃ (tel : A) (i : Path a tel),
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).weq i :=
-  ⟨a, Path.refl a, True.intro, weq_refl A a⟩
+  ⟨a, Path.refl a, trivial, weq_refl A a⟩
 
 /-- Homotopy fiber exists. -/
 theorem homotopy_fiber_exists {a b : A} (f : Path a b) :

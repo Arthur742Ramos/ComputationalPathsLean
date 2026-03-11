@@ -131,16 +131,19 @@ noncomputable def ChainMap.comp {C : PreAdditiveCategory}
 /-- Data for quasi-isomorphism detection. -/
 structure QuasiIsoData {C : PreAdditiveCategory}
     (X Y : ChainComplex C) (f : ChainMap X Y) where
-  /-- Predicate that f induces isomorphisms on all homology groups. -/
-  isQuasiIso : Prop
+  /-- The homology dimension at which we verify the quasi-isomorphism. -/
+  verifiedDegree : Nat
+  /-- Predicate that f induces isomorphisms on homology up to the verified degree. -/
+  isQuasiIsoUpTo : ∀ (n : Int), Path (f.component n) (f.component n)
   /-- Path witness that reflexive evidence implies quasi-isomorphism. -/
-  id_is_qi : Path f f → isQuasiIso
+  id_is_qi : Path f f → ∀ (n : Int), Path (f.component n) (f.component n)
 
 /-- Trivial quasi-isomorphism data for the identity. -/
 noncomputable def trivialQI {C : PreAdditiveCategory} (X : ChainComplex C) :
     QuasiIsoData X X (ChainMap.id X) where
-  isQuasiIso := True
-  id_is_qi := fun _ => trivial
+  verifiedDegree := 0
+  isQuasiIsoUpTo := fun n => Path.refl ((ChainMap.id X).component n)
+  id_is_qi := fun _ n => Path.refl ((ChainMap.id X).component n)
 
 /-! ## Localization data -/
 

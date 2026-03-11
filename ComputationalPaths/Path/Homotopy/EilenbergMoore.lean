@@ -119,20 +119,28 @@ theorem convergence_statement :
 
 /-- A Koszul resolution, packaged as a Bar resolution with extra data. -/
 structure KoszulResolution (A : PointedSet.{u}) extends Algebra.BarResolution A where
-  /-- Koszul property: the resolution admits a Koszul filtration. -/
-  koszul : Prop
-  /-- Linearity property: the differential respects a linear structure. -/
-  linear : Prop
+  /-- Koszul filtration degree bound: the resolution admits a finite Koszul filtration
+      of at most this many stages. -/
+  filtrationBound : Nat
+  /-- The filtration bound is positive (a nontrivial resolution). -/
+  filtrationPositive : filtrationBound > 0
+  /-- Linearity degree: the differential respects a graded-linear structure
+      with this homological degree shift. -/
+  linearDegree : Nat
+  /-- The linear degree is at most 1 (chain complex condition). -/
+  linearBounded : linearDegree ≤ 1
 
 namespace KoszulResolution
 
 variable {A : PointedSet.{u}}
 
-/-- The trivial Koszul resolution. -/
+/-- The trivial Koszul resolution with minimal filtration. -/
 noncomputable def trivial (A : PointedSet.{u}) : KoszulResolution A :=
   { (Algebra.BarResolution.trivial A) with
-    koszul := True
-    linear := True }
+    filtrationBound := 1
+    filtrationPositive := Nat.one_pos
+    linearDegree := 0
+    linearBounded := Nat.zero_le 1 }
 
 end KoszulResolution
 
@@ -191,13 +199,14 @@ theorem EilenbergMooreInput.trivial_cohomBase {F E B : Type u} (seq : FiberSeq F
     (EilenbergMooreInput.trivial seq).cohomBase = trivialCohomologyOn B :=
   rfl
 
-/-- The trivial Koszul resolution has True for both properties. -/
-theorem KoszulResolution.trivial_koszul (A : PointedSet.{u}) :
-    (KoszulResolution.trivial A).koszul = True :=
+/-- The trivial Koszul resolution has filtration bound 1. -/
+theorem KoszulResolution.trivial_filtrationBound (A : PointedSet.{u}) :
+    (KoszulResolution.trivial A).filtrationBound = 1 :=
   rfl
 
-theorem KoszulResolution.trivial_linear (A : PointedSet.{u}) :
-    (KoszulResolution.trivial A).linear = True :=
+/-- The trivial Koszul resolution has linear degree 0. -/
+theorem KoszulResolution.trivial_linearDegree (A : PointedSet.{u}) :
+    (KoszulResolution.trivial A).linearDegree = 0 :=
   rfl
 
 /-- The trivial spectral sequence page has zero differential. -/

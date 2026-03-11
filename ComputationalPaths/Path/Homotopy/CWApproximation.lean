@@ -148,18 +148,22 @@ noncomputable def skeletalRestriction_id (n : ENat) :
 structure HomotopyExtensionData where
   /-- The skeleton level. -/
   level : Nat
-  /-- Whether the obstruction vanishes. -/
-  obstructionVanishes : Prop
+  /-- The obstruction cocycle: a function from (level+1)-cells to a coefficient
+      group. The obstruction vanishes when this is identically zero. -/
+  obstructionCocycle : Nat → Nat
+  /-- Whether the obstruction cocycle is identically zero. -/
+  obstructionVanishes : ∀ (cellIndex : Nat), obstructionCocycle cellIndex = 0
 
-/-- When the obstruction vanishes, we have extension data. -/
+/-- When there are no cells, the obstruction vanishes trivially. -/
 noncomputable def homotopyExtension_trivial (n : Nat) : HomotopyExtensionData where
   level := n
-  obstructionVanishes := True
+  obstructionCocycle := fun _ => 0
+  obstructionVanishes := fun _ => rfl
 
-/-- Path witness: trivial obstruction. -/
+/-- Path witness: trivial obstruction cocycle is zero everywhere. -/
 theorem homotopyExtension_trivial_vanishes (n : Nat) :
-    (homotopyExtension_trivial n).obstructionVanishes :=
-  trivial
+    (homotopyExtension_trivial n).obstructionVanishes = fun _ => rfl := by
+  rfl
 
 /-! ## CW Approximation Uniqueness -/
 
