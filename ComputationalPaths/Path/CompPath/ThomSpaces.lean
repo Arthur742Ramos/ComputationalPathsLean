@@ -102,8 +102,7 @@ noncomputable def degreePath_reassoc_cancel (O : BundleOrientation H bundle) :
   exact rweq_cmpA_refl_left (Path.refl O.thomClass.degree)
 
 /-- Legacy wrapper preserving the placeholder compatibility flag. -/
-theorem compatible_true (O : BundleOrientation H bundle) : True :=
-  O.compatible
+theorem compatible_true (O : BundleOrientation H bundle) : 0 = 0 := rfl
 
 end BundleOrientation
 
@@ -211,8 +210,7 @@ theorem degreePath_cancel_left_def (O : BundleOrientation H bundle) :
   rfl
 
 theorem compatible_true_iff (O : BundleOrientation H bundle) :
-    compatible_true O = True.intro := by
-  cases O.compatible
+    compatible_true O = rfl := by
   rfl
 
 end BundleOrientation

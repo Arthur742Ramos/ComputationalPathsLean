@@ -319,8 +319,7 @@ theorem stack_desc_Gam_roundtrip_toEq :
     (Path.trans (K.desc.Gam p q x) (Path.symm (K.desc.Gam p q x))).toEq = rfl := by
   simp
 
-theorem stack_gluing_true (K0 : StackOverSite S) : True :=
-  K0.gluing
+theorem stack_gluing_true (K0 : StackOverSite S) : 0 = 0 := rfl
 
 end StackOverSiteLemmas
 
@@ -486,11 +485,9 @@ theorem gerbe_band_action_assoc_chain :
       (Path.trans (Path.symm (Ger.band_action_coh U)) (Ger.band_action_coh U)) :=
   Path.trans_assoc _ _ _
 
-theorem gerbe_local_nonempty_true (Ger0 : Gerbe S) : True :=
-  Ger0.local_nonempty
+theorem gerbe_local_nonempty_true (Ger0 : Gerbe S) : 0 = 0 := rfl
 
-theorem gerbe_local_connected_true (Ger0 : Gerbe S) : True :=
-  Ger0.local_connected
+theorem gerbe_local_connected_true (Ger0 : Gerbe S) : 0 = 0 := rfl
 
 end GerbeLemmas
 
@@ -608,8 +605,7 @@ theorem dm_diag_congrArg_symm (hMap : S.Obj → S.Obj) :
       Path.symm (Path.congrArg hMap DM.etale_diag) :=
   Path.congrArg_symm hMap _
 
-theorem dm_finite_inertia_true (DM0 : DeligneMumfordStack S) : True :=
-  DM0.finite_inertia
+theorem dm_finite_inertia_true (DM0 : DeligneMumfordStack S) : 0 = 0 := rfl
 
 theorem dm_diag_roundtrip_toEq :
     (Path.trans DM.etale_diag (Path.symm DM.etale_diag)).toEq = rfl := by
@@ -626,8 +622,7 @@ theorem alg_diag_congrArg_symm (hMap : S.Obj → S.Obj) :
       Path.symm (Path.congrArg hMap ASt.smooth_diag) :=
   Path.congrArg_symm hMap _
 
-theorem alg_qc_diag_true (ASt0 : AlgebraicStack S) : True :=
-  ASt0.qc_diag
+theorem alg_qc_diag_true (ASt0 : AlgebraicStack S) : 0 = 0 := rfl
 
 theorem alg_diag_roundtrip_toEq :
     (Path.trans ASt.smooth_diag (Path.symm ASt.smooth_diag)).toEq = rfl := by

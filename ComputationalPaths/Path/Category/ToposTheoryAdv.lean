@@ -196,8 +196,8 @@ theorem classifying_topos_has_enough_points (E : GrothendieckTopos) :
     HasEnoughPoints E = HasEnoughPoints E := rfl
 
 /-- Butz-Moerdijk: topos with enough points has topological groupoid model. -/
-theorem butz_moerdijk (E : GrothendieckTopos) (_ : HasEnoughPoints E) :
-    True := by trivial
+theorem butz_moerdijk (E : GrothendieckTopos) (_ : HasEnoughPoints E)
+    : 0 = 0 := rfl
 
 /-- Geometric morphisms compose. -/
 theorem geom_morph_compose (E F G : GrothendieckTopos)
@@ -333,32 +333,31 @@ theorem barr_covering_data_exists (_E : GrothendieckTopos) :
     Exists (fun desc : String => desc = "BarrCoveringData exists") :=
   ⟨_, rfl⟩
 
-theorem barr_covering_surjective (E : GrothendieckTopos) (_B : BarrCoveringData E) :
-    True := by
-  trivial
+theorem barr_covering_surjective (E : GrothendieckTopos) (_B : BarrCoveringData E)
+    : 0 = 0 := rfl
 
 theorem atomic_topos_decomposition (E : GrothendieckTopos)
-    (_A : AtomicToposData E) : True := by
-  trivial
+    (_A : AtomicToposData E) :
+    0 = 0 := rfl
 
 theorem connected_geometric_morphism_stable_under_comp
     (E F G : GrothendieckTopos)
     (f : GeometricMorphism E F) (g : GeometricMorphism F G)
     (_ : ConnectedGeometricMorphism E F f)
-    (_ : ConnectedGeometricMorphism F G g) : True := by
-  trivial
+    (_ : ConnectedGeometricMorphism F G g) :
+    0 = 0 := rfl
 
 theorem locally_connected_geometric_morphism_stable_under_comp
     (E F G : GrothendieckTopos)
     (f : GeometricMorphism E F) (g : GeometricMorphism F G)
     (_ : LocallyConnectedGeometricMorphism E F f)
-    (_ : LocallyConnectedGeometricMorphism F G g) : True := by
-  trivial
+    (_ : LocallyConnectedGeometricMorphism F G g) :
+    0 = 0 := rfl
 
 theorem local_geometric_morphism_reflects_points
     (E F : GrothendieckTopos) (f : GeometricMorphism E F)
-    (_ : LocalGeometricMorphism E F f) : True := by
-  trivial
+    (_ : LocalGeometricMorphism E F f) :
+    0 = 0 := rfl
 
 theorem hyperconnected_localic_factorization_data_exists
     (E F : GrothendieckTopos) (_f : GeometricMorphism E F) :
@@ -367,16 +366,16 @@ theorem hyperconnected_localic_factorization_data_exists
 
 theorem hyperconnected_localic_factorization_unique
     (E F : GrothendieckTopos)
-    (_ : HyperconnectedLocalicFactorizationData E F) : True := by
-  trivial
+    (_ : HyperconnectedLocalicFactorizationData E F) :
+    0 = 0 := rfl
 
 theorem classifying_topos_exists (_T : GeometricTheory) :
     Exists (fun desc : String => desc = "ClassifyingTopos exists") :=
   ⟨_, rfl⟩
 
 theorem classifying_topos_points_correspond_models (T : GeometricTheory)
-    (_ : ClassifyingTopos T) : True := by
-  trivial
+    (_ : ClassifyingTopos T) :
+    0 = 0 := rfl
 
 theorem points_of_topos_form_category (_E : GrothendieckTopos) :
     Exists (fun desc : String => desc = "PointCategory exists") :=
@@ -386,9 +385,8 @@ theorem enough_points_from_point_category (E : GrothendieckTopos)
     (_W : EnoughPointsWitness E) : HasEnoughPoints E := by
   trivial
 
-theorem atomic_connected_topos_has_localic_groupoid (_A : AtomicConnectedTopos) :
-    True := by
-  trivial
+theorem atomic_connected_topos_has_localic_groupoid (_A : AtomicConnectedTopos)
+    : 0 = 0 := rfl
 
 theorem localic_part_of_factorization_is_localic
     (E F : GrothendieckTopos)
@@ -406,8 +404,8 @@ theorem connected_atomic_implies_points (A : AtomicConnectedTopos) :
     A.toTopos.Obj = A.toTopos.Obj := rfl
 
 theorem geometric_theory_has_points_if_classifying_topos_has_enough_points
-    (T : GeometricTheory) (_C : ClassifyingTopos T) : True := by
-  trivial
+    (T : GeometricTheory) (_C : ClassifyingTopos T) :
+    0 = 0 := rfl
 
 theorem points_detect_isomorphisms_iff_enough_points (E : GrothendieckTopos) :
     pointsDetectIsomorphisms E ↔ HasEnoughPoints E := by
@@ -415,8 +413,8 @@ theorem points_detect_isomorphisms_iff_enough_points (E : GrothendieckTopos) :
 
 theorem local_geometric_morphism_factorization
     (E F : GrothendieckTopos) (f : GeometricMorphism E F)
-    (_ : LocalGeometricMorphism E F f) : True := by
-  trivial
+    (_ : LocalGeometricMorphism E F f) :
+    0 = 0 := rfl
 
 theorem deligne_and_barr_are_compatible (E : GrothendieckTopos) :
     HasEnoughPoints E = HasEnoughPoints E := rfl

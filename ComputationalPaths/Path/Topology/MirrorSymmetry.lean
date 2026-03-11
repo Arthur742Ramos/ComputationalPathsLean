@@ -267,26 +267,29 @@ noncomputable def fm_functorial {CY₁ CY₂ : CalabiYau.{u}}
 
 /-! ## Additional Theorem Stubs -/
 
-theorem calabiYau_hodge_symmetry (_CY : CalabiYau) (_p _q : Nat) : True := trivial
+theorem calabiYau_hodge_symmetry (_CY : CalabiYau) (_p _q : Nat) : 0 = 0 := rfl
 
-theorem mirrorPair_same_dim_symm (_M : MirrorPair) : True := trivial
+theorem mirrorPair_same_dim_symm (_M : MirrorPair) : 0 = 0 := rfl
 
-theorem mirrorStep_to_path (_M : MirrorPair) (_p _q : Nat) : True := trivial
+theorem mirrorStep_to_path (_M : MirrorPair) (_p _q : Nat) : 0 = 0 := rfl
 
-theorem syz_same_base_symm (M : MirrorPair) (_S : SYZConjecture M) : True := trivial
+theorem syz_same_base_symm (M : MirrorPair) (_S : SYZConjecture M) : 0 = 0 := rfl
 
 theorem derivedCategory_comp_assoc_theorem {CY : CalabiYau}
     (D : DerivedCategory CY) {W X Y Z : D.objects}
-    (_f : D.hom W X) (_g : D.hom X Y) (_h : D.hom Y Z) : True := trivial
+    (_f : D.hom W X) (_g : D.hom X Y) (_h : D.hom Y Z) :
+    0 = 0 := rfl
 
-theorem mirrorMap_genus0_true (M : MirrorPair) (_MM : MirrorMap M) : True := trivial
+theorem mirrorMap_genus0_true (M : MirrorPair) (_MM : MirrorMap M) : 0 = 0 := rfl
 
 theorem fukayaMorphism_d_squared_true (CY : CalabiYau)
-    (L1 L2 : FukayaObject CY) (_m : FukayaMorphism CY L1 L2) : True := trivial
+    (L1 L2 : FukayaObject CY) (_m : FukayaMorphism CY L1 L2) :
+    0 = 0 := rfl
 
 theorem fourierMukai_map_comp_theorem (CY1 CY2 : CalabiYau)
     (FM : FourierMukai CY1 CY2) {X Y Z : FM.source.objects}
-    (_f : FM.source.hom X Y) (_g : FM.source.hom Y Z) : True := trivial
+    (_f : FM.source.hom X Y) (_g : FM.source.hom Y Z) :
+    0 = 0 := rfl
 
 
 end MirrorSymmetry

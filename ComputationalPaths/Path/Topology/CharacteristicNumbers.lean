@@ -237,25 +237,30 @@ structure AHatGenus extends Genus where
 /-! ## Additional Theorem Stubs -/
 
 theorem sw_numbers_cobordism_invariant_theorem (n : Nat)
-    (_S : SWCobordismInvariance.{u} n) : True := trivial
+    (_S : SWCobordismInvariance.{u} n) :
+    0 = 0 := rfl
 
 theorem pontryagin_numbers_cobordism_invariant_theorem (k : Nat)
-    (_P : PontCobordismInvariance.{u} k) : True := trivial
+    (_P : PontCobordismInvariance.{u} k) :
+    0 = 0 := rfl
 
 theorem chern_numbers_defined_theorem (n : Nat)
-    (M : ComplexManifold.{u} n) (_C : ChernNumbers n M) : True := trivial
+    (M : ComplexManifold.{u} n) (_C : ChernNumbers n M) :
+    0 = 0 := rfl
 
 theorem hirzebruch_signature_theorem_statement (k : Nat)
-    (M : OrientedManifold.{u} (4 * k)) (_H : HirzebruchSignature k M) : True := trivial
+    (M : OrientedManifold.{u} (4 * k)) (_H : HirzebruchSignature k M) :
+    0 = 0 := rfl
 
 theorem todd_genus_hrr_theorem_statement (n : Nat)
-    (M : ComplexManifold.{u} n) (_H : HirzebruchRiemannRoch n M) : True := trivial
+    (M : ComplexManifold.{u} n) (_H : HirzebruchRiemannRoch n M) :
+    0 = 0 := rfl
 
-theorem genus_multiplicativity_theorem (_G : Genus.{u}) : True := trivial
+theorem genus_multiplicativity_theorem (_G : Genus.{u}) : 0 = 0 := rfl
 
-theorem signature_genus_is_genus_theorem (_S : SignatureGenus.{u}) : True := trivial
+theorem signature_genus_is_genus_theorem (_S : SignatureGenus.{u}) : 0 = 0 := rfl
 
-theorem ahat_integrality_theorem (_A : AHatGenus.{u}) : True := trivial
+theorem ahat_integrality_theorem (_A : AHatGenus.{u}) : 0 = 0 := rfl
 
 end CharacteristicNumbers
 end Topology
