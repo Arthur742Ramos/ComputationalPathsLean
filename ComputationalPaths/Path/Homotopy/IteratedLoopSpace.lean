@@ -138,6 +138,24 @@ structure EnSpaceData (X : Pointed) (n : Nat) where
     (l : (loopPointed (delooping.level ⟨k.val + 1, Nat.succ_lt_succ k.isLt⟩)).carrier),
     (delooping.structureMap k).toFun ((inverse k).toFun l) = l
 
+namespace EnSpaceData
+
+variable {X : Pointed} {n : Nat} (E : EnSpaceData X n)
+
+/-- `Path` witness for the left inverse law of an En-space structure map. -/
+noncomputable def left_inv_path (k : Fin n)
+    (x : (E.delooping.level ⟨k.val, Nat.lt_succ_of_lt k.isLt⟩).carrier) :
+    Path ((E.inverse k).toFun ((E.delooping.structureMap k).toFun x)) x :=
+  Path.stepChain (E.left_inv k x)
+
+/-- `Path` witness for the right inverse law of an En-space structure map. -/
+noncomputable def right_inv_path (k : Fin n)
+    (l : (loopPointed (E.delooping.level ⟨k.val + 1, Nat.succ_lt_succ k.isLt⟩)).carrier) :
+    Path ((E.delooping.structureMap k).toFun ((E.inverse k).toFun l)) l :=
+  Path.stepChain (E.right_inv k l)
+
+end EnSpaceData
+
 /-- An E1 space has a 1-fold delooping: it is a loop space. -/
 noncomputable def E1SpaceData (X : Pointed) := EnSpaceData X 1
 
@@ -153,6 +171,27 @@ structure PointedMonoidData (X : Pointed) where
   mul_pt_right : ∀ x, mul x X.pt = x
   /-- Associativity. -/
   mul_assoc : ∀ x y z, mul (mul x y) z = mul x (mul y z)
+
+namespace PointedMonoidData
+
+variable {X : Pointed} (M : PointedMonoidData X)
+
+/-- `Path` witness for the left unit law. -/
+noncomputable def mul_pt_left_path (x : X.carrier) :
+    Path (M.mul X.pt x) x :=
+  Path.stepChain (M.mul_pt_left x)
+
+/-- `Path` witness for the right unit law. -/
+noncomputable def mul_pt_right_path (x : X.carrier) :
+    Path (M.mul x X.pt) x :=
+  Path.stepChain (M.mul_pt_right x)
+
+/-- `Path` witness for associativity. -/
+noncomputable def mul_assoc_path (x y z : X.carrier) :
+    Path (M.mul (M.mul x y) z) (M.mul x (M.mul y z)) :=
+  Path.stepChain (M.mul_assoc x y z)
+
+end PointedMonoidData
 
 /-- Group completion data: a monoid together with its group completion. -/
 structure GroupCompletion (X : Pointed) where
@@ -179,6 +218,12 @@ noncomputable def GroupCompletion.inv_left_path {X : Pointed} (G : GroupCompleti
     Path (G.completionMul (G.inv y) y) G.completion.pt :=
   Path.stepChain (G.inv_left y)
 
+/-- Path-valued right inverse. -/
+noncomputable def GroupCompletion.inv_right_path {X : Pointed} (G : GroupCompletion X)
+    (y : G.completion.carrier) :
+    Path (G.completionMul y (G.inv y)) G.completion.pt :=
+  Path.stepChain (G.inv_right y)
+
 /-- The trivial group completion of a single point. -/
 noncomputable def GroupCompletion.trivial : GroupCompletion { carrier := Unit, pt := () } where
   monoid :=
@@ -192,6 +237,22 @@ noncomputable def GroupCompletion.trivial : GroupCompletion { carrier := Unit, p
   inv := fun _ => ()
   inv_left := fun _ => rfl
   inv_right := fun _ => rfl
+
+/-- `Path` witness for the left inverse law in the trivial group completion. -/
+noncomputable def GroupCompletion.trivial_inv_left_path
+    (y : GroupCompletion.trivial.completion.carrier) :
+    Path
+      (GroupCompletion.trivial.completionMul (GroupCompletion.trivial.inv y) y)
+      GroupCompletion.trivial.completion.pt :=
+  GroupCompletion.inv_left_path GroupCompletion.trivial y
+
+/-- `Path` witness for the right inverse law in the trivial group completion. -/
+noncomputable def GroupCompletion.trivial_inv_right_path
+    (y : GroupCompletion.trivial.completion.carrier) :
+    Path
+      (GroupCompletion.trivial.completionMul y (GroupCompletion.trivial.inv y))
+      GroupCompletion.trivial.completion.pt :=
+  GroupCompletion.inv_right_path GroupCompletion.trivial y
 
 /-! ## Summary -/
 
