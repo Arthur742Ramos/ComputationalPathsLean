@@ -58,8 +58,7 @@
 \newcommand{\defeq}{\coloneqq}
 \newcommand{\rweq}{\sim_{\mathsf{rw}}}
 
-\title[Computational Paths: A Calculus of Equality]{Computational Paths: A Calculus of Equality\\[4pt]
-{\normalsize\textit{A Comprehensive Survey}}}
+\title[Computational Paths: A Calculus of Equality]{Computational Paths: A Calculus of Equality}
 
 \author[A.~F.~Ramos]{Arthur Freitas Ramos}
 \address{Microsoft Corporation}
@@ -80,11 +79,11 @@
 \begin{document}
 
 \begin{abstract}
-We survey the theory of \emph{computational paths}---a proof-relevant
+We develop the theory of \emph{computational paths}---a proof-relevant
 account of equality in type theory in which every equality witness carries
 an explicit trace of elementary rewrite steps.  Starting from the framework
 of labelled natural deduction, where the judgement $t =_s u : A$ records
-\emph{why} two proof-terms are equal, we develop a complete rewrite calculus
+\emph{why} two proof-terms are equal, we construct a complete rewrite calculus
 on the resulting path expressions.  The calculus comprises 77 named rewrite
 rules, organised into eight categories covering the groupoid core, type
 constructor interactions, transport, and congruence.  The system is proved
@@ -222,8 +221,8 @@ this remark.
 
 \subsection{Scope and organisation}
 
-This paper presents a comprehensive survey of the theory of computational
-paths.  It gives the main
+This paper presents the theory of computational
+paths in full detail.  We develop the main
 definitions, theorems, and constructions in a self-contained form suitable
 for a broad audience in mathematical logic, type theory, and related areas.
 
@@ -2608,7 +2607,7 @@ CNPq and CAPES (Brazil).
 \bigskip
 
 \noindent\textbf{Historical note.}
-The development surveyed here spans over three decades, from
+The programme presented here spans over three decades, from
 de~Queiroz's original introduction of labelled equality
 judgements~\cite{deQueiroz88:dialectica} through the systematic
 elaboration by de~Queiroz, de~Oliveira, and
@@ -2622,7 +2621,7 @@ formalisation~\cite{RamosDeOliveiraDeQueirozDeVeras2025lean,RamosDeOliveiraDeQue
 The Seifert--van~Kampen theorem for computational paths was established
 in~\cite{RamosDeVerasDeQueirozDeOliveira2025svk}.
 The thesis~\cite{Ramos2019thesis} provided the first comprehensive
-treatment.  The present survey draws on all of these sources.
+treatment.  The present paper draws on all of these sources.
 
 \bigskip
 
