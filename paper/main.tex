@@ -1,42 +1,13 @@
-\documentclass[12pt]{amsart}
+\documentclass[manuscript]{BSLstyle}
 
-% Packages
-\usepackage{amsmath,amssymb,amsthm,mathtools}
+% Additional packages not pre-loaded by BSLstyle
 \usepackage{stmaryrd}
 \usepackage{tikz-cd}
-\usepackage{enumitem}
 \usepackage{booktabs}
 \usepackage{adjustbox}
 \usepackage[all]{nowidow}
-\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue]{hyperref}
-\usepackage[nameinlink,noabbrev]{cleveref}
-\usepackage{fancyhdr}
 \usepackage[numbers]{natbib}
 \allowdisplaybreaks
-
-% BSL-style header
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[C]{\small\textit{Submitted to the Bulletin of Symbolic Logic}}
-\fancyfoot[C]{\thepage}
-\renewcommand{\headrulewidth}{0pt}
-\setlength{\headheight}{13pt}
-\addtolength{\topmargin}{-5pt}
-\setlength{\footskip}{30pt}
-
-% Theorem environments
-\newtheorem{theorem}{Theorem}[section]
-\newtheorem{lemma}[theorem]{Lemma}
-\newtheorem{proposition}[theorem]{Proposition}
-\newtheorem{corollary}[theorem]{Corollary}
-\theoremstyle{definition}
-\newtheorem{definition}[theorem]{Definition}
-\newtheorem{example}[theorem]{Example}
-\newtheorem{notation}[theorem]{Notation}
-\newtheorem{construction}[theorem]{Construction}
-\theoremstyle{remark}
-\newtheorem{remark}[theorem]{Remark}
-\newtheorem{problem}[theorem]{Open Problem}
 
 % Custom commands
 \newcommand{\Path}{\mathsf{Path}}
@@ -58,23 +29,19 @@
 \newcommand{\defeq}{\coloneqq}
 \newcommand{\rweq}{\sim_{\mathsf{rw}}}
 
-\title[Computational Paths: A Calculus of Equality]{Computational Paths: A Calculus of Equality}
+\AuthorEmail{Arthur Freitas Ramos}{arfreita@microsoft.com}{50}
+\AuthorEmail{Ruy J.G.B. de Queiroz}{ruy@cin.ufpe.br}{25}
+\AuthorEmail{Anjolina Grisi de Oliveira}{ago@cin.ufpe.br}{25}
 
-\author[A.~F.~Ramos]{Arthur Freitas Ramos}
-\address{Microsoft Corporation}
-\email{arfreita@microsoft.com}
+\Affiliation{Microsoft Corporation}{}{}{Redmond, USA}{1}
+\Affiliation{Universidade Federal de Pernambuco}{Centro de Inform\'atica (CIn)}{}{Recife, Brazil}{2,3}
 
-\author[R.~J.~G.~B.~de~Queiroz]{Ruy J.G.B. de Queiroz}
-\address{Centro de Inform\'atica, Universidade Federal de Pernambuco (CIn/UFPE)}
-\email{ruy@cin.ufpe.br}
+\Funding{Not applicable.}
+\Conflict{None.}
+\Ethics{Not applicable.}
+\UseOfGAI{Generative AI tools were used to assist with the Lean 4 formalisation and with drafting portions of the manuscript. All results were verified by the authors.}
 
-\author[A.~G.~de~Oliveira]{Anjolina Grisi de Oliveira}
-\address{Centro de Inform\'atica, Universidade Federal de Pernambuco (CIn/UFPE)}
-\email{ago@cin.ufpe.br}
-
-\keywords{computational paths, weak $\omega$-groupoid, labelled natural deduction, term rewriting, proof relevance, homotopy type theory, Lean~4}
-\subjclass[2020]{03B15, 03B38, 03B70, 18N50, 55Q05, 68V15}
-\date{March 2026}
+\Title[Computational Paths]{Computational Paths: A Calculus of Equality}
 
 \begin{document}
 
@@ -109,7 +76,12 @@ The full development, proofs, and formalisation details
 are presented in the body of this paper.
 \end{abstract}
 
-\maketitle
+\begin{keywords}
+computational paths, weak $\omega$-groupoid, labelled natural deduction, term rewriting, proof relevance, homotopy type theory, Lean 4
+\end{keywords}
+\begin{msc}[2020]
+03B15, 03B38, 03B70, 18N50, 55Q05, 68V15
+\end{msc}
 
 % =========================================================================
 \section{Introduction}\label{sec:intro}
@@ -2762,7 +2734,7 @@ for partial map operations arising from binary congruence decomposition.
 
 \bigskip
 
-\bibliographystyle{plainnat}
+\bibliographystyle{BSLbibstyle}
 \bibliography{refs}
 
 \end{document}
