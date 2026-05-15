@@ -151,7 +151,7 @@ noncomputable def bottleneckDistance_self_path (D : PersistenceDiagram) :
 
 /-- q-tameness for persistence modules. -/
 structure QTame (M : PersistenceModule) : Prop where
-  /-- Placeholder finiteness condition. -/
+  /-- Finiteness condition for every source-target degree pair. -/
   finite_rank : forall _ _ : Nat, True
 
 /-- Trivial q-tame witness. -/

@@ -433,7 +433,8 @@ structure SimplicialModelCategory (A : Type u) extends MCat A where
     sets yield cofibrations. -/
 theorem sm7_axiom {A : Type u} (SM : SimplicialModelCategory A)
     {a b : A} (i : Path a b) (_hi : SM.cof i) :
-    True := trivial
+    True :=
+  SM.pushout_product
 
 /-! ## Path witnesses -/
 

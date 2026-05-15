@@ -345,8 +345,8 @@ theorem burnside_tr_apply {G : Type _} (S : StrictGroup G)
   rfl
 
 theorem burnsideDressInduction_holds {G : Type _} (_S : StrictGroup G) :
-    True :=
-  trivial
+    (burnsideDressInduction G _S).family = DressFamily.full G _S :=
+  rfl
 
 end SpectralMackey
 end Algebra

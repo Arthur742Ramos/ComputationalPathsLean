@@ -192,8 +192,9 @@ noncomputable def Dioperad.underlying (D : Dioperad.{u}) : BiGraded.{u} := D.toB
 
 -- 15. Dioperad identity composition produces correct arity
 theorem Dioperad.dcomp_arity {D : Dioperad.{u}} {m₁ n₁ m₂ n₂ : Nat}
-    (_f : D.ops (m₁ + 1) n₁) (_g : D.ops m₂ (n₂ + 1)) :
-    True := trivial
+    (f : D.ops (m₁ + 1) n₁) (g : D.ops m₂ (n₂ + 1)) :
+    Nonempty (D.ops (m₁ + m₂) (n₁ + n₂)) :=
+  ⟨D.dcomp f g⟩
 
 /-! ## Wheeled PROPs -/
 
