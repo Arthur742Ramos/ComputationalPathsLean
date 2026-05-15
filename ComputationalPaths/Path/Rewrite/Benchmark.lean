@@ -4,7 +4,7 @@
 This module collects hard metrics about the formalization suitable for
 inclusion in an FSCD/ITP submission. It provides:
 
-1. **Counts**: number of definitions, theorems, sorry-free status
+1. **Counts**: number of definitions, theorems, fully proved status
 2. **Complexity**: expression sizes, reduction lengths, rule counts
 3. **Concrete examples**: specific expressions and their normal forms
 4. **Statistics**: about the TRS (rules, critical pairs, etc.)
