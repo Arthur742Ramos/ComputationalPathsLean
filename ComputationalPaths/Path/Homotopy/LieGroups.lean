@@ -484,7 +484,11 @@ theorem bordgCavalleri_connection :
     -- Both approaches yield π₁(S¹) ≃ ℤ
     -- Both should yield π₁(T^n) ≃ ℤⁿ
     -- The computational paths approach doesn't need smooth structure
-    True := trivial
+    SO2.windingNumber SO2.piOneGenerator = 1 ∧
+      (∀ z : Int, SO2.piOneEquivInt.toFun (SO2.piOneEquivInt.invFun z) = z) ∧
+      TorusN.torusOneEquivCircle.toFun (TorusN.base 1) = circleBase :=
+  ⟨SO2.windingNumber_piOneGenerator, SO2.piOneEquivInt.right_inv,
+    TorusN.torusOneEquivCircle_base⟩
 
 end ProductPiOne
 

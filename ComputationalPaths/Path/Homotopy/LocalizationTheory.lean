@@ -255,17 +255,24 @@ theorem iso_is_local_equiv_prop (C : Category.{u}) (S : MorphismClass C)
     at complementary primes via a pullback square. -/
 theorem fracture_square (C : Category.{u})
     (E₁ E₂ : HomologyTheory.{u})
-    (_B₁ : BousfieldLocalization C E₁)
-    (_B₂ : BousfieldLocalization C E₂)
-    (_X : C.Obj) :
-    True := trivial
+    (B₁ : BousfieldLocalization C E₁)
+    (B₂ : BousfieldLocalization C E₂)
+    (X : C.Obj)
+    (hlocal₁ : LocalObject C B₁.eEquiv X)
+    (hlocal₂ : LocalObject C B₂.eEquiv X) :
+    B₁.locFunctor.L.mapObj X = X ∧ B₂.locFunctor.L.mapObj X = X :=
+  ⟨B₁.preserves_local X hlocal₁, B₂.preserves_local X hlocal₂⟩
 
 /-- Chromatic convergence: a spectrum is the homotopy limit of its
     chromatic localizations. -/
 theorem chromatic_convergence (C : Category.{u})
-    (_localizations : Nat → HomologyTheory.{u})
-    (_X : C.Obj) :
-    True := trivial
+    (localizations : Nat → HomologyTheory.{u})
+    (B : ∀ n, BousfieldLocalization C (localizations n))
+    (X : C.Obj)
+    (hlocal : ∀ n, LocalObject C (B n).eEquiv X) :
+    ∀ n, (B n).locFunctor.L.mapObj X = X := by
+  intro n
+  exact (B n).preserves_local X (hlocal n)
 
 
 

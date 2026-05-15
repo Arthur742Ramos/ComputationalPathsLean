@@ -33,6 +33,7 @@ This adjunction is characterized by:
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.CompPath.PushoutCompPath
+import ComputationalPaths.Path.CompPath.SphereCompPath
 
 namespace ComputationalPaths
 namespace Path
@@ -327,7 +328,14 @@ noncomputable def susp_north_connected {X : Type u} :
     The π₁(ΣX) = 1 result for general X follows the same pattern. -/
 theorem susp_pi1_trivial_for_sphere :
     -- π₁(S²) = 1 is proven in CompPath/SphereCompPath.lean
-    True := trivial
+    ∀ (α : π₁(CompPath.Sphere2CompPath,
+      (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath))),
+      α = Quot.mk _ (Path.refl (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath)) := by
+  simpa using
+    (CompPath.Sphere2CompPath.sphere2CompPath_pi1_trivial :
+      ∀ (α : π₁(CompPath.Sphere2CompPath,
+        (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath))),
+        α = Quot.mk _ (Path.refl (CompPath.Sphere2CompPath.basepoint : CompPath.Sphere2CompPath)))
 
 /-! ## Summary
 

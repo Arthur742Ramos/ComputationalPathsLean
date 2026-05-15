@@ -62,6 +62,7 @@ import ComputationalPaths.Path.CompPath.CircleCompPath
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.FigureEight
 import ComputationalPaths.Path.CompPath.PushoutPaths
+import ComputationalPaths.Path.Homotopy.HigherHomotopy
 
 namespace ComputationalPaths
 namespace Path
@@ -721,9 +722,32 @@ theorem hurewicz_universal {A : Type u} {a : A} {H : Type u}
 For n ≥ 2 and (n-1)-connected spaces, there's a higher version.
 -/
 
-/-- The higher Hurewicz homomorphism h_n : π_n(X) → H_n(X). -/
-theorem higherHurewiczMap (A : Type u) (_a : A) (_n : Nat) (_hn : _n ≥ 2) :
-    True := trivial
+/-- Explicit input data for a higher Hurewicz homomorphism.
+
+The unconditional higher Hurewicz theorem needs a developed higher homology theory.
+Until that carrier exists in this file, the map is recorded as supplied data rather
+than as a vacuous theorem. -/
+structure HigherHurewiczMapData (A : Type u) (a : A) (n : Nat) where
+  /-- The target homology carrier playing the role of `H_n(A)`. -/
+  homology : Type (u + 2)
+  /-- The higher Hurewicz homomorphism `π_n(A, a) → H_n(A)`. -/
+  map : HigherHomotopy.PiN n A a → homology
+
+/-- Explicit equivalence data for the higher Hurewicz theorem. -/
+structure HigherHurewiczEquivData (A : Type u) (a : A) (n : Nat)
+    extends HigherHurewiczMapData A a n where
+  /-- Inverse map from higher homology back to the homotopy group. -/
+  inv : homology → HigherHomotopy.PiN n A a
+  /-- The inverse is a left inverse to the higher Hurewicz map. -/
+  left_inv : ∀ x : HigherHomotopy.PiN n A a, inv (map x) = x
+  /-- The inverse is a right inverse to the higher Hurewicz map. -/
+  right_inv : ∀ y : homology, map (inv y) = y
+
+/-- The higher Hurewicz homomorphism projected from explicit map data. -/
+noncomputable def higherHurewiczMap (A : Type u) (a : A) (n : Nat) (_hn : n ≥ 2)
+    (data : HigherHurewiczMapData A a n) :
+    HigherHomotopy.PiN n A a → data.homology :=
+  data.map
 
 /-- **Higher Hurewicz Theorem**: For (n-1)-connected X and n ≥ 2,
     h_n : π_n(X) → H_n(X) is an isomorphism.
@@ -731,17 +755,28 @@ theorem higherHurewiczMap (A : Type u) (_a : A) (_n : Nat) (_hn : _n ≥ 2) :
 In particular:
 - For simply connected X: π₂(X) ≃ H₂(X)
 - For spheres: π_n(Sⁿ) ≃ H_n(Sⁿ) ≃ ℤ -/
-theorem higher_hurewicz_theorem (A : Type u) (_a : A) (n : Nat) (_hn : n ≥ 2)
-    (_hconn : True) :  -- X is (n-1)-connected
-    -- h_n : π_n(X) ≃ H_n(X)
-    True := trivial
+noncomputable def higher_hurewicz_theorem (A : Type u) (a : A) (n : Nat) (_hn : n ≥ 2)
+    (data : HigherHurewiczEquivData A a n) :
+    SimpleEquiv (HigherHomotopy.PiN n A a) data.homology where
+  toFun := data.map
+  invFun := data.inv
+  left_inv := data.left_inv
+  right_inv := data.right_inv
+
+/-- Explicit input data for the statement `H_n(S^n) ≃ ℤ`. -/
+structure SphereHnIntData (n : Nat) where
+  /-- The carrier used for `H_n(S^n)`. -/
+  homology : Type (u + 2)
+  /-- The supplied equivalence between that carrier and the integers. -/
+  equivInt : SimpleEquiv homology Int
 
 /-- **Example**: H_n(Sⁿ) ≃ ℤ.
 
 For spheres, H_n(Sⁿ) ≃ π_n(Sⁿ) ≃ ℤ by the higher Hurewicz theorem. -/
-theorem sphere_Hn_equiv_int (_n : Nat) (_hn : _n ≥ 1) :
-    -- H_n(Sⁿ) ≃ ℤ
-    True := trivial
+noncomputable def sphere_Hn_equiv_int (n : Nat) (_hn : n ≥ 1)
+    (data : SphereHnIntData.{u} n) :
+    SimpleEquiv data.homology Int :=
+  data.equivInt
 
 /-! ## Applications
 
@@ -801,7 +836,8 @@ This module establishes the Hurewicz theorem:
    - H₁(T²) ≃ ℤ²
    - H₁(S¹ ∨ S¹) ≃ ℤ² (abelianization of ℤ * ℤ)
 
-6. **Higher Hurewicz**: π_n(X) ≃ H_n(X) for (n-1)-connected X
+6. **Higher Hurewicz**: data-parametrized maps/equivalences until higher
+   homology carriers are developed
 
 ## Key Theorems
 
@@ -809,7 +845,7 @@ This module establishes the Hurewicz theorem:
 |---------|-----------|
 | `hurewicz_theorem` | H₁(X) ≃ π₁(X)^ab |
 | `figureEight_H1_equiv_int_prod` | (ℤ * ℤ)^ab ≃ ℤ × ℤ |
-| `higher_hurewicz_theorem` | π_n ≃ H_n for connected spaces |
+| `higher_hurewicz_theorem` | Supplied higher Hurewicz equivalence data packaged as `SimpleEquiv` |
 
 ## Connection to Other Modules
 
