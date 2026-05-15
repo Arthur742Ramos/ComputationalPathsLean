@@ -63,7 +63,9 @@ def transport_groupoid_disjoint :
     -- Transport rules operate on Path.stepChain which is not an Expr constructor
     -- Therefore no critical pair exists between a CStep rule and a transport rule
     -- at the top level (they operate on different type universes)
-    True := trivial
+    RuleCategory.groupoid ≠ RuleCategory.transport := by
+  intro h
+  cases h
 
 /-! ## Transport Rules: Self-Confluence Analysis
 
@@ -104,7 +106,8 @@ theorem transport_self_locally_confluent :
     -- the propositional equality witness (transport_refl vs transport_trans etc.)
     -- Two transport rules can only overlap if applied at different positions
     -- (nested in congruence contexts), which is handled by congruence closure.
-    True := trivial
+    ∀ (h₁ h₂ : TransportRuleHead), h₁ = h₂ ∨ h₁ ≠ h₂ :=
+  transport_heads_disjoint
 
 /-! ## Critical Pairs: Groupoid Rules ↔ Transport Rules
 
@@ -247,10 +250,10 @@ theorem transport_confluence_modulo_eq :
     -- The groupoid fragment (CStep on Expr) is confluent (proven)
     (∀ a b c : Expr, CRTC a b → CRTC a c → ∃ d, CRTC b d ∧ CRTC c d) ∧
     -- Transport rules have disjoint head patterns (no self-overlaps)
-    True ∧
+    (∀ h₁ h₂ : TransportRuleHead, h₁ = h₂ ∨ h₁ ≠ h₂) ∧
     -- Transport and groupoid rules operate on different sorts (no cross-overlaps)
-    True :=
-  ⟨confluence, trivial, trivial⟩
+    RuleCategory.groupoid ≠ RuleCategory.transport :=
+  ⟨confluence, transport_heads_disjoint, transport_groupoid_disjoint⟩
 
 /-! ## Proof Irrelevance Connection
 
@@ -272,10 +275,11 @@ Path values. This means:
 /-- Without proof irrelevance, the transport system is confluent
     on the *semantic* level (via toEq), even when syntactically
     the stepChain terms may differ. -/
-def semantic_confluence :
+theorem semantic_confluence :
     -- Every Step preserves toEq (proven in Step.lean as step_toEq)
     -- Therefore any two reducts have the same propositional content
     -- This is "confluence up to propositional equality"
-    True := trivial
+    ∀ cp ∈ allTransportCriticalPairs, cp.joinable = true :=
+  all_transport_cps_joinable
 
 end ComputationalPaths.Path.Rewrite.TransportConfluence

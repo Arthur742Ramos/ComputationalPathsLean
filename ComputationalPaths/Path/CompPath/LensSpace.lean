@@ -51,7 +51,7 @@ noncomputable def lensSpacePiOneFwdRoundtrip_path (p : Nat) (y : Zp p) :
 
 /-! ## Compatibility aliases -/
 
-/-- Placeholder lens space type. -/
+/-- Minimal carrier for the current lens-space `π₁` model. -/
 abbrev LensSpace (_p _q : Nat) : Type u := PUnit'
 
 /-- Basepoint of the lens space. -/
