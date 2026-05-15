@@ -11,6 +11,8 @@ into the semidirect product Z ⋊ Z, yielding the presentation
 - `kleinBottleLoopA`, `kleinBottleLoopB`: Path-level loop generators.
 - `kleinBottleLoopAPathZPow`, `kleinBottleLoopBPathZPow`: Path-level loop powers.
 - `kleinBottleDecodePath`: Decoding integer pairs into Path-level loops.
+- `kleinBottlePiOneEquivIntProd`: quotient-level computation
+  `pi_1(K) ~= Z semidirect Z`.
 -/
 
 import ComputationalPaths.Path.Basic
@@ -195,11 +197,123 @@ noncomputable def kleinBottleLoopBEq : kleinBottleBase = kleinBottleBase :=
 
 /-! ## pi_1(K) as the semidirect product Z ⋊ Z -/
 
-abbrev kleinBottlePiOne : Type := Int × Int
+@[simp] theorem kleinBottleEncodeExpr_powA (n : Nat) :
+    kleinBottleEncodeExpr' (kleinBottleLoopAExprPow n) = ((n : Int), 0) := by
+  induction n with
+  | zero =>
+      simp [kleinBottleLoopAExprPow]
+  | succ n ih =>
+      simp [kleinBottleLoopAExprPow, ih, kleinBottleMul, kleinBottleAct]
 
-@[simp] noncomputable def kleinBottleEncode : kleinBottlePiOne → Int × Int := fun x => x
+@[simp] theorem kleinBottleEncodeExpr_powB (n : Nat) :
+    kleinBottleEncodeExpr' (kleinBottleLoopBExprPow n) = (0, (n : Int)) := by
+  induction n with
+  | zero =>
+      simp [kleinBottleLoopBExprPow]
+  | succ n ih =>
+      simp [kleinBottleLoopBExprPow, ih, kleinBottleMul, kleinBottleAct_zero_exp]
 
-@[simp] noncomputable def kleinBottleDecode : Int × Int → kleinBottlePiOne := fun x => x
+@[simp] theorem kleinBottleEncodeExpr_zpowA (m : Int) :
+    kleinBottleEncodeExpr' (kleinBottleLoopAExprZPow m) = (m, 0) := by
+  cases m with
+  | ofNat n =>
+      simp [kleinBottleLoopAExprZPow]
+  | negSucc n =>
+      change kleinBottleInv (kleinBottleEncodeExpr' (kleinBottleLoopAExprPow (Nat.succ n))) =
+        (Int.negSucc n, 0)
+      have hpow :
+          kleinBottleEncodeExpr' (kleinBottleLoopAExprPow (Nat.succ n)) =
+            (Int.ofNat (Nat.succ n), 0) :=
+        kleinBottleEncodeExpr_powA (Nat.succ n)
+      rw [hpow]
+      have hneg : -Int.ofNat (Nat.succ n) = Int.negSucc n := rfl
+      change (-Int.ofNat (Nat.succ n), -kleinBottleAct (Int.ofNat (Nat.succ n)) 0) =
+        (Int.negSucc n, 0)
+      apply Prod.ext
+      · exact hneg
+      · simp [kleinBottleAct_zero]
+
+@[simp] theorem kleinBottleEncodeExpr_zpowB (n : Int) :
+    kleinBottleEncodeExpr' (kleinBottleLoopBExprZPow n) = (0, n) := by
+  cases n with
+  | ofNat k =>
+      simp [kleinBottleLoopBExprZPow]
+  | negSucc k =>
+      change kleinBottleInv (kleinBottleEncodeExpr' (kleinBottleLoopBExprPow (Nat.succ k))) =
+        (0, Int.negSucc k)
+      have hpow :
+          kleinBottleEncodeExpr' (kleinBottleLoopBExprPow (Nat.succ k)) =
+            (0, Int.ofNat (Nat.succ k)) :=
+        kleinBottleEncodeExpr_powB (Nat.succ k)
+      rw [hpow]
+      have hneg : -Int.ofNat (Nat.succ k) = Int.negSucc k := rfl
+      change (-0, -kleinBottleAct 0 (Int.ofNat (Nat.succ k))) = (0, Int.negSucc k)
+      apply Prod.ext
+      · simp
+      · simpa [Int.natCast_succ, kleinBottleAct_zero_exp] using hneg
+
+/-- The canonical expression for the normal-form coordinate `(m,n)` is `a^m b^n`. -/
+@[simp] noncomputable def kleinBottleDecodeExpr :
+    Int × Int → KleinBottleExpr kleinBottleBase kleinBottleBase
+  | (m, n) =>
+      KleinBottleExpr.trans (kleinBottleLoopAExprZPow m) (kleinBottleLoopBExprZPow n)
+
+@[simp] theorem kleinBottleEncodeExpr_decodeExpr (z : Int × Int) :
+    kleinBottleEncodeExpr' (kleinBottleDecodeExpr z) = z := by
+  cases z with
+  | mk m n =>
+      change kleinBottleEncodeExpr'
+        (KleinBottleExpr.trans (kleinBottleLoopAExprZPow m) (kleinBottleLoopBExprZPow n)) =
+        (m, n)
+      rw [kleinBottleEncodeExpr_trans, kleinBottleEncodeExpr_zpowA, kleinBottleEncodeExpr_zpowB]
+      simp [kleinBottleMul]
+
+/-- Loop-expression relation for the Klein bottle: equality of normal-form
+coordinates in the semidirect product `Z ⋊ Z`, where the second coordinate acts
+by sign on the first loop's transported `b`-coordinate. -/
+noncomputable def kleinBottleRel
+    (p q : KleinBottleExpr kleinBottleBase kleinBottleBase) : Prop :=
+  kleinBottleEncodeExpr' p = kleinBottleEncodeExpr' q
+
+/-- Setoid on based Klein bottle loop expressions by semidirect-product normal form. -/
+noncomputable def kleinBottleSetoid :
+    Setoid (KleinBottleExpr kleinBottleBase kleinBottleBase) where
+  r := kleinBottleRel
+  iseqv := by
+    refine ⟨?refl, ?symm, ?trans⟩
+    · intro p
+      rfl
+    · intro p q hpq
+      simpa [kleinBottleRel] using hpq.symm
+    · intro p q r hpq hqr
+      exact hpq.trans hqr
+
+/-- The computational-path fundamental group of the Klein bottle. -/
+abbrev kleinBottlePiOne : Type u :=
+  Quot kleinBottleSetoid.r
+
+/-- Encode a Klein bottle loop class by its semidirect-product normal form. -/
+@[simp] noncomputable def kleinBottleEncode : kleinBottlePiOne → Int × Int :=
+  Quot.lift kleinBottleEncodeExpr' (by
+    intro p q hpq
+    exact hpq)
+
+/-- Decode a semidirect-product coordinate to the canonical loop-expression class. -/
+@[simp] noncomputable def kleinBottleDecode : Int × Int → kleinBottlePiOne :=
+  fun z => Quot.mk _ (kleinBottleDecodeExpr z)
+
+@[simp] theorem kleinBottleEncode_decode (z : Int × Int) :
+    kleinBottleEncode (kleinBottleDecode z) = z := by
+  simpa [kleinBottleDecode, kleinBottleEncode] using kleinBottleEncodeExpr_decodeExpr z
+
+@[simp] theorem kleinBottleDecode_encode (x : kleinBottlePiOne) :
+    kleinBottleDecode (kleinBottleEncode x) = x := by
+  refine Quot.inductionOn x ?_
+  intro p
+  apply Quot.sound
+  change kleinBottleEncodeExpr' (kleinBottleDecodeExpr (kleinBottleEncodeExpr' p)) =
+    kleinBottleEncodeExpr' p
+  simpa using kleinBottleEncodeExpr_decodeExpr (kleinBottleEncodeExpr' p)
 
 /-! ## pi_1(K) equiv Z x Z (semidirect presentation) -/
 
@@ -207,8 +321,8 @@ noncomputable def kleinBottlePiOneEquivIntProd :
     SimpleEquiv kleinBottlePiOne (Int × Int) where
   toFun := kleinBottleEncode
   invFun := kleinBottleDecode
-  left_inv := fun _ => rfl
-  right_inv := fun _ => rfl
+  left_inv := kleinBottleDecode_encode
+  right_inv := kleinBottleEncode_decode
 
 /-! ## Relator: a b a^{-1} b = 1 -/
 

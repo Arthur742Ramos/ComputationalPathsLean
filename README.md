@@ -16,7 +16,7 @@ structure Path {A : Type u} (a b : A) where
 
 This library develops:
 - the computational-path rewrite system (`Step`, `Rw`, `RwEq`, normalization),
-- fundamental group computations via encode/decode (including circle and torus),
+- fundamental group computations via encode/decode (including circle, torus, and Klein bottle),
 - weak higher-groupoid structure (`OmegaGroupoid`),
 - and a broad collection of mathematical modules under `ComputationalPaths/`.
 
@@ -25,6 +25,7 @@ This library develops:
 Representative results and modules include:
 - `ComputationalPaths/Path/CompPath/CircleStep.lean` (`π₁(S¹) ≃ ℤ` interface)
 - `ComputationalPaths/Path/CompPath/TorusStep.lean` (`π₁(T²) ≃ ℤ × ℤ` interface)
+- `ComputationalPaths/Path/CompPath/KleinBottle.lean` (`π₁(K) ≃ ℤ ⋊ ℤ` via loop-expression quotients)
 - `ComputationalPaths/Path/OmegaGroupoid.lean` (weak ω-groupoid-style hierarchy)
 - `ComputationalPaths/Path/Rewrite/Step.lean` (primitive rewrite-step relation)
 
@@ -115,6 +116,7 @@ lake exe computational_paths
 ```bash
 lake build ComputationalPaths.Path.CompPath.CircleStep
 lake build ComputationalPaths.Path.CompPath.TorusStep
+lake build ComputationalPaths.Path.CompPath.KleinBottleStep
 lake build ComputationalPaths.Path.OmegaGroupoid
 ```
 
