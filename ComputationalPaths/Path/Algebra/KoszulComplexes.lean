@@ -285,12 +285,12 @@ structure KoszulHomology {R : Type u} {M : Type v}
   /-- If x is regular, then H_1 = 0. -/
   h1_vanish_if_regular : True
 
-/-- Path witness for H₁ vanishing. -/
+/-- Recorded H₁ vanishing condition. -/
 theorem KoszulHomology.h1Eq {R : Type u} {M : Type v}
     {ring : CRingData R} {mod : RModuleData ring M}
     (KH : KoszulHomology ring mod) :
-    KH.h1_vanish_if_regular = trivial :=
-  rfl
+    True :=
+  KH.h1_vanish_if_regular
 
 /-! ## Depth -/
 

@@ -541,10 +541,14 @@ theorem yonedaRightUnitPath_toEq (E : ExtAlgebra) (n : Nat) (x : Int) :
     (yonedaRightUnitPath E n x).toEq = E.rightUnit n x := by
   simp
 
-/-- Pentagon identity for Yoneda product (Mac Lane coherence). -/
-theorem yoneda_pentagon (_E : ExtAlgebra) (_p _q _r _s : Nat) (_a _b _c _d : Int) :
-    True := by
-  trivial
+/-- Pentagon edge for Yoneda product, obtained by two associativity steps. -/
+theorem yoneda_pentagon (E : ExtAlgebra) (p q r s : Nat) (a b c d : Int) :
+    E.yonedaProd ((p + q) + r) s
+        (E.yonedaProd (p + q) r (E.yonedaProd p q a b) c) d =
+      E.yonedaProd p (q + (r + s)) a
+        (E.yonedaProd q (r + s) b (E.yonedaProd r s c d)) := by
+  rw [E.assoc (p + q) r s (E.yonedaProd p q a b) c d]
+  rw [E.assoc p q (r + s) a b (E.yonedaProd r s c d)]
 
 /-- Left-right unit consistency. -/
 theorem yoneda_unit_consistency (E : ExtAlgebra) :

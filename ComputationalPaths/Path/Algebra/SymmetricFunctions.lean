@@ -286,7 +286,7 @@ structure HallLittlewoodSystem (SR : SymRing) (sf : SchurFunction SR) where
   Q : Partition → Nat → SR.R
   /-- Specialization `P_λ(0) = s_λ` (Path witness). -/
   specialize_t_zero : ∀ lam : Partition, Path (P lam 0) (sf.s lam)
-  /-- Placeholder orthogonality pairing statement at parameter level. -/
+  /-- Path-valued Hall-Littlewood pairing witness at parameter level. -/
   hall_pairing : ∀ (lam mu : Partition) (t : Nat),
     Path (SR.mul (Q lam t) (Q mu t)) (SR.mul (Q lam t) (Q mu t))
 

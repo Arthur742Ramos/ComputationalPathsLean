@@ -92,9 +92,11 @@ structure RankMatroid (n : Nat) where
 noncomputable def matroidFullRank (n : Nat) (M : RankMatroid n) : Nat :=
   M.rank (fun _ => true)
 
-/-- Rank is bounded by n. -/
-theorem rankBoundedByN (n : Nat) (_M : RankMatroid n) :
-    True := trivial
+/-- Adding one ground-set element increases rank by at most one. -/
+theorem rankUnitIncrease_projection (n : Nat) (M : RankMatroid n)
+    (A : Fin n → Bool) (e : Fin n) :
+    M.rank (fun i => A i || (i == e)) ≤ M.rank A + 1 :=
+  M.rank_unit_increase A e
 
 /-! ## Domain-Specific Rewrite Steps -/
 
@@ -462,10 +464,10 @@ theorem tropicalHyperplane_dim_path (n : Nat) (hn : n > 0)
     (tropicalHyperplane n hn vm).dim_eq_rank =
       (tropicalHyperplane n hn vm).dim_eq_rank := rfl
 
-theorem orientedMatroidTropicalBridge_true (n r : Nat)
-    (_tls : TropicalLinearSpace n r) :
-    True := by
-  trivial
+noncomputable def orientedMatroidTropicalBridge_dim_rank (n r : Nat)
+    (tls : TropicalLinearSpace n r) :
+    Path (tropicalBridgeDimension n r tls) r :=
+  Path.trans (Path.refl _) tls.dim_eq_rank
 
 end MatroidTheory
 end Algebra
