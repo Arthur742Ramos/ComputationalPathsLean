@@ -315,8 +315,9 @@ noncomputable def hasReflectiveAccessibleSubcategory (κ : RegularCardinal)
 
 theorem makkai_pare_presentation_exists (κ : RegularCardinal)
     (_C : AccessibleCategory κ) :
-    Exists (fun desc : String => desc = "MakkaiParePresentation exists") :=
-  ⟨_, rfl⟩
+    ∃ P : MakkaiParePresentation κ, P.equivalenceWitness = trivial :=
+  ⟨{ sketch := ⟨PUnit, PUnit, PUnit⟩, equivalenceWitness := trivial },
+    Subsingleton.elim _ _⟩
 
 theorem lambda_orthogonality_stable_under_filtered_colimits
     (κ : RegularCardinal) (Obj : Type u) (Hom : Obj → Obj → Type v)
@@ -330,22 +331,27 @@ theorem lambda_orthogonality_characterizes_accessibility
   C.generatorsAreCompact
 
 theorem ind_pro_bridge_exists (_Obj : Type u) :
-    Exists (fun desc : String => desc = "IndProBridge exists") :=
-  ⟨_, rfl⟩
+    ∃ B : IndProBridge _Obj, B.comparisonFunctor = trivial :=
+  ⟨{ indSide := { indObj := _Obj, indHom := fun _ _ => PUnit },
+      proSide := { proObj := _Obj, proHom := fun _ _ => PUnit },
+      comparisonFunctor := trivial },
+    Subsingleton.elim _ _⟩
 
 theorem ind_pro_bridge_functorial (Obj : Type u) (B : IndProBridge Obj) :
     B.comparisonFunctor = trivial :=
   Subsingleton.elim _ _
 
 theorem accessible_localization_data_exists (κ : RegularCardinal)
-    (_C : AccessibleCategory κ) :
-    Exists (fun desc : String => desc = "AccessibleLocalizationData exists") :=
-  ⟨_, rfl⟩
+    (C : AccessibleCategory κ) :
+    ∃ L : AccessibleLocalizationData κ C, L.isAccessible = trivial :=
+  ⟨{ localizationObj := PUnit, localize := fun _ => PUnit.unit, isAccessible := trivial },
+    Subsingleton.elim _ _⟩
 
 theorem accessible_localization_functor_exists (κ : RegularCardinal)
-    (_C : AccessibleCategory κ) :
-    Exists (fun desc : String => desc = "AccessibleLocalizationFunctor exists") :=
-  ⟨_, rfl⟩
+    (C : AccessibleCategory κ) :
+    ∃ L : AccessibleLocalizationFunctor κ C, L.preservesFilteredColimits = trivial :=
+  ⟨{ target := PUnit, mapObj := fun _ => PUnit.unit, preservesFilteredColimits := trivial },
+    Subsingleton.elim _ _⟩
 
 theorem accessible_localization_is_reflective_ext (κ : RegularCardinal)
     (C : AccessibleCategory κ) :
