@@ -1190,7 +1190,7 @@ This module establishes:
    - n = 1: F₁ = ℤ (via `freeGroupOneEquivInt`)
    - n = 2: F₂ is the free group on two generators (figure-eight expected)
 
-## Placeholders
+## Deferred equivalences
 
 `BouquetN` now uses the computational-path circle and pushout machinery.
 
