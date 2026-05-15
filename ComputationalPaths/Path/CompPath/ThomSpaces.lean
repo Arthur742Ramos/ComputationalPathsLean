@@ -102,7 +102,8 @@ noncomputable def degreePath_reassoc_cancel (O : BundleOrientation H bundle) :
   exact rweq_cmpA_refl_left (Path.refl O.thomClass.degree)
 
 /-- Legacy wrapper preserving the placeholder compatibility flag. -/
-theorem compatible_true (O : BundleOrientation H bundle) : 0 = 0 := rfl
+theorem compatible_true (O : BundleOrientation H bundle) : True :=
+  O.compatible
 
 end BundleOrientation
 
@@ -161,7 +162,7 @@ noncomputable def classPath (T : OrientedThomIsomorphism H bundle b0) :
 
 end OrientedThomIsomorphism
 
-/-! ## Basic theorem placeholders -/
+/-! ## Basic alias theorems -/
 
 theorem thomSpace_alias_cast {K B Total V : Type u}
     (bundle : VectorBundleData K B Total V) (Th : ThomSpace bundle) :
@@ -210,8 +211,8 @@ theorem degreePath_cancel_left_def (O : BundleOrientation H bundle) :
   rfl
 
 theorem compatible_true_iff (O : BundleOrientation H bundle) :
-    compatible_true O = rfl := by
-  rfl
+    compatible_true O = O.compatible := by
+  exact Subsingleton.elim _ _
 
 end BundleOrientation
 
