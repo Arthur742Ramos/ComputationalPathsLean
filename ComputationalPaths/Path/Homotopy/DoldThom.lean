@@ -146,27 +146,37 @@ noncomputable def symmProdInfAdd_singleton_fst_path {X : Type u}
 abbrev ReducedHomology (_X : Type u) : Type (u + 1) :=
   ℕ → Type u
 
-/-- The n-th homotopy group of the infinite symmetric product of `X`.
-    Stub implementation since HigherHomotopyGroups has universe issues. -/
-abbrev symmProdInfPi (_n : ℕ) (_X : Type u) : Type u :=
-  PUnit  -- Placeholder: proper definition requires HigherHomotopyGroups
+/-- Homotopy carriers for the infinite symmetric product of `X`, supplied as
+    local data so the Dold-Thom interface is not tied to a placeholder model. -/
+structure SymmProdInfHomotopy (X : Type u) where
+  /-- The n-th homotopy carrier of `SP^infty(X)`. -/
+  pi : ℕ → Type u
+  /-- Chosen basepoint in each homotopy carrier. -/
+  basepoint : ∀ n, pi n
 
 /-- Data of the Dold-Thom theorem: homotopy of `SP^infty(X)` matches homology. -/
 structure DoldThomSpace (X : Type u) where
+  /-- Homotopy carriers of the infinite symmetric product. -/
+  homotopy : SymmProdInfHomotopy X
   /-- Reduced homology groups. -/
   homology : ReducedHomology X
   /-- Dold-Thom equivalence between homotopy and homology. -/
-  equivalence : ∀ n : ℕ, SimpleEquiv (symmProdInfPi n X) (homology n)
+  equivalence : ∀ n : ℕ, SimpleEquiv (homotopy.pi n) (homology n)
 
-/-- Any two Dold-Thom structures on `X` yield equivalent homology theories. -/
+/-- Any two Dold-Thom structures on `X` whose homotopy carriers agree up to
+    equivalence yield equivalent homology theories. -/
 noncomputable def doldThomHomologyEquiv {X : Type u}
-    (A B : DoldThomSpace X) (n : ℕ) :
+    (A B : DoldThomSpace X)
+    (homotopyEquiv : ∀ n : ℕ, SimpleEquiv (A.homotopy.pi n) (B.homotopy.pi n))
+    (n : ℕ) :
     SimpleEquiv (A.homology n) (B.homology n) :=
-  SimpleEquiv.comp (SimpleEquiv.symm (A.equivalence n)) (B.equivalence n)
+  SimpleEquiv.comp
+    (SimpleEquiv.comp (SimpleEquiv.symm (A.equivalence n)) (homotopyEquiv n))
+    (B.equivalence n)
 
 /-- `Path` witnessing the Dold-Thom equivalence round-trip. -/
 noncomputable def doldThomRoundtrip_path {X : Type u}
-    (D : DoldThomSpace X) (n : ℕ) (x : symmProdInfPi n X) :
+    (D : DoldThomSpace X) (n : ℕ) (x : D.homotopy.pi n) :
     ComputationalPaths.Path
       ((D.equivalence n).invFun ((D.equivalence n).toFun x)) x :=
   ComputationalPaths.Path.stepChain ((D.equivalence n).left_inv x)
@@ -180,23 +190,29 @@ noncomputable def doldThomFwdRoundtrip_path {X : Type u}
 
 /-- `Path` witnessing the backward round-trip of the induced homology equivalence. -/
 noncomputable def doldThomHomologyEquivRoundtrip_path {X : Type u}
-    (A B : DoldThomSpace X) (n : ℕ) (x : A.homology n) :
+    (A B : DoldThomSpace X)
+    (homotopyEquiv : ∀ n : ℕ, SimpleEquiv (A.homotopy.pi n) (B.homotopy.pi n))
+    (n : ℕ) (x : A.homology n) :
     ComputationalPaths.Path
-      (((doldThomHomologyEquiv A B n).invFun ((doldThomHomologyEquiv A B n).toFun x))) x :=
-  ComputationalPaths.Path.stepChain ((doldThomHomologyEquiv A B n).left_inv x)
+      (((doldThomHomologyEquiv A B homotopyEquiv n).invFun
+        ((doldThomHomologyEquiv A B homotopyEquiv n).toFun x))) x :=
+  ComputationalPaths.Path.stepChain ((doldThomHomologyEquiv A B homotopyEquiv n).left_inv x)
 
 /-- `Path` witnessing the forward round-trip of the induced homology equivalence. -/
 noncomputable def doldThomHomologyEquivFwdRoundtrip_path {X : Type u}
-    (A B : DoldThomSpace X) (n : ℕ) (y : B.homology n) :
+    (A B : DoldThomSpace X)
+    (homotopyEquiv : ∀ n : ℕ, SimpleEquiv (A.homotopy.pi n) (B.homotopy.pi n))
+    (n : ℕ) (y : B.homology n) :
     ComputationalPaths.Path
-      (((doldThomHomologyEquiv A B n).toFun ((doldThomHomologyEquiv A B n).invFun y))) y :=
-  ComputationalPaths.Path.stepChain ((doldThomHomologyEquiv A B n).right_inv y)
+      (((doldThomHomologyEquiv A B homotopyEquiv n).toFun
+        ((doldThomHomologyEquiv A B homotopyEquiv n).invFun y))) y :=
+  ComputationalPaths.Path.stepChain ((doldThomHomologyEquiv A B homotopyEquiv n).right_inv y)
 
 /-! ## Summary
 
 We define symmetric products using Mathlib's `Sym`, the infinite symmetric
-product as a sigma type, and a minimal Dold-Thom interface that packages the
-equivalences between homotopy groups of `SP^infty(X)` and reduced homology.
+product as a sigma type, and a minimal Dold-Thom interface that packages supplied
+homotopy carriers for `SP^infty(X)` together with equivalences to reduced homology.
 
 We also add basic `Path` witnesses for degree bookkeeping and equivalence
 round-trip laws.

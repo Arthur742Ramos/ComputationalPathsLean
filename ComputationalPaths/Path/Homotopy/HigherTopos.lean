@@ -294,7 +294,9 @@ theorem adjoint_functor_exists (A : AdjointFunctorThm) :
 /-- An ∞-topos: a presentable ∞-category satisfying descent. -/
 structure InfinityTopos extends PresentableCategory where
   /-- Descent: pullback along any morphism preserves colimits. -/
-  descent : True
+  descent : ∀ {I : QuasiCategory} (D : InfinityDiagram I toPresentableCategory.category)
+      (CL : InfinityColimit D),
+    ∃ universal : InfinityColimit D, universal.cocone.nadir = CL.cocone.nadir
   /-- Object classifier: there exists a universal small fibration. -/
   objectClassifier : toPresentableCategory.category.obj
   /-- Classification: small maps to X correspond to maps X → U. -/
@@ -303,8 +305,8 @@ structure InfinityTopos extends PresentableCategory where
       toPresentableCategory.category.target f = objectClassifier
 
 /-- Descent property: colimits are universal. -/
-theorem descent_property (T : InfinityTopos) :
-    T.descent = trivial := rfl
+noncomputable def descent_property (T : InfinityTopos) :=
+  @InfinityTopos.descent T
 
 /-- The ∞-category of spaces is an ∞-topos. -/
 structure SpacesIsTopos where

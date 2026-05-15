@@ -109,20 +109,38 @@ noncomputable def betaFamily (k : Nat) : BetaFamily k :=
 
 /-! ## Chromatic spectral sequence at height 1 -/
 
+/-- Convergence target data for the height-1 chromatic spectral sequence. -/
+structure ChromaticHeightOneTarget (p : ChromaticHomotopy.Prime)
+    (E2 : AdamsSpectralSequence.SpectralSequencePage 1) where
+  /-- The target carrier for the p-local height-1 stable stem data. -/
+  carrier : Type u
+  /-- Chosen basepoint in the convergence target. -/
+  basepoint : carrier
+  /-- Contribution map from an E₂ term to the convergence target. -/
+  contribution : ∀ s t, E2.groups.carrier s t → carrier
+  /-- The zero class contributes the target basepoint. -/
+  zero_contribution : ∀ s t,
+    Path (contribution s t (E2.groups.zero s t)) basepoint
+
 /-- Height-1 chromatic spectral sequence data at a prime p. -/
 structure ChromaticHeightOneSS (p : ChromaticHomotopy.Prime) where
   /-- E2 page (modeled as a spectral sequence page at r = 1). -/
   E2 : AdamsSpectralSequence.SpectralSequencePage 1
   /-- The differential squares to zero. -/
   d_squared : AdamsSpectralSequence.HasDifferentialSquaredZero E2
-  /-- Convergence target type. -/
-  converges_to_stem : Type
+  /-- Convergence target data. -/
+  target : ChromaticHeightOneTarget p E2
 
 /-- The trivial height-1 chromatic spectral sequence at prime p. -/
 noncomputable def trivialHeightOneSS (p : ChromaticHomotopy.Prime) : ChromaticHeightOneSS p where
   E2 := AdamsSpectralSequence.trivialPage 1
   d_squared := inferInstance
-  converges_to_stem := Unit
+  target := {
+    carrier := Unit
+    basepoint := ()
+    contribution := fun _ _ _ => ()
+    zero_contribution := fun _ _ => Path.stepChain rfl
+  }
 
 /-- The prime 2, used for examples. -/
 noncomputable def primeTwo : ChromaticHomotopy.Prime :=
@@ -169,8 +187,8 @@ noncomputable def trivialHeightOneSS_page_path (p : ChromaticHomotopy.Prime) :
 
 /-- A chosen basepoint in the trivial convergence target. -/
 noncomputable def trivialHeightOneSS_targetBase (p : ChromaticHomotopy.Prime) :
-    (trivialHeightOneSS p).converges_to_stem :=
-  ()
+    (trivialHeightOneSS p).target.carrier :=
+  (trivialHeightOneSS p).target.basepoint
 
 /-- Path witness that the trivial height-1 differential squares to zero. -/
 noncomputable def trivialHeightOneSS_d_squared_path
