@@ -8,7 +8,7 @@
   derivation trees as paths, CYK parsing.
 
   Multi-step trans/symm/congrArg chains throughout.
-  All proofs sorry-free.  40+ theorems.
+  All proofs are complete.  40+ theorems.
 -/
 
 set_option linter.unusedVariables false
@@ -278,11 +278,17 @@ theorem nfa_path_length_eq_word (m : NFA) (qs : List Nat) (w : Word) :
 -- §9  Subset construction (NFA → DFA) as path morphism
 -- ============================================================
 
+noncomputable def subsetStateCode (qs : List Nat) : Nat :=
+  qs.eraseDups.foldl (fun acc q => acc + 2 ^ q) 0
+
+noncomputable def subsetStateDecode (states code : Nat) : List Nat :=
+  (List.range states).filter (fun q => decide ((code / (2 ^ q)) % 2 = 1))
+
 noncomputable def subsetDFA (m : NFA) : DFA where
-  states  := 2 ^ m.states  -- conceptually; encoding as Nat
-  start   := 0  -- encode start set
-  isFinal := fun _ => false  -- placeholder
-  delta   := fun q a => q  -- placeholder
+  states  := 2 ^ m.states
+  start   := subsetStateCode m.start
+  isFinal := fun q => (subsetStateDecode m.states q).any m.isFinal
+  delta   := fun q a => subsetStateCode (m.stepStates (subsetStateDecode m.states q) a)
 
 -- The important thing: the path structure is preserved
 -- We model this as a path mapping from NFA state-set paths to DFA paths
