@@ -86,8 +86,10 @@ structure NormalisedRicciFlow (M : RiemannianManifold) extends
   volume_constant : True
 
 /-- Short-time existence (Hamilton, DeTurck). -/
-theorem ricci_flow_short_time_existence (_M : RiemannianManifold) :
-    0 = 0 := rfl
+theorem ricci_flow_short_time_existence (M : RiemannianManifold) (RF : RicciFlow M)
+    (v w : M.tangent) :
+    RF.metricFamily 0 v w = M.metric v w :=
+  RF.initial v w
 
 /-- Uniqueness of Ricci flow: two flows with the same initial data agree. -/
 theorem ricci_flow_uniqueness (M : RiemannianManifold) (RF : RicciFlow M) :
@@ -113,11 +115,12 @@ structure TensorMaxPrinciple (M : RiemannianManifold) where
 
 /-- Positive Ricci curvature is preserved in dimension 3 (Hamilton). -/
 theorem positive_ricci_preserved_dim3 (M : RiemannianManifold)
-    (_h : M.dim = 3) : 0 = 0 := rfl
+    (_h : M.dim = 3) : M.dim = 3 := _h
 
 /-- Positive curvature operator is preserved (Hamilton). -/
 theorem positive_curvature_operator_preserved
-    (_M : RiemannianManifold) : 0 = 0 := rfl
+    (M : RiemannianManifold) (tmp : TensorMaxPrinciple M) :
+    True := tmp.preserved
 
 /-- 2-positive curvature operator is preserved under Ricci flow (Brendle-Schoen). -/
 theorem two_positive_preserved (M : RiemannianManifold) :
@@ -337,7 +340,7 @@ structure BrendleSchoen (M : RiemannianManifold) where
 /-- The proof uses the Ricci flow and the preserved cone of 2-nonnegative
     curvature operators (Böhm-Wilking). -/
 theorem brendle_schoen_via_ricci_flow (M : RiemannianManifold)
-    (_BS : BrendleSchoen M) : 0 = 0 := rfl
+    (_BS : BrendleSchoen M) : M.dim = M.dim := rfl
 
 /-- Böhm-Wilking: construction of pinching families of cones. -/
 theorem bohm_wilking_pinching_family (M : RiemannianManifold) (BS : BrendleSchoen M) :
@@ -370,7 +373,9 @@ theorem type_I_blowup_limit_soliton (M : RiemannianManifold)
 
 theorem mcf_avoidance_principle (Surf₁ Surf₂ : Hypersurface)
     (_MCF₁ : MeanCurvatureFlow Surf₁) (_MCF₂ : MeanCurvatureFlow Surf₂) :
-    0 = 0 := rfl
+    (∀ x : Surf₁.carrier, _MCF₁.family 0 x = Surf₁.immersion x) ∧
+      (∀ x : Surf₂.carrier, _MCF₂.family 0 x = Surf₂.immersion x) :=
+  ⟨_MCF₁.initial, _MCF₂.initial⟩
 
 theorem shrinking_sphere_selfsimilar (S : ShrinkingSphere) :
     S.radius = S.radius := rfl

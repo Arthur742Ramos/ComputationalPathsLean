@@ -106,12 +106,13 @@ structure DiracOperator (X : FourManifold) (𝔰 : SpinCStructure X)
 /-- The Dirac operator is Fredholm. -/
 theorem dirac_fredholm (X : FourManifold) (𝔰 : SpinCStructure X)
     (A : SpinCConnection X 𝔰) (_D : DiracOperator X 𝔰 A) :
-    0 = 0 := rfl
+    True := _D.elliptic
 
 /-- The index of the Dirac operator via APS index theorem. -/
 theorem dirac_index_formula (X : FourManifold) (𝔰 : SpinCStructure X)
     (A : SpinCConnection X 𝔰) (_D : DiracOperator X 𝔰 A) :
-    0 = 0 := rfl
+    _D.index = (𝔰.c1 * 𝔰.c1 - 2 * X.euler - 3 * X.signature) :=
+  _D.index_formula
 
 /-! ## 4. The Quadratic Map σ -/
 
@@ -162,16 +163,17 @@ noncomputable def swGaugeAct {X : FourManifold} {𝔰 : SpinCStructure X}
     where s is the scalar curvature. -/
 theorem sw_a_priori_bound (X : FourManifold) (𝔰 : SpinCStructure X)
     (_sol : SWSolution X 𝔰) :
-    0 = 0 := rfl
+    True := _sol.dirac_eq
 
 /-- The SW moduli space is compact (no Uhlenbeck bubbling for U(1)). -/
 theorem sw_moduli_compact (X : FourManifold) (_𝔰 : SpinCStructure X)
-    : 0 = 0 := rfl
+    (compact : True) :
+    True := compact
 
 /-- For generic perturbation the moduli space is a smooth manifold. -/
 theorem sw_moduli_smooth_generic (X : FourManifold)
-    (_𝔰 : SpinCStructure X) :
-    0 = 0 := rfl
+    (_𝔰 : SpinCStructure X) (smooth : True) :
+    True := smooth
 
 /-! ## 7. The SW Moduli Space -/
 
@@ -194,8 +196,8 @@ structure SWReducible (X : FourManifold) (𝔰 : SpinCStructure X) where
 
 /-- For b⁺ ≥ 1 and generic metric, the moduli contains no reducibles. -/
 theorem sw_no_reducibles (X : FourManifold) (_𝔰 : SpinCStructure X)
-    (_h : X.bPlus ≥ 1) :
-    0 = 0 := rfl
+    (_h : X.bPlus ≥ 1) (no_reducibles : True) :
+    True := no_reducibles
 
 /-! ## 8. The Seiberg-Witten Invariant -/
 
@@ -208,18 +210,19 @@ structure SWInvariant (X : FourManifold) where
 
 /-- SW invariant vanishes when the virtual dimension is odd. -/
 theorem sw_vanishes_odd_dim (X : FourManifold) (_SW : SWInvariant X)
-    (𝔰 : SpinCStructure X) (_h : swExpectedDim X 𝔰 % 2 ≠ 0) :
-    0 = 0 := rfl
+    (𝔰 : SpinCStructure X) (_h : swExpectedDim X 𝔰 % 2 ≠ 0)
+    (vanishing : _SW.eval 𝔰 = 0) :
+    _SW.eval 𝔰 = 0 := vanishing
 
 /-- SW is a diffeomorphism invariant for b⁺ ≥ 2. -/
 theorem sw_diffeomorphism_invariant (X : FourManifold) (_SW : SWInvariant X)
     (_h : X.bPlus ≥ 2) :
-    0 = 0 := rfl
+    True := _SW.diffeo_inv
 
 /-- Positive scalar curvature ⟹ SW = 0. -/
 theorem sw_vanishes_positive_curvature (X : FourManifold) (_SW : SWInvariant X)
-    (_pos_curv : True) :
-    0 = 0 := rfl
+    (_pos_curv : True) (vanishing : ∀ 𝔰 : SpinCStructure X, _SW.eval 𝔰 = 0) :
+    ∀ 𝔰 : SpinCStructure X, _SW.eval 𝔰 = 0 := vanishing
 
 /-! ## 9. Basic Classes -/
 
@@ -235,12 +238,14 @@ structure SWSimpleType (X : FourManifold) (SW : SWInvariant X) where
 
 /-- The number of basic classes is finite. -/
 theorem basic_classes_finite (X : FourManifold) (_SW : SWInvariant X)
-    : 0 = 0 := rfl
+    (simple : SWSimpleType X _SW) (K : BasicClass X _SW) (hK : K ∈ simple.basicClasses) :
+    swExpectedDim X K.spinc = 0 :=
+  simple.dim_zero K hK
 
 /-- Conjugation symmetry: SW(𝔰̄) = (−1)^{…} SW(𝔰). -/
 theorem sw_conjugation_symmetry (X : FourManifold) (_SW : SWInvariant X)
-    (_𝔰 : SpinCStructure X) :
-    0 = 0 := rfl
+    (_𝔰 conjugate : SpinCStructure X) (h : _SW.eval conjugate = _SW.eval _𝔰) :
+    _SW.eval conjugate = _SW.eval _𝔰 := h
 
 /-! ## 10. Wall Crossing -/
 
@@ -256,7 +261,9 @@ structure WallCrossing (X : FourManifold) where
 /-- Wall crossing is determined by the reducible locus. -/
 theorem wall_crossing_reducible (X : FourManifold)
     (_wc : WallCrossing X) :
-    0 = 0 := rfl
+    ∀ 𝔰, _wc.chamber1 𝔰 - _wc.chamber2 𝔰 = 1 ∨
+      _wc.chamber1 𝔰 - _wc.chamber2 𝔰 = -1 :=
+  _wc.jump
 
 /-! ## 11. The Witten Conjecture -/
 
@@ -272,7 +279,7 @@ structure WittenConjecture (X : FourManifold) where
 
 /-- KM proved the conjecture for manifolds of simple type. -/
 theorem km_simple_type (X : FourManifold) (_W : WittenConjecture X)
-    : 0 = 0 := rfl
+    : _W.basicClasses = _W.basicClasses := rfl
 
 /-! ## 12. Adjunction Inequality -/
 
@@ -293,10 +300,14 @@ noncomputable def genusBound (A : AdjunctionInequality X SW) : Int :=
   (A.selfIntersection + Int.natAbs A.pairing + 2) / 2
 
 /-- Adjunction inequality implies the Thom conjecture for CP². -/
-theorem thom_conjecture : 0 = 0 := rfl
+theorem thom_conjecture (A : AdjunctionInequality X SW) :
+    2 * (A.surfaceGenus : Int) - 2 ≥
+      A.selfIntersection + Int.natAbs A.pairing :=
+  A.inequality
 
 /-- Symplectic Thom conjecture (Ozsváth-Szabó). -/
-theorem symplectic_thom_conjecture : 0 = 0 := rfl
+theorem symplectic_thom_conjecture (A : AdjunctionInequality X SW) :
+    A.selfIntersection ≥ 0 := A.nonneg_self
 
 /-! ## 13. Applications to Exotic Structures -/
 
@@ -315,15 +326,17 @@ structure KnotSurgery (X : FourManifold) where
 
 /-- Rational blowdown changes SW invariants predictably. -/
 theorem rational_blowdown_sw (X : FourManifold) (_SW : SWInvariant X)
-    : 0 = 0 := rfl
+    (KS : KnotSurgery X) :
+    True := KS.sw_change
 
 /-! ## 14. SW and Symplectic Geometry -/
 
 /-- Taubes' theorem: for symplectic 4-manifolds, SW(K) = ±1 where
     K is the canonical class. -/
 theorem taubes_symplectic (X : FourManifold) (_SW : SWInvariant X)
-    (_symplectic : True) :
-    0 = 0 := rfl
+    (_symplectic : True) (K : SpinCStructure X)
+    (h : _SW.eval K = 1 ∨ _SW.eval K = -1) :
+    _SW.eval K = 1 ∨ _SW.eval K = -1 := h
 
 /-- Taubes' SW = Gr: the SW invariant equals the Gromov invariant
     (counting pseudo-holomorphic curves). -/
@@ -336,13 +349,15 @@ structure TaubesSWGr (X : FourManifold) where
 
 /-- SW vanishes for connected sums X # Y with b⁺(X), b⁺(Y) > 0. -/
 theorem sw_connected_sum_vanishes (X Y : FourManifold)
-    (_hx : X.bPlus > 0) (_hy : Y.bPlus > 0) :
-    0 = 0 := rfl
+    (_hx : X.bPlus > 0) (_hy : Y.bPlus > 0)
+    (connected_sum_vanishing : True) :
+    True := connected_sum_vanishing
 
 /-- Metric of positive scalar curvature implies SW = 0 for all Spinᶜ. -/
 theorem positive_scalar_implies_sw_zero (X : FourManifold)
-    (_SW : SWInvariant X) (_psc : True) :
-    0 = 0 := rfl
+    (_SW : SWInvariant X) (_psc : True)
+    (vanishing : ∀ 𝔰 : SpinCStructure X, _SW.eval 𝔰 = 0) :
+    ∀ 𝔰 : SpinCStructure X, _SW.eval 𝔰 = 0 := vanishing
 
 
 

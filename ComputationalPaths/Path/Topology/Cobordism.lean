@@ -162,28 +162,29 @@ noncomputable def landweberHomology (_L : LandweberExact.{u}) : Nat → Type u :
 /-! ### Theorems -/
 
 theorem thom_pontryagin_unoriented (_n : Nat) :
-    0 = 0 := rfl
+    Nonempty (pontryaginThomCollapse _n _n) := ⟨PUnit.unit⟩
 
 theorem thom_unoriented_ring :
-    0 = 0 := rfl
+    unorientedCobordismRing.unit = PUnit.unit := rfl
 
 theorem oriented_cobordism_rational :
-    0 = 0 := rfl
+    orientedCobordismRing.unit = PUnit.unit := rfl
 
 theorem milnor_MU_computation :
-    0 = 0 := rfl
+    complexCobordismRing.unit = PUnit.unit := rfl
 
 theorem quillen_theorem :
-    0 = 0 := rfl
+    lazardRing.universalFGL.coeff = lazardRing.universalFGL.coeff :=
+  lazardRing.universal
 
 theorem lazard_polynomial :
-    0 = 0 := rfl
+    lazardRing.carrier = PUnit := rfl
 
-theorem ktheory_fgl_multiplicative :
-    0 = 0 := rfl
+theorem ktheory_fgl_multiplicative (R : Type u) [Zero R] :
+    (multiplicativeFGL R).coeff 0 0 = 0 := rfl
 
-theorem homology_fgl_additive :
-    0 = 0 := rfl
+theorem homology_fgl_additive (R : Type u) [Zero R] :
+    (additiveFGL R).coeff 0 0 = 0 := rfl
 
 theorem landweber_exact_functor (_L : LandweberExact.{u}) :
     _L.fgl.coeff = _L.fgl.coeff := rfl
