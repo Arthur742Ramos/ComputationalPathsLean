@@ -48,7 +48,8 @@ universe u
 
 /-- Trivial cohomology data on a space. -/
 noncomputable def trivialCohomologyOn (X : Type u) : CohomologyOn X where
-  ring := { carrier := PUnit }
+  ring := { carrier := PUnit, cupLengthValue := 0 }
+  cupLengthBound := fun data => Nat.zero_le data.cat
 
 /-! ## Input data from fibrations -/
 

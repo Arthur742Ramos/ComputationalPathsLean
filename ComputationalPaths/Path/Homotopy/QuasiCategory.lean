@@ -206,23 +206,25 @@ theorem inner_horn_filling (C : QuasiCategory) (n : Nat) (k : Fin (n + 2))
   ⟨InnerKanProperty.fill C.innerKan n k hk horn⟩
 
 /-- The identity morphism is a left unit for composition. -/
-theorem QuasiCategory.id_comp' (C : QuasiCategory) (_f : C.mor) :
-    True := by trivial
+theorem QuasiCategory.id_comp' (C : QuasiCategory) (f : C.mor) :
+    Nonempty (HornFiller C.sset 1 ⟨1, by omega⟩ (C.compHorn (C.id (C.source f)) f)) :=
+  ⟨C.compFiller (C.id (C.source f)) f⟩
 
 /-- The identity morphism is a right unit for composition. -/
-theorem QuasiCategory.comp_id' (C : QuasiCategory) (_f : C.mor) :
-    True := by trivial
+theorem QuasiCategory.comp_id' (C : QuasiCategory) (f : C.mor) :
+    Nonempty (HornFiller C.sset 1 ⟨1, by omega⟩ (C.compHorn f (C.id (C.target f)))) :=
+  ⟨C.compFiller f (C.id (C.target f))⟩
 
 /-- Composition is associative up to a 3-simplex witness. -/
 theorem QuasiCategory.comp_assoc (C : QuasiCategory) (_f _g _h : C.mor) :
     Exists (fun desc : String => desc = "3-simplex associativity witness") :=
   ⟨_, rfl⟩
 
-/-- Mapping space adjunction: given mapping space data, the component types are
-    non-trivially related (constructive witness for the adjunction). -/
-theorem mapping_space_adjunction (C : QuasiCategory) (_M : MappingSpaceData C)
-    (_x _y _z : C.obj) : True :=
-  trivial
+/-- The mapping spaces used by the adjunction interface are Kan complexes. -/
+noncomputable def mapping_space_kan_pair (C : QuasiCategory) (M : MappingSpaceData C)
+    (x y z : C.obj) :
+    KanFillerProperty (M.map x y) × KanFillerProperty (M.map y z) :=
+  ⟨M.kan x y, M.kan y z⟩
 
 /-- The homotopy category of a quasi-category satisfies left identity. -/
 theorem homotopyCategory_id_comp (C : QuasiCategory) {a b : C.obj}

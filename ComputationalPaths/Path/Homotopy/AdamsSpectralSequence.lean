@@ -140,8 +140,22 @@ We reference the stable stems computed via the James construction.
 /-- Reference to stable stem types (placeholder). -/
 abbrev StableStem (_k : Nat) : Type := Unit
 
-/-- The Adams E_2 page converges to stable homotopy groups.
-    This is a statement of the convergence theorem (not a proof). -/
+/-- Convergence target data for an Adams E₂ page and a fixed stem.
+    Each bidegree with `t - s = stem` contributes to a chosen target carrier. -/
+structure AdamsConvergenceTarget (E2 : SpectralSequencePage 2) (stem : Nat) where
+  /-- The target stable stem carrier. -/
+  carrier : Type u
+  /-- Basepoint in the target carrier. -/
+  basepoint : carrier
+  /-- Contribution map from an E₂ term on the selected stem. -/
+  contribution : ∀ s t, t - s = stem → E2.groups.carrier s t → carrier
+  /-- The zero class contributes the target basepoint. -/
+  zero_contribution : ∀ s t (h : t - s = stem),
+    Path (contribution s t h (E2.groups.zero s t)) basepoint
+
+/-- The Adams E₂ page converges to stable homotopy groups.
+    This packages the chosen target and contribution maps rather than a bare
+    placeholder type. -/
 structure AdamsConvergence where
   /-- The E_2 page of the Adams spectral sequence -/
   E2 : SpectralSequencePage 2
@@ -150,7 +164,7 @@ structure AdamsConvergence where
   /-- The stem we're computing -/
   stem : Nat
   /-- Statement that E_∞^{s,t} with t-s = stem contributes to πₛ_{stem} -/
-  converges_to_stem : Type -- Placeholder for convergence data
+  target : AdamsConvergenceTarget E2 stem
 
 /-! ## Example: Trivial Spectral Sequence
 
@@ -192,7 +206,12 @@ noncomputable def trivialConvergence (stem : Nat) : AdamsConvergence where
   E2 := trivialPage 2
   d_squared := inferInstance
   stem := stem
-  converges_to_stem := Unit
+  target := {
+    carrier := Unit
+    basepoint := ()
+    contribution := fun _ _ _ _ => ()
+    zero_contribution := fun _ _ _ => Path.stepChain rfl
+  }
 
 /-- The trivial convergence package remembers its stem parameter. -/
 theorem trivialConvergence_stem (stem : Nat) :
@@ -204,8 +223,8 @@ theorem trivialConvergence_page (stem : Nat) :
 
 /-- A chosen basepoint in the trivial convergence target. -/
 noncomputable def trivialConvergence_targetBase (stem : Nat) :
-    (trivialConvergence stem).converges_to_stem :=
-  ()
+    (trivialConvergence stem).target.carrier :=
+  (trivialConvergence stem).target.basepoint
 
 /-- The basepoint of the trivial convergence target is definitionally the unit point. -/
 theorem trivialConvergence_targetBase_eq (stem : Nat) :

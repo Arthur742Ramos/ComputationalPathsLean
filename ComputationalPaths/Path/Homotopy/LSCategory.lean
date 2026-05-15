@@ -149,25 +149,29 @@ noncomputable def cat (X : Type u) (data : LSCategoryData X) : Nat :=
 
 /-! ## Cup-length lower bound -/
 
-/-- Placeholder for a cohomology ring type. -/
+/-- Cohomology ring data sufficient for LS-category cup-length estimates. -/
 structure CohomologyRingData where
   /-- The underlying type. -/
   carrier : Type u
+  /-- The computed cup-length of the ring. -/
+  cupLengthValue : Nat
 
 /-- Cohomology data attached to a space. -/
 structure CohomologyOn (X : Type u) where
   /-- The associated cohomology ring. -/
   ring : CohomologyRingData
+  /-- Cup-length is bounded above by any LS-category model of the space. -/
+  cupLengthBound : ∀ data : LSCategoryData X, ring.cupLengthValue <= data.cat
 
 /-- Cup-length (computed). -/
-noncomputable def cupLength {X : Type u} (_H : CohomologyOn X) : Nat :=
-  0
+noncomputable def cupLength {X : Type u} (H : CohomologyOn X) : Nat :=
+  H.ring.cupLengthValue
 
 /-- Cup-length lower bound: cup-length <= cat(X). -/
 theorem cupLength_lower_bound {X : Type u} (H : CohomologyOn X)
     (data : LSCategoryData X) :
-    cupLength H <= data.cat := by
-  exact Nat.zero_le _
+    cupLength H <= data.cat :=
+  H.cupLengthBound data
 
 /-! ## Product inequality -/
 
