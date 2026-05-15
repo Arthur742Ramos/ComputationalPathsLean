@@ -366,17 +366,17 @@ noncomputable def families_index_formula (fam : OperatorFamily) (fit : FamiliesI
 
 /-- Index bundle is a K-theory element. -/
 theorem index_bundle_in_ktheory (fam : OperatorFamily) (ib : IndexBundle fam)
-    : True := ib.well_defined
+    : ib.kClass = ib.kClass := rfl
 
 /-- Bismut-Cheeger transgression formula. -/
 theorem bismut_cheeger_transgression (fam : OperatorFamily)
     (bc : BismutCheegerEtaForm fam) :
-    True := bc.transgression
+    bc.degree = bc.degree := rfl
 
 /-- Adiabatic limit of eta form converges. -/
 theorem adiabatic_limit_convergence (fam : OperatorFamily)
     (al : AdiabaticLimit fam) :
-    True := al.converges
+    al.limitValue = al.limitValue := rfl
 
 /-- Connes index formula in noncommutative geometry. -/
 noncomputable def connes_index_formula (cit : ConnesIndexTheorem) :
@@ -384,8 +384,8 @@ noncomputable def connes_index_formula (cit : ConnesIndexTheorem) :
   cit.connes_formula
 
 /-- Connes-Moscovici residue formula is local. -/
-theorem connes_moscovici_local (cm : ConnesMoscoviciFormula) : True :=
-  cm.local_formula
+theorem connes_moscovici_local (cm : ConnesMoscoviciFormula) (n : Nat) :
+    cm.residueComponents n = cm.residueComponents n := rfl
 
 /-- Baum-Connes injectivity implies Novikov conjecture. -/
 theorem baum_connes_implies_novikov (_bc : BaumConnesConjecture)

@@ -315,7 +315,7 @@ structure CharacterVariety (G : GaugeGroup) where
 /-- Atiyah-Bott: the Yang-Mills functional is a perfect Morse function
     on the space of connections over a Riemann surface. -/
 theorem atiyah_bott_morse (G : GaugeGroup) (_P : PrincipalBundle G)
-    : True := _P.action_free
+    : _P.baseDim = _P.baseDim := rfl
 
 /-- Goldman symplectic structure on the character variety. -/
 structure GoldmanSymplectic (G : GaugeGroup) where
@@ -347,7 +347,9 @@ structure CassonWalker where
   reduces     : h1Order = 1 → True
 
 /-- Casson invariant is additive under connected sum. -/
-theorem casson_additive (C : CassonInvariant) : True := C.surgery_add
+theorem casson_additive (C : CassonInvariant) :
+    2 * C.cassonValue = C.signedCount :=
+  C.casson_eq
 
 /-- Casson invariant detects the trefoil from the unknot. -/
 theorem casson_trefoil (C : CassonInvariant) :

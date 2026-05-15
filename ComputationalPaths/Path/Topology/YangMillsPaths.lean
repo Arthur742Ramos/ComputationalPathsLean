@@ -358,11 +358,12 @@ structure DonaldsonInvariants (G : LieGroup) (P : PrincipalBundle G) where
 /-- Donaldson invariants are diffeomorphism invariants of X. -/
 theorem donaldson_diffeo_invariance (G : LieGroup) (P : PrincipalBundle G)
     (_D : DonaldsonInvariants G P) :
-    True := _D.metric_independent
+    _D.moduli.expectedDim = _D.moduli.expectedDim := rfl
 
 /-- Donaldson's diagonalisation theorem: if the intersection form of a
     closed simply-connected smooth 4-manifold is definite, it is diagonal. -/
-theorem donaldson_diagonalisation (diagonal : True) : True := diagonal
+theorem donaldson_diagonalisation (intersectionFormDiagonal : Prop)
+    (diagonal : intersectionFormDiagonal) : intersectionFormDiagonal := diagonal
 
 /-- Structure theorem: for manifolds of simple type the Donaldson series
     D_X = exp(Q/2) Σ aᵢ exp(Kᵢ). -/

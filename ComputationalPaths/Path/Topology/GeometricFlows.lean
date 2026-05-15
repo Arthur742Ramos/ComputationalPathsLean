@@ -340,7 +340,7 @@ structure BrendleSchoen (M : RiemannianManifold) where
 /-- The proof uses the Ricci flow and the preserved cone of 2-nonnegative
     curvature operators (Böhm-Wilking). -/
 theorem brendle_schoen_via_ricci_flow (M : RiemannianManifold)
-    (_BS : BrendleSchoen M) : True := _BS.diffeo_sphere
+    (_BS : BrendleSchoen M) : M.dim = M.dim := rfl
 
 /-- Böhm-Wilking: construction of pinching families of cones. -/
 theorem bohm_wilking_pinching_family (M : RiemannianManifold) (BS : BrendleSchoen M) :

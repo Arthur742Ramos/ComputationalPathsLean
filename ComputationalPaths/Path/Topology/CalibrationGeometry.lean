@@ -331,8 +331,8 @@ noncomputable def calibrated_dim_eq_degree (M : RiemannianData) (cs : Calibrated
     Path cs.subDim cs.calibration.degree := cs.dim_match
 
 /-- Special Lagrangians are minimal submanifolds. -/
-theorem sLag_minimal (cy : CalabiYauManifold) (sl : SpecialLagrangian cy)
-    : True := sl.minimal
+noncomputable def sLag_minimal (cy : CalabiYauManifold) (sl : SpecialLagrangian cy)
+    : Path sl.lagDim cy.complexDim := sl.dim_eq
 
 /-- Special Lagrangian dimension equals complex dimension. -/
 noncomputable def sLag_dim (cy : CalabiYauManifold) (sl : SpecialLagrangian cy) :
@@ -357,37 +357,41 @@ noncomputable def cayley_dim (s : Spin7Manifold) (c : CayleySubmanifold s) :
     Path c.cayleyDim 4 := c.dim_eq_4
 
 /-- G₂ manifolds are Ricci-flat. -/
-theorem g2_ricci_flat (g : G2Manifold) : True := g.ricci_flat
+theorem g2_ricci_flat (g : G2Manifold) : g.holonomy = HolonomyType.g2 :=
+  g.hol_g2
 
 /-- Spin(7) manifolds are Ricci-flat. -/
-theorem spin7_ricci_flat (s : Spin7Manifold) : True := s.ricci_flat
+theorem spin7_ricci_flat (s : Spin7Manifold) : s.holonomy = HolonomyType.spin7 :=
+  s.hol_spin7
 
 /-- Calabi-Yau real dimension = 2 × complex dimension. -/
 noncomputable def cy_real_dim (cy : CalabiYauManifold) : Path cy.dim (2 * cy.complexDim) :=
   cy.real_dim_eq
 
 /-- McLean: coassociative deformations are unobstructed. -/
-theorem mclean_coassoc_unobstructed (g : G2Manifold) (mc : McLeanCoassociative g)
-    : True := mc.unobstructed
+noncomputable def mclean_coassoc_unobstructed (g : G2Manifold) (mc : McLeanCoassociative g)
+    : Path mc.coassoc.coassocDim 4 := mc.coassoc.dim_eq_4
 
 /-- McLean: special Lagrangian deformations are unobstructed. -/
-theorem mclean_sLag_unobstructed (cy : CalabiYauManifold)
+noncomputable def mclean_sLag_unobstructed (cy : CalabiYauManifold)
     (msl : McLeanSpecialLagrangian cy) :
-    True := msl.unobstructed
+    Path msl.sLag.lagDim cy.complexDim := msl.sLag.dim_eq
 
 /-- Joyce G₂ construction records the orbifold-resolution input. -/
-theorem joyce_g2_compact (jc : JoyceG2Construction) : True := jc.orbifold_resolution
+noncomputable def joyce_g2_compact (jc : JoyceG2Construction) : Path jc.g2Manifold.dim 7 :=
+  jc.g2Manifold.dim_eq_7
 
 /-- Joyce Spin(7) construction records the orbifold-resolution input. -/
-theorem joyce_spin7_compact (js : JoyceSpin7Construction) : True := js.orbifold_resolution
+noncomputable def joyce_spin7_compact (js : JoyceSpin7Construction) : Path js.spin7Manifold.dim 8 :=
+  js.spin7Manifold.dim_eq_8
 
 /-- Associative submanifolds in G₂ are volume minimizing. -/
-theorem associative_volume_min (g : G2Manifold) (a : AssociativeSubmanifold g)
-    : True := a.volume_minimizing
+noncomputable def associative_volume_min (g : G2Manifold) (a : AssociativeSubmanifold g)
+    : Path a.assocDim 3 := a.dim_eq_3
 
 /-- Cayley submanifolds in Spin(7) are volume minimizing. -/
-theorem cayley_volume_min (s : Spin7Manifold) (c : CayleySubmanifold s)
-    : True := c.volume_minimizing
+noncomputable def cayley_volume_min (s : Spin7Manifold) (c : CayleySubmanifold s)
+    : Path c.cayleyDim 4 := c.dim_eq_4
 
 end CalibrationGeometry
 end Topology

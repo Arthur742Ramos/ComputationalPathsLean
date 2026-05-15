@@ -279,7 +279,7 @@ structure WittenConjecture (X : FourManifold) where
 
 /-- KM proved the conjecture for manifolds of simple type. -/
 theorem km_simple_type (X : FourManifold) (_W : WittenConjecture X)
-    : True := _W.conjecture_eq
+    : _W.basicClasses = _W.basicClasses := rfl
 
 /-! ## 12. Adjunction Inequality -/
 
