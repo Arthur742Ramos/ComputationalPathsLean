@@ -141,49 +141,50 @@ structure CodeParams where
 noncomputable def singletonBound (p : CodeParams) : Prop :=
   p.k ≤ p.n - p.d + 1
 
-/-- Theorem 11: Singleton bound equivalence -/
+/-- Package two concrete proofs as a computational path between their propositions. -/
+noncomputable def provedProp_path {P Q : Prop} (hp : P) (hq : Q) : Path P Q :=
+  Path.stepChain (propext ⟨fun _ => hq, fun _ => hp⟩)
+
+/-- Theorem 11: Singleton bound unfolds to its concrete inequality. -/
 noncomputable def singleton_equiv (p : CodeParams) (h : p.k ≤ p.n - p.d + 1)
-    : Path (singletonBound p) True :=
-  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
-          (propext ⟨fun _ => trivial, fun _ => h⟩)
+    : Path (singletonBound p) (p.k ≤ p.n - p.d + 1) :=
+  provedProp_path h h
 
 /-- Hamming bound (sphere-packing bound) -/
 noncomputable def hammingBound (p : CodeParams) : Prop :=
   p.k + p.d ≤ p.n + 1
 
-/-- Theorem 12: Hamming bound as path -/
+/-- Theorem 12: Hamming bound unfolds to its concrete inequality. -/
 noncomputable def hamming_bound_path (p : CodeParams) (h : p.k + p.d ≤ p.n + 1)
-    : Path (hammingBound p) True :=
-  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
-          (propext ⟨fun _ => trivial, fun _ => h⟩)
+    : Path (hammingBound p) (p.k + p.d ≤ p.n + 1) :=
+  provedProp_path h h
 
 /-- Plotkin bound -/
 noncomputable def plotkinBound (p : CodeParams) : Prop :=
   p.d > 0 → 2 * p.d ≤ p.n → p.k ≤ p.n
 
-/-- Theorem 13: Plotkin bound as path -/
+/-- Theorem 13: Plotkin bound unfolds to its conditional inequality. -/
 noncomputable def plotkin_bound_path (p : CodeParams) (h : p.d > 0 → 2 * p.d ≤ p.n → p.k ≤ p.n)
-    : Path (plotkinBound p) True :=
-  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
-          (propext ⟨fun _ => trivial, fun _ => h⟩)
+    : Path (plotkinBound p) (p.d > 0 → 2 * p.d ≤ p.n → p.k ≤ p.n) :=
+  provedProp_path h h
 
 /-- Theorem 14: Singleton implies Plotkin under conditions -/
 noncomputable def singleton_implies_plotkin (p : CodeParams)
     (hs : singletonBound p) (hdn : p.d ≤ p.n)
-    : Path (plotkinBound p) True := by
+    : Path (plotkinBound p) (p.d > 0 → 2 * p.d ≤ p.n → p.k ≤ p.n) := by
   have hp : plotkinBound p := by
     intro _ _
     unfold singletonBound at hs
     omega
-  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hp⟩)]
-                (propext ⟨fun _ => trivial, fun _ => hp⟩)
+  exact provedProp_path hp hp
 
 /-- Theorem 15: Bound chain via Path.trans -/
 noncomputable def bound_chain (p : CodeParams)
-    (s : Path (singletonBound p) True)
-    (h : Path (hammingBound p) True)
-    : Path (singletonBound p) (hammingBound p) :=
-  Path.trans s (Path.symm h)
+    (s : Path (singletonBound p) (p.k ≤ p.n - p.d + 1))
+    (h : Path (hammingBound p) (p.k + p.d ≤ p.n + 1))
+    (link : Path (p.k ≤ p.n - p.d + 1) (hammingBound p))
+    : Path (singletonBound p) (p.k + p.d ≤ p.n + 1) :=
+  Path.trans (Path.trans s link) h
 
 -- ============================================================================
 -- Section 5: Syndrome Decoding
@@ -364,34 +365,30 @@ noncomputable def correctsErrors (d : Nat) (t : Nat) : Prop := 2 * t + 1 ≤ d
 
 /-- Theorem 35: Detection vs correction relationship -/
 noncomputable def detect_correct_path (d t : Nat) (hc : correctsErrors d t)
-    : Path (detectsErrors d (2 * t)) True := by
+    : Path (detectsErrors d (2 * t)) (2 * t ≤ d - 1) := by
   unfold detectsErrors correctsErrors at *
   have hp : 2 * t ≤ d - 1 := by omega
-  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hp⟩)]
-                (propext ⟨fun _ => trivial, fun _ => hp⟩)
+  exact provedProp_path hp hp
 
 /-- Theorem 36: Minimum distance determines detection -/
-noncomputable def min_dist_detection (d : Nat) (_hd : d ≥ 1)
-    : Path (detectsErrors d (d - 1)) True := by
+noncomputable def min_dist_detection (d : Nat) (hd : d ≥ 1)
+    : Path (detectsErrors d (d - 1)) (d ≥ 1 ∧ d - 1 ≤ d - 1) := by
   unfold detectsErrors
   have hp : d - 1 ≤ d - 1 := Nat.le_refl _
-  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hp⟩)]
-                (propext ⟨fun _ => trivial, fun _ => hp⟩)
+  exact provedProp_path hp ⟨hd, hp⟩
 
 /-- Theorem 37: Correction capability witness -/
 noncomputable def correction_bound (d t : Nat) (hc : correctsErrors d t)
-    : Path (correctsErrors d t) True :=
-  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hc⟩)]
-          (propext ⟨fun _ => trivial, fun _ => hc⟩)
+    : Path (correctsErrors d t) (2 * t + 1 ≤ d) :=
+  provedProp_path hc hc
 
 /-- Theorem 38: Detection-correction tradeoff -/
 noncomputable def detection_correction_tradeoff (d s t : Nat)
-    (h : s + t + 1 ≤ d) (_hs : s ≥ t)
-    : Path (detectsErrors d s) True := by
+    (h : s + t + 1 ≤ d) (hs : s ≥ t)
+    : Path (detectsErrors d s) (s + t + 1 ≤ d ∧ s ≥ t ∧ s ≤ d - 1) := by
   unfold detectsErrors
   have hp : s ≤ d - 1 := by omega
-  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hp⟩)]
-                (propext ⟨fun _ => trivial, fun _ => hp⟩)
+  exact provedProp_path hp ⟨h, hs, hp⟩
 
 -- ============================================================================
 -- Section 11: Cyclic Codes
@@ -439,9 +436,8 @@ structure BCHParams where
 
 /-- Theorem 42: BCH bound: actual distance ≥ design distance -/
 noncomputable def bch_bound_path (bp : BCHParams)
-    : Path (bp.designDist ≤ bp.actualDist) True :=
-  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => bp.hBound⟩)]
-          (propext ⟨fun _ => trivial, fun _ => bp.hBound⟩)
+    : Path (bp.designDist ≤ bp.actualDist) (bp.designDist ≤ bp.actualDist) :=
+  provedProp_path bp.hBound bp.hBound
 
 /-- Theorem 43: BCH design distance equality as path -/
 noncomputable def bch_design_path (bp : BCHParams)
@@ -452,10 +448,10 @@ noncomputable def bch_design_path (bp : BCHParams)
 /-- Theorem 44: BCH meets Singleton when tight -/
 noncomputable def bch_singleton (bp : BCHParams) (k : Nat)
     (hk : k ≤ bp.n - bp.designDist + 1)
-    : Path (singletonBound ⟨bp.n, k, bp.designDist, 2⟩) True := by
+    : Path (singletonBound ⟨bp.n, k, bp.designDist, 2⟩)
+        (k ≤ bp.n - bp.designDist + 1) := by
   unfold singletonBound; simp
-  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => hk⟩)]
-                (propext ⟨fun _ => trivial, fun _ => hk⟩)
+  exact provedProp_path hk hk
 
 -- ============================================================================
 -- Section 13: Concatenated Codes
@@ -549,23 +545,22 @@ noncomputable def gilbertVarshamovBound (p : CodeParams) : Prop :=
 
 /-- Theorem 53: GV bound as path -/
 noncomputable def gv_bound_path (p : CodeParams) (h : p.q ≥ 1 → p.k ≤ p.n)
-    : Path (gilbertVarshamovBound p) True :=
-  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
-          (propext ⟨fun _ => trivial, fun _ => h⟩)
+    : Path (gilbertVarshamovBound p) (p.q ≥ 1 → p.k ≤ p.n) :=
+  provedProp_path h h
 
 /-- Theorem 54: Bound comparison chain -/
 noncomputable def bound_comparison_chain {p : CodeParams}
-    (singleton_holds : Path (singletonBound p) True)
-    (plotkin_holds : Path (plotkinBound p) True)
-    : Path (singletonBound p) (plotkinBound p) :=
-  Path.trans singleton_holds (Path.symm plotkin_holds)
+    (singleton_holds : Path (singletonBound p) (p.k ≤ p.n - p.d + 1))
+    (plotkin_holds : Path (plotkinBound p) (p.d > 0 → 2 * p.d ≤ p.n → p.k ≤ p.n))
+    (link : Path (p.k ≤ p.n - p.d + 1) (plotkinBound p))
+    : Path (singletonBound p) (p.d > 0 → 2 * p.d ≤ p.n → p.k ≤ p.n) :=
+  Path.trans (Path.trans singleton_holds link) plotkin_holds
 
 /-- Theorem 55: Singleton bound for specific code -/
 noncomputable def singleton_specific (n k d : Nat) (h : k ≤ n - d + 1)
-    : Path (singletonBound ⟨n, k, d, 2⟩) True := by
+    : Path (singletonBound ⟨n, k, d, 2⟩) (k ≤ n - d + 1) := by
   unfold singletonBound; simp
-  exact Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
-                (propext ⟨fun _ => trivial, fun _ => h⟩)
+  exact provedProp_path h h
 
 -- ============================================================================
 -- Section 16: Encoding Chains and Higher Structure
@@ -674,9 +669,8 @@ noncomputable def punctured_distance (d dpunct : Nat) (h : dpunct = d - 1)
 
 /-- Theorem 68: Shortening preserves structure -/
 noncomputable def shortening_distance (d dshort : Nat) (h : dshort ≥ d)
-    : Path (dshort ≥ d) True :=
-  Path.mk [Step.mk _ _ (propext ⟨fun _ => trivial, fun _ => h⟩)]
-          (propext ⟨fun _ => trivial, fun _ => h⟩)
+    : Path (dshort ≥ d) (d ≤ dshort) :=
+  provedProp_path h h
 
 -- ============================================================================
 -- Section 19: Repetition and Trivial Codes
@@ -686,14 +680,14 @@ noncomputable def shortening_distance (d dshort : Nat) (h : dshort ≥ d)
 noncomputable def repetitionEncode {A : Type u} {n : Nat} (b : Codeword A 1) : Codeword A n :=
   fun _ => b ⟨0, Nat.zero_lt_one⟩
 
-/-- Theorem 69: Repetition code minimum distance identity -/
+/-- Theorem 69: Repetition-code distance is unchanged by multiplication by one. -/
 noncomputable def repetition_distance (n : Nat)
-    : Path n n :=
-  Path.refl n
+    : Path (n * 1) n :=
+  Path.stepChain (Nat.mul_one n)
 
-/-- Theorem 70: Repetition code rate is 1/n (dimension 1) -/
-noncomputable def repetition_rate : Path (1 : Nat) 1 :=
-  Path.refl 1
+/-- Theorem 70: Repetition-code dimension numerator scales by one. -/
+noncomputable def repetition_rate (n : Nat) : Path (1 * n) n :=
+  Path.stepChain (Nat.one_mul n)
 
 /-- Trivial (universe) code: all words are codewords -/
 noncomputable def trivialCode (A : Type u) (n : Nat) : LinearCode A n n where

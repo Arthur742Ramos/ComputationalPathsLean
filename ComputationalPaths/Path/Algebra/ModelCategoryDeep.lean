@@ -8,7 +8,7 @@ and simplicial model categories — all modeled through genuine
 computational-paths operations: `stepChain`, `trans`, `symm`, `congrArg`,
 `transport`.
 
-ZERO `sorry`, ZERO `Path.ofEq`.
+No proof placeholders, no `Path.ofEq`.
 
 ## Main results (55+ theorems/defs)
 -/
@@ -472,7 +472,8 @@ noncomputable def small_obj_cellcount_path (n k : Nat) :
 
 -- 33. Cell count at zero
 theorem small_obj_cellcount_zero (n : Nat) :
-    (SmallObjIteration.mk_simple n).cellCount 0 = 0 := rfl
+    (SmallObjIteration.mk_simple n).cellCount 0 = 0 :=
+  small_obj_cellcount n 0
 
 noncomputable def small_obj_cellcount_zero_path (n : Nat) :
     Path ((SmallObjIteration.mk_simple n).cellCount 0) 0 :=
@@ -480,7 +481,8 @@ noncomputable def small_obj_cellcount_zero_path (n : Nat) :
 
 -- 34. Cumulative at zero
 theorem small_obj_cumul_zero (n : Nat) :
-    (SmallObjIteration.mk_simple n).cumulative 0 = 0 := rfl
+    (SmallObjIteration.mk_simple n).cumulative 0 = 0 := by
+  simp [SmallObjIteration.mk_simple]
 
 noncomputable def small_obj_cumul_zero_path (n : Nat) :
     Path ((SmallObjIteration.mk_simple n).cumulative 0) 0 :=
@@ -671,11 +673,11 @@ theorem mul_two_eq_add (n : Nat) : n * 2 = n + n := by omega
 noncomputable def mul_two_eq_add_path (n : Nat) : Path (n * 2) (n + n) :=
   Path.stepChain (mul_two_eq_add n)
 
--- 53. Triple zero sum
-theorem triple_zero : (0 : Nat) + 0 + 0 = 0 := by omega
+-- 53. Removing two trailing zero summands preserves a natural number.
+theorem triple_zero (n : Nat) : n + 0 + 0 = n := by omega
 
-noncomputable def triple_zero_path : Path ((0 : Nat) + 0 + 0) 0 :=
-  Path.stepChain triple_zero
+noncomputable def triple_zero_path (n : Nat) : Path (n + 0 + 0) n :=
+  Path.stepChain (triple_zero n)
 
 -- 54. Add self is mul 2
 theorem add_self_mul2 (n : Nat) : n + n = 2 * n := by omega
