@@ -24,9 +24,35 @@ noncomputable def path_is_weq {a b : A} (p : Path a b) : IsWeq p where
       id_l := rweq_cmpA_inv_right (p := p)
       id_r := rweq_cmpA_inv_left (p := p) }
 
+noncomputable def iso_comp {a b c : A} {f : Path a b} {g : Path b c}
+    (hf : IsIso f) (hg : IsIso g) : IsIso (Path.trans f g) where
+  inv := Path.trans hg.inv hf.inv
+  id_l :=
+    rweq_trans
+      (rweq_tt f g (Path.trans hg.inv hf.inv))
+      (rweq_trans
+        (rweq_trans_congr_right f
+          (rweq_trans
+            (rweq_symm (rweq_tt g hg.inv hf.inv))
+            (rweq_trans
+              (rweq_trans_congr_left hf.inv hg.id_l)
+              (rweq_cmpA_refl_left hf.inv))))
+        hf.id_l)
+  id_r :=
+    rweq_trans
+      (rweq_tt hg.inv hf.inv (Path.trans f g))
+      (rweq_trans
+        (rweq_trans_congr_right hg.inv
+          (rweq_trans
+            (rweq_symm (rweq_tt hf.inv f g))
+            (rweq_trans
+              (rweq_trans_congr_left g hf.id_r)
+              (rweq_cmpA_refl_left g))))
+        hg.id_r)
+
 noncomputable def weq_comp {a b c : A} {f : Path a b} {g : Path b c}
-    (_hf : IsWeq f) (_hg : IsWeq g) : IsWeq (Path.trans f g) :=
-  path_is_weq (Path.trans f g)
+    (hf : IsWeq f) (hg : IsWeq g) : IsWeq (Path.trans f g) where
+  iso := iso_comp hf.iso hg.iso
 
 structure Cylinder (a : A) where
   C : A
