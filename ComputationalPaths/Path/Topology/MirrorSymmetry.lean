@@ -267,29 +267,43 @@ noncomputable def fm_functorial {CY₁ CY₂ : CalabiYau.{u}}
 
 /-! ## Additional Theorem Stubs -/
 
-theorem calabiYau_hodge_symmetry (_CY : CalabiYau) (_p _q : Nat) : 0 = 0 := rfl
+noncomputable def calabiYau_hodge_symmetry (CY : CalabiYau) (p q : Nat) :
+    Path (CY.hodge p q) (CY.hodge q p) :=
+  CY.hodge_symm p q
 
-theorem mirrorPair_same_dim_symm (_M : MirrorPair) : 0 = 0 := rfl
+noncomputable def mirrorPair_same_dim_symm (M : MirrorPair) :
+    Path M.cyX.complexDim M.cyXCheck.complexDim :=
+  M.same_dim
 
-theorem mirrorStep_to_path (_M : MirrorPair) (_p _q : Nat) : 0 = 0 := rfl
+noncomputable def mirrorStep_to_path (M : MirrorPair) (p q : Nat) :
+    Path (M.cyX.hodge p q) (M.cyXCheck.hodge (M.cyX.complexDim - p) q) :=
+  mirrorStepPath (M := M) (MirrorStep.hodge_mirror p q)
 
-theorem syz_same_base_symm (M : MirrorPair) (_S : SYZConjecture M) : 0 = 0 := rfl
+noncomputable def syz_same_base_symm (M : MirrorPair) (S : SYZConjecture M) :
+    Path S.fibX.base S.fibXCheck.base :=
+  S.same_base
 
-theorem derivedCategory_comp_assoc_theorem {CY : CalabiYau}
+noncomputable def derivedCategory_comp_assoc_theorem {CY : CalabiYau}
     (D : DerivedCategory CY) {W X Y Z : D.objects}
-    (_f : D.hom W X) (_g : D.hom X Y) (_h : D.hom Y Z) :
-    0 = 0 := rfl
+    (f : D.hom W X) (g : D.hom X Y) (h : D.hom Y Z) :
+    Path (D.comp (D.comp f g) h) (D.comp f (D.comp g h)) :=
+  D.comp_assoc f g h
 
-theorem mirrorMap_genus0_true (M : MirrorPair) (_MM : MirrorMap M) : 0 = 0 := rfl
+theorem mirrorMap_genus0_true (M : MirrorPair) (MM : MirrorMap M) :
+    True :=
+  MM.genus0_mirror
 
 theorem fukayaMorphism_d_squared_true (CY : CalabiYau)
-    (L1 L2 : FukayaObject CY) (_m : FukayaMorphism CY L1 L2) :
-    0 = 0 := rfl
+    (L1 L2 : FukayaObject CY) (m : FukayaMorphism CY L1 L2) :
+    True :=
+  m.d_squared
 
-theorem fourierMukai_map_comp_theorem (CY1 CY2 : CalabiYau)
+noncomputable def fourierMukai_map_comp_theorem (CY1 CY2 : CalabiYau)
     (FM : FourierMukai CY1 CY2) {X Y Z : FM.source.objects}
-    (_f : FM.source.hom X Y) (_g : FM.source.hom Y Z) :
-    0 = 0 := rfl
+    (f : FM.source.hom X Y) (g : FM.source.hom Y Z) :
+    Path (FM.morMap (FM.source.comp f g))
+      (FM.target.comp (FM.morMap f) (FM.morMap g)) :=
+  FM.map_comp f g
 
 
 end MirrorSymmetry

@@ -294,35 +294,44 @@ structure TautFoliation (F : FoliationData.{u}) where
 
 /-! ## Additional Theorem Stubs -/
 
-theorem holonomy_well_defined_theorem (F : FoliationData.{u}) (L : Leaf F)
-    (_H : PathHolonomy F L) :
-    0 = 0 := rfl
+noncomputable def holonomy_well_defined_theorem (F : FoliationData.{u}) (L : Leaf F)
+    (H : PathHolonomy F L) :
+    Path H.germ H.germ :=
+  H.well_defined
 
 theorem reeb_stability_local_product_theorem (F : FoliationData.{u})
-    (_R : ReebStability F) :
-    0 = 0 := rfl
+    (R : ReebStability F) :
+    True :=
+  R.nearby_covers
 
-theorem novikov_reeb_component_theorem
-    (_N : NovikovTheorem.{u}) :
-    0 = 0 := rfl
+noncomputable def novikov_reeb_component_theorem
+    (N : NovikovTheorem.{u}) :
+    Path N.has_reeb.carrier N.has_reeb.carrier :=
+  N.inclusion
 
 theorem compact_foliation_depth_finite_theorem (F : FoliationData.{u})
-    (_C : CompactFoliationDepth F) :
-    0 = 0 := rfl
+    (C : CompactFoliationDepth F) :
+    ∃ d, C.foldepth.depth = some d :=
+  C.finite
 
 theorem leaf_space_nonhausdorff_reeb_theorem (F : FoliationData.{u})
-    (_L : LeafSpaceHausdorff F) :
-    0 = 0 := rfl
+    (L : LeafSpaceHausdorff F) :
+    L.isHausdorff = false → True :=
+  L.nonHausdorff_witness
 
 theorem transverse_riemannian_closure_theorem (F : FoliationData.{u})
-    (_M : MolinoTheorem F) :
-    0 = 0 := rfl
+    (M : MolinoTheorem F) :
+    True :=
+  M.closure_foliation
 
-theorem taut_foliation_codim_one_theorem (F : FoliationData.{u})
-    (_T : TautFoliation F) :
-    0 = 0 := rfl
+noncomputable def taut_foliation_codim_one_theorem (F : FoliationData.{u})
+    (T : TautFoliation F) :
+    Path F.codim 1 :=
+  T.codim_one
 
-theorem reeb_foliation_codim_one_theorem (_R : ReebFoliation.{u}) : 0 = 0 := rfl
+noncomputable def reeb_foliation_codim_one_theorem (R : ReebFoliation.{u}) :
+    Path R.foliationData.codim 1 :=
+  R.codim_one
 
 end FoliationsPaths
 end Topology
