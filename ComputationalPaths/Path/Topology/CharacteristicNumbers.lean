@@ -237,30 +237,43 @@ structure AHatGenus extends Genus where
 /-! ## Additional Theorem Stubs -/
 
 theorem sw_numbers_cobordism_invariant_theorem (n : Nat)
-    (_S : SWCobordismInvariance.{u} n) :
-    0 = 0 := rfl
+    (S : SWCobordismInvariance.{u} n) (p : Partition n) :
+    S.sw1.swNumber p = S.sw2.swNumber p :=
+  S.invariance p
 
 theorem pontryagin_numbers_cobordism_invariant_theorem (k : Nat)
-    (_P : PontCobordismInvariance.{u} k) :
-    0 = 0 := rfl
+    (P : PontCobordismInvariance.{u} k) (p : Partition k) :
+    P.pn1.pontNumber p = P.pn2.pontNumber p :=
+  P.invariance p
 
 theorem chern_numbers_defined_theorem (n : Nat)
-    (M : ComplexManifold.{u} n) (_C : ChernNumbers n M) :
-    0 = 0 := rfl
+    (M : ComplexManifold.{u} n) (C : ChernNumbers n M) :
+    True :=
+  C.classes.chern_zero_is_unit
 
-theorem hirzebruch_signature_theorem_statement (k : Nat)
-    (M : OrientedManifold.{u} (4 * k)) (_H : HirzebruchSignature k M) :
-    0 = 0 := rfl
+noncomputable def hirzebruch_signature_theorem_statement (k : Nat)
+    (M : OrientedManifold.{u} (4 * k)) (H : HirzebruchSignature k M) :
+    Path H.sigData.signature H.lPoly.lGenus :=
+  H.theorem_eq
 
-theorem todd_genus_hrr_theorem_statement (n : Nat)
-    (M : ComplexManifold.{u} n) (_H : HirzebruchRiemannRoch n M) :
-    0 = 0 := rfl
+noncomputable def todd_genus_hrr_theorem_statement (n : Nat)
+    (M : ComplexManifold.{u} n) (H : HirzebruchRiemannRoch n M) :
+    Path H.eulerChar H.chernChar :=
+  H.hrr_eq
 
-theorem genus_multiplicativity_theorem (_G : Genus.{u}) : 0 = 0 := rfl
+noncomputable def genus_multiplicativity_theorem (G : Genus.{u})
+    (m n : Nat) (M N : Type u) :
+    Path (G.genusValue (m + n) (Prod M N))
+      (G.targetMul (G.genusValue m M) (G.genusValue n N)) :=
+  G.multiplicative m n M N
 
-theorem signature_genus_is_genus_theorem (_S : SignatureGenus.{u}) : 0 = 0 := rfl
+theorem signature_genus_is_genus_theorem (S : SignatureGenus.{u})
+    (k : Nat) (M : Type u) : True :=
+  S.is_signature k M
 
-theorem ahat_integrality_theorem (_A : AHatGenus.{u}) : 0 = 0 := rfl
+theorem ahat_integrality_theorem (A : AHatGenus.{u})
+    (k : Nat) (M : Type u) : True :=
+  A.integrality k M
 
 end CharacteristicNumbers
 end Topology

@@ -271,36 +271,45 @@ structure MixedHodgeOnVariety where
 
 /-! ## Additional Theorem Stubs -/
 
-theorem deRham_exact_sub_closed_theorem (Omega : DifferentialForms)
-    (H : DeRhamCohomology Omega) (p : Nat) (_x : H.exact p) :
-    0 = 0 := rfl
+noncomputable def deRham_exact_sub_closed_theorem (Omega : DifferentialForms)
+    (H : DeRhamCohomology Omega) (p : Nat) (x : H.exact p) :
+    H.closed p :=
+  H.exact_sub_closed p x
 
-theorem hodgeStep_output_path (Omega : DifferentialForms) (p : Nat)
-    (_h : HodgeStep Omega p) :
-    0 = 0 := rfl
+noncomputable def hodgeStep_output_path (Omega : DifferentialForms) (p : Nat)
+    (h : HodgeStep Omega p) :
+    Path h.output (h.hodge.star p h.input) :=
+  h.output_eq
 
 theorem codifferential_squared_true (Omega : DifferentialForms)
-    (_C : Codifferential Omega) (p : Nat) (_hp : p > 1) (_hq : p > 0)
-    (_omega : Omega.forms p) :
-    0 = 0 := rfl
+    (C : Codifferential Omega) (p : Nat) (hp : p > 1) (hq : p > 0)
+    (omega : Omega.forms p) :
+    True :=
+  C.codiff_squared p hp hq omega
 
 theorem harmonicSpace_closed_true (Omega : DifferentialForms)
-    (L : HodgeLaplacian Omega) (_H : HarmonicSpace Omega L) :
-    0 = 0 := rfl
+    (L : HodgeLaplacian Omega) (H : HarmonicSpace Omega L) :
+    True :=
+  H.harmonic_closed
 
-theorem hodgeDeRham_dimension_path (Omega : DifferentialForms)
-    (_H : HodgeDeRham Omega) (_p : Nat) :
-    0 = 0 := rfl
+noncomputable def hodgeDeRham_dimension_path (Omega : DifferentialForms)
+    (H : HodgeDeRham Omega) (p : Nat) :
+    Path (H.harmonic p).harmonicDim (H.deRham.betti p) :=
+  H.iso p
 
-theorem kahler_real_dim_path (_K : KahlerManifold) : 0 = 0 := rfl
+noncomputable def kahler_real_dim_path (K : KahlerManifold) :
+    Path K.realDim (2 * K.complexDim) :=
+  K.dim_eq
 
-theorem dolbeault_conjugation_path (K : KahlerManifold)
-    (_D : DolbeaultDecomposition K) (_r _s : Nat) :
-    0 = 0 := rfl
+noncomputable def dolbeault_conjugation_path (K : KahlerManifold)
+    (D : DolbeaultDecomposition K) (r s : Nat) :
+    Path (D.hodgeNumber r s) (D.hodgeNumber s r) :=
+  D.conjugation r s
 
 theorem hardLefschetz_holds (K : KahlerManifold)
-    (_H : HardLefschetz K) (k : Nat) (_hk : k ≤ K.complexDim) :
-    0 = 0 := rfl
+    (H : HardLefschetz K) (k : Nat) (hk : k ≤ K.complexDim) :
+    True :=
+  H.lefschetz_iso k hk
 
 
 end HodgeTheory

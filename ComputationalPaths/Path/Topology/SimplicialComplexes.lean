@@ -224,31 +224,42 @@ noncomputable def iso_roundtrip (K L : SimplicialComplex) (I : SimplicialIso K L
 
 /-! ## Additional Theorem Stubs -/
 
-theorem simplicialMapComp_eval (K L M : SimplicialComplex)
-    (_f : SimplicialMap K L) (_g : SimplicialMap L M) (_v : Nat) :
-    0 = 0 := rfl
+noncomputable def simplicialMapComp_eval (K L M : SimplicialComplex)
+    (f : SimplicialMap K L) (g : SimplicialMap L M) (v : Nat) :
+    Path (simplicialMapComp K L M f g v) (g.vertexMap (f.vertexMap v)) :=
+  Path.refl _
 
-theorem simplicialIso_left_roundtrip (K L : SimplicialComplex)
-    (_I : SimplicialIso K L) (_v : Nat) :
-    0 = 0 := rfl
+noncomputable def simplicialIso_left_roundtrip (K L : SimplicialComplex)
+    (I : SimplicialIso K L) (v : Nat) :
+    Path (I.backward.vertexMap (I.forward.vertexMap v)) v :=
+  I.left_inv v
 
-theorem simplicialIso_right_roundtrip (K L : SimplicialComplex)
-    (_I : SimplicialIso K L) (_v : Nat) :
-    0 = 0 := rfl
+noncomputable def simplicialIso_right_roundtrip (K L : SimplicialComplex)
+    (I : SimplicialIso K L) (v : Nat) :
+    Path (I.forward.vertexMap (I.backward.vertexMap v)) v :=
+  I.right_inv v
 
-theorem chainRank_matches_numSimplices (K : SimplicialComplex)
-    (_C : SimplicialChainComplex K) (_k : Nat) :
-    0 = 0 := rfl
+noncomputable def chainRank_matches_numSimplices (K : SimplicialComplex)
+    (C : SimplicialChainComplex K) (k : Nat) :
+    Path (C.chainRank k) (numSimplices K k) :=
+  C.rank_eq k
 
-theorem barycentricSubdivision_preserves_euler (K : SimplicialComplex)
-    (_B : BarycentricSubdivision K) (_d : Nat) :
-    0 = 0 := rfl
+noncomputable def barycentricSubdivision_preserves_euler (K : SimplicialComplex)
+    (B : BarycentricSubdivision K) (d : Nat) :
+    Path (eulerChar K d) (eulerChar B.result d) :=
+  B.euler_preserved d
 
-theorem cechComplex_epsilon_nonnegative (_C : CechComplex) : 0 = 0 := rfl
+theorem cechComplex_epsilon_nonnegative (C : CechComplex) :
+    0 ≤ C.epsilon :=
+  Nat.zero_le C.epsilon
 
-theorem nerveTheorem_homotopy_equiv_true (_N : NerveTheorem) : 0 = 0 := rfl
+theorem nerveTheorem_homotopy_equiv_true (N : NerveTheorem) :
+    True :=
+  N.homotopy_equiv
 
-theorem simplicialStep_valid_true (_s : SimplicialStep) : 0 = 0 := rfl
+theorem simplicialStep_valid_true (s : SimplicialStep) :
+    True :=
+  simplicialStep_valid s
 
 
 end SimplicialComplexes
