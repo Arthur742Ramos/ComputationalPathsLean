@@ -126,7 +126,7 @@ structure EEquivalence (E : HomologyTheory'.{u}) where
 
 /-- E-acyclicity: X is E-acyclic if E_*(X) = 0. -/
 noncomputable def IsEAcyclic (E : HomologyTheory'.{u}) (X : E.carrier) : Prop :=
-  ∃ p : Path (E.evaluate X X) E.zero, True
+  ∃ _p : Path (E.evaluate X X) E.zero, True
 
 /-- E-local: X is E-local if for all E-acyclic W, mapping into X is trivial. -/
 noncomputable def IsELocal (E : HomologyTheory'.{u}) (X : E.carrier) : Prop :=
@@ -224,11 +224,11 @@ structure BousfieldClass where
   acyclics_zero : acyclics zero
 
 /-- Ordering on Bousfield classes: ⟨E⟩ ≤ ⟨F⟩ if E-acyclics ⊆ F-acyclics. -/
-noncomputable def BousfieldClass.le (a b : BousfieldClass.{u}) : Prop :=
+noncomputable def BousfieldClass.le (_a _b : BousfieldClass.{u}) : Prop :=
   True
 
 /-- Join of Bousfield classes (wedge). -/
-noncomputable def BousfieldClass.join (a b : BousfieldClass.{u}) :
+noncomputable def BousfieldClass.join (a _b : BousfieldClass.{u}) :
     BousfieldClass.{u} where
   representative := a.representative
   zero := a.zero
@@ -236,7 +236,7 @@ noncomputable def BousfieldClass.join (a b : BousfieldClass.{u}) :
   acyclics_zero := a.acyclics_zero
 
 /-- Meet of Bousfield classes (smash). -/
-noncomputable def BousfieldClass.meet (a b : BousfieldClass.{u}) :
+noncomputable def BousfieldClass.meet (a _b : BousfieldClass.{u}) :
     BousfieldClass.{u} where
   representative := a.representative
   zero := a.zero
@@ -559,11 +559,11 @@ structure ThickSubcat where
   closure_extension : (x y z : carrier) → mem x → mem z → mem y
 
 /-- Hopkins-Smith: thick subcategories are classified by type. -/
-noncomputable def thick_subcat_type (T : ThickSubcat.{u}) : Nat := 0
+noncomputable def thick_subcat_type (_T : ThickSubcat.{u}) : Nat := 0
 
 /-- Inclusion of thick subcategories by type. -/
 theorem thick_subcat_monotone (T₁ T₂ : ThickSubcat.{u})
-    (h : thick_subcat_type T₁ ≤ thick_subcat_type T₂) :
+    (_h : thick_subcat_type T₁ ≤ thick_subcat_type T₂) :
     ∀ x, T₁.mem x → T₁.mem x := by
   intro x hx
   exact hx

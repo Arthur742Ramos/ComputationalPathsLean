@@ -49,7 +49,7 @@ noncomputable def leftMap_id_full {b : B}
     of the transport path. -/
 noncomputable def leftMap_comp_full {b c d : B}
     (q : Path b c) (r : Path c d) (a : A)
-    (p : Path (J.obj a) b) (x : X.obj a) :
+    (p : Path (J.obj a) b) (_x : X.obj a) :
     RwEq
       (Path.trans (Path.trans p q) r)
       (Path.trans p (Path.trans q r)) :=
@@ -64,7 +64,7 @@ noncomputable def leftKanUnit (a : A) (x : X.obj a) :
 /-- Theorem 4: Unit naturality — transporting along `J.map p`
     is coherent with the functorial action. -/
 noncomputable def leftKanUnit_naturality {a a' : A}
-    (p : Path a a') (x : X.obj a) :
+    (p : Path a a') (_x : X.obj a) :
     RwEq
       (Path.trans (Path.refl (J.obj a)) (J.map p))
       (J.map p) :=
@@ -72,7 +72,7 @@ noncomputable def leftKanUnit_naturality {a a' : A}
 
 /-- Theorem 5: Transport along identity gives identity on paths. -/
 noncomputable def leftKanTransportId {b : B}
-    (a : A) (p : Path (J.obj a) b) (x : X.obj a) :
+    (a : A) (p : Path (J.obj a) b) (_x : X.obj a) :
     RwEq
       (Path.trans p (Path.refl b))
       p :=
@@ -81,7 +81,7 @@ noncomputable def leftKanTransportId {b : B}
 /-- Theorem 6: Double transport reduces. -/
 noncomputable def leftKanDoubleTransport {b c d : B}
     (q : Path b c) (r : Path c d)
-    (a : A) (p : Path (J.obj a) b) (x : X.obj a) :
+    (a : A) (p : Path (J.obj a) b) (_x : X.obj a) :
     RwEq
       (Path.trans (Path.trans p q) r)
       (Path.trans p (Path.trans q r)) :=
@@ -122,7 +122,7 @@ noncomputable def leftKanTransportCancelFull {b c : B}
 
 /-- Theorem 11: And the final step to `p` itself. -/
 noncomputable def leftKanTransportCancelToP {b c : B}
-    (q : Path b c) (a : A) (p : Path (J.obj a) b) :
+    (_q : Path b c) (a : A) (p : Path (J.obj a) b) :
     RwEq
       (Path.trans p (Path.refl b))
       p :=

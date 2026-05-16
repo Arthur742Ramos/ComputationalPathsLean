@@ -76,7 +76,7 @@ structure DerivedCategory where
 
 /-- The bounded derived category D^b(A). -/
 structure BoundedDerivedCategory extends DerivedCategory.{u,v} where
-  isBounded : ∀ (x : Obj), ∃ (a b : Int), a ≤ b
+  isBounded : ∀ (_x : Obj), ∃ (a b : Int), a ≤ b
 
 /-- The localization functor Q : K(A) → D(A). -/
 noncomputable def localizationFunctor (D : DerivedCategory.{u,v}) :

@@ -444,7 +444,7 @@ structure CochainMap (C D : CochainComplex.{u}) where
 noncomputable def CochainMap.id (C : CochainComplex.{u}) : CochainMap C C where
   f := fun x => x
   f_zero := fun n => Path.refl (C.zero n)
-  commute := fun x => Path.refl _
+  commute := fun _x => Path.refl _
 
 /-- Composition of chain maps. -/
 noncomputable def CochainMap.comp {C D E : CochainComplex.{u}}

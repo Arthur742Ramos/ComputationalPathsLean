@@ -70,7 +70,7 @@ abbrev lensSpaceLoopSpace (p q : Nat) : Type u :=
 /-- The fundamental lens-space loop has trivial underlying equality proof. -/
 @[simp] theorem lensSpaceLoop_toEq (p q : Nat) :
     (lensSpaceLoop p q).toEq = rfl := by
-  simp [lensSpaceLoop]
+  simp
 
 /-- Iterate the fundamental loop `n` times. -/
 @[simp] noncomputable def lensSpaceLoopPow (p q : Nat) : Nat → lensSpaceLoopSpace p q

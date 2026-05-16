@@ -192,16 +192,16 @@ noncomputable def newman_T {α : Type u} {R : α → α → Type v}
         (wf : WellFounded (fun y x => Nonempty (R x y)))
         (hLocal : LocallyConfluentT R) :
         ConfluentT R :=
-      fun {a b c} hab hac =>
+      fun {a _b _c} hab hac =>
         wf.fix (C := fun a => ∀ {b c : α}, ARTC R a b → ARTC R a c →
             Σ d : α, ARTC R b d × ARTC R c d)
-          (fun a ih {b c} hab hac =>
+          (fun _a ih {b c} hab hac =>
             match hab, hac with
             | ARTC.refl _, hac' => ⟨_, hac', ARTC.refl _⟩
             | hab', ARTC.refl _ => ⟨_, ARTC.refl _, hab'⟩
             | ARTC.step ha₁ h₁b, ARTC.step ha₂ h₂c =>
-              let ⟨d₀, h₁d₀, h₂d₀⟩ := hLocal ha₁ ha₂
-              let ⟨d₁, hbd₁, hd₀d₁⟩ := ih _ ⟨ha₁⟩ h₁b h₁d₀
+              let ⟨_, h₁d₀, h₂d₀⟩ := hLocal ha₁ ha₂
+              let ⟨_, hbd₁, hd₀d₁⟩ := ih _ ⟨ha₁⟩ h₁b h₁d₀
               let ⟨d₂, hcd₂, hd₁d₂⟩ := ih _ ⟨ha₂⟩ h₂c (ARTC.trans h₂d₀ hd₀d₁)
               ⟨d₂, ARTC.trans hbd₁ hd₁d₂, hcd₂⟩) a hab hac
 

@@ -104,12 +104,12 @@ noncomputable def π₁id (a : A) : π₁(A, a) :=
 /-- Left identity for π_1 multiplication. -/
 theorem π₁mul_id_left {a : A} (x : π₁(A, a)) :
     π₁mul (π₁id a) x = x := by
-  simpa [π₁mul, π₁id] using (PiOne.id_mul x)
+  simp [π₁mul, π₁id]
 
 /-- Right identity for π_1 multiplication. -/
 theorem π₁mul_id_right {a : A} (x : π₁(A, a)) :
     π₁mul x (π₁id a) = x := by
-  simpa [π₁mul, π₁id] using (PiOne.mul_id x)
+  simp [π₁mul, π₁id]
 
 /-- The quotient map preserves composition. -/
 theorem toπ₁_comp {a : A} (l₁ l₂ : LoopSpace A a) :
@@ -124,7 +124,7 @@ theorem toπ₁_inv {a : A} (l : LoopSpace A a) :
 /-- π₁ multiplication is associative. -/
 theorem π₁mul_assoc {a : A} (x y z : π₁(A, a)) :
     π₁mul (π₁mul x y) z = π₁mul x (π₁mul y z) := by
-  simpa [π₁mul] using (PiOne.mul_assoc x y z)
+  simp [π₁mul]
 
 /-! ## Induced Homomorphisms -/
 

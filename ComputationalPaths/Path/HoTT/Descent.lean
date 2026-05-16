@@ -112,7 +112,7 @@ inductive Coeq {A : Type u} {B : Type v} (f g : A → B) where
 
 /-- Coequaliser recursion. -/
 def Coeq.rec' {f g : A → B} {C : Type w}
-    (h : B → C) (glueH : ∀ a, Path (h (f a)) (h (g a))) :
+    (h : B → C) (_glueH : ∀ a, Path (h (f a)) (h (g a))) :
     Coeq f g → C
   | Coeq.mk b => h b
   | Coeq.glue a => h (f a)
@@ -248,8 +248,7 @@ theorem circle_descent_transport (D : CircleDescent) :
     Path.transport (D := circle_descent_family D) Pushouts.Circle.loop =
       id := by
   funext x
-  simpa [circle_descent_family] using
-    (Path.transport_const (p := Pushouts.Circle.loop) (x := x))
+  simp [circle_descent_family]
 
 /-- 26. Double loop transport is auto squared (by transport_trans). -/
 theorem circle_descent_double_loop (D : CircleDescent) :
@@ -257,9 +256,7 @@ theorem circle_descent_double_loop (D : CircleDescent) :
       (Path.trans Pushouts.Circle.loop Pushouts.Circle.loop) =
       id := by
   funext x
-  simpa [circle_descent_family] using
-    (Path.transport_const
-      (p := Path.trans Pushouts.Circle.loop Pushouts.Circle.loop) (x := x))
+  simp [circle_descent_family]
 
 /-! ## Cocone and descent -/
 
@@ -282,14 +279,14 @@ theorem cocone_comm_proof {B₀ B₁ : Type u} {s t : B₁ → B₀} {C : Type u
 theorem cocone_comm_cancel {B₀ B₁ : Type u} {s t : B₁ → B₀} {C : Type u}
     (cc : Cocone B₀ B₁ s t C) (e : B₁) :
     (Path.trans (cc.comm e) (Path.symm (cc.comm e))).proof = rfl := by
-  simp [Path.trans, Path.symm]
+  simp
 
 /-- 30. CongrArg through cocone leg. -/
 theorem cocone_congrArg {B₀ B₁ : Type u} {s t : B₁ → B₀} {C D : Type u}
     (cc : Cocone B₀ B₁ s t C) (f : C → D) (e : B₁) :
     (Path.congrArg f (cc.comm e)).proof =
       _root_.congrArg f (cc.comm e).proof := by
-  simp [Path.congrArg]
+  simp
 
 /-! ## Fibered descent -/
 
@@ -361,7 +358,7 @@ theorem descent_inv_transport {B : Type u} {E : B → Type v}
 theorem descent_const_transport {B : Type u} {D : Type v}
     {b₁ b₂ : B} (p : Path b₁ b₂) (x : D) :
     Path.transport (D := fun _ => D) p x = x := by
-  simpa using (Path.transport_const (p := p) (x := x))
+  simp
 
 /-- 40. Transport in product family. -/
 theorem descent_prod_transport {B : Type u} {E₁ E₂ : B → Type v}
@@ -399,7 +396,7 @@ theorem coherent_triangle {B₀ B₁ B₂ : Type u}
     {E : B₀ → Type v}
     {b₂ : B₂}
     (p₁ : Path (s (s' b₂)) (t (s' b₂)))
-    (p₂ : Path (s (t' b₂)) (t (t' b₂)))
+    (_p₂ : Path (s (t' b₂)) (t (t' b₂)))
     (x : E (s (s' b₂))) :
     Path.transport p₁ x = Path.transport p₁ x := rfl
 
@@ -424,14 +421,14 @@ theorem descent_double_glue {B₀ B₁ : Type u} {s t : B₁ → B₀}
 /-- 46. Sigma type descent: total space path decomposition. -/
 theorem sigma_descent_path {B : Type u} {E : B → Type v}
     {b₁ b₂ : B} {x₁ : E b₁} {x₂ : E b₂}
-    (p : Path b₁ b₂) (q : Path.transport p x₁ = x₂) :
+    (p : Path b₁ b₂) (_q : Path.transport p x₁ = x₂) :
     (⟨b₁, x₁⟩ : Σ b, E b) = ⟨b₁, x₁⟩ := rfl
 
 /-- 47. Sigma path fst component. -/
 theorem sigma_descent_fst {B : Type u} {E : B → Type v}
     {x y : Σ b, E b} (p : Path x y) :
     (Path.congrArg Sigma.fst p).proof = _root_.congrArg Sigma.fst p.proof := by
-  simp [Path.congrArg]
+  simp
 
 /-! ## Universal property of coequaliser descent -/
 

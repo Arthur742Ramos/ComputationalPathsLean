@@ -300,7 +300,7 @@ noncomputable def perverse_restrict_id {X : Type u} (P : PerverseSheafData X)
 
 structure WhittakerModelData (G : Type u) (grp : AlgGroupData G) where
   functional : (G → Int) → Int
-  equiv_witness : ∀ (f : G → Int) (n : G), Path (functional f) (functional f)
+  equiv_witness : ∀ (f : G → Int) (_n : G), Path (functional f) (functional f)
 
 noncomputable def whittaker_equiv {G : Type u} {grp : AlgGroupData G}
     (W : WhittakerModelData G grp) (f : G → Int) (n : G) :

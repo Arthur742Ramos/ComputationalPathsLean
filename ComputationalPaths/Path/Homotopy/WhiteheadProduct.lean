@@ -40,7 +40,7 @@ namespace LoopGroupAlgebra
 
 abbrev Pi1 (A : Type u) (a : A) := HigherHomotopy.PiN 1 A a
 
-noncomputable def commutator {A : Type u} {a : A} (_x y : Pi1 A a) : Pi1 A a :=
+noncomputable def commutator {A : Type u} {a : A} (_x _y : Pi1 A a) : Pi1 A a :=
   HigherHomotopy.piNBasepoint 1 A a
 
 theorem commutator_id_left {A : Type u} {a : A} (y : Pi1 A a) :

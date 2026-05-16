@@ -146,7 +146,7 @@ noncomputable def fgl_hom_compose {A : Sort u} (f g : A → A) (a : A) :
   FGLPath.congrArg f (fgl_strict_iso_path g a)
 
 -- 13. Homomorphism naturality
-noncomputable def fgl_hom_naturality {A : Sort u} (f : A → A) (F G : A → A → A) (a b : A)
+noncomputable def fgl_hom_naturality {A : Sort u} (f : A → A) (_F _G : A → A → A) (a b : A)
     (p : FGLPath a b) : FGLPath (f a) (f b) :=
   FGLPath.congrArg f p
 
@@ -339,7 +339,7 @@ noncomputable def fgl_double_inv_zero {A : Sort u} (F : A → A → A) (inv : A 
     (FGLPath.congrArg (F zero) (fgl_inverse_law F inv zero (inv a)))
 
 -- 46. Log-exp is identity on FGL elements
-noncomputable def log_exp_identity_on_fgl {A : Sort u} (log exp : A → A) (F op : A → A → A) (a b : A) :
+noncomputable def log_exp_identity_on_fgl {A : Sort u} (log exp : A → A) (_F op : A → A → A) (a b : A) :
     FGLPath (log (exp (op (log a) (log b)))) (op (log a) (log b)) :=
   fgl_log_exp log exp (op (log a) (log b))
 
@@ -364,7 +364,7 @@ noncomputable def fgl_comm_through_hom {A : Sort u} (f : A → A) (F : A → A �
   FGLPath.congrArg f (fgl_commutativity F a b)
 
 -- 51. FGL inverse through exponential
-noncomputable def fgl_inv_exp {A : Sort u} (exp : A → A) (F op : A → A → A) (inv : A → A) (zero : A) (a : A) :
+noncomputable def fgl_inv_exp {A : Sort u} (exp : A → A) (F op : A → A → A) (inv : A → A) (_zero : A) (a : A) :
     FGLPath (exp (op a (inv a))) (F (exp a) (exp (inv a))) :=
   fgl_exp_hom exp F op a (inv a)
 

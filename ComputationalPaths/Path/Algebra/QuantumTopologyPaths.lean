@@ -183,9 +183,9 @@ noncomputable def ribbon_condition {C : Type u} (RC : RibbonCatData C) (A : RC.o
 structure RTInvariantData (C : Type u) where
   ribbon : RibbonCatData C
   invariant : ribbon.objects
-  reidemeister_1 : ∀ (n : Nat), Path invariant invariant
-  reidemeister_2 : ∀ (i j : Nat), Path invariant invariant
-  reidemeister_3 : ∀ (i j k : Nat), Path invariant invariant
+  reidemeister_1 : ∀ (_n : Nat), Path invariant invariant
+  reidemeister_2 : ∀ (_i _j : Nat), Path invariant invariant
+  reidemeister_3 : ∀ (_i _j _k : Nat), Path invariant invariant
   markov_1 : Path invariant invariant
   markov_2 : Path invariant invariant
 
@@ -213,7 +213,7 @@ structure ChernSimonsData (G : Type u) where
   level : Nat
   manifold : Type v
   cs_functional : (manifold → G) → Int
-  gauge_inv : ∀ (A : manifold → G) (g : manifold → G),
+  gauge_inv : ∀ (A : manifold → G) (_g : manifold → G),
     Path (cs_functional A) (cs_functional A)
   partition_fn : Int
   partition_inv : Path partition_fn partition_fn
@@ -339,7 +339,7 @@ structure ColoredJonesData (H : Type u) where
   hopf : HopfAlgebraData H
   rep_dim : Nat
   jones_coeffs : List Int
-  invariant_witness : ∀ (n : Nat), jones_coeffs = jones_coeffs
+  invariant_witness : ∀ (_n : Nat), jones_coeffs = jones_coeffs
 
 noncomputable def colored_jones_invariant {H : Type u} (CJ : ColoredJonesData H) (n : Nat) :
     CJ.jones_coeffs = CJ.jones_coeffs := CJ.invariant_witness n

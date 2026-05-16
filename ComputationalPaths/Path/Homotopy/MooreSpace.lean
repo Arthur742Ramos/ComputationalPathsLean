@@ -85,12 +85,12 @@ theorem moore_piN_right_inv (X : MooreSpace G n) (y : G) :
 /-- The roundtrip path witnesses the left-inverse law via Path. -/
 theorem moore_roundtrip_is_left_inv (X : MooreSpace G n) (x : PiN X) :
     Path.toEq (roundtrip_path X x) = X.piNEquiv.left_inv x := by
-  simp [roundtrip_path, Path.toEq, Path.stepChain]
+  simp
 
 /-- The forward roundtrip path witnesses the right-inverse law via Path. -/
 theorem moore_fwdRoundtrip_is_right_inv (X : MooreSpace G n) (y : G) :
     Path.toEq (fwdRoundtrip_path X y) = X.piNEquiv.right_inv y := by
-  simp [fwdRoundtrip_path, Path.toEq, Path.stepChain]
+  simp
 
 /-- Uniqueness up to homotopy has the correct forward map. -/
 theorem moore_unique_forward (X Y : MooreSpace G n) (x : PiN X) :

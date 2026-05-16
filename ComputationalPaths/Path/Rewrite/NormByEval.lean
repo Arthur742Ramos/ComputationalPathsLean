@@ -113,9 +113,10 @@ noncomputable def quote (s : Sem) : Expr := rwToExpr s.1
 theorem nbe_is_quote_eval (e : Expr) : nbe e = quote (eval e) := rfl
 
 /-- The eval function is a homomorphism: it respects the groupoid operations. -/
-theorem eval_refl : eval .refl = ⟨[], trivial⟩ := rfl
+theorem eval_refl : eval .refl = ⟨[], GroupoidConfluence.reduced_nil⟩ := rfl
 
-theorem eval_atom (n : Nat) : eval (.atom n) = ⟨[.pos n], trivial⟩ := rfl
+theorem eval_atom (n : Nat) :
+    eval (.atom n) = ⟨[.pos n], GroupoidConfluence.reduced_singleton (.pos n)⟩ := rfl
 
 theorem eval_symm (e : Expr) :
     (eval (.symm e)).1 = rwInv (eval e).1 := rfl

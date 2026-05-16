@@ -202,7 +202,7 @@ theorem en_operad_identity (n : Nat) :
 
 -- 10. Presheaf identity is pointwise identity
 theorem presheaf_id (C : InfCat.{u,v}) (F : C.Obj → Type v) :
-    (Presheaf C).id F = (fun x a => a) :=
+    (Presheaf C).id F = (fun _x a => a) :=
   rfl
 
 -- 11. Presheaf composition

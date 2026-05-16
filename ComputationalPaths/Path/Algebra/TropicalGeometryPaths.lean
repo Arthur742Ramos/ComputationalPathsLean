@@ -172,7 +172,7 @@ structure BerkovichSpaceData (X : Type u) where
   points : Type v
   point_type : points → Fin 4
   norm : points → X → Int
-  connected_witness : ∀ (p q : points), True
+  connected_witness : ∀ (_p _q : points), True
   retract : points → points
   retract_idem : ∀ p, Path (retract (retract p)) (retract p)
 

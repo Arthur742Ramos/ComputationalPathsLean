@@ -125,7 +125,7 @@ theorem jamesMul_base_right (X : SuspensionLoop.Pointed) (a : JamesConstruction 
   refine Quot.inductionOn a ?_
   intro l
   apply Quot.sound
-  simp [JamesRel, reduceList_append]
+  simp [JamesRel]
 
 /-- `Path` witness for the right identity of `jamesMul`. -/
 noncomputable def jamesMul_base_right_path (X : SuspensionLoop.Pointed) (a : JamesConstruction X) :

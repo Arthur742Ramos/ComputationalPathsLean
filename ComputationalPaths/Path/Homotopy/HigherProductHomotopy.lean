@@ -242,7 +242,7 @@ noncomputable def higherPiN_inv {X : Type u} (x : X) (n : Nat)
 
 /-- Encoding is compatible with composition: γ₁ and γ₂ share the same type. -/
 theorem prodHigherPiN_encode_comp {A B : Type u} (a : A) (b : B) (n : Nat)
-    (γ₁ γ₂ : ProdHigherPiN A B a b n) : γ₁ = γ₁ := by
+    (γ₁ _γ₂ : ProdHigherPiN A B a b n) : γ₁ = γ₁ := by
   rfl
 
 /-- Encoding is compatible with inverses: γ is self-equal. -/
