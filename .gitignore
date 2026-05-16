@@ -7,9 +7,10 @@
 05-De Queiroz-De Oliveira-Ramos-SAJL.pdf
 05-De Queiroz-De Oliveira-Ramos-SAJL.txt
 
-# Docs - ignore all papers except thesis
+# Generated documentation/package artifacts
 docs/paper/
 docs/klein_bottle_proof.*
+docbuild/
 cover_letter_JAR.*
 
 # Local packaging artifacts
@@ -46,21 +47,18 @@ arxiv_svk/
 arXiv-*.tar
 *.pdf
 .claude/
-.claude/
 .git.old/
 CLAUDE.md
 
 # Local-only files
 .DS_Store
 *.docx
-*.pdf
-paper/
-docs/
-docbuild/
-Scripts/
 .codex/
 .copex/
+.fleet-out/
 .opencode/
+.squad/
+.squad-templates/
 *.patch
 opencode.json
 primer.eval.json
