@@ -1,5 +1,5 @@
 /-
-# Deep Lattice Theory via Computational Paths (de-scaffolded)
+# Deep Lattice Theory via Computational Paths
 
 This file avoids the `ofEq` constructor completely.
 
@@ -421,14 +421,57 @@ structure LatCongruence where
   meet_compat : ∀ a₁ a₂ b₁ b₂, rel a₁ a₂ → rel b₁ b₂ → rel (meet a₁ b₁) (meet a₂ b₂)
   join_compat : ∀ a₁ a₂ b₁ b₂, rel a₁ a₂ → rel b₁ b₂ → rel (join a₁ b₁) (join a₂ b₂)
 
-/-- Trivial congruence: everything is related. -/
-noncomputable def trivialCongruence : LatCongruence where
-  rel := fun _ _ => True
-  refl := fun _ => trivial
-  symm := fun _ _ _ => trivial
-  trans := fun _ _ _ _ _ => trivial
-  meet_compat := fun _ _ _ _ _ _ => trivial
-  join_compat := fun _ _ _ _ _ _ => trivial
+/-- Fixed cutoff used by the bounded congruence. -/
+def boundedCongruenceCutoff : Nat := 3
+
+private theorem meet_le_cutoff_iff (a b : LatElem) :
+    (meet a b).val ≤ boundedCongruenceCutoff ↔
+      a.val ≤ boundedCongruenceCutoff ∨ b.val ≤ boundedCongruenceCutoff := by
+  simp [meet, boundedCongruenceCutoff]
+  omega
+
+private theorem join_le_cutoff_iff (a b : LatElem) :
+    (join a b).val ≤ boundedCongruenceCutoff ↔
+      a.val ≤ boundedCongruenceCutoff ∧ b.val ≤ boundedCongruenceCutoff := by
+  simp [join, boundedCongruenceCutoff]
+  omega
+
+private theorem bounded_meet_compat {a₁ a₂ b₁ b₂ : LatElem}
+    (ha : (a₁.val ≤ boundedCongruenceCutoff) ↔ (a₂.val ≤ boundedCongruenceCutoff))
+    (hb : (b₁.val ≤ boundedCongruenceCutoff) ↔ (b₂.val ≤ boundedCongruenceCutoff)) :
+    ((meet a₁ b₁).val ≤ boundedCongruenceCutoff) ↔
+      ((meet a₂ b₂).val ≤ boundedCongruenceCutoff) := by
+  rw [meet_le_cutoff_iff, meet_le_cutoff_iff]
+  constructor
+  · intro h
+    cases h with
+    | inl h => exact Or.inl (ha.mp h)
+    | inr h => exact Or.inr (hb.mp h)
+  · intro h
+    cases h with
+    | inl h => exact Or.inl (ha.mpr h)
+    | inr h => exact Or.inr (hb.mpr h)
+
+private theorem bounded_join_compat {a₁ a₂ b₁ b₂ : LatElem}
+    (ha : (a₁.val ≤ boundedCongruenceCutoff) ↔ (a₂.val ≤ boundedCongruenceCutoff))
+    (hb : (b₁.val ≤ boundedCongruenceCutoff) ↔ (b₂.val ≤ boundedCongruenceCutoff)) :
+    ((join a₁ b₁).val ≤ boundedCongruenceCutoff) ↔
+      ((join a₂ b₂).val ≤ boundedCongruenceCutoff) := by
+  rw [join_le_cutoff_iff, join_le_cutoff_iff]
+  constructor
+  · intro h
+    exact ⟨ha.mp h.left, hb.mp h.right⟩
+  · intro h
+    exact ⟨ha.mpr h.left, hb.mpr h.right⟩
+
+/-- Bounded congruence: elements are related when they lie on the same side of a fixed cutoff. -/
+noncomputable def boundedCongruence : LatCongruence where
+  rel := fun a b => (a.val ≤ boundedCongruenceCutoff) ↔ (b.val ≤ boundedCongruenceCutoff)
+  refl := fun _ => Iff.rfl
+  symm := fun _ _ h => h.symm
+  trans := fun _ _ _ h1 h2 => h1.trans h2
+  meet_compat := fun _ _ _ _ h1 h2 => bounded_meet_compat h1 h2
+  join_compat := fun _ _ _ _ h1 h2 => bounded_join_compat h1 h2
 
 /-- Discrete congruence: only equal elements are related. -/
 noncomputable def discreteCongruence : LatCongruence where

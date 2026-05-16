@@ -415,8 +415,8 @@ structure LatticeCongruence (lat : PathLattice L) where
   compat_join : (a b c d : L) → rel a b → rel c d →
     rel (lat.join a c) (lat.join b d)
 
--- 54: Trivial congruence (path equality)
-noncomputable def trivial_congruence (lat : PathLattice L) : LatticeCongruence lat where
+-- 54: Path congruence
+noncomputable def path_congruence (lat : PathLattice L) : LatticeCongruence lat where
   rel := fun a b => Nonempty (Path a b)
   rel_refl := fun a => ⟨Path.refl a⟩
   rel_symm := fun _ _ ⟨p⟩ => ⟨Path.symm p⟩
@@ -426,14 +426,65 @@ noncomputable def trivial_congruence (lat : PathLattice L) : LatticeCongruence l
   compat_join := fun _ _ _ _ ⟨p⟩ ⟨q⟩ =>
     ⟨Path.trans (Path.congrArg (lat.join · _) p) (Path.congrArg (lat.join _ ·) q)⟩
 
--- 55: Total congruence
-noncomputable def total_congruence (lat : PathLattice L) : LatticeCongruence lat where
-  rel := fun _ _ => True
-  rel_refl := fun _ => trivial
-  rel_symm := fun _ _ _ => trivial
-  rel_trans := fun _ _ _ _ _ => trivial
-  compat_meet := fun _ _ _ _ _ _ => trivial
-  compat_join := fun _ _ _ _ _ _ => trivial
+/- 55: Operation-level congruence data.  Each related pair carries an
+   actual path between the pair together with local meet/join loop and
+   commutativity witnesses. -/
+structure OperationPairWitness (lat : PathLattice L) (a b : L) : Prop where
+  pair_path : Nonempty (Path a b)
+  meet_loop : Nonempty (Path (lat.meet a b) (lat.meet a b))
+  join_loop : Nonempty (Path (lat.join a b) (lat.join a b))
+  meet_swap : Nonempty (Path (lat.meet a b) (lat.meet b a))
+  join_swap : Nonempty (Path (lat.join a b) (lat.join b a))
+
+namespace OperationPairWitness
+
+theorem of_path (lat : PathLattice L) {a b : L} (p : Path a b) :
+    OperationPairWitness lat a b where
+  pair_path := ⟨p⟩
+  meet_loop := ⟨meet_comm_involutive lat a b⟩
+  join_loop := ⟨join_comm_involutive lat a b⟩
+  meet_swap := ⟨lat.meet_comm a b⟩
+  join_swap := ⟨lat.join_comm a b⟩
+
+theorem symm (lat : PathLattice L) {a b : L} (h : OperationPairWitness lat a b) :
+    OperationPairWitness lat b a :=
+  match h.pair_path with
+  | ⟨p⟩ => of_path lat (Path.symm p)
+
+theorem trans (lat : PathLattice L) {a b c : L}
+    (h1 : OperationPairWitness lat a b) (h2 : OperationPairWitness lat b c) :
+    OperationPairWitness lat a c :=
+  match h1.pair_path, h2.pair_path with
+  | ⟨p⟩, ⟨q⟩ => of_path lat (Path.trans p q)
+
+theorem compat_meet (lat : PathLattice L) {a b c d : L}
+    (h1 : OperationPairWitness lat a b) (h2 : OperationPairWitness lat c d) :
+    OperationPairWitness lat (lat.meet a c) (lat.meet b d) :=
+  match h1.pair_path, h2.pair_path with
+  | ⟨p⟩, ⟨q⟩ =>
+      of_path lat (Path.trans
+        (Path.congrArg (fun x => lat.meet x c) p)
+        (Path.congrArg (fun x => lat.meet b x) q))
+
+theorem compat_join (lat : PathLattice L) {a b c d : L}
+    (h1 : OperationPairWitness lat a b) (h2 : OperationPairWitness lat c d) :
+    OperationPairWitness lat (lat.join a c) (lat.join b d) :=
+  match h1.pair_path, h2.pair_path with
+  | ⟨p⟩, ⟨q⟩ =>
+      of_path lat (Path.trans
+        (Path.congrArg (fun x => lat.join x c) p)
+        (Path.congrArg (fun x => lat.join b x) q))
+
+end OperationPairWitness
+
+-- 55: Congruence carried by operation-local path witness packages.
+noncomputable def operation_witness_congruence (lat : PathLattice L) : LatticeCongruence lat where
+  rel := OperationPairWitness lat
+  rel_refl := fun a => OperationPairWitness.of_path lat (Path.refl a)
+  rel_symm := fun _ _ h => OperationPairWitness.symm lat h
+  rel_trans := fun _ _ _ h1 h2 => OperationPairWitness.trans lat h1 h2
+  compat_meet := fun _ _ _ _ h1 h2 => OperationPairWitness.compat_meet lat h1 h2
+  compat_join := fun _ _ _ _ h1 h2 => OperationPairWitness.compat_join lat h1 h2
 
 -- 56: Congruence reflexivity
 theorem congruence_refl (lat : PathLattice L) (cong : LatticeCongruence lat)
