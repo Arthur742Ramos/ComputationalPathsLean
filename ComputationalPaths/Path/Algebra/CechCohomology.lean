@@ -307,12 +307,37 @@ noncomputable def cechH0Point_path (G : CechCoeff.{v}) (c : G.Carrier) :
 
 /-! ## Naturality summary -/
 
-/-- The coboundary map squares to zero in a trivial sense:
-    for 0-cochains, δ¹ ∘ δ⁰ = 0. This is the fundamental
-    property of the Čech complex. We record the type signature. -/
-noncomputable def cechComplexProperty {X : Type u} (U : OpenCover X) (_G : CechCoeff.{v}) :=
-  ∀ _f : Cochain0 U _G, ∀ _σ : Nerve2 U,
-    ∃ _ : True, True  -- placeholder: d² = 0
+/-- The face opposite `i₀` in a 2-simplex. -/
+noncomputable def nerve2Face12 {X : Type u} {U : OpenCover X} (σ : Nerve2 U) : Nerve1 U where
+  i₀ := σ.i₁
+  i₁ := σ.i₂
+  nonempty := ⟨σ.nonempty.choose, σ.nonempty.choose_spec.2⟩
+
+/-- The face opposite `i₁` in a 2-simplex. -/
+noncomputable def nerve2Face02 {X : Type u} {U : OpenCover X} (σ : Nerve2 U) : Nerve1 U where
+  i₀ := σ.i₀
+  i₁ := σ.i₂
+  nonempty := ⟨σ.nonempty.choose, ⟨σ.nonempty.choose_spec.1, σ.nonempty.choose_spec.2.2⟩⟩
+
+/-- The face opposite `i₂` in a 2-simplex. -/
+noncomputable def nerve2Face01 {X : Type u} {U : OpenCover X} (σ : Nerve2 U) : Nerve1 U where
+  i₀ := σ.i₀
+  i₁ := σ.i₁
+  nonempty := ⟨σ.nonempty.choose, ⟨σ.nonempty.choose_spec.1, σ.nonempty.choose_spec.2.1⟩⟩
+
+/-- The alternating Čech 1-coboundary value of `δ⁰ f` on a 2-simplex. -/
+noncomputable def coboundary1OfCoboundary0Value {X : Type u} (U : OpenCover X) (G : CechCoeff.{v})
+    (f : Cochain0 U G) (σ : Nerve2 U) : G.Carrier :=
+  G.add
+    (G.add
+      (coboundary0 U G f (nerve2Face12 σ))
+      (G.neg (coboundary0 U G f (nerve2Face02 σ))))
+    (coboundary0 U G f (nerve2Face01 σ))
+
+/-- Path-valued form of the Čech complex condition `δ¹ (δ⁰ f) = 0`. -/
+noncomputable def cechComplexProperty {X : Type u} (U : OpenCover X) (G : CechCoeff.{v}) :=
+  ∀ f : Cochain0 U G, ∀ σ : Nerve2 U,
+    Path (coboundary1OfCoboundary0Value U G f σ) G.zero
 
 end CechCohomology
 end Algebra
