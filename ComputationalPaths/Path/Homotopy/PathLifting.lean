@@ -1,189 +1,156 @@
 /-
 # Path Lifting for Covering Spaces
 
-Detailed path-lifting theory using computational paths: unique lifting by
-induction on `Path.steps`, homotopy lifting via `RwEq`/`Step` preservation,
-and fiber transport connected to `Path.trans`.
+This module keeps path lifting honest about the data it consumes.  A raw
+`Path.steps` list has no invariant saying that the stored steps are composable
+or match the path endpoints, so genuine step-by-step lifting is stated for
+`StepChain`, the well-formed chain type from `CoveringDeep`.
 
-## Contents
-
-1. **Unique path lifting** — induction on `Path.steps` list
-2. **Homotopy lifting** — if `RwEq p q` downstairs, then lifted endpoints agree
-3. **Fiber transport** — transport in the fiber along a path, connected to `Path.trans`
+`RwEq`-invariance of lifted endpoints is real covering-space content, so it is
+recorded as a field of `HomotopyLiftingCoveringMap` rather than proved by
+reflexivity over arbitrary lists.
 -/
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Homotopy.CoveringDeep
+
 namespace ComputationalPaths
 
 open Path
 
-universe u v
+universe u
 
 variable {E B : Type u}
 
-/-! ## 1. Unique path lifting by induction on steps -/
+/-! ## 1. Fiber transport along well-formed chains -/
 
-/-- A covering map with a uniqueness guarantee on step lifts:
-    two lifts of the same step starting at the same point are equal. -/
-structure UniqueCoveringMap (E B : Type u) extends CoveringMap E B where
-  liftStep_unique : ∀ (s : Step B) (e : E) (_h : proj e = s.src)
-    (l₁ l₂ : Step E),
-    l₁.src = e → l₂.src = e →
-    proj l₁.tgt = s.tgt → proj l₂.tgt = s.tgt →
-    l₁ = l₂
+/-- Compatibility alias for fibers over a covering map. -/
+abbrev Fib (cov : CoveringMap E B) (b : B) : Type u :=
+  Fiber cov b
 
-/-- Lift a list of steps by induction on the list, threading the fiber point.
-    Returns the lifted step list and the final fiber point. -/
-noncomputable def liftStepList (_cov : UniqueCoveringMap E B)
-    (_steps : List (Step B)) (e : E) :
-    List (Step E) × E :=
-  ([], e)
-
-/-- **Uniqueness of step-list lifting**: given the same starting point, the
-    lift is deterministic.  By induction on the step list. -/
-theorem liftStepList_deterministic (cov : UniqueCoveringMap E B)
-    (steps : List (Step B)) (e : E) :
-    liftStepList cov steps e = liftStepList cov steps e := by
-  rfl
-
-/-- Lifting distributes over list append (the step-level analogue of
-    `Path.trans`): lifting `steps₁ ++ steps₂` is the same as lifting
-    `steps₁`, then continuing with `steps₂` from the endpoint.
-
-    This is the key structural lemma connecting lifting to `Path.trans`,
-    since `(Path.trans p q).steps = p.steps ++ q.steps`. -/
-theorem liftStepList_append (cov : UniqueCoveringMap E B)
-    (steps₁ steps₂ : List (Step B)) (e : E) :
-    liftStepList cov (steps₁ ++ steps₂) e =
-      let (lifted₁, e') := liftStepList cov steps₁ e
-      let (lifted₂, e'') := liftStepList cov steps₂ e'
-      (lifted₁ ++ lifted₂, e'') := by
-  rfl
-
-/-- Lifting `Path.trans p q` decomposes as lifting `p` then lifting `q`.
-    This follows from `liftStepList_append` and
-    `(Path.trans p q).steps = p.steps ++ q.steps`. -/
-theorem lift_trans_decompose (cov : UniqueCoveringMap E B)
-    {a b c : B} (p : Path a b) (q : Path b c) (e : E) :
-    liftStepList cov (Path.trans p q).steps e =
-      let (lifted_p, e') := liftStepList cov p.steps e
-      let (lifted_q, e'') := liftStepList cov q.steps e'
-      (lifted_p ++ lifted_q, e'') := by
-  simp [Path.trans]
-  exact liftStepList_append cov p.steps q.steps e
-
-/-- Lifting an empty step list (corresponding to `Path.refl`) is the identity. -/
-theorem liftStepList_nil (cov : UniqueCoveringMap E B) (e : E) :
-    liftStepList cov [] e = ([], e) := by
-  rfl
-
-/-! ## 2. Homotopy lifting property -/
-
-/-- **Homotopy lifting theorem (endpoint version)**: if `RwEq p q` in the
-    base space `B`, then lifting `p` and `q` from the same fiber point
-    yields the same final fiber point.
-
-    Proof by induction on `RwEq`:
-    - `refl`: trivial
-    - `step`: a single rewrite step preserves lifting endpoints
-    - `symm`: by symmetry
-    - `trans`: by transitivity -/
-noncomputable def homotopy_lifting (cov : UniqueCoveringMap E B)
-    {a b : B} {p q : Path a b} (h : RwEq p q)
-    (e : E) :
-    (liftStepList cov p.steps e).2 =
-    (liftStepList cov q.steps e).2 := by
-  induction h with
-  | refl _ => rfl
-  | step _ => rfl
-  | symm _ ih => exact ih.symm
-  | trans _ _ ih1 ih2 => exact ih1.trans ih2
-
-/-- Corollary: homotopy lifting for loops — if `RwEq γ₁ γ₂` for loops at `b`,
-    then the lifted endpoints coincide, i.e., monodromy is `RwEq`-invariant. -/
-noncomputable def homotopy_lifting_loops (cov : UniqueCoveringMap E B)
-    {b : B} {γ₁ γ₂ : Path b b} (h : RwEq γ₁ γ₂)
-    (e : E) :
-    (liftStepList cov γ₁.steps e).2 =
-    (liftStepList cov γ₂.steps e).2 :=
-  homotopy_lifting cov h e
-
-/-! ## 3. Fiber transport -/
-
-/-- The fiber `Fib b` of the covering map over a point `b ∈ B`. -/
-noncomputable def Fib (cov : CoveringMap E B) (b : B) := { e : E // cov.proj e = b }
-
-/-- Transport an element of the fiber along a path in the base, using
-    step-by-step lifting.  This is a repackaging of `liftStepList` that
-    explicitly uses `Path.trans` decomposition. -/
-noncomputable def fiberTransport (cov : UniqueCoveringMap E B)
-    {a b : B} (p : Path a b) : Fib cov.toCoveringMap a → Fib cov.toCoveringMap b :=
+/-- Transport a fiber point along a composable base chain by recursively lifting
+each base step upstairs. -/
+noncomputable def fiberTransportChain (cov : CoveringMap E B)
+    {a b : B} (chain : StepChain B a b) :
+    Fib cov a → Fib cov b :=
   fun ⟨e, he⟩ =>
-    ⟨(liftStepList cov p.steps e).2, by
-      simp [liftStepList]; exact he.trans p.proof⟩
+    let lifted := liftChain cov chain e he
+    ⟨lifted.endpoint, lifted.endpoint_proj⟩
 
-/-- Fiber transport along `Path.refl` is the identity. -/
-theorem fiberTransport_refl (cov : UniqueCoveringMap E B) {b : B}
+@[simp] theorem fiberTransportChain_refl (cov : CoveringMap E B)
+    {a : B} (fiber : Fib cov a) :
+    fiberTransportChain cov (StepChain.nil a) fiber = fiber := by
+  rcases fiber with ⟨e, he⟩
+  rfl
+
+/-- Transport along a concatenated chain is transport along the left chain,
+then transport along the right chain. -/
+theorem fiberTransportChain_append (cov : CoveringMap E B)
+    {a b c : B} (left : StepChain B a b) (right : StepChain B b c)
+    (fiber : Fib cov a) :
+    fiberTransportChain cov (StepChain.append left right) fiber =
+      fiberTransportChain cov right (fiberTransportChain cov left fiber) := by
+  rcases fiber with ⟨e, he⟩
+  apply Subtype.ext
+  exact liftChain_append_endpoint cov left right e he
+
+/-- The upstairs trace of a lifted concatenation is the concatenation of the two
+upstairs traces.  This is the non-tautological trace-level content behind
+`fiberTransportChain_append`. -/
+theorem liftChain_append_trace (cov : CoveringMap E B)
+    {a b c : B} (left : StepChain B a b) (right : StepChain B b c)
+    (e : E) (he : cov.proj e = a) :
+    (liftChain cov (StepChain.append left right) e he).path.steps =
+      (liftChain cov left e he).path.steps ++
+        (liftChain cov right
+          (liftChain cov left e he).endpoint
+          (liftChain cov left e he).endpoint_proj).path.steps :=
+  liftChain_append_steps cov left right e he
+
+/-! ## 2. Homotopy-aware coverings -/
+
+/-- A covering map whose chain lifts respect `RwEq` of base chains.
+
+The field is intentionally part of the structure: once lifting depends on
+actual step traces, homotopy invariance is a mathematical property of the
+covering, not a consequence of the loose `Path.steps` metadata. -/
+structure HomotopyLiftingCoveringMap (E B : Type u) extends CoveringMap E B where
+  liftChain_rweq :
+    ∀ {a b : B} (left right : StepChain B a b)
+      (e : E) (he : toCoveringMap.proj e = a),
+      RwEq (StepChain.toPath left) (StepChain.toPath right) →
+        (liftChain toCoveringMap left e he).endpoint =
+          (liftChain toCoveringMap right e he).endpoint
+
+namespace HomotopyLiftingCoveringMap
+
+variable (cov : HomotopyLiftingCoveringMap E B)
+
+/-- Endpoint form of homotopy lifting for well-formed chains. -/
+theorem liftChain_rweq_endpoint {a b : B}
+    (left right : StepChain B a b)
+    (e : E) (he : cov.toCoveringMap.proj e = a)
+    (h : RwEq (StepChain.toPath left) (StepChain.toPath right)) :
+    (liftChain cov.toCoveringMap left e he).endpoint =
+      (liftChain cov.toCoveringMap right e he).endpoint :=
+  cov.liftChain_rweq left right e he h
+
+/-- Fiber transport along well-formed chains is invariant under `RwEq` when the
+covering map supplies the homotopy-lifting property. -/
+theorem fiberTransportChain_rweq {a b : B}
+    (left right : StepChain B a b)
+    (h : RwEq (StepChain.toPath left) (StepChain.toPath right))
+    (fiber : Fib cov.toCoveringMap a) :
+    fiberTransportChain cov.toCoveringMap left fiber =
+      fiberTransportChain cov.toCoveringMap right fiber := by
+  rcases fiber with ⟨e, he⟩
+  apply Subtype.ext
+  exact cov.liftChain_rweq_endpoint left right e he h
+
+end HomotopyLiftingCoveringMap
+
+/-! ## 3. Chain-level monodromy functor -/
+
+/-- Monodromy along loops represented by well-formed chains. -/
+noncomputable def chainMonodromy (cov : CoveringMap E B) {b : B}
+    (loop : StepChain B b b) : Fib cov b → Fib cov b :=
+  fiberTransportChain cov loop
+
+@[simp] theorem chainMonodromy_refl (cov : CoveringMap E B)
+    {b : B} (fiber : Fib cov b) :
+    chainMonodromy cov (StepChain.nil b) fiber = fiber :=
+  fiberTransportChain_refl cov fiber
+
+theorem chainMonodromy_append (cov : CoveringMap E B)
+    {b : B} (left right : StepChain B b b) (fiber : Fib cov b) :
+    chainMonodromy cov (StepChain.append left right) fiber =
+      chainMonodromy cov right (chainMonodromy cov left fiber) :=
+  fiberTransportChain_append cov left right fiber
+
+/-- A chain-level action of based loops on the fiber. -/
+structure ChainMonodromyAction (cov : CoveringMap E B) (b : B) where
+  act : StepChain B b b → Fib cov b → Fib cov b
+  act_refl : ∀ fiber, act (StepChain.nil b) fiber = fiber
+  act_append : ∀ left right fiber,
+    act (StepChain.append left right) fiber = act right (act left fiber)
+
+/-- The canonical action obtained by lifting each chain. -/
+noncomputable def ChainMonodromyAction.ofCovering
+    (cov : CoveringMap E B) (b : B) :
+    ChainMonodromyAction cov b where
+  act := chainMonodromy cov
+  act_refl := chainMonodromy_refl cov
+  act_append := chainMonodromy_append cov
+
+/-- A homotopy-aware action descends from chain representatives to `RwEq`
+classes of loops. -/
+theorem chainMonodromy_rweq (cov : HomotopyLiftingCoveringMap E B)
+    {b : B} (left right : StepChain B b b)
+    (h : RwEq (StepChain.toPath left) (StepChain.toPath right))
     (fiber : Fib cov.toCoveringMap b) :
-    fiberTransport cov (Path.refl b) fiber = fiber := by
-  rcases fiber with ⟨e, he⟩
-  simp [fiberTransport, liftStepList]
-
-/-- Fiber transport along `Path.trans p q` equals the composition of
-    transports along `p` and `q`.  This follows from the `Path.trans`
-    structure: `(Path.trans p q).steps = p.steps ++ q.steps`. -/
-theorem fiberTransport_trans (cov : UniqueCoveringMap E B)
-    {a b c : B} (p : Path a b) (q : Path b c)
-    (fiber : Fib cov.toCoveringMap a) :
-    fiberTransport cov (Path.trans p q) fiber =
-      fiberTransport cov q (fiberTransport cov p fiber) := by
-  rcases fiber with ⟨e, he⟩
-  apply Subtype.ext
-  rfl
-
-/-- Fiber transport along `Path.symm p` is the inverse of transport along `p`. -/
-theorem fiberTransport_symm_left (cov : UniqueCoveringMap E B)
-    {a b : B} (p : Path a b)
-    (fiber : Fib cov.toCoveringMap a) :
-    fiberTransport cov (Path.symm p)
-      (fiberTransport cov p fiber) = fiber := by
-  rcases fiber with ⟨e, he⟩
-  apply Subtype.ext
-  rfl
-
-/-- Fiber transport is `RwEq`-invariant: if `RwEq p q` in `B`, then
-    `fiberTransport p = fiberTransport q` on fibers. -/
-theorem fiberTransport_rweq (cov : UniqueCoveringMap E B)
-    {a b : B} {p q : Path a b} (_h : RwEq p q)
-    (fiber : Fib cov.toCoveringMap a) :
-    fiberTransport cov p fiber = fiberTransport cov q fiber := by
-  rcases fiber with ⟨e, he⟩
-  apply Subtype.ext
-  rfl
-
-/-- Fiber transport determines a functor from the fundamental groupoid
-    (paths modulo `RwEq`) to `Set`: it sends each point to its fiber
-    and each path-class to the transport map.  Functoriality is exactly
-    `fiberTransport_refl` and `fiberTransport_trans`. -/
-structure FiberFunctor (cov : UniqueCoveringMap E B) where
-  /-- Object map: point to fiber -/
-  obj : B → Type u
-  /-- Morphism map: path to transport -/
-  map : {a b : B} → Path a b → obj a → obj b
-  /-- Identity: refl maps to identity -/
-  map_refl : ∀ {b : B} (f : obj b), map (Path.refl b) f = f
-  /-- Composition: trans maps to composition -/
-  map_trans : ∀ {a b c : B} (p : Path a b) (q : Path b c)
-    (f : obj a), map (Path.trans p q) f = map q (map p f)
-
-/-- The canonical fiber functor from a unique covering map. -/
-noncomputable def FiberFunctor.ofCovering (cov : UniqueCoveringMap E B) :
-    FiberFunctor cov where
-  obj := Fib cov.toCoveringMap
-  map := fun p => fiberTransport cov p
-  map_refl := fiberTransport_refl cov
-  map_trans := fiberTransport_trans cov
+    chainMonodromy cov.toCoveringMap left fiber =
+      chainMonodromy cov.toCoveringMap right fiber :=
+  cov.fiberTransportChain_rweq left right h fiber
 
 end ComputationalPaths
