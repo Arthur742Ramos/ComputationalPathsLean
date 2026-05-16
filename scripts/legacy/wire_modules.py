@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 """
+Legacy one-shot module wiring script.
+
+This script mutates Lean import hubs and is not part of the regular build or
+maintenance workflow. If it is ever reused, review the resulting diff carefully.
+
 Wire all orphan .lean files into the module tree, avoiding circular imports.
 
 Strategy:
@@ -11,10 +16,9 @@ Strategy:
 """
 
 import re
-import os
 from pathlib import Path
 
-ROOT = Path("/Users/arthur/clawd/ComputationalPaths")
+ROOT = Path(__file__).resolve().parents[2]
 
 def get_module(filepath):
     """Convert file path to module name."""

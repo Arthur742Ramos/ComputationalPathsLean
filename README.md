@@ -4,7 +4,7 @@
 [![Lean](https://img.shields.io/badge/Lean-4.24.0-orange)](https://leanprover.github.io/)
 [![Mathlib](https://img.shields.io/badge/Mathlib-v4.24.0-blue)](https://github.com/leanprover-community/mathlib4)
 
-A large Lean 4 formalization of **computational paths**: explicit, trace-carrying witnesses of equality built on top of Lean's `Eq`.
+A Lean 4 book companion repository for **computational paths**: explicit, trace-carrying witnesses of equality built on top of Lean's `Eq`.
 
 At the core, a path records both an equality proof and its rewrite trace:
 
@@ -29,7 +29,7 @@ Representative results and modules include:
 - `ComputationalPaths/Path/OmegaGroupoid.lean` (weak ω-groupoid-style hierarchy)
 - `ComputationalPaths/Path/Rewrite/Step.lean` (primitive rewrite-step relation)
 
-Beyond `Path/`, the repository also includes large domain trees such as arithmetic, geometric, motivic, topos-theoretic, and representation-theoretic developments.
+Beyond `Path/`, the repository also includes broad companion developments such as arithmetic, geometric, motivic, topos-theoretic, and representation-theoretic modules.
 
 ## Repository structure overview
 
@@ -39,6 +39,9 @@ Top-level layout:
 ComputationalPathsLean/
 ├── ComputationalPaths.lean           # Root import hub
 ├── Main.lean                         # CLI entry (prints libraryVersion)
+├── lakefile.lean                     # Lake package configuration
+├── lake-manifest.json                # Lake dependency manifest
+├── lean-toolchain                    # Pinned Lean toolchain
 ├── ComputationalPaths/
 │   ├── Basic.lean                    # Core exports + libraryVersion
 │   ├── Path/                         # Computational paths core ecosystem
@@ -72,9 +75,12 @@ ComputationalPathsLean/
 │   ├── Tropical/
 │   └── VertexAlgebra/
 ├── docs/
-├── docbuild/
-├── paper/
-└── Scripts/
+│   ├── ARCHITECTURE.md               # Canonical architecture overview
+│   ├── axioms.md                     # Canonical axiom/typeclass inventory
+│   └── archive/                      # Historical audits and run outputs
+├── paper/                            # Paper/book source material
+└── scripts/
+    └── legacy/                       # Archived maintenance scripts
 ```
 
 ## Getting started
@@ -86,7 +92,7 @@ ComputationalPathsLean/
 
 This project is pinned to:
 - Lean `v4.24.0` (`lean-toolchain`)
-- Mathlib `v4.24.0` (`lakefile.toml`)
+- Mathlib `v4.24.0` (`lakefile.lean`)
 
 ### Build
 
@@ -145,6 +151,7 @@ Use the badge at the top of this README to check live build status.
 - Keep proofs `sorry`-free and avoid new global axioms.
 - Prefer `Path`/`RwEq`-based reasoning for equality developments.
 - Run `lake build` before opening a PR.
+- Keep canonical documentation under `docs/`; move historical audits or generated run logs to `docs/archive/` rather than leaving them in the repository root.
 
 ## License
 
