@@ -70,6 +70,15 @@ Omega-groupoid and higher-cell developments are centered around:
 | Coherence and weak groupoid files | `ComputationalPaths/Path/OmegaGroupoid/CoherencePaths.lean`, `WeakGroupoidPaths.lean`, `OmegaWeakGroupoid.lean` |
 | 2-category style structure | `ComputationalPaths/Path/OmegaGroupoid/TwoCategoryStructure.lean`, `ComputationalPaths/TwoCategoryInstances.lean` |
 
+## Book and paper companion material
+
+For a short reader path from book and paper themes to repository entrypoints, see
+[`book-companion.md`](book-companion.md). The `paper/` directory contains LaTeX
+source, bibliography data, a checked-in PDF artifact, and campaign/wave notes
+preserved for historical provenance. See
+[`../paper/README.md`](../paper/README.md) before treating those Markdown notes
+as active documentation.
+
 ## Exploratory and assumption-sensitive surfaces
 
 The repository intentionally contains broader companion material. The following
