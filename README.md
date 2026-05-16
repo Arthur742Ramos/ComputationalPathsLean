@@ -86,6 +86,7 @@ ComputationalPathsLean/
 ├── docs/
 │   ├── README.md                     # Documentation entrypoint
 │   ├── ARCHITECTURE.md               # Canonical architecture overview
+│   ├── modules.md                    # Source/module navigation map
 │   ├── axioms.md                     # Canonical axiom/typeclass inventory
 │   └── archive/                      # Historical audits and run outputs
 ├── paper/                            # Paper/book source material
@@ -97,8 +98,10 @@ ComputationalPathsLean/
 
 - `docs/README.md` - documentation entrypoint and reading order.
 - `docs/ARCHITECTURE.md` - current architecture, layers, and representative theorem landmarks.
+- `docs/modules.md` - source/module navigation map and intended import entrypoints.
 - `docs/axioms.md` - current axiom and typeclass inventory.
 - `docs/archive/README.md` - provenance for historical audits and generated run outputs.
+- `ComputationalPaths/README.md` and `ComputationalPaths/Path/README.md` - source-local navigation notes.
 
 ## Getting started
 
