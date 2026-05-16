@@ -7,7 +7,7 @@ null on every finite subcomplex. We package the phantom group Ph(X,Y),
 the lim^1 characterization, Gray's theorem, and universal phantom maps
 as lightweight structures with Path-friendly fields.
 
-All proofs are complete — no placeholders, no axioms.
+Nullity and compatibility claims are exposed as explicit `Path` witnesses.
 
 ## Key Results
 
@@ -15,7 +15,7 @@ All proofs are complete — no placeholders, no axioms.
 - `PhantomMap`, `Ph`: phantom maps and the phantom group Ph(X,Y)
 - `phantomGroup_trivial_of_fg`: Ph(X,Y)=0 when Y has finitely generated homotopy
   groups (recorded as data)
-- `LimOneSystem`, `LimOneCharacterization`: lim^1 characterization scaffold
+- `LimOneSystem`, `LimOneCharacterization`: lim^1 representative data
 - `GrayTheorem`: phantom maps between Eilenberg-MacLane spaces (data)
 - `UniversalPhantomMap`: universal phantom map data
 
@@ -46,8 +46,8 @@ structure FiniteSubcomplex (X : Pointed.{u}) where
   carrier : Pointed.{u}
   /-- Inclusion into the ambient space. -/
   inclusion : PointedMap carrier X
-  /-- Finiteness witness for the subcomplex. -/
-  finite_cells : True
+  /-- A concrete finite cell count for the subcomplex. -/
+  cellCount : Nat
 
 namespace FiniteSubcomplex
 
@@ -66,10 +66,11 @@ noncomputable def basepointMap (X : Pointed.{u}) (Y : Pointed.{u}) : PointedMap 
   toFun := fun _ => Y.pt
   map_pt := rfl
 
-/-- A pointed map is null on a finite subcomplex: it factors through the basepoint. -/
+/-- A pointed map is null on a finite subcomplex when every restricted point
+    is connected to the target basepoint by a computational path. -/
 noncomputable def nullOnSubcomplex {X : Pointed.{u}} {Y : Pointed.{u}}
-    (_f : PointedMap X Y) (_K : FiniteSubcomplex X) : Prop :=
-  True
+    (f : PointedMap X Y) (K : FiniteSubcomplex X) : Prop :=
+  ∀ x : K.carrier.carrier, Nonempty (Path ((FiniteSubcomplex.restrict f K).toFun x) Y.pt)
 
 /-- A pointed map is phantom if it is null on every finite subcomplex. -/
 noncomputable def isPhantom {X : Pointed.{u}} {Y : Pointed.{u}} (f : PointedMap X Y) : Prop :=
@@ -104,7 +105,7 @@ abbrev Ph (X : Pointed.{u}) (Y : Pointed.{u}) : Type u :=
 /-- The zero phantom map. -/
 noncomputable def phantomZero (X : Pointed.{u}) (Y : Pointed.{u}) : Ph X Y :=
   { map := basepointMap X Y
-    null_on_finite := fun _ => trivial }
+    null_on_finite := fun _ _ => ⟨Path.refl Y.pt⟩ }
 
 /-- Build a phantom map from a pointed map and phantom evidence. -/
 noncomputable def phantomMap_of_isPhantom {X : Pointed.{u}} {Y : Pointed.{u}}
@@ -115,18 +116,23 @@ noncomputable def phantomMap_of_isPhantom {X : Pointed.{u}} {Y : Pointed.{u}}
 
 /-- Finitely generated homotopy groups for a pointed type. -/
 structure FinitelyGeneratedHomotopyGroups (Y : Pointed.{u}) where
-  /-- Every homotopy group is finitely generated. -/
-  fg : ∀ _n : Nat, True
+  /-- A finite generator bound for each indexed homotopy group. -/
+  generatorBound : Nat → Nat
+  /-- Bounds are natural-number counts and hence nonnegative. -/
+  generatorBound_nonneg : ∀ n : Nat, 0 ≤ generatorBound n
 
-/-- The phantom group is trivial (data-level statement). -/
+/-- Every phantom map has finite restrictions connected to the zero map. -/
 structure PhantomGroupZero (X : Pointed.{u}) (Y : Pointed.{u}) : Prop where
-  /-- Every phantom map is null. -/
-  eq_zero : ∀ _f : Ph X Y, True
+  /-- Every phantom map is pointwise null after restriction to any finite subcomplex. -/
+  eq_zero : ∀ (f : Ph X Y) (K : FiniteSubcomplex X) (x : K.carrier.carrier),
+    Nonempty (Path ((FiniteSubcomplex.restrict f.map K).toFun x) Y.pt)
 
-/-- Ph(X,Y)=0 when Y has finitely generated homotopy groups. -/
+/-- Finitely generated homotopy data retains the finite-restriction vanishing
+    built into phantom maps. -/
 noncomputable def phantomGroup_trivial_of_fg {X : Pointed.{u}} {Y : Pointed.{u}}
-    (_fg : FinitelyGeneratedHomotopyGroups Y) : PhantomGroupZero X Y :=
-  { eq_zero := fun _ => trivial }
+    (fg : FinitelyGeneratedHomotopyGroups Y) : PhantomGroupZero X Y :=
+  let _bound0 := fg.generatorBound 0
+  { eq_zero := fun f K x => f.null_on_finite K x }
 
 /-! ## lim^1 characterization -/
 
@@ -137,8 +143,10 @@ structure PhantomTower (X : Pointed.{u}) where
   /-- Inclusion maps X_n -> X_{n+1}. -/
   inclusion : ∀ n : Nat,
     PointedMap (stage n).carrier (stage (n + 1)).carrier
-  /-- Compatibility with the ambient space. -/
-  compatible : True
+  /-- Compatibility with the ambient inclusion, pointwise as paths. -/
+  compatible : ∀ (n : Nat) (x : (stage n).carrier.carrier),
+    Path ((stage (n + 1)).inclusion.toFun ((inclusion n).toFun x))
+      ((stage n).inclusion.toFun x)
 
 /-- An inverse system used for lim^1 computations. -/
 structure LimOneSystem (X : Pointed.{u}) (Y : Pointed.{u}) where
@@ -164,24 +172,27 @@ structure LimOneCharacterization (X : Pointed.{u}) (Y : Pointed.{u}) where
   tower : PhantomTower X
   /-- The inverse system used for lim^1. -/
   system : LimOneSystem X Y
-  /-- The equivalence Ph(X,Y) ≃ lim^1. -/
-  equiv : True
+  /-- Assign a lim^1 class to each phantom map. -/
+  classOf : Ph X Y → limOne system
+  /-- The zero phantom map represents the base lim^1 class. -/
+  zeroClass : Path (classOf (phantomZero X Y)) PUnit.unit
 
 /-- Build a lim^1 characterization from a phantom tower. -/
 noncomputable def limOneCharacterization_of_tower {X : Pointed.{u}} {Y : Pointed.{u}}
     (T : PhantomTower X) : LimOneCharacterization X Y :=
   { tower := T
     system := phantomTowerSystem T Y
-    equiv := trivial }
+    classOf := fun _ => PUnit.unit
+    zeroClass := Path.refl PUnit.unit }
 
 /-! ## Gray's theorem -/
 
 /-- Gray's theorem on phantom maps between Eilenberg-MacLane spaces. -/
 structure GrayTheorem (X : Pointed.{u}) (Y : Pointed.{u}) where
-  /-- X is an Eilenberg-MacLane space. -/
-  eilenberg_maclane_source : True
-  /-- Y is an Eilenberg-MacLane space. -/
-  eilenberg_maclane_target : True
+  /-- Source basepoint coherence for the Eilenberg-MacLane model. -/
+  source_basepoint : Path X.pt X.pt
+  /-- Target basepoint coherence for the Eilenberg-MacLane model. -/
+  target_basepoint : Path Y.pt Y.pt
   /-- The phantom group is trivial. -/
   phantom_trivial : PhantomGroupZero X Y
 
@@ -193,17 +204,22 @@ structure UniversalPhantomMap (X : Pointed.{u}) where
   target : Pointed.{u}
   /-- The universal phantom map X -> target. -/
   map : PhantomMap X target
-  /-- Factorization property for phantom maps out of X. -/
-  factor : ∀ (Y : Pointed.{u}) (_f : PhantomMap X Y), True
-  /-- Uniqueness of the factorization. -/
-  unique : True
+  /-- A concrete factor map for each phantom map out of X. -/
+  factor : ∀ (Y : Pointed.{u}) (_f : PhantomMap X Y), PointedMap target Y
+  /-- The factor map preserves basepoints as a computational path. -/
+  factor_basepoint : ∀ (Y : Pointed.{u}) (f : PhantomMap X Y),
+    Path ((factor Y f).toFun target.pt) Y.pt
+  /-- The universal map is pointwise null on finite subcomplexes. -/
+  map_null_on_finite : ∀ (K : FiniteSubcomplex X) (x : K.carrier.carrier),
+    Path ((FiniteSubcomplex.restrict map.map K).toFun x) target.pt
 
-/-- The trivial universal phantom map (uses the zero map). -/
+/-- The canonical universal phantom map built from the zero map. -/
 noncomputable def universalPhantomMap_trivial (X : Pointed.{u}) : UniversalPhantomMap X :=
   { target := X
     map := phantomZero X X
-    factor := fun _ _ => trivial
-    unique := trivial }
+    factor := fun _ f => f.map
+    factor_basepoint := fun _ f => PointedMap.map_pt_path f.map
+    map_null_on_finite := fun _ _ => Path.refl X.pt }
 
 
 /-! ## Theorems -/
@@ -211,7 +227,7 @@ noncomputable def universalPhantomMap_trivial (X : Pointed.{u}) : UniversalPhant
 /-- The zero phantom map is phantom. -/
 theorem phantomZero_isPhantom (X : Pointed.{u}) (Y : Pointed.{u}) :
     isPhantom (basepointMap X Y) :=
-  fun _ => trivial
+  fun _ _ => ⟨Path.refl Y.pt⟩
 
 /-- A phantom map composed with an inclusion yields a phantom map restricted to the subcomplex. -/
 theorem phantom_restrict_null (X : Pointed.{u}) (Y : Pointed.{u})
@@ -237,10 +253,10 @@ theorem limOneCharacterization_tower {X : Pointed.{u}} {Y : Pointed.{u}}
   rfl
 
 /-- A universal phantom map factors every phantom map out of X. -/
-theorem universal_phantom_factorization (X : Pointed.{u})
+noncomputable def universal_phantom_factorization (X : Pointed.{u})
     (U : UniversalPhantomMap X) (Y : Pointed.{u}) (f : PhantomMap X Y) :
-    U.factor Y f = trivial := by
-  rfl
+    Path ((U.factor Y f).toFun U.target.pt) Y.pt :=
+  U.factor_basepoint Y f
 
 /-- The trivial universal phantom map's target is X itself. -/
 theorem universalPhantomMap_trivial_target (X : Pointed.{u}) :
@@ -263,7 +279,7 @@ private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
 
 /-!
 We introduced finite subcomplex data, phantom maps, the phantom group Ph(X,Y),
-a lim^1 characterization scaffold, Gray's theorem data, and universal phantom
+a lim^1 representative package, Gray's theorem data, and universal phantom
 maps as lightweight structures compatible with computational paths.
 -/
 

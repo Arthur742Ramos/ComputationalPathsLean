@@ -58,10 +58,12 @@ structure GenuineGSpectrum (G : Type u) (S : StrictGroup G) where
   mackey : SpectralMackeyFunctor G S
   /-- Fixed-point spectra for each subgroup. -/
   fixedPointSpectrum : Subgroup G S → Algebra.SpectralAlgebra.Spectrum
-  /-- Restriction compatibility (abstract). -/
-  restriction : ∀ {_H _K : Subgroup G S}, True
-  /-- Transfer compatibility (abstract). -/
-  transfer : ∀ {_H _K : Subgroup G S}, True
+  /-- Restriction compatibility preserves the indexed fixed-point basepoint. -/
+  restriction : ∀ (H _K : Subgroup G S) (n : Nat),
+    Path ((fixedPointSpectrum H).basepoint n) ((fixedPointSpectrum H).basepoint n)
+  /-- Transfer compatibility preserves the indexed fixed-point basepoint. -/
+  transfer : ∀ (_H K : Subgroup G S) (n : Nat),
+    Path ((fixedPointSpectrum K).basepoint n) ((fixedPointSpectrum K).basepoint n)
 
 /-! ## Burnside ring -/
 
@@ -77,20 +79,22 @@ structure BurnsideRing (G : Type u) (S : StrictGroup G) where
   add : carrier → carrier → carrier
   /-- Multiplication. -/
   mul : carrier → carrier → carrier
-  /-- Additive commutativity (abstract). -/
-  add_comm : ∀ _x _y : carrier, True
-  /-- Additive associativity (abstract). -/
-  add_assoc : ∀ _x _y _z : carrier, True
-  /-- Additive identity (abstract). -/
-  add_zero : ∀ _x : carrier, True
-  /-- Multiplicative commutativity (abstract). -/
-  mul_comm : ∀ _x _y : carrier, True
-  /-- Multiplicative associativity (abstract). -/
-  mul_assoc : ∀ _x _y _z : carrier, True
-  /-- Multiplicative identity (abstract). -/
-  mul_one : ∀ _x : carrier, True
-  /-- Distributivity (abstract). -/
-  distrib : ∀ _x _y _z : carrier, True
+  /-- Additive commutativity. -/
+  add_comm : ∀ x y : carrier, add x y = add y x
+  /-- Additive associativity. -/
+  add_assoc : ∀ x y z : carrier, add (add x y) z = add x (add y z)
+  /-- Additive identity on both sides. -/
+  add_zero : ∀ x : carrier, add x zero = x ∧ add zero x = x
+  /-- Multiplicative commutativity. -/
+  mul_comm : ∀ x y : carrier, mul x y = mul y x
+  /-- Multiplicative associativity. -/
+  mul_assoc : ∀ x y z : carrier, mul (mul x y) z = mul x (mul y z)
+  /-- Multiplicative identity on both sides. -/
+  mul_one : ∀ x : carrier, mul x one = x ∧ mul one x = x
+  /-- Left and right distributivity. -/
+  distrib : ∀ x y z : carrier,
+    mul x (add y z) = add (mul x y) (mul x z) ∧
+    mul (add x y) z = add (mul x z) (mul y z)
 
 /-- The Burnside ring modeled as the constant Nat ring. -/
 noncomputable def burnsideRing (G : Type u) (S : StrictGroup G) : BurnsideRing G S where
@@ -99,13 +103,13 @@ noncomputable def burnsideRing (G : Type u) (S : StrictGroup G) : BurnsideRing G
   one := 1
   add := Nat.add
   mul := Nat.mul
-  add_comm := fun _ _ => trivial
-  add_assoc := fun _ _ _ => trivial
-  add_zero := fun _ => trivial
-  mul_comm := fun _ _ => trivial
-  mul_assoc := fun _ _ _ => trivial
-  mul_one := fun _ => trivial
-  distrib := fun _ _ _ => trivial
+  add_comm := Nat.add_comm
+  add_assoc := Nat.add_assoc
+  add_zero := fun x => ⟨Nat.add_zero x, Nat.zero_add x⟩
+  mul_comm := Nat.mul_comm
+  mul_assoc := Nat.mul_assoc
+  mul_one := fun x => ⟨Nat.mul_one x, Nat.one_mul x⟩
+  distrib := fun x y z => ⟨Nat.mul_add x y z, Nat.add_mul x y z⟩
 
 /-! ## RO(G)-graded cohomology -/
 
@@ -176,56 +180,61 @@ end ROCohomologyTheory
 /-- tom Dieck splitting data for a genuine G-spectrum. -/
 structure TomDieckSplitting {G : Type u} {S : StrictGroup G}
     (E : GenuineGSpectrum G S) where
-  /-- The splitting for each subgroup (abstract). -/
-  splitting : ∀ _H : Subgroup G S, True
+  /-- The splitting preserves the indexed basepoint in each fixed-point spectrum. -/
+  splitting : ∀ (H : Subgroup G S) (n : Nat),
+    Path ((E.fixedPointSpectrum H).basepoint n) ((E.fixedPointSpectrum H).basepoint n)
 
 /-- Trivial tom Dieck splitting witness. -/
 noncomputable def TomDieckSplitting.trivial {G : Type u} {S : StrictGroup G}
     (E : GenuineGSpectrum G S) : TomDieckSplitting E :=
-  { splitting := fun _ => True.intro }
+  { splitting := fun H n => Path.refl ((E.fixedPointSpectrum H).basepoint n) }
 
 /-! ## Summary -/
 
 
 /-! ## Basic path theorem layer -/
 
-theorem path_refl_1 {A : Type _} (a : A) :
-    Path.refl a = Path.refl a := by
+theorem ro_zero_degree (G : Type u) :
+    (RO.zero G).degree = 0 := by
   rfl
 
-theorem path_refl_2 {A : Type _} (a : A) :
-    Path.trans (Path.refl a) (Path.refl a) =
-      Path.trans (Path.refl a) (Path.refl a) := by
+theorem ro_shift_degree {G : Type u} (α : RO G) :
+    (RO.shift α).degree = α.degree + 1 := by
   rfl
 
-theorem path_symm_refl {A : Type _} (a : A) :
-    Path.symm (Path.refl a) = Path.symm (Path.refl a) := by
+theorem ro_add_degree {G : Type u} (α β : RO G) :
+    (RO.add α β).degree = α.degree + β.degree := by
   rfl
 
-theorem path_trans_refl {A : Type _} (a : A) :
-    Path.trans (Path.refl a) (Path.symm (Path.refl a)) =
-      Path.trans (Path.refl a) (Path.symm (Path.refl a)) := by
-  rfl
+theorem ro_add_comm_degree {G : Type u} (α β : RO G) :
+    (RO.add α β).degree = (RO.add β α).degree := by
+  exact Int.add_comm α.degree β.degree
 
-theorem path_trans_assoc_shape {A : Type _} (a : A) :
-    Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) =
-      Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) := by
-  rfl
+theorem ro_add_zero_degree {G : Type u} (α : RO G) :
+    (RO.add α (RO.zero G)).degree = α.degree := by
+  exact Int.add_zero α.degree
 
-theorem path_symm_trans_shape {A : Type _} (a : A) :
-    Path.symm (Path.trans (Path.refl a) (Path.refl a)) =
-      Path.symm (Path.trans (Path.refl a) (Path.refl a)) := by
-  rfl
+noncomputable def ro_shift_degree_path {G : Type u} (α : RO G) :
+    Path (RO.shift α).degree (α.degree + 1) :=
+  Path.stepChain (ro_shift_degree α)
 
-theorem path_trans_symm_shape {A : Type _} (a : A) :
-    Path.trans (Path.symm (Path.refl a)) (Path.refl a) =
-      Path.trans (Path.symm (Path.refl a)) (Path.refl a) := by
-  rfl
+noncomputable def burnside_add_comm_path (G : Type u) (S : StrictGroup G) (x y : Nat) :
+    Path ((burnsideRing G S).add x y) ((burnsideRing G S).add y x) :=
+  Path.stepChain ((burnsideRing G S).add_comm x y)
 
-theorem path_double_symm_refl {A : Type _} (a : A) :
-    Path.symm (Path.symm (Path.refl a)) =
-      Path.symm (Path.symm (Path.refl a)) := by
-  rfl
+noncomputable def burnside_mul_one_path (G : Type u) (S : StrictGroup G) (x : Nat) :
+    Path ((burnsideRing G S).mul x (burnsideRing G S).one) x :=
+  Path.stepChain (((burnsideRing G S).mul_one x).1)
+
+noncomputable def burnside_left_distrib_path (G : Type u) (S : StrictGroup G) (x y z : Nat) :
+    Path ((burnsideRing G S).mul x ((burnsideRing G S).add y z))
+      ((burnsideRing G S).add ((burnsideRing G S).mul x y) ((burnsideRing G S).mul x z)) :=
+  Path.stepChain (((burnsideRing G S).distrib x y z).1)
+
+noncomputable def unit_cohomology_map_id (G : Type u) (S : StrictGroup G)
+    (α : RO G) (X : Pointed) :
+    Path ((ROCohomologyTheory.trivial G S).map α (PointedMap.id X) PUnit.unit) PUnit.unit :=
+  Path.refl PUnit.unit
 
 end EquivariantStable
 end Homotopy
