@@ -287,7 +287,7 @@ noncomputable def ph_interleaving_bottleneck {A : Sort u} (il bn : A → A → A
   .cons (.interleaving_to_bottleneck il bn a b) (.nil _)
 
 -- 37. Stability through interleaving
-noncomputable def ph_stability_interleaving {A : Sort u} (dgm il bn : A → A → A) (f g : A) :
+noncomputable def ph_stability_interleaving {A : Sort u} (_dgm il bn : A → A → A) (f g : A) :
     PHPath (il f g) (bn f g) :=
   ph_interleaving_bottleneck il bn f g
 
@@ -360,7 +360,7 @@ noncomputable def ph_bottleneck_barcode {A : Sort u} (d : A → A → A) (bar : 
   ph_bottleneck_zero d (bar a)
 
 -- 50. Full persistence pipeline
-noncomputable def ph_pipeline {A : Sort u} (rips : A → A) (bar dec : A → A) (a : A) :
+noncomputable def ph_pipeline {A : Sort u} (rips : A → A) (_bar dec : A → A) (a : A) :
     PHPath (rips a) (dec (rips a)) :=
   PHPath.trans (ph_rips rips a) (ph_barcode_decompose dec (rips a))
 

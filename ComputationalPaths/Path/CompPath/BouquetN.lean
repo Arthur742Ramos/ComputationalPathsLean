@@ -808,7 +808,7 @@ noncomputable def decodeWord {n : Nat} : BouquetWord n → LoopSpaceN n
     up to rewrite equivalence. -/
 noncomputable def decodeWord_singleton_rweq {n : Nat} (i : Fin'B n) :
     RwEq (decodeWord (BouquetWord.singleton i)) (bouquetLoop i) := by
-  simp only [BouquetWord.singleton, decodeWord, iterateLoopInt, ge_iff_le, iterateLoopPos]
+  simp only [BouquetWord.singleton, decodeWord, iterateLoopInt, ge_iff_le]
   apply rweq_trans
     (rweq_trans_congr_left (Path.refl bouquetBase) (rweq_cmpA_refl_right (bouquetLoop i)))
   exact rweq_cmpA_refl_right (bouquetLoop i)

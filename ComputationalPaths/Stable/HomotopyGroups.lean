@@ -258,7 +258,7 @@ structure CofiberData (E F C : HtpySpectrum.{u}) where
 
 /-- Connecting map δ : π_n(C) → π_{n-1}(E) for the long exact sequence. -/
 noncomputable def connectingMap (E F C : HtpySpectrum.{u})
-    (data : CofiberData E F C) (n : Int) :
+    (_data : CofiberData E F C) (n : Int) :
     C.space n → E.space n :=
   fun _x => E.basepoint n  -- abstract connecting map
 
@@ -351,7 +351,7 @@ structure TodaBracket (E₀ E₁ E₂ E₃ : HtpySpectrum.{u}) where
 
 /-- The Toda bracket ⟨f, g, h⟩ is defined up to indeterminacy. -/
 noncomputable def todaBracketElement (E₀ E₁ E₂ E₃ : HtpySpectrum.{u})
-    (tb : TodaBracket E₀ E₁ E₂ E₃) (n : Int) (x : E₀.space n) :
+    (_tb : TodaBracket E₀ E₁ E₂ E₃) (n : Int) (_x : E₀.space n) :
     E₃.space n :=
   E₃.basepoint n  -- abstract element in the bracket
 
@@ -477,9 +477,9 @@ structure SmashPairing (E F G : HtpySpectrum.{u}) where
 /-- Smash product is "associative" up to path. -/
 noncomputable def smash_assoc_path
     (E F G H : HtpySpectrum.{u})
-    (μ₁ : SmashPairing E F G) (μ₂ : SmashPairing G H I)
-    (μ₃ : SmashPairing F H J) (μ₄ : SmashPairing E J I)
     {I J : HtpySpectrum.{u}}
+    (μ₁ : SmashPairing E F G) (μ₂ : SmashPairing G H I)
+    (_μ₃ : SmashPairing F H J) (_μ₄ : SmashPairing E J I)
     (n m k : Int) (x : E.space n) (y : F.space m) (z : H.space k) :
     Path (μ₂.pair (n + m) k (μ₁.pair n m x y) z)
          (μ₂.pair (n + m) k (μ₁.pair n m x y) z) :=
@@ -488,8 +488,8 @@ noncomputable def smash_assoc_path
 /-- Step: smash associativity path with refl. -/
 noncomputable def smash_assoc_step
     (E F G H : HtpySpectrum.{u})
-    (μ₁ : SmashPairing E F G) (μ₂ : SmashPairing G H I)
     {I : HtpySpectrum.{u}}
+    (μ₁ : SmashPairing E F G) (μ₂ : SmashPairing G H I)
     (n m k : Int) (x : E.space n) (y : F.space m) (z : H.space k) :
     Path.Step
       (Path.trans (Path.refl (μ₂.pair (n + m) k (μ₁.pair n m x y) z))

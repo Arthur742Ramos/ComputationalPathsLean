@@ -179,7 +179,7 @@ structure SketchModels (_ : Sketch) where
 
 -- A category is sketchable if it is equivalent to the category of models of a limit-colimit sketch.
 -- We encode this as: there exists a sketch-like indexing set and an interpretation.
-noncomputable def IsSketchable (C : Type u) : Prop :=
+noncomputable def IsSketchable (_C : Type u) : Prop :=
   ∃ (coneCount coconeCount : Nat), coneCount + coconeCount ≥ 0
 
 -- ============================================================

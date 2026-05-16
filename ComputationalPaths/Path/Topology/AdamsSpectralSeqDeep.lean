@@ -325,7 +325,7 @@ noncomputable def periodic_stem {A : Sort u} (v lim e : A → A) (a : A) :
   AdamsPath.congrArg v (stem_computation lim e a)
 
 -- 48. Adams spectral sequence full chain
-noncomputable def adams_full_chain {A : Sort u} (d ext lim e : A → A) (a : A) :
+noncomputable def adams_full_chain {A : Sort u} (d ext lim _e : A → A) (a : A) :
     AdamsPath (lim (ext (d (d a)))) (ext a) :=
   AdamsPath.trans
     (AdamsPath.congrArg lim (AdamsPath.congrArg ext (d2_square_zero_path d a)))

@@ -171,7 +171,7 @@ theorem CohomologyRepresentability.eval_natural
     {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
     (n : Nat) {X Y : Pointed} (f : PointedMap X Y)
     (g : PointedMap Y (R.space n)) :
-    ∃ (result : H.cohomology n X), True :=
+    ∃ (_result : H.cohomology n X), True :=
   ⟨(R.represent n X).toFun ⟨fun x => g.toFun (f.toFun x), by simp [f.map_pt, g.map_pt]⟩, trivial⟩
 
 /-- The basepoint map is the zero of the representable hom set. -/

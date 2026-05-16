@@ -245,7 +245,7 @@ structure ProEtaleSheafData (X : Type u) (F : X → Type v) where
   restrict_comp : ∀ {x y z : X} (p : x = y) (q : y = z) (s : F x),
     Path (restrict q (restrict p s)) (restrict (p ▸ q) s)
   glue : ∀ (cov : ProEtaleCoverData X)
-    (sections : ∀ i : cov.index, ∀ x, F (cov.cover i x)),
+    (_sections : ∀ i : cov.index, ∀ x, F (cov.cover i x)),
     ∀ x, F x
 
 noncomputable def proetale_restrict_id {X : Type u} {F : X → Type v}
@@ -339,11 +339,11 @@ structure PerfectoidSpaceData (X : Type u) where
   local_perf : ∀ p, PerfectoidRingData (local_ring p)
   restrict : ∀ {U V : points → Prop}, (∀ p, U p → V p) → sections V → sections U
   restrict_id : ∀ (U : points → Prop) (s : sections U),
-    Path (restrict (fun p h => h) s) s
+    Path (restrict (fun _p h => h) s) s
 
 noncomputable def perf_space_restrict_id {X : Type u} (S : PerfectoidSpaceData X)
     (U : S.points → Prop) (s : S.sections U) :
-    Path (S.restrict (fun p h => h) s) s :=
+    Path (S.restrict (fun _p h => h) s) s :=
   S.restrict_id U s
 
 structure PerfectoidMorphData (X Y : Type u)
@@ -454,7 +454,7 @@ structure CondensedSetData (F : Type u → Type v) where
   map_id : ∀ {S : Type u} (x : F S), Path (map id x) x
   map_comp : ∀ {S T U : Type u} (f : S → T) (g : T → U) (x : F U),
     Path (map f (map g x)) (map (g ∘ f) x)
-  sheaf_disj : ∀ {S T : Type u} (x : F S) (y : F T), F (S ⊕ T)
+  sheaf_disj : ∀ {S T : Type u} (_x : F S) (_y : F T), F (S ⊕ T)
 
 structure CondensedAbData (F : Type u → Type v)
     extends CondensedSetData F where

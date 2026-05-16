@@ -14,7 +14,7 @@ noncomputable def isAccessible (C : PresentableInfinityCategory) : Prop :=
 
 -- cocomplete: all small colimits exist (represented by colimitSeed)
 noncomputable def isCocomplete (C : PresentableInfinityCategory) : Prop :=
-  ∀ f : C.Obj → C.Obj, ∃ c : C.Obj, ∀ x, f x = f x  -- colimit cone exists
+  ∀ f : C.Obj → C.Obj, ∃ _c : C.Obj, ∀ x, f x = f x  -- colimit cone exists
 
 noncomputable def isPresentable (C : PresentableInfinityCategory) : Prop :=
   isAccessible C ∧ isCocomplete C

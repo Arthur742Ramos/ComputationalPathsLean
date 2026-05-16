@@ -155,7 +155,7 @@ theorem modC_hurewicz {C : SerreClass} {G H : Type u} (data : ModCHurewiczData C
 structure ModCWhiteheadData (C : SerreClass) {A B : Type u} (f : A → B)
     extends WhiteheadTheorem.WeakEquivData f where
   /-- Each induced map on pi_n is a C-isomorphism at every basepoint. -/
-  cisom_piN : ∀ (n : Nat) (a : A), CIsomorphism C f (f a)
+  cisom_piN : ∀ (_n : Nat) (a : A), CIsomorphism C f (f a)
 
 /-- Mod C Whitehead theorem: mod C data plus a bijection gives Whitehead data. -/
 noncomputable def modC_whitehead {C : SerreClass} {A B : Type u} {f : A → B}

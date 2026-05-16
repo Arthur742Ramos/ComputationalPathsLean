@@ -96,7 +96,7 @@ noncomputable def constantFiltration {V : Type u} (K : SimplicialComplex V) : Fi
     (constantFiltration K).level n = K := rfl
 
 @[simp] theorem constantFiltration_monotone {V : Type u}
-    (K : SimplicialComplex V) (i j : Nat) (h : i ≤ j) (s : Simplex V)
+    (K : SimplicialComplex V) (i j : Nat) (_h : i ≤ j) (s : Simplex V)
     (hf : (constantFiltration K).level i |>.hasFace s) :
     (constantFiltration K).level j |>.hasFace s := hf
 
@@ -135,7 +135,7 @@ noncomputable def shift (M : PersistenceModule) (eps : Nat) : PersistenceModule 
   carrier := fun i => M.carrier (i + eps)
   map := fun {_i _j} h => M.map (Nat.add_le_add_right h eps)
   mapId := fun i x => M.mapId (i + eps) x
-  mapComp := fun {i j k} hij hjk x => M.mapComp (Nat.add_le_add_right hij eps) (Nat.add_le_add_right hjk eps) x
+  mapComp := fun {_i _j _k} hij hjk x => M.mapComp (Nat.add_le_add_right hij eps) (Nat.add_le_add_right hjk eps) x
 
 @[simp] theorem shift_carrier (M : PersistenceModule) (eps i : Nat) :
     (shift M eps).carrier i = M.carrier (i + eps) := rfl
@@ -386,11 +386,11 @@ noncomputable def cechFiltration (X : FiniteMetricSpace) : Filtration X.Point wh
 @[simp] theorem cechFiltration_level (X : FiniteMetricSpace) (n : Nat) :
     (cechFiltration X).level n = CechComplex X n := rfl
 
-@[simp] theorem ripsFiltration_monotone (X : FiniteMetricSpace) (i j : Nat) (h : i ≤ j)
+@[simp] theorem ripsFiltration_monotone (X : FiniteMetricSpace) (i j : Nat) (_h : i ≤ j)
     (s : Simplex X.Point) (hf : (ripsFiltration X).level i |>.hasFace s) :
     (ripsFiltration X).level j |>.hasFace s := hf
 
-@[simp] theorem cechFiltration_monotone (X : FiniteMetricSpace) (i j : Nat) (h : i ≤ j)
+@[simp] theorem cechFiltration_monotone (X : FiniteMetricSpace) (i j : Nat) (_h : i ≤ j)
     (s : Simplex X.Point) (hf : (cechFiltration X).level i |>.hasFace s) :
     (cechFiltration X).level j |>.hasFace s := hf
 

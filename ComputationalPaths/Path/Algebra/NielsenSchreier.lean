@@ -70,24 +70,24 @@ noncomputable def intToFreeGroupOne_freeGroupOneToInt_path (x : BouquetFreeGroup
 
 theorem freeGroup_rank_formula_one_path_toEq (k : Nat) :
     (freeGroup_rank_formula_one_path k).toEq = (freeGroup_rank_formula_one k).toEq := by
-  simp [Path.toEq]
+  simp
 
 
 theorem intToFreeGroupOne_eq_genPow_path_toEq (k : Int) :
     (intToFreeGroupOne_eq_genPow_path k).toEq = (intToFreeGroupOne_eq_genPow k).toEq := by
-  simp [Path.toEq]
+  simp
 
 theorem freeGroupOneToInt_mul_path_toEq (x y : BouquetFreeGroup 1) :
     (freeGroupOneToInt_mul_path x y).toEq = freeGroupOneToInt_mul x y := by
-  simp [Path.toEq]
+  simp
 
 theorem freeGroupOneToInt_pow_path_toEq (x : BouquetFreeGroup 1) (k : Nat) :
     (freeGroupOneToInt_pow_path x k).toEq = freeGroupOneToInt_pow x k := by
-  simp [Path.toEq]
+  simp
 
 theorem freeGroupOneToInt_intToFreeGroupOne_path_toEq (k : Int) :
     (freeGroupOneToInt_intToFreeGroupOne_path k).toEq = freeGroupOneToInt_intToFreeGroupOne k := by
-  simp [Path.toEq]
+  simp
 
 theorem intToFreeGroupOne_freeGroupOneToInt_path_refl_right (x : BouquetFreeGroup 1) :
     Path.trans (intToFreeGroupOne_freeGroupOneToInt_path x) (Path.refl x) =
