@@ -103,6 +103,8 @@ ComputationalPathsLean/
 - `docs/modules.md` - source/module navigation map and intended import entrypoints.
 - `docs/axioms.md` - current axiom and typeclass inventory.
 - `paper/README.md` - paper directory contents, LaTeX source notes, and historical wave-note classification.
+- `CONTRIBUTING.md` - contribution workflow, local checks, proof hygiene, and PR expectations.
+- `SUPPORT.md` - where to ask repository questions or report build and documentation issues.
 - `docs/archive/README.md` - provenance for historical audits and generated run outputs.
 - `ComputationalPaths/README.md` and `ComputationalPaths/Path/README.md` - source-local navigation notes.
 
@@ -176,11 +178,18 @@ Use the badge at the top of this README to check live build status.
 
 ## Contributing
 
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup, local checks, proof hygiene,
+documentation expectations, and PR guidance.
+
 - Keep new proofs `sorry`-free and avoid new global axioms.
 - If a development must rely on an axiom or assumption, document it and keep `docs/axioms.md` current.
 - Prefer `Path`/`RwEq`-based reasoning for equality developments.
 - Run `lake build` before opening a PR.
 - Keep canonical documentation under `docs/`; move historical audits or generated run logs to `docs/archive/` rather than leaving them in the repository root.
+
+## Citation
+
+Software citation metadata is available in [`CITATION.cff`](CITATION.cff).
 
 ## License
 

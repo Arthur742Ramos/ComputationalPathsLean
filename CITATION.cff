@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this Lean companion repository, please cite the repository and the associated computational paths work."
+type: software
+title: "ComputationalPathsLean"
+authors:
+  - family-names: "Ramos"
+    given-names: "Arthur Freitas"
+  - family-names: "de Queiroz"
+    given-names: "Ruy J.G.B."
+  - family-names: "de Oliveira"
+    given-names: "Anjolina Grisi"
+  - family-names: "Veras"
+    given-names: "Tiago"
+repository-code: "https://github.com/Arthur742Ramos/ComputationalPathsLean"
+url: "https://github.com/Arthur742Ramos/ComputationalPathsLean"
+license: "MIT"
+keywords:
+  - "Lean 4"
+  - "computational paths"
+  - "term rewriting"
+  - "proof assistant"
+  - "homotopy type theory"
