@@ -421,82 +421,57 @@ structure LatCongruence where
   meet_compat : ∀ a₁ a₂ b₁ b₂, rel a₁ a₂ → rel b₁ b₂ → rel (meet a₁ b₁) (meet a₂ b₂)
   join_compat : ∀ a₁ a₂ b₁ b₂, rel a₁ a₂ → rel b₁ b₂ → rel (join a₁ b₁) (join a₂ b₂)
 
-/-- Concrete relation data: two elements are tracked below a recorded common upper bound. -/
-structure CommonUpperData (a b : LatElem) where
-  bound : Nat
-  left_le : a.val ≤ bound
-  right_le : b.val ≤ bound
+/-- Fixed cutoff used by the bounded congruence. -/
+def boundedCongruenceCutoff : Nat := 3
 
-namespace CommonUpperData
+private theorem meet_le_cutoff_iff (a b : LatElem) :
+    (meet a b).val ≤ boundedCongruenceCutoff ↔
+      a.val ≤ boundedCongruenceCutoff ∨ b.val ≤ boundedCongruenceCutoff := by
+  simp [meet, boundedCongruenceCutoff]
+  omega
 
-theorem of_pair (a b : LatElem) : Nonempty (CommonUpperData a b) :=
-  ⟨{
-    bound := max a.val b.val
-    left_le := Nat.le_max_left a.val b.val
-    right_le := Nat.le_max_right a.val b.val
-  }⟩
+private theorem join_le_cutoff_iff (a b : LatElem) :
+    (join a b).val ≤ boundedCongruenceCutoff ↔
+      a.val ≤ boundedCongruenceCutoff ∧ b.val ≤ boundedCongruenceCutoff := by
+  simp [join, boundedCongruenceCutoff]
+  omega
 
-theorem refl (a : LatElem) : Nonempty (CommonUpperData a a) :=
-  of_pair a a
+private theorem bounded_meet_compat {a₁ a₂ b₁ b₂ : LatElem}
+    (ha : (a₁.val ≤ boundedCongruenceCutoff) ↔ (a₂.val ≤ boundedCongruenceCutoff))
+    (hb : (b₁.val ≤ boundedCongruenceCutoff) ↔ (b₂.val ≤ boundedCongruenceCutoff)) :
+    ((meet a₁ b₁).val ≤ boundedCongruenceCutoff) ↔
+      ((meet a₂ b₂).val ≤ boundedCongruenceCutoff) := by
+  rw [meet_le_cutoff_iff, meet_le_cutoff_iff]
+  constructor
+  · intro h
+    cases h with
+    | inl h => exact Or.inl (ha.mp h)
+    | inr h => exact Or.inr (hb.mp h)
+  · intro h
+    cases h with
+    | inl h => exact Or.inl (ha.mpr h)
+    | inr h => exact Or.inr (hb.mpr h)
 
-theorem symm {a b : LatElem} (h : Nonempty (CommonUpperData a b)) :
-    Nonempty (CommonUpperData b a) := by
-  rcases h with ⟨h⟩
-  exact ⟨{
-    bound := h.bound
-    left_le := h.right_le
-    right_le := h.left_le
-  }⟩
+private theorem bounded_join_compat {a₁ a₂ b₁ b₂ : LatElem}
+    (ha : (a₁.val ≤ boundedCongruenceCutoff) ↔ (a₂.val ≤ boundedCongruenceCutoff))
+    (hb : (b₁.val ≤ boundedCongruenceCutoff) ↔ (b₂.val ≤ boundedCongruenceCutoff)) :
+    ((join a₁ b₁).val ≤ boundedCongruenceCutoff) ↔
+      ((join a₂ b₂).val ≤ boundedCongruenceCutoff) := by
+  rw [join_le_cutoff_iff, join_le_cutoff_iff]
+  constructor
+  · intro h
+    exact ⟨ha.mp h.left, hb.mp h.right⟩
+  · intro h
+    exact ⟨ha.mpr h.left, hb.mpr h.right⟩
 
-theorem trans {a b c : LatElem}
-    (hab : Nonempty (CommonUpperData a b)) (hbc : Nonempty (CommonUpperData b c)) :
-    Nonempty (CommonUpperData a c) := by
-  rcases hab with ⟨hab⟩
-  rcases hbc with ⟨hbc⟩
-  refine ⟨⟨max hab.bound hbc.bound, ?_, ?_⟩⟩
-  · exact Nat.le_trans hab.left_le (Nat.le_max_left hab.bound hbc.bound)
-  · exact Nat.le_trans hbc.right_le (Nat.le_max_right hab.bound hbc.bound)
-
-theorem meet_compat {a₁ a₂ b₁ b₂ : LatElem}
-    (ha : Nonempty (CommonUpperData a₁ a₂)) (hb : Nonempty (CommonUpperData b₁ b₂)) :
-    Nonempty (CommonUpperData (meet a₁ b₁) (meet a₂ b₂)) := by
-  rcases ha with ⟨ha⟩
-  rcases hb with ⟨hb⟩
-  have ha_left : a₁.val ≤ ha.bound := ha.left_le
-  have ha_right : a₂.val ≤ ha.bound := ha.right_le
-  have hb_left : b₁.val ≤ hb.bound := hb.left_le
-  have hb_right : b₂.val ≤ hb.bound := hb.right_le
-  refine ⟨⟨min ha.bound hb.bound, ?_, ?_⟩⟩
-  · simp [meet]
-    omega
-  · simp [meet]
-    omega
-
-theorem join_compat {a₁ a₂ b₁ b₂ : LatElem}
-    (ha : Nonempty (CommonUpperData a₁ a₂)) (hb : Nonempty (CommonUpperData b₁ b₂)) :
-    Nonempty (CommonUpperData (join a₁ b₁) (join a₂ b₂)) := by
-  rcases ha with ⟨ha⟩
-  rcases hb with ⟨hb⟩
-  have ha_left : a₁.val ≤ ha.bound := ha.left_le
-  have ha_right : a₂.val ≤ ha.bound := ha.right_le
-  have hb_left : b₁.val ≤ hb.bound := hb.left_le
-  have hb_right : b₂.val ≤ hb.bound := hb.right_le
-  refine ⟨⟨max ha.bound hb.bound, ?_, ?_⟩⟩
-  · simp [join]
-    omega
-  · simp [join]
-    omega
-
-end CommonUpperData
-
-/-- Bounded congruence: relation proofs carry an explicit shared upper-bound package. -/
+/-- Bounded congruence: elements are related when they lie on the same side of a fixed cutoff. -/
 noncomputable def boundedCongruence : LatCongruence where
-  rel := fun a b => Nonempty (CommonUpperData a b)
-  refl := CommonUpperData.refl
-  symm := fun _ _ h => CommonUpperData.symm h
-  trans := fun _ _ _ h1 h2 => CommonUpperData.trans h1 h2
-  meet_compat := fun _ _ _ _ h1 h2 => CommonUpperData.meet_compat h1 h2
-  join_compat := fun _ _ _ _ h1 h2 => CommonUpperData.join_compat h1 h2
+  rel := fun a b => (a.val ≤ boundedCongruenceCutoff) ↔ (b.val ≤ boundedCongruenceCutoff)
+  refl := fun _ => Iff.rfl
+  symm := fun _ _ h => h.symm
+  trans := fun _ _ _ h1 h2 => h1.trans h2
+  meet_compat := fun _ _ _ _ h1 h2 => bounded_meet_compat h1 h2
+  join_compat := fun _ _ _ _ h1 h2 => bounded_join_compat h1 h2
 
 /-- Discrete congruence: only equal elements are related. -/
 noncomputable def discreteCongruence : LatCongruence where
