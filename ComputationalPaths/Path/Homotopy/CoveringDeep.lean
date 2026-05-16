@@ -189,8 +189,8 @@ noncomputable def liftPath (cov : CoveringMap E B)
     { e' : E // cov.proj e' = b } := by
   exact ⟨e, he.trans p.proof⟩
 
-/-- **Uniqueness of path lifting**: two lifts of the same base path starting at
-    the same fiber point are equal.  Proved by induction on the step list. -/
+/-- Equality-only uniqueness: two values identified with the same transported
+    endpoint are equal.  Genuine trace-level lifting is handled by `liftChain`. -/
 theorem liftPath_unique (cov : CoveringMap E B)
     {a b : B} (p : Path a b) (e : E) (he : cov.proj e = a)
     (lift1 lift2 : { e' : E // cov.proj e' = b })
@@ -205,16 +205,17 @@ theorem liftPath_unique (cov : CoveringMap E B)
 noncomputable def Fiber (cov : CoveringMap E B) (b : B) : Type u :=
   { e : E // cov.proj e = b }
 
-/-- The monodromy transport: given a loop `γ` at `b` (a `Path b b`), we get
-    a function `Fiber cov b → Fiber cov b` by lifting the path. -/
+/-- Equality-only monodromy transport for raw `Path` loops.
+
+Raw `Path.steps` metadata is not known to be composable, so this operation uses
+only the proof field.  Use `chainMonodromy` from `PathLifting` for monodromy
+that records actual lifted step traces. -/
 noncomputable def monodromy (cov : CoveringMap E B) {b : B}
     (γ : Path b b) : Fiber cov b → Fiber cov b :=
   fun ⟨e, he⟩ => liftPath cov γ e he
 
-/-- Monodromy respects path composition (`Path.trans`): the monodromy of a
-    composite path is the composition of monodromies.  This follows directly
-    from the step-by-step lifting construction: `(Path.trans γ₁ γ₂).steps =
-    γ₁.steps ++ γ₂.steps`. -/
+/-- Equality-only monodromy respects path composition.  The corresponding
+    trace-level statement is `chainMonodromy_append`. -/
 theorem monodromy_trans (cov : CoveringMap E B) {b : B}
     (γ₁ γ₂ : Path b b) (fiber : Fiber cov b) :
     monodromy cov (Path.trans γ₁ γ₂) fiber =
@@ -223,8 +224,7 @@ theorem monodromy_trans (cov : CoveringMap E B) {b : B}
   apply Subtype.ext
   rfl
 
-/-- Monodromy of `Path.refl` is the identity on fibers.  `Path.refl` has
-    an empty step list, so no lifting occurs. -/
+/-- Equality-only monodromy of `Path.refl` is the identity on fibers. -/
 theorem monodromy_refl (cov : CoveringMap E B) {b : B}
     (fiber : Fiber cov b) :
     monodromy cov (Path.refl b) fiber = fiber := by
@@ -232,15 +232,10 @@ theorem monodromy_refl (cov : CoveringMap E B) {b : B}
   apply Subtype.ext
   rfl
 
-/-- **RwEq-invariance of monodromy**: if two loops are related by `RwEq` (the
-    symmetric rewrite closure), they induce the same monodromy.  This is the
-    key well-definedness result for the monodromy *action*.
+/-- Equality-only `RwEq`-invariance for raw-path monodromy.
 
-    Proof by induction on `RwEq`:
-    - `refl`: trivial
-    - `step`: a single rewrite step preserves lifting endpoints
-    - `symm`: by symmetry
-    - `trans`: by transitivity -/
+For step-trace monodromy this is not automatic; `HomotopyLiftingCoveringMap`
+records the required homotopy-lifting property. -/
 noncomputable def monodromy_rweq_invariant (cov : CoveringMap E B) {b : B}
     {γ₁ γ₂ : Path b b} (h : RwEq γ₁ γ₂) (fiber : Fiber cov b) :
     monodromy cov γ₁ fiber = monodromy cov γ₂ fiber := by
@@ -253,9 +248,9 @@ noncomputable def monodromy_rweq_invariant (cov : CoveringMap E B) {b : B}
   | symm _ ih => exact ih.symm
   | trans _ _ ih1 ih2 => exact ih1.trans ih2
 
-/-- Monodromy gives a well-defined group action of π₁(B, b) on the fiber.
+/-- Equality-only monodromy gives a group action of raw loops on the fiber.
     The group operation in π₁ is `Path.trans` (composition of loops),
-    and the identity is `Path.refl`.  Well-definedness uses `RwEq`-invariance. -/
+    and the identity is `Path.refl`. -/
 structure MonodromyAction (cov : CoveringMap E B) (b : B) where
   /-- The action on fibers -/
   act : Path b b → Fiber cov b → Fiber cov b
