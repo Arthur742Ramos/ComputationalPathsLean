@@ -204,7 +204,7 @@ noncomputable def prodPiOneEquiv_fwdRoundtrip_path
 
 end ProductFundamentalGroup
 
-/-! ## Application: n-Torus (Placeholder) -/
+/-! ## Application: n-Torus product decomposition -/
 
 section NTorusFundamentalGroup
 

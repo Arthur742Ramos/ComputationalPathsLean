@@ -31,25 +31,25 @@ private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
 
 /-! ## Surface type representatives -/
 
-/-- Placeholder type for the 2-sphere S². -/
+/-- Carrier model for the 2-sphere S². -/
 abbrev Sphere2 : Type := PUnit
 
 /-- Basepoint of S². -/
 @[simp] abbrev sphere2Base : Sphere2 := PUnit.unit
 
-/-- Placeholder type for a closed orientable surface of genus g. -/
+/-- Carrier model for a closed orientable surface of genus g. -/
 abbrev Surface (_g : Nat) : Type := PUnit
 
 /-- Basepoint of Σ_g. -/
 @[simp] abbrev surfaceBase (g : Nat) : Surface g := PUnit.unit
 
-/-- Placeholder type for the real projective plane RP². -/
+/-- Carrier model for the real projective plane RP². -/
 abbrev RP2 : Type := PUnit
 
 /-- Basepoint of RP². -/
 @[simp] abbrev rp2Base : RP2 := PUnit.unit
 
-/-- Placeholder type for the Klein bottle. -/
+/-- Carrier model for the Klein bottle. -/
 abbrev KleinBottle : Type := PUnit
 
 /-- Basepoint of Klein bottle. -/

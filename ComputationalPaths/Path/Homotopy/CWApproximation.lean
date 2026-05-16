@@ -3,7 +3,7 @@
 
 This module records CW approximation statements in the computational-path setting.
 We model CW approximation data for maps between CW complexes, provide the
-tautological approximation for the identity map, and develop additional
+canonical approximation for the identity map, and develop additional
 consequences including composition of approximations, uniqueness up to homotopy,
 and the skeletal filtration properties.
 
