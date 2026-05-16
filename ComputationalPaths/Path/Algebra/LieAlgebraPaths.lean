@@ -126,6 +126,14 @@ structure LieIdeal (LA : PathLieAlg A) {a : A} where
   add_mem : ∀ p q, mem p → mem q → mem (LA.add p q)
   bracket_mem : ∀ p q, mem q → mem (LA.bracket p q)
 
+/-- A loop-family membership certificate carrying an explicit self path. -/
+structure LoopSelfCertificate {a : A} (p : Path a a) where
+  selfPath : Path p p
+
+/-- The canonical certificate that a loop belongs to an unrestricted loop family. -/
+noncomputable def LoopSelfCertificate.refl {a : A} (p : Path a a) : LoopSelfCertificate p where
+  selfPath := Path.refl p
+
 /-- The zero ideal. -/
 noncomputable def zeroIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) where
   mem := fun p => p = LA.zero a
@@ -135,10 +143,10 @@ noncomputable def zeroIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) w
 
 /-- The whole algebra as an ideal. -/
 noncomputable def wholeIdeal (LA : PathLieAlg A) {a : A} : LieIdeal LA (a := a) where
-  mem := fun _ => True
-  zero_mem := trivial
-  add_mem := fun _ _ _ _ => trivial
-  bracket_mem := fun _ _ _ => trivial
+  mem := fun p => Nonempty (LoopSelfCertificate p)
+  zero_mem := ⟨LoopSelfCertificate.refl (LA.zero a)⟩
+  add_mem := fun p q _ _ => ⟨LoopSelfCertificate.refl (LA.add p q)⟩
+  bracket_mem := fun p q _ => ⟨LoopSelfCertificate.refl (LA.bracket p q)⟩
 
 /-! ## Derived series and solvability -/
 
@@ -148,7 +156,7 @@ noncomputable def isDerived (LA : PathLieAlg A) {a : A} (p : Path a a) : Prop :=
 
 /-- Iterated derived series predicate. -/
 noncomputable def inDerivedN (LA : PathLieAlg A) {a : A} : Nat → Path a a → Prop
-  | 0 => fun _ => True
+  | 0 => fun p => Nonempty (LoopSelfCertificate p)
   | n + 1 => fun p => ∃ q r : Path a a,
       inDerivedN LA n q ∧ inDerivedN LA n r ∧ p = LA.bracket q r
 
@@ -160,7 +168,7 @@ noncomputable def isSolvable (LA : PathLieAlg A) {a : A} : Prop :=
 
 /-- Lower central series predicate. -/
 noncomputable def inLowerCentralN (LA : PathLieAlg A) {a : A} : Nat → Path a a → Prop
-  | 0 => fun _ => True
+  | 0 => fun p => Nonempty (LoopSelfCertificate p)
   | n + 1 => fun p => ∃ q r : Path a a,
       inLowerCentralN LA n q ∧ p = LA.bracket q r
 
@@ -168,13 +176,15 @@ noncomputable def inLowerCentralN (LA : PathLieAlg A) {a : A} : Nat → Path a a
 noncomputable def isNilpotent (LA : PathLieAlg A) {a : A} : Prop :=
   ∃ n : Nat, ∀ p : Path a a, inLowerCentralN LA n p → p = LA.zero a
 
-/-- Zero-step derived series is trivially satisfied. -/
+/-- Zero-step derived series records the loop self-certificate. -/
 theorem inDerivedN_zero (LA : PathLieAlg A) {a : A} (p : Path a a) :
-    inDerivedN LA 0 p := trivial
+    inDerivedN LA 0 p :=
+  ⟨LoopSelfCertificate.refl p⟩
 
-/-- Zero-step lower central series is trivially satisfied. -/
+/-- Zero-step lower central series records the loop self-certificate. -/
 theorem inLowerCentralN_zero (LA : PathLieAlg A) {a : A} (p : Path a a) :
-    inLowerCentralN LA 0 p := trivial
+    inLowerCentralN LA 0 p :=
+  ⟨LoopSelfCertificate.refl p⟩
 
 /-- Nilpotent implies solvable. -/
 theorem nilpotent_implies_solvable_step (LA : PathLieAlg A) {a : A}

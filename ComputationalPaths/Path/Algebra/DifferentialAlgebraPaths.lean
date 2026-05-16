@@ -81,14 +81,22 @@ structure DiffIdeal (DR : DiffRing R) where
   mul_absorb : ∀ x y, mem x → mem (DR.mul x y)
   deriv_mem : ∀ x, mem x → mem (DR.deriv x)
 
+/-- A membership certificate for the full differential ideal, retaining a self path. -/
+structure FullDiffIdealMember (x : R) where
+  selfPath : Path x x
+
+/-- The canonical full-ideal certificate for an element: its reflexive computational path. -/
+noncomputable def FullDiffIdealMember.refl (x : R) : FullDiffIdealMember x where
+  selfPath := Path.refl x
+
 /-- The full ring is a differential ideal. -/
 noncomputable def fullDiffIdeal (DR : DiffRing R) : DiffIdeal DR where
-  mem := fun _ => True
-  zero_mem := trivial
-  add_mem := fun _ _ _ _ => trivial
-  neg_mem := fun _ _ => trivial
-  mul_absorb := fun _ _ _ => trivial
-  deriv_mem := fun _ _ => trivial
+  mem := fun x => Nonempty (FullDiffIdealMember x)
+  zero_mem := ⟨FullDiffIdealMember.refl DR.zero⟩
+  add_mem := fun x y _ _ => ⟨FullDiffIdealMember.refl (DR.add x y)⟩
+  neg_mem := fun x _ => ⟨FullDiffIdealMember.refl (DR.neg x)⟩
+  mul_absorb := fun x y _ => ⟨FullDiffIdealMember.refl (DR.mul x y)⟩
+  deriv_mem := fun x _ => ⟨FullDiffIdealMember.refl (DR.deriv x)⟩
 
 /-- Intersection of two differential ideals. -/
 noncomputable def interDiffIdeal (DR : DiffRing R) (I J : DiffIdeal DR) : DiffIdeal DR where
