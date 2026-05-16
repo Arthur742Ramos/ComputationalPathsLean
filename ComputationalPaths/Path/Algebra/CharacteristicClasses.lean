@@ -419,7 +419,8 @@ noncomputable def chernCharacterTrivialDegreeZero (n : Nat) : Nat := n
 
 /-- ch(trivial_0) = 0 in degree 0. -/
 theorem chernCharacterTrivial_zero :
-    chernCharacterTrivialDegreeZero 0 = 0 := rfl
+    chernCharacterTrivialDegreeZero 0 = 0 := by
+  simp [chernCharacterTrivialDegreeZero]
 
 /-- ch(trivial_1) = 1 in degree 0. -/
 theorem chernCharacterTrivial_one :

@@ -155,7 +155,8 @@ theorem principal_character_eval (q n : Nat) :
     (DirichletCharacter.principal q).value n = 1 := rfl
 
 theorem riemannZetaPartial_zero (s : Int) :
-    riemannZetaPartial s 0 = 0 := rfl
+    riemannZetaPartial s 0 = 0 := by
+  simp [riemannZetaPartial]
 
 theorem riemannZetaPartial_succ (s : Int) (n : Nat) :
     riemannZetaPartial s (Nat.succ n) =
@@ -165,7 +166,8 @@ theorem riemannZetaFormal_def (s : Int) (N : Nat) :
     riemannZetaFormal s N = riemannZetaPartial s N := rfl
 
 theorem dirichletLPartial_zero (χ : DirichletCharacter) (s : Int) :
-    dirichletLPartial χ s 0 = 0 := rfl
+    dirichletLPartial χ s 0 = 0 := by
+  simp [dirichletLPartial]
 
 theorem dirichletLPartial_succ (χ : DirichletCharacter) (s : Int) (n : Nat) :
     dirichletLPartial χ s (Nat.succ n) =
@@ -199,14 +201,16 @@ theorem largeSieveBound_nonneg (L : LargeSieveDatum) :
   exact Int.natCast_nonneg _
 
 theorem chebyshevPsi_zero :
-    chebyshevPsi 0 = 0 := rfl
+    chebyshevPsi 0 = 0 := by
+  simp [chebyshevPsi]
 
 theorem arithmeticProgressionCount_mod_one (x a : Nat) :
     arithmeticProgressionCount x 1 a = x := by
   simp [arithmeticProgressionCount, Nat.div_one, Nat.mod_one]
 
 theorem logarithmicIntegralModel_zero :
-    logarithmicIntegralModel 0 = 0 := rfl
+    logarithmicIntegralModel 0 = 0 := by
+  simp [logarithmicIntegralModel]
 
 theorem mollifierWeight_zero :
     mollifierWeight 0 = 1 := rfl
