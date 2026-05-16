@@ -72,26 +72,28 @@ Counts from current tree scan (`*.lean`):
 
 | Segment | File count |
 |---|---:|
-| Root files in `Path/` | 51 |
-| Algebra | 331 |
-| Homotopy | 204 |
-| Topology | 104 |
-| Category | 67 |
-| CompPath | 54 |
-| Rewrite | 35 |
-| Rewriting | 33 |
-| Logic | 28 |
-| HoTT | 13 |
-| Basic | 9 |
-| Groupoid | 9 |
-| Foundations | 9 |
-| TypeTheory | 6 |
-| OmegaGroupoid | 5 |
-| Geometry | 4 |
-| Graph | 4 |
+| Root files in `Path/` | 81 |
+| Algebra | 383 |
+| Homotopy | 215 |
+| Topology | 111 |
+| Category | 66 |
+| CompPath | 56 |
+| Rewrite | 52 |
 | Computation | 35 |
-| Other small segments (`Analysis`, `NumberTheory`, etc.) | 3+ |
-| **Total** | **1004** |
+| Logic | 29 |
+| OmegaGroupoid | 17 |
+| HoTT | 16 |
+| Basic | 11 |
+| Foundations | 9 |
+| Groupoid | 9 |
+| Rewriting | 5 |
+| Polygraph | 5 |
+| TypeTheory | 5 |
+| Graph | 4 |
+| Geometry | 2 |
+| HIT | 2 |
+| NumberTheory | 1 |
+| **Total** | **1114** |
 
 ## 4. Core architectural types
 
