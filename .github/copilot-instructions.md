@@ -10,12 +10,12 @@
 
 **The Insight**: Ruy de Queiroz and collaborators at UFPE (Brazil) asked: *What if we took the path metaphor literally?* Instead of identity being abstract, make it **explicit syntax**—you can *see* the proof term that witnesses `a = b`. These proof terms form a term rewriting system, and two proofs are "the same" when they normalize to the same form.
 
-**The Result**: This library formalizes 20+ years of research (SAJL 2016, IGPL 2017, LSFA 2011) proving that this "computational paths" approach:
+**The Result**: This repository collects Lean formalizations and exploratory companion material around 20+ years of research (SAJL 2016, IGPL 2017, LSFA 2011) on the "computational paths" approach:
 1. Gives the same π₁ calculations as classical algebraic topology
-2. Requires **zero axioms** beyond Lean's core type theory
-3. Makes every type a weak ω-groupoid (Lumsdaine's theorem, computationally!)
+2. Tracks axiom and typeclass assumptions explicitly in `docs/axioms.md`
+3. Develops weak ω-groupoid-style structure for computational paths
 
-**Why Lean 4?** Unlike Coq/Agda HoTT libraries that postulate univalence, we derive structure from *computation*. Lean 4's quotient types + definitional proof irrelevance give us clean quotients without axioms.
+**Why Lean 4?** Lean 4's quotient types and proof irrelevance provide a practical setting for trace-carrying equality, rewrite quotients, and book-companion examples. Consult `docs/axioms.md` before making constructivity or axiom-freeness claims about the whole tree.
 
 ## ⚡ Critical Facts (Read First)
 
@@ -41,7 +41,7 @@ In classical topology, the **fundamental group** π₁(X, x₀) is "loops at x�
 | Sphere S² | π₁ ≃ 1 | Surface relation kills loops |
 | Figure-8 | π₁ ≃ F₂ (free group) | No relations between generators |
 
-**Key insight**: The encode-decode method from HoTT (Licata-Shulman 2013) works computationally! We don't need univalence—quotients suffice.
+**Key insight**: The encode-decode method from HoTT (Licata-Shulman 2013) can be adapted to computational-path presentations. Some extended modules carry documented assumptions; check `docs/axioms.md` and file-level comments before generalizing a result.
 
 ### The ω-Groupoid Connection
 
@@ -84,10 +84,10 @@ inductive Path : A → A → Type where
 
 **The tradeoff**: More verbose proofs, but every step is inspectable. When `path_auto` fails, you can *see* exactly which rewrite rule is missing.
 
-### Why Avoid Mathlib?
+### Why Keep Core APIs Lightweight?
 
-Mathlib provides `Fin`, groupoids, and quotients. We define our own (`Fin'`, `SimpleEquiv`, etc.) because:
-1. **Minimal dependencies** = faster builds, clearer foundations
+Mathlib is pinned by `lakefile.lean`, but many core APIs remain lightweight (`Fin'`, `SimpleEquiv`, etc.) because:
+1. **Small local interfaces** keep foundational examples readable
 2. **Custom `Fin' n`** is n ∈ {1,...,n} not {0,...,n-1} (matches paper conventions)
 3. **`SimpleEquiv`** is just `toFun`/`invFun`/round-trips—no `Equiv.symm` complexity
 
@@ -350,14 +350,14 @@ def myFun : π₁(X, x) → Result :=
 
 ## Axiom Policy
 
-**Avoid new axioms.** The library aims to be constructive where possible.
+**Avoid new axioms.** Existing axiom declarations and assumptions are tracked in `docs/axioms.md`; keep that inventory current if it changes.
 
 - ✅ Inductive types for point spaces
 - ✅ Path-expression syntax for generators
 - ✅ Quotients by explicit relations
-- ❌ Classical.choice (only when unavoidable)
-- ❌ Univalence (we have lightweight `SimpleEquiv` instead)
-- ❌ Arbitrary axioms in signatures
+- ❌ New arbitrary axioms in signatures
+- ❌ Undocumented univalence/HIT/truncation assumptions
+- ❌ Silent assumptions that bypass `Path`/`RwEq` structure
 
 If you must assume something, make it a **Prop-valued typeclass** parameter, not a global axiom.
 
@@ -388,6 +388,6 @@ uvx --from aristotlelib aristotle.exe prove-from-file "path/to/file.lean"
 
 ### Related Formalizations
 
-- **HoTT-Agda** — Agda formalization using univalence axiom (contrast: we're axiom-free)
+- **HoTT-Agda** — Agda formalization using univalence axiom (contrast: this repository tracks such assumptions explicitly)
 - **Cubical Agda** — Computational univalence via cubical type theory (different approach)
-- **Lean 4 Mathlib** — We deliberately avoid Mathlib to stay self-contained
+- **Lean 4 Mathlib** — The project pins Mathlib in `lakefile.lean` while keeping selected core interfaces lightweight

@@ -4,9 +4,11 @@
 [![Lean](https://img.shields.io/badge/Lean-4.24.0-orange)](https://leanprover.github.io/)
 [![Mathlib](https://img.shields.io/badge/Mathlib-v4.24.0-blue)](https://github.com/leanprover-community/mathlib4)
 
-A Lean 4 book companion repository for **computational paths**: explicit, trace-carrying witnesses of equality built on top of Lean's `Eq`.
+A Lean 4 companion repository for the book [_The Calculus of Computational Paths_](https://www.amazon.com/dp/1848905157/). It collects formal definitions, examples, and exploratory developments around **computational paths**: explicit, trace-carrying witnesses of equality built on top of Lean's `Eq`.
 
-At the core, a path records both an equality proof and its rewrite trace:
+The most stable part of the repository is the computational-path core under `ComputationalPaths/Path/Basic` and `ComputationalPaths/Path/Rewrite`. Many larger mathematical subdirectories are companion and exploratory material; use the architecture and axiom inventory docs below to distinguish core infrastructure from broader experiments.
+
+At the core, a path records both an equality proof and a rewrite trace:
 
 ```lean
 structure Path {A : Type u} (a b : A) where
@@ -14,22 +16,29 @@ structure Path {A : Type u} (a b : A) where
   proof : a = b
 ```
 
-This library develops:
+This repository develops:
+
 - the computational-path rewrite system (`Step`, `Rw`, `RwEq`, normalization),
-- fundamental group computations via encode/decode (including circle, torus, and Klein bottle),
-- weak higher-groupoid structure (`OmegaGroupoid`),
-- and a broad collection of mathematical modules under `ComputationalPaths/`.
+- quotient and loop-space interfaces used by fundamental-group examples,
+- selected encode/decode-style space computations, including circle, torus, sphere, pushout, figure-eight, and Klein bottle modules,
+- weak higher-groupoid-style interfaces (`OmegaGroupoid`),
+- and broad companion developments under `ComputationalPaths/`.
 
 ## Project scope
 
-Representative results and modules include:
-- `ComputationalPaths/Path/CompPath/CircleStep.lean` (`π₁(S¹) ≃ ℤ` interface)
-- `ComputationalPaths/Path/CompPath/TorusStep.lean` (`π₁(T²) ≃ ℤ × ℤ` interface)
-- `ComputationalPaths/Path/CompPath/KleinBottle.lean` (`π₁(K) ≃ ℤ ⋊ ℤ` via loop-expression quotients)
-- `ComputationalPaths/Path/OmegaGroupoid.lean` (weak ω-groupoid-style hierarchy)
-- `ComputationalPaths/Path/Rewrite/Step.lean` (primitive rewrite-step relation)
+Representative landmarks include:
 
-Beyond `Path/`, the repository also includes broad companion developments such as arithmetic, geometric, motivic, topos-theoretic, and representation-theoretic modules.
+| Area | Where to start | Notes |
+|---|---|---|
+| Core path representation | `ComputationalPaths/Path/Basic/Core.lean` | `Path a b` packages trace metadata plus an equality proof. |
+| Rewrite equality | `ComputationalPaths/Path/Rewrite/Step.lean`, `Rw.lean`, `RwEq.lean`, `Quot.lean` | Main rewrite and quotient infrastructure. |
+| Fundamental-group examples | `ComputationalPaths/Path/CompPath/CircleStep.lean`, `TorusStep.lean`, `SphereCompPath.lean` | Representative encode/decode-style interfaces. |
+| Pushouts and wedges | `ComputationalPaths/Path/CompPath/PushoutPaths.lean`, `FigureEight.lean` | Includes documented assumptions and open encode-direction work. |
+| Higher structure | `ComputationalPaths/Path/OmegaGroupoid.lean` | Weak omega-groupoid-style hierarchy over computational paths. |
+
+The broader arithmetic, geometric, motivic, topos-theoretic, representation-theoretic, and category-theoretic modules should be read as companion material unless a specific file documents a stronger status.
+
+See `docs/axioms.md` before making axiom-related claims: the project tracks existing axiom declarations and typeclass assumptions explicitly rather than treating the whole tree as axiom-free.
 
 ## Repository structure overview
 
@@ -75,6 +84,7 @@ ComputationalPathsLean/
 │   ├── Tropical/
 │   └── VertexAlgebra/
 ├── docs/
+│   ├── README.md                     # Documentation entrypoint
 │   ├── ARCHITECTURE.md               # Canonical architecture overview
 │   ├── axioms.md                     # Canonical axiom/typeclass inventory
 │   └── archive/                      # Historical audits and run outputs
@@ -82,6 +92,13 @@ ComputationalPathsLean/
 └── scripts/
     └── legacy/                       # Archived maintenance scripts
 ```
+
+## Documentation map
+
+- `docs/README.md` - documentation entrypoint and reading order.
+- `docs/ARCHITECTURE.md` - current architecture, layers, and representative theorem landmarks.
+- `docs/axioms.md` - current axiom and typeclass inventory.
+- `docs/archive/README.md` - provenance for historical audits and generated run outputs.
 
 ## Getting started
 
@@ -120,6 +137,7 @@ lake exe computational_paths
 ### Build specific modules
 
 ```bash
+lake build ComputationalPaths.Basic
 lake build ComputationalPaths.Path.CompPath.CircleStep
 lake build ComputationalPaths.Path.CompPath.TorusStep
 lake build ComputationalPaths.Path.CompPath.KleinBottleStep
@@ -129,6 +147,9 @@ lake build ComputationalPaths.Path.OmegaGroupoid
 ### Useful maintenance checks
 
 ```bash
+# Confirm the pinned Lean toolchain used by Lake
+lake -R --no-ansi env lean --version
+
 # Find placeholders
 rg "sorry" --glob "*.lean" ComputationalPaths
 
@@ -148,7 +169,8 @@ Use the badge at the top of this README to check live build status.
 
 ## Contributing
 
-- Keep proofs `sorry`-free and avoid new global axioms.
+- Keep new proofs `sorry`-free and avoid new global axioms.
+- If a development must rely on an axiom or assumption, document it and keep `docs/axioms.md` current.
 - Prefer `Path`/`RwEq`-based reasoning for equality developments.
 - Run `lake build` before opening a PR.
 - Keep canonical documentation under `docs/`; move historical audits or generated run logs to `docs/archive/` rather than leaving them in the repository root.

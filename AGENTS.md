@@ -16,10 +16,10 @@ This is explicitly **not HoTT** — it's computational rewrite traces over proof
 | **Paper** | "The Calculus of Computational Paths" (BSL format, 93 pages) |
 | **Authors** | Arthur Freitas Ramos (Microsoft), Ruy de Queiroz (UFPE), Anjolina de Oliveira (UFPE), Tiago Veras (UFRPE) |
 
-## Invariants (MUST be maintained)
+## Invariants (MUST be maintained for new work)
 
-1. **Zero `sorry`** — every theorem must be fully proved
-2. **Zero `axiom` declarations** — no custom axioms (Lean kernel axioms only)
+1. **No new `sorry`** — every new theorem must be fully proved
+2. **No undocumented new `axiom` declarations** — existing declarations are inventoried in `docs/axioms.md`; avoid adding more
 3. **Genuine Path integration** — all files must use `Path` type for equalities, not bare `=`
 4. **Domain-specific Step types** where appropriate (e.g., `TQFTStep`, `KnotStep`)
 5. **At least one `RwEq` or multi-step `Path.trans` construction per file**
@@ -56,13 +56,13 @@ An "armada" is a batch deployment of 5 Lean 4 formalization files on a themed ma
 
 **Command:** `copex fleet "prompt with {topic}" -m gpt-5.3-codex -r xhigh`
 
-**Requirements for each file:**
+**Requirements for each new file:**
 - Import from `ComputationalPaths.Path.Step`, `.Basic`, `.Rewrite`
 - Use `Path` type (not bare `=`)
 - Domain-specific `Step` inductive types where appropriate
 - `Path.trans`/`Path.symm` compositions
 - At least one `RwEq` or multi-step construction
-- NO `sorry`, NO `axiom`
+- NO `sorry`; avoid new `axiom` declarations unless explicitly documented in `docs/axioms.md`
 - Minimum 150 lines of substantive content
 - Files go in appropriate subdirectory (Algebra/, Topology/, Homotopy/, etc.)
 
