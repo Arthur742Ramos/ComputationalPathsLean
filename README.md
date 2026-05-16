@@ -163,7 +163,8 @@ GitHub Actions workflow: **Lean Action CI**
 - Workflow file: `.github/workflows/lean_action_ci.yml`
 - Triggers: pushes to `main`, pull requests, manual dispatch
 - Runner: `ubuntu-latest`
-- Main step: `leanprover/lean-action@v1` with Mathlib cache enabled
+- Main step: `leanprover/lean-action@v1` runs `lake build` from the repository root with GitHub and Mathlib caches enabled
+- Action updates: `.github/dependabot.yml` checks GitHub Actions weekly
 
 Use the badge at the top of this README to check live build status.
 

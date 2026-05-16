@@ -36,11 +36,32 @@ GitHub Actions uses `leanprover/lean-action@v1`:
 ```yaml
 # .github/workflows/lean_action_ci.yml
 name: Lean Action CI
-on: [push, pull_request, workflow_dispatch]
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: lean-action-ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
+    name: Lake build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: leanprover/lean-action@v1
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Build with lean-action
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: "."
+          use-github-cache: "true"
+          use-mathlib-cache: "true"
+          build: "true"
 ```
