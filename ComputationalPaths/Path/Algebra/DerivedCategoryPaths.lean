@@ -377,7 +377,8 @@ theorem comp_id_triple (C : ChainComplex) (n : Int) (x : Int) :
 /-- Differential of a chain complex applied to 0 is 0.
     (Assumes the differential maps 0 to 0, which holds for the zero complex.) -/
 theorem zero_complex_diff_zero (n : Int) :
-    zeroComplex.diff n 0 = 0 := rfl
+    zeroComplex.diff n 0 = 0 := by
+  simp [zeroComplex]
 
 -- 40
 /-- Path from cone to swapped cone via commutativity. -/

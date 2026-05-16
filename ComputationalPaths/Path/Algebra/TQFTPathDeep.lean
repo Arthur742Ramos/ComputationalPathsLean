@@ -105,7 +105,8 @@ structure FrobeniusData (A : Type u) where
 -- ========================================================================
 
 /-- Theorem 1: Genus-0 (sphere) -/
-theorem genus_zero_sphere : GenusValue 0 = 0 := rfl
+theorem genus_zero_sphere : GenusValue 0 = 0 := by
+  simp [GenusValue]
 
 /-- Theorem 2: Genus-1 (torus) -/
 theorem genus_one_torus : GenusValue 1 = 2 := rfl

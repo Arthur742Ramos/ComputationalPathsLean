@@ -499,7 +499,8 @@ theorem low_nonneg (M : BinaryMatrix) (j : Nat) : 0 ≤ low M j :=
     pivotColumn M j = j := rfl
 
 @[simp] theorem pivotColumn_zero (M : BinaryMatrix) :
-    pivotColumn M 0 = 0 := rfl
+    pivotColumn M 0 = 0 := by
+  simp [pivotColumn]
 
 @[simp] theorem reduceColumn_zeroMatrix (r c j : Nat) :
     reduceColumn (zeroMatrix r c) j = zeroMatrix r c := rfl

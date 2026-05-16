@@ -56,7 +56,8 @@ abbrev FreeGroup (n : Nat) : Type := BouquetFreeGroup n
 /-- Rank of the free group on `n` generators. -/
 noncomputable def freeGroupRank (n : Nat) : Nat := n
 
-@[simp] theorem freeGroup_rank_zero : freeGroupRank 0 = 0 := rfl
+@[simp] theorem freeGroup_rank_zero : freeGroupRank 0 = 0 := by
+  simp [freeGroupRank]
 @[simp] theorem freeGroup_rank_one : freeGroupRank 1 = 1 := rfl
 @[simp] theorem freeGroup_rank_two : freeGroupRank 2 = 2 := rfl
 
