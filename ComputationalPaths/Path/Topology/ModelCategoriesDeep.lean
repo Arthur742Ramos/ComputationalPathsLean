@@ -32,6 +32,7 @@ and Reedy model structures using the computational paths framework.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -80,10 +81,34 @@ inductive MorphismClass where
   | trivialCofibration : MorphismClass -- cof ∩ weq
   deriving DecidableEq
 
-/-- Path witness for trivial fibration = fibration ∩ weq. -/
-noncomputable def trivFibDecomp :
-    Path MorphismClass.trivialFibration MorphismClass.trivialFibration :=
-  Path.stepChain rfl
+/-- Boolean class tags used to state the fibration/cofibration decompositions. -/
+def MorphismClass.isWeakEquivalence : MorphismClass → Bool
+  | .weakEquivalence => true
+  | .trivialFibration => true
+  | .trivialCofibration => true
+  | _ => false
+
+def MorphismClass.isFibration : MorphismClass → Bool
+  | .fibration => true
+  | .trivialFibration => true
+  | _ => false
+
+def MorphismClass.isCofibration : MorphismClass → Bool
+  | .cofibration => true
+  | .trivialCofibration => true
+  | _ => false
+
+/-- Trivial fibrations are exactly tagged as both fibrations and weak equivalences. -/
+theorem trivFibDecomp :
+    MorphismClass.isFibration MorphismClass.trivialFibration = true ∧
+    MorphismClass.isWeakEquivalence MorphismClass.trivialFibration = true := by
+  constructor <;> rfl
+
+/-- Trivial cofibrations are exactly tagged as both cofibrations and weak equivalences. -/
+theorem trivCofDecomp :
+    MorphismClass.isCofibration MorphismClass.trivialCofibration = true ∧
+    MorphismClass.isWeakEquivalence MorphismClass.trivialCofibration = true := by
+  constructor <;> rfl
 
 /-! ## Two-of-Three Property -/
 
@@ -103,25 +128,80 @@ structure TwoOfThreeData (A : Type u) where
   right_cancel : ∀ {a b c : A} (f : Path a b) (g : Path b c),
     isWeq g → isWeq (Path.trans f g) → isWeq f
 
-/-- Trivial two-of-three: every path is a weq. -/
-noncomputable def trivialTwoOfThree (A : Type u) : TwoOfThreeData A where
-  isWeq := fun _ => True
-  weq_refl := fun _ => trivial
-  comp_closed := fun _ _ _ _ => trivial
-  left_cancel := fun _ _ _ _ => trivial
-  right_cancel := fun _ _ _ _ => trivial
+/-- A weak equivalence witness is an inverse path with both rewrite identities. -/
+noncomputable def PathInverseWitness {A : Type u} {a b : A} (p : Path a b) :
+    Type (u + 1) :=
+  Σ inv : Path b a,
+    RwEq (Path.trans p inv) (Path.refl a) ×
+      RwEq (Path.trans inv p) (Path.refl b)
 
-/-- Path witness: identity is a weak equivalence. -/
-noncomputable def TwoOfThreeData.reflWeqPath {A : Type u} (T : TwoOfThreeData A) (a : A) :
-    Path (T.isWeq (Path.refl a)) True :=
-  Path.stepChain (propext ⟨fun _ => trivial, fun _ => T.weq_refl a⟩)
+/-- Path-level weak equivalence predicate. -/
+noncomputable def PathIsWeq {A : Type u} {a b : A} (p : Path a b) : Prop :=
+  Nonempty (PathInverseWitness p)
 
-/-- Step chain: compose two weqs and get a weq. -/
-noncomputable def TwoOfThreeData.compWeqChain {A : Type u} (T : TwoOfThreeData A)
+/-- Every computational path has the canonical inverse witness. -/
+noncomputable def pathInverseWitness {A : Type u} {a b : A} (p : Path a b) :
+    PathInverseWitness p :=
+  ⟨Path.symm p, rweq_cmpA_inv_right p, rweq_cmpA_inv_left p⟩
+
+theorem pathIsWeq {A : Type u} {a b : A} (p : Path a b) : PathIsWeq p :=
+  ⟨pathInverseWitness p⟩
+
+noncomputable def pathInverseWitness_comp {A : Type u} {a b c : A}
+    {f : Path a b} {g : Path b c}
+    (hf : PathInverseWitness f) (hg : PathInverseWitness g) :
+    PathInverseWitness (Path.trans f g) := by
+  rcases hf with ⟨finv, hf_l, hf_r⟩
+  rcases hg with ⟨ginv, hg_l, hg_r⟩
+  refine ⟨Path.trans ginv finv, ?_, ?_⟩
+  · exact
+      rweq_trans
+        (rweq_tt f g (Path.trans ginv finv))
+        (rweq_trans
+          (rweq_trans_congr_right f
+            (rweq_trans
+              (rweq_symm (rweq_tt g ginv finv))
+              (rweq_trans
+                (rweq_trans_congr_left finv hg_l)
+                (rweq_cmpA_refl_left finv))))
+          hf_l)
+  · exact
+      rweq_trans
+        (rweq_tt ginv finv (Path.trans f g))
+        (rweq_trans
+          (rweq_trans_congr_right ginv
+            (rweq_trans
+              (rweq_symm (rweq_tt finv f g))
+              (rweq_trans
+                (rweq_trans_congr_left g hf_r)
+                (rweq_cmpA_refl_left g))))
+          hg_r)
+
+theorem pathIsWeq_comp {A : Type u} {a b c : A}
+    {f : Path a b} {g : Path b c}
+    (hf : PathIsWeq f) (hg : PathIsWeq g) :
+    PathIsWeq (Path.trans f g) := by
+  rcases hf with ⟨hf'⟩
+  rcases hg with ⟨hg'⟩
+  exact ⟨pathInverseWitness_comp hf' hg'⟩
+
+/-- Two-of-three data for the path groupoid model. -/
+noncomputable def pathGroupoidTwoOfThree (A : Type u) : TwoOfThreeData A where
+  isWeq := fun p => PathIsWeq p
+  weq_refl := fun a => pathIsWeq (Path.refl a)
+  comp_closed := fun _ _ hf hg => pathIsWeq_comp hf hg
+  left_cancel := fun _ g _ _ => pathIsWeq g
+  right_cancel := fun f _ _ _ => pathIsWeq f
+
+theorem TwoOfThreeData.reflWeqWitness {A : Type u} (T : TwoOfThreeData A) (a : A) :
+    T.isWeq (Path.refl a) :=
+  T.weq_refl a
+
+theorem TwoOfThreeData.compWeqWitness {A : Type u} (T : TwoOfThreeData A)
     {a b c : A} (f : Path a b) (g : Path b c)
     (hf : T.isWeq f) (hg : T.isWeq g) :
-    Path (T.isWeq (Path.trans f g)) True :=
-  Path.stepChain (propext ⟨fun _ => trivial, fun _ => T.comp_closed f g hf hg⟩)
+    T.isWeq (Path.trans f g) :=
+  T.comp_closed f g hf hg
 
 /-! ## Retract Axiom -/
 
@@ -210,6 +290,36 @@ noncomputable def FactorizationData.doubleFactorChain {A : Type u} {a b : A}
     Path (Path.trans F.factor1 (Path.trans G.factor1 G.factor2)) f :=
   Path.stepChain h
 
+/-! ## Lifting witnesses -/
+
+noncomputable def HasLift {A : Type u} {a b c d : A}
+    (i : Path a c) (p : Path b d) : Type (u + 1) :=
+  ∀ (top : Path a b) (bottom : Path c d),
+    RwEq (Path.trans top p) (Path.trans i bottom) →
+    Σ lift : Path c b,
+      RwEq (Path.trans i lift) top × RwEq (Path.trans lift p) bottom
+
+noncomputable def pathHasLift {A : Type u} {a b c d : A}
+    (i : Path a c) (p : Path b d) : HasLift i p := by
+  intro top bottom square
+  refine ⟨Path.trans (Path.symm i) top, ?_, ?_⟩
+  · exact
+      rweq_trans
+        (rweq_symm (rweq_tt i (Path.symm i) top))
+        (rweq_trans
+          (rweq_trans_congr_left top (rweq_cmpA_inv_right i))
+          (rweq_cmpA_refl_left top))
+  · exact
+      rweq_trans
+        (rweq_tt (Path.symm i) top p)
+        (rweq_trans
+          (rweq_trans_congr_right (Path.symm i) square)
+          (rweq_trans
+            (rweq_symm (rweq_tt (Path.symm i) i bottom))
+            (rweq_trans
+              (rweq_trans_congr_left bottom (rweq_cmpA_inv_left i))
+              (rweq_cmpA_refl_left bottom))))
+
 /-! ## Closed Model Category -/
 
 /-- Full closed model category data. -/
@@ -222,31 +332,56 @@ structure ClosedModelData (A : Type u) where
   isCof : {a b : A} → Path a b → Prop
   /-- MC1: Retracts of weq/fib/cof are weq/fib/cof. -/
   retract_closed_weq : ∀ {a b c d : A} (f : Path a b) (g : Path c d),
-    weq.isWeq g → True → weq.isWeq f
+    weq.isWeq g → RetractData f g → weq.isWeq f
   /-- MC3: Lifting axiom. -/
   lifting_axiom : ∀ {a b c d : A}
     (i : Path a c) (p : Path b d),
     isCof i → isFib p → weq.isWeq i ∨ weq.isWeq p →
-    True
+    HasLift i p
   /-- MC4a: Factor as cofibration ∘ trivial fibration. -/
-  factor_cof_triv_fib : ∀ {a b : A} (_f : Path a b), True
+  factor_cof_triv_fib : ∀ {a b : A} (f : Path a b),
+    ∃ F : FactorizationData f,
+      isCof F.factor1 ∧ isFib F.factor2 ∧ weq.isWeq F.factor2
   /-- MC4b: Factor as trivial cofibration ∘ fibration. -/
-  factor_triv_cof_fib : ∀ {a b : A} (_f : Path a b), True
+  factor_triv_cof_fib : ∀ {a b : A} (f : Path a b),
+    ∃ F : FactorizationData f,
+      isCof F.factor1 ∧ weq.isWeq F.factor1 ∧ isFib F.factor2
 
-/-- Trivial closed model category: everything is everything. -/
-noncomputable def trivialClosedModel (A : Type u) : ClosedModelData A where
-  weq := trivialTwoOfThree A
-  isFib := fun _ => True
-  isCof := fun _ => True
-  retract_closed_weq := fun _ _ _ _ => trivial
-  lifting_axiom := fun _ _ _ _ _ => trivial
-  factor_cof_triv_fib := fun _ => trivial
-  factor_triv_cof_fib := fun _ => trivial
+/-- Closed model data induced by canonical inverses in the path groupoid. -/
+noncomputable def pathGroupoidClosedModel (A : Type u) : ClosedModelData A where
+  weq := pathGroupoidTwoOfThree A
+  isFib := fun p => PathIsWeq p
+  isCof := fun p => PathIsWeq p
+  retract_closed_weq := fun f _ _ _ => pathIsWeq f
+  lifting_axiom := fun i p _ _ _ => pathHasLift i p
+  factor_cof_triv_fib := by
+    intro a b f
+    refine ⟨
+      { mid := b
+        factor1 := f
+        factor2 := Path.refl b
+        compose_eq := Path.trans_refl_right f
+        factor1_class := MorphismClass.cofibration
+        factor2_class := MorphismClass.trivialFibration },
+      pathIsWeq f,
+      pathIsWeq (Path.refl b),
+      pathIsWeq (Path.refl b)⟩
+  factor_triv_cof_fib := by
+    intro a b f
+    refine ⟨
+      { mid := b
+        factor1 := f
+        factor2 := Path.refl b
+        compose_eq := Path.trans_refl_right f
+        factor1_class := MorphismClass.trivialCofibration
+        factor2_class := MorphismClass.fibration },
+      pathIsWeq f,
+      pathIsWeq f,
+      pathIsWeq (Path.refl b)⟩
 
-/-- Path witness: the trivial model is well-defined. -/
-theorem trivialClosedModel.wellDefined (A : Type u) (a : A) :
-    (trivialClosedModel A).weq.isWeq (Path.refl a) :=
-  trivial
+theorem pathGroupoidClosedModel.reflWeq (A : Type u) (a : A) :
+    (pathGroupoidClosedModel A).weq.isWeq (Path.refl a) :=
+  pathIsWeq (Path.refl a)
 
 /-! ## Cylinder Objects -/
 
@@ -354,10 +489,12 @@ structure QuillenAdjunctionData (A B : Type u) where
   triangle_left : ∀ a : A,
     Path.trans (Path.congrArg leftAdj (unit a)) (counit (leftAdj a)) =
     Path.refl (leftAdj a)
-  /-- Left adjoint preserves cofibrations (abstract). -/
-  left_preserves_cof : True
-  /-- Right adjoint preserves fibrations (abstract). -/
-  right_preserves_fib : True
+  /-- Supplied action of the left adjoint on Path witnesses. -/
+  left_preserves_path : ∀ {a b : A} (_p : Path a b),
+    Path (leftAdj a) (leftAdj b)
+  /-- Supplied action of the right adjoint on Path witnesses. -/
+  right_preserves_path : ∀ {a b : B} (_p : Path a b),
+    Path (rightAdj a) (rightAdj b)
 
 /-- Path witness for triangle identity. -/
 noncomputable def QuillenAdjunctionData.trianglePath {A B : Type u}
@@ -365,6 +502,16 @@ noncomputable def QuillenAdjunctionData.trianglePath {A B : Type u}
     Path (Path.trans (Path.congrArg Q.leftAdj (Q.unit a)) (Q.counit (Q.leftAdj a)))
          (Path.refl (Q.leftAdj a)) :=
   Path.stepChain (Q.triangle_left a)
+
+noncomputable def QuillenAdjunctionData.leftPath {A B : Type u}
+    (Q : QuillenAdjunctionData A B) {a b : A} (p : Path a b) :
+    Path (Q.leftAdj a) (Q.leftAdj b) :=
+  Q.left_preserves_path p
+
+noncomputable def QuillenAdjunctionData.rightPath {A B : Type u}
+    (Q : QuillenAdjunctionData A B) {a b : B} (p : Path a b) :
+    Path (Q.rightAdj a) (Q.rightAdj b) :=
+  Q.right_preserves_path p
 
 /-! ## Homotopy Category -/
 
@@ -378,16 +525,35 @@ structure HomotopyCategoryData (A : Type u) where
   localize : A → hoObj
   /-- Morphisms in Ho(A) (homotopy classes). -/
   hoMorphism : hoObj → hoObj → Type u
+  /-- Localization maps computational paths to paths between localized objects. -/
+  localizePath : ∀ {a b : A} (_f : Path a b),
+    Path (localize a) (localize b)
   /-- Weak equivalences become isomorphisms. -/
   weq_iso : ∀ {a b : A} (f : Path a b),
-    model.weq.isWeq f → True
+    model.weq.isWeq f →
+    Σ inv : Path (localize b) (localize a),
+      RwEq (Path.trans (localizePath f) inv) (Path.refl (localize a)) ×
+        RwEq (Path.trans inv (localizePath f)) (Path.refl (localize b))
 
-/-- Path for localization: weqs become isos. -/
-theorem HomotopyCategoryData.weqIsoEq {A : Type u}
+noncomputable def HomotopyCategoryData.weqIsoInverse {A : Type u}
     (HC : HomotopyCategoryData A) {a b : A}
     (f : Path a b) (hf : HC.model.weq.isWeq f) :
-    HC.weq_iso f hf = trivial :=
-  rfl
+    Path (HC.localize b) (HC.localize a) :=
+  (HC.weq_iso f hf).1
+
+noncomputable def HomotopyCategoryData.weqIsoLeft {A : Type u}
+    (HC : HomotopyCategoryData A) {a b : A}
+    (f : Path a b) (hf : HC.model.weq.isWeq f) :
+    RwEq (Path.trans (HC.localizePath f) (HC.weqIsoInverse f hf))
+      (Path.refl (HC.localize a)) :=
+  (HC.weq_iso f hf).2.1
+
+noncomputable def HomotopyCategoryData.weqIsoRight {A : Type u}
+    (HC : HomotopyCategoryData A) {a b : A}
+    (f : Path a b) (hf : HC.model.weq.isWeq f) :
+    RwEq (Path.trans (HC.weqIsoInverse f hf) (HC.localizePath f))
+      (Path.refl (HC.localize b)) :=
+  (HC.weq_iso f hf).2.2
 
 /-! ## Ken Brown's Lemma -/
 
@@ -398,19 +564,21 @@ structure KenBrownData (A B : Type u) where
   modelA : ClosedModelData A
   /-- The functor. -/
   func : A → B
+  /-- Weak equivalences in the target. -/
+  weqB : {x y : B} → Path x y → Prop
   /-- Preserves weqs between cofibrant objects. -/
   preserves_cof_weq : ∀ {a b : A} (f : Path a b),
-    modelA.isCof (Path.refl a) → modelA.weq.isWeq f → True
+    modelA.isCof (Path.refl a) → modelA.weq.isWeq f →
+    weqB (Path.congrArg func f)
   /-- Conclusion: preserves all weqs. -/
   preserves_all_weq : ∀ {a b : A} (f : Path a b),
-    modelA.weq.isWeq f → True
+    modelA.weq.isWeq f → weqB (Path.congrArg func f)
 
-/-- Path for Ken Brown conclusion. -/
-theorem KenBrownData.conclusionEq {A B : Type u}
+theorem KenBrownData.conclusionWitness {A B : Type u}
     (KB : KenBrownData A B) {a b : A}
     (f : Path a b) (hf : KB.modelA.weq.isWeq f) :
-    KB.preserves_all_weq f hf = trivial :=
-  rfl
+    KB.weqB (Path.congrArg KB.func f) :=
+  KB.preserves_all_weq f hf
 
 /-! ## Reedy Model Structure -/
 
@@ -429,11 +597,17 @@ structure ReedyCategoryData where
   /-- Inverse morphisms lower degree. -/
   inverse_lowers : ∀ a b, inverse a b → degree a > degree b
 
-/-- Path witness for degree raising. -/
-noncomputable def ReedyCategoryData.directPath (R : ReedyCategoryData)
+/-- Direct morphisms provide the promised strict degree increase. -/
+theorem ReedyCategoryData.directRaisesInequality (R : ReedyCategoryData)
     (a b : R.obj) (h : R.direct a b) :
-    Path (R.degree a < R.degree b) True :=
-  Path.stepChain (propext ⟨fun _ => trivial, fun _ => R.direct_raises a b h⟩)
+    R.degree a < R.degree b :=
+  R.direct_raises a b h
+
+/-- Inverse morphisms provide the promised strict degree decrease. -/
+theorem ReedyCategoryData.inverseLowersInequality (R : ReedyCategoryData)
+    (a b : R.obj) (h : R.inverse a b) :
+    R.degree a > R.degree b :=
+  R.inverse_lowers a b h
 
 /-- Reedy model structure data. -/
 structure ReedyModelData (A : Type u) where
@@ -448,9 +622,10 @@ structure ReedyModelData (A : Type u) where
 
 /-- Path for matching-latching duality. -/
 noncomputable def ReedyModelData.matchLatchPath {A : Type u}
-    (R : ReedyModelData A) (x : R.reedy.obj) :
-    Path (R.matching x) (R.matching x) :=
-  Path.stepChain rfl
+    (R : ReedyModelData A) (x : R.reedy.obj)
+    (h : R.matching x = R.latching x) :
+    Path (R.matching x) (R.latching x) :=
+  Path.stepChain h
 
 end ModelCategoriesDeep
 end Topology
