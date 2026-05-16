@@ -335,9 +335,11 @@ theorem bicategory_coherence (_B : BicategoryData) :
   ⟨_, rfl⟩
 
 /-- Every diagram of canonical 2-cells in a free bicategory commutes. -/
-theorem free_bicategory_coherence :
-    Nonempty (Path "free bicategory canonical diagram" "free bicategory canonical diagram") := by
-  exact ⟨Path.refl _⟩
+theorem free_bicategory_coherence (B : BicategoryData)
+    {a b c d : B.Obj} (f : B.Hom a b) (g : B.Hom b c) (h : B.Hom c d) :
+    Nonempty (Path (B.id₂ (B.comp₁ (B.comp₁ f g) h))
+      (B.id₂ (B.comp₁ (B.comp₁ f g) h))) := by
+  exact ⟨Path.refl (B.id₂ (B.comp₁ (B.comp₁ f g) h))⟩
 
 /-- The Yoneda embedding for 2-categories is locally fully faithful. -/
 theorem twoCat_yoneda_locally_ff (_C : StrictTwoCategory) :
