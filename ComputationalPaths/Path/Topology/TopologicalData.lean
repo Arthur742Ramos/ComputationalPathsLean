@@ -27,6 +27,7 @@ Topological Data Analysis (TDA) combines topology and statistics:
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 
@@ -54,8 +55,8 @@ structure Cover where
   numSets : Nat
   /-- Each cover element as an interval [low, high]. -/
   intervals : Nat → (Int × Int)
-  /-- Cover elements overlap (structural). -/
-  overlap : numSets > 0 → True
+  /-- A nonempty cover exposes at least one indexed interval. -/
+  nonempty_index : numSets > 0 → ∃ i, i < numSets
 
 /-- A clustering of points within a cover element. -/
 structure Clustering where
@@ -63,8 +64,8 @@ structure Clustering where
   numClusters : Nat
   /-- Cluster assignment for each point. -/
   assignment : Nat → Nat
-  /-- Assignments are valid. -/
-  valid : ∀ i, assignment i < numClusters ∨ True
+  /-- Assignments either land in a cluster or the clustering is explicitly empty. -/
+  valid : ∀ i, assignment i < numClusters ∨ numClusters = 0
 
 /-! ## Mapper Construction -/
 
@@ -98,8 +99,9 @@ structure MapperFunctoriality where
   fine : MapperGraph
   /-- Simplicial map (node mapping). -/
   simplicialMap : Nat → Nat
-  /-- Map preserves edges. -/
-  preserves_edges : True
+  /-- Each coarse edge maps to endpoints inside the fine Mapper graph. -/
+  preserves_edges : ∀ e, e ∈ coarse.edges →
+    simplicialMap e.1 < fine.numNodes ∧ simplicialMap e.2 < fine.numNodes
 
 /-! ## Reeb Graphs -/
 
@@ -119,8 +121,9 @@ structure ReebGraph where
 structure ReebMorphism (R₁ R₂ : ReebGraph) where
   /-- Vertex map. -/
   vertexMap : Nat → Nat
-  /-- Edge preservation. -/
-  edge_preserving : True
+  /-- Edge endpoints land in the target vertex range. -/
+  edge_preserving : ∀ e, e ∈ R₁.edges →
+    vertexMap e.1 < R₂.numVertices ∧ vertexMap e.2 < R₂.numVertices
 
 /-- The interleaving distance between two Reeb graphs. -/
 structure ReebInterleavingDist where
@@ -207,8 +210,9 @@ structure TransportPlan where
   dgm2 : List (Nat × Nat)
   /-- Transport weights: (i, j, weight). -/
   weights : List (Nat × Nat × Nat)
-  /-- Marginal constraint (structural). -/
-  marginals : True
+  /-- Every transported mass references existing source and target points. -/
+  marginals : ∀ w, w ∈ weights →
+    w.1 < dgm1.length ∧ w.2.1 < dgm2.length
 
 /-- The p-Wasserstein distance between persistence diagrams. -/
 structure WassersteinDistance (p : Nat) where
@@ -244,13 +248,52 @@ inductive TDAStep : Type
   | landscape_sum : TDAStep
   | wasserstein_opt : TDAStep
 
-/-- TDAStep validity. -/
-noncomputable def tdaStep_valid : TDAStep → True
-  | TDAStep.mapper_refine => trivial
-  | TDAStep.reeb_quotient => trivial
-  | TDAStep.merge_event => trivial
-  | TDAStep.landscape_sum => trivial
-  | TDAStep.wasserstein_opt => trivial
+/-- Bookkeeping path showing how an input complexity budget decomposes into
+    the output complexity plus the discarded local slack. -/
+noncomputable def tdaComplexityBudgetPath
+    (inputComplexity outputComplexity : Nat)
+    (h : outputComplexity ≤ inputComplexity) :
+    Path inputComplexity
+      (outputComplexity + (inputComplexity - outputComplexity)) :=
+  Path.ofEq
+    ((Nat.sub_add_cancel h).symm.trans
+      (Nat.add_comm (inputComplexity - outputComplexity) outputComplexity))
+
+/-- Local certificate carried by each TDA rewrite step. -/
+structure TDAStepCertificate where
+  /-- Size measure before the local rewrite. -/
+  inputComplexity : Nat
+  /-- Size measure after the local rewrite. -/
+  outputComplexity : Nat
+  /-- The rewrite does not increase the local size measure. -/
+  output_le_input : outputComplexity ≤ inputComplexity
+  /-- RwEq coherence for the step-specific complexity decomposition path. -/
+  coherence :
+    RwEq
+      (Path.trans
+        (tdaComplexityBudgetPath inputComplexity outputComplexity output_le_input)
+        (Path.symm
+          (tdaComplexityBudgetPath inputComplexity outputComplexity output_le_input)))
+      (Path.refl inputComplexity)
+
+/-- Build a local TDA certificate from concrete complexity bounds. -/
+noncomputable def mkTDAStepCertificate
+    (inputComplexity outputComplexity : Nat)
+    (h : outputComplexity ≤ inputComplexity) : TDAStepCertificate where
+  inputComplexity := inputComplexity
+  outputComplexity := outputComplexity
+  output_le_input := h
+  coherence :=
+    rweq_cmpA_inv_right
+      (tdaComplexityBudgetPath inputComplexity outputComplexity h)
+
+/-- TDAStep validity as a concrete local rewrite certificate. -/
+noncomputable def tdaStep_valid : TDAStep → TDAStepCertificate
+  | TDAStep.mapper_refine => mkTDAStepCertificate 2 2 (by decide)
+  | TDAStep.reeb_quotient => mkTDAStepCertificate 3 2 (by decide)
+  | TDAStep.merge_event => mkTDAStepCertificate 2 1 (by decide)
+  | TDAStep.landscape_sum => mkTDAStepCertificate 2 2 (by decide)
+  | TDAStep.wasserstein_opt => mkTDAStepCertificate 3 1 (by decide)
 
 /-- Merge tree root is a fixed point (Path witness). -/
 noncomputable def mergeTree_root_fixed (t : MergeTree) :
@@ -264,29 +307,45 @@ noncomputable def mapper_node_count (m : MapperGraph) :
 
 /-! ## Additional Theorems -/
 
-theorem mapper_node_count_consistency_theorem
-    (m : MapperGraph) : m.node_count = m.node_count := rfl
+noncomputable def mapperNodeCountConsistency
+    (m : MapperGraph) : Path m.numNodes m.nodes.length :=
+  m.node_count
 
 theorem mapper_functoriality_refinement_theorem
-    (M : MapperFunctoriality) : M = M := rfl
+    (M : MapperFunctoriality) :
+    ∀ e, e ∈ M.coarse.edges →
+      M.simplicialMap e.1 < M.fine.numNodes ∧
+        M.simplicialMap e.2 < M.fine.numNodes :=
+  M.preserves_edges
 
 theorem reeb_interleaving_symmetry_theorem
-    (R : ReebInterleavingDist) : R = R := rfl
+    (R : ReebInterleavingDist) :
+    ∀ e, e ∈ R.r2.edges →
+      R.backward.vertexMap e.1 < R.r1.numVertices ∧
+        R.backward.vertexMap e.2 < R.r1.numVertices :=
+  R.backward.edge_preserving
 
-theorem merge_tree_root_fixed_theorem
-    (t : MergeTree) : t.root = t.root := rfl
+noncomputable def mergeTreeRootFixed
+    (t : MergeTree) : Path (t.parent t.root) t.root :=
+  t.root_fixed
 
 theorem merge_tree_distance_nonnegative_theorem
-    (D : MergeTreeDist) : D = D := rfl
+    (D : MergeTreeDist) : 0 ≤ D.distance :=
+  Nat.zero_le D.distance
 
 theorem landscape_order_monotone_theorem
-    (L : PersistenceLandscape) : L = L := rfl
+    (L : PersistenceLandscape) :
+    ∀ k t, k + 1 < L.depth → L.values k t ≥ L.values (k + 1) t :=
+  L.ordered
 
 theorem wasserstein_triangle_theorem
-    (p : Nat) (W : WassersteinTriangle p) : W = W := rfl
+    (p : Nat) (W : WassersteinTriangle p) :
+    W.d13.distance ≤ W.d12.distance + W.d23.distance :=
+  W.triangle
 
 theorem tda_step_validity_theorem
-    (s : TDAStep) : s = s := rfl
+    (s : TDAStep) : (tdaStep_valid s).outputComplexity ≤ (tdaStep_valid s).inputComplexity :=
+  (tdaStep_valid s).output_le_input
 
 end TopologicalData
 end Topology
