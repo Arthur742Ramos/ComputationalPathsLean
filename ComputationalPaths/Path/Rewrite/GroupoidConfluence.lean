@@ -255,11 +255,23 @@ end Gen
 
 /-- No adjacent inverse pair. -/
 def Reduced : List Gen → Prop
-  | [] | [_] => True
+  | [] => 0 ≤ 1
+  | [_] => 1 ≤ 1
   | g :: h :: rest => g.inv ≠ h ∧ Reduced (h :: rest)
 
+@[simp] theorem reduced_nil : Reduced ([] : List Gen) := by
+  show 0 ≤ 1
+  exact Nat.zero_le 1
+
+@[simp] theorem reduced_singleton (g : Gen) : Reduced [g] := by
+  show 1 ≤ 1
+  exact Nat.le_refl 1
+
 theorem reduced_tail {g : Gen} {w : List Gen} (h : Reduced (g :: w)) :
-    Reduced w := by cases w with | nil => trivial | cons _ _ => exact h.2
+    Reduced w := by
+  cases w with
+  | nil => exact reduced_nil
+  | cons _ _ => exact h.2
 
 /-- Prepend with cancellation. -/
 def prepend (g : Gen) : List Gen → List Gen
@@ -275,7 +287,7 @@ theorem prepend_no_cancel (g h : Gen) (rest : List Gen) (hne : g.inv ≠ h) :
 theorem prepend_reduced (g : Gen) (w : List Gen) (hw : Reduced w) :
     Reduced (prepend g w) := by
   cases w with
-  | nil => trivial
+  | nil => exact reduced_singleton g
   | cons h rest =>
     simp only [prepend]
     split
@@ -373,8 +385,9 @@ theorem rwInv_single (g : Gen) : rwInv [g] = [g.inv] := rfl
 theorem rwInv_reduced (w : List Gen) (hw : Reduced w) :
     Reduced (rwInv w) := by
   induction w with
-  | nil => trivial
-  | cons g rest ih => exact rwAppend_reduced _ _ (ih (reduced_tail hw)) trivial
+  | nil => exact reduced_nil
+  | cons g rest ih =>
+      exact rwAppend_reduced _ _ (ih (reduced_tail hw)) (reduced_singleton g.inv)
 
 theorem rwInv_prepend (g : Gen) (w : List Gen) (hw : Reduced w) :
     rwInv (prepend g w) = rwAppend (rwInv w) [g.inv] := by
@@ -386,7 +399,7 @@ theorem rwInv_prepend (g : Gen) (w : List Gen) (hw : Reduced w) :
       rw [prepend_cancel]
       simp only [rwInv, Gen.inv_inv]
       rw [rwAppend_assoc (rwInv rest) [g] [g.inv]
-            (rwInv_reduced _ (reduced_tail hw)) trivial trivial]
+            (rwInv_reduced _ (reduced_tail hw)) (reduced_singleton g) (reduced_singleton g.inv)]
       have hc : rwAppend [g] [g.inv] = [] := by simp [rwAppend, prepend]
       rw [hc, rwAppend_nil_r _ (rwInv_reduced _ (reduced_tail hw))]
     · rw [prepend_no_cancel _ _ _ heq]
@@ -399,7 +412,7 @@ theorem rwAppend_rwInv (w : List Gen) (hw : Reduced w) :
   | cons g rest ih =>
     simp only [rwAppend, rwInv]
     rw [← rwAppend_assoc rest (rwInv rest) [g.inv]
-          (reduced_tail hw) (rwInv_reduced _ (reduced_tail hw)) trivial]
+          (reduced_tail hw) (rwInv_reduced _ (reduced_tail hw)) (reduced_singleton g.inv)]
     rw [ih (reduced_tail hw)]
     -- Goal: prepend g [g.inv] = []
     simp [prepend]
@@ -411,7 +424,7 @@ theorem rwInv_rwAppend_self (w : List Gen) (hw : Reduced w) :
   | cons g rest ih =>
     simp only [rwInv]
     rw [rwAppend_assoc (rwInv rest) [g.inv] (g :: rest)
-          (rwInv_reduced _ (reduced_tail hw)) trivial hw]
+          (rwInv_reduced _ (reduced_tail hw)) (reduced_singleton g.inv) hw]
     simp only [rwAppend_single]
     -- Goal: rwAppend (rwInv rest) (prepend g.inv (g :: rest)) = []
     -- prepend g.inv (g :: rest) = rest since g.inv.inv = g
@@ -429,7 +442,7 @@ theorem rwInv_dist (w₁ w₂ : List Gen)
     rw [rwInv_prepend g _ (rwAppend_reduced _ _ (reduced_tail h₁) h₂)]
     rw [ih (reduced_tail h₁)]
     rw [rwAppend_assoc (rwInv w₂) (rwInv rest) [g.inv]
-          (rwInv_reduced _ h₂) (rwInv_reduced _ (reduced_tail h₁)) trivial]
+          (rwInv_reduced _ h₂) (rwInv_reduced _ (reduced_tail h₁)) (reduced_singleton g.inv)]
     rfl
 
 theorem rwInv_rwInv (w : List Gen) (hw : Reduced w) :
@@ -439,7 +452,7 @@ theorem rwInv_rwInv (w : List Gen) (hw : Reduced w) :
   | cons g rest ih =>
     simp only [rwInv]
     rw [rwInv_dist (rwInv rest) [g.inv]
-          (rwInv_reduced _ (reduced_tail hw)) trivial]
+          (rwInv_reduced _ (reduced_tail hw)) (reduced_singleton g.inv)]
     simp [rwInv, Gen.inv_inv, rwAppend]
     rw [ih (reduced_tail hw)]
     cases rest with
@@ -484,8 +497,8 @@ def toRW_eq_decidable (e₁ e₂ : Expr) : Decidable (toRW e₁ = toRW e₂) :=
   inferInstance
 
 theorem toRW_reduced : ∀ (e : Expr), Reduced (toRW e)
-  | .atom _ => trivial
-  | .refl => trivial
+  | .atom n => reduced_singleton (.pos n)
+  | .refl => reduced_nil
   | .symm e => rwInv_reduced _ (toRW_reduced e)
   | .trans e₁ e₂ => rwAppend_reduced _ _ (toRW_reduced e₁) (toRW_reduced e₂)
 
@@ -685,7 +698,7 @@ theorem reach_symm (w : List Gen) (hw : Reduced w) :
         | neg n => exact RTC.single ⟨CStep.symm_symm (.atom n)⟩
       have s2 := CRTC.trans_congr ih_rest ih_g
       have s3 := reach_append (rwInv (h :: rest')) [g.inv]
-                   (rwInv_reduced _ hw') trivial
+                   (rwInv_reduced _ hw') (reduced_singleton g.inv)
       exact (RTC.single ⟨s1⟩).trans (s2.trans s3)
 
 /-- Every expression CStep-reduces to its canonical form. -/
