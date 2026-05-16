@@ -37,11 +37,153 @@ structure CoveringMap (E B : Type u) where
   liftStep_src : ∀ s e h, (liftStep s e h).src = e
   liftStep_tgt_proj : ∀ s e h, proj (liftStep s e h).tgt = s.tgt
 
+/-! ## 1a. Well-formed step chains and honest lifting -/
+
+/-- A composable list of elementary steps from `a` to `b`.
+
+Unlike the raw `Path.steps` metadata, this type carries the source/target
+threading needed for genuine path lifting. -/
+inductive StepChain (A : Type u) : A → A → Type u where
+  | nil (a : A) : StepChain A a a
+  | cons {a b : A} (s : ComputationalPaths.Step A) (hsrc : s.src = a)
+      (tail : StepChain A s.tgt b) : StepChain A a b
+
+namespace StepChain
+
+variable {A : Type u}
+
+/-- Forget a well-formed chain to the underlying step list. -/
+noncomputable def toSteps {a b : A} : StepChain A a b → List (ComputationalPaths.Step A)
+  | nil _ => []
+  | cons s _ tail => s :: toSteps tail
+
+/-- Realize a well-formed step chain as a computational path. -/
+noncomputable def toPath {a b : A} : StepChain A a b → Path a b
+  | nil a => Path.refl a
+  | cons s hsrc tail =>
+      Path.mk (s :: toSteps tail)
+        (hsrc.symm.trans (s.proof.trans (toPath tail).proof))
+
+@[simp] theorem toSteps_nil (a : A) :
+    toSteps (nil (A := A) a) = [] := rfl
+
+@[simp] theorem toSteps_cons {a b : A} (s : ComputationalPaths.Step A)
+    (hsrc : s.src = a) (tail : StepChain A s.tgt b) :
+    toSteps (cons s hsrc tail) = s :: toSteps tail := rfl
+
+@[simp] theorem toPath_nil (a : A) :
+    toPath (nil (A := A) a) = Path.refl a := rfl
+
+@[simp] theorem toPath_steps {a b : A} (chain : StepChain A a b) :
+    (toPath chain).steps = toSteps chain := by
+  cases chain <;> rfl
+
+/-- Concatenate composable step chains. -/
+noncomputable def append {a b c : A}
+    (left : StepChain A a b) (right : StepChain A b c) :
+    StepChain A a c :=
+  match left with
+  | nil _ => right
+  | cons s hsrc tail => cons s hsrc (append tail right)
+
+@[simp] theorem append_nil_left {a b : A} (chain : StepChain A a b) :
+    append (nil (A := A) a) chain = chain := rfl
+
+@[simp] theorem toSteps_append {a b c : A}
+    (left : StepChain A a b) (right : StepChain A b c) :
+    toSteps (append left right) = toSteps left ++ toSteps right := by
+  induction left with
+  | nil _ => rfl
+  | cons s hsrc tail ih =>
+      simp [append, toSteps, ih]
+
+@[simp] theorem toPath_append_steps {a b c : A}
+    (left : StepChain A a b) (right : StepChain A b c) :
+    (toPath (append left right)).steps =
+      (Path.trans (toPath left) (toPath right)).steps := by
+  simp [toPath_steps, toSteps_append, Path.trans]
+
+end StepChain
+
+/-- Result of lifting a well-formed base chain from a specified point upstairs. -/
+structure ChainLiftResult (cov : CoveringMap E B) (start : E) (targetBase : B) where
+  endpoint : E
+  endpoint_proj : cov.proj endpoint = targetBase
+  path : Path start endpoint
+
+/-- Lift one base step from a point whose projection is the chain source. -/
+noncomputable def liftStepFrom (cov : CoveringMap E B)
+    {a : B} (s : ComputationalPaths.Step B) (hsrc : s.src = a)
+    (e : E) (he : cov.proj e = a) : ComputationalPaths.Step E :=
+  cov.liftStep s e (he.trans hsrc.symm)
+
+/-- Lift a composable chain step-by-step, threading the upstairs endpoint. -/
+noncomputable def liftChain (cov : CoveringMap E B)
+    {a b : B} (chain : StepChain B a b) (e : E) (he : cov.proj e = a) :
+    ChainLiftResult cov e b :=
+  match chain with
+  | StepChain.nil _ =>
+      { endpoint := e
+        endpoint_proj := he
+        path := Path.refl e }
+  | StepChain.cons s hsrc tail =>
+      let hstart : cov.proj e = s.src := he.trans hsrc.symm
+      let lifted := cov.liftStep s e hstart
+      let tailLift := liftChain cov tail lifted.tgt (cov.liftStep_tgt_proj s e hstart)
+      { endpoint := tailLift.endpoint
+        endpoint_proj := tailLift.endpoint_proj
+        path :=
+          Path.mk (lifted :: tailLift.path.steps)
+            ((cov.liftStep_src s e hstart).symm.trans
+              (lifted.proof.trans tailLift.path.proof)) }
+
+@[simp] theorem liftChain_nil_endpoint (cov : CoveringMap E B)
+    (a : B) (e : E) (he : cov.proj e = a) :
+    (liftChain cov (StepChain.nil a) e he).endpoint = e := rfl
+
+@[simp] theorem liftChain_nil_path (cov : CoveringMap E B)
+    (a : B) (e : E) (he : cov.proj e = a) :
+    (liftChain cov (StepChain.nil a) e he).path = Path.refl e := rfl
+
+/-- Lifting a concatenated chain has the endpoint obtained by lifting the left
+chain and then continuing with the right chain. -/
+theorem liftChain_append_endpoint (cov : CoveringMap E B)
+    {a b c : B} (left : StepChain B a b) (right : StepChain B b c)
+    (e : E) (he : cov.proj e = a) :
+    (liftChain cov (StepChain.append left right) e he).endpoint =
+      (liftChain cov right
+        (liftChain cov left e he).endpoint
+        (liftChain cov left e he).endpoint_proj).endpoint := by
+  induction left generalizing e with
+  | nil _ => rfl
+  | cons s hsrc tail ih =>
+      simpa only [liftChain, StepChain.append] using
+        ih right (cov.liftStep s e (he.trans hsrc.symm)).tgt
+          (cov.liftStep_tgt_proj s e (he.trans hsrc.symm))
+
+/-- Lifting a concatenated chain concatenates the recorded upstairs trace. -/
+theorem liftChain_append_steps (cov : CoveringMap E B)
+    {a b c : B} (left : StepChain B a b) (right : StepChain B b c)
+    (e : E) (he : cov.proj e = a) :
+    (liftChain cov (StepChain.append left right) e he).path.steps =
+      (liftChain cov left e he).path.steps ++
+        (liftChain cov right
+          (liftChain cov left e he).endpoint
+          (liftChain cov left e he).endpoint_proj).path.steps := by
+  induction left generalizing e with
+  | nil _ => rfl
+  | cons s hsrc tail ih =>
+      simpa only [liftChain, StepChain.append, List.cons_append] using
+        congrArg (fun steps => cov.liftStep s e (he.trans hsrc.symm) :: steps)
+          (ih right (cov.liftStep s e (he.trans hsrc.symm)).tgt
+            (cov.liftStep_tgt_proj s e (he.trans hsrc.symm)))
+
 /-- Lift a path in the base to a path in the total space, starting at fiber
-    point `e` above `a`.  This uses the step-by-step structure of `Path`:
-    each `Step` in the path's `.steps` list is lifted individually, and the
-    results are composed via list concatenation (the same mechanism as
-    `Path.trans`). -/
+    point `e` above `a`.
+
+    This equality-only transport intentionally ignores `Path.steps`, because raw
+    `Path` values do not guarantee that their stored steps are composable.  Use
+    `liftChain` for genuine step-by-step lifting. -/
 noncomputable def liftPath (cov : CoveringMap E B)
     {a b : B} (p : Path a b) (e : E) (he : cov.proj e = a) :
     { e' : E // cov.proj e' = b } := by
