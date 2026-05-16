@@ -200,17 +200,21 @@ structure WhiteheadTheorem extends WeakHomotopyEquiv where
 /-! ## Cellular Approximation -/
 
 /-- Cellular approximation: any continuous map f : X → Y between CW
-    complexes is homotopic to a cellular map g with g(Xⁿ) ⊆ Yⁿ. -/
+    complexes is homotopic to a cellular map whose source skeleta land in
+    chosen target skeleta. -/
 structure CellularApprox where
   /-- Source complex. -/
   source : CWComplex
   /-- Target complex. -/
   target : CWComplex
-  /-- The cellular map preserves skeleta. -/
+  /-- Chosen target skeleton for the image of each source skeleton. -/
+  targetSkeleton : Nat → Nat
+  /-- The cellular map lands in the chosen target skeleton. -/
   preserves_skeleta : ∀ n, n ≤ source.structure_.maxDim →
-    n ≤ target.structure_.maxDim
-  /-- Homotopy trace between source and target cell counts. -/
-  homotopy : ∀ n, Path (source.structure_.cellCount n) (target.structure_.cellCount n)
+    targetSkeleton n ≤ target.structure_.maxDim
+  /-- Homotopy trace between source cells and their target skeleton. -/
+  homotopy : ∀ n, Path (source.structure_.cellCount n)
+    (target.structure_.cellCount (targetSkeleton n))
 
 /-- Cellular maps induce chain maps. -/
 structure CellularChainMap (X Y : CWComplex) where
