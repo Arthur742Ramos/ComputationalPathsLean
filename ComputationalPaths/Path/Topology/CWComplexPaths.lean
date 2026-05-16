@@ -163,7 +163,7 @@ structure RelativeHomology (P : CWPair) where
   /-- Bounded by relative rank. -/
   betti_le : ∀ n, betti n ≤ chains.relRank n
 
-/-- The long exact sequence of a CW pair. -/
+/-- Rank-level shadow of the long exact sequence of a CW pair. -/
 structure LongExactSequence (P : CWPair) where
   /-- Homology of A. -/
   h_sub : Nat → Nat
@@ -173,10 +173,10 @@ structure LongExactSequence (P : CWPair) where
   h_rel : Nat → Nat
   /-- Rank-level connecting homomorphism for the relative sequence. -/
   connecting : Nat → Nat
-  /-- The total term is controlled by adjacent subcomplex and relative terms. -/
-  exact_total : ∀ n, h_total n ≤ h_sub n + h_rel n + connecting n
-  /-- The relative term is controlled by adjacent total and subcomplex terms. -/
-  exact_relative : ∀ n, h_rel n ≤ h_total n + h_sub n + connecting n
+  /-- The total rank is controlled by adjacent subcomplex and relative ranks. -/
+  rank_bound_total : ∀ n, h_total n ≤ h_sub n + h_rel n + connecting n
+  /-- The relative rank is controlled by adjacent total and subcomplex ranks. -/
+  rank_bound_relative : ∀ n, h_rel n ≤ h_total n + h_sub n + connecting n
 
 /-! ## Whitehead Theorem -/
 
