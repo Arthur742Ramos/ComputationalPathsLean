@@ -307,7 +307,7 @@ noncomputable def mapper_node_count (m : MapperGraph) :
 
 /-! ## Additional Theorems -/
 
-noncomputable def mapper_node_count_consistency_theorem
+noncomputable def mapperNodeCountConsistency
     (m : MapperGraph) : Path m.numNodes m.nodes.length :=
   m.node_count
 
@@ -325,7 +325,7 @@ theorem reeb_interleaving_symmetry_theorem
         R.backward.vertexMap e.2 < R.r1.numVertices :=
   R.backward.edge_preserving
 
-noncomputable def merge_tree_root_fixed_theorem
+noncomputable def mergeTreeRootFixed
     (t : MergeTree) : Path (t.parent t.root) t.root :=
   t.root_fixed
 
