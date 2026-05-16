@@ -229,6 +229,17 @@ inductive CWStep : Type
   | whitehead_apply : CWStep
   | relative_seq : CWStep
 
+/-- Bookkeeping path showing how the permitted skeleton budget decomposes into
+    the output skeleton plus the unused local slack. -/
+noncomputable def cwSkeletonBudgetPath
+    (skeletonBefore skeletonAfter : Nat)
+    (h : skeletonAfter ≤ skeletonBefore + 1) :
+    Path (skeletonBefore + 1)
+      (skeletonAfter + (skeletonBefore + 1 - skeletonAfter)) :=
+  Path.ofEq
+    ((Nat.sub_add_cancel h).symm.trans
+      (Nat.add_comm (skeletonBefore + 1 - skeletonAfter) skeletonAfter))
+
 /-- Local certificate carried by each CW-complex rewrite step. -/
 structure CWStepCertificate where
   /-- Skeleton dimension before the local rewrite. -/
@@ -237,38 +248,33 @@ structure CWStepCertificate where
   skeletonAfter : Nat
   /-- The local rewrite advances the skeleton by at most one dimension. -/
   skeleton_le_step : skeletonAfter ≤ skeletonBefore + 1
-  /-- RwEq coherence for the normalized skeleton bookkeeping path. -/
+  /-- RwEq coherence for the step-specific skeleton budget path. -/
   coherence :
-    RwEq (Path.trans (Path.refl skeletonAfter) (Path.refl skeletonAfter))
-      (Path.refl skeletonAfter)
+    RwEq
+      (Path.trans
+        (cwSkeletonBudgetPath skeletonBefore skeletonAfter skeleton_le_step)
+        (Path.symm
+          (cwSkeletonBudgetPath skeletonBefore skeletonAfter skeleton_le_step)))
+      (Path.refl (skeletonBefore + 1))
+
+/-- Build a local CW certificate from concrete skeleton bounds. -/
+noncomputable def mkCWStepCertificate
+    (skeletonBefore skeletonAfter : Nat)
+    (h : skeletonAfter ≤ skeletonBefore + 1) : CWStepCertificate where
+  skeletonBefore := skeletonBefore
+  skeletonAfter := skeletonAfter
+  skeleton_le_step := h
+  coherence :=
+    rweq_cmpA_inv_right
+      (cwSkeletonBudgetPath skeletonBefore skeletonAfter h)
 
 /-- CWStep validity as a concrete local rewrite certificate. -/
 noncomputable def cwStep_valid : CWStep → CWStepCertificate
-  | CWStep.attach_cell =>
-      { skeletonBefore := 0
-        skeletonAfter := 1
-        skeleton_le_step := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 1) }
-  | CWStep.collapse_cell =>
-      { skeletonBefore := 1
-        skeletonAfter := 0
-        skeleton_le_step := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 0) }
-  | CWStep.cellular_approx =>
-      { skeletonBefore := 2
-        skeletonAfter := 2
-        skeleton_le_step := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 2) }
-  | CWStep.whitehead_apply =>
-      { skeletonBefore := 2
-        skeletonAfter := 2
-        skeleton_le_step := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 2) }
-  | CWStep.relative_seq =>
-      { skeletonBefore := 1
-        skeletonAfter := 1
-        skeleton_le_step := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 1) }
+  | CWStep.attach_cell => mkCWStepCertificate 0 1 (by decide)
+  | CWStep.collapse_cell => mkCWStepCertificate 1 0 (by decide)
+  | CWStep.cellular_approx => mkCWStepCertificate 2 2 (by decide)
+  | CWStep.whitehead_apply => mkCWStepCertificate 2 2 (by decide)
+  | CWStep.relative_seq => mkCWStepCertificate 1 1 (by decide)
 
 /-! ## RwEq Witnesses -/
 

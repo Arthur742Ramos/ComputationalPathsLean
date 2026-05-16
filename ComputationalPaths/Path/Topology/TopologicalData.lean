@@ -248,6 +248,17 @@ inductive TDAStep : Type
   | landscape_sum : TDAStep
   | wasserstein_opt : TDAStep
 
+/-- Bookkeeping path showing how an input complexity budget decomposes into
+    the output complexity plus the discarded local slack. -/
+noncomputable def tdaComplexityBudgetPath
+    (inputComplexity outputComplexity : Nat)
+    (h : outputComplexity ≤ inputComplexity) :
+    Path inputComplexity
+      (outputComplexity + (inputComplexity - outputComplexity)) :=
+  Path.ofEq
+    ((Nat.sub_add_cancel h).symm.trans
+      (Nat.add_comm (inputComplexity - outputComplexity) outputComplexity))
+
 /-- Local certificate carried by each TDA rewrite step. -/
 structure TDAStepCertificate where
   /-- Size measure before the local rewrite. -/
@@ -256,38 +267,33 @@ structure TDAStepCertificate where
   outputComplexity : Nat
   /-- The rewrite does not increase the local size measure. -/
   output_le_input : outputComplexity ≤ inputComplexity
-  /-- RwEq coherence for the step's normalized bookkeeping path. -/
+  /-- RwEq coherence for the step-specific complexity decomposition path. -/
   coherence :
-    RwEq (Path.trans (Path.refl outputComplexity) (Path.refl outputComplexity))
-      (Path.refl outputComplexity)
+    RwEq
+      (Path.trans
+        (tdaComplexityBudgetPath inputComplexity outputComplexity output_le_input)
+        (Path.symm
+          (tdaComplexityBudgetPath inputComplexity outputComplexity output_le_input)))
+      (Path.refl inputComplexity)
+
+/-- Build a local TDA certificate from concrete complexity bounds. -/
+noncomputable def mkTDAStepCertificate
+    (inputComplexity outputComplexity : Nat)
+    (h : outputComplexity ≤ inputComplexity) : TDAStepCertificate where
+  inputComplexity := inputComplexity
+  outputComplexity := outputComplexity
+  output_le_input := h
+  coherence :=
+    rweq_cmpA_inv_right
+      (tdaComplexityBudgetPath inputComplexity outputComplexity h)
 
 /-- TDAStep validity as a concrete local rewrite certificate. -/
 noncomputable def tdaStep_valid : TDAStep → TDAStepCertificate
-  | TDAStep.mapper_refine =>
-      { inputComplexity := 2
-        outputComplexity := 2
-        output_le_input := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 2) }
-  | TDAStep.reeb_quotient =>
-      { inputComplexity := 3
-        outputComplexity := 2
-        output_le_input := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 2) }
-  | TDAStep.merge_event =>
-      { inputComplexity := 2
-        outputComplexity := 1
-        output_le_input := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 1) }
-  | TDAStep.landscape_sum =>
-      { inputComplexity := 2
-        outputComplexity := 2
-        output_le_input := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 2) }
-  | TDAStep.wasserstein_opt =>
-      { inputComplexity := 3
-        outputComplexity := 1
-        output_le_input := by decide
-        coherence := rweq_cmpA_refl_left (Path.refl 1) }
+  | TDAStep.mapper_refine => mkTDAStepCertificate 2 2 (by decide)
+  | TDAStep.reeb_quotient => mkTDAStepCertificate 3 2 (by decide)
+  | TDAStep.merge_event => mkTDAStepCertificate 2 1 (by decide)
+  | TDAStep.landscape_sum => mkTDAStepCertificate 2 2 (by decide)
+  | TDAStep.wasserstein_opt => mkTDAStepCertificate 3 1 (by decide)
 
 /-- Merge tree root is a fixed point (Path witness). -/
 noncomputable def mergeTree_root_fixed (t : MergeTree) :
