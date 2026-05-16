@@ -1,0 +1,54 @@
+name: Build or proof issue
+description: Report a Lean build, proof, import, or module failure.
+title: "[Build/Proof]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a repository issue. Please include the smallest module or command that reproduces the problem.
+  - type: input
+    id: lean-version
+    attributes:
+      label: Lean version
+      description: Output from `lake -R --no-ansi env lean --version`.
+      placeholder: "Lean (version 4.24.0, ...)"
+    validations:
+      required: true
+  - type: input
+    id: module
+    attributes:
+      label: Target module or file
+      description: Name the smallest affected module or file.
+      placeholder: "ComputationalPaths.Basic"
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command
+      description: Paste the exact command you ran.
+      placeholder: "lake --no-ansi build ComputationalPaths.Basic"
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to build, prove, or import successfully?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Paste the relevant error output or warning text.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Link related PRs, stacked branches, or documentation if relevant.
