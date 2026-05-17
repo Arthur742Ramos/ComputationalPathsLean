@@ -85,7 +85,7 @@ theorem pi2Sphere2Generator_eq_refl :
 /-- Coherence: double reflexivity is itself reflexive. -/
 noncomputable def pi2Sphere2ReflCoherence :
     Path pi2Sphere2Generator (Path.refl (Path.refl sphere2Base)) :=
-  Path.refl _
+  Path.stepChain pi2Sphere2Generator_eq_refl
 
 /-! ## Group operations on π₂ -/
 
@@ -432,7 +432,7 @@ theorem hopfPi2Action_id (α : Pi2 Sphere2 sphere2Base) :
 /-- Coherence path for Hopf action. -/
 noncomputable def hopfPi2Action_path (α : Pi2 Sphere2 sphere2Base) :
     Path (hopfPi2Action α) α :=
-  Path.refl α
+  Path.stepChain (hopfPi2Action_id α)
 
 /-- Hopf action preserves composition. -/
 theorem hopfPi2Action_comp (α β : Pi2 Sphere2 sphere2Base) :
@@ -443,7 +443,7 @@ theorem hopfPi2Action_comp (α β : Pi2 Sphere2 sphere2Base) :
 noncomputable def hopfPi2Action_comp_path (α β : Pi2 Sphere2 sphere2Base) :
     Path (hopfPi2Action (pi2Comp α β))
          (pi2Comp (hopfPi2Action α) (hopfPi2Action β)) :=
-  Path.refl _
+  Path.stepChain (hopfPi2Action_comp α β)
 
 /-! ## Suspension and π₂ -/
 
@@ -719,6 +719,35 @@ noncomputable def pi2Surface_triviality_certificate (g : Nat)
   representativePath := pi2Surface_path g α
   inverseCancel := pi2Comp_inv_left_rweq α
 
+/-- Enriched surface certificate with explicit non-empty canonical step-chain data. -/
+structure Pi2SurfaceTrivialityTraceCertificate (g : Nat) where
+  /-- Original certificate for backwards-compatible access. -/
+  base : Pi2SurfaceTrivialityCertificate g
+  /-- Domain payload: the genus used to build this certificate. -/
+  genusPayload : Nat
+  /-- Canonical step-chain representative extracted from the sampled element. -/
+  canonicalStep : Pi2 (Surface g) (surfaceBase g)
+  /-- The canonical representative records an explicit step. -/
+  canonicalStepNonempty : canonicalStep.steps ≠ []
+  /-- Rewrite coherence from the canonical step representative to identity. -/
+  canonicalToIdentity : RwEq canonicalStep base.identityRepresentative
+  /-- Computational path from the canonical step representative to normalized identity. -/
+  canonicalPathToNormalized :
+    Path canonicalStep (pi2IdCanonical (A := Surface g) (a := surfaceBase g))
+
+/-- Build the enriched surface certificate with explicit canonical-step metadata. -/
+noncomputable def pi2Surface_triviality_trace_certificate (g : Nat)
+    (α : Pi2 (Surface g) (surfaceBase g)) :
+    Pi2SurfaceTrivialityTraceCertificate g where
+  base := pi2Surface_triviality_certificate g α
+  genusPayload := g
+  canonicalStep := Path.stepChain α.toEq
+  canonicalStepNonempty := by
+    simp [Path.stepChain]
+  canonicalToIdentity := by
+    simpa [pi2Surface_triviality_certificate, pi2Id] using pi2Surface_rweq g α
+  canonicalPathToNormalized := pi2Surface_path g α
+
 /-- Torus certificate for π₂-triviality in the surface model. -/
 noncomputable def pi2Torus_trivial_certificate
     (α : Pi2 (Surface 1) (surfaceBase 1)) :
@@ -767,15 +796,50 @@ noncomputable def pi2PUnit_triviality_certificate
   representativePath := pi2_punit_path α
   inverseCancel := pi2Comp_inv_left_rweq α
 
+/-- Enriched PUnit certificate with explicit non-empty canonical step-chain data. -/
+structure Pi2PUnitTrivialityTraceCertificate where
+  /-- Original certificate for backwards-compatible access. -/
+  base : Pi2PUnitTrivialityCertificate
+  /-- Canonical step-chain representative extracted from the sampled element. -/
+  canonicalStep : Pi2 PUnit PUnit.unit
+  /-- The canonical representative records an explicit step. -/
+  canonicalStepNonempty : canonicalStep.steps ≠ []
+  /-- Rewrite coherence from the canonical step representative to identity. -/
+  canonicalToIdentity : RwEq canonicalStep base.identityRepresentative
+  /-- Computational path from the canonical step representative to normalized identity. -/
+  canonicalPathToNormalized :
+    Path canonicalStep (pi2IdCanonical (A := PUnit) (a := PUnit.unit))
+
+/-- Build the enriched PUnit certificate with explicit canonical-step metadata. -/
+noncomputable def pi2PUnit_triviality_trace_certificate
+    (α : Pi2 PUnit PUnit.unit) : Pi2PUnitTrivialityTraceCertificate where
+  base := pi2PUnit_triviality_certificate α
+  canonicalStep := Path.stepChain α.toEq
+  canonicalStepNonempty := by
+    simp [Path.stepChain]
+  canonicalToIdentity := by
+    simpa [pi2PUnit_triviality_certificate, pi2Id] using pi2_punit_rweq (α := α)
+  canonicalPathToNormalized := pi2_punit_path α
+
 /-- RP² certificate for π₂-triviality in the PUnit model. -/
 noncomputable def pi2RP2_trivial_certificate
     (α : Pi2 RP2 rp2Base) : Pi2PUnitTrivialityCertificate :=
   pi2PUnit_triviality_certificate α
 
+/-- RP² enriched trace certificate for π₂-triviality in the PUnit model. -/
+noncomputable def pi2RP2_trivial_trace_certificate
+    (α : Pi2 RP2 rp2Base) : Pi2PUnitTrivialityTraceCertificate :=
+  pi2PUnit_triviality_trace_certificate α
+
 /-- Klein-bottle certificate for π₂-triviality in the PUnit model. -/
 noncomputable def pi2Klein_trivial_certificate
     (α : Pi2 KleinBottle kleinBase) : Pi2PUnitTrivialityCertificate :=
   pi2PUnit_triviality_certificate α
+
+/-- Klein-bottle enriched trace certificate for π₂-triviality in the PUnit model. -/
+noncomputable def pi2Klein_trivial_trace_certificate
+    (α : Pi2 KleinBottle kleinBase) : Pi2PUnitTrivialityTraceCertificate :=
+  pi2PUnit_triviality_trace_certificate α
 
 /-! ## Iterated π₂ composition -/
 

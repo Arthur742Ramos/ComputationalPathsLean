@@ -351,6 +351,74 @@ noncomputable def canonicalPathObject (b : A) :
   left_eval := rw_of_step (Step.trans_refl_left (Path.refl b))
   right_eval := rw_of_step (Step.trans_refl_left (Path.refl b))
 
+/-- Typed coherence package for the canonical cylinder object. -/
+structure CanonicalCylinderCoherenceCertificate (a : A) where
+  cylinder : CylinderObject (pathModelCategory A) a
+  left_composite_payload :
+    PathEvidencePayload (A := A) (Path.trans cylinder.i₀ cylinder.σ)
+  left_identity_payload :
+    PathEvidencePayload (A := A) (Path.refl a)
+  left_section_rweq : RwEq (Path.trans cylinder.i₀ cylinder.σ) (Path.refl a)
+  right_composite_payload :
+    PathEvidencePayload (A := A) (Path.trans cylinder.i₁ cylinder.σ)
+  right_identity_payload :
+    PathEvidencePayload (A := A) (Path.refl a)
+  right_section_rweq : RwEq (Path.trans cylinder.i₁ cylinder.σ) (Path.refl a)
+
+/-- Typed coherence package for the canonical path object. -/
+structure CanonicalPathObjectCoherenceCertificate (b : A) where
+  pathObject : PathObject (pathModelCategory A) b
+  left_eval_payload :
+    PathEvidencePayload (A := A) (Path.trans pathObject.δ pathObject.ev₀)
+  left_identity_payload :
+    PathEvidencePayload (A := A) (Path.refl b)
+  left_eval_rweq : RwEq (Path.trans pathObject.δ pathObject.ev₀) (Path.refl b)
+  right_eval_payload :
+    PathEvidencePayload (A := A) (Path.trans pathObject.δ pathObject.ev₁)
+  right_identity_payload :
+    PathEvidencePayload (A := A) (Path.refl b)
+  right_eval_rweq : RwEq (Path.trans pathObject.δ pathObject.ev₁) (Path.refl b)
+
+/-- Build the canonical cylinder coherence package with explicit non-empty traces. -/
+noncomputable def canonicalCylinder_coherence_certificate (a : A) :
+    CanonicalCylinderCoherenceCertificate (A := A) a := by
+  let cyl := canonicalCylinder (A := A) a
+  let leftR : RwEq (Path.trans cyl.i₀ cyl.σ) (Path.refl a) :=
+    rweq_of_step (Step.trans_refl_left (Path.refl a))
+  let rightR : RwEq (Path.trans cyl.i₁ cyl.σ) (Path.refl a) :=
+    rweq_of_step (Step.trans_refl_left (Path.refl a))
+  exact
+    { cylinder := cyl
+      left_composite_payload :=
+        canonicalPathEvidencePayload (A := A) (Path.trans cyl.i₀ cyl.σ)
+      left_identity_payload := canonicalPathEvidencePayload (A := A) (Path.refl a)
+      left_section_rweq := leftR
+      right_composite_payload :=
+        canonicalPathEvidencePayload (A := A) (Path.trans cyl.i₁ cyl.σ)
+      right_identity_payload := canonicalPathEvidencePayload (A := A) (Path.refl a)
+      right_section_rweq := rightR
+    }
+
+/-- Build the canonical path-object coherence package with explicit non-empty traces. -/
+noncomputable def canonicalPathObject_coherence_certificate (b : A) :
+    CanonicalPathObjectCoherenceCertificate (A := A) b := by
+  let pObj := canonicalPathObject (A := A) b
+  let leftR : RwEq (Path.trans pObj.δ pObj.ev₀) (Path.refl b) :=
+    rweq_of_step (Step.trans_refl_left (Path.refl b))
+  let rightR : RwEq (Path.trans pObj.δ pObj.ev₁) (Path.refl b) :=
+    rweq_of_step (Step.trans_refl_left (Path.refl b))
+  exact
+    { pathObject := pObj
+      left_eval_payload :=
+        canonicalPathEvidencePayload (A := A) (Path.trans pObj.δ pObj.ev₀)
+      left_identity_payload := canonicalPathEvidencePayload (A := A) (Path.refl b)
+      left_eval_rweq := leftR
+      right_eval_payload :=
+        canonicalPathEvidencePayload (A := A) (Path.trans pObj.δ pObj.ev₁)
+      right_identity_payload := canonicalPathEvidencePayload (A := A) (Path.refl b)
+      right_eval_rweq := rightR
+    }
+
 /-- Cylinder inclusions are cofibrations. -/
 theorem cylinder_inclusions_are_cof (a : A) :
     (pathModelCategory A).cof (canonicalCylinder (A := A) a).i₀ ∧
@@ -614,8 +682,9 @@ noncomputable def leftDerivedId {B : Type v} (F : A → B)
   resolve := id
   functor := F
   mapF := mapF
-  resolution_map := fun a => Path.refl a
-  resolution_weq := fun a => weq_refl A a
+  resolution_map := fun a => Path.stepChain (A := A) (a := a) (b := a) rfl
+  resolution_weq := fun a =>
+    path_is_weak_equivalence (A := A) (Path.stepChain (A := A) (a := a) (b := a) rfl)
 
 /-- A right derived functor from fibrant resolution + right Quillen functor. -/
 structure RightDerivedFunctor (A : Type u) (B : Type v) where
@@ -632,8 +701,9 @@ noncomputable def rightDerivedId {B : Type v} (F : A → B)
   resolve := id
   functor := F
   mapF := mapF
-  resolution_map := fun a => Path.refl a
-  resolution_weq := fun a => weq_refl A a
+  resolution_map := fun a => Path.stepChain (A := A) (a := a) (b := a) rfl
+  resolution_weq := fun a =>
+    path_is_weak_equivalence (A := A) (Path.stepChain (A := A) (a := a) (b := a) rfl)
 
 /-- Left derived functors preserve weak equivalences between cofibrant objects. -/
 theorem left_derived_preserves_weq {B : Type v} (L : LeftDerivedFunctor A B)
@@ -910,8 +980,8 @@ structure SimplicialEnrichment (A : Type u) where
 noncomputable def trivialSimplicialEnrichment (A : Type u) :
     SimplicialEnrichment A where
   map_space := fun a _b => a
-  compose_map := fun a _b _c => Path.refl a
-  mapping_id := fun a => Path.refl a
+  compose_map := fun a _b _c => Path.stepChain (A := A) (a := a) (b := a) rfl
+  mapping_id := fun a => Path.stepChain (A := A) (a := a) (b := a) rfl
 
 /-- SM7 axiom: pushout-product of cofibration with cofibration is cofibration. -/
 theorem sm7_pushout_product {a b : A}
