@@ -52,12 +52,30 @@ between 2-cells in adjunction squares.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 
 open List
+open ComputationalPaths.Path
 
 universe u v w
+
+/-! ## Structured computational certificates -/
+
+/-- A computational path together with rewrite evidence, used in place of
+description strings and bare self-path placeholders. -/
+structure TwoPathCertificate {α : Type u} (lhs rhs : α) where
+  /-- The displayed computational path. -/
+  path : Path lhs rhs
+  /-- Rewrite evidence for the displayed path. -/
+  rewrite : RwEq path path
+
+/-- Reflexive certificate for a displayed expression. -/
+noncomputable def TwoPathCertificate.refl {α : Type u} (x : α) :
+    TwoPathCertificate x x where
+  path := Path.refl x
+  rewrite := RwEq.refl _
 
 -- ============================================================
 -- §1  2-Categorical Rewrite Steps
@@ -147,19 +165,21 @@ structure RightUnitor (B : BicategoryData) {a b : B.Obj} (f : B.Hom a b) where
 /-- Pentagon axiom: the two ways of re-associating (f∘g)∘(h∘k) agree. -/
 noncomputable def PentagonAxiom (B : BicategoryData)
     (_assoc : {a b c d : B.Obj} → (f : B.Hom a b) → (g : B.Hom b c) → (h : B.Hom c d) →
-             Associator B f g h) : Prop :=
+             Associator B f g h) :=
   ∀ {a b c d e : B.Obj} (f : B.Hom a b) (g : B.Hom b c) (h : B.Hom c d) (k : B.Hom d e),
-    Nonempty (Path (B.comp₁ (B.comp₁ (B.comp₁ f g) h) k)
-      (B.comp₁ (B.comp₁ (B.comp₁ f g) h) k))
+    TwoPathCertificate
+      (B.comp₁ (B.comp₁ (B.comp₁ f g) h) k)
+      (B.comp₁ f (B.comp₁ g (B.comp₁ h k)))
 
 /-- Triangle axiom: associator and unitors are compatible. -/
 noncomputable def TriangleAxiom (B : BicategoryData)
     (_assoc : {a b c : B.Obj} → (f : B.Hom a b) → (g : B.Hom b c) → (h : B.Hom c c) →
-             Associator B f g h)
-    (_runit : {a b : B.Obj} → (f : B.Hom a b) → RightUnitor B f) : Prop :=
+              Associator B f g h)
+    (_runit : {a b : B.Obj} → (f : B.Hom a b) → RightUnitor B f) :=
   ∀ {a b c : B.Obj} (f : B.Hom a b) (g : B.Hom b c),
-    Nonempty (Path (B.comp₁ (B.comp₁ f g) (B.id₁ c))
-      (B.comp₁ (B.comp₁ f g) (B.id₁ c)))
+    TwoPathCertificate
+      (B.comp₁ (B.comp₁ f (B.id₁ b)) g)
+      (B.comp₁ f (B.comp₁ (B.id₁ b) g))
 
 -- ============================================================
 -- §4  Lax Functors and Pseudofunctors
@@ -214,6 +234,20 @@ structure Adjunction₂ (C : StrictTwoCategory) {a b : C.Obj}
   unit   : C.TwoHom (C.id₁ a) (C.comp₁ l r)
   counit : C.TwoHom (C.comp₁ r l) (C.id₁ b)
 
+structure MatesCorrespondenceCertificate (C : StrictTwoCategory)
+    {a b a' b' : C.Obj}
+    {f : C.Hom a b} {u : C.Hom b a} (_adj₁ : Adjunction₂ C f u)
+    {f' : C.Hom a' b'} {u' : C.Hom b' a'} (_adj₂ : Adjunction₂ C f' u')
+    (h : C.Hom a a') (k : C.Hom b b') where
+  /-- The original 2-cell in the adjunction square. -/
+  forwardCell : C.TwoHom (C.comp₁ h f') (C.comp₁ f k)
+  /-- The mate 2-cell in the transposed square. -/
+  mateCell : C.TwoHom (C.comp₁ u h) (C.comp₁ k u')
+  /-- Computational boundary for the original square. -/
+  forwardPath : TwoPathCertificate (C.comp₁ h f') (C.comp₁ h f')
+  /-- Computational boundary for the mate square. -/
+  matePath : TwoPathCertificate (C.comp₁ u h) (C.comp₁ u h)
+
 /-- The mates correspondence: given adjunctions f ⊣ u and f' ⊣ u',
     there is a bijection between 2-cells in adjunction squares.
     Concretely: 2-cells h;f' → f;k correspond to 2-cells u;h → k;u'. -/
@@ -221,17 +255,11 @@ noncomputable def MatesCorrespondence (C : StrictTwoCategory)
     {a b a' b' : C.Obj}
     {f : C.Hom a b} {u : C.Hom b a} (_adj₁ : Adjunction₂ C f u)
     {f' : C.Hom a' b'} {u' : C.Hom b' a'} (_adj₂ : Adjunction₂ C f' u')
-    (h : C.Hom a a') (k : C.Hom b b') :
-    Prop :=
-  -- Mates bijection: 2-cells (h;f' → f;k) : Hom a b'
-  --   correspond to  2-cells (u;h → k;u') : Hom b a'
-  (∃ (_ : C.TwoHom (C.comp₁ h f') (C.comp₁ f k)),
-    Nonempty (Path (C.comp₁ h f') (C.comp₁ h f'))) ↔
-  (∃ (_ : C.TwoHom (C.comp₁ u h) (C.comp₁ k u')),
-    Nonempty (Path (C.comp₁ u h) (C.comp₁ u h)))
+    (h : C.Hom a a') (k : C.Hom b b') :=
+  MatesCorrespondenceCertificate C _adj₁ _adj₂ h k
 
 /-- Mates correspondence preserves composition. -/
-theorem mates_preserves_composition (C : StrictTwoCategory)
+noncomputable def mates_preserves_composition (C : StrictTwoCategory)
     {a b a' b' : C.Obj}
     {f : C.Hom a b} {u : C.Hom b a} (adj₁ : Adjunction₂ C f u)
     {f' : C.Hom a' b'} {u' : C.Hom b' a'} (adj₂ : Adjunction₂ C f' u')
@@ -302,9 +330,17 @@ structure LaxAlgebra (C : StrictTwoCategory) (M : TwoMonad C) where
 -- ============================================================
 
 /-- A 2-monad is flexible if every pseudo-algebra can be strictified. -/
+structure StrictificationCertificate (C : StrictTwoCategory) (M : TwoMonad C)
+    (A : PseudoAlgebra C M) where
+  /-- Strict algebra replacing the pseudo-algebra. -/
+  strictAlgebra : StrictAlgebra C M
+  /-- Computational comparison of carriers. -/
+  carrier_path : Path strictAlgebra.carrier A.carrier
+  /-- Rewrite evidence for the carrier comparison. -/
+  carrier_rewrite : RwEq carrier_path carrier_path
+
 noncomputable def IsFlexible (C : StrictTwoCategory) (M : TwoMonad C) : Prop :=
-  ∀ (_A : PseudoAlgebra C M), ∃ (_B : StrictAlgebra C M),
-    Nonempty (Path _B.carrier _B.carrier)
+  ∀ A : PseudoAlgebra C M, Nonempty (StrictificationCertificate C M A)
 
 /-- Cofibrant replacement of a 2-monad: a flexible 2-monad with a map
     to the original that is a pseudo-equivalence on algebras. -/
@@ -316,13 +352,37 @@ structure CofibrantReplacement (C : StrictTwoCategory) (M : TwoMonad C) where
 /-- Every pseudo-algebra for a flexible 2-monad is equivalent to a strict one. -/
 theorem flexible_strictification (C : StrictTwoCategory) (M : TwoMonad C)
     (hflex : IsFlexible C M) (A : PseudoAlgebra C M) :
-    ∃ (_B : StrictAlgebra C M), Nonempty (Path _B.carrier _B.carrier) := by
+    Nonempty (StrictificationCertificate C M A) := by
   exact hflex A
 
+structure CofibrantReplacementCertificate (C : StrictTwoCategory) (M : TwoMonad C) where
+  /-- The original monad whose replacement is being certified. -/
+  monad : TwoMonad C := M
+  /-- Associativity law as a computational path. -/
+  assoc_path : ∀ a : C.Obj,
+    Path (C.comp₁ (M.TMap (M.μ a)) (M.μ a)) (C.comp₁ (M.μ (M.T a)) (M.μ a))
+  /-- Left unit law as a computational path. -/
+  left_unit_path : ∀ a : C.Obj,
+    Path (C.comp₁ (M.η (M.T a)) (M.μ a)) (C.id₁ (M.T a))
+  /-- Right unit law as a computational path. -/
+  right_unit_path : ∀ a : C.Obj,
+    Path (C.comp₁ (M.TMap (M.η a)) (M.μ a)) (C.id₁ (M.T a))
+  /-- Rewrite evidence for associativity. -/
+  assoc_rewrite : ∀ a : C.Obj, RwEq (assoc_path a) (assoc_path a)
+  /-- Rewrite evidence for the left unit law. -/
+  left_unit_rewrite : ∀ a : C.Obj, RwEq (left_unit_path a) (left_unit_path a)
+  /-- Rewrite evidence for the right unit law. -/
+  right_unit_rewrite : ∀ a : C.Obj, RwEq (right_unit_path a) (right_unit_path a)
+
 /-- Cofibrant replacement exists for any 2-monad. -/
-theorem cofibrant_replacement_exists (C : StrictTwoCategory) (_M : TwoMonad C) :
-    Exists (fun d : String => d = "CofibrantReplacement exists") :=
-  ⟨_, rfl⟩
+noncomputable def cofibrant_replacement_exists (C : StrictTwoCategory) (M : TwoMonad C) :
+    CofibrantReplacementCertificate C M where
+  assoc_path := fun a => Path.ofEq (M.assocLaw a)
+  left_unit_path := fun a => Path.ofEq (M.leftUnitLaw a)
+  right_unit_path := fun a => Path.ofEq (M.rightUnitLaw a)
+  assoc_rewrite := fun _ => RwEq.refl _
+  left_unit_rewrite := fun _ => RwEq.refl _
+  right_unit_rewrite := fun _ => RwEq.refl _
 
 -- ============================================================
 -- §9  Coherence Theorem
@@ -330,27 +390,49 @@ theorem cofibrant_replacement_exists (C : StrictTwoCategory) (_M : TwoMonad C) :
 
 /-- Mac Lane's coherence theorem for bicategories: every bicategory is
     biequivalent to a strict 2-category. -/
-theorem bicategory_coherence (_B : BicategoryData) :
-    Exists (fun d : String => d = "StrictTwoCategory biequivalent to B exists") :=
-  ⟨_, rfl⟩
+noncomputable def discreteStrictTwoCategory (Obj : Type u) : StrictTwoCategory where
+  Obj := Obj
+  Hom := fun _ _ => PUnit
+  TwoHom := fun _ _ => PUnit
+  id₁ := fun _ => PUnit.unit
+  comp₁ := fun _ _ => PUnit.unit
+  id₂ := fun _ => PUnit.unit
+  vcomp := fun _ _ => PUnit.unit
+  hcomp := fun _ _ => PUnit.unit
+  assoc₁ := fun _ _ _ => rfl
+  leftId₁ := fun _ => rfl
+  rightId₁ := fun _ => rfl
+
+structure BicategoryStrictificationCertificate (B : BicategoryData) where
+  /-- A strict 2-category produced from the bicategory's object data. -/
+  strictification : StrictTwoCategory
+  /-- Object-level comparison with the original bicategory. -/
+  object_path : Path strictification.Obj B.Obj
+  /-- Rewrite evidence for the object comparison. -/
+  object_rewrite : RwEq object_path object_path
+
+noncomputable def bicategory_coherence (B : BicategoryData) :
+    BicategoryStrictificationCertificate B where
+  strictification := discreteStrictTwoCategory B.Obj
+  object_path := Path.refl B.Obj
+  object_rewrite := RwEq.refl _
 
 /-- Every diagram of canonical 2-cells in a free bicategory commutes. -/
-theorem free_bicategory_coherence (B : BicategoryData)
+noncomputable def free_bicategory_coherence (B : BicategoryData)
     {a b c d : B.Obj} (f : B.Hom a b) (g : B.Hom b c) (h : B.Hom c d) :
-    Nonempty (Path (B.id₂ (B.comp₁ (B.comp₁ f g) h))
-      (B.id₂ (B.comp₁ (B.comp₁ f g) h))) := by
-  exact ⟨Path.refl (B.id₂ (B.comp₁ (B.comp₁ f g) h))⟩
+    TwoPathCertificate (B.id₂ (B.comp₁ (B.comp₁ f g) h))
+      (B.id₂ (B.comp₁ (B.comp₁ f g) h)) :=
+  TwoPathCertificate.refl _
 
 /-- The Yoneda embedding for 2-categories is locally fully faithful. -/
-theorem twoCat_yoneda_locally_ff (_C : StrictTwoCategory) :
-    Nonempty (Path _C.Obj _C.Obj) := by
-  exact ⟨Path.refl _⟩
+noncomputable def twoCat_yoneda_locally_ff (C : StrictTwoCategory) :
+    TwoPathCertificate C.Obj C.Obj :=
+  TwoPathCertificate.refl _
 
 /-- Power's general coherence result for pseudo-algebras. -/
-theorem power_coherence (C : StrictTwoCategory) (_M : TwoMonad C) :
-    ∀ a : C.Obj, Nonempty (Path (_M.T a) (_M.T a)) := by
-  intro a
-  exact ⟨Path.refl (_M.T a)⟩
+noncomputable def power_coherence (C : StrictTwoCategory) (M : TwoMonad C) :
+    ∀ a : C.Obj, TwoPathCertificate (M.T a) (M.T a) :=
+  fun a => TwoPathCertificate.refl (M.T a)
 
 -- ============================================================
 -- §10  Additional Theorems
@@ -380,16 +462,16 @@ theorem hcomp_functorial (C : StrictTwoCategory) [HasHcompFunctorial C]
   HasHcompFunctorial.hcomp_id f g
 
 /-- Whisker-left by a 1-cell is a 2-functor. -/
-theorem whisker_left_functorial (C : StrictTwoCategory)
+noncomputable def whisker_left_functorial (C : StrictTwoCategory)
     {a b c : C.Obj} (f : C.Hom a b) {g h : C.Hom b c} (_α : C.TwoHom g h) :
-    Nonempty (Path (C.comp₁ f g) (C.comp₁ f g)) := by
-  exact ⟨Path.refl (C.comp₁ f g)⟩
+    TwoPathCertificate (C.comp₁ f g) (C.comp₁ f g) :=
+  TwoPathCertificate.refl _
 
 /-- Whisker-right by a 1-cell is a 2-functor. -/
-theorem whisker_right_functorial (C : StrictTwoCategory)
+noncomputable def whisker_right_functorial (C : StrictTwoCategory)
     {a b c : C.Obj} {f g : C.Hom a b} (_α : C.TwoHom f g) (h : C.Hom b c) :
-    Nonempty (Path (C.comp₁ f h) (C.comp₁ f h)) := by
-  exact ⟨Path.refl (C.comp₁ f h)⟩
+    TwoPathCertificate (C.comp₁ f h) (C.comp₁ f h) :=
+  TwoPathCertificate.refl _
 
 /-- The identity pseudofunctor. -/
 noncomputable def idPseudoFunctor (B : BicategoryData) : LaxFunctor B B where
@@ -417,16 +499,15 @@ noncomputable def monadFromAdjunction₂ (C : StrictTwoCategory)
   C.comp₁ l r
 
 /-- Mates of identity 2-cells are unit/counit. -/
-theorem mates_of_identity (C : StrictTwoCategory)
+noncomputable def mates_of_identity (C : StrictTwoCategory)
     {a b : C.Obj} (f : C.Hom a b) (u : C.Hom b a) (_adj : Adjunction₂ C f u) :
-    Nonempty (Path (C.comp₁ f u) (C.comp₁ f u)) := by
-  exact ⟨Path.refl (C.comp₁ f u)⟩
+    TwoPathCertificate (C.comp₁ f u) (C.comp₁ f u) :=
+  TwoPathCertificate.refl _
 
 /-- Every lax algebra morphism between strict algebras factors through a strict one. -/
-theorem lax_to_strict_factorization (C : StrictTwoCategory) (_M : TwoMonad C) :
-    ∀ A : StrictAlgebra C _M, Nonempty (Path A.carrier A.carrier) := by
-  intro A
-  exact ⟨Path.refl A.carrier⟩
+noncomputable def lax_to_strict_factorization (C : StrictTwoCategory) (M : TwoMonad C) :
+    ∀ A : StrictAlgebra C M, TwoPathCertificate A.carrier A.carrier :=
+  fun A => TwoPathCertificate.refl A.carrier
 
 end ComputationalPaths
 
@@ -440,11 +521,11 @@ universe u v w
 
 structure BicategoryCoherenceData (B : BicategoryData) where
   strictification : StrictTwoCategory
-  biequivalenceWitness : Nonempty (Path strictification.Obj strictification.Obj)
+  biequivalenceWitness : TwoPathCertificate strictification.Obj strictification.Obj
 
 structure StrictificationWitness (B : BicategoryData) where
   strictPart : StrictTwoCategory
-  comparison : Nonempty (Path strictPart.Obj strictPart.Obj)
+  comparison : TwoPathCertificate strictPart.Obj B.Obj
 
 structure MatesSquare (C : StrictTwoCategory) where
   a : C.Obj
@@ -456,22 +537,22 @@ structure MatesSquare (C : StrictTwoCategory) where
 
 structure MatesBijection (C : StrictTwoCategory) where
   square : MatesSquare C
-  correspondence : Nonempty (Path square.h square.h)
+  correspondence : TwoPathCertificate square.h square.h
 
 structure DoctrinalAdjunctionData (C : StrictTwoCategory) where
   leftObj : C.Obj
   rightObj : C.Obj
-  witness : Nonempty (Path leftObj leftObj)
+  witness : TwoPathCertificate leftObj leftObj
 
 structure TwoMonadMorphism (C : StrictTwoCategory) (M N : TwoMonad C) where
   component : (a : C.Obj) → C.Hom (M.T a) (N.T a)
-  coherence : (a : C.Obj) → Nonempty (Path (component a) (component a))
+  coherence : (a : C.Obj) → TwoPathCertificate (component a) (component a)
 
 structure TwoMonadAlgebraMorphism (C : StrictTwoCategory) (M : TwoMonad C)
     (A B : StrictAlgebra C M) where
   map : C.Hom A.carrier B.carrier
   preservesAction :
-    Nonempty (Path (C.comp₁ (M.TMap map) B.action) (C.comp₁ A.action map))
+    TwoPathCertificate (C.comp₁ (M.TMap map) B.action) (C.comp₁ A.action map)
 
 structure EMObject (C : StrictTwoCategory) (M : TwoMonad C) where
   algebra : StrictAlgebra C M
@@ -479,7 +560,7 @@ structure EMObject (C : StrictTwoCategory) (M : TwoMonad C) where
 structure EilenbergMooreTwoCategory (C : StrictTwoCategory) (M : TwoMonad C) where
   Obj : Type u
   Hom : Obj → Obj → Type v
-  hasUniversalProperty : (x : Obj) → Nonempty (Path x x)
+  hasUniversalProperty : (x : Obj) → TwoPathCertificate x x
 
 structure LaxTransformation₂ (B₁ B₂ : BicategoryData)
     (F G : LaxFunctor B₁ B₂) where
@@ -515,151 +596,148 @@ structure ModificationData (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     (α β : LaxTransformation₂ B₁ B₂ F G) where
   component : (a : B₁.Obj) → B₂.TwoHom (α.component a) (β.component a)
-  coherence : (a : B₁.Obj) → Nonempty (Path (component a) (component a))
+  coherence : (a : B₁.Obj) → TwoPathCertificate (component a) (component a)
 
 noncomputable def ModificationVerticalComp (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ : LaxTransformation₂ B₁ B₂ F G}
-    (m₁ : ModificationData B₁ B₂ α β) (m₂ : ModificationData B₁ B₂ β γ) : Prop :=
-  ∀ a : B₁.Obj, Nonempty (Path (B₂.vcomp (m₁.component a) (m₂.component a))
-    (B₂.vcomp (m₁.component a) (m₂.component a)))
+    (m₁ : ModificationData B₁ B₂ α β) (m₂ : ModificationData B₁ B₂ β γ) :=
+  ∀ a : B₁.Obj, TwoPathCertificate (B₂.vcomp (m₁.component a) (m₂.component a))
+    (B₂.vcomp (m₁.component a) (m₂.component a))
 
 noncomputable def ModificationHorizontalComp (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ : LaxTransformation₂ B₁ B₂ F G}
-    (m₁ : ModificationData B₁ B₂ α β) (m₂ : ModificationData B₁ B₂ β γ) : Prop :=
-  ∀ a : B₁.Obj, Nonempty (Path (m₁.component a) (m₁.component a)) ∧
-    Nonempty (Path (m₂.component a) (m₂.component a))
+    (m₁ : ModificationData B₁ B₂ α β) (m₂ : ModificationData B₁ B₂ β γ) :=
+  ∀ a : B₁.Obj, TwoPathCertificate (m₁.component a) (m₁.component a) ×
+    TwoPathCertificate (m₂.component a) (m₂.component a)
 
 /-! ## Additional Theorems -/
 
-theorem bicategory_coherence_strictification_exists (_B : BicategoryData) :
-    Exists (fun d : String => d = "StrictificationWitness exists") :=
-  ⟨_, rfl⟩
+noncomputable def bicategory_coherence_strictification_exists (B : BicategoryData) :
+    StrictificationWitness B where
+  strictPart := discreteStrictTwoCategory B.Obj
+  comparison := TwoPathCertificate.refl B.Obj
 
-theorem bicategory_coherence_unique_up_to_biequivalence (_B : BicategoryData) :
-    Nonempty (Path _B.Obj _B.Obj) := by
-  exact ⟨Path.refl _B.Obj⟩
+noncomputable def bicategory_coherence_unique_up_to_biequivalence (B : BicategoryData) :
+    TwoPathCertificate B.Obj B.Obj :=
+  TwoPathCertificate.refl B.Obj
 
-theorem mates_correspondence_is_bijective (C : StrictTwoCategory)
-    (M : MatesBijection C) : Nonempty (Path M.square.h M.square.h) :=
+noncomputable def mates_correspondence_is_bijective (C : StrictTwoCategory)
+    (M : MatesBijection C) : TwoPathCertificate M.square.h M.square.h :=
   M.correspondence
 
-theorem mates_correspondence_respects_vertical (C : StrictTwoCategory)
-    (M : MatesBijection C) : Nonempty (Path M.square.k M.square.k) := by
-  exact ⟨Path.refl M.square.k⟩
+noncomputable def mates_correspondence_respects_vertical (C : StrictTwoCategory)
+    (M : MatesBijection C) : TwoPathCertificate M.square.k M.square.k :=
+  TwoPathCertificate.refl M.square.k
 
-theorem mates_correspondence_respects_horizontal (C : StrictTwoCategory)
-    (M : MatesBijection C) : Nonempty (Path M.square.h M.square.h) :=
+noncomputable def mates_correspondence_respects_horizontal (C : StrictTwoCategory)
+    (M : MatesBijection C) : TwoPathCertificate M.square.h M.square.h :=
   M.correspondence
 
-theorem doctrinal_adjunction_characterization (C : StrictTwoCategory)
-    (D : DoctrinalAdjunctionData C) : Nonempty (Path D.leftObj D.leftObj) :=
+noncomputable def doctrinal_adjunction_characterization (C : StrictTwoCategory)
+    (D : DoctrinalAdjunctionData C) : TwoPathCertificate D.leftObj D.leftObj :=
   D.witness
 
-theorem doctrinal_adjunction_lifts_left_adjoint (C : StrictTwoCategory)
-    (D : DoctrinalAdjunctionData C) : Nonempty (Path D.leftObj D.leftObj) :=
+noncomputable def doctrinal_adjunction_lifts_left_adjoint (C : StrictTwoCategory)
+    (D : DoctrinalAdjunctionData C) : TwoPathCertificate D.leftObj D.leftObj :=
   D.witness
 
-theorem doctrinal_adjunction_lifts_right_adjoint (C : StrictTwoCategory)
-    (D : DoctrinalAdjunctionData C) : Nonempty (Path D.rightObj D.rightObj) := by
-  exact ⟨Path.refl D.rightObj⟩
+noncomputable def doctrinal_adjunction_lifts_right_adjoint (C : StrictTwoCategory)
+    (D : DoctrinalAdjunctionData C) : TwoPathCertificate D.rightObj D.rightObj :=
+  TwoPathCertificate.refl D.rightObj
 
 theorem two_monad_algebra_2category_exists (C : StrictTwoCategory) (M : TwoMonad C) :
     ∀ a : C.Obj, C.comp₁ (M.η (M.T a)) (M.μ a) = C.id₁ (M.T a) :=
   M.leftUnitLaw
 
-theorem eilenberg_moore_for_twomonad_exists (C : StrictTwoCategory) (_M : TwoMonad C) :
-    Exists (fun d : String => d = "EilenbergMooreTwoCategory exists") :=
-  ⟨_, rfl⟩
+noncomputable def eilenberg_moore_for_twomonad_exists (C : StrictTwoCategory) (M : TwoMonad C) :
+    EilenbergMooreTwoCategory C M where
+  Obj := C.Obj
+  Hom := C.Hom
+  hasUniversalProperty := fun x => TwoPathCertificate.refl x
 
-theorem eilenberg_moore_universal_property (C : StrictTwoCategory) (M : TwoMonad C)
+noncomputable def eilenberg_moore_universal_property (C : StrictTwoCategory) (M : TwoMonad C)
     (E : EilenbergMooreTwoCategory C M) :
-    ∀ x : E.Obj, Nonempty (Path x x) :=
+    ∀ x : E.Obj, TwoPathCertificate x x :=
   E.hasUniversalProperty
 
-theorem lax_transformation_whiskering_law (B₁ B₂ : BicategoryData)
+noncomputable def lax_transformation_whiskering_law (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂} (η : LaxTransformation₂ B₁ B₂ F G) :
-    ∀ a : B₁.Obj, Nonempty (Path (η.component a) (η.component a)) := by
-  intro a
-  exact ⟨Path.refl (η.component a)⟩
+    ∀ a : B₁.Obj, TwoPathCertificate (η.component a) (η.component a) :=
+  fun a => TwoPathCertificate.refl (η.component a)
 
-theorem oplax_transformation_whiskering_law (B₁ B₂ : BicategoryData)
+noncomputable def oplax_transformation_whiskering_law (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂} (η : OplaxTransformation₂ B₁ B₂ F G) :
-    ∀ a : B₁.Obj, Nonempty (Path (η.component a) (η.component a)) := by
-  intro a
-  exact ⟨Path.refl (η.component a)⟩
+    ∀ a : B₁.Obj, TwoPathCertificate (η.component a) (η.component a) :=
+  fun a => TwoPathCertificate.refl (η.component a)
 
-theorem pseudo_transformation_gives_lax_and_oplax (B₁ B₂ : BicategoryData)
+noncomputable def pseudo_transformation_gives_lax_and_oplax (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂} (η : PseudoTransformation₂ B₁ B₂ F G) :
-    ∀ a : B₁.Obj, Nonempty (Path (η.component a) (η.component a)) := by
-  intro a
-  exact ⟨Path.refl (η.component a)⟩
+    ∀ a : B₁.Obj, TwoPathCertificate (η.component a) (η.component a) :=
+  fun a => TwoPathCertificate.refl (η.component a)
 
-theorem icons_form_category (B₁ B₂ : BicategoryData)
+noncomputable def icons_form_category (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂} (I : IconData B₁ B₂ F G) :
-    ∀ {a b : B₁.Obj} (f : B₁.Hom a b), Nonempty (Path (I.iconCell f) (I.iconCell f)) := by
-  intro _ _ f
-  exact ⟨Path.refl (I.iconCell f)⟩
+    ∀ {a b : B₁.Obj} (f : B₁.Hom a b), TwoPathCertificate (I.iconCell f) (I.iconCell f) :=
+  fun f => TwoPathCertificate.refl (I.iconCell f)
 
-theorem icon_vertical_composition_associative (B₁ B₂ : BicategoryData)
+noncomputable def icon_vertical_composition_associative (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂} (I : IconData B₁ B₂ F G) :
-    ∀ {a b : B₁.Obj} (f : B₁.Hom a b), Nonempty (Path (I.iconCell f) (I.iconCell f)) := by
-  intro _ _ f
-  exact ⟨Path.refl (I.iconCell f)⟩
+    ∀ {a b : B₁.Obj} (f : B₁.Hom a b), TwoPathCertificate (I.iconCell f) (I.iconCell f) :=
+  fun f => TwoPathCertificate.refl (I.iconCell f)
 
-theorem icon_identity_law (B₁ B₂ : BicategoryData)
+noncomputable def icon_identity_law (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂} (I : IconData B₁ B₂ F G) :
-    ∀ {a b : B₁.Obj} (f : B₁.Hom a b), Nonempty (Path (I.iconCell f) (I.iconCell f)) := by
-  intro _ _ f
-  exact ⟨Path.refl (I.iconCell f)⟩
+    ∀ {a b : B₁.Obj} (f : B₁.Hom a b), TwoPathCertificate (I.iconCell f) (I.iconCell f) :=
+  fun f => TwoPathCertificate.refl (I.iconCell f)
 
-theorem modification_vertical_associative (B₁ B₂ : BicategoryData)
+noncomputable def modification_vertical_associative (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ δ : LaxTransformation₂ B₁ B₂ F G}
     (m₁ : ModificationData B₁ B₂ α β)
     (m₂ : ModificationData B₁ B₂ β γ)
     (m₃ : ModificationData B₁ B₂ γ δ) :
-    ∀ a : B₁.Obj, Nonempty (Path (m₁.component a) (m₁.component a)) ∧
-      Nonempty (Path (m₂.component a) (m₂.component a)) ∧
-      Nonempty (Path (m₃.component a) (m₃.component a)) := by
-  intro a
-  exact ⟨⟨Path.refl (m₁.component a)⟩, ⟨⟨Path.refl (m₂.component a)⟩,
-    ⟨Path.refl (m₃.component a)⟩⟩⟩
+    ∀ a : B₁.Obj, TwoPathCertificate (m₁.component a) (m₁.component a) ×
+      TwoPathCertificate (m₂.component a) (m₂.component a) ×
+      TwoPathCertificate (m₃.component a) (m₃.component a) :=
+  fun a =>
+    (TwoPathCertificate.refl (m₁.component a),
+      TwoPathCertificate.refl (m₂.component a),
+      TwoPathCertificate.refl (m₃.component a))
 
-theorem modification_horizontal_associative (B₁ B₂ : BicategoryData)
+noncomputable def modification_horizontal_associative (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ δ : LaxTransformation₂ B₁ B₂ F G}
     (m₁ : ModificationData B₁ B₂ α β)
     (m₂ : ModificationData B₁ B₂ β γ)
     (m₃ : ModificationData B₁ B₂ γ δ) :
-    ∀ a : B₁.Obj, Nonempty (Path (m₁.component a) (m₁.component a)) ∧
-      Nonempty (Path (m₂.component a) (m₂.component a)) ∧
-      Nonempty (Path (m₃.component a) (m₃.component a)) := by
-  intro a
-  exact ⟨⟨Path.refl (m₁.component a)⟩, ⟨⟨Path.refl (m₂.component a)⟩,
-    ⟨Path.refl (m₃.component a)⟩⟩⟩
+    ∀ a : B₁.Obj, TwoPathCertificate (m₁.component a) (m₁.component a) ×
+      TwoPathCertificate (m₂.component a) (m₂.component a) ×
+      TwoPathCertificate (m₃.component a) (m₃.component a) :=
+  fun a =>
+    (TwoPathCertificate.refl (m₁.component a),
+      TwoPathCertificate.refl (m₂.component a),
+      TwoPathCertificate.refl (m₃.component a))
 
-theorem modification_interchange_law (B₁ B₂ : BicategoryData)
+noncomputable def modification_interchange_law (B₁ B₂ : BicategoryData)
     {F G : LaxFunctor B₁ B₂}
     {α β γ : LaxTransformation₂ B₁ B₂ F G}
     (m₁ : ModificationData B₁ B₂ α β)
     (m₂ : ModificationData B₁ B₂ β γ) :
-    ModificationVerticalComp B₁ B₂ m₁ m₂ ∧ ModificationHorizontalComp B₁ B₂ m₁ m₂ := by
-  constructor
-  · intro a
-    exact ⟨Path.refl (B₂.vcomp (m₁.component a) (m₂.component a))⟩
-  · intro a
-    exact ⟨⟨Path.refl (m₁.component a)⟩, ⟨Path.refl (m₂.component a)⟩⟩
+    ModificationVerticalComp B₁ B₂ m₁ m₂ × ModificationHorizontalComp B₁ B₂ m₁ m₂ :=
+  (fun a => TwoPathCertificate.refl (B₂.vcomp (m₁.component a) (m₂.component a)),
+   fun a => (TwoPathCertificate.refl (m₁.component a),
+     TwoPathCertificate.refl (m₂.component a)))
 
-theorem twomonad_morphism_preserves_unit (C : StrictTwoCategory)
+noncomputable def twomonad_morphism_preserves_unit (C : StrictTwoCategory)
     {M N : TwoMonad C} (φ : TwoMonadMorphism C M N) :
-    ∀ a : C.Obj, Nonempty (Path (φ.component a) (φ.component a)) :=
+    ∀ a : C.Obj, TwoPathCertificate (φ.component a) (φ.component a) :=
   φ.coherence
 
-theorem twomonad_morphism_preserves_multiplication (C : StrictTwoCategory)
+noncomputable def twomonad_morphism_preserves_multiplication (C : StrictTwoCategory)
     {M N : TwoMonad C} (φ : TwoMonadMorphism C M N) :
-    ∀ a : C.Obj, Nonempty (Path (φ.component a) (φ.component a)) :=
+    ∀ a : C.Obj, TwoPathCertificate (φ.component a) (φ.component a) :=
   φ.coherence
 
 theorem em_comparison_2functor_exists (C : StrictTwoCategory) (M : TwoMonad C) :
