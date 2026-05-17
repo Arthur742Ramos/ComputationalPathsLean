@@ -45,6 +45,14 @@ noncomputable def Path.length : Path α a b → Nat
   | .nil _    => 0
   | .cons _ p => 1 + p.length
 
+def Step.label : Step α a b → String
+  | .refl _     => "refl"
+  | .rule n _ _ => n
+
+def Path.trace : Path α a b → List String
+  | .nil _    => []
+  | .cons s p => s.label :: p.trace
+
 theorem path_trans_assoc (p : Path α a b) (q : Path α b c) (r : Path α c d) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
   induction p with
@@ -62,6 +70,44 @@ theorem path_length_trans (p : Path α a b) (q : Path α b c) :
   induction p with
   | nil _ => simp [Path.trans, Path.length]
   | cons s _ ih => simp [Path.trans, Path.length, ih, Nat.add_assoc]
+
+theorem path_trace_trans (p : Path α a b) (q : Path α b c) :
+    (Path.trans p q).trace = p.trace ++ q.trace := by
+  induction p with
+  | nil _ => simp [Path.trans, Path.trace]
+  | cons s _ ih => simp [Path.trans, Path.trace, ih]
+
+theorem path_trace_length (p : Path α a b) :
+    p.trace.length = p.length := by
+  induction p with
+  | nil _ => simp [Path.trace, Path.length]
+  | cons s _ ih =>
+      simp [Path.trace, Path.length, ih]
+      exact Nat.add_comm _ _
+
+def RwEq (p q : Path α a b) : Prop :=
+  p.trace = q.trace
+
+theorem rweq_refl (p : Path α a b) : RwEq p p := rfl
+
+theorem rweq_symm {p q : Path α a b} (h : RwEq p q) : RwEq q p :=
+  h.symm
+
+theorem rweq_trans {p q r : Path α a b} (hpq : RwEq p q) (hqr : RwEq q r) :
+    RwEq p r :=
+  hpq.trans hqr
+
+theorem rweq_trans_assoc (p : Path α a b) (q : Path α b c) (r : Path α c d) :
+    RwEq ((p.trans q).trans r) (p.trans (q.trans r)) := by
+  simp [RwEq, path_trace_trans, List.append_assoc]
+
+theorem rweq_trans_nil_right (p : Path α a b) :
+    RwEq (p.trans (.nil b)) p := by
+  simp [RwEq, path_trace_trans, Path.trace]
+
+theorem length_eq_of_trace_eq (p : Path α a b) (names : List String)
+    (h : p.trace = names) : p.length = names.length := by
+  rw [← path_trace_length p, h]
 
 -- ============================================================
 -- §2  Abelian Category Objects & Morphisms
@@ -554,88 +600,233 @@ noncomputable def connecting_naturality (conn : Mor) : MP conn conn :=
 -- ============================================================
 
 -- 61
-theorem ker_path_length (f : Mor) : (ker_comp_zero_path f).length = 1 := rfl
+theorem ker_path_trace (f : Mor) : (ker_comp_zero_path f).trace = ["ker∘f=0"] := rfl
+
+theorem ker_path_length (f : Mor) : (ker_comp_zero_path f).length = 1 := by
+  simpa using length_eq_of_trace_eq (ker_comp_zero_path f) ["ker∘f=0"] (ker_path_trace f)
 
 -- 62
-theorem snake_conn_path_length (conn : Mor) : (snake_connecting_chase conn).length = 3 := rfl
+theorem snake_conn_path_trace (conn : Mor) :
+    (snake_connecting_chase conn).trace = ["chase_lift", "chase_apply_vb", "chase_project"] := rfl
+
+theorem snake_conn_path_length (conn : Mor) : (snake_connecting_chase conn).length = 3 := by
+  simpa using length_eq_of_trace_eq (snake_connecting_chase conn)
+    ["chase_lift", "chase_apply_vb", "chase_project"] (snake_conn_path_trace conn)
 
 -- 63
-theorem five_lemma_path_length (a3 : AbObj) : (five_lemma_iso a3).length = 4 := rfl
+theorem five_lemma_path_trace (a3 : AbObj) :
+    (five_lemma_iso a3).trace =
+      ["five_iso_ker", "five_iso_apply_vb", "five_iso_exact", "five_iso_conclude"] := rfl
+
+theorem five_lemma_path_length (a3 : AbObj) : (five_lemma_iso a3).length = 4 := by
+  simpa using length_eq_of_trace_eq (five_lemma_iso a3)
+    ["five_iso_ker", "five_iso_apply_vb", "five_iso_exact", "five_iso_conclude"]
+    (five_lemma_path_trace a3)
 
 -- 64
-theorem add_zero_path_length (f : Mor) : (add_zero_path f).length = 1 := rfl
+theorem add_zero_path_trace (f : Mor) : (add_zero_path f).trace = ["add_zero"] := rfl
+
+theorem add_zero_path_length (f : Mor) : (add_zero_path f).length = 1 := by
+  simpa using length_eq_of_trace_eq (add_zero_path f) ["add_zero"] (add_zero_path_trace f)
 
 -- 65
-theorem biproduct_decomp_length (A B : AbObj) : (biproduct_decomp_path A B).length = 1 := rfl
+theorem biproduct_decomp_trace (A B : AbObj) :
+    (biproduct_decomp_path A B).trace = ["ι₁π₁+ι₂π₂=id"] := rfl
+
+theorem biproduct_decomp_length (A B : AbObj) : (biproduct_decomp_path A B).length = 1 := by
+  simpa using length_eq_of_trace_eq (biproduct_decomp_path A B) ["ι₁π₁+ι₂π₂=id"]
+    (biproduct_decomp_trace A B)
 
 -- 66
 theorem trans_preserves_length (p : MP a b) (q : MP b c) :
     (p.trans q).length = p.length + q.length := path_length_trans p q
 
+theorem trans_preserves_trace (p : MP a b) (q : MP b c) :
+    (p.trans q).trace = p.trace ++ q.trace := path_trace_trans p q
+
+theorem trans_assoc_rweq (p : MP a b) (q : MP b c) (r : MP c d) :
+    RwEq ((p.trans q).trans r) (p.trans (q.trans r)) :=
+  rweq_trans_assoc p q r
+
 -- 67
 theorem symm_exists (p : MP a b) : ∃ q : MP b a, q = p.symm := ⟨p.symm, rfl⟩
 
+theorem symm_exists_rweq (p : MP a b) : ∃ q : MP b a, RwEq q p.symm :=
+  ⟨p.symm, rweq_refl p.symm⟩
+
 -- 68
-theorem snake_six_term_length (m : Mor) : (snake_six_term m).length = 6 := rfl
+theorem snake_six_term_trace (m : Mor) :
+    (snake_six_term m).trace =
+      ["snake_term1", "snake_term2", "snake_term3", "snake_term4", "snake_term5", "snake_term6"] := rfl
+
+theorem snake_six_term_length (m : Mor) : (snake_six_term m).length = 6 := by
+  simpa using length_eq_of_trace_eq (snake_six_term m)
+    ["snake_term1", "snake_term2", "snake_term3", "snake_term4", "snake_term5", "snake_term6"]
+    (snake_six_term_trace m)
 
 -- 69
-theorem chase_three_length (f : Mor) : (chase_three_to_zero f).length = 3 := rfl
+theorem chase_three_trace (f : Mor) :
+    (chase_three_to_zero f).trace = ["chase_normalize", "chase_insert_neg", "add_neg"] := rfl
+
+theorem chase_three_length (f : Mor) : (chase_three_to_zero f).length = 3 := by
+  simpa using length_eq_of_trace_eq (chase_three_to_zero f)
+    ["chase_normalize", "chase_insert_neg", "add_neg"] (chase_three_trace f)
 
 -- 70
-theorem ker_then_zero_length (f : Mor) (B : AbObj) : (ker_f_then_zero_path f B).length = 2 := rfl
+theorem ker_then_zero_trace (f : Mor) (B : AbObj) :
+    (ker_f_then_zero_path f B).trace = ["ker_step", "zero_comp_zero"] := rfl
+
+theorem ker_then_zero_length (f : Mor) (B : AbObj) : (ker_f_then_zero_path f B).length = 2 := by
+  simpa using length_eq_of_trace_eq (ker_f_then_zero_path f B)
+    ["ker_step", "zero_comp_zero"] (ker_then_zero_trace f B)
 
 -- 71
-theorem abelian_roundtrip_length (f : Mor) : (abelian_roundtrip_path f).length = 2 := rfl
+theorem abelian_roundtrip_trace (f : Mor) :
+    (abelian_roundtrip_path f).trace = ["left_cancel", "right_cancel"] := rfl
+
+theorem abelian_roundtrip_length (f : Mor) : (abelian_roundtrip_path f).length = 2 := by
+  simpa using length_eq_of_trace_eq (abelian_roundtrip_path f)
+    ["left_cancel", "right_cancel"] (abelian_roundtrip_trace f)
 
 -- 72
-theorem section_idemp_length (s g : Mor) : (section_idempotent s g).length = 3 := rfl
+theorem section_idemp_trace (s g : Mor) :
+    (section_idempotent s g).trace = ["assoc", "assoc_inner", "use_section_id"] := rfl
+
+theorem section_idemp_length (s g : Mor) : (section_idempotent s g).length = 3 := by
+  simpa using length_eq_of_trace_eq (section_idempotent s g)
+    ["assoc", "assoc_inner", "use_section_id"] (section_idemp_trace s g)
 
 -- 73
-theorem five_mono_length (vc : Mor) : (five_lemma_mono vc).length = 4 := rfl
+theorem five_mono_trace (vc : Mor) :
+    (five_lemma_mono vc).trace =
+      ["five_mono_step1", "five_mono_step2_use_vb", "five_mono_step3_exact",
+       "five_mono_step4_conclude"] := rfl
+
+theorem five_mono_length (vc : Mor) : (five_lemma_mono vc).length = 4 := by
+  simpa using length_eq_of_trace_eq (five_lemma_mono vc)
+    ["five_mono_step1", "five_mono_step2_use_vb", "five_mono_step3_exact",
+     "five_mono_step4_conclude"] (five_mono_trace vc)
 
 -- 74
-theorem five_epi_length (vc : Mor) : (five_lemma_epi vc).length = 3 := rfl
+theorem five_epi_trace (vc : Mor) :
+    (five_lemma_epi vc).trace =
+      ["five_epi_step1", "five_epi_step2_use_vd", "five_epi_step3_conclude"] := rfl
+
+theorem five_epi_length (vc : Mor) : (five_lemma_epi vc).length = 3 := by
+  simpa using length_eq_of_trace_eq (five_lemma_epi vc)
+    ["five_epi_step1", "five_epi_step2_use_vd", "five_epi_step3_conclude"]
+    (five_epi_trace vc)
 
 -- 75
-theorem ext_sq_zero_length (n : Nat) : (ext_connecting_sq_zero n).length = 2 := rfl
+theorem ext_sq_zero_trace (n : Nat) :
+    (ext_connecting_sq_zero n).trace = ["ext_expand", "ext_δ²=0"] := rfl
+
+theorem ext_sq_zero_length (n : Nat) : (ext_connecting_sq_zero n).length = 2 := by
+  simpa using length_eq_of_trace_eq (ext_connecting_sq_zero n)
+    ["ext_expand", "ext_δ²=0"] (ext_sq_zero_trace n)
 
 -- 76
-theorem nil_path_length (a : Mor) : (Path.nil a : MP a a).length = 0 := rfl
+theorem nil_path_trace (a : Mor) : (Path.nil a : MP a a).trace = [] := rfl
+
+theorem nil_path_length (a : Mor) : (Path.nil a : MP a a).length = 0 := by
+  simpa using length_eq_of_trace_eq (Path.nil a : MP a a) [] (nil_path_trace a)
 
 -- 77
-def single_step_length (s : Step Mor a b) : (Path.single s).length = 1 := rfl
+def single_step_trace (s : Step Mor a b) : (Path.single s).trace = [s.label] := rfl
+
+def single_step_length (s : Step Mor a b) : (Path.single s).length = 1 := by
+  simpa using length_eq_of_trace_eq (Path.single s) [s.label] (single_step_trace s)
 
 -- 78
-theorem add_zero_twice_length (f : Mor) : (add_zero_twice_path f).length = 2 := rfl
+theorem add_zero_twice_trace (f : Mor) :
+    (add_zero_twice_path f).trace = ["add_zero_outer", "add_zero"] := rfl
+
+theorem add_zero_twice_length (f : Mor) : (add_zero_twice_path f).length = 2 := by
+  simpa using length_eq_of_trace_eq (add_zero_twice_path f)
+    ["add_zero_outer", "add_zero"] (add_zero_twice_trace f)
 
 -- 79
-theorem mono_trivial_ker_length (f : Mor) : (mono_trivial_ker f).length = 2 := rfl
+theorem mono_trivial_ker_trace (f : Mor) :
+    (mono_trivial_ker f).trace = ["mono_ker_step1", "mono_ker_step2"] := rfl
+
+theorem mono_trivial_ker_length (f : Mor) : (mono_trivial_ker f).length = 2 := by
+  simpa using length_eq_of_trace_eq (mono_trivial_ker f)
+    ["mono_ker_step1", "mono_ker_step2"] (mono_trivial_ker_trace f)
 
 -- 80
-theorem iso_iff_mono_epi_length (f : Mor) : (iso_iff_mono_epi f).length = 3 := rfl
+theorem iso_iff_mono_epi_trace (f : Mor) :
+    (iso_iff_mono_epi f).trace = ["iso_mono_part", "iso_epi_part", "iso_conclude"] := rfl
+
+theorem iso_iff_mono_epi_length (f : Mor) : (iso_iff_mono_epi f).length = 3 := by
+  simpa using length_eq_of_trace_eq (iso_iff_mono_epi f)
+    ["iso_mono_part", "iso_epi_part", "iso_conclude"] (iso_iff_mono_epi_trace f)
 
 -- 81
-theorem horseshoe_chain_length (m : Mor) : (horseshoe_chain_map m).length = 3 := rfl
+theorem horseshoe_chain_trace (m : Mor) :
+    (horseshoe_chain_map m).trace = ["horseshoe_chain1", "horseshoe_chain2", "horseshoe_chain3"] := rfl
+
+theorem horseshoe_chain_length (m : Mor) : (horseshoe_chain_map m).length = 3 := by
+  simpa using length_eq_of_trace_eq (horseshoe_chain_map m)
+    ["horseshoe_chain1", "horseshoe_chain2", "horseshoe_chain3"] (horseshoe_chain_trace m)
 
 -- 82
-theorem ext1_classifies_length (m : Mor) : (ext1_classifies m).length = 2 := rfl
+theorem ext1_classifies_trace (m : Mor) :
+    (ext1_classifies m).trace = ["ext1_classify_step1", "ext1_classify_step2"] := rfl
+
+theorem ext1_classifies_length (m : Mor) : (ext1_classifies m).length = 2 := by
+  simpa using length_eq_of_trace_eq (ext1_classifies m)
+    ["ext1_classify_step1", "ext1_classify_step2"] (ext1_classifies_trace m)
 
 -- 83
-theorem chain_map_homology_length (f : Mor) : (chain_map_homology f).length = 3 := rfl
+theorem chain_map_homology_trace (f : Mor) :
+    (chain_map_homology f).trace =
+      ["chain_map_cycle", "chain_map_boundary", "chain_map_well_defined"] := rfl
+
+theorem chain_map_homology_length (f : Mor) : (chain_map_homology f).length = 3 := by
+  simpa using length_eq_of_trace_eq (chain_map_homology f)
+    ["chain_map_cycle", "chain_map_boundary", "chain_map_well_defined"]
+    (chain_map_homology_trace f)
 
 -- 84
-theorem connecting_naturality_length (conn : Mor) : (connecting_naturality conn).length = 2 := rfl
+theorem connecting_naturality_trace (conn : Mor) :
+    (connecting_naturality conn).trace = ["connecting_nat_1", "connecting_nat_2"] := rfl
+
+theorem connecting_naturality_length (conn : Mor) : (connecting_naturality conn).length = 2 := by
+  simpa using length_eq_of_trace_eq (connecting_naturality conn)
+    ["connecting_nat_1", "connecting_nat_2"] (connecting_naturality_trace conn)
 
 -- 85
-theorem chase_four_length (a b c d e : Mor) : (chase_four_step a b c d e).length = 4 := rfl
+theorem chase_four_trace (a b c d e : Mor) :
+    (chase_four_step a b c d e).trace = ["chase4_s1", "chase4_s2", "chase4_s3", "chase4_s4"] := rfl
+
+theorem chase_four_length (a b c d e : Mor) : (chase_four_step a b c d e).length = 4 := by
+  simpa using length_eq_of_trace_eq (chase_four_step a b c d e)
+    ["chase4_s1", "chase4_s2", "chase4_s3", "chase4_s4"] (chase_four_trace a b c d e)
 
 -- 86
-theorem chase_five_length (a b c d e f : Mor) : (chase_five_step a b c d e f).length = 5 := rfl
+theorem chase_five_trace (a b c d e f : Mor) :
+    (chase_five_step a b c d e f).trace =
+      ["chase5_s1", "chase5_s2", "chase5_s3", "chase5_s4", "chase5_s5"] := rfl
+
+theorem chase_five_length (a b c d e f : Mor) : (chase_five_step a b c d e f).length = 5 := by
+  simpa using length_eq_of_trace_eq (chase_five_step a b c d e f)
+    ["chase5_s1", "chase5_s2", "chase5_s3", "chase5_s4", "chase5_s5"]
+    (chase_five_trace a b c d e f)
 
 -- 87
-theorem left_exact_ker_length (F : Mor → Mor) (f : Mor) : (left_exact_ker_path F f).length = 2 := rfl
+theorem left_exact_ker_trace (F : Mor → Mor) (f : Mor) :
+    (left_exact_ker_path F f).trace = ["left_exact_pres", "left_exact_iso"] := rfl
+
+theorem left_exact_ker_length (F : Mor → Mor) (f : Mor) : (left_exact_ker_path F f).length = 2 := by
+  simpa using length_eq_of_trace_eq (left_exact_ker_path F f)
+    ["left_exact_pres", "left_exact_iso"] (left_exact_ker_trace F f)
 
 -- 88
-theorem right_exact_coker_length (F : Mor → Mor) (f : Mor) : (right_exact_coker_path F f).length = 2 := rfl
+theorem right_exact_coker_trace (F : Mor → Mor) (f : Mor) :
+    (right_exact_coker_path F f).trace = ["right_exact_pres", "right_exact_iso"] := rfl
+
+theorem right_exact_coker_length (F : Mor → Mor) (f : Mor) : (right_exact_coker_path F f).length = 2 := by
+  simpa using length_eq_of_trace_eq (right_exact_coker_path F f)
+    ["right_exact_pres", "right_exact_iso"] (right_exact_coker_trace F f)
 
 end CompPaths.AbelianCat
