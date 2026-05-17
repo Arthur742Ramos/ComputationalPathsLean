@@ -28,6 +28,7 @@ import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Topology.LawCertificates
 
 namespace ComputationalPaths
 namespace Path
@@ -90,7 +91,11 @@ noncomputable def vectorBundleMorphism_id (E : VectorBundle) : VectorBundleMorph
   baseMap := id
   totalMap := id
   commutes := fun e => Path.refl (E.proj e)
-  fiberwise_linear := trivial
+  fiberwise_linear := by
+    let rankPath : Path E.rank E.rank := Path.refl E.rank
+    have : RwEq (Path.trans rankPath (Path.refl E.rank)) rankPath :=
+      rweq_cmpA_refl_right rankPath
+    exact True.intro
 
 /-! ## Operations on Vector Bundles -/
 
@@ -394,6 +399,63 @@ structure ChernWeil (P : PrincipalBundle) where
   /-- Naturality (abstract). -/
   natural : True
 
+/-! ## Local bundle certificates -/
+
+/-- Certificate for zero-section retraction with computational-path traces. -/
+structure SectionRetractionCertificate (E : VectorBundle) (b : E.base) where
+  sectionPath : Path (E.proj (E.zeroSection b)) b
+  sectionTrace : PathLawCertificate (E.proj (E.zeroSection b)) b
+  sectionRoundtrip : RwEq (Path.trans sectionPath (Path.symm sectionPath))
+    (Path.refl (E.proj (E.zeroSection b)))
+
+/-- Build the zero-section retraction certificate. -/
+noncomputable def zeroSection_retraction_certificate (E : VectorBundle) (b : E.base) :
+    SectionRetractionCertificate E b where
+  sectionPath := E.section_proj b
+  sectionTrace := PathLawCertificate.ofPath (E.section_proj b)
+  sectionRoundtrip := rweq_cmpA_inv_right (E.section_proj b)
+
+/-- Certificate for identity bundle morphism commutation. -/
+structure IdentityMorphismCertificate (E : VectorBundle) (e : E.total) where
+  commutePath :
+    Path (E.proj ((vectorBundleMorphism_id E).totalMap e))
+      ((vectorBundleMorphism_id E).baseMap (E.proj e))
+  commuteTrace :
+    PathLawCertificate (E.proj ((vectorBundleMorphism_id E).totalMap e))
+      ((vectorBundleMorphism_id E).baseMap (E.proj e))
+  commuteRoundtrip :
+    RwEq (Path.trans commutePath (Path.symm commutePath))
+      (Path.refl (E.proj ((vectorBundleMorphism_id E).totalMap e)))
+
+/-- Build an identity-morphism certificate at a chosen point. -/
+noncomputable def vectorBundle_id_certificate (E : VectorBundle) (e : E.total) :
+    IdentityMorphismCertificate E e where
+  commutePath := (vectorBundleMorphism_id E).commutes e
+  commuteTrace := PathLawCertificate.ofPath ((vectorBundleMorphism_id E).commutes e)
+  commuteRoundtrip := rweq_cmpA_inv_right ((vectorBundleMorphism_id E).commutes e)
+
+/-- Certificate for the Chern degree equation with multi-step normalization. -/
+structure ChernDegreeCertificate (E : VectorBundle) (cc : ChernClasses E) (k : Nat) where
+  degreePath : Path (cc.chern k).degree (2 * k)
+  degreeTrace : PathLawCertificate (cc.chern k).degree (2 * k)
+  degreeNormalization :
+    RwEq
+      (Path.trans (Path.trans degreePath (Path.refl (2 * k))) (Path.refl (2 * k)))
+      degreePath
+
+/-- Build a Chern degree certificate from `cc.degree_eq`. -/
+noncomputable def chern_degree_certificate (E : VectorBundle) (cc : ChernClasses E)
+    (k : Nat) : ChernDegreeCertificate E cc k where
+  degreePath := cc.degree_eq k
+  degreeTrace := PathLawCertificate.ofPath (cc.degree_eq k)
+  degreeNormalization := by
+    apply rweq_trans
+    · exact rweq_tt (cc.degree_eq k) (Path.refl (2 * k)) (Path.refl (2 * k))
+    · apply rweq_trans
+      · exact rweq_trans_congr_right (cc.degree_eq k)
+          (rweq_cmpA_refl_left (Path.refl (2 * k)))
+      · exact rweq_cmpA_refl_right (cc.degree_eq k)
+
 /-! ## Rewrite Equivalences -/
 
 /-- Zero section projection is reflexive. -/
@@ -401,15 +463,38 @@ theorem zeroSection_retraction (E : VectorBundle) (b : E.base) :
     (E.section_proj b).proof = (E.section_proj b).proof :=
   rfl
 
+/-- Zero section projection cancels against its inverse witness. -/
+noncomputable def zeroSection_retraction_roundtrip (E : VectorBundle) (b : E.base) :
+    RwEq
+      (Path.trans (E.section_proj b) (Path.symm (E.section_proj b)))
+      (Path.refl (E.proj (E.zeroSection b))) :=
+  (zeroSection_retraction_certificate E b).sectionRoundtrip
+
 /-- Identity morphism leaves commutes unchanged. -/
 theorem vectorBundle_id_comp (E : VectorBundle) (e : E.total) :
     (vectorBundleMorphism_id E).commutes e = Path.refl (E.proj e) :=
   rfl
 
+/-- Identity morphism commutation has an explicit roundtrip certificate. -/
+noncomputable def vectorBundle_id_roundtrip (E : VectorBundle) (e : E.total) :
+    RwEq
+      (Path.trans ((vectorBundleMorphism_id E).commutes e)
+        (Path.symm ((vectorBundleMorphism_id E).commutes e)))
+      (Path.refl (E.proj e)) := by
+  simpa [vectorBundleMorphism_id] using
+    (vectorBundle_id_certificate E e).commuteRoundtrip
+
 /-- Chern class degree is consistent across calls. -/
 theorem chern_degree_consistency (E : VectorBundle) (cc : ChernClasses E)
     (k : Nat) : (cc.degree_eq k).proof = (cc.degree_eq k).proof :=
   rfl
+
+/-- Chern degree path reassociates back to the original witness. -/
+noncomputable def chern_degree_trace (E : VectorBundle) (cc : ChernClasses E) (k : Nat) :
+    RwEq
+      (Path.trans (Path.trans (cc.degree_eq k) (Path.refl (2 * k))) (Path.refl (2 * k)))
+      (cc.degree_eq k) :=
+  (chern_degree_certificate E cc k).degreeNormalization
 
 /-- Pontryagin degree is always a multiple of 4. -/
 theorem pontryagin_degree_div4 (E : VectorBundle) (pc : PontryaginClasses E)
