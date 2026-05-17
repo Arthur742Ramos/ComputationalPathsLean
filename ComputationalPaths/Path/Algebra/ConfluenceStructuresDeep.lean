@@ -118,24 +118,46 @@ structure DiamondWitness (α : Type) (R : α → α → Prop)
   left  : RPath α R b d
   right : RPath α R c d
 
+/-- A join certificate packages a common reduct with concrete path lengths. -/
+structure JoinCertificate (α : Type) (R : α → α → Prop) (b c : α) where
+  target : α
+  left  : RPath α R b target
+  right : RPath α R c target
+  leftSteps : Nat
+  rightSteps : Nat
+  left_length : left.length = leftSteps
+  right_length : right.length = rightSteps
+
+/-- Build a join certificate from two paths to a common target. -/
+noncomputable def JoinCertificate.ofPaths {α : Type} {R : α → α → Prop}
+    {b c d : α} (left : RPath α R b d) (right : RPath α R c d) :
+    JoinCertificate α R b c where
+  target := d
+  left := left
+  right := right
+  leftSteps := left.length
+  rightSteps := right.length
+  left_length := rfl
+  right_length := rfl
+
 /-- The diamond property: every one-step divergence has a diamond witness. -/
 noncomputable def DiamondProp (α : Type) (R : α → α → Prop) : Prop :=
-  ∀ (a b c : α), R a b → R a c → ∃ d, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
+  ∀ (a b c : α), R a b → R a c → Nonempty (JoinCertificate α R b c)
 
 /-- Local confluence: diamond on single steps (weak Church-Rosser). -/
 noncomputable def LocallyConfluent (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α), R a b → R a c →
-    ∃ d, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
+    Nonempty (JoinCertificate α R b c)
 
 /-- Full confluence: diamond on multi-step paths. -/
 noncomputable def Confluent (α : Type) (R : α → α → Prop) : Prop :=
-  ∀ (a b c : α), (∃ _ : RPath α R a b, True) → (∃ _ : RPath α R a c, True) →
-    ∃ d, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
+  ∀ (a b c : α), Nonempty (RPath α R a b) → Nonempty (RPath α R a c) →
+    Nonempty (JoinCertificate α R b c)
 
 /-- Church-Rosser property: equivalence implies joinability. -/
 noncomputable def ChurchRosser (α : Type) (R : α → α → Prop) : Prop :=
-  ∀ (a b : α), (∃ _ : EqPath α R a b, True) →
-    ∃ c, (∃ _ : RPath α R a c, ∃ _ : RPath α R b c, True)
+  ∀ (a b : α), Nonempty (EqPath α R a b) →
+    Nonempty (JoinCertificate α R a b)
 
 -- ============================================================
 -- §4  Diamond Witness Algebra
@@ -480,9 +502,8 @@ structure CriticalPairJoin (α : Type) (R : α → α → Prop)
 /-- Theorem 30: A joinable critical pair forms a diamond witness. -/
 theorem critical_pair_diamond {α : Type} {R : α → α → Prop}
     (cp : CriticalPair α R) (j : CriticalPairJoin α R cp) :
-    ∃ d, (∃ _ : RPath α R cp.left_target d,
-          ∃ _ : RPath α R cp.right_target d, True) :=
-  ⟨j.common, ⟨j.left_path, ⟨j.right_path, trivial⟩⟩⟩
+    Nonempty (JoinCertificate α R cp.left_target cp.right_target) :=
+  ⟨JoinCertificate.ofPaths j.left_path j.right_path⟩
 
 /-- Extended critical pair: multi-step divergence. -/
 structure ExtCriticalPair (α : Type) (R : α → α → Prop) where
@@ -745,10 +766,9 @@ noncomputable def Terminating (α : Type) (R : α → α → Prop) : Prop :=
     (Key step of Newman's lemma — structural path witness.) -/
 theorem newman_step_joinable {α : Type} {R : α → α → Prop}
     (_wf : Terminating α R)
-    (lc : ∀ (a b c : α), R a b → R a c →
-      ∃ d, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True))
+    (lc : LocallyConfluent α R)
     (a b c : α) (hab : R a b) (hac : R a c) :
-    ∃ d, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True) :=
+    Nonempty (JoinCertificate α R b c) :=
   lc a b c hab hac
 
 /-- Path reversal in equivalence path yields proper symmetric path. -/
@@ -817,8 +837,8 @@ theorem normal_form_path_refl {α : Type} {R : α → α → Prop}
 /-- Theorem 55: a normal form is joinable with itself trivially. -/
 theorem normal_form_self_joinable {α : Type} {R : α → α → Prop}
     (a : α) (_nf : NormalForm α R a) :
-    ∃ d, (∃ _ : RPath α R a d, ∃ _ : RPath α R a d, True) :=
-  ⟨a, ⟨.refl a, ⟨.refl a, trivial⟩⟩⟩
+    Nonempty (JoinCertificate α R a a) :=
+  ⟨JoinCertificate.ofPaths (.refl a : RPath α R a a) (.refl a)⟩
 
 -- ============================================================
 -- §17  Equivalence Path Coherence
@@ -923,14 +943,14 @@ def parStep_refl {α : Type} {R : α → α → Prop} (a : α) :
 
 /-- Theorem 64: A ParStep refl gives a trivial parallel path. -/
 def parpath_from_refl {α : Type} {R : α → α → Prop} (a : α) :
-    ∃ _ : RPath α (ParStep α R) a a, True :=
-  ⟨.refl a, trivial⟩
+    Nonempty (RPath α (ParStep α R) a a) :=
+  ⟨.refl a⟩
 
 /-- Theorem 65: sequential path embeds into parallel path. -/
 def sequential_to_parallel {α : Type} {R : α → α → Prop} {a b : α}
     (p : RPath α R a b) :
-    ∃ _ : RPath α (ParStep α R) a b, True :=
-  ⟨p.toParPath, trivial⟩
+    Nonempty (RPath α (ParStep α R) a b) :=
+  ⟨p.toParPath⟩
 
 /-- Theorem 66: toParPath of single is single par step. -/
 def toParPath_single {α : Type} {R : α → α → Prop} {a b : α}
@@ -1073,15 +1093,15 @@ theorem threeStepPath_eq_trans {α : Type} {R : α → α → Prop} {a b c d : �
 theorem map_preserves_joinable {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {b c : α} (j : Joinable α R b c) :
-    ∃ d, (∃ _ : RPath β S (f b) d, ∃ _ : RPath β S (f c) d, True) :=
-  ⟨f j.target, ⟨j.left.map f hf, ⟨j.right.map f hf, trivial⟩⟩⟩
+    Nonempty (JoinCertificate β S (f b) (f c)) :=
+  ⟨JoinCertificate.ofPaths (j.left.map f hf) (j.right.map f hf)⟩
 
 /-- Theorem 79: map preserves path existence. -/
 theorem map_preserves_path {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ {x y}, R x y → S (f x) (f y))
     {a b : α} (p : RPath α R a b) :
-    ∃ _ : RPath β S (f a) (f b), True :=
-  ⟨p.map f hf, trivial⟩
+    Nonempty (RPath β S (f a) (f b)) :=
+  ⟨p.map f hf⟩
 
 -- ============================================================
 -- §26  EqPath Manipulation
@@ -1227,6 +1247,12 @@ noncomputable def ConfluenceCert.toJoinable {α : Type} {R : α → α → Prop}
     {a b c : α} (cert : ConfluenceCert α R a b c) :
     Joinable α R b c :=
   ⟨cert.witness, cert.left_path, cert.right_path⟩
+
+/-- A confluence cert also yields the strengthened join certificate. -/
+noncomputable def ConfluenceCert.toJoinCertificate {α : Type} {R : α → α → Prop}
+    {a b c : α} (cert : ConfluenceCert α R a b c) :
+    JoinCertificate α R b c :=
+  JoinCertificate.ofPaths cert.left_path cert.right_path
 
 /-- Theorem 93: cert joinable target = cert witness. -/
 theorem cert_joinable_target {α : Type} {R : α → α → Prop}

@@ -159,6 +159,20 @@ inductive CCStep : Mor → Mor → Type where
 
 abbrev CCPath := Path Mor
 
+/-- Certificate tying a CCC rewrite constructor to a concrete one-step path. -/
+structure CCStepCertificate (source target : Mor) where
+  step : CCStep source target
+  path : CCPath source target
+  path_length : path.length = 1
+
+/-- Build a CCC rewrite certificate from a named constructor. -/
+noncomputable def CCStepCertificate.ofStep {source target : Mor}
+    (step : CCStep source target) (label : String) :
+    CCStepCertificate source target where
+  step := step
+  path := Path.single (.rule label source target)
+  path_length := by simp [Path.single, Path.length]
+
 noncomputable def ccstep (a b : Mor) : CCPath a b :=
   Path.single (.rule "ccc" a b)
 
@@ -177,17 +191,17 @@ noncomputable def prodAssocL (A B C : Obj) : Mor :=
 noncomputable def prodSwap (A B : Obj) : Mor :=
   .pair (.snd A B) (.fst A B)
 
-def thm_pairFst_exists (f g : Mor) (A B : Obj) :
-    ∃ (_ : CCStep (.comp (.fst A B) (.pair f g)) f), True :=
-  ⟨CCStep.pairFst f g A B, trivial⟩
+noncomputable def thm_pairFst_exists (f g : Mor) (A B : Obj) :
+    Nonempty (CCStepCertificate (.comp (.fst A B) (.pair f g)) f) :=
+  ⟨CCStepCertificate.ofStep (CCStep.pairFst f g A B) "pair-fst"⟩
 
-def thm_pairSnd_exists (f g : Mor) (A B : Obj) :
-    ∃ (_ : CCStep (.comp (.snd A B) (.pair f g)) g), True :=
-  ⟨CCStep.pairSnd f g A B, trivial⟩
+noncomputable def thm_pairSnd_exists (f g : Mor) (A B : Obj) :
+    Nonempty (CCStepCertificate (.comp (.snd A B) (.pair f g)) g) :=
+  ⟨CCStepCertificate.ofStep (CCStep.pairSnd f g A B) "pair-snd"⟩
 
-def thm_prod_eta_exists (A B : Obj) :
-    ∃ (_ : CCStep (.pair (.fst A B) (.snd A B)) (.id (.prod A B))), True :=
-  ⟨CCStep.pairEta A B, trivial⟩
+noncomputable def thm_prod_eta_exists (A B : Obj) :
+    Nonempty (CCStepCertificate (.pair (.fst A B) (.snd A B)) (.id (.prod A B))) :=
+  ⟨CCStepCertificate.ofStep (CCStep.pairEta A B) "pair-eta"⟩
 
 /-- Swap is self-inverse (2-step path). -/
 noncomputable def swapSwapPath (A B : Obj) : CCPath
@@ -204,17 +218,20 @@ theorem thm_swap_involutive (A B : Obj) :
 -- §6  Exponentials: Curry, Uncurry, Beta, Eta
 -- ============================================================
 
-def thm_beta_exists (f : Mor) (A B C : Obj) :
-    ∃ (_ : CCStep (.comp (.eval_ A B) (.pair (.comp (.curry f) (.fst C A)) (.snd C A))) f), True :=
-  ⟨CCStep.beta f A B C, trivial⟩
+noncomputable def thm_beta_exists (f : Mor) (A B C : Obj) :
+    Nonempty (CCStepCertificate
+      (.comp (.eval_ A B) (.pair (.comp (.curry f) (.fst C A)) (.snd C A))) f) :=
+  ⟨CCStepCertificate.ofStep (CCStep.beta f A B C) "beta"⟩
 
-def thm_eta_exists (g : Mor) (A B C : Obj) :
-    ∃ (_ : CCStep (.curry (.comp (.eval_ A B) (.pair (.comp g (.fst C A)) (.snd C A)))) g), True :=
-  ⟨CCStep.eta g A B C, trivial⟩
+noncomputable def thm_eta_exists (g : Mor) (A B C : Obj) :
+    Nonempty (CCStepCertificate
+      (.curry (.comp (.eval_ A B) (.pair (.comp g (.fst C A)) (.snd C A)))) g) :=
+  ⟨CCStepCertificate.ofStep (CCStep.eta g A B C) "eta"⟩
 
-def thm_curryComp_exists (f h : Mor) (A B : Obj) :
-    ∃ (_ : CCStep (.curry (.comp f (.pair (.comp h (.fst A B)) (.snd A B)))) (.comp (.curry f) h)), True :=
-  ⟨CCStep.curryComp f h A B, trivial⟩
+noncomputable def thm_curryComp_exists (f h : Mor) (A B : Obj) :
+    Nonempty (CCStepCertificate
+      (.curry (.comp f (.pair (.comp h (.fst A B)) (.snd A B)))) (.comp (.curry f) h)) :=
+  ⟨CCStepCertificate.ofStep (CCStep.curryComp f h A B) "curry-comp"⟩
 
 /-- Beta as path (single step). -/
 noncomputable def betaPath (f : Mor) (A B C : Obj) : CCPath
@@ -288,41 +305,55 @@ inductive BetaStep : STLCTerm → STLCTerm → Type where
 
 abbrev BetaPath := Path STLCTerm
 
-def thm_beta_reduces :
-    ∃ (_ : BetaStep (.app (.lam (.base "A") (.var 0)) .star) (.var 0)), True :=
-  ⟨BetaStep.betaReduce (.base "A") (.var 0) .star, trivial⟩
+/-- Certificate tying an STLC beta/eta constructor to a one-step term path. -/
+structure BetaStepCertificate (source target : STLCTerm) where
+  step : BetaStep source target
+  path : BetaPath source target
+  path_length : path.length = 1
 
-def thm_fst_reduces :
-    ∃ (_ : BetaStep (.fst_ (.mkpair .star (.var 1))) .star), True :=
-  ⟨BetaStep.fstReduce .star (.var 1), trivial⟩
+/-- Build a term-reduction certificate from a named beta/eta constructor. -/
+noncomputable def BetaStepCertificate.ofStep {source target : STLCTerm}
+    (step : BetaStep source target) (label : String) :
+    BetaStepCertificate source target where
+  step := step
+  path := Path.single (.rule label source target)
+  path_length := by simp [Path.single, Path.length]
 
-def thm_snd_reduces :
-    ∃ (_ : BetaStep (.snd_ (.mkpair (.var 1) .star)) .star), True :=
-  ⟨BetaStep.sndReduce (.var 1) .star, trivial⟩
+noncomputable def thm_beta_reduces :
+    Nonempty (BetaStepCertificate (.app (.lam (.base "A") (.var 0)) .star) (.var 0)) :=
+  ⟨BetaStepCertificate.ofStep (BetaStep.betaReduce (.base "A") (.var 0) .star) "beta"⟩
 
-def thm_curry_howard_beta (ty : STLCType) (body arg : STLCTerm) :
-    ∃ (_ : BetaStep (.app (.lam ty body) arg) body), True :=
-  ⟨BetaStep.betaReduce ty body arg, trivial⟩
+noncomputable def thm_fst_reduces :
+    Nonempty (BetaStepCertificate (.fst_ (.mkpair .star (.var 1))) .star) :=
+  ⟨BetaStepCertificate.ofStep (BetaStep.fstReduce .star (.var 1)) "fst-beta"⟩
 
-def thm_curry_howard_pair_eta (p : STLCTerm) :
-    ∃ (_ : BetaStep (.mkpair (.fst_ p) (.snd_ p)) p), True :=
-  ⟨BetaStep.etaPair p, trivial⟩
+noncomputable def thm_snd_reduces :
+    Nonempty (BetaStepCertificate (.snd_ (.mkpair (.var 1) .star)) .star) :=
+  ⟨BetaStepCertificate.ofStep (BetaStep.sndReduce (.var 1) .star) "snd-beta"⟩
 
-def thm_curry_howard_eta_lam (A : STLCType) (f : STLCTerm) :
-    ∃ (_ : BetaStep (.lam A (.app f (.var 0))) f), True :=
-  ⟨BetaStep.etaLam A f, trivial⟩
+noncomputable def thm_curry_howard_beta (ty : STLCType) (body arg : STLCTerm) :
+    Nonempty (BetaStepCertificate (.app (.lam ty body) arg) body) :=
+  ⟨BetaStepCertificate.ofStep (BetaStep.betaReduce ty body arg) "curry-howard-beta"⟩
+
+noncomputable def thm_curry_howard_pair_eta (p : STLCTerm) :
+    Nonempty (BetaStepCertificate (.mkpair (.fst_ p) (.snd_ p)) p) :=
+  ⟨BetaStepCertificate.ofStep (BetaStep.etaPair p) "pair-eta"⟩
+
+noncomputable def thm_curry_howard_eta_lam (A : STLCType) (f : STLCTerm) :
+    Nonempty (BetaStepCertificate (.lam A (.app f (.var 0))) f) :=
+  ⟨BetaStepCertificate.ofStep (BetaStep.etaLam A f) "lambda-eta"⟩
 
 -- ============================================================
 -- §8  Natural Numbers Object
 -- ============================================================
 
-def thm_nno_zero_step (q f : Mor) (A : Obj) :
-    ∃ (_ : CCStep (.comp (.rec_ q f) (.comp .zero_ (.terminal A))) q), True :=
-  ⟨CCStep.recZero q f A, trivial⟩
+noncomputable def thm_nno_zero_step (q f : Mor) (A : Obj) :
+    Nonempty (CCStepCertificate (.comp (.rec_ q f) (.comp .zero_ (.terminal A))) q) :=
+  ⟨CCStepCertificate.ofStep (CCStep.recZero q f A) "rec-zero"⟩
 
-def thm_nno_succ_step (q f : Mor) :
-    ∃ (_ : CCStep (.comp (.rec_ q f) .succ_) (.comp f (.rec_ q f))), True :=
-  ⟨CCStep.recSucc q f, trivial⟩
+noncomputable def thm_nno_succ_step (q f : Mor) :
+    Nonempty (CCStepCertificate (.comp (.rec_ q f) .succ_) (.comp f (.rec_ q f))) :=
+  ⟨CCStepCertificate.ofStep (CCStep.recSucc q f) "rec-succ"⟩
 
 noncomputable def iterSuccPath : (n : Nat) → CCPath Mor.succ_ Mor.succ_
   | 0     => .nil Mor.succ_
@@ -481,9 +512,9 @@ theorem thm_eval_nat_len (A B : Obj) (f : Mor) :
 -- §13  Subobject Classifier (Topos sketch)
 -- ============================================================
 
-def thm_char_map_property (m : Mor) (A : Obj) :
-    ∃ (_ : CCStep (.comp (.char_ m) m) (.comp .true_ (.terminal A))), True :=
-  ⟨CCStep.charTrue m A, trivial⟩
+noncomputable def thm_char_map_property (m : Mor) (A : Obj) :
+    Nonempty (CCStepCertificate (.comp (.char_ m) m) (.comp .true_ (.terminal A))) :=
+  ⟨CCStepCertificate.ofStep (CCStep.charTrue m A) "char-true"⟩
 
 noncomputable def powerObj (A : Obj) : Obj := .exp A .omega
 
@@ -644,53 +675,53 @@ theorem thm_symm_length (p : CCPath a b) :
 -- §20  Coproduct Properties
 -- ============================================================
 
-def thm_copair_inl (f g : Mor) (A B : Obj) :
-    ∃ (_ : CCStep (.comp (.copair f g) (.inl A B)) f), True :=
-  ⟨CCStep.copairInl f g A B, trivial⟩
+noncomputable def thm_copair_inl (f g : Mor) (A B : Obj) :
+    Nonempty (CCStepCertificate (.comp (.copair f g) (.inl A B)) f) :=
+  ⟨CCStepCertificate.ofStep (CCStep.copairInl f g A B) "copair-inl"⟩
 
-def thm_copair_inr (f g : Mor) (A B : Obj) :
-    ∃ (_ : CCStep (.comp (.copair f g) (.inr A B)) g), True :=
-  ⟨CCStep.copairInr f g A B, trivial⟩
+noncomputable def thm_copair_inr (f g : Mor) (A B : Obj) :
+    Nonempty (CCStepCertificate (.comp (.copair f g) (.inr A B)) g) :=
+  ⟨CCStepCertificate.ofStep (CCStep.copairInr f g A B) "copair-inr"⟩
 
-def thm_copair_eta (A B : Obj) :
-    ∃ (_ : CCStep (.copair (.inl A B) (.inr A B)) (.id (.coprod A B))), True :=
-  ⟨CCStep.copairEta A B, trivial⟩
+noncomputable def thm_copair_eta (A B : Obj) :
+    Nonempty (CCStepCertificate (.copair (.inl A B) (.inr A B)) (.id (.coprod A B))) :=
+  ⟨CCStepCertificate.ofStep (CCStep.copairEta A B) "copair-eta"⟩
 
 -- ============================================================
 -- §21  Congruence in CCC Steps
 -- ============================================================
 
-def thm_congComp_left (s : CCStep f f') (g : Mor) :
-    ∃ (_ : CCStep (.comp f g) (.comp f' g)), True :=
-  ⟨CCStep.congComp₁ s, trivial⟩
+noncomputable def thm_congComp_left (s : CCStep f f') (g : Mor) :
+    Nonempty (CCStepCertificate (.comp f g) (.comp f' g)) :=
+  ⟨CCStepCertificate.ofStep (CCStep.congComp₁ s) "cong-comp-left"⟩
 
-def thm_congComp_right (f : Mor) (s : CCStep g g') :
-    ∃ (_ : CCStep (.comp f g) (.comp f g')), True :=
-  ⟨CCStep.congComp₂ s, trivial⟩
+noncomputable def thm_congComp_right (f : Mor) (s : CCStep g g') :
+    Nonempty (CCStepCertificate (.comp f g) (.comp f g')) :=
+  ⟨CCStepCertificate.ofStep (CCStep.congComp₂ s) "cong-comp-right"⟩
 
-def thm_congPair_left (s : CCStep f f') (g : Mor) :
-    ∃ (_ : CCStep (.pair f g) (.pair f' g)), True :=
-  ⟨CCStep.congPair₁ s, trivial⟩
+noncomputable def thm_congPair_left (s : CCStep f f') (g : Mor) :
+    Nonempty (CCStepCertificate (.pair f g) (.pair f' g)) :=
+  ⟨CCStepCertificate.ofStep (CCStep.congPair₁ s) "cong-pair-left"⟩
 
-def thm_congCurry (s : CCStep f f') :
-    ∃ (_ : CCStep (.curry f) (.curry f')), True :=
-  ⟨CCStep.congCurry s, trivial⟩
+noncomputable def thm_congCurry (s : CCStep f f') :
+    Nonempty (CCStepCertificate (.curry f) (.curry f')) :=
+  ⟨CCStepCertificate.ofStep (CCStep.congCurry s) "cong-curry"⟩
 
 -- ============================================================
 -- §22  Category Axioms as Paths
 -- ============================================================
 
-def thm_idL_step (f : Mor) (A : Obj) :
-    ∃ (_ : CCStep (.comp f (.id A)) f), True :=
-  ⟨CCStep.idL f A, trivial⟩
+noncomputable def thm_idL_step (f : Mor) (A : Obj) :
+    Nonempty (CCStepCertificate (.comp f (.id A)) f) :=
+  ⟨CCStepCertificate.ofStep (CCStep.idL f A) "id-left"⟩
 
-def thm_idR_step (f : Mor) (A : Obj) :
-    ∃ (_ : CCStep (.comp (.id A) f) f), True :=
-  ⟨CCStep.idR f A, trivial⟩
+noncomputable def thm_idR_step (f : Mor) (A : Obj) :
+    Nonempty (CCStepCertificate (.comp (.id A) f) f) :=
+  ⟨CCStepCertificate.ofStep (CCStep.idR f A) "id-right"⟩
 
-def thm_assoc_step (f g h : Mor) :
-    ∃ (_ : CCStep (.comp (.comp f g) h) (.comp f (.comp g h))), True :=
-  ⟨CCStep.assoc f g h, trivial⟩
+noncomputable def thm_assoc_step (f g h : Mor) :
+    Nonempty (CCStepCertificate (.comp (.comp f g) h) (.comp f (.comp g h))) :=
+  ⟨CCStepCertificate.ofStep (CCStep.assoc f g h) "assoc"⟩
 
 noncomputable def idBothPath (f : Mor) (A B : Obj) : CCPath
     (.comp (.id A) (.comp f (.id B)))
@@ -706,9 +737,9 @@ theorem thm_idBoth_length (f : Mor) (A B : Obj) :
 -- §23  Terminal Uniqueness
 -- ============================================================
 
-def thm_terminal_uniq (f : Mor) (A : Obj) :
-    ∃ (_ : CCStep f (.terminal A)), True :=
-  ⟨CCStep.termUniq f A, trivial⟩
+noncomputable def thm_terminal_uniq (f : Mor) (A : Obj) :
+    Nonempty (CCStepCertificate f (.terminal A)) :=
+  ⟨CCStepCertificate.ofStep (CCStep.termUniq f A) "terminal-unique"⟩
 
 noncomputable def terminalEqPath (f : Mor) (A : Obj) : CCPath f f :=
   Path.cons (.rule "term-uniq" f f) (Path.cons (.rule "term-uniq-inv" f f) (.nil f))
@@ -737,21 +768,21 @@ def thm_single_is_one (s : Step α a b) :
 -- §25  Symmetry of CCStep
 -- ============================================================
 
-def thm_ccstep_symm (s : CCStep a b) :
-    ∃ (_ : CCStep b a), True :=
-  ⟨CCStep.symm s, trivial⟩
+noncomputable def thm_ccstep_symm (s : CCStep a b) :
+    Nonempty (CCStepCertificate b a) :=
+  ⟨CCStepCertificate.ofStep (CCStep.symm s) "step-symm"⟩
 
-def thm_ccstep_symm_symm (s : CCStep a b) :
-    ∃ (_ : CCStep a b), True :=
-  ⟨CCStep.symm (CCStep.symm s), trivial⟩
+noncomputable def thm_ccstep_symm_symm (s : CCStep a b) :
+    Nonempty (CCStepCertificate a b) :=
+  ⟨CCStepCertificate.ofStep (CCStep.symm (CCStep.symm s)) "step-symm-symm"⟩
 
 -- ============================================================
 -- §26  Pair composition
 -- ============================================================
 
-def thm_pair_comp (f g h : Mor) :
-    ∃ (_ : CCStep (.comp (.pair f g) h) (.pair (.comp f h) (.comp g h))), True :=
-  ⟨CCStep.pairComp f g h, trivial⟩
+noncomputable def thm_pair_comp (f g h : Mor) :
+    Nonempty (CCStepCertificate (.comp (.pair f g) h) (.pair (.comp f h) (.comp g h))) :=
+  ⟨CCStepCertificate.ofStep (CCStep.pairComp f g h) "pair-comp"⟩
 
 -- ============================================================
 -- §27  Path reversal properties
