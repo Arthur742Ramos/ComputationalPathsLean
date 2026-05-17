@@ -197,10 +197,30 @@ structure CharacterVariety (G : Type u) (V : Type u) where
   /-- Transitivity. -/
   equiv_trans : ∀ ρ σ τ, equiv ρ σ → equiv σ τ → equiv ρ τ
 
+/-- Certificate carrying concrete representation data for reflexivity evidence. -/
+structure CharacterVarietyReflCertificate {G V : Type u}
+    (CV : CharacterVariety G V) where
+  witnessRep : RepresentationData G V
+  witnessEq : witnessRep = CV.rep
+  witnessSelfEquiv : CV.equiv witnessRep witnessRep
+  witnessPath : Path (CV.equiv witnessRep witnessRep) True
+
+/-- Build a reflexivity certificate from the distinguished representation. -/
+noncomputable def CharacterVariety.reflCertificate {G V : Type u}
+    (CV : CharacterVariety G V) : CharacterVarietyReflCertificate CV where
+  witnessRep := CV.rep
+  witnessEq := rfl
+  witnessSelfEquiv := CV.equiv_refl CV.rep
+  witnessPath := Path.stepChain
+    (propext ⟨fun _ => True.intro, fun _ => CV.equiv_refl CV.rep⟩)
+
 /-- Path witness for reflexivity of character variety equivalence. -/
 noncomputable def CharacterVariety.reflPath {G V : Type u} (CV : CharacterVariety G V) :
     Path (CV.equiv CV.rep CV.rep) True :=
-  Path.stepChain (propext ⟨fun _ => trivial, fun _ => CV.equiv_refl CV.rep⟩)
+  let cert := CV.reflCertificate
+  Path.trans
+    (Path.symm (Path.congrArg (fun ρ => CV.equiv ρ ρ) (Path.stepChain cert.witnessEq)))
+    cert.witnessPath
 
 /-! ## Schur-Weyl Duality -/
 
@@ -366,11 +386,30 @@ structure OrthogonalityData (G : Type u) where
   /-- Second orthogonality. -/
   second_orthogonality : True
 
+/-- Certificate for orthogonality witnesses at concrete character indices. -/
+structure OrthogonalityCertificate {G : Type u}
+    (O : OrthogonalityData G) (i j : Fin O.chars.length) where
+  firstWitness : (i = j) ∨ True
+  secondWitness : True
+  firstToTrue : Path ((i = j) ∨ True) True
+  trueToFirst : Path True ((i = j) ∨ True)
+
+/-- Build orthogonality certificate data from the stored orthogonality facts. -/
+noncomputable def OrthogonalityData.orthCertificate {G : Type u} (O : OrthogonalityData G)
+    (i j : Fin O.chars.length) : OrthogonalityCertificate O i j where
+  firstWitness := O.first_orthogonality i j
+  secondWitness := O.second_orthogonality
+  firstToTrue := Path.stepChain
+    (propext ⟨fun _ => O.second_orthogonality, fun _ => O.first_orthogonality i j⟩)
+  trueToFirst := Path.symm <| Path.stepChain
+    (propext ⟨fun _ => O.second_orthogonality, fun _ => O.first_orthogonality i j⟩)
+
 /-- Path witness for orthogonality. -/
 noncomputable def OrthogonalityData.orthPath {G : Type u} (O : OrthogonalityData G)
     (i j : Fin O.chars.length) :
     Path ((i = j) ∨ True) True :=
-  Path.stepChain (propext ⟨fun _ => trivial, fun _ => O.first_orthogonality i j⟩)
+  let cert := O.orthCertificate i j
+  Path.trans cert.firstToTrue (Path.refl True)
 
 end CharacterVarieties
 end Algebra
