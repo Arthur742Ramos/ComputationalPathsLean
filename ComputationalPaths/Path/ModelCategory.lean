@@ -84,20 +84,25 @@ theorem path_is_weak_equivalence {a b : A} (p : Path a b) :
 
 /-- Canonical path payload carrying explicit step-chain trace metadata. -/
 structure PathEvidencePayload {a b : A} (p : Path a b) where
-  source : A
-  target : A
+  /-- Canonical witness tied to the indexed endpoints and original path. -/
   canonical : Path a b
-  canonical_toEq : canonical.toEq = p.toEq
-  canonical_nonempty : canonical.steps ≠ []
+  /-- One-step/multi-step rewrite coherence from the canonical witness to `p`. -/
+  canonical_rw : Rw canonical p
+  canonical_rweq : RwEq canonical p
+  /-- Explicit non-empty trace representative carrying the same toEq witness as `p`. -/
+  traceRepresentative : Path a b
+  trace_toEq : traceRepresentative.toEq = p.toEq
+  trace_nonempty : traceRepresentative.steps ≠ []
 
 /-- Build the canonical payload for any path using `Path.stepChain`. -/
 noncomputable def canonicalPathEvidencePayload {a b : A} (p : Path a b) :
     PathEvidencePayload (A := A) p where
-  source := a
-  target := b
-  canonical := Path.stepChain p.toEq
-  canonical_toEq := rfl
-  canonical_nonempty := by
+  canonical := p
+  canonical_rw := Rw.refl p
+  canonical_rweq := RwEq.refl p
+  traceRepresentative := Path.stepChain p.toEq
+  trace_toEq := rfl
+  trace_nonempty := by
     simp [Path.stepChain]
 
 /-- Enriched certificate that a path is a cofibration in the trivial model structure. -/
