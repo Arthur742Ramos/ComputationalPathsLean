@@ -224,6 +224,39 @@ noncomputable def ClosedSubgroup.full (G : ProfiniteGroup) : ClosedSubgroup G wh
   inv_mem := fun _ _ => trivial
   closedCode := true
 
+/-- Certificate data for concrete closed-subgroup witnesses. -/
+structure ClosedSubgroupCertificate (G : ProfiniteGroup) where
+  subgroup : ClosedSubgroup G
+  witness : G.limit
+  witness_mem : subgroup.carrier witness
+  one_mem : subgroup.carrier G.lim_one
+  mul_mem : subgroup.carrier (G.lim_mul witness G.lim_one)
+  inv_mem : subgroup.carrier (G.lim_inv witness)
+  right_unit_path : Path (G.lim_mul witness G.lim_one) witness
+  inverse_roundtrip_path : Path (G.lim_mul (G.lim_inv witness) witness) G.lim_one
+  closed_code_path : Path subgroup.closedCode true
+
+/-- Certificate for the canonical full closed subgroup. -/
+noncomputable def ClosedSubgroup.fullCertificate (G : ProfiniteGroup) :
+    ClosedSubgroupCertificate G where
+  subgroup := ClosedSubgroup.full G
+  witness := G.lim_one
+  witness_mem := (ClosedSubgroup.full G).one_mem
+  one_mem := (ClosedSubgroup.full G).one_mem
+  mul_mem := by
+    exact (ClosedSubgroup.full G).mul_mem G.lim_one G.lim_one
+      (ClosedSubgroup.full G).one_mem (ClosedSubgroup.full G).one_mem
+  inv_mem := by
+    exact (ClosedSubgroup.full G).inv_mem G.lim_one (ClosedSubgroup.full G).one_mem
+  right_unit_path := G.lim_mul_one G.lim_one
+  inverse_roundtrip_path := G.lim_mul_left_inv G.lim_one
+  closed_code_path := Path.refl true
+
+/-- Multi-step transport of the full closed-code certificate. -/
+noncomputable def closed_subgroup_full_closed_code_trans (G : ProfiniteGroup) :
+    Path (ClosedSubgroup.fullCertificate G).subgroup.closedCode true :=
+  Path.trans (ClosedSubgroup.fullCertificate G).closed_code_path (Path.refl true)
+
 noncomputable def closed_subgroup_one_fixed (G : ProfiniteGroup) (H : ClosedSubgroup G) :
     H.carrier G.lim_one :=
   H.one_mem
@@ -258,6 +291,26 @@ noncomputable def IntermediateField.full (F : Type u) : IntermediateField F wher
   containsBase := true
   closedAdd := true
   closedMul := true
+
+/-- Certificate data for intermediate-field closure codes. -/
+structure IntermediateFieldCertificate (F : Type u) where
+  field : IntermediateField F
+  contains_path : Path field.containsBase true
+  closed_add_path : Path field.closedAdd true
+  closed_mul_path : Path field.closedMul true
+
+/-- Concrete certificate for the full intermediate field. -/
+noncomputable def IntermediateField.fullCertificate (F : Type u) :
+    IntermediateFieldCertificate F where
+  field := IntermediateField.full F
+  contains_path := Path.refl true
+  closed_add_path := Path.refl true
+  closed_mul_path := Path.refl true
+
+/-- Multi-step path witness for the full field containing the base field. -/
+noncomputable def intermediate_full_contains_base_trans (F : Type u) :
+    Path (IntermediateField.fullCertificate F).field.containsBase true :=
+  Path.trans (IntermediateField.fullCertificate F).contains_path (Path.refl true)
 
 noncomputable def intermediate_contains_base_true (F : Type u) (K : IntermediateField F)
     (h : K.containsBase = true) : Path K.containsBase true :=
