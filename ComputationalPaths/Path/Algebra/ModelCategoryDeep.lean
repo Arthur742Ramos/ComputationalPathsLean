@@ -176,6 +176,42 @@ noncomputable def cof_weq_trivCof_path (mc : ModelCat) (f : Nat)
     Path (mc.isTrivCof f) true :=
   Path.stepChain (cof_weq_trivCof mc f hc hw)
 
+/-- Data-bearing certificate that a morphism is a trivial fibration. -/
+structure TrivialFibrationCertificate (mc : ModelCat) (f : Nat) where
+  fib_witness : mc.isFib f = true
+  weq_witness : mc.isWeq f = true
+  fib_path : Path (mc.isFib f) true
+  weq_path : Path (mc.isWeq f) true
+  fib_weq_chain : Path (mc.isFib f) (mc.isWeq f)
+
+/-- Extract concrete fibration and weak-equivalence paths from a trivial fibration. -/
+noncomputable def trivialFibrationCertificate (mc : ModelCat) (f : Nat)
+    (h : mc.isTrivFib f = true) : TrivialFibrationCertificate mc f where
+  fib_witness := trivFib_is_fib mc f h
+  weq_witness := trivFib_is_weq mc f h
+  fib_path := trivFib_is_fib_path mc f h
+  weq_path := trivFib_is_weq_path mc f h
+  fib_weq_chain := Path.trans (trivFib_is_fib_path mc f h)
+    (Path.symm (trivFib_is_weq_path mc f h))
+
+/-- Data-bearing certificate that a morphism is a trivial cofibration. -/
+structure TrivialCofibrationCertificate (mc : ModelCat) (f : Nat) where
+  cof_witness : mc.isCof f = true
+  weq_witness : mc.isWeq f = true
+  cof_path : Path (mc.isCof f) true
+  weq_path : Path (mc.isWeq f) true
+  cof_weq_chain : Path (mc.isCof f) (mc.isWeq f)
+
+/-- Extract concrete cofibration and weak-equivalence paths from a trivial cofibration. -/
+noncomputable def trivialCofibrationCertificate (mc : ModelCat) (f : Nat)
+    (h : mc.isTrivCof f = true) : TrivialCofibrationCertificate mc f where
+  cof_witness := trivCof_is_cof mc f h
+  weq_witness := trivCof_is_weq mc f h
+  cof_path := trivCof_is_cof_path mc f h
+  weq_path := trivCof_is_weq_path mc f h
+  cof_weq_chain := Path.trans (trivCof_is_cof_path mc f h)
+    (Path.symm (trivCof_is_weq_path mc f h))
+
 -- ============================================================================
 -- § 6. Factorization paths
 -- ============================================================================
@@ -197,6 +233,34 @@ theorem trivcof_fib_sum (fact : TrivCofFibFact) :
 noncomputable def trivcof_fib_sum_path (fact : TrivCofFibFact) :
     Path (fact.trivCofPart + fact.fibPart) (fact.source + fact.target) :=
   Path.stepChain fact.factorizes
+
+/-- Certificate for a cofibration/trivial-fibration arithmetic factorization. -/
+structure CofTrivFibFactCertificate (fact : CofTrivFibFact) where
+  factor_path : Path (fact.cofPart + fact.trivFibPart) (fact.source + fact.target)
+  swapped_target : Path (fact.source + fact.target) (fact.target + fact.source)
+  composite_to_swapped : Path (fact.cofPart + fact.trivFibPart) (fact.target + fact.source)
+
+/-- Build the concrete path certificate carried by a cofibration/trivial-fibration factorization. -/
+noncomputable def cofTrivFibFactCertificate (fact : CofTrivFibFact) :
+    CofTrivFibFactCertificate fact where
+  factor_path := cof_trivfib_sum_path fact
+  swapped_target := Path.stepChain (by omega : fact.source + fact.target = fact.target + fact.source)
+  composite_to_swapped := Path.trans (cof_trivfib_sum_path fact)
+    (Path.stepChain (by omega : fact.source + fact.target = fact.target + fact.source))
+
+/-- Certificate for a trivial-cofibration/fibration arithmetic factorization. -/
+structure TrivCofFibFactCertificate (fact : TrivCofFibFact) where
+  factor_path : Path (fact.trivCofPart + fact.fibPart) (fact.source + fact.target)
+  swapped_target : Path (fact.source + fact.target) (fact.target + fact.source)
+  composite_to_swapped : Path (fact.trivCofPart + fact.fibPart) (fact.target + fact.source)
+
+/-- Build the concrete path certificate carried by a trivial-cofibration/fibration factorization. -/
+noncomputable def trivCofFibFactCertificate (fact : TrivCofFibFact) :
+    TrivCofFibFactCertificate fact where
+  factor_path := trivcof_fib_sum_path fact
+  swapped_target := Path.stepChain (by omega : fact.source + fact.target = fact.target + fact.source)
+  composite_to_swapped := Path.trans (trivcof_fib_sum_path fact)
+    (Path.stepChain (by omega : fact.source + fact.target = fact.target + fact.source))
 
 -- 9. Factorization with zero source
 theorem cof_trivfib_zero_source (fact : CofTrivFibFact) (hs : fact.source = 0) :

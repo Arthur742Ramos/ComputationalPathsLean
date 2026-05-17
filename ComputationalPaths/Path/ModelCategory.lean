@@ -175,6 +175,52 @@ noncomputable def factorization_triv_cof_fib_rweq_from_step {a b : A} (p : Path 
     RwEq ((pathModelCategory A).comp (Path.refl a) p) p := by
   exact rweq_of_step (factorization_triv_cof_fib_step_witness (A := A) p)
 
+/-- Certificate for the cofibration/trivial-fibration factorization of a path. -/
+structure CofTrivFibFactorizationCertificate {a b : A} (p : Path a b) where
+  mid : A
+  cofPart : Path a mid
+  trivFibPart : Path mid b
+  cof_witness : (pathModelCategory A).cof cofPart
+  fib_witness : (pathModelCategory A).fib trivFibPart
+  weq_witness : (pathModelCategory A).weq trivFibPart
+  factor_rw : Rw ((pathModelCategory A).comp cofPart trivFibPart) p
+  factor_rweq : RwEq ((pathModelCategory A).comp cofPart trivFibPart) p
+
+/-- Certificate for the trivial-cofibration/fibration factorization of a path. -/
+structure TrivCofFibFactorizationCertificate {a b : A} (p : Path a b) where
+  mid : A
+  trivCofPart : Path a mid
+  fibPart : Path mid b
+  cof_witness : (pathModelCategory A).cof trivCofPart
+  weq_witness : (pathModelCategory A).weq trivCofPart
+  fib_witness : (pathModelCategory A).fib fibPart
+  factor_rw : Rw ((pathModelCategory A).comp trivCofPart fibPart) p
+  factor_rweq : RwEq ((pathModelCategory A).comp trivCofPart fibPart) p
+
+/-- The canonical cofibration/trivial-fibration factorization with explicit rewrite evidence. -/
+noncomputable def cof_triv_fib_factorization_certificate {a b : A} (p : Path a b) :
+    CofTrivFibFactorizationCertificate (A := A) p where
+  mid := b
+  cofPart := p
+  trivFibPart := Path.refl b
+  cof_witness := rfl
+  fib_witness := rfl
+  weq_witness := path_is_weak_equivalence (A := A) (p := Path.refl b)
+  factor_rw := factorization_cof_triv_fib_rw_from_step (A := A) p
+  factor_rweq := factorization_cof_triv_fib_rweq_from_step (A := A) p
+
+/-- The canonical trivial-cofibration/fibration factorization with explicit rewrite evidence. -/
+noncomputable def triv_cof_fib_factorization_certificate {a b : A} (p : Path a b) :
+    TrivCofFibFactorizationCertificate (A := A) p where
+  mid := a
+  trivCofPart := Path.refl a
+  fibPart := p
+  cof_witness := rfl
+  weq_witness := path_is_weak_equivalence (A := A) (p := Path.refl a)
+  fib_witness := rfl
+  factor_rw := factorization_triv_cof_fib_rw_from_step (A := A) p
+  factor_rweq := factorization_triv_cof_fib_rweq_from_step (A := A) p
+
 /-- Step-level factorization can be packaged with a trivial fibration witness. -/
 def factorization_cof_triv_fib_step_trivial_fibration {a b : A} (p : Path a b) :
     ∃ (c : A) (i : Path a c) (q : Path c b),
@@ -343,6 +389,23 @@ theorem weq_symm {a b : A} {p : Path a b} :
       left_inv := rw_of_step (Step.trans_symm p)
       right_inv := rw_of_step (Step.symm_trans p) }
 
+/-- A diagonal lifting certificate records the canonical filler and its path coherence. -/
+structure LiftingCertificate {a b c d : A}
+    (f : Path a c) (_g : Path b d) (i : Path a b) (_p : Path c d) where
+  filler : Path b c
+  left_triangle : Rw (Path.trans i filler) f
+  left_triangle_rweq : RwEq (Path.trans i filler) f
+  filler_weq : (pathModelCategory A).weq filler
+
+/-- The canonical filler `i⁻¹ ; f` with both `Rw` and `RwEq` coherence. -/
+noncomputable def canonical_lifting_certificate {a b c d : A}
+    (f : Path a c) (g : Path b d) (i : Path a b) (p : Path c d) :
+    LiftingCertificate (A := A) f g i p where
+  filler := Path.trans (Path.symm i) f
+  left_triangle := rw_of_step (Step.trans_cancel_left i f)
+  left_triangle_rweq := rweq_of_step (Step.trans_cancel_left i f)
+  filler_weq := path_is_weak_equivalence (A := A) (Path.trans (Path.symm i) f)
+
 /-- Cofibrations are closed under composition in the path model structure. -/
 theorem cofibration_comp {a b c : A} (f : Path a b) (g : Path b c) :
     (pathModelCategory A).cof f →
@@ -365,9 +428,10 @@ theorem lifting_property {a b c d : A}
     ModelCategory.trivialCofibration (pathModelCategory A) i →
     (pathModelCategory A).fib p →
     (Path.trans f p).toEq = (Path.trans i g).toEq →
-    ∃ (h : Path b c), h = h := by
+    ∃ cert : LiftingCertificate (A := A) f g i p,
+      cert.filler = Path.trans (Path.symm i) f := by
   intro _ _ _
-  exact ⟨Path.trans (Path.symm i) f, rfl⟩
+  exact ⟨canonical_lifting_certificate (A := A) f g i p, rfl⟩
 
 /-- The lifting hypothesis guarantees existence of a diagonal filler path. -/
 theorem lifting_property_nonempty {a b c d : A}
@@ -377,8 +441,8 @@ theorem lifting_property_nonempty {a b c d : A}
     (Path.trans f p).toEq = (Path.trans i g).toEq →
     Nonempty (Path b c) := by
   intro hi hp hsquare
-  rcases lifting_property (A := A) f g i p hi hp hsquare with ⟨h, _⟩
-  exact ⟨h⟩
+  rcases lifting_property (A := A) f g i p hi hp hsquare with ⟨cert, _⟩
+  exact ⟨cert.filler⟩
 
 /-- A canonical diagonal filler used by the trivial lifting proof. -/
 theorem lifting_property_explicit_filler {a b c d : A}
@@ -392,21 +456,23 @@ theorem lifting_property_explicit_filler {a b c d : A}
 
 /-- Left lifting property: trivial cofibrations lift against all fibrations. -/
 theorem left_lifting_property {a b c d : A}
-    (i : Path a b) (p : Path c d) (f : Path a c) (_g : Path b d) :
+    (i : Path a b) (p : Path c d) (f : Path a c) (g : Path b d) :
     ModelCategory.trivialCofibration (pathModelCategory A) i →
     (pathModelCategory A).fib p →
-    ∃ (h : Path b c), h = h := by
+    ∃ cert : LiftingCertificate (A := A) f g i p,
+      cert.filler = Path.trans (Path.symm i) f := by
   intro _ _
-  exact ⟨Path.trans (Path.symm i) f, rfl⟩
+  exact ⟨canonical_lifting_certificate (A := A) f g i p, rfl⟩
 
 /-- Right lifting property: cofibrations lift against trivial fibrations. -/
 theorem right_lifting_property {a b c d : A}
-    (i : Path a b) (p : Path c d) (f : Path a c) (_g : Path b d) :
+    (i : Path a b) (p : Path c d) (f : Path a c) (g : Path b d) :
     (pathModelCategory A).cof i →
     ModelCategory.trivialFibration (pathModelCategory A) p →
-    ∃ (h : Path b c), h = h := by
+    ∃ cert : LiftingCertificate (A := A) f g i p,
+      cert.filler = Path.trans (Path.symm i) f := by
   intro _ _
-  exact ⟨Path.trans (Path.symm i) f, rfl⟩
+  exact ⟨canonical_lifting_certificate (A := A) f g i p, rfl⟩
 
 /-- Left lifting property yields a nonempty type of diagonal fillers. -/
 theorem left_lifting_property_nonempty {a b c d : A}
@@ -415,8 +481,8 @@ theorem left_lifting_property_nonempty {a b c d : A}
     (pathModelCategory A).fib p →
     Nonempty (Path b c) := by
   intro hi hp
-  rcases left_lifting_property (A := A) i p f g hi hp with ⟨h, _⟩
-  exact ⟨h⟩
+  rcases left_lifting_property (A := A) i p f g hi hp with ⟨cert, _⟩
+  exact ⟨cert.filler⟩
 
 /-- Right lifting property yields a nonempty type of diagonal fillers. -/
 theorem right_lifting_property_nonempty {a b c d : A}
@@ -425,8 +491,8 @@ theorem right_lifting_property_nonempty {a b c d : A}
     ModelCategory.trivialFibration (pathModelCategory A) p →
     Nonempty (Path b c) := by
   intro hi hp
-  rcases right_lifting_property (A := A) i p f g hi hp with ⟨h, _⟩
-  exact ⟨h⟩
+  rcases right_lifting_property (A := A) i p f g hi hp with ⟨cert, _⟩
+  exact ⟨cert.filler⟩
 
 /-- Canonical filler chosen by the left lifting construction. -/
 theorem left_lifting_property_canonical_filler {a b c d : A}

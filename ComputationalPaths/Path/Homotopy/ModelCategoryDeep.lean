@@ -783,8 +783,8 @@ theorem small_object_argument {a b : A} (f : Path a b) :
     ∃ (c : A) (i : Path a c) (p : Path c b),
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).fib p ∧
-      Rw (Path.trans i p) (Path.trans i p) := by
-  exact ⟨a, Path.refl a, f, rfl, rfl, Rw.refl _⟩
+      Rw (Path.trans i p) f := by
+  exact ⟨a, Path.refl a, f, rfl, rfl, rw_of_step (Step.trans_refl_left f)⟩
 
 /-- Small object argument produces a weak factorization. -/
 theorem small_object_gives_wfs {a b : A} (f : Path a b) :
@@ -1065,9 +1065,9 @@ theorem functorial_factorization_naturality {a b c : A}
     ∃ (x : A) (i : Path a x) (p : Path x c),
       (pathModelCategory A).cof i ∧
       (pathModelCategory A).fib p ∧
-      Rw (Path.trans i p) (Path.trans i p) := by
+      Rw (Path.trans i p) (Path.trans f g) := by
   refine ⟨a, Path.refl a, Path.trans f g, rfl, rfl, ?_⟩
-  exact Rw.refl _
+  exact rw_of_step (Step.trans_refl_left (Path.trans f g))
 
 /-- Mapping cylinder as a factorization tool. -/
 theorem mapping_cylinder_factorization {a b : A} (f : Path a b) :
