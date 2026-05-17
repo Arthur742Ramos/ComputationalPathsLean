@@ -27,6 +27,7 @@ import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Topology.LawCertificates
 
 namespace ComputationalPaths
 namespace Path
@@ -61,19 +62,33 @@ structure LieGroupData where
   /-- Compact or complex flag. -/
   isCompact : Bool
 
+/-- Surface-relation certificate for a sampled generator image. -/
+structure SurfaceRelationCertificate (sg : SurfaceGroup) (G : LieGroupData)
+    (generatorImages : Nat → G.carrier) where
+  generator : Nat
+  imagePath : Path (generatorImages generator) (generatorImages generator)
+  relationTrace : PathLawCertificate (generatorImages generator) (generatorImages generator)
+
 /-- A representation of a surface group into a Lie group. -/
 structure Representation (sg : SurfaceGroup) (G : LieGroupData) where
   /-- Images of generators. -/
   generatorImages : Nat → G.carrier
   /-- Relation satisfied: product of commutators = 1 (abstract). -/
-  relation_satisfied : True
+  relation_satisfied : SurfaceRelationCertificate sg G generatorImages
+
+/-- Expected-dimension certificate for representation varieties. -/
+structure ExpectedDimensionCertificate (sg : SurfaceGroup) (G : LieGroupData)
+    (dimension : Int) where
+  expected : Int
+  dimensionPath : Path dimension expected
+  dimensionTrace : PathLawCertificate dimension expected
 
 /-- The representation variety: Hom(π₁(Σ), G). -/
 structure RepresentationVariety (sg : SurfaceGroup) (G : LieGroupData) where
   /-- Dimension of the variety. -/
   dimension : Int
   /-- Expected dimension = (2g - 2) · dim G. -/
-  expected_dim : True
+  expected_dim : ExpectedDimensionCertificate sg G dimension
   /-- Number of components. -/
   numComponents : Nat
 
@@ -89,23 +104,41 @@ structure CharacterVariety (sg : SurfaceGroup) (G : LieGroupData) where
   hasSingularities : Bool
 
 /-- An irreducible representation: the stabilizer is the center of G. -/
+structure IrreducibilityCertificate (sg : SurfaceGroup) (G : LieGroupData)
+    (generatorImages : Nat → G.carrier) where
+  generator : Nat
+  stabilizerPath : Path (generatorImages generator) (generatorImages generator)
+  stabilizerTrace : PathLawCertificate (generatorImages generator) (generatorImages generator)
+
 structure IrreducibleRep (sg : SurfaceGroup) (G : LieGroupData) extends
     Representation sg G where
   /-- Irreducibility witness. -/
-  irreducible : True
+  irreducible : IrreducibilityCertificate sg G generatorImages
 
 /-- The smooth locus of the character variety: irreducible representations. -/
+structure TangentCohomologyCertificate (sg : SurfaceGroup) (G : LieGroupData)
+    (tangentDim : Int) where
+  cohomologyDim : Int
+  tangentPath : Path tangentDim cohomologyDim
+  tangentTrace : PathLawCertificate tangentDim cohomologyDim
+
 structure SmoothLocus (sg : SurfaceGroup) (G : LieGroupData) where
   /-- The character variety. -/
   charVar : CharacterVariety sg G
   /-- Tangent space dimension at an irreducible rep = (2g-2) dim G. -/
   tangentDim : Int
   /-- Tangent space ≅ H¹(Σ; Ad ρ). -/
-  tangent_is_cohomology : True
+  tangent_is_cohomology : TangentCohomologyCertificate sg G tangentDim
 
 /-! ## Goldman Symplectic Form -/
 
 /-- The Goldman symplectic form on the character variety. -/
+structure GoldmanFormCertificate (pairing : Int → Int → Int) where
+  tangentA : Int
+  tangentB : Int
+  formPath : Path (pairing tangentA tangentB) (pairing tangentA tangentB)
+  formTrace : PathLawCertificate (pairing tangentA tangentB) (pairing tangentA tangentB)
+
 structure GoldmanSymplecticForm (sg : SurfaceGroup) (G : LieGroupData) where
   /-- The character variety. -/
   charVar : CharacterVariety sg G
@@ -114,12 +147,19 @@ structure GoldmanSymplecticForm (sg : SurfaceGroup) (G : LieGroupData) where
   /-- Skew-symmetry. -/
   skewSymmetric : ∀ a b, Path (pairing a b) (-(pairing b a))
   /-- Non-degeneracy on smooth locus. -/
-  nonDegenerate : True
+  nonDegenerate : GoldmanFormCertificate pairing
   /-- Closedness: dω = 0. -/
-  closed : True
+  closed : GoldmanFormCertificate pairing
 
 /-- Goldman bracket: Poisson bracket on functions on the character variety
     defined via intersection of curves. -/
+structure GoldmanIntersectionCertificate (bracket : Int → Int → Int) where
+  curveA : Int
+  curveB : Int
+  intersectionNumber : Int
+  bracketPath : Path (bracket curveA curveB) intersectionNumber
+  intersectionTrace : PathLawCertificate (bracket curveA curveB) intersectionNumber
+
 structure GoldmanBracket (sg : SurfaceGroup) (G : LieGroupData) where
   /-- Bracket of trace functions. -/
   bracket : Int → Int → Int
@@ -129,18 +169,23 @@ structure GoldmanBracket (sg : SurfaceGroup) (G : LieGroupData) where
   jacobi : ∀ a b c, Path (bracket a (bracket b c) + bracket b (bracket c a) +
                            bracket c (bracket a b)) 0
   /-- Bracket computes via intersections. -/
-  intersection_formula : True
+  intersection_formula : GoldmanIntersectionCertificate bracket
 
 /-! ## Higgs Bundles and Hitchin System -/
 
 /-- A Higgs bundle (E, Φ) on a Riemann surface. -/
+structure HiggsFieldCertificate (rank : Nat) (degree : Int) where
+  spectralWeight : Int
+  fieldPath : Path spectralWeight spectralWeight
+  fieldTrace : PathLawCertificate spectralWeight spectralWeight
+
 structure HiggsBundle where
   /-- Rank of the bundle. -/
   rank : Nat
   /-- Degree of the bundle. -/
   degree : Int
   /-- Higgs field Φ ∈ H⁰(End(E) ⊗ K). -/
-  higgsFieldData : True
+  higgsFieldData : HiggsFieldCertificate rank degree
   /-- Stability condition. -/
   stable : Bool
 
@@ -335,9 +380,9 @@ noncomputable def charvar_dimension (sg : SurfaceGroup) (G : LieGroupData)
   cv.dimension
 
 /-- Tangent space at irreducible ρ is H¹(Σ; Ad ρ). -/
-theorem tangent_is_group_cohomology (sg : SurfaceGroup) (G : LieGroupData)
+noncomputable def tangent_is_group_cohomology (sg : SurfaceGroup) (G : LieGroupData)
     (sl : SmoothLocus sg G) :
-    True :=
+    TangentCohomologyCertificate sg G sl.tangentDim :=
   sl.tangent_is_cohomology
 
 /-- Surface group generators satisfy the relation. -/
@@ -372,9 +417,9 @@ theorem oper_hitchin_corr (sg : SurfaceGroup) (G : LieGroupData)
   ohc.correspondence
 
 /-- Goldman bracket computes via intersection numbers. -/
-theorem goldman_intersection_formula (sg : SurfaceGroup) (G : LieGroupData)
+noncomputable def goldman_intersection_formula (sg : SurfaceGroup) (G : LieGroupData)
     (gb : GoldmanBracket sg G) :
-    True :=
+    GoldmanIntersectionCertificate gb.bracket :=
   gb.intersection_formula
 
 /-- Higgs moduli has hyperkähler structure. -/

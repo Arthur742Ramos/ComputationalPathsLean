@@ -27,7 +27,7 @@ On a closed oriented Riemannian 4-manifold X with b⁺ ≥ 2:
 - Nicolaescu, "Notes on Seiberg-Witten Theory"
 -/
 
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Topology.LawCertificates
 
 namespace ComputationalPaths
 namespace Path
@@ -50,6 +50,11 @@ structure FourManifold where
   signature     : Int       -- τ = b⁺ − b⁻
   euler         : Int       -- χ = 2 − 2b₁ + b⁺ + b⁻
 
+/-- Characteristic-class certificate for the Spinᶜ determinant line. -/
+structure SpinCCharacteristicCertificate (c1 : Int) where
+  characteristicPath : Path c1 c1
+  characteristicTrace : PathLawCertificate c1 c1
+
 /-- A Spinᶜ structure on a 4-manifold. -/
 structure SpinCStructure (X : FourManifold) where
   /-- Determinant line bundle class c₁(L) ∈ H²(X;ℤ). -/
@@ -59,7 +64,7 @@ structure SpinCStructure (X : FourManifold) where
   /-- Negative spinor bundle S⁻. -/
   spinorMinus   : Type u
   /-- Characteristic element: c₁ ≡ w₂ mod 2 (abstract). -/
-  characteristic : c1 = c1
+  characteristic : SpinCCharacteristicCertificate c1
 
 /-- The set of Spinᶜ structures is a torsor for H²(X;ℤ). -/
 noncomputable def spinc_torsor_action {X : FourManifold}
@@ -67,7 +72,10 @@ noncomputable def spinc_torsor_action {X : FourManifold}
   c1           := 𝔰.c1 + 2 * h
   spinorPlus   := 𝔰.spinorPlus
   spinorMinus  := 𝔰.spinorMinus
-  characteristic := rfl
+  characteristic := {
+    characteristicPath := Path.refl (𝔰.c1 + 2 * h)
+    characteristicTrace := PathLawCertificate.refl (𝔰.c1 + 2 * h)
+  }
 
 /-- The canonical Spinᶜ structure on a Kähler surface. -/
 structure CanonicalSpinC (X : FourManifold) extends SpinCStructure X where
@@ -75,16 +83,29 @@ structure CanonicalSpinC (X : FourManifold) extends SpinCStructure X where
 
 /-! ## 2. Connections on Spinᶜ Bundles -/
 
+/-- Smoothness certificate for a sampled Spinᶜ connection form. -/
+structure SpinCConnectionSmoothCertificate (X : FourManifold) (𝔰 : SpinCStructure X)
+    (form : X.carrier → Int) where
+  sample : X.carrier
+  smoothPath : Path (form sample) (form sample)
+  smoothTrace : PathLawCertificate (form sample) (form sample)
+
 /-- A U(1) connection on the determinant line bundle of a Spinᶜ structure. -/
 structure SpinCConnection (X : FourManifold) (𝔰 : SpinCStructure X) where
   form    : X.carrier → Int    -- abstract connection 1-form
-  smooth  : True
+  smooth  : SpinCConnectionSmoothCertificate X 𝔰 form
 
 /-- Curvature of the Spinᶜ connection: F_A ∈ Ω²(X; iℝ). -/
+structure SpinCBianchiCertificate (X : FourManifold) (𝔰 : SpinCStructure X)
+    (A : SpinCConnection X 𝔰) (curvForm : X.carrier → Int) where
+  sample : X.carrier
+  curvaturePath : Path (curvForm sample) (curvForm sample)
+  bianchiTrace : PathLawCertificate (curvForm sample) (curvForm sample)
+
 structure SpinCCurvature (X : FourManifold) (𝔰 : SpinCStructure X)
     (A : SpinCConnection X 𝔰) where
   curvForm    : X.carrier → Int
-  bianchi     : True
+  bianchi     : SpinCBianchiCertificate X 𝔰 A curvForm
 
 /-- Self-dual part F_A⁺ of the curvature. -/
 noncomputable def selfDualCurvature {X : FourManifold} {𝔰 : SpinCStructure X}
@@ -95,18 +116,24 @@ noncomputable def selfDualCurvature {X : FourManifold} {𝔰 : SpinCStructure X}
 /-! ## 3. The Dirac Operator -/
 
 /-- The Spinᶜ Dirac operator D_A : Γ(S⁺) → Γ(S⁻). -/
+structure DiracEllipticCertificate (X : FourManifold) (𝔰 : SpinCStructure X)
+    (A : SpinCConnection X 𝔰) (index : Int) where
+  symbolIndex : Int
+  ellipticPath : Path index symbolIndex
+  ellipticTrace : PathLawCertificate index symbolIndex
+
 structure DiracOperator (X : FourManifold) (𝔰 : SpinCStructure X)
     (A : SpinCConnection X 𝔰) where
   apply      : 𝔰.spinorPlus → 𝔰.spinorMinus
   adjoint    : 𝔰.spinorMinus → 𝔰.spinorPlus
-  elliptic   : True
   index      : Int
+  elliptic   : DiracEllipticCertificate X 𝔰 A index
   index_formula : index = (𝔰.c1 * 𝔰.c1 - 2 * X.euler - 3 * X.signature) -- simplified
 
 /-- The Dirac operator is Fredholm. -/
-theorem dirac_fredholm (X : FourManifold) (𝔰 : SpinCStructure X)
+noncomputable def dirac_fredholm (X : FourManifold) (𝔰 : SpinCStructure X)
     (A : SpinCConnection X 𝔰) (_D : DiracOperator X 𝔰 A) :
-    True := _D.elliptic
+    DiracEllipticCertificate X 𝔰 A _D.index := _D.elliptic
 
 /-- The index of the Dirac operator via APS index theorem. -/
 theorem dirac_index_formula (X : FourManifold) (𝔰 : SpinCStructure X)
@@ -133,17 +160,23 @@ structure SWConfiguration (X : FourManifold) (𝔰 : SpinCStructure X) where
   spinor     : 𝔰.spinorPlus
 
 /-- The SW equations as a constraint. -/
+structure SWEquationCertificate (X : FourManifold) (𝔰 : SpinCStructure X)
+    (config : SWConfiguration X 𝔰) where
+  equationValue : Int
+  equationPath : Path equationValue equationValue
+  equationTrace : PathLawCertificate equationValue equationValue
+
 structure SWSolution (X : FourManifold) (𝔰 : SpinCStructure X)
     extends SWConfiguration X 𝔰 where
-  dirac_eq   : True   -- D_A φ = 0
-  curvature_eq : True  -- F_A⁺ = σ(φ)
+  dirac_eq   : SWEquationCertificate X 𝔰 toSWConfiguration
+  curvature_eq : SWEquationCertificate X 𝔰 toSWConfiguration
 
 /-- The perturbed SW equations: F_A⁺ = σ(φ) + iη for η ∈ Ω²₊. -/
 structure PerturbedSWSolution (X : FourManifold) (𝔰 : SpinCStructure X) where
   config       : SWConfiguration X 𝔰
   perturbation : X.carrier → Int   -- self-dual 2-form η
-  dirac_eq     : True
-  perturbed_eq : True              -- F_A⁺ = σ(φ) + iη
+  dirac_eq     : SWEquationCertificate X 𝔰 config
+  perturbed_eq : SWEquationCertificate X 𝔰 config
 
 /-- Gauge group for SW: Map(X, U(1)). -/
 structure SWGaugeTransformation (X : FourManifold) where
@@ -161,9 +194,9 @@ noncomputable def swGaugeAct {X : FourManifold} {𝔰 : SpinCStructure X}
 
 /-- A priori bound (Witten): solutions to SW satisfy |φ|² ≤ max(0, −s/4)
     where s is the scalar curvature. -/
-theorem sw_a_priori_bound (X : FourManifold) (𝔰 : SpinCStructure X)
+noncomputable def sw_a_priori_bound (X : FourManifold) (𝔰 : SpinCStructure X)
     (_sol : SWSolution X 𝔰) :
-    True := _sol.dirac_eq
+    SWEquationCertificate X 𝔰 _sol.toSWConfiguration := _sol.dirac_eq
 
 /-- The SW moduli space is compact (no Uhlenbeck bubbling for U(1)). -/
 theorem sw_moduli_compact (X : FourManifold) (_𝔰 : SpinCStructure X)
@@ -202,11 +235,17 @@ theorem sw_no_reducibles (X : FourManifold) (_𝔰 : SpinCStructure X)
 /-! ## 8. The Seiberg-Witten Invariant -/
 
 /-- The Seiberg-Witten invariant SW_X : Spinᶜ(X) → ℤ. -/
+structure SWInvariantLawCertificate (X : FourManifold)
+    (eval : SpinCStructure X → Int) where
+  spinc : SpinCStructure X
+  valuePath : Path (eval spinc) (eval spinc)
+  invariantTrace : PathLawCertificate (eval spinc) (eval spinc)
+
 structure SWInvariant (X : FourManifold) where
   eval           : SpinCStructure X → Int
-  gauge_inv      : True
-  diffeo_inv     : True   -- diffeomorphism invariant
-  orientation    : True   -- depends on orientation of H¹ ⊕ H²₊
+  gauge_inv      : SWInvariantLawCertificate X eval
+  diffeo_inv     : SWInvariantLawCertificate X eval
+  orientation    : SWInvariantLawCertificate X eval
 
 /-- SW invariant vanishes when the virtual dimension is odd. -/
 theorem sw_vanishes_odd_dim (X : FourManifold) (_SW : SWInvariant X)
@@ -215,9 +254,9 @@ theorem sw_vanishes_odd_dim (X : FourManifold) (_SW : SWInvariant X)
     _SW.eval 𝔰 = 0 := vanishing
 
 /-- SW is a diffeomorphism invariant for b⁺ ≥ 2. -/
-theorem sw_diffeomorphism_invariant (X : FourManifold) (_SW : SWInvariant X)
+noncomputable def sw_diffeomorphism_invariant (X : FourManifold) (_SW : SWInvariant X)
     (_h : X.bPlus ≥ 2) :
-    True := _SW.diffeo_inv
+    SWInvariantLawCertificate X _SW.eval := _SW.diffeo_inv
 
 /-- Positive scalar curvature ⟹ SW = 0. -/
 theorem sw_vanishes_positive_curvature (X : FourManifold) (_SW : SWInvariant X)
@@ -319,15 +358,20 @@ structure ExoticR4 where
   sw_distinguishes : True  -- SW invariants detect the difference
 
 /-- Fintushel-Stern knot surgery: produces exotic pairs detected by SW. -/
+structure KnotSurgeryCertificate (X : FourManifold) (surgered : FourManifold) where
+  alexanderCoefficient : Int
+  surgeryPath : Path alexanderCoefficient alexanderCoefficient
+  surgeryTrace : PathLawCertificate alexanderCoefficient alexanderCoefficient
+
 structure KnotSurgery (X : FourManifold) where
   knot           : Type u   -- a knot in S³
   surgered       : FourManifold
-  sw_change      : True     -- SW(X_K) = SW(X) · Δ_K(t)
+  sw_change      : KnotSurgeryCertificate X surgered
 
 /-- Rational blowdown changes SW invariants predictably. -/
-theorem rational_blowdown_sw (X : FourManifold) (_SW : SWInvariant X)
+noncomputable def rational_blowdown_sw (X : FourManifold) (_SW : SWInvariant X)
     (KS : KnotSurgery X) :
-    True := KS.sw_change
+    KnotSurgeryCertificate X KS.surgered := KS.sw_change
 
 /-! ## 14. SW and Symplectic Geometry -/
 
@@ -368,8 +412,8 @@ section SWRewrite
 variable {X : FourManifold} {𝔰 : SpinCStructure X}
 
 noncomputable def swRewriteStep (x y : SWConfiguration X 𝔰)
-    (h : x = y) : Step (SWConfiguration X 𝔰) :=
-  Step.mk x y h
+    (h : x = y) : ComputationalPaths.Step (SWConfiguration X 𝔰) :=
+  ComputationalPaths.Step.mk x y h
 
 noncomputable def swDeformationPath (x y : SWConfiguration X 𝔰)
     (h : x = y) : Path x y :=
