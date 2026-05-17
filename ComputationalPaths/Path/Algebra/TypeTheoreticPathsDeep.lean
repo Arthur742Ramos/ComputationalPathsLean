@@ -17,6 +17,7 @@ decidable-equality witnesses.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -151,6 +152,31 @@ theorem ap_not_symm :
     Path.symm (ap not (Path.refl true)) :=
   ap_symm not (Path.refl true)
 
+/-! ### Wave-two anchor evidence for `ap` -/
+
+/-- Function action on paths with the concrete source trace and unit rewrite evidence. -/
+structure ApActionWitness {A : Type u} {B : Type v} (f : A → B) {a b : A} where
+  source : Path a b
+  image : Path (f a) (f b)
+  image_eq : image = ap f source
+  leftUnitRw : RwEq (Path.trans (Path.refl (f a)) image) image
+
+/-- Bool `not` action anchored by a one-step source trace. -/
+noncomputable def apNotBoolWitness :
+    ApActionWitness (A := Bool) (B := Bool) not (a := true) (b := true) where
+  source := Path.mk [ComputationalPaths.Step.mk true true rfl] rfl
+  image := ap not (Path.mk [ComputationalPaths.Step.mk true true rfl] rfl)
+  image_eq := rfl
+  leftUnitRw := rweq_cmpA_refl_left (ap not (Path.mk [ComputationalPaths.Step.mk true true rfl] rfl))
+
+/-- Nat successor action anchored by a one-step source trace. -/
+noncomputable def apSuccNatWitness :
+    ApActionWitness (A := Nat) (B := Nat) Nat.succ (a := 0) (b := 0) where
+  source := Path.mk [ComputationalPaths.Step.mk 0 0 rfl] rfl
+  image := ap Nat.succ (Path.mk [ComputationalPaths.Step.mk 0 0 rfl] rfl)
+  image_eq := rfl
+  leftUnitRw := rweq_cmpA_refl_left (ap Nat.succ (Path.mk [ComputationalPaths.Step.mk 0 0 rfl] rfl))
+
 /-! ## Section 4 — Function extensionality -/
 
 /-- Propositional function extensionality via proof irrelevance. -/
@@ -235,13 +261,34 @@ noncomputable def qequivBoolNot : QEquiv Bool Bool where
     inv := not
     sect := fun a => by
       cases a
-      · exact Path.mk [Step.mk true true rfl] rfl
-      · exact Path.mk [Step.mk false false rfl] rfl
+      · exact Path.mk [ComputationalPaths.Step.mk true true rfl] rfl
+      · exact Path.mk [ComputationalPaths.Step.mk false false rfl] rfl
     retr := fun b => by
       cases b
-      · exact Path.mk [Step.mk true true rfl] rfl
-      · exact Path.mk [Step.mk false false rfl] rfl
+      · exact Path.mk [ComputationalPaths.Step.mk true true rfl] rfl
+      · exact Path.mk [ComputationalPaths.Step.mk false false rfl] rfl
   }
+
+/-- A quasi-equivalence sample with concrete section/retraction paths and rewrites. -/
+structure QEquivAnchor (A : Type u) (B : Type v) where
+  equiv : QEquiv A B
+  sample : A
+  sectionPath : Path (equiv.qinv.inv (equiv.toFun sample)) sample
+  retractionPath : Path (equiv.toFun (equiv.qinv.inv (equiv.toFun sample))) (equiv.toFun sample)
+  sectionUnitRw :
+    RwEq (Path.trans (Path.refl (equiv.qinv.inv (equiv.toFun sample))) sectionPath) sectionPath
+  retractionCancelRw :
+    RwEq (Path.trans retractionPath (Path.symm retractionPath))
+      (Path.refl (equiv.toFun (equiv.qinv.inv (equiv.toFun sample))))
+
+/-- Bool negation quasi-equivalence anchored at `true`. -/
+noncomputable def qequivBoolNotAnchor : QEquivAnchor Bool Bool where
+  equiv := qequivBoolNot
+  sample := true
+  sectionPath := qequivBoolNot.qinv.sect true
+  retractionPath := qequivBoolNot.qinv.retr (qequivBoolNot.toFun true)
+  sectionUnitRw := rweq_cmpA_refl_left (qequivBoolNot.qinv.sect true)
+  retractionCancelRw := rweq_cmpA_inv_right (qequivBoolNot.qinv.retr (qequivBoolNot.toFun true))
 
 /-- Quasi-inverse is unique up to path (propositional equality on inv). -/
 theorem qinv_unique {A B : Type u} (f : A → B)
@@ -318,6 +365,14 @@ theorem eckmann_hilton_interchange {A : Type u} {a : A}
     vcomp α β = vcomp β α :=
   eckmann_hilton α β
 
+/-- Eckmann-Hilton data anchored by a concrete loop and unit rewrite evidence. -/
+structure EckmannHiltonAnchor {A : Type u} (a : A) where
+  loop : Path a a
+  alpha : TwoPath loop loop
+  beta : TwoPath loop loop
+  rightUnitRw : RwEq (Path.trans loop (Path.refl a)) loop
+  commute : vcomp alpha beta = vcomp beta alpha
+
 /-! ## Section 7 — ap interaction with J -/
 
 /-- ap after J computes correctly. -/
@@ -382,15 +437,15 @@ noncomputable def Fiber.idFiber {A : Type u} (a : A) : Fiber id a :=
 
 /-- Fiber of not over false. -/
 noncomputable def Fiber.notFalse : Fiber not false :=
-  Fiber.mk true (Path.mk [Step.mk false false rfl] rfl)
+  Fiber.mk true (Path.mk [ComputationalPaths.Step.mk false false rfl] rfl)
 
 /-- Fiber of not over true. -/
 noncomputable def Fiber.notTrue : Fiber not true :=
-  Fiber.mk false (Path.mk [Step.mk true true rfl] rfl)
+  Fiber.mk false (Path.mk [ComputationalPaths.Step.mk true true rfl] rfl)
 
 /-- Fiber of Nat.succ over 1. -/
 noncomputable def Fiber.succ1 : Fiber Nat.succ 1 :=
-  Fiber.mk 0 (Path.mk [Step.mk 1 1 rfl] rfl)
+  Fiber.mk 0 (Path.mk [ComputationalPaths.Step.mk 1 1 rfl] rfl)
 
 /-! ## Section 11 — Path algebra via ap -/
 
@@ -471,35 +526,51 @@ theorem ap2_refl {A B : Type u} (f : A → B) {a b : A} (p : Path a b) :
 
 /-- Construct a Bool path via explicit step. -/
 noncomputable def boolPath (b : Bool) : Path b b :=
-  Path.mk [Step.mk b b rfl] rfl
+  Path.mk [ComputationalPaths.Step.mk b b rfl] rfl
 
 /-- Construct a Nat path via explicit step. -/
 noncomputable def natPath (n : Nat) : Path n n :=
-  Path.mk [Step.mk n n rfl] rfl
+  Path.mk [ComputationalPaths.Step.mk n n rfl] rfl
 
 /-- trans of Bool paths. -/
 def boolPath_trans (b : Bool) :
     Path.trans (boolPath b) (boolPath b) =
-    Path.mk [Step.mk b b rfl, Step.mk b b rfl] rfl := by
+    Path.mk [ComputationalPaths.Step.mk b b rfl, ComputationalPaths.Step.mk b b rfl] rfl := by
   simp [boolPath, Path.trans]
 
 /-- symm of Bool path. -/
 def boolPath_symm (b : Bool) :
     Path.symm (boolPath b) =
-    Path.mk [Step.symm (Step.mk b b rfl)] rfl := by
+    Path.mk [ComputationalPaths.Step.symm (ComputationalPaths.Step.mk b b rfl)] rfl := by
   simp [boolPath, Path.symm]
 
 /-- trans of Nat paths. -/
 def natPath_trans (n : Nat) :
     Path.trans (natPath n) (natPath n) =
-    Path.mk [Step.mk n n rfl, Step.mk n n rfl] rfl := by
+    Path.mk [ComputationalPaths.Step.mk n n rfl, ComputationalPaths.Step.mk n n rfl] rfl := by
   simp [natPath, Path.trans]
 
 /-- symm of Nat path. -/
 def natPath_symm (n : Nat) :
     Path.symm (natPath n) =
-    Path.mk [Step.symm (Step.mk n n rfl)] rfl := by
+    Path.mk [ComputationalPaths.Step.symm (ComputationalPaths.Step.mk n n rfl)] rfl := by
   simp [natPath, Path.symm]
+
+/-- Bool Eckmann-Hilton anchor using the non-empty `boolPath true` loop. -/
+noncomputable def eckmannHiltonBoolAnchor : EckmannHiltonAnchor true where
+  loop := boolPath true
+  alpha := rfl
+  beta := rfl
+  rightUnitRw := rweq_cmpA_refl_right (boolPath true)
+  commute := rfl
+
+/-- Nat Eckmann-Hilton anchor using the non-empty `natPath 0` loop. -/
+noncomputable def eckmannHiltonNatAnchor : EckmannHiltonAnchor (0 : Nat) where
+  loop := natPath 0
+  alpha := rfl
+  beta := rfl
+  rightUnitRw := rweq_cmpA_refl_right (natPath 0)
+  commute := rfl
 
 /-! ## Section 17 — Transport and ap interaction -/
 
@@ -533,6 +604,22 @@ noncomputable def HalfAdjEquiv.refl (A : Type u) : HalfAdjEquiv A A where
   sect := fun a => Path.refl a
   retr := fun a => Path.refl a
   adj := fun _ => rfl
+
+/-- Half-adjoint equivalence evidence anchored at one sample point. -/
+structure HalfAdjointAnchor (A : Type u) (B : Type v) where
+  equiv : HalfAdjEquiv A B
+  sample : A
+  sectionUnitRw :
+    RwEq (Path.trans (Path.refl (equiv.invFun (equiv.toFun sample))) (equiv.sect sample))
+      (equiv.sect sample)
+  adjPath : Path (ap equiv.toFun (equiv.sect sample)) (equiv.retr (equiv.toFun sample))
+
+/-- Identity half-adjoint equivalence anchored on Bool with explicit path evidence. -/
+noncomputable def halfAdjBoolAnchor : HalfAdjointAnchor Bool Bool where
+  equiv := HalfAdjEquiv.refl Bool
+  sample := true
+  sectionUnitRw := rweq_cmpA_refl_left ((HalfAdjEquiv.refl Bool).sect true)
+  adjPath := Path.refl (ap id (Path.refl true))
 
 /-- Half-adjoint equiv gives quasi-equivalence. -/
 noncomputable def HalfAdjEquiv.toQEquiv {A B : Type u} (e : HalfAdjEquiv A B) : QEquiv A B where
