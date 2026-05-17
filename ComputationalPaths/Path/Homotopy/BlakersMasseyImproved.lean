@@ -117,7 +117,7 @@ noncomputable def excisionIsoMetastable (H : Type u) (n m : Nat) (h : metastable
 --     Nonempty
 --       (Path (WhiteheadProduct.whiteheadProduct x y)
 --         (WhiteheadProduct.whiteheadProduct x y)) :=
---   ⟨Path.refl _⟩
+--   ⟨Path.stepChain rfl⟩
 
 /-! ## Deeper properties -/
 
@@ -133,13 +133,55 @@ theorem sharpTriadConnectivityBound_eq (k l : Nat) :
 
 
 
+/-- Typed certificate for the Freudenthal corollary data extracted from a sharp
+Blakers-Massey triad. The two pointed types are certified independently, since
+`Path` is homogeneous and previews over different pointed types live in different
+types. -/
+structure FreudenthalNaturalityCertificate {A B C : Type u} {f : C → A} {g : C → B}
+    (T : Triad A B C f g) (k l : Nat) (h : triadConnectivityStatement T k l)
+    (X Y : SuspensionLoop.Pointed.{u}) : Type (u + 2) where
+  bound : Nat
+  boundSharp : Path bound (sharpTriadConnectivityBound k l)
+  boundAdditive : Path (sharpTriadConnectivityBound k l) (k + l)
+  boundRouteRw :
+    RwEq (Path.trans (Path.refl bound) (Path.trans boundSharp boundAdditive))
+      (Path.trans boundSharp boundAdditive)
+  sourcePreview : FreudenthalSuspension.FreudenthalPreview X
+  sourceCanonical :
+    Path sourcePreview (FreudenthalSuspension.freudenthalPreview X)
+  sourceBasepoint :
+    Path (sourcePreview.toFun (Path.refl X.pt))
+      (FreudenthalSuspension.suspBaseLoop (X := X.carrier) X.pt)
+  sourceRouteRw :
+    RwEq (Path.trans (Path.refl sourcePreview) sourceCanonical) sourceCanonical
+  targetPreview : FreudenthalSuspension.FreudenthalPreview Y
+  targetCanonical :
+    Path targetPreview (FreudenthalSuspension.freudenthalPreview Y)
+  targetBasepoint :
+    Path (targetPreview.toFun (Path.refl Y.pt))
+      (FreudenthalSuspension.suspBaseLoop (X := Y.carrier) Y.pt)
+  targetRouteRw :
+    RwEq (Path.trans (Path.refl targetPreview) targetCanonical) targetCanonical
+  connectivity : triadConnectivityStatement T k l
+
 /-- Freudenthal corollary is natural in the pointed type. -/
-theorem freudenthalCorollary_natural {A B C : Type u} {f : C → A} {g : C → B}
-    (T : Triad A B C f g) (k l : Nat) (_h : triadConnectivityStatement T k l)
-    (_X _Y : SuspensionLoop.Pointed) :
-    Exists (fun desc : String =>
-      desc = "FreudenthalPreview for X and Y") :=
-  ⟨_, rfl⟩
+noncomputable def freudenthalCorollary_natural {A B C : Type u} {f : C → A} {g : C → B}
+    (T : Triad A B C f g) (k l : Nat) (h : triadConnectivityStatement T k l)
+    (X Y : SuspensionLoop.Pointed.{u}) :
+    FreudenthalNaturalityCertificate T k l h X Y :=
+  { bound := sharpTriadConnectivityBound k l
+    boundSharp := Path.stepChain rfl
+    boundAdditive := Path.stepChain rfl
+    boundRouteRw := rweq_cmpA_refl_left _
+    sourcePreview := freudenthalCorollary T k l h X
+    sourceCanonical := Path.stepChain rfl
+    sourceBasepoint := (freudenthalCorollary T k l h X).basepoint
+    sourceRouteRw := rweq_cmpA_refl_left _
+    targetPreview := freudenthalCorollary T k l h Y
+    targetCanonical := Path.stepChain rfl
+    targetBasepoint := (freudenthalCorollary T k l h Y).basepoint
+    targetRouteRw := rweq_cmpA_refl_left _
+    connectivity := h }
 
 
 
@@ -163,11 +205,11 @@ noncomputable def sharp_bound_path (k l : Nat) :
     Path (sharpTriadConnectivityBound k l) (k + l) :=
   Path.stepChain rfl
 
-/-- Any triad connectivity statement carries a reflexive computational-path witness. -/
+/-- Any triad connectivity statement carries an explicit proposition-equivalence path. -/
 noncomputable def triad_connectivity_refl_path {A B C : Type u} {f : C → A} {g : C → B}
     (T : Triad A B C f g) (k l : Nat) :
     Path (triadConnectivityStatement T k l) (triadConnectivityStatement T k l) :=
-  Path.refl _
+  Path.stepChain (propext ⟨fun h => h, fun h => h⟩)
 
 -- Barratt-Whitehead products have reflexive computational-path witnesses.
 -- DISABLED: WhiteheadProduct has type errors
@@ -175,7 +217,7 @@ noncomputable def triad_connectivity_refl_path {A B C : Type u} {f : C → A} {g
 --     (x : HigherHomotopyGroups.PiN m A a) (y : HigherHomotopyGroups.PiN n A a) :
 --     Path (WhiteheadProduct.whiteheadProduct x y)
 --       (WhiteheadProduct.whiteheadProduct x y) :=
---   Path.refl _
+--   Path.stepChain rfl
 
 /-! ## Summary
 
