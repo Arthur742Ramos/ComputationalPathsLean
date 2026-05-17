@@ -10,7 +10,7 @@ This directory contains the stable reader-facing documentation for `Computationa
 4. Use `modules.md` as a selective source map for entrypoints, import hubs, and major directories.
 5. Read `axioms.md` before making claims about constructivity, assumptions, or axiom use.
 6. Use `../paper/README.md` to understand the paper source directory and historical wave notes.
-7. Use `../CONTRIBUTING.md` for contribution workflow, local checks, and PR expectations.
+7. Use `../CONTRIBUTING.md` and the lightweight `../scripts/check.*` wrappers for contribution workflow, local checks, and PR expectations.
 8. Use `../SUPPORT.md` for repository question and issue routing.
 9. Use `archive/README.md` to understand historical audits and generated run outputs kept for provenance.
 
