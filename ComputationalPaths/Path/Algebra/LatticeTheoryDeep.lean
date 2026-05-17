@@ -11,6 +11,8 @@
   Paths ARE the math.
 -/
 
+import ComputationalPaths.Path.Rewrite.Step
+
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
 
@@ -80,6 +82,22 @@ theorem path_length_trans (p : Path α a b) (q : Path α b c) :
   induction p with
   | nil _ => simp [Path.trans, Path.length]
   | cons s _ ih => simp [Path.trans, Path.length, ih, Nat.add_assoc]
+
+/-- Local rewrite equivalence for the lightweight lattice-path calculus. -/
+inductive RwEq {α : Type} {a b : α} : Path α a b → Path α a b → Prop where
+  | of_eq {p q : Path α a b} : p = q → RwEq p q
+  | symm {p q : Path α a b} : RwEq p q → RwEq q p
+  | trans {p q r : Path α a b} : RwEq p q → RwEq q r → RwEq p r
+
+-- Theorem 3a
+theorem rweq_refl (p : Path α a b) : RwEq p p :=
+  RwEq.of_eq rfl
+
+-- Theorem 3b
+theorem path_trans_assoc_rweq
+    (p : Path α a b) (q : Path α b c) (r : Path α c d) :
+    RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
+  RwEq.of_eq (path_trans_assoc p q r)
 
 -- ============================================================================
 -- §3  Posets
@@ -835,5 +853,112 @@ def trans_singles_length (s₁ : Step α a b) (s₂ : Step α b c) :
 theorem map_nil (f : α → β) (a : α) :
     Path.map f (Path.nil a) = Path.nil (f a) := by
   simp [Path.map]
+
+-- ============================================================================
+-- §20  Project Path/RwEq bridge witnesses
+-- ============================================================================
+
+namespace ProjectBridge
+
+/-- Project-level rewrite equality used by the audit bridge, generated only by
+    the project `Step` relation so this example module stays lightweight. -/
+inductive CPathRwEq {α : Type} {a b : α} :
+    ComputationalPaths.Path a b → ComputationalPaths.Path a b → Type 1 where
+  | refl (p : ComputationalPaths.Path a b) : CPathRwEq p p
+  | step {p q : ComputationalPaths.Path a b} :
+      ComputationalPaths.Path.Step p q → CPathRwEq p q
+  | symm {p q : ComputationalPaths.Path a b} : CPathRwEq p q → CPathRwEq q p
+  | trans {p q r : ComputationalPaths.Path a b} :
+      CPathRwEq p q → CPathRwEq q r → CPathRwEq p r
+
+/-- A project-level computational path with its direct proof, factored trace,
+    and RwEq normalization of a trailing identity. -/
+structure CPathTrace {α : Type} (source target : α) where
+  direct : ComputationalPaths.Path source target
+  factored : ComputationalPaths.Path source target
+  normalized : CPathRwEq
+    (ComputationalPaths.Path.trans factored (ComputationalPaths.Path.refl target))
+    factored
+
+noncomputable def double_absorb_cpath_trace
+    (L : Lattice α) (a b : α) :
+    CPathTrace (L.meet a (L.join a (L.meet a b))) a :=
+  let innerPath :
+      ComputationalPaths.Path (L.meet a (L.join a (L.meet a b))) (L.meet a a) :=
+    ComputationalPaths.Path.stepChain
+      (congrArg (fun x => L.meet a x) (L.absorb_jm a b))
+  let idemPath : ComputationalPaths.Path (L.meet a a) a :=
+    ComputationalPaths.Path.stepChain (L.meet_idem a)
+  let factored : ComputationalPaths.Path (L.meet a (L.join a (L.meet a b))) a :=
+    ComputationalPaths.Path.trans innerPath idemPath
+  { direct :=
+      ComputationalPaths.Path.stepChain (by
+        calc
+          L.meet a (L.join a (L.meet a b)) = L.meet a a :=
+            congrArg (fun x => L.meet a x) (L.absorb_jm a b)
+          _ = a := L.meet_idem a)
+    factored := factored
+    normalized :=
+      CPathRwEq.step
+        (ComputationalPaths.Path.Step.trans_refl_right factored) }
+
+theorem double_absorb_cpath_factored_steps
+    (L : Lattice α) (a b : α) :
+    (double_absorb_cpath_trace L a b).factored.steps.length = 2 := by
+  simp [double_absorb_cpath_trace, ComputationalPaths.Path.trans,
+    ComputationalPaths.Path.stepChain]
+
+noncomputable def hom_comp_cpath_trace
+    (L₁ L₂ L₃ : Lattice α) (f g : α → α)
+    (hf : LatHom L₁ L₂ f) (hg : LatHom L₂ L₃ g) (a b : α) :
+    CPathTrace (g (f (L₁.meet a b))) (L₃.meet (g (f a)) (g (f b))) :=
+  let first :
+      ComputationalPaths.Path (g (f (L₁.meet a b)))
+        (g (L₂.meet (f a) (f b))) :=
+    ComputationalPaths.Path.stepChain (congrArg g (hf.pres_meet a b))
+  let second :
+      ComputationalPaths.Path (g (L₂.meet (f a) (f b)))
+        (L₃.meet (g (f a)) (g (f b))) :=
+    ComputationalPaths.Path.stepChain (hg.pres_meet (f a) (f b))
+  let factored :
+      ComputationalPaths.Path (g (f (L₁.meet a b)))
+        (L₃.meet (g (f a)) (g (f b))) :=
+    ComputationalPaths.Path.trans first second
+  { direct :=
+      ComputationalPaths.Path.stepChain (by
+        rw [hf.pres_meet, hg.pres_meet])
+    factored := factored
+    normalized :=
+      CPathRwEq.step
+        (ComputationalPaths.Path.Step.trans_refl_right factored) }
+
+theorem hom_comp_cpath_factored_steps
+    (L₁ L₂ L₃ : Lattice α) (f g : α → α)
+    (hf : LatHom L₁ L₂ f) (hg : LatHom L₂ L₃ g) (a b : α) :
+    (hom_comp_cpath_trace L₁ L₂ L₃ f g hf hg a b).factored.steps.length = 2 := by
+  simp [hom_comp_cpath_trace, ComputationalPaths.Path.trans,
+    ComputationalPaths.Path.stepChain]
+
+noncomputable def hom_comp_cpath_assoc_rweq
+    (L₁ L₂ L₃ : Lattice α) (f g : α → α)
+    (hf : LatHom L₁ L₂ f) (hg : LatHom L₂ L₃ g) (a b : α) :
+    CPathRwEq
+      (ComputationalPaths.Path.trans
+        (ComputationalPaths.Path.trans
+          (ComputationalPaths.Path.stepChain (congrArg g (hf.pres_meet a b)))
+          (ComputationalPaths.Path.stepChain (hg.pres_meet (f a) (f b))))
+        (ComputationalPaths.Path.refl (L₃.meet (g (f a)) (g (f b)))))
+      (ComputationalPaths.Path.trans
+        (ComputationalPaths.Path.stepChain (congrArg g (hf.pres_meet a b)))
+        (ComputationalPaths.Path.trans
+          (ComputationalPaths.Path.stepChain (hg.pres_meet (f a) (f b)))
+          (ComputationalPaths.Path.refl (L₃.meet (g (f a)) (g (f b)))))) :=
+  CPathRwEq.step
+    (ComputationalPaths.Path.Step.trans_assoc
+      (ComputationalPaths.Path.stepChain (congrArg g (hf.pres_meet a b)))
+      (ComputationalPaths.Path.stepChain (hg.pres_meet (f a) (f b)))
+      (ComputationalPaths.Path.refl (L₃.meet (g (f a)) (g (f b)))))
+
+end ProjectBridge
 
 end LatticeTheoryDeep
