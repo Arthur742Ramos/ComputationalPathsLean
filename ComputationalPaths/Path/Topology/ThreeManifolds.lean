@@ -30,6 +30,7 @@ The study of 3-manifolds is organized around decomposition theorems:
 import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -206,6 +207,27 @@ structure PrimeDecomposition (M : ThreeManifold.{u}) where
 noncomputable def kneser_milnor_existence (_M : ThreeManifold.{u}) :
     True := trivial
 
+/-- Certificate for a prime decomposition with explicit count traces and
+    rewrite stability on the factor-count witness. -/
+structure PrimeDecompositionCertificate (M : ThreeManifold.{u}) where
+  decomposition : PrimeDecomposition M
+  factorCount : Nat
+  factorCount_matches : Path factorCount decomposition.factors.length
+  recoveryPath : Path M.carrier M.carrier
+  recovery_matches : Path recoveryPath decomposition.recovers
+  factorCount_stable :
+    RwEq (Path.trans factorCount_matches (Path.refl decomposition.factors.length))
+      factorCount_matches
+
+noncomputable def certifyPrimeDecomposition (M : ThreeManifold.{u})
+    (P : PrimeDecomposition M) : PrimeDecompositionCertificate M where
+  decomposition := P
+  factorCount := P.factors.length
+  factorCount_matches := Path.refl _
+  recoveryPath := P.recovers
+  recovery_matches := Path.refl _
+  factorCount_stable := rweq_of_step (Step.trans_refl_right _)
+
 /-! ## JSJ Decomposition -/
 
 /-- An embedded torus in a 3-manifold. -/
@@ -242,6 +264,31 @@ structure JSJExistence (M : ThreeManifold.{u}) where
   decomp : JSJDecomposition M
   /-- Existence witness. -/
   exists_witness : True
+
+/-- Certificate for JSJ decomposition data with explicit torus/piece counts
+    and computational-path coherence for the complexity decomposition. -/
+structure JSJDecompositionCertificate (M : ThreeManifold.{u}) where
+  decomposition : JSJDecomposition M
+  torusCount : Nat
+  pieceCount : Nat
+  torusCount_matches : Path torusCount decomposition.tori.length
+  pieceCount_matches : Path pieceCount decomposition.pieces.length
+  complexity : Nat
+  complexity_is_sum : Path complexity (torusCount + pieceCount)
+  complexity_stable :
+    RwEq (Path.trans complexity_is_sum (Path.refl (torusCount + pieceCount)))
+      complexity_is_sum
+
+noncomputable def certifyJSJExistence (M : ThreeManifold.{u})
+    (J : JSJExistence M) : JSJDecompositionCertificate M where
+  decomposition := J.decomp
+  torusCount := J.decomp.tori.length
+  pieceCount := J.decomp.pieces.length
+  torusCount_matches := Path.refl _
+  pieceCount_matches := Path.refl _
+  complexity := J.decomp.tori.length + J.decomp.pieces.length
+  complexity_is_sum := Path.refl _
+  complexity_stable := rweq_of_step (Step.trans_refl_right _)
 
 /-! ## Incompressible Surfaces -/
 
