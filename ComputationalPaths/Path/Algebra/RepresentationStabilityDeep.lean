@@ -66,7 +66,10 @@ structure StabilityCertificate where
 
 noncomputable def mkStabilityCertificate (N : Nat) : StabilityCertificate where
   threshold := N
-  stabilizationPath := Path.trans (Path.refl N) (Path.refl N)
+  stabilizationPath :=
+    Path.trans
+      (Path.stepChain (rfl : N = N))
+      (Path.ofEq (rfl : N = N))
 
 noncomputable def FINoetherian (_F : CEFFramework) : Prop := Nonempty StabilityCertificate
 noncomputable def EventuallyInjective (_S : ConsistentSequence) : Prop := Nonempty StabilityCertificate

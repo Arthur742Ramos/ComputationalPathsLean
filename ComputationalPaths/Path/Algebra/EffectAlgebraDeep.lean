@@ -121,8 +121,8 @@ noncomputable def handlerComposeCertificate {A B C : Type u}
     HandlerComposeCertificate h1 h2 a where
   composedPath :=
     Path.trans
-      (Path.congrArg h2.ret (Path.refl (h1.ret a)))
-      (Path.refl (h2.ret (h1.ret a)))
+      (Path.stepChain (rfl : h2.ret (h1.ret a) = h2.ret (h1.ret a)))
+      (Path.ofEq (rfl : h2.ret (h1.ret a) = h2.ret (h1.ret a)))
   rightUnit := by
     simp
 
@@ -337,9 +337,11 @@ noncomputable def handlerAssocCertificate {A B C D : Type u}
     (h1 : RetHandler A B) (h2 : RetHandler B C) (h3 : RetHandler C D) (a : A) :
     HandlerAssocCertificate h1 h2 h3 a where
   assocPath :=
+    let lhs := ((composeHandlers (composeHandlers h1 h2) h3).ret a)
+    let rhs := ((composeHandlers h1 (composeHandlers h2 h3)).ret a)
     Path.trans
-      (Path.congrArg h3.ret (Path.congrArg h2.ret (Path.refl (h1.ret a))))
-      (Path.refl (h3.ret (h2.ret (h1.ret a))))
+      (Path.stepChain (rfl : lhs = rhs))
+      (Path.ofEq (rfl : rhs = rhs))
   rightUnit := by
     simp
 
@@ -351,13 +353,17 @@ structure HandlerUnitCertificate {A B : Type u} (h : RetHandler A B) (a : A) whe
 noncomputable def handlerUnitCertificate {A B : Type u}
     (h : RetHandler A B) (a : A) : HandlerUnitCertificate h a where
   leftUnitPath :=
+    let lhs := ((composeHandlers ⟨id⟩ h).ret a)
+    let rhs := h.ret a
     Path.trans
-      (Path.congrArg h.ret (Path.refl a))
-      (Path.refl (h.ret a))
+      (Path.stepChain (rfl : lhs = rhs))
+      (Path.ofEq (rfl : rhs = rhs))
   rightUnitPath :=
+    let lhs := ((composeHandlers h ⟨id⟩).ret a)
+    let rhs := h.ret a
     Path.trans
-      (Path.congrArg (fun x => id x) (Path.refl (h.ret a)))
-      (Path.refl (h.ret a))
+      (Path.stepChain (rfl : lhs = rhs))
+      (Path.ofEq (rfl : rhs = rhs))
 
 /-- Def 30: Handler composition is associative -/
 noncomputable def handler_comp_assoc {A B C D : Type u}

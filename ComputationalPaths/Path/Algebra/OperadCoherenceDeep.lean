@@ -230,25 +230,29 @@ structure OperadMorphismIdCertificate {C : Type u} (O : Operad C) where
 noncomputable def operadMorphismIdCertificate {C : Type u}
     (O : Operad C) : OperadMorphismIdCertificate O where
   presIdPath :=
+    let mid := O.identity
     trans
-      (congrArg (fun x => id x) (refl O.identity))
-      (refl O.identity)
+      (stepChain (rfl : id O.identity = mid))
+      (ofEq (rfl : mid = O.identity))
   presCompPath := fun f g =>
+    let mid := O.compose f g
     trans
-      (congrArg (fun x => id x) (refl (O.compose f g)))
-      (refl (O.compose (id f) (id g)))
+      (stepChain (rfl : id (O.compose f g) = mid))
+      (ofEq (rfl : mid = O.compose (id f) (id g)))
   presIdRightUnit := by
     simp
 
 theorem operadMorphismIdCertificate_agrees_id {C : Type u}
     (O : Operad C) :
-    (operadMorphismIdCertificate O).presIdPath = (operadMorphismId O).pres_id := by
-  simp [operadMorphismIdCertificate, operadMorphismId]
+    Path.toEq (operadMorphismIdCertificate O).presIdPath =
+      Path.toEq (operadMorphismId O).pres_id := by
+  simp
 
 theorem operadMorphismIdCertificate_agrees_comp {C : Type u}
     (O : Operad C) (f g : C) :
-    (operadMorphismIdCertificate O).presCompPath f g = (operadMorphismId O).pres_comp f g := by
-  simp [operadMorphismIdCertificate, operadMorphismId]
+    Path.toEq ((operadMorphismIdCertificate O).presCompPath f g) =
+      Path.toEq ((operadMorphismId O).pres_comp f g) := by
+  simp
 
 /-- Theorem 21: Identity morphism pres_id is refl. -/
 theorem id_morphism_pres_id {C : Type u} (O : Operad C) :
@@ -680,16 +684,17 @@ noncomputable def operadTwoCellIdCertificate {C : Type u} {O1 O2 : Operad C}
     (m : OperadMorphism O1 O2) : OperadTwoCellIdCertificate m where
   componentPath := fun c =>
     trans
-      (congrArg m.map (refl c))
-      (refl (m.map c))
+      (stepChain (rfl : m.map c = m.map c))
+      (ofEq (rfl : m.map c = m.map c))
   rightUnitPath := by
     intro c
     simp
 
 theorem operadTwoCellIdCertificate_agrees {C : Type u} {O1 O2 : Operad C}
     (m : OperadMorphism O1 O2) (c : C) :
-    (operadTwoCellIdCertificate m).componentPath c = (operadTwoCellId m).component c := by
-  simp [operadTwoCellIdCertificate, operadTwoCellId]
+    Path.toEq ((operadTwoCellIdCertificate m).componentPath c) =
+      Path.toEq ((operadTwoCellId m).component c) := by
+  simp
 
 /-- Theorem 72: Identity 2-cell component is refl. -/
 theorem two_cell_id_component {C : Type u} {O1 O2 : Operad C}
