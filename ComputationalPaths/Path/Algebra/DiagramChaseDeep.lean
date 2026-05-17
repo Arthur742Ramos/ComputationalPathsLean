@@ -67,6 +67,34 @@ noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.witness⟩
 
+/-- Typed coherence certificate for a 2-cell.
+`lenEq` carries proof content; `lenTrace` records an explicit path annotation. -/
+structure Cell2Certificate {α : Type} {a b : α} (p q : Path α a b) where
+  lhsLen : Nat
+  rhsLen : Nat
+  lhsDef : lhsLen = p.length
+  rhsDef : rhsLen = q.length
+  lenEq : lhsLen = rhsLen
+  lenTrace : Path Nat lhsLen rhsLen
+
+noncomputable def Cell2.certificate {p q : Path α a b} (σ : Cell2 p q) : Cell2Certificate p q := by
+  refine
+    { lhsLen := p.length
+      rhsLen := q.length
+      lhsDef := rfl
+      rhsDef := rfl
+      lenEq := ?_
+      lenTrace := Path.single (Step.rule "cell2_length_coherence" p.length q.length) }
+  simpa using congrArg Path.length σ.witness
+
+theorem cell2_certificate_trace_len {p q : Path α a b} (σ : Cell2 p q) :
+    (σ.certificate).lenTrace.length = 1 := by
+  simp [Cell2.certificate, Path.single, Path.length]
+
+theorem cell2_certificate_lenEq {p q : Path α a b} (σ : Cell2 p q) :
+    (σ.certificate).lhsLen = (σ.certificate).rhsLen :=
+  (σ.certificate).lenEq
+
 theorem path_trans_assoc (p : Path α a b) (q : Path α b c) (r : Path α c d) :
     Path.trans (Path.trans p q) r = Path.trans p (Path.trans q r) := by
   induction p with
@@ -440,6 +468,10 @@ theorem congrArg_cell2 {p q : Path N a b} (σ : Cell2 p q)
 -- Theorem 43: congrArg preserves identity cell
 theorem congrArg_cell2_id (p : Path N a b) :
     (Cell2.id p).witness = rfl := rfl
+
+theorem congrArg_cell2_id_certificate (p : Path N a b) :
+    (Cell2.certificate (Cell2.id p)).lenTrace.length = 1 := by
+  simp [Cell2.certificate, Path.single, Path.length]
 
 -- ============================================================
 -- §11  Salamander Lemma
