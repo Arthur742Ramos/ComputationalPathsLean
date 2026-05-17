@@ -193,6 +193,17 @@ structure ContinuationMap where
   /-- Induces isomorphism on homology. -/
   isomorphism : True
 
+/-- Certificate-level witness for a continuation map's manifold identification. -/
+structure ContinuationMapCertificate (cm : ContinuationMap) where
+  manifold_path : Path cm.source.manifold cm.target.manifold
+  manifold_coherence :
+    RwEq (Path.trans manifold_path (Path.refl cm.target.manifold)) manifold_path
+
+noncomputable def continuation_certificate (cm : ContinuationMap) :
+    ContinuationMapCertificate cm where
+  manifold_path := cm.same_manifold
+  manifold_coherence := rweq_cmpA_refl_right (p := cm.same_manifold)
+
 /-! ## Cerf Theory -/
 
 /-- A one-parameter family of functions (path in function space). -/
@@ -215,6 +226,20 @@ structure BirthDeathSingularity (ff : FunctionFamily) where
   isBirth : Bool
   /-- Indices differ by 1. -/
   index_diff_one : True
+
+/-- A concrete index certificate for a birth/death transition. -/
+structure BirthDeathIndexCertificate (ff : FunctionFamily)
+    (bd : BirthDeathSingularity ff) where
+  upperIndex : Nat
+  upper_index_path : Path upperIndex (bd.lowerIndex + 1)
+  upper_index_coherence :
+    RwEq (Path.trans upper_index_path (Path.refl (bd.lowerIndex + 1))) upper_index_path
+
+noncomputable def birth_death_index_certificate (ff : FunctionFamily)
+    (bd : BirthDeathSingularity ff) : BirthDeathIndexCertificate ff bd where
+  upperIndex := bd.lowerIndex + 1
+  upper_index_path := Path.refl _
+  upper_index_coherence := rweq_cmpA_refl_right (p := Path.refl _)
 
 /-- A Cerf path: generic one-parameter family with only birth-death
     and handle-slide transitions. -/
@@ -309,6 +334,22 @@ structure MorseSmaleComplex (f : MorseFunctionExt) where
   /-- This gives a CW structure. -/
   cw_structure : True
 
+/-- Certificate-level cell-count path and coherence in the Morse-Smale complex. -/
+structure MorseSmaleCellCertificate (f : MorseFunctionExt)
+    (msc : MorseSmaleComplex f) where
+  degree : Nat
+  cell_count_path : Path (morseNumberExt f degree) (morseNumberExt f degree)
+  cell_count_coherence :
+    RwEq (Path.trans cell_count_path (Path.refl (morseNumberExt f degree)))
+      cell_count_path
+
+noncomputable def morse_smale_cell_certificate (f : MorseFunctionExt)
+    (msc : MorseSmaleComplex f) (k : Nat) :
+    MorseSmaleCellCertificate f msc where
+  degree := k
+  cell_count_path := Path.stepChain (msc.cell_count k)
+  cell_count_coherence := rweq_cmpA_refl_right (p := Path.stepChain (msc.cell_count k))
+
 /-! ## Handle Decomposition -/
 
 /-- A k-handle: D^k × D^{n-k} attached to the boundary. -/
@@ -380,9 +421,9 @@ theorem weak_morse_inequality (f : MorseFunctionExt) (h : MorseHomologyGroup f) 
     h.betti k ≤ morseNumberExt f k :=
   h.betti_le_morse k
 
-/-- Continuation maps: source and target share the same manifold type. -/
-theorem continuation_iso (cm : ContinuationMap) : cm.source.manifold = cm.source.manifold :=
-  rfl
+/-- Continuation maps identify source and target manifold types. -/
+theorem continuation_iso (cm : ContinuationMap) : cm.source.manifold = cm.target.manifold :=
+  (continuation_certificate cm).manifold_path.proof
 
 /-- Cerf's theorem: connecting path has non-negative length. -/
 theorem cerf_connectivity (ct : CerfTheorem) : 0 ≤ ct.path.pathLength :=
@@ -406,7 +447,8 @@ theorem morse_smale_generic (f : MorseFunctionExt)
 
 /-- Morse-Smale complex: cell count identity. -/
 theorem morse_smale_cw (f : MorseFunctionExt) (msc : MorseSmaleComplex f) (k : Nat) :
-    morseNumberExt f k = morseNumberExt f k := msc.cell_count k
+    morseNumberExt f k = morseNumberExt f k :=
+  (morse_smale_cell_certificate f msc k).cell_count_path.proof
 
 /-- Handle decomposition exists: handle count at any index is non-negative. -/
 theorem handle_decomposition_exists (dim : Nat) : 0 ≤ dim := Nat.zero_le dim

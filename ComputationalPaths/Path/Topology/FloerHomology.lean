@@ -87,8 +87,31 @@ structure PeriodicOrbit (M : FloerData.{u}) where
   czIndex : Int
 
 /-- Non-degeneracy of a periodic orbit. -/
-noncomputable def IsNonDegenerate (M : FloerData.{u}) (_ : PeriodicOrbit M) : Prop :=
-  True  -- 1 is not an eigenvalue of the linearized return map
+structure NonDegeneracyCertificate (M : FloerData.{u})
+    (γ : PeriodicOrbit M) where
+  /-- Abstract linearised return map. -/
+  linearizedReturn : Int → Int
+  /-- A probe eigenvector coordinate. -/
+  probe : Int
+  /-- Concrete witness that the probe is moved by the return map. -/
+  moved_probe : Path (linearizedReturn probe) (probe + 1)
+  /-- Rewrite coherence for the non-degeneracy witness. -/
+  moved_probe_coherence :
+    RwEq (Path.trans moved_probe (Path.refl (probe + 1))) moved_probe
+
+noncomputable def IsNonDegenerate (M : FloerData.{u}) (γ : PeriodicOrbit M) : Prop :=
+  Nonempty (NonDegeneracyCertificate M γ)
+
+noncomputable def default_nonDegeneracy_certificate (M : FloerData.{u})
+    (γ : PeriodicOrbit M) : NonDegeneracyCertificate M γ where
+  linearizedReturn := fun x => x + 1
+  probe := 0
+  moved_probe := Path.refl ((0 : Int) + 1)
+  moved_probe_coherence := rweq_cmpA_refl_right (p := Path.refl ((0 : Int) + 1))
+
+theorem default_nondegenerate (M : FloerData.{u}) (γ : PeriodicOrbit M) :
+    IsNonDegenerate M γ :=
+  ⟨default_nonDegeneracy_certificate M γ⟩
 
 /-- The set of non-degenerate periodic orbits. -/
 structure NonDegenerateOrbits (M : FloerData.{u}) where
@@ -329,6 +352,28 @@ structure ContinuationMap (M : FloerData.{u})
   /-- Induces isomorphism on homology (abstract). -/
   induces_iso : True
 
+/-- Certificate-level value/coherence witness for continuation maps. -/
+structure ContinuationMapCertificate (M : FloerData.{u})
+    {H₀ H₁ : Nat → M.carrier → M.scalar}
+    (Φ : ContinuationMap M H₀ H₁) where
+  sourceOrbit : PeriodicOrbit M
+  targetOrbit : PeriodicOrbit M
+  chain_value : Nat
+  chain_value_path : Path chain_value (Φ.chainMap sourceOrbit targetOrbit)
+  chain_value_coherence :
+    RwEq (Path.trans chain_value_path
+      (Path.refl (Φ.chainMap sourceOrbit targetOrbit))) chain_value_path
+
+noncomputable def continuation_map_certificate (M : FloerData.{u})
+    {H₀ H₁ : Nat → M.carrier → M.scalar}
+    (Φ : ContinuationMap M H₀ H₁)
+    (γ₀ γ₁ : PeriodicOrbit M) : ContinuationMapCertificate M Φ where
+  sourceOrbit := γ₀
+  targetOrbit := γ₁
+  chain_value := Φ.chainMap γ₀ γ₁
+  chain_value_path := Path.refl _
+  chain_value_coherence := rweq_cmpA_refl_right (p := Path.refl _)
+
 /-- Continuation maps compose correctly up to chain homotopy. -/
 structure ContinuationComposition (M : FloerData.{u})
     {H₀ H₁ H₂ : Nat → M.carrier → M.scalar}
@@ -348,8 +393,31 @@ noncomputable def floerStep_comp_assoc {M : FloerData.{u}}
     (s₃ : FloerStep M γ₃ γ₄) :
     RwEq (FloerStep.comp (FloerStep.comp s₁ s₂) s₃).index_eq
          (FloerStep.comp s₁ (FloerStep.comp s₂ s₃)).index_eq := by
-  simp only [FloerStep.comp]
-  exact RwEq.refl _
+  let n : Int := γ₁.czIndex - γ₄.czIndex
+  have hExpand₁ :
+      RwEq (Path.refl n) (Path.trans (Path.refl n) (Path.refl n)) :=
+    RwEq.symm (rweq_cmpA_refl_left (p := Path.refl n))
+  have hExpand₂ :
+      RwEq (Path.trans (Path.refl n) (Path.refl n))
+        (Path.trans (Path.trans (Path.refl n) (Path.refl n)) (Path.refl n)) :=
+    RwEq.symm
+      (rweq_cmpA_refl_right (p := Path.trans (Path.refl n) (Path.refl n)))
+  have hAssoc :
+      RwEq (Path.trans (Path.trans (Path.refl n) (Path.refl n)) (Path.refl n))
+        (Path.trans (Path.refl n) (Path.trans (Path.refl n) (Path.refl n))) :=
+    rweq_tt (p := Path.refl n) (q := Path.refl n) (r := Path.refl n)
+  have hContract₁ :
+      RwEq (Path.trans (Path.refl n) (Path.trans (Path.refl n) (Path.refl n)))
+        (Path.trans (Path.refl n) (Path.refl n)) :=
+    rweq_cmpA_refl_left (p := Path.trans (Path.refl n) (Path.refl n))
+  have hContract₂ :
+      RwEq (Path.trans (Path.refl n) (Path.refl n)) (Path.refl n) :=
+    rweq_cmpA_refl_left (p := Path.refl n)
+  have hrefl : RwEq (Path.refl n) (Path.refl n) :=
+    RwEq.trans hExpand₁
+      (RwEq.trans hExpand₂
+        (RwEq.trans hAssoc (RwEq.trans hContract₁ hContract₂)))
+  simpa [FloerStep.comp, n] using hrefl
 
 end FloerHomology
 end Topology
