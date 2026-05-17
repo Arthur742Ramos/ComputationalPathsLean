@@ -131,6 +131,47 @@ noncomputable def differential_squared_zero {r : Nat} (E : SpectralSequencePage 
       (E.groups.zero (s + r + r) (t + r - 1 + r - 1)) :=
   h.d_squared_zero s t x
 
+/-- Concrete certificate for one sampled `d_r ∘ d_r = 0` computation. -/
+structure DifferentialSquareCertificate {r : Nat} (E : SpectralSequencePage r) where
+  /-- Source bidegree. -/
+  s : Nat
+  /-- Source internal degree. -/
+  t : Nat
+  /-- The sampled class in `E_r^{s,t}`. -/
+  source : E.groups.carrier s t
+  /-- The first differential value. -/
+  firstDifferential : E.groups.carrier (s + r) (t + r - 1)
+  /-- The second differential value. -/
+  secondDifferential : E.groups.carrier (s + r + r) (t + r - 1 + r - 1)
+  /-- The target zero class in the same bidegree as the second differential. -/
+  targetZero : E.groups.carrier (s + r + r) (t + r - 1 + r - 1)
+  /-- The recorded first value is the actual first differential. -/
+  firstPath : Path firstDifferential (E.d s t source)
+  /-- The recorded second value is the actual second differential. -/
+  secondPath :
+    Path secondDifferential (E.d (s + r) (t + r - 1) firstDifferential)
+  /-- The recorded zero is the page zero. -/
+  zeroPath : Path targetZero (E.groups.zero (s + r + r) (t + r - 1 + r - 1))
+  /-- Computational certificate that the sampled double differential vanishes. -/
+  squarePath :
+    Path (E.d (s + r) (t + r - 1) (E.d s t source))
+      (E.groups.zero (s + r + r) (t + r - 1 + r - 1))
+
+/-- Build a square-zero certificate from the page typeclass witness. -/
+noncomputable def differentialSquareCertificate {r : Nat} (E : SpectralSequencePage r)
+    [HasDifferentialSquaredZero E] (s t : Nat) (x : E.groups.carrier s t) :
+    DifferentialSquareCertificate E where
+  s := s
+  t := t
+  source := x
+  firstDifferential := E.d s t x
+  secondDifferential := E.d (s + r) (t + r - 1) (E.d s t x)
+  targetZero := E.groups.zero (s + r + r) (t + r - 1 + r - 1)
+  firstPath := Path.refl _
+  secondPath := Path.refl _
+  zeroPath := Path.refl _
+  squarePath := differential_squared_zero E s t x
+
 /-! ## Connection to Stable Homotopy
 
 The Adams spectral sequence connects Ext groups to stable homotopy.
@@ -165,6 +206,30 @@ structure AdamsConvergence where
   stem : Nat
   /-- Statement that E_∞^{s,t} with t-s = stem contributes to πₛ_{stem} -/
   target : AdamsConvergenceTarget E2 stem
+
+/-- Certificate tying an Adams convergence package to a sampled bidegree. -/
+structure AdamsConvergenceCertificate where
+  /-- The convergence package being certified. -/
+  convergence : AdamsConvergence
+  /-- Sampled Adams filtration. -/
+  s : Nat
+  /-- Sampled internal degree. -/
+  t : Nat
+  /-- Evidence that the sampled bidegree lies on the stored convergence stem. -/
+  stemPath : t - s = convergence.stem
+  /-- Sampled E₂ class. -/
+  term : convergence.E2.groups.carrier s t
+  /-- Its recorded contribution to the target. -/
+  contributionValue : convergence.target.carrier
+  /-- Path evidence for the recorded contribution. -/
+  contributionPath :
+    Path (convergence.target.contribution s t stemPath term) contributionValue
+  /-- Zero contribution at the same bidegree. -/
+  zeroContributionPath :
+    Path (convergence.target.contribution s t stemPath
+      (convergence.E2.groups.zero s t)) convergence.target.basepoint
+  /-- The sampled square-zero differential certificate. -/
+  squareCertificate : DifferentialSquareCertificate convergence.E2
 
 /-! ## Example: Trivial Spectral Sequence
 
@@ -238,6 +303,25 @@ noncomputable def trivialConvergence_d_squared_path (stem s t : Nat) :
       (((trivialConvergence stem).E2).groups.zero (s + 4) (t + 2)) := by
   letI := (trivialConvergence stem).d_squared
   simpa using differential_squared_zero ((trivialConvergence stem).E2) s t ()
+
+/-- Square-zero certificate for the trivial Adams convergence page. -/
+noncomputable def trivialConvergence_d_squared_certificate (stem s t : Nat) :
+    DifferentialSquareCertificate ((trivialConvergence stem).E2) := by
+  letI := (trivialConvergence stem).d_squared
+  exact differentialSquareCertificate ((trivialConvergence stem).E2) s t ()
+
+/-- Concrete convergence certificate for the trivial Adams page on the chosen stem. -/
+noncomputable def trivialConvergence_certificate (stem : Nat) :
+    AdamsConvergenceCertificate where
+  convergence := trivialConvergence stem
+  s := 0
+  t := stem
+  stemPath := Nat.sub_zero stem
+  term := ()
+  contributionValue := ()
+  contributionPath := Path.stepChain rfl
+  zeroContributionPath := Path.stepChain rfl
+  squareCertificate := trivialConvergence_d_squared_certificate stem 0 stem
 
 end AdamsSpectralSequence
 end Path

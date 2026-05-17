@@ -688,6 +688,95 @@ noncomputable def pi2_genus4_trivial_path
     Path (Path.stepChain α.toEq) (pi2IdCanonical (A := Surface 4) (a := surfaceBase 4)) :=
   pi2Surface_path 4 α
 
+/-- Certificate that a surface π₂ class collapses to the canonical trivial
+representative in the PUnit surface model. -/
+structure Pi2SurfaceTrivialityCertificate (g : Nat) where
+  /-- The sampled π₂ class. -/
+  element : Pi2 (Surface g) (surfaceBase g)
+  /-- The canonical representative obtained from the sampled propositional equality. -/
+  canonicalRepresentative : Pi2 (Surface g) (surfaceBase g)
+  /-- The identity element of π₂ at this surface. -/
+  identityRepresentative : Pi2 (Surface g) (surfaceBase g)
+  /-- The sampled class has trivial propositional equality. -/
+  toEqPath : element.toEq = identityRepresentative.toEq
+  /-- Rewrite evidence from the canonical representative to the identity. -/
+  rewritePath : RwEq canonicalRepresentative identityRepresentative
+  /-- Computational path to the normalized identity representative. -/
+  representativePath :
+    Path canonicalRepresentative (pi2IdCanonical (A := Surface g) (a := surfaceBase g))
+  /-- Inverse cancellation for the sampled class. -/
+  inverseCancel : RwEq (pi2Comp (pi2Inv element) element) identityRepresentative
+
+/-- Build the surface π₂ triviality certificate. -/
+noncomputable def pi2Surface_triviality_certificate (g : Nat)
+    (α : Pi2 (Surface g) (surfaceBase g)) :
+    Pi2SurfaceTrivialityCertificate g where
+  element := α
+  canonicalRepresentative := Path.stepChain α.toEq
+  identityRepresentative := pi2Id
+  toEqPath := pi2Surface_toEq g α
+  rewritePath := pi2Surface_rweq g α
+  representativePath := pi2Surface_path g α
+  inverseCancel := pi2Comp_inv_left_rweq α
+
+/-- Torus certificate for π₂-triviality in the surface model. -/
+noncomputable def pi2Torus_trivial_certificate
+    (α : Pi2 (Surface 1) (surfaceBase 1)) :
+    Pi2SurfaceTrivialityCertificate 1 :=
+  pi2Surface_triviality_certificate 1 α
+
+/-- Genus-3 certificate for π₂-triviality in the surface model. -/
+noncomputable def pi2_genus3_trivial_certificate
+    (α : Pi2 (Surface 3) (surfaceBase 3)) :
+    Pi2SurfaceTrivialityCertificate 3 :=
+  pi2Surface_triviality_certificate 3 α
+
+/-- Genus-4 certificate for π₂-triviality in the surface model. -/
+noncomputable def pi2_genus4_trivial_certificate
+    (α : Pi2 (Surface 4) (surfaceBase 4)) :
+    Pi2SurfaceTrivialityCertificate 4 :=
+  pi2Surface_triviality_certificate 4 α
+
+/-- Certificate that a PUnit-based π₂ class collapses to the canonical trivial
+representative. This is used by RP² and the Klein-bottle models here. -/
+structure Pi2PUnitTrivialityCertificate where
+  /-- The sampled π₂ class. -/
+  element : Pi2 PUnit PUnit.unit
+  /-- The canonical representative obtained from the sampled propositional equality. -/
+  canonicalRepresentative : Pi2 PUnit PUnit.unit
+  /-- The identity representative. -/
+  identityRepresentative : Pi2 PUnit PUnit.unit
+  /-- The sampled class has trivial propositional equality. -/
+  toEqPath : element.toEq = identityRepresentative.toEq
+  /-- Rewrite evidence from the canonical representative to the identity. -/
+  rewritePath : RwEq canonicalRepresentative identityRepresentative
+  /-- Computational path to the normalized identity representative. -/
+  representativePath :
+    Path canonicalRepresentative (pi2IdCanonical (A := PUnit) (a := PUnit.unit))
+  /-- Inverse cancellation for the sampled class. -/
+  inverseCancel : RwEq (pi2Comp (pi2Inv element) element) identityRepresentative
+
+/-- Build the PUnit π₂ triviality certificate. -/
+noncomputable def pi2PUnit_triviality_certificate
+    (α : Pi2 PUnit PUnit.unit) : Pi2PUnitTrivialityCertificate where
+  element := α
+  canonicalRepresentative := Path.stepChain α.toEq
+  identityRepresentative := pi2Id
+  toEqPath := pi2_punit_toEq α
+  rewritePath := pi2_punit_rweq α
+  representativePath := pi2_punit_path α
+  inverseCancel := pi2Comp_inv_left_rweq α
+
+/-- RP² certificate for π₂-triviality in the PUnit model. -/
+noncomputable def pi2RP2_trivial_certificate
+    (α : Pi2 RP2 rp2Base) : Pi2PUnitTrivialityCertificate :=
+  pi2PUnit_triviality_certificate α
+
+/-- Klein-bottle certificate for π₂-triviality in the PUnit model. -/
+noncomputable def pi2Klein_trivial_certificate
+    (α : Pi2 KleinBottle kleinBase) : Pi2PUnitTrivialityCertificate :=
+  pi2PUnit_triviality_certificate α
+
 /-! ## Iterated π₂ composition -/
 
 /-- Iterate π₂ composition n times. -/

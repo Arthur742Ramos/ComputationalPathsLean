@@ -118,6 +118,50 @@ noncomputable def boundary_is_cycle_path (C : ChainComplex) (n : Nat)
     Path (C.boundary n (C.boundary (n + 1) x)) (C.zero n) :=
   boundary_squared_zero_path C n x
 
+/-- Certificate for a concrete boundary-of-boundary computation. -/
+structure BoundaryCertificate (C : ChainComplex) (n : Nat) where
+  /-- Chain whose boundary is being inspected. -/
+  chain : C.group (n + 2)
+  /-- The recorded first boundary. -/
+  firstBoundary : C.group (n + 1)
+  /-- The recorded second boundary. -/
+  secondBoundary : C.group n
+  /-- The zero chain in degree `n`. -/
+  zeroValue : C.group n
+  /-- The first recorded boundary is the actual boundary. -/
+  firstPath : Path firstBoundary (C.boundary (n + 1) chain)
+  /-- The second recorded boundary is the boundary of the first. -/
+  secondPath : Path secondBoundary (C.boundary n firstBoundary)
+  /-- The second boundary vanishes. -/
+  squarePath : Path (C.boundary n (C.boundary (n + 1) chain)) zeroValue
+  /-- The recorded zero agrees with the complex zero. -/
+  zeroPath : Path zeroValue (C.zero n)
+  /-- Proposition-level cycle witness extracted from the same data. -/
+  cycleProof : isCycle C n firstBoundary
+
+/-- Build a boundary certificate from the chain-complex square-zero law. -/
+noncomputable def boundaryCertificate (C : ChainComplex) (n : Nat)
+    (x : C.group (n + 2)) : BoundaryCertificate C n where
+  chain := x
+  firstBoundary := C.boundary (n + 1) x
+  secondBoundary := C.boundary n (C.boundary (n + 1) x)
+  zeroValue := C.zero n
+  firstPath := Path.refl _
+  secondPath := Path.refl _
+  squarePath := boundary_squared_zero_path C n x
+  zeroPath := Path.refl _
+  cycleProof := boundary_is_cycle C n x
+
+/-- Concrete certificate for the trivial chain complex. -/
+noncomputable def trivialChainComplex_boundary_certificate (n : Nat) (x : Unit) :
+    BoundaryCertificate trivialChainComplex n :=
+  boundaryCertificate trivialChainComplex n x
+
+/-- Concrete certificate for the zero integer chain complex. -/
+noncomputable def zeroIntChainComplex_boundary_certificate (n : Nat) (x : Int) :
+    BoundaryCertificate (intToChainComplex zeroIntChainComplex) n :=
+  boundaryCertificate (intToChainComplex zeroIntChainComplex) n x
+
 /-! ## Euler characteristic -/
 
 /-- Finite chain complex data: ranks of chain groups. -/
@@ -169,6 +213,38 @@ noncomputable def chainMap_comm_path (C D : ChainComplex) (f : ChainMap C D)
     (n : Nat) (x : C.group (n + 1)) :
     Path (D.boundary n (f.map (n + 1) x)) (f.map n (C.boundary n x)) :=
   Path.stepChain (f.comm n x)
+
+/-- Certificate that a concrete chain map square commutes at one chain. -/
+structure ChainMapBoundaryCertificate (C D : ChainComplex) (f : ChainMap C D)
+    (n : Nat) where
+  /-- Source chain. -/
+  chain : C.group (n + 1)
+  /-- Boundary in the source complex. -/
+  sourceBoundary : C.group n
+  /-- Boundary after applying the chain map. -/
+  targetBoundary : D.group n
+  /-- Map of the source boundary. -/
+  mappedBoundary : D.group n
+  /-- Recorded source boundary agrees with the actual one. -/
+  sourceBoundaryPath : Path sourceBoundary (C.boundary n chain)
+  /-- Recorded target boundary agrees with the actual one. -/
+  targetBoundaryPath : Path targetBoundary (D.boundary n (f.map (n + 1) chain))
+  /-- Chain-map commutativity at the sampled chain. -/
+  commPath : Path targetBoundary mappedBoundary
+  /-- The mapped boundary agrees with mapping the recorded source boundary. -/
+  mappedBoundaryPath : Path mappedBoundary (f.map n sourceBoundary)
+
+/-- Build a concrete chain-map boundary certificate. -/
+noncomputable def chainMapBoundaryCertificate (C D : ChainComplex) (f : ChainMap C D)
+    (n : Nat) (x : C.group (n + 1)) : ChainMapBoundaryCertificate C D f n where
+  chain := x
+  sourceBoundary := C.boundary n x
+  targetBoundary := D.boundary n (f.map (n + 1) x)
+  mappedBoundary := f.map n (C.boundary n x)
+  sourceBoundaryPath := Path.refl _
+  targetBoundaryPath := Path.refl _
+  commPath := chainMap_comm_path C D f n x
+  mappedBoundaryPath := Path.refl _
 
 /-- Identity chain map. -/
 noncomputable def chainMap_id (C : ChainComplex) : ChainMap C C where

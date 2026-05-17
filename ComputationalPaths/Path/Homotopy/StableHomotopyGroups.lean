@@ -180,6 +180,37 @@ noncomputable def betaFamily_elem_path (k : Nat) :
     Path (betaFamily k).elem (stableStemBase (betaStem k)) :=
   Path.stepChain rfl
 
+/-- Certificate for a sampled image-of-J element and its e-invariant. -/
+structure ImageOfJCertificate (n : Nat) where
+  /-- Source element for the J-homomorphism. -/
+  source : JSource n
+  /-- Image-of-J package. -/
+  image : ImageOfJ n
+  /-- Underlying stable-stem element. -/
+  stemElement : StableStem n
+  /-- The image package stores the J-homomorphism value. -/
+  factorPath : Path image.elem (jHomomorphism n source)
+  /-- The stable-stem element is the image element. -/
+  stemPath : Path stemElement image.elem
+  /-- Adams e-invariant package for the sampled image. -/
+  eInvariant : AdamsEInvariant n
+  /-- The e-invariant package stores the sampled stem element. -/
+  eInvariantElemPath : Path eInvariant.elem stemElement
+  /-- The e-invariant value is zero in this height-one model. -/
+  eInvariantValuePath : Path eInvariant.value 0
+
+/-- Build an image-of-J certificate at a concrete source element. -/
+noncomputable def imageOfJCertificate (n : Nat) (x : JSource n) :
+    ImageOfJCertificate n where
+  source := x
+  image := imageOfJMap n x
+  stemElement := (imageOfJMap n x).elem
+  factorPath := Path.stepChain rfl
+  stemPath := Path.refl _
+  eInvariant := adamsEInvariant n (imageOfJMap n x).elem
+  eInvariantElemPath := Path.refl _
+  eInvariantValuePath := adamsEInvariant_value_path n (imageOfJMap n x).elem
+
 /-- Path witness that the trivial height-1 chromatic page is the trivial Adams page. -/
 noncomputable def trivialHeightOneSS_page_path (p : ChromaticHomotopy.Prime) :
     Path (trivialHeightOneSS p).E2 (AdamsSpectralSequence.trivialPage 1) :=
@@ -198,6 +229,43 @@ noncomputable def trivialHeightOneSS_d_squared_path
       (((trivialHeightOneSS p).E2).groups.zero (s + 2) t) := by
   letI := (trivialHeightOneSS p).d_squared
   simpa using AdamsSpectralSequence.differential_squared_zero ((trivialHeightOneSS p).E2) s t ()
+
+/-- Certificate for a sampled height-one chromatic square-zero computation. -/
+structure ChromaticHeightOneCertificate (p : ChromaticHomotopy.Prime) where
+  /-- Height-one spectral sequence data. -/
+  spectralSequence : ChromaticHeightOneSS p
+  /-- Sampled Adams filtration. -/
+  s : Nat
+  /-- Sampled internal degree. -/
+  t : Nat
+  /-- Sampled E₂ class. -/
+  source : spectralSequence.E2.groups.carrier s t
+  /-- Target basepoint for convergence. -/
+  targetBase : spectralSequence.target.carrier
+  /-- The spectral sequence page is the trivial Adams page. -/
+  pagePath :
+    Path spectralSequence.E2 (AdamsSpectralSequence.trivialPage 1)
+  /-- The zero class contributes the target basepoint. -/
+  zeroContributionPath :
+    Path (spectralSequence.target.contribution s t
+      (spectralSequence.E2.groups.zero s t)) spectralSequence.target.basepoint
+  /-- The sampled differential squares to zero. -/
+  squarePath :
+    Path (spectralSequence.E2.d (s + 1) t (spectralSequence.E2.d s t source))
+      (spectralSequence.E2.groups.zero (s + 2) t)
+
+/-- Build a height-one chromatic certificate for the trivial model. -/
+noncomputable def trivialHeightOneSS_certificate
+    (p : ChromaticHomotopy.Prime) (s t : Nat) :
+    ChromaticHeightOneCertificate p where
+  spectralSequence := trivialHeightOneSS p
+  s := s
+  t := t
+  source := ()
+  targetBase := (trivialHeightOneSS p).target.basepoint
+  pagePath := trivialHeightOneSS_page_path p
+  zeroContributionPath := (trivialHeightOneSS p).target.zero_contribution s t
+  squarePath := trivialHeightOneSS_d_squared_path p s t
 
 /-- The chosen prime-two example really has underlying value 2. -/
 theorem primeTwo_val : primeTwo.val = 2 := rfl
@@ -246,6 +314,34 @@ noncomputable def alpha_beta_interleave_path (k : Nat) :
     Path (alphaStem k + 1) (betaStem k) := by
   unfold alphaStem betaStem
   exact Path.stepChain (by omega)
+
+/-- Certificate recording the alpha/beta family degree bookkeeping at index `k`. -/
+structure AlphaBetaStemCertificate (k : Nat) where
+  /-- Alpha-family element. -/
+  alpha : AlphaFamily k
+  /-- Beta-family element. -/
+  beta : BetaFamily k
+  /-- Alpha stem is odd. -/
+  alphaOdd : alphaStem k % 2 = 1
+  /-- Beta stem is even. -/
+  betaEven : betaStem k % 2 = 0
+  /-- The alpha stem advances by one to the beta stem. -/
+  interleavePath : Path (alphaStem k + 1) (betaStem k)
+  /-- Path witness for the alpha representative. -/
+  alphaPath : Path alpha.elem (stableStemBase (alphaStem k))
+  /-- Path witness for the beta representative. -/
+  betaPath : Path beta.elem (stableStemBase (betaStem k))
+
+/-- Build the alpha/beta degree certificate at index `k`. -/
+noncomputable def alphaBetaStemCertificate (k : Nat) :
+    AlphaBetaStemCertificate k where
+  alpha := alphaFamily k
+  beta := betaFamily k
+  alphaOdd := alphaStem_odd k
+  betaEven := betaStem_even k
+  interleavePath := alpha_beta_interleave_path k
+  alphaPath := alphaFamily_elem_path k
+  betaPath := betaFamily_elem_path k
 
 
 /-! ## Summary -/

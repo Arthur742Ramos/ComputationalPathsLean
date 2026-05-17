@@ -89,6 +89,35 @@ noncomputable def cellularApprox_agree_path {f : ContinuousMap X Y}
   Path.trans (cellularApprox_path_at a₁ x)
     (Path.symm (cellularApprox_path_at a₂ x))
 
+/-- Pointwise certificate for a cellular approximation, with cancellation
+coherence for its homotopy path. -/
+structure CellularApproxPointCertificate {f : ContinuousMap X Y}
+    (approx : CWApproximationData (C := C) (D := D) f) (x : X) where
+  /-- The approximating value at the sampled point. -/
+  approxValue : Y
+  /-- The original map value at the sampled point. -/
+  targetValue : Y
+  /-- The recorded approximating value is `approx.map x`. -/
+  approxValuePath : Path approxValue (approx.map x)
+  /-- The recorded target value is `f x`. -/
+  targetValuePath : Path targetValue (f x)
+  /-- The cellular approximation homotopy at the sampled point. -/
+  homotopyPath : Path approxValue targetValue
+  /-- Rewrite evidence that the homotopy cancels with its inverse. -/
+  inverseCancel :
+    RwEq (Path.trans homotopyPath (Path.symm homotopyPath)) (Path.refl approxValue)
+
+/-- Build a pointwise certificate from the approximation data. -/
+noncomputable def cellularApprox_point_certificate {f : ContinuousMap X Y}
+    (approx : CWApproximationData (C := C) (D := D) f) (x : X) :
+    CellularApproxPointCertificate approx x where
+  approxValue := approx.map x
+  targetValue := f x
+  approxValuePath := Path.refl _
+  targetValuePath := Path.refl _
+  homotopyPath := cellularApprox_path_at approx x
+  inverseCancel := rweq_cmpA_inv_right (cellularApprox_path_at approx x)
+
 /-! ## Coherence of composition -/
 
 /-- Given cellular approximations of f and g, compose them. -/
@@ -110,6 +139,27 @@ theorem cellularApprox_comp_map_eq {f : ContinuousMap X Y} {g : ContinuousMap Y 
     (af : CWApproximationData (C := C) (D := D) f)
     (ag : CWApproximationData (C := D) (D := E) g) :
     (cellularApprox_comp af ag).map = ag.map.comp af.map := rfl
+
+/-- Certificate for the composed cellular approximation at one source point. -/
+structure CellularApproxCompCertificate {f : ContinuousMap X Y} {g : ContinuousMap Y Z}
+    (af : CWApproximationData (C := C) (D := D) f)
+    (ag : CWApproximationData (C := D) (D := E) g) (x : X) where
+  /-- Pointwise certificate for the first approximation. -/
+  firstCertificate : CellularApproxPointCertificate af x
+  /-- Pointwise certificate for the composed approximation. -/
+  compositeCertificate : CellularApproxPointCertificate (cellularApprox_comp af ag) x
+  /-- The composed map is recorded as `ag.map.comp af.map`. -/
+  mapPath : Path (cellularApprox_comp af ag).map (ag.map.comp af.map)
+
+/-- Build a concrete certificate for composition of cellular approximations. -/
+noncomputable def cellularApprox_comp_certificate {f : ContinuousMap X Y}
+    {g : ContinuousMap Y Z}
+    (af : CWApproximationData (C := C) (D := D) f)
+    (ag : CWApproximationData (C := D) (D := E) g) (x : X) :
+    CellularApproxCompCertificate af ag x where
+  firstCertificate := cellularApprox_point_certificate af x
+  compositeCertificate := cellularApprox_point_certificate (cellularApprox_comp af ag) x
+  mapPath := Path.stepChain (cellularApprox_comp_map_eq af ag)
 
 /-! ## Path algebra for approximation homotopies -/
 

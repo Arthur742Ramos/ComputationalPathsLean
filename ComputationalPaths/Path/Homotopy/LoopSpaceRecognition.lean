@@ -24,6 +24,7 @@ import ComputationalPaths.Path.Homotopy.LoopSpaceAlgebra
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Algebra.GroupStructures
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -153,25 +154,70 @@ noncomputable def trivial (X : Pointed) : DeloopingData (loopPointed X) where
   toLoop_pt := Path.refl _
   fromLoop_pt := Path.refl _
 
+/-- Certificate for a sampled delooping round trip. -/
+structure RoundTripCertificate (X : Pointed) (d : DeloopingData X) where
+  /-- Sampled point of the recognized space. -/
+  sample : X.carrier
+  /-- The sampled loop in the delooping. -/
+  loopSample : LoopSpace d.deloop.carrier d.deloop.pt
+  /-- The recorded loop sample is the forward image of `sample`. -/
+  loopSamplePath : Path loopSample (d.toLoop sample)
+  /-- Left inverse law at the sampled point. -/
+  leftPath : Path (d.fromLoop (d.toLoop sample)) sample
+  /-- Right inverse law at the sampled loop. -/
+  rightPath : Path (d.toLoop (d.fromLoop loopSample)) loopSample
+  /-- Forward basepoint preservation. -/
+  forwardBasepointPath : Path (d.toLoop X.pt) (Path.refl d.deloop.pt)
+  /-- Backward basepoint preservation. -/
+  backwardBasepointPath : Path (d.fromLoop (Path.refl d.deloop.pt)) X.pt
+
+/-- Build a sampled round-trip certificate from delooping data. -/
+noncomputable def roundTripCertificate {X : Pointed} (d : DeloopingData X)
+    (x : X.carrier) : RoundTripCertificate X d where
+  sample := x
+  loopSample := d.toLoop x
+  loopSamplePath := Path.refl _
+  leftPath := d.left_inv x
+  rightPath := d.right_inv (d.toLoop x)
+  forwardBasepointPath := d.toLoop_pt
+  backwardBasepointPath := d.fromLoop_pt
+
+/-- Certificate for the identity delooping, including rewrite equality between
+the two loop representatives in the right round trip. -/
+structure TrivialRoundTripCertificate (X : Pointed) where
+  /-- Sampled based loop. -/
+  sample : LoopSpace X.carrier X.pt
+  /-- The ordinary round-trip certificate. -/
+  roundTrip : RoundTripCertificate (loopPointed X) (trivial X)
+  /-- The right round trip is rewrite-equivalent to the sampled loop. -/
+  rightRwEq : RwEq ((trivial X).toLoop ((trivial X).fromLoop sample)) sample
+
+/-- Build the identity-delooping certificate for a sampled based loop. -/
+noncomputable def trivial_roundTrip_certificate (X : Pointed)
+    (l : LoopSpace X.carrier X.pt) : TrivialRoundTripCertificate X where
+  sample := l
+  roundTrip := roundTripCertificate (trivial X) l
+  rightRwEq := RwEq.refl l
+
 /-- Public left-inverse witness for the trivial delooping. -/
 noncomputable def trivial_left_inv_path (X : Pointed) (l : LoopSpace X.carrier X.pt) :
     Path ((trivial X).fromLoop ((trivial X).toLoop l)) l :=
-  (trivial X).left_inv l
+  (trivial_roundTrip_certificate X l).roundTrip.leftPath
 
 /-- Public right-inverse witness for the trivial delooping. -/
 noncomputable def trivial_right_inv_path (X : Pointed) (l : LoopSpace X.carrier X.pt) :
     Path ((trivial X).toLoop ((trivial X).fromLoop l)) l :=
-  (trivial X).right_inv l
+  (trivial_roundTrip_certificate X l).roundTrip.rightPath
 
 /-- Public basepoint-preservation witness for the forward map of the trivial delooping. -/
 noncomputable def trivial_toLoop_pt_path (X : Pointed) :
     Path ((trivial X).toLoop (loopPointed X).pt) (Path.refl X.pt) :=
-  (trivial X).toLoop_pt
+  (trivial_roundTrip_certificate X (Path.refl X.pt)).roundTrip.forwardBasepointPath
 
 /-- Public basepoint-preservation witness for the backward map of the trivial delooping. -/
 noncomputable def trivial_fromLoop_pt_path (X : Pointed) :
     Path ((trivial X).fromLoop (Path.refl X.pt)) (loopPointed X).pt :=
-  (trivial X).fromLoop_pt
+  (trivial_roundTrip_certificate X (Path.refl X.pt)).roundTrip.backwardBasepointPath
 
 end DeloopingData
 
@@ -201,6 +247,42 @@ noncomputable def recognitionFromDelooping {X : Pointed}
         (e1.mul x y)) :
     MayRecognition X :=
   { e1 := e1, delooping := d, compat := h }
+
+/-- Concrete compatibility certificate for a May recognition package. -/
+structure CompatibilityCertificate (X : Pointed) (R : MayRecognition X) where
+  /-- First sampled point. -/
+  left : X.carrier
+  /-- Second sampled point. -/
+  right : X.carrier
+  /-- Loop product transported back through the delooping. -/
+  loopProductValue : X.carrier
+  /-- E₁ multiplication value. -/
+  multiplicationValue : X.carrier
+  /-- The recorded loop product is the actual loop-composition transport. -/
+  loopProductPath :
+    Path loopProductValue
+      (R.delooping.fromLoop
+        (LoopSpace.comp (R.delooping.toLoop left) (R.delooping.toLoop right)))
+  /-- The recorded multiplication is the E₁ multiplication. -/
+  multiplicationPath : Path multiplicationValue (R.e1.mul left right)
+  /-- Recognition compatibility at the sampled pair. -/
+  compatPath : Path loopProductValue multiplicationValue
+  /-- Path-algebra cancellation for the compatibility path. -/
+  compatCancel :
+    RwEq (Path.trans compatPath (Path.symm compatPath)) (Path.refl loopProductValue)
+
+/-- Build a compatibility certificate from May recognition data. -/
+noncomputable def compatibilityCertificate {X : Pointed} (R : MayRecognition X)
+    (x y : X.carrier) : CompatibilityCertificate X R where
+  left := x
+  right := y
+  loopProductValue :=
+    R.delooping.fromLoop (LoopSpace.comp (R.delooping.toLoop x) (R.delooping.toLoop y))
+  multiplicationValue := R.e1.mul x y
+  loopProductPath := Path.refl _
+  multiplicationPath := Path.refl _
+  compatPath := R.compat x y
+  compatCancel := rweq_cmpA_inv_right (R.compat x y)
 
 /-- The `e1` field of `recognitionFromDelooping` is judgmentally the supplied one. -/
 theorem recognitionFromDelooping_e1_eq {X : Pointed}
