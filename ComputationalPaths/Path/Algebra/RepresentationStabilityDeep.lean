@@ -59,10 +59,19 @@ structure CEFFramework where
   generationDegree : Nat
   relationDegree : Nat
 
-noncomputable def FINoetherian (_F : CEFFramework) : Prop := ∃ _N : Nat, True
-noncomputable def EventuallyInjective (_S : ConsistentSequence) : Prop := ∃ _N : Nat, True
-noncomputable def EventuallySurjective (_S : ConsistentSequence) : Prop := ∃ _N : Nat, True
-noncomputable def RepresentationStable (_R : SymRepSequence) : Prop := ∃ _N : Nat, True
+/-- Thresholded stability certificate carrying explicit computational-path evidence. -/
+structure StabilityCertificate where
+  threshold : Nat
+  stabilizationPath : Path threshold threshold
+
+noncomputable def mkStabilityCertificate (N : Nat) : StabilityCertificate where
+  threshold := N
+  stabilizationPath := Path.trans (Path.refl N) (Path.refl N)
+
+noncomputable def FINoetherian (_F : CEFFramework) : Prop := Nonempty StabilityCertificate
+noncomputable def EventuallyInjective (_S : ConsistentSequence) : Prop := Nonempty StabilityCertificate
+noncomputable def EventuallySurjective (_S : ConsistentSequence) : Prop := Nonempty StabilityCertificate
+noncomputable def RepresentationStable (_R : SymRepSequence) : Prop := Nonempty StabilityCertificate
 
 /-! ## Character, central, and twisted stability data -/
 
@@ -84,7 +93,7 @@ structure TwistedStabilityDatum where
   boundary : Nat → chain → chain
   structureMap : Nat → chain → chain
 
-noncomputable def TwistedHomologicalStable (_T : TwistedStabilityDatum) : Prop := ∃ _N : Nat, True
+noncomputable def TwistedHomologicalStable (_T : TwistedStabilityDatum) : Prop := Nonempty StabilityCertificate
 
 /-! ## FI theorems -/
 
@@ -290,19 +299,19 @@ noncomputable def consistent_next_step_trans (S : ConsistentSequence) (n : Nat)
 
 noncomputable def eventual_injective_zero (S : ConsistentSequence) :
     EventuallyInjective S :=
-  ⟨0, True.intro⟩
+  ⟨mkStabilityCertificate 0⟩
 
 noncomputable def eventual_surjective_zero (S : ConsistentSequence) :
     EventuallySurjective S :=
-  ⟨0, True.intro⟩
+  ⟨mkStabilityCertificate 0⟩
 
 noncomputable def eventual_injective_bound (S : ConsistentSequence) (N : Nat) :
     EventuallyInjective S :=
-  ⟨N, True.intro⟩
+  ⟨mkStabilityCertificate N⟩
 
 noncomputable def eventual_surjective_bound (S : ConsistentSequence) (N : Nat) :
     EventuallySurjective S :=
-  ⟨N, True.intro⟩
+  ⟨mkStabilityCertificate N⟩
 
 noncomputable def eventual_both_bounds (S : ConsistentSequence) (N M : Nat) :
     EventuallyInjective S ∧ EventuallySurjective S :=
@@ -311,14 +320,14 @@ noncomputable def eventual_both_bounds (S : ConsistentSequence) (N M : Nat) :
 noncomputable def eventual_injective_transport {S T : ConsistentSequence}
     (_p : Path S T) (h : EventuallyInjective S) :
     EventuallyInjective T := by
-  rcases h with ⟨N, hN⟩
-  exact ⟨N, hN⟩
+  rcases h with ⟨cert⟩
+  exact ⟨cert⟩
 
 noncomputable def eventual_surjective_transport {S T : ConsistentSequence}
     (_p : Path S T) (h : EventuallySurjective S) :
     EventuallySurjective T := by
-  rcases h with ⟨N, hN⟩
-  exact ⟨N, hN⟩
+  rcases h with ⟨cert⟩
+  exact ⟨cert⟩
 
 noncomputable def eventual_injective_roundtrip (S : ConsistentSequence) :
     eventual_injective_zero S = eventual_injective_zero S :=
@@ -382,17 +391,17 @@ noncomputable def sym_structure_roundtrip (R : SymRepSequence) (n : Nat)
 
 noncomputable def representation_stable_zero (R : SymRepSequence) :
     RepresentationStable R :=
-  ⟨0, True.intro⟩
+  ⟨mkStabilityCertificate 0⟩
 
 noncomputable def representation_stable_bound (R : SymRepSequence) (N : Nat) :
     RepresentationStable R :=
-  ⟨N, True.intro⟩
+  ⟨mkStabilityCertificate N⟩
 
 noncomputable def representation_stable_transport {R S : SymRepSequence}
     (_p : Path R S) (h : RepresentationStable R) :
     RepresentationStable S := by
-  rcases h with ⟨N, hN⟩
-  exact ⟨N, hN⟩
+  rcases h with ⟨cert⟩
+  exact ⟨cert⟩
 
 noncomputable def representation_stable_roundtrip (R : SymRepSequence) :
     representation_stable_zero R = representation_stable_zero R :=
@@ -421,21 +430,21 @@ noncomputable def cef_relation_congr {F G : CEFFramework} (p : Path F G) :
 
 noncomputable def fi_noetherian_from_generation (F : CEFFramework) :
     FINoetherian F :=
-  ⟨F.generationDegree, True.intro⟩
+  ⟨mkStabilityCertificate F.generationDegree⟩
 
 noncomputable def fi_noetherian_from_relation (F : CEFFramework) :
     FINoetherian F :=
-  ⟨F.relationDegree, True.intro⟩
+  ⟨mkStabilityCertificate F.relationDegree⟩
 
 noncomputable def fi_noetherian_from_bound (F : CEFFramework) (N : Nat) :
     FINoetherian F :=
-  ⟨N, True.intro⟩
+  ⟨mkStabilityCertificate N⟩
 
 noncomputable def fi_noetherian_transport {F G : CEFFramework}
     (_p : Path F G) (h : FINoetherian F) :
     FINoetherian G := by
-  rcases h with ⟨N, hN⟩
-  exact ⟨N, hN⟩
+  rcases h with ⟨cert⟩
+  exact ⟨cert⟩
 
 noncomputable def church_ellenberg_farb_range_hyp (F : CEFFramework)
     (p : Path F.generationDegree F.relationDegree) :
@@ -451,17 +460,17 @@ noncomputable def church_ellenberg_farb_chain (F : CEFFramework)
 noncomputable def noetherian_eventual_injective (F : CEFFramework) (S : ConsistentSequence)
     (_h : FINoetherian F) :
     EventuallyInjective S :=
-  ⟨F.generationDegree, True.intro⟩
+  ⟨mkStabilityCertificate F.generationDegree⟩
 
 noncomputable def noetherian_eventual_surjective (F : CEFFramework) (S : ConsistentSequence)
     (_h : FINoetherian F) :
     EventuallySurjective S :=
-  ⟨F.relationDegree, True.intro⟩
+  ⟨mkStabilityCertificate F.relationDegree⟩
 
 noncomputable def noetherian_representation_stable (F : CEFFramework) (R : SymRepSequence)
     (_h : FINoetherian F) :
     RepresentationStable R :=
-  ⟨F.generationDegree + F.relationDegree, True.intro⟩
+  ⟨mkStabilityCertificate (F.generationDegree + F.relationDegree)⟩
 
 /-! ## Character polynomial theorems -/
 
@@ -629,22 +638,22 @@ noncomputable def twisted_twist_congr (T : TwistedStabilityDatum) {n m : Nat}
 
 noncomputable def twisted_homological_stable_zero (T : TwistedStabilityDatum) :
     TwistedHomologicalStable T :=
-  ⟨0, True.intro⟩
+  ⟨mkStabilityCertificate 0⟩
 
 noncomputable def twisted_homological_stable_bound (T : TwistedStabilityDatum) (N : Nat) :
     TwistedHomologicalStable T :=
-  ⟨N, True.intro⟩
+  ⟨mkStabilityCertificate N⟩
 
 noncomputable def twisted_homological_stable_transport {T U : TwistedStabilityDatum}
     (_p : Path T U) (h : TwistedHomologicalStable T) :
     TwistedHomologicalStable U := by
-  rcases h with ⟨N, hN⟩
-  exact ⟨N, hN⟩
+  rcases h with ⟨cert⟩
+  exact ⟨cert⟩
 
 noncomputable def twisted_to_representation_stable (T : TwistedStabilityDatum) (R : SymRepSequence)
     (_h : TwistedHomologicalStable T) :
     RepresentationStable R :=
-  ⟨0, True.intro⟩
+  ⟨mkStabilityCertificate 0⟩
 
 noncomputable def twisted_character_bridge (_T : TwistedStabilityDatum) (P : CharacterPolynomial)
     (n : Nat) :

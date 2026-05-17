@@ -221,6 +221,35 @@ noncomputable def operadMorphismId {C : Type u} (O : Operad C) : OperadMorphism 
   pres_id := Path.refl O.identity
   pres_comp := fun f g => Path.refl (O.compose f g)
 
+/-- Typed certificate for identity-morphism coherence traces. -/
+structure OperadMorphismIdCertificate {C : Type u} (O : Operad C) where
+  presIdPath : Path (id O.identity) O.identity
+  presCompPath : (f g : C) → Path (id (O.compose f g)) (O.compose (id f) (id g))
+  presIdRightUnit : trans presIdPath (refl O.identity) = presIdPath
+
+noncomputable def operadMorphismIdCertificate {C : Type u}
+    (O : Operad C) : OperadMorphismIdCertificate O where
+  presIdPath :=
+    trans
+      (congrArg (fun x => id x) (refl O.identity))
+      (refl O.identity)
+  presCompPath := fun f g =>
+    trans
+      (congrArg (fun x => id x) (refl (O.compose f g)))
+      (refl (O.compose (id f) (id g)))
+  presIdRightUnit := by
+    simp
+
+theorem operadMorphismIdCertificate_agrees_id {C : Type u}
+    (O : Operad C) :
+    (operadMorphismIdCertificate O).presIdPath = (operadMorphismId O).pres_id := by
+  simp [operadMorphismIdCertificate, operadMorphismId]
+
+theorem operadMorphismIdCertificate_agrees_comp {C : Type u}
+    (O : Operad C) (f g : C) :
+    (operadMorphismIdCertificate O).presCompPath f g = (operadMorphismId O).pres_comp f g := by
+  simp [operadMorphismIdCertificate, operadMorphismId]
+
 /-- Theorem 21: Identity morphism pres_id is refl. -/
 theorem id_morphism_pres_id {C : Type u} (O : Operad C) :
     (operadMorphismId O).pres_id = Path.refl O.identity :=
@@ -640,6 +669,27 @@ structure OperadTwoCell {C : Type u} {O1 O2 : Operad C}
 noncomputable def operadTwoCellId {C : Type u} {O1 O2 : Operad C}
     (m : OperadMorphism O1 O2) : OperadTwoCell m m where
   component := fun c => Path.refl (m.map c)
+
+/-- Typed certificate for identity 2-cell component traces. -/
+structure OperadTwoCellIdCertificate {C : Type u} {O1 O2 : Operad C}
+    (m : OperadMorphism O1 O2) where
+  componentPath : (c : C) → Path (m.map c) (m.map c)
+  rightUnitPath : (c : C) → trans (componentPath c) (refl (m.map c)) = componentPath c
+
+noncomputable def operadTwoCellIdCertificate {C : Type u} {O1 O2 : Operad C}
+    (m : OperadMorphism O1 O2) : OperadTwoCellIdCertificate m where
+  componentPath := fun c =>
+    trans
+      (congrArg m.map (refl c))
+      (refl (m.map c))
+  rightUnitPath := by
+    intro c
+    simp
+
+theorem operadTwoCellIdCertificate_agrees {C : Type u} {O1 O2 : Operad C}
+    (m : OperadMorphism O1 O2) (c : C) :
+    (operadTwoCellIdCertificate m).componentPath c = (operadTwoCellId m).component c := by
+  simp [operadTwoCellIdCertificate, operadTwoCellId]
 
 /-- Theorem 72: Identity 2-cell component is refl. -/
 theorem two_cell_id_component {C : Type u} {O1 O2 : Operad C}
