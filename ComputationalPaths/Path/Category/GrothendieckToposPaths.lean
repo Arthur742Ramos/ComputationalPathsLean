@@ -162,8 +162,9 @@ structure CoveringLawCertificate {I : Type u} (J : GrothendieckTopology I)
     (c : I) (S : I → Prop) : Type (u + 2) where
   cover : J.covers c S
   maximalCover : J.covers c (fun _ => True)
-  stableCover : ∀ f : I, J.covers f S
-  transitiveCover : ∀ i, S i → ∀ R, J.covers i R → J.covers c R
+  stableFromCover : (hCover : J.covers c S) → ∀ f : I, J.covers f S
+  transitiveFromCover :
+    (hCover : J.covers c S) → ∀ i, S i → ∀ R, J.covers i R → J.covers c R
   coverPath : Path (J.covers c S) (J.covers c S)
   coverRouteRw :
     RwEq (Path.trans (Path.refl (J.covers c S)) coverPath) coverPath
@@ -173,10 +174,10 @@ noncomputable def discrete_max_cover_certificate {I : Type u} (c : I) :
     CoveringLawCertificate (discreteTopology I) c (fun _ => True) :=
   { cover := discrete_max_covers c
     maximalCover := (discreteTopology I).maximal c
-    stableCover := fun f => (discreteTopology I).stable c (fun _ => True)
-      (discrete_max_covers c) f
-    transitiveCover := fun i hi R hR => (discreteTopology I).transitive c (fun _ => True)
-      (discrete_max_covers c) i hi R hR
+    stableFromCover := fun hCover f => (discreteTopology I).stable c (fun _ => True)
+      hCover f
+    transitiveFromCover := fun hCover i hi R hR => (discreteTopology I).transitive c (fun _ => True)
+      hCover i hi R hR
     coverPath := discrete_max_cover_prop_path c
     coverRouteRw := rweq_cmpA_refl_left _ }
 
@@ -186,10 +187,10 @@ noncomputable def indiscrete_cover_certificate {I : Type u} (c : I) (S : I → P
     CoveringLawCertificate (indiscreteTopology I) c S :=
   { cover := indiscrete_all_covers c S
     maximalCover := (indiscreteTopology I).maximal c
-    stableCover := fun f => (indiscreteTopology I).stable c S
-      (indiscrete_all_covers c S) f
-    transitiveCover := fun i hi R hR => (indiscreteTopology I).transitive c S
-      (indiscrete_all_covers c S) i hi R hR
+    stableFromCover := fun hCover f => (indiscreteTopology I).stable c S
+      hCover f
+    transitiveFromCover := fun hCover i hi R hR => (indiscreteTopology I).transitive c S
+      hCover i hi R hR
     coverPath := indiscrete_cover_prop_path c S
     coverRouteRw := rweq_cmpA_refl_left _ }
 

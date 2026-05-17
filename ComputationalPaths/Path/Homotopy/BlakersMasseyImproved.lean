@@ -164,8 +164,8 @@ structure FreudenthalNaturalityCertificate {A B C : Type u} {f : C → A} {g : C
     RwEq (Path.trans (Path.refl targetPreview) targetCanonical) targetCanonical
   connectivity : triadConnectivityStatement T k l
 
-/-- Freudenthal corollary is natural in the pointed type. -/
-noncomputable def freudenthalCorollary_natural {A B C : Type u} {f : C → A} {g : C → B}
+/-- Certificate form of Freudenthal naturality in the pointed type. -/
+noncomputable def freudenthalCorollaryNaturalityCertificate {A B C : Type u} {f : C → A} {g : C → B}
     (T : Triad A B C f g) (k l : Nat) (h : triadConnectivityStatement T k l)
     (X Y : SuspensionLoop.Pointed.{u}) :
     FreudenthalNaturalityCertificate T k l h X Y :=
@@ -182,6 +182,16 @@ noncomputable def freudenthalCorollary_natural {A B C : Type u} {f : C → A} {g
     targetBasepoint := (freudenthalCorollary T k l h Y).basepoint
     targetRouteRw := rweq_cmpA_refl_left _
     connectivity := h }
+
+/-- Freudenthal corollary is natural in the pointed type, stated as a
+Prop-valued API wrapper around the typed certificate. -/
+theorem freudenthalCorollary_natural {A B C : Type u} {f : C → A} {g : C → B}
+    (T : Triad A B C f g) (k l : Nat) (h : triadConnectivityStatement T k l)
+    (X Y : SuspensionLoop.Pointed.{u}) :
+    ∃ cert : FreudenthalNaturalityCertificate T k l h X Y,
+      cert.sourcePreview = freudenthalCorollary T k l h X ∧
+        cert.targetPreview = freudenthalCorollary T k l h Y := by
+  exact ⟨freudenthalCorollaryNaturalityCertificate T k l h X Y, rfl, rfl⟩
 
 
 

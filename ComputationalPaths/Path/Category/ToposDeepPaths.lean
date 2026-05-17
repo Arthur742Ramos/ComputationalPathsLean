@@ -477,8 +477,8 @@ theorem tvTransport_roundtrip {D : Bool → Type u} {a b : Bool}
 /-- A presheaf on a 3-element category {0, 1, 2}. -/
 structure SmallPresheaf where
   sections : Nat → Nat           -- F(i)
-  restrict : Nat → Nat → Nat     -- restrict i j = restriction map
-  restrict_id : ∀ i, restrict i i = 0  -- identity restriction is zero
+  restrict : Nat → Nat → Nat     -- restrict i j = encoded restriction map
+  restrict_id : ∀ i, restrict i i = 0  -- in this toy encoding, code 0 marks identity restriction
   restrict_comp : ∀ i j k, restrict i k = restrict j k + restrict i j
 
 /-- Path: restriction along identity. -/
