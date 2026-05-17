@@ -34,7 +34,9 @@ namespace StratifiedSpace
 variable {S : Type u} (X : StratifiedSpace S)
 
 noncomputable def closure_refl_path (s : S) : Path (X.closure_order s s) True :=
-  Path.ofEq (propext ⟨fun _ => trivial, fun _ => X.closure_refl s⟩)
+  let h : X.closure_order s s = True :=
+    propext ⟨fun _ => trivial, fun _ => X.closure_refl s⟩
+  Path.mk [Step.mk (X.closure_order s s) True h] h
 
 theorem closure_trans_assoc (a b c d : S)
     (h1 : X.closure_order a b) (h2 : X.closure_order b c) (h3 : X.closure_order c d) :
@@ -74,13 +76,13 @@ theorem middle_perversity_zero : middle_perversity.p 0 = 0 := by simp [middle_pe
 
 /-- Dual perversity. -/
 def dual (pv : Perversity) : Perversity where
-  p := fun n => (n : Int) - 2 - pv.p n
+  p := fun n => (n : Int) - pv.p n
   p_zero := by simp [pv.p_zero]
   p_monotone := fun n => by
-    have h1 := pv.p_step n
+    have h := pv.p_step n
     omega
   p_step := fun n => by
-    have h1 := pv.p_monotone n
+    have h := pv.p_monotone n
     omega
 
 noncomputable def dual_involutive (pv : Perversity) (n : Nat) :
@@ -207,28 +209,31 @@ theorem stalk_comp_eq (s t u : S) (h1 : PS.space.closure_order s t)
 
 /-- Morphism of perverse sheaves. -/
 structure Morphism (PS₁ PS₂ : PerverseSheaf S) where
+  map_order : ∀ {s t : S}, PS₁.space.closure_order s t → PS₂.space.closure_order s t
   map : ∀ s : S, PS₁.stalk s → PS₂.stalk s
   naturality : ∀ s t : S, ∀ (h : PS₁.space.closure_order s t), ∀ x : PS₁.stalk t,
-    Path (PS₂.stalk_map s t h (map t x)) (map s (PS₁.stalk_map s t h x))
+    Path (PS₂.stalk_map s t (map_order h) (map t x)) (map s (PS₁.stalk_map s t h x))
 
 theorem morphism_naturality_eq (PS₁ PS₂ : PerverseSheaf S)
     (f : Morphism PS₁ PS₂) (s t : S) (h : PS₁.space.closure_order s t) (x : PS₁.stalk t) :
-    PS₂.stalk_map s t h (f.map t x) = f.map s (PS₁.stalk_map s t h x) :=
+    PS₂.stalk_map s t (f.map_order h) (f.map t x) = f.map s (PS₁.stalk_map s t h x) :=
   (f.naturality s t h x).toEq
 
 /-- Identity morphism. -/
-def id_morphism : Morphism PS PS where
-  map := fun s x => x
+noncomputable def id_morphism : Morphism PS PS where
+  map_order := fun h => h
+  map := fun _ x => x
   naturality := fun _ _ _ _ => Path.refl _
 
 /-- Composition of morphisms. -/
-def comp_morphism (PS₁ PS₂ PS₃ : PerverseSheaf S)
+noncomputable def comp_morphism (PS₁ PS₂ PS₃ : PerverseSheaf S)
     (f : Morphism PS₁ PS₂) (g : Morphism PS₂ PS₃) : Morphism PS₁ PS₃ where
+  map_order := fun h => g.map_order (f.map_order h)
   map := fun s x => g.map s (f.map s x)
   naturality := fun s t h x =>
     Path.trans
+      (g.naturality s t (f.map_order h) (f.map t x))
       (congrArg (g.map s) (f.naturality s t h x))
-      (g.naturality s t h (PS₁.stalk_map s t h x))  -- simplified
 
 /-- Left identity for morphism composition. -/
 noncomputable def comp_id_left (PS₁ PS₂ : PerverseSheaf S) (f : Morphism PS₁ PS₂) (s : S) (x : PS₁.stalk s) :
@@ -256,7 +261,7 @@ structure DecompositionData (S : Type u) where
   recompose : ∀ s : S, ((i : Nat) → i < num_summands → summands i s) → source_sheaf s
   decompose_recompose : ∀ s : S, ∀ x : source_sheaf s,
     Path (recompose s (decompose s x)) x
-  semisimplicity : ∀ i : Nat, ∀ hi : i < num_summands, ∀ s : S,
+  semisimplicity : ∀ i : Nat, ∀ _ : i < num_summands, ∀ s : S,
     ∀ x y : summands i s, Path x y → True
 
 namespace DecompositionData
@@ -268,13 +273,13 @@ noncomputable def decompose_recompose_eq (s : S) (x : DD.source_sheaf s) :
   (DD.decompose_recompose s x).toEq
 
 /-- The decomposition is stable under base change. -/
-theorem decomposition_stable (s t : S) (st : DD.space.closure_order s t)
+noncomputable def decomposition_stable (s t : S) (_st : DD.space.closure_order s t)
     (pull : DD.source_sheaf t → DD.source_sheaf s) (x : DD.source_sheaf t) :
     Path (DD.recompose s (DD.decompose s (pull x))) (pull x) :=
   DD.decompose_recompose s (pull x)
 
 /-- Iterated decomposition is idempotent. -/
-theorem decompose_idempotent (s : S) (x : DD.source_sheaf s)
+noncomputable def decompose_idempotent (s : S) (x : DD.source_sheaf s)
     (i : Nat) (hi : i < DD.num_summands) :
     Path (DD.decompose s (DD.recompose s (DD.decompose s x)) i hi)
          (DD.decompose s x i hi) :=
@@ -357,7 +362,7 @@ structure SpringerCorrespondence (G : Type u) where
   springer_resolution : nilpotent_cone → flag_variety
   springer_fiber : nilpotent_cone → Type u
   weyl_action : weyl_group → flag_variety → flag_variety
-  springer_action : weyl_group → nilpotent_cone → springer_fiber → springer_fiber
+  springer_action : ∀ _g : weyl_group, ∀ e : nilpotent_cone, springer_fiber e → springer_fiber e
   irred_reps : weyl_group → Type u
   nilp_orbits : Type u
   correspondence : nilp_orbits → weyl_group → Prop  -- orbit ↦ irrep of W
@@ -389,7 +394,7 @@ structure CharacterSheaf (G : Type u) where
   group_id : G
   conj_class : G → G → G  -- conjugation class representative
   sheaf_val : G → Type u
-  equivariance : ∀ g h : G, ∀ x : sheaf_val h,
+  equivariance : ∀ g h : G, ∀ _x : sheaf_val h,
     Path (sheaf_val (conj_class g h)) (sheaf_val (conj_class g h))
   character : G → Int
   character_class_function : ∀ g h : G,
@@ -516,8 +521,8 @@ structure IntermediateExtension (S : Type u) where
   extend : ∀ s : S, open_stalk s → extended_stalk s
   restrict_extend : ∀ s : S, ∀ x : open_stalk s,
     Path (restrict s (extend s x)) x
-  no_sub : ∀ s : S, True   -- no sub nor quotient in heart
-  no_quot : ∀ s : S, True
+  no_sub : ∀ _s : S, True   -- no sub nor quotient in heart
+  no_quot : ∀ _s : S, True
 
 namespace IntermediateExtension
 
@@ -648,11 +653,15 @@ variable {S : Type u} (WF : WeightFiltration S)
 
 noncomputable def weight_chain (s : S) (n : Int) (x : WF.weight s n) :
     WF.weight s (n + 2) :=
-  WF.weight_monotone s (n + 1) (WF.weight_monotone s n x)
+  by
+    simpa [Int.add_assoc] using
+      (WF.weight_monotone s (n + 1) (WF.weight_monotone s n x))
 
 noncomputable def weight_three_step (s : S) (n : Int) (x : WF.weight s n) :
     WF.weight s (n + 3) :=
-  WF.weight_monotone s (n + 2) (WF.weight_chain s n x)
+  by
+    simpa [Int.add_assoc] using
+      (WF.weight_monotone s (n + 2) (WF.weight_chain s n x))
 
 noncomputable def filtration_compatible (s : S) (n : Int) (x : WF.weight s n) :
     Path (WF.filtration_incl s (n + 1) (WF.weight_monotone s n x))
@@ -674,13 +683,13 @@ structure MixedHodgeModule (X : Type u) where
   compatibility : ∀ x : X, ∀ n : Nat, ∀ k : Int,
     hodge_filt x n → weight_filt x k → underlying x
   strictness : ∀ x : X, ∀ f : underlying x → underlying x,
-    Path (f (f x.out)) (f (f x.out))  -- simplified strictness
+    ∀ y : underlying x, Path (f (f y)) (f (f y))
 
 namespace MixedHodgeModule
 
 variable {X : Type u} (MHM : MixedHodgeModule X)
 
-theorem compatibility_self (x : X) (n : Nat) (k : Int)
+noncomputable def compatibility_self (x : X) (n : Nat) (k : Int)
     (h : MHM.hodge_filt x n) (w : MHM.weight_filt x k) :
     Path (MHM.compatibility x n k h w) (MHM.compatibility x n k h w) :=
   Path.refl _
