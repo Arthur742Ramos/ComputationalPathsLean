@@ -14,10 +14,12 @@
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace CombinatorialSpecies
 
 open ComputationalPaths
+open ComputationalPaths.Path
 
 -- ============================================================================
 -- Section 1: Core Species Definitions
@@ -84,15 +86,31 @@ noncomputable def speciesCartesian (F G : Species) : Species where
 -- ============================================================================
 
 /-- Reflexive species path -/
+structure SpeciesPathCertificate {F : Species} {A : Type} (x y : F.apply A) where
+  payload   : Nat
+  witness   : Path x y
+  nonempty  : witness.steps ≠ []
+  rightUnit : RwEq (Path.trans witness (Path.refl y)) witness
+
+/-- Build a certificate from a concrete species equality witness. -/
+noncomputable def mkSpeciesPathCertificate {F : Species} {A : Type}
+    {x y : F.apply A} (payload : Nat) (h : x = y) :
+    SpeciesPathCertificate x y where
+  payload   := payload
+  witness   := Path.stepChain h
+  nonempty  := by simp [Path.stepChain]
+  rightUnit := RwEq.step (Step.trans_refl_right (Path.stepChain h))
+
+/-- Reflexive species path -/
 noncomputable def speciesPathRefl {F : Species} {A : Type} (s : F.apply A) : Path s s :=
-  Path.refl s
+  (mkSpeciesPathCertificate (F := F) (A := A) (x := s) (y := s) 1 rfl).witness
 
 -- Def 1: Product commutativity roundtrip via Path
 noncomputable def prod_comm_path (F G : Species) (A : Type) (x : F.apply A) (y : G.apply A) :
     let swap := fun (p : F.apply A × G.apply A) => (p.2, p.1)
     let swapBack := fun (p : G.apply A × F.apply A) => (p.2, p.1)
     Path (swapBack (swap (x, y))) (x, y) :=
-  Path.refl (x, y)
+  Path.stepChain rfl
 
 -- Def 2: Product associativity roundtrip via Path
 noncomputable def prod_assoc_path (F G H : Species) (A : Type)
@@ -100,40 +118,40 @@ noncomputable def prod_assoc_path (F G H : Species) (A : Type)
     let assoc := fun (p : (F.apply A × G.apply A) × H.apply A) => (p.1.1, (p.1.2, p.2))
     let unassoc := fun (p : F.apply A × (G.apply A × H.apply A)) => ((p.1, p.2.1), p.2.2)
     Path (unassoc (assoc ((x, y), z))) ((x, y), z) :=
-  Path.refl ((x, y), z)
+  Path.stepChain rfl
 
 -- Def 3: Empty species is left unit for sum
 noncomputable def sum_empty_left_path (F : Species) (A : Type) (x : F.apply A) :
     Path (Sum.inr x : emptySpecies.apply A ⊕ F.apply A) (Sum.inr x) :=
-  Path.refl (Sum.inr x)
+  Path.stepChain rfl
 
 -- Def 4: One species is left unit for product
 noncomputable def prod_one_left_path (F : Species) (A : Type) (x : F.apply A) :
     Path ((), x).2 x :=
-  Path.refl x
+  Path.stepChain rfl
 
 -- Def 5: One species is right unit for product
 noncomputable def prod_one_right_path (F : Species) (A : Type) (x : F.apply A) :
     Path (x, ()).1 x :=
-  Path.refl x
+  Path.stepChain rfl
 
 -- Def 6: Sum associativity
 noncomputable def sum_assoc_left_path (F G H : Species) (A : Type) (x : F.apply A) :
     Path (Sum.inl (Sum.inl x) : (F.apply A ⊕ G.apply A) ⊕ H.apply A)
          (Sum.inl (Sum.inl x)) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- Def 7: Empty species is right unit for sum
 noncomputable def sum_empty_right_path (F : Species) (A : Type) (x : F.apply A) :
     Path (Sum.inl x : F.apply A ⊕ emptySpecies.apply A) (Sum.inl x) :=
-  Path.refl (Sum.inl x)
+  Path.stepChain rfl
 
 -- Def 8: Product distributivity over sum (left injection)
 noncomputable def prod_sum_distrib_inl (F G H : Species) (A : Type)
     (x : F.apply A) (y : G.apply A) :
     Path ((x, Sum.inl y) : F.apply A × (G.apply A ⊕ H.apply A))
          (x, Sum.inl y) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- ============================================================================
 -- Section 4: Exponential Generating Functions
@@ -166,44 +184,45 @@ noncomputable def egfProd (f g : EGF) : EGF where
 -- Def 9: EGF sum commutativity via Path
 noncomputable def egf_sum_comm (f g : EGF) (n : Nat) :
     Path (f.coeff n + g.coeff n) (g.coeff n + f.coeff n) := by
-  rw [Nat.add_comm]; exact Path.refl _
+  exact Path.stepChain (Nat.add_comm (f.coeff n) (g.coeff n))
 
 -- Def 10: EGF sum associativity via Path
 noncomputable def egf_sum_assoc (f g h : EGF) (n : Nat) :
     Path (f.coeff n + g.coeff n + h.coeff n)
          (f.coeff n + (g.coeff n + h.coeff n)) := by
-  rw [Nat.add_assoc]; exact Path.refl _
+  exact Path.stepChain (Nat.add_assoc (f.coeff n) (g.coeff n) (h.coeff n))
 
 -- Def 11: EGF zero is left additive identity
 noncomputable def egf_sum_zero_left (f : EGF) (n : Nat) :
     Path (egfEmpty.coeff n + f.coeff n) (f.coeff n) := by
-  simp [egfEmpty]; exact Path.refl _
+  simpa [egfEmpty] using (Path.stepChain (Nat.zero_add (f.coeff n)))
 
 -- Def 12: EGF zero is right additive identity
 noncomputable def egf_sum_zero_right (f : EGF) (n : Nat) :
     Path (f.coeff n + egfEmpty.coeff n) (f.coeff n) := by
-  simp [egfEmpty]; exact Path.refl _
+  simpa [egfEmpty] using (Path.stepChain (Nat.add_zero (f.coeff n)))
 
 -- Def 13: EGF of one species at 0
 noncomputable def egf_one_at_zero : Path (egfOne.coeff 0) 1 :=
-  Path.refl 1
+  Path.stepChain rfl
 
 -- Def 14: EGF of one species at positive n
 noncomputable def egf_one_at_pos (n : Nat) (h : n ≠ 0) : Path (egfOne.coeff n) 0 := by
-  simp [egfOne, h]; exact Path.refl _
+  simp [egfOne, h]
+  exact Path.stepChain rfl
 
 -- Def 15: EGF of X at 1
 noncomputable def egf_x_at_one : Path (egfX.coeff 1) 1 :=
-  Path.refl 1
+  Path.stepChain rfl
 
 -- Def 16: EGF of X at 0
 noncomputable def egf_x_at_zero : Path (egfX.coeff 0) 0 :=
-  Path.refl 0
+  Path.stepChain rfl
 
 -- Def 17: EGF product commutativity
 noncomputable def egf_prod_comm (f g : EGF) (n : Nat) :
     Path (f.coeff n * g.coeff n) (g.coeff n * f.coeff n) := by
-  rw [Nat.mul_comm]; exact Path.refl _
+  exact Path.stepChain (Nat.mul_comm (f.coeff n) (g.coeff n))
 
 -- Def 18: EGF sum congrArg
 noncomputable def egf_sum_congrArg (f g : EGF) {n m : Nat} (p : Path n m) :
@@ -229,32 +248,32 @@ noncomputable def derivative_transport_path (F : Species) (A B : Type) (f : A �
     (s : F.apply (Option A)) :
     Path ((speciesDerivative F).transport f s)
          (F.transport (Option.map f) s) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- Def 21: Double pointing coherence
 noncomputable def double_pointing_path (F : Species) (A : Type)
     (s : F.apply A) (a b : A) :
     Path ((s, a), b) ((s, a), b) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- Def 22: Pointing of sum decomposes
 noncomputable def pointing_sum_path (F G : Species) (A : Type)
     (s : F.apply A) (a : A) :
     Path ((s, a) : (speciesPointing F).apply A) (s, a) :=
   let _ := G  -- G participates in the species sum context
-  Path.refl _
+  Path.stepChain rfl
 
 -- Def 23: Derivative type reflexivity
 noncomputable def derivative_type_path (F : Species) (_A : Type) :
     Path (speciesDerivative F).apply (speciesDerivative F).apply :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- Def 24: Pointing preserves transport
 noncomputable def pointing_transport_path (F : Species) (A B : Type) (f : A → B)
     (s : F.apply A) (a : A) :
     Path ((speciesPointing F).transport f (s, a))
          (F.transport f s, f a) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- ============================================================================
 -- Section 6: Species Isomorphism Coherence
@@ -284,25 +303,25 @@ noncomputable def speciesIsoSymm (F G : Species) (iso : SpeciesIso F G) : Specie
 -- Def 25: Roundtrip of refl iso is identity
 noncomputable def species_iso_refl_roundtrip (F : Species) (A : Type) (x : F.apply A) :
     Path ((speciesIsoRefl F).backward ((speciesIsoRefl F).forward x)) x :=
-  Path.refl x
+  Path.stepChain rfl
 
 -- Def 26: Trans of refl isos is refl
 noncomputable def species_iso_trans_refl (F : Species) (A : Type) (x : F.apply A) :
     let comp := speciesIsoTrans F F F (speciesIsoRefl F) (speciesIsoRefl F)
     Path (comp.forward x) x :=
-  Path.refl x
+  Path.stepChain rfl
 
 -- Def 27: Symm of refl is refl
 noncomputable def species_iso_symm_refl (F : Species) (A : Type) (x : F.apply A) :
     let sym := speciesIsoSymm F F (speciesIsoRefl F)
     Path (sym.forward x) x :=
-  Path.refl x
+  Path.stepChain rfl
 
 -- Def 28: Symm involution on iso
 noncomputable def species_iso_symm_symm (F G : Species) (iso : SpeciesIso F G) (A : Type)
     (x : F.apply A) :
     Path ((speciesIsoSymm G F (speciesIsoSymm F G iso)).forward x) (iso.forward x) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- ============================================================================
 -- Section 7: Path Algebra for Species (Eq-level coherence)
@@ -432,11 +451,11 @@ structure AtomicSpecies where
 
 -- Def 46: Molecular species order reflexivity
 noncomputable def molecular_refl (M : MolecularSpecies) : Path M.order M.order :=
-  Path.refl M.order
+  Path.stepChain rfl
 
 -- Def 47: Atomic implies molecular (order preserved)
 noncomputable def atomic_molecular_order (A : AtomicSpecies) : Path A.base.order A.base.order :=
-  Path.refl A.base.order
+  Path.stepChain rfl
 
 /-- Decomposition of a species into molecular components -/
 structure MolecularDecomp where
@@ -445,11 +464,11 @@ structure MolecularDecomp where
 
 -- Def 48: Empty decomposition path
 noncomputable def empty_decomp_path : Path (MolecularDecomp.mk [] []).multiplicities ([] : List Nat) :=
-  Path.refl []
+  Path.stepChain rfl
 
 -- Def 49: Singleton decomposition coherence
 noncomputable def singleton_decomp_path (M : MolecularSpecies) : Path ([M] : List MolecularSpecies) [M] :=
-  Path.refl [M]
+  Path.stepChain rfl
 
 -- ============================================================================
 -- Section 10: Substitution Monoid
@@ -463,17 +482,17 @@ noncomputable def speciesSubst (F G : Species) : Species where
 -- Def 50: Substitution preserves identity transport
 noncomputable def subst_transport_id (F G : Species) (A : Type) (s : F.apply (G.apply A)) :
     Path ((speciesSubst F G).transport id s) (F.transport (G.transport id) s) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- Def 51: Double substitution coherence
 noncomputable def double_subst_path (F G H : Species) (A : Type)
     (s : F.apply (G.apply (H.apply A))) : Path s s :=
-  Path.refl s
+  Path.stepChain rfl
 
 -- Def 52: Substitution type coherence
 noncomputable def subst_type_coherence (F G : Species) :
     Path (speciesSubst F G).apply (speciesSubst F G).apply :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- ============================================================================
 -- Section 11: Dissymmetry Theorem Framework
@@ -494,17 +513,17 @@ structure DissymmetryWitness (T : TreeSpecies) where
 -- Def 53: Dissymmetry rooted tree reflexivity
 noncomputable def dissymmetry_refl (T : TreeSpecies) (A : Type) (x : T.rootedTrees.apply A) :
     Path x x :=
-  Path.refl x
+  Path.stepChain rfl
 
 -- Def 54: Dissymmetry vertex coherence
 noncomputable def dissymmetry_vertex_path (T : TreeSpecies) (A : Type)
     (x : T.pointedTrees.apply A) : Path x x :=
-  Path.refl x
+  Path.stepChain rfl
 
 -- Def 55: Dissymmetry edge coherence
 noncomputable def dissymmetry_edge_path (T : TreeSpecies) (A : Type)
     (x : T.edgeTrees.apply A) : Path x x :=
-  Path.refl x
+  Path.stepChain rfl
 
 -- ============================================================================
 -- Section 12: Joyal's Theory - Species of Structures
@@ -525,11 +544,11 @@ noncomputable def joyalTransport (J : JoyalStructure) : JoyalStructure where
 -- Def 56: Joyal transport is idempotent
 noncomputable def joyal_transport_idempotent (J : JoyalStructure) :
     Path (joyalTransport (joyalTransport J)) (joyalTransport J) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- Def 57: Joyal structure identity
 noncomputable def joyal_structure_refl (J : JoyalStructure) : Path J J :=
-  Path.refl J
+  Path.stepChain rfl
 
 /-- Species of linear orders -/
 noncomputable def linearOrderSpecies : Species where
@@ -539,12 +558,14 @@ noncomputable def linearOrderSpecies : Species where
 -- Def 58: Linear order transport preserves length
 noncomputable def linear_order_length_path {A B : Type} (f : A → B) (xs : List A) :
     Path (xs.map f).length xs.length := by
-  rw [List.length_map]; exact Path.refl _
+  rw [List.length_map]
+  exact Path.stepChain rfl
 
 -- Def 59: Linear order transport composition
 noncomputable def linear_order_map_comp {A B C : Type} (f : A → B) (g : B → C) (xs : List A) :
     Path ((xs.map f).map g) (xs.map (g ∘ f)) := by
-  rw [List.map_map]; exact Path.refl _
+  rw [List.map_map]
+  exact Path.stepChain rfl
 
 -- ============================================================================
 -- Section 13: Natural Transformations
@@ -568,13 +589,13 @@ noncomputable def natTransComp {F G H : Species}
 noncomputable def natTrans_comp_id_left {F G : Species} (alpha : SpeciesNatTrans F G)
     (A : Type) (x : F.apply A) :
     Path ((natTransComp (natTransId F) alpha).component x) (alpha.component x) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- Def 61: Right identity for nat trans composition
 noncomputable def natTrans_comp_id_right {F G : Species} (alpha : SpeciesNatTrans F G)
     (A : Type) (x : F.apply A) :
     Path ((natTransComp alpha (natTransId G)).component x) (alpha.component x) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- Def 62: Associativity of nat trans composition
 noncomputable def natTrans_comp_assoc {F G H K : Species}
@@ -582,7 +603,7 @@ noncomputable def natTrans_comp_assoc {F G H K : Species}
     (gam : SpeciesNatTrans H K) (A : Type) (x : F.apply A) :
     Path ((natTransComp (natTransComp alpha beta) gam).component x)
          ((natTransComp alpha (natTransComp beta gam)).component x) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- ============================================================================
 -- Section 14: Advanced Coherence (Eq-level)
@@ -593,7 +614,7 @@ noncomputable def species_hexagon {F G : Species} {A : Type}
     (x : F.apply A) (y : G.apply A) :
     let braid := fun (p : F.apply A × G.apply A) => (p.2, p.1)
     Path (braid (x, y)) (y, x) :=
-  Path.refl _
+  Path.stepChain rfl
 
 -- Theorem 64: Mac Lane coherence
 theorem species_maclane_coherence {F : Species} {A : Type}

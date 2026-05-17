@@ -13,6 +13,9 @@
   50+ theorems, zero sorry, zero Path.ofEq.
 -/
 
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
 
@@ -46,6 +49,9 @@ structure Square where
 deriving DecidableEq, Repr
 
 namespace DoubleCatPaths
+
+open ComputationalPaths
+open ComputationalPaths.Path
 
 -- ============================================================
 -- §1  Horizontal Steps and Paths
@@ -494,17 +500,19 @@ structure HMonad where
 
 /-- Build a horizontal monad from identity step. -/
 noncomputable def HMonad.trivial (e : HEdge) : HMonad :=
-  { carrier := e, unit := HPath.refl e, mult := HPath.refl e }
+  { carrier := e
+    unit := HPath.single (HStep.identity e)
+    mult := HPath.single (HStep.identity e) }
 
-/-- Theorem 48 — trivial HMonad unit has length 0. -/
+/-- Theorem 48 — trivial HMonad unit has length 1 (single identity step). -/
 theorem hmonad_trivial_unit_length (e : HEdge) :
-    HPath.length (HMonad.trivial e).unit = 0 := by
-  simp [HMonad.trivial, HPath.refl, HPath.length]
+    HPath.length (HMonad.trivial e).unit = 1 := by
+  simp [HMonad.trivial, HPath.single, HPath.length]
 
-/-- Theorem 49 — trivial HMonad mult has length 0. -/
+/-- Theorem 49 — trivial HMonad mult has length 1 (single identity step). -/
 theorem hmonad_trivial_mult_length (e : HEdge) :
-    HPath.length (HMonad.trivial e).mult = 0 := by
-  simp [HMonad.trivial, HPath.refl, HPath.length]
+    HPath.length (HMonad.trivial e).mult = 1 := by
+  simp [HMonad.trivial, HPath.single, HPath.length]
 
 /-- Theorem 50 — HMonad left unit law: trans unit mult = mult (trivial). -/
 theorem hmonad_left_unit (e : HEdge) :
@@ -515,6 +523,19 @@ theorem hmonad_left_unit (e : HEdge) :
 theorem hmonad_right_unit (e : HEdge) (p : HPath e e) :
     HPath.length (HPath.trans p (HPath.refl e)) = HPath.length p := by
   simp [HPath.refl, hpath_trans_length, HPath.length]
+
+/-- Non-empty core-path trace witnessing horizontal trivial-monad carrier coherence. -/
+noncomputable def hmonad_trivial_trace (e : HEdge) : Path e e :=
+  Path.stepChain rfl
+
+theorem hmonad_trivial_trace_nonempty (e : HEdge) :
+    (hmonad_trivial_trace e).steps ≠ [] := by
+  simp [hmonad_trivial_trace, Path.stepChain]
+
+/-- Rewrite-equivalence coherence for the horizontal trivial-monad trace. -/
+noncomputable def hmonad_trivial_trace_rweq (e : HEdge) :
+    RwEq (Path.trans (hmonad_trivial_trace e) (Path.refl e)) (hmonad_trivial_trace e) :=
+  RwEq.step (Step.trans_refl_right (hmonad_trivial_trace e))
 
 -- ============================================================
 -- §13  Vertical Monad
@@ -528,22 +549,37 @@ structure VMonad where
 
 /-- Trivial vertical monad. -/
 noncomputable def VMonad.trivial (e : VEdge) : VMonad :=
-  { carrier := e, unit := VPath.refl e, mult := VPath.refl e }
+  { carrier := e
+    unit := VPath.single (VStep.identity e)
+    mult := VPath.single (VStep.identity e) }
 
-/-- Theorem 52 — trivial VMonad unit has length 0. -/
+/-- Theorem 52 — trivial VMonad unit has length 1 (single identity step). -/
 theorem vmonad_trivial_unit_length (e : VEdge) :
-    VPath.length (VMonad.trivial e).unit = 0 := by
-  simp [VMonad.trivial, VPath.refl, VPath.length]
+    VPath.length (VMonad.trivial e).unit = 1 := by
+  simp [VMonad.trivial, VPath.single, VPath.length]
 
-/-- Theorem 53 — trivial VMonad mult has length 0. -/
+/-- Theorem 53 — trivial VMonad mult has length 1 (single identity step). -/
 theorem vmonad_trivial_mult_length (e : VEdge) :
-    VPath.length (VMonad.trivial e).mult = 0 := by
-  simp [VMonad.trivial, VPath.refl, VPath.length]
+    VPath.length (VMonad.trivial e).mult = 1 := by
+  simp [VMonad.trivial, VPath.single, VPath.length]
 
 /-- Theorem 54 — VMonad left unit law. -/
 theorem vmonad_left_unit (e : VEdge) (p : VPath e e) :
     VPath.length (VPath.trans (VPath.refl e) p) = VPath.length p := by
   simp [VPath.trans, VPath.refl, VPath.length]
+
+/-- Non-empty core-path trace witnessing vertical trivial-monad carrier coherence. -/
+noncomputable def vmonad_trivial_trace (e : VEdge) : Path e e :=
+  Path.stepChain rfl
+
+theorem vmonad_trivial_trace_nonempty (e : VEdge) :
+    (vmonad_trivial_trace e).steps ≠ [] := by
+  simp [vmonad_trivial_trace, Path.stepChain]
+
+/-- Rewrite-equivalence coherence for the vertical trivial-monad trace. -/
+noncomputable def vmonad_trivial_trace_rweq (e : VEdge) :
+    RwEq (Path.trans (vmonad_trivial_trace e) (Path.refl e)) (vmonad_trivial_trace e) :=
+  RwEq.step (Step.trans_refl_right (vmonad_trivial_trace e))
 
 -- ============================================================
 -- §14  Cartesian Squares and Fibrations
