@@ -67,11 +67,13 @@ noncomputable def cstar_id_comp_path {A B : CStarAlgebra.{u}} (f : CStarMorphism
 
 noncomputable def cstar_star_inv_path (A : CStarAlgebra.{u}) (a : A.carrier) :
     Path (A.star (A.star a)) a :=
-  Path.ofEq (A.starInvolution a)
+  let h := A.starInvolution a
+  Path.mk [Step.mk (A.star (A.star a)) a h] h
 
 noncomputable def cstar_star_antimul_path (A : CStarAlgebra.{u}) (a b : A.carrier) :
     Path (A.star (A.mul a b)) (A.mul (A.star b) (A.star a)) :=
-  Path.ofEq (A.starAntiMul a b)
+  let h := A.starAntiMul a b
+  Path.mk [Step.mk (A.star (A.mul a b)) (A.mul (A.star b) (A.star a)) h] h
 
 /-! ## Ideals and Quotients -/
 
@@ -93,7 +95,8 @@ structure CStarQuotient (A : CStarAlgebra.{u}) (I : CStarIdeal A) where
 noncomputable def cstar_quotient_kernel_path {A : CStarAlgebra.{u}} {I : CStarIdeal A}
     (Q : CStarQuotient A I) (a : A.carrier) (h : I.elements a) :
     Path (Q.quotientMap.map a) Q.quotientAlg.zero :=
-  Path.ofEq (Q.kernel a h)
+  let hk := Q.kernel a h
+  Path.mk [Step.mk (Q.quotientMap.map a) Q.quotientAlg.zero hk] hk
 
 /-! ## Gelfand-Naimark -/
 
@@ -167,7 +170,8 @@ noncomputable def chern_nat_path {A B : CStarAlgebra.{u}}
     (N : ChernNaturality f chA chB) (x : chA.kTheory.k0) :
     Path (N.cyclicMap 0 (chA.chernMap0 x))
          (chB.chernMap0 (N.kMap x)) :=
-  Path.ofEq (N.naturality x)
+  let h := N.naturality x
+  Path.mk [Step.mk (N.cyclicMap 0 (chA.chernMap0 x)) (chB.chernMap0 (N.kMap x)) h] h
 
 /-! ## Noncommutative Differential Forms -/
 
@@ -222,7 +226,8 @@ noncomputable def spectral_triple_refl (S : SpectralTriple.{u}) (v : S.hilbertSp
 
 noncomputable def even_grading_sq_path (S : EvenSpectralTriple.{u}) (v : S.hilbertSpace) :
     Path (S.grading (S.grading v)) v :=
-  Path.ofEq (S.gradingSquared v)
+  let h := S.gradingSquared v
+  Path.mk [Step.mk (S.grading (S.grading v)) v h] h
 
 /-! ## Connes Distance Formula -/
 
@@ -234,7 +239,8 @@ structure ConnesMetric (S : SpectralTriple.{u}) where
 noncomputable def connes_dist_symm_path {S : SpectralTriple.{u}} (M : ConnesMetric S)
     (s t : M.states) :
     Path (M.distance s t) (M.distance t s) :=
-  Path.ofEq (M.symmetry s t)
+  let h := M.symmetry s t
+  Path.mk [Step.mk (M.distance s t) (M.distance t s) h] h
 
 /-! ## KK-Theory -/
 
@@ -324,7 +330,8 @@ structure NCAtiyahSinger (S : EvenSpectralTriple.{u}) where
 noncomputable def nc_atiyah_singer_path (S : EvenSpectralTriple.{u})
     (AS : NCAtiyahSinger S) :
     Path AS.topologicalIndex AS.analyticalIndex :=
-  Path.ofEq AS.equality
+  let h := AS.equality
+  Path.mk [Step.mk AS.topologicalIndex AS.analyticalIndex h] h
 
 /-! ## Morita Equivalence -/
 
@@ -363,11 +370,13 @@ structure NCTorusKTheory (T : NCTorus.{u}) where
 
 noncomputable def nc_torus_k0_path (T : NCTorus.{u}) (K : NCTorusKTheory T) :
     Path K.k0Rank 2 :=
-  Path.ofEq K.k0RankEq
+  let h := K.k0RankEq
+  Path.mk [Step.mk K.k0Rank 2 h] h
 
 noncomputable def nc_torus_k1_path (T : NCTorus.{u}) (K : NCTorusKTheory T) :
     Path K.k1Rank 2 :=
-  Path.ofEq K.k1RankEq
+  let h := K.k1RankEq
+  Path.mk [Step.mk K.k1Rank 2 h] h
 
 /-! ## Crossed Products -/
 

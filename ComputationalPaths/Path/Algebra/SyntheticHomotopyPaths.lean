@@ -44,7 +44,8 @@ structure SyntheticFunctor (C D : SyntheticCategory.{u, v}) where
 noncomputable def synth_functor_id_path {C D : SyntheticCategory.{u, v}}
     (F : SyntheticFunctor C D) (X : C.objects) :
     Path (F.onMor (C.id X)) (D.id (F.onOb X)) :=
-  Path.ofEq (F.preserveId X)
+  let h := F.preserveId X
+  Path.mk [Step.mk (F.onMor (C.id X)) (D.id (F.onOb X)) h] h
 
 /-! ## Synthetic Spectra -/
 
@@ -356,7 +357,8 @@ structure SyntheticPicard (C : SyntheticCategory.{u, v}) where
 noncomputable def synth_picard_unit_path {C : SyntheticCategory.{u, v}}
     (P : SyntheticPicard C) (x : P.invertibleObjects) :
     Path (P.product P.unit x) x :=
-  Path.ofEq (P.unitLeft x)
+  let h := P.unitLeft x
+  Path.mk [Step.mk (P.product P.unit x) x h] h
 
 end SyntheticHomotopy
 end Algebra

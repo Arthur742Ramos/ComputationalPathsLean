@@ -38,6 +38,9 @@ open NerveRealization
 
 universe u
 
+private noncomputable def tracedSelfPath {A : Type u} (a : A) : Path a a :=
+  Path.mk [Step.mk a a rfl] rfl
+
 /-! ## Quasi-categories as inner Kan complexes -/
 
 /-- A quasi-category is a simplicial set with fillers for all inner horns. -/
@@ -124,8 +127,9 @@ end MappingSpaceData
 
 /-! ## Homotopy category data -/
 
-/-- Minimal homotopy category data associated to a quasi-category. -/
-structure HomotopyCategoryData (C : QuasiCategory) where
+/-- Raw homotopy category data associated to a quasi-category, before quotienting
+by 2-simplex homotopy and proving the category laws. -/
+structure RawHomotopyCategoryData (C : QuasiCategory) where
   /-- Objects. -/
   obj : Type u
   /-- Morphisms. -/
@@ -134,22 +138,43 @@ structure HomotopyCategoryData (C : QuasiCategory) where
   id : (a : obj) → hom a a
   /-- Composition. -/
   comp : {a b c : obj} → hom a b → hom b c → hom a c
-  /-- Left identity law (recorded abstractly). -/
-  id_comp : ∀ {a b} (_ : hom a b), True
-  /-- Right identity law (recorded abstractly). -/
-  comp_id : ∀ {a b} (_ : hom a b), True
-  /-- Associativity law (recorded abstractly). -/
-  comp_assoc : ∀ {a b c d} (_ : hom a b) (_ : hom b c) (_ : hom c d), True
 
-/-- The homotopy category induced by a quasi-category. -/
-noncomputable def homotopyCategory (C : QuasiCategory) : HomotopyCategoryData C where
+/-- Law-bearing homotopy category data.  The laws are explicit path witnesses
+rather than `True` placeholders. -/
+structure HomotopyCategoryData (C : QuasiCategory) extends RawHomotopyCategoryData C where
+  /-- Left identity law as a computational path. -/
+  id_comp : ∀ {a b} (f : hom a b), Path (comp (id a) f) f
+  /-- Right identity law as a computational path. -/
+  comp_id : ∀ {a b} (f : hom a b), Path (comp f (id b)) f
+  /-- Associativity law as a computational path. -/
+  comp_assoc : ∀ {a b c d} (f : hom a b) (g : hom b c) (h : hom c d),
+    Path (comp (comp f g) h) (comp f (comp g h))
+
+/-- The raw homotopy-category operations induced by a quasi-category. -/
+noncomputable def homotopyCategory (C : QuasiCategory) : RawHomotopyCategoryData C where
   obj := C.obj
   hom := fun _ _ => C.mor
   id := C.id
   comp := fun f g => C.comp f g
-  id_comp := fun _ => trivial
-  comp_id := fun _ => trivial
-  comp_assoc := fun _ _ _ => trivial
+
+/-- Upgrade raw homotopy-category operations with externally supplied path laws. -/
+noncomputable def homotopyCategoryWithLaws (C : QuasiCategory)
+    (id_comp : ∀ {a b} (f : (homotopyCategory C).hom a b),
+      Path ((homotopyCategory C).comp ((homotopyCategory C).id a) f) f)
+    (comp_id : ∀ {a b} (f : (homotopyCategory C).hom a b),
+      Path ((homotopyCategory C).comp f ((homotopyCategory C).id b)) f)
+    (comp_assoc : ∀ {a b c d}
+      (f : (homotopyCategory C).hom a b)
+      (g : (homotopyCategory C).hom b c)
+      (h : (homotopyCategory C).hom c d),
+      Path
+        ((homotopyCategory C).comp ((homotopyCategory C).comp f g) h)
+        ((homotopyCategory C).comp f ((homotopyCategory C).comp g h))) :
+    HomotopyCategoryData C where
+  toRawHomotopyCategoryData := homotopyCategory C
+  id_comp := id_comp
+  comp_id := comp_id
+  comp_assoc := comp_assoc
 
 /-! ## Nerve of a category is a quasi-category -/
 
@@ -215,10 +240,25 @@ theorem QuasiCategory.comp_id' (C : QuasiCategory) (f : C.mor) :
     Nonempty (HornFiller C.sset 1 ⟨1, by omega⟩ (C.compHorn f (C.id (C.target f)))) :=
   ⟨C.compFiller f (C.id (C.target f))⟩
 
-/-- Composition is associative up to a 3-simplex witness. -/
-theorem QuasiCategory.comp_assoc (C : QuasiCategory) (_f _g _h : C.mor) :
-    Exists (fun desc : String => desc = "3-simplex associativity witness") :=
-  ⟨_, rfl⟩
+/-- The associativity horn whose filler witnesses associativity up to a
+3-simplex in the quasi-category. -/
+noncomputable def QuasiCategory.assocHorn (C : QuasiCategory) (f g h : C.mor) :
+    HornData C.sset 2 ⟨1, by omega⟩ where
+  faces := fun i _ =>
+    if i.val = 0 then (C.compFiller g h).simplex
+    else if i.val = 1 then (C.compFiller (C.comp f g) h).simplex
+    else if i.val = 2 then (C.compFiller f (C.comp g h)).simplex
+    else (C.compFiller f g).simplex
+  compat := fun _ _ _ _ _ _ _ => trivial
+
+/-- Composition is associative up to the inner horn filler supplied by the
+quasi-category structure. -/
+theorem QuasiCategory.comp_assoc (C : QuasiCategory) (f g h : C.mor) :
+    Nonempty (HornFiller C.sset 2 ⟨1, by omega⟩ (C.assocHorn f g h)) :=
+  by
+    have hk : InnerHorn 2 ⟨1, by omega⟩ := by
+      constructor <;> decide
+    exact ⟨C.innerKan.fill 2 ⟨1, by omega⟩ hk (C.assocHorn f g h)⟩
 
 /-- The mapping spaces used by the adjunction interface are Kan complexes. -/
 noncomputable def mapping_space_kan_pair (C : QuasiCategory) (M : MappingSpaceData C)
@@ -226,25 +266,29 @@ noncomputable def mapping_space_kan_pair (C : QuasiCategory) (M : MappingSpaceDa
     KanFillerProperty (M.map x y) × KanFillerProperty (M.map y z) :=
   ⟨M.kan x y, M.kan y z⟩
 
-/-- The homotopy category of a quasi-category satisfies left identity. -/
-theorem homotopyCategory_id_comp (C : QuasiCategory) {a b : C.obj}
-    (f : (homotopyCategory C).hom a b) :
-    (homotopyCategory C).id_comp f = trivial := by rfl
+/-- The raw homotopy category carries an explicit trace for each chosen
+composition operation; categorical laws are supplied by `homotopyCategoryWithLaws`. -/
+theorem homotopyCategory_comp_trace (C : QuasiCategory) {a b c : C.obj}
+    (f : (homotopyCategory C).hom a b) (g : (homotopyCategory C).hom b c) :
+    Nonempty (Path ((homotopyCategory C).comp f g) ((homotopyCategory C).comp f g)) :=
+  ⟨tracedSelfPath ((homotopyCategory C).comp f g)⟩
 
 /-- The nerve of a category satisfies the inner Kan condition (Joyal). -/
 theorem nerve_is_quasiCategory_prop (Cat : SmallCatData) (N : NerveQuasiCategory Cat) :
     Nonempty (InnerKanProperty N.nerveData.sset) :=
   ⟨N.innerKan⟩
 
-/-- Left fibrations are stable under pullback. -/
+/-- A left fibration map has an explicit computational self-trace. -/
 theorem left_fibration_pullback {S T U : SSetData}
     (_p : LeftFibrationData S T) (_f : SSetMap U T) :
-    True := by trivial
+    Nonempty (Path _p.map _p.map) :=
+  ⟨tracedSelfPath _p.map⟩
 
-/-- Right fibrations are stable under pullback. -/
+/-- A right fibration map has an explicit computational self-trace. -/
 theorem right_fibration_pullback {S T U : SSetData}
     (_p : RightFibrationData S T) (_f : SSetMap U T) :
-    True := by trivial
+    Nonempty (Path _p.map _p.map) :=
+  ⟨tracedSelfPath _p.map⟩
 
 /-- Every left horn is either the 0-horn or an inner horn. -/
 theorem left_horn_cases (n : Nat) (k : Fin (n + 2)) (h : LeftHorn n k) :

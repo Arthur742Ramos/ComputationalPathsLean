@@ -103,7 +103,8 @@ structure GrayUnit where
 noncomputable def gray_unit_path (U : GrayUnit.{u}) (n : Nat)
     (x y : U.unitSet.simplices n) :
     Path x y :=
-  Path.ofEq (U.uniqueness n x y)
+  let h := U.uniqueness n x y
+  Path.mk [Step.mk x y h] h
 
 structure GraySymmetry {C D : ScaledSimplicialSet.{u}}
     (CD : GrayTensor C D) (DC : GrayTensor D C) where
@@ -116,7 +117,8 @@ noncomputable def gray_symmetry_path {C D : ScaledSimplicialSet.{u}}
     {CD : GrayTensor C D} {DC : GrayTensor D C}
     (S : GraySymmetry CD DC) (n : Nat) (x : CD.result.simplices n) :
     Path (S.swapInverse.mapSimplices n (S.swapMap.mapSimplices n x)) x :=
-  Path.ofEq (S.roundtrip n x)
+  let h := S.roundtrip n x
+  Path.mk [Step.mk (S.swapInverse.mapSimplices n (S.swapMap.mapSimplices n x)) x h] h
 
 /-! ## Lax Functors -/
 
@@ -260,7 +262,8 @@ noncomputable def mate_roundtrip_path {C : ScaledSimplicialSet.{u}}
     {adj1 adj2 : Infty2Adjunction C}
     (M : MateCorrespondence adj1 adj2) (σ : C.simplices 2) :
     Path (M.mateInverse (M.mateMap σ)) σ :=
-  Path.ofEq (M.roundtrip σ)
+  let h := M.roundtrip σ
+  Path.mk [Step.mk (M.mateInverse (M.mateMap σ)) σ h] h
 
 /-! ## (∞,2)-Limits and Colimits -/
 

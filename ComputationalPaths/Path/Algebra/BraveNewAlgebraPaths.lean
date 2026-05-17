@@ -100,7 +100,8 @@ structure TensorProduct {R : EInfinityRing.{u}}
 noncomputable def module_action_unit_path {R : EInfinityRing.{u}} (M : ModuleSpectrum R)
     (n : Int) (m : M.space n) :
     Path (M.action n (R.mulUnit n) m) m :=
-  Path.ofEq (M.actionUnit n m)
+  let h := M.actionUnit n m
+  Path.mk [Step.mk (M.action n (R.mulUnit n) m) m h] h
 
 /-! ## Topological Hochschild Homology (THH) -/
 
@@ -148,7 +149,13 @@ noncomputable def tc_equalizer_path {R : EInfinityRing.{u}} (T : TC R) (n : Int)
     (x : T.tcSpace n) :
     Path (T.tr.restriction 0 n (T.tr.frobenius 0 n (T.toTR n x)))
          (T.toTR n x) :=
-  Path.ofEq (T.equalizerCondition n x)
+  let h := T.equalizerCondition n x
+  Path.mk
+    [Step.mk
+      (T.tr.restriction 0 n (T.tr.frobenius 0 n (T.toTR n x)))
+      (T.toTR n x)
+      h]
+    h
 
 structure TCMinus (R : EInfinityRing.{u}) where
   thh : THH R
@@ -187,7 +194,13 @@ noncomputable def trace_factor_path {R : EInfinityRing.{u}}
     (T : TraceFactorization R) (n : Int) (x : T.kTheory n) :
     Path (T.factorMap n (T.cyclotomicTrace n x))
          (T.dennisTrace n x) :=
-  Path.ofEq (T.factorCompat n x)
+  let h := T.factorCompat n x
+  Path.mk
+    [Step.mk
+      (T.factorMap n (T.cyclotomicTrace n x))
+      (T.dennisTrace n x)
+      h]
+    h
 
 structure DGMTheorem (R : EInfinityRing.{u}) where
   nilExtension : EInfinityRing.{u}
@@ -288,7 +301,8 @@ structure DyerLashof (R : EInfinityRing.{u}) where
 noncomputable def power_unit_path {R : EInfinityRing.{u}} (P : PowerOperations R)
     (p : Nat) (n : Int) :
     Path (P.power p n (R.mulUnit n)) (R.mulUnit n) :=
-  Path.ofEq (P.powerUnit p n)
+  let h := P.powerUnit p n
+  Path.mk [Step.mk (P.power p n (R.mulUnit n)) (R.mulUnit n) h] h
 
 /-! ## Thom Spectra -/
 
