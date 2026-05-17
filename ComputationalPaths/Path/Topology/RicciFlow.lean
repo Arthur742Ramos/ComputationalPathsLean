@@ -33,6 +33,7 @@ import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Topology.LawCertificates
 
 namespace ComputationalPaths
 namespace Path
@@ -364,6 +365,82 @@ structure ShrinkingSolitonClassification where
   is_shrinking : soliton.solitonType = -1
   classification : True
 
+/-! ## Local Ricci-flow certificates -/
+
+/-- Certificate for a single W-entropy monotonicity step. -/
+structure EntropyMonotonicityCertificate (flow : RicciFlowData)
+    (wm : WEntropyMonotonicity flow) (t : Nat) where
+  currentEntropy : Int
+  nextEntropy : Int
+  currentPath : Path currentEntropy (wm.wentropy t).wValue
+  nextPath : Path nextEntropy (wm.wentropy (t + 1)).wValue
+  nextTrace : PathLawCertificate nextEntropy (wm.wentropy (t + 1)).wValue
+  reassociation :
+    RwEq
+      (Path.trans (Path.trans nextPath (Path.refl (wm.wentropy (t + 1)).wValue))
+        (Path.refl (wm.wentropy (t + 1)).wValue))
+      nextPath
+  monotoneWitness : nextEntropy ≥ currentEntropy
+
+/-- Build the W-entropy monotonicity certificate at time `t`. -/
+noncomputable def wentropy_step_certificate (flow : RicciFlowData)
+    (wm : WEntropyMonotonicity flow) (t : Nat) :
+    EntropyMonotonicityCertificate flow wm t where
+  currentEntropy := (wm.wentropy t).wValue
+  nextEntropy := (wm.wentropy (t + 1)).wValue
+  currentPath := Path.refl (wm.wentropy t).wValue
+  nextPath := Path.refl (wm.wentropy (t + 1)).wValue
+  nextTrace := PathLawCertificate.refl (wm.wentropy (t + 1)).wValue
+  reassociation := by
+    apply rweq_trans
+    · exact rweq_tt
+        (Path.refl (wm.wentropy (t + 1)).wValue)
+        (Path.refl (wm.wentropy (t + 1)).wValue)
+        (Path.refl (wm.wentropy (t + 1)).wValue)
+    · apply rweq_trans
+      · exact rweq_trans_congr_right (Path.refl (wm.wentropy (t + 1)).wValue)
+          (rweq_cmpA_refl_left (Path.refl (wm.wentropy (t + 1)).wValue))
+      · exact rweq_cmpA_refl_left (Path.refl (wm.wentropy (t + 1)).wValue)
+  monotoneWitness := wm.monotone t
+
+/-- Certificate for a Type I curvature bound at a concrete time. -/
+structure TypeIBoundCertificate (flow : RicciFlowData) (s : TypeISingularity flow)
+    (t : Nat) where
+  timeWitness : t < s.singularTime
+  scaledCurvature : Nat
+  normalizationPath : Path scaledCurvature ((s.singularTime - t) * s.curvNorm t)
+  normalizationTrace : PathLawCertificate scaledCurvature ((s.singularTime - t) * s.curvNorm t)
+  boundWitness : scaledCurvature ≤ s.typeIConst
+
+/-- Build a Type I certificate from the singularity estimate. -/
+noncomputable def typeI_bound_certificate (flow : RicciFlowData)
+    (s : TypeISingularity flow) (t : Nat) (ht : t < s.singularTime) :
+    TypeIBoundCertificate flow s t where
+  timeWitness := ht
+  scaledCurvature := ((s.singularTime - t) * s.curvNorm t) + 0
+  normalizationPath := Path.ofEq (Nat.add_zero ((s.singularTime - t) * s.curvNorm t))
+  normalizationTrace := PathLawCertificate.ofPath
+    (Path.ofEq (Nat.add_zero ((s.singularTime - t) * s.curvNorm t)))
+  boundWitness := by
+    simpa [Nat.add_zero] using s.typeI_bound t ht
+
+/-- Certificate for prime decomposition uniqueness anchored to factor count. -/
+structure PrimeDecompositionCertificate (pd : PrimeDecomposition) where
+  factorCount : Nat
+  countPath : Path factorCount pd.primeFactors.length
+  countTrace : PathLawCertificate factorCount pd.primeFactors.length
+  countRoundtrip : RwEq (Path.trans countPath (Path.symm countPath)) (Path.refl factorCount)
+  uniquenessWitness : True
+
+/-- Build a prime decomposition uniqueness certificate. -/
+noncomputable def prime_decomposition_certificate (pd : PrimeDecomposition) :
+    PrimeDecompositionCertificate pd where
+  factorCount := pd.primeFactors.length + 0
+  countPath := Path.ofEq (Nat.add_zero pd.primeFactors.length)
+  countTrace := PathLawCertificate.ofPath (Path.ofEq (Nat.add_zero pd.primeFactors.length))
+  countRoundtrip := rweq_cmpA_inv_right (Path.ofEq (Nat.add_zero pd.primeFactors.length))
+  uniquenessWitness := pd.unique
+
 /-! ## Theorems -/
 
 /-- Maximum principle: R_min is non-decreasing. -/
@@ -396,7 +473,7 @@ theorem fentropy_gradient_flow (flow : RicciFlowData) (fm : FEntropyMonotonicity
 /-- W-entropy is non-decreasing under the flow. -/
 theorem wentropy_monotone (flow : RicciFlowData) (wm : WEntropyMonotonicity flow)
     (t : Nat) : (wm.wentropy (t + 1)).wValue ≥ (wm.wentropy t).wValue :=
-  wm.monotone t
+  (wentropy_step_certificate flow wm t).monotoneWitness
 
 /-- μ-functional is a lower bound on W-entropy. -/
 theorem mu_lower_bound (g : RiemannianMetric) (m : MuFunctional g)
@@ -412,7 +489,8 @@ theorem nu_lower_bound (g : RiemannianMetric) (n : NuFunctional g)
 theorem typeI_bounded_rescaled (flow : RicciFlowData) (s : TypeISingularity flow)
     (t : Nat) (ht : t < s.singularTime) :
     (s.singularTime - t) * s.curvNorm t ≤ s.typeIConst :=
-  s.typeI_bound t ht
+  by
+    simpa [Nat.add_zero] using (typeI_bound_certificate flow s t ht).boundWitness
 
 /-- Type II unbounded rescaled curvature. -/
 theorem typeII_unbounded_rescaled (flow : RicciFlowData) (s : TypeIISingularity flow)
@@ -473,7 +551,7 @@ theorem soliton_rescaling (rs : RicciSoliton) : True :=
 
 /-- Prime decomposition is unique up to reordering. -/
 theorem prime_decomposition_unique (pd : PrimeDecomposition) : True :=
-  pd.unique
+  (prime_decomposition_certificate pd).uniquenessWitness
 
 /-- Normalized Ricci flow preserves volume. -/
 theorem normalized_volume_preserved (nrf : NormalizedRicciFlowData)

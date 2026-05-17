@@ -30,6 +30,7 @@ import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
 import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Topology.LawCertificates
 
 namespace ComputationalPaths
 namespace Path
@@ -319,6 +320,65 @@ structure McLeanCayley (s : Spin7Manifold) where
   /-- Can be obstructed. -/
   possibly_obstructed : True
 
+/-! ## Local calibration certificates -/
+
+/-- Computational-path certificate for calibrated dimension data. -/
+structure CalibratedDimensionCertificate (M : RiemannianData)
+    (cs : CalibratedSubmanifold M) where
+  volumeBuffer : Nat
+  dimensionPath : Path cs.subDim cs.calibration.degree
+  shiftedPath : Path (cs.subDim + volumeBuffer) (cs.calibration.degree + volumeBuffer)
+  shiftedTrace : PathLawCertificate (cs.subDim + volumeBuffer)
+    (cs.calibration.degree + volumeBuffer)
+  roundtrip : RwEq (Path.trans shiftedPath (Path.symm shiftedPath))
+    (Path.refl (cs.subDim + volumeBuffer))
+
+/-- Build a calibrated-dimension certificate from the explicit path witness. -/
+noncomputable def calibrated_dimension_certificate (M : RiemannianData)
+    (cs : CalibratedSubmanifold M) : CalibratedDimensionCertificate M cs where
+  volumeBuffer := 1
+  dimensionPath := cs.dim_match
+  shiftedPath := Path.congrArg (fun n => n + 1) cs.dim_match
+  shiftedTrace := PathLawCertificate.ofPath (Path.congrArg (fun n => n + 1) cs.dim_match)
+  roundtrip := rweq_cmpA_inv_right (Path.congrArg (fun n => n + 1) cs.dim_match)
+
+/-- A multi-step transitivity normalization for calibrated dimensions. -/
+noncomputable def calibrated_dimension_trans_trace (M : RiemannianData)
+    (cs : CalibratedSubmanifold M) :
+    RwEq
+      (Path.trans (Path.trans cs.dim_match (Path.refl cs.calibration.degree))
+        (Path.refl cs.calibration.degree))
+      cs.dim_match := by
+  apply rweq_trans
+  · exact rweq_tt cs.dim_match (Path.refl cs.calibration.degree) (Path.refl cs.calibration.degree)
+  · apply rweq_trans
+    · exact rweq_trans_congr_right cs.dim_match
+        (rweq_cmpA_refl_left (Path.refl cs.calibration.degree))
+    · exact rweq_cmpA_refl_right cs.dim_match
+
+/-- Ricci-flat certificate for special-holonomy dimensions. -/
+structure SpecialHolonomyRicciCertificate (actualDim expectedDim : Nat) where
+  ricciFlatWitness : True
+  dimPath : Path actualDim expectedDim
+  dimTrace : PathLawCertificate actualDim expectedDim
+  dimRoundtrip : RwEq (Path.trans dimPath (Path.symm dimPath)) (Path.refl actualDim)
+
+/-- G₂ Ricci-flat certificate carrying explicit path evidence. -/
+noncomputable def g2_ricci_flat_certificate (g : G2Manifold) :
+    SpecialHolonomyRicciCertificate g.dim 7 where
+  ricciFlatWitness := g.ricci_flat
+  dimPath := g.dim_eq_7
+  dimTrace := PathLawCertificate.ofPath g.dim_eq_7
+  dimRoundtrip := rweq_cmpA_inv_right g.dim_eq_7
+
+/-- Spin(7) Ricci-flat certificate carrying explicit path evidence. -/
+noncomputable def spin7_ricci_flat_certificate (s : Spin7Manifold) :
+    SpecialHolonomyRicciCertificate s.dim 8 where
+  ricciFlatWitness := s.ricci_flat
+  dimPath := s.dim_eq_8
+  dimTrace := PathLawCertificate.ofPath s.dim_eq_8
+  dimRoundtrip := rweq_cmpA_inv_right s.dim_eq_8
+
 /-! ## Theorems -/
 
 /-- Calibrated submanifolds are volume minimizing (Harvey-Lawson). -/
@@ -358,11 +418,11 @@ noncomputable def cayley_dim (s : Spin7Manifold) (c : CayleySubmanifold s) :
 
 /-- G₂ manifolds are Ricci-flat. -/
 theorem g2_ricci_flat (g : G2Manifold) : True :=
-  g.ricci_flat
+  (g2_ricci_flat_certificate g).ricciFlatWitness
 
 /-- Spin(7) manifolds are Ricci-flat. -/
 theorem spin7_ricci_flat (s : Spin7Manifold) : True :=
-  s.ricci_flat
+  (spin7_ricci_flat_certificate s).ricciFlatWitness
 
 /-- Calabi-Yau real dimension = 2 × complex dimension. -/
 noncomputable def cy_real_dim (cy : CalabiYauManifold) : Path cy.dim (2 * cy.complexDim) :=
