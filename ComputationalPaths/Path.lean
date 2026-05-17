@@ -3,9 +3,12 @@
 
 This umbrella module gathers the submodules that formalise the notion of
 computational paths, the rewrite system that relates them, and the higher
-groupoid structure provided by identity types.
+groupoid structure provided by identity types. The import list is intentionally
+broad; section comments group the existing coverage without changing module
+boundaries.
 -/
 
+-- Core path representation and rewrite infrastructure.
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 import ComputationalPaths.Path.Rewrite.Step
@@ -24,6 +27,8 @@ import ComputationalPaths.Path.Rewrite.PathNormalizationDecision
 import ComputationalPaths.Path.Rewrite.ConfluenceConstructive
 import ComputationalPaths.Path.Rewrite.PathTactic
 import ComputationalPaths.Path.Polygraph.RwEqDerivation
+
+-- Groupoid, categorical, and derived path operations.
 import ComputationalPaths.Path.Groupoid
 import ComputationalPaths.Path.LocalizationCategory
 import ComputationalPaths.Path.ModelCategory
@@ -68,6 +73,8 @@ import ComputationalPaths.Path.WhiskerOperations
 import ComputationalPaths.Path.HigherPathOperations
 import ComputationalPaths.Path.HigherGroupoidCoherence
 import ComputationalPaths.Path.AdditiveNumberTheory
+
+-- Homotopy, loop-space, and fundamental-group interfaces.
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.LoopSpace
 import ComputationalPaths.Path.Homotopy.LoopSpaceAlgebra
@@ -170,6 +177,8 @@ import ComputationalPaths.Path.Homotopy.EilenbergMacLane
 import ComputationalPaths.Path.Homotopy.MooreSpace
 import ComputationalPaths.Path.Homotopy.Coproduct
 import ComputationalPaths.Path.Homotopy.CoproductPaths
+
+-- Concrete computational-path spaces and encode/decode examples.
 import ComputationalPaths.Path.CompPath.CircleCompPath
 import ComputationalPaths.Path.CompPath.WindingNumberProperties
 import ComputationalPaths.Path.CompPath.DeloopingConstruction
@@ -215,6 +224,8 @@ import ComputationalPaths.Path.CompPath.LensSpace
 import ComputationalPaths.Path.CompPath.LensSpaceAlgebra
 import ComputationalPaths.Path.CompPath.MilnorFibration
 -- removed legacy assumption-heavy modules (Mobius/Lens/Hopf/Pi2/Pi3/CP/Freudenthal/Cellular)
+
+-- Omega-groupoid and extended algebra/homotopy surfaces.
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.InfinityGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived

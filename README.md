@@ -47,12 +47,12 @@ Top-level layout:
 ```text
 ComputationalPathsLean/
 ├── ComputationalPaths.lean           # Root import hub
-├── Main.lean                         # CLI entry (prints libraryVersion)
+├── Main.lean                         # CLI entry (prints version and entrypoints)
 ├── lakefile.lean                     # Lake package configuration
 ├── lake-manifest.json                # Lake dependency manifest
 ├── lean-toolchain                    # Pinned Lean toolchain
 ├── ComputationalPaths/
-│   ├── Basic.lean                    # Core exports + libraryVersion
+│   ├── Basic.lean                    # Core exports + library metadata
 │   ├── Path/                         # Computational paths core ecosystem
 │   │   ├── Basic/                    # Path/Step core definitions
 │   │   ├── Rewrite/                  # Step, Rw, RwEq, normalization, tactics
@@ -141,6 +141,9 @@ lake exe cache get
 ```bash
 lake exe computational_paths
 ```
+
+This prints the package version, repository slug, and recommended core/full
+Lean import entrypoints.
 
 ### Build specific modules
 

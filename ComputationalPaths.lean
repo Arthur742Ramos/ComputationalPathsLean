@@ -1,7 +1,16 @@
--- This module serves as the root of the ComputationalPaths library.
--- Import modules here that should be built as part of the library.
+/-
+# Full ComputationalPaths import hub
+
+This module intentionally gathers the compact core, the broad path umbrella, and
+the top-level domain umbrellas. It is comprehensive rather than minimal; use
+`ComputationalPaths.Basic` for lightweight development.
+-/
+
+-- Core and path umbrella imports.
 import ComputationalPaths.Basic
 import ComputationalPaths.Path
+
+-- Direct cross-domain path integrations kept in the full root.
 import ComputationalPaths.SieveTheory
 import ComputationalPaths.Simplicial.PathCoherence
 import ComputationalPaths.Motivic.PathInfrastructure
@@ -41,6 +50,8 @@ import ComputationalPaths.SheafCohomology.PathInfrastructure
 import ComputationalPaths.TwoCategoryInstances
 import ComputationalPaths.DeformationTheory.DeformationPaths
 import ComputationalPaths.DeformationTheory.ObstructionPaths
+
+-- Path/foundational umbrella modules built by the full root.
 import ComputationalPaths.Path.Algebra
 import ComputationalPaths.Path.Category
 import ComputationalPaths.Coherence
@@ -56,7 +67,8 @@ import ComputationalPaths.Path.OmegaGroupoidCompPaths
 import ComputationalPaths.Path.Rewriting
 import ComputationalPaths.Path.Transport
 import ComputationalPaths.TypeFormers
--- Auto-wired subdirectory root modules
+
+-- Top-level domain umbrella modules retained from historical wiring.
 import ComputationalPaths.Adjunction
 import ComputationalPaths.AlgebraicGeometry
 import ComputationalPaths.Anabelian
@@ -123,6 +135,7 @@ import ComputationalPaths.Topos
 import ComputationalPaths.Tropical
 import ComputationalPaths.TropicalGeometry
 import ComputationalPaths.VertexAlgebra
--- Auto-wired orphan parent modules
+
+-- Orphan parent umbrellas retained for full-root coverage.
 import ComputationalPaths.Path.Computation
 import ComputationalPaths.Path.Logic

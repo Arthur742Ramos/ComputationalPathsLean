@@ -8,10 +8,10 @@ index of every file.
 
 | Entrypoint | Defined in | Use it for | Notes |
 |---|---|---|---|
-| `ComputationalPaths.Basic` | `ComputationalPaths/Basic.lean` | Compact core imports | Re-exports `Path.Basic`, the rewrite core (`SimpleEquiv`, `Step`, `Rw`, `RwEq`, `Quot`), and `Path.Groupoid`; also defines `libraryVersion`. |
+| `ComputationalPaths.Basic` | `ComputationalPaths/Basic.lean` | Compact core imports | Re-exports `Path.Basic`, the rewrite core (`SimpleEquiv`, `Step`, `Rw`, `RwEq`, `Quot`), and `Path.Groupoid`; also defines lightweight library metadata. |
 | `ComputationalPaths.Path` | `ComputationalPaths/Path.lean` | Broad computational-path umbrella | Pulls in the path core, rewrite infrastructure, homotopy interfaces, `CompPath` examples, omega-groupoid files, and many extended domain modules. |
 | `ComputationalPaths` | `ComputationalPaths.lean` | Full library root | Imports `ComputationalPaths.Basic`, `ComputationalPaths.Path`, and many top-level domain umbrellas. This is comprehensive, not minimal. |
-| `computational_paths` | `Main.lean` / `lakefile.lean` | Executable smoke entrypoint | Imports `ComputationalPaths` and prints `libraryVersion`. |
+| `computational_paths` | `Main.lean` / `lakefile.lean` | Executable smoke entrypoint | Imports `ComputationalPaths.Basic` and prints the package version plus recommended core/full import entrypoints. |
 
 For examples, prefer a narrow import first:
 
