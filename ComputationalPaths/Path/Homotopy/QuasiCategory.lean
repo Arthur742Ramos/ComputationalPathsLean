@@ -278,17 +278,45 @@ theorem nerve_is_quasiCategory_prop (Cat : SmallCatData) (N : NerveQuasiCategory
     Nonempty (InnerKanProperty N.nerveData.sset) :=
   ⟨N.innerKan⟩
 
-/-- A left fibration map has an explicit computational self-trace. -/
-theorem left_fibration_pullback {S T U : SSetData}
-    (_p : LeftFibrationData S T) (_f : SSetMap U T) :
-    Nonempty (Path _p.map _p.map) :=
-  ⟨tracedSelfPath _p.map⟩
+/-- Lightweight pullback/base-change evidence for a left fibration along a
+simplicial map.  The current `SSetMap` interface records face compatibility
+only, so this witness keeps the base-change leg and fibration map as explicit
+computational traces rather than constructing a full pullback simplicial set. -/
+structure LeftFibrationPullbackTrace {S T U : SSetData}
+    (p : LeftFibrationData S T) (f : SSetMap U T) where
+  /-- The map along which the fibration is pulled back. -/
+  baseChange : SSetMap U T
+  /-- The chosen base-change map is the supplied map, by an explicit trace. -/
+  baseChange_path : Path baseChange f
+  /-- The original fibration map remains available in the pullback certificate. -/
+  fibration_path : Path p.map p.map
 
-/-- A right fibration map has an explicit computational self-trace. -/
+/-- A left fibration map carries explicit base-change evidence along any map. -/
+theorem left_fibration_pullback {S T U : SSetData}
+    (p : LeftFibrationData S T) (f : SSetMap U T) :
+    Nonempty (LeftFibrationPullbackTrace p f) :=
+  ⟨{ baseChange := f
+     baseChange_path := tracedSelfPath f
+     fibration_path := tracedSelfPath p.map }⟩
+
+/-- Lightweight pullback/base-change evidence for a right fibration along a
+simplicial map. -/
+structure RightFibrationPullbackTrace {S T U : SSetData}
+    (p : RightFibrationData S T) (f : SSetMap U T) where
+  /-- The map along which the fibration is pulled back. -/
+  baseChange : SSetMap U T
+  /-- The chosen base-change map is the supplied map, by an explicit trace. -/
+  baseChange_path : Path baseChange f
+  /-- The original fibration map remains available in the pullback certificate. -/
+  fibration_path : Path p.map p.map
+
+/-- A right fibration map carries explicit base-change evidence along any map. -/
 theorem right_fibration_pullback {S T U : SSetData}
-    (_p : RightFibrationData S T) (_f : SSetMap U T) :
-    Nonempty (Path _p.map _p.map) :=
-  ⟨tracedSelfPath _p.map⟩
+    (p : RightFibrationData S T) (f : SSetMap U T) :
+    Nonempty (RightFibrationPullbackTrace p f) :=
+  ⟨{ baseChange := f
+     baseChange_path := tracedSelfPath f
+     fibration_path := tracedSelfPath p.map }⟩
 
 /-- Every left horn is either the 0-horn or an inner horn. -/
 theorem left_horn_cases (n : Nat) (k : Fin (n + 2)) (h : LeftHorn n k) :
