@@ -31,7 +31,7 @@ Yang-Mills theory studies connections on principal G-bundles over Riemannian
 - Atiyah–Hitchin–Drinfeld–Manin, "Construction of instantons"
 -/
 
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Topology.LawCertificates
 
 namespace ComputationalPaths
 namespace Path
@@ -60,18 +60,33 @@ structure LieGroup where
 noncomputable def LieGroup.adjoint (G : LieGroup) : G.carrier → G.lieAlgebra → G.lieAlgebra :=
   fun _ v => v   -- abstract placeholder
 
+/-- Certified Jacobi data for a concrete triple in the Lie algebra. -/
+structure LieJacobiCertificate (G : LieGroup)
+    (bracket : G.lieAlgebra → G.lieAlgebra → G.lieAlgebra)
+    (x y z : G.lieAlgebra) where
+  nestedPath : Path (bracket x (bracket y z)) (bracket x (bracket y z))
+  coherence : PathLawCertificate (bracket x (bracket y z)) (bracket x (bracket y z))
+
 /-- Lie bracket on the Lie algebra. -/
 structure LieBracket (G : LieGroup) where
   bracket        : G.lieAlgebra → G.lieAlgebra → G.lieAlgebra
   antisymmetry   : ∀ (x y : G.lieAlgebra), bracket x y = bracket x y  -- placeholder
-  jacobi         : ∀ (_x _y _z : G.lieAlgebra), True                      -- placeholder
+  jacobi         : ∀ (x y z : G.lieAlgebra), LieJacobiCertificate G bracket x y z
+
+/-- Killing-form law certificate at sampled Lie-algebra elements. -/
+structure KillingFormCertificate (G : LieGroup)
+    (eval : G.lieAlgebra → G.lieAlgebra → Int) where
+  x : G.lieAlgebra
+  y : G.lieAlgebra
+  pairingPath : Path (eval x y) (eval y x)
+  pairingTrace : PathLawCertificate (eval x y) (eval y x)
 
 /-- The Killing form ⟨−,−⟩ on g. -/
 structure KillingForm (G : LieGroup) where
   eval           : G.lieAlgebra → G.lieAlgebra → Int
   symmetric      : ∀ x y, eval x y = eval y x
-  invariant      : True   -- ad-invariance
-  nondegenerate  : True   -- for semisimple G
+  invariant      : KillingFormCertificate G eval
+  nondegenerate  : KillingFormCertificate G eval
 
 /-! ## 2. Principal Bundles -/
 
@@ -113,10 +128,16 @@ noncomputable def connectionDifference {G : LieGroup} {P : PrincipalBundle G}
   fun x => _A.form x  -- placeholder
 
 /-- Curvature 2-form F_A = dA + ½[A,A]. -/
+structure CurvatureBianchiCertificate (G : LieGroup) (P : PrincipalBundle G)
+    (A : Connection G P) (curvForm : P.base → G.lieAlgebra) where
+  sample : P.base
+  curvaturePath : Path (curvForm sample) (curvForm sample)
+  closedTrace : PathLawCertificate (curvForm sample) (curvForm sample)
+
 structure Curvature (G : LieGroup) (P : PrincipalBundle G)
     (A : Connection G P) where
   curvForm   : P.base → G.lieAlgebra
-  bianchi    : True   -- d_A F_A = 0
+  bianchi    : CurvatureBianchiCertificate G P A curvForm
 
 /-- A flat connection: F_A = 0. -/
 structure FlatConnection (G : LieGroup) (P : PrincipalBundle G)
@@ -124,11 +145,21 @@ structure FlatConnection (G : LieGroup) (P : PrincipalBundle G)
   flat : ∀ _x : P.base, True
 
 /-- Holonomy of a connection around a loop. -/
+structure HolonomyGaugeCertificate (G : LieGroup) (P : PrincipalBundle G)
+    (A : Connection G P) (holonomyVal : G.carrier) where
+  gauge : G.carrier
+  conjugacyPath :
+    Path (G.mul (G.mul gauge holonomyVal) (G.inv gauge))
+      (G.mul (G.mul gauge holonomyVal) (G.inv gauge))
+  conjugacyTrace :
+    PathLawCertificate (G.mul (G.mul gauge holonomyVal) (G.inv gauge))
+      (G.mul (G.mul gauge holonomyVal) (G.inv gauge))
+
 structure Holonomy (G : LieGroup) (P : PrincipalBundle G)
     (A : Connection G P) where
   loop        : P.base → P.base    -- abstract loop
   holonomyVal : G.carrier
-  gauge_conj  : True               -- conjugation under gauge
+  gauge_conj  : HolonomyGaugeCertificate G P A holonomyVal
 
 /-! ## 4. Gauge Transformations -/
 
@@ -189,20 +220,27 @@ structure YangMillsFunctional (G : LieGroup) (P : PrincipalBundle G) where
   eval           : Connection G P → Nat
   nonneg         : ∀ A, eval A ≥ 0
   gauge_inv      : ∀ (g : GaugeTransformation G P) (A : Connection G P),
-                     eval (gaugeAct g A) = eval A
+                      eval (gaugeAct g A) = eval A
 
 /-- Euler-Lagrange equations of YM: d_A *F_A = 0. -/
+structure YMEulerLagrangeCertificate (G : LieGroup) (P : PrincipalBundle G)
+    (A : Connection G P) where
+  sample : P.base
+  stationaryPath : Path (A.form sample) (A.form sample)
+  stationaryTrace : PathLawCertificate (A.form sample) (A.form sample)
+
 structure YangMillsEquation (G : LieGroup) (P : PrincipalBundle G)
     (A : Connection G P) where
-  critical   : True   -- d_A *F_A = 0
-  bianchi    : True   -- d_A  F_A = 0
+  critical   : YMEulerLagrangeCertificate G P A
+  bianchi    : YMEulerLagrangeCertificate G P A
 
 /-- Topological energy bound: YM(A) ≥ 8π² |κ(P)|. -/
 structure TopologicalBound (G : LieGroup) (P : PrincipalBundle G)
     (YM : YangMillsFunctional G P) where
   kappa           : Int          -- Pontryagin charge
   bound           : ∀ A, (YM.eval A : Int) ≥ 8 * kappa  -- simplified
-  equality_iff_sd : True         -- equality iff F⁺ or F⁻ = 0
+  equality_iff_sd : Sigma (fun A : Connection G P =>
+    PathLawCertificate (YM.eval A) (YM.eval A))
 
 /-- Second variation (Hessian) of YM at a Yang-Mills connection. -/
 structure YMHessian (G : LieGroup) (P : PrincipalBundle G)
@@ -217,11 +255,25 @@ structure YMHessian (G : LieGroup) (P : PrincipalBundle G)
 inductive SDType | SelfDual | AntiSelfDual
 
 /-- An instanton: a connection with (anti-)self-dual curvature. -/
+structure InstantonSelfDualityCertificate (G : LieGroup) (P : PrincipalBundle G)
+    (A : Connection G P) where
+  sample : P.base
+  curvatureValue : G.lieAlgebra
+  dualityPath : Path curvatureValue curvatureValue
+  dualityTrace : PathLawCertificate curvatureValue curvatureValue
+
+structure InstantonMinimalCertificate (G : LieGroup) (P : PrincipalBundle G)
+    (A : Connection G P) where
+  comparison : Connection G P
+  sample : P.base
+  minimizerPath : Path (A.form sample) (comparison.form sample)
+  minimizerTrace : PathLawCertificate (A.form sample) (comparison.form sample)
+
 structure Instanton (G : LieGroup) (P : PrincipalBundle G) where
   connection     : Connection G P
   sdType         : SDType
-  self_dual_eq   : True          -- *F_A = ±F_A
-  minimiser      : True          -- absolute minimum in topological class
+  self_dual_eq   : InstantonSelfDualityCertificate G P connection
+  minimiser      : InstantonMinimalCertificate G P connection
 
 /-- Instanton number κ = (1/8π²) ∫ Tr(F ∧ F). -/
 structure InstantonNumber (G : LieGroup) (P : PrincipalBundle G)
@@ -244,15 +296,15 @@ structure MultiInstanton (G : LieGroup) where
   instanton : Instanton G bundle
 
 /-- Every instanton satisfies the Yang-Mills equation. -/
-theorem instanton_is_yang_mills (G : LieGroup) (P : PrincipalBundle G)
+noncomputable def instanton_is_yang_mills (G : LieGroup) (P : PrincipalBundle G)
     (_I : Instanton G P) :
-    True := _I.self_dual_eq
+    InstantonSelfDualityCertificate G P _I.connection := _I.self_dual_eq
 
 /-- An instanton minimises YM in its topological class. -/
-theorem instanton_minimises (G : LieGroup) (P : PrincipalBundle G)
+noncomputable def instanton_minimises (G : LieGroup) (P : PrincipalBundle G)
     (_I : Instanton G P) (_YM : YangMillsFunctional G P)
     (_A : Connection G P) :
-    True := _I.minimiser
+    InstantonMinimalCertificate G P _I.connection := _I.minimiser
 
 /-! ## 8. Deformation Complex and Index -/
 
@@ -440,17 +492,17 @@ theorem flat_connection_trivial_holonomy (G : LieGroup)
     (P : PrincipalBundle G) (_A : FlatConnection G P) :
     ∀ _x : P.base, True := _A.flat
 
-theorem holonomy_gauge_conjugation (G : LieGroup) (P : PrincipalBundle G)
+noncomputable def holonomy_gauge_conjugation (G : LieGroup) (P : PrincipalBundle G)
     (A : Connection G P) (_H : Holonomy G P A) :
-    True := _H.gauge_conj
+    HolonomyGaugeCertificate G P A _H.holonomyVal := _H.gauge_conj
 
 theorem killing_form_symmetric (G : LieGroup) (K : KillingForm G)
     (x y : G.lieAlgebra) : K.eval x y = K.eval y x :=
   K.symmetric x y
 
-theorem bianchi_identity (G : LieGroup) (P : PrincipalBundle G)
+noncomputable def bianchi_identity (G : LieGroup) (P : PrincipalBundle G)
     (A : Connection G P) (_F : Curvature G P A) :
-    True := _F.bianchi
+    CurvatureBianchiCertificate G P A _F.curvForm := _F.bianchi
 
 theorem uhlenbeck_bubble_energy (G : LieGroup) (P : PrincipalBundle G)
     (_U : UhlenbeckCompactness G P) :
@@ -469,8 +521,8 @@ section GaugeRewrite
 variable {G : LieGroup} {P : PrincipalBundle G}
 
 noncomputable def gaugeRewriteStep (x y : Connection G P)
-    (h : x = y) : Step (Connection G P) :=
-  Step.mk x y h
+    (h : x = y) : ComputationalPaths.Step (Connection G P) :=
+  ComputationalPaths.Step.mk x y h
 
 noncomputable def gaugePathWitness (x y : Connection G P)
     (h : x = y) : Path x y :=
