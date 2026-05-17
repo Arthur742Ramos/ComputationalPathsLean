@@ -743,12 +743,11 @@ noncomputable def adams_trivial_prime_path (p : Nat) :
 -- 60. Double complex zero entry composed with total zero
 noncomputable def dc_zero_compose (p q n : Nat) :
     Path (DoubleComplex.zero.entry p q + DoubleComplex.zero.total n) 0 :=
-  Path.trans
-    (Path.stepChain (by simp [DoubleComplex.zero, DoubleComplex.total]
-                        induction (List.range (n + 1)) with
-                        | nil => simp
-                        | cons h t ih => simp [List.foldl]; exact ih))
-    (Path.refl 0)
+  Path.stepChain (by
+    simp [DoubleComplex.zero, DoubleComplex.total]
+    induction (List.range (n + 1)) with
+    | nil => simp
+    | cons h t ih => simp [List.foldl]; exact ih)
 
 -- 61. Const page entry sum
 theorem dc_const_entry_sum (c p q : Nat) :
@@ -887,9 +886,32 @@ structure TraceComparison (source target : Nat) where
   factored : Path source target
   normalized : RwEq (Path.trans factored (Path.refl target)) factored
 
+/-- Deep-audit payload for `TraceComparison`: stores a concrete pivot with
+    non-empty traces from source/target into that pivot. -/
+structure TraceComparisonPayload (source target : Nat) where
+  pivot : Nat
+  sourceToPivot : Path source pivot
+  targetToPivot : Path target pivot
+  sourceToPivot_nonempty : sourceToPivot.steps ≠ []
+  targetToPivot_nonempty : targetToPivot.steps ≠ []
+  direct : Path source target
+  normalized :
+    RwEq
+      (Path.trans
+        (Path.trans sourceToPivot (Path.symm targetToPivot))
+        (Path.refl target))
+      (Path.trans sourceToPivot (Path.symm targetToPivot))
+
+/-- Accessor wrapper preserving the original `TraceComparison` API. -/
+noncomputable def TraceComparisonPayload.toTraceComparison {source target : Nat}
+    (payload : TraceComparisonPayload source target) : TraceComparison source target :=
+  { direct := payload.direct
+    factored := Path.trans payload.sourceToPivot (Path.symm payload.targetToPivot)
+    normalized := payload.normalized }
+
 -- 77. Leibniz for the zero page as a two-step trace through the zero group.
-noncomputable def leibniz_zero_trace_comparison (p1 q1 p2 q2 : Nat) :
-    TraceComparison
+noncomputable def leibniz_zero_trace_payload (p1 q1 p2 q2 : Nat) :
+    TraceComparisonPayload
       (MultPage.zero_page.diff (p1 + p2) (q1 + q2))
       (MultPage.zero_page.diff p1 q1 + MultPage.zero_page.diff p2 q2) :=
   let sourceToZero : Path (MultPage.zero_page.diff (p1 + p2) (q1 + q2)) 0 :=
@@ -900,21 +922,34 @@ noncomputable def leibniz_zero_trace_comparison (p1 q1 p2 q2 : Nat) :
   let factored : Path (MultPage.zero_page.diff (p1 + p2) (q1 + q2))
       (MultPage.zero_page.diff p1 q1 + MultPage.zero_page.diff p2 q2) :=
     Path.trans sourceToZero (Path.symm targetToZero)
-  { direct := leibniz_zero_path p1 q1 p2 q2
-    factored := factored
+  { pivot := 0
+    sourceToPivot := sourceToZero
+    targetToPivot := targetToZero
+    sourceToPivot_nonempty := by
+      simp [sourceToZero, mp_zero_diff_path, Path.stepChain]
+    targetToPivot_nonempty := by
+      simp [targetToZero, Path.stepChain]
+    direct := leibniz_zero_path p1 q1 p2 q2
     normalized :=
       RwEq.step
         (ComputationalPaths.Path.Step.trans_refl_right factored) }
 
+noncomputable def leibniz_zero_trace_comparison (p1 q1 p2 q2 : Nat) :
+    TraceComparison
+      (MultPage.zero_page.diff (p1 + p2) (q1 + q2))
+      (MultPage.zero_page.diff p1 q1 + MultPage.zero_page.diff p2 q2) :=
+  (leibniz_zero_trace_payload p1 q1 p2 q2).toTraceComparison
+
 theorem leibniz_zero_trace_factored_steps (p1 q1 p2 q2 : Nat) :
     (leibniz_zero_trace_comparison p1 q1 p2 q2).factored.steps.length = 2 := by
-  simp [leibniz_zero_trace_comparison, mp_zero_diff_path, Path.trans, Path.symm,
+  simp [leibniz_zero_trace_comparison, leibniz_zero_trace_payload,
+    TraceComparisonPayload.toTraceComparison, mp_zero_diff_path, Path.trans, Path.symm,
     Path.stepChain]
 
 -- 78. Identity morphisms carry source to target through the shared map-rank page.
-noncomputable def ssm_identity_trace_comparison
+noncomputable def ssm_identity_trace_payload
     (entry : Nat → Nat → Nat) (p q : Nat) :
-    TraceComparison ((SSMorphism.identity entry).sourceEntry p q)
+    TraceComparisonPayload ((SSMorphism.identity entry).sourceEntry p q)
       ((SSMorphism.identity entry).targetEntry p q) :=
   let sourceToEntry : Path ((SSMorphism.identity entry).sourceEntry p q) (entry p q) :=
     ssm_id_source_path entry p q
@@ -923,16 +958,29 @@ noncomputable def ssm_identity_trace_comparison
   let factored : Path ((SSMorphism.identity entry).sourceEntry p q)
       ((SSMorphism.identity entry).targetEntry p q) :=
     Path.trans sourceToEntry (Path.symm targetToEntry)
-  { direct := Path.stepChain (by simp [SSMorphism.identity])
-    factored := factored
+  { pivot := entry p q
+    sourceToPivot := sourceToEntry
+    targetToPivot := targetToEntry
+    sourceToPivot_nonempty := by
+      simp [sourceToEntry, ssm_id_source_path, Path.stepChain]
+    targetToPivot_nonempty := by
+      simp [targetToEntry, ssm_id_target_path, Path.stepChain]
+    direct := Path.stepChain (by simp [SSMorphism.identity])
     normalized :=
       RwEq.step
         (ComputationalPaths.Path.Step.trans_refl_right factored) }
 
+noncomputable def ssm_identity_trace_comparison
+    (entry : Nat → Nat → Nat) (p q : Nat) :
+    TraceComparison ((SSMorphism.identity entry).sourceEntry p q)
+      ((SSMorphism.identity entry).targetEntry p q) :=
+  (ssm_identity_trace_payload entry p q).toTraceComparison
+
 theorem ssm_identity_trace_factored_steps
     (entry : Nat → Nat → Nat) (p q : Nat) :
     (ssm_identity_trace_comparison entry p q).factored.steps.length = 2 := by
-  simp [ssm_identity_trace_comparison, ssm_id_source_path, ssm_id_target_path,
+  simp [ssm_identity_trace_comparison, ssm_identity_trace_payload,
+    TraceComparisonPayload.toTraceComparison, ssm_id_source_path, ssm_id_target_path,
     Path.trans, Path.symm, Path.stepChain]
 
 noncomputable def ssm_identity_trace_assoc_rweq
