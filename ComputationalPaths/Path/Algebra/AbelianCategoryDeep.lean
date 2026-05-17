@@ -81,7 +81,9 @@ theorem path_trace_length (p : Path α a b) :
     p.trace.length = p.length := by
   induction p with
   | nil _ => simp [Path.trace, Path.length]
-  | cons s _ ih => simp [Path.trace, Path.length, ih, Nat.add_comm]
+  | cons s _ ih =>
+      simp [Path.trace, Path.length, ih]
+      exact Nat.add_comm _ _
 
 def RwEq (p q : Path α a b) : Prop :=
   p.trace = q.trace
