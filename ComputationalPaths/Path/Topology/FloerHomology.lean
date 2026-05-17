@@ -91,27 +91,23 @@ structure NonDegeneracyCertificate (M : FloerData.{u})
     (γ : PeriodicOrbit M) where
   /-- Abstract linearised return map. -/
   linearizedReturn : Int → Int
-  /-- A probe eigenvector coordinate. -/
-  probe : Int
-  /-- Concrete witness that the probe is moved by the return map. -/
-  moved_probe : Path (linearizedReturn probe) (probe + 1)
-  /-- Rewrite coherence for the non-degeneracy witness. -/
-  moved_probe_coherence :
-    RwEq (Path.trans moved_probe (Path.refl (probe + 1))) moved_probe
+  /-- Concrete witness that the linearized return map moves the orbit's CZ index. -/
+  moved_at_cz : Path (linearizedReturn γ.czIndex) (γ.czIndex + 1)
+  /-- Rewrite coherence for the CZ-index displacement witness. -/
+  moved_at_cz_coherence :
+    RwEq (Path.trans moved_at_cz (Path.refl (γ.czIndex + 1))) moved_at_cz
 
 noncomputable def IsNonDegenerate (M : FloerData.{u}) (γ : PeriodicOrbit M) : Prop :=
   Nonempty (NonDegeneracyCertificate M γ)
 
-noncomputable def default_nonDegeneracy_certificate (M : FloerData.{u})
-    (γ : PeriodicOrbit M) : NonDegeneracyCertificate M γ where
-  linearizedReturn := fun x => x + 1
-  probe := 0
-  moved_probe := Path.refl ((0 : Int) + 1)
-  moved_probe_coherence := rweq_cmpA_refl_right (p := Path.refl ((0 : Int) + 1))
-
-theorem default_nondegenerate (M : FloerData.{u}) (γ : PeriodicOrbit M) :
-    IsNonDegenerate M γ :=
-  ⟨default_nonDegeneracy_certificate M γ⟩
+/-- Build a non-degeneracy certificate from explicit linearized-return evidence. -/
+noncomputable def mkNonDegeneracyCertificate (M : FloerData.{u})
+    (γ : PeriodicOrbit M) (linRet : Int → Int)
+    (hmove : Path (linRet γ.czIndex) (γ.czIndex + 1)) :
+    NonDegeneracyCertificate M γ where
+  linearizedReturn := linRet
+  moved_at_cz := hmove
+  moved_at_cz_coherence := rweq_cmpA_refl_right (p := hmove)
 
 /-- The set of non-degenerate periodic orbits. -/
 structure NonDegenerateOrbits (M : FloerData.{u}) where

@@ -210,6 +210,8 @@ structure LegendrianStabilisationCertificate (cs : ContactStructure)
   rot_shift_path : Path S.stabilised.rot (S.original.rot + rotDelta)
   tb_drop_coherence :
     RwEq (Path.trans tb_drop_path (Path.refl (S.original.tb - 1))) tb_drop_path
+  rot_shift_coherence :
+    RwEq (Path.trans rot_shift_path (Path.refl (S.original.rot + rotDelta))) rot_shift_path
 
 /-- Build a stabilisation certificate from explicit rotation-shift data. -/
 noncomputable def legendrian_stabilisation_certificate {cs : ContactStructure}
@@ -222,6 +224,7 @@ noncomputable def legendrian_stabilisation_certificate {cs : ContactStructure}
   tb_drop_path := Path.stepChain S.tb_drop
   rot_shift_path := Path.stepChain hshift
   tb_drop_coherence := rweq_cmpA_refl_right (p := Path.stepChain S.tb_drop)
+  rot_shift_coherence := rweq_cmpA_refl_right (p := Path.stepChain hshift)
 
 /-! ## 5. Transverse Knots -/
 
