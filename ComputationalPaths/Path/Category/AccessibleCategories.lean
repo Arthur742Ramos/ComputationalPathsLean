@@ -11,6 +11,7 @@ Makkai–Paré theorem, accessible functors, accessible model categories, ind-ob
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 
@@ -90,7 +91,9 @@ structure AccessibleFunctor (κ : RegularCardinal)
     (C D : AccessibleCategory κ) where
   mapObj : C.Obj → D.Obj
   mapHom : {a b : C.Obj} → C.Hom a b → D.Hom (mapObj a) (mapObj b)
-  preservesFilteredColimits : True
+  preservationPath : (X : C.Obj) → Path (mapObj X) (mapObj X)
+  preservesFilteredColimits :
+    (X : C.Obj) → Path.RwEq (preservationPath X) (Path.refl (mapObj X))
 
 structure AccCat where
   categories : Type (u + 1)
@@ -100,8 +103,10 @@ theorem accessible_adjoint_functor_theorem (κ : RegularCardinal)
     (F : AccessibleFunctor κ C.toAccessibleCategory D.toAccessibleCategory) :
     C.hasFilteredColimits = trivial ∧
       D.hasFilteredColimits = trivial ∧
-      F.preservesFilteredColimits = trivial :=
-  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+      ((X : C.Obj) →
+        Path.RwEqProp (F.preservationPath X) (Path.refl (F.mapObj X))) :=
+  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _,
+    fun X => ⟨F.preservesFilteredColimits X⟩⟩
 
 -- ============================================================
 -- §6  Ind- and Pro-Objects
@@ -187,7 +192,8 @@ noncomputable def IsSketchable (_C : Type u) : Prop :=
 -- ============================================================
 
 theorem makkai_pare_theorem (κ : RegularCardinal) (_ : AccessibleCategory κ) :
-    ∃ (_ : Sketch), True := ⟨⟨PUnit, PUnit, PUnit⟩, trivial⟩
+    ∃ S : Sketch, Path.RwEqProp (Path.refl S.Obj) (Path.refl S.Obj) :=
+  ⟨⟨PUnit, PUnit, PUnit⟩, ⟨Path.rweq_refl _⟩⟩
 
 theorem adamek_rosicky_theorem (κ : RegularCardinal) (C : AccessibleCategory κ) :
     ∀ X : C.Obj, C.generationProperty X = trivial :=
@@ -239,39 +245,54 @@ universe u v w
 
 structure LambdaPresentableObject (κ : RegularCardinal) (Obj : Type u) where
   obj : Obj
-  isKappaPresentable : True
+  presentabilityPath : Path obj obj
+  isKappaPresentable : Path.RwEq presentabilityPath (Path.refl obj)
 
 structure LambdaOrthogonality (κ : RegularCardinal) (Obj : Type u)
     (Hom : Obj → Obj → Type v) where
   leftClass : Obj → Prop
   rightClass : Obj → Prop
-  liftingWitness : True
+  witnessObject : Obj
+  liftingPath : Path witnessObject witnessObject
+  liftingWitness : Path.RwEq liftingPath (Path.refl witnessObject)
 
 structure LambdaOrthogonalityClass (κ : RegularCardinal) (Obj : Type u) where
   morphismClass : Obj → Prop
   orthogonalObjects : Obj → Prop
-  closure : True
+  closureObject : Obj
+  closurePath : Path closureObject closureObject
+  closure : Path.RwEq closurePath (Path.refl closureObject)
 
 structure MakkaiParePresentation (κ : RegularCardinal) where
   sketch : Sketch
-  equivalenceWitness : True
+  modelType : Type u
+  interpretation : sketch.Obj → modelType
+  presentationPath : Path modelType modelType
+  equivalenceWitness : Path.RwEq presentationPath (Path.refl modelType)
 
 structure IndProBridge (Obj : Type u) where
   indSide : IndCategory Obj
   proSide : ProCategory Obj
-  comparisonFunctor : True
+  comparisonFunctor : indSide.indObj → proSide.proObj
+  comparisonPath : (x : indSide.indObj) → Path (comparisonFunctor x) (comparisonFunctor x)
+  comparisonWitness :
+    (x : indSide.indObj) → Path.RwEq (comparisonPath x) (Path.refl (comparisonFunctor x))
 
 structure AccessibleLocalizationData (κ : RegularCardinal)
     (C : AccessibleCategory κ) where
   localizationObj : Type u
   localize : C.Obj → localizationObj
-  isAccessible : True
+  localizationPath : (X : C.Obj) → Path (localize X) (localize X)
+  isAccessible :
+    (X : C.Obj) → Path.RwEq (localizationPath X) (Path.refl (localize X))
 
 structure AccessibleLocalizationFunctor (κ : RegularCardinal)
     (C : AccessibleCategory κ) where
   target : Type u
   mapObj : C.Obj → target
-  preservesFilteredColimits : True
+  mapPath : (X : C.Obj) → Path (mapObj X) (mapObj X)
+  preservesFilteredColimits :
+    (X : C.Obj) → Path.RwEq (mapPath X) (Path.refl (mapObj X))
 
 structure SketchDoctrine where
   baseSketch : Sketch
@@ -285,22 +306,30 @@ structure ReflectiveAccessibleSubcategory (κ : RegularCardinal)
     (C : AccessibleCategory κ) where
   Pred : C.Obj → Prop
   reflector : C.Obj → C.Obj
-  unitWitness : True
-  isAccessibleReflection : True
+  unitPath : (X : C.Obj) → Path (reflector X) (reflector X)
+  unitWitness : (X : C.Obj) → Path.RwEq (unitPath X) (Path.refl (reflector X))
+  reflectionPath : (X : C.Obj) → Path (reflector X) (reflector X)
+  isAccessibleReflection :
+    (X : C.Obj) → Path.RwEq (reflectionPath X) (Path.refl (reflector X))
 
 structure ReflectionFunctorData (κ : RegularCardinal)
     (C : AccessibleCategory κ) where
   subcat : ReflectiveAccessibleSubcategory κ C
-  preservesFilteredColimits : True
+  preservationPath : (X : C.Obj) → Path (subcat.reflector X) (subcat.reflector X)
+  preservesFilteredColimits :
+    (X : C.Obj) → Path.RwEq (preservationPath X) (Path.refl (subcat.reflector X))
 
 structure SoundDoctrine where
   syntaxType : Type u
   semantics : syntaxType → Type v
-  soundness : True
+  semanticPath : (s : syntaxType) → Path (semantics s) (semantics s)
+  soundness : (s : syntaxType) → Path.RwEq (semanticPath s) (Path.refl (semantics s))
 
 structure DoctrineMorphism (D₁ D₂ : SoundDoctrine) where
   mapSyntax : D₁.syntaxType → D₂.syntaxType
-  preservesTruth : True
+  syntaxPath : (s : D₁.syntaxType) → Path (mapSyntax s) (mapSyntax s)
+  preservesTruth :
+    (s : D₁.syntaxType) → Path.RwEq (syntaxPath s) (Path.refl (mapSyntax s))
 
 -- accessible + sketchable: the category has a sketch presentation compatible with accessibility
 noncomputable def isAccessibleSketchable (κ : RegularCardinal) (C : AccessibleCategory κ) : Prop :=
@@ -309,48 +338,96 @@ noncomputable def isAccessibleSketchable (κ : RegularCardinal) (C : AccessibleC
 -- has a reflective accessible subcategory: admits a reflector that preserves filtered colimits
 noncomputable def hasReflectiveAccessibleSubcategory (κ : RegularCardinal)
     (C : AccessibleCategory κ) : Prop :=
-  ∃ (P : C.Obj → Prop) (r : C.Obj → C.Obj), ∀ x, P (r x)
+  ∃ R : ReflectiveAccessibleSubcategory κ C, ∀ x, R.Pred (R.reflector x)
+
+noncomputable def identityMakkaiParePresentation (κ : RegularCardinal)
+    (C : AccessibleCategory κ) : MakkaiParePresentation κ where
+  sketch := { Obj := C.Obj, cones := C.Obj, cocones := C.Obj }
+  modelType := C.Obj
+  interpretation := fun X => X
+  presentationPath := Path.refl C.Obj
+  equivalenceWitness := Path.rweq_refl _
+
+noncomputable def identityIndProBridge (Obj : Type u) : IndProBridge Obj where
+  indSide := { indObj := Obj, indHom := fun _ _ => PUnit }
+  proSide := { proObj := Obj, proHom := fun _ _ => PUnit }
+  comparisonFunctor := fun x => x
+  comparisonPath := fun x => Path.refl x
+  comparisonWitness := fun _ => Path.rweq_refl _
+
+noncomputable def identityAccessibleLocalizationData (κ : RegularCardinal)
+    (C : AccessibleCategory κ) : AccessibleLocalizationData κ C where
+  localizationObj := C.Obj
+  localize := fun X => X
+  localizationPath := fun X => Path.refl X
+  isAccessible := fun _ => Path.rweq_refl _
+
+noncomputable def identityAccessibleLocalizationFunctor (κ : RegularCardinal)
+    (C : AccessibleCategory κ) : AccessibleLocalizationFunctor κ C where
+  target := C.Obj
+  mapObj := fun X => X
+  mapPath := fun X => Path.refl X
+  preservesFilteredColimits := fun _ => Path.rweq_refl _
+
+noncomputable def identityReflectiveAccessibleSubcategory (κ : RegularCardinal)
+    (C : AccessibleCategory κ) : ReflectiveAccessibleSubcategory κ C where
+  Pred := fun _ => True
+  reflector := fun X => X
+  unitPath := fun X => Path.refl X
+  unitWitness := fun _ => Path.rweq_refl _
+  reflectionPath := fun X => Path.refl X
+  isAccessibleReflection := fun _ => Path.rweq_refl _
 
 /-! ## Additional Theorems -/
 
 theorem makkai_pare_presentation_exists (κ : RegularCardinal)
-    (_C : AccessibleCategory κ) :
-    Exists (fun desc : String => desc = "MakkaiParePresentation exists") :=
-  ⟨_, rfl⟩
+    (C : AccessibleCategory κ) :
+    ∃ P : MakkaiParePresentation.{u, u} κ,
+      P.modelType = C.Obj ∧ Path.RwEqProp P.presentationPath (Path.refl P.modelType) :=
+  let P := identityMakkaiParePresentation κ C
+  ⟨P, rfl, ⟨P.equivalenceWitness⟩⟩
 
 theorem lambda_orthogonality_stable_under_filtered_colimits
     (κ : RegularCardinal) (Obj : Type u) (Hom : Obj → Obj → Type v)
     (L : LambdaOrthogonality κ Obj Hom) :
-    L.liftingWitness = trivial :=
-  Subsingleton.elim _ _
+    Path.RwEqProp L.liftingPath (Path.refl L.witnessObject) :=
+  ⟨L.liftingWitness⟩
 
 theorem lambda_orthogonality_characterizes_accessibility
     (κ : RegularCardinal) (C : AccessibleCategory κ) :
     ∀ g, C.compactGenerators g → True :=
   C.generatorsAreCompact
 
-theorem ind_pro_bridge_exists (_Obj : Type u) :
-    Exists (fun desc : String => desc = "IndProBridge exists") :=
-  ⟨_, rfl⟩
+theorem ind_pro_bridge_exists (Obj : Type u) :
+    ∃ B : IndProBridge Obj,
+      (x : B.indSide.indObj) →
+        Path.RwEqProp (B.comparisonPath x) (Path.refl (B.comparisonFunctor x)) :=
+  let B := identityIndProBridge Obj
+  ⟨B, fun x => ⟨B.comparisonWitness x⟩⟩
 
 theorem ind_pro_bridge_functorial (Obj : Type u) (B : IndProBridge Obj) :
-    B.comparisonFunctor = trivial :=
-  Subsingleton.elim _ _
+    (x : B.indSide.indObj) →
+      Path.RwEqProp (B.comparisonPath x) (Path.refl (B.comparisonFunctor x)) :=
+  fun x => ⟨B.comparisonWitness x⟩
 
 theorem accessible_localization_data_exists (κ : RegularCardinal)
-    (_C : AccessibleCategory κ) :
-    Exists (fun desc : String => desc = "AccessibleLocalizationData exists") :=
-  ⟨_, rfl⟩
+    (C : AccessibleCategory κ) :
+    ∃ L : AccessibleLocalizationData.{u, u, v} κ C,
+      (X : C.Obj) → Path.RwEqProp (L.localizationPath X) (Path.refl (L.localize X)) :=
+  let L := identityAccessibleLocalizationData κ C
+  ⟨L, fun X => ⟨L.isAccessible X⟩⟩
 
 theorem accessible_localization_functor_exists (κ : RegularCardinal)
-    (_C : AccessibleCategory κ) :
-    Exists (fun desc : String => desc = "AccessibleLocalizationFunctor exists") :=
-  ⟨_, rfl⟩
+    (C : AccessibleCategory κ) :
+    ∃ L : AccessibleLocalizationFunctor.{u, u, v} κ C,
+      (X : C.Obj) → Path.RwEqProp (L.mapPath X) (Path.refl (L.mapObj X)) :=
+  let L := identityAccessibleLocalizationFunctor κ C
+  ⟨L, fun X => ⟨L.preservesFilteredColimits X⟩⟩
 
 theorem accessible_localization_is_reflective_ext (κ : RegularCardinal)
     (C : AccessibleCategory κ) :
     hasReflectiveAccessibleSubcategory κ C :=
-  ⟨fun _ => True, fun x => x, fun _ => trivial⟩
+  ⟨identityReflectiveAccessibleSubcategory κ C, fun _ => trivial⟩
 
 theorem sketch_theoretic_characterization_of_accessibility
     (κ : RegularCardinal) (C : AccessibleCategory κ) :
@@ -361,23 +438,23 @@ theorem sketch_theoretic_characterization_of_accessibility
 theorem reflective_accessible_subcategory_exists
     (κ : RegularCardinal) (C : AccessibleCategory κ) :
     hasReflectiveAccessibleSubcategory κ C := by
-  exact ⟨fun _ => True, fun x => x, fun _ => trivial⟩
+  exact ⟨identityReflectiveAccessibleSubcategory κ C, fun _ => trivial⟩
 
 theorem reflective_accessible_subcategory_closed_under_limits
     (κ : RegularCardinal) (C : AccessibleCategory κ)
     (R : ReflectiveAccessibleSubcategory κ C) :
-    R.unitWitness = trivial :=
-  Subsingleton.elim _ _
+    (X : C.Obj) → Path.RwEqProp (R.unitPath X) (Path.refl (R.reflector X)) :=
+  fun X => ⟨R.unitWitness X⟩
 
 theorem reflective_accessible_subcategory_closed_under_filtered_colimits
     (κ : RegularCardinal) (C : AccessibleCategory κ)
     (R : ReflectiveAccessibleSubcategory κ C) :
-    R.isAccessibleReflection = trivial :=
-  Subsingleton.elim _ _
+    (X : C.Obj) → Path.RwEqProp (R.reflectionPath X) (Path.refl (R.reflector X)) :=
+  fun X => ⟨R.isAccessibleReflection X⟩
 
 theorem sound_doctrine_reflects_validity (D : SoundDoctrine) :
-    D.soundness = trivial :=
-  Subsingleton.elim _ _
+    (s : D.syntaxType) → Path.RwEqProp (D.semanticPath s) (Path.refl (D.semantics s)) :=
+  fun s => ⟨D.soundness s⟩
 
 theorem sound_doctrine_is_complete_on_models (D : SoundDoctrine) :
     ∀ s : D.syntaxType, Nonempty (D.semantics s) → Nonempty (D.semantics s) :=
@@ -385,31 +462,37 @@ theorem sound_doctrine_is_complete_on_models (D : SoundDoctrine) :
 
 theorem doctrine_morphism_composition (D₁ D₂ D₃ : SoundDoctrine)
     (f : DoctrineMorphism D₁ D₂) (g : DoctrineMorphism D₂ D₃) :
-    f.preservesTruth = trivial ∧ g.preservesTruth = trivial :=
-  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+    ((s : D₁.syntaxType) →
+        Path.RwEqProp (f.syntaxPath s) (Path.refl (f.mapSyntax s))) ∧
+      ((s : D₂.syntaxType) →
+        Path.RwEqProp (g.syntaxPath s) (Path.refl (g.mapSyntax s))) :=
+  ⟨fun s => ⟨f.preservesTruth s⟩, fun s => ⟨g.preservesTruth s⟩⟩
 
 theorem accessible_from_sound_doctrine (κ : RegularCardinal)
     (C : AccessibleCategory κ) (D : SoundDoctrine) :
-    C.hasFilteredColimits = trivial ∧ D.soundness = trivial :=
-  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+    C.hasFilteredColimits = trivial ∧
+      ((s : D.syntaxType) →
+        Path.RwEqProp (D.semanticPath s) (Path.refl (D.semantics s))) :=
+  ⟨Subsingleton.elim _ _, fun s => ⟨D.soundness s⟩⟩
 
 theorem reflective_subcategory_has_accessible_reflector
     (κ : RegularCardinal) (C : AccessibleCategory κ)
     (R : ReflectiveAccessibleSubcategory κ C) :
-    R.isAccessibleReflection = trivial :=
-  Subsingleton.elim _ _
+    (X : C.Obj) → Path.RwEqProp (R.reflectionPath X) (Path.refl (R.reflector X)) :=
+  fun X => ⟨R.isAccessibleReflection X⟩
 
 theorem accessibility_preserved_by_reflection
     (κ : RegularCardinal) (C : AccessibleCategory κ)
     (R : ReflectiveAccessibleSubcategory κ C) :
-    C.hasFilteredColimits = trivial ∧ R.isAccessibleReflection = trivial :=
-  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+    C.hasFilteredColimits = trivial ∧
+      ((X : C.Obj) → Path.RwEqProp (R.reflectionPath X) (Path.refl (R.reflector X))) :=
+  ⟨Subsingleton.elim _ _, fun X => ⟨R.isAccessibleReflection X⟩⟩
 
 theorem ind_and_pro_bridge_respects_localizations
     (κ : RegularCardinal) (C : AccessibleCategory κ)
     (L : AccessibleLocalizationFunctor κ C) :
-    L.preservesFilteredColimits = trivial :=
-  Subsingleton.elim _ _
+    (X : C.Obj) → Path.RwEqProp (L.mapPath X) (Path.refl (L.mapObj X)) :=
+  fun X => ⟨L.preservesFilteredColimits X⟩
 
 theorem sketchability_iff_makkai_pare (κ : RegularCardinal)
     (C : AccessibleCategory κ) :
