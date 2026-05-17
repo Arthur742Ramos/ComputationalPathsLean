@@ -908,6 +908,68 @@ theorem correspondence_roundtrip_factored_steps
   simp [correspondence_roundtrip_trace, fieldToGroup_invariant, groupToField_invariant,
     Path.trans, Path.symm, Path.stepChain]
 
+/-- A finite-data Galois audit certificate: it records the extension datum,
+    a tower witness, direct and factored degree/order traces, a solvability
+    trace, and RwEq normalization of the factored computation. -/
+structure GaloisAuditCertificate where
+  datum : GaloisDatum
+  tower : ExtChain
+  directOrder : Path datum.ext.degree datum.galGrp.order
+  factoredOrder : Path datum.ext.degree datum.galGrp.order
+  solvabilityTrace : Path datum.solvability.isSolvable datum.solvability.allFactorsAbelian
+  normalizedOrder :
+    RwEq (Path.trans factoredOrder (Path.refl datum.galGrp.order)) factoredOrder
+
+/-- Q(√2)/Q certificate: the order computation is factored through the concrete
+    degree `2`, rather than exposed as only a hardcoded reflexive endpoint. -/
+noncomputable def sqrtTwoAuditCertificate : GaloisAuditCertificate :=
+  let datum := sqrtTwoExt
+  let degreeToTwo : Path datum.ext.degree 2 :=
+    Path.stepChain sqrt2_degree
+  let twoToOrder : Path 2 datum.galGrp.order :=
+    Path.symm (Path.stepChain sqrt2_gal_order)
+  let factored := Path.trans degreeToTwo twoToOrder
+  { datum := datum
+    tower := validChain 1 2
+    directOrder := galois_degree_order 2 true true
+    factoredOrder := factored
+    solvabilityTrace := Path.stepChain (by rfl)
+    normalizedOrder :=
+      RwEq.step
+        (ComputationalPaths.Path.Step.trans_refl_right factored) }
+
+theorem sqrtTwoAuditCertificate_factored_steps :
+    sqrtTwoAuditCertificate.factoredOrder.steps.length = 2 := by
+  simp [sqrtTwoAuditCertificate, Path.trans, Path.symm, Path.stepChain]
+
+/-- Quintic obstruction certificate: the non-abelian and non-solvable Boolean
+    codes are carried by the Galois datum and related by an explicit path. -/
+structure GaloisObstructionCertificate where
+  datum : GaloisDatum
+  orderWitness : Path datum.galGrp.order 120
+  nonAbelianWitness : Path datum.galGrp.isAbelian false
+  nonsolvableWitness : Path datum.solvability.isSolvable false
+  obstructionPath : Path datum.galGrp.isAbelian datum.solvability.isSolvable
+  normalizedObstruction :
+    RwEq (Path.trans obstructionPath (Path.refl datum.solvability.isSolvable))
+      obstructionPath
+
+noncomputable def quinticObstructionCertificate : GaloisObstructionCertificate :=
+  let datum := quinticExt
+  let obstruction := quintic_nonab_nonsolv
+  { datum := datum
+    orderWitness := Path.stepChain quintic_order
+    nonAbelianWitness := Path.stepChain (by rfl)
+    nonsolvableWitness := Path.stepChain quintic_not_solvable
+    obstructionPath := obstruction
+    normalizedObstruction :=
+      RwEq.step
+        (ComputationalPaths.Path.Step.trans_refl_right obstruction) }
+
+theorem quinticObstructionCertificate_order_steps :
+    quinticObstructionCertificate.orderWitness.steps.length = 1 := by
+  simp [quinticObstructionCertificate, Path.stepChain]
+
 noncomputable def correspondence_roundtrip_assoc_rweq
     (f : IntermediateField) (totalDeg : Nat) :
     RwEq

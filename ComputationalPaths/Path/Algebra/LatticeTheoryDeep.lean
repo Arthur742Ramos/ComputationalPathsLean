@@ -939,6 +939,145 @@ theorem hom_comp_cpath_factored_steps
   simp [hom_comp_cpath_trace, ComputationalPaths.Path.trans,
     ComputationalPaths.Path.stepChain]
 
+/-- The two-element bounded lattice used by the audit certificates. -/
+noncomputable def boolBoundedLattice : BoundedLattice Bool where
+  le := fun a b =>
+    match a, b with
+    | true, false => false
+    | _, _ => true
+  le_refl := by
+    intro a
+    cases a <;> rfl
+  le_trans := by
+    intro a b c hab hbc
+    cases a <;> cases b <;> cases c <;> simp at *
+  le_antisymm := by
+    intro a b hab hba
+    cases a <;> cases b <;> simp at *
+  meet := fun a b => a && b
+  join := fun a b => a || b
+  meet_comm := by
+    intro a b
+    cases a <;> cases b <;> rfl
+  join_comm := by
+    intro a b
+    cases a <;> cases b <;> rfl
+  meet_assoc := by
+    intro a b c
+    cases a <;> cases b <;> cases c <;> rfl
+  join_assoc := by
+    intro a b c
+    cases a <;> cases b <;> cases c <;> rfl
+  meet_idem := by
+    intro a
+    cases a <;> rfl
+  join_idem := by
+    intro a
+    cases a <;> rfl
+  absorb_mj := by
+    intro a b
+    cases a <;> cases b <;> rfl
+  absorb_jm := by
+    intro a b
+    cases a <;> cases b <;> rfl
+  bot := false
+  top := true
+  bot_le := by
+    intro a
+    cases a <;> rfl
+  le_top := by
+    intro a
+    cases a <;> rfl
+  bot_join := by
+    intro a
+    cases a <;> rfl
+  top_meet := by
+    intro a
+    cases a <;> rfl
+  bot_meet := by
+    intro a
+    cases a <;> rfl
+  top_join := by
+    intro a
+    cases a <;> rfl
+
+noncomputable def boolAbsorbEnv : Nat → Bool
+  | 0 => true
+  | _ => false
+
+def boolAbsorbSource : LTerm :=
+  .meetT (.var 0) (.joinT (.var 0) (.var 1))
+
+def boolAbsorbTarget : LTerm :=
+  .var 0
+
+/-- Concrete lattice-rewrite certificate replacing a bare reflexive example with
+    the source term, target term, valuation, local rewrite trace, project-level
+    factored trace, and RwEq normalization. -/
+structure LatticeTermCertificate where
+  sourceTerm : LTerm
+  targetTerm : LTerm
+  env : Nat → Bool
+  localRewrite :
+    Path Bool
+      (evalLTerm boolBoundedLattice env sourceTerm)
+      (evalLTerm boolBoundedLattice env targetTerm)
+  direct :
+    ComputationalPaths.Path
+      (evalLTerm boolBoundedLattice env sourceTerm)
+      (evalLTerm boolBoundedLattice env targetTerm)
+  factored :
+    ComputationalPaths.Path
+      (evalLTerm boolBoundedLattice env sourceTerm)
+      (evalLTerm boolBoundedLattice env targetTerm)
+  normalized :
+    CPathRwEq
+      (ComputationalPaths.Path.trans factored
+        (ComputationalPaths.Path.refl (evalLTerm boolBoundedLattice env targetTerm)))
+      factored
+
+noncomputable def boolAbsorbCertificate : LatticeTermCertificate :=
+  let source := boolAbsorbSource
+  let target := boolAbsorbTarget
+  let env := boolAbsorbEnv
+  let unfoldPath :
+      ComputationalPaths.Path
+        (evalLTerm boolBoundedLattice env source)
+        (boolBoundedLattice.meet (env 0) (boolBoundedLattice.join (env 0) (env 1))) :=
+    ComputationalPaths.Path.stepChain (by rfl)
+  let absorbPath :
+      ComputationalPaths.Path
+        (boolBoundedLattice.meet (env 0) (boolBoundedLattice.join (env 0) (env 1)))
+        (env 0) :=
+    ComputationalPaths.Path.stepChain
+      (boolBoundedLattice.absorb_mj (env 0) (env 1))
+  let refoldPath :
+      ComputationalPaths.Path
+        (env 0)
+        (evalLTerm boolBoundedLattice env target) :=
+    ComputationalPaths.Path.symm (ComputationalPaths.Path.stepChain (by rfl))
+  let factored :=
+    ComputationalPaths.Path.trans unfoldPath
+      (ComputationalPaths.Path.trans absorbPath refoldPath)
+  { sourceTerm := source
+    targetTerm := target
+    env := env
+    localRewrite := absorb_rewrite_path boolBoundedLattice env 0 1
+    direct := ComputationalPaths.Path.stepChain (by rfl)
+    factored := factored
+    normalized :=
+      CPathRwEq.step
+        (ComputationalPaths.Path.Step.trans_refl_right factored) }
+
+theorem boolAbsorbCertificate_local_steps :
+    boolAbsorbCertificate.localRewrite.length = 2 := by
+  simp [boolAbsorbCertificate, absorb_rewrite_path, Path.length]
+
+theorem boolAbsorbCertificate_factored_steps :
+    boolAbsorbCertificate.factored.steps.length = 3 := by
+  simp [boolAbsorbCertificate, ComputationalPaths.Path.trans,
+    ComputationalPaths.Path.symm, ComputationalPaths.Path.stepChain]
+
 noncomputable def hom_comp_cpath_assoc_rweq
     (L₁ L₂ L₃ : Lattice α) (f g : α → α)
     (hf : LatHom L₁ L₂ f) (hg : LatHom L₂ L₃ g) (a b : α) :

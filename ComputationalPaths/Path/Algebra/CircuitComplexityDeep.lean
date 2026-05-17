@@ -22,6 +22,17 @@ namespace CircuitComplexityDeep
 
 open ComputationalPaths
 
+universe u
+
+/-- Local rewrite equality for circuit audit certificates. It records the same
+    identity cleanup shape used by the project path-rewrite system, without
+    forcing this synthetic module to import the heavyweight normalization stack. -/
+inductive CircuitRwEq {A : Type u} {a b : A} : Path a b → Path a b → Type (u + 1) where
+  | refl (p : Path a b) : CircuitRwEq p p
+  | of_eq {p q : Path a b} : p = q → CircuitRwEq p q
+  | symm {p q : Path a b} : CircuitRwEq p q → CircuitRwEq q p
+  | trans {p q r : Path a b} : CircuitRwEq p q → CircuitRwEq q r → CircuitRwEq p r
+
 /-! ## Section 1: Boolean gate signatures -/
 
 inductive GateKind : Type where
@@ -814,5 +825,108 @@ noncomputable def thm108_transform_chain_roundtrip (p : CircuitProfile) :
       (composeTransform
         (thresholdLiftTransform p)
         (monotoneProjectionTransform p)).tag)
+
+/-! ## Section 9: Deep-audit certificates -/
+
+/-- A concrete NC-profile work certificate. The profile, expected work budget,
+    direct computation, factored computation through `CircuitProfile.work`, and
+    RwEq normalization are all retained as data. -/
+structure CircuitProfileCertificate where
+  profile : CircuitProfile
+  expectedWork : Nat
+  directWork : Path profile.work expectedWork
+  factoredWork : Path profile.work expectedWork
+  normalizedWork :
+    CircuitRwEq (Path.trans factoredWork (Path.refl expectedWork)) factoredWork
+
+noncomputable def ncProfileWorkCertificate (n : Nat) : CircuitProfileCertificate :=
+  let profile := ncProfile 2 n
+  let workUnfold : Path profile.work (profile.size + profile.depth) :=
+    Path.stepChain (by rfl)
+  let workCompute : Path (profile.size + profile.depth) (n * 3 + 3) :=
+    Path.stepChain (by simp [profile, ncProfile])
+  let factored := Path.trans workUnfold workCompute
+  { profile := profile
+    expectedWork := n * 3 + 3
+    directWork := Path.stepChain (by simp [profile, ncProfile, CircuitProfile.work])
+    factoredWork := factored
+    normalizedWork :=
+      CircuitRwEq.of_eq (by simp [Path.trans]) }
+
+theorem ncProfileWorkCertificate_factored_steps (n : Nat) :
+    (ncProfileWorkCertificate n).factoredWork.steps.length = 2 := by
+  simp [ncProfileWorkCertificate, Path.trans, Path.stepChain]
+
+/-- A lower-bound witness certificate carrying the Razborov-Smolensky parameters
+    and an explicit score trace rather than just a reflexive theorem-shaped name. -/
+structure LowerBoundScoreCertificate where
+  witness : LowerBoundWitness
+  expectedScore : Nat
+  directScore : Path witness.score expectedScore
+  factoredScore : Path witness.score expectedScore
+  normalizedScore :
+    CircuitRwEq (Path.trans factoredScore (Path.refl expectedScore)) factoredScore
+
+noncomputable def razborovScoreCertificate (n : Nat) : LowerBoundScoreCertificate :=
+  let witness := razborovSmolenskyWitness 3 2 n
+  let scoreUnfold :
+      Path witness.score (witness.witnessSize + witness.polynomialDegree + witness.Sym + witness.Gam) :=
+    Path.stepChain (by rfl)
+  let scoreCompute :
+      Path (witness.witnessSize + witness.polynomialDegree + witness.Sym + witness.Gam)
+        (n * (2 + 1) + 2 + 3 + n) :=
+    Path.stepChain (by simp [witness, razborovSmolenskyWitness, LowerBoundWitness.Sym, LowerBoundWitness.Gam])
+  let factored := Path.trans scoreUnfold scoreCompute
+  { witness := witness
+    expectedScore := n * (2 + 1) + 2 + 3 + n
+    directScore :=
+      Path.stepChain (by
+        simp [witness, razborovSmolenskyWitness, LowerBoundWitness.score,
+          LowerBoundWitness.Sym, LowerBoundWitness.Gam])
+    factoredScore := factored
+    normalizedScore :=
+      CircuitRwEq.of_eq (by simp [Path.trans]) }
+
+theorem razborovScoreCertificate_factored_steps (n : Nat) :
+    (razborovScoreCertificate n).factoredScore.steps.length = 2 := by
+  simp [razborovScoreCertificate, Path.trans, Path.stepChain]
+
+/-- Transformation-chain certificate for the depth-balance/de Morgan/threshold
+    pipeline. The tag `6` is reached through associativity plus computation. -/
+structure TransformChainCertificate where
+  profile : CircuitProfile
+  chain : CircuitTransform
+  expectedTag : Nat
+  directTag : Path chain.tag expectedTag
+  factoredTag : Path chain.tag expectedTag
+  normalizedTag :
+    CircuitRwEq (Path.trans factoredTag (Path.refl expectedTag)) factoredTag
+
+noncomputable def canonicalTransformCertificate (p : CircuitProfile) :
+    TransformChainCertificate :=
+  let balance := depthBalanceTransform p
+  let demorgan := deMorganTransform p
+  let threshold := thresholdLiftTransform p
+  let chain := composeTransform (composeTransform balance demorgan) threshold
+  let reassoc :
+      Path chain.tag (composeTransform balance (composeTransform demorgan threshold)).tag :=
+    thm100_compose_tag_assoc balance demorgan threshold
+  let compute :
+      Path (composeTransform balance (composeTransform demorgan threshold)).tag 6 :=
+    Path.stepChain (by
+      simp [balance, demorgan, threshold, composeTransform, depthBalanceTransform,
+        deMorganTransform, thresholdLiftTransform])
+  let factored := Path.trans reassoc compute
+  { profile := p
+    chain := chain
+    expectedTag := 6
+    directTag := thm106_balance_demorgan_threshold_tag p
+    factoredTag := factored
+    normalizedTag :=
+      CircuitRwEq.of_eq (by simp [Path.trans]) }
+
+theorem canonicalTransformCertificate_factored_steps (p : CircuitProfile) :
+    (canonicalTransformCertificate p).factoredTag.steps.length = 2 := by
+  simp [canonicalTransformCertificate, thm100_compose_tag_assoc, Path.trans, Path.stepChain]
 
 end CircuitComplexityDeep
