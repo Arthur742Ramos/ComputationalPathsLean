@@ -92,6 +92,8 @@ ComputationalPathsLean/
 │   └── archive/                      # Historical audits and run outputs
 ├── paper/                            # Paper/book source material; see paper/README.md
 └── scripts/
+    ├── check.ps1                     # Lightweight contributor validation for PowerShell
+    ├── check.sh                      # Lightweight contributor validation for Unix shells
     └── legacy/                       # Archived maintenance scripts
 ```
 
@@ -130,6 +132,21 @@ cd ComputationalPathsLean
 lake build
 ```
 
+For the lightweight contributor validation used by small docs or metadata PRs,
+run the platform wrapper for your shell:
+
+```bash
+# Windows / PowerShell
+scripts\check.ps1
+
+# Unix shells / GitHub Actions style runners
+scripts/check.sh
+```
+
+The wrappers run whitespace checks, print the pinned Lean version through Lake,
+and build `ComputationalPaths.Basic`. Use the full `lake build` command above
+when you need complete library validation.
+
 Optional (faster first build when available):
 
 ```bash
@@ -158,6 +175,9 @@ lake build ComputationalPaths.Path.OmegaGroupoid
 ### Useful maintenance checks
 
 ```bash
+# Run the lightweight contributor validation wrapper
+scripts/check.sh
+
 # Confirm the pinned Lean toolchain used by Lake
 lake -R --no-ansi env lean --version
 
@@ -187,7 +207,7 @@ documentation expectations, and PR guidance.
 - Keep new proofs `sorry`-free and avoid new global axioms.
 - If a development must rely on an axiom or assumption, document it and keep `docs/axioms.md` current.
 - Prefer `Path`/`RwEq`-based reasoning for equality developments.
-- Run `lake build` before opening a PR.
+- Run `scripts/check.ps1` or `scripts/check.sh` for lightweight PR validation; run `lake build` before opening PRs with Lean source changes when practical.
 - Keep canonical documentation under `docs/`; move historical audits or generated run logs to `docs/archive/` rather than leaving them in the repository root.
 
 ## Citation

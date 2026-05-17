@@ -12,6 +12,7 @@ index of every file.
 | `ComputationalPaths.Path` | `ComputationalPaths/Path.lean` | Broad computational-path umbrella | Pulls in the path core, rewrite infrastructure, homotopy interfaces, `CompPath` examples, omega-groupoid files, and many extended domain modules. |
 | `ComputationalPaths` | `ComputationalPaths.lean` | Full library root | Imports `ComputationalPaths.Basic`, `ComputationalPaths.Path`, and many top-level domain umbrellas. This is comprehensive, not minimal. |
 | `computational_paths` | `Main.lean` / `lakefile.lean` | Executable smoke entrypoint | Imports `ComputationalPaths.Basic` and prints the package version plus recommended core/full import entrypoints. |
+| `scripts/check.ps1`, `scripts/check.sh` | `scripts/` | Lightweight contributor validation | Run whitespace checks, report the pinned Lean version through Lake, and build `ComputationalPaths.Basic`; use full `lake build` separately for complete validation. |
 
 For examples, prefer a narrow import first:
 

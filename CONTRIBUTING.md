@@ -14,12 +14,19 @@ lake -R --no-ansi env lean --version
 lake build
 ```
 
-For quick metadata or documentation changes, this smaller check is usually
-enough before opening a PR:
+For quick metadata or documentation changes, use the lightweight validation
+wrapper for your shell before opening a PR:
 
 ```bash
-lake --no-ansi build ComputationalPaths.Basic
+# Windows / PowerShell
+scripts\check.ps1
+
+# Unix shells / GitHub Actions style runners
+scripts/check.sh
 ```
+
+These wrappers run `git diff --check`, print the pinned Lean version through
+Lake, and build `ComputationalPaths.Basic`.
 
 For Lean source changes, build the smallest affected module first, then run the
 full `lake build` when practical.
@@ -53,4 +60,3 @@ full `lake build` when practical.
 - If a PR is stacked on another branch or PR, state the stack in the PR body.
 - For docs-only or metadata-only PRs, avoid touching Lean source files.
 - Include the checks you ran in the PR body.
-
