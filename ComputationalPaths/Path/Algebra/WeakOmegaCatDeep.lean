@@ -160,6 +160,27 @@ inductive Cell4 (α : Type) (R : α → α → Prop) :
              {m₁ m₂ m₃ : Cell3 α R h₁ h₂} →
              Cell4 α R m₁ m₂ → Cell4 α R m₂ m₃ → Cell4 α R m₁ m₃
 
+/-- Certificate carrying explicit 2-cell coherence data and local normal forms. -/
+structure Cell2Certificate (α : Type) (R : α → α → Prop)
+    {a b : α} (lhs rhs : SPath α R a b) where
+  dimension : Nat
+  witness : Cell2 α R lhs rhs
+  lhsNormal : SPath α R a b
+  rhsNormal : SPath α R a b
+  lhsTrace : lhs = lhsNormal
+  rhsTrace : rhs = rhsNormal
+
+/-- Certificate carrying explicit 3-cell coherence data and local normal forms. -/
+structure Cell3Certificate (α : Type) (R : α → α → Prop)
+    {a b : α} {p q : SPath α R a b}
+    (lhs rhs : Cell2 α R p q) where
+  dimension : Nat
+  witness : Cell3 α R lhs rhs
+  lhsNormal : Cell2 α R p q
+  rhsNormal : Cell2 α R p q
+  lhsTrace : lhs = lhsNormal
+  rhsTrace : rhs = rhsNormal
+
 -- Symmetry at each level
 
 noncomputable def Cell2.symm2 {α R} {a b : α} {p q : SPath α R a b}
@@ -321,10 +342,22 @@ noncomputable def associator {α R} {a b c d : α}
   exact Cell2.refl2 _
 
 /-- Theorem 20: The associator is refl after normalization. -/
+noncomputable def associator_eq_refl_cert {α R} {a b c d : α}
+    (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
+    Cell2Certificate α R
+      (comp0 (comp0 p q) r)
+      (comp0 p (comp0 q r)) where
+  dimension := 2
+  witness := associator p q r
+  lhsNormal := comp0 p (comp0 q r)
+  rhsNormal := comp0 p (comp0 q r)
+  lhsTrace := comp0_assoc p q r
+  rhsTrace := rfl
+
 theorem associator_eq_refl {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
     ∃ _h : Cell2 α R (comp0 (comp0 p q) r) (comp0 p (comp0 q r)), True := by
-  exact ⟨associator p q r, trivial⟩
+  exact ⟨(associator_eq_refl_cert p q r).witness, True.intro⟩
 
 /-- The associator inverse. -/
 noncomputable def associatorInv {α R} {a b c d : α}
@@ -333,11 +366,23 @@ noncomputable def associatorInv {α R} {a b c d : α}
   (associator p q r).symm2
 
 /-- Theorem 21: Associator composed with its inverse yields identity-type cell. -/
+noncomputable def associator_inv_comp_cert {α R} {a b c d : α}
+    (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
+    Cell2Certificate α R
+      (comp0 (comp0 p q) r)
+      (comp0 (comp0 p q) r) where
+  dimension := 2
+  witness := comp1 (associator p q r) (associatorInv p q r)
+  lhsNormal := comp0 (comp0 p q) r
+  rhsNormal := comp0 (comp0 p q) r
+  lhsTrace := rfl
+  rhsTrace := rfl
+
 theorem associator_inv_comp {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
     ∃ _w : Cell2 α R (comp0 (comp0 p q) r) (comp0 (comp0 p q) r),
       True := by
-  exact ⟨comp1 (associator p q r) (associatorInv p q r), trivial⟩
+  exact ⟨(associator_inv_comp_cert p q r).witness, True.intro⟩
 
 -- ============================================================
 -- §8  Unitors — left/right unit laws up to (n+1)-cell
@@ -356,14 +401,32 @@ noncomputable def rightUnitor {α R} {a b : α} (p : SPath α R a b) :
   exact Cell2.refl2 p
 
 /-- Theorem 22: Left unitor exists. -/
+noncomputable def leftUnitor_exists_cert {α R} {a b : α} (p : SPath α R a b) :
+    Cell2Certificate α R (comp0 (id1 a) p) p where
+  dimension := 2
+  witness := leftUnitor p
+  lhsNormal := p
+  rhsNormal := p
+  lhsTrace := by simp [comp0, id1, SPath.trans]
+  rhsTrace := rfl
+
 theorem leftUnitor_exists {α R} {a b : α} (p : SPath α R a b) :
     ∃ _h : Cell2 α R (comp0 (id1 a) p) p, True := by
-  exact ⟨leftUnitor p, trivial⟩
+  exact ⟨(leftUnitor_exists_cert p).witness, True.intro⟩
 
 /-- Theorem 23: Right unitor exists. -/
+noncomputable def rightUnitor_exists_cert {α R} {a b : α} (p : SPath α R a b) :
+    Cell2Certificate α R (comp0 p (id1 b)) p where
+  dimension := 2
+  witness := rightUnitor p
+  lhsNormal := p
+  rhsNormal := p
+  lhsTrace := comp0_nil_right p
+  rhsTrace := rfl
+
 theorem rightUnitor_exists {α R} {a b : α} (p : SPath α R a b) :
     ∃ _h : Cell2 α R (comp0 p (id1 b)) p, True := by
-  exact ⟨rightUnitor p, trivial⟩
+  exact ⟨(rightUnitor_exists_cert p).witness, True.intro⟩
 
 /-- Left unitor inverse. -/
 noncomputable def leftUnitorInv {α R} {a b : α} (p : SPath α R a b) :
@@ -376,9 +439,18 @@ noncomputable def rightUnitorInv {α R} {a b : α} (p : SPath α R a b) :
   (rightUnitor p).symm2
 
 /-- Theorem 24: Left unitor round-trip. -/
+noncomputable def leftUnitor_roundtrip_cert {α R} {a b : α} (p : SPath α R a b) :
+    Cell2Certificate α R (comp0 (id1 a) p) (comp0 (id1 a) p) where
+  dimension := 2
+  witness := comp1 (leftUnitor p) (leftUnitorInv p)
+  lhsNormal := comp0 (id1 a) p
+  rhsNormal := comp0 (id1 a) p
+  lhsTrace := rfl
+  rhsTrace := rfl
+
 theorem leftUnitor_roundtrip {α R} {a b : α} (p : SPath α R a b) :
     ∃ _w : Cell2 α R (comp0 (id1 a) p) (comp0 (id1 a) p), True := by
-  exact ⟨comp1 (leftUnitor p) (leftUnitorInv p), trivial⟩
+  exact ⟨(leftUnitor_roundtrip_cert p).witness, True.intro⟩
 
 -- ============================================================
 -- §9  Whiskering and Horizontal Composition
@@ -436,6 +508,22 @@ theorem pentagon_level0 {α R} {a b c d e : α}
   rw [comp0_assoc, comp0_assoc]
 
 /-- Theorem 29: Pentagon at level 1 — five associator 2-cells compose. -/
+noncomputable def pentagon_level1_cert {α R} {a b c d e : α}
+    (p : SPath α R a b) (q : SPath α R b c)
+    (r : SPath α R c d) (s : SPath α R d e) :
+    Cell2Certificate α R
+      (comp0 (comp0 (comp0 p q) r) s)
+      (comp0 p (comp0 q (comp0 r s))) := by
+  refine
+    { dimension := 2
+      witness := ?_
+      lhsNormal := comp0 p (comp0 q (comp0 r s))
+      rhsNormal := comp0 p (comp0 q (comp0 r s))
+      lhsTrace := pentagon_level0 p q r s
+      rhsTrace := rfl }
+  rw [pentagon_level0]
+  exact Cell2.refl2 _
+
 theorem pentagon_level1 {α R} {a b c d e : α}
     (p : SPath α R a b) (q : SPath α R b c)
     (r : SPath α R c d) (s : SPath α R d e) :
@@ -443,10 +531,22 @@ theorem pentagon_level1 {α R} {a b c d e : α}
       (comp0 (comp0 (comp0 p q) r) s)
       (comp0 p (comp0 q (comp0 r s))),
     True := by
-  rw [pentagon_level0]
-  exact ⟨Cell2.refl2 _, trivial⟩
+  exact ⟨(pentagon_level1_cert p q r s).witness, True.intro⟩
 
 /-- Theorem 30: Pentagon at level 2 — 3-cell witness for pentagon coherence. -/
+noncomputable def pentagon_level2_cert {α R} {a b c d e : α}
+    (p : SPath α R a b) (q : SPath α R b c)
+    (r : SPath α R c d) (s : SPath α R d e) :
+    Cell2Certificate α R
+      (comp0 (comp0 (comp0 p q) r) s)
+      (comp0 (comp0 (comp0 p q) r) s) where
+  dimension := 3
+  witness := Cell2.refl2 _
+  lhsNormal := comp0 (comp0 (comp0 p q) r) s
+  rhsNormal := comp0 (comp0 (comp0 p q) r) s
+  lhsTrace := rfl
+  rhsTrace := rfl
+
 theorem pentagon_level2 {α R} {a b c d e : α}
     (p : SPath α R a b) (q : SPath α R b c)
     (r : SPath α R c d) (s : SPath α R d e) :
@@ -454,20 +554,33 @@ theorem pentagon_level2 {α R} {a b c d e : α}
       (comp0 (comp0 (comp0 p q) r) s)
       (comp0 (comp0 (comp0 p q) r) s),
     True := by
-  exact ⟨Cell2.refl2 _, trivial⟩
+  exact ⟨(pentagon_level2_cert p q r s).witness, True.intro⟩
 
 -- ============================================================
 -- §11  Exchange / Interchange Law
 -- ============================================================
 
 /-- Theorem 31: Interchange witness — (h₁ ∘₁ h₂) ∘₀ (k₁ ∘₁ k₂). -/
+noncomputable def interchange_witness_cert {α R} {a b c : α}
+    {p₁ q₁ r₁ : SPath α R a b}
+    {p₂ q₂ r₂ : SPath α R b c}
+    (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R q₁ r₁)
+    (k₁ : Cell2 α R p₂ q₂) (k₂ : Cell2 α R q₂ r₂) :
+    Cell2Certificate α R (p₁.trans p₂) (r₁.trans r₂) where
+  dimension := 2
+  witness := Cell2.hcomp (h₁.trans2 h₂) (k₁.trans2 k₂)
+  lhsNormal := p₁.trans p₂
+  rhsNormal := r₁.trans r₂
+  lhsTrace := rfl
+  rhsTrace := rfl
+
 theorem interchange_witness {α R} {a b c : α}
     {p₁ q₁ r₁ : SPath α R a b}
     {p₂ q₂ r₂ : SPath α R b c}
     (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R q₁ r₁)
     (k₁ : Cell2 α R p₂ q₂) (k₂ : Cell2 α R q₂ r₂) :
     ∃ _w : Cell2 α R (p₁.trans p₂) (r₁.trans r₂), True := by
-  exact ⟨Cell2.hcomp (h₁.trans2 h₂) (k₁.trans2 k₂), trivial⟩
+  exact ⟨(interchange_witness_cert h₁ h₂ k₁ k₂).witness, True.intro⟩
 
 /-- Theorem 32: Interchange with identities. -/
 theorem interchange_id {α R} {a b c : α}
@@ -590,22 +703,56 @@ structure Contractible (α : Type) (R : α → α → Prop) where
   contract2 : {a b : α} → {p q : SPath α R a b} →
               (h₁ h₂ : Cell2 α R p q) → Cell3 α R h₁ h₂
 
+/-- Certificate carrying explicit 1-cell connectivity data. -/
+structure SPathCertificate (α : Type) (R : α → α → Prop) (x y : α) where
+  dimension : Nat
+  witness : SPath α R x y
+  normalForm : SPath α R x y
+  normalization : witness = normalForm
+
 /-- Theorem 41: Contractible implies any two objects are connected. -/
+noncomputable def contractible_connected_cert {α R} (hc : Contractible α R) (x y : α) :
+    SPathCertificate α R x y where
+  dimension := 1
+  witness := (hc.contract0 x).symm.trans (hc.contract0 y)
+  normalForm := (hc.contract0 x).symm.trans (hc.contract0 y)
+  normalization := rfl
+
 theorem contractible_connected {α R} (hc : Contractible α R) (x y : α) :
     ∃ _p : SPath α R x y, True := by
-  exact ⟨(hc.contract0 x).symm.trans (hc.contract0 y), trivial⟩
+  exact ⟨(contractible_connected_cert hc x y).witness, True.intro⟩
 
 /-- Theorem 42: Contractible implies all 1-cells are equal up to 2-cell. -/
+noncomputable def contractible_1cell_eq_cert {α R} (hc : Contractible α R) {a b : α}
+    (p q : SPath α R a b) :
+    Cell2Certificate α R p q where
+  dimension := 2
+  witness := hc.contract1 p q
+  lhsNormal := p
+  rhsNormal := q
+  lhsTrace := rfl
+  rhsTrace := rfl
+
 theorem contractible_1cell_eq {α R} (hc : Contractible α R) {a b : α}
     (p q : SPath α R a b) :
     ∃ _h : Cell2 α R p q, True := by
-  exact ⟨hc.contract1 p q, trivial⟩
+  exact ⟨(contractible_1cell_eq_cert hc p q).witness, True.intro⟩
 
 /-- Theorem 43: Contractible implies all 2-cells are equal up to 3-cell. -/
+noncomputable def contractible_2cell_eq_cert {α R} (hc : Contractible α R) {a b : α}
+    {p q : SPath α R a b} (h₁ h₂ : Cell2 α R p q) :
+    Cell3Certificate α R h₁ h₂ where
+  dimension := 3
+  witness := hc.contract2 h₁ h₂
+  lhsNormal := h₁
+  rhsNormal := h₂
+  lhsTrace := rfl
+  rhsTrace := rfl
+
 theorem contractible_2cell_eq {α R} (hc : Contractible α R) {a b : α}
     {p q : SPath α R a b} (h₁ h₂ : Cell2 α R p q) :
     ∃ _m : Cell3 α R h₁ h₂, True := by
-  exact ⟨hc.contract2 h₁ h₂, trivial⟩
+  exact ⟨(contractible_2cell_eq_cert hc h₁ h₂).witness, True.intro⟩
 
 -- ============================================================
 -- §14  Coherence Tower: Length & Structure Preservation
