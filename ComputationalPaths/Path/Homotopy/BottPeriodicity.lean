@@ -189,11 +189,48 @@ noncomputable def psi_zero_path {M : Type u} {S : StrictMonoid M}
     Path (A.psi 0 (KTheory.zero S)) (KTheory.zero S) :=
   Path.stepChain A.psi_zero
 
+/-- Certificate for one Adams operation evaluation, including path algebra
+coherence for the recorded action path. -/
+structure ActionCertificate {M : Type u} (S : StrictMonoid M) where
+  /-- Adams operation being sampled. -/
+  operation : AdamsOperation S
+  /-- Adams index. -/
+  index : Nat
+  /-- Source K-theory class. -/
+  source : KTheory.K0 S
+  /-- Target K-theory class. -/
+  target : KTheory.K0 S
+  /-- Computational path witnessing the sampled action. -/
+  actionPath : Path (operation.psi index source) target
+  /-- Right-unit rewrite coherence for the action witness. -/
+  actionRightUnit : RwEq (Path.trans actionPath (Path.refl target)) actionPath
+  /-- Inverse-cancellation rewrite coherence for the action witness. -/
+  actionInverseCancel :
+    RwEq (Path.trans actionPath (Path.symm actionPath))
+      (Path.refl (operation.psi index source))
+
+/-- Build an Adams action certificate from an explicit target path. -/
+noncomputable def actionCertificate {M : Type u} {S : StrictMonoid M}
+    (A : AdamsOperation S) (k : Nat) (x y : KTheory.K0 S)
+    (p : Path (A.psi k x) y) : ActionCertificate S where
+  operation := A
+  index := k
+  source := x
+  target := y
+  actionPath := p
+  actionRightUnit := rweq_cmpA_refl_right p
+  actionInverseCancel := rweq_cmpA_inv_right p
+
 /-- The trivial Adams operation: all psi^k are the identity. -/
 noncomputable def trivial {M : Type u} (S : StrictMonoid M) : AdamsOperation S where
   psi := fun _ x => x
   psi_one := by intro _; rfl
   psi_zero := rfl
+
+/-- Concrete action certificate for the trivial Adams operation. -/
+noncomputable def trivialActionCertificate {M : Type u} (S : StrictMonoid M)
+    (k : Nat) (x : KTheory.K0 S) : ActionCertificate S :=
+  actionCertificate (trivial S) k x x (Path.stepChain rfl)
 
 end AdamsOperation
 
@@ -221,6 +258,47 @@ noncomputable def psi_thom_path {K B E V M : Type u} {S : StrictMonoid M}
     (C : CannibalisticClass (K := K) (B := B) (E := E) (V := V) (S := S)) :
     Path (C.adams.psi C.k C.thomClass) C.cannibalistic :=
   Path.stepChain C.psi_thom
+
+/-- Certificate for the cannibalistic-class Thom identity, retaining the
+sampled index and K-theory classes alongside path-algebra coherence. -/
+structure PsiThomCertificate {K B E V M : Type u} (S : StrictMonoid M)
+    (bundle : VectorBundle.VectorBundleData K B E V) where
+  /-- The cannibalistic class package being sampled. -/
+  classData : CannibalisticClass (K := K) (B := B) (E := E) (V := V) S
+  /-- Recorded Adams index. -/
+  index : Nat
+  /-- Recorded Thom class. -/
+  thom : KTheory.K0 S
+  /-- Recorded cannibalistic value. -/
+  target : KTheory.K0 S
+  /-- The class stores the same bundle as the certificate anchor. -/
+  bundlePath : Path classData.bundle bundle
+  /-- The stored index agrees with the recorded index. -/
+  indexPath : Path classData.k index
+  /-- The stored Thom class agrees with the recorded Thom class. -/
+  thomPath : Path classData.thomClass thom
+  /-- The stored target agrees with the recorded cannibalistic value. -/
+  targetPath : Path classData.cannibalistic target
+  /-- Computational path for `psi^k` applied to the Thom class. -/
+  psiPath : Path (classData.adams.psi classData.k classData.thomClass) classData.cannibalistic
+  /-- Rewrite coherence for composing the Thom path with a right unit. -/
+  psiRightUnit :
+    RwEq (Path.trans psiPath (Path.refl classData.cannibalistic)) psiPath
+
+/-- Build a Thom certificate from an existing cannibalistic class package. -/
+noncomputable def psiThomCertificate {K B E V M : Type u} {S : StrictMonoid M}
+    (C : CannibalisticClass (K := K) (B := B) (E := E) (V := V) (S := S)) :
+    PsiThomCertificate S C.bundle where
+  classData := C
+  index := C.k
+  thom := C.thomClass
+  target := C.cannibalistic
+  bundlePath := Path.refl _
+  indexPath := Path.refl _
+  thomPath := Path.refl _
+  targetPath := Path.refl _
+  psiPath := C.psi_thom_path
+  psiRightUnit := rweq_cmpA_refl_right C.psi_thom_path
 
 /-- Trivial cannibalistic class built from the zero Thom class. -/
 noncomputable def trivial {K B E V M : Type u} (S : StrictMonoid M)
@@ -382,7 +460,13 @@ noncomputable def trivial_psi_thom_path {K B E V M : Type u} (S : StrictMonoid M
         (CannibalisticClass.trivial S bundle).k
         (CannibalisticClass.trivial S bundle).thomClass)
       (CannibalisticClass.trivial S bundle).cannibalistic :=
-  Path.refl _
+  (psiThomCertificate (CannibalisticClass.trivial S bundle)).psiPath
+
+/-- Concrete certificate for the trivial cannibalistic class. -/
+noncomputable def trivial_psi_thom_certificate {K B E V M : Type u} (S : StrictMonoid M)
+    (bundle : VectorBundle.VectorBundleData K B E V) :
+    PsiThomCertificate S bundle :=
+  psiThomCertificate (CannibalisticClass.trivial S bundle)
 
 end CannibalisticClass
 
