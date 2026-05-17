@@ -664,15 +664,59 @@ noncomputable def bmorphism_comp {F1 F2 F3 : KripkeFrame}
 -- SECTION 15: Path coherence for frame properties
 -- ============================================================
 
+/-- Typed tag for frame properties, used to avoid string-only witnesses. -/
+inductive FramePropKind where
+  | reflexive
+  | transitive
+  | symmetric
+  | euclidean
+  | serial
+  | custom : String → FramePropKind
+  deriving DecidableEq, Repr
+
+noncomputable def FramePropKind.label : FramePropKind → String
+  | .reflexive => "reflexive"
+  | .transitive => "transitive"
+  | .symmetric => "symmetric"
+  | .euclidean => "euclidean"
+  | .serial => "serial"
+  | .custom n => n
+
 /-- Wrapper for frame property witnesses -/
 structure FramePropWitness where
   name : String
   holds : Prop
+  kind : FramePropKind := FramePropKind.custom name
 
 /-- Def 46: Path refl for frame property witnesses -/
 noncomputable def frame_prop_path_refl (w : FramePropWitness) :
     Path w w :=
   Path.refl w
+
+/-- Typed certificate for frame property witnesses with explicit path coherence. -/
+structure FramePropCertificate where
+  source : FramePropWitness
+  kindLabel : String
+  normalizedName : String
+  normalizedKind : FramePropKind
+  namePath : Path source.name normalizedName
+  kindPath : Path source.kind normalizedKind
+  witnessPath : Path source source
+
+noncomputable def FramePropWitness.certificate (w : FramePropWitness) : FramePropCertificate :=
+  { source := w
+    kindLabel := FramePropKind.label w.kind
+    normalizedName := w.name
+    normalizedKind := w.kind
+    namePath := Path.trans (Path.refl w.name) (Path.refl w.name)
+    kindPath := Path.trans (Path.refl w.kind) (Path.refl w.kind)
+    witnessPath := Path.trans (Path.refl w) (Path.refl w) }
+
+theorem frame_prop_certificate_kind_label (w : FramePropWitness) :
+    (w.certificate).kindLabel = FramePropKind.label w.kind := rfl
+
+theorem frame_prop_certificate_witnessPath (w : FramePropWitness) :
+    (w.certificate).witnessPath = Path.trans (Path.refl w) (Path.refl w) := rfl
 
 /-- Theorem 47: Trans-assoc for frame property paths -/
 theorem frame_prop_trans_assoc (a b c d : FramePropWitness)
