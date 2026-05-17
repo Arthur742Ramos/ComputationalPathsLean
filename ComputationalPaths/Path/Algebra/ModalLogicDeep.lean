@@ -708,15 +708,15 @@ noncomputable def FramePropWitness.certificate (w : FramePropWitness) : FramePro
     kindLabel := FramePropKind.label w.kind
     normalizedName := w.name
     normalizedKind := w.kind
-    namePath := Path.trans (Path.refl w.name) (Path.refl w.name)
-    kindPath := Path.trans (Path.refl w.kind) (Path.refl w.kind)
-    witnessPath := Path.trans (Path.refl w) (Path.refl w) }
+    namePath := Path.refl w.name
+    kindPath := Path.refl w.kind
+    witnessPath := Path.refl w }
 
 theorem frame_prop_certificate_kind_label (w : FramePropWitness) :
     (w.certificate).kindLabel = FramePropKind.label w.kind := rfl
 
 theorem frame_prop_certificate_witnessPath (w : FramePropWitness) :
-    (w.certificate).witnessPath = Path.trans (Path.refl w) (Path.refl w) := rfl
+    (w.certificate).witnessPath = Path.refl w := rfl
 
 /-- Theorem 47: Trans-assoc for frame property paths -/
 theorem frame_prop_trans_assoc (a b c d : FramePropWitness)
