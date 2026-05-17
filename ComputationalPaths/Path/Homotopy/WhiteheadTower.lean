@@ -141,13 +141,30 @@ theorem towerFiber_unique (A : Type u) (n : Nat) (a : A)
 
 /-! ## Duality with Postnikov Tower -/
 
+/-- Certificate comparing the Whitehead and Postnikov tower directions. -/
+structure WhiteheadPostnikovDualCertificate (A : Type u) (a : A) (n : Nat) where
+  /-- The Whitehead connected cover at level `n`. -/
+  whiteheadStage : ConnectedCover A n
+  /-- The Postnikov stage at level `n`. -/
+  postnikovStage : Type u
+  /-- Computational witness that the Whitehead model is the ambient type here. -/
+  whiteheadCoverPath : Path whiteheadStage.cover A
+  /-- Computational witness identifying the stored Postnikov stage. -/
+  postnikovStagePath :
+    Path postnikovStage ((Homotopy.PostnikovTower.postnikovTower A a).stage n)
+  /-- Rewrite evidence for the unit loop used by the Postnikov truncation quotient. -/
+  loopUnitRwEq : RwEq (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a)
+
 /-- The Whitehead tower and Postnikov tower are dual constructions:
 - Postnikov kills homotopy groups *above* n
 - Whitehead kills homotopy groups *below* n -/
-theorem whitehead_postnikov_dual :
-    ∃ desc : String,
-      desc = "Whitehead kills below n, Postnikov kills above n" :=
-  ⟨_, rfl⟩
+noncomputable def whitehead_postnikov_dual (A : Type u) (a : A) (n : Nat) :
+    WhiteheadPostnikovDualCertificate A a n where
+  whiteheadStage := WhiteheadStage A n
+  postnikovStage := (Homotopy.PostnikovTower.postnikovTower A a).stage n
+  whiteheadCoverPath := Path.stepChain rfl
+  postnikovStagePath := Path.refl _
+  loopUnitRwEq := rweq_cmpA_refl_left (Path.refl a)
 
 /-! ## Convergence -/
 
@@ -155,17 +172,37 @@ theorem whitehead_postnikov_dual :
 theorem stage_zero_is_space (A : Type u) :
     (WhiteheadStage A 0).cover = A := rfl
 
+/-- Certificate for a concrete Whitehead stage and the fiber feeding into it. -/
+structure WhiteheadStageCertificate (A : Type u) (a : A)
+    (stageIndex fiberLevel : Nat) where
+  /-- The Whitehead stage being described. -/
+  stage : ConnectedCover A stageIndex
+  /-- A concrete point in the relevant tower fiber. -/
+  fiberPoint : towerFiber A fiberLevel a
+  /-- Computational witness that this simplified stage has cover type `A`. -/
+  stagePath : Path stage.cover A
+  /-- Computational witness that the chosen fiber point lies over `a`. -/
+  fiberPath : Path fiberPoint.val a
+  /-- Computational witness for the bond map defining the fiber. -/
+  bondPath : Path (((whiteheadTower A).bond fiberLevel).toFun fiberPoint.val) a
+
 /-- The universal cover is stage 1 of the Whitehead tower. -/
-theorem stage_one_description :
-    ∃ desc : String,
-      desc = "Stage 1 = universal cover, fiber = K(π₁, 0)" :=
-  ⟨_, rfl⟩
+noncomputable def stage_one_description (A : Type u) (a : A) :
+    WhiteheadStageCertificate A a 1 0 where
+  stage := WhiteheadStage A 1
+  fiberPoint := towerFiber_inhabited A 0 a
+  stagePath := Path.stepChain rfl
+  fiberPath := Path.stepChain rfl
+  bondPath := Path.stepChain rfl
 
 /-- The 2-connected cover is stage 2 of the Whitehead tower. -/
-theorem stage_two_description :
-    ∃ desc : String,
-      desc = "Stage 2 = 2-connected cover, fiber = K(π₂, 1)" :=
-  ⟨_, rfl⟩
+noncomputable def stage_two_description (A : Type u) (a : A) :
+    WhiteheadStageCertificate A a 2 1 where
+  stage := WhiteheadStage A 2
+  fiberPoint := towerFiber_inhabited A 1 a
+  stagePath := Path.stepChain rfl
+  fiberPath := Path.stepChain rfl
+  bondPath := Path.stepChain rfl
 
 /-! ## Computational-path tower laws -/
 

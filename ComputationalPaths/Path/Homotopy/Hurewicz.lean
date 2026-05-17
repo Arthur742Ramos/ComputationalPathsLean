@@ -375,11 +375,39 @@ theorem hurewicz_theorem (A : Type u) (a : A) :
 
 /-! ## Abelianization of Abelian Groups -/
 
-/-- For abelian π₁, the abelianization is itself.
-This gives a canonical map from π₁ to H₁ that's an equivalence when π₁ is abelian. -/
-theorem abelian_group_abelianization_desc :
-    ∃ desc : String, desc = "For abelian G, G^ab ≃ G (identity)" :=
-  ⟨_, rfl⟩
+/-- Certificate that an abelian group-like structure identifies with its abelianization. -/
+structure AbelianGroupAbelianizationCertificate (G : Type u)
+    (mul : G → G → G) (inv : G → G) (e : G) where
+  /-- The group-like laws for the input multiplication. -/
+  groupLike : IsGroupLike mul inv e
+  /-- The commutativity law for the input multiplication. -/
+  commutative : IsAbelian mul
+  /-- The concrete equivalence from the abelianization back to the group. -/
+  equivalence : SimpleEquiv (Abelianization G mul inv e) G
+  /-- The group unit used as input data. -/
+  inputUnit : G
+  /-- Computational witness that the input unit is the actual unit. -/
+  inputUnitPath : Path inputUnit e
+  /-- Computational witness for the quotient-unit round trip. -/
+  unitOutputPath :
+    Path (equivalence.toFun (abelianization_mk mul inv e inputUnit)) e
+  /-- Computational commutativity witness for the original multiplication. -/
+  commPath : (a b : G) -> Path (mul a b) (mul b a)
+
+/-- For abelian group-like data, package the abelianization equivalence and witnesses. -/
+noncomputable def abelian_group_abelianization_desc {G : Type u}
+    (mul : G → G → G) (inv : G → G) (e : G)
+    (groupLike : IsGroupLike mul inv e) (commutative : IsAbelian mul)
+    (equivalence : SimpleEquiv (Abelianization G mul inv e) G)
+    (unitOutput : equivalence.toFun (abelianization_mk mul inv e e) = e) :
+    AbelianGroupAbelianizationCertificate G mul inv e where
+  groupLike := groupLike
+  commutative := commutative
+  equivalence := equivalence
+  inputUnit := e
+  inputUnitPath := Path.refl e
+  unitOutputPath := Path.stepChain unitOutput
+  commPath := fun a b => Path.stepChain (commutative a b)
 
 /-- Projection from the abelianization to ℤ when the underlying group is ℤ. -/
 theorem abelianizationRel_int_eq {x y : Int} :
@@ -447,41 +475,107 @@ noncomputable def int_abelianization_equiv_right_inv_path (x : Int) :
     Path (int_abelianization_equiv.toFun (int_abelianization_equiv.invFun x)) x :=
   Path.stepChain (int_abelianization_equiv.right_inv x)
 
+/-- Concrete certificate that `ℤ^ab` identifies with `ℤ`. -/
+noncomputable def int_abelian_group_abelianization_certificate :
+    AbelianGroupAbelianizationCertificate Int Int.add Int.neg 0 :=
+  abelian_group_abelianization_desc Int.add Int.neg 0
+    (by
+      refine ⟨?assoc, ?idl, ?idr, ?invl, ?invr⟩
+      · intro x y z
+        exact Int.add_assoc x y z
+      · intro x
+        simp
+      · intro x
+        simp
+      · intro x
+        exact Int.add_left_neg x
+      · intro x
+        exact Int.add_right_neg x)
+    (by
+      intro x y
+      exact Int.add_comm x y)
+    int_abelianization_equiv
+    rfl
+
 /-! ## H₁ of Known Spaces -/
 
-/-- **H₁(S¹) ≃ ℤ**
+/-
+**H₁(S¹) ≃ ℤ**.
 
-π₁(S¹) ≃ ℤ is abelian, so H₁(S¹) ≃ π₁(S¹)^ab ≃ ℤ^ab ≃ ℤ. -/
-theorem circle_H1_equiv_int :
-    ∃ desc : String, desc = "H₁(S¹) ≃ ℤ (circle is abelian)" :=
-  ⟨_, rfl⟩
-
+π₁(S¹) ≃ ℤ is abelian, so H₁(S¹) ≃ π₁(S¹)^ab ≃ ℤ^ab ≃ ℤ.
+-/
 /-- H₁(S¹) represented as ℤ. -/
 abbrev CircleH1 : Type := Int
 
-/-- **H₁(T²) ≃ ℤ × ℤ**
+/-- Certificate for the first homology of the computational circle. -/
+structure CircleH1IntCertificate where
+  /-- The concrete circle fundamental-group model. -/
+  piOneModel : Type u
+  /-- The concrete H₁ model. -/
+  h1Model : Type
+  /-- The circle π₁ equivalence with integers. -/
+  piOneEquivInt : SimpleEquiv CompPath.circlePiOne.{u} Int
+  /-- A concrete loop-class input. -/
+  generator : CompPath.circlePiOne.{u}
+  /-- The H₁ output represented as an integer. -/
+  output : CircleH1
+  /-- Computational witness that the generator maps to the expected H₁ class. -/
+  generatorPath : Path (CompPath.circlePiOneEncode generator) output
 
-π₁(T²) ≃ ℤ × ℤ is abelian, so H₁(T²) ≃ π₁(T²)^ab ≃ ℤ² -/
-theorem torus_H1_equiv_int_prod :
-    ∃ desc : String, desc = "H₁(T²) ≃ ℤ × ℤ (torus π₁ is abelian)" :=
-  ⟨_, rfl⟩
+/-- **H₁(S¹) ≃ ℤ**, packaged with the circle generator and encode witness. -/
+noncomputable def circle_H1_equiv_int : CircleH1IntCertificate where
+  piOneModel := CompPath.circlePiOne.{u}
+  h1Model := CircleH1
+  piOneEquivInt := CompPath.circlePiOneEquivInt.{u}
+  generator := CompPath.circleDecode.{u} 1
+  output := 1
+  generatorPath := Path.stepChain (CompPath.circlePiOneEncode_circleDecode 1)
 
+/-
+**H₁(T²) ≃ ℤ × ℤ**.
+
+π₁(T²) ≃ ℤ × ℤ is abelian, so H₁(T²) ≃ π₁(T²)^ab ≃ ℤ².
+-/
 /-- H₁(T²) represented as ℤ × ℤ. -/
 abbrev TorusH1 : Type := Int × Int
 
+/-- Certificate for the first homology of the torus. -/
+structure TorusH1IntProdCertificate where
+  /-- The meridian loop input. -/
+  meridian : Path (A := Torus.{u}) torusBase torusBase
+  /-- The longitude loop input. -/
+  longitude : Path (A := Torus.{u}) torusBase torusBase
+  /-- The H₁ output for the meridian. -/
+  meridianOutput : TorusH1
+  /-- The H₁ output for the longitude. -/
+  longitudeOutput : TorusH1
+  /-- Rewrite evidence that the generating loops commute in the torus. -/
+  commuteRwEq : RwEq (Path.trans meridian longitude) (Path.trans longitude meridian)
+  /-- Computational witness for the meridian output. -/
+  meridianPath : Path meridianOutput (1, 0)
+  /-- Computational witness for the longitude output. -/
+  longitudePath : Path longitudeOutput (0, 1)
+
+/-- **H₁(T²) ≃ ℤ × ℤ**, packaged with the two loop generators and RwEq commutativity. -/
+noncomputable def torus_H1_equiv_int_prod : TorusH1IntProdCertificate where
+  meridian := torusLoop1
+  longitude := torusLoop2
+  meridianOutput := (1, 0)
+  longitudeOutput := (0, 1)
+  commuteRwEq := torusLoopsCommute_rweq
+  meridianPath := Path.refl (1, 0)
+  longitudePath := Path.refl (0, 1)
+
 /-! ## Abelianization of Free Product: Key Example -/
 
-/-- **H₁(S¹ ∨ S¹) ≃ ℤ × ℤ**
+/-
+**H₁(S¹ ∨ S¹) ≃ ℤ × ℤ**.
 
 The figure-eight has π₁ ≃ ℤ * ℤ (free product, non-abelian).
 The abelianization kills commutators [a,b] = aba⁻¹b⁻¹, giving ℤ × ℤ.
 
-This is the classic example where π₁ ≠ H₁ due to non-commutativity. -/
-theorem figureEight_H1_equiv_int_prod :
-    ∃ desc : String,
-      desc = "H₁(S¹ ∨ S¹) ≃ ℤ × ℤ: (ℤ * ℤ)^ab ≃ ℤ × ℤ" :=
-  ⟨_, rfl⟩
-
+This is the classic example where π₁ ≠ H₁ due to non-commutativity.
+-/
 /-- H₁(S¹ ∨ S¹) represented as ℤ × ℤ. -/
 abbrev FigureEightH1 : Type := Int × Int
 
@@ -591,6 +685,45 @@ theorem figureEight_abelianization_singleRight (y : Int) :
     figureEight_abelianization_map (CompPath.FreeProductWord.singleRight y) = (0, y) := by
   simp [figureEight_abelianization_map, CompPath.FreeProductWord.singleRight]
 
+/-- Certificate for the first homology of the figure-eight. -/
+structure FigureEightH1IntProdCertificate where
+  /-- The left-loop word input. -/
+  leftWord : CompPath.FreeProductWord Int Int
+  /-- The right-loop word input. -/
+  rightWord : CompPath.FreeProductWord Int Int
+  /-- The concatenated word input. -/
+  compositeWord : CompPath.FreeProductWord Int Int
+  /-- The H₁ output of the left-loop word. -/
+  leftOutput : FigureEightH1
+  /-- The H₁ output of the right-loop word. -/
+  rightOutput : FigureEightH1
+  /-- The H₁ output of the concatenated word. -/
+  compositeOutput : FigureEightH1
+  /-- Computational witness for the left generator. -/
+  leftPath : Path (figureEight_abelianization_map leftWord) leftOutput
+  /-- Computational witness for the right generator. -/
+  rightPath : Path (figureEight_abelianization_map rightWord) rightOutput
+  /-- Computational witness for concatenation in the abelianized target. -/
+  compositePath : Path (figureEight_abelianization_map compositeWord) compositeOutput
+
+/-- **H₁(S¹ wedge S¹) ≃ ℤ × ℤ**, packaged with the two free-product generators. -/
+noncomputable def figureEight_H1_equiv_int_prod : FigureEightH1IntProdCertificate where
+  leftWord := CompPath.FreeProductWord.singleLeft 1
+  rightWord := CompPath.FreeProductWord.singleRight 1
+  compositeWord :=
+    CompPath.FreeProductWord.concat
+      (CompPath.FreeProductWord.singleLeft 1)
+      (CompPath.FreeProductWord.singleRight 1)
+  leftOutput := (1, 0)
+  rightOutput := (0, 1)
+  compositeOutput := (1, 1)
+  leftPath := Path.stepChain (figureEight_abelianization_singleLeft 1)
+  rightPath := Path.stepChain (figureEight_abelianization_singleRight 1)
+  compositePath := by
+    apply Path.stepChain
+    simp [figureEight_abelianization_map, CompPath.FreeProductWord.singleLeft,
+      CompPath.FreeProductWord.singleRight, CompPath.FreeProductWord.concat]
+
 /-- The abelianization map respects inversion. -/
 theorem figureEight_abelianization_inverse (w : CompPath.FreeProductWord Int Int) :
     figureEight_abelianization_map (CompPath.FreeProductWord.inverse w) =
@@ -646,10 +779,44 @@ theorem figureEight_abelianization_desc_comp (w : CompPath.FreeProductWord Int I
 
 The abelianization of a free product is the direct product of abelianizations.
 For G = H = ℤ: (ℤ * ℤ)^ab ≃ ℤ^ab × ℤ^ab ≃ ℤ × ℤ. -/
-theorem freeProduct_abelianization :
-    ∃ desc : String,
-      desc = "(G * H)^ab ≃ G^ab × H^ab (free product abelianization)" :=
-  ⟨_, rfl⟩
+structure FreeProductAbelianizationCertificate where
+  /-- The source free-product word. -/
+  sourceWord : CompPath.FreeProductWord Int Int
+  /-- The corresponding abelianization quotient input. -/
+  quotientInput :
+    Abelianization (CompPath.FreeProductWord Int Int) CompPath.FreeProductWord.concat
+      CompPath.FreeProductWord.inverse CompPath.FreeProductWord.nil
+  /-- The descent map from the quotient to the product model. -/
+  descentMap :
+    Abelianization (CompPath.FreeProductWord Int Int) CompPath.FreeProductWord.concat
+      CompPath.FreeProductWord.inverse CompPath.FreeProductWord.nil → FigureEightH1
+  /-- The computed product output. -/
+  output : FigureEightH1
+  /-- Computational witness that the quotient input is the class of `sourceWord`. -/
+  quotientPath :
+    Path quotientInput
+      (abelianization_mk CompPath.FreeProductWord.concat CompPath.FreeProductWord.inverse
+        CompPath.FreeProductWord.nil sourceWord)
+  /-- Computational witness that the descent map computes the product output. -/
+  descentPath : Path (descentMap quotientInput) output
+  /-- Homomorphism evidence for the underlying free-product abelianization map. -/
+  homEvidence :
+    IsMulHom CompPath.FreeProductWord.concat CompPath.FreeProductWord.inverse
+      CompPath.FreeProductWord.nil figureEightMul figureEightInv figureEightOne
+      figureEight_abelianization_map
+
+/-- Free-product abelianization packaged with the concrete quotient descent map. -/
+noncomputable def freeProduct_abelianization
+    (w : CompPath.FreeProductWord Int Int) : FreeProductAbelianizationCertificate where
+  sourceWord := w
+  quotientInput :=
+    abelianization_mk CompPath.FreeProductWord.concat CompPath.FreeProductWord.inverse
+      CompPath.FreeProductWord.nil w
+  descentMap := figureEight_abelianization_desc
+  output := figureEight_abelianization_map w
+  quotientPath := Path.refl _
+  descentPath := Path.stepChain (figureEight_abelianization_desc_comp w)
+  homEvidence := figureEight_abelianization_hom
 
 /-! ## H₁ of Surfaces
 

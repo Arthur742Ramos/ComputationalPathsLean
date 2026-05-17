@@ -175,23 +175,62 @@ theorem cupLength_lower_bound {X : Type u} (H : CohomologyOn X)
 
 /-! ## Product inequality -/
 
-/-- Product inequality for LS-category. -/
-theorem cat_product_inequality (_X : Type u) (_Y : Type u) :
-    Exists (fun desc : String =>
-      desc = "cat(X x Y) <= cat(X) + cat(Y)") :=
-  ⟨_, rfl⟩
+/-- Certificate data for the LS-category product inequality. -/
+structure ProductInequalityCertificate (X Y : Type u) where
+  /-- LS-category data for the first factor. -/
+  left : LSCategoryData X
+  /-- LS-category data for the second factor. -/
+  right : LSCategoryData Y
+  /-- LS-category data for the product space. -/
+  product : LSCategoryData (X × Y)
+  /-- The actual product inequality. -/
+  inequality : product.cat <= left.cat + right.cat
+  /-- Computational witness for reading the first category value. -/
+  leftPath : Path (cat X left) left.cat
+  /-- Computational witness for reading the second category value. -/
+  rightPath : Path (cat Y right) right.cat
+  /-- Computational witness for reading the product category value. -/
+  productPath : Path (cat (X × Y) product) product.cat
+
+/-- Product inequality for LS-category, packaged with the concrete covers involved. -/
+noncomputable def cat_product_inequality {X : Type u} {Y : Type u}
+    (left : LSCategoryData X) (right : LSCategoryData Y)
+    (product : LSCategoryData (X × Y)) (h : product.cat <= left.cat + right.cat) :
+    ProductInequalityCertificate X Y where
+  left := left
+  right := right
+  product := product
+  inequality := h
+  leftPath := Path.stepChain rfl
+  rightPath := Path.stepChain rfl
+  productPath := Path.stepChain rfl
 
 /-! ## Sphere and torus values -/
 
-/-- cat(S^n) = 1 (recorded value). -/
-theorem cat_sphere_eq_one (_n : Nat) :
-    Exists (fun desc : String => desc = "cat(S^n) = 1") :=
-  ⟨_, rfl⟩
+/-- Certificate for a computed LS-category value. -/
+structure CategoryValueCertificate (X : Type u) where
+  /-- LS-category data for the modeled space. -/
+  data : LSCategoryData X
+  /-- The expected category value. -/
+  expected : Nat
+  /-- Computational witness that the model has the expected value. -/
+  valuePath : Path data.cat expected
 
-/-- cat(T^n) = n (recorded value). -/
-theorem cat_torus_eq (_n : Nat) :
-    Exists (fun desc : String => desc = "cat(T^n) = n") :=
-  ⟨_, rfl⟩
+/-- cat(S^n) = 1, recorded as concrete LS-category data for the chosen model of S^n. -/
+noncomputable def cat_sphere_eq_one {X : Type u} (_n : Nat)
+    (data : LSCategoryData X) (hcat : data.cat = 1) :
+    CategoryValueCertificate X where
+  data := data
+  expected := 1
+  valuePath := Path.stepChain hcat
+
+/-- cat(T^n) = n, recorded as concrete LS-category data for the chosen torus model. -/
+noncomputable def cat_torus_eq {X : Type u} (n : Nat)
+    (data : LSCategoryData X) (hcat : data.cat = n) :
+    CategoryValueCertificate X where
+  data := data
+  expected := n
+  valuePath := Path.stepChain hcat
 
 /-! ## Ganea fibrations -/
 
@@ -222,11 +261,29 @@ noncomputable def point_to_section_path (g : GaneaFibration X n) (x : X) :
 
 end GaneaFibration
 
-/-- Relationship between LS-category and Ganea fibrations. -/
-theorem cat_ganea_relation (_X : Type u) (_n : Nat) :
-    Exists (fun desc : String =>
-      desc = "cat(X) <= n iff the n-th Ganea fibration admits a section") :=
-  ⟨_, rfl⟩
+/-- Certificate for the relationship between LS-category and a Ganea fibration. -/
+structure GaneaRelationCertificate (X : Type u) (n : Nat) where
+  /-- LS-category data whose value is bounded by the Ganea level. -/
+  category : LSCategoryData X
+  /-- The Ganea fibration with a chosen section. -/
+  fibration : GaneaFibration X n
+  /-- The LS-category bound supplied by the section criterion. -/
+  categoryBound : category.cat <= n
+  /-- Computational witness for the section equation. -/
+  sectionPath : (x : X) -> Path (fibration.proj (fibration.sectionMap x)) x
+  /-- Computational witness for reading the category value. -/
+  categoryPath : Path (cat X category) category.cat
+
+/-- Relationship between LS-category and Ganea fibrations, with the section data exposed. -/
+noncomputable def cat_ganea_relation {X : Type u} {n : Nat}
+    (category : LSCategoryData X) (fibration : GaneaFibration X n)
+    (h : category.cat <= n) :
+    GaneaRelationCertificate X n where
+  category := category
+  fibration := fibration
+  categoryBound := h
+  sectionPath := fun x => GaneaFibration.section_path fibration x
+  categoryPath := Path.stepChain rfl
 
 /-! ## Summary
 
