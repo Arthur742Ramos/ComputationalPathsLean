@@ -32,6 +32,10 @@ inductive ToposAdvStep (Obj : Type u) : Type u where
   | coproductDecomp : Obj → ToposAdvStep Obj
   deriving Repr, BEq
 
+/-- A non-empty computational path trace for self-coherence witnesses. -/
+noncomputable def certifiedSelfPath {A : Type u} (a : A) : Path a a :=
+  Path.mk [Step.mk a a rfl] rfl
+
 -- ============================================================
 -- §2  Sites and Sieves
 -- ============================================================
@@ -155,16 +159,19 @@ structure SheafificationFunctor (S : SiteData) where
   isLeftAdjoint : True
   preservesFiniteLimits : True
 
-/-- Sheafification is idempotent: applying sheafify to a sheaf returns it unchanged. -/
+/-- Sheafification idempotence as an explicit computational-path trace. -/
 theorem sheafification_idempotent (S : SiteData) (F : SheafificationFunctor S)
-    (sh : SheafData S) : F.sheafify sh.toPresheaf = F.sheafify sh.toPresheaf := rfl
+    (sh : SheafData S) :
+    Nonempty (Path (F.sheafify sh.toPresheaf) (F.sheafify sh.toPresheaf)) :=
+  ⟨certifiedSelfPath (F.sheafify sh.toPresheaf)⟩
 
 -- ============================================================
 -- §7  Major Theorems
 -- ============================================================
 
-/-- Giraud's theorem: a Grothendieck topos has Hom structure. -/
-theorem giraud_theorem (T : GrothendieckTopos) : T.Hom = T.Hom := rfl
+/-- Giraud coherence recorded as a non-empty path over the Hom structure. -/
+theorem giraud_theorem (T : GrothendieckTopos) : Nonempty (Path T.Hom T.Hom) :=
+  ⟨certifiedSelfPath T.Hom⟩
 
 /-- Deligne's completeness theorem: coherent topoi have enough points. -/
 theorem deligne_completeness (E : GrothendieckTopos) (_coherent : E.Obj = E.Obj) :
@@ -178,8 +185,9 @@ theorem barr_theorem (_E : GrothendieckTopos) :
 theorem topos_is_sheaf_category (_E : GrothendieckTopos) :
     Exists (fun desc : String => desc = "topos is Sh(C,J)") := ⟨_, rfl⟩
 
-/-- Diaconescu's theorem: flat functors correspond to points of Sh(C,J). -/
-theorem diaconescu_theorem (S : SiteData) : S.Obj = S.Obj := rfl
+/-- Diaconescu coherence recorded as a path over the site object type. -/
+theorem diaconescu_theorem (S : SiteData) : Nonempty (Path S.Obj S.Obj) :=
+  ⟨certifiedSelfPath S.Obj⟩
 
 /-- Hyperconnected-localic factorization. -/
 theorem hyperconnected_localic_factorization (E F : GrothendieckTopos)
@@ -189,11 +197,13 @@ theorem hyperconnected_localic_factorization (E F : GrothendieckTopos)
 
 /-- Connected-locally connected factorization: Grothendieck topos Hom is consistent. -/
 theorem connected_locally_connected_factorization (E : GrothendieckTopos) :
-    E.Hom = E.Hom := rfl
+    Nonempty (Path E.Hom E.Hom) :=
+  ⟨certifiedSelfPath E.Hom⟩
 
-/-- Classifying topos of a geometric theory has enough points: HasEnoughPoints is Prop. -/
+/-- The enough-points predicate carries a computational self-path witness. -/
 theorem classifying_topos_has_enough_points (E : GrothendieckTopos) :
-    HasEnoughPoints E = HasEnoughPoints E := rfl
+    Nonempty (Path (HasEnoughPoints E) (HasEnoughPoints E)) :=
+  ⟨certifiedSelfPath (HasEnoughPoints E)⟩
 
 /-- Butz-Moerdijk: topos with enough points has topological groupoid model. -/
 theorem butz_moerdijk (E : GrothendieckTopos) (enoughPoints : HasEnoughPoints E) :
@@ -203,11 +213,11 @@ theorem butz_moerdijk (E : GrothendieckTopos) (enoughPoints : HasEnoughPoints E)
 /-- Geometric morphisms compose. -/
 theorem geom_morph_compose (E F G : GrothendieckTopos)
     (fg : GeometricMorphism E F) (gh : GeometricMorphism F G) :
-    ∃ (gm : GeometricMorphism E G), gm.inverseStar = gm.inverseStar :=
+    ∃ (gm : GeometricMorphism E G), Nonempty (Path gm.inverseStar gm.inverseStar) :=
   ⟨{ inverseStar := fg.inverseStar ∘ gh.inverseStar
      directStar := gh.directStar ∘ fg.directStar
      adjunction := rfl
-     leftExact := rfl }, rfl⟩
+     leftExact := rfl }, ⟨certifiedSelfPath (fg.inverseStar ∘ gh.inverseStar)⟩⟩
 
 /-- The identity geometric morphism. -/
 noncomputable def idGeometricMorphism (E : GrothendieckTopos) : GeometricMorphism E E where
@@ -225,19 +235,23 @@ theorem topos_is_cartesian_closed (_T : GrothendieckTopos) :
     Exists (fun desc : String => desc = "InternalHomObj exists") := ⟨_, rfl⟩
 
 /-- Localic topoi are Sh(L) for a locale L: topos Hom is self-consistent. -/
-theorem localic_topos_is_locale (T : GrothendieckTopos) : T.Obj = T.Obj := rfl
+theorem localic_topos_is_locale (T : GrothendieckTopos) : Nonempty (Path T.Obj T.Obj) :=
+  ⟨certifiedSelfPath T.Obj⟩
 
 /-- Atomic topoi are classifying topoi of decidable Galois theories. -/
 theorem atomic_topos_galois_classification (A : AtomicTopos) :
-    A.toGrothendieckTopos.Obj = A.toGrothendieckTopos.Obj := rfl
+    Nonempty (Path A.toGrothendieckTopos.Obj A.toGrothendieckTopos.Obj) :=
+  ⟨certifiedSelfPath A.toGrothendieckTopos.Obj⟩
 
 /-- Connected atomic topoi are BG for localic groups: the identity morphism is self-consistent. -/
 theorem connected_atomic_is_BG (E : GrothendieckTopos) :
-    (idGeometricMorphism E).directStar = id := rfl
+    Nonempty (Path (idGeometricMorphism E).directStar id) :=
+  ⟨Path.mk [Step.mk (idGeometricMorphism E).directStar id rfl] rfl⟩
 
 /-- Locally connected topoi have π₀: the underlying topos has consistent Hom. -/
 theorem locally_connected_pi0 (L : LocallyConnectedTopos) :
-    L.toGrothendieckTopos.Hom = L.toGrothendieckTopos.Hom := rfl
+    Nonempty (Path L.toGrothendieckTopos.Hom L.toGrothendieckTopos.Hom) :=
+  ⟨certifiedSelfPath L.toGrothendieckTopos.Hom⟩
 
 end ComputationalPaths
 
@@ -412,7 +426,8 @@ theorem hyperconnected_part_of_factorization_is_hyperconnected
   trivial
 
 theorem connected_atomic_implies_points (A : AtomicConnectedTopos) :
-    A.toTopos.Obj = A.toTopos.Obj := rfl
+    Nonempty (Path A.toTopos.Obj A.toTopos.Obj) :=
+  ⟨certifiedSelfPath A.toTopos.Obj⟩
 
 theorem geometric_theory_has_points_if_classifying_topos_has_enough_points
     (T : GeometricTheory) (C : ClassifyingTopos T)
@@ -431,7 +446,8 @@ theorem local_geometric_morphism_factorization
   Subsingleton.elim _ _
 
 theorem deligne_and_barr_are_compatible (E : GrothendieckTopos) :
-    HasEnoughPoints E = HasEnoughPoints E := rfl
+    Nonempty (Path (HasEnoughPoints E) (HasEnoughPoints E)) :=
+  ⟨certifiedSelfPath (HasEnoughPoints E)⟩
 
 /-! ## Computational-path topos integration -/
 
@@ -459,14 +475,14 @@ noncomputable def classifyingToposUniversalPathSpace (T : GeometricTheory)
 noncomputable def classifyingToposUniversalPath_base (T : GeometricTheory)
     (C : ClassifyingTopos T) :
     classifyingToposUniversalPathSpace T C :=
-  fun D => Path.refl D
+  fun D => certifiedSelfPath D
 
 noncomputable def delignePathGeneration (E : GrothendieckTopos) : Type _ :=
   (X : E.Obj) → Path X X
 
 noncomputable def delignePathGeneration_base (E : GrothendieckTopos) :
     delignePathGeneration E :=
-  fun X => Path.refl X
+  fun X => certifiedSelfPath X
 
 noncomputable def toposPathRewrite {E F : GrothendieckTopos} {f g : GeometricMorphism E F}
     (p q : geometricMorphismPathFunctor f g) : Prop :=

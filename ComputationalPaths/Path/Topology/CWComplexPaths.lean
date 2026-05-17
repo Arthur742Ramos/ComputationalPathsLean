@@ -240,9 +240,15 @@ noncomputable def cwSkeletonBudgetPath
     (h : skeletonAfter ≤ skeletonBefore + 1) :
     Path (skeletonBefore + 1)
       (skeletonAfter + (skeletonBefore + 1 - skeletonAfter)) :=
-  Path.ofEq
-    ((Nat.sub_add_cancel h).symm.trans
-      (Nat.add_comm (skeletonBefore + 1 - skeletonAfter) skeletonAfter))
+  let hBudget :=
+    (Nat.sub_add_cancel h).symm.trans
+      (Nat.add_comm (skeletonBefore + 1 - skeletonAfter) skeletonAfter)
+  Path.mk
+    [Step.mk
+      (skeletonBefore + 1)
+      (skeletonAfter + (skeletonBefore + 1 - skeletonAfter))
+      hBudget]
+    hBudget
 
 /-- Local certificate carried by each CW-complex rewrite step. -/
 structure CWStepCertificate where

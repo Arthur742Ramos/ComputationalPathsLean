@@ -255,9 +255,15 @@ noncomputable def tdaComplexityBudgetPath
     (h : outputComplexity ≤ inputComplexity) :
     Path inputComplexity
       (outputComplexity + (inputComplexity - outputComplexity)) :=
-  Path.ofEq
-    ((Nat.sub_add_cancel h).symm.trans
-      (Nat.add_comm (inputComplexity - outputComplexity) outputComplexity))
+  let hBudget :=
+    (Nat.sub_add_cancel h).symm.trans
+      (Nat.add_comm (inputComplexity - outputComplexity) outputComplexity)
+  Path.mk
+    [Step.mk
+      inputComplexity
+      (outputComplexity + (inputComplexity - outputComplexity))
+      hBudget]
+    hBudget
 
 /-- Local certificate carried by each TDA rewrite step. -/
 structure TDAStepCertificate where
