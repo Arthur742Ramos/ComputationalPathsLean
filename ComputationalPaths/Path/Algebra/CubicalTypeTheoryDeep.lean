@@ -10,6 +10,7 @@ All proofs are fully explicit and use computational-path primitives only.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -34,7 +35,7 @@ noncomputable def Sym {A : Type u} {a b : A} (p : Path a b) : Path b a :=
   Path.symm p
 
 noncomputable def seg : Path i0 i1 :=
-  Path.mk [Step.mk i0 i1 rfl] rfl
+  Path.mk [ComputationalPaths.Step.mk i0 i1 rfl] rfl
 
 noncomputable def segSym : Path i1 i0 :=
   Sym seg
@@ -46,7 +47,7 @@ noncomputable def segLoop1 : Path i1 i1 :=
   Path.trans segSym seg
 
 def interval_thm01_seg_steps :
-    seg.steps = [Step.mk i0 i1 rfl] := rfl
+    seg.steps = [ComputationalPaths.Step.mk i0 i1 rfl] := rfl
 
 theorem interval_thm02_seg_toEq :
     Path.toEq seg = rfl := rfl
@@ -221,10 +222,30 @@ noncomputable def filling (B : KanBox) : Cube :=
   B.front
 
 noncomputable def compPath (B : KanBox) : Path (composition B) (filling B) :=
-  Path.mk [Step.mk (composition B) (filling B) rfl] rfl
+  Path.mk [ComputationalPaths.Step.mk (composition B) (filling B) rfl] rfl
 
 noncomputable def fillPath (B : KanBox) : Path (filling B) (composition B) :=
   Path.symm (compPath B)
+
+/-! ### Wave-two anchor evidence for Kan composition -/
+
+/-- Kan composition packaged with concrete filler paths and inverse-cancellation `RwEq`. -/
+structure KanCompositionAnchor (B : KanBox) where
+  comp : Path (composition B) (filling B)
+  fill : Path (filling B) (composition B)
+  comp_def : comp = compPath B
+  fill_def : fill = fillPath B
+  cancellationRw : RwEq (Path.trans comp fill) (Path.refl (composition B))
+
+/-- Canonical Kan anchor for any box, using `compPath` and its symmetry as data. -/
+noncomputable def kanCompositionAnchor (B : KanBox) : KanCompositionAnchor B where
+  comp := compPath B
+  fill := fillPath B
+  comp_def := rfl
+  fill_def := rfl
+  cancellationRw := by
+    unfold fillPath
+    exact rweq_cmpA_inv_right (compPath B)
 
 theorem kan_thm31_composition_eq_filling (B : KanBox) :
     composition B = filling B := rfl
@@ -270,7 +291,8 @@ theorem kan_thm40_fillPath_def (B : KanBox) :
     fillPath B = Path.symm (compPath B) := rfl
 
 def kan_thm41_compPath_steps (B : KanBox) :
-    (compPath B).steps = [Step.mk (composition B) (filling B) rfl] := rfl
+    (compPath B).steps =
+      [ComputationalPaths.Step.mk (composition B) (filling B) rfl] := rfl
 
 theorem kan_thm42_comp_fill_toEq (B : KanBox) :
     Path.toEq (Path.trans (compPath B) (fillPath B)) = rfl := by
@@ -298,6 +320,26 @@ noncomputable def reflEquiv (A : Type u) : EquivData A A where
 noncomputable def reflGlue (A : Type u) : GlueType A A where
   equiv := reflEquiv A
   uaPath := Path.refl A
+
+/-! ### Wave-two anchor evidence for Glue/univalence witnesses -/
+
+/-- Glue data enriched with explicit carrier and computational path coherences. -/
+structure GlueAnchor (A : Type u) where
+  glue : GlueType A A
+  carrier : Type u
+  uaPath : Path A A
+  ua_def : uaPath = glue.uaPath
+  leftUnitRw : RwEq (Path.trans (Path.refl A) uaPath) uaPath
+  cancelRw : RwEq (Path.trans uaPath (Path.symm uaPath)) (Path.refl A)
+
+/-- Reflexive Glue anchor with concrete `RwEq` witnesses. -/
+noncomputable def reflGlueAnchor (A : Type u) : GlueAnchor A where
+  glue := reflGlue A
+  carrier := Sum A A
+  uaPath := (reflGlue A).uaPath
+  ua_def := rfl
+  leftUnitRw := rweq_cmpA_refl_left (reflGlue A).uaPath
+  cancelRw := rweq_cmpA_inv_right (reflGlue A).uaPath
 
 abbrev Gam (A : Type u) := Nat → A
 
@@ -410,13 +452,35 @@ inductive Circle : Type where
 noncomputable def circleBase : Circle := Circle.base
 
 noncomputable def circleLoop : Path circleBase circleBase :=
-  Path.mk [Step.mk circleBase circleBase rfl] rfl
+  Path.mk [ComputationalPaths.Step.mk circleBase circleBase rfl] rfl
 
 noncomputable def circleLoop2 : Path circleBase circleBase :=
   Path.trans circleLoop circleLoop
 
 noncomputable def circleLoopInv : Path circleBase circleBase :=
   Path.symm circleLoop
+
+/-- Circle loop data with explicit double-loop and cancellation witnesses. -/
+structure CircleLoopAnchor where
+  loop : Path circleBase circleBase
+  doubleLoop : Path circleBase circleBase
+  inverseLoop : Path circleBase circleBase
+  double_def : doubleLoop = Path.trans loop loop
+  inverse_def : inverseLoop = Path.symm loop
+  rightUnitRw : RwEq (Path.trans loop (Path.refl circleBase)) loop
+  cancelRw : RwEq (Path.trans loop inverseLoop) (Path.refl circleBase)
+
+/-- Concrete circle anchor replacing a bare one-step loop with computational evidence. -/
+noncomputable def circleLoopAnchor : CircleLoopAnchor where
+  loop := circleLoop
+  doubleLoop := circleLoop2
+  inverseLoop := circleLoopInv
+  double_def := rfl
+  inverse_def := rfl
+  rightUnitRw := rweq_cmpA_refl_right circleLoop
+  cancelRw := by
+    unfold circleLoopInv
+    exact rweq_cmpA_inv_right circleLoop
 
 theorem hit_thm62_circleLoop_toEq :
     Path.toEq circleLoop = rfl := rfl
@@ -462,14 +526,41 @@ inductive Torus : Type where
 noncomputable def torusBase : Torus := Torus.base
 
 noncomputable def torusMerid : Path torusBase torusBase :=
-  Path.mk [Step.mk torusBase torusBase rfl] rfl
+  Path.mk [ComputationalPaths.Step.mk torusBase torusBase rfl] rfl
 
 noncomputable def torusLong : Path torusBase torusBase :=
   torusMerid
 
 noncomputable def torusComm :
     Path (Path.trans torusMerid torusLong) (Path.trans torusLong torusMerid) :=
-  Path.mk [Step.mk (Path.trans torusMerid torusLong) (Path.trans torusLong torusMerid) rfl] rfl
+  Path.mk
+    [ComputationalPaths.Step.mk (Path.trans torusMerid torusLong)
+      (Path.trans torusLong torusMerid) rfl]
+    rfl
+
+/-- Torus commutator data with concrete meridian/longitude paths and rewrites. -/
+structure TorusCommutatorAnchor where
+  meridian : Path torusBase torusBase
+  longitude : Path torusBase torusBase
+  lhs : Path torusBase torusBase
+  rhs : Path torusBase torusBase
+  commutator : Path lhs rhs
+  lhs_def : lhs = Path.trans meridian longitude
+  rhs_def : rhs = Path.trans longitude meridian
+  commUnitRw : RwEq (Path.trans (Path.refl lhs) commutator) commutator
+  meridianCancelRw : RwEq (Path.trans meridian (Path.symm meridian)) (Path.refl torusBase)
+
+/-- Concrete torus commutator anchor for the collapsed torus presentation in this file. -/
+noncomputable def torusCommutatorAnchor : TorusCommutatorAnchor where
+  meridian := torusMerid
+  longitude := torusLong
+  lhs := Path.trans torusMerid torusLong
+  rhs := Path.trans torusLong torusMerid
+  commutator := torusComm
+  lhs_def := rfl
+  rhs_def := rfl
+  commUnitRw := rweq_cmpA_refl_left torusComm
+  meridianCancelRw := rweq_cmpA_inv_right torusMerid
 
 theorem hit_thm70_torusMerid_symm_symm :
     Path.symm (Path.symm torusMerid) = torusMerid :=
@@ -526,10 +617,26 @@ noncomputable def north {A : Type u} : Susp A := Susp.pt
 noncomputable def south {A : Type u} : Susp A := Susp.pt
 
 noncomputable def suspMerid {A : Type u} (_a : A) : Path (north (A := A)) (south (A := A)) :=
-  Path.mk [Step.mk (north (A := A)) (south (A := A)) rfl] rfl
+  Path.mk [ComputationalPaths.Step.mk (north (A := A)) (south (A := A)) rfl] rfl
 
 noncomputable def suspLoop {A : Type u} (a b : A) : Path (north (A := A)) (north (A := A)) :=
   Path.trans (suspMerid a) (Path.symm (suspMerid b))
+
+/-- Suspension data with a chosen meridian and its computational loop contraction. -/
+structure SuspensionAnchor (A : Type u) where
+  meridianWitness : A
+  meridian : Path (north (A := A)) (south (A := A))
+  loopAtNorth : Path (north (A := A)) (north (A := A))
+  loop_def : loopAtNorth = Path.trans meridian (Path.symm meridian)
+  cancelRw : RwEq (Path.trans meridian (Path.symm meridian)) (Path.refl (north (A := A)))
+
+/-- Bool suspension anchor with a concrete selected meridian. -/
+noncomputable def suspensionBoolAnchor : SuspensionAnchor Bool where
+  meridianWitness := true
+  meridian := suspMerid true
+  loopAtNorth := suspLoop true true
+  loop_def := rfl
+  cancelRw := rweq_cmpA_inv_right (suspMerid true)
 
 theorem susp_thm80_merid_toEq {A : Type u} (a : A) :
     Path.toEq (suspMerid a) = rfl := rfl

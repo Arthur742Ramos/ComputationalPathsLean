@@ -18,6 +18,7 @@ decidable-equality witnesses.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -44,7 +45,8 @@ noncomputable def i1 : I := I.pt
 theorem I_eq (x y : I) : x = y := by cases x; cases y; rfl
 
 /-- Canonical step on the interval. -/
-noncomputable def iStep : Step I := Step.mk i0 i1 (I_eq i0 i1)
+noncomputable def iStep : ComputationalPaths.Step I :=
+  ComputationalPaths.Step.mk i0 i1 (I_eq i0 i1)
 
 /-- Canonical path on the interval. -/
 noncomputable def iPath : Path i0 i1 := Path.mk [iStep] (I_eq i0 i1)
@@ -210,6 +212,45 @@ noncomputable def kanFillNat : Square
     (Path.refl 0) :=
   kanFill (Path.refl 0) (Path.refl 0) (Path.refl 0)
 
+/-! ### Wave-two anchor evidence for Kan fillers -/
+
+/-- A Kan filler with its boundary paths and a computational rewrite witness.
+    This strengthens the proof-level `Square` with explicit `RwEq` evidence. -/
+structure KanFillerWitness {A : Type u} {a b c : A} where
+  top : Path a b
+  right : Path b c
+  left : Path a c
+  filler : Square (Path.trans top right) left
+  boundaryRw : RwEq (Path.trans top right) left
+
+/-- Bool Kan filler anchored by concrete unit reduction data. -/
+noncomputable def kanFillerBoolWitness :
+    KanFillerWitness (A := Bool) (a := true) (b := true) (c := true) where
+  top := Path.refl true
+  right := Path.refl true
+  left := Path.refl true
+  filler := kanFillBool
+  boundaryRw := rweq_cmpA_refl_left (Path.refl true)
+
+/-- Nat Kan filler anchored by concrete unit reduction data. -/
+noncomputable def kanFillerNatWitness :
+    KanFillerWitness (A := Nat) (a := 0) (b := 0) (c := 0) where
+  top := Path.refl 0
+  right := Path.refl 0
+  left := Path.refl 0
+  filler := kanFillNat
+  boundaryRw := rweq_cmpA_refl_left (Path.refl 0)
+
+/-- The Bool Kan filler square and its rewrite witness have the same boundary proof. -/
+theorem kanFillerBoolWitness_sound :
+    rweq_toEq kanFillerBoolWitness.boundaryRw = kanFillerBoolWitness.filler.eq := by
+  apply Subsingleton.elim
+
+/-- The Nat Kan filler square and its rewrite witness have the same boundary proof. -/
+theorem kanFillerNatWitness_sound :
+    rweq_toEq kanFillerNatWitness.boundaryRw = kanFillerNatWitness.filler.eq := by
+  apply Subsingleton.elim
+
 /-- Filling uniqueness on Bool. -/
 theorem kanFill_unique_bool
     (s : Square (Path.trans (Path.refl true) (Path.refl true)) (Path.refl true)) :
@@ -347,10 +388,12 @@ theorem transport_line_trans {A : Type u} {D : A → Sort u} {a b c : A}
 /-! ## Section 9 — Concrete Bool paths with Step.mk -/
 
 /-- Step from true to true. -/
-noncomputable def stepBoolTT : Step Bool := Step.mk true true rfl
+noncomputable def stepBoolTT : ComputationalPaths.Step Bool :=
+  ComputationalPaths.Step.mk true true rfl
 
 /-- Step from false to false. -/
-noncomputable def stepBoolFF : Step Bool := Step.mk false false rfl
+noncomputable def stepBoolFF : ComputationalPaths.Step Bool :=
+  ComputationalPaths.Step.mk false false rfl
 
 /-- Path from true to true via a step. -/
 noncomputable def pathBoolTT : Path true true := Path.mk [stepBoolTT] rfl
@@ -366,7 +409,7 @@ theorem pathBoolTT_trans :
 
 /-- Symmetry of Bool path. -/
 def pathBoolTT_symm :
-    Path.symm pathBoolTT = Path.mk [Step.symm stepBoolTT] rfl := by
+    Path.symm pathBoolTT = Path.mk [ComputationalPaths.Step.symm stepBoolTT] rfl := by
   simp [pathBoolTT, Path.symm, stepBoolTT]
 
 /-- Path from true via step has correct proof. -/
@@ -378,10 +421,12 @@ theorem pathBoolFF_proof : pathBoolFF.proof = rfl := rfl
 /-! ## Section 10 — Concrete Nat paths with Step.mk -/
 
 /-- Step from 0 to 0. -/
-noncomputable def stepNat00 : Step Nat := Step.mk 0 0 rfl
+noncomputable def stepNat00 : ComputationalPaths.Step Nat :=
+  ComputationalPaths.Step.mk 0 0 rfl
 
 /-- Step from 42 to 42. -/
-noncomputable def stepNat42 : Step Nat := Step.mk 42 42 rfl
+noncomputable def stepNat42 : ComputationalPaths.Step Nat :=
+  ComputationalPaths.Step.mk 42 42 rfl
 
 /-- Path from 0 to 0 via a step. -/
 noncomputable def pathNat00 : Path (0 : Nat) 0 := Path.mk [stepNat00] rfl
@@ -397,7 +442,7 @@ theorem pathNat00_trans :
 
 /-- Symmetry of Nat path. -/
 def pathNat00_symm :
-    Path.symm pathNat00 = Path.mk [Step.symm stepNat00] rfl := by
+    Path.symm pathNat00 = Path.mk [ComputationalPaths.Step.symm stepNat00] rfl := by
   simp [pathNat00, Path.symm, stepNat00]
 
 /-- Path from 0 has correct proof. -/
@@ -405,6 +450,44 @@ theorem pathNat00_proof : pathNat00.proof = rfl := rfl
 
 /-- Path from 42 has correct proof. -/
 theorem pathNat42_proof : pathNat42.proof = rfl := rfl
+
+/-! ## Section 10.5 — Wave-two connection and degeneracy anchors -/
+
+/-- A right connection together with the rewrite evidence that contracts it. -/
+structure ConnectionAnchor {A : Type u} {a b : A} (p : Path a b) where
+  square : Square (Path.trans p (Path.refl b)) p
+  unitRw : RwEq (Path.trans p (Path.refl b)) p
+  cancelRw : RwEq (Path.trans p (Path.symm p)) (Path.refl a)
+
+/-- Bool connection anchored by the non-empty `pathBoolTT` trace. -/
+noncomputable def connectionBoolAnchor : ConnectionAnchor pathBoolTT where
+  square := connection_and pathBoolTT
+  unitRw := rweq_cmpA_refl_right pathBoolTT
+  cancelRw := rweq_cmpA_inv_right pathBoolTT
+
+/-- Nat connection anchored by the non-empty `pathNat00` trace. -/
+noncomputable def connectionNatAnchor : ConnectionAnchor pathNat00 where
+  square := connection_and pathNat00
+  unitRw := rweq_cmpA_refl_right pathNat00
+  cancelRw := rweq_cmpA_inv_right pathNat00
+
+/-- A degeneracy certificate that keeps both a concrete trace and unit-rewrite evidence. -/
+structure DegeneracyAnchor {A : Type u} (a : A) where
+  base : Path a a
+  square : Square base (Path.refl a)
+  leftUnitRw : RwEq (Path.trans (Path.refl a) base) base
+
+/-- Bool degeneracy anchored by the one-step trace rather than `True`/`trivial`. -/
+noncomputable def degeneracyBoolAnchor : DegeneracyAnchor true where
+  base := pathBoolTT
+  square := ⟨by apply Subsingleton.elim⟩
+  leftUnitRw := rweq_cmpA_refl_left pathBoolTT
+
+/-- Nat degeneracy anchored by the one-step trace rather than `True`/`trivial`. -/
+noncomputable def degeneracyNatAnchor : DegeneracyAnchor (0 : Nat) where
+  base := pathNat00
+  square := ⟨by apply Subsingleton.elim⟩
+  leftUnitRw := rweq_cmpA_refl_left pathNat00
 
 /-! ## Section 11 — Pentagon coherence for fourfold composition -/
 
@@ -425,6 +508,36 @@ theorem comp4_proof_eq {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
     (comp4L p q r s).proof = (comp4R p q r s).proof := by
   apply Subsingleton.elim
+
+/-- Computational rewrite route from left-nested to right-nested fourfold composition. -/
+noncomputable def comp4_rweq {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
+    RwEq (comp4L p q r s) (comp4R p q r s) :=
+  RwEq.trans
+    (rweq_tt (Path.trans p q) r s)
+    (rweq_tt p q (Path.trans r s))
+
+/-- Pentagon witness carrying both proof-level route equality and concrete `RwEq`. -/
+structure PentagonAnchor {A : Type u} {a b c d e : A}
+    (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) where
+  reassocRw : RwEq (comp4L p q r s) (comp4R p q r s)
+  routeEq : Path.trans_assoc_fourfold p q r s =
+    Path.trans_assoc_fourfold_alt p q r s
+  traceEq : (comp4L p q r s).steps = (comp4R p q r s).steps
+
+/-- Bool pentagon anchor with an explicit reassociation rewrite chain. -/
+noncomputable def pentagonBoolAnchor :
+    PentagonAnchor (Path.refl true) (Path.refl true) (Path.refl true) (Path.refl true) where
+  reassocRw := comp4_rweq (Path.refl true) (Path.refl true) (Path.refl true) (Path.refl true)
+  routeEq := by apply Subsingleton.elim
+  traceEq := by simp [comp4L, comp4R, Path.trans]
+
+/-- Nat pentagon anchor with an explicit reassociation rewrite chain. -/
+noncomputable def pentagonNatAnchor :
+    PentagonAnchor (Path.refl (0 : Nat)) (Path.refl 0) (Path.refl 0) (Path.refl 0) where
+  reassocRw := comp4_rweq (Path.refl (0 : Nat)) (Path.refl 0) (Path.refl 0) (Path.refl 0)
+  routeEq := by apply Subsingleton.elim
+  traceEq := by simp [comp4L, comp4R, Path.trans]
 
 /-- Pentagon coherence: the two reassociation routes agree. -/
 theorem pentagon_coherence {A : Type u} {a b c d e : A}
