@@ -16,6 +16,7 @@ All equalities are expressed with `Path` and computational path combinators.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -23,6 +24,49 @@ namespace Algebra
 namespace MotivicCohomologyDeep
 
 universe u
+
+/-- Certificate bundling a labeled reflexive computational path with
+rewrite-equivalence coherence to canonical reflexivity. -/
+structure ReflexivePathCertificate (A : Type u) where
+  payload : A
+  label : String
+  witness : Path payload payload
+  witnessNonempty : witness.steps ≠ []
+  coherenceToRefl : RwEq witness (Path.refl payload)
+
+namespace ReflexivePathCertificate
+
+noncomputable def tracedSelfPath {A : Type u} (x : A) : Path x x :=
+  Path.stepChain (rfl : x = x)
+
+noncomputable def compositeSelfPath {A : Type u} (x : A) : Path x x :=
+  Path.trans (tracedSelfPath x) (Path.symm (tracedSelfPath x))
+
+theorem compositeSelfPath_nonempty {A : Type u} (x : A) :
+    (compositeSelfPath x).steps ≠ [] := by
+  simp [compositeSelfPath, tracedSelfPath]
+
+noncomputable def compositeSelfPath_coherence {A : Type u} (x : A) :
+    RwEq (compositeSelfPath x) (Path.refl x) := by
+  simpa [compositeSelfPath, tracedSelfPath] using
+    (rweq_cmpA_inv_right (A := A) (a := x) (b := x) (tracedSelfPath x))
+
+noncomputable def build {A : Type u} (label : String) (x : A) :
+    ReflexivePathCertificate A where
+  payload := x
+  label := label
+  witness := compositeSelfPath x
+  witnessNonempty := compositeSelfPath_nonempty x
+  coherenceToRefl := compositeSelfPath_coherence x
+
+noncomputable def path {A : Type u} (label : String) (x : A) : Path x x :=
+  (build label x).witness
+
+noncomputable def coherence {A : Type u} (label : String) (x : A) :
+    RwEq (path label x) (Path.refl x) :=
+  (build label x).coherenceToRefl
+
+end ReflexivePathCertificate
 
 /-! ## Section 1: Smooth schemes and Bloch higher Chow data -/
 
@@ -92,10 +136,10 @@ noncomputable def chowBoundary (C : BlochHigherChowData α) : BlochHigherChowDat
   coefficientTag := C.coefficientTag
 
 noncomputable def chowReflPath (C : BlochHigherChowData α) : Path C C :=
-  Path.refl C
+  ReflexivePathCertificate.path "chow-refl" C
 
 noncomputable def chowTwoStepPath (C : BlochHigherChowData α) : Path C C :=
-  Path.trans (Path.refl C) (Path.refl C)
+  ReflexivePathCertificate.path "chow-two-step" C
 
 noncomputable def chowTransportName (C : BlochHigherChowData α) : String :=
   C.scheme.label ++ ":" ++ C.coefficientTag
@@ -124,12 +168,13 @@ theorem chowBoundary_level (C : BlochHigherChowData α) :
 theorem chowBoundary_nonneg (C : BlochHigherChowData α) :
     0 ≤ (chowBoundary C).simplicialLevel := Nat.zero_le _
 
-theorem chowReflPath_refl (C : BlochHigherChowData α) :
-    chowReflPath C = Path.refl C := rfl
+noncomputable def chowReflPath_refl (C : BlochHigherChowData α) :
+    RwEq (chowReflPath C) (Path.refl C) :=
+  ReflexivePathCertificate.coherence "chow-refl" C
 
-theorem chowTwoStepPath_eq_refl (C : BlochHigherChowData α) :
-    chowTwoStepPath C = Path.refl C := by
-  simp [chowTwoStepPath]
+noncomputable def chowTwoStepPath_eq_refl (C : BlochHigherChowData α) :
+    RwEq (chowTwoStepPath C) (Path.refl C) :=
+  ReflexivePathCertificate.coherence "chow-two-step" C
 
 theorem chowTransportName_eq (C : BlochHigherChowData α) :
     chowTransportName C = C.scheme.label ++ ":" ++ C.coefficientTag := rfl
@@ -173,10 +218,10 @@ noncomputable def motivicComplexWeightZero (X : SmoothSchemeData α) : MotivicCo
   objectName := "Z(0)"
 
 noncomputable def motivicComplexLoopPath (M : MotivicComplexData α) : Path M M :=
-  Path.refl M
+  ReflexivePathCertificate.path "motivic-complex-loop" M
 
 noncomputable def motivicComplexTwoStepPath (M : MotivicComplexData α) : Path M M :=
-  Path.trans (Path.refl M) (Path.refl M)
+  ReflexivePathCertificate.path "motivic-complex-two-step" M
 
 noncomputable def motivicComplexMapName (M : MotivicComplexData α) : String :=
   M.scheme.label ++ "::" ++ M.objectName
@@ -205,12 +250,13 @@ theorem motivicComplexWeightZero_weight (X : SmoothSchemeData α) :
 theorem motivicComplexWeightZero_degree (X : SmoothSchemeData α) :
     (motivicComplexWeightZero X).degree = 0 := rfl
 
-theorem motivicComplexLoopPath_eq_refl (M : MotivicComplexData α) :
-    motivicComplexLoopPath M = Path.refl M := rfl
+noncomputable def motivicComplexLoopPath_eq_refl (M : MotivicComplexData α) :
+    RwEq (motivicComplexLoopPath M) (Path.refl M) :=
+  ReflexivePathCertificate.coherence "motivic-complex-loop" M
 
-theorem motivicComplexTwoStepPath_eq_refl (M : MotivicComplexData α) :
-    motivicComplexTwoStepPath M = Path.refl M := by
-  simp [motivicComplexTwoStepPath]
+noncomputable def motivicComplexTwoStepPath_eq_refl (M : MotivicComplexData α) :
+    RwEq (motivicComplexTwoStepPath M) (Path.refl M) :=
+  ReflexivePathCertificate.coherence "motivic-complex-two-step" M
 
 theorem motivicComplexMapName_eq (M : MotivicComplexData α) :
     motivicComplexMapName M = M.scheme.label ++ "::" ++ M.objectName := rfl
@@ -265,10 +311,10 @@ noncomputable def motiveRealizationName (M : VoevodskyMotiveData α) : String :=
   "Real(" ++ M.motiveName ++ ")"
 
 noncomputable def motiveSelfPath (M : VoevodskyMotiveData α) : Path M M :=
-  Path.refl M
+  ReflexivePathCertificate.path "motive-self" M
 
 noncomputable def motiveTwoStepPath (M : VoevodskyMotiveData α) : Path M M :=
-  Path.trans (Path.refl M) (Path.refl M)
+  ReflexivePathCertificate.path "motive-two-step" M
 
 theorem motiveOfScheme_shift (X : SmoothSchemeData α) :
     (motiveOfScheme X).shift = 0 := rfl
@@ -297,12 +343,13 @@ theorem motiveDual_shift (M : VoevodskyMotiveData α) :
 theorem motiveRealization_target (M : VoevodskyMotiveData α) :
     motiveRealizationName M = "Real(" ++ M.motiveName ++ ")" := rfl
 
-theorem motiveSelfPath_refl (M : VoevodskyMotiveData α) :
-    motiveSelfPath M = Path.refl M := rfl
+noncomputable def motiveSelfPath_refl (M : VoevodskyMotiveData α) :
+    RwEq (motiveSelfPath M) (Path.refl M) :=
+  ReflexivePathCertificate.coherence "motive-self" M
 
-theorem motiveTwoStepPath_eq_refl (M : VoevodskyMotiveData α) :
-    motiveTwoStepPath M = Path.refl M := by
-  simp [motiveTwoStepPath]
+noncomputable def motiveTwoStepPath_eq_refl (M : VoevodskyMotiveData α) :
+    RwEq (motiveTwoStepPath M) (Path.refl M) :=
+  ReflexivePathCertificate.coherence "motive-two-step" M
 
 theorem motiveTensorName (M N : VoevodskyMotiveData α) :
     (motiveTensor M N).motiveName = M.motiveName ++ "⊗" ++ N.motiveName := rfl
@@ -364,10 +411,10 @@ noncomputable def weightTruncation (W : WeightFiltrationData α) (a b : Int) : W
   GamIndex := W.GamIndex
 
 noncomputable def mixedTateLoop (T : MixedTateData α) : Path T T :=
-  Path.refl T
+  ReflexivePathCertificate.path "mixed-tate-loop" T
 
 noncomputable def mixedTateTwoStep (T : MixedTateData α) : Path T T :=
-  Path.trans (Path.refl T) (Path.refl T)
+  ReflexivePathCertificate.path "mixed-tate-two-step" T
 
 noncomputable def weightRange (W : WeightFiltrationData α) : Nat :=
   Int.natAbs (W.maxWeight - W.minWeight)
@@ -396,12 +443,13 @@ theorem weightTruncation_lower (W : WeightFiltrationData α) (a b : Int) :
 theorem weightTruncation_upper (W : WeightFiltrationData α) (a b : Int) :
     (weightTruncation W a b).maxWeight = b := rfl
 
-theorem mixedTateLoop_eq_refl (T : MixedTateData α) :
-    mixedTateLoop T = Path.refl T := rfl
+noncomputable def mixedTateLoop_eq_refl (T : MixedTateData α) :
+    RwEq (mixedTateLoop T) (Path.refl T) :=
+  ReflexivePathCertificate.coherence "mixed-tate-loop" T
 
-def mixedTateTwoStep_eq_refl (T : MixedTateData α) :
-    mixedTateTwoStep T = Path.refl T := by
-  simp [mixedTateTwoStep]
+noncomputable def mixedTateTwoStep_eq_refl (T : MixedTateData α) :
+    RwEq (mixedTateTwoStep T) (Path.refl T) :=
+  ReflexivePathCertificate.coherence "mixed-tate-two-step" T
 
 theorem symGam_swap_involution (s : SymGamIndex) :
     SymGamIndex.swap (SymGamIndex.swap s) = s := by
@@ -473,13 +521,13 @@ noncomputable def regulatorEtale (C : BlochHigherChowData α) (M : MotivicComple
   compatibleWeight := true
 
 noncomputable def beilinsonPath (B : BeilinsonConjectureData α) : Path B B :=
-  Path.refl B
+  ReflexivePathCertificate.path "beilinson-loop" B
 
 noncomputable def regulatorLoop (f : RegulatorMapData α) : Path f f :=
-  Path.refl f
+  ReflexivePathCertificate.path "regulator-loop" f
 
 noncomputable def regulatorTwoStep (f : RegulatorMapData α) : Path f f :=
-  Path.trans (Path.refl f) (Path.refl f)
+  ReflexivePathCertificate.path "regulator-two-step" f
 
 theorem beilinsonBalanced_predicts (M : VoevodskyMotiveData α) (r : Nat) :
     (beilinsonBalanced M r).predictsIso = true := rfl
@@ -505,15 +553,17 @@ theorem regulatorCompose_weight (f g : RegulatorMapData α) :
 theorem regulatorCompose_target (f g : RegulatorMapData α) :
     (regulatorCompose f g).target = g.target := rfl
 
-theorem regulatorLoop_eq_refl (f : RegulatorMapData α) :
-    regulatorLoop f = Path.refl f := rfl
+noncomputable def regulatorLoop_eq_refl (f : RegulatorMapData α) :
+    RwEq (regulatorLoop f) (Path.refl f) :=
+  ReflexivePathCertificate.coherence "regulator-loop" f
 
-def regulatorTwoStep_eq_refl (f : RegulatorMapData α) :
-    regulatorTwoStep f = Path.refl f := by
-  simp [regulatorTwoStep]
+noncomputable def regulatorTwoStep_eq_refl (f : RegulatorMapData α) :
+    RwEq (regulatorTwoStep f) (Path.refl f) :=
+  ReflexivePathCertificate.coherence "regulator-two-step" f
 
-theorem beilinsonPath_refl (B : BeilinsonConjectureData α) :
-    beilinsonPath B = Path.refl B := rfl
+noncomputable def beilinsonPath_refl (B : BeilinsonConjectureData α) :
+    RwEq (beilinsonPath B) (Path.refl B) :=
+  ReflexivePathCertificate.coherence "beilinson-loop" B
 
 theorem regulatorBetti_name (C : BlochHigherChowData α) (M : MotivicComplexData α) :
     (regulatorBetti C M).mapName = "reg_Betti" := rfl
@@ -561,10 +611,10 @@ noncomputable def milnorProduct (A B : MilnorKData α) : MilnorKData α where
   relationTag := A.relationTag ++ "*" ++ B.relationTag
 
 noncomputable def milnorSteinbergPath (K : MilnorKData α) : Path K K :=
-  Path.refl K
+  ReflexivePathCertificate.path "milnor-steinberg" K
 
 noncomputable def milnorTwoStepPath (K : MilnorKData α) : Path K K :=
-  Path.trans (Path.refl K) (Path.refl K)
+  ReflexivePathCertificate.path "milnor-two-step" K
 
 noncomputable def normResidueStatement (k : α) (p n r : Nat) : NormResidueIsoData α where
   field := k
@@ -575,10 +625,10 @@ noncomputable def normResidueStatement (k : α) (p n r : Nat) : NormResidueIsoDa
   isIsomorphism := true
 
 noncomputable def normResiduePath (N : NormResidueIsoData α) : Path N N :=
-  Path.refl N
+  ReflexivePathCertificate.path "norm-residue-loop" N
 
 noncomputable def normResidueTwoStepPath (N : NormResidueIsoData α) : Path N N :=
-  Path.trans (Path.refl N) (Path.refl N)
+  ReflexivePathCertificate.path "norm-residue-two-step" N
 
 theorem milnorKZero_degree (k : α) : (milnorKZero k).degree = 0 := rfl
 
@@ -590,16 +640,17 @@ theorem milnorProduct_degree (A B : MilnorKData α) :
 theorem milnorProduct_symbolCount (A B : MilnorKData α) :
     (milnorProduct A B).symbolCount = A.symbolCount + B.symbolCount := rfl
 
-theorem milnorSteinberg_relation (K : MilnorKData α) :
-    milnorSteinbergPath K = Path.refl K := rfl
+noncomputable def milnorSteinberg_relation (K : MilnorKData α) :
+    RwEq (milnorSteinbergPath K) (Path.refl K) :=
+  ReflexivePathCertificate.coherence "milnor-steinberg" K
 
-theorem milnorLoop_refl (K : MilnorKData α) :
-    Path.trans (Path.refl K) (Path.refl K) = Path.refl K := by
-  simp
+noncomputable def milnorLoop_refl (K : MilnorKData α) :
+    RwEq (Path.trans (milnorSteinbergPath K) (Path.refl K)) (milnorSteinbergPath K) :=
+  rweq_cmpA_refl_right (milnorSteinbergPath K)
 
-theorem milnorTwoStep_eq_refl (K : MilnorKData α) :
-    milnorTwoStepPath K = Path.refl K := by
-  simp [milnorTwoStepPath]
+noncomputable def milnorTwoStep_eq_refl (K : MilnorKData α) :
+    RwEq (milnorTwoStepPath K) (Path.refl K) :=
+  ReflexivePathCertificate.coherence "milnor-two-step" K
 
 theorem normResidueStatement_iso (k : α) (p n r : Nat) :
     (normResidueStatement k p n r).isIsomorphism = true := rfl
@@ -613,12 +664,13 @@ theorem normResidueStatement_target (k : α) (p n r : Nat) :
 theorem normResiduePrimeStable (k : α) (p n r : Nat) :
     (normResidueStatement k p n r).prime = p := rfl
 
-theorem normResiduePath_refl (N : NormResidueIsoData α) :
-    normResiduePath N = Path.refl N := rfl
+noncomputable def normResiduePath_refl (N : NormResidueIsoData α) :
+    RwEq (normResiduePath N) (Path.refl N) :=
+  ReflexivePathCertificate.coherence "norm-residue-loop" N
 
-theorem normResidueTwoStep_eq_refl (N : NormResidueIsoData α) :
-    normResidueTwoStepPath N = Path.refl N := by
-  simp [normResidueTwoStepPath]
+noncomputable def normResidueTwoStep_eq_refl (N : NormResidueIsoData α) :
+    RwEq (normResidueTwoStepPath N) (Path.refl N) :=
+  ReflexivePathCertificate.coherence "norm-residue-two-step" N
 
 theorem normResidueSourceDegree (k : α) (p n r : Nat) :
     (normResidueStatement k p n r).sourceMilnor.degree = n := rfl
@@ -655,10 +707,10 @@ noncomputable def etaleComparisonIdentity (M : MotivicComplexData α) (E : Etale
   comparisonHolds := true
 
 noncomputable def etaleComparisonLoop (C : EtaleComparisonData α) : Path C C :=
-  Path.refl C
+  ReflexivePathCertificate.path "etale-comparison-loop" C
 
 noncomputable def etaleComparisonTwoStep (C : EtaleComparisonData α) : Path C C :=
-  Path.trans (Path.refl C) (Path.refl C)
+  ReflexivePathCertificate.path "etale-comparison-two-step" C
 
 noncomputable def etaleComparisonTransportName (C : EtaleComparisonData α) : String :=
   C.motivic.objectName ++ "=>" ++ C.etale.scheme.label
@@ -691,12 +743,13 @@ theorem etaleComparison_identity_weight (M : MotivicComplexData α) (E : EtaleCo
 theorem etaleComparison_identity_holds (M : MotivicComplexData α) (E : EtaleCohData α) :
     (etaleComparisonIdentity M E).comparisonHolds = true := rfl
 
-theorem etaleComparison_loop_refl (C : EtaleComparisonData α) :
-    etaleComparisonLoop C = Path.refl C := rfl
+noncomputable def etaleComparison_loop_refl (C : EtaleComparisonData α) :
+    RwEq (etaleComparisonLoop C) (Path.refl C) :=
+  ReflexivePathCertificate.coherence "etale-comparison-loop" C
 
-def etaleComparison_twoStep_eq_refl (C : EtaleComparisonData α) :
-    etaleComparisonTwoStep C = Path.refl C := by
-  simp [etaleComparisonTwoStep]
+noncomputable def etaleComparison_twoStep_eq_refl (C : EtaleComparisonData α) :
+    RwEq (etaleComparisonTwoStep C) (Path.refl C) :=
+  ReflexivePathCertificate.coherence "etale-comparison-two-step" C
 
 theorem etaleComparison_transport_name (C : EtaleComparisonData α) :
     etaleComparisonTransportName C = C.motivic.objectName ++ "=>" ++ C.etale.scheme.label := rfl
