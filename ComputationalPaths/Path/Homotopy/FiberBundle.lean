@@ -402,12 +402,35 @@ theorem structureGroup_inv (G : StructureGroup F)
     G.mem (TransitionFunction.inv g) :=
   G.inv_mem hg
 
+/-- Membership predicate used by the maximal structure group:
+it records explicit left/right inverse laws as data, not just truth. -/
+def maximalWitness (g : TransitionFunction F) : Prop :=
+  (∀ f, (TransitionFunction.comp (TransitionFunction.inv g) g).toFun f = f) ∧
+  (∀ f, (TransitionFunction.comp g (TransitionFunction.inv g)).toFun f = f)
+
 /-- The maximal structure group: all automorphisms of F. -/
 noncomputable def maximal : StructureGroup F where
-  mem := fun _ => True
-  id_mem := trivial
-  comp_mem := fun _ _ => trivial
-  inv_mem := fun _ => trivial
+  mem := maximalWitness
+  id_mem := by
+    constructor
+    · intro f
+      exact TransitionFunction.inv_comp (t := TransitionFunction.id) f
+    · intro f
+      exact TransitionFunction.comp_inv (t := TransitionFunction.id) f
+  comp_mem := by
+    intro g h _hg _hh
+    constructor
+    · intro f
+      exact TransitionFunction.inv_comp (t := TransitionFunction.comp g h) f
+    · intro f
+      exact TransitionFunction.comp_inv (t := TransitionFunction.comp g h) f
+  inv_mem := by
+    intro g _hg
+    constructor
+    · intro f
+      exact TransitionFunction.inv_comp (t := TransitionFunction.inv g) f
+    · intro f
+      exact TransitionFunction.comp_inv (t := TransitionFunction.inv g) f
 
 /-- The trivial structure group: only the identity. -/
 noncomputable def trivial : StructureGroup F where
