@@ -89,11 +89,11 @@ theorem nilpotence_iff_muPlus {p : Prime} {X : FinitePLocalSpectrum p}
 /-! ## Type-n complexes and v_n self-maps -/
 
 /-- A type-n complex (alias to the chromatic definition). -/
-abbrev TypeNComplex (p : Prime) (n : Nat) : Type (u + 1) :=
+abbrev TypeNComplex (p : Prime) (n : Nat) : Type (u + 2) :=
   ChromaticHomotopy.TypeNComplex.{u} p n
 
 /-- Data for a v_n-self-map (alias to the chromatic periodicity data). -/
-abbrev VnSelfMap (p : Prime) (n : Nat) : Type (u + 1) :=
+abbrev VnSelfMap (p : Prime) (n : Nat) : Type (u + 2) :=
   ChromaticHomotopy.PeriodicityData.{u} p n
 
 

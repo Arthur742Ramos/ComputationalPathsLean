@@ -24,6 +24,22 @@ This is explicitly **not HoTT** — it's computational rewrite traces over proof
 4. **Domain-specific Step types** where appropriate (e.g., `TQFTStep`, `KnotStep`)
 5. **At least one `RwEq` or multi-step `Path.trans` construction per file**
 
+## Scaffold Hardening Policy
+
+Generated modules may contain abstract placeholders such as `True`, `trivial`,
+or reflexive theorem stubs. When deepening these files:
+
+- Do not replace every placeholder mechanically.
+- Preserve existing public APIs when possible.
+- Prefer adding certificate records, e.g. `FooCertificate`, that carry:
+  - concrete domain data (`Nat`, `Int`, lists, presentations, counts)
+  - `Path` witnesses over those values
+  - at least one multi-step `Path.trans`
+  - at least one `RwEq` coherence that is not merely decorative
+- Avoid theorem statements whose conclusion is only `x = x`, `True`, or a reused field with no computational content.
+- Keep abstract `True` fields only when they explicitly document currently unformalized external mathematics.
+- Validate touched Lean modules with targeted `lake build`; for documentation-only changes, run `git diff --check`.
+
 ## Architecture
 
 ```
@@ -87,6 +103,19 @@ find . -name "*.lean" -not -path "./.lake/*" | wc -l
 
 # Deploy an armada
 copex fleet "Create a Lean 4 file formalizing {topic}..." -m gpt-5.3-codex -r xhigh
+```
+
+PowerShell-friendly checks:
+
+```powershell
+# Check for sorries outside Lake artifacts
+rg "\bsorry\b" -g "*.lean" -g "!.lake/**"
+
+# Check for custom axioms outside Lake artifacts
+rg "^axiom " -g "*.lean" -g "!.lake/**"
+
+# Count Lean files outside Lake artifacts
+(Get-ChildItem -Recurse -Filter *.lean | Where-Object { $_.FullName -notmatch "\\.lake\\" }).Count
 ```
 
 ## Terminology
