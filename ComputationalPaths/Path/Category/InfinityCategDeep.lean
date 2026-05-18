@@ -56,6 +56,24 @@ noncomputable def SSet.triangle (X : SSet.{u}) : Type u := X.obj 2
 /-- Tetrahedra (3-simplices) -/
 noncomputable def SSet.tetrahedron (X : SSet.{u}) : Type u := X.obj 3
 
+/-- Concrete compatibility data for two visible faces of an inner horn. -/
+structure HornCompatibilityCert
+    (X : SSet.{u}) (n : Nat) (k : Fin (n + 2))
+    (faces : (i : Fin (n + 2)) → i ≠ k → X.obj n)
+    (i j : Fin (n + 2)) (hi : i ≠ k) (hj : j ≠ k) where
+  overlapFace : X.obj n
+  leftTrace : Path overlapFace (faces i hi)
+  rightTrace : Path overlapFace (faces j hj)
+
+/-- Extract the boundary Path between two horn faces from compatibility data. -/
+noncomputable def HornCompatibilityCert.boundaryPath
+    {X : SSet.{u}} {n : Nat} {k : Fin (n + 2)}
+    {faces : (i : Fin (n + 2)) → i ≠ k → X.obj n}
+    {i j : Fin (n + 2)} {hi : i ≠ k} {hj : j ≠ k}
+    (cert : HornCompatibilityCert X n k faces i j hi hj)
+    : Path (faces i hi) (faces j hj) :=
+  Path.trans (Path.symm cert.leftTrace) cert.rightTrace
+
 -- ============================================================
 -- §2. Horns and Kan Conditions
 -- ============================================================
@@ -63,8 +81,25 @@ noncomputable def SSet.tetrahedron (X : SSet.{u}) : Type u := X.obj 3
 /-- An inner horn: a partial simplex missing one inner face -/
 structure InnerHorn (X : SSet.{u}) (n : Nat) (k : Fin (n + 2)) where
   faces : (i : Fin (n + 2)) → i ≠ k → X.obj n
-  compat : ∀ (i j : Fin (n + 2)) (_hi : i ≠ k) (_hj : j ≠ k),
-    i.val < j.val → True
+  compat : ∀ (i j : Fin (n + 2)) (hi : i ≠ k) (hj : j ≠ k),
+    i.val < j.val → HornCompatibilityCert X n k faces i j hi hj
+
+/-- Compatibility accessor that preserves the previous `True`-shaped API. -/
+noncomputable def InnerHorn.compatTrue
+    {X : SSet.{u}} {n : Nat} {k : Fin (n + 2)}
+    (_horn : InnerHorn X n k)
+    (i j : Fin (n + 2)) (_hi : i ≠ k) (_hj : j ≠ k)
+    (_hij : i.val < j.val) : True :=
+  True.intro
+
+/-- Path between two visible horn faces extracted from the compatibility data. -/
+noncomputable def InnerHorn.compatPath
+    {X : SSet.{u}} {n : Nat} {k : Fin (n + 2)}
+    (horn : InnerHorn X n k)
+    (i j : Fin (n + 2)) (hi : i ≠ k) (hj : j ≠ k)
+    (hij : i.val < j.val)
+    : Path (horn.faces i hi) (horn.faces j hj) :=
+  HornCompatibilityCert.boundaryPath (horn.compat i j hi hj hij)
 
 /-- Witness that an inner horn has a filler -/
 structure HornFiller (X : SSet.{u}) (n : Nat) (k : Fin (n + 2))
@@ -96,11 +131,38 @@ structure ComposablePair (Q : QuasiCategory.{u}) where
   f : Q.obj 1
   g : Q.obj 1
 
+/-- Certificate that a proposed composite edge is connected by explicit Path traces. -/
+structure CompositionCert (Q : QuasiCategory.{u}) (pair : ComposablePair Q)
+    (composite : Q.obj 1) where
+  leftMid : Q.obj 1
+  rightMid : Q.obj 1
+  leftTrace : Path pair.f leftMid
+  middleTrace : Path leftMid rightMid
+  rightTrace : Path rightMid composite
+
+/-- Multi-step path extracted from a composition certificate. -/
+noncomputable def CompositionCert.compositePath
+    {Q : QuasiCategory.{u}} {pair : ComposablePair Q} {composite : Q.obj 1}
+    (cert : CompositionCert Q pair composite) : Path pair.f composite :=
+  Path.trans (Path.trans cert.leftTrace cert.middleTrace) cert.rightTrace
+
 /-- Composition witness: a 2-simplex filling the inner horn -/
 structure CompositionWitness (Q : QuasiCategory.{u}) (pair : ComposablePair Q) where
   composite : Q.obj 1
   triangle : Q.obj 2
-  isComposite : True
+  compositeCert : CompositionCert Q pair composite
+
+/-- Compatibility accessor preserving the previous `True`-shaped witness API. -/
+noncomputable def CompositionWitness.isComposite
+    {Q : QuasiCategory.{u}} {pair : ComposablePair Q}
+    (_w : CompositionWitness Q pair) : True :=
+  True.intro
+
+/-- Concrete path from the left edge of a composable pair to the chosen composite. -/
+noncomputable def CompositionWitness.compositePathFromLeft
+    {Q : QuasiCategory.{u}} {pair : ComposablePair Q}
+    (w : CompositionWitness Q pair) : Path pair.f w.composite :=
+  w.compositeCert.compositePath
 
 /-- Path-level witness that two compositions agree -/
 structure CompositionPath (Q : QuasiCategory.{u})
@@ -113,7 +175,8 @@ noncomputable def composition_witnesses_connected
     {Q : QuasiCategory.{u}} {pair : ComposablePair Q}
     (w : CompositionWitness Q pair)
     : Path w.composite w.composite :=
-  Path.refl w.composite
+  let sourceToComposite := w.compositePathFromLeft
+  Path.trans (Path.symm sourceToComposite) sourceToComposite
 
 -- ============================================================
 -- §4. Associativity as Higher Simplices

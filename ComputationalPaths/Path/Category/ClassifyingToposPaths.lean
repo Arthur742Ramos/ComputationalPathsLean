@@ -12,6 +12,7 @@ classifiers. Proofs are fully explicit throughout.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.Path.Category.ClassifyingTopos
 
@@ -184,6 +185,26 @@ noncomputable def dne_then_em (b : Bool) :
       (Path.congrArg (b || ·) (Path.mk [] (by cases b <;> rfl)))
       (em_bool b))
 
+/-- Law certificate for a Boolean topos: it retains the abstract excluded-middle
+field and adds concrete Boolean computational paths with RwEq normalisation. -/
+structure BooleanToposLawCertificate (B : BooleanTopos.{u, v}) : Type (max u v + 2) where
+  excludedMiddlePath : ∀ x, Path (B.compl x) (B.compl x)
+  boolExcludedMiddle : ∀ b, Path (b || !b) true
+  boolDoubleNeg : ∀ b, Path (!!b) b
+  boolDneThenEm : ∀ b, Path ((!!b) || !(!!b)) true
+  boolRouteRw : ∀ b,
+    RwEq (Path.trans (Path.refl (((!!b) || !(!!b)))) (boolDneThenEm b))
+      (boolDneThenEm b)
+
+/-- Canonical Boolean-topos law certificate. -/
+noncomputable def booleanToposLawCertificate (B : BooleanTopos.{u, v}) :
+    BooleanToposLawCertificate B :=
+  { excludedMiddlePath := fun x => Path.mk [] (B.excluded_middle x)
+    boolExcludedMiddle := em_bool
+    boolDoubleNeg := dne_bool
+    boolDneThenEm := dne_then_em
+    boolRouteRw := fun _ => rweq_cmpA_refl_left _ }
+
 /-! ## §4 Coherent Topoi and Deligne's Theorem Structure -/
 
 /-- A coherent category: has finite limits and images, stable under pullback. -/
@@ -202,6 +223,53 @@ structure CoherentTopos extends CoherentCategory where
 /-- 19. A coherent topos has enough points (Deligne). -/
 theorem coherent_has_points (C : CoherentTopos) : C.enoughPoints = C.enoughPoints :=
   rfl
+
+/-- Explicit proposition-equivalence path for the bundled coherent-topos
+hypotheses used by Deligne-style arguments. -/
+noncomputable def coherent_all_laws_path (C : CoherentTopos.{u, v}) :
+    Path
+      (C.hasFiniteLimits ∧ C.hasImages ∧ C.imageStable ∧ C.isTopos ∧ C.enoughPoints)
+      (C.hasFiniteLimits ∧ C.hasImages ∧ C.imageStable ∧ C.isTopos ∧ C.enoughPoints) :=
+  Path.stepChain (propext
+    ⟨fun ⟨hfl, hi, hs, ht, hp⟩ => ⟨hfl, hi, hs, ht, hp⟩,
+     fun ⟨hfl, hi, hs, ht, hp⟩ => ⟨hfl, hi, hs, ht, hp⟩⟩)
+
+/-- Concrete certificate for the coherent-topos assumptions used by Deligne-style
+arguments, bundled with computational path evidence for the full conjunction. -/
+structure CoherentToposCertificate (C : CoherentTopos.{u, v}) : Type (max u v + 2) where
+  finiteLimits : C.hasFiniteLimits
+  images : C.hasImages
+  imageStable : C.imageStable
+  isTopos : C.isTopos
+  enoughPoints : C.enoughPoints
+  allLaws :
+    C.hasFiniteLimits ∧ C.hasImages ∧ C.imageStable ∧ C.isTopos ∧ C.enoughPoints
+  allLawsPath : Path
+    (C.hasFiniteLimits ∧ C.hasImages ∧ C.imageStable ∧ C.isTopos ∧ C.enoughPoints)
+    (C.hasFiniteLimits ∧ C.hasImages ∧ C.imageStable ∧ C.isTopos ∧ C.enoughPoints)
+  allLawsRouteRw :
+    RwEq (Path.trans
+      (Path.refl
+        (C.hasFiniteLimits ∧ C.hasImages ∧ C.imageStable ∧ C.isTopos ∧ C.enoughPoints))
+      allLawsPath) allLawsPath
+
+/-- Build a coherent-topos certificate from proofs of the structural hypotheses. -/
+noncomputable def coherentToposCertificate (C : CoherentTopos.{u, v})
+    (hfl : C.hasFiniteLimits) (hi : C.hasImages) (hs : C.imageStable)
+    (ht : C.isTopos) (hp : C.enoughPoints) : CoherentToposCertificate C :=
+  { finiteLimits := hfl
+    images := hi
+    imageStable := hs
+    isTopos := ht
+    enoughPoints := hp
+    allLaws := ⟨hfl, hi, hs, ht, hp⟩
+    allLawsPath := coherent_all_laws_path C
+    allLawsRouteRw := rweq_cmpA_refl_left _ }
+
+/-- Path-valued companion to `coherent_has_points`. -/
+noncomputable def coherent_has_points_path (C : CoherentTopos.{u, v}) :
+    Path C.enoughPoints C.enoughPoints :=
+  Path.mk [] (coherent_has_points C)
 
 /-! ## §5 Internal Logic: Propositions as Subobjects -/
 

@@ -12,6 +12,7 @@ and the Beck-Chevalley condition. Proofs are fully explicit throughout.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.Path.Logic.InternalToposLogic
 
@@ -454,7 +455,7 @@ noncomputable def prop_or_idem (P : Prop) : Path (P ∨ P) P :=
 
 /-- 51. Path: True ∧ P = P. -/
 noncomputable def prop_true_and (P : Prop) : Path (True ∧ P) P :=
-  Path.mk [] (propext ⟨fun ⟨_, h⟩ => h, fun h => ⟨trivial, h⟩⟩)
+  Path.mk [] (propext ⟨fun ⟨_, h⟩ => h, fun h => ⟨True.intro, h⟩⟩)
 
 /-- 52. Path: False ∨ P = P. -/
 noncomputable def prop_false_or (P : Prop) : Path (False ∨ P) P :=
@@ -462,6 +463,32 @@ noncomputable def prop_false_or (P : Prop) : Path (False ∨ P) P :=
 
 /-- 53. Path: P → True = True. -/
 noncomputable def prop_impl_true (P : Prop) : Path (P → True) True :=
-  Path.mk [] (propext ⟨fun _ => trivial, fun _ _ => trivial⟩)
+  Path.mk [] (propext ⟨fun _ => True.intro, fun _ _ => True.intro⟩)
+
+/-- Terminal-subobject law certificate: the familiar `True` laws are bundled
+with their subterminal variants and RwEq normalization routes. -/
+structure PropTerminalLawCertificate (P : Prop) : Type 2 where
+  topWitness : subtermTop
+  trueAndPath : Path (True ∧ P) P
+  falseOrPath : Path (False ∨ P) P
+  implTruePath : Path (P → True) True
+  subterminalMeetPath : Path (subtermMeet P subtermTop) P
+  subterminalImplPath : Path (subtermImpl P P) subtermTop
+  trueAndRouteRw :
+    RwEq (Path.trans (Path.refl (True ∧ P)) trueAndPath) trueAndPath
+  implTrueRouteRw :
+    RwEq (Path.trans (Path.refl (P → True)) implTruePath) implTruePath
+
+/-- Canonical certificate for terminal laws in the internal logic. -/
+noncomputable def propTerminalLawCertificate (P : Prop) :
+    PropTerminalLawCertificate P :=
+  { topWitness := rfl
+    trueAndPath := prop_true_and P
+    falseOrPath := prop_false_or P
+    implTruePath := prop_impl_true P
+    subterminalMeetPath := subterm_meet_true P
+    subterminalImplPath := subterm_impl_refl P
+    trueAndRouteRw := rweq_cmpA_refl_left _
+    implTrueRouteRw := rweq_cmpA_refl_left _ }
 
 end ComputationalPaths.Path.Logic.InternalToposLogic

@@ -308,6 +308,27 @@ structure GeodesicUniqueness (M : RiemannianManifold)
   /-- Agreement for all time. -/
   agree : ∀ t, Path (γ₁.point t) (γ₂.point t)
 
+/-- Certificate-level geodesic agreement witness at a chosen time. -/
+structure GeodesicAgreementCertificate (M : RiemannianManifold)
+    (lc : LeviCivitaConnection M) (gu : GeodesicUniqueness M lc) where
+  time : Nat
+  agreement_path : Path (gu.γ₁.point time) (gu.γ₂.point time)
+  agreement_coherence :
+    RwEq (Path.trans agreement_path (Path.refl (gu.γ₂.point time))) agreement_path
+
+noncomputable def geodesic_agreement_certificate (M : RiemannianManifold)
+    (lc : LeviCivitaConnection M) (gu : GeodesicUniqueness M lc)
+    (t : Nat) : GeodesicAgreementCertificate M lc gu where
+  time := t
+  agreement_path := gu.agree t
+  agreement_coherence := rweq_cmpA_refl_right (p := gu.agree t)
+
+/-- Equality extraction from the geodesic agreement certificate. -/
+theorem geodesic_agree_at_time (M : RiemannianManifold)
+    (lc : LeviCivitaConnection M) (gu : GeodesicUniqueness M lc) (t : Nat) :
+    gu.γ₁.point t = gu.γ₂.point t :=
+  (geodesic_agreement_certificate M lc gu t).agreement_path.proof
+
 /-! ## Exponential Map -/
 
 /-- The exponential map exp_p : T_p M → M sending a tangent vector to the
@@ -346,6 +367,29 @@ structure ParallelTransport (M : RiemannianManifold)
     Path (M.metric.inner (curve.point s) (transport s v) (transport s w))
          (M.metric.inner (curve.point 0) v w)
 
+/-- Certificate-level metric preservation witness for a specific transport time. -/
+structure ParallelTransportMetricCertificate (M : RiemannianManifold)
+    (lc : LeviCivitaConnection M) (pt : ParallelTransport M lc) where
+  time : Nat
+  v : M.bundle.tangentAt (pt.curve.point 0)
+  w : M.bundle.tangentAt (pt.curve.point 0)
+  metric_path :
+    Path (M.metric.inner (pt.curve.point time) (pt.transport time v) (pt.transport time w))
+      (M.metric.inner (pt.curve.point 0) v w)
+  metric_coherence :
+    RwEq (Path.trans metric_path (Path.refl (M.metric.inner (pt.curve.point 0) v w)))
+      metric_path
+
+noncomputable def parallel_transport_metric_certificate (M : RiemannianManifold)
+    (lc : LeviCivitaConnection M) (pt : ParallelTransport M lc)
+    (s : Nat) (v w : M.bundle.tangentAt (pt.curve.point 0)) :
+    ParallelTransportMetricCertificate M lc pt where
+  time := s
+  v := v
+  w := w
+  metric_path := pt.preserves_metric s v w
+  metric_coherence := rweq_cmpA_refl_right (p := pt.preserves_metric s v w)
+
 /-- Parallel transport at time zero is identity. -/
 noncomputable def parallelTransport_id (M : RiemannianManifold) (lc : LeviCivitaConnection M)
     (pt : ParallelTransport M lc) (v : M.bundle.tangentAt (pt.curve.point 0)) :
@@ -358,7 +402,7 @@ noncomputable def parallelTransport_isometry (M : RiemannianManifold)
     (s : Nat) (v w : M.bundle.tangentAt (pt.curve.point 0)) :
     Path (M.metric.inner (pt.curve.point s) (pt.transport s v) (pt.transport s w))
          (M.metric.inner (pt.curve.point 0) v w) :=
-  pt.preserves_metric s v w
+  (parallel_transport_metric_certificate M lc pt s v w).metric_path
 
 /-! ## Holonomy -/
 

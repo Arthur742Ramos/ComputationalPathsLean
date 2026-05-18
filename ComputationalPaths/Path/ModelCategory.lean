@@ -82,6 +82,63 @@ theorem path_is_weak_equivalence {a b : A} (p : Path a b) :
     pathWeakEquivalence (A := A) p := by
   exact ⟨WeakGroupoid.isIso (A := A) (G := WeakGroupoid.identity A) p⟩
 
+/-- Canonical path payload carrying explicit step-chain trace metadata. -/
+structure PathEvidencePayload {a b : A} (p : Path a b) where
+  /-- Canonical witness tied to the indexed endpoints and original path. -/
+  canonical : Path a b
+  /-- One-step/multi-step rewrite coherence from the canonical witness to `p`. -/
+  canonical_rw : Rw canonical p
+  canonical_rweq : RwEq canonical p
+  /-- Explicit non-empty trace representative carrying the same toEq witness as `p`. -/
+  traceRepresentative : Path a b
+  trace_toEq : traceRepresentative.toEq = p.toEq
+  trace_nonempty : traceRepresentative.steps ≠ []
+
+/-- Build the canonical payload for any path using `Path.stepChain`. -/
+noncomputable def canonicalPathEvidencePayload {a b : A} (p : Path a b) :
+    PathEvidencePayload (A := A) p where
+  canonical := p
+  canonical_rw := Rw.refl p
+  canonical_rweq := RwEq.refl p
+  traceRepresentative := Path.stepChain p.toEq
+  trace_toEq := rfl
+  trace_nonempty := by
+    simp [Path.stepChain]
+
+/-- Enriched certificate that a path is a cofibration in the trivial model structure. -/
+structure PathCofibrationCertificate {a b : A} (p : Path a b) where
+  payload : PathEvidencePayload (A := A) p
+  retract : Path b a
+  retract_rw : Rw (Path.trans p retract) (Path.refl a)
+  retract_rweq : RwEq (Path.trans p retract) (Path.refl a)
+  cof_witness : pathCofibration (A := A) p
+
+/-- Enriched certificate that a path is a fibration in the trivial model structure. -/
+structure PathFibrationCertificate {a b : A} (p : Path a b) where
+  payload : PathEvidencePayload (A := A) p
+  sectionPath : Path b a
+  section_rw : Rw (Path.trans sectionPath p) (Path.refl b)
+  section_rweq : RwEq (Path.trans sectionPath p) (Path.refl b)
+  fib_witness : pathFibration (A := A) p
+
+/-- Canonical cofibration certificate with explicit cancellation and rewrite coherence. -/
+noncomputable def canonical_path_cofibration_certificate {a b : A} (p : Path a b) :
+    PathCofibrationCertificate (A := A) p where
+  payload := canonicalPathEvidencePayload (A := A) p
+  retract := Path.symm p
+  retract_rw := rw_of_step (Step.trans_symm p)
+  retract_rweq := rweq_of_step (Step.trans_symm p)
+  cof_witness := rfl
+
+/-- Canonical fibration certificate with explicit cancellation and rewrite coherence. -/
+noncomputable def canonical_path_fibration_certificate {a b : A} (p : Path a b) :
+    PathFibrationCertificate (A := A) p where
+  payload := canonicalPathEvidencePayload (A := A) p
+  sectionPath := Path.symm p
+  section_rw := rw_of_step (Step.symm_trans p)
+  section_rweq := rweq_of_step (Step.symm_trans p)
+  fib_witness := rfl
+
 /-- The trivial model category structure on computational paths. -/
 noncomputable def pathModelCategory (A : Type u) : ModelCategory A where
   toWeakCategory := WeakCategory.identity A
@@ -197,6 +254,18 @@ structure TrivCofFibFactorizationCertificate {a b : A} (p : Path a b) where
   factor_rw : Rw ((pathModelCategory A).comp trivCofPart fibPart) p
   factor_rweq : RwEq ((pathModelCategory A).comp trivCofPart fibPart) p
 
+/-- Enriched cofibration/trivial-fibration factorization data with typed certificates. -/
+structure CofTrivFibFactorizationCertificateWithCoherence {a b : A} (p : Path a b) where
+  base : CofTrivFibFactorizationCertificate (A := A) p
+  cof_certificate : PathCofibrationCertificate (A := A) base.cofPart
+  triv_fib_certificate : PathFibrationCertificate (A := A) base.trivFibPart
+
+/-- Enriched trivial-cofibration/fibration factorization data with typed certificates. -/
+structure TrivCofFibFactorizationCertificateWithCoherence {a b : A} (p : Path a b) where
+  base : TrivCofFibFactorizationCertificate (A := A) p
+  triv_cof_certificate : PathCofibrationCertificate (A := A) base.trivCofPart
+  fib_certificate : PathFibrationCertificate (A := A) base.fibPart
+
 /-- The canonical cofibration/trivial-fibration factorization with explicit rewrite evidence. -/
 noncomputable def cof_triv_fib_factorization_certificate {a b : A} (p : Path a b) :
     CofTrivFibFactorizationCertificate (A := A) p where
@@ -220,6 +289,40 @@ noncomputable def triv_cof_fib_factorization_certificate {a b : A} (p : Path a b
   fib_witness := rfl
   factor_rw := factorization_triv_cof_fib_rw_from_step (A := A) p
   factor_rweq := factorization_triv_cof_fib_rweq_from_step (A := A) p
+
+/-- Accessor preserving the original factorization API inside enriched data. -/
+@[simp] noncomputable def CofTrivFibFactorizationCertificateWithCoherence.toBase
+    {a b : A} {p : Path a b}
+    (cert : CofTrivFibFactorizationCertificateWithCoherence (A := A) p) :
+    CofTrivFibFactorizationCertificate (A := A) p :=
+  cert.base
+
+/-- Accessor preserving the original factorization API inside enriched data. -/
+@[simp] noncomputable def TrivCofFibFactorizationCertificateWithCoherence.toBase
+    {a b : A} {p : Path a b}
+    (cert : TrivCofFibFactorizationCertificateWithCoherence (A := A) p) :
+    TrivCofFibFactorizationCertificate (A := A) p :=
+  cert.base
+
+/-- Build enriched cofibration/trivial-fibration factorization data. -/
+noncomputable def cof_triv_fib_factorization_certificate_with_coherence {a b : A}
+    (p : Path a b) :
+    CofTrivFibFactorizationCertificateWithCoherence (A := A) p := by
+  let base := cof_triv_fib_factorization_certificate (A := A) p
+  exact
+    { base := base
+      cof_certificate := canonical_path_cofibration_certificate (A := A) base.cofPart
+      triv_fib_certificate := canonical_path_fibration_certificate (A := A) base.trivFibPart }
+
+/-- Build enriched trivial-cofibration/fibration factorization data. -/
+noncomputable def triv_cof_fib_factorization_certificate_with_coherence {a b : A}
+    (p : Path a b) :
+    TrivCofFibFactorizationCertificateWithCoherence (A := A) p := by
+  let base := triv_cof_fib_factorization_certificate (A := A) p
+  exact
+    { base := base
+      triv_cof_certificate := canonical_path_cofibration_certificate (A := A) base.trivCofPart
+      fib_certificate := canonical_path_fibration_certificate (A := A) base.fibPart }
 
 /-- Step-level factorization can be packaged with a trivial fibration witness. -/
 def factorization_cof_triv_fib_step_trivial_fibration {a b : A} (p : Path a b) :

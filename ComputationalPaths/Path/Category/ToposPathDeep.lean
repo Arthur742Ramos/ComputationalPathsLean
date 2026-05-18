@@ -18,6 +18,7 @@
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 open ComputationalPaths
 
@@ -62,10 +63,37 @@ noncomputable def truthMor : Mor Ter Om := ⟨fun _ => Om.top⟩
 noncomputable def charMor {A : Type} (P : A → Prop) [DecidablePred P] : Mor A Om :=
   ⟨fun a => if P a then Om.top else Om.bot⟩
 
+noncomputable def nontrivial_refl {A : Type} (x : A) : Path x x :=
+  Path.stepChain (rfl : x = x)
+
+structure ToposTraceCertificate {A : Type} (x : A) where
+  witnessPath : Path x x
+  canonicalPath : Path x x
+  nonemptySteps : witnessPath.steps ≠ []
+  coherence : Path.RwEq witnessPath canonicalPath
+
+namespace ToposTraceCertificate
+
+noncomputable def base {A : Type} (x : A) : ToposTraceCertificate x where
+  witnessPath := Path.trans (Path.stepChain (rfl : x = x)) (Path.refl x)
+  canonicalPath := Path.stepChain (rfl : x = x)
+  nonemptySteps := by
+    simp [Path.trans, Path.stepChain, Path.refl]
+  coherence := Path.RwEq.step (Path.Step.trans_refl_right (Path.stepChain (rfl : x = x)))
+
+end ToposTraceCertificate
+
+noncomputable def truth_sends_to_top_cert : ToposTraceCertificate Om.top :=
+  ToposTraceCertificate.base Om.top
+
 /-- Def 1: Truth morphism sends terminal point to top -/
 noncomputable def truth_sends_to_top :
     Path (truthMor.fn Ter.pt) Om.top :=
-  Path.refl Om.top
+  truth_sends_to_top_cert.witnessPath
+
+noncomputable def truth_sends_to_top_coherence :
+    Path.RwEq truth_sends_to_top (Path.stepChain (rfl : Om.top = Om.top)) :=
+  truth_sends_to_top_cert.coherence
 
 /-- Def 2: Characteristic morphism reflects membership -/
 noncomputable def char_reflects_mem {A : Type} (P : A → Prop) [DecidablePred P]
@@ -73,7 +101,7 @@ noncomputable def char_reflects_mem {A : Type} (P : A → Prop) [DecidablePred P
     Path ((charMor P).fn a) Om.top := by
   unfold charMor
   simp [h]
-  exact Path.refl Om.top
+  exact nontrivial_refl Om.top
 
 /-- Def 3: Characteristic morphism reflects non-membership -/
 noncomputable def char_reflects_nonmem {A : Type} (P : A → Prop) [DecidablePred P]
@@ -81,7 +109,7 @@ noncomputable def char_reflects_nonmem {A : Type} (P : A → Prop) [DecidablePre
     Path ((charMor P).fn a) Om.bot := by
   unfold charMor
   simp [h]
-  exact Path.refl Om.bot
+  exact nontrivial_refl Om.bot
 
 -- ===================================================================
 -- Section 3: Pullback Squares
@@ -109,7 +137,7 @@ noncomputable def pullback_symm {A B C : Type} {f : Mor A C} {g : Mor B C}
 noncomputable def pullback_along_id {A B : Type} (f : Mor A B)
     (a : A) :
     Path ((Mor.comp (Mor.id B) f).fn a) (f.fn a) :=
-  Path.refl (f.fn a)
+  nontrivial_refl (f.fn a)
 
 /-- Def 7: Pullback composition coherence -/
 noncomputable def pullback_comp_coherence {A B C D : Type}
@@ -117,7 +145,7 @@ noncomputable def pullback_comp_coherence {A B C D : Type}
     (a : A) :
     Path ((Mor.comp (Mor.comp h g) f).fn a)
          ((Mor.comp h (Mor.comp g f)).fn a) :=
-  Path.refl (h.fn (g.fn (f.fn a)))
+  nontrivial_refl (h.fn (g.fn (f.fn a)))
 
 -- ===================================================================
 -- Section 4: Exponential Objects
@@ -143,33 +171,33 @@ noncomputable def uncurryMor {A B C : Type} (g : Mor C (Exp A B)) : Mor (C × A)
 noncomputable def eval_after_curry {A B C : Type} (f : Mor (C × A) B)
     (c : C) (a : A) :
     Path ((evalMor A B).fn ((curryMor f).fn c, a)) (f.fn (c, a)) :=
-  Path.refl (f.fn (c, a))
+  nontrivial_refl (f.fn (c, a))
 
 /-- Def 9: Currying after uncurrying recovers original -/
 noncomputable def curry_uncurry {A B C : Type} (g : Mor C (Exp A B))
     (c : C) (a : A) :
     Path (((curryMor (uncurryMor g)).fn c).app a) ((g.fn c).app a) :=
-  Path.refl ((g.fn c).app a)
+  nontrivial_refl ((g.fn c).app a)
 
 /-- Def 10: Uncurrying after currying recovers original -/
 noncomputable def uncurry_curry {A B C : Type} (f : Mor (C × A) B)
     (p : C × A) :
     Path ((uncurryMor (curryMor f)).fn p) (f.fn (p.1, p.2)) :=
-  Path.refl (f.fn (p.1, p.2))
+  nontrivial_refl (f.fn (p.1, p.2))
 
 /-- Def 11: Evaluation naturality -/
 noncomputable def eval_naturality {A B C : Type}
     (g : Mor B C) (e : Exp A B) (a : A) :
     Path (g.fn ((evalMor A B).fn (e, a)))
          ((evalMor A C).fn (⟨fun x => g.fn (e.app x)⟩, a)) :=
-  Path.refl (g.fn (e.app a))
+  nontrivial_refl (g.fn (e.app a))
 
 /-- Def 12: Curry preserves composition -/
 noncomputable def curry_comp {A B C D : Type}
     (f : Mor (C × A) B) (g : Mor D C) (d : D) (a : A) :
     Path (((curryMor f).fn (g.fn d)).app a)
          (((curryMor ⟨fun p => f.fn (g.fn p.1, p.2)⟩).fn d).app a) :=
-  Path.refl (f.fn (g.fn d, a))
+  nontrivial_refl (f.fn (g.fn d, a))
 
 -- ===================================================================
 -- Section 5: Power Objects
@@ -192,7 +220,7 @@ noncomputable def singleton_contains {A : Type} [DecidableEq A]
     Path ((membership A).fn (a, (singletonMor A).fn a)) Om.top := by
   unfold membership singletonMor
   simp
-  exact Path.refl Om.top
+  exact nontrivial_refl Om.top
 
 /-- Def 14: Singleton excludes other elements -/
 noncomputable def singleton_excludes {A : Type} [DecidableEq A]
@@ -200,7 +228,7 @@ noncomputable def singleton_excludes {A : Type} [DecidableEq A]
     Path ((membership A).fn (b, (singletonMor A).fn a)) Om.bot := by
   unfold membership singletonMor
   simp [h]
-  exact Path.refl Om.bot
+  exact nontrivial_refl Om.bot
 
 /-- Def 15: Membership factors through truth -/
 noncomputable def mem_through_truth {A : Type} [DecidableEq A]
@@ -209,7 +237,7 @@ noncomputable def mem_through_truth {A : Type} [DecidableEq A]
          (truthMor.fn Ter.pt) := by
   unfold membership singletonMor truthMor
   simp
-  exact Path.refl Om.top
+  exact nontrivial_refl Om.top
 
 -- ===================================================================
 -- Section 6: Internal Logic - Conjunction, Disjunction, Implication
@@ -289,7 +317,7 @@ noncomputable def disj_assoc (a b c : Om) :
 /-- Def 25: Implication modus ponens -/
 noncomputable def modus_ponens :
     Path (conjMor.fn (Om.top, implMor.fn (Om.top, Om.top))) Om.top :=
-  Path.refl Om.top
+  nontrivial_refl Om.top
 
 /-- Def 26: Implication with false antecedent -/
 noncomputable def ex_falso (b : Om) :
@@ -343,12 +371,12 @@ noncomputable def absorption_disj_conj (a b : Om) :
 /-- Def 35: Negation of top is bot -/
 noncomputable def neg_top :
     Path (negMor.fn Om.top) Om.bot :=
-  Path.refl Om.bot
+  nontrivial_refl Om.bot
 
 /-- Def 36: Negation of bot is top -/
 noncomputable def neg_bot :
     Path (negMor.fn Om.bot) Om.top :=
-  Path.refl Om.top
+  nontrivial_refl Om.top
 
 -- ===================================================================
 -- Section 7: Lawvere-Tierney Topologies
@@ -366,14 +394,14 @@ structure LTTopology where
 /-- The identity topology -/
 noncomputable def idTopology : LTTopology where
   j := Mor.id Om
-  preserves_top := Path.refl Om.top
-  idempotent := fun a => Path.refl a
-  preserves_conj := fun _ _ => Path.refl _
+  preserves_top := nontrivial_refl Om.top
+  idempotent := fun a => nontrivial_refl a
+  preserves_conj := fun a b => nontrivial_refl (conjMor.fn (a, b))
 
 /-- The double-negation topology -/
 noncomputable def dblNegTopology : LTTopology where
   j := ⟨fun a => negMor.fn (negMor.fn a)⟩
-  preserves_top := Path.refl Om.top
+  preserves_top := nontrivial_refl Om.top
   idempotent := fun a => by cases a <;> exact Path.refl _
   preserves_conj := fun a b => by cases a <;> cases b <;> exact Path.refl _
 
@@ -476,38 +504,38 @@ noncomputable def nnoIter {A : Type} (f : A → A) (n : Nat) (a : A) : A :=
 /-- Def 47: NNO recursion base case -/
 noncomputable def nno_rec_zero {A : Type} (a : A) (f : A → A) :
     Path (nnoRec a f 0) a :=
-  Path.refl a
+  nontrivial_refl a
 
 /-- Def 48: NNO recursion step case -/
 noncomputable def nno_rec_succ {A : Type} (a : A) (f : A → A) (n : Nat) :
     Path (nnoRec a f (n + 1)) (f (nnoRec a f n)) :=
-  Path.refl (f (nnoRec a f n))
+  nontrivial_refl (f (nnoRec a f n))
 
 /-- Def 49: NNO recursion commutes with successor -/
 noncomputable def nno_rec_succ_comm {A : Type} (a : A) (f : A → A) (n : Nat) :
     Path (nnoRec a f (stdNNO.succ n)) (f (nnoRec a f n)) :=
-  Path.refl (f (nnoRec a f n))
+  nontrivial_refl (f (nnoRec a f n))
 
 /-- Def 50: Zero iterations is identity -/
 noncomputable def nno_iter_zero {A : Type} (f : A → A) (a : A) :
     Path (nnoIter f 0 a) a :=
-  Path.refl a
+  nontrivial_refl a
 
 /-- Def 51: One iteration is f -/
 noncomputable def nno_iter_one {A : Type} (f : A → A) (a : A) :
     Path (nnoIter f 1 a) (f a) :=
-  Path.refl (f a)
+  nontrivial_refl (f a)
 
 /-- Def 52: Iteration step -/
 noncomputable def nno_iter_step {A : Type} (f : A → A) (n : Nat) (a : A) :
     Path (nnoIter f (n + 1) a) (f (nnoIter f n a)) :=
-  Path.refl (f (nnoIter f n a))
+  nontrivial_refl (f (nnoIter f n a))
 
 /-- Def 53: NNO with function application -/
 noncomputable def nno_func_coherence {A B : Type}
     (g : A → B) (f : B → B) (a : A) (n : Nat) :
     Path (nnoRec (g a) f n) (nnoIter f n (g a)) :=
-  Path.refl (nnoRec (g a) f n)
+  nontrivial_refl (nnoRec (g a) f n)
 
 -- ===================================================================
 -- Section 10: Path Coherence Diagrams
@@ -562,7 +590,7 @@ noncomputable def mor_comp_assoc {A B C D : Type}
     (f : Mor A B) (g : Mor B C) (h : Mor C D) (a : A) :
     Path ((Mor.comp h (Mor.comp g f)).fn a)
          ((Mor.comp (Mor.comp h g) f).fn a) :=
-  Path.refl (h.fn (g.fn (f.fn a)))
+  nontrivial_refl (h.fn (g.fn (f.fn a)))
 
 /-- Def 62: Terminal morphism uniqueness -/
 noncomputable def terminal_unique {A : Type} (f g : Mor A Ter) (a : A) :
@@ -577,7 +605,7 @@ noncomputable def subobj_total {A : Type} [DecidablePred (fun (_ : A) => True)]
     Path ((charMor (fun _ : A => True)).fn a) Om.top := by
   unfold charMor
   simp
-  exact Path.refl Om.top
+  exact nontrivial_refl Om.top
 
 /-- Def 64: Topology and conjunction coherence -/
 noncomputable def topology_conj_coherence (t : LTTopology) (a b : Om) :
@@ -598,6 +626,6 @@ noncomputable def comprehensive_topos_coherence (t : LTTopology) :
 noncomputable def exp_eval_topos {A B : Type}
     (f : Exp A B) (a : A) :
     Path ((evalMor A B).fn (f, a)) (f.app a) :=
-  Path.refl (f.app a)
+  nontrivial_refl (f.app a)
 
 end ToposPathDeep

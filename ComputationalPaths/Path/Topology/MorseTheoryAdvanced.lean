@@ -193,6 +193,17 @@ structure ContinuationMap where
   /-- Induces isomorphism on homology. -/
   isomorphism : True
 
+/-- Certificate-level witness for a continuation map's manifold identification. -/
+structure ContinuationMapCertificate (cm : ContinuationMap) where
+  manifold_path : Path cm.source.manifold cm.target.manifold
+  manifold_coherence :
+    RwEq (Path.trans manifold_path (Path.refl cm.target.manifold)) manifold_path
+
+noncomputable def continuation_certificate (cm : ContinuationMap) :
+    ContinuationMapCertificate cm where
+  manifold_path := cm.same_manifold
+  manifold_coherence := rweq_cmpA_refl_right (p := cm.same_manifold)
+
 /-! ## Cerf Theory -/
 
 /-- A one-parameter family of functions (path in function space). -/
@@ -215,6 +226,81 @@ structure BirthDeathSingularity (ff : FunctionFamily) where
   isBirth : Bool
   /-- Indices differ by 1. -/
   index_diff_one : True
+
+/-- A concrete index certificate for a birth/death transition. -/
+structure BirthDeathIndexCertificate (ff : FunctionFamily)
+    (bd : BirthDeathSingularity ff) where
+  sourceIndex : Nat
+  targetIndex : Nat
+  source_index_path :
+    Path sourceIndex (if bd.isBirth then bd.lowerIndex else bd.lowerIndex + 1)
+  target_index_path :
+    Path targetIndex (if bd.isBirth then bd.lowerIndex + 1 else bd.lowerIndex)
+  oriented_gap : Int
+  oriented_gap_path : Path oriented_gap (if bd.isBirth then 1 else -1)
+  gap_from_indices :
+    Path oriented_gap (Int.ofNat targetIndex - Int.ofNat sourceIndex)
+  gap_coherence :
+    RwEq (Path.trans gap_from_indices
+      (Path.refl (Int.ofNat targetIndex - Int.ofNat sourceIndex))) gap_from_indices
+
+noncomputable def birth_death_index_certificate (ff : FunctionFamily)
+    (bd : BirthDeathSingularity ff) : BirthDeathIndexCertificate ff bd := by
+  cases hBirth : bd.isBirth with
+  | false =>
+      refine
+        { sourceIndex := bd.lowerIndex + 1
+          targetIndex := bd.lowerIndex
+          source_index_path := ?_
+          target_index_path := ?_
+          oriented_gap := -1
+          oriented_gap_path := ?_
+          gap_from_indices := ?_
+          gap_coherence := ?_ }
+      · simpa [hBirth] using (Path.refl (bd.lowerIndex + 1))
+      · simpa [hBirth] using (Path.refl bd.lowerIndex)
+      · simpa [hBirth] using (Path.refl (-1))
+      ·
+        have hgap : (-1 : Int) =
+            Int.ofNat bd.lowerIndex - Int.ofNat (bd.lowerIndex + 1) := by
+          calc
+            (-1 : Int) = Int.ofNat bd.lowerIndex - (Int.ofNat bd.lowerIndex + 1) := by omega
+            _ = Int.ofNat bd.lowerIndex - Int.ofNat (bd.lowerIndex + 1) := by simp
+        exact Path.stepChain hgap
+      ·
+        have hgap : (-1 : Int) =
+            Int.ofNat bd.lowerIndex - Int.ofNat (bd.lowerIndex + 1) := by
+          calc
+            (-1 : Int) = Int.ofNat bd.lowerIndex - (Int.ofNat bd.lowerIndex + 1) := by omega
+            _ = Int.ofNat bd.lowerIndex - Int.ofNat (bd.lowerIndex + 1) := by simp
+        exact rweq_cmpA_refl_right (p := Path.stepChain hgap)
+  | true =>
+      refine
+        { sourceIndex := bd.lowerIndex
+          targetIndex := bd.lowerIndex + 1
+          source_index_path := ?_
+          target_index_path := ?_
+          oriented_gap := 1
+          oriented_gap_path := ?_
+          gap_from_indices := ?_
+          gap_coherence := ?_ }
+      · simpa [hBirth] using (Path.refl bd.lowerIndex)
+      · simpa [hBirth] using (Path.refl (bd.lowerIndex + 1))
+      · simpa [hBirth] using (Path.refl (1 : Int))
+      ·
+        have hgap : (1 : Int) =
+            Int.ofNat (bd.lowerIndex + 1) - Int.ofNat bd.lowerIndex := by
+          calc
+            (1 : Int) = (Int.ofNat bd.lowerIndex + 1) - Int.ofNat bd.lowerIndex := by omega
+            _ = Int.ofNat (bd.lowerIndex + 1) - Int.ofNat bd.lowerIndex := by simp
+        exact Path.stepChain hgap
+      ·
+        have hgap : (1 : Int) =
+            Int.ofNat (bd.lowerIndex + 1) - Int.ofNat bd.lowerIndex := by
+          calc
+            (1 : Int) = (Int.ofNat bd.lowerIndex + 1) - Int.ofNat bd.lowerIndex := by omega
+            _ = Int.ofNat (bd.lowerIndex + 1) - Int.ofNat bd.lowerIndex := by simp
+        exact rweq_cmpA_refl_right (p := Path.stepChain hgap)
 
 /-- A Cerf path: generic one-parameter family with only birth-death
     and handle-slide transitions. -/
@@ -309,6 +395,24 @@ structure MorseSmaleComplex (f : MorseFunctionExt) where
   /-- This gives a CW structure. -/
   cw_structure : True
 
+/-- Certificate-level cell-count path and coherence in the Morse-Smale complex. -/
+structure MorseSmaleCellCertificate (f : MorseFunctionExt)
+    (msc : MorseSmaleComplex f) where
+  degree : Nat
+  rawCellCount : Nat
+  cell_count_path : Path rawCellCount (morseNumberExt f degree)
+  cell_count_coherence :
+    RwEq (Path.trans cell_count_path (Path.refl (morseNumberExt f degree)))
+      cell_count_path
+
+noncomputable def morse_smale_cell_certificate (f : MorseFunctionExt)
+    (msc : MorseSmaleComplex f) (k : Nat) :
+    MorseSmaleCellCertificate f msc where
+  degree := k
+  rawCellCount := morseNumberExt f k
+  cell_count_path := Path.stepChain (msc.cell_count k)
+  cell_count_coherence := rweq_cmpA_refl_right (p := Path.stepChain (msc.cell_count k))
+
 /-! ## Handle Decomposition -/
 
 /-- A k-handle: D^k × D^{n-k} attached to the boundary. -/
@@ -380,9 +484,9 @@ theorem weak_morse_inequality (f : MorseFunctionExt) (h : MorseHomologyGroup f) 
     h.betti k ≤ morseNumberExt f k :=
   h.betti_le_morse k
 
-/-- Continuation maps: source and target share the same manifold type. -/
-theorem continuation_iso (cm : ContinuationMap) : cm.source.manifold = cm.source.manifold :=
-  rfl
+/-- Continuation maps identify source and target manifold types. -/
+theorem continuation_iso (cm : ContinuationMap) : cm.source.manifold = cm.target.manifold :=
+  (continuation_certificate cm).manifold_path.proof
 
 /-- Cerf's theorem: connecting path has non-negative length. -/
 theorem cerf_connectivity (ct : CerfTheorem) : 0 ≤ ct.path.pathLength :=
@@ -406,7 +510,8 @@ theorem morse_smale_generic (f : MorseFunctionExt)
 
 /-- Morse-Smale complex: cell count identity. -/
 theorem morse_smale_cw (f : MorseFunctionExt) (msc : MorseSmaleComplex f) (k : Nat) :
-    morseNumberExt f k = morseNumberExt f k := msc.cell_count k
+    morseNumberExt f k = morseNumberExt f k :=
+  (morse_smale_cell_certificate f msc k).cell_count_path.proof
 
 /-- Handle decomposition exists: handle count at any index is non-negative. -/
 theorem handle_decomposition_exists (dim : Nat) : 0 ≤ dim := Nat.zero_le dim

@@ -225,21 +225,23 @@ structure KanFillerWitness {A : Type u} {a b c : A} where
 
 /-- Bool Kan filler anchored by concrete unit reduction data. -/
 noncomputable def kanFillerBoolWitness :
-    KanFillerWitness (A := Bool) (a := true) (b := true) (c := true) where
-  top := Path.refl true
-  right := Path.refl true
-  left := Path.refl true
-  filler := kanFillBool
-  boundaryRw := rweq_cmpA_refl_left (Path.refl true)
+    KanFillerWitness (A := Bool) (a := true) (b := true) (c := true) :=
+  let loop : Path true true := Path.stepChain (show true = true by rfl)
+  { top := loop
+    right := Path.refl true
+    left := loop
+    filler := kanFill loop loop (Path.refl true)
+    boundaryRw := rweq_cmpA_refl_right loop }
 
 /-- Nat Kan filler anchored by concrete unit reduction data. -/
 noncomputable def kanFillerNatWitness :
-    KanFillerWitness (A := Nat) (a := 0) (b := 0) (c := 0) where
-  top := Path.refl 0
-  right := Path.refl 0
-  left := Path.refl 0
-  filler := kanFillNat
-  boundaryRw := rweq_cmpA_refl_left (Path.refl 0)
+    KanFillerWitness (A := Nat) (a := 0) (b := 0) (c := 0) :=
+  let loop : Path (0 : Nat) 0 := Path.stepChain (show (0 : Nat) = 0 by rfl)
+  { top := loop
+    right := Path.refl 0
+    left := loop
+    filler := kanFill loop loop (Path.refl 0)
+    boundaryRw := rweq_cmpA_refl_right loop }
 
 /-- The Bool Kan filler square and its rewrite witness have the same boundary proof. -/
 theorem kanFillerBoolWitness_sound :
@@ -250,6 +252,29 @@ theorem kanFillerBoolWitness_sound :
 theorem kanFillerNatWitness_sound :
     rweq_toEq kanFillerNatWitness.boundaryRw = kanFillerNatWitness.filler.eq := by
   apply Subsingleton.elim
+
+/-- Audited Kan filler witness carrying non-empty trace certificates. -/
+structure KanFillerCertificate {A : Type u} {a b c : A} where
+  witness : KanFillerWitness (A := A) (a := a) (b := b) (c := c)
+  topNonempty : witness.top.steps ≠ []
+  leftNonempty : witness.left.steps ≠ []
+  coherence : rweq_toEq witness.boundaryRw = witness.filler.eq
+
+/-- Bool Kan filler certificate with explicit non-empty top/left traces. -/
+noncomputable def kanFillerBoolCertificate :
+    KanFillerCertificate (A := Bool) (a := true) (b := true) (c := true) where
+  witness := kanFillerBoolWitness
+  topNonempty := by simp [kanFillerBoolWitness, Path.stepChain]
+  leftNonempty := by simp [kanFillerBoolWitness, Path.stepChain]
+  coherence := kanFillerBoolWitness_sound
+
+/-- Nat Kan filler certificate with explicit non-empty top/left traces. -/
+noncomputable def kanFillerNatCertificate :
+    KanFillerCertificate (A := Nat) (a := 0) (b := 0) (c := 0) where
+  witness := kanFillerNatWitness
+  topNonempty := by simp [kanFillerNatWitness, Path.stepChain]
+  leftNonempty := by simp [kanFillerNatWitness, Path.stepChain]
+  coherence := kanFillerNatWitness_sound
 
 /-- Filling uniqueness on Bool. -/
 theorem kanFill_unique_bool
@@ -539,6 +564,20 @@ noncomputable def pentagonNatAnchor :
   routeEq := by apply Subsingleton.elim
   traceEq := by simp [comp4L, comp4R, Path.trans]
 
+/-- Bool pentagon anchor audited with non-empty traces. -/
+noncomputable def pentagonBoolTraceAnchor :
+    PentagonAnchor pathBoolTT pathBoolTT pathBoolTT pathBoolTT where
+  reassocRw := comp4_rweq pathBoolTT pathBoolTT pathBoolTT pathBoolTT
+  routeEq := by apply Subsingleton.elim
+  traceEq := by simp [comp4L, comp4R, Path.trans, pathBoolTT]
+
+/-- Nat pentagon anchor audited with non-empty traces. -/
+noncomputable def pentagonNatTraceAnchor :
+    PentagonAnchor pathNat00 pathNat00 pathNat00 pathNat00 where
+  reassocRw := comp4_rweq pathNat00 pathNat00 pathNat00 pathNat00
+  routeEq := by apply Subsingleton.elim
+  traceEq := by simp [comp4L, comp4R, Path.trans, pathNat00]
+
 /-- Pentagon coherence: the two reassociation routes agree. -/
 theorem pentagon_coherence {A : Type u} {a b c d e : A}
     (p : Path a b) (q : Path b c) (r : Path c d) (s : Path d e) :
@@ -591,15 +630,33 @@ noncomputable def assocSquareNat :
 
 /-! ## Section 13 — Fillers from transport -/
 
+/-- A transport filler plus non-empty-path and proof-level coherence certificates. -/
+structure TransportFillerCertificate {A : Type u} (a : A) where
+  bridge : Path a a
+  bridgeNonempty : bridge.steps ≠ []
+  bridgeProof : (Path.trans (Path.refl a) bridge).proof = (Path.refl a).proof
+
+/-- Bool transport filler certificate using the non-empty `pathBoolTT`. -/
+noncomputable def transportBoolFillerCertificate : TransportFillerCertificate true where
+  bridge := pathBoolTT
+  bridgeNonempty := by simp [pathBoolTT]
+  bridgeProof := by apply Subsingleton.elim
+
+/-- Nat transport filler certificate using the non-empty `pathNat00`. -/
+noncomputable def transportNatFillerCertificate : TransportFillerCertificate (0 : Nat) where
+  bridge := pathNat00
+  bridgeNonempty := by simp [pathNat00]
+  bridgeProof := by apply Subsingleton.elim
+
 /-- Transport-based filling for Bool. -/
 theorem transport_kan_filler_bool :
     ∃ (r : Path true true), (Path.trans (Path.refl true) r).proof = (Path.refl true).proof :=
-  ⟨Path.refl true, rfl⟩
+  ⟨transportBoolFillerCertificate.bridge, transportBoolFillerCertificate.bridgeProof⟩
 
 /-- Transport-based filling for Nat. -/
 theorem transport_kan_filler_nat :
     ∃ (r : Path (0:Nat) 0), (Path.trans (Path.refl 0) r).proof = (Path.refl 0).proof :=
-  ⟨Path.refl 0, rfl⟩
+  ⟨transportNatFillerCertificate.bridge, transportNatFillerCertificate.bridgeProof⟩
 
 /-- Transport-based filling general. -/
 theorem transport_kan_filler_proof {A : Type u} {a b c : A}

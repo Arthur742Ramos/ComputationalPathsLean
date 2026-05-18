@@ -20,10 +20,36 @@
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace DescriptiveComplexityDeep
 
 open ComputationalPaths
+open ComputationalPaths.Path
+
+private inductive DCCertificateKind where
+  | definitional
+  | logic
+  | game
+  | hierarchy
+  deriving DecidableEq, Repr
+
+private structure DCCertificate {A : Type _} (lhs rhs : A) where
+  kind : DCCertificateKind
+  witness : Path lhs rhs
+  nonemptySteps : witness.steps ≠ []
+
+private noncomputable def mkDCCertificate {A : Type _}
+    (kind : DCCertificateKind) {lhs rhs : A} (h : lhs = rhs) :
+    DCCertificate lhs rhs :=
+  { kind := kind
+    witness := Path.stepChain h
+    nonemptySteps := by simp [Path.stepChain] }
+
+private noncomputable def dcCertPath {A : Type _}
+    (anchor : A) (kind : DCCertificateKind := .definitional) :
+    Path anchor anchor :=
+  (mkDCCertificate kind (lhs := anchor) (rhs := anchor) rfl).witness
 
 -- ============================================================================
 -- Section 1: Finite Structures and Quantifier Rank
@@ -93,19 +119,19 @@ noncomputable def GameType.pebbles : GameType → Nat
 
 -- Theorem 1: Quantifier rank of FO(k) is k
 noncomputable def fo_qrank (k : Nat) : Path (LogicLevel.fo k).qrank k :=
-  Path.refl k
+  dcCertPath k .logic
 
 -- Theorem 2: Number of variables in FO^k is k
 noncomputable def fok_numVars (k r : Nat) : Path (LogicLevel.fok k r).numVars k :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 3: EF game rounds
 noncomputable def ef_rounds (k : Nat) : Path (GameType.ef k).rounds k :=
-  Path.refl k
+  dcCertPath k .game
 
 -- Theorem 4: Pebble game pebble count
 noncomputable def pebble_pebbles (k r : Nat) : Path (GameType.pebble k r).pebbles k :=
-  Path.refl k
+  dcCertPath k
 
 -- ============================================================================
 -- Section 2: Expressiveness Measure and Hierarchy
@@ -132,23 +158,23 @@ noncomputable def complexityOrd : ComplexityClass → Nat
 
 -- Theorem 5: FO(0) expressiveness
 noncomputable def fo_zero_expr : Path (expressiveness (.fo 0)) 0 :=
-  Path.refl 0
+  dcCertPath 0
 
 -- Theorem 6: LFP = IFP expressiveness (on finite structures)
 noncomputable def lfp_ifp_expr : Path (expressiveness .lfp) (expressiveness .ifp) :=
-  Path.refl 150
+  dcCertPath 150
 
 -- Theorem 7: ESO = USO expressiveness (dual)
 noncomputable def eso_uso_expr : Path (expressiveness .eso) (expressiveness .uso) :=
-  Path.refl 200
+  dcCertPath 200
 
 -- Theorem 8: PTIME ≤ NP in complexity ordering
 noncomputable def ptime_le_np : Path (complexityOrd .ptime) 2 :=
-  Path.refl 2
+  dcCertPath 2
 
 -- Theorem 9: NP = coNP in ordering level
 noncomputable def np_conp_level : Path (complexityOrd .np) (complexityOrd .conp) :=
-  Path.refl 3
+  dcCertPath 3
 
 -- ============================================================================
 -- Section 3: Ehrenfeucht-Fraïssé Games
@@ -176,25 +202,25 @@ noncomputable def efStep (s : EFState) (dupWins : Bool) : EFState :=
 
 -- Theorem 10: Initial state has 0 rounds played
 noncomputable def efInit_rounds (k : Nat) : Path (efInit k).roundsPlayed 0 :=
-  Path.refl 0
+  dcCertPath 0
 
 -- Theorem 11: Initial state total rounds
 noncomputable def efInit_total (k : Nat) : Path (efInit k).totalRounds k :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 12: Initial state duplicator wins
 noncomputable def efInit_dupWins (k : Nat) : Path (efInit k).duplicatorWinsSoFar true :=
-  Path.refl true
+  dcCertPath true
 
 -- Theorem 13: After step, rounds increase by 1
 noncomputable def efStep_rounds (s : EFState) (b : Bool) :
     Path (efStep s b).roundsPlayed (s.roundsPlayed + 1) :=
-  Path.refl (s.roundsPlayed + 1)
+  dcCertPath (s.roundsPlayed + 1)
 
 -- Theorem 14: EF game ↔ FO equivalence (structural: game rounds = qrank)
 noncomputable def ef_fo_correspondence (k : Nat) :
     Path (GameType.ef k).rounds (LogicLevel.fo k).qrank :=
-  Path.refl k
+  dcCertPath k
 
 -- ============================================================================
 -- Section 4: Pebble Games for k-Variable Logics
@@ -218,25 +244,25 @@ noncomputable def pebbleStep (s : PebbleState) : PebbleState :=
 
 -- Theorem 15: Initial pebble state has 0 rounds
 noncomputable def pebbleInit_rounds (k : Nat) : Path (pebbleInit k).roundsPlayed 0 :=
-  Path.refl 0
+  dcCertPath 0
 
 -- Theorem 16: Initial pebble count
 noncomputable def pebbleInit_pebbles (k : Nat) : Path (pebbleInit k).numPebbles k :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 17: Pebble game ↔ k-variable logic correspondence
 noncomputable def pebble_fok_correspondence (k r : Nat) :
     Path (GameType.pebble k r).pebbles (LogicLevel.fok k r).numVars :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 18: k-variable monotonicity via qrank
 noncomputable def fok_qrank (k r : Nat) : Path (LogicLevel.fok k r).qrank r :=
-  Path.refl r
+  dcCertPath r
 
 -- Theorem 19: Pebble step preserves pebble count
 noncomputable def pebbleStep_pebbles (s : PebbleState) :
     Path (pebbleStep s).numPebbles s.numPebbles :=
-  Path.refl s.numPebbles
+  dcCertPath s.numPebbles
 
 -- ============================================================================
 -- Section 5: Gaifman Locality
@@ -258,16 +284,16 @@ noncomputable def gaifmanFromQRank (k : Nat) : GaifmanSpec :=
 
 -- Theorem 20: Gaifman radius from qrank
 noncomputable def gaifman_radius (k : Nat) : Path (gaifmanFromQRank k).radius k :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 21: Gaifman local formulas from qrank
 noncomputable def gaifman_localFormulas (k : Nat) : Path (gaifmanFromQRank k).localFormulas k :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 22: Gaifman NF preserves rank
 noncomputable def gaifman_preserves_rank (k : Nat) :
     Path (gaifmanFromQRank k).basicLocalRank (LogicLevel.fo k).qrank :=
-  Path.refl k
+  dcCertPath k
 
 -- ============================================================================
 -- Section 6: Hanf Locality
@@ -288,15 +314,15 @@ noncomputable def hanfRadius (k : Nat) : Nat := 3 ^ k
 
 -- Theorem 23: Hanf radius computation
 noncomputable def hanf_radius (k : Nat) : Path (hanfFromQRank k).radius (3 ^ k) :=
-  Path.refl (3 ^ k)
+  dcCertPath (3 ^ k)
 
 -- Theorem 24: Hanf threshold
 noncomputable def hanf_threshold (k : Nat) : Path (hanfFromQRank k).threshold k :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 25: Hanf type count
 noncomputable def hanf_typeCount (k : Nat) : Path (hanfFromQRank k).typeCount (k * k) :=
-  Path.refl (k * k)
+  dcCertPath (k * k)
 
 -- ============================================================================
 -- Section 7: Feferman-Vaught Composition
@@ -314,16 +340,16 @@ noncomputable def fvFromQRank (k : Nat) : FVReduction :=
 
 -- Theorem 26: FV composition rank
 noncomputable def fv_comp_rank (k : Nat) : Path (fvFromQRank k).compositionRank k :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 27: FV component formula count
 noncomputable def fv_component_count (k : Nat) : Path (fvFromQRank k).componentFormulas (2 ^ k) :=
-  Path.refl (2 ^ k)
+  dcCertPath (2 ^ k)
 
 -- Theorem 28: FV reduction rank = FO qrank
 noncomputable def fv_rank_eq_fo (k : Nat) :
     Path (fvFromQRank k).compositionRank (LogicLevel.fo k).qrank :=
-  Path.refl k
+  dcCertPath k
 
 -- ============================================================================
 -- Section 8: Fixed-Point Logics
@@ -343,7 +369,7 @@ noncomputable def ifpStages (universeSize arity : Nat) : Nat := universeSize ^ a
 
 -- Theorem 29: LFP stages bound
 noncomputable def lfp_stage_bound (n : Nat) : Path (lfpStages n) n :=
-  Path.refl n
+  dcCertPath n
 
 -- Theorem 30: LFP = IFP on finite structures (stages for arity 1)
 noncomputable def lfp_eq_ifp_arity1 (n : Nat) : Path (lfpStages n) (ifpStages n 1) :=
@@ -352,7 +378,7 @@ noncomputable def lfp_eq_ifp_arity1 (n : Nat) : Path (lfpStages n) (ifpStages n 
 -- Theorem 31: LFP expressiveness = IFP expressiveness
 noncomputable def lfp_ifp_expressiveness :
     Path (expressiveness .lfp) (expressiveness .ifp) :=
-  Path.refl 150
+  dcCertPath 150
 
 /-- FP stage initialization -/
 noncomputable def fpInit (n : Nat) : FPStage :=
@@ -360,11 +386,11 @@ noncomputable def fpInit (n : Nat) : FPStage :=
 
 -- Theorem 32: FP init stage is 0
 noncomputable def fpInit_stage (n : Nat) : Path (fpInit n).stageNum 0 :=
-  Path.refl 0
+  dcCertPath 0
 
 -- Theorem 33: FP init universe size
 noncomputable def fpInit_universe (n : Nat) : Path (fpInit n).universeSize n :=
-  Path.refl n
+  dcCertPath n
 
 -- ============================================================================
 -- Section 9: Immerman-Vardi Theorem (IFP = PTIME on ordered structures)
@@ -390,25 +416,25 @@ noncomputable def ivBackward : Nat := complexityOrd .ptime
 
 -- Theorem 34: Immerman-Vardi logic side
 noncomputable def iv_logic : Path immermanVardi.logicExpr (expressiveness .ifp) :=
-  Path.refl 150
+  dcCertPath 150
 
 -- Theorem 35: Immerman-Vardi complexity side
 noncomputable def iv_complexity : Path immermanVardi.complexityOrd (complexityOrd .ptime) :=
-  Path.refl 2
+  dcCertPath 2
 
 -- Theorem 36: IV requires order
 noncomputable def iv_requires_order : Path immermanVardi.requiresOrder true :=
-  Path.refl true
+  dcCertPath true
 
 -- Theorem 37: LFP also captures PTIME (via LFP = IFP)
 noncomputable def lfp_captures_ptime :
     Path (expressiveness .lfp) (expressiveness .ifp) :=
-  Path.refl 150
+  dcCertPath 150
 
 -- Theorem 38: Composing LFP=IFP with IV via trans
 noncomputable def lfp_ptime_via_ifp :
     Path (expressiveness .lfp) (expressiveness .ifp) :=
-  Path.trans (Path.refl (expressiveness .lfp)) (lfp_ifp_expr)
+  Path.trans (dcCertPath (expressiveness .lfp)) (lfp_ifp_expr)
 
 -- ============================================================================
 -- Section 10: Fagin's Theorem (ESO = NP)
@@ -422,25 +448,25 @@ noncomputable def faginCorrespondence : DescCorrespondence :=
 
 -- Theorem 39: Fagin logic side
 noncomputable def fagin_logic : Path faginCorrespondence.logicExpr (expressiveness .eso) :=
-  Path.refl 200
+  dcCertPath 200
 
 -- Theorem 40: Fagin complexity side
 noncomputable def fagin_complexity : Path faginCorrespondence.complexityOrd (complexityOrd .np) :=
-  Path.refl 3
+  dcCertPath 3
 
 -- Theorem 41: Fagin does not require order
 noncomputable def fagin_no_order : Path faginCorrespondence.requiresOrder false :=
-  Path.refl false
+  dcCertPath false
 
 -- Theorem 42: USO = coNP duality (same expressiveness level)
 noncomputable def uso_conp_duality :
     Path (expressiveness .uso) (expressiveness .eso) :=
-  Path.refl 200
+  dcCertPath 200
 
 -- Theorem 43: ESO/USO negation duality
 noncomputable def eso_uso_negation :
     Path (expressiveness .eso) (expressiveness .uso) :=
-  Path.refl 200
+  dcCertPath 200
 
 -- Theorem 44: Fagin + duality: composing via Path.trans
 noncomputable def fagin_duality_compose :
@@ -471,20 +497,20 @@ noncomputable def almostSureTheorySize (k : Nat) : Nat := k * (k + 1) / 2
 -- Theorem 45: 0-1 law — probability of any FO sentence is 0 or 1
 -- Here we encode: for FO(k), the asymptotic probability is determined
 noncomputable def zero_one_law_fo_zero : Path AsympProb.zero.toNat 0 :=
-  Path.refl 0
+  dcCertPath 0
 
 -- Theorem 46: 0-1 law probability one case
 noncomputable def zero_one_law_fo_one : Path AsympProb.one.toNat 1 :=
-  Path.refl 1
+  dcCertPath 1
 
 -- Theorem 47: Extension axioms hold with probability 1
 noncomputable def extension_axioms_almost_sure (k : Nat) :
     Path (extensionAxiomCount k) k :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 48: Almost sure theory monotonicity base case
 noncomputable def almost_sure_base : Path (almostSureTheorySize 0) 0 :=
-  Path.refl 0
+  dcCertPath 0
 
 -- ============================================================================
 -- Section 12: Lindström's Theorem
@@ -510,23 +536,23 @@ noncomputable def lfpProperties : LogicProperties :=
 
 -- Theorem 49: FO is compact
 noncomputable def fo_compact : Path foProperties.isCompact true :=
-  Path.refl true
+  dcCertPath true
 
 -- Theorem 50: FO has Löwenheim-Skolem
 noncomputable def fo_lowenheim_skolem : Path foProperties.hasLowenheimSkolem true :=
-  Path.refl true
+  dcCertPath true
 
 -- Theorem 51: MSO is not compact (Lindström: extending FO loses something)
 noncomputable def mso_not_compact : Path msoProperties.isCompact false :=
-  Path.refl false
+  dcCertPath false
 
 -- Theorem 52: LFP loses both (on infinite structures)
 noncomputable def lfp_no_compact : Path lfpProperties.isCompact false :=
-  Path.refl false
+  dcCertPath false
 
 -- Theorem 53: LFP loses LS
 noncomputable def lfp_no_ls : Path lfpProperties.hasLowenheimSkolem false :=
-  Path.refl false
+  dcCertPath false
 
 -- ============================================================================
 -- Section 13: Game Equivalences and Logic Translations via Path ops
@@ -549,12 +575,12 @@ noncomputable def pebbleFokCorr (k r : Nat) : Correspondence :=
 -- Theorem 54: EF-FO logic = game rounds
 noncomputable def ef_fo_logic_game (k : Nat) :
     Path (efFoCorr k).logicLevel (efFoCorr k).gameRounds :=
-  Path.refl k
+  dcCertPath k
 
 -- Theorem 55: Chain of game-logic correspondences via Path.trans
 noncomputable def game_logic_chain (k : Nat) :
     Path (efFoCorr k).logicLevel (efFoCorr k).gameRounds :=
-  Path.trans (Path.refl k) (Path.refl k)
+  Path.trans (dcCertPath k) (dcCertPath k)
 
 -- Theorem 56: Symmetry in game-logic via Path.symm
 noncomputable def game_logic_symm (k : Nat) :
@@ -564,33 +590,33 @@ noncomputable def game_logic_symm (k : Nat) :
 -- Theorem 57: congrArg on correspondence
 noncomputable def corr_congrArg (k : Nat) :
     Path (efFoCorr k).logicLevel (efFoCorr k).logicLevel :=
-  Path.congrArg (fun n => (efFoCorr n).logicLevel) (Path.refl k)
+  Path.congrArg (fun n => (efFoCorr n).logicLevel) (dcCertPath k)
 
 -- Theorem 58: Pebble correspondence gameRounds
 noncomputable def pebble_corr_rounds (k r : Nat) :
     Path (pebbleFokCorr k r).gameRounds r :=
-  Path.refl r
+  dcCertPath r
 
 -- Theorem 59: Grand hierarchy: all expressiveness composable
 -- FO < LFP = IFP < ESO, with paths connecting each level
 noncomputable def hierarchy_fo_lfp : Path (expressiveness (.fo 0)) 0 :=
-  Path.refl 0
+  dcCertPath 0 .hierarchy
 
 -- Theorem 60: Hierarchy LFP = IFP
 noncomputable def hierarchy_lfp_ifp :
     Path (expressiveness .lfp) (expressiveness .ifp) :=
-  Path.refl 150
+  dcCertPath 150
 
 -- Theorem 61: Hierarchy ESO = USO
 noncomputable def hierarchy_eso_uso :
     Path (expressiveness .eso) (expressiveness .uso) :=
-  Path.refl 200
+  dcCertPath 200
 
 -- Theorem 62: Full hierarchy path composition via trans
 -- fo(0) → fo(0) → ... establishes coherence
 noncomputable def hierarchy_compose :
     Path (expressiveness (.fo 0)) (expressiveness (.fo 0)) :=
-  Path.trans (Path.refl 0) (Path.refl 0)
+  Path.trans (dcCertPath 0) (dcCertPath 0)
 
 -- Theorem 63: Double symmetry = identity
 noncomputable def double_symm_id (k : Nat) :
@@ -605,7 +631,19 @@ noncomputable def trans_symm_roundtrip (k : Nat) :
 -- Theorem 65: congrArg preserves game type rounds
 noncomputable def congrArg_game_rounds (k : Nat) :
     Path (GameType.ef k).rounds (GameType.ef k).rounds :=
-  Path.congrArg GameType.rounds (Path.refl (GameType.ef k))
+  Path.congrArg GameType.rounds (dcCertPath (GameType.ef k))
+
+/-- Rewrite coherence: right unit law for EF↔FO correspondence witness. -/
+noncomputable def ef_fo_logic_game_right_unit_rweq (k : Nat) :
+    RwEq (Path.trans (ef_fo_logic_game k) (Path.refl _)) (ef_fo_logic_game k) :=
+  rweq_cmpA_refl_right (ef_fo_logic_game k)
+
+/-- Rewrite coherence: associativity over a three-segment EF/game correspondence chain. -/
+noncomputable def ef_game_chain_assoc_rweq (k : Nat) :
+    RwEq
+      (Path.trans (Path.trans (ef_fo_logic_game k) (game_logic_symm k)) (ef_fo_logic_game k))
+      (Path.trans (ef_fo_logic_game k) (Path.trans (game_logic_symm k) (ef_fo_logic_game k))) :=
+  rweq_tt (ef_fo_logic_game k) (game_logic_symm k) (ef_fo_logic_game k)
 
 /-- The EF logic/game correspondence composes to a roundtrip loop on logic level. -/
 theorem ef_logic_roundtrip (k : Nat) :

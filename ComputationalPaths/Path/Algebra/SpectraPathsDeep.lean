@@ -64,6 +64,34 @@ noncomputable def whiskerR {p q : Path α a b} (σ : Cell2 p q) (r : Path α b c
     Cell2 (p.trans r) (q.trans r) :=
   ⟨congrArg (· |>.trans r) σ.eq⟩
 
+/-- Typed coherence certificate for a 2-cell.
+`lenEq` carries proof content; `lenTrace` records an explicit path annotation. -/
+structure Cell2Certificate {α : Type} {a b : α} (p q : Path α a b) where
+  lhsLen : Nat
+  rhsLen : Nat
+  lhsDef : lhsLen = p.length
+  rhsDef : rhsLen = q.length
+  lenEq : lhsLen = rhsLen
+  lenTrace : Path Nat lhsLen rhsLen
+
+noncomputable def Cell2.certificate {p q : Path α a b} (σ : Cell2 p q) : Cell2Certificate p q := by
+  refine
+    { lhsLen := p.length
+      rhsLen := q.length
+      lhsDef := rfl
+      rhsDef := rfl
+      lenEq := ?_
+      lenTrace := Path.single (Step.rule "cell2_length_coherence" p.length q.length) }
+  simpa using congrArg Path.length σ.eq
+
+theorem cell2_certificate_trace_len {p q : Path α a b} (σ : Cell2 p q) :
+    (σ.certificate).lenTrace.length = 1 := by
+  simp [Cell2.certificate, Path.single, Path.length]
+
+theorem cell2_certificate_lenEq {p q : Path α a b} (σ : Cell2 p q) :
+    (σ.certificate).lhsLen = (σ.certificate).rhsLen :=
+  (σ.certificate).lenEq
+
 -- §1a  Fundamental path lemmas
 
 /-- Theorem 1: Path trans associativity. -/
@@ -661,5 +689,9 @@ theorem cell2_vcomp_assoc {p q r s : Path α a b}
 theorem whiskerL_id (r : Path α a b) (p : Path α b c) :
     (whiskerL r (Cell2.id p)).eq = rfl := by
   rfl
+
+theorem whiskerL_id_certificate (r : Path α a b) (p : Path α b c) :
+    (Cell2.certificate (whiskerL r (Cell2.id p))).lenTrace.length = 1 := by
+  simp [Cell2.certificate, whiskerL, Path.single, Path.length]
 
 end CompPaths.SpectraPaths

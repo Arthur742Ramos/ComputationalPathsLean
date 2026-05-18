@@ -54,6 +54,7 @@ the Euler characteristic via the Gauss-Bonnet theorem.
 - Bott & Tu, "Differential Forms in Algebraic Topology"
 -/
 
+import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
 
 namespace ComputationalPaths
@@ -148,6 +149,13 @@ theorem Bundle.rank_directSum (E F : Bundle) :
 theorem Bundle.rank_trivial (n : Nat) :
     (Bundle.trivial n).rank = n := rfl
 
+/-- Typed certificate bundling a bundle payload with computational-path evidence. -/
+structure BundlePathCertificate {A : Type u} (a b : A) where
+  bundle : Bundle
+  label : String
+  witness : Path a b
+  witnessCoherence : ComputationalPaths.Path.RwEq witness witness
+
 /-! ## Chern Classes
 
 Chern classes c_k(E) ∈ H^{2k}(X; ℤ) for complex bundles.
@@ -175,6 +183,14 @@ theorem chern_zero_is_one (E : Bundle) : C.chern 0 E = R.one :=
 /-- `Path`-typed witness of `c_0(E) = 1`. -/
 noncomputable def chern_zero_is_onePath (E : Bundle) : Path (C.chern 0 E) R.one :=
   Path.stepChain (C.chern_zero E)
+
+/-- Bundle-aware certificate for the `c₀(E)=1` witness. -/
+noncomputable def chern_zero_certificate (E : Bundle) :
+    BundlePathCertificate (C.chern 0 E) R.one where
+  bundle := E
+  label := s!"chern-zero-bundle-{E.label}"
+  witness := chern_zero_is_onePath (C := C) E
+  witnessCoherence := ComputationalPaths.Path.RwEq.refl _
 
 /-- c_k vanishes above the rank. -/
 theorem chern_vanishing_above (k : Nat) (E : Bundle) (hk : k > E.rank) :
@@ -271,6 +287,14 @@ theorem sw_zero_is_one (E : Bundle) : W.sw 0 E = M.one :=
 noncomputable def sw_zero_is_onePath (E : Bundle) : Path (W.sw 0 E) M.one :=
   Path.stepChain (W.sw_zero E)
 
+/-- Bundle-aware certificate for the `w₀(E)=1` witness. -/
+noncomputable def sw_zero_certificate (E : Bundle) :
+    BundlePathCertificate (W.sw 0 E) M.one where
+  bundle := E
+  label := s!"sw-zero-bundle-{E.label}"
+  witness := sw_zero_is_onePath (W := W) E
+  witnessCoherence := ComputationalPaths.Path.RwEq.refl _
+
 /-- w_k vanishes above the rank. -/
 theorem sw_vanishing_above (k : Nat) (E : Bundle) (hk : k > E.rank) :
     W.sw k E = M.zero k :=
@@ -354,6 +378,16 @@ noncomputable def euler_rank_zeroPath :
     Path (E_data.euler (Bundle.trivial 0)) (cast (by simp [Bundle.rank_trivial]) R.one) :=
   Path.stepChain E_data.euler_trivial_zero
 
+/-- Bundle-aware certificate for the rank-0 Euler witness. -/
+noncomputable def euler_rank_zero_certificate :
+    BundlePathCertificate
+      (E_data.euler (Bundle.trivial 0))
+      (cast (by simp [Bundle.rank_trivial]) R.one) where
+  bundle := Bundle.trivial 0
+  label := "euler-rank-zero-trivial"
+  witness := euler_rank_zeroPath (E_data := E_data)
+  witnessCoherence := ComputationalPaths.Path.RwEq.refl _
+
 /-- Euler class for rank-1 trivial bundle vanishes. -/
 theorem euler_rank_one :
     E_data.euler (Bundle.trivial 1) = R.zero 1 := by
@@ -365,6 +399,14 @@ theorem euler_rank_one :
 /-- `Path`-typed Euler class for the rank-1 trivial bundle. -/
 noncomputable def euler_rank_onePath : Path (E_data.euler (Bundle.trivial 1)) (R.zero 1) :=
   Path.stepChain (euler_rank_one (E_data := E_data))
+
+/-- Bundle-aware certificate for the rank-1 Euler witness. -/
+noncomputable def euler_rank_one_certificate :
+    BundlePathCertificate (E_data.euler (Bundle.trivial 1)) (R.zero 1) where
+  bundle := Bundle.trivial 1
+  label := "euler-rank-one-trivial"
+  witness := euler_rank_onePath (E_data := E_data)
+  witnessCoherence := ComputationalPaths.Path.RwEq.refl _
 
 end EulerClassData
 

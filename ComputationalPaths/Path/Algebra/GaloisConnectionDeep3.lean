@@ -292,13 +292,49 @@ noncomputable def gc_compose (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) : GC 
     · intro h
       exact (gc₂.gc_adj _ c).mpr ((gc₁.gc_adj a _).mpr h)
 
+/-- Certificate for the lower leg of composition on a concrete source point. -/
+structure ComposeLowerCertificate (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) where
+  source : A
+  lower_eq : (gc_compose gc₁ gc₂).lower source = gc₂.lower (gc₁.lower source)
+  lower_path : Path ((gc_compose gc₁ gc₂).lower source) (gc₂.lower (gc₁.lower source))
+  lower_chain : Path ((gc_compose gc₁ gc₂).lower source) (gc₂.lower (gc₁.lower source))
+
+/-- Build lower composition certificate data. -/
+noncomputable def composeLowerCertificate (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (a : A) :
+    ComposeLowerCertificate gc₁ gc₂ where
+  source := a
+  lower_eq := rfl
+  lower_path := Path.stepChain (rfl : (gc_compose gc₁ gc₂).lower a = gc₂.lower (gc₁.lower a))
+  lower_chain := Path.trans
+    (Path.stepChain (rfl : (gc_compose gc₁ gc₂).lower a = gc₂.lower (gc₁.lower a)))
+    (Path.refl _)
+
+/-- Certificate for the upper leg of composition on a concrete target point. -/
+structure ComposeUpperCertificate (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) where
+  target : C
+  upper_eq : (gc_compose gc₁ gc₂).upper target = gc₁.upper (gc₂.upper target)
+  upper_path : Path ((gc_compose gc₁ gc₂).upper target) (gc₁.upper (gc₂.upper target))
+  upper_chain : Path ((gc_compose gc₁ gc₂).upper target) (gc₁.upper (gc₂.upper target))
+
+/-- Build upper composition certificate data. -/
+noncomputable def composeUpperCertificate (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (c : C) :
+    ComposeUpperCertificate gc₁ gc₂ where
+  target := c
+  upper_eq := rfl
+  upper_path := Path.stepChain (rfl : (gc_compose gc₁ gc₂).upper c = gc₁.upper (gc₂.upper c))
+  upper_chain := Path.trans
+    (Path.stepChain (rfl : (gc_compose gc₁ gc₂).upper c = gc₁.upper (gc₂.upper c)))
+    (Path.refl _)
+
 -- Theorem 32: Composed lower path
 noncomputable def gc_compose_lower_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (a : A) :
-    Path ((gc_compose gc₁ gc₂).lower a) (gc₂.lower (gc₁.lower a)) := Path.refl _
+    Path ((gc_compose gc₁ gc₂).lower a) (gc₂.lower (gc₁.lower a)) :=
+  (composeLowerCertificate gc₁ gc₂ a).lower_chain
 
 -- Theorem 33: Composed upper path
 noncomputable def gc_compose_upper_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (c : C) :
-    Path ((gc_compose gc₁ gc₂).upper c) (gc₁.upper (gc₂.upper c)) := Path.refl _
+    Path ((gc_compose gc₁ gc₂).upper c) (gc₁.upper (gc₂.upper c)) :=
+  (composeUpperCertificate gc₁ gc₂ c).upper_chain
 
 -- ============================================================================
 -- Section 12: Identity GC
@@ -310,8 +346,24 @@ noncomputable def gc_id (p : PreOrd A) : GC A A p p where
   upper := id
   gc_adj := fun _ _ => Iff.rfl
 
+/-- Certificate for identity-closure normalization at a concrete point. -/
+structure IdentityClosureCertificate (p : PreOrd A) where
+  point : A
+  closure_eq : cl (gc_id p) point = point
+  closure_path : Path (cl (gc_id p) point) point
+  closure_chain : Path (cl (gc_id p) point) point
+
+/-- Build identity-closure certificate data. -/
+noncomputable def gcIdClosureCertificate (p : PreOrd A) (a : A) :
+    IdentityClosureCertificate p where
+  point := a
+  closure_eq := rfl
+  closure_path := Path.stepChain (rfl : cl (gc_id p) a = a)
+  closure_chain := Path.trans (Path.stepChain (rfl : cl (gc_id p) a = a)) (Path.refl _)
+
 -- Theorem 35: Identity closure path
-noncomputable def gc_id_cl_path (p : PreOrd A) (a : A) : Path (cl (gc_id p) a) a := Path.refl _
+noncomputable def gc_id_cl_path (p : PreOrd A) (a : A) : Path (cl (gc_id p) a) a :=
+  (gcIdClosureCertificate p a).closure_chain
 
 -- ============================================================================
 -- Section 13: CongrArg Paths
@@ -616,9 +668,36 @@ noncomputable def cl_join_true_path (a : Bool) :
 -- ============================================================================
 
 -- Theorem 81: Closure composition path
+structure ComposeClosureCertificate (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) where
+  source : A
+  closure_eq :
+    cl (gc_compose gc₁ gc₂) source =
+      gc₁.upper (gc₂.upper (gc₂.lower (gc₁.lower source)))
+  closure_path :
+    Path (cl (gc_compose gc₁ gc₂) source)
+      (gc₁.upper (gc₂.upper (gc₂.lower (gc₁.lower source))))
+  closure_chain :
+    Path (cl (gc_compose gc₁ gc₂) source)
+      (gc₁.upper (gc₂.upper (gc₂.lower (gc₁.lower source))))
+
+/-- Build closure-composition certificate data. -/
+noncomputable def composeClosureCertificate
+    (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (a : A) :
+    ComposeClosureCertificate gc₁ gc₂ where
+  source := a
+  closure_eq := rfl
+  closure_path := Path.stepChain
+    (rfl : cl (gc_compose gc₁ gc₂) a =
+      gc₁.upper (gc₂.upper (gc₂.lower (gc₁.lower a))))
+  closure_chain := Path.trans
+    (Path.stepChain (rfl : cl (gc_compose gc₁ gc₂) a =
+      gc₁.upper (gc₂.upper (gc₂.lower (gc₁.lower a)))))
+    (Path.refl _)
+
 noncomputable def cl_compose_path (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC) (a : A) :
     Path (cl (gc_compose gc₁ gc₂) a)
-         (gc₁.upper (gc₂.upper (gc₂.lower (gc₁.lower a)))) := Path.refl _
+         (gc₁.upper (gc₂.upper (gc₂.lower (gc₁.lower a)))) :=
+  (composeClosureCertificate gc₁ gc₂ a).closure_chain
 
 -- Theorem 82: Composed lower congrArg
 theorem congrArg_compose (gc₁ : GC A B pA pB) (gc₂ : GC B C pB pC)
@@ -706,11 +785,37 @@ noncomputable def boolNat_full_chain :
   Path.trans boolNat_chain_false boolNat_cl_false_path
 
 -- Theorem 94: Composition id path
+structure ComposeIdLowerCertificate (gc : GC A B pA pB) where
+  source : A
+  left_id_eq : (gc_compose (gc_id pA) gc).lower source = gc.lower source
+  right_id_eq : (gc_compose gc (gc_id pB)).lower source = gc.lower source
+  left_id_path : Path ((gc_compose (gc_id pA) gc).lower source) (gc.lower source)
+  right_id_path : Path ((gc_compose gc (gc_id pB)).lower source) (gc.lower source)
+  left_id_chain : Path ((gc_compose (gc_id pA) gc).lower source) (gc.lower source)
+  right_id_chain : Path ((gc_compose gc (gc_id pB)).lower source) (gc.lower source)
+
+/-- Build left/right identity certificates for composition on a concrete source point. -/
+noncomputable def composeIdLowerCertificate (gc : GC A B pA pB) (a : A) :
+    ComposeIdLowerCertificate gc where
+  source := a
+  left_id_eq := rfl
+  right_id_eq := rfl
+  left_id_path := Path.stepChain (rfl : (gc_compose (gc_id pA) gc).lower a = gc.lower a)
+  right_id_path := Path.stepChain (rfl : (gc_compose gc (gc_id pB)).lower a = gc.lower a)
+  left_id_chain := Path.trans
+    (Path.stepChain (rfl : (gc_compose (gc_id pA) gc).lower a = gc.lower a))
+    (Path.refl _)
+  right_id_chain := Path.trans
+    (Path.stepChain (rfl : (gc_compose gc (gc_id pB)).lower a = gc.lower a))
+    (Path.refl _)
+
 noncomputable def gc_compose_id_path (gc : GC A B pA pB) (a : A) :
-    Path ((gc_compose (gc_id pA) gc).lower a) (gc.lower a) := Path.refl _
+    Path ((gc_compose (gc_id pA) gc).lower a) (gc.lower a) :=
+  (composeIdLowerCertificate gc a).left_id_chain
 
 -- Theorem 95: Right id path
 noncomputable def gc_compose_id_right_path (gc : GC A B pA pB) (a : A) :
-    Path ((gc_compose gc (gc_id pB)).lower a) (gc.lower a) := Path.refl _
+    Path ((gc_compose gc (gc_id pB)).lower a) (gc.lower a) :=
+  (composeIdLowerCertificate gc a).right_id_chain
 
 end ComputationalPaths.Path.Algebra.GaloisConnectionDeep3

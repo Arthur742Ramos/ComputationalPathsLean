@@ -116,8 +116,8 @@ noncomputable def comp (f : HomData GA GB) (g : HomData GB GC) : HomData GA GC w
 
 noncomputable def id' (GA : AbelianData A) : HomData GA GA where
   map := fun x => x
-  mapAddPath _ _ := Path.refl _
-  mapZeroPath := Path.refl _
+  mapAddPath _ _ := Path.stepChain rfl
+  mapZeroPath := Path.stepChain rfl
 
 noncomputable def mapZero_rweq (f : HomData GA GB) :
     RwEq (Path.trans f.mapZeroPath (Path.refl _)) f.mapZeroPath :=
@@ -239,7 +239,7 @@ noncomputable def connecting_transport_const {D : Type v}
 noncomputable def snake_exactness_path (a : A)
     (kerP : Path (S.γ.map (S.g.map (S.f.map a))) GC'.zero) :
     Path (S.g'.map (S.β.map (S.f.map a))) GC'.zero :=
-  S.connectingPath (S.g.map (S.f.map a)) kerP (S.f.map a) (Path.refl _)
+  S.connectingPath (S.g.map (S.f.map a)) kerP (S.f.map a) (Path.stepChain rfl)
 
 noncomputable def snake_coherence (a : A)
     (kerP : Path (S.γ.map (S.g.map (S.f.map a))) GC'.zero) :

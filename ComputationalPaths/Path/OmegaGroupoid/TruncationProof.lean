@@ -289,13 +289,57 @@ noncomputable def confluence_contractibility₃
   have link₂ : Derivation₃ d₂ canon := contract₃_via_loop_normalizer d₂ canon
   exact ThreeCell.by_canonical canon link₁ link₂
 
+/-- Proof-relevant level-3 truncation certificate for parallel 2-cells.
+
+This packages concrete level/depth metadata, a confluence-chosen canonical
+target, and both 3-cell representations (`ThreeCell` and `Derivation₃`). -/
+structure Level3TruncationCertificate {p q : Path a b}
+    (d₁ d₂ : Derivation₂ p q) where
+  truncationLevel : Nat
+  canonicalPath : Path a b
+  leftToCanonical : Derivation₂ p canonicalPath
+  rightToCanonical : Derivation₂ q canonicalPath
+  leftDepth : Nat
+  rightDepth : Nat
+  loopTrace : Derivation₂ p p
+  loopDepth : Nat
+  comparison3Cell : ThreeCell d₁ d₂
+  comparisonDerivation : Derivation₃ d₁ d₂
+
+/-- Build the concrete level-3 truncation certificate from confluence data. -/
+noncomputable def confluence_level3_certificate
+    (hConf : StepConfluent (A := A) (a := a) (b := b))
+    {p q : Path a b} (d₁ d₂ : Derivation₂ p q) :
+    Level3TruncationCertificate d₁ d₂ := by
+  let canonData := canonical_derivation hConf d₁
+  let loop := Derivation₂.vcomp d₁ (Derivation₂.inv d₂)
+  let cell := confluence_contractibility₃ hConf d₁ d₂
+  exact
+    { truncationLevel := 3
+      canonicalPath := canonData.1
+      leftToCanonical := canonData.2.1
+      rightToCanonical := canonData.2.2
+      leftDepth := Derivation₂.depth d₁
+      rightDepth := Derivation₂.depth d₂
+      loopTrace := loop
+      loopDepth := Derivation₂.depth loop
+      comparison3Cell := cell
+      comparisonDerivation := cell.toDeriv₃ }
+
+/-- The certificate records level 3 as the truncation dimension. -/
+@[simp] theorem confluence_level3_certificate_level
+    (hConf : StepConfluent (A := A) (a := a) (b := b))
+    {p q : Path a b} (d₁ d₂ : Derivation₂ p q) :
+    (confluence_level3_certificate hConf d₁ d₂).truncationLevel = 3 :=
+  rfl
+
 /-- Alternative: directly build a `Derivation₃` from confluence,
     without going through the `ThreeCell` wrapper. -/
 noncomputable def confluence_deriv₃
     (hConf : StepConfluent (A := A) (a := a) (b := b))
     {p q : Path a b} (d₁ d₂ : Derivation₂ p q) :
     Derivation₃ d₁ d₂ :=
-  (confluence_contractibility₃ hConf d₁ d₂).toDeriv₃
+  (confluence_level3_certificate hConf d₁ d₂).comparisonDerivation
 
 end ConfluenceContractibility
 

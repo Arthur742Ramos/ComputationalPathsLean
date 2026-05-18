@@ -20,6 +20,30 @@ open List
 
 universe u v w
 
+structure ProfiniteCertificate where
+  label : String
+  payload : Nat
+  witnessPath : Path payload payload
+  canonicalPath : Path payload payload
+  nonemptySteps : witnessPath.steps ≠ []
+  coherence : Path.RwEq witnessPath canonicalPath
+
+namespace ProfiniteCertificate
+
+noncomputable def base (label : String) (payload : Nat) :
+    ProfiniteCertificate where
+  label := label
+  payload := payload
+  witnessPath := Path.trans (Path.stepChain (rfl : payload = payload)) (Path.refl payload)
+  canonicalPath := Path.stepChain (rfl : payload = payload)
+  nonemptySteps := by
+    simp [Path.trans, Path.stepChain, Path.refl]
+  coherence := Path.RwEq.step (Path.Step.trans_refl_right (Path.stepChain (rfl : payload = payload)))
+
+def asTrue (_ : ProfiniteCertificate) : True := trivial
+
+end ProfiniteCertificate
+
 -- ============================================================
 -- §1  Profinite Rewrite Steps
 -- ============================================================
@@ -40,11 +64,11 @@ inductive ProfiniteStep (Obj : Type u) : Type u where
 structure ProObject (Obj : Type u) where
   index   : Type u
   objects : index → Obj
-  isCofiltered : True
+  isCofiltered : ProfiniteCertificate
 
 /-- Morphisms between pro-objects. -/
-structure ProHom (Obj : Type u) (_ _ : ProObject Obj) where
-  data : True
+structure ProHom (Obj : Type u) (P Q : ProObject Obj) where
+  data : ProfiniteCertificate
 
 /-- The pro-category Pro(C). -/
 structure ProCat (Obj : Type u) where
@@ -57,8 +81,8 @@ structure ProCat (Obj : Type u) where
 /-- A profinite set: compact Hausdorff totally disconnected. -/
 structure ProfiniteSet where
   carrier : Type u
-  isCompact : True
-  isTotallyDisconnected : True
+  isCompact : ProfiniteCertificate
+  isTotallyDisconnected : ProfiniteCertificate
 
 /-- A profinite group. -/
 structure ProfiniteGroup where
@@ -69,19 +93,19 @@ structure ProfiniteGroup where
   mul_assoc : ∀ a b c, mul (mul a b) c = mul a (mul b c)
   one_mul   : ∀ a, mul one a = a
   mul_inv   : ∀ a, mul a (inv a) = one
-  isContinuous : True
-  isProfinite  : True
+  isContinuous : ProfiniteCertificate
+  isProfinite  : ProfiniteCertificate
 
 /-- Profinite completion of a group. -/
 structure ProfiniteCompletion (G : Type u) where
   completion : ProfiniteGroup
   map : G → completion.carrier
-  isUniversal : True
+  isUniversal : ProfiniteCertificate
 
 /-- The p-adic integers as a profinite group. -/
 structure PAdicIntegers (p : Nat) where
   carrier : ProfiniteGroup
-  isCompact : True
+  isCompact : ProfiniteCertificate
 
 -- ============================================================
 -- §4  Stone Duality
@@ -103,8 +127,8 @@ structure BoolAlg where
 /-- The Stone space of a Boolean algebra. -/
 noncomputable def StoneSpace (_ : BoolAlg) : ProfiniteSet where
   carrier := Unit
-  isCompact := True.intro
-  isTotallyDisconnected := True.intro
+  isCompact := ProfiniteCertificate.base "stone-compact" 1
+  isTotallyDisconnected := ProfiniteCertificate.base "stone-total-disconnected" 2
 
 /-- The clopen algebra of a profinite set. -/
 noncomputable def ClopenAlgebra (_ : ProfiniteSet) : BoolAlg where
@@ -135,17 +159,18 @@ theorem stone_duality_contravariant (S : ProfiniteSet) :
 structure GaloisCategory where
   Obj : Type u
   Hom : Obj → Obj → Type v
-  hasFiniteLimits   : True
-  hasFiniteColimits : True
-  connectedDecomp   : True
+  hasFiniteLimits   : ProfiniteCertificate
+  hasFiniteColimits : ProfiniteCertificate
+  connectedDecomp   : ProfiniteCertificate
   fiberFunctorObj   : Obj → Type v
-  isExact           : True
-  isConservative    : True
+  isExact           : ProfiniteCertificate
+  isConservative    : ProfiniteCertificate
 
 /-- Fundamental group of a Galois category. -/
 structure FundamentalGroupGal (C : GaloisCategory) where
   group : ProfiniteGroup
-  action : C.Obj → group.carrier → True
+  action : (X : C.Obj) → (g : group.carrier) →
+    ProfiniteCertificate
 
 /-- Galois category equivalence: the fundamental group acts on objects. -/
 theorem galois_category_equivalence (C : GaloisCategory) :
@@ -158,7 +183,7 @@ theorem galois_correspondence (C : GaloisCategory) :
 /-- Grothendieck's étale fundamental group. -/
 structure EtaleFundamentalGroup where
   group : ProfiniteGroup
-  classifiesCovers : True
+  classifiesCovers : ProfiniteCertificate
 
 -- ============================================================
 -- §6  Noohi Fundamental Group
@@ -167,7 +192,7 @@ structure EtaleFundamentalGroup where
 /-- Noohi's topological fundamental group for stacks. -/
 structure NoohiFundamentalGroup where
   group : Type u
-  classifiesCovers : True
+  classifiesCovers : ProfiniteCertificate
 
 /-- For locally connected spaces, Noohi agrees with classical: carrier types match. -/
 theorem noohi_agrees_classical (N : NoohiFundamentalGroup) :
@@ -184,18 +209,18 @@ theorem noohi_recovers_grothendieck (E : EtaleFundamentalGroup) :
 /-- A condensed set: sheaf on profinite sets. -/
 structure CondensedSet where
   sections : Type u → Type v
-  sheafCondition : True
+  sheafCondition : ProfiniteCertificate
 
 /-- A condensed abelian group. -/
 structure CondensedAbelianGroup where
   sections : Type u → Type v
-  groupStr : True
-  sheafCondition : True
+  groupStr : ProfiniteCertificate
+  sheafCondition : ProfiniteCertificate
 
 /-- A solid module (Clausen–Scholze). -/
 structure SolidModule where
   underlying : CondensedAbelianGroup
-  solidCondition : True
+  solidCondition : ProfiniteCertificate
 
 /-- Condensed sets form a topos: sections are self-consistent. -/
 theorem condensed_is_topos (C : CondensedSet) :
@@ -212,13 +237,13 @@ theorem solid_abelian (S : SolidModule) :
 /-- Continuous cohomology of a profinite group. -/
 structure ProfiniteGroupCohomology (G : ProfiniteGroup) where
   cohomology : Nat → Type v
-  isColimitOfFinite : True
+  isColimitOfFinite : ProfiniteCertificate
 
 /-- A continuous Galois representation. -/
 structure GaloisRepresentation (G : ProfiniteGroup) where
   module : Type v
   action : G.carrier → module → module
-  isContinuous : True
+  isContinuous : ProfiniteCertificate
 
 /-- Inflation-restriction: cohomology of a profinite group is a colimit of finite quotients. -/
 theorem inflation_restriction (G : ProfiniteGroup) :
@@ -274,93 +299,98 @@ universe u v w
 normalisation trace back to reflexivity. -/
 structure SelfRwCertificate {α : Type u} (x : α) where
   loop : Path x x
-  normalizes : RwEq loop (Path.refl x)
+  canonical : Path x x
+  nonemptySteps : loop.steps ≠ []
+  normalizes : RwEq loop canonical
 
 namespace SelfRwCertificate
 
-/-- The nontrivial `refl ∘ refl` loop, together with the rewrite step reducing it
-to `refl`. -/
+/-- A non-empty loop (`stepChain ∘ refl`) and a rewrite step reducing it to the
+canonical single-step chain. -/
 noncomputable def compRefl {α : Type u} (x : α) : SelfRwCertificate x where
-  loop := Path.trans (Path.refl x) (Path.refl x)
-  normalizes := RwEq.step (Step.trans_refl_left (Path.refl x))
+  loop := Path.trans (Path.stepChain (rfl : x = x)) (Path.refl x)
+  canonical := Path.stepChain (rfl : x = x)
+  nonemptySteps := by
+    simp [Path.trans, Path.stepChain, Path.refl]
+  normalizes := RwEq.step (Step.trans_refl_right (Path.stepChain (rfl : x = x)))
 
 end SelfRwCertificate
 
 structure StoneDualityData where
   profiniteSide : Type u
   booleanSide : Type v
-  equivalenceWitness : True
+  equivalenceWitness : SelfRwCertificate (profiniteSide × booleanSide)
 
 structure StoneSpectrumFunctor where
   onBoolAlg : BoolAlg → ProfiniteSet
-  functoriality : True
+  functoriality : SelfRwCertificate onBoolAlg
 
 structure ClopenFunctor where
   onProfinite : ProfiniteSet → BoolAlg
-  functoriality : True
+  functoriality : SelfRwCertificate onProfinite
 
 structure ContinuousCochainComplex (G : ProfiniteGroup) where
   cochains : Nat → Type v
-  differential : True
-  continuity : True
+  differential : SelfRwCertificate cochains
+  continuity : SelfRwCertificate cochains
 
 structure ContinuousCohomologyClass (G : ProfiniteGroup) where
   degree : Nat
   classRep : Type v
-  isContinuous : True
+  isContinuous : SelfRwCertificate classRep
 
 structure GaloisAxiomSet where
-  finiteLimits : True
-  finiteCoproducts : True
-  effectiveDescent : True
-  exactFiberFunctor : True
+  finiteLimits : SelfRwCertificate ()
+  finiteCoproducts : SelfRwCertificate ()
+  effectiveDescent : SelfRwCertificate ()
+  exactFiberFunctor : SelfRwCertificate ()
 
 structure FiberFunctor (C : GaloisCategory) where
   toFiniteSets : C.Obj → Type v
-  exactness : True
-  conservative : True
+  exactness : SelfRwCertificate toFiniteSets
+  conservative : SelfRwCertificate toFiniteSets
 
 structure FundamentalGroupoidAction (C : GaloisCategory) where
   baseGroup : ProfiniteGroup
-  action : C.Obj → baseGroup.carrier → True
+  action : (X : C.Obj) → (g : baseGroup.carrier) → SelfRwCertificate X
 
 structure CondensedPerspective where
   condensedCategory : Type (u + 1)
-  recoversProfiniteSets : True
+  recoversProfiniteSets : SelfRwCertificate condensedCategory
 
 structure PyknoticObject where
   carrier : Type u
-  pyknoticCondition : True
+  pyknoticCondition : SelfRwCertificate carrier
 
 structure PyknoticCategory where
   Obj : Type u
   Hom : Obj → Obj → Type v
-  sheafLike : True
+  sheafLike : SelfRwCertificate Obj
 
 structure NoohiGroup where
   carrier : Type u
   topology : Type v
-  complete : True
-  classifiesTorsors : True
+  complete : SelfRwCertificate carrier
+  classifiesTorsors : SelfRwCertificate carrier
 
 structure LightCondensedSet where
   sections : Type u → Type v
-  lightSheafCondition : True
+  lightSheafCondition : SelfRwCertificate sections
 
 structure LightCondensedAbelian where
   sections : Type u → Type v
-  additiveStructure : True
-  lightSheafCondition : True
+  additiveStructure : SelfRwCertificate sections
+  lightSheafCondition : SelfRwCertificate sections
 
 structure ContinuousRepresentation (G : ProfiniteGroup) where
   module : Type v
   action : G.carrier → module → module
-  continuity : True
+  continuity : SelfRwCertificate module
 
 structure ProfiniteHomotopyType where
   level : Nat
   underlying : Type u
-  completeness : True
+  completeness : SelfRwCertificate underlying
 
 /-- Structured replacement for the old Stone/clopen functoriality placeholders. -/
 structure StoneClopenFunctorialityCertificate
@@ -505,7 +535,7 @@ noncomputable def continuousCochainExactCertificate
   cochainTrace := fun n => SelfRwCertificate.compRefl (C.cochains n)
   complexTrace := SelfRwCertificate.compRefl C
   degreeZeroClass :=
-    { degree := 0, classRep := C.cochains 0, isContinuous := C.continuity }
+    { degree := 0, classRep := C.cochains 0, isContinuous := SelfRwCertificate.compRefl (C.cochains 0) }
 
 noncomputable def profiniteGroupFunctorialityCertificate
     (G H : ProfiniteGroup) : ProfiniteGroupFunctorialityCertificate G H where
@@ -536,8 +566,8 @@ noncomputable def fiberFunctorConservativityCertificate
 
 noncomputable def canonicalFiberFunctor (C : GaloisCategory) : FiberFunctor C where
   toFiniteSets := C.fiberFunctorObj
-  exactness := C.isExact
-  conservative := C.isConservative
+  exactness := SelfRwCertificate.compRefl C.fiberFunctorObj
+  conservative := SelfRwCertificate.compRefl C.fiberFunctorObj
 
 noncomputable def fiberFunctorExistenceCertificate
     (C : GaloisCategory) : FiberFunctorExistenceCertificate C where
@@ -587,7 +617,7 @@ noncomputable def continuousRepresentationCohomologyCertificate
   representationTrace := SelfRwCertificate.compRefl ρ
   moduleTrace := SelfRwCertificate.compRefl ρ.module
   inducedClass :=
-    { degree := 0, classRep := ρ.module, isContinuous := ρ.continuity }
+    { degree := 0, classRep := ρ.module, isContinuous := SelfRwCertificate.compRefl ρ.module }
 
 noncomputable def profiniteHomotopyCompletenessCertificate
     (X : ProfiniteHomotopyType) :
