@@ -211,19 +211,76 @@ structure StrictHFunctor (D E : StrictDblCat) extends HFunctor D.toDblCat E.toDb
   presVComp : {a b c : D.Obj} → (f : D.VMor a b) → (g : D.VMor b c) →
     Path (vMap (D.vComp f g)) (E.vComp (vMap f) (vMap g))
 
+/-- Certificate assembling strict functorial associativity coherence in the target double category. -/
+structure StrictHFunctorAssocCert {D E : StrictDblCat}
+    (F : StrictHFunctor D E) {a b c d : D.Obj}
+    (f : D.HMor a b) (g : D.HMor b c) (h : D.HMor c d) where
+  mapAssoc : Path (F.hMap (D.hComp (D.hComp f g) h)) (F.hMap (D.hComp f (D.hComp g h)))
+  preserveOuter : Path (F.hMap (D.hComp (D.hComp f g) h))
+      (E.hComp (F.hMap (D.hComp f g)) (F.hMap h))
+  preserveLeft : Path (E.hComp (F.hMap (D.hComp f g)) (F.hMap h))
+      (E.hComp (E.hComp (F.hMap f) (F.hMap g)) (F.hMap h))
+  assocTarget : Path (E.hComp (E.hComp (F.hMap f) (F.hMap g)) (F.hMap h))
+      (E.hComp (F.hMap f) (E.hComp (F.hMap g) (F.hMap h)))
+  preserveRight : Path (E.hComp (F.hMap f) (E.hComp (F.hMap g) (F.hMap h)))
+      (E.hComp (F.hMap f) (F.hMap (D.hComp g h)))
+  preserveInner : Path (E.hComp (F.hMap f) (F.hMap (D.hComp g h)))
+      (F.hMap (D.hComp f (D.hComp g h)))
+
+/-- Build the strict functor associativity certificate from primitive coherence witnesses. -/
+noncomputable def strict_hfunctor_assoc_cert {D E : StrictDblCat}
+    (F : StrictHFunctor D E) {a b c d : D.Obj}
+    (f : D.HMor a b) (g : D.HMor b c) (h : D.HMor c d) :
+    StrictHFunctorAssocCert F f g h where
+  mapAssoc := Path.congrArg F.hMap (D.hAssoc f g h)
+  preserveOuter := F.presHComp (D.hComp f g) h
+  preserveLeft := Path.congrArg (fun x => E.hComp x (F.hMap h)) (F.presHComp f g)
+  assocTarget := E.hAssoc (F.hMap f) (F.hMap g) (F.hMap h)
+  preserveRight := Path.symm (Path.congrArg (fun x => E.hComp (F.hMap f) x) (F.presHComp g h))
+  preserveInner := Path.symm (F.presHComp f (D.hComp g h))
+
+/-- Multi-step source-to-target coherence path assembled from strict functor certificate data. -/
+noncomputable def StrictHFunctorAssocCert.coherencePath
+    {D E : StrictDblCat} {F : StrictHFunctor D E}
+    {a b c d : D.Obj} {f : D.HMor a b} {g : D.HMor b c} {h : D.HMor c d}
+    (cert : StrictHFunctorAssocCert F f g h)
+    : Path (F.hMap (D.hComp (D.hComp f g) h)) (F.hMap (D.hComp f (D.hComp g h))) :=
+  Path.trans cert.preserveOuter
+    (Path.trans cert.preserveLeft
+      (Path.trans cert.assocTarget
+        (Path.trans cert.preserveRight cert.preserveInner)))
+
+/-- Loop on the left-associated image induced by comparing computed and mapped associativity witnesses. -/
+noncomputable def StrictHFunctorAssocCert.sourceLoop
+    {D E : StrictDblCat} {F : StrictHFunctor D E}
+    {a b c d : D.Obj} {f : D.HMor a b} {g : D.HMor b c} {h : D.HMor c d}
+    (cert : StrictHFunctorAssocCert F f g h)
+    : Path (F.hMap (D.hComp (D.hComp f g) h)) (F.hMap (D.hComp (D.hComp f g) h)) :=
+  Path.trans cert.coherencePath (Path.symm cert.mapAssoc)
+
+/-- Loop on the right-associated image induced by comparing mapped and computed associativity witnesses. -/
+noncomputable def StrictHFunctorAssocCert.targetLoop
+    {D E : StrictDblCat} {F : StrictHFunctor D E}
+    {a b c d : D.Obj} {f : D.HMor a b} {g : D.HMor b c} {h : D.HMor c d}
+    (cert : StrictHFunctorAssocCert F f g h)
+    : Path (F.hMap (D.hComp f (D.hComp g h))) (F.hMap (D.hComp f (D.hComp g h))) :=
+  Path.trans (Path.symm cert.mapAssoc) cert.coherencePath
+
 /-- Composing preservation witnesses -/
 noncomputable def strict_hfunctor_comp_path {D E : StrictDblCat}
     (F : StrictHFunctor D E) {a b c d : D.Obj}
     (f : D.HMor a b) (g : D.HMor b c) (h : D.HMor c d) :
     Path (F.hMap (D.hComp (D.hComp f g) h)) (F.hMap (D.hComp (D.hComp f g) h)) :=
-  Path.refl _
+  let cert := strict_hfunctor_assoc_cert (F := F) (f := f) (g := g) (h := h)
+  cert.sourceLoop
 
 /-- Functor preserves associativity coherence -/
 noncomputable def strict_hfunctor_assoc_coherence {D E : StrictDblCat}
     (F : StrictHFunctor D E) {a b c d : D.Obj}
     (f : D.HMor a b) (g : D.HMor b c) (h : D.HMor c d) :
     Path (F.hMap (D.hComp f (D.hComp g h))) (F.hMap (D.hComp f (D.hComp g h))) :=
-  Path.refl _
+  let cert := strict_hfunctor_assoc_cert (F := F) (f := f) (g := g) (h := h)
+  cert.targetLoop
 
 -- ========================================================================
 -- Section 9: Vertical Functors
