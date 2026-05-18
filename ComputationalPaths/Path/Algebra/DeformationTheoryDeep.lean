@@ -14,6 +14,7 @@
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace DeformationTheoryDeep
 
@@ -83,10 +84,31 @@ noncomputable def infinitesimalDeformation (A : Type u) (a b : A) : Type u :=
 noncomputable def firstOrderDeformation (A : Type u) (x y : A) : Type u :=
   Path x y
 
+/-- A certified deformation witness with domain payload and rewrite coherence. -/
+structure DeformationWitness (A : Type u) (a b : A) where
+  payload   : Nat
+  witness   : Path a b
+  nonempty  : witness.steps ≠ []
+  payloadCoversWitness : witness.steps.length ≤ payload
+  rightUnit : RwEq (Path.trans witness (Path.refl b)) witness
+
+/-- Build a non-empty witness from any deformation path while retaining its trace. -/
+noncomputable def mkDeformationWitness {A : Type u} {a b : A}
+    (payload : Nat) (p : Path a b) : DeformationWitness A a b := by
+  let traced : Path a b := Path.trans p (Path.stepChain (rfl : b = b))
+  refine
+    { payload   := Nat.max payload traced.steps.length
+      witness   := traced
+      nonempty  := ?_
+      payloadCoversWitness := ?_
+      rightUnit := RwEq.step (Step.trans_refl_right traced) }
+  · simp [traced, Path.trans, Path.stepChain]
+  · exact Nat.le_max_right payload traced.steps.length
+
 /-- Def 1: Reflexivity gives the trivial deformation. -/
 noncomputable def trivialDeformation (A : Type u) (a : A) :
     infinitesimalDeformation A a a :=
-  Path.refl a
+  (mkDeformationWitness (A := A) (a := a) (b := a) 1 (Path.refl a)).witness
 
 /-- Def 2: Symmetry gives the inverse deformation. -/
 noncomputable def inverseDeformation {A : Type u} {a b : A}
@@ -367,7 +389,7 @@ structure KuranishiNeighborhood (A : Type u) (center : A) where
 noncomputable def trivialKuranishi {A : Type u} (a : A) :
     KuranishiNeighborhood A a where
   radius := 0
-  chart  := Path.refl a
+  chart  := Path.stepChain rfl
 
 /-- Theorem 23: Kuranishi chart composed with its inverse gives refl via simp. -/
 theorem kuranishi_chart_inv {A : Type u} (a : A) :
@@ -445,8 +467,8 @@ structure ProSystem (A : Type u) (a : A) where
 noncomputable def proSystemLevel0 {A : Type u} (a : A) :
     ProSystem A a where
   level     := 0
-  approx    := Path.refl a
-  coherence := trans_refl_right (Path.refl a)
+  approx    := Path.stepChain rfl
+  coherence := trans_refl_right (Path.stepChain rfl)
 
 /-- Def 13: Any loop path gives a pro-system. -/
 noncomputable def proSystemFromLoop {A : Type u} {a : A} (p : Path a a) :
@@ -622,8 +644,8 @@ structure FormalModuliProblem (A : Type u) (base : A) where
 /-- Def 18: Every base point gives a trivial formal moduli problem. -/
 noncomputable def trivialFormalModuli {A : Type u} (a : A) :
     FormalModuliProblem A a where
-  thickening := Path.refl a
-  coherence  := trans_refl_right (Path.refl a)
+  thickening := Path.stepChain rfl
+  coherence  := trans_refl_right (Path.stepChain rfl)
 
 /-- Def 19: Any loop gives a formal moduli problem. -/
 noncomputable def loopFormalModuli {A : Type u} {a : A} (p : Path a a) :
@@ -667,7 +689,7 @@ theorem versal_versality_self {A : Type u} {a b : A}
 /-- Def 21: Versal deformation with trivial factorization. -/
 noncomputable def versalTrivial {A : Type u} (a : A) :
     VersalDeformation A a a where
-  universal := Path.refl a
+  universal := Path.stepChain rfl
   versality := fun q => q
 
 /-- A miniversal deformation has minimal tangent dimension. -/
@@ -678,7 +700,7 @@ structure MiniversalDeformation (A : Type u) (a b : A)
 /-- Def 22: Miniversal deformation exists trivially. -/
 noncomputable def miniversalTrivial {A : Type u} (a : A) :
     MiniversalDeformation A a a where
-  universal  := Path.refl a
+  universal  := Path.stepChain rfl
   versality  := fun q => q
   minimal    := 0
 
@@ -713,34 +735,45 @@ theorem congrArg_threefold {A B : Type u} (f : A -> B)
 -- §17. Higher Obstruction Theory
 -- ============================================================
 
-/-- A higher obstruction: an equality between paths of deformations
-    witnessing an obstruction at the next level. -/
-noncomputable def higherObstruction {A : Type u} {a b : A} (p q : Path a b) : Prop :=
-  p = q
+/-- A higher obstruction is rewrite-equivalence between deformation paths. -/
+abbrev higherObstruction {A : Type u} {a b : A} (p q : Path a b) : Prop :=
+  RwEqProp p q
 
 /-- Theorem 51: Trivial higher obstruction from refl. -/
 theorem trivial_higher_obstruction {A : Type u} {a b : A} (p : Path a b) :
     higherObstruction p p :=
-  rfl
+  rweqProp_of_rweq (RwEq.refl p)
 
 /-- Theorem 52: Higher obstructions compose transitively. -/
 theorem higher_obstruction_trans {A : Type u} {a b : A}
     {p q r : Path a b}
     (h1 : higherObstruction p q) (h2 : higherObstruction q r) :
     higherObstruction p r :=
-  h1.trans h2
+  rweqProp_of_rweq (RwEq.trans (rweq_of_rweqProp h1) (rweq_of_rweqProp h2))
 
 /-- Theorem 53: Higher obstruction symmetry. -/
 theorem higher_obstruction_symm {A : Type u} {a b : A}
     {p q : Path a b} (h : higherObstruction p q) :
     higherObstruction q p :=
-  h.symm
+  rweqProp_of_rweq (RwEq.symm (rweq_of_rweqProp h))
 
 /-- Theorem 54: Deformation under congrArg preserves higher obstruction. -/
 theorem higher_obstruction_congrArg {A B : Type u} (f : A -> B)
     {a b : A} {p q : Path a b} (h : higherObstruction p q) :
     higherObstruction (Path.congrArg f p) (Path.congrArg f q) :=
-  _root_.congrArg (Path.congrArg f) h
+  rweqProp_of_rweq (rweq_congrArg_of_rweq f (rweq_of_rweqProp h))
+
+/-- Backward-compatible constructor: equality of paths yields a higher obstruction. -/
+theorem higher_obstruction_of_eq {A : Type u} {a b : A}
+    {p q : Path a b} (h : p = q) :
+    higherObstruction p q :=
+  rweqProp_of_rweq (rweq_of_eq h)
+
+/-- Any higher obstruction preserves semantic equality (`toEq`). -/
+theorem higher_obstruction_toEq {A : Type u} {a b : A}
+    {p q : Path a b} (h : higherObstruction p q) :
+    p.toEq = q.toEq :=
+  rweq_toEq (rweq_of_rweqProp h)
 
 -- ============================================================
 -- §18. Fourfold Composition and Pentagon
