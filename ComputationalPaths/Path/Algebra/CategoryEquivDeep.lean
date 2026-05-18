@@ -130,6 +130,16 @@ structure CatEquiv where
   counitIso: Bool      -- G ∘ F ≅ Id
 deriving DecidableEq, Repr
 
+/-- Typed coherence certificate for categorical equivalence data. -/
+structure CatEquivCertificate where
+  fwd : String
+  bwd : String
+  unitPath : (m : Mor) → Path Mor m (functorMap bwd (functorMap fwd m))
+  counitPath : (m : Mor) → Path Mor (functorMap bwd (functorMap fwd m)) m
+
+noncomputable def CatEquivCertificate.toCatEquiv (cert : CatEquivCertificate) : CatEquiv :=
+  CatEquiv.mk cert.fwd cert.bwd true true
+
 noncomputable def CatEquiv.isEquiv (e : CatEquiv) : Bool :=
   e.unitIso && e.counitIso
 
@@ -140,6 +150,28 @@ theorem equiv_needs_both (e : CatEquiv) :
 
 -- 10
 theorem mk_equiv : (CatEquiv.mk "F" "G" true true).isEquiv = true := rfl
+
+noncomputable def catEquivCertificate (fwd bwd : String) : CatEquivCertificate where
+  fwd := fwd
+  bwd := bwd
+  unitPath := fun m =>
+    Path.trans
+      (.single (.rule ("apply_" ++ fwd) m (functorMap fwd m)))
+      (.single (.rule ("apply_" ++ bwd) (functorMap fwd m)
+                      (functorMap bwd (functorMap fwd m))))
+  counitPath := fun m =>
+    .single (.rule "counit_iso" (functorMap bwd (functorMap fwd m)) m)
+
+noncomputable def catEquivWitnessLoop (cert : CatEquivCertificate) (m : Mor) :
+    Path Mor m m :=
+  Path.trans (cert.unitPath m) (cert.counitPath m)
+
+theorem catEquivWitnessLoop_length (m : Mor) (fwd bwd : String) :
+    (catEquivWitnessLoop (catEquivCertificate fwd bwd) m).length = 3 := by
+  simp [catEquivWitnessLoop, catEquivCertificate, Path.trans, Path.single, Path.length]
+
+theorem catEquivCertificate_valid (fwd bwd : String) :
+    (CatEquivCertificate.toCatEquiv (catEquivCertificate fwd bwd)).isEquiv = true := rfl
 
 noncomputable def roundTripPath (m : Mor) (fwd bwd : String) :
     Path Mor m (functorMap bwd (functorMap fwd m)) :=
@@ -186,6 +218,32 @@ theorem adj_valid_needs_triangles (adj : Adjunction) :
 -- 14
 theorem mk_adjunction_valid :
     (Adjunction.mk "F" "G" (.named "η") (.named "ε") true true).isValid = true := rfl
+
+/-- Typed coherence certificate for adjunction triangle data. -/
+structure AdjunctionCertificate where
+  data : Adjunction
+  leftTrianglePath :
+    Path Mor (Mor.comp data.counit (functorMap data.leftAdj data.unit)) (Mor.id data.leftAdj)
+  rightTrianglePath :
+    Path Mor (Mor.comp (functorMap data.rightAdj data.counit) data.unit) (Mor.id data.rightAdj)
+
+noncomputable def adjunctionCertificate (leftAdj rightAdj : String) : AdjunctionCertificate where
+  data := Adjunction.mk leftAdj rightAdj (.named "η") (.named "ε") true true
+  leftTrianglePath :=
+    let src := Mor.comp (.named "ε") (functorMap leftAdj (.named "η"))
+    let mid := Mor.comp (Mor.named "ε_F") (Mor.named "F_η")
+    Path.trans
+      (.single (.rule "triangle_compose" src mid))
+      (.single (.rule "triangle_identity" mid (Mor.id leftAdj)))
+  rightTrianglePath :=
+    let src := Mor.comp (functorMap rightAdj (.named "ε")) (.named "η")
+    let mid := Mor.comp (Mor.named "G_ε") (Mor.named "η_G")
+    Path.trans
+      (.single (.rule "triangle_compose_right" src mid))
+      (.single (.rule "triangle_identity_right" mid (Mor.id rightAdj)))
+
+theorem adjunctionCertificate_valid (leftAdj rightAdj : String) :
+    (adjunctionCertificate leftAdj rightAdj).data.isValid = true := rfl
 
 noncomputable def adjUnitCounitPath (adj : Adjunction) :
     Path Mor adj.unit adj.counit :=
@@ -234,6 +292,31 @@ theorem monad_needs_all (m : MonadData) :
 -- 18
 theorem mk_monad_valid :
     (MonadData.mk "T" (.named "μ") (.named "η") true true true).isMonad = true := rfl
+
+/-- Typed coherence certificate for monad law witnesses. -/
+structure MonadCertificate where
+  data : MonadData
+  assocPath : Path Mor (Mor.named ("μ∘Tμ_" ++ data.T)) (Mor.named ("μ∘μT_" ++ data.T))
+  unitLPath : Path Mor (Mor.named ("μ∘Tη_" ++ data.T)) (Mor.id data.T)
+  unitRPath : Path Mor (Mor.named ("μ∘ηT_" ++ data.T)) (Mor.id data.T)
+
+noncomputable def monadCertificate (T : String) : MonadCertificate where
+  data := MonadData.mk T (.named ("μ_" ++ T)) (.named ("η_" ++ T)) true true true
+  assocPath :=
+    Path.trans
+      (.single (.rule "monad_assoc_expand" (Mor.named ("μ∘Tμ_" ++ T)) (Mor.named ("middle_assoc_" ++ T))))
+      (.single (.rule "monad_assoc_contract" (Mor.named ("middle_assoc_" ++ T)) (Mor.named ("μ∘μT_" ++ T))))
+  unitLPath :=
+    Path.trans
+      (.single (.rule "monad_unitL_expand" (Mor.named ("μ∘Tη_" ++ T)) (Mor.named ("left_unit_mid_" ++ T))))
+      (.single (.rule "monad_unitL_contract" (Mor.named ("left_unit_mid_" ++ T)) (Mor.id T)))
+  unitRPath :=
+    Path.trans
+      (.single (.rule "monad_unitR_expand" (Mor.named ("μ∘ηT_" ++ T)) (Mor.named ("right_unit_mid_" ++ T))))
+      (.single (.rule "monad_unitR_contract" (Mor.named ("right_unit_mid_" ++ T)) (Mor.id T)))
+
+theorem monadCertificate_valid (T : String) :
+    (monadCertificate T).data.isMonad = true := rfl
 
 /-- Beck's theorem sketch: an adjunction yields a monad. -/
 noncomputable def adjToMonad (adj : Adjunction) : MonadData where
@@ -306,10 +389,34 @@ noncomputable def kanExtPath (k : KanExt) :
     (.single (.rule "kan_setup" (Mor.named k.functor) (kanColimitFormula k)))
     (.single (.rule "kan_universal" (kanColimitFormula k) (Mor.named k.result)))
 
+/-- Typed certificate for Kan universal constructions. -/
+structure KanUniversalCertificate where
+  data : KanExt
+  setupPath : Path Mor (Mor.named data.functor) (kanColimitFormula data)
+  universalPath : Path Mor (kanColimitFormula data) (Mor.named data.result)
+
+noncomputable def kanUniversalCertificate
+    (kind : KanKind) (functor along result : String) : KanUniversalCertificate where
+  data := KanExt.mk kind functor along result true
+  setupPath := .single (.rule "kan_setup" (Mor.named functor)
+                        (Mor.named ("colim_" ++ functor ++ "_over_" ++ along)))
+  universalPath := .single (.rule "kan_universal"
+                        (Mor.named ("colim_" ++ functor ++ "_over_" ++ along))
+                        (Mor.named result))
+
+noncomputable def kanUniversalCertificatePath (cert : KanUniversalCertificate) :
+    Path Mor (Mor.named cert.data.functor) (Mor.named cert.data.result) :=
+  Path.trans cert.setupPath cert.universalPath
+
 -- 23
 theorem kanExtPath_length (k : KanExt) :
     (kanExtPath k).length = 2 := by
   simp [kanExtPath, kanColimitFormula, Path.trans, Path.single, Path.length]
+
+theorem kanUniversalCertificatePath_length
+    (kind : KanKind) (functor along result : String) :
+    (kanUniversalCertificatePath (kanUniversalCertificate kind functor along result)).length = 2 := by
+  simp [kanUniversalCertificatePath, kanUniversalCertificate, Path.trans, Path.single, Path.length]
 
 noncomputable def kanDualPath (f : String) (along : String) :
     Path Mor (Mor.named ("Lan_" ++ along ++ " " ++ f))
@@ -343,17 +450,43 @@ deriving DecidableEq, Repr
 
 noncomputable def CommaMor.isValid (cm : CommaMor) : Bool := cm.commutes
 
+/-- Typed certificate for commutative comma squares. -/
+structure CommaCommuteCertificate where
+  domObj : CommaObj
+  codObj : CommaObj
+  srcMor : Mor
+  tgtMor : Mor
+  commutationPath :
+    Path Mor (Mor.comp codObj.mor srcMor) (Mor.comp tgtMor domObj.mor)
+
+noncomputable def CommaCommuteCertificate.toCommaMor (cert : CommaCommuteCertificate) : CommaMor where
+  domObj := cert.domObj
+  codObj := cert.codObj
+  srcMor := cert.srcMor
+  tgtMor := cert.tgtMor
+  commutes := true
+
 -- 25
 theorem comma_mor_valid_iff (cm : CommaMor) :
     cm.isValid = true ↔ cm.commutes = true := by
   simp [CommaMor.isValid]
 
-noncomputable def commaIdentity (obj : CommaObj) : CommaMor where
+noncomputable def commaIdentityCertificate (obj : CommaObj) : CommaCommuteCertificate where
   domObj := obj
   codObj := obj
   srcMor := .id obj.src
   tgtMor := .id obj.tgt
-  commutes := true
+  commutationPath :=
+    Path.trans
+      (.single (.rule "comma_id_left"
+         (Mor.comp obj.mor (.id obj.src))
+         (Mor.comp (.id obj.tgt) obj.mor)))
+      (.single (.rule "comma_id_right"
+         (Mor.comp (.id obj.tgt) obj.mor)
+         (Mor.comp (.id obj.tgt) obj.mor)))
+
+noncomputable def commaIdentity (obj : CommaObj) : CommaMor :=
+  (commaIdentityCertificate obj).toCommaMor
 
 -- 26
 theorem commaIdentity_valid (obj : CommaObj) :

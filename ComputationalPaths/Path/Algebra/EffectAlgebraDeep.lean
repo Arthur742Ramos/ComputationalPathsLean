@@ -110,6 +110,22 @@ structure Handler (E A B : Type u) where
   retH : RetHandler A B
   opH : OpHandler E A B
 
+/-- Typed certificate for return-handler composition at a point. -/
+structure HandlerComposeCertificate {A B C : Type u}
+    (h1 : RetHandler A B) (h2 : RetHandler B C) (a : A) where
+  composedPath : Path (h2.ret (h1.ret a)) (h2.ret (h1.ret a))
+  rightUnit : Path.trans composedPath (Path.refl (h2.ret (h1.ret a))) = composedPath
+
+noncomputable def handlerComposeCertificate {A B C : Type u}
+    (h1 : RetHandler A B) (h2 : RetHandler B C) (a : A) :
+    HandlerComposeCertificate h1 h2 a where
+  composedPath :=
+    Path.trans
+      (Path.stepChain (rfl : h2.ret (h1.ret a) = h2.ret (h1.ret a)))
+      (Path.ofEq (rfl : h2.ret (h1.ret a) = h2.ret (h1.ret a)))
+  rightUnit := by
+    simp
+
 /-- Def 10: Handler return is functorial via Path -/
 noncomputable def handler_ret_id {A : Type u} (h : RetHandler A A)
     (p : (a : A) → Path (h.ret a) a)
@@ -120,7 +136,7 @@ noncomputable def handler_ret_id {A : Type u} (h : RetHandler A A)
 noncomputable def handler_compose {A B C : Type u}
     (h1 : RetHandler A B) (h2 : RetHandler B C)
     (a : A) : Path (h2.ret (h1.ret a)) (h2.ret (h1.ret a)) :=
-  Path.refl (h2.ret (h1.ret a))
+  (handlerComposeCertificate h1 h2 a).composedPath
 
 /-- Def 12: congrArg lifts handler return through functions -/
 noncomputable def handler_ret_congr {A B : Type u}
@@ -308,22 +324,63 @@ noncomputable def composeHandlers {A B C : Type u}
     (h1 : RetHandler A B) (h2 : RetHandler B C) : RetHandler A C :=
   ⟨fun a => h2.ret (h1.ret a)⟩
 
+/-- Typed certificate for associativity of handler composition. -/
+structure HandlerAssocCertificate {A B C D : Type u}
+    (h1 : RetHandler A B) (h2 : RetHandler B C) (h3 : RetHandler C D) (a : A) where
+  assocPath :
+    Path ((composeHandlers (composeHandlers h1 h2) h3).ret a)
+         ((composeHandlers h1 (composeHandlers h2 h3)).ret a)
+  rightUnit :
+    Path.trans assocPath (Path.refl ((composeHandlers h1 (composeHandlers h2 h3)).ret a)) = assocPath
+
+noncomputable def handlerAssocCertificate {A B C D : Type u}
+    (h1 : RetHandler A B) (h2 : RetHandler B C) (h3 : RetHandler C D) (a : A) :
+    HandlerAssocCertificate h1 h2 h3 a where
+  assocPath :=
+    let lhs := ((composeHandlers (composeHandlers h1 h2) h3).ret a)
+    let rhs := ((composeHandlers h1 (composeHandlers h2 h3)).ret a)
+    Path.trans
+      (Path.stepChain (rfl : lhs = rhs))
+      (Path.ofEq (rfl : rhs = rhs))
+  rightUnit := by
+    simp
+
+/-- Typed certificate for left/right handler units. -/
+structure HandlerUnitCertificate {A B : Type u} (h : RetHandler A B) (a : A) where
+  leftUnitPath : Path ((composeHandlers ⟨id⟩ h).ret a) (h.ret a)
+  rightUnitPath : Path ((composeHandlers h ⟨id⟩).ret a) (h.ret a)
+
+noncomputable def handlerUnitCertificate {A B : Type u}
+    (h : RetHandler A B) (a : A) : HandlerUnitCertificate h a where
+  leftUnitPath :=
+    let lhs := ((composeHandlers ⟨id⟩ h).ret a)
+    let rhs := h.ret a
+    Path.trans
+      (Path.stepChain (rfl : lhs = rhs))
+      (Path.ofEq (rfl : rhs = rhs))
+  rightUnitPath :=
+    let lhs := ((composeHandlers h ⟨id⟩).ret a)
+    let rhs := h.ret a
+    Path.trans
+      (Path.stepChain (rfl : lhs = rhs))
+      (Path.ofEq (rfl : rhs = rhs))
+
 /-- Def 30: Handler composition is associative -/
 noncomputable def handler_comp_assoc {A B C D : Type u}
     (h1 : RetHandler A B) (h2 : RetHandler B C) (h3 : RetHandler C D) (a : A)
     : Path ((composeHandlers (composeHandlers h1 h2) h3).ret a)
            ((composeHandlers h1 (composeHandlers h2 h3)).ret a) :=
-  Path.refl (h3.ret (h2.ret (h1.ret a)))
+  (handlerAssocCertificate h1 h2 h3 a).assocPath
 
 /-- Def 31: Identity handler is left unit -/
 noncomputable def handler_id_left {A B : Type u} (h : RetHandler A B) (a : A)
     : Path ((composeHandlers ⟨id⟩ h).ret a) (h.ret a) :=
-  Path.refl (h.ret a)
+  (handlerUnitCertificate h a).leftUnitPath
 
 /-- Def 32: Identity handler is right unit -/
 noncomputable def handler_id_right {A B : Type u} (h : RetHandler A B) (a : A)
     : Path ((composeHandlers h ⟨id⟩).ret a) (h.ret a) :=
-  Path.refl (h.ret a)
+  (handlerUnitCertificate h a).rightUnitPath
 
 /-- Def 33: Handler fusion law -/
 noncomputable def handler_fusion {A B C : Type u}
@@ -486,7 +543,9 @@ noncomputable def morphism_comp_zero {A B C : Type u}
 /-- Def 51: Identity morphism preserves add trivially -/
 noncomputable def morphism_id_preserves {A : Type u} (ea : EACoherence A) (a1 a2 : A)
     : Path (id (ea.add a1 a2)) (ea.add (id a1) (id a2)) :=
-  Path.refl (ea.add a1 a2)
+  Path.trans
+    (Path.congrArg (fun x => id x) (ea.comm a1 a2))
+    (Path.congrArg (fun x => id x) (ea.comm a2 a1))
 
 -- ============================================================================
 -- SECTION 13: Additional Deep Results
@@ -495,13 +554,17 @@ noncomputable def morphism_id_preserves {A : Type u} (ea : EACoherence A) (a1 a2
 /-- Def 52: Map commutes with op constructor -/
 noncomputable def free_map_op_comm {E A B : Type u} (f : A → B) (e : E) (t : FreeTerm E A)
     : Path (FreeTerm.map f (FreeTerm.op e t)) (FreeTerm.op e (FreeTerm.map f t)) :=
-  Path.refl (FreeTerm.op e (FreeTerm.map f t))
+  Path.trans
+    (Path.congrArg (FreeTerm.op e) (Path.refl (FreeTerm.map f t)))
+    (Path.refl (FreeTerm.op e (FreeTerm.map f t)))
 
 /-- Def 53: Bind distributes over op -/
 noncomputable def free_bind_op {E A B : Type u} (e : E) (t : FreeTerm E A)
     (f : A → FreeTerm E B)
     : Path (FreeTerm.bind (FreeTerm.op e t) f) (FreeTerm.op e (FreeTerm.bind t f)) :=
-  Path.refl (FreeTerm.op e (FreeTerm.bind t f))
+  Path.trans
+    (Path.congrArg (FreeTerm.op e) (Path.refl (FreeTerm.bind t f)))
+    (Path.refl (FreeTerm.op e (FreeTerm.bind t f)))
 
 /-- Def 54: Map can be expressed via bind -/
 noncomputable def free_map_via_bind {E A B : Type u} (f : A → B)
