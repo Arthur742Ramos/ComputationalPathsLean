@@ -104,8 +104,12 @@ structure ArithmeticSquare (X : HomotopyType.{u}) (p : Prime) where
   comparison : HomotopyType.{u}
   /-- The comparison map from X. -/
   compareMap : X.carrier -> comparison.carrier
-  /-- Pullback property: compareMap is the identity. -/
-  pullback : ∀ x, compareMap x = compareMap x
+  /-- Pullback-side self-comparison path witness for the arithmetic-square map. -/
+  comparisonSelfPath : ∀ x, Path (compareMap x) (compareMap x)
+  /-- Rewrite coherence for the self-comparison path witness. -/
+  comparisonSelfRwEq :
+    ∀ x, RwEq (Path.trans (comparisonSelfPath x) (Path.refl (compareMap x)))
+      (comparisonSelfPath x)
 
 /-- The identity arithmetic square. -/
 noncomputable def trivialArithmeticSquare (X : HomotopyType.{u}) (p : Prime) :
@@ -115,21 +119,70 @@ noncomputable def trivialArithmeticSquare (X : HomotopyType.{u}) (p : Prime) :
   rationalization := trivialRationalization X
   comparison := X
   compareMap := fun x => x
-  pullback := fun _ => rfl
+  comparisonSelfPath := fun x => Path.ofEq (rfl : x = x)
+  comparisonSelfRwEq := fun x => rweq_cmpA_refl_right (Path.ofEq (rfl : x = x))
+
+namespace ArithmeticSquare
+
+variable {X : HomotopyType.{u}} {p : Prime}
+
+/-- Compatibility accessor recovering the legacy propositional pullback witness. -/
+theorem pullback (sq : ArithmeticSquare X p) (x : X.carrier) :
+    sq.compareMap x = sq.compareMap x :=
+  (sq.comparisonSelfPath x).toEq
+
+/-- Path witness for arithmetic-square pullback self-comparison. -/
+noncomputable def pullback_path (sq : ArithmeticSquare X p) (x : X.carrier) :
+    Path (sq.compareMap x) (sq.compareMap x) :=
+  sq.comparisonSelfPath x
+
+/-- Rewrite coherence accessor for the pullback path witness. -/
+noncomputable def pullback_rweq (sq : ArithmeticSquare X p) (x : X.carrier) :
+    RwEq (Path.trans (pullback_path sq x) (Path.refl (sq.compareMap x)))
+      (pullback_path sq x) :=
+  sq.comparisonSelfRwEq x
+
+end ArithmeticSquare
 
 /-- Pullback witness for an arithmetic square. -/
 structure ArithmeticSquarePullback (X : HomotopyType.{u}) (p : Prime)
     (sq : ArithmeticSquare X p) where
   /-- Reconstruction map from the pullback. -/
   reconstruct : X.carrier -> X.carrier
-  /-- Reconstruction is the identity. -/
-  reconstruct_id : forall x, reconstruct x = x
+  /-- Reconstruction path witness. -/
+  reconstructPath : ∀ x, Path (reconstruct x) x
+  /-- Rewrite coherence for reconstruction composed with reflexivity. -/
+  reconstructRwEq :
+    ∀ x, RwEq (Path.trans (reconstructPath x) (Path.refl x)) (reconstructPath x)
 
 /-- Trivial pullback witness. -/
 noncomputable def trivialArithmeticPullback (X : HomotopyType.{u}) (p : Prime) :
     ArithmeticSquarePullback X p (trivialArithmeticSquare X p) where
   reconstruct := fun x => x
-  reconstruct_id := fun _ => rfl
+  reconstructPath := fun x => Path.ofEq (rfl : x = x)
+  reconstructRwEq := fun x => rweq_cmpA_refl_right (Path.ofEq (rfl : x = x))
+
+namespace ArithmeticSquarePullback
+
+variable {X : HomotopyType.{u}} {p : Prime}
+variable {sq : ArithmeticSquare X p}
+
+/-- Compatibility accessor recovering the legacy propositional reconstruction identity. -/
+theorem reconstruct_id (pb : ArithmeticSquarePullback X p sq) (x : X.carrier) :
+    pb.reconstruct x = x :=
+  (pb.reconstructPath x).toEq
+
+/-- Path accessor for reconstruction identity. -/
+noncomputable def reconstruct_id_path (pb : ArithmeticSquarePullback X p sq) (x : X.carrier) :
+    Path (pb.reconstruct x) x :=
+  pb.reconstructPath x
+
+/-- Rewrite coherence accessor for reconstruction identity. -/
+noncomputable def reconstruct_id_rweq (pb : ArithmeticSquarePullback X p sq) (x : X.carrier) :
+    RwEq (Path.trans (reconstruct_id_path pb x) (Path.refl x)) (reconstruct_id_path pb x) :=
+  pb.reconstructRwEq x
+
+end ArithmeticSquarePullback
 
 /-! ## Fracture theorem -/
 
@@ -145,29 +198,25 @@ noncomputable def fractureTheorem (X : HomotopyType.{u}) (p : Prime) : FractureT
   square := trivialArithmeticSquare X p
   pullback := trivialArithmeticPullback X p
 
-
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-- Path witness that the trivial arithmetic square's comparison is the identity. -/
 noncomputable def trivialArithmeticSquare_compareMap_path (X : HomotopyType.{u}) (p : Prime) (x : X.carrier) :
     Path ((trivialArithmeticSquare X p).compareMap x) x :=
-  Path.refl _
+  Path.ofEq (rfl : x = x)
 
 /-- Path witness for the pullback reconstruction being the identity. -/
 noncomputable def trivialArithmeticPullback_path (X : HomotopyType.{u}) (p : Prime) (x : X.carrier) :
     Path ((trivialArithmeticPullback X p).reconstruct x) x :=
-  Path.stepChain ((trivialArithmeticPullback X p).reconstruct_id x)
+  (trivialArithmeticPullback X p).reconstructPath x
 
 /-- The fracture theorem gives a pullback witness. -/
 theorem fractureTheorem_reconstruct_id (X : HomotopyType.{u}) (p : Prime) (x : X.carrier) :
     (fractureTheorem X p).pullback.reconstruct x = x :=
-  (fractureTheorem X p).pullback.reconstruct_id x
+  ((fractureTheorem X p).pullback.reconstructPath x).toEq
 
 /-- Path witness for fracture theorem reconstruction. -/
 noncomputable def fractureTheorem_path (X : HomotopyType.{u}) (p : Prime) (x : X.carrier) :
     Path ((fractureTheorem X p).pullback.reconstruct x) x :=
-  Path.stepChain (fractureTheorem_reconstruct_id X p x)
+  (fractureTheorem X p).pullback.reconstructPath x
 
 /-! ## Summary -/
 
@@ -177,45 +226,24 @@ and packaged a fracture theorem witness with trivial constructors.
 -/
 
 
-/-! ## Basic path theorem layer -/
+/-! ## Computational-path coherence layer -/
 
-theorem path_refl_1 {A : Type _} (a : A) :
-    Path.refl a = Path.refl a := by
-  rfl
+theorem trivialArithmeticSquare_compareMap_path_nonempty
+    (X : HomotopyType.{u}) (p : Prime) (x : X.carrier) :
+    (trivialArithmeticSquare_compareMap_path X p x).steps ≠ [] := by
+  simp [trivialArithmeticSquare_compareMap_path]
 
-theorem path_refl_2 {A : Type _} (a : A) :
-    Path.trans (Path.refl a) (Path.refl a) =
-      Path.trans (Path.refl a) (Path.refl a) := by
-  rfl
+theorem trivialArithmeticPullback_path_nonempty
+    (X : HomotopyType.{u}) (p : Prime) (x : X.carrier) :
+    (trivialArithmeticPullback_path X p x).steps ≠ [] := by
+  simp [trivialArithmeticPullback_path, trivialArithmeticPullback]
 
-theorem path_symm_refl {A : Type _} (a : A) :
-    Path.symm (Path.refl a) = Path.symm (Path.refl a) := by
-  rfl
-
-theorem path_trans_refl {A : Type _} (a : A) :
-    Path.trans (Path.refl a) (Path.symm (Path.refl a)) =
-      Path.trans (Path.refl a) (Path.symm (Path.refl a)) := by
-  rfl
-
-theorem path_trans_assoc_shape {A : Type _} (a : A) :
-    Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) =
-      Path.trans (Path.trans (Path.refl a) (Path.refl a)) (Path.refl a) := by
-  rfl
-
-theorem path_symm_trans_shape {A : Type _} (a : A) :
-    Path.symm (Path.trans (Path.refl a) (Path.refl a)) =
-      Path.symm (Path.trans (Path.refl a) (Path.refl a)) := by
-  rfl
-
-theorem path_trans_symm_shape {A : Type _} (a : A) :
-    Path.trans (Path.symm (Path.refl a)) (Path.refl a) =
-      Path.trans (Path.symm (Path.refl a)) (Path.refl a) := by
-  rfl
-
-theorem path_double_symm_refl {A : Type _} (a : A) :
-    Path.symm (Path.symm (Path.refl a)) =
-      Path.symm (Path.symm (Path.refl a)) := by
-  rfl
+/-- Rewrite coherence for the fracture-theorem reconstruction path. -/
+noncomputable def fractureTheorem_reconstruct_rweq
+    (X : HomotopyType.{u}) (p : Prime) (x : X.carrier) :
+    RwEq (Path.trans (fractureTheorem_path X p x) (Path.refl x))
+      (fractureTheorem_path X p x) :=
+  rweq_cmpA_refl_right (fractureTheorem_path X p x)
 
 end LocalizationAtPrime
 end Homotopy

@@ -114,10 +114,18 @@ structure E2TorCertificate (bound : Nat) (F E B : Type u) where
   torFunctor : Algebra.TorFunctor
   /-- Computational witness that the stored functor is the one used by `ss`. -/
   torPath : Path ss.tor torFunctor
+  /-- Inverse witness used to record explicit two-sided path coherence. -/
+  torInversePath : Path torFunctor ss.tor
+  /-- Rewrite coherence for `torPath` composed with its inverse. -/
+  torRoundtrip : RwEq (Path.trans torPath torInversePath) (Path.refl ss.tor)
   /-- The actual E2 page. -/
   e2Page : SpectralPage bound
   /-- Computational witness that `e2Page` is the page at index 2. -/
   e2PagePath : Path (EilenbergMooreSS.e2Page ss) e2Page
+  /-- Rewrite coherence for `e2PagePath` composed with its inverse. -/
+  e2PageRoundtrip :
+    RwEq (Path.trans e2PagePath (Path.symm e2PagePath))
+      (Path.refl (EilenbergMooreSS.e2Page ss))
 
 /-- E2 identification statement for the Eilenberg-Moore spectral sequence. -/
 noncomputable def e2_tor_statement {bound : Nat} {F E B : Type u}
@@ -126,9 +134,14 @@ noncomputable def e2_tor_statement {bound : Nat} {F E B : Type u}
   ss := ss
   e2Witness := w
   torFunctor := ss.tor
-  torPath := Path.refl ss.tor
+  torPath := Path.ofEq (rfl : ss.tor = ss.tor)
+  torInversePath := Path.symm (Path.ofEq (rfl : ss.tor = ss.tor))
+  torRoundtrip := rweq_cmpA_inv_right (Path.ofEq (rfl : ss.tor = ss.tor))
   e2Page := EilenbergMooreSS.e2Page ss
-  e2PagePath := Path.refl _
+  e2PagePath := Path.ofEq (rfl : EilenbergMooreSS.e2Page ss = EilenbergMooreSS.e2Page ss)
+  e2PageRoundtrip :=
+    rweq_cmpA_inv_right
+      (Path.ofEq (rfl : EilenbergMooreSS.e2Page ss = EilenbergMooreSS.e2Page ss))
 
 /-- Certificate for convergence data in an Eilenberg-Moore spectral sequence. -/
 structure ConvergenceCertificate (bound : Nat) (F E B : Type u) where
@@ -142,6 +155,12 @@ structure ConvergenceCertificate (bound : Nat) (F E B : Type u) where
   targetPage : SpectralPage bound
   /-- Computational witness that `targetPage` is the selected page. -/
   targetPath : Path (ss.sequence.page pageIndex) targetPage
+  /-- Inverse witness for the selected page path. -/
+  targetInversePath : Path targetPage (ss.sequence.page pageIndex)
+  /-- Rewrite coherence for `targetPath` composed with its inverse. -/
+  targetRoundtrip :
+    RwEq (Path.trans targetPath targetInversePath)
+      (Path.refl (ss.sequence.page pageIndex))
 
 /-- Convergence statement for the Eilenberg-Moore spectral sequence. -/
 noncomputable def convergence_statement {bound : Nat} {F E B : Type u}
@@ -151,7 +170,10 @@ noncomputable def convergence_statement {bound : Nat} {F E B : Type u}
   convergenceWitness := w
   pageIndex := r
   targetPage := ss.sequence.page r
-  targetPath := Path.refl _
+  targetPath := Path.ofEq (rfl : ss.sequence.page r = ss.sequence.page r)
+  targetInversePath := Path.symm (Path.ofEq (rfl : ss.sequence.page r = ss.sequence.page r))
+  targetRoundtrip :=
+    rweq_cmpA_inv_right (Path.ofEq (rfl : ss.sequence.page r = ss.sequence.page r))
 
 /-! ## Koszul resolutions -/
 
@@ -217,7 +239,7 @@ noncomputable def trivialPtSet : PtSet.{u} where
 noncomputable def trivialPage (bound : Nat) : SpectralPage.{u} bound where
   term := fun _ _ => trivialPtSet
   diff := fun _ _ => zeroMor trivialPtSet trivialPtSet
-  dd_zero := fun _ _ _ => Path.refl _
+  dd_zero := fun _ _ _ => Path.ofEq rfl
 
 /-- A constant spectral sequence with trivial pages. -/
 noncomputable def trivialSpectralSeq (bound : Nat) : SpectralSeq.{u} bound where

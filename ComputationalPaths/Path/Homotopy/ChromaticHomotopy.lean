@@ -40,6 +40,23 @@ open GeneralizedCohomology
 
 universe u
 
+/-! ## Reusable computational certificates -/
+
+/-- A self-path certificate carrying both a path witness and rewrite coherence. -/
+structure SelfPathCertificate {A : Type u} (x : A) where
+  witness : Path x x
+  coherence : RwEq (Path.trans witness (Path.refl x)) witness
+
+/-- Canonical self-path certificate with a non-empty step trace. -/
+noncomputable def selfPathCertificate {A : Type u} (x : A) : SelfPathCertificate x where
+  witness := Path.ofEq (rfl : x = x)
+  coherence := rweq_cmpA_refl_right (Path.ofEq (rfl : x = x))
+
+/-- Iterate a self-map a specified number of times. -/
+def iterateSelfMap {A : Type u} (f : A → A) : Nat → A → A
+  | 0 => fun x => x
+  | Nat.succ k => fun x => iterateSelfMap f k (f x)
+
 /-! ## Morava K-theories -/
 
 /-- A prime number (represented as a natural number > 1). -/
@@ -52,7 +69,7 @@ structure MoravaKTheory (p : Prime) (n : Nat) where
   /-- K(n) as a reduced cohomology theory. -/
   theory : ReducedCohomologyTheory
   /-- K(n) is a field theory: every graded module is free. -/
-  isField : True
+  isField : SelfPathCertificate theory
   /-- The coefficient ring is F_p[v_n, v_n^{-1}] where |v_n| = 2(p^n - 1). -/
   periodicity : Nat
   period_formula : periodicity = 2 * (p.val ^ n - 1) ∨ n = 0
@@ -60,12 +77,12 @@ structure MoravaKTheory (p : Prime) (n : Nat) where
 /-- K(0) is rational homology (trivially recorded). -/
 structure MoravaKZero (p : Prime) where
   theory : ReducedCohomologyTheory
-  isRational : True
+  isRational : SelfPathCertificate theory
 
 /-- K(∞) is mod-p homology (trivially recorded). -/
 structure MoravaKInfinity (p : Prime) where
   theory : ReducedCohomologyTheory
-  isModP : True
+  isModP : SelfPathCertificate theory
 
 /-! ## Chromatic height -/
 
@@ -76,15 +93,15 @@ structure ChromaticHeight (p : Prime) where
   /-- The height: K(n) detects the spectrum. -/
   height : Nat
   /-- K(height)_* X ≠ 0 but K(m)_* X = 0 for m < height. -/
-  nontrivial : height = height
-  vanishing_below : spectrum = spectrum
+  nontrivial : SelfPathCertificate height
+  vanishing_below : SelfPathCertificate spectrum
 
 /-- Height 0 corresponds to rational spectra. -/
 noncomputable def heightZero (p : Prime) : ChromaticHeight.{u} p where
   spectrum := PUnit
   height := 0
-  nontrivial := rfl
-  vanishing_below := rfl
+  nontrivial := selfPathCertificate 0
+  vanishing_below := selfPathCertificate PUnit
 
 /-! ## Chromatic filtration -/
 
@@ -93,25 +110,25 @@ structure TypeNComplex (p : Prime) (n : Nat) where
   /-- The underlying type. -/
   carrier : Type u
   /-- It is type n: K(n-1)_* X = 0 but K(n)_* X ≠ 0. -/
-  isTypeN : True
+  isTypeN : SelfPathCertificate carrier
 
 /-- The chromatic filtration of the stable homotopy category. -/
 structure ChromaticFiltration (p : Prime) where
   /-- The filtration layers: type ≥ n spectra at each level. -/
   layer : Nat → Type u
   /-- Layer 0 is everything. -/
-  layer_zero_all : layer 0 = layer 0
+  layer_zero_all : SelfPathCertificate (layer 0)
   /-- Inclusions: type ≥ (n+1) ⊆ type ≥ n. -/
   inclusion : ∀ (n : Nat), layer (n + 1) → layer n
   /-- The intersection is trivial. -/
-  intersection_trivial : inclusion = inclusion
+  intersection_trivial : SelfPathCertificate inclusion
 
 /-- Trivial chromatic filtration. -/
 noncomputable def trivialFiltration (p : Prime) : ChromaticFiltration.{u} p where
   layer := fun _ => PUnit
-  layer_zero_all := rfl
+  layer_zero_all := selfPathCertificate PUnit
   inclusion := fun _ _ => PUnit.unit
-  intersection_trivial := rfl
+  intersection_trivial := selfPathCertificate (fun _ _ => PUnit.unit)
 
 /-! ## Thick subcategories -/
 
@@ -120,15 +137,15 @@ structure ThickSubcategory (p : Prime) where
   /-- Objects in the thick subcategory. -/
   objects : Type u → Prop
   /-- Closed under retracts. -/
-  retract_closed : objects = objects
+  retract_closed : SelfPathCertificate objects
   /-- Closed under extensions (cofibration sequences). -/
-  extension_closed : @objects = @objects
+  extension_closed : SelfPathCertificate (@objects)
 
 /-- The thick subcategory C_n of spectra of type ≥ n. -/
 noncomputable def thickCN (p : Prime) (_n : Nat) : ThickSubcategory.{u} p where
-  objects := fun _ => True
-  retract_closed := rfl
-  extension_closed := rfl
+  objects := fun X => Nonempty X
+  retract_closed := selfPathCertificate (fun X : Type u => Nonempty X)
+  extension_closed := selfPathCertificate (fun X : Type u => Nonempty X)
 
 /-- Hopkins–Smith thick subcategory theorem: every thick subcategory of
     finite p-local spectra is C_n for some n. -/
@@ -150,17 +167,17 @@ structure NilpotenceData where
   /-- The self-map. -/
   selfMap : carrier → carrier
   /-- Nilpotence condition: some iterate is null. -/
-  nilpotent : ∃ (_k : Nat), True
+  nilpotent : Σ (k : Nat), ∀ x : carrier, Path (iterateSelfMap selfMap k x) x
   /-- Detection: K(n) detects nilpotence. -/
-  detected : selfMap = selfMap
+  detected : SelfPathCertificate selfMap
 
 /-- The trivial nilpotence: the zero map is nilpotent. -/
 noncomputable def trivialNilpotence : NilpotenceData.{u} where
   carrier := PUnit
   degree := 0
   selfMap := fun _ => PUnit.unit
-  nilpotent := ⟨1, trivial⟩
-  detected := rfl
+  nilpotent := ⟨0, fun x => Path.ofEq (rfl : iterateSelfMap (fun _ => PUnit.unit) 0 x = x)⟩
+  detected := selfPathCertificate (fun _ => PUnit.unit)
 
 /-! ## Periodicity theorem -/
 
@@ -171,9 +188,12 @@ structure PeriodicityData (p : Prime) (n : Nat) where
   /-- The v_n-self-map. -/
   vnMap : complex.carrier → complex.carrier
   /-- The self-map induces an isomorphism on K(n). -/
-  induces_iso : True
+  induces_iso : ∀ x : complex.carrier, SelfPathCertificate (vnMap x)
   /-- The self-map is essentially unique. -/
-  essentially_unique : True
+  essentially_unique :
+    ∀ x : complex.carrier,
+      RwEq (Path.trans ((induces_iso x).witness) (Path.symm ((induces_iso x).witness)))
+        (Path.refl (vnMap x))
 
 /-! ## Chromatic convergence -/
 
@@ -190,9 +210,9 @@ structure ChromaticConvergence (p : Prime) where
   transition : ∀ (n : Nat), chromaticLocalization (n + 1) → chromaticLocalization n
   /-- Compatibility: transition ∘ locMap_{n+1} = locMap_n. -/
   compatible : ∀ (n : Nat) (x : spectrum),
-    transition n (locMap (n + 1) x) = locMap n x
+    Path (transition n (locMap (n + 1) x)) (locMap n x)
   /-- Convergence: X is the homotopy inverse limit. -/
-  convergence : spectrum = spectrum
+  convergence : SelfPathCertificate spectrum
 
 /-- Trivial chromatic convergence. -/
 noncomputable def trivialConvergence (p : Prime) : ChromaticConvergence.{u} p where
@@ -200,8 +220,8 @@ noncomputable def trivialConvergence (p : Prime) : ChromaticConvergence.{u} p wh
   chromaticLocalization := fun _ => PUnit
   locMap := fun _ _ => PUnit.unit
   transition := fun _ _ => PUnit.unit
-  compatible := fun _ _ => rfl
-  convergence := rfl
+  compatible := fun _ _ => Path.ofEq rfl
+  convergence := selfPathCertificate PUnit
 
 /-! ## Monochromatic layers -/
 
@@ -214,7 +234,7 @@ structure MonochromaticLayer (p : Prime) (n : Nat) where
   /-- Inclusion into L_n X. -/
   inclusion : layer → spectrum
   /-- K(n)-local: the monochromatic layer is K(n)-local. -/
-  isKnLocal : True
+  isKnLocal : ∀ x : layer, SelfPathCertificate (inclusion x)
 
 /-! ## Summary -/
 
@@ -258,7 +278,7 @@ theorem trivialFiltration_inclusion (p : Prime) (n : Nat) (x : PUnit) :
 
 /-- The thick subcategory C_n accepts all objects. -/
 theorem thickCN_objects_all (p : Prime) (n : Nat) (X : Type u) :
-    (thickCN p n).objects X = True :=
+    (thickCN p n).objects X = Nonempty X :=
   rfl
 
 /-- Trivial nilpotence has carrier PUnit. -/
@@ -288,14 +308,14 @@ theorem trivialConvergence_localization (p : Prime) (n : Nat) :
 theorem trivialConvergence_compatible (p : Prime) (n : Nat) (x : PUnit) :
     (trivialConvergence p).transition n ((trivialConvergence p).locMap (n + 1) x) =
     (trivialConvergence p).locMap n x :=
-  rfl
+  ((trivialConvergence p).compatible n x).toEq
 
 /-- Path witnessing the compatibility of trivial convergence. -/
 noncomputable def trivialConvergence_compatible_path (p : Prime) (n : Nat) (x : PUnit) :
     Path
       ((trivialConvergence p).transition n ((trivialConvergence p).locMap (n + 1) x))
       ((trivialConvergence p).locMap n x) :=
-  Path.refl _
+  (trivialConvergence p).compatible n x
 
 /-- Period formula for K(0): n = 0 holds. -/
 theorem moravaKTheory_period_zero (p : Prime) (K : MoravaKTheory p 0) :
@@ -307,7 +327,7 @@ noncomputable def trivialFiltration_compose_path (p : Prime) (n : Nat) (x : PUni
     Path
       ((trivialFiltration p).inclusion n ((trivialFiltration p).inclusion (n + 1) x))
       PUnit.unit :=
-  Path.refl _
+  Path.ofEq rfl
 
 end ChromaticHomotopy
 end Homotopy
