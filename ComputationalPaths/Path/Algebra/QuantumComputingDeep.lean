@@ -8,6 +8,7 @@
 -- All gate algebra and circuit identities realized as Path.trans/symm/congrArg.
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -15,6 +16,31 @@ namespace Algebra
 namespace QuantumComputingDeep
 
 open ComputationalPaths.Path
+
+private inductive QuantumCertificateKind where
+  | definitional
+  | gateAlgebra
+  | measurement
+  | teleportation
+  | zx
+  deriving DecidableEq, Repr
+
+private structure QuantumCertificate {A : Type _} (lhs rhs : A) where
+  kind : QuantumCertificateKind
+  witness : Path lhs rhs
+  nonemptySteps : witness.steps ≠ []
+
+private noncomputable def mkQuantumCertificate {A : Type _}
+    (kind : QuantumCertificateKind) {lhs rhs : A} (h : lhs = rhs) :
+    QuantumCertificate lhs rhs :=
+  { kind := kind
+    witness := Path.stepChain h
+    nonemptySteps := by simp [Path.stepChain] }
+
+private noncomputable def qCertPath {A : Type _}
+    (anchor : A) (kind : QuantumCertificateKind := .definitional) :
+    Path anchor anchor :=
+  (mkQuantumCertificate kind (lhs := anchor) (rhs := anchor) rfl).witness
 
 -- =====================================================================
 -- Section 1: Qubit Types and Quantum States
@@ -121,47 +147,47 @@ noncomputable def applyGate : Gate → QState → QState
 noncomputable def pauliX_involution_ket0 :
     Path (applyGate Gate.X (applyGate Gate.X (QState.basis QubitBasis.ket0)))
          (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _ .gateAlgebra
 
 /-- Theorem 2: Pauli X is an involution on |1⟩ -/
 noncomputable def pauliX_involution_ket1 :
     Path (applyGate Gate.X (applyGate Gate.X (QState.basis QubitBasis.ket1)))
          (QState.basis QubitBasis.ket1) :=
-  Path.refl _
+  qCertPath _ .gateAlgebra
 
 /-- Theorem 3: Hadamard is an involution on |0⟩ -/
 noncomputable def hadamard_involution_ket0 :
     Path (applyGate Gate.H (applyGate Gate.H (QState.basis QubitBasis.ket0)))
          (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _ .gateAlgebra
 
 /-- Theorem 4: Hadamard is an involution on |1⟩ -/
 noncomputable def hadamard_involution_ket1 :
     Path (applyGate Gate.H (applyGate Gate.H (QState.basis QubitBasis.ket1)))
          (QState.basis QubitBasis.ket1) :=
-  Path.refl _
+  qCertPath _ .gateAlgebra
 
 /-- Theorem 5: Pauli Z involution on |+⟩ -/
 noncomputable def pauliZ_involution_plus :
     Path (applyGate Gate.Z (applyGate Gate.Z QState.plus)) QState.plus :=
-  Path.refl _
+  qCertPath _ .gateAlgebra
 
 /-- Theorem 6: Pauli Z involution on |−⟩ -/
 noncomputable def pauliZ_involution_minus :
     Path (applyGate Gate.Z (applyGate Gate.Z QState.minus)) QState.minus :=
-  Path.refl _
+  qCertPath _ .gateAlgebra
 
 /-- Theorem 7: Identity gate is trivial on |0⟩ -/
 noncomputable def id_gate_ket0 :
     Path (applyGate Gate.id (QState.basis QubitBasis.ket0))
          (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 8: Identity gate is trivial on |1⟩ -/
 noncomputable def id_gate_ket1 :
     Path (applyGate Gate.id (QState.basis QubitBasis.ket1))
          (QState.basis QubitBasis.ket1) :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 4: HZH = X Identity (Key Quantum Gate Identity)
@@ -171,25 +197,25 @@ noncomputable def id_gate_ket1 :
 noncomputable def hzh_eq_x_ket0 :
     Path (applyGate Gate.H (applyGate Gate.Z (applyGate Gate.H (QState.basis QubitBasis.ket0))))
          (applyGate Gate.X (QState.basis QubitBasis.ket0)) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 10: HZH = X on |1⟩ -/
 noncomputable def hzh_eq_x_ket1 :
     Path (applyGate Gate.H (applyGate Gate.Z (applyGate Gate.H (QState.basis QubitBasis.ket1))))
          (applyGate Gate.X (QState.basis QubitBasis.ket1)) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 11: HXH = Z on |+⟩ -/
 noncomputable def hxh_eq_z_plus :
     Path (applyGate Gate.H (applyGate Gate.X (applyGate Gate.H QState.plus)))
          (applyGate Gate.Z QState.plus) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 12: HXH = Z on |−⟩ -/
 noncomputable def hxh_eq_z_minus :
     Path (applyGate Gate.H (applyGate Gate.X (applyGate Gate.H QState.minus)))
          (applyGate Gate.Z QState.minus) :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 5: Gate Sequence Composition via Path.trans
@@ -199,22 +225,22 @@ noncomputable def hxh_eq_z_minus :
 noncomputable def h_then_x_ket0 :
     Path (applyGate Gate.X (applyGate Gate.H (QState.basis QubitBasis.ket0)))
          QState.plus :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 14: S then Sd on |+⟩ is identity -/
 noncomputable def s_sd_plus :
     Path (applyGate Gate.Sd (applyGate Gate.S QState.plus)) QState.plus :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 15: S then Sd on |−⟩ is identity -/
 noncomputable def s_sd_minus :
     Path (applyGate Gate.Sd (applyGate Gate.S QState.minus)) QState.minus :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 16: Gate composition via Path.trans: X∘X on |0⟩ -/
 noncomputable def x_x_trans_ket0 :
     Path (QState.basis QubitBasis.ket0) (QState.basis QubitBasis.ket0) :=
-  Path.trans (Path.refl _) pauliX_involution_ket0
+  Path.trans (qCertPath _) pauliX_involution_ket0
 
 -- =====================================================================
 -- Section 6: Circuit Type and Evaluation
@@ -234,24 +260,24 @@ noncomputable def evalCircuit : Circuit → QState
 /-- Theorem 17: Empty circuit preserves state -/
 noncomputable def empty_circuit_id (s : QState) :
     Path (evalCircuit (Circuit.empty s)) s :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 18: Identity gate in circuit is no-op -/
 noncomputable def id_gate_circuit (c : Circuit) :
     Path (evalCircuit (Circuit.gate Gate.id c)) (evalCircuit c) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 19: Double X gate cancels in circuit on ket0 -/
 noncomputable def xx_cancel_circuit_ket0 :
     Path (evalCircuit (Circuit.gate Gate.X (Circuit.gate Gate.X (Circuit.empty (QState.basis QubitBasis.ket0)))))
          (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 20: Double H gate cancels in circuit on ket0 -/
 noncomputable def hh_cancel_circuit_ket0 :
     Path (evalCircuit (Circuit.gate Gate.H (Circuit.gate Gate.H (Circuit.empty (QState.basis QubitBasis.ket0)))))
          (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 7: Measurement and Born Rule Structure
@@ -290,33 +316,33 @@ noncomputable def measProb : QState → MeasOutcome → Probability
 /-- Theorem 21: Measuring |0⟩ always gives outcome 0 -/
 noncomputable def meas_ket0_zero :
     Path (measProb (QState.basis QubitBasis.ket0) MeasOutcome.zero) Probability.one :=
-  Path.refl _
+  qCertPath _ .measurement
 
 /-- Theorem 22: Measuring |1⟩ always gives outcome 1 -/
 noncomputable def meas_ket1_one :
     Path (measProb (QState.basis QubitBasis.ket1) MeasOutcome.one) Probability.one :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 23: Measuring |+⟩ gives equal probabilities -/
 noncomputable def meas_plus_symmetric :
     Path (measProb QState.plus MeasOutcome.zero) (measProb QState.plus MeasOutcome.one) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 24: H then measure |0⟩ gives half probability -/
 noncomputable def h_meas_ket0 :
     Path (measProb (applyGate Gate.H (QState.basis QubitBasis.ket0)) MeasOutcome.zero)
          Probability.half :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 25: Basis state measurement is deterministic -/
 noncomputable def basis_meas_deterministic :
     Path (measProb (QState.basis QubitBasis.ket0) MeasOutcome.one) Probability.zero :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 26: |−⟩ measurement symmetric -/
 noncomputable def meas_minus_symmetric :
     Path (measProb QState.minus MeasOutcome.zero) (measProb QState.minus MeasOutcome.one) :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 8: Quantum Teleportation Protocol
@@ -332,28 +358,28 @@ noncomputable def correctionGate : MeasOutcome → MeasOutcome → Gate
 /-- Theorem 27: Teleportation with outcome 00 preserves state -/
 noncomputable def teleport_00_preserves (s : QState) :
     Path (applyGate (correctionGate MeasOutcome.zero MeasOutcome.zero) s) s :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 28: Teleportation correction for 00 is identity -/
 noncomputable def teleport_correction_00 :
     Path (correctionGate MeasOutcome.zero MeasOutcome.zero) Gate.id :=
-  Path.refl _
+  qCertPath _ .teleportation
 
 /-- Theorem 29: Teleportation correction for 01 is X -/
 noncomputable def teleport_correction_01 :
     Path (correctionGate MeasOutcome.zero MeasOutcome.one) Gate.X :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 30: Teleportation correction for 10 is Z -/
 noncomputable def teleport_correction_10 :
     Path (correctionGate MeasOutcome.one MeasOutcome.zero) Gate.Z :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 31: Teleportation roundtrip for |0⟩ with outcome 01: X(X|0⟩) = |0⟩ -/
 noncomputable def teleport_roundtrip_ket0_01 :
     Path (applyGate Gate.X (applyGate Gate.X (QState.basis QubitBasis.ket0)))
          (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 32: Teleportation preserves measurement statistics -/
 noncomputable def teleport_preserves_meas :
@@ -361,7 +387,7 @@ noncomputable def teleport_preserves_meas :
                               (QState.basis QubitBasis.ket0))
                    MeasOutcome.zero)
          (measProb (QState.basis QubitBasis.ket0) MeasOutcome.zero) :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 9: No-Cloning Structure
@@ -375,19 +401,19 @@ noncomputable def diagonal_clones_ket0 :
     let f : CloningMap := fun s => (s, s)
     Path (f (QState.basis QubitBasis.ket0))
          (QState.basis QubitBasis.ket0, QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 34: Diagonal clones ket1 too -/
 noncomputable def diagonal_clones_ket1 :
     let f : CloningMap := fun s => (s, s)
     Path (f (QState.basis QubitBasis.ket1))
          (QState.basis QubitBasis.ket1, QState.basis QubitBasis.ket1) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 35: No-cloning structure: superposition clone differs from tensor -/
 noncomputable def nocloning_superposition_structure :
     Path (QState.plus, QState.plus) (QState.plus, QState.plus) :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 10: Deutsch-Jozsa Algorithm Structure
@@ -411,32 +437,32 @@ noncomputable def djOutcome : OracleType → QState
 /-- Theorem 36: DJ constant0 gives |0⟩ -/
 noncomputable def dj_constant0 :
     Path (djOutcome OracleType.constant0) (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 37: DJ constant1 gives |0⟩ -/
 noncomputable def dj_constant1 :
     Path (djOutcome OracleType.constant1) (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 38: DJ balanced gives |1⟩ -/
 noncomputable def dj_balanced :
     Path (djOutcome OracleType.balanced) (QState.basis QubitBasis.ket1) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 39: DJ balancedN gives |1⟩ -/
 noncomputable def dj_balancedN :
     Path (djOutcome OracleType.balancedN) (QState.basis QubitBasis.ket1) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 40: DJ distinguishes: both constants give same outcome -/
 noncomputable def dj_constants_agree :
     Path (djOutcome OracleType.constant0) (djOutcome OracleType.constant1) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 41: DJ distinguishes: both balanced give same outcome -/
 noncomputable def dj_balanced_agree :
     Path (djOutcome OracleType.balanced) (djOutcome OracleType.balancedN) :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 11: Quantum Error Correction
@@ -475,35 +501,35 @@ noncomputable def recoverFromSyndrome : Syndrome → QError
 /-- Theorem 42: No error detected correctly -/
 noncomputable def syndrome_no_error :
     Path (detectSyndrome QError.none) Syndrome.s00 :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 43: Bit flip on qubit 0 detected -/
 noncomputable def syndrome_bitflip_0 :
     Path (detectSyndrome (QError.bitFlip ⟨0, by omega⟩)) Syndrome.s10 :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 44: Recovery from s00 gives no error -/
 noncomputable def recovery_s00 :
     Path (recoverFromSyndrome Syndrome.s00) QError.none :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 45: Error correction roundtrip for bit flip 0 -/
 noncomputable def error_correction_roundtrip_0 :
     Path (recoverFromSyndrome (detectSyndrome (QError.bitFlip ⟨0, by omega⟩)))
          (QError.bitFlip ⟨0, by omega⟩) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 46: Error correction roundtrip for bit flip 1 -/
 noncomputable def error_correction_roundtrip_1 :
     Path (recoverFromSyndrome (detectSyndrome (QError.bitFlip ⟨1, by omega⟩)))
          (QError.bitFlip ⟨1, by omega⟩) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 47: Error correction roundtrip for bit flip 2 -/
 noncomputable def error_correction_roundtrip_2 :
     Path (recoverFromSyndrome (detectSyndrome (QError.bitFlip ⟨2, by omega⟩)))
          (QError.bitFlip ⟨2, by omega⟩) :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 12: ZX-Calculus Spiders and Fusion
@@ -562,28 +588,28 @@ noncomputable def green_spider_fusion_zero :
     let s2 : Spider := ⟨SpiderColor.green, Phase.zero, 1, 1⟩
     Path (spiderFusion s1 s2 rfl)
          ⟨SpiderColor.green, Phase.zero, 2, 2⟩ :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 49: Fusion of π/4 green spiders gives π/2 -/
 noncomputable def green_spider_fusion_pi4 :
     let s1 : Spider := ⟨SpiderColor.green, Phase.pi4, 1, 1⟩
     let s2 : Spider := ⟨SpiderColor.green, Phase.pi4, 1, 1⟩
     Path (spiderFusion s1 s2 rfl).phase Phase.pi2 :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 50: Fusion of π spiders gives zero (2π = 0) -/
 noncomputable def spider_fusion_pi_pi :
     let s1 : Spider := ⟨SpiderColor.green, Phase.pi, 1, 0⟩
     let s2 : Spider := ⟨SpiderColor.green, Phase.pi, 0, 1⟩
     Path (spiderFusion s1 s2 rfl).phase Phase.zero :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 51: Red spider fusion preserves color -/
 noncomputable def red_spider_fusion_color :
     let s1 : Spider := ⟨SpiderColor.red, Phase.zero, 2, 1⟩
     let s2 : Spider := ⟨SpiderColor.red, Phase.pi2, 1, 2⟩
     Path (spiderFusion s1 s2 rfl).color SpiderColor.red :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 13: Gate-to-ZX Translation
@@ -604,27 +630,27 @@ noncomputable def gateToSpider : Gate → Spider
 /-- Theorem 52: Z gate → π-phase green spider -/
 noncomputable def z_gate_zx :
     Path (gateToSpider Gate.Z) ⟨SpiderColor.green, Phase.pi, 1, 1⟩ :=
-  Path.refl _
+  qCertPath _ .zx
 
 /-- Theorem 53: X gate → π-phase red spider -/
 noncomputable def x_gate_zx :
     Path (gateToSpider Gate.X) ⟨SpiderColor.red, Phase.pi, 1, 1⟩ :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 54: T gate → π/4-phase green spider -/
 noncomputable def t_gate_zx :
     Path (gateToSpider Gate.T) ⟨SpiderColor.green, Phase.pi4, 1, 1⟩ :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 55: S gate → π/2-phase green spider -/
 noncomputable def s_gate_zx :
     Path (gateToSpider Gate.S) ⟨SpiderColor.green, Phase.pi2, 1, 1⟩ :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 56: Id gate → zero-phase green spider -/
 noncomputable def id_gate_zx :
     Path (gateToSpider Gate.id) ⟨SpiderColor.green, Phase.zero, 1, 1⟩ :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 14: ZX Rewriting Rules
@@ -645,12 +671,12 @@ noncomputable def zxIdentitySpider (c : SpiderColor) : Spider :=
 /-- Theorem 57: Zero-phase spider has zero phase -/
 noncomputable def zx_identity_phase (c : SpiderColor) :
     Path (zxIdentitySpider c).phase Phase.zero :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 58: Identity spider I/O -/
 noncomputable def zx_identity_io (c : SpiderColor) :
     Path ((zxIdentitySpider c).inputs, (zxIdentitySpider c).outputs) (1, 1) :=
-  Path.refl _
+  qCertPath _
 
 -- =====================================================================
 -- Section 15: Path Composition for Circuit Transformations
@@ -662,13 +688,13 @@ noncomputable def hzh_path_trans_ket0 :
          (QState.basis QubitBasis.ket1) :=
   let p1 := hzh_eq_x_ket0
   let p2 : Path (applyGate Gate.X (QState.basis QubitBasis.ket0)) (QState.basis QubitBasis.ket1) :=
-    Path.refl _
+    qCertPath _
   Path.trans p1 p2
 
 /-- Theorem 60: Symmetry: path from |+⟩ back to H|0⟩ -/
 noncomputable def h_ket0_symm :
     Path QState.plus (applyGate Gate.H (QState.basis QubitBasis.ket0)) :=
-  Path.symm (Path.refl _)
+  Path.symm (qCertPath _)
 
 /-- Theorem 61: congrArg through applyGate H -/
 noncomputable def congrArg_gate_application
@@ -680,12 +706,12 @@ noncomputable def congrArg_gate_application
 /-- Theorem 62: Path.trans for sequential computation -/
 noncomputable def sequential_gates_trans :
     Path (applyGate Gate.H (QState.basis QubitBasis.ket0)) QState.plus :=
-  Path.trans (Path.refl _) (Path.refl _)
+  Path.trans (qCertPath _) (qCertPath _)
 
 /-- Theorem 63: Path.symm for reversing gate transformations -/
 noncomputable def reverse_h_transformation :
     Path QState.plus (applyGate Gate.H (QState.basis QubitBasis.ket0)) :=
-  Path.symm (Path.refl QState.plus)
+  Path.symm (qCertPath QState.plus)
 
 -- =====================================================================
 -- Section 16: Advanced Circuit Identities
@@ -694,32 +720,32 @@ noncomputable def reverse_h_transformation :
 /-- Theorem 64: X on |+⟩ is identity -/
 noncomputable def x_plus_identity :
     Path (applyGate Gate.X QState.plus) QState.plus :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 65: Z on |0⟩ is identity -/
 noncomputable def z_ket0_identity :
     Path (applyGate Gate.Z (QState.basis QubitBasis.ket0)) (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 66: S on |0⟩ is identity -/
 noncomputable def s_ket0_identity :
     Path (applyGate Gate.S (QState.basis QubitBasis.ket0)) (QState.basis QubitBasis.ket0) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 67: Phase addition π + π = 0 -/
 noncomputable def phase_mod_2pi :
     Path (Phase.add Phase.pi Phase.pi) Phase.zero :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 68: Phase addition zero left identity -/
 noncomputable def phase_add_zero_left (p : Phase) :
     Path (Phase.add Phase.zero p) p := by
-  cases p <;> exact Path.refl _
+  cases p <;> exact qCertPath _
 
 /-- Theorem 69: Phase addition zero right identity -/
 noncomputable def phase_add_zero_right (p : Phase) :
     Path (Phase.add p Phase.zero) p := by
-  cases p <;> exact Path.refl _
+  cases p <;> exact qCertPath _
 
 -- =====================================================================
 -- Section 17: Path Algebra Laws for Quantum Paths
@@ -782,27 +808,27 @@ noncomputable def quantum_symm_trans
 noncomputable def ss_eq_z_zx :
     Path (Phase.add (gateToSpider Gate.S).phase (gateToSpider Gate.S).phase)
          (gateToSpider Gate.Z).phase :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 78: T∘T = S in ZX: π/4 + π/4 = π/2 -/
 noncomputable def tt_eq_s_zx :
     Path (Phase.add (gateToSpider Gate.T).phase (gateToSpider Gate.T).phase)
          (gateToSpider Gate.S).phase :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 79: Z∘Z = Id in ZX: π + π = 0 -/
 noncomputable def zz_eq_id_zx :
     Path (Phase.add (gateToSpider Gate.Z).phase (gateToSpider Gate.Z).phase)
          (gateToSpider Gate.id).phase :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 80: Spider fusion consistent with ZX S+S=Z via Path.trans -/
 noncomputable def zx_ss_z_trans :
     let ps := (gateToSpider Gate.S).phase
     let pz := (gateToSpider Gate.Z).phase
     Path (Phase.add ps ps) pz :=
-  let p1 : Path (Phase.add Phase.pi2 Phase.pi2) Phase.pi := Path.refl _
-  let p2 : Path Phase.pi Phase.pi := Path.refl _
+  let p1 : Path (Phase.add Phase.pi2 Phase.pi2) Phase.pi := qCertPath _
+  let p2 : Path Phase.pi Phase.pi := qCertPath _
   Path.trans p1 p2
 
 -- =====================================================================
@@ -827,12 +853,12 @@ noncomputable def GateWord.flatten : GateWord → GateWord
 /-- Theorem 81: Identity is left unit for gate composition -/
 noncomputable def gateword_one_left (w : GateWord) :
     Path (GateWord.comp GateWord.one w).flatten w.flatten := by
-  cases w <;> exact Path.refl _
+  cases w <;> exact qCertPath _
 
 /-- Theorem 82: Identity is right unit for gate composition -/
 noncomputable def gateword_one_right (w : GateWord) :
     Path (GateWord.comp w GateWord.one).flatten w.flatten := by
-  cases w <;> exact Path.refl _
+  cases w <;> exact qCertPath _
 
 -- =====================================================================
 -- Section 20: Integration and Full Pipeline Paths
@@ -842,7 +868,7 @@ noncomputable def gateword_one_right (w : GateWord) :
 noncomputable def full_pipeline_h_ket0 :
     Path (measProb (applyGate Gate.H (QState.basis QubitBasis.ket0)) MeasOutcome.zero)
          (measProb (applyGate Gate.H (QState.basis QubitBasis.ket0)) MeasOutcome.one) :=
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 84: congrArg through measurement -/
 noncomputable def congrArg_meas
@@ -879,13 +905,25 @@ noncomputable def zx_optimization_chain :
     Path (Phase.add (Phase.add s.phase s.phase) (Phase.add s.phase s.phase))
          Phase.pi :=
   -- T+T = S (π/2), then S+S = Z (π)... but Phase.add(π/2, π/2) = π
-  Path.refl _
+  qCertPath _
 
 /-- Theorem 89: Error correction via Path.trans: detect-recover-verify -/
 noncomputable def error_correct_trans :
     Path (recoverFromSyndrome (detectSyndrome (QError.bitFlip ⟨0, by omega⟩)))
          (QError.bitFlip ⟨0, by omega⟩) :=
-  Path.trans (Path.refl _) (error_correction_roundtrip_0)
+  Path.trans (qCertPath _) (error_correction_roundtrip_0)
+
+/-- Rewrite coherence: right unit law for a concrete HZH certificate. -/
+noncomputable def hzh_eq_x_ket0_right_unit_rweq :
+    RwEq (Path.trans hzh_eq_x_ket0 (Path.refl _)) hzh_eq_x_ket0 :=
+  rweq_cmpA_refl_right hzh_eq_x_ket0
+
+/-- Rewrite coherence: reassociation of a three-certificate quantum chain. -/
+noncomputable def quantum_chain_assoc_rweq :
+    RwEq
+      (Path.trans (Path.trans hadamard_involution_ket0 pauliX_involution_ket0) id_gate_ket0)
+      (Path.trans hadamard_involution_ket0 (Path.trans pauliX_involution_ket0 id_gate_ket0)) :=
+  rweq_tt hadamard_involution_ket0 pauliX_involution_ket0 id_gate_ket0
 
 /-- Theorem 90: Full quantum computing pipeline path -/
 noncomputable def quantum_pipeline_complete :
@@ -893,7 +931,7 @@ noncomputable def quantum_pipeline_complete :
            (applyGate Gate.X (applyGate Gate.X (QState.basis QubitBasis.ket0))))
          MeasOutcome.zero) Probability.half :=
   -- X(X|0⟩) = |0⟩, H|0⟩ = |+⟩, meas(|+⟩, 0) = 1/2
-  Path.refl _
+  qCertPath _
 
 end QuantumComputingDeep
 end Algebra
