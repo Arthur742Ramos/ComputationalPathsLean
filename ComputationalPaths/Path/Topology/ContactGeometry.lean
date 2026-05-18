@@ -29,6 +29,7 @@ A contact structure on a (2n+1)-manifold M is a hyperplane distribution
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -197,6 +198,34 @@ structure LegendrianStabilisation (cs : ContactStructure) where
   tb_drop     : stabilised.tb = original.tb - 1
   rot_shift   : True   -- rot changes by ±1
 
+/-! ## 4.1 Certificate-level Legendrian and Gray data -/
+
+/-- A computational certificate recording explicit stabilisation deltas and
+their path-level coherence. -/
+structure LegendrianStabilisationCertificate (cs : ContactStructure)
+    (S : LegendrianStabilisation cs) where
+  rotDelta : Int
+  rot_delta_unit : Int.natAbs rotDelta = 1
+  tb_drop_path : Path S.stabilised.tb (S.original.tb - 1)
+  rot_shift_path : Path S.stabilised.rot (S.original.rot + rotDelta)
+  tb_drop_coherence :
+    RwEq (Path.trans tb_drop_path (Path.refl (S.original.tb - 1))) tb_drop_path
+  rot_shift_coherence :
+    RwEq (Path.trans rot_shift_path (Path.refl (S.original.rot + rotDelta))) rot_shift_path
+
+/-- Build a stabilisation certificate from explicit rotation-shift data. -/
+noncomputable def legendrian_stabilisation_certificate {cs : ContactStructure}
+    (S : LegendrianStabilisation cs) (rotDelta : Int)
+    (hrot : Int.natAbs rotDelta = 1)
+    (hshift : S.stabilised.rot = S.original.rot + rotDelta) :
+    LegendrianStabilisationCertificate cs S where
+  rotDelta := rotDelta
+  rot_delta_unit := hrot
+  tb_drop_path := Path.stepChain S.tb_drop
+  rot_shift_path := Path.stepChain hshift
+  tb_drop_coherence := rweq_cmpA_refl_right (p := Path.stepChain S.tb_drop)
+  rot_shift_coherence := rweq_cmpA_refl_right (p := Path.stepChain hshift)
+
 /-! ## 5. Transverse Knots -/
 
 /-- A transverse knot: a knot everywhere transverse to ξ. -/
@@ -228,6 +257,18 @@ structure GrayStability where
 /-- Moser's method for contact forms: the isotopy at time 0 is the identity. -/
 theorem gray_moser_method (gs : GrayStability) (x : (gs.family 0).carrier) :
     (gs.isotopy 0).toFun x = x := gs.isotopy_zero x
+
+/-- Gray/Moser certificate at the base time level t = 0. -/
+structure GrayMoserCertificate (gs : GrayStability) where
+  point : (gs.family 0).carrier
+  fixed_path : Path ((gs.isotopy 0).toFun point) point
+  fixed_coherence : RwEq (Path.trans fixed_path (Path.refl point)) fixed_path
+
+noncomputable def gray_moser_certificate (gs : GrayStability)
+    (x : (gs.family 0).carrier) : GrayMoserCertificate gs where
+  point := x
+  fixed_path := Path.stepChain (gs.isotopy_zero x)
+  fixed_coherence := rweq_cmpA_refl_right (p := Path.stepChain (gs.isotopy_zero x))
 
 /-! ## 7. Tight vs Overtwisted -/
 
@@ -343,6 +384,19 @@ theorem minus_one_surgery_tight (cs : ContactStructure)
 theorem plus_one_surgery_may_ot (cs : ContactStructure) (S : ContactSurgery cs) :
     S.result.carrier = S.result.carrier := rfl
 
+/-- Path-level witness of the surgery coefficient in the (−1)-surgery case. -/
+noncomputable def minus_one_surgery_trace (cs : ContactStructure)
+    (S : ContactSurgery cs) (h : S.coefficient = -1) :
+    Path S.coefficient (-1) :=
+  Path.stepChain h
+
+/-- The (−1)-surgery witness is coherent under right-unit rewrite. -/
+noncomputable def minus_one_surgery_trace_coherent (cs : ContactStructure)
+    (S : ContactSurgery cs) (h : S.coefficient = -1) :
+    RwEq (Path.trans (minus_one_surgery_trace cs S h) (Path.refl (-1)))
+      (minus_one_surgery_trace cs S h) :=
+  rweq_cmpA_refl_right (p := minus_one_surgery_trace cs S h)
+
 /-! ## 12. Contact Homology and SFT -/
 
 /-- Cylindrical contact homology: chain complex from Reeb orbits. -/
@@ -414,6 +468,28 @@ theorem reeb_flow_identity (cs : ContactStructure) (R : ReebFlow cs)
 theorem conley_zehnder_parity (cs : ContactStructure)
     (cz : ConleyZehnderIndex cs) : cz.czIndex = cz.czIndex := rfl
 
+/-- Explicit parity certificate for a Conley-Zehnder index. -/
+structure ConleyZehnderParityCertificate (cs : ContactStructure)
+    (cz : ConleyZehnderIndex cs) where
+  parityEven : Bool
+  parity_path : Path parityEven (decide (Int.natAbs cz.czIndex % 2 = 0))
+  parity_coherence :
+    RwEq (Path.trans parity_path
+      (Path.refl (decide (Int.natAbs cz.czIndex % 2 = 0)))) parity_path
+
+noncomputable def conley_zehnder_parity_certificate (cs : ContactStructure)
+    (cz : ConleyZehnderIndex cs) : ConleyZehnderParityCertificate cs cz where
+  parityEven := decide (Int.natAbs cz.czIndex % 2 = 0)
+  parity_path := Path.refl _
+  parity_coherence := rweq_cmpA_refl_right (p := Path.refl _)
+
+/-- Extract the parity equality from the computational certificate. -/
+theorem conley_zehnder_parity_value (cs : ContactStructure)
+    (cz : ConleyZehnderIndex cs) :
+    (conley_zehnder_parity_certificate cs cz).parityEven =
+      decide (Int.natAbs cz.czIndex % 2 = 0) :=
+  (conley_zehnder_parity_certificate cs cz).parity_path.proof
+
 theorem stabilisation_decreases_tb (cs : ContactStructure)
     (S : LegendrianStabilisation cs) :
     S.stabilised.tb = S.original.tb - 1 :=
@@ -432,8 +508,8 @@ section LegendrianRewrite
 variable {cs : ContactStructure}
 
 noncomputable def legendrianRewriteStep (x y : LegendrianKnot cs)
-    (h : x = y) : Step (LegendrianKnot cs) :=
-  Step.mk x y h
+    (h : x = y) : ComputationalPaths.Step (LegendrianKnot cs) :=
+  ComputationalPaths.Step.mk x y h
 
 noncomputable def legendrianIsotopyPath (x y : LegendrianKnot cs)
     (h : x = y) : Path x y :=

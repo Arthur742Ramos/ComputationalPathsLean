@@ -154,6 +154,28 @@ noncomputable def symplecto_inv (M₁ M₂ : SymplecticManifold)
   right_inv := f.left_inv
   preserves_omega := trivial
 
+/-- Certificate carrying explicit round-trip path witnesses for a symplectomorphism. -/
+structure SymplectomorphismRoundtripCertificate (M₁ M₂ : SymplecticManifold)
+    (f : Symplectomorphism M₁ M₂) where
+  sourcePoint : M₁.carrier
+  targetPoint : M₂.carrier
+  left_roundtrip : Path (f.invFun (f.toFun sourcePoint)) sourcePoint
+  right_roundtrip : Path (f.toFun (f.invFun targetPoint)) targetPoint
+  left_coherence :
+    RwEq (Path.trans left_roundtrip (Path.refl sourcePoint)) left_roundtrip
+  right_coherence :
+    RwEq (Path.trans right_roundtrip (Path.refl targetPoint)) right_roundtrip
+
+noncomputable def symplecto_roundtrip_certificate (M₁ M₂ : SymplecticManifold)
+    (f : Symplectomorphism M₁ M₂) (x : M₁.carrier) (y : M₂.carrier) :
+    SymplectomorphismRoundtripCertificate M₁ M₂ f where
+  sourcePoint := x
+  targetPoint := y
+  left_roundtrip := f.left_inv x
+  right_roundtrip := f.right_inv y
+  left_coherence := rweq_cmpA_refl_right (p := f.left_inv x)
+  right_coherence := rweq_cmpA_refl_right (p := f.right_inv y)
+
 /-! ## Hamiltonian Vector Fields -/
 
 /-- A Hamiltonian function on a symplectic manifold. -/
@@ -184,12 +206,31 @@ structure HamiltonianFlow (M : SymplecticManifold) where
   energy_conservation : ∀ t x,
     Path (hamVF.H.hamiltonian (flow t x)) (hamVF.H.hamiltonian x)
 
+/-- Certificate-level witness of Hamiltonian energy conservation. -/
+structure HamiltonianEnergyCertificate (M : SymplecticManifold)
+    (hf : HamiltonianFlow M) where
+  time : Nat
+  point : M.carrier
+  conservation_path :
+    Path (hf.hamVF.H.hamiltonian (hf.flow time point)) (hf.hamVF.H.hamiltonian point)
+  conservation_coherence :
+    RwEq (Path.trans conservation_path (Path.refl (hf.hamVF.H.hamiltonian point)))
+      conservation_path
+
+noncomputable def hamiltonian_energy_certificate (M : SymplecticManifold)
+    (hf : HamiltonianFlow M) (t : Nat) (x : M.carrier) :
+    HamiltonianEnergyCertificate M hf where
+  time := t
+  point := x
+  conservation_path := hf.energy_conservation t x
+  conservation_coherence := rweq_cmpA_refl_right (p := hf.energy_conservation t x)
+
 /-- Energy conservation — proof extraction. -/
 noncomputable def energy_conserved (M : SymplecticManifold) (hf : HamiltonianFlow M)
     (t : Nat) (x : M.carrier) :
     Path (hf.hamVF.H.hamiltonian (hf.flow t x))
          (hf.hamVF.H.hamiltonian x) :=
-  hf.energy_conservation t x
+  (hamiltonian_energy_certificate M hf t x).conservation_path
 
 /-! ## Poisson Brackets -/
 
