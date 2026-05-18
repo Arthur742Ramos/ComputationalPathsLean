@@ -41,6 +41,7 @@ abbrev Gam := Nat
     vertexCount (Simplex.mk (xs ++ ys)) = xs.length + ys.length := by
   simp [vertexCount, List.length_append]
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def simplex_refl_path {V : Type u} (s : Simplex V) : Path s s :=
   Path.stepChain rfl
 
@@ -61,6 +62,7 @@ noncomputable def simplex_refl_path {V : Type u} (s : Simplex V) : Path s s :=
       Path.refl s := by
   simp
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def simplex_vertexCount_path {V : Type u} (s : Simplex V) :
     Path (vertexCount s) (vertexCount s) :=
   Path.stepChain rfl
@@ -79,6 +81,7 @@ theorem totalComplex_face {V : Type u} (s : Simplex V) :
 @[simp] theorem totalComplex_empty {V : Type u} :
     (totalComplex V).hasFace ⟨([] : List V)⟩ := rfl
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def complex_refl_path {V : Type u} (K : SimplicialComplex V) : Path K K :=
   Path.stepChain rfl
 
@@ -209,15 +212,21 @@ structure ScalarDistanceCertificate (n : Nat) where
   payload  : Nat
   witness  : Path n n
   nonempty : witness.steps ≠ []
+  payloadCoversWitness : witness.steps.length ≤ payload
   rightUnit : RwEq (Path.trans witness (Path.refl n)) witness
 
 /-- Build a non-empty scalar distance certificate. -/
 noncomputable def mkScalarDistanceCertificate (n payload : Nat) :
-    ScalarDistanceCertificate n where
-  payload   := payload
-  witness   := Path.stepChain rfl
-  nonempty  := by simp [Path.stepChain]
-  rightUnit := RwEq.step (Step.trans_refl_right (Path.stepChain (rfl : n = n)))
+    ScalarDistanceCertificate n := by
+  let witness : Path n n := Path.stepChain (rfl : n = n)
+  refine
+    { payload   := Nat.max payload witness.steps.length
+      witness   := witness
+      nonempty  := ?_
+      payloadCoversWitness := ?_
+      rightUnit := RwEq.step (Step.trans_refl_right witness) }
+  · simp [witness, Path.stepChain]
+  · exact Nat.le_max_right payload witness.steps.length
 
 @[simp] theorem interleavingDistance_self (M : PersistenceModule) :
     interleavingDistance M M = 0 := rfl
@@ -230,6 +239,7 @@ theorem interleavingDistance_triangle (M N P : PersistenceModule) :
     interleavingDistance M P ≤ interleavingDistance M N + interleavingDistance N P := by
   simp [interleavingDistance]
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def interleavingDistance_path (M N : PersistenceModule) :
     Path (interleavingDistance M N) (interleavingDistance M N) :=
   (mkScalarDistanceCertificate (interleavingDistance M N) 1).witness
@@ -266,6 +276,7 @@ noncomputable def emptyBarcode : Barcode := ⟨[]⟩
 @[simp] theorem barcodeCard_cons (I : BarcodeInterval) (bs : List BarcodeInterval) :
     barcodeCard ⟨I :: bs⟩ = Nat.succ (barcodeCard ⟨bs⟩) := rfl
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def barcode_path_refl (B : Barcode) : Path B B := Path.stepChain rfl
 
 structure DiagramPoint where
@@ -326,10 +337,12 @@ theorem bottleneck_le_wasserstein (p : Nat) (D1 D2 : PersistenceDiagram) :
     bottleneckDistance D1 D2 ≤ wassersteinDistance D1 D2 p := by
   simp [bottleneckDistance, wassersteinDistance]
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def bottleneck_path_refl (D1 D2 : PersistenceDiagram) :
     Path (bottleneckDistance D1 D2) (bottleneckDistance D1 D2) :=
   (mkScalarDistanceCertificate (bottleneckDistance D1 D2) 2).witness
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def wasserstein_path_refl (p : Nat) (D1 D2 : PersistenceDiagram) :
     Path (wassersteinDistance D1 D2 p) (wassersteinDistance D1 D2 p) :=
   (mkScalarDistanceCertificate (wassersteinDistance D1 D2 p) (p + 1)).witness
@@ -354,6 +367,7 @@ theorem dist_symm (X : FiniteMetricSpace) (x y : X.Point) :
 theorem diameter_nonneg (X : FiniteMetricSpace) : 0 ≤ diameter X :=
   Nat.zero_le (diameter X)
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def diameter_path_refl (X : FiniteMetricSpace) :
     Path (diameter X) (diameter X) :=
   (mkScalarDistanceCertificate (diameter X) 1).witness
@@ -381,10 +395,12 @@ theorem cechEmpty (X : FiniteMetricSpace) (eps : Nat) :
 theorem vietoris_eq_cech (X : FiniteMetricSpace) (eps : Nat) :
     VietorisRipsComplex X eps = CechComplex X eps := rfl
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def vietoris_path_refl (X : FiniteMetricSpace) (eps : Nat) :
     Path (VietorisRipsComplex X eps) (VietorisRipsComplex X eps) :=
   Path.stepChain rfl
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def cech_path_refl (X : FiniteMetricSpace) (eps : Nat) :
     Path (CechComplex X eps) (CechComplex X eps) :=
   Path.stepChain rfl
@@ -464,10 +480,12 @@ noncomputable def constantZigzag (A : Type u) : ZigzagModule where
 @[simp] theorem constantZigzag_coherence (A : Type u) (i : Nat) (x : (constantZigzag A).obj i) :
     (constantZigzag A).mapBwd i ((constantZigzag A).mapFwd i x) = x := rfl
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def zigzag_arrow_path (A : Type u) (i : Nat) :
     Path ((constantZigzag A).arrow i) ((constantZigzag A).arrow i) :=
   Path.stepChain rfl
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def zigzag_module_path (Z : ZigzagModule) : Path Z Z := Path.stepChain rfl
 
 noncomputable def zigzag_reverse_path (a : ZigzagArrow) :
@@ -525,6 +543,7 @@ theorem low_nonneg (M : BinaryMatrix) (j : Nat) : 0 ≤ low M j :=
 @[simp] theorem reduceMatrix_zeroMatrix (r c : Nat) :
     reduceMatrix (zeroMatrix r c) = zeroMatrix r c := rfl
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def matrix_path_refl (M : BinaryMatrix) : Path M M := Path.stepChain rfl
 
 @[simp] theorem matrix_path_trans (M : BinaryMatrix) :
@@ -596,6 +615,7 @@ theorem algebraic_stability_shape (M N : PersistenceModule) :
     bottleneckDistance emptyDiagram emptyDiagram ≤ interleavingDistance M N := by
   simp [bottleneckDistance, interleavingDistance]
 
+/-- Compatibility helper: returns a non-empty step-chain witness, not literal `Path.refl`. -/
 noncomputable def stability_path_refl (M N : PersistenceModule) :
     Path (trivialStability M N) (trivialStability M N) :=
   Path.stepChain rfl

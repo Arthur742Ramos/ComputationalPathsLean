@@ -514,12 +514,12 @@ theorem hmonad_trivial_mult_length (e : HEdge) :
     HPath.length (HMonad.trivial e).mult = 1 := by
   simp [HMonad.trivial, HPath.single, HPath.length]
 
-/-- Theorem 50 — HMonad left unit law: trans unit mult = mult (trivial). -/
+/-- Theorem 50 — refl-based horizontal left-unit length law. -/
 theorem hmonad_left_unit (e : HEdge) :
     HPath.length (HPath.trans (HPath.refl e) (HPath.refl e)) = 0 := by
   simp [HPath.trans, HPath.refl, HPath.length]
 
-/-- Theorem 51 — HMonad right unit law: trans mult unit = mult (trivial). -/
+/-- Theorem 51 — refl-based horizontal right-unit length law. -/
 theorem hmonad_right_unit (e : HEdge) (p : HPath e e) :
     HPath.length (HPath.trans p (HPath.refl e)) = HPath.length p := by
   simp [HPath.refl, hpath_trans_length, HPath.length]
@@ -563,7 +563,7 @@ theorem vmonad_trivial_mult_length (e : VEdge) :
     VPath.length (VMonad.trivial e).mult = 1 := by
   simp [VMonad.trivial, VPath.single, VPath.length]
 
-/-- Theorem 54 — VMonad left unit law. -/
+/-- Theorem 54 — refl-based vertical left-unit length law. -/
 theorem vmonad_left_unit (e : VEdge) (p : VPath e e) :
     VPath.length (VPath.trans (VPath.refl e) p) = VPath.length p := by
   simp [VPath.trans, VPath.refl, VPath.length]

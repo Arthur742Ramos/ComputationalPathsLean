@@ -85,21 +85,27 @@ noncomputable def speciesCartesian (F G : Species) : Species where
 -- Section 3: Species Isomorphism as Path (def for non-Prop Path results)
 -- ============================================================================
 
-/-- Reflexive species path -/
+/-- Certificate bundling a species path, non-empty trace, and right-unit coherence. -/
 structure SpeciesPathCertificate {F : Species} {A : Type} (x y : F.apply A) where
   payload   : Nat
   witness   : Path x y
   nonempty  : witness.steps ≠ []
+  payloadCoversWitness : witness.steps.length ≤ payload
   rightUnit : RwEq (Path.trans witness (Path.refl y)) witness
 
 /-- Build a certificate from a concrete species equality witness. -/
 noncomputable def mkSpeciesPathCertificate {F : Species} {A : Type}
     {x y : F.apply A} (payload : Nat) (h : x = y) :
-    SpeciesPathCertificate x y where
-  payload   := payload
-  witness   := Path.stepChain h
-  nonempty  := by simp [Path.stepChain]
-  rightUnit := RwEq.step (Step.trans_refl_right (Path.stepChain h))
+    SpeciesPathCertificate x y := by
+  let witness : Path x y := Path.stepChain h
+  refine
+    { payload   := Nat.max payload witness.steps.length
+      witness   := witness
+      nonempty  := ?_
+      payloadCoversWitness := ?_
+      rightUnit := RwEq.step (Step.trans_refl_right witness) }
+  · simp [witness, Path.stepChain]
+  · exact Nat.le_max_right payload witness.steps.length
 
 /-- Reflexive species path -/
 noncomputable def speciesPathRefl {F : Species} {A : Type} (s : F.apply A) : Path s s :=

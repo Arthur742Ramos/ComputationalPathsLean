@@ -89,15 +89,21 @@ structure DeformationWitness (A : Type u) (a b : A) where
   payload   : Nat
   witness   : Path a b
   nonempty  : witness.steps ≠ []
+  payloadCoversWitness : witness.steps.length ≤ payload
   rightUnit : RwEq (Path.trans witness (Path.refl b)) witness
 
-/-- Build a non-empty witness from any deformation path. -/
+/-- Build a non-empty witness from any deformation path while retaining its trace. -/
 noncomputable def mkDeformationWitness {A : Type u} {a b : A}
-    (payload : Nat) (p : Path a b) : DeformationWitness A a b where
-  payload   := payload
-  witness   := Path.stepChain p.toEq
-  nonempty  := by simp [Path.stepChain]
-  rightUnit := RwEq.step (Step.trans_refl_right (Path.stepChain p.toEq))
+    (payload : Nat) (p : Path a b) : DeformationWitness A a b := by
+  let traced : Path a b := Path.trans p (Path.stepChain (rfl : b = b))
+  refine
+    { payload   := Nat.max payload traced.steps.length
+      witness   := traced
+      nonempty  := ?_
+      payloadCoversWitness := ?_
+      rightUnit := RwEq.step (Step.trans_refl_right traced) }
+  · simp [traced, Path.trans, Path.stepChain]
+  · exact Nat.le_max_right payload traced.steps.length
 
 /-- Def 1: Reflexivity gives the trivial deformation. -/
 noncomputable def trivialDeformation (A : Type u) (a : A) :
