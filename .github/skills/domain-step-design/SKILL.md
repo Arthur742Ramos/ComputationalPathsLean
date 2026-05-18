@@ -43,8 +43,9 @@ structure FooRewriteCertificate (x : FooObject) where
 
 - Use domain steps to name mathematical moves, not to hide missing proofs.
 - Include at least one concrete value-level `Path`, not only `Path X.carrier X.carrier`.
-- Prefer `rweq_of_step (Step.trans_refl_right _)` or the path tactics for unit
-  cleanup after a substantive domain trace.
+- Prefer `rweq_of_step (Path.Step.trans_refl_right _)` or the path tactics for
+  unit cleanup after a substantive domain trace; if `Path.Step` is not in scope,
+  state explicitly that the core rewrite step is intended.
 - If a file also imports `ComputationalPaths.Path.Rewrite.Step`, avoid unqualified
   `Step` in ambiguous contexts.
 - Keep certificates small and composable; downstream modules can combine them

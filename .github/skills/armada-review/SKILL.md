@@ -37,11 +37,14 @@ Do not delete broken or shallow files as the first response. Prefer:
 
 ```bash
 lake build ComputationalPaths.Path.Some.Module
-rg "\bsorry\b|^axiom |: True|:= trivial|= .* := rfl" ComputationalPaths
+rg "\bsorry\b|^axiom |: True|:= trivial|:= rfl" ComputationalPaths
 git diff --check
 ```
 
-On Windows PowerShell, use `rg` rather than Unix `grep` for reliable searches.
+The `rfl` alternative is intentionally broad: use it to find candidates, then
+inspect the theorem statement to distinguish legitimate definitional proofs from
+reflexive-only stubs. On Windows PowerShell, use `rg` rather than Unix `grep` for
+reliable searches.
 
 ## PR Guidance
 
