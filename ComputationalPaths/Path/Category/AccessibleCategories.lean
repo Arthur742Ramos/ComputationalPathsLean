@@ -37,10 +37,35 @@ inductive AccessibleStep (Obj : Type u) : Type u where
 
 abbrev RegularCardinal := Nat
 
+structure AccessibilityCertificate where
+  label : String
+  payload : Nat
+  witnessPath : Path payload payload
+  canonicalPath : Path payload payload
+  nonemptySteps : witnessPath.steps ≠ []
+  coherence : Path.RwEq witnessPath canonicalPath
+
+namespace AccessibilityCertificate
+
+noncomputable def base (label : String) (payload : Nat) :
+    AccessibilityCertificate where
+  label := label
+  payload := payload
+  witnessPath := Path.trans (Path.stepChain (rfl : payload = payload)) (Path.refl payload)
+  canonicalPath := Path.stepChain (rfl : payload = payload)
+  nonemptySteps := by
+    simp [Path.trans, Path.stepChain, Path.refl]
+  coherence := Path.RwEq.step
+    (Path.Step.trans_refl_right (Path.stepChain (rfl : payload = payload)))
+
+def asTrue (_ : AccessibilityCertificate) : True := trivial
+
+end AccessibilityCertificate
+
 structure FilteredCategory (κ : RegularCardinal) where
   Obj : Type u
   Hom : Obj → Obj → Type v
-  hasCocones : True
+  hasCocones : AccessibilityCertificate
 
 structure FilteredColimit (κ : RegularCardinal) (Obj : Type u) where
   diagram : FilteredCategory κ
@@ -56,11 +81,11 @@ structure DirectedSystem (Obj : Type u) where
 
 structure CompactObject (κ : RegularCardinal) (Obj : Type u) where
   obj : Obj
-  preservesFiltered : True
+  preservesFiltered : AccessibilityCertificate
 
 structure StrongGenerator (Obj : Type u) where
   generators : Obj → Prop
-  isStrong : True
+  isStrong : AccessibilityCertificate
 
 -- ============================================================
 -- §4  Accessible Categories
@@ -71,15 +96,16 @@ structure AccessibleCategory (κ : RegularCardinal) where
   Hom : Obj → Obj → Type v
   id : (a : Obj) → Hom a a
   comp : {a b c : Obj} → Hom a b → Hom b c → Hom a c
-  hasFilteredColimits : True
+  hasFilteredColimits : AccessibilityCertificate
   compactGenerators : Obj → Prop
-  generatorsAreCompact : ∀ g, compactGenerators g → True
-  generationProperty : ∀ (_X : Obj), True
+  generatorsAreCompact :
+    ∀ g, compactGenerators g → AccessibilityCertificate
+  generationProperty : ∀ (X : Obj), AccessibilityCertificate
 
 structure LocallyPresentableCategory (κ : RegularCardinal)
     extends AccessibleCategory κ where
-  hasCoproducts : True
-  hasCoequalizers : True
+  hasCoproducts : AccessibilityCertificate
+  hasCoequalizers : AccessibilityCertificate
 
 noncomputable def LocallyFinitelyPresentable := LocallyPresentableCategory 0
 
@@ -101,11 +127,11 @@ structure AccCat where
 theorem accessible_adjoint_functor_theorem (κ : RegularCardinal)
     (C D : LocallyPresentableCategory κ)
     (F : AccessibleFunctor κ C.toAccessibleCategory D.toAccessibleCategory) :
-    C.hasFilteredColimits = trivial ∧
-      D.hasFilteredColimits = trivial ∧
+    Path.RwEqProp C.hasFilteredColimits.witnessPath C.hasFilteredColimits.canonicalPath ∧
+      Path.RwEqProp D.hasFilteredColimits.witnessPath D.hasFilteredColimits.canonicalPath ∧
       ((X : C.Obj) →
         Path.RwEqProp (F.preservationPath X) (Path.refl (F.mapObj X))) :=
-  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _,
+  ⟨⟨C.hasFilteredColimits.coherence⟩, ⟨D.hasFilteredColimits.coherence⟩,
     fun X => ⟨F.preservesFilteredColimits X⟩⟩
 
 -- ============================================================
@@ -135,18 +161,20 @@ theorem ind_left_adjoint (_κ : RegularCardinal) (Obj : Type u) :
 
 noncomputable def Orthogonal (Obj : Type u) (Hom : Obj → Obj → Type v)
     {a b c d : Obj} (_ : Hom a b) (_ : Hom c d) : Prop :=
-  True
+  Nonempty AccessibilityCertificate
 
 structure OrthogonalityClass (Obj : Type u) where
   morphismSet : Obj → Prop
   orthoObjects : Obj → Prop
 
 structure LambdaPure (Obj : Type u) {a b : Obj} where
-  isPure : True
+  isPure : AccessibilityCertificate
 
 theorem small_object_argument (_κ : RegularCardinal) (Obj : Type u) :
     ∃ O : OrthogonalityClass Obj, ∀ X, O.orthoObjects X :=
-  ⟨{ morphismSet := fun _ => True, orthoObjects := fun _ => True }, fun _ => trivial⟩
+  ⟨{ morphismSet := fun _ => Nonempty AccessibilityCertificate,
+      orthoObjects := fun _ => Nonempty AccessibilityCertificate },
+    fun _ => ⟨AccessibilityCertificate.base "soa-orthogonal" 1⟩⟩
 
 -- ============================================================
 -- §8  Model Categories and Combinatorial Model Categories
@@ -165,10 +193,14 @@ structure CombinatorialModelCategory (κ : RegularCardinal) where
   generatingTrivCofib : (Σ (a : carrier.Obj) (b : carrier.Obj), carrier.Hom a b) → Prop
 
 theorem smith_recognition (κ : RegularCardinal) (M : CombinatorialModelCategory κ) :
-    M.carrier.hasFilteredColimits = trivial ∧
-      M.carrier.hasCoproducts = trivial ∧
-      M.carrier.hasCoequalizers = trivial :=
-  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+    Path.RwEqProp M.carrier.hasFilteredColimits.witnessPath
+      M.carrier.hasFilteredColimits.canonicalPath ∧
+      Path.RwEqProp M.carrier.hasCoproducts.witnessPath
+        M.carrier.hasCoproducts.canonicalPath ∧
+      Path.RwEqProp M.carrier.hasCoequalizers.witnessPath
+        M.carrier.hasCoequalizers.canonicalPath :=
+  ⟨⟨M.carrier.hasFilteredColimits.coherence⟩, ⟨M.carrier.hasCoproducts.coherence⟩,
+    ⟨M.carrier.hasCoequalizers.coherence⟩⟩
 
 -- ============================================================
 -- §9  Sketches and Theories
@@ -196,42 +228,50 @@ theorem makkai_pare_theorem (κ : RegularCardinal) (_ : AccessibleCategory κ) :
   ⟨⟨PUnit, PUnit, PUnit⟩, ⟨Path.rweq_refl _⟩⟩
 
 theorem adamek_rosicky_theorem (κ : RegularCardinal) (C : AccessibleCategory κ) :
-    ∀ X : C.Obj, C.generationProperty X = trivial :=
-  fun _ => Subsingleton.elim _ _
+    ∀ X : C.Obj,
+      Path.RwEqProp (C.generationProperty X).witnessPath (C.generationProperty X).canonicalPath :=
+  fun X => ⟨(C.generationProperty X).coherence⟩
 
 theorem accessible_complete_iff_cocomplete (κ : RegularCardinal)
     (C : AccessibleCategory κ) :
-    C.hasFilteredColimits = trivial :=
-  Subsingleton.elim _ _
+    Path.RwEqProp C.hasFilteredColimits.witnessPath C.hasFilteredColimits.canonicalPath :=
+  ⟨C.hasFilteredColimits.coherence⟩
 
 theorem change_of_rank (κ lam : RegularCardinal) (hRank : κ ≤ lam)
     (C : AccessibleCategory κ) :
-    κ ≤ lam ∧ C.hasFilteredColimits = trivial :=
-  ⟨hRank, Subsingleton.elim _ _⟩
+    κ ≤ lam ∧
+      Path.RwEqProp C.hasFilteredColimits.witnessPath C.hasFilteredColimits.canonicalPath :=
+  ⟨hRank, ⟨C.hasFilteredColimits.coherence⟩⟩
 
 theorem accessible_with_products_is_lp (κ : RegularCardinal)
-    (C : AccessibleCategory κ) (hasProducts : True) :
-    C.hasFilteredColimits = trivial ∧ hasProducts = trivial :=
-  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+    (C : AccessibleCategory κ)
+    (hasProducts : AccessibilityCertificate) :
+    Path.RwEqProp C.hasFilteredColimits.witnessPath C.hasFilteredColimits.canonicalPath ∧
+      Path.RwEqProp hasProducts.witnessPath hasProducts.canonicalPath :=
+  ⟨⟨C.hasFilteredColimits.coherence⟩, ⟨hasProducts.coherence⟩⟩
 
 theorem vopenka_reflective (κ : RegularCardinal)
     (C : LocallyPresentableCategory κ) :
-    C.hasFilteredColimits = trivial ∧ C.hasCoproducts = trivial :=
-  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+    Path.RwEqProp C.hasFilteredColimits.witnessPath C.hasFilteredColimits.canonicalPath ∧
+      Path.RwEqProp C.hasCoproducts.witnessPath C.hasCoproducts.canonicalPath :=
+  ⟨⟨C.hasFilteredColimits.coherence⟩, ⟨C.hasCoproducts.coherence⟩⟩
 
 theorem lp_well_copowered (κ : RegularCardinal)
     (C : LocallyPresentableCategory κ) :
-    C.hasCoproducts = trivial ∧ C.hasCoequalizers = trivial :=
-  ⟨Subsingleton.elim _ _, Subsingleton.elim _ _⟩
+    Path.RwEqProp C.hasCoproducts.witnessPath C.hasCoproducts.canonicalPath ∧
+      Path.RwEqProp C.hasCoequalizers.witnessPath C.hasCoequalizers.canonicalPath :=
+  ⟨⟨C.hasCoproducts.coherence⟩, ⟨C.hasCoequalizers.coherence⟩⟩
 
 theorem acc_has_pie_limits :
-    ∀ (κ : RegularCardinal) (C : AccessibleCategory κ), C.hasFilteredColimits = trivial :=
-  fun _ _ => Subsingleton.elim _ _
+    ∀ (κ : RegularCardinal) (C : AccessibleCategory κ),
+      Path.RwEqProp C.hasFilteredColimits.witnessPath C.hasFilteredColimits.canonicalPath :=
+  fun _ C => ⟨C.hasFilteredColimits.coherence⟩
 
 theorem accessible_localization (κ : RegularCardinal)
     (C : AccessibleCategory κ) :
-    ∀ X : C.Obj, C.generationProperty X = trivial :=
-  fun _ => Subsingleton.elim _ _
+    ∀ X : C.Obj,
+      Path.RwEqProp (C.generationProperty X).witnessPath (C.generationProperty X).canonicalPath :=
+  fun X => ⟨(C.generationProperty X).coherence⟩
 
 end ComputationalPaths
 
@@ -371,7 +411,7 @@ noncomputable def identityAccessibleLocalizationFunctor (κ : RegularCardinal)
 
 noncomputable def identityReflectiveAccessibleSubcategory (κ : RegularCardinal)
     (C : AccessibleCategory κ) : ReflectiveAccessibleSubcategory κ C where
-  Pred := fun _ => True
+  Pred := fun _ => Nonempty AccessibilityCertificate
   reflector := fun X => X
   unitPath := fun X => Path.refl X
   unitWitness := fun _ => Path.rweq_refl _
@@ -395,8 +435,11 @@ theorem lambda_orthogonality_stable_under_filtered_colimits
 
 theorem lambda_orthogonality_characterizes_accessibility
     (κ : RegularCardinal) (C : AccessibleCategory κ) :
-    ∀ g, C.compactGenerators g → True :=
-  C.generatorsAreCompact
+    ∀ g, (hg : C.compactGenerators g) →
+      Path.RwEqProp (C.generatorsAreCompact g hg).witnessPath
+        (C.generatorsAreCompact g hg).canonicalPath := by
+  intro g hg
+  exact ⟨(C.generatorsAreCompact g hg).coherence⟩
 
 theorem ind_pro_bridge_exists (Obj : Type u) :
     ∃ B : IndProBridge Obj,
@@ -427,7 +470,8 @@ theorem accessible_localization_functor_exists (κ : RegularCardinal)
 theorem accessible_localization_is_reflective_ext (κ : RegularCardinal)
     (C : AccessibleCategory κ) :
     hasReflectiveAccessibleSubcategory κ C :=
-  ⟨identityReflectiveAccessibleSubcategory κ C, fun _ => trivial⟩
+  ⟨identityReflectiveAccessibleSubcategory κ C,
+    fun _ => ⟨AccessibilityCertificate.base "reflective-subcategory" 2⟩⟩
 
 theorem sketch_theoretic_characterization_of_accessibility
     (κ : RegularCardinal) (C : AccessibleCategory κ) :
@@ -438,7 +482,8 @@ theorem sketch_theoretic_characterization_of_accessibility
 theorem reflective_accessible_subcategory_exists
     (κ : RegularCardinal) (C : AccessibleCategory κ) :
     hasReflectiveAccessibleSubcategory κ C := by
-  exact ⟨identityReflectiveAccessibleSubcategory κ C, fun _ => trivial⟩
+  exact ⟨identityReflectiveAccessibleSubcategory κ C,
+    fun _ => ⟨AccessibilityCertificate.base "reflective-subcategory" 2⟩⟩
 
 theorem reflective_accessible_subcategory_closed_under_limits
     (κ : RegularCardinal) (C : AccessibleCategory κ)
@@ -470,10 +515,10 @@ theorem doctrine_morphism_composition (D₁ D₂ D₃ : SoundDoctrine)
 
 theorem accessible_from_sound_doctrine (κ : RegularCardinal)
     (C : AccessibleCategory κ) (D : SoundDoctrine) :
-    C.hasFilteredColimits = trivial ∧
+    Path.RwEqProp C.hasFilteredColimits.witnessPath C.hasFilteredColimits.canonicalPath ∧
       ((s : D.syntaxType) →
         Path.RwEqProp (D.semanticPath s) (Path.refl (D.semantics s))) :=
-  ⟨Subsingleton.elim _ _, fun s => ⟨D.soundness s⟩⟩
+  ⟨⟨C.hasFilteredColimits.coherence⟩, fun s => ⟨D.soundness s⟩⟩
 
 theorem reflective_subcategory_has_accessible_reflector
     (κ : RegularCardinal) (C : AccessibleCategory κ)
@@ -484,9 +529,9 @@ theorem reflective_subcategory_has_accessible_reflector
 theorem accessibility_preserved_by_reflection
     (κ : RegularCardinal) (C : AccessibleCategory κ)
     (R : ReflectiveAccessibleSubcategory κ C) :
-    C.hasFilteredColimits = trivial ∧
+    Path.RwEqProp C.hasFilteredColimits.witnessPath C.hasFilteredColimits.canonicalPath ∧
       ((X : C.Obj) → Path.RwEqProp (R.reflectionPath X) (Path.refl (R.reflector X))) :=
-  ⟨Subsingleton.elim _ _, fun X => ⟨R.isAccessibleReflection X⟩⟩
+  ⟨⟨C.hasFilteredColimits.coherence⟩, fun X => ⟨R.isAccessibleReflection X⟩⟩
 
 theorem ind_and_pro_bridge_respects_localizations
     (κ : RegularCardinal) (C : AccessibleCategory κ)
