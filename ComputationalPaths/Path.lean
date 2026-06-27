@@ -218,6 +218,7 @@ import ComputationalPaths.Path.CompPath.MilnorFibration
 import ComputationalPaths.Path.OmegaGroupoid
 import ComputationalPaths.Path.InfinityGroupoid
 import ComputationalPaths.Path.OmegaGroupoid.Derived
+import ComputationalPaths.Path.OmegaGroupoid.ContractibilityIrrelevance
 import ComputationalPaths.Path.OmegaGroupoid.StepToCanonical
 import ComputationalPaths.Path.OmegaGroupoid.TruncationProof
 import ComputationalPaths.Path.Algebra.GroupStructures
