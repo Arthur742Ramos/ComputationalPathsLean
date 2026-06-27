@@ -233,13 +233,17 @@ noncomputable def compPathOmegaGroupoidIrrel (A : Type u) : WeakOmegaGroupoid A 
   cells := CellType A
   contract₃ := contractibility₃_native_irrel
   contract₄ := contractibility₄
-  pentagon := pentagonCoherence
-  triangle := triangleCoherence
+  pentagon := pentagonCoherence_irrel
+  triangle := triangleCoherence_irrel
 
 /-! ## Axiom audit
 
-The lines below print the axiom dependencies during compilation; read them off
-the build log.  Summary:
+The `#print axioms` commands that produced the results below are preserved
+(commented out) at the end of this file.  They are kept commented so that
+normal library builds stay quiet — this module is imported transitively from
+`ComputationalPaths.Path`, so live `#print axioms` would print on every
+downstream build.  Uncomment them, or paste them into a scratch file, to
+reproduce the audit.  Summary:
 
 * **New, proof-irrelevance route — choice-free.**
   - `contractibility_irrel`            : no axioms
@@ -261,22 +265,22 @@ the build log.  Summary:
 -/
 
 -- New proof-irrelevance route
-#print axioms contractibility_irrel
-#print axioms contractibility₃_irrel
-#print axioms contractibility₄_irrel
-#print axioms contractibilityHigh_irrel
-#print axioms contractibility₃_native_irrel
-#print axioms pentagonCoherence_irrel
-#print axioms triangleCoherence_irrel
-#print axioms compPathOmegaGroupoidIrrel
+-- #print axioms contractibility_irrel
+-- #print axioms contractibility₃_irrel
+-- #print axioms contractibility₄_irrel
+-- #print axioms contractibilityHigh_irrel
+-- #print axioms contractibility₃_native_irrel
+-- #print axioms pentagonCoherence_irrel
+-- #print axioms triangleCoherence_irrel
+-- #print axioms compPathOmegaGroupoidIrrel
 
 -- Existing development (for comparison)
-#print axioms contractibility₃
-#print axioms compPathOmegaGroupoid
-#print axioms pentagonCoherence
-#print axioms triangleCoherence
-#print axioms truncation_preserves_pentagon
-#print axioms truncation_preserves_triangle
+-- #print axioms contractibility₃
+-- #print axioms compPathOmegaGroupoid
+-- #print axioms pentagonCoherence
+-- #print axioms triangleCoherence
+-- #print axioms truncation_preserves_pentagon
+-- #print axioms truncation_preserves_triangle
 
 end OmegaGroupoid
 end Path
