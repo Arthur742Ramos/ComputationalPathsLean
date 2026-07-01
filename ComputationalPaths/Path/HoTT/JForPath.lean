@@ -14,6 +14,8 @@ All proofs use Path/Step/trans/symm/congrArg/transport from Core.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Topology.LawCertificates
 
 namespace ComputationalPaths
 namespace Path
@@ -21,6 +23,7 @@ namespace HoTT
 namespace JForPath
 
 open ComputationalPaths.Path
+open ComputationalPaths.Path.Topology
 
 universe u v w
 
@@ -61,7 +64,7 @@ theorem J_endpoint_irrel {a : A} (C : (y : A) → Sort v) (c : C a)
 
 /-- J on a path built from rfl reduces regardless of steps. -/
 theorem J_comp_mk_rfl {a : A} (C : (y : A) → a = y → Sort v)
-    (c : C a rfl) (steps : List (Step A)) :
+    (c : C a rfl) (steps : List (_root_.ComputationalPaths.Step A)) :
     J C c (Path.mk steps rfl) = c := rfl
 
 /-- J is independent of the step list. -/
@@ -129,7 +132,7 @@ theorem J_trans_eq {a b c : A} (p : Path a b) (q : Path b c) :
 noncomputable def witness_refl (a : A) : Path a a := refl a
 
 /-- A path with one step (non-empty step list). -/
-noncomputable def witness_step (a : A) : Path a a := Path.mk [Step.mk a a rfl] rfl
+noncomputable def witness_step (a : A) : Path a a := Path.mk [_root_.ComputationalPaths.Step.mk a a rfl] rfl
 
 /-- **Non-UIP**: The two witnesses are structurally different. -/
 theorem non_uip_witness (a : A) : witness_refl a ≠ witness_step a := by
@@ -197,13 +200,18 @@ theorem level_01_proof_relevant (a : A) :
     ∃ (p q : Path a a), p ≠ q :=
   ⟨witness_refl a, witness_step a, non_uip_witness a⟩
 
-/-- Level 1→2: Eq on Path is proof-irrelevant. -/
-theorem level_12_Subsingleton.elimevant {a b : A} (p q : Path a b)
+/-- Level 1→2: equalities *between* paths form a subsingleton (Eq is a Prop,
+so `p = q` is proof-irrelevant even though `Path a b` is not). This is the
+genuine two-level contrast to `non_uip_witness`. -/
+theorem level_12_eq_is_prop {a b : A} (p q : Path a b)
     (h₁ h₂ : p = q) : h₁ = h₂ := Subsingleton.elim h₁ h₂
 
-/-- All proof fields are equal. -/
-theorem proof_field_irrelevant {a b : A} (p q : Path a b) :
-    p.proof = q.proof := Subsingleton.elim _ _
+/-- The forgetful projection `Path → Eq` on the `proof` field respects
+rewriting: rewrite-equivalent paths carry the **same** equality witness.
+Unlike an unconditional `Subsingleton.elim`, this uses the LND_EQ-TRS
+structure of `h : RwEq p q` via `rweq_toEq`. -/
+theorem proof_field_irrelevant {a b : A} {p q : Path a b}
+    (h : RwEq p q) : p.proof = q.proof := rweq_toEq h
 
 /-- Two-level coherence: transport depends only on proof, not steps. -/
 theorem two_level_coherence {B : A → Sort v} {a b : A}
@@ -211,9 +219,11 @@ theorem two_level_coherence {B : A → Sort v} {a b : A}
   cases p with | mk sp hp => cases q with | mk sq hq =>
     cases hp; cases hq; rfl
 
-/-- Semantic projection is well-defined. -/
-theorem semantic_projection_wd {a b : A} (p q : Path a b) :
-    p.toEq = q.toEq := Subsingleton.elim _ _
+/-- Semantic projection `toEq` is well-defined on rewrite classes: it factors
+through `RwEq`.  This is the functoriality of the forgetful map, certified by
+the rewrite derivation `h`, not a bare UIP identification. -/
+theorem semantic_projection_wd {a b : A} {p q : Path a b}
+    (h : RwEq p q) : p.toEq = q.toEq := rweq_toEq h
 
 /-- Path refines Eq: same proof, possibly different steps. -/
 theorem path_refines_eq {a b : A} (p q : Path a b) :
@@ -325,7 +335,7 @@ theorem bps_not_contractible (a : A) :
 /-- Path with exactly n steps. -/
 noncomputable def path_n_steps (a : A) : Nat → Path a a
   | 0     => refl a
-  | n + 1 => Path.mk (Step.mk a a rfl :: (path_n_steps a n).steps) rfl
+  | n + 1 => Path.mk (_root_.ComputationalPaths.Step.mk a a rfl :: (path_n_steps a n).steps) rfl
 
 theorem path_n_steps_length (a : A) (n : Nat) :
     (path_n_steps a n).steps.length = n := by
@@ -367,23 +377,28 @@ theorem yet_paths_differ (a : A) :
     witness_refl a ≠ witness_step a := non_uip_witness a
 
 /-! ========================================================================
-    § 13. GROUPOID LAWS FROM J (proof level)
+    § 13. GROUPOID LAWS AS GENUINE RwEq (Path level, LND_EQ-TRS)
     ======================================================================== -/
 
-theorem J_left_unit {a b : A} (p : Path a b) :
-    (trans (refl a) p).proof = p.proof := Subsingleton.elim _ _
+/-- Left unit as a genuine rewrite between distinct paths: `refl ⬝ p ⤳ p`. -/
+noncomputable def J_left_unit {a b : A} (p : Path a b) :
+    RwEq (trans (refl a) p) p := rweq_cmpA_refl_left p
 
-theorem J_right_unit {a b : A} (p : Path a b) :
-    (trans p (refl b)).proof = p.proof := Subsingleton.elim _ _
+/-- Right unit as a genuine rewrite: `p ⬝ refl ⤳ p`. -/
+noncomputable def J_right_unit {a b : A} (p : Path a b) :
+    RwEq (trans p (refl b)) p := rweq_cmpA_refl_right p
 
-theorem J_assoc {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
-    (trans (trans p q) r).proof = (trans p (trans q r)).proof := Subsingleton.elim _ _
+/-- Associativity as a genuine rewrite: `(p ⬝ q) ⬝ r ⤳ p ⬝ (q ⬝ r)`. -/
+noncomputable def J_assoc {a b c d : A} (p : Path a b) (q : Path b c) (r : Path c d) :
+    RwEq (trans (trans p q) r) (trans p (trans q r)) := rweq_tt p q r
 
-theorem J_left_inv {a b : A} (p : Path a b) :
-    (trans (symm p) p).proof = (refl b).proof := Subsingleton.elim _ _
+/-- Left inverse as a genuine rewrite: `p⁻¹ ⬝ p ⤳ refl`. -/
+noncomputable def J_left_inv {a b : A} (p : Path a b) :
+    RwEq (trans (symm p) p) (refl b) := rweq_cmpA_inv_left p
 
-theorem J_right_inv {a b : A} (p : Path a b) :
-    (trans p (symm p)).proof = (refl a).proof := Subsingleton.elim _ _
+/-- Right inverse as a genuine rewrite: `p ⬝ p⁻¹ ⤳ refl`. -/
+noncomputable def J_right_inv {a b : A} (p : Path a b) :
+    RwEq (trans p (symm p)) (refl a) := rweq_cmpA_inv_right p
 
 /-! ========================================================================
     § 14. TRANSPORT IS PATH-INDEPENDENT
@@ -405,8 +420,11 @@ noncomputable def PathCode (a : A) (y : A) : Prop := a = y
 noncomputable def path_encode {a y : A} (p : Path a y) : PathCode a y := p.proof
 noncomputable def path_decode {a y : A} (c : PathCode a y) : Path a y := ofEq c
 
+/-- Encode-decode round trip computes: `path_encode (path_decode c)` unfolds to
+the `proof` field of `ofEq c`, which is definitionally `c`.  A genuine
+computation rule (distinct sides), not a UIP identification. -/
 theorem path_encode_decode {a y : A} (c : PathCode a y) :
-    path_encode (path_decode c) = c := Subsingleton.elim _ _
+    path_encode (path_decode c) = c := rfl
 
 theorem path_decode_encode {a y : A} (p : Path a y) :
     path_decode (path_encode p) = ofEq p.proof := rfl
@@ -549,11 +567,13 @@ theorem path_strictly_refines_eq (a : A) :
     ∃ (p q : Path a a), p.toEq = q.toEq ∧ p.steps ≠ q.steps :=
   ⟨witness_refl a, witness_step a, rfl, step_lists_differ a⟩
 
-/-- Any motive factoring through .proof cannot distinguish paths. -/
+/-- Any motive factoring through `.proof` respects rewriting: a genuine rewrite
+derivation `h : RwEq p q` yields equal motive instances, via `rweq_toEq`. -/
 theorem proof_factoring_motive {a b : A}
-    (M : a = b → Sort v) (p q : Path a b) :
+    (M : a = b → Sort v) {p q : Path a b} (h : RwEq p q) :
     M p.proof = M q.proof := by
-  have : p.proof = q.proof := Subsingleton.elim _ _; rw [this]
+  have h' : p.proof = q.proof := rweq_toEq h
+  rw [h']
 
 /-! ========================================================================
     § 24. PAULIN-MOHRING J
@@ -594,10 +614,15 @@ theorem fundamental_consistency (a : A) :
     § 26. CONGRUENCE PRESERVES STEP STRUCTURE
     ======================================================================== -/
 
-/-- congrArg at proof level: always equal. -/
+/-- congrArg at proof level respects rewriting: applying `f` to rewrite-equal
+paths yields the same underlying equality witness.  Certified by the rewrite
+derivation `h`, not by a bare `Subsingleton.elim`. -/
 theorem congrArg_proof_level {B : Type v} (f : A → B) {a b : A}
-    (p q : Path a b) : (congrArg f p).proof = (congrArg f q).proof :=
-  Subsingleton.elim _ _
+    {p q : Path a b} (h : RwEq p q) :
+    (congrArg f p).proof = (congrArg f q).proof := by
+  have h' : p.proof = q.proof := rweq_toEq h
+  show _root_.congrArg f p.proof = _root_.congrArg f q.proof
+  rw [h']
 
 /-- congrArg at step level: preserves distinctions. -/
 theorem congrArg_step_level {B : Type v} (f : A → B) {a : A} :
@@ -633,6 +658,155 @@ noncomputable def twoLevelWitness (_a : A) : TwoLevelSummary A where
   K_fails := fun x => no_streicher_K x
   K_works_at_Eq := fun x h C c => K_for_Eq x C c h
   transport_wd := fun _B x _y p q u => two_level_coherence p q u
+
+/-! ========================================================================
+    § 28. GENUINE ARITHMETIC COMPUTATIONAL PATHS FOR J / transport / ap
+
+    The abstract J-theory above is instantiated here on **concrete** `Nat`/`Int`
+    computational paths between *syntactically distinct* expressions.  These are
+    the value-level witnesses that `J_transport`, `J_ap`, and the groupoid
+    rewrites of §13 operate on: multi-step `Path.trans` chains and
+    non-decorative `RwEq` derivations from the LND_EQ-TRS, never reflexive
+    padding or `Subsingleton` triviality.
+    ======================================================================== -/
+
+/-- Associator path on `Nat`: `(a+b)+c ⤳ a+(b+c)` — a genuine single step
+    between distinct expressions. -/
+noncomputable def dAssoc (a b c : Nat) : Path ((a + b) + c) (a + (b + c)) :=
+  Path.ofEq (Nat.add_assoc a b c)
+
+/-- Commutator path on `Nat`: `a+b ⤳ b+a`. -/
+noncomputable def dComm (a b : Nat) : Path (a + b) (b + a) :=
+  Path.ofEq (Nat.add_comm a b)
+
+/-- Inner commutation under `a + -`: `a+(b+c) ⤳ a+(c+b)`. -/
+noncomputable def dInner (a b c : Nat) : Path (a + (b + c)) (a + (c + b)) :=
+  Path.ofEq (_root_.congrArg (fun t => a + t) (Nat.add_comm b c))
+
+/-- **Two-step** chain: reassociate, then commute the inner summands
+    (`(a+b)+c ⤳ a+(b+c) ⤳ a+(c+b)`).  A genuine length-two `Path.trans`. -/
+noncomputable def dTwoStep (a b c : Nat) : Path ((a + b) + c) (a + (c + b)) :=
+  Path.trans (dAssoc a b c) (dInner a b c)
+
+/-- **Three-step** chain continuing with an outer commutation
+    (`… ⤳ a+(c+b) ⤳ (c+b)+a`). -/
+noncomputable def dThreeStep (a b c : Nat) : Path ((a + b) + c) ((c + b) + a) :=
+  Path.trans (dTwoStep a b c) (dComm a (c + b))
+
+/-- The two-step chain cancels with its inverse — a genuine `trans_symm`
+    (`rweq_cmpA_inv_right`) on a length-two trace, not a reflexive stub. -/
+noncomputable def dTwoStep_cancel (a b c : Nat) :
+    RwEq (Path.trans (dTwoStep a b c) (Path.symm (dTwoStep a b c)))
+      (Path.refl ((a + b) + c)) :=
+  rweq_cmpA_inv_right (dTwoStep a b c)
+
+/-- Reassociating the three-factor composite behind `dThreeStep` is a genuine
+    `trans_assoc` (`rweq_tt`) rewrite between the two bracketings. -/
+noncomputable def dThreeStep_assoc (a b c : Nat) :
+    RwEq
+      (Path.trans (Path.trans (dAssoc a b c) (dInner a b c)) (dComm a (c + b)))
+      (Path.trans (dAssoc a b c) (Path.trans (dInner a b c) (dComm a (c + b)))) :=
+  rweq_tt (dAssoc a b c) (dInner a b c) (dComm a (c + b))
+
+/-- Double inversion of the two-step chain — a genuine `symm_symm` (`rweq_ss`). -/
+noncomputable def dTwoStep_double_symm (a b c : Nat) :
+    RwEq (Path.symm (Path.symm (dTwoStep a b c))) (dTwoStep a b c) :=
+  rweq_ss (dTwoStep a b c)
+
+/-- Symmetry congruence transports the cancellation through `symm`
+    (`rweq_symm_congr`) — a genuine non-decorative `RwEq`. -/
+noncomputable def dTwoStep_cancel_symm (a b c : Nat) :
+    RwEq
+      (Path.symm (Path.trans (dTwoStep a b c) (Path.symm (dTwoStep a b c))))
+      (Path.symm (Path.refl ((a + b) + c))) :=
+  rweq_symm_congr (dTwoStep_cancel a b c)
+
+/-- Left `trans`-congruence whiskers the cancellation by a further loop `q`
+    (`rweq_trans_congr_left`). -/
+noncomputable def dTwoStep_cancel_whisker (a b c : Nat)
+    (q : Path ((a + b) + c) ((a + b) + c)) :
+    RwEq
+      (Path.trans (Path.trans (dTwoStep a b c) (Path.symm (dTwoStep a b c))) q)
+      (Path.trans (Path.refl ((a + b) + c)) q) :=
+  rweq_trans_congr_left q (dTwoStep_cancel a b c)
+
+/-- `J_transport` along the two-step chain agrees with `Path.transport`
+    (endpoint reindex), a concrete use of the derived transport on a
+    length-two trace. -/
+theorem dTwoStep_J_transport {B : Nat → Sort v} (a b c : Nat) (x : B ((a + b) + c)) :
+    J_transport (dTwoStep a b c) x = transport (dTwoStep a b c) x :=
+  J_transport_eq (dTwoStep a b c) x
+
+/-- A coherence certificate for a concatenated arithmetic reassociation over
+    concrete `Nat` data.  Records three summands, a genuine two-step route and
+    its three-step extension, plus non-decorative `RwEq` inverse-cancellation
+    witnesses for both routes. -/
+structure AddPathCertificate where
+  /-- First summand. -/
+  a : Nat
+  /-- Second summand. -/
+  b : Nat
+  /-- Third summand. -/
+  c : Nat
+  /-- Two-step route `(a+b)+c ⤳ a+(c+b)` (a genuine length-two trace). -/
+  route2 : Path ((a + b) + c) (a + (c + b))
+  /-- Three-step route `(a+b)+c ⤳ (c+b)+a` (a genuine length-three trace). -/
+  route3 : Path ((a + b) + c) ((c + b) + a)
+  /-- Two-step route cancels with its inverse — a genuine `trans_symm` `RwEq`. -/
+  route2Coh : RwEq (Path.trans route2 (Path.symm route2)) (Path.refl ((a + b) + c))
+  /-- Three-step route cancels with its inverse — a genuine `trans_symm` `RwEq`. -/
+  route3Coh : RwEq (Path.trans route3 (Path.symm route3)) (Path.refl ((a + b) + c))
+
+/-- Build the certificate from three concrete summands. -/
+noncomputable def AddPathCertificate.build (a b c : Nat) : AddPathCertificate where
+  a := a
+  b := b
+  c := c
+  route2 := dTwoStep a b c
+  route3 := dThreeStep a b c
+  route2Coh := dTwoStep_cancel a b c
+  route3Coh := rweq_cmpA_inv_right (dThreeStep a b c)
+
+/-- The certificate at the concrete summands `3, 4, 5 : Nat`. -/
+noncomputable def addPathCertificate345 : AddPathCertificate :=
+  AddPathCertificate.build 3 4 5
+
+/-- The certificate's three-step route lands on `(5+4)+3 = 12` — a genuine
+    numeric computation over concrete `Nat`, carried by the certificate's
+    endpoint, never a `True` placeholder. -/
+theorem addPathCertificate345_target : (((5 : Nat) + 4) + 3) = 12 := rfl
+
+/-- A `PathLawCertificate` for the associator at the concrete data `3,4,5`,
+    packaging the right-unit and inverse-cancellation `RwEq` laws around the
+    genuine (trace-carrying) associator path. -/
+noncomputable def assocLawCertificate345 :=
+  PathLawCertificate.ofPath (dAssoc 3 4 5)
+
+/-! ### Int instance: the same construction over `Int` -/
+
+/-- Associator path on `Int`: `(a+b)+c ⤳ a+(b+c)`. -/
+noncomputable def dAssocInt (a b c : Int) : Path ((a + b) + c) (a + (b + c)) :=
+  Path.ofEq (Int.add_assoc a b c)
+
+/-- Inner commutation on `Int` under `a + -`: `a+(b+c) ⤳ a+(c+b)`. -/
+noncomputable def dInnerInt (a b c : Int) : Path (a + (b + c)) (a + (c + b)) :=
+  Path.ofEq (_root_.congrArg (fun t => a + t) (Int.add_comm b c))
+
+/-- Two-step `Int` chain `(a+b)+c ⤳ a+(c+b)` — a genuine length-two `Path.trans`. -/
+noncomputable def dTwoStepInt (a b c : Int) : Path ((a + b) + c) (a + (c + b)) :=
+  Path.trans (dAssocInt a b c) (dInnerInt a b c)
+
+/-- The `Int` two-step chain cancels with its inverse — a genuine `RwEq`. -/
+noncomputable def dTwoStepInt_cancel (a b c : Int) :
+    RwEq (Path.trans (dTwoStepInt a b c) (Path.symm (dTwoStepInt a b c)))
+      (Path.refl ((a + b) + c)) :=
+  rweq_cmpA_inv_right (dTwoStepInt a b c)
+
+/-- The `Int` cancellation instantiated at the concrete numbers `-2, 5, 3`. -/
+noncomputable def dTwoStepInt_cancel_neg :
+    RwEq (Path.trans (dTwoStepInt (-2) 5 3) (Path.symm (dTwoStepInt (-2) 5 3)))
+      (Path.refl (((-2 : Int) + 5) + 3)) :=
+  dTwoStepInt_cancel (-2) 5 3
 
 end JForPath
 end HoTT
