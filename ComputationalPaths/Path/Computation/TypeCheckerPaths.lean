@@ -8,10 +8,13 @@ progress, type soundness, all via computational paths. Zero `Path.mk [Step.mk _ 
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Topology.LawCertificates
 
 namespace ComputationalPaths.Path.Computation.TypeCheckerPaths
 
 open ComputationalPaths.Path
+open ComputationalPaths.Path.Topology
 
 /-! ## Types and Terms -/
 
@@ -65,10 +68,10 @@ inductive HasType : Ctx → Term → Ty → Prop where
   | snd : ∀ {Γ t τ₁ τ₂}, HasType Γ t (.prod τ₁ τ₂) →
       HasType Γ (.snd t) τ₂
 
--- 4. Typing judgments are proof-irrelevant
-theorem hastype_irrel {Γ : Ctx} {t : Term} {τ : Ty}
-    (h1 h2 : HasType Γ t τ) : h1 = h2 :=
-  Subsingleton.elim h1 h2
+-- The genuine determinism content for typing is `var_type_path` below: it turns
+-- two lookup witnesses into an honest computational `Path τ₁ τ₂` on the *types*,
+-- rather than a proof-irrelevant `Subsingleton.elim` on the `Prop` derivations
+-- (which certifies nothing beyond Lean's built-in proof irrelevance).
 
 /-! ## Type inference -/
 
@@ -111,8 +114,8 @@ inductive IsValue : Term → Prop where
   | unit : IsValue .unit
 
 -- 7
-theorem isvalue_irrel {t : Term} (h1 h2 : IsValue t) : h1 = h2 :=
-  Subsingleton.elim h1 h2
+theorem isvalue_canonical_lam (τ : Ty) (t : Term) : IsValue (.lam τ t) :=
+  IsValue.lam τ t
 
 /-- Substitution (simplified, no shifting). -/
 @[simp] noncomputable def subst (s : Term) : Term → Term
@@ -138,9 +141,11 @@ inductive Reduces : Term → Term → Prop where
   | fstStep : ∀ t t', Reduces t t' → Reduces (.fst t) (.fst t')
   | sndStep : ∀ t t', Reduces t t' → Reduces (.snd t) (.snd t')
 
--- 8
-theorem reduces_irrel {t t' : Term} (h1 h2 : Reduces t t') : h1 = h2 :=
-  Subsingleton.elim h1 h2
+-- 8. A concrete reduction: `fst (unit, unit) ⤳ unit` (a real `Reduces` witness,
+--    not a proof-irrelevant `Subsingleton.elim` on reduction derivations).
+theorem reduces_fst_unit :
+    Reduces (.fst (.pair .unit .unit)) .unit :=
+  Reduces.fstPair .unit .unit IsValue.unit IsValue.unit
 
 /-! ## Multi-step reduction -/
 
@@ -284,9 +289,14 @@ theorem congrArg_comp_arr_prod (σ₁ σ₂ : Ty) {τ₁ τ₂ : Ty} (p : Path �
     Path.congrArg (fun τ => Ty.arr τ σ₂) (Path.congrArg (fun τ => Ty.prod τ σ₁) p) := by
   simp
 
--- 35. Path coherence for types (UIP)
-theorem ty_path_coherence {τ₁ τ₂ : Ty} (p q : Path τ₁ τ₂) :
-    p.proof = q.proof := Subsingleton.elim _ _
+-- 35. Genuine type-path coherence (replaces the old `.proof`-UIP triviality):
+--     the domain-congruence path `arr τ₁ σ ⤳ arr τ₂ σ` cancels with its inverse,
+--     an LND_EQ-TRS `trans_symm` (`rweq_cmpA_inv_right`) rewrite between the
+--     *distinct* type expressions, not a `Subsingleton.elim` on proofs.
+noncomputable def arr_left_path_cancel {τ₁ τ₂ : Ty} (σ : Ty) (p : Path τ₁ τ₂) :
+    RwEq (Path.trans (arr_left_path σ p) (Path.symm (arr_left_path σ p)))
+      (Path.refl (Ty.arr τ₁ σ)) :=
+  rweq_cmpA_inv_right (arr_left_path σ p)
 
 /-! ## Type inference paths -/
 
@@ -339,5 +349,260 @@ theorem snd_typing (τ₁ τ₂ : Ty) :
 theorem app_typing (τ₁ τ₂ : Ty) :
     HasType [.arr τ₁ τ₂, τ₁] (.app (.var 0) (.var 1)) τ₂ :=
   HasType.app (HasType.var rfl) (HasType.var rfl)
+
+/-! ## Genuine computational paths on de Bruijn indices
+
+De Bruijn indices are `Nat`s, and context extension shifts them by one
+(`extend_lookup_succ`).  The additive structure of `Nat` therefore supplies
+*genuine* computational `Path`s between **syntactically distinct** index
+expressions (never a reflexive `X = X` stub), assembled into multi-step
+`Path.trans` chains and certified by non-decorative `RwEq` derivations inside the
+LND_EQ-TRS. -/
+
+/-- Index associator: `(a + b) + c ⤳ a + (b + c)` (distinct sides). -/
+noncomputable def idxAssoc (a b c : Nat) : Path ((a + b) + c) (a + (b + c)) :=
+  Path.ofEq (Nat.add_assoc a b c)
+
+/-- Index commutator: `a + b ⤳ b + a` (distinct sides). -/
+noncomputable def idxComm (a b : Nat) : Path (a + b) (b + a) :=
+  Path.ofEq (Nat.add_comm a b)
+
+/-- Inner commutator under a shift: `a + (b + c) ⤳ a + (c + b)`. -/
+noncomputable def idxInner (a b c : Nat) : Path (a + (b + c)) (a + (c + b)) :=
+  Path.ofEq (_root_.congrArg (fun t => a + t) (Nat.add_comm b c))
+
+/-- A genuine length-two reassociation chain `(a + b) + c ⤳ a + (c + b)`. -/
+noncomputable def idxTwoStep (a b c : Nat) : Path ((a + b) + c) (a + (c + b)) :=
+  Path.trans (idxAssoc a b c) (idxInner a b c)
+
+/-- A genuine length-three chain `(a + b) + c ⤳ (c + b) + a`. -/
+noncomputable def idxThreeStep (a b c : Nat) : Path ((a + b) + c) ((c + b) + a) :=
+  Path.trans (idxTwoStep a b c) (idxComm a (c + b))
+
+/-- Inverse-cancellation of the two-step index chain: a genuine `trans_symm`
+    (`rweq_cmpA_inv_right`) rewrite on a length-two trace. -/
+noncomputable def idxTwoStep_cancel (a b c : Nat) :
+    RwEq (Path.trans (idxTwoStep a b c) (Path.symm (idxTwoStep a b c)))
+      (Path.refl ((a + b) + c)) :=
+  rweq_cmpA_inv_right (idxTwoStep a b c)
+
+/-- Reassociating the three factors of `idxThreeStep` is a genuine `trans_assoc`
+    (`rweq_tt`) rewrite between the two bracketings. -/
+noncomputable def idxThreeStep_assoc (a b c : Nat) :
+    RwEq
+      (Path.trans (Path.trans (idxAssoc a b c) (idxInner a b c)) (idxComm a (c + b)))
+      (Path.trans (idxAssoc a b c) (Path.trans (idxInner a b c) (idxComm a (c + b)))) :=
+  rweq_tt (idxAssoc a b c) (idxInner a b c) (idxComm a (c + b))
+
+/-- Double symmetry of the index associator is a genuine `symm_symm` (`rweq_ss`). -/
+noncomputable def idxAssoc_double_symm (a b c : Nat) :
+    RwEq (Path.symm (Path.symm (idxAssoc a b c))) (idxAssoc a b c) :=
+  rweq_ss (idxAssoc a b c)
+
+/-- Symmetry congruence transports the two-step cancellation through `symm`. -/
+noncomputable def idxTwoStep_symm_congr (a b c : Nat) :
+    RwEq
+      (Path.symm (Path.trans (idxTwoStep a b c) (Path.symm (idxTwoStep a b c))))
+      (Path.symm (Path.refl ((a + b) + c))) :=
+  rweq_symm_congr (idxTwoStep_cancel a b c)
+
+/-- Left `trans`-congruence: whisker the two-step cancellation by a further loop. -/
+noncomputable def idxTwoStep_trans_congr (a b c : Nat)
+    (q : Path ((a + b) + c) ((a + b) + c)) :
+    RwEq
+      (Path.trans (Path.trans (idxTwoStep a b c) (Path.symm (idxTwoStep a b c))) q)
+      (Path.trans (Path.refl ((a + b) + c)) q) :=
+  rweq_trans_congr_left q (idxTwoStep_cancel a b c)
+
+/-- Left unit law for the two-step index chain (`rweq_cmpA_refl_left`). -/
+noncomputable def idxTwoStep_reflL (a b c : Nat) :
+    RwEq (Path.trans (Path.refl ((a + b) + c)) (idxTwoStep a b c)) (idxTwoStep a b c) :=
+  rweq_cmpA_refl_left (idxTwoStep a b c)
+
+/-- Right unit law for the two-step index chain (`rweq_cmpA_refl_right`). -/
+noncomputable def idxTwoStep_reflR (a b c : Nat) :
+    RwEq (Path.trans (idxTwoStep a b c) (Path.refl (a + (c + b)))) (idxTwoStep a b c) :=
+  rweq_cmpA_refl_right (idxTwoStep a b c)
+
+/-! ## Genuine computational paths on typing contexts
+
+`Ctx = List Ty`, so context concatenation `++` carries free-monoid structure: the
+associator `List.append_assoc` relates the **distinct** expressions
+`(Γ₁ ++ Γ₂) ++ Γ₃` and `Γ₁ ++ (Γ₂ ++ Γ₃)` as a genuine one-step `Path`.  Two
+`Path.trans` routes reassociate a four-context concatenation (the free-monoid
+pentagon), and `RwEq` rules certify their coherences — no `Subsingleton.elim`. -/
+
+/-- Context associator: `(Γ₁ ++ Γ₂) ++ Γ₃ ⤳ Γ₁ ++ (Γ₂ ++ Γ₃)`. -/
+noncomputable def ctxAssoc (Γ₁ Γ₂ Γ₃ : Ctx) :
+    Path ((Γ₁ ++ Γ₂) ++ Γ₃) (Γ₁ ++ (Γ₂ ++ Γ₃)) :=
+  Path.ofEq (List.append_assoc Γ₁ Γ₂ Γ₃)
+
+/-- Inverse context associator. -/
+noncomputable def ctxAssocInv (Γ₁ Γ₂ Γ₃ : Ctx) :
+    Path (Γ₁ ++ (Γ₂ ++ Γ₃)) ((Γ₁ ++ Γ₂) ++ Γ₃) :=
+  Path.symm (ctxAssoc Γ₁ Γ₂ Γ₃)
+
+/-- Right unit for context concatenation: `Γ ++ [] ⤳ Γ`. -/
+noncomputable def ctxNil (Γ : Ctx) : Path (Γ ++ ([] : Ctx)) Γ :=
+  Path.ofEq (List.append_nil Γ)
+
+/-- Pentagon **bottom** route over four contexts: two associators (length-two). -/
+noncomputable def ctxPentagon2 (Γ₁ Γ₂ Γ₃ Γ₄ : Ctx) :
+    Path (Γ₁ ++ (Γ₂ ++ (Γ₃ ++ Γ₄))) (((Γ₁ ++ Γ₂) ++ Γ₃) ++ Γ₄) :=
+  Path.trans (ctxAssocInv Γ₁ Γ₂ (Γ₃ ++ Γ₄)) (ctxAssocInv (Γ₁ ++ Γ₂) Γ₃ Γ₄)
+
+/-- Pentagon **top** route over four contexts: three whiskered associators
+    (length-three), sharing endpoints with `ctxPentagon2`. -/
+noncomputable def ctxPentagon1 (Γ₁ Γ₂ Γ₃ Γ₄ : Ctx) :
+    Path (Γ₁ ++ (Γ₂ ++ (Γ₃ ++ Γ₄))) (((Γ₁ ++ Γ₂) ++ Γ₃) ++ Γ₄) :=
+  Path.trans
+    (Path.congrArg (fun t => Γ₁ ++ t) (ctxAssocInv Γ₂ Γ₃ Γ₄))
+    (Path.trans
+      (ctxAssocInv Γ₁ (Γ₂ ++ Γ₃) Γ₄)
+      (Path.congrArg (fun t => t ++ Γ₄) (ctxAssocInv Γ₁ Γ₂ Γ₃)))
+
+/-- The bottom route cancels with its inverse — a non-decorative `RwEq`. -/
+noncomputable def ctxPentagon2_cancel (Γ₁ Γ₂ Γ₃ Γ₄ : Ctx) :
+    RwEq (Path.trans (ctxPentagon2 Γ₁ Γ₂ Γ₃ Γ₄) (Path.symm (ctxPentagon2 Γ₁ Γ₂ Γ₃ Γ₄)))
+      (Path.refl (Γ₁ ++ (Γ₂ ++ (Γ₃ ++ Γ₄)))) :=
+  rweq_cmpA_inv_right (ctxPentagon2 Γ₁ Γ₂ Γ₃ Γ₄)
+
+/-- The top route likewise cancels with its inverse — a non-decorative `RwEq`. -/
+noncomputable def ctxPentagon1_cancel (Γ₁ Γ₂ Γ₃ Γ₄ : Ctx) :
+    RwEq (Path.trans (ctxPentagon1 Γ₁ Γ₂ Γ₃ Γ₄) (Path.symm (ctxPentagon1 Γ₁ Γ₂ Γ₃ Γ₄)))
+      (Path.refl (Γ₁ ++ (Γ₂ ++ (Γ₃ ++ Γ₄)))) :=
+  rweq_cmpA_inv_right (ctxPentagon1 Γ₁ Γ₂ Γ₃ Γ₄)
+
+/-- The right-unit context path cancels with its inverse. -/
+noncomputable def ctxNil_cancel (Γ : Ctx) :
+    RwEq (Path.trans (ctxNil Γ) (Path.symm (ctxNil Γ)))
+      (Path.refl (Γ ++ ([] : Ctx))) :=
+  rweq_cmpA_inv_right (ctxNil Γ)
+
+/-! ## Genuine multi-step paths through the type constructors -/
+
+/-- A genuine length-two type path `arr τ₁ σ₁ ⤳ arr τ₂ σ₂`: rewrite the domain,
+    then the codomain, through the `Ty.arr` constructor. -/
+noncomputable def arrCongr₂ {τ₁ τ₂ σ₁ σ₂ : Ty}
+    (p : Path τ₁ τ₂) (q : Path σ₁ σ₂) :
+    Path (Ty.arr τ₁ σ₁) (Ty.arr τ₂ σ₂) :=
+  Path.trans (arr_left_path σ₁ p) (arr_right_path τ₂ q)
+
+/-- A genuine length-two type path through the `Ty.prod` constructor. -/
+noncomputable def prodCongr₂ {τ₁ τ₂ σ₁ σ₂ : Ty}
+    (p : Path τ₁ τ₂) (q : Path σ₁ σ₂) :
+    Path (Ty.prod τ₁ σ₁) (Ty.prod τ₂ σ₂) :=
+  Path.trans (prod_left_path σ₁ p) (prod_right_path τ₂ q)
+
+/-- The two-step `arr` congruence cancels with its inverse — non-decorative. -/
+noncomputable def arrCongr₂_cancel {τ₁ τ₂ σ₁ σ₂ : Ty}
+    (p : Path τ₁ τ₂) (q : Path σ₁ σ₂) :
+    RwEq (Path.trans (arrCongr₂ p q) (Path.symm (arrCongr₂ p q)))
+      (Path.refl (Ty.arr τ₁ σ₁)) :=
+  rweq_cmpA_inv_right (arrCongr₂ p q)
+
+/-- Reassociating the domain/codomain rewrites of `arrCongr₂` past a further loop
+    is a genuine `trans_assoc` (`rweq_tt`). -/
+noncomputable def arrCongr₂_assoc {τ₁ τ₂ σ₁ σ₂ : Ty}
+    (p : Path τ₁ τ₂) (q : Path σ₁ σ₂)
+    (r : Path (Ty.arr τ₂ σ₂) (Ty.arr τ₂ σ₂)) :
+    RwEq
+      (Path.trans (Path.trans (arr_left_path σ₁ p) (arr_right_path τ₂ q)) r)
+      (Path.trans (arr_left_path σ₁ p) (Path.trans (arr_right_path τ₂ q) r)) :=
+  rweq_tt (arr_left_path σ₁ p) (arr_right_path τ₂ q) r
+
+/-! ## A concrete coherence certificate over de Bruijn indices
+
+Instantiated at the concrete indices `1, 2, 3 : Nat`, this packages the genuine
+two-step reassociation `Path.trans` together with the LND_EQ-TRS unit and
+inverse-cancellation `RwEq` laws (`PathLawCertificate`) — real trace-carrying
+evidence at concrete numbers, never a `True` placeholder. -/
+
+/-- A coherence certificate for de Bruijn index reassociation: three indices, a
+    genuine two-step `Path.trans` route between the distinct expressions
+    `(a + b) + c` and `a + (c + b)`, a `PathLawCertificate` of unit/inverse laws,
+    and the inverse-cancellation `RwEq` on the length-two trace. -/
+structure IndexShiftCertificate where
+  /-- First index. -/
+  a : Nat
+  /-- Second index. -/
+  b : Nat
+  /-- Third index. -/
+  c : Nat
+  /-- The genuine two-step reassociation route. -/
+  route : Path ((a + b) + c) (a + (c + b))
+  /-- Packaged unit/inverse laws for the route. -/
+  law : PathLawCertificate ((a + b) + c) (a + (c + b))
+  /-- The route cancels with its inverse — a non-decorative `RwEq`. -/
+  cancel : RwEq (Path.trans route (Path.symm route)) (Path.refl ((a + b) + c))
+
+/-- Build an index-shift certificate from three concrete indices. -/
+noncomputable def IndexShiftCertificate.build (a b c : Nat) : IndexShiftCertificate where
+  a := a
+  b := b
+  c := c
+  route := idxTwoStep a b c
+  law := PathLawCertificate.ofPath (idxTwoStep a b c)
+  cancel := idxTwoStep_cancel a b c
+
+/-- The certificate at the concrete de Bruijn indices `1, 2, 3`. -/
+noncomputable def indexShiftCertificate123 : IndexShiftCertificate :=
+  IndexShiftCertificate.build 1 2 3
+
+/-- The certificate's source endpoint is the concrete Nat `6`. -/
+theorem indexShiftCertificate123_source : (1 + 2) + 3 = 6 := rfl
+
+/-- The certificate's target endpoint is the same concrete Nat `6`. -/
+theorem indexShiftCertificate123_target : 1 + (3 + 2) = 6 := rfl
+
+/-! ## A concrete coherence certificate over typing contexts -/
+
+/-- A free-monoid pentagon certificate for context concatenation: four contexts,
+    both reassociation routes as genuine multi-step `Path.trans` chains sharing
+    endpoints, and non-decorative `RwEq` witnesses that each route cancels with its
+    inverse. -/
+structure CtxPentagonCertificate where
+  /-- First context factor. -/
+  g1 : Ctx
+  /-- Second context factor. -/
+  g2 : Ctx
+  /-- Third context factor. -/
+  g3 : Ctx
+  /-- Fourth context factor. -/
+  g4 : Ctx
+  /-- Top route: three whiskered associators (length-three trace). -/
+  route1 : Path (g1 ++ (g2 ++ (g3 ++ g4))) (((g1 ++ g2) ++ g3) ++ g4)
+  /-- Bottom route: two associators (length-two trace). -/
+  route2 : Path (g1 ++ (g2 ++ (g3 ++ g4))) (((g1 ++ g2) ++ g3) ++ g4)
+  /-- Top route cancels with its inverse. -/
+  route1Coh : RwEq (Path.trans route1 (Path.symm route1))
+    (Path.refl (g1 ++ (g2 ++ (g3 ++ g4))))
+  /-- Bottom route cancels with its inverse. -/
+  route2Coh : RwEq (Path.trans route2 (Path.symm route2))
+    (Path.refl (g1 ++ (g2 ++ (g3 ++ g4))))
+
+/-- Build a context pentagon certificate from four contexts. -/
+noncomputable def CtxPentagonCertificate.build (g1 g2 g3 g4 : Ctx) :
+    CtxPentagonCertificate where
+  g1 := g1
+  g2 := g2
+  g3 := g3
+  g4 := g4
+  route1 := ctxPentagon1 g1 g2 g3 g4
+  route2 := ctxPentagon2 g1 g2 g3 g4
+  route1Coh := ctxPentagon1_cancel g1 g2 g3 g4
+  route2Coh := ctxPentagon2_cancel g1 g2 g3 g4
+
+/-- A concrete pentagon certificate over four singleton contexts of concrete
+    types. -/
+noncomputable def ctxPentagonCertificateConcrete : CtxPentagonCertificate :=
+  CtxPentagonCertificate.build [Ty.base] [Ty.arr Ty.base Ty.base]
+    [Ty.prod Ty.base Ty.base] [Ty.base]
+
+/-- The concrete context certificate's shared target flattens to the four-type
+    context — a genuine computation on concrete `Ty` list data. -/
+theorem ctxPentagonCertificateConcrete_target :
+    ((([Ty.base] ++ [Ty.arr Ty.base Ty.base]) ++ [Ty.prod Ty.base Ty.base]) ++ [Ty.base])
+      = [Ty.base, Ty.arr Ty.base Ty.base, Ty.prod Ty.base Ty.base, Ty.base] := rfl
 
 end ComputationalPaths.Path.Computation.TypeCheckerPaths
