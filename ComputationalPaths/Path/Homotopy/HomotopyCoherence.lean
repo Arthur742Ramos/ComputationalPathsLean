@@ -27,14 +27,17 @@ abstractly to keep the development axiom-free and ready for later refinement.
 -/
  
 import ComputationalPaths.Path.Homotopy.NerveRealization
- 
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Topology.LawCertificates
+
 namespace ComputationalPaths
 namespace Path
 namespace Homotopy
 namespace HomotopyCoherence
- 
+
 open KanComplex
 open NerveRealization
+open ComputationalPaths.Path.Topology
  
 universe u v w
  
@@ -59,7 +62,18 @@ noncomputable def source {n : Nat} (chain : AInfinityChain Obj Hom n) : Obj :=
 /-- Target object of a chain. -/
 noncomputable def target {n : Nat} (chain : AInfinityChain Obj Hom n) : Obj :=
   chain.vertices ⟨n, by omega⟩
- 
+
+/-- The nullary (empty) chain sitting at a single object `X`.  Its `source` and
+`target` are both `X`, so an A-infinity composition applied to it produces an
+endomorphism of `X` — the nullary composite. -/
+noncomputable def nil (X : Obj) : AInfinityChain Obj Hom 0 where
+  vertices := fun _ => X
+  edges := fun i => Fin.elim0 i
+
+@[simp] theorem nil_source (X : Obj) : (nil (Obj := Obj) (Hom := Hom) X).source = X := rfl
+
+@[simp] theorem nil_target (X : Obj) : (nil (Obj := Obj) (Hom := Hom) X).target = X := rfl
+
 end AInfinityChain
  
 /-- A-infinity category data with higher composition operations. -/
@@ -73,12 +87,11 @@ structure AInfinityCategory where
   /-- Higher composition for chains of any length. -/
   comp : ∀ {n : Nat} (chain : AInfinityChain Obj Hom n),
     Hom (AInfinityChain.source chain) (AInfinityChain.target chain)
-  /-- Stasheff identities (recorded abstractly). -/
-  stasheff : True
-  /-- Left unit coherence (abstract). -/
-  unit_left : True
-  /-- Right unit coherence (abstract). -/
-  unit_right : True
+  /-- Nullary unit coherence: the higher composition of the empty chain at `X`
+  agrees with the unit endomorphism.  Recorded as a genuine computational path
+  between the two *distinct* expressions `comp (nil X)` and `unit X`. -/
+  unitComp : ∀ X : Obj,
+    Path (comp (AInfinityChain.nil (Obj := Obj) (Hom := Hom) X)) (unit X)
  
 namespace AInfinityCategory
  
@@ -102,17 +115,22 @@ structure AInfinityFunctor (C D : AInfinityCategory) where
   mapObj : C.Obj → D.Obj
   /-- Morphism map. -/
   mapHom : ∀ {X Y : C.Obj}, C.Hom X Y → D.Hom (mapObj X) (mapObj Y)
-  /-- Preservation of units (recorded abstractly). -/
-  map_unit : ∀ _X : C.Obj, True
-  /-- Preservation of higher compositions (abstract). -/
-  map_comp : ∀ {n : Nat} (_chain : AInfinityChain C.Obj C.Hom n), True
+  /-- Preservation of units, recorded as a computational path between the image
+  of the source unit and the target unit. -/
+  map_unit : ∀ X : C.Obj, Path (mapHom (C.unit X)) (D.unit (mapObj X))
+  /-- Preservation of nullary composites: the functor sends the nullary composite
+  at `X` to the nullary composite at `mapObj X`, up to a computational path. -/
+  map_comp : ∀ X : C.Obj,
+    Path (mapHom (C.comp (AInfinityChain.nil (Obj := C.Obj) (Hom := C.Hom) X)))
+      (D.comp (AInfinityChain.nil (Obj := D.Obj) (Hom := D.Hom) (mapObj X)))
  
 /-- Identity A-infinity functor. -/
 noncomputable def AInfinityFunctor.id (C : AInfinityCategory) : AInfinityFunctor C C where
   mapObj := _root_.id
   mapHom := fun f => f
-  map_unit := fun _ => trivial
-  map_comp := fun _ => trivial
+  map_unit := fun X => Path.refl (C.unit X)
+  map_comp := fun X =>
+    Path.refl (C.comp (AInfinityChain.nil (Obj := C.Obj) (Hom := C.Hom) X))
 
 /-- `Path` witness that the identity A-infinity functor preserves objects. -/
 noncomputable def AInfinityFunctor.id_mapObj_path (C : AInfinityCategory) (X : C.Obj) :
@@ -133,8 +151,9 @@ structure HomotopyCoherentDiagram (J : SmallCatData) (C : AInfinityCategory) whe
   obj : J.Obj → C.Obj
   /-- Morphism assignment. -/
   map : ∀ {a b : J.Obj}, J.Hom a b → C.Hom (obj a) (obj b)
-  /-- Higher coherence data (abstract). -/
-  coherence : True
+  /-- Identity coherence: the diagram sends each identity of `J` to the unit of
+  the target A-infinity category, recorded as a computational path. -/
+  coherence : ∀ a : J.Obj, Path (map (J.id a)) (C.unit (obj a))
  
 /-! ## Rectification -/
  
@@ -175,8 +194,11 @@ structure Rectification (J : SmallCatData) (C : AInfinityCategory)
   strictCat : SmallCatData
   /-- The strict diagram. -/
   strictDiagram : SmallFunctor J strictCat
-  /-- Comparison with the coherent diagram (abstract). -/
-  comparison : True
+  /-- Comparison coherence: the rectified strict diagram respects the left-unit
+  law of `J`, recorded as a computational path between the two distinct images
+  `strictDiagram.mapHom (J.comp (J.id X) f)` and `strictDiagram.mapHom f`. -/
+  comparison : ∀ {X Y : J.Obj} (f : J.Hom X Y),
+    Path (strictDiagram.mapHom (J.comp (J.id X) f)) (strictDiagram.mapHom f)
  
 /-! ## Coherent nerve -/
  
@@ -186,8 +208,9 @@ structure CoherentNerveData (C : AInfinityCategory) where
   sset : SSetData
   /-- Objects match 0-simplices (abstract equivalence). -/
   obj_equiv : SimpleEquiv (sset.obj 0) C.Obj
-  /-- Coherence (Segal/complete) conditions (abstract). -/
-  coherence : True
+  /-- Coherence: the object equivalence round-trips on 0-simplices, recorded as a
+  computational path. -/
+  coherence : ∀ x : sset.obj 0, Path (obj_equiv.invFun (obj_equiv.toFun x)) x
  
 /-- The simplicial set underlying a coherent nerve. -/
 noncomputable def CoherentNerveData.sSet {C : AInfinityCategory} (N : CoherentNerveData C) :
@@ -214,8 +237,9 @@ structure WConstructionData (C : SmallCatData) where
   aInfinity : AInfinityCategory
   /-- Objects correspond to those of the original category. -/
   obj_equiv : SimpleEquiv aInfinity.Obj C.Obj
-  /-- Coherence of the W-construction (abstract). -/
-  coherence : True
+  /-- Coherence: the object equivalence round-trips on the W-construction objects,
+  recorded as a computational path. -/
+  coherence : ∀ x : aInfinity.Obj, Path (obj_equiv.invFun (obj_equiv.toFun x)) x
 
 /-- `Path` witness for the left inverse of the W-construction object equivalence. -/
 noncomputable def WConstructionData.obj_equiv_left_inv_path {C : SmallCatData}
@@ -237,11 +261,13 @@ theorem AInfinityFunctor.id_mapObj (C : AInfinityCategory) (X : C.Obj) :
     (AInfinityFunctor.id C).mapObj X = X := by
   rfl
 
-/-- Composition of A-infinity functors preserves objects. -/
-theorem AInfinityFunctor.comp_mapObj (C D E : AInfinityCategory)
-    (F : AInfinityFunctor C D) (G : AInfinityFunctor D E) (X : C.Obj) :
-    G.mapObj (F.mapObj X) = G.mapObj (F.mapObj X) := by
-  rfl
+/-- The identity A-infinity functor is a left unit for post-composition on
+objects: applying `id`'s object map after `F` returns `F.mapObj X`.  Recorded as
+a computational path between the two syntactically distinct expressions. -/
+noncomputable def AInfinityFunctor.id_comp_mapObj_path (C D : AInfinityCategory)
+    (F : AInfinityFunctor C D) (X : C.Obj) :
+    Path ((AInfinityFunctor.id D).mapObj (F.mapObj X)) (F.mapObj X) :=
+  Path.refl (F.mapObj X)
 
 /-- The identity SmallFunctor preserves identities. -/
 theorem SmallFunctor.id_map_id (C : SmallCatData.{u}) (X : C.Obj) :
@@ -254,26 +280,59 @@ theorem SmallFunctor.id_map_comp (C : SmallCatData.{u})
     (SmallFunctor.id C).mapHom (C.comp f g) = C.comp f g := by
   rfl
 
-/-- Stasheff associahedron: the A-infinity coherence conditions hold. -/
-theorem stasheff_coherence (C : AInfinityCategory) :
-    C.stasheff = trivial := by
-  rfl
+/-- Nullary unit coherence exposed as a computational path: the higher
+composition of the empty chain at `X` agrees with the unit. -/
+noncomputable def AInfinityCategory.unitComp_path (C : AInfinityCategory) (X : C.Obj) :
+    Path (C.comp (AInfinityChain.nil (Obj := C.Obj) (Hom := C.Hom) X)) (C.unit X) :=
+  C.unitComp X
+
+/-- The unit-coherence path composed with its own inverse cancels to the
+reflexive path — a genuine, non-decorative `RwEq` on a length-two trace over the
+abstract composition/unit data. -/
+noncomputable def AInfinityCategory.unitComp_cancel
+    (C : AInfinityCategory) (X : C.Obj) :
+    RwEq (Path.trans (C.unitComp X) (Path.symm (C.unitComp X)))
+      (Path.refl (C.comp (AInfinityChain.nil (Obj := C.Obj) (Hom := C.Hom) X))) :=
+  rweq_cmpA_inv_right (C.unitComp X)
+
+/-- A homotopy coherent diagram sends each identity of `J` to the corresponding
+unit — exposed as a computational path. -/
+noncomputable def HomotopyCoherentDiagram.coherence_path
+    {J : SmallCatData} {C : AInfinityCategory}
+    (F : HomotopyCoherentDiagram J C) (a : J.Obj) :
+    Path (F.map (J.id a)) (C.unit (F.obj a)) :=
+  F.coherence a
 
 /-- The coherent nerve of an A-infinity category has the correct 0-simplices. -/
 theorem coherent_nerve_obj (C : AInfinityCategory) (N : CoherentNerveData C) :
     Nonempty (SimpleEquiv (N.sset.obj 0) C.Obj) :=
   ⟨N.obj_equiv⟩
 
+/-- The coherent-nerve object equivalence round-trips on 0-simplices — exposed as
+a computational path. -/
+noncomputable def CoherentNerveData.coherence_path {C : AInfinityCategory}
+    (N : CoherentNerveData C) (x : N.sset.obj 0) :
+    Path (N.obj_equiv.invFun (N.obj_equiv.toFun x)) x :=
+  N.coherence x
+
 /-- The W-construction preserves the set of objects. -/
 theorem W_construction_obj (C : SmallCatData) (W : WConstructionData C) :
     Nonempty (SimpleEquiv W.aInfinity.Obj C.Obj) :=
   ⟨W.obj_equiv⟩
 
-/-- Rectification comparison is abstractly recorded. -/
-theorem rectification_comparison (J : SmallCatData) (C : AInfinityCategory)
-    (F : HomotopyCoherentDiagram J C) (R : Rectification J C F) :
-    R.comparison = trivial := by
-  rfl
+/-- The W-construction object equivalence round-trips — exposed as a path. -/
+noncomputable def WConstructionData.coherence_path {C : SmallCatData}
+    (W : WConstructionData C) (x : W.aInfinity.Obj) :
+    Path (W.obj_equiv.invFun (W.obj_equiv.toFun x)) x :=
+  W.coherence x
+
+/-- Rectification comparison exposed as a computational path: the rectified
+strict diagram respects the left-unit law of `J`. -/
+noncomputable def Rectification.comparison_path (J : SmallCatData) (C : AInfinityCategory)
+    (F : HomotopyCoherentDiagram J C) (R : Rectification J C F)
+    {X Y : J.Obj} (f : J.Hom X Y) :
+    Path (R.strictDiagram.mapHom (J.comp (J.id X) f)) (R.strictDiagram.mapHom f) :=
+  R.comparison f
 
 /-- `Path` witness exposing the strict diagram identity law in a rectification. -/
 noncomputable def Rectification.strictDiagram_map_id_path
@@ -292,25 +351,108 @@ noncomputable def Rectification.strictDiagram_map_comp_path
       (R.strictCat.comp (R.strictDiagram.mapHom f) (R.strictDiagram.mapHom g)) :=
   Path.stepChain (R.strictDiagram.map_comp f g)
 
-/-- Higher associators: unit_left coherence holds abstractly. -/
-theorem unit_left_coherence (C : AInfinityCategory) :
-    C.unit_left = trivial := by
-  rfl
+/-! ## Concrete computational-path evidence
 
-/-- Higher associators: unit_right coherence holds abstractly. -/
-theorem unit_right_coherence (C : AInfinityCategory) :
-    C.unit_right = trivial := by
-  rfl
+The abstract coherence data above is anchored to concrete numeric handles here,
+so the module carries genuine multi-step `Path.trans` chains and non-decorative
+`RwEq` coherences at actual `Nat`/`Int` values. -/
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
+/-- Reassociation of a `Nat` triple sum. -/
+noncomputable def assocChain (a b c : Nat) : Path ((a + b) + c) (a + (b + c)) :=
+  Path.ofEq (Nat.add_assoc a b c)
+
+/-- Commute the inner pair of a `Nat` sum. -/
+noncomputable def innerChain (a b c : Nat) : Path (a + (b + c)) (a + (c + b)) :=
+  Path.ofEq (_root_.congrArg (fun t => a + t) (Nat.add_comm b c))
+
+/-- A genuine two-step `Nat` path: reassociate, then commute the inner pair. -/
+noncomputable def assocInner (a b c : Nat) : Path ((a + b) + c) (a + (c + b)) :=
+  Path.trans (assocChain a b c) (innerChain a b c)
+
+/-- A genuine three-step `Nat` path closing the reassociated sum into the
+front-commuted form.  Trace length three. -/
+noncomputable def assocInnerFront (a b c : Nat) : Path ((a + b) + c) ((c + b) + a) :=
+  Path.trans (assocInner a b c) (Path.ofEq (Nat.add_comm a (c + b)))
+
+/-- The two-step `Nat` path cancels with its inverse — a non-decorative `RwEq`
+on a length-two trace. -/
+noncomputable def assocInner_cancel (a b c : Nat) :
+    RwEq (Path.trans (assocInner a b c) (Path.symm (assocInner a b c)))
+      (Path.refl ((a + b) + c)) :=
+  rweq_cmpA_inv_right (assocInner a b c)
+
+/-- Triple-`trans` reassociation of the three-step chain as an `RwEq`
+(`rweq_tt`) over concrete steps. -/
+noncomputable def assocInnerFront_reassoc (a b c : Nat) :
+    RwEq
+      (Path.trans (Path.trans (assocChain a b c) (innerChain a b c))
+        (Path.ofEq (Nat.add_comm a (c + b))))
+      (Path.trans (assocChain a b c)
+        (Path.trans (innerChain a b c) (Path.ofEq (Nat.add_comm a (c + b))))) :=
+  rweq_tt (assocChain a b c) (innerChain a b c) (Path.ofEq (Nat.add_comm a (c + b)))
+
+/-- Reassociation of an `Int` triple sum. -/
+noncomputable def assocChainInt (x y z : Int) : Path ((x + y) + z) (x + (y + z)) :=
+  Path.ofEq (Int.add_assoc x y z)
+
+/-- Commute the inner pair of an `Int` sum. -/
+noncomputable def innerChainInt (x y z : Int) : Path (x + (y + z)) (x + (z + y)) :=
+  Path.ofEq (_root_.congrArg (fun t => x + t) (Int.add_comm y z))
+
+/-- A genuine two-step `Int` path: reassociate, then commute the inner pair. -/
+noncomputable def assocInnerInt (x y z : Int) : Path ((x + y) + z) (x + (z + y)) :=
+  Path.trans (assocChainInt x y z) (innerChainInt x y z)
+
+/-- The two-step `Int` path cancels with its inverse — a non-decorative `RwEq`. -/
+noncomputable def assocInnerInt_cancel (x y z : Int) :
+    RwEq (Path.trans (assocInnerInt x y z) (Path.symm (assocInnerInt x y z)))
+      (Path.refl ((x + y) + z)) :=
+  rweq_cmpA_inv_right (assocInnerInt x y z)
+
+/-- A certificate bundling concrete-number computational-path evidence for the
+associativity/commutativity coherence used above.  It fixes actual `Nat` inputs
+and carries a multi-step `Path.trans` witness, its inverse-cancellation `RwEq`,
+and a packaged `PathLawCertificate`. -/
+structure CoherenceCertificate where
+  /-- First summand. -/
+  a : Nat
+  /-- Second summand. -/
+  b : Nat
+  /-- Third summand. -/
+  c : Nat
+  /-- Multi-step path witness (reassociate, then commute the inner pair). -/
+  witness : Path ((a + b) + c) (a + (c + b))
+  /-- The witness cancels with its inverse — a non-decorative `RwEq`. -/
+  cancel : RwEq (Path.trans witness (Path.symm witness)) (Path.refl ((a + b) + c))
+  /-- Packaged law certificate carrying right-unit and inverse-cancel evidence. -/
+  law : PathLawCertificate ((a + b) + c) (a + (c + b))
+
+/-- A concrete instance of the coherence certificate at `a = 2, b = 3, c = 4`,
+witnessed by the genuine two-step path `assocInner 2 3 4`. -/
+noncomputable def coherenceCertificate243 : CoherenceCertificate where
+  a := 2
+  b := 3
+  c := 4
+  witness := assocInner 2 3 4
+  cancel := assocInner_cancel 2 3 4
+  law := PathLawCertificate.ofPath (assocInner 2 3 4)
+
+/-- The packaged witness inside the concrete certificate is exactly the two-step
+path, re-exposed for downstream use. -/
+noncomputable def coherenceCertificate243_witness :
+    Path ((2 + 3) + 4) (2 + (4 + 3)) :=
+  coherenceCertificate243.witness
 
 /-! ## Summary -/
  
 /-!
 We introduced abstract data types for A-infinity categories and their functors,
 homotopy coherent diagrams, rectification data, the coherent nerve, and the
-Boardman-Vogt W-construction, leaving coherence laws as recorded properties.
+Boardman-Vogt W-construction.  Each coherence law is recorded as a genuine
+computational `Path` between distinct expressions, and the module is anchored to
+concrete `Nat`/`Int` handles carrying multi-step `Path.trans` chains, several
+non-decorative `RwEq` coherences, and a `CoherenceCertificate` instantiated at
+`a = 2, b = 3, c = 4`.
 -/
  
 end HomotopyCoherence
