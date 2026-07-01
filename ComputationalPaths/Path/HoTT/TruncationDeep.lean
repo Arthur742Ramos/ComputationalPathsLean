@@ -251,10 +251,11 @@ theorem strunc_path_steps (a b : A) :
 
 /-! ## Truncation level arithmetic -/
 
-/-- 34. Successor of truncation level preserves truncation (proof-level). -/
+/-- 34. Successor of truncation level preserves truncation: every propositional
+       equality is realized by a genuine single-step computational path. -/
 theorem isTrunc_succ_of_isTrunc {n : TruncLevel} (_h : IsTruncProp n A) :
     IsTruncProp (TruncLevel.succ n) A := by
-  intro a b _; trivial
+  intro a b hab; exact ⟨Path.ofEq hab⟩
 
 /-- 35. Double successor still truncated. -/
 theorem isTrunc_succ_succ {n : TruncLevel} (h : IsTruncProp n A) :

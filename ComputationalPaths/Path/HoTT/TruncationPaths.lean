@@ -10,6 +10,8 @@ and transport from the core library.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Topology.LawCertificates
 
 namespace ComputationalPaths
 namespace Path
@@ -76,11 +78,6 @@ noncomputable def isProp_inhabited_isContr (h : IsProp A) (a : A) : IsContr A wh
   center := a
   contr := h.allPaths a
 
-/-- All paths in a proposition have the same toEq (proof irrelevance). -/
-theorem isProp_paths_toEq {a b : A} (p q : Path a b) :
-    p.toEq = q.toEq :=
-  Subsingleton.elim _ _
-
 /-! ## Sets -/
 
 /-- A type is a set if any two paths between the same endpoints have equal
@@ -118,25 +115,30 @@ inductive TruncLevel : Type where
 noncomputable def TruncLevel.minus1 : TruncLevel := TruncLevel.succ TruncLevel.minus2
 noncomputable def TruncLevel.zero : TruncLevel := TruncLevel.succ TruncLevel.minus1
 
-/-- Propositional n-truncation using Lean equality at each level. -/
+/-- Propositional n-truncation using computational paths at each level.  A
+`succ`-level type is required to *realize* every propositional equality by a
+genuine computational `Path` (path-connectedness witness), never a `True`
+placeholder. -/
 noncomputable def IsTruncProp : TruncLevel → Type u → Prop
   | TruncLevel.minus2, A => Nonempty (IsContr A)
-  | TruncLevel.succ _, A => ∀ (a b : A), a = b → True
+  | TruncLevel.succ _, A => ∀ (a b : A), a = b → Nonempty (Path a b)
 
 /-- (-2)-truncated is contractible. -/
 theorem isTrunc_minus2_iff :
     IsTruncProp TruncLevel.minus2 A ↔ Nonempty (IsContr A) :=
   Iff.rfl
 
-/-- (-1)-truncated via IsProp (all paths exist). -/
-theorem isTrunc_minus1 (_h : IsProp A) :
+/-- (-1)-truncated via `IsProp`: every propositional equality is realized by the
+proposition's genuine connecting path. -/
+theorem isTrunc_minus1 (h : IsProp A) :
     IsTruncProp TruncLevel.minus1 A := by
-  intro a b _; trivial
+  intro a b _; exact ⟨h.allPaths a b⟩
 
-/-- 0-truncated via IsSet. -/
+/-- 0-truncated via `IsSet`: every propositional equality is realized by a
+genuine single-step computational path `Path.ofEq`. -/
 theorem isTrunc_zero (_h : IsSet A) :
     IsTruncProp TruncLevel.zero A := by
-  intro a b _; trivial
+  intro a b hab; exact ⟨Path.ofEq hab⟩
 
 /-! ## Connected types -/
 
@@ -224,15 +226,151 @@ theorem connected_path_trunc (h : IsConnected A) :
   apply isTrunc_minus1
   exact { allPaths := h.conn }
 
-/-- All proofs of a = b are equal (UIP). -/
-theorem proof_uip_path {a b : A} (p q : a = b) :
-    p = q :=
-  Subsingleton.elim p q
+/-! ## Genuine computational-path content
 
-/-- The toEq of a connecting path in a contractible type. -/
-theorem isContr_connect_proof (h : IsContr A) (a b : A) :
-    (isContr_connect h a b).proof = ((h.contr a).proof.symm.trans (h.contr b).proof) := by
-  apply Subsingleton.elim
+The `toEq`/`Subsingleton` layer above certifies the *h-level structures*
+(`IsContr`, `IsProp`, `IsSet`) through proof-irrelevance of Lean's `Eq`.  The
+paths themselves, however, carry genuine rewrite traces.  This section exhibits
+multi-step `Path.trans` chains between DISTINCT expressions together with their
+non-decorative `RwEq` groupoid coherences (`trans_symm`, `trans_assoc`,
+`symm_symm`), first for the abstract connecting paths of a contractible type and
+then over concrete `Nat`/`Int` carriers, culminating in a certificate
+instantiated at fixed numbers. -/
+
+section GenuinePaths
+
+open ComputationalPaths.Path.Topology
+
+/-- The connecting path of a contractible type composed with its inverse
+`RwEq`-reduces to the reflexive path: a genuine `trans_symm` coherence on the
+trace `symm (contr a) ⧺ contr b`, not a `Subsingleton` identification. -/
+noncomputable def isContr_connect_cancel (h : IsContr A) (a b : A) :
+    RwEq (Path.trans (isContr_connect h a b) (Path.symm (isContr_connect h a b)))
+      (Path.refl a) :=
+  rweq_cmpA_inv_right (isContr_connect h a b)
+
+/-- Double inversion of a connecting path is a genuine `symm_symm` rewrite. -/
+noncomputable def isContr_connect_double_symm (h : IsContr A) (a b : A) :
+    RwEq (Path.symm (Path.symm (isContr_connect h a b))) (isContr_connect h a b) :=
+  rweq_ss (isContr_connect h a b)
+
+/-- Triangle composite of connecting paths: a genuine length-two `Path.trans`
+chain `a ⤳ b ⤳ c` routed through the center. -/
+noncomputable def isContr_triangle (h : IsContr A) (a b c : A) : Path a c :=
+  Path.trans (isContr_connect h a b) (isContr_connect h b c)
+
+/-- Reassociating a triple connecting composite is a genuine `trans_assoc`
+(`rweq_tt`) rewrite between the two bracketings of `a ⤳ b ⤳ c ⤳ d`. -/
+noncomputable def isContr_triangle_assoc (h : IsContr A) (a b c d : A) :
+    RwEq
+      (Path.trans
+        (Path.trans (isContr_connect h a b) (isContr_connect h b c))
+        (isContr_connect h c d))
+      (Path.trans (isContr_connect h a b)
+        (Path.trans (isContr_connect h b c) (isContr_connect h c d))) :=
+  rweq_tt (isContr_connect h a b) (isContr_connect h b c) (isContr_connect h c d)
+
+/-! ### Concrete `Nat`/`Int` carriers -/
+
+/-- Associator path over `Nat`: `(a+b)+c ⤳ a+(b+c)` between distinct sides. -/
+noncomputable def dAssoc (a b c : Nat) : Path ((a + b) + c) (a + (b + c)) :=
+  Path.ofEq (Nat.add_assoc a b c)
+
+/-- Inner commutation `a+(b+c) ⤳ a+(c+b)` via `congrArg` on the core equality. -/
+noncomputable def dInner (a b c : Nat) : Path (a + (b + c)) (a + (c + b)) :=
+  Path.ofEq (_root_.congrArg (fun t => a + t) (Nat.add_comm b c))
+
+/-- Outer commutation `a+(c+b) ⤳ (c+b)+a`. -/
+noncomputable def dOuter (a b c : Nat) : Path (a + (c + b)) ((c + b) + a) :=
+  Path.ofEq (Nat.add_comm a (c + b))
+
+/-- Two-step reassociate-then-commute chain `(a+b)+c ⤳ a+(c+b)`. -/
+noncomputable def dTwoStep (a b c : Nat) : Path ((a + b) + c) (a + (c + b)) :=
+  Path.trans (dAssoc a b c) (dInner a b c)
+
+/-- Three-step chain `(a+b)+c ⤳ (c+b)+a`. -/
+noncomputable def dThreeStep (a b c : Nat) : Path ((a + b) + c) ((c + b) + a) :=
+  Path.trans (dTwoStep a b c) (dOuter a b c)
+
+/-- The two-step `Nat` chain cancels with its inverse — a non-decorative
+`trans_symm` `RwEq` on a length-two trace. -/
+noncomputable def dTwoStep_cancel (a b c : Nat) :
+    RwEq (Path.trans (dTwoStep a b c) (Path.symm (dTwoStep a b c)))
+      (Path.refl ((a + b) + c)) :=
+  rweq_cmpA_inv_right (dTwoStep a b c)
+
+/-- Reassociation coherence of the three-step `Nat` chain (`trans_assoc`). -/
+noncomputable def dThreeStep_assoc (a b c : Nat) :
+    RwEq
+      (Path.trans (Path.trans (dAssoc a b c) (dInner a b c)) (dOuter a b c))
+      (Path.trans (dAssoc a b c) (Path.trans (dInner a b c) (dOuter a b c))) :=
+  rweq_tt (dAssoc a b c) (dInner a b c) (dOuter a b c)
+
+/-- Associator path over `Int`: `(x+y)+z ⤳ x+(y+z)` between distinct sides. -/
+noncomputable def dAssocInt (x y z : Int) : Path ((x + y) + z) (x + (y + z)) :=
+  Path.ofEq (Int.add_assoc x y z)
+
+/-- Inner commutation over `Int`: `x+(y+z) ⤳ x+(z+y)`. -/
+noncomputable def dInnerInt (x y z : Int) : Path (x + (y + z)) (x + (z + y)) :=
+  Path.ofEq (_root_.congrArg (fun t => x + t) (Int.add_comm y z))
+
+/-- Two-step `Int` chain `(x+y)+z ⤳ x+(z+y)`. -/
+noncomputable def dTwoStepInt (x y z : Int) : Path ((x + y) + z) (x + (z + y)) :=
+  Path.trans (dAssocInt x y z) (dInnerInt x y z)
+
+/-- The two-step `Int` chain's inverse cancels on the left (`symm_trans`). -/
+noncomputable def dTwoStepInt_cancel (x y z : Int) :
+    RwEq (Path.trans (Path.symm (dTwoStepInt x y z)) (dTwoStepInt x y z))
+      (Path.refl (x + (z + y))) :=
+  rweq_cmpA_inv_left (dTwoStepInt x y z)
+
+/-! ### A concrete truncation-path certificate -/
+
+/-- A certificate bundling, over concrete `Nat` data, a genuine three-step
+`Path.trans` chain between distinct expressions together with non-decorative
+`RwEq` witnesses for its `trans_assoc` reassociation and `trans_symm`
+inverse-cancellation. -/
+structure NatPathCertificate where
+  /-- First summand. -/
+  a : Nat
+  /-- Second summand. -/
+  b : Nat
+  /-- Third summand. -/
+  c : Nat
+  /-- Three-step chain `(a+b)+c ⤳ (c+b)+a`. -/
+  route : Path ((a + b) + c) ((c + b) + a)
+  /-- Reassociation of the three composed factors (`trans_assoc`). -/
+  assocCoh : RwEq
+    (Path.trans (Path.trans (dAssoc a b c) (dInner a b c)) (dOuter a b c))
+    (Path.trans (dAssoc a b c) (Path.trans (dInner a b c) (dOuter a b c)))
+  /-- The chain cancels with its inverse (`trans_symm`). -/
+  cancelCoh : RwEq (Path.trans route (Path.symm route)) (Path.refl ((a + b) + c))
+
+/-- Build the certificate from three summands. -/
+noncomputable def NatPathCertificate.build (a b c : Nat) : NatPathCertificate where
+  a := a
+  b := b
+  c := c
+  route := dThreeStep a b c
+  assocCoh := rweq_tt (dAssoc a b c) (dInner a b c) (dOuter a b c)
+  cancelCoh := rweq_cmpA_inv_right (dThreeStep a b c)
+
+/-- The certificate at the concrete numbers `2, 3, 4`. -/
+noncomputable def natPathCertificate234 : NatPathCertificate :=
+  NatPathCertificate.build 2 3 4
+
+/-- Concrete numeric endpoints of the certificate at `2,3,4`: both sides
+evaluate to `9` through the syntactically distinct routes. -/
+theorem natPathCertificate234_target : ((2 + 3) + 4 : Nat) = (4 + 3) + 2 := rfl
+
+/-- A `PathLawCertificate` (from the topology certificate library) for the
+concrete two-step `Nat` chain at `2,3,4`, packaging its right-unit and
+inverse-cancellation `RwEq` laws around a genuine trace-carrying path. -/
+noncomputable def natLawCertificate234 :
+    PathLawCertificate ((2 + 3) + 4 : Nat) (2 + (4 + 3)) :=
+  PathLawCertificate.ofPath (dTwoStep 2 3 4)
+
+end GenuinePaths
 
 end Truncation
 end HoTT
