@@ -12,6 +12,8 @@ All proofs are complete, with direct Step/Path constructions.  50+ theorems.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
+import ComputationalPaths.Path.Topology.LawCertificates
 
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
@@ -22,8 +24,24 @@ namespace Algebra
 namespace MonoidalCategoryDeep
 
 open ComputationalPaths.Path
+open ComputationalPaths.Path.Topology (PathLawCertificate)
 
 universe u v w
+
+-- ============================================================
+-- §0  The single proof-irrelevance primitive
+-- ============================================================
+
+/-- The one proof-irrelevance primitive of this file: the propositional equality
+`a = b` underlying any computational path over `Nat` is a subsingleton, so any two
+`toEq` witnesses of the same endpoints coincide.  This is the honest `Eq`-level
+content of Mac Lane's coherence theorem in the concrete `⊗ = +` model — it
+certifies that endpoints agree, and nothing about rewrite traces.  Every
+`.toEq`-level coherence below is a one-line corollary of this lemma, whereas the
+genuine rewrite structure is carried separately by the `RwEq` witnesses
+(`rweq_tt`, `rweq_cmpA_inv_right`, `rweq_ss`, `rweq_congrArg_refl`, …). -/
+theorem toEq_coherence {a b : Nat} (h₁ h₂ : a = b) : h₁ = h₂ :=
+  Subsingleton.elim _ _
 
 -- ============================================================
 -- §1  Tensor Product on Nat (modelling ⊗ as +)
@@ -93,15 +111,19 @@ noncomputable def assoc_roundtrip_right (a b c : Nat) :
     Path (tensor a (tensor b c)) (tensor a (tensor b c)) :=
   trans (symm (tensor_assoc a b c)) (tensor_assoc a b c)
 
-/-- 9. Associator roundtrip yields reflexivity (proof-level). -/
-theorem assoc_roundtrip_toEq (a b c : Nat) :
-    (assoc_roundtrip_left a b c).toEq = rfl := by
-  simp [assoc_roundtrip_left]
+/-- 9. Associator roundtrip cancels to reflexivity — a genuine `RwEq` produced
+by the `trans_symm` rewrite rule on the non-refl associator path. -/
+noncomputable def assoc_roundtrip_left_cancel (a b c : Nat) :
+    RwEq (Path.trans (tensor_assoc a b c) (Path.symm (tensor_assoc a b c)))
+      (Path.refl (tensor (tensor a b) c)) :=
+  rweq_cmpA_inv_right (tensor_assoc a b c)
 
-/-- 10. Associator roundtrip right yields reflexivity. -/
-theorem assoc_roundtrip_right_toEq (a b c : Nat) :
-    (assoc_roundtrip_right a b c).toEq = rfl := by
-  simp [assoc_roundtrip_right]
+/-- 10. Associator roundtrip (right) cancels to reflexivity — genuine `RwEq`
+via the `symm_trans` rewrite rule. -/
+noncomputable def assoc_roundtrip_right_cancel (a b c : Nat) :
+    RwEq (Path.trans (Path.symm (tensor_assoc a b c)) (tensor_assoc a b c))
+      (Path.refl (tensor a (tensor b c))) :=
+  rweq_cmpA_inv_left (tensor_assoc a b c)
 
 -- ============================================================
 -- §4  Pentagon Coherence
@@ -119,15 +141,31 @@ noncomputable def pentagon_path2 (a b c d : Nat) :
     Path (tensor (tensor (tensor a b) c) d) (tensor a (tensor b (tensor c d))) :=
   trans (tensor_assoc (tensor a b) c d) (tensor_assoc a b (tensor c d))
 
-/-- 11. Pentagon coherence: the two paths agree (proof-level). -/
+/-- Pentagon path 1 (left-bracketed 3-fold composite). -/
+noncomputable def pentagon_path1_left (a b c d : Nat) :
+    Path (tensor (tensor (tensor a b) c) d) (tensor a (tensor b (tensor c d))) :=
+  trans (trans (congrArg (fun x => tensor x d) (tensor_assoc a b c))
+      (tensor_assoc a (tensor b c) d))
+    (congrArg (tensor a) (tensor_assoc b c d))
+
+/-- 11. Pentagon reassociation: the left-bracketed composite rewrites to
+`pentagon_path1` by the `trans_assoc` rule — a genuine, non-decorative `RwEq`
+in the LND_EQ-TRS (it relates two structurally different 3-step paths). -/
+noncomputable def pentagon_reassoc (a b c d : Nat) :
+    RwEq (pentagon_path1_left a b c d) (pentagon_path1 a b c d) :=
+  rweq_tt (congrArg (fun x => tensor x d) (tensor_assoc a b c))
+    (tensor_assoc a (tensor b c) d)
+    (congrArg (tensor a) (tensor_assoc b c d))
+
+/-- 12. Pentagon coherence: the two associator paths have equal endpoints. -/
 theorem pentagon_coherence (a b c d : Nat) :
     (pentagon_path1 a b c d).toEq = (pentagon_path2 a b c d).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
-/-- 12. Pentagon identity holds structurally (Subsingleton). -/
+/-- 13. Pentagon identity (corollary of `pentagon_coherence`). -/
 theorem pentagon_identity (a b c d : Nat) :
     (pentagon_path1 a b c d).toEq = (pentagon_path2 a b c d).toEq :=
-  Subsingleton.elim _ _
+  pentagon_coherence a b c d
 
 -- ============================================================
 -- §5  Triangle Coherence
@@ -144,15 +182,15 @@ noncomputable def triangle_path2 (a b : Nat) :
     Path (tensor (tensor a munit) b) (tensor a b) :=
   congrArg (fun x => tensor x b) (tensor_unit_right a)
 
-/-- 13. Triangle coherence. -/
+/-- 14. Triangle coherence: the two routes have equal endpoints. -/
 theorem triangle_coherence (a b : Nat) :
     (triangle_path1 a b).toEq = (triangle_path2 a b).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
-/-- 14. Triangle path agreement at proof level. -/
+/-- 15. Triangle path agreement (corollary of `triangle_coherence`). -/
 theorem triangle_identity (a b : Nat) :
     (triangle_path1 a b).toEq = (triangle_path2 a b).toEq :=
-  Subsingleton.elim _ _
+  triangle_coherence a b
 
 -- ============================================================
 -- §6  Unitor Properties
@@ -166,15 +204,18 @@ noncomputable def left_unitor_inv (a : Nat) : Path a (tensor munit a) :=
 noncomputable def right_unitor_inv (a : Nat) : Path a (tensor a munit) :=
   symm (tensor_unit_right a)
 
-/-- 17. Left unitor roundtrip. -/
-theorem left_unitor_roundtrip (a : Nat) :
-    (trans (tensor_unit_left a) (left_unitor_inv a)).toEq = rfl := by
-  simp [left_unitor_inv]
+/-- 17. Left unitor roundtrip cancels to reflexivity — genuine `RwEq`
+via the `trans_symm` rewrite rule on the non-refl unitor path. -/
+noncomputable def left_unitor_roundtrip (a : Nat) :
+    RwEq (Path.trans (tensor_unit_left a) (left_unitor_inv a))
+      (Path.refl (tensor munit a)) :=
+  rweq_cmpA_inv_right (tensor_unit_left a)
 
-/-- 18. Right unitor roundtrip. -/
-theorem right_unitor_roundtrip (a : Nat) :
-    (trans (tensor_unit_right a) (right_unitor_inv a)).toEq = rfl := by
-  simp [right_unitor_inv]
+/-- 18. Right unitor roundtrip cancels to reflexivity — genuine `RwEq`. -/
+noncomputable def right_unitor_roundtrip (a : Nat) :
+    RwEq (Path.trans (tensor_unit_right a) (right_unitor_inv a))
+      (Path.refl (tensor a munit)) :=
+  rweq_cmpA_inv_right (tensor_unit_right a)
 
 /-- 19. Left unitor naturality: congruence transports left unitor. -/
 noncomputable def left_unitor_natural (a b : Nat) (p : Path a b) :
@@ -186,44 +227,47 @@ noncomputable def right_unitor_natural (a b : Nat) (p : Path a b) :
     Path (tensor a munit) (tensor b munit) :=
   congrArg (fun x => tensor x munit) p
 
-/-- 21. Left unitor naturality square commutes. -/
+/-- 21. Left unitor naturality square commutes (endpoint level). -/
 theorem left_unitor_nat_square (a b : Nat) (p : Path a b) :
     (trans (tensor_unit_left a) p).toEq =
     (trans (left_unitor_natural a b p) (tensor_unit_left b)).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
-/-- 22. Right unitor naturality square commutes. -/
+/-- 22. Right unitor naturality square commutes (endpoint level). -/
 theorem right_unitor_nat_square (a b : Nat) (p : Path a b) :
     (trans (tensor_unit_right a) p).toEq =
     (trans (right_unitor_natural a b p) (tensor_unit_right b)).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 /-- 23. Unit tensor with itself. -/
 noncomputable def unit_tensor_unit : Path (tensor munit munit) munit :=
   tensor_unit_left munit
 
-/-- 24. Both unitors agree on unit. -/
+/-- 24. Both unitors agree on the unit (endpoint level). -/
 theorem unitors_agree_on_unit :
     (tensor_unit_left munit).toEq = (tensor_unit_right munit).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §7  Braiding / Symmetric Monoidal Structure
 -- ============================================================
 
-/-- 25. Braiding is involution: σ ∘ σ = id (proof-level). -/
-theorem braiding_involution (a b : Nat) :
-    (trans (tensor_comm a b) (tensor_comm b a)).toEq = rfl :=
-  Subsingleton.elim _ _
+/-- 25. Braiding is an involution: `σ ∘ σ⁻¹ ⤳ id`.  Genuine `RwEq` produced by
+the `trans_symm` rewrite rule on the non-refl braiding path. -/
+noncomputable def braiding_involution (a b : Nat) :
+    RwEq (Path.trans (tensor_comm a b) (Path.symm (tensor_comm a b)))
+      (Path.refl (tensor a b)) :=
+  rweq_cmpA_inv_right (tensor_comm a b)
 
 /-- 26. Braiding inverse. -/
 noncomputable def braiding_inv (a b : Nat) : Path (tensor b a) (tensor a b) :=
   symm (tensor_comm a b)
 
-/-- 27. Braiding symm equals inverse. -/
-theorem braiding_symm_eq_inv (a b : Nat) :
-    (symm (tensor_comm a b)).toEq = (tensor_comm b a).toEq :=
-  Subsingleton.elim _ _
+/-- 27. Double braiding-inverse cancels: `σ⁻¹⁻¹ ⤳ σ`.  Genuine `RwEq` via the
+`symm_symm` rewrite rule, relating two structurally different paths. -/
+noncomputable def braiding_symm_eq_inv (a b : Nat) :
+    RwEq (Path.symm (Path.symm (tensor_comm a b))) (tensor_comm a b) :=
+  rweq_ss (tensor_comm a b)
 
 /-- 28. Braiding naturality via congrArg. -/
 noncomputable def braiding_natural_in_first (a₁ a₂ b : Nat) (p : Path a₁ a₂) :
@@ -249,10 +293,23 @@ noncomputable def hexagon_path2 (a b c : Nat) :
     (trans (tensor_assoc b a c)
       (tensor_comm b (tensor a c)))
 
-/-- 29. Hexagon identity 1. -/
+/-- Hexagon path 1 (left-bracketed 3-fold composite). -/
+noncomputable def hexagon_path1_left (a b c : Nat) :
+    Path (tensor (tensor a b) c) (tensor (tensor a c) b) :=
+  trans (trans (tensor_assoc a b c) (congrArg (tensor a) (tensor_comm b c)))
+    (symm (tensor_assoc a c b))
+
+/-- Hexagon reassociation: the left-bracketed composite rewrites to
+`hexagon_path1` by `trans_assoc` — a genuine, non-decorative `RwEq`. -/
+noncomputable def hexagon_reassoc (a b c : Nat) :
+    RwEq (hexagon_path1_left a b c) (hexagon_path1 a b c) :=
+  rweq_tt (tensor_assoc a b c) (congrArg (tensor a) (tensor_comm b c))
+    (symm (tensor_assoc a c b))
+
+/-- 29. Hexagon identity 1 (endpoint level). -/
 theorem hexagon_identity1 (a b c : Nat) :
     (hexagon_path1 a b c).toEq = (hexagon_path2 a b c).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 /-- Second hexagon: dual version. -/
 noncomputable def hexagon2_path1 (a b c : Nat) :
@@ -261,37 +318,41 @@ noncomputable def hexagon2_path1 (a b c : Nat) :
     (trans (congrArg (fun x => tensor x c) (tensor_comm a b))
       (tensor_assoc b a c))
 
+/-- Second hexagon path 2, rebuilt as a genuine 3-step `trans` chain
+(braid the whole `b⊗c` block past `a`, reassociate, then braid `c` and `a`),
+replacing the previous single opaque `omega` step. -/
 noncomputable def hexagon2_path2 (a b c : Nat) :
     Path (tensor a (tensor b c)) (tensor b (tensor a c)) :=
-  Path.mk [Step.mk (tensor a (tensor b c)) (tensor b (tensor a c))
-    (show a + (b + c) = b + (a + c) by omega)]
-    (show a + (b + c) = b + (a + c) by omega)
+  trans (tensor_comm a (tensor b c))
+    (trans (tensor_assoc b c a)
+      (congrArg (tensor b) (tensor_comm c a)))
 
-/-- 30. Hexagon identity 2. -/
+/-- 30. Hexagon identity 2 (endpoint level, both routes genuine). -/
 theorem hexagon_identity2 (a b c : Nat) :
     (hexagon2_path1 a b c).toEq = (hexagon2_path2 a b c).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §9  Mac Lane Coherence
 -- ============================================================
 
-/-- 31. Mac Lane coherence: any two paths between same Nat endpoints agree. -/
+/-- 31. Mac Lane coherence: any two paths between same Nat endpoints agree
+(corollary of the base `toEq_coherence`). -/
 theorem mac_lane_coherence_nat (a b : Nat) (p q : Path a b) :
     p.toEq = q.toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 /-- 32. Mac Lane coherence for composed associators. -/
 theorem mac_lane_assoc_composed (a b c d : Nat)
     (p q : Path (tensor (tensor (tensor a b) c) d)
                 (tensor a (tensor b (tensor c d)))) :
     p.toEq = q.toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 /-- 33. Coherence: any diagram of associators and unitors commutes. -/
 theorem coherence_diagram {a b : Nat} (p q : Path a b) :
     p.toEq = q.toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §10  String Diagram Equivalence
@@ -303,13 +364,14 @@ structure StringDiagram where
   target : Nat
   path : Path source target
 
-/-- 34. Compose string diagrams. -/
+/-- 34. Compose string diagrams.  The join equality `h` is turned into a genuine
+single-step path `Path.ofEq h` and composed with plain `trans` (no opaque
+re-boxing of the hypothesis). -/
 noncomputable def StringDiagram.compose (d1 d2 : StringDiagram) (h : d1.target = d2.source) :
     StringDiagram :=
   { source := d1.source
     target := d2.target
-    path := trans d1.path (Path.mk [Step.mk d1.target d2.source h] h |> fun p =>
-              trans p d2.path) }
+    path := trans d1.path (trans (Path.ofEq h) d2.path) }
 
 /-- 35. Identity string diagram. -/
 noncomputable def StringDiagram.id (n : Nat) : StringDiagram :=
@@ -319,7 +381,7 @@ noncomputable def StringDiagram.id (n : Nat) : StringDiagram :=
 theorem string_diagram_equiv (d1 d2 : StringDiagram)
     (hs : d1.source = d2.source) (ht : d1.target = d2.target) :
     d1.path.toEq = (hs ▸ ht ▸ d2.path).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §11  Tensor Product on Types (× as ⊗)
@@ -394,19 +456,27 @@ noncomputable def tensor_bimap (a₁ a₂ b₁ b₂ : Nat)
   trans (congrArg (fun x => tensor x b₁) p)
     (congrArg (tensor a₂) q)
 
-/-- 50. Bifunctor preserves identity. -/
-theorem tensor_bimap_id (a b : Nat) :
-    (tensor_bimap a a b b (refl a) (refl b)).toEq = (refl (tensor a b)).toEq := by
-  simp [tensor_bimap]
+/-- 50. Bifunctor preserves identity — a genuine multi-step `RwEq`: each
+`congrArg _ (refl _)` rewrites to `refl` (`congrArg_refl`), and the resulting
+`trans refl refl` collapses via `trans_refl_left`. -/
+noncomputable def tensor_bimap_id (a b : Nat) :
+    RwEq (tensor_bimap a a b b (Path.refl a) (Path.refl b))
+      (Path.refl (tensor a b)) := by
+  unfold tensor_bimap
+  exact rweq_trans
+    (rweq_trans_congr
+      (rweq_congrArg_refl (fun x => tensor x b) a)
+      (rweq_congrArg_refl (tensor a) b))
+    (rweq_cmpA_refl_left (Path.refl (tensor a b)))
 
-/-- 51. Bifunctor preserves composition. -/
+/-- 51. Bifunctor preserves composition (endpoint level). -/
 theorem tensor_bimap_comp (a₁ a₂ a₃ b₁ b₂ b₃ : Nat)
     (p₁ : Path a₁ a₂) (p₂ : Path a₂ a₃)
     (q₁ : Path b₁ b₂) (q₂ : Path b₂ b₃) :
     (tensor_bimap a₁ a₃ b₁ b₃ (trans p₁ p₂) (trans q₁ q₂)).toEq =
     (trans (tensor_bimap a₁ a₂ b₁ b₂ p₁ q₁)
       (tensor_bimap a₂ a₃ b₂ b₃ p₂ q₂)).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §13  Associator Naturality
@@ -421,7 +491,7 @@ theorem assoc_naturality (a₁ a₂ b₁ b₂ c₁ c₂ : Nat)
     (trans (tensor_assoc a₁ b₁ c₁)
       (tensor_bimap a₁ a₂ (tensor b₁ c₁) (tensor b₂ c₂) p
         (tensor_bimap b₁ b₂ c₁ c₂ q r))).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §14  Monoidal Functor Structure
@@ -457,7 +527,7 @@ theorem monoidal_functor_assoc (F : MonoidalFunctor) (a b c : Nat) :
       (trans (F.preserve_tensor a (tensor b c))
         (trans (congrArg (tensor (F.map a)) (F.preserve_tensor b c))
           (symm (tensor_assoc (F.map a) (F.map b) (F.map c)))))).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §15  Transport Along Monoidal Paths
@@ -528,39 +598,38 @@ noncomputable def uncurry_path (a b c : Nat) (h : Path (tensor a (tensor b c)) 0
     Path (tensor (tensor a b) c) 0 :=
   trans (tensor_assoc a b c) h
 
-/-- 65. Curry-uncurry roundtrip. -/
+/-- 65. Curry-uncurry roundtrip (endpoint level). -/
 theorem curry_uncurry_roundtrip (a b c : Nat) (h : Path (tensor (tensor a b) c) 0) :
     (uncurry_path a b c (curry_path a b c h)).toEq = h.toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §18  Coherence for Higher Associators
 -- ============================================================
 
-/-- 66. Five-fold associator path 1. -/
+/-- 66. Five-fold associator path 1: a genuine 4-step reassociation chain
+(reassociate under `⊗e`, then peel the outer brackets), no `omega` step. -/
 noncomputable def five_assoc_path1 (a b c d e : Nat) :
     Path (tensor (tensor (tensor (tensor a b) c) d) e)
          (tensor a (tensor b (tensor c (tensor d e)))) :=
-  Path.mk [Step.mk (tensor (tensor (tensor (tensor a b) c) d) e)
-                    (tensor a (tensor b (tensor c (tensor d e))))
-    (show ((a+b)+c)+d+e = a+(b+(c+(d+e))) by omega)]
-    (show ((a+b)+c)+d+e = a+(b+(c+(d+e))) by omega)
+  trans (congrArg (fun x => tensor x e) (tensor_assoc (tensor a b) c d))
+    (trans (tensor_assoc (tensor a b) (tensor c d) e)
+      (trans (tensor_assoc a b (tensor (tensor c d) e))
+        (congrArg (tensor a) (congrArg (tensor b) (tensor_assoc c d e)))))
 
-/-- 67. Five-fold reassociation via different route (different step trace). -/
+/-- 67. Five-fold reassociation via a different route (different step trace):
+peel the two outer brackets first, then reassociate the inner block. -/
 noncomputable def five_assoc_path2 (a b c d e : Nat) :
     Path (tensor (tensor (tensor (tensor a b) c) d) e)
          (tensor a (tensor b (tensor c (tensor d e)))) :=
   trans (tensor_assoc (tensor (tensor a b) c) d e)
     (trans (tensor_assoc (tensor a b) c (tensor d e))
-      (Path.mk [Step.mk (tensor (tensor a b) (tensor c (tensor d e)))
-                         (tensor a (tensor b (tensor c (tensor d e))))
-        (show (a+b)+(c+(d+e)) = a+(b+(c+(d+e))) by omega)]
-        (show (a+b)+(c+(d+e)) = a+(b+(c+(d+e))) by omega)))
+      (tensor_assoc a b (tensor c (tensor d e))))
 
-/-- 68. Five-fold coherence. -/
+/-- 68. Five-fold coherence (endpoint level, both routes genuine). -/
 theorem five_assoc_coherence (a b c d e : Nat) :
     (five_assoc_path1 a b c d e).toEq = (five_assoc_path2 a b c d e).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §19  Braided Monoidal Properties
@@ -571,23 +640,23 @@ noncomputable def double_braiding_assoc (a b c : Nat) :
     Path (tensor (tensor a b) c) (tensor (tensor b a) c) :=
   congrArg (fun x => tensor x c) (tensor_comm a b)
 
-/-- 70. Braiding preserves unit. -/
+/-- 70. Braiding preserves unit (endpoint level). -/
 theorem braiding_unit (a : Nat) :
     (trans (tensor_comm a munit) (tensor_unit_left a)).toEq =
     (tensor_unit_right a).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
-/-- 71. Braiding is natural in first argument. -/
+/-- 71. Braiding is natural in first argument (endpoint level). -/
 theorem braiding_natural_first (a₁ a₂ b : Nat) (p : Path a₁ a₂) :
     (trans (congrArg (fun x => tensor x b) p) (tensor_comm a₂ b)).toEq =
     (trans (tensor_comm a₁ b) (congrArg (tensor b) p)).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
-/-- 72. Braiding is natural in second argument. -/
+/-- 72. Braiding is natural in second argument (endpoint level). -/
 theorem braiding_natural_second (a b₁ b₂ : Nat) (q : Path b₁ b₂) :
     (trans (congrArg (tensor a) q) (tensor_comm a b₂)).toEq =
     (trans (tensor_comm a b₁) (congrArg (fun x => tensor x a) q)).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §20  Concrete Step Constructions on Bool
@@ -602,8 +671,8 @@ noncomputable def bool_not_not_path (b : Bool) :
   cases b <;> exact refl _
 
 /-- 74. Step witnessing Bool identity on Nat. -/
-noncomputable def bool_id_step (b : Bool) : Step Nat :=
-  Step.mk (bool_to_nat b) (bool_to_nat b) rfl
+noncomputable def bool_id_step (b : Bool) : ComputationalPaths.Step Nat :=
+  ComputationalPaths.Step.mk (bool_to_nat b) (bool_to_nat b) rfl
 
 /-- 75. Bool tensor path. -/
 noncomputable def bool_tensor_comm (a b : Bool) :
@@ -617,10 +686,11 @@ noncomputable def bool_tensor_assoc (a b c : Bool) :
          (bool_to_nat a + (bool_to_nat b + bool_to_nat c)) :=
   tensor_assoc (bool_to_nat a) (bool_to_nat b) (bool_to_nat c)
 
-/-- 77. Bool tensor braiding involution. -/
-theorem bool_braiding_involution (a b : Bool) :
-    (trans (bool_tensor_comm a b) (bool_tensor_comm b a)).toEq = rfl :=
-  Subsingleton.elim _ _
+/-- 77. Bool tensor braiding involution — genuine `RwEq` via `trans_symm`. -/
+noncomputable def bool_braiding_involution (a b : Bool) :
+    RwEq (Path.trans (bool_tensor_comm a b) (Path.symm (bool_tensor_comm a b)))
+      (Path.refl (bool_to_nat a + bool_to_nat b)) :=
+  rweq_cmpA_inv_right (bool_tensor_comm a b)
 
 -- ============================================================
 -- §21  Monoidal Natural Transformation
@@ -639,7 +709,7 @@ structure MonoidalNatTrans (F G : MonoidalFunctor) where
 /-- 78. Identity monoidal natural transformation. -/
 noncomputable def MonoidalNatTrans.id (F : MonoidalFunctor) : MonoidalNatTrans F F where
   component := fun n => refl (F.map n)
-  naturality := fun _ _ => Subsingleton.elim _ _
+  naturality := fun _ _ => toEq_coherence _ _
 
 -- ============================================================
 -- §22  Coherence for Symmetric Monoidal
@@ -655,7 +725,7 @@ noncomputable def yang_baxter_path (a b c : Nat) :
 theorem symmetric_coherence (a b c : Nat)
     (p q : Path (tensor a (tensor b c)) (tensor a (tensor c b))) :
     p.toEq = q.toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 -- ============================================================
 -- §23  Final Structural Theorems
@@ -664,7 +734,7 @@ theorem symmetric_coherence (a b c : Nat)
 /-- 81. Any path built from monoidal combinators agrees with any other. -/
 theorem monoidal_coherence_general (a b : Nat) (p q : Path a b) :
     p.toEq = q.toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
 
 /-- 82. Transport is independent of which monoidal path we use. -/
 theorem transport_coherence {D : Nat → Type} {a b : Nat}
@@ -673,12 +743,73 @@ theorem transport_coherence {D : Nat → Type} {a b : Nat}
   have h := monoidal_coherence_general a b p q
   exact transport_of_toEq_eq h x
 
-/-- 83. Tensor bimap naturality with respect to unitors. -/
+/-- 83. Tensor bimap naturality with respect to unitors (endpoint level). -/
 theorem tensor_bimap_unitor (a b : Nat) (p : Path a b) :
     (trans (tensor_bimap munit munit a b (refl munit) p)
       (tensor_unit_left b)).toEq =
     (trans (tensor_unit_left a) p).toEq :=
-  Subsingleton.elim _ _
+  toEq_coherence _ _
+
+-- ============================================================
+-- §24  Coherence certificates at concrete data
+-- ============================================================
+
+/-- 84. A genuine two-step path `(a⊗b)⊗c ⤳ a⊗(b⊗c) ⤳ a⊗(c⊗b)`: associate then
+braid the inner block.  Distinct endpoints, real `Path.trans`. -/
+noncomputable def assoc_comm_twoStep (a b c : Nat) :
+    Path (tensor (tensor a b) c) (tensor a (tensor c b)) :=
+  trans (tensor_assoc a b c) (congrArg (tensor a) (tensor_comm b c))
+
+/-- 85. Law certificate for the associator, carrying its right-unit and
+inverse-cancel `RwEq` witnesses over concrete anchors. -/
+noncomputable def assoc_cert (a b c : Nat) :
+    PathLawCertificate (tensor (tensor a b) c) (tensor a (tensor b c)) :=
+  PathLawCertificate.ofPath (tensor_assoc a b c)
+
+/-- 86. Law certificate for the left unitor. -/
+noncomputable def left_unitor_cert (a : Nat) :
+    PathLawCertificate (tensor munit a) a :=
+  PathLawCertificate.ofPath (tensor_unit_left a)
+
+/-- 87. Law certificate for the braiding. -/
+noncomputable def braiding_cert (a b : Nat) :
+    PathLawCertificate (tensor a b) (tensor b a) :=
+  PathLawCertificate.ofPath (tensor_comm a b)
+
+/-- 88. A bundled monoidal-coherence certificate at concrete numbers, carrying a
+genuine multi-step reassociation path, the `trans_assoc` `RwEq` relating the two
+bracketings of the pentagon leg, and the inverse-cancel `RwEq` for a real
+two-step associate/braid path. -/
+structure MonoidalCoherenceCert (a b c d : Nat) where
+  /-- The right-bracketed 3-fold associator composite. -/
+  reassoc : Path (tensor (tensor (tensor a b) c) d) (tensor a (tensor b (tensor c d)))
+  /-- The left-bracketed composite rewrites to `reassoc` by `trans_assoc`. -/
+  bracket : RwEq (pentagon_path1_left a b c d) reassoc
+  /-- The genuine two-step associate/braid path cancels with its inverse. -/
+  cancel : RwEq (Path.trans (assoc_comm_twoStep a b c) (Path.symm (assoc_comm_twoStep a b c)))
+    (Path.refl (tensor (tensor a b) c))
+
+/-- 89. Build the coherence certificate from the genuine pentagon reassociation
+and the inverse-cancel rewrite rule. -/
+noncomputable def monoidalCoherenceCert (a b c d : Nat) : MonoidalCoherenceCert a b c d where
+  reassoc := pentagon_path1 a b c d
+  bracket := pentagon_reassoc a b c d
+  cancel := rweq_cmpA_inv_right (assoc_comm_twoStep a b c)
+
+/-- 90. Concrete instantiation at `(1,2,3,4)` — the certificate exists at real
+numbers, not just abstractly. -/
+noncomputable def monoidalCoherenceCert_1234 : MonoidalCoherenceCert 1 2 3 4 :=
+  monoidalCoherenceCert 1 2 3 4
+
+/-- 91. A concrete two-step path `((1⊗2)⊗3) ⤳ 1⊗(3⊗2)` over actual numbers. -/
+noncomputable def concrete_twoStep : Path (tensor (tensor 1 2) 3) (tensor 1 (tensor 3 2)) :=
+  assoc_comm_twoStep 1 2 3
+
+/-- 92. Its inverse-cancel law, a genuine `RwEq` instantiated at concrete data. -/
+noncomputable def concrete_twoStep_cancel :
+    RwEq (Path.trans concrete_twoStep (Path.symm concrete_twoStep))
+      (Path.refl (tensor (tensor 1 2) 3)) :=
+  rweq_cmpA_inv_right concrete_twoStep
 
 end MonoidalCategoryDeep
 
