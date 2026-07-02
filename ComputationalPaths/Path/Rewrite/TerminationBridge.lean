@@ -95,18 +95,27 @@ structure NewmanData (A : Type u) (a b : A) where
   termination : ∀ (p : Path a b),
     ¬ ∃ (f : Nat → Path a b), f 0 = p ∧ ∀ n, Nonempty (Step (f n) (f (n + 1)))
 
-/-- From Newman data, we extract the propositional-level confluence guarantee:
-any two Rw chains from the same source yield paths with the same `toEq`. -/
-theorem newman_toEq_confluence' (_nd : NewmanData A a b) :
+/-- Two `Rw` chains from a common source yield paths with the same `toEq`.
+
+⚠ This is **not** genuine confluence of the step-rewriting system: it holds for
+*any* two paths `p q : Path a b` because `toEq` lands in `Eq` (a subsingleton),
+so it follows immediately from `rw_toEq` (that `Rw` preserves the underlying
+equality) and is independent of the `NewmanData` argument, which is unused.
+For genuine (step-level) confluence of the groupoid TRS see
+`GroupoidConfluence.confluence` on `Expr`. -/
+theorem rw_toEq_agree' (_nd : NewmanData A a b) :
     ∀ {p q r : Path a b}, Rw p q → Rw p r →
       q.toEq = r.toEq := by
   intro p q r hpq hpr
   exact (rw_toEq hpq).symm.trans (rw_toEq hpr)
 
-/-- Newman's Lemma (simplified): in our system, the toEq invariant
-already ensures that all paths can be "joined" at the propositional level,
-since `rw_toEq` shows that Rw preserves the underlying equality. -/
-theorem newman_toEq_confluence {p q r : Path a b}
+/-- Two `Rw` chains from a common source agree on `toEq`.
+
+⚠ Proof-irrelevance fact, **not** Newman's Lemma / step confluence: `toEq`
+values live in `Eq`, so any two paths with the same endpoints already agree
+here.  See `rw_toEq_agree'` for the caveat and `GroupoidConfluence.confluence`
+for the genuine result. -/
+theorem rw_toEq_agree {p q r : Path a b}
     (hpq : Rw p q) (hpr : Rw p r) :
     q.toEq = r.toEq :=
   (rw_toEq hpq).symm.trans (rw_toEq hpr)

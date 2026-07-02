@@ -294,13 +294,24 @@ noncomputable def CircleArcCover.toCoverData (C : CircleArcCover) : CoverData wh
   baseUV := C.baseUV
   glue := C.glue
 
-/-- `H₁(S¹) ≅ ℤ` via Mayer-Vietoris: the two-arc cover reduces
-    H₁ to winding numbers by the long exact sequence + contractibility of arcs.
+/-- `H₁(S¹) ≅ ℤ` via Mayer-Vietoris — **conditional** on the fundamental-group
+    bridge, which is taken as a hypothesis, not proved here.
 
-    The bridge `pi1ToCirclePiOne` converts the path-based `π₁(S¹)` quotient
-    into the computational circle's winding-number quotient `circlePiOne`,
-    completing the chain `H₁ ≃ π₁ ≃ circlePiOne ≃ ℤ`. -/
-noncomputable def circleH1EquivInt_viaMayerVietoris
+    Given `pi1Bridge`, the two-arc cover reduces `H₁` to winding numbers via the
+    long exact sequence + contractibility of the arcs, completing the chain
+    `H₁ ≃ π₁ ≃ circlePiOne ≃ ℤ`.
+
+    ⚠ **Open assumption.** `pi1Bridge : SimpleEquiv (π₁(S¹)) circlePiOne`
+    identifies the framework's genuine loop quotient
+    `π₁(Circle, circleBase) = LoopQuot Circle circleBase = PathRwQuot Circle …`
+    (real loops modulo `RwEq`) with the *syntactic* winding-number model
+    `circlePiOne = circleCompPathPiOne`.  Only `circlePiOne ≃ ℤ` is proved
+    (`circlePiOneEquivInt`, genuinely, as the first-iso-theorem for the winding
+    map).  Constructing `pi1Bridge` itself is the encode–decode / universal-cover
+    step (see `docs/axioms.md §5`), an open formalisation problem in this
+    codebase.  This definition is therefore a reduction, not a closed proof of
+    `H₁(S¹) ≅ ℤ` for the framework's own fundamental group. -/
+noncomputable def circleH1EquivInt_viaMayerVietoris_ofPi1Bridge
     (C : CircleArcCover)
     (W : MayerVietorisWitness C.toCoverData)
     (pi1Bridge : SimpleEquiv (π₁(Circle, circleBase)) circlePiOne) :

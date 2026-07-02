@@ -1281,7 +1281,7 @@ theorem modular_confluence_certificate :
 theorem modular_confluence_toEq {A : Type u} {a b : A} {p q r : Path a b}
     (hpq : Rw p q) (hpr : Rw p r) :
     q.toEq = r.toEq :=
-  TerminationBridge.newman_toEq_confluence hpq hpr
+  TerminationBridge.rw_toEq_agree hpq hpr
 
 theorem modular_confluence_from_layers {A : Type u} {a b : A} {p q r : Path a b}
     (_hOrth : tierOrthogonalityCertificate)

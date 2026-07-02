@@ -178,10 +178,19 @@ noncomputable def join_trans' {A : Type u} {a b : A}
     Join p r := by
   exact join_of_eq (by rw [join_eq' J₁, join_eq' J₂])
 
-/-! ## Church-Rosser property -/
+/-! ## Church-Rosser property
+
+⚠ **Scope caveat.**  The `PathExpr.Step` relation this file works over is the
+*minimal core*: `rw_target_eq_source` shows `Rw p q → p = q` (nothing genuinely
+rewrites).  Consequently the "confluence", "Church-Rosser", and "unique normal
+forms" results below are **trivially true** over that (essentially empty)
+relation — they are not confluence statements about the substantive LND_EQ-TRS
+rules.  The genuine, non-trivial confluence + termination result is
+`GroupoidConfluence.confluence` for the completed groupoid TRS on `Expr`. -/
 
 /-- The Church-Rosser property follows from confluence:
-    any two expressions reachable from the same source are joinable. -/
+    any two expressions reachable from the same source are joinable.
+    (Trivial here — see the scope caveat above: `Rw` is the identity relation.) -/
 theorem church_rosser
     {A : Type u} {a b : A}
     {p q r : PathExpr A a b}
