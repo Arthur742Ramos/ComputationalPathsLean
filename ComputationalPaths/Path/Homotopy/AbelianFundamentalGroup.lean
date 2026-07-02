@@ -20,6 +20,7 @@ applies it to the torus fundamental group computed as Z x Z.
 -/
 
 import ComputationalPaths.Path.CompPath.TorusStep
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -253,6 +254,27 @@ theorem torusPiOne_abelian : PiOneAbelian torusPiOne torusPiOneOps :=
 noncomputable def torusPiOne_abelian_path (x y : torusPiOne) :
     Path (torusPiOneOps.mul x y) (torusPiOneOps.mul y x) :=
   Path.stepChain (torusPiOne_abelian x y)
+
+/-! ### Multi-step unit compositions and inverse rewrite coherences
+
+The left- and right-unit witnesses of the torus `π₁` multiplication both contract to
+their argument, so they compose into a genuine two-step computational path identifying
+the two unit insertions, and each satisfies the LND_EQ-TRS inverse law `p ∘ symm p ▷ refl`. -/
+
+/-- Two-step path bridging the left- and right-unit products through `x`:
+    `1 · x ⤳ x ⤟ x · 1`. -/
+noncomputable def torusPiOneMul_unit_bridge_path (x : torusPiOne) :
+    Path (torusPiOneMul torusPiOneOne x) (torusPiOneMul x torusPiOneOne) :=
+  Path.trans (torusPiOneMul_one_left_path x)
+    (Path.symm (torusPiOneMul_one_right_path x))
+
+/-- Right-inverse coherence for the left-unit witness: `p ∘ symm p ▷ refl`. -/
+noncomputable def torusPiOneMul_one_left_inv_right_rweq (x : torusPiOne) :
+    RwEq
+      (Path.trans (torusPiOneMul_one_left_path x)
+        (Path.symm (torusPiOneMul_one_left_path x)))
+      (Path.refl (torusPiOneMul torusPiOneOne x)) :=
+  RwEq.step (Step.trans_symm (torusPiOneMul_one_left_path x))
 
 end TorusPiOne
 

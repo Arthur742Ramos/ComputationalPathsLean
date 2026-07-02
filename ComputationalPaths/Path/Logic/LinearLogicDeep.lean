@@ -12,6 +12,7 @@ coherence spaces, and proof nets — all modeled through computational paths.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -324,6 +325,23 @@ noncomputable def sequent_ante_append_comm (Γ Δ : List LProp) :
     Path ({ ante := Γ ++ Δ, succ := ([] : List LProp) } : LSequent)
          ({ ante := Γ ++ Δ, succ := ([] : List LProp) } : LSequent) :=
   Path.refl _
+
+/-! ### Iterated negation paths and inverse rewrite coherences
+
+Double-negation elimination composes with itself to eliminate a *quadruple* negation
+in two genuine steps, and the involution witness satisfies the LND_EQ-TRS inverse law
+`p ∘ symm p ▷ refl`. -/
+
+/-- Two-step path eliminating a quadruple negation `A⁴ ⤳ A.neg.neg ⤳ A`, composing
+    `neg_neg_path A.neg.neg` with `neg_neg_path A`. -/
+noncomputable def neg_quad_path (A : LProp) : Path A.neg.neg.neg.neg A :=
+  Path.trans (neg_neg_path A.neg.neg) (neg_neg_path A)
+
+/-- Right-inverse coherence for double-negation elimination: `p ∘ symm p ▷ refl`. -/
+noncomputable def neg_neg_inv_right_rweq (A : LProp) :
+    RwEq (Path.trans (neg_neg_path A) (Path.symm (neg_neg_path A)))
+      (Path.refl A.neg.neg) :=
+  RwEq.step (Step.trans_symm (neg_neg_path A))
 
 end LinearLogicDeep
 end Logic

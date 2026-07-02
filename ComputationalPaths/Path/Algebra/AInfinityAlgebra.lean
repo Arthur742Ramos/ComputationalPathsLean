@@ -18,6 +18,7 @@ and unit laws as computational paths.
 -/
 
 import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -108,6 +109,24 @@ theorem unit_left_one_eq (x : A) :
 /-- `unit_right_one` agrees with `unit_right` specialized to singleton lists. -/
 theorem unit_right_one_eq (x : A) :
     S.unit_right_one x = S.unit_right [x] := rfl
+
+/-! ### Multi-step unit compositions and inverse rewrite coherences
+
+The two singleton unit normalizations `[unit, x] ⤳ [x] ⤟ [x, unit]` compose into a
+genuine two-step computational path identifying the left- and right-unit insertions,
+and each unit witness satisfies the LND_EQ-TRS inverse law `p ∘ symm p ▷ refl`. -/
+
+/-- Two-step path bridging the left- and right-unit insertions of `x` through the
+    unary product `mul [x]`: `mul [unit, x] ⤳ mul [x] ⤟ mul [x, unit]`. -/
+noncomputable def unit_bridge_path (x : A) :
+    Path (S.mul [S.unit, x]) (S.mul [x, S.unit]) :=
+  Path.trans (S.unit_left_one x) (Path.symm (S.unit_right_one x))
+
+/-- Right-inverse coherence for the left-unit witness: `p ∘ symm p ▷ refl`. -/
+noncomputable def unit_left_inv_right_rweq (x : A) :
+    RwEq (Path.trans (S.unit_left_one x) (Path.symm (S.unit_left_one x)))
+      (Path.refl (S.mul [S.unit, x])) :=
+  RwEq.step (Step.trans_symm (S.unit_left_one x))
 
 end AInfinityAlgebra
 

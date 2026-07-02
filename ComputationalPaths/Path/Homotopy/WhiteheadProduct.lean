@@ -25,6 +25,7 @@ degrees use the canonical base element provided by `HigherHomotopy.piNBasepoint`
 -- import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups  -- DISABLED: universe level mismatch
 import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -444,6 +445,32 @@ We developed the Whitehead product on computational-path homotopy groups:
 9. **Lower central series**: iterated Whitehead products
 10. **Abelianization**: Whitehead products in the abelianization
 -/
+
+/-! ## Multi-step commutator paths and inverse rewrite coherences
+
+The single-step commutator witnesses in `LoopGroupAlgebra` compose into genuine
+multi-step computational paths and satisfy the LND_EQ-TRS inverse laws. -/
+
+/-- Genuine **two-step** path bridging two basepoint-trivial commutators through
+    the identity element of `π₁`: `[1, y] ⤳ 1 ⤳ [x, 1]`. Distinct endpoints. -/
+noncomputable def commutator_id_bridge_path {A : Type u} {a : A} (x y : LoopGroupAlgebra.Pi1 A a) :
+    Path
+      (LoopGroupAlgebra.commutator (A := A) (a := a)
+        (HigherHomotopy.piNBasepoint 1 A a) y)
+      (LoopGroupAlgebra.commutator (A := A) (a := a) x
+        (HigherHomotopy.piNBasepoint 1 A a)) :=
+  Path.trans (LoopGroupAlgebra.commutator_id_left_path y)
+    (Path.symm (LoopGroupAlgebra.commutator_id_right_path x))
+
+/-- Right-inverse coherence for the left-identity commutator witness `[1, y] ⤳ 1`:
+    `p ∘ symm p ▷ refl`. -/
+noncomputable def commutator_id_left_inv_right_rweq {A : Type u} {a : A} (y : LoopGroupAlgebra.Pi1 A a) :
+    RwEq
+      (Path.trans (LoopGroupAlgebra.commutator_id_left_path y)
+        (Path.symm (LoopGroupAlgebra.commutator_id_left_path y)))
+      (Path.refl (LoopGroupAlgebra.commutator (A := A) (a := a)
+        (HigherHomotopy.piNBasepoint 1 A a) y)) :=
+  RwEq.step (Step.trans_symm (LoopGroupAlgebra.commutator_id_left_path y))
 
 end WhiteheadProduct
 end Homotopy
