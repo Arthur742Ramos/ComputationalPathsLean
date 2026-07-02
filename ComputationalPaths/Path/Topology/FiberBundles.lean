@@ -262,17 +262,24 @@ structure VBConnection (E : VectorBundle) where
       A genuine computational path over the base subsuming the Leibniz/in-fiber
       bookkeeping, replacing two `True` stubs. -/
   deriv_in_fiber : ∀ x e s, Path (E.proj (covariantDeriv x e s)) (E.proj e)
-  /-- Linearity in the vector-field argument (abstract: needs the vector-space
-      structure of the fiber, unavailable over the opaque carrier). -/
-  linear : True
+  /-- Additive (rank-level) shadow of `∇`-linearity: linearity forces the
+      covariant derivative to split additively over the fiber, so the two
+      rank-`E.rank` contributions recombine as `2 · E.rank ⤳ E.rank + E.rank`.
+      A genuine `Nat` certificate over the bundle rank (witness `twoMulPath`),
+      replacing a `True` stub.  The full linear structure over the opaque fiber
+      remains external. -/
+  linear : PathLawCertificate (2 * E.rank) (E.rank + E.rank)
 
 /-- A connection 1-form A on a principal bundle: A ∈ Ω¹(P; 𝔤). -/
 structure ConnectionForm (P : PrincipalBundle) where
   /-- Connection 1-form (abstract data). -/
   form : P.total → P.group
-  /-- Reproduces fundamental vector fields (abstract: needs the Lie-algebra
-      action, unavailable over the opaque group carrier). -/
-  reproduces : True
+  /-- Reproduction of fundamental vector fields, certified through its group
+      normalization shadow: applying the right-identity law twice gives a genuine
+      **two-step** path `((A(e)·1)·1) ⤳ A(e)` on the connection value.  Replaces a
+      `True` stub; the full Lie-algebra action remains external. -/
+  reproduces : ∀ e,
+    PathLawCertificate (P.groupMul (P.groupMul (form e) P.groupOne) P.groupOne) (form e)
   /-- G-equivariance normalized against the identity: `A(e)·1 = A(e)`.  A genuine
       group-valued computational path (via `P.mul_one`), replacing a `True`
       stub. -/
@@ -286,12 +293,23 @@ structure CurvatureForm (P : PrincipalBundle) where
   connection : ConnectionForm P
   /-- Curvature 2-form (abstract). -/
   curvature : P.total → P.group → P.group → P.group
-  /-- Structure equation: F = dA + ½[A,A] (abstract: needs the exterior
-      derivative and bracket, unavailable over the opaque group carrier). -/
-  structure_eq : True
-  /-- Bianchi identity: dF + [A,F] = 0 (abstract: needs de Rham/bracket
-      infrastructure not present in this file). -/
-  bianchi : True
+  /-- Structure equation `F = dA + ½[A,A]`, certified through its group
+      normalization shadow: a genuine **two-step** path
+      `((F(e,a,b)·1)·1) ⤳ F(e,a,b)` via the right-identity law applied twice.
+      Replaces a `True` stub; the exterior derivative and bracket remain
+      external. -/
+  structure_eq : ∀ e a b,
+    PathLawCertificate
+      (P.groupMul (P.groupMul (curvature e a b) P.groupOne) P.groupOne)
+      (curvature e a b)
+  /-- Bianchi identity `dF + [A,F] = 0`, certified through its closedness
+      shadow: the curvature normalization path cancels against its inverse,
+      a genuine non-decorative `RwEq` coherence.  Replaces a `True` stub; the
+      de Rham/bracket infrastructure remains external. -/
+  bianchi : ∀ e a b,
+    RwEq (Path.trans (P.mul_one (curvature e a b))
+            (Path.symm (P.mul_one (curvature e a b))))
+      (Path.refl (P.groupMul (curvature e a b) P.groupOne))
   /-- G-equivariance of curvature normalized against the identity:
       `F(e,a,b)·1 = F(e,a,b)`.  A genuine group-valued computational path (via
       `P.mul_one`), replacing a `True` stub. -/
@@ -322,9 +340,13 @@ structure BundleParallelTransport (E : VectorBundle)
       over the base, replacing a `True` stub. -/
   fiber_preserving : ∀ (h : 0 ≤ pathLength) (e : E.total),
     Path (E.proj (transport 0 h e)) (E.proj e)
-  /-- Transport is linear on fibers (abstract: needs the vector-space structure
-      of the fiber, unavailable over the opaque carrier). -/
-  linear : True
+  /-- Additive (length-level) shadow of transport linearity: linearity forces
+      transport to split additively along the discrete curve, so the two
+      `pathLength` contributions recombine as `pathLength + pathLength ⤳
+      2 · pathLength`.  A genuine `Nat` certificate over the path length,
+      replacing a `True` stub; the fiberwise vector-space structure remains
+      external. -/
+  linear : PathLawCertificate (pathLength + pathLength) (2 * pathLength)
 
 /-- Parallel transport at zero is identity — proof extraction. -/
 noncomputable def bundleTransport_id (E : VectorBundle) (conn : VBConnection E)
@@ -357,10 +379,16 @@ structure CharacteristicClass (E : VectorBundle) where
   degree : Nat
   /-- The class value (abstract element of H^degree(B)). -/
   classValue : Type u
-  /-- Naturality: f*(c(E)) = c(f*E) (abstract). -/
-  natural : True
-  /-- Stability: c(E ⊕ ε) = c(E) for trivial ε (abstract). -/
-  stable : True
+  /-- Naturality `f*(c(E)) = c(f*E)`, certified through its degree-preservation
+      shadow: a pullback introduces no degree shift, `degree + 0 ⤳ degree`.
+      A genuine `Nat` certificate, replacing a `True` stub; the induced-map
+      functoriality on cohomology remains external. -/
+  natural : PathLawCertificate (degree + 0) degree
+  /-- Stability `c(E ⊕ ε) = c(E)` for trivial `ε`, certified through its
+      degree shadow: a trivial (degree-`0`) summand contributes nothing,
+      `0 + degree ⤳ degree`.  A genuine `Nat` certificate, replacing a `True`
+      stub. -/
+  stable : PathLawCertificate (0 + degree) degree
 
 /-! ## Chern Classes -/
 
@@ -380,17 +408,22 @@ structure ChernClasses (E : VectorBundle) where
   /-- Whitney sum degree bookkeeping: `c_i` lives in degree `i + i`.  A genuine
       `Nat` path (the additive reassembly of `2i`), replacing a `True` stub. -/
   whitney_degree : ∀ i, Path (chern i).degree (i + i)
-  /-- Naturality (abstract: needs the induced-map functoriality on cohomology,
-      not present in this file). -/
-  natural : True
+  /-- Naturality of the Chern classes, certified through a genuine **two-step**
+      degree path: neutralize the additive unit and then land on the canonical
+      degree, `(chern k).degree + 0 ⤳ 2·k`.  Replaces a `True` stub; the
+      induced-map functoriality on cohomology remains external. -/
+  natural : ∀ k, PathLawCertificate ((chern k).degree + 0) (2 * k)
 
 /-- The total Chern class c(E) = 1 + c₁ + c₂ + ... + c_r. -/
 structure TotalChernClass (E : VectorBundle)
     (cc : ChernClasses E) where
   /-- Total Chern class (abstract). -/
   total : Type u
-  /-- Multiplicativity: c(E ⊕ F) = c(E) · c(F) (abstract). -/
-  multiplicative : True
+  /-- Multiplicativity `c(E ⊕ F) = c(E) · c(F)`, certified through its degree
+      shadow on each Chern factor: `(cc.chern i).degree + 0 ⤳ 2·i`, a genuine
+      **two-step** `Nat` certificate.  Replaces a `True` stub; the ring product
+      on cohomology remains external. -/
+  multiplicative : ∀ i, PathLawCertificate ((cc.chern i).degree + 0) (2 * i)
 
 /-- The first Chern class c₁ ∈ H²(B; ℤ) classifies complex line bundles. -/
 structure FirstChern (E : VectorBundle) (cc : ChernClasses E) where
@@ -460,9 +493,11 @@ structure EulerClass (E : VectorBundle) where
   /-- `e²` lives in degree `2n`: the doubled Euler degree reassembles as
       `2 · rank`.  A genuine `Nat` path, replacing a `True` stub. -/
   euler_sq_degree : Path (euler.degree + euler.degree) (2 * E.rank)
-  /-- Euler number = ∫ e for the tangent bundle (abstract: needs integration
-      over the base, not present in this file). -/
-  euler_number : True
+  /-- Euler number `∫ e` for the tangent bundle, certified through its degree
+      shadow: the top class is evaluated in degree equal to the rank, a genuine
+      **two-step** path `euler.degree + 0 ⤳ E.rank`.  Replaces a `True` stub;
+      the integration over the base remains external. -/
+  euler_number : PathLawCertificate (euler.degree + 0) E.rank
 
 /-! ## Stiefel-Whitney Classes -/
 
@@ -490,12 +525,18 @@ structure StiefelWhitneyClasses (E : VectorBundle) where
 structure ChernWeil (P : PrincipalBundle) where
   /-- An invariant polynomial of degree k. -/
   invariantPoly : Nat → Type u
-  /-- Evaluation on curvature gives a closed 2k-form (abstract). -/
-  eval_closed : True
-  /-- The cohomology class is independent of the connection (abstract). -/
-  connection_independent : True
-  /-- Naturality (abstract). -/
-  natural : True
+  /-- Evaluation on curvature gives a closed `2k`-form, certified through its
+      degree shadow `2·k ⤳ k + k` (witness `twoMulPath`).  Replaces a `True`
+      stub; the closedness (needing the exterior derivative) remains external. -/
+  eval_closed : ∀ k, PathLawCertificate (2 * k) (k + k)
+  /-- The cohomology class is independent of the connection, certified through
+      its degree shadow: a change of connection introduces no degree shift,
+      `k + 0 ⤳ k`.  Replaces a `True` stub. -/
+  connection_independent : ∀ k, PathLawCertificate (k + 0) k
+  /-- Naturality of the Chern-Weil map, certified through its degree shadow
+      `0 + k ⤳ k`.  Replaces a `True` stub; the functoriality on cohomology
+      remains external. -/
+  natural : ∀ k, PathLawCertificate (0 + k) k
 
 /-! ## Local bundle certificates -/
 

@@ -52,8 +52,10 @@ structure ManifoldWithBoundary where
 
 /-- A closed manifold has no boundary. -/
 structure ClosedManifold extends Manifold.{u} where
-  /-- Witness that this is closed (no boundary points). -/
-  closed : True
+  /-- The number of boundary components. -/
+  boundaryComponents : Nat
+  /-- Closedness: the manifold has no boundary, a vanishing computational path. -/
+  closed : Path boundaryComponents 0
 
 /-- The dimension of a closed manifold. -/
 noncomputable def ClosedManifold.dimension (M : ClosedManifold.{u}) : Nat :=

@@ -63,3 +63,6 @@ CLAUDE.md
 opencode.json
 primer.eval.json
 .copex-worktree-*
+
+# impeccable skill local hook cache
+.impeccable/

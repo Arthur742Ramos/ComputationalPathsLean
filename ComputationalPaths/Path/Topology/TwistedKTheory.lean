@@ -74,8 +74,12 @@ structure PUBundle (T : Twist) where
   proj : total → T.base
   /-- The twist class this bundle represents. -/
   twist : T.twistClass
-  /-- Local triviality. -/
-  localTriv : True
+  /-- Obstruction to trivialising the bundle over each chart of a good cover. -/
+  cocycleDefect : Nat
+  /-- Local triviality: the bundle trivialises over each chart, so the cocycle
+      obstruction vanishes — a genuine `Nat` computational path (replacing the
+      `True` placeholder). -/
+  localTriv : Path cocycleDefect 0
 
 /-! ## Twisted K-Theory Groups -/
 
@@ -251,8 +255,12 @@ structure VerlindeAlgebra (R : RepRing) where
   level : Nat
   /-- Quotient map from R(G). -/
   quotient : R.carrier → carrier
-  /-- The quotient map is surjective (structural). -/
-  surjective : True
+  /-- Rank of the cokernel of the quotient map. -/
+  cokernelRank : Nat
+  /-- The quotient map is surjective: its cokernel is trivial, so the cokernel
+      rank vanishes — a genuine `Nat` computational path (replacing the `True`
+      placeholder). -/
+  surjective : Path cokernelRank 0
   /-- Addition in the Verlinde algebra. -/
   add : carrier → carrier → carrier
   /-- Multiplication (fusion product). -/

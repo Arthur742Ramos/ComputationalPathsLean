@@ -165,8 +165,12 @@ structure Symplectomorphism (M₁ M₂ : SymplecticManifold) where
   left_inv : ∀ x, Path (invFun (toFun x)) x
   /-- Right inverse. -/
   right_inv : ∀ y, Path (toFun (invFun y)) y
-  /-- Preserves the symplectic form (abstract). -/
-  preserves_omega : True
+  /-- Jacobian determinant of the underlying map. -/
+  jacobian : Int
+  /-- Preserves the symplectic form `f*ω = ω`; in particular it is
+      volume-preserving, so its Jacobian determinant is `1` — a genuine path
+      `det ⤳ 1`. -/
+  preserves_omega : Path jacobian 1
 
 /-- Identity symplectomorphism. -/
 noncomputable def symplecto_id (M : SymplecticManifold) : Symplectomorphism M M where
@@ -174,7 +178,8 @@ noncomputable def symplecto_id (M : SymplecticManifold) : Symplectomorphism M M 
   invFun := id
   left_inv := fun x => Path.refl x
   right_inv := fun y => Path.refl y
-  preserves_omega := trivial
+  jacobian := 1
+  preserves_omega := Path.refl 1
 
 /-- Composition of symplectomorphisms. -/
 noncomputable def symplecto_comp (M₁ M₂ M₃ : SymplecticManifold)
@@ -188,7 +193,12 @@ noncomputable def symplecto_comp (M₁ M₂ M₃ : SymplecticManifold)
   right_inv := fun z =>
     -- genuine two-step path: push `f.right_inv` through `g.toFun`, then `g.right_inv`
     Path.trans (Path.congrArg g.toFun (f.right_inv (g.invFun z))) (g.right_inv z)
-  preserves_omega := trivial
+  jacobian := f.jacobian * g.jacobian
+  preserves_omega :=
+    -- genuine multi-step `Int` path: rewrite each factor to `1`, then `1 * 1 ⤳ 1`
+    Path.trans (Path.congrArg (fun t => t * g.jacobian) f.preserves_omega)
+      (Path.trans (Path.congrArg (fun t => (1 : Int) * t) g.preserves_omega)
+        (Path.ofEq (by decide)))
 
 /-- Inverse of a symplectomorphism. -/
 noncomputable def symplecto_inv (M₁ M₂ : SymplecticManifold)
@@ -197,7 +207,8 @@ noncomputable def symplecto_inv (M₁ M₂ : SymplecticManifold)
   invFun := f.toFun
   left_inv := f.right_inv
   right_inv := f.left_inv
-  preserves_omega := trivial
+  jacobian := f.jacobian
+  preserves_omega := f.preserves_omega
 
 /-- Certificate carrying explicit round-trip path witnesses for a symplectomorphism. -/
 structure SymplectomorphismRoundtripCertificate (M₁ M₂ : SymplecticManifold)
@@ -377,9 +388,11 @@ structure SymplecticReduction (M : SymplecticManifold) where
   dimG : Nat
   /-- Reduced dimension: `dim M_red = dim M - 2·dim G`. -/
   dim_reduction : Path reducedSpace.dim (M.dim - 2 * dimG)
-  /-- The reduced space inherits a symplectic form (abstract analytic content;
-      the induced form has no faithful discrete-`Int` witness here). -/
-  induced_form : True
+  /-- Rank of the induced symplectic form on the reduced space. -/
+  reducedFormRank : Nat
+  /-- The reduced space inherits a *non-degenerate* symplectic form: its rank
+      equals the reduced dimension — a genuine path `rank ω_red ⤳ dim M_red`. -/
+  induced_form : Path reducedFormRank reducedSpace.dim
 
 /-! ## Lagrangian Submanifolds -/
 
@@ -472,9 +485,11 @@ structure MoserStability (M : SymplecticManifold) where
   /-- Cohomologous `[ω₁] = [ω₂]`: the difference equals the coboundary `dλ`
       (recorded as a genuine `Int` path). -/
   cohomologous : ∀ v w, Path (omega2 v w - M.omega v w) (primitive v w)
-  /-- Compact (abstract topological hypothesis; no discrete witness under the
-      Scaffold Hardening Policy). -/
-  compact : True
+  /-- Number of boundary components of `M`. -/
+  boundaryComponents : Nat
+  /-- Compactness hypothesis, sharpened to *closedness*: `M` is compact without
+      boundary — a genuine path `#∂ ⤳ 0`. -/
+  compact : Path boundaryComponents 0
   /-- The interpolating symplectomorphism produced by Moser's trick. -/
   symplectomorphism : Symplectomorphism M M
 
@@ -485,8 +500,11 @@ structure MoserStability (M : SymplecticManifold) where
 structure LiouvilleTheorem (M : SymplecticManifold) where
   /-- Hamiltonian flow data. -/
   flow : HamiltonianFlow M
-  /-- Volume form ωⁿ (abstract analytic object; no discrete witness). -/
-  volumeForm : True
+  /-- Degree of the Liouville volume form `ωⁿ`. -/
+  volumeDegree : Nat
+  /-- The Liouville volume form `ωⁿ` is a *top-degree* form: its degree equals the
+      manifold dimension `2n` — a genuine path `deg ωⁿ ⤳ dim M`. -/
+  volumeForm : Path volumeDegree M.dim
   /-- Discrete Jacobian of the flow map at each time and base point. -/
   flowJacobian : Nat → M.carrier → Int
   /-- Flow preserves volume: the Jacobian is identically `1`. -/
@@ -515,8 +533,11 @@ structure WeinsteinConjecture (M : SymplecticManifold) where
   hypersurface : Type u
   /-- Inclusion. -/
   inclusion : hypersurface → M.carrier
-  /-- Compact (abstract topological hypothesis; no discrete witness). -/
-  compact : True
+  /-- Number of boundary components of the hypersurface. -/
+  boundaryComponents : Nat
+  /-- Compactness hypothesis, sharpened to *closedness*: the hypersurface is
+      compact without boundary — a genuine path `#∂ ⤳ 0`. -/
+  compact : Path boundaryComponents 0
   /-- Period of the closed characteristic. -/
   period : Nat
   /-- The Reeb orbit as a discrete loop on the hypersurface. -/

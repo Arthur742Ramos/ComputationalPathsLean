@@ -97,7 +97,12 @@ structure MotivicGaloisGroup (k : Type u) where
   -- Motivic structure
   weight_cocharacter : group_elem
   connected_component : group_elem → Prop
-  reductive : True  -- motivic Galois group is pro-reductive
+  /-- Dimension of the unipotent radical. -/
+  unipotent_radical_dim : Nat
+  /-- The motivic Galois group is pro-reductive: its unipotent radical is trivial,
+      i.e. has dimension `0` — a genuine `Nat` computational path (replacing the
+      `True` placeholder). -/
+  reductive : Path unipotent_radical_dim 0
 
 namespace MotivicGaloisGroup
 

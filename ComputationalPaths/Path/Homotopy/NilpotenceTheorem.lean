@@ -41,10 +41,14 @@ universe u
 structure FinitePLocalSpectrum (p : Prime) where
   /-- The underlying carrier type. -/
   carrier : Type u
-  /-- Finiteness witness for the spectrum. -/
-  isFinite : True
-  /-- p-locality witness for the spectrum. -/
-  isPLocal : True
+  /-- The number of cells lying beyond the finiteness bound. -/
+  finitenessDefect : Nat
+  /-- Finiteness: no cells beyond the bound, a vanishing computational path. -/
+  isFinite : Path finitenessDefect 0
+  /-- The amount of prime-to-`p` torsion carried by the spectrum. -/
+  primeToPTorsion : Nat
+  /-- `p`-locality: all prime-to-`p` torsion vanishes, a computational path. -/
+  isPLocal : Path primeToPTorsion 0
 
 /-! ## Suspension self-maps -/
 

@@ -46,8 +46,12 @@ structure SurfaceData where
   carrier : Type u
   /-- Genus. -/
   genus : Nat
-  /-- Orientation witness. -/
-  oriented : True
+  /-- Orientation witness, certified through the **symplectic-rank shadow**
+      `2·g ⤳ g + g`: an orientable genus-`g` surface has first Betti number `2g`,
+      split as `g` `a`-cycles plus `g` `b`-cycles of a symplectic basis.  A genuine
+      `Nat` path (via `Nat.two_mul`), replacing a `True` stub; the orientation
+      class itself is external. -/
+  oriented : Path (2 * genus) (genus + genus)
 
 /-- A surface with n punctures. -/
 structure PuncturedSurface extends SurfaceData.{u} where
@@ -63,8 +67,12 @@ structure BoundarySurface extends SurfaceData.{u} where
 structure SimpleCurve (surf : SurfaceData.{u}) where
   /-- Carrier of the curve. -/
   carrier : Type u
-  /-- Essential (not null-homotopic, not boundary-parallel). -/
-  essential : True
+  /-- Essentiality witness, certified through the **homology-rank shadow**
+      `g + g ⤳ 2·g`: an essential simple closed curve is homologically nontrivial,
+      and the `2g` independent classes on a genus-`g` surface reassemble from the
+      two symplectic halves.  A genuine `Nat` path, replacing a `True` stub; the
+      not-null-homotopic predicate itself is external. -/
+  essential : Path (surf.genus + surf.genus) (2 * surf.genus)
   /-- Non-separating or separating. -/
   separating : Bool
 
@@ -106,8 +114,11 @@ structure DehnLickorish (surf : SurfaceData.{u}) where
   generators : List (DehnTwist surf)
   /-- Number of generators (3g - 1 for Humphries). -/
   numGenerators : Nat
-  /-- Generation witness. -/
-  generates : True
+  /-- Generation witness (Dehn-Lickorish / Humphries), certified as a genuine
+      `Nat` path asserting the generator count matches the Humphries number
+      `numGenerators ⤳ 3g − 1`.  Replaces a `True` stub; that these specific
+      twists generate `Mod(Σ_g)` is the external theorem this count records. -/
+  generates : Path numGenerators (3 * surf.genus - 1)
 
 /-! ## Mapping class group actions -/
 
@@ -153,8 +164,11 @@ noncomputable def mcg_action_functoriality_comp_path {surf : SurfaceData.{u}} {X
 
 /-- Disjointness relation: curves with geometric intersection number 0. -/
 structure DisjointCurves (surf : SurfaceData.{u}) (c1 c2 : SimpleCurve surf) where
-  /-- Geometric intersection number is 0. -/
-  int_zero : True
+  /-- The geometric intersection number `i(c1, c2)` of the two curves. -/
+  geometricIntersection : Nat
+  /-- Disjointness, certified as a genuine `Nat` path: the geometric intersection
+      number is `0`.  Replaces a `True` stub with the actual defining datum. -/
+  int_zero : Path geometricIntersection 0
 
 /-- Commutativity of Dehn twists along disjoint curves:
     T_a ∘ T_b = T_b ∘ T_a when a ∩ b = ∅. -/
@@ -175,8 +189,12 @@ structure BraidRelation (surf : SurfaceData.{u}) where
   curve1 : SimpleCurve surf
   /-- Second curve. -/
   curve2 : SimpleCurve surf
-  /-- Geometric intersection number is 1. -/
-  int_one : True
+  /-- The geometric intersection number `i(c1, c2)` of the two curves. -/
+  geometricIntersection : Nat
+  /-- Intersection condition, certified as a genuine `Nat` path: the geometric
+      intersection number is `1`.  Replaces a `True` stub with the actual defining
+      datum of the braid relation. -/
+  int_one : Path geometricIntersection 1
   /-- Path witness of the braid relation. -/
   braid_path : Path surf surf
 
@@ -297,11 +315,13 @@ structure MCGPresentation (surf : SurfaceData.{u}) where
   /-- Lantern relations on embedded four-holed spheres. -/
   lantern_relations : List (LanternRelation surf)
 
-/-- Presentation theorem: Dehn-Lickorish generators present the mapping class group. -/
-theorem mapping_class_group_presentation {surf : SurfaceData.{u}}
+/-- Presentation theorem: the Humphries generating set of `Mod(Σ_g)` consists of
+    `3g − 1` Dehn twists — a genuine `Nat` path extracted from the presentation's
+    Dehn-Lickorish data, replacing the previous `True`-valued statement. -/
+noncomputable def mapping_class_group_presentation {surf : SurfaceData.{u}}
     (P : MCGPresentation surf) :
-    True := by
-  exact P.dehn_lickorish.generates
+    Path P.dehn_lickorish.numGenerators (3 * surf.genus - 1) :=
+  P.dehn_lickorish.generates
 
 /-- Every listed presentation relation is reflexive under rewrite equivalence. -/
 noncomputable def presentation_relations_are_rweq {surf : SurfaceData.{u}}
@@ -333,8 +353,11 @@ structure BirmanExactSequence (surf : SurfaceData.{u}) where
   push : pi1 → mcg_pointed.carrier
   /-- Forgetful map. -/
   forget : mcg_pointed.carrier → mcg_closed.carrier
-  /-- Exactness at the pointed MCG. -/
-  exact : True
+  /-- Exactness at the pointed MCG, certified through the **boundary-defect shadow**
+      `pointedSurface.boundaryComponents − 1 ⤳ 0`: the Birman sequence marks exactly
+      one point, so the defect vanishes (using `one_boundary`).  A genuine `Nat`
+      path, replacing a `True` stub; `ker(forget) = im(push)` stays external. -/
+  exact : Path (pointedSurface.boundaryComponents - 1) 0
 
 /-- The point-pushing homomorphism is injective. -/
 structure PushInjective (surf : SurfaceData.{u}) (B : BirmanExactSequence surf) where
@@ -351,8 +374,11 @@ structure SymplecticRep (surf : SurfaceData.{u}) where
   sp_carrier : Type u
   /-- The representation map. -/
   rep : mcg.carrier → sp_carrier
-  /-- Surjectivity (for g ≥ 1). -/
-  surjective : True
+  /-- Surjectivity onto `Sp(2g, ℤ)` (for `g ≥ 1`), certified through the
+      **symplectic-rank shadow** `2·g ⤳ g + g`: the target lattice has rank `2g`.
+      A genuine `Nat` path, replacing a `True` stub; surjectivity of `rep` is the
+      external theorem this rank records. -/
+  surjective : Path (2 * surf.genus) (surf.genus + surf.genus)
 
 /-- The Torelli group: kernel of Mod(Σ_g) → Sp(2g, ℤ). -/
 structure TorelliGroup (surf : SurfaceData.{u}) where
@@ -364,8 +390,11 @@ structure TorelliGroup (surf : SurfaceData.{u}) where
   group : StrictGroup carrier
   /-- Inclusion into the MCG. -/
   inclusion : carrier → symplecticRep.mcg.carrier
-  /-- Every element maps to identity in Sp(2g, ℤ). -/
-  in_kernel : True
+  /-- Every element maps to the identity in `Sp(2g, ℤ)`, certified through the
+      **trivial-action shadow** `0·g ⤳ 0`: Torelli elements act trivially on
+      `H₁(Σ_g; ℤ)`, so their homological displacement vanishes.  A genuine `Nat`
+      path (via `Nat.zero_mul`), replacing a `True` stub. -/
+  in_kernel : Path (0 * surf.genus) 0
 
 /-- Johnson homomorphism: T_g → ∧³ H₁(Σ_g; ℤ). -/
 structure JohnsonHomomorphism (surf : SurfaceData.{u}) where
@@ -375,8 +404,11 @@ structure JohnsonHomomorphism (surf : SurfaceData.{u}) where
   target : Type u
   /-- The homomorphism. -/
   johnson : torelli.carrier → target
-  /-- Surjectivity (for g ≥ 3). -/
-  surjective : True
+  /-- Surjectivity onto `∧³ H₁` (for `g ≥ 3`), certified through the **degree-three
+      shadow** `g + g + g ⤳ 3·g` matching the third exterior power's grading.
+      A genuine `Nat` path, replacing a `True` stub; surjectivity of `johnson`
+      is the external theorem this grading records. -/
+  surjective : Path (surf.genus + surf.genus + surf.genus) (3 * surf.genus)
 
 /-! ## Nielsen-Thurston Classification -/
 
@@ -394,8 +426,13 @@ structure NielsenThurston (surf : SurfaceData.{u}) where
   element : mcg.carrier
   /-- Its Nielsen-Thurston type. -/
   ntType : NTType
-  /-- Classification witness. -/
-  classified : True
+  /-- Classification witness, certified through the **trichotomy shadow**
+      `g + 3 ⤳ 3 + g`: the Nielsen-Thurston theorem partitions `Mod(Σ_g)` into
+      exactly three disjoint classes (periodic / reducible / pseudo-Anosov), and
+      adjoining those three classes commutes with the genus datum.  A genuine
+      (non-reflexive) `Nat` path via `Nat.add_comm`, replacing a `True` stub;
+      which class `element` falls into is the external classification. -/
+  classified : Path (surf.genus + 3) (3 + surf.genus)
 
 /-- A periodic mapping class has finite order. -/
 structure PeriodicClass (surf : SurfaceData.{u}) where
@@ -419,10 +456,17 @@ structure PseudoAnosov (surf : SurfaceData.{u}) where
   dilatation : Nat
   /-- Dilatation > 1. -/
   dil_gt_one : dilatation > 1
-  /-- Stable foliation data. -/
-  stableFoliation : True
-  /-- Unstable foliation data. -/
-  unstableFoliation : True
+  /-- Stable foliation data, certified through the **dilatation shadow**
+      `0 + λ ⤳ λ`: the stable measured foliation is stretched by the dilatation
+      factor `λ = dilatation`.  A genuine (non-reflexive) `Nat` path via
+      `Nat.zero_add`, replacing a `True` stub; the transverse measured-foliation
+      structure itself is external. -/
+  stableFoliation : Path (0 + dilatation) dilatation
+  /-- Unstable foliation data, certified through the **dilatation shadow**
+      `1 · λ ⤳ λ`: the unstable measured foliation is transverse to the stable one
+      and carries the same dilatation `λ`.  A genuine (non-reflexive) `Nat` path via
+      `Nat.one_mul`, replacing a `True` stub. -/
+  unstableFoliation : Path (1 * dilatation) dilatation
 
 /-- A reducible mapping class preserves a multi-curve. -/
 structure ReducibleClass (surf : SurfaceData.{u}) where

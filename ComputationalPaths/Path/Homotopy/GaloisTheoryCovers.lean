@@ -119,10 +119,17 @@ noncomputable def etaleMonodromy (E : EtaleCovering A) (a : A) :
 structure GaloisCovering (A : Type u) : Type (u + 1) where
   /-- Underlying covering. -/
   covering : CoveringSpace.Covering A
-  /-- Connectedness of the cover (abstract). -/
-  isConnected : True
-  /-- Normality of the cover (abstract). -/
-  isNormal : True
+  /-- The number of connected components of the total space. -/
+  componentCount : Nat
+  /-- Connectedness: exactly one component, a computational path. -/
+  isConnected : Path componentCount 1
+  /-- The number of deck transformations (order of the Galois group). -/
+  deckCount : Nat
+  /-- The number of sheets (degree) of the covering. -/
+  sheetCount : Nat
+  /-- Normality: the covering is Galois, so `|Deck| = degree`, a computational
+      path equating the deck-transformation count with the sheet count. -/
+  isNormal : Path deckCount sheetCount
 
 /-- Deck transformations as the Galois group of a covering. -/
 abbrev GaloisGroup (C : CoveringSpace.Covering A) : Type u :=

@@ -64,8 +64,11 @@ structure BundleOrientation (H : ReducedCohomologyTheory) {K B Total V : Type u}
   thomClass : ThomClass H bundle thomSpace
   /-- Orientation degree matches the bundle rank. -/
   degree_eq_rank : thomClass.degree = bundle.rank
-  /-- Compatibility data (abstract). -/
-  compatible : True
+  /-- Obstruction to compatibility of the Thom class with the orientation. -/
+  compatDefect : Nat
+  /-- Compatibility of the Thom class with the orientation class, recorded as a
+      vanishing computational path. -/
+  compatible : Path compatDefect 0
 
 namespace BundleOrientation
 
@@ -101,9 +104,10 @@ noncomputable def degreePath_reassoc_cancel (O : BundleOrientation H bundle) :
     (rweq_trans_congr_right (Path.refl O.thomClass.degree) (degreePath_cancel_right O))
   exact rweq_cmpA_refl_left (Path.refl O.thomClass.degree)
 
-/-- Legacy wrapper exposing the stored compatibility field. -/
-theorem compatible_true (O : BundleOrientation H bundle) : True :=
-  O.compatible
+/-- The compatibility obstruction vanishes, extracted from the stored path. -/
+theorem compatible_obstruction_zero (O : BundleOrientation H bundle) :
+    O.compatDefect = 0 :=
+  Path.toEq O.compatible
 
 end BundleOrientation
 
@@ -210,9 +214,10 @@ theorem degreePath_cancel_left_def (O : BundleOrientation H bundle) :
     degreePath_cancel_left O = rweq_cmpA_inv_left (degreePath O) := by
   rfl
 
-theorem compatible_true_iff (O : BundleOrientation H bundle) :
-    compatible_true O = O.compatible := by
-  exact Subsingleton.elim _ _
+/-- The compatibility path composes trivially with reflexivity on the right. -/
+noncomputable def compatible_trans_refl (O : BundleOrientation H bundle) :
+    RwEq (Path.trans O.compatible (Path.refl 0)) O.compatible :=
+  rweq_cmpA_refl_right O.compatible
 
 end BundleOrientation
 

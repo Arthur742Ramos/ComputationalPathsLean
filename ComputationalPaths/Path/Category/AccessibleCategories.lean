@@ -58,8 +58,6 @@ noncomputable def base (label : String) (payload : Nat) :
   coherence := Path.RwEq.step
     (Path.Step.trans_refl_right (Path.stepChain (rfl : payload = payload)))
 
-def asTrue (_ : AccessibilityCertificate) : True := trivial
-
 end AccessibilityCertificate
 
 structure FilteredCategory (κ : RegularCardinal) where

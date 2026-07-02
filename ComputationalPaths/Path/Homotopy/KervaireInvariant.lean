@@ -93,15 +93,18 @@ structure SliceFiltration where
   slice : Nat → Type u
   /-- Structure maps slice_{n+1} -> slice_n. -/
   structureMap : ∀ n : Nat, slice (n + 1) → slice n
-  /-- Convergence witness: iterated structure maps compose. -/
-  converges : True
+  /-- The number of slices in which the tower fails to stabilise. -/
+  nonConvergentSlices : Nat
+  /-- Convergence of the slice tower, recorded as a vanishing computational path. -/
+  converges : Path nonConvergentSlices 0
 
 /-- Trivial slice filtration for a point spectrum. -/
 noncomputable def trivialSliceFiltration : SliceFiltration.{u} where
   spectrum := PUnit
   slice := fun _ => PUnit
   structureMap := fun _ _ => PUnit.unit
-  converges := trivial
+  nonConvergentSlices := 0
+  converges := Path.refl 0
 
 /-- Data for the gap theorem in the slice filtration. -/
 structure GapTheorem (F : SliceFiltration.{u}) where
@@ -109,14 +112,18 @@ structure GapTheorem (F : SliceFiltration.{u}) where
   gapStart : Nat
   /-- Upper bound of the vanishing gap. -/
   gapEnd : Nat
-  /-- The gap property: gapStart ≤ gapEnd. -/
-  gapHolds : True
+  /-- The width of the gap `gapEnd - gapStart`. -/
+  gapWidth : Nat
+  /-- The gap property `gapStart ≤ gapEnd`, recorded as the computational path
+      `gapStart + gapWidth = gapEnd`. -/
+  gapHolds : Path (gapStart + gapWidth) gapEnd
 
 /-- Trivial gap theorem for the trivial filtration. -/
 noncomputable def trivialGapTheorem : GapTheorem trivialSliceFiltration where
   gapStart := 0
   gapEnd := 0
-  gapHolds := trivial
+  gapWidth := 0
+  gapHolds := Path.refl 0
 
 /-! ## Norm maps -/
 
@@ -128,15 +135,18 @@ structure NormMap where
   target : Type u
   /-- The underlying map. -/
   map : source → target
-  /-- Multiplicativity constraint. -/
-  multiplicative : True
+  /-- The obstruction to multiplicativity of the norm map. -/
+  multDefect : Nat
+  /-- Multiplicativity of the norm map, recorded as a vanishing path. -/
+  multiplicative : Path multDefect 0
 
 /-- The trivial norm map on the unit spectrum. -/
 noncomputable def trivialNormMap : NormMap.{u} where
   source := PUnit
   target := PUnit
   map := fun _ => PUnit.unit
-  multiplicative := trivial
+  multDefect := 0
+  multiplicative := Path.refl 0
 
 /-! ## Summary
 

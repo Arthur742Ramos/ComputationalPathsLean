@@ -88,17 +88,25 @@ theorem wedge_assoc_four (EA : PathExteriorAlg A) {a : A}
 
 /-! ## Grading -/
 
-/-- Grade of a path in the exterior algebra. -/
+/-- Grade of a path in the exterior algebra: a certificate carrying the computed
+    grade together with a genuine `Nat` path identifying it with the declared
+    grade `k` (replacing the earlier `grade_witness : True` placeholder). -/
 structure HasGrade (EA : PathExteriorAlg A) {a : A}
-    (p : Path a a) (k : Nat) : Prop where
-  grade_witness : True
+    (p : Path a a) (k : Nat) where
+  /-- The grade computed for `p`. -/
+  gradeValue : Nat
+  /-- The computed grade matches the declared grade `k`. -/
+  grade_eq : Path gradeValue k
 
 /-- Wedge product of grade-k and grade-l element has grade k+l. -/
-theorem grade_add (EA : PathExteriorAlg A) {a : A}
+noncomputable def grade_add (EA : PathExteriorAlg A) {a : A}
     (p q : Path a a) (k l : Nat)
-    (_hk : HasGrade EA p k) (_hl : HasGrade EA q l) :
-    HasGrade EA (EA.wedge p q) (k + l) :=
-  ⟨trivial⟩
+    (hk : HasGrade EA p k) (hl : HasGrade EA q l) :
+    HasGrade EA (EA.wedge p q) (k + l) where
+  gradeValue := hk.gradeValue + hl.gradeValue
+  grade_eq :=
+    Path.trans (Path.congrArg (· + hl.gradeValue) hk.grade_eq)
+      (Path.congrArg (k + ·) hl.grade_eq)
 
 /-! ## Determinant via exterior algebra -/
 

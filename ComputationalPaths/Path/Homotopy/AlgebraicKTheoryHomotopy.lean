@@ -305,8 +305,11 @@ structure WaldhausenSConstruction (C : WaldhausenCategory) where
 structure WaldhausenSExists (C : WaldhausenCategory) where
   /-- The S-construction data. -/
   sConstruction : WaldhausenSConstruction C
-  /-- The levels are n-step filtrations. -/
-  levels_are_filtrations : True
+  /-- The number of filtration steps recorded at each simplicial level. -/
+  filtrationSteps : Nat → Nat
+  /-- The `n`-th level is an `n`-step filtration: its step count equals `n`,
+      a genuine computational path at every level. -/
+  levels_are_filtrations : ∀ n, Path (filtrationSteps n) n
 
 /-! ## K-Theory Space -/
 
@@ -322,8 +325,11 @@ structure KTheorySpace (C : WaldhausenCategory) where
   loopSpace : Type u
   /-- K-groups as homotopy groups. -/
   kGroup : (n : Nat) → Type u
-  /-- K₀ is the Grothendieck group. -/
-  k0_is_grothendieck : True
+  /-- The failure of cancellativity obstructing group completion at `K₀`. -/
+  grothendieckDefect : Nat
+  /-- `K₀` is the Grothendieck group: the completion obstruction vanishes,
+      a computational path. -/
+  k0_is_grothendieck : Path grothendieckDefect 0
 
 /-- The Waldhausen additivity theorem structure:
     given a cofibration sequence of exact functors, the induced map on

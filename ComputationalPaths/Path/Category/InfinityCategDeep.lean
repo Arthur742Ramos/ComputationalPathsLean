@@ -84,14 +84,6 @@ structure InnerHorn (X : SSet.{u}) (n : Nat) (k : Fin (n + 2)) where
   compat : ∀ (i j : Fin (n + 2)) (hi : i ≠ k) (hj : j ≠ k),
     i.val < j.val → HornCompatibilityCert X n k faces i j hi hj
 
-/-- Compatibility accessor that preserves the previous `True`-shaped API. -/
-noncomputable def InnerHorn.compatTrue
-    {X : SSet.{u}} {n : Nat} {k : Fin (n + 2)}
-    (_horn : InnerHorn X n k)
-    (i j : Fin (n + 2)) (_hi : i ≠ k) (_hj : j ≠ k)
-    (_hij : i.val < j.val) : True :=
-  True.intro
-
 /-- Path between two visible horn faces extracted from the compatibility data. -/
 noncomputable def InnerHorn.compatPath
     {X : SSet.{u}} {n : Nat} {k : Fin (n + 2)}
@@ -151,12 +143,6 @@ structure CompositionWitness (Q : QuasiCategory.{u}) (pair : ComposablePair Q) w
   composite : Q.obj 1
   triangle : Q.obj 2
   compositeCert : CompositionCert Q pair composite
-
-/-- Compatibility accessor preserving the previous `True`-shaped witness API. -/
-noncomputable def CompositionWitness.isComposite
-    {Q : QuasiCategory.{u}} {pair : ComposablePair Q}
-    (_w : CompositionWitness Q pair) : True :=
-  True.intro
 
 /-- Concrete path from the left edge of a composable pair to the chosen composite. -/
 noncomputable def CompositionWitness.compositePathFromLeft

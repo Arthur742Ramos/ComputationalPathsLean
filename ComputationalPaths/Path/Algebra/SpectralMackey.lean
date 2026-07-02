@@ -73,8 +73,15 @@ structure FiniteGSet (G : Type u) (S : StrictGroup G) where
   carrier : Type v
   /-- Action of G on the carrier. -/
   action : GroupAction G S carrier
-  /-- Finiteness witness (abstract). -/
-  finite : True
+  /-- Cardinality of the finite carrier. -/
+  cardinality : Nat
+  /-- Sum of the sizes of the G-orbits. -/
+  orbitSizeSum : Nat
+  /-- Finiteness witness: the carrier decomposes into finitely many orbits, so its
+      cardinality equals the sum of the orbit sizes (the orbit-decomposition
+      identity) — a genuine `Nat` computational path (replacing the `True`
+      placeholder). -/
+  finite : Path cardinality orbitSizeSum
 
 namespace FiniteGSet
 
@@ -222,8 +229,12 @@ structure TambaraFunctor (G : Type u) (S : StrictGroup G)
   /-- Norm composition (abstract). -/
   norm_comp : ∀ {X Y Z : FiniteGSet.{u, v} G S}
     (_ : FiniteGSetHom X Y) (_ : FiniteGSetHom Y Z), True
-  /-- Distributivity of norms with transfers (abstract). -/
-  norm_distrib : True
+  /-- Obstruction to norm/transfer distributivity (the exponential-diagram defect). -/
+  distribDefect : Nat
+  /-- Distributivity of norms with transfers: the distributivity obstruction
+      vanishes — a genuine `Nat` computational path (replacing the `True`
+      placeholder). -/
+  norm_distrib : Path distribDefect 0
 
 /-! ## Dress induction -/
 

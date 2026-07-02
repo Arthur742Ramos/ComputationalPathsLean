@@ -151,8 +151,12 @@ structure FrobVerRelation (p : Nat) (R : Type u) where
   ops : WittRingOps R
   /-- Scalar multiplication by p. -/
   scalarP : PTypicalWittVector p R → BigWittVector R
-  /-- FV relation witness (structural). -/
-  fv_relation : True
+  /-- The scalar realised by the Frobenius–Verschiebung composite `F ∘ V`. -/
+  fvScalar : Nat
+  /-- Frobenius–Verschiebung relation `F ∘ V = p · id`: the composite acts as
+      multiplication by the prime `p`, so its scalar equals `p` — a genuine `Nat`
+      computational path (replacing the `True` placeholder). -/
+  fv_relation : Path fvScalar p
 
 /-! ## Teichmüller Lift -/
 

@@ -132,7 +132,7 @@ theorem toRW_cancel :
 theorem wp_ex1 : ExprRwEq (.trans (.trans (.atom 0) (.atom 1)) (.atom 2))
     (.trans (.atom 0) (.trans (.atom 1) (.atom 2))) := by
   rw [← toRW_eq_iff_exprRwEq]
-  native_decide
+  decide
 
 /-- Two non-equivalent expressions. -/
 theorem wp_ex2 : ¬ ExprRwEq (.atom 0) (.atom 1) := by
@@ -143,7 +143,7 @@ theorem wp_ex2 : ¬ ExprRwEq (.atom 0) (.atom 1) := by
 /-- Reflexivity example. -/
 theorem wp_ex3 : ExprRwEq (.trans (.atom 0) .refl) (.atom 0) := by
   rw [← toRW_eq_iff_exprRwEq]
-  native_decide
+  decide
 
 /-! ## Polygraph Dimension Summary -/
 
@@ -210,13 +210,13 @@ theorem formalization_scale :
 /-- NbE on a deeply nested expression. -/
 theorem nbe_deep : NormByEval.nbe
     (.trans (.trans (.atom 0) (.symm (.atom 0))) (.atom 1)) = .atom 1 := by
-  native_decide
+  rfl
 
 /-- NbE on a large cancellation chain. -/
 theorem nbe_cancel_chain : NormByEval.nbe
     (.trans (.atom 0) (.trans (.symm (.atom 0))
       (.trans (.atom 1) (.trans (.symm (.atom 1)) (.atom 2))))) = .atom 2 := by
-  native_decide
+  rfl
 
 /-- NbE agrees with canon on a complex expression. -/
 theorem nbe_canon_agree :
