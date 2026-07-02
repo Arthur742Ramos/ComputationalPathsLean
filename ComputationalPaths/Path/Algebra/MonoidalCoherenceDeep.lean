@@ -163,11 +163,15 @@ noncomputable def pentagonPath2 (a b c d : MObj) :
       (MonPath.single (MonStep.assocR a (b ⊗ₘ c) d))
       (MonPath.single (MonStep.tensorR a (MonStep.assocR b c d))))
 
-/-- Theorem 15: Pentagon — both paths well-typed with same endpoints. -/
+/-- Theorem 15: Pentagon coherence — both pentagon paths share endpoints, and
+    those endpoints collapse to the same `flatten` normal form (associativity of
+    generator concatenation).  This discharges the former decorative `True`
+    conclusion into a genuine equation of flattenings. -/
 theorem pentagon_endpoints (a b c d : MObj) :
-    ∃ (p₁ p₂ : MonPath (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d) (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d)))),
-      True :=
-  ⟨pentagonPath1 a b c d, pentagonPath2 a b c d, trivial⟩
+    ∃ (_p₁ _p₂ : MonPath (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d) (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d)))),
+      (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d).flatten = (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d))).flatten :=
+  ⟨pentagonPath1 a b c d, pentagonPath2 a b c d, by
+    simp [MObj.flatten, List.append_assoc]⟩
 
 -- ============================================================
 -- §8  Triangle identity
@@ -349,10 +353,16 @@ noncomputable def hexagonPath2 (a b c : MObj) :
       (BrMonPath.congrArg_tensorR b
         (BrMonPath.step (BraidMonStep.braid a c) (BrMonPath.refl _))))
 
-/-- Theorem 37: Both hexagon paths share source and target. -/
+/-- Theorem 37: Both hexagon paths share source and target, and — since
+    braiding only permutes generators — their endpoints carry the same number of
+    generators.  This discharges the former decorative `True` into a genuine
+    length invariant (the braided-coherence analogue of the `flatten` invariant,
+    which is not itself preserved because braiding reorders generators). -/
 theorem hexagon_endpoints (a b c : MObj) :
-    ∃ (p₁ p₂ : BrMonPath ((a ⊗ₘ b) ⊗ₘ c) (b ⊗ₘ (c ⊗ₘ a))), True :=
-  ⟨hexagonPath1 a b c, hexagonPath2 a b c, trivial⟩
+    ∃ (_p₁ _p₂ : BrMonPath ((a ⊗ₘ b) ⊗ₘ c) (b ⊗ₘ (c ⊗ₘ a))),
+      ((a ⊗ₘ b) ⊗ₘ c).flatten.length = (b ⊗ₘ (c ⊗ₘ a)).flatten.length :=
+  ⟨hexagonPath1 a b c, hexagonPath2 a b c, by
+    simp only [MObj.flatten, List.length_append]; omega⟩
 
 -- ============================================================
 -- §13  Symmetric monoidal: σ ∘ σ = id
