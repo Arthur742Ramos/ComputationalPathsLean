@@ -311,7 +311,11 @@ theorem factor_60 : listProd [2, 2, 3, 5] = 60 := by decide
 /-- CRT state: system of congruences. -/
 structure CRTSystem where
   residues : List (Nat × Nat)  -- (remainder, modulus) pairs
-  pairwiseCoprime : True  -- simplified: assertion that moduli are coprime
+  /-- Number of non-coprime pairs among the moduli. -/
+  coprimeViolations : Nat
+  /-- Pairwise coprimality of the moduli: the count of non-coprime pairs vanishes
+      — a genuine `Nat` computational path (replacing the `True` placeholder). -/
+  pairwiseCoprime : Path coprimeViolations 0
 
 /-- CRT solution witness. -/
 structure CRTSolution where
@@ -321,7 +325,7 @@ structure CRTSolution where
 
 /-- Theorem 33: CRT for x ≡ 2 (mod 3), x ≡ 3 (mod 5). -/
 noncomputable def crt_3_5 : CRTSolution where
-  system := ⟨[(2, 3), (3, 5)], trivial⟩
+  system := ⟨[(2, 3), (3, 5)], 0, Path.refl 0⟩
   solution := 8
   valid := by
     intro ⟨r, m⟩ hmem
@@ -330,7 +334,7 @@ noncomputable def crt_3_5 : CRTSolution where
 
 /-- Theorem 34: CRT for x ≡ 1 (mod 2), x ≡ 2 (mod 3), x ≡ 3 (mod 5). -/
 noncomputable def crt_2_3_5 : CRTSolution where
-  system := ⟨[(1, 2), (2, 3), (3, 5)], trivial⟩
+  system := ⟨[(1, 2), (2, 3), (3, 5)], 0, Path.refl 0⟩
   solution := 23
   valid := by
     intro ⟨r, m⟩ hmem

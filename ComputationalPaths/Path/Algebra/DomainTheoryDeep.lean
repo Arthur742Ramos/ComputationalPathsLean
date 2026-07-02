@@ -40,7 +40,12 @@ structure HasBot (A : Type u) (ord : LePath A) where
 /-- A directed set in a partial order -/
 structure Directed (A : Type u) (ord : LePath A) where
   carrier : Nat → A
-  nonempty : True
+  /-- A designated element witnessing non-emptiness of the directed set. -/
+  witness : A
+  /-- Non-emptiness: the directed set is inhabited, witnessed at base index `0`
+      — a genuine `A`-valued computational path (replacing the `True`
+      placeholder). -/
+  nonempty : Path witness (carrier 0)
   directed : ∀ i j, Sigma fun (k : Nat) =>
     PLift (ord.le (carrier i) (carrier k) ∧ ord.le (carrier j) (carrier k))
 
@@ -68,7 +73,8 @@ structure MonoFun {A : Type u} {B : Type v} (cA : CPO A) (cB : CPO B) (f : A →
 noncomputable def imageDirected {A : Type u} {B : Type v} (cA : CPO A) (cB : CPO B)
     (f : A → B) (mf : MonoFun cA cB f) (d : Directed A cA.ord) : Directed B cB.ord where
   carrier := fun i => f (d.carrier i)
-  nonempty := trivial
+  witness := f (d.carrier 0)
+  nonempty := Path.refl _
   directed := fun i j =>
     let ⟨k, ⟨hik, hjk⟩⟩ := d.directed i j
     ⟨k, ⟨mf.mono _ _ hik, mf.mono _ _ hjk⟩⟩
@@ -136,7 +142,8 @@ theorem chain_le_of_le {A : Type u} (cpo : CPO A) (c : Chain A cpo)
 /-- Convert a chain to a directed set -/
 noncomputable def chainToDirected {A : Type u} (cpo : CPO A) (c : Chain A cpo) : Directed A cpo.ord where
   carrier := c.elem
-  nonempty := trivial
+  witness := c.elem 0
+  nonempty := Path.refl _
   directed := fun i j =>
     ⟨i + j, ⟨chain_le_of_le cpo c i (i + j) (Nat.le_add_right i j),
              chain_le_of_le cpo c j (i + j) (Nat.le_add_left j i)⟩⟩

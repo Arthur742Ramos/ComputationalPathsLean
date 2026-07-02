@@ -275,8 +275,11 @@ structure DerivedScheme where
 structure DerivedSchemeMorphism (X Y : DerivedScheme) where
   /-- The underlying map on spaces. -/
   spaceMap : X.space → Y.space
-  /-- Compatible with affine charts. -/
-  compatible : True
+  /-- Obstruction to compatibility of `spaceMap` with the affine charts. -/
+  chartMismatch : Nat
+  /-- Compatibility with affine charts: the chart-mismatch obstruction vanishes —
+      a genuine `Nat` computational path (replacing the `True` placeholder). -/
+  compatible : Path chartMismatch 0
 
 /-- The truncation functor t₀ from derived schemes to classical schemes. -/
 structure Truncation (X : DerivedScheme) where

@@ -126,8 +126,12 @@ structure TreeMorphism (S T : PlanarTree) where
   edgeMap : Edge → Edge
   /-- Root preservation. -/
   root_pres : edgeMap S.root = T.root
-  /-- Number of edges is monotone (weak condition). -/
-  edge_compat : True
+  /-- Edge-count defect: how many more edges the target tree has than the source. -/
+  edgeDefect : Nat
+  /-- Edge monotonicity: a tree morphism does not decrease the edge count, so the
+      source edge count plus a defect equals the target edge count — a genuine
+      `Nat` computational path (replacing the `True` placeholder). -/
+  edge_compat : Path (S.edges.length + edgeDefect) T.edges.length
 
 /-- Path witness for root preservation. -/
 noncomputable def TreeMorphism.root_path {S T : PlanarTree} (f : TreeMorphism S T) :
@@ -138,7 +142,8 @@ noncomputable def TreeMorphism.root_path {S T : PlanarTree} (f : TreeMorphism S 
 noncomputable def TreeMorphism.id (T : PlanarTree) : TreeMorphism T T where
   edgeMap := fun e => e
   root_pres := rfl
-  edge_compat := trivial
+  edgeDefect := 0
+  edge_compat := Path.refl _
 
 /-- Composition of tree morphisms. -/
 noncomputable def TreeMorphism.comp {S T U : PlanarTree}
@@ -146,7 +151,11 @@ noncomputable def TreeMorphism.comp {S T U : PlanarTree}
     TreeMorphism S U where
   edgeMap := fun e => g.edgeMap (f.edgeMap e)
   root_pres := by rw [f.root_pres, g.root_pres]
-  edge_compat := trivial
+  edgeDefect := f.edgeDefect + g.edgeDefect
+  edge_compat :=
+    Path.trans
+      (Path.ofEq (Nat.add_assoc S.edges.length f.edgeDefect g.edgeDefect).symm)
+      (Path.trans (Path.congrArg (· + g.edgeDefect) f.edge_compat) g.edge_compat)
 
 /-- Path witness for composition root preservation. -/
 noncomputable def TreeMorphism.comp_root_path {S T U : PlanarTree}
