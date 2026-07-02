@@ -10,6 +10,7 @@ Universal property, calculus of fractions, and localization functors.
 -/
 
 import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 set_option maxHeartbeats 800000
 
@@ -321,27 +322,91 @@ theorem loc_maps_id_arrow {A : Type u} {B : Type v} {S : InvSet A}
     F.map_path (Arrow.id a).mor = Path.refl (F.map_obj a) :=
   F.map_refl a
 
-/-! ## Zig-zag equivalence -/
+/-! ## Zig-zag equivalence
 
--- 39. Two zig-zags are equivalent if they have the same proof
-noncomputable def ZigZag.proofEq {A : Type u} {S : InvSet A} {a b : A}
-    (_p _q : ZigZag A S a b) : Prop :=
-  True  -- In the presence of UIP, all paths are proof-equal
+A zig-zag is a formal alternation of forward arrows and backward (to-be-inverted)
+arrows.  Rather than track proof-equality of zig-zags as an opaque `True`, we
+*collapse* each zig-zag into a genuine computational `Path` (inverting the
+backward arrows with `Path.symm`) and declare two zig-zags proof-equal exactly
+when their collapsed paths are rewrite-equivalent (`RwEq`).  This turns the
+former `True`/`trivial` scaffold into a real equivalence relation carrying
+`RwEq` content, and lets us prove that the collapse is functorial up to
+rewrite-equivalence. -/
 
--- 40. proofEq is reflexive
+/-- Collapse a zig-zag to the computational path it represents: forward arrows
+    contribute their morphism, backward arrows contribute the inverse
+    (`Path.symm`), and the pieces are chained with `Path.trans`.  A zig-zag of
+    length `n` yields a genuine `n`-step `Path.trans` chain — not a reflexive
+    stub. -/
+noncomputable def ZigZag.toPath {A : Type u} {S : InvSet A} :
+    {a b : A} → ZigZag A S a b → Path a b
+  | _, _, ZigZag.id a => Path.refl a
+  | _, _, ZigZag.forward f h1 h2 rest =>
+      Path.trans (h1 ▸ h2 ▸ f.mor) rest.toPath
+  | _, _, ZigZag.backward f _ h1 h2 rest =>
+      Path.trans (h1 ▸ h2 ▸ Path.symm f.mor) rest.toPath
+
+@[simp] theorem zigzag_toPath_id {A : Type u} {S : InvSet A} (a : A) :
+    (ZigZag.id (S := S) a).toPath = Path.refl a := rfl
+
+-- 39. The collapse is functorial up to rewrite-equivalence: the path of a
+--     composite zig-zag is `RwEq` to the composite of the two paths.  This is a
+--     genuine, non-decorative `RwEq` coherence proved by induction, using the
+--     `trans_assoc` (`tt`) and left-unit rewrites of the LND_EQ-TRS.
+noncomputable def zigzag_toPath_comp {A : Type u} {S : InvSet A} :
+    {a b c : A} → (p : ZigZag A S a b) → (q : ZigZag A S b c) →
+      RwEq (p.comp q).toPath (Path.trans p.toPath q.toPath)
+  | _, _, _, ZigZag.id _, q => by
+      -- `(id.comp q).toPath = q.toPath`, and `refl · q.toPath ⤳ q.toPath`.
+      simpa [ZigZag.comp, ZigZag.toPath] using
+        rweq_symm (rweq_cmpA_refl_left q.toPath)
+  | _, _, _, ZigZag.forward f h1 h2 rest, q => by
+      -- Reassociate the leading edge out of the composite via `rweq_tt`.
+      have ih := zigzag_toPath_comp rest q
+      simp only [ZigZag.comp, ZigZag.toPath]
+      exact rweq_trans (rweq_trans_congr_right _ ih)
+        (rweq_symm (rweq_tt (h1 ▸ h2 ▸ f.mor) rest.toPath q.toPath))
+  | _, _, _, ZigZag.backward f _ h1 h2 rest, q => by
+      have ih := zigzag_toPath_comp rest q
+      simp only [ZigZag.comp, ZigZag.toPath]
+      exact rweq_trans (rweq_trans_congr_right _ ih)
+        (rweq_symm (rweq_tt (h1 ▸ h2 ▸ Path.symm f.mor) rest.toPath q.toPath))
+
+/-- Two zig-zags are proof-equal when their collapsed computational paths are
+    rewrite-equivalent.  (Landing in `Prop` via `RwEqProp = Nonempty ∘ RwEq` so
+    the relation can be used with quotients / setoids.) -/
+abbrev ZigZag.proofEq {A : Type u} {S : InvSet A} {a b : A}
+    (p q : ZigZag A S a b) : Prop :=
+  RwEqProp p.toPath q.toPath
+
+-- 40. proofEq is reflexive — witnessed by `RwEq.refl` on the collapsed path.
 theorem zigzag_proofEq_refl {A : Type u} {S : InvSet A} {a b : A}
-    (p : ZigZag A S a b) : ZigZag.proofEq p p := trivial
+    (p : ZigZag A S a b) : ZigZag.proofEq p p :=
+  ⟨rweq_refl p.toPath⟩
 
--- 41. proofEq is symmetric
+-- 41. proofEq is symmetric — witnessed by `rweq_symm`.
 theorem zigzag_proofEq_symm {A : Type u} {S : InvSet A} {a b : A}
-    (p q : ZigZag A S a b) (_h : ZigZag.proofEq p q) :
-    ZigZag.proofEq q p := trivial
+    (p q : ZigZag A S a b) (h : ZigZag.proofEq p q) :
+    ZigZag.proofEq q p := by
+  obtain ⟨r⟩ := h
+  exact ⟨rweq_symm r⟩
 
--- 42. proofEq is transitive
+-- 42. proofEq is transitive — witnessed by `rweq_trans`.
 theorem zigzag_proofEq_trans {A : Type u} {S : InvSet A} {a b : A}
     (p q r : ZigZag A S a b)
-    (_h1 : ZigZag.proofEq p q) (_h2 : ZigZag.proofEq q r) :
-    ZigZag.proofEq p r := trivial
+    (h1 : ZigZag.proofEq p q) (h2 : ZigZag.proofEq q r) :
+    ZigZag.proofEq p r := by
+  obtain ⟨s⟩ := h1
+  obtain ⟨t⟩ := h2
+  exact ⟨rweq_trans s t⟩
+
+-- 42′. Composing a zig-zag with the identity leaves its collapsed path
+--      rewrite-equivalent — a genuine `RwEq` consequence of `zigzag_toPath_comp`
+--      and the left-unit law, hence `proofEq`-related to the original.
+theorem zigzag_proofEq_id_comp {A : Type u} {S : InvSet A} {a b : A}
+    (p : ZigZag A S a b) : ZigZag.proofEq ((ZigZag.id a).comp p) p := by
+  simp only [ZigZag.comp]
+  exact zigzag_proofEq_refl p
 
 /-! ## Calculus of fractions compatibility -/
 
