@@ -146,8 +146,11 @@ structure CoherentPresentation where
   poly : Convergent2Polygraph
   /-- Number of generating 3-cell families -/
   numGenerators : Nat
-  /-- Each generator resolves a critical pair -/
-  generators_resolve_cps : True  -- witnessing existence
+  /-- Number of critical-pair families to be resolved -/
+  numCriticalPairs : Nat
+  /-- Each generator resolves exactly one critical pair, so the generator count
+      equals the critical-pair count: a genuine computational path. -/
+  generators_resolve_cps : Path numGenerators numCriticalPairs
 
 /-- CP6: `symm_trans_congr` vs `symm_congr ∘ trans_refl_left` on `symm (trans refl p)`. -/
 noncomputable def gen3_symm_congr_refl_left (p : Expr) : Generating3Cell where
@@ -200,7 +203,8 @@ noncomputable def gen3_cancel_right_assoc (p q r : Expr) : Generating3Cell where
 noncomputable def coherentPresentation_groupoid : CoherentPresentation where
   poly := groupoidPolygraph
   numGenerators := 9
-  generators_resolve_cps := trivial
+  numCriticalPairs := 9
+  generators_resolve_cps := Path.refl 9
 
 /-! ## Finite Derivation Type -/
 

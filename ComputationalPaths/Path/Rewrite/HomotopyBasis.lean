@@ -123,8 +123,6 @@ theorem reduceRwEqToBasis :
   | refl p =>
       exact Generated2Cells.refl p
   | step hs =>
-      have _ : True := by
-        cases hs <;> trivial
       exact Generated2Cells.basis (CriticalPairBasisCell.step hs)
   | symm _ ih =>
       exact Generated2Cells.symm ih
