@@ -188,9 +188,6 @@ noncomputable def SpectrumEquiv.refl (E : SpectrumObject) : SpectrumEquiv E E wh
 
 
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Summary -/
 
 end InfiniteLoopSpace

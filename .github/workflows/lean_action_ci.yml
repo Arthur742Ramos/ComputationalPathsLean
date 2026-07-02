@@ -7,6 +7,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  invariants:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Enforce proof-hygiene invariants (zero sorry / admit / custom axiom)
+        run: python3 scripts/check_invariants.py
+
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 120

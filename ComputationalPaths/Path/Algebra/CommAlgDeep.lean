@@ -325,26 +325,26 @@ noncomputable def height_zero_path : Path (idealHeight 0) 0 := Path.refl 0
 -- § 8. CRT and coprimality
 -- ============================================================
 
--- 42. Concrete: (6) + (10) = (2)  (via native_decide soundness)
-private def sum_6_10_eq : PIdeal.sum ⟨6⟩ ⟨10⟩ = ⟨2⟩ := by native_decide
+-- 42. Concrete: (6) + (10) = (2)  (via kernel `decide` soundness)
+private def sum_6_10_eq : PIdeal.sum ⟨6⟩ ⟨10⟩ = ⟨2⟩ := by decide
 
 noncomputable def sum_6_10_path : Path (PIdeal.sum ⟨6⟩ ⟨10⟩) ⟨2⟩ :=
   Path.mk [Step.mk _ _ sum_6_10_eq] sum_6_10_eq
 
 -- 43. Concrete: (6) ∩ (10) = (30)
-private def inter_6_10_eq : PIdeal.inter ⟨6⟩ ⟨10⟩ = ⟨30⟩ := by native_decide
+private def inter_6_10_eq : PIdeal.inter ⟨6⟩ ⟨10⟩ = ⟨30⟩ := by decide
 
 noncomputable def inter_6_10_path : Path (PIdeal.inter ⟨6⟩ ⟨10⟩) ⟨30⟩ :=
   Path.mk [Step.mk _ _ inter_6_10_eq] inter_6_10_eq
 
 -- 44. Concrete: (6) · (10) = (60)
-private def prod_6_10_eq : PIdeal.prod ⟨6⟩ ⟨10⟩ = ⟨60⟩ := by native_decide
+private def prod_6_10_eq : PIdeal.prod ⟨6⟩ ⟨10⟩ = ⟨60⟩ := by decide
 
 noncomputable def prod_6_10_path : Path (PIdeal.prod ⟨6⟩ ⟨10⟩) ⟨60⟩ :=
   Path.mk [Step.mk _ _ prod_6_10_eq] prod_6_10_eq
 
 -- 45. Concrete chain: (6)+(10) → (2) → (10)+(6) (symm of comm + concrete)
-private def sum_10_6_eq : PIdeal.sum ⟨10⟩ ⟨6⟩ = ⟨2⟩ := by native_decide
+private def sum_10_6_eq : PIdeal.sum ⟨10⟩ ⟨6⟩ = ⟨2⟩ := by decide
 
 noncomputable def sum_6_10_comm_chain : Path (PIdeal.sum ⟨6⟩ ⟨10⟩) (PIdeal.sum ⟨10⟩ ⟨6⟩) :=
   Path.trans sum_6_10_path

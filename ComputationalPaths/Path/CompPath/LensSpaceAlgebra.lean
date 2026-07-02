@@ -303,7 +303,7 @@ theorem l51_order :
     zpAdd 5 (by omega) (zpAdd 5 (by omega) (zpAdd 5 (by omega)
       (zpAdd 5 (by omega) l51_gen l51_gen) l51_gen) l51_gen) l51_gen =
     zpZero 5 (by omega) := by
-  native_decide
+  decide
 
 /-- Path for ℤ/5 order. -/
 def l51_order_path :

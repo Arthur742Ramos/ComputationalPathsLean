@@ -97,9 +97,6 @@ abbrev VnSelfMap (p : Prime) (n : Nat) : Type (u + 2) :=
   ChromaticHomotopy.PeriodicityData.{u} p n
 
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Summary -/
 
 -- We packaged finite p-local spectra, suspension self-maps, MU_+ nilpotence,

@@ -256,7 +256,7 @@ def torusStdCW : TorusCWData := { vertices := 1, edges := 2, faces := 1 }
 /-- The Euler characteristic computes from the CW data. -/
 theorem torusEuler_from_CW :
     (torusStdCW.vertices : Int) - torusStdCW.edges + torusStdCW.faces = torusEulerChar := by
-  native_decide
+  decide
 
 /-! ## n-dimensional Torus -/
 

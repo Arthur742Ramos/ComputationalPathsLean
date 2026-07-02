@@ -107,8 +107,5 @@ end HomologicalStability
 end Homotopy
 end Path
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 
 end ComputationalPaths

@@ -462,7 +462,4 @@ theorem formalConcat_empty_left {A : Type u} {a : A} (w : FormalWord A a) :
 
 end
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 end ComputationalPaths.Path.Homotopy.LoopSpaceDeep

@@ -323,9 +323,6 @@ theorem left_horn_cases (n : Nat) (k : Fin (n + 2)) (h : LeftHorn n k) :
     k.val = 0 ∨ InnerHorn n k :=
   h
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Summary
 
 We defined quasi-categories as inner Kan complexes, implemented composition

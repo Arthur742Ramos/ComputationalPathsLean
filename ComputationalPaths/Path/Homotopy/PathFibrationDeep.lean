@@ -490,7 +490,4 @@ theorem relativeLoopMul_assoc {A : Type u} {R : RelativeData A}
 
 end
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 end ComputationalPaths.Path.Homotopy.PathFibrationDeep

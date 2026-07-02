@@ -261,9 +261,6 @@ noncomputable def evenSphereCDGA (_n : Nat) : CDGA where
   diff_sq := fun _ _ => rfl
 
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Structural theorems -/
 
 /-- The trivial CDGA has unit components. -/

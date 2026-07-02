@@ -188,7 +188,7 @@ def pointBetti : BettiData where
 
 /-- Euler characteristic of a point is 1. -/
 theorem pointEuler : eulerCharacteristic pointBetti = 1 := by
-  native_decide
+  decide
 
 /-- Path witness for χ(point) = 1. -/
 noncomputable def pointEuler_path : Path (eulerCharacteristic pointBetti) 1 :=
@@ -202,7 +202,7 @@ def circleBetti : BettiData where
 
 /-- Euler characteristic of S¹ is 0. -/
 theorem circleEuler : eulerCharacteristic circleBetti = 0 := by
-  native_decide
+  decide
 
 /-- Path witness for χ(S¹) = 0. -/
 noncomputable def circleEuler_path : Path (eulerCharacteristic circleBetti) 0 :=
@@ -216,7 +216,7 @@ def sphere2Betti : BettiData where
 
 /-- Euler characteristic of S² is 2. -/
 theorem sphere2Euler : eulerCharacteristic sphere2Betti = 2 := by
-  native_decide
+  decide
 
 /-- Path witness for χ(S²) = 2. -/
 noncomputable def sphere2Euler_path : Path (eulerCharacteristic sphere2Betti) 2 :=
@@ -230,7 +230,7 @@ def torusBetti : BettiData where
 
 /-- Euler characteristic of T² is 0. -/
 theorem torusEuler : eulerCharacteristic torusBetti = 0 := by
-  native_decide
+  decide
 
 /-- Path witness for χ(T²) = 0. -/
 noncomputable def torusEuler_path : Path (eulerCharacteristic torusBetti) 0 :=

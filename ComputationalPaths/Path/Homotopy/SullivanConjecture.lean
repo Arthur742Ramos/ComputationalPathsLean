@@ -252,9 +252,6 @@ theorem mapPlus_is_pointed (X Y : Pointed.{u}) :
     (MapPlus X Y).carrier = PointedMap X Y := by
   rfl
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Summary -/
 
 -- We recorded data-level structures for the Sullivan conjecture, including

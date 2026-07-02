@@ -177,7 +177,7 @@ def XX_identity_ket1 : Path QubitState QubitState.ket1 QubitState.ket1 :=
 
 /-- Theorem 10: HH has length 2. -/
 theorem HH_length : HH_identity_ket0.length = 2 := by
-  native_decide
+  rfl
 
 /-- Theorem 11: X on |0⟩. -/
 def X_on_ket0 : Path QubitState QubitState.ket0 QubitState.ket1 :=
@@ -239,7 +239,7 @@ def CNOT_cubed_10 : Path TwoQubitState
 
 /-- Theorem 17: CNOT³ has length 3. -/
 theorem CNOT_cubed_length : CNOT_cubed_10.length = 3 := by
-  native_decide
+  rfl
 
 /-- Theorem 18: CNOT² = I on |10⟩ — round trip. -/
 def CNOT_squared_10 : Path TwoQubitState
@@ -269,7 +269,7 @@ def bell_prep_00 : Path TwoQubitState
 
 /-- Theorem 20: Bell preparation is 2 steps. -/
 theorem bell_prep_length : bell_prep_00.length = 2 := by
-  native_decide
+  rfl
 
 def stepHxI_10 : Step TwoQubitState
     (TwoQubitState.basis QubitState.ket1 QubitState.ket0)
@@ -308,7 +308,7 @@ def teleportation_protocol : Path ThreeQubitState ThreeQubitState.initial ThreeQ
 
 /-- Theorem 23: Teleportation is exactly 3 steps. -/
 theorem teleportation_length : teleportation_protocol.length = 3 := by
-  native_decide
+  rfl
 
 /-- Theorem 24: Alice's local operations (first 2 steps). -/
 def alice_part : Path ThreeQubitState ThreeQubitState.initial ThreeQubitState.afterH :=
@@ -438,7 +438,7 @@ def euler_decomposition : Path UnitaryState UnitaryState.arbitrary UnitaryState.
 
 /-- Theorem 34: Euler decomposition is 4 steps. -/
 theorem euler_decomposition_length : euler_decomposition.length = 4 := by
-  native_decide
+  rfl
 
 -- ============================================================
 -- §13  Circuit equivalences via Cell2
@@ -509,7 +509,7 @@ def error_correction_cycle : Path ParityState ParityState.initial ParityState.co
 
 /-- Theorem 44: Error correction is 4 steps. -/
 theorem error_correction_length : error_correction_cycle.length = 4 := by
-  native_decide
+  rfl
 
 -- ============================================================
 -- §16  Superdense coding
@@ -527,7 +527,7 @@ def superdense_coding : Path SuperdenseState SuperdenseState.shared_bell Superde
 
 /-- Theorem 46: Superdense coding is 2 steps. -/
 theorem superdense_length : superdense_coding.length = 2 := by
-  native_decide
+  rfl
 
 -- ============================================================
 -- §17  Gate symmetries via symm
@@ -563,7 +563,7 @@ def bell_roundtrip : Path TwoQubitState
 
 /-- Theorem 51: Bell roundtrip is 3 steps. -/
 theorem bell_roundtrip_length : bell_roundtrip.length = 3 := by
-  native_decide
+  rfl
 
 /-- Theorem 52: General circuit composition preserves length. -/
 theorem circuit_compose (p : Path α a b) (q : Path α b c) :

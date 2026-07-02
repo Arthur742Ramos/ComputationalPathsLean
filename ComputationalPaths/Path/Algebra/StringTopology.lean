@@ -244,8 +244,6 @@ theorem bracket_skew (G : GoldmanBracket Surface) (x y : G.loopClass) :
 
 end GoldmanBracket
 
-private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
-
 /-! ## Summary -/
 
 /-!

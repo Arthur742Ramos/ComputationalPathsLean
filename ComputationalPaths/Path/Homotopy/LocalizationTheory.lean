@@ -283,9 +283,6 @@ theorem every_object_local_empty (C : Category.{u}) (_W : C.Obj) :
     ∀ {X Y : C.Obj} (_f : C.Hom X Y) (_hf : False), False := by
   intro _ _ _ hf; exact hf
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Summary -/
 
 -- We have formalized:

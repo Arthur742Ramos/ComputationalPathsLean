@@ -225,9 +225,6 @@ This module provides the evaluated confluence interface for PathExpr rewrites:
 5. `eval_symm_rw_path` / `eval_trans_rw_*`: interactions with constructors
 -/
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 end ConfluenceProofPathExpr
 end Rewrite
 end Path

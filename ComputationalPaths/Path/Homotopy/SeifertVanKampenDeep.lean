@@ -486,7 +486,4 @@ theorem piOneGmap_mul {B C : Type u}
 
 end
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 end ComputationalPaths.Path.Homotopy.SeifertVanKampenDeep

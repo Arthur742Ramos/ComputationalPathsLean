@@ -392,9 +392,6 @@ noncomputable def localization_functor_path (C : QuasiCategory)
     Path (L.locFunctor.map.map 0) (L.locFunctor.map.map 0) :=
   Path.refl _
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 end InfinityCatDeep2
 end Homotopy
 end Path
