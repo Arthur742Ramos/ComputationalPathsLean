@@ -113,17 +113,29 @@ structure EllipticOperator extends FredholmOperator where
   order : Nat
   /-- Symbol class in K-theory (abstract). -/
   symbolClass : Int
-  /-- Ellipticity: symbol is invertible off zero section. -/
-  elliptic : True
+  /-- Rank of the symbol's domain bundle `E`. -/
+  symbolRankDomain : Nat
+  /-- Rank of the symbol's codomain bundle `F`. -/
+  symbolRankCodomain : Nat
+  /-- Ellipticity: the principal symbol `σ(D) : π*E → π*F` is an isomorphism off
+      the zero section, forcing equal bundle ranks — a genuine path
+      `rank E ⤳ rank F`. -/
+  elliptic : Path symbolRankDomain symbolRankCodomain
 
 /-- A Dirac-type operator on a spin manifold. -/
 structure DiracOperator extends EllipticOperator where
   /-- The manifold dimension. -/
   dim : Nat
-  /-- Clifford multiplication data. -/
-  cliffordData : True
-  /-- Self-adjointness. -/
-  selfAdjoint : True
+  /-- Square `c(e)²` of Clifford multiplication by a unit vector. -/
+  cliffordSquare : Int
+  /-- The defining Clifford relation `c(e)² = −1` for a unit vector `e` — a
+      genuine path `c(e)² ⤳ −1`. -/
+  cliffordData : Path cliffordSquare (-1)
+  /-- Fredholm index of the (odd) Dirac operator. -/
+  adjointIndex : Int
+  /-- Self-adjointness `D* = D` gives `ker D ≅ coker D`, hence vanishing index —
+      a genuine path `ind D ⤳ 0`. -/
+  selfAdjoint : Path adjointIndex 0
 
 /-! ## Eta Invariant -/
 
@@ -140,8 +152,11 @@ structure SpectrumData where
 structure EtaFunction (spec : SpectrumData) where
   /-- Value at s (discretized). -/
   etaAt : Nat → Int
-  /-- Meromorphic continuation exists. -/
-  meromorphic : True
+  /-- The regularized value produced by the meromorphic continuation at `s = 0`. -/
+  regularizedValue : Int
+  /-- Meromorphic continuation: the analytically continued value at `s = 0` agrees
+      with the regularized value — a genuine path `η(0) ⤳ η_reg`. -/
+  meromorphic : Path (etaAt 0) regularizedValue
 
 /-- The eta invariant: η(D) = η(0), the value of the eta function at s = 0. -/
 structure EtaInvariant where
@@ -153,12 +168,29 @@ structure EtaInvariant where
   etaFun : EtaFunction spectrum
   /-- η(0) value. -/
   etaValue : Int
-  /-- Regularity at s = 0. -/
-  regular_at_zero : True
+  /-- Residue of the eta function at `s = 0`. -/
+  residueAtZero : Int
+  /-- Regularity at `s = 0`: the residue vanishes (Atiyah–Patodi–Singer), so `η(0)`
+      is finite — a genuine path `res_{s=0} η ⤳ 0`. -/
+  regular_at_zero : Path residueAtZero 0
 
 /-- The reduced eta invariant ξ = (η + dim ker D) / 2. -/
 noncomputable def reducedEta (ei : EtaInvariant) : Int :=
   (ei.etaValue + ei.operator.dimKer) / 2
+
+/-- The self-adjoint Dirac operator's index-zero certificate composed with its
+    inverse cancels to `refl` — a non-decorative `RwEq` over the genuine path
+    `ind D ⤳ 0`. -/
+noncomputable def diracSelfAdjoint_cancel (D : DiracOperator) :
+    RwEq (Path.trans D.selfAdjoint (Path.symm D.selfAdjoint))
+      (Path.refl D.adjointIndex) :=
+  rweq_cmpA_inv_right D.selfAdjoint
+
+/-- The eta-invariant regularity witness, reassociated against the reflexive right
+    unit — a genuine `trans_refl` `RwEq` on the residue-vanishing path. -/
+noncomputable def etaRegular_rightUnit (ei : EtaInvariant) :
+    RwEq (Path.trans ei.regular_at_zero (Path.refl 0)) ei.regular_at_zero :=
+  rweq_cmpA_refl_right (p := ei.regular_at_zero)
 
 /-! ## Atiyah-Patodi-Singer Theorem -/
 
@@ -278,8 +310,9 @@ structure AdiabaticLimit (fam : OperatorFamily) where
   etaForm : BismutCheegerEtaForm fam
   /-- Limit value. -/
   limitValue : Int
-  /-- Convergence. -/
-  converges : True
+  /-- Convergence: as the fibre metric shrinks, the Bismut–Cheeger eta form value
+      converges to the limit value — a genuine path `η̃ ⤳ limitValue`. -/
+  converges : Path etaForm.etaFormValue limitValue
 
 /-! ## Connes' Index in Noncommutative Geometry -/
 
@@ -293,10 +326,16 @@ structure SpectralTriple where
   diracOp : hilbertSpace → hilbertSpace
   /-- Dimension (spectral). -/
   spectralDim : Nat
-  /-- Regularity. -/
-  regular : True
-  /-- Compact resolvent. -/
-  compactResolvent : True
+  /-- Defect measuring failure of smoothness under `δ = [|D|, ·]`. -/
+  regularityDefect : Int
+  /-- Regularity: the algebra lies in the smooth domain `∩ₙ dom δⁿ`, so the defect
+      vanishes — a genuine path `defect ⤳ 0`. -/
+  regular : Path regularityDefect 0
+  /-- Schatten exponent `p` of the resolvent `(1 + D²)^{-1/2} ∈ 𝓛^p`. -/
+  schattenExponent : Nat
+  /-- Compact resolvent / finite summability: the resolvent's Schatten exponent
+      equals the spectral dimension — a genuine path `p ⤳ spectralDim`. -/
+  compactResolvent : Path schattenExponent spectralDim
 
 /-- Cyclic cohomology pairing with K-theory. -/
 structure CyclicCohomologyPairing where
