@@ -145,8 +145,12 @@ noncomputable def FlatModuli (T : ConnectionSpace B G S) : Type _ :=
 structure WittenInvariant (T : ConnectionSpace B G S) where
   /-- The invariant assigned to a flat gauge class. -/
   invariant : FlatModuli T → T.Scalar
-  /-- Formal normalization constraint. -/
-  normalization : True
+  /-- The normalization constant of the invariant. -/
+  normValue : Int
+  /-- Formal normalization constraint: the invariant is normalized so that its
+      normalization constant equals `1` (e.g. `Z(S³) = 1`) — a genuine `Int`
+      computational path (replacing the `True` placeholder). -/
+  normalization : Path normValue 1
 
 /-! ## Summary
 

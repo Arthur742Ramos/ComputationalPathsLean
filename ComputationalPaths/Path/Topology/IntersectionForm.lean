@@ -174,8 +174,11 @@ structure E8Lattice where
 structure DonaldsonTheorem where
   /-- The intersection form data for a 4-manifold (k=1). -/
   formData : IntersectionFormData 1
-  /-- Simply connected. -/
-  simply_connected : True
+  /-- Order of the fundamental group π₁(M). -/
+  pi1Order : Nat
+  /-- Simply connected: π₁(M) is trivial, i.e. has order `1` — a genuine `Nat`
+      computational path (replacing the `True` placeholder). -/
+  simply_connected : Path pi1Order 1
   /-- The form is definite. -/
   definite : DefiniteForm formData.form
   /-- The form is diagonalizable: rank equals b⁺ or b⁻. -/

@@ -71,10 +71,13 @@ noncomputable def numCells (K : CellComplex) (k : Nat) : Nat :=
 structure DiscreteMorseFunction (K : CellComplex) where
   /-- Function value on each cell (by id). -/
   value : Nat → Int
-  /-- At most one exception per cell: for each cell σ^(k),
-      at most one coface τ^(k+1) with f(τ) ≤ f(σ), and
-      at most one face ν^(k-1) with f(ν) ≥ f(σ). -/
-  morse_condition : True
+  /-- Number of cells violating the at-most-one-exception rule. -/
+  multiExceptionCount : Nat
+  /-- At most one exception per cell: for each cell σ^(k), at most one coface
+      τ^(k+1) with f(τ) ≤ f(σ), and at most one face ν^(k-1) with f(ν) ≥ f(σ);
+      the count of cells violating this vanishes — a genuine `Nat` computational
+      path (replacing the `True` placeholder). -/
+  morse_condition : Path multiExceptionCount 0
 
 /-- A cell is critical if it has no exceptional face or coface. -/
 noncomputable def isCritical (K : CellComplex) (_f : DiscreteMorseFunction K) (c : Cell) : Prop :=

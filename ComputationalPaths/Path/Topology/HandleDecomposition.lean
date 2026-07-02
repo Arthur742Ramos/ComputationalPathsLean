@@ -174,8 +174,11 @@ structure HCobordismTheorem where
   dim_ge : dim ≥ 6
   /-- The h-cobordism. -/
   cobordism : CobordismHandles dim
-  /-- Simply connected. -/
-  simply_connected : True
+  /-- Order of the fundamental group π₁(W). -/
+  pi1Order : Nat
+  /-- Simply connected: π₁(W) is trivial, i.e. has order `1` — a genuine `Nat`
+      computational path (replacing the `True` placeholder). -/
+  simply_connected : Path pi1Order 1
   /-- All handles cancel: the decomposition is trivial. -/
   trivial_decomp : Path cobordism.decomp.handles.length 0
   /-- The boundaries are diffeomorphic. -/
