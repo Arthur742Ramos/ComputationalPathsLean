@@ -377,15 +377,19 @@ theorem symm_symm (p : Path a b) : Path.symm (Path.symm p) = p := by
 -- §13  Coherence: whiskering and interchange
 -- ============================================================
 
-/-- Theorem 45 – left whiskering with refl produces refl. -/
+/-- Theorem 45 – left whiskering with `refl` produces `refl`: the identity
+    2-cell on `p ⬝ q` is idempotent under vertical composition
+    (`trans h h = h`), discharging the former decorative `True`. -/
 theorem whiskerL_refl_path2 (p : Path a b) (q : Path b c) :
-    ∃ _ : Path2 (Path.trans p q) (Path.trans p q), True :=
-  ⟨Path2.refl2 _, trivial⟩
+    ∃ h : Path2 (Path.trans p q) (Path.trans p q), Path2.trans h h = h :=
+  ⟨Path2.refl2 _, rfl⟩
 
-/-- Theorem 46 – right whiskering preserves refl. -/
+/-- Theorem 46 – right whiskering preserves `refl`: the identity 2-cell on `p`
+    is idempotent under vertical composition (`trans h h = h`), discharging the
+    former decorative `True`. -/
 theorem whiskerR_preserves_refl (p : Path a b) :
-    ∃ _ : Path2 p p, True :=
-  ⟨Path2.refl2 p, trivial⟩
+    ∃ h : Path2 p p, Path2.trans h h = h :=
+  ⟨Path2.refl2 p, rfl⟩
 
 -- ============================================================
 -- §14  Groupoid morphisms (functors between groupoids)

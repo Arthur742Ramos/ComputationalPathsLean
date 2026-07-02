@@ -185,10 +185,14 @@ noncomputable def trianglePath2 (a b : MObj) :
     (MonPath.single (MonStep.assocR a .unit b))
     (MonPath.single (MonStep.tensorR a (MonStep.unitL b)))
 
-/-- Theorem 18: Triangle — both paths well-typed with same endpoints. -/
+/-- Theorem 18: Triangle coherence — both triangle paths share endpoints and
+    those endpoints collapse to the same `flatten` normal form, the fundamental
+    monoidal coherence invariant.  This discharges the former decorative `True`
+    conclusion into a genuine equation of flattenings. -/
 theorem triangle_endpoints (a b : MObj) :
-    ∃ (p₁ p₂ : MonPath ((a ⊗ₘ .unit) ⊗ₘ b) (a ⊗ₘ b)), True :=
-  ⟨trianglePath1 a b, trianglePath2 a b, trivial⟩
+    ∃ (_p₁ _p₂ : MonPath ((a ⊗ₘ .unit) ⊗ₘ b) (a ⊗ₘ b)),
+      ((a ⊗ₘ .unit) ⊗ₘ b).flatten = (a ⊗ₘ b).flatten :=
+  ⟨trianglePath1 a b, trianglePath2 a b, by simp [MObj.flatten, List.append_nil]⟩
 
 -- ============================================================
 -- §9  Coherence via the flatten invariant

@@ -356,8 +356,9 @@ noncomputable def associator_eq_refl_cert {α R} {a b c d : α}
 
 theorem associator_eq_refl {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
-    ∃ _h : Cell2 α R (comp0 (comp0 p q) r) (comp0 p (comp0 q r)), True := by
-  exact ⟨(associator_eq_refl_cert p q r).witness, True.intro⟩
+    ∃ _h : Cell2 α R (comp0 (comp0 p q) r) (comp0 p (comp0 q r)),
+      comp0 (comp0 p q) r = comp0 p (comp0 q r) :=
+  ⟨(associator_eq_refl_cert p q r).witness, comp0_assoc p q r⟩
 
 /-- The associator inverse. -/
 noncomputable def associatorInv {α R} {a b c d : α}
@@ -411,8 +412,8 @@ noncomputable def leftUnitor_exists_cert {α R} {a b : α} (p : SPath α R a b) 
   rhsTrace := rfl
 
 theorem leftUnitor_exists {α R} {a b : α} (p : SPath α R a b) :
-    ∃ _h : Cell2 α R (comp0 (id1 a) p) p, True := by
-  exact ⟨(leftUnitor_exists_cert p).witness, True.intro⟩
+    ∃ _h : Cell2 α R (comp0 (id1 a) p) p, comp0 (id1 a) p = p :=
+  ⟨(leftUnitor_exists_cert p).witness, comp0_nil_left p⟩
 
 /-- Theorem 23: Right unitor exists. -/
 noncomputable def rightUnitor_exists_cert {α R} {a b : α} (p : SPath α R a b) :
@@ -425,8 +426,8 @@ noncomputable def rightUnitor_exists_cert {α R} {a b : α} (p : SPath α R a b)
   rhsTrace := rfl
 
 theorem rightUnitor_exists {α R} {a b : α} (p : SPath α R a b) :
-    ∃ _h : Cell2 α R (comp0 p (id1 b)) p, True := by
-  exact ⟨(rightUnitor_exists_cert p).witness, True.intro⟩
+    ∃ _h : Cell2 α R (comp0 p (id1 b)) p, comp0 p (id1 b) = p :=
+  ⟨(rightUnitor_exists_cert p).witness, comp0_nil_right p⟩
 
 /-- Left unitor inverse. -/
 noncomputable def leftUnitorInv {α R} {a b : α} (p : SPath α R a b) :
@@ -530,8 +531,8 @@ theorem pentagon_level1 {α R} {a b c d e : α}
     ∃ _w : Cell2 α R
       (comp0 (comp0 (comp0 p q) r) s)
       (comp0 p (comp0 q (comp0 r s))),
-    True := by
-  exact ⟨(pentagon_level1_cert p q r s).witness, True.intro⟩
+    comp0 (comp0 (comp0 p q) r) s = comp0 p (comp0 q (comp0 r s)) :=
+  ⟨(pentagon_level1_cert p q r s).witness, pentagon_level0 p q r s⟩
 
 /-- Theorem 30: Pentagon at level 2 — 3-cell witness for pentagon coherence. -/
 noncomputable def pentagon_level2_cert {α R} {a b c d e : α}
