@@ -215,8 +215,6 @@ theorem lipschitz_stability {X : Type u} (f g : X -> Nat) (L : Nat)
   dsimp [interleavingDistance]
   exact Nat.zero_le L
 
-private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
-
 /-! ## Summary -/
 
 -- We recorded persistence module interfaces, distances d_B and d_I, q-tame

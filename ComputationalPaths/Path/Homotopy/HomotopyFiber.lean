@@ -183,9 +183,6 @@ noncomputable def fibrationEquiv_right_inv_path {P : B → Type u} (b : B)
   fiberEquivFamily_right_inv_path (P := P) b x
 
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Summary
 
 We defined homotopy fibers as fibers of maps, packaged the associated fiber

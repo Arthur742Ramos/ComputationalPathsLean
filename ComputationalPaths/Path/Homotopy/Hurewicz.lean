@@ -983,9 +983,6 @@ theorem H1_nontrivial_implies_pi1_nontrivial {A : Type u} {a : A}
   exact hne this
 
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Summary
 
 This module establishes the Hurewicz theorem:

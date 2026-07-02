@@ -1,67 +1,47 @@
 # ComputationalPaths — Axiom & Typeclass Inventory
 
-> Auto-generated 2026-02-18.  Covers every `axiom` declaration in the
-> project source tree and every typeclass whose instantiation status is
-> tracked.
+> Last corrected 2026-07-01 (hand-verified against the source tree).
 
 ---
 
-## §1  Lean `axiom` declarations (30 total)
+## §1  Lean `axiom` declarations — **none**
 
-### 1.1  HoTT axioms — Higher Inductive Type constructors (9)
+The project is **axiom-free**: there are **zero** custom `axiom` declarations in
+the source tree.  You can verify this at any time:
 
-| # | File | Name | Purpose |
-|---|------|------|---------|
-| 1 | `Path/Algebra/HigherInductiveDeep.lean:31` | `S1.loop` | The non-trivial loop on the circle `S¹` |
-| 2 | `Path/Algebra/HigherInductiveDeep.lean:106` | `Interval.seg` | Path from `Interval.zero` to `Interval.one` |
-| 3 | `Path/Algebra/HigherInductiveDeep.lean:160` | `Susp.merid` | Meridian path in the suspension `Susp A` |
-| 4 | `Path/Algebra/HigherInductiveDeep.lean:262` | `QType.glue` | Gluing path for quotient types `A/R` |
-| 5 | `Path/Algebra/HigherInductiveDeep.lean:312` | `Pushout.glue` | Gluing path in pushouts `A ⊔_C B` |
-| 6 | `Path/Algebra/HigherInductiveDeep.lean:369` | `Coeq.glue` | Gluing path in coequalizers |
-| 7 | `Path/Algebra/HigherInductiveDeep.lean:413` | `Torus.loopA` | First generator loop on the torus |
-| 8 | `Path/Algebra/HigherInductiveDeep.lean:414` | `Torus.loopB` | Second generator loop on the torus |
-| 9 | `Path/Algebra/HigherInductiveDeep.lean:417` | `Torus.surface` | 2-cell filling `loopA·loopB = loopB·loopA` |
+```bash
+grep -rnE "^axiom " ComputationalPaths --include="*.lean" | grep -v ".lake"
+# (no output — the only textual match is a docstring in ContractibilityIrrelevance.lean)
+```
 
-### 1.2  HoTT axioms — Univalence (8)
+An earlier revision of this document listed 30 `axiom` declarations (HoTT higher
+inductive-type constructors, univalence, propositional/n-truncation, and SKI
+combinator equations).  **Those axioms and the files that declared them have been
+removed** (`Path/Algebra/HigherInductiveDeep.lean`, `Path/HoTT/UnivalenceDeep.lean`,
+`Path/HoTT/UnivalencePaths.lean`, `Path/Homotopy/HigherInductiveTypes.lean`,
+`Path/Homotopy/TruncationTheory.lean`, `Path/Homotopy/UnivalenceApplications.lean`,
+`Path/Rewriting/CombinatorReductionDeep.lean`).  Removing them is a rigor
+improvement: the library now stands on Lean's kernel axioms alone.
 
-| # | File | Name | Purpose |
-|---|------|------|---------|
-| 10 | `Path/HoTT/UnivalenceDeep.lean:115` | `ua` | Univalence: equivalence → path of types (`Equiv' A B → Path A B`) |
-| 11 | `Path/HoTT/UnivalenceDeep.lean:116` | `ua_transport` | Transport along `ua e` computes as `e.toFun` |
-| 12 | `Path/HoTT/UnivalenceDeep.lean:118` | `ua_refl'` | `ua (Equiv'.refl A) = Path.refl A` |
-| 13 | `Path/HoTT/UnivalencePaths.lean:352` | `ua'` | Univalence (alternate equiv `≃ₚ` variant) |
-| 14 | `Path/HoTT/UnivalencePaths.lean:354` | `ua'_transport` | Transport computation for `ua'` |
-| 15 | `Path/HoTT/UnivalencePaths.lean:359` | `ua'_idEquiv` | `ua' idEquiv = refl` |
-| 16 | `Path/HoTT/UnivalencePaths.lean:364` | `ua'_comp` | `ua'` respects composition of equivalences |
-| 17 | `Path/HoTT/UnivalencePaths.lean:393` | `ua'_symm_transport` | Inverse transport along `ua'` |
+### Kernel-axiom footprint
 
-### 1.3  HoTT axioms — Univalence (function form) (1)
+Definitions and theorems depend only on the standard Lean/Mathlib kernel axioms:
 
-| # | File | Name | Purpose |
-|---|------|------|---------|
-| 18 | `Path/Homotopy/UnivalenceApplications.lean:42` | `univalence` | `IsEquiv (@idtoeqv A B)` — univalence as equivalence-of-maps |
+| Axiom | When it appears |
+|-------|-----------------|
+| `propext` | Propositional extensionality — used pervasively (e.g. via `Eq`/`Quot`). |
+| `Quot.sound` | Quotient soundness — `RwEq`/`Quot`-based constructions. |
+| `Classical.choice` | Only where classical/noncomputable Mathlib machinery is invoked. A **choice-free core** exists and is verified: e.g. `ContractibilityIrrelevance` and `compPathOmegaGroupoidIrrel` depend on `propext`/`Quot.sound` only. |
 
-### 1.4  Truncation axioms (9)
+Many core results are fully choice-free.  Check any declaration with:
 
-| # | File | Name | Purpose |
-|---|------|------|---------|
-| 19 | `Path/Homotopy/HigherInductiveTypes.lean:73` | `Trunc` (propositional) | Propositional truncation type former |
-| 20 | `Path/Homotopy/HigherInductiveTypes.lean:76` | `Trunc.mk` (propositional) | Constructor for propositional truncation |
-| 21 | `Path/Homotopy/HigherInductiveTypes.lean:79` | `Trunc.isProp` | All elements of `Trunc A` are equal |
-| 22 | `Path/Homotopy/HigherInductiveTypes.lean:82` | `Trunc.rec` | Eliminator for propositional truncation |
-| 23 | `Path/Homotopy/TruncationTheory.lean:58` | `Trunc` (n-truncation) | n-truncation type former `Trunc n A` |
-| 24 | `Path/Homotopy/TruncationTheory.lean:61` | `Trunc.mk` (n-truncation) | Constructor for n-truncation |
-| 25 | `Path/Homotopy/TruncationTheory.lean:64` | `Trunc.isOfHLevel` | `Trunc n A` has h-level `n` |
-| 26 | `Path/Homotopy/TruncationTheory.lean:68` | `Trunc.elim` | Eliminator for n-truncation (non-dependent) |
-| 27 | `Path/Homotopy/TruncationTheory.lean:72` | `Trunc.ind` | Dependent eliminator for n-truncation |
+```lean
+#print axioms <declarationName>
+```
 
-### 1.5  SKI combinator equations (3)
-
-| # | File | Name | Purpose |
-|---|------|------|---------|
-| 28 | `Path/Rewriting/CombinatorReductionDeep.lean:71` | `I_ax` | `I x = x` |
-| 29 | `Path/Rewriting/CombinatorReductionDeep.lean:72` | `K_ax` | `K x y = x` |
-| 30 | `Path/Rewriting/CombinatorReductionDeep.lean:73` | `S_ax` | `S x y z = (x z)(y z)` |
+> Note: `native_decide` (currently used in a small number of files) additionally
+> pulls `Lean.ofReduceBool` + `Lean.trustCompiler` into the trusted base of the
+> declarations that use it; prefer kernel `decide`/`rfl`/`omega` where possible.
 
 ---
 
@@ -78,9 +58,15 @@ These classes have concrete, `sorry`-free instances.
 | `HasGlueNaturalLoopRwEq` | `instHasGlueNaturalLoopRwEq_Wedge` | `Path/CompPath/PushoutCompPath.lean:345` | Wedge specialisation (`C = PUnit'`) |
 | `HasWedgeProvenanceEncode` | `instHasWedgeProvenanceEncode_FigureEight` | `Path/CompPath/FigureEight.lean:124` | Provenance tagging for figure-eight |
 | `HasDifferentialSquaredZero` | `(trivialPage r)` | `Path/Homotopy/AdamsSpectralSequence.lean:185` | Trivial spectral sequence page |
-| **`HasVcompAssoc`** | `instHasVcompAssoc_EqTwoCat` | `TwoCategoryInstances.lean` | **NEW** — `PLift Eq` 2-cells; proof irrelevance |
-| **`HasHcompFunctorial`** | `instHasHcompFunctorial_EqTwoCat` | `TwoCategoryInstances.lean` | **NEW** — `PLift Eq` 2-cells; proof irrelevance |
-| **`HasInterchange`** | `instHasInterchange_EqTwoCat` | `TwoCategoryInstances.lean` | **NEW** — `PLift Eq` 2-cells; proof irrelevance |
+| `HasVcompAssoc` | `instHasVcompAssoc_EqTwoCat` | `TwoCategoryInstances.lean` | `PLift Eq` 2-cells; proof irrelevance |
+| `HasHcompFunctorial` | `instHasHcompFunctorial_EqTwoCat` | `TwoCategoryInstances.lean` | `PLift Eq` 2-cells; proof irrelevance |
+| `HasInterchange` | `instHasInterchange_EqTwoCat` | `TwoCategoryInstances.lean` | `PLift Eq` 2-cells; proof irrelevance |
+
+> Honesty note: `HasCirclePiOneEncode`/`HasTorusPiOneEncode` establish that the
+> **winding-number model** of the loop quotient is `≃ ℤ` (resp. `ℤ×ℤ`).  The
+> identification of that model with the framework's own fundamental group is a
+> separate bridge (see `MayerVietoris.lean` `pi1Bridge`) and is **assumed**, not
+> proved — the headline `π₁(S¹) ≃ ℤ` should be read with that caveat.
 
 ---
 
@@ -153,7 +139,7 @@ but has not been carried out in this codebase.
 
 | Category | Count |
 |----------|-------|
-| `axiom` declarations | **30** |
+| custom `axiom` declarations | **0** (axiom-free) |
 | Instantiated typeclasses ✅ | **10** |
 | Impossible typeclasses ⛔ | **4** |
 | Blocked at Path level ⛔ | **3** |

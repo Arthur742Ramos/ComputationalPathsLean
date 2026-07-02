@@ -360,9 +360,6 @@ theorem whitehead_in_topos_holds (H : HypercompleteTopos)
     (heq : W.isEquivalence) : W.isEquivalence :=
   heq
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 end HigherToposDeep2
 end Homotopy
 end Path

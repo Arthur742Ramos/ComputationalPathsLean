@@ -192,15 +192,12 @@ noncomputable def finiteSerreClass : SerreClass where
     intro A B C ⟨n, _⟩ ⟨m, _⟩
     exact ⟨n + m + 1, ⟨fun _ => ⟨0, Nat.zero_lt_succ _⟩⟩⟩
 
-/-- Finiteness of pi_n(S^k) for odd k and n != k. -/
+-- Finiteness of pi_n(S^k) for odd k and n != k.
 -- DISABLED: HigherHomotopyGroups has universe issues
 -- theorem piN_sphere_finite_odd (n k : Nat) (_hk : Odd k) (_hneq : n = k → False)
 --     (a : Sphere k) :
 --     IsFinite (HigherHomotopy.PiN n (Sphere k) a) := by
 --   exact trivial
-
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
 
 /-! ## Summary -/
 

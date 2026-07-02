@@ -280,8 +280,6 @@ noncomputable def burnsideDressInduction (G : Type u) (S : StrictGroup G) :
   family := DressFamily.full G S
   induction := rfl
 
-private noncomputable def pathAnchor {A : Type u} (a : A) : Path a a := Path.refl a
-
 /-! ## Summary
 
 We introduced G-sets and equivariant maps, abstract Mackey and spectral

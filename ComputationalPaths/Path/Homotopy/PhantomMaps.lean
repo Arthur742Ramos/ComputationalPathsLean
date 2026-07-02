@@ -272,9 +272,6 @@ theorem gray_phantom_trivial {X : Pointed.{u}} {Y : Pointed.{u}}
 
 
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Summary -/
 
 /-!

@@ -224,11 +224,11 @@ theorem circComp_equiv_right {a b c : Nat}
 
 -- 17. AND with true is identity (on single bit)
 theorem and_true_right (x : Bool) : (x && true) = x := by
-  cases x <;> native_decide
+  cases x <;> rfl
 
 -- 18. AND with false is false
 theorem and_false_right (x : Bool) : (x && false) = false := by
-  cases x <;> native_decide
+  cases x <;> rfl
 
 -- 19. OR with false is identity
 theorem or_false_right (x : Bool) : x || false = x := by

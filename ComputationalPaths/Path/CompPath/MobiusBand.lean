@@ -142,7 +142,7 @@ def mobiusBandStdCW : MobiusBandCWData := {}
 
 theorem mobiusBandEuler_from_CW :
     (mobiusBandStdCW.vertices : Int) - mobiusBandStdCW.edges + mobiusBandStdCW.faces
-    = mobiusBandEulerChar := by native_decide
+    = mobiusBandEulerChar := by decide
 
 /-! ## Loop Space and Path Algebra -/
 

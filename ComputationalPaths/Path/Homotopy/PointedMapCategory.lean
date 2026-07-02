@@ -160,7 +160,4 @@ noncomputable def loopPtd (X : PtdType.{u}) : PtdType.{u} where
 end PointedMapCategory
 end Path
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 end ComputationalPaths

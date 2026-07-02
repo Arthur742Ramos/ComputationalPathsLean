@@ -236,9 +236,6 @@ noncomputable def stageZero_path (A : Type u) :
     Path ((WhiteheadStage A 0).cover) A :=
   Path.stepChain (stage_zero_is_space A)
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 end WhiteheadTower
 end Path
 end ComputationalPaths

@@ -144,9 +144,6 @@ theorem mvExactAtPieces
   simp [mvFold, mvConnecting, h]
 
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Summary
 
 We define the Mayer-Vietoris connecting and folding maps for a pushout cover

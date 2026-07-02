@@ -257,9 +257,6 @@ structure SpectrumSmash (E F : SpectrumTheory.Spectrum) where
     (E.level n).carrier → (F.level m).carrier →
     (result.level (n + m)).carrier
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-- The self-module's action is the ring's multiplication (a genuine definitional
     computation: the projection of `selfModule` reduces to `R.mul`). -/
 theorem selfModule_act_eq (R : RingSpectrum) :

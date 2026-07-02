@@ -451,7 +451,7 @@ theorem assoc_unit_tier_lifts_to_full_step_toEq
     (_hTier : AssocUnitTierCertificate.{u})
     (hpq : Rw p q) (hpr : Rw p r) :
     q.toEq = r.toEq :=
-  TerminationBridge.newman_toEq_confluence hpq hpr
+  TerminationBridge.rw_toEq_agree hpq hpr
 
 /-- Tier 2 confluence lifts to full-step `toEq` confluence. -/
 theorem symmetry_tier_lifts_to_full_step_toEq
@@ -459,7 +459,7 @@ theorem symmetry_tier_lifts_to_full_step_toEq
     (_hTier : SymmetryTierCertificate.{u})
     (hpq : Rw p q) (hpr : Rw p r) :
     q.toEq = r.toEq :=
-  TerminationBridge.newman_toEq_confluence hpq hpr
+  TerminationBridge.rw_toEq_agree hpq hpr
 
 /-- Tier 3 confluence lifts to full-step `toEq` confluence. -/
 theorem inverse_tier_lifts_to_full_step_toEq
@@ -467,7 +467,7 @@ theorem inverse_tier_lifts_to_full_step_toEq
     (_hTier : InverseTierCertificate.{u})
     (hpq : Rw p q) (hpr : Rw p r) :
     q.toEq = r.toEq :=
-  TerminationBridge.newman_toEq_confluence hpq hpr
+  TerminationBridge.rw_toEq_agree hpq hpr
 
 /-- Tier 4 confluence lifts to full-step `toEq` confluence. -/
 theorem congruence_tier_lifts_to_full_step_toEq
@@ -475,7 +475,7 @@ theorem congruence_tier_lifts_to_full_step_toEq
     (_hTier : CongruenceTierCertificate.{u})
     (hpq : Rw p q) (hpr : Rw p r) :
     q.toEq = r.toEq :=
-  TerminationBridge.newman_toEq_confluence hpq hpr
+  TerminationBridge.rw_toEq_agree hpq hpr
 
 /-- Combined layered certificate lifts to full-step `toEq` confluence. -/
 theorem layered_certificate_lifts_to_full_step_toEq
@@ -483,9 +483,15 @@ theorem layered_certificate_lifts_to_full_step_toEq
     (_hLayered : LayeredStepConfluenceCertificate.{u})
     (hpq : Rw p q) (hpr : Rw p r) :
     q.toEq = r.toEq :=
-  TerminationBridge.newman_toEq_confluence hpq hpr
+  TerminationBridge.rw_toEq_agree hpq hpr
 
-/-- Full-step confluence (at `toEq`) from the layered modular strategy. -/
+/-- "Full-step confluence" at the `toEq` (proof-irrelevant) level.
+
+⚠ This lands in `Eq` and reduces (via `rw_toEq_agree`) to the fact that `Rw`
+preserves `toEq`; it is **not** step-level confluence of the path rewrite
+system.  The `LayeredStepConfluenceCertificate`/`modular_decomposition_theorem`
+plumbing does not add content here.  Genuine confluence is
+`GroupoidConfluence.confluence` on `Expr`. -/
 theorem full_step_confluence_toEq_layered
     {A : Type u} {a b : A} {p q r : Path a b}
     (hpq : Rw p q) (hpr : Rw p r) :

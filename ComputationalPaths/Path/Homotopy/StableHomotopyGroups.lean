@@ -278,9 +278,6 @@ theorem primeTwo_val : primeTwo.val = 2 := rfl
 
 
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-- The J-homomorphism factors through imageOfJMap. -/
 theorem jHomomorphism_factors (n : Nat) (x : JSource n) :
     (imageOfJMap n x).elem = jHomomorphism n x := rfl

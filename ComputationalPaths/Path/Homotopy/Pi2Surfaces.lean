@@ -26,9 +26,6 @@ namespace Pi2Surfaces
 
 universe u
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 /-! ## Surface type representatives -/
 
 /-- Carrier model for the 2-sphere S². -/

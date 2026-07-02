@@ -215,17 +215,17 @@ structure BezoutWitness where
 /-- Theorem 15: Bezout witness for gcd(6,4) = 2. -/
 noncomputable def bezout_6_4 : BezoutWitness where
   a := 6; b := 4; gcd_val := 2; x := 1; y := -1
-  identity := by native_decide
+  identity := by decide
 
 /-- Theorem 16: Bezout witness for gcd(35,15) = 5. -/
 noncomputable def bezout_35_15 : BezoutWitness where
   a := 35; b := 15; gcd_val := 5; x := 1; y := -2
-  identity := by native_decide
+  identity := by decide
 
 /-- Theorem 17: Bezout witness for gcd(12,8) = 4. -/
 noncomputable def bezout_12_8 : BezoutWitness where
   a := 12; b := 8; gcd_val := 4; x := 1; y := -1
-  identity := by native_decide
+  identity := by decide
 
 /-! ## §9 Arithmetic rewrite paths (computational) -/
 
@@ -298,13 +298,13 @@ theorem listProd_cons (x : Nat) (xs : List Nat) :
     listProd (x :: xs) = x * listProd xs := rfl
 
 /-- Theorem 30: Factorization path for 12 = 2 * 2 * 3. -/
-theorem factor_12 : listProd [2, 2, 3] = 12 := by native_decide
+theorem factor_12 : listProd [2, 2, 3] = 12 := by decide
 
 /-- Theorem 31: Factorization path for 30 = 2 * 3 * 5. -/
-theorem factor_30 : listProd [2, 3, 5] = 30 := by native_decide
+theorem factor_30 : listProd [2, 3, 5] = 30 := by decide
 
 /-- Theorem 32: Factorization path for 60 = 2 * 2 * 3 * 5. -/
-theorem factor_60 : listProd [2, 2, 3, 5] = 60 := by native_decide
+theorem factor_60 : listProd [2, 2, 3, 5] = 60 := by decide
 
 /-! ## §11 Chinese Remainder Theorem -/
 
@@ -326,7 +326,7 @@ noncomputable def crt_3_5 : CRTSolution where
   valid := by
     intro ⟨r, m⟩ hmem
     simp [List.mem_cons, Prod.mk.injEq] at hmem
-    rcases hmem with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> native_decide
+    rcases hmem with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> decide
 
 /-- Theorem 34: CRT for x ≡ 1 (mod 2), x ≡ 2 (mod 3), x ≡ 3 (mod 5). -/
 noncomputable def crt_2_3_5 : CRTSolution where
@@ -335,7 +335,7 @@ noncomputable def crt_2_3_5 : CRTSolution where
   valid := by
     intro ⟨r, m⟩ hmem
     simp [List.mem_cons, Prod.mk.injEq] at hmem
-    rcases hmem with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> native_decide
+    rcases hmem with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩ <;> decide
 
 /-! ## §12 Quadratic Reciprocity Sketch -/
 
@@ -349,16 +349,16 @@ def legendreSymbol (a p : Nat) : Int :=
     else -1
 
 /-- Theorem 35: Legendre symbol (2 | 7) = 1 (2 is a QR mod 7). -/
-theorem legendre_2_7 : legendreSymbol 2 7 = 1 := by native_decide
+theorem legendre_2_7 : legendreSymbol 2 7 = 1 := by decide
 
 /-- Theorem 36: Legendre symbol (3 | 7) computation. -/
-theorem legendre_3_7 : legendreSymbol 3 7 = -1 := by native_decide
+theorem legendre_3_7 : legendreSymbol 3 7 = -1 := by decide
 
 /-- Quadratic reciprocity: for odd primes p, q, the Legendre symbols satisfy
     (p|q)(q|p) = (-1)^((p-1)/2 · (q-1)/2). We state this for concrete values.
     Theorem 37: QR check for (3|5)(5|3). -/
 theorem qr_3_5 : legendreSymbol 3 5 * legendreSymbol 5 3 =
-    if (3 - 1) / 2 * ((5 - 1) / 2) % 2 == 0 then 1 else -1 := by native_decide
+    if (3 - 1) / 2 * ((5 - 1) / 2) % 2 == 0 then 1 else -1 := by decide
 
 /-! ## §13 p-adic Valuation -/
 
@@ -375,19 +375,19 @@ def padicVal (p n : Nat) : Nat :=
     go n n
 
 /-- Theorem 38: v_2(8) = 3. -/
-theorem padic_2_8 : padicVal 2 8 = 3 := by native_decide
+theorem padic_2_8 : padicVal 2 8 = 3 := by decide
 
 /-- Theorem 39: v_2(12) = 2. -/
-theorem padic_2_12 : padicVal 2 12 = 2 := by native_decide
+theorem padic_2_12 : padicVal 2 12 = 2 := by decide
 
 /-- Theorem 40: v_3(27) = 3. -/
-theorem padic_3_27 : padicVal 3 27 = 3 := by native_decide
+theorem padic_3_27 : padicVal 3 27 = 3 := by decide
 
 /-- Theorem 41: v_5(100) = 2. -/
-theorem padic_5_100 : padicVal 5 100 = 2 := by native_decide
+theorem padic_5_100 : padicVal 5 100 = 2 := by decide
 
 /-- Theorem 42: v_2(0) = 0 (convention). -/
-theorem padic_zero : padicVal 2 0 = 0 := by native_decide
+theorem padic_zero : padicVal 2 0 = 0 := by decide
 
 /-! ## §14 p-adic valuation rewrite paths -/
 
@@ -527,16 +527,16 @@ def isPrime (n : Nat) : Bool :=
   decide (n ≥ 2) && ((List.range n).filter (fun d => decide (d ≥ 2) && n % d == 0)).length == 0
 
 /-- Theorem 61: 2 is prime. -/
-theorem two_prime : isPrime 2 = true := by native_decide
+theorem two_prime : isPrime 2 = true := by decide
 
 /-- Theorem 62: 3 is prime. -/
-theorem three_prime : isPrime 3 = true := by native_decide
+theorem three_prime : isPrime 3 = true := by decide
 
 /-- Theorem 63: 5 is prime. -/
-theorem five_prime : isPrime 5 = true := by native_decide
+theorem five_prime : isPrime 5 = true := by decide
 
 /-- Theorem 64: 7 is prime. -/
-theorem seven_prime : isPrime 7 = true := by native_decide
+theorem seven_prime : isPrime 7 = true := by decide
 
 /-! ## §19 Additional multi-step computational paths -/
 

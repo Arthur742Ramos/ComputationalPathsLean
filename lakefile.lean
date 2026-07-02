@@ -7,6 +7,7 @@ package «computational_paths» where
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4" @ "v4.24.0"
 
+@[default_target]
 lean_lib ComputationalPaths where
   roots := #[`ComputationalPaths,
     `ComputationalPaths.Path.Algebra,
@@ -26,6 +27,5 @@ lean_lib ComputationalPaths where
     `ComputationalPaths.Path.Transport,
     `ComputationalPaths.TypeFormers]
 
-@[default_target]
 lean_exe computational_paths where
   root := `Main

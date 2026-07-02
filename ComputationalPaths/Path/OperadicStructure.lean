@@ -443,9 +443,6 @@ noncomputable def associahedron_k4 {A : Type u} {a : A}
     Vec.split, LoopSpace.comp] using
       (RwEq.refl (LoopSpace.comp p (LoopSpace.comp q (LoopSpace.comp r s))))
 
-private noncomputable def pathAnchor {A : Type} (a : A) : Path a a :=
-  Path.refl a
-
 end OperadicStructure
 end Path
 end ComputationalPaths
