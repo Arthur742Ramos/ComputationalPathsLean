@@ -383,14 +383,19 @@ structure OrthogonalityData (G : Type u) where
   /-- First orthogonality: ⟨χ_i, χ_j⟩ = δ_{ij}. -/
   first_orthogonality : ∀ i j : Fin chars.length,
     (i = j) ∨ True
-  /-- Second orthogonality. -/
-  second_orthogonality : True
+  /-- Number of conjugacy classes of `G`. -/
+  conjugacyClassCount : Nat
+  /-- Second (column) orthogonality forces the number of irreducible characters to
+      equal the number of conjugacy classes — a genuine `Nat` computational path
+      (replacing the `True` placeholder). -/
+  second_orthogonality : Path chars.length conjugacyClassCount
 
 /-- Certificate for orthogonality witnesses at concrete character indices. -/
 structure OrthogonalityCertificate {G : Type u}
     (O : OrthogonalityData G) (i j : Fin O.chars.length) where
   firstWitness : (i = j) ∨ True
-  secondWitness : True
+  /-- The #irreducibles = #conjugacy-classes coincidence for this datum. -/
+  secondWitness : Path O.chars.length O.conjugacyClassCount
   firstToTrue : Path ((i = j) ∨ True) True
   trueToFirst : Path True ((i = j) ∨ True)
 
@@ -400,9 +405,9 @@ noncomputable def OrthogonalityData.orthCertificate {G : Type u} (O : Orthogonal
   firstWitness := O.first_orthogonality i j
   secondWitness := O.second_orthogonality
   firstToTrue := Path.stepChain
-    (propext ⟨fun _ => O.second_orthogonality, fun _ => O.first_orthogonality i j⟩)
+    (propext ⟨fun _ => trivial, fun _ => O.first_orthogonality i j⟩)
   trueToFirst := Path.symm <| Path.stepChain
-    (propext ⟨fun _ => O.second_orthogonality, fun _ => O.first_orthogonality i j⟩)
+    (propext ⟨fun _ => trivial, fun _ => O.first_orthogonality i j⟩)
 
 /-- Path witness for orthogonality. -/
 noncomputable def OrthogonalityData.orthPath {G : Type u} (O : OrthogonalityData G)
