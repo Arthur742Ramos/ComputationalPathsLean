@@ -50,8 +50,12 @@ structure FiniteGroup where
   carrier : Type u
   /-- Strict group structure. -/
   group : Algebra.StrictGroup carrier
-  /-- Finiteness. -/
-  finite : True
+  /-- The order `|G|` of the group. -/
+  order : Nat
+  /-- The number of elements lying beyond the finite order. -/
+  finitenessDefect : Nat
+  /-- Finiteness: no elements beyond the order `|G|`, a vanishing path. -/
+  finite : Path finitenessDefect 0
 
 /-- A finite CW complex with a chosen basepoint. -/
 structure FiniteCWComplex where

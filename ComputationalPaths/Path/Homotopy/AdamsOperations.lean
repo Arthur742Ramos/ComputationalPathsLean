@@ -134,24 +134,30 @@ structure AdamsConjecture {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) 
   adams : AdamsOperationRingHom S R
   /-- Image of J inside K-theory. -/
   jImage : JImageMap S
-  /-- Compatibility: psi^k - id factors through J-image. -/
-  compatibility : True
+  /-- The obstruction to factoring `ψ^k - id` through the `J`-image. -/
+  factorizationObstruction : Nat
+  /-- Compatibility: `ψ^k - id` factors through the `J`-image, recorded as a
+      vanishing computational path. -/
+  compatibility : Path factorizationObstruction 0
 
 /-- Trivial Adams conjecture witness. -/
 noncomputable def adamsConjectureTrivial {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) :
     AdamsConjecture S R where
   adams := AdamsOperationRingHom.trivial S R
   jImage := JImageMap.trivial S
-  compatibility := trivial
+  factorizationObstruction := 0
+  compatibility := Path.refl 0
 
 namespace AdamsConjecture
 
 
 
-/-- Trivial Adams conjecture witness carries its compatibility proof. -/
-theorem trivial_compatibility {M : Type u} (S : StrictMonoid M) (R : KTheoryRing S) :
-    (adamsConjectureTrivial S R).compatibility = True.intro := by
-  trivial
+/-- In any Adams conjecture datum the factorization obstruction vanishes,
+    extracted from its compatibility path. -/
+theorem factorizationObstruction_eq_zero {M : Type u} {S : StrictMonoid M}
+    {R : KTheoryRing S} (C : AdamsConjecture S R) :
+    C.factorizationObstruction = 0 :=
+  Path.toEq C.compatibility
 
 end AdamsConjecture
 

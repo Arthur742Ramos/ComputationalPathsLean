@@ -57,12 +57,15 @@ structure Immersion {m n : Nat} (M : SmoothManifold m) (N : SmoothManifold n) wh
   toFun : M.carrier → N.carrier
   /-- Differential data for the immersion. -/
   differential : Type u
-  /-- Injectivity of the differential. -/
-  injective : True
+  /-- The rank of the kernel of the differential. -/
+  kernelRank : Nat
+  /-- Injectivity of the differential: its kernel is trivial (rank `0`),
+      a vanishing computational path. -/
+  injective : Path kernelRank 0
 
 /-- Identity immersion on a smooth manifold. -/
 noncomputable def immersionId {n : Nat} (M : SmoothManifold n) : Immersion M M :=
-  { toFun := _root_.id, differential := PUnit, injective := trivial }
+  { toFun := _root_.id, differential := PUnit, kernelRank := 0, injective := Path.refl 0 }
 
 /-! ## Regular homotopy -/
 

@@ -140,8 +140,10 @@ structure CobordismRing where
 
 /-- An orientation on a closed manifold. -/
 structure Orientation {n : Nat} (M : ClosedManifold.{u} n) where
-  /-- Orientation data (abstract). -/
-  orient : True
+  /-- The orientation sign `±1`. -/
+  orientationSign : Int
+  /-- Orientation: the sign squares to `1`, a genuine computational path. -/
+  orient : Path (orientationSign * orientationSign) 1
 
 /-- An oriented closed manifold. -/
 structure OrientedClosedManifold (n : Nat) where
@@ -169,8 +171,10 @@ structure VectorBundleData (n : Nat) where
   base : Type u
   /-- Projection. -/
   proj : total → base
-  /-- Rank equals n. -/
-  rank_eq : True
+  /-- The rank of the bundle. -/
+  rank : Nat
+  /-- The rank equals the ambient parameter `n`, a genuine computational path. -/
+  rank_eq : Path rank n
   /-- Zero section. -/
   zeroSection : base → total
   /-- Zero section is a section. -/

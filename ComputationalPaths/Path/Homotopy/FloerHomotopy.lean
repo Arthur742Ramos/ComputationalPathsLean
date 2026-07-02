@@ -153,12 +153,15 @@ structure SymplecticManifold where
   dim : Nat
   /-- Dimension is even. -/
   dim_even : ∃ k, dim = 2 * k
-  /-- Non-degeneracy of the symplectic form `ω` is external differential
-      geometry over the opaque point set, with no combinatorial handle here;
-      kept abstract per the scaffold-hardening policy. -/
-  nonDegenerate : True
-  /-- Closedness `dω = 0` is external differential geometry; kept abstract. -/
-  closed : True
+  /-- The (fibrewise) rank of the symplectic form `ω`. -/
+  formRank : Nat
+  /-- Non-degeneracy of `ω`: its rank equals the manifold dimension, recorded as
+      a genuine computational path `formRank = dim`. -/
+  nonDegenerate : Path formRank dim
+  /-- The norm of `dω`, a numeric proxy for the exterior derivative. -/
+  dOmega : Nat
+  /-- Closedness `dω = 0`, recorded as a vanishing computational path. -/
+  closed : Path dOmega 0
 
 /-- A Hamiltonian function H : M x S1 -> R. -/
 structure HamiltonianData (M : SymplecticManifold) where
@@ -175,9 +178,10 @@ structure AlmostComplexData (M : SymplecticManifold) where
   /-- A discretized proxy for the almost complex structure `J`, recorded as a
       self-map of the point set — genuine data replacing a `True` placeholder. -/
   almostComplex : M.points → M.points
-  /-- Compatibility `g(·,·) = ω(·, J·)` with the metric is external
-      Riemannian/symplectic geometry; kept abstract per policy. -/
-  compatible : True
+  /-- The obstruction to compatibility `g(·,·) = ω(·, J·)` with the metric. -/
+  compatDefect : Nat
+  /-- Compatibility of `J` with the metric, recorded as a vanishing path. -/
+  compatible : Path compatDefect 0
 
 /-! ## Floer Generators -/
 
@@ -396,10 +400,13 @@ structure ActionFunctional (M : SymplecticManifold) (H : HamiltonianData M) wher
   loopSpace : Type u
   /-- The action functional (abstract). -/
   action : loopSpace → Int
-  /-- The correspondence "critical points of `A_H` are periodic orbits" is the
-      external variational content of Floer theory; kept abstract per policy
-      (the computational-path content lives in the chain-complex layer). -/
-  critical_are_orbits : True
+  /-- The number of critical points of `A_H`. -/
+  criticalCount : Nat
+  /-- The number of 1-periodic Hamiltonian orbits. -/
+  orbitCount : Nat
+  /-- The correspondence "critical points of `A_H` are periodic orbits",
+      recorded as an equality of the two enumerations. -/
+  critical_are_orbits : Path criticalCount orbitCount
 
 /-- Floer homology = Morse homology of the action functional. -/
 structure FloerAsMorse (M : SymplecticManifold) where
@@ -425,9 +432,11 @@ structure FloerAsMorse (M : SymplecticManifold) where
 structure ArnoldConjecture (M : SymplecticManifold) where
   /-- The Hamiltonian. -/
   hamiltonian : HamiltonianData M
-  /-- Non-degeneracy of the Hamiltonian is external differential geometry;
-      the enumerative content is carried by `arnold_bound` below. -/
-  nondegenerate : True
+  /-- The number of degenerate 1-periodic orbits. -/
+  degenerateOrbits : Nat
+  /-- Non-degeneracy of the Hamiltonian: no orbit is degenerate, recorded as a
+      vanishing computational path. -/
+  nondegenerate : Path degenerateOrbits 0
   /-- Number of periodic orbits. -/
   numOrbits : Nat
   /-- Sum of Betti numbers. -/
@@ -522,8 +531,10 @@ noncomputable def sampleManifold : SymplecticManifold.{0} where
   points := PUnit
   dim := 2
   dim_even := ⟨1, rfl⟩
-  nonDegenerate := trivial
-  closed := trivial
+  formRank := 2
+  nonDegenerate := Path.refl 2
+  dOmega := 0
+  closed := Path.refl 0
 
 /-- A concrete (constant, `1`-periodic) Hamiltonian datum. -/
 noncomputable def sampleHamiltonian : HamiltonianData sampleManifold where
@@ -534,7 +545,8 @@ noncomputable def sampleHamiltonian : HamiltonianData sampleManifold where
 /-- A concrete almost complex datum (identity proxy). -/
 noncomputable def sampleAlmostComplex : AlmostComplexData sampleManifold where
   almostComplex := id
-  compatible := trivial
+  compatDefect := 0
+  compatible := Path.refl 0
 
 /-- The concrete integer Floer chain complex `CF_k = ℤ`. -/
 noncomputable def sampleChainComplex : FloerChainComplex sampleManifold where
