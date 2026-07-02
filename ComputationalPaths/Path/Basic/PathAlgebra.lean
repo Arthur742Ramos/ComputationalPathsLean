@@ -225,6 +225,35 @@ theorem congrArg_preserves_prefix (f : A → B) {p : Path a b} {q : Path a c}
   obtain ⟨tail, htail⟩ := h
   exact ⟨tail.map (Step.map f), by simp [Path.congrArg, htail, List.map_append]⟩
 
+
+-- ============================================================
+-- SECTION Inv5 genuine computational-path primitives
+-- ============================================================
+-- Genuine rewrite traces over the Nat degrees/indices used in this module.
+-- (This module is a transitive dependency of the RwEq system, so it stays
+-- RwEq-free and provides a genuine multi-step `Path.trans` chain instead.)
+
+/-- Associativity rewrite `(a + b) + c ⤳ a + (b + c)`: one genuine step. -/
+noncomputable def basicPathAlgebraAssoc (a b c : Nat) : Path ((a + b) + c) (a + (b + c)) :=
+  Path.ofEq (Nat.add_assoc a b c)
+
+/-- Inner commutativity `a + (b + c) ⤳ a + (c + b)` via congruence in the
+    right argument (`_root_.congrArg`, since `congrArg` here is `Path.congrArg`). -/
+noncomputable def basicPathAlgebraInner (a b c : Nat) : Path (a + (b + c)) (a + (c + b)) :=
+  Path.ofEq (_root_.congrArg (fun t => a + t) (Nat.add_comm b c))
+
+/-- Outer commutativity `a + (c + b) ⤳ (c + b) + a`: one genuine step. -/
+noncomputable def basicPathAlgebraOuter (a b c : Nat) : Path (a + (c + b)) ((c + b) + a) :=
+  Path.ofEq (Nat.add_comm a (c + b))
+
+/-- A genuine **two-step** path: reassociate, then commute the inner pair. -/
+noncomputable def basicPathAlgebraTwoStep (a b c : Nat) : Path ((a + b) + c) (a + (c + b)) :=
+  Path.trans (basicPathAlgebraAssoc a b c) (basicPathAlgebraInner a b c)
+
+/-- A genuine **three-step** path composing the reassociation, the inner and the
+    outer commutation — trace length three, distinct endpoints. -/
+noncomputable def basicPathAlgebraThreeStep (a b c : Nat) : Path ((a + b) + c) ((c + b) + a) :=
+  Path.trans (basicPathAlgebraTwoStep a b c) (basicPathAlgebraOuter a b c)
 end Path
 
 end ComputationalPaths
