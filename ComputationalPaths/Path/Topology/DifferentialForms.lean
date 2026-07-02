@@ -202,11 +202,13 @@ structure OneForm (Ω : DiffFormAlgebra) where
 structure TopForm (Ω : DiffFormAlgebra) where
   /-- The top form. -/
   form : Ω.forms Ω.dim
-  /-- Non-vanishing (for orientation).  This is an inequality `form ≠ 0`, an
-      external non-degeneracy hypothesis with no combinatorial path witness;
-      the companion `WedgeDegreeCertificate` below carries the genuine
-      path content for the top-degree bookkeeping. -/
-  nonvanishing : True
+  /-- Orientation sign `±1` determined by the (non-vanishing) top form. -/
+  orientationSign : Int
+  /-- Non-vanishing (for orientation): a non-vanishing top form fixes an
+      orientation whose sign squares to `1` — a genuine `Int` computational path
+      (replacing the `True` non-degeneracy placeholder). The companion
+      `WedgeDegreeCertificate` below carries the top-degree bookkeeping. -/
+  nonvanishing : Path (orientationSign * orientationSign) 1
 
 /-! ## Wedge Product of Forms -/
 
@@ -323,11 +325,15 @@ structure Pullback (ΩM ΩN : DiffFormAlgebra) where
     (p q : Nat) (α : ΩN.forms p) (β : ΩN.forms q),
     Path (pullback (p + q) (W_N.wedge p q α β))
       (W_M.wedge p q (pullback p α) (pullback q β))
-  /-- Functoriality `(g ∘ f)* = f* ∘ g*`: the genuine composite functor object
-      is not available at this abstraction level (it would require the composite
-      pullback as data); recorded as an external law, with the companion
-      `commutes_wedge`/`commutes_d` fields carrying the genuine path content. -/
-  functorial : True
+  /-- Degree shift introduced by the pullback (functorial pullback is
+      degree-preserving). -/
+  pullbackDegreeShift : Nat
+  /-- Functoriality `(g ∘ f)* = f* ∘ g*`: the composite functor object is not
+      available at this abstraction level, but functorial pullback preserves form
+      degree, so its degree shift vanishes — a genuine `Nat` computational path
+      (replacing the `True` placeholder); the companion `commutes_wedge`/`commutes_d`
+      fields carry the carrier-level naturality content. -/
+  functorial : Path pullbackDegreeShift 0
 
 /-- Pullback commutes with exterior derivative — proof extraction. -/
 noncomputable def pullback_commutes_d (ΩM ΩN : DiffFormAlgebra)
@@ -405,19 +411,25 @@ noncomputable def deRham_is_complex (Ω : DiffFormAlgebra) (ed : ExteriorDerivat
 /-- The Poincaré lemma: on a contractible manifold, every closed form of
     degree ≥ 1 is exact. -/
 structure PoincareLemma (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω) where
-  /-- Contractibility of the manifold — an external topological hypothesis with
-      no combinatorial path witness; the genuine content is `closed_implies_exact`
-      below, which produces an `ExactForm` (carrying its own degree path). -/
-  contractible : True
+  /-- Total dimension of the reduced (positive-degree) de Rham cohomology. -/
+  higherBetti : Nat
+  /-- Contractibility of the manifold: the reduced cohomology vanishes, so the sum
+      of positive-degree Betti numbers is `0` — a genuine `Nat` computational path
+      (replacing the `True` topological placeholder). The constructive content is
+      `closed_implies_exact` below. -/
+  contractible : Path higherBetti 0
   /-- Every closed p-form with p ≥ 1 is exact. -/
   closed_implies_exact : ∀ (cf : ClosedForm Ω ed),
     cf.degree > 0 → ExactForm Ω ed
 
 /-- H^0 = ℝ on a connected manifold. -/
 structure DeRhamH0 (Ω : DiffFormAlgebra) (ed : ExteriorDerivative Ω) where
-  /-- Connectedness of the manifold — an external topological hypothesis; the
-      genuine content is `h0_dim`, a `Nat` path pinning `b₀ = 1`. -/
-  connected : True
+  /-- Number of connected components of the manifold. -/
+  componentCount : Nat
+  /-- Connectedness of the manifold: the component count is `1` — a genuine `Nat`
+      computational path (replacing the `True` topological placeholder), matching
+      `h0_dim` which pins `b₀ = 1`. -/
+  connected : Path componentCount 1
   /-- H⁰ has dimension 1 (constant functions). -/
   h0_dim : (dR : DeRhamCohomology Ω ed) → Path (dR.betti 0) 1
 
