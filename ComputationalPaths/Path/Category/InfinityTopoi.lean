@@ -341,6 +341,25 @@ theorem giraud_disjoint (T : InfinityTopos.{u,v}) :
     DisjointCoproducts T.carrier :=
   T.axioms.disjoint
 
+/-! ### Multi-step truncation paths and inverse rewrite coherences
+
+Truncations of a single object at two levels are connected through the object itself,
+yielding a genuine two-step computational path, and each truncation witness satisfies
+the LND_EQ-TRS inverse law `p ∘ symm p ▷ refl`. -/
+
+/-- Two-step path connecting the `n`- and `m`-truncations of `x` through `x`:
+  `τ≤n x ⤳ x ⤟ τ≤m x`. -/
+noncomputable def truncation_bridge_path (T : InfinityTopos.{u,v}) (n m : TruncLevel)
+  (x : T.carrier.Obj) :
+  Path ((truncationFunctor T n).obj x) ((truncationFunctor T m).obj x) :=
+  Path.trans (truncation_path T n x) (Path.symm (truncation_path T m x))
+
+/-- Right-inverse coherence for the truncation witness: `p ∘ symm p ▷ refl`. -/
+noncomputable def truncation_inv_right_rweq (T : InfinityTopos.{u,v}) (n : TruncLevel)
+  (x : T.carrier.Obj) :
+  RwEq (Path.trans (truncation_path T n x) (Path.symm (truncation_path T n x)))
+    (Path.refl ((truncationFunctor T n).obj x)) :=
+  RwEq.step (Step.trans_symm (truncation_path T n x))
 
 -- ============================================================
 -- SECTION Inv5 genuine computational-path primitives
@@ -382,4 +401,5 @@ noncomputable def categoryInfinityTopoiAssocCoh {α : Type} {a b c d : α}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     Path.RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   Path.rweq_tt p q r
+
 end ComputationalPaths.Path.Category.InfinityTopoi

@@ -450,6 +450,48 @@ noncomputable def config_path (pc : PlaneConfigData n) :
 
 end PlaneConfigData
 
+/-! ## Multi-step compositions and rewrite coherences
+
+The single-step permutation witnesses above (`comp_id_path`, `comp_assoc_path`,
+…) are not isolated: they compose into genuine multi-step computational paths
+and satisfy the groupoid rewrite coherences of the LND_EQ-TRS.  These
+constructions record traces of length ≥ 2 and use real rewrite rules
+(`p ∘ symm p ▷ refl`, `symm p ∘ p ▷ refl`), not decorative reflexivities. -/
+
+namespace Perm
+
+/-- A genuine **two-step** computational path stripping two trailing identity
+    factors from `(σ ∘ id) ∘ id`, landing on `σ` with a recorded trace of
+    length two. -/
+noncomputable def comp_id_id_path {n : Nat} (σ : Perm n) :
+    Path (comp (comp σ (id n)) (id n)) σ :=
+  Path.trans (comp_id_path (comp σ (id n))) (comp_id_path σ)
+
+/-- A genuine **two-step** path combining a unit law with associativity:
+    `((σ ∘ τ) ∘ ρ) ∘ id ⤳ (σ ∘ τ) ∘ ρ ⤳ σ ∘ (τ ∘ ρ)`.  The two endpoints are
+    genuinely distinct, so this is not a disguised reflexivity. -/
+noncomputable def assoc_after_unit_path {n : Nat} (σ τ ρ : Perm n) :
+    Path (comp (comp (comp σ τ) ρ) (id n)) (comp σ (comp τ ρ)) :=
+  Path.trans (comp_id_path (comp (comp σ τ) ρ)) (comp_assoc_path σ τ ρ)
+
+/-- Right-inverse coherence for the associativity witness: composing the
+    associativity path with its own inverse rewrites to reflexivity — a genuine
+    instance of the LND_EQ-TRS rule `p ∘ symm p ▷ refl`. -/
+noncomputable def assoc_path_inv_right_rweq {n : Nat} (σ τ ρ : Perm n) :
+    RwEq (Path.trans (comp_assoc_path σ τ ρ) (Path.symm (comp_assoc_path σ τ ρ)))
+      (Path.refl (comp (comp σ τ) ρ)) :=
+  RwEq.step (Step.trans_symm (comp_assoc_path σ τ ρ))
+
+/-- Left-inverse coherence for the associativity witness: the reversed
+    associativity path composed with the associativity path rewrites to
+    reflexivity (`symm p ∘ p ▷ refl`). -/
+noncomputable def assoc_path_inv_left_rweq {n : Nat} (σ τ ρ : Perm n) :
+    RwEq (Path.trans (Path.symm (comp_assoc_path σ τ ρ)) (comp_assoc_path σ τ ρ))
+      (Path.refl (comp σ (comp τ ρ))) :=
+  RwEq.step (Step.symm_trans (comp_assoc_path σ τ ρ))
+
+end Perm
+
 /-! ## Summary
 
 We have formalized:

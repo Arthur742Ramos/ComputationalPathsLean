@@ -45,33 +45,33 @@ expressions (never a reflexive `X = X` stub); they are reused below to assemble
 multi-step `Path.trans` chains and non-decorative `RwEq` coherences. -/
 
 /-- Associativity rewrite `(a + b) + c ⤳ a + (b + c)` over `Nat`: one genuine step. -/
-noncomputable def dAssoc (a b c : Nat) : Path ((a + b) + c) (a + (b + c)) :=
+noncomputable def gdp_dAssoc (a b c : Nat) : Path ((a + b) + c) (a + (b + c)) :=
   Path.ofEq (Nat.add_assoc a b c)
 
 /-- Commutativity rewrite `a + b ⤳ b + a`: one genuine step. -/
-noncomputable def dComm (a b : Nat) : Path (a + b) (b + a) :=
+noncomputable def gdp_dComm (a b : Nat) : Path (a + b) (b + a) :=
   Path.ofEq (Nat.add_comm a b)
 
 /-- Inner commutativity `a + (b + c) ⤳ a + (c + b)` via congruence in the right
     argument (note `_root_.congrArg`, since `congrArg` here is `Path.congrArg`). -/
-noncomputable def dInner (a b c : Nat) : Path (a + (b + c)) (a + (c + b)) :=
+noncomputable def gdp_dInner (a b c : Nat) : Path (a + (b + c)) (a + (c + b)) :=
   Path.ofEq (_root_.congrArg (fun t => a + t) (Nat.add_comm b c))
 
 /-- A genuine **two-step** path on a weight slice: reassociate, then commute the
     inner pair.  Its trace has length two — this is not a reflexive path. -/
-noncomputable def dTwoStep (a b c : Nat) : Path ((a + b) + c) (a + (c + b)) :=
-  Path.trans (dAssoc a b c) (dInner a b c)
+noncomputable def gdp_dTwoStep (a b c : Nat) : Path ((a + b) + c) (a + (c + b)) :=
+  Path.trans (gdp_dAssoc a b c) (gdp_dInner a b c)
 
 /-- The two-step slice path composed with its inverse cancels to the reflexive
     path — a non-decorative `RwEq` (the inverse-cancel rule on a length-two trace). -/
-noncomputable def dCancel (a b c : Nat) :
-    RwEq (Path.trans (dTwoStep a b c) (Path.symm (dTwoStep a b c)))
+noncomputable def gdp_dCancel (a b c : Nat) :
+    RwEq (Path.trans (gdp_dTwoStep a b c) (Path.symm (gdp_dTwoStep a b c)))
       (Path.refl ((a + b) + c)) :=
-  rweq_cmpA_inv_right (dTwoStep a b c)
+  rweq_cmpA_inv_right (gdp_dTwoStep a b c)
 
 /-- Associativity-of-composition (`trans_assoc`, the `tt` rewrite) on any three
     composable paths — a genuine `RwEq` between distinct bracketings. -/
-noncomputable def dAssocCoh {α : Type u} {a b c d : α}
+noncomputable def gdp_dAssocCoh {α : Type u} {a b c d : α}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   rweq_tt p q r
@@ -583,25 +583,25 @@ cancellations, all instantiated at CONCRETE numbers below. -/
 /-- Genuine two-step `Nat` path `a + (b + c) ⤳ a + (c + b) ⤳ (c + b) + a`
     (inner commutation, then outer commutation). -/
 noncomputable def dOuter (a b c : Nat) : Path (a + (b + c)) ((c + b) + a) :=
-  Path.trans (dInner a b c) (dComm a (c + b))
+  Path.trans (gdp_dInner a b c) (gdp_dComm a (c + b))
 
 /-- A genuine **three-step** path
     `(a + b) + c ⤳ a + (b + c) ⤳ a + (c + b) ⤳ (c + b) + a` (trace length three). -/
-noncomputable def dThreeStep (a b c : Nat) : Path ((a + b) + c) ((c + b) + a) :=
-  Path.trans (dAssoc a b c) (dOuter a b c)
+noncomputable def gdp_dThreeStep (a b c : Nat) : Path ((a + b) + c) ((c + b) + a) :=
+  Path.trans (gdp_dAssoc a b c) (dOuter a b c)
 
 /-- The three-step path composed with its inverse cancels to `refl` — a
     non-decorative `RwEq` on a length-three trace. -/
-noncomputable def dThreeCancel (a b c : Nat) :
-    RwEq (Path.trans (dThreeStep a b c) (Path.symm (dThreeStep a b c)))
+noncomputable def gdp_dThreeCancel (a b c : Nat) :
+    RwEq (Path.trans (gdp_dThreeStep a b c) (Path.symm (gdp_dThreeStep a b c)))
       (Path.refl ((a + b) + c)) :=
-  rweq_cmpA_inv_right (dThreeStep a b c)
+  rweq_cmpA_inv_right (gdp_dThreeStep a b c)
 
 /-- Right-unit coherence for the two-step degree path: appending `refl` is a
     genuine `RwEq` (the `cmpA_refl_right` rule) — not a reflexive stub. -/
 noncomputable def dTwoStep_runit (a b c : Nat) :
-    RwEq (Path.trans (dTwoStep a b c) (Path.refl (a + (c + b)))) (dTwoStep a b c) :=
-  rweq_cmpA_refl_right (dTwoStep a b c)
+    RwEq (Path.trans (gdp_dTwoStep a b c) (Path.refl (a + (c + b)))) (gdp_dTwoStep a b c) :=
+  rweq_cmpA_refl_right (gdp_dTwoStep a b c)
 
 /-- Genuine two-step `Int` path `(a + b) + c ⤳ a + (b + c) ⤳ a + (c + b)`. -/
 noncomputable def dIntTwoStep (a b c : Int) : Path ((a + b) + c) (a + (c + b)) :=
@@ -641,9 +641,9 @@ noncomputable def DeformationLawCertificate.ofWeights (a b c : Nat) :
   w₁ := b
   w₂ := c
   total := a + (b + c)
-  total_eq := Path.symm (dAssoc a b c)
-  slicePath := dTwoStep a b c
-  sliceCoh := dCancel a b c
+  total_eq := Path.symm (gdp_dAssoc a b c)
+  slicePath := gdp_dTwoStep a b c
+  sliceCoh := gdp_dCancel a b c
 
 /-- A concrete certificate with Hodge–Tate weights `0, 1, 2`: total `0+(1+2)`. -/
 noncomputable def sampleDeformationCertificate : DeformationLawCertificate :=
@@ -662,16 +662,16 @@ noncomputable def sampleDeformation_slice_coherence :
   sampleDeformationCertificate.sliceCoh
 
 /-- A `PathLawCertificate` (from `Topology.LawCertificates`) at concrete anchors,
-    built from the two-step weight path `dTwoStep 0 1 2 : Path ((0+1)+2) (0+(2+1))`,
+    built from the two-step weight path `gdp_dTwoStep 0 1 2 : Path ((0+1)+2) (0+(2+1))`,
     carrying its right-unit and inverse-cancel `RwEq` coherences. -/
 noncomputable def deformationPathLawCert :
     PathLawCertificate ((0 + 1) + 2) (0 + (2 + 1)) :=
-  PathLawCertificate.ofPath (dTwoStep 0 1 2)
+  PathLawCertificate.ofPath (gdp_dTwoStep 0 1 2)
 
 /-- A fully concrete length-two computational path at numbers `2, 3, 4`:
     `(2+3)+4 ⤳ 2+(3+4) ⤳ 2+(4+3)`. -/
 noncomputable def concreteWeightPath : Path ((2 + 3) + 4) (2 + (4 + 3)) :=
-  dTwoStep 2 3 4
+  gdp_dTwoStep 2 3 4
 
 end Algebra
 end Path

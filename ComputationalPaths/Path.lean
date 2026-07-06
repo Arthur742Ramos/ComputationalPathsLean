@@ -980,6 +980,7 @@ import ComputationalPaths.Path.Topology.StratifiedSpace
 import ComputationalPaths.Path.Topology.SuspensionPaths
 import ComputationalPaths.Path.Topology.SymplecticGeometry
 import ComputationalPaths.Path.Topology.TwistedKTheory
+import ComputationalPaths.Path.Topology.SpectraAlgebraDeep
 import ComputationalPaths.Path.TransportDeep
 import ComputationalPaths.Path.Homotopy.KillerExamples
 import ComputationalPaths.Path.Rewrite.ConfluenceDeepType
@@ -988,3 +989,5 @@ import ComputationalPaths.Path.OmegaGroupoid.EckmannHiltonProof
 import ComputationalPaths.Path.OmegaGroupoid.PentagonProof
 import ComputationalPaths.Path.OmegaGroupoid.OmegaWeakGroupoid
 import ComputationalPaths.Path.Algebra.DeformationDeep
+import ComputationalPaths.Path.ComputationDeep
+import ComputationalPaths.Path.LogicDeep
