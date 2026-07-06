@@ -52,6 +52,7 @@ import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.Step
 import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Rewrite.Rw
+import ComputationalPaths.Path.OmegaGroupoid.CoherencePathsDeep
 
 namespace ComputationalPaths
 namespace Path

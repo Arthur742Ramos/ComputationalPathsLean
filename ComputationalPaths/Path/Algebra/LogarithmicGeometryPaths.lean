@@ -47,33 +47,33 @@ expressions — never a reflexive `X = X` stub — and they are reused below to 
 multi-step `Path.trans` chains and non-decorative `RwEq` coherences. -/
 
 /-- Associativity rewrite `(a + b) + c ⤳ a + (b + c)` over `Nat`: one genuine step. -/
-noncomputable def dAssoc (a b c : Nat) : Path ((a + b) + c) (a + (b + c)) :=
+noncomputable def lgp_dAssoc (a b c : Nat) : Path ((a + b) + c) (a + (b + c)) :=
   Path.ofEq (Nat.add_assoc a b c)
 
 /-- Commutativity rewrite `a + b ⤳ b + a`: one genuine step. -/
-noncomputable def dComm (a b : Nat) : Path (a + b) (b + a) :=
+noncomputable def lgp_dComm (a b : Nat) : Path (a + b) (b + a) :=
   Path.ofEq (Nat.add_comm a b)
 
 /-- Inner commutativity `a + (b + c) ⤳ a + (c + b)` via congruence in the right
     argument (note `_root_.congrArg`, since `congrArg` here is `Path.congrArg`). -/
-noncomputable def dInner (a b c : Nat) : Path (a + (b + c)) (a + (c + b)) :=
+noncomputable def lgp_dInner (a b c : Nat) : Path (a + (b + c)) (a + (c + b)) :=
   Path.ofEq (_root_.congrArg (fun t => a + t) (Nat.add_comm b c))
 
 /-- A genuine **two-step** valuation path: reassociate, then commute the inner
     pair.  Its trace has length two — this is not a reflexive path. -/
-noncomputable def dTwoStep (a b c : Nat) : Path ((a + b) + c) (a + (c + b)) :=
-  Path.trans (dAssoc a b c) (dInner a b c)
+noncomputable def lgp_dTwoStep (a b c : Nat) : Path ((a + b) + c) (a + (c + b)) :=
+  Path.trans (lgp_dAssoc a b c) (lgp_dInner a b c)
 
 /-- The two-step path composed with its inverse cancels to the reflexive path — a
     non-decorative `RwEq` (the `trans_symm` rule on a length-two trace). -/
-noncomputable def dCancel (a b c : Nat) :
-    RwEq (Path.trans (dTwoStep a b c) (Path.symm (dTwoStep a b c)))
+noncomputable def lgp_dCancel (a b c : Nat) :
+    RwEq (Path.trans (lgp_dTwoStep a b c) (Path.symm (lgp_dTwoStep a b c)))
       (Path.refl ((a + b) + c)) :=
-  rweq_cmpA_inv_right (dTwoStep a b c)
+  rweq_cmpA_inv_right (lgp_dTwoStep a b c)
 
 /-- Associativity-of-composition (`trans_assoc`, the `tt` rewrite) on any three
     composable paths — a genuine `RwEq` between distinct bracketings. -/
-noncomputable def dAssocCoh {α : Type u} {a b c d : α}
+noncomputable def lgp_dAssocCoh {α : Type u} {a b c d : α}
     (p : Path a b) (q : Path b c) (r : Path c d) :
     RwEq (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r)) :=
   rweq_tt p q r
@@ -421,13 +421,13 @@ variable {X₁ : Type u} {M₁ : Type v} {X₂ : Type u} {M₂ : Type v}
     endpoints, a real `Nat.add_assoc` step (replaces the reflexive stubs). -/
 noncomputable def relDimAssoc (a b : Nat) :
     Path ((f.rel_dim + a) + b) (f.rel_dim + (a + b)) :=
-  dAssoc f.rel_dim a b
+  lgp_dAssoc f.rel_dim a b
 
 /-- Genuine **two-step** relative-dimension path
     `(dim f + a) + b ⤳ dim f + (a + b) ⤳ dim f + (b + a)`. -/
 noncomputable def relDimTwoStep (a b : Nat) :
     Path ((f.rel_dim + a) + b) (f.rel_dim + (b + a)) :=
-  dTwoStep f.rel_dim a b
+  lgp_dTwoStep f.rel_dim a b
 
 end LogSmoothMorphism
 
@@ -727,16 +727,16 @@ structure LogLawCertificate where
     (Path.refl ((v₀ + v₁) + v₂))
 
 /-- Build a logarithmic law certificate from three concrete contributions,
-    reusing the genuine primitives `dAssoc`, `dTwoStep`, `dCancel`. -/
+    reusing the genuine primitives `lgp_dAssoc`, `lgp_dTwoStep`, `lgp_dCancel`. -/
 noncomputable def LogLawCertificate.ofContributions (a b c : Nat) :
     LogLawCertificate where
   v₀ := a
   v₁ := b
   v₂ := c
   total := a + (b + c)
-  total_eq := Path.symm (dAssoc a b c)
-  slicePath := dTwoStep a b c
-  sliceCoh := dCancel a b c
+  total_eq := Path.symm (lgp_dAssoc a b c)
+  slicePath := lgp_dTwoStep a b c
+  sliceCoh := lgp_dCancel a b c
 
 /-- A concrete certificate: boundary multiplicities `1 + (2 + 3) = 6` along a
     three-component divisor, carrying genuine multi-step path content. -/
@@ -761,14 +761,14 @@ noncomputable def sampleLog_slice_coherence :
     with distinct endpoints at every stage. -/
 noncomputable def sampleLog_three_step :
     Path (((1 : Nat) + 2) + 3) ((3 + 2) + 1) :=
-  Path.trans (dAssoc 1 2 3) (Path.trans (dInner 1 2 3) (dComm 1 (3 + 2)))
+  Path.trans (lgp_dAssoc 1 2 3) (Path.trans (lgp_dInner 1 2 3) (lgp_dComm 1 (3 + 2)))
 
 /-- A `PathLawCertificate` (from `Topology.LawCertificates`) at concrete anchors,
-    built from the two-step valuation path `dTwoStep 1 2 3 : Path ((1+2)+3) (1+(3+2))`,
+    built from the two-step valuation path `lgp_dTwoStep 1 2 3 : Path ((1+2)+3) (1+(3+2))`,
     carrying its right-unit and inverse-cancel `RwEq` coherences. -/
 noncomputable def logPathLawCert :
     PathLawCertificate (((1 : Nat) + 2) + 3) (1 + (3 + 2)) :=
-  PathLawCertificate.ofPath (dTwoStep 1 2 3)
+  PathLawCertificate.ofPath (lgp_dTwoStep 1 2 3)
 
 end Algebra
 end Path

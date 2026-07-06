@@ -12,3 +12,6 @@ import ComputationalPaths.Path.Homotopy.VanKampenApplications
 import ComputationalPaths.Path.Homotopy.WhiteheadTheorem
 import ComputationalPaths.Path.Homotopy.LocalizationAtPrime
 import ComputationalPaths.Path.Homotopy.SmaleParadox
+import ComputationalPaths.Path.Homotopy.ModelCategoryDeep
+import ComputationalPaths.Path.Homotopy.PathFibrationDeep
+import ComputationalPaths.Path.Homotopy.SeifertVanKampenDeep

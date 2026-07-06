@@ -288,19 +288,19 @@ noncomputable def thom_path {A : Sort u} (thom : A → A) (a : A) :
   .cons (.thom_spectrum thom a) (.nil _)
 
 -- 35. Thom isomorphism
-noncomputable def thom_iso_path {A : Sort u} (thom : A → A) (a : A) :
+noncomputable def spectra_thom_iso_path {A : Sort u} (thom : A → A) (a : A) :
     SpectraPath (thom a) a :=
   .cons (.thom_iso thom a) (.nil _)
 
 -- 36. Thom naturality
 noncomputable def thom_naturality {A : Sort u} (thom f : A → A) (a : A) :
     SpectraPath (f (thom a)) (f a) :=
-  SpectraPath.congrArg f (thom_iso_path thom a)
+  SpectraPath.congrArg f (spectra_thom_iso_path thom a)
 
 -- 37. EM with Thom
 noncomputable def em_thom {A : Sort u} (em thom : A → A) (a : A) :
     SpectraPath (em (thom a)) (em a) :=
-  SpectraPath.congrArg em (thom_iso_path thom a)
+  SpectraPath.congrArg em (spectra_thom_iso_path thom a)
 
 -- ============================================================================
 -- Section 6: Spanier-Whitehead Duality
@@ -372,7 +372,7 @@ noncomputable def module_over_ring {A : Sort u} (mult act : A → A → A) (unit
 -- 49. Thom with suspension
 noncomputable def thom_susp {A : Sort u} (thom sigma : A → A) (a : A) :
     SpectraPath (sigma (thom a)) (sigma a) :=
-  SpectraPath.congrArg sigma (thom_iso_path thom a)
+  SpectraPath.congrArg sigma (spectra_thom_iso_path thom a)
 
 -- 50. EM localization
 noncomputable def em_localization {A : Sort u} (em loc : A → A) (a : A) :
@@ -382,7 +382,7 @@ noncomputable def em_localization {A : Sort u} (em loc : A → A) (a : A) :
 -- 51. Dual of Thom
 noncomputable def dual_thom {A : Sort u} (dual thom : A → A) (a : A) :
     SpectraPath (dual (thom a)) (dual a) :=
-  SpectraPath.congrArg dual (thom_iso_path thom a)
+  SpectraPath.congrArg dual (spectra_thom_iso_path thom a)
 
 -- 52. Full spectra chain: localize, smash, ring multiply
 noncomputable def spectra_full_chain {A : Sort u} (loc : A → A) (smash mult : A → A → A) (a b c : A) :
