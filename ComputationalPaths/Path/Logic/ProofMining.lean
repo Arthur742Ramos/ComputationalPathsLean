@@ -14,7 +14,9 @@ proof-theoretic bounds with Path coherences.
 | `DialecticaWitness`            | Witnessing data for Dialectica                 |
 | `MonotoneFunctional`           | Monotone functional interpretation             |
 | `ProofTheoreticBound`          | Extracted bounds with Path certificates        |
+| `BoundExtractionCertificate`   | Threshold/slack reconstruction certificate     |
 | `HerbrandWitness`              | Herbrand normal form data                      |
+| `HerbrandExtractionCertificate` | Selected witness and candidate-count evidence |
 
 ## References
 
@@ -143,6 +145,61 @@ structure ProofTheoreticBound where
   property : Nat → Nat → Prop
   valid : (k n : Nat) → n ≥ bound k → property k n
 
+/-- Reconstruct an admissible observation from its threshold and slack. -/
+noncomputable def bound_reconstruction_path
+    (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
+    Path (b.bound k + (n - b.bound k)) n :=
+  Path.ofEq (by omega)
+
+/-- A two-step extraction trace: reconstruct the observation, then place the
+    precision parameter before it in the extracted code. -/
+noncomputable def bound_extraction_trace
+    (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
+    Path ((b.bound k + (n - b.bound k)) + k) (k + n) :=
+  Path.trans
+    (Path.congrArg (fun m => m + k) (bound_reconstruction_path b k n hn))
+    (Path.ofEq (Nat.add_comm n k))
+
+/-- Extraction followed by reversal contracts to the original threshold code. -/
+noncomputable def bound_extraction_cancel_rweq
+    (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
+    RwEq
+      (Path.trans (bound_extraction_trace b k n hn)
+        (Path.symm (bound_extraction_trace b k n hn)))
+      (Path.refl ((b.bound k + (n - b.bound k)) + k)) :=
+  rweq_cmpA_inv_right (bound_extraction_trace b k n hn)
+
+/-- Quantitative certificate extracted from a proof-theoretic bound.
+
+Unlike `bound_path`, this record exposes the numerical threshold, the slack in
+the observed index, their reconstruction path, and a genuine two-step trace. -/
+structure BoundExtractionCertificate
+    (b : ProofTheoreticBound) (k n : Nat) where
+  threshold : Nat
+  slack : Nat
+  threshold_matches : Path threshold (b.bound k)
+  slack_matches : Path slack (n - threshold)
+  admissible : threshold ≤ n
+  reconstruction : Path (threshold + slack) n
+  extraction_trace : Path ((threshold + slack) + k) (k + n)
+  trace_coherence :
+    RwEq
+      (Path.trans extraction_trace (Path.symm extraction_trace))
+      (Path.refl ((threshold + slack) + k))
+
+/-- Construct the canonical threshold/slack certificate. -/
+noncomputable def bound_extraction_certificate
+    (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
+    BoundExtractionCertificate b k n where
+  threshold := b.bound k
+  slack := n - b.bound k
+  threshold_matches := Path.refl _
+  slack_matches := Path.refl _
+  admissible := hn
+  reconstruction := bound_reconstruction_path b k n hn
+  extraction_trace := bound_extraction_trace b k n hn
+  trace_coherence := bound_extraction_cancel_rweq b k n hn
+
 /-- Path from bound validity to True. -/
 noncomputable def bound_path (b : ProofTheoreticBound) (k n : Nat) (hn : n ≥ b.bound k) :
     Path (b.property k n : Prop) True :=
@@ -191,6 +248,52 @@ structure HerbrandWitness where
   witnesses : List Nat
   property : Nat → Nat → Prop
   valid : ∃ w, w ∈ witnesses ∧ property challenge w
+
+/-- A two-step catalogue trace built from the number of Herbrand candidates and
+    the challenge code. -/
+noncomputable def herbrand_selection_trace (h : HerbrandWitness) :
+    Path ((h.witnesses.length + h.challenge) + 1)
+      (h.witnesses.length + (1 + h.challenge)) :=
+  Path.trans
+    (Path.ofEq (Nat.add_assoc h.witnesses.length h.challenge 1))
+    (Path.ofEq (_root_.congrArg (fun n => h.witnesses.length + n)
+      (Nat.add_comm h.challenge 1)))
+
+/-- The candidate-count trace contracts after following it by its inverse. -/
+noncomputable def herbrand_selection_cancel_rweq (h : HerbrandWitness) :
+    RwEq
+      (Path.trans (herbrand_selection_trace h)
+        (Path.symm (herbrand_selection_trace h)))
+      (Path.refl ((h.witnesses.length + h.challenge) + 1)) :=
+  rweq_cmpA_inv_right (herbrand_selection_trace h)
+
+/-- Computationally useful replacement for merely recording Herbrand validity
+    as a path to `True`: it exposes the selected numeral, its list membership,
+    and the property that it realizes. -/
+structure HerbrandExtractionCertificate (h : HerbrandWitness) where
+  selected : Nat
+  selected_mem : selected ∈ h.witnesses
+  selected_valid : h.property h.challenge selected
+  witness_count : Nat
+  witness_count_matches : Path witness_count h.witnesses.length
+  selection_trace :
+    Path ((witness_count + h.challenge) + 1)
+      (witness_count + (1 + h.challenge))
+  trace_coherence :
+    RwEq
+      (Path.trans selection_trace (Path.symm selection_trace))
+      (Path.refl ((witness_count + h.challenge) + 1))
+
+/-- Extract the canonical certificate from the existential Herbrand witness. -/
+noncomputable def herbrand_extraction_certificate (h : HerbrandWitness) :
+    HerbrandExtractionCertificate h where
+  selected := Classical.choose h.valid
+  selected_mem := (Classical.choose_spec h.valid).1
+  selected_valid := (Classical.choose_spec h.valid).2
+  witness_count := h.witnesses.length
+  witness_count_matches := Path.refl _
+  selection_trace := herbrand_selection_trace h
+  trace_coherence := herbrand_selection_cancel_rweq h
 
 /-- Herbrand as Path to True. -/
 noncomputable def herbrand_path (h : HerbrandWitness) :
