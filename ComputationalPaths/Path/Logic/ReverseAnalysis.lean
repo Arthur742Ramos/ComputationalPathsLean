@@ -245,38 +245,38 @@ hierarchy order is explicit, the theorem receives a concrete catalogue code,
 and `catalogue_trace` records a two-step arithmetic reindexing with an explicit
 cancellation coherence. -/
 structure ReverseEquivalenceCertificate (e : ReverseEquivalence) where
-  baseSubsystem : BigFiveSubsystem
-  subsystem : BigFiveSubsystem
-  base_name : Path baseSubsystem.label e.base
-  system_name : Path subsystem.label e.axiom_system
-  hierarchy_order : baseSubsystem.rank ≤ subsystem.rank
+  base_subsystem : BigFiveSubsystem
+  target_subsystem : BigFiveSubsystem
+  base_name : Path base_subsystem.label e.base
+  target_name : Path target_subsystem.label e.axiom_system
+  hierarchy_order : base_subsystem.rank ≤ target_subsystem.rank
   theorem_code : Nat
   theorem_code_matches : Path theorem_code e.theoremId
   catalogue_trace :
-    Path ((subsystem.rank + theorem_code) + 1)
-      (subsystem.rank + (1 + theorem_code))
+    Path ((target_subsystem.rank + theorem_code) + 1)
+      (target_subsystem.rank + (1 + theorem_code))
   trace_coherence :
     RwEq
       (Path.trans catalogue_trace (Path.symm catalogue_trace))
-      (Path.refl ((subsystem.rank + theorem_code) + 1))
+      (Path.refl ((target_subsystem.rank + theorem_code) + 1))
 
 /-- Build a typed certificate once the legacy system name has been identified. -/
 noncomputable def reverse_equivalence_certificate
     (e : ReverseEquivalence)
-    (baseSubsystem subsystem : BigFiveSubsystem)
-    (baseName : Path baseSubsystem.label e.base)
-    (systemName : Path subsystem.label e.axiom_system)
-    (hierarchyOrder : baseSubsystem.rank ≤ subsystem.rank) :
+    (base_subsystem target_subsystem : BigFiveSubsystem)
+    (base_name : Path base_subsystem.label e.base)
+    (target_name : Path target_subsystem.label e.axiom_system)
+    (hierarchy_order : base_subsystem.rank ≤ target_subsystem.rank) :
     ReverseEquivalenceCertificate e where
-  baseSubsystem := baseSubsystem
-  subsystem := subsystem
-  base_name := baseName
-  system_name := systemName
-  hierarchy_order := hierarchyOrder
+  base_subsystem := base_subsystem
+  target_subsystem := target_subsystem
+  base_name := base_name
+  target_name := target_name
+  hierarchy_order := hierarchy_order
   theorem_code := e.theoremId
   theorem_code_matches := Path.refl _
-  catalogue_trace := catalogue_reindex_path subsystem.rank e.theoremId
-  trace_coherence := catalogue_reindex_cancel_rweq subsystem.rank e.theoremId
+  catalogue_trace := catalogue_reindex_path target_subsystem.rank e.theoremId
+  trace_coherence := catalogue_reindex_cancel_rweq target_subsystem.rank e.theoremId
 
 /-- WKL₀ ↔ IVT (Intermediate Value Theorem) over RCA₀. -/
 noncomputable def wkl_equiv_ivt : ReverseEquivalence where

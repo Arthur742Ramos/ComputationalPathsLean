@@ -274,15 +274,15 @@ structure HerbrandExtractionCertificate (h : HerbrandWitness) where
   selected : Nat
   selected_mem : selected ∈ h.witnesses
   selected_valid : h.property h.challenge selected
-  witnessCount : Nat
-  witness_count_matches : Path witnessCount h.witnesses.length
+  witness_count : Nat
+  witness_count_matches : Path witness_count h.witnesses.length
   selection_trace :
-    Path ((witnessCount + h.challenge) + 1)
-      (witnessCount + (1 + h.challenge))
+    Path ((witness_count + h.challenge) + 1)
+      (witness_count + (1 + h.challenge))
   trace_coherence :
     RwEq
       (Path.trans selection_trace (Path.symm selection_trace))
-      (Path.refl ((witnessCount + h.challenge) + 1))
+      (Path.refl ((witness_count + h.challenge) + 1))
 
 /-- Extract the canonical certificate from the existential Herbrand witness. -/
 noncomputable def herbrand_extraction_certificate (h : HerbrandWitness) :
@@ -290,7 +290,7 @@ noncomputable def herbrand_extraction_certificate (h : HerbrandWitness) :
   selected := Classical.choose h.valid
   selected_mem := (Classical.choose_spec h.valid).1
   selected_valid := (Classical.choose_spec h.valid).2
-  witnessCount := h.witnesses.length
+  witness_count := h.witnesses.length
   witness_count_matches := Path.refl _
   selection_trace := herbrand_selection_trace h
   trace_coherence := herbrand_selection_cancel_rweq h

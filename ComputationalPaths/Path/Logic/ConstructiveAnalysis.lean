@@ -130,29 +130,29 @@ noncomputable def modulus_rebalance_cancel_rweq (a b c : Nat) :
 /-- Concrete evidence for the modulus selected by constructive-real addition. -/
 structure AdditionModulusCertificate
     (x y : ConstructiveReal) (k : Nat) where
-  leftRate : Nat
-  rightRate : Nat
-  combinedRate : Nat
-  left_rate_matches : Path leftRate (x.modulus k)
-  right_rate_matches : Path rightRate (y.modulus k)
-  combined_rate_matches : Path combinedRate ((CRAdd x y).modulus k)
-  dominates_left : leftRate ≤ combinedRate
-  dominates_right : rightRate ≤ combinedRate
+  left_rate : Nat
+  right_rate : Nat
+  combined_rate : Nat
+  left_rate_matches : Path left_rate (x.modulus k)
+  right_rate_matches : Path right_rate (y.modulus k)
+  combined_rate_matches : Path combined_rate ((CRAdd x y).modulus k)
+  dominates_left : left_rate ≤ combined_rate
+  dominates_right : right_rate ≤ combined_rate
   rebalance_trace :
-    Path (Nat.max (Nat.max leftRate rightRate) combinedRate)
-      (Nat.max leftRate (Nat.max combinedRate rightRate))
+    Path (Nat.max (Nat.max left_rate right_rate) combined_rate)
+      (Nat.max left_rate (Nat.max combined_rate right_rate))
   rebalance_coherence :
     RwEq
       (Path.trans rebalance_trace (Path.symm rebalance_trace))
-      (Path.refl (Nat.max (Nat.max leftRate rightRate) combinedRate))
+      (Path.refl (Nat.max (Nat.max left_rate right_rate) combined_rate))
 
 /-- The canonical modulus certificate for pointwise addition. -/
 noncomputable def addition_modulus_certificate
     (x y : ConstructiveReal) (k : Nat) :
     AdditionModulusCertificate x y k where
-  leftRate := x.modulus k
-  rightRate := y.modulus k
-  combinedRate := Nat.max (x.modulus k) (y.modulus k)
+  left_rate := x.modulus k
+  right_rate := y.modulus k
+  combined_rate := Nat.max (x.modulus k) (y.modulus k)
   left_rate_matches := Path.refl _
   right_rate_matches := Path.refl _
   combined_rate_matches := Path.refl _
