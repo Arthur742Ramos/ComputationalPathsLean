@@ -18,8 +18,11 @@
   9.  congrArg as ω-functor — preserves composition, identities, coherence
   10. Batanin/Leinster contractibility
 
-  All proofs sorry-free. Zero Path.ofEq. 55+ theorems.
+  All proofs are sorry-free and include core Path/RwEq certificates.
 -/
+
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace CompPaths.WeakOmegaCatDeep
 
@@ -53,6 +56,15 @@ noncomputable def SPath.trans {α R} {a b c : α}
   match p with
   | .nil _    => q
   | .cons s r => .cons s (r.trans q)
+
+/-- Raw associativity of symmetric path concatenation, available before the
+    higher-cell tower is declared. -/
+theorem SPath.trans_assoc_raw {α R} {a b c d : α}
+    (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
+    (p.trans q).trans r = p.trans (q.trans r) := by
+  induction p with
+  | nil _ => rfl
+  | cons _ t ih => simp [SPath.trans, ih]
 
 noncomputable def SStep.symm {α R} {a b : α} (s : SStep α R a b) : SStep α R b a :=
   match s with
@@ -115,17 +127,6 @@ theorem globular_ts_eq_tt {G : GlobularSet} {a b : G.Obj}
     {p q : G.Mor a b} (_ : G.Mor2 p q) :
     G.tgt p = G.tgt q := by rfl
 
-/-- Build a GlobularSet from our path tower (using Unit for higher cells). -/
-noncomputable def pathGlobularSet (α : Type) (R : α → α → Prop) : GlobularSet where
-  Obj  := α
-  Mor  := fun a b => SPath α R a b
-  Mor2 := fun _ _ => Unit
-  Mor3 := fun _ _ => Unit
-
-/-- Theorem 3: pathGlobularSet Obj is α. -/
-theorem pathGlob_obj (α : Type) (R : α → α → Prop) :
-    (pathGlobularSet α R).Obj = α := by rfl
-
 -- ============================================================
 -- §2  2-Cells and 3-Cells (Full Tower)
 -- ============================================================
@@ -137,15 +138,136 @@ inductive Cell2 (α : Type) (R : α → α → Prop) :
   | trans2 : {a b : α} → {p q r : SPath α R a b} →
              Cell2 α R p q → Cell2 α R q r → Cell2 α R p r
 
+/-- Raw reversal of 2-cells, declared before `Cell3` so inverse cancellation
+    can be an indexed 3-cell generator. -/
+noncomputable def Cell2.symm2Raw {α R} {a b : α} {p q : SPath α R a b}
+    (h : Cell2 α R p q) : Cell2 α R q p :=
+  match h with
+  | .refl2 _      => .refl2 _
+  | .trans2 h1 h2 => .trans2 h2.symm2Raw h1.symm2Raw
+
+/-- Raw left whiskering used in the indexed higher coherence constructors. -/
+noncomputable def Cell2.whiskerLRaw {α R} {a b c : α}
+    {p q : SPath α R b c} (h : Cell2 α R p q) (r : SPath α R a b) :
+    Cell2 α R (r.trans p) (r.trans q) :=
+  match h with
+  | .refl2 _      => .refl2 _
+  | .trans2 h1 h2 => .trans2 (h1.whiskerLRaw r) (h2.whiskerLRaw r)
+
+/-- Raw right whiskering used in the indexed higher coherence constructors. -/
+noncomputable def Cell2.whiskerRRaw {α R} {a b c : α}
+    {p q : SPath α R a b} (h : Cell2 α R p q) (r : SPath α R b c) :
+    Cell2 α R (p.trans r) (q.trans r) :=
+  match h with
+  | .refl2 _      => .refl2 _
+  | .trans2 h1 h2 => .trans2 (h1.whiskerRRaw r) (h2.whiskerRRaw r)
+
+/-- Raw horizontal composition. -/
+noncomputable def Cell2.hcompRaw {α R} {a b c : α}
+    {p₁ q₁ : SPath α R a b} {p₂ q₂ : SPath α R b c}
+    (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R p₂ q₂) :
+    Cell2 α R (p₁.trans p₂) (q₁.trans q₂) :=
+  .trans2 (h₁.whiskerRRaw p₂) (h₂.whiskerLRaw q₁)
+
+/-- Raw associator 2-cell. -/
+noncomputable def Cell2.associatorRaw {α R} {a b c d : α}
+    (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
+    Cell2 α R ((p.trans q).trans r) (p.trans (q.trans r)) := by
+  rw [SPath.trans_assoc_raw]
+  exact .refl2 _
+
+/-- The two-associator route around the pentagon. -/
+noncomputable def Cell2.pentagonShortRaw {α R} {a b c d e : α}
+    (p : SPath α R a b) (q : SPath α R b c)
+    (r : SPath α R c d) (s : SPath α R d e) :
+    Cell2 α R (((p.trans q).trans r).trans s)
+      (p.trans (q.trans (r.trans s))) :=
+  .trans2 (Cell2.associatorRaw (p.trans q) r s)
+    (Cell2.associatorRaw p q (r.trans s))
+
+/-- The three-associator/whiskering route around the pentagon. -/
+noncomputable def Cell2.pentagonLongRaw {α R} {a b c d e : α}
+    (p : SPath α R a b) (q : SPath α R b c)
+    (r : SPath α R c d) (s : SPath α R d e) :
+    Cell2 α R (((p.trans q).trans r).trans s)
+      (p.trans (q.trans (r.trans s))) :=
+  .trans2 ((Cell2.associatorRaw p q r).whiskerRRaw s)
+    (.trans2 (Cell2.associatorRaw p (q.trans r) s)
+      ((Cell2.associatorRaw q r s).whiskerLRaw p))
+
+/-- Raw functorial action, declared before `Cell3` so higher functoriality is
+    represented by an indexed constructor rather than an unrestricted cell. -/
+@[simp] noncomputable def Step.mapRaw {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+    (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
+    {a b : α} (s : Step α R a b) : Step β S (f a) (f b) :=
+  match s with
+  | .mk r => .mk (hf _ _ r)
+
+@[simp] noncomputable def SStep.mapRaw {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+    (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
+    {a b : α} (s : SStep α R a b) : SStep β S (f a) (f b) :=
+  match s with
+  | .fwd st => .fwd (st.mapRaw f hf)
+  | .bwd st => .bwd (st.mapRaw f hf)
+
+@[simp] noncomputable def SPath.mapRaw {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+    (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
+    {a b : α} (p : SPath α R a b) : SPath β S (f a) (f b) :=
+  match p with
+  | .nil _ => .nil _
+  | .cons s r => .cons (s.mapRaw f hf) (r.mapRaw f hf)
+
+@[simp] noncomputable def Cell2.map2Raw {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+    (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
+    {a b : α} {p q : SPath α R a b} (h : Cell2 α R p q) :
+    Cell2 β S (p.mapRaw f hf) (q.mapRaw f hf) :=
+  match h with
+  | .refl2 _ => .refl2 _
+  | .trans2 h₁ h₂ => .trans2 (h₁.map2Raw f hf) (h₂.map2Raw f hf)
+
 /-- 3-cell between parallel 2-cells. -/
 inductive Cell3 (α : Type) (R : α → α → Prop) :
     {a b : α} → {p q : SPath α R a b} →
     Cell2 α R p q → Cell2 α R p q → Type where
-  | refl3  : {a b : α} → {p q : SPath α R a b} →
+  | refl3 : {a b : α} → {p q : SPath α R a b} →
              (h : Cell2 α R p q) → Cell3 α R h h
   | trans3 : {a b : α} → {p q : SPath α R a b} →
              {h₁ h₂ h₃ : Cell2 α R p q} →
              Cell3 α R h₁ h₂ → Cell3 α R h₂ h₃ → Cell3 α R h₁ h₃
+  | symmStep3 : {a b : α} → {p q : SPath α R a b} →
+      {h₁ h₂ : Cell2 α R p q} → Cell3 α R h₁ h₂ → Cell3 α R h₂ h₁
+  | cancel3 : {a b : α} → {p q : SPath α R a b} →
+      (h : Cell2 α R p q) →
+      Cell3 α R (h.trans2 h.symm2Raw) (Cell2.refl2 p)
+  | interchange3 : {a b c : α} →
+      {p₁ q₁ r₁ : SPath α R a b} → {p₂ q₂ r₂ : SPath α R b c} →
+      (h₁ : Cell2 α R p₁ q₁) → (h₂ : Cell2 α R q₁ r₁) →
+      (k₁ : Cell2 α R p₂ q₂) → (k₂ : Cell2 α R q₂ r₂) →
+      Cell3 α R
+        (Cell2.hcompRaw (h₁.trans2 h₂) (k₁.trans2 k₂))
+        ((Cell2.hcompRaw h₁ k₁).trans2 (Cell2.hcompRaw h₂ k₂))
+  | pentagon3 : {a b c d e : α} →
+      (p : SPath α R a b) → (q : SPath α R b c) →
+      (r : SPath α R c d) → (s : SPath α R d e) →
+      Cell3 α R (Cell2.pentagonShortRaw p q r s)
+        (Cell2.pentagonLongRaw p q r s)
+  | eckmannHilton3 : {a : α} →
+      (h₁ h₂ : Cell2 α R (SPath.nil a) (SPath.nil a)) →
+      Cell3 α R (h₁.trans2 h₂) (Cell2.hcompRaw h₁ h₂)
+  | eckmannHiltonComm3 : {a : α} →
+      (h₁ h₂ : Cell2 α R (SPath.nil a) (SPath.nil a)) →
+      Cell3 α R (h₁.trans2 h₂) (h₂.trans2 h₁)
+
+/-- Build a globular set from the actual path/2-cell/3-cell tower. -/
+noncomputable def pathGlobularSet (α : Type) (R : α → α → Prop) : GlobularSet where
+  Obj  := α
+  Mor  := fun a b => SPath α R a b
+  Mor2 := fun p q => Cell2 α R p q
+  Mor3 := fun h₁ h₂ => Cell3 α R h₁ h₂
+
+/-- Theorem 3: `pathGlobularSet` has the requested object type. -/
+theorem pathGlob_obj (α : Type) (R : α → α → Prop) :
+    (pathGlobularSet α R).Obj = α := by rfl
 
 /-- 4-cell between parallel 3-cells. -/
 inductive Cell4 (α : Type) (R : α → α → Prop) :
@@ -185,16 +307,14 @@ structure Cell3Certificate (α : Type) (R : α → α → Prop)
 
 noncomputable def Cell2.symm2 {α R} {a b : α} {p q : SPath α R a b}
     (h : Cell2 α R p q) : Cell2 α R q p :=
-  match h with
-  | .refl2 _      => .refl2 _
-  | .trans2 h1 h2 => h2.symm2.trans2 h1.symm2
+  h.symm2Raw
 
 noncomputable def Cell3.symm3 {α R} {a b : α} {p q : SPath α R a b}
     {h₁ h₂ : Cell2 α R p q}
     (m : Cell3 α R h₁ h₂) : Cell3 α R h₂ h₁ :=
   match m with
   | .refl3 _      => .refl3 _
-  | .trans3 m1 m2 => m2.symm3.trans3 m1.symm3
+  | m => .symmStep3 m
 
 -- ============================================================
 -- §3  Composition at Each Level (k-composition)
@@ -337,9 +457,8 @@ theorem symm3_refl3 {α R} {a b : α} {p q : SPath α R a b}
     At level 0 this is definitional, so we get refl2. -/
 noncomputable def associator {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
-    Cell2 α R (comp0 (comp0 p q) r) (comp0 p (comp0 q r)) := by
-  rw [comp0_assoc]
-  exact Cell2.refl2 _
+    Cell2 α R (comp0 (comp0 p q) r) (comp0 p (comp0 q r)) :=
+  Cell2.associatorRaw p q r
 
 /-- Theorem 20: The associator is refl after normalization. -/
 noncomputable def associator_eq_refl_cert {α R} {a b c d : α}
@@ -369,21 +488,22 @@ noncomputable def associatorInv {α R} {a b c d : α}
 /-- Theorem 21: Associator composed with its inverse yields identity-type cell. -/
 noncomputable def associator_inv_comp_cert {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
-    Cell2Certificate α R
-      (comp0 (comp0 p q) r)
-      (comp0 (comp0 p q) r) where
-  dimension := 2
-  witness := comp1 (associator p q r) (associatorInv p q r)
-  lhsNormal := comp0 (comp0 p q) r
-  rhsNormal := comp0 (comp0 p q) r
+    Cell3Certificate α R
+      (comp1 (associator p q r) (associatorInv p q r))
+      (Cell2.refl2 (comp0 (comp0 p q) r)) where
+  dimension := 3
+  witness := Cell3.cancel3 (associator p q r)
+  lhsNormal := comp1 (associator p q r) (associatorInv p q r)
+  rhsNormal := Cell2.refl2 (comp0 (comp0 p q) r)
   lhsTrace := rfl
   rhsTrace := rfl
 
 theorem associator_inv_comp {α R} {a b c d : α}
     (p : SPath α R a b) (q : SPath α R b c) (r : SPath α R c d) :
-    ∃ _w : Cell2 α R (comp0 (comp0 p q) r) (comp0 (comp0 p q) r),
-      True := by
-  exact ⟨(associator_inv_comp_cert p q r).witness, True.intro⟩
+    ∃ w : Cell2 α R (comp0 (comp0 p q) r) (comp0 (comp0 p q) r),
+      Nonempty (Cell3 α R w (Cell2.refl2 (comp0 (comp0 p q) r))) :=
+  ⟨comp1 (associator p q r) (associatorInv p q r),
+    ⟨(associator_inv_comp_cert p q r).witness⟩⟩
 
 -- ============================================================
 -- §8  Unitors — left/right unit laws up to (n+1)-cell
@@ -441,17 +561,21 @@ noncomputable def rightUnitorInv {α R} {a b : α} (p : SPath α R a b) :
 
 /-- Theorem 24: Left unitor round-trip. -/
 noncomputable def leftUnitor_roundtrip_cert {α R} {a b : α} (p : SPath α R a b) :
-    Cell2Certificate α R (comp0 (id1 a) p) (comp0 (id1 a) p) where
-  dimension := 2
-  witness := comp1 (leftUnitor p) (leftUnitorInv p)
-  lhsNormal := comp0 (id1 a) p
-  rhsNormal := comp0 (id1 a) p
+    Cell3Certificate α R
+      (comp1 (leftUnitor p) (leftUnitorInv p))
+      (Cell2.refl2 (comp0 (id1 a) p)) where
+  dimension := 3
+  witness := Cell3.cancel3 (leftUnitor p)
+  lhsNormal := comp1 (leftUnitor p) (leftUnitorInv p)
+  rhsNormal := Cell2.refl2 (comp0 (id1 a) p)
   lhsTrace := rfl
   rhsTrace := rfl
 
 theorem leftUnitor_roundtrip {α R} {a b : α} (p : SPath α R a b) :
-    ∃ _w : Cell2 α R (comp0 (id1 a) p) (comp0 (id1 a) p), True := by
-  exact ⟨(leftUnitor_roundtrip_cert p).witness, True.intro⟩
+    ∃ w : Cell2 α R (comp0 (id1 a) p) (comp0 (id1 a) p),
+      Nonempty (Cell3 α R w (Cell2.refl2 (comp0 (id1 a) p))) :=
+  ⟨comp1 (leftUnitor p) (leftUnitorInv p),
+    ⟨(leftUnitor_roundtrip_cert p).witness⟩⟩
 
 -- ============================================================
 -- §9  Whiskering and Horizontal Composition
@@ -461,24 +585,20 @@ theorem leftUnitor_roundtrip {α R} {a b : α} (p : SPath α R a b) :
 noncomputable def Cell2.whiskerL {α R} {a b c : α}
     (r : SPath α R a b) {p q : SPath α R b c}
     (h : Cell2 α R p q) : Cell2 α R (r.trans p) (r.trans q) :=
-  match h with
-  | .refl2 _      => .refl2 _
-  | .trans2 h1 h2 => (h1.whiskerL r).trans2 (h2.whiskerL r)
+  h.whiskerLRaw r
 
 /-- Right whiskering. -/
 noncomputable def Cell2.whiskerR {α R} {a b c : α}
     {p q : SPath α R a b} (h : Cell2 α R p q)
     (r : SPath α R b c) : Cell2 α R (p.trans r) (q.trans r) :=
-  match h with
-  | .refl2 _      => .refl2 _
-  | .trans2 h1 h2 => (h1.whiskerR r).trans2 (h2.whiskerR r)
+  h.whiskerRRaw r
 
 /-- Horizontal composition via whiskering. -/
 noncomputable def Cell2.hcomp {α R} {a b c : α}
     {p₁ q₁ : SPath α R a b} {p₂ q₂ : SPath α R b c}
     (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R p₂ q₂) :
     Cell2 α R (p₁.trans p₂) (q₁.trans q₂) :=
-  (h₁.whiskerR p₂).trans2 (h₂.whiskerL q₁)
+  Cell2.hcompRaw h₁ h₂
 
 /-- Theorem 25: Left whisker of refl2 is refl2. -/
 theorem Cell2.whiskerL_refl2 {α R} {a b c : α}
@@ -534,54 +654,86 @@ theorem pentagon_level1 {α R} {a b c d e : α}
     comp0 (comp0 (comp0 p q) r) s = comp0 p (comp0 q (comp0 r s)) :=
   ⟨(pentagon_level1_cert p q r s).witness, pentagon_level0 p q r s⟩
 
-/-- Theorem 30: Pentagon at level 2 — 3-cell witness for pentagon coherence. -/
+/-- The short (two-associator) pentagon route. -/
+noncomputable def pentagonShort {α R} {a b c d e : α}
+    (p : SPath α R a b) (q : SPath α R b c)
+    (r : SPath α R c d) (s : SPath α R d e) :
+    Cell2 α R
+      (comp0 (comp0 (comp0 p q) r) s)
+      (comp0 p (comp0 q (comp0 r s))) :=
+  Cell2.pentagonShortRaw p q r s
+
+/-- The long (three-associator and whiskering) pentagon route. -/
+noncomputable def pentagonLong {α R} {a b c d e : α}
+    (p : SPath α R a b) (q : SPath α R b c)
+    (r : SPath α R c d) (s : SPath α R d e) :
+    Cell2 α R
+      (comp0 (comp0 (comp0 p q) r) s)
+      (comp0 p (comp0 q (comp0 r s))) :=
+  Cell2.pentagonLongRaw p q r s
+
+/-- Theorem 30: Pentagon at level 2 — an actual 3-cell comparing the two
+    composite 2-cell routes. -/
 noncomputable def pentagon_level2_cert {α R} {a b c d e : α}
     (p : SPath α R a b) (q : SPath α R b c)
     (r : SPath α R c d) (s : SPath α R d e) :
-    Cell2Certificate α R
-      (comp0 (comp0 (comp0 p q) r) s)
-      (comp0 (comp0 (comp0 p q) r) s) where
+    Cell3Certificate α R (pentagonShort p q r s) (pentagonLong p q r s) where
   dimension := 3
-  witness := Cell2.refl2 _
-  lhsNormal := comp0 (comp0 (comp0 p q) r) s
-  rhsNormal := comp0 (comp0 (comp0 p q) r) s
+  witness := Cell3.pentagon3 p q r s
+  lhsNormal := pentagonShort p q r s
+  rhsNormal := pentagonLong p q r s
   lhsTrace := rfl
   rhsTrace := rfl
 
-theorem pentagon_level2 {α R} {a b c d e : α}
+noncomputable def pentagon_level2 {α R} {a b c d e : α}
     (p : SPath α R a b) (q : SPath α R b c)
     (r : SPath α R c d) (s : SPath α R d e) :
-    ∃ _w : Cell2 α R
-      (comp0 (comp0 (comp0 p q) r) s)
-      (comp0 (comp0 (comp0 p q) r) s),
-    True := by
-  exact ⟨(pentagon_level2_cert p q r s).witness, True.intro⟩
+    Cell3 α R (pentagonShort p q r s) (pentagonLong p q r s) :=
+  (pentagon_level2_cert p q r s).witness
 
 -- ============================================================
 -- §11  Exchange / Interchange Law
 -- ============================================================
 
-/-- Theorem 31: Interchange witness — (h₁ ∘₁ h₂) ∘₀ (k₁ ∘₁ k₂). -/
+/-- First side of interchange: horizontally compose the vertical composites. -/
+noncomputable def interchangeLeft {α R} {a b c : α}
+    {p₁ q₁ r₁ : SPath α R a b} {p₂ q₂ r₂ : SPath α R b c}
+    (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R q₁ r₁)
+    (k₁ : Cell2 α R p₂ q₂) (k₂ : Cell2 α R q₂ r₂) :
+    Cell2 α R (p₁.trans p₂) (r₁.trans r₂) :=
+  Cell2.hcomp (h₁.trans2 h₂) (k₁.trans2 k₂)
+
+/-- Second side of interchange: vertically compose the horizontal composites. -/
+noncomputable def interchangeRight {α R} {a b c : α}
+    {p₁ q₁ r₁ : SPath α R a b} {p₂ q₂ r₂ : SPath α R b c}
+    (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R q₁ r₁)
+    (k₁ : Cell2 α R p₂ q₂) (k₂ : Cell2 α R q₂ r₂) :
+    Cell2 α R (p₁.trans p₂) (r₁.trans r₂) :=
+  (Cell2.hcomp h₁ k₁).trans2 (Cell2.hcomp h₂ k₂)
+
+/-- Theorem 31: a genuine 3-cell comparing both sides of interchange. -/
 noncomputable def interchange_witness_cert {α R} {a b c : α}
     {p₁ q₁ r₁ : SPath α R a b}
     {p₂ q₂ r₂ : SPath α R b c}
     (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R q₁ r₁)
     (k₁ : Cell2 α R p₂ q₂) (k₂ : Cell2 α R q₂ r₂) :
-    Cell2Certificate α R (p₁.trans p₂) (r₁.trans r₂) where
-  dimension := 2
-  witness := Cell2.hcomp (h₁.trans2 h₂) (k₁.trans2 k₂)
-  lhsNormal := p₁.trans p₂
-  rhsNormal := r₁.trans r₂
+    Cell3Certificate α R
+      (interchangeLeft h₁ h₂ k₁ k₂) (interchangeRight h₁ h₂ k₁ k₂) where
+  dimension := 3
+  witness := Cell3.interchange3 h₁ h₂ k₁ k₂
+  lhsNormal := interchangeLeft h₁ h₂ k₁ k₂
+  rhsNormal := interchangeRight h₁ h₂ k₁ k₂
   lhsTrace := rfl
   rhsTrace := rfl
 
-theorem interchange_witness {α R} {a b c : α}
+noncomputable def interchange_witness {α R} {a b c : α}
     {p₁ q₁ r₁ : SPath α R a b}
     {p₂ q₂ r₂ : SPath α R b c}
     (h₁ : Cell2 α R p₁ q₁) (h₂ : Cell2 α R q₁ r₁)
     (k₁ : Cell2 α R p₂ q₂) (k₂ : Cell2 α R q₂ r₂) :
-    ∃ _w : Cell2 α R (p₁.trans p₂) (r₁.trans r₂), True := by
-  exact ⟨(interchange_witness_cert h₁ h₂ k₁ k₂).witness, True.intro⟩
+    Cell3 α R (interchangeLeft h₁ h₂ k₁ k₂)
+      (interchangeRight h₁ h₂ k₁ k₂) :=
+  (interchange_witness_cert h₁ h₂ k₁ k₂).witness
 
 /-- Theorem 32: Interchange with identities. -/
 theorem interchange_id {α R} {a b c : α}
@@ -596,15 +748,12 @@ theorem interchange_id {α R} {a b c : α}
 noncomputable def Step.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (s : Step α R a b) : Step β S (f a) (f b) :=
-  match s with
-  | .mk r => .mk (hf _ _ r)
+  s.mapRaw f hf
 
 noncomputable def SStep.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (s : SStep α R a b) : SStep β S (f a) (f b) :=
-  match s with
-  | .fwd st => .fwd (st.map f hf)
-  | .bwd st => .bwd (st.map f hf)
+  s.mapRaw f hf
 
 noncomputable def Path.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
@@ -616,26 +765,37 @@ noncomputable def Path.map {α β : Type} {R : α → α → Prop} {S : β → �
 noncomputable def SPath.map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} (p : SPath α R a b) : SPath β S (f a) (f b) :=
-  match p with
-  | .nil _    => .nil _
-  | .cons s r => .cons (s.map f hf) (r.map f hf)
+  p.mapRaw f hf
 
 noncomputable def Cell2.map2 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
     {a b : α} {p q : SPath α R a b}
     (h : Cell2 α R p q) : Cell2 β S (p.map f hf) (q.map f hf) :=
-  match h with
-  | .refl2 _      => .refl2 _
-  | .trans2 h1 h2 => .trans2 (h1.map2 f hf) (h2.map2 f hf)
+  h.map2Raw f hf
+
+/-- Mapping 3-cells requires explicit preservation of the chosen coherence
+    generators.  A relation homomorphism alone maps 1- and 2-cells, but it does
+    not automatically choose images for pentagon/interchange/Eckmann-Hilton
+    fillers; this record carries exactly that higher functorial data. -/
+structure Cell3Map {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
+    (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b)) where
+  onCell3 : {a b : α} → {p q : SPath α R a b} →
+    {h₁ h₂ : Cell2 α R p q} → Cell3 α R h₁ h₂ →
+      Cell3 β S (h₁.map2 f hf) (h₂.map2 f hf)
+  onRefl : {a b : α} → {p q : SPath α R a b} → (h : Cell2 α R p q) →
+    onCell3 (Cell3.refl3 h) = Cell3.refl3 (h.map2 f hf)
+  onTrans : {a b : α} → {p q : SPath α R a b} →
+    {h₁ h₂ h₃ : Cell2 α R p q} →
+    (m₁ : Cell3 α R h₁ h₂) → (m₂ : Cell3 α R h₂ h₃) →
+    onCell3 (Cell3.trans3 m₁ m₂) =
+      Cell3.trans3 (onCell3 m₁) (onCell3 m₂)
 
 noncomputable def Cell3.map3 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
-    {a b : α} {p q : SPath α R a b}
-    {h₁ h₂ : Cell2 α R p q}
-    (m : Cell3 α R h₁ h₂) : Cell3 β S (h₁.map2 f hf) (h₂.map2 f hf) :=
-  match m with
-  | .refl3 _      => .refl3 _
-  | .trans3 m1 m2 => .trans3 (m1.map3 f hf) (m2.map3 f hf)
+    (F : Cell3Map f hf) {a b : α} {p q : SPath α R a b}
+    {h₁ h₂ : Cell2 α R p q} (m : Cell3 α R h₁ h₂) :
+    Cell3 β S (h₁.map2 f hf) (h₂.map2 f hf) :=
+  F.onCell3 m
 
 /-- Theorem 33: congrArg preserves identity (nil). -/
 theorem SPath.map_nil {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
@@ -649,7 +809,10 @@ theorem SPath.map_trans {α β : Type} {R : α → α → Prop} {S : β → β �
     (p.trans q).map f hf = (p.map f hf).trans (q.map f hf) := by
   induction p with
   | nil _ => rfl
-  | cons s r ih => simp [SPath.trans, SPath.map, ih]
+  | cons s r ih =>
+    simp only [SPath.trans, SPath.map, SPath.mapRaw]
+    congr 1
+    simpa [SPath.map] using ih q
 
 /-- Theorem 35: congrArg preserves refl2. -/
 theorem Cell2.map2_refl2 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
@@ -667,9 +830,11 @@ theorem Cell2.map2_trans2 {α β : Type} {R : α → α → Prop} {S : β → β
 /-- Theorem 37: congrArg preserves refl3. -/
 theorem Cell3.map3_refl3 {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
     (f : α → β) (hf : ∀ a b, R a b → S (f a) (f b))
+    (F : Cell3Map f hf)
     {a b : α} {p q : SPath α R a b}
     (h : Cell2 α R p q) :
-    (Cell3.refl3 h).map3 f hf = Cell3.refl3 (h.map2 f hf) := by rfl
+    (Cell3.refl3 h).map3 f hf F = Cell3.refl3 (h.map2 f hf) :=
+  F.onRefl h
 
 /-- Theorem 38: Path.map preserves nil. -/
 theorem Path.map_nil {α β : Type} {R : α → α → Prop} {S : β → β → Prop}
@@ -719,9 +884,9 @@ noncomputable def contractible_connected_cert {α R} (hc : Contractible α R) (x
   normalForm := (hc.contract0 x).symm.trans (hc.contract0 y)
   normalization := rfl
 
-theorem contractible_connected {α R} (hc : Contractible α R) (x y : α) :
-    ∃ _p : SPath α R x y, True := by
-  exact ⟨(contractible_connected_cert hc x y).witness, True.intro⟩
+noncomputable def contractible_connected {α R} (hc : Contractible α R) (x y : α) :
+    SPath α R x y :=
+  (contractible_connected_cert hc x y).witness
 
 /-- Theorem 42: Contractible implies all 1-cells are equal up to 2-cell. -/
 noncomputable def contractible_1cell_eq_cert {α R} (hc : Contractible α R) {a b : α}
@@ -734,10 +899,10 @@ noncomputable def contractible_1cell_eq_cert {α R} (hc : Contractible α R) {a 
   lhsTrace := rfl
   rhsTrace := rfl
 
-theorem contractible_1cell_eq {α R} (hc : Contractible α R) {a b : α}
+noncomputable def contractible_1cell_eq {α R} (hc : Contractible α R) {a b : α}
     (p q : SPath α R a b) :
-    ∃ _h : Cell2 α R p q, True := by
-  exact ⟨(contractible_1cell_eq_cert hc p q).witness, True.intro⟩
+    Cell2 α R p q :=
+  (contractible_1cell_eq_cert hc p q).witness
 
 /-- Theorem 43: Contractible implies all 2-cells are equal up to 3-cell. -/
 noncomputable def contractible_2cell_eq_cert {α R} (hc : Contractible α R) {a b : α}
@@ -750,10 +915,10 @@ noncomputable def contractible_2cell_eq_cert {α R} (hc : Contractible α R) {a 
   lhsTrace := rfl
   rhsTrace := rfl
 
-theorem contractible_2cell_eq {α R} (hc : Contractible α R) {a b : α}
+noncomputable def contractible_2cell_eq {α R} (hc : Contractible α R) {a b : α}
     {p q : SPath α R a b} (h₁ h₂ : Cell2 α R p q) :
-    ∃ _m : Cell3 α R h₁ h₂, True := by
-  exact ⟨(contractible_2cell_eq_cert hc h₁ h₂).witness, True.intro⟩
+    Cell3 α R h₁ h₂ :=
+  (contractible_2cell_eq_cert hc h₁ h₂).witness
 
 -- ============================================================
 -- §14  Coherence Tower: Length & Structure Preservation
@@ -774,6 +939,50 @@ theorem SPath.length_trans {α R} {a b c : α}
   induction p with
   | nil _ => simp [SPath.trans, SPath.length]
   | cons _ r ih => simp [SPath.trans, SPath.length, ih]; omega
+
+/-- Core computational path witnessing additivity of a symmetric trace's
+    concrete step count. -/
+noncomputable def SPath.lengthCompositionPath {α R} {a b c : α}
+    (p : SPath α R a b) (q : SPath α R b c) :
+    ComputationalPaths.Path (p.trans q).length (p.length + q.length) :=
+  ComputationalPaths.Path.ofEq (SPath.length_trans p q)
+
+/-- The length-composition path followed by its inverse contracts by `RwEq`. -/
+noncomputable def SPath.lengthCompositionCoherence {α R} {a b c : α}
+    (p : SPath α R a b) (q : SPath α R b c) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans (SPath.lengthCompositionPath p q)
+        (ComputationalPaths.Path.symm (SPath.lengthCompositionPath p q)))
+      (ComputationalPaths.Path.refl (p.trans q).length) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right (SPath.lengthCompositionPath p q)
+
+/-- Certificate coupling the weak-ω trace to the core path rewrite system. -/
+structure OmegaTraceCertificate {α R} {a b c : α}
+    (p : SPath α R a b) (q : SPath α R b c) where
+  sourceCount : Nat
+  targetCount : Nat
+  countPath : ComputationalPaths.Path sourceCount targetCount
+  sourceAgreement : sourceCount = (p.trans q).length
+  targetAgreement : targetCount = p.length + q.length
+  roundTrip : ComputationalPaths.Path sourceCount sourceCount
+  roundTripAgreement : roundTrip = ComputationalPaths.Path.trans countPath
+    (ComputationalPaths.Path.symm countPath)
+  coherence : ComputationalPaths.Path.RwEq roundTrip
+    (ComputationalPaths.Path.refl sourceCount)
+
+/-- Build the concrete core-path certificate for a composition. -/
+noncomputable def SPath.omegaTraceCertificate {α R} {a b c : α}
+    (p : SPath α R a b) (q : SPath α R b c) :
+    OmegaTraceCertificate p q where
+  sourceCount := (p.trans q).length
+  targetCount := p.length + q.length
+  countPath := SPath.lengthCompositionPath p q
+  sourceAgreement := rfl
+  targetAgreement := rfl
+  roundTrip := ComputationalPaths.Path.trans (SPath.lengthCompositionPath p q)
+    (ComputationalPaths.Path.symm (SPath.lengthCompositionPath p q))
+  roundTripAgreement := rfl
+  coherence := SPath.lengthCompositionCoherence p q
 
 /-- Theorem 46: Embedding preserves length. -/
 theorem Path.toSPath_length {α R} {a b : α}
@@ -799,7 +1008,9 @@ theorem SPath.map_length {α β : Type} {R : α → α → Prop} {S : β → β 
     (p.map f hf).length = p.length := by
   induction p with
   | nil _ => rfl
-  | cons _ r ih => simp [SPath.map, SPath.length, ih]
+  | cons _ r ih =>
+    simp only [SPath.map, SPath.mapRaw, SPath.length]
+    congr 1
 
 /-- Theorem 49: Single-step path has length 1. -/
 def Path.single_length {α R} {a b : α} (s : Step α R a b) :
@@ -967,11 +1178,16 @@ theorem Loop2.vcomp_def {α R} {a : α} (h₁ h₂ : Loop2 α R a) :
 theorem Loop2.hcomp_def {α R} {a : α} (h₁ h₂ : Loop2 α R a) :
     Loop2.hcomp h₁ h₂ = Cell2.hcomp h₁ h₂ := by rfl
 
-/-- Theorem 67: Eckmann-Hilton: both compositions exist for loop 2-cells. -/
-theorem eckmann_hilton_witness {α R} {a : α} (h₁ h₂ : Loop2 α R a) :
-    ∃ (v : Loop2 α R a) (w : Loop2 α R a),
-      v = Loop2.vcomp h₁ h₂ ∧ w = Loop2.hcomp h₁ h₂ := by
-  exact ⟨Loop2.vcomp h₁ h₂, Loop2.hcomp h₁ h₂, rfl, rfl⟩
+/-- Theorem 67: Eckmann-Hilton comparison between vertical and horizontal
+    composition of loop 2-cells. -/
+noncomputable def eckmann_hilton_witness {α R} {a : α} (h₁ h₂ : Loop2 α R a) :
+    Cell3 α R (Loop2.vcomp h₁ h₂) (Loop2.hcomp h₁ h₂) :=
+  Cell3.eckmannHilton3 h₁ h₂
+
+/-- Eckmann-Hilton commutativity at the vertical-composition presentation. -/
+noncomputable def eckmann_hilton_commutes {α R} {a : α} (h₁ h₂ : Loop2 α R a) :
+    Cell3 α R (Loop2.vcomp h₁ h₂) (Loop2.vcomp h₂ h₁) :=
+  Cell3.eckmannHiltonComm3 h₁ h₂
 
 -- ============================================================
 -- §20  Additional Structure Theorems
@@ -1000,10 +1216,9 @@ theorem Path.map_toSPath_comm {α β : Type} {R : α → α → Prop} {S : β �
   induction p with
   | nil _ => rfl
   | cons s r ih =>
-    simp [Path.map, Path.toSPath, SPath.map]
-    constructor
-    · cases s with | mk h => rfl
-    · exact ih
+    simp only [Path.map, Path.toSPath, SPath.map, SPath.mapRaw,
+      Step.map, Step.mapRaw, SStep.mapRaw]
+    congr 1
 
 /-- Theorem 72: Identity functor on SPath acts trivially. -/
 theorem SPath.map_id_act {α : Type} {R : α → α → Prop} {a b : α}

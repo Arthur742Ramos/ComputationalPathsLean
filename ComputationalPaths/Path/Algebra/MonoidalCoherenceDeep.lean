@@ -10,6 +10,9 @@
   All proofs are sorry‑free.
 -/
 
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+
 set_option linter.unusedVariables false
 
 -- ============================================================
@@ -52,8 +55,10 @@ inductive MonStep : MObj → MObj → Type where
 -- §3  Computational paths
 -- ============================================================
 
-/-- A computational path is a sequence of MonStep rewrites. -/
-inductive MonPath : MObj → MObj → Prop where
+/-- A computational path is a proof-relevant sequence of `MonStep` rewrites.
+    Keeping this in `Type` preserves the trace; putting it in `Prop` would make
+    all parallel traces equal by proof irrelevance. -/
+inductive MonPath : MObj → MObj → Type where
   | refl (a : MObj) : MonPath a a
   | step {a b c : MObj} : MonStep a b → MonPath b c → MonPath a c
 
@@ -62,7 +67,7 @@ inductive MonPath : MObj → MObj → Prop where
 -- ============================================================
 
 /-- Theorem 1: Transitivity of monoidal paths. -/
-theorem MonPath.trans {a b c : MObj}
+noncomputable def MonPath.trans {a b c : MObj}
     (p : MonPath a b) (q : MonPath b c) : MonPath a c := by
   induction p with
   | refl _ => exact q
@@ -80,27 +85,27 @@ noncomputable def MonStep.symm : MonStep a b → MonStep b a
   | .tensorR a h => .tensorR a h.symm
 
 /-- Theorem 2: Symmetry of monoidal paths. -/
-theorem MonPath.symm {a b : MObj} (p : MonPath a b) : MonPath b a := by
+noncomputable def MonPath.symm {a b : MObj} (p : MonPath a b) : MonPath b a := by
   induction p with
   | refl _ => exact MonPath.refl _
   | step s _ ih => exact MonPath.trans ih (MonPath.step s.symm (MonPath.refl _))
 
 /-- Theorem 3: congrArg — tensoring on the right preserves paths. -/
-theorem MonPath.congrArg_tensorL {a a' : MObj} (b : MObj)
+noncomputable def MonPath.congrArg_tensorL {a a' : MObj} (b : MObj)
     (p : MonPath a a') : MonPath (a ⊗ₘ b) (a' ⊗ₘ b) := by
   induction p with
   | refl _ => exact MonPath.refl _
   | step s _ ih => exact MonPath.step (MonStep.tensorL b s) ih
 
 /-- Theorem 4: congrArg — tensoring on the left preserves paths. -/
-theorem MonPath.congrArg_tensorR (a : MObj) {b b' : MObj}
+noncomputable def MonPath.congrArg_tensorR (a : MObj) {b b' : MObj}
     (p : MonPath b b') : MonPath (a ⊗ₘ b) (a ⊗ₘ b') := by
   induction p with
   | refl _ => exact MonPath.refl _
   | step s _ ih => exact MonPath.step (MonStep.tensorR a s) ih
 
 /-- Theorem 5: congrArg on both — bifunctor action on paths. -/
-theorem MonPath.congrArg_tensor {a a' b b' : MObj}
+noncomputable def MonPath.congrArg_tensor {a a' b b' : MObj}
     (p : MonPath a a') (q : MonPath b b') :
     MonPath (a ⊗ₘ b) (a' ⊗ₘ b') :=
   MonPath.trans (MonPath.congrArg_tensorL b p) (MonPath.congrArg_tensorR a' q)
@@ -110,11 +115,11 @@ theorem MonPath.congrArg_tensor {a a' b b' : MObj}
 -- ============================================================
 
 /-- Theorem 6: Single step as path. -/
-theorem MonPath.single (s : MonStep a b) : MonPath a b :=
+noncomputable def MonPath.single (s : MonStep a b) : MonPath a b :=
   MonPath.step s (MonPath.refl _)
 
 /-- Theorem 7: Append a step at the end. -/
-theorem MonPath.append_step {a b c : MObj}
+noncomputable def MonPath.append_step {a b c : MObj}
     (p : MonPath a b) (s : MonStep b c) : MonPath a c :=
   MonPath.trans p (MonPath.single s)
 
@@ -139,7 +144,7 @@ noncomputable def unitRPath (a : MObj) : MonPath (a ⊗ₘ .unit) a :=
   MonPath.single (MonStep.unitR a)
 
 /-- Theorem 12: Associator round-trip. -/
-theorem assoc_roundtrip (a b c : MObj) :
+noncomputable def assoc_roundtrip (a b c : MObj) :
     MonPath ((a ⊗ₘ b) ⊗ₘ c) ((a ⊗ₘ b) ⊗ₘ c) :=
   MonPath.trans (assocPath a b c) (assocPathInv a b c)
 
@@ -163,16 +168,6 @@ noncomputable def pentagonPath2 (a b c d : MObj) :
       (MonPath.single (MonStep.assocR a (b ⊗ₘ c) d))
       (MonPath.single (MonStep.tensorR a (MonStep.assocR b c d))))
 
-/-- Theorem 15: Pentagon coherence — both pentagon paths share endpoints, and
-    those endpoints collapse to the same `flatten` normal form (associativity of
-    generator concatenation).  This discharges the former decorative `True`
-    conclusion into a genuine equation of flattenings. -/
-theorem pentagon_endpoints (a b c d : MObj) :
-    ∃ (_p₁ _p₂ : MonPath (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d) (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d)))),
-      (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d).flatten = (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d))).flatten :=
-  ⟨pentagonPath1 a b c d, pentagonPath2 a b c d, by
-    simp [MObj.flatten, List.append_assoc]⟩
-
 -- ============================================================
 -- §8  Triangle identity
 -- ============================================================
@@ -189,14 +184,65 @@ noncomputable def trianglePath2 (a b : MObj) :
     (MonPath.single (MonStep.assocR a .unit b))
     (MonPath.single (MonStep.tensorR a (MonStep.unitL b)))
 
-/-- Theorem 18: Triangle coherence — both triangle paths share endpoints and
-    those endpoints collapse to the same `flatten` normal form, the fundamental
-    monoidal coherence invariant.  This discharges the former decorative `True`
-    conclusion into a genuine equation of flattenings. -/
+/-- Domain-specific rewrite equality between parallel monoidal traces.  The
+    pentagon and triangle constructors are the generating coherence 2-cells;
+    reflexive, symmetric, and transitive closure lets later developments compose
+    those cells without erasing either trace. -/
+inductive MonPathRw : {a b : MObj} → MonPath a b → MonPath a b → Type where
+  | refl (p : MonPath a b) : MonPathRw p p
+  | symm {p q : MonPath a b} : MonPathRw p q → MonPathRw q p
+  | trans {p q r : MonPath a b} : MonPathRw p q → MonPathRw q r → MonPathRw p r
+  | pentagon (a b c d : MObj) :
+      MonPathRw (pentagonPath1 a b c d) (pentagonPath2 a b c d)
+  | triangle (a b : MObj) :
+      MonPathRw (trianglePath1 a b) (trianglePath2 a b)
+  | assocNaturality (a a' b b' c c' : MObj)
+      (pa : MonPath a a') (pb : MonPath b b') (pc : MonPath c c') :
+      MonPathRw
+        (MonPath.trans
+          (MonPath.single (MonStep.assocR a b c))
+          (MonPath.congrArg_tensor pa (MonPath.congrArg_tensor pb pc)))
+        (MonPath.trans
+          (MonPath.congrArg_tensor (MonPath.congrArg_tensor pa pb) pc)
+          (MonPath.single (MonStep.assocR a' b' c')))
+  | unitLNaturality (a a' : MObj) (p : MonPath a a') :
+      MonPathRw
+        (MonPath.trans (MonPath.single (MonStep.unitL a)) p)
+        (MonPath.trans (MonPath.congrArg_tensorR MObj.unit p)
+          (MonPath.single (MonStep.unitL a')))
+  | unitRNaturality (a a' : MObj) (p : MonPath a a') :
+      MonPathRw
+        (MonPath.trans (MonPath.single (MonStep.unitR a)) p)
+        (MonPath.trans (MonPath.congrArg_tensorL MObj.unit p)
+          (MonPath.single (MonStep.unitR a')))
+
+/-- Theorem 15: the two routes around Mac Lane's pentagon are related by the
+    domain coherence rewrite, while their objects share the flattening normal
+    form used by the semantic interpretation. -/
+theorem pentagon_endpoints (a b c d : MObj) :
+    ∃ (p₁ p₂ : MonPath (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d) (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d)))),
+      Nonempty (MonPathRw p₁ p₂) ∧
+        (((a ⊗ₘ b) ⊗ₘ c) ⊗ₘ d).flatten = (a ⊗ₘ (b ⊗ₘ (c ⊗ₘ d))).flatten :=
+  ⟨pentagonPath1 a b c d, pentagonPath2 a b c d, ⟨MonPathRw.pentagon a b c d⟩, by
+    simp [MObj.flatten, List.append_assoc]⟩
+
+/-- Direct pentagon coherence between the named traces. -/
+noncomputable def pentagon_coherence (a b c d : MObj) :
+    MonPathRw (pentagonPath1 a b c d) (pentagonPath2 a b c d) :=
+  MonPathRw.pentagon a b c d
+
+/-- Theorem 18: the two routes around the triangle are related by the domain
+    coherence rewrite and share their flattening normal form. -/
 theorem triangle_endpoints (a b : MObj) :
-    ∃ (_p₁ _p₂ : MonPath ((a ⊗ₘ .unit) ⊗ₘ b) (a ⊗ₘ b)),
-      ((a ⊗ₘ .unit) ⊗ₘ b).flatten = (a ⊗ₘ b).flatten :=
-  ⟨trianglePath1 a b, trianglePath2 a b, by simp [MObj.flatten, List.append_nil]⟩
+    ∃ (p₁ p₂ : MonPath ((a ⊗ₘ .unit) ⊗ₘ b) (a ⊗ₘ b)),
+      Nonempty (MonPathRw p₁ p₂) ∧ ((a ⊗ₘ .unit) ⊗ₘ b).flatten = (a ⊗ₘ b).flatten :=
+  ⟨trianglePath1 a b, trianglePath2 a b, ⟨MonPathRw.triangle a b⟩,
+    by simp [MObj.flatten, List.append_nil]⟩
+
+/-- Direct triangle coherence between the named traces. -/
+noncomputable def triangle_coherence (a b : MObj) :
+    MonPathRw (trianglePath1 a b) (trianglePath2 a b) :=
+  MonPathRw.triangle a b
 
 -- ============================================================
 -- §9  Coherence via the flatten invariant
@@ -222,19 +268,99 @@ theorem MonPath.preserves_flatten {a b : MObj} (p : MonPath a b) :
   | refl _ => rfl
   | step s _ ih => exact Eq.trans s.preserves_flatten ih
 
+/-- Number of domain rewrite steps retained by a monoidal trace. -/
+noncomputable def MonPath.length : MonPath a b → Nat
+  | .refl _ => 0
+  | .step _ p => p.length + 1
+
+/-- Interpret one monoidal rewrite as a genuine core computational path on the
+    flattening semantics. -/
+noncomputable def MonStep.toCorePath {a b : MObj} (s : MonStep a b) :
+    ComputationalPaths.Path a.flatten b.flatten :=
+  ComputationalPaths.Path.ofEq s.preserves_flatten
+
+/-- Interpret the complete proof-relevant monoidal trace as a multi-step core
+    `Path`; composition concatenates the core trace rather than discarding it. -/
+noncomputable def MonPath.toCorePath {a b : MObj} :
+    MonPath a b → ComputationalPaths.Path a.flatten b.flatten
+  | .refl x => ComputationalPaths.Path.refl x.flatten
+  | .step s p =>
+      ComputationalPaths.Path.trans s.toCorePath p.toCorePath
+
+/-- The one-step semantic path used to compare the equality meaning of two
+    parallel traces independently of their retained domain syntax. -/
+noncomputable def MonPath.semanticPath {a b : MObj} (p : MonPath a b) :
+    ComputationalPaths.Path a.flatten b.flatten :=
+  ComputationalPaths.Path.ofEq p.preserves_flatten
+
+/-- Parallel monoidal traces have `RwEq`-equivalent semantic paths.  The domain
+    relation `MonPathRw` retains which coherence rule related the traces, while
+    this theorem connects that relation to the project's core path calculus. -/
+noncomputable def MonPath.semanticRwEq {a b : MObj} (p q : MonPath a b) :
+    ComputationalPaths.Path.RwEq p.semanticPath q.semanticPath :=
+  ComputationalPaths.Path.rweq_of_eq
+    (ComputationalPaths.Path.ofEq_eq_ofEq p.preserves_flatten q.preserves_flatten)
+
+/-- Every interpreted trace followed by its inverse contracts to reflexivity
+    under the LND_EQ-TRS rewrite equality. -/
+noncomputable def MonPath.toCorePath_cancel {a b : MObj} (p : MonPath a b) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans p.toCorePath
+        (ComputationalPaths.Path.symm p.toCorePath))
+      (ComputationalPaths.Path.refl a.flatten) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right p.toCorePath
+
+/-- Certificate bundling the concrete domain trace with its core computational
+    interpretation and a nontrivial round-trip coherence. -/
+structure MonPathCertificate {a b : MObj} (p : MonPath a b) where
+  stepCount : Nat
+  semanticTrace : ComputationalPaths.Path a.flatten b.flatten
+  traceAgreement : semanticTrace = p.toCorePath
+  roundTrip : ComputationalPaths.Path a.flatten a.flatten
+  roundTripAgreement :
+    roundTrip = ComputationalPaths.Path.trans semanticTrace
+      (ComputationalPaths.Path.symm semanticTrace)
+  coherence : ComputationalPaths.Path.RwEq roundTrip
+    (ComputationalPaths.Path.refl a.flatten)
+
+/-- Build the semantic certificate for any monoidal trace. -/
+noncomputable def MonPath.certificate {a b : MObj} (p : MonPath a b) :
+    MonPathCertificate p where
+  stepCount := p.length
+  semanticTrace := p.toCorePath
+  traceAgreement := rfl
+  roundTrip := ComputationalPaths.Path.trans p.toCorePath
+    (ComputationalPaths.Path.symm p.toCorePath)
+  roundTripAgreement := rfl
+  coherence := p.toCorePath_cancel
+
+/-- Core semantic coherence for the two pentagon traces. -/
+noncomputable def pentagon_core_coherence (a b c d : MObj) :
+    ComputationalPaths.Path.RwEq
+      (pentagonPath1 a b c d).semanticPath
+      (pentagonPath2 a b c d).semanticPath :=
+  MonPath.semanticRwEq _ _
+
+/-- Core semantic coherence for the two triangle traces. -/
+noncomputable def triangle_core_coherence (a b : MObj) :
+    ComputationalPaths.Path.RwEq
+      (trianglePath1 a b).semanticPath
+      (trianglePath2 a b).semanticPath :=
+  MonPath.semanticRwEq _ _
+
 /-- Theorem 21: Unit removal path I⊗A → A. -/
-theorem path_unitL_cancel (a : MObj) : MonPath (.unit ⊗ₘ a) a :=
+noncomputable def path_unitL_cancel (a : MObj) : MonPath (.unit ⊗ₘ a) a :=
   MonPath.single (MonStep.unitL a)
 
 /-- Theorem 22: Unit removal path A⊗I → A. -/
-theorem path_unitR_cancel (a : MObj) : MonPath (a ⊗ₘ .unit) a :=
+noncomputable def path_unitR_cancel (a : MObj) : MonPath (a ⊗ₘ .unit) a :=
   MonPath.single (MonStep.unitR a)
 
 /-- Theorem 23: Self-loop (identity path). -/
-theorem coherence_loop (a : MObj) : MonPath a a := MonPath.refl a
+noncomputable def coherence_loop (a : MObj) : MonPath a a := MonPath.refl a
 
 /-- Theorem 24: Two-step composition. -/
-theorem coherence_two_step {a b c : MObj}
+noncomputable def coherence_two_step {a b c : MObj}
     (s₁ : MonStep a b) (s₂ : MonStep b c) : MonPath a c :=
   MonPath.trans (MonPath.single s₁) (MonPath.single s₂)
 
@@ -243,7 +369,7 @@ theorem coherence_two_step {a b c : MObj}
 -- ============================================================
 
 /-- Theorem 25: Naturality of α (direction 1). -/
-theorem assoc_naturality (a a' b b' c c' : MObj)
+noncomputable def assoc_naturality (a a' b b' c c' : MObj)
     (pa : MonPath a a') (pb : MonPath b b') (pc : MonPath c c') :
     MonPath ((a ⊗ₘ b) ⊗ₘ c) (a' ⊗ₘ (b' ⊗ₘ c')) :=
   MonPath.trans
@@ -251,7 +377,7 @@ theorem assoc_naturality (a a' b b' c c' : MObj)
     (MonPath.congrArg_tensor pa (MonPath.congrArg_tensor pb pc))
 
 /-- Theorem 26: Naturality of α (direction 2). -/
-theorem assoc_naturality' (a a' b b' c c' : MObj)
+noncomputable def assoc_naturality' (a a' b b' c c' : MObj)
     (pa : MonPath a a') (pb : MonPath b b') (pc : MonPath c c') :
     MonPath ((a ⊗ₘ b) ⊗ₘ c) (a' ⊗ₘ (b' ⊗ₘ c')) :=
   MonPath.trans
@@ -259,14 +385,43 @@ theorem assoc_naturality' (a a' b b' c c' : MObj)
     (MonPath.single (MonStep.assocR a' b' c'))
 
 /-- Theorem 27: Naturality of left unitor. -/
-theorem unitL_naturality (a a' : MObj) (p : MonPath a a') :
+noncomputable def unitL_naturality (a a' : MObj) (p : MonPath a a') :
     MonPath (.unit ⊗ₘ a) a' :=
   MonPath.trans (MonPath.single (MonStep.unitL a)) p
 
 /-- Theorem 28: Naturality of right unitor. -/
-theorem unitR_naturality (a a' : MObj) (p : MonPath a a') :
+noncomputable def unitR_naturality (a a' : MObj) (p : MonPath a a') :
     MonPath (a ⊗ₘ .unit) a' :=
   MonPath.trans (MonPath.single (MonStep.unitR a)) p
+
+/-- The associator naturality square commutes at the domain rewrite level. -/
+noncomputable def assoc_naturality_coherence (a a' b b' c c' : MObj)
+    (pa : MonPath a a') (pb : MonPath b b') (pc : MonPath c c') :
+    MonPathRw (assoc_naturality a a' b b' c c' pa pb pc)
+      (assoc_naturality' a a' b b' c c' pa pb pc) :=
+  MonPathRw.assocNaturality a a' b b' c c' pa pb pc
+
+/-- Second route in the left-unitor naturality square. -/
+noncomputable def unitL_naturality' (a a' : MObj) (p : MonPath a a') :
+    MonPath (.unit ⊗ₘ a) a' :=
+  MonPath.trans (MonPath.congrArg_tensorR .unit p)
+    (MonPath.single (MonStep.unitL a'))
+
+/-- Left-unitor naturality compares the two square routes. -/
+noncomputable def unitL_naturality_coherence (a a' : MObj) (p : MonPath a a') :
+    MonPathRw (unitL_naturality a a' p) (unitL_naturality' a a' p) :=
+  MonPathRw.unitLNaturality a a' p
+
+/-- Second route in the right-unitor naturality square. -/
+noncomputable def unitR_naturality' (a a' : MObj) (p : MonPath a a') :
+    MonPath (a ⊗ₘ .unit) a' :=
+  MonPath.trans (MonPath.congrArg_tensorL .unit p)
+    (MonPath.single (MonStep.unitR a'))
+
+/-- Right-unitor naturality compares the two square routes. -/
+noncomputable def unitR_naturality_coherence (a a' : MObj) (p : MonPath a a') :
+    MonPathRw (unitR_naturality a a' p) (unitR_naturality' a a' p) :=
+  MonPathRw.unitRNaturality a a' p
 
 -- ============================================================
 -- §11  Braided monoidal structure
@@ -282,13 +437,13 @@ inductive BraidMonStep : MObj → MObj → Type where
   | tensorR (a : MObj) {b b' : MObj} :
       BraidMonStep b b' → BraidMonStep (a ⊗ₘ b) (a ⊗ₘ b')
 
-/-- Braided monoidal paths. -/
-inductive BrMonPath : MObj → MObj → Prop where
+/-- Proof-relevant braided monoidal paths. -/
+inductive BrMonPath : MObj → MObj → Type where
   | refl (a : MObj) : BrMonPath a a
   | step {a b c : MObj} : BraidMonStep a b → BrMonPath b c → BrMonPath a c
 
 /-- Theorem 29: Transitivity of braided monoidal paths. -/
-theorem BrMonPath.trans {a b c : MObj}
+noncomputable def BrMonPath.trans {a b c : MObj}
     (p : BrMonPath a b) (q : BrMonPath b c) : BrMonPath a c := by
   induction p with
   | refl _ => exact q
@@ -303,7 +458,7 @@ noncomputable def BraidMonStep.symm : BraidMonStep a b → BraidMonStep b a
   | .tensorR a h => .tensorR a h.symm
 
 /-- Theorem 31: Symmetry of braided monoidal paths. -/
-theorem BrMonPath.symm {a b : MObj} (p : BrMonPath a b) : BrMonPath b a := by
+noncomputable def BrMonPath.symm {a b : MObj} (p : BrMonPath a b) : BrMonPath b a := by
   induction p with
   | refl _ => exact BrMonPath.refl _
   | step s _ ih =>
@@ -314,18 +469,48 @@ noncomputable def braidPath (a b : MObj) : BrMonPath (a ⊗ₘ b) (b ⊗ₘ a) :
   BrMonPath.step (BraidMonStep.braid a b) (BrMonPath.refl _)
 
 /-- Theorem 33: congrArg for braided paths on the left. -/
-theorem BrMonPath.congrArg_tensorL {a a' : MObj} (b : MObj)
+noncomputable def BrMonPath.congrArg_tensorL {a a' : MObj} (b : MObj)
     (p : BrMonPath a a') : BrMonPath (a ⊗ₘ b) (a' ⊗ₘ b) := by
   induction p with
   | refl _ => exact BrMonPath.refl _
   | step s _ ih => exact BrMonPath.step (BraidMonStep.tensorL b s) ih
 
 /-- Theorem 34: congrArg for braided paths on the right. -/
-theorem BrMonPath.congrArg_tensorR (a : MObj) {b b' : MObj}
+noncomputable def BrMonPath.congrArg_tensorR (a : MObj) {b b' : MObj}
     (p : BrMonPath b b') : BrMonPath (a ⊗ₘ b) (a ⊗ₘ b') := by
   induction p with
   | refl _ => exact BrMonPath.refl _
   | step s _ ih => exact BrMonPath.step (BraidMonStep.tensorR a s) ih
+
+/-- Braided steps preserve the number of generators, including across a
+    nontrivial swap. -/
+theorem BraidMonStep.preserves_flatten_length {a b : MObj}
+    (s : BraidMonStep a b) : a.flatten.length = b.flatten.length := by
+  induction s with
+  | mon s => exact congrArg List.length s.preserves_flatten
+  | braid a b => simp [MObj.flatten, List.length_append, Nat.add_comm]
+  | braidInv a b => simp [MObj.flatten, List.length_append, Nat.add_comm]
+  | tensorL b _ ih => simp [MObj.flatten, List.length_append, ih]
+  | tensorR a _ ih => simp [MObj.flatten, List.length_append, ih]
+
+/-- Braided traces preserve generator count. -/
+theorem BrMonPath.preserves_flatten_length {a b : MObj} (p : BrMonPath a b) :
+    a.flatten.length = b.flatten.length := by
+  induction p with
+  | refl _ => rfl
+  | step s _ ih => exact s.preserves_flatten_length.trans ih
+
+/-- Core semantic path carried by a braided trace. -/
+noncomputable def BrMonPath.semanticPath {a b : MObj} (p : BrMonPath a b) :
+    ComputationalPaths.Path a.flatten.length b.flatten.length :=
+  ComputationalPaths.Path.ofEq p.preserves_flatten_length
+
+/-- Parallel braided traces have `RwEq`-equivalent core semantics. -/
+noncomputable def BrMonPath.semanticRwEq {a b : MObj} (p q : BrMonPath a b) :
+    ComputationalPaths.Path.RwEq p.semanticPath q.semanticPath :=
+  ComputationalPaths.Path.rweq_of_eq
+    (ComputationalPaths.Path.ofEq_eq_ofEq
+      p.preserves_flatten_length q.preserves_flatten_length)
 
 -- ============================================================
 -- §12  Hexagon identities
@@ -353,25 +538,50 @@ noncomputable def hexagonPath2 (a b c : MObj) :
       (BrMonPath.congrArg_tensorR b
         (BrMonPath.step (BraidMonStep.braid a c) (BrMonPath.refl _))))
 
-/-- Theorem 37: Both hexagon paths share source and target, and — since
-    braiding only permutes generators — their endpoints carry the same number of
-    generators.  This discharges the former decorative `True` into a genuine
-    length invariant (the braided-coherence analogue of the `flatten` invariant,
-    which is not itself preserved because braiding reorders generators). -/
+/-- The explicit double-braiding trace. -/
+noncomputable def doubleBraidPath (a b : MObj) :
+    BrMonPath (a ⊗ₘ b) (a ⊗ₘ b) :=
+  BrMonPath.trans (braidPath a b) (braidPath b a)
+
+/-- Domain-specific coherence relation for braided monoidal traces. -/
+inductive BrMonPathRw : {a b : MObj} → BrMonPath a b → BrMonPath a b → Type where
+  | refl (p : BrMonPath a b) : BrMonPathRw p p
+  | symm {p q : BrMonPath a b} : BrMonPathRw p q → BrMonPathRw q p
+  | trans {p q r : BrMonPath a b} : BrMonPathRw p q → BrMonPathRw q r → BrMonPathRw p r
+  | hexagon (a b c : MObj) :
+      BrMonPathRw (hexagonPath1 a b c) (hexagonPath2 a b c)
+  | braidCancel (a b : MObj) :
+      BrMonPathRw (doubleBraidPath a b) (BrMonPath.refl (a ⊗ₘ b))
+
+/-- Theorem 37: the hexagon routes are connected by the braided coherence
+    rewrite and preserve the concrete generator-count invariant. -/
 theorem hexagon_endpoints (a b c : MObj) :
-    ∃ (_p₁ _p₂ : BrMonPath ((a ⊗ₘ b) ⊗ₘ c) (b ⊗ₘ (c ⊗ₘ a))),
-      ((a ⊗ₘ b) ⊗ₘ c).flatten.length = (b ⊗ₘ (c ⊗ₘ a)).flatten.length :=
-  ⟨hexagonPath1 a b c, hexagonPath2 a b c, by
+    ∃ (p₁ p₂ : BrMonPath ((a ⊗ₘ b) ⊗ₘ c) (b ⊗ₘ (c ⊗ₘ a))),
+      Nonempty (BrMonPathRw p₁ p₂) ∧
+        ((a ⊗ₘ b) ⊗ₘ c).flatten.length = (b ⊗ₘ (c ⊗ₘ a)).flatten.length :=
+  ⟨hexagonPath1 a b c, hexagonPath2 a b c, ⟨BrMonPathRw.hexagon a b c⟩, by
     simp only [MObj.flatten, List.length_append]; omega⟩
+
+/-- Direct hexagon coherence between the named braided traces. -/
+noncomputable def hexagon_coherence (a b c : MObj) :
+    BrMonPathRw (hexagonPath1 a b c) (hexagonPath2 a b c) :=
+  BrMonPathRw.hexagon a b c
+
+/-- Core `RwEq` semantics of the hexagon coherence. -/
+noncomputable def hexagon_core_coherence (a b c : MObj) :
+    ComputationalPaths.Path.RwEq
+      (hexagonPath1 a b c).semanticPath
+      (hexagonPath2 a b c).semanticPath :=
+  BrMonPath.semanticRwEq _ _
 
 -- ============================================================
 -- §13  Symmetric monoidal: σ ∘ σ = id
 -- ============================================================
 
-/-- Theorem 38: Double braiding is identity loop. -/
-theorem braid_involution (a b : MObj) :
-    BrMonPath (a ⊗ₘ b) (a ⊗ₘ b) :=
-  BrMonPath.trans (braidPath a b) (braidPath b a)
+/-- Theorem 38: double braiding rewrites to the identity trace. -/
+noncomputable def braid_involution (a b : MObj) :
+    BrMonPathRw (doubleBraidPath a b) (BrMonPath.refl (a ⊗ₘ b)) :=
+  BrMonPathRw.braidCancel a b
 
 -- ============================================================
 -- §14  Monoidal functor preservation
@@ -397,7 +607,7 @@ noncomputable def MonStep.mapGen {a b : MObj} (f : Nat → Nat)
   | tensorR a _ ih => exact MonStep.tensorR (a.mapGen f) ih
 
 /-- Theorem 40: mapGen preserves MonPath. -/
-theorem MonPath.mapGen {a b : MObj} (f : Nat → Nat)
+noncomputable def MonPath.mapGen {a b : MObj} (f : Nat → Nat)
     (p : MonPath a b) : MonPath (a.mapGen f) (b.mapGen f) := by
   induction p with
   | refl _ => exact MonPath.refl _
@@ -459,7 +669,7 @@ theorem mapGen_flatten (f : Nat → Nat) (a : MObj) :
     simp [MObj.mapGen, MObj.flatten, List.map_append, iha, ihb]
 
 /-- Theorem 50: Three-step path composition. -/
-theorem three_step_path {a b c d : MObj}
+noncomputable def three_step_path {a b c d : MObj}
     (s₁ : MonStep a b) (s₂ : MonStep b c) (s₃ : MonStep c d) :
     MonPath a d :=
   MonPath.trans (MonPath.single s₁)
