@@ -10,6 +10,9 @@
   All proofs are sorry-free.  40+ theorems.
 -/
 
+import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
+
 -- ============================================================
 -- §1  Points and computational paths
 -- ============================================================
@@ -120,21 +123,57 @@ def step_symm_symm (s : Step a b) : Step.symm (Step.symm s) = s := by
 -- §4  2-Paths (paths between paths) — higher groupoid structure
 -- ============================================================
 
-/-- 2-path: a path between paths (homotopy). -/
+/-- Domain-specific generating rewrites between local path traces.  Unlike the
+    former unrestricted constructor, these rules cannot manufacture a 2-path
+    between arbitrary traces. -/
+inductive Path2Step : Path a b → Path a b → Type where
+  | transAssoc (p : Path a b) (q : Path b c) (r : Path c d) :
+      Path2Step (Path.trans (Path.trans p q) r) (Path.trans p (Path.trans q r))
+  | transReflRight (p : Path a b) :
+      Path2Step (Path.trans p (Path.refl b)) p
+  | transSymm (p : Path a b) :
+      Path2Step (Path.trans p (Path.symm p)) (Path.refl a)
+  | symmTrans (p : Path a b) :
+      Path2Step (Path.trans (Path.symm p) p) (Path.refl b)
+  | symmSymm (p : Path a b) :
+      Path2Step (Path.symm (Path.symm p)) p
+  | congrLeft (r : Path x a) {p q : Path a b} :
+      Path2Step p q → Path2Step (Path.trans r p) (Path.trans r q)
+  | congrRight {p q : Path a b} (r : Path b c) :
+      Path2Step p q → Path2Step (Path.trans p r) (Path.trans q r)
+  | symm {p q : Path a b} : Path2Step p q → Path2Step q p
+
+/-- 2-paths are the reflexive/transitive closure of the admissible rewrite
+    generators. -/
 inductive Path2 : Path a b → Path a b → Type where
   | refl2 : (p : Path a b) → Path2 p p
-  | step2 : (name : String) → (p q : Path a b) → Path2 p q
+  | step2 {p q : Path a b} : Path2Step p q → Path2 p q
+  | trans2 {p q r : Path a b} : Path2 p q → Path2 q r → Path2 p r
 
-/-- Theorem 16 – Path2.trans: vertical composition of 2-paths. -/
+/-- Theorem 16 – vertical composition of 2-paths. -/
 noncomputable def Path2.trans : Path2 p q → Path2 q r → Path2 p r
   | Path2.refl2 _, h => h
-  | Path2.step2 n p q, Path2.refl2 _ => Path2.step2 n p q
-  | Path2.step2 n1 p _, Path2.step2 n2 _ r => Path2.step2 (n1 ++ "·" ++ n2) p r
+  | h, k => Path2.trans2 h k
 
-/-- Theorem 17 – Path2.symm: inversion of 2-paths. -/
+/-- Theorem 17 – inversion of 2-paths. -/
 noncomputable def Path2.symm : Path2 p q → Path2 q p
   | Path2.refl2 p => Path2.refl2 p
-  | Path2.step2 n p q => Path2.step2 (n ++ "⁻¹") q p
+  | Path2.step2 s => Path2.step2 (Path2Step.symm s)
+  | Path2.trans2 h k => Path2.trans (Path2.symm k) (Path2.symm h)
+
+/-- Left whiskering transports every generating rewrite through composition. -/
+noncomputable def Path2.whiskerL (r : Path x a) : Path2 p q →
+    Path2 (Path.trans r p) (Path.trans r q)
+  | Path2.refl2 p => Path2.refl2 (Path.trans r p)
+  | Path2.step2 s => Path2.step2 (Path2Step.congrLeft r s)
+  | Path2.trans2 h k => Path2.trans (Path2.whiskerL r h) (Path2.whiskerL r k)
+
+/-- Right whiskering transports every generating rewrite through composition. -/
+noncomputable def Path2.whiskerR (r : Path b c) : Path2 p q →
+    Path2 (Path.trans p r) (Path.trans q r)
+  | Path2.refl2 p => Path2.refl2 (Path.trans p r)
+  | Path2.step2 s => Path2.step2 (Path2Step.congrRight r s)
+  | Path2.trans2 h k => Path2.trans (Path2.whiskerR r h) (Path2.whiskerR r k)
 
 /-- Theorem 18 – Path2.trans refl2 left identity. -/
 theorem path2_trans_refl_left (h : Path2 p q) :
@@ -144,10 +183,11 @@ theorem path2_trans_refl_left (h : Path2 p q) :
 -- §5  Horizontal composition for Eckmann-Hilton
 -- ============================================================
 
-/-- Horizontal composition of 2-paths (whiskering model). -/
+/-- Horizontal 2-paths use the same admissible rewrite generators. -/
 inductive HPath2 : Path a b → Path a b → Type where
   | hrefl : (p : Path a b) → HPath2 p p
-  | hcomp : (name : String) → (p q : Path a b) → HPath2 p q
+  | hstep {p q : Path a b} : Path2Step p q → HPath2 p q
+  | htrans2 {p q r : Path a b} : HPath2 p q → HPath2 q r → HPath2 p r
 
 /-- Theorem 19 – horizontal identity. -/
 noncomputable def HPath2.hid (p : Path a b) : HPath2 p p := HPath2.hrefl p
@@ -155,8 +195,7 @@ noncomputable def HPath2.hid (p : Path a b) : HPath2 p p := HPath2.hrefl p
 /-- Theorem 20 – horizontal trans. -/
 noncomputable def HPath2.htrans : HPath2 p q → HPath2 q r → HPath2 p r
   | HPath2.hrefl _, h => h
-  | HPath2.hcomp n p q, HPath2.hrefl _ => HPath2.hcomp n p q
-  | HPath2.hcomp n1 p _, HPath2.hcomp n2 _ r => HPath2.hcomp (n1 ++ "⋆" ++ n2) p r
+  | h, k => HPath2.htrans2 h k
 
 /-- Eckmann-Hilton witness: vertical and horizontal compositions
     agree on loops at the same base point. -/
@@ -181,17 +220,36 @@ noncomputable def eckmannHilton_refl (a : Pt) : EckmannHilton a :=
 structure FundGroupoid where
   pts : Type
   path : pts → pts → Type
+  rwEq : {x y : pts} → path x y → path x y → Type
   id   : (x : pts) → path x x
   comp : path x y → path y z → path x z
   inv  : path x y → path y x
+  rwRefl : {x y : pts} → (p : path x y) → rwEq p p
+  rwSymm : {x y : pts} → {p q : path x y} → rwEq p q → rwEq q p
+  rwTrans : {x y : pts} → {p q r : path x y} → rwEq p q → rwEq q r → rwEq p r
+  assoc : {w x y z : pts} → (p : path w x) → (q : path x y) → (r : path y z) →
+    rwEq (comp (comp p q) r) (comp p (comp q r))
+  idLeft : {x y : pts} → (p : path x y) → rwEq (comp (id x) p) p
+  idRight : {x y : pts} → (p : path x y) → rwEq (comp p (id y)) p
+  invLeft : {x y : pts} → (p : path x y) → rwEq (comp (inv p) p) (id y)
+  invRight : {x y : pts} → (p : path x y) → rwEq (comp p (inv p)) (id x)
 
 /-- Theorem 22 – our Path forms a fundamental groupoid. -/
 noncomputable def ptGroupoid : FundGroupoid :=
   { pts  := Pt
     path := Path
+    rwEq := Path2
     id   := Path.refl
     comp := Path.trans
-    inv  := Path.symm }
+    inv  := Path.symm
+    rwRefl := Path2.refl2
+    rwSymm := Path2.symm
+    rwTrans := Path2.trans
+    assoc := fun p q r => Path2.step2 (Path2Step.transAssoc p q r)
+    idLeft := fun p => Path2.refl2 p
+    idRight := fun p => Path2.step2 (Path2Step.transReflRight p)
+    invLeft := fun p => Path2.step2 (Path2Step.symmTrans p)
+    invRight := fun p => Path2.step2 (Path2Step.transSymm p) }
 
 -- ============================================================
 -- §7  π₁ — fundamental group (loops at a base point)
@@ -298,21 +356,65 @@ theorem transport_trans (F : Fibre) (tr : StepTransport F)
 -- §10  Covering space lifting
 -- ============================================================
 
-/-- A covering space: fibre + step transport with unique lifting. -/
+/-- A covering space supplies a type of admissible lifts of each base step, a
+    canonical transport lift, and genuine uniqueness between any two admissible
+    lifts.  Uniqueness is Path-valued rather than a tautological pair of
+    equalities to a preselected endpoint. -/
 structure Covering where
   fibre  : Fibre
   tr     : StepTransport fibre
-  unique : ∀ {a b : Pt} (s : Step a b) (x : fibre a) (y₁ y₂ : fibre b),
-           y₁ = tr.fwd s x → y₂ = tr.fwd s x → y₁ = y₂
+  liftStep : {a b : Pt} → (s : Step a b) →
+    (x : fibre a) → (y : fibre b) → Type
+  canonical : {a b : Pt} → (s : Step a b) → (x : fibre a) →
+    liftStep s x (tr.fwd s x)
+  unique : {a b : Pt} → {s : Step a b} → {x : fibre a} →
+    {y₁ y₂ : fibre b} → liftStep s x y₁ → liftStep s x y₂ →
+      ComputationalPaths.Path y₁ y₂
 
-/-- Theorem 37 – unique path lifting: if two lifts start at the same
-    fibre point, they arrive at the same fibre point. -/
-theorem unique_path_lifting (cov : Covering) (p : Path a b) (x : cov.fibre a) :
-    ∀ y₁ y₂ : cov.fibre b,
-      y₁ = transport cov.fibre cov.tr p x →
-      y₂ = transport cov.fibre cov.tr p x → y₁ = y₂ := by
-  intro y₁ y₂ h₁ h₂
-  rw [h₁, h₂]
+/-- An explicit lift trace records an admissible fibre lift over every base
+    rewrite step. -/
+inductive LiftTrace (cov : Covering) :
+    {a b : Pt} → Path a b → cov.fibre a → cov.fibre b → Type where
+  | nil (x : cov.fibre a) : LiftTrace cov (Path.nil a) x x
+  | cons {a b c : Pt} {s : Step a b} {p : Path b c}
+      {x : cov.fibre a} {y : cov.fibre b} {z : cov.fibre c}
+      (head : cov.liftStep s x y) (tail : LiftTrace cov p y z) :
+      LiftTrace cov (Path.cons s p) x z
+
+/-- The deterministic transport action gives a canonical explicit lift trace. -/
+noncomputable def canonicalLiftTrace (cov : Covering) :
+    (p : Path a b) → (x : cov.fibre a) →
+      LiftTrace cov p x (transport cov.fibre cov.tr p x)
+  | Path.nil _, x => LiftTrace.nil x
+  | Path.cons s p, x =>
+      LiftTrace.cons (cov.canonical s x)
+        (canonicalLiftTrace cov p (cov.tr.fwd s x))
+
+/-- Theorem 37 – unique path lifting, proved recursively from uniqueness of
+    individual lifted steps. -/
+noncomputable def unique_path_lifting (cov : Covering) :
+    (p : Path a b) → (x : cov.fibre a) → {y₁ y₂ : cov.fibre b} →
+      LiftTrace cov p x y₁ → LiftTrace cov p x y₂ →
+        ComputationalPaths.Path y₁ y₂
+  | Path.nil _, x, _, _, LiftTrace.nil _, LiftTrace.nil _ =>
+      ComputationalPaths.Path.refl x
+  | Path.cons s p, _, _, _, LiftTrace.cons head₁ tail₁,
+      LiftTrace.cons head₂ tail₂ => by
+      have hmid := cov.unique head₁ head₂
+      cases hmid.toEq
+      exact unique_path_lifting cov p _ tail₁ tail₂
+
+/-- The uniqueness path followed by its inverse contracts to reflexivity under
+    the core rewrite equality, providing a genuine multi-step coherence. -/
+noncomputable def unique_path_lifting_coherence (cov : Covering)
+    (p : Path a b) (x : cov.fibre a) {y₁ y₂ : cov.fibre b}
+    (l₁ : LiftTrace cov p x y₁) (l₂ : LiftTrace cov p x y₂) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans (unique_path_lifting cov p x l₁ l₂)
+        (ComputationalPaths.Path.symm (unique_path_lifting cov p x l₁ l₂)))
+      (ComputationalPaths.Path.refl y₁) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right
+    (unique_path_lifting cov p x l₁ l₂)
 
 /-- Theorem 38 – lifting over refl is trivial. -/
 theorem lift_refl (cov : Covering) (x : cov.fibre a) :
@@ -377,19 +479,14 @@ theorem symm_symm (p : Path a b) : Path.symm (Path.symm p) = p := by
 -- §13  Coherence: whiskering and interchange
 -- ============================================================
 
-/-- Theorem 45 – left whiskering with `refl` produces `refl`: the identity
-    2-cell on `p ⬝ q` is idempotent under vertical composition
-    (`trans h h = h`), discharging the former decorative `True`. -/
+/-- Theorem 45 – actual left whiskering of an identity 2-cell is the identity
+    on the composite path. -/
 theorem whiskerL_refl_path2 (p : Path a b) (q : Path b c) :
-    ∃ h : Path2 (Path.trans p q) (Path.trans p q), Path2.trans h h = h :=
-  ⟨Path2.refl2 _, rfl⟩
+    Path2.whiskerL p (Path2.refl2 q) = Path2.refl2 (Path.trans p q) := rfl
 
-/-- Theorem 46 – right whiskering preserves `refl`: the identity 2-cell on `p`
-    is idempotent under vertical composition (`trans h h = h`), discharging the
-    former decorative `True`. -/
-theorem whiskerR_preserves_refl (p : Path a b) :
-    ∃ h : Path2 p p, Path2.trans h h = h :=
-  ⟨Path2.refl2 p, rfl⟩
+/-- Theorem 46 – actual right whiskering preserves identity 2-cells. -/
+theorem whiskerR_preserves_refl (p : Path a b) (q : Path b c) :
+    Path2.whiskerR q (Path2.refl2 p) = Path2.refl2 (Path.trans p q) := rfl
 
 -- ============================================================
 -- §14  Groupoid morphisms (functors between groupoids)
@@ -414,27 +511,40 @@ noncomputable def GroupoidMorphism.comp (f : GroupoidMorphism G₁ G₂) (g : Gr
 -- §15  Concrete groupoid: cyclic paths
 -- ============================================================
 
-/-- Cyclic group of paths: Z/n on a single point. -/
-noncomputable def cyclicLoop (n : Nat) (k : Nat) (a : Pt) : Path a a :=
+/-- Repeat the distinguished loop edge a concrete number of times. -/
+noncomputable def repeatLoop (k : Nat) (a : Pt) : Path a a :=
   match k with
   | 0 => Path.refl a
   | k + 1 => Path.trans (Path.single (Step.edge (match a with | Pt.mk m => m)
                                                   (match a with | Pt.mk m => m)))
-                         (cyclicLoop n k a)
+                         (repeatLoop k a)
+
+/-- Canonical representative count for `Z/n`; `n = 0` retains the infinite
+    cyclic interpretation. -/
+noncomputable def cyclicCount (n k : Nat) : Nat :=
+  if n = 0 then k else k % n
+
+/-- Cyclic group path represented by the residue class of `k` modulo `n`. -/
+noncomputable def cyclicLoop (n : Nat) (k : Nat) (a : Pt) : Path a a :=
+  repeatLoop (cyclicCount n k) a
 
 /-- Theorem 49 – cyclic loop at 0 is refl. -/
-theorem cyclicLoop_zero (n : Nat) (a : Pt) : cyclicLoop n 0 a = Path.refl a := rfl
+theorem cyclicLoop_zero (n : Nat) (a : Pt) : cyclicLoop n 0 a = Path.refl a := by
+  simp [cyclicLoop, cyclicCount, repeatLoop]
 
-/-- Theorem 50 – length of cyclic loop equals k. -/
-theorem cyclicLoop_length (n k : Nat) (a : Pt) :
-    (cyclicLoop n k a).length = k := by
+/-- Length of a repeated loop is its explicit repetition count. -/
+theorem repeatLoop_length (k : Nat) (a : Pt) :
+    (repeatLoop k a).length = k := by
   induction k with
   | zero => rfl
   | succ k ih =>
-    simp [cyclicLoop]
-    rw [length_trans]
-    simp [Path.single, Path.length]
-    rw [ih]; omega
+    simp [repeatLoop, length_trans, Path.single, Path.length, ih]
+    omega
+
+/-- Theorem 50 – cyclic-loop length is the canonical residue count. -/
+theorem cyclicLoop_length (n k : Nat) (a : Pt) :
+    (cyclicLoop n k a).length = cyclicCount n k := by
+  exact repeatLoop_length (cyclicCount n k) a
 
 -- ============================================================
 -- §16  Naturality of transport
