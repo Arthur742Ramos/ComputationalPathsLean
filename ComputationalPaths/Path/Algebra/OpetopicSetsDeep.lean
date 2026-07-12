@@ -7,7 +7,7 @@
   hypothesis structure, multitopes, and coherence laws for opetopic composition.
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.OpetopicSetsDeep
 
@@ -18,16 +18,16 @@ universe u v w
 /-! ## Elementary path witnesses -/
 
 noncomputable def edgePath {A : Type u} {a b : A} (h : a = b) : Path a b :=
-  Path.mk [Step.mk a b h] h
+  Path.stepChain h
 
 noncomputable def reflPathViaMk {A : Type u} (a : A) : Path a a :=
-  Path.mk [] rfl
+  Path.refl a
 
 @[simp] theorem edgePath_toEq {A : Type u} {a b : A} (h : a = b) :
     toEq (edgePath h) = h := rfl
 
 @[simp] theorem edgePath_refl {A : Type u} (a : A) :
-    edgePath (rfl : a = a) = Path.mk [Step.mk a a rfl] rfl := rfl
+    edgePath (rfl : a = a) = Path.stepChain rfl := rfl
 
 @[simp] theorem edgePath_symm_toEq {A : Type u} {a b : A} (h : a = b) :
     toEq (symm (edgePath h)) = h.symm := rfl
@@ -89,17 +89,31 @@ noncomputable def assocSym {A : Type u} (O : OpetopicType A) (x y z : A) :
 
 noncomputable def assocChain {A : Type u} (O : OpetopicType A) (x y z w : A) :
     Path (O.Gam (O.Gam (O.Gam x y) z) w) (O.Gam x (O.Gam y (O.Gam z w))) :=
-  trans (O.assoc (O.Gam x y) z w) (O.assoc x y (O.Gam z w))
+  Path.trans (O.assoc (O.Gam x y) z w) (O.assoc x y (O.Gam z w))
 
 noncomputable def coherenceRouteLeft {A : Type u} (O : OpetopicType A) (x y z w : A) :
     Path (O.Gam (O.Gam (O.Gam x y) z) w) (O.Gam x (O.Gam y (O.Gam z w))) :=
-  trans (trans (O.assoc (O.Gam x y) z w) (O.assoc x y (O.Gam z w)))
-    (refl (O.Gam x (O.Gam y (O.Gam z w))))
+  Path.trans
+    (Path.trans (O.assoc (O.Gam x y) z w) (O.assoc x y (O.Gam z w)))
+    (Path.refl (O.Gam x (O.Gam y (O.Gam z w))))
 
 noncomputable def coherenceRouteRight {A : Type u} (O : OpetopicType A) (x y z w : A) :
     Path (O.Gam (O.Gam (O.Gam x y) z) w) (O.Gam x (O.Gam y (O.Gam z w))) :=
-  trans (O.assoc (O.Gam x y) z w)
-    (trans (O.assoc x y (O.Gam z w)) (refl (O.Gam x (O.Gam y (O.Gam z w)))))
+  Path.trans (O.assoc (O.Gam x y) z w)
+    (Path.trans (O.assoc x y (O.Gam z w))
+      (Path.refl (O.Gam x (O.Gam y (O.Gam z w)))))
+
+/-- The two parenthesizations of the four-cell opetopic associativity route
+are related by the primitive transitivity reassociation rewrite. -/
+noncomputable def coherence_routes_rweq {A : Type u}
+    (O : OpetopicType A) (x y z w : A) :
+    RwEq
+      (coherenceRouteLeft O x y z w)
+      (coherenceRouteRight O x y z w) :=
+  rweq_tt
+    (O.assoc (O.Gam x y) z w)
+    (O.assoc x y (O.Gam z w))
+    (Path.refl (O.Gam x (O.Gam y (O.Gam z w))))
 
 theorem assoc_symm_symm {A : Type u} (O : OpetopicType A) (x y z : A) :
     symm (symm (O.assoc x y z)) = O.assoc x y z :=

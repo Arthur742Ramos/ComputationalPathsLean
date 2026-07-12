@@ -7,6 +7,7 @@ layer with pentagon/triangle coherence inherited as 3-cells.
 -/
 
 import ComputationalPaths.Path.TwoCategory
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -73,8 +74,7 @@ noncomputable def gray_interchange_path_from_interchange (G : GrayCategory (Obj 
     CellPath
       (G.vcomp (G.hcomp η₁ θ₁) (G.hcomp η₂ θ₂))
       (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂)) :=
-  Path.mk
-    [Step.mk _ _ (_root_.congrArg PLift.up (G.interchange η₁ η₂ θ₁ θ₂))]
+  Path.stepChain
     (_root_.congrArg PLift.up (G.interchange η₁ η₂ θ₁ θ₂))
 
 /-- Interchange with identity 2-cells collapses to the original tensor. -/
@@ -113,6 +113,52 @@ theorem gray_interchange_assoc (G : GrayCategory (Obj := Obj))
           (G.vcomp θ₁ (G.vcomp θ₂ θ₃)) := by
             rw [G.interchange (η₁ := η₁) (η₂ := G.vcomp η₂ η₃)
               (θ₁ := θ₁) (θ₂ := G.vcomp θ₂ θ₃)]
+
+/-- The three mathematical stages in associative Gray interchange, retained
+as an explicit computational path. -/
+noncomputable def gray_interchange_assoc_path (G : GrayCategory (Obj := Obj))
+    {a b c : Obj}
+    {f₀ f₁ f₂ f₃ : G.Hom a b} {g₀ g₁ g₂ g₃ : G.Hom b c}
+    (η₁ : G.TwoCell f₀ f₁) (η₂ : G.TwoCell f₁ f₂)
+    (η₃ : G.TwoCell f₂ f₃)
+    (θ₁ : G.TwoCell g₀ g₁) (θ₂ : G.TwoCell g₁ g₂)
+    (θ₃ : G.TwoCell g₂ g₃) :
+    CellPath
+      (G.vcomp (G.vcomp (G.hcomp η₁ θ₁) (G.hcomp η₂ θ₂))
+        (G.hcomp η₃ θ₃))
+      (G.hcomp (G.vcomp η₁ (G.vcomp η₂ η₃))
+        (G.vcomp θ₁ (G.vcomp θ₂ θ₃))) :=
+  let p₁ := Path.stepChain (_root_.congrArg PLift.up
+    (G.vcomp_assoc (η := G.hcomp η₁ θ₁)
+      (θ := G.hcomp η₂ θ₂) (ι := G.hcomp η₃ θ₃)))
+  let p₂ := Path.stepChain (_root_.congrArg PLift.up
+    (_root_.congrArg (fun ξ => G.vcomp (G.hcomp η₁ θ₁) ξ)
+      (G.interchange η₂ η₃ θ₂ θ₃)))
+  let p₃ := Path.stepChain (_root_.congrArg PLift.up
+    (G.interchange η₁ (G.vcomp η₂ η₃) θ₁ (G.vcomp θ₂ θ₃)))
+  Path.trans p₁ (Path.trans p₂ p₃)
+
+/-- Reassociation of the three Gray-interchange stages is an LND_EQ-TRS
+coherence, rather than an appended unit detour. -/
+noncomputable def gray_interchange_assoc_rweq
+    (G : GrayCategory (Obj := Obj))
+    {a b c : Obj}
+    {f₀ f₁ f₂ f₃ : G.Hom a b} {g₀ g₁ g₂ g₃ : G.Hom b c}
+    (η₁ : G.TwoCell f₀ f₁) (η₂ : G.TwoCell f₁ f₂)
+    (η₃ : G.TwoCell f₂ f₃)
+    (θ₁ : G.TwoCell g₀ g₁) (θ₂ : G.TwoCell g₁ g₂)
+    (θ₃ : G.TwoCell g₂ g₃) :
+    let p₁ := Path.stepChain (_root_.congrArg PLift.up
+      (G.vcomp_assoc (η := G.hcomp η₁ θ₁)
+        (θ := G.hcomp η₂ θ₂) (ι := G.hcomp η₃ θ₃)))
+    let p₂ := Path.stepChain (_root_.congrArg PLift.up
+      (_root_.congrArg (fun ξ => G.vcomp (G.hcomp η₁ θ₁) ξ)
+        (G.interchange η₂ η₃ θ₂ θ₃)))
+    let p₃ := Path.stepChain (_root_.congrArg PLift.up
+      (G.interchange η₁ (G.vcomp η₂ η₃) θ₁ (G.vcomp θ₂ θ₃)))
+    RwEq (Path.trans (Path.trans p₁ p₂) p₃)
+      (Path.trans p₁ (Path.trans p₂ p₃)) := by
+  exact rweq_tt _ _ _
 
 /-- A tensor-associative form of interchange for three composable factors. -/
 theorem gray_tensor_assoc (G : GrayCategory (Obj := Obj))
@@ -153,12 +199,11 @@ theorem gray_tensor_product_associative_nonempty (G : GrayCategory (Obj := Obj))
       (G.vcomp (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂)) (G.hcomp η₃ θ₃))
       (G.hcomp (G.vcomp η₁ (G.vcomp η₂ η₃))
         (G.vcomp θ₁ (G.vcomp θ₂ θ₃)))) :=
-  ⟨Path.mk
-    [Step.mk _ _
+  ⟨Path.trans
+    (Path.stepChain
       (_root_.congrArg PLift.up
-        (gray_tensor_product_associative (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃))]
-    (_root_.congrArg PLift.up
-      (gray_tensor_product_associative (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃))⟩
+        (gray_tensor_product_associative (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃)))
+    (Path.refl _)⟩
 
 /-- Gray tensor (horizontal composition) is functorial: interchange swaps
 the direction of the 3-cell. -/
@@ -369,21 +414,15 @@ noncomputable def pathGrayCategory (A : Type u) : GrayCategory (Obj := A) where
   toTwoCategory := pathTwoCategory A
   interchange_path := by
     intro a b c f₀ f₁ f₂ g₀ g₁ g₂ η₁ η₂ θ₁ θ₂
-    exact
-      Path.mk
-        [Step.mk _ _
-          (_root_.congrArg PLift.up
-            ((pathTwoCategory A).interchange
-              (a := a) (b := b) (c := c)
-              (f₀ := f₀) (f₁ := f₁) (f₂ := f₂)
-              (g₀ := g₀) (g₁ := g₁) (g₂ := g₂)
-              (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)))]
+    exact Path.trans
+      (Path.stepChain
         (_root_.congrArg PLift.up
           ((pathTwoCategory A).interchange
             (a := a) (b := b) (c := c)
             (f₀ := f₀) (f₁ := f₁) (f₂ := f₂)
             (g₀ := g₀) (g₁ := g₁) (g₂ := g₂)
-            (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)))
+            (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂))))
+      (Path.refl _)
 
 /-- For `pathGrayCategory`, the stored interchange 3-cell recovers interchange by extraction. -/
 theorem pathGrayCategory_interchange_from_path (A : Type u)
@@ -423,10 +462,11 @@ noncomputable def pathGrayCategory_tensor_assoc_path (A : Type u)
       ((pathGrayCategory A).vcomp
         ((pathGrayCategory A).assoc f₀ g₀ h₀)
         ((pathGrayCategory A).hcomp η ((pathGrayCategory A).hcomp θ ι))) :=
-  Path.mk
-    [Step.mk _ _
-      (_root_.congrArg PLift.up (pathGrayCategory_tensor_assoc (A := A) η θ ι))]
-    (_root_.congrArg PLift.up (pathGrayCategory_tensor_assoc (A := A) η θ ι))
+  Path.trans
+    (Path.stepChain
+      (_root_.congrArg PLift.up
+        (pathGrayCategory_tensor_assoc (A := A) η θ ι)))
+    (Path.refl _)
 
 /-- Forgetting 3-cell data recovers the path 2-category. -/
 @[simp] theorem pathGrayCategory_to_twoCategory (A : Type u) :

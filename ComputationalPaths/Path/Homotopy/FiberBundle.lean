@@ -41,6 +41,7 @@ between the fiber and the model fiber F.
 
 import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -538,13 +539,27 @@ noncomputable def transition_comp_toFun_path {F : Type u}
 noncomputable def transition_inv_comp_toFun_path {F : Type u}
     (t : TransitionFunction F) (f : F) :
     Path ((TransitionFunction.comp (TransitionFunction.inv t) t).toFun f) f :=
-  Path.stepChain (TransitionFunction.inv_comp t f)
+  Path.trans
+    (transition_comp_toFun_path (TransitionFunction.inv t) t f)
+    (TransitionFunction.left_inv_path t f)
 
 /-- Map-then-inverse transition route contracts to identity by computational path. -/
 noncomputable def transition_comp_inv_toFun_path {F : Type u}
     (t : TransitionFunction F) (f : F) :
     Path ((TransitionFunction.comp t (TransitionFunction.inv t)).toFun f) f :=
-  Path.stepChain (TransitionFunction.comp_inv t f)
+  Path.trans
+    (transition_comp_toFun_path t (TransitionFunction.inv t) f)
+    (TransitionFunction.right_inv_path t f)
+
+/-- Composition with an inverse and its reverse trace cancel coherently. -/
+noncomputable def transition_comp_inv_cancel {F : Type u}
+    (t : TransitionFunction F) (f : F) :
+    RwEq
+      (Path.trans (transition_comp_inv_toFun_path t f)
+        (Path.symm (transition_comp_inv_toFun_path t f)))
+      (Path.refl ((TransitionFunction.comp t
+        (TransitionFunction.inv t)).toFun f)) :=
+  rweq_cmpA_inv_right (transition_comp_inv_toFun_path t f)
 
 /-- Trivial bundle fibers satisfy round-trip by computational path. -/
 noncomputable def trivialBundle_fiber_roundtrip_path₂ (B : Type u) (F : Type u) (b : B)

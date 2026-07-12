@@ -225,6 +225,8 @@ inductive DerivEquivT : {e₁ e₂ : Expr} → RwEqDeriv e₁ e₂ → RwEqDeriv
 
 namespace DerivEquivT
 
+open Rewrite.GroupoidConfluence (toRW)
+
 abbrev refl' {e₁ e₂ : Expr} (d : RwEqDeriv e₁ e₂) : DerivEquivT d d := .refl d
 
 abbrev symm' {e₁ e₂ : Expr} {d₁ d₂ : RwEqDeriv e₁ e₂}
@@ -233,6 +235,33 @@ abbrev symm' {e₁ e₂ : Expr} {d₁ d₂ : RwEqDeriv e₁ e₂}
 abbrev trans' {e₁ e₂ : Expr} {d₁ d₂ d₃ : RwEqDeriv e₁ e₂}
     (h₁ : DerivEquivT d₁ d₂) (h₂ : DerivEquivT d₂ d₃) : DerivEquivT d₁ d₃ :=
   .dtrans h₁ h₂
+
+/-- A proof-relevant 3-cell determines a semantic boundary loop: follow the
+first derivation and return along the second. -/
+noncomputable def boundaryLoop
+    {e₁ e₂ : Expr} {d₁ d₂ : RwEqDeriv e₁ e₂}
+    (_h : DerivEquivT d₁ d₂) :
+    Path (toRW e₁) (toRW e₁) :=
+  Path.trans (RwEqDeriv.semanticPath d₁)
+    (Path.symm (RwEqDeriv.semanticPath d₂))
+
+/-- Closing the boundary loop with the second derivation is coherent under
+reassociation of the three semantic legs. -/
+noncomputable def boundaryLoop_rweq
+    {e₁ e₂ : Expr} {d₁ d₂ : RwEqDeriv e₁ e₂}
+    (_h : DerivEquivT d₁ d₂) :
+    RwEq
+      (Path.trans
+        (Path.trans (RwEqDeriv.semanticPath d₁)
+          (Path.symm (RwEqDeriv.semanticPath d₂)))
+        (RwEqDeriv.semanticPath d₂))
+      (Path.trans
+        (RwEqDeriv.semanticPath d₁)
+        (Path.trans (Path.symm (RwEqDeriv.semanticPath d₂))
+          (RwEqDeriv.semanticPath d₂))) :=
+  rweq_tt (RwEqDeriv.semanticPath d₁)
+    (Path.symm (RwEqDeriv.semanticPath d₂))
+    (RwEqDeriv.semanticPath d₂)
 
 end DerivEquivT
 
@@ -315,7 +344,11 @@ the Grothendieck–Maltsiniotis conjecture. -/
 
 /-- The 3-groupoid axiom: every 2-cell has an inverse. -/
 theorem two_cell_inverse (d : RwEqDeriv e₁ e₂) :
-    ∃ _d' : RwEqDeriv e₂ e₁, True := ⟨d.symm, trivial⟩
+    ∃ d' : RwEqDeriv e₂ e₁,
+      RwEqDeriv.toExprRwEq d' =
+        Rewrite.GroupoidConfluence.ExprRwEq.symm
+          (RwEqDeriv.toExprRwEq d) :=
+  ⟨d.symm, rfl⟩
 
 /-- Vertical composition of 3-cells is well-defined on equivalence classes. -/
 theorem vcomp_respects_equiv {e₁ e₂ e₃ : Expr}

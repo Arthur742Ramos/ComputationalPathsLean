@@ -9,6 +9,8 @@
   All proofs are sorry‑free.
 -/
 
+import ComputationalPaths.Path.Rewrite.RwEq
+
 -- ============================================================
 -- §1  Alphabet and positive‑braid words
 -- ============================================================
@@ -458,6 +460,30 @@ theorem BraidPath.preserves_length {n : Nat} {a b : BraidWord n}
   induction p with
   | refl _ => rfl
   | step s _ ih => exact Eq.trans s.preserves_length ih
+
+/-- A braid-rewriting path induces a computational path between the source
+and target word lengths. -/
+noncomputable def BraidPath.lengthPath
+    {n : Nat} {a b : BraidWord n} (p : BraidPath n a b) :
+    ComputationalPaths.Path a.length b.length :=
+  ComputationalPaths.Path.stepChain p.preserves_length
+
+/-- Length preservation composes along two consecutive braid paths. -/
+noncomputable def BraidPath.transLengthPath
+    {n : Nat} {a b c : BraidWord n}
+    (p : BraidPath n a b) (q : BraidPath n b c) :
+    ComputationalPaths.Path a.length c.length :=
+  ComputationalPaths.Path.trans p.lengthPath q.lengthPath
+
+/-- The composite length trace for braid rewriting cancels coherently. -/
+noncomputable def BraidPath.transLengthCancel
+    {n : Nat} {a b c : BraidWord n}
+    (p : BraidPath n a b) (q : BraidPath n b c) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans (p.transLengthPath q)
+        (ComputationalPaths.Path.symm (p.transLengthPath q)))
+      (ComputationalPaths.Path.refl a.length) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right (p.transLengthPath q)
 
 -- ============================================================
 -- §15  Concatenation is compatible with paths (congruence)

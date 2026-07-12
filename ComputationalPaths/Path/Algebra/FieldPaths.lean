@@ -19,7 +19,7 @@ propositional path closure, and 55 theorems built from genuine multi-step
 - Hungerford, "Algebra"
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -589,7 +589,31 @@ theorem path_sound {F V : Type u} (fi : FieldInterp F V)
 noncomputable def lift_to_path {F V : Type u} (fi : FieldInterp F V)
     {a b : FieldExpr V} (p : FieldPath V a b) :
     Path (evalInterp fi a) (evalInterp fi b) :=
-  Path.mk [Step.mk _ _ (path_sound fi p)] (path_sound fi p)
+  Path.stepChain (path_sound fi p)
+
+/-- The three algebraic reductions in `add_sub_cancel`, lifted separately to
+the interpreted field. -/
+noncomputable def add_sub_cancel_core_path {F V : Type u}
+    (fi : FieldInterp F V) (a b : FieldExpr V) :
+    Path (evalInterp fi (.add (.add a b) (.neg b))) (evalInterp fi a) :=
+  Path.trans
+    (Path.stepChain (path_sound fi (add_assoc a b (.neg b))))
+    (Path.trans
+      (Path.stepChain
+        (path_sound fi (congr_add_right a (add_neg b))))
+      (Path.stepChain (path_sound fi (add_zero a))))
+
+/-- Left- and right-associated interpretations of the three
+`add_sub_cancel` reductions are rewrite equivalent. -/
+noncomputable def add_sub_cancel_core_coherence {F V : Type u}
+    (fi : FieldInterp F V) (a b : FieldExpr V) :
+    let p₁ := Path.stepChain (path_sound fi (add_assoc a b (.neg b)))
+    let p₂ := Path.stepChain
+      (path_sound fi (congr_add_right a (add_neg b)))
+    let p₃ := Path.stepChain (path_sound fi (add_zero a))
+    RwEq (Path.trans (Path.trans p₁ p₂) p₃)
+      (Path.trans p₁ (Path.trans p₂ p₃)) := by
+  exact rweq_tt _ _ _
 
 /-- Theorem 54: Soundness of add_sub_cancel in any interpretation. -/
 theorem add_sub_cancel_sound {F V : Type u} (fi : FieldInterp F V)

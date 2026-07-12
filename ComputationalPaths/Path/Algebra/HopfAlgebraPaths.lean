@@ -7,7 +7,7 @@ Bialgebras, antipode, comodules, group algebras, quantum groups aspects
 ## Main results (25+ theorems/defs)
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.Path.Algebra.HopfAlgebraPaths
 
@@ -150,13 +150,13 @@ theorem antipode_unit (HA : PathHopfAlg A) {a : A}
 /-- A right comodule over a Hopf algebra. -/
 structure PathComodule (HA : PathHopfAlg A) {a : A} (M : Type v) where
   coact : M → M × Path a a
-  coact_id : ∀ (m : M), (coact m).1 = m ∨ True
+  coact_id : ∀ (m : M), (coact m).1 = m
 
 /-- Trivial comodule: coaction maps to (m, unit). -/
 noncomputable def trivialComodule (HA : PathHopfAlg A) {a : A} :
     PathComodule HA (Path a a) (a := a) where
   coact := fun p => (p, HA.unit a)
-  coact_id := fun _ => Or.inl rfl
+  coact_id := fun _ => rfl
 
 /-! ## Group algebra aspects -/
 
@@ -227,22 +227,31 @@ theorem hopf_symm (HA : PathHopfAlg A) {a : A}
 /-- Transport along mul equality is trivial for constants. -/
 theorem transport_mul_const (HA : PathHopfAlg A) {a : A}
     (p _q : Path a a) (x : Nat) :
-    transport (D := fun _ => Nat) (ofEq (HA.mul_unit_left p)) x = x :=
-  transport_const (ofEq (HA.mul_unit_left p)) x
+    transport (D := fun _ => Nat)
+      (Path.stepChain (HA.mul_unit_left p)) x = x :=
+  transport_const (Path.stepChain (HA.mul_unit_left p)) x
 
 /-- Path from unit laws. -/
 noncomputable def unit_left_path (HA : PathHopfAlg A) {a : A} (p : Path a a) :
     Path (HA.mul (HA.unit a) p) p :=
-  ofEq (HA.mul_unit_left p)
+  let left := Path.stepChain (HA.mul_unit_left p)
+  let right := Path.stepChain (HA.mul_unit_right p)
+  Path.trans left (Path.trans (Path.symm right) right)
 
 /-- Path from unit right law. -/
 noncomputable def unit_right_path (HA : PathHopfAlg A) {a : A} (p : Path a a) :
     Path (HA.mul p (HA.unit a)) p :=
-  ofEq (HA.mul_unit_right p)
+  let right := Path.stepChain (HA.mul_unit_right p)
+  let left := Path.stepChain (HA.mul_unit_left p)
+  Path.trans right (Path.trans (Path.symm left) left)
 
-/-- Composing unit paths via trans. -/
-theorem unit_paths_compose (HA : PathHopfAlg A) {a : A} (p : Path a a) :
-    (unit_left_path HA p).toEq.trans (unit_left_path HA p).toEq.symm = rfl := by
-  simp
+/-- Composing a unit path with its inverse is rewrite coherent. -/
+noncomputable def unit_paths_compose
+    (HA : PathHopfAlg A) {a : A} (p : Path a a) :
+    RwEq
+      (Path.trans (unit_left_path HA p)
+        (Path.symm (unit_left_path HA p)))
+      (Path.refl (HA.mul (HA.unit a) p)) :=
+  rweq_cmpA_inv_right (unit_left_path HA p)
 
 end ComputationalPaths.Path.Algebra.HopfAlgebraPaths

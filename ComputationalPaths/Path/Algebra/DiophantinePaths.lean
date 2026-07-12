@@ -8,7 +8,7 @@ sum of squares, Fermat descent — all via `Path`, `Step`, `trans`, `symm`,
 ## Main results (25+ theorems/defs)
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.Path.Algebra.DiophantinePaths
 
@@ -42,37 +42,37 @@ structure DRing (A : Type u) where
 /-- Addition commutativity path. -/
 noncomputable def dr_add_comm_path (R : DRing A) (a b : A) :
     Path (R.add a b) (R.add b a) :=
-  Path.mk [Step.mk _ _ (R.add_comm a b)] (R.add_comm a b)
+  Path.stepChain (R.add_comm a b)
 
 /-- Multiplication commutativity path. -/
 noncomputable def dr_mul_comm_path (R : DRing A) (a b : A) :
     Path (R.mul a b) (R.mul b a) :=
-  Path.mk [Step.mk _ _ (R.mul_comm a b)] (R.mul_comm a b)
+  Path.stepChain (R.mul_comm a b)
 
 /-- Addition associativity path. -/
 noncomputable def dr_add_assoc_path (R : DRing A) (a b c : A) :
     Path (R.add (R.add a b) c) (R.add a (R.add b c)) :=
-  Path.mk [Step.mk _ _ (R.add_assoc a b c)] (R.add_assoc a b c)
+  Path.stepChain (R.add_assoc a b c)
 
 /-- Multiplication associativity path. -/
 noncomputable def dr_mul_assoc_path (R : DRing A) (a b c : A) :
     Path (R.mul (R.mul a b) c) (R.mul a (R.mul b c)) :=
-  Path.mk [Step.mk _ _ (R.mul_assoc a b c)] (R.mul_assoc a b c)
+  Path.stepChain (R.mul_assoc a b c)
 
 /-- Distributivity path. -/
 noncomputable def dr_distrib_path (R : DRing A) (a b c : A) :
     Path (R.mul a (R.add b c)) (R.add (R.mul a b) (R.mul a c)) :=
-  Path.mk [Step.mk _ _ (R.distrib a b c)] (R.distrib a b c)
+  Path.stepChain (R.distrib a b c)
 
 /-- Zero absorbs multiplication path. -/
 noncomputable def dr_mul_zero_path (R : DRing A) (a : A) :
     Path (R.mul a R.zero) R.zero :=
-  Path.mk [Step.mk _ _ (R.mul_zero a)] (R.mul_zero a)
+  Path.stepChain (R.mul_zero a)
 
 /-- Additive inverse path. -/
 noncomputable def dr_add_neg_path (R : DRing A) (a : A) :
     Path (R.add a (R.neg a)) R.zero :=
-  Path.mk [Step.mk _ _ (R.add_neg a)] (R.add_neg a)
+  Path.stepChain (R.add_neg a)
 
 /-! ## Linear Diophantine equations: ax + by = c -/
 
@@ -85,7 +85,7 @@ structure LinearDiophSol (R : DRing A) (a b c : A) where
 /-- Path witnessing a solution to ax + by = c. -/
 noncomputable def linear_dioph_path (R : DRing A) (a b c : A) (S : LinearDiophSol R a b c) :
     Path (R.add (R.mul a S.x) (R.mul b S.y)) c :=
-  Path.mk [Step.mk _ _ S.sol] S.sol
+  Path.stepChain S.sol
 
 /-- Any two solution paths to the same target agree semantically. -/
 theorem linear_dioph_solution_unique_toEq (R : DRing A) (a b c : A)
@@ -113,7 +113,7 @@ structure PythTriple (R : DRing A) where
 /-- Path witnessing a Pythagorean triple. -/
 noncomputable def pyth_path (R : DRing A) (T : PythTriple R) :
     Path (R.add (R.mul T.a T.a) (R.mul T.b T.b)) (R.mul T.c T.c) :=
-  Path.mk [Step.mk _ _ T.pyth] T.pyth
+  Path.stepChain T.pyth
 
 /-- Pythagorean triple roundtrip (semantic). -/
 theorem pyth_roundtrip_toEq (R : DRing A) (T : PythTriple R) :
@@ -124,7 +124,7 @@ theorem pyth_roundtrip_toEq (R : DRing A) (T : PythTriple R) :
 /-- congrArg of a function through a Pythagorean path. -/
 def congrArg_pyth {B : Type u} (R : DRing A) (T : PythTriple R) (f : A → B) :
     congrArg f (pyth_path R T) =
-      Path.mk [Step.mk _ _ (_root_.congrArg f T.pyth)] (_root_.congrArg f T.pyth) := by
+      Path.stepChain (_root_.congrArg f T.pyth) := by
   simp [pyth_path, congrArg]
 
 /-- Transport along Pythagorean path. -/
@@ -144,7 +144,7 @@ structure SumTwoSquares (R : DRing A) (n : A) where
 /-- Path for sum-of-two-squares representation. -/
 noncomputable def sos_path (R : DRing A) (n : A) (S : SumTwoSquares R n) :
     Path (R.add (R.mul S.a S.a) (R.mul S.b S.b)) n :=
-  Path.mk [Step.mk _ _ S.repr] S.repr
+  Path.stepChain S.repr
 
 /-- Two sum-of-squares roundtrips agree semantically. -/
 theorem sos_roundtrip_toEq (R : DRing A) (n : A)
@@ -165,7 +165,7 @@ structure SumFourSquares (R : DRing A) (n : A) where
 noncomputable def s4s_path (R : DRing A) (n : A) (S : SumFourSquares R n) :
     Path (R.add (R.add (R.mul S.a S.a) (R.mul S.b S.b))
                 (R.add (R.mul S.c S.c) (R.mul S.d S.d))) n :=
-  Path.mk [Step.mk _ _ S.repr] S.repr
+  Path.stepChain S.repr
 
 /-! ## Pell's equation: x² - Dy² = 1 -/
 
@@ -178,7 +178,7 @@ structure PellSol (R : DRing A) (D : A) where
 /-- Path for a Pell equation solution. -/
 noncomputable def pell_path (R : DRing A) (D : A) (S : PellSol R D) :
     Path (R.mul S.x S.x) (R.add R.one (R.mul D (R.mul S.y S.y))) :=
-  Path.mk [Step.mk _ _ S.pell] S.pell
+  Path.stepChain S.pell
 
 /-- Pell path roundtrip (semantic). -/
 theorem pell_roundtrip_toEq (R : DRing A) (D : A) (S : PellSol R D) :
@@ -206,14 +206,24 @@ structure FermatDescent (R : DRing A) where
 noncomputable def descent_measure_path (R : DRing A) (FD : FermatDescent R) (n : A)
     (h : FD.prop n) :
     Path (FD.measure (FD.descendTo n)) (R.mul (FD.measure n) R.zero) :=
-  Path.mk [Step.mk _ _ (FD.descend_measure n h)] (FD.descend_measure n h)
+  Path.stepChain (FD.descend_measure n h)
 
 /-- Descent measure reaches zero via mul_zero. -/
 noncomputable def descent_to_zero_path (R : DRing A) (FD : FermatDescent R) (n : A)
     (h : FD.prop n) :
     Path (FD.measure (FD.descendTo n)) R.zero :=
-  trans (descent_measure_path R FD n h)
-    (Path.mk [Step.mk _ _ (R.mul_zero (FD.measure n))] (R.mul_zero (FD.measure n)))
+  Path.trans (descent_measure_path R FD n h)
+    (dr_mul_zero_path R (FD.measure n))
+
+/-- Fermat descent followed by zero absorption cancels coherently. -/
+noncomputable def descent_to_zero_coherence
+    (R : DRing A) (FD : FermatDescent R) (n : A)
+    (h : FD.prop n) :
+    RwEq
+      (Path.trans (descent_to_zero_path R FD n h)
+        (Path.symm (descent_to_zero_path R FD n h)))
+      (Path.refl (FD.measure (FD.descendTo n))) :=
+  rweq_cmpA_inv_right (descent_to_zero_path R FD n h)
 
 /-! ## Brahmagupta–Fibonacci identity via paths -/
 
@@ -235,7 +245,7 @@ noncomputable def bf_path (R : DRing A) (BF : BrahmaguptaFib R) (a b c d : A) :
                   (R.add (R.mul a c) (R.neg (R.mul b d))))
            (R.mul (R.add (R.mul a d) (R.mul b c))
                   (R.add (R.mul a d) (R.mul b c)))) :=
-  Path.mk [Step.mk _ _ (BF.identity a b c d)] (BF.identity a b c d)
+  Path.stepChain (BF.identity a b c d)
 
 /-- BF identity roundtrip (semantic). -/
 theorem bf_roundtrip_toEq (R : DRing A) (BF : BrahmaguptaFib R) (a b c d : A) :
@@ -263,21 +273,25 @@ theorem congrArg_trans_ring {B : Type u} (_R : DRing A) (f : A → B)
   simp [congrArg, trans]
 
 /-- Step from Pythagorean triple. -/
-noncomputable def pyth_step (R : DRing A) (T : PythTriple R) : Step A :=
-  Step.mk (R.add (R.mul T.a T.a) (R.mul T.b T.b)) (R.mul T.c T.c) T.pyth
+noncomputable def pyth_step (R : DRing A) (T : PythTriple R) :
+    ComputationalPaths.Step A :=
+  ComputationalPaths.Step.mk
+    (R.add (R.mul T.a T.a) (R.mul T.b T.b)) (R.mul T.c T.c) T.pyth
 
 /-- Symm of Pythagorean step. -/
 def pyth_step_symm (R : DRing A) (T : PythTriple R) :
     (pyth_step R T).symm =
-      Step.mk (R.mul T.c T.c) (R.add (R.mul T.a T.a) (R.mul T.b T.b)) T.pyth.symm := by
-  simp [pyth_step, Step.symm]
+      ComputationalPaths.Step.mk (R.mul T.c T.c)
+        (R.add (R.mul T.a T.a) (R.mul T.b T.b)) T.pyth.symm := by
+  simp [pyth_step, ComputationalPaths.Step.symm]
 
 /-- Mapping a function through a Pythagorean step. -/
 def pyth_step_map {B : Type u} (R : DRing A) (T : PythTriple R) (f : A → B) :
-    Step.map f (pyth_step R T) =
-      Step.mk (f (R.add (R.mul T.a T.a) (R.mul T.b T.b))) (f (R.mul T.c T.c))
+    ComputationalPaths.Step.map f (pyth_step R T) =
+      ComputationalPaths.Step.mk
+        (f (R.add (R.mul T.a T.a) (R.mul T.b T.b))) (f (R.mul T.c T.c))
         (_root_.congrArg f T.pyth) := by
-  simp [pyth_step, Step.map]
+  simp [pyth_step, ComputationalPaths.Step.map]
 
 /-- Two diophantine paths agree semantically. -/
 theorem dioph_coherence {x y : A} (p q : Path x y) :

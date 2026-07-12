@@ -11,7 +11,7 @@ Zero `Path.mk [Step.mk _ _ h] h`.
 - Winskel, "The Formal Semantics of Programming Languages"
 -/
 
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -114,7 +114,7 @@ theorem eval_seq_skip (env : Env) (s : Stmt) :
 /-- 11. Path between expression values under equal environments. -/
 noncomputable def semanticPath (env : Env) (e1 e2 : Expr) (h : ∀ env', evalExpr env' e1 = evalExpr env' e2) :
     Path (evalExpr env e1) (evalExpr env e2) :=
-  Path.mk [Step.mk (evalExpr env e1) (evalExpr env e2) (h env)] (h env)
+  Path.stepChain (h env)
 
 /-- 12. Literal semantic path is refl. -/
 noncomputable def lit_semantic_refl (env : Env) (n : Nat) : Path (evalExpr env (Expr.lit n)) n :=
@@ -212,7 +212,23 @@ theorem semEquiv_trans {e1 e2 e3 : Expr} (h1 : SemEquiv e1 e2) (h2 : SemEquiv e2
 /-- 28. Semantic equivalence as a path. -/
 noncomputable def semEquivPath {e1 e2 : Expr} (h : SemEquiv e1 e2) (env : Env) :
     Path (evalExpr env e1) (evalExpr env e2) :=
-  Path.mk [Step.mk _ _ (h env)] (h env)
+  Path.stepChain (h env)
+
+/-- Transitivity of semantic equivalence is realized by concatenating both
+evaluation traces. -/
+noncomputable def semEquiv_trans_path {e1 e2 e3 : Expr}
+    (h₁₂ : SemEquiv e1 e2) (h₂₃ : SemEquiv e2 e3) (env : Env) :
+    Path (evalExpr env e1) (evalExpr env e3) :=
+  Path.trans (semEquivPath h₁₂ env) (semEquivPath h₂₃ env)
+
+/-- The composite semantic-equivalence trace is coherently invertible. -/
+noncomputable def semEquiv_trans_coherence {e1 e2 e3 : Expr}
+    (h₁₂ : SemEquiv e1 e2) (h₂₃ : SemEquiv e2 e3) (env : Env) :
+    RwEq
+      (Path.trans (semEquiv_trans_path h₁₂ h₂₃ env)
+        (Path.symm (semEquiv_trans_path h₁₂ h₂₃ env)))
+      (Path.refl (evalExpr env e1)) :=
+  rweq_cmpA_inv_right (semEquiv_trans_path h₁₂ h₂₃ env)
 
 /-- 29. Add is commutative semantically. -/
 theorem add_comm_sem (e1 e2 : Expr) :
@@ -289,7 +305,7 @@ theorem seq_assoc_equiv (s1 s2 s3 : Stmt) :
 /-- 43. Equivalence as path. -/
 noncomputable def stmtEquivPath {s1 s2 : Stmt} (h : StmtEquiv s1 s2) (env : Env) :
     Path (evalStmt env s1) (evalStmt env s2) :=
-  Path.mk [Step.mk _ _ (h env)] (h env)
+  Path.stepChain (h env)
 
 /-! ## Congruence Lifting -/
 

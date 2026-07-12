@@ -9,6 +9,8 @@
   All proofs are sorry‑free.
 -/
 
+import ComputationalPaths.Path.Rewrite.RwEq
+
 set_option linter.unusedVariables false
 
 -- ============================================================
@@ -316,6 +318,28 @@ theorem monad_right_unit_length (n : Nat) :
         monad_right_unit_step2, APath.length_congrFmapG, triangle1,
         fmapG_id, APath.single, APath.length]
 
+/-- The two stages of the monad right-unit reduction compute the recorded
+path length in two explicit equality steps. -/
+noncomputable def monad_right_unit_length_path (n : Nat) :
+    ComputationalPaths.Path (monad_right_unit n).length 2 :=
+  ComputationalPaths.Path.trans
+    (ComputationalPaths.Path.stepChain
+      (APath.length_trans (monad_right_unit_step1 n)
+        (monad_right_unit_step2 n)))
+    (ComputationalPaths.Path.stepChain (by
+      simp [monad_right_unit_step1, monad_right_unit_step2,
+        APath.length_congrFmapG, triangle1, fmapG_id,
+        APath.single, APath.length]))
+
+/-- The monad right-unit length computation is coherently invertible. -/
+noncomputable def monad_right_unit_length_coherence (n : Nat) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans (monad_right_unit_length_path n)
+        (ComputationalPaths.Path.symm (monad_right_unit_length_path n)))
+      (ComputationalPaths.Path.refl (monad_right_unit n).length) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right
+    (monad_right_unit_length_path n)
+
 -- ============================================================
 -- §9  Mates Correspondence
 -- ============================================================
@@ -509,13 +533,20 @@ theorem transport_refl {P : MorE → Prop} {a : MorE} (pa : P a)
     (h : ∀ x y, AStep x y → P x → P y) :
     transport (APath.refl a) pa h = pa := rfl
 
-/-- Theorem 48: A predicate "is identity" is preserved by triangle1. -/
-noncomputable def isId : MorE → Prop
-  | MorE.id _ => True
-  | _ => False
+/-- Typed evidence that a morphism expression is an identity at a specified
+object index. -/
+structure IdentityWitness (e : MorE) where
+  index : Nat
+  shape : e = MorE.id index
+
+/-- A morphism expression is an identity when it carries an explicit index
+and shape equation. -/
+noncomputable def isId (e : MorE) : Prop :=
+  Nonempty (IdentityWitness e)
 
 theorem triangle1_transports_to_id (n : Nat) :
-    isId (MorE.id n) := trivial
+    isId (MorE.id n) :=
+  ⟨⟨n, rfl⟩⟩
 
 -- ============================================================
 -- §17  Confluence / Church–Rosser Property

@@ -23,6 +23,8 @@
   All proofs are sorry-free.  Zero Path.ofEq usage.
 -/
 
+import ComputationalPaths.Path.Rewrite.RwEq
+
 namespace CompPaths.ConfluenceDeep
 
 -- ============================================================
@@ -139,6 +141,35 @@ noncomputable def JoinCertificate.ofPaths {α : Type} {R : α → α → Prop}
   rightSteps := right.length
   left_length := rfl
   right_length := rfl
+
+/-- The two branches of a join certificate jointly compute its recorded
+number of reduction steps.  Both certificate equalities contribute a visible
+step to the computational path. -/
+noncomputable def JoinCertificate.totalLengthPath
+    {α : Type} {R : α → α → Prop} {b c : α}
+    (cert : JoinCertificate α R b c) :
+    ComputationalPaths.Path
+      (cert.left.length + cert.right.length)
+      (cert.leftSteps + cert.rightSteps) :=
+  ComputationalPaths.Path.trans
+    (ComputationalPaths.Path.congrArg
+      (fun n => n + cert.right.length)
+      (ComputationalPaths.Path.stepChain cert.left_length))
+    (ComputationalPaths.Path.congrArg
+      (fun n => cert.leftSteps + n)
+      (ComputationalPaths.Path.stepChain cert.right_length))
+
+/-- Cancelling the total-length computation is coherent in the
+LND_EQ-TRS rewrite system. -/
+noncomputable def JoinCertificate.totalLengthCancel
+    {α : Type} {R : α → α → Prop} {b c : α}
+    (cert : JoinCertificate α R b c) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans cert.totalLengthPath
+        (ComputationalPaths.Path.symm cert.totalLengthPath))
+      (ComputationalPaths.Path.refl
+        (cert.left.length + cert.right.length)) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right cert.totalLengthPath
 
 /-- The diamond property: every one-step divergence has a diamond witness. -/
 noncomputable def DiamondProp (α : Type) (R : α → α → Prop) : Prop :=

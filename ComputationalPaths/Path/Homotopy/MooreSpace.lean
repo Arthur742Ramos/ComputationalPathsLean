@@ -20,14 +20,15 @@ via `SimpleEquiv`, and we expose `Path` witnesses for the round-trip laws.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
--- import ComputationalPaths.Path.Homotopy.HigherHomotopyGroups  -- DISABLED: universe level mismatch
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
 
 universe u
 
-abbrev MoorePiN (_n : Nat) (_A : Type u) (_base : _A) : Type u := ULift Unit
+abbrev MoorePiN (_n : Nat) (_A : Type u) (_base : _A) : Type u :=
+  ULift Unit
 
 /-! ## Definition -/
 
@@ -45,11 +46,11 @@ namespace MooreSpace
 variable {G : Type u} {n : Nat}
 
 /-- The n-th homotopy group of a Moore space. -/
-abbrev PiN (X : MooreSpace G n) : Type u :=
+abbrev PiN (X : MooreSpace G n) :=
   MoorePiN n X.carrier X.base
 
 /-- Homotopy equivalence between Moore spaces, recorded on pi_n. -/
-abbrev Homotopy (X Y : MooreSpace G n) : Type u :=
+abbrev Homotopy (X Y : MooreSpace G n) :=
   SimpleEquiv (PiN X) (PiN Y)
 
 /-- Any two Moore spaces M(G,n) are equivalent at the level of pi_n. -/
@@ -106,6 +107,32 @@ theorem moore_unique_left_inv (X Y : MooreSpace G n) (x : PiN X) :
         = X.piNEquiv.invFun (X.piNEquiv.toFun x) := by
             simp [Y.piNEquiv.right_inv]
     _ = x := X.piNEquiv.left_inv x
+
+/-- Uniqueness of Moore-space models reduces by the two inverse laws rather
+than collapsing the composite to one equality step. -/
+noncomputable def moore_unique_left_inv_path
+    (X Y : MooreSpace G n) (x : PiN X) :
+    Path
+      ((uniqueUpToHomotopy Y X).toFun
+        ((uniqueUpToHomotopy X Y).toFun x))
+      x := by
+  simpa [uniqueUpToHomotopy, SimpleEquiv.comp, SimpleEquiv.symm] using
+    Path.trans
+      (Path.congrArg X.piNEquiv.invFun
+        (Path.stepChain
+          (Y.piNEquiv.right_inv (X.piNEquiv.toFun x))))
+      (Path.stepChain (X.piNEquiv.left_inv x))
+
+/-- The two-stage Moore-space uniqueness trace is coherently invertible. -/
+noncomputable def moore_unique_left_inv_coherence
+    (X Y : MooreSpace G n) (x : PiN X) :
+    RwEq
+      (Path.trans (moore_unique_left_inv_path X Y x)
+        (Path.symm (moore_unique_left_inv_path X Y x)))
+      (Path.refl
+        ((uniqueUpToHomotopy Y X).toFun
+          ((uniqueUpToHomotopy X Y).toFun x))) :=
+  rweq_cmpA_inv_right (moore_unique_left_inv_path X Y x)
 
 /-- Uniqueness up to homotopy has a right inverse. -/
 theorem moore_unique_right_inv (X Y : MooreSpace G n) (y : PiN Y) :

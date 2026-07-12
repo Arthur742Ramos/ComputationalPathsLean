@@ -8,7 +8,7 @@ using `Path`, `Step`, `trans`, `symm`, `congrArg`, `transport`.
 ## Main results (22+ theorems/defs)
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 set_option linter.unusedVariables false
 
@@ -47,13 +47,13 @@ noncomputable def trivialSolution (C : CSP A) (a : A) (h : C.domain a) :
 noncomputable def solutionPath (C : CSP A) (s₁ s₂ : CSPSolution C)
     (h : s₁.point = s₂.point) :
     Path s₁.point s₂.point :=
-  Path.mk [Step.mk _ _ h] h
+  Path.stepChain h
 
 /-- Solution path steps -/
 def solutionPath_steps (C : CSP A) (s₁ s₂ : CSPSolution C)
     (h : s₁.point = s₂.point) :
     (solutionPath C s₁ s₂ h).steps =
-    [Step.mk s₁.point s₂.point h] := by
+    [ComputationalPaths.Step.mk s₁.point s₂.point h] := by
   simp [solutionPath]
 
 /-- Symmetry of solution paths -/
@@ -81,14 +81,14 @@ structure FixedWitness (C : CSP A) (AC : ArcConsistent C) where
 noncomputable def fixedWitnessPath (C : CSP A) (AC : ArcConsistent C)
     (FW : FixedWitness C AC) :
     Path (AC.witness FW.fixedPt) FW.fixedPt :=
-  Path.mk [Step.mk _ _ FW.isFixed] FW.isFixed
+  Path.stepChain FW.isFixed
 
 /-- CongrArg applied to fixed witness path -/
 def congrArg_fixedWitness (C : CSP A) (AC : ArcConsistent C)
     (FW : FixedWitness C AC) (f : A → B) :
     congrArg f (fixedWitnessPath C AC FW) =
-    Path.mk [Step.mk _ _ (_root_.congrArg f FW.isFixed)] (_root_.congrArg f FW.isFixed) := by
-  simp [fixedWitnessPath, congrArg, Step.map]
+    Path.stepChain (_root_.congrArg f FW.isFixed) := by
+  simp [fixedWitnessPath, congrArg, ComputationalPaths.Step.map]
 
 /-! ## Constraint propagation as path reduction -/
 
@@ -122,7 +122,7 @@ structure SearchNode (A : Type u) where
 /-- Path from a search node's value to one of its choices -/
 noncomputable def choicePath (n : SearchNode A) (c : A) (h : c = n.value) :
     Path c n.value :=
-  Path.mk [Step.mk _ _ h] h
+  Path.stepChain h
 
 /-- Backtracking: reverting a choice via symm -/
 noncomputable def backtrack (n : SearchNode A) (c : A) (h : c = n.value) :
@@ -175,8 +175,8 @@ theorem transport_domain (C : CSP A) {a b : A} (p : Path a b)
 def congrArg_solution (C : CSP A) (f : A → B)
     (s₁ s₂ : CSPSolution C) (h : s₁.point = s₂.point) :
     congrArg f (solutionPath C s₁ s₂ h) =
-    Path.mk [Step.mk _ _ (_root_.congrArg f h)] (_root_.congrArg f h) := by
-  simp [solutionPath, congrArg, Step.map]
+    Path.stepChain (_root_.congrArg f h) := by
+  simp [solutionPath, congrArg, ComputationalPaths.Step.map]
 
 /-- Transport along solution path and back is identity -/
 theorem solution_transport_roundtrip {P : A → Type v}
@@ -190,8 +190,27 @@ theorem solution_transport_roundtrip {P : A → Type v}
 def step_map_solution (C : CSP A) (f : A → B)
     (s₁ s₂ : CSPSolution C) (h : s₁.point = s₂.point) :
     (congrArg f (solutionPath C s₁ s₂ h)).steps =
-    [Step.mk (f s₁.point) (f s₂.point) (_root_.congrArg f h)] := by
-  simp [solutionPath, congrArg, Step.map]
+    [ComputationalPaths.Step.mk
+      (f s₁.point) (f s₂.point) (_root_.congrArg f h)] := by
+  simp [solutionPath, congrArg, ComputationalPaths.Step.map]
+
+/-- Equality of three CSP solutions composes as a two-stage solution trace. -/
+noncomputable def solutionChainPath
+    (C : CSP A) (s₁ s₂ s₃ : CSPSolution C)
+    (h₁₂ : s₁.point = s₂.point) (h₂₃ : s₂.point = s₃.point) :
+    Path s₁.point s₃.point :=
+  Path.trans (solutionPath C s₁ s₂ h₁₂)
+    (solutionPath C s₂ s₃ h₂₃)
+
+/-- The chained CSP solution trace is coherently invertible. -/
+noncomputable def solutionChain_coherence
+    (C : CSP A) (s₁ s₂ s₃ : CSPSolution C)
+    (h₁₂ : s₁.point = s₂.point) (h₂₃ : s₂.point = s₃.point) :
+    RwEq
+      (Path.trans (solutionChainPath C s₁ s₂ s₃ h₁₂ h₂₃)
+        (Path.symm (solutionChainPath C s₁ s₂ s₃ h₁₂ h₂₃)))
+      (Path.refl s₁.point) :=
+  rweq_cmpA_inv_right (solutionChainPath C s₁ s₂ s₃ h₁₂ h₂₃)
 
 /-- Reflexive solution path has empty-like proof -/
 theorem solutionPath_refl_proof (C : CSP A) (s : CSPSolution C) :

@@ -13,7 +13,7 @@ is also treated. All coherences are witnessed by `Path` values.
 - van Oosten, "Realizability: an introduction to its categorical side"
 -/
 
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -36,6 +36,24 @@ noncomputable def idCode : Nat := 0
 
 noncomputable def constCode (n : Nat) : Nat := n + 1
 
+/-- Evaluation of the identity realizer records both unfolding its code and
+the arithmetic normalization. -/
+noncomputable def identityApplicationPath (n : Nat) :
+    Path (apply idCode n) n :=
+  Path.trans
+    (Path.stepChain
+      (show apply idCode n = 0 * (n + 1) + n by rfl))
+    (Path.stepChain
+      (show 0 * (n + 1) + n = n by omega))
+
+/-- Identity-code evaluation and its inverse cancel coherently. -/
+noncomputable def identityApplicationCoherence (n : Nat) :
+    RwEq
+      (Path.trans (identityApplicationPath n)
+        (Path.symm (identityApplicationPath n)))
+      (Path.refl (apply idCode n)) :=
+  rweq_cmpA_inv_right (identityApplicationPath n)
+
 /-! ## Realizability relation -/
 
 /-- e realizes φ: code e witnesses that φ holds. -/
@@ -46,9 +64,17 @@ noncomputable def ModRealizes (_e : Nat) (φ : Prop) (truth : Prop) : Prop := tr
 
 /-! ## Basic theorems -/
 
+/-- Typed code evidence for a realizer of logical truth. -/
+structure TruthRealizerCertificate (e : Nat) where
+  code : Nat
+  code_matches : Path code e
+  identity_evaluation : Path (apply idCode code) code
+
 -- 1
-theorem realizes_true (e : Nat) : Realizes e True :=
-  show True from True.intro
+noncomputable def realizes_true (e : Nat) : TruthRealizerCertificate e where
+  code := e
+  code_matches := Path.refl e
+  identity_evaluation := identityApplicationPath e
 
 -- 2
 theorem realizes_and {e : Nat} {φ ψ : Prop}
@@ -102,8 +128,12 @@ theorem realizes_exists {n e : Nat} {P : Nat → Prop}
   ⟨n, h⟩
 
 -- 12
-theorem modRealizes_true (e : Nat) (t : Prop) : ModRealizes e True t :=
-  fun _ => True.intro
+structure ModifiedTruthRealizerCertificate (e : Nat) (truth : Prop) where
+  realize : truth → TruthRealizerCertificate e
+
+noncomputable def modRealizes_true (e : Nat) (t : Prop) :
+    ModifiedTruthRealizerCertificate e t where
+  realize := fun _ => realizes_true e
 
 -- 13
 theorem modRealizes_strengthen {e : Nat} {φ : Prop} {t₁ t₂ : Prop}

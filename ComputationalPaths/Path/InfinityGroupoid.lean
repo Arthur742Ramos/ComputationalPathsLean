@@ -19,6 +19,7 @@ n-groupoid truncations.
 -/
 
 import ComputationalPaths.Path.OmegaGroupoid
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -115,6 +116,31 @@ theorem truncation_functorial_step {n m k : Nat} (h : n ≤ m) (hk : k ≤ n) :
     truncCell A m k = truncCell A n k := by
   have hkm : k ≤ m := Nat.le_trans hk h
   simp [truncCell, hk, hkm]
+
+/-- A stable cell dimension gives an explicit computational path from the
+larger truncation cutoff back to the smaller cutoff. -/
+noncomputable def truncationMapPath {n m k : Nat}
+    (h : n ≤ m) (hk : k ≤ n) :
+    Path (truncCell A m k) (truncCell A n k) :=
+  Path.stepChain (truncation_functorial_step (A := A) h hk)
+
+/-- Two successive truncation maps compose as a genuine multi-step
+computational path. -/
+noncomputable def truncationMapCompPath {n m l k : Nat}
+    (h₁ : n ≤ m) (h₂ : m ≤ l) (hk : k ≤ n) :
+    Path (truncCell A l k) (truncCell A n k) :=
+  Path.trans
+    (truncationMapPath (A := A) h₂ (Nat.le_trans hk h₁))
+    (truncationMapPath (A := A) h₁ hk)
+
+/-- The composite truncation trace and its inverse cancel in LND_EQ-TRS. -/
+noncomputable def truncationMapCompCancel {n m l k : Nat}
+    (h₁ : n ≤ m) (h₂ : m ≤ l) (hk : k ≤ n) :
+    RwEq
+      (Path.trans (truncationMapCompPath (A := A) h₁ h₂ hk)
+        (Path.symm (truncationMapCompPath (A := A) h₁ h₂ hk)))
+      (Path.refl (truncCell A l k)) :=
+  rweq_cmpA_inv_right (truncationMapCompPath (A := A) h₁ h₂ hk)
 
 /-- Functoriality is compositional along `n ≤ m ≤ l`, below level `n`. -/
 theorem truncation_functorial_comp {n m l k : Nat}

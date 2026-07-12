@@ -10,6 +10,8 @@
   All proofs are sorry‑free.  50 theorems.
 -/
 
+import ComputationalPaths.Path.Rewrite.RwEq
+
 -- ============================================================
 -- §1  Places, Markings, Transitions
 -- ============================================================
@@ -122,9 +124,8 @@ theorem BoundedFPath.toFPath {N : PetriNet} {a b : Marking} {n : Nat}
 
 /-- Theorem 10: Bounded path weakening. -/
 theorem BoundedFPath.weaken {N : PetriNet} {a b : Marking} {n : Nat}
-    (h : BoundedFPath N a b n) :
-    ∃ _ : FPath N a b, True :=
-  ⟨h.toFPath, trivial⟩
+    (h : BoundedFPath N a b n) : FPath N a b :=
+  h.toFPath
 
 -- ============================================================
 -- §6  Coverability
@@ -289,13 +290,45 @@ theorem concurrent_sub_comm {t₁ t₂ : Transition} {m : Marking}
   | inr h => simp [h]
 
 /-- Theorem 27: Full diamond for concurrent transitions. -/
+noncomputable def concurrent_diamond_path
+    {t₁ t₂ : Transition} {m : Marking}
+    (hconc : Concurrent t₁ t₂) :
+    ComputationalPaths.Path
+      (Marking.add (Marking.sub (Marking.sub m t₁.pre) t₂.pre)
+        (Marking.add t₁.post t₂.post))
+      (Marking.add (Marking.sub (Marking.sub m t₂.pre) t₁.pre)
+        (Marking.add t₂.post t₁.post)) :=
+  ComputationalPaths.Path.trans
+    (ComputationalPaths.Path.stepChain
+      (_root_.congrArg
+        (fun consumed =>
+          Marking.add consumed (Marking.add t₁.post t₂.post))
+        (concurrent_sub_comm hconc)))
+    (ComputationalPaths.Path.stepChain
+      (_root_.congrArg
+        (Marking.add (Marking.sub (Marking.sub m t₂.pre) t₁.pre))
+        (concurrent_post_comm t₁ t₂)))
+
+/-- The concurrent firing diamond and its reverse trace cancel coherently. -/
+noncomputable def concurrent_diamond_coherence
+    {t₁ t₂ : Transition} {m : Marking}
+    (hconc : Concurrent t₁ t₂) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans (concurrent_diamond_path hconc)
+        (ComputationalPaths.Path.symm (concurrent_diamond_path hconc)))
+      (ComputationalPaths.Path.refl
+        (Marking.add (Marking.sub (Marking.sub m t₁.pre) t₂.pre)
+          (Marking.add t₁.post t₂.post))) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right
+    (concurrent_diamond_path hconc)
+
 theorem concurrent_diamond {t₁ t₂ : Transition} {m : Marking}
     (hconc : Concurrent t₁ t₂) :
     Marking.add (Marking.sub (Marking.sub m t₁.pre) t₂.pre)
                 (Marking.add t₁.post t₂.post) =
     Marking.add (Marking.sub (Marking.sub m t₂.pre) t₁.pre)
-                (Marking.add t₂.post t₁.post) := by
-  rw [concurrent_sub_comm hconc, concurrent_post_comm]
+                (Marking.add t₂.post t₁.post) :=
+  (concurrent_diamond_path hconc).toEq
 
 -- ============================================================
 -- §12  Liveness

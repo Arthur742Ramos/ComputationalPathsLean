@@ -20,7 +20,7 @@ we package inclusion-exclusion as `Path` witnesses over formal weight data.
 - Halberstam-Richert, *Sieve Methods*.
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 import Mathlib.Tactic.Linarith
 
 namespace ComputationalPaths
@@ -174,6 +174,22 @@ namespace SelbergSieve
 noncomputable def lambdaSum (S : SelbergSieve) (divisors : List Nat) : Int :=
   divisors.foldl (fun acc d => acc + S.lambda d) 0
 
+/-- Normalize two occurrences of the Selberg coefficient at one in two
+separate computational steps. -/
+noncomputable def doubleLambdaOnePath (S : SelbergSieve) :
+    Path (S.lambda 1 + S.lambda 1) ((1 : Int) + 1) :=
+  Path.trans
+    (Path.congrArg (fun z => z + S.lambda 1) S.lambda_one)
+    (Path.congrArg (fun z => (1 : Int) + z) S.lambda_one)
+
+/-- The two-step Selberg normalization trace is coherently invertible. -/
+noncomputable def doubleLambdaOneCoherence (S : SelbergSieve) :
+    Path.RwEq
+      (Path.trans (doubleLambdaOnePath S)
+        (Path.symm (doubleLambdaOnePath S)))
+      (Path.refl (S.lambda 1 + S.lambda 1)) :=
+  Path.rweq_cmpA_inv_right (doubleLambdaOnePath S)
+
 end SelbergSieve
 
 /-! ## Inclusion-exclusion as paths -/
@@ -194,6 +210,41 @@ noncomputable def inclusion_exclusion_path_symm (w : SieveWeight) (s t : SieveSt
 noncomputable def removeMultiples_weight_path (w : SieveWeight) (p : Nat) (s : SieveStep) :
     Path (stepWeight w (SieveStep.removeMultiples p s)) (stepWeight w s) := by
   exact Path.refl _
+
+/-- Removing multiples of three moduli records all three weight-preservation
+steps in order. -/
+noncomputable def removeThreeMultiples_weight_path
+    (w : SieveWeight) (p q r : Nat) (s : SieveStep) :
+    Path
+      (stepWeight w
+        (SieveStep.removeMultiples r
+          (SieveStep.removeMultiples q
+            (SieveStep.removeMultiples p s))))
+      (stepWeight w s) :=
+  Path.trans
+    (Path.trans
+      (removeMultiples_weight_path w r
+        (SieveStep.removeMultiples q (SieveStep.removeMultiples p s)))
+      (removeMultiples_weight_path w q (SieveStep.removeMultiples p s)))
+    (removeMultiples_weight_path w p s)
+
+/-- The left- and right-associated three-modulus sieve traces are rewrite
+equivalent. -/
+noncomputable def removeThreeMultiples_weight_rweq
+    (w : SieveWeight) (p q r : Nat) (s : SieveStep) :
+    Path.RwEq
+      (removeThreeMultiples_weight_path w p q r s)
+      (Path.trans
+        (removeMultiples_weight_path w r
+          (SieveStep.removeMultiples q (SieveStep.removeMultiples p s)))
+        (Path.trans
+          (removeMultiples_weight_path w q (SieveStep.removeMultiples p s))
+          (removeMultiples_weight_path w p s))) :=
+  Path.rweq_tt
+    (removeMultiples_weight_path w r
+      (SieveStep.removeMultiples q (SieveStep.removeMultiples p s)))
+    (removeMultiples_weight_path w q (SieveStep.removeMultiples p s))
+    (removeMultiples_weight_path w p s)
 
 /-- Complement weights are the formal negation. -/
 noncomputable def complement_weight_path (w : SieveWeight) (s : SieveStep) :

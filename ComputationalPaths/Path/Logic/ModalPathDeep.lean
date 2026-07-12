@@ -1,7 +1,7 @@
 -- ModalPathDeep.lean: Modal logic via computational paths
 -- Kripke frames, □/◇, K/T/S4/S5 axiom schemes, bisimulation,
 -- temporal operators, dynamic logic
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 
@@ -345,6 +345,28 @@ theorem dynBox_seq (α β : Program) (φ : ModalProp) (w : World)
     : dynBox (α.seq β) φ w ↔ dynBox α (dynBox β φ) w :=
   ⟨fun h v hαv u hβu => h u ⟨v, hαv, hβu⟩,
    fun h u ⟨v, hαv, hβu⟩ => h v hαv u hβu⟩
+
+/-- Three sequential programs expose the two dynamic-box decomposition
+steps as a computational path between propositions. -/
+noncomputable def dynBox_seq_path
+    (α β γ : Program) (φ : ModalProp) (w : World) :
+    Path
+      (dynBox ((α.seq β).seq γ) φ w)
+      (dynBox α (dynBox β (dynBox γ φ)) w) :=
+  Path.trans
+    (Path.stepChain
+      (propext (dynBox_seq (α.seq β) γ φ w)))
+    (Path.stepChain
+      (propext (dynBox_seq α β (dynBox γ φ) w)))
+
+/-- Dynamic-box sequence decomposition is coherently invertible. -/
+noncomputable def dynBox_seq_coherence
+    (α β γ : Program) (φ : ModalProp) (w : World) :
+    Path.RwEq
+      (Path.trans (dynBox_seq_path α β γ φ w)
+        (Path.symm (dynBox_seq_path α β γ φ w)))
+      (Path.refl (dynBox ((α.seq β).seq γ) φ w)) :=
+  Path.rweq_cmpA_inv_right (dynBox_seq_path α β γ φ w)
 
 /-- [α∪β]φ ↔ [α]φ ∧ [β]φ -/
 theorem dynBox_choice (α β : Program) (φ : ModalProp) (w : World)

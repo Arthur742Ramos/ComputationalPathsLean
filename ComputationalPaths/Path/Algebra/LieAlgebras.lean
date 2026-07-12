@@ -20,7 +20,7 @@ and root systems.
 - `LieIdeal.topIdeal`, `LieIdeal.botIdeal`: canonical ideals
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -77,16 +77,23 @@ noncomputable def IsAbelian : Prop :=
   ∀ x y, A.bracket x y = A.zero
 
 /-- The additive inverse of zero is zero. -/
-theorem neg_zero : A.neg A.zero = A.zero := by
-  have h₁ : A.add A.zero (A.neg A.zero) = A.add (A.neg A.zero) A.zero :=
-    A.add_comm A.zero (A.neg A.zero)
-  have h₂ : A.add (A.neg A.zero) A.zero = A.zero :=
-    A.add_left_neg A.zero
-  have h₃ : A.add A.zero (A.neg A.zero) = A.zero :=
-    h₁.trans h₂
-  have h₄ : A.add A.zero (A.neg A.zero) = A.neg A.zero :=
-    A.add_zero (A.neg A.zero)
-  exact h₄.symm.trans h₃
+noncomputable def neg_zero_path : Path (A.neg A.zero) A.zero :=
+  Path.trans
+    (Path.stepChain (A.add_zero (A.neg A.zero)).symm)
+    (Path.trans
+      (Path.stepChain (A.add_comm A.zero (A.neg A.zero)))
+      (Path.stepChain (A.add_left_neg A.zero)))
+
+/-- The three algebraic reductions proving `-0 = 0` cancel coherently. -/
+noncomputable def neg_zero_cancel :
+    RwEq
+      (Path.trans (neg_zero_path A) (Path.symm (neg_zero_path A)))
+      (Path.refl (A.neg A.zero)) :=
+  rweq_cmpA_inv_right (neg_zero_path A)
+
+/-- The additive inverse of zero is zero. -/
+theorem neg_zero : A.neg A.zero = A.zero :=
+  (neg_zero_path A).toEq
 
 /-- In an abelian Lie algebra, each self-bracket is zero. -/
 theorem bracket_self_eq_zero_of_abelian (hA : A.IsAbelian) (x : L) :
