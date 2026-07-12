@@ -23,6 +23,7 @@ in the symmetric monoidal category of pointed spaces.
 -/
 
 import ComputationalPaths.Path.Homotopy.PointedMapCategory
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -86,6 +87,23 @@ theorem smash_baseR (X Y : PtdType.{u}) (y : Y.carrier) :
 noncomputable def smash_baseR_path (X Y : PtdType.{u}) (y : Y.carrier) :
     Path (smashMk X Y X.pt y) (Smash X Y).pt :=
   Path.stepChain (smash_baseR X Y y)
+
+/-- The two wedge branches meet through the common smash basepoint. -/
+noncomputable def smash_wedge_path (X Y : PtdType.{u})
+    (x : X.carrier) (y : Y.carrier) :
+    Path (smashMk X Y x Y.pt) (smashMk X Y X.pt y) :=
+  Path.trans
+    (smash_baseL_path X Y x)
+    (Path.symm (smash_baseR_path X Y y))
+
+/-- The wedge-collapse route is coherently invertible. -/
+noncomputable def smash_wedge_path_cancel (X Y : PtdType.{u})
+    (x : X.carrier) (y : Y.carrier) :
+    RwEq
+      (Path.trans (smash_wedge_path X Y x y)
+        (Path.symm (smash_wedge_path X Y x y)))
+      (Path.refl (smashMk X Y x Y.pt)) :=
+  rweq_cmpA_inv_right (smash_wedge_path X Y x y)
 
 /-! ## Universal Property
 

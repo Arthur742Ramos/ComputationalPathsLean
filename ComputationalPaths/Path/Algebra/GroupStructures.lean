@@ -22,6 +22,7 @@ constructions.
 -/
 
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -331,6 +332,29 @@ theorem pow_comm (S : StrictMonoid M) (x : M) (m n : Nat) :
     S.mul (pow S x m) (pow S x n) = pow S x (m + n) := (pow_add S x m n).symm
     _ = pow S x (n + m) := by simp [Nat.add_comm]
     _ = S.mul (pow S x n) (pow S x m) := pow_add S x n m
+
+/-- Power commutation records both power expansions and commutation of the
+exponents as a three-stage computational path. -/
+noncomputable def pow_comm_path (S : StrictMonoid M) (x : M)
+    (m n : Nat) :
+    Path
+      (S.mul (pow S x m) (pow S x n))
+      (S.mul (pow S x n) (pow S x m)) :=
+  Path.trans
+    (Path.stepChain (pow_add S x m n).symm)
+    (Path.trans
+      (Path.congrArg (fun k => pow S x k)
+        (Path.stepChain (Nat.add_comm m n)))
+      (Path.stepChain (pow_add S x n m)))
+
+/-- The fixed-base power commutation route cancels coherently. -/
+noncomputable def pow_comm_path_coherence (S : StrictMonoid M) (x : M)
+    (m n : Nat) :
+    RwEq
+      (Path.trans (pow_comm_path S x m n)
+        (Path.symm (pow_comm_path S x m n)))
+      (Path.refl (S.mul (pow S x m) (pow S x n))) :=
+  rweq_cmpA_inv_right (pow_comm_path S x m n)
 
 /-- Multiplicative law for powers. -/
 theorem pow_mul (S : StrictMonoid M) (x : M) (m n : Nat) :

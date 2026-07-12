@@ -9,7 +9,7 @@ presheaves, natural transformations, presheaf categories, colimits.
 - Mac Lane–Moerdijk, *Sheaves in Geometry and Logic* (1992)
 -/
 
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -135,6 +135,17 @@ noncomputable def yonedaEmbedPath {A : Type u} {a b : A} (p : Path a b) :
   app := fun c q => Path.mk q.steps (q.proof.trans p.proof.symm)
   natural := by
     intro c d r q; simp only [representable]
+
+/-- A Yoneda-embedded path followed by its inverse gives a coherent loop at
+the source section. -/
+noncomputable def yonedaEmbed_roundtrip_coherence
+    {A : Type u} {a b : A} (p : Path a b)
+    (c : A) (q : Path c b) :
+    RwEq
+      (Path.trans ((yonedaEmbedPath p).app c q)
+        (Path.symm ((yonedaEmbedPath p).app c q)))
+      (Path.refl c) :=
+  rweq_cmpA_inv_right ((yonedaEmbedPath p).app c q)
 
 /-- Yoneda embedding preserves identity. -/
 theorem yonedaEmbed_refl {A : Type u} (a c : A) (q : Path c a) :

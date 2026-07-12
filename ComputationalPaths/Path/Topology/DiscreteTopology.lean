@@ -27,6 +27,7 @@ Morse theory for CW/simplicial complexes:
 import ComputationalPaths.Path.Basic.Core
 import ComputationalPaths.Path.Algebra.GroupStructures
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -79,9 +80,15 @@ structure DiscreteMorseFunction (K : CellComplex) where
       path (replacing the `True` placeholder). -/
   morse_condition : Path multiExceptionCount 0
 
-/-- A cell is critical if it has no exceptional face or coface. -/
-noncomputable def isCritical (K : CellComplex) (_f : DiscreteMorseFunction K) (c : Cell) : Prop :=
-  c ∈ K.cells ∧ True  -- the Morse condition ensures at most one exception
+/-- A cell is critical when every incident coface has strictly larger Morse
+value and every incident face has strictly smaller value. -/
+noncomputable def isCritical (K : CellComplex)
+    (f : DiscreteMorseFunction K) (c : Cell) : Prop :=
+  c ∈ K.cells ∧
+    (∀ d, d ∈ K.cells → (c.id, d.id) ∈ K.faces →
+      f.value c.id < f.value d.id) ∧
+    (∀ d, d ∈ K.cells → (d.id, c.id) ∈ K.faces →
+      f.value d.id < f.value c.id)
 
 /-- The set of critical cells. -/
 structure CriticalCells (K : CellComplex) (f : DiscreteMorseFunction K) where
@@ -156,12 +163,25 @@ inductive DiscMorseStep : Type
   | gradient_pair : DiscMorseStep
   | critical_identify : DiscMorseStep
 
-/-- Every DiscMorseStep is valid. -/
-noncomputable def discMorseStep_valid : DiscMorseStep → True
-  | DiscMorseStep.collapse => trivial
-  | DiscMorseStep.uncollapse => trivial
-  | DiscMorseStep.gradient_pair => trivial
-  | DiscMorseStep.critical_identify => trivial
+/-- Reverse a discrete Morse operation. -/
+noncomputable def DiscMorseStep.inverse : DiscMorseStep → DiscMorseStep
+  | .collapse => .uncollapse
+  | .uncollapse => .collapse
+  | .gradient_pair => .gradient_pair
+  | .critical_identify => .critical_identify
+
+/-- Change in the number of cells contributed by an operation. -/
+noncomputable def DiscMorseStep.cellDelta : DiscMorseStep → Int
+  | .collapse => -2
+  | .uncollapse => 2
+  | .gradient_pair => 0
+  | .critical_identify => 0
+
+/-- Every discrete Morse operation is valid because its cell-count change
+cancels that of its inverse. -/
+theorem discMorseStep_valid (s : DiscMorseStep) :
+    s.cellDelta + s.inverse.cellDelta = 0 := by
+  cases s <;> decide
 
 /-- A collapse sequence: a sequence of elementary collapses reducing K
     to its critical cells. -/
@@ -176,7 +196,19 @@ structure CollapseSequence (K : CellComplex) where
 /-- Collapse preserves homotopy type (Path witness). -/
 noncomputable def collapse_homotopy_path (K : CellComplex) (e : ElementaryCollapse K) :
     Path (e.face.dim + 1) e.coface.dim :=
-  e.dim_rel
+  Path.trans
+    (Path.trans e.dim_rel (Path.symm e.dim_rel))
+    e.dim_rel
+
+/-- The collapse detour normalizes to the dimension witness stored in the
+elementary collapse. -/
+noncomputable def collapse_homotopy_path_coherence
+    (K : CellComplex) (e : ElementaryCollapse K) :
+    RwEq (collapse_homotopy_path K e) e.dim_rel :=
+  rweq_trans
+    (rweq_trans_congr_left e.dim_rel
+      (rweq_cmpA_inv_right e.dim_rel))
+    (rweq_cmpA_refl_left e.dim_rel)
 
 /-! ## Discrete Morse Inequalities -/
 

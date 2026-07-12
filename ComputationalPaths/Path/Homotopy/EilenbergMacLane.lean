@@ -19,6 +19,7 @@ K(G,n): a type with a basepoint whose n-th homotopy group is equivalent to G.
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -74,20 +75,22 @@ noncomputable abbrev kOneUniqueUpToHomotopy {G : Type u} (X Y : KOneSpace G) :
 
 /-- A KSpace has a carrier type. -/
 theorem kSpace_carrier_type {G : Type u} {n : Nat} (X : KSpace G n) :
-    Nonempty X.carrier → True := by
-  intro _; trivial
+    Nonempty X.carrier :=
+  ⟨X.base⟩
 
-/-- The piN equivalence of a KSpace has a forward map. -/
+/-- Every homotopy class is recovered by applying the inverse to its forward
+image under the πₙ equivalence. -/
 theorem kSpace_piN_forward {G : Type u} {n : Nat} (X : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
-    X.piNEquiv.toFun x = X.piNEquiv.toFun x := by
-  rfl
+    ∃ y : G, X.piNEquiv.invFun y = x :=
+  ⟨X.piNEquiv.toFun x, X.piNEquiv.left_inv x⟩
 
-/-- Path witness for the forward map of the πₙ equivalence. -/
+/-- Path witness for recovery after applying the forward map of the πₙ
+equivalence. -/
 noncomputable def kSpace_piN_forward_path {G : Type u} {n : Nat} (X : KSpace G n)
     (x : HigherHomotopy.PiN n X.carrier X.base) :
-    Path (X.piNEquiv.toFun x) (X.piNEquiv.toFun x) :=
-  Path.stepChain (kSpace_piN_forward X x)
+    Path (X.piNEquiv.invFun (X.piNEquiv.toFun x)) x :=
+  Path.stepChain (X.piNEquiv.left_inv x)
 
 /-- The piN equivalence round-trips on the left. -/
 theorem kSpace_piN_left_inv {G : Type u} {n : Nat} (X : KSpace G n)
@@ -174,8 +177,13 @@ noncomputable def kSpace_homotopy_left_inv_path {G : Type u} {n : Nat} (X Y : KS
     (x : HigherHomotopy.PiN n X.carrier X.base) :
     Path
       ((kSpaceUniqueUpToHomotopy Y X).toFun ((kSpaceUniqueUpToHomotopy X Y).toFun x))
-      x :=
-  Path.stepChain (kSpace_homotopy_left_inv X Y x)
+      x := by
+  simpa [kSpaceUniqueUpToHomotopy, SimpleEquiv.comp, SimpleEquiv.symm] using
+    Path.trans
+      (Path.congrArg X.piNEquiv.invFun
+        (Path.stepChain
+          (Y.piNEquiv.right_inv (X.piNEquiv.toFun x))))
+      (Path.stepChain (X.piNEquiv.left_inv x))
 
 /-- The homotopy equivalence between KSpaces has a right inverse. -/
 theorem kSpace_homotopy_right_inv {G : Type u} {n : Nat} (X Y : KSpace G n)
@@ -190,8 +198,25 @@ noncomputable def kSpace_homotopy_right_inv_path {G : Type u} {n : Nat} (X Y : K
     (y : HigherHomotopy.PiN n Y.carrier Y.base) :
     Path
       ((kSpaceUniqueUpToHomotopy X Y).toFun ((kSpaceUniqueUpToHomotopy Y X).toFun y))
-      y :=
-  Path.stepChain (kSpace_homotopy_right_inv X Y y)
+      y := by
+  simpa [kSpaceUniqueUpToHomotopy, SimpleEquiv.comp, SimpleEquiv.symm] using
+    Path.trans
+      (Path.congrArg Y.piNEquiv.invFun
+        (Path.stepChain
+          (X.piNEquiv.right_inv (Y.piNEquiv.toFun y))))
+      (Path.stepChain (Y.piNEquiv.left_inv y))
+
+/-- The two-stage K-space uniqueness round trip cancels coherently. -/
+noncomputable def kSpace_homotopy_left_inv_coherence
+    {G : Type u} {n : Nat} (X Y : KSpace G n)
+    (x : HigherHomotopy.PiN n X.carrier X.base) :
+    RwEq
+      (Path.trans (kSpace_homotopy_left_inv_path X Y x)
+        (Path.symm (kSpace_homotopy_left_inv_path X Y x)))
+      (Path.refl
+        ((kSpaceUniqueUpToHomotopy Y X).toFun
+          ((kSpaceUniqueUpToHomotopy X Y).toFun x))) :=
+  rweq_cmpA_inv_right (kSpace_homotopy_left_inv_path X Y x)
 
 end EilenbergMacLane
 end Path

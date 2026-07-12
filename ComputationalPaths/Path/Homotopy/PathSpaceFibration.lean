@@ -24,6 +24,7 @@ import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Homotopy.Fibration
 import ComputationalPaths.Path.Homotopy.Truncation
 import ComputationalPaths.Path.Homotopy.Loops
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -46,6 +47,23 @@ noncomputable def LiftEq.toEq {A : Type u} {a b : A} : LiftEq a b → a = b
 /-- Reflexivity in the lifted equality type. -/
 noncomputable def liftEqRefl {A : Type u} (a : A) : LiftEq a a :=
   LiftEq.mk rfl
+
+/-- Lift equality data to a trace-carrying computational path. -/
+noncomputable def liftEqToPath {A : Type u} {a b : A}
+    (p : LiftEq a b) : Path a b :=
+  Path.stepChain p.toEq
+
+/-- Following a lifted equality forwards and then backwards gives a
+two-stage loop. -/
+noncomputable def liftEq_symm_trans_path {A : Type u} {a b : A}
+    (p : LiftEq a b) : Path a a :=
+  Path.trans (liftEqToPath p) (Path.symm (liftEqToPath p))
+
+/-- The lifted equality loop contracts by inverse cancellation. -/
+noncomputable def liftEq_symm_trans_rweq {A : Type u} {a b : A}
+    (p : LiftEq a b) :
+    RwEq (liftEq_symm_trans_path p) (Path.refl a) :=
+  rweq_cmpA_inv_right (liftEqToPath p)
 
 
 
@@ -91,6 +109,21 @@ noncomputable def pathSpaceContr (A : Type u) (a : A) : IsContr (PathSpace A a) 
           cases p
           exact Path.refl _ }
 
+/-- Any two points in the based path space are connected through its
+contraction center. -/
+noncomputable def pathSpace_connected (A : Type u) (a : A)
+    (x y : PathSpace A a) : Path x y :=
+  (pathSpaceContr A a).allPathsConnected x y
+
+/-- The path-space contraction trace is coherently invertible. -/
+noncomputable def pathSpace_connected_coherence (A : Type u) (a : A)
+    (x y : PathSpace A a) :
+    RwEq
+      (Path.trans (pathSpace_connected A a x y)
+        (Path.symm (pathSpace_connected A a x y)))
+      (Path.refl x) :=
+  rweq_cmpA_inv_right (pathSpace_connected A a x y)
+
 
 /-! ## Loop space as a fiber -/
 
@@ -110,7 +143,7 @@ noncomputable def loopSpaceEquivFiber (A : Type u) (a : A) :
 /-- Map from propositional loops to computational loops. -/
 noncomputable def loopSpaceEqToPath {A : Type u} {a : A} :
     LoopSpaceEq A a → LoopSpace A a :=
-  fun p => Path.stepChain p.toEq
+  liftEqToPath
 
 @[simp] theorem loopSpaceEqToPath_toEq {A : Type u} {a : A}
     (p : LoopSpaceEq A a) :

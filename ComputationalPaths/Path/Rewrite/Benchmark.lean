@@ -24,6 +24,7 @@ import ComputationalPaths.Path.Rewrite.Squier
 import ComputationalPaths.Path.Polygraph.ThreeCells
 import ComputationalPaths.Path.Rewrite.NormByEval
 import ComputationalPaths.Path.Rewrite.CriticalPairEnum
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.Path.Rewrite.Benchmark
 
@@ -85,6 +86,25 @@ theorem norm_ex1 : canon (.trans .refl (.atom 0)) = .atom 0 := by rfl
 
 /-- `symm (symm (atom 0))` normalizes to `atom 0`. -/
 theorem norm_ex2 : canon (.symm (.symm (.atom 0))) = .atom 0 := by rfl
+
+/-- Two independent benchmark reductions to `atom 0` compose to a path
+between their canonical normal forms. -/
+noncomputable def normalization_agreement_path :
+    Path
+      (canon (.trans .refl (.atom 0)))
+      (canon (.symm (.symm (.atom 0)))) :=
+  Path.trans
+    (Path.stepChain norm_ex1)
+    (Path.stepChain norm_ex2.symm)
+
+/-- The benchmark normalization comparison and its inverse cancel
+coherently. -/
+noncomputable def normalization_agreement_coherence :
+    RwEq
+      (Path.trans normalization_agreement_path
+        (Path.symm normalization_agreement_path))
+      (Path.refl (canon (.trans .refl (.atom 0)))) :=
+  rweq_cmpA_inv_right normalization_agreement_path
 
 /-- `trans (atom 0) (symm (atom 0))` normalizes to `refl`. -/
 theorem norm_ex3 : canon (.trans (.atom 0) (.symm (.atom 0))) = .refl := by rfl

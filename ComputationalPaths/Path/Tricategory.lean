@@ -7,6 +7,7 @@
  -/
  
  import ComputationalPaths.Path.GrayCategory
+ import ComputationalPaths.Path.Rewrite.RwEq
  
  namespace ComputationalPaths
  namespace Path
@@ -37,10 +38,10 @@ variable {Obj : Type u}
     ComputationalPaths.Step (PLift α) :=
   ComputationalPaths.Step.mk (PLift.up x) (PLift.up y) (_root_.congrArg PLift.up h)
 
-/-- Build a 4-cell as a one-step computational path. -/
+/-- Build a 4-cell from its generating rewrite. -/
 @[simp] noncomputable def coherencePath {α : Sort u} {x y : α} (h : x = y) :
     CellPath x y :=
-  Path.mk [coherenceStep h] (_root_.congrArg PLift.up h)
+ Path.stepChain (_root_.congrArg PLift.up h)
 
 /-- One-step coherence paths are singleton step traces. -/
 @[simp] theorem coherencePath_steps {α : Sort u} {x y : α} (h : x = y) :
@@ -571,6 +572,21 @@ noncomputable def tricategory_coherence_theorem
           (Tricategory.pentagonatorPath T f g h k)
           (CellPath.refl (GrayCategory.pentagonPath T.toGrayCategory f g h k)))) :=
   Tricategory.coherencePath (tricategory_associator_coherence_eq T f g h k)
+
+/-- The two parenthesizations of the three constituent pentagonator
+4-cells are rewrite equivalent. -/
+noncomputable def tricategory_associator_rweq
+    (T : Tricategory (Obj := Obj))
+    {a b c d e : Obj}
+    (f : T.Hom a b) (g : T.Hom b c) (h : T.Hom c d) (k : T.Hom d e) :
+    let p := CellPath.refl
+      (TwoCategory.pentagonPath T.toGrayCategory.toTwoCategory f g h k)
+    let q := Tricategory.pentagonatorPath T f g h k
+    let r := CellPath.refl
+      (GrayCategory.pentagonPath T.toGrayCategory f g h k)
+    RwEq (Path.trans (Path.trans p q) r)
+      (Path.trans p (Path.trans q r)) := by
+  exact rweq_tt _ _ _
 
 /-- Associator coherence is carried by one explicit rewrite step. -/
 @[simp] theorem tricategory_associator_coherence_steps

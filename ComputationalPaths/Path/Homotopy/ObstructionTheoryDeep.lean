@@ -46,7 +46,7 @@ stage n-1 to stage n in the Postnikov tower.
 - Whitehead, "Elements of Homotopy Theory"
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -250,6 +250,20 @@ end KSpaceDeep
 
 /-! ## Postnikov Decomposition -/
 
+/-- An explicit group isomorphism between homotopy-group models, including
+computational inverse and homomorphism witnesses. -/
+structure HomotopyGroupIso
+    {X Y : Type u} {x : X} {y : Y} {n : Nat}
+    (πX : HomotopyGroupData X x n)
+    (πY : HomotopyGroupData Y y n) where
+  toFun : πX.carrier → πY.carrier
+  invFun : πY.carrier → πX.carrier
+  left_inv : ∀ a, Path (invFun (toFun a)) a
+  right_inv : ∀ b, Path (toFun (invFun b)) b
+  map_e : Path (toFun πX.e) πY.e
+  map_mul : ∀ a b,
+    Path (toFun (πX.mul a b)) (πY.mul (toFun a) (toFun b))
+
 /-- A Postnikov stage: the n-type approximation of a space. -/
 structure PostnikovStage (X : Type u) (base : X) (n : Nat) where
   /-- The n-th stage space. -/
@@ -264,7 +278,7 @@ structure PostnikovStage (X : Type u) (base : X) (n : Nat) where
   piPreserved : ∀ k, k ≤ n →
     (πX : HomotopyGroupData X base k) →
     (πS : HomotopyGroupData stage stageBase k) →
-    ∀ _x : πX.carrier, ∃ _y : πS.carrier, True
+    HomotopyGroupIso πX πS
   /-- πₖ for k > n is trivial. -/
   piTrivial : ∀ k, n < k →
     (πS : HomotopyGroupData stage stageBase k) →
@@ -305,7 +319,12 @@ variable {X : Type u} {base : X} {n : Nat}
 -- Theorem 18: connecting map base compatibility as Path
 noncomputable def connectBase_path (pm : PostnikovMap X base n) :
     Path (pm.connect pm.upper.stageBase) pm.lower.stageBase :=
-  Path.stepChain pm.connectBase
+  Path.trans
+    (Path.congrArg pm.connect
+      (Path.stepChain pm.upper.truncBase.symm))
+    (Path.trans
+      (Path.stepChain (pm.compat base))
+      (Path.stepChain pm.lower.truncBase))
 
 -- Theorem 19: tower compatibility as Path
 noncomputable def compat_path (pm : PostnikovMap X base n) (x : X) :
@@ -455,7 +474,20 @@ theorem compat_double (cw : CWSkeleton X) (n : Nat) (x : cw.skeleton n) :
 
 noncomputable def compat_double_path (cw : CWSkeleton X) (n : Nat) (x : cw.skeleton n) :
     Path (cw.toTotal (n + 2) (cw.incl (n + 1) (cw.incl n x))) (cw.toTotal n x) :=
-  Path.stepChain (cw.compat_double n x)
+  Path.trans
+    (Path.stepChain (cw.compat (n + 1) (cw.incl n x)))
+    (Path.stepChain (cw.compat n x))
+
+/-- The two skeletal compatibility steps and their inverse cancel
+coherently. -/
+noncomputable def compat_double_coherence
+    (cw : CWSkeleton X) (n : Nat) (x : cw.skeleton n) :
+    RwEq
+      (Path.trans (compat_double_path cw n x)
+        (Path.symm (compat_double_path cw n x)))
+      (Path.refl
+        (cw.toTotal (n + 2) (cw.incl (n + 1) (cw.incl n x)))) :=
+  rweq_cmpA_inv_right (compat_double_path cw n x)
 
 -- Theorem 32: skeletal extension problem
 noncomputable def skeletalExtProblem (cw : CWSkeleton X) (n : Nat) (Y : Type u)

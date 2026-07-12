@@ -27,6 +27,7 @@ import ComputationalPaths.Path.Homotopy.LoopIteration
 import ComputationalPaths.Path.Homotopy.IntArith
 import ComputationalPaths.Path.Homotopy.LoopGroupAlgebra
 import ComputationalPaths.Path.Algebra.GroupStructures
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -86,6 +87,53 @@ theorem fiberAction_inv_left {P : A → Type u} {a : A}
     _ = fiberAction (P := P) (a := a) (LoopQuot.id (A := A) (a := a)) x := by
           simp
     _ = x := fiberAction_one (P := P) (a := a) (x := x)
+
+/-- Inverse cancellation for the fiber action, retaining composition,
+group reduction, and unit action as three separate path steps. -/
+noncomputable def fiberAction_inv_left_path {P : A → Type u} {a : A}
+    (g : LoopQuot A a) (x : P a) :
+    Path
+      (fiberAction (P := P) (a := a) (LoopQuot.inv g)
+        (fiberAction (P := P) (a := a) g x))
+      x := by
+  let pcomp : Path
+      (fiberAction (P := P) (a := a) (LoopQuot.inv g)
+        (fiberAction (P := P) (a := a) g x))
+      (fiberAction (P := P) (a := a)
+        (LoopQuot.comp (LoopQuot.inv g) g) x) :=
+    Path.stepChain
+      (fiberAction_mul (P := P) (a := a) (LoopQuot.inv g) g x)
+  let preduce : Path
+      (fiberAction (P := P) (a := a)
+        (LoopQuot.comp (LoopQuot.inv g) g) x)
+      (fiberAction (P := P) (a := a)
+        (LoopQuot.id (A := A) (a := a)) x) :=
+    Path.stepChain (by simp)
+  let punit : Path
+      (fiberAction (P := P) (a := a)
+        (LoopQuot.id (A := A) (a := a)) x) x :=
+    Path.stepChain (fiberAction_one (P := P) (a := a) (x := x))
+  exact Path.trans pcomp (Path.trans preduce punit)
+
+/-- The three inverse-action stages reassociate coherently. -/
+noncomputable def fiberAction_inv_left_assoc {P : A → Type u} {a : A}
+    (g : LoopQuot A a) (x : P a) :
+    RwEq
+      (Path.trans
+        (Path.trans
+          (Path.stepChain
+            (fiberAction_mul (P := P) (a := a)
+              (LoopQuot.inv g) g x))
+          (Path.stepChain (by simp)))
+        (Path.stepChain
+          (fiberAction_one (P := P) (a := a) (x := x))))
+      (fiberAction_inv_left_path g x) :=
+  rweq_tt
+    (Path.stepChain
+      (fiberAction_mul (P := P) (a := a) (LoopQuot.inv g) g x))
+    (Path.stepChain (by simp))
+    (Path.stepChain
+      (fiberAction_one (P := P) (a := a) (x := x)))
 
 /-- Action of a loop cancels the action of its inverse. -/
 theorem fiberAction_inv_right {P : A → Type u} {a : A}

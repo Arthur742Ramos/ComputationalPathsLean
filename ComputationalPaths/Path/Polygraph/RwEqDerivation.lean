@@ -7,6 +7,7 @@ trees remain distinguishable.
 -/
 
 import ComputationalPaths.Path.Rewrite.GroupoidConfluence
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -93,6 +94,31 @@ noncomputable def toExprRwEq {p q : Expr} : RwEqDeriv p q → ExprRwEq p q
 /-- Every derivation tree preserves the reduced-word semantics. -/
 theorem toRW_eq {p q : Expr} (d : RwEqDeriv p q) : toRW p = toRW q :=
   toRW_eq_of_exprRwEq (toExprRwEq d)
+
+/-- A derivation tree induces an explicit computational path between its
+reduced-word semantics. -/
+noncomputable def semanticPath {p q : Expr} (d : RwEqDeriv p q) :
+    Path (toRW p) (toRW q) :=
+  Path.stepChain (toRW_eq d)
+
+/-- Vertical composition of derivations is interpreted by transitivity of
+their semantic computational paths. -/
+noncomputable def semanticVcompPath {p q r : Expr}
+    (d₁ : RwEqDeriv p q) (d₂ : RwEqDeriv q r) :
+    Path (toRW p) (toRW r) :=
+  Path.trans (semanticPath d₁) (semanticPath d₂)
+
+/-- Three vertically composable derivations have coherently associated
+semantic traces. -/
+noncomputable def semanticVcomp_assoc {p q r s : Expr}
+    (d₁ : RwEqDeriv p q) (d₂ : RwEqDeriv q r)
+    (d₃ : RwEqDeriv r s) :
+    RwEq
+      (Path.trans (Path.trans (semanticPath d₁) (semanticPath d₂))
+        (semanticPath d₃))
+      (Path.trans (semanticPath d₁)
+        (Path.trans (semanticPath d₂) (semanticPath d₃))) :=
+  rweq_tt (semanticPath d₁) (semanticPath d₂) (semanticPath d₃)
 
 /-- Vertical composition of derivations. -/
 @[simp] noncomputable def vcomp {p q r : Expr}

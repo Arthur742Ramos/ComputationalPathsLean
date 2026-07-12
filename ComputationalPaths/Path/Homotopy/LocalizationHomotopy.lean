@@ -5,6 +5,7 @@ Localization at a set of primes, rationalization, p-completion,
 and Sullivan's arithmetic square. All proofs are complete.
 -/
 import ComputationalPaths.Path.Homotopy.HomologicalAlgebra
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -82,6 +83,31 @@ structure LocalizedGroup (G : AbelianGroup.{u}) (S : PrimeSet) where
   universal_comm : ∀ (H : SLocalGroup.{u} S) (f : GroupHom G H.toAbelianGroup)
     (x : G.carrier),
     (universal H f).toFun (locMap.toFun x) = f.toFun x
+
+/-- A localization factorization preserves addition in two explicit stages:
+the universal triangle first, followed by homomorphism compatibility. -/
+noncomputable def LocalizedGroup.factorAddPath
+    {G : AbelianGroup.{u}} {S : PrimeSet}
+    (L : LocalizedGroup G S) (H : SLocalGroup.{u} S)
+    (f : GroupHom G H.toAbelianGroup) (x y : G.carrier) :
+    Path
+      ((L.universal H f).toFun (L.locMap.toFun (G.add x y)))
+      (H.add (f.toFun x) (f.toFun y)) :=
+  Path.trans
+    (Path.stepChain (L.universal_comm H f (G.add x y)))
+    (Path.stepChain (f.map_add x y))
+
+/-- The additive localization factorization is coherently invertible. -/
+noncomputable def LocalizedGroup.factorAddCoherence
+    {G : AbelianGroup.{u}} {S : PrimeSet}
+    (L : LocalizedGroup G S) (H : SLocalGroup.{u} S)
+    (f : GroupHom G H.toAbelianGroup) (x y : G.carrier) :
+    RwEq
+      (Path.trans (L.factorAddPath H f x y)
+        (Path.symm (L.factorAddPath H f x y)))
+      (Path.refl
+        ((L.universal H f).toFun (L.locMap.toFun (G.add x y)))) :=
+  rweq_cmpA_inv_right (L.factorAddPath H f x y)
 
 /-! ## Rationalization -/
 

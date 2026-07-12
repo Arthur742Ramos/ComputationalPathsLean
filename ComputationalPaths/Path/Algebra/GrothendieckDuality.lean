@@ -4,7 +4,7 @@
 Chain complexes, chain maps, chain homotopies, derived functors,
 Grothendieck duality, and Serre duality. All proofs are complete.
 -/
-import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.GrothendieckDuality
 universe u
@@ -55,6 +55,32 @@ noncomputable def ChainMap.comp {C D E : ChainComplex.{u}} (g : ChainMap D E) (f
   map := fun n x => g.map n (f.map n x)
   map_zero := fun n => by simp [f.map_zero, g.map_zero]
   comm := fun n x => by simp [f.comm, g.comm]
+
+/-- Composition preserves a chain-complex zero in two computational stages:
+first through `f`, then through `g`. -/
+noncomputable def ChainMap.compZeroPath
+    {C D E : ChainComplex.{u}}
+    (g : ChainMap D E) (f : ChainMap C D) (n : Nat) :
+    ComputationalPaths.Path
+      ((ChainMap.comp g f).map n (C.zero n))
+      (E.zero n) := by
+  simpa [ChainMap.comp] using
+    ComputationalPaths.Path.trans
+      (ComputationalPaths.Path.congrArg (g.map n)
+        (ComputationalPaths.Path.stepChain (f.map_zero n)))
+      (ComputationalPaths.Path.stepChain (g.map_zero n))
+
+/-- The composed zero-preservation trace cancels coherently. -/
+noncomputable def ChainMap.compZeroCancel
+    {C D E : ChainComplex.{u}}
+    (g : ChainMap D E) (f : ChainMap C D) (n : Nat) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans (ChainMap.compZeroPath g f n)
+        (ComputationalPaths.Path.symm (ChainMap.compZeroPath g f n)))
+      (ComputationalPaths.Path.refl
+        ((ChainMap.comp g f).map n (C.zero n))) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right
+    (ChainMap.compZeroPath g f n)
 
 /-- id ∘ f = f. -/
 theorem ChainMap.id_comp {C D : ChainComplex.{u}} (f : ChainMap C D) :

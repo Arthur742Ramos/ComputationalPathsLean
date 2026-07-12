@@ -1,4 +1,4 @@
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 
@@ -147,6 +147,15 @@ noncomputable def length {α : Type} {a b : α} (p : StratPath α a b) : Nat :=
   | .nil _ => 0
   | .cons _ rest => 1 + rest.length
 
+/-- Concatenation adds the lengths of stratified paths. -/
+theorem length_trans {α : Type} {a b c : α}
+    (p : StratPath α a b) (q : StratPath α b c) :
+    (p.trans q).length = p.length + q.length := by
+  induction p with
+  | nil _ => simp [StratPath.trans, StratPath.length]
+  | cons _ rest ih =>
+      simp [StratPath.trans, StratPath.length, ih, Nat.add_assoc]
+
 -- ═══════════════════════════════════════════════════════════════
 -- SECTION 4: Whitney Stratification
 -- ═══════════════════════════════════════════════════════════════
@@ -183,6 +192,24 @@ noncomputable def frontier_chain_two (n : Nat) :
 noncomputable def frontier_to_bottom_via_closure (n : Nat) :
     StratPath StratumIdx (StratumIdx.mid (n + 1)) StratumIdx.bottom :=
   (frontier_adjacent n).trans (frontier_to_bottom n)
+
+/-- The adjacent-frontier route has two recorded stratification steps. -/
+noncomputable def frontier_chain_length_path (n : Nat) :
+    Path (frontier_to_bottom_via_closure n).length 2 :=
+  Path.trans
+    (Path.stepChain
+      (length_trans (frontier_adjacent n) (frontier_to_bottom n)))
+    (Path.stepChain
+      (show (frontier_adjacent n).length +
+          (frontier_to_bottom n).length = 2 by rfl))
+
+/-- The frontier-chain length calculation is coherently invertible. -/
+noncomputable def frontier_chain_length_coherence (n : Nat) :
+    Path.RwEq
+      (Path.trans (frontier_chain_length_path n)
+        (Path.symm (frontier_chain_length_path n)))
+      (Path.refl (frontier_to_bottom_via_closure n).length) :=
+  Path.rweq_cmpA_inv_right (frontier_chain_length_path n)
 
 noncomputable def frontier_functorial (f : StratumIdx → StratumIdx) (n : Nat) :
     StratPath StratumIdx (f (StratumIdx.mid n)) (f StratumIdx.bottom) :=

@@ -12,7 +12,7 @@ spectral sequences, and Voevodsky motives with Path-valued witnesses.
 - Mazza–Voevodsky–Weibel, "Lecture Notes on Motivic Cohomology"
 -/
 
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -75,7 +75,7 @@ theorem add_zero_components (c : AlgCycle) :
 /-- Adding zero gives same components (path). -/
 noncomputable def add_zero_path (c : AlgCycle) :
     Path (c.add (AlgCycle.zero c.codim)).components (c.components ++ []) :=
-  Path.mk [Step.mk _ _ (add_zero_components c)] (add_zero_components c)
+  Path.stepChain (add_zero_components c)
 
 -- ============================================================================
 -- Section 2: Chow Groups
@@ -122,7 +122,11 @@ theorem classical_degree (p rank : Nat) :
 /-- Product codim comm path. -/
 noncomputable def chow_product_codim_comm_path (c₁ c₂ : ChowData) :
     Path (c₁.product c₂).codim (c₂.product c₁).codim :=
-  Path.mk [Step.mk _ _ (chow_product_codim_comm c₁ c₂)] (chow_product_codim_comm c₁ c₂)
+  Path.trans
+    (Path.stepChain (chow_product_codim c₁ c₂))
+    (Path.trans
+      (Path.stepChain (Nat.add_comm c₁.codim c₂.codim))
+      (Path.symm (Path.stepChain (chow_product_codim c₂ c₁))))
 
 -- ============================================================================
 -- Section 3: Cycle Class Maps
@@ -143,7 +147,7 @@ theorem cycle_class_degree (ccm : CycleClassMap) :
 /-- Cycle class degree path. -/
 noncomputable def cycle_class_degree_path (ccm : CycleClassMap) :
     Path ccm.target_degree (2 * ccm.source_codim) :=
-  Path.mk [Step.mk _ _ ccm.degree_formula] ccm.degree_formula
+  Path.stepChain ccm.degree_formula
 
 /-- Compatibility: cycle class of codim 0 maps to H^0. -/
 theorem cycle_class_codim_zero (ccm : CycleClassMap) (h : ccm.source_codim = 0) :
@@ -192,7 +196,13 @@ theorem tate_twist_twist (mw : MotivicWeight) :
 /-- Double twist path. -/
 noncomputable def double_twist_weight_path (mw : MotivicWeight) :
     Path mw.doubleTwist.weight (mw.weight + 4) :=
-  Path.mk [Step.mk _ _ (double_twist_weight mw)] (double_twist_weight mw)
+  Path.trans
+    (Path.stepChain (tate_twist_weight mw.tateTwist))
+    (Path.trans
+      (Path.congrArg (fun n : Int => n + 2)
+        (Path.stepChain (tate_twist_weight mw)))
+      (Path.stepChain
+        (show (mw.weight + 2) + 2 = mw.weight + 4 by omega)))
 
 -- ============================================================================
 -- Section 5: Motivic Spectral Sequence
@@ -248,7 +258,7 @@ theorem bloch_kato_iso (bk : BlochKatoData) :
 /-- Bloch-Kato path. -/
 noncomputable def bloch_kato_path (bk : BlochKatoData) :
     Path bk.milnorK_rank bk.galoisH_rank :=
-  Path.mk [Step.mk _ _ bk.iso] bk.iso
+  Path.stepChain bk.iso
 
 /-- Bloch-Kato symmetric path. -/
 noncomputable def bloch_kato_symm_path (bk : BlochKatoData) :
@@ -309,7 +319,13 @@ theorem tensor_dimension (m₁ m₂ : VoevodskyMotive) :
 /-- Direct sum dimension path. -/
 noncomputable def directSum_dim_comm_path (m₁ m₂ : VoevodskyMotive) :
     Path (m₁.directSum m₂).dimension (m₂.directSum m₁).dimension :=
-  Path.mk [Step.mk _ _ (directSum_dim_comm m₁ m₂)] (directSum_dim_comm m₁ m₂)
+  Path.trans
+    (Path.stepChain (show (m₁.directSum m₂).dimension =
+      m₁.dimension + m₂.dimension by rfl))
+    (Path.trans
+      (Path.stepChain (Nat.add_comm m₁.dimension m₂.dimension))
+      (Path.stepChain (show m₂.dimension + m₁.dimension =
+        (m₂.directSum m₁).dimension by rfl)))
 
 /-- Tensor weight commutativity. -/
 theorem tensor_weight_comm (m₁ m₂ : VoevodskyMotive) :
@@ -319,7 +335,21 @@ theorem tensor_weight_comm (m₁ m₂ : VoevodskyMotive) :
 /-- Tensor weight comm path. -/
 noncomputable def tensor_weight_comm_path (m₁ m₂ : VoevodskyMotive) :
     Path (m₁.tensor m₂).weight (m₂.tensor m₁).weight :=
-  Path.mk [Step.mk _ _ (tensor_weight_comm m₁ m₂)] (tensor_weight_comm m₁ m₂)
+  Path.trans
+    (Path.stepChain (tensor_weight m₁ m₂))
+    (Path.trans
+      (Path.stepChain (Int.add_comm m₁.weight m₂.weight))
+      (Path.symm (Path.stepChain (tensor_weight m₂ m₁))))
+
+/-- Tensor-weight commutativity and its inverse are an LND_EQ-TRS
+coherent round trip. -/
+noncomputable def tensor_weight_comm_coherence
+    (m₁ m₂ : VoevodskyMotive) :
+    RwEq
+      (Path.trans (tensor_weight_comm_path m₁ m₂)
+        (Path.symm (tensor_weight_comm_path m₁ m₂)))
+      (Path.refl (m₁.tensor m₂).weight) :=
+  rweq_cmpA_inv_right (tensor_weight_comm_path m₁ m₂)
 
 end MotivicPaths
 end Algebra

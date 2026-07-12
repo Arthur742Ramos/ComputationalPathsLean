@@ -21,7 +21,7 @@
   All constructions use Path.trans, Path.symm, Path.congrArg as core operations.
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ConcurrencyTheoryDeep
 
@@ -305,7 +305,16 @@ noncomputable def dpath_comp {A : Type u} (p : DPath A) (q : DPath A)
     (h : Path p.target q.source) : DPath A :=
   { source := p.source
     target := q.target
-    witness := p.witness.trans (h.trans q.witness) }
+    witness := Path.trans p.witness (Path.trans h q.witness) }
+
+/-- Directed-path composition is coherent under reassociation of its source,
+endpoint bridge, and target traces. -/
+noncomputable def dpath_comp_coherence {A : Type u}
+    (p q : DPath A) (h : Path p.target q.source) :
+    RwEq
+      (Path.trans (Path.trans p.witness h) q.witness)
+      (Path.trans p.witness (Path.trans h q.witness)) :=
+  rweq_tt p.witness h q.witness
 
 -- ===================================================================
 -- THEOREM 24: DPath composition source
@@ -400,7 +409,7 @@ noncomputable def fire (net : PetriNet) (t : PTransition) (m : Marking) : Markin
 noncomputable def fire_identity (net : PetriNet) (t : PTransition) (m : Marking)
     (h_pre : ∀ p, net.pre t p = 0) (h_post : ∀ p, net.post t p = 0) :
     Path (fire net t m) m :=
-  Path.mk [] (by unfold fire; funext p; simp [h_pre, h_post])
+  Path.stepChain (by unfold fire; funext p; simp [h_pre, h_post])
 
 -- ===================================================================
 -- DEF 30: Two fires with identity transitions
@@ -614,7 +623,7 @@ noncomputable def traceConcat {Act : Type u} (t1 t2 : List Act) : List Act :=
 -- ===================================================================
 noncomputable def trace_concat_assoc {Act : Type u} (t1 t2 t3 : List Act) :
     Path (traceConcat (traceConcat t1 t2) t3) (traceConcat t1 (traceConcat t2 t3)) :=
-  Path.mk [] (by unfold traceConcat; rw [List.append_assoc])
+  Path.stepChain (by unfold traceConcat; rw [List.append_assoc])
 
 -- ===================================================================
 -- DEF 48: Empty trace is left identity
@@ -628,7 +637,7 @@ noncomputable def trace_concat_nil_left {Act : Type u} (t : List Act) :
 -- ===================================================================
 noncomputable def trace_concat_nil_right {Act : Type u} (t : List Act) :
     Path (traceConcat t []) t :=
-  Path.mk [] (by unfold traceConcat; rw [List.append_nil])
+  Path.stepChain (by unfold traceConcat; rw [List.append_nil])
 
 -- ===================================================================
 -- SECTION 20: Concurrent Composition Coherence
@@ -834,7 +843,7 @@ theorem flatten_nil {Act : Type u} : flattenSteps ([] : List (List Act)) = ([] :
 -- ===================================================================
 noncomputable def flatten_singleton {Act : Type u} (s : List Act) :
     Path (flattenSteps [s]) (s ++ []) :=
-  Path.mk [] (by simp [flattenSteps])
+  Path.stepChain (by simp [flattenSteps])
 
 -- ===================================================================
 -- SECTION 26: Symmetry and Coherence Laws
@@ -979,7 +988,7 @@ noncomputable def sepConj (r1 r2 : List Resource) : List Resource := r1 ++ r2
 -- ===================================================================
 noncomputable def sep_conj_assoc (r1 r2 r3 : List Resource) :
     Path (sepConj (sepConj r1 r2) r3) (sepConj r1 (sepConj r2 r3)) :=
-  Path.mk [] (by unfold sepConj; rw [List.append_assoc])
+  Path.stepChain (by unfold sepConj; rw [List.append_assoc])
 
 -- ===================================================================
 -- DEF 83: Empty resource is unit left
@@ -993,7 +1002,7 @@ noncomputable def sep_conj_nil_left (r : List Resource) :
 -- ===================================================================
 noncomputable def sep_conj_nil_right (r : List Resource) :
     Path (sepConj r []) r :=
-  Path.mk [] (by unfold sepConj; rw [List.append_nil])
+  Path.stepChain (by unfold sepConj; rw [List.append_nil])
 
 -- ===================================================================
 -- SECTION 31: Diamond Property Advanced

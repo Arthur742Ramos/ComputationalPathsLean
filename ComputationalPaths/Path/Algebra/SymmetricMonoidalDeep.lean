@@ -10,6 +10,8 @@
   No Path.ofEq — genuine multi-step trans/symm/congrArg chains.
 -/
 
+import ComputationalPaths.Path.Rewrite.RwEq
+
 set_option linter.unusedVariables false
 
 namespace SymmetricMonoidalDeep
@@ -150,6 +152,31 @@ noncomputable def pentagon_bot (a b c d : SMObj)
   ((assocR_path a b c).congrArgL d).trans
     ((assocR_path a (SMObj.tensor b c) d).trans
       ((assocR_path b c d).congrArgR a))
+
+/-- Flattening the pentagon source reaches the pentagon target by two
+associativity rewrites on lists of tensor generators. -/
+noncomputable def pentagon_flatten_path (a b c d : SMObj) :
+    ComputationalPaths.Path
+      (SMObj.tensor (SMObj.tensor (SMObj.tensor a b) c) d).flatten
+      (SMObj.tensor a (SMObj.tensor b (SMObj.tensor c d))).flatten := by
+  simpa [SMObj.flatten] using
+    ComputationalPaths.Path.trans
+      (ComputationalPaths.Path.stepChain
+        (List.append_assoc
+          (a.flatten ++ b.flatten) c.flatten d.flatten))
+      (ComputationalPaths.Path.stepChain
+        (List.append_assoc
+          a.flatten b.flatten (c.flatten ++ d.flatten)))
+
+/-- The flattened pentagon trace cancels coherently. -/
+noncomputable def pentagon_flatten_cancel (a b c d : SMObj) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans (pentagon_flatten_path a b c d)
+        (ComputationalPaths.Path.symm (pentagon_flatten_path a b c d)))
+      (ComputationalPaths.Path.refl
+        (SMObj.tensor (SMObj.tensor (SMObj.tensor a b) c) d).flatten) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right
+    (pentagon_flatten_path a b c d)
 
 /-- Theorem 15: Pentagon top length = 2. -/
 theorem pentagon_top_length (a b c d : SMObj) : (pentagon_top a b c d).length = 2 := by rfl

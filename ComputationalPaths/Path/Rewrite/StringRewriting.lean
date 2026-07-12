@@ -18,7 +18,7 @@ rewrite rules replace subwords, and we prove:
 - Thue, "Die Lösung eines Speziellen Problems" (1914)
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.Path.Rewrite.StringRewriting
 
@@ -110,20 +110,37 @@ theorem word_append_nil {α : Type u} (w : Word α) :
 /-- Path witnessing associativity of word concatenation. -/
 noncomputable def wordAssocPath {α : Type u} (u v w : Word α) :
     ComputationalPaths.Path (u ++ v ++ w) (u ++ (v ++ w)) :=
-  ComputationalPaths.Path.mk [Step.mk _ _ (word_append_assoc u v w)]
-    (word_append_assoc u v w)
+  ComputationalPaths.Path.stepChain (word_append_assoc u v w)
 
 /-- Path witnessing left identity of word concatenation. -/
 noncomputable def wordNilLeftPath {α : Type u} (w : Word α) :
     ComputationalPaths.Path ([] ++ w) w :=
-  ComputationalPaths.Path.mk [Step.mk _ _ (word_nil_append w)]
-    (word_nil_append w)
+  ComputationalPaths.Path.stepChain (word_nil_append w)
 
 /-- Path witnessing right identity of word concatenation. -/
 noncomputable def wordNilRightPath {α : Type u} (w : Word α) :
     ComputationalPaths.Path (w ++ []) w :=
-  ComputationalPaths.Path.mk [Step.mk _ _ (word_append_nil w)]
-    (word_append_nil w)
+  ComputationalPaths.Path.stepChain (word_append_nil w)
+
+/-- Removing a trailing empty word and then reassociating gives a two-stage
+free-monoid coherence path. -/
+noncomputable def wordMonoidCoherencePath {α : Type u}
+    (u v w : Word α) :
+    ComputationalPaths.Path (((u ++ v) ++ w) ++ [])
+      (u ++ (v ++ w)) :=
+  ComputationalPaths.Path.trans
+    (wordNilRightPath ((u ++ v) ++ w))
+    (wordAssocPath u v w)
+
+/-- The free-monoid coherence path is coherently invertible. -/
+noncomputable def wordMonoidCoherenceCancel {α : Type u}
+    (u v w : Word α) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans (wordMonoidCoherencePath u v w)
+        (ComputationalPaths.Path.symm (wordMonoidCoherencePath u v w)))
+      (ComputationalPaths.Path.refl (((u ++ v) ++ w) ++ [])) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right
+    (wordMonoidCoherencePath u v w)
 
 /-- Monoid left-unit path toEq is correct. -/
 theorem wordNilLeftPath_toEq {α : Type u} (w : Word α) :

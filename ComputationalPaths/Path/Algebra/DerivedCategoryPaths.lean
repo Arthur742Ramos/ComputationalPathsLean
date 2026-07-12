@@ -8,7 +8,7 @@ inductives, rewrite steps, and multi-step paths. Zero `Path.mk [Step.mk _ _ h] h
 ## Main results (35+ theorems)
 -/
 
-import ComputationalPaths.Path.Basic
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths.Path.Algebra.DerivedCategoryPaths
 
@@ -105,7 +105,7 @@ theorem eval_eq {a b : Int} (s : DStep a b) : a = b := by
 
 /-- Lift a step to a core `Path`. -/
 noncomputable def toCorePath {a b : Int} (s : DStep a b) : Path a b :=
-  ⟨[⟨a, b, s.eval_eq⟩], s.eval_eq⟩
+  Path.stepChain s.eval_eq
 
 end DStep
 
@@ -146,8 +146,11 @@ theorem depth_symm {a b : Int} (p : DPath a b) :
 
 -- 5
 /-- Lift to a core `Path`. -/
-noncomputable def toCorePath {a b : Int} (p : DPath a b) : Path a b :=
-  ⟨[⟨a, b, p.eval_eq⟩], p.eval_eq⟩
+noncomputable def toCorePath {a b : Int} : DPath a b → Path a b
+  | .refl x => Path.refl x
+  | .step s => s.toCorePath
+  | .trans p q => Path.trans p.toCorePath q.toCorePath
+  | .symm p => Path.symm p.toCorePath
 
 end DPath
 
@@ -243,6 +246,20 @@ noncomputable def neg_zero_path : DPath (-(0 : Int)) 0 :=
 noncomputable def add_zero_then_comm (x y : Int) : DPath (x + y + 0) (y + x) :=
   .trans (add_zero_path (x + y)) (add_comm_path x y)
 
+/-- The two-step integer route underlying derived-category addition, lifted
+without collapsing its trace to a single equality. -/
+noncomputable def add_zero_then_comm_core (x y : Int) :
+    Path (x + y + 0) (y + x) :=
+  (add_zero_then_comm x y).toCorePath
+
+/-- The lifted derived-category addition route is coherently invertible. -/
+noncomputable def add_zero_then_comm_coherence (x y : Int) :
+    RwEq
+      (Path.trans (add_zero_then_comm_core x y)
+        (Path.symm (add_zero_then_comm_core x y)))
+      (Path.refl (x + y + 0)) :=
+  rweq_cmpA_inv_right (add_zero_then_comm_core x y)
+
 /-! ## Coherence Theorems -/
 
 -- 23
@@ -284,8 +301,8 @@ noncomputable def zeroHomotopy (C D : ChainComplex) (f : ChainMap C D) :
 -- 28
 /-- Homotopy is reflexive. -/
 theorem homotopy_refl (C D : ChainComplex) (f : ChainMap C D) :
-    ∃ _ : ChainHomotopy f f, True :=
-  ⟨zeroHomotopy C D f, trivial⟩
+    Nonempty (ChainHomotopy f f) :=
+  ⟨zeroHomotopy C D f⟩
 
 /-! ## Mapping Cone -/
 

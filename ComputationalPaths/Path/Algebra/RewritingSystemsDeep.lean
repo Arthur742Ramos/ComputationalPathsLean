@@ -31,6 +31,8 @@
   All proofs are sorry-free.  Zero Path.ofEq.  Zero axiom cheats.
 -/
 
+import ComputationalPaths.Path.Rewrite.RwEq
+
 namespace CompPaths.RewritingSystems
 
 -- ════════════════════════════════════════════════════════════
@@ -135,6 +137,39 @@ theorem rpath_trans_length {α : Type} {R : α → α → Prop} {a b c : α}
   induction p with
   | refl _ => simp [RPath.trans, RPath.length]
   | cons _ _ ih => simp [RPath.trans, RPath.length, ih, Nat.add_assoc]
+
+/-- The length of three consecutive reductions is computed in three explicit
+stages: the outer concatenation, the inner concatenation, and reassociation of
+the resulting sum. -/
+noncomputable def rpath_three_length_path
+    {α : Type} {R : α → α → Prop} {a b c d : α}
+    (p : RPath α R a b) (q : RPath α R b c)
+    (r : RPath α R c d) :
+    ComputationalPaths.Path ((p.trans q).trans r).length
+      (p.length + (q.length + r.length)) :=
+  ComputationalPaths.Path.trans
+    (ComputationalPaths.Path.stepChain
+      (rpath_trans_length (p.trans q) r))
+    (ComputationalPaths.Path.trans
+      (ComputationalPaths.Path.congrArg
+        (fun n => n + r.length)
+        (ComputationalPaths.Path.stepChain
+          (rpath_trans_length p q)))
+      (ComputationalPaths.Path.stepChain
+        (Nat.add_assoc p.length q.length r.length)))
+
+/-- The three-reduction length computation and its inverse normalize to the
+empty path. -/
+noncomputable def rpath_three_length_cancel
+    {α : Type} {R : α → α → Prop} {a b c d : α}
+    (p : RPath α R a b) (q : RPath α R b c)
+    (r : RPath α R c d) :
+    ComputationalPaths.Path.RwEq
+      (ComputationalPaths.Path.trans (rpath_three_length_path p q r)
+        (ComputationalPaths.Path.symm (rpath_three_length_path p q r)))
+      (ComputationalPaths.Path.refl ((p.trans q).trans r).length) :=
+  ComputationalPaths.Path.rweq_cmpA_inv_right
+    (rpath_three_length_path p q r)
 
 /-- Theorem 4: trans with refl on the right is identity. -/
 theorem rpath_trans_refl {α : Type} {R : α → α → Prop} {a b : α}
@@ -310,23 +345,23 @@ structure DiamondWit (α : Type) (R : α → α → Prop)
 /-- Diamond property (one-step): every fork closes in one step. -/
 noncomputable def HasDiamond (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α), R a b → R a c →
-    ∃ d : α, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
+    Nonempty (Joinable α R b c)
 
 /-- Local confluence: every one-step fork joins via multi-step. -/
 noncomputable def WCR (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α), R a b → R a c →
-    ∃ d : α, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
+    Nonempty (Joinable α R b c)
 
 /-- Confluence: every multi-step fork joins. -/
 noncomputable def CR (α : Type) (R : α → α → Prop) : Prop :=
   ∀ (a b c : α),
-    (∃ _ : RPath α R a b, True) → (∃ _ : RPath α R a c, True) →
-    ∃ d : α, (∃ _ : RPath α R b d, ∃ _ : RPath α R c d, True)
+    Nonempty (RPath α R a b) → Nonempty (RPath α R a c) →
+    Nonempty (Joinable α R b c)
 
 /-- Church-Rosser: convertibility implies joinability. -/
 noncomputable def ChurchRosser (α : Type) (R : α → α → Prop) : Prop :=
-  ∀ (a b : α), (∃ _ : ConvPath α R a b, True) →
-    ∃ c : α, (∃ _ : RPath α R a c, ∃ _ : RPath α R b c, True)
+  ∀ (a b : α), Nonempty (ConvPath α R a b) →
+    Nonempty (Joinable α R a b)
 
 -- ════════════════════════════════════════════════════════════
 -- §5  Diamond ⇒ Confluence (Path Construction)
@@ -363,7 +398,8 @@ theorem diamond_implies_wcr {α : Type} {R : α → α → Prop}
 theorem cr_implies_wcr {α : Type} {R : α → α → Prop}
     (hcr : CR α R) : WCR α R := by
   intro a b c hab hac
-  exact hcr a b c ⟨RPath.single (.mk hab), trivial⟩ ⟨RPath.single (.mk hac), trivial⟩
+  exact hcr a b c ⟨RPath.single (.mk hab)⟩
+    ⟨RPath.single (.mk hac)⟩
 
 -- ════════════════════════════════════════════════════════════
 -- §6  Normal Forms
@@ -380,7 +416,7 @@ structure NormalizesTo (α : Type) (R : α → α → Prop) (a b : α) where
 
 /-- The ARS is weakly normalising: every element has a normal form. -/
 noncomputable def WN (α : Type) (R : α → α → Prop) : Prop :=
-  ∀ a : α, ∃ b : α, ∃ _ : NormalizesTo α R a b, True
+  ∀ a : α, ∃ b : α, Nonempty (NormalizesTo α R a b)
 
 /-- The ARS is strongly normalising: no infinite reduction sequences. -/
 noncomputable def SN (α : Type) (R : α → α → Prop) : Prop :=
@@ -406,9 +442,9 @@ theorem sn_implies_wn {α : Type} {R : α → α → Prop}
   | intro x _ ih =>
     by_cases h : ∃ y, R x y
     · obtain ⟨y, hy⟩ := h
-      obtain ⟨nf, ⟨norm, _⟩⟩ := ih y hy
-      exact ⟨nf, ⟨⟨RPath.cons (.mk hy) norm.path, norm.nf⟩, trivial⟩⟩
-    · exact ⟨x, ⟨⟨.refl x, fun b hb => h ⟨b, hb⟩⟩, trivial⟩⟩
+      obtain ⟨nf, ⟨norm⟩⟩ := ih y hy
+      exact ⟨nf, ⟨⟨RPath.cons (.mk hy) norm.path, norm.nf⟩⟩⟩
+    · exact ⟨x, ⟨⟨.refl x, fun b hb => h ⟨b, hb⟩⟩⟩⟩
 
 /-- Theorem 28: if a is NF then any path from a has length 0. -/
 theorem nf_path_trivial {α : Type} {R : α → α → Prop} {a b : α}
@@ -431,9 +467,9 @@ noncomputable def UN (α : Type) (R : α → α → Prop) : Prop :=
 theorem cr_wn_implies_un {α : Type} {R : α → α → Prop}
     (hcr : CR α R) (_ : WN α R) : UN α R := by
   intro a b c nb nc
-  have ⟨d, ⟨pb, ⟨pc, _⟩⟩⟩ := hcr a b c ⟨nb.path, trivial⟩ ⟨nc.path, trivial⟩
-  have hbd := nf_path_trivial nb.nf pb
-  have hcd := nf_path_trivial nc.nf pc
+  obtain ⟨j⟩ := hcr a b c ⟨nb.path⟩ ⟨nc.path⟩
+  have hbd := nf_path_trivial nb.nf j.left
+  have hcd := nf_path_trivial nc.nf j.right
   exact hbd.trans hcd.symm
 
 /-- Theorem 30: if a is NF and a →* b then a = b. -/

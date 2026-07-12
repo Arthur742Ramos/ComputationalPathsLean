@@ -1,4 +1,4 @@
-import ComputationalPaths.Path.Basic.Core
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 
@@ -195,6 +195,15 @@ noncomputable def length {α : Type} {a b : α} (p : QGPath α a b) : Nat :=
   | .nil _ => 0
   | .cons _ rest => 1 + rest.length
 
+/-- Concatenation adds the lengths of quantum-group rewrite paths. -/
+theorem length_trans {α : Type} {a b c : α}
+    (p : QGPath α a b) (q : QGPath α b c) :
+    (p.trans q).length = p.length + q.length := by
+  induction p with
+  | nil _ => simp [QGPath.trans, QGPath.length]
+  | cons _ rest ih =>
+      simp [QGPath.trans, QGPath.length, ih, Nat.add_assoc]
+
 -- ═══════════════════════════════════════════════════════════════
 -- SECTION 4: U_q(g) Algebra
 -- ═══════════════════════════════════════════════════════════════
@@ -323,6 +332,25 @@ noncomputable def qdim_comm (a b : QDim) :
 noncomputable def qdim_product_classical (n m : Nat) :
     QGPath QDim (QDim.product (QDim.quantum n) (QDim.quantum m)) (QDim.classical (n * m)) :=
   (qdim_product n m).trans (qdim_classical (n * m))
+
+/-- Passing from a product of quantum dimensions to its classical limit has
+exactly the two displayed quantum-group steps. -/
+noncomputable def qdim_product_classical_trace (n m : Nat) :
+    Path (qdim_product_classical n m).length 2 :=
+  Path.trans
+    (Path.stepChain
+      (length_trans (qdim_product n m) (qdim_classical (n * m))))
+    (Path.stepChain
+      (show (qdim_product n m).length +
+          (qdim_classical (n * m)).length = 2 by rfl))
+
+/-- The quantum-dimension length trace is coherently invertible. -/
+noncomputable def qdim_product_classical_coherence (n m : Nat) :
+    Path.RwEq
+      (Path.trans (qdim_product_classical_trace n m)
+        (Path.symm (qdim_product_classical_trace n m)))
+      (Path.refl (qdim_product_classical n m).length) :=
+  Path.rweq_cmpA_inv_right (qdim_product_classical_trace n m)
 
 noncomputable def qdim_double_comm (a b : QDim) :
     QGPath QDim (QDim.product a b) (QDim.product a b) :=

@@ -25,6 +25,7 @@ import ComputationalPaths.Path.Homotopy.PostnikovSystem
 import ComputationalPaths.Path.Homotopy.Loops
 import ComputationalPaths.Path.Homotopy.SuspensionLoop
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.RwEq
 
 namespace ComputationalPaths
 namespace Path
@@ -88,6 +89,17 @@ structure CohomologyRepresentability (H : ReducedCohomologyTheory) where
   represent_zero :
       ∀ (n : Nat) (X : Pointed),
         (represent n X).toFun (basepointMap X (space n)) = H.zero n X
+
+/-- Naturality certificate for a chosen cohomology representation.  Kept
+separate so existing representability data remains source-compatible. -/
+structure CohomologyNaturalityCertificate
+    {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H) where
+  natural :
+    ∀ (n : Nat) {X Y : Pointed} (f : PointedMap X Y)
+      (g : PointedMap Y (R.space n)),
+      Path
+        ((R.represent n X).toFun (PointedMap.comp g f))
+        (H.map n f ((R.represent n Y).toFun g))
 
 namespace CohomologyRepresentability
 
@@ -166,13 +178,17 @@ theorem trivialKInvariant_kMap_const {A : Type u} {G : Type u} (n : Nat)
     (trivialKInvariant n P a X).kMap x = X.base := by
   rfl
 
-/-- CohomologyRepresentability.eval is natural with respect to pointed maps. -/
-theorem CohomologyRepresentability.eval_natural
+/-- `CohomologyRepresentability.eval` is natural with respect to pointed
+maps, with the naturality square witnessed by a computational path. -/
+noncomputable def CohomologyRepresentability.eval_natural
     {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
+    (N : CohomologyNaturalityCertificate R)
     (n : Nat) {X Y : Pointed} (f : PointedMap X Y)
     (g : PointedMap Y (R.space n)) :
-    ∃ (_result : H.cohomology n X), True :=
-  ⟨(R.represent n X).toFun ⟨fun x => g.toFun (f.toFun x), by simp [f.map_pt, g.map_pt]⟩, trivial⟩
+    Path
+      (R.eval n (PointedMap.comp g f))
+      (H.map n f (R.eval n g)) :=
+  N.natural n f g
 
 /-- The basepoint map is the zero of the representable hom set. -/
 theorem basepointMap_is_zero {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
@@ -236,6 +252,33 @@ noncomputable def CohomologyRepresentability.eval_base_path
     (n : Nat) (X : Pointed) :
     Path (R.eval n (basepointMap X (R.space n))) (H.zero n X) :=
   Path.stepChain (R.eval_base n X)
+
+/-- Naturality followed by the basepoint calculation gives the mapped zero
+class in two explicit cohomological stages. -/
+noncomputable def CohomologyRepresentability.eval_base_natural_path
+    {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
+    (N : CohomologyNaturalityCertificate R)
+    (n : Nat) {X Y : Pointed} (f : PointedMap X Y) :
+    Path
+      (R.eval n
+        (PointedMap.comp (basepointMap Y (R.space n)) f))
+      (H.map n f (H.zero n Y)) :=
+  Path.trans
+    (R.eval_natural N n f (basepointMap Y (R.space n)))
+    (Path.congrArg (H.map n f) (R.eval_base_path n Y))
+
+/-- The natural basepoint evaluation trace is coherently invertible. -/
+noncomputable def CohomologyRepresentability.eval_base_natural_coherence
+    {H : ReducedCohomologyTheory} (R : CohomologyRepresentability H)
+    (N : CohomologyNaturalityCertificate R)
+    (n : Nat) {X Y : Pointed} (f : PointedMap X Y) :
+    RwEq
+      (Path.trans (R.eval_base_natural_path N n f)
+        (Path.symm (R.eval_base_natural_path N n f)))
+      (Path.refl
+        (R.eval n
+          (PointedMap.comp (basepointMap Y (R.space n)) f))) :=
+  rweq_cmpA_inv_right (R.eval_base_natural_path N n f)
 
 /-- k-invariant basepoint condition as a computational path. -/
 noncomputable def PostnikovKInvariant.kMap_base_path {A : Type u} {G : Type u} {n : Nat}
