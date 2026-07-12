@@ -199,11 +199,9 @@ theorem gray_tensor_product_associative_nonempty (G : GrayCategory (Obj := Obj))
       (G.vcomp (G.hcomp (G.vcomp η₁ η₂) (G.vcomp θ₁ θ₂)) (G.hcomp η₃ θ₃))
       (G.hcomp (G.vcomp η₁ (G.vcomp η₂ η₃))
         (G.vcomp θ₁ (G.vcomp θ₂ θ₃)))) :=
-  ⟨Path.trans
-    (Path.stepChain
-      (_root_.congrArg PLift.up
-        (gray_tensor_product_associative (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃)))
-    (Path.refl _)⟩
+  ⟨Path.stepChain
+    (_root_.congrArg PLift.up
+      (gray_tensor_product_associative (G := G) η₁ η₂ η₃ θ₁ θ₂ θ₃))⟩
 
 /-- Gray tensor (horizontal composition) is functorial: interchange swaps
 the direction of the 3-cell. -/
@@ -414,15 +412,13 @@ noncomputable def pathGrayCategory (A : Type u) : GrayCategory (Obj := A) where
   toTwoCategory := pathTwoCategory A
   interchange_path := by
     intro a b c f₀ f₁ f₂ g₀ g₁ g₂ η₁ η₂ θ₁ θ₂
-    exact Path.trans
-      (Path.stepChain
-        (_root_.congrArg PLift.up
-          ((pathTwoCategory A).interchange
-            (a := a) (b := b) (c := c)
-            (f₀ := f₀) (f₁ := f₁) (f₂ := f₂)
-            (g₀ := g₀) (g₁ := g₁) (g₂ := g₂)
-            (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂))))
-      (Path.refl _)
+    exact Path.stepChain
+      (_root_.congrArg PLift.up
+        ((pathTwoCategory A).interchange
+          (a := a) (b := b) (c := c)
+          (f₀ := f₀) (f₁ := f₁) (f₂ := f₂)
+          (g₀ := g₀) (g₁ := g₁) (g₂ := g₂)
+          (η₁ := η₁) (η₂ := η₂) (θ₁ := θ₁) (θ₂ := θ₂)))
 
 /-- For `pathGrayCategory`, the stored interchange 3-cell recovers interchange by extraction. -/
 theorem pathGrayCategory_interchange_from_path (A : Type u)
@@ -462,11 +458,9 @@ noncomputable def pathGrayCategory_tensor_assoc_path (A : Type u)
       ((pathGrayCategory A).vcomp
         ((pathGrayCategory A).assoc f₀ g₀ h₀)
         ((pathGrayCategory A).hcomp η ((pathGrayCategory A).hcomp θ ι))) :=
-  Path.trans
-    (Path.stepChain
-      (_root_.congrArg PLift.up
-        (pathGrayCategory_tensor_assoc (A := A) η θ ι)))
-    (Path.refl _)
+  Path.stepChain
+    (_root_.congrArg PLift.up
+      (pathGrayCategory_tensor_assoc (A := A) η θ ι))
 
 /-- Forgetting 3-cell data recovers the path 2-category. -/
 @[simp] theorem pathGrayCategory_to_twoCategory (A : Type u) :
