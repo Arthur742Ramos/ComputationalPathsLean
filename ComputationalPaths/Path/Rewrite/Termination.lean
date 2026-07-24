@@ -132,9 +132,12 @@ end Precedence
 Extensions to `Instantiation` for rule ranking.
 
 Note: The `Witness` structure for normalization has been removed because it
-relied on `Step.canon` which was found to be inconsistent (it would collapse
-all paths to be RwEq, contradicting π₁(S¹) ≃ ℤ). Without automatic normalization,
-witnesses must be constructed explicitly when needed.
+relied on `Step.canon`, which would add an `RwEq` from every path to the
+proof-erasing `Path.stepChain p.toEq`.  That is a much stronger relation than
+the explicit generated system and would erase all trace distinctions.  It is
+not a contradiction with the current one-constructor circle, whose genuine
+loop quotient is in fact contractible.  Without such an added rule, witnesses
+must be constructed explicitly when needed.
 -/
 
 namespace LNDEQ

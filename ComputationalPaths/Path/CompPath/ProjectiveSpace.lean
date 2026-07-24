@@ -1,9 +1,11 @@
 /-
 # Projective spaces via computational paths
 
-Lightweight computational-path models for real and complex projective spaces.
-We model RP^1 using the computational circle, RP^n for n >= 2 using a Z2 loop
-quotient, and CP^n as a subsingleton type with trivial fundamental group.
+Lightweight presentation models for real and complex projective spaces.
+The RP^1 branch reuses the computational circle's synthetic winding quotient;
+it is not the genuine `PathRwQuot` of the one-constructor carrier.  Higher
+branches likewise package stated algebraic models rather than deriving
+topological equivalences from the carriers.
 
 ## Key Results
 
@@ -190,13 +192,13 @@ noncomputable def RealProjectiveSpace : Nat → Type u
   | Nat.succ 0 => circleCompPathBase
   | Nat.succ (Nat.succ _) => realProjective2CompPathBase
 
-/-- Model for pi_1(RP^n) by dimension. -/
+/-- Synthetic presentation model for pi_1(RP^n) by dimension. -/
 noncomputable def realProjectivePiOne : Nat → Type u
   | 0 => PUnit'
   | Nat.succ 0 => circleCompPathPiOne
   | Nat.succ (Nat.succ _) => realProjective2CompPathPiOne
 
-/-- Group model for pi_1(RP^n) by dimension. -/
+/-- Target group for the synthetic presentation model by dimension. -/
 noncomputable def realProjectivePiOneModel : Nat → Type
   | 0 => Unit
   | Nat.succ 0 => Int

@@ -4,7 +4,8 @@
   Homotopy type theory via computational paths.
   Covers: path induction (J-eliminator), transport, apd,
   function extensionality, univalence statement, higher inductive
-  types (circle, suspension), loop space algebra, π₁(S¹) sketch.
+  types (circle, suspension), loop-word algebra, and a synthetic winding sketch.
+  Its `S1Loop` list syntax is not the genuine `PathRwQuot` of `CompPath.Circle`.
 
   All proofs are sorry-free.  40+ theorems.
 -/
@@ -267,7 +268,7 @@ theorem loop_power_length : (n : Nat) → s1_length (loop_power n) = n
     simp [loop_power, s1_trans, s1_length, fundamental_loop]
     exact loop_power_length n
 
-/-- Theorem 33 – loop_power_add: additive structure of π₁(S¹). -/
+/-- Theorem 33 – additive structure of the local synthetic loop-word model. -/
 theorem loop_power_add : (m n : Nat) →
     loop_power (m + n) = s1_trans (loop_power m) (loop_power n)
   | 0, _ => by simp [loop_power, s1_trans]
@@ -527,7 +528,7 @@ theorem roundtrip_length (p : Path a b) :
   rw [length_trans, length_symm]; omega
 
 -- ============================================================
--- §20  Encode–decode for π₁(S¹)
+-- §20  Encode data for the synthetic loop-word model
 -- ============================================================
 
 noncomputable def encode : S1Loop → Int := winding

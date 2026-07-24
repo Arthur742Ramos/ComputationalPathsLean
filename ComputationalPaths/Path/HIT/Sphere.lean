@@ -4,6 +4,11 @@
 This module defines the 2-sphere S² as the suspension of the circle S¹,
 and proves that π₁(S²) ≅ 1 using the Seifert-van Kampen theorem.
 
+Here `Circle` is the local abbreviation `Suspension (ULift Bool)` below, not
+`CompPath.Circle`.  References to classical `π₁(S¹) = ℤ` are background and
+do not assert that the current one-constructor `CompPath.Circle` has that
+genuine loop quotient.
+
 ## Mathematical Background
 
 The 2-sphere can be constructed as:
@@ -20,7 +25,7 @@ For the suspension Σ(S¹):
 - f, g : S¹ → PUnit' (constant maps)
 
 Since π₁(PUnit') = 1 (trivial), we get:
-  π₁(S²) = π₁(Σ(S¹)) = 1 *_{π₁(S¹)} 1 = 1
+  π₁(S²) = π₁(Σ(local Circle)) = 1 *_{π₁(local Circle)} 1 = 1
 
 The key insight is that when both π₁(A) and π₁(B) are trivial, the amalgamated
 free product collapses to the trivial group regardless of what π₁(C) is.
@@ -155,7 +160,7 @@ The suspension Σ(S¹) is a pushout:
 where f and g are the constant maps to the unique point.
 
 By SVK:
-  π₁(Σ(S¹)) ≃ π₁(PUnit') *_{π₁(S¹)} π₁(PUnit')
+  π₁(Σ(local Circle)) ≃ π₁(PUnit') *_{π₁(local Circle)} π₁(PUnit')
             = 1 *_{ℤ} 1
             = 1
 -/
@@ -253,7 +258,7 @@ theorem amalg_trivial_is_one ...
 
     Proof:
     1. S² = Σ(S¹) = Pushout PUnit' PUnit' S¹
-    2. By SVK: π₁(S²) ≃ π₁(PUnit') *_{π₁(S¹)} π₁(PUnit')
+    2. By SVK: π₁(S²) ≃ π₁(PUnit') *_{π₁(local Circle)} π₁(PUnit')
     3. Every element x of the amalgamated free product satisfies:
        decode(x) = Quot.mk _ refl (by trivial_decode)
     4. By the SVK equivalence: α = decode(encode(α)) = Quot.mk _ refl
@@ -324,7 +329,7 @@ We have shown that the 2-sphere S² = Σ(S¹) has:
   - π₂(S²) ≃ 1 (in the computational paths framework)
 
 **π₁(S²) = 1** via Seifert-van Kampen:
-  π₁(Σ(S¹)) ≃ π₁(PUnit') *_{π₁(S¹)} π₁(PUnit') = 1 *_{ℤ} 1 = 1
+  π₁(Σ(local Circle)) ≃ π₁(PUnit') *_{π₁(local Circle)} π₁(PUnit') = 1 *_{ℤ} 1 = 1
 
 Key facts used:
 1. S² = Σ(S¹) is the suspension of the circle

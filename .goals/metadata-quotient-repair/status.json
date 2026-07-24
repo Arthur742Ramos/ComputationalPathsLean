@@ -1,7 +1,7 @@
 {
   "goal_id": "metadata-quotient-repair",
-  "status": "inspecting",
-  "iteration": 1,
+  "status": "building",
+  "iteration": 2,
   "builder_model": "OpenAI:GPT-5.6-Sol",
   "inspector_model": "OpenAI:GPT-5.6-Luna",
   "initial_sha": "0ebc644b29e1415e53e164d8d4867ece32d011b6",

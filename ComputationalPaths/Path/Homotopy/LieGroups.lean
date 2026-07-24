@@ -43,8 +43,8 @@ The computational paths framework captures homotopy-theoretic aspects:
 
 | Section | Description |
 |---------|-------------|
-| `SO2`, `U1` | 2D rotation group and unit complex numbers, π₁ ≃ ℤ |
-| `TorusN` | n-torus T^n = (S¹)^n with basepoint and integer tuples |
+| `SO2`, `U1` | aliases of the current one-point circle plus separate synthetic winding data |
+| `TorusN` | iterated products of the current carrier, with synthetic integer tuples kept separate |
 | `MaximalTorusU` | T^n as maximal torus in U(n) |
 | `MaximalTorusSU` | T^{n-1} as maximal torus in SU(n) |
 | `IsSimplyConnected` | Definition and examples of simply connected types |
@@ -134,7 +134,9 @@ Topologically, SO(2) is homeomorphic to the circle S¹. Every rotation
 R_θ is uniquely determined by an angle θ ∈ [0, 2π), and as θ varies,
 the rotations trace out a circle.
 
-We identify SO(2) with Circle directly, inheriting all the π₁ machinery. -/
+The following alias reuses the current one-constructor `Circle` only as a
+carrier.  It is not a topological equivalence with classical SO(2), and its
+genuine `PathRwQuot` loop fiber is contractible. -/
 abbrev SO2 : Type u := Circle
 
 namespace SO2
@@ -212,12 +214,15 @@ end SO2
 
 /-! ## The n-Torus as a Lie Group
 
-The n-torus T^n = (S¹)^n is a compact abelian Lie group. It appears as:
+Classically, the n-torus T^n = (S¹)^n is a compact abelian Lie group. It appears as:
 - The maximal torus in U(n): diagonal unitary matrices
 - The maximal torus in SU(n): diagonal special unitary matrices
 - The maximal torus in SO(2n): block-diagonal rotation matrices
 
-By the product theorem, π₁(T^n) ≃ ℤⁿ.
+The `TorusN` below is instead an iterated product of the current
+one-constructor carrier.  The product theorem decomposes its genuine loop
+quotient, but does not identify it with `ℤⁿ`; integer tuples below belong to a
+separate synthetic winding presentation.
 -/
 
 section NTorus
@@ -227,8 +232,8 @@ section NTorus
 - T⁰ = point (the trivial group)
 - T^(n+1) = T^n × S¹
 
-This definition captures the Lie group structure: T^n is the n-fold
-product of the circle group U(1) ≃ SO(2) ≃ S¹. -/
+This definition records only an iterated product carrier.  It does not
+construct smooth or topological Lie-group structure. -/
 noncomputable def TorusN : Nat → Type u
   | 0 => PUnit'
   | n + 1 => TorusN n × Circle
@@ -460,26 +465,14 @@ noncomputable def torusN1_piOne_equiv_int_right_inv_path (z : Int) :
     Path (torusN1_piOne_equiv_int.toFun (torusN1_piOne_equiv_int.invFun z)) z :=
   Path.stepChain (torusN1_piOne_equiv_int.right_inv z)
 
-/-- **Connection to Bordg-Cavalleri**:
+/-- **Scoped comparison data for Bordg--Cavalleri.**
 
-Both approaches should yield π₁(T^n) ≃ ℤⁿ for the n-torus. The key difference:
-
-1. **This framework**: Uses computational paths + encode-decode
-   - T^n defined as iterated product of Circle (constructed via paths)
-   - π₁(S¹) ≃ ℤ via encode-decode
-   - π₁(A × B) ≃ π₁(A) × π₁(B) via path projections
-
-2. **Differential geometry**: Uses smooth structure
-   - T^n = ℝⁿ/ℤⁿ as quotient of Euclidean space
-   - π₁ via covering space theory
-   - The universal cover is ℝⁿ
-
-The isomorphism of results demonstrates that homotopy-theoretic invariants
-are independent of the foundation (smooth manifolds vs computational paths). -/
+This theorem packages three elementary facts: winding-one encodes to `1` in
+the synthetic circle quotient, synthetic encode/decode round-trips, and the
+rank-one product base projects to `circleBase`.  It is not a theorem comparing
+the genuine fundamental groups of smooth tori with the current Lean carrier. -/
 theorem bordgCavalleri_connection :
-    -- Both approaches yield π₁(S¹) ≃ ℤ
-    -- Both should yield π₁(T^n) ≃ ℤⁿ
-    -- The computational paths approach doesn't need smooth structure
+    -- Synthetic winding data plus a carrier-level basepoint equation.
     SO2.windingNumber SO2.piOneGenerator = 1 ∧
       (∀ z : Int, SO2.piOneEquivInt.toFun (SO2.piOneEquivInt.invFun z) = z) ∧
       TorusN.torusOneEquivCircle.toFun (TorusN.base 1) = circleBase :=
@@ -490,12 +483,13 @@ end ProductPiOne
 
 /-! ## Summary
 
-This module establishes connections between computational paths and Lie groups:
+This module records carrier-level and synthetic-presentation analogies:
 
-1. **SO(2) and U(1)**: π₁ ≃ ℤ (inherited from S¹)
+1. **SO(2) and U(1) names**: aliases of the current one-point carrier; the
+   `ℤ` equivalence belongs to synthetic winding syntax.
 
-2. **n-Torus T^n**: Defined as (S¹)^n with π₁(T²) ≃ ℤ × ℤ proved,
-   and π₁(T^n) ≃ ℤⁿ derivable from the product theorem
+2. **n-Torus names**: iterated products of that carrier; the genuine loop
+   quotients are not identified with `ℤⁿ` here.
 
 3. **Maximal Tori**: T^n as maximal torus in U(n), T^{n-1} in SU(n)
 
@@ -506,8 +500,8 @@ This module establishes connections between computational paths and Lie groups:
 6. **Bordg-Cavalleri Connection**: Comparison with differential geometry approach
    showing complementary strengths
 
-The computational paths framework successfully captures the homotopy-theoretic
-aspects of Lie groups without requiring the smooth manifold structure.
+No claim is made here that these carrier aliases formalize the topology or
+smooth structure of classical Lie groups.
 
 ## Future Directions
 

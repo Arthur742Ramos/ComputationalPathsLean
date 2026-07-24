@@ -1,8 +1,11 @@
 /-
-# Fundamental group of the torus via explicit computational paths
+# Raw torus-path rewrite examples on the current product carrier
 
-This file proves π₁(T²) ≅ ℤ × ℤ using the computational paths calculus.
-Every proof constructs explicit `Step`/`RwEq` witness chains.
+This file constructs explicit `Step`/`RwEq` witness chains for raw paths on
+the current `Torus = Circle × Circle` carrier.  It does **not** prove a
+`PathRwQuot` equivalence with `ℤ × ℤ`: the genuine current torus loop quotient
+is contractible, while `torusPiOne ≃ ℤ × ℤ` is a separate synthetic winding
+presentation.
 
 ## Key results with explicit path reasoning:
 
@@ -11,7 +14,8 @@ Every proof constructs explicit `Step`/`RwEq` witness chains.
    via `Step.map2_subst` showing `horizontal⬝vertical ≈ vertical⬝horizontal`
 3. **Commutator [a,b] = 1**: Step-by-step cancellation PATH using
    `Step.trans_symm`, `Step.trans_refl_right`, `Step.symm_refl`, etc.
-4. **Generator independence**: PATH-level proof via product projections
+4. **Component projection**: an equality of product paths projects to
+   equalities of both components
 -/
 
 import ComputationalPaths.Path.Basic
@@ -339,15 +343,18 @@ noncomputable def torusCommutator_trivial_path :
     Path.prodMk_refl_refl circleBase circleBase
   exact rweq_trans h_eta (rweq_trans h_prod (rweq_of_eq h_refl))
 
-/-! ## (4) Generator independence at the path level
+/-! ## (4) Component projection and the current generator collapse
 
-If the two generators `torusLoop1` and `torusLoop2` were identified,
-then projecting onto each S¹ factor would collapse `circleLoop` to `refl`.
+Projecting an `RwEq` witness between `torusLoop1` and `torusLoop2` gives
+`circleLoop ≈ refl` in one component and the reverse witness in the other.
+For the current one-constructor circle these conclusions are consistent and
+already hold; they are not contradictions and do not prove independence.
 
 The proof uses:
 - `Step.prod_fst_beta` / `Step.prod_snd_beta` to extract components
 - `rweq_congrArg_of_rweq` for functorial transport of RwEq through projections
-- The contradiction between `circleLoop ≈ refl` and π₁(S¹) ≅ ℤ -/
+- The current genuine circle quotient is contractible, whereas the separate
+  synthetic winding quotient is equivalent to `ℤ`. -/
 
 /-- Path-level independence: if `prodMk(p₁, q₁) ≈ prodMk(p₂, q₂)`,
 then `p₁ ≈ p₂` and `q₁ ≈ q₂` separately.
@@ -380,8 +387,9 @@ noncomputable def torusPathPair_independence
       rweq_trans (rweq_symm (rweq_snd_prodMk p₁ q₁))
         (rweq_trans hsnd (rweq_snd_prodMk p₂ q₂))
 
-/-- If the two torus generators were identified, both circle axes would collapse.
-This is proved entirely at the path level using `torusPathPair_independence`. -/
+/-- Legacy-named projection consequence: an `RwEq` between the two raw torus
+paths yields the corresponding component `RwEq` witnesses.  This is not an
+independence theorem under the current definitions. -/
 noncomputable def torusGenerator_independence_path
     (h : RwEq torusLoop1 torusLoop2) :
     RwEq circleLoop (Path.refl circleBase) × RwEq (Path.refl circleBase) circleLoop := by

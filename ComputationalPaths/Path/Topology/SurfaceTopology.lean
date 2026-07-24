@@ -6,6 +6,10 @@ framework. We define the classification of compact surfaces, Euler
 characteristic computations, genus, polygon identifications as Step
 sequences, and fundamental polygon relations via RwEq.
 
+The polygon-presentation records below are combinatorial bookkeeping.  In
+particular, the legacy `torus_pi1` value is not an equivalence computing the
+genuine `PathRwQuot` of the current one-constructor product carrier.
+
 ## Mathematical Background
 
 The classification of closed surfaces states that every closed surface
@@ -359,7 +363,9 @@ structure FundamentalGroupPresentation (g : Nat) where
   /-- The fundamental relation. -/
   relation : FundamentalRelation g
 
-/-- The torus has fundamental group ℤ × ℤ. -/
+/-- Synthetic genus-one polygon-presentation data with two generators and one
+commutator relation.  Despite the legacy name, this does not prove that the
+current genuine torus `PathRwQuot` is `ℤ × ℤ`. -/
 noncomputable def torus_pi1 : FundamentalGroupPresentation 1 :=
   { numGenerators := 2,
     gen_count := Path.refl _,

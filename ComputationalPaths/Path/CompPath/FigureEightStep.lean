@@ -1,24 +1,26 @@
 /-
-# π₁(Figure-Eight) ≃ F₂
+# Conditional figure-eight free-product presentation
 
-This module packages the wedge-sum SVK equivalence for the figure-eight and
-records its fundamental group as the free product π₁(S¹) * π₁(S¹).
+This module packages a wedge-sum SVK equivalence under the explicit
+`HasWedgeSVKDecodeBijective` hypothesis.  The current `Circle` factors have
+contractible genuine loop quotients, so these declarations must not be read as
+an unconditional proof of a free group on two generators.
 
 ## Key Results
 
-- `FigureEightFreeGroup`: free group on two generators as π₁(S¹) * π₁(S¹)
-- `figureEightPiOneEquivFreeGroup`: π₁(FigureEight) ≃ FigureEightFreeGroup
+- `FigureEightFreeGroup`: a legacy free-product code over current circle factors
+- `figureEightPiOneEquivFreeGroup`: conditional equivalence to that code
 - `loopA_class_decode`, `loopB_class_decode`: decoding the generator classes
 - `figure_eight_loop_compose`: path witness for loop composition
 - `loopPow`: iterated loops and basic properties
 - `loopAB_compose_path`: path witness for composing the two loops
-- `figure_eight_pi_one_noncommutative`: π₁ is non-abelian (via free product)
+- `figure_eight_pi_one_noncommutative`: a conditional presentation-level claim
 
 ## Mathematical Background
 
-The figure-eight is the wedge of two circles, so its fundamental group is the
-free product of two copies of π₁(S¹). This is the simplest example of a space
-with non-abelian fundamental group.
+Classically, the figure-eight has free fundamental group on two generators.
+The current file exposes a conditional computational presentation; it does not
+turn the one-constructor `CompPath.Circle` into the classical circle.
 
 ## References
 
@@ -40,7 +42,8 @@ open CompPath
 
 /-! ## Free group on two generators -/
 
-/-- The free group on two generators, modeled as π₁(S¹) * π₁(S¹). -/
+/-- Legacy free-product code over two current genuine circle loop quotients.
+Those factors are contractible under the present `Circle` definition. -/
 abbrev FigureEightFreeGroup : Type :=
   WedgeFreeProductCode (A := Circle) (B := Circle) circleBase circleBase
 
@@ -387,9 +390,9 @@ theorem commutator_toEq_eq :
 
 /-! ## Summary
 
-This module packages the figure-eight fundamental group computation:
+This module packages conditional figure-eight presentation data:
 
-1. `figureEightPiOneEquivFreeGroup`: π₁(S¹ ∨ S¹) ≃ π₁(S¹) * π₁(S¹)
+1. `figureEightPiOneEquivFreeGroup`: a conditional wedge/free-product equivalence
 2. `loopAB`, `loopBA`: the two generator compositions
 3. `loopA_inv_cancel` etc.: inverse laws via rewrite steps
 4. `figure_eight_pi_one_noncommutative_paths`: non-commutativity witness

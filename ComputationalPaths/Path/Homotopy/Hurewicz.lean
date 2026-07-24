@@ -1,8 +1,10 @@
 /-
 # The Hurewicz Theorem: H₁(X) ≃ π₁(X)^ab
 
-This module formalizes the Hurewicz theorem, which establishes a fundamental
-connection between homotopy and homology.
+This module packages an algebraic Hurewicz interface by defining its `H1`
+carrier from loop-quotient abelianization data.  It does not construct singular
+homology or prove that the current one-constructor circle/product torus have
+the classical groups in the background table below.
 
 ## Mathematical Background
 
@@ -25,7 +27,7 @@ This means:
 - H₁(X) = π₁(X) / [π₁(X), π₁(X)]
 - H₁(X) is the "largest abelian quotient" of π₁(X)
 
-### Examples
+### Classical examples (background only)
 
 | Space X | π₁(X) | H₁(X) = π₁(X)^ab |
 |---------|-------|------------------|
@@ -551,7 +553,7 @@ structure TorusH1IntProdCertificate where
   meridianOutput : TorusH1
   /-- The H₁ output for the longitude. -/
   longitudeOutput : TorusH1
-  /-- Rewrite evidence that the generating loops commute in the torus. -/
+  /-- Rewrite evidence that the two named raw torus paths commute. -/
   commuteRwEq : RwEq (Path.trans meridian longitude) (Path.trans longitude meridian)
   /-- Computational witness for the meridian output. -/
   meridianPath : Path meridianOutput (1, 0)
@@ -572,12 +574,9 @@ noncomputable def torus_H1_equiv_int_prod : TorusH1IntProdCertificate where
 /-! ## Abelianization of Free Product: Key Example -/
 
 /-
-**H₁(S¹ ∨ S¹) ≃ ℤ × ℤ**.
-
-The figure-eight has π₁ ≃ ℤ * ℤ (free product, non-abelian).
-The abelianization kills commutators [a,b] = aba⁻¹b⁻¹, giving ℤ × ℤ.
-
-This is the classic example where π₁ ≠ H₁ due to non-commutativity.
+Classically, **H₁(S¹ ∨ S¹) ≃ ℤ × ℤ** and the figure-eight has free
+fundamental group.  The declarations below are algebraic model data; they do
+not supply the conditional wedge decode bridge for the current carriers.
 -/
 /-- H₁(S¹ ∨ S¹) represented as ℤ × ℤ. -/
 abbrev FigureEightH1 : Type := Int × Int
@@ -998,10 +997,9 @@ This module establishes the Hurewicz theorem:
 
 4. **Main theorem**: h induces π₁(X)^ab ≃ H₁(X)
 
-5. **Examples**:
-   - H₁(S¹) ≃ ℤ
-   - H₁(T²) ≃ ℤ²
-   - H₁(S¹ ∨ S¹) ≃ ℤ² (abelianization of ℤ * ℤ)
+5. **Classical background examples**: the familiar circle, torus, and
+   figure-eight homology groups.  The legacy certificates in this file do not
+   prove those equivalences for the current computational carriers.
 
 6. **Higher Hurewicz**: data-parametrized maps/equivalences until higher
    homology carriers are developed

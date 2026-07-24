@@ -820,10 +820,12 @@ claims.
 \label{def:indiscrete}
 The indiscrete setoid \(\nabla_X\) on \(X\) is
 \[
-                        \nabla_X(x,y)=\Unit
+                        \nabla_X(x,y)=\top
                         \qquad(x,y:X).
 \tag{5.14}\label{eq:indiscrete}
 \]
+\(\top\) denotes the always-true proposition, matching the Prop-valued Lean
+relation \texttt{fun \_ \_ => True}; it is not the data type \(\Unit\).
 \end{definition}
 
 The relation \(\nabla_X\) is total, hence its quotient is contractible whenever
@@ -1952,7 +1954,7 @@ The same module contains a genuine length-two
 \texttt{metadataTwoStep\_cancel}.  There are no custom axioms or incomplete
 proofs.
 
-The companion module \path{MetadataRepair.lean}, in the same
+The repair module \path{MetadataRepair.lean}, in the same
 \path{Path/TypeTheory} directory, contains the new repair and case-study
 results:
 \begingroup

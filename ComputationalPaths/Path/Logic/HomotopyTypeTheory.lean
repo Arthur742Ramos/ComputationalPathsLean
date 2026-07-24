@@ -313,14 +313,12 @@ theorem suspensionHIT_pathGens (A : Type u) :
     (suspensionHIT A).pathGens = A :=
   rfl
 
-/-! ## The Loop Space of the Circle: `π₁(S¹) ≅ ℤ`
+/-! ## Synthetic winding-number arithmetic
 
-The fundamental group of the circle is the integers: concatenation of loops adds
-winding numbers.  We realise this correspondence with *genuine* computational
-paths between DISTINCT integer expressions — multi-step `Path.trans` chains and
-non-decorative `RwEq` derivations inside the LND_EQ-TRS — rather than reflexive
-`p = p` stubs.  Each factor below is an honest integer sum, so every path relates
-syntactically distinct endpoints and every coherence rewrites a real trace. -/
+The definitions below construct genuine computational paths between distinct
+integer expressions.  They model arithmetic on synthetic winding numbers; they
+do not establish an equivalence from the current one-constructor circle's
+genuine `PathRwQuot`, which is contractible. -/
 
 namespace LoopSpace
 
@@ -332,7 +330,7 @@ noncomputable def windAssoc (a b c : Int) :
     Path ((a + b) + c) (a + (b + c)) :=
   Path.ofEq (Int.add_assoc a b c)
 
-/-- Commutation of two winding numbers (the loop space of `S¹` is abelian). -/
+/-- Commutation of two synthetic winding-number values. -/
 noncomputable def windComm (a b : Int) : Path (a + b) (b + a) :=
   Path.ofEq (Int.add_comm a b)
 
@@ -406,8 +404,9 @@ noncomputable def windTwoStep_trans_congr (a b c : Int)
 
 /-! ### A concrete winding-number certificate
 
-Instantiated at the winding numbers `2, 3, 5 : ℤ`, giving the loop-space instance
-of `π₁(S¹) ≅ ℤ` with genuine trace-carrying evidence, never a `True` placeholder. -/
+Instantiated at the synthetic winding numbers `2, 3, 5 : ℤ`, giving
+trace-carrying arithmetic evidence rather than a theorem about the genuine
+circle loop quotient. -/
 
 /-- A coherence certificate for winding-number arithmetic over concrete integer
     data.  It records three winding numbers, the two- and three-step loop
@@ -455,7 +454,7 @@ theorem windingCertificate235_source : ((2 + 3) + 5 : Int) = 10 := rfl
 
 /-- Its three-step loop lands at the basepoint that also evaluates to `10`:
     the winding numbers `2 + 3 + 5` and `5 + 3 + 2` agree, witnessing the
-    commutativity of `π₁(S¹)`. -/
+    commutativity of integer addition in the synthetic winding proxy. -/
 theorem windingCertificate235_target : ((5 + 3) + 2 : Int) = 10 := rfl
 
 /-- The concrete certificate's two-step inverse-cancellation, a genuine `RwEq` on a

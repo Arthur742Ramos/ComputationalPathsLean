@@ -164,8 +164,9 @@ end NaturalitySquares
 
 The interchange law relates horizontal and vertical composition of 2-paths.
 
-At the RwEq level, this is trivially true since RwEq is Prop-valued.
-At the Derivation₂ level, the interchange is witnessed by `MetaStep₃.interchange`,
+At the `RwEqProp` level, equality of inhabitance proofs is propositionally
+irrelevant.  At the `Derivation₂` level, interchange is witnessed by
+`MetaStep₃.interchange`,
 a primitive 3-cell in the weak ω-groupoid tower.
 -/
 

@@ -14,9 +14,9 @@ synthetic circle winding quotients; its `ℤ × ℤ` computation is packaged in
 |-------------------|-------------|
 | `Torus` | The torus type `S¹ × S¹` |
 | `torusBase` | Distinguished base point on the torus |
-| `torusLoop1`, `torusLoop2` | The two generating loops |
+| `torusLoop1`, `torusLoop2` | Legacy named raw paths in the two factors |
 | `torusPiOneEquiv` | genuine product-loop equivalence (both sides contractible here) |
-| `torusLoopsCommute` | Commutativity of the two generating loops |
+| `torusLoopsCommute` | `RwEq` commutativity of the two named raw paths |
 | `torusPiOne_abelian_toEq` | proof-irrelevant equality of raw loop composites |
 | `torusEulerChar` | Euler characteristic of the torus is 0 |
 | `nTorus` | n-dimensional torus as iterated product |
@@ -51,13 +51,15 @@ noncomputable abbrev torusBase : Torus.{u} := (circleBase.{u}, circleBase.{u})
 /-- Raw loop space of the torus at `torusBase`. -/
 abbrev torusLoopSpace : Type u := LoopSpace Torus.{u} torusBase
 
-/-! ## Generating Loops -/
+/-! ## Named raw factor paths -/
 
-/-- Loop around the first circle factor (meridian). -/
+/-- Raw path named as the first-factor meridian; its genuine quotient class is
+trivial under the current carrier. -/
 noncomputable def torusLoop1 : Path (A := Torus.{u}) torusBase torusBase :=
   Path.prodMk (circleLoop.{u}) (Path.refl (circleBase.{u}))
 
-/-- Loop around the second circle factor (longitude). -/
+/-- Raw path named as the second-factor longitude; its genuine quotient class
+is trivial under the current carrier. -/
 noncomputable def torusLoop2 : Path (A := Torus.{u}) torusBase torusBase :=
   Path.prodMk (Path.refl (circleBase.{u})) (circleLoop.{u})
 
@@ -90,7 +92,7 @@ noncomputable def torusPiOneEquiv :
 
 /-! ## Commutativity of Torus Loops -/
 
-/-- The two generating loops of the torus commute at the `RwEq` level. -/
+/-- The two named raw torus paths commute at the `RwEq` level. -/
 noncomputable def torusLoopsCommute_rweq :
     RwEq (Path.trans torusLoop1 torusLoop2) (Path.trans torusLoop2 torusLoop1) := by
   exact rweq_of_eq (by simp [torusLoop1, torusLoop2, Path.trans, Path.prodMk])
@@ -102,7 +104,7 @@ theorem torusLoopsCommute_quot :
     Quot.mk _ (Path.trans torusLoop2 torusLoop1) := by
   exact Quot.sound (rweqProp_of_rweq torusLoopsCommute_rweq)
 
-/-- The two generating loops of the torus commute at the `toEq` level.
+/-- The two named raw torus paths commute at the `toEq` level.
 This is immediate because `toEq` is proof-irrelevant. -/
 theorem torusLoopsCommute_toEq :
     (Path.trans torusLoop1 torusLoop2).toEq =

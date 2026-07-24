@@ -14,8 +14,12 @@ canonical p q := .vcomp (deriv₂_to_normal p) (.inv (deriv₂_to_normal q))
 where `deriv₂_to_normal p := .step (Step.canon p)` used a canonicalization step
 `Step.canon : ∀ p, Step p (Path.stepChain p.toEq)`.
 
-**This approach was abandoned** because `Step.canon` caused all paths with the same
-`toEq` to become RwEq, collapsing π₁(S¹) to be trivial (contradicting π₁(S¹) ≃ ℤ).
+**This approach was abandoned** because `Step.canon` caused all paths with the
+same `toEq` to become `RwEq`, replacing the explicit generated relation by a
+proof-erasing collapse.  This destroys raw trace distinctions.  It is not a
+contradiction with the current one-constructor circle: its genuine
+`PathRwQuot` loop fiber is already contractible, while the nontrivial `ℤ`
+winding quotient is a separate synthetic object.
 
 ## Current Status
 
@@ -24,23 +28,23 @@ The current formalization no longer needs `to_canonical`: contractibility at lev
 now routes through the inverse loop `d₁ · d₂⁻¹` and contracts that loop via the
 normalizer-based loop connector.
 
-## The Semantic Argument (Still Valid)
+## The quotient boundary
 
-At the level of `RwEq` (Prop-valued), everything still works: any two derivations
-between the same paths have equal `toRwEq`. This explains the residual
-projection boundary that remains only behind the loop-specialized raw-`Path`
-connector.
+`RwEq` itself is Type-valued and retains a rewrite certificate.
+`RwEqProp := Nonempty (RwEq p q)` is the Prop-valued relation used by
+`PathRwQuot`. Passing to `RwEqProp` forgets which certificate was supplied; it
+does not prove equality of arbitrary `RwEq` or `Derivation₂` witnesses.
 
 ## The Structural Gap
 
-The fundamental issue is the gap between `Prop` and `Type`:
-- `RwEq p q` is in `Prop` — proof irrelevant, loses computational content
-- `Derivation₂ p q` is in `Type` — preserves structure of the derivation
+The relevant gap is between explicit Type-valued certificates and their
+propositional truncation:
+- `RwEq p q` and `Derivation₂ p q` are Type-valued certificates;
+- `RwEqProp p q` is Prop-valued and records only inhabitance.
 
-All `Derivation₂ p q` values have the same `toRwEq` (by proof irrelevance of `RwEq`).
-The exported `contractibility₃` witness, however, no longer compares arbitrary
-parallel derivations directly through that projection; it first isolates an
-inverse loop and then contracts that loop constructively.
+The exported `contractibility₃` witness first isolates an inverse loop and
+contracts that loop constructively; no proof-irrelevance shortcut for explicit
+derivations is claimed.
 
 ## Analysis Summary
 
@@ -67,21 +71,19 @@ universe u
 
 variable {A : Type u}
 
-/-! ## Part 1: The Semantic Argument
+/-! ## Part 1: Equality after projecting certificates
 
-At the level of `RwEq` (Prop-valued), everything works: any two derivations
-between the same paths have equal `toRwEq`. This still explains why no new
-assumption is needed, even though the exported 3-cell now factors through the
-loop-normalizer route instead of using a direct global transport.
+The theorem below compares only the ambient equality proofs obtained by
+`rweq_toEq`.  It does not equate Type-valued `RwEq` certificates or
+`Derivation₂` values.
 -/
 
 section SemanticArgument
 
 variable {a b : A} {p q : Path a b}
 
-/-- All derivations between the same paths have equal toRwEq.
-    Uses the RwEqProp wrapper approach: `rweq_toEq` projects to `Prop`-level
-    equality, which is proof-irrelevant. -/
+/-- All derivations between the same paths project to the same ambient equality
+proof via `rweq_toEq`, by proof irrelevance of Lean's `Eq`. -/
 theorem derivations_toRwEq_prop_eq (d₁ d₂ : Derivation₂ p q) :
     rweq_toEq d₁.toRwEq = rweq_toEq d₂.toRwEq :=
   rfl

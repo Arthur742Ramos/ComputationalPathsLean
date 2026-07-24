@@ -1,16 +1,17 @@
 /-
 # The Möbius band via computational paths
 
-The Möbius band deformation retracts onto its core circle, so its fundamental
-group is the same as the circle. We model it as a compatibility alias of the
-computational-path circle and reuse the existing π₁ encoding.
+Classically, the Möbius band deformation retracts onto its core circle.  This
+file keeps a compatibility alias of the current one-constructor circle and
+reuses its **synthetic winding-expression quotient**.  It does not construct a
+deformation retract or compute the genuine `PathRwQuot` of the aliased carrier.
 
 ## Key Results
 
 | Definition/Theorem | Description |
 |-------------------|-------------|
 | `MobiusBandCompPath` | Möbius band type (≃ S¹) |
-| `mobiusBandPiOneEquivInt` | π₁(M) ≅ ℤ |
+| `mobiusBandPiOneEquivInt` | synthetic winding model ≅ ℤ |
 | `mobiusBandNonorientable` | Non-orientability witness |
 | `mobiusBandBoundary` | The boundary circle of M |
 | `mobiusBandDeformRetract` | Deformation retract data |
@@ -39,12 +40,13 @@ abbrev MobiusBandCompPath : Type u := CircleCompPath.{u}
 
 @[simp] abbrev mobiusBandBase : MobiusBandCompPath := circleCompPathBase
 
-/-! ## Fundamental group -/
+/-! ## Synthetic winding model -/
 
-/-- The fundamental group of the Möbius band. -/
+/-- Legacy alias for the synthetic circle winding quotient. -/
 abbrev mobiusBandPiOne : Type u := circleCompPathPiOne
 
-/-- π₁(M) ≅ ℤ via the deformation retract onto S¹. -/
+/-- Synthetic winding-model equivalence with `Int`; not an equivalence from
+the genuine loop quotient of `MobiusBandCompPath`. -/
 noncomputable def mobiusBandPiOneEquivInt :
     SimpleEquiv mobiusBandPiOne Int :=
   circleCompPathPiOneEquivInt
