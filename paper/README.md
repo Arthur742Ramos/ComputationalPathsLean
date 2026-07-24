@@ -5,8 +5,8 @@ requirements.
 
 | Source | Role | Build prerequisites |
 |---|---|---|
-| `adequacy/main.tex` | Focused 25-page diagnosis and universal-repair article | Self-contained `amsart` source plus a standard TeX Live installation |
-| `adequacy/companion/main.tex` | Distinct 37-page raw scoped-calculus companion | Self-contained `amsart` source plus a standard TeX Live installation |
+| `adequacy/main.tex` | Focused diagnosis and universal-repair article | Self-contained `amsart` source plus a standard TeX Live installation |
+| `adequacy/companion/main.tex` | Self-contained raw scoped-calculus article, posted independently and cited by the focused article | Self-contained `amsart` source plus a standard TeX Live installation |
 | `main.tex` | Legacy broad computational-paths manuscript | External `BSLstyle.cls` and `BSLbibstyle.bst`, in addition to TeX Live |
 
 The external BSL class and bibliography style are **not vendored** in this

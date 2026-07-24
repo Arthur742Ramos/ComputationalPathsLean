@@ -326,10 +326,9 @@ Martin-L\"of type theory, do not assume or prove univalence or higher
 inductive types, and do not identify \eqref{eq:path-record} with the HoTT
 identity type.  The collapse theorem of Section~\ref{sec:collapse} is a
 statement about the formalized rule set, not about computational-path calculi in
-general; the raw de Bruijn calculus previously developed alongside this work is
-preserved as a separate companion manuscript
-\cite{ScopedTraceSoftware2026}, and Section~\ref{sec:formalization} describes
-the division.
+general; the raw de Bruijn calculus developed alongside this work is published
+separately as a self-contained article \cite{ScopedTraceCalculus2026}, and
+Section~\ref{sec:formalization} describes the division.
 
 \paragraph{Organization.}
 Section~\ref{sec:setting} fixes the metatheory.
@@ -1599,8 +1598,8 @@ accompanying artifact, and about the specific trace semantics of the operations
 appearing in~\eqref{eq:lamcongr-trace}.  It is not a claim about
 computational-path calculi in general, and in particular it does not apply to
 presentations in which equality reasons are terms of a scoped syntax rather than
-lists of elementary steps; the companion manuscript
-\cite{ScopedTraceSoftware2026} treats one such presentation.
+lists of elementary steps; the companion article
+\cite{ScopedTraceCalculus2026} treats one such presentation.
 \end{remark}
 
 \section{The largest explicitly supported class of motives}
@@ -2648,19 +2647,21 @@ theorem-bearing commit cited in~\cite{MetadataJSoftware2026}; the tag is not a
 placeholder DOI.  A future Zenodo archive may supplement that Git reference
 when a DOI has actually been issued.
 
-The earlier raw scope-indexed de Bruijn development is intentionally not
-interleaved with the theory paper.  Its complete manuscript is preserved at
-\[
-                  \texttt{paper/adequacy/companion/main.tex}.
-\]
-It independently develops raw syntax, substitution, primitive-redex
-preservation, syntactic quotients, and source identity programs, in a
-scope-indexed de Bruijn presentation \cite{deBruijn1972}.  The
-companion builds separately and remains useful as a formal-interface study,
-but none of those raw-calculus results is needed for
-Theorem~\ref{thm:metadata-fiber}.  This separation keeps the present article a
-mathematics/type-theory paper rather than a report on Lean or on a particular
-de Bruijn implementation.
+The raw scope-indexed de Bruijn development is intentionally not interleaved
+with the present theory paper.  It appears as a self-contained companion
+article \cite{ScopedTraceCalculus2026}, which develops raw syntax and its
+binder algebra, typed substitution, primitive-redex preservation, contextual
+and multi-step reduction with a conditional subject-reduction theorem,
+syntactic quotients, and source identity programs, in a scope-indexed
+de Bruijn presentation \cite{deBruijn1972}.  That article also proves that its
+quotient traces are \emph{unlabelled} in a precise sense: evaluation factors
+through a label-free syntax that cannot mention a source derivation.
+
+None of those raw-calculus results is needed for
+Theorem~\ref{thm:metadata-fiber}; the dependence runs the other way, in that
+the companion applies the present fiber criterion to its own trace records.
+Keeping the two separate leaves this article a mathematics/type-theory paper
+rather than a report on Lean or on a particular de Bruijn implementation.
 
 \section{Conclusion}
 \label{sec:conclusion}
