@@ -28,6 +28,9 @@ Representative results and modules include:
 - `ComputationalPaths/Path/CompPath/KleinBottle.lean` (`π₁(K) ≃ ℤ ⋊ ℤ` via loop-expression quotients)
 - `ComputationalPaths/Path/OmegaGroupoid.lean` (weak ω-groupoid-style hierarchy)
 - `ComputationalPaths/Path/Rewrite/Step.lean` (primitive rewrite-step relation)
+- `ComputationalPaths/Path/TypeTheory/MetadataJ.lean` (metadata-fiber
+  classification for based elimination, factorizing motives, and the
+  computational-trace obstruction)
 
 Beyond `Path/`, the repository also includes broad companion developments such as arithmetic, geometric, motivic, topos-theoretic, and representation-theoretic modules.
 
@@ -124,6 +127,26 @@ lake build ComputationalPaths.Path.CompPath.CircleStep
 lake build ComputationalPaths.Path.CompPath.TorusStep
 lake build ComputationalPaths.Path.CompPath.KleinBottleStep
 lake build ComputationalPaths.Path.OmegaGroupoid
+lake build ComputationalPaths.Path.TypeTheory.MetadataJ
+```
+
+## Metadata-J paper and companion
+
+The focused theory paper is `paper/adequacy/main.tex`.  It proves that an
+equality refinement `Σ h : a = b, M b h` admits unrestricted based elimination
+with propositional beta exactly when the reflexivity metadata fiber
+`M a rfl` is contractible.
+
+The earlier raw, scope-indexed de Bruijn calculus is preserved independently at
+`paper/adequacy/companion/main.tex`; it is not folded into the theory article.
+Build the manuscripts separately:
+
+```bash
+cd paper/adequacy
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+
+cd companion
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
 ### Useful maintenance checks
