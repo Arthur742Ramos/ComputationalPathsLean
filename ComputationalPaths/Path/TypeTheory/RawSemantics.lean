@@ -9,13 +9,14 @@ trace-carrying `Path`s.  This is the standard syntactic (term) model; it is
 independent of the pre-existing intrinsically typed Lean CwF and makes no
 initiality, normalization, or decidable-type-checking claim.
 
-The interpretation under an environment is simultaneous substitution followed
-by the quotient map.  Its substitution theorem is a direct consequence of the
-proved raw substitution algebra, not a postulated model law.  Raw typing
-derivations and typed computation derivations are mapped to semantic
-certificates.  More importantly, endpoint conservativity is exact on this
-specified model: a target `Path` between two quoted raw terms reflects to
-source `DefEq` by quotient exactness.
+The interpretation under an environment is the quotient-level map induced by
+simultaneous substitution.  `DefEq.substitution` and `DefEq.subst_congr` prove
+well-definedness in both term and environment representatives; identity and
+composition hold on arbitrary quotient values.  Semantic typing is the
+quotient saturation of a raw derivation, is itself substitution-stable, and
+typed computation uses genuinely derived subject reduction.  Endpoint
+conservativity is exact on this specified model: a target `Path` between two
+quoted raw terms reflects to source `DefEq` by quotient exactness.
 
 The second half defines source identity programs and their rewrite calculus.
 The source constructors mention only `DefEq`, raw one-hole frames, and other
@@ -34,18 +35,60 @@ namespace RawMLTT
 
 noncomputable section
 
-/-! ## The source term model -/
+/-! ## Quotient-level substitution on the source term model -/
 
-/-- The bounded term-model carrier at de Bruijn scope `n`. -/
-abbrev TermModel (n : Nat) := Quotient (exprSetoid n)
+/-- The quotient-level action induced by a simultaneous raw substitution.
 
-/-- Quote a raw expression into the term model. -/
-def denote {n : Nat} (t : Expr n) : TermModel n :=
-  Quot.mk _ t
+Well-definedness is exactly `DefEq.substitution`: definitionally equal
+representatives remain definitionally equal after substitution. -/
+def modelSubst {n m : Nat} (sigma : Sub n m) :
+    TermModel n -> TermModel m :=
+  Quotient.lift
+    (fun t => denote (subst sigma t))
+    (fun _ _ h => Quotient.sound (DefEq.substitution h sigma))
+
+@[simp] theorem modelSubst_denote {n m : Nat} (sigma : Sub n m)
+    (t : Expr n) :
+    modelSubst sigma (denote t) = denote (subst sigma t) :=
+  rfl
+
+/-- Identity substitution acts identically on the quotient carrier. -/
+@[simp] theorem modelSubst_identity {n : Nat} (x : TermModel n) :
+    modelSubst (Sub.id n) x = x := by
+  refine Quotient.inductionOn x ?_
+  intro t
+  exact _root_.congrArg denote (subst_id t)
+
+/-- Quotient-level substitution composition follows from the independently
+proved raw substitution-composition theorem. -/
+@[simp] theorem modelSubst_composition {n m k : Nat}
+    (sigma : Sub n m) (tau : Sub m k) (x : TermModel n) :
+    modelSubst tau (modelSubst sigma x) =
+      modelSubst (Sub.comp sigma tau) x := by
+  refine Quotient.inductionOn x ?_
+  intro t
+  exact _root_.congrArg denote (subst_comp sigma tau t)
+
+/-- Trace-carrying quotient-level substitution composition. -/
+def modelSubst_composition_path {n m k : Nat}
+    (sigma : Sub n m) (tau : Sub m k) (x : TermModel n) :
+    Path
+      (modelSubst tau (modelSubst sigma x))
+      (modelSubst (Sub.comp sigma tau) x) :=
+  Path.stepChain (modelSubst_composition sigma tau x)
+
+/-- Quotient substitution is also well defined in its environment: pointwise
+source-definitionally-equal substitutions induce the same semantic map. -/
+theorem modelSubst_congr {n m : Nat} {sigma tau : Sub n m}
+    (h : DefEq.SubDefEq sigma tau) (x : TermModel n) :
+    modelSubst sigma x = modelSubst tau x := by
+  refine Quotient.inductionOn x ?_
+  intro t
+  exact Quotient.sound (DefEq.subst_congr h t)
 
 /-- Interpret an expression under a simultaneous raw environment. -/
 def interpret {n m : Nat} (rho : Sub n m) (t : Expr n) : TermModel m :=
-  denote (subst rho t)
+  modelSubst rho (denote t)
 
 /-- Interpret a raw context declaration by declaration. -/
 def interpretCtx {n : Nat} (Gamma : Ctx n) : Fin n -> TermModel n :=
@@ -83,11 +126,13 @@ def interpretCtx {n : Nat} (Gamma : Ctx n) : Fin n -> TermModel n :=
       denote (.pair (subst rho a) (subst rho b)) := rfl
 
 @[simp] theorem interpret_natElim {n m : Nat} (rho : Sub n m)
-    (motive : Expr (n + 1)) (zeroCase : Expr n)
+    (natLevel : Nat) (motive : Expr (n + 1)) (zeroCase : Expr n)
     (succCase : Expr (n + 2)) (scrutinee : Expr n) :
-    interpret rho (.natElim motive zeroCase succCase scrutinee) =
+    interpret rho
+        (.natElim natLevel motive zeroCase succCase scrutinee) =
       denote
         (.natElim
+          natLevel
           (subst (Sub.lift rho) motive)
           (subst rho zeroCase)
           (subst (Sub.lift (Sub.lift rho)) succCase)
@@ -139,168 +184,53 @@ def interpret_substitution_path {n m k : Nat}
 
 /-! ## Typing and computation soundness -/
 
-/-- Semantic typing rules on the term-model carrier.
+/-- Quotient-saturated term-model typing.
 
-This is a second, explicitly interpreted judgment rather than a wrapper around
-`HasType`: its premises and conclusions live over quotient values.  Raw
-representatives remain in constructor parameters only to describe binders and
-dependent result types.  Consequently `typing_sound` below is a genuine
-rule-by-rule interpretation proof. -/
-inductive SemHasType :
-    {n : Nat} -> Ctx n -> TermModel n -> TermModel n -> Type where
-  | var {n : Nat} {Gamma : Ctx n} (i : Fin n) :
-      SemHasType Gamma (denote (.var i)) (denote (Gamma i))
-  | sort {n : Nat} {Gamma : Ctx n} (level : Nat) :
-      SemHasType Gamma (denote (.sort level))
-        (denote (.sort (level + 1)))
-  | piForm {n : Nat} {Gamma : Ctx n} {A : Expr n}
-      {B : Expr (n + 1)} {level : Nat} :
-      SemHasType Gamma (denote A) (denote (.sort level)) ->
-      SemHasType (Ctx.extend Gamma A) (denote B) (denote (.sort level)) ->
-      SemHasType Gamma (denote (.pi A B)) (denote (.sort level))
-  | sigmaForm {n : Nat} {Gamma : Ctx n} {A : Expr n}
-      {B : Expr (n + 1)} {level : Nat} :
-      SemHasType Gamma (denote A) (denote (.sort level)) ->
-      SemHasType (Ctx.extend Gamma A) (denote B) (denote (.sort level)) ->
-      SemHasType Gamma (denote (.sigma A B)) (denote (.sort level))
-  | lamIntro {n : Nat} {Gamma : Ctx n} {A : Expr n}
-      {B body : Expr (n + 1)} {level : Nat} :
-      SemHasType Gamma (denote A) (denote (.sort level)) ->
-      SemHasType (Ctx.extend Gamma A) (denote B) (denote (.sort level)) ->
-      SemHasType (Ctx.extend Gamma A) (denote body) (denote B) ->
-      SemHasType Gamma (denote (.lam body)) (denote (.pi A B))
-  | appElim {n : Nat} {Gamma : Ctx n} {A : Expr n}
-      {B : Expr (n + 1)} {f a : Expr n} :
-      SemHasType Gamma (denote f) (denote (.pi A B)) ->
-      SemHasType Gamma (denote a) (denote A) ->
-      SemHasType Gamma (denote (.app f a))
-        (denote (instantiate B a))
-  | pairIntro {n : Nat} {Gamma : Ctx n} {A : Expr n}
-      {B : Expr (n + 1)} {a b : Expr n} :
-      SemHasType Gamma (denote a) (denote A) ->
-      SemHasType Gamma (denote b) (denote (instantiate B a)) ->
-      SemHasType Gamma (denote (.pair a b)) (denote (.sigma A B))
-  | fstElim {n : Nat} {Gamma : Ctx n} {A : Expr n}
-      {B : Expr (n + 1)} {p : Expr n} :
-      SemHasType Gamma (denote p) (denote (.sigma A B)) ->
-      SemHasType Gamma (denote (.fst p)) (denote A)
-  | sndElim {n : Nat} {Gamma : Ctx n} {A : Expr n}
-      {B : Expr (n + 1)} {p : Expr n} :
-      SemHasType Gamma (denote p) (denote (.sigma A B)) ->
-      SemHasType Gamma (denote (.snd p))
-        (denote (instantiate B (.fst p)))
-  | natForm {n : Nat} {Gamma : Ctx n} :
-      SemHasType Gamma (denote (.nat : Expr n)) (denote (.sort 0))
-  | zeroIntro {n : Nat} {Gamma : Ctx n} :
-      SemHasType Gamma (denote (.zero : Expr n)) (denote .nat)
-  | succIntro {n : Nat} {Gamma : Ctx n} {t : Expr n} :
-      SemHasType Gamma (denote t) (denote .nat) ->
-      SemHasType Gamma (denote (.succ t)) (denote .nat)
-  | natElim {n : Nat} {Gamma : Ctx n}
-      {motive : Expr (n + 1)} {zeroCase scrutinee : Expr n}
-      {succCase : Expr (n + 2)} {level : Nat} :
-      SemHasType (Ctx.extend Gamma .nat) (denote motive)
-        (denote (.sort level)) ->
-      SemHasType Gamma (denote zeroCase)
-        (denote (instantiate motive .zero)) ->
-      SemHasType (natStepCtx Gamma motive) (denote succCase)
-        (denote (natStepTarget motive)) ->
-      SemHasType Gamma (denote scrutinee) (denote .nat) ->
-      SemHasType Gamma
-        (denote (.natElim motive zeroCase succCase scrutinee))
-        (denote (instantiate motive scrutinee))
-  | codeNatIntro {n : Nat} {Gamma : Ctx n} (level : Nat) :
-      SemHasType Gamma (denote (.codeNat level))
-        (denote (.sort level))
-  | codePiIntro {n : Nat} {Gamma : Ctx n} {A : Expr n}
-      {B : Expr (n + 1)} {level : Nat} :
-      SemHasType Gamma (denote A) (denote (.sort level)) ->
-      SemHasType (Ctx.extend Gamma (.el A)) (denote B)
-        (denote (.sort level)) ->
-      SemHasType Gamma (denote (.codePi A B)) (denote (.sort level))
-  | codeSigmaIntro {n : Nat} {Gamma : Ctx n} {A : Expr n}
-      {B : Expr (n + 1)} {level : Nat} :
-      SemHasType Gamma (denote A) (denote (.sort level)) ->
-      SemHasType (Ctx.extend Gamma (.el A)) (denote B)
-        (denote (.sort level)) ->
-      SemHasType Gamma (denote (.codeSigma A B))
-        (denote (.sort level))
-  | codeIdIntro {n : Nat} {Gamma : Ctx n}
-      {A a b : Expr n} {level : Nat} :
-      SemHasType Gamma (denote A) (denote (.sort level)) ->
-      SemHasType Gamma (denote a) (denote (.el A)) ->
-      SemHasType Gamma (denote b) (denote (.el A)) ->
-      SemHasType Gamma (denote (.codeId A a b))
-        (denote (.sort level))
-  | elForm {n : Nat} {Gamma : Ctx n}
-      {code : Expr n} {level : Nat} :
-      SemHasType Gamma (denote code) (denote (.sort level)) ->
-      SemHasType Gamma (denote (.el code)) (denote (.sort level))
-  | idForm {n : Nat} {Gamma : Ctx n}
-      {A a b : Expr n} {level : Nat} :
-      SemHasType Gamma (denote A) (denote (.sort level)) ->
-      SemHasType Gamma (denote a) (denote A) ->
-      SemHasType Gamma (denote b) (denote A) ->
-      SemHasType Gamma (denote (.id A a b)) (denote (.sort level))
-  | reflIntro {n : Nat} {Gamma : Ctx n} {A a : Expr n} :
-      SemHasType Gamma (denote a) (denote A) ->
-      SemHasType Gamma (denote (.refl a)) (denote (.id A a a))
-  | eqJElim {n : Nat} {Gamma : Ctx n}
-      {A a : Expr n} {motive : Expr (n + 2)}
-      {reflCase endpoint proof : Expr n} {level motiveLevel : Nat} :
-      SemHasType Gamma (denote A) (denote (.sort level)) ->
-      SemHasType Gamma (denote a) (denote A) ->
-      SemHasType (eqMotiveCtx Gamma A a) (denote motive)
-        (denote (.sort motiveLevel)) ->
-      SemHasType Gamma (denote reflCase)
-        (denote (instantiate₂ motive a (.refl a))) ->
-      SemHasType Gamma (denote endpoint) (denote A) ->
-      SemHasType Gamma (denote proof) (denote (.id A a endpoint)) ->
-      SemHasType Gamma (denote (.eqJ motive reflCase endpoint proof))
-        (denote (instantiate₂ motive endpoint proof))
+This is not a second copy of the raw rules.  A semantic judgment consists of a
+typed raw representative together with equations identifying the requested
+quotient values with that representative.  The equations make the relation
+stable under source definitional equality. -/
+structure SemHasType {n : Nat} (Gamma : Ctx n)
+    (term type : TermModel n) where
+  representativeTerm : Expr n
+  representativeType : Expr n
+  derivation : HasType Gamma representativeTerm representativeType
+  termEquation : term = denote representativeTerm
+  typeEquation : type = denote representativeType
 
-/-- Every raw typing derivation has a term-model interpretation. -/
+/-- Every raw typing derivation has a quotient-saturated interpretation. -/
 def typing_sound {n : Nat} {Gamma : Ctx n} {t A : Expr n}
     (d : HasType Gamma t A) :
-    SemHasType Gamma (denote t) (denote A) := by
-  induction d with
-  | var i => exact SemHasType.var i
-  | sort level => exact SemHasType.sort level
-  | piForm _ _ ihA ihB => exact SemHasType.piForm ihA ihB
-  | sigmaForm _ _ ihA ihB => exact SemHasType.sigmaForm ihA ihB
-  | lamIntro _ _ _ ihA ihB ihBody =>
-      exact SemHasType.lamIntro ihA ihB ihBody
-  | appElim _ _ ihf iha => exact SemHasType.appElim ihf iha
-  | pairIntro _ _ iha ihb => exact SemHasType.pairIntro iha ihb
-  | fstElim _ ih => exact SemHasType.fstElim ih
-  | sndElim _ ih => exact SemHasType.sndElim ih
-  | natForm => exact SemHasType.natForm
-  | zeroIntro => exact SemHasType.zeroIntro
-  | succIntro _ ih => exact SemHasType.succIntro ih
-  | natElim _ _ _ _ ihm ihz ihs ihn =>
-      exact SemHasType.natElim ihm ihz ihs ihn
-  | codeNatIntro level => exact SemHasType.codeNatIntro level
-  | codePiIntro _ _ ihA ihB => exact SemHasType.codePiIntro ihA ihB
-  | codeSigmaIntro _ _ ihA ihB =>
-      exact SemHasType.codeSigmaIntro ihA ihB
-  | codeIdIntro _ _ _ ihA iha ihb =>
-      exact SemHasType.codeIdIntro ihA iha ihb
-  | elForm _ ih => exact SemHasType.elForm ih
-  | idForm _ _ _ ihA iha ihb => exact SemHasType.idForm ihA iha ihb
-  | reflIntro _ ih => exact SemHasType.reflIntro ih
-  | eqJElim _ _ _ _ _ _ ihA iha ihm ihr ihe ihp =>
-      exact SemHasType.eqJElim ihA iha ihm ihr ihe ihp
+    SemHasType Gamma (denote t) (denote A) :=
+  { representativeTerm := t
+    representativeType := A
+    derivation := d
+    termEquation := rfl
+    typeEquation := rfl }
 
-/-- A source definitional equality becomes a computational path in the term
-model.  The path has a concrete one-step trace. -/
-def defEqPath {n : Nat} {t u : Expr n} (h : DefEq t u) :
-    Path (denote t) (denote u) :=
-  Path.stepChain (Quot.sound h)
+/-- Semantic typing is compositional under quotient-level substitution. -/
+noncomputable def semantic_typing_substitution
+    {n m : Nat} {Gamma : Ctx n} {Delta : Ctx m}
+    {term type : TermModel n} {sigma : Sub n m}
+    (d : SemHasType Gamma term type)
+    (hSigma : CtxSub Delta Gamma sigma) :
+    SemHasType Delta (modelSubst sigma term) (modelSubst sigma type) := by
+  refine
+    { representativeTerm := subst sigma d.representativeTerm
+      representativeType := subst sigma d.representativeType
+      derivation :=
+        HasType.substitution_preserves d.derivation sigma hSigma
+      termEquation := ?_
+      typeEquation := ?_ }
+  · exact (_root_.congrArg (modelSubst sigma) d.termEquation).trans
+      (modelSubst_denote sigma d.representativeTerm)
+  · exact (_root_.congrArg (modelSubst sigma) d.typeEquation).trans
+      (modelSubst_denote sigma d.representativeType)
 
 /-- Primitive source computation is sound as a trace-carrying path. -/
 def computation_sound {n : Nat} {t u : Expr n} (h : Computation t u) :
     Path (denote t) (denote u) :=
-  defEqPath (DefEq.beta h)
+  computationPath h
 
 /-- Computation soundness is natural in every raw environment. -/
 def computation_substitution_sound {n m : Nat} (sigma : Sub n m)
@@ -321,6 +251,7 @@ def eqJ_beta_path {n : Nat} (motive : Expr (n + 2))
 /-- Semantic certificate for a typed source computation. -/
 structure TypedComputationSemantics {n : Nat} {Gamma : Ctx n}
     {source target : Expr n} (d : TypedComputation Gamma source target) where
+  subjectReduction : SubjectReduction d
   sourceTyping :
     SemHasType Gamma (denote source) (denote d.type)
   targetTyping :
@@ -331,15 +262,23 @@ structure TypedComputationSemantics {n : Nat} {Gamma : Ctx n}
       (Path.trans computationPath (Path.refl (denote target)))
       computationPath
 
-/-- Typing preservation and beta soundness for the exact typed computation
-fragment claimed by this development. -/
+/-- Typing preservation and beta soundness, with target typing derived by the
+raw subject-reduction theorem rather than supplied as a premise. -/
 def typed_computation_sound {n : Nat} {Gamma : Ctx n}
     {source target : Expr n} (d : TypedComputation Gamma source target) :
     TypedComputationSemantics d := by
   let p := computation_sound d.computation
+  let reduction := subject_reduction d
   exact
-    { sourceTyping := typing_sound d.sourceTyping
-      targetTyping := typing_sound d.targetTyping
+    { subjectReduction := reduction
+      sourceTyping := typing_sound d.sourceTyping
+      targetTyping :=
+        { representativeTerm := target
+          representativeType := reduction.targetType
+          derivation := reduction.targetTyping
+          termEquation := rfl
+          typeEquation :=
+            (Quotient.sound reduction.typeCoherence).symm }
       computationPath := p
       trailingUnit :=
         rweq_of_step (Path.Step.trans_refl_right p) }
@@ -370,7 +309,7 @@ inductive Frame (n : Nat) : Type where
   | pairSnd (first : Expr n)
   | fst
   | snd
-  | succ
+  | succ (natLevel : Nat)
   | el
   | refl
   | idType (left right : Expr n)
@@ -391,7 +330,7 @@ def plug {n : Nat} : Frame n -> Expr n -> Expr n
   | .pairSnd a, t => .pair a t
   | .fst, t => .fst t
   | .snd, t => .snd t
-  | .succ, t => .succ t
+  | .succ natLevel, t => .succ natLevel t
   | .el, t => .el t
   | .refl, t => .refl t
   | .idType a b, t => .id t a b
@@ -411,7 +350,7 @@ def congrDefEq {n : Nat} (C : Frame n) {t u : Expr n}
   | pairSnd a => exact DefEq.pairSnd h
   | fst => exact DefEq.fstCongr h
   | snd => exact DefEq.sndCongr h
-  | succ => exact DefEq.succCongr h
+  | succ natLevel => exact DefEq.succCongr natLevel h
   | el => exact DefEq.elCongr h
   | refl => exact DefEq.reflCongr h
   | idType a b => exact DefEq.idType h
@@ -606,6 +545,28 @@ def reassociate_and_remove_unit_sound {n : Nat} {t u v : Expr n}
 
 /-- Machine-checked statement of the exact raw result established here. -/
 structure RawAdequacyCertificate where
+  definitionalEqualitySubstitution :
+    forall {n m : Nat} {t u : Expr n},
+      DefEq t u -> (sigma : Sub n m) ->
+        DefEq (subst sigma t) (subst sigma u)
+  quotientSubstitutionIdentity :
+    forall {n : Nat} (x : TermModel n),
+      modelSubst (Sub.id n) x = x
+  quotientSubstitutionComposition :
+    forall {n m k : Nat} (sigma : Sub n m) (tau : Sub m k)
+      (x : TermModel n),
+      modelSubst tau (modelSubst sigma x) =
+        modelSubst (Sub.comp sigma tau) x
+  quotientSubstitutionPath :
+    forall {n m k : Nat} (sigma : Sub n m) (tau : Sub m k)
+      (x : TermModel n),
+      Path
+        (modelSubst tau (modelSubst sigma x))
+        (modelSubst (Sub.comp sigma tau) x)
+  quotientSubstitutionEnvironment :
+    forall {n m : Nat} {sigma tau : Sub n m},
+      DefEq.SubDefEq sigma tau ->
+      forall x : TermModel n, modelSubst sigma x = modelSubst tau x
   substitution :
     forall {n m k : Nat} (sigma : Sub n m) (tau : Sub m k)
       (t : Expr n),
@@ -615,6 +576,12 @@ structure RawAdequacyCertificate where
     forall {n : Nat} {Gamma : Ctx n} {t A : Expr n},
       HasType Gamma t A ->
       SemHasType Gamma (denote t) (denote A)
+  typingSubstitution :
+    forall {n m : Nat} {Gamma : Ctx n} {Delta : Ctx m}
+      {term type : TermModel n} {sigma : Sub n m},
+      SemHasType Gamma term type ->
+      CtxSub Delta Gamma sigma ->
+      SemHasType Delta (modelSubst sigma term) (modelSubst sigma type)
   computation :
     forall {n : Nat} {t u : Expr n},
       Computation t u -> Path (denote t) (denote u)
@@ -626,6 +593,13 @@ structure RawAdequacyCertificate where
     forall {n : Nat} {Gamma : Ctx n} {t u : Expr n}
       (d : TypedComputation Gamma t u),
       TypedComputationSemantics d
+  computationCertificate :
+    forall {n : Nat} {Gamma : Ctx n} {t u : Expr n}
+      (d : TypedComputation Gamma t u),
+      ComputationPathCertificate d
+  liftedNatSubjectReduction :
+    forall {n : Nat} (Gamma : Ctx n) (level : Nat),
+      SubjectReduction (liftedNatDecodeComputation Gamma level)
   identityRewrite :
     forall {n : Nat} {t u : Expr n}
       {p q : IdentityExpr t u},
@@ -641,11 +615,20 @@ and the independent identity rewrite calculus in the computational-path term
 model.  Its reflection field is deliberately restricted to quoted raw terms in
 that model. -/
 def raw_computational_path_adequacy : RawAdequacyCertificate where
+  definitionalEqualitySubstitution := fun h sigma =>
+    DefEq.substitution h sigma
+  quotientSubstitutionIdentity := modelSubst_identity
+  quotientSubstitutionComposition := modelSubst_composition
+  quotientSubstitutionPath := modelSubst_composition_path
+  quotientSubstitutionEnvironment := fun h x => modelSubst_congr h x
   substitution := interpret_substitution_path
   typing := typing_sound
+  typingSubstitution := semantic_typing_substitution
   computation := computation_sound
   computationSubstitution := computation_substitution_sound
   typedComputation := typed_computation_sound
+  computationCertificate := computationPathCertificate
+  liftedNatSubjectReduction := liftedNatDecode_subject_reduction
   identityRewrite := identity_rweq_sound
   endpointConservativity := term_model_endpoint_adequacy
 

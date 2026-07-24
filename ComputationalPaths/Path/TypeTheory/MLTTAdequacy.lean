@@ -12,8 +12,9 @@ validated by `RwEq`.
 
 Second, `RawMLTT` supplies an independent de Bruijn-scoped source calculus.
 Renaming and simultaneous substitution traverse explicit binder lifts; raw
-typing and beta computation cover every in-scope type former; and the
-compositional term-model interpretation is substitution compatible.  Its
+typing and level-correct beta computation cover every in-scope type former;
+subject reduction is derived from source typing, and the quotient-level
+term-model interpretation is well defined and substitution compatible.  Its
 identity-program constructors contain only source `DefEq` evidence and source
 one-hole frames.  Target `Path.Step` and `RwEq` constructors appear solely in
 the proof of semantic soundness, never as a source-rule escape hatch.
@@ -24,6 +25,10 @@ the proof of semantic soundness, never as a source-rule escape hatch.
 * `identity_rweq_sound`: typed identity rewrites evaluate to `RwEq`.
 * `endpoint_adequacy`: a computational path exists exactly when its endpoints
   are propositionally equal.
+* `RawMLTT.subject_reduction`: every typed primitive beta rule derives target
+  typing (modulo source `DefEq`) without a target-typing premise.
+* `RawMLTT.modelSubst_composition`: simultaneous substitution acts
+  compositionally on arbitrary term-model quotient values.
 * `RawMLTT.raw_computational_path_adequacy`: scoped raw typing, computation,
   substitution, identity-rewrite soundness, and exact term-model endpoint
   conservativity.
@@ -771,6 +776,11 @@ structure ComputationalPathAdequacy where
     forall {A : Type u} {a b : A} {p q : IdentityExpr a b},
       IdentityRwEq p q -> RwEq p.eval q.eval
   raw_syntax : RawMLTT.RawAdequacyCertificate
+  raw_subject_reduction :
+    forall {n : Nat} {Gamma : RawMLTT.Ctx n}
+      {source target : RawMLTT.Expr n}
+      (d : RawMLTT.TypedComputation Gamma source target),
+      RawMLTT.SubjectReduction d
   raw_identity_rewrite_sound :
     forall {n : Nat} {t s : RawMLTT.Expr n}
       {p q : RawMLTT.IdentityExpr t s},
@@ -820,6 +830,7 @@ def computational_path_adequacy : ComputationalPathAdequacy.{u, v} where
   substitution := substitution_adequacy
   rewrite_sound := fun h => identity_rweq_sound h
   raw_syntax := RawMLTT.raw_computational_path_adequacy
+  raw_subject_reduction := RawMLTT.subject_reduction
   raw_identity_rewrite_sound := fun h => RawMLTT.identity_rweq_sound h
   raw_endpoint_conservativity := RawMLTT.term_model_endpoint_adequacy
   endpoint_sound_complete := endpoint_adequacy

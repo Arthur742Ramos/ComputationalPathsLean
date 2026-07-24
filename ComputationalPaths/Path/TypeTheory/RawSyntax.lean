@@ -7,11 +7,13 @@ variables are de Bruijn indices, binders change the scope index in the type of
 an expression, and renaming and simultaneous substitution are defined by
 structural recursion.
 
-The fragment contains dependent products and sums, lifted natural numbers,
-Tarski-style predicative universe codes, identity types, and the explicitly
-supported equality-factored identity eliminator.  The latter binds an endpoint
-and an identity proof in its motive; it is deliberately not an eliminator whose
-motive can inspect a target `Path.steps` trace.
+The fragment contains dependent products and sums, level-indexed lifted natural
+numbers, Tarski-style predicative universe codes, identity types, and the
+explicitly supported equality-factored identity eliminator.  `nat level`,
+`zero level`, and `succ level` remain in one universe throughout decoding and
+computation.  The identity eliminator binds an endpoint and an identity proof
+in its motive; it is deliberately not an eliminator whose motive can inspect a
+target `Path.steps` trace.
 
 The main metatheoretic result in this file is the complete substitution
 algebra.  In particular, `Ren.lift` and `Sub.lift` are explicit definitions and
@@ -46,11 +48,11 @@ inductive Expr : Nat -> Type where
   | pair {n : Nat} : Expr n -> Expr n -> Expr n
   | fst {n : Nat} : Expr n -> Expr n
   | snd {n : Nat} : Expr n -> Expr n
-  | nat {n : Nat} : Expr n
-  | zero {n : Nat} : Expr n
-  | succ {n : Nat} : Expr n -> Expr n
+  | nat {n : Nat} : Nat -> Expr n
+  | zero {n : Nat} : Nat -> Expr n
+  | succ {n : Nat} : Nat -> Expr n -> Expr n
   | natElim {n : Nat} :
-      Expr (n + 1) -> Expr n -> Expr (n + 2) -> Expr n -> Expr n
+      Nat -> Expr (n + 1) -> Expr n -> Expr (n + 2) -> Expr n -> Expr n
   | codeNat {n : Nat} : Nat -> Expr n
   | codePi {n : Nat} : Expr n -> Expr (n + 1) -> Expr n
   | codeSigma {n : Nat} : Expr n -> Expr (n + 1) -> Expr n
@@ -137,11 +139,12 @@ def rename {n m : Nat} (rho : Ren n m) : Expr n -> Expr m
   | .pair a b => .pair (rename rho a) (rename rho b)
   | .fst p => .fst (rename rho p)
   | .snd p => .snd (rename rho p)
-  | .nat => .nat
-  | .zero => .zero
-  | .succ t => .succ (rename rho t)
-  | .natElim motive zeroCase succCase scrutinee =>
+  | .nat level => .nat level
+  | .zero level => .zero level
+  | .succ level t => .succ level (rename rho t)
+  | .natElim level motive zeroCase succCase scrutinee =>
       .natElim
+        level
         (rename (Ren.lift rho) motive)
         (rename rho zeroCase)
         (rename (Ren.lift (Ren.lift rho)) succCase)
@@ -175,10 +178,10 @@ def rename {n m : Nat} (rho : Ren n m) : Expr n -> Expr m
   | pair a b iha ihb => simp [rename, iha, ihb]
   | fst p ih => simp [rename, ih]
   | snd p ih => simp [rename, ih]
-  | nat => rfl
-  | zero => rfl
-  | succ t ih => simp [rename, ih]
-  | natElim motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
+  | nat level => rfl
+  | zero level => rfl
+  | succ level t ih => simp [rename, ih]
+  | natElim level motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
       simp [rename, ihm, ihz, ihs, ihn]
   | codeNat level => rfl
   | codePi A B ihA ihB => simp [rename, ihA, ihB]
@@ -205,10 +208,10 @@ def rename {n m : Nat} (rho : Ren n m) : Expr n -> Expr m
   | pair a b iha ihb => simp [rename, iha, ihb]
   | fst p ih => simp [rename, ih]
   | snd p ih => simp [rename, ih]
-  | nat => rfl
-  | zero => rfl
-  | succ t ih => simp [rename, ih]
-  | natElim motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
+  | nat level => rfl
+  | zero level => rfl
+  | succ level t ih => simp [rename, ih]
+  | natElim level motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
       simp [rename, ihm, ihz, ihs, ihn, Ren.lift_comp]
   | codeNat level => rfl
   | codePi A B ihA ihB =>
@@ -273,11 +276,12 @@ def subst {n m : Nat} (sigma : Sub n m) : Expr n -> Expr m
   | .pair a b => .pair (subst sigma a) (subst sigma b)
   | .fst p => .fst (subst sigma p)
   | .snd p => .snd (subst sigma p)
-  | .nat => .nat
-  | .zero => .zero
-  | .succ t => .succ (subst sigma t)
-  | .natElim motive zeroCase succCase scrutinee =>
+  | .nat level => .nat level
+  | .zero level => .zero level
+  | .succ level t => .succ level (subst sigma t)
+  | .natElim level motive zeroCase succCase scrutinee =>
       .natElim
+        level
         (subst (Sub.lift sigma) motive)
         (subst sigma zeroCase)
         (subst (Sub.lift (Sub.lift sigma)) succCase)
@@ -316,10 +320,10 @@ end Sub
   | pair a b iha ihb => simp [subst, rename, iha, ihb]
   | fst p ih => simp [subst, rename, ih]
   | snd p ih => simp [subst, rename, ih]
-  | nat => rfl
-  | zero => rfl
-  | succ t ih => simp [subst, rename, ih]
-  | natElim motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
+  | nat level => rfl
+  | zero level => rfl
+  | succ level t ih => simp [subst, rename, ih]
+  | natElim level motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
       simp [subst, rename, ihm, ihz, ihs, ihn]
   | codeNat level => rfl
   | codePi A B ihA ihB => simp [subst, rename, ihA, ihB]
@@ -366,10 +370,10 @@ theorem rename_subst {n m k : Nat} (rho : Ren m k)
   | pair a b iha ihb => simp [subst, rename, iha, ihb]
   | fst p ih => simp [subst, rename, ih]
   | snd p ih => simp [subst, rename, ih]
-  | nat => rfl
-  | zero => rfl
-  | succ t ih => simp [subst, rename, ih]
-  | natElim motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
+  | nat level => rfl
+  | zero level => rfl
+  | succ level t ih => simp [subst, rename, ih]
+  | natElim level motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
       simp only [subst, rename, ihm, ihz, ihs, ihn]
       rw [lift_rename]
       rw [lift_rename]
@@ -419,10 +423,10 @@ theorem subst_rename {n m k : Nat} (sigma : Sub m k)
   | pair a b iha ihb => simp [rename, subst, iha, ihb]
   | fst p ih => simp [rename, subst, ih]
   | snd p ih => simp [rename, subst, ih]
-  | nat => rfl
-  | zero => rfl
-  | succ t ih => simp [rename, subst, ih]
-  | natElim motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
+  | nat level => rfl
+  | zero level => rfl
+  | succ level t ih => simp [rename, subst, ih]
+  | natElim level motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
       simp only [rename, subst, ihm, ihz, ihs, ihn]
       rw [lift_precomp]
       rw [lift_precomp]
@@ -474,10 +478,10 @@ theorem lift_comp {n m k : Nat} (sigma : Sub n m) (tau : Sub m k) :
   | pair a b iha ihb => simp [subst, iha, ihb]
   | fst p ih => simp [subst, ih]
   | snd p ih => simp [subst, ih]
-  | nat => rfl
-  | zero => rfl
-  | succ t ih => simp [subst, ih]
-  | natElim motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
+  | nat level => rfl
+  | zero level => rfl
+  | succ level t ih => simp [subst, ih]
+  | natElim level motive zeroCase succCase scrutinee ihm ihz ihs ihn =>
       simp only [subst, ihm, ihz, ihs, ihn]
       rw [lift_comp]
       rw [lift_comp]
@@ -511,6 +515,29 @@ def instantiate₂ {n : Nat} (motive : Expr (n + 2))
       (fun j => Fin.cases endpoint (fun k => .var k) j) i)
     motive
 
+@[simp] theorem instantiate_weaken {n : Nat} (t argument : Expr n) :
+    instantiate (rename (Ren.wk n) t) argument = t := by
+  unfold instantiate
+  rw [subst_rename]
+  change subst (Sub.id n) t = t
+  exact subst_id t
+
+@[simp] theorem instantiate₂_weaken {n : Nat} (t : Expr (n + 1))
+    (endpoint proof : Expr n) :
+    instantiate₂ (rename (Ren.wk (n + 1)) t) endpoint proof =
+      instantiate t endpoint := by
+  unfold instantiate₂ instantiate
+  rw [subst_rename]
+  rfl
+
+@[simp] theorem instantiate₂_weaken₂ {n : Nat} (t : Expr n)
+    (endpoint proof : Expr n) :
+    instantiate₂
+        (rename (Ren.wk (n + 1)) (rename (Ren.wk n) t))
+        endpoint proof =
+      t := by
+  rw [instantiate₂_weaken, instantiate_weaken]
+
 @[simp] theorem instantiate_rename {n m : Nat} (rho : Ren n m)
     (body : Expr (n + 1)) (argument : Expr n) :
     rename rho (instantiate body argument) =
@@ -534,6 +561,20 @@ def instantiate₂ {n : Nat} (motive : Expr (n + 2))
   · simp only [Sub.comp, Sub.lift_succ, subst_rename]
     change sigma j = subst (Sub.id m) (sigma j)
     exact (subst_id (sigma j)).symm
+
+@[simp] theorem instantiate₂_rename {n m : Nat} (rho : Ren n m)
+    (motive : Expr (n + 2)) (endpoint proof : Expr n) :
+    rename rho (instantiate₂ motive endpoint proof) =
+      instantiate₂ (rename (Ren.lift (Ren.lift rho)) motive)
+        (rename rho endpoint) (rename rho proof) := by
+  simp only [instantiate₂, rename_subst, subst_rename]
+  apply _root_.congrArg (fun tau => subst tau motive)
+  funext i
+  refine Fin.cases ?_ (fun j => ?_) i
+  · rfl
+  · refine Fin.cases ?_ (fun k => ?_) j
+    · rfl
+    · rfl
 
 @[simp] theorem instantiate₂_subst {n m : Nat} (sigma : Sub n m)
     (motive : Expr (n + 2)) (endpoint proof : Expr n) :
