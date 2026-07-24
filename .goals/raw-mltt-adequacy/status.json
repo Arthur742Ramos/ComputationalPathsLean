@@ -1,0 +1,21 @@
+{
+  "goal_id": "raw-mltt-adequacy",
+  "status": "completed",
+  "iteration": 2,
+  "builder_model": "OpenAI:GPT-5.6-Sol",
+  "inspector_model": "OpenAI:GPT-5.6-Luna",
+  "initial_sha": "42a7511a5bd0afd4495631e6b022854500a0f2cc",
+  "created_at": "2026-07-23T17:01:53.169-04:00",
+  "history": [
+    {
+      "iteration": 1,
+      "verdict": "FAIL",
+      "summary": "Semantic soundness was not quotient-compositional; subject reduction assumed target typing; universe levels were incoherent; RawJudgments Path evidence was decorative."
+    },
+    {
+      "iteration": 2,
+      "verdict": "PASS",
+      "summary": "All criteria passed after adding quotient substitution, derived subject reduction, coherent level-indexed universes and Nat, and substantive computation certificates."
+    }
+  ]
+}
