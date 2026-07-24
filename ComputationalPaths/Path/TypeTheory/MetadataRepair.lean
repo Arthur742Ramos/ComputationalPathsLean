@@ -485,8 +485,10 @@ theorem loop_quotient_contractible_iff_local_axiomK
 
 /-- Main `PathRwQuot` result: unrestricted based elimination with
 propositional beta exists exactly when local quotient-level axiom K holds.  The
-theorem neither asserts that `RwEq` always repairs metadata nor that it always
-fails. -/
+theorem itself neither asserts that `RwEq` always repairs metadata nor that it
+always fails; it is a classification.  Under the primitive rule set formalized
+here the hypothesis is in fact always satisfied, by
+`QuotientPathInduction.pathRwQuot_localAxiomK`. -/
 theorem pathRwQuot_elimination_iff_local_axiomK
     (A : Type u) (a : A) :
     Nonempty
@@ -758,7 +760,13 @@ construction.  Feeding it to the universal repair criterion removes the
 quotient from the statement: the exact test is that `RwEq` relates *every* pair
 of raw loops at `a`.  This is the bridge between the general repair theorem and
 the `PathRwQuot`/K criterion, and it is the form one actually checks against a
-concrete carrier, since no quotient has to be formed to state it. -/
+concrete carrier, since no quotient has to be formed to state it.
+
+`ComputationalPaths/Path/TypeTheory/QuotientPathInduction.lean` performs that
+check for the primitive rule set formalized here and finds the test satisfied on
+every carrier (`QuotientPathInduction.rwEqTotalOnLoops_always`).  The results in
+this section remain the right statements: they are what one would re-check
+against a modified rule set. -/
 
 /-- `RwEq` relates every pair of raw loops based at `a`.  This is a statement
 about raw `Path` records; it does not mention any quotient. -/

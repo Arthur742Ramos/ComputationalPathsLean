@@ -106,10 +106,12 @@ corresponds to `PathRwQuot X x x`. The contractibility₃ theorem says that diff
 between paths that have no rewrite connection.
 
 For the current one-constructor circle, explicit rewrites do collapse every
-raw loop class to reflexivity, as proved in `MetadataRepair`.  A future carrier
-with a genuinely nontrivial loop quotient would still be compatible with the
-level-3 theorem: it connects parallel derivations but does not manufacture a
-derivation where the level-2 relation has none.
+raw loop class to reflexivity, as proved in `MetadataRepair`.  In fact
+`QuotientPathInduction.rweq_total` shows this happens for *every* carrier under
+the present primitive rule set, so no choice of carrier makes the genuine loop
+quotient nontrivial without first changing the rewrite rules.  The level-3
+theorem is compatible with either situation: it connects parallel derivations
+but does not manufacture a derivation where the level-2 relation has none.
 
 ### Metatheory
 
