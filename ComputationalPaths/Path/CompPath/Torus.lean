@@ -1,11 +1,12 @@
 /-
-# The torus as `S¹ × S¹`
+# One-point product carrier and its separate torus winding presentation
 
-This development uses the computational-path circle `Circle` from
-`CompPath/CircleCompPath.lean`. Rather than postulating a separate torus
-interface, we construct the torus as the ordinary product `Circle × Circle`.
-
-The π₁ computation is packaged in `TorusStep.lean`.
+This development uses the one-constructor `Circle` from
+`CompPath/CircleCompPath.lean` and defines `Torus` as its ordinary product.
+Consequently the genuine `PathRwQuot` loop fiber of this carrier is
+contractible.  Separately, the legacy `torusPiOne` API is the product of two
+synthetic circle winding quotients; its `ℤ × ℤ` computation is packaged in
+`TorusStep.lean`.
 
 ## Key Results
 
@@ -14,9 +15,9 @@ The π₁ computation is packaged in `TorusStep.lean`.
 | `Torus` | The torus type `S¹ × S¹` |
 | `torusBase` | Distinguished base point on the torus |
 | `torusLoop1`, `torusLoop2` | The two generating loops |
-| `torusPiOneEquiv` | `π₁(T²) ≃ ℤ × ℤ` |
+| `torusPiOneEquiv` | genuine product-loop equivalence (both sides contractible here) |
 | `torusLoopsCommute` | Commutativity of the two generating loops |
-| `torusAbelian` | Abelianness of the torus fundamental group |
+| `torusPiOne_abelian_toEq` | proof-irrelevant equality of raw loop composites |
 | `torusEulerChar` | Euler characteristic of the torus is 0 |
 | `nTorus` | n-dimensional torus as iterated product |
 
@@ -66,22 +67,22 @@ noncomputable def torusReflLoop : Path (A := Torus.{u}) torusBase torusBase :=
 
 /-! ## Fundamental Group -/
 
-/-- The fundamental group of the torus based at `torusBase`. -/
+/-- Legacy synthetic torus winding quotient: the product of two synthetic
+circle winding quotients.  This is not `π₁(Torus, torusBase)`. -/
 noncomputable abbrev torusPiOne : Type u := circlePiOne.{u} × circlePiOne.{u}
 
-/-- Decodes an integer pair into an element of the torus fundamental group. -/
+/-- Decode an integer pair into the synthetic torus winding quotient. -/
 noncomputable def torusDecode (z : Int × Int) : torusPiOne.{u} :=
   (circleDecode z.1, circleDecode z.2)
 
-/-- Encodes an element of the torus fundamental group as an integer pair. -/
+/-- Encode an element of the synthetic torus winding quotient. -/
 noncomputable def torusEncode : torusPiOne.{u} → Int × Int :=
   fun ⟨x, y⟩ => (circlePiOneEncode x, circlePiOneEncode y)
 
-/-! ## Equivalence π₁(T²) ≅ ℤ × ℤ -/
+/-! ## Genuine product-loop decomposition -/
 
-/-- The fundamental group of `T²` is isomorphic to `ℤ × ℤ`.
-This follows from the product fundamental group theorem and
-the circle computation `π₁(S¹) ≅ ℤ`. -/
+/-- Genuine product decomposition for the `PathRwQuot` fundamental group of
+the current product carrier.  It does not identify either factor with `Int`. -/
 noncomputable def torusPiOneEquiv :
     SimpleEquiv (π₁(Torus.{u}, torusBase.{u}))
       (π₁(Circle.{u}, circleBase.{u}) × π₁(Circle.{u}, circleBase.{u})) :=
@@ -117,8 +118,9 @@ theorem torusLoop_comm_proof :
 
 /-! ## Torus Abelianness -/
 
-/-- The fundamental group of the torus is abelian: any two elements commute
-at the `toEq` level.  This follows from the product structure. -/
+/-- Any two raw torus loops have equal underlying ambient equality proofs.
+This is proof irrelevance at the `toEq` level, not a nontrivial computation of
+the quotient group. -/
 theorem torusPiOne_abelian_toEq
     (p q : Path (A := Torus.{u}) torusBase torusBase) :
     (Path.trans p q).toEq = (Path.trans q p).toEq := by

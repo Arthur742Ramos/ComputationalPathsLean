@@ -455,6 +455,7 @@ import ComputationalPaths.Path.TypeTheory.RawJudgments
 import ComputationalPaths.Path.TypeTheory.RawSemantics
 import ComputationalPaths.Path.TypeTheory.MLTTAdequacy
 import ComputationalPaths.Path.TypeTheory.MetadataJ
+import ComputationalPaths.Path.TypeTheory.MetadataRepair
 import ComputationalPaths.Path.HoTT.PathAlgebraDeep
 import ComputationalPaths.Path.HoTT.TransportDeep
 import ComputationalPaths.Path.Homotopy.CubicalDeep

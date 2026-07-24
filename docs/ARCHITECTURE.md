@@ -34,6 +34,9 @@ Key modules:
 - `Rewrite/Step.lean`: single-step rewrite relation with categorized rules (basic path algebra, products, sigma, sums, functions, transport, contexts, structural completion rules).
 - `Rewrite/Rw.lean`: reflexive-transitive closure.
 - `Rewrite/RwEq.lean`: symmetric reflexive-transitive closure (`RwEq`).
+- `Rewrite/Normalization.lean`: a proof-erasing normalization invariant.  Equal
+  outputs characterize `RwEq` only relative to a separately supplied complete
+  step system; the bare function is not the definition of `RwEq`.
 - `Rewrite/Quot.lean`: quotient machinery:
   - `rwEqSetoid`,
   - `PathRwQuot A a b`,
@@ -59,7 +62,14 @@ Representative modules:
 - `CompPath/PushoutCompPath.lean`, `CompPath/PushoutPaths.lean`
 - `CompPath/FigureEight.lean`, `CompPath/BouquetN.lean`
 
-These modules package encode/decode style computations and concrete `π₁` equivalences.
+These modules include both genuine `PathRwQuot` constructions and synthetic
+encode/decode presentations.  In particular, `circlePiOne` and `torusPiOne`
+are legacy names for winding-expression quotients, not the genuine loop
+quotients of the current one-constructor `Circle` and product `Torus`.
+
+`Path/TypeTheory/MetadataRepair.lean` audits this boundary formally: the genuine
+circle and torus loop quotients are contractible, the synthetic winding
+quotients are noncontractible, and no `SimpleEquiv` bridge exists.
 
 ### Layer E: Extended domain ecosystems
 
@@ -113,8 +123,11 @@ Representative named results:
 
 | Result | Statement (informal) | Module |
 |---|---|---|
-| `circlePiOneEquivInt` | `π₁(S¹) ≃ ℤ` | `CompPath/CircleStep.lean` (and alias in `CircleCompPath.lean`) |
-| `torusPiOneEquivIntProd` | `π₁(T²) ≃ ℤ × ℤ` | `CompPath/TorusStep.lean` |
+| `circlePiOneEquivInt` | synthetic circle winding quotient `≃ ℤ` | `CompPath/CircleStep.lean` |
+| `torusPiOneEquivIntProd` | synthetic product winding quotient `≃ ℤ × ℤ` | `CompPath/TorusStep.lean` |
+| `genuine_circle_piOne_contractible` | current genuine circle `PathRwQuot` is contractible | `TypeTheory/MetadataRepair.lean` |
+| `genuine_torus_piOne_contractible` | current genuine torus `PathRwQuot` is contractible | `TypeTheory/MetadataRepair.lean` |
+| `no_circle_genuine_synthetic_bridge` / `no_torus_genuine_synthetic_bridge` | no `SimpleEquiv` between the corresponding genuine and synthetic quotients | `TypeTheory/MetadataRepair.lean` |
 | `sphere2CompPath_pi1_equiv_unit` | `π₁(S²) ≃ Unit` | `CompPath/SphereCompPath.lean` |
 | `figureEightPiOneEquiv` | figure-eight `π₁` as free-product words (under required decode-bijectivity assumption) | `CompPath/FigureEight.lean` |
 | `seifertVanKampenEquiv` | pushout `π₁` to amalgamated free product equivalence | `CompPath/PushoutPaths.lean` |
@@ -125,4 +138,8 @@ Representative named results:
 
 - The architectural core is: **`Path` traces + rewrite closure (`RwEq`) + quotient (`PathRwQuot`)**.
 - Homotopy-level objects (`LoopQuot`, `π₁`, fundamental groupoid) are defined on top of that quotient.
-- Space-specific computations (circle/torus/sphere/pushouts/figure-eight) are layered in `CompPath`, while large domain expansions (Algebra/Topology/Category/Logic/Homotopy) reuse the same core interfaces.
+- Synthetic expression quotients in `CompPath` are useful presentations but
+  must not be identified with those homotopy-level objects without a proved
+  bridge; for the current circle and torus definitions such an equivalence is
+  formally impossible.
+- Other space-specific computations are layered in `CompPath`, while large domain expansions (Algebra/Topology/Category/Logic/Homotopy) reuse the same core interfaces.

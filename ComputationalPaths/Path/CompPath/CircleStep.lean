@@ -1,9 +1,10 @@
 /-
-# π₁(S¹) ≃ ℤ
+# Synthetic circle winding quotient `≃ ℤ`
 
 This module packages the winding-number encode/decode data from
-`CompPath/CircleCompPath.lean`
-into a `SimpleEquiv` between `π₁(S¹)` and `ℤ`.
+`CompPath/CircleCompPath.lean` into a `SimpleEquiv` between the synthetic
+loop-expression quotient and `ℤ`.  It does not identify that quotient with the
+genuine `PathRwQuot` loop fiber of the current one-constructor carrier.
 -/
 
 import ComputationalPaths.Path.CompPath.CircleCompPath
@@ -23,13 +24,14 @@ universe u
 
 /-! ## Winding-number interface -/
 
-/-- A discharge-friendly interface for `π₁(S¹) ≃ ℤ`. -/
+/-- A discharge-friendly interface for the synthetic winding quotient
+`≃ ℤ`. -/
 class HasCirclePiOneEncode : Type u where
-  /-- Winding-number map `π₁(S¹) → ℤ`. -/
+  /-- Winding-number map from the synthetic expression quotient to `ℤ`. -/
   encode : circlePiOne → Int
   /-- Encoding after decoding is the identity on `ℤ`. -/
   encode_circleDecode : ∀ z : Int, Path (encode (circleDecode z)) z
-  /-- Decoding after encoding is the identity on `π₁(S¹)`. -/
+  /-- Decoding after encoding is the identity on the synthetic quotient. -/
   circleDecode_encode : ∀ x : circlePiOne, Path (circleDecode (encode x)) x
 
 /-- Canonical instance for the circle computation. -/
@@ -38,7 +40,7 @@ noncomputable instance instHasCirclePiOneEncode : HasCirclePiOneEncode where
   encode_circleDecode := fun z => Path.stepChain (circlePiOneEncode_circleDecode z)
   circleDecode_encode := fun x => Path.stepChain (circleDecode_circlePiOneEncode x)
 
-/-- Winding-number map specialised to the computational circle. -/
+/-- Winding-number map specialised to the synthetic circle presentation. -/
 @[simp] noncomputable def circlePiOneEncode' [HasCirclePiOneEncode] : circlePiOne → Int :=
   HasCirclePiOneEncode.encode
 
@@ -50,15 +52,10 @@ noncomputable def circleDecode_circlePiOneEncode' [HasCirclePiOneEncode] (x : ci
     Path (circleDecode (circlePiOneEncode' x)) x :=
   HasCirclePiOneEncode.circleDecode_encode x
 
-/-! ## π₁ equivalence -/
+/-! ## Synthetic quotient equivalence -/
 
-/-- Build the raw loop encode/decode interface from the quotient-level one.
-
-This factors the raw winding number through the quotient `π₁(S¹)`, and then
-uses `Quotient.exact` to recover an `RwEq` witness from the `decode ∘ encode`
-equation in the quotient.  We keep this as an explicit constructor (rather than
-an instance) to avoid typeclass loops between the two interfaces.
--/
+/-- The legacy equivalence name packages only the synthetic expression
+quotient.  No map to or from the genuine `PathRwQuot` is constructed here. -/
 
 noncomputable def circlePiOneEquivInt :
     SimpleEquiv circlePiOne Int :=

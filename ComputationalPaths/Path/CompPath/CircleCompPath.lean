@@ -1,16 +1,19 @@
 /-
-# Circle via computational path expressions
+# Synthetic circle winding expressions over a one-point carrier
 
-Defines a custom circle whose paths are syntactic path expressions with a
-distinguished loop generator. This is a computational-path construction rather
-than a higher inductive axiom.
+Defines a one-constructor carrier together with a separate syntax of loop
+expressions and a quotient by winding number.  The expression quotient is a
+useful synthetic presentation, but it is not the genuine
+`PathRwQuot CircleCompPath base base`: interpreting the formal generator as a
+raw `Path` sends it to reflexivity.
 
 ## Key Results
 
 - `CircleCompPath`: a one-point type.
 - `CircleCompPathExpr`: path expressions with a loop generator.
 - `circleCompPathLoopExpr`: the formal loop generator expression.
-- `circleCompPathPiOneEquivInt`: pi_1(S^1) ~= Z via loop counts.
+- `circleCompPathPiOneEquivInt`: the synthetic winding quotient is equivalent
+  to `Int`.
 
 ## References
 
@@ -69,12 +72,14 @@ inductive CircleCompPathExpr : CircleCompPath → CircleCompPath → Type u
   | Int.negSucc n =>
       CircleCompPathExpr.symm (circleCompPathLoopExprPow (Nat.succ n))
 
-/-- Canonical path-level loop generator (path-first presentation). -/
+/-- Forgetful path-level image of the synthetic generator.  Because the
+carrier has one constructor and no HIT loop constructor, this is reflexivity. -/
 @[simp] noncomputable def circleLoopPath :
     Path circleCompPathBase circleCompPathBase :=
   Path.refl circleCompPathBase
 
-/-- Interpret loop expressions as computational paths. -/
+/-- Forget loop-expression winding data and interpret expressions as raw
+computational paths on the one-point carrier. -/
 @[simp] noncomputable def circleLoopExpr_toPath :
     CircleCompPathExpr circleCompPathBase circleCompPathBase →
       Path circleCompPathBase circleCompPathBase := by
@@ -145,7 +150,7 @@ noncomputable def circleCompPathEncodeExpr' :
         _ = Int.negSucc n := by
                 simpa using this
 
-/-! ## Loop quotient and pi_1 -/
+/-! ## Synthetic winding quotient -/
 
 /-- Loop expression relation: same winding number. -/
 noncomputable def circleCompPathRel
@@ -165,7 +170,8 @@ noncomputable def circleCompPathSetoid :
     · intro p q r hpq hqr
       exact hpq.trans hqr
 
-/-- The computational-path pi_1 of the circle (loop expressions mod winding). -/
+/-- Synthetic loop-expression quotient by winding number.  This is not the
+genuine `PathRwQuot` loop fiber of `CircleCompPath`. -/
 abbrev circleCompPathPiOne : Type u :=
   Quot circleCompPathSetoid.r
 
@@ -205,9 +211,9 @@ theorem circleCompPathDecodeEncode (x : circleCompPathPiOne) :
     circleCompPathEncodeExpr' p
   simpa using circleCompPathEncodeExpr_zpow (circleCompPathEncodeExpr' p)
 
-/-! ## pi_1(S^1) ~= Z -/
+/-! ## Synthetic winding quotient `≃ Int` -/
 
-/-- The computational-path circle has pi_1 equivalent to Z. -/
+/-- The synthetic circle winding quotient is equivalent to `Int`. -/
 noncomputable def circleCompPathPiOneEquivInt :
     SimpleEquiv circleCompPathPiOne Int where
   toFun := circleCompPathEncode
@@ -223,24 +229,25 @@ abbrev Circle : Type u := CircleCompPath.{u}
 /-- Alias for the basepoint, matching the legacy name. -/
 @[simp] noncomputable abbrev circleBase : Circle := circleCompPathBase
 
-/-- Alias for the loop quotient, matching the legacy name. -/
+/-- Legacy alias for the synthetic winding quotient. -/
 abbrev circlePiOne : Type u := circleCompPathPiOne
 
 /-! ## Definitional compatibility -/
 
-/-- Alias for the π₁ encode map, matching the legacy name. -/
+/-- Legacy encode name for the synthetic winding quotient. -/
 @[simp] noncomputable def circlePiOneEncode : circlePiOne → Int :=
   circleCompPathEncode
 
-/-- Alias for the π₁ decode map, matching the legacy name. -/
+/-- Legacy decode name for the synthetic winding quotient. -/
 @[simp] noncomputable def circleDecode : Int → circlePiOne :=
   circleCompPathDecode
 
-/-- Chosen equality proof used to seed the loop generator. -/
+/-- Chosen reflexive equality used by the raw image of the synthetic loop. -/
 noncomputable def circleLoopEq : circleBase = circleBase :=
   circleLoopPath.toEq
 
-/-- Alias for the fundamental loop path. -/
+/-- Raw path named by the legacy synthetic loop API.  It is a singleton
+reflexivity step and does not carry the expression's winding number. -/
 @[simp] noncomputable def circleLoop : Path circleBase circleBase :=
   Path.stepChain circleLoopEq
 
@@ -294,7 +301,7 @@ noncomputable def circleLoopZPow_add_rweq (m n : Nat) :
       have hTotal := rweq_trans hAssoc hCongr
       simpa [circleLoopPathPow, Nat.add_assoc, Nat.add_comm, Nat.add_left_comm] using hTotal
 
-/-- Alias for the fundamental loop in π₁. -/
+/-- Legacy name for winding number one in the synthetic quotient. -/
 @[simp] noncomputable def circlePiOneLoop : circlePiOne :=
   circleDecode 1
 
@@ -315,14 +322,15 @@ noncomputable def circleLoopZPow_add_rweq (m n : Nat) :
     circleDecode (circlePiOneEncode x) = x :=
   circleCompPathDecodeEncode x
 
-/-! ## Fundamental group coercions -/
+/-! ## Legacy synthetic-presentation aliases -/
 
-/-- Legacy name for the π₁ equivalence. -/
+/-- Legacy name for the synthetic winding equivalence. -/
 noncomputable abbrev circlePiOneEquivInt :
     SimpleEquiv circlePiOne Int :=
   circleCompPathPiOneEquivInt
 
-/-- Circle π₁ as the standard loop quotient. -/
+/-- Legacy alias for the synthetic winding quotient; despite the historical
+name, this is not `PathRwQuot Circle circleBase circleBase`. -/
 abbrev circlePiOneStd : Type u := circlePiOne
 
 /-! ## Summary -/

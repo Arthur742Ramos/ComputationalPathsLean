@@ -1,6 +1,6 @@
 # ComputationalPaths — Axiom & Typeclass Inventory
 
-> Last corrected 2026-07-01 (hand-verified against the source tree).
+> Last corrected 2026-07-24 (hand-verified against the source tree).
 
 ---
 
@@ -62,11 +62,13 @@ These classes have concrete, `sorry`-free instances.
 | `HasHcompFunctorial` | `instHasHcompFunctorial_EqTwoCat` | `TwoCategoryInstances.lean` | `PLift Eq` 2-cells; proof irrelevance |
 | `HasInterchange` | `instHasInterchange_EqTwoCat` | `TwoCategoryInstances.lean` | `PLift Eq` 2-cells; proof irrelevance |
 
-> Honesty note: `HasCirclePiOneEncode`/`HasTorusPiOneEncode` establish that the
-> **winding-number model** of the loop quotient is `≃ ℤ` (resp. `ℤ×ℤ`).  The
-> identification of that model with the framework's own fundamental group is a
-> separate bridge (see `MayerVietoris.lean` `pi1Bridge`) and is **assumed**, not
-> proved — the headline `π₁(S¹) ≃ ℤ` should be read with that caveat.
+> Honesty note: `HasCirclePiOneEncode`/`HasTorusPiOneEncode` establish that
+> explicitly **synthetic winding-expression quotients** are `≃ ℤ` (resp.
+> `ℤ×ℤ`).  They do not compute the framework's genuine `PathRwQuot`
+> fundamental groups.  For the current one-constructor `Circle` and product
+> `Torus`, `MetadataRepair.lean` proves the genuine loop quotients contractible,
+> the synthetic quotients noncontractible, and the corresponding `SimpleEquiv`
+> bridges impossible.
 
 ---
 
@@ -81,6 +83,13 @@ exist.  They are retained for documentation but marked `-- DEPRECATED`.
 | `HasWedgeSVKEncodeData` | Contains `encode_decode` field from `HasWedgeSVKEncodeDecode` ⇒ inherits its impossibility. | `PushoutSVKInstances.hasWedgeSVKEncodeData_impossible_PUnit` |
 | `HasPushoutSVKEncodeDecode` | `AmalgEquiv` preserves word length while `pushoutDecode` maps words of different lengths to the same π₁ element. | `PushoutSVKInstances.hasPushoutSVKEncodeDecode_impossible_PUnit` |
 | `HasPushoutSVKDecodeAmalgBijective` | Same word-length obstruction as `HasPushoutSVKEncodeDecode`. | `PushoutSVKInstances.hasPushoutSVKDecodeAmalgBijective_impossible_PUnit` |
+
+The formerly “open” circle bridge
+`SimpleEquiv (π₁(Circle, circleBase)) circlePiOne` is also impossible under the
+current definitions; see
+`MetadataRepair.no_circle_genuine_synthetic_bridge`.  The analogous torus
+bridge is ruled out by `no_torus_genuine_synthetic_bridge`.  These are
+no-bridge theorems rather than missing encode/decode instances.
 
 **Replacement**: Use `HasPushoutSVKEncodeDecodeFull` / `HasWedgeSVKEncodeDataFull`
 which quotient by `FullAmalgEquiv` (amalgamation + free group reduction).

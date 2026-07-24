@@ -497,23 +497,24 @@ noncomputable def int_abelian_group_abelianization_certificate :
     int_abelianization_equiv
     rfl
 
-/-! ## H₁ of Known Spaces -/
+/-! ## Legacy algebraic model certificates -/
 
 /-
-**H₁(S¹) ≃ ℤ**.
-
-π₁(S¹) ≃ ℤ is abelian, so H₁(S¹) ≃ π₁(S¹)^ab ≃ ℤ^ab ≃ ℤ.
+The following record packages the synthetic circle winding quotient and an
+integer output.  It does not prove an equivalence for the genuine
+`PathRwQuot` fundamental group or derive singular homology.
 -/
-/-- H₁(S¹) represented as ℤ. -/
+/-- Legacy integer label used as a proposed circle H₁ model. -/
 abbrev CircleH1 : Type := Int
 
-/-- Certificate for the first homology of the computational circle. -/
+/-- Certificate relating the synthetic circle winding model to an integer
+output; no genuine Hurewicz bridge is included. -/
 structure CircleH1IntCertificate where
-  /-- The concrete circle fundamental-group model. -/
+  /-- The synthetic circle winding model. -/
   piOneModel : Type u
   /-- The concrete H₁ model. -/
   h1Model : Type
-  /-- The circle π₁ equivalence with integers. -/
+  /-- The synthetic winding-quotient equivalence with integers. -/
   piOneEquivInt : SimpleEquiv CompPath.circlePiOne.{u} Int
   /-- A concrete loop-class input. -/
   generator : CompPath.circlePiOne.{u}
@@ -522,7 +523,8 @@ structure CircleH1IntCertificate where
   /-- Computational witness that the generator maps to the expected H₁ class. -/
   generatorPath : Path (CompPath.circlePiOneEncode generator) output
 
-/-- **H₁(S¹) ≃ ℤ**, packaged with the circle generator and encode witness. -/
+/-- Package the synthetic winding generator and its integer encode witness.
+Despite the legacy name, this is not a proof of `H₁(S¹) ≃ ℤ`. -/
 noncomputable def circle_H1_equiv_int : CircleH1IntCertificate where
   piOneModel := CompPath.circlePiOne.{u}
   h1Model := CircleH1
@@ -532,14 +534,14 @@ noncomputable def circle_H1_equiv_int : CircleH1IntCertificate where
   generatorPath := Path.stepChain (CompPath.circlePiOneEncode_circleDecode 1)
 
 /-
-**H₁(T²) ≃ ℤ × ℤ**.
-
-π₁(T²) ≃ ℤ × ℤ is abelian, so H₁(T²) ≃ π₁(T²)^ab ≃ ℤ².
+The torus record below stores two raw paths, hard-coded integer-pair outputs,
+and an `RwEq` commutativity witness.  It contains no equivalence from genuine
+homology or from the genuine torus loop quotient.
 -/
-/-- H₁(T²) represented as ℤ × ℤ. -/
+/-- Legacy integer-pair label used as a proposed torus H₁ model. -/
 abbrev TorusH1 : Type := Int × Int
 
-/-- Certificate for the first homology of the torus. -/
+/-- Data package for two raw torus loops and integer-pair labels. -/
 structure TorusH1IntProdCertificate where
   /-- The meridian loop input. -/
   meridian : Path (A := Torus.{u}) torusBase torusBase
@@ -556,7 +558,8 @@ structure TorusH1IntProdCertificate where
   /-- Computational witness for the longitude output. -/
   longitudePath : Path longitudeOutput (0, 1)
 
-/-- **H₁(T²) ≃ ℤ × ℤ**, packaged with the two loop generators and RwEq commutativity. -/
+/-- Package the two raw loops, labels, and `RwEq` commutativity.  This does not
+establish `H₁(T²) ≃ ℤ × ℤ` under the current definitions. -/
 noncomputable def torus_H1_equiv_int_prod : TorusH1IntProdCertificate where
   meridian := torusLoop1
   longitude := torusLoop2

@@ -1,10 +1,11 @@
 /-
-# π₁(S¹) ≅ ℤ with explicit computational-path traces
+# Synthetic circle winding quotient with explicit raw-path traces
 
-This module proves the fundamental group of the circle is ℤ using
-the computational paths calculus. Every key proof constructs explicit
-`Path.trans`/`Path.symm`/`Path.refl` chains and `Step`/`RwEq` witnesses
-BEFORE connecting to integer encodings.
+This module proves that the synthetic circle expression quotient is `ℤ` and
+also constructs explicit `Path.trans`/`Path.symm`/`Path.refl` chains and
+`Step`/`RwEq` witnesses on the one-point carrier.  Those two developments are
+not connected by an equivalence: the genuine `PathRwQuot` loop fiber is
+contractible, while the synthetic winding quotient is not.
 
 ## Key results with explicit path reasoning:
 - `circleLoopPowNat_add_rweq`: loop^m · loop^n ≈ loop^(m+n) via trans chains
@@ -222,7 +223,7 @@ noncomputable def circleLoopUnit_right_rweq (z : Int) :
   rweq_cmpA_refl_right (A := Circle)
     (a := circleBase) (b := circleBase) (p := circleLoopPowInt z)
 
-/-! ## Group laws for `circlePiOne`
+/-! ## Group laws for the synthetic `circlePiOne`
 
 Each proof constructs the PATH-LEVEL `RwEq` witness first, then bridges
 to the quotient via `winding_number_injective`. The winding number
@@ -272,7 +273,8 @@ theorem circlePiOneMul_inv_right (x : circlePiOne) :
 
 /-! ### (3) Commutativity via Eckmann-Hilton interchange
 
-The abelianness of π₁(S¹) is witnessed by the Eckmann-Hilton argument.
+The raw path interchange witness is an Eckmann--Hilton-style calculation.
+The abelianness theorem below concerns the separate synthetic quotient.
 `Step.map2_subst` provides the explicit interchange 2-cell. This is the
 geometric heart — commutativity comes from the 2-cell structure, NOT
 from "integers commute".

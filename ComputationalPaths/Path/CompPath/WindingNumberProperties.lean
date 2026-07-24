@@ -1,14 +1,15 @@
 /-
-# Winding Number Properties for the Computational Circle
+# Winding Number Properties for the Synthetic Circle Presentation
 
 This module extends `CircleCompPath` with algebraic properties of the winding
-number on `π₁(S¹)`. We define loop multiplication on the quotient of loop
-expressions and show additivity, homomorphism behavior, injectivity,
-surjectivity, and the constant-loop value.
+number on its synthetic loop-expression quotient.  We define expression
+multiplication and show additivity, homomorphism behavior, injectivity,
+surjectivity, and the constant-expression value.  The quotient is not the
+genuine `PathRwQuot` loop fiber of the one-constructor carrier.
 
 ## Key Results
 
-- `circlePiOneMul`: multiplication on circle π₁ by concatenating expressions
+- `circlePiOneMul`: multiplication on the synthetic quotient by concatenating expressions
 - `winding_number_add`: winding number is additive under multiplication
 - `winding_number_injective`/`winding_number_surjective`: bijectivity facts
 - `winding_number_constant`: constant loop maps to zero
@@ -26,7 +27,7 @@ namespace CompPath
 
 universe u
 
-/-! ## Multiplication on circle π₁ -/
+/-! ## Multiplication on the synthetic winding quotient -/
 
 private theorem circleCompPathRel_trans_right
     (p : CircleCompPathExpr circleCompPathBase circleCompPathBase)
@@ -54,7 +55,8 @@ noncomputable def circleCompPathMulExprRight
     (fun p => Quot.mk _ (CircleCompPathExpr.trans p q))
     (fun _ _ h => Quot.sound (circleCompPathRel_trans_left q h))
 
-/-- Multiplication on `circlePiOne` induced by loop concatenation. -/
+/-- Multiplication on synthetic `circlePiOne` induced by expression
+concatenation. -/
 noncomputable def circlePiOneMul (x y : circlePiOne) : circlePiOne :=
   Quot.lift
     (fun q => circleCompPathMulExprRight q x)
@@ -79,7 +81,7 @@ noncomputable def circlePiOneMul (x y : circlePiOne) : circlePiOne :=
     circlePiOneMul (Quot.mk _ p) (Quot.mk _ q) =
       Quot.mk _ (CircleCompPathExpr.trans p q) := rfl
 
-/-- Identity element of `circlePiOne` (constant loop). -/
+/-- Identity element of synthetic `circlePiOne` (constant expression). -/
 noncomputable def circlePiOneOne : circlePiOne :=
   circleDecode 0
 
@@ -131,9 +133,9 @@ theorem winding_number_surjective (z : Int) :
 /-! ## Summary -/
 
 /-!
-We define loop multiplication on the circle π₁ quotient, prove the winding
-number is additive and a homomorphism, and record explicit injectivity,
-surjectivity, and the constant-loop value.
+We define expression multiplication on the synthetic circle quotient, prove
+the winding number is additive and a homomorphism, and record explicit
+injectivity, surjectivity, and the constant-expression value.
 -/
 
 end CompPath
