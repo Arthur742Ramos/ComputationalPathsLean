@@ -750,6 +750,247 @@ theorem no_torus_genuine_synthetic_bridge :
     ((contractible_iff_of_equiv bridge).mp
       genuine_torus_piOne_contractible)
 
+/-! ## Raw-level form of the criterion
+
+`PathRwQuot A a b` is by definition `Quot (rwEqRel A a b)`, hence an instance of
+the ordinary setoid repairs classified above rather than a separate
+construction.  Feeding it to the universal repair criterion removes the
+quotient from the statement: the exact test is that `RwEq` relates *every* pair
+of raw loops at `a`.  This is the bridge between the general repair theorem and
+the `PathRwQuot`/K criterion, and it is the form one actually checks against a
+concrete carrier, since no quotient has to be formed to state it. -/
+
+/-- `RwEq` relates every pair of raw loops based at `a`.  This is a statement
+about raw `Path` records; it does not mention any quotient. -/
+def RwEqTotalOnLoops (A : Type u) (a : A) : Prop :=
+  ∀ p q : Path a a, Nonempty (RwEq p q)
+
+/-- The genuine loop quotient is exactly the setoid quotient of raw loops by
+`RwEq`, so `Quotient.sound`/`Quotient.exact` apply verbatim: contractibility of
+the loop quotient is `RwEq`-totality on raw loops. -/
+theorem loop_quotient_contractible_iff_rweq_total (A : Type u) (a : A) :
+    IsContractible (PathRwQuot A a a) ↔ RwEqTotalOnLoops A a :=
+  quotient_contractible_iff_setoidTotal (rwEqSetoid A a a) (Path.refl a)
+
+/-- Local quotient-level axiom K, restated with no quotient: every two raw
+loops at `a` admit a rewrite certificate. -/
+theorem local_axiomK_iff_rweq_total (A : Type u) (a : A) :
+    PathRwQuotLocalAxiomK A a ↔ RwEqTotalOnLoops A a :=
+  (loop_quotient_contractible_iff_local_axiomK A a).symm.trans
+    (loop_quotient_contractible_iff_rweq_total A a)
+
+/-- Raw-level form of the main `PathRwQuot` theorem: unrestricted based
+elimination with propositional beta exists exactly when `RwEq` is total on raw
+loops. -/
+theorem pathRwQuot_elimination_iff_rweq_total (A : Type u) (a : A) :
+    Nonempty
+        (UnrestrictedBasedEliminator.{max u u, w}
+          (pathRwQuotCenter A a)) ↔
+      RwEqTotalOnLoops A a :=
+  (pathRwQuot_elimination_iff_loop_quotient_contractible A a).trans
+    (loop_quotient_contractible_iff_rweq_total A a)
+
+/-- Necessity in raw form: an eliminator for the rewrite quotient *produces* a
+rewrite certificate relating any two raw loops.  Nothing weaker than
+`RwEq`-connectedness of the raw loop set can support it. -/
+theorem elimination_forces_rweq_on_raw_loops (A : Type u) (a : A)
+    (J : Nonempty
+      (UnrestrictedBasedEliminator.{max u u, w}
+        (pathRwQuotCenter A a)))
+    (p q : Path a a) : Nonempty (RwEq p q) :=
+  (pathRwQuot_elimination_iff_rweq_total A a).mp J p q
+
+/-- Global axiom K in raw form. -/
+theorem pathRwQuot_axiomK_iff_rweq_total (A : Type u) :
+    PathRwQuotAxiomK A ↔ ∀ a : A, RwEqTotalOnLoops A a := by
+  constructor
+  · intro axiomK a
+    exact (local_axiomK_iff_rweq_total A a).mp (axiomK a)
+  · intro total a
+    exact (local_axiomK_iff_rweq_total A a).mpr (total a)
+
+/-- An explicit certificate of the kind the raw criterion asks for.  Composing
+the singleton reflexive trace with itself rewrites to the empty trace by a
+genuine three-stage derivation: congruence under `Path.trans`, the primitive
+`transport_refl_beta` erasure, the left-unit rule, and a second erasure.  It is
+not a reflexivity stub, and the two sides are distinct `Path` records. -/
+noncomputable def doubleSingletonRweqEmpty {A : Type u} (a : A) :
+    RwEq
+      (Path.trans (rawSingletonReflexivePath a)
+        (rawSingletonReflexivePath a))
+      (rawEmptyReflexivePath a) :=
+  rweq_trans
+    (rweq_trans_congr_left (rawSingletonReflexivePath a)
+      (raw_singleton_rweq_empty_reflexive_path a))
+    (rweq_trans
+      (rweq_of_step (Step.trans_refl_left (rawSingletonReflexivePath a)))
+      (raw_singleton_rweq_empty_reflexive_path a))
+
+/-- The corresponding quotient identification, obtained from the explicit
+derivation rather than from equality of normalizations. -/
+theorem double_singleton_same_pathRwQuot_class {A : Type u} (a : A) :
+    (Quot.mk _
+        (Path.trans (rawSingletonReflexivePath a)
+          (rawSingletonReflexivePath a)) :
+        PathRwQuot A a a) =
+      Quot.mk _ (rawEmptyReflexivePath a) :=
+  Quot.sound (rweqProp_of_rweq (doubleSingletonRweqEmpty a))
+
+/-- Instantiating the raw criterion on the current circle: every two raw loops
+at the base point are `RwEq`-related. -/
+theorem current_circle_rweq_total_on_loops :
+    RwEqTotalOnLoops Circle.{u} circleBase :=
+  (loop_quotient_contractible_iff_rweq_total Circle circleBase).mp
+    genuine_circle_piOne_contractible
+
+/-- The same raw statement for the current product torus. -/
+theorem current_torus_rweq_total_on_loops :
+    RwEqTotalOnLoops Torus.{u} torusBase :=
+  (loop_quotient_contractible_iff_rweq_total Torus torusBase).mp
+    genuine_torus_piOne_contractible
+
+/-! ## The exact trace fiber
+
+The obstruction of the trace case study is usually stated as "`List (Step A)`
+has two distinct reflexive elements".  The fiber can in fact be computed
+exactly: a step is determined by its source, so raw loops at `a` are precisely
+lists of points of `A`. -/
+
+/-- An elementary step is determined by its source: the stored equality forces
+its target, and that equality is itself proof-irrelevant. -/
+def stepEquivPoint (A : Type u) :
+    SimpleEquiv (_root_.ComputationalPaths.Step A) A where
+  toFun := fun s => s.src
+  invFun := fun x => _root_.ComputationalPaths.Step.mk x x rfl
+  left_inv := by
+    intro s
+    obtain ⟨src, tgt, proof⟩ := s
+    cases proof
+    rfl
+  right_inv := fun _ => rfl
+
+/-- Consequently a recorded trace is exactly a list of points of the carrier. -/
+def traceEquivPointList (A : Type u) :
+    SimpleEquiv (List (_root_.ComputationalPaths.Step A)) (List A) where
+  toFun := fun steps => steps.map (fun s => s.src)
+  invFun := fun points =>
+    points.map (fun x => _root_.ComputationalPaths.Step.mk x x rfl)
+  left_inv := by
+    intro steps
+    induction steps with
+    | nil => rfl
+    | cons s tail ih =>
+        obtain ⟨src, tgt, proof⟩ := s
+        cases proof
+        simpa using ih
+  right_inv := by
+    intro points
+    induction points with
+    | nil => rfl
+    | cons x tail ih => simpa using ih
+
+/-- Raw paths with the same trace are equal: the remaining field is a
+proof-irrelevant ambient equality. -/
+theorem path_eq_of_steps_eq {A : Type u} {a b : A} {p q : Path a b}
+    (h : p.steps = q.steps) : p = q := by
+  obtain ⟨ps, pp⟩ := p
+  obtain ⟨qs, qp⟩ := q
+  cases h
+  rfl
+
+/-- The reflexivity metadata fiber of the trace-carrying record, computed
+exactly: raw loops at `a` are lists of points of `A`.  Noncontractibility of
+this fiber is then immediate for any pointed carrier, since `[]` and `[a]`
+differ. -/
+def loopPathEquivPointList {A : Type u} (a : A) :
+    SimpleEquiv (Path a a) (List A) where
+  toFun := fun p => (traceEquivPointList A).toFun p.steps
+  invFun := fun points =>
+    Path.mk ((traceEquivPointList A).invFun points) rfl
+  left_inv := by
+    intro p
+    exact path_eq_of_steps_eq
+      ((traceEquivPointList A).left_inv p.steps)
+  right_inv := fun points => (traceEquivPointList A).right_inv points
+
+/-- The raw loop fiber is never contractible: `[]` and `[a]` are distinct
+points of the computed fiber `List A`. -/
+theorem raw_loop_fiber_not_contractible {A : Type u} (a : A) :
+    ¬ IsContractible (Path a a) := by
+  intro contraction
+  have listContr : IsContractible (List A) :=
+    (contractible_iff_of_equiv (loopPathEquivPointList a)).mp contraction
+  have : ([] : List A) = [a] := IsContractible.all_eq listContr _ _
+  simp at this
+
+/-! ## A nontrivial quotient repair that still fails
+
+Theorem `metadata_quotient_repair_criterion` is an equivalence, so its
+necessity direction has content only if some genuine quotient fails it.
+Trace-length parity is such a quotient: it identifies infinitely many distinct
+traces, yet leaves two reflexivity classes and therefore repairs nothing. -/
+
+/-- Trace-length parity as a setoid on recorded traces. -/
+def traceParitySetoid (A : Type u) :
+    Setoid (List (_root_.ComputationalPaths.Step A)) where
+  r := fun steps steps' => steps.length % 2 = steps'.length % 2
+  iseqv :=
+    { refl := fun _ => rfl
+      symm := fun h => h.symm
+      trans := fun h₁ h₂ => h₁.trans h₂ }
+
+/-- The parity quotient really does collapse distinct traces, so its failure is
+not the trivial failure of the discrete setoid. -/
+theorem traceParity_identifies_distinct_traces {A : Type u} (a : A) :
+    Quotient.mk (traceParitySetoid A)
+        ([] : List (_root_.ComputationalPaths.Step A)) =
+      Quotient.mk (traceParitySetoid A)
+        [_root_.ComputationalPaths.Step.mk a a rfl,
+          _root_.ComputationalPaths.Step.mk a a rfl] :=
+  Quotient.sound (show (0 : Nat) % 2 = 2 % 2 from rfl)
+
+/-- Parity is not total: the empty and singleton reflexive traces remain
+separated. -/
+theorem traceParity_not_setoidTotal {A : Type u} (a : A) :
+    ¬ SetoidTotal (traceParitySetoid A) := by
+  intro total
+  have h : (0 : Nat) % 2 = 1 % 2 :=
+    total ([] : List (_root_.ComputationalPaths.Step A))
+      [_root_.ComputationalPaths.Step.mk a a rfl]
+  exact absurd h (by decide)
+
+/-- Two reflexivity classes survive, so the parity quotient is not
+contractible. -/
+theorem traceParity_quotient_not_contractible {A : Type u} (a : A) :
+    ¬ IsContractible (Quotient (traceParitySetoid A)) := by
+  intro contraction
+  exact traceParity_not_setoidTotal a
+    ((quotient_contractible_iff_setoidTotal (traceParitySetoid A)
+      ([] : List (_root_.ComputationalPaths.Step A))).mp contraction)
+
+/-- Trace-length parity, viewed as a repair of the trace metadata family. -/
+def traceParityFamily {A : Type u} (a : A) :
+    MetadataSetoidFamily a (MetadataJ.TraceMetadata (A := A) (a := a)) :=
+  fun _ _ => traceParitySetoid A
+
+/-- Quotienting computational traces by length parity is a genuine, nontrivial
+quotient which nevertheless does *not* repair unrestricted based elimination.
+This is the promised worked failure of the necessity direction: collapsing
+metadata is not enough, the reflexivity fiber must become contractible. -/
+theorem trace_parity_repair_fails {A : Type u} (a : A) :
+    ¬ Nonempty
+      (UnrestrictedBasedEliminator.{max u u, w}
+        (quotientMetadataCenter a
+          (MetadataJ.TraceMetadata (A := A) (a := a))
+          (traceParityFamily a)
+          ([] : List (_root_.ComputationalPaths.Step A)))) := by
+  intro J
+  exact traceParity_not_setoidTotal a
+    ((metadata_quotient_repair_criterion a
+      (MetadataJ.TraceMetadata (A := A) (a := a))
+      (traceParityFamily a)
+      ([] : List (_root_.ComputationalPaths.Step A))).mp J)
+
 end MetadataRepair
 end Path
 end ComputationalPaths
