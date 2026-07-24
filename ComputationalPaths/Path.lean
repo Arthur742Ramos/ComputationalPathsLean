@@ -455,6 +455,8 @@ import ComputationalPaths.Path.TypeTheory.RawJudgments
 import ComputationalPaths.Path.TypeTheory.RawSemantics
 import ComputationalPaths.Path.TypeTheory.RawReduction
 import ComputationalPaths.Path.TypeTheory.RawErasure
+import ComputationalPaths.Path.TypeTheory.RawConversionNecessity
+import ComputationalPaths.Path.TypeTheory.RawErasureImage
 import ComputationalPaths.Path.TypeTheory.MLTTAdequacy
 import ComputationalPaths.Path.TypeTheory.MetadataJ
 import ComputationalPaths.Path.TypeTheory.MetadataRepair
