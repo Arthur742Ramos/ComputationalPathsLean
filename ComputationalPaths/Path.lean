@@ -450,6 +450,10 @@ import ComputationalPaths.Path.TypeTheory.IdentityTypePaths
 import ComputationalPaths.Path.TypeTheory.UnivalencePaths
 import ComputationalPaths.Path.TypeTheory.CwFDeep
 import ComputationalPaths.Path.TypeTheory.IdentityTypeDeep
+import ComputationalPaths.Path.TypeTheory.RawSyntax
+import ComputationalPaths.Path.TypeTheory.RawJudgments
+import ComputationalPaths.Path.TypeTheory.RawSemantics
+import ComputationalPaths.Path.TypeTheory.MLTTAdequacy
 import ComputationalPaths.Path.HoTT.PathAlgebraDeep
 import ComputationalPaths.Path.HoTT.TransportDeep
 import ComputationalPaths.Path.Homotopy.CubicalDeep
