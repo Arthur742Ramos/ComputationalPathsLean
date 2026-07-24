@@ -898,6 +898,22 @@ theorem path_eq_of_steps_eq {A : Type u} {a b : A} {p q : Path a b}
   cases h
   rfl
 
+/-- The full record form of a computational path: a list of points of the
+carrier together with the ambient equality it witnesses. -/
+def pathEquivPointListProd {A : Type u} (a b : A) :
+    SimpleEquiv (Path a b) (PProd (List A) (a = b)) where
+  toFun := fun p => ⟨(traceEquivPointList A).toFun p.steps, p.proof⟩
+  invFun := fun record =>
+    Path.mk ((traceEquivPointList A).invFun record.1) record.2
+  left_inv := by
+    intro p
+    exact path_eq_of_steps_eq
+      ((traceEquivPointList A).left_inv p.steps)
+  right_inv := by
+    rintro ⟨points, proof⟩
+    have h := (traceEquivPointList A).right_inv points
+    simp [h]
+
 /-- The reflexivity metadata fiber of the trace-carrying record, computed
 exactly: raw loops at `a` are lists of points of `A`.  Noncontractibility of
 this fiber is then immediate for any pointed carrier, since `[]` and `[a]`
