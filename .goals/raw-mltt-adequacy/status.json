@@ -1,6 +1,6 @@
 {
   "goal_id": "raw-mltt-adequacy",
-  "status": "building",
+  "status": "inspecting",
   "iteration": 2,
   "builder_model": "OpenAI:GPT-5.6-Sol",
   "inspector_model": "OpenAI:GPT-5.6-Luna",
@@ -11,6 +11,10 @@
       "iteration": 1,
       "verdict": "FAIL",
       "summary": "Semantic soundness was not quotient-compositional; subject reduction assumed target typing; universe levels were incoherent; RawJudgments Path evidence was decorative."
+    },
+    {
+      "iteration": 2,
+      "verdict": "PASS"
     }
   ]
 }
