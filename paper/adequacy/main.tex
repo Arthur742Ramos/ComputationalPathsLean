@@ -291,9 +291,9 @@ set/type-theoretic metatheory, matching the formal artifact.  We classify
 \emph{propositional} beta only.  We do not present a full syntax or model of
 Martin-L\"of type theory, do not assume or prove univalence or higher
 inductive types, and do not identify \eqref{eq:path-record} with the HoTT
-identity type.  The raw de Bruijn calculus previously developed alongside this
-work is preserved as a separate companion manuscript
-\cite{ScopedTraceSoftware2026}; Section~\ref{sec:formalization} describes the
+identity type.  The raw de Bruijn calculus developed alongside this work is
+published separately as a self-contained article
+\cite{ScopedTraceCalculus2026}; Section~\ref{sec:formalization} describes the
 division.
 
 \paragraph{Organization.}
@@ -2241,19 +2241,21 @@ theorem-bearing commit cited in~\cite{MetadataJSoftware2026}; the tag is not a
 placeholder DOI.  A future Zenodo archive may supplement that Git reference
 when a DOI has actually been issued.
 
-The earlier raw scope-indexed de Bruijn development is intentionally not
-interleaved with the theory paper.  Its complete manuscript is preserved at
-\[
-                  \texttt{paper/adequacy/companion/main.tex}.
-\]
-It independently develops raw syntax, substitution, primitive-redex
-preservation, syntactic quotients, and source identity programs, in a
-scope-indexed de Bruijn presentation \cite{deBruijn1972}.  The
-companion builds separately and remains useful as a formal-interface study,
-but none of those raw-calculus results is needed for
-Theorem~\ref{thm:metadata-fiber}.  This separation keeps the present article a
-mathematics/type-theory paper rather than a report on Lean or on a particular
-de Bruijn implementation.
+The raw scope-indexed de Bruijn development is intentionally not interleaved
+with the present theory paper.  It appears as a self-contained companion
+article \cite{ScopedTraceCalculus2026}, which develops raw syntax and its
+binder algebra, typed substitution, primitive-redex preservation, contextual
+and multi-step reduction with a conditional subject-reduction theorem,
+syntactic quotients, and source identity programs, in a scope-indexed
+de Bruijn presentation \cite{deBruijn1972}.  That article also proves that its
+quotient traces are \emph{unlabelled} in a precise sense: evaluation factors
+through a label-free syntax that cannot mention a source derivation.
+
+None of those raw-calculus results is needed for
+Theorem~\ref{thm:metadata-fiber}; the dependence runs the other way, in that
+the companion applies the present fiber criterion to its own trace records.
+Keeping the two separate leaves this article a mathematics/type-theory paper
+rather than a report on Lean or on a particular de Bruijn implementation.
 
 \section{Conclusion}
 \label{sec:conclusion}

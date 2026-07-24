@@ -2,7 +2,11 @@
 
 - `main.tex` is the focused article, *Equality with Observable
   Metadata: Diagnosis, Universal Quotient Repair, and the PathRwQuot Boundary*.
-- `companion/main.tex` is the distinct 37-page raw scoped-calculus manuscript.
+- `companion/main.tex` is a **self-contained** article, *A Scoped Calculus of
+  Equality Traces: Structural Metatheory, Contextual Reduction, and Derivation
+  Erasure*. It makes no reference to `main.tex` and is intended to be posted
+  independently; `main.tex` cites it as `ScopedTraceCalculus2026`. See
+  `companion/README.md`.
 - Each directory has its own `refs.bib` and builds independently with
   `latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex`.
 
