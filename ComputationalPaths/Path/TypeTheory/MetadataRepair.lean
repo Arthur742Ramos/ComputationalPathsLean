@@ -936,8 +936,9 @@ theorem raw_loop_fiber_not_contractible {A : Type u} (a : A) :
   intro contraction
   have listContr : IsContractible (List A) :=
     (contractible_iff_of_equiv (loopPathEquivPointList a)).mp contraction
-  have : ([] : List A) = [a] := IsContractible.all_eq listContr _ _
-  simp at this
+  have impossible : ([] : List A) = [a] :=
+    IsContractible.all_eq listContr _ _
+  exact List.noConfusion impossible
 
 /-! ## A nontrivial quotient repair that still fails
 
