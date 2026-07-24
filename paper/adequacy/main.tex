@@ -56,7 +56,7 @@ traces}
 \newcommand{\Jbeta}{\mathsf J^\beta}
 \newcommand{\Meta}{\mathsf M}
 \newcommand{\Tot}{\mathsf T}
-\newcommand{\Tr}{\mathsf{Tr}}
+\newcommand{\RwTot}{\mathsf{RwTot}}
 \newcommand{\Step}{\mathsf{Step}}
 \newcommand{\PathTy}{\mathsf{Path}}
 \newcommand{\refl}{\mathsf{refl}}
@@ -100,6 +100,8 @@ Thus every set-level repair supporting unrestricted \(J\) identifies all
 reflexivity metadata; no visible distinction can survive there.  The
 indiscrete relation is maximal as a relation, minimal in retained information,
 and terminal---not initial---for quotient-map-preserving factorizations.
+Trace-length parity shows that the criterion is not about how much a quotient
+identifies: it collapses infinitely many traces and still repairs nothing.
 
 The classification extends beyond sigma-shaped refinements.  For a reflexive
 projection \(q_b:R(b)\to(a=b)\), unrestricted elimination is equivalent to
@@ -108,19 +110,26 @@ contractibility of the reflexivity kernel
 \(\PRW\), this yields the exact local criterion: elimination exists if and only
 if the genuine loop quotient is trivial, equivalently local quotient-level
 axiom K holds.  The theorem says neither that rewrite quotienting always repairs
-\(J\) nor that it always fails.
+\(J\) nor that it always fails.  Pushing the criterion back to representatives
+removes the quotient entirely: it holds exactly when \(\mathsf{RwEq}\) relates
+every pair of raw loops at the base point, so an eliminator is precisely as
+strong as a rewrite certificate between any two loops.
 
-Finally we audit the computational-path examples.  Empty and singleton
-reflexive raw paths are unequal records but are explicitly
+Finally we audit the computational-path examples.  The reflexivity fiber of the
+trace record is computed exactly---it is \(\List(A)\)---so failure there is
+unconditional on every pointed carrier.  Empty and singleton reflexive raw paths
+are unequal records but are explicitly
 \(\mathsf{RwEq}\)-equivalent.  The current ``circle'' is a one-constructor Lean
 type and the current ``torus'' its product, so their genuine \(\PRW\)
 fundamental groups are contractible.  The separately defined winding-expression
 quotients are equivalent to \(\mathbb Z\) and \(\mathbb Z^2\), hence
 noncontractible; consequently no equivalence can bridge the genuine and
 synthetic objects under the present definitions.  A Lean development verifies
-the quotient exactness, factorization, kernel, trace, contractibility, and
-no-bridge results.  The scope remains proof-irrelevant ambient equality with
-propositional beta, not full Martin-L\"of or homotopy type theory.
+the quotient exactness, factorization, kernel, raw-level, computed-fiber,
+trace, contractibility, and no-bridge results, using only propositional
+extensionality and quotient soundness.  The scope remains proof-irrelevant
+ambient equality with propositional beta, not full Martin-L\"of or homotopy
+type theory.
 \end{abstract}
 
 \maketitle
@@ -259,8 +268,17 @@ The paper provides:
   criterion and unique terminal factorization direction;
 \item the projection/kernel theorem and its
   \(\PRW\)/local-axiom-K specialization;
+\item a raw-level form of that criterion: \(\PRW\) elimination holds exactly
+  when \(\mathsf{RwEq}\) connects every pair of raw loops, which exhibits the
+  rewrite quotient as an instance of the setoid classification and makes the
+  condition checkable without forming any quotient;
 \item a factorization theorem for equality-projection motives, including
   motives fiberwise equivalent to strict pullbacks;
+\item an exact computation of the trace fiber, \(\PathTy_A(a,a)\Eqv\List(A)\),
+  from which failure for raw records is unconditional on every pointed carrier;
+\item a worked nontrivial quotient---trace-length parity---that collapses
+  infinitely many traces and still repairs nothing, showing that the necessity
+  direction of the repair criterion has content;
 \item an explicit raw-versus-\(\mathsf{RwEq}\) reflexivity calculation; and
 \item formal contractibility, noncontractibility, and no-bridge results
   separating the current genuine circle and torus loop quotients from their
@@ -282,12 +300,14 @@ division.
 Section~\ref{sec:setting} fixes the metatheory.
 Section~\ref{sec:total-space} proves the general total-space classification.
 Section~\ref{sec:metadata} proves Theorem~\ref{thm:headline}.
-Section~\ref{sec:setoid-repair} classifies setoid quotient repairs and proves
-the indiscrete terminal factorization theorem.
-Section~\ref{sec:projection-kernel} proves the projection/kernel theorem and
-the exact \(\PRW\)/K criterion.
+Section~\ref{sec:setoid-repair} classifies setoid quotient repairs, exhibits a
+nontrivial quotient that repairs nothing, and proves the indiscrete terminal
+factorization theorem.
+Section~\ref{sec:projection-kernel} proves the projection/kernel theorem, the
+exact \(\PRW\)/K criterion, and its quotient-free reformulation.
 Section~\ref{sec:factorization} gives the factorizing-motive theorem.
-Section~\ref{sec:traces} is the principal raw-trace case study, and
+Section~\ref{sec:traces} is the principal raw-trace case study, where the
+reflexivity fiber is computed exactly, and
 Section~\ref{sec:genuine-synthetic} audits the circle and torus definitions.
 Section~\ref{sec:examples} classifies further metadata.  Sections
 \ref{sec:comparison}--\ref{sec:conclusion} state boundaries, related work,
@@ -814,7 +834,45 @@ fibers cannot appear in this equality-indexed family once \(m_0\) is given,
 whereas Warning~\ref{warn:empty-carrier} still governs standalone quotient
 claims.
 
+\subsection{A nontrivial quotient that repairs nothing}
+\label{subsec:parity}
+
+The necessity direction of Theorem~\ref{thm:universal-repair} has content only
+if some genuine quotient fails it.  It is worth exhibiting one, because the
+informal instruction ``quotient the administrative metadata'' can easily
+produce a quotient that collapses a great deal and still repairs nothing.
+
+\begin{example}[Trace-length parity]
+\label{ex:parity}
+Let \(M_{\mathrm{tr}}(b,h)=\List(\Step(A))\) be the trace metadata of
+Section~\ref{sec:traces} and let \(S^{\mathrm{par}}\) relate two traces exactly
+when their lengths have the same parity.  This setoid is far from discrete: each
+class contains infinitely many pairwise distinct traces, and, for instance,
+\[
+ \bigl[\Empty\bigr]
+ =
+ \bigl[\,[\,a\xrightarrow{\refl_a}a,\;a\xrightarrow{\refl_a}a\,]\,\bigr].
+\tag{5.20}\label{eq:parity-collapse}
+\]
+It is nevertheless not total, because \(\Empty\) has even length while
+\([\,a\xrightarrow{\refl_a}a\,]\) has odd length.  These two traces therefore
+have distinct images, so by Theorem~\ref{thm:quotient-contractible} the
+reflexivity quotient is not contractible, and by
+Theorem~\ref{thm:universal-repair} the parity-repaired refinement still admits
+no unrestricted based eliminator.
+\end{example}
+
+Example~\ref{ex:parity} isolates the misconception cleanly.  Quotienting is not
+measured by how much it identifies, nor by whether the resulting classes have
+canonical representatives, nor by decidability of the induced equality.  The
+only relevant question is whether the reflexivity quotient is contractible.
+Parity identifies infinitely many traces and still fails; the indiscrete
+relation of Section~\ref{subsec:indiscrete} is the smallest strengthening that
+cannot fail, because by Theorem~\ref{thm:universal-repair} success already
+forces every pair to be related.
+
 \subsection{The indiscrete repair}
+\label{subsec:indiscrete}
 
 \begin{definition}[Indiscrete setoid]
 \label{def:indiscrete}
@@ -1109,6 +1167,107 @@ relative to a separately supplied complete step system.  This distinction is
 crucial when claiming that a quotient collapses a particular raw trace.
 \end{remark}
 
+\subsection{Removing the quotient from the criterion}
+\label{subsec:raw-criterion}
+
+Theorem~\ref{thm:pathrw-k} is stated at quotient level, which makes it awkward
+to check: verifying \(\LocalK(A,a)\) appears to require reasoning about
+classes.  It can be pushed back to raw paths.  Doing so also exhibits
+Section~\ref{sec:projection-kernel} as an \emph{instance} of
+Section~\ref{sec:setoid-repair} rather than a parallel development, because
+\(\PRW_A(a,b)\) is literally an ordinary setoid quotient: its carrier is
+\(\PathTy_A(a,b)\) and its relation is \(\mathsf{RwEq}\).
+
+\begin{definition}[Rewrite-connected loops]
+\label{def:rweq-total}
+Say that \(\mathsf{RwEq}\) is \emph{total on loops at \(a\)} when every two raw
+loops admit a rewrite certificate:
+\[
+ \RwTot(A,a)
+ \quad:\!\!\Longleftrightarrow\quad
+ \prod_{p,q:\PathTy_A(a,a)}
+   \bigl\|\,p\mathrel{\mathsf{RwEq}}q\,\bigr\|.
+\tag{6.13}\label{eq:rweq-total}
+\]
+Here \(\|-\|\) is the propositional inhabitance used by the defining setoid, so
+\eqref{eq:rweq-total} is exactly \(\SetTot\) for the relation \(\mathsf{RwEq}\)
+on the carrier \(\PathTy_A(a,a)\).  No quotient occurs
+in~\eqref{eq:rweq-total}.
+\end{definition}
+
+\begin{theorem}[Raw-level criterion]
+\label{thm:raw-criterion}
+For every \(A\) and \(a:A\), the following are equivalent:
+\[
+\begin{split}
+ &\text{\(\PRW_A(a,-)\), based at \([\mathbf r_a]\), admits
+   unrestricted \(J^\beta\);}\\
+ &\isContr\bigl(\PRW_A(a,a)\bigr);\qquad
+  \LocalK(A,a);\qquad
+  \RwTot(A,a).
+\end{split}
+\tag{6.14}\label{eq:raw-criterion}
+\]
+\end{theorem}
+
+\begin{proof}
+Equivalence of the first three is Theorem~\ref{thm:pathrw-k}.  For the last,
+apply Corollary~\ref{cor:quotient-total} to the setoid \(\mathsf{RwEq}\) on the
+carrier \(\PathTy_A(a,a)\); the chosen center \(\mathbf r_a\) supplies
+inhabitance.  Sufficiency is quotient soundness and necessity is quotient
+exactness, exactly as in Theorem~\ref{thm:quotient-contractible}.
+\end{proof}
+
+\begin{corollary}[Eliminators manufacture certificates]
+\label{cor:eliminator-certificates}
+If \(\PRW_A(a,-)\) admits unrestricted based elimination with propositional
+beta, then for every pair of raw loops \(p,q:\PathTy_A(a,a)\) there is an
+actual \(\mathsf{RwEq}\) derivation between them.
+\end{corollary}
+
+Corollary~\ref{cor:eliminator-certificates} is the sharp form of the ``no
+unconditional slogan'' point.  Assuming such an eliminator is not a mild
+structural convenience: it is exactly as strong as asserting that the rewrite
+system connects every raw loop at \(a\) to every other.  Conversely, this is
+what one proves in practice.  Proposition~\ref{prop:subsingleton-loop-quotient}
+below establishes \(\RwTot(A,a)\) directly, by constructing the derivations, and
+only then reads off contractibility; it does not first form the quotient.
+
+A small instance shows the shape of such a derivation.  Write
+\(\mathbf s_a=\bigl([\,a\xrightarrow{\refl_a}a\,],\refl_a\bigr)\) for the
+singleton reflexive trace, formally introduced in
+Definition~\ref{def:two-traces}.  Composing it with itself gives a two-step raw
+loop, and
+\[
+ \mathbf s_a\cdot\mathbf s_a
+ \;\mathrel{\mathsf{RwEq}}\;
+ \mathbf r_a
+\tag{6.15}\label{eq:double-singleton}
+\]
+is obtained by congruence under composition, the primitive
+transport-reflexivity erasure, the left-unit rule, and a second erasure.  The
+two sides of~\eqref{eq:double-singleton} are distinct \(\PathTy\) records, so
+this is a genuine derivation and not an instance of reflexivity.
+
+\begin{remark}[Global form]
+\label{rem:raw-global}
+Quantifying over base points, family-wide elimination for \(\PRW\) is
+equivalent to \(\prod_{a:A}\RwTot(A,a)\).  Whether some carrier violates
+\(\RwTot(A,a)\) is a question about the specific primitive rule set of
+LND\(_{\mathrm{EQ}}\)-TRS, not about the classification, and we do not settle it
+here.  What Theorem~\ref{thm:raw-criterion} contributes is that the question is
+now completely elementary: it asks only whether two given step lists are
+connected by primitive rewrites.
+\end{remark}
+
+The contrast with the unquotiented record is worth stating explicitly.  For raw
+\(\PathTy\) the answer is unconditional and negative for every pointed carrier
+(Theorem~\ref{thm:no-trace-j}, sharpened by
+Proposition~\ref{prop:trace-fiber-computed}).  For \(\PRW\) the answer is
+conditional, and the condition is~\eqref{eq:rweq-total}.  Quotienting therefore
+changes the problem from ``always fails'' to ``fails exactly when some raw loop
+is not rewrite-connected to reflexivity''.
+
 \section{The largest explicitly supported class of motives}
 \label{sec:factorization}
 
@@ -1250,6 +1409,48 @@ Reordering fields gives mutually inverse maps
 \]
 Both inverse equations are reflexivity of records.  Thus this is not only an
 analogy: \(\PathTy\) is the corresponding equality refinement.
+
+The reflexivity fiber can be computed outright, which makes the obstruction
+below quantitative rather than merely nonempty.
+
+\begin{proposition}[The trace fiber, computed]
+\label{prop:trace-fiber-computed}
+A step is determined by its source, so \(\Step(A)\Eqv A\).  Consequently
+\[
+ \PathTy_A(a,b)\Eqv\List(A)\times(a=b),
+ \qquad
+ \PathTy_A(a,a)\Eqv\List(A).
+\tag{8.5a}\label{eq:trace-fiber-computed}
+\]
+\end{proposition}
+
+\begin{proof}
+Send \(s:\Step(A)\) to its source, and \(x:A\) to \((x,x,\refl_x)\).
+Eliminating the stored equality of \(s\) replaces the target by the source, and
+the equality field is then proof-irrelevant, so the two composites are
+identities.  Applying this pointwise to lists gives
+\(\List(\Step(A))\Eqv\List(A)\), and reordering fields as in
+\eqref{eq:path-refinement} gives the first equivalence.  For the second, the
+remaining component \(a=a\) is a proof-irrelevant proposition, so two loops with
+the same trace are equal.
+\end{proof}
+
+\begin{corollary}[Unconditional failure for raw traces]
+\label{cor:raw-unconditional}
+For every \(A\) and every \(a:A\), the reflexivity metadata fiber
+\(M_{\mathrm{tr}}(a,\refl_a)=\List(\Step(A))\) is equivalent to \(\List(A)\),
+which contains the distinct elements \(\Empty\) and \([a]\).  Hence that fiber
+is never contractible and, by Theorem~\ref{thm:metadata-fiber}, raw
+computational paths never admit unrestricted based elimination with
+propositional beta.  Equivalently, \(\PathTy_A(a,a)\Eqv\List(A)\) is itself
+never contractible.
+\end{corollary}
+
+The point of Proposition~\ref{prop:trace-fiber-computed} is that no auxiliary
+hypothesis on \(A\) is available to rescue the raw record.  A pointed carrier
+already forces two visible reflexive traces.  This is the exact sense in which
+the raw obstruction is unconditional, in contrast with the conditional
+\(\PRW\) criterion of Theorem~\ref{thm:raw-criterion}.
 
 \begin{definition}[Two reflexive traces]
 \label{def:two-traces}
@@ -1478,6 +1679,16 @@ For a quotient class \([p]\), quotient soundness gives
 
 The proof is stronger than an equality-of-normalizations argument: it builds
 the rewrite certificate needed by the defining quotient relation.
+
+\begin{remark}[The proposition verifies the raw criterion]
+\label{rem:subsingleton-verifies-raw}
+The first conclusion of Proposition~\ref{prop:subsingleton-loop-quotient} is
+already \(\RwTot(A,a)\): composing the derivation for \(p\) with the reverse of
+the derivation for \(q\) relates any two loops.  Theorem~\ref{thm:raw-criterion}
+then yields~\eqref{eq:subsingleton-loop-contractible} without a separate
+quotient argument.  This is the intended use of the raw criterion---one exhibits
+rewrite derivations, not quotient classes.
+\end{remark}
 
 \subsection{The current genuine circle and torus}
 
@@ -1849,7 +2060,11 @@ classes, and ambient equality rather than moving silently between them.
   quotients.  It does not claim the same converse for higher quotients or
   quotient-like interfaces without exactness.
 \item The \(\PRW\) theorem is conditional on local K; it does not label
-  `RwEq` a universal success or a universal failure.
+  `RwEq` a universal success or a universal failure.  Equivalently, by
+  Theorem~\ref{thm:raw-criterion}, it does not decide whether every raw loop of
+  every carrier is rewrite-connected to reflexivity.  That is a question about
+  the primitive rule set, and we leave it open; the classification is valid
+  either way.
 \item The no-bridge theorems concern the current one-constructor circle,
   product torus, and `SimpleEquiv`.  They do not preclude a future genuinely
   higher-inductive carrier with a different loop theory.
@@ -1917,6 +2132,16 @@ record refining it, without a fibrancy judgment.  The methodological
 similarity is only the insistence that the available eliminator be attached to
 the correct equality notion.
 
+Categorical frameworks for dependent type theory---categories with attributes
+and comprehension categories, internal type theory, and their more recent
+uniform formulations \cite{Cartmell1986,Dybjer1996,Hofmann1997,Uemura2023}---fix
+the structure that an identity type must satisfy in a model.  The present
+classification is complementary and deliberately more modest: it takes ambient
+equality as given and asks which \emph{refinements} of it retain the based
+eliminator.  A refinement failing the criterion is not thereby a defective
+implementation; it is simply not an identity type, and it should be exposed
+through the projection of Section~\ref{sec:factorization} instead.
+
 The computational-path literature motivates the trace application and the
 use of explicit rewrite histories
 \cite{deQueirozEtAl2016,RamosEtAl2017,RamosEtAl2018,RamosEtAl2026}.
@@ -1972,6 +2197,21 @@ results:
 \item \path{projection_kernel_criterion},
   \path{pathRwQuot_elimination_iff_loop_quotient_contractible}, and
   \path{pathRwQuot_elimination_iff_local_axiomK};
+\item the raw-level criterion
+  \path{loop_quotient_contractible_iff_rweq_total},
+  \path{local_axiomK_iff_rweq_total},\\
+  \path{pathRwQuot_elimination_iff_rweq_total},
+  \path{elimination_forces_rweq_on_raw_loops}, and the explicit derivation
+  \path{doubleSingletonRweqEmpty} with its quotient consequence
+  \path{double_singleton_same_pathRwQuot_class};
+\item the computed trace fiber \path{stepEquivPoint},
+  \path{traceEquivPointList}, \path{path_eq_of_steps_eq},
+  \path{pathEquivPointListProd}, \path{loopPathEquivPointList}, and
+  \path{raw_loop_fiber_not_contractible};
+\item the failing nontrivial repair \path{traceParitySetoid},
+  \path{traceParity_identifies_distinct_traces},
+  \path{traceParity_not_setoidTotal}, and
+  \path{trace_parity_repair_fails};
 \item \path{raw_empty_ne_singleton_reflexive_path},
   \path{raw_empty_rweq_singleton_reflexive_path}, and
   \path{raw_empty_singleton_same_pathRwQuot_class}; and
@@ -1986,9 +2226,15 @@ results:
 The pointed-subsingleton proof constructs a multi-step `RwEq` derivation by
 induction on the stored trace; the raw singleton theorem uses the primitive
 \path{Step.transport_refl_beta} rule.  The new file contains no custom axioms,
-`sorry`, or `admit`.  Lean's axiom report for the principal quotient-repair and
-no-bridge theorems contains only propositional extensionality and quotient
-soundness; no classical choice is introduced by this development.
+`sorry`, or `admit`.  Lean's axiom report was checked for every displayed
+theorem above.  The quotient-based results---setoid classification, repair
+criterion, factorization, \(\PRW\)/K, the raw-level criterion, the parity
+failure, contractibility, and both no-bridge theorems---depend only on
+\texttt{propext} and \texttt{Quot.sound}; the projection/kernel criterion
+depends on no axiom at all, and the computed-fiber results depend only on
+\texttt{propext}.  In particular \texttt{Classical.choice} is not introduced by
+this development, so the classification is constructive relative to
+propositional extensionality and quotient soundness.
 
 The release tag \texttt{metadata-quotient-repair-v2} names the stable
 theorem-bearing commit cited in~\cite{MetadataJSoftware2026}; the tag is not a
@@ -2001,7 +2247,8 @@ interleaved with the theory paper.  Its complete manuscript is preserved at
                   \texttt{paper/adequacy/companion/main.tex}.
 \]
 It independently develops raw syntax, substitution, primitive-redex
-preservation, syntactic quotients, and source identity programs.  The
+preservation, syntactic quotients, and source identity programs, in a
+scope-indexed de Bruijn presentation \cite{deBruijn1972}.  The
 companion builds separately and remains useful as a formal-interface study,
 but none of those raw-calculus results is needed for
 Theorem~\ref{thm:metadata-fiber}.  This separation keeps the present article a
@@ -2037,13 +2284,20 @@ The diagnosis now has a universal ordinary-quotient repair.  Given setoids
 when \(S_{a,\refl_a}\) is total.  Every successful set-level repair therefore
 identifies all reflexivity metadata.  The indiscrete relation is the canonical
 instance: maximal as a relation, minimal in retained information, and terminal
-for representative-preserving quotient factors.
+for representative-preserving quotient factors.  Trace-length parity shows the
+criterion is genuinely about contractibility rather than about the amount
+identified: it collapses infinitely many traces and repairs nothing.
 
 The projection/kernel theorem removes the need for a sigma presentation.
 For `PathRwQuot.toEq`, it yields the exact local-K criterion rather than a
-blanket slogan about rewrite quotienting.  Empty and singleton reflexive paths
-show why this precision matters: they are distinct raw records but explicitly
-`RwEq`-equivalent and hence equal in the quotient.
+blanket slogan about rewrite quotienting, and its raw-level form replaces that
+criterion by an elementary statement about representatives: every two raw loops
+at the base point must admit a rewrite derivation.  An eliminator for the
+rewrite quotient is therefore exactly as strong as that connectivity assertion.
+Empty and singleton reflexive paths show why this precision matters: they are
+distinct raw records but explicitly `RwEq`-equivalent and hence equal in the
+quotient.  The raw record itself is beyond repair without quotienting, since its
+reflexivity fiber is exactly \(\List(A)\) for every pointed carrier.
 
 Finally, the circle and torus audit separates constructions that current legacy
 names had obscured.  The genuine loop quotients of the one-constructor circle
