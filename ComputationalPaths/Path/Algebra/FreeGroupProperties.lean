@@ -7,10 +7,12 @@ This module records baseline free-group properties needed by later developments:
 - `freeGroupOne_is_cyclic`: Nielsen-Schreier base case (F₁ is cyclic).
 - `torsionFree_one`: F₁ has no nontrivial torsion.
 - `freeGroup_rank_formula_one`: rank formula base case for F₁.
-- `figureEightPiOneEquivIntWords`: connect π₁(figure-eight) to free ℤ-words.
+- `figureEightPiOneEquivIntWords`: conditional connection from the
+  figure-eight presentation to free ℤ-words.
 
 The proofs reuse the explicit word normalization in `BouquetN` and the
-π₁(S¹) ≃ ℤ equivalence from `CircleStep`.
+synthetic winding-quotient equivalence from `CircleStep`.  That equivalence is
+not the genuine `PathRwQuot` of the current one-constructor `Circle`.
 -/
 
 import ComputationalPaths.Path.CompPath.BouquetN

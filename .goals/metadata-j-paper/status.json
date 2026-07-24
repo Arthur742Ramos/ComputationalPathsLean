@@ -1,0 +1,16 @@
+{
+  "goal_id": "metadata-j-paper",
+  "status": "completed",
+  "iteration": 1,
+  "builder_model": "OpenAI:GPT-5.6-Sol",
+  "inspector_model": "OpenAI:GPT-5.6-Luna",
+  "initial_sha": "cf79dfaa56e77b0b929c26f4598383503b1d3b6c",
+  "created_at": "2026-07-24T01:31:27.596-04:00",
+  "history": [
+    {
+      "iteration": 1,
+      "verdict": "PASS",
+      "summary": "Generic metadata-J theory, Path/composable-trace corollaries, focused 15-page paper, and 37-page companion all passed independent verification."
+    }
+  ]
+}

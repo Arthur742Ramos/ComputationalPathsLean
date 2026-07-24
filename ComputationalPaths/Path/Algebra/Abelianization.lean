@@ -1408,26 +1408,28 @@ noncomputable def kleinBottle_nonAbelian :
     Path True True :=
   kleinBottle_nonAbelian_cert.summaryPath
 
-/-! ## First Homology
+/-! ## Legacy first-homology count certificates
 
-By Hurewicz, H₁(X) ≃ π₁(X)^ab for path-connected X.
+The declarations below package generator/rank counts as `Path True True`.
+They do not instantiate a Hurewicz equivalence or compute homology of the
+current `CompPath.Circle`/`Torus` carriers.
 -/
 
-/-- H₁(circle) ≃ ℤ -/
+/-- Legacy numerical certificate labeled as the circle H₁ count. -/
 noncomputable def circle_H1_cert : AbelianizationComputationCertificate :=
   mkAbelianizationCertificate 1 0 1 rfl
 
 noncomputable def circle_H1 :
-    -- H₁(S¹) ≃ π₁(S¹)^ab ≃ ℤ^ab ≃ ℤ
+    -- Count-only certificate; no genuine circle π₁/H₁ equivalence.
     Path True True :=
   circle_H1_cert.summaryPath
 
-/-- H₁(torus) ≃ ℤ² -/
+/-- Legacy numerical certificate labeled as the torus H₁ count. -/
 noncomputable def torus_H1_cert : AbelianizationComputationCertificate :=
   mkAbelianizationCertificate 2 0 2 rfl
 
 noncomputable def torus_H1 :
-    -- H₁(T²) ≃ π₁(T²)^ab ≃ (ℤ × ℤ)^ab ≃ ℤ × ℤ
+    -- Count-only certificate; no genuine torus π₁/H₁ equivalence.
     Path True True :=
   torus_H1_cert.summaryPath
 

@@ -63,7 +63,9 @@ theorem CompleteStepSystem.unique_normal_form_class {A : Type u} {a b : A}
   refine ⟨S.classOf p, ?_⟩
   exact ⟨p, ⟨RwEq.refl p⟩, rfl⟩
 
-/-- Deciding `RwEq` reduces to comparing normal forms. -/
+/-- Given an explicit `CompleteStepSystem`, deciding `RwEq` reduces to
+comparing that system's normal forms.  This is not a claim about the bare
+proof-erasing `Path.normalize` function. -/
 noncomputable def CompleteStepSystem.decideRwEq {A : Type u} {a b : A}
     (S : CompleteStepSystem (A := A) a b)
     (p q : Path a b) : Decidable (RwEqProp p q) := by

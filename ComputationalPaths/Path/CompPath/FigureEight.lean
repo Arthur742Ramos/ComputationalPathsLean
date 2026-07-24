@@ -79,21 +79,21 @@ noncomputable def inrCircle (x : Circle) : FigureEight := Wedge.inr x
 noncomputable def glue : Path (inlCircle circleBase) (inrCircle circleBase) :=
   Wedge.glue (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase)
 
-/-! ## The Two Fundamental Loops
+/-! ## Two legacy raw loop paths
 
-The figure-eight has two fundamental loops:
+The construction supplies two named raw paths:
 - Loop A: goes around the left circle
 - Loop B: goes around the right circle (conjugated by glue)
 
-These generate the fundamental group freely.
+No freeness or nontriviality follows for the current carriers; the circle loop
+classes are contractible, and the later SVK equivalence is conditional.
 -/
 
-/-- Loop A: The fundamental loop of the left circle, embedded in the figure-eight.
-This is simply the left circle's loop, which is already based at the basepoint. -/
+/-- Loop A: the legacy raw circle loop embedded in the left summand. -/
 noncomputable def loopA : Path (A := FigureEight) base base :=
   Pushout.inlPath (A := Circle) (B := Circle) (C := PUnit') (f := fun _ => circleBase) (g := fun _ => circleBase) circleLoop
 
-/-- Loop B: The fundamental loop of the right circle, conjugated to be based at
+/-- Loop B: the legacy raw loop of the right circle, conjugated to be based at
 the figure-eight basepoint.
 
 Since the right circle's basepoint is identified with the left via glue,
@@ -148,8 +148,10 @@ noncomputable def figureEightProvenanceEquiv :
     (WedgeProvenance.wedgeProvenanceEquiv
       (A := Circle) (B := Circle) (a₀ := circleBase) (b₀ := circleBase))
 
-/-- SVK equivalence for the figure-eight (free product words over π₁(S¹)).
-Requires `HasWedgeSVKDecodeBijective` for the wedge decode map. -/
+/-- Conditional SVK equivalence for the figure-eight, with free-product words
+over the current genuine circle loop quotient.  The required
+`HasWedgeSVKDecodeBijective` hypothesis is not supplied here, and the current
+circle factor itself is contractible. -/
 noncomputable def figureEightPiOneEquiv
     [HasWedgeSVKDecodeBijective Circle Circle circleBase circleBase] :
     PathSimpleEquiv FigureEightPiOne
@@ -226,15 +228,16 @@ This module establishes:
 1. **Figure-Eight Definition**: `FigureEight := Wedge Circle Circle`
 
 2. **Two Generators**:
-   - `loopA`: The left circle's fundamental loop
-   - `loopB`: The right circle's loop (conjugated by glue)
+   - `loopA`: the left summand's legacy raw loop
+   - `loopB`: the right summand's legacy raw loop (conjugated by glue)
 
-3. **Fundamental Group Elements**:
-   - `loopAClass` and `loopBClass` are the π₁ classes of the two loops.
+3. **Loop-quotient elements**:
+   - `loopAClass` and `loopBClass` are the quotient classes of the two raw paths;
+     no distinctness claim is made.
 
-4. **Fundamental Group Equivalence**:
-    - `figureEightPiOneEquiv` identifies π₁(FigureEight) with free product words,
-      using the SVK decode bijectivity assumption (inverse laws witnessed by `Path`).
+4. **Conditional quotient equivalence**:
+    - `figureEightPiOneEquiv` requires the SVK decode-bijectivity assumption and
+      targets free-product words over the current genuine circle factors.
 
 5. **Provenance SVK Equivalence**:
     - `figureEightProvenanceEquiv` provides the constructive SVK-style equivalence

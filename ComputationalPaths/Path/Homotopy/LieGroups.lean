@@ -6,6 +6,13 @@ and classical Lie group theory. It demonstrates how the abstract computational
 path approach captures the homotopy theory of important mathematical objects
 without requiring the smooth manifold structure.
 
+**Scope correction.**  The `circlePiOne` and `torusPiOne` values used in the
+SO(2), U(1), and torus examples below are synthetic winding-expression
+quotients.  They are not the genuine `PathRwQuot` loop fibers of the current
+one-constructor `Circle` and product `Torus`, which are contractible.  The
+classical table is background; the synthetic examples do not formalize those
+topological identifications.
+
 ## Mathematical Background
 
 A **Lie group** is a smooth manifold that is also a group, with smooth
@@ -36,8 +43,8 @@ The computational paths framework captures homotopy-theoretic aspects:
 
 | Section | Description |
 |---------|-------------|
-| `SO2`, `U1` | 2D rotation group and unit complex numbers, π₁ ≃ ℤ |
-| `TorusN` | n-torus T^n = (S¹)^n with basepoint and integer tuples |
+| `SO2`, `U1` | aliases of the current one-point circle plus separate synthetic winding data |
+| `TorusN` | iterated products of the current carrier, with synthetic integer tuples kept separate |
 | `MaximalTorusU` | T^n as maximal torus in U(n) |
 | `MaximalTorusSU` | T^{n-1} as maximal torus in SU(n) |
 | `IsSimplyConnected` | Definition and examples of simply connected types |
@@ -47,9 +54,9 @@ The computational paths framework captures homotopy-theoretic aspects:
 
 | Definition/Theorem | Statement |
 |-------------------|-----------|
-| `SO2.piOneEquivInt` | π₁(SO(2)) ≃ ℤ |
-| `U1.piOneEquivInt` | π₁(U(1)) ≃ ℤ |
-| `TorusN.torus2PiOneEquiv` | π₁(T²) ≃ ℤ × ℤ |
+| `SO2.piOneEquivInt` | synthetic circle winding quotient ≃ ℤ |
+| `U1.piOneEquivInt` | synthetic circle winding quotient ≃ ℤ |
+| `TorusN.torus2PiOneEquiv` | synthetic product winding quotient ≃ ℤ × ℤ |
 | `sphere2_simplyConnected_at_base` | π₁(S²) = 1 |
 | `simplyConnected_unique_path` | Simply connected ⟹ unique path class |
 
@@ -127,7 +134,9 @@ Topologically, SO(2) is homeomorphic to the circle S¹. Every rotation
 R_θ is uniquely determined by an angle θ ∈ [0, 2π), and as θ varies,
 the rotations trace out a circle.
 
-We identify SO(2) with Circle directly, inheriting all the π₁ machinery. -/
+The following alias reuses the current one-constructor `Circle` only as a
+carrier.  It is not a topological equivalence with classical SO(2), and its
+genuine `PathRwQuot` loop fiber is contractible. -/
 abbrev SO2 : Type u := Circle
 
 namespace SO2
@@ -135,49 +144,42 @@ namespace SO2
 /-- The identity element of SO(2): the identity rotation (θ = 0). -/
 noncomputable def e : SO2 := circleBase
 
-/-- The generator of π₁(SO(2)): a full rotation by 2π.
-
-This corresponds to circleLoop and represents the non-trivial element
-in π₁(SO(2)) ≃ ℤ. Going around once in SO(2) is not homotopic to staying
-at the identity, reflecting the fact that SO(2) is not simply connected. -/
+/-- A raw loop named as a full rotation.  On the current one-constructor
+carrier its genuine `PathRwQuot` class is reflexive; nontrivial winding belongs
+only to the separate synthetic expression quotient. -/
 noncomputable def fullRotation : Path e e :=
   (Path.stepChain rfl).trans (circleLoop.trans (Path.stepChain rfl))
 
-/-- **Main Theorem**: π₁(SO(2)) ≃ ℤ
-
-The fundamental group of the 2D rotation group is the integers.
-This is inherited directly from π₁(S¹) ≃ ℤ.
-
-**Physical interpretation**: The integer n corresponds to the winding number -
-how many times a loop in SO(2) "wraps around" the group. -/
+/-- Legacy API for the synthetic circle winding equivalence with `Int`.
+This is not an equivalence from the genuine `PathRwQuot` of `SO2`. -/
 noncomputable def piOneEquivInt :
     SimpleEquiv circlePiOne Int :=
   circlePiOneEquivInt
 
-/- The fundamental loop as an element of the circle π₁. -/
+/- Winding-one element of the synthetic circle quotient. -/
 noncomputable def piOneGenerator : circlePiOne :=
   piOneEquivInt.symm 1
 
-/-- The winding number of a loop in SO(2). -/
+/-- Winding number on the synthetic circle quotient. -/
 noncomputable def windingNumber : circlePiOne → Int :=
   piOneEquivInt
 
-/-- `Path` witness for the left inverse of `π₁(SO(2)) ≃ ℤ`. -/
+/-- `Path` witness for the left inverse of the synthetic equivalence. -/
 noncomputable def piOneEquivInt_left_inv_path (α : circlePiOne) :
     Path (piOneEquivInt.invFun (piOneEquivInt.toFun α)) α :=
   Path.stepChain (piOneEquivInt.left_inv α)
 
-/-- `Path` witness for the right inverse of `π₁(SO(2)) ≃ ℤ`. -/
+/-- `Path` witness for the right inverse of the synthetic equivalence. -/
 noncomputable def piOneEquivInt_right_inv_path (z : Int) :
     Path (piOneEquivInt.toFun (piOneEquivInt.invFun z)) z :=
   Path.stepChain (piOneEquivInt.right_inv z)
 
-/-- The fundamental loop in `SO(2)` has winding number `1`. -/
+/-- The synthetic winding-one element encodes to `1`. -/
 theorem windingNumber_piOneGenerator :
     windingNumber piOneGenerator = 1 :=
   piOneEquivInt.right_inv 1
 
-/-- `Path`-typed winding-number calculation for the fundamental loop. -/
+/-- `Path`-typed calculation for the synthetic winding-one element. -/
 noncomputable def windingNumber_piOneGenerator_path :
     Path (windingNumber piOneGenerator) (1 : Int) :=
   Path.stepChain windingNumber_piOneGenerator
@@ -196,12 +198,12 @@ noncomputable def piOneEquivInt :
     SimpleEquiv circlePiOne Int :=
   circlePiOneEquivInt
 
-/-- `Path` witness for the left inverse of `π₁(U(1)) ≃ ℤ`. -/
+/-- `Path` witness for the left inverse of the synthetic U(1)-named model. -/
 noncomputable def piOneEquivInt_left_inv_path (α : circlePiOne) :
     Path (piOneEquivInt.invFun (piOneEquivInt.toFun α)) α :=
   Path.stepChain (piOneEquivInt.left_inv α)
 
-/-- `Path` witness for the right inverse of `π₁(U(1)) ≃ ℤ`. -/
+/-- `Path` witness for the right inverse of the synthetic U(1)-named model. -/
 noncomputable def piOneEquivInt_right_inv_path (z : Int) :
     Path (piOneEquivInt.toFun (piOneEquivInt.invFun z)) z :=
   Path.stepChain (piOneEquivInt.right_inv z)
@@ -212,12 +214,15 @@ end SO2
 
 /-! ## The n-Torus as a Lie Group
 
-The n-torus T^n = (S¹)^n is a compact abelian Lie group. It appears as:
+Classically, the n-torus T^n = (S¹)^n is a compact abelian Lie group. It appears as:
 - The maximal torus in U(n): diagonal unitary matrices
 - The maximal torus in SU(n): diagonal special unitary matrices
 - The maximal torus in SO(2n): block-diagonal rotation matrices
 
-By the product theorem, π₁(T^n) ≃ ℤⁿ.
+The `TorusN` below is instead an iterated product of the current
+one-constructor carrier.  The product theorem decomposes its genuine loop
+quotient, but does not identify it with `ℤⁿ`; integer tuples below belong to a
+separate synthetic winding presentation.
 -/
 
 section NTorus
@@ -227,8 +232,8 @@ section NTorus
 - T⁰ = point (the trivial group)
 - T^(n+1) = T^n × S¹
 
-This definition captures the Lie group structure: T^n is the n-fold
-product of the circle group U(1) ≃ SO(2) ≃ S¹. -/
+This definition records only an iterated product carrier.  It does not
+construct smooth or topological Lie-group structure. -/
 noncomputable def TorusN : Nat → Type u
   | 0 => PUnit'
   | n + 1 => TorusN n × Circle
@@ -295,7 +300,7 @@ noncomputable def torusOneEquivCircle_base_path :
     Path (torusOneEquivCircle.toFun (base 1)) circleBase :=
   Path.stepChain torusOneEquivCircle_base
 
-/-- The type of n-tuples of integers, representing π₁(T^n). -/
+/-- Integer tuples used by the synthetic winding presentation. -/
 noncomputable def IntTuple : Nat → Type
   | 0 => Unit
   | n + 1 => IntTuple n × Int
@@ -305,21 +310,19 @@ noncomputable def IntTuple.zero : (n : Nat) → IntTuple n
   | 0 => ()
   | n + 1 => (zero n, 0)
 
-/-- The standard 2-torus T² has π₁(T²) ≃ ℤ × ℤ.
-
-This is already proved in Torus.lean. The torus is the simplest
-  compact non-simply-connected abelian Lie group of rank 2. -/
+/-- Equivalence from the synthetic torus winding quotient to `ℤ × ℤ`.
+It is not the genuine loop quotient of the current `Torus` carrier. -/
 noncomputable def torus2PiOneEquiv { _ : HasTorusPiOneEncode } :
     SimpleEquiv torusPiOne (Int × Int) :=
   torusPiOneEquivIntProdSimple
 
-/-- `Path` witness for the left inverse of `π₁(T²) ≃ ℤ × ℤ`. -/
+/-- `Path` witness for the left inverse of the synthetic torus equivalence. -/
 noncomputable def torus2PiOneEquiv_left_inv_path [inst : HasTorusPiOneEncode]
     (α : torusPiOne) :
     Path ((@torus2PiOneEquiv inst).invFun ((@torus2PiOneEquiv inst).toFun α)) α :=
   Path.stepChain ((@torus2PiOneEquiv inst).left_inv α)
 
-/-- `Path` witness for the right inverse of `π₁(T²) ≃ ℤ × ℤ`. -/
+/-- `Path` witness for the right inverse of the synthetic torus equivalence. -/
 noncomputable def torus2PiOneEquiv_right_inv_path [inst : HasTorusPiOneEncode]
     (z : Int × Int) :
     Path ((@torus2PiOneEquiv inst).toFun ((@torus2PiOneEquiv inst).invFun z)) z :=
@@ -414,19 +417,16 @@ end SimplyConnected
 
 /-! ## Product Fundamental Group and n-Torus
 
-With the product fundamental group theorem from `ProductFundamentalGroup.lean`,
-we can now directly calculate π₁(T^n) ≃ ℤⁿ.
+The genuine product theorem below decomposes `PathRwQuot` loop fibers.  For the
+current one-constructor circle these genuine factors are contractible; the
+separate synthetic `circlePiOne ≃ ℤ` result cannot serve as its induction base.
 -/
 
 section ProductPiOne
 
-/-- The product theorem applied to TorusN gives π₁(T^n × S¹) ≃ π₁(T^n) × ℤ.
-
-This allows inductive calculation of π₁(T^n):
-- π₁(T⁰) = π₁(point) ≃ 1
-- π₁(T^{n+1}) = π₁(T^n × S¹) ≃ π₁(T^n) × π₁(S¹) ≃ π₁(T^n) × ℤ
-
-By induction, π₁(T^n) ≃ ℤⁿ. -/
+/-- Genuine product decomposition
+`π₁(TorusN (n+1)) ≃ π₁(TorusN n) × π₁(Circle)`.  No `Int`
+identification is asserted by this theorem. -/
 noncomputable def torusN_product_step (n : Nat) :
     SimpleEquiv
       (π₁(TorusN (n + 1), TorusN.base (n + 1)))
@@ -449,41 +449,30 @@ noncomputable def torusN_product_step_right_inv_path (n : Nat)
       β :=
   Path.stepChain ((torusN_product_step n).right_inv β)
 
-/-- π₁(S¹) ≃ ℤ, packaged for the n-torus induction base. -/
+/-- Synthetic circle winding equivalence retained under its legacy n-torus
+base name; it is not a base case for `torusN_product_step`. -/
 noncomputable def torusN1_piOne_equiv_int :
     SimpleEquiv circlePiOne Int :=
   circlePiOneEquivInt
 
-/-- `Path` witness for the left inverse of the torus base equivalence `π₁(S¹) ≃ ℤ`. -/
+/-- Left-inverse witness for the synthetic base equivalence. -/
 noncomputable def torusN1_piOne_equiv_int_left_inv_path (α : circlePiOne) :
     Path (torusN1_piOne_equiv_int.invFun (torusN1_piOne_equiv_int.toFun α)) α :=
   Path.stepChain (torusN1_piOne_equiv_int.left_inv α)
 
-/-- `Path` witness for the right inverse of the torus base equivalence `π₁(S¹) ≃ ℤ`. -/
+/-- Right-inverse witness for the synthetic base equivalence. -/
 noncomputable def torusN1_piOne_equiv_int_right_inv_path (z : Int) :
     Path (torusN1_piOne_equiv_int.toFun (torusN1_piOne_equiv_int.invFun z)) z :=
   Path.stepChain (torusN1_piOne_equiv_int.right_inv z)
 
-/-- **Connection to Bordg-Cavalleri**:
+/-- **Scoped comparison data for Bordg--Cavalleri.**
 
-Both approaches should yield π₁(T^n) ≃ ℤⁿ for the n-torus. The key difference:
-
-1. **This framework**: Uses computational paths + encode-decode
-   - T^n defined as iterated product of Circle (constructed via paths)
-   - π₁(S¹) ≃ ℤ via encode-decode
-   - π₁(A × B) ≃ π₁(A) × π₁(B) via path projections
-
-2. **Differential geometry**: Uses smooth structure
-   - T^n = ℝⁿ/ℤⁿ as quotient of Euclidean space
-   - π₁ via covering space theory
-   - The universal cover is ℝⁿ
-
-The isomorphism of results demonstrates that homotopy-theoretic invariants
-are independent of the foundation (smooth manifolds vs computational paths). -/
+This theorem packages three elementary facts: winding-one encodes to `1` in
+the synthetic circle quotient, synthetic encode/decode round-trips, and the
+rank-one product base projects to `circleBase`.  It is not a theorem comparing
+the genuine fundamental groups of smooth tori with the current Lean carrier. -/
 theorem bordgCavalleri_connection :
-    -- Both approaches yield π₁(S¹) ≃ ℤ
-    -- Both should yield π₁(T^n) ≃ ℤⁿ
-    -- The computational paths approach doesn't need smooth structure
+    -- Synthetic winding data plus a carrier-level basepoint equation.
     SO2.windingNumber SO2.piOneGenerator = 1 ∧
       (∀ z : Int, SO2.piOneEquivInt.toFun (SO2.piOneEquivInt.invFun z) = z) ∧
       TorusN.torusOneEquivCircle.toFun (TorusN.base 1) = circleBase :=
@@ -494,12 +483,13 @@ end ProductPiOne
 
 /-! ## Summary
 
-This module establishes connections between computational paths and Lie groups:
+This module records carrier-level and synthetic-presentation analogies:
 
-1. **SO(2) and U(1)**: π₁ ≃ ℤ (inherited from S¹)
+1. **SO(2) and U(1) names**: aliases of the current one-point carrier; the
+   `ℤ` equivalence belongs to synthetic winding syntax.
 
-2. **n-Torus T^n**: Defined as (S¹)^n with π₁(T²) ≃ ℤ × ℤ proved,
-   and π₁(T^n) ≃ ℤⁿ derivable from the product theorem
+2. **n-Torus names**: iterated products of that carrier; the genuine loop
+   quotients are not identified with `ℤⁿ` here.
 
 3. **Maximal Tori**: T^n as maximal torus in U(n), T^{n-1} in SU(n)
 
@@ -510,8 +500,8 @@ This module establishes connections between computational paths and Lie groups:
 6. **Bordg-Cavalleri Connection**: Comparison with differential geometry approach
    showing complementary strengths
 
-The computational paths framework successfully captures the homotopy-theoretic
-aspects of Lie groups without requiring the smooth manifold structure.
+No claim is made here that these carrier aliases formalize the topology or
+smooth structure of classical Lie groups.
 
 ## Future Directions
 

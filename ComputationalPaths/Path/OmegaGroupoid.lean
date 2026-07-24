@@ -28,8 +28,9 @@ are connected.
 
 **Critical design choice**: Contractibility starts at dimension 3, NOT dimension 2.
 - At level 2 (derivations between paths): NOT contractible - only paths connected
-  by actual rewrite steps have derivations between them. This preserves non-trivial
-  fundamental groups like π₁(S¹) ≃ ℤ.
+  by actual rewrite steps have derivations between them.  This leaves room for
+  nontrivial quotients on suitable carriers, but the current one-constructor
+  circle is not such an example: its genuine loop quotient is contractible.
 - At level 3+: Contractible - any two parallel 2-cells are connected by a 3-cell.
 
 ## Contractibility Structure
@@ -73,8 +74,8 @@ any two parallel (k-1)-cells are connected by a k-cell.
 
 - **Level 2 (NOT contractible)**: `Derivation₂ p q` is only inhabited when there is
   an actual sequence of rewrite steps from `p` to `q`. Parallel paths without such
-  a connection have no derivation between them. This preserves non-trivial
-  fundamental groups like π₁(S¹) ≃ ℤ.
+  a connection have no derivation between them.  This generic statement does
+  not imply a nontrivial quotient for the current `Circle`.
 
 - **Level 3+ (contractible)**: `Derivation₃ d₁ d₂` is inhabited for any parallel
   derivations `d₁, d₂ : Derivation₂ p q`. Similarly for higher levels.
@@ -104,10 +105,11 @@ corresponds to `PathRwQuot X x x`. The contractibility₃ theorem says that diff
 *derivations* between the same paths are connected, but it does NOT create derivations
 between paths that have no rewrite connection.
 
-For example, in π₁(S¹):
-- `loop` and `loop · loop` are different paths with no derivation between them
-- Different derivations of the same path (if they existed) would be connected by 3-cells
-- But since no derivation exists, there's no collapse
+For the current one-constructor circle, explicit rewrites do collapse every
+raw loop class to reflexivity, as proved in `MetadataRepair`.  A future carrier
+with a genuinely nontrivial loop quotient would still be compatible with the
+level-3 theorem: it connects parallel derivations but does not manufacture a
+derivation where the level-2 relation has none.
 
 ### Metatheory
 
@@ -132,15 +134,15 @@ noncomputable def depth {p q : Path a b} : Derivation₂ p q → Nat
   | .inv d => d.depth + 1
   | .vcomp d₁ d₂ => d₁.depth + d₂.depth + 1
 
-/-- Convert a `Derivation₂` (Type-valued 2-cell) to `RwEq` (Prop-valued rewrite equivalence).
+/-- Convert a `Derivation₂` to the Type-valued `RwEq` rewrite certificate.
 
 This lemma establishes that whenever `Derivation₂ p q` is inhabited, `RwEq p q` holds.
 The converse `ofRwEq` shows the other direction. Together they establish:
 
 > `Derivation₂ p q` is inhabited if and only if `RwEq p q`.
 
-This bridges the gap between the Type-valued derivations used for the ω-groupoid
-structure and the Prop-valued equivalence relation used in the rewriting theory. -/
+The Prop-valued quotient relation is
+`RwEqProp p q := Nonempty (RwEq p q)`. -/
 noncomputable def toRwEq {p q : Path a b} : Derivation₂ p q → RwEq p q
   | .refl _ => RwEq.refl _
   | .step s => RwEq.step s
@@ -168,12 +170,12 @@ noncomputable def ofRwEq {p q : Path a b} : RwEq p q → Derivation₂ p q
 
 end Derivation₂
 
-/-! ## Bridging Lemma: Derivation₂ → RwEq
+/-! ## Bridging Lemma: Derivation₂ ↔ RwEq
 
 The Type-valued 2-cells `Derivation₂` track explicit rewrite derivations.
-Every derivation corresponds to a `RwEq` proof. Note that the converse does
-NOT hold in general - not all parallel paths have derivations between them.
-This is essential for preserving non-trivial fundamental groups. -/
+Every derivation corresponds to an `RwEq` proof, and `ofRwEq` above proves the
+converse for this inductive presentation.  What does not hold is that every
+pair of parallel raw paths has either kind of witness. -/
 
 /-- A derivation implies RwEq (but not conversely in general). -/
 noncomputable def derivation₂_to_rweq {p q : Path a b} : Derivation₂ p q → RwEq p q :=
@@ -3384,8 +3386,9 @@ This module establishes the **complete** weak ω-groupoid structure:
 The critical insight is that contractibility does NOT hold at level 2 (between paths),
 only at level 3 and above (between derivations).
 
-- **Level 2 (NOT contractible)**: `Derivation₂ p q` only exists when there's an actual
-  rewrite sequence from `p` to `q`. This preserves non-trivial fundamental groups.
+- **Level 2 (NOT globally contractible)**: `Derivation₂ p q` only exists when
+  there is an actual rewrite sequence from `p` to `q`.  Whether a concrete loop
+  quotient is nontrivial must be proved separately.
 
 - **Level 3+ (contractible)**: All parallel derivations/higher cells are connected.
 
@@ -3405,18 +3408,19 @@ The fundamental group π₁(X, x) is the quotient of loops by `RwEq`. The contra
 hypotheses at level 3+ say that different DERIVATIONS between the same paths are connected,
 but they do NOT create derivations between paths that have no rewrite connection.
 
-For π₁(S¹) ≃ ℤ:
-- Different loop powers (loop, loop·loop, etc.) have no rewrite derivation between them
-- Each remains a distinct element in the fundamental group
-- The contractibility₃ theorem doesn't affect this because it only connects derivations
-  that already exist
+For the current one-constructor `Circle`, different-looking loop powers do
+have sufficient rewrite witnesses to yield a contractible genuine quotient.
+The separate synthetic winding-expression quotient is `ℤ` and is not connected
+to that genuine quotient by an equivalence.  The level-3 theorem remains
+orthogonal: it only compares derivations that already exist.
 
 **Coherences** (all proved, not axiomatized):
 - Pentagon: `MetaStep₃.pentagon` (Mac Lane's pentagon for associators)
 - Triangle: `MetaStep₃.triangle` (compatibility of associator and unitors)
 - Interchange: `MetaStep₃.interchange` (vertical/horizontal composition compatibility)
 - Anti-homomorphism: `MetaStep₃.inv_vcomp` (inverse distributes over composition)
-- Step coherence: `MetaStep₃.step_eq` (justified by `Step` being in `Prop`)
+- Step coherence: `MetaStep₃.step_eq` (an explicit higher constructor; `Step`
+  is Type-valued)
 
 This implements the Lumsdaine/van den Berg-Garner weak ω-groupoid construction.
 -/

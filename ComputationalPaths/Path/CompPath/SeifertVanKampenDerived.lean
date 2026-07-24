@@ -6,7 +6,9 @@ connected sums (pushouts along the circle), and surface-group specializations.
 
 ## Key Results
 - `wedgePiOneEquivFreeProduct`: π₁(A ∨ B) ≃ π₁(A) * π₁(B).
-- `connectedSumPiOneEquiv`: π₁(A # B) ≃ π₁(A) *_{π₁(S¹)} π₁(B).
+- `connectedSumPiOneEquiv`: a conditional connected-sum/free-product
+  presentation over its boundary-circle interface; it does not use the
+  synthetic `circlePiOne ≃ Int` result as a genuine bridge.
 - `surfaceGenus2PiOneEquiv`: genus-2 surface group via a torus connected sum.
 
 ## References

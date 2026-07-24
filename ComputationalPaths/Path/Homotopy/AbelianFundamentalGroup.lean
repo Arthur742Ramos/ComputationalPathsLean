@@ -2,15 +2,17 @@
 # Abelian Fundamental Groups via Eckmann-Hilton
 
 This module packages an Eckmann-Hilton style criterion for commutativity and
-applies it to the torus fundamental group computed as Z x Z.
+applies it to the synthetic torus winding quotient computed as Z x Z.  The
+generic criterion is independent of that example; `torusPiOne` here is not the
+genuine `PathRwQuot` loop fiber.
 
 ## Key Results
 
 - `PiOneOps`: minimal multiplication/unit data for a pi_1-style group.
 - `PiOneInterchange`: a second multiplication with an interchange law.
 - `piOne_comm_of_interchange`: Eckmann-Hilton commutativity lemma.
-- `torusPiOne_interchange`: interchange law for torus pi_1 via Z x Z addition.
-- `torusPiOne_abelian`: torus pi_1 is abelian.
+- `torusPiOne_interchange`: interchange law for the synthetic torus quotient.
+- `torusPiOne_abelian`: the synthetic torus quotient is abelian.
 
 ## References
 
@@ -88,7 +90,7 @@ noncomputable def piOne_comm_of_interchange_path {G : Type u} {ops : PiOneOps G}
     Path (ops.mul x y) (ops.mul y x) :=
   Path.stepChain (piOne_comm_of_interchange (H := H) x y)
 
-/-! ## Torus pi_1 (Z x Z) -/
+/-! ## Synthetic torus winding quotient (Z x Z) -/
 
 /-- Componentwise addition on integer pairs. -/
 noncomputable def intProdAdd (x y : Int × Int) : Int × Int :=
@@ -148,11 +150,12 @@ noncomputable def encode_torusDecode_path (z : Int × Int) :
     Path (encode (torusDecode z)) z :=
   Path.stepChain (encode_torusDecode z)
 
-/-- Torus pi_1 multiplication induced by Z x Z addition. -/
+/-- Multiplication on the synthetic torus winding quotient induced by
+Z x Z addition. -/
 noncomputable def torusPiOneMul (x y : torusPiOne) : torusPiOne :=
   torusDecode (intProdAdd (encode x) (encode y))
 
-/-- Identity element in torus pi_1. -/
+/-- Identity element in the synthetic torus quotient. -/
 noncomputable def torusPiOneOne : torusPiOne :=
   torusDecode intProdZero
 
@@ -161,7 +164,7 @@ noncomputable def torusPiOneOne : torusPiOne :=
   unfold torusPiOneMul
   simp [intProdAdd]
 
-/-- `Path` witness for torus `π₁` multiplication under encoding. -/
+/-- `Path` witness for synthetic torus multiplication under encoding. -/
 noncomputable def torusPiOneEncode_mul_path (x y : torusPiOne) :
     Path (encode (torusPiOneMul x y)) (intProdAdd (encode x) (encode y)) :=
   Path.stepChain (torusPiOneEncode_mul x y)
@@ -196,7 +199,7 @@ theorem torusPiOneMul_one_left (x : torusPiOne) :
     _ = encode x := by
           simp [intProdAdd_zero_left]
 
-/-- `Path` witness for the left unit law on torus `π₁`. -/
+/-- `Path` witness for the left unit law on the synthetic torus quotient. -/
 noncomputable def torusPiOneMul_one_left_path (x : torusPiOne) :
     Path (torusPiOneMul torusPiOneOne x) x :=
   Path.stepChain (torusPiOneMul_one_left x)
@@ -213,7 +216,7 @@ theorem torusPiOneMul_one_right (x : torusPiOne) :
     _ = encode x := by
           simp [intProdAdd_zero_right]
 
-/-- `Path` witness for the right unit law on torus `π₁`. -/
+/-- `Path` witness for the right unit law on the synthetic torus quotient. -/
 noncomputable def torusPiOneMul_one_right_path (x : torusPiOne) :
     Path (torusPiOneMul x torusPiOneOne) x :=
   Path.stepChain (torusPiOneMul_one_right x)
@@ -225,39 +228,39 @@ theorem torusPiOne_interchange (x1 x2 y1 y2 : torusPiOne) :
   apply Prod.ext <;>
     simp [torusPiOneMul, intProdAdd, Int.add_assoc, Int.add_left_comm]
 
-/-- `Path` witness for the interchange law on torus `π₁`. -/
+/-- `Path` witness for the interchange law on the synthetic torus quotient. -/
 noncomputable def torusPiOne_interchange_path (x1 x2 y1 y2 : torusPiOne) :
     Path
       (torusPiOneMul (torusPiOneMul x1 x2) (torusPiOneMul y1 y2))
       (torusPiOneMul (torusPiOneMul x1 y1) (torusPiOneMul x2 y2)) :=
   Path.stepChain (torusPiOne_interchange x1 x2 y1 y2)
 
-/-- Operations package for torus pi_1. -/
+/-- Operations package for the synthetic torus quotient. -/
 noncomputable def torusPiOneOps : PiOneOps torusPiOne where
   mul := torusPiOneMul
   one := torusPiOneOne
   one_mul := torusPiOneMul_one_left
   mul_one := torusPiOneMul_one_right
 
-/-- Interchange data for torus pi_1 (using the same multiplication). -/
+/-- Interchange data for the synthetic torus quotient. -/
 noncomputable def torusPiOneInterchange : PiOneInterchange torusPiOne torusPiOneOps where
   hmul := torusPiOneMul
   hmul_one_left := torusPiOneMul_one_left
   hmul_one_right := torusPiOneMul_one_right
   interchange := torusPiOne_interchange
 
-/-- Torus pi_1 is abelian (Eckmann-Hilton). -/
+/-- The synthetic torus quotient is abelian (Eckmann-Hilton). -/
 theorem torusPiOne_abelian : PiOneAbelian torusPiOne torusPiOneOps :=
   piOne_comm_of_interchange (H := torusPiOneInterchange)
 
-/-- `Path` witness for the commutativity of torus `π₁`. -/
+/-- `Path` witness for commutativity of the synthetic torus quotient. -/
 noncomputable def torusPiOne_abelian_path (x y : torusPiOne) :
     Path (torusPiOneOps.mul x y) (torusPiOneOps.mul y x) :=
   Path.stepChain (torusPiOne_abelian x y)
 
 /-! ### Multi-step unit compositions and inverse rewrite coherences
 
-The left- and right-unit witnesses of the torus `π₁` multiplication both contract to
+The left- and right-unit witnesses of the synthetic torus multiplication both contract to
 their argument, so they compose into a genuine two-step computational path identifying
 the two unit insertions, and each satisfies the LND_EQ-TRS inverse law `p ∘ symm p ▷ refl`. -/
 

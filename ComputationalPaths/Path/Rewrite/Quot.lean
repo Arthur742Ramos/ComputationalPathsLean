@@ -103,7 +103,8 @@ noncomputable def toEq {a b : A} : PathRwQuot A a b → a = b :=
   Quot.lift (fun p : Path a b => p.toEq)
     (by
       intro p q h
-      exact rweq_toEq (rweq_of_rweqProp h))
+      obtain ⟨rewrite⟩ := h
+      exact rweq_toEq rewrite)
 
 @[simp] theorem toEq_mk {a b : A} (p : Path a b) :
     toEq (A := A) (Quot.mk _ p) = p.toEq := rfl

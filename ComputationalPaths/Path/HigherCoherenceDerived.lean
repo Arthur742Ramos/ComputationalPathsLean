@@ -123,7 +123,7 @@ theorem k5_routes_equal (p : Path a b) (q : Path b c) (r : Path c d)
 
 /-! ## 2-Cell Coherence: All Diagrams Commute
 
-Since `TwoCell p q` is `RwEq p q` which lives in `Prop`, any two
+Since `TwoCell p q` is the Prop-valued `RwEqProp p q`, any two
 2-cells with the same boundary are equal by proof irrelevance. This
 is the computational paths version of "all diagrams of constraint
 cells commute". -/

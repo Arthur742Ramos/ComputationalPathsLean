@@ -5,7 +5,8 @@ This module develops the basic algebra needed to reason about loop spaces in
 the computational-paths setting.  Starting from raw loops (`Path a a`) we
 descend to rewrite equivalence classes, equip them with the induced group
 structure, and provide power operations that mirror the iterated-loop
-manipulations used in the proof that `pi_1(S^1) ~= Z`.
+manipulations used by synthetic winding presentations.  This generic module
+does not identify the current genuine circle loop quotient with `Int`.
 -/
 
 import ComputationalPaths.Path.Basic

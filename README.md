@@ -16,18 +16,33 @@ structure Path {A : Type u} (a b : A) where
 
 This library develops:
 - the computational-path rewrite system (`Step`, `Rw`, `RwEq`, normalization),
-- fundamental group computations via encode/decode (including circle, torus, and Klein bottle),
+- genuine loop quotients (`PathRwQuot`) together with separate synthetic
+  winding-expression presentations (including circle and torus case studies),
 - weak higher-groupoid structure (`OmegaGroupoid`),
 - and a broad collection of mathematical modules under `ComputationalPaths/`.
 
 ## Project scope
 
 Representative results and modules include:
-- `ComputationalPaths/Path/CompPath/CircleStep.lean` (`π₁(S¹) ≃ ℤ` interface)
-- `ComputationalPaths/Path/CompPath/TorusStep.lean` (`π₁(T²) ≃ ℤ × ℤ` interface)
+- `ComputationalPaths/Path/CompPath/CircleStep.lean` (synthetic circle
+  winding-expression quotient `≃ ℤ`)
+- `ComputationalPaths/Path/CompPath/TorusStep.lean` (synthetic product winding
+  quotient `≃ ℤ × ℤ`)
 - `ComputationalPaths/Path/CompPath/KleinBottle.lean` (`π₁(K) ≃ ℤ ⋊ ℤ` via loop-expression quotients)
 - `ComputationalPaths/Path/OmegaGroupoid.lean` (weak ω-groupoid-style hierarchy)
 - `ComputationalPaths/Path/Rewrite/Step.lean` (primitive rewrite-step relation)
+- `ComputationalPaths/Path/TypeTheory/MetadataJ.lean` (metadata-fiber
+  classification for based elimination, factorizing motives, and the
+  computational-trace obstruction)
+- `ComputationalPaths/Path/TypeTheory/MetadataRepair.lean` (universal setoid
+  repair, projection/kernel and `PathRwQuot`/K criteria, raw-vs-`RwEq` traces,
+  and genuine-vs-synthetic circle/torus no-bridge theorems)
+
+The current `Circle` is a one-constructor Lean type and `Torus` is its product.
+Their genuine `PathRwQuot` loop fibers are therefore contractible.  The
+noncontractible `ℤ` and `ℤ × ℤ` results belong to explicitly synthetic
+expression quotients; the library proves that no `SimpleEquiv` can bridge those
+quotients to the current genuine loop fibers.
 
 Beyond `Path/`, the repository also includes broad companion developments such as arithmetic, geometric, motivic, topos-theoretic, and representation-theoretic modules.
 
@@ -124,6 +139,30 @@ lake build ComputationalPaths.Path.CompPath.CircleStep
 lake build ComputationalPaths.Path.CompPath.TorusStep
 lake build ComputationalPaths.Path.CompPath.KleinBottleStep
 lake build ComputationalPaths.Path.OmegaGroupoid
+lake build ComputationalPaths.Path.TypeTheory.MetadataJ
+lake build ComputationalPaths.Path.TypeTheory.MetadataRepair
+```
+
+## Metadata-J paper and companion
+
+The focused theory paper is `paper/adequacy/main.tex`.  It develops diagnosis
+and universal setoid repair for equality metadata, the projection/kernel
+classification, the exact `PathRwQuot`/local-K criterion, and the
+genuine-versus-synthetic circle/torus audit.
+
+The earlier raw, scope-indexed de Bruijn calculus is preserved independently at
+`paper/adequacy/companion/main.tex`; it is not folded into the theory article.
+See `paper/README.md` for the manuscript build matrix and the external
+`BSLstyle.cls`/`BSLbibstyle.bst` prerequisites of the separate legacy
+`paper/main.tex` source.
+Build the manuscripts separately:
+
+```bash
+cd paper/adequacy
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
+
+cd companion
+latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
 
 ### Useful maintenance checks

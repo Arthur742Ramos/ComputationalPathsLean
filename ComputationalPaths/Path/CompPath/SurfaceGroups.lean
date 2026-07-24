@@ -176,7 +176,8 @@ noncomputable def kleinBottleSurface : SurfaceData where
   basepoint := kleinBottleBase
   surfClass := SurfaceClass.nonorientable 2 0
 
-/-- The Mobius band as a surface datum. -/
+/-- Surface metadata using the `MobiusBandCompPath` compatibility alias.
+This record does not construct a genuine Möbius-band carrier. -/
 noncomputable def mobiusBandSurface : SurfaceData where
   carrier := MobiusBandCompPath
   basepoint := mobiusBandBase

@@ -14,14 +14,16 @@ full π₁ equivalence is not yet formalized.
 ## Mathematical Background
 
 The bouquet of n circles is the wedge sum of n copies of S¹ at a common point.
-It generalizes:
+Classically it generalizes:
 - n = 0: The single point (π₁ = 1)
-- n = 1: The circle S¹ (π₁ = ℤ)
+- n = 1: The classical circle S¹ (π₁ = ℤ)
 - n = 2: The figure-eight S¹ ∨ S¹ (π₁ = F₂ = ℤ * ℤ)
 - n ≥ 2: The free group on n generators
 
 The expected equivalence π₁(∨ⁿS¹) ≃ F_n is standard, but the proof is not yet
-formalized here.
+formalized here.  In particular, it must not be inferred from the current
+one-constructor `CompPath.Circle`, whose genuine `PathRwQuot` loop fiber is
+contractible; the synthetic winding quotient is a separate presentation.
 
 ## References
 

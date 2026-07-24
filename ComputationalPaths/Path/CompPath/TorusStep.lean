@@ -1,14 +1,16 @@
 /-
-# π₁(T²) ≃ ℤ × ℤ
+# Synthetic torus winding quotient `≃ ℤ × ℤ`
 
-This module packages the torus π₁ computation as a `PathSimpleEquiv`
-between `π₁(T²)` and `ℤ × ℤ`.
+This module packages the product of two synthetic circle winding quotients as
+a `PathSimpleEquiv` with `ℤ × ℤ`.  The legacy name `torusPiOne` does not denote
+the genuine `PathRwQuot` loop fiber of the current product carrier.
 
 ## Key Results
 
 - `torusPiOneEncode_torusDecode`: encoding after decoding is the identity (as a `Path`).
 - `torusDecode_torusPiOneEncode`: decoding after encoding is the identity (as a `Path`).
-- `torusPiOneEquivIntProd`: `π₁(T²)` is `PathSimpleEquiv` to `ℤ × ℤ`.
+- `torusPiOneEquivIntProd`: the synthetic product winding quotient is
+  `PathSimpleEquiv` to `ℤ × ℤ`.
 -/
 
 import ComputationalPaths.Path.CompPath.Torus
@@ -45,18 +47,19 @@ noncomputable def pathSimpleEquivToSimpleEquiv {α : Type u} {β : Type v}
     left_inv := fun x => (e.left_inv x).toEq
     right_inv := fun y => (e.right_inv y).toEq }
 
-/-- A discharge-friendly interface for `π₁(T²) ≃ ℤ × ℤ`.
+/-- A discharge-friendly interface for the synthetic winding quotient
+`≃ ℤ × ℤ`.
 
-Unlike `HasTorusLoopDecode`, this class only talks about the loop *quotient*
-(`π₁`) rather than raw loop normal forms.  Downstream developments that only
-need the fundamental group can depend on this weaker hypothesis.
+Unlike `HasTorusLoopDecode`, this class only talks about the synthetic
+expression quotient rather than raw loop normal forms.  It supplies no bridge
+to the genuine fundamental group.
 -/
 class HasTorusPiOneEncode : Type u where
-  /-- Winding-number map `π₁(T²) → ℤ × ℤ`. -/
+  /-- Winding-number map from the synthetic product quotient to `ℤ × ℤ`. -/
   encode : torusPiOne → Int × Int
   /-- Encoding after decoding is the identity on `ℤ × ℤ`. -/
   encode_torusDecode : ∀ z : Int × Int, Path (encode (torusDecode z)) z
-  /-- Decoding after encoding is the identity on `π₁(T²)`. -/
+  /-- Decoding after encoding is the identity on the synthetic quotient. -/
   torusDecode_encode : ∀ x : torusPiOne, Path (torusDecode (encode x)) x
 
 /-- Winding-number map specialised from `HasTorusPiOneEncode`. -/
@@ -80,12 +83,12 @@ noncomputable def torusDecode_torusPiOneEncode [HasTorusPiOneEncode] (x : torusP
   (torusDecode_torusPiOneEncode (x := x)).toEq
 
 /-!
-## Canonical instance from the circle π₁ computation
+## Canonical instance from the synthetic circle computation
 
-Because `Torus` is defined as `Circle × Circle`, we can construct the torus
-π₁ encode/decode data from:
-- the product fundamental group equivalence, and
-- the circle π₁ encode/decode interface (`HasCirclePiOneEncode`).
+Because the synthetic torus presentation is defined as a product of two
+synthetic circle presentations, its encode/decode data is constructed
+componentwise from `HasCirclePiOneEncode`.  No product fundamental-group
+equivalence is used in this instance.
 -/
 noncomputable instance instHasTorusPiOneEncode_ofCircle :
     HasTorusPiOneEncode.{u} where
@@ -265,9 +268,10 @@ noncomputable def torusCommutator_rweq_step2 :
     RwEq (Path.snd torusCommutator) (Path.refl circleBase) :=
   torusCommutator_snd_refl
 
-/-- Combined: both projections reduce, so the product reduces to refl.
-This demonstrates the encode/decode proof that `aba⁻¹b⁻¹ = refl`
-on the torus, witnessing commutativity of π₁(T²). -/
+/-- Combined: both projections reduce, so the raw product path reduces to
+reflexivity.  This is a genuine `RwEq` certificate on the current product
+carrier, but it is not the synthetic `ℤ × ℤ` encode/decode theorem and does not
+by itself identify the two quotient notions. -/
 noncomputable def torusCommutator_rweq_refl_via_steps :
     RwEq torusCommutator (Path.refl torusBase) := by
   -- Step 1: η-expand the commutator to prodMk(fst, snd)
@@ -282,7 +286,7 @@ noncomputable def torusCommutator_rweq_refl_via_steps :
 
 
 
-/-- Fundamental group of the torus is equivalent to `ℤ × ℤ`. -/
+/-- The synthetic torus winding quotient is equivalent to `ℤ × ℤ`. -/
 noncomputable def torusPiOneEquivIntProd [HasTorusPiOneEncode] :
     PathSimpleEquiv torusPiOne (Int × Int) where
   toFun := torusPiOneEncode
@@ -294,7 +298,7 @@ noncomputable def torusPiOneEquivIntProd [HasTorusPiOneEncode] :
     intro z
     simpa using (torusPiOneEncode_torusDecode (z := z))
 
-/-- Step-normalized path witnesses for the torus π₁ equivalence. -/
+/-- Step-normalized witnesses for the synthetic torus equivalence. -/
 noncomputable def torusPiOneEquivIntProdNormalized [HasTorusPiOneEncode] :
     PathSimpleEquiv torusPiOne (Int × Int) where
   toFun := torusPiOneEncode

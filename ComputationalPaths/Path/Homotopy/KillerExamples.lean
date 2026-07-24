@@ -5,16 +5,16 @@ import ComputationalPaths.Path.Rewrite.RwEq
 import ComputationalPaths.Path.Homotopy.Loops
 
 /-!
-# Killer Examples: Fundamental Group Computations via Step/RwEq
+# Raw Circle/Torus Rewrite Examples via Step/RwEq
 
-Genuine computational path proofs demonstrating the Step/RwEq rewriting
-infrastructure on fundamental group computations:
+Computational-path proofs demonstrating the `Step`/`RwEq` infrastructure on
+raw paths over the current one-constructor circle and its product:
 
-1. **π₁(S¹) ≅ ℤ**: Loop iteration, cancellation laws, and group homomorphism
-   properties for the circle, all witnessed by explicit `Step`/`RwEq` chains.
+1. **Circle raw paths**: iteration and cancellation laws witnessed by explicit
+   `Step`/`RwEq` chains.  Their genuine quotient is contractible.
 
-2. **π₁(T²) ≅ ℤ × ℤ**: Loop iteration for the torus, commutativity of
-   generators, and cancellation — using the product circle construction.
+2. **Torus raw paths**: iteration, commutativity, and cancellation using the
+   product carrier.  The separate synthetic winding quotient is `ℤ × ℤ`.
 
 Every definition uses the Type-valued `Step`/`RwEq` infrastructure.
 No `sorry`, no `admit`, no `Path.ofEq`.
@@ -28,17 +28,18 @@ open ComputationalPaths.Path.CompPath
 
 universe u
 
-/-! ## Part 1: Circle — π₁(S¹) loop algebra via Step/RwEq -/
+/-! ## Part 1: Raw circle-path algebra via Step/RwEq -/
 
 section CircleAlgebra
 
 /-- The base point of the circle. -/
 noncomputable abbrev S1base : Circle.{u} := circleBase
 
-/-- The fundamental loop of the circle. -/
+/-- Legacy raw path called the fundamental loop; its current genuine quotient
+class is reflexive. -/
 noncomputable abbrev S1loop : Path S1base S1base := circleLoop
 
-/-- Loop power: iterate the fundamental loop n times (natural number). -/
+/-- Iterate the legacy raw loop path `n` times. -/
 noncomputable def loopNatPow : Nat → Path S1base.{u} S1base
   | 0 => Path.refl S1base
   | n + 1 => Path.trans (loopNatPow n) S1loop
@@ -121,7 +122,7 @@ noncomputable def S1_identity_laws_chain :
 
 end CircleAlgebra
 
-/-! ## Part 2: Torus — π₁(T²) loop algebra via Step/RwEq -/
+/-! ## Part 2: Raw torus-path algebra via Step/RwEq -/
 
 section TorusAlgebra
 

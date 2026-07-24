@@ -1,14 +1,16 @@
 /-
 # Fundamental group presentations
 
-This module records generator/relator data for fundamental group computations
-already formalized in the library, packaging them as explicit presentations and
-connecting to the existing π₁ equivalences.
+This module records generator/relator data for several group-like models.
+The circle and torus entries use the legacy synthetic winding quotients
+`circlePiOne` and `torusPiOne`; they are presentations of those models, not of
+the current genuine `PathRwQuot` loop fibers.
 
 ## Key Results
 - `FundamentalGroupPresentation`: presentation data (generators + relations).
-- `circlePresentation`, `torusPresentation`, `figureEightPresentation`,
-  `spherePresentation`: presentations for standard computational-path spaces.
+- `circlePresentation`, `torusPresentation`: synthetic winding presentations.
+- `figureEightPresentation`, `spherePresentation`: separately scoped models
+  with the hypotheses shown in their signatures.
 
 ## References
 - HoTT Book, Chapter 8
@@ -60,7 +62,8 @@ structure FundamentalGroupPresentation (G : Type u) where
 inductive CircleGenerator where
   | loop
 
-/-- Presentation of π₁(S¹) as a single generator with no relations. -/
+/-- Presentation of the synthetic circle winding quotient as a single
+generator with no relations. -/
 noncomputable def circlePresentation :
     FundamentalGroupPresentation circlePiOne.{u} where
   presentationGroup := Int
@@ -100,7 +103,8 @@ inductive TorusRelation where
 noncomputable def intProdAdd (x y : Int × Int) : Int × Int :=
   (x.1 + y.1, x.2 + y.2)
 
-/-- Presentation of π₁(T²) with two commuting generators. -/
+/-- Presentation of the synthetic torus winding quotient with two commuting
+generators. -/
 noncomputable def torusPresentation :
     FundamentalGroupPresentation torusPiOne.{u} :=
   let torusGenerator : TorusGenerator → Int × Int
@@ -190,8 +194,9 @@ noncomputable def spherePresentation :
 
 /-! ## Summary
 
-We package the computational-path π₁ computations as explicit generator/relator
-presentations for the circle, torus, figure-eight, and sphere.
+We package explicit generator/relator data.  In particular, the circle and
+torus packages concern synthetic winding quotients and must not be read as
+computations of the current genuine `PathRwQuot` fundamental groups.
 -/
 
 /-! ## Theorems -/

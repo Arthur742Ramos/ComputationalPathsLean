@@ -50,9 +50,9 @@ The loop-suspension adjunction packaged below is *propositional*: its
 coherences collapse through the subsingleton structure of `LoopSpaceEq`, so on
 their own they exhibit no multi-step rewriting.  To supply genuine computational
 paths we descend to the numeric invariants that loops carry across the
-adjunction — the **winding number** of a loop, valued in `Int` (winding numbers
-add under loop concatenation, `π₁(S¹) ≅ ℤ`), and the **concatenation length**,
-valued in `Nat`.
+adjunction — a synthetic **winding-number** handle valued in `Int`, and the
+**concatenation length** valued in `Nat`.  These numeric handles do not identify
+the current genuine circle `PathRwQuot` with `Int`.
 
 Each primitive below is a real single rewrite step (associativity or
 commutativity of a winding-number / length sum witnessed by `Int.add_*` /
@@ -66,8 +66,8 @@ handles, reused in the capstone certificate at the end of the file. -/
 noncomputable def windAssoc (m n k : Int) : Path ((m + n) + k) (m + (n + k)) :=
   Path.ofEq (Int.add_assoc m n k)
 
-/-- Commute two winding numbers `m + n ⤳ n + m` in `Int` — the fundamental group
-    of the circle is abelian.  A genuine single step via `Int.add_comm`. -/
+/-- Commute two synthetic winding numbers `m + n ⤳ n + m` in `Int`.
+A genuine single step via `Int.add_comm`. -/
 noncomputable def windComm (m n : Int) : Path (m + n) (n + m) :=
   Path.ofEq (Int.add_comm m n)
 
