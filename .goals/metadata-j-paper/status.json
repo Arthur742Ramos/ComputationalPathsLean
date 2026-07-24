@@ -1,10 +1,15 @@
 {
   "goal_id": "metadata-j-paper",
-  "status": "building",
+  "status": "inspecting",
   "iteration": 1,
   "builder_model": "OpenAI:GPT-5.6-Sol",
   "inspector_model": "OpenAI:GPT-5.6-Luna",
   "initial_sha": "cf79dfaa56e77b0b929c26f4598383503b1d3b6c",
   "created_at": "2026-07-24T01:31:27.596-04:00",
-  "history": []
+  "history": [
+    {
+      "iteration": 1,
+      "verdict": "PASS"
+    }
+  ]
 }
