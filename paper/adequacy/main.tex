@@ -6,12 +6,13 @@
 \usepackage{mathtools}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{enumitem}
 \usepackage{hyperref}
 \usepackage{url}
 
 \hypersetup{
   hidelinks,
-  pdftitle={A Scoped Calculus of Equality Traces: Structural Metatheory and a Metadata-Fiber Criterion for J},
+  pdftitle={Equality with Observable Metadata: A Fiber Criterion for Based Elimination},
   pdfauthor={Arthur Freitas Ramos, Ruy J. G. B. de Queiroz, Anjolina Grisi de Oliveira, and Dov M. Gabbay}
 }
 \allowdisplaybreaks
@@ -21,12 +22,9 @@
 \setlength{\abovedisplayshortskip}{4pt plus 2pt}
 \setlength{\belowdisplayshortskip}{5pt plus 2pt minus 2pt}
 
-% Archive note: replace or supplement the stable commit citation with the
-% future Zenodo archival DOI in the submission version.
-\title[A Scoped Calculus of Equality Traces]
-  {A Scoped Calculus of Equality Traces:
-   Structural Metatheory and a Metadata-Fiber Criterion for
-   \texorpdfstring{\(J\)}{J}}
+\title[Equality with Observable Metadata]
+  {Equality with Observable Metadata:\\
+   A Fiber Criterion for Based Elimination}
 
 \author{Arthur Freitas Ramos}
 \author{Ruy J. G. B. de Queiroz}
@@ -35,8 +33,8 @@
 \renewcommand{\shortauthors}{Ramos et al.}
 
 \subjclass[2020]{03B15, 03B38, 03B70, 18N45}
-\keywords{dependent type theory, de Bruijn syntax, definitional equality,
-substitution, syntactic quotient, equality traces, path induction}
+\keywords{identity elimination, path induction, observable metadata,
+contractibility, computational paths, equality traces}
 
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{proposition}[theorem]{Proposition}
@@ -47,92 +45,58 @@ substitution, syntactic quotient, equality traces, path induction}
 \newtheorem{remark}[theorem]{Remark}
 \newtheorem{warning}[theorem]{Warning}
 
-\newcommand{\Fin}{\mathsf{Fin}}
-\newcommand{\Expr}{\mathsf{Expr}}
-\newcommand{\Ctx}{\mathsf{Ctx}}
-\newcommand{\Ext}[2]{\mathsf{ext}(#1,#2)}
-\newcommand{\EmptyCtx}{\mathsf{empty}}
-\newcommand{\Ren}{\mathsf{Ren}}
-\newcommand{\Sub}{\mathsf{Sub}}
-\newcommand{\Var}{\mathsf{var}}
-\newcommand{\Sort}{\mathsf{U}}
-\newcommand{\PiTy}{\mathsf{Pi}}
-\newcommand{\SigmaTy}{\mathsf{Sigma}}
-\newcommand{\Lam}{\mathsf{lam}}
-\newcommand{\App}{\mathsf{app}}
-\newcommand{\Pair}{\mathsf{pair}}
-\newcommand{\Fst}{\mathsf{fst}}
-\newcommand{\Snd}{\mathsf{snd}}
-\newcommand{\NatTy}{\mathsf{Nat}}
-\newcommand{\Zero}{\mathsf{zero}}
-\newcommand{\Succ}{\mathsf{succ}}
-\newcommand{\NatElim}{\mathsf{natElim}}
-\newcommand{\CodeNat}{\widehat{\mathsf{Nat}}}
-\newcommand{\CodePi}{\widehat{\mathsf{Pi}}}
-\newcommand{\CodeSigma}{\widehat{\mathsf{Sigma}}}
-\newcommand{\CodeId}{\widehat{\mathsf{Id}}}
-\newcommand{\El}{\mathsf{El}}
-\newcommand{\IdTy}{\mathsf{Id}}
-\newcommand{\Refl}{\mathsf{refl}}
-\newcommand{\EqJ}{\mathsf{eqJ}}
+\newcommand{\U}{\mathcal U}
+\newcommand{\V}{\mathcal V}
+\newcommand{\isContr}{\mathsf{isContr}}
+\newcommand{\Contr}{\mathsf{Contr}}
+\newcommand{\Eqv}{\simeq}
+\newcommand{\Jbeta}{\mathsf J^\beta}
+\newcommand{\Meta}{\mathsf M}
+\newcommand{\Tot}{\mathsf T}
 \newcommand{\Tr}{\mathsf{Tr}}
-\newcommand{\TrStep}{\mathrel{\triangleright_{\mathrm{tr}}}}
-\newcommand{\TrEq}{\mathrel{\simeq_{\mathrm{tr}}}}
-\newcommand{\Frame}{\mathsf{Frame}}
-\newcommand{\IProg}{\mathsf{IProg}}
-\newcommand{\ev}{\mathsf{ev}}
-\newcommand{\den}[1]{\mathopen{\lbrack\!\lbrack}#1\mathclose{\rbrack\!\rbrack}}
-\newcommand{\defeq}{\mathrel{\equiv_{\mathrm d}}}
-\newcommand{\red}{\mathrel{\longmapsto}}
-\newcommand{\srw}{\mathrel{\rightsquigarrow_{\mathrm s}}}
-\newcommand{\srweq}{\mathrel{\simeq_{\mathrm s}}}
-\newcommand{\idren}{\mathsf{id}}
-\newcommand{\wk}{\mathsf{wk}}
-\newcommand{\lift}{\uparrow}
-\newcommand{\Q}{\mathcal{Q}}
+\newcommand{\Step}{\mathsf{Step}}
+\newcommand{\PathTy}{\mathsf{Path}}
+\newcommand{\refl}{\mathsf{refl}}
+\newcommand{\transport}{\mathsf{transport}}
+\newcommand{\List}{\mathsf{List}}
+\newcommand{\proj}{\pi_{=}}
+\newcommand{\Unit}{\mathbf 1}
+\newcommand{\Empty}{[\,]}
 
 \begin{document}
 
 \begin{abstract}
-We define a raw, scope-indexed dependent-style calculus using de Bruijn
-indices.  Its expressions include dependent products and sums,
-level-indexed natural-number syntax, Tarski-style codes, identity,
-reflexivity, and a two-binder raw \(J\)-constructor.  Contexts are
-same-scope assignments, not well-formed telescopes.  Renaming and
-simultaneous substitution are defined explicitly under one and two binders.
-We prove their identity, composition, lifting, weakening, and instantiation
-laws; typed substitution for the raw typing judgment; and preservation of
-typing, modulo source definitional equality between displayed type
-expressions, for exactly ten top-level primitive redexes.
+Suppose that equality from a fixed point \(a:A\) to \(b:A\) is refined by
+observable metadata:
+\[
+  R_M(a,b)=\sum_{h:a=b}M(b,h),
+  \qquad r^M_a=(\refl_a,m_0).
+\]
+We classify exactly when this refinement supports unrestricted based
+elimination into arbitrary motives, with a propositional beta law at
+\(r^M_a\).  Such an eliminator exists if and only if the reflexivity metadata
+fiber \(M(a,\refl_a)\) is contractible.  The proof first identifies based
+elimination with contraction of the total space
+\(\sum_b R_M(a,b)\), and then constructs the independent equivalence
+\[
+  \sum_{b:A}\sum_{h:a=b}M(b,h)\;\Eqv\;M(a,\refl_a).
+\]
+This second step is the metadata-fiber criterion, not a restatement of the
+standard contraction of \(\sum_b(a=b)\).
 
-Source definitional equality is untyped and has no conversion rule.  It is
-closed under substitution, so substitution descends to a
-representative-independent action on the syntactic quotient that preserves
-identity and composition.
-An independent source language of identity programs evaluates into
-\emph{unlabelled quotient traces}: lists of equality steps over the quotient
-together with an endpoint equality.  We give the target trace operations,
-one-step rules, congruence, and symmetric-reflexive-transitive closure, and
-prove soundness of the source groupoid and finite-frame rewrites.
-For quoted expressions, inhabitation of the trace record is equivalent to
-source definitional equality.  This is the endpoint exactness of the
-syntactic quotient and is tautological once that quotient has been formed.
-
-The conceptual theorem classifies equality refinements.  For
-\(R_M(a,b)=\sum_{h:a=b}M(b,h)\), an unrestricted based eliminator satisfying
-propositional beta exists exactly when the reflexivity metadata fiber
-\(M(a,\mathsf{refl})\) is contractible.  The
-proof identifies \(\sum_bR_M(a,b)\) with that fiber.  List-valued trace
-metadata has distinct empty and singleton reflexive values, so intrinsic
-composability does not yield an unrestricted based eliminator satisfying
-propositional beta.  Motives factoring through the equality projection remain
-available.  This external theorem is separate from raw
-\(J\), which has only its syntactic reflexivity beta rule and no
-interpretation theorem for its motive.  The carriers and motive values lie
-in a fixed Grothendieck-style universe \(\mathcal U\); the collection of all
-\(\mathcal U\)-valued motives and the beta-qualified elimination proposition
-lie in a larger \(\mathcal V\).  No judgmental beta is claimed.  The results do not supply a model of
-Martin-L\"of or homotopy type theory.
+The principal application is a computational path carrying a visible list of
+rewrite steps in addition to its endpoint equality.  The empty reflexive trace
+and the singleton reflexive step are distinct metadata values, so unrestricted
+trace-sensitive elimination fails.  The singleton is already intrinsically
+composable; non-composability is therefore not the obstruction.  Motives that
+factor through the projection to equality still admit elimination.  More
+generally, one may either restrict motives or hide or quotient the metadata.
+Examples with derivation histories, costs, certificates, normalization logs,
+and proof labels show how the criterion separates harmless from obstructive
+decorations.  A Lean development verifies the abstract equivalences and the
+trace corollary.  We make no claim to model full Martin-L\"of type theory or
+homotopy type theory, and the trace-carrying object is not asserted to be the
+HoTT identity type.
 \end{abstract}
 
 \maketitle
@@ -140,3072 +104,1062 @@ Martin-L\"of or homotopy type theory.
 \section{Introduction}
 \label{sec:introduction}
 
-The conceptual headline is a metadata-fiber classification for
-equality refinements.  Alongside it, we
-prove structural theorems about a deliberately raw calculus, not an
-interpretation theorem.  Fix \(n\in\mathbb N\).  The
-expressions \(\Expr_n\) have exactly \(n\) de Bruijn variables and the
-constructors listed in Section~\ref{sec:syntax}.  A context is merely a
-same-scope assignment
-\(\Gamma:\Fin(n)\to\Expr_n\).  There is no context-formation judgment saying
-that \(\Gamma\) is a well-formed telescope.  The typing family
-\(\Gamma\vdash t:A\) is raw; its definitional equality
-\(t\defeq u\) is an untyped relation on expressions.  There is no conversion
-rule and no typed definitional-equality judgment.
+Equality evidence is often decorated.  A proof assistant may retain a
+derivation history; an optimizer may attach a cost; a checker may keep a
+certificate; a normalizer may record a log; and a rewriting calculus may expose
+the sequence of elementary steps.  The decoration is useful precisely because
+it is observable.  That same observability changes the elimination principle.
 
-Let \(\Q_n=\Expr_n/{\defeq}\) be the syntactic quotient and write
-\(\den t\) for the class of \(t\).  Over any carrier \(X\) we use the record
+Fix \(a:A\).  Given a family
 \[
- \Tr_X(a,b)
-   =\operatorname{List}\!\left(\sum_{x,y:X}(x=y)\right)\times(a=b).
-\tag{1.1}\label{eq:intro-trace-record}
+        M:\prod_{b:A}(a=b)\longrightarrow\U
 \]
-When \(X=\Q_n\), this is an \emph{unlabelled quotient trace}.  Its list
-contains equality steps over already-quotiented endpoints.  In particular,
-a source derivation of \(t\defeq u\) is not retained as a label: it is sent to
-the proof-irrelevant quotient equality \(\den t=\den u\).
-Throughout, \(X\simeq Y\) denotes specified mutually inverse maps, and
-\(\mathsf{transport}_D(e,-)\) denotes equality transport in a family \(D\);
-Section~\ref{sec:ambient} states the precise universe conventions and
-propositional computation law.
+and a chosen \(m_0:M(a,\refl_a)\), define
+\[
+ R_M(a,b)=\sum_{h:a=b}M(b,h),
+ \qquad r^M_a=(\refl_a,m_0).
+\tag{1.1}\label{eq:refinement}
+\]
+The projection
+\[
+       \proj:R_M(a,b)\longrightarrow(a=b),\qquad
+       \proj(h,m)=h
+\tag{1.2}\label{eq:projection}
+\]
+forgets the metadata.  Ordinary equality elimination can act through
+\(\proj\).  The stronger question is whether \emph{every} motive on the
+refined object can be eliminated from the single base case \(r^M_a\).
 
-\begin{theorem}[Metadata-fiber criterion, headline form]
-\label{thm:intro-j-collapse}
-Fix \(a:A\), let
-\(M:\prod_{b:A}(a=b)\to\mathcal U\), and choose
-\(m_0:M(a,\mathsf{refl}_a)\).  For
+\begin{theorem}[Metadata-fiber criterion]
+\label{thm:headline}
+The refinement \(R_M\), based at \(r^M_a\), admits unrestricted based
+elimination into all \(\U\)-valued motives with propositional beta if and only
+if
 \[
- R_M(a,b)=\sum_{h:a=b}M(b,h)
+                        \isContr\bigl(M(a,\refl_a)\bigr).
+\tag{1.3}\label{eq:headline}
 \]
-with reflexivity \((\mathsf{refl}_a,m_0)\), the refinement admits an
-unrestricted based eliminator satisfying propositional beta if and only if
-the metadata fiber \(M(a,\mathsf{refl}_a)\) is contractible.
 \end{theorem}
 
-Here \(A\) and all \(M(b,h)\) are \(\mathcal U\)-small, while the proposition
-quantifying over all \(\mathcal U\)-valued motives is formed in
-\(\mathcal V\).  The beta law is an equality proposition, never a
-judgmental equality.
+Theorem~\ref{thm:headline} is the organizing result of the paper.  Its two
+directions are constructive at the level used here.  An eliminator contracts
+the based total space by choosing the motive ``the base point equals the
+current point.''  Conversely, a contraction transports the base datum to every
+point.  The new classification step is that the total space of
+\eqref{eq:refinement} is equivalent to the single reflexivity metadata fiber.
+Consequently all endpoint and equality coordinates disappear, but observable
+metadata over reflexivity remains.
 
-The proof combines the standard equivalence between based elimination and
-contractibility of \(\sum_bR_M(a,b)\) with an explicit equivalence
+This distinction matters.  The familiar total identity space
 \[
- \sum_{b:A}\sum_{h:a=b}M(b,h)
-   \simeq M(a,\mathsf{refl}_a).
+                         \sum_{b:A}(a=b)
+\tag{1.4}\label{eq:identity-total}
 \]
-The complete argument is Theorem~\ref{thm:metadata-fiber-criterion}.  Empty
-and singleton reflexive trace metadata give a noncontractible fiber.
+is contractible by equality elimination.  That standard argument explains
+ordinary based path induction.  It does not say that a larger space obtained
+by retaining an arbitrary extra coordinate is contractible.  Theorem
+\ref{thm:headline} measures exactly that extra coordinate.
 
-\begin{theorem}[Raw scoped structural results]
-\label{thm:intro-main}
-For the raw scoped calculus with \(\Pi\), \(\Sigma\), level-indexed natural
-syntax, Tarski-style codes, identity, reflexivity, and raw two-binder
-\(\EqJ\), the following statements hold.
-\begin{enumerate}
-\item Renamings \(\Ren(n,m)=\Fin(n)\to\Fin(m)\) and simultaneous
-  substitutions
-  \(\Sub(n,m)=\Fin(n)\to\Expr_m\) have explicit one- and two-binder lifts.
-  Renaming and substitution satisfy identity, composition, weakening, and
-  one- and two-variable instantiation equations.
-\item A pointwise typed simultaneous substitution preserves the raw typing
-  family.  Each of the ten \emph{top-level} primitive computation
-  constructors preserves typing modulo \(\defeq\) between the displayed
-  source and target type expressions.  There is no contextual or multi-step
-  reduction theorem.
-\item The untyped relation \(\defeq\) is stable under simultaneous
-  substitution and under pointwise \(\defeq\)-equal substitution
-  environments.  Consequently every
-  \(\sigma:\Sub(n,m)\) induces a representative-independent map
-  \(\Q(\sigma):\Q_n\to\Q_m\), and these maps respect substitution identity
-  and composition.
-\item An independent source family
-  \(\IProg_n(t,u)\), generated by \(\defeq\)-atoms, reflexivity, inverse,
-  composition, and a finite grammar of same-scope frames, is endpoint-trivial
-  and has the expected unique structural-recursion interpretation into any
-  target carrying those five operations.  Its quotient-trace instance
-  evaluates into \(\Tr_{\Q_n}(\den t,\den u)\).  The named source rewrite equivalence is
-  sound for the explicitly defined target trace rewrite equivalence:
-  \[
-      p\srweq q\quad\Longrightarrow\quad
-      \ev(p)\TrEq\ev(q).
-  \]
-\item Raw \(\EqJ\) has its listed syntactic reflexivity beta constructor.
-  This statement is not obtained from, and is not packaged with, any
-  external interpretation of its motive.
+Our main case study is the record
+\[
+ \PathTy_A(a,b)
+   =\bigl\{\,L:\List(\Step(A)),\quad h:a=b\,\bigr\},
+\tag{1.5}\label{eq:path-record}
+\]
+where \(L\) is a visible trace.  Reordering its fields gives
+\[
+ \PathTy_A(a,b)\Eqv
+ \sum_{h:a=b}\List(\Step(A)).
+\tag{1.6}\label{eq:path-refinement-intro}
+\]
+At reflexivity, the empty list and the singleton step
+\([\,a\xrightarrow{\refl_a}a\,]\) differ.  The fiber is not contractible, so
+unrestricted elimination for motives observing \(L\) cannot exist.  The
+singleton is a valid chain from \(a\) to \(a\), hence imposing adjacency and
+endpoint conditions does not repair the problem.
+
+There are two principled remedies.
+\begin{enumerate}[label=(\roman*)]
+\item Restrict motives to those factoring through
+  \(\proj\).  These motives cannot observe the metadata and inherit equality
+  elimination.
+\item Hide or quotient the metadata until its reflexivity fiber is
+  contractible.  Unrestricted elimination is then recovered by
+  Theorem~\ref{thm:headline}.
 \end{enumerate}
-\end{theorem}
+The first preserves the data but limits observation; the second changes the
+identity-like object.
 
-\begin{proposition}[Endpoint exactness of the syntactic quotient]
-\label{prop:intro-endpoint}
-For \(t,u\in\Expr_n\),
-\[
- \operatorname{Nonempty}\bigl(\Tr_{\Q_n}(\den t,\den u)\bigr)
- \quad\Longleftrightarrow\quad t\defeq u.
-\tag{1.2}\label{eq:intro-endpoint}
-\]
-\end{proposition}
-
-This equivalence is tautological after quotient construction.  The forward
-direction forgets the list and uses quotient exactness; the reverse direction
-uses quotient soundness and forms a singleton trace.  It is included to
-identify exactly what endpoint statement is available, not as a semantic
-completeness theorem.
-
-\begin{corollary}[Trace-metadata instance]
-\label{thm:intro-obstruction}
-The record \(\Tr_X\) admits an eliminator through its ambient-equality
-component.  It does not admit an unrestricted based eliminator satisfying
-propositional beta for arbitrary motives that can observe the list field.
-\end{corollary}
-
-The obstruction uses a well-formed singleton reflexive trace, not a malformed
-or non-composable list.  Hence imposing intrinsic composability on traces
-does not change the classification.  The metadata fiber must be made
-contractible, or motives must be restricted through the equality projection.
-
-\subsection*{Contribution as a metatheoretic note}
-
-The contribution is the combination of five sharply bounded pieces:
-binder-correct raw scoped syntax; source-derived preservation for ten
-primitive redexes; representative-independent and compositional quotient
-substitution; source/target-separated identity programs; and the
-metadata-fiber criterion applied to computational trace records.  The
-equivalence between a based eliminator with propositional beta and
-contractibility of the based total space is standard background.  The
-explicit reduction to the reflexivity metadata fiber, its trace application,
-and the binder-correct raw interface are the contribution of this note.
-Source identity
-rewrite soundness is a homomorphic simulation, largely forced by the
-structural-recursion interpretation once the target operations and their
-laws are supplied.  Endpoint exactness is tautological after quotienting.
-The note claims no absolute priority; its point is the combined interface and
-the trace-metadata application.
-
-\subsection*{Status of the calculus}
-
-The terminology in Theorem~\ref{thm:intro-main} is intentional.  We study a
-\emph{scoped dependent-style calculus}, not a presentation of full
-Martin-L\"of type theory.  We construct only a syntactic quotient; no typed
-model or initial CwF is supplied.  We prove primitive-redex preservation,
-not standard contextual or multi-step subject reduction.  Source identity
-programs have no typing judgment and are endpoint-trivial in the sense of
-Proposition~\ref{prop:iprogram-endpoints}: an atom already requires
-\(t\defeq u\).  There is no normalization, canonicity,
-decidable type checking, univalence, higher inductive type, or completeness
-theorem for source identity rewrites.
-
-\subsection*{Relation to earlier computational paths}
-
-The prior computational-path articles
-\cite{deQueirozEtAl2016,RamosEtAl2017,RamosEtAl2018} and the 2026 monograph
-\cite{RamosEtAl2026} study label-sensitive paths: equality reasons are
-first-class labels and their rewrite calculus preserves that intentional
-presentation.  The target in this paper is weaker.  A
-\(\defeq\)-derivation is used only to obtain equality in \(\Q_n\); proof
-irrelevance then erases which derivation was chosen.  Evaluated identity
-programs are therefore trace-decorated paths over quotient-collapsed
-endpoints, not carriers of the original computational reason.  This change
-of target is central and is compared theorem by theorem in
-Section~\ref{sec:comparison}.
-
-\subsection*{Organization}
-
-Section~\ref{sec:layers} separates the equality layers.
-Sections~\ref{sec:syntax} and~\ref{sec:substitution} give the raw syntax and
-its structural algebra.  Section~\ref{sec:judgments} presents typing,
-computation, substitution, and primitive-redex preservation.  The syntactic
-quotient is constructed in Section~\ref{sec:syntactic-quotient}.  Source identity programs
-and their trace semantics occupy Section~\ref{sec:identity-programs}.
-Section~\ref{sec:example} gives lambda, dependent-projection, and
-natural-successor examples.  Section~\ref{sec:main-result} collects the raw
-structural theorem, while Section~\ref{sec:j-boundary} separately proves the
-external elimination obstruction.  Sections~\ref{sec:family-semantics} and
-\ref{sec:comparison} give an independent fixed-universe algebra and the
-comparison with prior work.
-Appendices~\ref{app:grammar} and~\ref{app:rewrites} collect the raw rules.
-
-\section{The equality layers}
-\label{sec:layers}
-
-\subsection{Ambient metatheory}
-\label{sec:ambient}
-
-Fix once and for all a Grothendieck-style universe \(\mathcal U\) of small
-sets.  Every carrier, expression family, metadata fiber, and quotient used
-below is an element of \(\mathcal U\).  The universe is closed under finite
-lists, dependent sums and products indexed by small sets, equality
-propositions, and quotients by equivalence relations.  We reason in ordinary
-extensional mathematics about these sets.  Concretely:
-\begin{enumerate}
-\item equality has its usual eliminator and equality propositions are proof
-  irrelevant:
-  \(h,k:x=y\) implies \(h=k\);
-\item functions are extensional, so pointwise equal functions are equal;
-\item finite lists with append, reversal, map, and no-confusion
-  \([]\neq z::L\);
-\item every equivalence relation \(E\) on a small set \(X\) has an effective
-  small quotient
-  \(\eta:X\to X/E\) with
-  \[
-       E(x,y)\Longrightarrow\eta x=\eta y
-       \quad\text{and}\quad
-       (\eta x=\eta y)\Longrightarrow E(x,y).
-  \tag{2.1}\label{eq:quotient-sound-exact}
-  \]
+\paragraph{Contributions.}
+The paper provides:
+\begin{enumerate}[label=(\arabic*)]
+\item an explicit equivalence between unrestricted based elimination with
+  propositional beta and based total-space contractibility;
+\item the total-space equivalence
+  \(\sum_b\sum_hM(b,h)\Eqv M(a,\refl_a)\), yielding the
+  metadata-fiber criterion;
+\item a factorization theorem for equality-projection motives, including
+  motives fiberwise equivalent to strict pullbacks;
+\item a trace application derived from the generic criterion, together with
+  the composable singleton counterexample; and
+\item a classification pattern for histories, costs, certificates, logs, and
+  labels.
 \end{enumerate}
-The first implication in~\eqref{eq:quotient-sound-exact} is quotient
-soundness; the second is quotient exactness.
 
-For small sets \(X,Y\), the notation \(X\simeq Y\) means specified maps
-\[
- F:X\to Y,\qquad G:Y\to X
-\]
-together with propositional equalities
-\(F(Gy)=y\) and \(G(Fx)=x\).  If \(D:X\to\mathcal U\) and \(e:x=y\), then
-\(\mathsf{transport}_D(e,-):D(x)\to D(y)\) denotes equality transport.
-We use only its propositional reflexivity law
-\[
- \mathsf{transport}_D(\mathsf{refl}_x,z)=z.
-\tag{2.2}\label{eq:transport-beta}
-\]
-No judgmental computation rule is part of the ambient assumptions.
-
-When we quantify over the collection of all \(\mathcal U\)-valued motives
-\(C\), that collection is regarded as living in one fixed larger universe
-\(\mathcal V\).  Each individual motive value, equality proposition,
-\(\IProg\)-fiber, \(R\)-fiber, and metadata fiber remains
-\(\mathcal U\)-small.  Thus the phrase ``admits an unrestricted based
-eliminator satisfying propositional beta'' means an eliminator into every
-\(\mathcal U\)-valued motive together with that beta family; it makes no
-impredicative claim that
-the collection of all such motives lies in \(\mathcal U\) itself.
-For \(X\in\mathcal U\) and \(c\in X\), the sets
-\(\mathsf{Contr}_c(X)\) and \(\mathsf{isContr}(X)\) are
-\(\mathcal U\)-small.  By contrast, the set of all
-\(\mathcal U\)-valued motives on \(X\), the data of an eliminator over all of
-them, and the proposition asserting existence of such data lie in
-\(\mathcal V\).  Each individual propositional beta equation lies in the
-small equality proposition of a fiber \(C(x)\in\mathcal U\).
-
-These assumptions have sharply delimited uses.  Function extensionality
-turns the pointwise lift and environment calculations of
-Sections~\ref{sec:substitution} and~\ref{sec:syntactic-quotient} into
-equalities of functions.  Quotient soundness defines quotient substitution
-and the trace attached to a source atom.  Quotient exactness is used only in
-the map from trace inhabitation back to source \(\defeq\) in endpoint
-exactness.  Proof irrelevance erases the
-choice of source \(\defeq\)-derivation after quotient soundness and makes the
-external equality-component eliminator insensitive to equality proofs.
-List no-confusion proves that the empty and singleton traces differ.
-Lean is one realization of this metatheory for reproducibility; it is not the
-definition of the mathematics.
-
-\subsection{The dependency layers}
-
-The word ``equality'' occurs at several levels.  The direction of dependence
-matters: none of the target trace relations is used to generate a source
-typing or definitional-equality derivation.
-
-\begin{table}[ht]
-\centering
-\small
-\renewcommand{\arraystretch}{1.22}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}
-                >{\centering\arraybackslash}p{0.19\textwidth}
-                >{\raggedright\arraybackslash}p{0.48\textwidth}}
-\toprule
-Layer & Notation & Information and role\\
-\midrule
-Metatheoretic equality
-  & \(x=y\)
-  & Proof-irrelevant equality used to form quotient classes and the endpoint
-    field of a trace record.\\
-Primitive source computation
-  & \(t\red u\)
-  & Exactly one of ten top-level constructors.  There is no contextual or
-    multi-step closure.\\
-Source definitional equality
-  & \(t\defeq u\)
-  & Equivalence and enumerated compatible closure of primitive computation.
-    It is untyped and defines the syntactic quotient.\\
-Syntactic-quotient equality
-  & \(\den t=\den u\)
-  & Ambient equality in \(\Q_n=\Expr_n/{\defeq}\).  Quotient exactness
-    identifies this precisely with \(t\defeq u\).\\
-Source identity program
-  & \(p:\IProg_n(t,u)\)
-  & Explicit syntax generated by source atoms, unit, inverse, composition,
-    and finite same-scope frames.\\
-Unlabelled quotient trace
-  & \(T:\Tr_{\Q_n}(\den t,\den u)\)
-  & A list of quotient-equality steps plus an endpoint equality.  Source
-    \(\defeq\)-derivation labels have been erased.\\
-Source identity rewrite
-  & \(p\srweq q\)
-  & Symmetric reflexive-transitive closure of the named source program laws.\\
-Target trace rewrite
-  & \(T\TrEq U\)
-  & Explicit symmetric-reflexive-transitive trace equivalence.  Soundness maps the
-    preceding row to this one; no reflection theorem is asserted.\\
-\bottomrule
-\end{tabular}
-\caption{The layered equality discipline.}
-\label{tab:equality-layers}
-\end{table}
-
-There are two essential arrows.  The first is quotient soundness
-\[
-       (t\defeq u)\longmapsto(\den t=\den u).
-\]
-The second evaluates source identity syntax:
-\[
-       \ev:\IProg_n(t,u)\longrightarrow
-       \Tr_{\Q_n}(\den t,\den u).
-\]
-The first arrow erases source evidence: quotient soundness returns only an
-ambient equality proof, and proof irrelevance identifies different proofs of
-the same quotient equality.  The second arrow consequently cannot preserve a
-\(\defeq\)-derivation as a label.
-
-\begin{remark}[Scope of the no-target-leakage statement]
-The source constructors in Definition~\ref{def:identity-programs} consume
-only source \(\defeq\)-derivations and source frames.  The statement applies
-to that family alone (named \texttt{RawMLTT.IdentityExpr} in the
-accompanying software).  The broader software repository also contains
-convenience syntax that starts from already constructed target trace records; that
-syntax is excluded from the calculus and from
-Theorem~\ref{thm:raw-structural}.
-\end{remark}
-
-\section{An independently scoped source calculus}
-\label{sec:syntax}
-
-\subsection{Scopes and raw expressions}
-
-Following de Bruijn's nameless representation
-\cite{deBruijn1972}, let
-\(\Fin(n)=\{0,\ldots,n-1\}\), with \(0\) the most recently bound
-variable.  The family \(\Expr_n\) is defined inductively by
-\begin{align*}
-t,u,A,B,M ::= {}&
-  \Var(i) \mid \Sort_\ell
-  \mid \PiTy(A,B) \mid \SigmaTy(A,B)
-  \mid \Lam(t) \mid \App(t,u)\\
- &\mid \Pair(t,u)\mid\Fst(t)\mid\Snd(t)
-  \mid \NatTy_\ell\mid\Zero_\ell\mid\Succ_\ell(t)\\
- &\mid \NatElim_\ell(M,z,s,t)
-  \mid \CodeNat_\ell\mid\CodePi(A,B)
-  \mid\CodeSigma(A,B)\mid\CodeId(A,t,u)\\
- &\mid \El(A)\mid\IdTy(A,t,u)\mid\Refl(t)
-  \mid \EqJ(M,r,b,p).
-\end{align*}
-Here \(i\in\Fin(n)\) and \(\ell\in\mathbb{N}\).  The displayed grammar
-suppresses scope indices, which are part of the inductive definition:
-\[
-\begin{array}{c|c}
-\text{constructor} & \text{scopes of arguments}\\ \hline
-\PiTy,\SigmaTy,\CodePi,\CodeSigma
-  & \Expr_n\times\Expr_{n+1}\to\Expr_n\\
-\Lam & \Expr_{n+1}\to\Expr_n\\
-\NatElim_\ell
-  & \Expr_{n+1}\times\Expr_n\times\Expr_{n+2}
-      \times\Expr_n\to\Expr_n\\
-\EqJ
-  & \Expr_{n+2}\times\Expr_n\times\Expr_n\times\Expr_n
-      \to\Expr_n.
-\end{array}
-\]
-All other arguments remain in scope \(n\).  Thus the codomains of
-\(\PiTy\), \(\SigmaTy\), and their codes bind one variable; the successor
-branch of \(\NatElim\) binds a predecessor and an induction hypothesis; and
-the motive of \(\EqJ\) binds an endpoint and an identity proof.
-
-A raw context of length \(n\) is a function
-\[
-                       \Gamma:\Fin(n)\longrightarrow\Expr_n.
-\]
-This is a \emph{same-scope assignment}: every declaration is already written
-in the full scope \(n\).  There is no judgment
-\(\vdash\Gamma\;\mathsf{ctx}\), no inductively generated telescope, and no
-theorem relating these assignments to well-formed MLTT contexts.  The raw
-typing constructors use whichever declarations they require.  The empty
-assignment is
-\(\EmptyCtx_0:\Fin(0)\to\Expr_0\).  Extension is the explicit operation
-\[
- \Ext{\Gamma}{A}\in\Ctx(n+1)
- \quad(\Gamma\in\Ctx(n),\ A\in\Expr_n)
-\]
-that weakens every declaration:
-\[
-\begin{split}
-\Ext{\Gamma}{A}(0)&=A[\wk_n]_{\mathrm r},\\
-\Ext{\Gamma}{A}(i+1)&=\Gamma(i)[\wk_n]_{\mathrm r}.
-\end{split}
-\tag{3.1}\label{eq:context-extension}
-\]
-
-\subsection{Levels, natural numbers, and codes}
-
-Levels are natural numbers internal to the grammar only as parameters.
-The rules use
-\[
-              \Gamma\vdash\Sort_\ell:\Sort_{\ell+1},
-   \qquad
-              \Gamma\vdash\NatTy_\ell:\Sort_\ell.
-\]
-Natural numbers, zero, successor, and their recursor all carry the same
-level parameter.  This indexing is not cosmetic: it makes
-\[
-                 \El(\CodeNat_\ell)\red\NatTy_\ell
-\]
-type preserving at every level.  There is no cumulativity or resizing rule.
-
-The code constructors are Tarski-style in the limited sense relevant here:
-codes are explicit syntax and are decoded by \(\El\).  A code at level
-\(\ell\) has type \(\Sort_\ell\), and its decoding also has type
-\(\Sort_\ell\).  Product and sum codes bind over the decoding of their domain
-code.  The calculus does not purport to give a full hierarchy of inductive
-universes or a universe-polymorphic elaboration algorithm.
-
-\subsection{\texorpdfstring{The raw two-binder \(J\)-constructor}
-{The raw two-binder J-constructor}}
-
-Suppose \(A,a\in\Expr_n\).  Define the proof declaration in endpoint scope by
-\[
- \mathsf{IdProof}_n(A,a)
-   \coloneqq
-   \IdTy\bigl(A[\wk_n]_{\mathrm r},
-              a[\wk_n]_{\mathrm r},\Var(0)\bigr)
-   \in\Expr_{n+1}.
-\tag{3.2}\label{eq:idproof-definition}
-\]
-The endpoint is the new variable of \(\Ext{\Gamma}{A}\).  Extending this
-assignment once more gives the explicit motive assignment
-\[
- \Ext{\Ext{\Gamma}{A}}{\mathsf{IdProof}_n(A,a)}
-   \in\Ctx(n+2).
-\tag{3.3}\label{eq:motive-context}
-\]
-Because the latest variable is numbered \(0\), a motive
-\(M\in\Expr_{n+2}\) sees the proof at index \(0\), the endpoint at index
-\(1\), and the ambient variables from index \(2\) onward.  The raw term
-\(\EqJ(M,r,b,p)\) instantiates those two variables by \(p\) and \(b\).
-Its only computation constructor is the syntactic rule
-\[
-                 \EqJ(M,r,a,\Refl(a))\red r.
-\]
-Nothing in the raw syntax says that \(M\) factors through an ambient equality
-component, and this paper proves no such interpretation.  The independent
-external eliminator of Section~\ref{sec:j-boundary} is therefore a separate
-construction, not a semantics for this raw motive.
-
-\section{Renaming and simultaneous substitution}
-\label{sec:substitution}
-
-\subsection{Renamings and binder lift}
-
-Set
-\[
-                  \Ren(n,m)\coloneqq\Fin(n)\to\Fin(m).
-\]
-We write \(\rho:n\rightsquigarrow_{\mathrm r}m\) only when
-\(\rho\in\Ren(n,m)\).  Identity and composition are
-\[
-  \idren^{\Ren}_n(i)=i,\qquad
-  (\rho;_{\Ren}\tau)(i)=\tau(\rho(i)),
-\]
-where \(\rho\in\Ren(n,m)\) and \(\tau\in\Ren(m,k)\).
-Weakening \(\wk_n\in\Ren(n,n+1)\) is \(\wk_n(i)=i+1\).  The binder lift
-\(\rho^\lift\in\Ren(n+1,m+1)\) is
-\[
-        \rho^\lift(0)=0,\qquad
-        \rho^\lift(i+1)=\rho(i)+1.
-\tag{4.1}\label{eq:ren-lift}
-\]
-Renaming \(t[\rho]_{\mathrm r}\) is structural recursion, using one lift
-under one binder and two lifts under the \(\NatElim\) successor branch and
-the \(\EqJ\) motive.
-
-\begin{proposition}[Renaming algebra]
-\label{prop:renaming}
-For every expression and every composable pair of renamings,
-\[
-\begin{aligned}
-t[\idren^{\Ren}_n]_{\mathrm r}&=t,\\
-t[\rho]_{\mathrm r}[\tau]_{\mathrm r}
-  &=t[\rho;_{\Ren}\tau]_{\mathrm r},\\
-(\idren^{\Ren}_n)^\lift&=\idren^{\Ren}_{n+1},\\
-(\rho;_{\Ren}\tau)^\lift&=\rho^\lift;_{\Ren}\tau^\lift,\\
-\wk_n;_{\Ren}\rho^\lift&=\rho;_{\Ren}\wk_m.
-\end{aligned}
-\]
-\end{proposition}
-
-\begin{proof}
-Prove the three equations between renamings first.  At index \(0\), both
-\((\idren^{\Ren}_n)^\lift\) and
-\((\rho;_{\Ren}\tau)^\lift\) return \(0\).  At \(i+1\),
-\[
- (\idren^{\Ren}_n)^\lift(i+1)=i+1,
-\qquad
- (\rho;_{\Ren}\tau)^\lift(i+1)
-   =\tau(\rho(i))+1
-   =(\rho^\lift;_{\Ren}\tau^\lift)(i+1).
-\]
-For \(i:\Fin(n)\),
-\[
- (\wk_n;_{\Ren}\rho^\lift)(i)=\rho(i)+1
-   =(\rho;_{\Ren}\wk_m)(i).
-\]
-Function extensionality gives the three renaming equalities.
-
-Now induct structurally on \(t\), proving identity and composition
-simultaneously.  The variable case is the corresponding equation for
-\(\rho\); \(\Sort_\ell,\NatTy_\ell,\Zero_\ell,\CodeNat_\ell\) are fixed.
-For a one-binder constructor, for example,
-\[
-\begin{aligned}
-\PiTy(A,B)[\rho]_{\mathrm r}[\tau]_{\mathrm r}
- &=\PiTy(A[\rho]_{\mathrm r}[\tau]_{\mathrm r},
-          B[\rho^\lift]_{\mathrm r}[\tau^\lift]_{\mathrm r})\\
- &=\PiTy(A[\rho;_{\Ren}\tau]_{\mathrm r},
-          B[(\rho;_{\Ren}\tau)^\lift]_{\mathrm r}),
-\end{aligned}
-\]
-using the two induction hypotheses and lift composition.
-The same calculation covers \(\SigmaTy,\CodePi,\CodeSigma\); \(\Lam\)
-uses only the bound induction hypothesis.  Application, pairing,
-projections, successor, decoding, identity, code identity, and reflexivity
-use the induction hypotheses componentwise.
-
-For the two-binder constructors the recursive equations display all lifts:
-\[
-\begin{aligned}
-&\NatElim_\ell(M,z,s,k)[\rho]_{\mathrm r}[\tau]_{\mathrm r}\\
-&=\NatElim_\ell(
- M[\rho^\lift]_{\mathrm r}[\tau^\lift]_{\mathrm r},
- z[\rho]_{\mathrm r}[\tau]_{\mathrm r},
- s[\rho^{\lift\lift}]_{\mathrm r}
-   [\tau^{\lift\lift}]_{\mathrm r},
- k[\rho]_{\mathrm r}[\tau]_{\mathrm r})\\
-&=\NatElim_\ell(
- M[(\rho;_{\Ren}\tau)^\lift]_{\mathrm r},
- z[\rho;_{\Ren}\tau]_{\mathrm r},
- s[(\rho;_{\Ren}\tau)^{\lift\lift}]_{\mathrm r},
- k[\rho;_{\Ren}\tau]_{\mathrm r}),
-\end{aligned}
-\]
-and
-\[
-\begin{aligned}
-&\EqJ(M,r,b,p)[\rho]_{\mathrm r}[\tau]_{\mathrm r}\\
-&=\EqJ(
- M[\rho^{\lift\lift}]_{\mathrm r}
-   [\tau^{\lift\lift}]_{\mathrm r},
- r[\rho]_{\mathrm r}[\tau]_{\mathrm r},
- b[\rho]_{\mathrm r}[\tau]_{\mathrm r},
- p[\rho]_{\mathrm r}[\tau]_{\mathrm r})\\
-&=\EqJ(
- M[(\rho;_{\Ren}\tau)^{\lift\lift}]_{\mathrm r},
- r[\rho;_{\Ren}\tau]_{\mathrm r},
- b[\rho;_{\Ren}\tau]_{\mathrm r},
- p[\rho;_{\Ren}\tau]_{\mathrm r}).
-\end{aligned}
-\]
-The identity proof is the same induction with
-\((\idren^{\Ren})^\lift=\idren^{\Ren}\), used twice in these final two
-cases.  These are all constructors of \(\Expr\).
-\end{proof}
-
-\subsection{Simultaneous substitutions}
-
-Set
-\[
-       \Sub(n,m)\coloneqq\Fin(n)\to\Expr_m.
-\]
-The embedding of renamings as variable-only substitutions is
-\[
- \mathsf{ofRen}_{n,m}:\Ren(n,m)\to\Sub(n,m),\qquad
- \mathsf{ofRen}(\rho)(i)=\Var(\rho(i)).
-\tag{4.2}\label{eq:of-ren}
-\]
-The substitution identity is not the renaming identity:
-\[
-       \idren^{\Sub}_n\coloneqq
-       \mathsf{ofRen}(\idren^{\Ren}_n)\in\Sub(n,n).
-\]
-For \(\sigma\in\Sub(n,m)\), its lift lies in
-\(\Sub(n+1,m+1)\) and is
-\[
-\sigma^\lift(0)=\Var(0),\qquad
-\sigma^\lift(i+1)=\sigma(i)[\wk_m]_{\mathrm r}.
-\tag{4.3}\label{eq:sub-lift}
-\]
-Capture-avoiding substitution \(t[\sigma]\) is again structural recursion,
-using the same one- and two-lift pattern as renaming.  Composition is
-\[
- \sigma;_{\Sub}\tau\in\Sub(n,k),\qquad
- (\sigma;_{\Sub}\tau)(i)=\sigma(i)[\tau],
-\tag{4.4}\label{eq:sub-composition}
-\]
-for \(\sigma\in\Sub(n,m)\) and \(\tau\in\Sub(m,k)\).
-
-The distinction between pre- and post-renaming is useful in the proof.
-Writing \(\rho^\ast\sigma=\sigma\circ\rho\) and
-\(\rho_\ast\sigma=(i\mapsto\sigma(i)[\rho]_{\mathrm r})\), one obtains the
-fusion laws
-\[
-\begin{aligned}
-t[\sigma][\rho]_{\mathrm r}&=t[\rho_\ast\sigma],\\
-t[\rho]_{\mathrm r}[\sigma]&=t[\rho^\ast\sigma].
-\end{aligned}
-\tag{4.5}\label{eq:fusion}
-\]
-Their binder cases depend on the naturality square in
-Proposition~\ref{prop:renaming}.
-
-\begin{theorem}[Substitution algebra]
-\label{thm:substitution-algebra}
-For \(t\in\Expr_n\), \(\sigma\in\Sub(n,m)\), and
-\(\tau\in\Sub(m,k)\), and \(\upsilon\in\Sub(k,l)\),
-\[
-\begin{aligned}
-t[\idren^{\Sub}_n]&=t,\\
-t[\sigma][\tau]&=t[\sigma;_{\Sub}\tau],\\
-(\idren^{\Sub}_n)^\lift&=\idren^{\Sub}_{n+1},\\
-(\sigma;_{\Sub}\tau)^\lift&=\sigma^\lift;_{\Sub}\tau^\lift.
-\end{aligned}
-\tag{4.6}\label{eq:sub-algebra}
-\]
-The substitution environments themselves satisfy
-\[
-\begin{aligned}
-\idren^{\Sub}_n;_{\Sub}\sigma&=\sigma,&
-\sigma;_{\Sub}\idren^{\Sub}_m&=\sigma,\\
-(\sigma;_{\Sub}\tau);_{\Sub}\upsilon
- &=\sigma;_{\Sub}(\tau;_{\Sub}\upsilon).
-\end{aligned}
-\tag{4.7}\label{eq:sub-environment-algebra}
-\]
-Moreover
-\[
-                 t[\mathsf{ofRen}(\rho)]=t[\rho]_{\mathrm r},
-\tag{4.8}\label{eq:ofren-subst}
-\]
-and the fusion equations~\eqref{eq:fusion} hold with their displayed scope
-types.
-\end{theorem}
-
-\begin{proof}
-We establish the lift and fusion equations before expression composition.
-First,
-\[
- \mathsf{ofRen}(\rho)^\lift=\mathsf{ofRen}(\rho^\lift)
-\tag{4.9}\label{eq:ofren-lift}
-\]
-pointwise: both sides return \(\Var(0)\) at \(0\), and
-\(\Var(\rho(i)+1)\) at \(i+1\).  Structural induction on \(t\), using
-\eqref{eq:ofren-lift} once or twice under binders, proves
-\eqref{eq:ofren-subst}.
-
-Next prove the two fusion equations~\eqref{eq:fusion} by structural induction
-on \(t\).  Their variable cases are the definitions of
-\(\rho_\ast\sigma\) and \(\rho^\ast\sigma\).  Under one binder the required
-environment equalities are, pointwise,
-\[
-\begin{aligned}
-(\rho_\ast\sigma)^\lift(0)&=\Var(0),\\
-(\rho_\ast\sigma)^\lift(i+1)
- &=\sigma(i)[\rho]_{\mathrm r}[\wk]_{\mathrm r}
-  =\sigma(i)[\wk]_{\mathrm r}[\rho^\lift]_{\mathrm r},\\
-(\rho^\ast\sigma)^\lift(0)&=\Var(0),\\
-(\rho^\ast\sigma)^\lift(i+1)
- &=\sigma(\rho(i))[\wk]_{\mathrm r}
-  =\sigma^\lift(\rho^\lift(i+1)).
-\end{aligned}
-\]
-The middle equality in the first pair is the weakening naturality equation
-of Proposition~\ref{prop:renaming}.  The two-binder constructors apply these
-equalities twice.  All nonbinding constructors follow componentwise.
-
-The identity lift is also pointwise:
-\[
-(\idren^{\Sub}_n)^\lift(0)=\Var(0),\qquad
-(\idren^{\Sub}_n)^\lift(i+1)=\Var(i+1),
-\]
-so it is \(\idren^{\Sub}_{n+1}\).
-For lift composition, both sides return \(\Var(0)\) at \(0\).  At \(i+1\),
-\[
-\begin{aligned}
-(\sigma^\lift;_{\Sub}\tau^\lift)(i+1)
- &=\bigl(\sigma(i)[\wk_m]_{\mathrm r}\bigr)[\tau^\lift]\\
- &=\bigl(\sigma(i)[\tau]\bigr)[\wk_k]_{\mathrm r}\\
- &=(\sigma;_{\Sub}\tau)^\lift(i+1),
-\end{aligned}
-\tag{4.10}\label{eq:lift-composition-proof}
-\]
-where the middle step is the two fusion equations, equivalently the
-imagewise square
-\[
- \mathsf{ofRen}(\wk_m);_{\Sub}\tau^\lift
- =\tau;_{\Sub}\mathsf{ofRen}(\wk_k).
-\]
-
-We can now prove expression substitution.  Identity follows from
-\eqref{eq:ofren-subst} and renaming identity.  For composition, induct
-structurally on \(t\).  Variables give the definition of
-\(\sigma;_{\Sub}\tau\); constants are fixed; all nonbinding constructors
-use their induction hypotheses componentwise.  The one-binder cases use
-\eqref{eq:lift-composition-proof}.  For the two-binder arguments,
-\[
- M[\sigma^{\lift\lift}][\tau^{\lift\lift}]
-  =M[\sigma^{\lift\lift};_{\Sub}\tau^{\lift\lift}]
-  =M[(\sigma;_{\Sub}\tau)^{\lift\lift}],
-\tag{4.11}\label{eq:eqj-double-lift-composition}
-\]
-and likewise for the successor branch \(s\) of \(\NatElim\).
-Thus the \(\NatElim\) motive uses one lift, its successor branch two, and its
-other arguments none; the \(\EqJ\) motive uses two lifts and its other
-arguments none.  This exhausts the binding constructors.
-
-Only after expression composition is established do we derive
-\eqref{eq:sub-environment-algebra}.  At \(i\), left identity is
-\(\Var(i)[\sigma]=\sigma(i)\), right identity is
-\(\sigma(i)[\idren^{\Sub}_m]=\sigma(i)\), and associativity is
-\[
- ((\sigma;_{\Sub}\tau);_{\Sub}\upsilon)(i)
- =(\sigma(i)[\tau])[\upsilon]
- =\sigma(i)[\tau;_{\Sub}\upsilon]
- =(\sigma;_{\Sub}(\tau;_{\Sub}\upsilon))(i).
-\]
-Function extensionality yields the environment equalities.  There is
-therefore no use of environment associativity in the proof of expression
-composition.
-\end{proof}
-
-\subsection{Weakening and instantiation}
-
-For \(a\in\Expr_n\), let
-\(\langle a\rangle\in\Sub(n+1,n)\) send \(0\) to \(a\) and \(i+1\) to
-\(\Var(i)\).  One-variable instantiation is
-\[
-                     B\{a\}\coloneqq B[\langle a\rangle].
-\]
-For \(M\in\Expr_{n+2}\) and \(b,p\in\Expr_n\), let
-\(\langle b,p\rangle\in\Sub(n+2,n)\) send \(0\) to \(p\), \(1\) to \(b\),
-and \(i+2\) to \(\Var(i)\).  Then
-\[
-                     M\{b,p\}\coloneqq M[\langle b,p\rangle].
-\]
-The order reflects de Bruijn extension: the proof is newest.
-
-\begin{proposition}[Instantiation laws]
-\label{prop:instantiation}
-Weakening is cancelled by one-variable instantiation,
-\[
-                   t[\wk]\{a\}=t,
-\]
-and by two-variable instantiation,
-\[
-              t[\wk][\wk]\{b,p\}=t.
-\]
-Renaming and substitution commute with both forms:
-\[
-\begin{aligned}
-B\{a\}[\rho]_{\mathrm r}
- &=B[\rho^\lift]_{\mathrm r}\{a[\rho]_{\mathrm r}\},\\
-B\{a\}[\sigma]
- &=B[\sigma^\lift]\{a[\sigma]\},\\
-M\{b,p\}[\rho]_{\mathrm r}
- &=M[\rho^{\lift\lift}]_{\mathrm r}
-       \{b[\rho]_{\mathrm r},p[\rho]_{\mathrm r}\},\\
-M\{b,p\}[\sigma]
- &=M[\sigma^{\lift\lift}]\{b[\sigma],p[\sigma]\}.
-\end{aligned}
-\tag{4.12}\label{eq:instantiation-laws}
-\]
-\end{proposition}
-
-\begin{proof}
-Expand instantiation as simultaneous substitution and use expression
-composition from Theorem~\ref{thm:substitution-algebra}.  For the
-one-variable substitution law, the two induced substitutions in
-\(\Sub(n+1,m)\) agree at \(0\), where both return \(a[\sigma]\), and at
-\(i+1\), where both return \(\sigma(i)\).  Function extensionality and
-expression composition give the displayed equality.
-
-For the two-variable substitution law, both sides act on \(M\) by substitutions in
-\(\Sub(n+2,m)\).  At index \(0\) both return \(p[\sigma]\); at index \(1\)
-both return \(b[\sigma]\); at \(i+2\), one side gives
-\(\Var(i)[\sigma]=\sigma(i)\), while the other gives
-\(\Var(i+2)[\sigma^{\lift\lift}]\) and then instantiates, again reducing to
-\(\sigma(i)\).  The renaming proof has the identical three cases with
-\(\rho\) in place of \(\sigma\).  For weakening cancellation,
-\(\mathsf{ofRen}(\wk_n);_{\Sub}\langle a\rangle\) is
-\(\idren^{\Sub}_n\) pointwise, and the two-fold version satisfies
-\[
-\mathsf{ofRen}(\wk_n);_{\Sub}
-\mathsf{ofRen}(\wk_{n+1});_{\Sub}\langle b,p\rangle
- =\idren^{\Sub}_n.
-\]
-Expression identity completes both equations.
-\end{proof}
-
-\section{Typing, computation, and primitive-redex preservation}
-\label{sec:judgments}
-
-\subsection{Typing rules}
-
-The judgment \(\Gamma\vdash t:A\) is an inductive family, not a predicate
-obtained from target semantics.  Variables and universes satisfy
-\[
- \frac{i\in\Fin(n)}{\Gamma\vdash\Var(i):\Gamma(i)}
- \qquad
- \frac{}{\Gamma\vdash\Sort_\ell:\Sort_{\ell+1}}.
-\]
-The dependent product rules are
-\[
-\frac{\Gamma\vdash A:\Sort_\ell\qquad
-      \Ext{\Gamma}{A}\vdash B:\Sort_\ell}
-     {\Gamma\vdash\PiTy(A,B):\Sort_\ell}.
-\]
-\[
-\frac{\Gamma\vdash A:\Sort_\ell\quad
-      \Ext{\Gamma}{A}\vdash B:\Sort_\ell\quad
-      \Ext{\Gamma}{A}\vdash t:B}
-     {\Gamma\vdash\Lam(t):\PiTy(A,B)},
-\]
-\[
-\frac{\Gamma\vdash f:\PiTy(A,B)\qquad\Gamma\vdash a:A}
-     {\Gamma\vdash\App(f,a):B\{a\}}.
-\]
-The sum rules form \(\SigmaTy(A,B)\), introduce
-\(\Pair(a,b)\) from \(a:A\) and \(b:B\{a\}\), and type the projections as
-\[
-  \Gamma\vdash\Fst(p):A,\qquad
-  \Gamma\vdash\Snd(p):B\{\Fst(p)\}.
-\]
-
-For each \(\ell\), the natural-number rules are
-\[
-\Gamma\vdash\NatTy_\ell:\Sort_\ell,\quad
-\Gamma\vdash\Zero_\ell:\NatTy_\ell,\quad
-\frac{\Gamma\vdash k:\NatTy_\ell}
-     {\Gamma\vdash\Succ_\ell(k):\NatTy_\ell}.
-\]
-If \(M\) is a type in \(\Ext{\Gamma}{\NatTy_\ell}\), the zero case has type
-\(M\{\Zero_\ell\}\), and the successor case is checked in
-\(\Ext{\Ext{\Gamma}{\NatTy_\ell}}{M}\) against the explicit substitution of
-\(\Succ_\ell(\Var(1))\) for the natural argument, then the recursor has type
-\(M\{k\}\).  Appendix~\ref{app:grammar} records the complete rule.
-
-The universe-code rules include
-\[
-\frac{}{\Gamma\vdash\CodeNat_\ell:\Sort_\ell},
-\qquad
-\frac{\Gamma\vdash A:\Sort_\ell\quad
-      \Ext{\Gamma}{\El(A)}\vdash B:\Sort_\ell}
-     {\Gamma\vdash\CodePi(A,B):\Sort_\ell},
-\]
-with an analogous sum rule, and
-\[
-\frac{\Gamma\vdash A:\Sort_\ell\quad
-      \Gamma\vdash a:\El(A)\quad\Gamma\vdash b:\El(A)}
-     {\Gamma\vdash\CodeId(A,a,b):\Sort_\ell}.
-\]
-Any \(c:\Sort_\ell\) decodes to \(\El(c):\Sort_\ell\).
-
-Identity formation and reflexivity are standard for the bounded grammar:
-\[
-\frac{\Gamma\vdash A:\Sort_\ell\quad\Gamma\vdash a:A\quad
-      \Gamma\vdash b:A}
-     {\Gamma\vdash\IdTy(A,a,b):\Sort_\ell},
-\qquad
-\frac{\Gamma\vdash a:A}
-     {\Gamma\vdash\Refl(a):\IdTy(A,a,a)}.
-\]
-For raw \(\EqJ\), if \(M\) is a type expression in the motive
-assignment~\eqref{eq:motive-context}, then
-\[
-\frac{
- \begin{array}{c}
- \Gamma\vdash A:\Sort_\ell\quad\Gamma\vdash a:A\\
- \Ext{\Ext{\Gamma}{A}}{\mathsf{IdProof}_n(A,a)}
-      \vdash M:\Sort_j\\
- \Gamma\vdash r:M\{a,\Refl(a)\}\quad
- \Gamma\vdash b:A\quad
- \Gamma\vdash p:\IdTy(A,a,b)
- \end{array}}
- {\Gamma\vdash\EqJ(M,r,b,p):M\{b,p\}}.
-\tag{5.1}\label{eq:eqj-rule}
-\]
-
-\begin{warning}[No conversion rule]
-The raw judgment has no general rule converting a term from \(A\) to a
-definitionally equal \(B\).  Nor is there a typed judgment
-\(\Gamma\vdash A\defeq B\).  The preservation theorem below therefore
-returns an explicit target type expression \(B\) and an \emph{untyped}
-derivation \(B\defeq A\), rather than silently applying conversion.
-\end{warning}
-
-\subsection{Primitive computation and definitional equality}
-
-The directed computation judgment \(r\red s\) has exactly the following
-schemes:
-\begin{equation}
-\begin{aligned}
-\App(\Lam(t),a)&\red t\{a\},\\
-\Fst(\Pair(a,b))&\red a,
-&
-\Snd(\Pair(a,b))&\red b,\\
-\NatElim_\ell(M,z,s,\Zero_\ell)&\red z,\\
-\NatElim_\ell(M,z,s,\Succ_\ell(k))
- &\red s\{k,\NatElim_\ell(M,z,s,k)\},\\
-\EqJ(M,r,a,\Refl(a))&\red r,\\
-\El(\CodeNat_\ell)&\red\NatTy_\ell,\\
-\El(\CodePi(A,B))&\red\PiTy(\El(A),\El(B)),\\
-\El(\CodeSigma(A,B))&\red\SigmaTy(\El(A),\El(B)),\\
-\El(\CodeId(A,a,b))&\red\IdTy(\El(A),a,b).
-\end{aligned}
-\tag{5.2}\label{eq:computations}
-\end{equation}
-Only raw expressions occur in these rules.  These are exactly ten
-constructors of a top-level relation.  In particular, \(r\red s\) does not
-mean reduction under an expression context, and it has no reflexive,
-transitive, or multi-step constructor.  Contextual closure appears only in
-the separate relation \(\defeq\).
-
-Source definitional equality \(\defeq\) is generated by primitive
-computation, reflexivity, symmetry, transitivity, and a constructor-by-
-constructor compatible closure.  The closure is explicit: it covers both
-arguments of products and sums, lambda bodies, function and argument
-positions of application, pair components, projections, successor, all four
-recursor positions, code arguments, decoding, the three identity positions,
-reflexivity, and all four \(\EqJ\) positions.  This enumeration is important:
-there is no clause saying that an arbitrary target trace creates source
-definitional equality.
-
-\begin{theorem}[Fundamental typing substitution]
-\label{thm:fundamental-substitution}
-Let \(\Gamma\in\Ctx(n)\), \(\Delta\in\Ctx(m)\), and
-\(\sigma\in\Sub(n,m)\).  Suppose that \(\Gamma\vdash t:A\), and that
-\(\sigma\) is typed from \(\Gamma\) to \(\Delta\), meaning
-\[
-      \Delta\vdash\sigma(i):\Gamma(i)[\sigma]
-                 \quad\text{for every }i\in\Fin(n).
-\tag{5.3}\label{eq:typed-substitution}
-\]
-Then
-\[
-                   \Delta\vdash t[\sigma]:A[\sigma].
-\]
-\end{theorem}
-
-\begin{proof}
-Induct on the typing derivation.  The variable case is
-\eqref{eq:typed-substitution}.  The binder lemma says that a typed
-\(\sigma\in\Sub(n,m)\) induces a typed
-\(\sigma^\lift\in\Sub(n+1,m+1)\) from \(\Ext{\Gamma}{A}\) to
-\(\Ext{\Delta}{A[\sigma]}\).  At index \(0\), the image is \(\Var(0)\), whose
-declaration is \(A[\sigma][\wk_m]_{\mathrm r}\); this is also
-\((A[\wk_n]_{\mathrm r})[\sigma^\lift]\) by the weakening square.  At
-\(i+1\), the image \(\sigma(i)[\wk_m]_{\mathrm r}\) is typed by the renaming
-admissibility theorem applied to
-\(\Delta\vdash\sigma(i):\Gamma(i)[\sigma]\).  The type is rewritten by the
-same square to
-\((\Gamma(i)[\wk_n]_{\mathrm r})[\sigma^\lift]\).
-
-We now inspect every typing constructor.  Universes, natural formation,
-zero, and the natural code are unchanged.  Product and sum formation, lambda
-introduction, and product/sum code formation apply the induction hypotheses
-under \(\sigma^\lift\) using the binder lemma.  Application uses the
-induction hypotheses for \(f\) and \(a\), then the one-variable equation
-\[
- (B\{a\})[\sigma]=B[\sigma^\lift]\{a[\sigma]\}.
-\]
-Pairing uses the same equation for the second component.  First and second
-projection, successor, decoding, identity/code-identity formation, and
-reflexivity use their induction hypotheses componentwise; the second
-projection again rewrites its displayed type by the one-variable equation.
-This accounts for every constructor except \(\NatElim\) and \(\EqJ\).
-
-For the natural successor branch, apply the binder lemma twice to
-obtain a typed
-\(\sigma^{\lift\lift}\in\Sub(n+2,m+2)\).  The induction hypothesis types the
-substituted branch at
-\(T_{\mathrm{succ}}(M)[\sigma^{\lift\lift}]\); the pointwise calculation
-\[
- T_{\mathrm{succ}}(M)[\sigma^{\lift\lift}]
-   =T_{\mathrm{succ}}(M[\sigma^\lift])
-\tag{5.4}\label{eq:nat-target-substitution}
-\]
-has two cases on an index of \(M\): its natural argument \(0\), which is sent
-to \(\Succ_\ell(\Var(1))\), and an inherited variable \(i+1\), shifted by
-two.  The motive premise uses \(\sigma^\lift\), the zero case and scrutinee
-use \(\sigma\), and the successor branch uses
-\(\sigma^{\lift\lift}\).  The conclusion type is put in the required form by
-\[
- M\{k\}[\sigma]=M[\sigma^\lift]\{k[\sigma]\}.
-\]
-
-The raw \(\EqJ\) motive uses the same double lift.  The identity-proof
-declaration satisfies
-\[
- \mathsf{IdProof}_n(A,a)[\sigma^\lift]
-   =\mathsf{IdProof}_m(A[\sigma],a[\sigma]),
-\tag{5.5}\label{eq:id-proof-substitution}
-\]
-because the weakened \(A\) and \(a\) commute with lift and \(\Var(0)\) is
-fixed.  Thus the twice-lifted environment is typed for the substituted motive
-assignment.  In the \(\EqJ\) case the induction hypotheses give, separately,
-the substituted formation of \(A\), typing of \(a\), typing of
-\(M[\sigma^{\lift\lift}]\) in that assignment, and typing of
-\(r[\sigma]\), \(b[\sigma]\), and \(p[\sigma]\).  The proof premise has type
-\[
- \IdTy(A[\sigma],a[\sigma],b[\sigma])
-\]
-by structural substitution.  The reflexivity-case type and conclusion type
-are rewritten by the same two-variable law:
-\[
- \begin{aligned}
- M\{a,\Refl(a)\}[\sigma]
-  &=M[\sigma^{\lift\lift}]
-       \{a[\sigma],\Refl(a[\sigma])\},\\
- M\{b,p\}[\sigma]
-  =M[\sigma^{\lift\lift}]\{b[\sigma],p[\sigma]\},
- \end{aligned}
-\]
-the three-index calculation of Proposition~\ref{prop:instantiation}.  These
-are exactly the premise and conclusion types of the substituted raw
-\(\EqJ\) rule.
-No quotient or target trace is used.
-\end{proof}
-
-\begin{corollary}[Typed instantiation]
-\label{cor:typed-instantiation}
-If \(\Ext{\Gamma}{A}\vdash t:T\) and \(\Gamma\vdash a:A\), then
-\[
-             \Gamma\vdash t\{a\}:T\{a\}.
-\]
-If \(\Ext{\Ext{\Gamma}{A}}{B}\vdash t:T\), \(\Gamma\vdash a:A\), and
-\(\Gamma\vdash p:B\{a\}\), then
-\[
-             \Gamma\vdash t\{a,p\}:T\{a,p\}.
-\]
-\end{corollary}
-
-\begin{theorem}[Computation and definitional equality under substitution]
-\label{thm:computation-substitution}
-For \(r,s\in\Expr_n\) and every \(\sigma\in\Sub(n,m)\),
-\[
- r\red s\Longrightarrow r[\sigma]\red s[\sigma],
- \qquad
- r\defeq s\Longrightarrow r[\sigma]\defeq s[\sigma].
-\]
-\end{theorem}
-
-\begin{proof}
-Inspect the ten computation constructors.  Product beta is preserved because
-\[
-\App(\Lam(t),a)[\sigma]
- =\App(\Lam(t[\sigma^\lift]),a[\sigma])
- \red t[\sigma^\lift]\{a[\sigma]\}
- =(t\{a\})[\sigma].
-\]
-The two projection redexes become
-\[
-\Fst(\Pair(a[\sigma],b[\sigma]))\red a[\sigma],
-\qquad
-\Snd(\Pair(a[\sigma],b[\sigma]))\red b[\sigma].
-\]
-Natural-zero beta becomes
-\[
-\NatElim_\ell(M[\sigma^\lift],z[\sigma],
- s[\sigma^{\lift\lift}],\Zero_\ell)\red z[\sigma].
-\]
-Natural-successor beta is
-\[
-\begin{aligned}
-&\NatElim_\ell(M[\sigma^\lift],z[\sigma],
- s[\sigma^{\lift\lift}],\Succ_\ell(k[\sigma]))\\
-&\quad\red
-s[\sigma^{\lift\lift}]
- \{k[\sigma],
-   \NatElim_\ell(M[\sigma^\lift],z[\sigma],
-       s[\sigma^{\lift\lift}],k[\sigma])\}\\
-&\quad=
-\bigl(s\{k,\NatElim_\ell(M,z,s,k)\}\bigr)[\sigma],
-\end{aligned}
-\]
-by the two-variable instantiation equation.  Raw \(J\)-beta becomes
-\[
-\begin{aligned}
-&\EqJ(M,r,a,\Refl(a))[\sigma]\\
-&\quad=
-\EqJ(M[\sigma^{\lift\lift}],r[\sigma],a[\sigma],
-     \Refl(a[\sigma]))
-\red r[\sigma],
-\end{aligned}
-\]
-and the four decoding redexes become, respectively,
-\[
-\begin{gathered}
-\El(\CodeNat_\ell)\red\NatTy_\ell,\\
-\El(\CodePi(A[\sigma],B[\sigma^\lift]))
- \red\PiTy(\El(A[\sigma]),\El(B[\sigma^\lift])),\\
-\El(\CodeSigma(A[\sigma],B[\sigma^\lift]))
- \red\SigmaTy(\El(A[\sigma]),\El(B[\sigma^\lift])),\\
-\El(\CodeId(A[\sigma],a[\sigma],b[\sigma]))
- \red\IdTy(\El(A[\sigma]),a[\sigma],b[\sigma]).
-\end{gathered}
-\]
-This exhausts the ten constructors.
-
-For \(\defeq\), induct on its derivation.  Reflexivity, symmetry, and
-transitivity use the corresponding closure constructors; a beta leaf uses
-the preceding ten-case argument.  Product/sum domain congruence applies the
-induction hypothesis under \(\sigma\), while codomain congruence applies it
-under \(\sigma^\lift\); lambda and product/sum-code binders likewise use one
-lift.  In \(\NatElim\), the motive uses \(\sigma^\lift\), the successor
-branch uses \(\sigma^{\lift\lift}\), and the other two positions use
-\(\sigma\).  In \(\EqJ\), the motive uses two lifts and the other three
-positions use none.  Application, pairing, projections, successor, identity,
-code identity, decoding, and reflexivity use the induction hypotheses in
-their same-scope positions.  Reapplying the matching congruence constructor
-proves each case, with no quotient assumption.
-\end{proof}
-
-\begin{theorem}[Primitive-redex preservation modulo type \(\defeq\)]
-\label{thm:redex-preservation}
-For \(\Gamma\in\Ctx(n)\) and \(r,s,A\in\Expr_n\), if
-\(\Gamma\vdash r:A\) and \(r\red s\), then there is \(B\in\Expr_n\)
-such that
-\[
-                  \Gamma\vdash s:B
-                  \qquad\text{and}\qquad B\defeq A.
-\tag{5.6}\label{eq:redex-preservation}
-\]
-Here \(B\defeq A\) is the untyped source relation applied to expressions
-being used as types.  The theorem covers exactly the ten top-level schemes
-in~\eqref{eq:computations}; it does not cover contextual or multi-step
-reduction.  We reserve ``subject reduction'' for that stronger future
-theorem.
-\end{theorem}
-
-\begin{proof}
-Invert the typing derivation of the redex and inspect which of the ten
-computation constructors was supplied.
-The complete case analysis is summarized here; ``same'' means that the
-target derivation has exactly the displayed source type.
-\[
-\begin{array}{c|c|c}
-\text{redex}&\text{target term and chosen target type}&
-  \text{type comparison}\\ \hline
-\Pi\text{-}\beta&t\{a\}:B\{a\}&\text{same}\\
-\Sigma\text{-fst}&a:A&\text{same}\\
-\Sigma\text{-snd}&b:B\{a\}&
- B\{a\}\defeq B\{\Fst(\Pair(a,b))\}\\
-\NatTy\text{-zero}&z:M\{\Zero_\ell\}&\text{same}\\
-\NatTy\text{-succ}&s\{k,R_k\}:M\{\Succ_\ell(k)\}&\text{same}\\
-\EqJ\text{-}\beta&r:M\{a,\Refl(a)\}&\text{same}\\
-\El\text{-Nat}&\NatTy_\ell:\Sort_\ell&\text{same}\\
-\El\text{-}\Pi&\PiTy(\El(A),\El(B)):\Sort_\ell&\text{same}\\
-\El\text{-}\Sigma&\SigmaTy(\El(A),\El(B)):\Sort_\ell&\text{same}\\
-\El\text{-Id}&\IdTy(\El(A),a,b):\Sort_\ell&\text{same}
-\end{array}
-\tag{5.7}\label{eq:redex-case-table}
-\]
-
-For product beta, inversion produces
-\(\Ext{\Gamma}{A}\vdash t:B\) and \(\Gamma\vdash a:A\);
-Corollary~\ref{cor:typed-instantiation} gives
-\(\Gamma\vdash t\{a\}:B\{a\}\).
-For first projection, inversion reaches the pair premise
-\(\Gamma\vdash a:A\).  For natural-zero beta, inversion reaches the stored
-zero-case premise \(\Gamma\vdash z:M\{\Zero_\ell\}\).
-
-For the dependent second projection, inversion has the exact shape
-\[
- \frac{\Gamma\vdash a:A\qquad\Gamma\vdash b:B\{a\}}
-      {\Gamma\vdash\Snd(\Pair(a,b)):
-         B\{\Fst(\Pair(a,b))\}}.
-\]
-The target \(b\) is already typed at \(B\{a\}\).  Primitive first-projection
-beta gives
-\(\Fst(\Pair(a,b))\defeq a\); symmetry gives
-\(a\defeq\Fst(\Pair(a,b))\).  Compare the two substitutions in
-\(\Sub(n+1,n)\):
-\[
-\begin{array}{lll}
-\langle a\rangle(0)=a,
-&\quad&
-\langle\Fst(\Pair(a,b))\rangle(0)=\Fst(\Pair(a,b)),\\
-\langle a\rangle(i+1)=\Var(i),
-&&
-\langle\Fst(\Pair(a,b))\rangle(i+1)=\Var(i).
-\end{array}
-\]
-They are pointwise \(\defeq\)-equal by the symmetric beta step at \(0\) and
-reflexivity at \(i+1\).  Applying substitution-environment congruence
-(Proposition~\ref{prop:environment-congruence}) to the body \(B\) gives
-\[
-       B\{a\}\defeq B\{\Fst(\Pair(a,b))\}.
-\]
-This is why the theorem returns a possibly different type expression instead
-of pretending that a conversion rule exists.
-
-For natural successor beta, write
-\[
- R_k=\NatElim_\ell(M,z,s,k).
-\]
-Inversion gives \(\Gamma\vdash k:\NatTy_\ell\), hence the recursor rule gives
-\(\Gamma\vdash R_k:M\{k\}\).  The successor branch is typed in
-\(\Ext{\Ext{\Gamma}{\NatTy_\ell}}{M}\) at
-\(T_{\mathrm{succ}}(M)\).  Two-variable typed
-instantiation with \(k\) and \(R_k\) yields
-\[
- \Gamma\vdash s\{k,R_k\}:
-     T_{\mathrm{succ}}(M)\{k,R_k\}.
-\]
-The pointwise substitution calculation
-\[
- T_{\mathrm{succ}}(M)\{k,R_k\}=M\{\Succ_\ell(k)\}
-\tag{5.8}\label{eq:nat-target-instantiation}
-\]
-is exact: the branch proof variable does not occur in
-\(T_{\mathrm{succ}}(M)\), the predecessor becomes \(k\), and the motive
-variable becomes \(\Succ_\ell(k)\).  This is the displayed source type of the
-successor redex.
-
-For raw \(J\)-beta, inversion reaches the stored premise
-\(\Gamma\vdash r:M\{a,\Refl(a)\}\), exactly the redex type.
-
-For \(\El(\CodeNat_\ell)\), inversion first yields
-\(\Gamma\vdash\CodeNat_\ell:\Sort_\ell\); natural formation gives
-\(\Gamma\vdash\NatTy_\ell:\Sort_\ell\).
-For a product code, inversion yields
-\[
-\Gamma\vdash A:\Sort_\ell,\qquad
-\Ext{\Gamma}{\El(A)}\vdash B:\Sort_\ell.
-\]
-Decoding formation gives the domain
-\(\Gamma\vdash\El(A):\Sort_\ell\) and the codomain
-\(\Ext{\Gamma}{\El(A)}\vdash\El(B):\Sort_\ell\); product formation therefore
-types \(\PiTy(\El(A),\El(B))\) at \(\Sort_\ell\).
-The sum-code case is identical with sum formation.  For an identity code,
-inversion gives
-\[
-\Gamma\vdash A:\Sort_\ell,\quad
-\Gamma\vdash a:\El(A),\quad
-\Gamma\vdash b:\El(A);
-\]
-decoding formation and identity formation type
-\(\IdTy(\El(A),a,b)\) at \(\Sort_\ell\).
-All four source decoding redexes were displayed at \(\Sort_\ell\), so their
-type-coherence proof is reflexivity.  This completes all ten cases without a
-target-typing premise or a conversion rule.
-\end{proof}
-
-\section{The syntactic quotient and compositional substitution}
-\label{sec:syntactic-quotient}
-
-\subsection{The quotient carrier}
-
-For each scope \(n\), source definitional equality is a setoid on
-\(\Expr_n\).  Define
-\[
-              \Q_n=\Expr_n/{\defeq},
-       \qquad \eta_n(t)=\den t.
-\tag{6.1}\label{eq:syntactic-quotient}
-\]
-This is only a syntactic quotient at a fixed scope.  It carries neither a
-context-formation judgment nor the structure of a CwF, and no initiality
-property is asserted.  No normal forms are chosen.
-
-For \(\sigma\in\Sub(n,m)\), put
-\[
-       \Q(\sigma)(\den t)=\den{t[\sigma]}.
-\tag{6.2}\label{eq:quotient-substitution}
-\]
-Theorem~\ref{thm:computation-substitution} proves that this definition is
-independent of the representative \(t\).  This order matters logically:
-substitution closure is a theorem about the source relation, proved before
-the quotient action is defined.
-
-\begin{proposition}[Substitution environment congruence]
-\label{prop:environment-congruence}
-Suppose \(\sigma,\tau\in\Sub(n,m)\) and
-\(\sigma(i)\defeq\tau(i)\) for every \(i\in\Fin(n)\).  Then
-\[
-                     t[\sigma]\defeq t[\tau]
-                     \quad\text{for every }t\in\Expr_n.
-\tag{6.3}\label{eq:subst-congruence}
-\]
-Consequently \(\Q(\sigma)=\Q(\tau)\) pointwise.
-\end{proposition}
-
-\begin{proof}
-Induct on \(t\).  The variable case is the assumption.  First prove the lift
-lemma pointwise:
-\[
- \sigma\equiv_{\mathrm{env}}\tau
- \Longrightarrow
- \sigma^\lift\equiv_{\mathrm{env}}\tau^\lift.
-\tag{6.4}\label{eq:lift-env-congruence}
-\]
-At index \(0\), both sides are \(\Var(0)\).  At \(i+1\), apply
-Theorem~\ref{thm:computation-substitution} to
-\(\sigma(i)\defeq\tau(i)\) with
-\(\mathsf{ofRen}(\wk_m)\); by~\eqref{eq:ofren-subst} this is precisely
-\(\sigma(i)[\wk_m]_{\mathrm r}\defeq
-  \tau(i)[\wk_m]_{\mathrm r}\).  Applying the lemma twice gives pointwise
-\(\sigma^{\lift\lift}\equiv_{\mathrm{env}}
- \tau^{\lift\lift}\).
-
-For \(\PiTy,\SigmaTy,\Lam,\CodePi,\CodeSigma\), use
-\eqref{eq:lift-env-congruence} in the bound argument and the original
-assumption in the unbound argument.  Application, pairing, projections,
-successor, decoding, identity, code identity, and reflexivity use the
-induction hypotheses in their same-scope positions, chaining one-position
-congruence constructors when there is more than one argument.  Constants
-are reflexive.  For \(\NatElim_\ell(M,z,s,k)\), the four induction hypotheses use,
-respectively, \(\sigma^\lift\), \(\sigma\),
-\(\sigma^{\lift\lift}\), and \(\sigma\); transitivity chains the four
-one-position congruence constructors.  Concretely, it compares motives,
-zero branches, successor branches, and scrutinees in that order:
-\[
-\begin{aligned}
-&\NatElim_\ell(M[\sigma^\lift],z[\sigma],
- s[\sigma^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\sigma],
- s[\sigma^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\tau],
- s[\sigma^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\tau],
- s[\tau^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\tau],
- s[\tau^{\lift\lift}],k[\tau]).
-\end{aligned}
-\]
-Each step changes exactly one displayed argument using the corresponding
-congruence constructor.  Raw \(\EqJ(M,r,b,p)\) similarly uses
-\(\sigma^{\lift\lift}\) for \(M\) and \(\sigma\) for the remaining three
-arguments:
-\[
-\begin{aligned}
-&\EqJ(M[\sigma^{\lift\lift}],r[\sigma],b[\sigma],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\sigma],b[\sigma],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\sigma],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\tau],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\tau],p[\tau]).
-\end{aligned}
-\]
-Thus every constructor, including the two-binder cases, is covered by the
-explicit compatible closure of \(\defeq\).  Quotient soundness gives
-\(\Q(\sigma)(\den t)=\Q(\tau)(\den t)\); quotient induction extends this to
-arbitrary \(x:\Q_n\), and function extensionality identifies the two maps if
-map equality rather than pointwise equality is desired.
-\end{proof}
-
-\begin{theorem}[Compositionality of quotient substitution]
-\label{thm:quotient-compositionality}
-For every \(x\in\Q_n\) and composable substitutions
-\(\sigma\in\Sub(n,m)\), \(\tau\in\Sub(m,k)\),
-\[
-\begin{aligned}
-\Q(\idren^{\Sub}_n)(x)&=x,\\
-\Q(\tau)(\Q(\sigma)(x))&=\Q(\sigma;_{\Sub}\tau)(x).
-\end{aligned}
-\tag{6.5}\label{eq:quotient-compositionality}
-\]
-The equations hold for arbitrary quotient values, not merely for a chosen
-notation of the form \(\den t\).  If \(\sigma\) and \(\tau\) are pointwise
-definitionally equal, their induced maps agree.
-\end{theorem}
-
-\begin{proof}
-Define \(\Q(\sigma)\) by quotient elimination from
-\[
- t\longmapsto\den{t[\sigma]}.
-\]
-Its representative-independence obligation is: from \(t\defeq u\), prove
-\(\den{t[\sigma]}=\den{u[\sigma]}\).  Theorem~\ref{thm:computation-substitution}
-gives \(t[\sigma]\defeq u[\sigma]\), and quotient soundness supplies exactly
-that equality.  Thus the map is well defined.
-
-For identity and composition, use quotient induction to reduce an arbitrary
-\(x\) to \(\den t\).  Equations~\eqref{eq:sub-algebra} give
-\(\den{t[\idren^{\Sub}_n]}=\den t\) and
-\[
- \begin{aligned}
- \Q(\idren^{\Sub}_n)(\den t)
-   &=\den{t[\idren^{\Sub}_n]}=\den t,\\
- \Q(\tau)(\Q(\sigma)(\den t))
-   &=\den{t[\sigma][\tau]}
-     =\den{t[\sigma;_{\Sub}\tau]}
-     =\Q(\sigma;_{\Sub}\tau)(\den t).
- \end{aligned}
-\]
-Proposition~\ref{prop:environment-congruence} proves that pointwise
-\(\defeq\)-equal environments induce pointwise equal quotient maps; function
-extensionality gives equality of maps.  Hence the construction is independent
-both of expression representatives and of pointwise equivalent environment
-representatives, and the two displayed equations hold on every quotient
-value.
-\end{proof}
-
-Theorem~\ref{thm:quotient-compositionality} asserts only these identity and
-composition equations.  We have not defined a category of well-formed
-contexts and substitutions, so no categorical structure is asserted.
-
-\subsection{Action on quoted expressions}
-
-For \(t\in\Expr_n\) and \(\sigma\in\Sub(n,m)\), abbreviate
-\[
-                       \den t_\sigma\coloneqq
-                       \Q(\sigma)(\den t)=\den{t[\sigma]}.
-\tag{6.6}\label{eq:environment-interpretation}
-\]
-Then
-\[
-          \den{t[\sigma]}_\tau
-            =\den t_{\sigma;_{\Sub}\tau}.
-\tag{6.7}\label{eq:interpretation-composition}
-\]
-The quotient equality in~\eqref{eq:interpretation-composition} may be
-decorated by a singleton unlabelled quotient trace.  That decoration does
-not remember the substitution proof and plays no role in establishing the
-equation.
-
-Typing can be saturated by quotient representatives without calling the
-quotient a typed model.
-
-\begin{definition}[Quotient-saturated typing]
-\label{def:quotient-typing}
-For \(x,X\in\Q_n\), write
-\(\Gamma\models_{\Q}x:X\) when there exist \(t,A\in\Expr_n\) such that
-\[
-             \Gamma\vdash t:A,\qquad x=\den t,\qquad X=\den A.
+\paragraph{Scope.}
+We reason about proof-irrelevant ambient equality in an extensional
+set/type-theoretic metatheory, matching the formal artifact.  We classify
+\emph{propositional} beta only.  We do not present a full syntax or model of
+Martin-L\"of type theory, do not assume or prove univalence or higher
+inductive types, and do not identify \eqref{eq:path-record} with the HoTT
+identity type.  The raw de Bruijn calculus previously developed alongside this
+work is preserved as a separate companion manuscript
+\cite{ScopedTraceSoftware2026}; Section~\ref{sec:formalization} describes the
+division.
+
+\paragraph{Organization.}
+Section~\ref{sec:setting} fixes the metatheory.
+Section~\ref{sec:total-space} proves the general total-space classification.
+Section~\ref{sec:metadata} proves Theorem~\ref{thm:headline}.
+Section~\ref{sec:factorization} gives the factorizing-motive theorem and the
+two remedies.  Section~\ref{sec:traces} is the principal trace case study.
+Section~\ref{sec:examples} classifies further metadata.  Sections
+\ref{sec:comparison}--\ref{sec:conclusion} state boundaries, related work,
+formal verification, and conclusions.
+
+\section{Setting and definitions}
+\label{sec:setting}
+
+\subsection{Ambient equality and universes}
+
+Fix a universe \(\U\) closed under dependent sums and products, equality,
+finite lists, and the elementary constructions below.  A larger universe
+\(\V\) contains collections quantifying over all \(\U\)-valued motives.
+Thus an individual motive value and every equality proposition remain
+\(\U\)-small, while the record of an operation accepting every such motive
+may live in \(\V\).  No impredicative identification \(\U=\V\) is intended.
+
+Ambient equality has elimination, transport, function extensionality, and
+proof irrelevance.  For \(e:x=y\) and \(C:X\to\U\), write
+\[
+                  \transport_C(e,-):C(x)\longrightarrow C(y).
+\]
+Its reflexivity law is used propositionally:
+\[
+                  \transport_C(\refl_x,c)=c.
+\tag{2.1}\label{eq:transport-beta}
+\]
+Proof irrelevance implies that any two witnesses of the same ambient equality
+are equal.  This assumption is appropriate for Lean's \(\mathsf{Eq}\), which
+lives in \(\mathsf{Prop}\).  It is also why the present theory must not be read
+as a claim about arbitrary proof-relevant identity types.
+
+An equivalence \(e:X\Eqv Y\) consists of maps
+\[
+ e:X\to Y,\qquad e^{-1}:Y\to X
+\]
+with specified inverse equations.  We use no univalence principle: an
+equivalence is data, not an equality of types.
+
+\begin{definition}[Contractibility]
+For \(c:X\), define
+\[
+ \Contr_c(X)=\prod_{x:X}(c=x),\qquad
+ \isContr(X)=\sum_{c:X}\Contr_c(X).
+\tag{2.2}\label{eq:contractibility}
 \]
 \end{definition}
 
-\begin{proposition}[Substitution for quotient-saturated typing]
-\label{prop:quotient-typing-substitution}
-If \(\Gamma\models_{\Q}x:X\) and \(\sigma\) is a typed substitution from
-\(\Gamma\) to \(\Delta\), then
+The orientation \(c=x\) is convenient for transport from the center.  If
+\((c,\kappa):\isContr(X)\), then every two points are equal:
 \[
-        \Delta\models_{\Q}\Q(\sigma)(x):\Q(\sigma)(X).
+             x=(\kappa x)^{-1}\cdot\kappa y=y.
+\tag{2.3}\label{eq:all-equal}
 \]
-\end{proposition}
-
-\begin{proof}
-Choose the representatives in Definition~\ref{def:quotient-typing} and
-apply Theorem~\ref{thm:fundamental-substitution}.  The equalities identifying
-\(x\) and \(X\) with their representatives are preserved by the function
-\(\Q(\sigma)\).
-\end{proof}
-
-This relation merely packages a raw representative and two quotient
-equalities.  It supplies no context validity, conversion, or initial CwF.
-
-\section{Source identity programs and unlabelled quotient traces}
-\label{sec:identity-programs}
-
-\subsection{Finite same-scope frames and source programs}
-
-For \(t\in\Expr_n\), let \(C[t]\) denote plugging \(t\) into the one-hole
-frame \(C\).  The finite frame grammar used here is
+For a specified \(c_0:X\), the propositions
+\(\Contr_{c_0}(X)\) and \(\isContr(X)\) are equivalent.  One direction chooses
+\(c_0\); the other uses
 \[
-\begin{array}{llll}
-\App([-],a),&\App(f,[-]),&
-\Pair([-],b),&\Pair(a,[-]),\\
-\Fst([-]),&\Snd([-]),&\Succ_\ell([-]),&\El([-]),\\
-\Refl([-]),&
-\IdTy([-],a,b),&\IdTy(A,[-],b),&\IdTy(A,a,[-]),\\
-\CodeId([-],a,b),&\CodeId(A,[-],b),&\CodeId(A,a,[-]).
-\end{array}
-\tag{7.1}\label{eq:frames}
-\]
-These are same-scope frames; they do not include binder contexts.
-
-\begin{lemma}[Frame congruence]
-\label{lem:frame-congruence}
-If \(t\defeq u\), then \(C[t]\defeq C[u]\) for every
-\(C\) in~\eqref{eq:frames}.  Hence
-\[
- \overline C:\Q_n\to\Q_n,\qquad
- \overline C(\den t)=\den{C[t]}
-\]
-is representative-independent.
-\end{lemma}
-
-\begin{proof}
-Each case is the corresponding one-position congruence constructor of
-\(\defeq\).  Quotient soundness proves representative independence.
-\end{proof}
-
-\begin{definition}[Source identity programs]
-\label{def:identity-programs}
-For \(t,u\in\Expr_n\), the family \(\IProg_n(t,u)\) is generated by
-\[
-\frac{h:t\defeq u}{\mathsf{atom}(h):\IProg_n(t,u)},\qquad
-\mathbf{1}_t:\IProg_n(t,t),
-\]
-\[
-\frac{p:\IProg_n(t,u)}{p^{-1}:\IProg_n(u,t)},\qquad
-\frac{p:\IProg_n(t,u)\quad q:\IProg_n(u,v)}
-     {p\cdot q:\IProg_n(t,v)}.
-\]
-\[
-\frac{p:\IProg_n(t,u)}
-     {C[p]:\IProg_n(C[t],C[u])}.
-\]
-\end{definition}
-
-The atom accepts an untyped source \(\defeq\)-derivation.  It cannot accept a
-target trace step or target trace equivalence.  The family itself has no
-typing judgment for its endpoints.
-
-\begin{proposition}[Endpoint triviality]
-\label{prop:iprogram-endpoints}
-For \(t,u\in\Expr_n\),
-\[
- \operatorname{Nonempty}\bigl(\IProg_n(t,u)\bigr)
- \quad\Longleftrightarrow\quad t\defeq u.
-\tag{7.2}\label{eq:iprogram-endpoint-iff}
-\]
-\end{proposition}
-
-\begin{proof}
-For the forward implication, choose \(p:\IProg_n(t,u)\) and induct on
-\(p\).  An atom contains the required derivation.  Unit uses reflexivity;
-inverse uses symmetry; composition uses transitivity; and \(C[p]\) uses
-Lemma~\ref{lem:frame-congruence}.  Conversely, from \(h:t\defeq u\) take
-\(\mathsf{atom}(h):\IProg_n(t,u)\).
-\end{proof}
-
-Thus identity-program syntax adds compositional trace structure only after
-endpoint reachability has already been supplied by the untyped relation
-\(\defeq\).  It cannot discover a new pair of reachable endpoints, and its
-terms need not relate expressions having a common raw type.
-
-\begin{proposition}[Structural-recursion interpretation]
-\label{prop:iprogram-recursion}
-Fix \(n\).  Let \(G(t,u)\) be any family indexed by
-\(t,u\in\Expr_n\), equipped with:
-\[
-\begin{array}{ll}
-a_h:G(t,u)&\text{for every }h:t\defeq u,\\
-e_t:G(t,t),&\\
-i_{t,u}:G(t,u)\to G(u,t),&\\
-m_{t,u,v}:G(t,u)\to G(u,v)\to G(t,v),&\\
-F_C:G(t,u)\to G(C[t],C[u])&\text{for every }C\in\Frame_n.
-\end{array}
-\tag{7.3}\label{eq:target-signature}
-\]
-There is a unique pointwise family of maps
-\[
-        \Phi_{t,u}:\IProg_n(t,u)\to G(t,u)
-\tag{7.4}\label{eq:iprogram-fold}
-\]
-such that
-\[
-\begin{aligned}
-\Phi(\mathsf{atom}(h))&=a_h,&
-\Phi(\mathbf1_t)&=e_t,\\
-\Phi(p^{-1})&=i(\Phi p),&
-\Phi(p\cdot q)&=m(\Phi p)(\Phi q),\\
-\Phi(C[p])&=F_C(\Phi p).
-\end{aligned}
-\tag{7.5}\label{eq:iprogram-fold-equations}
-\]
-\end{proposition}
-
-\begin{proof}
-Existence is structural recursion on the five constructors of
-\(\IProg\).  If \(\Psi\) satisfies the same equations, induction on
-\(p:\IProg_n(t,u)\) gives \(\Phi(p)=\Psi(p)\) in each constructor case.
-This is pointwise uniqueness; function extensionality converts it to equality
-of the map families if desired.
-\end{proof}
-
-Proposition~\ref{prop:iprogram-recursion} is a free-\emph{syntax} property
-only.  It imposes no groupoid equations on \(G\) and says nothing about the
-quotient of \(\IProg\) by source rewrites.  A universal property for a free
-groupoid quotient would require proving that all source relations are
-respected and is not claimed here.
-
-\subsection{The unlabelled quotient-trace record}
-
-\begin{definition}[Trace steps and trace records]
-\label{def:trace-record}
-For a metatheoretic carrier \(X\), define
-\[
- \mathsf{QStep}(X)\coloneqq\sum_{x,y:X}(x=y),
- \qquad
- \Tr_X(a,b)\coloneqq
-   \operatorname{List}(\mathsf{QStep}(X))\times(a=b).
-\tag{7.6}\label{eq:trace-record}
-\]
-If \(S=(L,e):\Tr_X(a,b)\), write
-\(\operatorname{list}(S)=L\) and
-\(\operatorname{end}(S)=e\).
-\end{definition}
-
-The basic operations are fully determined on both fields.  Put
-\[
-\begin{aligned}
-\mathbf r_a&=([],\mathsf{refl}_a),\\
-(L,e)^{-1}
-  &=\bigl(\operatorname{map}(\mathsf{inv},
-       \operatorname{reverse}(L)),e^{-1}\bigr),\\
-(L,e)\cdot(M,d)&=(L{+\!\!+}M,e\mathbin{\cdot_{=}}d),
-\end{aligned}
-\tag{7.7}\label{eq:trace-operations}
-\]
-where
-\(\mathsf{inv}(x,y,h)=(y,x,h^{-1})\), \(+\!\!+\) is list
-concatenation, and \(\cdot_{=}\) is transitivity of ambient equality.
-For \(f:X\to Y\),
-\[
- f_\ast(L,e)=
- \bigl(\operatorname{map}(x,y,h\mapsto
-       (fx,fy,\mathsf{ap}_f(h)),L),\mathsf{ap}_f(e)\bigr).
-\tag{7.8}\label{eq:trace-map}
-\]
-Thus \(f_\ast\mathbf r_a=\mathbf r_{fa}\),
-\(f_\ast(S^{-1})=(f_\ast S)^{-1}\), and
-\(f_\ast(S\cdot T)=f_\ast S\cdot f_\ast T\).
-
-For a completely arbitrary record, Definition~\ref{def:trace-record} imposes
-no adjacency relation between successive list entries and no relation between
-the list and the outer endpoint field.  This fact is not used as a positive
-invariant.  The soundness theorem quantifies only over expressions of the
-form \(\ev(p)\).
-
-When \(X=\Q_n\), the record is \emph{unlabelled}.  Given
-\(h:t\defeq u\), quotient soundness produces
-\(\bar h:\den t=\den u\), and the atom is evaluated by
-\[
- \langle\bar h\rangle
- =\bigl([(\den t,\den u,\bar h)],\bar h\bigr).
-\]
-The derivation \(h\) is absent from this record.  In particular, two
-\(\defeq\)-derivations with the same endpoints yield equal quotient-equality
-proofs by proof irrelevance.  This differs from the label-sensitive calculus
-of~\cite{deQueirozEtAl2016,RamosEtAl2017,RamosEtAl2018,RamosEtAl2026}.
-Because \(\den t=\den u\) already in \(\Q_n\), an evaluated identity program
-is best regarded as a trace-decorated loop over that quotient-collapsed
-endpoint (although the displayed record retains the two representatives).
-
-Evaluation is structural:
-\[
-\begin{aligned}
-\ev(\mathsf{atom}(h))&=\langle\bar h\rangle,&
-\ev(\mathbf{1}_t)&=\mathbf r_{\den t},\\
-\ev(p^{-1})&=\ev(p)^{-1},&
-\ev(p\cdot q)&=\ev(p)\cdot\ev(q),\\
-\ev(C[p])&=\overline C_\ast(\ev(p)).
-\end{aligned}
-\tag{7.9}\label{eq:evaluation}
-\]
-This is the instance of Proposition~\ref{prop:iprogram-recursion} with
-\[
- G(t,u)=\Tr_{\Q_n}(\den t,\den u),\quad
- a_h=\langle\bar h\rangle,\quad e_t=\mathbf r_{\den t},
-\]
-and with inverse, composition, and frame actions supplied by
-\eqref{eq:trace-operations} and~\eqref{eq:trace-map}.
-If desired, the evaluated sublanguage can be named without asserting an
-unproved trace invariant:
-\[
- \mathsf{EvalTr}_n(t,u)
-   =\{\,T:\Tr_{\Q_n}(\den t,\den u)
-        \mid \exists p:\IProg_n(t,u),\ T=\ev(p)\,\}.
-\tag{7.10}\label{eq:evaluated-image}
-\]
-We use only the witness \(p\) and the defining equations~\eqref{eq:evaluation}.
-
-\subsection{The target trace rewrite relation}
-
-We now give the entire target relation needed below.  At fixed endpoints,
-the one-step relation \(S\TrStep T\) has exactly eight schemes:
-\[
-\begin{array}{rclcrcl}
-(\mathbf r_a)^{-1}&\TrStep&\mathbf r_a,
-&& (S^{-1})^{-1}&\TrStep&S,\\
-\mathbf r_a\cdot S&\TrStep&S,
-&&S\cdot\mathbf r_b&\TrStep&S,\\
-S\cdot S^{-1}&\TrStep&\mathbf r_a,
-&&S^{-1}\cdot S&\TrStep&\mathbf r_b,\\
-(S\cdot T)^{-1}&\TrStep&T^{-1}\cdot S^{-1},
-&&(S\cdot T)\cdot U&\TrStep&S\cdot(T\cdot U).
-\end{array}
-\tag{7.11}\label{eq:target-one-step}
-\]
-Here \(S:\Tr_X(a,b)\), \(T:\Tr_X(b,c)\), and
-\(U:\Tr_X(c,d)\) where required.  These rules are equations of trace
-expressions oriented from left to right; they do not inspect source syntax.
-
-\begin{definition}[Target trace equivalence]
-\label{def:target-trace-equivalence}
-\(\TrEq\) is the least endpoint-indexed family generated by
-\[
-\frac{}{S\TrEq S},\qquad
-\frac{S\TrStep T}{S\TrEq T},\qquad
-\frac{S\TrEq T}{T\TrEq S},\qquad
-\frac{S\TrEq T\quad T\TrEq U}{S\TrEq U},
-\tag{7.12}\label{eq:target-equivalence-closure}
-\]
-and the congruence rules
-\[
-\frac{S\TrEq T}{S^{-1}\TrEq T^{-1}},\qquad
-\frac{S\TrEq T}{S\cdot U\TrEq T\cdot U},\qquad
-\frac{T\TrEq U}{S\cdot T\TrEq S\cdot U},\qquad
-\frac{S\TrEq T}{f_\ast S\TrEq f_\ast T}.
-\tag{7.13}\label{eq:target-congruence}
-\]
-\end{definition}
-
-Equations~\eqref{eq:target-one-step}--\eqref{eq:target-congruence} are a
-complete mathematical presentation of the target fragment used in the
-soundness proof.  They are the groupoid core and congruence fragment of the
-larger computational-path rewrite system, not a presentation of all rules in
-the monograph.
-
-\subsection{Source rewrites and soundness}
-
-The source one-step relation \(p\srw q\) has the eight schemes obtained from
-\eqref{eq:target-one-step} by replacing \(S,T,U,\mathbf r\) with
-\(p,q,r,\mathbf1\).  It also has the congruence rules
-\[
-\frac{p\srw q}{p^{-1}\srw q^{-1}},\quad
-\frac{p\srw q}{p\cdot r\srw q\cdot r},\quad
-\frac{q\srw r}{p\cdot q\srw p\cdot r},\quad
-\frac{p\srw q}{C[p]\srw C[q]},
-\tag{7.14}\label{eq:source-congruence-rules}
-\]
-and the frame-unit rule
-\[
-                  C[\mathbf1_t]\srw\mathbf1_{C[t]}.
-\tag{7.15}\label{eq:frame-unit}
-\]
-Let \(\srweq\) be the reflexive, symmetric, transitive closure of
-\(\srw\).
-
-\begin{theorem}[Source identity rewrite soundness]
-\label{thm:identity-soundness}
-For \(p,q:\IProg_n(t,u)\),
-\[
-          p\srweq q
-          \quad\Longrightarrow\quad
-          \ev(p)\TrEq\ev(q).
-\tag{7.16}\label{eq:rewrite-soundness}
-\]
-\end{theorem}
-
-\begin{proof}
-Induct first on a source one-step derivation.  The eight groupoid cases are
-the eight target rules~\eqref{eq:target-one-step} after unfolding
-\eqref{eq:evaluation}.  Inverse and the two composition congruences use the
-first three rules in~\eqref{eq:target-congruence}.  Frame congruence uses the
-last rule with \(f=\overline C\).  The frame-unit case is reflexivity because
-\(\overline C_\ast\mathbf r_{\den t}=\mathbf r_{\den{C[t]}}\) by
-\eqref{eq:trace-map}.  Induct next on the reflexive, symmetric, transitive
-closure of the source relation and use the first, third, and fourth rules in
-\eqref{eq:target-equivalence-closure}.  No target derivation is an input to a
-source constructor.
-\end{proof}
-
-\begin{example}[Multi-step soundness]
-\label{ex:two-step-coherence}
-For \(p:\IProg_n(t,u)\) and \(q:\IProg_n(u,v)\), source associativity
-followed by right-unit congruence gives
-\[
-       (p\cdot q)\cdot\mathbf{1}_v
-          \srweq p\cdot q.
-\]
-The soundness derivation first applies target associativity and then removes
-the right unit inside the right factor.  This is a two-step derivation of
-trace equivalence; no equality between derivations is asserted.
-\end{example}
-
-\section{Examples: beta, dependency, and two-binder instantiation}
-\label{sec:example}
-
-\subsection{Lambda beta across the quotient layers}
-
-Fix a level \(\ell\) and work in the empty scope.  In one bound variable let
-\(x=\Var(0)\), and consider
-\[
-       r=\App(\Lam(x),\Zero_\ell),
-       \qquad s=\Zero_\ell.
-\tag{8.1}\label{eq:running-redex}
-\]
-The variable rule gives
-\(\Ext{\EmptyCtx_0}{\NatTy_\ell}\vdash
-x:\NatTy_\ell[\wk_0]_{\mathrm r}\); the latter expression is
-definitionally the constant \(\NatTy_\ell\).  Product formation and lambda
-introduction therefore derive
-\[
-  \EmptyCtx_0\vdash
-     \Lam(x):\PiTy(\NatTy_\ell,\NatTy_\ell),
-\]
-where the codomain notation suppresses its one-variable scope.  Together
-with
-\(\EmptyCtx_0\vdash\Zero_\ell:\NatTy_\ell\), application gives
-\[
-                  \EmptyCtx_0\vdash r:\NatTy_\ell.
+      c_0=(\kappa c_0)^{-1}\cdot\kappa x=x.
+\tag{2.4}\label{eq:recenter}
 \]
 
-At the operational layer, product beta gives
-\[
-          r\red x\{\Zero_\ell\}=\Zero_\ell=s.
-\tag{8.2}\label{eq:running-beta}
-\]
-The final equality is the variable clause of simultaneous substitution.
-Embedding primitive computation into the untyped definitional relation gives
-\[
-                         r\defeq s.
-\tag{8.3}\label{eq:running-defeq}
-\]
-Consequently quotient soundness identifies their classes:
-\[
-                         \den r=\den s
-                          \quad\text{in }\Q_0.
-\tag{8.4}\label{eq:running-quotient}
-\]
+\subsection{Based relations and unrestricted elimination}
 
-Let \(\beta\) denote the derivation~\eqref{eq:running-defeq} and define the
-source identity atom
+Let \(R:A\to\U\) be a relation row based at \(a\), and choose \(r_a:R(a)\).
+Its based total space and center are
 \[
-                   \alpha=\mathsf{atom}(\beta)
-                     :\IProg_0(r,s).
+             B_R=\sum_{b:A}R(b),\qquad c_R=(a,r_a).
+\tag{2.5}\label{eq:based-total}
 \]
-Its evaluation is the singleton unlabelled quotient trace
-\[
- P_\beta=\ev(\alpha)
-  =\Bigl(
-      [\,(\den r,\den s,\overline\beta)\,],
-      \overline\beta
-    \Bigr)
- :\Tr_{\Q_0}(\den r,\den s).
-\tag{8.5}\label{eq:running-path}
-\]
-It has one visible list entry, but that entry contains only the quotient
-equality \(\overline\beta\), not the derivation \(\beta\).  Source
-cancellation is sound as
-\[
-    \alpha\cdot\alpha^{-1}\srw\mathbf{1}_r
-    \quad\longmapsto\quad
-    P_\beta\cdot P_\beta^{-1}
-        \TrEq\mathbf r_{\den r}.
-\tag{8.6}\label{eq:running-rweq}
-\]
-
-Thus the example exhibits source beta, untyped source definitional equality,
-quotient equality, an unlabelled trace decoration, and target trace
-equivalence.  The quotient step erases the computational label; no arrow is
-reversed to define a source judgment.
-
-The same calculation is natural in environments.  If
-\(\App(\Lam(t),a)\in\Expr_n\) and \(\sigma\in\Sub(n,m)\), then
-\[
-\App(\Lam(t),a)[\sigma]
-   \red t[\sigma^\lift]\{a[\sigma]\}
-   =t\{a\}[\sigma].
-\]
-The final equation is the one-variable case of
-Proposition~\ref{prop:instantiation}.
-
-\subsection{Dependent second projection}
-\label{sec:example-snd}
-
-Suppose
-\[
-\Gamma\vdash A:\Sort_\ell,\qquad
-\Ext{\Gamma}{A}\vdash B:\Sort_\ell,\qquad
-\Gamma\vdash a:A,\qquad
-\Gamma\vdash b:B\{a\}.
-\]
-Then pair introduction and second-projection elimination derive
-\[
- \Gamma\vdash
- \Snd(\Pair(a,b)):
- B\{\Fst(\Pair(a,b))\}.
-\tag{8.7}\label{eq:snd-source-type}
-\]
-The primitive redex is
-\[
-                    \Snd(\Pair(a,b))\red b.
-\tag{8.8}\label{eq:snd-redex}
-\]
-The target \(b\) is not presented at the expression in
-\eqref{eq:snd-source-type}; its derivation has type \(B\{a\}\).  The required
-coherence is a source calculation:
-\[
-\Fst(\Pair(a,b))\red a
-\ \Longrightarrow\
-a\defeq\Fst(\Pair(a,b))
-\ \Longrightarrow\
-B\{a\}\defeq B\{\Fst(\Pair(a,b))\}.
-\tag{8.9}\label{eq:snd-type-coherence}
-\]
-The first implication uses symmetry in \(\defeq\); the second is
-one-variable substitution-environment congruence for the body \(B\).
-Therefore Theorem~\ref{thm:redex-preservation} returns \(B\{a\}\) as the
-target type and~\eqref{eq:snd-type-coherence} as its relation to the source
-type.  This example is the reason neither a conversion rule nor literal
-equality of displayed types should be inferred from the theorem.
-
-\subsection{Natural successor beta}
-\label{sec:example-nat}
-
-Assume the premises of the natural eliminator and
-\(\Gamma\vdash k:\NatTy_\ell\).  Put
-\[
-             R_k=\NatElim_\ell(M,z,s,k).
-\]
-The successor redex and contractum are
-\[
-\NatElim_\ell(M,z,s,\Succ_\ell(k))
-  \red s\{k,R_k\}.
-\tag{8.10}\label{eq:nat-succ-example}
-\]
-The branch derivation lives under two binders:
-\[
-  \Ext{\Ext{\Gamma}{\NatTy_\ell}}{M}\vdash s:T_{\mathrm{succ}}(M).
-\]
-Typed two-variable instantiation first uses
-\(\Gamma\vdash k:\NatTy_\ell\) and then
-\(\Gamma\vdash R_k:M\{k\}\), producing
-\[
- \Gamma\vdash s\{k,R_k\}:
-   T_{\mathrm{succ}}(M)\{k,R_k\}.
-\]
-The explicit substitution defining \(T_{\mathrm{succ}}\) yields
-\[
- T_{\mathrm{succ}}(M)\{k,R_k\}
-   =M\{\Succ_\ell(k)\},
-\]
-which is exactly the type of the redex.  The equality is a three-index
-calculation on the substitution into \(M\), not an appeal to target traces.
-
-\subsection{\texorpdfstring{What raw \(J\)-beta says}{What raw J-beta says}}
-
-If the six premises of~\eqref{eq:eqj-rule} specialize to endpoint \(a\) and
-proof \(\Refl(a)\), then
-\[
-             \EqJ(M,r,a,\Refl(a))\red r
-\]
-and the source and target are typed at the same raw expression
-\(M\{a,\Refl(a)\}\).  This is the entire raw result.  It does not say that
-\(M\) factors through quotient equality and is not interpreted by the
-external construction of Section~\ref{sec:j-boundary}.
-
-\section{Summary of the raw structural theorems}
-\label{sec:main-result}
-
-\begin{theorem}[Raw scoped structural theorem]
-\label{thm:raw-structural}
-For the exact grammar and judgments of
-Sections~\ref{sec:syntax}--\ref{sec:judgments}:
-\begin{enumerate}
-\item \(\Ren(n,m)\), \(\Sub(n,m)\), their lifts, the embedding
-  \(\mathsf{ofRen}\), weakening, and one- and two-variable instantiation
-  satisfy Propositions~\ref{prop:renaming} and~\ref{prop:instantiation} and
-  Theorem~\ref{thm:substitution-algebra}.
-\item Pointwise typed \(\sigma\in\Sub(n,m)\) preserves the raw typing family.
-  Primitive computation and untyped \(\defeq\) are stable under every such
-  raw substitution.
-\item The ten top-level primitive redex constructors satisfy
-  Theorem~\ref{thm:redex-preservation}.  No contextual or multi-step
-  preservation statement is included.
-\item The quotient action~\eqref{eq:quotient-substitution} is independent of
-  expression representatives and pointwise \(\defeq\)-equal substitution
-  environments.  It satisfies identity and composition on arbitrary
-  quotient values, and the quotient-saturated typing relation is stable
-  under pointwise typed substitutions.
-\item Source identity programs are endpoint-trivial
-  (Proposition~\ref{prop:iprogram-endpoints}) and satisfy the
-  operation-preserving structural-recursion principle of
-  Proposition~\ref{prop:iprogram-recursion}.  Its quotient-trace instance is
-  evaluation~\eqref{eq:evaluation}, and
-  \(p\srweq q\) implies \(\ev(p)\TrEq\ev(q)\).
-\item The raw \(\EqJ\) constructor participates only through its raw typing,
-  two-binder substitution, congruence, and top-level reflexivity beta rules.
-  No external motive-factorization theorem is included.
-\end{enumerate}
-\end{theorem}
-
-\begin{proof}
-The clauses collect
-Theorems~\ref{thm:substitution-algebra},
-\ref{thm:fundamental-substitution},
-\ref{thm:computation-substitution},
-\ref{thm:redex-preservation},
-\ref{thm:quotient-compositionality}, and
-\ref{thm:identity-soundness}, with
-Propositions~\ref{prop:environment-congruence} and
-\ref{prop:quotient-typing-substitution},
-\ref{prop:iprogram-endpoints}, and
-\ref{prop:iprogram-recursion}.  Each constituent proof was given
-before quotient traces were introduced, except for source identity rewrite
-soundness, whose target relation was explicitly defined in
-\eqref{eq:target-one-step}--\eqref{eq:target-congruence}.
-\end{proof}
-
-\begin{proposition}[Endpoint exactness of the syntactic quotient]
-\label{prop:endpoint-exactness}
-For \(t,u\in\Expr_n\),
-\[
-  \operatorname{Nonempty}
-    \bigl(\Tr_{\Q_n}(\den t,\den u)\bigr)
-       \quad\Longleftrightarrow\quad t\defeq u.
-\tag{9.1}\label{eq:exact-endpoint}
-\]
-\end{proposition}
-
-\begin{proof}
-Given a trace record, discard its list and retain
-\(\den t=\den u\); quotient exactness gives \(t\defeq u\).
-Conversely, \(h:t\defeq u\) gives a quotient equality by quotient soundness,
-and Definition~\ref{def:trace-record} accepts the corresponding singleton
-list and endpoint proof.
-\end{proof}
-
-\begin{remark}
-Proposition~\ref{prop:endpoint-exactness} is tautological after defining
-\(\Q_n\) as the quotient by \(\defeq\).  It is not a completeness or
-external-semantic theorem.  The substantive results are
-the source structural inductions, primitive-redex preservation, quotient-map
-well-definedness, and source-to-target rewrite soundness collected in
-Theorem~\ref{thm:raw-structural}.
-\end{remark}
-
-\section{\texorpdfstring{The metadata-fiber criterion for \(J\)}
-{The metadata-fiber criterion for J}}
-\label{sec:j-boundary}
-
-\subsection{\texorpdfstring{\(J\) and based total-space contractibility}
-{J and based total-space contractibility}}
-
-Let \(A\in\mathcal U\) be a small set and let
-\[
-                    R:A\to A\to\mathcal U
-\]
-be any reflexivity-equipped family, with a chosen
-\(r_x:R(x,x)\) for every \(x:A\).  No composition, inverse, or equality
-projection is assumed.  At a fixed \(a:A\), define the based total space
-\[
-                B_a\coloneqq\sum_{b:A}R(a,b),
-       \qquad c_a\coloneqq(a,r_a):B_a.
-\tag{10.1}\label{eq:based-total-space}
-\]
-Write
-\[
- \mathsf{Contr}_{c}(X)\coloneqq\prod_{x:X}(c=x),
- \qquad
- \mathsf{isContr}(X)\coloneqq\sum_{c:X}\mathsf{Contr}_{c}(X).
-\tag{10.2}\label{eq:contractibility}
-\]
-For a specified \(c:X\), \(\mathsf{Contr}_c(X)\) is equivalent to
-\(\mathsf{isContr}(X)\).  One direction chooses \(c\).  Conversely, from
-\((d,k):\mathsf{isContr}(X)\) obtain
-\((k(c))^{-1}\cdot k(x):c=x\).
+Writing \(R(b)\) rather than \(R(a,b)\) keeps the fixed base point implicit.
 
 \begin{definition}[Unrestricted based elimination with propositional beta]
-\label{def:unrestricted-j}
-Write \(\mathsf{J}^{\beta}_R(a)\) for the proposition that there exist
-eliminator data
+\label{def:unrestricted}
+The data \(\Jbeta_R(a,r_a)\) consist of an operation
 \[
  \mathcal J:
- \prod_{C:B_a\to\mathcal U}
- C(c_a)\to\prod_{x:B_a}C(x)
-\tag{10.3}\label{eq:unrestricted-j}
+   \prod_{C:B_R\to\U}
+   C(c_R)\longrightarrow\prod_{x:B_R}C(x)
+\tag{2.6}\label{eq:j-data}
 \]
-together with the propositional beta family
+and equations
 \[
- \beta_{C,d}:\mathcal J(C,d,c_a)=d
- \qquad(C:B_a\to\mathcal U,\ d:C(c_a)).
-\tag{10.4}\label{eq:unrestricted-j-beta}
+       \beta_{C,d}:\mathcal J(C,d,c_R)=d
+       \qquad(C:B_R\to\U,\ d:C(c_R)).
+\tag{2.7}\label{eq:j-beta}
 \]
-In endpoint notation,
-\(\mathcal J(C,d,(b,p))\) is written \(\mathcal J(C,d,b,p)\), so beta is
-explicitly
-\[
-             \mathcal J(C,d,a,r_a)=d.
-\]
-The eliminator data and the proposition
-\(\mathsf{J}^{\beta}_R(a)\) lie in \(\mathcal V\); each beta equation is a
-small proof-irrelevant proposition.  Beta is propositional only.  No
-judgmental beta rule is claimed.
 \end{definition}
 
-\begin{theorem}[Based elimination with propositional beta classifies
-total-space contractibility]
-\label{thm:j-contracts-total}
-There are equivalences of \(\mathcal V\)-propositions
+The adjective ``unrestricted'' refers only to the motive: \(C\) may inspect
+the entire point \(x=(b,p)\), including every field of \(p\).  The beta law is
+an ambient equality, not a judgmental reduction.  Definition
+\ref{def:unrestricted} is based: \(a\) and \(r_a\) are fixed.
+
+\section{Based elimination and total-space contractibility}
+\label{sec:total-space}
+
+\begin{theorem}[Total-space classification]
+\label{thm:j-total}
+For any based relation row \((R,r_a)\),
 \[
- \mathsf{J}^{\beta}_R(a)
- \quad\Longleftrightarrow\quad
- \mathsf{Contr}_{c_a}(B_a)
- \quad\Longleftrightarrow\quad
- \mathsf{isContr}(B_a).
-\tag{10.5}\label{eq:j-total-equivalence}
+        \Jbeta_R(a,r_a)
+        \quad\Longleftrightarrow\quad
+        \Contr_{c_R}(B_R)
+        \quad\Longleftrightarrow\quad
+        \isContr(B_R).
+\tag{3.1}\label{eq:j-total}
 \]
+Here the first term means that the data of Definition
+\ref{def:unrestricted} exist.
 \end{theorem}
 
 \begin{proof}
-Suppose first that \((\mathcal J,\beta)\) witnesses
-\(\mathsf{J}^{\beta}_R(a)\).  Choose the motive
+Assume \((\mathcal J,\beta)\).  Use the motive
 \[
-              C(b,p)\coloneqq\bigl(c_a=(b,p)\bigr).
-\tag{10.6}\label{eq:contraction-motive}
+                         C(x)=(c_R=x).
+\tag{3.2}\label{eq:contraction-motive}
 \]
-Its reflexivity case is
-\(\mathsf{refl}_{c_a}:C(a,r_a)\).  Define, for every \(b:A\) and
-\(p:R(a,b)\),
+Its base datum is \(\refl_{c_R}:C(c_R)\).  Define
 \[
- \kappa_{b,p}\coloneqq
- \mathcal J(C,\mathsf{refl}_{c_a},b,p):c_a=(b,p).
-\tag{10.7}\label{eq:contraction-path}
+       \kappa(x)=\mathcal J(C,\refl_{c_R},x):c_R=x.
+\tag{3.3}\label{eq:kappa-from-j}
 \]
-Every \(x:B_a\) is a pair \((b,p)\); dependent-sum elimination therefore
-defines
-\(\kappa:\prod_{x:B_a}c_a=x\) by
-\(\kappa(b,p)=\kappa_{b,p}\).  This gives
-\(\mathsf{Contr}_{c_a}(B_a)\).  The supplied beta law also records the
-coherence
-\[
-             \kappa(c_a)=\mathsf{refl}_{c_a}.
-\tag{10.8}\label{eq:contraction-center-beta}
-\]
+This is an element of \(\Contr_{c_R}(B_R)\).  The supplied beta equation
+also gives \(\kappa(c_R)=\refl_{c_R}\), although only the contraction itself
+is needed for this direction.
 
-Conversely, suppose
-\(\kappa:\mathsf{Contr}_{c_a}(B_a)\).  For a
-\(\mathcal U\)-valued motive \(C\), a base element
-\(d:C(a,r_a)\), and \(x=(b,p):B_a\), define
+Conversely, let \(\kappa:\Contr_{c_R}(B_R)\).  Given \(C\), \(d:C(c_R)\),
+and \(x:B_R\), put
 \[
- J_{\kappa}(C,d,b,p)
- \coloneqq
- \mathsf{transport}_{\widetilde C}(\kappa(b,p),d):C(b,p),
-\tag{10.9}\label{eq:j-from-contraction}
+        \mathcal J_\kappa(C,d,x)
+        =\transport_C(\kappa(x),d):C(x).
+\tag{3.4}\label{eq:j-from-kappa}
 \]
-where \(\widetilde C(b,p)=C(b,p)\) is regarded as a family on \(B_a\).
-At the center, proof irrelevance gives
-\(\kappa(c_a)=\mathsf{refl}_{c_a}\).  Congruence of transport in its
-equality argument and~\eqref{eq:transport-beta} give the propositional beta
-equation
+At \(x=c_R\), proof irrelevance identifies
+\(\kappa(c_R)\) with \(\refl_{c_R}\).  Congruence of transport in its equality
+argument and~\eqref{eq:transport-beta} give
 \[
- J_\kappa(C,d,a,r_a)
- =\mathsf{transport}_{\widetilde C}(\kappa(c_a),d)
+ \mathcal J_\kappa(C,d,c_R)
+ =\transport_C(\kappa(c_R),d)
+ =\transport_C(\refl_{c_R},d)
  =d.
-\tag{10.10}\label{eq:contraction-derived-beta}
+\tag{3.5}\label{eq:derived-beta}
 \]
-Thus \((J_\kappa,\beta^\kappa)\) witnesses
-\(\mathsf{J}^{\beta}_R(a)\); no judgmental equality was used.  The final equivalence with
-\(\mathsf{isContr}(B_a)\) is the specified-center argument following
-\eqref{eq:contractibility}.
+Thus \((\mathcal J_\kappa,\beta^\kappa)\) is the required data.
+The final equivalence in~\eqref{eq:j-total} is the recentering argument
+\eqref{eq:recenter}.
 \end{proof}
 
-\begin{corollary}[Observable-metadata obstruction]
-\label{cor:observable-obstruction}
-Each of the following shows that \(R\) does not admit an unrestricted based
-eliminator satisfying propositional beta, i.e. refutes
-\(\mathsf{J}^{\beta}_R(a)\):
-\begin{enumerate}
-\item an element \(x:B_a\) with \(c_a\neq x\);
-\item in particular, \(p:R(a,a)\) with
-  \((a,r_a)\neq(a,p)\);
-\item a predicate \(O:B_a\to\mathsf{Prop}\) and \(x:B_a\) such that
-  \(O(c_a)\) and \(\neg O(x)\).
-\end{enumerate}
+\begin{remark}[What is standard]
+\label{rem:standard-stage}
+Theorem~\ref{thm:j-total} is the standard universal-property argument for a
+pointed contractible space: sections of every family are determined by the
+fiber over the center.  Applied to \(R(b)=(a=b)\), equality elimination proves
+that~\eqref{eq:identity-total} is contractible.  Neither fact mentions
+metadata.  The classification specific to decorated equality begins in
+Section~\ref{sec:metadata}, where a second equivalence computes the enlarged
+total space.
+\end{remark}
+
+\begin{corollary}[Observable-point obstruction]
+\label{cor:observable-point}
+If \(x:B_R\) satisfies \(x\ne c_R\), then \(\Jbeta_R(a,r_a)\) does not exist.
+More generally, it is enough to give \(O:B_R\to\mathsf{Prop}\) with
+\(O(c_R)\) and \(\neg O(x)\).
 \end{corollary}
 
 \begin{proof}
-In the first two cases, Theorem~\ref{thm:j-contracts-total} supplies
-\(c_a=x\), contradicting the hypothesis.  In the third case one may either
-transport \(O(c_a)\) along that equality or argue directly: choose the motive
-\(C(b,p)=O(b,p)\) for the eliminator~\eqref{eq:unrestricted-j}; its base case yields
-\(O(x)\), contradicting \(\neg O(x)\).
+An eliminator gives \(c_R=x\) by~\eqref{eq:kappa-from-j}, contradicting the
+first hypothesis.  For the predicate formulation, transport \(O(c_R)\) along
+that equality.  Equivalently, use \(O\) itself as the motive in
+\eqref{eq:j-data}.
 \end{proof}
 
-Theorem~\ref{thm:j-contracts-total} is standard background: it abstracts the
-familiar contractibility proof for the based total identity space.  The next
-step identifies exactly what it says for equality enriched by metadata.
+The corollary is useful for finding counterexamples, but it does not yet
+classify a structured family.  For equality refinements, the entire
+obstruction can be localized to one fiber.
 
-\subsection{Equality plus metadata}
-\label{sec:metadata-classification}
+\section{The metadata-fiber criterion}
+\label{sec:metadata}
 
-Fix \(a:A\).  Let
+Return to the data of~\eqref{eq:refinement}.  The based total space is
 \[
- M:\prod_{b:A}(a=b)\to\mathcal U
+       T_M(a)
+       =\sum_{b:A}R_M(a,b)
+       =\sum_{b:A}\sum_{h:a=b}M(b,h),
+\tag{4.1}\label{eq:metadata-total}
 \]
-be a metadata family and choose
-\(m_0:M(a,\mathsf{refl}_a)\).  Define
+with center
 \[
- R_M(a,b)\coloneqq\sum_{h:a=b}M(b,h),
- \qquad
- r^M_a\coloneqq(\mathsf{refl}_a,m_0),
-\tag{10.11}\label{eq:metadata-refinement}
+                         c_M=(a,\refl_a,m_0).
+\tag{4.2}\label{eq:metadata-center}
 \]
-and
-\[
- B_M\coloneqq
- \sum_{b:A}\sum_{h:a=b}M(b,h).
-\tag{10.12}\label{eq:metadata-total-space}
-\]
-Only the row based at the fixed \(a\) is required by
-Definition~\ref{def:unrestricted-j}; no refinement data at another base point
-is being inferred.
 
-\begin{lemma}[The based equality total space]
-\label{lem:based-equality-total}
-The small set
-\[
- P_a\coloneqq\sum_{b:A}(a=b)
-\]
-is contractible with center
-\(s_0=(a,\mathsf{refl}_a)\).
+\subsection{Collapsing the equality coordinates}
+
+\begin{lemma}[Based equality total space]
+\label{lem:equality-total}
+The type \(P_a=\sum_{b:A}(a=b)\) is contractible with center
+\((a,\refl_a)\).
 \end{lemma}
 
 \begin{proof}
-Equality elimination on \(h:a=b\) defines
+For \((b,h):P_a\), equality elimination on \(h\) reduces the goal
 \[
- \lambda(b,h).\,\kappa_{b,h}:
- \prod_{(b,h):P_a}s_0=(b,h),
+                    (a,\refl_a)=(b,h)
 \]
-with
-\(\kappa_{a,\mathsf{refl}_a}=\mathsf{refl}_{s_0}\).
-This is a contraction centered at \(s_0\).
+to reflexivity at \((a,\refl_a)\).  This defines the contraction for every
+\((b,h)\).
 \end{proof}
 
-\begin{theorem}[The metadata total space is its reflexivity fiber]
-\label{thm:metadata-total-equivalence}
-There is an equivalence
+\begin{theorem}[Total space--fiber equivalence]
+\label{thm:total-fiber}
+There is a specified equivalence
 \[
-       B_M\simeq M(a,\mathsf{refl}_a)
-\tag{10.13}\label{eq:metadata-equivalence}
+             \Phi_M:T_M(a)\Eqv M(a,\refl_a)
+\tag{4.3}\label{eq:total-fiber}
 \]
-that sends \((a,\mathsf{refl}_a,m)\) to \(m\).
+whose forward map sends \((a,\refl_a,m)\) to \(m\), and whose inverse sends
+\(m\) to \((a,\refl_a,m)\).
 \end{theorem}
 
 \begin{proof}
-Regard \(M\) as the family
-\(\widetilde M:P_a\to\mathcal U\) given by
-\(\widetilde M(b,h)=M(b,h)\), and use the contraction
-\(\kappa_{b,h}:s_0=(b,h)\) above.  Define
+Define the inverse immediately:
 \[
- \begin{aligned}
- F:B_M&\longrightarrow M(a,\mathsf{refl}_a),&
- F(b,h,m)&=
- \mathsf{transport}_{\widetilde M}(\kappa_{b,h}^{-1},m),\\
- G:M(a,\mathsf{refl}_a)&\longrightarrow B_M,&
- G(m)&=(a,\mathsf{refl}_a,m).
- \end{aligned}
-\tag{10.14}\label{eq:metadata-equivalence-maps}
+       G:M(a,\refl_a)\longrightarrow T_M(a),\qquad
+       G(m)=(a,\refl_a,m).
+\tag{4.4}\label{eq:fiber-inclusion}
 \]
-Equality elimination makes
-\(\kappa_{a,\mathsf{refl}_a}\) reflexivity, hence
-\(F(G(m))=m\).  For \(G(F(b,h,m))=(b,h,m)\), eliminate on
-\(h:a=b\).  The remaining case is
+For the forward map, take \((b,h,m):T_M(a)\) and eliminate on \(h:a=b\).
+In the reflexive case return \(m\):
 \[
- G(F(a,\mathsf{refl}_a,m))
- =(a,\mathsf{refl}_a,m),
+ F(b,h,m)=
+ \mathsf J_{=}\bigl(
+    b,h,m;\;m\mapsto m
+ \bigr):M(a,\refl_a).
+\tag{4.5}\label{eq:fiber-retraction}
 \]
-which is reflexivity.  Proof irrelevance ensures there is no further
-equality-proof case.  Thus \(F\) and \(G\) are inverse.
+Equivalently, using the contraction
+\(\gamma_{b,h}:(a,\refl_a)=(b,h)\) from
+Lemma~\ref{lem:equality-total},
+\[
+ F(b,h,m)=
+ \transport_{\widetilde M}(\gamma_{b,h}^{-1},m),
+ \qquad \widetilde M(b,h)=M(b,h).
+\tag{4.6}\label{eq:fiber-transport}
+\]
+At reflexivity, \(F(G(m))=m\).  For the other composite, eliminate on
+\(h\).  The required equation becomes
+\[
+ G(F(a,\refl_a,m))=(a,\refl_a,m),
+\]
+which is reflexivity.  Thus \(F\) and \(G\) are inverse.
 \end{proof}
 
-\begin{lemma}[Contractibility is invariant under equivalence]
-\label{lem:contractibility-equivalence}
-If \(F:X\simeq Y\), then
-\(\mathsf{isContr}(X)\) iff \(\mathsf{isContr}(Y)\).
+The proof uses equality elimination; it does not choose representatives of
+arbitrary paths, normalize metadata, or assume that all metadata values equal
+\(m_0\).  It says that all metadata in the total space can be transported to
+the reflexivity fiber, where it remains visible.
+
+\begin{lemma}[Contractibility respects equivalence]
+\label{lem:contr-equiv}
+If \(e:X\Eqv Y\), then
+\[
+                         \isContr(X)\Longleftrightarrow\isContr(Y).
+\tag{4.7}\label{eq:contr-equiv}
+\]
 \end{lemma}
 
 \begin{proof}
-Let \(G\) be an inverse.  If \((c,k)\) contracts \(X\), then \(F(c)\)
-contracts \(Y\): for \(y:Y\), apply \(F\) to \(k(Gy):c=Gy\) and compose
-with the inverse law \(F(Gy)=y\).  The converse exchanges \(F\) and \(G\).
+If \((c,\kappa)\) contracts \(X\), use \(e(c)\) as center of \(Y\).  For
+\(y:Y\), the composite
+\[
+ e(c)\xrightarrow{\,e(\kappa(e^{-1}y))\,}
+ e(e^{-1}y)\xrightarrow{\,\varepsilon_y\,}y
+\]
+is the contraction path.  Apply the same construction to \(e^{-1}\) for the
+converse.
 \end{proof}
 
-\begin{theorem}[Metadata-fiber criterion for \(J\)]
-\label{thm:metadata-fiber-criterion}
-The refinement~\eqref{eq:metadata-refinement} admits an unrestricted based
-eliminator satisfying propositional beta exactly when its reflexivity
-metadata fiber is contractible:
+\begin{theorem}[Metadata-fiber criterion, full form]
+\label{thm:metadata-fiber}
+For \(R_M\) and \(r^M_a\) as in~\eqref{eq:refinement},
 \[
- \mathsf{J}^{\beta}_{R_M}(a)
+ \Jbeta_{R_M}(a,r^M_a)
  \quad\Longleftrightarrow\quad
- \mathsf{isContr}\bigl(M(a,\mathsf{refl}_a)\bigr).
-\tag{10.15}\label{eq:metadata-fiber-criterion}
+ \isContr\bigl(T_M(a)\bigr)
+ \quad\Longleftrightarrow\quad
+ \isContr\bigl(M(a,\refl_a)\bigr).
+\tag{4.8}\label{eq:metadata-full}
 \]
-The equivalence is read in \(\mathcal V\); the contractibility witness itself
-is \(\mathcal U\)-small.
 \end{theorem}
 
 \begin{proof}
-Theorem~\ref{thm:j-contracts-total} identifies the left side with
-\(\mathsf{isContr}(B_M)\).
-Theorem~\ref{thm:metadata-total-equivalence} and
-Lemma~\ref{lem:contractibility-equivalence} identify that proposition with
-contractibility of the reflexivity metadata fiber.
+The first equivalence is Theorem~\ref{thm:j-total}, applied to the relation row
+\(b\mapsto R_M(a,b)\) and center \(c_M\).  The second is
+Lemma~\ref{lem:contr-equiv}, applied to the explicit equivalence
+\(\Phi_M\) of Theorem~\ref{thm:total-fiber}.  Composing the equivalences proves
+the claim.
 \end{proof}
 
-\subsection{The available equality-component eliminator}
+Theorem~\ref{thm:headline} is the first-to-last equivalence in
+\eqref{eq:metadata-full}.  The chosen base metadata \(m_0\) does not by itself
+need to equal every metadata value by definition; the criterion says exactly
+that such equalities must be available as a contraction.
 
-The metadata refinement has the projection
-\[
- q_{a,b}:R_M(a,b)\to(a=b),\qquad q(h,m)=h,
-\tag{10.16}\label{eq:equality-projection}
-\]
-with \(q(r^M_a)=\mathsf{refl}_a\).  For a family \(D(b,h)\) depending only
-on the equality component, ambient equality elimination defines
-\[
- J_q(D,d,b,p):D(b,q(p))
-\tag{10.17}\label{eq:general-equality-component-j}
-\]
-from \(d:D(a,\mathsf{refl}_a)\), with propositional beta
-\[
-                J_q(D,d,a,r^M_a)=d.
-\]
-This is not unrestricted
-\(\mathsf{J}^{\beta}_{R_M}(a)\): the motive is forced to factor through
-\(q\), although it has its own propositional reflexivity equation.
-For the trace record, this projection is
-\[
-             \pi:\Tr_X(a,b)\longrightarrow(a=b),
-             \qquad \pi(L,e)=e.
-\tag{10.18}\label{eq:forget-trace}
-\]
-Let \(C(b,e)\) be a family depending on an endpoint \(b:X\) and an ambient
-equality \(e:a=b\), but not on a trace list.  Given
-\(c:C(a,\mathsf{refl}_a)\), ordinary elimination on the equality component
-defines
-\[
-  J_{=}(C,c,P):C(b,\pi(P))
-             \qquad(P:\Tr_X(a,b)).
-\tag{10.19}\label{eq:proof-insensitive-j}
-\]
-It satisfies the reflexivity equation at the empty reflexive trace:
-\[
-             J_{=}(C,c,\mathbf r_a)=c.
-\tag{10.20}\label{eq:j-beta}
-\]
-This beta equation is propositional, not judgmental.
-Moreover, for any \(P,Q:\Tr_X(a,b)\), proof irrelevance of the equality
-components gives
-\[
-             J_{=}(C,c,P)=J_{=}(C,c,Q).
-\tag{10.21}\label{eq:j-trace-irrelevance}
-\]
-This is an \emph{available equality-component eliminator with propositional
-beta}.  We do not claim
-that the syntactic motive \(M\) of raw \(\EqJ\) is interpreted by \(C\), or
-that raw beta is proved through this construction.
+\subsection{Immediate classifications}
 
-\subsection{Trace metadata}
+\begin{corollary}[Contractible decorations]
+\label{cor:contractible-decoration}
+If \(M(a,\refl_a)\) is contractible, then \(R_M\) admits unrestricted based
+elimination with propositional beta.  In particular this holds when the
+reflexivity fiber is:
+\begin{enumerate}[label=(\roman*)]
+\item the unit type;
+\item an inhabited subsingleton;
+\item a proof-irrelevant proposition with a witness; or
+\item a type equipped with a quotient identifying every element with \(m_0\).
+\end{enumerate}
+\end{corollary}
 
-Let
+\begin{corollary}[Visible alternatives]
+\label{cor:visible-alternatives}
+If \(m_1:M(a,\refl_a)\) and \(m_0\ne m_1\), unrestricted based elimination
+with propositional beta does not exist.
+\end{corollary}
+
+\begin{proof}
+A contraction would identify \(m_0\) and \(m_1\) by
+\eqref{eq:all-equal}; apply Theorem~\ref{thm:metadata-fiber}.
+\end{proof}
+
+\begin{remark}[Only the reflexivity fiber]
+\label{rem:only-fiber}
+The criterion does not require a separate contractibility hypothesis for
+every \(M(b,h)\).  Equality elimination transports the entire total space to
+\(M(a,\refl_a)\).  Conversely, noncanonical metadata over reflexivity is
+already fatal, even if every nonreflexive-looking presentation has a unique
+decoration.
+\end{remark}
+
+\section{The largest explicitly supported class of motives}
+\label{sec:factorization}
+
+Failure of unrestricted elimination does not mean that no useful elimination
+principle remains.  The projection~\eqref{eq:projection} supports precisely the
+class we can state and prove without inspecting metadata.
+
+\begin{definition}[Strict equality-projection motive]
+\label{def:strict-factor}
+Given
+\[
+                  D:\prod_{b:A}(a=b)\longrightarrow\U,
+\]
+its pullback along \(\proj\) is the motive
+\[
+       C_D(b,h,m)=D(b,h)
+       \qquad ((h,m):R_M(a,b)).
+\tag{5.1}\label{eq:strict-factor}
+\]
+\end{definition}
+
+\begin{theorem}[Motive factorization]
+\label{thm:motive-factorization}
+Every strict equality-projection motive \(C_D\) admits elimination
+\[
+  J_{\proj}:
+  D(a,\refl_a)\longrightarrow
+  \prod_{b:A}\prod_{p:R_M(a,b)}D(b,\proj p)
+\tag{5.2}\label{eq:factored-j}
+\]
+with propositional beta at \(r^M_a\):
+\[
+                  J_{\proj}(d,a,r^M_a)=d.
+\tag{5.3}\label{eq:factored-beta}
+\]
+More generally, the conclusion holds for any motive \(C\) equipped, for every
+\(x=(b,h,m):T_M(a)\), with a specified fiberwise equivalence
+\[
+                         C(x)\Eqv D(b,h).
+\tag{5.4}\label{eq:fiberwise-factor}
+\]
+\end{theorem}
+
+\begin{proof}
+For the strict case, ignore \(m\) and eliminate on \(h:a=b\):
+\[
+       J_{\proj}(d,b,(h,m))
+       =\mathsf J_{=}(D,d,b,h):D(b,h).
+\]
+At \(h=\refl_a\), equality beta gives~\eqref{eq:factored-beta}.
+
+For the fiberwise case, let \(e_x:C(x)\Eqv D(b,h)\) be the chosen equivalence.
+Map the base datum \(c:C(c_M)\) forward along \(e_{c_M}\), apply the strict
+construction in \(D\), and map the result back along \(e_x^{-1}\).  At the
+center the equality eliminator has propositional beta, and
+\(e_{c_M}^{-1}(e_{c_M}(c))=c\), proving the required beta equation.
+\end{proof}
+
+The theorem identifies the largest class \emph{explicitly supported here}:
+motives supplied with a factorization through equality, strictly or up to
+fiberwise equivalence.  We do not claim that this is a semantic maximality
+theorem about isolated motives.  A particular metadata-sensitive motive might
+have a section for accidental reasons.  What fails is one uniform operator
+covering every motive from one base datum.
+
+\begin{corollary}[Metadata irrelevance for factored elimination]
+\label{cor:factored-irrelevance}
+For \(p=(h,m)\) and \(q=(k,n)\) in \(R_M(a,b)\), if \(h=k\), then factored
+elimination gives propositionally equal results after transport along that
+equality.  In the proof-irrelevant ambient setting this applies to every
+pair \(p,q:R_M(a,b)\).
+\end{corollary}
+
+\subsection{Two remedies}
+
+\paragraph{Restrict motives.}
+Keep the full record \(R_M\), but expose only motives of the form
+\eqref{eq:strict-factor} or~\eqref{eq:fiberwise-factor}.  This retains
+histories, costs, and traces for inspection by nondependent operations while
+preventing a purported identity eliminator from distinguishing them.
+
+\paragraph{Hide or quotient metadata.}
+Replace \(M\) by a family \(\overline M\) whose reflexivity fiber is
+contractible.  Examples include an opaque interface with a single observable
+value, a propositional truncation when inhabited, or an explicit quotient
+collapsing all reflexive histories.  Theorem~\ref{thm:metadata-fiber} then
+provides unrestricted elimination.  This is not a proof that the original
+metadata was irrelevant; it is a new identity-like object in which the
+distinction has been removed.
+
+\begin{warning}[Quotienting must match the intended observation]
+Merely quotienting by administrative rewrites is insufficient if two
+reflexive metadata classes remain.  The criterion asks for contractibility of
+the resulting reflexivity fiber, not merely confluence, normalization, or
+decidable equality.
+\end{warning}
+
+\section{Computational traces: the principal case study}
+\label{sec:traces}
+
+\subsection{The trace-carrying record}
+
+For a carrier \(A\), let an elementary step be
+\[
+       \Step(A)=\sum_{x,y:A}(x=y).
+\tag{6.1}\label{eq:step}
+\]
+A step stores source, target, and an ambient equality witness.  Define
+\[
+       \PathTy_A(a,b)
+       =\List(\Step(A))\times(a=b),
+\tag{6.2}\label{eq:path}
+\]
+written as a record \((L,h)\).  Its reflexive element is
+\[
+                         \mathbf r_a=(\Empty,\refl_a).
+\tag{6.3}\label{eq:empty-refl}
+\]
+The list is observable data.  Concatenation and reversal may be used to define
+composition and symmetry, but those operations are not needed for the
+classification.
+
+Set
+\[
+ M_{\mathrm{tr}}(b,h)=\List(\Step(A)).
+\tag{6.4}\label{eq:trace-metadata}
+\]
+Reordering fields gives mutually inverse maps
+\[
+\begin{aligned}
+ S:\PathTy_A(a,b)&\longrightarrow
+      \sum_{h:a=b}M_{\mathrm{tr}}(b,h),
+ & S(L,h)&=(h,L),\\
+ T:\sum_{h:a=b}M_{\mathrm{tr}}(b,h)&\longrightarrow
+      \PathTy_A(a,b),
+ & T(h,L)&=(L,h).
+\end{aligned}
+\tag{6.5}\label{eq:path-refinement}
+\]
+Both inverse equations are reflexivity of records.  Thus this is not only an
+analogy: \(\PathTy\) is the corresponding equality refinement.
+
+\begin{definition}[Two reflexive traces]
+\label{def:two-traces}
+Besides \(\mathbf r_a\), define
 \[
  \mathbf s_a=
- \Bigl([\, (a,a,\mathsf{refl}_a)\,],\mathsf{refl}_a\Bigr)
- :\Tr_X(a,a)
-\tag{10.22}\label{eq:traced-refl}
+  \bigl([\, (a,a,\refl_a)\,],\refl_a\bigr)
+  :\PathTy_A(a,a).
+\tag{6.6}\label{eq:singleton-refl}
 \]
-be the explicit one-step reflexive trace.  It is well formed even under the
-usual intrinsic chain conditions: its sole step starts and ends at \(a\),
-its outer endpoints are \(a,a\), and its composite equality is reflexivity.
-It differs from \(\mathbf r_a\) only by observable, noncanonical metadata.
+\end{definition}
 
-\begin{theorem}[Trace instance of the metadata-fiber criterion]
+The list no-confusion principle gives
+\[
+       \Empty\ne[\, (a,a,\refl_a)\,],
+\qquad\text{hence}\qquad
+       \mathbf r_a\ne\mathbf s_a.
+\tag{6.7}\label{eq:trace-distinct}
+\]
+
+\begin{theorem}[No unrestricted trace-sensitive \(J\)]
 \label{thm:no-trace-j}
-For every \(X\) and \(a:X\), \(\Tr_X\) with reflexivity
-\(\mathbf r\) does not admit an unrestricted based eliminator satisfying
+For every \(A\) and \(a:A\), the family \(\PathTy_A(a,-)\), based at the empty
+reflexive trace, has no unrestricted based eliminator satisfying
 propositional beta.
 \end{theorem}
 
 \begin{proof}
-Define the metadata family
-\[
- M_X(b,h)\coloneqq
-   \operatorname{List}(\mathsf{QStep}(X)).
-\]
-The trace record is equivalent to the associated refinement by the explicit
-maps
-\[
-\begin{aligned}
- S_{a,b}:\Tr_X(a,b)&\longrightarrow\sum_{h:a=b}M_X(b,h),
- &S_{a,b}(L,e)&=(e,L),\\
- T_{a,b}:\sum_{h:a=b}M_X(b,h)&\longrightarrow\Tr_X(a,b),
- &T_{a,b}(h,L)&=(L,h).
-\end{aligned}
-\]
-For every \((h,L)\),
-\[
- S_{a,b}(T_{a,b}(h,L))=(h,L),
-\]
-and for every \((L,e)\),
-\[
- T_{a,b}(S_{a,b}(L,e))=(L,e).
-\]
-Both equalities are reflexivity of ordered pairs, so \(S_{a,b}\) and
-\(T_{a,b}\) exhibit the required equivalence in the sense fixed in
-Section~\ref{sec:ambient}.
-The reflexivity metadata is the empty list.  Its fiber
-\(M_X(a,\mathsf{refl}_a)\) also contains the singleton
-\([\, (a,a,\mathsf{refl}_a)\,]\), distinct from the empty list by
-no-confusion.  A contractible set has all elements equal, so
-Theorem~\ref{thm:metadata-fiber-criterion} refutes the existence of an
-unrestricted based eliminator satisfying propositional beta.
+By~\eqref{eq:path-refinement}, \(\PathTy_A(a,b)\) is the equality refinement
+with metadata~\eqref{eq:trace-metadata}.  Its reflexivity metadata fiber is
+\(\List(\Step(A))\).  That fiber contains the distinct values in
+\eqref{eq:trace-distinct}, so it is not contractible.  Apply
+Theorem~\ref{thm:metadata-fiber}.  This derives the result from the generic
+criterion; no bespoke motive is needed.
 \end{proof}
 
-Intrinsic composability does not repair the obstruction, because
-\(\mathbf s_a\) is already a well-formed composable trace with reflexive
-composite.  Any intrinsic metadata family that still contains distinct empty
-and singleton reflexive values has a noncontractible reflexivity fiber and
-fails the same criterion.  An unrestricted based eliminator satisfying
-propositional beta requires that fiber to become contractible, for example
-by hiding or quotienting metadata.  Alternatively,
-restricting motives to factor through~\eqref{eq:forget-trace} retains the
-available equality-component eliminator.
-
-\section{An independent fixed-universe family algebra}
-\label{sec:family-semantics}
-
-This section records an independent algebraic example.  It is not a
-semantics of the raw calculus and is not used in
-Theorem~\ref{thm:raw-structural}.  Use the fixed universe
-\(\mathcal U\) of Section~\ref{sec:ambient}.  Take a context-like object to be a small set
-\(\Gamma:\mathcal U\), a substitution \(\Delta\to\Gamma\) to be a function,
-a family over \(\Gamma\) to be \(A:\Gamma\to\mathcal U\), and a section to
-be
+One may recover the familiar direct counter-motive by taking
 \[
-                  a:\prod_{\gamma:\Gamma}A(\gamma).
+ C(b,L,h)=
+ \begin{cases}
+ \Unit,&L=\Empty,\\
+ \varnothing,&L\ne\Empty.
+ \end{cases}
 \]
-Extension is the explicitly defined dependent sum
-\(\Ext{\Gamma}{A}=\sum_{\gamma:\Gamma}A(\gamma)\).  Substitution is
-precomposition:
+It has a base value but none at \(\mathbf s_a\).  This is a useful diagnostic,
+not the classification proof.
+
+\subsection{Composability is not the issue}
+
+The raw list in~\eqref{eq:path} need not enforce adjacency.  It is tempting to
+attribute Theorem~\ref{thm:no-trace-j} to that permissiveness.  The following
+intrinsic version rules out the diagnosis.
+
+\begin{definition}[Composable visible trace]
+\label{def:composable}
+A list \([s_1,\ldots,s_n]\) is composable from \(a\) to \(b\) when the source
+of \(s_1\) is \(a\), the target of \(s_i\) is the source of \(s_{i+1}\), and
+the target of \(s_n\) is \(b\).  The empty list is composable from \(a\) to
+\(a\).  Write \(\mathsf{CTr}_A(a,b)\) for the subtype of lists satisfying this
+condition.
+\end{definition}
+
+Both
 \[
-\begin{aligned}
-A[\sigma](\delta)&=A(\sigma\delta),\\
-a[\sigma](\delta)&=a(\sigma\delta).
-\end{aligned}
-\tag{11.1}\label{eq:family-substitution}
+      \epsilon_a=(\Empty,\text{empty-chain proof})
+      \quad\text{and}\quad
+      \sigma_a=([\,a\xrightarrow{\refl_a}a\,],
+                   \text{singleton-chain proof})
+\tag{6.8}\label{eq:composable-two}
 \]
-Consequently identity and composition of substitution on contexts, types,
-and terms hold definitionally.
+belong to \(\mathsf{CTr}_A(a,a)\).  Equality of subtype values would imply
+equality of their underlying lists, so \(\epsilon_a\ne\sigma_a\).
 
-Products and sums are interpreted pointwise:
+\begin{corollary}[Composable-trace obstruction]
+\label{cor:composable}
+The equality refinement
 \[
-\begin{aligned}
-(\Pi_A B)(\gamma)&=\prod_{x:A(\gamma)}B(\gamma,x),\\
-(\Sigma_A B)(\gamma)&=\sum_{x:A(\gamma)}B(\gamma,x).
-\end{aligned}
+   \sum_{h:a=b}\mathsf{CTr}_A(a,b),
+\tag{6.9}\label{eq:composable-refinement}
 \]
-Lambda, application, pairing, and projection are the corresponding
-metatheoretic operations.  Application/lambda beta and both projection/pair
-beta equations are definitional.  Eta is different: equality of sections
-such as
+based at \((\refl_a,\epsilon_a)\), has no unrestricted based eliminator with
+propositional beta.
+\end{corollary}
+
+\begin{proof}
+The reflexivity metadata fiber
+\(\mathsf{CTr}_A(a,a)\) contains the distinct values
+\(\epsilon_a\) and \(\sigma_a\).  It is noncontractible, so
+Theorem~\ref{thm:metadata-fiber} applies.
+\end{proof}
+
+The singleton step starts at \(a\), ends at \(a\), and has reflexive composite.
+It survives any condition requiring adjacency, correct outer endpoints, and a
+composite equality matching \(\refl_a\).  The obstruction is therefore:
 \[
- \lambda\gamma.\,(\pi_1 t(\gamma),\pi_2 t(\gamma))=t
- \quad\text{and}\quad
- \lambda\gamma\,x.\,f(\gamma)(x)=f
+ \boxed{\text{visible noncanonical reflexive metadata, not
+ non-composability.}}
+\tag{6.10}\label{eq:boxed-obstruction}
 \]
-is propositional/extensional in the ambient metatheory, using pair equality
-and function extensionality unless a chosen metatheory happens to make a
-particular eta law definitional.  Eta is not included among the definitional
-claims below.
 
-Natural numbers are represented by a universe lift of the metatheoretic
-natural numbers.  The motive and branches are defined pointwise, so zero,
-successor, and substitution equations of the recursor are definitional.  A
-small code in this fixed algebra is simply a record containing a carrier in
-\(\mathcal U\).  Independent code operations for lifted naturals, dependent
-products, dependent sums, and trace records decode definitionally.
+\subsection{What remains available}
 
-For sections \(a,b:\prod_{\gamma:\Gamma}A(\gamma)\), define
+The endpoint-equality projection
 \[
-              \mathsf{Id}^{\mathrm{tr}}_A(a,b)(\gamma)
-                             =\Tr_{A(\gamma)}(a(\gamma),b(\gamma)).
-\tag{11.2}\label{eq:family-path}
+       (L,h)\longmapsto h
+\tag{6.11}\label{eq:trace-projection}
 \]
-Reflexivity is the empty trace.  Substitution stability follows
-definitionally from precomposition.  The equality-component eliminator is
-available pointwise with propositional beta by
-Section~\ref{sec:j-boundary}; unrestricted trace-sensitive elimination with
-propositional beta is not.
+is exactly~\eqref{eq:projection}.  If
+\(D:\prod_{b:A}(a=b)\to\U\), Theorem
+\ref{thm:motive-factorization} gives
+\[
+ D(a,\refl_a)\longrightarrow
+ \prod_{b:A}\prod_{P:\PathTy_A(a,b)}D(b,\proj P)
+\tag{6.12}\label{eq:trace-factored-j}
+\]
+with propositional beta at \(\mathbf r_a\).  The result is independent of the
+list.  Thus trace algebra, including concatenation and rewrite equivalence,
+can coexist with equality-component elimination; what cannot coexist is an
+unrestricted eliminator whose motive is allowed to separate
+\(\mathbf r_a\) from \(\mathbf s_a\).
 
-Definitionally, the operations satisfy substitution identity and
-composition; substitution stability of \(\Pi,\Sigma\), lifted naturals,
-decoded codes, and~\eqref{eq:family-path}; product/sum beta; natural-number
-beta; and the listed decoding equations.
+\subsection{Computational paths and rewrite evidence}
 
-There is no map interpreting raw \(\Sort_\ell\), raw codes, contexts, or
-derivations into this algebra, and no relation between raw level \(\ell\) and
-its single universe lift.  A comparison theorem would have to cover
-assignments, levels, codes, typing, all ten redexes, and de Bruijn
-substitution.  None is supplied here.
+In the accompanying library, \(\PathTy\) is the structure
+\(\texttt{Path}\), with fields
+\(\texttt{steps : List (Step A)}\) and
+\(\texttt{proof : a = b}\).  Composition concatenates lists, and
+\(\texttt{RwEq}\) records the LND\(_{\mathrm{EQ}}\)-TRS groupoid
+coherences.  For example, if \(p\) is a two-step arithmetic path, the artifact
+constructs
+\[
+       p\cdot p^{-1}\;\mathrel{\mathsf{RwEq}}\;\mathbf r
+\tag{6.13}\label{eq:rweq-evidence}
+\]
+as an actual rewrite certificate.  Such a certificate organizes traces; it
+does not equate every list as record data.  In particular it does not make the
+raw reflexivity metadata fiber contractible unless one forms an appropriate
+quotient and proves that quotient contractible.
 
-\section{Boundaries and possible strengthenings}
-\label{sec:limitations}
+\section{Beyond lists: a classification guide}
+\label{sec:examples}
 
-\paragraph{Source and reduction.}
-The source has only the constructors in Section~\ref{sec:syntax}.  Contexts
-are same-scope assignments, with no context-formation judgment, typed
-\(\defeq\), or conversion rule.  The paper proves substitution and
-preservation for ten top-level redexes, not contextual or multi-step subject
-reduction, normalization, confluence, canonicity, or decidable type checking.
+The criterion applies to any observable decoration.  The following examples
+are not encodings of one another; they illustrate which property matters.
 
-\paragraph{Identity programs and endpoints.}
-\(\IProg\) is untyped and endpoint-trivial.  We prove only the homomorphic
-simulation \(\srweq\Rightarrow\TrEq\), with no converse, completeness, or
-claim that every trace is evaluated.  Distinct empty and singleton metadata
-does not refute UIP for ambient equality; it shows that the metadata fiber is
-noncontractible.  The singleton is intrinsically composable, so
-composability alone cannot produce an unrestricted based eliminator
-satisfying propositional beta.
-
-\paragraph{Quotient and external algebra.}
-\(\Tr_X(a,b)\) presupposes \(a=b\), and endpoint exactness is immediate from
-the chosen quotient.  The fixed-universe algebra is not a raw
-interpretation.  Such an interpretation would have to cover assignments,
-levels, codes, typing, and all redexes.  Univalence, higher inductive types,
-and a pentagon equality between rewrite derivations are not claimed.
-
-\section{Comparison with prior computational-path results}
-\label{sec:comparison}
-
-Table~\ref{tab:comparison} compares statements, not implementation size or
-historical importance.  ``Not stated in this form'' is deliberately weaker
-than a priority claim: the table records how the cited theorems are used and
-how the present statements differ.
-
-The comparison uses identifiable portions of the sources.  In the 2016
-article, Section~2 treats normal forms for equality proofs, Section~3 gives
-labelled deduction, termination, and rewrite equality, and Section~4 treats
-groupoid structure and UIP
-\cite{deQueirozEtAl2016}.  In the 2017 article, Sections~2--3 introduce
-computational paths and the path-based identity construction, while
-Section~4 establishes groupoid laws and sketches higher structure
-\cite{RamosEtAl2017}.  The 2018 article reviews paths and identity in
-Sections~2--3, presents its path term-rewriting system in Section~4, and
-develops type-theoretic and homotopical constructions in Section~5
-\cite{RamosEtAl2018}.  In the 2026 monograph, Chapter~2 develops labelled
-natural deduction, Chapter~3 computational paths, Chapter~4 the path rewrite
-system, Chapters~6--8 the groupoid, higher, and weak
-\(\omega\)-groupoid structures, Chapter~9 \(J\), UIP, and transport, and
-Chapter~10 applications
-\cite{RamosEtAl2026}.  Those are label-sensitive developments.  This note
-instead uses an unlabelled quotient-trace target as a source-separation
-experiment.  We do not claim that those works contain no substitution
-results; the claim is only that the same-scope raw interface assembled here
-is isolated and proved as the particular theorem package of
-Theorem~\ref{thm:raw-structural}.
-
-\begin{table}[ht]
+\begin{table}[t]
 \centering
-\scriptsize
-\renewcommand{\arraystretch}{1.18}
+\small
+\renewcommand{\arraystretch}{1.22}
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}
-                >{\raggedright\arraybackslash}p{0.33\textwidth}
-                >{\raggedright\arraybackslash}p{0.38\textwidth}}
+                >{\raggedright\arraybackslash}p{0.36\textwidth}
+                >{\raggedright\arraybackslash}p{0.34\textwidth}}
 \toprule
-Present statement & Prior labelled-path results & Exact comparison\\
+Metadata & Reflexivity fiber & Unrestricted \(J^\beta\)\\
 \midrule
-Scope-indexed \(\Ren/\Sub\) algebra
-& The 2016 and 2017 papers develop labelled equality reasons and their
-  identity-type reading; the 2018 paper makes path operations explicit
-  \cite{deQueirozEtAl2016,RamosEtAl2017,RamosEtAl2018}.
-& No absence claim is made about substitution results in those works.
-  This paper isolates and proves the specific same-scope de Bruijn
-  \(\Ren(n,m)\), \(\Sub(n,m)\), double-lift, and instantiation interface used
-  by its theorem package.\\
-
-Ten top-level primitive-redex cases
-& The prior calculus studies equality rewrites and computational-path
-  reductions; the monograph gives a comprehensive labelled calculus
-  \cite{RamosEtAl2026}.
-& Theorem~\ref{thm:redex-preservation} is narrower: ten raw constructors,
-  no contextual closure, no multi-step theorem, and only untyped
-  \(B\defeq A\) coherence between displayed types.\\
-
-Source identity rewrite soundness
-& Groupoid and rewrite laws for label-sensitive computational paths are
-  central in the earlier papers and book
-  \cite{RamosEtAl2017,RamosEtAl2018,deVerasEtAl2025,RamosEtAl2026}.
-& Theorem~\ref{thm:identity-soundness} is a separation result for the
-  present source grammar.  Its target is only the eight-rule core plus
-  congruence on unlabelled quotient traces.\\
-
-Endpoint exactness
-& Earlier work relates labelled paths and equality/identity judgments
-  \cite{deQueirozEtAl2016,RamosEtAl2017}.
-& Proposition~\ref{prop:endpoint-exactness} is not a strengthening of those
-  results.  It is tautological exactness for the quotient by \(\defeq\).\\
-
-Metadata-fiber criterion and trace obstruction
-& Earlier identity-type discussions concern the labelled computational-path
-  programme; the book develops the broader calculus
-  \cite{RamosEtAl2017,RamosEtAl2026}.
-& The standard background total-space contraction is refined by
-  Theorem~\ref{thm:metadata-fiber-criterion}:
-  an unrestricted based eliminator satisfying propositional beta for \(R_M\)
-  exists exactly when
-  \(M(a,\mathsf{refl})\) is contractible.
-  Theorem~\ref{thm:no-trace-j} applies the criterion to visible lists; it
-  does not preclude an unrestricted based eliminator with propositional beta
-  for a quotient or hidden-label identity type.\\
-
-Information carried by a path
-& A labelled path retains a computational reason and rewrites that reason
-  \cite{RamosEtAl2018,RamosEtAl2026}.
-& A trace atom here stores only
-  \((\den t,\den u,\bar h)\); the source derivation \(h\) is erased.
-  Evaluated programs decorate already quotient-collapsed endpoints.\\
+Hidden token
+ & A singleton or inhabited subsingleton
+ & Yes: the fiber is contractible.\\
+Derivation history
+ & Empty history and a visible reflexive inference
+ & No, unless histories are hidden or collapsed.\\
+Cost
+ & Distinct costs \(0\) and \(1\) for reflexive computations
+ & No; uniqueness of a minimum is irrelevant.\\
+Certificate
+ & An inhabited proof-irrelevant proposition
+ & Yes in the present metatheory.\\
+Certificate as data
+ & Two distinguishable certificate objects
+ & No, even if both certify the same fact.\\
+Normalization log
+ & Empty log and a nonempty administrative loop
+ & No; unique normal forms do not imply unique logs.\\
+Proof label
+ & Exactly one reflexivity label
+ & Yes; two visible reflexivity labels make it fail.\\
 \bottomrule
 \end{tabular}
-\caption{Statement-by-statement comparison with the labelled
-computational-path literature.}
-\label{tab:comparison}
+\caption{The reflexivity fiber, rather than the informal purpose of metadata,
+determines unrestricted based elimination.}
+\label{tab:examples}
 \end{table}
+
+\subsection{Derivation histories}
+
+Let \(H(b,h)\) be a type of derivations whose conclusion is \(h:a=b\).
+Suppose \(H(a,\refl_a)\) contains an empty derivation \(e\) and an explicit
+reflexivity-rule derivation \(\rho\), with \(e\ne\rho\).
+Then
+\[
+                  \sum_{h:a=b}H(b,h)
+\]
+fails unrestricted \(J^\beta\).  Confluence of derivations does not alter this
+conclusion when histories remain visible as syntax.  A quotient by conversions
+works only if the quotient reflexivity fiber is contractible.
+
+\begin{example}[Administrative steps]
+A derivation calculus may have a ``do nothing'' derivation and a derivation
+that inserts then removes a coercion.  Even if both evaluate to the same
+endpoint equality and are interconvertible, they remain an obstruction as raw
+metadata.  Passing to conversion classes is a separate construction requiring
+the contractibility check again.
+\end{example}
+
+\subsection{Costs and resource annotations}
+
+Let \(M(b,h)=\mathbb N\), with base cost \(0\).  Since \(0\ne1\), the
+reflexivity fiber is noncontractible and unrestricted elimination fails.
+This remains true if composition adds costs, if cost comparison is decidable,
+or if \(0\) is the unique optimal cost.  Optimization supplies an order and a
+preferred element, not an equality between all costs.
+
+A canonical-cost interface can recover elimination by exposing only the
+proposition that the stored cost is optimal, provided that proposition is
+inhabited and proof-irrelevant.  Alternatively, the cost can remain stored but
+motives must factor through equality.
+
+\subsection{Certificates}
+
+The word ``certificate'' hides an important representation choice.  If
+\(M(a,\refl_a)\) is an inhabited proposition, proof irrelevance makes it
+contractible.  If certificates are records with serial numbers, proof trees,
+or signatures, two records may certify the same equality while remaining
+distinguishable.  The latter representation fails the criterion.
+
+\begin{proposition}[Certificate dichotomy]
+An inhabited proof-irrelevant certificate fiber supports unrestricted
+elimination.  A certificate fiber with two provably distinct values does not.
+\end{proposition}
+
+\begin{proof}
+Apply Corollaries~\ref{cor:contractible-decoration} and
+\ref{cor:visible-alternatives}, respectively.
+\end{proof}
+
+\subsection{Normalization logs}
+
+Suppose every term has a unique normal form, but normalization records the
+sequence of reductions.  Unique endpoints do not imply unique logs.  An empty
+reflexive log and a log containing a reversible administrative step are enough
+to refute contractibility.  This separates three properties:
+\[
+\begin{array}{c}
+\text{unique normal form},\\
+\text{all logs connected by log rewrites},\\
+\text{all observable reflexive log values equal}.
+\end{array}
+\]
+Only the third is the metadata-fiber condition.  The second can imply the
+third after quotienting, but not for raw logs.
+
+\subsection{Proof labels}
+
+Let labels depend on the endpoint and equality proof.  The criterion permits
+arbitrarily elaborate indexing away from the chosen presentation; after the
+total-space equivalence, only the transported reflexivity fiber remains.  A
+single reflexivity label, or an inhabited subsingleton of labels, is harmless.
+Two visible labels for reflexivity obstruct unrestricted elimination.
+
+\begin{example}[Sparse metadata]
+It can happen that a presentation assigns different-looking label sets to
+different \(b,h\), yet equality elimination transports all of them into a
+contractible reflexivity fiber.  Theorem~\ref{thm:total-fiber}, not a
+pointwise cardinality argument, is the correct classification.
+\end{example}
+
+\section{Conceptual consequences and boundaries}
+\label{sec:comparison}
+
+\subsection{The standard identity argument versus the fiber criterion}
+
+The standard argument has the shape
+\[
+  \text{equality elimination}
+  \Longrightarrow
+  \isContr\!\left(\sum_b(a=b)\right).
+\tag{8.1}\label{eq:standard-chain}
+\]
+Our classification adds a genuinely separate coordinate calculation:
+\[
+\begin{aligned}
+ \Jbeta_{R_M}
+ &\Longleftrightarrow
+   \isContr\!\left(\sum_b\sum_hM(b,h)\right)\\
+ &\Longleftrightarrow
+   \isContr\bigl(M(a,\refl_a)\bigr).
+\end{aligned}
+\tag{8.2}\label{eq:new-chain}
+\]
+The first line uses the universal property of a pointed contractible total
+space.  The second uses Theorem~\ref{thm:total-fiber}.  Conflating these stages
+would incorrectly suggest that every decoration of equality inherits path
+induction.
+
+\subsection{What the theorem does not say}
+
+\begin{enumerate}[label=(\roman*)]
+\item It does not refute ordinary equality elimination.  The projection
+  \(\proj\) still supports Theorem~\ref{thm:motive-factorization}.
+\item It does not say metadata cannot be composed, inverted, normalized, or
+  rewritten.  Those operations are orthogonal to raw fiber contractibility.
+\item It does not establish a judgmental beta classification.  Every beta law
+  in this paper is propositional.
+\item It does not identify trace-carrying \(\PathTy\) with an intensional or
+  homotopical identity type.
+\item It does not model full MLTT or HoTT, and it proves nothing about
+  univalence or higher inductive types.
+\item It does not show that every individual metadata-sensitive motive lacks a
+  section.  It rules out one unrestricted based eliminator for all motives.
+\end{enumerate}
+
+\subsection{Relation to proof relevance}
+
+Ambient equality in the present metatheory is proof-irrelevant.  The
+proof-relevance in \(\PathTy\) comes from the \(\U\)-valued metadata field, not
+from multiple inhabitants of the ambient equality proposition.  This
+two-level distinction is essential:
+\[
+       (L,h)\ne(L',h)
+       \quad\text{can hold because }L\ne L',
+\]
+even though any two witnesses \(h,k:a=b\) are equal.
+
+In intensional homotopy type theory, identity itself may have higher
+structure, and contractibility is formulated internally
+\cite{HoTTBook2013}.  The total identity-space contraction remains a central
+idea there.  Our theorem is deliberately about an external refinement of
+proof-irrelevant equality.  It neither replaces the HoTT identity type nor
+transfers the higher-groupoid interpretation to a trace record.
+
+\subsection{Relation to computational paths}
+
+Computational-path work treats equality reasons and their rewrites as
+first-class syntax
+\cite{deQueirozEtAl2016,RamosEtAl2017,RamosEtAl2018,deVerasEtAl2025,
+RamosEtAl2026}.  The present result isolates one design boundary for an
+implementation in which a \(\PathTy\) record contains both ambient equality
+and visible steps.  Groupoid laws up to \(\mathsf{RwEq}\) organize the step
+calculus; they do not automatically provide unrestricted dependent elimination
+over raw records.  If one instead defines an identity type by a suitable
+quotient or higher construction, the criterion must be applied to that new
+fiber rather than to the raw list.
 
 \section{Related work}
 \label{sec:related}
 
-\subsection{Syntax and categorical semantics of dependent type theory}
+Martin-L\"of type theory makes identity elimination and its computation law
+foundational \cite{MartinLof1984}.  The groupoid interpretation of
+Hofmann and Streicher showed that intensional identity need not collapse to
+proof-irrelevant equality \cite{HofmannStreicher1998}.  Homotopical and
+weak-factorization semantics further explain identity elimination through
+path-object structure \cite{AwodeyWarren2009,GambinoGarner2008}, while weak
+higher-groupoid results expose the iterated coherence generated by identity
+types \cite{Lumsdaine2010,vanDenBergGarner2011}.
 
-The scope representation follows de Bruijn's nameless notation
-\cite{deBruijn1972}; the judgmental organization follows the intensional
-tradition of Martin-L\"of~\cite{MartinLof1984}.  Contextual categories and generalized
-algebraic theories provide a categorical account of contexts and
-substitution~\cite{Cartmell1986}.  Dybjer's internal type theory
-\cite{Dybjer1996} and Hofmann's syntax--semantics account
-\cite{Hofmann1997} are particularly relevant to the separation between raw
-substitution and semantic substitution.  Uemura's general framework
-\cite{Uemura2023} gives a much broader organization of theories and their
-models.  We do not establish the initiality or universal-model properties
-studied in that line of work; \(\Q_n\) is only an explicitly constructed
-syntactic quotient.
+The contraction of the based identity total space is standard in homotopy type
+theory \cite{HoTTBook2013}.  Our contribution begins after that observation:
+we calculate the total space of equality plus arbitrary observable metadata
+and classify its elimination by one fiber.  This calculation is elementary,
+but it is useful as a design theorem because it distinguishes a relation that
+\emph{projects} to equality from one that itself supports unrestricted
+identity elimination.
 
-\subsection{Identity types and homotopical semantics}
+Two-level type theories carefully separate strict and fibrant equality
+\cite{Capriotti2016,AltenkirchCapriottiKraus2016,AnnenkovEtAl2023}.
+Our setting is not a two-level type theory: it has ambient equality and a data
+record refining it, without a fibrancy judgment.  The methodological
+similarity is only the insistence that the available eliminator be attached to
+the correct equality notion.
 
-The Hofmann--Streicher groupoid interpretation
-\cite{HofmannStreicher1998} demonstrated that intensional identity types need
-not collapse to proof-irrelevant equality.  Homotopy-theoretic models
-\cite{AwodeyWarren2009} and the identity-type weak factorization system
-\cite{GambinoGarner2008} place identity elimination in categorical and
-homotopical structure.  Lumsdaine~\cite{Lumsdaine2010} and van den Berg and
-Garner~\cite{vanDenBergGarner2011} establish weak higher-groupoid structure
-generated by intensional identity types.  The HoTT Book
-\cite{HoTTBook2013} develops this perspective together with univalence and
-higher inductive types.
+The computational-path literature motivates the trace application and the
+use of explicit rewrite histories
+\cite{deQueirozEtAl2016,RamosEtAl2017,RamosEtAl2018,RamosEtAl2026}.
+Earlier work studies a richer label-sensitive calculus.  The theorem here is
+not a historical-priority claim about path induction; it is a classification
+of a specific equality-plus-metadata interface.
 
-Theorem~\ref{thm:j-contracts-total} abstracts the familiar path-induction
-proof that the based total identity space
-\(\sum_{b:A}(a=b)\) is contractible
-\cite{HoTTBook2013}.  The present note then identifies the total space of an
-equality-plus-metadata refinement with its reflexivity metadata fiber and
-applies that criterion to quotient-trace records.
+\section{Formal verification and companion artifact}
+\label{sec:formalization}
 
-Our target is different in a decisive respect: it is a record consisting of
-proof-irrelevant equality and an observable trace list.  The no-go theorem
-in Section~\ref{sec:j-boundary} explains why the higher-groupoid results for
-ordinary identity types cannot simply be transferred to this record.  The
-sound groupoid rewrites of Section~\ref{sec:identity-programs} concern
-evaluations of source identity programs, not a derivation of an
-identity-type eliminator.
+The mathematical development above is checked in Lean~4
+\cite{deMouraUllrich2021,MetadataJSoftware2026}.  The public source
+\path{ComputationalPaths/Path/TypeTheory/MetadataJ.lean} defines
+\path{EqualityRefinement}, \path{MetadataTotal},
+\path{UnrestrictedBasedEliminator}, and \path{IsContractible}.  Its main
+theorems and constructions are:
+\begin{itemize}[leftmargin=1.3em,itemsep=1pt,topsep=3pt]
+\item \path{unrestricted_based_elimination_iff_contractible}, the equivalence
+  \(\Jbeta\Eqv\isContr(\text{total})\);
+\item \path{metadataTotalEquiv} and
+  \path{contractible_iff_of_equiv}, giving
+  \(T_M(a)\Eqv M(a,\refl_a)\) and invariance of contractibility;
+\item \path{metadata_fiber_criterion} and
+  \path{factorized_motive_eliminator}, formalizing
+  Theorems~\ref{thm:metadata-fiber} and~\ref{thm:motive-factorization};
+\item \path{pathRefinementEquiv} and
+  \path{path_no_unrestricted_based_eliminator}, formalizing
+  Theorem~\ref{thm:no-trace-j}; and
+\item \path{composable_trace_no_unrestricted_based_eliminator}, formalizing
+  Corollary~\ref{cor:composable}.
+\end{itemize}
+The same module contains a genuine length-two
+\(\texttt{Path.trans}\) construction and the nontrivial
+\(\texttt{RwEq}\) inverse-cancellation certificate
+\texttt{metadataTwoStep\_cancel}.  There are no custom axioms or incomplete
+proofs.
 
-\subsection{Strict and two-level equality}
+The release tag \texttt{metadata-j-paper-v1} names the stable
+theorem-bearing commit cited in~\cite{MetadataJSoftware2026}; the tag is not a
+placeholder DOI.  A future Zenodo archive may supplement that Git reference
+when a DOI has actually been issued.
 
-Two-level systems distinguish a strict equality suitable for coherence from
-a fibrant or homotopical equality.  Capriotti's models
-\cite{Capriotti2016}, the strict-equality extension of Altenkirch, Capriotti,
-and Kraus~\cite{AltenkirchCapriottiKraus2016}, and the systematic treatment
-by Annenkov, Capriotti, Kraus, and Sattler~\cite{AnnenkovEtAl2023} provide
-the relevant comparison.  Our layered table is not itself a two-level type
-theory: ambient equality, source definitional equality, source identity
-programs, and target trace rewrites are metatheoretic layers, not two
-internal equality formers with a fibrancy discipline.  Nevertheless, the
-two-level literature reinforces the methodological lesson that equality
-notions and their elimination rules must be kept explicit.
-
-\subsection{Computational paths}
-
-The 2016 and 2017 articles
-\cite{deQueirozEtAl2016,RamosEtAl2017} connect labelled equality reasons
-with identity types; the 2018 treatment makes computational paths explicit
-\cite{RamosEtAl2018}; and later work develops weak groupoid structure
-\cite{deVerasEtAl2025}.  The monograph
-\cite{RamosEtAl2026} is the comprehensive background source for the
-label-sensitive calculus, its history, rewriting operations, and
-applications.  The present target deliberately erases those labels at
-quotient soundness.  The structural results and this change of target are
-summarized in Table~\ref{tab:comparison}; no claim of absolute priority is
-intended.
-
-\section{Reproducibility}
-\label{sec:reproducibility}
-
-The mathematical proofs were checked against a machine-verifiable
-development in Lean~4~\cite{deMouraUllrich2021,ScopedTraceSoftware2026}.
-The artifact covers the scoped syntax, structural laws, raw judgments,
-primitive-redex preservation, quotient substitution, source identity rewrite
-soundness, endpoint exactness, the independent fixed-universe algebra, and
-the concrete trace-metadata obstruction.  It does not currently formalize
-the abstract total-space equivalence or metadata-fiber classification
-(Theorems~\ref{thm:j-contracts-total} and
-\ref{thm:metadata-fiber-criterion}), whose complete mathematical proofs are
-given in Section~\ref{sec:j-boundary}.
-
-\medskip
-\noindent
-\fbox{\parbox{0.94\linewidth}{
-\textbf{Software snapshot:}
-repository snapshot at commit \texttt{70ee53ee}
-(full commit
-\texttt{70ee53eeac604d7430aaa4348abc1ff53936b0cf}).
-A future Zenodo archival DOI may supplement this stable commit reference in
-the final version.}}
-
-\medskip
-The software is evidence for the listed inductions; it does not supply the
-missing context-formation, contextual reduction, or external interpretation
-theorems.
+The earlier raw scope-indexed de Bruijn development is intentionally not
+interleaved with the theory paper.  Its complete manuscript is preserved at
+\[
+                  \texttt{paper/adequacy/companion/main.tex}.
+\]
+It independently develops raw syntax, substitution, primitive-redex
+preservation, syntactic quotients, and source identity programs.  The
+companion builds separately and remains useful as a formal-interface study,
+but none of those raw-calculus results is needed for
+Theorem~\ref{thm:metadata-fiber}.  This separation keeps the present article a
+mathematics/type-theory paper rather than a report on Lean or on a particular
+de Bruijn implementation.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-The paper establishes a scoped syntax and its binder algebra, typed
-substitution, preservation for ten top-level primitive redexes, compositional
-substitution on a syntactic quotient, and sound evaluation of source identity
-rewrites into an explicitly presented unlabelled trace relation.  None of
-these statements requires calling the quotient a model of MLTT.
-
-Endpoint exactness is immediate from quotient soundness and exactness.  Its
-role is bookkeeping, not semantic completeness.  More structurally
-informative is the separation of labels: the quotient trace records the
-existence and arrangement of equality steps but erases the source
-\(\defeq\)-derivations that produced them.  It is therefore different from
-the label-sensitive computational paths of the earlier literature.
-
-Raw \(\EqJ\)-beta and the external equality-component eliminator are also
-separate results.  More generally, for
-\(R_M(a,b)=\sum_{h:a=b}M(b,h)\), an unrestricted based eliminator satisfying
-propositional beta exists exactly when the reflexivity metadata fiber
-\(M(a,\mathsf{refl})\) is contractible.
-The empty/singleton trace fiber is one noncontractible instance, while
-equality-component motives remain available through projection.  Future work
-may construct a genuine raw-to-CwF
-interpretation and contextual subject reduction, or may hide or quotient
-trace metadata.  Each extension must state which equality layer and which
-elimination principle it uses.
-
-\appendix
-\small
-
-\section{Raw grammar and judgment summary}
-\label{app:grammar}
-
-\subsection{Scope-indexed constructors}
-
-The complete scope information is as follows.  In each row, unmarked
-arguments live in \(\Expr_n\).
+For equality decorated by observable metadata,
 \[
-\begin{array}{rcl}
-\Var &:& \Fin(n)\to\Expr_n,\\
-\Sort_\ell&:&\Expr_n,\\
-\PiTy,\SigmaTy&:&\Expr_n\times\Expr_{n+1}\to\Expr_n,\\
-\Lam&:&\Expr_{n+1}\to\Expr_n,\\
-\App,\Pair&:&\Expr_n\times\Expr_n\to\Expr_n,\\
-\Fst,\Snd&:&\Expr_n\to\Expr_n,\\
-\NatTy_\ell,\Zero_\ell&:&\Expr_n,\\
-\Succ_\ell&:&\Expr_n\to\Expr_n,\\
-\NatElim_\ell&:&
-  \Expr_{n+1}\times\Expr_n\times\Expr_{n+2}\times\Expr_n
-  \to\Expr_n,\\
-\CodeNat_\ell&:&\Expr_n,\\
-\CodePi,\CodeSigma&:&\Expr_n\times\Expr_{n+1}\to\Expr_n,\\
-\CodeId&:&\Expr_n^3\to\Expr_n,\\
-\El&:&\Expr_n\to\Expr_n,\\
-\IdTy&:&\Expr_n^3\to\Expr_n,\\
-\Refl&:&\Expr_n\to\Expr_n,\\
-\EqJ&:&\Expr_{n+2}\times\Expr_n^3\to\Expr_n.
-\end{array}
-\tag{A.1}\label{eq:full-grammar}
+                 R_M(a,b)=\sum_{h:a=b}M(b,h),
+\]
+unrestricted based elimination with propositional beta is controlled by one
+object: \(M(a,\refl_a)\).  The proof separates a standard universal-property
+step from a metadata-specific equivalence:
+\[
+ \Jbeta_{R_M}
+ \Longleftrightarrow
+ \isContr\!\left(\sum_bR_M(a,b)\right)
+ \Longleftrightarrow
+ \isContr\bigl(M(a,\refl_a)\bigr).
 \]
 
-\subsection{Renaming and substitution clauses under binders}
+For computational traces, empty and singleton reflexive lists are visible and
+distinct.  The singleton is already well formed and composable, so the
+failure is not caused by malformed chains.  It is caused by noncanonical
+reflexive metadata.  Equality-projection motives remain eliminable, giving a
+precise and useful boundary rather than a blanket impossibility result.
 
-The nontrivial recursion clauses are
-\[
-\begin{aligned}
-\PiTy(A,B)[\rho]_{\mathrm r}
- &=\PiTy(A[\rho]_{\mathrm r},B[\rho^\lift]_{\mathrm r}),\\
-\Lam(t)[\rho]_{\mathrm r}
- &=\Lam(t[\rho^\lift]_{\mathrm r}),\\
-\NatElim_\ell(M,z,s,k)[\rho]_{\mathrm r}
- &=\NatElim_\ell(M[\rho^\lift]_{\mathrm r},
-    z[\rho]_{\mathrm r},s[\rho^{\lift\lift}]_{\mathrm r},
-    k[\rho]_{\mathrm r}),\\
-\EqJ(M,r,b,p)[\rho]_{\mathrm r}
- &=\EqJ(M[\rho^{\lift\lift}]_{\mathrm r},
-    r[\rho]_{\mathrm r},b[\rho]_{\mathrm r},p[\rho]_{\mathrm r}),
-\end{aligned}
-\]
-with identical lift placement for substitution:
-\[
-\begin{aligned}
-\PiTy(A,B)[\sigma]
- &=\PiTy(A[\sigma],B[\sigma^\lift]),\\
-\Lam(t)[\sigma]&=\Lam(t[\sigma^\lift]),\\
-\NatElim_\ell(M,z,s,k)[\sigma]
- &=\NatElim_\ell(M[\sigma^\lift],z[\sigma],
-     s[\sigma^{\lift\lift}],k[\sigma]),\\
-\EqJ(M,r,b,p)[\sigma]
- &=\EqJ(M[\sigma^{\lift\lift}],r[\sigma],
-        b[\sigma],p[\sigma]).
-\end{aligned}
-\tag{A.2}\label{eq:binder-clauses}
-\]
-Product and sum codes use one lift in their second argument.
-
-\subsection{Typing rules omitted from the main display}
-
-The complete sum fragment is
-\[
-\frac{\Gamma\vdash A:\Sort_\ell\quad
-      \Ext{\Gamma}{A}\vdash B:\Sort_\ell}
-     {\Gamma\vdash\SigmaTy(A,B):\Sort_\ell},
-\qquad
-\frac{\Gamma\vdash a:A\quad\Gamma\vdash b:B\{a\}}
-     {\Gamma\vdash\Pair(a,b):\SigmaTy(A,B)},
-\]
-\[
-\frac{\Gamma\vdash p:\SigmaTy(A,B)}
-     {\Gamma\vdash\Fst(p):A},
-\qquad
-\frac{\Gamma\vdash p:\SigmaTy(A,B)}
-     {\Gamma\vdash\Snd(p):B\{\Fst(p)\}}.
-\tag{A.3}\label{eq:sigma-rules}
-\]
-
-For natural elimination, define the successor-branch context
-\[
- \Gamma_{\mathrm{succ}}
-   =\Ext{\Ext{\Gamma}{\NatTy_\ell}}{M}.
-\]
-In its scope, let
-\[
- T_{\mathrm{succ}}(M)
-   =M[
-      0\mapsto\Succ_\ell(\Var(1)),\
-      i+1\mapsto\Var(i+2)
-     ].
-\tag{A.4}\label{eq:nat-step-target}
-\]
-If
-\[
-\Ext{\Gamma}{\NatTy_\ell}\vdash M:\Sort_j,\quad
-\Gamma\vdash z:M\{\Zero_\ell\},\quad
-\Gamma_{\mathrm{succ}}\vdash s:T_{\mathrm{succ}}(M),\quad
-\Gamma\vdash k:\NatTy_\ell,
-\]
-then
-\[
-\Gamma\vdash\NatElim_\ell(M,z,s,k):M\{k\}.
-\tag{A.5}\label{eq:nat-elim-full}
-\]
-Two-variable instantiation of~\eqref{eq:nat-step-target} by \(k\) and an
-induction hypothesis is \(M\{\Succ_\ell(k)\}\), the key equation in the
-successor primitive-redex preservation case.
-
-Code formation and decoding are
-\[
-\frac{}{\Gamma\vdash\CodeNat_\ell:\Sort_\ell},
-\quad
-\frac{\Gamma\vdash A:\Sort_\ell\quad
-      \Ext{\Gamma}{\El(A)}\vdash B:\Sort_\ell}
-     {\Gamma\vdash\CodePi(A,B):\Sort_\ell},
-\]
-\[
-\frac{\Gamma\vdash A:\Sort_\ell\quad
-      \Ext{\Gamma}{\El(A)}\vdash B:\Sort_\ell}
-     {\Gamma\vdash\CodeSigma(A,B):\Sort_\ell},
-\]
-\[
-\frac{\Gamma\vdash A:\Sort_\ell\quad
-      \Gamma\vdash a:\El(A)\quad\Gamma\vdash b:\El(A)}
-     {\Gamma\vdash\CodeId(A,a,b):\Sort_\ell},
-\qquad
-\frac{\Gamma\vdash c:\Sort_\ell}
-     {\Gamma\vdash\El(c):\Sort_\ell}.
-\tag{A.6}\label{eq:code-rules}
-\]
-The identity rules and raw two-binder eliminator are those in
-\eqref{eq:eqj-rule}.
-
-\subsection{Definitional-equality compatible closure}
-
-Besides equivalence and the beta inclusions, \(\defeq\) is congruent in the
-following positions:
-\[
-\begin{array}{ll}
-\PiTy,\SigmaTy:&\text{domain and codomain},\\
-\Lam:&\text{body},\\
-\App:&\text{function and argument},\\
-\Pair:&\text{first and second component},\\
-\Fst,\Snd,\Succ_\ell,\El,\Refl:&\text{their unique argument},\\
-\NatElim_\ell:&\text{motive, zero case, successor case, scrutinee},\\
-\CodePi,\CodeSigma:&\text{domain and codomain},\\
-\CodeId,\IdTy:&\text{type, left endpoint, right endpoint},\\
-\EqJ:&\text{motive, reflexivity case, endpoint, proof}.
-\end{array}
-\tag{A.7}\label{eq:defeq-congruence}
-\]
-Binder positions live in their larger scopes.  Substitution closure applies
-\(\sigma^\lift\) or \(\sigma^{\lift\lift}\) in precisely those positions.
-
-\section{Source identity rewrite rules}
-\label{app:rewrites}
-
-\subsection{Source one-step judgment}
-
-The judgment \(p\srw q\) is indexed by common source endpoints:
-\[
- p,q:\IProg_n(t,u)\quad\Longrightarrow\quad
- (p\srw q)\ \mathsf{judgment}.
-\]
-For \(p:\IProg_n(t,u)\), \(q:\IProg_n(u,v)\), and
-\(r:\IProg_n(v,w)\), its eight base constructors are
-\[
-\frac{}{(\mathbf1_t)^{-1}\srw\mathbf1_t}
-\quad
-\frac{}{(p^{-1})^{-1}\srw p}
-\quad
-\frac{}{\mathbf1_t\cdot p\srw p}
-\quad
-\frac{}{p\cdot\mathbf1_u\srw p},
-\tag{B.1}\label{eq:app-source-units}
-\]
-\[
-\frac{}{p\cdot p^{-1}\srw\mathbf1_t}
-\quad
-\frac{}{p^{-1}\cdot p\srw\mathbf1_u}
-\quad
-\frac{}{(p\cdot q)^{-1}\srw q^{-1}\cdot p^{-1}}
-\quad
-\frac{}{(p\cdot q)\cdot r\srw p\cdot(q\cdot r)}.
-\tag{B.2}\label{eq:app-source-groupoid}
-\]
-The compatible constructors are
-\[
-\frac{p\srw p'}{p^{-1}\srw(p')^{-1}},
-\qquad
-\frac{p\srw p'}{p\cdot q\srw p'\cdot q},
-\qquad
-\frac{q\srw q'}{p\cdot q\srw p\cdot q'},
-\tag{B.3}\label{eq:app-source-composition-congruence}
-\]
-\[
-\frac{p\srw p'}{C[p]\srw C[p']},
-\qquad
-\frac{}{C[\mathbf1_t]\srw\mathbf1_{C[t]}}
-\quad(C\in\Frame_n).
-\tag{B.4}\label{eq:app-source-frame-congruence}
-\]
-No other source one-step constructor is implicit.
-
-\subsection{Source rewrite equivalence}
-
-At fixed \(t,u\), the judgment \(p\srweq q\) is inductively generated by
-\[
-\frac{}{p\srweq p},
-\qquad
-\frac{p\srw q}{p\srweq q},
-\qquad
-\frac{p\srweq q}{q\srweq p},
-\qquad
-\frac{p\srweq q\quad q\srweq r}{p\srweq r}.
-\tag{B.5}\label{eq:app-source-equivalence}
-\]
-Thus \(\srweq\) is a derivation-carrying symmetric, reflexive, transitive
-closure, not an equality between derivations.
-
-\subsection{Target trace rules}
-
-For \(S:\Tr_X(a,b)\), \(T:\Tr_X(b,c)\), and
-\(U:\Tr_X(c,d)\), target one-step rewriting has exactly
-\[
-\frac{}{(\mathbf r_a)^{-1}\TrStep\mathbf r_a}
-\quad
-\frac{}{(S^{-1})^{-1}\TrStep S}
-\quad
-\frac{}{\mathbf r_a\cdot S\TrStep S}
-\quad
-\frac{}{S\cdot\mathbf r_b\TrStep S},
-\tag{B.6}\label{eq:app-target-units}
-\]
-\[
-\frac{}{S\cdot S^{-1}\TrStep\mathbf r_a}
-\quad
-\frac{}{S^{-1}\cdot S\TrStep\mathbf r_b}.
-\]
-\[
-\frac{}{(S\cdot T)^{-1}\TrStep T^{-1}\cdot S^{-1}}
-\quad
-\frac{}{(S\cdot T)\cdot U\TrStep S\cdot(T\cdot U)}.
-\tag{B.7}\label{eq:app-target-groupoid}
-\]
-Target equivalence \(S\TrEq T\) is generated by
-\[
-\frac{}{S\TrEq S},
-\quad
-\frac{S\TrStep T}{S\TrEq T},
-\quad
-\frac{S\TrEq T}{T\TrEq S},
-\quad
-\frac{S\TrEq T\quad T\TrEq U}{S\TrEq U},
-\tag{B.8}\label{eq:app-target-equivalence}
-\]
-together with all four congruence rules
-\[
-\frac{S\TrEq T}{S^{-1}\TrEq T^{-1}},
-\qquad
-\frac{S\TrEq T}{S\cdot U\TrEq T\cdot U},
-\qquad
-\frac{T\TrEq U}{S\cdot T\TrEq S\cdot U},
-\qquad
-\frac{S\TrEq T}{f_\ast S\TrEq f_\ast T}.
-\tag{B.9}\label{eq:app-target-congruence}
-\]
-The map operation \(f_\ast\) is
-Definition~\ref{def:trace-record} and equation~\eqref{eq:trace-map};
-in particular \(f_\ast\mathbf r_a=\mathbf r_{fa}\) by definition.
-
-\subsection{Rule-by-rule soundness map}
-
-Evaluation sends the four rules in~\eqref{eq:app-source-units} to
-\eqref{eq:app-target-units}, the four rules
-in~\eqref{eq:app-source-groupoid} to
-\eqref{eq:app-target-groupoid}, and the first three rules
-in~\eqref{eq:app-source-composition-congruence} to the first three congruence
-rules in~\eqref{eq:app-target-congruence}.  Frame congruence uses the last
-target congruence rule with \(f=\overline C\); frame-unit soundness is target
-reflexivity after the definitional equation
-\(\overline C_\ast\mathbf r_{\den t}=\mathbf r_{\den{C[t]}}\).
-Finally, the four constructors in~\eqref{eq:app-source-equivalence} map to
-the four constructors in~\eqref{eq:app-target-equivalence}.  This is the
-complete induction for Theorem~\ref{thm:identity-soundness}.
+The design choice is therefore explicit.  Keep metadata visible and restrict
+motives, or hide or quotient metadata until the reflexivity fiber is
+contractible.  Histories, costs, certificates, normalization logs, and labels
+all follow the same test.  Any stronger claim---judgmental beta, a full MLTT or
+HoTT model, univalence, higher inductive structure, or an identification of
+raw traces with the HoTT identity type---requires additional theory and is
+outside the result proved here.
 
 \begingroup
 \small
