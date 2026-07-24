@@ -152,6 +152,9 @@ genuine-versus-synthetic circle/torus audit.
 
 The earlier raw, scope-indexed de Bruijn calculus is preserved independently at
 `paper/adequacy/companion/main.tex`; it is not folded into the theory article.
+See `paper/README.md` for the manuscript build matrix and the external
+`BSLstyle.cls`/`BSLbibstyle.bst` prerequisites of the separate legacy
+`paper/main.tex` source.
 Build the manuscripts separately:
 
 ```bash

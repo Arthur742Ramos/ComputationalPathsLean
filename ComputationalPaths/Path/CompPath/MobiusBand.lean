@@ -1,5 +1,5 @@
 /-
-# The Möbius band via computational paths
+# Möbius-band compatibility presentation over circle syntax
 
 Classically, the Möbius band deformation retracts onto its core circle.  This
 file keeps a compatibility alias of the current one-constructor circle and
@@ -10,12 +10,12 @@ deformation retract or compute the genuine `PathRwQuot` of the aliased carrier.
 
 | Definition/Theorem | Description |
 |-------------------|-------------|
-| `MobiusBandCompPath` | Möbius band type (≃ S¹) |
+| `MobiusBandCompPath` | compatibility alias of one-constructor `CircleCompPath` |
 | `mobiusBandPiOneEquivInt` | synthetic winding model ≅ ℤ |
-| `mobiusBandNonorientable` | Non-orientability witness |
-| `mobiusBandBoundary` | The boundary circle of M |
-| `mobiusBandDeformRetract` | Deformation retract data |
-| `mobiusBandEuler` | Euler characteristic of M is 0 |
+| `mobiusBandNonorientable` | equality for a declared presentation flag |
+| `MobiusBandBoundary` | compatibility alias used as boundary presentation data |
+| `mobiusBandDeformRetract` | identity retraction record between identical aliases |
+| `mobiusBandEulerChar` | declared Euler-characteristic label |
 
 ## References
 
@@ -33,9 +33,10 @@ namespace CompPath
 
 universe u
 
-/-! ## The Möbius band as a computational-path circle -/
+/-! ## Compatibility carrier alias -/
 
-/-- The Möbius band is modeled by its deformation retract onto the circle. -/
+/-- Compatibility/presentation alias of the current one-constructor circle.
+No Möbius-band carrier or topological deformation retract is constructed. -/
 abbrev MobiusBandCompPath : Type u := CircleCompPath.{u}
 
 @[simp] abbrev mobiusBandBase : MobiusBandCompPath := circleCompPathBase
@@ -57,9 +58,10 @@ abbrev MobiusBand : Type u := MobiusBandCompPath.{u}
 
 @[simp] abbrev mobiusBandBasepoint : MobiusBand := mobiusBandBase
 
-/-! ## Deformation Retract -/
+/-! ## Identity retraction record between aliases -/
 
-/-- Data for a deformation retract of a space onto a subspace. -/
+/-- Minimal retraction data.  This structure contains no homotopy field and
+does not by itself express a topological deformation retract. -/
 structure DeformRetractData (Total : Type u) (Core : Type u) where
   /-- The inclusion of the core into the total space. -/
   inclusion : Core → Total
@@ -68,22 +70,24 @@ structure DeformRetractData (Total : Type u) (Core : Type u) where
   /-- The retraction is a left inverse of the inclusion. -/
   retract_incl : ∀ c : Core, retraction (inclusion c) = c
 
-/-- The Möbius band deformation retracts onto its core circle. -/
+/-- Identity retraction data between the definitionally identical compatibility
+aliases `MobiusBand` and `CircleCompPath`; not an implemented deformation
+retract of a genuine Möbius-band carrier. -/
 noncomputable def mobiusBandDeformRetract :
     DeformRetractData MobiusBand.{u} CircleCompPath.{u} where
   inclusion := id
   retraction := id
   retract_incl := fun _ => rfl
 
-/-- The retraction preserves the base point. -/
+/-- The identity compatibility retraction preserves the chosen point. -/
 theorem mobiusBandRetract_base :
     mobiusBandDeformRetract.retraction (mobiusBandBase : MobiusBand.{u}) = circleCompPathBase := rfl
 
-/-- The inclusion preserves the base point. -/
+/-- The identity compatibility inclusion preserves the chosen point. -/
 theorem mobiusBandIncl_base :
     mobiusBandDeformRetract.inclusion (circleCompPathBase : CircleCompPath.{u}) = mobiusBandBase := rfl
 
-/-! ## Non-orientability -/
+/-! ## Declared presentation metadata -/
 
 /-- Orientability flag for a surface. -/
 inductive Orientability where
@@ -91,10 +95,10 @@ inductive Orientability where
   | nonorientable : Orientability
   deriving DecidableEq
 
-/-- The Möbius band is non-orientable. -/
+/-- Declared orientability label for the presentation. -/
 def mobiusBandOrientability : Orientability := Orientability.nonorientable
 
-/-- Witness that the Möbius band is non-orientable. -/
+/-- Reflexive verification of the declared nonorientability label. -/
 theorem mobiusBandNonorientable :
     mobiusBandOrientability = Orientability.nonorientable := rfl
 
@@ -105,36 +109,36 @@ structure OrientationReversal (S : Type u) (base : S) where
   /-- The orientation reversal flag. -/
   reverses : Bool := true
 
-/-- The core loop of the Möbius band reverses orientation. -/
+/-- Presentation record assigning the `true` reversal flag to a singleton
+reflexivity step.  This is data, not a derived orientation theorem. -/
 noncomputable def mobiusBandOrientationReversal :
     OrientationReversal MobiusBand.{u} mobiusBandBase where
   loop := Path.stepChain rfl
   reverses := true
 
-/-! ## Boundary Circle -/
+/-! ## Boundary presentation data -/
 
-/-- The boundary of the Möbius band is a circle. The boundary circle wraps
-    around the core circle twice (degree-2 covering). -/
+/-- Compatibility alias used to represent a boundary circle; no boundary
+subspace or covering map is constructed. -/
 abbrev MobiusBandBoundary : Type u := CircleCompPath.{u}
 
-/-- The boundary maps to the core by a degree-2 covering. -/
+/-- Declared degree label for the intended boundary presentation. -/
 def mobiusBandBoundaryCoveringDegree : Nat := 2
 
-/-- The boundary inclusion sends the boundary base to the Möbius band base. -/
+/-- Identity map between the boundary and carrier compatibility aliases. -/
 noncomputable def mobiusBandBoundaryInclusion :
     MobiusBandBoundary.{u} → MobiusBand.{u} := id
 
 theorem mobiusBandBoundaryInclusion_base :
     mobiusBandBoundaryInclusion circleCompPathBase = (mobiusBandBase : MobiusBand.{u}) := rfl
 
-/-! ## Euler Characteristic -/
+/-! ## Declared Euler-characteristic data -/
 
-/-- Euler characteristic of the Möbius band.
-    χ(M) = 0 (it deformation retracts to S¹). -/
+/-- Declared Euler-characteristic label for the presentation. -/
 def mobiusBandEulerChar : Int := 0
 
-/-- CW data for the Möbius band:
-    1 vertex, 2 edges, 1 face → χ = 1 - 2 + 1 = 0. -/
+/-- Declared CW-count record matching the intended presentation:
+    1 vertex, 2 edges, 1 face. -/
 structure MobiusBandCWData where
   vertices : Nat := 1
   edges : Nat := 2
@@ -148,10 +152,11 @@ theorem mobiusBandEuler_from_CW :
 
 /-! ## Loop Space and Path Algebra -/
 
-/-- Loop space of the Möbius band at the base point. -/
+/-- Raw loop space of the one-constructor compatibility carrier. -/
 abbrev mobiusBandLoopSpace : Type u := Path (A := MobiusBand.{u}) mobiusBandBase mobiusBandBase
 
-/-- The core loop of the Möbius band. -/
+/-- Singleton-reflexivity raw path used as a legacy core-loop representative;
+its genuine `PathRwQuot` class is trivial. -/
 noncomputable def mobiusBandCoreLoop : mobiusBandLoopSpace.{u} :=
   Path.stepChain (circleLoopEq)
 
@@ -188,7 +193,7 @@ structure NonorientableSurfaceData where
   /-- Euler characteristic. -/
   euler : Int
 
-/-- Data record for the Möbius band. -/
+/-- Declared presentation metadata under the Möbius-band name. -/
 noncomputable def mobiusBandSurfaceData : NonorientableSurfaceData where
   name := "Möbius band"
   orientability := Orientability.nonorientable
@@ -200,22 +205,22 @@ noncomputable def kleinBottleSurfaceData : NonorientableSurfaceData where
   orientability := Orientability.nonorientable
   euler := 0
 
-/-- Both the Möbius band and Klein bottle have Euler characteristic 0. -/
+/-- The two declared metadata records carry the same Euler label. -/
 theorem mobius_klein_euler_eq :
     mobiusBandSurfaceData.euler = kleinBottleSurfaceData.euler := rfl
 
-/-- Both are non-orientable. -/
+/-- The two declared metadata records carry the same orientability label. -/
 theorem mobius_klein_nonorientable :
     mobiusBandSurfaceData.orientability = kleinBottleSurfaceData.orientability := rfl
 
-/-! ## SimpleEquiv round-trip -/
+/-! ## Synthetic winding-equivalence round-trips -/
 
-/-- The encode-decode round-trip for Möbius band π₁ encodes. -/
+/-- Encode-decode for the synthetic winding quotient compatibility alias. -/
 theorem mobiusBand_encode_decode (z : Int) :
     mobiusBandPiOneEquivInt.toFun (mobiusBandPiOneEquivInt.invFun z) = z :=
   mobiusBandPiOneEquivInt.right_inv z
 
-/-- The decode-encode round-trip for Möbius band π₁ decodes. -/
+/-- Decode-encode for the synthetic winding quotient compatibility alias. -/
 theorem mobiusBand_decode_encode (x : mobiusBandPiOne.{u}) :
     mobiusBandPiOneEquivInt.invFun (mobiusBandPiOneEquivInt.toFun x) = x :=
   mobiusBandPiOneEquivInt.left_inv x
