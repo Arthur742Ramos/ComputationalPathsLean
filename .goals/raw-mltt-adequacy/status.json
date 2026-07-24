@@ -1,6 +1,6 @@
 {
   "goal_id": "raw-mltt-adequacy",
-  "status": "inspecting",
+  "status": "completed",
   "iteration": 2,
   "builder_model": "OpenAI:GPT-5.6-Sol",
   "inspector_model": "OpenAI:GPT-5.6-Luna",
@@ -14,7 +14,8 @@
     },
     {
       "iteration": 2,
-      "verdict": "PASS"
+      "verdict": "PASS",
+      "summary": "All criteria passed after adding quotient substitution, derived subject reduction, coherent level-indexed universes and Nat, and substantive computation certificates."
     }
   ]
 }
