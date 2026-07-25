@@ -3117,7 +3117,6 @@ applications.  The present target deliberately erases those labels at
 quotient soundness.  The structural results and this change of target are
 summarized in Table~\ref{tab:comparison}; no claim of absolute priority is
 intended.
-
 \section{Reproducibility}
 \label{sec:reproducibility}
 
@@ -3130,7 +3129,86 @@ substitution, erasure with its factorization and essential image, source identit
 independent fixed-universe algebra, the abstract total-space equivalence, the
 metadata-fiber classification, and the concrete trace-metadata obstruction.
 
-The correspondence between the theorems above and the development is as
+Every displayed theorem was checked with Lean's axiom report.  The
+machine-checked results rely only on propositional extensionality and quotient
+soundness, and the negative theorems of Section~\ref{sec:reduction} use
+propositional extensionality alone; no form of choice is used, so the results
+are constructive relative to those principles.  Two points deserve emphasis.
+The conversion hypothesis of Definition~\ref{def:conversion-rules} is formalized
+as a record of assumed rules that every dependent theorem takes as an explicit
+argument, not as an axiom---the development declares none.  And because
+Theorem~\ref{thm:not-admissible} proves that record uninhabited, a reader
+auditing the artifact should read the conditional subject-reduction theorem as an
+analysis of the induction rather than as a usable lemma.
+
+The theorem-by-theorem correspondence with the source modules, and the build
+instructions, are collected in Appendix~\ref{app:artifact}, so that no
+formalization detail interrupts the mathematics.  The software is evidence for
+the listed inductions; it does not supply the missing context-formation,
+confluence, or external interpretation theorems.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+The paper establishes a scoped syntax and its binder algebra, typed
+substitution, preservation for ten top-level primitive redexes, a contextual
+and multi-step reduction theory, compositional substitution on a syntactic
+quotient, and sound evaluation of source identity rewrites into an explicitly
+presented unlabelled trace relation.  None of these statements requires
+calling the quotient a model of MLTT.
+
+Two of the results are measurements rather than constructions, and that is
+their point.
+
+The first concerns reduction, and it is negative.  Contextual subject reduction
+is not merely unproved here but false, with a witness small enough to check by
+eye; neither of the two rules that would repair it is admissible; and the
+hypothesis record packaging them is uninhabited, so the conditional theorem
+derived from it is vacuous as a statement about \(\vdash\).  What that
+conditional proof does establish is an analysis of the induction: repairs of
+exactly two shapes, enumerated in Table~\ref{tab:sr-cases}, close every case.
+The constructive response is the conversion-closed extension \(\vdashC\), for
+which we prove no subject-reduction theorem, because doing so needs generation
+lemmas and hence confluence.  The distance from this calculus to subject
+reduction is therefore a different judgment, not two hypotheses.
+
+The second concerns labels.  Calling the quotient traces \emph{unlabelled} is
+otherwise a statement about intent, so Section~\ref{sec:erasure} makes it a
+theorem.  Evaluation factors through a label-free syntax whose atoms carry only
+proof-irrelevant equalities of classes; erasure preserves program size, so the
+arrangement of equality steps survives and only labels are discarded; and at
+atoms erasure is inverse to the recovery map supplied by quotient exactness.
+Because the label-free grammar is strictly more permissive than erasure needs,
+we characterize the essential image rather than claiming the two languages
+agree.  Together these pin down what the target retains and what it cannot
+express, and they make the contrast with label-sensitive computational paths
+precise: an analogue of Corollary~\ref{cor:no-derivation-observation} fails
+there by design, and that failure is the source of that theory's content.
+
+Endpoint exactness, by contrast, is immediate from quotient soundness and
+exactness; its role is bookkeeping, not semantic completeness.
+
+Applying the metadata-fiber criterion of \cite{ObservableMetadata2026} to our
+own records gives the deflationary reading we recommend: the quotient trace
+fiber is a list of quotient classes, hence never contractible, so trace records
+support no unrestricted based eliminator, while equality-component motives
+remain available through projection.  These objects are observable list metadata
+decorating an equality, not carriers of reasons for it.
+
+The open directions follow from the above.  Confluence for \(\defeq\) would
+unlock generation lemmas and hence an unconditional subject-reduction theorem
+for \(\vdashC\); that is the single most valuable next step.  We also prove no
+normalization or standardization theorem, the syntactic quotient is built from
+\(\defeq\) directly rather than from a normal-form analysis, and a genuine
+raw-to-CwF interpretation is not attempted.  Each such extension must state
+which equality layer and which elimination principle it uses.
+
+\appendix
+
+\section{The companion Lean artifact}
+\label{app:artifact}
+
+The correspondence between the theorems of the article and the development is as
 follows.  Contextual and multi-step reduction, together with their soundness
 and substitution stability
 (Definition~\ref{def:contextual-reduction},
@@ -3206,7 +3284,7 @@ Build: \texttt{lake build}.  Sources for this article:
 \path{ComputationalPaths/Path/TypeTheory/Raw*.lean}.
 Invariant check (no \texttt{sorry}, \texttt{admit}, or custom \texttt{axiom}):
 \texttt{python3 scripts/check\_invariants.py}.
-Axiom audit: \texttt{\#print axioms} on any theorem named above.
+Axiom audit: \texttt{\#print axioms} on any theorem named in this appendix.
 A Zenodo archival DOI will be minted for the version of record; until then the
 tagged commit in the repository is the citable snapshot.}}
 
@@ -3214,63 +3292,6 @@ tagged commit in the repository is the citable snapshot.}}
 The software is evidence for the listed inductions; it does not supply the
 missing context-formation, confluence, or external interpretation theorems.
 
-\section{Conclusion}
-\label{sec:conclusion}
-
-The paper establishes a scoped syntax and its binder algebra, typed
-substitution, preservation for ten top-level primitive redexes, a contextual
-and multi-step reduction theory, compositional substitution on a syntactic
-quotient, and sound evaluation of source identity rewrites into an explicitly
-presented unlabelled trace relation.  None of these statements requires
-calling the quotient a model of MLTT.
-
-Two of the results are measurements rather than constructions, and that is
-their point.
-
-The first concerns reduction, and it is negative.  Contextual subject reduction
-is not merely unproved here but false, with a witness small enough to check by
-eye; neither of the two rules that would repair it is admissible; and the
-hypothesis record packaging them is uninhabited, so the conditional theorem
-derived from it is vacuous as a statement about \(\vdash\).  What that
-conditional proof does establish is an analysis of the induction: repairs of
-exactly two shapes, enumerated in Table~\ref{tab:sr-cases}, close every case.
-The constructive response is the conversion-closed extension \(\vdashC\), for
-which we prove no subject-reduction theorem, because doing so needs generation
-lemmas and hence confluence.  The distance from this calculus to subject
-reduction is therefore a different judgment, not two hypotheses.
-
-The second concerns labels.  Calling the quotient traces \emph{unlabelled} is
-otherwise a statement about intent, so Section~\ref{sec:erasure} makes it a
-theorem.  Evaluation factors through a label-free syntax whose atoms carry only
-proof-irrelevant equalities of classes; erasure preserves program size, so the
-arrangement of equality steps survives and only labels are discarded; and at
-atoms erasure is inverse to the recovery map supplied by quotient exactness.
-Because the label-free grammar is strictly more permissive than erasure needs,
-we characterize the essential image rather than claiming the two languages
-agree.  Together these pin down what the target retains and what it cannot
-express, and they make the contrast with label-sensitive computational paths
-precise: an analogue of Corollary~\ref{cor:no-derivation-observation} fails
-there by design, and that failure is the source of that theory's content.
-
-Endpoint exactness, by contrast, is immediate from quotient soundness and
-exactness; its role is bookkeeping, not semantic completeness.
-
-Applying the metadata-fiber criterion of \cite{ObservableMetadata2026} to our
-own records gives the deflationary reading we recommend: the quotient trace
-fiber is a list of quotient classes, hence never contractible, so trace records
-support no unrestricted based eliminator, while equality-component motives
-remain available through projection.  These objects are observable list metadata
-decorating an equality, not carriers of reasons for it.
-
-The open directions follow from the above.  Confluence for \(\defeq\) would
-unlock generation lemmas and hence an unconditional subject-reduction theorem
-for \(\vdashC\); that is the single most valuable next step.  We also prove no
-normalization or standardization theorem, the syntactic quotient is built from
-\(\defeq\) directly rather than from a normal-form analysis, and a genuine
-raw-to-CwF interpretation is not attempted.  Each such extension must state
-which equality layer and which elimination principle it uses.
-
-\appendix
 \small
 
 \section{Raw grammar and judgment summary}

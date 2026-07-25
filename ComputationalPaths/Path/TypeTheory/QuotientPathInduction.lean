@@ -529,6 +529,142 @@ theorem doubleStepLoop_same_class {A : Type u} (a : A) :
       Quot.mk _ (Path.refl a) :=
   Quot.sound (rweqProp_of_rweq (doubleStepLoopRweqRefl a))
 
+/-! ## A design constraint on redesigned rewrite systems
+
+The collapse is a fact about one rule set.  The natural follow-up question is
+what any *replacement* rule set must satisfy in order to keep the quotient
+informative.  The answer is a single equivalence, and both of the concrete
+results above are instances of it.
+
+"Keeping information" is made precise as admitting an invariant that is not
+constant: a map out of the fiber which is stable under the rewrite relation and
+still separates two paths.  Such a map is exactly a nonconstant function on the
+quotient. -/
+
+/-- A function constant on each class of a setoid. -/
+def SetoidInvariant {X : Type u} (S : Setoid X) {V : Type v} (I : X → V) : Prop :=
+  ∀ x y : X, S.r x y → I x = I y
+
+/-- An invariant carries information when it separates two points. -/
+def Nonconstant {X : Type u} {V : Type v} (I : X → V) : Prop :=
+  ∃ x y : X, I x ≠ I y
+
+/-- **The design theorem.**  A setoid is total exactly when every invariant of
+it is constant.  Combined with
+`MetadataRepair.quotient_contractible_iff_setoidTotal`, this puts the two design
+goals in direct opposition: for an inhabited carrier a quotient supports
+unrestricted elimination exactly when it retains nothing, so no rewrite system
+can meet both.
+
+Note the inhabitance side condition in that combination.  The equivalence below
+needs none -- on an empty carrier both sides hold vacuously -- but
+`quotient_contractible_iff_setoidTotal` does, since the empty quotient is not
+contractible while every relation on it is vacuously total.
+
+The invariants are quantified at `Type u`, the universe of the carrier.  This
+is the sharpest form rather than a restriction: the reverse direction needs only
+the *single* invariant `Quotient.mk S`, which lives at `Type u`, while the
+forward direction is available at every universe
+(`invariant_constant_of_setoidTotal`).  The two are combined in
+`all_invariants_constant_of_typeU_invariants_constant` below, which is the
+statement matching the informal phrase "every invariant". -/
+theorem setoidTotal_iff_all_invariants_constant {X : Type u} (S : Setoid X) :
+    SetoidTotal S ↔
+      ∀ (V : Type u) (I : X → V), SetoidInvariant S I → ∀ x y : X, I x = I y := by
+  constructor
+  · intro total V I hinv x y
+    exact hinv x y (total x y)
+  · intro h x y
+    exact Quotient.exact
+      (h (Quotient S) (Quotient.mk S) (fun _ _ hr => Quotient.sound hr) x y)
+
+/-- Constancy of `Type u`-valued invariants propagates to invariants valued in
+*any* universe.  Lean cannot quantify over universe levels inside a proposition,
+so this is how the unrestricted reading of the design theorem is stated: it
+routes through totality, which is universe-free. -/
+theorem all_invariants_constant_of_typeU_invariants_constant {X : Type u}
+    (S : Setoid X)
+    (h : ∀ (V : Type u) (I : X → V), SetoidInvariant S I → ∀ x y : X, I x = I y)
+    {W : Type v} (J : X → W) (hJ : SetoidInvariant S J) (x y : X) : J x = J y :=
+  hJ x y ((setoidTotal_iff_all_invariants_constant S).mpr h x y)
+
+/-- Contrapositive, in the form a designer uses it: exhibiting one invariant
+that separates two paths proves the relation is not total, hence that the
+quotient is not contractible. -/
+theorem not_setoidTotal_of_nonconstant_invariant {X : Type u} {S : Setoid X}
+    {V : Type v} {I : X → V}
+    (hinv : SetoidInvariant S I) (hI : Nonconstant I) : ¬ SetoidTotal S := by
+  rintro total
+  obtain ⟨x, y, hxy⟩ := hI
+  exact hxy (hinv x y (total x y))
+
+/-- The other direction, in the form a critic uses it: if the relation is total
+then every invariant is constant. -/
+theorem invariant_constant_of_setoidTotal {X : Type u} {S : Setoid X}
+    (total : SetoidTotal S) {V : Type v} {I : X → V}
+    (hinv : SetoidInvariant S I) (x y : X) : I x = I y :=
+  hinv x y (total x y)
+
+/-- The abstract reason the present rule set collapses: some element rewrites to
+everything.  Any relation with such a universal predecessor is total, whatever
+its other rules are. -/
+theorem setoidTotal_of_universal_predecessor {X : Type u} (S : Setoid X) (e : X)
+    (h : ∀ x : X, S.r e x) : SetoidTotal S :=
+  fun x y => S.trans (S.symm (h x)) (h y)
+
+/-- The collapse is exactly that instance: the trace-free path is a universal
+predecessor of its fiber. -/
+theorem rwEq_universal_predecessor {A : Type u} {a b : A} (h : a = b) :
+    ∀ p : Path a b, (rwEqSetoid A a b).r (emptyTrace h) p :=
+  fun p => rweqProp_of_rweq (rweqEmptyTrace p)
+
+/-- Consequently a redesigned rule set that keeps any information at a fiber
+must not admit a universal predecessor there.  This is the concrete design
+constraint. -/
+theorem no_universal_predecessor_of_nonconstant_invariant
+    {X : Type u} {S : Setoid X} {V : Type v} {I : X → V}
+    (hinv : SetoidInvariant S I) (hI : Nonconstant I) (e : X) :
+    ¬ (∀ x : X, S.r e x) := fun h =>
+  not_setoidTotal_of_nonconstant_invariant hinv hI
+    (setoidTotal_of_universal_predecessor S e h)
+
+/-- **Every `RwEq`-invariant is constant.**  This is the sharpest statement of
+what the present rewrite quotient retains, and it is the form to check a
+redesign against: any proposed invariant of `PathRwQuot` -- a winding number, a
+trace length, a normal form, a homotopy class -- is provably constant under the
+current rules. -/
+theorem rwEq_invariant_constant {A : Type u} {a b : A} {V : Type v}
+    {I : Path a b → V}
+    (hinv : ∀ p q : Path a b, Nonempty (RwEq p q) → I p = I q)
+    (p q : Path a b) : I p = I q :=
+  hinv p q (rweq_total p q)
+
+/-! ### The groupoid fragment as a proof of concept
+
+The design theorem asks a redesign to exhibit a nonconstant invariant.  The
+groupoid fragment does exhibit one, which is what makes the sharpness result of
+the previous section an instance of the general statement rather than an
+unrelated argument. -/
+
+theorem groupoidSetoid_parity_invariant (A : Type u) (a b : A) :
+    SetoidInvariant (groupoidSetoid A a b) (fun p : Path a b => traceParity p) :=
+  fun _ _ h => Nonempty.elim h (fun d => groupoidRwEq_traceParity d)
+
+theorem groupoidSetoid_parity_nonconstant {A : Type u} (a : A) :
+    Nonconstant (fun p : Path a a => traceParity p) := by
+  refine ⟨Path.refl a, Path.stepChain (rfl : a = a), ?_⟩
+  simp only [traceParity_refl, traceParity_stepChain]
+  exact Nat.zero_ne_one
+
+/-- Re-deriving non-totality of the fragment from the design theorem, rather
+than from the ad hoc argument, confirms that the theorem has the intended
+force. -/
+theorem groupoidSetoid_not_total_via_design {A : Type u} (a : A) :
+    ¬ SetoidTotal (groupoidSetoid A a a) :=
+  not_setoidTotal_of_nonconstant_invariant
+    (groupoidSetoid_parity_invariant A a a)
+    (groupoidSetoid_parity_nonconstant a)
+
 end QuotientPathInduction
 end Path
 end ComputationalPaths

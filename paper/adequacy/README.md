@@ -1,8 +1,9 @@
-# Observable metadata, identity elimination, and the PathRwQuot collapse
+# Identity elimination, observable metadata, and a quotient collapse
 
-- `main.tex` is the focused article, *Observable Metadata and Identity
-  Elimination: Contractibility Criteria, Exact Setoid-Quotient Repair, and the
-  PathRwQuot Case Study*.
+- `main.tex` is the focused article, *Identity Elimination with Observable
+  Metadata, and the Collapse of a Computational-Path Rewrite Quotient*. It is in
+  two parts: Part I is the general classification and mentions no rewrite
+  system; Part II is the case study that finds the collapse.
 - `companion/main.tex` is a **self-contained** article, *A Scoped Calculus of
   Equality Traces: Structural Metatheory, Contextual Reduction, and Derivation
   Erasure*. It makes no reference to `main.tex` and is intended to be posted
@@ -92,3 +93,37 @@ not used.
   repairs nothing.
   Lean: `traceParitySetoid`, `traceParity_identifies_distinct_traces`,
   `traceParity_not_setoidTotal`, `trace_parity_repair_fails`.
+
+## Presentation conventions
+
+Code-formatted identifiers and module paths appear only in the appendix of each
+article. The theorem-by-theorem correspondence with the source modules, the
+axiom footprint, and the build instructions live in an appendix titled *The
+companion Lean artifact*; nothing in either body is typeset as code.
+
+The bodies do still *name* the operations under analysis — `PathRwQuot`,
+`lamCongr`, `congrArg` — but as mathematical notation (`\mathsf{...}`), because
+the case study is precisely about which named rules cause the collapse and the
+result would be unstatable without them. They are names of objects in the
+rewrite system being studied, not references to source code.
+
+## Design constraint (new)
+
+Section 12 of `main.tex` proves that a setoid is total exactly when every
+invariant of it is constant, so unrestricted elimination and retained
+information are strictly opposed for ordinary setoid quotients. A rule set
+admitting a universal predecessor at a fiber therefore retains nothing there,
+and a redesign is validated by exhibiting a separating invariant --- exactly as
+trace-length parity validates the groupoid fragment.
+Note the side conditions: the equivalence itself needs no inhabitance
+hypothesis (on an empty carrier both sides hold vacuously), but combining it
+with the contractibility classification does, since the empty quotient is not
+contractible while every relation on it is vacuously total.
+Lean: `SetoidInvariant`, `Nonconstant`,
+`setoidTotal_iff_all_invariants_constant`,
+`all_invariants_constant_of_typeU_invariants_constant`,
+`not_setoidTotal_of_nonconstant_invariant`,
+`setoidTotal_of_universal_predecessor`,
+`no_universal_predecessor_of_nonconstant_invariant`,
+`rwEq_universal_predecessor`, `rwEq_invariant_constant`,
+`groupoidSetoid_parity_invariant`, `groupoidSetoid_not_total_via_design`.
