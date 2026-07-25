@@ -4,10 +4,10 @@
   Metadata, and the Collapse of a Computational-Path Rewrite Quotient*. It is in
   two parts: Part I is the general classification and mentions no rewrite
   system; Part II is the case study that finds the collapse.
-- `companion/main.tex` is a **self-contained** article, *A Scoped Calculus of
-  Equality Traces: Structural Metatheory, Contextual Reduction, and Derivation
-  Erasure*. It makes no reference to `main.tex` and is intended to be posted
-  independently; `main.tex` cites it as `ScopedTraceCalculus2026`. See
+- `companion/main.tex` is a **self-contained** article, *Auditing a Scoped
+  Calculus of Equality Traces: Structural Metatheory, Contextual Reduction, and
+  Derivation Erasure*. It makes no reference to `main.tex` and is intended to be
+  posted independently; `main.tex` cites it as `ScopedTraceCalculus2026`. See
   `companion/README.md`.
 - Each directory has its own `refs.bib` and builds independently with
   `latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex`.
@@ -20,11 +20,16 @@ The Lean counterparts are
 | `MetadataRepair.lean` | setoid repair, projection/kernel, `PathRwQuot`/K, raw-level `RwEq`-totality criterion, computed trace fiber, failing parity repair, circle/torus no-bridge |
 | `QuotientPathInduction.lean` | the collapse theorem, quotient path induction, universal no-bridge, groupoid-fragment sharpness |
 
-## Resolution pass: computational paths do have path induction
+## Resolution pass: the rewrite quotient collapses to ambient equality
 
 The raw-level criterion of Section 6 reduces unrestricted `J` for `PathRwQuot`
 to an elementary question about primitive rewrite rules: is `RwEq` total on raw
-loops?  That question, previously left open, is now settled affirmatively.
+loops?  That question, previously left open, is now settled affirmatively — and
+the affirmative answer is a collapse, not a repair.  `PathRwQuot` does support
+unrestricted based path induction, but only because it has become ambient
+equality; the unqualified form ("computational paths have path induction")
+invites the reading that a proof-relevant path object admits `J`, which is not
+what is proved.
 
 - **Section 7, the collapse theorem.** `Path.lamCongr` records the *empty*
   trace, while `Path.congrArg` maps traces pointwise.  Instantiating

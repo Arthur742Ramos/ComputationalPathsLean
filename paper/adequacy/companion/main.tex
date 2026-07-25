@@ -13,7 +13,7 @@
 
 \hypersetup{
   hidelinks,
-  pdftitle={A Scoped Calculus of Equality Traces: Structural Metatheory, Reduction, and Derivation Erasure},
+  pdftitle={Auditing a Scoped Calculus of Equality Traces: Structural Metatheory, Contextual Reduction, and Derivation Erasure},
   pdfauthor={Arthur Freitas Ramos, Ruy J. G. B. de Queiroz, Anjolina Grisi de Oliveira, and Dov M. Gabbay}
 }
 \allowdisplaybreaks
@@ -25,8 +25,8 @@
 
 % Archive note: replace or supplement the stable commit citation with the
 % future Zenodo archival DOI in the submission version.
-\title[A Scoped Calculus of Equality Traces]
-  {A Scoped Calculus of Equality Traces:\\
+\title[Auditing a Scoped Calculus of Equality Traces]
+  {Auditing a Scoped Calculus of Equality Traces:\\
    Structural Metatheory, Contextual Reduction,
    and Derivation Erasure}
 
@@ -101,75 +101,67 @@ substitution, syntactic quotient, equality traces, path induction}
 \begin{document}
 
 \begin{abstract}
-We define a raw, scope-indexed dependent-style calculus using de Bruijn
-indices.  Its expressions include dependent products and sums,
-level-indexed natural-number syntax, Tarski-style codes, identity,
-reflexivity, and a two-binder raw \(J\)-constructor.  Contexts are
-same-scope assignments, not well-formed telescopes.  Renaming and
-simultaneous substitution are defined explicitly under one and two binders.
-We prove their identity, composition, lifting, weakening, and instantiation
-laws, and typed substitution for the raw typing judgment.
+This is a machine-checked audit, not a new type theory.  Its subject is the raw
+scope-indexed calculus that underlies a formalized development of equality
+traces, and its output is a precise account of what that calculus proves, what
+it fails to prove, and what its traces actually record.  We report the failures
+as theorems rather than as gaps, which is what distinguishes an audit from an
+incomplete metatheory.
 
-We then develop the calculus' reduction theory.  Ten top-level primitive
-redexes preserve typing modulo source definitional equality between the
-displayed type expressions.  Beyond these we define the full congruence
-closure of the primitive rules and its reflexive-transitive closure, and prove
-both sound for definitional equality and stable under simultaneous
+The calculus is a raw, scope-indexed dependent-style syntax in de Bruijn form,
+with dependent products and sums, level-indexed natural numbers, Tarski-style
+codes, identity, reflexivity, and a two-binder raw \(J\)-constructor.  Contexts
+are same-scope assignments rather than well-formed telescopes; definitional
+equality \(\defeq\) is untyped; and there is no conversion rule.  Renaming and
+simultaneous substitution are given explicitly under one and two binders, with
+their identity, composition, lifting, weakening, and instantiation laws, and
+substitution is proved admissible for the raw typing judgment.  Ten top-level
+primitive redexes preserve typing modulo \(\defeq\) between the displayed type
+expressions, and the congruence closure of those rules, together with its
+reflexive-transitive closure, is sound for \(\defeq\) and stable under
 substitution.
 
-Contextual subject reduction then \emph{fails}, and we prove that it does.  We
-exhibit a reduction inside a well-typed term whose reduct admits no derivation
-at the same type, so the failure is a theorem rather than a stuck induction.  We
-also prove that neither of the two rules usually invoked to repair it---the
-conversion rule and its context-wise companion---is admissible for the raw
-judgment, and hence that the natural hypothesis record packaging them is
-\emph{uninhabited}.  A conditional subject-reduction theorem over that record is
-therefore vacuously true, and we say so: what it establishes is an analysis of
-the induction, namely that repairs of exactly those two shapes suffice to close
-every case, not a hypothesis a reader could discharge.  The positive counterpart
-is the conversion-closed extension, in which both rules hold by construction; we
-state precisely what unconditional subject reduction for it would additionally
-require, namely generation lemmas and hence confluence, which we do not prove.
+Contextual subject reduction then \emph{fails}, and we prove that it does: a
+reduction inside a well-typed term yields a reduct admitting no derivation at
+the same type.  We prove further that neither rule usually invoked to repair
+this---conversion and its context-wise companion---is admissible, so the natural
+hypothesis record packaging them is \emph{uninhabited} and any conditional
+subject-reduction theorem over it is vacuous as a statement about the raw
+judgment.  What such a proof does establish is an analysis of the induction:
+repairs of exactly those two shapes close every case.  The conversion-closed
+extension satisfies both rules by construction, and we state exactly what an
+unconditional theorem for it would additionally need---generation lemmas, hence
+confluence---which we do not prove.
 
-Source definitional equality is untyped and has no conversion rule.  It is
-closed under substitution, so substitution descends to a
-representative-independent action on the syntactic quotient that preserves
-identity and composition.
-An independent source language of identity programs evaluates into
-\emph{unlabelled quotient traces}: lists of equality steps over the quotient
-together with an endpoint equality.  We give the target trace operations,
-one-step rules, congruence, and symmetric-reflexive-transitive closure, and
-prove soundness of the source groupoid and finite-frame rewrites.
+The audit's second half concerns what the traces retain.  Substitution descends
+to a representative-independent, compositional action on the syntactic quotient
+\(\Q_n=\Expr_n/{\defeq}\), and an independent source language of identity
+programs evaluates into \emph{unlabelled quotient traces}: lists of equality
+steps over \(\Q_n\) together with an endpoint equality.  That these traces are
+unlabelled is proved, not asserted.  Evaluation \emph{factors} through a
+label-free syntax whose atoms carry only proof-irrelevant equalities of classes
+and which therefore cannot mention a source derivation; program size and
+constructor shape are preserved, so the arrangement of steps survives while the
+reasons do not; and every quotient equality between represented classes has a
+source witness erasing back to the same atom.  Erasure is \emph{not} surjective
+onto the label-free grammar, whose congruence constructor accepts arbitrary
+endofunctions, so we characterize its essential image exactly---the fragment
+whose atoms are quotient soundness applied to a source \(\defeq\)-derivation and
+whose congruences are induced by source frames.  This separates the present
+target sharply from label-sensitive presentations of computational paths.
 
-That the traces are unlabelled is proved rather than asserted.  We introduce a
-label-free program syntax over the quotient, whose atoms carry only
-proof-irrelevant equalities of classes and which therefore cannot mention a
-source derivation, and show that evaluation \emph{factors} through it.  Three
-statements are proved, and we are careful to claim no more: evaluation is
-insensitive to source labels; program size and constructor shape are preserved,
-so the arrangement of equality steps survives; and every quotient equality
-between represented classes has a source witness, which erases back to the same
-atom.  Erasure is \emph{not} surjective onto the label-free grammar, whose
-congruence constructor accepts arbitrary endofunctions of the term model, so we
-characterize the essential image exactly: it is the fragment whose atoms are
-quotient soundness applied to a source definitional equality and whose
-congruences are induced by source frames.  This separates the present target
-sharply from label-sensitive presentations of computational paths.
-
-Finally, we record what the traces are and are not.  A trace is a list of
-equality steps over a proof-irrelevant quotient together with an endpoint
-equality; its entries need not be adjacent, composable, or related to the outer
-endpoints.  These objects are observable list metadata decorating an equality,
-not carriers of reasons for it---indeed the erasure theorem says precisely that
-the reasons have been discarded.  Applying the metadata-fiber criterion of the
-companion article to our own records makes this quantitative: the quotient trace
-fiber is computed to be a list of quotient classes, which is never contractible,
-so trace records admit no unrestricted based eliminator, while motives factoring
-through the equality projection remain available.  No judgmental beta is
-claimed, and the results do not supply a model of Martin-L\"of or homotopy type
-theory.  A Lean~4 development machine-checks the structural laws, the reduction
-theory, the failure and necessity theorems, quotient substitution, erasure and
-its essential image, rewrite soundness, and the trace obstruction.
+The verdict is deflationary and quantitative.  A trace is observable list
+metadata decorating an equality: its entries need not be adjacent, composable,
+or related to the outer endpoints, and the erasure theorem says the reasons have
+been discarded.  Applying the metadata-fiber criterion of the companion article
+\cite{ObservableMetadata2026} to our own records computes the trace fiber to be
+a list of quotient classes, which is never contractible, so trace records admit
+no unrestricted based eliminator, while motives factoring through the equality
+projection remain available.  No judgmental beta is claimed, and no model of
+Martin-L\"of or homotopy type theory is supplied.  A Lean~4 development
+machine-checks every statement above: the structural laws, the reduction theory,
+the failure and inadmissibility theorems, quotient substitution, erasure and its
+essential image, rewrite soundness, and the trace obstruction.
 \end{abstract}
 
 \maketitle
@@ -177,8 +169,25 @@ its essential image, rewrite soundness, and the trace obstruction.
 \section{Introduction}
 \label{sec:introduction}
 
-This paper is a structural study of a deliberately raw calculus of equality
-traces, not an interpretation theorem.  Fix \(n\in\mathbb N\).  The
+This paper audits a formalized calculus of equality traces.  It is not a
+proposal for a new type theory, and it is not an interpretation theorem.  The
+object under examination is a raw, scope-indexed dependent-style syntax that
+exists as Lean~4 source, and the task is to determine, with machine-checked
+precision, three things: which structural properties it genuinely has, which
+properties it demonstrably lacks, and what its equality traces actually record.
+Where the calculus fails, we prove the failure.  That discipline---negative
+results stated as theorems rather than reported as gaps---is what an audit
+contributes, and it is what a reader deciding whether to build on the artifact
+needs.
+
+The framing matters because raw calculi are easy to over-read.  A syntax with
+\(\Pi\)-types, universes, an identity type, and a \(J\)-constructor invites the
+assumption that the usual metatheory is present in the background.  Here it is
+not, and the paper's job is to say exactly where the resemblance stops.
+
+\subsection*{The object of study}
+
+Fix \(n\in\mathbb N\).  The
 expressions \(\Expr_n\) have exactly \(n\) de Bruijn variables and the
 constructors listed in Section~\ref{sec:syntax}.  A context is merely a
 same-scope assignment
@@ -204,7 +213,7 @@ Throughout, \(X\simeq Y\) denotes specified mutually inverse maps, and
 Section~\ref{sec:ambient} states the precise universe conventions and
 propositional computation law.
 
-Two questions organize the development.  The first is how far the raw calculus
+Two questions organize the audit.  The first is how far the raw calculus
 gets on its own, and where exactly it stops.  The second is what its traces
 actually record.
 
@@ -248,11 +257,11 @@ not over a definitionally equal one.  Consequently the record packaging the two
 rules is uninhabited.
 \end{theorem}
 
-Theorem~\ref{thm:intro-not-admissible} has a consequence we state plainly
-because it is easy to state misleadingly.  Assuming the two rules as a
-hypothesis record and deriving contextual and multi-step subject reduction from
-it---which we do, in Section~\ref{sec:reduction}---yields a theorem whose
-hypothesis is empty, hence a vacuously true one.
+Theorem~\ref{thm:intro-not-admissible} has a consequence that is easy to state
+misleadingly, so we state it plainly.  Assuming the two rules as a hypothesis
+record and deriving contextual and multi-step subject reduction from it---which
+we do, in Section~\ref{sec:reduction}---yields a theorem with an empty
+hypothesis.
 
 \begin{theorem}[Conditional subject reduction, and what it means]
 \label{thm:intro-subject-reduction}
@@ -266,12 +275,12 @@ Its content is the analysis of the induction: repairs of exactly those two
 shapes, and no others, are needed to close every one of its cases.
 \end{theorem}
 
-We therefore do not claim that the two rules are ``all that is missing'' between
-this calculus and a conversion-closed one; that phrasing would confuse a fact
+Accordingly we do not say that the two rules are ``all that is missing''
+between this calculus and a conversion-closed one; that phrasing confuses a fact
 about a proof with a fact about a judgment.  The defensible statement is that
 conversion and context conversion are \emph{sufficient to repair every
-obstruction arising in the structural subject-reduction proof}, and that they
-are \emph{necessary} in the concrete sense of
+obstruction arising in the structural subject-reduction proof}, and
+\emph{necessary} in the concrete sense of
 Theorem~\ref{thm:intro-not-admissible}.
 
 The positive route is to change the judgment rather than to assume rules about
@@ -318,12 +327,11 @@ arrangement of equality steps survives, and only labels are discarded.  The
 round trip is \emph{atom-level}: every quotient equality between represented
 classes has a source witness, and erasing that witness returns the same atom.
 
-What the three clauses do not say is that the two program languages are
-equivalent, and we do not claim it.  The label-free grammar is strictly more
-permissive than erasure needs: its congruence constructor accepts an arbitrary
-endofunction of the term model, whereas erasure only ever supplies one induced
-by a source frame.  Section~\ref{sec:erasure} therefore characterizes the
-essential image instead.
+The three clauses do not say that the two program languages are equivalent.  The
+label-free grammar is strictly more permissive than erasure needs: its
+congruence constructor accepts an arbitrary endofunction of the term model,
+whereas erasure only ever supplies one induced by a source frame.
+Section~\ref{sec:erasure} therefore characterizes the essential image instead.
 
 \begin{theorem}[Essential image of erasure]
 \label{thm:intro-image}
@@ -397,29 +405,37 @@ contractible, or motives must be restricted through the equality projection.
 
 \subsection*{Contribution}
 
-The contribution is the combination of sharply bounded pieces:
-binder-correct raw scoped syntax; source-derived preservation for ten
-primitive redexes; a contextual and multi-step reduction theory together with
-a proved failure of contextual subject reduction and proved inadmissibility of
-the two rules that would repair it; representative-independent and
-compositional quotient substitution; source/target-separated identity programs;
-a proof that the resulting traces are unlabelled, together with an exact
-characterization of the essential image of erasure; and the trace-record
-elimination obstruction.
+The contribution is an audit with two substantive findings and a supporting
+body of verified structural metatheory.
 
-Of these, the negative reduction results and the erasure analysis are the
-substantive additions.  The former replace a reported obstruction by theorems:
-contextual subject reduction is false
+The first finding is negative and concerns reduction.  It replaces a reported
+obstruction by theorems: contextual subject reduction is false
 (Theorem~\ref{thm:intro-sr-fails}), neither repairing rule is admissible, and
 the hypothesis record packaging them is uninhabited
-(Theorem~\ref{thm:intro-not-admissible}).  That is a sharper outcome than
-asserting a gap, and a more honest one than a conditional theorem presented as
-a measurement.  The latter converts a naming convention into mathematics:
-calling a trace ``unlabelled'' is otherwise a claim about intent, whereas the
-factorization, size-preservation, and atom round-trip clauses of
+(Theorem~\ref{thm:intro-not-admissible}).  A gap in a proof and a false
+statement are different objects, and only the second tells a prospective user of
+the artifact that no amount of further effort will close the case.  Reporting a
+conditional theorem as if it were a measurement would have concealed exactly
+that.
+
+The second finding concerns labels, and it converts a naming convention into
+mathematics.  Calling a trace ``unlabelled'' is otherwise a claim about intent;
+the factorization, size-preservation, and atom round-trip clauses of
 Theorem~\ref{thm:intro-erasure}, together with the image characterization of
-Theorem~\ref{thm:intro-image}, pin down what the target retains, what it cannot
-express, and which of its programs are actually reached.
+Theorem~\ref{thm:intro-image}, instead pin down what the target retains, what it
+cannot express, and which of its programs are actually reached.  The
+consequence for the wider programme is stated in Section~\ref{sec:comparison}:
+the traces produced here are not label-sensitive computational paths, and the
+difference is provable rather than stylistic.
+
+Supporting these are binder-correct raw scoped syntax; source-derived
+preservation for ten primitive redexes; a contextual and multi-step reduction
+theory; representative-independent and compositional quotient substitution;
+source/target-separated identity programs; and the trace-record elimination
+obstruction.  Handling the two-binder constructors correctly is the least
+glamorous and most error-prone part of this, and mechanizing it is what makes
+the negative results trustworthy: a counterexample to subject reduction is only
+as good as the substitution algebra it is stated over.
 
 Several components are deliberately modest and we mark them as such.  The
 metadata-fiber criterion is imported from the companion article
@@ -432,7 +448,7 @@ in part by the definitions---source atoms are evaluated only through quotient
 soundness---so its interest lies in the image characterization rather than in
 the induction.  The paper claims no absolute priority.
 
-\subsection*{Status of the calculus}
+\subsection*{What this paper is not}
 
 The terminology in Theorem~\ref{thm:intro-main} is intentional.  This is a
 \emph{scoped dependent-style calculus}, not a presentation of full
@@ -443,6 +459,13 @@ decidable type checking, univalence, higher inductive type, or completeness
 theorem for source identity rewrites.  Section~\ref{sec:limitations} states
 these boundaries in full, and every one of them is load-bearing somewhere
 above.
+
+We also do not repair the calculus.  The conversion-closed extension of
+Section~\ref{subsec:conversion-closed} shows what a repair would look like and
+identifies precisely what it would then owe---generation lemmas, hence
+confluence---but supplying that positive metatheory is separate work, and
+presenting it here would obscure the audit's actual result, which is that the
+calculus as formalized does not have it.
 
 \subsection*{Relation to earlier computational paths}
 
@@ -1427,6 +1450,91 @@ their same-scope positions.  Reapplying the matching congruence constructor
 proves each case, with no quotient assumption.
 \end{proof}
 
+Theorem~\ref{thm:computation-substitution} has one further consequence that is
+used twice below: once in the redex-preservation theorem immediately following,
+and again in Section~\ref{sec:syntactic-quotient} when substitution is
+transported to the syntactic quotient.  We record it here, at the level of the
+source relation, before any quotient has been formed.
+
+\begin{proposition}[Substitution environment congruence]
+\label{prop:environment-congruence}
+Suppose \(\sigma,\tau\in\Sub(n,m)\) and
+\(\sigma(i)\defeq\tau(i)\) for every \(i\in\Fin(n)\).  Then
+\[
+                     t[\sigma]\defeq t[\tau]
+                     \quad\text{for every }t\in\Expr_n.
+\tag{5.6}\label{eq:subst-congruence}
+\]
+\end{proposition}
+
+\begin{proof}
+Induct on \(t\).  The variable case is the assumption.  First prove the lift
+lemma pointwise:
+\[
+ \sigma\equiv_{\mathrm{env}}\tau
+ \Longrightarrow
+ \sigma^\lift\equiv_{\mathrm{env}}\tau^\lift.
+\tag{5.7}\label{eq:lift-env-congruence}
+\]
+At index \(0\), both sides are \(\Var(0)\).  At \(i+1\), apply
+Theorem~\ref{thm:computation-substitution} to
+\(\sigma(i)\defeq\tau(i)\) with
+\(\mathsf{ofRen}(\wk_m)\); by~\eqref{eq:ofren-subst} this is precisely
+\(\sigma(i)[\wk_m]_{\mathrm r}\defeq
+  \tau(i)[\wk_m]_{\mathrm r}\).  Applying the lemma twice gives pointwise
+\(\sigma^{\lift\lift}\equiv_{\mathrm{env}}
+ \tau^{\lift\lift}\).
+
+For \(\PiTy,\SigmaTy,\Lam,\CodePi,\CodeSigma\), use
+\eqref{eq:lift-env-congruence} in the bound argument and the original
+assumption in the unbound argument.  Application, pairing, projections,
+successor, decoding, identity, code identity, and reflexivity use the
+induction hypotheses in their same-scope positions, chaining one-position
+congruence constructors when there is more than one argument.  Constants
+are reflexive.  For \(\NatElim_\ell(M,z,s,k)\), the four induction hypotheses use,
+respectively, \(\sigma^\lift\), \(\sigma\),
+\(\sigma^{\lift\lift}\), and \(\sigma\); transitivity chains the four
+one-position congruence constructors.  Concretely, it compares motives,
+zero branches, successor branches, and scrutinees in that order:
+\[
+\begin{aligned}
+&\NatElim_\ell(M[\sigma^\lift],z[\sigma],
+ s[\sigma^{\lift\lift}],k[\sigma])\\
+\defeq{}&
+\NatElim_\ell(M[\tau^\lift],z[\sigma],
+ s[\sigma^{\lift\lift}],k[\sigma])\\
+\defeq{}&
+\NatElim_\ell(M[\tau^\lift],z[\tau],
+ s[\sigma^{\lift\lift}],k[\sigma])\\
+\defeq{}&
+\NatElim_\ell(M[\tau^\lift],z[\tau],
+ s[\tau^{\lift\lift}],k[\sigma])\\
+\defeq{}&
+\NatElim_\ell(M[\tau^\lift],z[\tau],
+ s[\tau^{\lift\lift}],k[\tau]).
+\end{aligned}
+\]
+Each step changes exactly one displayed argument using the corresponding
+congruence constructor.  Raw \(\EqJ(M,r,b,p)\) similarly uses
+\(\sigma^{\lift\lift}\) for \(M\) and \(\sigma\) for the remaining three
+arguments:
+\[
+\begin{aligned}
+&\EqJ(M[\sigma^{\lift\lift}],r[\sigma],b[\sigma],p[\sigma])\\
+\defeq{}&
+\EqJ(M[\tau^{\lift\lift}],r[\sigma],b[\sigma],p[\sigma])\\
+\defeq{}&
+\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\sigma],p[\sigma])\\
+\defeq{}&
+\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\tau],p[\sigma])\\
+\defeq{}&
+\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\tau],p[\tau]).
+\end{aligned}
+\]
+Thus every constructor, including the two-binder cases, is covered by the
+explicit compatible closure of \(\defeq\).
+\end{proof}
+
 \begin{theorem}[Primitive-redex preservation modulo type \(\defeq\)]
 \label{thm:redex-preservation}
 For \(\Gamma\in\Ctx(n)\) and \(r,s,A\in\Expr_n\), if
@@ -1435,7 +1543,7 @@ such that
 \[
                   \Gamma\vdash s:B
                   \qquad\text{and}\qquad B\defeq A.
-\tag{5.6}\label{eq:redex-preservation}
+\tag{5.8}\label{eq:redex-preservation}
 \]
 Here \(B\defeq A\) is the untyped source relation applied to expressions
 being used as types.  The theorem covers exactly the ten top-level schemes
@@ -1466,7 +1574,7 @@ target derivation has exactly the displayed source type.
 \El\text{-}\Sigma&\SigmaTy(\El(A),\El(B)):\Sort_\ell&\text{same}\\
 \El\text{-Id}&\IdTy(\El(A),a,b):\Sort_\ell&\text{same}
 \end{array}
-\tag{5.7}\label{eq:redex-case-table}
+\tag{5.9}\label{eq:redex-case-table}
 \]
 
 For product beta, inversion produces
@@ -1523,7 +1631,7 @@ instantiation with \(k\) and \(R_k\) yields
 The pointwise substitution calculation
 \[
  T_{\mathrm{succ}}(M)\{k,R_k\}=M\{\Succ_\ell(k)\}
-\tag{5.8}\label{eq:nat-target-instantiation}
+\tag{5.10}\label{eq:nat-target-instantiation}
 \]
 is exact: the branch proof variable does not occur in
 \(T_{\mathrm{succ}}(M)\), the predecessor becomes \(k\), and the motive
@@ -1649,7 +1757,7 @@ Let \(\Gamma_0\) be the one-slot context assigning
  t=\App(\Var_0,r),
  \qquad
  u=\App(\Var_0,\Zero_0).
-\tag{6.2}\label{eq:sr-counterexample}
+\tag{6.1}\label{eq:sr-counterexample}
 \]
 Then \(t\ctxred u\) and \(\Gamma_0\vdash t:r\) are derivable, while
 \(\Gamma_0\vdash u:r\) is not.
@@ -1686,7 +1794,7 @@ The \emph{conversion hypothesis} consists of two rules:
 \qquad
 \frac{\Gamma\vdash t:A\qquad \Gamma\defeq\Delta}
      {\Delta\vdash t:A}
-\tag{6.1}\label{eq:conversion-rules}
+\tag{6.2}\label{eq:conversion-rules}
 \]
 where \(\Gamma\defeq\Delta\) abbreviates pointwise source definitional
 equality of the two same-scope assignments.
@@ -1890,15 +1998,9 @@ anyway, and state this caveat with it, because its proof carries information
 that neither of the negative theorems does: it enumerates every case of the
 induction and shows that repairs of exactly the two shapes in
 \eqref{eq:conversion-rules}---and no others---suffice to close all of them.
-
-The defensible formulation is therefore the following, and it is the one we
-assert.  Conversion and context conversion are \emph{sufficient to repair every
-obstruction arising in the structural subject-reduction proof}, and each is
-\emph{necessary} in the sense of Theorem~\ref{thm:not-admissible}.  We do not
-assert that they are ``all that is missing'', that the gap is ``exactly two
-rules deep'', or that Theorem~\ref{thm:contextual-subject-reduction} measures a
-distance between calculi; those readings confuse a fact about a proof with a
-fact about a judgment.
+This is the sense, and the only sense, in which the pair is claimed to be
+sufficient; it is a fact about the proof, not a measurement of the distance
+between two calculi.
 \end{remark}
 
 \subsection{The conversion-closed extension}
@@ -1939,9 +2041,8 @@ require a confluence analysis; Remark~\ref{rem:reduction-limits} records that
 we have none.  So the honest summary of this section is not that the raw
 calculus is two rules away from subject reduction, but that it is a
 \emph{different judgment} away, and that the metatheory of that judgment needs
-confluence.  We regard supplying it as the natural next step for this calculus,
-and note that it is exactly the step at which the present development stops
-being elementary.
+confluence.  Supplying it is the natural next step, and it is exactly the point
+at which this development stops being elementary.
 \end{remark}
 
 \begin{remark}[What is still not proved]
@@ -1979,88 +2080,23 @@ independent of the representative \(t\).  This order matters logically:
 substitution closure is a theorem about the source relation, proved before
 the quotient action is defined.
 
-\begin{proposition}[Substitution environment congruence]
-\label{prop:environment-congruence}
-Suppose \(\sigma,\tau\in\Sub(n,m)\) and
-\(\sigma(i)\defeq\tau(i)\) for every \(i\in\Fin(n)\).  Then
-\[
-                     t[\sigma]\defeq t[\tau]
-                     \quad\text{for every }t\in\Expr_n.
-\tag{7.3}\label{eq:subst-congruence}
-\]
-Consequently \(\Q(\sigma)=\Q(\tau)\) pointwise.
-\end{proposition}
+\begin{corollary}[Representative independence in the environment]
+\label{cor:quotient-environment}
+If \(\sigma,\tau\in\Sub(n,m)\) satisfy \(\sigma(i)\defeq\tau(i)\) for every
+\(i\in\Fin(n)\), then \(\Q(\sigma)=\Q(\tau)\) pointwise, and as maps under
+function extensionality.
+\end{corollary}
 
 \begin{proof}
-Induct on \(t\).  The variable case is the assumption.  First prove the lift
-lemma pointwise:
-\[
- \sigma\equiv_{\mathrm{env}}\tau
- \Longrightarrow
- \sigma^\lift\equiv_{\mathrm{env}}\tau^\lift.
-\tag{7.4}\label{eq:lift-env-congruence}
-\]
-At index \(0\), both sides are \(\Var(0)\).  At \(i+1\), apply
-Theorem~\ref{thm:computation-substitution} to
-\(\sigma(i)\defeq\tau(i)\) with
-\(\mathsf{ofRen}(\wk_m)\); by~\eqref{eq:ofren-subst} this is precisely
-\(\sigma(i)[\wk_m]_{\mathrm r}\defeq
-  \tau(i)[\wk_m]_{\mathrm r}\).  Applying the lemma twice gives pointwise
-\(\sigma^{\lift\lift}\equiv_{\mathrm{env}}
- \tau^{\lift\lift}\).
-
-For \(\PiTy,\SigmaTy,\Lam,\CodePi,\CodeSigma\), use
-\eqref{eq:lift-env-congruence} in the bound argument and the original
-assumption in the unbound argument.  Application, pairing, projections,
-successor, decoding, identity, code identity, and reflexivity use the
-induction hypotheses in their same-scope positions, chaining one-position
-congruence constructors when there is more than one argument.  Constants
-are reflexive.  For \(\NatElim_\ell(M,z,s,k)\), the four induction hypotheses use,
-respectively, \(\sigma^\lift\), \(\sigma\),
-\(\sigma^{\lift\lift}\), and \(\sigma\); transitivity chains the four
-one-position congruence constructors.  Concretely, it compares motives,
-zero branches, successor branches, and scrutinees in that order:
-\[
-\begin{aligned}
-&\NatElim_\ell(M[\sigma^\lift],z[\sigma],
- s[\sigma^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\sigma],
- s[\sigma^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\tau],
- s[\sigma^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\tau],
- s[\tau^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\tau],
- s[\tau^{\lift\lift}],k[\tau]).
-\end{aligned}
-\]
-Each step changes exactly one displayed argument using the corresponding
-congruence constructor.  Raw \(\EqJ(M,r,b,p)\) similarly uses
-\(\sigma^{\lift\lift}\) for \(M\) and \(\sigma\) for the remaining three
-arguments:
-\[
-\begin{aligned}
-&\EqJ(M[\sigma^{\lift\lift}],r[\sigma],b[\sigma],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\sigma],b[\sigma],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\sigma],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\tau],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\tau],p[\tau]).
-\end{aligned}
-\]
-Thus every constructor, including the two-binder cases, is covered by the
-explicit compatible closure of \(\defeq\).  Quotient soundness gives
-\(\Q(\sigma)(\den t)=\Q(\tau)(\den t)\); quotient induction extends this to
-arbitrary \(x:\Q_n\), and function extensionality identifies the two maps if
-map equality rather than pointwise equality is desired.
+Proposition~\ref{prop:environment-congruence} gives \(t[\sigma]\defeq t[\tau]\)
+for every \(t\in\Expr_n\), so quotient soundness gives
+\(\Q(\sigma)(\den t)=\Q(\tau)(\den t)\), and quotient induction extends this to
+an arbitrary \(x:\Q_n\).
 \end{proof}
+
+The action~\eqref{eq:quotient-substitution} is therefore independent of the
+expression representative, by Theorem~\ref{thm:computation-substitution}, and of
+the environment representative, by Corollary~\ref{cor:quotient-environment}.
 
 \begin{theorem}[Compositionality of quotient substitution]
 \label{thm:quotient-compositionality}
@@ -2071,7 +2107,7 @@ For every \(x\in\Q_n\) and composable substitutions
 \Q(\idren^{\Sub}_n)(x)&=x,\\
 \Q(\tau)(\Q(\sigma)(x))&=\Q(\sigma;_{\Sub}\tau)(x).
 \end{aligned}
-\tag{7.5}\label{eq:quotient-compositionality}
+\tag{7.3}\label{eq:quotient-compositionality}
 \]
 The equations hold for arbitrary quotient values, not merely for a chosen
 notation of the form \(\den t\).  If \(\sigma\) and \(\tau\) are pointwise
@@ -2101,7 +2137,7 @@ For identity and composition, use quotient induction to reduce an arbitrary
      =\Q(\sigma;_{\Sub}\tau)(\den t).
  \end{aligned}
 \]
-Proposition~\ref{prop:environment-congruence} proves that pointwise
+Corollary~\ref{cor:quotient-environment} proves that pointwise
 \(\defeq\)-equal environments induce pointwise equal quotient maps; function
 extensionality gives equality of maps.  Hence the construction is independent
 both of expression representatives and of pointwise equivalent environment
@@ -2119,13 +2155,13 @@ For \(t\in\Expr_n\) and \(\sigma\in\Sub(n,m)\), abbreviate
 \[
                        \den t_\sigma\coloneqq
                        \Q(\sigma)(\den t)=\den{t[\sigma]}.
-\tag{7.6}\label{eq:environment-interpretation}
+\tag{7.4}\label{eq:environment-interpretation}
 \]
 Then
 \[
           \den{t[\sigma]}_\tau
             =\den t_{\sigma;_{\Sub}\tau}.
-\tag{7.7}\label{eq:interpretation-composition}
+\tag{7.5}\label{eq:interpretation-composition}
 \]
 The quotient equality in~\eqref{eq:interpretation-composition} may be
 decorated by a singleton unlabelled quotient trace.  That decoration does
@@ -2911,13 +2947,17 @@ remains available is elimination for motives factoring through the
 endpoint-equality projection
 \[
  \Tr_X(a,b)\longrightarrow(a=b),\qquad (L,e)\longmapsto e,
-\tag{12.1}\label{eq:forget-trace}
+\tag{11.1}\label{eq:forget-trace}
 \]
 which cannot observe the list; this is the projection theorem of
 \cite{ObservableMetadata2026}, and it is what the present traces do support.
 
 \section{Boundaries and possible strengthenings}
 \label{sec:limitations}
+
+This section is the consolidated list of what the audit does \emph{not}
+establish.  It is stated once, here, and the remaining sections do not restate
+it.
 
 \paragraph{Source and reduction.}
 The source has only the constructors in Section~\ref{sec:syntax}.  Contexts
@@ -3150,15 +3190,18 @@ confluence, or external interpretation theorems.
 \section{Conclusion}
 \label{sec:conclusion}
 
-The paper establishes a scoped syntax and its binder algebra, typed
-substitution, preservation for ten top-level primitive redexes, a contextual
-and multi-step reduction theory, compositional substitution on a syntactic
-quotient, and sound evaluation of source identity rewrites into an explicitly
-presented unlabelled trace relation.  None of these statements requires
-calling the quotient a model of MLTT.
+An audit is judged by whether a reader can act on it, so we close by saying
+what has been settled and what a user of the artifact should conclude.
 
-Two of the results are measurements rather than constructions, and that is
-their point.
+On the positive side, the calculus genuinely supports a scoped syntax and its
+binder algebra, typed substitution, preservation for ten top-level primitive
+redexes, a contextual and multi-step reduction theory, compositional
+substitution on a syntactic quotient, and sound evaluation of source identity
+rewrites into an explicitly presented unlabelled trace relation.  These are
+usable, and none of them requires calling the quotient a model of MLTT.
+
+Two further results are measurements rather than constructions, and they are the
+audit's findings.
 
 The first concerns reduction, and it is negative.  Contextual subject reduction
 is not merely unproved here but false, with a witness small enough to check by
@@ -3170,7 +3213,9 @@ exactly two shapes, enumerated in Table~\ref{tab:sr-cases}, close every case.
 The constructive response is the conversion-closed extension \(\vdashC\), for
 which we prove no subject-reduction theorem, because doing so needs generation
 lemmas and hence confluence.  The distance from this calculus to subject
-reduction is therefore a different judgment, not two hypotheses.
+reduction is therefore a different judgment, not two hypotheses.  For a reader,
+the operational consequence is concrete: the raw judgment must not be relied on
+to be preserved by reduction anywhere in the development.
 
 The second concerns labels.  Calling the quotient traces \emph{unlabelled} is
 otherwise a statement about intent, so Section~\ref{sec:erasure} makes it a
@@ -3184,20 +3229,20 @@ agree.  Together these pin down what the target retains and what it cannot
 express, and they make the contrast with label-sensitive computational paths
 precise: an analogue of Corollary~\ref{cor:no-derivation-observation} fails
 there by design, and that failure is the source of that theory's content.
-
-Endpoint exactness, by contrast, is immediate from quotient soundness and
-exactness; its role is bookkeeping, not semantic completeness.
-
 Applying the metadata-fiber criterion of \cite{ObservableMetadata2026} to our
-own records gives the deflationary reading we recommend: the quotient trace
-fiber is a list of quotient classes, hence never contractible, so trace records
-support no unrestricted based eliminator, while equality-component motives
-remain available through projection.  These objects are observable list metadata
-decorating an equality, not carriers of reasons for it.
+own records completes the picture quantitatively: the quotient trace fiber is a
+list of quotient classes, hence never contractible, so trace records support no
+unrestricted based eliminator, while equality-component motives remain available
+through projection.  These objects are observable list metadata decorating an
+equality, not carriers of reasons for it.  Endpoint exactness, by contrast, is
+immediate from quotient soundness and exactness; its role is bookkeeping, not
+semantic completeness.
 
-The open directions follow from the above.  Confluence for \(\defeq\) would
+The open directions follow from the above, and we state them as the work the
+audit has scoped rather than as speculation.  Confluence for \(\defeq\) would
 unlock generation lemmas and hence an unconditional subject-reduction theorem
-for \(\vdashC\); that is the single most valuable next step.  We also prove no
+for \(\vdashC\); that is the single most valuable next step, and this paper
+establishes both that it is needed and that nothing weaker will do.  We prove no
 normalization or standardization theorem, the syntactic quotient is built from
 \(\defeq\) directly rather than from a normal-form analysis, and a genuine
 raw-to-CwF interpretation is not attempted.  Each such extension must state
@@ -3257,20 +3302,10 @@ Theorem~\ref{thm:erasure-image} is \path{FramedAt}, \path{erase_framedAt},
 \path{erase_congr_frame_induced} and \path{erase_atom_is_sound} for the two
 ``invents nothing'' statements.
 
-Three points about the formal development are worth stating precisely.  First,
-the conversion hypothesis of Definition~\ref{def:conversion-rules} is
-formalized as a record of assumed rules that every dependent theorem takes as
-an explicit argument.  It is not an axiom: the development declares none, and
-the dependence of Theorem~\ref{thm:contextual-subject-reduction} on the two
-omitted rules is visible in its statement rather than hidden in the ambient
-theory.  Second---and this is why that visibility matters---the record is
-proved uninhabited, so a reader auditing the artifact should read
-\path{contextual_subject_reduction} as an analysis of the induction and not as
-a usable subject-reduction lemma.  Third, the machine-checked theorems rely
-only on propositional extensionality and quotient soundness; the negative
-theorems of Section~\ref{sec:reduction} use propositional extensionality alone.
-No form of choice is used, so the results are constructive relative to those
-principles.
+The axiom profile of the development, and the reason
+\path{contextual_subject_reduction} must be read as an analysis of the induction
+rather than as a usable lemma, are stated in Section~\ref{sec:reproducibility}
+and not repeated here.
 
 \medskip
 \noindent
