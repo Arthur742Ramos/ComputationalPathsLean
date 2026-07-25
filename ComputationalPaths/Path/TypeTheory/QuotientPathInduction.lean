@@ -552,8 +552,22 @@ def Nonconstant {X : Type u} {V : Type v} (I : X → V) : Prop :=
 /-- **The design theorem.**  A setoid is total exactly when every invariant of
 it is constant.  Combined with
 `MetadataRepair.quotient_contractible_iff_setoidTotal`, this puts the two design
-goals in direct opposition: a quotient supports unrestricted elimination exactly
-when it retains nothing, so no rewrite system can meet both. -/
+goals in direct opposition: for an inhabited carrier a quotient supports
+unrestricted elimination exactly when it retains nothing, so no rewrite system
+can meet both.
+
+Note the inhabitance side condition in that combination.  The equivalence below
+needs none -- on an empty carrier both sides hold vacuously -- but
+`quotient_contractible_iff_setoidTotal` does, since the empty quotient is not
+contractible while every relation on it is vacuously total.
+
+The invariants are quantified at `Type u`, the universe of the carrier.  This
+is the sharpest form rather than a restriction: the reverse direction needs only
+the *single* invariant `Quotient.mk S`, which lives at `Type u`, while the
+forward direction is available at every universe
+(`invariant_constant_of_setoidTotal`).  The two are combined in
+`all_invariants_constant_of_typeU_invariants_constant` below, which is the
+statement matching the informal phrase "every invariant". -/
 theorem setoidTotal_iff_all_invariants_constant {X : Type u} (S : Setoid X) :
     SetoidTotal S ↔
       ∀ (V : Type u) (I : X → V), SetoidInvariant S I → ∀ x y : X, I x = I y := by
@@ -563,6 +577,16 @@ theorem setoidTotal_iff_all_invariants_constant {X : Type u} (S : Setoid X) :
   · intro h x y
     exact Quotient.exact
       (h (Quotient S) (Quotient.mk S) (fun _ _ hr => Quotient.sound hr) x y)
+
+/-- Constancy of `Type u`-valued invariants propagates to invariants valued in
+*any* universe.  Lean cannot quantify over universe levels inside a proposition,
+so this is how the unrestricted reading of the design theorem is stated: it
+routes through totality, which is universe-free. -/
+theorem all_invariants_constant_of_typeU_invariants_constant {X : Type u}
+    (S : Setoid X)
+    (h : ∀ (V : Type u) (I : X → V), SetoidInvariant S I → ∀ x y : X, I x = I y)
+    {W : Type v} (J : X → W) (hJ : SetoidInvariant S J) (x y : X) : J x = J y :=
+  hJ x y ((setoidTotal_iff_all_invariants_constant S).mpr h x y)
 
 /-- Contrapositive, in the form a designer uses it: exhibiting one invariant
 that separates two paths proves the relation is not total, hence that the

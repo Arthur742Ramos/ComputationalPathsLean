@@ -96,10 +96,16 @@ not used.
 
 ## Presentation conventions
 
-Lean identifiers appear only in the appendix of each article. The body of both
-manuscripts is mathematical prose; the theorem-by-theorem correspondence with
-the source modules, the axiom footprint, and the build instructions live in an
-appendix titled *The companion Lean artifact*.
+Code-formatted identifiers and module paths appear only in the appendix of each
+article. The theorem-by-theorem correspondence with the source modules, the
+axiom footprint, and the build instructions live in an appendix titled *The
+companion Lean artifact*; nothing in either body is typeset as code.
+
+The bodies do still *name* the operations under analysis — `PathRwQuot`,
+`lamCongr`, `congrArg` — but as mathematical notation (`\mathsf{...}`), because
+the case study is precisely about which named rules cause the collapse and the
+result would be unstatable without them. They are names of objects in the
+rewrite system being studied, not references to source code.
 
 ## Design constraint (new)
 
@@ -109,8 +115,13 @@ information are strictly opposed for ordinary setoid quotients. A rule set
 admitting a universal predecessor at a fiber therefore retains nothing there,
 and a redesign is validated by exhibiting a separating invariant --- exactly as
 trace-length parity validates the groupoid fragment.
+Note the side conditions: the equivalence itself needs no inhabitance
+hypothesis (on an empty carrier both sides hold vacuously), but combining it
+with the contractibility classification does, since the empty quotient is not
+contractible while every relation on it is vacuously total.
 Lean: `SetoidInvariant`, `Nonconstant`,
 `setoidTotal_iff_all_invariants_constant`,
+`all_invariants_constant_of_typeU_invariants_constant`,
 `not_setoidTotal_of_nonconstant_invariant`,
 `setoidTotal_of_universal_predecessor`,
 `no_universal_predecessor_of_nonconstant_invariant`,

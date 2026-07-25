@@ -124,9 +124,10 @@ so the rewrite quotient retains no computational-path information whatever and
 every invariant on it is constant.  It does support unrestricted based path
 induction on every carrier---but precisely because it has become ambient
 equality, which is the price the classification predicts for an ordinary
-setoid repair.  A design theorem makes the trade-off general: a quotient is
-contractible exactly when every invariant of it is constant, so the two goals
-are strictly opposed.  Sharpness is proved by a parity invariant: the groupoid
+setoid repair.  A design theorem makes the trade-off general: a setoid is total
+exactly when every invariant of it is constant, so for an inhabited carrier the
+quotient is contractible exactly when it retains nothing and the two goals are
+strictly opposed.  Sharpness is proved by a parity invariant: the groupoid
 fragment of the rewriting system preserves trace-length parity and therefore
 does not collapse, so the degeneracy is caused by the function-space rules
 rather than by path algebra.
@@ -270,10 +271,10 @@ that a proof-relevant path object has been shown to admit \(J\), which is not
 what is proved.
 
 Section~\ref{sec:design} shows the trade-off is structural rather than
-accidental: a setoid quotient is contractible exactly when every invariant of it
-is constant, so elimination and retained information are strictly opposed, and
-any rule making one path a predecessor of a whole fiber destroys everything
-there.  Section~\ref{subsec:sharpness} then localises the present failure: the
+accidental: a setoid is total exactly when every invariant of it is constant, so
+for an inhabited carrier---which a pointed fiber always is---elimination and
+retained information are strictly opposed, and any rule making one path a
+predecessor of a whole fiber destroys everything there.  Section~\ref{subsec:sharpness} then localises the present failure: the
 groupoid fragment preserves trace-length parity and does not collapse, so the
 degeneracy comes from the function-space rules and not from path algebra.
 
@@ -1871,7 +1872,20 @@ soundness; constancy gives \(\eta_S(x)=\eta_S(y)\), and quotient exactness
 returns \(S(x,y)\).
 \end{proof}
 
-Theorem~\ref{thm:design} is elementary, but placing it beside
+Two side conditions deserve explicit mention, since both are easy to drop when
+paraphrasing.  First, \eqref{eq:design} needs no inhabitance hypothesis---on the
+empty carrier both sides hold vacuously---but the \emph{combination} with
+Theorem~\ref{thm:quotient-contractible} does, exactly as
+Warning~\ref{warn:empty-carrier} records: for \(X=\varnothing\) every invariant
+is vacuously constant while \(X/S\) is empty and not contractible.  Every
+statement below is therefore phrased for an inhabited carrier, which the pointed
+fibers of interest always are.  Second, the converse direction of
+\eqref{eq:design} needs only the single invariant \(\eta_S\), whose codomain
+lies in the universe of \(X\); the forward direction holds for invariants valued
+in any universe.  So ``every invariant is constant'' may be read unrestrictedly,
+the two readings being linked by totality, which mentions no universe at all.
+
+With those recorded, placing Theorem~\ref{thm:design} beside
 Theorem~\ref{thm:quotient-contractible} is the point: for an inhabited carrier,
 \[
  \isContr(X/S)\iff\SetTot(S)\iff\text{no information survives.}
@@ -2443,10 +2457,10 @@ quotienting, since its reflexivity fiber is exactly \(\List(A)\) for every
 pointed carrier.
 
 Section~\ref{sec:design} makes the trade-off general rather than anecdotal: a
-quotient is contractible exactly when every invariant of it is constant, so
-elimination and information are strictly opposed for ordinary setoid quotients,
-and a rule set admitting a universal predecessor at a fiber can retain nothing
-there.  A parity invariant localises the present failure---the groupoid fragment
+setoid is total exactly when every invariant of it is constant, so on an
+inhabited carrier elimination and information are strictly opposed for ordinary
+setoid quotients, and a rule set admitting a universal predecessor at a fiber can
+retain nothing there.  A parity invariant localises the present failure---the groupoid fragment
 does not collapse---so what forces the degeneracy is the function-space rules
 together with the trace-erasing packaging convention.  A redesign changing
 either one is checked against two finite tasks: exhibit a separating invariant,
@@ -2582,7 +2596,11 @@ module, in the same directory
 \item the design constraint of Section~\ref{sec:design}:
   \path{SetoidInvariant}, \path{Nonconstant},
   \path{setoidTotal_iff_all_invariants_constant} for
-  Theorem~\ref{thm:design}, \path{not_setoidTotal_of_nonconstant_invariant} for
+  Theorem~\ref{thm:design}, with
+  \path{all_invariants_constant_of_typeU_invariants_constant} extending
+  constancy to invariants valued in any universe (Lean cannot quantify over
+  universe levels inside a proposition, so the unrestricted reading is routed
+  through totality), \path{not_setoidTotal_of_nonconstant_invariant} for
   Corollary~\ref{cor:design-certificate},
   \path{setoidTotal_of_universal_predecessor} with
   \path{no_universal_predecessor_of_nonconstant_invariant} for
