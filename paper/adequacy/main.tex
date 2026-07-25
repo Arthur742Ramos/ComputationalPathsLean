@@ -13,7 +13,7 @@
 
 \hypersetup{
   hidelinks,
-  pdftitle={Observable Metadata and Identity Elimination: Contractibility Criteria, Exact Setoid-Quotient Repair, and the PathRwQuot Case Study},
+  pdftitle={Identity Elimination with Observable Metadata, and the Collapse of a Computational-Path Rewrite Quotient},
   pdfauthor={Arthur Freitas Ramos, Ruy J. G. B. de Queiroz, Anjolina Grisi de Oliveira, and Dov M. Gabbay}
 }
 \allowdisplaybreaks
@@ -23,10 +23,9 @@
 \setlength{\abovedisplayshortskip}{4pt plus 2pt}
 \setlength{\belowdisplayshortskip}{5pt plus 2pt minus 2pt}
 
-\title[Observable Metadata and Identity Elimination]
-  {Observable Metadata and Identity Elimination:\\
-   Contractibility Criteria, Exact Setoid-Quotient Repair,
-   and the \(\mathsf{PathRwQuot}\) Case Study}
+\title[Metadata, Identity Elimination, and a Quotient Collapse]
+  {Identity Elimination with Observable Metadata,\\
+   and the Collapse of a Computational-Path Rewrite Quotient}
 
 \author{Arthur Freitas Ramos}
 \author{Ruy J. G. B. de Queiroz}
@@ -112,24 +111,30 @@ if the genuine loop quotient is trivial---and, pushed back to representatives, a
 quotient-free form: it holds exactly when \(\mathsf{RwEq}\) relates every pair of
 raw loops at the base point.
 
-We then settle that condition for the computational-path rewriting system.  One
-primitive rule decides it.  Because packaging pointwise paths into a path
-between functions records the \emph{empty} trace, the function-application beta
-rule exhibits the trace-free path as a one-step predecessor of an arbitrary path
-with the same endpoints.  Consequently \(\mathsf{RwEq}\) is total on every fiber,
-\(\PRW_A(a,b)\simeq(a=b)\), quotient-level axiom K holds on every carrier, and
-\emph{computational paths do satisfy unrestricted based path induction after
-rewrite quotienting}---with a beta law that is here even judgmental.  The price
-is exactly the one the classification predicts: the repair is the indiscrete
-one, so no trace distinction survives in \(\PRW\).  Sharpness is proved by a
-parity invariant: the groupoid fragment of the rewriting system preserves
-trace-length parity and therefore does not collapse, so the phenomenon is
-caused by the function-space rules rather than by path algebra.
+We then settle that condition for a formalized computational-path rewriting
+system, and the answer is a collapse.  One primitive rule decides it: because
+packaging pointwise paths into a path between functions records the \emph{empty}
+trace, the function-application beta rule exhibits the trace-free path as a
+one-step predecessor of an arbitrary path with the same endpoints.  Consequently
+\(\mathsf{RwEq}\) is total on every fiber and
+\[
+ \PRW_A(a,b)\simeq(a=b),
+\]
+so the rewrite quotient retains no computational-path information whatever and
+every invariant on it is constant.  It does support unrestricted based path
+induction on every carrier---but precisely because it has become ambient
+equality, which is the price the classification predicts for an ordinary
+setoid repair.  A design theorem makes the trade-off general: a quotient is
+contractible exactly when every invariant of it is constant, so the two goals
+are strictly opposed.  Sharpness is proved by a parity invariant: the groupoid
+fragment of the rewriting system preserves trace-length parity and therefore
+does not collapse, so the degeneracy is caused by the function-space rules
+rather than by path algebra.
 
 Finally we audit the computational-path examples.  The reflexivity fiber of the
 trace record is computed exactly---it is \(\List(A)\)---so failure for raw
 records is unconditional on every pointed carrier, in sharp contrast with the
-quotient.  The current ``circle'' is a one-constructor Lean type and the current
+quotient.  The current ``circle'' is a one-constructor inductive type and the current
 ``torus'' its product; their genuine \(\PRW\) loop quotients are contractible,
 while the separately defined winding-expression quotients are equivalent to
 \(\mathbb Z\) and \(\mathbb Z^2\).  The collapse theorem upgrades the resulting
@@ -181,68 +186,51 @@ if
 \]
 \end{theorem}
 
-Theorem~\ref{thm:headline} is the organizing result of the paper.  Its two
-directions are constructive at the level used here.  An eliminator contracts
-the based total space by choosing the motive ``the base point equals the
-current point.''  Conversely, a contraction transports the base datum to every
-point.  The new classification step is that the total space of
-\eqref{eq:refinement} is equivalent to the single reflexivity metadata fiber.
-Consequently all endpoint and equality coordinates disappear, but observable
-metadata over reflexivity remains.
+Theorem~\ref{thm:headline} organizes Part~\ref{part:general}.  Its two
+directions are constructive here: an eliminator contracts the based total space
+by choosing the motive ``the base point equals the current point'', and a
+contraction transports the base datum to every point.  The classification step
+is that the total space of \eqref{eq:refinement} is equivalent to the single
+reflexivity metadata fiber, so all endpoint and equality coordinates disappear
+while observable metadata over reflexivity remains.  This is what the familiar
+contraction of \(\sum_{b:A}(a=b)\) does \emph{not} give: that argument explains
+ordinary based path induction, but says nothing about a larger space obtained by
+retaining an extra coordinate.  Theorem~\ref{thm:headline} measures exactly that
+coordinate.
 
-This distinction matters.  The familiar total identity space
-\[
-                         \sum_{b:A}(a=b)
-\tag{1.4}\label{eq:identity-total}
-\]
-is contractible by equality elimination.  That standard argument explains
-ordinary based path induction.  It does not say that a larger space obtained
-by retaining an arbitrary extra coordinate is contractible.  Theorem
-\ref{thm:headline} measures exactly that extra coordinate.
-
-Our main case study is the record
+Our case study is the record
 \[
  \PathTy_A(a,b)
-   =\bigl\{\,L:\List(\Step(A)),\quad h:a=b\,\bigr\},
-\tag{1.5}\label{eq:path-record}
+   =\bigl\{\,L:\List(\Step(A)),\quad h:a=b\,\bigr\}
+ \ \Eqv\ \sum_{h:a=b}\List(\Step(A)),
+\tag{1.4}\label{eq:path-record}
 \]
-where \(L\) is a visible trace.  Reordering its fields gives
-\[
- \PathTy_A(a,b)\Eqv
- \sum_{h:a=b}\List(\Step(A)).
-\tag{1.6}\label{eq:path-refinement-intro}
-\]
-At reflexivity, the empty list and the singleton step
-\([\,a\xrightarrow{\refl_a}a\,]\) differ.  The fiber is not contractible, so
-unrestricted elimination for motives observing \(L\) cannot exist.  The
-singleton is a valid chain from \(a\) to \(a\), hence imposing adjacency and
-endpoint conditions does not repair the problem.
+where \(L\) is a visible trace and the equivalence merely reorders fields.  At
+reflexivity the empty list and the singleton step
+\([\,a\xrightarrow{\refl_a}a\,]\) differ, so the fiber is not contractible and
+no unrestricted eliminator can exist for motives observing \(L\).  The singleton
+is a valid chain from \(a\) to \(a\), so imposing adjacency and endpoint
+conditions does not help.
 
-The diagnosis leads to two principled remedies.
-\begin{enumerate}[label=(\roman*)]
-\item Restrict motives to those factoring through
-  \(\proj\).  These motives cannot observe the metadata and inherit equality
-  elimination.
-\item Quotient the metadata by explicit setoids until its reflexivity quotient
-  is contractible.  The exact criterion developed below says that, for an
-  inhabited reflexivity fiber, this happens precisely when the setoid is total.
-\end{enumerate}
-The first preserves the data but limits observation; the second changes the
-identity-like object.
+Two remedies follow: restrict motives to those factoring through \(\proj\),
+which cannot observe the metadata and inherit equality elimination; or quotient
+the metadata until its reflexivity quotient is contractible.  The first
+preserves the data and limits observation, the second changes the identity-like
+object.
 
 The second option has a sharp universal boundary.  Write
 \(\Q_S(X)=X/S\) and
 \[
  \SetTot(S)\quad:\!\!\Longleftrightarrow\quad
  \prod_{x,y:X}S(x,y).
-\tag{1.7}\label{eq:setoid-total-intro}
+\tag{1.5}\label{eq:setoid-total-intro}
 \]
 Quotient soundness proves that totality contracts \(\Q_S(X)\), while quotient
 exactness recovers \(S(x,y)\) from equality of the quotient images.  Hence, for
 a chosen \(x_0:X\),
 \[
  \isContr(\Q_S(X))\quad\Longleftrightarrow\quad\SetTot(S).
-\tag{1.8}\label{eq:quotient-intro}
+\tag{1.6}\label{eq:quotient-intro}
 \]
 Without \(x_0\), inhabitance must appear as an additional conjunct.  Applied to
 the reflexivity metadata fiber, this is a classification of \emph{all} ordinary
@@ -252,7 +240,7 @@ We also replace the sigma-specific viewpoint by a projection theorem.  A
 reflexive map \(q_b:R(b)\to(a=b)\) determines
 \[
  \Ker(q)=\sum_{r:R(a)}\bigl(q_a(r)=\refl_a\bigr),
-\tag{1.9}\label{eq:kernel-intro}
+\tag{1.7}\label{eq:kernel-intro}
 \]
 and equality induction gives
 \(\sum_bR(b)\Eqv\Ker(q)\).  Consequently unrestricted elimination is
@@ -270,50 +258,48 @@ trace-free path a one-step predecessor of an \emph{arbitrary} path with the same
 endpoints.  Consequently \(\mathsf{RwEq}\) is total on every fiber and
 \[
  \PRW_A(a,b)\Eqv(a=b),
-\tag{1.10}\label{eq:collapse-intro}
+\tag{1.8}\label{eq:collapse-intro}
 \]
-so quotient-level axiom K holds on every carrier and \(\PRW\) admits
-unrestricted based path induction unconditionally.  Computational paths
-therefore do support path induction---after quotienting---but at the price the
-classification predicts: the repair is the indiscrete one, so \(\PRW\) retains
-no rewrite information.  The two statements are complementary, not in tension,
-and Section~\ref{subsec:sharpness} shows the phenomenon is caused by the
-function-space rules rather than by path algebra: the groupoid fragment of the
-rewriting system preserves trace-length parity and does not collapse.
+The rewrite quotient is therefore ambient equality.  It retains no
+computational-path information, every invariant on it is constant, and it
+supports unrestricted based path induction on every carrier for exactly that
+reason.  We state the positive half with its cause attached throughout---the
+implemented rewrite quotient supports path induction \emph{because} it is
+equivalent to ambient equality---since the unqualified form invites the reading
+that a proof-relevant path object has been shown to admit \(J\), which is not
+what is proved.
+
+Section~\ref{sec:design} shows the trade-off is structural rather than
+accidental: a setoid quotient is contractible exactly when every invariant of it
+is constant, so elimination and retained information are strictly opposed, and
+any rule making one path a predecessor of a whole fiber destroys everything
+there.  Section~\ref{subsec:sharpness} then localises the present failure: the
+groupoid fragment preserves trace-length parity and does not collapse, so the
+degeneracy comes from the function-space rules and not from path algebra.
 
 \paragraph{Contributions.}
-The paper provides:
-\begin{enumerate}[label=(\arabic*)]
-\item the total-space equivalence
-  \(\sum_b\sum_hM(b,h)\Eqv M(a,\refl_a)\), yielding the
-  metadata-fiber criterion;
-\item the empty-sensitive theorem
-  \(\isContr(X/S)\leftrightarrow(\mathsf{Inh}(X)\wedge\SetTot(S))\), and its
-  specialization classifying every setoid repair of equality metadata;
-\item the indiscrete repair together with the exact relation-inclusion
-  criterion and unique terminal factorization direction, and a worked
-  nontrivial quotient---trace-length parity---that collapses infinitely many
-  traces and still repairs nothing;
-\item the projection/kernel theorem, its
-  \(\PRW\)/local-axiom-K specialization, and a raw-level form which makes the
-  criterion checkable without forming any quotient;
-\item the collapse theorem for the computational-path rewriting system:
-  \(\mathsf{RwEq}\) is total, \(\PRW_A(a,b)\Eqv(a=b)\), and \(\PRW\) admits
-  unrestricted based path induction on every carrier, resolving the question
-  left open by the criterion;
-\item a sharpness result isolating the responsible rules: the groupoid fragment
-  preserves trace-length parity, hence does not identify the empty and singleton
-  reflexive traces;
-\item a factorization theorem for equality-projection motives, including
-  motives fiberwise equivalent to strict pullbacks;
-\item an exact computation of the trace fiber, \(\PathTy_A(a,a)\Eqv\List(A)\),
-  from which failure for raw records is unconditional on every pointed carrier,
-  giving a sharp raw-versus-quotient dichotomy; and
-\item formal contractibility, noncontractibility, and no-bridge results
-  separating the current genuine circle and torus loop quotients from their
-  synthetic winding-expression presentations, together with the universal
-  no-bridge theorem that follows from~\eqref{eq:collapse-intro}.
-\end{enumerate}
+The centrepiece is Part~\ref{part:case-study}: the implemented rewrite quotient
+collapses to ambient equality, so it retains no computational-path information
+and admits only constant invariants
+(Theorem~\ref{thm:rweq-total}, Corollary~\ref{cor:unconditional-repair}).  A
+parity invariant shows the groupoid fragment does \emph{not} collapse, locating
+the cause in the function-space rules (Theorem~\ref{thm:sharpness}), and a design
+theorem shows the trade-off is structural: a quotient is contractible exactly
+when every invariant of it is constant (Theorem~\ref{thm:design}).  The audit of
+the circle and torus, and the universal no-bridge theorem
+(Theorem~\ref{thm:universal-no-bridge}), follow.
+
+Part~\ref{part:general} supplies the classification these rest on: the
+total-space computation \(\sum_b\sum_hM(b,h)\Eqv M(a,\refl_a)\) and its
+metadata-fiber criterion; the empty-sensitive quotient theorem
+\(\isContr(X/S)\leftrightarrow(\mathsf{Inh}(X)\wedge\SetTot(S))\) with its
+specialization to every setoid repair of metadata, the indiscrete repair, and a
+worked nontrivial quotient that repairs nothing; the projection/kernel theorem
+and its raw-level form, which makes the criterion checkable without forming any
+quotient; and a factorization theorem for equality-projection motives.  These
+ingredients are individually elementary; their value is that together they
+decide the case study.
+
 Theorem~\ref{thm:j-total}, the equivalence between unrestricted based
 elimination and based total-space contractibility, is stated for completeness
 but is not claimed as a contribution; see Remark~\ref{rem:standard-stage}.
@@ -331,23 +317,31 @@ separately as a self-contained article \cite{ScopedTraceCalculus2026}, and
 Section~\ref{sec:formalization} describes the division.
 
 \paragraph{Organization.}
-Section~\ref{sec:setting} fixes the metatheory.
-Section~\ref{sec:total-space} recalls the total-space classification.
-Section~\ref{sec:metadata} proves Theorem~\ref{thm:headline}.
-Section~\ref{sec:setoid-repair} classifies setoid quotient repairs, exhibits a
-nontrivial quotient that repairs nothing, and proves the indiscrete terminal
-factorization theorem.
-Section~\ref{sec:projection-kernel} proves the projection/kernel theorem, the
-exact \(\PRW\)/K criterion, and its quotient-free reformulation.
-Section~\ref{sec:collapse} resolves that criterion for the artifact's rule set
-and proves the sharpness result.
-Section~\ref{sec:factorization} gives the factorizing-motive theorem.
-Section~\ref{sec:traces} is the principal raw-trace case study, where the
-reflexivity fiber is computed exactly, and
-Section~\ref{sec:genuine-synthetic} audits the circle and torus definitions.
-Section~\ref{sec:examples} classifies further metadata.  Sections
-\ref{sec:comparison}--\ref{sec:conclusion} state boundaries, related work,
-formal verification, and conclusions.
+The paper is in two parts.  Part~\ref{part:general} is the general theory and
+mentions no rewrite system: Section~\ref{sec:setting} fixes the metatheory,
+Section~\ref{sec:total-space} recalls the identity-system classification,
+Section~\ref{sec:metadata} proves Theorem~\ref{thm:headline},
+Section~\ref{sec:setoid-repair} classifies setoid quotient repairs,
+Section~\ref{sec:projection-kernel} proves the projection/kernel theorem,
+Section~\ref{sec:factorization} gives the factorizing-motive theorem, and
+Section~\ref{sec:examples} classifies further metadata.
+
+Part~\ref{part:case-study} is the case study.  Section~\ref{sec:traces} computes
+the raw trace fiber, Section~\ref{sec:pathrwquot-criterion} specializes the
+kernel theorem to the rewrite quotient and removes the quotient from the
+criterion, Section~\ref{sec:collapse} proves the collapse and its sharpness,
+Section~\ref{sec:design} derives the design constraint any replacement rule set
+must meet, and Section~\ref{sec:genuine-synthetic} audits the circle and torus
+definitions.  Sections~\ref{sec:comparison}--\ref{sec:conclusion} state
+boundaries, related work, formal verification, and conclusions.
+
+\part{Classification of equality with observable metadata}
+\label{part:general}
+
+Part~\ref{part:general} is independent of computational paths.  It classifies which decorations of an equality retain unrestricted based
+elimination, and which quotients of a decoration restore it.  Nothing in
+it mentions a rewrite system.
+
 
 \section{Setting and definitions}
 \label{sec:setting}
@@ -372,7 +366,7 @@ Its reflexivity law is used propositionally:
 \tag{2.1}\label{eq:transport-beta}
 \]
 Proof irrelevance implies that any two witnesses of the same ambient equality
-are equal.  This assumption is appropriate for Lean's \(\mathsf{Eq}\), which
+are equal.  This assumption is appropriate for a proof-irrelevant equality, which
 lives in \(\mathsf{Prop}\).  It is also why the present theory must not be read
 as a claim about arbitrary proof-relevant identity types.
 
@@ -504,7 +498,8 @@ analysis of inductive identity types of Awodey, Gambino and Sojakova
 \cite{AwodeyGambinoSojakova2012,AwodeyGambinoSojakova2017}; the underlying
 universal-property argument for a pointed contractible space is older still.
 Applied to \(R(b)=(a=b)\), equality elimination proves that
-\eqref{eq:identity-total} is contractible.  Neither fact mentions metadata.
+the based total identity space is contractible.  Neither fact mentions
+metadata.
 
 We record it in the present setting only because the ambient equality here is
 proof-irrelevant and the beta law is propositional, so the standard statement
@@ -582,61 +577,28 @@ whose forward map sends \((a,\refl_a,m)\) to \(m\), and whose inverse sends
 \end{theorem}
 
 \begin{proof}
-Define the inverse immediately:
-\[
-       G:M(a,\refl_a)\longrightarrow T_M(a),\qquad
-       G(m)=(a,\refl_a,m).
-\tag{4.4}\label{eq:fiber-inclusion}
-\]
-For the forward map, take \((b,h,m):T_M(a)\) and eliminate on \(h:a=b\).
-In the reflexive case return \(m\):
-\[
- F(b,h,m)=
- \mathsf J_{=}\bigl(
-    b,h,m;\;m\mapsto m
- \bigr):M(a,\refl_a).
-\tag{4.5}\label{eq:fiber-retraction}
-\]
-Equivalently, using the contraction
-\(\gamma_{b,h}:(a,\refl_a)=(b,h)\) from
-Lemma~\ref{lem:equality-total},
-\[
- F(b,h,m)=
- \transport_{\widetilde M}(\gamma_{b,h}^{-1},m),
- \qquad \widetilde M(b,h)=M(b,h).
-\tag{4.6}\label{eq:fiber-transport}
-\]
-At reflexivity, \(F(G(m))=m\).  For the other composite, eliminate on
-\(h\).  The required equation becomes
-\[
- G(F(a,\refl_a,m))=(a,\refl_a,m),
-\]
-which is reflexivity.  Thus \(F\) and \(G\) are inverse.
+The inverse is \(G(m)=(a,\refl_a,m)\).  For the forward map take
+\((b,h,m):T_M(a)\) and eliminate on \(h:a=b\), returning \(m\) in the reflexive
+case; equivalently
+\(F(b,h,m)=\transport_{\widetilde M}(\gamma_{b,h}^{-1},m)\) using the
+contraction \(\gamma_{b,h}\) of Lemma~\ref{lem:equality-total}.  Then
+\(F(G(m))=m\) at reflexivity, and the other composite reduces to reflexivity
+after eliminating on \(h\).
 \end{proof}
 
-The proof uses equality elimination; it does not choose representatives of
-arbitrary paths, normalize metadata, or assume that all metadata values equal
-\(m_0\).  It says that all metadata in the total space can be transported to
-the reflexivity fiber, where it remains visible.
+The proof uses equality elimination only.  It chooses no representatives,
+normalizes no metadata, and does not assume all metadata values equal \(m_0\):
+it says every metadata value in the total space transports to the reflexivity
+fiber, where it remains visible.
 
 \begin{lemma}[Contractibility respects equivalence]
 \label{lem:contr-equiv}
-If \(e:X\Eqv Y\), then
-\[
-                         \isContr(X)\Longleftrightarrow\isContr(Y).
-\tag{4.7}\label{eq:contr-equiv}
-\]
+If \(e:X\Eqv Y\) then \(\isContr(X)\Longleftrightarrow\isContr(Y)\).
 \end{lemma}
 
 \begin{proof}
-If \((c,\kappa)\) contracts \(X\), use \(e(c)\) as center of \(Y\).  For
-\(y:Y\), the composite
-\[
- e(c)\xrightarrow{\,e(\kappa(e^{-1}y))\,}
- e(e^{-1}y)\xrightarrow{\,\varepsilon_y\,}y
-\]
-is the contraction path.  Apply the same construction to \(e^{-1}\) for the
-converse.
+Transport the center and compose the contraction with the round-trip witness;
+apply the same construction to \(e^{-1}\) for the converse.
 \end{proof}
 
 \begin{theorem}[Metadata-fiber criterion, full form]
@@ -648,7 +610,7 @@ For \(R_M\) and \(r^M_a\) as in~\eqref{eq:refinement},
  \isContr\bigl(T_M(a)\bigr)
  \quad\Longleftrightarrow\quad
  \isContr\bigl(M(a,\refl_a)\bigr).
-\tag{4.8}\label{eq:metadata-full}
+\tag{4.4}\label{eq:metadata-full}
 \]
 \end{theorem}
 
@@ -712,37 +674,15 @@ unrestricted elimination.  Quotient exactness is essential in the converse.
 
 \begin{definition}[Total setoid]
 \label{def:setoid-total}
-Let \(S\) be a setoid on a type \(X\).  Define
-\[
-       \SetTot(S)
-       \quad:\!\!\Longleftrightarrow\quad
-       \prod_{x,y:X} S(x,y).
-\tag{5.1}\label{eq:setoid-total}
-\]
-Write \(\eta_S:X\to X/S\) for the canonical quotient map.
+For a setoid \(S\) on \(X\), write
+\(\SetTot(S):\Longleftrightarrow\prod_{x,y:X}S(x,y)\), and \(\eta_S:X\to X/S\)
+for the canonical quotient map.
 \end{definition}
 
-Totality concerns the relation, not the number of raw terms.  A type may have
-many inhabitants while a total setoid has one quotient class.  Conversely, on
-the empty type the condition is vacuous.  This is why the following theorem
-has an inhabitance conjunct.
-
-\begin{lemma}[Quotient inhabitance]
-\label{lem:quotient-inhabited}
-For every setoid \(S\) on \(X\),
-\[
-                 \mathsf{Inh}(X/S)
-                 \quad\Longleftrightarrow\quad
-                 \mathsf{Inh}(X).
-\tag{5.2}\label{eq:quotient-inhabited}
-\]
-\end{lemma}
-
-\begin{proof}
-An inhabitant \(x:X\) gives \(\eta_S(x):X/S\).  Conversely, quotient induction
-on an inhabitant of \(X/S\) exposes a representative \(x:X\).  No choice of a
-representative for \emph{every} quotient class is made.
-\end{proof}
+Totality concerns the relation, not the number of raw terms: a type may have
+many inhabitants while a total setoid has one class, and on the empty type the
+condition holds vacuously.  That is why the following statement carries an
+inhabitance conjunct.
 
 \begin{theorem}[Setoid quotient classification]
 \label{thm:quotient-contractible}
@@ -751,50 +691,33 @@ For every setoid \(S\) on \(X\),
  \isContr(X/S)
  \quad\Longleftrightarrow\quad
  \bigl(\mathsf{Inh}(X)\ \wedge\ \SetTot(S)\bigr).
-\tag{5.3}\label{eq:quotient-contractible}
+\tag{5.1}\label{eq:quotient-contractible}
 \]
 \end{theorem}
 
 \begin{proof}
-Suppose first that \(X/S\) is contractible.  It is inhabited, so
-Lemma~\ref{lem:quotient-inhabited} gives \(\mathsf{Inh}(X)\).  For arbitrary
-\(x,y:X\), contractibility gives
-\[
-                         \eta_S(x)=\eta_S(y).
-\tag{5.4}\label{eq:quotient-images-equal}
-\]
-Quotient exactness turns~\eqref{eq:quotient-images-equal} back into
-\(S(x,y)\).  Thus \(S\) is total.
-
-Conversely, choose \(x_0:X\) from the inhabitance hypothesis and use
-\(\eta_S(x_0)\) as center.  Quotient induction reduces an arbitrary
-\(\xi:X/S\) to \(\eta_S(x)\).  Totality gives \(S(x_0,x)\), and quotient
-soundness gives
-\[
-                       \eta_S(x_0)=\eta_S(x).
-\tag{5.5}\label{eq:quotient-contraction}
-\]
-These equalities define the contraction.
+If \(X/S\) is contractible it is inhabited, and quotient induction on an
+inhabitant exposes a representative, giving \(\mathsf{Inh}(X)\); no
+representative is chosen for every class.  For \(x,y:X\), contractibility gives
+\(\eta_S(x)=\eta_S(y)\), and quotient \emph{exactness} turns this back into
+\(S(x,y)\).  Conversely, take \(\eta_S(x_0)\) as center for \(x_0\) supplied by
+inhabitance; quotient induction reduces an arbitrary class to \(\eta_S(x)\), and
+totality with quotient \emph{soundness} gives \(\eta_S(x_0)=\eta_S(x)\).
 \end{proof}
+
+The two directions use the two halves of quotient exactness, and this is the
+only place either is needed.
 
 \begin{corollary}[Chosen-center form]
 \label{cor:quotient-total}
-If \(x_0:X\), then
-\[
-                    \isContr(X/S)
-                    \quad\Longleftrightarrow\quad
-                    \SetTot(S).
-\tag{5.6}\label{eq:quotient-total}
-\]
+If \(x_0:X\), then \(\isContr(X/S)\Longleftrightarrow\SetTot(S)\).
 \end{corollary}
 
 \begin{warning}[The empty carrier]
 \label{warn:empty-carrier}
-If \(X=\varnothing\), then \(\SetTot(S)\) holds vacuously while \(X/S\) is
-empty and hence not contractible.  Dropping inhabitance from
-Theorem~\ref{thm:quotient-contractible} would therefore be false.  In the
-metadata application below the chosen \(m_0\) supplies inhabitance; it must not
-be silently inferred in unrelated quotient statements.
+For \(X=\varnothing\), \(\SetTot(S)\) holds vacuously while \(X/S\) is empty and
+not contractible, so inhabitance cannot be dropped.  In the metadata application
+the chosen \(m_0\) supplies it; it must not be silently inferred elsewhere.
 \end{warning}
 
 \subsection{Classification of metadata repairs}
@@ -802,7 +725,7 @@ be silently inferred in unrelated quotient statements.
 Let
 \[
  S_{b,h}\ \text{ be a setoid on }\ M(b,h)
-\tag{5.7}\label{eq:setoid-family}
+\tag{5.2}\label{eq:setoid-family}
 \]
 for every \(b:A\) and \(h:a=b\).  Define the quotient metadata family and its
 refined equality by
@@ -810,12 +733,12 @@ refined equality by
  \overline M_S(b,h)=M(b,h)/S_{b,h},
  \qquad
  \overline R_S(a,b)=\sum_{h:a=b}\overline M_S(b,h),
-\tag{5.8}\label{eq:quotient-metadata}
+\tag{5.3}\label{eq:quotient-metadata}
 \]
 with base
 \[
        \overline r^S_a=(\refl_a,\eta_{S_{a,\refl_a}}(m_0)).
-\tag{5.9}\label{eq:quotient-metadata-base}
+\tag{5.4}\label{eq:quotient-metadata-base}
 \]
 
 \begin{theorem}[Universal setoid-repair criterion]
@@ -827,7 +750,7 @@ total:
  \Jbeta_{\overline R_S}(a,\overline r^S_a)
  \quad\Longleftrightarrow\quad
  \SetTot(S_{a,\refl_a}).
-\tag{5.10}\label{eq:universal-repair}
+\tag{5.5}\label{eq:universal-repair}
 \]
 \end{theorem}
 
@@ -837,7 +760,7 @@ Apply the metadata-fiber criterion to \(\overline M_S\):
  \Jbeta_{\overline R_S}(a,\overline r^S_a)
  \quad\Longleftrightarrow\quad
  \isContr\!\left(M(a,\refl_a)/S_{a,\refl_a}\right).
-\tag{5.11}\label{eq:repair-first-step}
+\tag{5.6}\label{eq:repair-first-step}
 \]
 The raw reflexivity fiber is inhabited by \(m_0\).  Corollary
 \ref{cor:quotient-total} identifies the right-hand side with
@@ -852,7 +775,7 @@ direction says that every successful ordinary setoid repair must relate
              =
              \eta_{S_{a,\refl_a}}(y)
              \qquad\text{for all }x,y.
-\tag{5.12}\label{eq:no-visible-reflexivity}
+\tag{5.7}\label{eq:no-visible-reflexivity}
 \]
 Therefore:
 \begin{quote}
@@ -903,7 +826,7 @@ class contains infinitely many pairwise distinct traces, and, for instance,
  \bigl[\Empty\bigr]
  =
  \bigl[\,[\,a\xrightarrow{\refl_a}a,\;a\xrightarrow{\refl_a}a\,]\,\bigr].
-\tag{5.20}\label{eq:parity-collapse}
+\tag{5.8}\label{eq:parity-collapse}
 \]
 It is nevertheless not total, because \(\Empty\) has even length while
 \([\,a\xrightarrow{\refl_a}a\,]\) has odd length.  These two traces therefore
@@ -931,115 +854,65 @@ The indiscrete setoid \(\nabla_X\) on \(X\) is
 \[
                         \nabla_X(x,y)=\top
                         \qquad(x,y:X).
-\tag{5.14}\label{eq:indiscrete}
+\tag{5.9}\label{eq:indiscrete}
 \]
-\(\top\) denotes the always-true proposition, matching the Prop-valued Lean
-relation \texttt{fun \_ \_ => True}; it is not the data type \(\Unit\).
+\(\top\) denotes the always-true proposition; it is not the data type \(\Unit\).
 \end{definition}
 
 The relation \(\nabla_X\) is total, hence its quotient is contractible whenever
 \(X\) is inhabited.  Applied fiberwise, it is the canonical unconditional
 repair supplied by the data \(m_0\).
 
-Terminology matters here.
-\begin{itemize}[leftmargin=1.4em]
-\item \(\nabla_X\) is \emph{maximal as a relation}: every relation on \(X\) is
-  included in it.
-\item \(X/\nabla_X\) is \emph{minimal in retained information}: all
-  representatives have the same image.
-\item The corresponding quotient is \emph{terminal} for the factor direction
-  defined below.  Calling it initial reverses the arrows and is false.
-\end{itemize}
-
 \subsection{Exact factorization direction}
 
-Let \(S,T\) be setoids on the same carrier \(X\).  A
-\emph{quotient-map-preserving factor} is a map
-\[
- F:X/S\longrightarrow X/T
- \quad\text{such that}\quad
- F\circ\eta_S=\eta_T.
-\tag{5.15}\label{eq:factor-map}
-\]
+The indiscrete repair is canonical, and it is worth saying in which direction.
+For setoids \(S,T\) on \(X\), call \(F:X/S\to X/T\) a
+\emph{quotient-map-preserving factor} when \(F\circ\eta_S=\eta_T\).
 
 \begin{theorem}[Relation inclusion versus quotient factorization]
 \label{thm:factor-inclusion}
-There exists a quotient-map-preserving factor \(X/S\to X/T\) exactly when
-\[
-                 S\subseteq T,
- \qquad
-                 \prod_{x,y:X}S(x,y)\to T(x,y).
-\tag{5.16}\label{eq:relation-inclusion}
-\]
-When it exists, the factor is unique as a function.
+A quotient-map-preserving factor \(X/S\to X/T\) exists exactly when
+\(S\subseteq T\), and it is then unique as a function.
 \end{theorem}
 
 \begin{proof}
-If \(S\subseteq T\), quotient recursion on representatives defines
-\[
-                         F(\eta_S(x))=\eta_T(x).
-\tag{5.17}\label{eq:factor-on-reps}
-\]
-The inclusion is exactly the well-definedness obligation: \(S(x,y)\) implies
-\(\eta_T(x)=\eta_T(y)\) by quotient soundness.
-
-Conversely, assume \(F\) satisfies~\eqref{eq:factor-map} and let \(S(x,y)\).
-Soundness gives \(\eta_S(x)=\eta_S(y)\); applying \(F\) and using the commuting
-equations gives \(\eta_T(x)=\eta_T(y)\).  Exactness yields \(T(x,y)\).
-
-For uniqueness, quotient induction reduces two candidate factors to a
-representative \(\eta_S(x)\), where both values are forced to be
-\(\eta_T(x)\).
+Given \(S\subseteq T\), quotient recursion sets \(F(\eta_S(x))=\eta_T(x)\); the
+inclusion is precisely the well-definedness obligation, by soundness for \(T\).
+Conversely \(S(x,y)\) gives \(\eta_S(x)=\eta_S(y)\), hence
+\(\eta_T(x)=\eta_T(y)\) after applying \(F\), and exactness returns \(T(x,y)\).
+Uniqueness is quotient induction on a representative.
 \end{proof}
 
-\begin{corollary}[Terminal indiscrete factorization]
-\label{cor:indiscrete-terminal}
-For every setoid \(S\) on \(X\), there is a unique quotient-map-preserving map
+Every \(S\) is contained in \(\nabla_X\), so arrows point \emph{toward} the
+indiscrete quotient: it is terminal, not initial, in this
+quotient-map-preserving category.  When \(S\) is itself total the inclusion
+reverses as well, and quotient induction makes the two maps inverse,
 \[
-                       X/S\longrightarrow X/\nabla_X.
-\tag{5.18}\label{eq:terminal-factor}
+ X/S\Eqv X/\nabla_X.
+\tag{5.10}\label{eq:total-indiscrete-equiv}
 \]
-\end{corollary}
+So every successful setoid repair is, on the reflexivity fiber, canonically
+equivalent to the indiscrete one.  This does not say the raw setoids are
+definitionally equal, nor that discarded metadata can be recovered.
 
-\begin{proof}
-Every relation \(S\) is included in \(\nabla_X\); apply
-Theorem~\ref{thm:factor-inclusion}.
-\end{proof}
-
-If \(S\) is itself total, then also \(\nabla_X\subseteq S\), so there is a
-representative-preserving map in the reverse direction.  Quotient induction
-shows that the two maps are inverse:
-\[
-                         X/S\Eqv X/\nabla_X.
-\tag{5.19}\label{eq:total-indiscrete-equiv}
-\]
-Thus every successful setoid repair in
-Theorem~\ref{thm:universal-repair} is, on the reflexivity fiber, canonically
-equivalent to the indiscrete repair.  The theorem does not say that the raw
-setoids are definitionally equal, nor that one can recover discarded metadata.
-
-\begin{remark}[Why terminal, not initial]
+\begin{remark}[Maximal, minimal, terminal]
 \label{rem:terminal-not-initial}
-We order quotient presentations by loss of information.  If \(S\subseteq T\),
-then \(X/S\to X/T\): the target identifies at least as much as the source.
-Since every \(S\) is included in \(\nabla_X\), arrows point
-\emph{toward} the indiscrete quotient.  It is terminal in this
-quotient-map-preserving category.  Relation-theoretic maximality and
-information-theoretic minimality describe the same object from opposite
-viewpoints; neither justifies an initiality claim.
+Three descriptions of \(\nabla_X\) are easily conflated.  It is
+\emph{maximal} as a relation, \emph{minimal} in retained information, and
+\emph{terminal} for quotient-map-preserving factors.  The first two are the same
+fact seen from opposite sides; neither justifies an initiality claim.
 \end{remark}
 
 \begin{remark}[Scope of universality]
 \label{rem:quotient-scope}
-The necessity proof uses exactness:
-\(\eta_S(x)=\eta_S(y)\Rightarrow S(x,y)\).  The result therefore classifies
-ordinary exact setoid quotients in the present extensional metatheory.  It is
-not asserted for arbitrary truncations, higher quotients, opaque
-implementations without exactness, or homotopical localization.
+The necessity direction uses exactness,
+\(\eta_S(x)=\eta_S(y)\Rightarrow S(x,y)\).  The classification therefore covers
+ordinary exact setoid quotients in the present metatheory, and is not asserted
+for truncations, higher quotients, opaque implementations without exactness, or
+homotopical localization.
 \end{remark}
 
-\section{Projection kernels and the
-  \texorpdfstring{\(\mathsf{PathRwQuot}\)}{PathRwQuot} criterion}
+\section{Projection kernels}
 \label{sec:projection-kernel}
 
 The metadata presentation \(\sum_hM(b,h)\) is convenient but not fundamental.
@@ -1116,492 +989,6 @@ The kernel is then equivalent to \(M(a,\refl_a)\).  The projection theorem is
 strictly more reusable: \(R\) need not be presented as a sigma type, and \(q\)
 may forget an implementation-specific representation.
 
-\subsection{Application to rewrite-quotiented paths}
-
-Let
-\[
- R_{\mathsf{rw}}(b)=\PRW_A(a,b)
- =\PathTy_A(a,b)/\mathsf{RwEq},
-\tag{6.6}\label{eq:pathrw-row}
-\]
-based at the class \([\mathbf r_a]\).  The quotient operation
-\[
- \mathsf{toEq}_b:\PRW_A(a,b)\longrightarrow(a=b)
-\tag{6.7}\label{eq:pathrw-toeq}
-\]
-forgets rewrite traces and is well-defined because every primitive rewrite
-preserves the underlying equality proof.
-
-The reflexivity kernel is
-\[
- \Ker(\mathsf{toEq})
- =
- \sum_{x:\PRW_A(a,a)}
-       \bigl(\mathsf{toEq}(x)=\refl_a\bigr).
-\tag{6.8}\label{eq:pathrw-kernel}
-\]
-Ambient equality proofs live in \(\mathsf{Prop}\), so the second component is
-automatic by proof irrelevance.  Projection to the first component and
-reinsertion of that proof give
-\[
-              \Ker(\mathsf{toEq})\Eqv\PRW_A(a,a).
-\tag{6.9}\label{eq:pathrw-kernel-loop}
-\]
-
-\begin{definition}[Local quotient-level axiom K]
-\label{def:local-k}
-Define
-\[
- \LocalK(A,a)
- \quad:\!\!\Longleftrightarrow\quad
- \prod_{x:\PRW_A(a,a)}x=[\mathbf r_a].
-\tag{6.10}\label{eq:local-k}
-\]
-\end{definition}
-
-This is a statement about classes of computational paths.  It is not the
-assertion that two raw `Path` records with different step lists are equal, and
-it is not obtained merely by observing that their \(\mathsf{toEq}\) values are
-proof-irrelevant.
-
-\begin{theorem}[\(\mathsf{PathRwQuot}\)/K classification]
-\label{thm:pathrw-k}
-For every \(A\) and \(a:A\), the following are equivalent:
-\[
-\begin{split}
- &\text{\(\PRW_A(a,-)\), based at \([\mathbf r_a]\), admits
- unrestricted \(J^\beta\);}\\
- &\isContr\bigl(\PRW_A(a,a)\bigr);\\
- &\LocalK(A,a).
-\end{split}
-\tag{6.11}\label{eq:pathrw-k}
-\]
-\end{theorem}
-
-\begin{proof}
-The first equivalence is Theorem~\ref{thm:projection-kernel} followed by
-\eqref{eq:pathrw-kernel-loop}.  For the second, a contraction identifies every
-loop class with the reflexive class.  Conversely, the equations in
-\(\LocalK(A,a)\), reversed in orientation, contract the loop quotient at
-\([\mathbf r_a]\).
-\end{proof}
-
-\begin{corollary}[Global form]
-\label{cor:pathrw-global-k}
-The family \(\PRW_A(a,-)\) admits such an eliminator for every \(a:A\) exactly
-when \(\prod_{a:A}\LocalK(A,a)\).
-\end{corollary}
-
-\begin{remark}[No unconditional slogan]
-\label{rem:rweq-no-slogan}
-Theorem~\ref{thm:pathrw-k} does not say that quotienting by
-\(\mathsf{RwEq}\) always repairs unrestricted elimination.  That would require
-local K for every carrier.  It also does not say that the quotient always
-fails: when the loop quotient is trivial, the repair succeeds.  The theorem is
-the exact criterion, and concrete spaces must be checked against it.
-\end{remark}
-
-\begin{remark}[Normalization is only one direction]
-\label{rem:rweq-normalization}
-In the artifact, \(\mathsf{RwEq}\) is the equivalence closure generated by
-explicit primitive rewrites.  The current function
-\(\mathsf{normalize}(p)=\mathsf{stepChain}(p.\mathsf{toEq})\) satisfies
-\[
-       p\mathrel{\mathsf{RwEq}}q
-       \quad\Longrightarrow\quad
-       \mathsf{normalize}(p)=\mathsf{normalize}(q).
-\tag{6.12}\label{eq:rweq-normalization}
-\]
-The converse is not part of the bare definition and cannot replace an
-\(\mathsf{RwEq}\) witness.  A normal-form characterization is available only
-relative to a separately supplied complete step system.  This distinction is
-crucial when claiming that a quotient collapses a particular raw trace.
-\end{remark}
-
-\subsection{Removing the quotient from the criterion}
-\label{subsec:raw-criterion}
-
-Theorem~\ref{thm:pathrw-k} is stated at quotient level, which makes it awkward
-to check: verifying \(\LocalK(A,a)\) appears to require reasoning about
-classes.  It can be pushed back to raw paths.  Doing so also exhibits
-Section~\ref{sec:projection-kernel} as an \emph{instance} of
-Section~\ref{sec:setoid-repair} rather than a parallel development, because
-\(\PRW_A(a,b)\) is literally an ordinary setoid quotient: its carrier is
-\(\PathTy_A(a,b)\) and its relation is \(\mathsf{RwEq}\).
-
-\begin{definition}[Rewrite-connected loops]
-\label{def:rweq-total}
-Say that \(\mathsf{RwEq}\) is \emph{total on loops at \(a\)} when every two raw
-loops admit a rewrite certificate:
-\[
- \RwTot(A,a)
- \quad:\!\!\Longleftrightarrow\quad
- \prod_{p,q:\PathTy_A(a,a)}
-   \bigl\|\,p\mathrel{\mathsf{RwEq}}q\,\bigr\|.
-\tag{6.13}\label{eq:rweq-total}
-\]
-Here \(\|-\|\) is the propositional inhabitance used by the defining setoid, so
-\eqref{eq:rweq-total} is exactly \(\SetTot\) for the relation \(\mathsf{RwEq}\)
-on the carrier \(\PathTy_A(a,a)\).  No quotient occurs
-in~\eqref{eq:rweq-total}.
-\end{definition}
-
-\begin{theorem}[Raw-level criterion]
-\label{thm:raw-criterion}
-For every \(A\) and \(a:A\), the following are equivalent:
-\[
-\begin{split}
- &\text{\(\PRW_A(a,-)\), based at \([\mathbf r_a]\), admits
-   unrestricted \(J^\beta\);}\\
- &\isContr\bigl(\PRW_A(a,a)\bigr);\qquad
-  \LocalK(A,a);\qquad
-  \RwTot(A,a).
-\end{split}
-\tag{6.14}\label{eq:raw-criterion}
-\]
-\end{theorem}
-
-\begin{proof}
-Equivalence of the first three is Theorem~\ref{thm:pathrw-k}.  For the last,
-apply Corollary~\ref{cor:quotient-total} to the setoid \(\mathsf{RwEq}\) on the
-carrier \(\PathTy_A(a,a)\); the chosen center \(\mathbf r_a\) supplies
-inhabitance.  Sufficiency is quotient soundness and necessity is quotient
-exactness, exactly as in Theorem~\ref{thm:quotient-contractible}.
-\end{proof}
-
-\begin{corollary}[Eliminators manufacture certificates]
-\label{cor:eliminator-certificates}
-If \(\PRW_A(a,-)\) admits unrestricted based elimination with propositional
-beta, then for every pair of raw loops \(p,q:\PathTy_A(a,a)\) there is an
-actual \(\mathsf{RwEq}\) derivation between them.
-\end{corollary}
-
-Corollary~\ref{cor:eliminator-certificates} is the sharp form of the ``no
-unconditional slogan'' point.  Assuming such an eliminator is not a mild
-structural convenience: it is exactly as strong as asserting that the rewrite
-system connects every raw loop at \(a\) to every other.  Conversely, this is
-what one proves in practice.  Proposition~\ref{prop:subsingleton-loop-quotient}
-below establishes \(\RwTot(A,a)\) directly, by constructing the derivations, and
-only then reads off contractibility; it does not first form the quotient.
-
-A small instance shows the shape of such a derivation.  Write
-\(\mathbf s_a=\bigl([\,a\xrightarrow{\refl_a}a\,],\refl_a\bigr)\) for the
-singleton reflexive trace, formally introduced in
-Definition~\ref{def:two-traces}.  Composing it with itself gives a two-step raw
-loop, and
-\[
- \mathbf s_a\cdot\mathbf s_a
- \;\mathrel{\mathsf{RwEq}}\;
- \mathbf r_a
-\tag{6.15}\label{eq:double-singleton}
-\]
-is obtained by congruence under composition, the primitive
-transport-reflexivity erasure, the left-unit rule, and a second erasure.  The
-two sides of~\eqref{eq:double-singleton} are distinct \(\PathTy\) records, so
-this is a genuine derivation and not an instance of reflexivity.
-
-\begin{remark}[Global form]
-\label{rem:raw-global}
-Quantifying over base points, family-wide elimination for \(\PRW\) is
-equivalent to \(\prod_{a:A}\RwTot(A,a)\).  Theorem~\ref{thm:raw-criterion}
-makes the remaining question completely elementary: it asks only whether two
-given step lists are connected by primitive rewrites.  In an earlier version of
-this work we left that question open, since it concerns the specific primitive
-rule set of LND\(_{\mathrm{EQ}}\)-TRS rather than the classification.
-Section~\ref{sec:collapse} settles it, and the answer is affirmative for every
-carrier.
-\end{remark}
-
-The contrast with the unquotiented record is worth stating explicitly.  For raw
-\(\PathTy\) the answer is unconditional and negative for every pointed carrier
-(Theorem~\ref{thm:no-trace-j}, sharpened by
-Proposition~\ref{prop:trace-fiber-computed}).  For \(\PRW\) the criterion is
-\eqref{eq:rweq-total}, and Section~\ref{sec:collapse} verifies it outright.
-Quotienting therefore changes the answer from ``always fails'' to ``always
-succeeds'', and the classification tells us exactly what is paid for the
-change.
-
-\section{Resolution: the rewrite quotient satisfies the criterion}
-\label{sec:collapse}
-
-Theorem~\ref{thm:raw-criterion} reduces a question about eliminators to a
-question about the primitive rewrite rules.  This section answers it.  One rule
-decides the matter, and it does so on every carrier at once.
-
-\subsection{A trace-erasing packaging rule}
-
-Two primitives of the artifact interact.  Congruence transports a trace
-pointwise,
-\[
- \mathsf{congrArg}(f,(L,h))
- =\bigl(\,\mathsf{map}\,(\mathsf{Step.map}\,f)\,L,\ \mathrm{ap}_f(h)\,\bigr),
-\tag{7.1}\label{eq:congrarg-trace}
-\]
-whereas the packaging operation for function types records nothing at all:
-\[
- \mathsf{lamCongr}
-   \Bigl(\,\lambda x.\,P_x:\prod_{x:\alpha}\PathTy(f\,x,g\,x)\Bigr)
- =\bigl(\,[\,]\ ,\ \mathsf{funext}(\lambda x.\,\pi_{=}P_x)\,\bigr).
-\tag{7.2}\label{eq:lamcongr-trace}
-\]
-Equation~\eqref{eq:lamcongr-trace} is a design decision, not a derived fact:
-there is no canonical way to concatenate an \(\alpha\)-indexed family of traces
-into a single trace, and the implementation therefore keeps none.
-
-The primitive application rule of the rewriting system relates the two:
-\[
- \mathsf{congrArg}\bigl(\lambda h.\,h\,x,\ \mathsf{lamCongr}(P)\bigr)
- \;\triangleright\;
- P_x .
-\tag{7.3}\label{eq:fun-app-beta}
-\]
-
-\begin{lemma}[The collapsing rule]
-\label{lem:collapse-rule}
-Write \(\varepsilon_{a,b}=([\,],h)\) for the trace-free path determined by an
-ambient equality \(h:a=b\); by proof irrelevance it does not depend on the
-choice of \(h\).  Then for every carrier \(A\), all \(a,b:A\), and \emph{every}
-\(p:\PathTy_A(a,b)\) there is a single primitive rewrite
-\[
- \varepsilon_{a,b}\;\triangleright\;p .
-\tag{7.4}\label{eq:collapse-step}
-\]
-\end{lemma}
-
-\begin{proof}
-Instantiate~\eqref{eq:fun-app-beta} at the unit domain \(\alpha=\mathbf 1\),
-with \(f=\lambda\_.a\), \(g=\lambda\_.b\), \(P=\lambda\_.p\) and \(x=\star\).
-By~\eqref{eq:lamcongr-trace} the inner packaging has empty trace, and
-by~\eqref{eq:congrarg-trace} congruence maps the empty trace to the empty trace,
-so the left-hand side of~\eqref{eq:fun-app-beta} is literally
-\(([\,],\mathrm{ap}_{(\lambda h.h\star)}(\mathsf{funext}(\lambda\_.\pi_{=}p)))\).
-Its two fields are the empty list and an ambient proof of \(a=b\), so it is
-\(\varepsilon_{a,b}\).  The right-hand side is \(P_\star=p\).
-\end{proof}
-
-Lemma~\ref{lem:collapse-rule} is the whole story.  The trace-free path is a
-common one-step predecessor of every path with the same endpoints, so the
-rewrite relation cannot separate any two of them.
-
-\subsection{Totality, and unrestricted elimination}
-
-\begin{theorem}[\(\mathsf{RwEq}\) is total]
-\label{thm:rweq-total}
-For every carrier \(A\) and all \(a,b:A\), any two computational paths
-\(p,q:\PathTy_A(a,b)\) are related:
-\[
- p\;\mathrel{\mathsf{RwEq}}\;q .
-\tag{7.5}\label{eq:rweq-total-thm}
-\]
-In particular \(\RwTot(A,a)\) holds for every pointed carrier.
-\end{theorem}
-
-\begin{proof}
-By Lemma~\ref{lem:collapse-rule} there are single rewrites
-\(\varepsilon_{a,b}\triangleright p\) and
-\(\varepsilon_{a,b}\triangleright q\).  Compose the inverse of the first with
-the second inside the equivalence closure.
-\end{proof}
-
-The derivation in Theorem~\ref{thm:rweq-total} is genuine: it has two stages and
-passes through a third path, \(\varepsilon_{a,b}\), which is in general distinct
-from both endpoints as a record.
-
-\begin{corollary}[Unconditional repair]
-\label{cor:unconditional-repair}
-For every carrier \(A\) and every \(a,b:A\):
-\begin{enumerate}[label=(\roman*),itemsep=1pt,topsep=3pt]
-\item \(\PRW_A(a,b)\) is a subsingleton, and
-  \(\PRW_A(a,b)\Eqv(a=b)\);
-\item \(\isContr\bigl(\PRW_A(a,a)\bigr)\);
-\item \(\LocalK(A,a)\) holds, and so does the global form;
-\item \(\PRW_A(a,-)\), based at \([\mathbf r_a]\), admits unrestricted based
-  elimination into every motive, with propositional beta.
-\end{enumerate}
-\end{corollary}
-
-\begin{proof}
-Theorem~\ref{thm:rweq-total} gives \(\SetTot\) for the defining setoid, so
-quotient soundness identifies all classes, which is~(i); the map to \(a=b\) is
-\(\pi_{=}\) and its inverse sends \(h\) to \([\varepsilon_{a,b}]\).  Items
-(ii)--(iv) are then Theorem~\ref{thm:raw-criterion} read from right to left.
-\end{proof}
-
-So the answer to the question that motivates this paper is affirmative, in the
-following precise sense.
-
-\begin{theorem}[Path induction for computational paths]
-\label{thm:quotient-path-induction}
-Let \(A\) be any type and \(a:A\).  For every motive
-\[
-        C:\prod_{b:A}\PRW_A(a,b)\longrightarrow\U
-\]
----including motives that inspect the quotient class itself---and every
-\(d:C(a,[\mathbf r_a])\) there is
-\[
- \mathcal J_{\PRW}(C,d):\prod_{b:A}\prod_{x:\PRW_A(a,b)}C(b,x),
- \qquad
- \mathcal J_{\PRW}(C,d,a,[\mathbf r_a])=d .
-\tag{7.6}\label{eq:prw-J}
-\]
-The Martin-L\"of (unbased) form and the associated transport operator follow.
-\end{theorem}
-
-\begin{proof}
-Given \(x:\PRW_A(a,b)\), the projection \(\pi_{=}x:a=b\) allows equality
-elimination to reduce to \(b=a\); Corollary~\ref{cor:unconditional-repair}(iii)
-then supplies \(x=[\mathbf r_a]\), along which \(d\) transports.
-\end{proof}
-
-\begin{remark}[The beta law is judgmental here]
-\label{rem:judgmental-beta}
-Everywhere else in this paper beta laws are propositional, and the
-classification is stated for that weaker notion.  For the eliminator of
-Theorem~\ref{thm:quotient-path-induction} the equation in~\eqref{eq:prw-J} in
-fact holds by reflexivity in the formalization.  The reason is specific and does
-not generalize: the transport is performed along an \emph{ambient equality
-proof}, and definitional proof irrelevance identifies that proof with
-reflexivity, after which the recursor reduces.  We flag this as a property of
-the construction rather than as a strengthening of the classification theorems.
-\end{remark}
-
-\subsection{What has been bought, and what has been paid}
-
-Corollary~\ref{cor:unconditional-repair} is exactly the trade-off predicted by
-Theorem~\ref{thm:universal-repair}, instantiated at the artifact's own rewrite
-relation.  Section~\ref{sec:setoid-repair} proved that a set-level repair
-supports unrestricted \(J\) only if it identifies \emph{all} reflexivity
-metadata.  Here that necessary condition is met, and it is met in the extreme
-form: by~(i) the quotient retains the ambient equality and nothing else, so
-\(\PRW\) is (equivalent to) the indiscrete repair of
-Section~\ref{subsec:indiscrete}.  The two readings should be kept apart.
-
-\begin{enumerate}[label=(\alph*)]
-\item \emph{Positive.}  Computational paths are not disqualified from being an
-  identity-like object.  Raw records fail unrestricted \(J\) on every pointed
-  carrier, but the rewrite quotient satisfies it on every carrier, with no
-  hypothesis and no additional axiom.  A user of \(\PRW\) may reason by path
-  induction.
-\item \emph{Cautionary.}  Because the repair is the indiscrete one, \(\PRW\)
-  carries no rewrite information: it is a reformulation of ambient equality.
-  Any construction whose interest depends on distinguishing two classes of
-  \(\PRW\) is, under the present rule set, vacuous.  In particular no
-  invariant defined on \(\PRW\) can be nonconstant.
-\end{enumerate}
-
-The dichotomy is sharp and is worth recording as such.
-
-\begin{theorem}[Raw versus quotient]
-\label{thm:raw-vs-quotient}
-For every pointed carrier \((A,a)\),
-\[
- \neg\isContr\bigl(\PathTy_A(a,a)\bigr)
- \qquad\text{and}\qquad
- \isContr\bigl(\PRW_A(a,a)\bigr).
-\tag{7.7}\label{eq:raw-vs-quotient}
-\]
-\end{theorem}
-
-\begin{proof}
-The first is Proposition~\ref{prop:trace-fiber-computed} and the second is
-Corollary~\ref{cor:unconditional-repair}(ii).
-\end{proof}
-
-\subsection{Sharpness: the groupoid fragment does not collapse}
-\label{subsec:sharpness}
-
-It matters whether the collapse is intrinsic to computational-path rewriting or
-an artifact of particular rules.  It is the latter, and the separating invariant
-is elementary.
-
-\begin{definition}[Groupoid fragment]
-\label{def:groupoid-fragment}
-Let \(\triangleright_{\mathrm{grp}}\) be the sub-relation of \(\triangleright\)
-generated by the path-algebra rules only:
-\(\mathsf{symm}\,\mathbf r\triangleright\mathbf r\),
-double symmetry, the two unit laws, the two inverse laws, contravariance of
-symmetry over composition, associativity, the two cancellation rules, and the
-three structural congruences for \(\mathsf{symm}\) and composition.  Write
-\(\mathrel{\mathsf{RwEq}}_{\mathrm{grp}}\) for its equivalence closure.
-\end{definition}
-
-\begin{proposition}[Parity is a groupoid invariant]
-\label{prop:parity-invariant}
-Let \(\ell(p)\) denote the length of the recorded trace of \(p\).  If
-\(p\mathrel{\mathsf{RwEq}}_{\mathrm{grp}}q\) then
-\(\ell(p)\equiv\ell(q)\pmod 2\).
-\end{proposition}
-
-\begin{proof}
-Composition concatenates traces and symmetry reverses them, so
-\(\ell(p\cdot q)=\ell(p)+\ell(q)\) and \(\ell(p^{-1})=\ell(p)\).  Each generator
-is then checked directly.  The unit, associativity and contravariance rules
-preserve \(\ell\) exactly.  The inverse laws send \(2\ell(p)\) to \(0\) and the
-cancellation rules send \(2\ell(p)+\ell(q)\) to \(\ell(q)\); both preserve
-parity.  The congruences preserve parity by induction.  Parity is then
-preserved by reflexivity, symmetry and transitivity of the closure.
-\end{proof}
-
-\begin{theorem}[The collapse is caused by the function-space rules]
-\label{thm:sharpness}
-The empty and singleton reflexive traces satisfy
-\[
- \mathbf r_a
- \mathrel{\mathsf{RwEq}}
- \mathbf s_a,
- \qquad\text{but}\qquad
- \neg\bigl(\mathbf r_a
-   \mathrel{\mathsf{RwEq}}_{\mathrm{grp}}\mathbf s_a\bigr).
-\tag{7.8}\label{eq:sharpness}
-\]
-Hence \(\triangleright_{\mathrm{grp}}\) is not total, its quotient is not
-contractible, and it does not by itself repair unrestricted \(J\).
-\end{theorem}
-
-\begin{proof}
-The first is Theorem~\ref{thm:rweq-total}.  For the second,
-\(\ell(\mathbf r_a)=0\) and \(\ell(\mathbf s_a)=1\), so
-Proposition~\ref{prop:parity-invariant} forbids a groupoid derivation.  The
-remaining assertions follow from Theorem~\ref{thm:quotient-contractible} applied
-to the setoid generated by \(\triangleright_{\mathrm{grp}}\), whose totality has
-just been refuted.
-\end{proof}
-
-Theorem~\ref{thm:sharpness} also shows that the criterion of
-Section~\ref{sec:projection-kernel} is doing work in both directions.  Writing
-\(\PathTy_A(a,a)/\mathord{\mathsf{RwEq}}_{\mathrm{grp}}\) for the fragment's loop
-quotient,
-\[
- \neg\isContr\bigl(\PathTy_A(a,a)/\mathord{\mathsf{RwEq}}_{\mathrm{grp}}\bigr)
- \qquad\text{and}\qquad
- \isContr\bigl(\PRW_A(a,a)\bigr)
-\tag{7.9}\label{eq:fragment-vs-full}
-\]
-for every pointed carrier.  Two rewrite systems over the same carrier, differing
-only in the function-space rules, land on opposite sides of the classification.
-
-Theorem~\ref{thm:sharpness} thus localises the phenomenon.  The classical
-LND\(_{\mathrm{EQ}}\)-TRS coherences---the ones that make paths a groupoid up to
-rewriting---are compatible with a nontrivial rewrite quotient.  What collapses
-the quotient is the combination of the function-space rules
-\eqref{eq:fun-app-beta} with the trace-erasing convention
-\eqref{eq:lamcongr-trace}.  This suggests a concrete repair for implementations
-that want \(\PRW\) to remain informative: give \(\mathsf{lamCongr}\) a trace, or
-restrict \eqref{eq:fun-app-beta} so that its left-hand side is not trace-free.
-We do not carry out that redesign here; Theorem~\ref{thm:raw-criterion} is
-stated so that the redesigned system can be tested against the same criterion.
-
-\begin{remark}[Scope of the collapse theorem]
-\label{rem:collapse-scope}
-Theorem~\ref{thm:rweq-total} is a statement about the rule set formalized in the
-accompanying artifact, and about the specific trace semantics of the operations
-appearing in~\eqref{eq:lamcongr-trace}.  It is not a claim about
-computational-path calculi in general, and in particular it does not apply to
-presentations in which equality reasons are terms of a scoped syntax rather than
-lists of elementary steps; the companion article
-\cite{ScopedTraceCalculus2026} treats one such presentation.
-\end{remark}
-
 \section{The largest explicitly supported class of motives}
 \label{sec:factorization}
 
@@ -1619,7 +1006,7 @@ its pullback along \(\proj\) is the motive
 \[
        C_D(b,h,m)=D(b,h)
        \qquad ((h,m):R_M(a,b)).
-\tag{8.1}\label{eq:strict-factor}
+\tag{7.1}\label{eq:strict-factor}
 \]
 \end{definition}
 
@@ -1630,18 +1017,18 @@ Every strict equality-projection motive \(C_D\) admits elimination
   J_{\proj}:
   D(a,\refl_a)\longrightarrow
   \prod_{b:A}\prod_{p:R_M(a,b)}D(b,\proj p)
-\tag{8.2}\label{eq:factored-j}
+\tag{7.2}\label{eq:factored-j}
 \]
 with propositional beta at \(r^M_a\):
 \[
                   J_{\proj}(d,a,r^M_a)=d.
-\tag{8.3}\label{eq:factored-beta}
+\tag{7.3}\label{eq:factored-beta}
 \]
 More generally, the conclusion holds for any motive \(C\) equipped, for every
 \(x=(b,h,m):T_M(a)\), with a specified fiberwise equivalence
 \[
                          C(x)\Eqv D(b,h).
-\tag{8.4}\label{eq:fiberwise-factor}
+\tag{7.4}\label{eq:fiberwise-factor}
 \]
 \end{theorem}
 
@@ -1699,6 +1086,87 @@ the resulting reflexivity fiber, not merely confluence, normalization, or
 decidable equality.
 \end{warning}
 
+\section{Beyond lists: a classification guide}
+\label{sec:examples}
+
+The criterion applies to any observable decoration.  The following examples
+are not encodings of one another; they illustrate which property matters.
+
+\begin{table}[t]
+\centering
+\small
+\renewcommand{\arraystretch}{1.22}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}
+                >{\raggedright\arraybackslash}p{0.36\textwidth}
+                >{\raggedright\arraybackslash}p{0.34\textwidth}}
+\toprule
+Metadata & Reflexivity fiber & Unrestricted \(J^\beta\)\\
+\midrule
+Hidden token
+ & A singleton or inhabited subsingleton
+ & Yes: the fiber is contractible.\\
+Derivation history
+ & Empty history and a visible reflexive inference
+ & No, unless histories are hidden or collapsed.\\
+Cost
+ & Distinct costs \(0\) and \(1\) for reflexive computations
+ & No; uniqueness of a minimum is irrelevant.\\
+Certificate
+ & An inhabited proof-irrelevant proposition
+ & Yes in the present metatheory.\\
+Certificate as data
+ & Two distinguishable certificate objects
+ & No, even if both certify the same fact.\\
+Normalization log
+ & Empty log and a nonempty administrative loop
+ & No; unique normal forms do not imply unique logs.\\
+Proof label
+ & Exactly one reflexivity label
+ & Yes; two visible reflexivity labels make it fail.\\
+\bottomrule
+\end{tabular}
+\caption{The reflexivity fiber, rather than the informal purpose of metadata,
+determines unrestricted based elimination.}
+\label{tab:examples}
+\end{table}
+
+Table~\ref{tab:examples} is read off the reflexivity fiber and nothing else,
+and three of its rows are worth a comment because they are commonly misread.
+
+\emph{Costs} are not rescued by structure: additivity under composition,
+decidable comparison, and uniqueness of an optimum are all irrelevant, because
+optimization supplies an order and a preferred element, not an equality between
+all costs.  Exposing instead the \emph{proposition} that the stored cost is
+optimal does restore elimination, an inhabited proposition being contractible
+here.
+
+\emph{Certificates} hide a representation choice.  An inhabited proof-irrelevant
+certificate fiber is contractible, so elimination holds
+(Corollary~\ref{cor:contractible-decoration}); certificates carried as records
+with serial numbers, proof trees, or signatures may certify the same equality
+while remaining distinguishable, and then it fails
+(Corollary~\ref{cor:visible-alternatives}).
+
+\emph{Normalization logs} separate three properties that are easily conflated:
+uniqueness of normal forms, connectedness of logs under log rewrites, and
+equality of all observable reflexive logs.  Only the third is the metadata-fiber
+condition; the second implies it only after quotienting, at which point
+Theorem~\ref{thm:universal-repair} applies to the quotient.  The same pattern
+governs derivation histories, where an empty derivation and an explicit
+reflexivity-rule derivation obstruct elimination while they remain visible as
+syntax, and proof labels, where arbitrarily elaborate indexing away from
+reflexivity is harmless because the total-space equivalence transports
+everything into one fiber.
+
+\part{The computational-path rewrite quotient}
+\label{part:case-study}
+
+Part~\ref{part:case-study} applies the classification to one concrete
+implementation and finds that it collapses.  The general theorems of
+Part~\ref{part:general} are not tied to this implementation; the strongest
+concrete result very much is.
+
+
 \section{Computational traces: the principal case study}
 \label{sec:traces}
 
@@ -1754,7 +1222,7 @@ A step is determined by its source, so \(\Step(A)\Eqv A\).  Consequently
  \PathTy_A(a,b)\Eqv\List(A)\times(a=b),
  \qquad
  \PathTy_A(a,a)\Eqv\List(A).
-\tag{8.5a}\label{eq:trace-fiber-computed}
+\tag{9.6}\label{eq:trace-fiber-computed}
 \]
 \end{proposition}
 
@@ -1769,68 +1237,38 @@ remaining component \(a=a\) is a proof-irrelevant proposition, so two loops with
 the same trace are equal.
 \end{proof}
 
-\begin{corollary}[Unconditional failure for raw traces]
-\label{cor:raw-unconditional}
-For every \(A\) and every \(a:A\), the reflexivity metadata fiber
-\(M_{\mathrm{tr}}(a,\refl_a)=\List(\Step(A))\) is equivalent to \(\List(A)\),
-which contains the distinct elements \(\Empty\) and \([a]\).  Hence that fiber
-is never contractible and, by Theorem~\ref{thm:metadata-fiber}, raw
-computational paths never admit unrestricted based elimination with
-propositional beta.  Equivalently, \(\PathTy_A(a,a)\Eqv\List(A)\) is itself
-never contractible.
-\end{corollary}
-
-The point of Proposition~\ref{prop:trace-fiber-computed} is that no auxiliary
-hypothesis on \(A\) is available to rescue the raw record.  A pointed carrier
-already forces two visible reflexive traces.  This is the exact sense in which
-the raw obstruction is unconditional, in contrast with the conditional
-\(\PRW\) criterion of Theorem~\ref{thm:raw-criterion}.
-
 \begin{definition}[Two reflexive traces]
 \label{def:two-traces}
-Besides \(\mathbf r_a\), define
-\[
- \mathbf s_a=
-  \bigl([\, (a,a,\refl_a)\,],\refl_a\bigr)
-  :\PathTy_A(a,a).
-\tag{9.6}\label{eq:singleton-refl}
-\]
+Besides \(\mathbf r_a\), write
+\(\mathbf s_a=\bigl([\,(a,a,\refl_a)\,],\refl_a\bigr):\PathTy_A(a,a)\) for the
+singleton reflexive trace.  List no-confusion gives
+\(\mathbf r_a\ne\mathbf s_a\).
 \end{definition}
-
-The list no-confusion principle gives
-\[
-       \Empty\ne[\, (a,a,\refl_a)\,],
-\qquad\text{hence}\qquad
-       \mathbf r_a\ne\mathbf s_a.
-\tag{9.7}\label{eq:trace-distinct}
-\]
 
 \begin{theorem}[No unrestricted trace-sensitive \(J\)]
 \label{thm:no-trace-j}
-For every \(A\) and \(a:A\), the family \(\PathTy_A(a,-)\), based at the empty
-reflexive trace, has no unrestricted based eliminator satisfying
-propositional beta.
+For every \(A\) and \(a:A\), the family \(\PathTy_A(a,-)\), based at
+\(\mathbf r_a\), has no unrestricted based eliminator satisfying propositional
+beta.
 \end{theorem}
 
 \begin{proof}
-By~\eqref{eq:path-refinement}, \(\PathTy_A(a,b)\) is the equality refinement
-with metadata~\eqref{eq:trace-metadata}.  Its reflexivity metadata fiber is
-\(\List(\Step(A))\).  That fiber contains the distinct values in
-\eqref{eq:trace-distinct}, so it is not contractible.  Apply
-Theorem~\ref{thm:metadata-fiber}.  This derives the result from the generic
-criterion; no bespoke motive is needed.
+By~\eqref{eq:path-refinement} the record is the equality refinement with
+metadata~\eqref{eq:trace-metadata}, whose reflexivity fiber
+\(\List(\Step(A))\) contains \(\mathbf r_a\ne\mathbf s_a\) and so is not
+contractible; apply Theorem~\ref{thm:metadata-fiber}.
 \end{proof}
 
-One may recover the familiar direct counter-motive by taking
-\[
- C(b,L,h)=
- \begin{cases}
- \Unit,&L=\Empty,\\
- \varnothing,&L\ne\Empty.
- \end{cases}
-\]
-It has a base value but none at \(\mathbf s_a\).  This is a useful diagnostic,
-not the classification proof.
+Proposition~\ref{prop:trace-fiber-computed} makes the failure
+\emph{unconditional}: no hypothesis on \(A\) can rescue the raw record, because
+a pointed carrier already forces two visible reflexive traces.  This is the
+contrast with the \(\PRW\) criterion of Theorem~\ref{thm:raw-criterion}, which
+is conditional and which Section~\ref{sec:collapse} then discharges in the
+opposite direction.
+
+One may recover the familiar direct counter-motive by taking \(C(b,L,h)=\Unit\)
+when \(L=\Empty\) and \(\varnothing\) otherwise: it has a base value but none at
+\(\mathbf s_a\).  That is a useful diagnostic, not the classification proof.
 
 \subsection{Composability is not the issue}
 
@@ -1853,7 +1291,7 @@ Both
       \quad\text{and}\quad
       \sigma_a=([\,a\xrightarrow{\refl_a}a\,],
                    \text{singleton-chain proof})
-\tag{9.8}\label{eq:composable-two}
+\tag{9.7}\label{eq:composable-two}
 \]
 belong to \(\mathsf{CTr}_A(a,a)\).  Equality of subtype values would imply
 equality of their underlying lists, so \(\epsilon_a\ne\sigma_a\).
@@ -1863,7 +1301,7 @@ equality of their underlying lists, so \(\epsilon_a\ne\sigma_a\).
 The equality refinement
 \[
    \sum_{h:a=b}\mathsf{CTr}_A(a,b),
-\tag{9.9}\label{eq:composable-refinement}
+\tag{9.8}\label{eq:composable-refinement}
 \]
 based at \((\refl_a,\epsilon_a)\), has no unrestricted based eliminator with
 propositional beta.
@@ -1882,62 +1320,642 @@ composite equality matching \(\refl_a\).  The obstruction is therefore:
 \[
  \boxed{\text{visible noncanonical reflexive metadata, not
  non-composability.}}
-\tag{9.10}\label{eq:boxed-obstruction}
+\tag{9.9}\label{eq:boxed-obstruction}
 \]
 
 \subsection{What remains available}
 
-The endpoint-equality projection
-\[
-       (L,h)\longmapsto h
-\tag{9.11}\label{eq:trace-projection}
-\]
-is exactly~\eqref{eq:projection}.  If
-\(D:\prod_{b:A}(a=b)\to\U\), Theorem
-\ref{thm:motive-factorization} gives
+The endpoint-equality projection \((L,h)\mapsto h\) is
+exactly~\eqref{eq:projection}, so for \(D:\prod_{b:A}(a=b)\to\U\)
+Theorem~\ref{thm:motive-factorization} supplies
 \[
  D(a,\refl_a)\longrightarrow
  \prod_{b:A}\prod_{P:\PathTy_A(a,b)}D(b,\proj P)
-\tag{9.12}\label{eq:trace-factored-j}
+\tag{9.10}\label{eq:trace-factored-j}
 \]
-with propositional beta at \(\mathbf r_a\).  The result is independent of the
-list.  Thus trace algebra, including concatenation and rewrite equivalence,
-can coexist with equality-component elimination; what cannot coexist is an
-unrestricted eliminator whose motive is allowed to separate
-\(\mathbf r_a\) from \(\mathbf s_a\).
+with propositional beta at \(\mathbf r_a\), independently of the list.  Trace
+algebra---concatenation, inversion, rewrite equivalence---therefore coexists
+with equality-component elimination.  What cannot coexist is an unrestricted
+eliminator whose motive may separate \(\mathbf r_a\) from \(\mathbf s_a\).
 
-\subsection{Computational paths, rewrite evidence, and the quotient}
+\subsection{Rewrite evidence, and the quotient}
 \label{subsec:raw-versus-rweq}
 
-In the accompanying library, \(\PathTy\) is the structure \(\texttt{Path}\),
-with fields \(\texttt{steps}\), a list of elementary steps, and
-\(\texttt{proof}\), an ambient equality \(a=b\).
-Composition concatenates lists, and \(\texttt{RwEq}\) records the
-LND\(_{\mathrm{EQ}}\)-TRS coherences; for a two-step arithmetic path \(p\) the
-artifact constructs the certificate
-\(p\cdot p^{-1}\mathrel{\mathsf{RwEq}}\mathbf r\).  Such a certificate organizes
-traces.  It does not, by itself, equate every list as record data, and in
-particular it does not make the raw reflexivity fiber contractible.
+Composition of records concatenates their lists, and \(\mathsf{RwEq}\) records
+the LND\(_{\mathrm{EQ}}\)-TRS coherences; for a two-step path \(p\) one has the
+certificate \(p\cdot p^{-1}\mathrel{\mathsf{RwEq}}\mathbf r\).  Such a
+certificate organizes traces.  It does not, by itself, equate every list as
+record data, and in particular it does not make the raw reflexivity fiber
+contractible.
 
 The two witnesses of Theorem~\ref{thm:no-trace-j} illustrate the gap.  Writing
-\(\epsilon_a=\texttt{Path.refl}\,a\) and
-\(\sigma_a=\texttt{Path.stepChain}\,\refl_a\), their step lists have lengths
+\(\epsilon_a=\mathbf r_a\) for the empty reflexive record and
+\(\sigma_a=\mathbf s_a\) for the singleton one, their step lists have lengths
 zero and one, so \(\epsilon_a\ne\sigma_a\) as records; yet the primitive
 transport-beta rewrite at a constant family gives
 \[
  \sigma_a\mathrel{\mathsf{RwEq}}\epsilon_a,
  \qquad\text{hence}\qquad
  [\epsilon_a]=[\sigma_a]\ \text{in }\PRW_A(a,a).
-\tag{9.13}\label{eq:raw-empty-singleton-rweq}
+\tag{9.11}\label{eq:raw-empty-singleton-rweq}
 \]
-A motive on raw `Path` may inspect the list and separate the two; a motive on
+A motive on the raw record may inspect the list and separate the two; a motive on
 \(\PRW\) sees only the class, and this particular distinction has been removed by
 an actual derivation.  Equality of the outputs of the implemented normalization
 function would not establish~\eqref{eq:raw-empty-singleton-rweq}---that function
-depends only on \(\pi_{=}\)---so the formal development uses the named primitive
-rule.  Whether \emph{all} distinctions vanish is the local-K question of
+depends only on \(\pi_{=}\)---so the argument uses the named primitive rule
+instead.  Whether \emph{all} distinctions vanish is the local-K question of
 Theorem~\ref{thm:pathrw-k}, settled affirmatively, for a quite different reason,
 in Section~\ref{sec:collapse}.
+
+\section{\texorpdfstring{The \(\mathsf{PathRwQuot}\) criterion}{The PathRwQuot criterion}}
+\label{sec:pathrwquot-criterion}
+
+\subsection{Applying the kernel theorem}
+
+Let
+\[
+ R_{\mathsf{rw}}(b)=\PRW_A(a,b)
+ =\PathTy_A(a,b)/\mathsf{RwEq},
+\tag{10.1}\label{eq:pathrw-row}
+\]
+based at the class \([\mathbf r_a]\).  The quotient operation
+\[
+ \mathsf{toEq}_b:\PRW_A(a,b)\longrightarrow(a=b)
+\tag{10.2}\label{eq:pathrw-toeq}
+\]
+forgets rewrite traces and is well-defined because every primitive rewrite
+preserves the underlying equality proof.
+
+The reflexivity kernel is
+\[
+ \Ker(\mathsf{toEq})
+ =
+ \sum_{x:\PRW_A(a,a)}
+       \bigl(\mathsf{toEq}(x)=\refl_a\bigr).
+\tag{10.3}\label{eq:pathrw-kernel}
+\]
+Ambient equality proofs live in \(\mathsf{Prop}\), so the second component is
+automatic by proof irrelevance.  Projection to the first component and
+reinsertion of that proof give
+\[
+              \Ker(\mathsf{toEq})\Eqv\PRW_A(a,a).
+\tag{10.4}\label{eq:pathrw-kernel-loop}
+\]
+
+\begin{definition}[Local quotient-level axiom K]
+\label{def:local-k}
+Define
+\[
+ \LocalK(A,a)
+ \quad:\!\!\Longleftrightarrow\quad
+ \prod_{x:\PRW_A(a,a)}x=[\mathbf r_a].
+\tag{10.5}\label{eq:local-k}
+\]
+\end{definition}
+
+This is a statement about classes of computational paths.  It is not the
+assertion that two raw records with different step lists are equal, and
+it is not obtained merely by observing that their \(\mathsf{toEq}\) values are
+proof-irrelevant.
+
+\begin{theorem}[\(\mathsf{PathRwQuot}\)/K classification]
+\label{thm:pathrw-k}
+For every \(A\) and \(a:A\), the following are equivalent:
+\[
+\begin{split}
+ &\text{\(\PRW_A(a,-)\), based at \([\mathbf r_a]\), admits
+ unrestricted \(J^\beta\);}\\
+ &\isContr\bigl(\PRW_A(a,a)\bigr);\\
+ &\LocalK(A,a).
+\end{split}
+\tag{10.6}\label{eq:pathrw-k}
+\]
+\end{theorem}
+
+\begin{proof}
+The first equivalence is Theorem~\ref{thm:projection-kernel} followed by
+\eqref{eq:pathrw-kernel-loop}.  For the second, a contraction identifies every
+loop class with the reflexive class.  Conversely, the equations in
+\(\LocalK(A,a)\), reversed in orientation, contract the loop quotient at
+\([\mathbf r_a]\).
+\end{proof}
+
+\begin{corollary}[Global form]
+\label{cor:pathrw-global-k}
+The family \(\PRW_A(a,-)\) admits such an eliminator for every \(a:A\) exactly
+when \(\prod_{a:A}\LocalK(A,a)\).
+\end{corollary}
+
+\begin{remark}[The criterion is exact, in both directions]
+\label{rem:rweq-no-slogan}
+Theorem~\ref{thm:pathrw-k} says neither that quotienting by \(\mathsf{RwEq}\)
+always repairs unrestricted elimination nor that it always fails; it is the
+exact criterion, and a concrete rule set must be checked against it.
+Section~\ref{sec:collapse} performs that check for the formalized rules.
+\end{remark}
+
+\begin{remark}[Normalization is only one direction]
+\label{rem:rweq-normalization}
+\(\mathsf{RwEq}\) is the equivalence closure generated by explicit primitive
+rewrites.  The implemented normalization function, which returns the one-step
+chain of a path's underlying equality, satisfies
+\(p\mathrel{\mathsf{RwEq}}q\Rightarrow\mathsf{normalize}(p)=\mathsf{normalize}(q)\),
+but the converse is not part of the definition and cannot replace an
+\(\mathsf{RwEq}\) witness; a normal-form characterization needs a separately
+supplied complete step system.  Every derivation below therefore exhibits named
+primitive rules.
+\end{remark}
+
+\subsection{Removing the quotient from the criterion}
+\label{subsec:raw-criterion}
+
+Theorem~\ref{thm:pathrw-k} is stated at quotient level, which makes it awkward
+to check: verifying \(\LocalK(A,a)\) appears to require reasoning about
+classes.  It can be pushed back to raw paths.  Doing so also exhibits
+Section~\ref{sec:projection-kernel} as an \emph{instance} of
+Section~\ref{sec:setoid-repair} rather than a parallel development, because
+\(\PRW_A(a,b)\) is literally an ordinary setoid quotient: its carrier is
+\(\PathTy_A(a,b)\) and its relation is \(\mathsf{RwEq}\).
+
+\begin{definition}[Rewrite-connected loops]
+\label{def:rweq-total}
+Say that \(\mathsf{RwEq}\) is \emph{total on loops at \(a\)} when every two raw
+loops admit a rewrite certificate:
+\[
+ \RwTot(A,a)
+ \quad:\!\!\Longleftrightarrow\quad
+ \prod_{p,q:\PathTy_A(a,a)}
+   \bigl\|\,p\mathrel{\mathsf{RwEq}}q\,\bigr\|.
+\tag{10.7}\label{eq:rweq-total}
+\]
+Here \(\|-\|\) is the propositional inhabitance used by the defining setoid, so
+\eqref{eq:rweq-total} is exactly \(\SetTot\) for the relation \(\mathsf{RwEq}\)
+on the carrier \(\PathTy_A(a,a)\).  No quotient occurs
+in~\eqref{eq:rweq-total}.
+\end{definition}
+
+\begin{theorem}[Raw-level criterion]
+\label{thm:raw-criterion}
+For every \(A\) and \(a:A\), the following are equivalent:
+\[
+\begin{split}
+ &\text{\(\PRW_A(a,-)\), based at \([\mathbf r_a]\), admits
+   unrestricted \(J^\beta\);}\\
+ &\isContr\bigl(\PRW_A(a,a)\bigr);\qquad
+  \LocalK(A,a);\qquad
+  \RwTot(A,a).
+\end{split}
+\tag{10.8}\label{eq:raw-criterion}
+\]
+\end{theorem}
+
+\begin{proof}
+Equivalence of the first three is Theorem~\ref{thm:pathrw-k}.  For the last,
+apply Corollary~\ref{cor:quotient-total} to the setoid \(\mathsf{RwEq}\) on the
+carrier \(\PathTy_A(a,a)\); the chosen center \(\mathbf r_a\) supplies
+inhabitance.  Sufficiency is quotient soundness and necessity is quotient
+exactness, exactly as in Theorem~\ref{thm:quotient-contractible}.
+\end{proof}
+
+\begin{corollary}[Eliminators manufacture certificates]
+\label{cor:eliminator-certificates}
+If \(\PRW_A(a,-)\) admits unrestricted based elimination with propositional
+beta, then for every pair of raw loops \(p,q:\PathTy_A(a,a)\) there is an
+actual \(\mathsf{RwEq}\) derivation between them.
+\end{corollary}
+
+Corollary~\ref{cor:eliminator-certificates} is the sharp form of the ``no
+unconditional slogan'' point.  Assuming such an eliminator is not a mild
+structural convenience: it is exactly as strong as asserting that the rewrite
+system connects every raw loop at \(a\) to every other.  Conversely, this is
+what one proves in practice.  Proposition~\ref{prop:subsingleton-loop-quotient}
+below establishes \(\RwTot(A,a)\) directly, by constructing the derivations, and
+only then reads off contractibility; it does not first form the quotient.
+
+A small instance shows the shape of such a derivation.  Write
+\(\mathbf s_a=\bigl([\,a\xrightarrow{\refl_a}a\,],\refl_a\bigr)\) for the
+singleton reflexive trace, formally introduced in
+Definition~\ref{def:two-traces}.  Composing it with itself gives a two-step raw
+loop, and
+\[
+ \mathbf s_a\cdot\mathbf s_a
+ \;\mathrel{\mathsf{RwEq}}\;
+ \mathbf r_a
+\tag{10.9}\label{eq:double-singleton}
+\]
+is obtained by congruence under composition, the primitive
+transport-reflexivity erasure, the left-unit rule, and a second erasure.  The
+two sides of~\eqref{eq:double-singleton} are distinct \(\PathTy\) records, so
+this is a genuine derivation and not an instance of reflexivity.
+
+\begin{remark}[Global form]
+\label{rem:raw-global}
+Quantifying over base points, family-wide elimination for \(\PRW\) is
+equivalent to \(\prod_{a:A}\RwTot(A,a)\).  Theorem~\ref{thm:raw-criterion}
+makes the remaining question completely elementary: it asks only whether two
+given step lists are connected by primitive rewrites.  In an earlier version of
+this work we left that question open, since it concerns the specific primitive
+rule set of LND\(_{\mathrm{EQ}}\)-TRS rather than the classification.
+Section~\ref{sec:collapse} settles it, and the answer is affirmative for every
+carrier.
+\end{remark}
+
+The contrast with the unquotiented record is worth stating explicitly.  For raw
+\(\PathTy\) the answer is unconditional and negative for every pointed carrier
+(Theorem~\ref{thm:no-trace-j}, sharpened by
+Proposition~\ref{prop:trace-fiber-computed}).  For \(\PRW\) the criterion is
+\eqref{eq:rweq-total}, and Section~\ref{sec:collapse} verifies it outright.
+Quotienting therefore changes the answer from ``always fails'' to ``always
+succeeds'', and the classification tells us exactly what is paid for the
+change.
+
+\section{The collapse}
+\label{sec:collapse}
+
+Theorem~\ref{thm:raw-criterion} reduces a question about eliminators to a
+question about the primitive rewrite rules.  This section answers it.  One rule
+decides the matter, and it does so on every carrier at once.
+
+\subsection{A trace-erasing packaging rule}
+
+Two primitives of the artifact interact.  Congruence transports a trace
+pointwise,
+\[
+ \mathsf{congrArg}(f,(L,h))
+ =\bigl(\,\mathsf{map}\,(f_*)\,L,\ \mathrm{ap}_f(h)\,\bigr),
+\tag{11.1}\label{eq:congrarg-trace}
+\]
+whereas the packaging operation for function types records nothing at all:
+\[
+ \mathsf{lamCongr}
+   \Bigl(\,\lambda x.\,P_x:\prod_{x:\alpha}\PathTy(f\,x,g\,x)\Bigr)
+ =\bigl(\,[\,]\ ,\ \mathsf{funext}(\lambda x.\,\pi_{=}P_x)\,\bigr).
+\tag{11.2}\label{eq:lamcongr-trace}
+\]
+Equation~\eqref{eq:lamcongr-trace} is a design decision, not a derived fact:
+there is no canonical way to concatenate an \(\alpha\)-indexed family of traces
+into a single trace, and the implementation therefore keeps none.
+
+The primitive application rule of the rewriting system relates the two:
+\[
+ \mathsf{congrArg}\bigl(\lambda h.\,h\,x,\ \mathsf{lamCongr}(P)\bigr)
+ \;\triangleright\;
+ P_x .
+\tag{11.3}\label{eq:fun-app-beta}
+\]
+
+\begin{lemma}[The collapsing rule]
+\label{lem:collapse-rule}
+Write \(\varepsilon_{a,b}=([\,],h)\) for the trace-free path determined by an
+ambient equality \(h:a=b\); by proof irrelevance it does not depend on the
+choice of \(h\).  Then for every carrier \(A\), all \(a,b:A\), and \emph{every}
+\(p:\PathTy_A(a,b)\) there is a single primitive rewrite
+\[
+ \varepsilon_{a,b}\;\triangleright\;p .
+\tag{11.4}\label{eq:collapse-step}
+\]
+\end{lemma}
+
+\begin{proof}
+Instantiate~\eqref{eq:fun-app-beta} at the unit domain \(\alpha=\mathbf 1\),
+with \(f=\lambda\_.a\), \(g=\lambda\_.b\), \(P=\lambda\_.p\) and \(x=\star\).
+By~\eqref{eq:lamcongr-trace} the inner packaging has empty trace, and
+by~\eqref{eq:congrarg-trace} congruence maps the empty trace to the empty trace,
+so the left-hand side of~\eqref{eq:fun-app-beta} is literally
+\(([\,],\mathrm{ap}_{(\lambda h.h\star)}(\mathsf{funext}(\lambda\_.\pi_{=}p)))\).
+Its two fields are the empty list and an ambient proof of \(a=b\), so it is
+\(\varepsilon_{a,b}\).  The right-hand side is \(P_\star=p\).
+\end{proof}
+
+Lemma~\ref{lem:collapse-rule} is the whole story.  The trace-free path is a
+common one-step predecessor of every path with the same endpoints, so the
+rewrite relation cannot separate any two of them.
+
+\subsection{Totality, and unrestricted elimination}
+
+\begin{theorem}[\(\mathsf{RwEq}\) is total]
+\label{thm:rweq-total}
+For every carrier \(A\) and all \(a,b:A\), any two computational paths
+\(p,q:\PathTy_A(a,b)\) are related:
+\[
+ p\;\mathrel{\mathsf{RwEq}}\;q .
+\tag{11.5}\label{eq:rweq-total-thm}
+\]
+In particular \(\RwTot(A,a)\) holds for every pointed carrier.
+\end{theorem}
+
+\begin{proof}
+By Lemma~\ref{lem:collapse-rule} there are single rewrites
+\(\varepsilon_{a,b}\triangleright p\) and
+\(\varepsilon_{a,b}\triangleright q\).  Compose the inverse of the first with
+the second inside the equivalence closure.
+\end{proof}
+
+The derivation in Theorem~\ref{thm:rweq-total} is genuine: it has two stages and
+passes through a third path, \(\varepsilon_{a,b}\), which is in general distinct
+from both endpoints as a record.
+
+\begin{corollary}[Unconditional repair]
+\label{cor:unconditional-repair}
+For every carrier \(A\) and every \(a,b:A\):
+\begin{enumerate}[label=(\roman*),itemsep=1pt,topsep=3pt]
+\item \(\PRW_A(a,b)\) is a subsingleton, and
+  \(\PRW_A(a,b)\Eqv(a=b)\);
+\item \(\isContr\bigl(\PRW_A(a,a)\bigr)\);
+\item \(\LocalK(A,a)\) holds, and so does the global form;
+\item \(\PRW_A(a,-)\), based at \([\mathbf r_a]\), admits unrestricted based
+  elimination into every motive, with propositional beta.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+Theorem~\ref{thm:rweq-total} gives \(\SetTot\) for the defining setoid, so
+quotient soundness identifies all classes, which is~(i); the map to \(a=b\) is
+\(\pi_{=}\) and its inverse sends \(h\) to \([\varepsilon_{a,b}]\).  Items
+(ii)--(iv) are then Theorem~\ref{thm:raw-criterion} read from right to left.
+\end{proof}
+
+So the answer to the question that motivates this paper is affirmative, in the
+following precise sense.
+
+\begin{theorem}[Path induction for computational paths]
+\label{thm:quotient-path-induction}
+Let \(A\) be any type and \(a:A\).  For every motive
+\[
+        C:\prod_{b:A}\PRW_A(a,b)\longrightarrow\U
+\]
+---including motives that inspect the quotient class itself---and every
+\(d:C(a,[\mathbf r_a])\) there is
+\[
+ \mathcal J_{\PRW}(C,d):\prod_{b:A}\prod_{x:\PRW_A(a,b)}C(b,x),
+ \qquad
+ \mathcal J_{\PRW}(C,d,a,[\mathbf r_a])=d .
+\tag{11.6}\label{eq:prw-J}
+\]
+The Martin-L\"of (unbased) form and the associated transport operator follow.
+\end{theorem}
+
+\begin{proof}
+Given \(x:\PRW_A(a,b)\), the projection \(\pi_{=}x:a=b\) allows equality
+elimination to reduce to \(b=a\); Corollary~\ref{cor:unconditional-repair}(iii)
+then supplies \(x=[\mathbf r_a]\), along which \(d\) transports.
+\end{proof}
+
+\begin{remark}[The beta law is judgmental here]
+\label{rem:judgmental-beta}
+Everywhere else in this paper beta laws are propositional, and the
+classification is stated for that weaker notion.  For the eliminator of
+Theorem~\ref{thm:quotient-path-induction} the equation in~\eqref{eq:prw-J} in
+fact holds by reflexivity in the formalization.  The reason is specific and does
+not generalize: the transport is performed along an \emph{ambient equality
+proof}, and definitional proof irrelevance identifies that proof with
+reflexivity, after which the recursor reduces.  We flag this as a property of
+the construction rather than as a strengthening of the classification theorems.
+\end{remark}
+
+\subsection{What has been bought, and what has been paid}
+
+Corollary~\ref{cor:unconditional-repair} is the trade-off predicted by
+Theorem~\ref{thm:universal-repair}, instantiated at the artifact's own rewrite
+relation, and it is met in the extreme form: by~(i) the quotient retains the
+ambient equality and nothing else, so \(\PRW\) is equivalent to the indiscrete
+repair of Section~\ref{subsec:indiscrete}.  Two readings follow, and they should
+be kept apart.
+
+\begin{enumerate}[label=(\alph*)]
+\item \emph{Positive.}  Raw records fail unrestricted \(J\) on every pointed
+  carrier, but the rewrite quotient satisfies it on every carrier, with no
+  hypothesis and no additional axiom.  A user of \(\PRW\) may reason by path
+  induction---because \(\PRW\) is ambient equality.
+\item \emph{Cautionary.}  For the same reason \(\PRW\) carries no rewrite
+  information, and no invariant defined on it can be nonconstant.  Any
+  construction whose interest depends on separating two classes of \(\PRW\) is,
+  under the present rule set, vacuous.
+\end{enumerate}
+
+Section~\ref{sec:design} shows this is not a coincidence of these rules but a
+theorem about ordinary quotients.  The dichotomy with the raw record is sharp.
+
+\begin{theorem}[Raw versus quotient]
+\label{thm:raw-vs-quotient}
+For every pointed carrier \((A,a)\),
+\(\neg\isContr(\PathTy_A(a,a))\) and \(\isContr(\PRW_A(a,a))\).
+\end{theorem}
+
+\begin{proof}
+Proposition~\ref{prop:trace-fiber-computed} and
+Corollary~\ref{cor:unconditional-repair}(ii).
+\end{proof}
+
+\subsection{Sharpness: the groupoid fragment does not collapse}
+\label{subsec:sharpness}
+
+It matters whether the collapse is intrinsic to computational-path rewriting or
+an artifact of particular rules.  It is the latter, and the separating invariant
+is elementary.
+
+\begin{definition}[Groupoid fragment]
+\label{def:groupoid-fragment}
+Let \(\triangleright_{\mathrm{grp}}\) be the sub-relation of \(\triangleright\)
+generated by the path-algebra rules only:
+\(\mathsf{symm}\,\mathbf r\triangleright\mathbf r\),
+double symmetry, the two unit laws, the two inverse laws, contravariance of
+symmetry over composition, associativity, the two cancellation rules, and the
+three structural congruences for \(\mathsf{symm}\) and composition.  Write
+\(\mathrel{\mathsf{RwEq}}_{\mathrm{grp}}\) for its equivalence closure.
+\end{definition}
+
+\begin{proposition}[Parity is a groupoid invariant]
+\label{prop:parity-invariant}
+Let \(\ell(p)\) denote the length of the recorded trace of \(p\).  If
+\(p\mathrel{\mathsf{RwEq}}_{\mathrm{grp}}q\) then
+\(\ell(p)\equiv\ell(q)\pmod 2\).
+\end{proposition}
+
+\begin{proof}
+Composition concatenates traces and symmetry reverses them, so
+\(\ell(p\cdot q)=\ell(p)+\ell(q)\) and \(\ell(p^{-1})=\ell(p)\).  Each generator
+is then checked directly.  The unit, associativity and contravariance rules
+preserve \(\ell\) exactly.  The inverse laws send \(2\ell(p)\) to \(0\) and the
+cancellation rules send \(2\ell(p)+\ell(q)\) to \(\ell(q)\); both preserve
+parity.  The congruences preserve parity by induction.  Parity is then
+preserved by reflexivity, symmetry and transitivity of the closure.
+\end{proof}
+
+\begin{theorem}[The collapse is caused by the function-space rules]
+\label{thm:sharpness}
+The empty and singleton reflexive traces satisfy
+\[
+ \mathbf r_a
+ \mathrel{\mathsf{RwEq}}
+ \mathbf s_a,
+ \qquad\text{but}\qquad
+ \neg\bigl(\mathbf r_a
+   \mathrel{\mathsf{RwEq}}_{\mathrm{grp}}\mathbf s_a\bigr).
+\tag{11.7}\label{eq:sharpness}
+\]
+Hence \(\triangleright_{\mathrm{grp}}\) is not total, its quotient is not
+contractible, and it does not by itself repair unrestricted \(J\).
+\end{theorem}
+
+\begin{proof}
+The first is Theorem~\ref{thm:rweq-total}.  For the second,
+\(\ell(\mathbf r_a)=0\) and \(\ell(\mathbf s_a)=1\), so
+Proposition~\ref{prop:parity-invariant} forbids a groupoid derivation.  The
+remaining assertions follow from Theorem~\ref{thm:quotient-contractible} applied
+to the setoid generated by \(\triangleright_{\mathrm{grp}}\), whose totality has
+just been refuted.
+\end{proof}
+
+Theorem~\ref{thm:sharpness} also shows that the criterion of
+Section~\ref{sec:projection-kernel} is doing work in both directions.  Writing
+\(\PathTy_A(a,a)/\mathord{\mathsf{RwEq}}_{\mathrm{grp}}\) for the fragment's loop
+quotient,
+\[
+ \neg\isContr\bigl(\PathTy_A(a,a)/\mathord{\mathsf{RwEq}}_{\mathrm{grp}}\bigr)
+ \qquad\text{and}\qquad
+ \isContr\bigl(\PRW_A(a,a)\bigr)
+\tag{11.8}\label{eq:fragment-vs-full}
+\]
+for every pointed carrier.  Two rewrite systems over the same carrier, differing
+only in the function-space rules, land on opposite sides of the classification.
+
+Theorem~\ref{thm:sharpness} thus localises the phenomenon.  The classical
+LND\(_{\mathrm{EQ}}\)-TRS coherences---the ones making paths a groupoid up to
+rewriting---are compatible with a nontrivial rewrite quotient; what collapses it
+is the combination of the function-space rules \eqref{eq:fun-app-beta} with the
+trace-erasing convention \eqref{eq:lamcongr-trace}.
+Section~\ref{sec:design} turns this observation into a constraint any
+replacement rule set must satisfy.
+
+\begin{remark}[Scope of the collapse theorem]
+\label{rem:collapse-scope}
+Theorem~\ref{thm:rweq-total} is a statement about the rule set formalized in the
+accompanying artifact, and about the specific trace semantics of the operations
+appearing in~\eqref{eq:lamcongr-trace}.  It is not a claim about
+computational-path calculi in general, and in particular it does not apply to
+presentations in which equality reasons are terms of a scoped syntax rather than
+lists of elementary steps; the companion article
+\cite{ScopedTraceCalculus2026} treats one such presentation.
+\end{remark}
+
+\section{A design constraint on any replacement rule set}
+\label{sec:design}
+
+Theorem~\ref{thm:rweq-total} is a fact about one rule set.  What must a
+\emph{replacement} satisfy to keep the quotient informative?  There is a single
+answer, and both the collapse and its sharpness counterpart are instances of it.
+
+Make ``keeping information'' precise.  An \emph{invariant} of a relation \(S\)
+on \(X\) is a map \(I:X\to V\) with \(S(x,y)\to I(x)=I(y)\); it is
+\emph{nonconstant} when \(I(x)\ne I(y)\) for some \(x,y\).  Invariants of \(S\)
+are exactly the functions descending to \(X/S\), so a nonconstant invariant is
+precisely a nonconstant function on the quotient.
+
+\begin{theorem}[Totality versus information]
+\label{thm:design}
+For every setoid \(S\) on \(X\),
+\[
+ \SetTot(S)
+ \quad\Longleftrightarrow\quad
+ \text{every invariant of \(S\) is constant.}
+\tag{12.1}\label{eq:design}
+\]
+\end{theorem}
+
+\begin{proof}
+Left to right is immediate.  For the converse, apply the hypothesis to the
+canonical invariant \(\eta_S:X\to X/S\), which is an invariant by quotient
+soundness; constancy gives \(\eta_S(x)=\eta_S(y)\), and quotient exactness
+returns \(S(x,y)\).
+\end{proof}
+
+Theorem~\ref{thm:design} is elementary, but placing it beside
+Theorem~\ref{thm:quotient-contractible} is the point: for an inhabited carrier,
+\[
+ \isContr(X/S)\iff\SetTot(S)\iff\text{no information survives.}
+\tag{12.2}\label{eq:opposition}
+\]
+The two design goals are therefore not merely difficult to reconcile but
+strictly opposed.  A rewrite quotient supports unrestricted based elimination
+exactly to the extent that it has stopped distinguishing anything.  This is the
+general form of the trade-off that Section~\ref{sec:collapse} exhibited
+concretely.
+
+The contrapositive is what one checks a proposal against.
+
+\begin{corollary}[Certificate of nontriviality]
+\label{cor:design-certificate}
+Exhibiting one invariant that separates two paths proves that the generated
+relation is not total, hence that the quotient is not contractible and does not
+support unrestricted based elimination.
+\end{corollary}
+
+Section~\ref{subsec:sharpness} is exactly such a certificate: trace-length
+parity is an invariant of the groupoid fragment separating \(\mathbf r_a\) from
+\(\mathbf s_a\), so that fragment is not total.  Presenting the sharpness result
+this way shows it is an instance of Theorem~\ref{thm:design} rather than an
+unrelated argument.
+
+In the failing direction the mechanism is equally simple, and equally general.
+
+\begin{proposition}[Universal predecessors are fatal]
+\label{prop:universal-predecessor}
+If some \(e:X\) satisfies \(S(e,x)\) for every \(x\), then \(S\) is total.
+Consequently a rule set that keeps any information at a fiber admits no such
+\(e\) there.
+\end{proposition}
+
+\begin{proof}
+Compose the inverse of \(S(e,x)\) with \(S(e,y)\).  The second statement is the
+contrapositive, via Corollary~\ref{cor:design-certificate}.
+\end{proof}
+
+Lemma~\ref{lem:collapse-rule} says precisely that \(\varepsilon_{a,b}\) is a
+universal predecessor, so the collapse is this proposition applied to the trace-free
+path.  Nothing about traces, lists, or path algebra is involved; any rule making
+one object a one-step predecessor of an entire fiber has the same effect.
+
+We can therefore state the constraint a redesign must meet.
+
+\begin{corollary}[What a redesign must do]
+\label{cor:redesign}
+Let \(\triangleright'\) be any replacement for the primitive rules and let
+\(\approx'\) be its equivalence closure.  If the loop quotient
+\(\PathTy_A(a,a)/{\approx'}\) is to be nontrivial, then:
+\begin{enumerate}[label=(\roman*),itemsep=1pt,topsep=3pt]
+\item \(\approx'\) must admit a nonconstant invariant on \(\PathTy_A(a,a)\);
+\item no path may be a \(\triangleright'\)-predecessor of the whole fiber; and
+\item consequently \(\PathTy_A(a,a)/{\approx'}\) does \emph{not} support
+  unrestricted based elimination, by Theorem~\ref{thm:pathrw-k}.
+\end{enumerate}
+\end{corollary}
+
+Item (iii) is not a defect of the redesign; it is the price named by
+\eqref{eq:opposition}, and it is unavoidable at the level of ordinary setoid
+quotients.  An implementation must choose which of the two properties it wants.
+
+Applied to the present rules, the diagnosis is concrete.  The two candidates for
+repair are the trace-erasing clause~\eqref{eq:lamcongr-trace} and the
+application rule~\eqref{eq:fun-app-beta}.  Giving \(\mathsf{lamCongr}\) a trace,
+or restricting~\eqref{eq:fun-app-beta} so that its left-hand side is not
+trace-free, removes the universal predecessor;
+Proposition~\ref{prop:universal-predecessor} says that is necessary, and
+Corollary~\ref{cor:design-certificate} says a proposed replacement is validated
+by exhibiting an invariant, exactly as parity validates the groupoid fragment.
+We do not carry out the redesign here, but Theorem~\ref{thm:raw-criterion} and
+Theorem~\ref{thm:design} between them reduce checking one to two finite tasks:
+verify no universal predecessor, and exhibit a separating invariant.
+
+\begin{remark}[Scope]
+\label{rem:design-scope}
+Theorem~\ref{thm:design} concerns ordinary setoid quotients, as does
+Theorem~\ref{thm:quotient-contractible}.  A construction that is not an exact
+quotient---a higher quotient, a truncation, or a proof-relevant identity
+type---is outside its scope, and is the natural place to look for a target
+retaining information while supporting a stronger eliminator.
+\end{remark}
 
 \section{Genuine and synthetic circle and torus quotients}
 \label{sec:genuine-synthetic}
@@ -1955,61 +1973,35 @@ and torus definitions, incompatible contractibility properties.
 
 \subsection{A pointed-subsingleton calculation}
 
+For carriers that are pointed subsingletons there is a second, independent route
+to contractibility of the loop quotient, and it is worth recording because it
+survives changes to the rule set that Theorem~\ref{thm:rweq-total} does not.
+
 \begin{proposition}[Loop quotient of a pointed subsingleton]
 \label{prop:subsingleton-loop-quotient}
-Let \(a:A\) and suppose
-\[
-                         \prod_{x:A}(x=a).
-\tag{10.1}\label{eq:all-points-base}
-\]
-Then every raw loop \(p:\PathTy_A(a,a)\) is
-\(\mathsf{RwEq}\)-equivalent to \(\mathbf r_a\), and
-\[
-                         \isContr(\PRW_A(a,a)).
-\tag{10.2}\label{eq:subsingleton-loop-contractible}
-\]
+If \(\prod_{x:A}(x=a)\), then every raw loop \(p:\PathTy_A(a,a)\) is
+\(\mathsf{RwEq}\)-equivalent to \(\mathbf r_a\), and hence
+\(\isContr(\PRW_A(a,a))\).
 \end{proposition}
 
 \begin{proof}
-Write the stored trace of \(p\) as a list of elementary steps.  By
-\eqref{eq:all-points-base}, each stored source and target is \(a\).  Proof
-irrelevance identifies the step's equality field with \(\refl_a\).  Induct on
-the list.  The empty list is \(\mathbf r_a\).  In the successor case, split off
-the leading singleton `stepChain`, rewrite that singleton to reflexivity by the
-primitive transport-reflexivity beta rule, remove the resulting left unit, and
-apply the induction hypothesis.  This constructs an explicit composite
-\(\mathsf{RwEq}\) witness.
-
-For a quotient class \([p]\), quotient soundness gives
-\([p]=[\mathbf r_a]\).  Reversing the equation contracts the quotient at
-\([\mathbf r_a]\).
+Every stored source and target is \(a\), and proof irrelevance identifies each
+step's equality field with \(\refl_a\).  Induct on the stored list: the empty
+list is \(\mathbf r_a\), and otherwise split off the leading singleton, rewrite
+it to reflexivity by the transport-reflexivity beta rule, remove the resulting
+left unit, and apply the induction hypothesis.  This builds an explicit
+composite \(\mathsf{RwEq}\) witness---a rewrite certificate, not an
+equality-of-normalizations argument.  Contractibility follows by soundness, or
+directly from Theorem~\ref{thm:raw-criterion}, since the first conclusion is
+already \(\RwTot(A,a)\).
 \end{proof}
 
-The proof is stronger than an equality-of-normalizations argument: it builds
-the rewrite certificate needed by the defining quotient relation.
-
-\begin{remark}[Relation to the collapse theorem]
-\label{rem:subsingleton-vs-collapse}
-Theorem~\ref{thm:rweq-total} subsumes
-Proposition~\ref{prop:subsingleton-loop-quotient}, since it drops the hypothesis
-\eqref{eq:all-points-base} entirely.  We retain the proposition because its
-derivation is independent and informative: it uses only the
-transport-reflexivity erasure and the unit rule, so it survives the removal of
-the function-space rules discussed in Section~\ref{subsec:sharpness}, whereas
-Theorem~\ref{thm:rweq-total} does not.  For carriers that are pointed
-subsingletons, the loop quotient is therefore contractible for two independent
-reasons.
-\end{remark}
-
-\begin{remark}[The proposition verifies the raw criterion]
-\label{rem:subsingleton-verifies-raw}
-The first conclusion of Proposition~\ref{prop:subsingleton-loop-quotient} is
-already \(\RwTot(A,a)\): composing the derivation for \(p\) with the reverse of
-the derivation for \(q\) relates any two loops.  Theorem~\ref{thm:raw-criterion}
-then yields~\eqref{eq:subsingleton-loop-contractible} without a separate
-quotient argument.  This is the intended use of the raw criterion---one exhibits
-rewrite derivations, not quotient classes.
-\end{remark}
+Theorem~\ref{thm:rweq-total} subsumes this, dropping the hypothesis entirely.
+The proposition is retained because it uses only the transport-reflexivity
+erasure and the unit rule: it survives the removal of the function-space rules
+contemplated in Section~\ref{sec:design}, whereas the collapse theorem does not.
+For pointed subsingletons the loop quotient is thus contractible for two
+independent reasons.
 
 \subsection{The current genuine circle and torus}
 
@@ -2020,7 +2012,7 @@ The artifact currently defines
   \mathsf{Circle}&:=\mathsf{CircleCompPath},\\
   \mathsf{Torus}&:=\mathsf{Circle}\times\mathsf{Circle}.
  \end{aligned}
-\tag{10.3}\label{eq:current-circle-torus}
+\tag{13.1}\label{eq:current-circle-torus}
 \]
 There is no higher-inductive loop constructor in the carrier
 \(\mathsf{CircleCompPath}\).  Its separately declared loop-expression syntax
@@ -2043,7 +2035,7 @@ Under the current definitions,
     \PRW_{\mathsf{Torus}}(\mathsf{base},\mathsf{base})
   \bigr).
  \end{aligned}
-\tag{10.4}\label{eq:genuine-contractible}
+\tag{13.2}\label{eq:genuine-contractible}
 \]
 Both genuine loop quotients satisfy local quotient-level axiom K and hence the
 unrestricted elimination criterion of Theorem~\ref{thm:pathrw-k}.
@@ -2051,57 +2043,30 @@ unrestricted elimination criterion of Theorem~\ref{thm:pathrw-k}.
 
 The displayed notation abbreviates the loop fibers
 \(\PRW\,\mathsf{Circle}\,\mathsf{base}\,\mathsf{base}\) and similarly for the
-torus.  It does not assert that the raw `Path` type is a subsingleton: raw step
+torus.  It does not assert that the raw record type is a subsingleton: raw step
 lists remain observable before quotienting.
 
 \subsection{The synthetic winding presentations}
 
-Independently, the file `CircleCompPath.lean` defines an indexed syntax
-\[
-\begin{aligned}
- e ::= {}&\mathsf{loop}
- \mid \mathsf{refl}
- \mid \mathsf{symm}(e)
- \mid \mathsf{trans}(e,e')
-\end{aligned}
-\tag{10.5}\label{eq:circle-expression}
-\]
-and an encoding \(w(e):\mathbb Z\) with the expected clauses
-\[
-\begin{aligned}
- w(\mathsf{loop})&=1,&
- w(\mathsf{refl})&=0,\\
- w(\mathsf{symm}(e))&=-w(e),&
- w(\mathsf{trans}(e,e'))&=w(e)+w(e').
-\end{aligned}
-\tag{10.6}\label{eq:winding-clauses}
-\]
-It then forms the setoid quotient
+Independently, the development defines an indexed syntax of loop expressions
+\(e::=\mathsf{loop}\mid\mathsf{refl}\mid\mathsf{symm}(e)\mid
+\mathsf{trans}(e,e')\) with the expected integer winding encoding \(w(e)\)
+(\(w(\mathsf{loop})=1\), \(w(\mathsf{refl})=0\), \(w\) anti-preserving symmetry
+and additive on composition), and forms the setoid quotient
 \[
  \mathsf{CircleWind}
- =
- \mathsf{Expr}/(e\sim e'\Longleftrightarrow w(e)=w(e')).
-\tag{10.7}\label{eq:circle-wind}
+ =\mathsf{Expr}/(e\sim e'\Longleftrightarrow w(e)=w(e'))
+ \ \Eqv\ \mathbb Z,
+\tag{13.3}\label{eq:circle-wind-int}
 \]
-Encode/decode proves
-\[
-                  \mathsf{CircleWind}\Eqv\mathbb Z.
-\tag{10.8}\label{eq:circle-wind-int}
-\]
-The legacy public alias `circlePiOne` denotes this synthetic quotient.
-
-The synthetic torus presentation is the product
-\[
-             \mathsf{TorusWind}
-             =
-             \mathsf{CircleWind}\times\mathsf{CircleWind}
-             \Eqv\mathbb Z\times\mathbb Z.
-\tag{10.9}\label{eq:torus-wind}
-\]
-Its legacy alias is `torusPiOne`.  These encode/decode theorems are valid and
-useful algebraic presentations.  The correction is solely that they are not
-the genuine \(\PRW\) loop fibers of the carriers in
-\eqref{eq:current-circle-torus}.
+the equivalence by encode/decode.  The synthetic torus presentation is the
+product
+\(\mathsf{TorusWind}=\mathsf{CircleWind}\times\mathsf{CircleWind}
+\Eqv\mathbb Z\times\mathbb Z\).
+Legacy names in the development denote both by \(\pi_1\).  These encode/decode
+theorems are valid and useful algebraic presentations; the correction is solely
+that they are not the genuine \(\PRW\) loop fibers of the carriers
+in~\eqref{eq:current-circle-torus}.
 
 \begin{proposition}[Synthetic noncontractibility]
 \label{prop:synthetic-noncontractible}
@@ -2109,18 +2074,16 @@ Both \(\mathsf{CircleWind}\) and \(\mathsf{TorusWind}\) are noncontractible.
 \end{proposition}
 
 \begin{proof}
-Contractibility is invariant under equivalence.  The integers contain the
-distinct points \(0\) and \(1\); integer pairs contain \((0,0)\) and \((1,0)\).
-Thus neither target in~\eqref{eq:circle-wind-int} or~\eqref{eq:torus-wind} is
-contractible, and neither source can be contractible.
+Contractibility is invariant under equivalence, and \(\mathbb Z\) contains
+\(0\ne1\) while \(\mathbb Z^2\) contains \((0,0)\ne(1,0)\).
 \end{proof}
 
 \subsection{No equivalence bridge}
 
 \begin{theorem}[Circle and torus no-bridge results]
 \label{thm:no-bridges}
-There is no `SimpleEquiv` between the current genuine circle loop quotient and
-\(\mathsf{CircleWind}\), and no `SimpleEquiv` between the current genuine torus
+There is no equivalence between the current genuine circle loop quotient and
+\(\mathsf{CircleWind}\), and none between the current genuine torus
 loop quotient and \(\mathsf{TorusWind}\):
 \[
 \begin{aligned}
@@ -2133,7 +2096,7 @@ loop quotient and \(\mathsf{TorusWind}\):
    \Eqv\mathsf{TorusWind}
  \bigr).
 \end{aligned}
-\tag{10.10}\label{eq:no-bridges}
+\tag{13.4}\label{eq:no-bridges}
 \]
 \end{theorem}
 
@@ -2146,7 +2109,7 @@ equivalence yields a contradiction.
 
 This settles the formerly suggested bridge under the current signatures: it is
 not merely unformalized, but impossible.  The exact formal statement excludes
-invertible `SimpleEquiv` bridges.  It does not claim that no function whatsoever
+invertible bridges.  It does not claim that no function whatsoever
 can be written between the types.
 
 Theorem~\ref{thm:rweq-total} strengthens the conclusion considerably.  The
@@ -2159,7 +2122,7 @@ Let \(X\) be any type, \(x:X\), and let \(Y\) be any noncontractible type.  Then
 there is no equivalence
 \[
  \PRW_X(x,x)\Eqv Y .
-\tag{10.11}\label{eq:universal-no-bridge}
+\tag{13.5}\label{eq:universal-no-bridge}
 \]
 In particular \(\PRW_X(x,x)\not\Eqv\mathbb Z\) and
 \(\PRW_X(x,x)\not\Eqv\mathbb Z^2\) for every pointed carrier.
@@ -2176,8 +2139,8 @@ higher-inductive carrier would make the genuine loop quotient agree with the
 synthetic winding presentation.  Under the present rewrite rules that is
 impossible for \emph{any} carrier: the genuine loop quotient is contractible
 before the carrier is even chosen.  A nontrivial genuine loop quotient therefore
-requires changing the rewrite system---for instance along the lines suggested at
-the end of Section~\ref{subsec:sharpness}---and not only the point space.
+requires changing the rewrite system---subject to the constraint of
+Corollary~\ref{cor:redesign}---and not only the point space.
 
 \subsection{Which earlier statements are corrected}
 \label{subsec:corrections}
@@ -2188,11 +2151,11 @@ naming and interpretation in the artifact and its documentation; no previously
 proved theorem is retracted.
 
 \begin{enumerate}[label=(C\arabic*),leftmargin=3.1em]
-\item \emph{The aliases `circlePiOne` and `torusPiOne`.}  These names, and
+\item \emph{The \(\pi_1\) aliases.}  Two names in the development, and
   accompanying documentation, presented the winding-expression quotients
-  \eqref{eq:circle-wind} and \eqref{eq:torus-wind} as fundamental groups of the
+  \eqref{eq:circle-wind-int} as fundamental groups of the
   circle and the torus computed by the computational-path machinery.  The
-  encode/decode theorems \eqref{eq:circle-wind-int} and~\eqref{eq:torus-wind}
+  encode/decode theorems behind~\eqref{eq:circle-wind-int}
   are correct, but they are theorems about a separately introduced syntax of
   loop expressions.  They are not statements about \(\PRW\), and by
   Theorem~\ref{thm:no-bridges} they cannot be transported to it.  The objects
@@ -2231,19 +2194,19 @@ proved theorem is retracted.
 Object & Defining quotient & Current result\\
 \midrule
 Genuine circle loop fiber
- & raw `Path` loops modulo `RwEq`
+ & raw loops modulo \(\mathsf{RwEq}\)
  & Contractible; local K holds.\\
 Synthetic circle winding quotient
  & expressions modulo equal integer encoding
  & Equivalent to \(\mathbb Z\); noncontractible.\\
 Genuine torus loop fiber
- & raw product-carrier loops modulo `RwEq`
+ & raw product-carrier loops modulo \(\mathsf{RwEq}\)
  & Contractible; local K holds.\\
 Synthetic torus winding quotient
  & product of two synthetic circle quotients
  & Equivalent to \(\mathbb Z^2\); noncontractible.\\
 Genuine loop fiber of any pointed carrier
- & raw loops modulo `RwEq`
+ & raw loops modulo \(\mathsf{RwEq}\)
  & Contractible (Thm.~\ref{thm:rweq-total}); no equivalence to a
    noncontractible type.\\
 \bottomrule
@@ -2254,203 +2217,97 @@ generalises the first and third to every carrier.}
 \label{tab:genuine-synthetic}
 \end{table}
 
-\section{Beyond lists: a classification guide}
-\label{sec:examples}
-
-The criterion applies to any observable decoration.  The following examples
-are not encodings of one another; they illustrate which property matters.
-
-\begin{table}[t]
-\centering
-\small
-\renewcommand{\arraystretch}{1.22}
-\begin{tabular}{>{\raggedright\arraybackslash}p{0.20\textwidth}
-                >{\raggedright\arraybackslash}p{0.36\textwidth}
-                >{\raggedright\arraybackslash}p{0.34\textwidth}}
-\toprule
-Metadata & Reflexivity fiber & Unrestricted \(J^\beta\)\\
-\midrule
-Hidden token
- & A singleton or inhabited subsingleton
- & Yes: the fiber is contractible.\\
-Derivation history
- & Empty history and a visible reflexive inference
- & No, unless histories are hidden or collapsed.\\
-Cost
- & Distinct costs \(0\) and \(1\) for reflexive computations
- & No; uniqueness of a minimum is irrelevant.\\
-Certificate
- & An inhabited proof-irrelevant proposition
- & Yes in the present metatheory.\\
-Certificate as data
- & Two distinguishable certificate objects
- & No, even if both certify the same fact.\\
-Normalization log
- & Empty log and a nonempty administrative loop
- & No; unique normal forms do not imply unique logs.\\
-Proof label
- & Exactly one reflexivity label
- & Yes; two visible reflexivity labels make it fail.\\
-\bottomrule
-\end{tabular}
-\caption{The reflexivity fiber, rather than the informal purpose of metadata,
-determines unrestricted based elimination.}
-\label{tab:examples}
-\end{table}
-
-The five rows of Table~\ref{tab:examples} are worth a sentence each; in every
-case the verdict is read off the reflexivity fiber and nothing else.
-
-\emph{Derivation histories.}  If \(H(a,\refl_a)\) contains both an empty
-derivation and an explicit reflexivity-rule derivation, and they are distinct,
-then \(\sum_hH(b,h)\) fails unrestricted \(J^\beta\).  Confluence does not help
-while histories remain visible as syntax; a calculus with a ``do nothing''
-derivation and a derivation that inserts and then removes a coercion is the
-typical case.  Passing to conversion classes is a separate construction, and by
-Theorem~\ref{thm:universal-repair} it succeeds exactly when conversion relates
-all reflexive derivations.
-
-\emph{Costs.}  For \(M(b,h)=\mathbb N\) with base cost \(0\), the fiber is
-noncontractible because \(0\ne1\).  This is unaffected by additivity of costs
-under composition, by decidability of comparison, or by \(0\) being the unique
-optimum: optimization supplies an order and a preferred element, not an equality
-between all costs.  Exposing instead the \emph{proposition} that the stored cost
-is optimal restores elimination, since an inhabited proposition is contractible
-here.
-
-\emph{Certificates.}  The word hides a representation choice.  An inhabited
-proof-irrelevant certificate fiber is contractible, so elimination holds
-(Corollary~\ref{cor:contractible-decoration}); certificates carried as records
-with serial numbers, proof trees or signatures may certify the same equality
-while remaining distinguishable, and then it fails
-(Corollary~\ref{cor:visible-alternatives}).
-
-\emph{Normalization logs.}  Unique normal forms do not imply unique logs.  An
-empty reflexive log and a log containing a reversible administrative step
-already refute contractibility.  Three properties must be kept apart: uniqueness
-of normal forms, connectedness of logs under log rewrites, and equality of all
-observable reflexive logs.  Only the third is the metadata-fiber condition; the
-second implies it only after quotienting.
-
-\emph{Proof labels.}  Arbitrarily elaborate indexing away from the chosen
-presentation is harmless, because the total-space equivalence transports
-everything into the reflexivity fiber; a single label, or an inhabited
-subsingleton of labels, costs nothing, while two visible reflexivity labels
-obstruct elimination.  A presentation may therefore assign very different label
-sets to different \((b,h)\) and still satisfy the criterion:
-Theorem~\ref{thm:total-fiber}, not a pointwise cardinality count, is the correct
-test.
-
-\section{Conceptual consequences and boundaries}
+\section{Consequences and boundaries}
 \label{sec:comparison}
 
 \subsection{Where each stage does its work}
 
-The classification is a chain of equivalences, and its value lies in keeping the
-stages apart.  The first is the identity-systems step of
-Remark~\ref{rem:standard-stage}, which is not specific to metadata; the second
-is the coordinate calculation of Theorem~\ref{thm:total-fiber}:
+The classification is a chain of equivalences and its value lies in keeping the
+stages apart:
 \[
  \Jbeta_{R_M}
  \Longleftrightarrow
    \isContr\!\left(\sum_b\sum_hM(b,h)\right)
  \Longleftrightarrow
    \isContr\bigl(M(a,\refl_a)\bigr).
-\tag{12.1}\label{eq:new-chain}
+\tag{14.1}\label{eq:new-chain}
 \]
-Conflating them would suggest that every decoration of equality inherits path
-induction, which is false.  The repair theorem adds a relation-theoretic stage,
-in which the second equivalence is quotient exactness and is what turns
-``collapse enough metadata'' into the exact requirement ``relate every pair at
-reflexivity'':
+The first equivalence is the identity-systems step of
+Remark~\ref{rem:standard-stage} and is not specific to metadata; the second is
+the coordinate calculation of Theorem~\ref{thm:total-fiber}.  Conflating them
+would suggest that every decoration of equality inherits path induction, which is
+false.  Quotienting adds a relation-theoretic stage whose second equivalence is
+quotient exactness, turning ``collapse enough metadata'' into the exact
+requirement ``relate every pair at reflexivity'':
 \[
  \Jbeta_{\overline R_S}
  \Longleftrightarrow
  \isContr\bigl(M(a,\refl_a)/S_{a,\refl_a}\bigr)
  \Longleftrightarrow
  \SetTot(S_{a,\refl_a}).
-\tag{12.2}\label{eq:repair-chain}
+\tag{14.2}\label{eq:repair-chain}
 \]
-For a generic projection \(q:R\to{=}\) the summary is
+For a generic projection the summary is
 \(\Jbeta_R\Longleftrightarrow\isContr(\Ker(q))\); for \(\PRW\) the kernel is the
-genuine loop quotient, so the condition becomes local quotient-level axiom K and
-then \(\RwTot\), which Section~\ref{sec:collapse} verifies outright.  It is
-precisely this discipline---raw data, quotient classes and ambient equality kept
-distinct---that makes the last step informative rather than circular: what it
-establishes is the left-hand side, by an argument entirely about primitive
-rewrite rules.
+loop quotient, so the condition becomes local axiom K and then \(\RwTot\), which
+Section~\ref{sec:collapse} verifies outright.  Keeping raw data, quotient
+classes and ambient equality distinct is what makes that last step informative
+rather than circular: what it establishes is the left-hand side, by an argument
+entirely about primitive rewrite rules.
 
 \subsection{What the theorems do not say}
 
 \begin{enumerate}[label=(\roman*)]
-\item They do not refute ordinary equality elimination.  The projection
+\item They do not refute ordinary equality elimination: the projection
   \(\proj\) still supports Theorem~\ref{thm:motive-factorization}.
 \item They do not say metadata cannot be composed, inverted, normalized, or
-  rewritten.  Those operations are orthogonal to raw fiber contractibility.
-\item They do not establish a judgmental beta classification.  Every beta law in
-  the classification theorems is propositional; the eliminator of
-  Theorem~\ref{thm:quotient-path-induction} happens to satisfy a judgmental one,
-  for the specific reason given in Remark~\ref{rem:judgmental-beta}.
-\item They do not identify trace-carrying \(\PathTy\) with an intensional or
-  homotopical identity type.
-\item They do not model full MLTT or HoTT, and prove nothing about
+  rewritten; those operations are orthogonal to fiber contractibility.
+\item Every beta law in the classification theorems is propositional.  The
+  eliminator of Theorem~\ref{thm:quotient-path-induction} happens to satisfy a
+  judgmental one, for the reason given in Remark~\ref{rem:judgmental-beta}; no
+  judgmental classification is claimed.
+\item They do not identify the trace-carrying record with an intensional or
+  homotopical identity type, model full MLTT or HoTT, or prove anything about
   univalence or higher inductive types.
-\item They do not show that every individual metadata-sensitive motive lacks a
-  section.  What is ruled out for raw records is one unrestricted based
-  eliminator for all motives.
-\item The universal quotient theorem classifies exact ordinary setoid
-  quotients.  It does not claim the same converse for higher quotients or
+\item For raw records what is ruled out is one unrestricted based eliminator for
+  all motives, not a section for each individual metadata-sensitive motive.
+\item Theorems~\ref{thm:universal-repair} and~\ref{thm:design} classify exact
+  ordinary setoid quotients; no converse is claimed for higher quotients or for
   quotient-like interfaces without exactness.
 \item Theorem~\ref{thm:rweq-total} is a theorem about the primitive rule set
-  formalized here, not about computational-path calculi in general; see
-  Remark~\ref{rem:collapse-scope}.  It is not evidence that
-  \(\PRW\) is a good identity-like object---by
-  Corollary~\ref{cor:unconditional-repair}(i) it is a reformulation of ambient
-  equality---but that a set-level rewrite quotient which supports unrestricted
-  \(J\) must be so degenerate is precisely the content of
-  Theorem~\ref{thm:universal-repair}.
-\item The no-bridge theorems concern `SimpleEquiv` bridges.  They do not claim
-  that no function whatsoever can be written between the types.
+  formalized here, not about computational-path calculi in general
+  (Remark~\ref{rem:collapse-scope}).  It is not evidence that \(\PRW\) is a good
+  identity-like object---by Corollary~\ref{cor:unconditional-repair}(i) it is a
+  reformulation of ambient equality---but Theorem~\ref{thm:design} shows that
+  any set-level rewrite quotient supporting unrestricted \(J\) must be equally
+  degenerate.
+\item The no-bridge theorems concern invertible bridges; they do not claim that
+  no function whatsoever can be written between the types.
 \end{enumerate}
 
-\subsection{Relation to proof relevance}
+\subsection{Relation to proof relevance and to computational paths}
 
-Ambient equality in the present metatheory is proof-irrelevant.  The
-proof-relevance in \(\PathTy\) comes from the \(\U\)-valued metadata field, not
-from multiple inhabitants of the ambient equality proposition.  This
-two-level distinction is essential:
-\[
-       (L,h)\ne(L',h)
-       \quad\text{can hold because }L\ne L',
-\]
-even though any two witnesses \(h,k:a=b\) are equal.
-
-In intensional homotopy type theory, identity itself may have higher
-structure, and contractibility is formulated internally
-\cite{HoTTBook2013}.  The total identity-space contraction remains a central
-idea there.  Our theorem is deliberately about an external refinement of
-proof-irrelevant equality.  It neither replaces the HoTT identity type nor
-transfers the higher-groupoid interpretation to a trace record.
-
-\subsection{Relation to computational paths}
+Ambient equality here is proof-irrelevant, and the proof-relevance of the record
+comes from its \(\U\)-valued metadata field rather than from multiple
+inhabitants of an equality proposition: \((L,h)\ne(L',h)\) can hold because
+\(L\ne L'\), even though any two witnesses \(h,k:a=b\) are equal.  In
+intensional homotopy type theory identity itself may have higher structure and
+contractibility is formulated internally \cite{HoTTBook2013}; our results
+concern an external refinement of a proof-irrelevant equality and neither
+replace the HoTT identity type nor transfer its higher-groupoid interpretation
+to a trace record.
 
 Computational-path work treats equality reasons and their rewrites as
 first-class syntax
 \cite{deQueirozEtAl2016,RamosEtAl2017,RamosEtAl2018,deVerasEtAl2025,
-RamosEtAl2026}.  The present result isolates one design boundary for an
-implementation in which a \(\PathTy\) record contains both ambient equality
-and visible steps.  Groupoid laws up to \(\mathsf{RwEq}\) organize the step
-calculus; they do not automatically provide unrestricted dependent elimination
-over raw records.  If one instead defines an identity type by a suitable
-quotient or higher construction, the criterion must be applied to that new
-fiber rather than to the raw list.  For ordinary setoid quotients,
-Theorem~\ref{thm:universal-repair} performs that second check exactly.  For the
-repository's `RwEq` quotient, Theorem~\ref{thm:pathrw-k} reduces the check to
-local K, and Theorem~\ref{thm:rweq-total} discharges it.  The reading we
-recommend is the conjunction of the two halves: computational paths are a
-legitimate presentation of equality \emph{reasons}, and their rewrite quotient
-is a legitimate identity-like object, but under the present rule set these are
-different jobs done by different objects, and no single object does both.
+RamosEtAl2026}.  Groupoid laws up to \(\mathsf{RwEq}\) organize that step
+calculus; they do not by themselves provide unrestricted dependent elimination
+over raw records, and Theorem~\ref{thm:sharpness} shows they are also not what
+destroys it.  The reading we recommend is the conjunction of the two halves:
+computational paths are a legitimate presentation of equality \emph{reasons},
+and their rewrite quotient is a legitimate identity-like object, but under the
+present rule set these are different jobs done by different objects, and no
+single object does both.
 
 \section{Related work}
 \label{sec:related}
@@ -2510,12 +2367,113 @@ formalization and does not transfer to such presentations.  Nothing here is a
 historical-priority claim about path induction; the results classify a specific
 equality-plus-metadata interface and then decide the classification for one
 implementation of it.
+\section{Formal verification}
+\label{sec:verification}
 
-\section{Formal verification and companion artifact}
+Every mathematical statement above is machine-checked in Lean~4
+\cite{deMouraUllrich2021,MetadataJSoftware2026,QuotientPathInductionSoftware2026}.
+The development introduces no custom axioms and contains no incomplete proofs.
+Lean's axiom report was checked for every displayed theorem: the quotient-based
+results depend only on propositional extensionality and quotient soundness, the
+projection/kernel criterion and the two purely relational statements of
+Section~\ref{sec:design} depend on no axiom at all, and the computed-fiber
+results depend only on propositional extensionality.  \emph{Classical.choice} is
+not used anywhere, so the classification is constructive relative to those two
+principles.
+
+The theorem-by-theorem correspondence with the source modules is deferred to
+Appendix~\ref{sec:formalization}, so that no formalization detail interrupts the
+mathematics.  The raw de Bruijn calculus developed alongside this work is a
+separate, self-contained article \cite{ScopedTraceCalculus2026}.
+
+\section{Conclusion}
+\label{sec:conclusion}
+
+For equality decorated by observable metadata,
+\[
+                 R_M(a,b)=\sum_{h:a=b}M(b,h),
+\]
+unrestricted based elimination with propositional beta is controlled by one
+object: \(M(a,\refl_a)\).  The proof separates a standard universal-property
+step from a metadata-specific equivalence:
+\[
+ \Jbeta_{R_M}
+ \Longleftrightarrow
+ \isContr\!\left(\sum_bR_M(a,b)\right)
+ \Longleftrightarrow
+ \isContr\bigl(M(a,\refl_a)\bigr).
+\]
+
+For computational traces, empty and singleton reflexive lists are visible and
+distinct.  The singleton is already well formed and composable, so the
+failure is not caused by malformed chains.  It is caused by noncanonical
+reflexive metadata.  Equality-projection motives remain eliminable, giving a
+precise and useful boundary rather than a blanket impossibility result.
+
+The diagnosis now has a universal ordinary-quotient repair.  Given setoids
+\(S_{b,h}\), the repaired relation supports unrestricted \(J^\beta\) exactly
+when \(S_{a,\refl_a}\) is total.  Every successful set-level repair therefore
+identifies all reflexivity metadata.  The indiscrete relation is the canonical
+instance: maximal as a relation, minimal in retained information, and terminal
+for representative-preserving quotient factors.  Trace-length parity shows the
+criterion is genuinely about contractibility rather than about the amount
+identified: it collapses infinitely many traces and repairs nothing.
+
+The projection/kernel theorem removes the need for a sigma presentation.
+For the rewrite quotient's equality projection it yields the exact local-K
+criterion rather than a
+blanket slogan about rewrite quotienting, and its raw-level form replaces that
+criterion by an elementary statement about representatives: every two raw loops
+at the base point must admit a rewrite derivation.  An eliminator for the
+rewrite quotient is therefore exactly as strong as that connectivity assertion.
+
+That assertion is then decided.  Because the implementation packages pointwise
+paths into a path between functions while recording the empty trace, the
+primitive application rule makes the trace-free path a one-step predecessor of
+every path with the same endpoints.  Hence \(\mathsf{RwEq}\) is total and
+\(\PRW_A(a,b)\Eqv(a=b)\): the implemented rewrite quotient is ambient equality,
+retains no computational-path information, and admits only constant invariants.
+It supports unrestricted based path induction on every carrier, and the
+formulation we recommend keeps the reason attached to the fact---\emph{the
+implemented rewrite quotient supports path induction because it is equivalent to
+ambient equality}.  What has path induction is not a proof-relevant path object
+preserving computational reasons; it is a quotient that has stopped
+distinguishing them.  The raw record, by contrast, is beyond repair without
+quotienting, since its reflexivity fiber is exactly \(\List(A)\) for every
+pointed carrier.
+
+Section~\ref{sec:design} makes the trade-off general rather than anecdotal: a
+quotient is contractible exactly when every invariant of it is constant, so
+elimination and information are strictly opposed for ordinary setoid quotients,
+and a rule set admitting a universal predecessor at a fiber can retain nothing
+there.  A parity invariant localises the present failure---the groupoid fragment
+does not collapse---so what forces the degeneracy is the function-space rules
+together with the trace-erasing packaging convention.  A redesign changing
+either one is checked against two finite tasks: exhibit a separating invariant,
+and verify that no path is a predecessor of a whole fiber.
+
+Finally, the circle and torus audit separates constructions that legacy names
+had obscured.  The genuine loop quotients of the one-constructor circle and its
+product torus are contractible; the synthetic winding quotients are equivalent
+to \(\mathbb Z\) and \(\mathbb Z^2\) and are noncontractible, so no equivalence
+bridges them.  The collapse theorem upgrades this from a fact about two
+particular carriers to a fact about all of them: no pointed carrier has a
+genuine loop quotient equivalent to a noncontractible type, so no change of
+point space can restore the intended reading while the present rules stand.
+Histories, costs, certificates, normalization logs, and labels all follow the
+same reflexivity-fiber test.  Any stronger claim---a judgmental beta
+classification, full MLTT or HoTT, univalence, a new higher-inductive circle, or
+a higher-quotient universality theorem---requires additional theory and is
+outside the results proved here.
+
+\appendix
+
+\section{The companion Lean artifact}
 \label{sec:formalization}
 
-The mathematical development above is checked in Lean~4
-\cite{deMouraUllrich2021,MetadataJSoftware2026}.  The public source
+This appendix records the theorem-by-theorem correspondence with the source
+modules \cite{MetadataJSoftware2026,QuotientPathInductionSoftware2026}.  The
+public source
 \path{ComputationalPaths/Path/TypeTheory/MetadataJ.lean} defines
 \path{EqualityRefinement}, \path{MetadataTotal},
 \path{UnrestrictedBasedEliminator}, and \path{IsContractible}.  Its main
@@ -2585,18 +2543,10 @@ results:
   \path{no_torus_genuine_}\allowbreak\path{synthetic_bridge}.
 \end{itemize}
 \endgroup
-The pointed-subsingleton proof constructs a multi-step `RwEq` derivation by
-induction on the stored trace; the raw singleton theorem uses the primitive
-\path{Step.transport_refl_beta} rule.  The new file contains no custom axioms,
-`sorry`, or `admit`.  Lean's axiom report was checked for every displayed
-theorem above.  The quotient-based results---setoid classification, repair
-criterion, factorization, \(\PRW\)/K, the raw-level criterion, the parity
-failure, contractibility, and both no-bridge theorems---depend only on
-\texttt{propext} and \texttt{Quot.sound}; the projection/kernel criterion
-depends on no axiom at all, and the computed-fiber results depend only on
-\texttt{propext}.  In particular \texttt{Classical.choice} is not introduced by
-this development, so the classification is constructive relative to
-propositional extensionality and quotient soundness.
+The pointed-subsingleton proof constructs a multi-step \(\mathsf{RwEq}\)
+derivation by induction on the stored trace; the raw singleton theorem uses the
+primitive \path{Step.transport_refl_beta} rule.  The axiom footprint is reported
+in Section~\ref{sec:verification}.
 
 The results of Section~\ref{sec:collapse} are formalized in a third
 module, in the same directory
@@ -2628,7 +2578,20 @@ module, in the same directory
   \path{groupoidStepToStep}, its closure \path{GroupoidRwEq}, the invariant
   \path{groupoidStep_traceParity} and \path{groupoidRwEq_traceParity}, and
   \path{groupoid_fragment_not_total}, formalizing
-  Proposition~\ref{prop:parity-invariant} and Theorem~\ref{thm:sharpness}; and
+  Proposition~\ref{prop:parity-invariant} and Theorem~\ref{thm:sharpness};
+\item the design constraint of Section~\ref{sec:design}:
+  \path{SetoidInvariant}, \path{Nonconstant},
+  \path{setoidTotal_iff_all_invariants_constant} for
+  Theorem~\ref{thm:design}, \path{not_setoidTotal_of_nonconstant_invariant} for
+  Corollary~\ref{cor:design-certificate},
+  \path{setoidTotal_of_universal_predecessor} with
+  \path{no_universal_predecessor_of_nonconstant_invariant} for
+  Proposition~\ref{prop:universal-predecessor},
+  \path{rwEq_universal_predecessor} and \path{rwEq_invariant_constant} for the
+  instance at hand, and
+  \path{groupoidSetoid_parity_invariant} with
+  \path{groupoidSetoid_not_total_via_design} re-deriving the sharpness result
+  from the general theorem; and
 \item \path{groupoidSetoid}, \path{groupoidSetoid_not_setoidTotal},
   \path{groupoid_quotient_loop_not_contractible} and
   \path{fragment_fails_full_system_succeeds}, formalizing
@@ -2636,11 +2599,9 @@ module, in the same directory
 \end{itemize}
 \endgroup
 The beta equation \path{pathRwQuotJ_beta} is proved by \path{rfl}, which is the
-formal content of Remark~\ref{rem:judgmental-beta}.  The embedding
+formal content of Remark~\ref{rem:judgmental-beta}, and the embedding
 \path{groupoidStepToStep} is what makes Theorem~\ref{thm:sharpness} a statement
-about a genuine sub-system rather than about an unrelated relation.  Every
-theorem in this module was checked with Lean's axiom report and depends only on
-\texttt{propext} and \texttt{Quot.sound}.
+about a genuine sub-system rather than about an unrelated relation.
 
 The release tag \texttt{metadata-quotient-repair-v2} names the stable
 theorem-bearing commit cited in~\cite{MetadataJSoftware2026}; the tag is not a
@@ -2662,79 +2623,6 @@ Theorem~\ref{thm:metadata-fiber}; the dependence runs the other way, in that
 the companion applies the present fiber criterion to its own trace records.
 Keeping the two separate leaves this article a mathematics/type-theory paper
 rather than a report on Lean or on a particular de Bruijn implementation.
-
-\section{Conclusion}
-\label{sec:conclusion}
-
-For equality decorated by observable metadata,
-\[
-                 R_M(a,b)=\sum_{h:a=b}M(b,h),
-\]
-unrestricted based elimination with propositional beta is controlled by one
-object: \(M(a,\refl_a)\).  The proof separates a standard universal-property
-step from a metadata-specific equivalence:
-\[
- \Jbeta_{R_M}
- \Longleftrightarrow
- \isContr\!\left(\sum_bR_M(a,b)\right)
- \Longleftrightarrow
- \isContr\bigl(M(a,\refl_a)\bigr).
-\]
-
-For computational traces, empty and singleton reflexive lists are visible and
-distinct.  The singleton is already well formed and composable, so the
-failure is not caused by malformed chains.  It is caused by noncanonical
-reflexive metadata.  Equality-projection motives remain eliminable, giving a
-precise and useful boundary rather than a blanket impossibility result.
-
-The diagnosis now has a universal ordinary-quotient repair.  Given setoids
-\(S_{b,h}\), the repaired relation supports unrestricted \(J^\beta\) exactly
-when \(S_{a,\refl_a}\) is total.  Every successful set-level repair therefore
-identifies all reflexivity metadata.  The indiscrete relation is the canonical
-instance: maximal as a relation, minimal in retained information, and terminal
-for representative-preserving quotient factors.  Trace-length parity shows the
-criterion is genuinely about contractibility rather than about the amount
-identified: it collapses infinitely many traces and repairs nothing.
-
-The projection/kernel theorem removes the need for a sigma presentation.
-For `PathRwQuot.toEq`, it yields the exact local-K criterion rather than a
-blanket slogan about rewrite quotienting, and its raw-level form replaces that
-criterion by an elementary statement about representatives: every two raw loops
-at the base point must admit a rewrite derivation.  An eliminator for the
-rewrite quotient is therefore exactly as strong as that connectivity assertion.
-
-That assertion is then decided.  Because the implementation packages pointwise
-paths into a path between functions while recording the empty trace, the
-primitive application rule makes the trace-free path a one-step predecessor of
-every path with the same endpoints.  Hence \(\mathsf{RwEq}\) is total,
-\(\PRW_A(a,b)\Eqv(a=b)\), and \(\PRW\) admits unrestricted based path induction
-on every carrier.  Computational paths therefore \emph{do} satisfy path
-induction once one quotients by rewriting---and the classification says exactly
-what that costs, because the repair produced is the indiscrete one.  The raw
-record is beyond repair without quotienting, since its reflexivity fiber is
-exactly \(\List(A)\) for every pointed carrier; the quotient is repaired, but
-retains nothing beyond ambient equality.  A parity invariant localises the
-phenomenon: the groupoid fragment of the rewriting system does not collapse, so
-what forces the degeneracy is the function-space rules together with the
-trace-erasing packaging convention.  An implementation that wants an informative
-rewrite quotient should change one of those two, and
-Theorem~\ref{thm:raw-criterion} is stated so that the redesign can be tested
-against the same criterion.
-
-Finally, the circle and torus audit separates constructions that legacy names
-had obscured.  The genuine loop quotients of the one-constructor circle and its
-product torus are contractible; the synthetic winding quotients are equivalent
-to \(\mathbb Z\) and \(\mathbb Z^2\) and are noncontractible, so no equivalence
-bridges them.  The collapse theorem upgrades this from a fact about two
-particular carriers to a fact about all of them: no pointed carrier has a
-genuine loop quotient equivalent to a noncontractible type, so no change of
-point space can restore the intended reading while the present rules stand.
-Histories, costs, certificates, normalization logs, and labels all follow the
-same reflexivity-fiber test.  Any stronger claim---a judgmental beta
-classification, full MLTT or HoTT, univalence, a new higher-inductive circle, or
-a higher-quotient universality theorem---requires additional theory and is
-outside the results proved here.
-
 \begingroup
 \small
 \bibliographystyle{amsplain}
