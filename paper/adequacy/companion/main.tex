@@ -101,12 +101,13 @@ substitution, syntactic quotient, equality traces, path induction}
 \begin{document}
 
 \begin{abstract}
-This is a machine-checked audit, not a new type theory.  Its subject is the raw
+This paper is a machine-checked audit, not a proposal for a new type theory.
+Its subject is the raw
 scope-indexed calculus that underlies a formalized development of equality
 traces, and its output is a precise account of what that calculus proves, what
-it fails to prove, and what its traces actually record.  We report the failures
-as theorems rather than as gaps, which is what distinguishes an audit from an
-incomplete metatheory.
+it fails to prove, and what its traces actually record.  The failures are
+reported as theorems rather than as gaps, which is what distinguishes an audit
+from an incomplete metatheory.
 
 The calculus is a raw, scope-indexed dependent-style syntax in de Bruijn form,
 with dependent products and sums, level-indexed natural numbers, Tarski-style
@@ -180,10 +181,10 @@ results stated as theorems rather than reported as gaps---is what an audit
 contributes, and it is what a reader deciding whether to build on the artifact
 needs.
 
-The framing matters because raw calculi are easy to over-read.  A syntax with
-\(\Pi\)-types, universes, an identity type, and a \(J\)-constructor invites the
-assumption that the usual metatheory is present in the background.  Here it is
-not, and the paper's job is to say exactly where the resemblance stops.
+The framing matters because raw calculi invite over-reading.  A syntax with
+\(\Pi\)-types, universes, an identity type, and a \(J\)-constructor suggests
+that the usual metatheory is present in the background.  Here it is not, and the
+paper's task is to say exactly where the resemblance stops.
 
 \subsection*{The object of study}
 
@@ -853,43 +854,16 @@ uses only the bound induction hypothesis.  Application, pairing,
 projections, successor, decoding, identity, code identity, and reflexivity
 use the induction hypotheses componentwise.
 
-For the two-binder constructors the recursive equations display all lifts:
-\[
-\begin{aligned}
-&\NatElim_\ell(M,z,s,k)[\rho]_{\mathrm r}[\tau]_{\mathrm r}\\
-&=\NatElim_\ell(
- M[\rho^\lift]_{\mathrm r}[\tau^\lift]_{\mathrm r},
- z[\rho]_{\mathrm r}[\tau]_{\mathrm r},
- s[\rho^{\lift\lift}]_{\mathrm r}
-   [\tau^{\lift\lift}]_{\mathrm r},
- k[\rho]_{\mathrm r}[\tau]_{\mathrm r})\\
-&=\NatElim_\ell(
- M[(\rho;_{\Ren}\tau)^\lift]_{\mathrm r},
- z[\rho;_{\Ren}\tau]_{\mathrm r},
- s[(\rho;_{\Ren}\tau)^{\lift\lift}]_{\mathrm r},
- k[\rho;_{\Ren}\tau]_{\mathrm r}),
-\end{aligned}
-\]
-and
-\[
-\begin{aligned}
-&\EqJ(M,r,b,p)[\rho]_{\mathrm r}[\tau]_{\mathrm r}\\
-&=\EqJ(
- M[\rho^{\lift\lift}]_{\mathrm r}
-   [\tau^{\lift\lift}]_{\mathrm r},
- r[\rho]_{\mathrm r}[\tau]_{\mathrm r},
- b[\rho]_{\mathrm r}[\tau]_{\mathrm r},
- p[\rho]_{\mathrm r}[\tau]_{\mathrm r})\\
-&=\EqJ(
- M[(\rho;_{\Ren}\tau)^{\lift\lift}]_{\mathrm r},
- r[\rho;_{\Ren}\tau]_{\mathrm r},
- b[\rho;_{\Ren}\tau]_{\mathrm r},
- p[\rho;_{\Ren}\tau]_{\mathrm r}).
-\end{aligned}
-\]
-The identity proof is the same induction with
-\((\idren^{\Ren})^\lift=\idren^{\Ren}\), used twice in these final two
-cases.  These are all constructors of \(\Expr\).
+The two-binder constructors are the only cases where the argument is not
+mechanical, and they are mechanical for a different reason: their recursive
+equations must apply \(\lift\) the correct number of times in each position.
+For \(\NatElim_\ell(M,z,s,k)\) the motive takes one lift, the successor branch
+two, and the zero branch and scrutinee none; for \(\EqJ(M,r,b,p)\) the motive
+takes two and the remaining three positions none.  Given that bookkeeping, both
+cases close by lift composition exactly as the \(\PiTy\) case does, and the
+identity proof is the same induction with
+\((\idren^{\Ren})^\lift=\idren^{\Ren}\).  Appendix~\ref{app:grammar} displays
+the clauses, and the artifact checks every case.
 \end{proof}
 
 \subsection{Simultaneous substitutions}
@@ -1491,48 +1465,18 @@ assumption in the unbound argument.  Application, pairing, projections,
 successor, decoding, identity, code identity, and reflexivity use the
 induction hypotheses in their same-scope positions, chaining one-position
 congruence constructors when there is more than one argument.  Constants
-are reflexive.  For \(\NatElim_\ell(M,z,s,k)\), the four induction hypotheses use,
-respectively, \(\sigma^\lift\), \(\sigma\),
-\(\sigma^{\lift\lift}\), and \(\sigma\); transitivity chains the four
-one-position congruence constructors.  Concretely, it compares motives,
-zero branches, successor branches, and scrutinees in that order:
-\[
-\begin{aligned}
-&\NatElim_\ell(M[\sigma^\lift],z[\sigma],
- s[\sigma^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\sigma],
- s[\sigma^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\tau],
- s[\sigma^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\tau],
- s[\tau^{\lift\lift}],k[\sigma])\\
-\defeq{}&
-\NatElim_\ell(M[\tau^\lift],z[\tau],
- s[\tau^{\lift\lift}],k[\tau]).
-\end{aligned}
-\]
-Each step changes exactly one displayed argument using the corresponding
-congruence constructor.  Raw \(\EqJ(M,r,b,p)\) similarly uses
-\(\sigma^{\lift\lift}\) for \(M\) and \(\sigma\) for the remaining three
-arguments:
-\[
-\begin{aligned}
-&\EqJ(M[\sigma^{\lift\lift}],r[\sigma],b[\sigma],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\sigma],b[\sigma],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\sigma],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\tau],p[\sigma])\\
-\defeq{}&
-\EqJ(M[\tau^{\lift\lift}],r[\tau],b[\tau],p[\tau]).
-\end{aligned}
-\]
-Thus every constructor, including the two-binder cases, is covered by the
-explicit compatible closure of \(\defeq\).
+are reflexive.
+
+The two-binder constructors again need explicit bookkeeping.  The four
+induction hypotheses for \(\NatElim_\ell\) use, respectively,
+\(\sigma^\lift\) at the motive, \(\sigma\) at the zero branch,
+\(\sigma^{\lift\lift}\) at the successor branch, and \(\sigma\) at the
+scrutinee; one compares those four positions in that order, changing exactly
+one argument at each step by the corresponding one-position congruence
+constructor, and transitivity chains the four steps.  Raw \(\EqJ\) is the same
+pattern, with \(\sigma^{\lift\lift}\) at the motive and \(\sigma\) at its
+remaining three arguments.  Thus every constructor, including the two-binder
+cases, is covered by the explicit compatible closure of \(\defeq\).
 \end{proof}
 
 \begin{theorem}[Primitive-redex preservation modulo type \(\defeq\)]

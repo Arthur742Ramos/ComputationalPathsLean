@@ -92,6 +92,24 @@ computational paths, weak $\omega$-groupoid, labelled natural deduction, term re
 \section{Introduction}\label{sec:intro}
 % =========================================================================
 
+\subsection*{Correction to earlier versions}
+
+Earlier versions of this work described the trace-carrying \texttt{Path} record
+as a drop-in replacement for propositional equality, and presented the circle
+and torus fundamental-group results without distinguishing genuine
+\texttt{PathRwQuot} loop fibers from separately defined synthetic
+winding-expression quotients.  Both descriptions are withdrawn.  A record whose
+reflexivity fiber is $\mathsf{List}(A)$ admits no unrestricted based
+eliminator, so it is not interchangeable with ambient equality; and its rewrite
+quotient, which does admit one, satisfies
+$\mathsf{PathRwQuot}_A(a,b)\simeq(a=b)$ for every carrier, so it is
+interchangeable with ambient equality only degenerately.  The
+$\Z$ and $\Z \times \Z$ results belong to the synthetic
+presentations, and no equivalence bridges them to the genuine loop quotients.
+The present version states all results in the corrected form; a full account,
+with proofs, appears in the companion adequacy articles, and the repository
+records the corrections in \texttt{ERRATA.md}.
+
 \subsection{The problem: equality and its reasons}
 
 The Curry--Howard correspondence~\cite{Curry34,Howard80} establishes
