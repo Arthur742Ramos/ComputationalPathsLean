@@ -45,11 +45,11 @@ expression quotients; the library proves that no `SimpleEquiv` can bridge those
 quotients to the current genuine loop fibers.
 
 More strongly, `PathRwQuot A a b ≃ PLift (a = b)` for *every* carrier `A`
-(`Path/TypeTheory/QuotientPathInduction.lean`): the rewrite quotient is ambient
-equality, so it supports unrestricted based path induction precisely because it
-retains no computational-path information.  See [`ERRATA.md`](ERRATA.md) for the
-corrections this implies for earlier public descriptions of the library,
-including the arXiv preprint.
+(`ComputationalPaths/Path/TypeTheory/QuotientPathInduction.lean`): the rewrite
+quotient is ambient equality, so it supports unrestricted based path induction
+precisely because it retains no computational-path information.  See
+[`ERRATA.md`](ERRATA.md) for the corrections this implies for earlier public
+descriptions of the library, including the arXiv preprint.
 
 Beyond `Path/`, the repository also includes broad companion developments such as arithmetic, geometric, motivic, topos-theoretic, and representation-theoretic modules.
 
