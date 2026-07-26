@@ -1,4 +1,4 @@
-# A Scoped Calculus of Equality Traces
+# Auditing a Scoped Calculus of Equality Traces
 
 `main.tex` is a self-contained article. It builds independently of any other
 manuscript in this repository:
@@ -6,6 +6,13 @@ manuscript in this repository:
 ```bash
 latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 ```
+
+## What kind of paper this is
+
+A machine-checked **audit** of the raw scope-indexed calculus underlying this
+development — not a proposal for a new type theory. Its findings are stated as
+theorems in both directions: what the calculus proves, and what it demonstrably
+fails to prove.
 
 ## What it proves
 
