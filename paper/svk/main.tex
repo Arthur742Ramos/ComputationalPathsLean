@@ -15,8 +15,40 @@
 \usepackage{booktabs}
 \usepackage{amsthm}
 \usepackage{url}
-\usepackage{adjustbox}
-\setlength{\emergencystretch}{2em}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{ragged2e}
+\setlength{\emergencystretch}{3em}
+
+%% Long Lean identifiers must be allowed to wrap inside narrow table columns and
+%% at the end of prose lines, but only at their natural boundaries.  Breaking is
+%% permitted after `.', `_' and `-', and before `/'; never inside a word, so a
+%% declaration name is either kept whole or split where a reader expects it.
+%% In this paper \path is used exclusively for Lean names and module paths, so
+%% it is given the same breaking policy.
+\newcommand{\LeanBreakSetup}{%
+  \urlstyle{tt}%
+  \mathchardef\UrlBreakPenalty=100
+  \mathchardef\UrlBigBreakPenalty=100
+  \def\UrlBigBreaks{\do\/}%
+  \def\UrlBreaks{\do\.\do\_\do\-}%
+}
+\DeclareUrlCommand\leanname{\LeanBreakSetup}
+\DeclareUrlCommand\path{\LeanBreakSetup}
+
+%% Ragged-right paragraph columns keep prose in tables free of the very loose
+%% interword spacing that justification forces in narrow measures.  Numeric
+%% columns use LaTeX's fully stretchable \raggedleft so that short entries do
+%% not register as underfull boxes.
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\arraybackslash}p{#1}}
+
+%% An inventory entry: the Lean declaration, with its module subordinated on a
+%% second line.  Keeping both in one cell lets the declaration name occupy a
+%% column wide enough to hold it without breaking mid-identifier.
+\newcommand{\leanentry}[2]{%
+  \leanname{#1}\newline
+  {\scriptsize\itshape module\/}\enspace{\scriptsize\leanname{#2}}}
 
 %% Theorem-like environments
 \theoremstyle{definition}
@@ -200,7 +232,7 @@ This paper provides:
         \item Point constructors $\inl : A \to \Pushout$ and $\inr : B \to \Pushout$ (definitions, not axioms)
         \item Path constructor $\glmark : \prod_{c:C} \Path(\inl(f(c)), \inr(g(c)))$ (via \texttt{Quot.sound})
         \item Glue-naturality hypotheses exposed through
-        \texttt{HasGlueNaturalLoopRwEq}
+        \path{HasGlueNaturalLoopRwEq}
         \item Proved naturality instances for wedge sums, constant span maps,
         subsingletons, and explicitly supplied Axiom~K data
     \end{itemize}
@@ -209,8 +241,8 @@ This paper provides:
     \begin{itemize}
         \item Amalgamation-only quotient, whose word-length invariant rules out
         the required SVK round trip
-        \item \emph{Full} amalgamated free product with free group reduction
-        (\path{FullAmalgamatedFreeProduct})
+        \item \path{FullAmalgamatedFreeProduct}: the \emph{full} amalgamated
+        free product, which also reduces via free-group laws
         \item Both data-level and Prop-level (choice-based) interfaces
     \end{itemize}
 
@@ -230,7 +262,7 @@ This paper provides:
 
     \item A topological fundamental-group comparison for the circle:
     \begin{itemize}
-        \item \path{isCoveringMap\_circleCover} proves that
+        \item \path{isCoveringMap_circleCover} proves that
         \(\mathbb R\to\mathsf{AddCircle}\,1\) is a covering map;
         \item \path{topologicalPiOneEquivInt} computes Mathlib's topological
         fundamental group by lifted winding number;
@@ -240,9 +272,9 @@ This paper provides:
 
     \item A general simplicial and geometric realization:
     \begin{itemize}
-        \item \path{Presented.Realization.nerve} and
-        \path{Presented.Realization.topologicalRealization} construct the nerve
-        and its Mathlib geometric realization;
+        \item \path{Presented.Realization.nerve} constructs the nerve, and
+        \path{Presented.Realization.topologicalRealization} its Mathlib
+        geometric realization;
         \item \path{Presented.Realization.hoNerveIso} proves that the homotopy
         category of the nerve is the original presented path groupoid;
         \item \path{Presented.Realization.TopologicalComparisonStatement}
@@ -253,19 +285,19 @@ This paper provides:
     \texttt{PathRwQuot}, parametric in user-supplied encode/decode structure,
     with \emph{split typeclass assumptions}:
     \begin{itemize}
-        \item \texttt{HasPushoutSVKEncodeQuot}: encode map (assumed)
-        \item \texttt{HasPushoutSVKDecodeEncode}: decode-encode round-trip (assumed)
-        \item \texttt{HasPushoutSVKEncodeDecodeFull}: encode-decode round-trip
+        \item \path{HasPushoutSVKEncodeQuot}: encode map (assumed)
+        \item \path{HasPushoutSVKDecodeEncode}: decode-encode round-trip (assumed)
+        \item \path{HasPushoutSVKEncodeDecodeFull}: encode-decode round-trip
         modulo amalgamation and free-group reduction
-        \item \texttt{HasPushoutSVKDecodeFullAmalgBijective}: Prop-level
+        \item \path{HasPushoutSVKDecodeFullAmalgBijective}: Prop-level
         bijectivity alternative
         \item Decode map and both relation-respecting properties:
         \textbf{proved}
     \end{itemize}
 
-    \item A proved normal-form equivalence for scoped expression completions
-    (\path{scopedSeifertVanKampenEquiv}), together with its nontrivial
-    figure-eight instance.
+    \item A proved normal-form equivalence
+    \path{scopedSeifertVanKampenEquiv} for scoped expression completions,
+    together with its nontrivial figure-eight instance.
 
     \item An application inventory distinguishing:
     \begin{itemize}
@@ -443,27 +475,28 @@ inductive RwEq {A : Type u} {a b : A} :
 abbrev RwEqProp (p q : Path a b) : Prop := Nonempty (RwEq p q)
 \end{lstlisting}
 
-\subsection{Metatheory of the $\mathrm{LND}_{\mathrm{EQ}}$-TRS}
+\subsection{Metatheory of the \texorpdfstring{$\mathrm{LND}_{\mathrm{EQ}}$}{LND\_EQ}-TRS}
 \label{sec:metatheory}
 
 The rewrite system $\mathrm{LND}_{\mathrm{EQ}}$-TRS has been studied in prior work \cite{Ramos2018ExplicitPaths, Ramos2018Thesis, Queiroz2016Paths}. The following table summarizes the status of key metatheoretic properties in this formalization:
 
 \begin{center}
-\begin{tabular}{llp{6cm}}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}L{0.22\textwidth}L{0.15\textwidth}L{0.55\textwidth}@{}}
 \toprule
 \textbf{Property} & \textbf{Status} & \textbf{Location / responsibility} \\
 \midrule
 Soundness & Proved & \texttt{step\_toEq} in \texttt{Step.lean}: $p \RwEq q \Rightarrow p.\mathrm{proof} = q.\mathrm{proof}$ \\
 Expression termination & Proved & Library instance
-\texttt{instHasTerminationProp}, via a lexicographic weight on
-\texttt{GroupoidTRS.Expr} \\
+\leanname{instHasTerminationProp}, via a lexicographic weight on
+\leanname{GroupoidTRS.Expr} \\
 Expression confluence & Proved & Library instance
-\texttt{instHasConfluencePropExpr}, via reduced-word interpretation \\
+\leanname{instHasConfluencePropExpr}, via reduced-word interpretation \\
 Path-level confluence & Not globally instantiated &
-\texttt{HasJoinOfRw}/\texttt{HasConfluenceProp}; a caller must supply join
+\leanname{HasJoinOfRw}/\leanname{HasConfluenceProp}; a caller must supply join
 witnesses because observable step lists obstruct the expression proof \\
 Decidability of $\RwEq$ & Conditional & The caller supplies a
-\texttt{CompleteStepSystem}; then \texttt{CompleteStepSystem.decideRwEq}
+\leanname{CompleteStepSystem}; then \leanname{CompleteStepSystem.decideRwEq}
 is proved correct \\
 \bottomrule
 \end{tabular}
@@ -563,9 +596,9 @@ N(\mathcal P):=\mathsf{Nerve}(\Pi(\mathcal P)),
 \qquad
 \lvert\mathcal P\rvert:=\mathsf{SSet.toTop}(N(\mathcal P)).
 \]
-These are \path{Presented.Realization.nerve} and
-\path{Presented.Realization.topologicalRealization}.  Full faithfulness of
-Mathlib's nerve functor gives the checked isomorphism
+These are the declarations \path{Presented.Realization.nerve} and
+\path{Presented.Realization.topologicalRealization}.
+Full faithfulness of Mathlib's nerve functor gives the checked isomorphism
 \[
 \mathsf{Ho}(N(\mathcal P))\cong\Pi(\mathcal P),
 \]
@@ -610,8 +643,8 @@ paths only after these data.  Lean proves that every raw path is homotopic to
 the edge carrying its winding number; quotient induction gives both
 encode/decode round trips.  The theorem is
 \path{CirclePresented.piOneEquivInt}; the lemmas
-\path{CirclePresented.encode\_mul}, \path{CirclePresented.encode\_id}, and
-\path{CirclePresented.encode\_inv} prove that it preserves the group
+\path{CirclePresented.encode_mul}, \path{CirclePresented.encode_id}, and
+\path{CirclePresented.encode_inv} prove that it preserves the group
 operations.  Moreover,
 \path{CirclePresented.identity_ne_generator} proves that the identity and
 unit-winding classes differ.
@@ -630,7 +663,7 @@ Let \(\mathbb T=\mathsf{AddCircle}(1)=\mathbb R/\mathbb Z\), with basepoint
 \end{theorem}
 
 \begin{proof}
-Lean theorem \path{isCoveringMap\_circleCover} constructs an evenly covered
+Lean theorem \path{isCoveringMap_circleCover} constructs an evenly covered
 punctured-circle neighborhood explicitly.  The sheet coordinate is
 \(\lfloor e-(a-\frac12)\rfloor\), and the resulting homeomorphism proves that
 \(\mathbb R\to\mathbb R/\mathbb Z\) is a covering map.  Mathlib's path- and
@@ -788,7 +821,7 @@ A key property for the SVK theorem is the \emph{naturality of glue paths}:
 
 \begin{lemma}[Glue Naturality]
 \label{lem:glue-natural}
-Assume \texttt{HasGlueNaturalLoopRwEq} at \(c_1\).  For any path
+Assume \path{HasGlueNaturalLoopRwEq} at \(c_1\).  For any path
 $p : \Path(c_1, c_2)$ in $C$, the following square commutes up to $\RwEq$:
 \begin{center}
 \begin{tikzcd}
@@ -815,7 +848,7 @@ L\cdot\glmark(c_2)
 \RwEq R.
 \]
 This proof is checked by the theorem
-\texttt{glue\_natural\_}\allowbreak\texttt{square\_rweq} in
+\path{glue_natural_square_rweq} in
 \path{CompPath/PushoutCompPath.lean}.
 \end{proof}
 
@@ -878,7 +911,7 @@ noncomputable def south : Suspension A := Pushout.inr PUnit'.unit
 noncomputable def merid (a : A) : Path north south := Pushout.glue a
 \end{lstlisting}
 
-\subsubsection{Bouquet of $n$ Circles}
+\subsubsection{Bouquet of \texorpdfstring{$n$}{n} Circles}
 
 The \emph{bouquet} of $n$ circles $\bigvee_n \Sone$ generalizes the wedge sum:
 
@@ -910,6 +943,7 @@ inductive FreeProductWord (G1 : Type u) (G2 : Type u) : Type u
 The group operations on words are defined by concatenation and inversion with appropriate reductions.
 
 \begin{definition}[Word Operations]
+\leavevmode
 \begin{lstlisting}
 -- Concatenation
 def concat : FreeProductWord G1 G2 -> FreeProductWord G1 G2 ->
@@ -931,6 +965,7 @@ def invert : FreeProductWord G1 G2 -> FreeProductWord G1 G2
 When $G_1$ and $G_2$ share a common subgroup $H$ via homomorphisms $i_1 : H \to G_1$ and $i_2 : H \to G_2$, the \emph{amalgamated free product} $G_1 \AmalgProduct_H G_2$ identifies $i_1(h)$ with $i_2(h)$ for all $h : H$.
 
 \begin{definition}[Amalgamation Relation]
+\leavevmode
 \begin{lstlisting}
 inductive AmalgRelation (i1 : H -> G1) (i2 : H -> G2) :
     FreeProductWord G1 G2 -> FreeProductWord G1 G2 -> Prop
@@ -942,6 +977,7 @@ inductive AmalgRelation (i1 : H -> G1) (i2 : H -> G2) :
 \end{definition}
 
 \begin{definition}[Amalgamated Free Product]
+\leavevmode
 \begin{lstlisting}
 def AmalgEquiv (i1 : H -> G1) (i2 : H -> G2) :=
   EqvGen (AmalgRelation i1 i2)
@@ -1206,7 +1242,7 @@ theorem pushoutDecode_respects_amalg [HasGlueNaturalLoopRwEq c0]
 \subsubsection{The Encode Map}
 
 The nondegenerate encode map is parameterized by
-\texttt{HasPushoutSVK}\allowbreak\texttt{EncodeQuot}; it is not a custom
+\path{HasPushoutSVKEncodeQuot}; it is not a custom
 kernel axiom or a global
 instance.  A code-family construction remains future work.
 
@@ -1215,10 +1251,10 @@ instance.  A code-family construction remains future work.
 The round-trip properties establish the equivalence:
 \begin{itemize}
     \item $\decode(\encode(\alpha)) = \alpha$ (via
-    \texttt{HasPushoutSVK}\allowbreak\texttt{DecodeEncode})
+    \path{HasPushoutSVKDecodeEncode})
     \item $\encode(\decode(w)) \sim w$ up to amalgamation and free-group
     reduction (via
-    \texttt{HasPushoutSVK}\allowbreak\texttt{EncodeDecodeFull})
+    \path{HasPushoutSVKEncodeDecodeFull})
 \end{itemize}
 
 %==============================================================================
@@ -1230,17 +1266,18 @@ We summarize the distinct loop-quotient, path-presentation, and model
 calculations formalized in Lean.  Table~\ref{tab:svk-summary} names the object
 being classified in each row.
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Status of the application interfaces}
 \label{tab:svk-summary}
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{llll}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}L{0.15\textwidth}L{0.30\textwidth}L{0.21\textwidth}L{0.23\textwidth}@{}}
 \toprule
 \textbf{Space/object} & \textbf{Result represented in Lean} &
 \textbf{Method} & \textbf{Status} \\
 \midrule
-\multicolumn{4}{l}{\emph{Presented computational fundamental groups}} \\
+\multicolumn{4}{@{}l@{}}{\emph{Presented computational fundamental groups}} \\
 \(\mathcal S^1_{\mathrm{pres}}\) &
 \(\piOne^{\mathrm{pres}}\cong\ZZ\) &
 Raw paths and generated relators & Proved nontrivial \\
@@ -1254,7 +1291,7 @@ Presented SVK & Proved \\
 \(\piOne^{\mathrm{pres}}\cong\mathrm{FullAmalg}(\ZZ,\ZZ;\mathbf1)\) &
 Presented SVK & Proved nontrivial \\
 \midrule
-\multicolumn{4}{l}{\emph{Global-rule loop quotients and conditional interfaces}} \\
+\multicolumn{4}{@{}l@{}}{\emph{Global-rule loop quotients and conditional interfaces}} \\
 $A \Wedge B$ & Full-target SVK equivalence & Pushout over $\mathbf{1}$ &
 Conditional; collapsed form proved \\
 $\bigvee_n \Sone$ & Candidate decode $F_n\to\pi_1$ &
@@ -1262,7 +1299,7 @@ $n$-bouquet presentation & Equivalence open \\
 $S^n$ ($n \geq 1$) & Global-rule $\piOne(S^n)\simeq 1$ &
 Universal quotient collapse & Proved; no SVK dependency \\
 \midrule
-\multicolumn{4}{l}{\emph{Scoped completed presentation quotients}} \\
+\multicolumn{4}{@{}l@{}}{\emph{Scoped completed presentation quotients}} \\
 $\Sone$ & Scoped quotient $\simeq\ZZ$ &
 Winding completion & Proved nontrivial \\
 $K$ (Klein bottle) & Scoped quotient $\simeq\ZZ\rtimes\ZZ$ &
@@ -1274,14 +1311,13 @@ No presented or topological $\pi_1$ equivalence claimed \\
 $L(p,q)$ & Scoped cyclic quotient $\simeq\mathrm{Fin}\,p$ &
 Loop powers modulo $p$ & Proved for $p>0$ \\
 \midrule
-\multicolumn{4}{l}{\emph{Other formalized objects}} \\
+\multicolumn{4}{@{}l@{}}{\emph{Other formalized objects}} \\
 $T^2$ & Scoped product quotient $\simeq\ZZ^2$ &
 Product of scoped circles & Proved nontrivial \\
 $\CP^n$ & Unit-valued presentation model &
 Fibration scaffold & Model only \\
 \bottomrule
 \end{tabular}
-\end{adjustbox}
 \end{table}
 
 \begin{remark}[Scope of Applications]
@@ -1340,14 +1376,14 @@ This is packaged as \path{figureEightPresentedPiOneGroupEquiv}, an instance of
 Theorem~\ref{thm:svk}.  Its two integer-labelled edge families are raw
 proof-relevant paths, and their homotopy is generated by the component and
 groupoid relators.  The theorem
-\path{figureEightPresented\_nontrivial} separates the left unit generator from
+\path{figureEightPresented_nontrivial} separates the left unit generator from
 the identity using a left-exponent invariant.
 
 \path{figureEightScopedSVKEquiv} and
 \path{figureEightProvenanceEquiv} remain lower-level normal-form and provenance
 equivalences.
-The separate declaration
-\path{figureEightPiOneEquiv} for the global-rule loop quotient is conditional on
+For the global-rule loop quotient, the separate declaration
+\path{figureEightPiOneEquiv} is conditional on
 \path{HasWedgeSVKDecodeBijective}; no such instance is asserted.  The
 following code only demonstrates noncommutativity of the target word syntax:
 \begin{lstlisting}
@@ -1376,11 +1412,9 @@ For $n \geq 1$:
 \end{theorem}
 
 \begin{proof}
-Lean theorem
-\texttt{sphereN\_piOne\_}\allowbreak\texttt{equiv\_unit} specializes the
-universal
-\texttt{pathRwQuotLoop}\allowbreak\texttt{EquivUnit}.  It therefore has no
-SVK encode/decode dependency.
+The Lean theorem \path{sphereN_piOne_equiv_unit} is a specialization of
+the universal collapse theorem \path{pathRwQuotLoopEquivUnit}, so it carries
+no SVK encode/decode dependency.
 \end{proof}
 
 \subsection{The Torus (Product Formula, Not SVK)}
@@ -1453,7 +1487,7 @@ parity-based scoped expression quotient in
 global-rule loop quotient is claimed.
 \end{proof}
 
-\subsection{Orientable Surfaces of Genus $g$}
+\subsection{Orientable Surfaces of Genus \texorpdfstring{$g$}{g}}
 
 \begin{remark}[Orientable-surface presentation status]
 \[
@@ -1488,13 +1522,13 @@ loop-quotient equivalence is claimed.
 \end{remark}
 
 \begin{example}[Scoped normal forms for two special cases]
+\leavevmode
 \begin{itemize}
-    \item Projective-plane expressions:
-    \(\mathsf{RP2ScopedQuotient}\simeq
-      \langle a\mid a^2=1\rangle\cong\ZZ_2\).
-    \item Klein-bottle expressions:
-    \(\mathsf{KleinScopedQuotient}\simeq
-      \langle a,b\mid a^2b^2=1\rangle\cong\ZZ\rtimes\ZZ\).
+    \item Projective-plane expressions satisfy
+      \(\mathsf{RP2ScopedQuotient}\simeq\langle a\mid a^2=1\rangle\cong\ZZ_2\).
+    \item Klein-bottle expressions satisfy
+      \(\mathsf{KleinScopedQuotient}\simeq
+       \langle a,b\mid a^2b^2=1\rangle\cong\ZZ\rtimes\ZZ\).
 \end{itemize}
 \end{example}
 
@@ -1514,7 +1548,7 @@ presentation from a quotient of all raw paths in a lens-space carrier, and it
 is not an SVK theorem.
 \end{remark}
 
-\subsection{Bouquet of $n$ Circles}
+\subsection{Bouquet of \texorpdfstring{$n$}{n} Circles}
 
 \begin{remark}[Bouquet status]
 \[
@@ -1563,7 +1597,7 @@ theorem piTwo_comm (x y : PiTwo A a) : PiTwo.mul x y = PiTwo.mul y x := by
   exact contractibility_3 _ _
 \end{lstlisting}
 
-\subsection{The Weak $\omega$-Groupoid Structure}
+\subsection{The Weak \texorpdfstring{$\omega$}{omega}-Groupoid Structure}
 
 \begin{theorem}[Types are Weak $\omega$-Groupoids]
 Via computational paths, every type carries the structure of a weak $\omega$-groupoid:
@@ -1726,11 +1760,13 @@ inspected declaration-by-declaration with \texttt{\#print axioms}.
 \begin{definition}[Typeclass Assumption]
 A \emph{typeclass assumption} is a hypothesis provided via Lean's typeclass mechanism. These are \textbf{not} kernel axioms---they are parameters that users instantiate. We use these for:
 \begin{enumerate}
-    \item \textbf{Naturality}: \texttt{HasGlueNaturalLoopRwEq} (glue commutes with paths)
+    \item \textbf{Naturality}: \path{HasGlueNaturalLoopRwEq} (glue commutes with paths)
     \item \textbf{Nondegenerate encode/decode data}:
-    \texttt{HasPushoutSVK}\allowbreak\texttt{EncodeQuot},
-    \texttt{HasPushoutSVK}\allowbreak\texttt{DecodeEncode}, and
-    \texttt{HasPushoutSVK}\allowbreak\texttt{EncodeDecodeFull}
+    \begin{itemize}
+        \item \path{HasPushoutSVKEncodeQuot}
+        \item \path{HasPushoutSVKDecodeEncode}
+        \item \path{HasPushoutSVKEncodeDecodeFull}
+    \end{itemize}
 \end{enumerate}
 \end{definition}
 
@@ -1761,70 +1797,82 @@ proved by \texttt{pathRwQuot\_loop\_contractible}.
 The split typeclass architecture allows users to provide minimal hypotheses:
 
 \begin{center}
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{lp{8cm}}
+\setlength{\tabcolsep}{4pt}
+\footnotesize
+\begin{tabular}{@{}L{0.42\textwidth}L{0.50\textwidth}@{}}
 \toprule
 \textbf{Assumption} & \textbf{When to Use} \\
 \midrule
-\texttt{HasGlueNaturalLoopRwEq} & Required by the general decode lift;
+\leanname{HasGlueNaturalLoopRwEq} & Required by the general decode lift;
 proved for wedges and other named cases.  Under the global \(\RwEq\) relation,
-\texttt{hasGlueNaturalLoopRwEq\_collapsed} discharges it generally. \\
-\texttt{HasPushoutSVKEncodeQuot} & When you have an explicit encode function. \\
-\texttt{HasPushoutSVKDecodeEncode} & Standard encode-decode round-trip. \\
-\texttt{HasPushoutSVKEncodeDecodeFull} & Round-trip modulo amalgamation and
+\leanname{hasGlueNaturalLoopRwEq_collapsed} discharges it generally. \\
+\leanname{HasPushoutSVKEncodeQuot} & When you have an explicit encode function. \\
+\leanname{HasPushoutSVKDecodeEncode} & Standard encode-decode round-trip. \\
+\leanname{HasPushoutSVKEncodeDecodeFull} & Round-trip modulo amalgamation and
 free-group reduction. \\
-\texttt{HasPushoutSVKDecodeFullAmalgBijective} & Choice-based full-target
+\leanname{HasPushoutSVKDecodeFullAmalgBijective} & Choice-based full-target
 interface when only decode bijectivity is available. \\
 \bottomrule
 \end{tabular}
-\end{adjustbox}
 \end{center}
 
 \subsection{Architecture}
 
-The Lean 4 formalization is organized as follows:
+The Lean 4 formalization is organized as follows.  Every module listed below
+is relative to \path{ComputationalPaths/Path/} and carries the \path{.lean}
+extension.
 
-\begin{center}
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{ll}
+{\footnotesize
+\setlength{\tabcolsep}{4pt}
+\setlength{\LTpre}{0.6\baselineskip}
+\setlength{\LTpost}{0.6\baselineskip}
+\begin{longtable}{@{}L{0.42\textwidth}L{0.50\textwidth}@{}}
 \toprule
 \textbf{Module} & \textbf{Content} \\
 \midrule
-\texttt{Path/Basic/Core.lean} & Path type, refl, symm, trans \\
-\texttt{Path/Basic/Congruence.lean} & congrArg, transport \\
-\texttt{Path/Rewrite/Step.lean} & Single-step rewrites (50+ rules) \\
-\texttt{Path/Rewrite/RwEq.lean} & Rewrite equality \\
-\texttt{Path/Rewrite/ScopedCompletion.lean} & Presentation-specific completion relations \\
-\texttt{Path/Rewrite/PathTactic.lean} & Automated tactics \\
-\texttt{Path/Homotopy/Loops.lean} & Loop spaces \\
-\texttt{Path/Homotopy/FundamentalGroup.lean} & $\piOne$ definition \\
-\texttt{Path/Homotopy/PresentedFundamentalGroup.lean} &
-Raw presented paths, generated homotopy, and \(\piOne^{\mathrm{pres}}\) \\
-\texttt{Path/Homotopy/PresentedGroupoidRealization.lean} &
-Nerve, geometric realization, and homotopy-category recovery \\
-\texttt{Path/Homotopy/HigherHomotopy.lean} & $\piN$ for $n \geq 2$ \\
-\texttt{Path/CompPath/PushoutCompPath.lean} & Quotient pushout and glue naturality \\
-\texttt{Path/CompPath/PushoutPaths.lean} & Word quotients, decode, conditional full SVK \\
-\texttt{Path/CompPath/PushoutSVKInstances.lean} & Obstructions and collapsed full SVK \\
-\texttt{Path/CompPath/ScopedSeifertVanKampen.lean} & Scoped SVK encode/decode equivalence \\
-\texttt{Path/CompPath/PresentedSeifertVanKampen.lean} &
-Presented SVK and figure-eight theorem \\
-\texttt{Path/CompPath/CirclePresented.lean} &
-Presented circle fundamental group \(\simeq\ZZ\) \\
-\texttt{Path/CompPath/CircleTopologicalRealization.lean} &
-Covering map, topological winding, and circle comparison \\
-\texttt{Path/CompPath/CircleScoped.lean} & Circle and torus scoped completions \\
-\texttt{Path/CompPath/ClassicalPresentationsScoped.lean} & Klein, projective, and lens completions \\
-\texttt{Path/CompPath/FigureEight.lean} & Conditional and provenance interfaces \\
-\texttt{Path/CompPath/SuspensionDeep.lean} & Iterated spheres under the global relation \\
-\texttt{Path/Homotopy/Fibration.lean} & $\pi_1$ sequence and $\pi_0$ tail \\
-\texttt{Path/TypeTheory/QuotientPathInduction.lean} & Universal global-loop collapse \\
-\texttt{Path/TypeTheory/MetadataRepair.lean} & Global/scoped no-bridge results \\
-\texttt{Path/OmegaGroupoid.lean} & Weak $\omega$-groupoid structure \\
+\endfirsthead
+\toprule
+\textbf{Module} & \textbf{Content} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{2}{r@{}}{\footnotesize\emph{continued on the next page}} \\
+\endfoot
 \bottomrule
-\end{tabular}
-\end{adjustbox}
-\end{center}
+\endlastfoot
+\leanname{Basic/Core} & Path type, refl, symm, trans \\
+\leanname{Basic/Congruence} & congrArg, transport \\
+\leanname{Rewrite/Step} & Single-step rewrites (50+ rules) \\
+\leanname{Rewrite/RwEq} & Rewrite equality \\
+\leanname{Rewrite/ScopedCompletion} & Presentation-specific completion relations \\
+\leanname{Rewrite/PathTactic} & Automated tactics \\
+\leanname{Homotopy/Loops} & Loop spaces \\
+\leanname{Homotopy/FundamentalGroup} & $\piOne$ definition \\
+\leanname{Homotopy/PresentedFundamentalGroup} &
+Raw presented paths, generated homotopy, and \(\piOne^{\mathrm{pres}}\) \\
+\leanname{Homotopy/PresentedGroupoidRealization} &
+Nerve, geometric realization, and homotopy-category recovery \\
+\leanname{Homotopy/HigherHomotopy} & $\piN$ for $n \geq 2$ \\
+\leanname{CompPath/PushoutCompPath} & Quotient pushout and glue naturality \\
+\leanname{CompPath/PushoutPaths} & Word quotients, decode, conditional full SVK \\
+\leanname{CompPath/PushoutSVKInstances} & Obstructions and collapsed full SVK \\
+\leanname{CompPath/ScopedSeifertVanKampen} & Scoped SVK encode/decode equivalence \\
+\leanname{CompPath/PresentedSeifertVanKampen} &
+Presented SVK and figure-eight theorem \\
+\leanname{CompPath/CirclePresented} &
+Presented circle fundamental group \(\simeq\ZZ\) \\
+\leanname{CompPath/CircleTopologicalRealization} &
+Covering map, topological winding, and circle comparison \\
+\leanname{CompPath/CircleScoped} & Circle and torus scoped completions \\
+\leanname{CompPath/ClassicalPresentationsScoped} & Klein, projective, and lens completions \\
+\leanname{CompPath/FigureEight} & Conditional and provenance interfaces \\
+\leanname{CompPath/SuspensionDeep} & Iterated spheres under the global relation \\
+\leanname{Homotopy/Fibration} & $\pi_1$ sequence and $\pi_0$ tail \\
+\leanname{TypeTheory/QuotientPathInduction} & Universal global-loop collapse \\
+\leanname{TypeTheory/MetadataRepair} & Global/scoped no-bridge results \\
+\leanname{OmegaGroupoid} & Weak $\omega$-groupoid structure \\
+\end{longtable}
+}
 
 \subsection{Kernel-axiom inventory}
 \label{tab:kernel-axioms}
@@ -1837,7 +1885,8 @@ axioms.
 \subsection{Statistics}
 
 \begin{center}
-\begin{tabular}{lr}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}L{0.58\textwidth}R{0.34\textwidth}@{}}
 \toprule
 \textbf{Metric} & \textbf{Value} \\
 \midrule
@@ -1845,7 +1894,7 @@ Lean lines in the 21-module formalization core & 12,653 \\
 Modules in the formalization core & 21 \\
 Custom \texttt{axiom} declarations & 0 \\
 \texttt{sorry}/\texttt{admit} occurrences after comment stripping & 0/0 \\
-Reproduction command & \texttt{python3 paper/svk/check\_stats.py} \\
+Reproduction script & \leanname{paper/svk/check_stats.py} \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -1860,22 +1909,21 @@ certificates.  For reference, the following table records only the parameters of
 the separate global-rule schema, Theorem~\ref{thm:global-svk}.
 
 \begin{center}
-\small
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{lll}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}L{0.42\textwidth}L{0.20\textwidth}L{0.30\textwidth}@{}}
 \toprule
 \textbf{Typeclass} & \textbf{Role} & \textbf{Status} \\
 \midrule
-\texttt{HasGlueNaturalLoopRwEq} & Glue naturality & Proved for named
+\leanname{HasGlueNaturalLoopRwEq} & Glue naturality & Proved for named
 cases; generally derivable in the collapsed system \\
-\texttt{HasPushoutSVKEncodeQuot} & Nondegenerate encode map & Open parameter \\
-\texttt{HasPushoutSVKDecodeEncode} & Decode--encode & Open parameter \\
-\texttt{HasPushoutSVKEncodeDecodeFull} & Full encode--decode & Open parameter \\
-\texttt{HasPushoutSVKDecodeFullAmalgBijective} & Alternative full-decode
+\leanname{HasPushoutSVKEncodeQuot} & Nondegenerate encode map & Open parameter \\
+\leanname{HasPushoutSVKDecodeEncode} & Decode--encode & Open parameter \\
+\leanname{HasPushoutSVKEncodeDecodeFull} & Full encode--decode & Open parameter \\
+\leanname{HasPushoutSVKDecodeFullAmalgBijective} & Alternative full-decode
 bijectivity & Open choice-based parameter \\
 \bottomrule
 \end{tabular}
-\end{adjustbox}
 \end{center}
 
 \textbf{Proved}: the presented path groupoid construction, both presented SVK
@@ -1903,7 +1951,7 @@ Key results include:
     \item Long exact sequence of a fibration (\texttt{Fibration.lean})
 \end{itemize}
 
-\subsection{Weak $\omega$-Groupoid Structure}
+\subsection{Weak \texorpdfstring{$\omega$}{omega}-Groupoid Structure}
 
 Types are shown to form weak $\omega$-groupoids via the derivation tower:
 \begin{itemize}
@@ -1936,10 +1984,12 @@ Covering space theory with $\piOne$-actions:
 
 \begin{itemize}
     \item \textbf{Eilenberg--MacLane models}: typed model structures and
-    classical benchmark statements (\texttt{EilenbergMacLane.lean}); no
+    classical benchmark statements (\path{EilenbergMacLane.lean}); no
     carrier-level \(S^1=K(\ZZ,1)\) theorem is claimed here
-    \item \textbf{Mayer-Vietoris}: Abelianized SVK sequence (\texttt{MayerVietoris.lean})
-    \item \textbf{Path tactics}: Automation via \texttt{path\_simp}, \texttt{path\_auto}, \texttt{path\_normalize} (\texttt{PathTactic.lean})
+    \item \textbf{Mayer-Vietoris}: Abelianized SVK sequence
+    (\path{MayerVietoris.lean})
+    \item \textbf{Path tactics}: \path{path_simp}, \path{path_auto}, and
+    \path{path_normalize} (\path{PathTactic.lean})
 \end{itemize}
 
 %==============================================================================
@@ -1973,10 +2023,11 @@ We have presented a \emph{modular SVK framework} within the computational paths 
 
 \subsection{Comparison with HoTT Approaches}
 
-\begin{table}[h]
+\begin{table}[htbp]
 \centering
 \caption{Comparison with Standard HoTT}
-\begin{tabular}{lll}
+\label{tab:hott-comparison}
+\begin{tabular}{@{}lll@{}}
 \toprule
 \textbf{Aspect} & \textbf{Standard HoTT} & \textbf{Computational Paths} \\
 \midrule
@@ -2140,6 +2191,7 @@ Egbert~R. van Kampen.
 \end{thebibliography}
 
 %==============================================================================
+\clearpage
 \appendix
 \section{Application Inventory}
 \label{app:inventory}
@@ -2148,73 +2200,87 @@ Egbert~R. van Kampen.
 The following table provides the exact Lean names, module paths, objects, and
 dependency status for the headline results.  Presented fundamental groups,
 global-rule \texttt{PathRwQuot} fibers, and completed expression quotients are
-listed as distinct objects.
+listed as distinct objects.  There are no opt-in axiom imports in the source
+tree.
 
-\begin{center}
-\footnotesize
-\begin{adjustbox}{max width=\textwidth}
-\begin{tabular}{@{}p{0.22\textwidth}p{0.36\textwidth}p{0.20\textwidth}p{0.15\textwidth}@{}}
+{\footnotesize
+\setlength{\tabcolsep}{4pt}
+\setlength{\LTpre}{0.6\baselineskip}
+\setlength{\LTpost}{0.6\baselineskip}
+\begin{longtable}{@{}L{0.23\textwidth}L{0.46\textwidth}L{0.20\textwidth}@{}}
 \toprule
-\textbf{Object/result} & \textbf{Lean name} & \textbf{Module} & \textbf{Status} \\
+\textbf{Object/result} & \textbf{Lean declaration and module} &
+\textbf{Status} \\
 \midrule
+\endfirsthead
+\toprule
+\textbf{Object/result} & \textbf{Lean declaration and module} &
+\textbf{Status} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{3}{r@{}}{\footnotesize\emph{continued on the next page}} \\
+\endfoot
+\bottomrule
+\endlastfoot
 Presented circle fundamental group \(\simeq\ZZ\) &
-\path{CirclePresented.piOneEquivInt} & \texttt{CirclePresented} &
+\leanentry{CirclePresented.piOneEquivInt}{CirclePresented} &
 Proved nontrivial \\
 Presented/topological circle group comparison &
-\path{presentedCircleTopologicalPiOneGroupEquiv} &
-\texttt{CircleTopologicalRealization} & Proved group equivalence \\
+\leanentry{presentedCircleTopologicalPiOneGroupEquiv}{CircleTopologicalRealization} &
+Proved group equivalence \\
 General nerve recovery &
-\path{Presented.Realization.hoNerveIso} &
-\texttt{PresentedGroupoidRealization} & Proved category isomorphism \\
+\leanentry{Presented.Realization.hoNerveIso}{PresentedGroupoidRealization} &
+Proved category isomorphism \\
 General presented SVK group equivalence &
-\path{presentedSeifertVanKampenGroupEquiv} &
-\texttt{PresentedSeifertVanKampen} & Proved \\
+\leanentry{presentedSeifertVanKampenGroupEquiv}{PresentedSeifertVanKampen} &
+Proved \\
 Presented figure-eight fundamental group &
-\path{figureEightPresentedPiOneGroupEquiv} &
-\texttt{PresentedSeifertVanKampen} & Proved nontrivial \\
+\leanentry{figureEightPresentedPiOneGroupEquiv}{PresentedSeifertVanKampen} &
+Proved nontrivial \\
 Every global-rule loop quotient \(\simeq 1\) &
-\path{pathRwQuotLoopEquivUnit} &
-\texttt{QuotientPathInduction} & Proved \\
+\leanentry{pathRwQuotLoopEquivUnit}{QuotientPathInduction} &
+Proved \\
 Iterated sphere global-rule loop quotient \(\simeq 1\) &
-\path{sphereN_piOne_equiv_unit} &
-\texttt{SuspensionDeep} & Proved; no SVK \\
+\leanentry{sphereN_piOne_equiv_unit}{SuspensionDeep} &
+Proved; no SVK \\
 Scoped circle expression quotient \(\simeq\ZZ\) &
-\path{circleScopedPiOneEquivInt} & \texttt{CircleScoped} & Proved nontrivial \\
+\leanentry{circleScopedPiOneEquivInt}{CircleScoped} &
+Proved nontrivial \\
 Scoped torus expression quotient \(\simeq\ZZ^2\) &
-\path{torusScopedPiOneEquivIntProd} & \texttt{CircleScoped} & Proved nontrivial \\
+\leanentry{torusScopedPiOneEquivIntProd}{CircleScoped} &
+Proved nontrivial \\
 Scoped figure-eight SVK equivalence &
-\path{figureEightScopedSVKEquiv} & \texttt{ScopedSeifertVanKampen} &
+\leanentry{figureEightScopedSVKEquiv}{ScopedSeifertVanKampen} &
 Proved nontrivial \\
 General scoped SVK equivalence &
-\path{scopedSeifertVanKampenEquiv} & \texttt{ScopedSeifertVanKampen} &
+\leanentry{scopedSeifertVanKampenEquiv}{ScopedSeifertVanKampen} &
 Proved \\
 Nondegenerate full SVK schema &
-\path{seifertVanKampenFullEquiv} & \texttt{PushoutPaths} &
+\leanentry{seifertVanKampenFullEquiv}{PushoutPaths} &
 Four displayed classes \\
 Collapsed full SVK schema &
-\path{seifertVanKampenFullEquiv_collapsed} &
-\texttt{PushoutSVKInstances} & Proved, degenerate \\
+\leanentry{seifertVanKampenFullEquiv_collapsed}{PushoutSVKInstances} &
+Proved, degenerate \\
 Amalgamation-only target obstruction &
-\path{hasPushoutSVKEncodeDecode_impossible} &
-\texttt{PushoutSVKInstances} & Proved \\
+\leanentry{hasPushoutSVKEncodeDecode_impossible}{PushoutSVKInstances} &
+Proved \\
 Scoped Klein presentation \(\simeq\ZZ\rtimes\ZZ\) &
-\path{kleinBottleScopedPiOneEquivIntProd} &
-\texttt{ClassicalPresentationsScoped} & Proved nontrivial \\
+\leanentry{kleinBottleScopedPiOneEquivIntProd}{ClassicalPresentationsScoped} &
+Proved nontrivial \\
 Scoped \(\RP^2\) presentation \(\simeq\ZZ_2\) &
-\path{realProjective2ScopedPiOneEquivZ2} &
-\texttt{ClassicalPresentationsScoped} & Proved nontrivial \\
+\leanentry{realProjective2ScopedPiOneEquivZ2}{ClassicalPresentationsScoped} &
+Proved nontrivial \\
 Scoped lens presentation \(\simeq\mathrm{Fin}\,p\) &
-\path{lensScopedPiOneEquivZp} & \texttt{ClassicalPresentationsScoped} &
+\leanentry{lensScopedPiOneEquivZp}{ClassicalPresentationsScoped} &
 Proved for \(p>0\) \\
 Bouquet candidate decode &
-\path{BouquetN.decode_def} & \texttt{BouquetN} & Equivalence open \\
+\leanentry{BouquetN.decode_def}{BouquetN} &
+Equivalence open \\
 \(\pi_0\) fibration tail &
-\path{lowDegreeFibrationSequence} & \texttt{Fibration} & Proved maps/laws \\
-\bottomrule
-\end{tabular}
-\end{adjustbox}
-\end{center}
-
-\noindent There are no opt-in axiom imports in the source tree.
+\leanentry{lowDegreeFibrationSequence}{Fibration} &
+Proved maps/laws \\
+\end{longtable}
+}
 
 \end{document}
