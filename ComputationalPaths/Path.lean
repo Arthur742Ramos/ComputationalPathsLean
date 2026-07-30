@@ -183,6 +183,8 @@ import ComputationalPaths.Path.CompPath.ThomSpaces
 import ComputationalPaths.Path.CompPath.CircleStep
 import ComputationalPaths.Path.CompPath.CircleScoped
 import ComputationalPaths.Path.CompPath.CirclePresented
+import ComputationalPaths.Path.CompPath.CircleTopologicalRealization
+import ComputationalPaths.Path.Homotopy.PresentedGroupoidRealization
 import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.TorusStep

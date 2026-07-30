@@ -27,7 +27,9 @@ lake build ComputationalPaths.Path.CompPath.PushoutSVKInstances
 lake build ComputationalPaths.Path.CompPath.ScopedSeifertVanKampen
 lake build ComputationalPaths.Path.CompPath.ClassicalPresentationsScoped
 lake build ComputationalPaths.Path.Homotopy.PresentedFundamentalGroup
+lake build ComputationalPaths.Path.Homotopy.PresentedGroupoidRealization
 lake build ComputationalPaths.Path.CompPath.CirclePresented
+lake build ComputationalPaths.Path.CompPath.CircleTopologicalRealization
 lake build ComputationalPaths.Path.CompPath.PresentedSeifertVanKampen
 lake build ComputationalPaths.Path.Homotopy.Fibration
 lake build ComputationalPaths.Path.CompPath.SuspensionDeep
@@ -36,4 +38,8 @@ lake build ComputationalPaths.Path.CompPath.SuspensionDeep
 The manuscript distinguishes presented computational fundamental groups,
 global-rule `PathRwQuot` loop fibers, and completed expression quotients.  The
 headline theorem is the proved presented SVK equivalence; the global-rule SVK
-schema remains separately conditional.
+schema remains separately conditional.  The circle presentation is additionally
+identified with Mathlib's topological fundamental group of `AddCircle 1`.
+Every presented path groupoid also has a checked nerve/geometric realization
+and homotopy-category recovery theorem; the general topological fundamental
+groupoid comparison remains explicit future work.
