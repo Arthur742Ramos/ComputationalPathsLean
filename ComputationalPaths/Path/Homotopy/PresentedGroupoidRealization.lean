@@ -9,20 +9,31 @@ The nerve is fully faithful: its Mathlib homotopy category is isomorphic to the
 original presented path groupoid.  This is the general combinatorial
 realization theorem available in Mathlib.
 
+The canonical forward functor
+
+```
+P ⥤ FundamentalGroupoid (SSet.toTop.obj (nerve P))
+```
+
+is constructed explicitly from realized vertices and edges. Degenerate edges
+prove the identity law, while realized 2-simplices prove the composition law.
 The further topological statement
 
 ```
 FundamentalGroupoid (SSet.toTop.obj (nerve P)) ≌ P
 ```
 
-requires a comparison between the topological fundamental groupoid of a
-geometric realization and the homotopy category of a Kan simplicial set.
-Mathlib v4.24 does not yet provide that theorem.  The circle comparison is
+requires proving that this canonical functor is full and faithful: the
+topological edge-path theorem for geometric realizations. Essential
+surjectivity is proved here from the colimit presentation and path-connectedness
+of every topological simplex. Mathlib v4.24 does not yet provide the remaining
+edge-path theorem. The circle comparison is
 proved directly by covering-space methods in
 `CircleTopologicalRealization.lean`.
 -/
 
 import ComputationalPaths.Path.Homotopy.PresentedFundamentalGroup
+import ComputationalPaths.Path.Homotopy.TopologicalNerve
 import Mathlib.AlgebraicTopology.SimplicialSet.NerveAdjunction
 import Mathlib.AlgebraicTopology.SingularSet
 import Mathlib.AlgebraicTopology.FundamentalGroupoid.Basic
@@ -80,6 +91,20 @@ noncomputable def nerve : SSet.{max u v} :=
 noncomputable def topologicalRealization : TopCat.{max u v} :=
   SSet.toTop.obj (nerve P)
 
+/-- The canonical functor from the presented path groupoid to the topological
+fundamental groupoid of its geometric realization. It is essentially
+surjective by `topologicalComparisonFunctor_essSurj`. -/
+noncomputable def topologicalComparisonFunctor :
+    Object P ⥤ FundamentalGroupoid (topologicalRealization P) :=
+  TopologicalNerve.nerveRealizationFunctor
+
+noncomputable instance topologicalComparisonFunctor_essSurj :
+    (topologicalComparisonFunctor P).EssSurj := by
+  change
+    (TopologicalNerve.nerveRealizationFunctor
+      (C := Object P)).EssSurj
+  infer_instance
+
 /-- **General nerve recovery.**  The homotopy category of the nerve is
 isomorphic to the presented path groupoid. -/
 noncomputable def hoNerveIso :
@@ -87,10 +112,30 @@ noncomputable def hoNerveIso :
   CategoryTheory.nerveFunctorCompHoFunctorIso.app (Cat.of (Object P))
 
 /-- Named statement of the remaining general topological comparison.  It is
-kept as a proposition rather than an axiom or typeclass instance. -/
+kept as a proposition rather than an axiom or typeclass instance. The explicit
+candidate equivalence is `topologicalComparisonFunctor`. -/
 def TopologicalComparisonStatement : Prop :=
   Nonempty
     (FundamentalGroupoid (topologicalRealization P) ≌ Object P)
+
+/-- The edge-path theorem would close the comparison by proving that the
+canonical realization functor is an equivalence. -/
+theorem topologicalComparisonStatement_of_isEquivalence
+    [(topologicalComparisonFunctor P).IsEquivalence] :
+    TopologicalComparisonStatement P :=
+  ⟨(topologicalComparisonFunctor P).asEquivalence.symm⟩
+
+/-- Since essential surjectivity is proved, the full topological comparison is
+reduced exactly to the edge-path functor being full and faithful. -/
+theorem topologicalComparisonStatement_of_full_faithful
+    [(topologicalComparisonFunctor P).Full]
+    [(topologicalComparisonFunctor P).Faithful] :
+    TopologicalComparisonStatement P := by
+  letI : (topologicalComparisonFunctor P).IsEquivalence :=
+    { faithful := inferInstance
+      full := inferInstance
+      essSurj := inferInstance }
+  exact topologicalComparisonStatement_of_isEquivalence P
 
 /-- Computational-path associativity certificate inherited by the realized
 presentation's vertex group. -/

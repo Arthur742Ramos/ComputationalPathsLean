@@ -16,6 +16,7 @@ SVK_CORE = [
     SRC / "Path/Rewrite/ScopedCompletion.lean",
     SRC / "Path/Homotopy/FundamentalGroup.lean",
     SRC / "Path/Homotopy/PresentedFundamentalGroup.lean",
+    SRC / "Path/Homotopy/TopologicalNerve.lean",
     SRC / "Path/Homotopy/PresentedGroupoidRealization.lean",
     SRC / "Path/CompPath/CircleScoped.lean",
     SRC / "Path/CompPath/CirclePresented.lean",

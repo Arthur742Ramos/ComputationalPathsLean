@@ -136,9 +136,11 @@ separately proved nontrivial generator.
 For every presented path groupoid \(\Pi(\mathcal P)\), we also construct its
 simplicial nerve \(N\Pi(\mathcal P)\) and Mathlib geometric realization
 \(\lvert N\Pi(\mathcal P)\rvert\).  The theorem \texttt{hoNerveIso} proves
-\(\mathsf{Ho}(N\Pi(\mathcal P))\cong\Pi(\mathcal P)\).  Mathlib does not yet
-provide the remaining general comparison between the topological fundamental
-groupoid of a geometric realization and this simplicial homotopy category.
+\(\mathsf{Ho}(N\Pi(\mathcal P))\cong\Pi(\mathcal P)\).  We construct the
+canonical functor from \(\Pi(\mathcal P)\) to the topological fundamental
+groupoid of the realization and prove it essentially surjective.  Mathlib does
+not yet provide the edge-path theorem needed to prove that functor full and
+faithful.
 
 The distinction between this presented path groupoid and the library's global
 \texttt{PathRwQuot} is explicit.  Function-space rules make every loop fiber
@@ -148,8 +150,8 @@ torus, Klein bottle, projective plane, and cyclic lens-space expression
 languages, but they are not identified with the global quotient or with
 ordinary topological fundamental groups.
 
-The twenty-one Lean modules in the formalization core described here comprise
-\textbf{12,653 lines}.
+The twenty-two Lean modules in the formalization core described here comprise
+\textbf{13,552 lines}.
 The formalization contains no \texttt{sorry}, \texttt{admit}, or custom
 \texttt{axiom} declaration.  The immutable Lean artifact, build instructions,
 and theorem manifest are archived at
@@ -245,8 +247,12 @@ This paper provides:
         and its Mathlib geometric realization;
         \item \path{Presented.Realization.hoNerveIso} proves that the homotopy
         category of the nerve is the original presented path groupoid;
+        \item \path{Presented.Realization.topologicalComparisonFunctor}
+        realizes objects and arrows as topological vertices and paths, and
+        \path{topologicalComparisonFunctor_essSurj} proves essential
+        surjectivity;
         \item \path{Presented.Realization.TopologicalComparisonStatement}
-        names, but does not assume, the remaining general topological bridge.
+        names, but does not assume, the remaining full-faithfulness bridge.
     \end{itemize}
 
     \item A separate SVK equivalence \emph{schema} for the global
@@ -278,7 +284,7 @@ This paper provides:
 
     \item A Lean 4 development supporting these results, comprising:
     \begin{itemize}
-        \item 12,653 lines across the 21 modules used by this paper
+        \item 13,552 lines across the 22 modules used by this paper
         \item zero \texttt{sorry}, \texttt{admit}, and custom \texttt{axiom}
         declarations
         \item a public repository and reproducible source/automation statistics
@@ -573,16 +579,33 @@ implemented by \path{Presented.Realization.hoNerveIso}.  Thus the presented
 groupoid is recovered from its simplicial realization without invoking encode
 or a normal form.
 
+There is a canonical functor
+\[
+\Phi_{\mathcal P}\colon
+\Pi(\mathcal P)\longrightarrow
+\Pi_1^{\mathrm{top}}(\lvert\mathcal P\rvert),
+\]
+implemented by \path{Presented.Realization.topologicalComparisonFunctor}.
+It sends objects to realized vertices and arrows to realized one-simplices.
+Degenerate edges prove the identity law, and realized two-simplices give the
+endpoint-fixed homotopies proving preservation of composition.  Since every
+point of the realization is represented by a point of a topological simplex,
+and every such simplex is path connected,
+\path{topologicalComparisonFunctor_essSurj} proves that \(\Phi_{\mathcal P}\)
+is essentially surjective.
+
 The stronger statement
 \[
 \Pi_1^{\mathrm{top}}(\lvert\mathcal P\rvert)\simeq\Pi(\mathcal P)
 \]
-requires a theorem comparing the topological fundamental groupoid of
-\(\mathsf{SSet.toTop}(K)\) with the homotopy category of a Kan simplicial set.
-That bridge is not available in Mathlib~v4.24.  We name its exact specialization
-as \path{Presented.Realization.TopologicalComparisonStatement}, without adding
-it as an axiom or typeclass hypothesis.  Theorem~\ref{thm:circle-realization}
-proves the fundamental-group comparison directly for the circle.
+is therefore reduced to proving that \(\Phi_{\mathcal P}\) is full and
+faithful: the topological edge-path theorem for the geometric realization.
+That bridge is not available in Mathlib~v4.24.  We name its exact
+specialization as \path{Presented.Realization.TopologicalComparisonStatement},
+without adding it as an axiom or typeclass hypothesis.
+\path{topologicalComparisonStatement_of_full_faithful} records the exact
+remaining obligation.  Theorem~\ref{thm:circle-realization} proves the
+fundamental-group comparison directly for the circle.
 
 \subsection{Circle path presentation}
 
@@ -1692,12 +1715,12 @@ path_congr_right h -- apply hypothesis on left
 \end{lstlisting}
 
 To quantify their use, \texttt{paper/svk/check\_stats.py} performs a
-comment-stripped lexical count.  None of the 19,967 declarations introduced with
+comment-stripped lexical count.  None of the 19,986 declarations introduced with
 \texttt{theorem}/\texttt{lemma} directly invokes a \texttt{path\_*} tactic.
-Across all 53,451 declarations counted (including \texttt{def},
+Across all 53,498 declarations counted (including \texttt{def},
 \texttt{instance}, and \texttt{example}), 11 invoke one directly
-(approximately \(0.021\%\)).  In the twenty-one modules used by this paper,
-one of 1,018 declarations does so (\(0.098\%\)).  Thus the tactics are
+(approximately \(0.021\%\)).  In the twenty-two modules used by this paper,
+one of 1,065 declarations does so (\(0.094\%\)).  Thus the tactics are
 small convenience wrappers; the SVK proofs are predominantly explicit
 applications of named \texttt{RwEq} lemmas, congruence, and quotient induction.
 
@@ -1841,8 +1864,8 @@ axioms.
 \toprule
 \textbf{Metric} & \textbf{Value} \\
 \midrule
-Lean lines in the 21-module formalization core & 12,653 \\
-Modules in the formalization core & 21 \\
+Lean lines in the 22-module formalization core & 13,552 \\
+Modules in the formalization core & 22 \\
 Custom \texttt{axiom} declarations & 0 \\
 \texttt{sorry}/\texttt{admit} occurrences after comment stripping & 0/0 \\
 Reproduction command & \texttt{python3 paper/svk/check\_stats.py} \\
@@ -1966,7 +1989,7 @@ We have presented a \emph{modular SVK framework} within the computational paths 
     \item Presented fundamental groups, global-rule loop quotients, conditional
     schemas, and completed expression quotients are distinguished throughout.
 
-    \item The twenty-one modules used by the paper comprise 12,653 lines, and the
+    \item The twenty-two modules used by the paper comprise 13,552 lines, and the
     repository contains no \texttt{sorry}, \texttt{admit}, or custom
     \texttt{axiom} declaration.
 \end{enumerate}
@@ -2166,6 +2189,9 @@ Presented/topological circle group comparison &
 General nerve recovery &
 \path{Presented.Realization.hoNerveIso} &
 \texttt{PresentedGroupoidRealization} & Proved category isomorphism \\
+Canonical topological realization functor &
+\path{Presented.Realization.topologicalComparisonFunctor} &
+\texttt{PresentedGroupoidRealization} & Proved; essentially surjective \\
 General presented SVK group equivalence &
 \path{presentedSeifertVanKampenGroupEquiv} &
 \texttt{PresentedSeifertVanKampen} & Proved \\
