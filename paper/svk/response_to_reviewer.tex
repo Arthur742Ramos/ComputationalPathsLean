@@ -51,9 +51,15 @@ of multiplication, identity, and inversion:
 \]
 We instantiate it for the figure-eight and separately prove a nontrivial
 generator.  The circle presentation is likewise proved equivalent to
-\(\mathbb Z\).  The manuscript states explicitly that a comparison with the
-ordinary topological fundamental group still requires a geometric-realization
-theorem.
+\(\mathbb Z\).  At the fundamental-group level, we additionally prove that
+\(\mathbb R\to\mathsf{AddCircle}\,1\) is a covering map, classify Mathlib's
+topological fundamental group of the circle by winding, and prove the group
+equivalence \code{presentedCircleTopologicalPiOneGroupEquiv}.  A general
+geometric realization is also constructed from the nerve, and
+\code{Presented.Realization.hoNerveIso} recovers the original presented
+groupoid as its simplicial homotopy category.  The final comparison with the
+topological fundamental groupoid of that realization, including the
+figure-eight, remains open and is stated as such.
 
 \section*{Overall remarks}
 
@@ -135,6 +141,10 @@ round trips, and packages the group homomorphism laws.  Its hypotheses
 \code{GroupLaws} and \code{AmalgamationLaws} are explicit algebraic structures;
 the latter includes the source-group laws and two
 \code{PreservesGroupOps} certificates.  None of these are encode assumptions.
+For the circle, the separate theorem
+\code{presentedCircleTopologicalPiOneGroupEquiv} identifies the presented
+fundamental group with Mathlib's topological
+\code{FundamentalGroup (AddCircle 1) 0}.
 
 The separate theorem for the global-rule \code{PathRwQuot} is titled
 ``Conditional global-rule SVK schema'', and all four required typeclasses are
@@ -198,11 +208,11 @@ Appendix~A repeats the same status.
 
 \review{p.~36, path tactics: state what fraction of theorems rely on them.}
 \response
-We added a reproducible lexical count.  None of 19,931
+We added a reproducible lexical count.  None of 19,967
 \code{theorem}/\code{lemma} declarations directly invokes a \code{path\_*}
-tactic.  Across all 53,378 declarations counted, including definitions,
-instances, and examples, 11 do so (approximately \(0.021\%\)); in the nineteen
-paper modules, one of 945 declarations does so (\(0.106\%\)).  The paper
+tactic.  Across all 53,451 declarations counted, including definitions,
+instances, and examples, 11 do so (approximately \(0.021\%\)); in the twenty-one
+paper modules, one of 1,018 declarations does so (\(0.098\%\)).  The paper
 therefore characterizes these tactics as convenience wrappers rather than a
 mature dominant automation layer.
 
