@@ -319,6 +319,115 @@ class HasGlueNaturalLoopRwEq : Prop where
       RwEqProp (trans (symm (inlPath (congrArg f p))) (trans (glue c₀) (inrPath (congrArg g p))))
         (glue c)
 
+/-- The commuting-square form of glue naturality follows from the stored
+basepoint form by left-multiplying with `inlPath (congrArg f p)` and cancelling
+the resulting inverse pair. -/
+theorem glue_natural_square_rweq
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    (c : C) (p : Path c₀ c) :
+    RwEqProp
+      (trans (inlPath (congrArg f p)) (glue c))
+      (trans (glue c₀) (inrPath (congrArg g p))) := by
+  let leftPath := inlPath (A := A) (B := B) (C := C) (f := f) (g := g)
+    (congrArg f p)
+  let rightPath := trans
+    (glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀)
+    (inrPath (A := A) (B := B) (C := C) (f := f) (g := g)
+      (congrArg g p))
+  have naturality :
+      RwEqProp (trans (symm leftPath) rightPath)
+        (glue (A := A) (B := B) (C := C) (f := f) (g := g) c) := by
+    simpa [leftPath, rightPath] using
+      (HasGlueNaturalLoopRwEq.eq
+        (A := A) (B := B) (C := C) (f := f) (g := g)
+        (c₀ := c₀) c p)
+  rcases naturality with ⟨naturality⟩
+  refine ⟨?_⟩
+  have insert_naturality :
+      RwEq
+        (trans leftPath
+          (glue (A := A) (B := B) (C := C) (f := f) (g := g) c))
+        (trans leftPath (trans (symm leftPath) rightPath)) :=
+    rweq_trans_congr_right leftPath (rweq_symm naturality)
+  have reassociate :
+      RwEq
+        (trans leftPath (trans (symm leftPath) rightPath))
+        (trans (trans leftPath (symm leftPath)) rightPath) :=
+    rweq_symm (rweq_tt leftPath (symm leftPath) rightPath)
+  have cancel :
+      RwEq
+        (trans (trans leftPath (symm leftPath)) rightPath)
+        (trans (Path.refl _) rightPath) :=
+    rweq_trans_congr_left rightPath (rweq_cmpA_inv_right leftPath)
+  exact
+    rweq_trans insert_naturality
+      (rweq_trans reassociate
+        (rweq_trans cancel (rweq_cmpA_refl_left rightPath)))
+
+/-- Rearranged glue naturality, obtained from the commuting square by
+right-multiplying with `symm (glue c)` and cancelling. -/
+theorem glue_natural_rearranged_rweq
+    [HasGlueNaturalLoopRwEq (A := A) (B := B) (C := C) (f := f) (g := g) c₀]
+    (c : C) (p : Path c₀ c) :
+    RwEqProp
+      (inlPath (congrArg f p))
+      (trans (glue c₀)
+        (trans (inrPath (congrArg g p)) (symm (glue c)))) := by
+  let leftPath := inlPath (A := A) (B := B) (C := C) (f := f) (g := g)
+    (congrArg f p)
+  let rightPath := trans
+    (glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀)
+    (inrPath (A := A) (B := B) (C := C) (f := f) (g := g)
+      (congrArg g p))
+  let gluePath := glue (A := A) (B := B) (C := C) (f := f) (g := g) c
+  have square :
+      RwEqProp (trans leftPath gluePath) rightPath := by
+    simpa [leftPath, rightPath, gluePath] using
+      (glue_natural_square_rweq
+        (A := A) (B := B) (C := C) (f := f) (g := g)
+        (c₀ := c₀) c p)
+  rcases square with ⟨square⟩
+  refine ⟨?_⟩
+  have add_identity :
+      RwEq leftPath (trans leftPath (Path.refl _)) :=
+    rweq_symm (rweq_cmpA_refl_right leftPath)
+  have insert_inverse :
+      RwEq
+        (trans leftPath (Path.refl _))
+        (trans leftPath (trans gluePath (symm gluePath))) :=
+    rweq_trans_congr_right leftPath
+      (rweq_symm (rweq_cmpA_inv_right gluePath))
+  have reassociate_left :
+      RwEq
+        (trans leftPath (trans gluePath (symm gluePath)))
+        (trans (trans leftPath gluePath) (symm gluePath)) :=
+    rweq_symm (rweq_tt leftPath gluePath (symm gluePath))
+  have apply_square :
+      RwEq
+        (trans (trans leftPath gluePath) (symm gluePath))
+        (trans rightPath (symm gluePath)) :=
+    rweq_trans_congr_left (symm gluePath) square
+  have reassociate_right :
+      RwEq
+        (trans rightPath (symm gluePath))
+        (trans
+          (glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀)
+          (trans
+            (inrPath (A := A) (B := B) (C := C) (f := f) (g := g)
+              (congrArg g p))
+            (symm gluePath))) := by
+    simpa [rightPath] using
+      (rweq_tt
+        (glue (A := A) (B := B) (C := C) (f := f) (g := g) c₀)
+        (inrPath (A := A) (B := B) (C := C) (f := f) (g := g)
+          (congrArg g p))
+        (symm gluePath))
+  exact
+    rweq_trans add_identity
+      (rweq_trans insert_inverse
+        (rweq_trans reassociate_left
+          (rweq_trans apply_square reassociate_right)))
+
 end Pushout
 
 namespace Wedge

@@ -8,6 +8,7 @@ groupoid structure provided by identity types.
 
 import ComputationalPaths.Path.Basic
 import ComputationalPaths.Path.Rewrite.SimpleEquiv
+import ComputationalPaths.Path.Rewrite.ScopedCompletion
 import ComputationalPaths.Path.Rewrite.Step
 import ComputationalPaths.Path.Rewrite.Rw
 import ComputationalPaths.Path.Rewrite.RwEq
@@ -180,6 +181,8 @@ import ComputationalPaths.Path.CompPath.ClassifyingSpace
 import ComputationalPaths.Path.CompPath.ClassifyingSpaceBG
 import ComputationalPaths.Path.CompPath.ThomSpaces
 import ComputationalPaths.Path.CompPath.CircleStep
+import ComputationalPaths.Path.CompPath.CircleScoped
+import ComputationalPaths.Path.CompPath.CirclePresented
 import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.TorusStep
@@ -189,6 +192,8 @@ import ComputationalPaths.Path.CompPath.MappingCylinder
 import ComputationalPaths.Path.CompPath.MappingCone
 import ComputationalPaths.Path.CompPath.PushoutPaths
 import ComputationalPaths.Path.CompPath.PushoutSVKInstances
+import ComputationalPaths.Path.CompPath.ScopedSeifertVanKampen
+import ComputationalPaths.Path.CompPath.PresentedSeifertVanKampen
 import ComputationalPaths.Path.CompPath.WedgeSVKCircleInstances
 import ComputationalPaths.Path.CompPath.PullbackPaths
 import ComputationalPaths.Path.CompPath.VanKampenGeneralized
@@ -209,6 +214,7 @@ import ComputationalPaths.Path.CompPath.MobiusBand
 import ComputationalPaths.Path.CompPath.FlagManifold
 import ComputationalPaths.Path.CompPath.RealProjective
 import ComputationalPaths.Path.CompPath.ProjectiveSpace
+import ComputationalPaths.Path.CompPath.ClassicalPresentationsScoped
 import ComputationalPaths.Path.CompPath.StiefelManifold
 import ComputationalPaths.Path.CompPath.GrassmannManifold
 import ComputationalPaths.Path.CompPath.LensSpace

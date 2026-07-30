@@ -28,6 +28,7 @@ making them "fibrations" in the type-theoretic sense.
 import ComputationalPaths.Path.Homotopy.HigherHomotopy
 import ComputationalPaths.Path.Homotopy.CoveringSpace
 import ComputationalPaths.Path.Homotopy.FundamentalGroup
+import ComputationalPaths.Path.Topology.PathConnectedness
 
 namespace ComputationalPaths
 namespace Path
@@ -431,6 +432,91 @@ noncomputable def longExactSequence {P : B → Type u} (b : B) (x₀ : P b) :
       -- And (sigmaSnd l).toEq proves: transport (sigmaFst l) x₀ = x₀
       exact (sigmaSnd l).toEq
 
+/-! ## The low-degree π₀ tail
+
+The fibration sequence does not stop at `π₁(B)`.  For a type family it
+continues
+
+`π₁(B,b) → π₀(P b) → π₀(Total P) → π₀(B)`.
+
+The structure below packages these three maps together with the pointed
+adjacent-composition laws.  It deliberately does not call those laws full
+exactness of pointed sets; an image/kernel formulation at `π₀` needs a separate
+pointed-set exactness interface.
+-/
+
+/-- The connecting map with codomain the path-component quotient. -/
+noncomputable def boundaryPi0 {P : B → Type u} (b : B) (x₀ : P b) :
+    π₁(B, b) → _root_.ComputationalPaths.Pi0 (P b) :=
+  fun α => _root_.ComputationalPaths.Pi0.mk (connectingMapPi1 b x₀ α)
+
+/-- Map on components induced by the inclusion of the fiber. -/
+noncomputable def fiberPi0ToTotalPi0 {P : B → Type u} (b : B) :
+    _root_.ComputationalPaths.Pi0 (P b) →
+      _root_.ComputationalPaths.Pi0 (Total P) :=
+  _root_.ComputationalPaths.Pi0.map (fun x => (⟨b, x⟩ : Total P))
+
+/-- Map on components induced by the total-space projection. -/
+noncomputable def totalPi0ToBasePi0 {P : B → Type u} :
+    _root_.ComputationalPaths.Pi0 (Total P) →
+      _root_.ComputationalPaths.Pi0 B :=
+  _root_.ComputationalPaths.Pi0.map (@Total.proj B P)
+
+/-- Projecting a fiber component after including it gives the base component. -/
+theorem totalPi0ToBasePi0_fiberPi0ToTotalPi0
+    {P : B → Type u} (b : B)
+    (x : _root_.ComputationalPaths.Pi0 (P b)) :
+    totalPi0ToBasePi0 (P := P) (fiberPi0ToTotalPi0 (P := P) b x) =
+      _root_.ComputationalPaths.Pi0.mk b := by
+  obtain ⟨point, rfl⟩ := _root_.ComputationalPaths.Pi0.surjective x
+  rfl
+
+/-- A boundary component becomes the base total-space component after fiber
+inclusion.  The witness is the reverse of the lifted base loop. -/
+theorem fiberPi0ToTotalPi0_boundaryPi0
+    {P : B → Type u} (b : B) (x₀ : P b) (α : π₁(B, b)) :
+    fiberPi0ToTotalPi0 (P := P) b (boundaryPi0 b x₀ α) =
+      _root_.ComputationalPaths.Pi0.mk (⟨b, x₀⟩ : Total P) := by
+  induction α using Quot.ind with
+  | _ loop =>
+      change
+       _root_.ComputationalPaths.Pi0.mk
+           (⟨b, Path.transport loop x₀⟩ : Total P) =
+         _root_.ComputationalPaths.Pi0.mk (⟨b, x₀⟩ : Total P)
+      exact
+       _root_.ComputationalPaths.Pi0.mk_eq_of_path
+         (Path.symm (liftPath loop x₀))
+
+/-- The checked low-degree tail of the fibration sequence. -/
+structure LowDegreeFibrationSequence {P : B → Type u} (b : B) (x₀ : P b) where
+  /-- `π₁(B,b) → π₀(F)`. -/
+  boundary₀ : π₁(B, b) → _root_.ComputationalPaths.Pi0 (P b)
+  /-- `π₀(F) → π₀(E)`. -/
+  incl₀ :
+    _root_.ComputationalPaths.Pi0 (P b) →
+      _root_.ComputationalPaths.Pi0 (Total P)
+  /-- `π₀(E) → π₀(B)`. -/
+  proj₀ :
+    _root_.ComputationalPaths.Pi0 (Total P) →
+      _root_.ComputationalPaths.Pi0 B
+  /-- Consecutive `boundary₀` and `incl₀` land at the chosen component. -/
+  incl_boundary₀ :
+    ∀ α, incl₀ (boundary₀ α) =
+      _root_.ComputationalPaths.Pi0.mk (⟨b, x₀⟩ : Total P)
+  /-- Consecutive `incl₀` and `proj₀` land at the base component. -/
+  proj_incl₀ :
+    ∀ x, proj₀ (incl₀ x) = _root_.ComputationalPaths.Pi0.mk b
+
+/-- Construct the checked low-degree tail for any type-family fibration. -/
+noncomputable def lowDegreeFibrationSequence
+    {P : B → Type u} (b : B) (x₀ : P b) :
+    LowDegreeFibrationSequence b x₀ where
+  boundary₀ := boundaryPi0 b x₀
+  incl₀ := fiberPi0ToTotalPi0 b
+  proj₀ := totalPi0ToBasePi0
+  incl_boundary₀ := fiberPi0ToTotalPi0_boundaryPi0 b x₀
+  proj_incl₀ := totalPi0ToBasePi0_fiberPi0ToTotalPi0 b
+
 /-- Exactness theorem: in a long exact sequence, composing adjacent maps gives trivial result. -/
 theorem les_composition_trivial {P : B → Type u} (b : B) (x₀ : P b)
     (les : LongExactSequencePi1 (P := P) b x₀) :
@@ -455,7 +541,9 @@ This module establishes fibration theory for computational paths:
 
 7. **Induced maps**: f : A → B induces f_* : π_n(A) → π_n(B)
 
-8. **Long exact sequence**: π₁(F) → π₁(E) → π₁(B) → π₀(F) with exactness
+8. **Long exact sequence**: π₁(F) → π₁(E) → π₁(B) → π₀(F) → π₀(E) → π₀(B);
+   exactness is proved at π₁, while the π₀ tail carries checked pointed
+   adjacent-composition laws
 
 This provides the foundation for:
 - Long exact sequence of homotopy groups

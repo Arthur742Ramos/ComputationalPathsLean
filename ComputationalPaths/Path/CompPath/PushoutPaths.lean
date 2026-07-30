@@ -113,27 +113,27 @@ noncomputable def reverse : FreeProductWord G₁ G₂ → FreeProductWord G₁ G
   | consRight y rest => concat (reverse rest) (singleRight y)
 
 /-- Map a word by mapping each letter on its side. -/
-noncomputable def map {H₁ H₂ : Type u}
+noncomputable def map {H₁ H₂ : Type v}
     (f : G₁ → H₁) (g : G₂ → H₂) :
     FreeProductWord G₁ G₂ → FreeProductWord H₁ H₂
   | nil => nil
   | consLeft x rest => consLeft (f x) (map f g rest)
   | consRight y rest => consRight (g y) (map f g rest)
 
-@[simp] theorem map_nil {H₁ H₂ : Type u}
+@[simp] theorem map_nil {H₁ H₂ : Type v}
     (f : G₁ → H₁) (g : G₂ → H₂) :
     map f g (nil : FreeProductWord G₁ G₂) = nil := rfl
 
-@[simp] theorem map_consLeft {H₁ H₂ : Type u}
+@[simp] theorem map_consLeft {H₁ H₂ : Type v}
     (f : G₁ → H₁) (g : G₂ → H₂) (x : G₁) (rest : FreeProductWord G₁ G₂) :
     map f g (consLeft x rest) = consLeft (f x) (map f g rest) := rfl
 
-@[simp] theorem map_consRight {H₁ H₂ : Type u}
+@[simp] theorem map_consRight {H₁ H₂ : Type v}
     (f : G₁ → H₁) (g : G₂ → H₂) (y : G₂) (rest : FreeProductWord G₁ G₂) :
     map f g (consRight y rest) = consRight (g y) (map f g rest) := rfl
 
 /-- Equivalence on free-product words induced by equivalences on each side. -/
-noncomputable def equiv {H₁ H₂ : Type u}
+noncomputable def equiv {H₁ H₂ : Type v}
     (e₁ : SimpleEquiv G₁ H₁) (e₂ : SimpleEquiv G₂ H₂) :
     SimpleEquiv (FreeProductWord G₁ G₂) (FreeProductWord H₁ H₂) where
   toFun := map e₁.toFun e₂.toFun
@@ -2201,8 +2201,8 @@ identity). Therefore no `encodeQuot` function can satisfy
 Use `HasPushoutSVKEncodeDecodeFull` instead, which quotients by
 `FullAmalgEquiv` (amalgamation + free group reduction).
 
-See `PushoutSVKInstances.hasPushoutSVKEncodeDecode_impossible_PUnit` for the
-formal impossibility proof. -/
+See `PushoutSVKInstances.AmalgamationOnlyObstruction.
+hasPushoutSVKEncodeDecode_impossible` for the formal impossibility proof. -/
 -- DEPRECATED: Provably unsatisfiable — nil vs consLeft(0,nil) obstruction.
 class HasPushoutSVKEncodeDecode (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C) [HasPushoutSVKEncodeQuot A B C f g c₀] : Prop where
@@ -2990,8 +2990,9 @@ Use `HasPushoutSVKDecodeFullAmalgBijective` instead, which quotients by
 `FullAmalgEquiv` (amalgamation + free group reduction), collapsing
 `consLeft 0 nil` to `nil`.
 
-See `PushoutSVKInstances.hasPushoutSVKDecodeAmalgBijective_impossible_PUnit`
-for the formal impossibility proof. -/
+See `PushoutSVKInstances.AmalgamationOnlyObstruction.
+hasPushoutSVKDecodeAmalgBijective_impossible` for the formal impossibility
+proof. -/
 -- DEPRECATED: Provably unsatisfiable — AmalgEquiv preserves word length.
 class HasPushoutSVKDecodeAmalgBijective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
@@ -3547,12 +3548,12 @@ The strict word-level round-trip `encodeQuot (pushoutDecode w) = w` requires
 distinct words. Therefore no `encodeQuot` can return `nil` for one and
 `consLeft 0 nil` for the other.
 
-Use `HasPushoutSVKEncodeDecodeFull` (or `HasWedgeSVKEncodeDataFull` from
-`PushoutSVKInstances.lean`) instead, which uses `FullAmalgEquiv`.
+Use the general-pushout `HasPushoutSVKEncodeDecodeFull` interface instead,
+which uses `FullAmalgEquiv`.
 
-See `WedgeSVKCircleInstances.not_hasWedgeSVKEncodeDecode_Circle` and
-`PushoutSVKInstances.hasWedgeSVKEncodeData_impossible_PUnit` for the
-formal impossibility proofs. -/
+See `PushoutSVKInstances.AmalgamationOnlyObstruction.
+hasPushoutSVKEncodeDecode_impossible` for the formal obstruction after
+specializing the pushout to `PUnit'`. -/
 -- DEPRECATED: Provably unsatisfiable — nil vs consLeft(0,nil) obstruction.
 class HasWedgeSVKEncodeDecode (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
     [HasWedgeSVKEncodeQuot A B a₀ b₀] : Prop where
