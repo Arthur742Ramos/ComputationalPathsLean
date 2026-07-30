@@ -70,7 +70,17 @@ geometric realization is also constructed from the nerve, and
 \code{Presented.Realization.hoNerveIso} recovers the original presented
 groupoid as its simplicial homotopy category.  The final comparison with the
 topological fundamental groupoid of that realization, including the
-figure-eight, remains open and is stated as such.
+figure-eight, is classical but not yet formalized in Mathlib; the paper now
+says so explicitly and cites Gabriel and Zisman, and no result depends on it.
+
+Because these additions change where the paper places its weight, we also
+added two short remarks that state their status plainly.  Remark~2.10 records
+that the presented path space is the standard combinatorial presentation of a
+groupoid, citing Higgins and Brown, so that the reader can see it is not an
+object introduced to make a theorem succeed; Brown states Seifert--van Kampen
+for fundamental groupoids in exactly this form.  Remark~2.7 gives the precise
+mechanism of the global-rule collapse and reads it as a constraint on the
+design space rather than as a defect of one implementation.
 
 \section*{Overall remarks}
 

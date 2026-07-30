@@ -168,13 +168,16 @@ separately proved nontrivial generator.
 For every presented path groupoid \(\Pi(\mathcal P)\), we also construct its
 simplicial nerve \(N\Pi(\mathcal P)\) and Mathlib geometric realization
 \(\lvert N\Pi(\mathcal P)\rvert\).  The theorem \texttt{hoNerveIso} proves
-\(\mathsf{Ho}(N\Pi(\mathcal P))\cong\Pi(\mathcal P)\).  Mathlib does not yet
-provide the remaining general comparison between the topological fundamental
-groupoid of a geometric realization and this simplicial homotopy category.
+\(\mathsf{Ho}(N\Pi(\mathcal P))\cong\Pi(\mathcal P)\).  The remaining comparison
+with the topological fundamental groupoid of that realization is classical, but
+is not yet available in Mathlib; no result in this paper assumes it.
 
 The distinction between this presented path groupoid and the library's global
-\texttt{PathRwQuot} is explicit.  Function-space rules make every loop fiber
-of the latter contractible; consequently, its SVK theorem is degenerate unless
+\texttt{PathRwQuot} is explicit.  We isolate the exact mechanism by which
+function-space rules make every loop fiber of the latter contractible, and read
+it as a constraint on the design space: a trace-carrying equality cannot both
+admit function-path constructors that erase traces and retain non-trivial loop
+quotients.  Consequently the global-rule SVK theorem is degenerate unless
 encode/decode data are assumed.  Scoped completions remain available for the
 torus, Klein bottle, projective plane, and cyclic lens-space expression
 languages, but they are not identified with the global quotient or with
@@ -278,7 +281,8 @@ This paper provides:
         \item \path{Presented.Realization.hoNerveIso} proves that the homotopy
         category of the nerve is the original presented path groupoid;
         \item \path{Presented.Realization.TopologicalComparisonStatement}
-        names, but does not assume, the remaining general topological bridge.
+        names, but does not assume, the remaining topological bridge, which is
+        classical~\cite{GabrielZisman1967} but not yet formalized in Mathlib.
     \end{itemize}
 
     \item A separate SVK equivalence \emph{schema} for the global
@@ -554,6 +558,29 @@ path identities are witnessed by $\RwEq$.  The function-space rules in this
 global relation make every such loop fiber contractible
 (\path{pathRwQuot_loop_contractible}).
 
+\begin{remark}[Why the global quotient collapses, and what it rules out]
+\label{rem:collapse}
+The collapse is not an artifact of a particular carrier or of a stray rule; it
+is forced by two features acting together, and the mechanism is short enough to
+state.  First, \path{Path.lamCongr}, which packages a family of pointwise paths
+into a single path between functions, records the empty trace.  Second, the
+primitive application rule \path{Step.fun_app_beta}, instantiated at the unit
+domain, makes that trace-free path a one-step predecessor of an \emph{arbitrary}
+path with the same endpoints.  Because the ambient equality carried inside a
+path is proof-irrelevant, the trace-free path depends only on its endpoints, so
+the two facts collapse each fiber to a single $\RwEq$ class
+(\path{rweq_total}).
+We record this as a constraint on the design space rather than as a defect of
+one implementation: \emph{a trace-carrying equality cannot simultaneously admit
+function-path constructors that erase traces and retain non-trivial loop
+quotients}.  The obstruction is independent of the space being studied, so no
+choice of carrier repairs it.  This is what motivates
+Section~\ref{sec:presented-spaces}, where generating edges are proof-relevant
+and homotopy is generated only from named relators, and it is why the
+conditional global-rule schema of Section~\ref{sec:svk} is presented separately
+from the unconditional presented theorem.
+\end{remark}
+
 \begin{remark}[Base Point Dependence]
 \label{rem:basepoint}
 The fundamental group $\piOne(A, a)$ depends on the choice of basepoint $a$. For different basepoints $a, b : A$ in a path-connected type, the fundamental groups are isomorphic via conjugation by a path $\gamma : \Path(a, b)$:
@@ -564,8 +591,10 @@ However, this isomorphism is not canonical---it depends on the choice of $\gamma
 \end{remark}
 
 \subsection{Presented computational path spaces}
+\label{sec:presented-spaces}
 
 \begin{definition}[Presented path space]
+\label{def:presented}
 A \emph{presented computational path space} consists of:
 \begin{enumerate}
     \item a type of points and a proof-relevant family of generating edges;
@@ -586,6 +615,26 @@ This order is important: \texttt{Presented.RawPath},
 \texttt{Presented.Presentation}, and \texttt{Presented.Homotopy} are defined
 before any encode or normalization map.  The Lean construction is in
 \path{Homotopy/PresentedFundamentalGroup.lean}.
+
+\begin{remark}[This is the standard combinatorial model]
+\label{rem:presented-standard}
+Definition~\ref{def:presented} is not an object introduced to make a theorem
+come out right.  Items (1)--(3) are precisely the classical data of a
+\emph{presentation of a groupoid}: a graph of generators, the free groupoid on
+that graph, and a set of relators between parallel words
+\cite{Brown2006,Higgins1971}.  The vertex group
+\(\operatorname{Aut}_{\Pi(\mathcal P)}(a)\) is then the group presented by those
+generators and relators, which for a presentation arising from a CW pair is the
+fundamental group of the associated presentation complex.  Brown states the
+Seifert--van Kampen theorem for fundamental \emph{groupoids} in exactly this
+form, and Theorem~\ref{thm:svk} is its expected statement, not a weakened
+substitute.  What is new here is that the raw paths carry explicit rewrite
+traces, that homotopy is generated rather than assumed, and that both round
+trips and the group homomorphism laws are machine-checked.  The circle
+instance is pinned to Mathlib's topological fundamental group in
+Theorem~\ref{thm:circle-realization}, which is an external check that the
+presented notion is the intended one.
+\end{remark}
 
 \subsection{General nerve and geometric realization}
 
@@ -610,12 +659,20 @@ The stronger statement
 \[
 \Pi_1^{\mathrm{top}}(\lvert\mathcal P\rvert)\simeq\Pi(\mathcal P)
 \]
-requires a theorem comparing the topological fundamental groupoid of
-\(\mathsf{SSet.toTop}(K)\) with the homotopy category of a Kan simplicial set.
-That bridge is not available in Mathlib~v4.24.  We name its exact specialization
-as \path{Presented.Realization.TopologicalComparisonStatement}, without adding
-it as an axiom or typeclass hypothesis.  Theorem~\ref{thm:circle-realization}
-proves the fundamental-group comparison directly for the circle.
+is classically true and standard.  Gabriel and Zisman construct a fundamental
+groupoid functor \(\pi:\mathbf{sSet}\to\mathbf{Grpd}\), left adjoint to the
+nerve, and prove \(\Pi_1^{\mathrm{top}}(\lvert K\rvert)\cong\pi(K)\) for every
+simplicial set \(K\)~\cite{GabrielZisman1967}.  Since the nerve is fully
+faithful, the counit \(\pi N\Rightarrow\mathrm{id}\) is an isomorphism, so
+\(\pi(N(\mathcal P))\cong\Pi(\mathcal P)\); composing the two gives the display.
+The obstruction is therefore one of formalization rather than of mathematics:
+Mathlib~v4.24 supplies the nerve, the geometric realization, and the topological
+fundamental groupoid, but not the comparison between them.  We name the exact
+specialization that would be needed as
+\path{Presented.Realization.TopologicalComparisonStatement} and deliberately do
+not assume it as an axiom or as a typeclass hypothesis, so no result in this
+paper depends on it.  Theorem~\ref{thm:circle-realization} discharges the
+fundamental-group comparison for the circle directly, without that bridge.
 
 \subsection{Circle path presentation}
 
@@ -2051,8 +2108,12 @@ $\omega$-groupoid & Higher identity types & Derivation tower \\
     \ref{thm:circle-realization} proves the fundamental-group comparison for
     the circle.  For arbitrary presentations, the nerve and geometric
     realization are constructed and the nerve's homotopy category is recovered.
-    No theorem yet identifies the topological fundamental groupoid of that
-    realization, including the presented figure-eight case.
+    We do not yet formalize the identification of the topological fundamental
+    groupoid of that realization, including the presented figure-eight case.
+    This is a formalization gap rather than a mathematical one: the comparison
+    is classical~\cite{GabrielZisman1967}, but the supporting simplicial
+    homotopy theory is not yet in Mathlib~v4.24.  No result in this paper
+    assumes it.
 
     \item \textbf{Quotient collapse}: Although raw paths retain
     \texttt{List (Step A)}, the global \(\RwEq\) relation is total on parallel
@@ -2087,6 +2148,11 @@ $\omega$-groupoid & Higher identity types & Derivation tower \\
 %==============================================================================
 \begin{thebibliography}{99}
 
+\bibitem{Brown2006}
+Ronald Brown.
+\newblock {\em Topology and Groupoids}.
+\newblock BookSurge, 2006.
+
 \bibitem{Cohen2018Cubical}
 Cyril Cohen, Thierry Coquand, Simon Huber, and Anders M{\"o}rtberg.
 \newblock Cubical type theory: A constructive interpretation of the univalence axiom.
@@ -2117,10 +2183,22 @@ Tiago M.~L. de~Veras, Arthur~F. Ramos, Ruy J. G.~B. de~Queiroz, and Anjolina~G. 
 \newblock Computational paths -- a weak groupoid.
 \newblock {\em Journal of Logic and Computation}, 35(5):exad071, 2023.
 
+\bibitem{GabrielZisman1967}
+Peter Gabriel and Michel Zisman.
+\newblock {\em Calculus of Fractions and Homotopy Theory}.
+\newblock Ergebnisse der Mathematik und ihrer Grenzgebiete 35. Springer, 1967.
+
 \bibitem{Hatcher2002}
 Allen Hatcher.
 \newblock {\em Algebraic Topology}.
 \newblock Cambridge University Press, 2002.
+
+\bibitem{Higgins1971}
+Philip J. Higgins.
+\newblock {\em Categories and Groupoids}.
+\newblock Van Nostrand, 1971.
+\newblock Reprinted in {\em Reprints in Theory and Applications of Categories},
+7:1--195, 2005.
 
 \bibitem{FavoniaShulman2016}
 Kuen-Bang {Hou (Favonia)} and Michael Shulman.
