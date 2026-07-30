@@ -12,6 +12,7 @@ import ComputationalPaths.Path.CompPath.SuspensionSpace
 import ComputationalPaths.Path.CompPath.SuspensionCircle
 import ComputationalPaths.Path.Homotopy.LoopSpaceAdjunction
 import ComputationalPaths.Path.Homotopy.LoopSpaceSuspension
+import ComputationalPaths.Path.TypeTheory.QuotientPathInduction
 namespace ComputationalPaths
 namespace HIT
 namespace SuspensionDeep
@@ -70,7 +71,7 @@ noncomputable def suspS1_pi1_equiv_unit :
 
 noncomputable def susp_leftAdjoint_loop
     (X Y : Pointed) :
-    PathSimpleEquiv
+    ComputationalPaths.Path.Homotopy.LoopSpaceSuspension.PathSimpleEquiv
       (PointedMap (sigmaPointed X) Y)
       (PointedMap X (omegaEqPointed Y)) :=
   loopSpaceSuspensionAdjunction X Y
@@ -111,6 +112,17 @@ noncomputable abbrev sphereSouth (n : Nat) : SphereN (Nat.succ n) := south (Sphe
 noncomputable abbrev sphereMerid (n : Nat) (x : SphereN n) :
     Path (sphereNorth n) (sphereSouth n) :=
   merid (A := SphereN n) x
+
+/-- The genuine loop quotient of every positive-dimensional iterated-suspension
+sphere is equivalent to `Unit`.  This is a specialization of the universal
+`PathRwQuot` collapse theorem and therefore has no SVK encode/decode
+dependency. -/
+noncomputable def sphereN_piOne_equiv_unit (n : Nat) :
+    SimpleEquiv
+      (π₁(SphereN (Nat.succ n), sphereNorth n))
+      Unit :=
+  QuotientPathInduction.pathRwQuotLoopEquivUnit
+    (SphereN (Nat.succ n)) (sphereNorth n)
 
 /-- The standard suspension loop on `Sⁿ` as a trans/symm chain in `Sⁿ⁺¹`. -/
 noncomputable def sphereMeridChain (n : Nat) (x y : SphereN n) :

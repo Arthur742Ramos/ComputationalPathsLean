@@ -160,6 +160,19 @@ theorem pathRwQuot_loop_contractible (A : Type u) (a : A) :
   (loop_quotient_contractible_iff_rweq_total A a).mpr
     (rwEqTotalOnLoops_always A a)
 
+/-- Every genuine computational-path loop quotient is equivalent to the unit
+type.  This is the equivalence form of `pathRwQuot_loop_contractible` used by
+downstream application inventories. -/
+noncomputable def pathRwQuotLoopEquivUnit (A : Type u) (a : A) :
+    SimpleEquiv (PathRwQuot A a a) Unit where
+  toFun := fun _ => ()
+  invFun := fun _ => PathRwQuot.refl a
+  left_inv := fun x => pathRwQuot_subsingleton A a a _ x
+  right_inv := by
+    intro x
+    cases x
+    rfl
+
 /-- Local quotient-level axiom K holds unconditionally. -/
 theorem pathRwQuot_localAxiomK (A : Type u) (a : A) :
     PathRwQuotLocalAxiomK A a :=
