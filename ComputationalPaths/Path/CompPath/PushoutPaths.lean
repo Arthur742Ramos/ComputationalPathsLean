@@ -2990,9 +2990,9 @@ Use `HasPushoutSVKDecodeFullAmalgBijective` instead, which quotients by
 `FullAmalgEquiv` (amalgamation + free group reduction), collapsing
 `consLeft 0 nil` to `nil`.
 
-See `PushoutSVKInstances.AmalgamationOnlyObstruction.
-hasPushoutSVKDecodeAmalgBijective_impossible` for the formal impossibility
-proof. -/
+See
+`PushoutSVKInstances.AmalgamationOnlyObstruction.hasPushoutSVKDecodeAmalgBijective_impossible`
+for the formal impossibility proof. -/
 -- DEPRECATED: Provably unsatisfiable — AmalgEquiv preserves word length.
 class HasPushoutSVKDecodeAmalgBijective (A : Type u) (B : Type u) (C : Type u)
     (f : C → A) (g : C → B) (c₀ : C)
@@ -3551,9 +3551,9 @@ distinct words. Therefore no `encodeQuot` can return `nil` for one and
 Use the general-pushout `HasPushoutSVKEncodeDecodeFull` interface instead,
 which uses `FullAmalgEquiv`.
 
-See `PushoutSVKInstances.AmalgamationOnlyObstruction.
-hasPushoutSVKEncodeDecode_impossible` for the formal obstruction after
-specializing the pushout to `PUnit'`. -/
+See
+`PushoutSVKInstances.AmalgamationOnlyObstruction.hasPushoutSVKEncodeDecode_impossible`
+for the formal obstruction after specializing the pushout to `PUnit'`. -/
 -- DEPRECATED: Provably unsatisfiable — nil vs consLeft(0,nil) obstruction.
 class HasWedgeSVKEncodeDecode (A : Type u) (B : Type u) (a₀ : A) (b₀ : B)
     [HasWedgeSVKEncodeQuot A B a₀ b₀] : Prop where
