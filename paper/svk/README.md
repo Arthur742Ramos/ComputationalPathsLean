@@ -46,5 +46,5 @@ and homotopy-category recovery theorem. The canonical functor to the
 topological fundamental groupoid is constructed and proved essentially
 surjective.  The realization quotient atlas, contraction of under-category
 nerves, and unique simplex lifting for the categorical universal cover are now
-formalized; the remaining full-faithfulness step is the realized-covering
-point-set theorem.
+formalized, together with degeneracy-aware open core-face stars; the remaining
+full-faithfulness step is the realized-covering point-set theorem.

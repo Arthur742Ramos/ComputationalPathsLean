@@ -64,7 +64,8 @@ proved.  Its remaining full-faithfulness edge-path theorem, including the
 figure-eight specialization, remains open and is stated as such.  We have now
 formalized the realization quotient atlas, the contraction of nerves with an
 initial object, and unique simplex lifting for the under-category universal
-cover.  The manuscript identifies the remaining point-set obligation
+cover, together with degeneracy-aware open core-face stars.  The manuscript
+identifies the remaining point-set obligation
 precisely: proving that this simplicial cover realizes to a topological
 covering map.
 
@@ -218,9 +219,9 @@ Appendix~A repeats the same status.
 
 \review{p.~36, path tactics: state what fraction of theorems rely on them.}
 \response
-We added a reproducible lexical count.  None of 20,021
+We added a reproducible lexical count.  None of 20,026
 \code{theorem}/\code{lemma} declarations directly invokes a \code{path\_*}
-tactic.  Across all 53,560 declarations counted, including definitions,
+tactic.  Across all 53,572 declarations counted, including definitions,
 instances, and examples, 11 do so (approximately \(0.021\%\)); in the twenty-two
 paper modules, one of 1,065 declarations does so (\(0.094\%\)).  The paper
 therefore characterizes these tactics as convenience wrappers rather than a
