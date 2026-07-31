@@ -1,7 +1,7 @@
 {
   "goal_id": "edge-path-full-faithful",
-  "status": "inspecting",
-  "iteration": 3,
+  "status": "building",
+  "iteration": 4,
   "builder_model": "OpenAI:GPT-5.6-Sol",
   "inspector_model": "OpenAI:GPT-5.6-Luna",
   "initial_sha": "18f279a310920aaf0705e4432e24de503caedccf",

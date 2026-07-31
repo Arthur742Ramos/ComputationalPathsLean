@@ -12,7 +12,7 @@ Grothendieck fibration is a covering map; the definitions here isolate that
 map without replacing the genuine realization.
 -/
 
-import ComputationalPaths.Path.Homotopy.TopologicalNerveContractible
+import ComputationalPaths.Path.Homotopy.TopologicalSimplexStar
 import Mathlib.CategoryTheory.Comma.Over.Basic
 
 open CategoryTheory Simplicial Opposite
@@ -269,6 +269,229 @@ noncomputable def nerveCoverCertificate (x : K) :
   project := nerveCoverLiftChain_forget x
   vertex := nerveCoverLiftChain_vertex x
   unique := nerveCoverLiftChain_unique x
+
+/-! ## Core-face stars and their lifted sheets -/
+
+noncomputable def coreFaceIndex
+    {k n : ℕ} {c : (CategoryTheory.nerve K) _⦋k⦌}
+    {t : (CategoryTheory.nerve K) _⦋n⦌}
+    (h : SimplexCoreFace (CategoryTheory.nerve K) c t) :
+    Fin (h.dim + 1) :=
+  Classical.choose (h.collapse_surjective (0 : Fin (k + 1)))
+
+theorem coreFaceIndex_collapse
+    {k n : ℕ} {c : (CategoryTheory.nerve K) _⦋k⦌}
+    {t : (CategoryTheory.nerve K) _⦋n⦌}
+    (h : SimplexCoreFace (CategoryTheory.nerve K) c t) :
+    h.collapse.toOrderHom (coreFaceIndex h) = 0 :=
+  Classical.choose_spec
+    (h.collapse_surjective (0 : Fin (k + 1)))
+
+theorem coreFace_vertex_eq
+    {k n : ℕ} {c : (CategoryTheory.nerve K) _⦋k⦌}
+    {t : (CategoryTheory.nerve K) _⦋n⦌}
+    (h : SimplexCoreFace (CategoryTheory.nerve K) c t) :
+    t.obj (h.face.toOrderHom (coreFaceIndex h)) = c.obj 0 := by
+  have hv := _root_.congrArg
+    (fun s : (CategoryTheory.nerve K) _⦋h.dim⦌ =>
+      s.obj (coreFaceIndex h)) h.face_eq
+  change
+    t.obj (h.face.toOrderHom (coreFaceIndex h)) =
+      c.obj (h.collapse.toOrderHom (coreFaceIndex h)) at hv
+  rw [coreFaceIndex_collapse h] at hv
+  exact hv
+
+/-- Fiber used to label a sheet over a core simplex. -/
+abbrev NerveCoreFiber (x : K)
+    {k : ℕ} (c : (CategoryTheory.nerve K) _⦋k⦌) :=
+  {e : Under x // e.right = c.obj 0}
+
+/-- Lift the core simplex from its zeroth vertex. -/
+noncomputable def liftCoreSimplex (x : K)
+    {k : ℕ} (c : (CategoryTheory.nerve K) _⦋k⦌)
+    (e : NerveCoreFiber x c) :
+    ComposableArrows (Under x) k :=
+  nerveCoverLiftChain x c 0 e.1 e.2
+
+/-- Lift an ambient simplex using a selected core-face sheet. -/
+noncomputable def liftSimplexAtCoreFace (x : K)
+    {k n : ℕ} {c : (CategoryTheory.nerve K) _⦋k⦌}
+    {t : (CategoryTheory.nerve K) _⦋n⦌}
+    (h : SimplexCoreFace (CategoryTheory.nerve K) c t)
+    (e : NerveCoreFiber x c) :
+    ComposableArrows (Under x) n :=
+  nerveCoverLiftChain x t
+    (h.face.toOrderHom (coreFaceIndex h)) e.1
+    (e.2.trans (coreFace_vertex_eq h).symm)
+
+theorem nerveCover_project_map
+    (x : K) {m n : ℕ}
+    (f : ⦋m⦌ ⟶ ⦋n⦌)
+    (s : ComposableArrows (Under x) n) :
+    (((nerveCoverFunctor x).mapComposableArrows m).obj
+      ((CategoryTheory.nerve (Under x)).map f.op s)) =
+    (CategoryTheory.nerve K).map f.op
+      (((nerveCoverFunctor x).mapComposableArrows n).obj s) := by
+  refine ComposableArrows.ext (h := ?_) (w := ?_)
+  · intro j
+    rfl
+  · intro j hj
+    simp [nerveCoverFunctor]
+
+/-- A base core face and a core-fiber element determine a core face in the
+corresponding lifted simplex. -/
+noncomputable def liftCoreFace (x : K)
+    {k n : ℕ} {c : (CategoryTheory.nerve K) _⦋k⦌}
+    {t : (CategoryTheory.nerve K) _⦋n⦌}
+    (h : SimplexCoreFace (CategoryTheory.nerve K) c t)
+    (e : NerveCoreFiber x c) :
+    SimplexCoreFace (CategoryTheory.nerve (Under x))
+      (liftCoreSimplex x c e) (liftSimplexAtCoreFace x h e) where
+  dim := h.dim
+  face := h.face
+  face_injective := h.face_injective
+  collapse := h.collapse
+  collapse_surjective := h.collapse_surjective
+  face_eq := by
+    let lhs :=
+      (CategoryTheory.nerve (Under x)).map h.face.op
+        (liftSimplexAtCoreFace x h e)
+    let rhs :=
+      (CategoryTheory.nerve (Under x)).map h.collapse.op
+        (liftCoreSimplex x c e)
+    let base :=
+      (CategoryTheory.nerve K).map h.face.op t
+    have hlproj :
+        (((nerveCoverFunctor x).mapComposableArrows h.dim).obj lhs) =
+          base := by
+      rw [show lhs =
+        (CategoryTheory.nerve (Under x)).map h.face.op
+          (liftSimplexAtCoreFace x h e) by rfl]
+      rw [nerveCover_project_map]
+      change
+        (CategoryTheory.nerve K).map h.face.op
+          (((nerveCoverFunctor x).mapComposableArrows n).obj
+            (nerveCoverLiftChain x t
+              (h.face.toOrderHom (coreFaceIndex h)) e.1
+              (e.2.trans (coreFace_vertex_eq h).symm))) =
+          base
+      rw [nerveCoverLiftChain_forget]
+    have hrproj :
+        (((nerveCoverFunctor x).mapComposableArrows h.dim).obj rhs) =
+          base := by
+      rw [show rhs =
+        (CategoryTheory.nerve (Under x)).map h.collapse.op
+          (liftCoreSimplex x c e) by rfl]
+      rw [nerveCover_project_map]
+      change
+        (CategoryTheory.nerve K).map h.collapse.op
+          (((nerveCoverFunctor x).mapComposableArrows k).obj
+            (nerveCoverLiftChain x c 0 e.1 e.2)) =
+          base
+      rw [nerveCoverLiftChain_forget]
+      exact h.face_eq.symm
+    have hlvertex :
+        lhs.obj (coreFaceIndex h) = e.1 := by
+      change
+        (liftSimplexAtCoreFace x h e).obj
+          (h.face.toOrderHom (coreFaceIndex h)) = e.1
+      exact nerveCoverLiftChain_vertex _ _ _ _ _
+    have hrvertex :
+        rhs.obj (coreFaceIndex h) = e.1 := by
+      change
+        (liftCoreSimplex x c e).obj
+          (h.collapse.toOrderHom (coreFaceIndex h)) = e.1
+      rw [coreFaceIndex_collapse h]
+      exact nerveCoverLiftChain_vertex _ _ _ _ _
+    have hl :=
+      nerveCoverLiftChain_unique x base (coreFaceIndex h) e.1
+        (by
+          have hv := _root_.congrArg
+            (fun s : ComposableArrows K h.dim =>
+              s.obj (coreFaceIndex h)) hlproj
+          change
+            (lhs.obj (coreFaceIndex h)).right =
+              base.obj (coreFaceIndex h) at hv
+          rw [hlvertex] at hv
+          exact hv)
+        lhs hlproj hlvertex
+    have hr :=
+      nerveCoverLiftChain_unique x base (coreFaceIndex h) e.1
+        (by
+          have hv := _root_.congrArg
+            (fun s : ComposableArrows K h.dim =>
+              s.obj (coreFaceIndex h)) hrproj
+          change
+            (rhs.obj (coreFaceIndex h)).right =
+              base.obj (coreFaceIndex h) at hv
+          rw [hrvertex] at hv
+          exact hv)
+        rhs hrproj hrvertex
+    exact hl.trans hr.symm
+
+theorem liftCoreFace_starSet_iff (x : K)
+    {k n : ℕ} {c : (CategoryTheory.nerve K) _⦋k⦌}
+    {t : (CategoryTheory.nerve K) _⦋n⦌}
+    (h : SimplexCoreFace (CategoryTheory.nerve K) c t)
+    (e : NerveCoreFiber x c) (p : ⦋n⦌.toTopObj) :
+    p ∈ (liftCoreFace x h e).starSet ↔ p ∈ h.starSet :=
+  Iff.rfl
+
+/-- The open chart in a topological simplex determined by a core face. -/
+abbrev CoreFaceOpen
+    {X : SSet.{u}} {k n : ℕ}
+    {c : X _⦋k⦌} {t : X _⦋n⦌}
+    (h : SimplexCoreFace X c t) :=
+  {p : SimplexCategory.toTop.{u}.obj ⦋n⦌ //
+    p.down ∈ h.starSet}
+
+/-- On every simplex chart, a chosen core-fiber element identifies the lifted
+open sheet homeomorphically with the base core-face star. -/
+noncomputable def coreFaceSheetHomeomorph (x : K)
+    {k n : ℕ} {c : (CategoryTheory.nerve K) _⦋k⦌}
+    {t : (CategoryTheory.nerve K) _⦋n⦌}
+    (h : SimplexCoreFace (CategoryTheory.nerve K) c t)
+    (e : NerveCoreFiber x c) :
+    CoreFaceOpen (liftCoreFace x h e) ≃ₜ CoreFaceOpen h :=
+  Homeomorph.refl _
+
+theorem nerveCoverMap_liftSimplexAtCoreFace (x : K)
+    {k n : ℕ} {c : (CategoryTheory.nerve K) _⦋k⦌}
+    {t : (CategoryTheory.nerve K) _⦋n⦌}
+    (h : SimplexCoreFace (CategoryTheory.nerve K) c t)
+    (e : NerveCoreFiber x c)
+    (p : SimplexCategory.toTop.{u}.obj ⦋n⦌) :
+    nerveCoverMap x
+        (realizeSimplex (liftSimplexAtCoreFace x h e) p) =
+      realizeSimplex t p := by
+  rw [nerveCoverMap]
+  rw [map_realizeSimplex]
+  change
+    realizeSimplex
+        (((nerveCoverFunctor x).mapComposableArrows n).obj
+          (liftSimplexAtCoreFace x h e)) p =
+      realizeSimplex t p
+  have hp :
+      (((nerveCoverFunctor x).mapComposableArrows n).obj
+        (liftSimplexAtCoreFace x h e)) = t := by
+    change
+      (((nerveCoverFunctor x).mapComposableArrows n).obj
+        (nerveCoverLiftChain x t
+          (h.face.toOrderHom (coreFaceIndex h)) e.1
+          (e.2.trans (coreFace_vertex_eq h).symm))) = t
+    exact nerveCoverLiftChain_forget _ _ _ _ _
+  rw [hp]
+
+theorem coreFaceSheetHomeomorph_realize (x : K)
+    {k n : ℕ} {c : (CategoryTheory.nerve K) _⦋k⦌}
+    {t : (CategoryTheory.nerve K) _⦋n⦌}
+    (h : SimplexCoreFace (CategoryTheory.nerve K) c t)
+    (e : NerveCoreFiber x c)
+    (p : CoreFaceOpen (liftCoreFace x h e)) :
+    nerveCoverMap x
+        (realizeSimplex (liftSimplexAtCoreFace x h e) p.1) =
+      realizeSimplex t (coreFaceSheetHomeomorph x h e p).1 :=
+  nerveCoverMap_liftSimplexAtCoreFace x h e p.1
 
 /-! ## Computational-path certificate -/
 
