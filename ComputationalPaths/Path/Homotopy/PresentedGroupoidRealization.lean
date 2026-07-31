@@ -17,23 +17,20 @@ P ⥤ FundamentalGroupoid (SSet.toTop.obj (nerve P))
 
 is constructed explicitly from realized vertices and edges. Degenerate edges
 prove the identity law, while realized 2-simplices prove the composition law.
-The further topological statement
+The topological edge-path theorem gives
 
 ```
 FundamentalGroupoid (SSet.toTop.obj (nerve P)) ≌ P
 ```
 
-requires proving that this canonical functor is full and faithful: the
-topological edge-path theorem for geometric realizations. Essential
-surjectivity is proved here from the colimit presentation and path-connectedness
-of every topological simplex. Mathlib v4.24 does not yet provide the remaining
-edge-path theorem. The circle comparison is
-proved directly by covering-space methods in
-`CircleTopologicalRealization.lean`.
+unconditionally. Full faithfulness follows by realizing the under-category
+projection as a covering map, lifting paths and homotopies, and using the
+contractibility of its total realization. Essential surjectivity follows from
+the colimit presentation and path-connectedness of every topological simplex.
 -/
 
 import ComputationalPaths.Path.Homotopy.PresentedFundamentalGroup
-import ComputationalPaths.Path.Homotopy.TopologicalNerve
+import ComputationalPaths.Path.Homotopy.TopologicalNerveComparison
 import Mathlib.AlgebraicTopology.SimplicialSet.NerveAdjunction
 import Mathlib.AlgebraicTopology.SingularSet
 import Mathlib.AlgebraicTopology.FundamentalGroupoid.Basic
@@ -105,28 +102,45 @@ noncomputable instance topologicalComparisonFunctor_essSurj :
       (C := Object P)).EssSurj
   infer_instance
 
+noncomputable instance topologicalComparisonFunctor_full :
+    (topologicalComparisonFunctor P).Full := by
+  change
+    (TopologicalNerve.nerveRealizationFunctor
+      (C := Object P)).Full
+  infer_instance
+
+noncomputable instance topologicalComparisonFunctor_faithful :
+    (topologicalComparisonFunctor P).Faithful := by
+  change
+    (TopologicalNerve.nerveRealizationFunctor
+      (C := Object P)).Faithful
+  infer_instance
+
+noncomputable instance topologicalComparisonFunctor_isEquivalence :
+    (topologicalComparisonFunctor P).IsEquivalence where
+  faithful := inferInstance
+  full := inferInstance
+  essSurj := inferInstance
+
 /-- **General nerve recovery.**  The homotopy category of the nerve is
 isomorphic to the presented path groupoid. -/
 noncomputable def hoNerveIso :
     SSet.hoFunctor.obj (nerve P) ≅ Cat.of (Object P) :=
   CategoryTheory.nerveFunctorCompHoFunctorIso.app (Cat.of (Object P))
 
-/-- Named statement of the remaining general topological comparison.  It is
-kept as a proposition rather than an axiom or typeclass instance. The explicit
-candidate equivalence is `topologicalComparisonFunctor`. -/
+/-- Named proposition recording the general topological comparison. -/
 def TopologicalComparisonStatement : Prop :=
   Nonempty
     (FundamentalGroupoid (topologicalRealization P) ≌ Object P)
 
-/-- The edge-path theorem would close the comparison by proving that the
-canonical realization functor is an equivalence. -/
+/-- Constructor from an available equivalence instance. -/
 theorem topologicalComparisonStatement_of_isEquivalence
     [(topologicalComparisonFunctor P).IsEquivalence] :
     TopologicalComparisonStatement P :=
   ⟨(topologicalComparisonFunctor P).asEquivalence.symm⟩
 
-/-- Since essential surjectivity is proved, the full topological comparison is
-reduced exactly to the edge-path functor being full and faithful. -/
+/-- Constructor from full and faithful instances together with essential
+surjectivity. -/
 theorem topologicalComparisonStatement_of_full_faithful
     [(topologicalComparisonFunctor P).Full]
     [(topologicalComparisonFunctor P).Faithful] :
@@ -136,6 +150,18 @@ theorem topologicalComparisonStatement_of_full_faithful
       full := inferInstance
       essSurj := inferInstance }
   exact topologicalComparisonStatement_of_isEquivalence P
+
+/-- **Topological realization theorem.** The fundamental groupoid of the
+genuine geometric realization of a presented path groupoid is equivalent to
+the original presented groupoid. -/
+noncomputable def topologicalFundamentalGroupoidEquivalence :
+    FundamentalGroupoid (topologicalRealization P) ≌ Object P :=
+  (topologicalComparisonFunctor P).asEquivalence.symm
+
+/-- Unconditional public proof of the topological comparison statement. -/
+theorem topologicalComparisonStatement :
+    TopologicalComparisonStatement P :=
+  ⟨topologicalFundamentalGroupoidEquivalence P⟩
 
 /-- Computational-path associativity certificate inherited by the realized
 presentation's vertex group. -/
