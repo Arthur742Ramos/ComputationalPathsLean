@@ -2163,16 +2163,14 @@ $\omega$-groupoid & Higher identity types & Derivation tower \\
 \subsection{Limitations}
 
 \begin{enumerate}
-    \item \textbf{General topological comparison}: Theorem
-    \ref{thm:circle-realization} proves the fundamental-group comparison for
-    the circle.  For arbitrary presentations, the nerve and geometric
-    realization are constructed and the nerve's homotopy category is recovered.
-    We do not yet formalize the identification of the topological fundamental
-    groupoid of that realization, including the presented figure-eight case.
-    This is a formalization gap rather than a mathematical one: the comparison
-    is classical~\cite{GabrielZisman1967}, but the supporting simplicial
-    homotopy theory is not yet in Mathlib~v4.24.  No result in this paper
-    assumes it.
+    \item \textbf{Scope of the realization theorem}: The general comparison
+    identifies a presented path groupoid with the topological fundamental
+    groupoid of the genuine Mathlib realization of its own simplicial nerve.
+    It does not identify the library's global \texttt{PathRwQuot} with that
+    topological groupoid, nor does it assert that an arbitrary ambient space
+    supplied with the same presentation is homotopy equivalent to the nerve
+    realization.  Theorem~\ref{thm:circle-realization} remains a separate
+    comparison with the concrete space \(\mathsf{AddCircle}\,1\).
 
     \item \textbf{Quotient collapse}: Although raw paths retain
     \texttt{List (Step A)}, the global \(\RwEq\) relation is total on parallel
@@ -2189,9 +2187,10 @@ $\omega$-groupoid & Higher identity types & Derivation tower \\
 \begin{enumerate}
     \item \textbf{Cubical type theory comparison}: Relate computational paths to cubical approaches.
 
-    \item \textbf{Geometric realization}: Construct realizations of the
-    presented path groupoids and compare
-    \(\piOne^{\mathrm{pres}}\) with the topological fundamental group.
+    \item \textbf{From presentations to ambient spaces}: For presentations
+    extracted from concrete CW decompositions, compare the canonical nerve
+    realization with the original ambient space and extend the present
+    fundamental-groupoid result to higher homotopy invariants.
 
     \item \textbf{Covering space classification}: Prove the Galois correspondence between covering spaces and subgroups of $\piOne$.
 

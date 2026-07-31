@@ -28,6 +28,11 @@ lake build ComputationalPaths.Path.CompPath.ScopedSeifertVanKampen
 lake build ComputationalPaths.Path.CompPath.ClassicalPresentationsScoped
 lake build ComputationalPaths.Path.Homotopy.PresentedFundamentalGroup
 lake build ComputationalPaths.Path.Homotopy.TopologicalNerve
+lake build ComputationalPaths.Path.Homotopy.TopologicalNerveContractible
+lake build ComputationalPaths.Path.Homotopy.TopologicalRealizationOpen
+lake build ComputationalPaths.Path.Homotopy.TopologicalSimplexStar
+lake build ComputationalPaths.Path.Homotopy.TopologicalNerveCover
+lake build ComputationalPaths.Path.Homotopy.TopologicalNerveComparison
 lake build ComputationalPaths.Path.Homotopy.PresentedGroupoidRealization
 lake build ComputationalPaths.Path.CompPath.CirclePresented
 lake build ComputationalPaths.Path.CompPath.CircleTopologicalRealization
@@ -49,3 +54,15 @@ presented groupoid.  The proof descends degeneracy-aware open stars through the
 realization quotient, partitions their preimages into disjoint lifted sheets,
 constructs sheet homeomorphisms, proves the under-category projection is a
 Mathlib covering map, and applies path and homotopy lifting.
+
+## Build the archival artifact
+
+From a clean commit, build the standalone archive for a new Zenodo version:
+
+```bash
+python3 paper/svk/build_artifact.py --version 0.2.0
+```
+
+The archive is written under `paper/svk/dist/`.  Its explicit import manifest
+contains the same 27 entry modules audited by `check_stats.py`, including the
+six modules that prove the general topological comparison.
