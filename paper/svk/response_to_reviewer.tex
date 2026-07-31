@@ -5,15 +5,26 @@
 \usepackage{amsmath,amssymb}
 \usepackage{enumitem}
 \usepackage[hidelinks]{hyperref}
+\usepackage{url}
 \usepackage{xcolor}
-\setlength{\emergencystretch}{4em}
-\sloppy
+\setlength{\emergencystretch}{3em}
+
+%% Long Lean identifiers wrap only at their natural boundaries: after `.', `_'
+%% and `-', and before `/'.  Allowing these breaks removes the need for \sloppy,
+%% whose infinite tolerance produced very loose interword spacing.
+\newcommand{\LeanBreakSetup}{%
+  \urlstyle{tt}%
+  \mathchardef\UrlBreakPenalty=100
+  \mathchardef\UrlBigBreakPenalty=100
+  \def\UrlBigBreaks{\do\/}%
+  \def\UrlBreaks{\do\.\do\_\do\-}%
+}
+\DeclareUrlCommand\code{\LeanBreakSetup}
 
 \newcommand{\review}[1]{\par\medskip\noindent
   \textbf{\color{blue!55!black}Reviewer comment.} \emph{#1}\par}
 \newcommand{\response}{\par\smallskip\noindent
   \textbf{\color{green!35!black}Response.} }
-\newcommand{\code}[1]{\texttt{#1}}
 
 \title{Response to Reviewer 1\\
 \large ``The Seifert--van Kampen Theorem via Computational Paths''}
@@ -68,6 +79,15 @@ homotopy lifting over its contractible total space then provide the explicit
 hom-set inverse and the public equivalence
 \code{topologicalFundamentalGroupoidEquivalence}.
 
+Because these additions change where the paper places its weight, we also
+added two short remarks that state their status plainly.  Remark~2.10 records
+that the presented path space is the standard combinatorial presentation of a
+groupoid, citing Higgins and Brown, so that the reader can see it is not an
+object introduced to make a theorem succeed; Brown states Seifert--van Kampen
+for fundamental groupoids in exactly this form.  Remark~2.7 gives the precise
+mechanism of the global-rule collapse and reads it as a constraint on the
+design space rather than as a defect of one implementation.
+
 \section*{Overall remarks}
 
 \review{The assumption bookkeeping is not applied consistently, and the reader
@@ -93,14 +113,14 @@ termination and confluence are proved, while path-level decidability requires
 an explicitly supplied \code{CompleteStepSystem}.  The ``36 axioms'' headline
 and optional axiom-import inventory were removed.  The source contains
 zero custom \code{axiom} declarations, as checked by
-\code{scripts/check\_invariants.py} and \code{paper/svk/check\_stats.py}.
+\code{scripts/check_invariants.py} and \code{paper/svk/check_stats.py}.
 
 \review{A key naturality lemma is asserted without proof.}
 \response
-We added a complete derivation in the paper and two Lean theorems:
-\code{Pushout.glue\_natural\_square\_rweq} and
-\code{Pushout.glue\_natural\_rearranged\_rweq}, both in
-\code{ComputationalPaths/Path/CompPath/PushoutCompPath.lean}.
+We added a complete derivation in the paper, together with the two Lean
+theorems \code{Pushout.glue_natural_square_rweq} and
+\code{Pushout.glue_natural_rearranged_rweq}.  Both are proved in the module
+\code{Path/CompPath/PushoutCompPath.lean}.
 
 \section*{Detailed comments}
 
@@ -128,14 +148,14 @@ The added proof sets
 \(R=\mathsf{glue}(c_1)\cdot\mathsf{inr}_*(g_*(p))\), uses the stored witness
 \(L^{-1}\cdot R\sim\mathsf{glue}(c_2)\), and then applies left congruence,
 associativity, inverse cancellation, and the unit law.  The paper cites
-\code{glue\_natural\_square\_rweq}.
+\code{glue_natural_square_rweq}.
 
 \review{p.~16, Corollary 3.5: state explicitly that it follows by
 right-multiplying by \(\mathsf{glue}(c_2)^{-1}\).}
 \response
 The proof now says exactly this, including reassociation and inverse
 cancellation.  The corresponding Lean theorem is
-\code{glue\_natural\_rearranged\_rweq}.
+\code{glue_natural_rearranged_rweq}.
 
 \review{p.~21, Section 5.1: Theorem 5.1 gives no indication that it is
 conditional.}
@@ -151,16 +171,16 @@ the latter includes the source-group laws and two
 For the circle, the separate theorem
 \code{presentedCircleTopologicalPiOneGroupEquiv} identifies the presented
 fundamental group with Mathlib's topological
-\code{FundamentalGroup (AddCircle 1) 0}.
+\texttt{FundamentalGroup (AddCircle 1) 0}.
 
 The separate theorem for the global-rule \code{PathRwQuot} is titled
 ``Conditional global-rule SVK schema'', and all four required typeclasses are
 part of its statement.  We also distinguish the full target, which includes
 free-group reduction, from the amalgamation-only target.  Lean proves that
 round-trip and bijectivity interfaces for the latter are impossible:
-\code{hasPushoutSVKEncodeDecode\_impossible} and
-\code{hasPushoutSVKDecodeAmalgBijective\_impossible}.  Separately,
-\code{seifertVanKampenFullEquiv\_collapsed} proves the full-target equivalence
+\code{hasPushoutSVKEncodeDecode_impossible} and
+\code{hasPushoutSVKDecodeAmalgBijective_impossible}.  Separately,
+\code{seifertVanKampenFullEquiv_collapsed} proves the full-target equivalence
 for the global rewrite quotient and is explicitly labeled degenerate.
 The completed-expression theorem \code{scopedSeifertVanKampenEquiv} remains as
 a separate normal-form result rather than serving as the fundamental-group
@@ -170,7 +190,7 @@ theorem.
 lists no dependency for \(S^2\).}
 \response
 We added the general Lean theorem
-\code{sphereN\_piOne\_equiv\_unit}, specialized from
+\code{sphereN_piOne_equiv_unit}, specialized from
 \code{pathRwQuotLoopEquivUnit}.  Table~1 and Appendix~A agree: this global-rule
 loop-quotient result has no SVK encode/decode dependency and follows from the
 universal quotient collapse.
@@ -228,9 +248,9 @@ mature dominant automation layer.
 
 \review{The seventh line of the table on p.~51 does not express Theorem 6.8.}
 \response
-The Klein-bottle row and the corresponding theorem now name
-\code{kleinBottleScopedPiOneEquivIntProd} and identify its source as the scoped
-expression quotient in \code{ClassicalPresentationsScoped.lean}.  Both places
+The Klein-bottle row and the corresponding theorem now name the declaration
+\code{kleinBottleScopedPiOneEquivIntProd}, and identify its source as the
+scoped expression quotient in \code{ClassicalPresentationsScoped.lean}.  Both places
 state that the quotient is classified by the
 \(\mathbb Z\rtimes\mathbb Z\) normal form and do not identify it with the
 global-rule \code{PathRwQuot}.
