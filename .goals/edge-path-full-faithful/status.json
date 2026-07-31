@@ -1,6 +1,6 @@
 {
   "goal_id": "edge-path-full-faithful",
-  "status": "building",
+  "status": "inspecting",
   "iteration": 3,
   "builder_model": "OpenAI:GPT-5.6-Sol",
   "inspector_model": "OpenAI:GPT-5.6-Luna",
@@ -16,6 +16,11 @@
       "iteration": 2,
       "verdict": "FAIL",
       "summary": "Nerve realization atlas, contraction, and unique simplex-lifting foundations compile, but no realized-covering or edge-path theorem was added: TopologicalComparisonStatement and Full/Faithful remain conditional, and the public equivalence is still absent."
+    },
+    {
+      "iteration": 3,
+      "verdict": "FAIL",
+      "summary": "Degeneracy-aware open core-face stars compile, but star saturation/trivialization, IsCoveringMap, Full/Faithful, the public equivalence, and the unconditional comparison remain absent."
     }
   ]
 }
