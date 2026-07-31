@@ -1,6 +1,6 @@
 {
   "goal_id": "edge-path-full-faithful",
-  "status": "building",
+  "status": "inspecting",
   "iteration": 2,
   "builder_model": "OpenAI:GPT-5.6-Sol",
   "inspector_model": "OpenAI:GPT-5.6-Luna",
@@ -11,6 +11,11 @@
       "iteration": 1,
       "verdict": "BLOCKED",
       "summary": "Mathlib v4.24 lacks the edge-path or realized simplicial-cover theorem; the Builder found no sound short substitute within the fixed dependency boundary."
+    },
+    {
+      "iteration": 2,
+      "verdict": "FAIL",
+      "summary": "Nerve realization atlas, contraction, and unique simplex-lifting foundations compile, but no realized-covering or edge-path theorem was added: TopologicalComparisonStatement and Full/Faithful remain conditional, and the public equivalence is still absent."
     }
   ]
 }
