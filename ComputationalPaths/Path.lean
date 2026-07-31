@@ -185,6 +185,8 @@ import ComputationalPaths.Path.CompPath.CircleScoped
 import ComputationalPaths.Path.CompPath.CirclePresented
 import ComputationalPaths.Path.CompPath.CircleTopologicalRealization
 import ComputationalPaths.Path.Homotopy.TopologicalNerve
+import ComputationalPaths.Path.Homotopy.TopologicalNerveContractible
+import ComputationalPaths.Path.Homotopy.TopologicalNerveCover
 import ComputationalPaths.Path.Homotopy.PresentedGroupoidRealization
 import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.CompPath.Torus

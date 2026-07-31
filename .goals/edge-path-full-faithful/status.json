@@ -1,0 +1,16 @@
+{
+  "goal_id": "edge-path-full-faithful",
+  "status": "building",
+  "iteration": 2,
+  "builder_model": "OpenAI:GPT-5.6-Sol",
+  "inspector_model": "OpenAI:GPT-5.6-Luna",
+  "initial_sha": "18f279a310920aaf0705e4432e24de503caedccf",
+  "created_at": "2026-07-30T21:09:34Z",
+  "history": [
+    {
+      "iteration": 1,
+      "verdict": "BLOCKED",
+      "summary": "Mathlib v4.24 lacks the edge-path or realized simplicial-cover theorem; the Builder found no sound short substitute within the fixed dependency boundary."
+    }
+  ]
+}

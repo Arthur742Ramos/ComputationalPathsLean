@@ -44,4 +44,7 @@ identified with Mathlib's topological fundamental group of `AddCircle 1`.
 Every presented path groupoid also has a checked nerve/geometric realization
 and homotopy-category recovery theorem. The canonical functor to the
 topological fundamental groupoid is constructed and proved essentially
-surjective; its remaining full-faithfulness comparison is explicit future work.
+surjective.  The realization quotient atlas, contraction of under-category
+nerves, and unique simplex lifting for the categorical universal cover are now
+formalized; the remaining full-faithfulness step is the realized-covering
+point-set theorem.

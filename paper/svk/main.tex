@@ -140,7 +140,11 @@ simplicial nerve \(N\Pi(\mathcal P)\) and Mathlib geometric realization
 canonical functor from \(\Pi(\mathcal P)\) to the topological fundamental
 groupoid of the realization and prove it essentially surjective.  Mathlib does
 not yet provide the edge-path theorem needed to prove that functor full and
-faithful.
+faithful.  The companion development now exposes the realization as a quotient
+of its simplex atlas, constructs an explicit contraction for nerves with an
+initial object, and proves unique simplex lifting for the under-category
+universal cover; the remaining step is the point-set theorem that its realized
+projection is a covering map.
 
 The distinction between this presented path groupoid and the library's global
 \texttt{PathRwQuot} is explicit.  Function-space rules make every loop fiber
@@ -252,7 +256,12 @@ This paper provides:
         \path{topologicalComparisonFunctor_essSurj} proves essential
         surjectivity;
         \item \path{Presented.Realization.TopologicalComparisonStatement}
-        names, but does not assume, the remaining full-faithfulness bridge.
+        names, but does not assume, the remaining full-faithfulness bridge;
+        \item \path{realizationAtlas_isQuotientMap},
+        \path{contractibleSpace_nerve_of_isInitial}, and
+        \path{nerveCoverCertificate} establish the quotient-atlas,
+        contractible-total-space, and unique-simplex-lifting inputs for the
+        required realized-covering theorem.
     \end{itemize}
 
     \item A separate SVK equivalence \emph{schema} for the global
@@ -606,6 +615,20 @@ without adding it as an axiom or typeclass hypothesis.
 \path{topologicalComparisonStatement_of_full_faithful} records the exact
 remaining obligation.  Theorem~\ref{thm:circle-realization} proves the
 fundamental-group comparison directly for the circle.
+
+The formalized covering-space route now has three additional kernel-checked
+inputs.  First, \path{realizationAtlas_isQuotientMap} proves that the aggregate
+map from the disjoint union of topological simplices carries exactly the final
+topology of Mathlib's left-Kan-extension realization.  Second,
+\path{contractibleSpace_nerve_of_isInitial} explicitly contracts a realized
+nerve by prepending an initial vertex and varying barycentric weight.  Applied
+to \(\mathord{x\!\downarrow\!\Pi(\mathcal P)}\), this proves that the total
+space of the categorical universal cover is contractible.  Third,
+\path{nerveCoverCertificate} proves, for every dimension and every selected
+vertex, existence and uniqueness of the lifted simplex.  These results do not
+assert full faithfulness by themselves: the outstanding point-set step is to
+turn this unique simplicial lifting certificate into a covering map after
+geometric realization.
 
 \subsection{Circle path presentation}
 
@@ -1715,9 +1738,9 @@ path_congr_right h -- apply hypothesis on left
 \end{lstlisting}
 
 To quantify their use, \texttt{paper/svk/check\_stats.py} performs a
-comment-stripped lexical count.  None of the 19,986 declarations introduced with
+comment-stripped lexical count.  None of the 20,021 declarations introduced with
 \texttt{theorem}/\texttt{lemma} directly invokes a \texttt{path\_*} tactic.
-Across all 53,498 declarations counted (including \texttt{def},
+Across all 53,560 declarations counted (including \texttt{def},
 \texttt{instance}, and \texttt{example}), 11 invoke one directly
 (approximately \(0.021\%\)).  In the twenty-two modules used by this paper,
 one of 1,065 declarations does so (\(0.094\%\)).  Thus the tactics are
@@ -1825,6 +1848,12 @@ The Lean 4 formalization is organized as follows:
 Raw presented paths, generated homotopy, and \(\piOne^{\mathrm{pres}}\) \\
 \texttt{Path/Homotopy/PresentedGroupoidRealization.lean} &
 Nerve, geometric realization, and homotopy-category recovery \\
+\texttt{Path/Homotopy/TopologicalNerve.lean} &
+Realized vertices and edges, functor laws, and essential surjectivity \\
+\texttt{Path/Homotopy/TopologicalNerveContractible.lean} &
+Quotient simplex atlas and contractions of nerves with an initial object \\
+\texttt{Path/Homotopy/TopologicalNerveCover.lean} &
+Under-category cover, contractible total space, and unique simplex lifting \\
 \texttt{Path/Homotopy/HigherHomotopy.lean} & $\piN$ for $n \geq 2$ \\
 \texttt{Path/CompPath/PushoutCompPath.lean} & Quotient pushout and glue naturality \\
 \texttt{Path/CompPath/PushoutPaths.lean} & Word quotients, decode, conditional full SVK \\
