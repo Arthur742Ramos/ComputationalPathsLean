@@ -1,6 +1,6 @@
 {
   "goal_id": "edge-path-full-faithful",
-  "status": "building",
+  "status": "completed",
   "iteration": 5,
   "builder_model": "OpenAI:GPT-5.6-Sol",
   "inspector_model": "OpenAI:GPT-5.6-Luna",
@@ -26,6 +26,11 @@
       "iteration": 4,
       "verdict": "FAIL",
       "summary": "Core-face lifts and simplex-coordinate sheet identities compile, but global quotient saturation, IsCoveringMap, Full/Faithful, the public equivalence, and the unconditional comparison remain absent."
+    },
+    {
+      "iteration": 5,
+      "verdict": "PASS",
+      "summary": "Genuine SSet.toTop open-star sheets and Mathlib IsCoveringMap are proved; path and homotopy lifting yields generic hom-set equivalences, unconditional Full/Faithful instances, a public equivalence, and the unconditional comparison. All Lean, invariant, statistics, full-build, and LaTeX gates pass."
     }
   ]
 }
