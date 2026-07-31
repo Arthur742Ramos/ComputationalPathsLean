@@ -1,0 +1,36 @@
+{
+  "goal_id": "edge-path-full-faithful",
+  "status": "completed",
+  "iteration": 5,
+  "builder_model": "OpenAI:GPT-5.6-Sol",
+  "inspector_model": "OpenAI:GPT-5.6-Luna",
+  "initial_sha": "18f279a310920aaf0705e4432e24de503caedccf",
+  "created_at": "2026-07-30T21:09:34Z",
+  "history": [
+    {
+      "iteration": 1,
+      "verdict": "BLOCKED",
+      "summary": "Mathlib v4.24 lacks the edge-path or realized simplicial-cover theorem; the Builder found no sound short substitute within the fixed dependency boundary."
+    },
+    {
+      "iteration": 2,
+      "verdict": "FAIL",
+      "summary": "Nerve realization atlas, contraction, and unique simplex-lifting foundations compile, but no realized-covering or edge-path theorem was added: TopologicalComparisonStatement and Full/Faithful remain conditional, and the public equivalence is still absent."
+    },
+    {
+      "iteration": 3,
+      "verdict": "FAIL",
+      "summary": "Degeneracy-aware open core-face stars compile, but star saturation/trivialization, IsCoveringMap, Full/Faithful, the public equivalence, and the unconditional comparison remain absent."
+    },
+    {
+      "iteration": 4,
+      "verdict": "FAIL",
+      "summary": "Core-face lifts and simplex-coordinate sheet identities compile, but global quotient saturation, IsCoveringMap, Full/Faithful, the public equivalence, and the unconditional comparison remain absent."
+    },
+    {
+      "iteration": 5,
+      "verdict": "PASS",
+      "summary": "Genuine SSet.toTop open-star sheets and Mathlib IsCoveringMap are proved; path and homotopy lifting yields generic hom-set equivalences, unconditional Full/Faithful instances, a public equivalence, and the unconditional comparison. All Lean, invariant, statistics, full-build, and LaTeX gates pass."
+    }
+  ]
+}

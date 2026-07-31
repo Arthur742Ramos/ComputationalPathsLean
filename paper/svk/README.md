@@ -27,6 +27,7 @@ lake build ComputationalPaths.Path.CompPath.PushoutSVKInstances
 lake build ComputationalPaths.Path.CompPath.ScopedSeifertVanKampen
 lake build ComputationalPaths.Path.CompPath.ClassicalPresentationsScoped
 lake build ComputationalPaths.Path.Homotopy.PresentedFundamentalGroup
+lake build ComputationalPaths.Path.Homotopy.TopologicalNerve
 lake build ComputationalPaths.Path.Homotopy.PresentedGroupoidRealization
 lake build ComputationalPaths.Path.CompPath.CirclePresented
 lake build ComputationalPaths.Path.CompPath.CircleTopologicalRealization
@@ -41,5 +42,10 @@ headline theorem is the proved presented SVK equivalence; the global-rule SVK
 schema remains separately conditional.  The circle presentation is additionally
 identified with Mathlib's topological fundamental group of `AddCircle 1`.
 Every presented path groupoid also has a checked nerve/geometric realization
-and homotopy-category recovery theorem; the general topological fundamental
-groupoid comparison remains explicit future work.
+and homotopy-category recovery theorem. The canonical functor to the
+topological fundamental groupoid is constructed and proved essentially
+surjective, full, and faithful, yielding a public equivalence with the original
+presented groupoid.  The proof descends degeneracy-aware open stars through the
+realization quotient, partitions their preimages into disjoint lifted sheets,
+constructs sheet homeomorphisms, proves the under-category projection is a
+Mathlib covering map, and applies path and homotopy lifting.

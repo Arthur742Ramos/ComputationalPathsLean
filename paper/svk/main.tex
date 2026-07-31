@@ -168,9 +168,15 @@ separately proved nontrivial generator.
 For every presented path groupoid \(\Pi(\mathcal P)\), we also construct its
 simplicial nerve \(N\Pi(\mathcal P)\) and Mathlib geometric realization
 \(\lvert N\Pi(\mathcal P)\rvert\).  The theorem \texttt{hoNerveIso} proves
-\(\mathsf{Ho}(N\Pi(\mathcal P))\cong\Pi(\mathcal P)\).  The remaining comparison
-with the topological fundamental groupoid of that realization is classical, but
-is not yet available in Mathlib; no result in this paper assumes it.
+\(\mathsf{Ho}(N\Pi(\mathcal P))\cong\Pi(\mathcal P)\).  We construct the
+canonical functor from \(\Pi(\mathcal P)\) to the topological fundamental
+groupoid of the realization and prove it essentially surjective, full, and
+faithful.  The companion development exposes the realization as a quotient of
+its simplex atlas, constructs an explicit contraction for nerves with an
+initial object, descends open core-face stars, and proves that the
+under-category projection is a covering map.  Path and homotopy lifting over
+that contractible total space yield a public equivalence with
+\(\Pi(\mathcal P)\).
 
 The distinction between this presented path groupoid and the library's global
 \texttt{PathRwQuot} is explicit.  We isolate the exact mechanism by which
@@ -183,8 +189,8 @@ torus, Klein bottle, projective plane, and cyclic lens-space expression
 languages, but they are not identified with the global quotient or with
 ordinary topological fundamental groups.
 
-The twenty-one Lean modules in the formalization core described here comprise
-\textbf{12,653 lines}.
+The twenty-seven Lean modules in the formalization core described here comprise
+\textbf{17,931 lines}.
 The formalization contains no \texttt{sorry}, \texttt{admit}, or custom
 \texttt{axiom} declaration.  The immutable Lean artifact, build instructions,
 and theorem manifest are archived at
@@ -280,9 +286,22 @@ This paper provides:
         geometric realization;
         \item \path{Presented.Realization.hoNerveIso} proves that the homotopy
         category of the nerve is the original presented path groupoid;
-        \item \path{Presented.Realization.TopologicalComparisonStatement}
-        names, but does not assume, the remaining topological bridge, which is
-        classical~\cite{GabrielZisman1967} but not yet formalized in Mathlib.
+        \item \path{Presented.Realization.topologicalComparisonFunctor}
+        realizes objects and arrows as topological vertices and paths, and
+        \path{topologicalComparisonFunctor_essSurj} proves essential
+        surjectivity;
+        \item \path{topologicalComparisonFunctor_full} and
+        \path{topologicalComparisonFunctor_faithful} prove the edge-path
+        comparison, while \path{topologicalFundamentalGroupoidEquivalence}
+        packages the resulting equivalence;
+        \item \path{Presented.Realization.topologicalComparisonStatement}
+        proves the named comparison proposition unconditionally;
+        \item \path{realizationAtlas_isQuotientMap},
+        \path{exists_mem_realizationStar},
+        \path{preimage_realizationStar_eq_iUnion_nerveCoreSheet}, and
+        \path{isCoveringMap_nerveCoverMap} establish the quotient atlas,
+        global open-star cover, exact sheet decomposition, and realized
+        covering theorem.
     \end{itemize}
 
     \item A separate SVK equivalence \emph{schema} for the global
@@ -314,7 +333,7 @@ This paper provides:
 
     \item A Lean 4 development supporting these results, comprising:
     \begin{itemize}
-        \item 12,653 lines across the 21 modules used by this paper
+        \item 17,931 lines across the 27 modules used by this paper
         \item zero \texttt{sorry}, \texttt{admit}, and custom \texttt{axiom}
         declarations
         \item a public repository and reproducible source/automation statistics
@@ -655,24 +674,52 @@ implemented by \path{Presented.Realization.hoNerveIso}.  Thus the presented
 groupoid is recovered from its simplicial realization without invoking encode
 or a normal form.
 
+There is a canonical functor
+\[
+\Phi_{\mathcal P}\colon
+\Pi(\mathcal P)\longrightarrow
+\Pi_1^{\mathrm{top}}(\lvert\mathcal P\rvert),
+\]
+implemented by \path{Presented.Realization.topologicalComparisonFunctor}.
+It sends objects to realized vertices and arrows to realized one-simplices.
+Degenerate edges prove the identity law, and realized two-simplices give the
+endpoint-fixed homotopies proving preservation of composition.  Since every
+point of the realization is represented by a point of a topological simplex,
+and every such simplex is path connected,
+\path{topologicalComparisonFunctor_essSurj} proves that \(\Phi_{\mathcal P}\)
+is essentially surjective.
+
 The stronger statement
 \[
 \Pi_1^{\mathrm{top}}(\lvert\mathcal P\rvert)\simeq\Pi(\mathcal P)
 \]
-is classically true and standard.  Gabriel and Zisman construct a fundamental
-groupoid functor \(\pi:\mathbf{sSet}\to\mathbf{Grpd}\), left adjoint to the
-nerve, and prove \(\Pi_1^{\mathrm{top}}(\lvert K\rvert)\cong\pi(K)\) for every
-simplicial set \(K\)~\cite{GabrielZisman1967}.  Since the nerve is fully
-faithful, the counit \(\pi N\Rightarrow\mathrm{id}\) is an isomorphism, so
-\(\pi(N(\mathcal P))\cong\Pi(\mathcal P)\); composing the two gives the display.
-The obstruction is therefore one of formalization rather than of mathematics:
-Mathlib~v4.24 supplies the nerve, the geometric realization, and the topological
-fundamental groupoid, but not the comparison between them.  We name the exact
-specialization that would be needed as
-\path{Presented.Realization.TopologicalComparisonStatement} and deliberately do
-not assume it as an axiom or as a typeclass hypothesis, so no result in this
-paper depends on it.  Theorem~\ref{thm:circle-realization} discharges the
-fundamental-group comparison for the circle directly, without that bridge.
+is proved by
+\path{Presented.Realization.topologicalFundamentalGroupoidEquivalence}.
+The instances \path{topologicalComparisonFunctor_full} and
+\path{topologicalComparisonFunctor_faithful} establish the topological
+edge-path theorem, and
+\path{Presented.Realization.topologicalComparisonStatement} proves the named
+comparison proposition without an axiom or additional hypothesis.
+Theorem~\ref{thm:circle-realization} remains a separate concrete winding
+calculation for the circle.
+
+The formalized covering-space route now has three additional kernel-checked
+inputs.  First, \path{realizationAtlas_isQuotientMap} proves that the aggregate
+map from the disjoint union of topological simplices carries exactly the final
+topology of Mathlib's left-Kan-extension realization.  Second,
+\path{contractibleSpace_nerve_of_isInitial} explicitly contracts a realized
+nerve by prepending an initial vertex and varying barycentric weight.  Applied
+to \(\mathord{x\!\downarrow\!\Pi(\mathcal P)}\), this proves that the total
+space of the categorical universal cover is contractible.  Third,
+\path{nerveCoverCertificate} proves, for every dimension and every selected
+vertex, existence and uniqueness of the lifted simplex.  The open sets are the
+descended \path{SimplexCoreFace.realizationStar}s: support faces and
+nondegenerate cores prove that they cover.  Their inverse images decompose
+exactly into pairwise-disjoint \path{nerveCoreSheet}s, each homeomorphic to the
+base star.  The resulting
+\path{isCoveringMap_nerveCoverMap} feeds Mathlib's path and homotopy lifting;
+contractibility of the total realization then proves the hom-set equivalence
+\path{nerveRealizationHomEquiv}.
 
 \subsection{Circle path presentation}
 
@@ -1783,12 +1830,12 @@ path_congr_right h -- apply hypothesis on left
 \end{lstlisting}
 
 To quantify their use, \texttt{paper/svk/check\_stats.py} performs a
-comment-stripped lexical count.  None of the 19,967 declarations introduced with
+comment-stripped lexical count.  None of the 20,126 declarations introduced with
 \texttt{theorem}/\texttt{lemma} directly invokes a \texttt{path\_*} tactic.
-Across all 53,451 declarations counted (including \texttt{def},
+Across all 53,729 declarations counted (including \texttt{def},
 \texttt{instance}, and \texttt{example}), 11 invoke one directly
-(approximately \(0.021\%\)).  In the twenty-one modules used by this paper,
-one of 1,018 declarations does so (\(0.098\%\)).  Thus the tactics are
+(approximately \(0.020\%\)).  In the twenty-seven modules used by this paper,
+one of 1,296 declarations does so (\(0.077\%\)).  Thus the tactics are
 small convenience wrappers; the SVK proofs are predominantly explicit
 applications of named \texttt{RwEq} lemmas, congruence, and quotient induction.
 
@@ -1909,6 +1956,18 @@ extension.
 Raw presented paths, generated homotopy, and \(\piOne^{\mathrm{pres}}\) \\
 \leanname{Homotopy/PresentedGroupoidRealization} &
 Nerve, geometric realization, and homotopy-category recovery \\
+\leanname{Homotopy/TopologicalNerve} &
+Realized vertices and edges, functor laws, and essential surjectivity \\
+\leanname{Homotopy/TopologicalNerveContractible} &
+Quotient simplex atlas and contractions of nerves with an initial object \\
+\leanname{Homotopy/TopologicalRealizationOpen} &
+Descent of compatible open simplex families to realization \\
+\leanname{Homotopy/TopologicalSimplexStar} &
+Degeneracy-aware open core-face stars for realized-cover charts \\
+\leanname{Homotopy/TopologicalNerveCover} &
+Global lifted sheets, homeomorphisms, and the realized covering map \\
+\leanname{Homotopy/TopologicalNerveComparison} &
+Path/homotopy lifting, full faithfulness, and the edge-path equivalence \\
 \leanname{Homotopy/HigherHomotopy} & $\piN$ for $n \geq 2$ \\
 \leanname{CompPath/PushoutCompPath} & Quotient pushout and glue naturality \\
 \leanname{CompPath/PushoutPaths} & Word quotients, decode, conditional full SVK \\
@@ -1947,8 +2006,8 @@ axioms.
 \toprule
 \textbf{Metric} & \textbf{Value} \\
 \midrule
-Lean lines in the 21-module formalization core & 12,653 \\
-Modules in the formalization core & 21 \\
+Lean lines in the 27-module formalization core & 17,931 \\
+Modules in the formalization core & 27 \\
 Custom \texttt{axiom} declarations & 0 \\
 \texttt{sorry}/\texttt{admit} occurrences after comment stripping & 0/0 \\
 Reproduction script & \leanname{paper/svk/check_stats.py} \\
@@ -2073,7 +2132,7 @@ We have presented a \emph{modular SVK framework} within the computational paths 
     \item Presented fundamental groups, global-rule loop quotients, conditional
     schemas, and completed expression quotients are distinguished throughout.
 
-    \item The twenty-one modules used by the paper comprise 12,653 lines, and the
+    \item The twenty-seven modules used by the paper comprise 17,931 lines, and the
     repository contains no \texttt{sorry}, \texttt{admit}, or custom
     \texttt{axiom} declaration.
 \end{enumerate}
@@ -2310,6 +2369,10 @@ Proved group equivalence \\
 General nerve recovery &
 \leanentry{Presented.Realization.hoNerveIso}{PresentedGroupoidRealization} &
 Proved category isomorphism \\
+General topological fundamental-groupoid comparison &
+\leanentry{Presented.Realization.topologicalFundamentalGroupoidEquivalence}
+  {PresentedGroupoidRealization} &
+Proved category equivalence \\
 General presented SVK group equivalence &
 \leanentry{presentedSeifertVanKampenGroupEquiv}{PresentedSeifertVanKampen} &
 Proved \\

@@ -69,9 +69,15 @@ equivalence \code{presentedCircleTopologicalPiOneGroupEquiv}.  A general
 geometric realization is also constructed from the nerve, and
 \code{Presented.Realization.hoNerveIso} recovers the original presented
 groupoid as its simplicial homotopy category.  The final comparison with the
-topological fundamental groupoid of that realization, including the
-figure-eight, is classical but not yet formalized in Mathlib; the paper now
-says so explicitly and cites Gabriel and Zisman, and no result depends on it.
+topological fundamental groupoid is now represented by an explicit canonical
+functor, whose identity and composition laws, essential surjectivity, fullness,
+and faithfulness are proved.  We descend degeneracy-aware open core-face stars
+through the realization quotient, prove that they cover, partition each
+preimage into disjoint lifted sheets, construct the sheet homeomorphisms, and
+prove that the under-category projection is a Mathlib covering map.  Path and
+homotopy lifting over its contractible total space then provide the explicit
+hom-set inverse and the public equivalence
+\code{topologicalFundamentalGroupoidEquivalence}.
 
 Because these additions change where the paper places its weight, we also
 added two short remarks that state their status plainly.  Remark~2.10 records
@@ -232,11 +238,11 @@ Appendix~A repeats the same status.
 
 \review{p.~36, path tactics: state what fraction of theorems rely on them.}
 \response
-We added a reproducible lexical count.  None of 19,967
-\code{theorem}/\code{lemma} declarations directly invokes a \code{path_*}
-tactic.  Across all 53,451 declarations counted, including definitions,
-instances, and examples, 11 do so (approximately \(0.021\%\)); in the twenty-one
-paper modules, one of 1,018 declarations does so (\(0.098\%\)).  The paper
+We added a reproducible lexical count.  None of 20,126
+\code{theorem}/\code{lemma} declarations directly invokes a \code{path\_*}
+tactic.  Across all 53,729 declarations counted, including definitions,
+instances, and examples, 11 do so (approximately \(0.020\%\)); in the twenty-seven
+paper modules, one of 1,296 declarations does so (\(0.077\%\)).  The paper
 therefore characterizes these tactics as convenience wrappers rather than a
 mature dominant automation layer.
 
