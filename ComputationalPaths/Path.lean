@@ -192,6 +192,7 @@ import ComputationalPaths.Path.Homotopy.TopologicalSimplexStar
 import ComputationalPaths.Path.Homotopy.PresentedGroupoidRealization
 import ComputationalPaths.Path.Homotopy.AmbientPathComparison
 import ComputationalPaths.Path.CompPath.CircleAmbientRealization
+import ComputationalPaths.Path.CompPath.CircleNerveAmbient
 import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.TorusStep
