@@ -20,6 +20,7 @@ arxiv_package/
 computational_paths_arxiv_arxiv.zip
 docs/computational_paths_arxiv_arxiv.zip
 omega_groupoid_arxiv.zip
+paper/svk/dist/
 tmpzip/
 
 # LaTeX build artifacts
@@ -55,6 +56,8 @@ CLAUDE.md
 # Local-only files
 .DS_Store
 *.docx
+__pycache__/
+*.py[cod]
 .codex/
 .copex/
 .fleet-out/
