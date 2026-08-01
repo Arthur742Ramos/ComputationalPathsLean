@@ -137,6 +137,11 @@ equality refinement `Σ h : a = b, M b h` admits unrestricted based elimination
 with propositional beta exactly when the reflexivity metadata fiber
 `M a rfl` is contractible.
 
+The stable Lean names for the headline chain are
+`based_identity_total_space_contractible`,
+`unrestricted_based_elimination_iff_contractible`, and
+`metadata_fiber_criterion`.
+
 The earlier raw, scope-indexed de Bruijn calculus is preserved independently at
 `paper/adequacy/companion/main.tex`; it is not folded into the theory article.
 Build the manuscripts separately:

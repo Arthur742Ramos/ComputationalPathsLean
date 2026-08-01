@@ -73,6 +73,30 @@ theorem all_eq (h : IsContractible X) (x y : X) : x = y := by
 
 end IsContractible
 
+/-! ## The standard based identity total space -/
+
+/-- The total space of ambient equality paths starting at `a`.
+
+`PSigma` is used because Lean's ambient equality is `Prop`-valued. -/
+abbrev BasedIdentityTotal {A : Type u} (a : A) : Type u :=
+  PSigma (fun b : A => a = b)
+
+/-- The reflexive center of the based identity total space. -/
+def basedIdentityCenter {A : Type u} (a : A) : BasedIdentityTotal a :=
+  ⟨a, rfl⟩
+
+/-- The based identity total space contracts to its reflexive point. -/
+theorem based_identity_total_space_contracts_at {A : Type u} (a : A) :
+    ContractsAt (basedIdentityCenter a) := by
+  rintro ⟨b, h⟩
+  cases h
+  rfl
+
+/-- The standard based identity total space is contractible. -/
+theorem based_identity_total_space_contractible {A : Type u} (a : A) :
+    IsContractible (BasedIdentityTotal a) :=
+  ⟨basedIdentityCenter a, based_identity_total_space_contracts_at a⟩
+
 /-- An unrestricted eliminator contracts its domain to its base point.  The
 contraction motive is the standard one; the beta field additionally records
 its value at the center. -/
