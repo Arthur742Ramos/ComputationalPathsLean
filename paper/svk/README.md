@@ -36,6 +36,7 @@ lake build ComputationalPaths.Path.Homotopy.TopologicalNerveComparison
 lake build ComputationalPaths.Path.Homotopy.PresentedGroupoidRealization
 lake build ComputationalPaths.Path.CompPath.CirclePresented
 lake build ComputationalPaths.Path.CompPath.CircleTopologicalRealization
+lake build ComputationalPaths.Path.CompPath.CircleNerveAmbient
 lake build ComputationalPaths.Path.CompPath.PresentedSeifertVanKampen
 lake build ComputationalPaths.Path.Homotopy.Fibration
 lake build ComputationalPaths.Path.CompPath.SuspensionDeep
@@ -54,15 +55,18 @@ presented groupoid.  The proof descends degeneracy-aware open stars through the
 realization quotient, partitions their preimages into disjoint lifted sheets,
 constructs sheet homeomorphisms, proves the under-category projection is a
 Mathlib covering map, and applies path and homotopy lifting.
+The circle instance additionally proves an unconditional homotopy equivalence
+between the nerve realization of the presented circle and `TopologicalCircle`.
 
 ## Build the archival artifact
 
 From a clean commit, build the standalone archive for a new Zenodo version:
 
 ```bash
-python3 paper/svk/build_artifact.py --version 0.2.0
+python3 paper/svk/build_artifact.py --version 0.3.0
 ```
 
 The archive is written under `paper/svk/dist/`.  Its explicit import manifest
-contains the same 27 entry modules audited by `check_stats.py`, including the
-six modules that prove the general topological comparison.
+contains the same 28 entry modules audited by `check_stats.py`, including the
+circle ambient-realization theorem and the modules that prove the general
+topological comparison.

@@ -123,6 +123,8 @@ The archive includes:
 - circle and nontrivial figure-eight specializations;
 - the topological circle comparison with Mathlib's
   `FundamentalGroup (AddCircle 1) 0`;
+- the unconditional homotopy equivalence between the presented circle's nerve
+  realization and `TopologicalCircle`;
 - the simplicial nerve and genuine Mathlib geometric realization of every
   presented path groupoid;
 - the unconditional equivalence between the original presented groupoid and
@@ -156,6 +158,8 @@ def render_theorem_manifest() -> str:
 - `ComputationalPaths.Path.CompPath.CircleTopologicalRealization.isCoveringMap_circleCover`
 - `ComputationalPaths.Path.CompPath.CircleTopologicalRealization.topologicalPiOneEquivInt`
 - `ComputationalPaths.Path.CompPath.CircleTopologicalRealization.presentedCircleTopologicalPiOneGroupEquiv`
+- `ComputationalPaths.Path.CompPath.CircleNerveAmbient.circleAmbientHomotopyEquiv`
+- `ComputationalPaths.Path.CompPath.CircleNerveAmbient.circlePresented_topologicalRealization_homotopyEquiv`
 
 ## General topological realization
 

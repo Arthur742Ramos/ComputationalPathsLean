@@ -26,6 +26,7 @@ SVK_CORE = [
     SRC / "Path/CompPath/CircleScoped.lean",
     SRC / "Path/CompPath/CirclePresented.lean",
     SRC / "Path/CompPath/CircleTopologicalRealization.lean",
+    SRC / "Path/CompPath/CircleNerveAmbient.lean",
     SRC / "Path/CompPath/ClassicalPresentationsScoped.lean",
     SRC / "Path/CompPath/ScopedSeifertVanKampen.lean",
     SRC / "Path/CompPath/PresentedSeifertVanKampen.lean",
