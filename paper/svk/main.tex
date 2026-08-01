@@ -292,15 +292,17 @@ This paper provides:
         surjectivity;
         \item \path{topologicalComparisonFunctor_full} and
         \path{topologicalComparisonFunctor_faithful} prove the edge-path
-        comparison, while \path{topologicalFundamentalGroupoidEquivalence}
-        packages the resulting equivalence;
+        comparison;
+        \item \path{topologicalFundamentalGroupoidEquivalence} packages
+        the resulting equivalence;
         \item \path{Presented.Realization.topologicalComparisonStatement}
         proves the named comparison proposition unconditionally;
         \item \path{realizationAtlas_isQuotientMap},
-        \path{exists_mem_realizationStar},
-        \path{preimage_realizationStar_eq_iUnion_nerveCoreSheet}, and
-        \path{isCoveringMap_nerveCoverMap} establish the quotient atlas,
-        global open-star cover, exact sheet decomposition, and realized
+        \path{exists_mem_realizationStar}, and
+        \path{preimage_realizationStar_eq_iUnion_nerveCoreSheet} establish
+        the quotient atlas, global open-star cover, and exact sheet
+        decomposition;
+        \item \path{isCoveringMap_nerveCoverMap} establishes the realized
         covering theorem.
     \end{itemize}
 
@@ -696,9 +698,9 @@ The stronger statement
 \]
 is proved by
 \path{Presented.Realization.topologicalFundamentalGroupoidEquivalence}.
-The instances \path{topologicalComparisonFunctor_full} and
-\path{topologicalComparisonFunctor_faithful} establish the topological
-edge-path theorem, and
+The instance \path{topologicalComparisonFunctor_full} establishes the full
+part of the topological edge-path theorem.  The instance
+\path{topologicalComparisonFunctor_faithful} establishes faithfulness, and
 \path{Presented.Realization.topologicalComparisonStatement} proves the named
 comparison proposition without an axiom or additional hypothesis.
 Theorem~\ref{thm:circle-realization} remains a separate concrete winding
@@ -1600,7 +1602,7 @@ global-rule loop quotient is claimed.
 \mid [a_1,b_1]\cdots[a_g,b_g]=1\rangle
 \]
 is represented by typed word and relator syntax.  The Lean development does
-does not prove a presented or topological
+not prove a presented or topological
 \(\piOne(\Sigma_g)\) equivalence with this presentation.
 \end{remark}
 
@@ -1633,7 +1635,7 @@ loop-quotient equivalence is claimed.
       \(\mathsf{RP2ScopedQuotient}\simeq\langle a\mid a^2=1\rangle\cong\ZZ_2\).
     \item Klein-bottle expressions satisfy
       \(\mathsf{KleinScopedQuotient}\simeq
-       \langle a,b\mid a^2b^2=1\rangle\cong\ZZ\rtimes\ZZ\).
+       \langle a,b\mid aba^{-1}b=1\rangle\cong\ZZ\rtimes\ZZ\).
 \end{itemize}
 \end{example}
 
