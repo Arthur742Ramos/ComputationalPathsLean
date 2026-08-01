@@ -57,6 +57,57 @@ structure RealizationModel (A : Type u) [TopologicalSpace A] where
   realize_continuous {a b : A} :
     Continuous (realize : ComputationalPaths.Path a b → _root_.Path a b)
 
+/-- The canonical realization forced by the equality semantics of raw
+computational paths: every trace is sent to the constant interval path at its
+source, cast to the target endpoint. -/
+noncomputable def constantRealize {A : Type u} [TopologicalSpace A]
+    {a b : A} (p : ComputationalPaths.Path a b) : _root_.Path a b :=
+  (_root_.Path.refl a).cast rfl p.proof.symm
+
+/-!
+This model is intentionally degenerate geometrically.  It is canonical for
+the present `Path` definition because a raw path carries `a = b`; nonconstant
+geometric motion requires an additional path notion whose endpoints need not
+be propositionally equal.
+-/
+
+/-- A proof-irrelevant realization model available for every topological space.
+Its trace coordinate remains fully visible in `GeometricCompPath`, while the
+geometric coordinate is the canonical constant path. -/
+noncomputable def constantRealizationModel {A : Type u} [TopologicalSpace A] :
+    RealizationModel A where
+  realize := constantRealize
+  realize_refl := by
+    intro a
+    exact ⟨by
+      simpa [constantRealize] using (_root_.Path.Homotopy.refl (_root_.Path.refl a))⟩
+  realize_trans := by
+    intro a b c p q
+    rcases p with ⟨psteps, hp⟩
+    rcases q with ⟨qsteps, hq⟩
+    cases hp
+    cases hq
+    exact ⟨by
+      simpa [constantRealize] using (_root_.Path.Homotopy.refl (_root_.Path.refl a))⟩
+  realize_symm := by
+    intro a b p
+    rcases p with ⟨steps, hp⟩
+    cases hp
+    exact ⟨by
+      simpa [constantRealize] using (_root_.Path.Homotopy.refl (_root_.Path.refl a))⟩
+  realize_continuous := by
+    intro a b
+    cases isEmpty_or_nonempty (ComputationalPaths.Path a b) with
+    | inl h =>
+        letI : IsEmpty (ComputationalPaths.Path a b) := h
+        apply continuous_iff_continuousAt.mpr
+        intro p
+        exact isEmptyElim p
+    | inr h =>
+        let p₀ : ComputationalPaths.Path a b := Classical.choice h
+        convert (continuous_const :
+          Continuous (fun _ : ComputationalPaths.Path a b => constantRealize p₀)) using 1
+
 /-! ## Geometric paths carrying computational traces -/
 
 /-- A continuous interval path equipped with a raw computational trace and a
