@@ -1007,6 +1007,7 @@ import ComputationalPaths.Path.Topology.SymplecticGeometry
 import ComputationalPaths.Path.Topology.TwistedKTheory
 import ComputationalPaths.Path.Topology.SpectraAlgebraDeep
 import ComputationalPaths.Path.Topology.ComputationalPathTopology
+import ComputationalPaths.Path.Topology.GeometricComputationalPath
 import ComputationalPaths.Path.TransportDeep
 import ComputationalPaths.Path.Homotopy.KillerExamples
 import ComputationalPaths.Path.Rewrite.ConfluenceDeepType
