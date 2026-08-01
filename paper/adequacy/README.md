@@ -20,6 +20,17 @@ The Lean counterparts are
 | `MetadataRepair.lean` | setoid repair, projection/kernel, `PathRwQuot`/K, raw-level `RwEq`-totality criterion, computed trace fiber, failing parity repair, circle/torus no-bridge |
 | `QuotientPathInduction.lean` | the collapse theorem, quotient path induction, universal no-bridge, groupoid-fragment sharpness |
 
+Reviewer claim map:
+
+| Earlier combined-draft claim | Stable Lean declaration |
+| --- | --- |
+| Based identity total-space contractibility | `based_identity_total_space_contractible` |
+| Unrestricted based eliminator with propositional beta iff contractible | `unrestricted_based_elimination_iff_contractible` |
+| General equality-metadata fiber criterion | `metadata_fiber_criterion` |
+
+The explicit beta field is part of `UnrestrictedBasedEliminator`; the
+factor-through-equality result is `factorized_motive_eliminator`.
+
 ## Resolution pass: the rewrite quotient collapses to ambient equality
 
 The raw-level criterion of Section 6 reduces unrestricted `J` for `PathRwQuot`

@@ -2306,7 +2306,12 @@ scope once and do not restate it.
 
 \begin{enumerate}[label=(\roman*)]
 \item They do not refute ordinary equality elimination: the projection
-  \(\proj\) still supports Theorem~\ref{thm:motive-factorization}.
+  \(\proj\) still supports Theorem~\ref{thm:motive-factorization}, so ordinary
+  path induction through ambient equality remains available.
+\item They do not refute uniqueness of identity proofs for ambient equality.
+  In the proof-irrelevant metatheory used here, UIP already holds for that
+  equality.  The distinct values are metadata records, not distinct ambient
+  equality proofs.
 \item They do not say metadata cannot be composed, inverted, normalized, or
   rewritten; those operations are orthogonal to fiber contractibility.
 \item Every beta law in the classification theorems is propositional.  The
@@ -2504,6 +2509,8 @@ public source
 \path{UnrestrictedBasedEliminator}, and \path{IsContractible}.  Its main
 theorems and constructions are:
 \begin{itemize}[leftmargin=1.3em,itemsep=1pt,topsep=3pt]
+\item \path{based_identity_total_space_contractible}, the standard
+  contractibility theorem for \(\sum_{b:A}(a=b)\);
 \item \path{unrestricted_based_elimination_iff_contractible}, the equivalence
   \(\Jbeta\Eqv\isContr(\text{total})\);
 \item \path{metadataTotalEquiv} and
@@ -2518,6 +2525,11 @@ theorems and constructions are:
 \item \path{composable_trace_no_unrestricted_based_eliminator}, formalizing
   Corollary~\ref{cor:composable}.
 \end{itemize}
+The first, second, and fourth declarations in this list are the stable names
+for the three abstract results identified in the earlier combined draft: the
+based identity total-space theorem, the
+unrestricted-eliminator/contractibility equivalence with explicit
+propositional beta, and the general metadata-fiber criterion.
 The same module contains a genuine length-two
 \(\texttt{Path.trans}\) construction and the nontrivial
 \(\texttt{RwEq}\) inverse-cancellation certificate

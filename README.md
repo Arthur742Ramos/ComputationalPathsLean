@@ -157,6 +157,11 @@ and universal setoid repair for equality metadata, the projection/kernel
 classification, the exact `PathRwQuot`/local-K criterion, and the
 genuine-versus-synthetic circle/torus audit.
 
+The stable Lean names for the headline chain are
+`based_identity_total_space_contractible`,
+`unrestricted_based_elimination_iff_contractible`, and
+`metadata_fiber_criterion`.
+
 The earlier raw, scope-indexed de Bruijn calculus is preserved independently at
 `paper/adequacy/companion/main.tex`; it is not folded into the theory article.
 See `paper/README.md` for the manuscript build matrix and the external
