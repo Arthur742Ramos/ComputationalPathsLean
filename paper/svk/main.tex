@@ -165,6 +165,13 @@ and obtain a group isomorphism from the presented circle fundamental group to
 specialization of SVK is the full free product of two copies of \(\ZZ\), with a
 separately proved nontrivial generator.
 
+We additionally prove the space-level statement
+\(\mathsf{CircleNerveRealization}\simeq_h\mathsf{TopologicalCircle}\):
+the nerve realization of the presented circle is homotopy equivalent to the
+ordinary additive circle.  The Lean construction uses explicit continuous maps,
+an exact right inverse, and a globally compatible simplexwise homotopy for the
+left inverse descended through the realization colimit.
+
 For every presented path groupoid \(\Pi(\mathcal P)\), we also construct its
 simplicial nerve \(N\Pi(\mathcal P)\) and Mathlib geometric realization
 \(\lvert N\Pi(\mathcal P)\rvert\).  The theorem \texttt{hoNerveIso} proves
@@ -189,12 +196,12 @@ torus, Klein bottle, projective plane, and cyclic lens-space expression
 languages, but they are not identified with the global quotient or with
 ordinary topological fundamental groups.
 
-The twenty-seven Lean modules in the formalization core described here comprise
-\textbf{17,931 lines}.
+The twenty-eight Lean modules in the formalization core described here comprise
+\textbf{20,351 lines}.
 The formalization contains no \texttt{sorry}, \texttt{admit}, or custom
 \texttt{axiom} declaration.  The immutable Lean artifact, build instructions,
 and theorem manifest are archived at
-\url{https://doi.org/10.5281/zenodo.21716462}.
+\url{https://doi.org/10.5281/zenodo.21745185}.
 \end{abstract}
 
 \maketitle
@@ -276,7 +283,10 @@ This paper provides:
         \item \path{topologicalPiOneEquivInt} computes Mathlib's topological
         fundamental group by lifted winding number;
         \item \path{presentedCircleTopologicalPiOneGroupEquiv} identifies it,
-        as a group, with the presented circle fundamental group.
+        as a group, with the presented circle fundamental group;
+        \item \path{circlePresented_topologicalRealization_homotopyEquiv} proves
+        the stronger ambient homotopy equivalence between the presented circle's
+        nerve realization and \(\mathsf{AddCircle}\,1\).
     \end{itemize}
 
     \item A general simplicial and geometric realization:
@@ -335,7 +345,7 @@ This paper provides:
 
     \item A Lean 4 development supporting these results, comprising:
     \begin{itemize}
-        \item 17,931 lines across the 27 modules used by this paper
+        \item 20,351 lines across the 28 modules used by this paper
         \item zero \texttt{sorry}, \texttt{admit}, and custom \texttt{axiom}
         declarations
         \item a public repository and reproducible source/automation statistics
@@ -372,10 +382,10 @@ Readers interested in the mathematical content can focus on Sections~\ref{sec:pu
 \subsection{Code availability}
 
 The immutable Lean~4 formalization artifact for this article is archived as
-version~0.2.0 at Zenodo:
-\url{https://doi.org/10.5281/zenodo.21716462}.
-It contains the 27 paper entry modules and their 44 transitive local
-dependencies (71 Lean files total), the pinned Lean/Lake configuration, MIT
+version~0.3.0 at Zenodo:
+\url{https://doi.org/10.5281/zenodo.21745185}.
+It contains the 28 paper entry modules and their 45 transitive local
+dependencies (73 Lean files total), the pinned Lean/Lake configuration, MIT
 license, theorem manifest, and invariant checker.  The standalone commands are
 \texttt{lake update},
 \texttt{lake build}, and \texttt{python3 scripts/check\_invariants.py}.
@@ -704,7 +714,8 @@ part of the topological edge-path theorem.  The instance
 \path{Presented.Realization.topologicalComparisonStatement} proves the named
 comparison proposition without an axiom or additional hypothesis.
 Theorem~\ref{thm:circle-realization} remains a separate concrete winding
-calculation for the circle.
+calculation for the circle.  In addition, the concrete circle instance has a
+space-level comparison with the ordinary additive circle, stated below.
 
 The formalized covering-space route now has three additional kernel-checked
 inputs.  First, \path{realizationAtlas_isQuotientMap} proves that the aggregate
@@ -780,6 +791,31 @@ connectivity of \(\mathbb R\) proves the two round trips.  Finally,
 \path{presentedCircleTopologicalPiOneGroupEquiv} composes the two winding
 classifications and records preservation of multiplication, identity, and
 inversion.
+\end{proof}
+
+\begin{theorem}[Ambient realization of the presented circle]
+\label{thm:circle-ambient-realization}
+Let \(\mathsf{CircleNerveRealization}\) be the Mathlib geometric realization of
+the nerve of the presented circle groupoid.  Then
+\[
+\begin{gathered}
+\mathsf{CircleNerveRealization}\simeq_h\mathsf{TopologicalCircle},\\
+\mathsf{CircleNerveRealization}\simeq_h\mathbb R/\mathbb Z.
+\end{gathered}
+\]
+\end{theorem}
+
+\begin{proof}
+The Lean declarations \path{circleNerveToAmbient} and
+\path{circleAmbientToNerve} define the two continuous maps.  Their composite
+from the ambient circle to the nerve and back is proved exactly equal to the
+identity.  For the other composite, \path{circleLocalJoin} gives a
+simplexwise join homotopy between the chosen generator edge and the original
+simplex point; face and degeneracy naturality makes these homotopies compatible
+on overlaps.  The compatible cocone descends through the Mathlib realization
+colimit as \path{circleAmbientClassifyingSpaceHomotopy}, yielding the
+unconditional definition \path{circlePresented_topologicalRealization_homotopyEquiv}.
+No encode/decode parameter, ambient-space hypothesis, or custom axiom is used.
 \end{proof}
 
 \subsubsection*{Scoped completion semantics}
@@ -1833,12 +1869,12 @@ path_congr_right h -- apply hypothesis on left
 \end{lstlisting}
 
 To quantify their use, \texttt{paper/svk/check\_stats.py} performs a
-comment-stripped lexical count.  None of the 20,126 declarations introduced with
+comment-stripped lexical count.  None of the 20,243 declarations introduced with
 \texttt{theorem}/\texttt{lemma} directly invokes a \texttt{path\_*} tactic.
-Across all 53,729 declarations counted (including \texttt{def},
+Across all 53,956 declarations counted (including \texttt{def},
 \texttt{instance}, and \texttt{example}), 11 invoke one directly
-(approximately \(0.020\%\)).  In the twenty-seven modules used by this paper,
-one of 1,296 declarations does so (\(0.077\%\)).  Thus the tactics are
+(approximately \(0.020\%\)).  In the twenty-eight modules used by this paper,
+one of 1,411 declarations does so (\(0.071\%\)).  Thus the tactics are
 small convenience wrappers; the SVK proofs are predominantly explicit
 applications of named \texttt{RwEq} lemmas, congruence, and quotient induction.
 
@@ -1982,6 +2018,8 @@ Presented SVK and figure-eight theorem \\
 Presented circle fundamental group \(\simeq\ZZ\) \\
 \leanname{CompPath/CircleTopologicalRealization} &
 Covering map, topological winding, and circle comparison \\
+\leanname{CompPath/CircleNerveAmbient} &
+Explicit ambient circle maps and realization homotopy equivalence \\
 \leanname{CompPath/CircleScoped} & Circle and torus scoped completions \\
 \leanname{CompPath/ClassicalPresentationsScoped} & Klein, projective, and lens completions \\
 \leanname{CompPath/FigureEight} & Conditional and provenance interfaces \\
@@ -2009,8 +2047,8 @@ axioms.
 \toprule
 \textbf{Metric} & \textbf{Value} \\
 \midrule
-Lean lines in the 27-module formalization core & 17,931 \\
-Modules in the formalization core & 27 \\
+Lean lines in the 28-module formalization core & 20,351 \\
+Modules in the formalization core & 28 \\
 Custom \texttt{axiom} declarations & 0 \\
 \texttt{sorry}/\texttt{admit} occurrences after comment stripping & 0/0 \\
 Reproduction script & \leanname{paper/svk/check_stats.py} \\
@@ -2135,7 +2173,7 @@ We have presented a \emph{modular SVK framework} within the computational paths 
     \item Presented fundamental groups, global-rule loop quotients, conditional
     schemas, and completed expression quotients are distinguished throughout.
 
-    \item The twenty-seven modules used by the paper comprise 17,931 lines, and the
+    \item The twenty-eight modules used by the paper comprise 20,351 lines, and the
     repository contains no \texttt{sorry}, \texttt{admit}, or custom
     \texttt{axiom} declaration.
 \end{enumerate}
@@ -2172,8 +2210,9 @@ $\omega$-groupoid & Higher identity types & Derivation tower \\
     It does not identify the library's global \texttt{PathRwQuot} with that
     topological groupoid, nor does it assert that an arbitrary ambient space
     supplied with the same presentation is homotopy equivalent to the nerve
-    realization.  Theorem~\ref{thm:circle-realization} remains a separate
-    comparison with the concrete space \(\mathsf{AddCircle}\,1\).
+    realization.  The concrete presented-circle case is now closed by
+    Theorem~\ref{thm:circle-ambient-realization}; the general ambient-space
+    comparison remains open.
 
     \item \textbf{Quotient collapse}: Although raw paths retain
     \texttt{List (Step A)}, the global \(\RwEq\) relation is total on parallel
@@ -2190,10 +2229,11 @@ $\omega$-groupoid & Higher identity types & Derivation tower \\
 \begin{enumerate}
     \item \textbf{Cubical type theory comparison}: Relate computational paths to cubical approaches.
 
-    \item \textbf{From presentations to ambient spaces}: For presentations
-    extracted from concrete CW decompositions, compare the canonical nerve
-    realization with the original ambient space and extend the present
-    fundamental-groupoid result to higher homotopy invariants.
+    \item \textbf{From presentations to ambient spaces}: Beyond the verified
+    presented-circle case, compare canonical nerve realizations for presentations
+    extracted from concrete CW decompositions with their original ambient spaces,
+    and extend the present fundamental-groupoid result to higher homotopy
+    invariants.
 
     \item \textbf{Covering space classification}: Prove the Galois correspondence between covering spaces and subgroups of $\piOne$.
 
@@ -2309,8 +2349,8 @@ Arthur~F. Ramos.
 
 \bibitem{ComputationalPathsLean}
 Arthur~F. Ramos, Tiago M.~L. de~Veras, Ruy J. G.~B. de~Queiroz, and Anjolina~G. de~Oliveira.
-\newblock Lean 4 formalization artifact for the Seifert--van Kampen theorem via computational paths, version 0.2.0.
-\newblock Zenodo, 2026. \url{https://doi.org/10.5281/zenodo.21716462}.
+\newblock Lean 4 formalization artifact for the Seifert--van Kampen theorem via computational paths, version 0.3.0.
+\newblock Zenodo, 2026. \url{https://doi.org/10.5281/zenodo.21745185}.
 
 \bibitem{Seifert1931}
 Herbert Seifert.
@@ -2368,6 +2408,9 @@ Proved nontrivial \\
 Presented/topological circle group comparison &
 \leanentry{presentedCircleTopologicalPiOneGroupEquiv}{CircleTopologicalRealization} &
 Proved group equivalence \\
+Circle nerve realization / ambient circle &
+\leanentry{circlePresented_topologicalRealization_homotopyEquiv}{CircleNerveAmbient} &
+Proved unconditional homotopy equivalence \\
 General nerve recovery &
 \leanentry{Presented.Realization.hoNerveIso}{PresentedGroupoidRealization} &
 Proved category isomorphism \\
