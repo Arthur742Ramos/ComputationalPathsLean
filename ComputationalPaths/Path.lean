@@ -190,6 +190,7 @@ import ComputationalPaths.Path.Homotopy.TopologicalNerveCover
 import ComputationalPaths.Path.Homotopy.TopologicalNerveComparison
 import ComputationalPaths.Path.Homotopy.TopologicalSimplexStar
 import ComputationalPaths.Path.Homotopy.PresentedGroupoidRealization
+import ComputationalPaths.Path.Homotopy.AmbientPathComparison
 import ComputationalPaths.Path.Homotopy.HoTT
 import ComputationalPaths.Path.CompPath.Torus
 import ComputationalPaths.Path.CompPath.TorusStep
@@ -1005,6 +1006,7 @@ import ComputationalPaths.Path.Topology.SuspensionPaths
 import ComputationalPaths.Path.Topology.SymplecticGeometry
 import ComputationalPaths.Path.Topology.TwistedKTheory
 import ComputationalPaths.Path.Topology.SpectraAlgebraDeep
+import ComputationalPaths.Path.Topology.ComputationalPathTopology
 import ComputationalPaths.Path.TransportDeep
 import ComputationalPaths.Path.Homotopy.KillerExamples
 import ComputationalPaths.Path.Rewrite.ConfluenceDeepType
