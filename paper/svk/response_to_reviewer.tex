@@ -92,6 +92,21 @@ up to homotopy.  Thus the circle case is no longer an ambient-space limitation;
 the analogous comparison for arbitrary concrete CW presentations remains
 Future Work.
 
+We also completed the topological structure carried by the computational paths
+themselves.  The new declaration
+\code{unconditionalTopologicalGroupoidCertificate} packages continuous source,
+target, identity, inverse, and composition together with the endpoint, unit,
+inverse, and associativity laws on quotient classes.  It is specialized to all
+presented realizations by
+\code{continuousPresentedTopologicalGroupoidCertificate}, and transported
+along any supplied ambient homotopy equivalence by
+\code{continuousAmbientTopologicalGroupoidCertificate}.  The unconditional
+composition domain has the final topology induced from composable
+representatives.  We state separately that continuity for the ordinary
+product/subspace topology retains the explicit
+\code{ProductQuotientCompatibility} hypothesis, since products of quotient
+maps are not quotient maps in arbitrary topological spaces.
+
 Because these additions change where the paper places its weight, we also
 added two short remarks that state their status plainly.  Remark~2.10 records
 that the presented path space is the standard combinatorial presentation of a
@@ -253,11 +268,11 @@ Appendix~A repeats the same status.
 
 \review{p.~36, path tactics: state what fraction of theorems rely on them.}
 \response
-We added a reproducible lexical count.  None of 20,243
+We added a reproducible lexical count.  None of 20,389
 \code{theorem}/\code{lemma} declarations directly invokes a \code{path\_*}
-tactic.  Across all 53,956 declarations counted, including definitions,
-instances, and examples, 11 do so (approximately \(0.020\%\)); in the twenty-eight
-paper modules, one of 1,411 declarations does so (\(0.071\%\)).  The paper
+tactic.  Across all 54,249 declarations counted, including definitions,
+instances, and examples, 11 do so (approximately \(0.020\%\)); in the thirty-one
+paper modules, one of 1,465 declarations does so (\(0.068\%\)).  The paper
 therefore characterizes these tactics as convenience wrappers rather than a
 mature dominant automation layer.
 

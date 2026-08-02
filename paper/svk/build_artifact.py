@@ -129,6 +129,11 @@ The archive includes:
   presented path groupoid;
 - the unconditional equivalence between the original presented groupoid and
   the topological fundamental groupoid of that realization;
+- the unconditional quotient-compatible topological groupoid of computational
+  paths: continuous source, target, identity, inverse, and composition, with
+  endpoint, unit, inverse, and associativity laws;
+- specializations of that topological groupoid certificate to every presented
+  realization and to every supplied ambient homotopy equivalence;
 - the quotient atlas, contractible categorical universal cover, descended open
   stars, covering-space theorem, and path/homotopy lifting used in that proof;
 - the global `PathRwQuot` collapse analysis and obstruction theorems;
@@ -176,6 +181,22 @@ def render_theorem_manifest() -> str:
 - `ComputationalPaths.Path.TopologicalNerve.nerveCoverCertificate`
 - `ComputationalPaths.Path.TopologicalNerve.isCoveringMap_nerveCoverMap`
 - `ComputationalPaths.Path.TopologicalNerve.nerveRealizationHomEquiv`
+
+## Topological computational paths
+
+- `ComputationalPaths.Path.GeometricTopology.TotalOpenGeometricCompPath.unconditionalTopologicalGroupoidCertificate`
+- `ComputationalPaths.Path.GeometricTopology.TotalOpenGeometricCompPath.quotientTransOnStrongPair_leftUnit`
+- `ComputationalPaths.Path.GeometricTopology.TotalOpenGeometricCompPath.quotientTransOnStrongPair_rightUnit`
+- `ComputationalPaths.Path.GeometricTopology.TotalOpenGeometricCompPath.quotientTransOnStrongPair_rightInverse`
+- `ComputationalPaths.Path.GeometricTopology.TotalOpenGeometricCompPath.quotientTransOnStrongPair_leftInverse`
+- `ComputationalPaths.Path.GeometricTopology.TotalOpenGeometricCompPath.quotientTransOnStrongPair_assoc`
+- `ComputationalPaths.Path.Presented.Realization.GeometricAdapter.continuousPresentedTopologicalGroupoidCertificate`
+- `ComputationalPaths.Path.Presented.Realization.AmbientAdapter.continuousAmbientTopologicalGroupoidCertificate`
+
+The composition topology here is the quotient-compatible final topology on
+composable classes.  The separate ordinary product/subspace continuity theorem
+retains its explicit `ProductQuotientCompatibility` hypothesis, since products
+of quotient maps need not be quotient maps in arbitrary topological spaces.
 
 ## Pushout naturality and target analysis
 

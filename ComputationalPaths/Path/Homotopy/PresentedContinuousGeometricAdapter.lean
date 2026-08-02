@@ -1,4 +1,4 @@
-import ComputationalPaths.Path.Topology.TopologicalCompPathFundamentalGroupoid
+import ComputationalPaths.Path.Topology.TopologicalCompPathGroupoidLaws
 import ComputationalPaths.Path.Homotopy.PresentedGeometricAdapter
 
 /-!
@@ -80,6 +80,14 @@ noncomputable def continuousPresentedFundamentalGroupoidCertificate :
     TotalOpenGeometricCompPath.TopologicalCompPathFundamentalGroupoidCertificate
       (continuousPresentedStepSystem P) :=
   TotalOpenGeometricCompPath.topologicalCompPathFundamentalGroupoidCertificate
+    (continuousPresentedStepSystem P)
+
+/-- The presented SVK realization carries the complete unconditional
+quotient-compatible topological groupoid laws. -/
+noncomputable def continuousPresentedTopologicalGroupoidCertificate :
+    TotalOpenGeometricCompPath.UnconditionalTopologicalGroupoidCertificate
+      (continuousPresentedStepSystem P) :=
+  TotalOpenGeometricCompPath.unconditionalTopologicalGroupoidCertificate
     (continuousPresentedStepSystem P)
 
 /-! Keep an explicit multi-step computational witness in the presented layer. -/

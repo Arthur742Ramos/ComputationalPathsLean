@@ -85,6 +85,17 @@ noncomputable def continuousAmbientFundamentalGroupoidCertificate
   TotalOpenGeometricCompPath.topologicalCompPathFundamentalGroupoidCertificate
     (continuousAmbientStepSystem P h)
 
+/-- Transporting the presentation through an ambient homotopy equivalence
+preserves the complete unconditional quotient-compatible topological groupoid
+certificate. -/
+noncomputable def continuousAmbientTopologicalGroupoidCertificate
+    {X : TopCat.{max u v}}
+    (h : topologicalRealization P ≃ₕ X) :
+    TotalOpenGeometricCompPath.UnconditionalTopologicalGroupoidCertificate
+      (continuousAmbientStepSystem P h) :=
+  TotalOpenGeometricCompPath.unconditionalTopologicalGroupoidCertificate
+    (continuousAmbientStepSystem P h)
+
 /-! Keep a multi-step computational witness in the ambient layer. -/
 noncomputable def ambientTraceLoopCertificate
     {X : TopCat.{max u v}}

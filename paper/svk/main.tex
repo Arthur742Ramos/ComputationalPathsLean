@@ -185,6 +185,14 @@ under-category projection is a covering map.  Path and homotopy lifting over
 that contractible total space yield a public equivalence with
 \(\Pi(\mathcal P)\).
 
+Finally, the endpoint-varying quotient of geometric computational paths is
+packaged as an unconditional quotient-compatible topological groupoid model.
+Source, target, identity, reversal, and composition are continuous, and the
+endpoint, unit, inverse, and associativity laws are proved.  Composition is
+continuous on the final topology induced from composable representatives; the
+ordinary inherited product/subspace topology has a separate theorem with an
+explicit product-quotient compatibility hypothesis.
+
 The distinction between this presented path groupoid and the library's global
 \texttt{PathRwQuot} is explicit.  We isolate the exact mechanism by which
 function-space rules make every loop fiber of the latter contractible, and read
@@ -196,8 +204,8 @@ torus, Klein bottle, projective plane, and cyclic lens-space expression
 languages, but they are not identified with the global quotient or with
 ordinary topological fundamental groups.
 
-The twenty-eight Lean modules in the formalization core described here comprise
-\textbf{20,351 lines}.
+The thirty-one Lean modules in the formalization core described here comprise
+\textbf{21,012 lines}.
 The formalization contains no \texttt{sorry}, \texttt{admit}, or custom
 \texttt{axiom} declaration.  The immutable Lean artifact, build instructions,
 and theorem manifest are archived at
@@ -316,6 +324,19 @@ This paper provides:
         covering theorem.
     \end{itemize}
 
+    \item An unconditional quotient-compatible topological groupoid model for
+    endpoint-varying geometric computational paths:
+    \begin{itemize}
+        \item \path{unconditionalTopologicalGroupoidCertificate} packages
+        continuity of source, target, identity, inverse, and composition;
+        \item the same certificate proves both endpoint laws, both unit laws,
+        both inverse laws, and associativity on quotient classes;
+        \item \path{continuousPresentedTopologicalGroupoidCertificate}
+        specializes the construction to every presented realization, while
+        \path{continuousAmbientTopologicalGroupoidCertificate} transports it
+        along any supplied ambient homotopy equivalence.
+    \end{itemize}
+
     \item A separate SVK equivalence \emph{schema} for the global
     \texttt{PathRwQuot}, parametric in user-supplied encode/decode structure,
     with \emph{split typeclass assumptions}:
@@ -345,7 +366,7 @@ This paper provides:
 
     \item A Lean 4 development supporting these results, comprising:
     \begin{itemize}
-        \item 20,351 lines across the 28 modules used by this paper
+        \item 21,012 lines across the 31 modules used by this paper
         \item zero \texttt{sorry}, \texttt{admit}, and custom \texttt{axiom}
         declarations
         \item a public repository and reproducible source/automation statistics
@@ -734,6 +755,40 @@ base star.  The resulting
 \path{isCoveringMap_nerveCoverMap} feeds Mathlib's path and homotopy lifting;
 contractibility of the total realization then proves the hom-set equivalence
 \path{nerveRealizationHomEquiv}.
+
+\subsection{A quotient-compatible topological groupoid of computational paths}
+
+Let \(\mathcal T_S\) be the total space of finite geometric computational
+paths for a continuous step system \(S\), with varying source and target, and
+let \(\mathcal H_S\) be its quotient by endpoint-fixed path homotopy.  We equip
+\(\mathcal T_S\) with the topology generated jointly by source, target, trace
+length, trace realization, and the underlying compact--open path.  The quotient
+topology on \(\mathcal H_S\) makes source, target, identity, and reversal
+continuous.
+
+For composition, the unconditional domain is the final topology on composable
+homotopy classes induced by the quotient map from composable representatives.
+The declaration
+\path{unconditionalTopologicalGroupoidCertificate} proves, without any
+additional topological hypothesis, continuity of composition on this domain,
+the source and target formulas, the left and right unit laws, the left and
+right inverse laws, and associativity.  In particular, the result packages the
+entire quotient-level groupoid algebra rather than only a representative-level
+composition operation.  The declarations
+\path{continuousPresentedTopologicalGroupoidCertificate} and
+\path{continuousAmbientTopologicalGroupoidCertificate} instantiate it for the
+canonical realization of every presentation and for every ambient space
+equipped with a supplied homotopy equivalence from that realization.
+
+There is an unavoidable distinction between this quotient-compatible domain
+and the ordinary subspace topology inherited from
+\(\mathcal H_S\times\mathcal H_S\).  Products of quotient maps need not be
+quotient maps in arbitrary topological spaces.  Accordingly,
+\path{continuous_quotientTransOnProduct} retains the explicit hypothesis
+\path{ProductQuotientCompatibility}; the unconditional theorem does not claim
+that generally false strengthening.  The continuous comparison map from the
+quotient-compatible domain to the ordinary composable-pair space is part of
+the certificate.
 
 \subsection{Circle path presentation}
 
@@ -1869,12 +1924,12 @@ path_congr_right h -- apply hypothesis on left
 \end{lstlisting}
 
 To quantify their use, \texttt{paper/svk/check\_stats.py} performs a
-comment-stripped lexical count.  None of the 20,243 declarations introduced with
+comment-stripped lexical count.  None of the 20,389 declarations introduced with
 \texttt{theorem}/\texttt{lemma} directly invokes a \texttt{path\_*} tactic.
-Across all 53,956 declarations counted (including \texttt{def},
+Across all 54,249 declarations counted (including \texttt{def},
 \texttt{instance}, and \texttt{example}), 11 invoke one directly
-(approximately \(0.020\%\)).  In the twenty-eight modules used by this paper,
-one of 1,411 declarations does so (\(0.071\%\)).  Thus the tactics are
+(approximately \(0.020\%\)).  In the thirty-one modules used by this paper,
+one of 1,465 declarations does so (\(0.068\%\)).  Thus the tactics are
 small convenience wrappers; the SVK proofs are predominantly explicit
 applications of named \texttt{RwEq} lemmas, congruence, and quotient induction.
 
@@ -2007,6 +2062,12 @@ Degeneracy-aware open core-face stars for realized-cover charts \\
 Global lifted sheets, homeomorphisms, and the realized covering map \\
 \leanname{Homotopy/TopologicalNerveComparison} &
 Path/homotopy lifting, full faithfulness, and the edge-path equivalence \\
+\leanname{Topology/TopologicalCompPathGroupoidLaws} &
+Unconditional quotient-compatible continuity and all groupoid laws \\
+\leanname{Homotopy/PresentedContinuousGeometricAdapter} &
+Presented-realization specialization of the topological groupoid certificate \\
+\leanname{Homotopy/PresentedAmbientContinuousGeometricAdapter} &
+Ambient-homotopy-equivalence specialization of the certificate \\
 \leanname{Homotopy/HigherHomotopy} & $\piN$ for $n \geq 2$ \\
 \leanname{CompPath/PushoutCompPath} & Quotient pushout and glue naturality \\
 \leanname{CompPath/PushoutPaths} & Word quotients, decode, conditional full SVK \\
@@ -2047,8 +2108,8 @@ axioms.
 \toprule
 \textbf{Metric} & \textbf{Value} \\
 \midrule
-Lean lines in the 28-module formalization core & 20,351 \\
-Modules in the formalization core & 28 \\
+Lean lines in the 31-module formalization core & 21,012 \\
+Modules in the formalization core & 31 \\
 Custom \texttt{axiom} declarations & 0 \\
 \texttt{sorry}/\texttt{admit} occurrences after comment stripping & 0/0 \\
 Reproduction script & \leanname{paper/svk/check_stats.py} \\
@@ -2173,7 +2234,7 @@ We have presented a \emph{modular SVK framework} within the computational paths 
     \item Presented fundamental groups, global-rule loop quotients, conditional
     schemas, and completed expression quotients are distinguished throughout.
 
-    \item The twenty-eight modules used by the paper comprise 20,351 lines, and the
+    \item The thirty-one modules used by the paper comprise 21,012 lines, and the
     repository contains no \texttt{sorry}, \texttt{admit}, or custom
     \texttt{axiom} declaration.
 \end{enumerate}
@@ -2213,6 +2274,14 @@ $\omega$-groupoid & Higher identity types & Derivation tower \\
     realization.  The concrete presented-circle case is now closed by
     Theorem~\ref{thm:circle-ambient-realization}; the general ambient-space
     comparison remains open.
+
+    \item \textbf{Topology on composable quotient paths}: The unconditional
+    computational-path groupoid uses the quotient-compatible final topology
+    induced from composable representatives.  We do not identify it in
+    arbitrary \texttt{Top} with the subspace topology inherited from the
+    product of two quotient arrow spaces.  The latter comparison requires the
+    explicit \path{ProductQuotientCompatibility} hypothesis because products
+    of quotient maps are not quotient maps in general.
 
     \item \textbf{Quotient collapse}: Although raw paths retain
     \texttt{List (Step A)}, the global \(\RwEq\) relation is total on parallel
@@ -2418,6 +2487,10 @@ General topological fundamental-groupoid comparison &
 \leanentry{Presented.Realization.topologicalFundamentalGroupoidEquivalence}
   {PresentedGroupoidRealization} &
 Proved category equivalence \\
+Topological computational-path groupoid &
+\leanentry{unconditionalTopologicalGroupoidCertificate}
+  {TopologicalCompPathGroupoidLaws} &
+Proved unconditionally for the quotient-compatible composition topology \\
 General presented SVK group equivalence &
 \leanentry{presentedSeifertVanKampenGroupEquiv}{PresentedSeifertVanKampen} &
 Proved \\
