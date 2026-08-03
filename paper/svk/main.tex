@@ -213,10 +213,10 @@ The thirty-one Lean modules in the formalization core described here comprise
 \textbf{21,025 lines}.
 The formalization contains no \texttt{sorry}, \texttt{admit}, or custom
 \texttt{axiom} declaration.  The matching Lean artifact, build instructions,
-and theorem manifest are archived as Zenodo version~0.4.1 at
-\url{https://doi.org/10.5281/zenodo.21779002}; the corresponding source
+and theorem manifest are archived as Zenodo version~0.4.2 at
+\url{https://doi.org/10.5281/zenodo.21779801}; the corresponding source
 release is
-\url{https://github.com/Arthur742Ramos/ComputationalPathsLean/releases/tag/v0.4.1}.
+\url{https://github.com/Arthur742Ramos/ComputationalPathsLean/releases/tag/v0.4.2}.
 \end{abstract}
 
 \maketitle
@@ -418,21 +418,17 @@ Readers interested in the mathematical content can focus on Sections~\ref{sec:pu
 \subsection{Code availability}
 
 The Lean~4 formalization artifact matching this revision is archived as
-Zenodo version~0.4.1:
-\url{https://doi.org/10.5281/zenodo.21779002}.
+Zenodo version~0.4.2:
+\url{https://doi.org/10.5281/zenodo.21779801}.
 It contains the 31 paper entry modules and their 61 transitive local
 dependencies (92 Lean files total), the pinned Lean/Lake configuration, MIT
 license, theorem manifest, invariant checker, and the manuscript and response
-sources.  Its archive SHA-256 is
-\texttt{8e42cccd63d088e9}\allowbreak
-\texttt{1f43162a5954cbeb}\allowbreak
-\texttt{fded5843420823b6}\allowbreak
-\texttt{af1ca327e8219c96}.
+sources.  Its archive SHA-256 is recorded in the Zenodo metadata.
 The standalone commands are
 \texttt{lake update},
 \texttt{lake build}, and \texttt{python3 scripts/check\_invariants.py}.
 The corresponding source release is
-\url{https://github.com/Arthur742Ramos/ComputationalPathsLean/releases/tag/v0.4.1}.
+\url{https://github.com/Arthur742Ramos/ComputationalPathsLean/releases/tag/v0.4.2}.
 The Zenodo concept DOI for the archival series is
 \url{https://doi.org/10.5281/zenodo.21696874}; the repository is
 \url{https://github.com/Arthur742Ramos/ComputationalPathsLean}.
@@ -506,7 +502,7 @@ The foundation of the computational paths framework is the \texttt{Step} relatio
 
 In Lean, the Step relation is defined inductively with 76 constructors:
 \begin{lstlisting}
-inductive Step : {A : Type u} -> {a b : A} -> Path a b -> Path a b -> Prop
+inductive Step : {A : Type u} -> {a b : A} -> Path a b -> Path a b -> Type (u + 1)
   | symm_refl (a : A) : Step (symm (Path.refl a)) (Path.refl a)
   | symm_symm (p : Path a b) : Step (symm (symm p)) p
   | trans_refl_left (p : Path a b) : Step (trans (Path.refl a) p) p
@@ -1181,10 +1177,11 @@ def concat : FreeProductWord G1 G2 -> FreeProductWord G1 G2 ->
   | consRight y rest, w => consRight y (concat rest w)
 
 -- Inversion
-def invert : FreeProductWord G1 G2 -> FreeProductWord G1 G2
+noncomputable def inverse [Neg G1] [Neg G2] :
+    FreeProductWord G1 G2 -> FreeProductWord G1 G2
   | nil => nil
-  | consLeft x rest => concat (invert rest) (singleLeft (-x))
-  | consRight y rest => concat (invert rest) (singleRight (-y))
+  | consLeft x rest => concat (inverse rest) (singleLeft (-x))
+  | consRight y rest => concat (inverse rest) (singleRight (-y))
 \end{lstlisting}
 \end{definition}
 
@@ -2506,8 +2503,8 @@ Arthur~F. Ramos.
 
 \bibitem{ComputationalPathsLean}
 Arthur~F. Ramos, Tiago M.~L. de~Veras, Ruy J. G.~B. de~Queiroz, and Anjolina~G. de~Oliveira.
-\newblock Lean 4 formalization artifact for the Seifert--van Kampen theorem via computational paths, version 0.4.1.
-\newblock Zenodo, 2026. \url{https://doi.org/10.5281/zenodo.21779002}.
+\newblock Lean 4 formalization artifact for the Seifert--van Kampen theorem via computational paths, version 0.4.2.
+\newblock Zenodo, 2026. \url{https://doi.org/10.5281/zenodo.21779801}.
 
 \bibitem{Seifert1931}
 Herbert Seifert.

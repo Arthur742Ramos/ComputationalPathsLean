@@ -75,7 +75,7 @@ equivalence supplied by the user.
 From a clean commit, build the standalone archive for a new Zenodo version:
 
 ```bash
-python3 paper/svk/build_artifact.py --version 0.4.1
+python3 paper/svk/build_artifact.py --version 0.4.2
 ```
 
 The archive is written under `paper/svk/dist/`.  Its explicit import manifest
