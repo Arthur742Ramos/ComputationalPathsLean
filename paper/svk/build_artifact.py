@@ -92,8 +92,7 @@ It is a curated, standalone build artifact, not a copy of the full repository.
 It contains the {entry_count} paper entry modules listed in
 `ENTRY_MODULES.txt`, their {dependency_count} transitive local dependencies
 ({total} Lean files total), the Lean/Lake configuration, the MIT license, and
-the invariant checker. It does **not** contain the manuscript or reviewer
-response.
+the invariant checker, and the manuscript and reviewer-response sources.
 
 ## Source
 
@@ -289,6 +288,9 @@ def main() -> None:
             "lean-toolchain",
             "lake-manifest.json",
             "scripts/check_invariants.py",
+            "paper/svk/main.tex",
+            "paper/svk/response_to_reviewer.tex",
+            "paper/svk/lmcs.cls",
         ):
             target = stage / path
             target.parent.mkdir(parents=True, exist_ok=True)
