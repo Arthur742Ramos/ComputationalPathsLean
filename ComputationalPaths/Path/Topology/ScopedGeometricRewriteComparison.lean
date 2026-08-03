@@ -20,7 +20,7 @@ namespace GeometricTopology
 
 open scoped ContinuousMap Topology
 
-universe u v
+universe u v w
 
 namespace ScopedGeometricRewrite
 
@@ -104,13 +104,13 @@ def GeometricCompleteness : Prop :=
 /-! ## Effective normal-form certificates -/
 
 structure ScopedGeometricNormalFormCertificate where
-  normal : ScopedRawPath (S := S) → ScopedRawPath (S := S)
+  NF : Type w
+  representative : NF → ScopedRawPath (S := S)
+  normal : ScopedRawPath (S := S) → NF
   normal_scoped : ∀ p,
-    scopedEquivalent P p (normal p)
+    scopedEquivalent P p (representative (normal p))
   geometric_normal_eq : ∀ {p q},
     totalEquivalent S p q → normal p = normal q
-  normal_eq_scoped : ∀ {p q},
-    normal p = normal q → scopedEquivalent P (normal p) (normal q)
 
 theorem geometricCompleteness_of_normalForm
     (C : ScopedGeometricNormalFormCertificate P) :
@@ -118,7 +118,8 @@ theorem geometricCompleteness_of_normalForm
   intro p q hgeo
   exact (scopedSetoid P).iseqv.trans (C.normal_scoped p) <|
     (scopedSetoid P).iseqv.trans
-      (C.normal_eq_scoped (C.geometric_normal_eq hgeo)) <|
+      (by
+        rw [C.geometric_normal_eq hgeo]) <|
         (scopedSetoid P).iseqv.symm (C.normal_scoped q)
 
 theorem toGeometricClass_surjective :

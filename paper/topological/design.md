@@ -75,14 +75,37 @@ space \(X\) consists of:
 - for every rewrite generator, an endpoint-fixed homotopy from the geometric
   realization of \(p\) to that of \(q\).
 
-The trace space is
+Let \(E^+\cong E\) be a positive copy and let \(E^-\) be a formal inverse
+copy.  Write \(\widetilde E=E^+\sqcup E^-\), with endpoints interchanged and
+realizations reversed on \(E^-\).  For \(n\geq 1\), let
+\(W_n\subseteq\widetilde E^n\) be the composable-word subspace, and put
+\(W_0=X\).  The topological trace carrier is
 \[
-T_{\mathcal P}=\coprod_{n\geq 0} E^{\times_X n},
+\mathsf{Tr}_{\mathcal P}=\coprod_{n\geq 0} W_n,
 \]
-where \(E^{\times_X n}\) is the subspace of composable \(n\)-tuples and the
-zero-length component is \(X\). Concatenation of traces is strict. Reversal is
-part of the trace syntax, so it does not require a primitive inverse to exist
-as a separate parameter. Trace realization uses the induced path operations.
+with the coproduct topology.  The length map is the coproduct index, and word
+concatenation and reversal are the trace operations.  Their realizations use
+the compact-open concatenation and reversal operations on \(X^I\).
+
+Write \(\mathsf{Coh}_{\mathcal P}(p,\gamma)\) for the proposition that
+\(\gamma\) is endpoint-fixed homotopic to the realization of \(p\).  The
+coherent carrier is the set of pairs \((p,\gamma)\) satisfying the endpoint
+conditions and \(\mathsf{Coh}_{\mathcal P}(p,\gamma)\); the homotopy witness is
+not a field of the carrier.  Equip it with the initial topology for
+\[
+\kappa(p,\gamma)=(s(p),t(p),\ell(p),|p|,\gamma)
+\in X\times X\times\mathbb N\times X^I\times X^I,
+\]
+where \(\mathbb N\) is discrete.  This is the coarsest topology making the
+observable code continuous, and it is the topology used throughout the paper.
+
+The identity insertion, reversal, and coherent concatenation maps are
+continuous for this topology.  After applying \(\kappa\), their observable
+codes are respectively \((a,a,0,c_a,c_a)\),
+\((t(p),s(p),\ell(p),|p|^{-1},\gamma^{-1})\), and
+\((s(p),t(q),\ell(p)+\ell(q),|p|\star|q|,\gamma\star\delta)\).  These are
+continuous by the compact-open path operations and addition on the discrete
+length coordinate.
 
 The presentation includes the structural reductions needed for a groupoid:
 unit insertion/removal, adjacent cancellation of \(e e^{-1}\) and
@@ -106,10 +129,12 @@ used. No ambient equality-normalization principle is imported.
 The rewrite groupoid \(G_{\mathrm{rw}}(\mathcal P)\) has object space \(X\)
 and arrows
 \[
-G_{\mathrm{rw}}(\mathcal P)_1=T_{\mathcal P}/\simeq_{\mathcal P}
+G_{\mathrm{rw}}(\mathcal P)_1=T/\simeq_{\mathcal P}
 \]
-with the quotient topology. Source and target descend from trace endpoints;
-composition and inversion are induced by concatenation and reversal.
+with the quotient topology, where (T) is the coherent carrier above and the
+relation compares endpoints and scoped trace equality. Source and target
+descend from trace endpoints; composition and inversion are induced by
+concatenation and reversal.
 
 ### Definition 3.4 (geometric kernel and realized subgroupoid)
 
@@ -127,7 +152,7 @@ groupoid \(\Pi_1^{q}(X)\).
 
 ## 4. The two composable-pair topologies
 
-Let \(G=G_{\mathrm{rw}}(\mathcal P)_1\), and let \(q:T_{\mathcal P}\to G\)
+Let \(G=G_{\mathrm{rw}}(\mathcal P)_1\), and let \(q:T\to G\)
 be the quotient map.
 
 ### Definition 4.1 (ordinary composable-pair space)
@@ -144,21 +169,37 @@ Let
 \[
 T_{\mathcal P}^{(2)}=T_{\mathcal P}\times_XT_{\mathcal P}.
 \]
-The final composable-pair space \(C_{\mathrm{fin}}\) has the same underlying
-set as \(C_{\mathrm{ord}}\), but carries the final topology for the surjection
+The final composable-pair space \(C_{\mathrm{fin}}\) is the quotient of
+\(T_{\mathcal P}^{(2)}\) by componentwise scoped equivalence.  Write
 \[
-q^{(2)}:T_{\mathcal P}^{(2)}\longrightarrow G\times_XG,
+q_{\mathrm{fin}}^{(2)}:T_{\mathcal P}^{(2)}\longrightarrow C_{\mathrm{fin}}
+\]
+for its quotient map.  The ordinary composable-pair space \(C_{\mathrm{ord}}\)
+has the same underlying set, with the subspace topology, and the raw map is
+\[
+q_{\mathrm{ord}}^{(2)}:T_{\mathcal P}^{(2)}\longrightarrow C_{\mathrm{ord}},
 \qquad (p,r)\longmapsto([p],[r]).
 \]
+There is a unique bijection
+\[
+j:C_{\mathrm{fin}}\longrightarrow C_{\mathrm{ord}}
+\]
+such that
+\[
+q_{\mathrm{ord}}^{(2)}=j\circ q_{\mathrm{fin}}^{(2)}.
+\]
 
-The identity map \(C_{\mathrm{fin}}\to C_{\mathrm{ord}}\) is always
-continuous. The reverse identity need not be continuous.
+The map \(j\) is always continuous. The reverse identity need not be
+continuous.
 
 ### Definition 4.3 (product-quotient compatibility)
 
-The presentation satisfies product-quotient compatibility when \(q^{(2)}\),
-viewed as a map to \(C_{\mathrm{ord}}\), is a quotient map. Equivalently,
-\(C_{\mathrm{ord}}\) and \(C_{\mathrm{fin}}\) have the same topology.
+The presentation satisfies product-quotient compatibility when
+\(q_{\mathrm{ord}}^{(2)}\) is a quotient map.  Since
+\(q_{\mathrm{ord}}^{(2)}=j\circ q_{\mathrm{fin}}^{(2)}\) and
+\(q_{\mathrm{fin}}^{(2)}\) is quotient, this is equivalent to \(j\) being
+quotient, to continuity of \(j^{-1}\), and to \(j\) being a homeomorphism.
+Equivalently, \(C_{\mathrm{ord}}\) and \(C_{\mathrm{fin}}\) have the same topology.
 
 ## 5. The theorem package
 
@@ -198,12 +239,15 @@ the domain of multiplication need not have the ordinary pullback topology.
 
 ### Theorem C (ordinary/final topology comparison)
 
-The following are equivalent:
+The following are equivalent (and each is equivalent to product-quotient
+compatibility):
 
-1. product-quotient compatibility holds;
-2. the identity \(C_{\mathrm{ord}}\to C_{\mathrm{fin}}\) is continuous;
-3. the ordinary and final composable-pair topologies coincide; and
-4. \(q^{(2)}:T_{\mathcal P}^{(2)}\to C_{\mathrm{ord}}\) is a quotient map.
+1. \(q_{\mathrm{ord}}^{(2)}:T_{\mathcal P}^{(2)}\to C_{\mathrm{ord}}\) is a
+   quotient map;
+2. \(j:C_{\mathrm{fin}}\to C_{\mathrm{ord}}\) is a quotient map;
+3. \(j^{-1}:C_{\mathrm{ord}}\to C_{\mathrm{fin}}\) is continuous; and
+4. \(j\) is a homeomorphism, equivalently the ordinary and final
+   composable-pair topologies coincide.
 
 The theorem is an exact classification of the ordinary-pullback upgrade. The
 unconditional groupoid result in this paper is the final-domain result of
@@ -256,6 +300,12 @@ complete. No ordinary-pullback upgrade is included in this theorem.
 
 ### Theorem F (universal geometric presentation)
 
+For the universal presentation, the projection from the coherent carrier to
+the chosen representative path is a quotient map.  A continuous section sends
+\(\gamma\in X^I\) to the one-letter universal trace carrying \(\gamma\), so
+the quotient of coherent paths by endpoint-fixed homotopy is homeomorphic to
+the standard quotient-topologized fundamental-groupoid arrow space.
+
 There is a universal presentation \(\mathcal U_X\) whose primitive steps are
 continuous paths in \(X\), whose rewrite generators include endpoint-fixed
 homotopies, and whose scoped rewrite congruence is exactly endpoint-fixed path
@@ -274,11 +324,13 @@ completion claim.
 
 ### Theorem E' (effective normal forms)
 
-An explicit normalizer with (i) a scoped derivation from every raw path to its
-normal form, (ii) separation of geometrically equal paths by normal forms, and
-(iii) scoped equality of equal normal forms proves geometric completeness. The
-finite-generator circle and torus word reductions instantiate all three
-clauses.
+An explicit normalizer into proof-irrelevant normal-form codes, together with
+(i) a scoped derivation from every raw path to the chosen representative of
+its code and (ii) separation of geometrically equal paths by equal codes,
+proves geometric completeness. There is no separate equality-witness clause:
+equal codes have equal chosen representatives, and scoped reflexivity closes
+the proof. The finite-generator circle and torus word reductions instantiate
+both clauses.
 
 ### Theorem G (positive ordinary-pullback class)
 
@@ -356,7 +408,9 @@ implementation architecture. The appendix and artifact may provide:
 - the assumptions used by each theorem;
 - a statement that the checked development introduces no custom axioms and no
   unfinished proofs; and
-- a permanent archive identifier for the released artifact.
+- the immutable source snapshot for the released artifact.  It is the tag
+  `topological-paper-v1` in the public repository
+  `https://github.com/Arthur742Ramos/ComputationalPathsLean`.
 
 Implementation-specific certificate records, source-file names, and phase
 labels do not belong in theorem statements or the mathematical narrative.
@@ -370,11 +424,11 @@ The current Lean artifact checks the dependency chain as follows.
 | Presentation and soundness | `ScopedGeometricRewritePresentation`, `ScopedRwEq`, `ScopedRwEq.sound` |
 | Rewrite quotient | `scopedEquivalent`, `scopedClassTopologicalSpace`, `scopedSrc`, `scopedTgt`, `scopedSymm` |
 | Final and ordinary composable domains | `ScopedComposableClass`, `ScopedComposablePair`, `scopedCompositionFromComposable`, `ScopedStrongComposablePair`, `scopedCompositionOnStrong`, `scopedPairToOrdinary`, `scopedOrdinaryToFinal`, `scopedOrdinaryPairMap` |
-| Groupoid laws and topology comparison | `scopedFinalTopologicalGroupoidCertificate`, `scopedProductCompatibility_iff_four_way`, `scopedFinalOrdinaryHomeomorph`, `scopedProductCompatibility_of_open_pair_map`, `scopedProductCompatibility_of_compact_final_t2`, `scopedProductCompatibility_of_discrete_arrow_and_final_domain` |
+| Groupoid laws and topology comparison | `TopologicalWeakCompPathCertificate`, `topologicalWeakCompPathCertificate`, `TotalOpenGeometricCompPath.continuous_totalRefl`, `TotalOpenGeometricCompPath.continuous_totalTrans`, `TotalOpenGeometricCompPath.continuous_totalSymm`, `scopedFinalTopologicalGroupoidCertificate`, `scopedProductCompatibility_iff_four_way`, `scopedFinalOrdinaryHomeomorph`, `scopedProductCompatibility_of_open_pair_map`, `scopedProductCompatibility_of_compact_final_t2`, `scopedProductCompatibility_of_discrete_arrow_and_final_domain` |
 | Geometric comparison and completeness | `toGeometricClass`, `toGeometricComposableClass`, `toGeometricStrongPair`, `toGeometricClass_composition_on_strong`, `GeometricCompleteness`, `ScopedGeometricNormalFormCertificate`, `geometricCompleteness_of_normalForm`, `toGeometricClass_injective_iff_geometricCompleteness`, `comparisonHomeomorph_of_complete`, `comparisonCompletenessCertificate`, `ComparisonFunctorCertificate` |
 | Realized fundamental-groupoid bridge | `RealizedFundamentalArrow`, `realizedFundamentalArrowHomeomorph`, `PresentedRealizedFundamentalArrow`, `realizedFundamentalGroupoidArrow`, `RealizedFundamentalGroupoidCertificate`, `presentedRealizedFundamentalArrow_identity_mem`, `presentedRealizedFundamentalArrow_reversal_mem`, `presentedRealizedFundamentalArrow_composition_mem`, `universalRealizedFundamentalArrowHomeomorph` |
 | Presentation functoriality | `PresentationMap`, `mapClass`, `ScopedPresentationFunctorCertificate`, `scopedPresentationFunctorCertificate_of_compatibility`, `PresentationFunctorIdentityCertificate`, `PresentationFunctorCompositionCertificate` |
-| Circle instance | `circleLoopStepSystem`, `circleLoopRule`, `circleLoopRule_sound`, `circleTrace_normalizes`, `circleLoopPresentation`, `circleBasedNormalForm`, `circleBasedNormalFormCertificate`, `circleFinalTopologicalGroupoidCertificate`, `circleOrdinaryFinalCompatibility_iff`, `circleLoopEquivInt`, `circleScoped_nontrivial`, `CircleScopedNondegeneracyCertificate`, `circleLoopToScoped_range_iff` |
+| Circle instance | `circleLoopStepSystem`, `circleLoopRule`, `circleLoopRule_sound`, `circleTrace_normalizes`, `circleLoopPresentation`, `circleBasedNormalCode`, `circleBasedNormalRepresentative`, `circleBasedNormalCode_scoped`, `circleBasedNormalCode_eq_of_homotopic`, `circleBasedNormalFormCertificate`, `circleFinalTopologicalGroupoidCertificate`, `circleOrdinaryFinalCompatibility_iff`, `circleLoopEquivInt`, `circleScoped_nontrivial`, `CircleScopedNondegeneracyCertificate`, `circleLoopToScoped_range_iff` |
 | Actual topological torus | `TopologicalTorus.standardLoop`, `TopologicalTorus.winding`, `TopologicalTorus.standardLoop_homotopic`, `TopologicalTorus.equivIntProd`, `TopologicalTorus.certificate` |
 
 The root import hub includes all eight new topological modules, and the complete

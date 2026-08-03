@@ -244,22 +244,24 @@ noncomputable def scopedFinalOrdinaryHomeomorph
 
 theorem scopedProductCompatibility_iff_four_way :
     ProductQuotientCompatibility P ↔
-      (Continuous (scopedOrdinaryToFinal P :
-        ScopedComposablePair P → ScopedComposableClass P) ∧
+      (Topology.IsQuotientMap (scopedOrdinaryPairMap P :
+          ScopedComposableRaw (S := S) → ScopedComposablePair P) ∧
+        Topology.IsQuotientMap (scopedPairToOrdinary P :
+          ScopedComposableClass P → ScopedComposablePair P) ∧
+        Continuous (scopedOrdinaryToFinal P :
+          ScopedComposablePair P → ScopedComposableClass P) ∧
         (inferInstance : TopologicalSpace (ScopedComposableClass P)) =
           TopologicalSpace.induced (scopedPairToOrdinary P)
-            (inferInstance : TopologicalSpace (ScopedComposablePair P)) ∧
-        Topology.IsQuotientMap (scopedOrdinaryPairMap P :
-          ScopedComposableRaw (S := S) → ScopedComposablePair P)) := by
+            (inferInstance : TopologicalSpace (ScopedComposablePair P))) := by
   constructor
   · intro H
     exact ⟨
+      (scopedProductCompatibility_iff_raw_pair_map_quotient P).1 H,
+      H.pair_map_is_quotient,
       (scopedProductCompatibility_iff_ordinary_to_final_continuous P).1 H,
-      (scopedProductCompatibility_iff_final_topology_agreement P).1 H,
-      (scopedProductCompatibility_iff_raw_pair_map_quotient P).1 H⟩
-  · rintro ⟨hordinary, _, hraw⟩
-    exact (scopedProductCompatibility_iff_ordinary_to_final_continuous P).2
-      hordinary
+      (scopedProductCompatibility_iff_final_topology_agreement P).1 H⟩
+  · rintro ⟨_, hpair, _, _⟩
+    exact ⟨hpair⟩
 
 theorem continuous_scopedCompositionOnProduct
     (H : ProductQuotientCompatibility P) :

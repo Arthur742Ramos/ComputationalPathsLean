@@ -282,6 +282,12 @@ def circleLoopEquivalent (p q : CircleOpenLoop) : Prop :=
 noncomputable def circleBasedNormalForm (p : CircleOpenLoop) : CircleOpenLoop :=
   circleStandardOpenLoop (circleTraceWinding p.trace)
 
+def circleBasedNormalCode (p : CircleOpenLoop) : ℤ :=
+  circleTraceWinding p.trace
+
+noncomputable def circleBasedNormalRepresentative (n : ℤ) : CircleOpenLoop :=
+  circleStandardOpenLoop n
+
 theorem circleBasedNormalForm_scoped (p : CircleOpenLoop) :
     scopedEquivalent circleLoopPresentation
       (circleRawLoop p)
@@ -290,48 +296,50 @@ theorem circleBasedNormalForm_scoped (p : CircleOpenLoop) :
   simpa [circleRawLoop, circleBasedNormalForm] using
     (circleTrace_normalizes p.trace)
 
-theorem circleBasedNormalForm_eq_of_homotopic
+theorem circleBasedNormalCode_scoped (p : CircleOpenLoop) :
+    scopedEquivalent circleLoopPresentation
+      (circleRawLoop p)
+      (circleRawLoop
+        (circleBasedNormalRepresentative (circleBasedNormalCode p))) := by
+  simpa [circleBasedNormalCode, circleBasedNormalRepresentative,
+    circleBasedNormalForm] using circleBasedNormalForm_scoped p
+
+theorem circleBasedNormalCode_eq_of_homotopic
     {p q : CircleOpenLoop}
     (h : circleLoopEquivalent p q) :
-    circleBasedNormalForm p = circleBasedNormalForm q := by
+    circleBasedNormalCode p = circleBasedNormalCode q := by
   have hp : windingPath p.geometric = circleTraceWinding p.trace :=
     (windingPath_eq_of_homotopic p.coherent).trans
       (circleTraceWinding_realize p.trace)
   have hq : windingPath q.geometric = circleTraceWinding q.trace :=
     (windingPath_eq_of_homotopic q.coherent).trans
       (circleTraceWinding_realize q.trace)
-  have hwind : circleTraceWinding p.trace = circleTraceWinding q.trace :=
-    hp.symm.trans ((windingPath_eq_of_homotopic h).trans hq)
-  exact _root_.congrArg circleStandardOpenLoop hwind
+  exact hp.symm.trans ((windingPath_eq_of_homotopic h).trans hq)
 
-theorem circleBasedNormalForm_eq_scoped
+theorem circleBasedNormalForm_eq_of_homotopic
     {p q : CircleOpenLoop}
-    (h : circleBasedNormalForm p = circleBasedNormalForm q) :
-    scopedEquivalent circleLoopPresentation
-      (circleRawLoop (circleBasedNormalForm p))
-      (circleRawLoop (circleBasedNormalForm q)) := by
-  have hraw := _root_.congrArg circleRawLoop h
-  rw [hraw]
-  exact ⟨rfl, rfl, ScopedRwEq.refl _⟩
+    (h : circleLoopEquivalent p q) :
+    circleBasedNormalForm p = circleBasedNormalForm q := by
+  simpa [circleBasedNormalForm, circleBasedNormalCode] using
+    (_root_.congrArg circleStandardOpenLoop
+      (circleBasedNormalCode_eq_of_homotopic h))
 
 structure CircleBasedNormalFormCertificate where
-  normal : CircleOpenLoop → CircleOpenLoop
+  normalCode : CircleOpenLoop → ℤ
+  representative : ℤ → CircleOpenLoop
   normal_scoped : ∀ p,
     scopedEquivalent circleLoopPresentation
-      (circleRawLoop p) (circleRawLoop (normal p))
+      (circleRawLoop p)
+      (circleRawLoop (representative (normalCode p)))
   semantic_separation : ∀ {p q},
-    circleLoopEquivalent p q → normal p = normal q
-  normal_equality_scoped : ∀ {p q},
-    normal p = normal q →
-      scopedEquivalent circleLoopPresentation
-        (circleRawLoop (normal p)) (circleRawLoop (normal q))
+    circleLoopEquivalent p q → normalCode p = normalCode q
 
 noncomputable def circleBasedNormalFormCertificate :
     CircleBasedNormalFormCertificate where
-  normal := circleBasedNormalForm
-  normal_scoped := circleBasedNormalForm_scoped
-  semantic_separation := circleBasedNormalForm_eq_of_homotopic
-  normal_equality_scoped := circleBasedNormalForm_eq_scoped
+  normalCode := circleBasedNormalCode
+  representative := circleBasedNormalRepresentative
+  normal_scoped := circleBasedNormalCode_scoped
+  semantic_separation := circleBasedNormalCode_eq_of_homotopic
 
 /-! ## The loop quotient seen by the scoped carrier -/
 
