@@ -49,6 +49,7 @@ arXiv-*.tar
 *.pdf
 !paper/svk/main.pdf
 !paper/svk/response_to_reviewer.pdf
+!output/pdf/topological-computational-paths.pdf
 .claude/
 .git.old/
 CLAUDE.md
