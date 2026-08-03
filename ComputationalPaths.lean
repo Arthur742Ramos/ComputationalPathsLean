@@ -52,6 +52,14 @@ import ComputationalPaths.CwF
 import ComputationalPaths.Examples
 import ComputationalPaths.Path.HIT
 import ComputationalPaths.Path.Homotopy
+import ComputationalPaths.Path.Topology.ScopedGeometricRewrite
+import ComputationalPaths.Path.Topology.ScopedGeometricRewriteQuotient
+import ComputationalPaths.Path.Topology.ScopedGeometricRewriteGroupoid
+import ComputationalPaths.Path.Topology.ScopedGeometricRewriteComparison
+import ComputationalPaths.Path.Topology.ScopedGeometricRewriteFundamental
+import ComputationalPaths.Path.Topology.ScopedGeometricRewriteFunctor
+import ComputationalPaths.Path.Topology.ScopedGeometricRewriteCircle
+import ComputationalPaths.Path.Topology.TopologicalTorusScoped
 import ComputationalPaths.Path.OmegaGroupoidCompPaths
 import ComputationalPaths.Path.Rewriting
 import ComputationalPaths.Path.Transport

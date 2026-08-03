@@ -628,6 +628,19 @@ theorem windingPath_refl :
   rw [← h]
   exact windingPath_standardLoop 0
 
+/-! ## Winding of reversed loops -/
+
+theorem windingPath_symm
+    (γ : _root_.Path (0 : TopologicalCircle) 0) :
+    windingPath γ.symm = -windingPath γ := by
+  have hcancelHomotopy : _root_.Path.Homotopic
+      (γ.trans γ.symm) (_root_.Path.refl (0 : TopologicalCircle)) :=
+    ⟨(_root_.Path.Homotopy.reflTransSymm γ).symm⟩
+  have hcancel := windingPath_eq_of_homotopic
+    hcancelHomotopy
+  rw [windingPath_trans, windingPath_refl] at hcancel
+  omega
+
 @[simp] theorem topologicalPiOneEquivInt_one :
     topologicalPiOneEquivInt.toFun (1 : TopologicalPiOne) = 0 := by
   change
