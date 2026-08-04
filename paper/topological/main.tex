@@ -1352,8 +1352,7 @@ Presentation and soundness &
 \LeanName{ScopedRwEq}, \LeanName{ScopedRwEq.sound}\\
 Weighted realization bridge &
 \LeanName{WeightedSlotReparam}, \LeanName{balancedSlotReparam},
-\LeanName{weightedConcatenationInvariant},
-\LeanName{weightedConcatenationInvariant\_balanced}\\
+\LeanName{weightedConcatenationInvariant}\\
 Quotient and final domain &
 \LeanName{scopedEquivalent}, \LeanName{ScopedClass},
 \LeanName{ScopedComposableClass}, \LeanName{scopedCompositionOnStrong}\\
@@ -1407,12 +1406,12 @@ The artifact implements the scoped-soundness induction with a parenthesized
 inductive \LeanName{GeometricTrace} representation, whose realization uses
 the fixed interval-path concatenation operation recursively.  The separate
 \LeanName{WeightedSlotReparam}, \LeanName{balancedSlotReparam},
-\LeanName{weightedConcatenationInvariant}, and
-\LeanName{weightedConcatenationInvariant\_balanced} declarations formalize
-the endpoint-preserving reparametrization bridge, including the endpoint-fixed
-null-homotopy hypotheses for zero slots.  Thus the artifact checks the
-corresponding soundness and quotient interfaces while the manuscript presents
-the flat-word strictification at the mathematical level.
+\LeanName{weightedConcatenationInvariant} declarations formalize the
+endpoint-preserving reparametrization bridge, including the endpoint-fixed
+null-homotopy hypotheses for zero slots; the artifact also includes the
+concrete positive-slot specialization used by the flat-word model.  Thus the
+artifact checks the corresponding soundness and quotient interfaces while the
+manuscript presents the flat-word strictification at the mathematical level.
 
 The realized fundamental-groupoid bridge identifies the quotient of realized
 open paths with the range of the endpoint-and-homotopy code in Mathlib's
@@ -1423,9 +1422,9 @@ formalized comparison is a groupoid morphism on the same final domain as the
 mathematical theorem.
 
 The Lean artifact accompanying this manuscript is archived as
-\href{https://doi.org/10.5281/zenodo.21781777}
-{\nolinkurl{doi:10.5281/zenodo.21781777}} and corresponds to the immutable tag
-\texttt{topological-paper-v1} in the
+\href{https://doi.org/10.5281/zenodo.21797011}
+{\nolinkurl{doi:10.5281/zenodo.21797011}} and corresponds to the immutable tag
+\texttt{topological-paper-v2} in the
 \href{https://github.com/Arthur742Ramos/ComputationalPathsLean}{GitHub repository}.
 The literal root reproducibility command is \texttt{lake build}; focused module
 commands are listed in the artifact README and can be run independently.
