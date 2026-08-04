@@ -423,6 +423,7 @@ The current Lean artifact checks the dependency chain as follows.
 | Mathematical layer | Checked declarations |
 | --- | --- |
 | Presentation and soundness | `ScopedGeometricRewritePresentation`, `ScopedRwEq`, `ScopedRwEq.sound` |
+| Weighted realization bridge | `WeightedSlotReparam`, `balancedSlotReparam`, `weightedConcatenationInvariant`, `weightedConcatenationInvariant_balanced` |
 | Rewrite quotient | `scopedEquivalent`, `scopedClassTopologicalSpace`, `scopedSrc`, `scopedTgt`, `scopedSymm` |
 | Final and ordinary composable domains | `ScopedComposableClass`, `ScopedComposablePair`, `scopedCompositionFromComposable`, `ScopedStrongComposablePair`, `scopedCompositionOnStrong`, `scopedPairToOrdinary`, `scopedOrdinaryToFinal`, `scopedOrdinaryPairMap` |
 | Groupoid laws and topology comparison | `TopologicalWeakCompPathCertificate`, `topologicalWeakCompPathCertificate`, `TotalOpenGeometricCompPath.continuous_totalRefl`, `TotalOpenGeometricCompPath.continuous_totalTrans`, `TotalOpenGeometricCompPath.continuous_totalSymm`, `scopedFinalTopologicalGroupoidCertificate`, `scopedProductCompatibility_iff_four_way`, `scopedFinalOrdinaryHomeomorph`, `scopedProductCompatibility_of_open_pair_map`, `scopedProductCompatibility_of_compact_final_t2`, `scopedProductCompatibility_of_discrete_arrow_and_final_domain` |

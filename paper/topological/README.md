@@ -2,7 +2,9 @@
 
 This directory contains the mathematical design contract for the standalone
 paper.  The checked Lean implementation is in
-`ComputationalPaths/Path/Topology/ScopedGeometricRewrite*.lean` and is imported
+`ComputationalPaths/Path/Topology/ScopedGeometricRewrite*.lean`, together with
+the weighted-realization bridge in
+`ComputationalPaths/Path/Topology/WeightedConcatenation.lean`, and is imported
 by `ComputationalPaths.lean`.
 
 The implementation has two explicit levels of composition:
@@ -46,6 +48,7 @@ The focused checks are:
 
 ```text
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewrite
+lake build ComputationalPaths.Path.Topology.WeightedConcatenation
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteQuotient
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteGroupoid
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteComparison
@@ -59,7 +62,8 @@ Declaration-level audits for the new implementation are:
 
 ```text
 rg -n '^[[:space:]]*(sorry|admit|axiom)' \
-  ComputationalPaths/Path/Topology/ScopedGeometricRewrite*.lean
+  ComputationalPaths/Path/Topology/ScopedGeometricRewrite*.lean \
+  ComputationalPaths/Path/Topology/WeightedConcatenation.lean
 git diff --check
 ```
 

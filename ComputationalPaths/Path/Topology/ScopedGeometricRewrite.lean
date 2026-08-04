@@ -1,4 +1,5 @@
 import ComputationalPaths.Path.Topology.TotalCompPathHomotopyQuotient
+import ComputationalPaths.Path.Topology.WeightedConcatenation
 import ComputationalPaths.Path.Rewrite.RwEq
 
 /-!
