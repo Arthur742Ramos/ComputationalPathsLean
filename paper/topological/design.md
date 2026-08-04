@@ -410,7 +410,8 @@ implementation architecture. The appendix and artifact may provide:
   unfinished proofs; and
 - the immutable source snapshot for the released artifact.  It is the tag
   `topological-paper-v1` in the public repository
-  `https://github.com/Arthur742Ramos/ComputationalPathsLean`.
+  `https://github.com/Arthur742Ramos/ComputationalPathsLean`, archived at
+  DOI `10.5281/zenodo.21781777`.
 
 Implementation-specific certificate records, source-file names, and phase
 labels do not belong in theorem statements or the mathematical narrative.

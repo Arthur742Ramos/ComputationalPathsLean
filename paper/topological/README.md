@@ -79,6 +79,7 @@ latexmk -pdf -interaction=nonstopmode -halt-on-error main.tex
 The checked output is published at
 `output/pdf/topological-computational-paths.pdf`.
 
-The exact source snapshot for this manuscript is the immutable tag
+The exact source snapshot for the released Lean artifact is the immutable tag
 `topological-paper-v1` in
-`https://github.com/Arthur742Ramos/ComputationalPathsLean`.
+`https://github.com/Arthur742Ramos/ComputationalPathsLean`. The archived
+artifact has DOI [`10.5281/zenodo.21781777`](https://doi.org/10.5281/zenodo.21781777).
