@@ -94,7 +94,7 @@ The realization map to geometric homotopy classes is a continuous groupoid
 morphism and is faithful exactly under a separate geometric-completeness
 condition.  In the universal presentation, a continuous section identifies
 the coherent-path quotient homeomorphically with the usual quotient-topologized
-fundamental groupoid.  We then give finite-generator circle and actual-torus
+fundamental groupoid.  We then give finite-generator circle and genuine torus
 examples, with winding-based normal forms and classifications by $\mathbb Z$
 and $\mathbb Z^2$.  A Lean 4.24.0 development checks the theorem package; the
 mathematical presentation is independent of the implementation.
@@ -248,7 +248,17 @@ Use the natural zero-length conventions
 $\alpha\star_{0,n}\beta=\beta$ and
 $\alpha\star_{m,0}\beta=\alpha$; when $m=n=0$, use the constant path at
 the common endpoint.  Thus the two input paths occupy $m$ and $n$ equal
-word slots, respectively.
+word slots, respectively.  For composable paths $\alpha$, $\beta$, and
+$\gamma$ occupying $m$, $n$, and $k$ word slots, respectively, this gives the
+following literal identities, including the zero-length cases under the stated
+conventions:
+\[
+ (\alpha\star_{m,n}\beta)\star_{m+n,k}\gamma
+ =\alpha\star_{m,n+k}(\beta\star_{n,k}\gamma),
+ \qquad
+ (\alpha\star_{m,n}\beta)^{-1}
+ =\beta^{-1}\star_{n,m}\alpha^{-1}.
+\]
 
 \begin{definition}[geometric trace]
 For $n\geq 1$, let $W_n\subseteq\widetilde E^n$ be the subspace of composable
