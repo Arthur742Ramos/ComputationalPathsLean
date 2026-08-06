@@ -52,55 +52,63 @@
   {Topological Semantics for Scoped Computational Paths}
 
 \author{Arthur Freitas Ramos}
-\address{Microsoft, USA}
-\email{arfreita@microsoft.com}
 
 \author{Ruy J. G. B. de Queiroz}
-\address{Centro de Inform\'atica, Universidade Federal de Pernambuco, Brazil}
-\email{ruy@cin.ufpe.br}
 
 \author{Anjolina Grisi de Oliveira}
-\address{Centro de Inform\'atica, Universidade Federal de Pernambuco, Brazil}
-\email{ago@cin.ufpe.br}
 
 \author{Tiago M. L. de Veras}
-\address{Departamento de Matem\'atica, Universidade Federal Rural de Pernambuco, Brazil}
-\email{tiago.veras@ufrpe.br}
 
 \renewcommand{\shortauthors}{Ramos et al.}
 
 \subjclass[2020]{Primary 03B38, 18N10, 54B30; Secondary 55Q05, 68V15}
-\keywords{computational paths, rewriting, fundamental groupoid, quotient topology, topological groupoid, formalized mathematics}
+\keywords{computational paths, rewriting, fundamental groupoid, quotient topology, topological groupoid}
 
 \begin{document}
 
 \raggedbottom
 
 \begin{abstract}
-Computational paths record equality as explicit finite traces of primitive
-steps.  We give a topological semantics for a scoped rewrite presentation
-whose steps have continuous geometric realizations and whose named rewrites
-carry endpoint-fixed homotopies.
+Computational paths record equality as explicit finite traces.  We give a
+topological semantics for scoped rewrite presentations whose steps have
+continuous realizations and whose named rewrites carry endpoint-fixed
+homotopies.
 
-For every presentation we construct a quotient arrow space with a canonical
-final-domain groupoid structure: multiplication is continuous on the quotient
-of explicitly composable representatives.  We prove an exact four-way
-criterion for this final composable topology to agree with the ordinary
-pullback topology, together with a compact-Hausdorff sufficient condition.
-Thus the unconditional construction exposes, rather than hides, the
-product-quotient issue in ordinary topological groupoids.
+A representative pairs a trace with a coherent interval path.  An initial
+topology records endpoints, word length, trace realization, and the chosen
+path.  Named rewrites alone generate syntactic identifications; arbitrary
+endpoint-fixed homotopies enter through a comparison map.
 
-The realization map to geometric homotopy classes is a continuous groupoid
-morphism and is faithful exactly under a separate geometric-completeness
-condition.  In the universal presentation, a continuous section identifies
-the coherent-path quotient homeomorphically with the usual quotient-topologized
-fundamental groupoid.  We then give finite-generator circle and genuine torus
-examples, with winding-based normal forms and classifications by $\mathbb Z$
-and $\mathbb Z^2$.  A Lean 4.24.0 development checks the theorem package; the
-mathematical presentation is independent of the implementation.
+Every presentation yields a quotient arrow space with a canonical
+final-domain groupoid structure, where multiplication is continuous on the
+quotient of explicitly composable representatives.  Four equivalent
+conditions characterize agreement with the ordinary pullback topology, and
+compact-Hausdorff hypotheses suffice.  For the universal presentation of the
+Hawaiian earring the based-loop comparison fails: the final pair topology is
+strictly finer.  This detects a genuine product-quotient obstruction.
+
+The realization map to geometric homotopy classes is continuous and faithful
+exactly under geometric completeness.  A continuous section identifies the
+universal coherent-path quotient with the usual quotient-topologized
+fundamental groupoid.  Normal-form certificates reduce completeness to
+terminating normalization plus semantic separation.  As validation,
+finite-generator based-loop presentations for the circle and torus recover
+$\mathbb Z$ and $\mathbb Z^2$.  A Lean 4.24.0 development checks the theorem
+package; the mathematical presentation is independent of the implementation.
 \end{abstract}
 
 \maketitle
+
+\begin{center}
+\footnotesize
+Arthur Freitas Ramos: Microsoft, USA; \texttt{arfreita@microsoft.com}\\
+Ruy J. G. B. de Queiroz and Anjolina Grisi de Oliveira: Centro de
+Inform\'atica, Universidade Federal de Pernambuco, Brazil;\\
+\texttt{ruy@cin.ufpe.br}, \texttt{ago@cin.ufpe.br}\\
+Tiago M. L. de Veras: Departamento de Matem\'atica, Universidade Federal
+Rural de Pernambuco, Brazil; \texttt{tiago.veras@ufrpe.br}\\[2pt]
+\emph{Corresponding author: Arthur Freitas Ramos}
+\end{center}
 
 \section{Introduction}
 
@@ -209,18 +217,20 @@ The contributions are grouped conceptually as follows.
   derivation relation, and realization soundness.  This supplies the syntax
   and the semantic induction principle for the rest of the paper.
 \item We construct the quotient arrow space and its canonical final-domain
-  topological groupoid, then isolate the ordinary-pullback issue.  The exact
-  four-way criterion, together with the compact-Hausdorff and discrete
-  sufficient conditions, identifies precisely when the two composable-pair
-  topologies agree.
+  topological groupoid, then isolate the ordinary-pullback issue.  Four
+  equivalent formulations identify the compatibility obstruction; the
+  compact-Hausdorff and discrete results give positive cases, while the
+  Hawaiian earring gives a strict negative case.
 \item We prove functoriality, the realization comparison, the universal
   presentation theorem, and an effective normal-form criterion for geometric
   completeness.  The comparison preserves the final composable-domain
   operation, not only a set-level map on arrows.
-\item We apply the criterion to the additive circle and the genuine
-  topological torus, obtaining $\Z$ and $\Z^2$ classifications from winding
-  normal forms.  A Lean 4.24.0 artifact checks the theorem package while the
-  mathematical arguments remain independent of the implementation.
+\item We apply the normal-form criterion on the based-loop fibers of the
+  additive circle and the genuine topological torus, obtaining $\Z$ and
+  $\Z^2$ classifications from winding normal forms.  These are validation
+  cases for the semantic framework, not new calculations of the classical
+  fundamental groups.  A Lean 4.24.0 artifact checks the theorem package while
+  the mathematical arguments remain independent of the implementation.
 \end{enumerate}
 
 Our earlier work supplies the ingredients that this paper organizes into a
@@ -256,9 +266,11 @@ same goal by changing the topology on the fundamental-groupoid quotient
 \cite{PakdamanShahini21,PakdamanShahini23}.  By contrast, the quotient topology
 on path classes is intentionally retained here: the quotient-topology
 literature shows that even the based fundamental group can lose joint
-multiplication continuity \cite{BrazasFabel13}.  Our final-domain construction
-isolates that obstruction as the product-quotient comparison theorem instead
-of silently replacing the quotient topology with a better-behaved one.
+multiplication continuity \cite{Fabel11,BrazasFabel13}.  Our final-domain
+construction isolates that obstruction as the product-quotient comparison
+theorem instead of silently replacing the quotient topology with a
+better-behaved one; Proposition~\ref{prop:hawaiian-earring} makes the
+connection explicit for the Hawaiian earring.
 
 The paper is organized as follows.  Section~2 defines geometric traces,
 scoped presentations, and realization soundness.  Section~3 constructs the
@@ -312,6 +324,19 @@ conventions:
  (\alpha\star_{m,n}\beta)^{-1}
  =\beta^{-1}\star_{n,m}\alpha^{-1}.
 \]
+
+\begin{example}[Reading the weights]
+Suppose that $\alpha$ occupies two word slots and $\beta$ occupies one.
+Then $\alpha\star_{2,1}\beta$ follows $\alpha$ until time $2/3$ and
+follows $\beta$ on the remaining third of the interval.  If $\gamma$ also
+occupies one slot, strict reassociation is visible in the concrete identity
+\[
+  (\alpha\star_{2,1}\beta)\star_{3,1}\gamma
+  =\alpha\star_{2,2}(\beta\star_{1,1}\gamma).
+\]
+Thus the weights record word-slot lengths, not an additional choice of
+parenthesization or of geometric homotopy witness.
+\end{example}
 
 \begin{definition}[geometric trace]
 For $n\geq 1$, let $W_n\subseteq\widetilde E^n$ be the subspace of composable
@@ -384,6 +409,28 @@ computational realization, and $\gamma$ observes the movement of the chosen
 geometric representative.  The initial topology is exactly the coarsest
 topology with these observations, while the scoped quotient relation below
 controls which computational traces are identified.
+
+The word ``coarsest'' is the relevant canonicity claim.  It is relative to the
+chosen semantic observables, not a claim that no other useful topology exists.
+For example, the subspace topology inherited from
+$\mathsf{Tr}_{\mathcal P}\times X^I$ would additionally make the complete word
+$p$ observable.  The topology used here deliberately retains only the
+endpoints, length, realization, and coherent representative needed by the
+semantic operations.  Among topologies on the same carrier making this code
+continuous, the initial topology is minimal.
+
+\begin{example}[One trace, two coherent representatives]
+Let $p$ be a trace and let $\gamma$ and $\delta$ be endpoint-fixed homotopic
+representatives with
+\[
+  \gamma\simeq_{\partial I}|p|\simeq_{\partial I}\delta.
+\]
+Then $(p,\gamma)$ and $(p,\delta)$ are both points of $T$.  The initial
+topology may observe the difference between their fifth coordinates, but the
+scoped quotient identifies them because the trace coordinate is the same.
+This is why a coherent representative is useful before quotienting without
+becoming extra data in a quotient arrow.
+\end{example}
 
 For $u=(p,\gamma)\in T$, put $s(u)=s(p)$ and $t(u)=t(p)$, and give
 \[
@@ -700,6 +747,16 @@ open sets.  The map $j$ is always continuous because the final topology is at
 least as fine; compatibility says that the ordinary topology detects exactly
 the same opens, so that $j^{-1}$ is continuous as well.
 
+\begin{example}[A transparent compatible case]
+If the relevant trace, coherent-carrier, and quotient spaces are discrete---for
+example, in a finite discrete presentation with only constant geometric
+paths---then $T^{(2)}$, $G_{\mathcal P}^{(2),\Fin}$, and
+$G_{\mathcal P}^{(2),\Ord}$ are discrete.  Both pair maps are then quotient
+maps, and $j$ is automatically a homeomorphism.  This toy case illustrates
+the compatibility conclusion; the theorem is needed because discreteness is
+not available for general geometric presentations.
+\end{example}
+
 \begin{theorem}[ordinary/final comparison]
 For every presentation $\mathcal P$, the following are equivalent:
 \begin{enumerate}[label=(\arabic*),leftmargin=2.2em]
@@ -728,6 +785,15 @@ groupoid laws, but its multiplication domain carries the final topology from
 explicitly composable representatives.
 \end{remark}
 
+\begin{remark}[comparison with convenient categories]
+One can instead change the ambient category of spaces, for example by using
+compactly generated spaces and their $k$-ified products \cite{May99}.  That
+remedy changes the topology assigned to the ordinary product.  The present
+construction stays in $\Top$ and records the final topology forced by the
+chosen representative quotient, so the failure of the ordinary product
+remains visible.  No general identification of these two remedies is claimed.
+\end{remark}
+
 \begin{figure}[ht]
 \centering
 \[
@@ -746,6 +812,9 @@ G_{\mathcal P}^{(2),\Fin}$ is continuous.  The upper quotient is therefore
 the unconditional composition domain, while the lower pullback is the
 ordinary topological-groupoid domain.
 \caption{Final versus ordinary composable-pair topologies.}
+% Alt text: A commutative square compares the quotient of explicitly composable
+% representatives with the ordinary pullback of quotient arrows.  The upper
+% quotient maps to the lower pullback through the canonical map j.
 \label{fig:final-ordinary}
 \end{figure}
 \FloatBarrier
@@ -814,11 +883,75 @@ Hausdorff.  The compact-Hausdorff theorem applies.
 
 The compact-Hausdorff theorem is the promised positive class: it establishes
 the ordinary-pullback upgrade from independently checkable properties of the
-actual presentation, rather than leaving the four-way criterion as the only
+actual presentation, rather than leaving the equivalent formulations as the only
 result.  Its proof is the standard compact-to-Hausdorff continuous-bijection
 argument; the point here is the resulting compatibility theorem for this
 presentation framework.  The final-domain theorem remains the general
 statement and does not need these hypotheses.
+
+\subsection{A strict failure: the Hawaiian earring}
+
+Let
+\[
+  \mathbb H=\bigcup_{n\geq 1}
+  \left\{(x,y)\in\mathbb R^2:
+  \left(x-\frac1n\right)^2+y^2=\frac1{n^2}\right\}
+\]
+be the Hawaiian earring, based at $x_0=(0,0)$.  Write
+$\Omega=\Omega(\mathbb H,x_0)$ for its based loop space with the compact-open
+topology and
+\[
+  q_\Omega:\Omega\longrightarrow\pi_1^q(\mathbb H,x_0)
+\]
+for the endpoint-fixed homotopy quotient.  Fabel proved that
+$q_\Omega\times q_\Omega$ is not a quotient map and that multiplication in
+$\pi_1^q(\mathbb H,x_0)$ is not continuous \cite{Fabel11}.
+
+\begin{proposition}[Hawaiian-earring obstruction]
+\label{prop:hawaiian-earring}
+Apply the universal presentation of Section~7 fiberwise at $x_0$, giving the
+based coherent carrier $T_0$ and its scoped quotient $G_0$.  Then the ordinary
+pair map
+\[
+  q_0\times q_0:T_0\times T_0\longrightarrow G_0\times G_0
+\]
+is not quotient.  Consequently the final topology on composable pairs is
+strictly finer than the ordinary product topology, and multiplication on the
+ordinary product is discontinuous.
+\end{proposition}
+
+\begin{proof}
+The projection $\pi:T_0\to\Omega$, $(p,\gamma)\mapsto\gamma$, has the
+continuous section $\sigma(\gamma)=(\langle\gamma\rangle,\gamma)$ from
+Section~7.  The universal-completion homeomorphism of
+Theorem~\ref{thm:universal-completion},
+\[
+  h:G_0\longrightarrow\pi_1^q(\mathbb H,x_0)
+\]
+satisfies $h\circ q_0=q_\Omega\circ\pi$.  Suppose that $q_0\times q_0$ were
+quotient.  Postcomposition with the homeomorphism $h\times h$ would make
+\[
+  (q_\Omega\times q_\Omega)\circ(\pi\times\pi)
+\]
+a quotient map.  If $(q_\Omega\times q_\Omega)^{-1}(U)$ were open, its
+preimage under the continuous map $\pi\times\pi$ would therefore be open;
+the quotient criterion for the displayed composite would force $U$ to be
+open.  Hence $q_\Omega\times q_\Omega$ would be quotient, contradicting
+Fabel's theorem.
+
+The ordinary/final comparison theorem now shows that the continuous identity
+from the final pair domain to the ordinary pair domain is not a
+homeomorphism.  Since the final topology is always at least as fine, it is
+strictly finer here.  Finally, $h$ preserves loop multiplication, so
+continuity of ordinary-product multiplication on $G_0$ would imply continuity
+on $\pi_1^q(\mathbb H,x_0)$, again contradicting Fabel's theorem.
+\end{proof}
+
+This example is a diagnostic application rather than a new theorem about the
+Hawaiian earring: the external non-quotient result is classical, while the
+proposition locates it exactly at the comparison map $j$.  It also shows why
+the final-domain construction is not merely terminological---there are natural
+presentations for which the two topologies provably differ.
 
 \section{Functoriality}
 
@@ -1060,7 +1193,7 @@ the section $\sigma$ supplies the homeomorphism between them.  The section is
 what makes the topological identification explicit rather than merely a
 set-theoretic comparison.
 
-\begin{theorem}[universal completion]
+\begin{theorem}[universal completion]\label{thm:universal-completion}
 For the universal presentation $\mathcal U_X$, scoped rewrite equality of
 parallel traces is equivalent to endpoint-fixed homotopy of their realizations.
 Consequently,
@@ -1335,14 +1468,20 @@ computational traces at the presented level \cite{MacLane98,Brown06}.
 The mathematical statements above are independent of the implementation.  A
 Lean 4.24.0 development with Mathlib 4.24.0 checks the construction in the
 scoped-rewrite modules.
+The Lean artifact now checks the transfer argument in
+\LeanName{ScopedGeometricRewriteHawaiianEarring}:
+an externally supplied non-quotient product map forces failure of ordinary
+pullback compatibility, and external multiplication discontinuity transfers
+through a homeomorphic comparison.  Fabel's classical Hawaiian-earring facts
+remain external inputs rather than being reproved in Lean.
 The separate genuine-torus certificate is in
 \LeanName{ComputationalPaths/Path/Topology/TopologicalTorusScoped.lean}.
 The root import hub is \LeanName{ComputationalPaths.lean}.  The principal
 declaration layers are listed in Table~\ref{tab:declarations}.
 
-\begin{table}[ht]
+\begin{table}[p]
 \centering
-\small
+\scriptsize
 \begin{tabular}{>{\raggedright\arraybackslash}p{0.29\linewidth}>{\raggedright\arraybackslash}p{0.63\linewidth}}
 \toprule
 Mathematical layer & Checked implementation declarations\\
@@ -1375,6 +1514,14 @@ Comparison and completeness &
 \LeanName{comparisonHomeomorph_of_complete},
 \LeanName{ScopedGeometricNormalFormCertificate},
 \LeanName{geometricCompleteness_of_normalForm}\\
+Hawaiian-earring transfer &
+\LeanName{QuotientObstructionTransfer},
+\LeanName{QuotientObstructionTransfer.external_isQuotientMap_of_source_isQuotientMap},
+\LeanName{QuotientObstructionTransfer.not_isQuotientMap_quotientMap},
+\LeanName{MultiplicationComparison},
+\LeanName{MultiplicationComparison.not_source_continuous_of_not_external_continuous},
+\LeanName{ScopedGeometricRewrite.not_productQuotientCompatibility_of_transfer},
+\LeanName{ScopedGeometricRewrite.not_final_topology_agreement_of_transfer}\\
 Universal completion &
 \LeanName{universalPresentation},
 \LeanName{universalScopedEquivalent_iff_totalEquivalent},
@@ -1439,6 +1586,12 @@ paths and the Lean theorem prover
 it is not used as a substitute for the mathematical definitions or arguments
 in the main text.
 
+\section*{Acknowledgements}
+AI-assisted tools were used during manuscript preparation for editorial
+revision, reference auditing, and software and documentation support.  The
+authors reviewed the resulting text and take responsibility for the final
+content.
+
 \FloatBarrier
 \section{Conclusion}
 
@@ -1450,14 +1603,15 @@ product-quotient condition needed for the ordinary pullback topology.
 
 The universal presentation identifies ordinary quotient-topologized
 fundamental groupoids as geometric completions of scoped trace systems.  The
-compact-Hausdorff and discrete finite-presentation theorems give a positive
-ordinary-pullback class, while the effective normal-form criterion turns
-concrete reductions into geometric completeness.  The finite-generator circle
-and genuine torus calculations show that the framework retains nontrivial
-topological information without silently identifying scoped syntax with
-ambient equality.
+compact-Hausdorff and discrete finite-presentation theorems give positive
+ordinary-pullback classes, while the Hawaiian earring shows that the
+final/ordinary distinction can be strict.  The effective normal-form criterion
+turns concrete reductions into geometric completeness.  The finite-generator
+circle and genuine torus based-loop calculations validate that the framework
+retains nontrivial topological information without silently identifying scoped
+syntax with ambient equality.
 
-\bibliographystyle{alpha}
+\bibliographystyle{amsplain}
 \begingroup
 \small
 \bibliography{../refs}

@@ -4,8 +4,10 @@ This directory contains the mathematical design contract for the standalone
 paper.  The checked Lean implementation is in
 `ComputationalPaths/Path/Topology/ScopedGeometricRewrite*.lean`, together with
 the weighted-realization bridge in
-`ComputationalPaths/Path/Topology/WeightedConcatenation.lean`, and is imported
-by `ComputationalPaths.lean`.
+`ComputationalPaths/Path/Topology/WeightedConcatenation.lean` and the
+Hawaiian-earring transfer module
+`ComputationalPaths/Path/Topology/ScopedGeometricRewriteHawaiianEarring.lean`,
+and is imported by `ComputationalPaths.lean`.
 
 The implementation has two explicit levels of composition:
 
@@ -30,6 +32,9 @@ The strengthened artifact additionally checks:
 - the based circle normal-form certificate; and
 - the genuine product-torus winding equivalence in
   `TopologicalTorusScoped.lean`.
+- the quotient-obstruction transfer from an externally supplied Fabel-style
+  non-quotient product theorem to failure of ordinary-pullback compatibility
+  and discontinuity of ordinary multiplication.
 
 The manuscript's main mathematical example uses finite oriented circle and
 torus generators.  The integer-indexed circle module is the completed normal
@@ -54,6 +59,7 @@ lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteGroupoid
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteComparison
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteFunctor
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteFundamental
+lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteHawaiianEarring
 lake build ComputationalPaths.Path.Topology.ScopedGeometricRewriteCircle
 lake build ComputationalPaths.Path.Topology.TopologicalTorusScoped
 ```
@@ -71,7 +77,9 @@ The paper’s mathematical claims and the Lean declaration map are recorded in
 [`design.md`](design.md).  This artifact does not claim a discrete topology
 for the circle’s integer normal form, and it does not identify the ordinary
 and final composable-pair topologies without the proved compatibility
-criterion.
+criterion.  The Hawaiian-earring module checks the transfer argument from
+external non-quotient and discontinuity facts; it does not reprove Fabel's
+classical Hawaiian-earring theorem.
 
 The standalone manuscript is [`main.tex`](main.tex). Reproduce the PDF from
 this directory with:
